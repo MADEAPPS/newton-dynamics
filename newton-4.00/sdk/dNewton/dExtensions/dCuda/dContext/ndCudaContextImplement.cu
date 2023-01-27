@@ -64,6 +64,29 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//}
 	//
 	//*m_sceneInfoCpu = ndCudaSceneInfo();
+
+	/// ***********************************
+	m_buf0.SetCount(16);
+	m_buf1.SetCount(16);
+	m_sortPrefixBuffer.SetCount(64 * 1024);
+
+	int m_buffer0[1024];
+	for (int i = 0; i < m_buf0.GetCount(); i++)
+	{
+		m_buffer0[i] = 0;
+	}
+	m_buffer0[0] = 2;
+	m_buffer0[1] = 1;
+	m_buffer0[2] = 2;
+	m_buffer0[3] = 1;
+	m_buffer0[4] = 2;
+	m_buffer0[5] = 1;
+	m_buffer0[6] = 3;
+	m_buffer0[7] = 2;
+	m_buffer0[8] = 1;
+	m_buffer0[9] = 2;
+	m_buffer0[10] = 3;
+	m_buf0.ReadData(m_buffer0, 16);
 }
 
 ndCudaContextImplement::~ndCudaContextImplement()
@@ -86,7 +109,6 @@ ndCudaContextImplement::~ndCudaContextImplement()
 	//{
 	//	ndAssert(0);
 	//}
-	delete m_device;
 }
 
 const char* ndCudaContextImplement::GetStringId() const
@@ -353,4 +375,16 @@ void ndCudaContextImplement::Begin()
 	//}
 	//
 	//ndCudaBeginFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo);
+
+	auto GetRadix = []  __device__(int item)
+	{
+		return item & 0x07;
+	};
+
+	ndCountingSort<int, 3>(m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
+
+
+	int xxxxxxxxxx[1024];
+	cudaDeviceSynchronize();
+	m_sortPrefixBuffer.WriteData(xxxxxxxxxx, 16);
 }

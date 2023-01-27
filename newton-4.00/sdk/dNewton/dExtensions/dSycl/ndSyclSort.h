@@ -35,7 +35,11 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<int>& 
 template <class T, class ndEvaluateKey, int exponentRadix>
 void ndCountingSort(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<T>& dst, sycl::buffer<int>& scansBuffer);
 
-// implementation support functions
+// *****************************************************************
+// 
+// support functions implementation 
+//
+// *****************************************************************
 template <class T, class ndEvaluateKey, int exponentRadix>
 void SyclCountItems(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<int>& scansBuffer);
 

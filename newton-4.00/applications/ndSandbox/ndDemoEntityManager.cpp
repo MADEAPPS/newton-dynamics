@@ -427,8 +427,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showConcaveEdge = true;
 	//m_autoSleepMode = false;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
-	m_solverMode = ndWorld::ndSyclSolverCpu;
-	//m_solverMode = ndWorld::ndCudaSolver;
+	//m_solverMode = ndWorld::ndSyclSolverCpu;
+	m_solverMode = ndWorld::ndCudaSolver;
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
 	//m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverPasses = 4;

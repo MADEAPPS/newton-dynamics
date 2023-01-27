@@ -27,26 +27,18 @@
 void CudaSetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free);
 
 ndCudaContext::ndCudaContext()
-	:m_implement(nullptr)
+	:m_device (new ndCudaDevice)
+	,m_implement(nullptr)
 {
-	ndCudaDevice* const device = new ndCudaDevice;
-	int campbility = device->m_prop.major * 100 + device->m_prop.minor;
+	int campbility = m_device->m_prop.major * 100 + m_device->m_prop.minor;
 	// go as far back as 5.2 Maxwell GeForce GTX 960 or better.
 	if (campbility >= 600)
 	{
 		cudaError_t cudaStatus = cudaSetDevice(0);
 		if (cudaStatus == cudaSuccess)
 		{
-			m_implement = new ndCudaContextImplement(device);
+			m_implement = new ndCudaContextImplement(m_device);
 		}
-		else
-		{
-			delete device;
-		}
-	}
-	else
-	{
-		delete device;
 	}
 }
 
@@ -56,6 +48,7 @@ ndCudaContext::~ndCudaContext()
 	{
 		delete m_implement;
 	}
+	delete m_device;
 }
 
 void* ndCudaContext::operator new (size_t size)

@@ -30,9 +30,11 @@
 #include "ndCudaSceneInfo.h"
 #include "ndCudaIntrinsics.h"
 
-#if 0
-#define D_COUNTING_SORT_BLOCK_SIZE		(1<<10)
 
+//#define D_COUNTING_SORT_BLOCK_SIZE		(1<<8)
+#define D_COUNTING_SORT_BLOCK_SIZE		(8)
+
+#if 0
 __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount);
 
 
@@ -208,5 +210,42 @@ __global__ void ndCudaCountingSort(
 	}
 }
 #endif
+
+
+// *****************************************************************
+// 
+// support functions implementation 
+//
+// *****************************************************************
+
+template <typename BufferItem, typename SortKeyPredicate>
+__global__ void ndCudaCountItems(const BufferItem* src, int size, int* histogram, SortKeyPredicate getRadix)
+{
+	__shared__  unsigned cacheBuffer[D_COUNTING_SORT_BLOCK_SIZE];
+
+	unsigned blockId = blockIdx.x;
+	unsigned threadId = threadIdx.x;
+
+	cacheBuffer[threadId] = 0;
+	__syncthreads();
+
+	unsigned index = threadId + blockDim.x * blockId;
+	if (index < size)
+	{
+		int radix = getRadix(src[index]);
+		atomicAdd(&cacheBuffer[radix], 1);
+	}
+	__syncthreads();
+
+	histogram[index] = cacheBuffer[threadId];
+}
+
+template <class T, int exponentRadix, typename ndEvaluateRadix>
+void ndCountingSort(ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix)
+{
+	ndAssert(src.m_size == dst.m_size);
+	int blocks = (src.m_size + D_COUNTING_SORT_BLOCK_SIZE - 1) / D_COUNTING_SORT_BLOCK_SIZE;
+	ndCudaCountItems << <blocks, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (src.m_array, src.m_size, scansBuffer.m_array, evaluateRadix);
+}
 
 #endif

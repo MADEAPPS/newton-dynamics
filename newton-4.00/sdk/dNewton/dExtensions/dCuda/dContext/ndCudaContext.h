@@ -24,7 +24,7 @@
 
 #include "ndCudaStdafx.h"
 
-//class ndCudaDevice;
+class ndCudaDevice;
 //class ndCudaBodyProxy;
 //class ndCudaSpatialVector;
 class ndCudaContextImplement;
@@ -64,7 +64,7 @@ class ndCudaContext
 
 	D_CUDA_API static void SetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free);
 
-	//ndCudaDevice* m_device;
+	ndCudaDevice* m_device;
 	ndCudaContextImplement* m_implement;
 };
 

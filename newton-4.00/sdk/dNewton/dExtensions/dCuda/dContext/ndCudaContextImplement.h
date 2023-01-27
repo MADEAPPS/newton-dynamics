@@ -83,6 +83,12 @@ class ndCudaContextImplement
 	//unsigned m_frameCounter;
 
 	ndCudaDevice* m_device;
+
+	/// **********************
+	ndCudaDeviceBuffer<int> m_buf0;
+	ndCudaDeviceBuffer<int> m_buf1;
+	ndCudaDeviceBuffer<int> m_sortPrefixBuffer;
+
 };
 
 #endif
