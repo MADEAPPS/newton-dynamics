@@ -381,7 +381,7 @@ void ndCudaContextImplement::Begin()
 		return item & 0x07;
 	};
 
-	ndCountingSort<int, 3>(m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
+	ndCountingSort<int, 3>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
 
 
 	int xxxxxxxxxx[1024];

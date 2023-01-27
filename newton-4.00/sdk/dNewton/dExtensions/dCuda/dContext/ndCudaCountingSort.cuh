@@ -31,8 +31,7 @@
 #include "ndCudaIntrinsics.h"
 
 
-//#define D_COUNTING_SORT_BLOCK_SIZE		(1<<8)
-#define D_COUNTING_SORT_BLOCK_SIZE		(8)
+#define D_COUNTING_SORT_BLOCK_SIZE		(1<<8)
 
 #if 0
 __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount);
@@ -212,6 +211,10 @@ __global__ void ndCudaCountingSort(
 #endif
 
 
+template <class T, int exponentRadix, typename ndEvaluateRadix>
+void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix);
+
+
 // *****************************************************************
 // 
 // support functions implementation 
@@ -221,15 +224,15 @@ __global__ void ndCudaCountingSort(
 template <typename BufferItem, typename SortKeyPredicate>
 __global__ void ndCudaCountItems(const BufferItem* src, int size, int* histogram, SortKeyPredicate getRadix)
 {
-	__shared__  unsigned cacheBuffer[D_COUNTING_SORT_BLOCK_SIZE];
+	__shared__  int cacheBuffer[D_COUNTING_SORT_BLOCK_SIZE];
 
-	unsigned blockId = blockIdx.x;
-	unsigned threadId = threadIdx.x;
+	int blockId = blockIdx.x;
+	int threadId = threadIdx.x;
 
 	cacheBuffer[threadId] = 0;
 	__syncthreads();
 
-	unsigned index = threadId + blockDim.x * blockId;
+	int index = threadId + blockDim.x * blockId;
 	if (index < size)
 	{
 		int radix = getRadix(src[index]);
@@ -240,12 +243,49 @@ __global__ void ndCudaCountItems(const BufferItem* src, int size, int* histogram
 	histogram[index] = cacheBuffer[threadId];
 }
 
+template <typename BufferItem, typename SortKeyPredicate>
+__global__ void ndAddPartialScans(const BufferItem* src, int size, int* histogram, SortKeyPredicate getRadix)
+{
+	int sum = 0;
+	int offset = 0;
+	int threadId = threadIdx.x;
+	int radixSize = blockDim.x;
+	int blockCount = (size + radixSize - 1) / radixSize;
+	__shared__  int localPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1];
+
+	localPrefixScan[threadId] = 0;
+	for (int i = 0; i < blockCount; i++)
+	{
+		int count = histogram[offset + threadId];
+		histogram[offset + threadId] = sum;
+		sum += count;
+		offset += radixSize;
+	}
+	histogram[offset + threadId] = sum;
+	localPrefixScan[radixSize / 2 + threadId + 1] = sum;
+
+	for (int i = 1; i < radixSize; i = i << 1)
+	{
+		int sum = localPrefixScan[radixSize / 2 + threadId] + localPrefixScan[radixSize / 2 - i + threadId];
+		__syncthreads();
+		localPrefixScan[radixSize / 2 + threadId] = sum;
+		__syncthreads();
+	}
+	histogram[offset + radixSize + threadId] = localPrefixScan[radixSize / 2 + threadId];
+}
+
 template <class T, int exponentRadix, typename ndEvaluateRadix>
-void ndCountingSort(ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix)
+void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix)
 {
 	ndAssert(src.m_size == dst.m_size);
-	int blocks = (src.m_size + D_COUNTING_SORT_BLOCK_SIZE - 1) / D_COUNTING_SORT_BLOCK_SIZE;
-	ndCudaCountItems << <blocks, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (src.m_array, src.m_size, scansBuffer.m_array, evaluateRadix);
+	ndAssert(src.m_size >= context->m_sortPrefixBuffer.m_size);
+
+	int stride = 1 << exponentRadix;
+	int blocks = (src.m_size + stride - 1) / stride;
+	ndAssert(stride < D_COUNTING_SORT_BLOCK_SIZE);
+
+	ndCudaCountItems << <blocks, stride, 0 >> > (src.m_array, src.m_size, context->m_sortPrefixBuffer.m_array, evaluateRadix);
+	ndAddPartialScans << <1, stride, 0 >> > (src.m_array, src.m_size, context->m_sortPrefixBuffer.m_array, evaluateRadix);
 }
 
 #endif

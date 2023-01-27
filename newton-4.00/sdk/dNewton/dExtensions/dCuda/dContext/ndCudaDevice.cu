@@ -35,7 +35,6 @@ ndCudaDevice::ndCudaDevice()
 	{
 		ndAssert(0);
 	}
-	m_valid = (cudaStatus == cudaSuccess);
 	
 	cuTrace(("gpu: %s\n", m_prop.name));
 	cuTrace(("compute capability: %d.%d\n", m_prop.major, m_prop.minor));
@@ -46,9 +45,6 @@ ndCudaDevice::ndCudaDevice()
 	cuTrace(("blocks per multiprocessors %d\n", m_prop.maxBlocksPerMultiProcessor));
 	cuTrace(("memory bus with: %d bits\n", m_prop.memoryBusWidth));
 	cuTrace(("memory: (mbytes) %d\n", m_prop.totalGlobalMem / (1024 * 1024)));
-	
-	m_frequency = m_prop.clockRate * 1000;
-	m_blocksPerKernelCall = m_prop.maxBlocksPerMultiProcessor * m_prop.multiProcessorCount;
 }
 
 ndCudaDevice::~ndCudaDevice()

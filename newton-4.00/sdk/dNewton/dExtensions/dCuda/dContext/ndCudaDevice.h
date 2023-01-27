@@ -38,9 +38,6 @@ class ndCudaDevice
 	void operator delete (void* ptr);
 
 	struct cudaDeviceProp m_prop;
-	double m_frequency;
-	unsigned m_valid;
-	unsigned m_blocksPerKernelCall;
 };
 
 #endif
