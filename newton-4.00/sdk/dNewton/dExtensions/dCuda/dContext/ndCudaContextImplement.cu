@@ -384,7 +384,11 @@ void ndCudaContextImplement::Begin()
 	ndCountingSort<int, 3>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
 
 
-	int xxxxxxxxxx[1024];
+	int xxxxxxxxxx0[1024];
+	int xxxxxxxxxx1[1024];
+	int xxxxxxxxxx2[1024];
 	cudaDeviceSynchronize();
-	m_sortPrefixBuffer.WriteData(xxxxxxxxxx, 16);
+	m_buf0.WriteData(xxxxxxxxxx0, m_buf0.GetCount());
+	m_buf1.WriteData(xxxxxxxxxx1, m_buf1.GetCount());
+	m_sortPrefixBuffer.WriteData(xxxxxxxxxx2, 256);
 }
