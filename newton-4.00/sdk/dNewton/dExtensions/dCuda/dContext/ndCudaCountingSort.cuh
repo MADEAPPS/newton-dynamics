@@ -206,7 +206,7 @@ template <class T, class ndEvaluateKey, int exponentRadix>
 void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, ndCudaHostBuffer<int>& scansBuffer)
 {
 	//ndAssert(0);
-	auto CountItems = [&](int blockIdx)
+	auto CountItems = [&](int blockIdx, int coreCount)
 	{
 		ndEvaluateKey evaluator;
 		int cacheBuffer[D_COUNTING_SORT_BLOCK_SIZE];
@@ -236,7 +236,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		}
 	};
 
-	auto AddPrefix = [&](int blockIdx)
+	auto AddPrefix = [&](int blockIdx, int coreCount)
 	{
 		int size = src.GetCount();
 		int blockDim = 1 << exponentRadix;
@@ -288,7 +288,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		}
 	};
 
-	auto MergeBuckects = [&](int blockIdx)
+	auto MergeBuckects = [&](int blockIdx, int coreCount)
 	{
 		ndEvaluateKey evaluator;
 
@@ -384,23 +384,25 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	ndAssert(src.GetCount() == dst.GetCount());
 	ndAssert(scansBuffer.GetCount() >= src.GetCount());
 
+	int coreCount = 2;
 	int stride = 1 << exponentRadix;
 	int blocks = (src.GetCount() + stride - 1) / stride;
+	int superBlock = (blocks + coreCount - 1) / coreCount;
 	ndAssert(stride < D_COUNTING_SORT_BLOCK_SIZE);
 
 	for (int block = 0; block < blocks; ++block)
 	{
-		CountItems(block);
+		CountItems(block, coreCount);
 	}
 
 	for (int block = 0; block < 1; ++block)
 	{
-		AddPrefix(block);
+		AddPrefix(block, coreCount);
 	}
 
 	for (int block = 0; block < blocks; ++block)
 	{
-		MergeBuckects(block);
+		MergeBuckects(block, coreCount);
 	}
 }
 
