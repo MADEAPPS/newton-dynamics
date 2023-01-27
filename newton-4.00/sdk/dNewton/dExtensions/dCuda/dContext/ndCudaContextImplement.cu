@@ -391,4 +391,24 @@ void ndCudaContextImplement::Begin()
 	m_buf0.WriteData(xxxxxxxxxx0, m_buf0.GetCount());
 	m_buf1.WriteData(xxxxxxxxxx1, m_buf1.GetCount());
 	m_sortPrefixBuffer.WriteData(xxxxxxxxxx2, 256);
+
+	ndCudaHostBuffer<int> src;
+	ndCudaHostBuffer<int> dst;
+	ndCudaHostBuffer<int> scans;
+
+	scans.SetCount(64 * 1024);
+	src.SetCount(m_buf0.GetCount());
+	dst.SetCount(m_buf1.GetCount());
+	src.ReadData(xxxxxxxxxx0, m_buf0.GetCount());
+
+	class GetKey
+	{
+		public:
+		int GetRadix(int item) const
+		{
+			return item & 0x07;
+		};
+	};
+
+	ndCountingSort<int, GetKey, 3>(src, dst, scans);
 }

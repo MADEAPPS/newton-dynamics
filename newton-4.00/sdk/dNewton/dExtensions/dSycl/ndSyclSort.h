@@ -27,7 +27,7 @@
 
 //using namespace sycl;
 
-#define D_COUNTING_SORT_LOCAL_BLOCK_SIZE	(1<<8)
+#define D_COUNTING_SORT_BLOCK_SIZE	(1<<8)
 
 template <class T, class ndEvaluateKey, int exponentRadix>
 void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<int>& scansBuffer);
@@ -93,12 +93,12 @@ arraySize = 16;
 
 		const int prefixBase = workGroupSize / 2;
 		const int lastWorkGroup = workGroupSize * workGroupCount;
-		int localPrefixScan[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
+		int localPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1];
 
 		for (int group = 0; group < 1; ++group)
 		{
-			unsigned sumReg[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-			unsigned offsetReg[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
+			unsigned sumReg[D_COUNTING_SORT_BLOCK_SIZE];
+			unsigned offsetReg[D_COUNTING_SORT_BLOCK_SIZE];
 			for (int item = workGroupSize - 1; item >= 0; --item)
 			{
 				sumReg[item] = 0;
@@ -129,7 +129,7 @@ arraySize = 16;
 
 			for (int i = 1; i < workGroupSize; i = i << 1)
 			{
-				int countSumReg[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
+				int countSumReg[D_COUNTING_SORT_BLOCK_SIZE];
 				for (int item = 0; item < workGroupSize; ++item)
 				{
 					countSumReg[item] = localPrefixScan[prefixBase + item] + localPrefixScan[prefixBase - i + item];
@@ -158,10 +158,10 @@ arraySize = 16;
 
 		for (int group = workGroupCount - 1; group >= 0; --group)
 		{
-			int cacheSortedKey[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-			int cacheKeyPrefix[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-			int cacheBaseOffset[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-			int cacheItemCount[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
+			int cacheSortedKey[D_COUNTING_SORT_BLOCK_SIZE];
+			int cacheKeyPrefix[D_COUNTING_SORT_BLOCK_SIZE];
+			int cacheBaseOffset[D_COUNTING_SORT_BLOCK_SIZE];
+			int cacheItemCount[D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1];
 
 			int base = group * workGroupSize;
 			int prefixBase = workGroupSize / 2;
@@ -223,7 +223,7 @@ arraySize = 16;
 			
 			for (int i = 1; i < workGroupSize; i = i << 1)
 			{
-				int countSumReg[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
+				int countSumReg[D_COUNTING_SORT_BLOCK_SIZE];
 				for (int item = 0; item < workGroupSize; ++item)
 				{ 
 					countSumReg[item] = cacheItemCount[prefixBase + item] + cacheItemCount[prefixBase - i + item];
@@ -290,7 +290,7 @@ void SyclAddPrefix(sycl::queue& queue, const sycl::buffer<T>& src, sycl::buffer<
 template <class T, class ndEvaluateKey, int exponentRadix>
 void SyclCountItems(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<int>& scansBuffer)
 {
-	ndAssert((1 << exponentRadix) <= D_COUNTING_SORT_LOCAL_BLOCK_SIZE);
+	ndAssert((1 << exponentRadix) <= D_COUNTING_SORT_BLOCK_SIZE);
 	queue.submit([&](sycl::handler& handler)
 	{
 #if 1
@@ -304,7 +304,7 @@ void SyclCountItems(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<int>&
 
 		sycl::accessor srcAccessor(src, handler);
 		sycl::accessor scanAccessor(scansBuffer, handler);
-		sycl::local_accessor<int, 1> counters(D_COUNTING_SORT_LOCAL_BLOCK_SIZE, handler);
+		sycl::local_accessor<int, 1> counters(D_COUNTING_SORT_BLOCK_SIZE, handler);
 
 		//sycl::stream out(1024, 256, handler);
 		handler.parallel_for_work_group(workGroupCountRange, workGroupSizeRange, [=](sycl::group<1> group)
@@ -359,7 +359,7 @@ void SyclCountItems(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<int>&
 
 		sycl::accessor<T, 1> srcAccessor(src, handler);
 		sycl::accessor<int, 1>  scanAccessor(scansBuffer, handler);
-		sycl::local_accessor<int, 1> counters(D_COUNTING_SORT_LOCAL_BLOCK_SIZE, handler);
+		sycl::local_accessor<int, 1> counters(D_COUNTING_SORT_BLOCK_SIZE, handler);
 
 		sycl::stream out(1024, 256, handler);
 		handler.parallel_for(sycl::nd_range<1>{ {workGroupCount}, {workGroupSize}}, [=](sycl::nd_item<1> item)
@@ -396,12 +396,12 @@ void SyclMergeBuckects(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<T>
 		sycl::accessor dstAccessor(dst, handler);
 		sycl::accessor scanAccessor(scansBuffer, handler);
 
-		sycl::local_accessor<int, 1> countSumReg(D_COUNTING_SORT_LOCAL_BLOCK_SIZE, handler);
-		sycl::local_accessor<int, 1> prefixSumReg(D_COUNTING_SORT_LOCAL_BLOCK_SIZE, handler);
-		sycl::local_accessor<int, 1> cacheSortedKey(D_COUNTING_SORT_LOCAL_BLOCK_SIZE, handler);
-		sycl::local_accessor<int, 1> cacheBaseOffset(D_COUNTING_SORT_LOCAL_BLOCK_SIZE, handler);
-		sycl::local_accessor<int, 1> cacheKeyPrefix(D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1, handler);
-		sycl::local_accessor<int, 1> cacheItemCount(D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1, handler);
+		sycl::local_accessor<int, 1> countSumReg(D_COUNTING_SORT_BLOCK_SIZE, handler);
+		sycl::local_accessor<int, 1> prefixSumReg(D_COUNTING_SORT_BLOCK_SIZE, handler);
+		sycl::local_accessor<int, 1> cacheSortedKey(D_COUNTING_SORT_BLOCK_SIZE, handler);
+		sycl::local_accessor<int, 1> cacheBaseOffset(D_COUNTING_SORT_BLOCK_SIZE, handler);
+		sycl::local_accessor<int, 1> cacheKeyPrefix(D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1, handler);
+		sycl::local_accessor<int, 1> cacheItemCount(D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1, handler);
 
 		sycl::stream out(4096, 256, handler);
 		handler.parallel_for_work_group(workGroupCountRange, workGroupSizeRange, [=](sycl::group<1> group)
