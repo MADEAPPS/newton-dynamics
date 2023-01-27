@@ -65,28 +65,35 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//
 	//*m_sceneInfoCpu = ndCudaSceneInfo();
 
-	/// ***********************************
-	m_buf0.SetCount(16);
-	m_buf1.SetCount(16);
-	m_sortPrefixBuffer.SetCount(64 * 1024);
+	// ***********************************
 
-	int m_buffer0[1024];
+	int buffer0[1024];
+	m_buf0.SetCount(1024);
 	for (int i = 0; i < m_buf0.GetCount(); i++)
 	{
-		m_buffer0[i] = 0;
+		buffer0[i] = 99;
 	}
-	m_buffer0[0] = 2;
-	m_buffer0[1] = 1;
-	m_buffer0[2] = 2;
-	m_buffer0[3] = 1;
-	m_buffer0[4] = 2;
-	m_buffer0[5] = 1;
-	m_buffer0[6] = 3;
-	m_buffer0[7] = 2;
-	m_buffer0[8] = 1;
-	m_buffer0[9] = 2;
-	m_buffer0[10] = 3;
-	m_buf0.ReadData(m_buffer0, 16);
+	m_buf0.ReadData(buffer0, m_buf0.GetCount());
+
+	m_buf0.SetCount(35);
+	m_buf1.SetCount(35);
+	m_sortPrefixBuffer.SetCount(64 * 1024);
+	for (int i = 0; i < m_buf0.GetCount(); i++)
+	{
+		buffer0[i] = 0;
+	}
+	buffer0[0] = 2;
+	buffer0[1] = 1;
+	buffer0[2] = 2;
+	buffer0[3] = 1;
+	buffer0[4] = 2;
+	buffer0[5] = 1;
+	buffer0[6] = 3;
+	buffer0[7] = 2;
+	buffer0[8] = 1;
+	buffer0[9] = 2;
+	buffer0[10] = 3;
+	m_buf0.ReadData(buffer0, 16);
 }
 
 ndCudaContextImplement::~ndCudaContextImplement()
@@ -410,5 +417,5 @@ void ndCudaContextImplement::Begin()
 		};
 	};
 
-	ndCountingSort<int, GetKey, 3>(src, dst, scans);
+	//ndCountingSort<int, GetKey, 3>(src, dst, scans);
 }

@@ -210,7 +210,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	{
 		ndEvaluateKey evaluator;
 		int arraySize = src.GetCount();
-		arraySize = 16;
 		int workGroupSize = 1 << exponentRadix;
 		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
 
@@ -240,7 +239,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	auto AddPrefix = [&]()
 	{
 		int arraySize = src.GetCount();
-		arraySize = 16;
 		int workGroupSize = 1 << exponentRadix;
 		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
 
@@ -305,7 +303,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	{
 		ndEvaluateKey evaluator;
 		int arraySize = src.GetCount();
-arraySize = 16;
 		int workGroupSize = 1 << exponentRadix;
 		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
 
