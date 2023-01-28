@@ -73,6 +73,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	{
 		buffer0[i] = 99;
 	}
+	buffer0[20] = 2;
 	m_buf0.ReadData(buffer0, m_buf0.GetCount());
 
 	m_buf0.SetCount(35);
@@ -86,7 +87,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	buffer0[1] = 1;
 	buffer0[2] = 2;
 	buffer0[3] = 1;
-	buffer0[4] = 2;
+	buffer0[4] = 0;
 	buffer0[5] = 1;
 	buffer0[6] = 3;
 	buffer0[7] = 2;
@@ -417,5 +418,6 @@ void ndCudaContextImplement::Begin()
 		};
 	};
 
-	ndCountingSort<int, GetKey, 3>(src, dst, scans);
+	ndCountingSortOld<int, GetKey, 3>(src, dst, scans);
+	//ndCountingSort<int, GetKey, 3>(src, dst, scans);
 }
