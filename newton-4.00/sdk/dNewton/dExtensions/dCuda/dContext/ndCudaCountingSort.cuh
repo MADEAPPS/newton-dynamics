@@ -242,11 +242,11 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		}
 	};
 
-	auto AddPrefix = [&](int blockIdx, int coreCount)
+	auto AddPrefix = [&](int blockIdx, int blockDim, int blockCount)
 	{
-		int size = src.GetCount();
-		int blockDim = 1 << exponentRadix;
-		int blockCount = (size + blockDim - 1) / blockDim;
+		//int size = src.GetCount();
+		//int blockDim = 1 << exponentRadix;
+		//int blockCount = (size + blockDim - 1) / blockDim;
 		int localPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1];
 
 		for (int threadId = 0; threadId < blockDim; ++threadId)
@@ -398,18 +398,16 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	int coreCount = (size + blocksCount * D_COUNTING_SORT_BLOCK_SIZE - 1) / (blocksCount * D_COUNTING_SORT_BLOCK_SIZE);
 
 	ndAssert(coreCount <= hardwareCoreCount);
-	//ndAssert(stride < D_COUNTING_SORT_BLOCK_SIZE);
-	//for (int block = 0; block < blocks; ++block)
 	for (int block = 0; block < coreCount; ++block)
 	{
 		CountItems(block, blocksCount);
 	}
 
-	//for (int block = 0; block < 1; ++block)
-	//{
-	//	AddPrefix(block, coreCount);
-	//}
-	//
+	for (int block = 0; block < 1; ++block)
+	{
+		AddPrefix(block, 1 << exponentRadix, coreCount);
+	}
+
 	//for (int block = 0; block < blocks; ++block)
 	//{
 	//	MergeBuckects(block, coreCount);
