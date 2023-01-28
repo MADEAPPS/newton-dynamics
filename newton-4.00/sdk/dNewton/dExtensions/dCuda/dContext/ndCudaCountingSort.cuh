@@ -32,7 +32,8 @@
 #include "ndCudaHostBuffer.h"
 #include "ndCudaDeviceBuffer.h"
 
-#define D_COUNTING_SORT_BLOCK_SIZE		(1<<8)
+//#define D_COUNTING_SORT_BLOCK_SIZE		(1<<8)
+#define D_COUNTING_SORT_BLOCK_SIZE		(8)
 
 template <class T, int exponentRadix, typename ndEvaluateRadix>
 void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix);
@@ -68,7 +69,7 @@ void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src,
 
 	int stride = 1 << exponentRadix;
 	int blocks = (src.m_size + stride - 1) / stride;
-	ndAssert(stride < D_COUNTING_SORT_BLOCK_SIZE);
+	ndAssert(stride <= D_COUNTING_SORT_BLOCK_SIZE);
 
 	ndCudaCountItems << <blocks, stride, 0 >> > (src.m_array, src.m_size, context->m_sortPrefixBuffer.m_array, evaluateRadix);
 	ndCudaAddPartialScans << <1, stride, 0 >> > (src.m_array, src.m_size, context->m_sortPrefixBuffer.m_array, evaluateRadix);
@@ -206,27 +207,32 @@ template <class T, class ndEvaluateKey, int exponentRadix>
 void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, ndCudaHostBuffer<int>& scansBuffer)
 {
 	//ndAssert(0);
-	auto CountItems = [&](int blockIdx, int coreCount)
+	auto CountItems = [&](int blockIdx, int blocksCount)
 	{
 		ndEvaluateKey evaluator;
 		int cacheBuffer[D_COUNTING_SORT_BLOCK_SIZE];
 		int size = src.GetCount();
-		int blockDim = 1 << exponentRadix;
+		int blockDim = D_COUNTING_SORT_BLOCK_SIZE;
 
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
 			cacheBuffer[threadId] = 0;
 		}
-		
-		for (int threadId = 0; threadId < blockDim; ++threadId)
+
+		int base = blocksCount * blockDim * blockIdx;
+		for (int i = 0; i < blocksCount; i++)
 		{
-			int index = threadId + blockDim * blockIdx;
-			if (index < size)
+			for (int threadId = 0; threadId < blockDim; ++threadId)
 			{
-				int radix = evaluator.GetRadix(src[index]);
-				//atomicAdd(&cacheBuffer[radix], 1);
-				cacheBuffer[radix] ++;
+				int index = threadId + base;
+				if (index < size)
+				{
+					int radix = evaluator.GetRadix(src[index]);
+					//atomicAdd(&cacheBuffer[radix], 1);
+					cacheBuffer[radix] ++;
+				}
 			}
+			base += blockDim;
 		}
 
 		for (int threadId = 0; threadId < blockDim; ++threadId)
@@ -384,26 +390,30 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	ndAssert(src.GetCount() == dst.GetCount());
 	ndAssert(scansBuffer.GetCount() >= src.GetCount());
 
-	int coreCount = 2;
-	int stride = 1 << exponentRadix;
-	int blocks = (src.GetCount() + stride - 1) / stride;
-	int superBlock = (blocks + coreCount - 1) / coreCount;
-	ndAssert(stride < D_COUNTING_SORT_BLOCK_SIZE);
+	int hardwareCoreCount = 2;
+	int size = src.GetCount();
+	//int stride = 1 << exponentRadix;
+	int blocks = (size + D_COUNTING_SORT_BLOCK_SIZE - 1) / D_COUNTING_SORT_BLOCK_SIZE;
+	int blocksCount = (blocks + hardwareCoreCount - 1) / hardwareCoreCount;
+	int coreCount = (size + blocksCount * D_COUNTING_SORT_BLOCK_SIZE - 1) / (blocksCount * D_COUNTING_SORT_BLOCK_SIZE);
 
-	for (int block = 0; block < blocks; ++block)
+	ndAssert(coreCount <= hardwareCoreCount);
+	//ndAssert(stride < D_COUNTING_SORT_BLOCK_SIZE);
+	//for (int block = 0; block < blocks; ++block)
+	for (int block = 0; block < coreCount; ++block)
 	{
-		CountItems(block, coreCount);
+		CountItems(block, blocksCount);
 	}
 
-	for (int block = 0; block < 1; ++block)
-	{
-		AddPrefix(block, coreCount);
-	}
-
-	for (int block = 0; block < blocks; ++block)
-	{
-		MergeBuckects(block, coreCount);
-	}
+	//for (int block = 0; block < 1; ++block)
+	//{
+	//	AddPrefix(block, coreCount);
+	//}
+	//
+	//for (int block = 0; block < blocks; ++block)
+	//{
+	//	MergeBuckects(block, coreCount);
+	//}
 }
 
 #endif
