@@ -38,10 +38,6 @@
 template <class T, int exponentRadix, typename ndEvaluateRadix>
 void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix);
 
-template <class T, class ndEvaluateKey, int exponentRadix>
-void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, ndCudaHostBuffer<int>& scansBuffer);
-
-
 // *****************************************************************
 // 
 // support function declarations
@@ -61,225 +57,6 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 // support function implementation 
 //
 // *****************************************************************
-template <class T, class ndEvaluateKey, int exponentRadix>
-void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, ndCudaHostBuffer<int>& scansBuffer)
-{
-	auto AddPrefix = [&](int blockIdx, int blockDim, int computeUnits)
-	{
-		int sum[D_COUNTING_SORT_BLOCK_SIZE];
-		int offset[D_COUNTING_SORT_BLOCK_SIZE];
-		int localPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1];
-
-		for (int threadId = 0; threadId < blockDim; ++threadId)
-		{
-			sum[threadId] = 0;
-			localPrefixScan[threadId] = 0;
-			offset[threadId] = threadId;
-		}
-
-		for (int i = 0; i < computeUnits; ++i)
-		{
-			for (int threadId = 0; threadId < blockDim; ++threadId)
-			{
-				int count = scansBuffer[offset[threadId]];
-				scansBuffer[offset[threadId]] = sum[threadId];
-				sum[threadId] += count;
-				offset[threadId] += blockDim;
-			}
-		}
-
-		for (int threadId = 0; threadId < blockDim; ++threadId)
-		{
-			scansBuffer[offset[threadId]] = sum[threadId];
-			localPrefixScan[blockDim / 2 + threadId + 1] = sum[threadId];
-		}
-
-		for (int i = 1; i < blockDim; i = i << 1)
-		{
-			for (int threadId = 0; threadId < blockDim; ++threadId)
-			{
-				sum[threadId] = localPrefixScan[blockDim / 2 + threadId] + localPrefixScan[blockDim / 2 - i + threadId];
-			}
-			for (int threadId = 0; threadId < blockDim; ++threadId)
-			{
-				localPrefixScan[blockDim / 2 + threadId] = sum[threadId];
-			}
-		}
-
-		for (int threadId = 0; threadId < blockDim; ++threadId)
-		{
-			scansBuffer[offset[threadId] + blockDim] = localPrefixScan[blockDim / 2 + threadId];
-		}
-	};
-
-	auto CountItems = [&](int blockIndex, int blocksCount)
-	{
-		int radixCountBuffer[D_COUNTING_SORT_BLOCK_SIZE];
-
-		int size = src.GetCount();
-		int blockStride = D_COUNTING_SORT_BLOCK_SIZE;
-		int bashSize = blocksCount * blockStride * blockIndex;
-
-		ndEvaluateKey evaluator;
-
-		for (int threadId = 0; threadId < blockStride; ++threadId)
-		{
-			radixCountBuffer[threadId] = 0;
-		}
-
-		for (int i = 0; i < blocksCount; ++i)
-		{
-			for (int threadId = 0; threadId < blockStride; ++threadId)
-			{
-				int index = bashSize + threadId;
-				if (index < size)
-				{
-					int radix = evaluator.GetRadix(src[index]);
-					radixCountBuffer[radix] ++;
-				}
-			}
-			bashSize += blockStride;
-		}
-
-		for (int threadId = 0; threadId < (1 << exponentRadix); ++threadId)
-		{
-			int index = threadId + (1 << exponentRadix) * blockIndex;
-			scansBuffer[index] = radixCountBuffer[threadId];
-		}
-	};
-
-	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
-	{
-		ndEvaluateKey evaluator;
-		T cachedItems[D_COUNTING_SORT_BLOCK_SIZE];
-		int sortedRadix[D_COUNTING_SORT_BLOCK_SIZE];
-		int radixPrefixCount[D_COUNTING_SORT_BLOCK_SIZE];
-		int radixPrefixStart[D_COUNTING_SORT_BLOCK_SIZE];
-		int radixPrefixBatchScan[D_COUNTING_SORT_BLOCK_SIZE];
-		int radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1];
-
-		int size = src.GetCount();
-		int radixSize = (1 << exponentRadix);
-		int blockDim = D_COUNTING_SORT_BLOCK_SIZE;
-		int radixBase = blockIdx * radixSize;
-		int bashSize = blocksCount * blockDim * blockIdx;
-		int radixPrefixOffset = computeUnits * radixSize + radixSize;
-
-		for (int threadId = 0; threadId < radixSize; ++threadId)
-		{
-			radixPrefixScan[threadId] = 0;
-			radixPrefixStart[threadId] = scansBuffer[radixBase + threadId];
-			radixPrefixBatchScan[threadId] = scansBuffer[radixPrefixOffset + threadId];
-		}
-		
-		for (int i = 0; i < blocksCount; ++i)
-		{
-			for (int threadId = 0; threadId < radixSize; ++threadId)
-			{
-				radixPrefixCount[threadId] = 0;
-				sortedRadix[threadId] = (radixSize << 16) + threadId;
-			}
-
-			for (int threadId = 0; threadId < blockDim; ++threadId)
-			{
-				int index = bashSize + threadId;
-				if (index < size)
-				{
-					cachedItems[threadId] = src[index];
-					int radix = evaluator.GetRadix(cachedItems[threadId]);
-					radixPrefixCount[radix] ++;
-					sortedRadix[threadId] = (radix << 16) + threadId;
-				}
-			}
-
-			for (int k = 2; k <= blockDim; k = k << 1)
-			{
-				for (int j = k >> 1; j > 0; j = j >> 1)
-				{
-					for (int threadId0 = 0; threadId0 < blockDim; ++threadId0)
-					{
-						int threadId1 = threadId0 ^ j;
-						if (threadId1 > threadId0)
-						{
-							const int a = sortedRadix[threadId0];
-							const int b = sortedRadix[threadId1];
-							const int mask0 = (-(threadId0 & k)) >> 31;
-							const int mask1 = -(a > b);
-							const int mask = mask0 ^ mask1;
-							sortedRadix[threadId0] = (b & mask) | (a & ~mask);
-							sortedRadix[threadId1] = (a & mask) | (b & ~mask);
-						}
-					}
-				}
-			}
-
-			for (int threadId = 0; threadId < radixSize; ++threadId)
-			{
-				radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId + 1] = radixPrefixCount[threadId];
-			}
-
-			for (int k = 1; k < radixSize; k = k << 1)
-			{
-				int sumReg[D_COUNTING_SORT_BLOCK_SIZE];
-				for (int threadId = 0; threadId < radixSize; ++threadId)
-				{
-					sumReg[threadId] = radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId] + radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId - k];
-				}
-				for (int threadId = 0; threadId < radixSize; ++threadId)
-				{
-					radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId] = sumReg[threadId];
-				}
-			}
-
-			for (int threadId = 0; threadId < blockDim; ++threadId)
-			{
-				int index = bashSize + threadId;
-				if (index < size)
-				{
-					int keyValue = sortedRadix[threadId];
-					int keyHigh = keyValue >> 16;
-					int keyLow = keyValue & 0xffff;
-					int dstOffset1 = radixPrefixBatchScan[keyHigh] + radixPrefixStart[keyHigh];
-					int dstOffset0 = threadId - radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + keyHigh];
-					dst[dstOffset0 + dstOffset1] = cachedItems[keyLow];
-				}
-			}
-
-			for (int threadId = 0; threadId < radixSize; ++threadId)
-			{
-				radixPrefixStart[threadId] += radixPrefixCount[threadId];
-			}
-
-			bashSize += blockDim;
-		}
-	};
-
-	ndAssert(src.GetCount() == dst.GetCount());
-	ndAssert(scansBuffer.GetCount() >= src.GetCount());
-
-	int deviceComputeUnits = 2;
-	int itemCount = src.GetCount();
-	int computeUnitsBashCount = (itemCount + D_COUNTING_SORT_BLOCK_SIZE - 1) / D_COUNTING_SORT_BLOCK_SIZE;
-	int bashCount = (computeUnitsBashCount + deviceComputeUnits - 1) / deviceComputeUnits;
-	int computeUnits = (itemCount + bashCount * D_COUNTING_SORT_BLOCK_SIZE - 1) / (bashCount * D_COUNTING_SORT_BLOCK_SIZE);
-	
-	ndAssert(computeUnits <= deviceComputeUnits);
-	for (int block = 0; block < computeUnits; ++block)
-	{
-		CountItems(block, bashCount);
-	}
-
-	for (int block = 0; block < 1; ++block)
-	{
-		AddPrefix(block, 1 << exponentRadix, computeUnits);
-	}
-	
-	for (int block = 0; block < computeUnits; ++block)
-	{
-		MergeBuckects(block, bashCount, computeUnits);
-	}
-}
-
 template <class T, int exponentRadix, typename ndEvaluateRadix>
 void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix)
 {
@@ -316,7 +93,6 @@ __global__ void ndCudaAddPrefix(const T* src, int blocksCount, int* scansBuffer,
 		offset += radixSize;
 	}
 
-	scansBuffer[offset + threadId] = sum;
 	localPrefixScan[radixHalfSize + threadId + 1] = sum;
 	__syncthreads();
 
@@ -327,7 +103,7 @@ __global__ void ndCudaAddPrefix(const T* src, int blocksCount, int* scansBuffer,
 		localPrefixScan[radixHalfSize + threadId] = acc;
 		__syncthreads();
 	}
-	scansBuffer[offset + radixSize + threadId] = localPrefixScan[radixHalfSize + threadId];
+	scansBuffer[offset + threadId] = localPrefixScan[radixHalfSize + threadId];
 }
 
 template <typename T, typename SortKeyPredicate>
@@ -377,7 +153,7 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 	int blockIndex = blockIdx.x;
 	int radixBase = blockIndex * radixStride;
 	int bashSize = blocksCount * blockSride * blockIndex;
-	int radixPrefixOffset = computeUnits * radixStride + radixStride;
+	int radixPrefixOffset = computeUnits * radixStride;
 
 	if (threadId < radixStride)
 	{
@@ -385,7 +161,6 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 		radixPrefixStart[threadId] = scansBuffer[radixBase + threadId];
 		radixPrefixBatchScan[threadId] = scansBuffer[radixPrefixOffset + threadId];
 	}
-	//__syncthreads();
 
 	for (int i = 0; i < blocksCount; ++i)
 	{

@@ -21,8 +21,8 @@
 
 #include <ndSyclStdafx.h>
 #include "ndSyclUtils.h"
+#include "ndHostArray.h"
 #include "ndSyclContext.h"
-#include "ndStlContainers.h"
 #include "ndSyclContextImpl.h"
 
 void ndSyclSetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free);

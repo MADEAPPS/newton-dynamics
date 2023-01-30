@@ -24,6 +24,7 @@
 
 #include <ndSyclStdafx.h>
 #include "ndSyclSort.h"
+#include "ndHostArray.h"
 
 class ndSyclContextImpl
 {
@@ -63,10 +64,10 @@ class ndSyclContextImpl
 	char m_deviceName[64];
 	sycl::buffer<int> m_sortPrefixBuffer;
 
-	// debuging code
-	StlVector<int> m_cpuBuffer0;
-	StlVector<int> m_cpuBuffer1;
-	StlVector<int> m_cpuBuffer2;
+	// debugging code
+	ndHostArray<int> m_cpuBuffer0;
+	ndHostArray<int> m_cpuBuffer1;
+	ndHostArray<int> m_cpuBuffer2;
 
 	sycl::buffer<int> m_buf0;
 	sycl::buffer<int> m_buf1;

@@ -19,24 +19,24 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_STL_ALLOCATOR_H__
-#define __ND_STL_ALLOCATOR_H__
+#ifndef __ND_HOST_ALLOCATOR_H__
+#define __ND_HOST_ALLOCATOR_H__
 
 void* ndSyclMalloc(size_t size);
 void ndSyclFree(void* const ptr);
 
 template <class T>
-class StlAllocator
+class ndHostAllocator
 {
 	public:
 	// type definitions
-	typedef T        value_type;
+	typedef T	value_type;
 
 	// rebind allocator to type U
 	template <class U>
 	struct rebind 
 	{
-		typedef StlAllocator<U> other;
+		typedef ndHostAllocator<U> other;
 	};
 
 	// return address of values
@@ -50,20 +50,20 @@ class StlAllocator
 		return &value;
 	}
 
-	StlAllocator() throw()
+	ndHostAllocator() throw()
 	{
 	}
 
-	StlAllocator(const StlAllocator&) throw()
+	ndHostAllocator(const ndHostAllocator&) throw()
 	{
 	}
 
 	template <class U>
-	StlAllocator(const StlAllocator<U>&) throw()
+	ndHostAllocator(const ndHostAllocator<U>&) throw()
 	{
 	}
 
-	~StlAllocator() throw()
+	~ndHostAllocator() throw()
 	{
 	}
 
@@ -100,11 +100,6 @@ class StlAllocator
 	{
 		ndSyclFree(ptr);
 	}
-};
-
-template <class T>
-class StlVector : public std::vector<T, StlAllocator<T> >
-{
 };
 
 #endif

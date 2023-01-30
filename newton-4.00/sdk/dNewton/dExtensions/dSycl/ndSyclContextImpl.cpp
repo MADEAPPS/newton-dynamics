@@ -21,7 +21,7 @@
 
 #include <ndSyclStdafx.h>
 #include "ndSyclUtils.h"
-#include "ndStlContainers.h"
+//#include "ndStlContainers.h"
 #include "ndSyclContextImpl.h"
 
 #define ND_SORT_SCAN_BUFFER_SIZE (256 * 256)
@@ -145,7 +145,6 @@ void ndSyclContextImpl::UpdateTransform()
 }
 #endif
 
-
 void ndSyclContextImpl::Begin()
 {
 	class CountDigit
@@ -158,8 +157,7 @@ void ndSyclContextImpl::Begin()
 		}
 	};
 
-
-	StlVector<int> xxxxxxxx;
+	ndHostArray<int> xxxxxxxx;
 	xxxxxxxx.resize(64 * 1024);
 	//ndCountingSort<int, CountDigit, 8>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
 	ndCountingSort<int, CountDigit, 3>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);

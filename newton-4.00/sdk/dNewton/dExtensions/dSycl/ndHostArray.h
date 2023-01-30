@@ -19,212 +19,28 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_CUDA_HOST_BUFFER_H__
-#define __ND_CUDA_HOST_BUFFER_H__
+#ifndef __ND_HOST_ARRAY_H__
+#define __ND_HOST_ARRAY_H__
 
-#include <cuda.h>
-#include <cuda_runtime.h>
-#include "ndCudaIntrinsics.h"
+#include "ndSyclStdafx.h"
+#include "ndHostAllocator____.h"
 
-#define D_HOST_SORT_BLOCK_SIZE	(1<<10)
-
-template<class T>
-class ndCudaHostBuffer
+template <class T>
+class ndHostArray : public std::vector<T, ndHostAllocator<T> >
 {
-	public:
-	ndCudaHostBuffer();
-	~ndCudaHostBuffer();
-
-	int GetCount() const;
-	void SetCount(int count);
-
-	void Clear();
-	void Resize(int count);
-	int GetCapacity() const;
-
-	T& operator[] (int i);
-	const T& operator[] (int i) const;
-
-	void Swap(ndCudaHostBuffer& buffer);
-
-	void ReadData(const T* const src, int elements);
-	void WriteData(T* const dst, int elements) const;
-
-	void ReadData(const T* const src, int elements, cudaStream_t stream);
-	void WriteData(T* const dst, int elements, cudaStream_t stream) const;
-
-	T* m_array;
-	int m_size;
-	int m_capacity;
 };
 
 template <class T, class ndEvaluateKey, int exponentRadix>
-void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, ndCudaHostBuffer<int>& scansBuffer);
-
-template<class T>
-ndCudaHostBuffer<T>::ndCudaHostBuffer()
-	:m_array(nullptr)
-	,m_size(0)
-	,m_capacity(0)
-{
-	SetCount(D_GRANULARITY);
-	SetCount(0);
-}
-
-template<class T>
-ndCudaHostBuffer<T>::~ndCudaHostBuffer()
-{
-	if (m_array)
-	{
-		cudaError_t cudaStatus = cudaSuccess;
-		cudaStatus = cudaFreeHost(m_array);
-		ndAssert(cudaStatus == cudaSuccess);
-		if (cudaStatus != cudaSuccess)
-		{
-			ndAssert(0);
-		}
-	}
-}
-
-template<class T>
-const T& ndCudaHostBuffer<T>::operator[] (int i) const
-{
-	ndAssert(i >= 0);
-	ndAssert(i < m_size);
-	return m_array[i];
-}
-
-template<class T>
-T& ndCudaHostBuffer<T>::operator[] (int i)
-{
-	ndAssert(i >= 0);
-	ndAssert(i < m_size);
-	return m_array[i];
-}
-
-template<class T>
-int ndCudaHostBuffer<T>::GetCount() const
-{
-	return m_size;
-}
-
-template<class T>
-void ndCudaHostBuffer<T>::SetCount(int count)
-{
-	while (count > m_capacity)
-	{
-		Resize(m_capacity * 2);
-	}
-	m_size = count;
-}
-
-template<class T>
-int ndCudaHostBuffer<T>::GetCapacity() const
-{
-	return m_capacity;
-}
-
-template<class T>
-void ndCudaHostBuffer<T>::Clear()
-{
-	m_size = 0;
-}
-
-template<class T>
-void ndCudaHostBuffer<T>::Swap(ndCudaHostBuffer& buffer)
-{
-	cuSwap(m_size, buffer.m_size);
-	cuSwap(m_array, buffer.m_array);
-	cuSwap(m_capacity, buffer.m_capacity);
-}
-
-template<class T>
-void ndCudaHostBuffer<T>::Resize(int newSize)
-{
-	cudaError_t cudaStatus = cudaSuccess;
-	if (newSize > m_capacity || (m_capacity == 0))
-	{
-		T* newArray;
-		newSize = std::max(newSize, D_GRANULARITY);
-		cudaStatus = cudaMallocHost((void**)&newArray, newSize * sizeof(T));
-		ndAssert(cudaStatus == cudaSuccess);
-		if (m_array)
-		{
-			cudaStatus = cudaMemcpy(newArray, m_array, m_size * sizeof(T), cudaMemcpyDeviceToDevice);
-			ndAssert(cudaStatus == cudaSuccess);
-			cudaStatus = cudaFreeHost(m_array);
-			ndAssert(cudaStatus == cudaSuccess);
-		}
-		m_array = newArray;
-		m_capacity = newSize;
-	}
-	else if (newSize < m_capacity)
-	{
-		T* newArray;
-		newSize = std::max(newSize, D_GRANULARITY);
-		cudaStatus = cudaMallocHost((void**)&newArray, newSize * sizeof(T));
-		if (m_array)
-		{
-			cudaStatus = cudaMemcpy(newArray, m_array, newSize * sizeof(T), cudaMemcpyDeviceToDevice);
-			cudaStatus = cudaFreeHost(m_array);
-			ndAssert(cudaStatus == cudaSuccess);
-		}
-
-		m_capacity = newSize;
-		m_array = newArray;
-	}
-	if (cudaStatus != cudaSuccess)
-	{
-		ndAssert(0);
-	}
-}
-
-template<class T>
-void ndCudaHostBuffer<T>::ReadData(const T* const src, int elements)
-{
-	ndAssert(elements <= m_size);
-	cudaMemcpy(m_array, src, sizeof (T) * elements, cudaMemcpyHostToDevice);
-}
-
-template<class T>
-void ndCudaHostBuffer<T>::WriteData(T* const dst, int elements) const
-{
-	ndAssert(elements <= m_size);
-	cudaMemcpy(dst, m_array, sizeof(T) * elements, cudaMemcpyDeviceToHost);
-}
-
-template<class T>
-void ndCudaHostBuffer<T>::ReadData(const T* const src, int elements, cudaStream_t stream)
-{
-	ndAssert(elements <= m_size);
-	cudaError_t cudaStatus = cudaMemcpyAsync(m_array, src, sizeof(T) * elements, cudaMemcpyHostToDevice, stream);
-	ndAssert(cudaStatus == cudaSuccess);
-	if (cudaStatus != cudaSuccess)
-	{
-		ndAssert(0);
-	}
-}
-
-template<class T>
-void ndCudaHostBuffer<T>::WriteData(T* const dst, int elements, cudaStream_t stream) const
-{
-	ndAssert(elements <= m_size);
-	cudaError_t cudaStatus = cudaMemcpyAsync(dst, m_array, sizeof(T) * elements, cudaMemcpyDeviceToHost, stream);
-	ndAssert(cudaStatus == cudaSuccess);
-	if (cudaStatus != cudaSuccess)
-	{
-		ndAssert(0);
-	}
-}
+void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<int>& scansBuffer);
 
 template <class T, class ndEvaluateKey, int exponentRadix>
-void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, ndCudaHostBuffer<int>& scansBuffer)
+void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<int>& scansBuffer)
 {
 	auto AddPrefix = [&](int blockIdx, int blockDim, int computeUnits)
 	{
-		int sum[D_HOST_SORT_BLOCK_SIZE];
-		int offset[D_HOST_SORT_BLOCK_SIZE];
-		int localPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + D_HOST_SORT_BLOCK_SIZE + 1];
+		int sum[D_COUNTING_SORT_BLOCK_SIZE];
+		int offset[D_COUNTING_SORT_BLOCK_SIZE];
+		int localPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1];
 
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
@@ -270,10 +86,10 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 
 	auto CountItems = [&](int blockIndex, int blocksCount)
 	{
-		int radixCountBuffer[D_HOST_SORT_BLOCK_SIZE];
+		int radixCountBuffer[D_COUNTING_SORT_BLOCK_SIZE];
 
-		int size = src.GetCount();
-		int blockStride = D_HOST_SORT_BLOCK_SIZE;
+		int size = src.size();
+		int blockStride = D_COUNTING_SORT_BLOCK_SIZE;
 		int bashSize = blocksCount * blockStride * blockIndex;
 
 		ndEvaluateKey evaluator;
@@ -307,16 +123,16 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
 		ndEvaluateKey evaluator;
-		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
-		int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
-		int radixPrefixCount[D_HOST_SORT_BLOCK_SIZE];
-		int radixPrefixStart[D_HOST_SORT_BLOCK_SIZE];
-		int radixPrefixBatchScan[D_HOST_SORT_BLOCK_SIZE];
-		int radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + D_HOST_SORT_BLOCK_SIZE + 1];
+		T cachedItems[D_COUNTING_SORT_BLOCK_SIZE];
+		int sortedRadix[D_COUNTING_SORT_BLOCK_SIZE];
+		int radixPrefixCount[D_COUNTING_SORT_BLOCK_SIZE];
+		int radixPrefixStart[D_COUNTING_SORT_BLOCK_SIZE];
+		int radixPrefixBatchScan[D_COUNTING_SORT_BLOCK_SIZE];
+		int radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1];
 
-		int size = src.GetCount();
+		int size = src.size();
 		int radixSize = (1 << exponentRadix);
-		int blockDim = D_HOST_SORT_BLOCK_SIZE;
+		int blockDim = D_COUNTING_SORT_BLOCK_SIZE;
 		int radixBase = blockIdx * radixSize;
 		int bashSize = blocksCount * blockDim * blockIdx;
 		int radixPrefixOffset = computeUnits * radixSize + radixSize;
@@ -371,19 +187,19 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 
 			for (int threadId = 0; threadId < radixSize; ++threadId)
 			{
-				radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + threadId + 1] = radixPrefixCount[threadId];
+				radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId + 1] = radixPrefixCount[threadId];
 			}
 
 			for (int k = 1; k < radixSize; k = k << 1)
 			{
-				int sumReg[D_HOST_SORT_BLOCK_SIZE];
+				int sumReg[D_COUNTING_SORT_BLOCK_SIZE];
 				for (int threadId = 0; threadId < radixSize; ++threadId)
 				{
-					sumReg[threadId] = radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + threadId] + radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + threadId - k];
+					sumReg[threadId] = radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId] + radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId - k];
 				}
 				for (int threadId = 0; threadId < radixSize; ++threadId)
 				{
-					radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + threadId] = sumReg[threadId];
+					radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId] = sumReg[threadId];
 				}
 			}
 
@@ -396,7 +212,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					int keyHigh = keyValue >> 16;
 					int keyLow = keyValue & 0xffff;
 					int dstOffset1 = radixPrefixBatchScan[keyHigh] + radixPrefixStart[keyHigh];
-					int dstOffset0 = threadId - radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + keyHigh];
+					int dstOffset0 = threadId - radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + keyHigh];
 					dst[dstOffset0 + dstOffset1] = cachedItems[keyLow];
 				}
 			}
@@ -410,14 +226,14 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		}
 	};
 
-	ndAssert(src.GetCount() == dst.GetCount());
-	ndAssert(scansBuffer.GetCount() >= src.GetCount());
+	ndAssert(src.size() == dst.size());
+	ndAssert(scansBuffer.size() >= src.size());
 
 	int deviceComputeUnits = 2;
-	int itemCount = src.GetCount();
-	int computeUnitsBashCount = (itemCount + D_HOST_SORT_BLOCK_SIZE - 1) / D_HOST_SORT_BLOCK_SIZE;
+	int itemCount = src.size();
+	int computeUnitsBashCount = (itemCount + D_COUNTING_SORT_BLOCK_SIZE - 1) / D_COUNTING_SORT_BLOCK_SIZE;
 	int bashCount = (computeUnitsBashCount + deviceComputeUnits - 1) / deviceComputeUnits;
-	int computeUnits = (itemCount + bashCount * D_HOST_SORT_BLOCK_SIZE - 1) / (bashCount * D_HOST_SORT_BLOCK_SIZE);
+	int computeUnits = (itemCount + bashCount * D_COUNTING_SORT_BLOCK_SIZE - 1) / (bashCount * D_COUNTING_SORT_BLOCK_SIZE);
 
 	ndAssert(computeUnits <= deviceComputeUnits);
 	for (int block = 0; block < computeUnits; ++block)

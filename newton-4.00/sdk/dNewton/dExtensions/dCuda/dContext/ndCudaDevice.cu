@@ -73,7 +73,6 @@ void ndCudaDevice::operator delete (void* ptr)
 
 int ndCudaDevice::GetComputeUnits() const
 {
-	//return m_computeUnits;
-	return 2;
+	return m_computeUnits;
 }
 
