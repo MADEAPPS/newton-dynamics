@@ -69,10 +69,13 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 
 
 	// ***********************************
-	m_src.SetCount(1000);
+	//m_src.SetCount(1000);
+	m_src.SetCount(3 * 256 + 1);
+	//m_src.SetCount(1000000);
 	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
-		m_src[i] = rand() % 256;
+		//m_src[i] = rand() % 256;
+		m_src[i] = i % 256;
 	}
 
 	m_scan0.SetCount(1024 * 256);
@@ -82,6 +85,12 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	m_buf0.SetCount(m_src.GetCount());
 	m_buf1.SetCount(m_src.GetCount());
 	m_buf0.ReadData(&m_src[0], m_src.GetCount());
+
+	for (int i = 0; i < m_dst1.GetCount(); ++i)
+	{
+		m_dst1[i] = -2;
+	}
+	m_buf1.ReadData(&m_dst1[0], m_dst1.GetCount());
 
 	class GetKey
 	{

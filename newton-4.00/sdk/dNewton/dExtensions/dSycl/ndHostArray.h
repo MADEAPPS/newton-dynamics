@@ -33,8 +33,6 @@ class ndHostArray : public std::vector<T, ndHostAllocator<T> >
 {
 };
 
-template <class T, class ndEvaluateKey, int exponentRadix>
-void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<int>& scansBuffer);
 
 template <class T, class ndEvaluateKey, int exponentRadix>
 void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<int>& scansBuffer)
@@ -65,7 +63,6 @@ void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<
 
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
-			scansBuffer[offset[threadId]] = sum[threadId];
 			localPrefixScan[blockDim / 2 + threadId + 1] = sum[threadId];
 		}
 
@@ -83,7 +80,7 @@ void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<
 
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
-			scansBuffer[offset[threadId] + blockDim] = localPrefixScan[blockDim / 2 + threadId];
+			scansBuffer[offset[threadId]] = localPrefixScan[blockDim / 2 + threadId];
 		}
 	};
 
@@ -138,7 +135,7 @@ void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<
 		int blockDim = D_HOST_SORT_BLOCK_SIZE;
 		int radixBase = blockIdx * radixSize;
 		int bashSize = blocksCount * blockDim * blockIdx;
-		int radixPrefixOffset = computeUnits * radixSize + radixSize;
+		int radixPrefixOffset = computeUnits * radixSize;
 
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
@@ -234,15 +231,14 @@ void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<
 	};
 
 	ndAssert(src.size() == dst.size());
-	//ndAssert(scansBuffer.size() >= src.size());
 
 	int deviceComputeUnits = 20;
 	int itemCount = src.size();
 	int computeUnitsBashCount = (itemCount + D_HOST_SORT_BLOCK_SIZE - 1) / D_HOST_SORT_BLOCK_SIZE;
 	int bashCount = (computeUnitsBashCount + deviceComputeUnits - 1) / deviceComputeUnits;
 	int computeUnits = (itemCount + bashCount * D_HOST_SORT_BLOCK_SIZE - 1) / (bashCount * D_HOST_SORT_BLOCK_SIZE);
-
 	ndAssert(computeUnits <= deviceComputeUnits);
+
 	for (int block = 0; block < computeUnits; ++block)
 	{
 		CountItems(block, bashCount);

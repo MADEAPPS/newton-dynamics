@@ -247,7 +247,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
-			scansBuffer[offset[threadId]] = sum[threadId];
 			localPrefixScan[blockDim / 2 + threadId + 1] = sum[threadId];
 		}
 
@@ -265,7 +264,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
-			scansBuffer[offset[threadId] + blockDim] = localPrefixScan[blockDim / 2 + threadId];
+			scansBuffer[offset[threadId]] = localPrefixScan[blockDim / 2 + threadId];
 		}
 	};
 
@@ -320,7 +319,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		int blockDim = D_HOST_SORT_BLOCK_SIZE;
 		int radixBase = blockIdx * radixSize;
 		int bashSize = blocksCount * blockDim * blockIdx;
-		int radixPrefixOffset = computeUnits * radixSize + radixSize;
+		int radixPrefixOffset = computeUnits * radixSize;
 
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
@@ -436,7 +435,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 
 	for (int block = 0; block < computeUnits; ++block)
 	{
-		//MergeBuckects(block, bashCount, computeUnits);
+		MergeBuckects(block, bashCount, computeUnits);
 	}
 }
 

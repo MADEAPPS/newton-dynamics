@@ -218,7 +218,7 @@ void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src,
 
 	ndCudaCountItems << <computeUnits, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (src.m_array, itemCount, bashCount, context->m_sortPrefixBuffer.m_array, radixStride, evaluateRadix);
 	ndCudaAddPrefix << <1, radixStride, 0 >> > (src.m_array, computeUnits, context->m_sortPrefixBuffer.m_array, evaluateRadix);
-	//ndCudaMergeBuckets << <computeUnits, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (src.m_array, dst.m_array, itemCount, bashCount, context->m_sortPrefixBuffer.m_array, radixStride, computeUnits, evaluateRadix);
+	ndCudaMergeBuckets << <computeUnits, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (src.m_array, dst.m_array, itemCount, bashCount, context->m_sortPrefixBuffer.m_array, radixStride, computeUnits, evaluateRadix);
 }
 
 #endif
