@@ -438,5 +438,5 @@ void ndCudaContextImplement::Begin()
 		};
 	};
 
-	//ndCountingSort<int, GetKey, 3>(src, dst, scans);
+	ndCountingSort<int, GetKey, 3>(src, dst, scans);
 }

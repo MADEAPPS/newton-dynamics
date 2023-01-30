@@ -23,7 +23,9 @@
 #define __ND_HOST_ARRAY_H__
 
 #include "ndSyclStdafx.h"
-#include "ndHostAllocator____.h"
+#include "ndHostAllocator.h"
+
+#define D_HOST_SORT_BLOCK_SIZE	(1<<8)
 
 template <class T>
 class ndHostArray : public std::vector<T, ndHostAllocator<T> >
@@ -38,9 +40,9 @@ void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<
 {
 	auto AddPrefix = [&](int blockIdx, int blockDim, int computeUnits)
 	{
-		int sum[D_COUNTING_SORT_BLOCK_SIZE];
-		int offset[D_COUNTING_SORT_BLOCK_SIZE];
-		int localPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1];
+		int sum[D_HOST_SORT_BLOCK_SIZE];
+		int offset[D_HOST_SORT_BLOCK_SIZE];
+		int localPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + D_HOST_SORT_BLOCK_SIZE + 1];
 
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
@@ -86,10 +88,10 @@ void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<
 
 	auto CountItems = [&](int blockIndex, int blocksCount)
 	{
-		int radixCountBuffer[D_COUNTING_SORT_BLOCK_SIZE];
+		int radixCountBuffer[D_HOST_SORT_BLOCK_SIZE];
 
 		int size = src.size();
-		int blockStride = D_COUNTING_SORT_BLOCK_SIZE;
+		int blockStride = D_HOST_SORT_BLOCK_SIZE;
 		int bashSize = blocksCount * blockStride * blockIndex;
 
 		ndEvaluateKey evaluator;
@@ -123,30 +125,34 @@ void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<
 	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
 		ndEvaluateKey evaluator;
-		T cachedItems[D_COUNTING_SORT_BLOCK_SIZE];
-		int sortedRadix[D_COUNTING_SORT_BLOCK_SIZE];
-		int radixPrefixCount[D_COUNTING_SORT_BLOCK_SIZE];
-		int radixPrefixStart[D_COUNTING_SORT_BLOCK_SIZE];
-		int radixPrefixBatchScan[D_COUNTING_SORT_BLOCK_SIZE];
-		int radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1];
+		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
+		int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
+		int radixPrefixCount[D_HOST_SORT_BLOCK_SIZE];
+		int radixPrefixStart[D_HOST_SORT_BLOCK_SIZE];
+		int radixPrefixBatchScan[D_HOST_SORT_BLOCK_SIZE];
+		int radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + D_HOST_SORT_BLOCK_SIZE + 1];
 
 		int size = src.size();
 		int radixSize = (1 << exponentRadix);
-		int blockDim = D_COUNTING_SORT_BLOCK_SIZE;
+		int blockDim = D_HOST_SORT_BLOCK_SIZE;
 		int radixBase = blockIdx * radixSize;
 		int bashSize = blocksCount * blockDim * blockIdx;
 		int radixPrefixOffset = computeUnits * radixSize + radixSize;
 
-		for (int threadId = 0; threadId < radixSize; ++threadId)
+		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
 			radixPrefixScan[threadId] = 0;
+		}
+
+		for (int threadId = 0; threadId < radixSize; ++threadId)
+		{
 			radixPrefixStart[threadId] = scansBuffer[radixBase + threadId];
 			radixPrefixBatchScan[threadId] = scansBuffer[radixPrefixOffset + threadId];
 		}
 
 		for (int i = 0; i < blocksCount; ++i)
 		{
-			for (int threadId = 0; threadId < radixSize; ++threadId)
+			for (int threadId = 0; threadId < blockDim; ++threadId)
 			{
 				radixPrefixCount[threadId] = 0;
 				sortedRadix[threadId] = (radixSize << 16) + threadId;
@@ -187,19 +193,19 @@ void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<
 
 			for (int threadId = 0; threadId < radixSize; ++threadId)
 			{
-				radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId + 1] = radixPrefixCount[threadId];
+				radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + threadId + 1] = radixPrefixCount[threadId];
 			}
 
 			for (int k = 1; k < radixSize; k = k << 1)
 			{
-				int sumReg[D_COUNTING_SORT_BLOCK_SIZE];
+				int sumReg[D_HOST_SORT_BLOCK_SIZE];
 				for (int threadId = 0; threadId < radixSize; ++threadId)
 				{
-					sumReg[threadId] = radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId] + radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId - k];
+					sumReg[threadId] = radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + threadId] + radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + threadId - k];
 				}
 				for (int threadId = 0; threadId < radixSize; ++threadId)
 				{
-					radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId] = sumReg[threadId];
+					radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + threadId] = sumReg[threadId];
 				}
 			}
 
@@ -212,7 +218,7 @@ void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<
 					int keyHigh = keyValue >> 16;
 					int keyLow = keyValue & 0xffff;
 					int dstOffset1 = radixPrefixBatchScan[keyHigh] + radixPrefixStart[keyHigh];
-					int dstOffset0 = threadId - radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + keyHigh];
+					int dstOffset0 = threadId - radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + keyHigh];
 					dst[dstOffset0 + dstOffset1] = cachedItems[keyLow];
 				}
 			}
@@ -231,9 +237,9 @@ void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<
 
 	int deviceComputeUnits = 2;
 	int itemCount = src.size();
-	int computeUnitsBashCount = (itemCount + D_COUNTING_SORT_BLOCK_SIZE - 1) / D_COUNTING_SORT_BLOCK_SIZE;
+	int computeUnitsBashCount = (itemCount + D_HOST_SORT_BLOCK_SIZE - 1) / D_HOST_SORT_BLOCK_SIZE;
 	int bashCount = (computeUnitsBashCount + deviceComputeUnits - 1) / deviceComputeUnits;
-	int computeUnits = (itemCount + bashCount * D_COUNTING_SORT_BLOCK_SIZE - 1) / (bashCount * D_COUNTING_SORT_BLOCK_SIZE);
+	int computeUnits = (itemCount + bashCount * D_HOST_SORT_BLOCK_SIZE - 1) / (bashCount * D_HOST_SORT_BLOCK_SIZE);
 
 	ndAssert(computeUnits <= deviceComputeUnits);
 	for (int block = 0; block < computeUnits; ++block)

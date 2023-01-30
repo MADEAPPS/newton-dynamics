@@ -74,7 +74,7 @@ void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src,
 }
 
 template <typename T, typename SortKeyPredicate>
-__global__ void ndCudaAddPrefix(const T* src, int blocksCount, int* scansBuffer, SortKeyPredicate getRadix)
+__global__ void ndCudaAddPrefix(const T* src, int computeUnits, int* scansBuffer, SortKeyPredicate getRadix)
 {
 	__shared__  int localPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1];
 
@@ -85,7 +85,7 @@ __global__ void ndCudaAddPrefix(const T* src, int blocksCount, int* scansBuffer,
 	int sum = 0;
 	int offset = 0;
 	localPrefixScan[threadId] = 0;
-	for (int i = 0; i < blocksCount; ++i)
+	for (int i = 0; i < computeUnits; ++i)
 	{
 		int count = scansBuffer[offset + threadId];
 		scansBuffer[offset + threadId] = sum;
@@ -155,9 +155,9 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 	int bashSize = blocksCount * blockSride * blockIndex;
 	int radixPrefixOffset = computeUnits * radixStride;
 
+	radixPrefixScan[threadId] = 0;
 	if (threadId < radixStride)
 	{
-		radixPrefixScan[threadId] = 0;
 		radixPrefixStart[threadId] = scansBuffer[radixBase + threadId];
 		radixPrefixBatchScan[threadId] = scansBuffer[radixPrefixOffset + threadId];
 	}
