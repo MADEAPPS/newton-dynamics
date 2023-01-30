@@ -83,9 +83,9 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	{
 		buffer0[i] = 0;
 	}
-	buffer0[0] = 2;
+	buffer0[0] = 3;
 	buffer0[1] = 1;
-	buffer0[2] = 2;
+	buffer0[2] = 3;
 	buffer0[3] = 1;
 	buffer0[4] = 0;
 	buffer0[5] = 1;
@@ -94,7 +94,23 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	buffer0[8] = 1;
 	buffer0[9] = 2;
 	buffer0[10] = 3;
-	m_buf0.ReadData(buffer0, 16);
+	buffer0[11] = 2;
+
+	buffer0[16] = 3;
+	buffer0[17] = 2;
+	buffer0[18] = 3;
+	buffer0[19] = 0;
+	buffer0[20] = 3;
+	buffer0[21] = 1;
+	buffer0[22] = 3;
+	buffer0[23] = 1;
+
+	buffer0[24] = 2;
+	buffer0[25] = 1;
+	buffer0[26] = 2;
+	buffer0[27] = 1;
+	buffer0[32] = 1;
+	m_buf0.ReadData(buffer0, 35);
 }
 
 ndCudaContextImplement::~ndCudaContextImplement()
@@ -388,9 +404,7 @@ void ndCudaContextImplement::Begin()
 	{
 		return item & 0x07;
 	};
-
-	ndCountingSort<int, 3>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
-
+	//ndCountingSort<int, 3>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
 
 	int xxxxxxxxxx0[1024];
 	int xxxxxxxxxx1[1024];
@@ -418,6 +432,6 @@ void ndCudaContextImplement::Begin()
 		};
 	};
 
-	ndCountingSortOld<int, GetKey, 3>(src, dst, scans);
-	//ndCountingSort<int, GetKey, 3>(src, dst, scans);
+	//ndCountingSortOld<int, GetKey, 3>(src, dst, scans);
+	ndCountingSort<int, GetKey, 3>(src, dst, scans);
 }
