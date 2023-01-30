@@ -33,11 +33,10 @@ Set(CMAKE_CUDA_FLAGS_DEBUG "-Xcompiler=\"-MDd -W4 -wd4100 -wd4201 -wd4324 -wd450
 Set(CMAKE_CUDA_FLAGS_RELEASE "-Xcompiler=\"-MD -W4 -wd4100 -wd4201 -wd4324 -wd4505 -Zi -O2 -Ob2\" -DNDEBUG --extended-lambda") 
 Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "-Xcompiler=\"-MD -W4 -wd4100 -wd4201 -wd4324 -wd4505 -Zi -O2 -Ob1\" -DNDEBUG --extended-lambda")
 
-#Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -lineinfo")
+Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -lineinfo")
 Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -lineinfo")
-#Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} -lineinfo")
+Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} -lineinfo")
 
-# this does not fucking works, unless yo umak ethe p[ropject a cuda solution.]
 Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -rdc=true")
 Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -rdc=true")
 Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} -rdc=true")
@@ -48,6 +47,9 @@ Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} --device
 #Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -use_fast_math")
 #Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -use_fast_math")
 #Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} -use_fast_math")
+
+#target_link_options(${projectName} PRIVATE $<DEVICE_LINK:-Xcompiler "/wd4100 /WX">)
+#target_link_options(${projectName} PRIVATE $<DEVICE_LINK:-Xcompiler "/wd4100">)
 
 message ("cuda debug options ${CMAKE_CUDA_FLAGS_DEBUG}")
 message ("cuda release options ${CMAKE_CUDA_FLAGS_RELEASE}")

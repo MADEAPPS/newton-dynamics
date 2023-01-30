@@ -140,6 +140,11 @@ const char* ndCudaContextImplement::GetStringId() const
 	return m_device->m_prop.name;
 }
 
+int ndCudaContextImplement::GetComputeUnits() const
+{
+	return m_device->GetComputeUnits();
+}
+
 #if 0
 float ndCudaContextImplement::GetTimeInSeconds() const
 {
@@ -404,11 +409,12 @@ void ndCudaContextImplement::Begin()
 	{
 		return item & 0x07;
 	};
-	//ndCountingSort<int, 3>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
+	ndCountingSort<int, 3>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
 
 	int xxxxxxxxxx0[1024];
 	int xxxxxxxxxx1[1024];
 	int xxxxxxxxxx2[1024];
+	
 	cudaDeviceSynchronize();
 	m_buf0.WriteData(xxxxxxxxxx0, m_buf0.GetCount());
 	m_buf1.WriteData(xxxxxxxxxx1, m_buf1.GetCount());

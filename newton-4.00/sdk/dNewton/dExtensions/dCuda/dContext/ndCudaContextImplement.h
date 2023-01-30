@@ -60,6 +60,8 @@ class ndCudaContextImplement
 	//
 	//void IntegrateBodies(float timestep);
 	//void IntegrateUnconstrainedBodies(float timestep);
+
+	int GetComputeUnits() const;
 	
 	
 	//ndCudaSceneInfo* m_sceneInfoGpu;

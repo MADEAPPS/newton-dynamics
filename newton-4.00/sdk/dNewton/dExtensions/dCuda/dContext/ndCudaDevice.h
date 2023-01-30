@@ -37,7 +37,10 @@ class ndCudaDevice
 	void* operator new (size_t size);
 	void operator delete (void* ptr);
 
+	int GetComputeUnits() const;
+
 	struct cudaDeviceProp m_prop;
+	int m_computeUnits;
 };
 
 #endif

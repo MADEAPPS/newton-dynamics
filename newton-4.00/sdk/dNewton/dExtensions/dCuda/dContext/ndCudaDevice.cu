@@ -45,6 +45,8 @@ ndCudaDevice::ndCudaDevice()
 	cuTrace(("blocks per multiprocessors %d\n", m_prop.maxBlocksPerMultiProcessor));
 	cuTrace(("memory bus with: %d bits\n", m_prop.memoryBusWidth));
 	cuTrace(("memory: (mbytes) %d\n", m_prop.totalGlobalMem / (1024 * 1024)));
+
+	m_computeUnits = std::min(2 * m_prop.multiProcessorCount, 128);
 }
 
 ndCudaDevice::~ndCudaDevice()
@@ -69,4 +71,9 @@ void ndCudaDevice::operator delete (void* ptr)
 	ndCudaFree(ptr);
 }											
 
+int ndCudaDevice::GetComputeUnits() const
+{
+	//return m_computeUnits;
+	return 2;
+}
 
