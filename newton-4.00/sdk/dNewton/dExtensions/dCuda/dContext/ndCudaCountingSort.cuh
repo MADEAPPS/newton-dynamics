@@ -160,6 +160,7 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 			atomicAdd(&radixPrefixCount[radix], 1);
 			sortedRadix[threadId] = (radix << 16) + threadId;
 		}
+		__syncthreads();
 
 		radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId + 1] = radixPrefixCount[threadId];
 		for (int k = 1; k < radixStride; k = k << 1)
@@ -200,6 +201,7 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 			dst[dstOffset0 + dstOffset1] = cachedItems[keyLow];
 		}
 	
+		__syncthreads();
 		radixPrefixStart[threadId] += radixPrefixCount[threadId];
 		bashSize += blockSride;
 	}
