@@ -30,10 +30,10 @@
 #include "ndCudaHostBuffer.h"
 #include "ndCudaDeviceBuffer.h"
 
-#define D_COUNTING_SORT_BLOCK_SIZE	(1<<10)
-//#define D_COUNTING_SORT_BLOCK_SIZE	(1<<8)
-//#define D_COUNTING_SORT_BLOCK_SIZE	(16)
 //#define D_COUNTING_SORT_BLOCK_SIZE	(8)
+//#define D_COUNTING_SORT_BLOCK_SIZE	(1<<8)
+//#define D_COUNTING_SORT_BLOCK_SIZE	(1<<9)
+#define D_COUNTING_SORT_BLOCK_SIZE	(1<<10)
 
 template <class T, int exponentRadix, typename ndEvaluateRadix>
 void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix);
@@ -57,22 +57,6 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 // support function implementation 
 //
 // *****************************************************************
-template <class T, int exponentRadix, typename ndEvaluateRadix>
-void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix)
-{
-	int itemCount = src.GetCount();
-	int radixStride = 1 << exponentRadix;
-	int deviceComputeUnits = context->GetComputeUnits();
-	int computeUnitsBashCount = (itemCount + D_COUNTING_SORT_BLOCK_SIZE - 1) / D_COUNTING_SORT_BLOCK_SIZE;
-	int bashCount = (computeUnitsBashCount + deviceComputeUnits - 1) / deviceComputeUnits;
-	int computeUnits = (itemCount + bashCount * D_COUNTING_SORT_BLOCK_SIZE - 1) / (bashCount * D_COUNTING_SORT_BLOCK_SIZE);
-	ndAssert(computeUnits <= deviceComputeUnits);
-
-	ndCudaCountItems << <computeUnits, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (src.m_array, itemCount, bashCount, context->m_sortPrefixBuffer.m_array, radixStride, evaluateRadix);
-	ndCudaAddPrefix << <1, radixStride, 0 >> > (src.m_array, computeUnits, context->m_sortPrefixBuffer.m_array, evaluateRadix);
-	ndCudaMergeBuckets << <computeUnits, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (src.m_array, dst.m_array, itemCount, bashCount, context->m_sortPrefixBuffer.m_array, radixStride, computeUnits, evaluateRadix);
-}
-
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaAddPrefix(const T* src, int computeUnits, int* scansBuffer, SortKeyPredicate getRadix)
 {
@@ -220,4 +204,21 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 		bashSize += blockSride;
 	}
 }
+
+template <class T, int exponentRadix, typename ndEvaluateRadix>
+void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix)
+{
+	int itemCount = src.GetCount();
+	int radixStride = 1 << exponentRadix;
+	int deviceComputeUnits = context->GetComputeUnits();
+	int computeUnitsBashCount = (itemCount + D_COUNTING_SORT_BLOCK_SIZE - 1) / D_COUNTING_SORT_BLOCK_SIZE;
+	int bashCount = (computeUnitsBashCount + deviceComputeUnits - 1) / deviceComputeUnits;
+	int computeUnits = (itemCount + bashCount * D_COUNTING_SORT_BLOCK_SIZE - 1) / (bashCount * D_COUNTING_SORT_BLOCK_SIZE);
+	ndAssert(computeUnits <= deviceComputeUnits);
+
+	ndCudaCountItems << <computeUnits, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (src.m_array, itemCount, bashCount, context->m_sortPrefixBuffer.m_array, radixStride, evaluateRadix);
+	ndCudaAddPrefix << <1, radixStride, 0 >> > (src.m_array, computeUnits, context->m_sortPrefixBuffer.m_array, evaluateRadix);
+	//ndCudaMergeBuckets << <computeUnits, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (src.m_array, dst.m_array, itemCount, bashCount, context->m_sortPrefixBuffer.m_array, radixStride, computeUnits, evaluateRadix);
+}
+
 #endif

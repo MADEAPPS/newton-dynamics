@@ -65,52 +65,40 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//
 	//*m_sceneInfoCpu = ndCudaSceneInfo();
 
+	m_sortPrefixBuffer.SetCount(m_sortPrefixBuffer.GetCapacity());
+
+
 	// ***********************************
-
-	int buffer0[1024];
-	m_buf0.SetCount(1024);
-	for (int i = 0; i < m_buf0.GetCount(); i++)
+	m_src.SetCount(1000);
+	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
-		buffer0[i] = 99;
+		m_src[i] = rand() % 256;
 	}
-	buffer0[20] = 2;
-	m_buf0.ReadData(buffer0, m_buf0.GetCount());
 
-	m_buf0.SetCount(35);
-	m_buf1.SetCount(35);
-	m_sortPrefixBuffer.SetCount(64 * 1024);
-	for (int i = 0; i < m_buf0.GetCount(); i++)
+	m_scan0.SetCount(1024 * 256);
+	m_scan1.SetCount(1024 * 256);
+	m_dst0.SetCount(m_src.GetCount());
+	m_dst1.SetCount(m_src.GetCount());
+	m_buf0.SetCount(m_src.GetCount());
+	m_buf1.SetCount(m_src.GetCount());
+	m_buf0.ReadData(&m_src[0], m_src.GetCount());
+
+	class GetKey
 	{
-		buffer0[i] = 0;
+		public:
+		int GetRadix(int item) const
+		{
+			return item & 0xff;
+		};
+	};
+
+	ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
+	for (int i = 1; i < m_dst0.GetCount(); ++i)
+	{
+		int a = m_dst0[i - 1];
+		int b = m_dst0[i];
+		ndAssert(a <= b);
 	}
-	buffer0[0] = 3;
-	buffer0[1] = 1;
-	buffer0[2] = 3;
-	buffer0[3] = 1;
-	buffer0[4] = 0;
-	buffer0[5] = 1;
-	buffer0[6] = 3;
-	buffer0[7] = 2;
-	buffer0[8] = 1;
-	buffer0[9] = 2;
-	buffer0[10] = 3;
-	buffer0[11] = 2;
-
-	buffer0[16] = 3;
-	buffer0[17] = 2;
-	buffer0[18] = 3;
-	buffer0[19] = 0;
-	buffer0[20] = 3;
-	buffer0[21] = 1;
-	buffer0[22] = 3;
-	buffer0[23] = 1;
-
-	buffer0[24] = 2;
-	buffer0[25] = 1;
-	buffer0[26] = 2;
-	buffer0[27] = 1;
-	buffer0[32] = 1;
-	m_buf0.ReadData(buffer0, 35);
 }
 
 ndCudaContextImplement::~ndCudaContextImplement()
@@ -407,36 +395,18 @@ void ndCudaContextImplement::Begin()
 
 	auto GetRadix = []  __device__(int item)
 	{
-		return item & 0x07;
+		return item & 0xff;
 	};
-	ndCountingSort<int, 3>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
-
-	int xxxxxxxxxx0[1024];
-	int xxxxxxxxxx1[1024];
-	int xxxxxxxxxx2[1024];
-	
+	ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
 	cudaDeviceSynchronize();
-	m_buf0.WriteData(xxxxxxxxxx0, m_buf0.GetCount());
-	m_buf1.WriteData(xxxxxxxxxx1, m_buf1.GetCount());
-	m_sortPrefixBuffer.WriteData(xxxxxxxxxx2, 256);
 
-	ndCudaHostBuffer<int> src;
-	ndCudaHostBuffer<int> dst;
-	ndCudaHostBuffer<int> scans;
+	m_sortPrefixBuffer.WriteData(&m_scan1[0], m_scan1.GetCount());
+	m_buf1.WriteData(&m_dst1[0], m_dst1.GetCount());
 
-	scans.SetCount(64 * 1024);
-	src.SetCount(m_buf0.GetCount());
-	dst.SetCount(m_buf1.GetCount());
-	src.ReadData(xxxxxxxxxx0, m_buf0.GetCount());
-
-	class GetKey
+	for (int i = 1; i < m_dst1.GetCount(); ++i)
 	{
-		public:
-		int GetRadix(int item) const
-		{
-			return item & 0x07;
-		};
-	};
-
-	ndCountingSort<int, GetKey, 3>(src, dst, scans);
+		int a = m_dst1[i - 1];
+		int b = m_dst1[i];
+		ndAssert(a <= b);
+	}
 }

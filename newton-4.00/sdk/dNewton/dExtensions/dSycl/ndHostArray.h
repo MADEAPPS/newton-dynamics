@@ -25,7 +25,8 @@
 #include "ndSyclStdafx.h"
 #include "ndHostAllocator.h"
 
-#define D_HOST_SORT_BLOCK_SIZE	(1<<8)
+#define D_HOST_SORT_BLOCK_SIZE	(1 << 10)
+//#define D_HOST_SORT_BLOCK_SIZE	(1<<8)
 
 template <class T>
 class ndHostArray : public std::vector<T, ndHostAllocator<T> >
@@ -233,9 +234,9 @@ void ndCountingSort(const ndHostArray<T>& src, ndHostArray<T>& dst, ndHostArray<
 	};
 
 	ndAssert(src.size() == dst.size());
-	ndAssert(scansBuffer.size() >= src.size());
+	//ndAssert(scansBuffer.size() >= src.size());
 
-	int deviceComputeUnits = 2;
+	int deviceComputeUnits = 20;
 	int itemCount = src.size();
 	int computeUnitsBashCount = (itemCount + D_HOST_SORT_BLOCK_SIZE - 1) / D_HOST_SORT_BLOCK_SIZE;
 	int bashCount = (computeUnitsBashCount + deviceComputeUnits - 1) / deviceComputeUnits;

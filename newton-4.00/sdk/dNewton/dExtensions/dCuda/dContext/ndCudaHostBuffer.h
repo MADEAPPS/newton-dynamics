@@ -26,6 +26,7 @@
 #include <cuda_runtime.h>
 #include "ndCudaIntrinsics.h"
 
+//#define D_HOST_SORT_BLOCK_SIZE	(1<<9)
 #define D_HOST_SORT_BLOCK_SIZE	(1<<10)
 
 template<class T>
@@ -415,9 +416,8 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	};
 
 	ndAssert(src.GetCount() == dst.GetCount());
-	ndAssert(scansBuffer.GetCount() >= src.GetCount());
 
-	int deviceComputeUnits = 2;
+	int deviceComputeUnits = 20;
 	int itemCount = src.GetCount();
 	int computeUnitsBashCount = (itemCount + D_HOST_SORT_BLOCK_SIZE - 1) / D_HOST_SORT_BLOCK_SIZE;
 	int bashCount = (computeUnitsBashCount + deviceComputeUnits - 1) / deviceComputeUnits;
@@ -436,7 +436,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 
 	for (int block = 0; block < computeUnits; ++block)
 	{
-		MergeBuckects(block, bashCount, computeUnits);
+		//MergeBuckects(block, bashCount, computeUnits);
 	}
 }
 

@@ -87,6 +87,11 @@ class ndCudaContextImplement
 	ndCudaDevice* m_device;
 
 	/// **********************
+	ndCudaHostBuffer<int> m_src;
+	ndCudaHostBuffer<int> m_dst0;
+	ndCudaHostBuffer<int> m_dst1;
+	ndCudaHostBuffer<int> m_scan0;
+	ndCudaHostBuffer<int> m_scan1;
 	ndCudaDeviceBuffer<int> m_buf0;
 	ndCudaDeviceBuffer<int> m_buf1;
 	ndCudaDeviceBuffer<int> m_sortPrefixBuffer;
