@@ -30,9 +30,10 @@
 #include "ndCudaHostBuffer.h"
 #include "ndCudaDeviceBuffer.h"
 
+#define D_COUNTING_SORT_BLOCK_SIZE	(1<<10)
 //#define D_COUNTING_SORT_BLOCK_SIZE	(1<<8)
 //#define D_COUNTING_SORT_BLOCK_SIZE	(16)
-#define D_COUNTING_SORT_BLOCK_SIZE	(8)
+//#define D_COUNTING_SORT_BLOCK_SIZE	(8)
 
 template <class T, int exponentRadix, typename ndEvaluateRadix>
 void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix);
@@ -401,6 +402,15 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 			sortedRadix[threadId] = (radix << 16) + threadId;
 		}
 
+		radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId + 1] = radixPrefixCount[threadId];
+		for (int k = 1; k < radixStride; k = k << 1)
+		{
+			__syncthreads();
+			int sum = radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId] + radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId - k];
+			__syncthreads();
+			radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId] = sum;
+		}
+
 		int threadId0 = threadId;
 		for (int k = 2; k <= blockSride; k = k << 1)
 		{
@@ -419,17 +429,6 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 				}
 				__syncthreads();
 			}
-		}
-	
-		radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId + 1] = radixPrefixCount[threadId];
-		 __syncthreads();
-	
-		for (int k = 1; k < radixStride; k = k << 1)
-		{
-			int sum = radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId] + radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId - k];
-			__syncthreads();
-			radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId] = sum;
-			__syncthreads();
 		}
 
 		if (index < bufferSize)
