@@ -32,8 +32,8 @@
 
 //#define D_COUNTING_SORT_BLOCK_SIZE	(8)
 //#define D_COUNTING_SORT_BLOCK_SIZE	(1<<8)
-//#define D_COUNTING_SORT_BLOCK_SIZE	(1<<9)
-#define D_COUNTING_SORT_BLOCK_SIZE	(1<<10)
+#define D_COUNTING_SORT_BLOCK_SIZE	(1<<9)
+//#define D_COUNTING_SORT_BLOCK_SIZE	(1<<10)
 
 template <class T, int exponentRadix, typename ndEvaluateRadix>
 void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix);
@@ -177,6 +177,7 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 			for (int j = k >> 1; j > 0; j = j >> 1)
 			{
 				int threadId1 = threadId0 ^ j;
+#if 1
 				if (threadId1 > threadId0)
 				{
 					const int a = sortedRadix[threadId0];
@@ -188,6 +189,19 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 					sortedRadix[threadId1] = (a & mask) | (b & ~mask);
 				}
 				__syncthreads();
+#else
+				const int a = sortedRadix[threadId0];
+				const int b = sortedRadix[threadId1];
+				const int mask0 = (-(threadId0 & k)) >> 31;
+				const int mask1 = -(a > b);
+				const int mask2 = mask0 ^ mask1;
+				const int mask3 = -(threadId1 < threadId0);
+				const int a1 = (b & mask3) | (a & ~mask3);
+				const int b1 = (a & mask3) | (b & ~mask3);
+				__syncthreads();
+				sortedRadix[threadId0] = (b1 & mask2) | (a1 & ~mask2);
+				__syncthreads();
+#endif
 			}
 		}
 
