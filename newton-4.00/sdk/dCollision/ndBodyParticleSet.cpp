@@ -34,6 +34,7 @@ ndBodyParticleSet::ndBodyParticleSet()
 	,m_veloc(1024)
 	,m_listNode(nullptr)
 	,m_radius(ndFloat32 (0.125f))
+	,m_timestep(ndFloat32(0.0f))
 	,m_updateInBackground(true)
 {
 }

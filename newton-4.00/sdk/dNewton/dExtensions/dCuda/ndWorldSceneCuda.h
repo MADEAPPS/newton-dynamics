@@ -58,6 +58,8 @@ class ndWorldSceneCuda : public ndWorldScene
 	//
 	//friend class ndDynamicsUpdateCuda;
 
+	virtual void ParticleUpdate(ndFloat32 timestep);
+
 	private:
 	ndCudaContext* m_context;
 	friend class ndDynamicsUpdateCuda;

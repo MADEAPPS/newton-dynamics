@@ -243,3 +243,12 @@ void ndWorldSceneCuda::CalculateContacts(ndInt32, ndContact* const)
 	ndAssert(0);
 }
 #endif
+
+void ndWorldSceneCuda::ParticleUpdate(ndFloat32 timestep)
+{
+	for (ndBodyList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyParticleSet* const body = node->GetInfo()->GetAsBodyParticleSet();
+		body->Update(this, timestep);
+	}
+}

@@ -178,6 +178,8 @@ class ndWaterVolumeEntity : public ndDemoEntity
 	ndWaterVolumeEntity(ndDemoEntityManager* const scene, const ndMatrix& location, const ndVector&, ndIsoSurfaceParticleVolume* const fluidBody)
 		:ndDemoEntity(location, nullptr)
 		,m_fluidBody(fluidBody)
+		,m_isoSurfaceMesh0()
+		,m_isoSurfaceMesh1()
 	{
 		ndShapeInstance box(new ndShapeBox(9.0f, 10.0f, 9.0f));
 		ndMatrix uvMatrix(ndGetIdentityMatrix());

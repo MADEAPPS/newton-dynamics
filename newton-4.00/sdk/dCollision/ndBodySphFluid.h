@@ -29,9 +29,9 @@ D_MSV_NEWTON_ALIGN_32
 class ndBodySphFluid: public ndBodyParticleSet
 {
 	public:
-	D_NEWTON_API ndBodySphFluid();
-	D_NEWTON_API ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	D_NEWTON_API virtual ~ndBodySphFluid ();
+	D_COLLISION_API ndBodySphFluid();
+	D_COLLISION_API ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc);
+	D_COLLISION_API virtual ~ndBodySphFluid ();
 
 	ndFloat32 GetViscosity() const;
 	void SetViscosity(ndFloat32 viscosity);
@@ -48,12 +48,13 @@ class ndBodySphFluid: public ndBodyParticleSet
 	ndFloat32 GetSphGridSize() const;
 
 	virtual ndBodySphFluid* GetAsBodySphFluid();
-	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
+	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	D_NEWTON_API void Execute(ndThreadPool* const threadPool);
+	D_COLLISION_API void Execute(ndThreadPool* const threadPool);
 
 	protected:
-	D_NEWTON_API virtual void Update(const ndWorld* const world, ndFloat32 timestep);
+	//D_COLLISION_API virtual void Update(const ndWorld* const world, ndFloat32 timestep);
+	D_COLLISION_API virtual void Update(const ndScene* const scene, ndFloat32 timestep);
 	virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const;
 
 	private:
@@ -84,7 +85,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	ndFloat32 m_viscosity;
 	ndFloat32 m_restDensity;
 	ndFloat32 m_gasConstant;
-	ndFloat32 m_timestep;
+	
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const ndFastRay&, const ndFloat32) const
