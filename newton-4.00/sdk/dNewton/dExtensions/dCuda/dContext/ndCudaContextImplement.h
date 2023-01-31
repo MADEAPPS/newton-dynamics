@@ -48,9 +48,6 @@ class ndCudaContextImplement
 	void Begin();
 
 	//void End();
-	
-	float GetTimeInSeconds() const;
-	
 	//void ResizeBuffers(int size);
 	//void LoadBodyData(const ndCudaBodyProxy* const src, int size);
 	//
@@ -95,10 +92,6 @@ class ndCudaContextImplement
 	ndCudaDeviceBuffer<int> m_buf0;
 	ndCudaDeviceBuffer<int> m_buf1;
 	ndCudaDeviceBuffer<int> m_sortPrefixBuffer;
-
-	
-	long long m_timeInMicroSeconds;
-	long long m_deltaTimeInMicroSeconds;
 };
 
 #endif

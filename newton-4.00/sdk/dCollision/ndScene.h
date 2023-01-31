@@ -81,7 +81,6 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void Sync();
 	D_COLLISION_API virtual bool IsHighPerformanceCompute() const;
 	D_COLLISION_API virtual bool IsValid() const;
-	D_COLLISION_API virtual double GetGPUTime() const;
 
 	D_COLLISION_API virtual void Cleanup();
 
@@ -191,11 +190,6 @@ inline bool ndScene::IsValid() const
 inline bool ndScene::IsHighPerformanceCompute() const
 {
 	return false;
-}
-
-inline double ndScene::GetGPUTime() const
-{
-	return 0.0;
 }
 
 inline ndWorld* ndScene::GetWorld() const

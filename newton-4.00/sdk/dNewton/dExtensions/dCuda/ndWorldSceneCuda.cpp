@@ -70,11 +70,6 @@ bool ndWorldSceneCuda::IsHighPerformanceCompute() const
 	return true;
 }
 
-double ndWorldSceneCuda::GetGPUTime() const
-{
-	return m_context->GetGPUTime();
-}
-
 #if 0
 void ndWorldSceneCuda::LoadBodyData()
 {

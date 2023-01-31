@@ -105,7 +105,6 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API ndUnsigned32 GetFrameNumber() const;
 	D_NEWTON_API ndUnsigned32 GetSubFrameNumber() const;
 	D_NEWTON_API ndFloat32 GetAverageUpdateTime() const;
-	D_NEWTON_API ndFloat32 GetExtensionAverageUpdateTime() const;
 
 	D_NEWTON_API ndContactNotify* GetContactNotify() const;
 	D_NEWTON_API void SetContactNotify(ndContactNotify* const notify);
@@ -175,9 +174,6 @@ class ndWorld: public ndClassAlloc
 	ndFloat32 m_averageTimestepAcc;
 	ndFloat32 m_averageFramesCount;
 	ndFloat32 m_lastExecutionTime;
-	ndFloat32 m_extensionAverageUpdateTime;
-	ndFloat32 m_extensionAverageTimestepAcc;
-
 	dgSolverProgressiveSleepEntry m_sleepTable[D_SLEEP_ENTRIES];
 
 	ndInt32 m_subSteps;

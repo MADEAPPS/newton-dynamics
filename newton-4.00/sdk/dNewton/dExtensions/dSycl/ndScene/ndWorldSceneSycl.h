@@ -34,7 +34,6 @@ class ndWorldSceneSycl : public ndWorldScene
 	virtual void End();
 	virtual bool IsValid() const;
 	virtual bool IsHighPerformanceCompute() const;
-	//virtual double GetGPUTime() const;
 	//
 	//virtual void ApplyExtForce();
 	//virtual void BalanceScene();

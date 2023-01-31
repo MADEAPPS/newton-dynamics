@@ -74,14 +74,6 @@ bool ndWorldSceneSycl::IsHighPerformanceCompute() const
 //	return this;
 //}
 
-
-double ndWorldSceneSycl::GetGPUTime() const
-{
-	ndAssert(0);
-	return 0;
-	//return ndCudaContext::GetGPUTime();
-}
-
 void ndWorldSceneSycl::LoadBodyData()
 {
 	auto CopyBodies = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)

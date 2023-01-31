@@ -21,7 +21,6 @@
 
 #include "ndCudaStdafx.h"
 #include "ndCudaUtils.h"
-#include "ndCudaTimer.h"
 #include "ndCudaDevice.h"
 #include "ndCudaContext.h"
 #include "ndCudaPrefixScan.cuh"
@@ -45,8 +44,6 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//,m_solverComputeStream(0)
 	//,m_timeInSeconds(0.0f)
 	//,m_frameCounter(0)
-	,m_timeInMicroSeconds(0)
-	,m_deltaTimeInMicroSeconds(0)
 {
 	//cudaError_t cudaStatus;
 	//cudaStatus = cudaStreamCreate(&m_solverMemCpuStream);
@@ -141,14 +138,6 @@ const char* ndCudaContextImplement::GetStringId() const
 int ndCudaContextImplement::GetComputeUnits() const
 {
 	return m_device->GetComputeUnits();
-}
-
-float ndCudaContextImplement::GetTimeInSeconds() const
-{
-	//return float(m_timeInSeconds);
-	//return float (double(ndCudaGetTimeInMicroseconds()) * 1.0e-6);
-	//return float(double(ndCudaGetTimeInMicroseconds()) * 1.0e-6);
-	return float(double(m_deltaTimeInMicroSeconds) * 1.0e-6);
 }
 
 #if 0
@@ -381,9 +370,7 @@ void ndCudaContextImplement::InitBodyArray()
 void ndCudaContextImplement::Begin()
 {
 	//ndAssert(0);
-	//m_deltaTimeInMicroSeconds = ndCudaGetTimeInMicroseconds() - m_timeInMicroSeconds;
 	cudaDeviceSynchronize();
-	//m_timeInMicroSeconds = ndCudaGetTimeInMicroseconds();
 
 	//// get the scene info from the update	
 	//ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
@@ -409,15 +396,6 @@ void ndCudaContextImplement::Begin()
 	//
 	//ndCudaBeginFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo);
 
-	auto GetRadix = []  __device__(int item)
-	{
-		return item & 0xff;
-	};
-	//ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
-	//ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
-	//ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
-	//ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
-
 	//class GetKey
 	//{
 	//	public:
@@ -431,14 +409,24 @@ void ndCudaContextImplement::Begin()
 	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
 	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
 
-	//cudaDeviceSynchronize();
-	//m_sortPrefixBuffer.WriteData(&m_scan1[0], m_scan1.GetCount());
-	//m_buf1.WriteData(&m_dst1[0], m_dst1.GetCount());
-	//
-	//for (int i = 1; i < m_dst1.GetCount(); ++i)
-	//{
-	//	int a = m_dst1[i - 1];
-	//	int b = m_dst1[i];
-	//	ndAssert(a <= b);
-	//}
+	auto GetRadix = []  __device__(int item)
+	{
+		return item & 0xff;
+	};
+	ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
+	ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
+	ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
+	ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
+#if 0
+	cudaDeviceSynchronize();
+	m_sortPrefixBuffer.WriteData(&m_scan1[0], m_scan1.GetCount());
+	m_buf1.WriteData(&m_dst1[0], m_dst1.GetCount());
+	
+	for (int i = 1; i < m_dst1.GetCount(); ++i)
+	{
+		int a = m_dst1[i - 1];
+		int b = m_dst1[i];
+		ndAssert(a <= b);
+	}
+#endif
 }

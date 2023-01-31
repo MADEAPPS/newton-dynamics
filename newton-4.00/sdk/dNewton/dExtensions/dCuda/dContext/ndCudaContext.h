@@ -42,7 +42,6 @@ class ndCudaContext
 	D_CUDA_API void operator delete (void* ptr);
 
 	D_CUDA_API bool IsValid() const;
-	D_CUDA_API double GetGPUTime() const;
 	D_CUDA_API const char* GetStringId() const;
 
 	D_CUDA_API void Begin();

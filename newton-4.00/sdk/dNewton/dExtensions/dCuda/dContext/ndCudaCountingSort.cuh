@@ -184,9 +184,13 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 					const int b = sortedRadix[threadId1];
 					const int mask0 = (-(threadId0 & k)) >> 31;
 					const int mask1 = -(a > b);
-					const int mask = mask0 ^ mask1;
-					sortedRadix[threadId0] = (b & mask) | (a & ~mask);
-					sortedRadix[threadId1] = (a & mask) | (b & ~mask);
+					const int mask2 = mask0 ^ mask1;
+					//const int a1 = (b & mask2) | (a & ~mask2);
+					//const int b1 = (a & mask2) | (b & ~mask2);
+					const int a1 = mask2 ? b : a;
+					const int b1 = mask2 ? a : b;
+					sortedRadix[threadId0] = a1;
+					sortedRadix[threadId1] = b1;
 				}
 				__syncthreads();
 #else
@@ -196,10 +200,13 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 				const int mask1 = -(a > b);
 				const int mask2 = mask0 ^ mask1;
 				const int mask3 = -(threadId1 < threadId0);
-				const int a1 = (b & mask3) | (a & ~mask3);
-				const int b1 = (a & mask3) | (b & ~mask3);
+				const int a1 = mask2 ? b : a;
+				const int b1 = mask2 ? a : b;
+				//const int a1 = (b & mask2) | (a & ~mask2);
+				const int a2 = mask3 ? b1 : a1;
 				__syncthreads();
-				sortedRadix[threadId0] = (b1 & mask2) | (a1 & ~mask2);
+				//sortedRadix[threadId0] = (b1 & mask2) | (a1 & ~mask2);
+				sortedRadix[threadId0] = a2;
 				__syncthreads();
 #endif
 			}

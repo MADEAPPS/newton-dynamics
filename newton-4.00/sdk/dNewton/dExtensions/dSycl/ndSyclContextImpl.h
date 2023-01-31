@@ -38,7 +38,6 @@ class ndSyclContextImpl
 
 	void Begin();
 	//void End();
-	//double GetGPUTime() const;
 	//
 	//void ResizeBuffers(int size);
 	//void LoadBodyData(const ndCudaBodyProxy* const src, int size);

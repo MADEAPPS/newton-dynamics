@@ -36,7 +36,6 @@ class ndWorldSceneCuda : public ndWorldScene
 	virtual void Begin();
 	virtual void End();
 	virtual bool IsValid() const;
-	virtual double GetGPUTime() const;
 	virtual bool IsHighPerformanceCompute() const;
 	
 	//virtual void ApplyExtForce();

@@ -77,11 +77,6 @@ const char* ndCudaContext::GetStringId() const
 	return m_implement->GetStringId();
 }
 
-double ndCudaContext::GetGPUTime() const
-{
-	return m_implement->GetTimeInSeconds();
-}
-
 #if 0
 ndCudaSpatialVector* ndCudaContext::GetTransformBuffer()
 {
