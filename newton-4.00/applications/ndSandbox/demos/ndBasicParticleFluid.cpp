@@ -209,7 +209,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		{
 			ndScopeSpinLock lock(m_lock);
 
-			if (m_fluidBody->taskState() == ndBackgroundTask::m_taskCompleted)
+			if (m_fluidBody->TaskState() == ndBackgroundTask::m_taskCompleted)
 			{
 				m_fluidBody->m_meshIsReady.store(0);
 				const ndArray<ndInt32>& indexList = m_fluidBody->m_indexList;

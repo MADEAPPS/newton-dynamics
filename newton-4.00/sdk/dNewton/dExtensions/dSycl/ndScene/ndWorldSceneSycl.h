@@ -32,8 +32,8 @@ class ndWorldSceneSycl : public ndWorldScene
 
 	virtual void Begin();
 	virtual void End();
-	//virtual bool IsGPU() const;
 	virtual bool IsValid() const;
+	virtual bool IsHighPerformanceCompute() const;
 	//virtual double GetGPUTime() const;
 	//
 	//virtual void ApplyExtForce();

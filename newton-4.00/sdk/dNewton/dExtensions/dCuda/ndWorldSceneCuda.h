@@ -35,11 +35,10 @@ class ndWorldSceneCuda : public ndWorldScene
 
 	virtual void Begin();
 	virtual void End();
-
-	//virtual bool IsGPU() const;
 	virtual bool IsValid() const;
-	//virtual double GetGPUTime() const;
-	//
+	virtual double GetGPUTime() const;
+	virtual bool IsHighPerformanceCompute() const;
+	
 	//virtual void ApplyExtForce();
 	//virtual void BalanceScene();
 	//virtual void InitBodyArray();

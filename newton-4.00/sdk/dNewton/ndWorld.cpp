@@ -214,9 +214,9 @@ const char* ndWorld::GetSolverString() const
 	return m_solver->GetStringId();
 }
 
-bool ndWorld::IsGPU() const
+bool ndWorld::IsHighPerformanceCompute() const
 {
-	return m_scene->IsGPU();
+	return m_scene->IsHighPerformanceCompute();
 }
 
 void ndWorld::ClearCache()

@@ -48,8 +48,9 @@ class ndCudaContextImplement
 	void Begin();
 
 	//void End();
-	//float GetTimeInSeconds() const;
-	//
+	
+	float GetTimeInSeconds() const;
+	
 	//void ResizeBuffers(int size);
 	//void LoadBodyData(const ndCudaBodyProxy* const src, int size);
 	//

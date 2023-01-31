@@ -26,7 +26,7 @@ void* ndSyclMalloc(size_t size);
 void ndSyclFree(void* const ptr);
 
 template <class T>
-class ndHostAllocator
+class ndSyclAllocator
 {
 	public:
 	// type definitions
@@ -36,7 +36,7 @@ class ndHostAllocator
 	template <class U>
 	struct rebind 
 	{
-		typedef ndHostAllocator<U> other;
+		typedef ndSyclAllocator<U> other;
 	};
 
 	// return address of values
@@ -50,20 +50,20 @@ class ndHostAllocator
 		return &value;
 	}
 
-	ndHostAllocator() throw()
+	ndSyclAllocator() throw()
 	{
 	}
 
-	ndHostAllocator(const ndHostAllocator&) throw()
+	ndSyclAllocator(const ndSyclAllocator&) throw()
 	{
 	}
 
 	template <class U>
-	ndHostAllocator(const ndHostAllocator<U>&) throw()
+	ndSyclAllocator(const ndSyclAllocator<U>&) throw()
 	{
 	}
 
-	~ndHostAllocator() throw()
+	~ndSyclAllocator() throw()
 	{
 	}
 

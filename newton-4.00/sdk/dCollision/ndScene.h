@@ -79,7 +79,7 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void Begin();
 	D_COLLISION_API virtual void End();
 	D_COLLISION_API virtual void Sync();
-	D_COLLISION_API virtual bool IsGPU() const;
+	D_COLLISION_API virtual bool IsHighPerformanceCompute() const;
 	D_COLLISION_API virtual bool IsValid() const;
 	D_COLLISION_API virtual double GetGPUTime() const;
 
@@ -188,7 +188,7 @@ inline bool ndScene::IsValid() const
 	return true;
 }
 
-inline bool ndScene::IsGPU() const
+inline bool ndScene::IsHighPerformanceCompute() const
 {
 	return false;
 }

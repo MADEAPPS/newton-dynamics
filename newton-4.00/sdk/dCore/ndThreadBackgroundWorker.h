@@ -47,7 +47,7 @@ class ndBackgroundTask
 
 	virtual ~ndBackgroundTask() {}
 
-	ndTaskState taskState() const
+	ndTaskState TaskState() const
 	{
 		return m_taskState.load();
 	}

@@ -63,19 +63,17 @@ void ndWorldSceneSycl::End()
 	ndWorldScene::End();
 }
 
+bool ndWorldSceneSycl::IsHighPerformanceCompute() const
+{
+	return true;
+}
+
 #if 0
 //ndCudaContext* ndWorldSceneSycl::GetContext()
 //{
 //	return this;
 //}
 
-
-bool ndWorldSceneSycl::IsGPU() const
-{
-	ndAssert(0);
-	return false;
-	//return ndCudaContext::IsValid();
-}
 
 double ndWorldSceneSycl::GetGPUTime() const
 {

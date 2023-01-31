@@ -23,13 +23,13 @@
 #define __ND_HOST_ARRAY_H__
 
 #include "ndSyclStdafx.h"
-#include "ndHostAllocator.h"
+#include "ndSyclAllocator.h"
 
 #define D_HOST_SORT_BLOCK_SIZE	(1 << 10)
 //#define D_HOST_SORT_BLOCK_SIZE	(1<<8)
 
 template <class T>
-class ndHostArray : public std::vector<T, ndHostAllocator<T> >
+class ndHostArray : public std::vector<T, ndSyclAllocator<T> >
 {
 };
 

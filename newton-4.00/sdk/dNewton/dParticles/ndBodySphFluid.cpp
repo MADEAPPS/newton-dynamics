@@ -962,10 +962,13 @@ void ndBodySphFluid::Execute(ndThreadPool* const threadPool)
 
 void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
 {
-	if (taskState() == ndBackgroundTask::m_taskCompleted)
+	ndScene* const scene = world->GetScene();
+	if (scene->IsHighPerformanceCompute())
+	{
+	}
+	else if (TaskState() == ndBackgroundTask::m_taskCompleted)
 	{
 		m_timestep = timestep;
-		ndScene* const scene = world->GetScene();
 		scene->SendBackgroundTask(this);
 		if (!m_updateInBackground)
 		{

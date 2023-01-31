@@ -65,18 +65,17 @@ void ndWorldSceneCuda::End()
 	ndWorldScene::End();
 }
 
-#if 0
-bool ndWorldSceneCuda::IsGPU() const
+bool ndWorldSceneCuda::IsHighPerformanceCompute() const
 {
-	return ndCudaContext::IsValid();
+	return true;
 }
 
 double ndWorldSceneCuda::GetGPUTime() const
 {
-	return ndCudaContext::GetGPUTime();
+	return m_context->GetGPUTime();
 }
 
-
+#if 0
 void ndWorldSceneCuda::LoadBodyData()
 {
 	auto CopyBodies = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)

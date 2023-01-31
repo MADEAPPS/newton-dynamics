@@ -37,14 +37,14 @@
 	//#define REPLAY_RECORD
 #endif
 
-#define DEFAULT_SCENE	0		// basic rigidbody
+//#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
-//#define DEFAULT_SCENE	7		// particle fluid
+#define DEFAULT_SCENE	7		// particle fluid
 //#define DEFAULT_SCENE	8		// static mesh collision 
 //#define DEFAULT_SCENE	9		// static user mesh collision 
 //#define DEFAULT_SCENE	10		// basic joints
@@ -444,6 +444,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_collisionDisplayMode = 2;	
 	//m_collisionDisplayMode = 3;		// solid wire frame
 	//m_synchronousPhysicsUpdate = false;
+	m_synchronousParticlesUpdate = true;
 
 	Cleanup();
 	ResetTimer();
@@ -1204,7 +1205,7 @@ void ndDemoEntityManager::RenderStats()
 			sprintf(text, "physics time:  %6.3f ms", m_world->GetAverageUpdateTime() * 1.0e3f);
 			ImGui::Text(text, "");
 
-			if (m_world->IsGPU())
+			if (m_world->IsHighPerformanceCompute())
 			{
 				sprintf(text, "gpu     time:  %6.3f ms", m_world->GetExtensionAverageUpdateTime() * 1.0e3f);
 				ImGui::Text(text, "");

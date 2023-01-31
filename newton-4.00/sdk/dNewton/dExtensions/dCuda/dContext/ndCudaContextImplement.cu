@@ -21,6 +21,7 @@
 
 #include "ndCudaStdafx.h"
 #include "ndCudaUtils.h"
+#include "ndCudaTimer.h"
 #include "ndCudaDevice.h"
 #include "ndCudaContext.h"
 #include "ndCudaPrefixScan.cuh"
@@ -140,12 +141,13 @@ int ndCudaContextImplement::GetComputeUnits() const
 	return m_device->GetComputeUnits();
 }
 
-#if 0
 float ndCudaContextImplement::GetTimeInSeconds() const
 {
-	return float (m_timeInSeconds);
+	//return float(m_timeInSeconds);
+	return float (double(ndCudaGetTimeInMicroseconds()) * 1.0e-6);
 }
 
+#if 0
 
 void ndCudaContextImplement::End()
 {
