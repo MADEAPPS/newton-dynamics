@@ -82,7 +82,6 @@ class ndCudaContextImplement
 	//
 	//cudaStream_t m_solverMemCpuStream;
 	//cudaStream_t m_solverComputeStream;
-	//double m_timeInSeconds;
 	//unsigned m_frameCounter;
 
 	ndCudaDevice* m_device;
@@ -97,6 +96,9 @@ class ndCudaContextImplement
 	ndCudaDeviceBuffer<int> m_buf1;
 	ndCudaDeviceBuffer<int> m_sortPrefixBuffer;
 
+	
+	long long m_timeInMicroSeconds;
+	long long m_deltaTimeInMicroSeconds;
 };
 
 #endif

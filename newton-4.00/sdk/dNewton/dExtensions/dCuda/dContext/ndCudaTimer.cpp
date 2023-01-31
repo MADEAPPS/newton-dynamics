@@ -22,15 +22,15 @@
 //#include "ndCudaStdafx.h"
 //#include <chrono>
 //#include <atomic>
-//#include <chrono>
+#include <chrono>
 #include "ndCudaTimer.h"
 
 long long ndCudaGetTimeInMicroseconds()
 {
-	return 1000;
-	//static std::chrono::high_resolution_clock::time_point timeStampBase = std::chrono::high_resolution_clock::now();
-	//std::chrono::high_resolution_clock::time_point currentTimeStamp = std::chrono::high_resolution_clock::now();
-	//long long  timeStamp = std::chrono::duration_cast<std::chrono::microseconds>(currentTimeStamp - timeStampBase).count();
-	//return timeStamp;
+	//return 1000;
+	static std::chrono::high_resolution_clock::time_point timeStampBase = std::chrono::high_resolution_clock::now();
+	std::chrono::high_resolution_clock::time_point currentTimeStamp = std::chrono::high_resolution_clock::now();
+	long long  timeStamp = std::chrono::duration_cast<std::chrono::microseconds>(currentTimeStamp - timeStampBase).count();
+	return timeStamp;
 }
 

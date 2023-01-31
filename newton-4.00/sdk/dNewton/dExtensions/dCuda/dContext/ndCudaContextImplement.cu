@@ -45,6 +45,8 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//,m_solverComputeStream(0)
 	//,m_timeInSeconds(0.0f)
 	//,m_frameCounter(0)
+	,m_timeInMicroSeconds(0)
+	,m_deltaTimeInMicroSeconds(0)
 {
 	//cudaError_t cudaStatus;
 	//cudaStatus = cudaStreamCreate(&m_solverMemCpuStream);
@@ -144,7 +146,9 @@ int ndCudaContextImplement::GetComputeUnits() const
 float ndCudaContextImplement::GetTimeInSeconds() const
 {
 	//return float(m_timeInSeconds);
-	return float (double(ndCudaGetTimeInMicroseconds()) * 1.0e-6);
+	//return float (double(ndCudaGetTimeInMicroseconds()) * 1.0e-6);
+	//return float(double(ndCudaGetTimeInMicroseconds()) * 1.0e-6);
+	return float(double(m_deltaTimeInMicroSeconds) * 1.0e-6);
 }
 
 #if 0
@@ -377,7 +381,10 @@ void ndCudaContextImplement::InitBodyArray()
 void ndCudaContextImplement::Begin()
 {
 	//ndAssert(0);
+	//m_deltaTimeInMicroSeconds = ndCudaGetTimeInMicroseconds() - m_timeInMicroSeconds;
 	cudaDeviceSynchronize();
+	//m_timeInMicroSeconds = ndCudaGetTimeInMicroseconds();
+
 	//// get the scene info from the update	
 	//ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
 	//ndCudaSceneInfo* const cpuInfo = m_sceneInfoCpu;
@@ -406,10 +413,10 @@ void ndCudaContextImplement::Begin()
 	{
 		return item & 0xff;
 	};
-	ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
-	ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
-	ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
-	ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
+	//ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
+	//ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
+	//ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
+	//ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
 
 	//class GetKey
 	//{
