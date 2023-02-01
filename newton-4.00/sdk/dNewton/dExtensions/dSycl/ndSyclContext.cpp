@@ -118,11 +118,6 @@ void ndSyclContext::EnumDevices(bool selectCpu)
 
 
 #if 0
-double ndSyclContext::GetGPUTime() const
-{
-	return IsValid() ? m_impl->GetTimeInSeconds() : 0.0;
-}
-
 ndCudaSpatialVector* ndSyclContext::GetTransformBuffer()
 {
 	return m_impl->GetTransformBuffer();
