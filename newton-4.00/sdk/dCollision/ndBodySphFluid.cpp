@@ -977,4 +977,14 @@ void ndBodySphFluid::Update(const ndScene* const scene, ndFloat32 timestep)
 	//		Sync();
 	//	}
 	//}
+
+	if (TaskState() == ndBackgroundTask::m_taskCompleted)
+	{
+		m_timestep = timestep;
+		((ndScene*)scene)->SendBackgroundTask(this);
+		if (!m_updateInBackground)
+		{
+			Sync();
+		}
+	}
 }

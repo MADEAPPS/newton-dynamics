@@ -242,3 +242,24 @@ void ndWorldSceneCuda::CalculateContacts(ndInt32, ndContact* const)
 	ndAssert(0);
 }
 #endif
+
+bool ndWorldSceneCuda::AddParticle(ndSharedPtr<ndBody>& particle)
+{
+	bool ret = ndWorldScene::AddParticle(particle);
+	return ret;
+}
+
+bool ndWorldSceneCuda::RemoveParticle(ndSharedPtr<ndBody>& particle)
+{
+	bool ret = ndWorldScene::RemoveParticle(particle);
+	return ret;
+}
+
+void ndWorldSceneCuda::ParticleUpdate(ndFloat32 timestep)
+{
+	for (ndBodyList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyParticleSet* const body = node->GetInfo()->GetAsBodyParticleSet();
+		//body->Update(this, timestep);
+	}
+}

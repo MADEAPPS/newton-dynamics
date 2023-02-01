@@ -248,3 +248,24 @@ void ndWorldSceneSycl::InitBodyArray()
 	//ndCudaContext::InitBodyArray();
 }
 #endif
+
+bool ndWorldSceneSycl::AddParticle(ndSharedPtr<ndBody>& particle)
+{
+	bool ret = ndWorldScene::AddParticle(particle);
+	return ret;
+}
+
+bool ndWorldSceneSycl::RemoveParticle(ndSharedPtr<ndBody>& particle)
+{
+	bool ret = ndWorldScene::RemoveParticle(particle);
+	return ret;
+}
+
+void ndWorldSceneSycl::ParticleUpdate(ndFloat32 timestep)
+{
+	for (ndBodyList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyParticleSet* const body = node->GetInfo()->GetAsBodyParticleSet();
+		//body->Update(this, timestep);
+	}
+}

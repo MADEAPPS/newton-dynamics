@@ -155,11 +155,12 @@ void ndSyclContextImpl::Begin()
 	ndHostArray<int> xxxxxxxx;
 	xxxxxxxx.resize(64 * 1024);
 	//ndCountingSort<int, CountDigit, 8>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
-	ndCountingSort<int, CountDigit, 3>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
-#if 0
+	//ndCountingSort<int, CountDigit, 3>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
+
 	CountingSort<int, CountDigit, 3>(m_buf0, m_buf1);
 	m_queue.wait();
-	
+
+#if 0	
 	ndAssert(0);
 	sycl::host_accessor result1(m_buf1);
 	for (int i = 0; i < result1.size(); i++)

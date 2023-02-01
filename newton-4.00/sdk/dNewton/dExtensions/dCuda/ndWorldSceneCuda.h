@@ -53,7 +53,12 @@ class ndWorldSceneCuda : public ndWorldScene
 	//void GetBodyTransforms();
 	//
 	//ndCudaContext* GetContext();
-	//
+
+	virtual void ParticleUpdate(ndFloat32 timestep);
+	virtual bool AddParticle(ndSharedPtr<ndBody>& particle);
+	virtual bool RemoveParticle(ndSharedPtr<ndBody>& particle);
+
+
 	//ndArray<ndCudaBodyProxy> m_bodyBufferCpu;
 	//
 	//friend class ndDynamicsUpdateCuda;

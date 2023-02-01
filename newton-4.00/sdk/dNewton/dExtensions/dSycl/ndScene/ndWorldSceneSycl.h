@@ -48,7 +48,11 @@ class ndWorldSceneSycl : public ndWorldScene
 	//virtual void UpdateTransform();
 	//void LoadBodyData();
 	//void GetBodyTransforms();
-	//
+
+	virtual void ParticleUpdate(ndFloat32 timestep);
+	virtual bool AddParticle(ndSharedPtr<ndBody>& particle);
+	virtual bool RemoveParticle(ndSharedPtr<ndBody>& particle);
+
 	////ndCudaContext* GetContext();
 	////ndArray<ndCudaBodyProxy> m_bodyBufferCpu;
 	
