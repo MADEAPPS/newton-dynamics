@@ -27,7 +27,7 @@
 #include "ndBodyDynamic.h"
 #include "ndSkeletonList.h"
 #include "ndDynamicsUpdate.h"
-//#include "ndBodyParticleSet.h"
+#include "ndBodyParticleSet.h"
 #include "ndDynamicsUpdateSoa.h"
 #include "ndJointBilateralConstraint.h"
 
@@ -105,6 +105,7 @@ ndWorld::ndWorld()
 	,m_jointList()
 	,m_modelList()
 	,m_skeletonList()
+	,m_particleSetList()
 	,m_deletedBodies(256)
 	,m_deletedModels(256)
 	,m_deletedJoints(256)
@@ -189,10 +190,10 @@ void ndWorld::CleanUp()
 		RemoveModel(model);
 	}
 
-	while (m_scene->m_particleSetList.GetFirst())
+	while (m_particleSetList.GetFirst())
 	{
 		//ndBodyParticleSet* const body = m_particleSetList.GetFirst()->GetInfo()->GetAsBodyParticleSet();
-		ndSharedPtr<ndBody>& body = m_scene->m_particleSetList.GetFirst()->GetInfo();
+		ndSharedPtr<ndBody>& body = m_particleSetList.GetFirst()->GetInfo();
 		RemoveBody(body);
 	}
 
@@ -299,7 +300,7 @@ const ndSkeletonList& ndWorld::GetSkeletonList() const
 
 const ndBodyList& ndWorld::GetParticleList() const
 {
-	return m_scene->GetParticleList();
+	return m_particleSetList;
 }
 
 const ndModelList& ndWorld::GetModelList() const
@@ -354,7 +355,17 @@ void ndWorld::SendBackgroundTask(ndBackgroundTask* const job)
 
 void ndWorld::UpdateTransforms()
 {
-	D_TRACKTIME();
+	for (ndBodyList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyParticleSet* const particleSet = node->GetInfo()->GetAsBodyParticleSet();
+		ndAssert(particleSet);
+		ndBodyNotify* const notify = particleSet->GetNotifyCallback();
+		if (notify)
+		{
+			notify->OnTransform(0, particleSet->GetMatrix());
+		}
+	}
+
 	m_scene->UpdateTransform();
 }
 
@@ -376,7 +387,7 @@ bool ndWorld::AddBody(ndSharedPtr<ndBody>& body)
 	{
 		ndBodyParticleSet* const particleSet = body->GetAsBodyParticleSet();
 		ndAssert(particleSet->m_listNode == nullptr);
-		ndBodyList::ndNode* const node = m_scene->m_particleSetList.Append(body);
+		ndBodyList::ndNode* const node = m_particleSetList.Append(body);
 		particleSet->m_listNode = node;
 	}
 	return false;
@@ -543,7 +554,11 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 void ndWorld::ParticleUpdate(ndFloat32 timestep)
 {
 	D_TRACKTIME();
-	m_scene->ParticleUpdate(timestep);
+	for (ndBodyList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyParticleSet* const body = node->GetInfo()->GetAsBodyParticleSet();
+		body->Update(this, timestep);
+	}
 }
 
 void ndWorld::ModelUpdate()
@@ -1113,7 +1128,7 @@ void ndWorld::RemoveBody(ndSharedPtr<ndBody>& body)
 		{
 			ndBodyParticleSet* const particleSet = body->GetAsBodyParticleSet();
 			ndAssert(particleSet->m_listNode);
-			m_scene->m_particleSetList.Remove(particleSet->m_listNode);
+			m_particleSetList.Remove(particleSet->m_listNode);
 		}
 	}
 }

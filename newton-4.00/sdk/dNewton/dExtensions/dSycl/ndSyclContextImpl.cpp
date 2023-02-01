@@ -93,6 +93,11 @@ const char* ndSyclContextImpl::GetStringId() const
 
 
 #if 0
+double ndSyclContextImpl::GetGPUTime() const
+{
+	return IsValid() ? m_implement->GetTimeInSeconds() : 0.0;
+}
+
 ndCudaSpatialVector* ndSyclContextImpl::GetTransformBuffer()
 {
 	return m_implement->GetTransformBuffer();

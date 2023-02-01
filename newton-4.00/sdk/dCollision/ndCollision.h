@@ -45,7 +45,6 @@
 #include <ndShapeConvex.h>
 #include <ndBodyListView.h>
 #include <ndContactArray.h>
-#include <ndBodySphFluid.h>
 #include <ndShapeCapsule.h>
 #include <ndShapeCylinder.h>
 #include <ndBodyKinematic.h>
@@ -56,7 +55,6 @@
 #include <ndShapeCompound.h>
 #include <ndContactOptions.h>
 #include <ndMeshEffectNode.h>
-#include <ndBodyParticleSet.h>
 #include <ndPolygonMeshDesc.h>
 #include <ndShapeStatic_bvh.h>
 #include <ndShapeConvexHull.h>

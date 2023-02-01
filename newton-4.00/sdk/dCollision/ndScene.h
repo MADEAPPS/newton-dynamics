@@ -117,9 +117,7 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API ndScene(const ndScene& src);
 	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
 
-	const ndBodyList& GetParticleList() const;
 	const ndContactArray& GetContactArray() const;
-
 	void FindCollidingPairs(ndBodyKinematic* const body, ndInt32 threadId);
 	void FindCollidingPairsForward(ndBodyKinematic* const body, ndInt32 threadId);
 	void FindCollidingPairsBackward(ndBodyKinematic* const body, ndInt32 threadId);
@@ -148,10 +146,7 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
 	D_COLLISION_API virtual void UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body);
 
-	D_COLLISION_API virtual void ParticleUpdate(ndFloat32 timestep);
-
 	ndBodyListView m_bodyList;
-	ndBodyList m_particleSetList;
 	ndContactArray m_contactArray;
 	ndBvhSceneManager m_bvhSceneManager;
 	ndArray<ndUnsigned8> m_scratchBuffer;
@@ -161,7 +156,6 @@ class ndScene : public ndThreadPool
 	ndThreadBackgroundWorker m_backgroundThread;
 	ndArray<ndContactPairs> m_newPairs;
 	ndArray<ndContactPairs> m_partialNewPairs[D_MAX_THREADS_COUNT];
-	
 	ndPolygonMeshDesc::ndStaticMeshFaceQuery m_staticMeshQuery[D_MAX_THREADS_COUNT];
 	ndPolygonMeshDesc::ndProceduralStaticMeshFaceQuery m_proceduralStaticMeshQuery[D_MAX_THREADS_COUNT];
 
@@ -212,11 +206,6 @@ inline ndInt32 ndScene::GetThreadCount() const
 inline ndArray<ndUnsigned8>& ndScene::GetScratchBuffer()
 {
 	return m_scratchBuffer;
-}
-
-inline const ndBodyList& ndScene::GetParticleList() const
-{
-	return m_particleSetList;
 }
 
 inline const ndBodyListView& ndScene::GetBodyList() const

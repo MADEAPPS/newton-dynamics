@@ -160,7 +160,7 @@ class ndWorld: public ndClassAlloc
 	ndJointList m_jointList;
 	ndModelList m_modelList;
 	ndSkeletonList m_skeletonList;
-	//ndBodyList m_particleSetList;
+	ndBodyList m_particleSetList;
 	ndArray<ndBody*> m_deletedBodies;
 	ndArray<ndModel*> m_deletedModels;
 	ndArray<ndJointBilateralConstraint*> m_deletedJoints;

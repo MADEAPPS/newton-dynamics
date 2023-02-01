@@ -29,7 +29,6 @@
 #include "ndContactNotify.h"
 #include "ndContactSolver.h"
 #include "ndRayCastNotify.h"
-#include "ndBodyParticleSet.h"
 #include "ndConvexCastNotify.h"
 #include "ndBodyTriggerVolume.h"
 #include "ndBodiesInAabbNotify.h"
@@ -48,7 +47,6 @@ ndVector ndScene::m_linearContactError2(D_CONTACT_TRANSLATION_ERROR * D_CONTACT_
 ndScene::ndScene()
 	:ndThreadPool("newtonWorker")
 	,m_bodyList()
-	,m_particleSetList()
 	,m_contactArray()
 	,m_bvhSceneManager()
 	,m_scratchBuffer(1024 * sizeof (void*))
@@ -117,17 +115,6 @@ ndScene::ndScene(const ndScene& src)
 		nextNode = node->GetNext();
 		stealData->m_specialUpdateList.Unlink(node);
 		m_specialUpdateList.Append(node);
-	}
-
-	ndBodyList::ndNode* nextParticleNode;
-	for (ndBodyList::ndNode* node = stealData->m_particleSetList.GetFirst(); node; node = nextParticleNode)
-	{
-		nextParticleNode = node->GetNext();
-		ndBodyParticleSet* const body = node->GetInfo()->GetAsBodyParticleSet();
-		body->m_sceneForceUpdate = 1;
-		stealData->m_particleSetList.Unlink(node);
-		ndBodyList::ndNode* const newNode = m_particleSetList.Append(body);
-		body->m_listNode = newNode;
 	}
 
 	for (ndBodyListView::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
@@ -731,17 +718,6 @@ void ndScene::FindCollidingPairsBackward(ndBodyKinematic* const body, ndInt32 th
 void ndScene::UpdateTransform()
 {
 	D_TRACKTIME();
-	for (ndBodyList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
-	{
-		ndBodyParticleSet* const particleSet = node->GetInfo()->GetAsBodyParticleSet();
-		ndAssert(particleSet);
-		ndBodyNotify* const notify = particleSet->GetNotifyCallback();
-		if (notify)
-		{
-			notify->OnTransform(0, particleSet->GetMatrix());
-		}
-	}
-
 	auto TransformUpdate = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(TransformUpdate);
@@ -1717,25 +1693,6 @@ void ndScene::DeleteDeadContacts()
 				}
 			});
 			ParallelExecute(CopyActiveContact);
-		}
-	}
-}
-
-void ndScene::ParticleUpdate(ndFloat32 timestep)
-{
-	D_TRACKTIME();
-	for (ndBodyList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
-	{
-		ndBodyParticleSet* const body = node->GetInfo()->GetAsBodyParticleSet();
-		//body->Update(this, timestep);
-		if (body->TaskState() == ndBackgroundTask::m_taskCompleted)
-		{
-			body->m_timestep = timestep;
-			SendBackgroundTask(body);
-			if (!body->m_updateInBackground)
-			{
-				body->Sync();
-			}
 		}
 	}
 }

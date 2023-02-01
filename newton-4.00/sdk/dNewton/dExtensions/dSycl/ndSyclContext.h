@@ -42,6 +42,7 @@ class ndSyclContext
 
 	D_SYCL_API void Begin();
 	//D_SYCL_API void End();
+	//D_SYCL_API double GetGPUTime() const;
 	//
 	//D_SYCL_API void ResizeBuffers(int size);
 	//D_SYCL_API void LoadBodyData(const ndCudaBodyProxy* const src, int size);
