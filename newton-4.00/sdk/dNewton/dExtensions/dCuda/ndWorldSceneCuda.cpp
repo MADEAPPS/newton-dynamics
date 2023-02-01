@@ -30,7 +30,6 @@
 #include "ndCudaSceneInfo.h"
 #include "ndWorldSceneCuda.h"
 #include "ndDynamicsUpdate.h"
-#include "ndBodyParticleSet.h"
 #include "ndJointBilateralConstraint.h"
 
 ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)

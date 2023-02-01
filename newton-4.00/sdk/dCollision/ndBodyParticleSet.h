@@ -22,16 +22,19 @@
 #ifndef __ND_BODY_PARTICLE_SET_H__
 #define __ND_BODY_PARTICLE_SET_H__
 
-#include "ndNewtonStdafx.h"
+//#include "ndNewtonStdafx.h"
+#include "ndCoreStdafx.h"
+#include "ndCollisionStdafx.h"
+#include "ndBody.h"
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodyParticleSet: public ndBody, public ndBackgroundTask
 {
 	public:
-	D_NEWTON_API ndBodyParticleSet();
-	D_NEWTON_API ndBodyParticleSet(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	D_NEWTON_API virtual ~ndBodyParticleSet ();
-	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
+	D_COLLISION_API ndBodyParticleSet();
+	D_COLLISION_API ndBodyParticleSet(const ndLoadSaveBase::ndLoadDescriptor& desc);
+	D_COLLISION_API virtual ~ndBodyParticleSet ();
+	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	const ndVector GetGravity() const;
 	void SetGravity(const ndVector& gravity);
@@ -47,7 +50,8 @@ class ndBodyParticleSet: public ndBody, public ndBackgroundTask
 	ndFloat32 GetParticleRadius() const;
 	void SetParticleRadius(ndFloat32 radius);
 
-	D_NEWTON_API virtual void Update(const ndWorld* const workd, ndFloat32 timestep) = 0;
+	//D_COLLISION_API virtual void Update(const ndWorld* const workd, ndFloat32 timestep) = 0;
+	D_COLLISION_API virtual void Update(const ndScene* const scene, ndFloat32 timestep) = 0;
 
 	protected:
 	ndVector m_box0;
@@ -57,8 +61,10 @@ class ndBodyParticleSet: public ndBody, public ndBackgroundTask
 	ndArray<ndVector> m_veloc;
 	ndBodyList::ndNode* m_listNode;
 	ndFloat32 m_radius;
+	ndFloat32 m_timestep;
 	bool m_updateInBackground;
 	friend class ndWorld;
+	friend class ndScene;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline ndBodyParticleSet* ndBodyParticleSet::GetAsBodyParticleSet() 

@@ -46,7 +46,6 @@
 #include <ndJointPulley.h>
 #include <ndBodyDynamic.h>
 #include <ndIkJointHinge.h>
-#include <ndBodySphFluid.h>
 #include <ndContactArray.h>
 #include <ndJointFix6dof.h>
 #include <ndBodySphFluid.h>
@@ -59,7 +58,6 @@
 #include <ndJointSpherical.h>
 #include <ndDynamicsUpdate.h>
 #include <ndJointFollowPath.h>
-#include <ndBodyParticleSet.h>
 #include <ndIkJointSpherical.h>
 #include <ndJointDoubleHinge.h>
 #include <ndJointFixDistance.h>

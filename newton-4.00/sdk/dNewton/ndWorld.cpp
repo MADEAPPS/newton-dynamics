@@ -27,7 +27,6 @@
 #include "ndBodyDynamic.h"
 #include "ndSkeletonList.h"
 #include "ndDynamicsUpdate.h"
-#include "ndBodyParticleSet.h"
 #include "ndDynamicsUpdateSoa.h"
 #include "ndJointBilateralConstraint.h"
 
@@ -557,7 +556,8 @@ void ndWorld::ParticleUpdate(ndFloat32 timestep)
 	for (ndBodyList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyParticleSet* const body = node->GetInfo()->GetAsBodyParticleSet();
-		body->Update(this, timestep);
+		//body->Update(this, timestep);
+		body->Update(m_scene, timestep);
 	}
 }
 

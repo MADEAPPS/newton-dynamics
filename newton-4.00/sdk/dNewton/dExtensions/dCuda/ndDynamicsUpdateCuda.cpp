@@ -29,7 +29,6 @@
 #include "ndSkeletonList.h"
 #include "ndDynamicsUpdate.h"
 #include "ndWorldSceneCuda.h"
-#include "ndBodyParticleSet.h"
 #include "ndDynamicsUpdateCuda.h"
 #include "ndJointBilateralConstraint.h"
 

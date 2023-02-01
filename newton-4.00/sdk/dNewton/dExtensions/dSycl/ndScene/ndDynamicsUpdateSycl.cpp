@@ -30,7 +30,6 @@
 #include "ndSkeletonList.h"
 #include "ndDynamicsUpdate.h"
 #include "ndWorldSceneSycl.h"
-#include "ndBodyParticleSet.h"
 #include "ndDynamicsUpdateSycl.h"
 #include "ndJointBilateralConstraint.h"
 

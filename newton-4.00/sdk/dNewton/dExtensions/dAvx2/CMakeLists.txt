@@ -22,7 +22,6 @@ include_directories(../../../dCollision)
 include_directories(../../../dNewton/dJoints)
 include_directories(../../../dNewton/dModels)
 include_directories(../../../dNewton/dIkSolver)
-include_directories(../../../dNewton/dParticles)
 include_directories(../../../dNewton/dModels/dVehicle)
 include_directories(../../../dNewton/dModels/dCharacter)
 

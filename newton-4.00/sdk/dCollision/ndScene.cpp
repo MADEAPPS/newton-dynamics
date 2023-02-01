@@ -29,6 +29,7 @@
 #include "ndContactNotify.h"
 #include "ndContactSolver.h"
 #include "ndRayCastNotify.h"
+#include "ndBodyParticleSet.h"
 #include "ndConvexCastNotify.h"
 #include "ndBodyTriggerVolume.h"
 #include "ndBodiesInAabbNotify.h"

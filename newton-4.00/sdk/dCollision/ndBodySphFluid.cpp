@@ -19,8 +19,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+//#include "ndCoreStdafx.h"
+//#include "ndNewtonStdafx.h"
 #include "ndCoreStdafx.h"
-#include "ndNewtonStdafx.h"
+#include "ndCollisionStdafx.h"
 #include "ndWorld.h"
 #include "ndBodySphFluid.h"
 
@@ -960,19 +962,19 @@ void ndBodySphFluid::Execute(ndThreadPool* const threadPool)
 	}
 }
 
-void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
+void ndBodySphFluid::Update(const ndScene* const scene, ndFloat32 timestep)
 {
-	ndScene* const scene = world->GetScene();
-	if (scene->IsHighPerformanceCompute())
-	{
-	}
-	else if (TaskState() == ndBackgroundTask::m_taskCompleted)
-	{
-		m_timestep = timestep;
-		scene->SendBackgroundTask(this);
-		if (!m_updateInBackground)
-		{
-			Sync();
-		}
-	}
+	//ndScene* const scene = world->GetScene();
+	//if (scene->IsHighPerformanceCompute())
+	//{
+	//}
+	//if (TaskState() == ndBackgroundTask::m_taskCompleted)
+	//{
+	//	m_timestep = timestep;
+	//	scene->SendBackgroundTask(this);
+	//	if (!m_updateInBackground)
+	//	{
+	//		Sync();
+	//	}
+	//}
 }

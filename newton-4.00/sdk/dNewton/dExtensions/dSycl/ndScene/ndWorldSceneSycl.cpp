@@ -29,7 +29,6 @@
 #include "ndSkeletonList.h"
 #include "ndWorldSceneSycl.h"
 #include "ndDynamicsUpdate.h"
-#include "ndBodyParticleSet.h"
 #include "ndJointBilateralConstraint.h"
 
 ndWorldSceneSycl::ndWorldSceneSycl(const ndWorldScene& src, bool selectCpu)
