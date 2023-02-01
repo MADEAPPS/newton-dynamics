@@ -75,11 +75,3 @@ void ndSyclSetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free)
 //	ndAssert(0);
 //	g_free(ptr);
 //}
-
-//long long ndSyclGetTimeInMicroseconds()
-//{
-//	static std::chrono::high_resolution_clock::time_point timeStampBase = std::chrono::high_resolution_clock::now();
-//	std::chrono::high_resolution_clock::time_point currentTimeStamp = std::chrono::high_resolution_clock::now();
-//	long long  timeStamp = std::chrono::duration_cast<std::chrono::microseconds>(currentTimeStamp - timeStampBase).count();
-//	return timeStamp;
-//}

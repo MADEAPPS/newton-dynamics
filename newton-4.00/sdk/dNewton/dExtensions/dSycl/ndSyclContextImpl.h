@@ -23,7 +23,7 @@
 #define __ND_SYCL_CONTEXT_IMPL_H__
 
 #include <ndSyclStdafx.h>
-#include "ndSyclSort.h"
+#include "ndSyclUtils.h"
 #include "ndHostArray.h"
 
 class ndSyclContextImpl
@@ -52,8 +52,8 @@ class ndSyclContextImpl
 	//void IntegrateUnconstrainedBodies(float timestep);
 
 
-	template <class T, class ndEvaluateKey, int bitSize>
-	void CountingSort(sycl::buffer<T>& src, sycl::buffer<T>& dst);
+	//template <class T, class ndEvaluateKey, int bitSize>
+	//void CountingSort(sycl::buffer<T>& src, sycl::buffer<T>& dst);
 
 	sycl::device m_device;
 	sycl::queue m_queue;
@@ -72,10 +72,10 @@ class ndSyclContextImpl
 	sycl::buffer<int> m_buf1;
 };
 
-template <class T, class ndEvaluateKey, int bitSize>
-void ndSyclContextImpl::CountingSort(sycl::buffer<T>& src, sycl::buffer<T>& dst)
-{
-	ndCountingSort<T, ndEvaluateKey, bitSize>(m_queue, src, dst, m_sortPrefixBuffer);
-}
+//template <class T, class ndEvaluateKey, int bitSize>
+//void ndSyclContextImpl::CountingSort(sycl::buffer<T>& src, sycl::buffer<T>& dst)
+//{
+//	ndCountingSort<T, ndEvaluateKey, bitSize>(m_queue, src, dst, m_sortPrefixBuffer);
+//}
 
 #endif

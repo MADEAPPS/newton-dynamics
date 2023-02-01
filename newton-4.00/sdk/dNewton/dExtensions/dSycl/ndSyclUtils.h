@@ -56,7 +56,6 @@ typedef void (*ndMemFreeCallback) (void* const ptr);
 
 void* ndSyclMalloc(size_t size);
 void ndSyclFree(void* const ptr);
-//D_SYCL_API long long ndSyclGetTimeInMicroseconds();
 
 #define D_SYCL_OPERATOR_NEW_AND_DELETE		\
 inline void *operator new (size_t size)		\
@@ -78,6 +77,5 @@ inline void operator delete[](void* ptr)	\
 {											\
 	ndSyclFree(ptr);						\
 }
-
 
 #endif

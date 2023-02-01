@@ -39,8 +39,8 @@
 	#include <sys/stat.h>
 #endif
 
-#include <chrono>
 #include <vector>
+#include <algorithm>
 
 //#define D_DISABLE_ASSERT
 

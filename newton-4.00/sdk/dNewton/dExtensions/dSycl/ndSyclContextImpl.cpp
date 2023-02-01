@@ -20,8 +20,7 @@
 */
 
 #include <ndSyclStdafx.h>
-#include "ndSyclUtils.h"
-//#include "ndStlContainers.h"
+#include "ndSyclSort.h"
 #include "ndSyclContextImpl.h"
 
 #define ND_SORT_SCAN_BUFFER_SIZE (256 * 256)
@@ -48,6 +47,10 @@ ndSyclContextImpl::ndSyclContextImpl(sycl::device& device)
 	std::string deviceName(m_device.get_info<sycl::info::device::name>());
 	std::string platformName(m_device.get_platform().get_info<sycl::info::platform::name>());
 	sprintf(m_deviceName, "%s: %s", platformName.c_str(), deviceName.c_str());
+
+	m_computeUnits = std::min<int>(m_maxWorkGroupSize, int(256));
+	m_maxWorkGroupSize = std::min<int>(m_maxWorkGroupSize, int(512));
+
 
 	// debuging code
 	for (int i = 0; i < m_buf0.size(); i++)
@@ -157,7 +160,7 @@ void ndSyclContextImpl::Begin()
 	//ndCountingSort<int, CountDigit, 8>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
 	//ndCountingSort<int, CountDigit, 3>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
 
-	CountingSort<int, CountDigit, 3>(m_buf0, m_buf1);
+	ndCountingSort<int, CountDigit, 3>(this, m_buf0, m_buf1);
 	m_queue.wait();
 
 #if 0	
