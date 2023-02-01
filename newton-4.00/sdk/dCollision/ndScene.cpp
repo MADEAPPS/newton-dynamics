@@ -48,6 +48,7 @@ ndVector ndScene::m_linearContactError2(D_CONTACT_TRANSLATION_ERROR * D_CONTACT_
 ndScene::ndScene()
 	:ndThreadPool("newtonWorker")
 	,m_bodyList()
+	,m_particleSetList()
 	,m_contactArray()
 	,m_bvhSceneManager()
 	,m_scratchBuffer(1024 * sizeof (void*))
@@ -78,6 +79,7 @@ ndScene::ndScene()
 ndScene::ndScene(const ndScene& src)
 	:ndThreadPool("newtonWorker")
 	,m_bodyList(src.m_bodyList)
+	,m_particleSetList()
 	,m_contactArray(src.m_contactArray)
 	,m_bvhSceneManager(src.m_bvhSceneManager)
 	,m_scratchBuffer()
@@ -116,6 +118,15 @@ ndScene::ndScene(const ndScene& src)
 		nextNode = node->GetNext();
 		stealData->m_specialUpdateList.Unlink(node);
 		m_specialUpdateList.Append(node);
+	}
+
+	ndBodyList::ndNode* nextParticleNode;
+	for (ndBodyList::ndNode* node = stealData->m_particleSetList.GetFirst(); node; node = nextParticleNode)
+	{
+		nextParticleNode = node->GetNext();
+		stealData->m_particleSetList.Unlink(node);
+		ndBodyParticleSet* const particle = (*node->GetInfo())->GetAsBodyParticleSet();
+		particle->m_listNode = m_particleSetList.Append(node);
 	}
 
 	for (ndBodyListView::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
@@ -163,6 +174,23 @@ void ndScene::End()
 	m_frameNumber++;
 }
 
+bool ndScene::AddParticle(ndSharedPtr<ndBody>& particle)
+{
+	ndBodyParticleSet* const particleSet = particle->GetAsBodyParticleSet();
+	ndAssert(particleSet->m_listNode == nullptr);
+	ndBodyList::ndNode* const node = m_particleSetList.Append(particle);
+	particleSet->m_listNode = node;
+	return true;
+}
+
+bool ndScene::RemoveParticle(ndSharedPtr<ndBody>& particle)
+{
+	ndBodyParticleSet* const particleSet = particle->GetAsBodyParticleSet();
+	ndAssert(particleSet->m_listNode);
+	m_particleSetList.Remove(particleSet->m_listNode);
+	return true;
+}
+
 ndContactNotify* ndScene::GetContactNotify() const
 {
 	return m_contactNotifyCallback;
@@ -199,58 +227,70 @@ void ndScene::DebugScene(ndSceneTreeNotiFy* const notify)
 
 bool ndScene::AddBody(ndSharedPtr<ndBody>& body)
 {
-	ndAssert(body->GetAsBodyKinematic());
-	ndBodyKinematic* const kinBody = body->GetAsBodyKinematic();
-	if ((kinBody->m_scene == nullptr) && (kinBody->m_sceneNode == nullptr))
+	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	if (kinematicBody)
 	{
-		ndBodyListView::ndNode* const node = m_bodyList.AddItem(body);
-		kinBody->SetSceneNodes(this, node);
-		m_contactNotifyCallback->OnBodyAdded(kinBody);
-		kinBody->UpdateCollisionMatrix();
-		
-		m_rootNode = m_bvhSceneManager.AddBody(kinBody, m_rootNode);
-		if (kinBody->GetAsBodyKinematicSpecial())
+		if ((kinematicBody->m_scene == nullptr) && (kinematicBody->m_sceneNode == nullptr))
 		{
-			kinBody->m_spetialUpdateNode = m_specialUpdateList.Append(kinBody);
-		}
-		
-		m_forceBalanceSceneCounter = 0;
+			ndBodyListView::ndNode* const node = m_bodyList.AddItem(body);
+			kinematicBody->SetSceneNodes(this, node);
+			m_contactNotifyCallback->OnBodyAdded(kinematicBody);
+			kinematicBody->UpdateCollisionMatrix();
 
-		return true;
+			m_rootNode = m_bvhSceneManager.AddBody(kinematicBody, m_rootNode);
+			if (kinematicBody->GetAsBodyKinematicSpecial())
+			{
+				kinematicBody->m_spetialUpdateNode = m_specialUpdateList.Append(kinematicBody);
+			}
+
+			m_forceBalanceSceneCounter = 0;
+
+			return true;
+		}
+	}
+	else if (body->GetAsBodyParticleSet())
+	{
+		return AddParticle(body);
 	}
 	return false;
 }
 
-//bool ndScene::RemoveBody(ndSharedPtr<ndBody>& bodyPtr)
-bool ndScene::RemoveBody(ndBodyKinematic* const body)
+//bool ndScene::RemoveBody(ndBodyKinematic* const body)
+bool ndScene::RemoveBody(ndSharedPtr<ndBody>& body)
 {
-	//ndAssert(bodyPtr->GetAsBodyKinematic());
+	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	if (kinematicBody)
+	{
+		m_forceBalanceSceneCounter = 0;
+		m_bvhSceneManager.RemoveBody(kinematicBody);
 
-	m_forceBalanceSceneCounter = 0;
-	//ndSharedPtr<ndBodyKinematic>& body = (ndSharedPtr<ndBodyKinematic>&) bodyPtr;
-	//ndBodyKinematic* const body = bodyPtr->GetAsBodyKinematic();
-	m_bvhSceneManager.RemoveBody(body);
-	
-	ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
-	while (contactMap.GetRoot())
-	{
-		ndContact* const contact = contactMap.GetRoot()->GetInfo();
-		m_contactArray.DetachContact(contact);
-	}
-	
-	ndBodyListView::ndNode* const sceneNode = body->m_sceneNode;
-	if (body->m_scene && sceneNode)
-	{
-		if (body->GetAsBodyKinematicSpecial())
+		ndBodyKinematic::ndContactMap& contactMap = kinematicBody->GetContactMap();
+		while (contactMap.GetRoot())
 		{
-			m_specialUpdateList.Remove(body->m_spetialUpdateNode);
-			body->m_spetialUpdateNode = nullptr;
+			ndContact* const contact = contactMap.GetRoot()->GetInfo();
+			m_contactArray.DetachContact(contact);
 		}
-	
-		m_contactNotifyCallback->OnBodyRemoved(body);
-		body->SetSceneNodes(nullptr, nullptr);
-		m_bodyList.RemoveItem(sceneNode);
-		return true;
+
+		ndBodyListView::ndNode* const sceneNode = kinematicBody->m_sceneNode;
+		if (kinematicBody->m_scene && sceneNode)
+		{
+			if (kinematicBody->GetAsBodyKinematicSpecial())
+			{
+				m_specialUpdateList.Remove(kinematicBody->m_spetialUpdateNode);
+				kinematicBody->m_spetialUpdateNode = nullptr;
+			}
+
+			m_contactNotifyCallback->OnBodyRemoved(kinematicBody);
+			kinematicBody->SetSceneNodes(nullptr, nullptr);
+			m_bodyList.RemoveItem(sceneNode);
+			return true;
+		}
+	}
+	else
+	{
+		//ndBodyParticleSet* const particle = body->GetAsBodyParticleSet();
+		ndAssert(body->GetAsBodyParticleSet());
+		RemoveParticle(body);
 	}
 	return false;
 }
@@ -719,6 +759,18 @@ void ndScene::FindCollidingPairsBackward(ndBodyKinematic* const body, ndInt32 th
 void ndScene::UpdateTransform()
 {
 	D_TRACKTIME();
+
+	for (ndBodyList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyParticleSet* const particleSet = node->GetInfo()->GetAsBodyParticleSet();
+		ndAssert(particleSet);
+		ndBodyNotify* const notify = particleSet->GetNotifyCallback();
+		if (notify)
+		{
+			notify->OnTransform(0, particleSet->GetMatrix());
+		}
+	}
+
 	auto TransformUpdate = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(TransformUpdate);
@@ -731,6 +783,7 @@ void ndScene::UpdateTransform()
 		}
 	});
 	ParallelExecute(TransformUpdate);
+
 }
 
 void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
@@ -1095,6 +1148,7 @@ void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback, const ndVector& minBo
 void ndScene::Cleanup()
 {
 	Sync();
+	
 	m_frameNumber = 0;
 	m_subStepNumber = 0;
 
@@ -1695,5 +1749,15 @@ void ndScene::DeleteDeadContacts()
 			});
 			ParallelExecute(CopyActiveContact);
 		}
+	}
+}
+
+void ndScene::ParticleUpdate(ndFloat32 timestep)
+{
+	D_TRACKTIME();
+	for (ndBodyList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyParticleSet* const body = node->GetInfo()->GetAsBodyParticleSet();
+		body->Update(this, timestep);
 	}
 }

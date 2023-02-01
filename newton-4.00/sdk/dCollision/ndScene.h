@@ -74,7 +74,7 @@ class ndScene : public ndThreadPool
 	public:
 	D_COLLISION_API virtual ~ndScene();
 	D_COLLISION_API virtual bool AddBody(ndSharedPtr<ndBody>& body);
-	D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
+	D_COLLISION_API virtual bool RemoveBody(ndSharedPtr<ndBody>& body);
 
 	D_COLLISION_API virtual void Begin();
 	D_COLLISION_API virtual void End();
@@ -146,7 +146,12 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
 	D_COLLISION_API virtual void UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body);
 
+	D_COLLISION_API virtual void ParticleUpdate(ndFloat32 timestep);
+	D_COLLISION_API virtual bool AddParticle(ndSharedPtr<ndBody>& particle);
+	D_COLLISION_API virtual bool RemoveParticle(ndSharedPtr<ndBody>& particle);
+
 	ndBodyListView m_bodyList;
+	ndBodyList m_particleSetList;
 	ndContactArray m_contactArray;
 	ndBvhSceneManager m_bvhSceneManager;
 	ndArray<ndUnsigned8> m_scratchBuffer;
