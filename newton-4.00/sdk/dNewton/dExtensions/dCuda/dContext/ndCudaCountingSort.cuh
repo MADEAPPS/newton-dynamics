@@ -177,7 +177,7 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 			for (int j = k >> 1; j > 0; j = j >> 1)
 			{
 				int threadId1 = threadId0 ^ j;
-#if 1
+				#if 1
 				if (threadId1 > threadId0)
 				{
 					const int a = sortedRadix[threadId0];
@@ -193,7 +193,7 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 					sortedRadix[threadId1] = b1;
 				}
 				__syncthreads();
-#else
+				#else
 				const int a = sortedRadix[threadId0];
 				const int b = sortedRadix[threadId1];
 				const int mask0 = (-(threadId0 & k)) >> 31;
@@ -208,7 +208,7 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 				//sortedRadix[threadId0] = (b1 & mask2) | (a1 & ~mask2);
 				sortedRadix[threadId0] = a2;
 				__syncthreads();
-#endif
+				#endif
 			}
 		}
 

@@ -46,7 +46,7 @@ ndCudaDevice::ndCudaDevice()
 	cuTrace(("memory bus with: %d bits\n", m_prop.memoryBusWidth));
 	cuTrace(("memory: (mbytes) %d\n", m_prop.totalGlobalMem / (1024 * 1024)));
 
-	m_computeUnits = std::min(2 * m_prop.multiProcessorCount, 256);
+	m_computeUnits = std::min(4 * m_prop.multiProcessorCount, 256);
 }
 
 ndCudaDevice::~ndCudaDevice()
