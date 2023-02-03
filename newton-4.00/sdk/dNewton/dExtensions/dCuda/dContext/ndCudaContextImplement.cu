@@ -957,7 +957,7 @@ void ndCudaContextImplement::Begin()
 	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
 	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
 
-#if 0
+#if 1
 	auto GetRadix = []  __device__(int item)
 	{
 		return item & 0xff;
@@ -985,7 +985,7 @@ void ndCudaContextImplement::Begin()
 	totalTime /= (1.0e3f * numIterations);
 	printf("radixSortThrust, Throughput = %.4f MElements/s, Time = %.5f s, Size = %u elements\n",	1.0e-6f * m_buf0.GetCount() / totalTime, totalTime, m_buf0.GetCount());
 
-	#if 0
+	#if 1
 	cudaDeviceSynchronize();
 	m_sortPrefixBuffer.WriteData(&m_scan1[0], m_scan1.GetCount());
 	m_buf1.WriteData(&m_dst1[0], m_dst1.GetCount());

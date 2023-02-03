@@ -100,7 +100,10 @@ __global__ void ndCudaCountItems(const T* src, int bufferSize, int blocksCount, 
 	int blockIndex = blockIdx.x;
 	int bashSize = blocksCount * blockSride * blockIndex;
 
-	radixCountBuffer[threadId] = 0;
+	if (threadId < radixStride)
+	{
+		radixCountBuffer[threadId] = 0;
+	}
 	__syncthreads();
 
 	for (int i = 0; i < blocksCount; ++i)
@@ -135,20 +138,24 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
 	int blockIndex = blockIdx.x;
+	int halfRadixStride = radixStride / 2;
 	int radixBase = blockIndex * radixStride;
 	int bashSize = blocksCount * blockSride * blockIndex;
 	int radixPrefixOffset = computeUnits * radixStride;
 
-	radixPrefixScan[threadId] = 0;
 	if (threadId < radixStride)
 	{
+		radixPrefixScan[threadId] = 0;
 		radixPrefixStart[threadId] = scansBuffer[radixBase + threadId];
 		radixPrefixBatchScan[threadId] = scansBuffer[radixPrefixOffset + threadId];
 	}
 
 	for (int i = 0; i < blocksCount; ++i)
 	{
-		radixPrefixCount[threadId] = 0;
+		if (threadId < radixStride)
+		{
+			radixPrefixCount[threadId] = 0;
+		}
 		sortedRadix[threadId] = (radixStride << 16) + threadId;
 		__syncthreads();
 	
@@ -162,13 +169,23 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 		}
 		__syncthreads();
 
-		radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId + 1] = radixPrefixCount[threadId];
+		if (threadId < radixStride)
+		{
+			radixPrefixScan[halfRadixStride + threadId + 1] = radixPrefixCount[threadId];
+		}
 		for (int k = 1; k < radixStride; k = k << 1)
 		{
+			int sum;
 			__syncthreads();
-			int sum = radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId] + radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId - k];
+			if (threadId < radixStride)
+			{
+				sum = radixPrefixScan[halfRadixStride + threadId] + radixPrefixScan[halfRadixStride + threadId - k];
+			}
 			__syncthreads();
-			radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + threadId] = sum;
+			if (threadId < radixStride)
+			{
+				radixPrefixScan[halfRadixStride + threadId] = sum;
+			}
 		}
 
 		int threadId0 = threadId;
@@ -185,8 +202,6 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 					const int mask0 = (-(threadId0 & k)) >> 31;
 					const int mask1 = -(a > b);
 					const int mask2 = mask0 ^ mask1;
-					//const int a1 = (b & mask2) | (a & ~mask2);
-					//const int b1 = (a & mask2) | (b & ~mask2);
 					const int a1 = mask2 ? b : a;
 					const int b1 = mask2 ? a : b;
 					sortedRadix[threadId0] = a1;
@@ -218,12 +233,14 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 			int keyHigh = keyValue >> 16;
 			int keyLow = keyValue & 0xffff;
 			int dstOffset1 = radixPrefixBatchScan[keyHigh] + radixPrefixStart[keyHigh];
-			int dstOffset0 = threadId - radixPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + keyHigh];
+			int dstOffset0 = threadId - radixPrefixScan[halfRadixStride + keyHigh];
 			dst[dstOffset0 + dstOffset1] = cachedItems[keyLow];
 		}
-	
 		__syncthreads();
-		radixPrefixStart[threadId] += radixPrefixCount[threadId];
+		if (threadId < radixStride)
+		{
+			radixPrefixStart[threadId] += radixPrefixCount[threadId];
+		}
 		bashSize += blockSride;
 	}
 }
