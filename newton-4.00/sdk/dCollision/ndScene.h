@@ -99,6 +99,7 @@ class ndScene : public ndThreadPool
 
 	virtual ndWorld* GetWorld() const;
 	const ndBodyListView& GetBodyList() const;
+	const ndBodyList& GetParticleList() const;
 
 	ndArray<ndBodyKinematic*>& GetActiveBodyArray();
 	const ndArray<ndBodyKinematic*>& GetActiveBodyArray() const;
@@ -211,6 +212,11 @@ inline ndInt32 ndScene::GetThreadCount() const
 inline ndArray<ndUnsigned8>& ndScene::GetScratchBuffer()
 {
 	return m_scratchBuffer;
+}
+
+inline const ndBodyList& ndScene::GetParticleList() const
+{
+	return m_particleSetList;
 }
 
 inline const ndBodyListView& ndScene::GetBodyList() const

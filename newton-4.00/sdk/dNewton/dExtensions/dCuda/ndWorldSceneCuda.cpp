@@ -34,18 +34,34 @@
 
 ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
 	:ndWorldScene(src)
+	,m_fluidParticles()
 {
 	m_context = new ndCudaContext();
+
+	const ndBodyList& particles = GetParticleList();
+	for (ndBodyList::ndNode* node = particles.GetFirst(); node; node = node->GetNext())
+	{
+		ndBody* const body = *node->GetInfo();
+		ndBodySphFluid* const particle = body->GetAsBodySphFluid();
+		if (particle)
+		{
+			m_fluidParticles.Append(new ndCudaSphFliud(particle));
+		}
+	}
 }
 
 ndWorldSceneCuda::~ndWorldSceneCuda()
 {
+	for (ndSpecialList<ndCudaSphFliud>::ndNode* node = m_fluidParticles.GetFirst(); node; node = node->GetNext())
+	{
+		delete node->GetInfo();
+	}
+
 	if (m_context)
 	{
 		delete m_context;
 	}
 }
-
 
 bool ndWorldSceneCuda::IsValid() const
 {
@@ -246,20 +262,50 @@ void ndWorldSceneCuda::CalculateContacts(ndInt32, ndContact* const)
 bool ndWorldSceneCuda::AddParticle(ndSharedPtr<ndBody>& particle)
 {
 	bool ret = ndWorldScene::AddParticle(particle);
+
+	ndBodySphFluid* const fluid = particle->GetAsBodySphFluid();
+	if (fluid)
+	{
+		m_fluidParticles.Append(new ndCudaSphFliud(fluid));
+	}
+	else
+	{
+		ndAssert(0);
+	}
+
 	return ret;
 }
 
 bool ndWorldSceneCuda::RemoveParticle(ndSharedPtr<ndBody>& particle)
 {
+	ndBodySphFluid* const fluid = particle->GetAsBodySphFluid();
+	if (fluid)
+	{
+		for (ndSpecialList<ndCudaSphFliud>::ndNode* node = m_fluidParticles.GetFirst(); node; node = node->GetNext())
+		{
+			if (node->GetInfo()->m_owner == fluid)
+			{
+				delete node->GetInfo();
+				m_fluidParticles.Remove(node);
+				break;
+			}
+		}
+	}
+	else
+	{
+		ndAssert(0);
+	}
+
 	bool ret = ndWorldScene::RemoveParticle(particle);
 	return ret;
 }
 
 void ndWorldSceneCuda::ParticleUpdate(ndFloat32 timestep)
 {
-	for (ndBodyList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
+	for (ndSpecialList<ndCudaSphFliud>::ndNode* node = m_fluidParticles.GetFirst(); node; node = node->GetNext())
 	{
-		ndBodyParticleSet* const body = node->GetInfo()->GetAsBodyParticleSet();
+		ndCudaSphFliud* const fluid = node->GetInfo();
+		fluid->Update(m_context, timestep);
 		//body->Update(this, timestep);
 	}
 }

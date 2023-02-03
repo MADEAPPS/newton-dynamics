@@ -21,12 +21,12 @@
 
 #include <ndNewtonStdafx.h>
 #include <ndCudaContext.h>
+#include <ndCudaSphFluid.h>
 #include <ndCudaBodyProxy.h>
 #include <ndDynamicsUpdate.h>
 
 class ndCudaContext;
 
-//class ndWorldSceneCuda : public ndWorldScene, public ndCudaContext
 class ndWorldSceneCuda : public ndWorldScene
 {
 	public:
@@ -65,5 +65,7 @@ class ndWorldSceneCuda : public ndWorldScene
 
 	private:
 	ndCudaContext* m_context;
+	ndSpecialList<ndCudaSphFliud> m_fluidParticles;
+
 	friend class ndDynamicsUpdateCuda;
 };

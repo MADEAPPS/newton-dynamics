@@ -957,7 +957,7 @@ void ndCudaContextImplement::Begin()
 	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
 	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
 
-#if 1
+#if 0
 	auto GetRadix = []  __device__(int item)
 	{
 		return item & 0xff;
