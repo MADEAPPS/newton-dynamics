@@ -264,7 +264,9 @@ void ndWorldSceneCuda::Addparticle(ndBodySphFluid* const particle)
 {
 	ndCudaSphFliud* const fluid = new ndCudaSphFliud(particle);
 	m_fluidParticles.Append(fluid);
-	//gpuFliud->Copydata(const float* const src, int strideInItems, int count)
+
+	const ndArray<ndVector>& posit = particle->GetPositions();
+	fluid->MemCpy(&posit[0].m_x, sizeof(ndVector) / sizeof(ndFloat32), posit.GetCount());
 }
 
 bool ndWorldSceneCuda::AddParticle(ndSharedPtr<ndBody>& particle)

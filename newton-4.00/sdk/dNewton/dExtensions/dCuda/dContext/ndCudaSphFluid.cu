@@ -32,9 +32,8 @@ ndCudaSphFliud::~ndCudaSphFliud()
 {
 }
 
-void ndCudaSphFliud::Copydata(const float* const src, int strideInItems, int count)
+void ndCudaSphFliud::MemCpy(const float* const src, int strideInItems, int items)
 {
-
 }
 
 void ndCudaSphFliud::Update(ndCudaContext* const context, float timestep)
