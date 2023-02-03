@@ -45,7 +45,8 @@ ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
 		ndBodySphFluid* const particle = body->GetAsBodySphFluid();
 		if (particle)
 		{
-			m_fluidParticles.Append(new ndCudaSphFliud(particle));
+			//m_fluidParticles.Append(new ndCudaSphFliud(particle));
+			Addparticle(particle);
 		}
 	}
 }
@@ -259,6 +260,13 @@ void ndWorldSceneCuda::CalculateContacts(ndInt32, ndContact* const)
 }
 #endif
 
+void ndWorldSceneCuda::Addparticle(ndBodySphFluid* const particle)
+{
+	ndCudaSphFliud* const fluid = new ndCudaSphFliud(particle);
+	m_fluidParticles.Append(fluid);
+	//gpuFliud->Copydata(const float* const src, int strideInItems, int count)
+}
+
 bool ndWorldSceneCuda::AddParticle(ndSharedPtr<ndBody>& particle)
 {
 	bool ret = ndWorldScene::AddParticle(particle);
@@ -266,7 +274,7 @@ bool ndWorldSceneCuda::AddParticle(ndSharedPtr<ndBody>& particle)
 	ndBodySphFluid* const fluid = particle->GetAsBodySphFluid();
 	if (fluid)
 	{
-		m_fluidParticles.Append(new ndCudaSphFliud(fluid));
+		Addparticle(fluid);
 	}
 	else
 	{

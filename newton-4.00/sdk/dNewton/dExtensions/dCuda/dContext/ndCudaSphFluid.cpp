@@ -32,7 +32,12 @@ ndCudaSphFliud::~ndCudaSphFliud()
 {
 }
 
-void ndCudaSphFliud::Update(ndCudaContext* context, float timestep)
+void ndCudaSphFliud::Copydata(const float* const src, int strideInItems, int count)
+{
+
+}
+
+void ndCudaSphFliud::Update(ndCudaContext* const context, float timestep)
 {
 
 }

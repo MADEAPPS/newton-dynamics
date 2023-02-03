@@ -36,7 +36,8 @@ class ndCudaSphFliud
 	D_CUDA_API ndCudaSphFliud(ndBodySphFluid* const owner);
 	D_CUDA_API ~ndCudaSphFliud();
 
-	D_CUDA_API void Update(ndCudaContext* context, float timestep);
+	void Copydata(const float* const src, int strideInItems, int count);
+	D_CUDA_API void Update(ndCudaContext* const context, float timestep);
 
 	ndBodySphFluid* m_owner;
 	

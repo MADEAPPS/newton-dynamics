@@ -64,6 +64,8 @@ class ndWorldSceneCuda : public ndWorldScene
 	//friend class ndDynamicsUpdateCuda;
 
 	private:
+	void Addparticle(ndBodySphFluid* const fluid);
+
 	ndCudaContext* m_context;
 	ndSpecialList<ndCudaSphFliud> m_fluidParticles;
 
