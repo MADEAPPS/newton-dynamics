@@ -19,12 +19,14 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "ndCudaStdafx.h"
+#include "ndCudaDevice.h"
+#include "ndCudaContext.h"
 #include "ndCudaSphFluid.h"
 
-ndCudaSphFliud::ndCudaSphFliud(ndBodySphFluid* const owner)
+ndCudaSphFliud::ndCudaSphFliud(ndCudaContext* const context, ndBodySphFluid* const owner)
 	:m_owner(owner)
+	,m_context(context)
 	,m_points()
 {
 }
@@ -52,10 +54,20 @@ void ndCudaSphFliud::MemCpy(const float* const src, int strideInItems, int items
 		ndAssert(0);
 	}
 
-
+	InitBuffers();
 }
 
-void ndCudaSphFliud::Update(ndCudaContext* const context, float timestep)
+void ndCudaSphFliud::InitBuffers()
+{
+	int workGroupSize = m_context->m_device->m_workGroupSize;
+	int groups = (m_points.GetCount() + workGroupSize - 1) / workGroupSize;
+	int size = workGroupSize * groups;
+	m_workingPoint.m_x.SetCount(size);
+	m_workingPoint.m_y.SetCount(size);
+	m_workingPoint.m_z.SetCount(size);
+}
+
+void ndCudaSphFliud::Update(float timestep)
 {
 
 }

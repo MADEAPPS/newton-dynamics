@@ -262,7 +262,7 @@ void ndWorldSceneCuda::CalculateContacts(ndInt32, ndContact* const)
 
 void ndWorldSceneCuda::Addparticle(ndBodySphFluid* const particle)
 {
-	ndCudaSphFliud* const fluid = new ndCudaSphFliud(particle);
+	ndCudaSphFliud* const fluid = new ndCudaSphFliud(m_context, particle);
 	m_fluidParticles.Append(fluid);
 
 	const ndArray<ndVector>& posit = particle->GetPositions();
@@ -315,7 +315,6 @@ void ndWorldSceneCuda::ParticleUpdate(ndFloat32 timestep)
 	for (ndSpecialList<ndCudaSphFliud>::ndNode* node = m_fluidParticles.GetFirst(); node; node = node->GetNext())
 	{
 		ndCudaSphFliud* const fluid = node->GetInfo();
-		fluid->Update(m_context, timestep);
-		//body->Update(this, timestep);
+		fluid->Update(timestep);
 	}
 }

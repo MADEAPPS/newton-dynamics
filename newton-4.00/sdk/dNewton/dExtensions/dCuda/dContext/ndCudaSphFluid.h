@@ -33,17 +33,30 @@ class ndBodySphFluid;
 class ndCudaSphFliud
 {
 	public:
+	class ndPoint
+	{
+		public:
+		ndCudaDeviceBuffer<float> m_x;
+		ndCudaDeviceBuffer<float> m_y;
+		ndCudaDeviceBuffer<float> m_z;
+	};
+
 	D_CUDA_OPERATOR_NEW_AND_DELETE;
 
-	D_CUDA_API ndCudaSphFliud(ndBodySphFluid* const owner);
+	D_CUDA_API ndCudaSphFliud(ndCudaContext* const context, ndBodySphFluid* const owner);
 	D_CUDA_API ~ndCudaSphFliud();
 
 	D_CUDA_API void MemCpy(const float* const src, int strideInItems, int items);
 	D_CUDA_API void MemCpy(const double* const src, int strideInItems, int items);
-	D_CUDA_API void Update(ndCudaContext* const context, float timestep);
+	D_CUDA_API void Update(float timestep);
+
+	void InitBuffers();
 
 	ndBodySphFluid* m_owner;
+	ndCudaContext* m_context;
 	ndCudaDeviceBuffer<ndCudaVector> m_points;
+
+	ndPoint m_workingPoint;
 	
 };
 
