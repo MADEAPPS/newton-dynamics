@@ -45,10 +45,9 @@ class ndCudaContext
 	D_CUDA_API const char* GetStringId() const;
 
 	D_CUDA_API void Begin();
-#if 0
 	D_CUDA_API void End();
 	
-
+#if 0
 	D_CUDA_API void ResizeBuffers(int size);
 	D_CUDA_API void LoadBodyData(const ndCudaBodyProxy* const src, int size);
 

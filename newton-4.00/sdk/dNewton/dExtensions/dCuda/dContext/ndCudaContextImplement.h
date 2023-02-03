@@ -46,8 +46,8 @@ class ndCudaContextImplement
 	const char* GetStringId() const;
 
 	void Begin();
+	void End();
 
-	//void End();
 	//void ResizeBuffers(int size);
 	//void LoadBodyData(const ndCudaBodyProxy* const src, int size);
 	//

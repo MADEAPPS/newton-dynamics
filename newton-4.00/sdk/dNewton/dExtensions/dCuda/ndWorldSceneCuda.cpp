@@ -77,7 +77,7 @@ void ndWorldSceneCuda::Begin()
 
 void ndWorldSceneCuda::End()
 {
-	//m_context->End();
+	m_context->End();
 	ndWorldScene::End();
 }
 
@@ -189,30 +189,6 @@ void ndWorldSceneCuda::GetBodyTransforms()
 	////gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, stream);
 }
 
-void ndWorldSceneCuda::UpdateTransform()
-{
-	D_TRACKTIME();
-	ndCudaContext::UpdateTransform();
-	auto SetTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME();
-		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-		const ndCudaSpatialVector* const data = GetTransformBuffer();
-		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndBodyKinematic* const body = bodyArray[i];
-			const ndCudaSpatialVector& transform = data[i];
-			const ndVector position(transform.m_linear.x, transform.m_linear.y, transform.m_linear.z, ndFloat32(1.0f));
-			const ndQuaternion rotation(ndVector(transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w));
-			body->SetMatrixAndCentreOfMass(rotation, position);
-			
-			body->m_transformIsDirty = true;
-			UpdateTransformNotify(threadIndex, body);
-		}
-	});
-	ParallelExecute(SetTransform);
-}
 
 
 void ndWorldSceneCuda::BalanceScene()
@@ -310,6 +286,41 @@ bool ndWorldSceneCuda::RemoveParticle(ndSharedPtr<ndBody>& particle)
 	return ret;
 }
 
+void ndWorldSceneCuda::UpdateTransform()
+{
+	D_TRACKTIME();
+	for (ndSpecialList<ndCudaSphFliud>::ndNode* node = m_fluidParticles.GetFirst(); node; node = node->GetNext())
+	{
+		ndCudaSphFliud* const fluid = node->GetInfo();
+		ndBodySphFluid* const owner = fluid->m_owner;
+		ndArray<ndVector>& posit = owner->GetPositions();
+		fluid->GetPositions(&posit[0].m_x, sizeof(ndVector) / sizeof(ndFloat32), posit.GetCount());
+	}
+
+	//m_context->UpdateTransform();
+	//auto SetTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	D_TRACKTIME();
+	//	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+	//	const ndCudaSpatialVector* const data = GetTransformBuffer();
+	//	const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+	//	{
+	//		ndBodyKinematic* const body = bodyArray[i];
+	//		const ndCudaSpatialVector& transform = data[i];
+	//		const ndVector position(transform.m_linear.x, transform.m_linear.y, transform.m_linear.z, ndFloat32(1.0f));
+	//		const ndQuaternion rotation(ndVector(transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w));
+	//		body->SetMatrixAndCentreOfMass(rotation, position);
+	//
+	//		body->m_transformIsDirty = true;
+	//		UpdateTransformNotify(threadIndex, body);
+	//	}
+	//});
+	//ParallelExecute(SetTransform);
+
+	ndWorldScene::UpdateTransform();
+}
+
 void ndWorldSceneCuda::ParticleUpdate(ndFloat32 timestep)
 {
 	for (ndSpecialList<ndCudaSphFliud>::ndNode* node = m_fluidParticles.GetFirst(); node; node = node->GetNext())
@@ -318,3 +329,4 @@ void ndWorldSceneCuda::ParticleUpdate(ndFloat32 timestep)
 		fluid->Update(timestep);
 	}
 }
+

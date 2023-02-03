@@ -83,10 +83,6 @@ ndCudaSpatialVector* ndCudaContext::GetTransformBuffer()
 	return m_implement->GetTransformBuffer();
 }
 
-void ndCudaContext::End()
-{
-	m_implement->End();
-}
 
 void ndCudaContext::ResizeBuffers(int size)
 {
@@ -127,4 +123,9 @@ void ndCudaContext::UpdateTransform()
 void ndCudaContext::Begin()
 {
 	m_implement->Begin();
+}
+
+void ndCudaContext::End()
+{
+	m_implement->End();
 }

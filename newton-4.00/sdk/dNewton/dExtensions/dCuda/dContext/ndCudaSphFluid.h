@@ -48,6 +48,10 @@ class ndCudaSphFliud
 
 	D_CUDA_API void MemCpy(const float* const src, int strideInItems, int items);
 	D_CUDA_API void MemCpy(const double* const src, int strideInItems, int items);
+
+	D_CUDA_API void GetPositions(float* const dst, int strideInItems, int items);
+	D_CUDA_API void GetPositions(double* const dst, int strideInItems, int items);
+
 	D_CUDA_API void Update(float timestep);
 
 	void InitBuffers();

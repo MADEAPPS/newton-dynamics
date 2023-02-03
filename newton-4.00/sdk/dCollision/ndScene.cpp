@@ -759,7 +759,6 @@ void ndScene::FindCollidingPairsBackward(ndBodyKinematic* const body, ndInt32 th
 void ndScene::UpdateTransform()
 {
 	D_TRACKTIME();
-
 	for (ndBodyList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyParticleSet* const particleSet = node->GetInfo()->GetAsBodyParticleSet();

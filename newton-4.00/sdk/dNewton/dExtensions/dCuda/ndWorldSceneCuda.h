@@ -48,11 +48,12 @@ class ndWorldSceneCuda : public ndWorldScene
 	////virtual void FindCollidingPairs(ndBodyKinematic* const body);
 	//virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
 	//
-	//virtual void UpdateTransform();
+	
 	//void LoadBodyData();
 	//void GetBodyTransforms();
-	//
 	//ndCudaContext* GetContext();
+
+	virtual void UpdateTransform();
 
 	virtual void ParticleUpdate(ndFloat32 timestep);
 	virtual bool AddParticle(ndSharedPtr<ndBody>& particle);

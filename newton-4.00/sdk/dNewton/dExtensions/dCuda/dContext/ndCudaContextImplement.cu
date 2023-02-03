@@ -689,14 +689,6 @@ int ndCudaContextImplement::GetComputeUnits() const
 }
 
 #if 0
-
-void ndCudaContextImplement::End()
-{
-	m_frameCounter = m_frameCounter + 1;
-	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
-	ndCudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, m_frameCounter);
-}
-
 ndCudaSpatialVector* ndCudaContextImplement::GetTransformBuffer()
 {
 	return &m_transformBufferCpu[0];
@@ -998,4 +990,11 @@ void ndCudaContextImplement::Begin()
 	}
 	#endif
 #endif
+}
+
+void ndCudaContextImplement::End()
+{
+	//m_frameCounter = m_frameCounter + 1;
+	//ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
+	//ndCudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, m_frameCounter);
 }

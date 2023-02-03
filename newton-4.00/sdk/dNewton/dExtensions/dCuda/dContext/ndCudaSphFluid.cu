@@ -40,6 +40,11 @@ void ndCudaSphFliud::MemCpy(const double* const src, int strideInItems, int item
 	ndAssert(0);
 }
 
+void GetPositions(double* const dst, int strideInItems, int items)
+{
+	ndAssert(0);
+}
+
 void ndCudaSphFliud::MemCpy(const float* const src, int strideInItems, int items)
 {
 	m_points.SetCount(items);
@@ -56,6 +61,20 @@ void ndCudaSphFliud::MemCpy(const float* const src, int strideInItems, int items
 
 	InitBuffers();
 }
+
+void ndCudaSphFliud::GetPositions(float* const dst, int strideInItems, int items)
+{
+	if (strideInItems == sizeof(ndCudaVector) / sizeof(float))
+	{
+		 ndCudaVector* const dstPtr = (ndCudaVector*)dst;
+		m_points.WriteData(dstPtr, items);
+	}
+	else
+	{
+		ndAssert(0);
+	}
+}
+
 
 void ndCudaSphFliud::InitBuffers()
 {
