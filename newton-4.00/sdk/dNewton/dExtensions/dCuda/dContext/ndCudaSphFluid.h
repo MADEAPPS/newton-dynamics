@@ -24,6 +24,8 @@
 
 #include "ndCudaUtils.h"
 #include "ndCudaStdafx.h"
+#include "ndCudaVector.h"
+#include "ndCudaDeviceBuffer.h"
 
 class ndCudaContext;
 class ndBodySphFluid;
@@ -37,9 +39,11 @@ class ndCudaSphFliud
 	D_CUDA_API ~ndCudaSphFliud();
 
 	D_CUDA_API void MemCpy(const float* const src, int strideInItems, int items);
+	D_CUDA_API void MemCpy(const double* const src, int strideInItems, int items);
 	D_CUDA_API void Update(ndCudaContext* const context, float timestep);
 
 	ndBodySphFluid* m_owner;
+	ndCudaDeviceBuffer<ndCudaVector> m_points;
 	
 };
 

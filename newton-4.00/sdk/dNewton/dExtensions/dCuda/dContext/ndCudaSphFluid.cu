@@ -24,7 +24,8 @@
 #include "ndCudaSphFluid.h"
 
 ndCudaSphFliud::ndCudaSphFliud(ndBodySphFluid* const owner)
-	:m_owner (owner)
+	:m_owner(owner)
+	,m_points()
 {
 }
 
@@ -32,8 +33,26 @@ ndCudaSphFliud::~ndCudaSphFliud()
 {
 }
 
+void ndCudaSphFliud::MemCpy(const double* const src, int strideInItems, int items)
+{
+	ndAssert(0);
+}
+
 void ndCudaSphFliud::MemCpy(const float* const src, int strideInItems, int items)
 {
+	m_points.SetCount(items);
+
+	if (strideInItems == sizeof(ndCudaVector) / sizeof(float))
+	{
+		const ndCudaVector* const srcPtr = (ndCudaVector*)src;
+		m_points.ReadData(srcPtr, items);
+	}
+	else
+	{
+		ndAssert(0);
+	}
+
+
 }
 
 void ndCudaSphFliud::Update(ndCudaContext* const context, float timestep)
