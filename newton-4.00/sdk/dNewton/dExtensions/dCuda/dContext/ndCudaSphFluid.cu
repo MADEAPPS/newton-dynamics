@@ -25,18 +25,25 @@
 #include "ndCudaSphFluid.h"
 
 
-__global__ void ndFluidInitTransposes(const ndAssessor<ndCudaVector> input, ndSphFliudPoint::ndPointAssessor output)
+__global__ void ndFluidInitTranspose(const ndKernelParams params, const ndAssessor<ndCudaVector> input, ndSphFliudPoint::ndPointAssessor output)
 {
+	int blockId = blockIdx.x;
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
-	int blockIndex = blockIdx.x;
-	int index = threadId + blockSride * blockIndex;
-	if (index < input.m_size)
+
+	int base = blockSride * params.m_blocksPerKernel * blockId;
+	for (int i = 0; i < params.m_blocksPerKernel; ++i)
 	{
-		ndCudaVector point (input[threadId]);
-		output.m_x[threadId] = point.x;
-		output.m_y[threadId] = point.y;
-		output.m_z[threadId] = point.z;
+		int index = base + threadId;
+		if (index < input.m_size)
+		{
+			ndCudaVector point(input[index]);
+			output.m_x[threadId] = point.x;
+			output.m_y[threadId] = point.y;
+			output.m_z[threadId] = point.z;
+		}
+
+		base += blockSride;
 	}
 };
 
@@ -45,8 +52,8 @@ __global__ void ndFluidGetPositions(ndAssessor<ndCudaVector> output, const ndSph
 {
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
-	int blockIndex = blockIdx.x;
-	int index = threadId + blockSride * blockIndex;
+	int blockId = blockIdx.x;
+	int index = threadId + blockSride * blockId;
 	if (index < output.m_size)
 	{
 		ndCudaVector point(input.m_x[threadId], input.m_y[threadId], input.m_z[threadId], 1.0f);
@@ -70,8 +77,8 @@ __global__ void ndCalculateAabb(const ndSphFliudPoint::ndPointAssessor input)
 
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
-	int blockIndex = blockIdx.x;
-	int index = threadId + blockSride * blockIndex;
+	int blockId = blockIdx.x;
+	int index = threadId + blockSride * blockId;
 	if (index < input.m_x.m_size)
 	{
 		ndCudaVector point(input.m_x[threadId], input.m_y[threadId], input.m_z[threadId], 1.0f);
@@ -122,7 +129,7 @@ void ndCudaSphFliud::GetPositions(float* const dst, int strideInItems, int items
 	int workGroupSize = m_context->m_device->m_workGroupSize;
 	int groups = (m_points.GetCount() + workGroupSize - 1) / workGroupSize;
 	//int size = m_points.GetCount();
-	ndAssert(groups <= m_context->m_device->m_maxBlocksPerKernel);
+	//ndAssert(groups <= m_context->m_device->m_maxBlocksPerKernel);
 
 	ndAssessor<ndCudaVector> output(m_points);
 	const ndSphFliudPoint::ndPointAssessor input(m_workingPoint);
@@ -131,7 +138,7 @@ void ndCudaSphFliud::GetPositions(float* const dst, int strideInItems, int items
 	{
 		ndFluidGetPositions << <groups, workGroupSize, 0 >> > (output, input);
 		ndCudaVector* const dstPtr = (ndCudaVector*)dst;
-		m_points.WriteData(dstPtr, items);
+		//m_points.WriteData(dstPtr, items);
 	}
 	else
 	{
@@ -141,19 +148,17 @@ void ndCudaSphFliud::GetPositions(float* const dst, int strideInItems, int items
 
 void ndCudaSphFliud::InitBuffers()
 {
-	int workGroupSize = m_context->m_device->m_workGroupSize;
-	int groups = (m_points.GetCount() + workGroupSize - 1) / workGroupSize;
-	int size = m_points.GetCount();
-	ndAssert(groups <= m_context->m_device->m_maxBlocksPerKernel);
+	const ndKernelParams params(m_context->m_device, m_context->m_device->m_workGroupSize, m_points.GetCount());
 
-	m_aabb.SetCount(groups);
-	m_workingPoint.m_x.SetCount(size);
-	m_workingPoint.m_y.SetCount(size);
-	m_workingPoint.m_z.SetCount(size);
+	//m_aabb.SetCount(groups);
+	//m_aabb.SetCount(params.m_kernelCount + 32);
+	m_workingPoint.m_x.SetCount(params.m_itemCount);
+	m_workingPoint.m_y.SetCount(params.m_itemCount);
+	m_workingPoint.m_z.SetCount(params.m_itemCount);
 
-	ndAssessor<ndCudaVector> input(m_points);
+	const ndAssessor<ndCudaVector> input(m_points);
 	ndSphFliudPoint::ndPointAssessor output(m_workingPoint);
-	ndFluidInitTransposes<<<groups, workGroupSize, 0>>>(input, output);
+	ndFluidInitTranspose<<<params.m_kernelCount, params.m_workGroupSize, 0>>>(params, input, output);
 }
 
 void ndCudaSphFliud::Update(float timestep)

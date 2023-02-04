@@ -42,7 +42,6 @@ class ndCudaDevice
 	struct cudaDeviceProp m_prop;
 	int m_computeUnits;
 	int m_workGroupSize;
-	int m_maxBlocksPerKernel;
 };
 
 class ndKernelParams
@@ -51,8 +50,8 @@ class ndKernelParams
 	ndKernelParams(const ndCudaDevice* const device, int workGroupSize, int itemCount);
 
 	int m_itemCount;
-	int m_workGroup;
 	int m_kernelCount;
+	int m_workGroupSize;
 	int m_blocksPerKernel;
 };
 

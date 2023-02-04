@@ -36,21 +36,7 @@
 //#define D_COUNTING_SORT_BLOCK_SIZE	(1<<10)
 
 template <class T, int exponentRadix, typename ndEvaluateRadix>
-void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix);
-
-// *****************************************************************
-// 
-// support function declarations
-//
-// *****************************************************************
-template <typename T, typename SortKeyPredicate>
-__global__ void ndCudaAddPrefix(const T* src, int blocksCount, int* scansBuffer, SortKeyPredicate getRadix);
-
-template <typename T, typename SortKeyPredicate>
-__global__ void ndCudaCountItems(const T* src, int bufferSize, int blocksCount, int* scansBuffer, int radixStride, SortKeyPredicate getRadix);
-
-template <typename T, typename SortKeyPredicate>
-__global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blocksCount, int* scansBuffer, int radixStride, SortKeyPredicate getRadix);
+void ndCountingSort(ndCudaContextImplement* const context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix);
 
 // *****************************************************************
 // 
@@ -58,7 +44,7 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 //
 // *****************************************************************
 template <typename T, typename SortKeyPredicate>
-__global__ void ndCudaAddPrefix(const T* src, int computeUnits, int* scansBuffer, SortKeyPredicate getRadix)
+__global__ void ndCudaAddPrefix(const ndKernelParams params, const ndAssessor<T> dommy, ndAssessor<int> scansBuffer, SortKeyPredicate getRadix)
 {
 	__shared__  int localPrefixScan[D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1];
 
@@ -69,7 +55,7 @@ __global__ void ndCudaAddPrefix(const T* src, int computeUnits, int* scansBuffer
 	int sum = 0;
 	int offset = 0;
 	localPrefixScan[threadId] = 0;
-	for (int i = 0; i < computeUnits; ++i)
+	for (int i = 0; i < params.m_kernelCount; ++i)
 	{
 		int count = scansBuffer[offset + threadId];
 		scansBuffer[offset + threadId] = sum;
@@ -91,14 +77,15 @@ __global__ void ndCudaAddPrefix(const T* src, int computeUnits, int* scansBuffer
 }
 
 template <typename T, typename SortKeyPredicate>
-__global__ void ndCudaCountItems(const T* src, int bufferSize, int blocksCount, int* scansBuffer, int radixStride, SortKeyPredicate getRadix)
+__global__ void ndCudaCountItems(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
 	__shared__  int radixCountBuffer[D_COUNTING_SORT_BLOCK_SIZE];
 
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
 	int blockIndex = blockIdx.x;
-	int bashSize = blocksCount * blockSride * blockIndex;
+	//int bashSize = blocksCount * blockSride * blockIndex;
+	int bashSize = params.m_blocksPerKernel * params.m_workGroupSize * blockIndex;
 
 	if (threadId < radixStride)
 	{
@@ -106,12 +93,12 @@ __global__ void ndCudaCountItems(const T* src, int bufferSize, int blocksCount, 
 	}
 	__syncthreads();
 
-	for (int i = 0; i < blocksCount; ++i)
+	for (int i = 0; i < params.m_blocksPerKernel; ++i)
 	{
 		int index = bashSize + threadId;
-		if (index < bufferSize)
+		if (index < input.m_size)
 		{
-			int radix = getRadix(src[index]);
+			int radix = getRadix(input[index]);
 			atomicAdd(&radixCountBuffer[radix], 1);
 		}
 		bashSize += blockSride;
@@ -126,7 +113,7 @@ __global__ void ndCudaCountItems(const T* src, int bufferSize, int blocksCount, 
 }
 
 template <typename T, typename SortKeyPredicate>
-__global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blocksCount, int* scansBuffer, int radixStride, int computeUnits, SortKeyPredicate getRadix)
+__global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
 	__shared__  T cachedItems[D_COUNTING_SORT_BLOCK_SIZE];
 	__shared__  int sortedRadix[D_COUNTING_SORT_BLOCK_SIZE];
@@ -140,8 +127,8 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 	int blockIndex = blockIdx.x;
 	int halfRadixStride = radixStride / 2;
 	int radixBase = blockIndex * radixStride;
-	int bashSize = blocksCount * blockSride * blockIndex;
-	int radixPrefixOffset = computeUnits * radixStride;
+	int radixPrefixOffset = params.m_kernelCount * radixStride;
+	int bashSize = params.m_blocksPerKernel * params.m_workGroupSize * blockIndex;
 
 	if (threadId < radixStride)
 	{
@@ -150,7 +137,7 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 		radixPrefixBatchScan[threadId] = scansBuffer[radixPrefixOffset + threadId];
 	}
 
-	for (int i = 0; i < blocksCount; ++i)
+	for (int i = 0; i < params.m_blocksPerKernel; ++i)
 	{
 		if (threadId < radixStride)
 		{
@@ -160,9 +147,9 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 		__syncthreads();
 	
 		int index = bashSize + threadId;
-		if (index < bufferSize)
+		if (index < input.m_size)
 		{
-			cachedItems[threadId] = src[index];
+			cachedItems[threadId] = input[index];
 			int radix = getRadix(cachedItems[threadId]);
 			atomicAdd(&radixPrefixCount[radix], 1);
 			sortedRadix[threadId] = (radix << 16) + threadId;
@@ -227,14 +214,14 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 			}
 		}
 
-		if (index < bufferSize)
+		if (index < input.m_size)
 		{
 			int keyValue = sortedRadix[threadId];
 			int keyHigh = keyValue >> 16;
 			int keyLow = keyValue & 0xffff;
 			int dstOffset1 = radixPrefixBatchScan[keyHigh] + radixPrefixStart[keyHigh];
 			int dstOffset0 = threadId - radixPrefixScan[halfRadixStride + keyHigh];
-			dst[dstOffset0 + dstOffset1] = cachedItems[keyLow];
+			output[dstOffset0 + dstOffset1] = cachedItems[keyLow];
 		}
 		__syncthreads();
 		if (threadId < radixStride)
@@ -246,21 +233,17 @@ __global__ void ndCudaMergeBuckets(const T* src, T* dst, int bufferSize, int blo
 }
 
 template <class T, int exponentRadix, typename ndEvaluateRadix>
-void ndCountingSort(ndCudaContextImplement* context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix)
+void ndCountingSort(ndCudaContextImplement* const context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix)
 {
-	int itemCount = src.GetCount();
-	int radixStride = 1 << exponentRadix;
-	int deviceComputeUnits = context->GetComputeUnits();
-	int computeUnitsBashCount = (itemCount + D_COUNTING_SORT_BLOCK_SIZE - 1) / D_COUNTING_SORT_BLOCK_SIZE;
-	int bashCount = (computeUnitsBashCount + deviceComputeUnits - 1) / deviceComputeUnits;
-	int computeUnits = (itemCount + bashCount * D_COUNTING_SORT_BLOCK_SIZE - 1) / (bashCount * D_COUNTING_SORT_BLOCK_SIZE);
-	ndAssert(computeUnits <= deviceComputeUnits);
-
+	ndAssessor<T> input(src);
+	ndAssessor<T> output(dst);
+	ndAssessor<int> prefixScanBuffer(context->m_sortPrefixBuffer);
 	ndKernelParams params(context->m_device, D_COUNTING_SORT_BLOCK_SIZE, src.GetCount());
 
-	ndCudaCountItems << <computeUnits, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (src.m_array, itemCount, bashCount, context->m_sortPrefixBuffer.m_array, radixStride, evaluateRadix);
-	ndCudaAddPrefix << <1, radixStride, 0 >> > (src.m_array, computeUnits, context->m_sortPrefixBuffer.m_array, evaluateRadix);
-	ndCudaMergeBuckets << <computeUnits, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (src.m_array, dst.m_array, itemCount, bashCount, context->m_sortPrefixBuffer.m_array, radixStride, computeUnits, evaluateRadix);
+	int radixStride = 1 << exponentRadix;
+	ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, input, prefixScanBuffer, radixStride, evaluateRadix);
+	ndCudaAddPrefix << <1, radixStride, 0 >> > (params, input, prefixScanBuffer, evaluateRadix);
+	ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, input, output, prefixScanBuffer, radixStride, evaluateRadix);
 }
 
 #endif

@@ -47,8 +47,9 @@ ndCudaDevice::ndCudaDevice()
 	cuTrace(("memory: (mbytes) %d\n", m_prop.totalGlobalMem / (1024 * 1024)));
 
 	m_workGroupSize = std::min(m_prop.maxThreadsPerBlock, 512);
-	m_computeUnits = std::min(4 * m_prop.multiProcessorCount, 256);
-	m_maxBlocksPerKernel = m_prop.maxBlocksPerMultiProcessor * m_prop.multiProcessorCount;
+	m_computeUnits = std::min(4 * m_prop.multiProcessorCount, 512);
+	//m_computeUnits = std::min(m_prop.maxBlocksPerMultiProcessor * m_prop.multiProcessorCount / 4, 512);
+	//m_maxBlocksPerKernel = m_prop.maxBlocksPerMultiProcessor * m_prop.multiProcessorCount;
 }
 
 ndCudaDevice::~ndCudaDevice()
@@ -80,14 +81,14 @@ int ndCudaDevice::GetComputeUnits() const
 
 ndKernelParams::ndKernelParams(const ndCudaDevice* const device, int workGroupSize, int itemCount)
 	:m_itemCount(itemCount)
-	,m_workGroup(workGroupSize)
+	,m_workGroupSize(workGroupSize)
 {
 	ndAssert(workGroupSize);
 	ndAssert(!(workGroupSize & (workGroupSize - 1)));
 	int deviceComputeUnits = device->GetComputeUnits();
-	int computeUnitsBashCount = (itemCount + workGroupSize - 1) / workGroupSize;
+	int computeUnitsBashCount = (itemCount + m_workGroupSize - 1) / m_workGroupSize;
 
 	m_blocksPerKernel = (computeUnitsBashCount + deviceComputeUnits - 1) / deviceComputeUnits;
-	m_kernelCount = (itemCount + m_blocksPerKernel * workGroupSize - 1) / (m_blocksPerKernel * workGroupSize);
+	m_kernelCount = (itemCount + m_blocksPerKernel * m_workGroupSize - 1) / (m_blocksPerKernel * m_workGroupSize);
 	ndAssert(m_kernelCount <= deviceComputeUnits);
 }
