@@ -38,26 +38,31 @@ __global__ void ndFluidInitTranspose(const ndKernelParams params, const ndAssess
 		if (index < input.m_size)
 		{
 			ndCudaVector point(input[index]);
-			output.m_x[threadId] = point.x;
-			output.m_y[threadId] = point.y;
-			output.m_z[threadId] = point.z;
+			output.m_x[index] = point.x;
+			output.m_y[index] = point.y;
+			output.m_z[index] = point.z;
 		}
 
 		base += blockSride;
 	}
 };
 
-//__global__ void ndFluidGetPositions(ndCudaVector* output, const float* x, const float* y, const float* z, int size)
-__global__ void ndFluidGetPositions(ndAssessor<ndCudaVector> output, const ndSphFliudPoint::ndPointAssessor input)
+__global__ void ndFluidGetPositions(const ndKernelParams params, ndAssessor<ndCudaVector> output, const ndSphFliudPoint::ndPointAssessor input)
 {
+	int blockId = blockIdx.x;
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
-	int blockId = blockIdx.x;
-	int index = threadId + blockSride * blockId;
-	if (index < output.m_size)
+
+	int base = blockSride * params.m_blocksPerKernel * blockId;
+	for (int i = 0; i < params.m_blocksPerKernel; ++i)
 	{
-		ndCudaVector point(input.m_x[threadId], input.m_y[threadId], input.m_z[threadId], 1.0f);
-		output[threadId] = point;
+		int index = base + threadId;
+		if (index < output.m_size)
+		{
+			ndCudaVector point(input.m_x[index], input.m_y[index], input.m_z[index], 1.0f);
+			output[index] = point;
+		}
+		base += blockSride;
 	}
 };
 
@@ -126,19 +131,15 @@ void ndCudaSphFliud::MemCpy(const float* const src, int strideInItems, int items
 
 void ndCudaSphFliud::GetPositions(float* const dst, int strideInItems, int items)
 {
-	int workGroupSize = m_context->m_device->m_workGroupSize;
-	int groups = (m_points.GetCount() + workGroupSize - 1) / workGroupSize;
-	//int size = m_points.GetCount();
-	//ndAssert(groups <= m_context->m_device->m_maxBlocksPerKernel);
-
 	ndAssessor<ndCudaVector> output(m_points);
 	const ndSphFliudPoint::ndPointAssessor input(m_workingPoint);
+	const ndKernelParams params(m_context->m_device, m_context->m_device->m_workGroupSize, m_points.GetCount());
 
 	if (strideInItems == sizeof(ndCudaVector) / sizeof(float))
 	{
-		ndFluidGetPositions << <groups, workGroupSize, 0 >> > (output, input);
+		ndFluidGetPositions << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, output, input);
 		ndCudaVector* const dstPtr = (ndCudaVector*)dst;
-		//m_points.WriteData(dstPtr, items);
+		m_points.WriteData(dstPtr, items);
 	}
 	else
 	{
