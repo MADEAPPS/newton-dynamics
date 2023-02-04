@@ -156,10 +156,11 @@ class ndCudaVector: public float4
 
 	inline ndCudaVector __device__ __host__ CrossProduct(const ndCudaVector& B) const
 	{
-		return ndCudaVector(y * B.z - z * B.y,
-						z * B.x - x * B.z,
-						x * B.y - y * B.x,
-						w);
+		return ndCudaVector(
+			y * B.z - z * B.y,
+			z * B.x - x * B.z,
+			x * B.y - y * B.x,
+			w);
 	}
 
 	inline ndCudaVector __device__ __host__ Normalize() const

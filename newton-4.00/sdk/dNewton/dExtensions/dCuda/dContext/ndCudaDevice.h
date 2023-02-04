@@ -42,6 +42,7 @@ class ndCudaDevice
 	struct cudaDeviceProp m_prop;
 	int m_computeUnits;
 	int m_workGroupSize;
+	int m_maxBlocksPerKernel;
 };
 
 #endif

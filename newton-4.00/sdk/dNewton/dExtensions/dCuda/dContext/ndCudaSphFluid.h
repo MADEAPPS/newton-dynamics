@@ -30,17 +30,24 @@
 class ndCudaContext;
 class ndBodySphFluid;
 
+class ndSphFliudPoint
+{
+	public:
+	ndCudaDeviceBuffer<float> m_x;
+	ndCudaDeviceBuffer<float> m_y;
+	ndCudaDeviceBuffer<float> m_z;
+};
+
+class ndSphFliudAabb
+{
+	public:
+	ndCudaVector m_min;
+	ndCudaVector m_max;
+};
+
 class ndCudaSphFliud
 {
 	public:
-	class ndPoint
-	{
-		public:
-		ndCudaDeviceBuffer<float> m_x;
-		ndCudaDeviceBuffer<float> m_y;
-		ndCudaDeviceBuffer<float> m_z;
-	};
-
 	D_CUDA_OPERATOR_NEW_AND_DELETE;
 
 	D_CUDA_API ndCudaSphFliud(ndCudaContext* const context, ndBodySphFluid* const owner);
@@ -55,13 +62,13 @@ class ndCudaSphFliud
 	D_CUDA_API void Update(float timestep);
 
 	void InitBuffers();
+	void CaculateAabb();
 
 	ndBodySphFluid* m_owner;
 	ndCudaContext* m_context;
 	ndCudaDeviceBuffer<ndCudaVector> m_points;
-
-	ndPoint m_workingPoint;
-	
+	ndCudaDeviceBuffer<ndSphFliudAabb> m_aabb;
+	ndSphFliudPoint m_workingPoint;
 };
 
 

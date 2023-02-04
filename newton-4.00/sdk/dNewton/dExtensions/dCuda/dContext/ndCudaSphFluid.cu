@@ -24,6 +24,61 @@
 #include "ndCudaContext.h"
 #include "ndCudaSphFluid.h"
 
+__global__ void ndFluidInitTransposes(const ndCudaVector* input, float* x, float* y, float* z, int size)
+{
+	int threadId = threadIdx.x;
+	int blockSride = blockDim.x;
+	int blockIndex = blockIdx.x;
+	int index = threadId + blockSride * blockIndex;
+	if (index < size)
+	{
+		ndCudaVector point (input[threadId]);
+		x[threadId] = point.x;
+		y[threadId] = point.y;
+		z[threadId] = point.z;
+	}
+};
+
+__global__ void ndFluidGetPositions(ndCudaVector* output, const float* x, const float* y, const float* z, int size)
+{
+	int threadId = threadIdx.x;
+	int blockSride = blockDim.x;
+	int blockIndex = blockIdx.x;
+	int index = threadId + blockSride * blockIndex;
+	if (index < size)
+	{
+		ndCudaVector point(x[threadId], y[threadId], z[threadId], 1.0f);
+		output[threadId] = point;
+	}
+};
+
+
+__global__ void ndCalculateAabb(const float* x, const float* y, const float* z, int size)
+{
+//	D_TRACKTIME_NAMED(CalculateAabb);
+//	ndBox box;
+//	const ndArray<ndVector>& posit = m_posit;
+//	const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
+//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+//	{
+//		box.m_min = box.m_min.GetMin(posit[i]);
+//		box.m_max = box.m_max.GetMax(posit[i]);
+//	}
+//	boxes[threadIndex] = box;
+
+	int threadId = threadIdx.x;
+	int blockSride = blockDim.x;
+	int blockIndex = blockIdx.x;
+	int index = threadId + blockSride * blockIndex;
+	if (index < size)
+	{
+		ndCudaVector point(x[threadId], y[threadId], z[threadId], 1.0f);
+	}
+
+}
+
+
+
 ndCudaSphFliud::ndCudaSphFliud(ndCudaContext* const context, ndBodySphFluid* const owner)
 	:m_owner(owner)
 	,m_context(context)
@@ -64,9 +119,14 @@ void ndCudaSphFliud::MemCpy(const float* const src, int strideInItems, int items
 
 void ndCudaSphFliud::GetPositions(float* const dst, int strideInItems, int items)
 {
+	int workGroupSize = m_context->m_device->m_workGroupSize;
+	int groups = (m_points.GetCount() + workGroupSize - 1) / workGroupSize;
+	int size = m_points.GetCount();
+	ndAssert(groups <= m_context->m_device->m_maxBlocksPerKernel);
 	if (strideInItems == sizeof(ndCudaVector) / sizeof(float))
 	{
-		 ndCudaVector* const dstPtr = (ndCudaVector*)dst;
+		ndFluidGetPositions << <groups, workGroupSize, 0 >> > (m_points.m_array, m_workingPoint.m_x.m_array, m_workingPoint.m_y.m_array, m_workingPoint.m_z.m_array, size);
+		ndCudaVector* const dstPtr = (ndCudaVector*)dst;
 		m_points.WriteData(dstPtr, items);
 	}
 	else
@@ -75,18 +135,85 @@ void ndCudaSphFliud::GetPositions(float* const dst, int strideInItems, int items
 	}
 }
 
-
 void ndCudaSphFliud::InitBuffers()
 {
 	int workGroupSize = m_context->m_device->m_workGroupSize;
 	int groups = (m_points.GetCount() + workGroupSize - 1) / workGroupSize;
-	int size = workGroupSize * groups;
+	int size = m_points.GetCount();
+	ndAssert(groups <= m_context->m_device->m_maxBlocksPerKernel);
+
+	m_aabb.SetCount(groups);
 	m_workingPoint.m_x.SetCount(size);
 	m_workingPoint.m_y.SetCount(size);
 	m_workingPoint.m_z.SetCount(size);
+	
+	ndFluidInitTransposes<<<groups, workGroupSize, 0>>>(m_points.m_array, m_workingPoint.m_x.m_array, m_workingPoint.m_y.m_array, m_workingPoint.m_z.m_array, size);
 }
 
 void ndCudaSphFliud::Update(float timestep)
 {
-
+	CaculateAabb();
 }
+
+void ndCudaSphFliud::CaculateAabb()
+{
+	//D_TRACKTIME();
+	//class ndBox
+	//{
+	//	public:
+	//	ndBox()
+	//		:m_min(ndFloat32(1.0e10f))
+	//		, m_max(ndFloat32(-1.0e10f))
+	//	{
+	//	}
+	//	ndVector m_min;
+	//	ndVector m_max;
+	//};
+	//
+	//ndBox boxes[D_MAX_THREADS_COUNT];
+	//auto CalculateAabb = ndMakeObject::ndFunction([this, &boxes](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	D_TRACKTIME_NAMED(CalculateAabb);
+	//	ndBox box;
+	//	const ndArray<ndVector>& posit = m_posit;
+	//	const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
+	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+	//	{
+	//		box.m_min = box.m_min.GetMin(posit[i]);
+	//		box.m_max = box.m_max.GetMax(posit[i]);
+	//	}
+	//	boxes[threadIndex] = box;
+	//});
+	//
+	//threadPool->ParallelExecute(CalculateAabb);
+	//
+	//ndBox box;
+	//const ndInt32 threadCount = threadPool->GetThreadCount();
+	//for (ndInt32 i = 0; i < threadCount; ++i)
+	//{
+	//	box.m_min = box.m_min.GetMin(boxes[i].m_min);
+	//	box.m_max = box.m_max.GetMax(boxes[i].m_max);
+	//}
+	//
+	//const ndFloat32 gridSize = GetSphGridSize();
+	//
+	//ndVector grid(gridSize);
+	//ndVector invGrid(ndFloat32(1.0f) / gridSize);
+	//
+	//// add one grid padding to the aabb
+	//box.m_min -= grid;
+	//box.m_max += (grid + grid);
+	//
+	//// quantize the aabb to integers of the gird size
+	//box.m_min = grid * (box.m_min * invGrid).Floor();
+	//box.m_max = grid * (box.m_max * invGrid).Floor();
+	//
+	//// make sure the w component is zero.
+	//m_box0 = box.m_min & ndVector::m_triplexMask;
+	//m_box1 = box.m_max & ndVector::m_triplexMask;
+	//
+	//ndWorkingBuffers& data = *m_workingBuffers;
+	//ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
+	//data.SetWorldToGridMapping(numberOfGrid, m_box1.m_x, m_box0.m_x);
+}
+

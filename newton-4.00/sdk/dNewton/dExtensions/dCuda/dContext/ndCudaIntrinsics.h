@@ -25,7 +25,7 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-#define D_GRANULARITY	(1024 * 256)
+#define D_GRANULARITY	(1024 * 64)
 
 template <class T>
 inline T __device__ __host__ cuAbs(T A)
