@@ -33,6 +33,21 @@ class ndBodySphFluid;
 class ndSphFliudPoint
 {
 	public:
+	class ndPointAssessor
+	{
+		public:
+		ndPointAssessor(ndSphFliudPoint& data)
+			:m_x(data.m_x)
+			,m_y(data.m_y)
+			,m_z(data.m_z)
+		{
+		}
+
+		ndAssessor<float> m_x;
+		ndAssessor<float> m_y;
+		ndAssessor<float> m_z;
+	};
+
 	ndCudaDeviceBuffer<float> m_x;
 	ndCudaDeviceBuffer<float> m_y;
 	ndCudaDeviceBuffer<float> m_z;

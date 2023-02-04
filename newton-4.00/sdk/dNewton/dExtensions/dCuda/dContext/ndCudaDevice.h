@@ -45,4 +45,16 @@ class ndCudaDevice
 	int m_maxBlocksPerKernel;
 };
 
+class ndKernelParams
+{
+	public:
+	ndKernelParams(const ndCudaDevice* const device, int workGroupSize, int itemCount);
+
+	int m_itemCount;
+	int m_workGroup;
+	int m_kernelCount;
+	int m_blocksPerKernel;
+};
+
+
 #endif

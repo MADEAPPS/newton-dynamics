@@ -55,6 +55,30 @@ class ndCudaDeviceBuffer
 };
 
 template<class T>
+class ndAssessor
+{
+	public:
+	__device__ __host__ ndAssessor(ndCudaDeviceBuffer<T>& buffer)
+		:m_array(buffer.m_array)
+		, m_size(buffer.m_size)
+	{
+	}
+
+	__device__ __host__ T& operator[] (int i)
+	{
+		return m_array[i];
+	}
+
+	__device__ __host__ const T& operator[] (int i) const
+	{
+		return m_array[i];
+	}
+
+	T* m_array;
+	int m_size;
+};
+
+template<class T>
 ndCudaDeviceBuffer<T>::ndCudaDeviceBuffer()
 	:m_array(nullptr)
 	,m_size(0)
@@ -176,7 +200,7 @@ void ndCudaDeviceBuffer<T>::ReadData(const T* const src, int elements)
 template<class T>
 void ndCudaDeviceBuffer<T>::WriteData(T* const dst, int elements) const
 {
-	ndAssert(elements <= m_size);
+	ndAssert(m_size <= elements);
 	cudaMemcpy(dst, m_array, sizeof(T) * elements, cudaMemcpyDeviceToHost);
 }
 

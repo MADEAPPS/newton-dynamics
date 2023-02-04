@@ -949,7 +949,7 @@ void ndCudaContextImplement::Begin()
 	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
 	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
 
-#if 0
+#if 1
 	auto GetRadix = []  __device__(int item)
 	{
 		return item & 0xff;
@@ -959,7 +959,8 @@ void ndCudaContextImplement::Begin()
 	cudaEventCreate(&start_event);
 	cudaEventCreate(&stop_event);
 
-	int numIterations = 100;
+	//int numIterations = 100;
+	int numIterations = 10;
 	cudaEventRecord(start_event, 0);
 	for (int i = 0; i < numIterations; ++i)
 	{
