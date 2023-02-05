@@ -53,7 +53,7 @@ class ndSphFliudPoint
 	ndCudaDeviceBuffer<float> m_z;
 };
 
-class ndSphFliudAabb
+class ndSphFluidAabb
 {
 	public:
 	ndCudaVector m_min;
@@ -82,7 +82,7 @@ class ndCudaSphFliud
 	ndBodySphFluid* m_owner;
 	ndCudaContext* m_context;
 	ndCudaDeviceBuffer<ndCudaVector> m_points;
-	ndCudaDeviceBuffer<ndSphFliudAabb> m_aabb;
+	ndCudaDeviceBuffer<ndSphFluidAabb> m_aabb;
 	ndSphFliudPoint m_workingPoint;
 };
 

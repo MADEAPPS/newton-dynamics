@@ -66,7 +66,7 @@ __global__ void ndFluidGetPositions(const ndKernelParams params, ndAssessor<ndCu
 };
 
 
-__global__ void ndCalculateAabb(const ndSphFliudPoint::ndPointAssessor input)
+__global__ void ndCalculateAabb(const ndKernelParams params, const ndSphFliudPoint::ndPointAssessor input, ndAssessor<ndSphFluidAabb> output)
 {
 //	D_TRACKTIME_NAMED(CalculateAabb);
 //	ndBox box;
@@ -150,8 +150,7 @@ void ndCudaSphFliud::InitBuffers()
 {
 	const ndKernelParams params(m_context->m_device, m_context->m_device->m_workGroupSize, m_points.GetCount());
 
-	//m_aabb.SetCount(groups);
-	//m_aabb.SetCount(params.m_kernelCount + 32);
+	m_aabb.SetCount(params.m_kernelCount + 32);
 	m_workingPoint.m_x.SetCount(params.m_itemCount);
 	m_workingPoint.m_y.SetCount(params.m_itemCount);
 	m_workingPoint.m_z.SetCount(params.m_itemCount);
@@ -227,6 +226,10 @@ void ndCudaSphFliud::CaculateAabb()
 	//ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
 	//data.SetWorldToGridMapping(numberOfGrid, m_box1.m_x, m_box0.m_x);
 
-	ndSphFliudPoint::ndPointAssessor output(m_workingPoint);
+	ndAssessor<ndSphFluidAabb> aabb(m_aabb);
+	const ndSphFliudPoint::ndPointAssessor input(m_workingPoint);
+	const ndKernelParams params(m_context->m_device, m_context->m_device->m_workGroupSize, m_points.GetCount());
+
+	ndCalculateAabb << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, input, aabb);
 }
 
