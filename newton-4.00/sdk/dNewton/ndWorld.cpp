@@ -31,6 +31,7 @@
 #include "ndJointBilateralConstraint.h"
 
 #ifdef _D_USE_AVX2_SOLVER
+	#include "ndWorldSceneAvx2.h"
 	#include "ndDynamicsUpdateAvx2.h"
 #endif
 
@@ -906,7 +907,7 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 			case ndSimdAvx2Solver:
 			{
 				#ifdef _D_USE_AVX2_SOLVER
-					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+					ndWorldScene* const newScene = new ndWorldSceneAvx2(*((ndWorldScene*)m_scene));
 					delete m_scene;
 					m_scene = newScene;
 

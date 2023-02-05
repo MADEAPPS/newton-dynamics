@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -19,30 +19,15 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_WORLD_SCENE_H__
-#define __D_WORLD_SCENE_H__
+#include "ndWorldSceneAvx2.h"
 
-#include "ndNewtonStdafx.h"
-#include "ndWorld.h"
-
-class ndWorldScene : public ndScene
+ndWorldSceneAvx2::ndWorldSceneAvx2(const ndWorldScene& src)
+	:ndWorldScene(src)
 {
-	public:
-	D_NEWTON_API ndWorldScene(ndWorld* const world);
-	D_NEWTON_API ndWorldScene(const ndWorldScene& src);
-	D_NEWTON_API virtual ~ndWorldScene();
-
-	protected:
-	virtual void ThreadFunction();
-
-	virtual ndWorld* GetWorld() const;
-
-	ndWorld* m_world;
-};
-
-inline ndWorld* ndWorldScene::GetWorld() const
-{
-	return m_world;
 }
 
-#endif
+ndWorldSceneAvx2::~ndWorldSceneAvx2()
+{
+}
+
+

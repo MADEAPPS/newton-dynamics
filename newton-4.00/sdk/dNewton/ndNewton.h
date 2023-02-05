@@ -36,6 +36,7 @@
 #include <ndJointGear.h>
 #include <ndJointList.h>
 #include <ndCharacter.h>
+#include <ndWorldScene.h>
 #include <ndConstraint.h>
 #include <ndJointHinge.h>
 #include <ndJointPlane.h>

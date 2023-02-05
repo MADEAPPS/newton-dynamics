@@ -24,7 +24,6 @@
 #include "ndCudaContext.h"
 #include "ndCudaSphFluid.h"
 
-
 __global__ void ndFluidInitTranspose(const ndKernelParams params, const ndAssessor<ndCudaVector> input, ndSphFliudPoint::ndPointAssessor output)
 {
 	int blockId = blockIdx.x;
