@@ -564,10 +564,10 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 			}
 		};
 
-		// even step is nor good because the bashes tend to be clustered
-		// a better way is to sort, bu that takes about 1 ms,
-		// we interleaving bashes and has the randomizing 
-		// effect that balance the work load on the thread.
+		// even step is not good because the bashes tend to be clustered
+		// a better way is to sort, but that takes about 1 ms.
+		// Interleaving bashes and has the randomizing effect that 
+		// tend to balance the work load on the thread.
 
 		const ndInt32 scansCount = gridScans.GetCount() - 1;
 		for (ndInt32 i = threadIndex; i < scansCount; i += threadCount)
@@ -947,28 +947,28 @@ void ndBodySphFluid::Execute(ndThreadPool* const threadPool)
 	D_TRACKTIME();
 	ndAssert(sizeof(ndGridHash) == sizeof(ndUnsigned64));
 
-	if (m_posit.GetCount())
-	{
-		CaculateAabb(threadPool);
-		CreateGrids(threadPool);
-		SortGrids(threadPool);
-		CalculateScans(threadPool);
-		BuildPairs(threadPool);
-		CalculateParticlesDensity(threadPool);
-		CalculateAccelerations(threadPool);
-		IntegrateParticles(threadPool);
-	}
+	CaculateAabb(threadPool);
+	CreateGrids(threadPool);
+	SortGrids(threadPool);
+	CalculateScans(threadPool);
+	BuildPairs(threadPool);
+	CalculateParticlesDensity(threadPool);
+	CalculateAccelerations(threadPool);
+	IntegrateParticles(threadPool);
 }
 
 void ndBodySphFluid::Update(const ndScene* const scene, ndFloat32 timestep)
 {
 	if (TaskState() == ndBackgroundTask::m_taskCompleted)
 	{
-		m_timestep = timestep;
-		((ndScene*)scene)->SendBackgroundTask(this);
-		if (!m_updateInBackground)
+		if (m_posit.GetCount())
 		{
-			Sync();
+			m_timestep = timestep;
+			((ndScene*)scene)->SendBackgroundTask(this);
+			if (!m_updateInBackground)
+			{
+				Sync();
+			}
 		}
 	}
 }

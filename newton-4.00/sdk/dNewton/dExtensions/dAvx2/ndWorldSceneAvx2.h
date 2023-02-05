@@ -29,6 +29,8 @@ class ndWorldSceneAvx2 : public ndWorldScene
 	public:
 	ndWorldSceneAvx2(const ndWorldScene& src);
 	virtual ~ndWorldSceneAvx2();
+
+	virtual void ParticleUpdate(ndFloat32 timestep);
 };
 
 #endif

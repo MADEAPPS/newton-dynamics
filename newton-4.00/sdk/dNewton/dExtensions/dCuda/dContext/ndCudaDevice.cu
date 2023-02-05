@@ -48,8 +48,6 @@ ndCudaDevice::ndCudaDevice()
 
 	m_workGroupSize = std::min(m_prop.maxThreadsPerBlock, 512);
 	m_computeUnits = std::min(4 * m_prop.multiProcessorCount, 512);
-	//m_computeUnits = std::min(m_prop.maxBlocksPerMultiProcessor * m_prop.multiProcessorCount / 4, 512);
-	//m_maxBlocksPerKernel = m_prop.maxBlocksPerMultiProcessor * m_prop.multiProcessorCount;
 }
 
 ndCudaDevice::~ndCudaDevice()

@@ -24,15 +24,18 @@
 #include "ndCudaContext.h"
 #include "ndCudaContextImplement.h"
 
+#define D_CUDA_MIN_COMPUTE_CAP	610
+
 void CudaSetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free);
 
 ndCudaContext::ndCudaContext()
 	:m_device (new ndCudaDevice)
 	,m_implement(nullptr)
 {
-	int campbility = m_device->m_prop.major * 100 + m_device->m_prop.minor;
+	int capability = m_device->m_prop.major * 100 + m_device->m_prop.minor * 10;
 	// go as far back as 5.2 Maxwell GeForce GTX 960 or better.
-	if (campbility >= 600)
+	// go as far back as 6.1 Pascal GeForce GTX 1050 or better.
+	if (capability >= D_CUDA_MIN_COMPUTE_CAP)
 	{
 		cudaError_t cudaStatus = cudaSetDevice(0);
 		if (cudaStatus == cudaSuccess)

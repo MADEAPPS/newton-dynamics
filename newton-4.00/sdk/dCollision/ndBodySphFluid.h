@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_BODY_SPH_FLUID_CPU_H__
-#define __ND_BODY_SPH_FLUID_CPU_H__
+#ifndef __ND_BODY_SPH_FLUID_H__
+#define __ND_BODY_SPH_FLUID_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndBodyParticleSet.h"
@@ -53,7 +53,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 	D_COLLISION_API void Execute(ndThreadPool* const threadPool);
 
 	protected:
-	//D_COLLISION_API virtual void Update(const ndWorld* const world, ndFloat32 timestep);
 	D_COLLISION_API virtual void Update(const ndScene* const scene, ndFloat32 timestep);
 	virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const;
 
