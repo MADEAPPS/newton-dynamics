@@ -238,7 +238,13 @@ void ndWorldSceneCuda::CalculateContacts(ndInt32, ndContact* const)
 
 void ndWorldSceneCuda::Addparticle(ndBodySphFluid* const particle)
 {
-	ndCudaSphFliud* const fluid = new ndCudaSphFliud(m_context, particle);
+	ndSphFluidInitInfo info;
+	info.m_owner = particle;
+	info.m_context = m_context;
+	info.m_owner = particle;
+	info.m_gridSize = particle->GetSphGridSize();
+
+	ndCudaSphFliud* const fluid = new ndCudaSphFliud(info);
 	m_fluidParticles.Append(fluid);
 
 	const ndArray<ndVector>& posit = particle->GetPositions();
@@ -269,7 +275,7 @@ bool ndWorldSceneCuda::RemoveParticle(ndSharedPtr<ndBody>& particle)
 	{
 		for (ndSpecialList<ndCudaSphFliud>::ndNode* node = m_fluidParticles.GetFirst(); node; node = node->GetNext())
 		{
-			if (node->GetInfo()->m_owner == fluid)
+			if (node->GetInfo()->m_info.m_owner == fluid)
 			{
 				delete node->GetInfo();
 				m_fluidParticles.Remove(node);
@@ -292,7 +298,7 @@ void ndWorldSceneCuda::UpdateTransform()
 	for (ndSpecialList<ndCudaSphFliud>::ndNode* node = m_fluidParticles.GetFirst(); node; node = node->GetNext())
 	{
 		ndCudaSphFliud* const fluid = node->GetInfo();
-		ndBodySphFluid* const owner = fluid->m_owner;
+		ndBodySphFluid* const owner = fluid->m_info.m_owner;
 		ndArray<ndVector>& posit = owner->GetPositions();
 		fluid->GetPositions(&posit[0].m_x, sizeof(ndVector) / sizeof(ndFloat32), posit.GetCount());
 	}

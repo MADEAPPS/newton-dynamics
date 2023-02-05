@@ -29,13 +29,17 @@ file(GLOB CPP_SOURCE dContext/*.h dContext/*.cpp dContext/*.cuh dContext/*.cu)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 
-Set(CMAKE_CUDA_FLAGS_DEBUG "-Xcompiler=\"-MDd -W4 -wd4100 -wd4201 -wd4324 -wd4505 -Zi -Ob0 -Od /RTC1\" --extended-lambda")
-Set(CMAKE_CUDA_FLAGS_RELEASE "-Xcompiler=\"-MD -W4 -wd4100 -wd4201 -wd4324 -wd4505 -Zi -O2 -Ob2\" -DNDEBUG --extended-lambda") 
-Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "-Xcompiler=\"-MD -W4 -wd4100 -wd4201 -wd4324 -wd4505 -Zi -O2 -Ob1\" -DNDEBUG --extended-lambda")
+Set(CMAKE_CUDA_FLAGS_DEBUG "-Xcompiler=\"-MDd -W4 -wd4100 -wd4201 -wd4324 -wd4505 -Zi -Ob0 -Od /RTC1\" ")
+Set(CMAKE_CUDA_FLAGS_RELEASE "-Xcompiler=\"-MD -W4 -wd4100 -wd4201 -wd4324 -wd4505 -Zi -O2 -Ob2\" -DNDEBUG") 
+Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "-Xcompiler=\"-MD -W4 -wd4100 -wd4201 -wd4324 -wd4505 -Zi -O2 -Ob1\" -DNDEBUG")
 
 #Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -lineinfo")
 #Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -lineinfo")
 #Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} -lineinfo")
+
+Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} --extended-lambda")
+Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} --extended-lambda")
+Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} --extended-lambda")
 
 Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -rdc=true")
 Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -rdc=true")
@@ -57,7 +61,9 @@ message ("cuda release with debug options ${CMAKE_CUDA_FLAGS_RELWITHDEBINFO}")
 
 add_definitions(-D_D_CUDA_EXPORT_DLL)
 add_library(${projectName} SHARED ${CPP_SOURCE})
+
 set_target_properties(${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON CUDA_RESOLVE_DEVICE_SYMBOLS ON)
+target_compile_options(${projectName} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_60,code=sm_60>)
 
 install(FILES ${HEADERS} DESTINATION include/${projectName})
 install(FILES $<TARGET_PDB_FILE:${projectName}> DESTINATION bin OPTIONAL)

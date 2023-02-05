@@ -30,13 +30,21 @@
 class ndCudaContext;
 class ndBodySphFluid;
 
-class ndSphFliudPoint
+class ndSphFluidInitInfo
+{
+	public:
+	ndCudaContext* m_context;
+	ndBodySphFluid* m_owner;
+	float m_gridSize;
+};
+
+class ndSphFluidPosit
 {
 	public:
 	class ndPointAssessor
 	{
 		public:
-		ndPointAssessor(ndSphFliudPoint& data)
+		ndPointAssessor(ndSphFluidPosit& data)
 			:m_x(data.m_x)
 			,m_y(data.m_y)
 			,m_z(data.m_z)
@@ -65,7 +73,8 @@ class ndCudaSphFliud
 	public:
 	D_CUDA_OPERATOR_NEW_AND_DELETE;
 
-	D_CUDA_API ndCudaSphFliud(ndCudaContext* const context, ndBodySphFluid* const owner);
+	//D_CUDA_API ndCudaSphFliud(ndCudaContext* const context, ndBodySphFluid* const owner);
+	D_CUDA_API ndCudaSphFliud(const ndSphFluidInitInfo& info);
 	D_CUDA_API ~ndCudaSphFliud();
 
 	D_CUDA_API void MemCpy(const float* const src, int strideInItems, int items);
@@ -79,11 +88,12 @@ class ndCudaSphFliud
 	void InitBuffers();
 	void CaculateAabb();
 
-	ndBodySphFluid* m_owner;
-	ndCudaContext* m_context;
+	//ndBodySphFluid* m_owner;
+	//ndCudaContext* m_context;
+	ndSphFluidInitInfo m_info;
 	ndCudaDeviceBuffer<ndCudaVector> m_points;
 	ndCudaDeviceBuffer<ndSphFluidAabb> m_aabb;
-	ndSphFliudPoint m_workingPoint;
+	ndSphFluidPosit m_workingPoint;
 };
 
 
