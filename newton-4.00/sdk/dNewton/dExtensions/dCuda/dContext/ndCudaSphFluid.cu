@@ -24,6 +24,8 @@
 #include "ndCudaContext.h"
 #include "ndCudaSphFluid.h"
 
+#define D_MAX_LOCAL_SIZE 512
+
 __global__ void ndFluidInitTranspose(const ndKernelParams params, const ndAssessor<ndCudaVector> input, ndSphFliudPoint::ndPointAssessor output)
 {
 	int blockId = blockIdx.x;
@@ -65,28 +67,172 @@ __global__ void ndFluidGetPositions(const ndKernelParams params, ndAssessor<ndCu
 	}
 };
 
-
-__global__ void ndCalculateAabb(const ndKernelParams params, const ndSphFliudPoint::ndPointAssessor input, ndAssessor<ndSphFluidAabb> output)
+__global__ void ndCalculateBlockAabb(const ndKernelParams params, const ndSphFliudPoint::ndPointAssessor input, ndAssessor<ndSphFluidAabb> output)
 {
-//	D_TRACKTIME_NAMED(CalculateAabb);
-//	ndBox box;
-//	const ndArray<ndVector>& posit = m_posit;
-//	const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
-//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-//	{
-//		box.m_min = box.m_min.GetMin(posit[i]);
-//		box.m_max = box.m_max.GetMax(posit[i]);
-//	}
-//	boxes[threadIndex] = box;
+	__shared__  float box_x0[D_MAX_LOCAL_SIZE];
+	__shared__  float box_y0[D_MAX_LOCAL_SIZE];
+	__shared__  float box_z0[D_MAX_LOCAL_SIZE];
+	__shared__  float box_x1[D_MAX_LOCAL_SIZE];
+	__shared__  float box_y1[D_MAX_LOCAL_SIZE];
+	__shared__  float box_z1[D_MAX_LOCAL_SIZE];
+
+	int blockId = blockIdx.x;
+	int threadId = threadIdx.x;
+	int blockSride = blockDim.x;
+
+	float xMin = 1.0e15f;
+	float yMin = 1.0e15f;
+	float zMin = 1.0e15f;
+	float xMax = -1.0e15f;
+	float yMax = -1.0e15f;
+	float zMax = -1.0e15f;
+
+	int base = blockSride * params.m_blocksPerKernel * blockId;
+	for (int i = 0; i < params.m_blocksPerKernel; ++i)
+	{
+		int index = base + threadId;
+
+		float x = index < output.m_size ? input.m_x[index] : input.m_x[0];
+		float y = index < output.m_size ? input.m_y[index] : input.m_y[0];
+		float z = index < output.m_size ? input.m_z[index] : input.m_z[0];
+
+		xMin = x < xMin ? x : xMin;
+		yMin = y < yMin ? y : yMin;
+		zMin = z < zMin ? z : zMin;
+
+		xMax = x > xMax ? x : xMax;
+		yMax = y > yMax ? y : yMax;
+		zMax = z > zMax ? z : zMax;
+
+		base += blockSride;
+	}
+
+	box_x0[threadId] = xMin;
+	box_y0[threadId] = yMin;
+	box_z0[threadId] = zMin;
+
+	box_x1[threadId] = xMax;
+	box_y1[threadId] = yMax;
+	box_z1[threadId] = zMax;
+
+	for (int i = params.m_workGroupSize / 2; i > 0; i = i >> 1)
+	{
+		if (threadId < i)
+		{
+			float x0 = box_x0[threadId];
+			float y0 = box_y0[threadId];
+			float z0 = box_z0[threadId];
+			float x1 = box_x0[i + threadId];
+			float y1 = box_y0[i + threadId];
+			float z1 = box_z0[i + threadId];
+			box_x0[threadId] = x0 < x1 ? x0 : x1;
+			box_y0[threadId] = y0 < y1 ? y0 : y1;
+			box_z0[threadId] = z0 < z1 ? z0 : z1;
+	
+			x0 = box_x1[threadId];
+			y0 = box_y1[threadId];
+			z0 = box_z1[threadId];
+			x1 = box_x1[i + threadId];
+			y1 = box_y1[i + threadId];
+			z1 = box_z1[i + threadId];
+			box_x1[threadId] = x0 > x1 ? x0 : x1;
+			box_y1[threadId] = y0 > y1 ? y0 : y1;
+			box_z1[threadId] = z0 > z1 ? z0 : z1;
+		}
+		__syncthreads();
+	}
+	
+	if (threadId == 0)
+	{
+		output[blockId].m_min = ndCudaVector(box_x0[0], box_y0[0], box_z0[0], 0.0f);
+		output[blockId].m_max = ndCudaVector(box_x1[0], box_y1[0], box_z1[0], 0.0f);
+	}
+}
+
+__global__ void ndCalculateAabb(const ndKernelParams params, ndAssessor<ndSphFluidAabb> output)
+{
+	__shared__  float box_x0[D_MAX_LOCAL_SIZE];
+	__shared__  float box_y0[D_MAX_LOCAL_SIZE];
+	__shared__  float box_z0[D_MAX_LOCAL_SIZE];
+	__shared__  float box_x1[D_MAX_LOCAL_SIZE];
+	__shared__  float box_y1[D_MAX_LOCAL_SIZE];
+	__shared__  float box_z1[D_MAX_LOCAL_SIZE];
 
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
-	int blockId = blockIdx.x;
-	int index = threadId + blockSride * blockId;
-	if (index < input.m_x.m_size)
+
+	if (threadId < params.m_kernelCount)
 	{
-		ndCudaVector point(input.m_x[threadId], input.m_y[threadId], input.m_z[threadId], 1.0f);
+		box_x0[threadId] = output[threadId].m_min.x;
+		box_y0[threadId] = output[threadId].m_min.y;
+		box_z0[threadId] = output[threadId].m_min.z;
+		box_x1[threadId] = output[threadId].m_max.x;
+		box_y1[threadId] = output[threadId].m_max.y;
+		box_z1[threadId] = output[threadId].m_max.z;
 	}
+	else
+	{
+		box_x0[threadId] = output[0].m_min.x;
+		box_y0[threadId] = output[0].m_min.y;
+		box_z0[threadId] = output[0].m_min.z;
+		box_x1[threadId] = output[0].m_max.x;
+		box_y1[threadId] = output[0].m_max.y;
+		box_z1[threadId] = output[0].m_max.z;
+	}
+
+	for (int i = blockSride / 2; i > 0; i = i >> 1)
+	{
+		if (threadId < i)
+		{
+			float x0 = box_x0[threadId];
+			float y0 = box_y0[threadId];
+			float z0 = box_z0[threadId];
+			float x1 = box_x0[i + threadId];
+			float y1 = box_y0[i + threadId];
+			float z1 = box_z0[i + threadId];
+			box_x0[threadId] = x0 < x1 ? x0 : x1;
+			box_y0[threadId] = y0 < y1 ? y0 : y1;
+			box_z0[threadId] = z0 < z1 ? z0 : z1;
+
+			x0 = box_x1[threadId];
+			y0 = box_y1[threadId];
+			z0 = box_z1[threadId];
+			x1 = box_x1[i + threadId];
+			y1 = box_y1[i + threadId];
+			z1 = box_z1[i + threadId];
+			box_x1[threadId] = x0 > x1 ? x0 : x1;
+			box_y1[threadId] = y0 > y1 ? y0 : y1;
+			box_z1[threadId] = z0 > z1 ? z0 : z1;
+		}
+		__syncthreads();
+	}
+
+	if (threadId == 0)
+	{
+		output[0].m_min = ndCudaVector(box_x0[0], box_y0[0], box_z0[0], 0.0f);
+		output[0].m_max = ndCudaVector(box_x1[0], box_y1[0], box_z1[0], 0.0f);
+	}
+
+	//const ndFloat32 gridSize = GetSphGridSize();
+	//
+	//ndVector grid(gridSize);
+	//ndVector invGrid(ndFloat32(1.0f) / gridSize);
+	//
+	//// add one grid padding to the aabb
+	//box.m_min -= grid;
+	//box.m_max += (grid + grid);
+	//
+	//// quantize the aabb to integers of the gird size
+	//box.m_min = grid * (box.m_min * invGrid).Floor();
+	//box.m_max = grid * (box.m_max * invGrid).Floor();
+	//
+	//// make sure the w component is zero.
+	//m_box0 = box.m_min & ndVector::m_triplexMask;
+	//m_box1 = box.m_max & ndVector::m_triplexMask;
+	//
+	//ndWorkingBuffers& data = *m_workingBuffers;
+	//ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
+	//data.SetWorldToGridMapping(numberOfGrid, m_box1.m_x, m_box0.m_x);
 
 }
 
@@ -94,6 +240,8 @@ ndCudaSphFliud::ndCudaSphFliud(ndCudaContext* const context, ndBodySphFluid* con
 	:m_owner(owner)
 	,m_context(context)
 	,m_points()
+	,m_aabb()
+	,m_workingPoint()
 {
 }
 
@@ -167,69 +315,16 @@ void ndCudaSphFliud::Update(float timestep)
 
 void ndCudaSphFliud::CaculateAabb()
 {
-	//D_TRACKTIME();
-	//class ndBox
-	//{
-	//	public:
-	//	ndBox()
-	//		:m_min(ndFloat32(1.0e10f))
-	//		, m_max(ndFloat32(-1.0e10f))
-	//	{
-	//	}
-	//	ndVector m_min;
-	//	ndVector m_max;
-	//};
-	//
-	//ndBox boxes[D_MAX_THREADS_COUNT];
-	//auto CalculateAabb = ndMakeObject::ndFunction([this, &boxes](ndInt32 threadIndex, ndInt32 threadCount)
-	//{
-	//	D_TRACKTIME_NAMED(CalculateAabb);
-	//	ndBox box;
-	//	const ndArray<ndVector>& posit = m_posit;
-	//	const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
-	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-	//	{
-	//		box.m_min = box.m_min.GetMin(posit[i]);
-	//		box.m_max = box.m_max.GetMax(posit[i]);
-	//	}
-	//	boxes[threadIndex] = box;
-	//});
-	//
-	//threadPool->ParallelExecute(CalculateAabb);
-	//
-	//ndBox box;
-	//const ndInt32 threadCount = threadPool->GetThreadCount();
-	//for (ndInt32 i = 0; i < threadCount; ++i)
-	//{
-	//	box.m_min = box.m_min.GetMin(boxes[i].m_min);
-	//	box.m_max = box.m_max.GetMax(boxes[i].m_max);
-	//}
-	//
-	//const ndFloat32 gridSize = GetSphGridSize();
-	//
-	//ndVector grid(gridSize);
-	//ndVector invGrid(ndFloat32(1.0f) / gridSize);
-	//
-	//// add one grid padding to the aabb
-	//box.m_min -= grid;
-	//box.m_max += (grid + grid);
-	//
-	//// quantize the aabb to integers of the gird size
-	//box.m_min = grid * (box.m_min * invGrid).Floor();
-	//box.m_max = grid * (box.m_max * invGrid).Floor();
-	//
-	//// make sure the w component is zero.
-	//m_box0 = box.m_min & ndVector::m_triplexMask;
-	//m_box1 = box.m_max & ndVector::m_triplexMask;
-	//
-	//ndWorkingBuffers& data = *m_workingBuffers;
-	//ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
-	//data.SetWorldToGridMapping(numberOfGrid, m_box1.m_x, m_box0.m_x);
-
 	ndAssessor<ndSphFluidAabb> aabb(m_aabb);
 	const ndSphFliudPoint::ndPointAssessor input(m_workingPoint);
 	const ndKernelParams params(m_context->m_device, m_context->m_device->m_workGroupSize, m_points.GetCount());
 
-	ndCalculateAabb << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, input, aabb);
+	int power = 1;
+	while (power < params.m_kernelCount)
+	{
+		power *= 2;
+	}
+	ndCalculateBlockAabb << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, input, aabb);
+	ndCalculateAabb << <1, power, 0 >> > (params, aabb);
 }
-
+													
