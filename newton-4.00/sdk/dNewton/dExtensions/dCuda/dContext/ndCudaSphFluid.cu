@@ -67,6 +67,102 @@ __global__ void ndFluidGetPositions(const ndKernelParams params, ndAssessor<ndCu
 	}
 };
 
+__global__ void ndCalculateAabb(const ndKernelParams params, ndAssessor<ndSphFluidAabb> output, float gridSize)
+{
+	__shared__  float box_x0[D_MAX_LOCAL_SIZE];
+	__shared__  float box_y0[D_MAX_LOCAL_SIZE];
+	__shared__  float box_z0[D_MAX_LOCAL_SIZE];
+	__shared__  float box_x1[D_MAX_LOCAL_SIZE];
+	__shared__  float box_y1[D_MAX_LOCAL_SIZE];
+	__shared__  float box_z1[D_MAX_LOCAL_SIZE];
+
+	int threadId = threadIdx.x;
+	int blockSride = blockDim.x;
+
+	if (threadId < params.m_kernelCount)
+	{
+		box_x0[threadId] = output[threadId].m_min.x;
+		box_y0[threadId] = output[threadId].m_min.y;
+		box_z0[threadId] = output[threadId].m_min.z;
+		box_x1[threadId] = output[threadId].m_max.x;
+		box_y1[threadId] = output[threadId].m_max.y;
+		box_z1[threadId] = output[threadId].m_max.z;
+	}
+	else
+	{
+		box_x0[threadId] = output[0].m_min.x;
+		box_y0[threadId] = output[0].m_min.y;
+		box_z0[threadId] = output[0].m_min.z;
+		box_x1[threadId] = output[0].m_max.x;
+		box_y1[threadId] = output[0].m_max.y;
+		box_z1[threadId] = output[0].m_max.z;
+	}
+
+	for (int i = blockSride / 2; i > 0; i = i >> 1)
+	{
+		if (threadId < i)
+		{
+			float x0 = box_x0[threadId];
+			float y0 = box_y0[threadId];
+			float z0 = box_z0[threadId];
+			float x1 = box_x0[i + threadId];
+			float y1 = box_y0[i + threadId];
+			float z1 = box_z0[i + threadId];
+			box_x0[threadId] = x0 < x1 ? x0 : x1;
+			box_y0[threadId] = y0 < y1 ? y0 : y1;
+			box_z0[threadId] = z0 < z1 ? z0 : z1;
+
+			x0 = box_x1[threadId];
+			y0 = box_y1[threadId];
+			z0 = box_z1[threadId];
+			x1 = box_x1[i + threadId];
+			y1 = box_y1[i + threadId];
+			z1 = box_z1[i + threadId];
+			box_x1[threadId] = x0 > x1 ? x0 : x1;
+			box_y1[threadId] = y0 > y1 ? y0 : y1;
+			box_z1[threadId] = z0 > z1 ? z0 : z1;
+		}
+		__syncthreads();
+	}
+
+	if (threadId == 0)
+	{
+		ndSphFluidAabb box;
+
+		box.m_min = ndCudaVector(box_x0[0], box_y0[0], box_z0[0], 0.0f);
+		box.m_max = ndCudaVector(box_x1[0], box_y1[0], box_z1[0], 0.0f);
+		//output[0].m_min = ndCudaVector(box_x0[0], box_y0[0], box_z0[0], 0.0f);
+		//output[0].m_max = ndCudaVector(box_x1[0], box_y1[0], box_z1[0], 0.0f);
+
+		//const ndFloat32 gridSize = GetSphGridSize();
+		//
+		//ndVector grid(gridSize);
+		//ndVector invGrid(ndFloat32(1.0f) / gridSize);
+		ndCudaVector grid(gridSize);
+		ndCudaVector invGrid(1.0f / gridSize);
+
+		//// add one grid padding to the aabb
+		box.m_min = box.m_min - grid;
+		box.m_max = box.m_max + grid + grid;
+
+		// quantize the aabb to integers of the gird size
+		box.m_min = grid * (box.m_min * invGrid).Floor();
+		box.m_max = grid * (box.m_max * invGrid).Floor();
+
+		box.m_min.w = 0.0f;
+		box.m_max.w = 0.0f;
+
+		// make sure the w component is zero.
+		//m_box0 = box.m_min & ndVector::m_triplexMask;
+		//m_box1 = box.m_max & ndVector::m_triplexMask;
+		output[0] = box;
+
+		//ndWorkingBuffers& data = *m_workingBuffers;
+		//ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
+		//data.SetWorldToGridMapping(numberOfGrid, m_box1.m_x, m_box0.m_x);
+	}
+}
+
 __global__ void ndCalculateBlockAabb(const ndKernelParams params, const ndSphFluidPosit::ndPointAssessor input, ndAssessor<ndSphFluidAabb> output)
 {
 	__shared__  float box_x0[D_MAX_LOCAL_SIZE];
@@ -149,110 +245,88 @@ __global__ void ndCalculateBlockAabb(const ndKernelParams params, const ndSphFlu
 	}
 }
 
-__global__ void ndCalculateAabb(const ndKernelParams params, ndAssessor<ndSphFluidAabb> output, float gridSize)
+__global__ void ndCountGrids(const ndKernelParams params, const ndSphFluidPosit::ndPointAssessor input, const ndAssessor<ndSphFluidAabb> worldBox, ndAssessor<int> gridScans)
 {
-	__shared__  float box_x0[D_MAX_LOCAL_SIZE];
-	__shared__  float box_y0[D_MAX_LOCAL_SIZE];
-	__shared__  float box_z0[D_MAX_LOCAL_SIZE];
-	__shared__  float box_x1[D_MAX_LOCAL_SIZE];
-	__shared__  float box_y1[D_MAX_LOCAL_SIZE];
-	__shared__  float box_z1[D_MAX_LOCAL_SIZE];
+	//auto CountGrids = ndMakeObject::ndFunction([this, &data, &neiborghood](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	D_TRACKTIME_NAMED(CountGrids);
+	//	const ndVector origin(m_box0);
+	//	const ndFloat32 gridSize = GetSphGridSize();
+	//	const ndVector box(gridSize * ndFloat32(0.5f * 0.99f));
+	//	const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
+	//	const ndVector* const posit = &m_posit[0];
+	//	ndInt32* const scans = &data.m_gridScans[0];
+	//
+	//	const ndStartEnd startEnd(m_posit.GetCount(), threadIndex, threadCount);
+	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+	//	{
+	//		const ndVector r(posit[i] - origin);
+	//		const ndVector p(r * invGridSize);
+	//		const ndGridHash hashKey(p, i);
+	//
+	//		const ndVector p0((r - box) * invGridSize);
+	//		const ndVector p1((r + box) * invGridSize);
+	//		ndGridHash box0Hash(p0, i);
+	//		const ndGridHash box1Hash(p1, i);
+	//		const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
+	//
+	//		ndAssert(codeHash.m_y <= 1);
+	//		ndAssert(codeHash.m_z <= 1);
+	//		const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
+	//		scans[i] = neiborghood.m_counter[code];
+	//	}
+	//});
 
+	int blockId = blockIdx.x;
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
+	int base = blockSride * params.m_blocksPerKernel * blockId;
 
-	if (threadId < params.m_kernelCount)
-	{
-		box_x0[threadId] = output[threadId].m_min.x;
-		box_y0[threadId] = output[threadId].m_min.y;
-		box_z0[threadId] = output[threadId].m_min.z;
-		box_x1[threadId] = output[threadId].m_max.x;
-		box_y1[threadId] = output[threadId].m_max.y;
-		box_z1[threadId] = output[threadId].m_max.z;
-	}
-	else
-	{
-		box_x0[threadId] = output[0].m_min.x;
-		box_y0[threadId] = output[0].m_min.y;
-		box_z0[threadId] = output[0].m_min.z;
-		box_x1[threadId] = output[0].m_max.x;
-		box_y1[threadId] = output[0].m_max.y;
-		box_z1[threadId] = output[0].m_max.z;
-	}
+	//ndSphFluidAabb origin(worldBox[0]);
+	ndCudaVector origin(worldBox[0].m_min);
 
-	for (int i = blockSride / 2; i > 0; i = i >> 1)
+	for (int i = 0; i < params.m_blocksPerKernel; ++i)
 	{
-		if (threadId < i)
+		int index = base + threadId;
+
+		if (index < input.m_x.m_size)
 		{
-			float x0 = box_x0[threadId];
-			float y0 = box_y0[threadId];
-			float z0 = box_z0[threadId];
-			float x1 = box_x0[i + threadId];
-			float y1 = box_y0[i + threadId];
-			float z1 = box_z0[i + threadId];
-			box_x0[threadId] = x0 < x1 ? x0 : x1;
-			box_y0[threadId] = y0 < y1 ? y0 : y1;
-			box_z0[threadId] = z0 < z1 ? z0 : z1;
+			ndCudaVector posit(input.m_x[index], input.m_y[index], input.m_z[index], 0.0f);
 
-			x0 = box_x1[threadId];
-			y0 = box_y1[threadId];
-			z0 = box_z1[threadId];
-			x1 = box_x1[i + threadId];
-			y1 = box_y1[i + threadId];
-			z1 = box_z1[i + threadId];
-			box_x1[threadId] = x0 > x1 ? x0 : x1;
-			box_y1[threadId] = y0 > y1 ? y0 : y1;
-			box_z1[threadId] = z0 > z1 ? z0 : z1;
+			//const ndVector r(posit[i] - origin);
+			//const ndVector p(r * invGridSize);
+			ndCudaVector r(posit - origin);
+			//ndCudaVector p(r - origin);
+
+			//const ndGridHash hashKey(p, i);
+			//
+			//const ndVector p0((r - box) * invGridSize);
+			//const ndVector p1((r + box) * invGridSize);
+			//ndGridHash box0Hash(p0, i);
+			//const ndGridHash box1Hash(p1, i);
+			//const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
+			//
+			//ndAssert(codeHash.m_y <= 1);
+			//ndAssert(codeHash.m_z <= 1);
+			//const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
+			//scans[i] = neiborghood.m_counter[code];
+
+			gridScans[index] = index;
 		}
-		__syncthreads();
+
+		base += blockSride;
 	}
-
-	if (threadId == 0)
-	{
-		ndSphFluidAabb box;
-
-		box.m_min = ndCudaVector(box_x0[0], box_y0[0], box_z0[0], 0.0f);
-		box.m_max = ndCudaVector(box_x1[0], box_y1[0], box_z1[0], 0.0f);
-		//output[0].m_min = ndCudaVector(box_x0[0], box_y0[0], box_z0[0], 0.0f);
-		//output[0].m_max = ndCudaVector(box_x1[0], box_y1[0], box_z1[0], 0.0f);
-
-		//const ndFloat32 gridSize = GetSphGridSize();
-		//
-		//ndVector grid(gridSize);
-		//ndVector invGrid(ndFloat32(1.0f) / gridSize);
-		ndCudaVector grid(gridSize);
-		ndCudaVector invGrid(1.0f / gridSize);
-		
-		//// add one grid padding to the aabb
-		box.m_min = box.m_min - grid;
-		box.m_max = box.m_max + grid + grid;
-		
-		// quantize the aabb to integers of the gird size
-		box.m_min = grid * (box.m_min * invGrid).Floor();
-		box.m_max = grid * (box.m_max * invGrid).Floor();
-		
-		box.m_min.w = 0.0f;
-		box.m_max.w = 0.0f;
-
-		// make sure the w component is zero.
-		//m_box0 = box.m_min & ndVector::m_triplexMask;
-		//m_box1 = box.m_max & ndVector::m_triplexMask;
-		output[0] = box;
-
-		//ndWorkingBuffers& data = *m_workingBuffers;
-		//ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
-		//data.SetWorldToGridMapping(numberOfGrid, m_box1.m_x, m_box0.m_x);
-	}
-
 }
 
-//ndCudaSphFliud::ndCudaSphFliud(ndCudaContext* const context, ndBodySphFluid* const owner)
+
+
 ndCudaSphFliud::ndCudaSphFliud(const ndSphFluidInitInfo& info)
 	//:m_owner(owner)
 	//,m_context(context)
 	:m_info(info)
 	,m_points()
 	,m_aabb()
+	,m_gridScans()
 	,m_workingPoint()
 {
 }
@@ -323,11 +397,6 @@ void ndCudaSphFliud::InitBuffers()
 	ndFluidInitTranspose<<<params.m_kernelCount, params.m_workGroupSize, 0>>>(params, input, output);
 }
 
-void ndCudaSphFliud::Update(float timestep)
-{
-	CaculateAabb();
-}
-
 void ndCudaSphFliud::CaculateAabb()
 {
 	ndAssessor<ndSphFluidAabb> aabb(m_aabb);
@@ -343,4 +412,180 @@ void ndCudaSphFliud::CaculateAabb()
 	ndCalculateBlockAabb << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, input, aabb);
 	ndCalculateAabb << <1, power, 0 >> > (params, aabb, m_info.m_gridSize);
 }
-													
+
+void ndCudaSphFliud::Update(float timestep)
+{
+	CaculateAabb();
+	CreateGrids();
+}
+
+void ndCudaSphFliud::CreateGrids()
+{
+	//class ndGridNeighborInfo
+	//{
+	//	public:
+	//	ndGridNeighborInfo()
+	//	{
+	//		//ndGridHash stepsCode;
+	//		m_neighborDirs[0][0] = ndGridHash(0, 0);
+	//		m_neighborDirs[0][1] = ndGridHash(0, 0);
+	//		m_neighborDirs[0][2] = ndGridHash(0, 0);
+	//		m_neighborDirs[0][3] = ndGridHash(0, 0);
+	//
+	//		m_counter[0] = 1;
+	//		m_isPadd[0][0] = 0;
+	//		m_isPadd[0][1] = 1;
+	//		m_isPadd[0][2] = 1;
+	//		m_isPadd[0][3] = 1;
+	//
+	//		ndGridHash stepsCode_y;
+	//		m_neighborDirs[1][0] = ndGridHash(0, 0);
+	//		m_neighborDirs[1][1] = ndGridHash(1, 0);
+	//		m_neighborDirs[1][2] = ndGridHash(0, 0);
+	//		m_neighborDirs[1][3] = ndGridHash(0, 0);
+	//
+	//		m_counter[1] = 2;
+	//		m_isPadd[1][0] = 0;
+	//		m_isPadd[1][1] = 0;
+	//		m_isPadd[1][2] = 1;
+	//		m_isPadd[1][3] = 1;
+	//
+	//		//ndGridHash stepsCode_z;
+	//		m_neighborDirs[2][0] = ndGridHash(0, 0);
+	//		m_neighborDirs[2][1] = ndGridHash(0, 1);
+	//		m_neighborDirs[2][2] = ndGridHash(0, 0);
+	//		m_neighborDirs[2][3] = ndGridHash(0, 0);
+	//
+	//		m_counter[2] = 2;
+	//		m_isPadd[2][0] = 0;
+	//		m_isPadd[2][1] = 0;
+	//		m_isPadd[2][2] = 1;
+	//		m_isPadd[2][3] = 1;
+	//
+	//		//ndGridHash stepsCode_yz;
+	//		m_neighborDirs[3][0] = ndGridHash(0, 0);
+	//		m_neighborDirs[3][1] = ndGridHash(1, 0);
+	//		m_neighborDirs[3][2] = ndGridHash(0, 1);
+	//		m_neighborDirs[3][3] = ndGridHash(1, 1);
+	//
+	//		m_counter[3] = 4;
+	//		m_isPadd[3][0] = 0;
+	//		m_isPadd[3][1] = 0;
+	//		m_isPadd[3][2] = 0;
+	//		m_isPadd[3][3] = 0;
+	//	}
+	//
+	//	ndGridHash m_neighborDirs[4][4];
+	//	ndInt8 m_isPadd[4][4];
+	//	ndInt8 m_counter[4];
+	//};
+	//
+	//ndGridNeighborInfo neiborghood;
+	//ndWorkingBuffers& data = *m_workingBuffers;
+	//
+	//auto CountGrids = ndMakeObject::ndFunction([this, &data, &neiborghood](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	D_TRACKTIME_NAMED(CountGrids);
+	//	const ndVector origin(m_box0);
+	//	const ndFloat32 gridSize = GetSphGridSize();
+	//	const ndVector box(gridSize * ndFloat32(0.5f * 0.99f));
+	//	const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
+	//	const ndVector* const posit = &m_posit[0];
+	//	ndInt32* const scans = &data.m_gridScans[0];
+	//
+	//	const ndStartEnd startEnd(m_posit.GetCount(), threadIndex, threadCount);
+	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+	//	{
+	//		const ndVector r(posit[i] - origin);
+	//		const ndVector p(r * invGridSize);
+	//		const ndGridHash hashKey(p, i);
+	//
+	//		const ndVector p0((r - box) * invGridSize);
+	//		const ndVector p1((r + box) * invGridSize);
+	//		ndGridHash box0Hash(p0, i);
+	//		const ndGridHash box1Hash(p1, i);
+	//		const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
+	//
+	//		ndAssert(codeHash.m_y <= 1);
+	//		ndAssert(codeHash.m_z <= 1);
+	//		const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
+	//		scans[i] = neiborghood.m_counter[code];
+	//	}
+	//});
+	//
+	//auto CreateGrids = ndMakeObject::ndFunction([this, &data, &neiborghood](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	D_TRACKTIME_NAMED(CreateGrids);
+	//	const ndVector origin(m_box0);
+	//	const ndFloat32 gridSize = GetSphGridSize();
+	//	ndGridHash* const dst = &data.m_hashGridMap[0];
+	//	const ndInt32* const scans = &data.m_gridScans[0];
+	//
+	//	// the 0.99 factor is to make sure the box 
+	//	// fits in not more than two adjacent grids.
+	//	const ndVector box(gridSize * ndFloat32(0.5f * 0.99f));
+	//	const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
+	//	const ndVector* const posit = &m_posit[0];
+	//
+	//	const ndStartEnd startEnd(m_posit.GetCount(), threadIndex, threadCount);
+	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+	//	{
+	//		const ndVector r(posit[i] - origin);
+	//		const ndVector p(r * invGridSize);
+	//		const ndGridHash hashKey(p, i);
+	//
+	//		const ndVector p0((r - box) * invGridSize);
+	//		const ndVector p1((r + box) * invGridSize);
+	//		ndGridHash box0Hash(p0, i);
+	//		const ndGridHash box1Hash(p1, i);
+	//		const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
+	//
+	//		ndAssert(codeHash.m_y <= 1);
+	//		ndAssert(codeHash.m_z <= 1);
+	//		const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
+	//
+	//		const ndInt32 base = scans[i];
+	//		const ndInt32 count = scans[i + 1] - base;
+	//		const ndGridHash* const neigborgh = &neiborghood.m_neighborDirs[code][0];
+	//		for (ndInt32 j = 0; j < count; ++j)
+	//		{
+	//			ndGridHash quadrand(box0Hash);
+	//			quadrand.m_gridHash += neigborgh[j].m_gridHash;
+	//			quadrand.m_cellType = ndGridType(quadrand.m_gridHash == hashKey.m_gridHash);
+	//			ndAssert(quadrand.m_cellType == ((quadrand.m_gridHash == hashKey.m_gridHash) ? ndHomeGrid : ndAdjacentGrid));
+	//			dst[base + j] = quadrand;
+	//		}
+	//	}
+	//});
+	//ndAssert(sizeof(ndGridHash) <= 16);
+	//
+	//data.m_gridScans.SetCount(m_posit.GetCount() + 1);
+	//data.m_gridScans[m_posit.GetCount()] = 0;
+	//threadPool->ParallelExecute(CountGrids);
+	//
+	//ndInt32 gridCount = 0;
+	//for (ndInt32 i = 0; i < data.m_gridScans.GetCount(); ++i)
+	//{
+	//	ndInt32 count = data.m_gridScans[i];
+	//	data.m_gridScans[i] = gridCount;
+	//	gridCount += count;
+	//}
+	//
+	//data.m_hashGridMap.SetCount(gridCount);
+	//threadPool->ParallelExecute(CreateGrids);
+	//data.m_hashGridMapScratchBuffer.SetCount(gridCount);
+
+	m_gridScans.SetCount(m_points.GetCount() + 1);
+
+	ndCudaContext* const context = m_info.m_context;
+	const ndKernelParams params(context->m_device, context->m_device->m_workGroupSize, m_points.GetCount());
+
+	ndAssessor<int> gridScans(m_gridScans);
+	const ndAssessor<ndSphFluidAabb> aabb(m_aabb);
+	const ndSphFluidPosit::ndPointAssessor input(m_workingPoint);
+	
+	ndCountGrids << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, input, m_aabb, gridScans);
+	//data.m_gridScans[m_posit.GetCount()] = 0;
+	//threadPool->ParallelExecute(CountGrids);
+
+}

@@ -930,31 +930,35 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	threadPool->ParallelExecute(CountGrids);
 	
 	ndInt32 gridCount = 0;
+#if 0
 	for (ndInt32 i = 0; i < data.m_gridScans.GetCount(); ++i)
 	{
 		ndInt32 count = data.m_gridScans[i];
 		data.m_gridScans[i] = gridCount;
 		gridCount += count;
 	}
+#else
+	const ndInt32 itemsCount = data.m_gridScans.GetCount() & (-8);
+	for (ndInt32 i = 0; i < itemsCount; i += 8)
+	{
+		for (ndInt32 j = 0; j < 8; ++j)
+		{
+			ndInt32 count = data.m_gridScans[i + j];
+			data.m_gridScans[i + j] = gridCount;
+			gridCount += count;
+		}
+	}
+	for (ndInt32 j = itemsCount; j < data.m_gridScans.GetCount(); ++j)
+	{
+		ndInt32 count = data.m_gridScans[j];
+		data.m_gridScans[j] = gridCount;
+		gridCount += count;
+	}
+#endif
 	
 	data.m_hashGridMap.SetCount(gridCount);
 	threadPool->ParallelExecute(CreateGrids);
 	data.m_hashGridMapScratchBuffer.SetCount(gridCount);
-}
-
-void ndBodySphFluid::Execute(ndThreadPool* const threadPool)
-{
-	D_TRACKTIME();
-	ndAssert(sizeof(ndGridHash) == sizeof(ndUnsigned64));
-
-	CaculateAabb(threadPool);
-	CreateGrids(threadPool);
-	SortGrids(threadPool);
-	CalculateScans(threadPool);
-	BuildPairs(threadPool);
-	CalculateParticlesDensity(threadPool);
-	CalculateAccelerations(threadPool);
-	IntegrateParticles(threadPool);
 }
 
 void ndBodySphFluid::Update(const ndScene* const scene, ndFloat32 timestep)
@@ -971,4 +975,19 @@ void ndBodySphFluid::Update(const ndScene* const scene, ndFloat32 timestep)
 			}
 		}
 	}
+}
+
+void ndBodySphFluid::Execute(ndThreadPool* const threadPool)
+{
+	D_TRACKTIME();
+	ndAssert(sizeof(ndGridHash) == sizeof(ndUnsigned64));
+
+	CaculateAabb(threadPool);
+	CreateGrids(threadPool);
+	SortGrids(threadPool);
+	CalculateScans(threadPool);
+	BuildPairs(threadPool);
+	CalculateParticlesDensity(threadPool);
+	CalculateAccelerations(threadPool);
+	IntegrateParticles(threadPool);
 }

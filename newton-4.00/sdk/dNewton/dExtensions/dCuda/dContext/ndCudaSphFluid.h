@@ -87,12 +87,13 @@ class ndCudaSphFliud
 
 	void InitBuffers();
 	void CaculateAabb();
+	void CreateGrids();
 
-	//ndBodySphFluid* m_owner;
-	//ndCudaContext* m_context;
 	ndSphFluidInitInfo m_info;
 	ndCudaDeviceBuffer<ndCudaVector> m_points;
 	ndCudaDeviceBuffer<ndSphFluidAabb> m_aabb;
+	ndCudaDeviceBuffer<int> m_gridScans;
+	
 	ndSphFluidPosit m_workingPoint;
 };
 
