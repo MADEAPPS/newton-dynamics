@@ -864,11 +864,11 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 		{
 			const ndVector r(posit[i] - origin);
 			const ndVector p(r * invGridSize);
-			const ndGridHash hashKey(p, i);
+			//const ndGridHash hashKey(p, i);
 
 			const ndVector p0((r - box) * invGridSize);
 			const ndVector p1((r + box) * invGridSize);
-			ndGridHash box0Hash(p0, i);
+			const ndGridHash box0Hash(p0, i);
 			const ndGridHash box1Hash(p1, i);
 			const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
 
@@ -898,21 +898,22 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 		{
 			const ndVector r(posit[i] - origin);
 			const ndVector p(r * invGridSize);
-			const ndGridHash hashKey(p, i);
-
 			const ndVector p0((r - box) * invGridSize);
 			const ndVector p1((r + box) * invGridSize);
-			ndGridHash box0Hash(p0, i);
+			const ndGridHash box0Hash(p0, i);
 			const ndGridHash box1Hash(p1, i);
 			const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
 
 			ndAssert(codeHash.m_y <= 1);
 			ndAssert(codeHash.m_z <= 1);
-			const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
 
 			const ndInt32 base = scans[i];
 			const ndInt32 count = scans[i + 1] - base;
+			const ndInt32 code = ndInt32(codeHash.m_z * 2 + codeHash.m_y);
 			const ndGridHash* const neigborgh = &neiborghood.m_neighborDirs[code][0];
+			ndAssert(count == neiborghood.m_counter[code]);
+
+			const ndGridHash hashKey(p, i);
 			for (ndInt32 j = 0; j < count; ++ j)
 			{
 				ndGridHash quadrand(box0Hash);

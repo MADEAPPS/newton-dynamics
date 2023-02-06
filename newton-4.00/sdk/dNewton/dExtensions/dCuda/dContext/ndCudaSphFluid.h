@@ -31,6 +31,9 @@
 class ndCudaContext;
 class ndBodySphFluid;
 
+#define D_SPH_CUDA_HASH_BITS 8
+
+
 class ndSphFluidInitInfo
 {
 	public:
@@ -51,6 +54,123 @@ class ndCudaSphFluid
 	public:
 	D_CUDA_OPERATOR_NEW_AND_DELETE;
 
+	enum ndGridType
+	{
+		ndAdjacentGrid = 0,
+		ndHomeGrid = 1,
+	};
+
+	class ndGridHash
+	{
+		public:
+		ndGridHash()
+		{
+		}
+
+		__device__ __host__ ndGridHash(uint64_t gridHash)
+			:m_gridHash(gridHash)
+		{
+		}
+
+		ndGridHash(int y, int z)
+		{
+			m_gridHash = 0;
+			m_y = uint64_t (y);
+			m_z = uint64_t (z);
+		}
+
+		__device__ __host__ ndGridHash(const ndCudaVector& grid, int particleIndex)
+		{
+			//ndCudaVector hash(grid.GetInt());
+			unsigned hash_y = unsigned(floor(grid.y));
+			unsigned hash_z = unsigned(floor(grid.z));
+
+			m_gridHash = 0;
+			m_y = uint64_t (hash_y);
+			m_z = uint64_t (hash_z);
+			m_cellType = ndAdjacentGrid;
+			m_particleIndex = uint64_t (particleIndex);
+		}
+
+		union
+		{
+			struct
+			{
+				uint64_t  m_y : D_SPH_CUDA_HASH_BITS * 2;
+				uint64_t  m_z : D_SPH_CUDA_HASH_BITS * 2;
+				uint64_t  m_particleIndex : 23;
+				uint64_t  m_cellType : 1;
+			};
+			struct
+			{
+				uint64_t  m_yLow : D_SPH_CUDA_HASH_BITS;
+				uint64_t  m_yHigh : D_SPH_CUDA_HASH_BITS;
+				uint64_t  m_zLow : D_SPH_CUDA_HASH_BITS;
+				uint64_t  m_zHigh : D_SPH_CUDA_HASH_BITS;
+			};
+			uint64_t  m_gridHash : D_SPH_CUDA_HASH_BITS * 2 * 2;
+		};
+	};
+
+	class ndGridNeighborInfo
+	{
+		public:
+		ndGridNeighborInfo()
+		{
+			//ndGridHash stepsCode;
+			m_neighborDirs[0][0] = ndGridHash(0, 0);
+			m_neighborDirs[0][1] = ndGridHash(0, 0);
+			m_neighborDirs[0][2] = ndGridHash(0, 0);
+			m_neighborDirs[0][3] = ndGridHash(0, 0);
+
+			m_counter[0] = 1;
+			m_isPadd[0][0] = 0;
+			m_isPadd[0][1] = 1;
+			m_isPadd[0][2] = 1;
+			m_isPadd[0][3] = 1;
+
+			ndGridHash stepsCode_y;
+			m_neighborDirs[1][0] = ndGridHash(0, 0);
+			m_neighborDirs[1][1] = ndGridHash(1, 0);
+			m_neighborDirs[1][2] = ndGridHash(0, 0);
+			m_neighborDirs[1][3] = ndGridHash(0, 0);
+
+			m_counter[1] = 2;
+			m_isPadd[1][0] = 0;
+			m_isPadd[1][1] = 0;
+			m_isPadd[1][2] = 1;
+			m_isPadd[1][3] = 1;
+
+			//ndGridHash stepsCode_z;
+			m_neighborDirs[2][0] = ndGridHash(0, 0);
+			m_neighborDirs[2][1] = ndGridHash(0, 1);
+			m_neighborDirs[2][2] = ndGridHash(0, 0);
+			m_neighborDirs[2][3] = ndGridHash(0, 0);
+
+			m_counter[2] = 2;
+			m_isPadd[2][0] = 0;
+			m_isPadd[2][1] = 0;
+			m_isPadd[2][2] = 1;
+			m_isPadd[2][3] = 1;
+
+			//ndGridHash stepsCode_yz;
+			m_neighborDirs[3][0] = ndGridHash(0, 0);
+			m_neighborDirs[3][1] = ndGridHash(1, 0);
+			m_neighborDirs[3][2] = ndGridHash(0, 1);
+			m_neighborDirs[3][3] = ndGridHash(1, 1);
+
+			m_counter[3] = 4;
+			m_isPadd[3][0] = 0;
+			m_isPadd[3][1] = 0;
+			m_isPadd[3][2] = 0;
+			m_isPadd[3][3] = 0;
+		}
+
+		ndGridHash m_neighborDirs[4][4];
+		unsigned char m_isPadd[4][4];
+		unsigned char m_counter[4];
+	};
+
 	class Image: public ndSphFluidInitInfo
 	{
 		public:
@@ -67,6 +187,7 @@ class ndCudaSphFluid
 
 		cudaError_t m_cudaStatus;
 		ndSphFluidAabb m_aabb;
+		ndGridNeighborInfo m_neighborgInfo;
 	};
 
 	D_CUDA_API ndCudaSphFluid(const ndSphFluidInitInfo& info);
@@ -92,7 +213,7 @@ class ndCudaSphFluid
 	ndCudaDeviceBuffer<float> m_x;
 	ndCudaDeviceBuffer<float> m_y;
 	ndCudaDeviceBuffer<float> m_z;
-	ndCudaDeviceBuffer<int> m_gridScans;
+	//ndCudaDeviceBuffer<int> m_gridScans;
 	ndCudaDeviceBuffer<ndCudaVector> m_points;
 	ndCudaDeviceBuffer<ndSphFluidAabb> m_pointsAabb;
 };
