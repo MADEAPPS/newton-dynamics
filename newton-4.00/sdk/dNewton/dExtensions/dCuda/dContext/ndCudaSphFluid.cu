@@ -320,7 +320,6 @@ __global__ void ndCountGrids(ndCudaSphFluid::Image* fluid)
 		{
 			scans[halfBlockSride + threadId + 1] = 0;
 		}
-		//__syncthreads();
 
 		for (int j = 1; j < blockSride; j = j << 1)
 		{
@@ -341,23 +340,47 @@ __global__ void ndCountGrids(ndCudaSphFluid::Image* fluid)
 	{
 		int offset = blockSride * fluid->m_param.m_blocksPerKernel * fluid->m_param.m_kernelCount;
 		fluid->m_gridScans[offset + blockId] = sumAccumulator;
-		//printf("adressBase:%d  offset:%d sum:%d\n", offset, blockId, sumAccumulator);
-		//printf("adressBase\n");
-		//printf("adressBase:%d sum:%d\n", offset, sumAccumulator);
 	}
 }
 
-__global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid)
+__global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 {
+	__shared__  float scanSum[D_MAX_LOCAL_SIZE / 2 + D_MAX_LOCAL_SIZE + 1];
+
 	int blockId = blockIdx.x;
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
+	int halfKernelStride = kernelStride / 2;
+	int scanSize = fluid->m_param.m_workGroupSize * fluid->m_param.m_blocksPerKernel * fluid->m_param.m_kernelCount;
+	if (threadId < (halfKernelStride + 1))
+	{
+		scanSum[threadId] = 0;
+	}
+	scanSum[halfKernelStride + threadId + 1] = fluid->m_gridScans[scanSize + threadId];
+	for (int j = 1; j < kernelStride; j = j << 1)
+	{
+		int sum;
+		__syncthreads();
+		if (threadId < kernelStride)
+		{
+			sum = scanSum[halfKernelStride + threadId] + scanSum[halfKernelStride + threadId - j];
+		}
+		__syncthreads();
+		if (threadId < kernelStride)
+		{
+			scanSum[halfKernelStride + threadId] = sum;
+		}
+	}
+	__syncthreads();
 
-	int base = blockSride * fluid->m_param.m_blocksPerKernel * blockId;
-	for (int i = 0; i < fluid->m_param.m_blocksPerKernel; ++i)
+	int base = blockSride * blockId;
+	int itemsPerBlock = fluid->m_param.m_workGroupSize * fluid->m_param.m_blocksPerKernel;
+	for (int i = 0; i < fluid->m_param.m_kernelCount; ++i)
 	{
 		int index = base + threadId;
-		base += blockSride;
+		float sumAcc = scanSum[halfKernelStride + i];
+		fluid->m_gridScans[index] = fluid->m_gridScans[index] + sumAcc;
+		base += itemsPerBlock;
 	}
 }
 
@@ -462,98 +485,9 @@ void ndCudaSphFluid::Update(float timestep)
 
 void ndCudaSphFluid::CreateGrids()
 {
-	//class ndGridNeighborInfo
-	//{
-	//	public:
-	//	ndGridNeighborInfo()
-	//	{
-	//		//ndGridHash stepsCode;
-	//		m_neighborDirs[0][0] = ndGridHash(0, 0);
-	//		m_neighborDirs[0][1] = ndGridHash(0, 0);
-	//		m_neighborDirs[0][2] = ndGridHash(0, 0);
-	//		m_neighborDirs[0][3] = ndGridHash(0, 0);
-	//
-	//		m_counter[0] = 1;
-	//		m_isPadd[0][0] = 0;
-	//		m_isPadd[0][1] = 1;
-	//		m_isPadd[0][2] = 1;
-	//		m_isPadd[0][3] = 1;
-	//
-	//		ndGridHash stepsCode_y;
-	//		m_neighborDirs[1][0] = ndGridHash(0, 0);
-	//		m_neighborDirs[1][1] = ndGridHash(1, 0);
-	//		m_neighborDirs[1][2] = ndGridHash(0, 0);
-	//		m_neighborDirs[1][3] = ndGridHash(0, 0);
-	//
-	//		m_counter[1] = 2;
-	//		m_isPadd[1][0] = 0;
-	//		m_isPadd[1][1] = 0;
-	//		m_isPadd[1][2] = 1;
-	//		m_isPadd[1][3] = 1;
-	//
-	//		//ndGridHash stepsCode_z;
-	//		m_neighborDirs[2][0] = ndGridHash(0, 0);
-	//		m_neighborDirs[2][1] = ndGridHash(0, 1);
-	//		m_neighborDirs[2][2] = ndGridHash(0, 0);
-	//		m_neighborDirs[2][3] = ndGridHash(0, 0);
-	//
-	//		m_counter[2] = 2;
-	//		m_isPadd[2][0] = 0;
-	//		m_isPadd[2][1] = 0;
-	//		m_isPadd[2][2] = 1;
-	//		m_isPadd[2][3] = 1;
-	//
-	//		//ndGridHash stepsCode_yz;
-	//		m_neighborDirs[3][0] = ndGridHash(0, 0);
-	//		m_neighborDirs[3][1] = ndGridHash(1, 0);
-	//		m_neighborDirs[3][2] = ndGridHash(0, 1);
-	//		m_neighborDirs[3][3] = ndGridHash(1, 1);
-	//
-	//		m_counter[3] = 4;
-	//		m_isPadd[3][0] = 0;
-	//		m_isPadd[3][1] = 0;
-	//		m_isPadd[3][2] = 0;
-	//		m_isPadd[3][3] = 0;
-	//	}
-	//
-	//	ndGridHash m_neighborDirs[4][4];
-	//	ndInt8 m_isPadd[4][4];
-	//	ndInt8 m_counter[4];
-	//};
-	//
 	//ndGridNeighborInfo neiborghood;
 	//ndWorkingBuffers& data = *m_workingBuffers;
-	//
-	//auto CountGrids = ndMakeObject::ndFunction([this, &data, &neiborghood](ndInt32 threadIndex, ndInt32 threadCount)
-	//{
-	//	D_TRACKTIME_NAMED(CountGrids);
-	//	const ndVector origin(m_box0);
-	//	const ndFloat32 gridSize = GetSphGridSize();
-	//	const ndVector box(gridSize * ndFloat32(0.5f * 0.99f));
-	//	const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
-	//	const ndVector* const posit = &m_posit[0];
-	//	ndInt32* const scans = &data.m_gridScans[0];
-	//
-	//	const ndStartEnd startEnd(m_posit.GetCount(), threadIndex, threadCount);
-	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-	//	{
-	//		const ndVector r(posit[i] - origin);
-	//		const ndVector p(r * invGridSize);
-	//		const ndGridHash hashKey(p, i);
-	//
-	//		const ndVector p0((r - box) * invGridSize);
-	//		const ndVector p1((r + box) * invGridSize);
-	//		ndGridHash box0Hash(p0, i);
-	//		const ndGridHash box1Hash(p1, i);
-	//		const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
-	//
-	//		ndAssert(codeHash.m_y <= 1);
-	//		ndAssert(codeHash.m_z <= 1);
-	//		const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
-	//		scans[i] = neiborghood.m_counter[code];
-	//	}
-	//});
-	//
+	
 	//auto CreateGrids = ndMakeObject::ndFunction([this, &data, &neiborghood](ndInt32 threadIndex, ndInt32 threadCount)
 	//{
 	//	D_TRACKTIME_NAMED(CreateGrids);
@@ -598,8 +532,7 @@ void ndCudaSphFluid::CreateGrids()
 	//		}
 	//	}
 	//});
-	//ndAssert(sizeof(ndGridHash) <= 16);
-	//
+
 	//data.m_gridScans.SetCount(m_posit.GetCount() + 1);
 	//data.m_gridScans[m_posit.GetCount()] = 0;
 	//threadPool->ParallelExecute(CountGrids);
@@ -612,7 +545,12 @@ void ndCudaSphFluid::CreateGrids()
 	//	data.m_gridScans[i] = gridCount;
 	//	gridCount += count;
 	//}
-	//ndPrefixScanSum << <m_imageCpu.m_param.m_kernelCount, m_imageCpu.m_param.m_workGroupSize, 0 >> > (m_imageGpu);
+	int power = 1;
+	while (power < m_imageCpu.m_param.m_kernelCount)
+	{
+		power *= 2;
+	}
+	ndPrefixScanSum << <m_imageCpu.m_param.m_blocksPerKernel * 2, m_imageCpu.m_param.m_workGroupSize / 2, 0 >> > (m_imageGpu, power);
 
 	//data.m_hashGridMap.SetCount(gridCount);
 	//threadPool->ParallelExecute(CreateGrids);

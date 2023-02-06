@@ -804,7 +804,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 			m_isPadd[0][2] = 1;
 			m_isPadd[0][3] = 1;
 
-			ndGridHash stepsCode_y;
+			//ndGridHash stepsCode_y;
 			m_neighborDirs[1][0] = ndGridHash(0, 0);
 			m_neighborDirs[1][1] = ndGridHash(1, 0);
 			m_neighborDirs[1][2] = ndGridHash(0, 0);
