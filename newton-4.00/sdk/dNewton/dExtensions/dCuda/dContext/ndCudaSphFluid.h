@@ -25,6 +25,7 @@
 #include "ndCudaUtils.h"
 #include "ndCudaStdafx.h"
 #include "ndCudaVector.h"
+#include "ndCudaDevice.h"
 #include "ndCudaDeviceBuffer.h"
 
 class ndCudaContext;
@@ -38,29 +39,6 @@ class ndSphFluidInitInfo
 	float m_gridSize;
 };
 
-class ndSphFluidPosit
-{
-	public:
-	class ndPointAssessor
-	{
-		public:
-		ndPointAssessor(ndSphFluidPosit& data)
-			:m_x(data.m_x)
-			,m_y(data.m_y)
-			,m_z(data.m_z)
-		{
-		}
-
-		ndAssessor<float> m_x;
-		ndAssessor<float> m_y;
-		ndAssessor<float> m_z;
-	};
-
-	ndCudaDeviceBuffer<float> m_x;
-	ndCudaDeviceBuffer<float> m_y;
-	ndCudaDeviceBuffer<float> m_z;
-};
-
 class ndSphFluidAabb
 {
 	public:
@@ -68,14 +46,33 @@ class ndSphFluidAabb
 	ndCudaVector m_max;
 };
 
-class ndCudaSphFliud
+class ndCudaSphFluid
 {
 	public:
 	D_CUDA_OPERATOR_NEW_AND_DELETE;
 
-	//D_CUDA_API ndCudaSphFliud(ndCudaContext* const context, ndBodySphFluid* const owner);
-	D_CUDA_API ndCudaSphFliud(const ndSphFluidInitInfo& info);
-	D_CUDA_API ~ndCudaSphFliud();
+	class Image: public ndSphFluidInitInfo
+	{
+		public:
+		Image(const ndSphFluidInitInfo& info);
+		void Init(ndCudaSphFluid& fluid);
+
+		ndKernelParams m_param;
+		ndAssessor<ndCudaVector> m_points;
+		ndAssessor<float> m_x;
+		ndAssessor<float> m_y;
+		ndAssessor<float> m_z;
+		ndAssessor<int> m_gridScans;
+		ndAssessor<ndSphFluidAabb> m_pointsAabb;
+
+		cudaError_t m_cudaStatus;
+		ndSphFluidAabb m_aabb;
+	};
+
+	D_CUDA_API ndCudaSphFluid(const ndSphFluidInitInfo& info);
+	D_CUDA_API ~ndCudaSphFluid();
+
+	ndBodySphFluid* GetOwner();
 
 	D_CUDA_API void MemCpy(const float* const src, int strideInItems, int items);
 	D_CUDA_API void MemCpy(const double* const src, int strideInItems, int items);
@@ -89,13 +86,19 @@ class ndCudaSphFliud
 	void CaculateAabb();
 	void CreateGrids();
 
-	ndSphFluidInitInfo m_info;
-	ndCudaDeviceBuffer<ndCudaVector> m_points;
-	ndCudaDeviceBuffer<ndSphFluidAabb> m_aabb;
+	Image m_imageCpu;
+	Image* m_imageGpu;
+
+	ndCudaDeviceBuffer<float> m_x;
+	ndCudaDeviceBuffer<float> m_y;
+	ndCudaDeviceBuffer<float> m_z;
 	ndCudaDeviceBuffer<int> m_gridScans;
-	
-	ndSphFluidPosit m_workingPoint;
+	ndCudaDeviceBuffer<ndCudaVector> m_points;
+	ndCudaDeviceBuffer<ndSphFluidAabb> m_pointsAabb;
 };
 
-
+inline ndBodySphFluid* ndCudaSphFluid::GetOwner()
+{
+	return m_imageCpu.m_owner;
+}
 #endif

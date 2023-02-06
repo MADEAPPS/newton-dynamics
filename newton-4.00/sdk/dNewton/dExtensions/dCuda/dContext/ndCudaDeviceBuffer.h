@@ -58,9 +58,15 @@ template<class T>
 class ndAssessor
 {
 	public:
-	__device__ __host__ ndAssessor(ndCudaDeviceBuffer<T>& buffer)
+	ndAssessor()
+		:m_array(nullptr)
+		,m_size(0)
+	{
+	}
+
+	ndAssessor(ndCudaDeviceBuffer<T>& buffer)
 		:m_array(buffer.m_array)
-		, m_size(buffer.m_size)
+		,m_size(buffer.m_size)
 	{
 	}
 

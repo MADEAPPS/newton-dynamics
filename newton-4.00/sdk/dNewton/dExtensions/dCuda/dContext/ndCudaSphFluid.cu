@@ -26,48 +26,71 @@
 
 #define D_MAX_LOCAL_SIZE 512
 
-__global__ void ndFluidInitTranspose(const ndKernelParams params, const ndAssessor<ndCudaVector> input, ndSphFluidPosit::ndPointAssessor output)
+ndCudaSphFluid::Image::Image(const ndSphFluidInitInfo& info)
+	:ndSphFluidInitInfo(info)
+{
+}
+
+void ndCudaSphFluid::Image::Init(ndCudaSphFluid& fluid)
+{
+	m_param = ndKernelParams (m_context->m_device, m_context->m_device->m_workGroupSize, fluid.m_points.GetCount());
+	
+	fluid.m_x.SetCount(m_param.m_itemCount);
+	fluid.m_y.SetCount(m_param.m_itemCount);
+	fluid.m_z.SetCount(m_param.m_itemCount);
+	fluid.m_gridScans.SetCount(m_param.m_kernelCount + 1);
+	fluid.m_pointsAabb.SetCount(m_param.m_kernelCount + 32);
+	
+	m_x = ndAssessor<float>(fluid.m_x);
+	m_y = ndAssessor<float>(fluid.m_y);
+	m_z = ndAssessor<float>(fluid.m_z);
+	m_gridScans = ndAssessor<int>(fluid.m_gridScans);
+	m_points = ndAssessor<ndCudaVector>(fluid.m_points);
+	m_pointsAabb = ndAssessor<ndSphFluidAabb>(fluid.m_pointsAabb);
+}
+
+__global__ void ndFluidInitTranspose(ndCudaSphFluid::Image* fluid)
 {
 	int blockId = blockIdx.x;
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
 
-	int base = blockSride * params.m_blocksPerKernel * blockId;
-	for (int i = 0; i < params.m_blocksPerKernel; ++i)
+	int base = blockSride * fluid->m_param.m_blocksPerKernel * blockId;
+	for (int i = 0; i < fluid->m_param.m_blocksPerKernel; ++i)
 	{
 		int index = base + threadId;
-		if (index < input.m_size)
+		if (index < fluid->m_points.m_size)
 		{
-			ndCudaVector point(input[index]);
-			output.m_x[index] = point.x;
-			output.m_y[index] = point.y;
-			output.m_z[index] = point.z;
+			ndCudaVector point(fluid->m_points[index]);
+			fluid->m_x[index] = point.x;
+			fluid->m_y[index] = point.y;
+			fluid->m_z[index] = point.z;
 		}
 
 		base += blockSride;
 	}
-};
+}
 
-__global__ void ndFluidGetPositions(const ndKernelParams params, ndAssessor<ndCudaVector> output, const ndSphFluidPosit::ndPointAssessor input)
+__global__ void ndFluidGetPositions(ndCudaSphFluid::Image* fluid)
 {
 	int blockId = blockIdx.x;
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
 
-	int base = blockSride * params.m_blocksPerKernel * blockId;
-	for (int i = 0; i < params.m_blocksPerKernel; ++i)
+	int base = blockSride * fluid->m_param.m_blocksPerKernel * blockId;
+	for (int i = 0; i < fluid->m_param.m_blocksPerKernel; ++i)
 	{
 		int index = base + threadId;
-		if (index < output.m_size)
+		if (index < fluid->m_points.m_size)
 		{
-			ndCudaVector point(input.m_x[index], input.m_y[index], input.m_z[index], 1.0f);
-			output[index] = point;
+			ndCudaVector point(fluid->m_x[index], fluid->m_y[index], fluid->m_z[index], 1.0f);
+			fluid->m_points[index] = point;
 		}
 		base += blockSride;
 	}
-};
+}
 
-__global__ void ndCalculateAabb(const ndKernelParams params, ndAssessor<ndSphFluidAabb> output, float gridSize)
+__global__ void ndCalculateAabb(ndCudaSphFluid::Image* fluid)
 {
 	__shared__  float box_x0[D_MAX_LOCAL_SIZE];
 	__shared__  float box_y0[D_MAX_LOCAL_SIZE];
@@ -79,23 +102,23 @@ __global__ void ndCalculateAabb(const ndKernelParams params, ndAssessor<ndSphFlu
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
 
-	if (threadId < params.m_kernelCount)
+	if (threadId < fluid->m_param.m_kernelCount)
 	{
-		box_x0[threadId] = output[threadId].m_min.x;
-		box_y0[threadId] = output[threadId].m_min.y;
-		box_z0[threadId] = output[threadId].m_min.z;
-		box_x1[threadId] = output[threadId].m_max.x;
-		box_y1[threadId] = output[threadId].m_max.y;
-		box_z1[threadId] = output[threadId].m_max.z;
+		box_x0[threadId] = fluid->m_pointsAabb[threadId].m_min.x;
+		box_y0[threadId] = fluid->m_pointsAabb[threadId].m_min.y;
+		box_z0[threadId] = fluid->m_pointsAabb[threadId].m_min.z;
+		box_x1[threadId] = fluid->m_pointsAabb[threadId].m_max.x;
+		box_y1[threadId] = fluid->m_pointsAabb[threadId].m_max.y;
+		box_z1[threadId] = fluid->m_pointsAabb[threadId].m_max.z;
 	}
 	else
 	{
-		box_x0[threadId] = output[0].m_min.x;
-		box_y0[threadId] = output[0].m_min.y;
-		box_z0[threadId] = output[0].m_min.z;
-		box_x1[threadId] = output[0].m_max.x;
-		box_y1[threadId] = output[0].m_max.y;
-		box_z1[threadId] = output[0].m_max.z;
+		box_x0[threadId] = fluid->m_pointsAabb[0].m_min.x;
+		box_y0[threadId] = fluid->m_pointsAabb[0].m_min.y;
+		box_z0[threadId] = fluid->m_pointsAabb[0].m_min.z;
+		box_x1[threadId] = fluid->m_pointsAabb[0].m_max.x;
+		box_y1[threadId] = fluid->m_pointsAabb[0].m_max.y;
+		box_z1[threadId] = fluid->m_pointsAabb[0].m_max.z;
 	}
 
 	for (int i = blockSride / 2; i > 0; i = i >> 1)
@@ -138,10 +161,10 @@ __global__ void ndCalculateAabb(const ndKernelParams params, ndAssessor<ndSphFlu
 		//
 		//ndVector grid(gridSize);
 		//ndVector invGrid(ndFloat32(1.0f) / gridSize);
-		ndCudaVector grid(gridSize);
-		ndCudaVector invGrid(1.0f / gridSize);
+		ndCudaVector grid(fluid->m_gridSize);
+		ndCudaVector invGrid(1.0f / fluid->m_gridSize);
 
-		//// add one grid padding to the aabb
+		// add one grid padding to the aabb
 		box.m_min = box.m_min - grid;
 		box.m_max = box.m_max + grid + grid;
 
@@ -151,11 +174,11 @@ __global__ void ndCalculateAabb(const ndKernelParams params, ndAssessor<ndSphFlu
 
 		box.m_min.w = 0.0f;
 		box.m_max.w = 0.0f;
-
+	
 		// make sure the w component is zero.
 		//m_box0 = box.m_min & ndVector::m_triplexMask;
 		//m_box1 = box.m_max & ndVector::m_triplexMask;
-		output[0] = box;
+		fluid->m_aabb = box;
 
 		//ndWorkingBuffers& data = *m_workingBuffers;
 		//ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
@@ -163,7 +186,7 @@ __global__ void ndCalculateAabb(const ndKernelParams params, ndAssessor<ndSphFlu
 	}
 }
 
-__global__ void ndCalculateBlockAabb(const ndKernelParams params, const ndSphFluidPosit::ndPointAssessor input, ndAssessor<ndSphFluidAabb> output)
+__global__ void ndCalculateBlockAabb(ndCudaSphFluid::Image* fluid)
 {
 	__shared__  float box_x0[D_MAX_LOCAL_SIZE];
 	__shared__  float box_y0[D_MAX_LOCAL_SIZE];
@@ -183,14 +206,14 @@ __global__ void ndCalculateBlockAabb(const ndKernelParams params, const ndSphFlu
 	float yMax = -1.0e15f;
 	float zMax = -1.0e15f;
 
-	int base = blockSride * params.m_blocksPerKernel * blockId;
-	for (int i = 0; i < params.m_blocksPerKernel; ++i)
+	int base = blockSride * fluid->m_param.m_blocksPerKernel * blockId;
+	for (int i = 0; i < fluid->m_param.m_blocksPerKernel; ++i)
 	{
 		int index = base + threadId;
 
-		float x = index < output.m_size ? input.m_x[index] : input.m_x[0];
-		float y = index < output.m_size ? input.m_y[index] : input.m_y[0];
-		float z = index < output.m_size ? input.m_z[index] : input.m_z[0];
+		float x = index < fluid->m_points.m_size ? fluid->m_x[index] : fluid->m_x[0];
+		float y = index < fluid->m_points.m_size ? fluid->m_y[index] : fluid->m_y[0];
+		float z = index < fluid->m_points.m_size ? fluid->m_z[index] : fluid->m_z[0];
 
 		xMin = x < xMin ? x : xMin;
 		yMin = y < yMin ? y : yMin;
@@ -211,7 +234,7 @@ __global__ void ndCalculateBlockAabb(const ndKernelParams params, const ndSphFlu
 	box_y1[threadId] = yMax;
 	box_z1[threadId] = zMax;
 
-	for (int i = params.m_workGroupSize / 2; i > 0; i = i >> 1)
+	for (int i = fluid->m_param.m_workGroupSize / 2; i > 0; i = i >> 1)
 	{
 		if (threadId < i)
 		{
@@ -240,63 +263,64 @@ __global__ void ndCalculateBlockAabb(const ndKernelParams params, const ndSphFlu
 	
 	if (threadId == 0)
 	{
-		output[blockId].m_min = ndCudaVector(box_x0[0], box_y0[0], box_z0[0], 0.0f);
-		output[blockId].m_max = ndCudaVector(box_x1[0], box_y1[0], box_z1[0], 0.0f);
+		fluid->m_pointsAabb[blockId].m_min = ndCudaVector(box_x0[0], box_y0[0], box_z0[0], 0.0f);
+		fluid->m_pointsAabb[blockId].m_max = ndCudaVector(box_x1[0], box_y1[0], box_z1[0], 0.0f);
 	}
 }
 
-__global__ void ndCountGrids(const ndKernelParams params, const ndSphFluidPosit::ndPointAssessor input, const ndAssessor<ndSphFluidAabb> worldBox, ndAssessor<int> gridScans)
+//__global__ void ndCountGrids(const ndKernelParams params, const ndSphFluidPosit::ndPointAssessor input, const ndAssessor<ndSphFluidAabb> worldBox, ndAssessor<int> gridScans)
+__global__ void ndCountGrids(ndCudaSphFluid::Image* fluid)
 {
-	//auto CountGrids = ndMakeObject::ndFunction([this, &data, &neiborghood](ndInt32 threadIndex, ndInt32 threadCount)
-	//{
-	//	D_TRACKTIME_NAMED(CountGrids);
-	//	const ndVector origin(m_box0);
-	//	const ndFloat32 gridSize = GetSphGridSize();
-	//	const ndVector box(gridSize * ndFloat32(0.5f * 0.99f));
-	//	const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
-	//	const ndVector* const posit = &m_posit[0];
-	//	ndInt32* const scans = &data.m_gridScans[0];
-	//
-	//	const ndStartEnd startEnd(m_posit.GetCount(), threadIndex, threadCount);
-	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-	//	{
-	//		const ndVector r(posit[i] - origin);
-	//		const ndVector p(r * invGridSize);
-	//		const ndGridHash hashKey(p, i);
-	//
-	//		const ndVector p0((r - box) * invGridSize);
-	//		const ndVector p1((r + box) * invGridSize);
-	//		ndGridHash box0Hash(p0, i);
-	//		const ndGridHash box1Hash(p1, i);
-	//		const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
-	//
-	//		ndAssert(codeHash.m_y <= 1);
-	//		ndAssert(codeHash.m_z <= 1);
-	//		const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
-	//		scans[i] = neiborghood.m_counter[code];
-	//	}
-	//});
+//	//auto CountGrids = ndMakeObject::ndFunction([this, &data, &neiborghood](ndInt32 threadIndex, ndInt32 threadCount)
+//	//{
+//	//	D_TRACKTIME_NAMED(CountGrids);
+//	//	const ndVector origin(m_box0);
+//	//	const ndFloat32 gridSize = GetSphGridSize();
+//	//	const ndVector box(gridSize * ndFloat32(0.5f * 0.99f));
+//	//	const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
+//	//	const ndVector* const posit = &m_posit[0];
+//	//	ndInt32* const scans = &data.m_gridScans[0];
+//	//
+//	//	const ndStartEnd startEnd(m_posit.GetCount(), threadIndex, threadCount);
+//	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+//	//	{
+//	//		const ndVector r(posit[i] - origin);
+//	//		const ndVector p(r * invGridSize);
+//	//		const ndGridHash hashKey(p, i);
+//	//
+//	//		const ndVector p0((r - box) * invGridSize);
+//	//		const ndVector p1((r + box) * invGridSize);
+//	//		ndGridHash box0Hash(p0, i);
+//	//		const ndGridHash box1Hash(p1, i);
+//	//		const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
+//	//
+//	//		ndAssert(codeHash.m_y <= 1);
+//	//		ndAssert(codeHash.m_z <= 1);
+//	//		const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
+//	//		scans[i] = neiborghood.m_counter[code];
+//	//	}
+//	//});
 
 	int blockId = blockIdx.x;
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
-	int base = blockSride * params.m_blocksPerKernel * blockId;
+	int base = blockSride * fluid->m_param.m_blocksPerKernel * blockId;
 
 	//ndSphFluidAabb origin(worldBox[0]);
-	ndCudaVector origin(worldBox[0].m_min);
+	ndCudaVector origin(fluid->m_aabb.m_min);
 
-	for (int i = 0; i < params.m_blocksPerKernel; ++i)
+	for (int i = 0; i < fluid->m_param.m_blocksPerKernel; ++i)
 	{
 		int index = base + threadId;
 
-		if (index < input.m_x.m_size)
+		if (index < fluid->m_x.m_size)
 		{
-			ndCudaVector posit(input.m_x[index], input.m_y[index], input.m_z[index], 0.0f);
+			ndCudaVector posit(fluid->m_x[index], fluid->m_y[index], fluid->m_z[index], 0.0f);
 
 			//const ndVector r(posit[i] - origin);
 			//const ndVector p(r * invGridSize);
 			ndCudaVector r(posit - origin);
-			//ndCudaVector p(r - origin);
+			ndCudaVector p(r - origin);
 
 			//const ndGridHash hashKey(p, i);
 			//
@@ -311,31 +335,34 @@ __global__ void ndCountGrids(const ndKernelParams params, const ndSphFluidPosit:
 			//const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
 			//scans[i] = neiborghood.m_counter[code];
 
-			gridScans[index] = index;
+			fluid->m_gridScans[index] = index;
 		}
 
 		base += blockSride;
 	}
 }
 
-
-
-ndCudaSphFliud::ndCudaSphFliud(const ndSphFluidInitInfo& info)
-	//:m_owner(owner)
-	//,m_context(context)
-	:m_info(info)
-	,m_points()
-	,m_aabb()
+ndCudaSphFluid::ndCudaSphFluid(const ndSphFluidInitInfo& info)
+	:m_imageCpu(info)
+	,m_imageGpu(nullptr)
+	,m_x()
+	,m_y()
+	,m_z()
 	,m_gridScans()
-	,m_workingPoint()
+	,m_points()
+	,m_pointsAabb()
 {
+	m_imageCpu.m_cudaStatus = cudaMalloc((void**)&m_imageGpu, sizeof (Image));
+	ndAssert(m_imageCpu.m_cudaStatus == cudaSuccess);
 }
 
-ndCudaSphFliud::~ndCudaSphFliud()
+ndCudaSphFluid::~ndCudaSphFluid()
 {
+	m_imageCpu.m_cudaStatus = cudaFree(m_imageGpu);
+	ndAssert(m_imageCpu.m_cudaStatus == cudaSuccess);
 }
 
-void ndCudaSphFliud::MemCpy(const double* const src, int strideInItems, int items)
+void ndCudaSphFluid::MemCpy(const double* const src, int strideInItems, int items)
 {
 	ndAssert(0);
 }
@@ -345,7 +372,7 @@ void GetPositions(double* const dst, int strideInItems, int items)
 	ndAssert(0);
 }
 
-void ndCudaSphFliud::MemCpy(const float* const src, int strideInItems, int items)
+void ndCudaSphFluid::MemCpy(const float* const src, int strideInItems, int items)
 {
 	m_points.SetCount(items);
 
@@ -362,17 +389,11 @@ void ndCudaSphFliud::MemCpy(const float* const src, int strideInItems, int items
 	InitBuffers();
 }
 
-void ndCudaSphFliud::GetPositions(float* const dst, int strideInItems, int items)
+void ndCudaSphFluid::GetPositions(float* const dst, int strideInItems, int items)
 {
-	ndAssessor<ndCudaVector> output(m_points);
-	ndCudaContext* const context = m_info.m_context;
-	const ndSphFluidPosit::ndPointAssessor input(m_workingPoint);
-	
-	const ndKernelParams params(context->m_device, context->m_device->m_workGroupSize, m_points.GetCount());
-
 	if (strideInItems == sizeof(ndCudaVector) / sizeof(float))
 	{
-		ndFluidGetPositions << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, output, input);
+		ndFluidGetPositions << <m_imageCpu.m_param.m_kernelCount, m_imageCpu.m_param.m_workGroupSize, 0 >> > (m_imageGpu);
 		ndCudaVector* const dstPtr = (ndCudaVector*)dst;
 		m_points.WriteData(dstPtr, items);
 	}
@@ -382,44 +403,41 @@ void ndCudaSphFliud::GetPositions(float* const dst, int strideInItems, int items
 	}
 }
 
-void ndCudaSphFliud::InitBuffers()
+void ndCudaSphFluid::InitBuffers()
 {
-	ndCudaContext* const context = m_info.m_context;
-	const ndKernelParams params(context->m_device, context->m_device->m_workGroupSize, m_points.GetCount());
+	m_imageCpu.Init(*this);
+	m_imageCpu.m_cudaStatus = cudaMemcpy(m_imageGpu, &m_imageCpu, sizeof (Image), cudaMemcpyHostToDevice);
+	ndAssert(m_imageCpu.m_cudaStatus == cudaSuccess);
 
-	m_aabb.SetCount(params.m_kernelCount + 32);
-	m_workingPoint.m_x.SetCount(params.m_itemCount);
-	m_workingPoint.m_y.SetCount(params.m_itemCount);
-	m_workingPoint.m_z.SetCount(params.m_itemCount);
-
-	const ndAssessor<ndCudaVector> input(m_points);
-	ndSphFluidPosit::ndPointAssessor output(m_workingPoint);
-	ndFluidInitTranspose<<<params.m_kernelCount, params.m_workGroupSize, 0>>>(params, input, output);
+	ndFluidInitTranspose << <m_imageCpu.m_param.m_kernelCount, m_imageCpu.m_param.m_workGroupSize, 0 >> > (m_imageGpu);
 }
 
-void ndCudaSphFliud::CaculateAabb()
+void ndCudaSphFluid::CaculateAabb()
 {
-	ndAssessor<ndSphFluidAabb> aabb(m_aabb);
-	ndCudaContext* const context = m_info.m_context;
-	const ndSphFluidPosit::ndPointAssessor input(m_workingPoint);
-	const ndKernelParams params(context->m_device, context->m_device->m_workGroupSize, m_points.GetCount());
+#if 0
+	char xxxxx[256];
+	Image* xxxxxxx = (Image*)&xxxxx;
+	cudaError_t cudaStatus = cudaSuccess;
+	cudaStatus = cudaMemcpy(xxxxxxx, m_imageGpu, sizeof(Image), cudaMemcpyDeviceToHost);
+	ndAssert(cudaStatus == cudaSuccess);
+#endif
 
 	int power = 1;
-	while (power < params.m_kernelCount)
+	while (power < m_imageCpu.m_param.m_kernelCount)
 	{
 		power *= 2;
 	}
-	ndCalculateBlockAabb << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, input, aabb);
-	ndCalculateAabb << <1, power, 0 >> > (params, aabb, m_info.m_gridSize);
+	ndCalculateBlockAabb << <m_imageCpu.m_param.m_kernelCount, m_imageCpu.m_param.m_workGroupSize, 0 >> > (m_imageGpu);
+	ndCalculateAabb << <1, power, 0 >> > (m_imageGpu);
 }
 
-void ndCudaSphFliud::Update(float timestep)
+void ndCudaSphFluid::Update(float timestep)
 {
 	CaculateAabb();
 	CreateGrids();
 }
 
-void ndCudaSphFliud::CreateGrids()
+void ndCudaSphFluid::CreateGrids()
 {
 	//class ndGridNeighborInfo
 	//{
@@ -562,7 +580,8 @@ void ndCudaSphFliud::CreateGrids()
 	//data.m_gridScans.SetCount(m_posit.GetCount() + 1);
 	//data.m_gridScans[m_posit.GetCount()] = 0;
 	//threadPool->ParallelExecute(CountGrids);
-	//
+
+	ndCountGrids << <m_imageCpu.m_param.m_kernelCount, m_imageCpu.m_param.m_workGroupSize, 0 >> > (m_imageGpu);
 	//ndInt32 gridCount = 0;
 	//for (ndInt32 i = 0; i < data.m_gridScans.GetCount(); ++i)
 	//{
@@ -575,17 +594,7 @@ void ndCudaSphFliud::CreateGrids()
 	//threadPool->ParallelExecute(CreateGrids);
 	//data.m_hashGridMapScratchBuffer.SetCount(gridCount);
 
-	m_gridScans.SetCount(m_points.GetCount() + 1);
 
-	ndCudaContext* const context = m_info.m_context;
-	const ndKernelParams params(context->m_device, context->m_device->m_workGroupSize, m_points.GetCount());
-
-	ndAssessor<int> gridScans(m_gridScans);
-	const ndAssessor<ndSphFluidAabb> aabb(m_aabb);
-	const ndSphFluidPosit::ndPointAssessor input(m_workingPoint);
 	
-	ndCountGrids << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, input, m_aabb, gridScans);
-	//data.m_gridScans[m_posit.GetCount()] = 0;
-	//threadPool->ParallelExecute(CountGrids);
 
 }

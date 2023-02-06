@@ -47,6 +47,7 @@ class ndCudaDevice
 class ndKernelParams
 {
 	public:
+	ndKernelParams() {}
 	ndKernelParams(const ndCudaDevice* const device, int workGroupSize, int itemCount);
 
 	int m_itemCount;
