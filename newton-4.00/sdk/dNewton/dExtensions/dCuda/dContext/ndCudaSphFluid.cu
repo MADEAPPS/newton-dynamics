@@ -274,18 +274,27 @@ __global__ void ndCalculateBlockAabb(ndCudaSphFluid::Image* fluid)
 
 __global__ void ndCountGrids(ndCudaSphFluid::Image* fluid)
 {
+	__shared__  float scans[D_MAX_LOCAL_SIZE/2 + D_MAX_LOCAL_SIZE + 1];
+
 	int blockId = blockIdx.x;
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
+	int halfBlockSride = blockSride / 2;
 	int base = blockSride * fluid->m_param.m_blocksPerKernel * blockId;
 
 	const ndCudaVector origin(fluid->m_aabb.m_min);
 	const ndCudaVector box(fluid->m_gridSize * 0.5f * 0.99f);
 	const ndCudaVector invGridSize(1.0f / fluid->m_gridSize);
 
+	int sumAccumulator = 0;
 	for (int i = 0; i < fluid->m_param.m_blocksPerKernel; ++i)
 	{
 		int index = base + threadId;
+
+		if (threadId < halfBlockSride)
+		{
+			scans[threadId] = 0;
+		}
 
 		if (index < fluid->m_x.m_size)
 		{
@@ -303,10 +312,38 @@ __global__ void ndCountGrids(ndCudaSphFluid::Image* fluid)
 			const ndCudaSphFluid::ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
 			
 			const unsigned code = unsigned(codeHash.m_z * 2 + codeHash.m_y);
-			fluid->m_gridScans[index] = fluid->m_neighborgInfo.m_counter[code];
+			//fluid->m_gridScans[index] = fluid->m_neighborgInfo.m_counter[code];
+			//scans[halfBlockSride + threadId + 1] = fluid->m_neighborgInfo.m_counter[code];
+			scans[halfBlockSride + threadId] = fluid->m_neighborgInfo.m_counter[code];
 		}
+		else
+		{
+			scans[halfBlockSride + threadId + 1] = 0;
+		}
+		//__syncthreads();
+
+		for (int j = 1; j < blockSride; j = j << 1)
+		{
+			__syncthreads();
+			int sum = scans[halfBlockSride + threadId] + scans[halfBlockSride + threadId - j];
+			__syncthreads();
+			scans[halfBlockSride + threadId] = sum;
+		}
+		__syncthreads();
+		fluid->m_gridScans[index] = scans[halfBlockSride + threadId] + sumAccumulator;
+		sumAccumulator += scans[halfBlockSride + blockSride - 1];
 
 		base += blockSride;
+	}
+	__syncthreads();
+
+	if (threadId == 0)
+	{
+		int offset = blockSride * fluid->m_param.m_blocksPerKernel * fluid->m_param.m_kernelCount;
+		fluid->m_gridScans[offset + blockId] = sumAccumulator;
+		//printf("adressBase:%d  offset:%d sum:%d\n", offset, blockId, sumAccumulator);
+		//printf("adressBase\n");
+		//printf("adressBase:%d sum:%d\n", offset, sumAccumulator);
 	}
 }
 
@@ -416,8 +453,9 @@ void ndCudaSphFluid::Update(float timestep)
 	cudaDeviceSynchronize();
 	ndAssert(m_imageCpu.m_cudaStatus == cudaSuccess);
 	ndCudaHostBuffer<int> scans;
+	scans.SetCount(xxxxxxx->m_param.m_itemCount + 4000);
+	scans.ReadData(&xxxxxxx->m_gridScans[0], scans.GetCount());
 	scans.SetCount(xxxxxxx->m_param.m_itemCount);
-	scans.ReadData(&xxxxxxx->m_gridScans[0], xxxxxxx->m_param.m_itemCount);
 #endif
 
 }
