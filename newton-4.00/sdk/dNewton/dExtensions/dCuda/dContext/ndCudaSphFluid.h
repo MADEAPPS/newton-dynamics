@@ -183,11 +183,13 @@ class ndCudaSphFluid
 		ndAssessor<float> m_y;
 		ndAssessor<float> m_z;
 		ndAssessor<int> m_gridScans;
+		ndAssessor<ndGridHash> m_hashGridMap;
 		ndAssessor<ndSphFluidAabb> m_pointsAabb;
 
 		cudaError_t m_cudaStatus;
 		ndSphFluidAabb m_aabb;
 		ndGridNeighborInfo m_neighborgInfo;
+		int m_activeHashGridMapSize;
 	};
 
 	D_CUDA_API ndCudaSphFluid(const ndSphFluidInitInfo& info);
@@ -213,8 +215,8 @@ class ndCudaSphFluid
 	ndCudaDeviceBuffer<float> m_x;
 	ndCudaDeviceBuffer<float> m_y;
 	ndCudaDeviceBuffer<float> m_z;
-	//ndCudaDeviceBuffer<int> m_gridScans;
 	ndCudaDeviceBuffer<ndCudaVector> m_points;
+	ndCudaDeviceBuffer<ndGridHash> m_hashGridMap;
 	ndCudaDeviceBuffer<ndSphFluidAabb> m_pointsAabb;
 };
 

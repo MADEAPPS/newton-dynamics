@@ -44,11 +44,14 @@ void ndCudaSphFluid::Image::Init(ndCudaSphFluid& fluid)
 	{
 		m_context->m_implement->m_sortPrefixBuffer.SetCount(m_param.m_itemCount * 2);
 	}
+	fluid.m_hashGridMap.SetCount(m_param.m_itemCount * 4 + 1024);
+	m_activeHashGridMapSize = fluid.m_hashGridMap.GetCount();
 	
 	m_x = ndAssessor<float>(fluid.m_x);
 	m_y = ndAssessor<float>(fluid.m_y);
 	m_z = ndAssessor<float>(fluid.m_z);
 	m_points = ndAssessor<ndCudaVector>(fluid.m_points);
+	m_hashGridMap = ndAssessor<ndGridHash>(fluid.m_hashGridMap);
 	m_pointsAabb = ndAssessor<ndSphFluidAabb>(fluid.m_pointsAabb);
 	m_gridScans = ndAssessor<int>(m_context->m_implement->m_sortPrefixBuffer);
 }
@@ -158,13 +161,6 @@ __global__ void ndCalculateAabb(ndCudaSphFluid::Image* fluid)
 
 		box.m_min = ndCudaVector(box_x0[0], box_y0[0], box_z0[0], 0.0f);
 		box.m_max = ndCudaVector(box_x1[0], box_y1[0], box_z1[0], 0.0f);
-		//output[0].m_min = ndCudaVector(box_x0[0], box_y0[0], box_z0[0], 0.0f);
-		//output[0].m_max = ndCudaVector(box_x1[0], box_y1[0], box_z1[0], 0.0f);
-
-		//const ndFloat32 gridSize = GetSphGridSize();
-		//
-		//ndVector grid(gridSize);
-		//ndVector invGrid(ndFloat32(1.0f) / gridSize);
 		ndCudaVector grid(fluid->m_gridSize);
 		ndCudaVector invGrid(1.0f / fluid->m_gridSize);
 
@@ -303,7 +299,6 @@ __global__ void ndCountGrids(ndCudaSphFluid::Image* fluid)
 			ndCudaVector r(posit - origin);
 			ndCudaVector p(r - origin);
 
-			//const ndCudaSphFluid::ndGridHash hashKey(p, i);
 			const ndCudaVector p0((r - box) * invGridSize);
 			const ndCudaVector p1((r + box) * invGridSize);
 			
@@ -352,11 +347,12 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 	int blockSride = blockDim.x;
 	int halfKernelStride = kernelStride / 2;
 	int scanSize = fluid->m_param.m_workGroupSize * fluid->m_param.m_blocksPerKernel * fluid->m_param.m_kernelCount;
-	if (threadId < (halfKernelStride + 1))
+	if (threadId < halfKernelStride)
 	{
 		scanSum[threadId] = 0;
 	}
-	scanSum[halfKernelStride + threadId + 1] = fluid->m_gridScans[scanSize + threadId];
+
+	scanSum[halfKernelStride + threadId] = fluid->m_gridScans[scanSize + threadId];
 	for (int j = 1; j < kernelStride; j = j << 1)
 	{
 		int sum;
@@ -378,11 +374,80 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 	for (int i = 0; i < fluid->m_param.m_kernelCount; ++i)
 	{
 		int index = base + threadId;
-		float sumAcc = scanSum[halfKernelStride + i];
+		float sumAcc = scanSum[halfKernelStride + i - 1];
 		fluid->m_gridScans[index] = fluid->m_gridScans[index] + sumAcc;
 		base += itemsPerBlock;
 	}
+
+	if ((blockId == (gridDim.x - 1) && (threadId == 0)))
+	{
+		fluid->m_activeHashGridMapSize = scanSum[halfKernelStride + kernelStride - 1];
+		//m_hashGridMap
+	}
 }
+
+__global__ void ndCreateGrids(ndCudaSphFluid::Image* fluid)
+{
+	int blockId = blockIdx.x;
+	int threadId = threadIdx.x;
+	int blockSride = blockDim.x;
+	int base = blockSride * fluid->m_param.m_blocksPerKernel * blockId;
+
+	const ndCudaVector origin(fluid->m_aabb.m_min);
+	const ndCudaVector box(fluid->m_gridSize * 0.5f * 0.99f);
+	const ndCudaVector invGridSize(1.0f / fluid->m_gridSize);
+
+	for (int i = 0; i < fluid->m_param.m_blocksPerKernel; ++i)
+	{
+		int index = base + threadId;
+		if (index < fluid->m_x.m_size)
+		{
+			//const ndVector r(posit[i] - origin);
+			//const ndVector p(r * invGridSize);
+			//const ndGridHash hashKey(p, i);
+			ndCudaVector posit(fluid->m_x[index], fluid->m_y[index], fluid->m_z[index], 0.0f);
+			ndCudaVector r(posit - origin);
+			ndCudaVector p(r - origin);
+			//const ndCudaSphFluid::ndGridHash boxHash(p, i);
+
+			//const ndVector p0((r - box) * invGridSize);
+			//const ndVector p1((r + box) * invGridSize);
+			//ndGridHash box0Hash(p0, i);
+			//const ndGridHash box1Hash(p1, i);
+			//const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
+			const ndCudaVector p0((r - box) * invGridSize);
+			const ndCudaVector p1((r + box) * invGridSize);
+			const ndCudaSphFluid::ndGridHash box0Hash(p0, i);
+			const ndCudaSphFluid::ndGridHash box1Hash(p1, i);
+			const ndCudaSphFluid::ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
+
+			//const ndInt32 base = scans[i];
+			//const ndInt32 count = scans[i + 1] - base;
+			//const ndInt32 code = ndInt32(codeHash.m_z * 2 + codeHash.m_y);
+			const int base = fluid->m_gridScans[index];
+			const unsigned code = unsigned(codeHash.m_z * 2 + codeHash.m_y);
+			const ndCudaSphFluid::ndGridHash* const neigborgh = &fluid->m_neighborgInfo.m_neighborDirs[code][0];
+			//ndAssert(count == neiborghood.m_counter[code]);
+			const int count = fluid->m_neighborgInfo.m_counter[code];
+			
+			const ndCudaSphFluid::ndGridHash hashKey(p, i);
+			for (int j = 0; j < count; ++j)
+			{
+				//ndGridHash quadrand(box0Hash);
+				ndCudaSphFluid::ndGridHash quadrand(box0Hash);
+				//quadrand.m_gridHash += neigborgh[j].m_gridHash;
+				 quadrand.m_gridHash += neigborgh[j].m_gridHash;
+				//quadrand.m_cellType = ndGridType(quadrand.m_gridHash == hashKey.m_gridHash);
+				quadrand.m_cellType = ndCudaSphFluid::ndGridType(quadrand.m_gridHash == hashKey.m_gridHash);
+				//ndAssert(quadrand.m_cellType == ((quadrand.m_gridHash == hashKey.m_gridHash) ? ndHomeGrid : ndAdjacentGrid));
+				//dst[base + j] = quadrand;
+				fluid->m_hashGridMap[base + j] = quadrand;
+			}
+		}
+		base += blockSride;
+	}
+}
+
 
 ndCudaSphFluid::ndCudaSphFluid(const ndSphFluidInitInfo& info)
 	:m_imageCpu(info)
@@ -485,66 +550,11 @@ void ndCudaSphFluid::Update(float timestep)
 
 void ndCudaSphFluid::CreateGrids()
 {
-	//ndGridNeighborInfo neiborghood;
-	//ndWorkingBuffers& data = *m_workingBuffers;
-	
-	//auto CreateGrids = ndMakeObject::ndFunction([this, &data, &neiborghood](ndInt32 threadIndex, ndInt32 threadCount)
-	//{
-	//	D_TRACKTIME_NAMED(CreateGrids);
-	//	const ndVector origin(m_box0);
-	//	const ndFloat32 gridSize = GetSphGridSize();
-	//	ndGridHash* const dst = &data.m_hashGridMap[0];
-	//	const ndInt32* const scans = &data.m_gridScans[0];
-	//
-	//	// the 0.99 factor is to make sure the box 
-	//	// fits in not more than two adjacent grids.
-	//	const ndVector box(gridSize * ndFloat32(0.5f * 0.99f));
-	//	const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
-	//	const ndVector* const posit = &m_posit[0];
-	//
-	//	const ndStartEnd startEnd(m_posit.GetCount(), threadIndex, threadCount);
-	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-	//	{
-	//		const ndVector r(posit[i] - origin);
-	//		const ndVector p(r * invGridSize);
-	//		const ndGridHash hashKey(p, i);
-	//
-	//		const ndVector p0((r - box) * invGridSize);
-	//		const ndVector p1((r + box) * invGridSize);
-	//		ndGridHash box0Hash(p0, i);
-	//		const ndGridHash box1Hash(p1, i);
-	//		const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
-	//
-	//		ndAssert(codeHash.m_y <= 1);
-	//		ndAssert(codeHash.m_z <= 1);
-	//		const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
-	//
-	//		const ndInt32 base = scans[i];
-	//		const ndInt32 count = scans[i + 1] - base;
-	//		const ndGridHash* const neigborgh = &neiborghood.m_neighborDirs[code][0];
-	//		for (ndInt32 j = 0; j < count; ++j)
-	//		{
-	//			ndGridHash quadrand(box0Hash);
-	//			quadrand.m_gridHash += neigborgh[j].m_gridHash;
-	//			quadrand.m_cellType = ndGridType(quadrand.m_gridHash == hashKey.m_gridHash);
-	//			ndAssert(quadrand.m_cellType == ((quadrand.m_gridHash == hashKey.m_gridHash) ? ndHomeGrid : ndAdjacentGrid));
-	//			dst[base + j] = quadrand;
-	//		}
-	//	}
-	//});
-
 	//data.m_gridScans.SetCount(m_posit.GetCount() + 1);
 	//data.m_gridScans[m_posit.GetCount()] = 0;
 	//threadPool->ParallelExecute(CountGrids);
 
 	ndCountGrids << <m_imageCpu.m_param.m_kernelCount, m_imageCpu.m_param.m_workGroupSize, 0 >> > (m_imageGpu);
-	//ndInt32 gridCount = 0;
-	//for (ndInt32 i = 0; i < data.m_gridScans.GetCount(); ++i)
-	//{
-	//	ndInt32 count = data.m_gridScans[i];
-	//	data.m_gridScans[i] = gridCount;
-	//	gridCount += count;
-	//}
 	int power = 1;
 	while (power < m_imageCpu.m_param.m_kernelCount)
 	{
@@ -554,5 +564,7 @@ void ndCudaSphFluid::CreateGrids()
 
 	//data.m_hashGridMap.SetCount(gridCount);
 	//threadPool->ParallelExecute(CreateGrids);
+	ndCreateGrids << <m_imageCpu.m_param.m_kernelCount, m_imageCpu.m_param.m_workGroupSize, 0 >> > (m_imageGpu);
+	
 	//data.m_hashGridMapScratchBuffer.SetCount(gridCount);
 }
