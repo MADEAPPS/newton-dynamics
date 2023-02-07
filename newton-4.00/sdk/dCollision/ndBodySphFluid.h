@@ -25,7 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndBodyParticleSet.h"
 
-#define D_USE_YZ_PLANE_BUCKETS
+//#define D_USE_YZ_PLANE_BUCKETS
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodySphFluid: public ndBodyParticleSet
@@ -80,6 +80,8 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void IntegrateParticles(ndThreadPool* const threadPool);
 	void CalculateAccelerations(ndThreadPool* const threadPool);
 	void CalculateParticlesDensity(ndThreadPool* const threadPool);
+
+	bool TraceHashes() const;
 
 	ndWorkingBuffers* m_workingBuffers;
 	ndFloat32 m_mass;

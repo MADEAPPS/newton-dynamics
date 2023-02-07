@@ -1052,6 +1052,22 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	data.m_hashGridMap.SetCount(gridCount);
 	threadPool->ParallelExecute(CreateGrids);
 	data.m_hashGridMapScratchBuffer.SetCount(gridCount);
+
+	//ndAssert(TraceHashes());
+}
+
+bool ndBodySphFluid::TraceHashes() const
+{
+#if 1
+	ndWorkingBuffers& data = *m_workingBuffers;
+	ndGridHash* xxxx = &data.m_hashGridMap[0];
+	for (int i = 0; i < data.m_hashGridMap.GetCount(); i++)
+	{
+		ndTrace(("id(%d)\tx(%d)\tz(%d)\n", xxxx[i].m_particleIndex, xxxx[i].m_x, xxxx[i].m_z));
+	}
+#endif
+
+	return true;
 }
 
 void ndBodySphFluid::Update(const ndScene* const scene, ndFloat32 timestep)
