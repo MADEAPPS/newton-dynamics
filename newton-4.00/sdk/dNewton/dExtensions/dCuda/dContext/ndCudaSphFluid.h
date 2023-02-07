@@ -178,11 +178,8 @@ class ndCudaSphFluid
 		void Init(ndCudaSphFluid& fluid);
 
 		ndKernelParams m_param;
-		ndAssessor<ndCudaVector> m_points;
-		ndAssessor<float> m_x;
-		ndAssessor<float> m_y;
-		ndAssessor<float> m_z;
 		ndAssessor<int> m_gridScans;
+		ndAssessor<ndCudaVector> m_points;
 		ndAssessor<ndGridHash> m_hashGridMap;
 		ndAssessor<ndSphFluidAabb> m_pointsAabb;
 
@@ -212,9 +209,6 @@ class ndCudaSphFluid
 	Image m_imageCpu;
 	Image* m_imageGpu;
 
-	ndCudaDeviceBuffer<float> m_x;
-	ndCudaDeviceBuffer<float> m_y;
-	ndCudaDeviceBuffer<float> m_z;
 	ndCudaDeviceBuffer<ndCudaVector> m_points;
 	ndCudaDeviceBuffer<ndGridHash> m_hashGridMap;
 	ndCudaDeviceBuffer<ndSphFluidAabb> m_pointsAabb;

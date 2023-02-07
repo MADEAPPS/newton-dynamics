@@ -191,7 +191,6 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
 
-	#define XRESOLUTION	ndFloat32(1<<23)
 	class ndKey_low
 	{
 		public:
@@ -864,8 +863,6 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 		{
 			const ndVector r(posit[i] - origin);
 			const ndVector p(r * invGridSize);
-			//const ndGridHash hashKey(p, i);
-
 			const ndVector p0((r - box) * invGridSize);
 			const ndVector p1((r + box) * invGridSize);
 			const ndGridHash box0Hash(p0, i);
