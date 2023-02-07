@@ -253,7 +253,7 @@ __global__ void ndCountGrids(ndCudaSphFluid::Image* fluid)
 			const ndCudaSphFluid::ndGridHash box1Hash(p1, i);
 			const ndCudaSphFluid::ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
 			
-			const unsigned code = unsigned(codeHash.m_z * 2 + codeHash.m_y);
+			const unsigned code = unsigned(codeHash.m_z * 2 + codeHash.m_x);
 			//fluid->m_gridScans[index] = fluid->m_neighborgInfo.m_counter[code];
 			//scans[halfBlockSride + threadId + 1] = fluid->m_neighborgInfo.m_counter[code];
 			scans[halfBlockSride + threadId] = fluid->m_neighborgInfo.m_counter[code];
@@ -370,9 +370,9 @@ __global__ void ndCreateGrids(ndCudaSphFluid::Image* fluid)
 
 			//const ndInt32 base = scans[i];
 			//const ndInt32 count = scans[i + 1] - base;
-			//const ndInt32 code = ndInt32(codeHash.m_z * 2 + codeHash.m_y);
+			//const ndInt32 code = ndInt32(codeHash.m_z * 2 + codeHash.m_x);
 			const int base = fluid->m_gridScans[index];
-			const unsigned code = unsigned(codeHash.m_z * 2 + codeHash.m_y);
+			const unsigned code = unsigned(codeHash.m_z * 2 + codeHash.m_x);
 			const ndCudaSphFluid::ndGridHash* const neigborgh = &fluid->m_neighborgInfo.m_neighborDirs[code][0];
 			//ndAssert(count == neiborghood.m_counter[code]);
 			const int count = fluid->m_neighborgInfo.m_counter[code];
