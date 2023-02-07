@@ -25,6 +25,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndBodyParticleSet.h"
 
+#define D_USE_YZ_PLANE_BUCKETS
+
 D_MSV_NEWTON_ALIGN_32
 class ndBodySphFluid: public ndBodyParticleSet
 {
@@ -72,7 +74,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void BuildPairs(ndThreadPool* const threadPool);
 	void CreateGrids(ndThreadPool* const threadPool);
 	void CaculateAabb(ndThreadPool* const threadPool);
-	void SortXdimension(ndThreadPool* const threadPool);
+	void SortBuckets(ndThreadPool* const threadPool);
 	void CalculateScans(ndThreadPool* const threadPool);
 	void SortCellBuckects(ndThreadPool* const threadPool);
 	void IntegrateParticles(ndThreadPool* const threadPool);

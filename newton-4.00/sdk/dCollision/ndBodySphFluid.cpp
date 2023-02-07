@@ -39,6 +39,7 @@ class ndBodySphFluid::ndGridHash
 	{
 	}
 
+#ifdef D_USE_YZ_PLANE_BUCKETS
 	ndGridHash(ndInt32 y, ndInt32 z)
 	{
 		m_gridHash = 0;
@@ -62,24 +63,61 @@ class ndBodySphFluid::ndGridHash
 		m_cellType = ndAdjacentGrid;
 		m_particleIndex = ndUnsigned64(particleIndex);
 	}
+#else
+	ndGridHash(ndInt32 x, ndInt32 z)
+	{
+		m_gridHash = 0;
+		m_x = ndUnsigned64(x);
+		m_z = ndUnsigned64(z);
+	}
+
+	ndGridHash(const ndVector& grid, ndInt32 particleIndex)
+	{
+		ndAssert(grid.m_x >= ndFloat32(0.0f));
+		ndAssert(grid.m_z >= ndFloat32(0.0f));
+		ndAssert(grid.m_x < ndFloat32(1 << (D_SPH_HASH_BITS * 2)));
+		ndAssert(grid.m_z < ndFloat32(1 << (D_SPH_HASH_BITS * 2)));
+
+		ndVector hash(grid.GetInt());
+
+		m_gridHash = 0;
+		m_x = ndUnsigned64(hash.m_ix);
+		m_z = ndUnsigned64(hash.m_iz);
+
+		m_cellType = ndAdjacentGrid;
+		m_particleIndex = ndUnsigned64(particleIndex);
+	}
+#endif
 
 	union
 	{
 		struct
 		{
+#ifdef D_USE_YZ_PLANE_BUCKETS
 			ndUnsigned64 m_y				: D_SPH_HASH_BITS * 2;
 			ndUnsigned64 m_z				: D_SPH_HASH_BITS * 2;
+#else
+			ndUnsigned64 m_x				: D_SPH_HASH_BITS * 2;
+			ndUnsigned64 m_z				: D_SPH_HASH_BITS * 2;
+#endif
 			ndUnsigned64 m_particleIndex	: 23;
 			ndUnsigned64 m_cellType			: 1;
 		};
 		struct
 		{
-			ndUnsigned64 m_yLow				: D_SPH_HASH_BITS;
-			ndUnsigned64 m_yHigh			: D_SPH_HASH_BITS;
-			ndUnsigned64 m_zLow				: D_SPH_HASH_BITS;
-			ndUnsigned64 m_zHigh			: D_SPH_HASH_BITS;
+#ifdef D_USE_YZ_PLANE_BUCKETS
+			ndUnsigned64 m_yLow		: D_SPH_HASH_BITS;
+			ndUnsigned64 m_yHigh	: D_SPH_HASH_BITS;
+			ndUnsigned64 m_zLow		: D_SPH_HASH_BITS;
+			ndUnsigned64 m_zHigh	: D_SPH_HASH_BITS;
+#else
+			ndUnsigned64 m_xLow		: D_SPH_HASH_BITS;
+			ndUnsigned64 m_xHigh	: D_SPH_HASH_BITS;
+			ndUnsigned64 m_zLow		: D_SPH_HASH_BITS;
+			ndUnsigned64 m_zHigh	: D_SPH_HASH_BITS;
+#endif
 		};
-		ndUnsigned64 m_gridHash				: D_SPH_HASH_BITS * 2 * 2;
+		ndUnsigned64 m_gridHash		: D_SPH_HASH_BITS * 2 * 2;
 	};
 };
 
@@ -124,15 +162,26 @@ class ndBodySphFluid::ndWorkingBuffers
 	{
 	}
 
-	void SetWorldToGridMapping(ndInt32 gridCount, ndFloat32 xMax, ndFloat32 xMin)
+	void SetWorldToGridMapping(ndFloat32 gridSize, const ndVector& maxP, const ndVector& minP)
 	{
-		m_worlToGridOrigin = xMin;
-		m_worlToGridScale = ndFloat32(1<< D_SPH_GRID_X_RESOLUTION) * (ndFloat32)gridCount / (xMax - xMin);
+#ifdef D_USE_YZ_PLANE_BUCKETS
+		m_worlToGridOrigin = minP.m_x;
+		ndFloat32 gridCount = ndFloor((maxP.m_x - minP.m_x) / gridSize + ndFloat32(1.0f));
+		m_worlToGridScale = ndFloat32(1<< D_SPH_GRID_X_RESOLUTION) * gridCount / (maxP.m_x - minP.m_x);
+#else
+		m_worlToGridOrigin = minP.m_y;
+		ndFloat32 gridCount = ndFloor((maxP.m_y - minP.m_y) / gridSize + ndFloat32(1.0f));
+		m_worlToGridScale = ndFloat32(1 << D_SPH_GRID_X_RESOLUTION) * (ndFloat32)gridCount / (maxP.m_y - minP.m_y);
+#endif
 	}
 
-	ndInt32 WorldToGrid(ndFloat32 x) const
+	ndInt32 WorldToGrid(const ndVector& point) const
 	{
-		ndInt32 val = ndInt32((x - m_worlToGridOrigin) * m_worlToGridScale);
+#ifdef D_USE_YZ_PLANE_BUCKETS
+		ndInt32 val = ndInt32((point.m_x - m_worlToGridOrigin) * m_worlToGridScale);
+#else
+		ndInt32 val = ndInt32((point.m_y - m_worlToGridOrigin) * m_worlToGridScale);
+#endif
 		ndAssert(val >= 0);
 		return val;
 	}
@@ -187,7 +236,7 @@ void ndBodySphFluid::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
 }
 
-void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
+void ndBodySphFluid::SortBuckets(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
 
@@ -204,7 +253,7 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			ndInt32 index = ndInt32(cell.m_particleIndex);
-			ndUnsigned32 key = ndUnsigned32(m_data.WorldToGrid(m_point[index].m_x));
+			ndUnsigned32 key = ndUnsigned32(m_data.WorldToGrid(m_point[index]));
 			return ndInt32(key & 0xff);
 		}
 
@@ -226,7 +275,7 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			ndInt32 index = ndInt32 (cell.m_particleIndex);
-			ndUnsigned32 key = ndUnsigned32(m_data.WorldToGrid(m_point[index].m_x));
+			ndUnsigned32 key = ndUnsigned32(m_data.WorldToGrid(m_point[index]));
 			return ndInt32((key >> 8) & 0xff);
 		}
 
@@ -248,7 +297,7 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			ndInt32 index = ndInt32(cell.m_particleIndex);
-			ndUnsigned32 key = ndUnsigned32(m_data.WorldToGrid(m_point[index].m_x));
+			ndUnsigned32 key = ndUnsigned32(m_data.WorldToGrid(m_point[index]));
 			return ndInt32((key >> 16) & 0xff);
 		}
 
@@ -258,7 +307,7 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 	};
 
 	ndWorkingBuffers& data = *m_workingBuffers;
-	const ndInt32 keySize = data.WorldToGrid(m_box1.m_x);
+	const ndInt32 keySize = data.WorldToGrid(m_box1);
 
 	ndCountingSort<ndGridHash, ndKey_low, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, nullptr, this);
 	if (keySize >= 256)
@@ -278,10 +327,9 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 		ndGridHash cell1(data.m_hashGridMap[i + 0]);
 		const ndVector p0(point[ndInt32(cell0.m_particleIndex)]);
 		const ndVector p1(point[ndInt32(cell1.m_particleIndex)]);
-		ndInt32 key0 = data.WorldToGrid(p0.m_x);
-		ndInt32 key1 = data.WorldToGrid(p1.m_x);
+		ndInt32 key0 = data.WorldToGrid(p0);
+		ndInt32 key1 = data.WorldToGrid(p1);
 		ndAssert(key0 <= key1);
-		//ndAssert(p0.m_x <= p1.m_x);
 	}
 #endif
 }
@@ -289,6 +337,7 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
+#ifdef D_USE_YZ_PLANE_BUCKETS
 	class ndKey_ylow
 	{
 		public:
@@ -299,16 +348,6 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 		}
 	};
 
-	class ndKey_zlow
-	{
-		public:
-		ndKey_zlow(void* const) {}
-		ndInt32 GetKey(const ndGridHash& cell) const
-		{
-			return ndInt32(cell.m_zLow);
-		}
-	};
-
 	class ndKey_yhigh
 	{
 		public:
@@ -316,6 +355,38 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return ndInt32(cell.m_yHigh);
+		}
+	};
+#else
+	class ndKey_xlow
+	{
+		public:
+		ndKey_xlow(void* const) {}
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return ndInt32(cell.m_xLow);
+		}
+	};
+
+	class ndKey_xhigh
+	{
+		public:
+		ndKey_xhigh(void* const) {}
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return ndInt32(cell.m_xHigh);
+		}
+	};
+
+#endif
+
+	class ndKey_zlow
+	{
+		public:
+		ndKey_zlow(void* const) {}
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return ndInt32(cell.m_zLow);
 		}
 	};
 
@@ -332,11 +403,19 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 	ndWorkingBuffers& data = *m_workingBuffers;
 	const ndVector boxSize((m_box1 - m_box0).Scale(ndFloat32(1.0f) / GetSphGridSize()).GetInt());
 
+#ifdef D_USE_YZ_PLANE_BUCKETS
 	ndCountingSort<ndGridHash, ndKey_ylow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, nullptr, nullptr);
 	if (boxSize.m_iy > (1 << D_SPH_HASH_BITS))
 	{
 		ndCountingSort<ndGridHash, ndKey_yhigh, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, nullptr, nullptr);
 	}
+#else
+	ndCountingSort<ndGridHash, ndKey_xlow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, nullptr, nullptr);
+	if (boxSize.m_ix > (1 << D_SPH_HASH_BITS))
+	{
+		ndCountingSort<ndGridHash, ndKey_xhigh, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, nullptr, nullptr);
+	}
+#endif
 	
 	ndCountingSort<ndGridHash, ndKey_zlow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, nullptr, nullptr);
 	if (boxSize.m_iz > (1 << D_SPH_HASH_BITS))
@@ -349,8 +428,13 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 	{
 		ndGridHash cell0(data.m_hashGridMap[i - 1]);
 		ndGridHash cell1(data.m_hashGridMap[i + 0]);
+#ifdef D_USE_YZ_PLANE_BUCKETS
 		ndUnsigned64 key0 = (cell0.m_z << (D_SPH_HASH_BITS * 2)) + cell0.m_y;
 		ndUnsigned64 key1 = (cell1.m_z << (D_SPH_HASH_BITS * 2)) + cell1.m_y;
+#else
+		ndUnsigned64 key0 = (cell0.m_z << (D_SPH_HASH_BITS * 2)) + cell0.m_x;
+		ndUnsigned64 key1 = (cell1.m_z << (D_SPH_HASH_BITS * 2)) + cell1.m_x;
+#endif
 		ndAssert(key0 <= key1);
 	}
 #endif
@@ -441,7 +525,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 void ndBodySphFluid::SortGrids(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
-	SortXdimension(threadPool);
+	SortBuckets(threadPool);
 	SortCellBuckects(threadPool);
 
 	#ifdef _DEBUG
@@ -482,7 +566,7 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 		const ndArray<ndInt32>& gridScans = data.m_gridScans;
 		const ndFloat32 diameter = GetSphGridSize();
 		const ndFloat32 diameter2 = diameter * diameter;
-		const ndInt32 windowsTest = data.WorldToGrid(data.m_worlToGridOrigin + diameter) + 1;
+		const ndInt32 windowsTest = data.WorldToGrid(ndVector (data.m_worlToGridOrigin + diameter)) + 1;
 
 		ndArray<ndSpinLock>& locks = data.m_locks;
 		ndArray<ndInt8>& pairCount = data.m_pairCount;
@@ -497,13 +581,13 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 				const ndGridHash hash0 = hashGridMap[start + i];
 				const ndInt32 homeGridTest0 = (hash0.m_cellType == ndHomeGrid);
 				const ndInt32 particle0 = ndInt32(hash0.m_particleIndex);
-				const ndInt32 x0 = data.WorldToGrid(m_posit[particle0].m_x);
+				const ndInt32 x0 = data.WorldToGrid(m_posit[particle0]);
 				for (ndInt32 j = i + 1; j < count; ++j)
 				{
 					const ndGridHash hash1 = hashGridMap[start + j];
 					const ndInt32 particle1 = ndInt32(hash1.m_particleIndex);
 					ndAssert(particle0 != particle1);
-					const ndInt32 x1 = data.WorldToGrid(m_posit[particle1].m_x);
+					const ndInt32 x1 = data.WorldToGrid(m_posit[particle1]);
 					//ndAssert((x1 - x0) > ndFloat32(-1.0e-3f));
 					const ndInt32 sweeptTest = ((x1 - x0) >= windowsTest);
 					if (sweeptTest)
@@ -779,8 +863,7 @@ void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 	m_box1 = box.m_max & ndVector::m_triplexMask;
 
 	ndWorkingBuffers& data = *m_workingBuffers;
-	ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
-	data.SetWorldToGridMapping(numberOfGrid, m_box1.m_x, m_box0.m_x);
+	data.SetWorldToGridMapping(gridSize, m_box1, m_box0);
 }
 
 void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
@@ -868,10 +951,16 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 			const ndGridHash box0Hash(p0, i);
 			const ndGridHash box1Hash(p1, i);
 			const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
-
+			
+#ifdef D_USE_YZ_PLANE_BUCKETS
 			ndAssert(codeHash.m_y <= 1);
 			ndAssert(codeHash.m_z <= 1);
 			const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
+#else
+			ndAssert(codeHash.m_x <= 1);
+			ndAssert(codeHash.m_z <= 1);
+			const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_x);
+#endif
 			scans[i] = neiborghood.m_counter[code];
 		}
 	});
@@ -901,12 +990,18 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 			const ndGridHash box1Hash(p1, i);
 			const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
 
-			ndAssert(codeHash.m_y <= 1);
-			ndAssert(codeHash.m_z <= 1);
-
 			const ndInt32 base = scans[i];
 			const ndInt32 count = scans[i + 1] - base;
+
+#ifdef D_USE_YZ_PLANE_BUCKETS
+			ndAssert(codeHash.m_y <= 1);
+			ndAssert(codeHash.m_z <= 1);
 			const ndInt32 code = ndInt32(codeHash.m_z * 2 + codeHash.m_y);
+#else
+			ndAssert(codeHash.m_x <= 1);
+			ndAssert(codeHash.m_z <= 1);
+			const ndInt32 code = ndInt32(codeHash.m_z * 2 + codeHash.m_x);
+#endif
 			const ndGridHash* const neigborgh = &neiborghood.m_neighborDirs[code][0];
 			ndAssert(count == neiborghood.m_counter[code]);
 
