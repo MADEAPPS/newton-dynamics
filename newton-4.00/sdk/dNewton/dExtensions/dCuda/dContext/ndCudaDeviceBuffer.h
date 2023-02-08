@@ -65,7 +65,7 @@ class ndAssessor
 	{
 	}
 
-	ndAssessor(ndCudaDeviceBuffer<T>& buffer)
+	__device__ __host__ ndAssessor(ndCudaDeviceBuffer<T>& buffer)
 		:m_array(buffer.m_array)
 		,m_size(buffer.m_size)
 		,m_capacity(buffer.m_capacity)

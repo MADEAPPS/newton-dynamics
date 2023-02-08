@@ -45,11 +45,14 @@ void ndCudaSphFluid::Image::Init(ndCudaSphFluid& fluid)
 	{
 		m_context->m_implement->m_sortPrefixBuffer.SetCount(m_param.m_itemCount * 2);
 	}
+
 	fluid.m_hashGridMap.SetCount(m_param.m_itemCount * 4 + 1024);
+	fluid.m_hashGridMapTemp.SetCount(fluid.m_hashGridMap.GetCount());
 	m_activeHashGridMapSize = fluid.m_hashGridMap.GetCount();
 	
 	m_points = ndAssessor<ndCudaVector>(fluid.m_points);
 	m_hashGridMap = ndAssessor<ndGridHash>(fluid.m_hashGridMap);
+	m_hashGridMapTemp = ndAssessor<ndGridHash>(m_hashGridMapTemp);
 	m_pointsAabb = ndAssessor<ndSphFluidAabb>(fluid.m_pointsAabb);
 	m_gridScans = ndAssessor<int>(m_context->m_implement->m_sortPrefixBuffer);
 }
@@ -337,6 +340,9 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 			fluid->m_hashGridMap[activeHashGridMapSize].m_gridHash = uint64_t (- 1);
 			fluid->m_activeHashGridMapSize = activeHashGridMapSize;
 
+			fluid->m_sortHashGridMap0 = fluid->m_hashGridMap;
+			fluid->m_sortHashGridMap1 = fluid->m_hashGridMapTemp;
+
 			if (fluid->m_activeHashGridMapSize > fluid->m_hashGridMap.m_capacity)
 			{
 				fluid->m_errorCode.Set(-1);
@@ -351,6 +357,8 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 			int activeHashGridMapSize = fluid->m_gridScans[scanSize];
 			fluid->m_hashGridMap[activeHashGridMapSize].m_gridHash = uint64_t(-1);
 			fluid->m_activeHashGridMapSize = activeHashGridMapSize;
+			fluid->m_sortHashGridMap0 = fluid->m_hashGridMap;
+			fluid->m_sortHashGridMap1 = fluid->m_hashGridMapTemp;
 
 			if (fluid->m_activeHashGridMapSize > fluid->m_hashGridMap.m_capacity)
 			{
@@ -537,6 +545,7 @@ void ndCudaSphFluid::Update(float timestep)
 	HandleErrors();
 	CaculateAabb();
 	CreateGrids();
+	SortGrids();
 
 	ndAssert (TraceHashes());
 
@@ -588,12 +597,6 @@ void ndCudaSphFluid::HandleErrors()
 
 void ndCudaSphFluid::CreateGrids()
 {
-	//data.m_gridScans.SetCount(m_posit.GetCount() + 1);
-	//data.m_gridScans[m_posit.GetCount()] = 0;
-	//threadPool->ParallelExecute(CountGrids);
-	//data.m_hashGridMap.SetCount(gridCount);
-	//threadPool->ParallelExecute(CreateGrids);
-
 	int power = 1;
 	while (power < m_imageCpu.m_param.m_kernelCount)
 	{
@@ -602,6 +605,9 @@ void ndCudaSphFluid::CreateGrids()
 	ndCountGrids << <m_imageCpu.m_param.m_kernelCount, m_imageCpu.m_param.m_workGroupSize, 0 >> > (m_imageGpu);
 	ndPrefixScanSum << <m_imageCpu.m_param.m_blocksPerKernel * 2, m_imageCpu.m_param.m_workGroupSize / 2, 0 >> > (m_imageGpu, power);
 	ndCreateGrids << <m_imageCpu.m_param.m_kernelCount, m_imageCpu.m_param.m_workGroupSize, 0 >> > (m_imageGpu);
-	
-	//data.m_hashGridMapScratchBuffer.SetCount(gridCount);
+}
+
+void ndCudaSphFluid::SortGrids()
+{
+
 }

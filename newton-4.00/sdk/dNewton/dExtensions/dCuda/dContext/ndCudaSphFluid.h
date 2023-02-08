@@ -188,7 +188,11 @@ class ndCudaSphFluid
 		ndAssessor<int> m_gridScans;
 		ndAssessor<ndCudaVector> m_points;
 		ndAssessor<ndGridHash> m_hashGridMap;
+		ndAssessor<ndGridHash> m_hashGridMapTemp;
 		ndAssessor<ndSphFluidAabb> m_pointsAabb;
+
+		ndAssessor<ndGridHash> m_sortHashGridMap0;
+		ndAssessor<ndGridHash> m_sortHashGridMap1;
 
 		ndSphFluidAabb m_aabb;
 		ndGridNeighborInfo m_neighborgInfo;
@@ -215,6 +219,7 @@ class ndCudaSphFluid
 	void HandleErrors();
 	void CaculateAabb();
 	void CreateGrids();
+	void SortGrids();
 
 	bool TraceHashes();
 
@@ -223,6 +228,7 @@ class ndCudaSphFluid
 
 	ndCudaDeviceBuffer<ndCudaVector> m_points;
 	ndCudaDeviceBuffer<ndGridHash> m_hashGridMap;
+	ndCudaDeviceBuffer<ndGridHash> m_hashGridMapTemp;
 	ndCudaDeviceBuffer<ndSphFluidAabb> m_pointsAabb;
 };
 
