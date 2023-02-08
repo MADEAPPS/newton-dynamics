@@ -174,6 +174,13 @@ class ndCudaSphFluid
 	class Image: public ndSphFluidInitInfo
 	{
 		public:
+
+		enum ndError
+		{
+			m_noError,
+			m_gridsOverFlow,
+		};
+
 		Image(const ndSphFluidInitInfo& info);
 		void Init(ndCudaSphFluid& fluid);
 
@@ -183,11 +190,11 @@ class ndCudaSphFluid
 		ndAssessor<ndGridHash> m_hashGridMap;
 		ndAssessor<ndSphFluidAabb> m_pointsAabb;
 
-		cudaError_t m_cudaStatus;
 		ndSphFluidAabb m_aabb;
 		ndGridNeighborInfo m_neighborgInfo;
 		int m_activeHashGridMapSize;
 
+		ndError m_error;
 		ndErrorCode m_errorCode;
 	};
 
@@ -205,6 +212,7 @@ class ndCudaSphFluid
 	D_CUDA_API void Update(float timestep);
 
 	void InitBuffers();
+	void HandleErrors();
 	void CaculateAabb();
 	void CreateGrids();
 

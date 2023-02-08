@@ -61,12 +61,14 @@ class ndAssessor
 	ndAssessor()
 		:m_array(nullptr)
 		,m_size(0)
+		,m_capacity(0)
 	{
 	}
 
 	ndAssessor(ndCudaDeviceBuffer<T>& buffer)
 		:m_array(buffer.m_array)
 		,m_size(buffer.m_size)
+		,m_capacity(buffer.m_capacity)
 	{
 	}
 
@@ -82,6 +84,7 @@ class ndAssessor
 
 	T* m_array;
 	int m_size;
+	int m_capacity;
 };
 
 template<class T>

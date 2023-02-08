@@ -35,6 +35,8 @@ ndCudaSphFluid::Image::Image(const ndSphFluidInitInfo& info)
 void ndCudaSphFluid::Image::Init(ndCudaSphFluid& fluid)
 {
 	m_errorCode = ndErrorCode(m_context->m_device);
+
+	m_error = m_noError;
 	m_errorCode.Set(0);
 	m_param = ndKernelParams (m_context->m_device, m_context->m_device->m_workGroupSize, fluid.m_points.GetCount());
 	
@@ -335,7 +337,11 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 			fluid->m_hashGridMap[activeHashGridMapSize].m_gridHash = uint64_t (- 1);
 			fluid->m_activeHashGridMapSize = activeHashGridMapSize;
 
-			//fluid->m_errorCode.Set(-2);
+			if (fluid->m_activeHashGridMapSize > fluid->m_hashGridMap.m_capacity)
+			{
+				fluid->m_errorCode.Set(-1);
+				fluid->m_error = ndCudaSphFluid::Image::m_gridsOverFlow;
+			}
 		}
 	}
 	else
@@ -346,7 +352,11 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 			fluid->m_hashGridMap[activeHashGridMapSize].m_gridHash = uint64_t(-1);
 			fluid->m_activeHashGridMapSize = activeHashGridMapSize;
 
-			//fluid->m_errorCode.Set(-2);
+			if (fluid->m_activeHashGridMapSize > fluid->m_hashGridMap.m_capacity)
+			{
+				fluid->m_errorCode.Set(-1);
+				fluid->m_error = ndCudaSphFluid::Image::m_gridsOverFlow;
+			}
 		}
 	}
 }
@@ -356,70 +366,77 @@ __global__ void ndCreateGrids(ndCudaSphFluid::Image* fluid)
 	int blockId = blockIdx.x;
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
+
+	__shared__  float error;
+	__shared__  float scanStart;
+
+
 	int base = blockSride * fluid->m_param.m_blocksPerKernel * blockId;
 
 	const ndCudaVector origin(fluid->m_aabb.m_min);
 	const ndCudaVector box(fluid->m_gridSize * 0.5f * 0.99f);
 	const ndCudaVector invGridSize(1.0f / fluid->m_gridSize);
 
-	__shared__  float scanStart;
 	if (threadId == 0)
 	{
+		error = fluid->m_error;
 		scanStart = fluid->m_gridScans[0];
 	}
 	__syncthreads();
 
-	for (int i = 0; i < fluid->m_param.m_blocksPerKernel; ++i)
+	if (error != ndCudaSphFluid::Image::m_noError)
 	{
-		int index = base + threadId;
-		if (index < fluid->m_points.m_size)
+		for (int i = 0; i < fluid->m_param.m_blocksPerKernel; ++i)
 		{
-			//const ndVector r(posit[i] - origin);
-			//const ndVector p(r * invGridSize);
-			//const ndGridHash hashKey(p, i);
-			const ndCudaVector posit(fluid->m_points[index]);
-			const ndCudaVector r(posit - origin);
-			const ndCudaVector p(r - origin);
-			//const ndCudaSphFluid::ndGridHash boxHash(p, i);
-
-			//const ndVector p0((r - box) * invGridSize);
-			//const ndVector p1((r + box) * invGridSize);
-			//ndGridHash box0Hash(p0, i);
-			//const ndGridHash box1Hash(p1, i);
-			//const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
-			const ndCudaVector p0((r - box) * invGridSize);
-			const ndCudaVector p1((r + box) * invGridSize);
-			const ndCudaSphFluid::ndGridHash box0Hash(p0, index);
-			const ndCudaSphFluid::ndGridHash box1Hash(p1, index);
-			const ndCudaSphFluid::ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
-
-			//const ndInt32 base = scans[i];
-			//const ndInt32 count = scans[i + 1] - base;
-			//const ndInt32 code = ndInt32(codeHash.m_z * 2 + codeHash.m_x);
-			const int base = fluid->m_gridScans[index] - scanStart;
-			const unsigned code = unsigned(codeHash.m_z * 2 + codeHash.m_x);
-			const ndCudaSphFluid::ndGridHash* const neigborgh = &fluid->m_neighborgInfo.m_neighborDirs[code][0];
-			//ndAssert(count == neiborghood.m_counter[code]);
-			const int count = fluid->m_neighborgInfo.m_counter[code];
-			
-			const ndCudaSphFluid::ndGridHash hashKey(p, index);
-			for (int j = 0; j < count; ++j)
+			int index = base + threadId;
+			if (index < fluid->m_points.m_size)
 			{
-				//ndGridHash quadrand(box0Hash);
-				ndCudaSphFluid::ndGridHash quadrand(box0Hash);
-				//quadrand.m_gridHash += neigborgh[j].m_gridHash;
-				 quadrand.m_gridHash += neigborgh[j].m_gridHash;
-				//quadrand.m_cellType = ndGridType(quadrand.m_gridHash == hashKey.m_gridHash);
-				quadrand.m_cellType = ndCudaSphFluid::ndGridType(quadrand.m_gridHash == hashKey.m_gridHash);
-				//ndAssert(quadrand.m_cellType == ((quadrand.m_gridHash == hashKey.m_gridHash) ? ndHomeGrid : ndAdjacentGrid));
-				//dst[base + j] = quadrand;
-				fluid->m_hashGridMap[base + j] = quadrand;
+				//const ndVector r(posit[i] - origin);
+				//const ndVector p(r * invGridSize);
+				//const ndGridHash hashKey(p, i);
+				const ndCudaVector posit(fluid->m_points[index]);
+				const ndCudaVector r(posit - origin);
+				const ndCudaVector p(r - origin);
+				//const ndCudaSphFluid::ndGridHash boxHash(p, i);
+
+				//const ndVector p0((r - box) * invGridSize);
+				//const ndVector p1((r + box) * invGridSize);
+				//ndGridHash box0Hash(p0, i);
+				//const ndGridHash box1Hash(p1, i);
+				//const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
+				const ndCudaVector p0((r - box) * invGridSize);
+				const ndCudaVector p1((r + box) * invGridSize);
+				const ndCudaSphFluid::ndGridHash box0Hash(p0, index);
+				const ndCudaSphFluid::ndGridHash box1Hash(p1, index);
+				const ndCudaSphFluid::ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
+
+				//const ndInt32 base = scans[i];
+				//const ndInt32 count = scans[i + 1] - base;
+				//const ndInt32 code = ndInt32(codeHash.m_z * 2 + codeHash.m_x);
+				const int base = fluid->m_gridScans[index] - scanStart;
+				const unsigned code = unsigned(codeHash.m_z * 2 + codeHash.m_x);
+				const ndCudaSphFluid::ndGridHash* const neigborgh = &fluid->m_neighborgInfo.m_neighborDirs[code][0];
+				//ndAssert(count == neiborghood.m_counter[code]);
+				const int count = fluid->m_neighborgInfo.m_counter[code];
+
+				const ndCudaSphFluid::ndGridHash hashKey(p, index);
+				for (int j = 0; j < count; ++j)
+				{
+					//ndGridHash quadrand(box0Hash);
+					ndCudaSphFluid::ndGridHash quadrand(box0Hash);
+					//quadrand.m_gridHash += neigborgh[j].m_gridHash;
+					quadrand.m_gridHash += neigborgh[j].m_gridHash;
+					//quadrand.m_cellType = ndGridType(quadrand.m_gridHash == hashKey.m_gridHash);
+					quadrand.m_cellType = ndCudaSphFluid::ndGridType(quadrand.m_gridHash == hashKey.m_gridHash);
+					//ndAssert(quadrand.m_cellType == ((quadrand.m_gridHash == hashKey.m_gridHash) ? ndHomeGrid : ndAdjacentGrid));
+					//dst[base + j] = quadrand;
+					fluid->m_hashGridMap[base + j] = quadrand;
+				}
 			}
+			base += blockSride;
 		}
-		base += blockSride;
 	}
 }
-
 
 ndCudaSphFluid::ndCudaSphFluid(const ndSphFluidInitInfo& info)
 	:m_imageCpu(info)
@@ -427,14 +444,14 @@ ndCudaSphFluid::ndCudaSphFluid(const ndSphFluidInitInfo& info)
 	,m_points()
 	,m_pointsAabb()
 {
-	m_imageCpu.m_cudaStatus = cudaMalloc((void**)&m_imageGpu, sizeof (Image));
-	ndAssert(m_imageCpu.m_cudaStatus == cudaSuccess);
+	m_imageCpu.m_context->m_device->m_lastError = cudaMalloc((void**)&m_imageGpu, sizeof (Image));
+	ndAssert(m_imageCpu.m_context->m_device->m_lastError == cudaSuccess);
 }
 
 ndCudaSphFluid::~ndCudaSphFluid()
 {
-	m_imageCpu.m_cudaStatus = cudaFree(m_imageGpu);
-	ndAssert(m_imageCpu.m_cudaStatus == cudaSuccess);
+	m_imageCpu.m_context->m_device->m_lastError = cudaFree(m_imageGpu);
+	ndAssert(m_imageCpu.m_context->m_device->m_lastError == cudaSuccess);
 }
 
 void ndCudaSphFluid::MemCpy(const double* const src, int strideInItems, int items)
@@ -480,8 +497,8 @@ void ndCudaSphFluid::GetPositions(float* const dst, int strideInItems, int items
 void ndCudaSphFluid::InitBuffers()
 {
 	m_imageCpu.Init(*this);
-	m_imageCpu.m_cudaStatus = cudaMemcpy(m_imageGpu, &m_imageCpu, sizeof (Image), cudaMemcpyHostToDevice);
-	ndAssert(m_imageCpu.m_cudaStatus == cudaSuccess);
+	m_imageCpu.m_context->m_device->m_lastError = cudaMemcpy(m_imageGpu, &m_imageCpu, sizeof (Image), cudaMemcpyHostToDevice);
+	ndAssert(m_imageCpu.m_context->m_device->m_lastError == cudaSuccess);
 }
 
 void ndCudaSphFluid::CaculateAabb()
@@ -515,10 +532,9 @@ bool ndCudaSphFluid::TraceHashes()
 	return true;
 }
 
-
 void ndCudaSphFluid::Update(float timestep)
 {
-	ndAssert(m_imageCpu.m_errorCode.Get() == 0);
+	HandleErrors();
 	CaculateAabb();
 	CreateGrids();
 
@@ -535,6 +551,39 @@ void ndCudaSphFluid::Update(float timestep)
 	scans.ReadData(&xxxxxxx->m_gridScans[0], scans.GetCount());
 	scans.SetCount(xxxxxxx->m_param.m_itemCount);
 #endif
+}
+
+void ndCudaSphFluid::HandleErrors()
+{
+	if (m_imageCpu.m_errorCode.Get())
+	{
+		ndAssert(0);
+		char imageBuff[sizeof(Image) + 256];
+		Image* image = (Image*)&imageBuff;
+		m_imageCpu.m_context->m_device->m_lastError = cudaMemcpy(image, m_imageGpu, sizeof(Image), cudaMemcpyDeviceToHost);
+		ndAssert(m_imageCpu.m_context->m_device->m_lastError == cudaSuccess);
+		cudaDeviceSynchronize();
+
+		switch (image->m_error)
+		{
+			case Image::m_gridsOverFlow:
+			{
+				ndAssert(0);
+				break;
+			}
+
+			default:;
+			{
+				ndAssert(0);
+			}
+		}
+
+		m_imageCpu.m_errorCode.Set(0);
+		m_imageCpu.m_error = Image::m_noError;
+
+		m_imageCpu.m_context->m_device->m_lastError = cudaMemcpy(m_imageGpu, &m_imageCpu, sizeof(Image), cudaMemcpyHostToDevice);
+		ndAssert(m_imageCpu.m_context->m_device->m_lastError == cudaSuccess);
+	}
 }
 
 void ndCudaSphFluid::CreateGrids()

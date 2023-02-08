@@ -1058,7 +1058,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 
 bool ndBodySphFluid::TraceHashes() const
 {
-#if 1
+#if 0
 	ndWorkingBuffers& data = *m_workingBuffers;
 	ndGridHash* xxxx = &data.m_hashGridMap[0];
 	for (int i = 0; i < data.m_hashGridMap.GetCount(); i++)
