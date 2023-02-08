@@ -329,14 +329,18 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 
 		if ((blockId == (gridDim.x - 1) && (threadId == 0)))
 		{
-			fluid->m_activeHashGridMapSize = scanSum[halfKernelStride + kernelStride - 1];
+			int activeHashGridMapSize = scanSum[halfKernelStride + kernelStride - 1];
+			fluid->m_hashGridMap[activeHashGridMapSize].m_gridHash = uint64_t (- 1);
+			fluid->m_activeHashGridMapSize = activeHashGridMapSize;
 		}
 	}
 	else
 	{
 		if ((blockId == (gridDim.x - 1) && (threadId == 0)))
 		{
-			fluid->m_activeHashGridMapSize = fluid->m_gridScans[scanSize];
+			int activeHashGridMapSize = fluid->m_gridScans[scanSize];
+			fluid->m_hashGridMap[activeHashGridMapSize].m_gridHash = uint64_t(-1);
+			fluid->m_activeHashGridMapSize = activeHashGridMapSize;
 		}
 	}
 }
@@ -351,6 +355,13 @@ __global__ void ndCreateGrids(ndCudaSphFluid::Image* fluid)
 	const ndCudaVector origin(fluid->m_aabb.m_min);
 	const ndCudaVector box(fluid->m_gridSize * 0.5f * 0.99f);
 	const ndCudaVector invGridSize(1.0f / fluid->m_gridSize);
+
+	__shared__  float scanStart;
+	if (threadId == 0)
+	{
+		scanStart = fluid->m_gridScans[0];
+	}
+	__syncthreads();
 
 	for (int i = 0; i < fluid->m_param.m_blocksPerKernel; ++i)
 	{
@@ -379,7 +390,7 @@ __global__ void ndCreateGrids(ndCudaSphFluid::Image* fluid)
 			//const ndInt32 base = scans[i];
 			//const ndInt32 count = scans[i + 1] - base;
 			//const ndInt32 code = ndInt32(codeHash.m_z * 2 + codeHash.m_x);
-			const int base = fluid->m_gridScans[index];
+			const int base = fluid->m_gridScans[index] - scanStart;
 			const unsigned code = unsigned(codeHash.m_z * 2 + codeHash.m_x);
 			const ndCudaSphFluid::ndGridHash* const neigborgh = &fluid->m_neighborgInfo.m_neighborDirs[code][0];
 			//ndAssert(count == neiborghood.m_counter[code]);
