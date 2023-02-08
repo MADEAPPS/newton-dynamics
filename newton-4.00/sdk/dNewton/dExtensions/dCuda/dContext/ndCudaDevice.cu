@@ -23,18 +23,43 @@
 #include "ndCudaUtils.h"
 #include "ndCudaDevice.h"
 
+#define D_STATUS_ERROR_SIZE	512
+
+ndErrorCode::ndErrorCode()
+	:m_baseAdress(nullptr)
+	,m_offset(0)
+{
+}
+
+ndErrorCode::ndErrorCode(ndCudaDevice* const context)
+	:m_baseAdress(context->m_statusMemory)
+	,m_offset(0)
+{
+	for (int i = 0; i < D_STATUS_ERROR_SIZE; i++)
+	{
+		if (m_baseAdress[i] == -1)
+		{
+			m_offset = i;
+			m_baseAdress[m_offset] = 0;
+			return;
+		}
+	}
+	ndAssert(0);
+}
+
+ndErrorCode::~ndErrorCode()
+{
+	m_baseAdress[m_offset] = -1;
+}
+
+
 ndCudaDevice::ndCudaDevice()
 {
-	cudaError_t cudaStatus;
-	cudaStatus = cudaGetDeviceProperties(&m_prop, 0);
-	ndAssert(cudaStatus == cudaSuccess);
+	m_lastError = cudaGetDeviceProperties(&m_prop, 0);
+	ndAssert(m_lastError == cudaSuccess);
 	
-	cudaStatus = cudaSetDevice(0);
-	ndAssert(cudaStatus == cudaSuccess);
-	if (cudaStatus != cudaSuccess)
-	{
-		ndAssert(0);
-	}
+	m_lastError = cudaSetDevice(0);
+	ndAssert(m_lastError == cudaSuccess);
 	
 	cuTrace(("gpu: %s\n", m_prop.name));
 	cuTrace(("compute capability: %d.%d\n", m_prop.major, m_prop.minor));
@@ -48,18 +73,19 @@ ndCudaDevice::ndCudaDevice()
 
 	m_workGroupSize = std::min(m_prop.maxThreadsPerBlock, 512);
 	m_computeUnits = std::min(4 * m_prop.multiProcessorCount, 512);
+
+	m_lastError = cudaMallocManaged(&m_statusMemory, D_STATUS_ERROR_SIZE * sizeof(int));
+	ndAssert(m_lastError == cudaSuccess);
+	memset(m_statusMemory, -1, D_STATUS_ERROR_SIZE * sizeof(int));
 }
 
 ndCudaDevice::~ndCudaDevice()
 {
-	cudaError_t cudaStatus;
-	cudaStatus = cudaDeviceReset();
-	ndAssert(cudaStatus == cudaSuccess);
-	
-	if (cudaStatus != cudaSuccess)
-	{
-		ndAssert(0);
-	}
+	m_lastError = cudaFree(m_statusMemory);
+	ndAssert(m_lastError == cudaSuccess);
+
+	m_lastError = cudaDeviceReset();
+	ndAssert(m_lastError == cudaSuccess);
 }
 
 void* ndCudaDevice::operator new (size_t size)

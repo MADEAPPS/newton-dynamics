@@ -81,8 +81,12 @@ class ndCudaContextImplement
 	//cudaStream_t m_solverComputeStream;
 	//unsigned m_frameCounter;
 
+	private:
 	ndCudaDevice* m_device;
+	ndCudaDeviceBuffer<int> m_sortPrefixBuffer;
 
+	friend class ndCudaSphFluid;
+	
 	/// **********************
 	ndCudaHostBuffer<int> m_src;
 	ndCudaHostBuffer<int> m_dst0;
@@ -91,7 +95,7 @@ class ndCudaContextImplement
 	ndCudaHostBuffer<int> m_scan1;
 	ndCudaDeviceBuffer<int> m_buf0;
 	ndCudaDeviceBuffer<int> m_buf1;
-	ndCudaDeviceBuffer<int> m_sortPrefixBuffer;
 };
+
 
 #endif

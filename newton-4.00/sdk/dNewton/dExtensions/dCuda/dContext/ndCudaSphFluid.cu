@@ -34,6 +34,8 @@ ndCudaSphFluid::Image::Image(const ndSphFluidInitInfo& info)
 
 void ndCudaSphFluid::Image::Init(ndCudaSphFluid& fluid)
 {
+	m_errorCode = ndErrorCode(m_context->m_device);
+	m_errorCode.Set(0);
 	m_param = ndKernelParams (m_context->m_device, m_context->m_device->m_workGroupSize, fluid.m_points.GetCount());
 	
 	fluid.m_pointsAabb.SetCount(m_param.m_kernelCount + 32);
@@ -332,6 +334,8 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 			int activeHashGridMapSize = scanSum[halfKernelStride + kernelStride - 1];
 			fluid->m_hashGridMap[activeHashGridMapSize].m_gridHash = uint64_t (- 1);
 			fluid->m_activeHashGridMapSize = activeHashGridMapSize;
+
+			//fluid->m_errorCode.Set(-2);
 		}
 	}
 	else
@@ -341,6 +345,8 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 			int activeHashGridMapSize = fluid->m_gridScans[scanSize];
 			fluid->m_hashGridMap[activeHashGridMapSize].m_gridHash = uint64_t(-1);
 			fluid->m_activeHashGridMapSize = activeHashGridMapSize;
+
+			//fluid->m_errorCode.Set(-2);
 		}
 	}
 }
@@ -491,7 +497,7 @@ void ndCudaSphFluid::CaculateAabb()
 
 bool ndCudaSphFluid::TraceHashes()
 {
-#if 1
+#if 0
 	char imageBuff[sizeof(Image) + 256];
 	Image* image = (Image*)&imageBuff;
 	m_imageCpu.m_cudaStatus = cudaMemcpy(image, m_imageGpu, sizeof(Image), cudaMemcpyDeviceToHost);
@@ -512,6 +518,7 @@ bool ndCudaSphFluid::TraceHashes()
 
 void ndCudaSphFluid::Update(float timestep)
 {
+	ndAssert(m_imageCpu.m_errorCode.Get() == 0);
 	CaculateAabb();
 	CreateGrids();
 

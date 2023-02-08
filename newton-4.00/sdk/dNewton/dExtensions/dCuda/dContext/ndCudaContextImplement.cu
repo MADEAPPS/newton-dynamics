@@ -574,6 +574,7 @@ void radix_sort(unsigned int* const d_out___, unsigned int* const d_in___, unsig
 
 #endif
 
+
 ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	:m_device(device)
 	//,m_sceneInfoGpu(nullptr)
@@ -610,7 +611,6 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//}
 	//
 	//*m_sceneInfoCpu = ndCudaSceneInfo();
-
 	m_sortPrefixBuffer.SetCount(m_sortPrefixBuffer.GetCapacity());
 
 
@@ -659,6 +659,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 ndCudaContextImplement::~ndCudaContextImplement()
 {
 	ndAssert(m_device);
+	
 	//cudaError_t cudaStatus;
 	//cudaStatus = cudaFreeHost(m_sceneInfoCpu);
 	//ndAssert(cudaStatus == cudaSuccess);

@@ -40,8 +40,10 @@ class ndCudaDevice
 	int GetComputeUnits() const;
 
 	struct cudaDeviceProp m_prop;
+	int* m_statusMemory;
 	int m_computeUnits;
 	int m_workGroupSize;
+	cudaError_t m_lastError;
 };
 
 class ndKernelParams
@@ -54,6 +56,28 @@ class ndKernelParams
 	int m_kernelCount;
 	int m_workGroupSize;
 	int m_blocksPerKernel;
+};
+
+class ndErrorCode
+{
+	public:
+	ndErrorCode();
+	ndErrorCode(ndCudaDevice* const context);
+	~ndErrorCode();
+
+	int __device__ __host__ Get() const
+	{
+		return m_baseAdress[m_offset];
+	}
+
+	void __device__ __host__ Set(int x)
+	{
+		m_baseAdress[m_offset] = x;
+	}
+
+	private:
+	int* m_baseAdress;
+	int m_offset;
 };
 
 

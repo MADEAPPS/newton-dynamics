@@ -187,6 +187,8 @@ class ndCudaSphFluid
 		ndSphFluidAabb m_aabb;
 		ndGridNeighborInfo m_neighborgInfo;
 		int m_activeHashGridMapSize;
+
+		ndErrorCode m_errorCode;
 	};
 
 	D_CUDA_API ndCudaSphFluid(const ndSphFluidInitInfo& info);
