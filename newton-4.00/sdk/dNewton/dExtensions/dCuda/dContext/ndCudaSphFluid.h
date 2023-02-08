@@ -206,7 +206,7 @@ class ndCudaSphFluid
 	void CaculateAabb();
 	void CreateGrids();
 
-	bool TraceHashes() const;
+	bool TraceHashes();
 
 	Image m_imageCpu;
 	Image* m_imageGpu;

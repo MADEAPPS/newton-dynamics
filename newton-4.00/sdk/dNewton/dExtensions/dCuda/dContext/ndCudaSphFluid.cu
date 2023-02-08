@@ -254,13 +254,11 @@ __global__ void ndCountGrids(ndCudaSphFluid::Image* fluid)
 			const ndCudaSphFluid::ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
 			
 			const unsigned code = unsigned(codeHash.m_z * 2 + codeHash.m_x);
-			//fluid->m_gridScans[index] = fluid->m_neighborgInfo.m_counter[code];
-			//scans[halfBlockSride + threadId + 1] = fluid->m_neighborgInfo.m_counter[code];
 			scans[halfBlockSride + threadId] = fluid->m_neighborgInfo.m_counter[code];
 		}
 		else
 		{
-			scans[halfBlockSride + threadId + 1] = 0;
+			scans[halfBlockSride + threadId] = 0;
 		}
 
 		for (int j = 1; j < blockSride; j = j << 1)
@@ -317,28 +315,29 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 				scanSum[halfKernelStride + threadId] = sum;
 			}
 		}
+
+		int base = blockSride * blockId;
+		int itemsPerBlock = fluid->m_param.m_workGroupSize * fluid->m_param.m_blocksPerKernel;
+		for (int i = 0; i < fluid->m_param.m_kernelCount; ++i)
+		{
+			int index = base + threadId;
+			float sumAcc = scanSum[halfKernelStride + i - 1];
+			fluid->m_gridScans[index] = fluid->m_gridScans[index] + sumAcc;
+			base += itemsPerBlock;
+		}
+		__syncthreads();
+
+		if ((blockId == (gridDim.x - 1) && (threadId == 0)))
+		{
+			fluid->m_activeHashGridMapSize = scanSum[halfKernelStride + kernelStride - 1];
+		}
 	}
 	else
 	{
-		halfKernelStride = 1;
-		scanSum[0] = 0;
-		scanSum[1] = fluid->m_gridScans[scanSize + 0];
-	}
-	__syncthreads();
-	
-	int base = blockSride * blockId;
-	int itemsPerBlock = fluid->m_param.m_workGroupSize * fluid->m_param.m_blocksPerKernel;
-	for (int i = 0; i < fluid->m_param.m_kernelCount; ++i)
-	{
-		int index = base + threadId;
-		float sumAcc = scanSum[halfKernelStride + i - 1];
-		fluid->m_gridScans[index] = fluid->m_gridScans[index] + sumAcc;
-		base += itemsPerBlock;
-	}
-	
-	if ((blockId == (gridDim.x - 1) && (threadId == 0)))
-	{
-		fluid->m_activeHashGridMapSize = scanSum[halfKernelStride + kernelStride - 1];
+		if ((blockId == (gridDim.x - 1) && (threadId == 0)))
+		{
+			fluid->m_activeHashGridMapSize = fluid->m_gridScans[scanSize];
+		}
 	}
 }
 
@@ -479,14 +478,18 @@ void ndCudaSphFluid::CaculateAabb()
 	ndCalculateAabb << <1, power, 0 >> > (m_imageGpu);
 }
 
-bool ndCudaSphFluid::TraceHashes() const
+bool ndCudaSphFluid::TraceHashes()
 {
 #if 1
+	char imageBuff[sizeof(Image) + 256];
+	Image* image = (Image*)&imageBuff;
+	m_imageCpu.m_cudaStatus = cudaMemcpy(image, m_imageGpu, sizeof(Image), cudaMemcpyDeviceToHost);
 	cudaDeviceSynchronize();
+
 	ndCudaHostBuffer<ndGridHash> buffer;
-	buffer.SetCount(m_imageCpu.m_activeHashGridMapSize + 4000);
-	buffer.ReadData(&m_hashGridMap[0], m_imageCpu.m_activeHashGridMapSize);
-	for (int i = 0; i < m_imageCpu.m_activeHashGridMapSize; i++)
+	buffer.SetCount(image->m_activeHashGridMapSize + 4000);
+	buffer.ReadData(&m_hashGridMap[0], image->m_activeHashGridMapSize);
+	for (int i = 0; i < image->m_activeHashGridMapSize; i++)
 	{
 		cuTrace(("id(%d)\tx(%d)\tz(%d)\n", buffer[i].m_particleIndex, buffer[i].m_x, buffer[i].m_z));
 	}
