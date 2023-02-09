@@ -60,9 +60,10 @@ inline T __device__ __host__ cuSelect(bool test, T A, T B)
 template <class T>
 inline void __device__ __host__ cuSwap(T& A, T& B)
 {
-	T tmp(A);
-	A = B;
-	B = tmp;
+	T tmpA(A);
+	T tmpB(B);
+	A = tmpB;
+	B = tmpA;
 }
 
 #endif
