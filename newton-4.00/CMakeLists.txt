@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-option("NEWTON_EXCLUDE_TEST" "generate test project" "OFF")
+option("NEWTON_EXCLUDE_UNIX_TEST" "generate unit test projects" "OFF")
 option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" "ON")
 option("NEWTON_BUILD_PROFILER" "build profiler" OFF)
 option("NEWTON_BUILD_SINGLE_THREADED" "single threaded" OFF)
@@ -190,7 +190,7 @@ add_subdirectory(sdk)
 add_subdirectory(thirdParty)
 add_subdirectory(applications)
 
-if (NOT NEWTON_EXCLUDE_TEST)
+if (NOT NEWTON_EXCLUDE_UNIX_TEST)
 	message("building unit tests")
 	file(REMOVE_RECURSE ${PROJECT_BINARY_DIR}/_deps)
 	add_subdirectory(tests)
