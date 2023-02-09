@@ -53,7 +53,7 @@ void ndCudaSphFluid::Image::Init(ndCudaSphFluid& fluid)
 	
 	m_points = ndAssessor<ndCudaVector>(fluid.m_points);
 	m_hashGridMap = ndAssessor<ndGridHash>(fluid.m_hashGridMap);
-	m_hashGridMapTemp = ndAssessor<ndGridHash>(m_hashGridMapTemp);
+	m_hashGridMapTemp = ndAssessor<ndGridHash>(fluid.m_hashGridMapTemp);
 	m_pointsAabb = ndAssessor<ndSphFluidAabb>(fluid.m_pointsAabb);
 	m_gridScans = ndAssessor<int>(m_context->m_implement->m_sortPrefixBuffer);
 }
@@ -343,6 +343,8 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 
 			fluid->m_sortHashGridMap0 = fluid->m_hashGridMap;
 			fluid->m_sortHashGridMap1 = fluid->m_hashGridMapTemp;
+			fluid->m_sortHashGridMap0.m_size = activeHashGridMapSize;
+			fluid->m_sortHashGridMap1.m_size = activeHashGridMapSize;
 
 			if (fluid->m_activeHashGridMapSize > fluid->m_hashGridMap.m_capacity)
 			{
@@ -358,8 +360,11 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 			int activeHashGridMapSize = fluid->m_gridScans[scanSize];
 			fluid->m_hashGridMap[activeHashGridMapSize].m_gridHash = uint64_t(-1);
 			fluid->m_activeHashGridMapSize = activeHashGridMapSize;
+
 			fluid->m_sortHashGridMap0 = fluid->m_hashGridMap;
 			fluid->m_sortHashGridMap1 = fluid->m_hashGridMapTemp;
+			fluid->m_sortHashGridMap0.m_size = activeHashGridMapSize;
+			fluid->m_sortHashGridMap1.m_size = activeHashGridMapSize;
 
 			if (fluid->m_activeHashGridMapSize > fluid->m_hashGridMap.m_capacity)
 			{
@@ -445,16 +450,29 @@ __global__ void ndCreateGrids(ndCudaSphFluid::Image* fluid)
 	}
 }
 
-//__global__ void ndSortGrids(ndCudaSphFluid::Image* fluid)
-//{
-//	int blockId = blockIdx.x;
-//	int threadId = threadIdx.x;
-//	int blockSride = blockDim.x;
-//	if (fluid->m_error == ndCudaSphFluid::Image::m_noError)
-//	{
-//
-//	}
-//}
+template <typename ndEvaluateRadix_xLow, typename ndEvaluateRadix_zLow>
+__global__ void ndSortGrids(ndCudaSphFluid::Image* fluid, 
+	ndEvaluateRadix_xLow sort_xLow, ndEvaluateRadix_zLow sort_zLow)
+{
+	if (fluid->m_error == ndCudaSphFluid::Image::m_noError)
+	{
+		cudaStream_t stream;
+		//cudaStreamCreateWithFlags(&s, cudaStreamNonBlocking);
+		cudaStreamCreateWithFlags(&stream, cudaStreamDefault);
+		
+		ndKernelParams params(fluid->m_param, D_COUNTING_SORT_BLOCK_SIZE, fluid->m_activeHashGridMapSize);
+
+		ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, 256, sort_xLow);
+		ndCudaAddPrefix << <1, 256, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, sort_xLow);
+		ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1, fluid->m_gridScans, 256, sort_xLow);
+		
+		ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap1, fluid->m_gridScans, 256, sort_zLow);
+		ndCudaAddPrefix << <1, 256, 0, stream >> > (params, fluid->m_sortHashGridMap1, fluid->m_gridScans, sort_zLow);
+		ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap1, fluid->m_sortHashGridMap0, fluid->m_gridScans, 256, sort_zLow);
+
+		cudaStreamDestroy(stream);
+	}
+}
 
 ndCudaSphFluid::ndCudaSphFluid(const ndSphFluidInitInfo& info)
 	:m_imageCpu(info)
@@ -556,7 +574,7 @@ void ndCudaSphFluid::Update(float timestep)
 	HandleErrors();
 	CaculateAabb();
 	CreateGrids();
-	SortGrids();
+	//SortGrids();
 
 #if 0
 	Image* image = ndAlloca(Image, 2);
@@ -618,12 +636,12 @@ void ndCudaSphFluid::CreateGrids()
 
 void ndCudaSphFluid::SortGrids()
 {
+#if 0
 	Image* image = ndAlloca(Image, 2);
 	m_imageCpu.m_context->m_device->m_lastError = cudaMemcpy(image, m_imageGpu, sizeof(Image), cudaMemcpyDeviceToHost);
 	ndAssert(m_imageCpu.m_context->m_device->m_lastError == cudaSuccess);
 	cudaDeviceSynchronize();
 
-	//ndSortGrids << <1, 1, 0 >> > (m_imageGpu);
 	auto GetRadix_xLow = []  __device__(const ndGridHash& item)
 	{
 		return item.m_xLow;
@@ -632,12 +650,12 @@ void ndCudaSphFluid::SortGrids()
 	{
 		return item.m_xHigh;
 	};
-
+	
 	auto GetRadix_zLow = []  __device__(const ndGridHash& item)
 	{
 		return item.m_zLow;
 	};
-
+	
 	auto GetRadix_zHigh = []  __device__(const ndGridHash& item)
 	{
 		return item.m_zHigh;
@@ -645,13 +663,28 @@ void ndCudaSphFluid::SortGrids()
 
 	m_hashGridMap.SetCount(image->m_activeHashGridMapSize);
 	m_hashGridMapTemp.SetCount(image->m_activeHashGridMapSize);
-
+	
 	//ndAssert(TraceHashes());
 	ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMap, m_hashGridMapTemp, GetRadix_xLow);
-	ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMapTemp, m_hashGridMap, GetRadix_xHigh);
-
-	ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMap, m_hashGridMapTemp, GetRadix_zLow);
-	ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMapTemp, m_hashGridMap, GetRadix_zHigh);
-
+	//ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMapTemp, m_hashGridMap, GetRadix_xHigh);
+	
+	//ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMap, m_hashGridMapTemp, GetRadix_zLow);
+	//ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMapTemp, m_hashGridMap, GetRadix_zHigh);
+	
 	//ndAssert(TraceHashes());
+
+#else
+	auto GetRadix_xLow = []  __device__(const ndGridHash & item)
+	{
+		return item.m_xLow;
+	};
+	auto GetRadix_zLow = []  __device__(const ndGridHash& item)
+	{
+		return item.m_zLow;
+	};
+
+	ndSortGrids << < 1, 1, 0 >>> (m_imageGpu, GetRadix_xLow, GetRadix_zLow);
+
+	ndAssert(TraceHashes());
+#endif
 }

@@ -106,13 +106,14 @@ int ndCudaDevice::GetComputeUnits() const
 ndKernelParams::ndKernelParams(const ndCudaDevice* const device, int workGroupSize, int itemCount)
 	:m_itemCount(itemCount)
 	,m_workGroupSize(workGroupSize)
+	,m_deviceComputeUnits(device->GetComputeUnits())
 {
 	ndAssert(workGroupSize);
 	ndAssert(!(workGroupSize & (workGroupSize - 1)));
-	int deviceComputeUnits = device->GetComputeUnits();
+	//int deviceComputeUnits = device->GetComputeUnits();
 	int computeUnitsBashCount = (itemCount + m_workGroupSize - 1) / m_workGroupSize;
 
-	m_blocksPerKernel = (computeUnitsBashCount + deviceComputeUnits - 1) / deviceComputeUnits;
+	m_blocksPerKernel = (computeUnitsBashCount + m_deviceComputeUnits - 1) / m_deviceComputeUnits;
 	m_kernelCount = (itemCount + m_blocksPerKernel * m_workGroupSize - 1) / (m_blocksPerKernel * m_workGroupSize);
-	ndAssert(m_kernelCount <= deviceComputeUnits);
+	ndAssert(m_kernelCount <= m_deviceComputeUnits);
 }

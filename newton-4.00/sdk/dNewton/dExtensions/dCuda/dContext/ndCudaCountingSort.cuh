@@ -84,7 +84,6 @@ __global__ void ndCudaCountItems(const ndKernelParams params, const ndAssessor<T
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
 	int blockIndex = blockIdx.x;
-	//int bashSize = blocksCount * blockSride * blockIndex;
 	int bashSize = params.m_blocksPerKernel * params.m_workGroupSize * blockIndex;
 
 	if (threadId < radixStride)

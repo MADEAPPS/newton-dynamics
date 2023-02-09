@@ -52,10 +52,21 @@ class ndKernelParams
 	ndKernelParams() {}
 	ndKernelParams(const ndCudaDevice* const device, int workGroupSize, int itemCount);
 
+	__device__ __host__ ndKernelParams(const ndKernelParams& params, int workGroupSize, int itemCount)
+		:m_itemCount(itemCount)
+		,m_workGroupSize(workGroupSize)
+		,m_deviceComputeUnits(params.m_deviceComputeUnits)
+	{
+		int computeUnitsBashCount = (itemCount + m_workGroupSize - 1) / m_workGroupSize;
+		m_blocksPerKernel = (computeUnitsBashCount + m_deviceComputeUnits - 1) / m_deviceComputeUnits;
+		m_kernelCount = (itemCount + m_blocksPerKernel * m_workGroupSize - 1) / (m_blocksPerKernel * m_workGroupSize);
+	}
+
 	int m_itemCount;
 	int m_kernelCount;
 	int m_workGroupSize;
 	int m_blocksPerKernel;
+	int m_deviceComputeUnits;
 };
 
 class ndErrorCode
