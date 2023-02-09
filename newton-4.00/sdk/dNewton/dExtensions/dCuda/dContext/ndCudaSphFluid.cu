@@ -371,14 +371,12 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 
 __global__ void ndCreateGrids(ndCudaSphFluid::Image* fluid)
 {
-	int blockId = blockIdx.x;
-	int threadId = threadIdx.x;
-	int blockSride = blockDim.x;
-
 	__shared__  float error;
 	__shared__  float scanStart;
 
-
+	int blockId = blockIdx.x;
+	int threadId = threadIdx.x;
+	int blockSride = blockDim.x;
 	int base = blockSride * fluid->m_param.m_blocksPerKernel * blockId;
 
 	const ndCudaVector origin(fluid->m_aabb.m_min);
@@ -443,6 +441,17 @@ __global__ void ndCreateGrids(ndCudaSphFluid::Image* fluid)
 			}
 			base += blockSride;
 		}
+	}
+}
+
+__global__ void ndSortGrids(ndCudaSphFluid::Image* fluid)
+{
+	int blockId = blockIdx.x;
+	int threadId = threadIdx.x;
+	int blockSride = blockDim.x;
+	if (fluid->m_error == ndCudaSphFluid::Image::m_noError)
+	{
+
 	}
 }
 
@@ -609,5 +618,5 @@ void ndCudaSphFluid::CreateGrids()
 
 void ndCudaSphFluid::SortGrids()
 {
-
+	ndSortGrids << <1, 1, 0 >> > (m_imageGpu);
 }
