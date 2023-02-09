@@ -36,7 +36,7 @@
 //#define D_COUNTING_SORT_BLOCK_SIZE	(1<<10)
 
 template <class T, int exponentRadix, typename ndEvaluateRadix>
-void ndCountingSort(ndCudaContextImplement* const context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix);
+void ndCountingSort(ndCudaContextImplement* const context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndEvaluateRadix evaluateRadix);
 
 // *****************************************************************
 // 
@@ -233,12 +233,12 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 }
 
 template <class T, int exponentRadix, typename ndEvaluateRadix>
-void ndCountingSort(ndCudaContextImplement* const context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndCudaDeviceBuffer<int>& scansBuffer, ndEvaluateRadix evaluateRadix)
+void ndCountingSort(ndCudaContextImplement* const context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndEvaluateRadix evaluateRadix)
 {
 	ndAssessor<T> input(src);
 	ndAssessor<T> output(dst);
-	ndAssessor<int> prefixScanBuffer(context->m_sortPrefixBuffer);
-	ndKernelParams params(context->m_device, D_COUNTING_SORT_BLOCK_SIZE, src.GetCount());
+	ndAssessor<int> prefixScanBuffer(context->GetPrefixScanBuffer());
+	ndKernelParams params(context->GetDevice(), D_COUNTING_SORT_BLOCK_SIZE, src.GetCount());
 
 	int radixStride = 1 << exponentRadix;
 	ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, input, prefixScanBuffer, radixStride, evaluateRadix);

@@ -60,6 +60,8 @@ class ndCudaContextImplement
 	//void IntegrateUnconstrainedBodies(float timestep);
 
 	int GetComputeUnits() const;
+	ndCudaDevice* GetDevice() const;
+	ndCudaDeviceBuffer<int>& GetPrefixScanBuffer();
 	
 	
 	//ndCudaSceneInfo* m_sceneInfoGpu;
@@ -80,6 +82,8 @@ class ndCudaContextImplement
 	//cudaStream_t m_solverMemCpuStream;
 	//cudaStream_t m_solverComputeStream;
 	//unsigned m_frameCounter;
+
+	
 
 	private:
 	ndCudaDevice* m_device;

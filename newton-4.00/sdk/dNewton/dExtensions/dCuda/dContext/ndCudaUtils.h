@@ -57,6 +57,8 @@ typedef void (*ndMemFreeCallback) (void* const ptr);
 D_CUDA_API void* ndCudaMalloc(size_t size);
 D_CUDA_API void ndCudaFree(void* const ptr);
 
+#define ndAlloca(type, count) (type*) alloca (sizeof (type) * (count))
+
 #define D_CUDA_OPERATOR_NEW_AND_DELETE		\
 inline void *operator new (size_t size)		\
 {											\

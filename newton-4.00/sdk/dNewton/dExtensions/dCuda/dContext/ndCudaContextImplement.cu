@@ -679,6 +679,11 @@ ndCudaContextImplement::~ndCudaContextImplement()
 	//}
 }
 
+ndCudaDevice* ndCudaContextImplement::GetDevice() const
+{
+	return m_device;
+}
+
 const char* ndCudaContextImplement::GetStringId() const
 {
 	return m_device->m_prop.name;
@@ -687,6 +692,11 @@ const char* ndCudaContextImplement::GetStringId() const
 int ndCudaContextImplement::GetComputeUnits() const
 {
 	return m_device->GetComputeUnits();
+}
+
+ndCudaDeviceBuffer<int>& ndCudaContextImplement::GetPrefixScanBuffer()
+{
+	return m_sortPrefixBuffer;
 }
 
 #if 0

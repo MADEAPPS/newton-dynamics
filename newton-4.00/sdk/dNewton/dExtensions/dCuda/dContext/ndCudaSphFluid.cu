@@ -23,6 +23,7 @@
 #include "ndCudaDevice.h"
 #include "ndCudaContext.h"
 #include "ndCudaSphFluid.h"
+#include "ndCudaCountingSort.cuh"
 #include "ndCudaContextImplement.h"
 
 #define D_MAX_LOCAL_SIZE 512
@@ -390,7 +391,7 @@ __global__ void ndCreateGrids(ndCudaSphFluid::Image* fluid)
 	}
 	__syncthreads();
 
-	if (error != ndCudaSphFluid::Image::m_noError)
+	if (error == ndCudaSphFluid::Image::m_noError)
 	{
 		for (int i = 0; i < fluid->m_param.m_blocksPerKernel; ++i)
 		{
@@ -444,16 +445,16 @@ __global__ void ndCreateGrids(ndCudaSphFluid::Image* fluid)
 	}
 }
 
-__global__ void ndSortGrids(ndCudaSphFluid::Image* fluid)
-{
-	int blockId = blockIdx.x;
-	int threadId = threadIdx.x;
-	int blockSride = blockDim.x;
-	if (fluid->m_error == ndCudaSphFluid::Image::m_noError)
-	{
-
-	}
-}
+//__global__ void ndSortGrids(ndCudaSphFluid::Image* fluid)
+//{
+//	int blockId = blockIdx.x;
+//	int threadId = threadIdx.x;
+//	int blockSride = blockDim.x;
+//	if (fluid->m_error == ndCudaSphFluid::Image::m_noError)
+//	{
+//
+//	}
+//}
 
 ndCudaSphFluid::ndCudaSphFluid(const ndSphFluidInitInfo& info)
 	:m_imageCpu(info)
@@ -531,10 +532,10 @@ void ndCudaSphFluid::CaculateAabb()
 
 bool ndCudaSphFluid::TraceHashes()
 {
-#if 0
-	char imageBuff[sizeof(Image) + 256];
-	Image* image = (Image*)&imageBuff;
-	m_imageCpu.m_cudaStatus = cudaMemcpy(image, m_imageGpu, sizeof(Image), cudaMemcpyDeviceToHost);
+#if 1
+	Image* image = ndAlloca(Image, 2);
+	m_imageCpu.m_context->m_device->m_lastError = cudaMemcpy(image, m_imageGpu, sizeof(Image), cudaMemcpyDeviceToHost);
+	ndAssert(m_imageCpu.m_context->m_device->m_lastError == cudaSuccess);
 	cudaDeviceSynchronize();
 
 	ndCudaHostBuffer<ndGridHash> buffer;
@@ -544,6 +545,7 @@ bool ndCudaSphFluid::TraceHashes()
 	{
 		cuTrace(("id(%d)\tx(%d)\tz(%d)\n", buffer[i].m_particleIndex, buffer[i].m_x, buffer[i].m_z));
 	}
+	cuTrace(("\n"));
 #endif
 
 	return true;
@@ -556,18 +558,16 @@ void ndCudaSphFluid::Update(float timestep)
 	CreateGrids();
 	SortGrids();
 
-	ndAssert (TraceHashes());
-
 #if 0
-	char xxxxx[sizeof(Image) + 256];
-	Image* xxxxxxx = (Image*)&xxxxx;
-	m_imageCpu.m_cudaStatus = cudaMemcpy(xxxxxxx, m_imageGpu, sizeof(Image), cudaMemcpyDeviceToHost);
+	Image* image = ndAlloca(Image, 2);
+	m_imageCpu.m_context->m_device->m_lastError = cudaMemcpy(image, m_imageGpu, sizeof(Image), cudaMemcpyDeviceToHost);
+	ndAssert(m_imageCpu.m_context->m_device->m_lastError == cudaSuccess);
 	cudaDeviceSynchronize();
-	ndAssert(m_imageCpu.m_cudaStatus == cudaSuccess);
+	
 	ndCudaHostBuffer<int> scans;
-	scans.SetCount(xxxxxxx->m_param.m_itemCount + 4000);
-	scans.ReadData(&xxxxxxx->m_gridScans[0], scans.GetCount());
-	scans.SetCount(xxxxxxx->m_param.m_itemCount);
+	scans.SetCount(image->m_param.m_itemCount + 4000);
+	scans.ReadData(&image->m_gridScans[0], scans.GetCount());
+	scans.SetCount(image->m_param.m_itemCount);
 #endif
 }
 
@@ -618,5 +618,40 @@ void ndCudaSphFluid::CreateGrids()
 
 void ndCudaSphFluid::SortGrids()
 {
-	ndSortGrids << <1, 1, 0 >> > (m_imageGpu);
+	Image* image = ndAlloca(Image, 2);
+	m_imageCpu.m_context->m_device->m_lastError = cudaMemcpy(image, m_imageGpu, sizeof(Image), cudaMemcpyDeviceToHost);
+	ndAssert(m_imageCpu.m_context->m_device->m_lastError == cudaSuccess);
+	cudaDeviceSynchronize();
+
+	//ndSortGrids << <1, 1, 0 >> > (m_imageGpu);
+	auto GetRadix_xLow = []  __device__(const ndGridHash& item)
+	{
+		return item.m_xLow;
+	};
+	auto GetRadix_xHigh = []  __device__(const ndGridHash& item)
+	{
+		return item.m_xHigh;
+	};
+
+	auto GetRadix_zLow = []  __device__(const ndGridHash& item)
+	{
+		return item.m_zLow;
+	};
+
+	auto GetRadix_zHigh = []  __device__(const ndGridHash& item)
+	{
+		return item.m_zHigh;
+	};
+
+	m_hashGridMap.SetCount(image->m_activeHashGridMapSize);
+	m_hashGridMapTemp.SetCount(image->m_activeHashGridMapSize);
+
+	//ndAssert(TraceHashes());
+	ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMap, m_hashGridMapTemp, GetRadix_xLow);
+	ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMapTemp, m_hashGridMap, GetRadix_xHigh);
+
+	ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMap, m_hashGridMapTemp, GetRadix_zLow);
+	ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMapTemp, m_hashGridMap, GetRadix_zHigh);
+
+	//ndAssert(TraceHashes());
 }
