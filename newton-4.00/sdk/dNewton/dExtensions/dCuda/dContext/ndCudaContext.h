@@ -46,6 +46,8 @@ class ndCudaContext
 
 	D_CUDA_API void Begin();
 	D_CUDA_API void End();
+	D_CUDA_API void Cleanup();
+	D_CUDA_API void PrepareCleanup();
 	
 #if 0
 	D_CUDA_API void ResizeBuffers(int size);

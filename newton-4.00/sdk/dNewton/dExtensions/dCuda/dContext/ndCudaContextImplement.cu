@@ -28,6 +28,7 @@
 #include "ndCudaContextImplement.h"
 #include "ndCudaContextImplementInternal.cuh"
 
+//#define D_USE_EVENT_FOR_SYNC
 
 #if 0
 #define MAX_BLOCK_SZ 128
@@ -918,11 +919,27 @@ void ndCudaContextImplement::InitBodyArray()
 
 #endif
 
+void ndCudaContextImplement::PrepareCleanup()
+{
+	cudaDeviceSynchronize();
+}
+
+void ndCudaContextImplement::Cleanup()
+{
+	cudaDeviceSynchronize();
+
+#ifdef	D_USE_EVENT_FOR_SYNC
+	m_device->m_lastError = cudaEventRecord(m_device->m_syncEvent, 0);
+	ndAssert(m_device->m_lastError == cudaSuccess);
+#endif
+}
+
 void ndCudaContextImplement::Begin()
 {
-	//ndAssert(0);
-	//cudaDeviceSynchronize();
-	//cuCtxSynchronize();
+#ifdef	D_USE_EVENT_FOR_SYNC
+	cudaEventSynchronize(m_device->m_syncEvent);
+	ndAssert(m_device->m_lastError == cudaSuccess);
+#endif
 
 	//// get the scene info from the update	
 	//ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
@@ -1007,8 +1024,13 @@ void ndCudaContextImplement::Begin()
 
 void ndCudaContextImplement::End()
 {
+#ifdef	D_USE_EVENT_FOR_SYNC
+	m_device->m_lastError = cudaEventRecord(m_device->m_syncEvent, 0);
+	ndAssert(m_device->m_lastError == cudaSuccess);
+#else
 	cudaDeviceSynchronize();
 	//cuCtxSynchronize();
+#endif
 
 	//m_frameCounter = m_frameCounter + 1;
 	//ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;

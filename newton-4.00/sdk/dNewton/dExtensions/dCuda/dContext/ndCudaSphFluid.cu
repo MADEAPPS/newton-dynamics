@@ -33,12 +33,13 @@ ndCudaSphFluid::Image::Image(const ndSphFluidInitInfo& info)
 {
 }
 
+ndCudaSphFluid::Image::~Image()
+{
+}
+
 void ndCudaSphFluid::Image::Init(ndCudaSphFluid& fluid)
 {
-	m_errorCode = ndErrorCode(m_context->m_device);
-
 	m_error = m_noError;
-	m_errorCode.Set(0);
 	m_param = ndKernelParams (m_context->m_device, m_context->m_device->m_workGroupSize, fluid.m_points.GetCount());
 	
 	fluid.m_pointsAabb.SetCount(m_param.m_kernelCount + 32);
@@ -46,11 +47,12 @@ void ndCudaSphFluid::Image::Init(ndCudaSphFluid& fluid)
 	{
 		m_context->m_implement->m_sortPrefixBuffer.SetCount(m_param.m_itemCount * 2);
 	}
-
+	fluid.m_errorCode.Set(0);
 	fluid.m_hashGridMap.SetCount(m_param.m_itemCount * 4 + 1024);
 	fluid.m_hashGridMapTemp.SetCount(fluid.m_hashGridMap.GetCount());
 	m_activeHashGridMapSize = fluid.m_hashGridMap.GetCount();
 	
+	m_errorCode____ = fluid.m_errorCode.Pointer();
 	m_points = ndAssessor<ndCudaVector>(fluid.m_points);
 	m_hashGridMap = ndAssessor<ndGridHash>(fluid.m_hashGridMap);
 	m_hashGridMapTemp = ndAssessor<ndGridHash>(fluid.m_hashGridMapTemp);
@@ -353,7 +355,7 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 
 			if (fluid->m_activeHashGridMapSize > fluid->m_hashGridMap.m_capacity)
 			{
-				fluid->m_errorCode.Set(-1);
+				*fluid->m_errorCode____ = 1;
 				fluid->m_error = ndCudaSphFluid::Image::m_gridsOverFlow;
 			}
 		}
@@ -373,7 +375,7 @@ __global__ void ndPrefixScanSum(ndCudaSphFluid::Image* fluid, int kernelStride)
 
 			if (fluid->m_activeHashGridMapSize > fluid->m_hashGridMap.m_capacity)
 			{
-				fluid->m_errorCode.Set(-1);
+				*fluid->m_errorCode____ = 1;
 				fluid->m_error = ndCudaSphFluid::Image::m_gridsOverFlow;
 			}
 		}
@@ -508,6 +510,7 @@ ndCudaSphFluid::ndCudaSphFluid(const ndSphFluidInitInfo& info)
 	,m_imageGpu(nullptr)
 	,m_points()
 	,m_pointsAabb()
+	,m_errorCode(m_imageCpu.m_context->m_device)
 {
 	m_imageCpu.m_context->m_device->m_lastError = cudaMalloc((void**)&m_imageGpu, sizeof (Image));
 	ndAssert(m_imageCpu.m_context->m_device->m_lastError == cudaSuccess);
@@ -550,7 +553,7 @@ void ndCudaSphFluid::GetPositions(float* const dst, int strideInItems, int items
 {
 	if (strideInItems == sizeof(ndCudaVector) / sizeof(float))
 	{
-		ndAssert(0);
+		//ndAssert(0);
 		ndCudaVector* const dstPtr = (ndCudaVector*)dst;
 		//m_points.WriteData(dstPtr, items);
 	}
@@ -621,7 +624,7 @@ void ndCudaSphFluid::Update(float timestep)
 
 void ndCudaSphFluid::HandleErrors()
 {
-	if (m_imageCpu.m_errorCode.Get())
+	if (m_errorCode.Get())
 	{
 		ndAssert(0);
 		char imageBuff[sizeof(Image) + 256];
@@ -644,12 +647,14 @@ void ndCudaSphFluid::HandleErrors()
 			}
 		}
 
-		m_imageCpu.m_errorCode.Set(0);
+		m_errorCode.Set(0);
 		m_imageCpu.m_error = Image::m_noError;
 
 		m_imageCpu.m_context->m_device->m_lastError = cudaMemcpy(m_imageGpu, &m_imageCpu, sizeof(Image), cudaMemcpyHostToDevice);
 		ndAssert(m_imageCpu.m_context->m_device->m_lastError == cudaSuccess);
 	}
+
+	m_errorCode.Set(0);
 }
 
 void ndCudaSphFluid::CreateGrids()

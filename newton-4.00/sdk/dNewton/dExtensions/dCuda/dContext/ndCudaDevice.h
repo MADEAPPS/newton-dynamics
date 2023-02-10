@@ -39,7 +39,9 @@ class ndCudaDevice
 
 	int GetComputeUnits() const;
 
-	struct cudaDeviceProp m_prop;
+	cudaDeviceProp m_prop;
+	cudaEvent_t m_syncEvent;
+
 	int* m_statusMemory;
 	int m_computeUnits;
 	int m_workGroupSize;
@@ -84,6 +86,11 @@ class ndErrorCode
 	void __device__ __host__ Set(int x)
 	{
 		m_baseAdress[m_offset] = x;
+	}
+
+	int* Pointer() const
+	{
+		return &m_baseAdress[m_offset];
 	}
 
 	private:

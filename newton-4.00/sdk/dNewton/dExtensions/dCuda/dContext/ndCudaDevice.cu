@@ -49,7 +49,7 @@ ndErrorCode::ndErrorCode(ndCudaDevice* const context)
 
 ndErrorCode::~ndErrorCode()
 {
-	m_baseAdress[m_offset] = -1;
+	Set(-1);
 }
 
 ndCudaDevice::ndCudaDevice()
@@ -76,10 +76,16 @@ ndCudaDevice::ndCudaDevice()
 	m_lastError = cudaMallocManaged(&m_statusMemory, D_STATUS_ERROR_SIZE * sizeof(int));
 	ndAssert(m_lastError == cudaSuccess);
 	memset(m_statusMemory, -1, D_STATUS_ERROR_SIZE * sizeof(int));
+
+	m_lastError = cudaEventCreate(&m_syncEvent);
+	ndAssert(m_lastError == cudaSuccess);
 }
 
 ndCudaDevice::~ndCudaDevice()
 {
+	m_lastError = cudaEventDestroy(m_syncEvent);
+	ndAssert(m_lastError == cudaSuccess);
+
 	m_lastError = cudaFree(m_statusMemory);
 	ndAssert(m_lastError == cudaSuccess);
 

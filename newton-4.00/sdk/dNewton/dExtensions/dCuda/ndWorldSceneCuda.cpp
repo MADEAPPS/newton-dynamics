@@ -81,6 +81,18 @@ void ndWorldSceneCuda::End()
 	ndWorldScene::End();
 }
 
+void ndWorldSceneCuda::Cleanup()
+{
+	m_context->Cleanup();
+	ndWorldScene::Cleanup();
+}
+
+void ndWorldSceneCuda::PrepareCleanup()
+{
+	m_context->PrepareCleanup();
+	ndWorldScene::PrepareCleanup();
+}
+
 bool ndWorldSceneCuda::IsHighPerformanceCompute() const
 {
 	return true;

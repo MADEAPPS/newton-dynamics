@@ -132,3 +132,13 @@ void ndCudaContext::End()
 {
 	m_implement->End();
 }
+
+void ndCudaContext::Cleanup()
+{
+	m_implement->Cleanup();
+}
+
+void ndCudaContext::PrepareCleanup()
+{
+	m_implement->PrepareCleanup();
+}

@@ -83,6 +83,7 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual bool IsValid() const;
 
 	D_COLLISION_API virtual void Cleanup();
+	D_COLLISION_API virtual void PrepareCleanup();
 
 	D_COLLISION_API ndContactNotify* GetContactNotify() const;
 	D_COLLISION_API void SetContactNotify(ndContactNotify* const notify);
@@ -187,6 +188,10 @@ class ndScene : public ndThreadPool
 	friend class ndConvexCastNotify;
 	friend class ndSkeletonContainer;
 } D_GCC_NEWTON_ALIGN_32 ;
+
+inline void ndScene::PrepareCleanup()
+{
+}
 
 inline bool ndScene::IsValid() const
 {

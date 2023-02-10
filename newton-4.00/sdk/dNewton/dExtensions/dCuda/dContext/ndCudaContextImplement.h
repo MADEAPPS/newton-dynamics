@@ -47,6 +47,8 @@ class ndCudaContextImplement
 
 	void Begin();
 	void End();
+	void Cleanup();
+	void PrepareCleanup();
 
 	//void ResizeBuffers(int size);
 	//void LoadBodyData(const ndCudaBodyProxy* const src, int size);

@@ -1147,11 +1147,11 @@ void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback, const ndVector& minBo
 void ndScene::Cleanup()
 {
 	Sync();
+	m_backgroundThread.Terminate();
+	PrepareCleanup();
 	
 	m_frameNumber = 0;
 	m_subStepNumber = 0;
-
-	m_backgroundThread.Terminate();
 
 	if (m_sentinelBody)
 	{

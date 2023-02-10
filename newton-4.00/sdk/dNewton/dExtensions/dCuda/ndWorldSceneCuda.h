@@ -35,6 +35,8 @@ class ndWorldSceneCuda : public ndWorldScene
 
 	virtual void Begin();
 	virtual void End();
+	virtual void Cleanup();
+	virtual void PrepareCleanup();
 	virtual bool IsValid() const;
 	virtual bool IsHighPerformanceCompute() const;
 	

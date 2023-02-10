@@ -182,6 +182,7 @@ class ndCudaSphFluid
 		};
 
 		Image(const ndSphFluidInitInfo& info);
+		~Image();
 		void Init(ndCudaSphFluid& fluid);
 
 		ndKernelParams m_param;
@@ -196,13 +197,15 @@ class ndCudaSphFluid
 
 		ndSphFluidAabb m_aabb;
 		ndGridNeighborInfo m_neighborgInfo;
+
+		int* m_errorCode____;
 		int m_gridSizeX;
 		int m_gridSizeY;
 		int m_gridSizeZ;
 		int m_activeHashGridMapSize;
-
+	
 		ndError m_error;
-		ndErrorCode m_errorCode;
+		//ndErrorCode m_errorCode;
 	};
 
 	D_CUDA_API ndCudaSphFluid(const ndSphFluidInitInfo& info);
@@ -229,6 +232,7 @@ class ndCudaSphFluid
 	Image m_imageCpu;
 	Image* m_imageGpu;
 
+	ndErrorCode m_errorCode;
 	ndCudaDeviceBuffer<ndCudaVector> m_points;
 	ndCudaDeviceBuffer<ndGridHash> m_hashGridMap;
 	ndCudaDeviceBuffer<ndGridHash> m_hashGridMapTemp;
