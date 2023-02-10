@@ -921,7 +921,8 @@ void ndCudaContextImplement::InitBodyArray()
 void ndCudaContextImplement::Begin()
 {
 	//ndAssert(0);
-	cudaDeviceSynchronize();
+	//cudaDeviceSynchronize();
+	//cuCtxSynchronize();
 
 	//// get the scene info from the update	
 	//ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
@@ -1006,6 +1007,9 @@ void ndCudaContextImplement::Begin()
 
 void ndCudaContextImplement::End()
 {
+	cudaDeviceSynchronize();
+	//cuCtxSynchronize();
+
 	//m_frameCounter = m_frameCounter + 1;
 	//ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
 	//ndCudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, m_frameCounter);

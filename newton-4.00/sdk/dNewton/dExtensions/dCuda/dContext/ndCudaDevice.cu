@@ -52,7 +52,6 @@ ndErrorCode::~ndErrorCode()
 	m_baseAdress[m_offset] = -1;
 }
 
-
 ndCudaDevice::ndCudaDevice()
 {
 	m_lastError = cudaGetDeviceProperties(&m_prop, 0);

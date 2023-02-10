@@ -196,6 +196,9 @@ class ndCudaSphFluid
 
 		ndSphFluidAabb m_aabb;
 		ndGridNeighborInfo m_neighborgInfo;
+		int m_gridSizeX;
+		int m_gridSizeY;
+		int m_gridSizeZ;
 		int m_activeHashGridMapSize;
 
 		ndError m_error;

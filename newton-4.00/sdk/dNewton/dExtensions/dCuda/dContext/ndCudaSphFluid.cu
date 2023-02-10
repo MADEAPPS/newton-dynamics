@@ -58,94 +58,6 @@ void ndCudaSphFluid::Image::Init(ndCudaSphFluid& fluid)
 	m_gridScans = ndAssessor<int>(m_context->m_implement->m_sortPrefixBuffer);
 }
 
-__global__ void ndCalculateAabb(ndCudaSphFluid::Image* fluid)
-{
-	__shared__  float box_x0[D_MAX_LOCAL_SIZE];
-	__shared__  float box_y0[D_MAX_LOCAL_SIZE];
-	__shared__  float box_z0[D_MAX_LOCAL_SIZE];
-	__shared__  float box_x1[D_MAX_LOCAL_SIZE];
-	__shared__  float box_y1[D_MAX_LOCAL_SIZE];
-	__shared__  float box_z1[D_MAX_LOCAL_SIZE];
-
-	int threadId = threadIdx.x;
-	int blockSride = blockDim.x;
-
-	if (threadId < fluid->m_param.m_kernelCount)
-	{
-		box_x0[threadId] = fluid->m_pointsAabb[threadId].m_min.x;
-		box_y0[threadId] = fluid->m_pointsAabb[threadId].m_min.y;
-		box_z0[threadId] = fluid->m_pointsAabb[threadId].m_min.z;
-		box_x1[threadId] = fluid->m_pointsAabb[threadId].m_max.x;
-		box_y1[threadId] = fluid->m_pointsAabb[threadId].m_max.y;
-		box_z1[threadId] = fluid->m_pointsAabb[threadId].m_max.z;
-	}
-	else
-	{
-		box_x0[threadId] = fluid->m_pointsAabb[0].m_min.x;
-		box_y0[threadId] = fluid->m_pointsAabb[0].m_min.y;
-		box_z0[threadId] = fluid->m_pointsAabb[0].m_min.z;
-		box_x1[threadId] = fluid->m_pointsAabb[0].m_max.x;
-		box_y1[threadId] = fluid->m_pointsAabb[0].m_max.y;
-		box_z1[threadId] = fluid->m_pointsAabb[0].m_max.z;
-	}
-
-	for (int i = blockSride / 2; i > 0; i = i >> 1)
-	{
-		if (threadId < i)
-		{
-			float x0 = box_x0[threadId];
-			float y0 = box_y0[threadId];
-			float z0 = box_z0[threadId];
-			float x1 = box_x0[i + threadId];
-			float y1 = box_y0[i + threadId];
-			float z1 = box_z0[i + threadId];
-			box_x0[threadId] = x0 < x1 ? x0 : x1;
-			box_y0[threadId] = y0 < y1 ? y0 : y1;
-			box_z0[threadId] = z0 < z1 ? z0 : z1;
-
-			x0 = box_x1[threadId];
-			y0 = box_y1[threadId];
-			z0 = box_z1[threadId];
-			x1 = box_x1[i + threadId];
-			y1 = box_y1[i + threadId];
-			z1 = box_z1[i + threadId];
-			box_x1[threadId] = x0 > x1 ? x0 : x1;
-			box_y1[threadId] = y0 > y1 ? y0 : y1;
-			box_z1[threadId] = z0 > z1 ? z0 : z1;
-		}
-		__syncthreads();
-	}
-
-	if (threadId == 0)
-	{
-		ndSphFluidAabb box;
-
-		box.m_min = ndCudaVector(box_x0[0], box_y0[0], box_z0[0], 0.0f);
-		box.m_max = ndCudaVector(box_x1[0], box_y1[0], box_z1[0], 0.0f);
-		ndCudaVector grid(fluid->m_gridSize);
-		ndCudaVector invGrid(1.0f / fluid->m_gridSize);
-
-		// add one grid padding to the aabb
-		box.m_min = box.m_min - grid;
-		box.m_max = box.m_max + grid + grid;
-
-		// quantize the aabb to integers of the gird size
-		box.m_min = grid * (box.m_min * invGrid).Floor();
-		box.m_max = grid * (box.m_max * invGrid).Floor();
-	
-		// make sure the w component is zero.
-		//m_box0 = box.m_min & ndVector::m_triplexMask;
-		//m_box1 = box.m_max & ndVector::m_triplexMask;
-		box.m_min.w = 0.0f;
-		box.m_max.w = 0.0f;
-		fluid->m_aabb = box;
-
-		//ndWorkingBuffers& data = *m_workingBuffers;
-		//ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
-		//data.SetWorldToGridMapping(numberOfGrid, m_box1.m_x, m_box0.m_x);
-	}
-}
-
 __global__ void ndCalculateBlockAabb(ndCudaSphFluid::Image* fluid)
 {
 	__shared__  float box_x0[D_MAX_LOCAL_SIZE];
@@ -222,6 +134,99 @@ __global__ void ndCalculateBlockAabb(ndCudaSphFluid::Image* fluid)
 	{
 		fluid->m_pointsAabb[blockId].m_min = ndCudaVector(box_x0[0], box_y0[0], box_z0[0], 0.0f);
 		fluid->m_pointsAabb[blockId].m_max = ndCudaVector(box_x1[0], box_y1[0], box_z1[0], 0.0f);
+	}
+}
+
+__global__ void ndCalculateAabb(ndCudaSphFluid::Image* fluid)
+{
+	__shared__  float box_x0[D_MAX_LOCAL_SIZE];
+	__shared__  float box_y0[D_MAX_LOCAL_SIZE];
+	__shared__  float box_z0[D_MAX_LOCAL_SIZE];
+	__shared__  float box_x1[D_MAX_LOCAL_SIZE];
+	__shared__  float box_y1[D_MAX_LOCAL_SIZE];
+	__shared__  float box_z1[D_MAX_LOCAL_SIZE];
+
+	int threadId = threadIdx.x;
+	int blockSride = blockDim.x;
+
+	if (threadId < fluid->m_param.m_kernelCount)
+	{
+		box_x0[threadId] = fluid->m_pointsAabb[threadId].m_min.x;
+		box_y0[threadId] = fluid->m_pointsAabb[threadId].m_min.y;
+		box_z0[threadId] = fluid->m_pointsAabb[threadId].m_min.z;
+		box_x1[threadId] = fluid->m_pointsAabb[threadId].m_max.x;
+		box_y1[threadId] = fluid->m_pointsAabb[threadId].m_max.y;
+		box_z1[threadId] = fluid->m_pointsAabb[threadId].m_max.z;
+	}
+	else
+	{
+		box_x0[threadId] = fluid->m_pointsAabb[0].m_min.x;
+		box_y0[threadId] = fluid->m_pointsAabb[0].m_min.y;
+		box_z0[threadId] = fluid->m_pointsAabb[0].m_min.z;
+		box_x1[threadId] = fluid->m_pointsAabb[0].m_max.x;
+		box_y1[threadId] = fluid->m_pointsAabb[0].m_max.y;
+		box_z1[threadId] = fluid->m_pointsAabb[0].m_max.z;
+	}
+
+	for (int i = blockSride / 2; i > 0; i = i >> 1)
+	{
+		if (threadId < i)
+		{
+			float x0 = box_x0[threadId];
+			float y0 = box_y0[threadId];
+			float z0 = box_z0[threadId];
+			float x1 = box_x0[i + threadId];
+			float y1 = box_y0[i + threadId];
+			float z1 = box_z0[i + threadId];
+			box_x0[threadId] = x0 < x1 ? x0 : x1;
+			box_y0[threadId] = y0 < y1 ? y0 : y1;
+			box_z0[threadId] = z0 < z1 ? z0 : z1;
+
+			x0 = box_x1[threadId];
+			y0 = box_y1[threadId];
+			z0 = box_z1[threadId];
+			x1 = box_x1[i + threadId];
+			y1 = box_y1[i + threadId];
+			z1 = box_z1[i + threadId];
+			box_x1[threadId] = x0 > x1 ? x0 : x1;
+			box_y1[threadId] = y0 > y1 ? y0 : y1;
+			box_z1[threadId] = z0 > z1 ? z0 : z1;
+		}
+		__syncthreads();
+	}
+
+	if (threadId == 0)
+	{
+		ndSphFluidAabb box;
+
+		box.m_min = ndCudaVector(box_x0[0], box_y0[0], box_z0[0], 0.0f);
+		box.m_max = ndCudaVector(box_x1[0], box_y1[0], box_z1[0], 0.0f);
+		ndCudaVector grid(fluid->m_gridSize);
+		ndCudaVector invGrid(1.0f / fluid->m_gridSize);
+
+		// add one grid padding to the aabb
+		box.m_min = box.m_min - grid;
+		box.m_max = box.m_max + grid + grid;
+
+		// quantize the aabb to integers of the gird size
+		box.m_min = grid * (box.m_min * invGrid).Floor();
+		box.m_max = grid * (box.m_max * invGrid).Floor();
+
+		// make sure the w component is zero.
+		//m_box0 = box.m_min & ndVector::m_triplexMask;
+		//m_box1 = box.m_max & ndVector::m_triplexMask;
+		box.m_min.w = 0.0f;
+		box.m_max.w = 0.0f;
+		fluid->m_aabb = box;
+
+		//const ndVector boxSize((m_box1 - m_box0).Scale(ndFloat32(1.0f) / GetSphGridSize()).GetInt());
+		fluid->m_gridSizeX = int(cuFloor((box.m_max.x - box.m_min.x) * invGrid.x));
+		fluid->m_gridSizeY = int(cuFloor((box.m_max.y - box.m_min.y) * invGrid.y));
+		fluid->m_gridSizeZ = int(cuFloor((box.m_max.z - box.m_min.z) * invGrid.z));
+
+		//ndWorkingBuffers& data = *m_workingBuffers;
+		//ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
+		//data.SetWorldToGridMapping(numberOfGrid, m_box1.m_x, m_box0.m_x);
 	}
 }
 
@@ -455,9 +460,11 @@ __global__ void ndSwapGrids(ndCudaSphFluid::Image* fluid)
 	cuSwap(fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1);
 }
 
-template <typename ndEvaluateRadix_xLow, typename ndEvaluateRadix_zLow>
+template <typename ndEvaluateRadix_xLow, typename ndEvaluateRadix_xHigh, 
+		  typename ndEvaluateRadix_zLow, typename ndEvaluateRadix_zHigh>
 __global__ void ndSortGrids(ndCudaSphFluid::Image* fluid, 
-	ndEvaluateRadix_xLow sort_xLow, ndEvaluateRadix_zLow sort_zLow)
+	ndEvaluateRadix_xLow sort_xLow, ndEvaluateRadix_xHigh sort_xHigh,
+	ndEvaluateRadix_zLow sort_zLow, ndEvaluateRadix_zHigh sort_zHigh)
 {
 	if (fluid->m_error == ndCudaSphFluid::Image::m_noError)
 	{
@@ -467,15 +474,30 @@ __global__ void ndSortGrids(ndCudaSphFluid::Image* fluid,
 		
 		ndKernelParams params(fluid->m_param, D_COUNTING_SORT_BLOCK_SIZE, fluid->m_activeHashGridMapSize);
 
-		ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, 256, sort_xLow);
-		ndCudaAddPrefix << <1, 256, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, sort_xLow);
-		ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1, fluid->m_gridScans, 256, sort_xLow);
+		int radixSize = 1 << D_SPH_CUDA_HASH_BITS;
+		ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, radixSize, sort_xLow);
+		ndCudaAddPrefix << <1, radixSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, sort_xLow);
+		ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1, fluid->m_gridScans, radixSize, sort_xLow);
 		ndSwapGrids << <1, 1, 0 >> > (fluid);
+		if (fluid->m_gridSizeX < radixSize)
+		{
+			ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, radixSize, sort_xHigh);
+			ndCudaAddPrefix << <1, radixSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, sort_xHigh);
+			ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1, fluid->m_gridScans, radixSize, sort_xHigh);
+			ndSwapGrids << <1, 1, 0 >> > (fluid);
+		}
 		
 		ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, 256, sort_zLow);
 		ndCudaAddPrefix << <1, 256, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, sort_zLow);
 		ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1, fluid->m_gridScans, 256, sort_zLow);
 		ndSwapGrids << <1, 1, 0 >> > (fluid);
+		if (fluid->m_gridSizeZ < radixSize)
+		{
+			ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, radixSize, sort_zHigh);
+			ndCudaAddPrefix << <1, radixSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, sort_zHigh);
+			ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1, fluid->m_gridScans, radixSize, sort_zHigh);
+			ndSwapGrids << <1, 1, 0 >> > (fluid);
+		}
 
 		cudaStreamDestroy(stream);
 	}
@@ -528,8 +550,9 @@ void ndCudaSphFluid::GetPositions(float* const dst, int strideInItems, int items
 {
 	if (strideInItems == sizeof(ndCudaVector) / sizeof(float))
 	{
+		ndAssert(0);
 		ndCudaVector* const dstPtr = (ndCudaVector*)dst;
-		m_points.WriteData(dstPtr, items);
+		//m_points.WriteData(dstPtr, items);
 	}
 	else
 	{
@@ -673,10 +696,9 @@ void ndCudaSphFluid::SortGrids()
 	
 	//ndAssert(TraceHashes());
 	ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMap, m_hashGridMapTemp, GetRadix_xLow);
-	//ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMapTemp, m_hashGridMap, GetRadix_xHigh);
-	
-	//ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMap, m_hashGridMapTemp, GetRadix_zLow);
-	//ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMapTemp, m_hashGridMap, GetRadix_zHigh);
+	ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMapTemp, m_hashGridMap, GetRadix_xHigh);
+	ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMap, m_hashGridMapTemp, GetRadix_zLow);
+	ndCountingSort<ndGridHash, D_SPH_CUDA_HASH_BITS>(m_imageCpu.m_context->m_implement, m_hashGridMapTemp, m_hashGridMap, GetRadix_zHigh);
 	
 	//ndAssert(TraceHashes());
 
@@ -685,13 +707,24 @@ void ndCudaSphFluid::SortGrids()
 	{
 		return item.m_xLow;
 	};
+
+	auto GetRadix_xHigh = []  __device__(const ndGridHash & item)
+	{
+		return item.m_xHigh;
+	};
+
 	auto GetRadix_zLow = []  __device__(const ndGridHash& item)
 	{
 		return item.m_zLow;
 	};
 
-	ndSortGrids << < 1, 1, 0 >>> (m_imageGpu, GetRadix_xLow, GetRadix_zLow);
+	auto GetRadix_zHigh = []  __device__(const ndGridHash & item)
+	{
+		return item.m_zHigh;
+	};
 
-	//ndAssert(TraceHashes());
+	ndSortGrids << < 1, 1, 0 >>> (m_imageGpu, GetRadix_xLow, GetRadix_xHigh, GetRadix_zLow, GetRadix_zHigh);
+
+	//ndAssert(TraceHashes()); 
 #endif
 }
