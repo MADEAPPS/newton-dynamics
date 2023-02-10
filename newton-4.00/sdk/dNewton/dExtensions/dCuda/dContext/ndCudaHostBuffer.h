@@ -352,43 +352,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				}
 			}
 
-			for (int k = 2; k <= blockDim; k = k << 1)
-			{
-				for (int j = k >> 1; j > 0; j = j >> 1)
-				{
-					for (int threadId0 = 0; threadId0 < blockDim; ++threadId0)
-					{
-						int threadId1 = threadId0 ^ j;
-						if (threadId1 > threadId0)
-						{
-							//const int a = sortedRadix[threadId0];
-							//const int b = sortedRadix[threadId1];
-							//const int mask0 = (-(threadId0 & k)) >> 31;
-							//const int mask1 = -(a > b);
-							//const int mask2 = mask0 ^ mask1;
-							//const int mask3 = -(threadId1 < threadId0);
-							//const int a1 = (b & mask3) | (a & ~mask3);
-							//const int b1 = (a & mask3) | (b & ~mask3);
-							//sortedRadix[threadId0] = (b1 & mask2) | (a1 & ~mask2);
-
-
-
-							const int a = sortedRadix[threadId0];
-							const int b = sortedRadix[threadId1];
-							const int mask0 = (-(threadId0 & k)) >> 31;
-							const int mask1 = -(a > b);
-							const int mask2 = mask0 ^ mask1;
-							//const int a1 = (b & mask2) | (a & ~mask2);
-							//const int b1 = (a & mask2) | (b & ~mask2);
-							const int a1 = mask2 ? b : a;
-							const int b1 = mask2 ? a : b;
-							sortedRadix[threadId0] = a1;
-							sortedRadix[threadId1] = b1;
-						}
-					}
-				}
-			}
-
 			for (int threadId = 0; threadId < radixSize; ++threadId)
 			{
 				radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + threadId + 1] = radixPrefixCount[threadId];
@@ -404,6 +367,29 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				for (int threadId = 0; threadId < radixSize; ++threadId)
 				{
 					radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + threadId] = sumReg[threadId];
+				}
+			}
+
+			for (int k = 2; k <= blockDim; k = k << 1)
+			{
+				for (int j = k >> 1; j > 0; j = j >> 1)
+				{
+					for (int threadId0 = 0; threadId0 < blockDim; ++threadId0)
+					{
+						int threadId1 = threadId0 ^ j;
+						if (threadId1 > threadId0)
+						{
+							const int a = sortedRadix[threadId0];
+							const int b = sortedRadix[threadId1];
+							const int mask0 = (-(threadId0 & k)) >> 31;
+							const int mask1 = -(a > b);
+							const int mask2 = mask0 ^ mask1;
+							const int a1 = mask2 ? b : a;
+							const int b1 = mask2 ? a : b;
+							sortedRadix[threadId0] = a1;
+							sortedRadix[threadId1] = b1;
+						}
+					}
 				}
 			}
 

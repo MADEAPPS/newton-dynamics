@@ -553,9 +553,8 @@ void ndCudaSphFluid::GetPositions(float* const dst, int strideInItems, int items
 {
 	if (strideInItems == sizeof(ndCudaVector) / sizeof(float))
 	{
-		//ndAssert(0);
 		ndCudaVector* const dstPtr = (ndCudaVector*)dst;
-		//m_points.WriteData(dstPtr, items);
+		m_points.WriteData(dstPtr, items);
 	}
 	else
 	{

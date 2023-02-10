@@ -616,11 +616,8 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 
 
 	// ***********************************
-	//m_src.SetCount(1000);
-	//m_src.SetCount(3 * 256 + 1);
-	//m_src.SetCount(2 * 1024 + 1);
-	m_src.SetCount(1000000);
-	//m_src.SetCount(1000000 * 64);
+	m_src.SetCount(15);
+	//m_src.SetCount(1000000);
 	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
 		m_src[i] = rand() % 256;
@@ -653,8 +650,6 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 		int b = m_dst0[i];
 		ndAssert(a <= b);
 	}
-
-	//radix_sort(nullptr, nullptr, 0);
 }
 
 ndCudaContextImplement::~ndCudaContextImplement()
