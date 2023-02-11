@@ -314,6 +314,8 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		int radixPrefixBatchScan[D_HOST_SORT_BLOCK_SIZE];
 		int radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + D_HOST_SORT_BLOCK_SIZE + 1];
 
+		int sortedRadix____[D_HOST_SORT_BLOCK_SIZE];
+
 		int size = src.GetCount();
 		int radixSize = (1 << exponentRadix);
 		int blockDim = D_HOST_SORT_BLOCK_SIZE;
@@ -348,6 +350,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					cachedItems[threadId] = src[index];
 					int radix = evaluator.GetRadix(cachedItems[threadId]);
 					radixPrefixCount[radix] ++;
+					sortedRadix____[threadId] = radix;
 					sortedRadix[threadId] = (radix << 16) + threadId;
 				}
 			}
@@ -367,6 +370,21 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				for (int threadId = 0; threadId < radixSize; ++threadId)
 				{
 					radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + threadId] = sumReg[threadId];
+				}
+			}
+
+			int radixPrefixScan____[D_HOST_SORT_BLOCK_SIZE];
+			//for (int threadId = 0; threadId < blockDim; ++threadId)
+			for (int j = 0; j < blockDim; ++j)
+			{
+				//int index = bashSize + threadId;
+				int index = bashSize + j;
+				if (index < size)
+				{
+					int key = sortedRadix____[j];
+					int adressIndex = radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + key];
+					radixPrefixScan____[j] = adressIndex;
+					radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + key] = adressIndex + 1;
 				}
 			}
 
@@ -398,12 +416,17 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				int index = bashSize + threadId;
 				if (index < size)
 				{
-					int keyValue = sortedRadix[threadId];
-					int keyHigh = keyValue >> 16;
-					int keyLow = keyValue & 0xffff;
-					int dstOffset1 = radixPrefixBatchScan[keyHigh] + radixPrefixStart[keyHigh];
-					int dstOffset0 = threadId - radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + keyHigh];
-					dst[dstOffset0 + dstOffset1] = cachedItems[keyLow];
+					//int keyValue = sortedRadix[threadId];
+					//int keyHigh = keyValue >> 16;
+					//int keyLow = keyValue & 0xffff;
+					//int dstOffset1 = radixPrefixBatchScan[keyHigh] + radixPrefixStart[keyHigh];
+					//int dstOffset0 = threadId - radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + keyHigh];
+					//dst[dstOffset0 + dstOffset1] = cachedItems[keyLow];
+
+					int keyHigh__ = sortedRadix____[threadId];
+					int dstOffset1__ = radixPrefixStart[keyHigh__];
+					int dstOffset0__ = radixPrefixScan____[threadId];
+					dst[dstOffset0__ + dstOffset1__] = cachedItems[threadId];
 				}
 			}
 
