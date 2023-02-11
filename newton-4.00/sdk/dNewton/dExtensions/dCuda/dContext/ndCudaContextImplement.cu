@@ -617,8 +617,8 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 
 
 	// ***********************************
-	m_src.SetCount(15);
-	//m_src.SetCount(1000000);
+	//m_src.SetCount(15);
+	m_src.SetCount(1000000);
 	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
 		m_src[i] = rand() % 256;
@@ -635,22 +635,22 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	m_buf0.ReadData(&m_src[0], m_src.GetCount());
 	m_buf1.ReadData(&m_dst1[0], m_dst1.GetCount());
 
-	class GetKey
-	{
-		public:
-		int GetRadix(int item) const
-		{
-			return item & 0xff;
-		};
-	};
-
-	ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
-	for (int i = 1; i < m_dst0.GetCount(); ++i)
-	{
-		int a = m_dst0[i - 1];
-		int b = m_dst0[i];
-		ndAssert(a <= b);
-	}
+	//class GetKey
+	//{
+	//	public:
+	//	int GetRadix(int item) const
+	//	{
+	//		return item & 0xff;
+	//	};
+	//};
+	//
+	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
+	//for (int i = 1; i < m_dst0.GetCount(); ++i)
+	//{
+	//	int a = m_dst0[i - 1];
+	//	int b = m_dst0[i];
+	//	ndAssert(a <= b);
+	//}
 }
 
 ndCudaContextImplement::~ndCudaContextImplement()
@@ -974,7 +974,7 @@ void ndCudaContextImplement::Begin()
 	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
 	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
 
-#if 0
+#if 1
 	auto GetRadix = []  __device__(int item)
 	{
 		return item & 0xff;
@@ -989,10 +989,10 @@ void ndCudaContextImplement::Begin()
 	cudaEventRecord(start_event, 0);
 	for (int i = 0; i < numIterations; ++i)
 	{
-		ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
-		ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
-		ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
-		ndCountingSort<int, 8>(this, m_buf0, m_buf1, m_sortPrefixBuffer, GetRadix);
+		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix);
+		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix);
+		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix);
+		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix);
 	}
 	cudaEventRecord(stop_event, 0);
 	cudaEventSynchronize(stop_event);
@@ -1000,8 +1000,9 @@ void ndCudaContextImplement::Begin()
 	float totalTime;
 	cudaEventElapsedTime(&totalTime, start_event, stop_event);
 
-	totalTime /= (1.0e3f * numIterations);
-	printf("radixSortThrust, Throughput = %.4f MElements/s, Time = %.5f s, Size = %u elements\n",	1.0e-6f * m_buf0.GetCount() / totalTime, totalTime, m_buf0.GetCount());
+	float megkeys = m_buf0.GetCount() * 1.e-6f;
+	float average = 1.0e-3f * totalTime / numIterations;
+	printf("radixSortThrust, Throughput = %.4f MElements/s, Time = %.5f s, Size = %u elements\n", megkeys / average, average, m_buf0.GetCount());
 
 	#if 1
 	m_device->SyncDevice();
