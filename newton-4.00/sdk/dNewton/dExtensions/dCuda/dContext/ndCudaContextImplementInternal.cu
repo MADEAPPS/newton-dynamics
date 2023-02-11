@@ -22,9 +22,9 @@
 #include "ndCudaStdafx.h"
 #include "ndCudaUtils.h"
 #include "ndCudaDevice.h"
+#include "ndCudaSort.cuh"
 #include "ndCudaContext.h"
 #include "ndCudaPrefixScan.cuh"
-#include "ndCudaCountingSort.cuh"
 #include "ndCudaContextImplement.h"
 #include "ndCudaContextImplementInternal.cuh"
 

@@ -21,10 +21,10 @@
 
 #include "ndCudaStdafx.h"
 #include "ndCudaUtils.h"
+#include "ndCudaSort.cuh"
 #include "ndCudaDevice.h"
 #include "ndCudaContext.h"
 #include "ndCudaPrefixScan.cuh"
-#include "ndCudaCountingSort.cuh"
 #include "ndCudaContextImplement.h"
 #include "ndCudaContextImplementInternal.cuh"
 
@@ -617,13 +617,14 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 
 
 	// ***********************************
-	//m_src.SetCount(15);
-	m_src.SetCount(1000000);
+	m_src.SetCount(20);
+	//m_src.SetCount(512);
+	//m_src.SetCount(512 + 99);
+	//m_src.SetCount(1000000);
 	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
-		m_src[i] = rand() % 256;
-		//m_src[i] = i % 256;
-		//m_src[i] = 1;
+		//m_src[i] = rand() % 256;
+		m_src[i] = rand() % 8;
 	}
 
 	m_scan0.SetCount(1024 * 256);
@@ -635,22 +636,24 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	m_buf0.ReadData(&m_src[0], m_src.GetCount());
 	m_buf1.ReadData(&m_dst1[0], m_dst1.GetCount());
 
-	//class GetKey
-	//{
-	//	public:
-	//	int GetRadix(int item) const
-	//	{
-	//		return item & 0xff;
-	//	};
-	//};
-	//
+	class GetKey
+	{
+		public:
+		int GetRadix(int item) const
+		{
+			//return item & 0xff;
+			return item & 0x07;
+		};
+	};
+	
 	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
-	//for (int i = 1; i < m_dst0.GetCount(); ++i)
-	//{
-	//	int a = m_dst0[i - 1];
-	//	int b = m_dst0[i];
-	//	ndAssert(a <= b);
-	//}
+	ndCountingSort<int, GetKey, 3>(m_src, m_dst0, m_scan0);
+	for (int i = 1; i < m_dst0.GetCount(); ++i)
+	{
+		int a = m_dst0[i - 1];
+		int b = m_dst0[i];
+		ndAssert(a <= b);
+	}
 }
 
 ndCudaContextImplement::~ndCudaContextImplement()

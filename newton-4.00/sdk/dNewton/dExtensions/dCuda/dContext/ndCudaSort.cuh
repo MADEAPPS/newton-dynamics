@@ -19,13 +19,14 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __CU_COUNTIN_SORT_H__
-#define __CU_COUNTIN_SORT_H__
+#ifndef __CUDA_SORT_H__
+#define __CUDA_SORT_H__
 
 #include <cuda.h>
 #include <vector_types.h>
 #include <cuda_runtime.h>
 
+#include "ndCudaDevice.h"
 #include "ndCudaContext.h"
 #include "ndCudaHostBuffer.h"
 #include "ndCudaDeviceBuffer.h"
