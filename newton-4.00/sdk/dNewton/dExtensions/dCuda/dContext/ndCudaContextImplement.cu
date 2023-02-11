@@ -28,7 +28,8 @@
 #include "ndCudaContextImplement.h"
 #include "ndCudaContextImplementInternal.cuh"
 
-//#define D_USE_EVENT_FOR_SYNC
+#define	D_PROFILE_KERNELS
+#define D_USE_EVENT_FOR_SYNC
 
 #if 0
 #define MAX_BLOCK_SZ 128
@@ -725,7 +726,7 @@ void ndCudaContextImplement::ResizeBuffers(int cpuBodyCount)
 
 void ndCudaContextImplement::LoadBodyData(const ndCudaBodyProxy* const src, int cpuBodyCount)
 {
-	cudaDeviceSynchronize();
+	m_imageCpu.m_context->m_device->SyncDevice();
 		
 	ndCudaSceneInfo info;
 	info.m_histogram = ndCudaBuffer<unsigned>(m_histogram);
@@ -745,7 +746,7 @@ void ndCudaContextImplement::LoadBodyData(const ndCudaBodyProxy* const src, int 
 	ndCudaInitTransforms << <blocksCount, D_THREADS_PER_BLOCK, 0, m_solverComputeStream >> > (*m_sceneInfoCpu);
 	ndCudaGenerateSceneGraph << <1, 1, 0, m_solverComputeStream >> > (*m_sceneInfoCpu);
 	
-	cudaDeviceSynchronize();
+	m_imageCpu.m_context->m_device->SyncDevice();
 	if (cudaStatus != cudaSuccess)
 	{
 		ndAssert(0);
@@ -757,7 +758,7 @@ void ndCudaContextImplement::ValidateContextBuffers()
 	ndCudaSceneInfo* const sceneInfo = m_sceneInfoCpu;
 	if (!sceneInfo->m_frameIsValid)
 	{
-		cudaDeviceSynchronize();
+		m_device->SyncDevice();
 
 		if (sceneInfo->m_histogram.m_size > sceneInfo->m_histogram.m_capacity)
 		{
@@ -787,7 +788,7 @@ void ndCudaContextImplement::ValidateContextBuffers()
 		{
 			ndAssert(0);
 		}
-		cudaDeviceSynchronize();
+		m_imageCpu.m_context->m_device->SyncDevice();
 	}
 }
 
@@ -916,12 +917,12 @@ void ndCudaContextImplement::InitBodyArray()
 
 void ndCudaContextImplement::PrepareCleanup()
 {
-	cudaDeviceSynchronize();
+	m_device->SyncDevice();
 }
 
 void ndCudaContextImplement::Cleanup()
 {
-	cudaDeviceSynchronize();
+	m_device->SyncDevice();
 
 #ifdef	D_USE_EVENT_FOR_SYNC
 	m_device->m_lastError = cudaEventRecord(m_device->m_syncEvent, 0);
@@ -931,8 +932,8 @@ void ndCudaContextImplement::Cleanup()
 
 void ndCudaContextImplement::Begin()
 {
-#ifdef	D_USE_EVENT_FOR_SYNC
-	cudaEventSynchronize(m_device->m_syncEvent);
+#ifdef D_PROFILE_KERNELS
+	m_device->m_lastError = cudaEventRecord(m_device->m_startTimer, 0);
 	ndAssert(m_device->m_lastError == cudaSuccess);
 #endif
 
@@ -1003,7 +1004,7 @@ void ndCudaContextImplement::Begin()
 	printf("radixSortThrust, Throughput = %.4f MElements/s, Time = %.5f s, Size = %u elements\n",	1.0e-6f * m_buf0.GetCount() / totalTime, totalTime, m_buf0.GetCount());
 
 	#if 1
-	cudaDeviceSynchronize();
+	m_device->SyncDevice();
 	m_sortPrefixBuffer.WriteData(&m_scan1[0], m_scan1.GetCount());
 	m_buf1.WriteData(&m_dst1[0], m_dst1.GetCount());
 	
@@ -1019,12 +1020,31 @@ void ndCudaContextImplement::Begin()
 
 void ndCudaContextImplement::End()
 {
+#ifdef D_PROFILE_KERNELS
+	cudaEventRecord(m_device->m_stopTimer, 0);
+#endif
+
 #ifdef	D_USE_EVENT_FOR_SYNC
 	m_device->m_lastError = cudaEventRecord(m_device->m_syncEvent, 0);
 	ndAssert(m_device->m_lastError == cudaSuccess);
+	cudaEventSynchronize(m_device->m_syncEvent);
 #else
-	cudaDeviceSynchronize();
-	//cuCtxSynchronize();
+	m_device->SyncDevice();
+#endif
+
+#ifdef D_PROFILE_KERNELS
+	float elapsedTime;
+	cudaEventElapsedTime(&elapsedTime, m_device->m_startTimer, m_device->m_stopTimer);
+
+	m_device->m_timerFrames++;
+	m_device->m_timeAcc += elapsedTime;
+	if (m_device->m_timerFrames >= 60)
+	{
+		float time = m_device->m_timeAcc / m_device->m_timerFrames;
+		printf("kernels average time = %f ms\n", time);
+		m_device->m_timerFrames = 0;
+		m_device->m_timeAcc = 0.0f;
+	}
 #endif
 
 	//m_frameCounter = m_frameCounter + 1;

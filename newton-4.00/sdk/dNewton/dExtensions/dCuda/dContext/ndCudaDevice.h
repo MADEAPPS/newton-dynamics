@@ -37,14 +37,20 @@ class ndCudaDevice
 	void* operator new (size_t size);
 	void operator delete (void* ptr);
 
+	void SyncDevice() const;
 	int GetComputeUnits() const;
 
 	cudaDeviceProp m_prop;
+	cudaEvent_t m_startTimer;
+	cudaEvent_t m_stopTimer;
 	cudaEvent_t m_syncEvent;
+	cudaStream_t m_childStream;
 
 	int* m_statusMemory;
 	int m_computeUnits;
 	int m_workGroupSize;
+	int m_timerFrames;
+	float m_timeAcc;
 	cudaError_t m_lastError;
 };
 

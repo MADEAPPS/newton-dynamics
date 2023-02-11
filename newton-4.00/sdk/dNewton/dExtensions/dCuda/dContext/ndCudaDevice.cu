@@ -77,13 +77,34 @@ ndCudaDevice::ndCudaDevice()
 	ndAssert(m_lastError == cudaSuccess);
 	memset(m_statusMemory, -1, D_STATUS_ERROR_SIZE * sizeof(int));
 
+	m_lastError = cudaEventCreate(&m_startTimer);
+	ndAssert(m_lastError == cudaSuccess);
+
+	m_lastError = cudaEventCreate(&m_stopTimer);
+	ndAssert(m_lastError == cudaSuccess);
+
 	m_lastError = cudaEventCreate(&m_syncEvent);
 	ndAssert(m_lastError == cudaSuccess);
+
+	m_lastError = cudaStreamCreateWithFlags(&m_childStream, cudaStreamDefault);
+	ndAssert(m_lastError == cudaSuccess);
+
+	m_timerFrames = 0;
+	m_timeAcc = 0.0f;
 }
 
 ndCudaDevice::~ndCudaDevice()
 {
+	m_lastError = cudaEventDestroy(m_startTimer);
+	ndAssert(m_lastError == cudaSuccess);
+
+	m_lastError = cudaEventDestroy(m_stopTimer);
+	ndAssert(m_lastError == cudaSuccess);
+
 	m_lastError = cudaEventDestroy(m_syncEvent);
+	ndAssert(m_lastError == cudaSuccess);
+
+	m_lastError = cudaStreamDestroy(m_childStream);
 	ndAssert(m_lastError == cudaSuccess);
 
 	m_lastError = cudaFree(m_statusMemory);
@@ -91,6 +112,14 @@ ndCudaDevice::~ndCudaDevice()
 
 	m_lastError = cudaDeviceReset();
 	ndAssert(m_lastError == cudaSuccess);
+
+	m_lastError = cudaStreamCreateWithFlags(&m_childStream, cudaStreamDefault);
+	ndAssert(m_lastError == cudaSuccess);
+}
+
+void ndCudaDevice::SyncDevice() const
+{
+	cudaDeviceSynchronize();
 }
 
 void* ndCudaDevice::operator new (size_t size)

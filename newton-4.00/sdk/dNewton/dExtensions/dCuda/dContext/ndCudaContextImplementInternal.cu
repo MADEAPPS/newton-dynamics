@@ -309,7 +309,7 @@ __global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info)
 		#endif
 		ndCudaMergeAabbInternal << <1, D_THREADS_PER_BLOCK, 0 >> > (info);
 
-		//cudaDeviceSynchronize();
+		m_device->SyncDevice();
 		info.m_histogram.m_size = bodyCount;
 		if (bodyCount > info.m_histogram.m_capacity)
 		{

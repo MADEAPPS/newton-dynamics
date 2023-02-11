@@ -311,7 +311,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
 		int radixPrefixCount[D_HOST_SORT_BLOCK_SIZE];
 		int radixPrefixStart[D_HOST_SORT_BLOCK_SIZE];
-		int radixPrefixBatchScan[D_HOST_SORT_BLOCK_SIZE];
+		//int radixPrefixBatchScan[D_HOST_SORT_BLOCK_SIZE];
 		int radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + D_HOST_SORT_BLOCK_SIZE + 1];
 
 		int sortedRadix____[D_HOST_SORT_BLOCK_SIZE];
@@ -321,7 +321,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		int blockDim = D_HOST_SORT_BLOCK_SIZE;
 		int radixBase = blockIdx * radixSize;
 		int bashSize = blocksCount * blockDim * blockIdx;
-		int radixPrefixOffset = computeUnits * radixSize;
+		//int radixPrefixOffset = computeUnits * radixSize;
 
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
@@ -331,7 +331,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		for (int threadId = 0; threadId < radixSize; ++threadId)
 		{
 			radixPrefixStart[threadId] = scansBuffer[radixBase + threadId];
-			radixPrefixBatchScan[threadId] = scansBuffer[radixPrefixOffset + threadId];
+			//radixPrefixBatchScan[threadId] = scansBuffer[radixPrefixOffset + threadId];
 		}
 
 		for (int i = 0; i < blocksCount; ++i)

@@ -198,14 +198,14 @@ class ndCudaSphFluid
 		ndSphFluidAabb m_aabb;
 		ndGridNeighborInfo m_neighborgInfo;
 
-		int* m_errorCode____;
+		int* m_errorCode;
 		int m_gridSizeX;
 		int m_gridSizeY;
 		int m_gridSizeZ;
 		int m_activeHashGridMapSize;
 	
 		ndError m_error;
-		//ndErrorCode m_errorCode;
+		cudaStream_t m_childStream;
 	};
 
 	D_CUDA_API ndCudaSphFluid(const ndSphFluidInitInfo& info);
