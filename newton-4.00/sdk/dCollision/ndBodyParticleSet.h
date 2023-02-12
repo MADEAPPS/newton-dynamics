@@ -22,10 +22,11 @@
 #ifndef __ND_BODY_PARTICLE_SET_H__
 #define __ND_BODY_PARTICLE_SET_H__
 
-//#include "ndNewtonStdafx.h"
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndBody.h"
+
+#define D_USE_NEW_FLUID
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodyParticleSet: public ndBody, public ndBackgroundTask

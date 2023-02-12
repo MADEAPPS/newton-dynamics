@@ -19,13 +19,13 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_BODY_SPH_FLUID_H__
-#define __ND_BODY_SPH_FLUID_H__
+#ifndef __ND_BODY_SPH_NEW_FLUID_H__
+#define __ND_BODY_SPH_NEW_FLUID_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndBodyParticleSet.h"
 
-#ifndef D_USE_NEW_FLUID
+#ifdef D_USE_NEW_FLUID
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodySphFluid: public ndBodyParticleSet
@@ -71,12 +71,10 @@ class ndBodySphFluid: public ndBodyParticleSet
 	class ndParticleKernelDistance;
 
 	void SortGrids(ndThreadPool* const threadPool);
-	void BuildPairs(ndThreadPool* const threadPool);
 	void CreateGrids(ndThreadPool* const threadPool);
+	void BuildBuckets(ndThreadPool* const threadPool);
 	void CaculateAabb(ndThreadPool* const threadPool);
-	void SortBuckets(ndThreadPool* const threadPool);
 	void CalculateScans(ndThreadPool* const threadPool);
-	void SortCellBuckects(ndThreadPool* const threadPool);
 	void IntegrateParticles(ndThreadPool* const threadPool);
 	void CalculateAccelerations(ndThreadPool* const threadPool);
 	void CalculateParticlesDensity(ndThreadPool* const threadPool);

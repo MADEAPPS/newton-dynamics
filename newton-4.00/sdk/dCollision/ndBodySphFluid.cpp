@@ -24,6 +24,10 @@
 #include "ndWorld.h"
 #include "ndBodySphFluid.h"
 
+#ifndef D_USE_NEW_FLUID
+
+//#define D_USE_YZ_PLANE_BUCKETS
+
 #define D_SPH_HASH_BITS				8
 #define D_SPH_BUFFER_GRANULARITY	4096	
 
@@ -1016,7 +1020,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 			}
 		}
 	});
-	ndAssert(sizeof(ndGridHash) <= 16);
+	ndAssert(sizeof(ndGridHash) == 8);
 
 	data.m_gridScans.SetCount(m_posit.GetCount() + 1);
 	data.m_gridScans[m_posit.GetCount()] = 0;
@@ -1100,3 +1104,5 @@ void ndBodySphFluid::Execute(ndThreadPool* const threadPool)
 	CalculateAccelerations(threadPool);
 	IntegrateParticles(threadPool);
 }
+
+#endif
