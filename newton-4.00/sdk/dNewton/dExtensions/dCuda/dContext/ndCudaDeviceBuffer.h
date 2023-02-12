@@ -22,8 +22,10 @@
 #ifndef __ND_CUDA_DEVICE_BUFFER_H__
 #define __ND_CUDA_DEVICE_BUFFER_H__
 
+//ndCudaUtils.h
 #include <cuda.h>
 #include <cuda_runtime.h>
+#include "ndCudaUtils.h"
 #include "ndCudaIntrinsics.h"
 
 template<class T>

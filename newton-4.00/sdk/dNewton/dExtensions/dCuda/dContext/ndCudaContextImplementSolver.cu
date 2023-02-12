@@ -21,10 +21,10 @@
 
 #include "ndCudaStdafx.h"
 #include "ndCudaUtils.h"
+#include "ndCudaSort.cuh"
 #include "ndCudaDevice.h"
 #include "ndCudaContext.h"
 #include "ndCudaPrefixScan.cuh"
-#include "ndCudaCountingSort.cuh"
 #include "ndCudaContextImplement.h"
 
 #if 0

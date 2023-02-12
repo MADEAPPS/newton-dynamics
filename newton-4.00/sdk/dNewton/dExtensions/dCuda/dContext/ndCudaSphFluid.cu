@@ -21,9 +21,9 @@
 
 #include "ndCudaStdafx.h"
 #include "ndCudaDevice.h"
+#include "ndCudaSort.cuh"
 #include "ndCudaContext.h"
 #include "ndCudaSphFluid.h"
-#include "ndCudaCountingSort.cuh"
 #include "ndCudaContextImplement.h"
 
 #define D_MAX_LOCAL_SIZE 512
@@ -474,7 +474,7 @@ __global__ void ndSortGrids(ndCudaSphFluid::Image* fluid,
 		cudaStream_t stream = fluid->m_childStream;
 		//cudaStreamCreateWithFlags(&stream, cudaStreamDefault);
 		
-		ndKernelParams params(fluid->m_param, D_COUNTING_SORT_BLOCK_SIZE, fluid->m_activeHashGridMapSize);
+		ndKernelParams params(fluid->m_param, D_DEVICE_SORT_BLOCK_SIZE, fluid->m_activeHashGridMapSize);
 
 		int radixSize = 1 << D_SPH_CUDA_HASH_BITS;
 		ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, radixSize, sort_xLow);
@@ -607,7 +607,7 @@ void ndCudaSphFluid::Update(float timestep)
 	HandleErrors();
 	CaculateAabb();
 	CreateGrids();
-	SortGrids();
+	//SortGrids();
 
 #if 0
 	Image* image = ndAlloca(Image, 2);

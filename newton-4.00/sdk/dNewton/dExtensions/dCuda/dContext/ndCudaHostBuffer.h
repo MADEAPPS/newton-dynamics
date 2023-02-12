@@ -24,15 +24,16 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
+#include "ndCudaUtils.h"
 #include "ndCudaIntrinsics.h"
 
-#define D_HOST_SORT_BLOCK_SIZE	(8)
+//#define D_HOST_SORT_BLOCK_SIZE	(8)
 //#define D_HOST_SORT_BLOCK_SIZE	(16)
-//#define D_HOST_SORT_BLOCK_SIZE	(1<<9)
+#define D_HOST_SORT_BLOCK_SIZE		(1<<9)
 //#define D_HOST_SORT_BLOCK_SIZE	(1<<10)
 
-//#define D_HOST_MAX_RADIX_SIZE	(1<<8)
-#define D_HOST_MAX_RADIX_SIZE	(1<<3)
+#define D_HOST_MAX_RADIX_SIZE	(1<<8)
+//#define D_HOST_MAX_RADIX_SIZE	(1<<3)
 
 #if D_HOST_MAX_RADIX_SIZE > D_HOST_SORT_BLOCK_SIZE
 	#error counting sort diget larger that block
@@ -313,13 +314,13 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		}
 	};
 
-	auto MergeBuckectsOrdered = [&](int blockIdx, int blocksCount, int computeUnits)
+#if 1
+	auto MergeBuckectsBitonic = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
 		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
 		int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
 		int radixPrefixCount[D_HOST_MAX_RADIX_SIZE];
 		int radixPrefixStart[D_HOST_MAX_RADIX_SIZE];
-		int radixPrefixBatchScan[D_HOST_MAX_RADIX_SIZE];
 		int radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + D_HOST_MAX_RADIX_SIZE + 1];
 		
 		int size = src.GetCount();
@@ -330,11 +331,11 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		int radixPrefixOffset = computeUnits * radixStride;
 
 		ndEvaluateKey evaluator;
+		radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2] = 0;
 		for (int threadId = 0; threadId < radixStride; ++threadId)
 		{
-			radixPrefixScan[threadId] = 0;
-			radixPrefixStart[threadId] = scansBuffer[radixBase + threadId];
-			radixPrefixBatchScan[threadId] = scansBuffer[radixPrefixOffset + threadId];
+			radixPrefixScan[(D_HOST_MAX_RADIX_SIZE - radixStride) / 2 + threadId] = 0;
+			radixPrefixStart[threadId] = scansBuffer[radixBase + threadId] + scansBuffer[radixPrefixOffset + threadId];
 		}
 
 		for (int i = 0; i < blocksCount; ++i)
@@ -378,12 +379,10 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				}
 			}
 		
-			int xxxx = 0;
 			for (int k = 2; k <= blockStride; k = k << 1)
 			{
 				for (int j = k >> 1; j > 0; j = j >> 1)
 				{
-					xxxx++;
 					for (int threadId0 = 0; threadId0 < blockStride; ++threadId0)
 					{
 						int threadId1 = threadId0 ^ j;
@@ -411,7 +410,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					int keyValue = sortedRadix[threadId];
 					int keyHigh = keyValue >> 16;
 					int keyLow = keyValue & 0xffff;
-					int dstOffset1 = radixPrefixBatchScan[keyHigh] + radixPrefixStart[keyHigh];
+					int dstOffset1 = radixPrefixStart[keyHigh];
 					int dstOffset0 = threadId - radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + keyHigh];
 					dst[dstOffset0 + dstOffset1] = cachedItems[keyLow];
 				}
@@ -425,7 +424,8 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		}
 	};
 
-	auto MergeBuckectsUnordered = [&](int blockIdx, int blocksCount, int computeUnits)
+#else
+	auto MergeBuckectsOrdered = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
 		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
 		int itemRadix[D_HOST_SORT_BLOCK_SIZE];
@@ -483,12 +483,13 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			bashSize += blockStride;
 		}
 	};
+#endif
 
 	ndAssert(src.GetCount() == dst.GetCount());
 	ndAssert((1 << exponentRadix) <= D_HOST_MAX_RADIX_SIZE);
 
 	//int deviceComputeUnits = 20;
-	int deviceComputeUnits = 2;
+	int deviceComputeUnits = 1;
 	int itemCount = src.GetCount();
 	int computeUnitsBashCount = (itemCount + D_HOST_SORT_BLOCK_SIZE - 1) / D_HOST_SORT_BLOCK_SIZE;
 	int bashCount = (computeUnitsBashCount + deviceComputeUnits - 1) / deviceComputeUnits;
@@ -507,8 +508,8 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 
 	for (int block = 0; block < computeUnits; ++block)
 	{
+		MergeBuckectsBitonic(block, bashCount, computeUnits);
 		//MergeBuckectsOrdered(block, bashCount, computeUnits);
-		MergeBuckectsUnordered(block, bashCount, computeUnits);
 	}
 }
 
