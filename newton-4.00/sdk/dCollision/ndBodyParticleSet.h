@@ -26,7 +26,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndBody.h"
 
-#define D_USE_NEW_FLUID
+//#define D_USE_NEW_FLUID
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodyParticleSet: public ndBody, public ndBackgroundTask

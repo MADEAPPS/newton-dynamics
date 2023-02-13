@@ -274,7 +274,8 @@ static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const s
 	ndVector v(ndVector::m_zero);
 	for (ndInt32 z = 0; z < size; z++)
 	{
-		for (ndInt32 y = 0; y < size; y++)
+		//for (ndInt32 y = 0; y < size; y++)
+		for (ndInt32 y = 0; y < 1; y++)
 		{
 			for (ndInt32 x = 0; x < size; x++)
 			{
@@ -283,9 +284,9 @@ static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const s
 				p.m_y = spacing * (ndFloat32)ndInt32(p.m_y / spacing);
 				p.m_z = spacing * (ndFloat32)ndInt32(p.m_z / spacing);
 
-				p.m_x += ndGaussianRandom(0.0f, spacing * 0.01f);
-				p.m_y += ndGaussianRandom(0.0f, spacing * 0.01f);
-				p.m_z += ndGaussianRandom(0.0f, spacing * 0.01f);
+				//p.m_x += ndGaussianRandom(0.0f, spacing * 0.01f);
+				//p.m_y += ndGaussianRandom(0.0f, spacing * 0.01f);
+				//p.m_z += ndGaussianRandom(0.0f, spacing * 0.01f);
 				posit.PushBack(p);
 				veloc.PushBack(v);
 			}
@@ -373,10 +374,11 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	
 	//ndInt32 particleCountPerAxis = 1;
 	//ndInt32 particleCountPerAxis = 2;
-	//ndInt32 particleCountPerAxis = 4;
+	ndInt32 particleCountPerAxis = 4;
+	//ndInt32 particleCountPerAxis = 8;
 	//ndInt32 particleCountPerAxis = 10;
 	//ndInt32 particleCountPerAxis = 32;
-	ndInt32 particleCountPerAxis = 40;
+	//ndInt32 particleCountPerAxis = 40;
 	//ndInt32 particleCountPerAxis = 64;
 	ndFloat32 spacing = diameter;
 	

@@ -59,19 +59,13 @@ class ndBodySphFluid: public ndBodyParticleSet
 	virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const;
 
 	private:
-	enum ndGridType
-	{
-		ndAdjacentGrid = 0,
-		ndHomeGrid = 1,
-	};
-
 	class ndGridHash;
 	class ndParticlePair;
 	class ndWorkingBuffers;
 	class ndParticleKernelDistance;
 
 	void SortGrids(ndThreadPool* const threadPool);
-	void BuildPairs(ndThreadPool* const threadPool);
+	void BuildBuckets(ndThreadPool* const threadPool);
 	void CreateGrids(ndThreadPool* const threadPool);
 	void CaculateAabb(ndThreadPool* const threadPool);
 	void SortBuckets(ndThreadPool* const threadPool);

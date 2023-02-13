@@ -31,9 +31,18 @@
 #define D_SPH_HASH_BITS				8
 #define D_SPH_BUFFER_GRANULARITY	4096	
 
+#define D_PARTICLE_BUCKET_SIZE		32
+#define D_GRID_SIZE_SCALER			(1.0f)
+
 class ndBodySphFluid::ndGridHash
 {
 	public:
+	enum ndGridType
+	{
+		m_adjacentGrid = 0,
+		m_homeGrid = 1,
+	};
+
 	ndGridHash()
 	{
 	}
@@ -64,7 +73,7 @@ class ndBodySphFluid::ndGridHash
 		m_y = ndUnsigned64(hash.m_iy);
 		m_z = ndUnsigned64(hash.m_iz);
 
-		m_cellType = ndAdjacentGrid;
+		m_cellType = m_adjacentGrid;
 		m_particleIndex = ndUnsigned64(particleIndex);
 	}
 #else
@@ -88,7 +97,7 @@ class ndBodySphFluid::ndGridHash
 		m_x = ndUnsigned64(hash.m_ix);
 		m_z = ndUnsigned64(hash.m_iz);
 
-		m_cellType = ndAdjacentGrid;
+		m_cellType = m_adjacentGrid;
 		m_particleIndex = ndUnsigned64(particleIndex);
 	}
 #endif
@@ -128,13 +137,13 @@ class ndBodySphFluid::ndGridHash
 class ndBodySphFluid::ndParticlePair
 {
 	public:
-	ndInt32 m_neighborg[32];
+	ndInt32 m_neighborg[D_PARTICLE_BUCKET_SIZE];
 };
 
 class ndBodySphFluid::ndParticleKernelDistance
 {
 	public:
-	ndFloat32 m_dist[32];
+	ndFloat32 m_dist[D_PARTICLE_BUCKET_SIZE];
 };
 
 class ndBodySphFluid::ndWorkingBuffers
@@ -155,6 +164,8 @@ class ndBodySphFluid::ndWorkingBuffers
 		,m_kernelDistance(D_SPH_BUFFER_GRANULARITY)
 		,m_worlToGridOrigin(ndFloat32 (1.0f))
 		,m_worlToGridScale(ndFloat32(1.0f))
+		,m_hashGridSize(ndFloat32(0.0f))
+		,m_hashInvGridSize(ndFloat32(0.0f))
 	{
 		for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; ++i)
 		{
@@ -203,6 +214,8 @@ class ndBodySphFluid::ndWorkingBuffers
 	ndArray<ndInt32> m_partialsGridScans[D_MAX_THREADS_COUNT];
 	ndFloat32 m_worlToGridOrigin;
 	ndFloat32 m_worlToGridScale;
+	ndFloat32 m_hashGridSize;
+	ndFloat32 m_hashInvGridSize;
 };
 
 ndBodySphFluid::ndBodySphFluid()
@@ -405,7 +418,8 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 	};
 
 	ndWorkingBuffers& data = *m_workingBuffers;
-	const ndVector boxSize((m_box1 - m_box0).Scale(ndFloat32(1.0f) / GetSphGridSize()).GetInt());
+	//const ndVector boxSize((m_box1 - m_box0).Scale(ndFloat32(1.0f) / GetSphGridSize()).GetInt());
+	const ndVector boxSize((m_box1 - m_box0).Scale(data.m_hashInvGridSize).GetInt());
 
 #ifdef D_USE_YZ_PLANE_BUCKETS
 	ndCountingSort<ndGridHash, ndKey_ylow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, nullptr, nullptr);
@@ -545,7 +559,7 @@ void ndBodySphFluid::SortGrids(ndThreadPool* const threadPool)
 	#endif
 }
 
-void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
+void ndBodySphFluid::BuildBuckets(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
 	ndWorkingBuffers& data = *m_workingBuffers;
@@ -568,7 +582,7 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 		D_TRACKTIME_NAMED(AddPairs);
 		const ndArray<ndGridHash>& hashGridMap = data.m_hashGridMap;
 		const ndArray<ndInt32>& gridScans = data.m_gridScans;
-		const ndFloat32 diameter = GetSphGridSize();
+		const ndFloat32 diameter = ndFloat32(1.5f) * ndFloat32(2.0f) * GetParticleRadius();
 		const ndFloat32 diameter2 = diameter * diameter;
 		const ndInt32 windowsTest = data.WorldToGrid(ndVector (data.m_worlToGridOrigin + diameter)) + 1;
 
@@ -583,38 +597,34 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 			for (ndInt32 i = 0; i < count0; ++i)
 			{
 				const ndGridHash hash0 = hashGridMap[start + i];
-				const ndInt32 homeGridTest0 = (hash0.m_cellType == ndHomeGrid);
 				const ndInt32 particle0 = ndInt32(hash0.m_particleIndex);
 				const ndInt32 x0 = data.WorldToGrid(m_posit[particle0]);
+				const bool homeGridTest0 = (hash0.m_cellType == ndGridHash::m_homeGrid);
 				for (ndInt32 j = i + 1; j < count; ++j)
 				{
 					const ndGridHash hash1 = hashGridMap[start + j];
 					const ndInt32 particle1 = ndInt32(hash1.m_particleIndex);
 					ndAssert(particle0 != particle1);
 					const ndInt32 x1 = data.WorldToGrid(m_posit[particle1]);
-					//ndAssert((x1 - x0) > ndFloat32(-1.0e-3f));
 					const ndInt32 sweeptTest = ((x1 - x0) >= windowsTest);
 					if (sweeptTest)
 					{
 						break;
 					}
 					ndAssert(particle0 != particle1);
-					const ndInt32 homeGridTest1 = (hash1.m_cellType == ndHomeGrid);
+					const bool homeGridTest1 = (hash1.m_cellType == ndGridHash::m_homeGrid);
 					const ndInt32 test = homeGridTest0 | homeGridTest1;
 					if (test)
 					{
-						ndAssert(particle0 != particle1);
-
 						const ndVector p1p0(m_posit[particle0] - m_posit[particle1]);
 						const ndFloat32 dist2(p1p0.DotProduct(p1p0).GetScalar());
 						if (dist2 < diameter2)
 						{
-							ndAssert(dist2 >= ndFloat32(0.0f));
-							const ndFloat32 dist = ndSqrt(dist2);
+							const ndFloat32 dist = ndSqrt(ndMax(dist2, ndFloat32(1.0e-8f)));
 							{
 								ndSpinLock lock(locks[particle0]);
 								ndInt8 neigborCount = pairCount[particle0];
-								if (neigborCount < 32)
+								if (neigborCount < D_PARTICLE_BUCKET_SIZE)
 								{
 									ndInt8 isUnique = 1;
 									ndInt32* const neighborg = pair[particle0].m_neighborg;
@@ -622,17 +632,18 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 									{
 										isUnique = isUnique & (neighborg[k] != particle1);
 									}
-
+									//ndAssert(isUnique);
+					
 									neighborg[neigborCount] = particle1;
 									distance[particle0].m_dist[neigborCount] = dist;
 									pairCount[particle0] = neigborCount + isUnique;
 								}
 							}
-
+					
 							{
 								ndSpinLock lock(locks[particle1]);
 								ndInt8 neigborCount = pairCount[particle1];
-								if (neigborCount < 32)
+								if (neigborCount < D_PARTICLE_BUCKET_SIZE)
 								{
 									ndInt8 isUnique = 1;
 									ndInt32* const neighborg = pair[particle1].m_neighborg;
@@ -640,6 +651,8 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 									{
 										isUnique = isUnique & (neighborg[k] != particle0);
 									}
+									//ndAssert(isUnique);
+
 									neighborg[neigborCount] = particle0;
 									distance[particle1].m_dist[neigborCount] = dist;
 									pairCount[particle1] = neigborCount + isUnique;
@@ -651,10 +664,103 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 			}
 		};
 
-		// even step is not good because the bashes tend to be clustered
-		// a better way is to sort, but that takes about 1 ms.
-		// Interleaving bashes and has the randomizing effect that 
-		// tend to balance the work load on the thread.
+		const ndInt32 scansCount = gridScans.GetCount() - 1;
+		for (ndInt32 i = threadIndex; i < scansCount; i += threadCount)
+		{
+			const ndInt32 start = gridScans[i];
+			const ndInt32 count = gridScans[i + 1] - start;
+			ProccessCell(start, count);
+		}
+	});
+
+	auto AddPairs_new = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME_NAMED(AddPairs);
+		const ndArray<ndGridHash>& hashGridMap = data.m_hashGridMap;
+		const ndArray<ndInt32>& gridScans = data.m_gridScans;
+		const ndFloat32 diameter = ndFloat32(1.5f) * ndFloat32(2.0f) * GetParticleRadius();
+		const ndFloat32 diameter2 = diameter * diameter;
+		const ndInt32 windowsTest = data.WorldToGrid(ndVector(data.m_worlToGridOrigin + diameter)) + 1;
+
+		ndArray<ndSpinLock>& locks = data.m_locks;
+		ndArray<ndInt8>& pairCount = data.m_pairCount;
+		ndArray<ndParticlePair>& pair = data.m_pairs;
+		ndArray<ndParticleKernelDistance>& distance = data.m_kernelDistance;
+
+		auto ProccessCell = [this, &data, &hashGridMap, &pair, &pairCount, &locks, &distance, windowsTest, diameter2](ndInt32 start, ndInt32 count)
+		{
+			const ndInt32 count0 = count - 1;
+			for (ndInt32 i = 0; i < count0; ++i)
+			{
+				const ndGridHash hash0 = hashGridMap[start + i];
+				const ndInt32 particle0 = ndInt32(hash0.m_particleIndex);
+				const ndInt32 x0 = data.WorldToGrid(m_posit[particle0]);
+				const bool homeGridTest0 = (hash0.m_cellType == ndGridHash::m_homeGrid);
+				for (ndInt32 j = i + 1; j < count; ++j)
+				{
+					const ndGridHash hash1 = hashGridMap[start + j];
+					const ndInt32 particle1 = ndInt32(hash1.m_particleIndex);
+					ndAssert(particle0 != particle1);
+					const ndInt32 x1 = data.WorldToGrid(m_posit[particle1]);
+					const ndInt32 sweeptTest = ((x1 - x0) >= windowsTest);
+					if (sweeptTest)
+					{
+						break;
+					}
+					ndAssert(particle0 != particle1);
+					const ndVector p1p0(m_posit[particle0] - m_posit[particle1]);
+					const ndFloat32 dist2(p1p0.DotProduct(p1p0).GetScalar());
+					if (dist2 < diameter2)
+					{
+						const bool homeGridTest1 = (hash1.m_cellType == ndGridHash::m_homeGrid);
+						if (homeGridTest0 && homeGridTest1)
+						{
+							ndInt8 neigborCount0 = pairCount[particle0];
+							const ndFloat32 dist = ndSqrt(ndMax(dist2, ndFloat32(1.0e-8f)));
+							if (neigborCount0 < D_PARTICLE_BUCKET_SIZE)
+							{
+								pair[particle0].m_neighborg[neigborCount0] = particle1;
+								distance[particle0].m_dist[neigborCount0] = dist;
+								pairCount[particle0] = neigborCount0 + 1;
+							}
+		
+							ndInt8 neigborCount1 = pairCount[particle1];
+							if (neigborCount1 < D_PARTICLE_BUCKET_SIZE)
+							{
+								pair[particle1].m_neighborg[neigborCount1] = particle0;
+								distance[particle1].m_dist[neigborCount1] = dist;
+								pairCount[particle1] = neigborCount1 + 1;
+							}
+		
+						}
+						else if (homeGridTest0)
+						{
+							ndAssert(!homeGridTest1);
+							ndInt8 neigborCount0 = pairCount[particle0];
+							const ndFloat32 dist = ndSqrt(ndMax(dist2, ndFloat32(1.0e-8f)));
+							if (neigborCount0 < D_PARTICLE_BUCKET_SIZE)
+							{
+								pair[particle0].m_neighborg[neigborCount0] = particle1;
+								distance[particle0].m_dist[neigborCount0] = dist;
+								pairCount[particle0] = neigborCount0 + 1;
+							}
+						}
+						else if (homeGridTest1)
+						{
+							ndAssert(!homeGridTest0);
+							ndInt8 neigborCount1 = pairCount[particle1];
+							const ndFloat32 dist = ndSqrt(ndMax(dist2, ndFloat32(1.0e-8f)));
+							if (neigborCount1 < D_PARTICLE_BUCKET_SIZE)
+							{
+								pair[particle1].m_neighborg[neigborCount1] = particle0;
+								distance[particle1].m_dist[neigborCount1] = dist;
+								pairCount[particle1] = neigborCount1 + 1;
+							}
+						}
+					}
+				}
+			}
+		};
 
 		const ndInt32 scansCount = gridScans.GetCount() - 1;
 		for (ndInt32 i = threadIndex; i < scansCount; i += threadCount)
@@ -664,8 +770,22 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 			ProccessCell(start, count);
 		}
 	});
-	
+
+//#ifdef _DEBUG 
+#if 0
+	ndTree<ndInt32, ndInt32> filter;
+	for (ndInt32 i = 0; i < data.m_hashGridMap.GetCount(); ++i)
+	{
+		if (data.m_hashGridMap[i].m_cellType == ndGridHash::m_homeGrid)
+		{
+			ndAssert(filter.Insert(ndInt32 (data.m_hashGridMap[i].m_particleIndex)));
+		}
+	}
+#endif	
+
 	threadPool->ParallelExecute(AddPairs);
+
+	//threadPool->ParallelExecute(AddPairs_new);
 }
 
 void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
@@ -680,7 +800,7 @@ void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
 		D_TRACKTIME_NAMED(CalculateDensity);
 		const ndArray<ndVector>& posit = m_posit;
 
-		const ndFloat32 h = GetSphGridSize();
+		const ndFloat32 h = ndFloat32(1.5f) * ndFloat32(2.0f) * GetParticleRadius();
 		const ndFloat32 h2 = h * h;
 		const ndFloat32 kernelMagicConst = ndFloat32(315.0f) / (ndFloat32(64.0f) * ndPi * ndPow(h, 9));
 		const ndFloat32 kernelConst = m_mass * kernelMagicConst;
@@ -725,7 +845,7 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 		const ndFloat32* const density = &data.m_density[0];
 		const ndFloat32* const invDensity = &data.m_invDensity[0];
 
-		const ndFloat32 h = GetSphGridSize();
+		const ndFloat32 h = ndFloat32(1.5f) * ndFloat32(2.0f) * GetParticleRadius();
 		//const ndFloat32 u = m_viscosity;
 		const ndVector kernelConst(m_mass * ndFloat32(45.0f) / (ndPi * ndPow(h, 6)));
 
@@ -789,9 +909,10 @@ void ndBodySphFluid::IntegrateParticles(ndThreadPool* const threadPool)
 		ndArray<ndVector>& veloc = m_veloc;
 		ndArray<ndVector>& posit = m_posit;
 
+		//const ndVector timestep (ndFloat32 (0.003f));
 		//const ndVector timestep(m_timestep);
-		//ndVector halfTime(timestep * ndVector::m_half);
-		const ndVector timestep (ndFloat32 (0.003f));
+		//const ndVector timestep(m_timestep * 0.5f);
+		const ndVector timestep(m_timestep * 0.25f);
 
 		const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -817,7 +938,7 @@ void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 		public:
 		ndBox()
 			:m_min(ndFloat32(1.0e10f))
-			, m_max(ndFloat32(-1.0e10f))
+			,m_max(ndFloat32(-1.0e10f))
 		{
 		}
 		ndVector m_min;
@@ -849,10 +970,16 @@ void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 		box.m_max = box.m_max.GetMax(boxes[i].m_max);
 	}
 
-	const ndFloat32 gridSize = GetSphGridSize();
+	ndWorkingBuffers& data = *m_workingBuffers;
+	//const ndFloat32 diameter = ndFloat32(2.0f) * GetParticleRadius();
+	const ndFloat32 diameter = ndFloat32(1.5f) * ndFloat32(2.0f) * GetParticleRadius();
+	const ndFloat32 gridSize = diameter * D_GRID_SIZE_SCALER;
 
-	ndVector grid(gridSize);
-	ndVector invGrid(ndFloat32(1.0f) / gridSize);
+	data.m_hashGridSize = gridSize;
+	data.m_hashInvGridSize = ndFloat32(1.0f) / gridSize;
+
+	const ndVector grid(data.m_hashGridSize);
+	const ndVector invGrid(data.m_hashInvGridSize);
 
 	// add one grid padding to the aabb
 	box.m_min -= grid;
@@ -865,8 +992,6 @@ void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 	// make sure the w component is zero.
 	m_box0 = box.m_min & ndVector::m_triplexMask;
 	m_box1 = box.m_max & ndVector::m_triplexMask;
-
-	ndWorkingBuffers& data = *m_workingBuffers;
 	data.SetWorldToGridMapping(gridSize, m_box1, m_box0);
 }
 
@@ -939,21 +1064,21 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	{
 		D_TRACKTIME_NAMED(CountGrids);
 		const ndVector origin(m_box0);
-		const ndFloat32 gridSize = GetSphGridSize();
-		const ndVector box(gridSize * ndFloat32(0.5f * 0.99f));
-		const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
+		const ndVector invGridSize(data.m_hashInvGridSize);
+		//const ndVector particleBox(ndFloat32(1.5f) * GetParticleRadius());
+		const ndVector particleBox(ndFloat32(0.5f) * data.m_hashGridSize);
+		
 		const ndVector* const posit = &m_posit[0];
 		ndInt32* const scans = &data.m_gridScans[0];
 
 		const ndStartEnd startEnd(m_posit.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			const ndVector r(posit[i] - origin);
-			const ndVector p(r * invGridSize);
-			const ndVector p0((r - box) * invGridSize);
-			const ndVector p1((r + box) * invGridSize);
-			const ndGridHash box0Hash(p0, i);
-			const ndGridHash box1Hash(p1, i);
+			const ndVector gridPosit(posit[i] - origin);
+			const ndVector p0(gridPosit - particleBox);
+			const ndVector p1(gridPosit + particleBox);
+			const ndGridHash box0Hash(p0 * invGridSize, i);
+			const ndGridHash box1Hash(p1 * invGridSize, i);
 			const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
 			
 #ifdef D_USE_YZ_PLANE_BUCKETS
@@ -973,25 +1098,22 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	{
 		D_TRACKTIME_NAMED(CreateGrids);
 		const ndVector origin(m_box0);
-		const ndFloat32 gridSize = GetSphGridSize();
 		ndGridHash* const dst = &data.m_hashGridMap[0];
 		const ndInt32* const scans = &data.m_gridScans[0];
-		
-		// the 0.99 factor is to make sure the box 
-		// fits in not more than two adjacent grids.
-		const ndVector box(gridSize * ndFloat32(0.5f * 0.99f));
-		const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
 		const ndVector* const posit = &m_posit[0];
+		const ndVector invGridSize(data.m_hashInvGridSize);
+		//const ndVector particleBox(ndFloat32(1.5f)* GetParticleRadius());
+		const ndVector particleBox(ndFloat32(0.5f)* data.m_hashGridSize);
 
 		const ndStartEnd startEnd(m_posit.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			const ndVector r(posit[i] - origin);
-			const ndVector p(r * invGridSize);
-			const ndVector p0((r - box) * invGridSize);
-			const ndVector p1((r + box) * invGridSize);
-			const ndGridHash box0Hash(p0, i);
-			const ndGridHash box1Hash(p1, i);
+			const ndVector gridPosit(posit[i] - origin);
+			const ndVector gridPosit0(gridPosit - particleBox);
+			const ndVector gridPosit1(gridPosit + particleBox);
+			const ndGridHash centerHash(gridPosit* invGridSize, i);
+			const ndGridHash box0Hash(gridPosit0 * invGridSize, i);
+			const ndGridHash box1Hash(gridPosit1 * invGridSize, i);
 			const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
 
 			const ndInt32 base = scans[i];
@@ -1008,33 +1130,22 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 #endif
 			const ndGridHash* const neigborgh = &neiborghood.m_neighborDirs[code][0];
 			ndAssert(count == neiborghood.m_counter[code]);
-
-			const ndGridHash hashKey(p, i);
 			for (ndInt32 j = 0; j < count; ++ j)
 			{
 				ndGridHash quadrand(box0Hash);
 				quadrand.m_gridHash += neigborgh[j].m_gridHash;
-				quadrand.m_cellType = ndGridType(quadrand.m_gridHash == hashKey.m_gridHash);
-				ndAssert(quadrand.m_cellType == ((quadrand.m_gridHash == hashKey.m_gridHash) ? ndHomeGrid : ndAdjacentGrid));
+				quadrand.m_cellType = ndGridHash::ndGridType(quadrand.m_gridHash == centerHash.m_gridHash);
+				ndAssert(quadrand.m_cellType == ((quadrand.m_gridHash == centerHash.m_gridHash) ? ndGridHash::m_homeGrid : ndGridHash::m_adjacentGrid));
 				dst[base + j] = quadrand;
 			}
 		}
 	});
-	ndAssert(sizeof(ndGridHash) == 8);
 
 	data.m_gridScans.SetCount(m_posit.GetCount() + 1);
 	data.m_gridScans[m_posit.GetCount()] = 0;
 	threadPool->ParallelExecute(CountGrids);
 	
 	ndInt32 gridCount = 0;
-#if 0
-	for (ndInt32 i = 0; i < data.m_gridScans.GetCount(); ++i)
-	{
-		ndInt32 count = data.m_gridScans[i];
-		data.m_gridScans[i] = gridCount;
-		gridCount += count;
-	}
-#else
 	const ndInt32 itemsCount = data.m_gridScans.GetCount() & (-8);
 	for (ndInt32 i = 0; i < itemsCount; i += 8)
 	{
@@ -1051,7 +1162,6 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 		data.m_gridScans[j] = gridCount;
 		gridCount += count;
 	}
-#endif
 	
 	data.m_hashGridMap.SetCount(gridCount);
 	threadPool->ParallelExecute(CreateGrids);
@@ -1099,7 +1209,7 @@ void ndBodySphFluid::Execute(ndThreadPool* const threadPool)
 	CreateGrids(threadPool);
 	SortGrids(threadPool);
 	CalculateScans(threadPool);
-	BuildPairs(threadPool);
+	BuildBuckets(threadPool);
 	CalculateParticlesDensity(threadPool);
 	CalculateAccelerations(threadPool);
 	IntegrateParticles(threadPool);
