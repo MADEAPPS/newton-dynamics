@@ -47,8 +47,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 	ndFloat32 GetGasConstant() const;
 	void SetGasConstant(ndFloat32 gasConst);
 
-	ndFloat32 GetSphGridSize() const;
-
 	virtual ndBodySphFluid* GetAsBodySphFluid();
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
@@ -133,12 +131,6 @@ inline ndFloat32 ndBodySphFluid::GetGasConstant() const
 inline void ndBodySphFluid::SetGasConstant(ndFloat32 gasConst)
 {
 	m_gasConstant = gasConst;
-}
-
-inline ndFloat32 ndBodySphFluid::GetSphGridSize() const
-{
-	return GetParticleRadius() * ndFloat32(2.0f) * ndFloat32(1.5f);
-	//return GetParticleRadius() * ndFloat32(2.0f) * ndFloat32(0.75f);
 }
 
 #endif 

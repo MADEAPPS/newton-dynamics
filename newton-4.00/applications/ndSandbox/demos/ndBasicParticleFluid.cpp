@@ -106,8 +106,7 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid
 	{
 		D_TRACKTIME();
 		ndArray<ndVector>& pointCloud = GetPositions();
-		ndFloat32 gridSpacing = GetSphGridSize();
-		//gridSpacing *= 1.0f;
+		ndFloat32 gridSpacing = 2.0f * GetParticleRadius();
 		m_isoSurface.GenerateMesh(pointCloud, gridSpacing);
 
 #if 1
@@ -267,7 +266,7 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 
 static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const surface, ndInt32 size)
 {
-	ndFloat32 spacing = surface->GetSphGridSize();
+	ndFloat32 spacing = 2.0f * surface->GetParticleRadius();
 	ndArray<ndVector>& veloc = surface->GetVelocity();
 	ndArray<ndVector>& posit = surface->GetPositions();
 
@@ -296,7 +295,7 @@ static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const s
 
 static void BuildHollowBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const surface, ndInt32 size)
 {
-	ndFloat32 spacing = surface->GetSphGridSize();
+	ndFloat32 spacing = 2.0f * surface->GetParticleRadius();
 	ndArray<ndVector>& veloc = surface->GetVelocity();
 	ndArray<ndVector>& posit = surface->GetPositions();
 
@@ -325,7 +324,7 @@ static void BuildHollowBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* c
 
 static void BuildSphere(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const surface, ndInt32 size)
 {
-	ndFloat32 spacing = surface->GetSphGridSize();
+	ndFloat32 spacing = 2.0f * surface->GetParticleRadius();
 	ndArray<ndVector>& veloc = surface->GetVelocity();
 	ndArray<ndVector>& posit = surface->GetPositions();
 
@@ -364,7 +363,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 
 	//ndFloat32 diameter = 0.25f;
 	//ndFloat32 diameter = 0.15f;
-	ndFloat32 diameter = 0.125f;
+	//ndFloat32 diameter = 0.125f;
+	ndFloat32 diameter = 1.0f;
 	ndIsoSurfaceParticleVolume* const fluidObject = new ndIsoSurfaceParticleVolume(diameter * 0.5f);
 	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, ndVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject);
 

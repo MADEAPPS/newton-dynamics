@@ -1205,14 +1205,14 @@ void ndBodySphFluid::Execute(ndThreadPool* const threadPool)
 	D_TRACKTIME();
 	ndAssert(sizeof(ndGridHash) == sizeof(ndUnsigned64));
 
-	CaculateAabb(threadPool);
-	CreateGrids(threadPool);
-	SortGrids(threadPool);
-	CalculateScans(threadPool);
-	BuildBuckets(threadPool);
-	CalculateParticlesDensity(threadPool);
-	CalculateAccelerations(threadPool);
-	IntegrateParticles(threadPool);
+	//CaculateAabb(threadPool);
+	//CreateGrids(threadPool);
+	//SortGrids(threadPool);
+	//CalculateScans(threadPool);
+	//BuildBuckets(threadPool);
+	//CalculateParticlesDensity(threadPool);
+	//CalculateAccelerations(threadPool);
+	//IntegrateParticles(threadPool);
 }
 
 #endif
