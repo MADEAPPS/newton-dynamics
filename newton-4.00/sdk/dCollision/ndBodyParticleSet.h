@@ -49,9 +49,8 @@ class ndBodyParticleSet: public ndBody, public ndBackgroundTask
 	bool GetAsynUpdate() const;
 	void SetAsynUpdate(bool update);
 	ndFloat32 GetParticleRadius() const;
-	void SetParticleRadius(ndFloat32 radius);
+	virtual void SetParticleRadius(ndFloat32 radius);
 
-	//D_COLLISION_API virtual void Update(const ndWorld* const workd, ndFloat32 timestep) = 0;
 	D_COLLISION_API virtual void Update(const ndScene* const scene, ndFloat32 timestep) = 0;
 
 	protected:

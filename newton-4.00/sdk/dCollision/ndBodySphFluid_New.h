@@ -37,9 +37,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 
 	ndFloat32 GetViscosity() const;
 	void SetViscosity(ndFloat32 viscosity);
-	
-	ndFloat32 GetParticleMass() const;
-	void SetParticleMass(ndFloat32 mass);
 
 	ndFloat32 GetRestDensity() const;
 	void SetRestDensity(ndFloat32 resDensity);
@@ -47,7 +44,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	ndFloat32 GetGasConstant() const;
 	void SetGasConstant(ndFloat32 gasConst);
 
-	ndFloat32 GetSphGridSize() const;
+	void SetParticleRadius(ndFloat32 radius);
 
 	virtual ndBodySphFluid* GetAsBodySphFluid();
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
@@ -126,7 +123,16 @@ inline ndFloat32 ndBodySphFluid::GetRestDensity() const
 
 inline void ndBodySphFluid::SetRestDensity(ndFloat32 restDensity)
 {
+	ndFloat32 r = GetParticleRadius();
+	ndFloat32 volume = ndPi * ndFloat32(4.0f / 3.0f) * r * r * r;
 	m_restDensity = restDensity;
+	m_mass = volume * m_restDensity;
+}
+
+inline void ndBodySphFluid::SetParticleRadius(ndFloat32 radius)
+{
+	ndBodyParticleSet::SetParticleRadius(radius);
+	SetRestDensity(m_restDensity);
 }
 
 inline ndFloat32 ndBodySphFluid::GetGasConstant() const
@@ -138,13 +144,6 @@ inline void ndBodySphFluid::SetGasConstant(ndFloat32 gasConst)
 {
 	m_gasConstant = gasConst;
 }
-
-inline ndFloat32 ndBodySphFluid::GetSphGridSize() const
-{
-	return GetParticleRadius() * ndFloat32(2.0f) * ndFloat32(1.5f);
-	//return GetParticleRadius() * ndFloat32(2.0f) * ndFloat32(0.75f);
-}
-
 #endif 
 
 #endif
