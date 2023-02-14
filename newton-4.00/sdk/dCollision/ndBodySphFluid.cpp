@@ -806,7 +806,7 @@ void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
 
 		const ndFloat32 h = ndFloat32(1.5f) * ndFloat32(2.0f) * GetParticleRadius();
 		const ndFloat32 h2 = h * h;
-		const ndFloat32 kernelMagicConst = ndFloat32(315.0f) / (ndFloat32(64.0f) * ndPi * ndPow(h, 9));
+		const ndFloat32 kernelMagicConst = ndFloat32(315.0f) / (ndFloat32(64.0f) * ndPi * ndPow(h, ndFloat32 (9.0f)));
 		const ndFloat32 kernelConst = m_mass * kernelMagicConst;
 		const ndFloat32 selfDensity = kernelConst * h2 * h2 * h2;
 
@@ -851,11 +851,11 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 
 		const ndFloat32 h = ndFloat32(1.5f) * ndFloat32(2.0f) * GetParticleRadius();
 		//const ndFloat32 u = m_viscosity;
-		const ndVector kernelConst(m_mass * ndFloat32(45.0f) / (ndPi * ndPow(h, 6)));
+		const ndVector kernelConst(m_mass * ndFloat32(45.0f) / (ndPi * ndPow(h, ndFloat32 (6.0f))));
 
 		const ndFloat32 viscosity = m_viscosity;
 		const ndFloat32 restDensity = m_restDensity;
-		const ndFloat32 gasConstant = ndFloat32(0.5f) * m_gasConstant;
+		const ndFloat32 gasConstant = m_gasConstant;
 
 		const ndVector gravity(m_gravity);
 		const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
@@ -1989,11 +1989,10 @@ void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
 		D_TRACKTIME_NAMED(CalculateDensity);
 		const ndArray<ndVector>& posit = m_posit;
 
-		//const ndFloat32 h = ndFloat32(1.5f) * ndFloat32(2.0f) * GetParticleRadius();
 		const ndFloat32 h = data.m_particleDiameter;
 		const ndFloat32 h2 = h * h;
-		const ndFloat32 kernelMagicConst = ndFloat32(315.0f) / (ndFloat32(64.0f) * ndPi * ndPow(h, 9));
-		const ndFloat32 kernelConst = m_mass * kernelMagicConst;
+		const ndFloat32 kernelConst = ndFloat32(315.0f) / (ndFloat32(64.0f) * ndPi * ndPow(h, ndFloat32 (9.0f)));
+		const ndFloat32 kernelMassConst = m_mass * kernelConst;
 		//const ndFloat32 selfDensity = kernelConst * h2 * h2 * h2;
 		const ndFloat32 selfVolume = h2 * h2 * h2;
 
@@ -2006,15 +2005,15 @@ void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
 			ndFloat32 volume = selfVolume;
 			for (ndInt32 j = 0; j < count; ++j)
 			{
-				const ndFloat32 d = distance.m_dist[j];
-				const ndFloat32 dist2 = h2 - d * d;
+				const ndFloat32 dist = distance.m_dist[j];
+				const ndFloat32 dist2 = h2 - dist * dist;
 				ndAssert(dist2 >= ndFloat32(0.0f));
 				const ndFloat32 dist6 = dist2 * dist2 * dist2;
 				//density += kernelConst * dist6;
 				volume += dist6;
 			}
 			//density = kernelConst * density;
-			ndFloat32 density = kernelConst * volume;
+			ndFloat32 density = kernelMassConst * volume;
 			data.m_density[i] = density;
 			data.m_invDensity[i] = ndFloat32(1.0f) / density;
 		}
@@ -2039,14 +2038,17 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 		const ndFloat32* const density = &data.m_density[0];
 		const ndFloat32* const invDensity = &data.m_invDensity[0];
 
-		//const ndFloat32 h = ndFloat32(1.5f) * ndFloat32(2.0f) * GetParticleRadius();
-		const ndFloat32 h = data.m_particleDiameter;
 		//const ndFloat32 u = m_viscosity;
-		const ndVector kernelConst(m_mass * ndFloat32(45.0f) / (ndPi * ndPow(h, 6)));
+		const ndFloat32 h = data.m_particleDiameter;
+		//const ndFloat32 h2 = h * h;
+		const ndVector kernelConst(ndFloat32(45.0f) / (ndPi * ndPow(h, ndFloat32 (6.0f))));
+		//const ndFloat32 kernelConst = ndFloat32(315.0f) / (ndFloat32(64.0f) * ndPi * ndPow(h, ndFloat32(9.0f)));
+		//const ndFloat32 kernelMassConst = m_mass * kernelConst;
 
 		const ndFloat32 viscosity = m_viscosity;
 		const ndFloat32 restDensity = m_restDensity;
-		const ndFloat32 gasConstant = ndFloat32(0.5f) * m_gasConstant;
+		//const ndFloat32 gasConstant = m_gasConstant * ndFloat32 (0.5f);
+		const ndFloat32 gasConstant = m_gasConstant;
 
 		const ndVector gravity(m_gravity);
 		const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
@@ -2054,41 +2056,48 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 		{
 			const ndVector p0(posit[i0]);
 			const ndVector v0(veloc[i0]);
-
-			const ndInt32 count = data.m_pairCount[i0];
+			ndVector forceAcc(ndVector::m_zero);
+			
 			const ndParticlePair& pairs = data.m_pairs[i0];
 			ndParticleKernelDistance& distance = data.m_kernelDistance[i0];
-			const ndFloat32 pressureI0 = density[i0] - restDensity;
+			const ndFloat32 pressureI0 = gasConstant * (density[i0] - restDensity);
 
-			ndVector forceAcc(ndVector::m_zero);
+			const ndInt32 count = data.m_pairCount[i0];
 			for (ndInt32 j = 0; j < count; ++j)
 			{
 				const ndInt32 i1 = pairs.m_neighborg[j];
 				const ndVector p10(posit[i1] - p0);
 				const ndVector dot(p10.DotProduct(p10) + epsilon2);
 				const ndVector unitDir(p10 * dot.InvSqrt());
-
-				ndAssert(unitDir.m_w == ndFloat32(0.0f));
-
+			
+				ndAssert(p10.m_w == ndFloat32(0.0f));
+				ndAssert(ndAbs(ndSqrt (dot.GetScalar()) - distance.m_dist[j]) < ndFloat32(1.0e-4f));
+			
 				// kernel distance
-				const ndFloat32 dist = distance.m_dist[j];
-				const ndFloat32 kernelDist = h - dist;
-				ndAssert(kernelDist >= ndFloat32(0.0f));
-
+				const ndFloat32 dist = h - distance.m_dist[j];
+				ndAssert(dist >= ndFloat32(0.0f));
+				const ndFloat32 kernelValue = dist * dist;
+			
 				// calculate pressure
-				const ndFloat32 kernelDist2 = kernelDist * kernelDist;
-				const ndFloat32 pressureI1 = density[i1] - restDensity;
-				const ndVector force(gasConstant * kernelDist2 * invDensity[i1] * (pressureI0 + pressureI1));
-				forceAcc += force * unitDir;
+				const ndFloat32 pressureI1 = gasConstant * (density[i1] - restDensity);
+				const ndFloat32 averagePressure = ndFloat32 (0.5f) * invDensity[i1] * (pressureI1 + pressureI0);
+				const ndVector forcePresure(m_mass * averagePressure * kernelValue);
 
-				// calculate viscosity acceleration
-				const ndVector v01(veloc[i1] - v0);
-				forceAcc += v01 * ndVector(kernelDist * viscosity * invDensity[j]);
+			//	const ndVector force(gasConstant * kernelDist2 * invDensity[i1] * (pressureI0 + pressureI1));
+			//	forceAcc += force * unitDir;
+			//
+			//	// calculate viscosity acceleration
+			//	const ndVector v01(veloc[i1] - v0);
+			//	forceAcc += v01 * ndVector(kernelDist * viscosity * invDensity[j]);
+
+				const ndVector force(forcePresure * unitDir);
+				forceAcc += force;
 			}
-			// something very wrong here.
-			const ndVector accel(gravity + ndVector(invDensity[i0]) * kernelConst * forceAcc);
-			//const ndVector accel(gravity + kernelConst * forceAcc);
-			data.m_accel[i0] = accel;
+			//// something very wrong here.
+			//const ndVector accel(gravity + ndVector(invDensity[i0]) * kernelMassConst * forceAcc);
+			////const ndVector accel(gravity + kernelConst * forceAcc);
+			//data.m_accel[i0] = accel;
+			data.m_accel[i0] = gravity;
 		}
 	});
 

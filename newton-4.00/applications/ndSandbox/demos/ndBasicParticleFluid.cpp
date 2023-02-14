@@ -270,6 +270,7 @@ static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const s
 	ndArray<ndVector>& veloc = surface->GetVelocity();
 	ndArray<ndVector>& posit = surface->GetPositions();
 
+spacing *= 0.9f;
 	ndVector v(ndVector::m_zero);
 	//for (ndInt32 z = 0; z < size; z++)
 	for (ndInt32 z = 0; z < 1; z++)
@@ -374,8 +375,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	fluidObject->SetMatrix(matrix);
 	fluidObject->SetParticleRadius(diameter * 0.5f);
 	
-	ndInt32 particleCountPerAxis = 1;
-	//ndInt32 particleCountPerAxis = 2;
+	//ndInt32 particleCountPerAxis = 1;
+	ndInt32 particleCountPerAxis = 2;
 	//ndInt32 particleCountPerAxis = 4;
 	//ndInt32 particleCountPerAxis = 8;
 	//ndInt32 particleCountPerAxis = 10;

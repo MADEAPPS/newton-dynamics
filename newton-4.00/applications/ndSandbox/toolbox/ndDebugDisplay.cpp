@@ -506,7 +506,7 @@ void RenderParticles(ndDemoEntityManager* const scene)
 			//glVertexPointer(3, GL_FLOAT, sizeof(glVector3), &pointBuffer[0]);
 			glVertexPointer(4, GL_FLOAT, 0, &positions[0]);
 
-			ndFloat32 radius = 1.5f * particle->GetParticleRadius();
+			ndFloat32 radius = 1.0f * particle->GetParticleRadius();
 
 			glVector4 quadUV[] =
 			{

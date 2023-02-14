@@ -250,17 +250,18 @@ void ndWorldSceneCuda::CalculateContacts(ndInt32, ndContact* const)
 
 void ndWorldSceneCuda::Addparticle(ndBodySphFluid* const particle)
 {
-	ndSphFluidInitInfo info;
-	info.m_owner = particle;
-	info.m_context = m_context;
-	info.m_owner = particle;
-	info.m_gridSize = particle->GetSphGridSize();
-
-	ndCudaSphFluid* const fluid = new ndCudaSphFluid(info);
-	m_fluidParticles.Append(fluid);
-
-	const ndArray<ndVector>& posit = particle->GetPositions();
-	fluid->MemCpy(&posit[0].m_x, sizeof(ndVector) / sizeof(ndFloat32), posit.GetCount());
+	ndAssert(0);
+	//ndSphFluidInitInfo info;
+	//info.m_owner = particle;
+	//info.m_context = m_context;
+	//info.m_owner = particle;
+	//info.m_gridSize = particle->GetSphGridSize();
+	//
+	//ndCudaSphFluid* const fluid = new ndCudaSphFluid(info);
+	//m_fluidParticles.Append(fluid);
+	//
+	//const ndArray<ndVector>& posit = particle->GetPositions();
+	//fluid->MemCpy(&posit[0].m_x, sizeof(ndVector) / sizeof(ndFloat32), posit.GetCount());
 }
 
 bool ndWorldSceneCuda::AddParticle(ndSharedPtr<ndBody>& particle)
