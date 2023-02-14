@@ -2064,6 +2064,7 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 			{
 				const ndInt32 i1 = pairs.m_neighborg[j];
 				const ndVector p10(p0 - posit[i1]);
+				//const ndVector p10(posit[i1] - p0);
 				const ndVector dot(p10.DotProduct(p10) + epsilon2);
 				const ndVector unitDir(p10 * dot.InvSqrt());
 			
