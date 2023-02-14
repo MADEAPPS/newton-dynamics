@@ -2040,17 +2040,14 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 
 		//const ndFloat32 u = m_viscosity;
 		const ndFloat32 h = data.m_particleDiameter;
-		//const ndFloat32 h2 = h * h;
 		const ndVector kernelConst(ndFloat32(45.0f) / (ndPi * ndPow(h, ndFloat32 (6.0f))));
-		//const ndFloat32 kernelConst = ndFloat32(315.0f) / (ndFloat32(64.0f) * ndPi * ndPow(h, ndFloat32(9.0f)));
-		//const ndFloat32 kernelMassConst = m_mass * kernelConst;
 
 		const ndFloat32 viscosity = m_viscosity;
 		const ndFloat32 restDensity = m_restDensity;
-		//const ndFloat32 gasConstant = m_gasConstant * ndFloat32 (0.5f);
 		const ndFloat32 gasConstant = m_gasConstant;
 
-		const ndVector gravity(m_gravity);
+		//const ndVector gravity(m_gravity);
+		const ndVector gravity(ndVector::m_zero);
 		const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i0 = startEnd.m_start; i0 < startEnd.m_end; ++i0)
 		{
@@ -2066,7 +2063,7 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 			for (ndInt32 j = 0; j < count; ++j)
 			{
 				const ndInt32 i1 = pairs.m_neighborg[j];
-				const ndVector p10(posit[i1] - p0);
+				const ndVector p10(p0 - posit[i1]);
 				const ndVector dot(p10.DotProduct(p10) + epsilon2);
 				const ndVector unitDir(p10 * dot.InvSqrt());
 			
@@ -2083,21 +2080,17 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 				const ndFloat32 averagePressure = ndFloat32 (0.5f) * invDensity[i1] * (pressureI1 + pressureI0);
 				const ndVector forcePresure(m_mass * averagePressure * kernelValue);
 
-			//	const ndVector force(gasConstant * kernelDist2 * invDensity[i1] * (pressureI0 + pressureI1));
-			//	forceAcc += force * unitDir;
-			//
-			//	// calculate viscosity acceleration
-			//	const ndVector v01(veloc[i1] - v0);
-			//	forceAcc += v01 * ndVector(kernelDist * viscosity * invDensity[j]);
+				//// calculate viscosity acceleration
+				//const ndVector v01(veloc[i1] - v0);
+				//forceAcc += v01 * ndVector(kernelDist * viscosity * invDensity[j]);
 
 				const ndVector force(forcePresure * unitDir);
 				forceAcc += force;
 			}
-			//// something very wrong here.
-			//const ndVector accel(gravity + ndVector(invDensity[i0]) * kernelMassConst * forceAcc);
-			////const ndVector accel(gravity + kernelConst * forceAcc);
-			//data.m_accel[i0] = accel;
-			data.m_accel[i0] = gravity;
+
+			const ndVector accel(gravity + forceAcc);
+			//const ndVector accel(gravity + ndVector(invDensity[i0]) * forceAcc);
+			data.m_accel[i0] = accel;
 		}
 	});
 

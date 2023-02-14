@@ -376,7 +376,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	fluidObject->SetParticleRadius(diameter * 0.5f);
 	
 	//ndInt32 particleCountPerAxis = 1;
-	ndInt32 particleCountPerAxis = 2;
+	//ndInt32 particleCountPerAxis = 2;
+	ndInt32 particleCountPerAxis = 3;
 	//ndInt32 particleCountPerAxis = 4;
 	//ndInt32 particleCountPerAxis = 8;
 	//ndInt32 particleCountPerAxis = 10;
