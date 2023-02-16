@@ -91,7 +91,7 @@ ndFileFormatRegistry* ndFileFormatRegistry::GetHandler(const char* const classNa
 	return nullptr;
 }
 
-void ndFileFormatRegistry::SaveBody(nd::TiXmlElement* const parentNode, ndBody* const body)
+void ndFileFormatRegistry::SaveBody(nd::TiXmlElement* const, ndBody* const)
 {
 	ndAssert(0);
 }

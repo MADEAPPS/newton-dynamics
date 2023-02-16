@@ -37,4 +37,8 @@ void ndFileFormatBody::SaveBody(nd::TiXmlElement* const parentNode, ndBody* cons
 	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndBody::StaticClassName());
 	parentNode->LinkEndChild(classNode);
 
+	xmlSaveParam(classNode, "transform", body->GetMatrix());
+	xmlSaveParam(classNode, "omega", body->GetOmega());
+	xmlSaveParam(classNode, "velocity", body->GetVelocity());
+	xmlSaveParam(classNode, "centerOfMass", body->GetCentreOfMass());
 }

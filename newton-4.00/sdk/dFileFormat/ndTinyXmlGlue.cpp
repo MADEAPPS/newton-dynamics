@@ -19,9 +19,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#include "ndFileFormatStdafx.h"
 #include "ndTinyXmlGlue.h"
 
-#if 0
+
 static char* FloatToString(char* const buffer, ndFloat32 value)
 {
 	sprintf(buffer, "%f", value);
@@ -42,6 +43,7 @@ static char* FloatToString(char* const buffer, ndFloat32 value)
 	return ptr;
 }
 
+
 static void CleanWhiteSpace(const char* const value)
 {
 	size_t size = strlen(value) - 1;
@@ -52,14 +54,7 @@ static void CleanWhiteSpace(const char* const value)
 	}
 }
 
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const type, const char* const value)
-{
-	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
-	rootNode->LinkEndChild(node);
-	CleanWhiteSpace(value);
-	node->SetAttribute(type, value);
-}
-
+#if 0
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 value)
 {
 	char buffer[1024];
@@ -80,32 +75,6 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndFl
 	char buffer[1024];
 	FloatToString(buffer, value);
 	xmlSaveParam(rootNode, name, "float", buffer);
-}
-
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndVector& value)
-{
-	char buffer[1024];
-	char* ptr0 = FloatToString(buffer, value.m_x);
-	char* ptr1 = FloatToString(ptr0, value.m_y);
-	FloatToString(ptr1, value.m_z);
-	xmlSaveParam(rootNode, name, "float3", buffer);
-}
-
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndMatrix& value)
-{
-	ndVector euler0;
-	ndVector euler1;
-	value.CalcPitchYawRoll(euler0, euler1);
-	euler0 = euler0.Scale(ndRadToDegree);
-
-	char buffer[256];
-	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
-	rootNode->LinkEndChild(node);
-
-	sprintf(buffer, "%f %f %f", value.m_posit.m_x, value.m_posit.m_y, value.m_posit.m_z);
-	node->SetAttribute("position", buffer);
-	sprintf(buffer, "%f %f %f", euler0.m_x, euler0.m_y, euler0.m_z);
-	node->SetAttribute("angles", buffer);
 }
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value)
@@ -362,3 +331,40 @@ const nd::TiXmlNode* xmlFind(const nd::TiXmlNode* const rootNode, const char* co
 }
 
 #endif
+
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const type, const char* const value)
+{
+	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
+	rootNode->LinkEndChild(node);
+	CleanWhiteSpace(value);
+	node->SetAttribute(type, value);
+}
+
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndMatrix& value)
+{
+	ndVector euler0;
+	ndVector euler1;
+	value.CalcPitchYawRoll(euler0, euler1);
+	euler0 = euler0.Scale(ndRadToDegree);
+
+	//char buffer[256];
+	//nd::TiXmlElement* const node = new nd::TiXmlElement(name);
+	//rootNode->LinkEndChild(node);
+
+	xmlSaveParam(rootNode, "posit", value.m_posit);
+	xmlSaveParam(rootNode, "angle", euler0);
+
+	//sprintf(buffer, "%f %f %f", value.m_posit.m_x, value.m_posit.m_y, value.m_posit.m_z);
+	//node->SetAttribute("position", buffer);
+	//sprintf(buffer, "%f %f %f", euler0.m_x, euler0.m_y, euler0.m_z);
+	//node->SetAttribute("angles", buffer);
+}
+
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndVector& value)
+{
+	char buffer[1024];
+	char* ptr0 = FloatToString(buffer, value.m_x);
+	char* ptr1 = FloatToString(ptr0, value.m_y);
+	FloatToString(ptr1, value.m_z);
+	xmlSaveParam(rootNode, name, "float3", buffer);
+}
