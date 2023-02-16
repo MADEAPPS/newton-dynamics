@@ -44,6 +44,7 @@ ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
 	m_bias.SetSize(src.GetOuputSize());
 }
 
+#if 0
 ndBrainLayer::ndBrainLayer(const nd::TiXmlNode* layerNode)
 	:ndBrainMatrix()
 {
@@ -75,6 +76,7 @@ ndBrainLayer::ndBrainLayer(const nd::TiXmlNode* layerNode)
 		ndAssert(0);
 	}
 }
+#endif
 
 ndBrainLayer::~ndBrainLayer()
 {
@@ -153,6 +155,7 @@ bool ndBrainLayer::Compare(const ndBrainLayer& src) const
 	return true;
 }
 
+#if 0
 void ndBrainLayer::Load(const nd::TiXmlElement* const layerNode)
 {
 	const nd::TiXmlNode* const weights = layerNode->FirstChild("inputWeights");
@@ -220,6 +223,7 @@ void ndBrainLayer::Save(nd::TiXmlElement* const layerNode) const
 		xmlSaveParam(input, weight, (*this)[i]);
 	}
 }
+#endif
 
 void ndBrainLayer::InitGaussianWeights(ndReal mean, ndReal variance)
 {

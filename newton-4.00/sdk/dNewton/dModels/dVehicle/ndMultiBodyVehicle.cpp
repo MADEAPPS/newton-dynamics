@@ -90,39 +90,6 @@ ndFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(ndFloat32 speed) c
 	return downForceFactor * m_gravity;
 }
 
-void ndMultiBodyVehicle::ndDownForce::Save(nd::TiXmlNode* const parentNode) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement("aerodynamics");
-	parentNode->LinkEndChild(childNode);
-
-	xmlSaveParam(childNode, "gravity", m_gravity);
-	for (ndInt32 i = 0; i < ndInt32(sizeof(m_downForceTable) / sizeof(m_downForceTable[0])); ++i)
-	{
-		ndVector nod(m_downForceTable[i].m_speed, m_downForceTable[i].m_forceFactor, m_downForceTable[i].m_aerodynamicDownforceConstant, ndFloat32(0.0f));
-		xmlSaveParam(childNode, "downforceCurve", nod);
-	}
-}
-
-void ndMultiBodyVehicle::ndDownForce::Load(const nd::TiXmlNode* const xmlNode)
-{
-	m_gravity = xmlGetFloat(xmlNode, "gravity");
-	const nd::TiXmlNode* node = xmlNode->FirstChild();
-	for (ndInt32 i = 0; i < ndInt32(sizeof(m_downForceTable) / sizeof(m_downForceTable[0])); ++i)
-	{
-		node = node->NextSibling();
-		const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-		const char* const data = element->Attribute("float3");
-
-		ndFloat64 fx;
-		ndFloat64 fy;
-		ndFloat64 fz;
-		sscanf(data, "%lf %lf %lf", &fx, &fy, &fz);
-		m_downForceTable[i].m_speed = ndFloat32(fx);
-		m_downForceTable[i].m_forceFactor = ndFloat32(fy);
-		m_downForceTable[i].m_aerodynamicDownforceConstant = ndFloat32(fz);
-	}
-}
-
 ndMultiBodyVehicle* ndMultiBodyVehicle::GetAsMultiBodyVehicle()
 {
 	return this;

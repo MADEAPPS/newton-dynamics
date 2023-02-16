@@ -31,7 +31,7 @@ class ndBrainLayer: public ndBrainMatrix
 {
 	public: 
 	ndBrainLayer(const ndBrainLayer& src);
-	ndBrainLayer(const nd::TiXmlNode* layerNode);
+	//ndBrainLayer(const nd::TiXmlNode* layerNode);
 	ndBrainLayer(ndInt32 inputs, ndInt32 outputs, ndBrainActivationType type);
 	virtual ~ndBrainLayer();
 
@@ -52,8 +52,8 @@ class ndBrainLayer: public ndBrainMatrix
 	virtual void CopyFrom(const ndBrainLayer& src);
 	virtual bool Compare(const ndBrainLayer& src) const;
 
-	virtual void Load(const nd::TiXmlElement* const layerNode);
-	virtual void Save(nd::TiXmlElement* const layerNode) const;
+	//virtual void Load(const nd::TiXmlElement* const layerNode);
+	//virtual void Save(nd::TiXmlElement* const layerNode) const;
 
 	void ApplyActivation(ndBrainVector& output) const;
 	void ActivationDerivative(const ndBrainVector& input, ndBrainVector& outputDerivative) const;

@@ -19,9 +19,9 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndCoreStdafx.h"
 #include "ndTinyXmlGlue.h"
 
+#if 0
 static char* FloatToString(char* const buffer, ndFloat32 value)
 {
 	sprintf(buffer, "%f", value);
@@ -360,3 +360,5 @@ const nd::TiXmlNode* xmlFind(const nd::TiXmlNode* const rootNode, const char* co
 	//}
 	return rootNode->FirstChild(name);
 }
+
+#endif

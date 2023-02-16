@@ -136,8 +136,3 @@ void ndBody::SetMatrix(const ndMatrix& matrix)
 	SetMatrixNoSleep(matrix);
 }
 
-D_COLLISION_API const nd::TiXmlNode* ndBody::FindNode(const nd::TiXmlNode* const rootNode, const char* const name)
-{
-	return rootNode->FirstChild(name);
-}
-

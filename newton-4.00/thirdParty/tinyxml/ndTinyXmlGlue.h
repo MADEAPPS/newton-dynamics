@@ -22,6 +22,7 @@
 #ifndef __ND_TINYXML_GLUE_H__
 #define __ND_TINYXML_GLUE_H__
 
+#if 0
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"
 #include "ndArray.h"
@@ -55,5 +56,6 @@ D_CORE_API void xmlGetFloatArray(const nd::TiXmlNode* const rootNode, const char
 
 D_CORE_API const nd::TiXmlNode* xmlFind(const nd::TiXmlNode* const rootNode, const char* const name);
 
+#endif
 #endif
 

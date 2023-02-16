@@ -62,9 +62,6 @@ class ndMultiBodyVehicle: public ndModel
 		ndDownForce();
 		ndFloat32 GetDownforceFactor(ndFloat32 speed) const;
 
-		void Load(const nd::TiXmlNode* const xmlNode);
-		void Save(nd::TiXmlNode* const xmlNode) const;
-
 		private:
 		ndFloat32 CalculateFactor(const ndSpeedForcePair* const entry) const;
 	

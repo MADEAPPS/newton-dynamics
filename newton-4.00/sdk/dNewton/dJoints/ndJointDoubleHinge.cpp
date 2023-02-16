@@ -25,30 +25,6 @@ ndJointDoubleHinge::ndAxisParam::ndAxisParam()
 {
 }
 
-void ndJointDoubleHinge::ndAxisParam::Load(const nd::TiXmlElement* const xmlNode)
-{
-	m_angle = xmlGetFloat(xmlNode, "angle");
-	m_omega = xmlGetFloat(xmlNode, "omega");
-	m_springK = xmlGetFloat(xmlNode, "springK");
-	m_damperC = xmlGetFloat(xmlNode, "damperC");
-	m_minLimit = xmlGetFloat(xmlNode, "minLimit");
-	m_maxLimit = xmlGetFloat(xmlNode, "maxLimit");
-	m_offsetAngle = xmlGetFloat(xmlNode, "offsetAngle");
-	m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
-}
-
-void ndJointDoubleHinge::ndAxisParam::Save(nd::TiXmlElement* const xmlNode) const
-{
-	xmlSaveParam(xmlNode, "angle", m_angle);
-	xmlSaveParam(xmlNode, "omega", m_omega);
-	xmlSaveParam(xmlNode, "springK", m_springK);
-	xmlSaveParam(xmlNode, "damperC", m_damperC);
-	xmlSaveParam(xmlNode, "minLimit", m_minLimit);
-	xmlSaveParam(xmlNode, "maxLimit", m_maxLimit);
-	xmlSaveParam(xmlNode, "offsetAngle", m_offsetAngle);
-	xmlSaveParam(xmlNode, "springDamperRegularizer", m_springDamperRegularizer);
-}
-
 ndJointDoubleHinge::ndJointDoubleHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
 	,m_axis0()

@@ -53,7 +53,6 @@
 #include <ndIsoSurface.h>
 #include <ndQuaternion.h>
 #include <ndPerlinNoise.h>
-#include <ndTinyXmlGlue.h>
 #include <ndFixSizeArray.h>
 #include <ndConvexHull2d.h>
 #include <ndConvexHull3d.h>

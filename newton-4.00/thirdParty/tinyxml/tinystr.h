@@ -46,24 +46,25 @@ distribution.
 typedef void* (*xmlAlloc) (size_t size);
 typedef void (*xmlFree) (void*);
 
-#if defined(_MSC_VER)
-	#define D_TINYXML_EXPORT __declspec(dllexport)
-	#define D_TINYXML_IMPORT __declspec(dllimport)
-#else
-	#define D_TINYXML_EXPORT __attribute__((visibility("default")))
-	#define D_TINYXML_IMPORT __attribute__((visibility("default")))
-#endif
+//#if defined(_MSC_VER)
+//	#define D_TINYXML_EXPORT __declspec(dllexport)
+//	#define D_TINYXML_IMPORT __declspec(dllimport)
+//#else
+//	#define D_TINYXML_EXPORT __attribute__((visibility("default")))
+//	#define D_TINYXML_IMPORT __attribute__((visibility("default")))
+//#endif
+//
+//#ifdef _D_TINY_DLL
+//	#ifdef _D_TINYXML_EXPORT_DLL
+//		#define D_TINY_API D_TINYXML_EXPORT
+//	#else
+//		#define D_TINY_API D_TINYXML_IMPORT
+//	#endif
+//#else
+//	#define D_TINY_API
+//#endif
 
-#ifdef _D_TINY_DLL
-	#ifdef _D_TINYXML_EXPORT_DLL
-		#define D_TINY_API D_TINYXML_EXPORT
-	#else
-		#define D_TINY_API D_TINYXML_IMPORT
-	#endif
-#else
-	#define D_TINY_API
-#endif
-
+#define D_TINY_API
 
 /*	The support for explicit isn't that universal, and it isn't really
 	required - it is used to check that the TiXmlString class isn't incorrectly

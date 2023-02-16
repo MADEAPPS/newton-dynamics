@@ -86,8 +86,6 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	D_COLLISION_API void SetMatrixAndCentreOfMass(const ndQuaternion& rotation, const ndVector& globalcom);
 
 	protected:
-	D_COLLISION_API static const nd::TiXmlNode* FindNode(const nd::TiXmlNode* const rootNode, const char* const name);
-
 	virtual void AttachContact(ndContact* const) {}
 	virtual void DetachContact(ndContact* const) {}
 	virtual ndContact* FindContact(const ndBody* const) const { return nullptr; }

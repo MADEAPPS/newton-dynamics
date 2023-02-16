@@ -13,52 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointWheel.h"
 
-void ndWheelDescriptor::Load(const nd::TiXmlNode* const xmlNode)
-{
-	const nd::TiXmlNode* childNode = nullptr;
-	for (const nd::TiXmlNode* node = xmlNode->FirstChild(); node; node = node->NextSibling())
-	{
-		const char* const name = node->Value();
-		if (strcmp(name, "ndTireInfo") == 0)
-		{
-			childNode = node;
-			break;
-		}
-	}
-	
-	ndAssert(childNode);
-	m_springK = xmlGetFloat(childNode, "springK");
-	m_damperC = xmlGetFloat(childNode, "damperC");
-	m_upperStop = xmlGetFloat(childNode, "upperStop");
-	m_lowerStop = xmlGetFloat(childNode, "lowerStop");
-	m_regularizer = xmlGetFloat(childNode, "regularizer");
-	m_brakeTorque = xmlGetFloat(childNode, "brakeTorque");
-	m_handBrakeTorque = xmlGetFloat(childNode, "handBrakeTorque");
-	m_steeringAngle = xmlGetFloat(childNode, "steeringAngle");
-	//m_laterialStiffness = xmlGetFloat(childNode, "laterialStiffness");
-	//m_longitudinalStiffness = xmlGetFloat(childNode, "longitudinalStiffness");
-	//m_frictionModel = ndFrictionModel(xmlGetInt(childNode, "frictionModel"));
-}
-
-void ndWheelDescriptor::Save(nd::TiXmlNode* const xmlNode) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement("ndTireInfo");
-	xmlNode->LinkEndChild(childNode);
-
-	xmlSaveParam(childNode, "springK", m_springK);
-	xmlSaveParam(childNode, "damperC", m_damperC);
-	xmlSaveParam(childNode, "upperStop", m_upperStop);
-	xmlSaveParam(childNode, "lowerStop", m_lowerStop);
-	xmlSaveParam(childNode, "regularizer", m_regularizer);
-	xmlSaveParam(childNode, "brakeTorque", m_brakeTorque);
-	xmlSaveParam(childNode, "handBrakeTorque", m_handBrakeTorque);
-	xmlSaveParam(childNode, "steeringAngle", m_steeringAngle);
-	ndAssert(0);
-	//xmlSaveParam(childNode, "laterialStiffness", m_laterialStiffness);
-	//xmlSaveParam(childNode, "longitudinalStiffness", m_longitudinalStiffness);
-	//xmlSaveParam(childNode, "frictionModel", m_frictionModel);
-}
-
 ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	,ndJointBilateralConstraint::ndIkInterface()

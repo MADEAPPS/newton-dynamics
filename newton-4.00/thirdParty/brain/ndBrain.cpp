@@ -76,7 +76,6 @@ ndInt32 ndBrain::GetOutputSize() const
 	return GetCount() ? (*this)[GetCount()-1]->GetOuputSize() : 0;
 }
 
-
 void ndBrain::CopyFrom(const ndBrain& src)
 {
 	const ndArray<ndBrainLayer*>& layers = *this;
@@ -173,6 +172,7 @@ void ndBrain::InitGaussianWeights(ndReal mean, ndReal variance)
 	}
 }
 
+#if 0
 void ndBrain::Save(const char* const pathName) const
 {
 	nd::TiXmlDocument asciifile;
@@ -198,6 +198,8 @@ void ndBrain::Save(const char* const pathName) const
 
 bool ndBrain::Load(const char* const pathName)
 {
+	ndAssert(0);
+
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");
 
@@ -248,6 +250,6 @@ bool ndBrain::Load(const char* const pathName)
 	}
 
 	m_isReady = true;
-
 	return true;
 }
+#endif

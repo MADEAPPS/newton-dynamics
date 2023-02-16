@@ -10,12 +10,10 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-set (projectName "ndBrain")
+set (projectName "ndTinyxml")
 message (${projectName})
 
 include_directories(.)
-include_directories(../../sdk/dCore)
-include_directories(../../sdk/dProfiler)
 
 file(GLOB CPP_SOURCE *.cpp *.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
@@ -27,10 +25,7 @@ if (MSVC)
 	set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} /Zi /W4 /O2 /fp:fast")
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Zi /GS- /W4 /Ox /Oi /Ot /Ob2 /Oy /fp:fast")
 
-	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundBrainStdafx.h")
-	set_source_files_properties(ndBrainStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndBrainStdafx.h")
+	#set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundTinyxmlStdafx.h")
+	#set_source_files_properties(ndBrainStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndTinyxmlStdafx.h")
 
 endif()
-
-
-

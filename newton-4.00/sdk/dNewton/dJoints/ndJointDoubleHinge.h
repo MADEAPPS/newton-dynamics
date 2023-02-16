@@ -25,9 +25,6 @@ class ndJointDoubleHinge: public ndJointBilateralConstraint
 	{
 		public:
 		ndAxisParam();
-		void Load(const nd::TiXmlElement* const xmlNode);
-		void Save(nd::TiXmlElement* const xmlNode) const;
-
 		ndFloat32 m_angle;
 		ndFloat32 m_omega;
 		ndFloat32 m_springK;

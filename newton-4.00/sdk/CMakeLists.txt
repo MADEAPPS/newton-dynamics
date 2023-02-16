@@ -21,7 +21,6 @@ endif()
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	add_subdirectory(dCore)
 	add_subdirectory(dNewton)
-	add_subdirectory(dTinyxml)
 	add_subdirectory(dCollision)
 else()
 	set (projectName "ndNewton")
@@ -29,7 +28,6 @@ else()
 
 	include_directories(dCore)
 	include_directories(dNewton)
-	include_directories(dTinyxml)
 	include_directories(dCollision)
 	include_directories(dNewton/dJoints)
 	include_directories(dNewton/dModels)
@@ -41,7 +39,6 @@ else()
 
 	# source and header files
 	file(GLOB HEADERS 
-		dTinyxml/*.h 
 		dCore/*.h 
 		dNewton/*.h 
 		dCollision/*.h 
@@ -52,8 +49,6 @@ else()
 		dNewton/dModels/dCharacter/*.h)
 
 	file(GLOB CPP_SOURCE 
-		dTinyxml/*.h
-		dTinyxml/*.cpp
 		dCore/*.h 
 		dCore/*.cpp
 		dNewton/*.h 
@@ -106,7 +101,6 @@ else()
 	if(NEWTON_BUILD_SHARED_LIBS)
 		add_definitions(-D_D_CORE_EXPORT_DLL)
 		add_definitions(-D_D_NEWTON_EXPORT_DLL)
-		add_definitions(-D_D_TINYXML_EXPORT_DLL)
 		add_definitions(-D_D_COLLISION_EXPORT_DLL)
 		add_library(${projectName} SHARED ${CPP_SOURCE})
 

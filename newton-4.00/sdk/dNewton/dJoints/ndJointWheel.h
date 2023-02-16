@@ -31,9 +31,6 @@ class ndWheelDescriptor
 	{
 	}
 	
-	D_NEWTON_API void Save(nd::TiXmlNode* const xmlNode) const;
-	D_NEWTON_API void Load(const nd::TiXmlNode* const xmlNode);
-	
 	ndFloat32 m_radios;
 	ndFloat32 m_springK;
 	ndFloat32 m_damperC;

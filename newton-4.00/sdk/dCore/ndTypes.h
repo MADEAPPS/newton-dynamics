@@ -58,12 +58,10 @@
 #include <string.h>
 #include <stdarg.h>
 #include <locale.h>
-#include <tinyxml.h>
 #include <condition_variable>
 
-// we need _clearfp() and _controlfp() from float.h which are excluded if __STRICT_ANSI__ is defined
-// weird workaround but i'm not sure how a global compiler flag would affect the rest of the code
-// probably useless since this functionality will not be used/implemented but to avoid compiler errors
+// weird workaround but i am not sure how a global compiler flag would affect the rest of the code
+// probably useless since this functionality will not be used/implemented but avoid compiler errors
 #if defined(__STRICT_ANSI__) && (defined (__MINGW32__) || defined (__MINGW64__))
 	#pragma push_macro("__STRICT_ANSI__")
 	#undef __STRICT_ANSI__
