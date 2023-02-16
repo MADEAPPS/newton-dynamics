@@ -419,7 +419,8 @@ namespace ndQuadruped_1
 			m_effectorsPosit[index].m_posit.m_x = h;
 		}
 
-		virtual void ExecuteStep(const ndJacobian& com, ndFloat32 timestep)
+		//virtual void ExecuteStep(const ndJacobian& com, ndFloat32 timestep)
+		virtual void ExecuteStep(const ndJacobian&, ndFloat32 timestep)
 		{
 			//UpdateEffector(0);
 			//UpdateEffector(1);
@@ -560,7 +561,7 @@ namespace ndQuadruped_1
 	class ndQuadrupedModel : public ndModel
 	{
 		public:
-		D_CLASS_REFLECTION(ndQuadruped_1::ndQuadrupedModel);
+		D_CLASS_REFLECTION(ndQuadruped_1::ndQuadrupedModel, ndModel)
 
 		class ndModelUI : public ndUIEntity
 		{

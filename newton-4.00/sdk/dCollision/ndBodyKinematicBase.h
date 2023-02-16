@@ -29,7 +29,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndBodyKinematicBase : public ndBodyKinematic
 {
 	public:
-	D_CLASS_REFLECTION(ndBodyKinematicBase);
+	D_CLASS_REFLECTION(ndBodyKinematicBase,ndBodyKinematic)
 	D_COLLISION_API ndBodyKinematicBase();
 	D_COLLISION_API virtual ~ndBodyKinematicBase();
 

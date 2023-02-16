@@ -2002,7 +2002,7 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 		const ndFloat32 h = data.m_particleDiameter;
 		const ndVector kernelConst(ndFloat32(45.0f) / (ndPi * ndPow(h, ndFloat32 (6.0f))));
 
-		const ndFloat32 viscosity = m_viscosity;
+		//const ndFloat32 viscosity = m_viscosity;
 		const ndFloat32 restDensity = m_restDensity;
 		const ndFloat32 gasConstant = m_gasConstant;
 

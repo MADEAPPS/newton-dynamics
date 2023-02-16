@@ -30,7 +30,7 @@ class ndJointSpherical;
 class ndCharacterForwardDynamicNode: public ndCharacterNode 
 {
 	public:
-	D_CLASS_REFLECTION(ndCharacterForwardDynamicNode);
+	D_CLASS_REFLECTION(ndCharacterForwardDynamicNode, ndCharacterNode)
 	D_NEWTON_API ndCharacterForwardDynamicNode(const ndMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterForwardDynamicNode ();
 

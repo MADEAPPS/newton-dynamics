@@ -30,7 +30,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 {
 	public:  
-	D_CLASS_REFLECTION(ndBodyNotify);
+	D_BASE_CLASS_REFLECTION(ndBodyNotify)
 	D_COLLISION_API ndBodyNotify(const ndVector& defaultGravity);
 
 	D_COLLISION_API virtual ~ndBodyNotify();

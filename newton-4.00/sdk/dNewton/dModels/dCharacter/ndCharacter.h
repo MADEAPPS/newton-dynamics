@@ -52,7 +52,7 @@ class ndCharacter: public ndModel
 		ndIk6DofEffector* m_effector;
 	};
 
-	D_CLASS_REFLECTION(ndCharacter);
+	D_CLASS_REFLECTION(ndCharacter, ndModel)
 	D_NEWTON_API ndCharacter();
 	D_NEWTON_API virtual ~ndCharacter ();
 

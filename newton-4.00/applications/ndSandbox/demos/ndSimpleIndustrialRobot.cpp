@@ -59,7 +59,7 @@ namespace ndSimpleRobot
 	class ndIndustrialRobot : public ndModel
 	{
 		public:
-		D_CLASS_REFLECTION(ndSimpleRobot::ndIndustrialRobot);
+		D_CLASS_REFLECTION(ndSimpleRobot::ndIndustrialRobot, ndModel)
 
 		ndIndustrialRobot(ndDemoEntityManager* const scene, ndDemoEntity* const robotMesh, const ndMatrix& location)
 			:ndModel()

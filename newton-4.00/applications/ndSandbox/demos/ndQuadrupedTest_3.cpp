@@ -237,7 +237,7 @@ namespace ndQuadruped_3
 		public:
 		#define D_SAMPLES_COUNT 128
 
-		D_CLASS_REFLECTION(ndQuadruped_3::ndQuadrupedModel);
+		D_CLASS_REFLECTION(ndQuadruped_3::ndQuadrupedModel, ndModel)
 
 		class ndEffectorInfo
 		{

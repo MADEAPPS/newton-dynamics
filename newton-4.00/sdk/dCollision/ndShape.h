@@ -208,7 +208,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndShape: public ndContainersFreeListAlloc<ndShape>
 {
 	public:
-	D_CLASS_REFLECTION(ndShape);
+	D_BASE_CLASS_REFLECTION(ndShape)
 	D_COLLISION_API virtual ~ndShape();
 
 	D_COLLISION_API ndInt32 GetRefCount() const;

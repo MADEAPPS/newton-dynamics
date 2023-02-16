@@ -38,7 +38,7 @@ class ndJointDoubleHinge: public ndJointBilateralConstraint
 		ndFloat32 m_springDamperRegularizer;
 	};
 
-	D_CLASS_REFLECTION(ndJointDoubleHinge);
+	D_CLASS_REFLECTION(ndJointDoubleHinge, ndJointBilateralConstraint)
 	D_NEWTON_API ndJointDoubleHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointDoubleHinge();
 

@@ -59,7 +59,7 @@ namespace ndAdvancedRobot
 	class ndIndustrialRobot : public ndModel
 	{
 		public:
-		D_CLASS_REFLECTION(ndAdvancedRobot::ndIndustrialRobot);
+		D_CLASS_REFLECTION(ndAdvancedRobot::ndIndustrialRobot, ndBodyDynamic)
 
 		ndIndustrialRobot(ndDemoEntityManager* const scene, ndDemoEntity* const robotMesh, const ndMatrix& location)
 			:ndModel()

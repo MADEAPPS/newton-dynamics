@@ -195,7 +195,7 @@ class ndVehicleCommon : public ndMultiBodyVehicle
 		m_clutch = ndGameControllerInputs::m_azis_03,
 	};
 
-	D_CLASS_REFLECTION(ndVehicleCommon);
+	D_CLASS_REFLECTION(ndVehicleCommon, ndMultiBodyVehicle)
 
 	ndVehicleCommon(const ndVehicleDectriptor& desc);
 	virtual ~ndVehicleCommon();
@@ -236,7 +236,7 @@ class ndVehicleCommon : public ndMultiBodyVehicle
 class ndVehicleSelector : public ndModel
 {
 	public:
-	D_CLASS_REFLECTION(ndVehicleSelector);
+	D_CLASS_REFLECTION(ndVehicleSelector, ndModel)
 	ndVehicleSelector();
 
 	void Update(ndWorld* const, ndFloat32){}

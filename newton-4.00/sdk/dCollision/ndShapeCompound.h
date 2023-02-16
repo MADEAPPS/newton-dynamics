@@ -46,7 +46,7 @@ class ndShapeCompound: public ndShape
 		D_COLLISION_API void AddNode(ndNodeBase* const node, ndInt32 index, const ndShapeInstance* const parent);
 	};
 
-	D_CLASS_REFLECTION(ndShapeCompound);
+	D_CLASS_REFLECTION(ndShapeCompound,ndShape)
 	D_COLLISION_API ndShapeCompound();
 	D_COLLISION_API virtual ~ndShapeCompound();
 

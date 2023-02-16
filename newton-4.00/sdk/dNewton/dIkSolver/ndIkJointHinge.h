@@ -18,13 +18,13 @@
 class ndIkJointHinge: public ndJointHinge, public ndJointBilateralConstraint::ndIkInterface
 {
 	public:
-	D_CLASS_REFLECTION(ndIkJointHinge);
+	D_CLASS_REFLECTION(ndIkJointHinge, ndJointHinge)
 	D_NEWTON_API ndIkJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API ndIkJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIkJointHinge();
 
 	// inverse dynamics interface
-	D_ADD_IK_INTERFACE();
+	D_ADD_IK_INTERFACE()
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);

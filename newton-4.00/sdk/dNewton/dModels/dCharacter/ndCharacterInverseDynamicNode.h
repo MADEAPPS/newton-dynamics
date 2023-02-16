@@ -28,7 +28,7 @@
 class ndCharacterInverseDynamicNode: public ndCharacterNode 
 {
 	public:
-	D_CLASS_REFLECTION(ndCharacterInverseDynamicNode);
+	D_CLASS_REFLECTION(ndCharacterInverseDynamicNode, ndCharacterNode)
 	D_NEWTON_API ndCharacterInverseDynamicNode(const ndMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterInverseDynamicNode ();
 

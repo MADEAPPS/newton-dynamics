@@ -30,7 +30,7 @@ namespace ndZmp
 	class ndZeroMomentModel : public ndModel
 	{
 		public:
-		D_CLASS_REFLECTION(ndZmp::ndZeroMomentModel);
+		D_CLASS_REFLECTION(ndZmp::ndZeroMomentModel, ndModel)
 
 		class ndDynamicState
 		{

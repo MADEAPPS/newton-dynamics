@@ -55,7 +55,7 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 		m_invertedDiagonals,
 	};
 
-	D_CLASS_REFLECTION(ndShapeHeightfield);
+	D_CLASS_REFLECTION(ndShapeHeightfield,ndShapeStaticMesh)
 	D_COLLISION_API ndShapeHeightfield(
 		ndInt32 width, ndInt32 height, ndGridConstruction constructionMode,
 		ndFloat32 horizontalScale_x, ndFloat32 horizontalScale_z);

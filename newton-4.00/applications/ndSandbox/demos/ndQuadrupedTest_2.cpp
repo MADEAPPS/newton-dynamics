@@ -30,7 +30,7 @@ namespace ndQuadruped_2
 	class ndQuadrupedModel : public ndModel
 	{
 		public:
-		D_CLASS_REFLECTION(ndQuadruped_2::ndQuadrupedModel);
+		D_CLASS_REFLECTION(ndQuadruped_2::ndQuadrupedModel, ndModel)
 
 		class ndEffectorInfo
 		{

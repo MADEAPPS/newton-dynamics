@@ -42,7 +42,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndBodyDynamic: public ndBodyKinematic
 {
 	public:
-	D_CLASS_REFLECTION(ndBodyDynamic);
+	D_CLASS_REFLECTION(ndBodyDynamic, ndBodyKinematic)
 	D_NEWTON_API ndBodyDynamic();
 	D_NEWTON_API virtual ~ndBodyDynamic ();
 

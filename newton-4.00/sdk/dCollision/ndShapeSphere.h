@@ -30,7 +30,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeSphere: public ndShapeConvex
 {
 	public:
-	D_CLASS_REFLECTION(ndShapeSphere);
+	D_CLASS_REFLECTION(ndShapeSphere,ndShapeConvex)
 	D_COLLISION_API ndShapeSphere(ndFloat32 radius);
 	D_COLLISION_API virtual ~ndShapeSphere();
 

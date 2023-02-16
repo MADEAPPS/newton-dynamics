@@ -42,7 +42,7 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 		}
 	};
 
-	D_CLASS_REFLECTION(ndModel);
+	D_BASE_CLASS_REFLECTION(ndModel)
 
 	ndModel();
 	virtual ~ndModel ();

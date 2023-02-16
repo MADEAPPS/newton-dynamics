@@ -18,12 +18,12 @@
 class ndIkJointSpherical: public ndJointSpherical, public ndJointBilateralConstraint::ndIkInterface
 {
 	public:
-	D_CLASS_REFLECTION(ndIkJointSpherical);
+	D_CLASS_REFLECTION(ndIkJointSpherical, ndJointSpherical)
 	D_NEWTON_API ndIkJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIkJointSpherical();
 
 	// inverse dynamics interface
-	D_ADD_IK_INTERFACE();
+	D_ADD_IK_INTERFACE()
 
 	protected:
 	D_NEWTON_API void SubmitAccel(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);

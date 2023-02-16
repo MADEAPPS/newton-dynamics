@@ -31,7 +31,7 @@
 class ndShapeChamferCylinder: public ndShapeConvex
 {
 	public:
-	D_CLASS_REFLECTION(ndShapeChamferCylinder);
+	D_CLASS_REFLECTION(ndShapeChamferCylinder, ndShapeConvex)
 	D_COLLISION_API ndShapeChamferCylinder(ndFloat32 radius, ndFloat32 height);
 	D_COLLISION_API virtual ~ndShapeChamferCylinder();
 

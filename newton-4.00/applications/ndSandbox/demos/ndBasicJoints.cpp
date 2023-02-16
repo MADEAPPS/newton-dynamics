@@ -24,7 +24,7 @@
 class SplinePathBody : public ndBodyDynamic
 {
 	public:
-	D_CLASS_REFLECTION(SplinePathBody);
+	D_CLASS_REFLECTION(SplinePathBody, ndBodyDynamic)
 	SplinePathBody(ndDemoEntityManager* const scene, ndMatrix& matrix)
 		:ndBodyDynamic()
 	{
@@ -71,7 +71,7 @@ class SplinePathBody : public ndBodyDynamic
 class ndJointFollowSplinePath : public ndJointFollowPath
 {
 	public:
-	D_CLASS_REFLECTION(ndJointFollowSplinePath);
+	D_CLASS_REFLECTION(ndJointFollowSplinePath, ndJointFollowPath)
 	ndJointFollowSplinePath(const ndMatrix& pinAndPivotFrame, ndBodyDynamic* const child, ndBodyDynamic* const pathBody)
 		:ndJointFollowPath(pinAndPivotFrame, child, pathBody)
 	{

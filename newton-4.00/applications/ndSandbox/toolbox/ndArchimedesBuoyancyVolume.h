@@ -19,7 +19,7 @@
 class ndArchimedesBuoyancyVolume: public ndBodyTriggerVolume
 {
 	public:
-	D_CLASS_REFLECTION(ndArchimedesBuoyancyVolume);
+	D_CLASS_REFLECTION(ndArchimedesBuoyancyVolume, ndBodyTriggerVolume)
 	ndArchimedesBuoyancyVolume();
 
 	void CalculatePlane(ndBodyKinematic* const body);

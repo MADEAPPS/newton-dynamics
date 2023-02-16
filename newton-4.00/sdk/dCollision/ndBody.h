@@ -42,7 +42,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndBody : public ndContainersFreeListAlloc<ndBody>
 {
 	public:
-	D_CLASS_REFLECTION(ndBody);
+	D_BASE_CLASS_REFLECTION(ndBody)
 	D_COLLISION_API ndBody();
 	D_COLLISION_API virtual ~ndBody();
 

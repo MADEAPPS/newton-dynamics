@@ -31,7 +31,7 @@ class ndPolygonMeshDesc;
 class ndShapeStaticMesh: public ndShape
 {
 	public:
-	D_CLASS_REFLECTION(ndShapeStaticMesh);
+	D_CLASS_REFLECTION(ndShapeStaticMesh,ndShape)
 	D_COLLISION_API ndShapeStaticMesh(ndShapeID id);
 	D_COLLISION_API virtual ~ndShapeStaticMesh();
 

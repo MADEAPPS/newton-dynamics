@@ -19,7 +19,7 @@
 class ndJointPulley: public ndJointBilateralConstraint
 {
 	public:
-	D_CLASS_REFLECTION(ndJointPulley);
+	D_CLASS_REFLECTION(ndJointPulley, ndJointBilateralConstraint)
 	D_NEWTON_API ndJointPulley(ndFloat32 gearRatio,
 		const ndVector& body0Pin, ndBodyKinematic* const body0,
 		const ndVector& body1Pin, ndBodyKinematic* const body1);

@@ -75,7 +75,7 @@ class ndMultiBodyVehicle: public ndModel
 		friend class ndMultiBodyVehicleTireJoint;
 	};
 
-	D_CLASS_REFLECTION(ndMultiBodyVehicle);
+	D_CLASS_REFLECTION(ndMultiBodyVehicle, ndModel)
 	D_NEWTON_API ndMultiBodyVehicle(const ndVector& frontDir, const ndVector& upDir);
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
 

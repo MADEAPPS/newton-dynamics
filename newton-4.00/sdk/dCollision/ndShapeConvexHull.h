@@ -30,7 +30,7 @@ class ndShapeConvexHull : public ndShapeConvex
 	class ndConvexBox;
 
 	public:
-	D_CLASS_REFLECTION(ndShapeConvexHull);
+	D_CLASS_REFLECTION(ndShapeConvexHull,ndShapeConvex)
 	D_COLLISION_API ndShapeConvexHull(ndInt32 count, ndInt32 strideInBytes, ndFloat32 tolerance, const ndFloat32* const vertexArray, ndInt32 maxPointsOut = 0x7fffffff);
 	D_COLLISION_API virtual ~ndShapeConvexHull();
 

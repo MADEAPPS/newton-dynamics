@@ -37,7 +37,7 @@ class ndCharacterInverseDynamicNode;
 class ndCharacterNode: public ndNodeHierarchy<ndCharacterNode>
 {
 	public:
-	D_CLASS_REFLECTION(ndCharacterNode);
+	D_BASE_CLASS_REFLECTION(ndCharacterNode)
 	D_NEWTON_API ndCharacterNode(ndCharacterNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterNode ();
 

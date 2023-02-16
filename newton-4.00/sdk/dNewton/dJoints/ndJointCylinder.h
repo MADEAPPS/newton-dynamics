@@ -18,7 +18,7 @@
 class ndJointCylinder: public ndJointBilateralConstraint
 {
 	public:
-	D_CLASS_REFLECTION(ndJointCylinder);
+	D_CLASS_REFLECTION(ndJointCylinder, ndJointBilateralConstraint)
 	D_NEWTON_API ndJointCylinder(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API ndJointCylinder(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointCylinder();

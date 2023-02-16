@@ -363,7 +363,7 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const ndMatri
 	ndConvexFractureRootEntity* const entity = new ndConvexFractureRootEntity(*rootEntity);
 	scene->AddEntity(entity);
 
-	ndWorld* const world = scene->GetWorld();
+	//ndWorld* const world = scene->GetWorld();
 
 	ndInt32 bodyCount = 0;
 	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetFirstChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetNext())
@@ -377,8 +377,8 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const ndMatri
 	ndBodyDynamic** const bodyArray = ndAlloca(ndBodyDynamic*, bodyCount);
 	memset(bodyArray, 0, bodyCount * sizeof(ndBodyDynamic*));
 	
-	ndInt32 debrisID = ndApplicationMaterial::m_dedris;
 	ndAssert(0);
+	//ndInt32 debrisID = ndApplicationMaterial::m_dedris;
 	//ndMaterial& material0 = callback->RegisterMaterial(ndContactCallback::m_default, ndContactCallback::m_dedris);
 	//ndAssert(0);
 	//material0;

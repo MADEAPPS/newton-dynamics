@@ -524,7 +524,8 @@ void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const, nd
 	contactPoint.m_material.m_flags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
 }
 
-void ndMultiBodyVehicle::CalculateNormalizedAlgningTorque(ndMultiBodyVehicleTireJoint* const tire, ndFloat32 sideSlipTangent) const
+//void ndMultiBodyVehicle::CalculateNormalizedAlgningTorque(ndMultiBodyVehicleTireJoint* const tire, ndFloat32 sideSlipTangent) const
+void ndMultiBodyVehicle::CalculateNormalizedAlgningTorque(ndMultiBodyVehicleTireJoint* const, ndFloat32 sideSlipTangent) const
 {
 	//I need to calculate the integration of the align torque 
 	//using the calculate contact patch, form the standard brush model.

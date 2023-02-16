@@ -30,7 +30,7 @@ class ndMultiBodyVehicle;
 class ndMultiBodyVehicleGearBox : public ndJointGear
 {
 	public: 
-	D_CLASS_REFLECTION(ndMultiBodyVehicleGearBox);
+	D_CLASS_REFLECTION(ndMultiBodyVehicleGearBox, ndJointGear)
 	D_NEWTON_API ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, ndMultiBodyVehicle* const chassis);
 
 	D_NEWTON_API void SetIdleOmega(ndFloat32 rpm);

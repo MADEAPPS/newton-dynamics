@@ -30,7 +30,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeCone : public ndShapeConvex
 {
 	public:
-	D_CLASS_REFLECTION(ndShapeCone);
+	D_CLASS_REFLECTION(ndShapeCone, ndShapeConvex)
 	D_COLLISION_API ndShapeCone(ndFloat32 radio, ndFloat32 height);
 	D_COLLISION_API ~ndShapeCone();
 

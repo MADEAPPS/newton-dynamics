@@ -229,7 +229,7 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 {
 	public:
 	// add some reflexion to the classes
-	D_CLASS_REFLECTION(ndConstraint);
+	D_BASE_CLASS_REFLECTION(ndConstraint)
 
 	virtual ~ndConstraint();
 

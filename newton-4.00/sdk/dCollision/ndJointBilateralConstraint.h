@@ -75,7 +75,7 @@ class ndJointBilateralConstraint : public ndConstraint
 		bool m_ikMode;
 	};
 
-	D_CLASS_REFLECTION(ndJointBilateralConstraint);
+	D_CLASS_REFLECTION(ndJointBilateralConstraint, ndConstraint)
 	D_COLLISION_API ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrix);
 	D_COLLISION_API ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrixBody0,  const ndMatrix& globalMatrixBody1);
 	D_COLLISION_API virtual ~ndJointBilateralConstraint();

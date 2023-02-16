@@ -23,7 +23,7 @@
 class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 {
 	public:
-	D_CLASS_REFLECTION(ndRegularProceduralGrid);
+	D_CLASS_REFLECTION(ndRegularProceduralGrid, ndShapeStaticProceduralMesh)
 
 	ndRegularProceduralGrid(ndFloat32 gridSize, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const ndVector& planeEquation)
 		:ndShapeStaticProceduralMesh(sizex, sizey, sizez)

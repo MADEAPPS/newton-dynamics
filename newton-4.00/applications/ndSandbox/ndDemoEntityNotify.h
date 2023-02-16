@@ -23,7 +23,7 @@ class ndDemoMeshInterface;
 class ndDemoEntityNotify: public ndBodyNotify
 {
 	public:
-	D_CLASS_REFLECTION(ndDemoEntityNotify);
+	D_CLASS_REFLECTION(ndDemoEntityNotify, ndBodyNotify)
 	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody = nullptr, ndFloat32 gravity = DEMO_GRAVITY);
 	virtual ~ndDemoEntityNotify();
 
@@ -50,7 +50,7 @@ class ndDemoEntityNotify: public ndBodyNotify
 class ndBindingRagdollEntityNotify : public ndDemoEntityNotify
 {
 	public:
-	D_CLASS_REFLECTION(ndBindingRagdollEntityNotify);
+	D_CLASS_REFLECTION(ndBindingRagdollEntityNotify, ndDemoEntityNotify)
 	ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody, ndFloat32 campSpeed);
 
 	void OnTransform(ndInt32, const ndMatrix& matrix);

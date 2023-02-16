@@ -56,7 +56,7 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 		ndEdgeMap();
 	};
 
-	D_CLASS_REFLECTION(ndShapeStaticProceduralMesh);
+	D_CLASS_REFLECTION(ndShapeStaticProceduralMesh, ndShapeStaticMesh)
 	D_COLLISION_API ndShapeStaticProceduralMesh(ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez);
 	D_COLLISION_API virtual ~ndShapeStaticProceduralMesh();
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;

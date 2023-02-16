@@ -24,7 +24,7 @@ class ndAnimationBlendTreeNode;
 class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 {
 	public:
-	D_CLASS_REFLECTION(ndBasicPlayerCapsule);
+	D_CLASS_REFLECTION(ndBasicPlayerCapsule, ndBodyPlayerCapsule)
 	class PlayerInputs
 	{
 		public:

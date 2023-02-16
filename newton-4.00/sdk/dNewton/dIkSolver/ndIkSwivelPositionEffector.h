@@ -24,7 +24,7 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 		m_pitchYawRoll,
 	};
 
-	D_CLASS_REFLECTION(ndIkSwivelPositionEffector);
+	D_CLASS_REFLECTION(ndIkSwivelPositionEffector, ndJointBilateralConstraint)
 	D_NEWTON_API ndIkSwivelPositionEffector(const ndVector& childPivot, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIkSwivelPositionEffector();
 

@@ -25,7 +25,7 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 		m_shortestPath,
 	};
 
-	D_CLASS_REFLECTION(ndIk6DofEffector);
+	D_CLASS_REFLECTION(ndIk6DofEffector, ndJointBilateralConstraint)
 	D_NEWTON_API ndIk6DofEffector(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIk6DofEffector();
 
