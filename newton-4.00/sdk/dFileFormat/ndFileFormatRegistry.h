@@ -32,7 +32,7 @@ class ndFileFormatRegistry : public ndClassAlloc
 	virtual ~ndFileFormatRegistry();
 	
 	public:
-	virtual void Save(nd::TiXmlElement* const parentNode) = 0;
+	virtual void SaveBody(nd::TiXmlElement* const parentNode, ndBody* const body);
 
 	private:
 	static void Init();

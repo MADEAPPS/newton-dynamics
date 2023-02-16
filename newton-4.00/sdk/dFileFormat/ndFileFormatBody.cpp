@@ -27,7 +27,14 @@ ndFileFormatBody::ndFileFormatBody()
 {
 }
 
-void ndFileFormatBody::Save(nd::TiXmlElement* const parentNode)
+ndFileFormatBody::ndFileFormatBody(const char* const className)
+	:ndFileFormatRegistry(className)
 {
+}
+
+void ndFileFormatBody::SaveBody(nd::TiXmlElement* const parentNode, ndBody* const body)
+{
+	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndBody::StaticClassName());
+	parentNode->LinkEndChild(classNode);
 
 }

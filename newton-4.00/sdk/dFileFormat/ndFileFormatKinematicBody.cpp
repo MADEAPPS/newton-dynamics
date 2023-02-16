@@ -19,20 +19,23 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_FILE_FORMAT_BODY_H__
-#define _ND_FILE_FORMAT_BODY_H__
-
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatRegistry.h"
+#include "ndFileFormatKinematicBody.h"
 
-class ndFileFormatBody : public ndFileFormatRegistry
+ndFileFormatKinematicBody::ndFileFormatKinematicBody()
+	:ndFileFormatBody(ndBodyKinematic::StaticClassName())
 {
-	public: 
-	ndFileFormatBody();
-	ndFileFormatBody(const char* const className);
+}
 
-	virtual void SaveBody(nd::TiXmlElement* const parentNode, ndBody* const body);
-};
+ndFileFormatKinematicBody::ndFileFormatKinematicBody(const char* const className)
+	: ndFileFormatBody(className)
+{
+}
 
-#endif 
+void ndFileFormatKinematicBody::SaveBody(nd::TiXmlElement* const parentNode, ndBody* const body)
+{
+	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndBodyKinematic::StaticClassName());
+	parentNode->LinkEndChild(classNode);
+	ndFileFormatBody::SaveBody(classNode, body);
 
+}

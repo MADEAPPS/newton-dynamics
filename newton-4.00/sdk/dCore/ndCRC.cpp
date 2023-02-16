@@ -101,11 +101,13 @@ ndUnsigned64 dCRC64 (const char* const name, ndUnsigned64 crcAcc)
 {
 	if (name) 
 	{
-		const ndInt32 bitshift = (sizeof (ndUnsigned64)<<3) - 8;
+		//const ndInt32 bitshift = (sizeof (ndUnsigned64)<<3) - 8;
+        const ndInt32 bitshift = 8;
 		for (ndInt32 i = 0; name[i]; ++i) 
 		{
 			char c = name[i];
-			ndUnsigned64 val = randBits0[((crcAcc >> bitshift) ^ c) & 0xff];
+            ndInt32 index = ndInt32 (((crcAcc >> bitshift) ^ c) & 0xff);
+			ndUnsigned64 val = randBits0[index];
 			crcAcc = (crcAcc << 8) ^ val;
 		}
 	}

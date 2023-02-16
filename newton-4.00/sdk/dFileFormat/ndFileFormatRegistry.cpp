@@ -22,6 +22,8 @@
 #include "ndFileFormatStdafx.h"
 #include "ndFileFormatRegistry.h"
 #include "ndFileFormatBody.h"
+#include "ndFileFormatDynamicBody.h"
+#include "ndFileFormatKinematicBody.h"
 
 ndFixSizeArray<ndFileFormatRegistry*, 256> ndFileFormatRegistry::m_registry;
 
@@ -34,12 +36,15 @@ ndFileFormatRegistry::ndFileFormatRegistry(const char* const className)
 	m_registry.PushBack(this);
 	for (ndInt32 i = m_registry.GetCount() - 2; i >= 0; --i)
 	{
-		ndAssert(0);
 		ndFileFormatRegistry* const entry = m_registry[i];
 		if (entry->m_hash > m_hash)
 		{
 			m_registry[i] = this;
 			m_registry[i + 1] = entry;
+		}
+		else
+		{
+			break;
 		}
 	}
 }
@@ -51,7 +56,8 @@ ndFileFormatRegistry::~ndFileFormatRegistry()
 void ndFileFormatRegistry::Init()
 {
 	static ndFileFormatBody body;
-
+	static ndFileFormatDynamicBody dynamicBody;
+	static ndFileFormatKinematicBody kinematicBody;
 }
 
 ndFileFormatRegistry* ndFileFormatRegistry::GetHandler(const char* const className)
@@ -83,4 +89,9 @@ ndFileFormatRegistry* ndFileFormatRegistry::GetHandler(const char* const classNa
 	}
 
 	return nullptr;
+}
+
+void ndFileFormatRegistry::SaveBody(nd::TiXmlElement* const parentNode, ndBody* const body)
+{
+	ndAssert(0);
 }
