@@ -21,6 +21,7 @@
 
 #include "ndFileFormatStdafx.h"
 #include "ndFileFormatBody.h"
+#include "ndFileFormatNotify.h"
 
 ndFileFormatBody::ndFileFormatBody()
 	:ndFileFormatRegistry(ndBody::StaticClassName())
@@ -41,4 +42,14 @@ void ndFileFormatBody::SaveBody(nd::TiXmlElement* const parentNode, ndBody* cons
 	xmlSaveParam(classNode, "omega", body->GetOmega());
 	xmlSaveParam(classNode, "velocity", body->GetVelocity());
 	xmlSaveParam(classNode, "centerOfMass", body->GetCentreOfMass());
+
+	ndBodyNotify* const notity = body->GetNotifyCallback();
+	ndFileFormatRegistry* const handler = ndFileFormatRegistry::GetHandler(notity->ClassName());
+	//ndAssert(handler);
+	if (handler)
+	{
+		nd::TiXmlElement* const notifyNode = new nd::TiXmlElement("Notify");
+		classNode->LinkEndChild(notifyNode);
+		handler->SaveNotify(notifyNode, notity);
+	}
 }

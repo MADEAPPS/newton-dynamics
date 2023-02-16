@@ -19,41 +19,26 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_FILE_FORMAT_REGISTRY_H__
-#define _ND_FILE_FORMAT_REGISTRY_H__
-
 #include "ndFileFormatStdafx.h"
-#include "ndTinyXmlGlue.h"
+#include "ndFileFormatNotify.h"
 
-class ndFileFormatRegistry : public ndClassAlloc
+ndFileFormatNotify::ndFileFormatNotify()
+	:ndFileFormatRegistry(ndBodyNotify::StaticClassName())
 {
-	protected:	
-	ndFileFormatRegistry(const char* const className);
-	virtual ~ndFileFormatRegistry();
-	
-	public:
-	virtual void SaveBody(nd::TiXmlElement* const parentNode, ndBody* const body);
-	virtual void SaveNotify(nd::TiXmlElement* const parentNode, ndBodyNotify* const notify);
-
-	static ndFileFormatRegistry* GetHandler(const char* const className);
-
-	private:
-	static void Init();
-	static ndFixSizeArray<ndFileFormatRegistry*, 256> m_registry;
-
-	ndUnsigned64 m_hash;
-	friend class ndFileFormat;
-};
-
-inline void ndFileFormatRegistry::SaveBody(nd::TiXmlElement* const, ndBody* const)
-{
-	ndAssert(0);
 }
 
-inline void ndFileFormatRegistry::SaveNotify(nd::TiXmlElement* const, ndBodyNotify* const)
+ndFileFormatNotify::ndFileFormatNotify(const char* const className)
+	:ndFileFormatRegistry(className)
 {
-	ndAssert(0);
 }
 
-#endif 
+void ndFileFormatNotify::SaveNotify(nd::TiXmlElement* const parentNode, ndBodyNotify* const notify)
+{
+	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndBodyNotify::StaticClassName());
+	parentNode->LinkEndChild(classNode);
 
+	//xmlSaveParam(classNode, "transform", body->GetMatrix());
+	//xmlSaveParam(classNode, "omega", body->GetOmega());
+	//xmlSaveParam(classNode, "velocity", body->GetVelocity());
+	//xmlSaveParam(classNode, "centerOfMass", body->GetCentreOfMass());
+}

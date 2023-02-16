@@ -22,6 +22,7 @@
 #include "ndFileFormatStdafx.h"
 #include "ndFileFormatRegistry.h"
 #include "ndFileFormatBody.h"
+#include "ndFileFormatNotify.h"
 #include "ndFileFormatDynamicBody.h"
 #include "ndFileFormatKinematicBody.h"
 
@@ -58,6 +59,7 @@ void ndFileFormatRegistry::Init()
 	static ndFileFormatBody body;
 	static ndFileFormatDynamicBody dynamicBody;
 	static ndFileFormatKinematicBody kinematicBody;
+	static ndFileFormatNotify bodyNotiy;
 }
 
 ndFileFormatRegistry* ndFileFormatRegistry::GetHandler(const char* const className)
@@ -91,7 +93,3 @@ ndFileFormatRegistry* ndFileFormatRegistry::GetHandler(const char* const classNa
 	return nullptr;
 }
 
-void ndFileFormatRegistry::SaveBody(nd::TiXmlElement* const, ndBody* const)
-{
-	ndAssert(0);
-}
