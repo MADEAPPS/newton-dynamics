@@ -20,6 +20,5 @@
 */
 
 
-#include "ndFileStdafx.h"
-
+#include "ndFileFormatStdafx.h"
 

@@ -19,37 +19,34 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_H__
-#define _ND_BRAIN_H__
+#include "ndFileFormatStdafx.h"
+#include "ndFileFormat.h"
 
-#include "ndFileStdafx.h"
-
-/*
-class ndBrain: public ndArray<ndBrainLayer*>
+ndFileFormat::ndFileFormat()
+	:ndClassAlloc()
 {
-	public: 
-	ndBrain();
-	ndBrain(const ndBrain& src);
-	~ndBrain();
+}
 
-	ndInt32 GetInputSize() const;
-	ndInt32 GetOutputSize() const;
+void ndFileFormat::SaveBody(const char* const path, ndBody* const body)
+{
+	nd::TiXmlDocument asciifile;
+	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
+	asciifile.LinkEndChild(decl);
 
-	bool Load(const char* const pathName);
-	void Save(const char* const pathName) const;
-	void CopyFrom(const ndBrain& src);
+	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
+	asciifile.LinkEndChild(rootNode);
+	
+	//for (ndInt32 i = 0; i < GetCount(); i++)
+	//{
+	//	ndBrainLayer* const layer = (*this)[i];
+	//	nd::TiXmlElement* const layerNode = new nd::TiXmlElement("ndLayer");
+	//	rootNode->LinkEndChild(layerNode);
+	//	layer->Save(layerNode);
+	//}
 
-	void BeginAddLayer();
-	void EndAddLayer();
-	bool Compare(const ndBrain& src) const;
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+	asciifile.SaveFile(path);
+	setlocale(LC_ALL, oldloc);
 
-	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
-	void InitGaussianWeights(ndReal mean, ndReal variance);
-
-	void* m_memory;
-	ndInt32 m_memorySize;
-	bool m_isReady;
-};
-*/
-#endif 
-
+}

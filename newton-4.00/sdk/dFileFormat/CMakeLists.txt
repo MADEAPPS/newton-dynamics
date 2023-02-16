@@ -24,6 +24,7 @@ include_directories(../dNewton/dModels)
 include_directories(../dNewton/dIkSolver)
 include_directories(../dNewton/dModels/dVehicle)
 include_directories(../dNewton/dModels/dCharacter)
+include_directories(../../thirdParty/tinyxml)
 
 file(GLOB CPP_SOURCE *.cpp *.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
@@ -31,8 +32,8 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 add_library(${projectName} STATIC ${CPP_SOURCE})
 
 if (MSVC)
-	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundFileStdafx.h")
-	set_source_files_properties(ndFileStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndFileStdafx.h")
+	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundFileFormatStdafx.h")
+	set_source_files_properties(ndFileFormatStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndFileFormatStdafx.h")
 endif()
 
 

@@ -15,6 +15,7 @@
 #include "ndVehicleUI.h"
 #include "ndDemoEntity.h"
 #include "ndDemoCamera.h"
+#include "ndShaderCache.h"
 #include "ndLoadFbxMesh.h"
 #include "ndFileBrowser.h"
 #include "ndDebugDisplay.h"
@@ -24,7 +25,6 @@
 #include "ndTestDeepBrain.h"
 #include "ndDemoDebugMesh.h"
 #include "ndTargaToOpenGl.h"
-#include "ndShaderCache.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"
@@ -37,14 +37,14 @@
 	//#define REPLAY_RECORD
 #endif
 
-//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
-#define DEFAULT_SCENE	7		// particle fluid
+//#define DEFAULT_SCENE	7		// particle fluid
 //#define DEFAULT_SCENE	8		// static mesh collision 
 //#define DEFAULT_SCENE	9		// static user mesh collision 
 //#define DEFAULT_SCENE	10		// basic joints

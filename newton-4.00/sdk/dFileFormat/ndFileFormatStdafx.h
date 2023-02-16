@@ -20,10 +20,11 @@
 */
 
 
-#ifndef _ND_FILE_STDAFX_H__
-#define _ND_FILE_STDAFX_H__
+#ifndef _ND_FILE_FORMAT_STDAFX_H__
+#define _ND_FILE_FORMAT_STDAFX_H__
 
 #include <ndNewton.h>
+#include <tinyxml.h>
 
 #endif 
 

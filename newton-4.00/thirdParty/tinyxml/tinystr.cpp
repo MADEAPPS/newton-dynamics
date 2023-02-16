@@ -34,11 +34,10 @@ distribution.
 
 namespace nd
 {
-	//xmlFree	 __free__ = free;
-	//xmlAlloc __alloc__ = malloc;
-	xmlFree	 __free__ = nullptr;
-	xmlAlloc __alloc__ = nullptr;
-
+	xmlFree	 __free__ = free;
+	xmlAlloc __alloc__ = malloc;
+	//xmlFree	 __free__ = nullptr;
+	//xmlAlloc __alloc__ = nullptr;
 
 // Error value for find primitive
 const TiXmlString::size_type TiXmlString::npos = static_cast< TiXmlString::size_type >(-1);

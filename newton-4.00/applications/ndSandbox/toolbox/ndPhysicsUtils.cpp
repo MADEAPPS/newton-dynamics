@@ -104,6 +104,12 @@ static void AddShape(ndDemoEntityManager* const scene,
 		ndSharedPtr<ndBody> bodyPtr(body);
 		world->AddBody(bodyPtr);
 		matrix.m_posit.m_y += high * 2.5f;
+
+		ndFileFormat xxxx;
+		//char outPathName[1024];
+		//dGetWorkingFileName("xxxx.nd", outPathName);
+		//xxxx.SaveBody(outPathName, body);
+		xxxx.SaveBody("xxxx.nd", body);
 	}
 }
 

@@ -103,6 +103,9 @@
 #include "ndBrainReplayBuffer.h"
 #include <ndBrainParallelTrainer.h>
 
+#include <ndFileFormatStdafx.h>
+#include <ndFileFormat.h>
+
 void dGetWorkingFileName (const char* const name, char* const outPathName);
 
 // endian conversion
