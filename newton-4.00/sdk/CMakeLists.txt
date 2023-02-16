@@ -18,6 +18,8 @@ if (NEWTON_BUILD_PROFILER)
 	add_subdirectory(dProfiler)
 endif()
 
+add_subdirectory(dBrain)
+
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	add_subdirectory(dCore)
 	add_subdirectory(dNewton)
