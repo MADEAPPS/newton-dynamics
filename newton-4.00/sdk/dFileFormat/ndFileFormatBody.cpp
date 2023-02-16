@@ -20,37 +20,14 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormat.h"
-#include "ndFileFormatRegistry.h"
+#include "ndFileFormatBody.h"
 
-ndFileFormat::ndFileFormat()
-	:ndClassAlloc()
+ndFileFormatBody::ndFileFormatBody()
+	:ndFileFormatRegistry(ndBody::StaticClassName())
 {
-	ndFileFormatRegistry::Init();
 }
 
-void ndFileFormat::SaveBody(const char* const path, ndBody* const body)
+void ndFileFormatBody::Save(nd::TiXmlElement* const parentNode)
 {
-	nd::TiXmlDocument asciifile;
-	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
-	asciifile.LinkEndChild(decl);
-
-	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
-	asciifile.LinkEndChild(rootNode);
-	
-	ndFileFormatRegistry* const handler = ndFileFormatRegistry::GetHandler(body->ClassName());
-	//ndAssert(handler);
-	//for (ndInt32 i = 0; i < GetCount(); i++)
-	//{
-	//	ndBrainLayer* const layer = (*this)[i];
-	//	nd::TiXmlElement* const layerNode = new nd::TiXmlElement("ndLayer");
-	//	rootNode->LinkEndChild(layerNode);
-	//	layer->Save(layerNode);
-	//}
-
-	char* const oldloc = setlocale(LC_ALL, 0);
-	setlocale(LC_ALL, "C");
-	asciifile.SaveFile(path);
-	setlocale(LC_ALL, oldloc);
 
 }
