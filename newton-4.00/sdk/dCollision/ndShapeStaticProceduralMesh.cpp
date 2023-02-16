@@ -27,8 +27,6 @@
 #include "ndPolygonMeshDesc.h"
 #include "ndShapeStaticProceduralMesh.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeStaticProceduralMesh)
-
 ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez)
 	:ndShapeStaticMesh(m_staticProceduralMesh)
 	,m_minBox(ndVector::m_negOne * ndVector::m_half * ndVector(sizex, sizey, sizez, ndFloat32(0.0f)))
@@ -37,29 +35,8 @@ ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(ndFloat32 sizex, ndFloa
 	CalculateLocalObb();
 }
 
-ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndShapeStaticMesh(m_staticProceduralMesh)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	m_minBox = xmlGetVector3(xmlNode, "minBox");
-	m_maxBox = xmlGetVector3(xmlNode, "maxBox");
-	CalculateLocalObb();
-}
-
 ndShapeStaticProceduralMesh::~ndShapeStaticProceduralMesh(void)
 {
-}
-
-void ndShapeStaticProceduralMesh::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeStaticMesh::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "minBox", m_minBox);
-	xmlSaveParam(childNode, "maxBox", m_maxBox);
 }
 
 ndShapeInfo ndShapeStaticProceduralMesh::GetShapeInfo() const

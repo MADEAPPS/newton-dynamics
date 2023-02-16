@@ -31,13 +31,10 @@ class ndBodyKinematicBase : public ndBodyKinematic
 	public:
 	D_CLASS_REFLECTION(ndBodyKinematicBase);
 	D_COLLISION_API ndBodyKinematicBase();
-	D_COLLISION_API ndBodyKinematicBase(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndBodyKinematicBase();
 
 	void SpecialUpdate(ndFloat32 timestep);
 	ndBodyKinematicBase* GetAsBodyKinematicSpecial();
-
-	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndBodyKinematicBase* ndBodyKinematicBase::GetAsBodyKinematicSpecial()

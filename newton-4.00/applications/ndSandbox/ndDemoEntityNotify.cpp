@@ -15,9 +15,6 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityNotify.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndDemoEntityNotify)
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBindingRagdollEntityNotify)
-
 ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody, ndFloat32 gravity)
 	:ndBodyNotify(ndVector (ndFloat32 (0.0f), gravity, ndFloat32(0.0f), ndFloat32(0.0f)))
 	,m_entity(entity)
@@ -26,36 +23,12 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDem
 {
 }
 
-// member a fill in a post process pass
-ndDemoEntityNotify::ndDemoEntityNotify(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndBodyNotify(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_entity(nullptr)
-	,m_parentBody(nullptr)
-	,m_manager(nullptr)
-{
-//	const nd::TiXmlNode* const rootNode = desc.m_rootNode;
-// remember to save member below
-}
-
 ndDemoEntityNotify::~ndDemoEntityNotify()
 {
 	if (m_entity && m_entity->m_rootNode)
 	{
 		m_manager->GetWorld()->RemoveEntity(m_entity);
 	}
-}
-
-void ndDemoEntityNotify::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	ndBodyNotify::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-	xmlSaveParam(childNode, "comment", "string", "body notification for Newton 4.0 demos");
-
-	// remember to save member below
-	//ndDemoEntity* m_entity;
-	//ndBodyDynamic* m_parentBody;
-	//ndDemoEntityManager* m_manager;
 }
 
 void ndDemoEntityNotify::OnObjectPick() const
@@ -117,22 +90,6 @@ ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* 
 {
 	ndDemoEntity* const parentEntity = m_parentBody ? (ndDemoEntity*)(parentBody->GetNotifyCallback()->GetUserData()) : nullptr;
 	m_bindMatrix = entity->GetParent()->CalculateGlobalMatrix(parentEntity).Inverse();
-}
-
-ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndDemoEntityNotify(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_bindMatrix(nullptr)
-	,m_capSpeed(0.0f)
-{
-	ndAssert(0);
-}
-
-void ndBindingRagdollEntityNotify::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	ndAssert(0);
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	ndBodyNotify::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
 void ndBindingRagdollEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)

@@ -13,8 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointUpVector.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointUpVector)
-
 ndJointUpVector::ndJointUpVector(const ndVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(2, child, parent, ndGetIdentityMatrix())
 {
@@ -24,22 +22,8 @@ ndJointUpVector::ndJointUpVector(const ndVector& normal, ndBodyKinematic* const 
 	CalculateLocalMatrix (matrix, m_localMatrix0, m_localMatrix1);
 }
 
-ndJointUpVector::ndJointUpVector(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-{
-	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-}
-
 ndJointUpVector::~ndJointUpVector()
 {
-}
-
-void ndJointUpVector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
 // by animating the orientation of the pin vector the application can change the orientation of the picked object

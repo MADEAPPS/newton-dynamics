@@ -14,8 +14,6 @@
 #include "ndMultiBodyVehicle.h"
 #include "ndMultiBodyVehicleTireJoint.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleTireJoint)
-
 ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndMultiBodyVehicleTireJointInfo& info, ndMultiBodyVehicle* const vehicle)
 	:ndJointWheel(pinAndPivotFrame, child, parent, info)
 	,m_vehicle(vehicle)
@@ -28,35 +26,8 @@ ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const ndMatrix& pinAndP
 	m_frictionModel.m_longitudinalStiffness = ndMax(ndAbs(m_frictionModel.m_longitudinalStiffness), ndFloat32(1.0f));
 }
 
-ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointWheel(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_vehicle(nullptr)
-	,m_frictionModel()
-	,m_lateralSlip(ndFloat32(0.0f))
-	,m_longitudinalSlip(ndFloat32(0.0f))
-	,m_normalizedAligningTorque(ndFloat32(0.0f))
-{
-	ndAssert(0);
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	m_lateralSlip = xmlGetFloat(xmlNode, "lateralSlip");
-	m_longitudinalSlip = xmlGetFloat(xmlNode, "longitudinalSlip");
-}
-
 ndMultiBodyVehicleTireJoint::~ndMultiBodyVehicleTireJoint()
 {
-}
-
-void ndMultiBodyVehicleTireJoint::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointWheel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	ndAssert(0);
-	xmlSaveParam(childNode, "lateralSlip", m_lateralSlip);
-	xmlSaveParam(childNode, "longitudinalSlip", m_longitudinalSlip);
 }
 
 ndFloat32 ndMultiBodyVehicleTireJoint::GetSideSlip() const

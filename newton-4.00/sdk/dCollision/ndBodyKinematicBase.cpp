@@ -24,16 +24,8 @@
 #include "ndContact.h"
 #include "ndBodyKinematicBase.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyKinematicBase)
-
 ndBodyKinematicBase::ndBodyKinematicBase()
 	:ndBodyKinematic()
-{
-	m_contactTestOnly = 1;
-}
-
-ndBodyKinematicBase::ndBodyKinematicBase(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndBodyKinematic(ndLoadSaveBase::ndLoadDescriptor(desc))
 {
 	m_contactTestOnly = 1;
 }
@@ -41,14 +33,3 @@ ndBodyKinematicBase::ndBodyKinematicBase(const ndLoadSaveBase::ndLoadDescriptor&
 ndBodyKinematicBase::~ndBodyKinematicBase()
 {
 }
-
-void ndBodyKinematicBase::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBodyKinematic::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	// nothing to save so far
-}
-

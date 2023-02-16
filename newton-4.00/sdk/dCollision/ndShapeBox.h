@@ -29,7 +29,6 @@ class ndShapeBox: public ndShapeConvex
 {
 	public:
 	D_CLASS_REFLECTION(ndShapeBox);
-	D_COLLISION_API ndShapeBox(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API ndShapeBox(ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z);
 	D_COLLISION_API virtual ~ndShapeBox();
 
@@ -48,7 +47,6 @@ class ndShapeBox: public ndShapeConvex
 
 	D_COLLISION_API const ndConvexSimplexEdge** GetVertexToEdgeMapping() const;
 	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
-	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	ndVector m_size[2];
 	ndVector m_vertex[8];

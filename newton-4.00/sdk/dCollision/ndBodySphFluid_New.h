@@ -32,7 +32,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 {
 	public:
 	D_COLLISION_API ndBodySphFluid();
-	D_COLLISION_API ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndBodySphFluid ();
 
 	ndFloat32 GetViscosity() const;
@@ -43,11 +42,8 @@ class ndBodySphFluid: public ndBodyParticleSet
 	
 	ndFloat32 GetGasConstant() const;
 	void SetGasConstant(ndFloat32 gasConst);
-
 	void SetParticleRadius(ndFloat32 radius);
-
 	virtual ndBodySphFluid* GetAsBodySphFluid();
-	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	D_COLLISION_API void Execute(ndThreadPool* const threadPool);
 

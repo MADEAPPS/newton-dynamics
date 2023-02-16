@@ -133,15 +133,6 @@ namespace ndZmp
 			AddLimb(scene, limbLocation);
 		}
 
-		ndZeroMomentModel(const ndLoadSaveBase::ndLoadDescriptor& desc)
-			:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
-			,m_effector()
-			,m_invDynamicsSolver()
-			,m_bodies()
-		{
-			ndAssert(0);
-		}
-
 		~ndZeroMomentModel()
 		{
 		}
@@ -216,12 +207,6 @@ namespace ndZmp
 
 			m_effector = ndEffector(effector);
 			m_wheelBody = wheelBody;
-		}
-
-		//void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-		void Save(const ndLoadSaveBase::ndSaveDescriptor&) const
-		{
-			ndAssert(0);
 		}
 
 		void Debug(ndConstraintDebugCallback& context) const
@@ -399,7 +384,6 @@ ndTrace(("%d: invTorque=%f %f\n", xxxx, torque0.m_z, torqueB___.m_z));
 		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
 		ndBodyKinematic* m_wheelBody;
 	};
-	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndZeroMomentModel);
 
 	class ndModelUI : public ndUIEntity
 	{

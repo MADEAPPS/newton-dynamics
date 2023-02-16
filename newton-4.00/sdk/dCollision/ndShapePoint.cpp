@@ -30,19 +30,8 @@ ndShapePoint::ndShapePoint()
 {
 }
 
-ndShapePoint::ndShapePoint(const ndLoadSaveBase::ndLoadDescriptor&)
-	:ndShapeConvex(m_pointCollision)
-{
-	ndAssert(0);
-}
-
 ndShapePoint::~ndShapePoint()
 {
-}
-
-void ndShapePoint::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
-{
-	ndAssert(0);
 }
 
 void ndShapePoint::MassProperties()

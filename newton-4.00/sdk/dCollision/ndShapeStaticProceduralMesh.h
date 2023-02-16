@@ -57,11 +57,9 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	};
 
 	D_CLASS_REFLECTION(ndShapeStaticProceduralMesh);
-	D_COLLISION_API ndShapeStaticProceduralMesh(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API ndShapeStaticProceduralMesh(ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez);
 	D_COLLISION_API virtual ~ndShapeStaticProceduralMesh();
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return this; }
 	virtual void GetCollidingFaces(const ndVector& minBox, const ndVector& maxBox, ndArray<ndVector>& vertex, ndArray<ndInt32>& faceList, ndArray<ndInt32>& faceMaterial, ndArray<ndInt32>& indexListList) const;

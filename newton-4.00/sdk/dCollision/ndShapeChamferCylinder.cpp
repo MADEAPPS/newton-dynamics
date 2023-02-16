@@ -25,8 +25,6 @@
 #include "ndContactSolver.h"
 #include "ndShapeChamferCylinder.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeChamferCylinder)
-
 ndInt32 ndShapeChamferCylinder::m_shapeRefCount = 0;
 ndVector ndShapeChamferCylinder::m_yzMask (0, 0xffffffff, 0xffffffff, 0);
 ndVector ndShapeChamferCylinder::m_shapesDirs[DG_MAX_CHAMFERCYLINDER_DIR_COUNT];
@@ -38,16 +36,6 @@ ndShapeChamferCylinder::ndShapeChamferCylinder(ndFloat32 radius, ndFloat32 heigh
 	Init (radius, height);
 }
 
-ndShapeChamferCylinder::ndShapeChamferCylinder(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndShapeConvex(m_chamferCylinder)
-{
-	//ndVector size;
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	ndFloat32 radius = xmlGetFloat(xmlNode, "radius");
-	ndFloat32 height = xmlGetFloat(xmlNode, "height");
-	Init(radius, height);
-}
-
 ndShapeChamferCylinder::~ndShapeChamferCylinder()
 {
 	m_shapeRefCount --;
@@ -55,17 +43,6 @@ ndShapeChamferCylinder::~ndShapeChamferCylinder()
 
 	ndShapeConvex::m_simplex = nullptr;
 	ndShapeConvex::m_vertex = nullptr;
-}
-
-void ndShapeChamferCylinder::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "radius", m_radius);
-	xmlSaveParam(childNode, "height", m_height * ndFloat32(2.0f));
 }
 
 void ndShapeChamferCylinder::Init (ndFloat32 radius, ndFloat32 height)

@@ -25,8 +25,6 @@
 #include "ndBodyDynamic.h"
 #include "ndCharacterNode.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterNode)
-
 ndCharacterNode::ndCharacterNode(ndCharacterNode* const parent)
 	:ndNodeHierarchy<ndCharacterNode>()
 	,m_localPose(ndGetIdentityMatrix())
@@ -37,49 +35,8 @@ ndCharacterNode::ndCharacterNode(ndCharacterNode* const parent)
 	}
 }
 
-ndCharacterNode::ndCharacterNode(const ndCharacterLoadDescriptor& desc)
-	:ndNodeHierarchy<ndCharacterNode>()
-{
-	if (desc.m_parentModelNode)
-	{
-		Attach((ndCharacterNode*)desc.m_parentModelNode);
-	}
-
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	ndInt32 hashId;
-	const nd::TiXmlElement* const element = (nd::TiXmlElement*) xmlNode;
-	element->Attribute("hashId", &hashId);
-	desc.m_limbMap->Insert(this, ndUnsigned32(hashId));
-
-	ndCharacterLoadDescriptor childDesc(desc);
-	childDesc.m_parentModelNode = this;
-	for (const nd::TiXmlNode* node = xmlNode->FirstChild(); node; node = node->NextSibling())
-	{
-		const char* const partName = node->Value();
-		//dTrace(("%s\n", partName));
-		if (strstr(partName, "ndCharacter"))
-		{
-			childDesc.m_rootNode = node;
-			D_CLASS_REFLECTION_LOAD_NODE(ndCharacterNode, partName, childDesc);
-		}
-	}
-}
-
 ndCharacterNode::~ndCharacterNode()
 {
-}
-
-void ndCharacterNode::Save(const ndCharacterSaveDescriptor& desc) const
-{
-	ndCharacterSaveDescriptor childDesc(desc);
-	
-	ndAssert(0);
-	childDesc.m_limbMap->Insert(childDesc.m_limbMap->GetCount(), (ndCharacterNode*)this);
-	for (ndCharacterNode* child = GetFirstChild(); child; child = child->GetNext())
-	{
-		child->Save(childDesc);
-	}
 }
 
 ndCharacterNode* ndCharacterNode::CreateClone() const

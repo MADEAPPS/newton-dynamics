@@ -30,36 +30,12 @@
 #include "ndCharacterForwardDynamicNode.h"
 #include "ndCharacterInverseDynamicNode.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacter)
-
 ndCharacter::ndCharacter()
 	:ndModel()
 	,m_rootNode(nullptr)
 	,m_effectors()
 	,m_extraJointAttachments()
 {
-}
-
-ndCharacter::ndCharacter(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_rootNode(nullptr)
-	,m_effectors()
-	,m_extraJointAttachments()
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	ndTree<const ndCharacterNode*, ndUnsigned32> limbMap;
-	for (const nd::TiXmlNode* node = xmlNode->FirstChild(); node; node = node->NextSibling())
-	{
-		const char* const partName = node->Value();
-		if (strcmp(partName, "ndCharacterRootNode") == 0)
-		{
-			ndCharacterLoadDescriptor loadDesc(desc, &limbMap);
-			loadDesc.m_rootNode = node;
-			m_rootNode = new ndCharacterRootNode(loadDesc);
-			m_rootNode->m_owner = this;
-		}
-	}
 }
 
 ndCharacter::~ndCharacter()
@@ -79,23 +55,6 @@ ndCharacter::~ndCharacter()
 	if (m_rootNode)
 	{
 		delete m_rootNode;
-	}
-}
-
-void ndCharacter::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndModel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	if (m_rootNode)
-	{
-		ndTree<ndInt32, const ndCharacterNode*> limbMap;
-		ndCharacterSaveDescriptor childDesc(desc);
-		childDesc.m_rootNode = childNode;
-		childDesc.m_limbMap = &limbMap;
-		m_rootNode->Save(childDesc);
 	}
 }
 

@@ -106,7 +106,6 @@ class ndShapeInstance: public ndContainersFreeListAlloc<ndShapeInstance>
 	D_COLLISION_API ndShapeInstance(ndShape* const shape);
 	D_COLLISION_API ndShapeInstance(const ndShapeInstance& instance);
 	D_COLLISION_API ndShapeInstance(const ndShapeInstance& instance, ndShape* const shape);
-	D_COLLISION_API ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndShapeLoaderCache& shapesMap);
 	D_COLLISION_API ~ndShapeInstance();
 
 	D_COLLISION_API ndShapeInstance& operator=(const ndShapeInstance& src);
@@ -120,7 +119,6 @@ class ndShapeInstance: public ndContainersFreeListAlloc<ndShapeInstance>
 	//D_COLLISION_API ndInt32 ClosestPoint(const ndMatrix& matrix, const ndVector& point, ndVector& contactPoint) const;
 
 	D_COLLISION_API ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_COLLISION_API ndFloat32 CalculateBuoyancyCenterOfPresure(ndVector& com, const ndMatrix& matrix, const ndVector& fluidPlane) const;
 
 	D_COLLISION_API static ndVector GetBoxPadding();

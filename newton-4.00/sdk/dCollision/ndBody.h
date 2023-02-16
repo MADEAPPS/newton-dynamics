@@ -44,7 +44,6 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	public:
 	D_CLASS_REFLECTION(ndBody);
 	D_COLLISION_API ndBody();
-	D_COLLISION_API ndBody(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndBody();
 
 	virtual ndBody* GetAsBody() { return this;}
@@ -79,8 +78,6 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	D_COLLISION_API virtual void SetOmega(const ndVector& veloc);
 	D_COLLISION_API virtual void SetVelocity(const ndVector& veloc);
 	D_COLLISION_API virtual void SetMatrix(const ndMatrix& matrix);
-		
-	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_COLLISION_API ndVector GetVelocityAtPoint(const ndVector& point) const;
 
 	D_COLLISION_API void SetOmegaNoSleep(const ndVector& veloc);

@@ -101,71 +101,11 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance, ndShape* const
 {
 }
 
-ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndShapeLoaderCache& shapesCache)
-	:ndContainersFreeListAlloc<ndShapeInstance>()
-	,m_globalMatrix(ndGetIdentityMatrix())
-	,m_localMatrix(ndGetIdentityMatrix())
-	,m_alignmentMatrix(ndGetIdentityMatrix())
-	,m_scale(ndVector::m_one & ndVector::m_triplexMask)
-	,m_invScale(ndVector::m_one & ndVector::m_triplexMask)
-	,m_maxScale(ndVector::m_one & ndVector::m_triplexMask)
-	,m_shape(nullptr)
-	,m_ownerBody(nullptr)
-	,m_subCollisionHandle(nullptr)
-	,m_parent(nullptr)
-	,m_skinMargin(ndFloat32(0.0f))
-	,m_scaleType(m_unit)
-	,m_collisionMode(true)
-{
-	ndInt32 index = xmlGetInt(xmlNode, "shapeHashId");
-	const ndShapeInstance& cacheInstance = shapesCache.Find(index)->GetInfo();
-	m_shape = cacheInstance.GetShape()->AddRef();
-	
-	m_localMatrix = xmlGetMatrix(xmlNode, "localMatrix");
-	m_alignmentMatrix = xmlGetMatrix(xmlNode, "alignmentMatrix");
-	m_skinMargin = xmlGetFloat(xmlNode, "skinMargin");
-	m_collisionMode = xmlGetInt(xmlNode, "collisionMode") ? true : false;
-	m_shapeMaterial.m_userId = xmlGetInt64(xmlNode, "materialID");
-	m_shapeMaterial.m_data.m_alignPad = ndUnsigned64 (xmlGetInt64(xmlNode, "userData"));
-	
-	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); ++i)
-	{
-		char name[64];
-		sprintf(name, "intData%d", i);
-		m_shapeMaterial.m_userParam[i].m_intData = ndUnsigned64(xmlGetInt64(xmlNode, name));
-	}
-	
-	ndVector scale (xmlGetVector3(xmlNode, "scale"));
-	SetScale(scale);
-}
-
 ndShapeInstance::~ndShapeInstance()
 {
 	if (m_shape)
 	{
 		m_shape->Release();
-	}
-}
-
-void ndShapeInstance::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeInstance");
-	desc.m_rootNode->LinkEndChild(paramNode);
-
-	xmlSaveParam(paramNode, "shapeHashId", desc.m_shapeNodeHash);
-	xmlSaveParam(paramNode, "localMatrix", m_localMatrix);
-	xmlSaveParam(paramNode, "alignmentMatrix", m_alignmentMatrix);
-	xmlSaveParam(paramNode, "scale", m_scale);
-
-	xmlSaveParam(paramNode, "skinMargin", m_skinMargin);
-	xmlSaveParam(paramNode, "collisionMode", m_collisionMode ? 1 : 0);
-	xmlSaveParam(paramNode, "materialID", m_shapeMaterial.m_userId);
-	xmlSaveParam(paramNode, "userData", ndInt64(m_shapeMaterial.m_data.m_alignPad));
-	for (ndInt32 i = 0; i < ndInt32(sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); ++i)
-	{
-		char name[64];
-		sprintf(name, "intData%d", i);
-		xmlSaveParam(paramNode, name, ndInt64(m_shapeMaterial.m_userParam[i].m_intData));
 	}
 }
 

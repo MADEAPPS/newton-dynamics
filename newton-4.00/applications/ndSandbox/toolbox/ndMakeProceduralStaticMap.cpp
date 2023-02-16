@@ -33,27 +33,6 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 	{
 	}
 
-	ndRegularProceduralGrid(const ndLoadSaveBase::ndLoadDescriptor& desc)
-		:ndShapeStaticProceduralMesh(ndLoadSaveBase::ndLoadDescriptor(desc))
-	{
-		const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-		m_planeEquation = xmlGetVector3(xmlNode, "planeEquation");
-		m_gridSize = xmlGetFloat(xmlNode, "gridSize");
-		m_invGridSize = ndFloat32 (1.0f) / m_gridSize;
-	}
-
-	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-	{
-		nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-		desc.m_rootNode->LinkEndChild(childNode);
-		childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-		ndShapeStaticProceduralMesh::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-		xmlSaveParam(childNode, "planeEquation", m_planeEquation);
-		xmlSaveParam(childNode, "gridSize", m_gridSize);
-	}
-
 	virtual void DebugShape(const ndMatrix&, ndShapeDebugNotify& notify) const
 	{
 		ndDebugNotify& debugDraw = (ndDebugNotify&)notify;
@@ -167,7 +146,6 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 	ndFloat32 m_gridSize;
 	ndFloat32 m_invGridSize;
 };
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndRegularProceduralGrid)
 
 ndDemoEntity* BuildVisualEntity(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
 {

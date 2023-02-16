@@ -33,13 +33,11 @@ class ndShapeStaticMesh: public ndShape
 	public:
 	D_CLASS_REFLECTION(ndShapeStaticMesh);
 	D_COLLISION_API ndShapeStaticMesh(ndShapeID id);
-	D_COLLISION_API ndShapeStaticMesh(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeStaticMesh();
 
 	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
-	D_COLLISION_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	protected:
 	virtual ndFloat32 GetVolume() const;

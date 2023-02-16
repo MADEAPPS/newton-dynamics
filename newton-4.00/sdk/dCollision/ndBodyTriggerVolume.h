@@ -31,7 +31,6 @@ class ndBodyTriggerVolume : public ndBodyKinematicBase
 	public:
 	D_CLASS_REFLECTION(ndBodyTriggerVolume);
 	D_COLLISION_API ndBodyTriggerVolume();
-	D_COLLISION_API ndBodyTriggerVolume(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndBodyTriggerVolume();
 
 	ndBodyTriggerVolume* GetAsBodyTriggerVolume();
@@ -41,7 +40,6 @@ class ndBodyTriggerVolume : public ndBodyKinematicBase
 	virtual void OnTriggerExit(ndBodyKinematic* const body, ndFloat32 timestep);
 
 	D_COLLISION_API virtual void SpecialUpdate(ndFloat32 timestep);
-	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	private:
 	virtual void IntegrateExternalForce(ndFloat32 timestep);

@@ -45,7 +45,6 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	D_CLASS_REFLECTION(ndModel);
 
 	ndModel();
-	D_NEWTON_API ndModel(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	virtual ~ndModel ();
 
 	virtual ndModel* GetAsModel();
@@ -55,8 +54,6 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	protected:
 	virtual void AddToWorld(ndWorld* const world);
 	virtual void RemoveFromToWorld();
-	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
-
 	virtual void Update(ndWorld* const world, ndFloat32 timestep);
 	virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
 	virtual void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep);

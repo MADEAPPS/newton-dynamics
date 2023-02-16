@@ -23,23 +23,3 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndModel.h"
-
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndModel)
-
-ndModel::ndModel(const ndLoadSaveBase::ndLoadDescriptor&)
-	:ndContainersFreeListAlloc<ndModel>()
-	,m_world(nullptr)
-	,m_node(nullptr)
-	,m_markedForRemoved(0)
-{
-}
-
-void ndModel::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-}
-
-
-

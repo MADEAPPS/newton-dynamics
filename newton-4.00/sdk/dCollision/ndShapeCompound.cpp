@@ -28,7 +28,6 @@
 #include "ndShapeCompound.h"
 
 #define D_MAX_MIN_VOLUME	ndFloat32 (1.0e-3f)
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeCompound)
 
 ndShapeCompound::ndNodeBase::~ndNodeBase()
 {
@@ -364,47 +363,11 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeIns
 	}
 }
 
-ndShapeCompound::ndShapeCompound(const ndLoadSaveBase::ndLoadDescriptor&)
-	:ndShape(m_compound)
-	,m_array()
-	,m_treeEntropy(ndFloat32 (0.0f))
-	,m_boxMinRadius(ndFloat32(0.0f))
-	,m_boxMaxRadius(ndFloat32(0.0f))
-	,m_root(nullptr)
-	,m_myInstance(nullptr)
-	,m_idIndex(0)
-{
-	//do nothing here;
-	//sub shapes will be load in a post process pass,
-	//when all sub shape are converted to instanaced.
-}
-
 ndShapeCompound::~ndShapeCompound()
 {
 	if (m_root) 
 	{
 		delete m_root;
-	}
-}
-
-void ndShapeCompound::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShape::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	nd::TiXmlElement* const subShapedNode = new nd::TiXmlElement("ndCompoundsSubShaped");
-	childNode->LinkEndChild(subShapedNode);
-	ndLoadSaveBase::ndSaveDescriptor subShapeDesc(desc);
-	subShapeDesc.m_rootNode = subShapedNode;
-	ndTreeArray::Iterator iter(m_array);
-	for (iter.Begin(); iter; iter++)
-	{
-		ndNodeBase* const node = iter.GetNode()->GetInfo();
-		ndShapeInstance* const instance = node->GetShape();
-		subShapeDesc.m_shapeNodeHash = subShapeDesc.m_shapeMap->Find(instance->GetShape())->GetInfo();
-		instance->Save(subShapeDesc);
 	}
 }
 

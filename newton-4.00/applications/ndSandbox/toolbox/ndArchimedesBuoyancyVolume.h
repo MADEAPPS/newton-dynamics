@@ -21,13 +21,11 @@ class ndArchimedesBuoyancyVolume: public ndBodyTriggerVolume
 	public:
 	D_CLASS_REFLECTION(ndArchimedesBuoyancyVolume);
 	ndArchimedesBuoyancyVolume();
-	ndArchimedesBuoyancyVolume(const ndLoadSaveBase::ndLoadDescriptor& desc);
 
 	void CalculatePlane(ndBodyKinematic* const body);
 	void OnTriggerEnter(ndBodyKinematic* const body, ndFloat32 timestep);
 	void OnTrigger(ndBodyKinematic* const kinBody, ndFloat32 timestep);
 	void OnTriggerExit(ndBodyKinematic* const body, ndFloat32 timestep);
-	virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	ndPlane m_plane;
 	ndFloat32 m_density;

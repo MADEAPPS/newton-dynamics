@@ -25,8 +25,6 @@
 #include "ndShapeCone.h"
 #include "ndContactSolver.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeCone)
-
 ndInt32 ndShapeCone::m_shapeRefCount = 0;
 ndShapeConvex::ndConvexSimplexEdge ndShapeCone::m_edgeArray[D_CONE_SEGMENTS * 4];
 
@@ -36,32 +34,12 @@ ndShapeCone::ndShapeCone(ndFloat32 radius, ndFloat32 height)
 	Init(radius, height);
 }
 
-ndShapeCone::ndShapeCone(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndShapeConvex(m_cone)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	ndFloat32 radius = xmlGetFloat(xmlNode, "radius");
-	ndFloat32 height = xmlGetFloat(xmlNode, "height");
-	Init(radius, height);
-}
-
 ndShapeCone::~ndShapeCone()
 {
 	m_shapeRefCount--;
 	ndAssert(m_shapeRefCount >= 0);
 	ndShapeConvex::m_vertex = nullptr;
 	ndShapeConvex::m_simplex = nullptr;
-}
-
-void ndShapeCone::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "radius", m_radius);
-	xmlSaveParam(childNode, "height", m_height * ndFloat32(2.0f));
 }
 
 void ndShapeCone::Init(ndFloat32 radius, ndFloat32 height)

@@ -29,7 +29,6 @@ class ndCharacterRootNode: public ndCharacterNode
 {
 	public:
 	D_CLASS_REFLECTION(ndCharacterRootNode);
-	D_NEWTON_API ndCharacterRootNode(const ndCharacterLoadDescriptor& desc);
 	D_NEWTON_API ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body);
 	D_NEWTON_API virtual ~ndCharacterRootNode ();
 
@@ -41,8 +40,6 @@ class ndCharacterRootNode: public ndCharacterNode
 
 	protected:
 	//void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
-	void Save(const ndCharacterSaveDescriptor& desc) const;
-
 	ndMatrix m_coronalFrame;
 	ndCharacter* m_owner;
 	ndBodyDynamic* m_body;

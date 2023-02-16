@@ -13,8 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndIkSwivelPositionEffector.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIkSwivelPositionEffector)
-
 ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndVector& childPivot, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotParent)
 	,m_localTargetPosit(ndVector::m_wOne)
@@ -45,70 +43,8 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndVector& childPivo
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
-ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_localTargetPosit(ndVector::m_wOne)
-	,m_swivelAngle(ndFloat32(0.0f))
-	,m_angularSpring(ndFloat32(1000.0f))
-	,m_angularDamper(ndFloat32(50.0f))
-	,m_angularMaxTorque(D_LCP_MAX_VALUE)
-	,m_angularRegularizer(ndFloat32(5.0e-3f))
-	,m_linearSpring(ndFloat32(1000.0f))
-	,m_linearDamper(ndFloat32(50.0f))
-	,m_linearMaxForce(D_LCP_MAX_VALUE)
-	,m_linearRegularizer(ndFloat32(5.0e-3f))
-	,m_minWorkSpaceRadio(ndFloat32(0.0f))
-	,m_maxWorkSpaceRadio(ndFloat32(0.0f))
-	,m_rotationOrder(m_pitchYawRoll)
-	,m_enableSwivelControl(true)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	
-	m_localTargetPosit = xmlGetVector3(xmlNode, "localTargetPosit");
-	m_swivelAngle = xmlGetFloat(xmlNode, "swivelAngle");
-
-	m_angularSpring = xmlGetFloat(xmlNode, "angularSpring");
-	m_angularDamper = xmlGetFloat(xmlNode, "angularDamper");
-	m_angularMaxTorque = xmlGetFloat(xmlNode, "angularMaxTorque");
-	m_angularRegularizer = xmlGetFloat(xmlNode, "angularRegularizer");
-	
-	m_linearSpring = xmlGetFloat(xmlNode, "linearSpring");
-	m_linearDamper = xmlGetFloat(xmlNode, "linearDamper");
-	m_linearMaxForce = xmlGetFloat(xmlNode, "linearMaxForce");
-	m_linearRegularizer = xmlGetFloat(xmlNode, "linearRegularizer");
-
-	m_minWorkSpaceRadio = xmlGetFloat(xmlNode, "minWorkSpaceRadior");
-	m_maxWorkSpaceRadio = xmlGetFloat(xmlNode, "maxWorkSpaceRadior");
-	m_enableSwivelControl = xmlGetInt(xmlNode, "enableSwivelControl") ? true : false;
-	m_enableSwivelControl = xmlGetInt(xmlNode, "rotationOrder") ? m_pitchYawRoll : m_pitchRollYaw;
-}
-
 ndIkSwivelPositionEffector::~ndIkSwivelPositionEffector()
 {
-}
-
-void ndIkSwivelPositionEffector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "localTargetPosit", m_localTargetPosit);
-	xmlSaveParam(childNode, "swivelAngle", m_swivelAngle);
-	xmlSaveParam(childNode, "angularSpring", m_angularSpring);
-	xmlSaveParam(childNode, "angularDamper", m_angularDamper);
-	xmlSaveParam(childNode, "angularMaxTorque", m_angularMaxTorque);
-	xmlSaveParam(childNode, "angularRegularizer", m_angularRegularizer);
-	xmlSaveParam(childNode, "linearSpring", m_linearSpring);
-	xmlSaveParam(childNode, "linearDamper", m_linearDamper);
-	xmlSaveParam(childNode, "linearMaxForce", m_linearMaxForce);
-	xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
-
-	xmlSaveParam(childNode, "minWorkSpaceRadio", m_minWorkSpaceRadio);
-	xmlSaveParam(childNode, "maxWorkSpaceRadio", m_maxWorkSpaceRadio);
-	xmlSaveParam(childNode, "enableSwivelControl", m_enableSwivelControl ? 1 : 0);
-	xmlSaveParam(childNode, "rotationOrder", m_rotationOrder ? m_pitchYawRoll : m_pitchRollYaw);
 }
 
 bool ndIkSwivelPositionEffector::GetSwivelMode() const

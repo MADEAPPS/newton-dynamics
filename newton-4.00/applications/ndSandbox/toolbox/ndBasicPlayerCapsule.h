@@ -45,11 +45,7 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 		ndDemoEntityManager* const scene, const ndDemoEntity* const modelEntity,
 		const ndMatrix& localAxis, const ndMatrix& location, 
 		ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight, bool isPlayer = false);
-
 	~ndBasicPlayerCapsule();
-
-	ndBasicPlayerCapsule(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	void ApplyInputs(ndFloat32 timestep);
 	ndFloat32 ContactFrictionCallback(const ndVector& position, const ndVector& normal, ndInt32 contactId, const ndBodyKinematic* const otherbody) const;

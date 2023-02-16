@@ -27,8 +27,6 @@
 #define D_VEL_DAMP			 ndFloat32(100.0f)
 #define D_POS_DAMP			 ndFloat32(1500.0f)
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointBilateralConstraint)
-
 ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrix)
 	:ndConstraint()
 	,m_forceBody0(ndVector::m_zero)
@@ -106,67 +104,11 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 	memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
 }
 
-ndJointBilateralConstraint::ndJointBilateralConstraint(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndConstraint()
-	,m_forceBody0(ndVector::m_zero)
-	,m_torqueBody0(ndVector::m_zero)
-	,m_forceBody1(ndVector::m_zero)
-	,m_torqueBody1(ndVector::m_zero)
-	,m_worldNode(nullptr)
-	,m_body0Node(nullptr)
-	,m_body1Node(nullptr)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	
-	m_mark0 = 0;
-	m_mark1 = 0;
-	m_rowIsMotor = 0;
-	m_markedForRemoved = 0;
-	m_isInSkeleton = 0;
-
-	ndInt32 body0Hash = xmlGetInt(xmlNode, "body0Hash");
-	ndInt32 body1Hash = xmlGetInt(xmlNode, "body1Hash");
-	ndBody* const body0 = (ndBody*)desc.m_bodyMap->Find(body0Hash)->GetInfo();
-	ndBody* const body1 = (ndBody*)desc.m_bodyMap->Find(body1Hash)->GetInfo();
-
-	m_body0 = body0->GetAsBodyKinematic();
-	m_body1 = body1->GetAsBodyKinematic();
-
-	m_localMatrix0 = xmlGetMatrix(xmlNode, "localMatrix0");
-	m_localMatrix1 = xmlGetMatrix(xmlNode, "localMatrix1");
-	
-	m_maxDof = ndUnsigned32(xmlGetInt(xmlNode, "maxDof"));
-	m_enableCollision = ndUnsigned32(xmlGetInt(xmlNode, "enableCollision"));
-	m_solverModel = ndJointBilateralSolverModel(xmlGetInt(xmlNode, "solverModel"));
-	m_defualtDiagonalRegularizer = xmlGetFloat(xmlNode, "defualtDiagonalRegularizer");
-
-	memset(m_jointForce, 0, sizeof(m_jointForce));
-	memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
-}
-
 ndJointBilateralConstraint::~ndJointBilateralConstraint()
 {
 	ndAssert(m_worldNode == nullptr);
 	ndAssert(m_body0Node == nullptr);
 	ndAssert(m_body1Node == nullptr);
-}
-
-void ndJointBilateralConstraint::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-
-	xmlSaveParam(childNode, "body0Hash", desc.m_body0NodeHash);
-	xmlSaveParam(childNode, "body1Hash", desc.m_body1NodeHash);
-
-	xmlSaveParam(childNode, "localMatrix0", m_localMatrix0);
-	xmlSaveParam(childNode, "localMatrix1", m_localMatrix1);
-
-	xmlSaveParam(childNode, "defualtDiagonalRegularizer", m_defualtDiagonalRegularizer);
-	xmlSaveParam(childNode, "maxDof", ndInt32(m_maxDof));
-	xmlSaveParam(childNode, "enableCollision", ndInt32(m_enableCollision));
-	xmlSaveParam(childNode, "solverModel", ndInt32(m_solverModel));
 }
 
 void ndJointBilateralConstraint::SetIkMode(bool)

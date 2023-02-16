@@ -33,7 +33,6 @@ class ndBodyPlayerCapsule : public ndBodyKinematicBase
 {
 	public:
 	D_CLASS_REFLECTION(ndBodyPlayerCapsule);
-	D_COLLISION_API ndBodyPlayerCapsule(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API ndBodyPlayerCapsule(const ndMatrix& localAxis, ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight);
 	D_COLLISION_API virtual ~ndBodyPlayerCapsule();
 
@@ -75,8 +74,6 @@ class ndBodyPlayerCapsule : public ndBodyKinematicBase
 	void IntegrateVelocity(ndFloat32 timestep);
 
 	protected: 
-	D_COLLISION_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
-
 	ndMatrix m_localFrame;
 	ndVector m_impulse;
 	ndFloat32 m_mass;

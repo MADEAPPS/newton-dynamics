@@ -23,32 +23,11 @@
 #include "ndNewtonStdafx.h"
 #include "ndMultiBodyVehicleDifferential.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleDifferential)
-
 ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(ndBodyKinematic* const differential, ndBodyKinematic* const chassis, ndFloat32 slipOmegaLock)
 	:ndJointBilateralConstraint(2, differential, chassis, differential->GetMatrix())
 	,m_limitedSlipOmega(slipOmegaLock)
 {
 	ndAssert(slipOmegaLock >= 0.0f);
-}
-
-ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_limitedSlipOmega(ndFloat32 (0.0f))
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	m_limitedSlipOmega = xmlGetFloat(xmlNode, "limitedSlipOmega");
-}
-
-void ndMultiBodyVehicleDifferential::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "limitedSlipOmega", m_limitedSlipOmega);
 }
 
 void ndMultiBodyVehicleDifferential::AlignMatrix()

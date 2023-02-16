@@ -33,9 +33,7 @@ class ndBodyParticleSet: public ndBody, public ndBackgroundTask
 {
 	public:
 	D_COLLISION_API ndBodyParticleSet();
-	D_COLLISION_API ndBodyParticleSet(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndBodyParticleSet ();
-	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	const ndVector GetGravity() const;
 	void SetGravity(const ndVector& gravity);

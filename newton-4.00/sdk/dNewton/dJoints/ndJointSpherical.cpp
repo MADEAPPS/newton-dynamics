@@ -13,8 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointSpherical.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointSpherical)
-
 ndJointSpherical::ndJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(9, child, parent, pinAndPivotFrame)
 	,m_rotation(ndGetIdentityMatrix())
@@ -27,45 +25,8 @@ ndJointSpherical::ndJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinem
 {
 }
 
-ndJointSpherical::ndJointSpherical(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_rotation(ndGetIdentityMatrix())
-	,m_springK(ndFloat32(0.0f))
-	,m_damperC(ndFloat32(0.0f))
-	,m_maxConeAngle(ndFloat32(1.0e10f))
-	,m_minTwistAngle(-ndFloat32(1.0e10f))
-	,m_maxTwistAngle(ndFloat32(1.0e10f))
-	,m_springDamperRegularizer(ndFloat32(0.0f))
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	m_rotation = xmlGetMatrix(xmlNode, "rotation");
-	m_springK = xmlGetFloat(xmlNode, "springK");
-	m_damperC = xmlGetFloat(xmlNode, "damperC");
-	m_maxConeAngle = xmlGetFloat(xmlNode, "maxConeAngle");
-	m_minTwistAngle = xmlGetFloat(xmlNode, "minTwistAngle");
-	m_maxTwistAngle = xmlGetFloat(xmlNode, "maxTwistAngle");
-	m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
-}
-
 ndJointSpherical::~ndJointSpherical()
 {
-}
-
-void ndJointSpherical::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "rotation", m_rotation);
-	xmlSaveParam(childNode, "springK", m_springK);
-	xmlSaveParam(childNode, "damperC", m_damperC);
-	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
-	xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
-	xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
-	xmlSaveParam(childNode, "springDamperRegularizer", m_springDamperRegularizer);
 }
 
 ndFloat32 ndJointSpherical::PenetrationOmega(ndFloat32 penetration) const

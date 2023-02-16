@@ -13,8 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointFixDistance.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointFixDistance)
-
 ndJointFixDistance::ndJointFixDistance(const ndVector& pivotInChildInGlobalSpace, const ndVector& pivotInParentInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(3, child, parent, ndGetIdentityMatrix())
 	,m_distance(ndFloat32 (0.0f))
@@ -35,27 +33,8 @@ ndJointFixDistance::ndJointFixDistance(const ndVector& pivotInChildInGlobalSpace
 	CalculateLocalMatrix(parentMatrix, dummy, m_localMatrix1);
 }
 
-ndJointFixDistance::ndJointFixDistance(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_distance(ndFloat32(0.0f))
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	m_distance = xmlGetFloat(xmlNode, "distance");
-}
-
 ndJointFixDistance::~ndJointFixDistance()
 {
-}
-
-void ndJointFixDistance::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "distance", m_distance);
 }
 
 void ndJointFixDistance::JacobianDerivative(ndConstraintDescritor& desc)

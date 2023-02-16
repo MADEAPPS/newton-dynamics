@@ -30,7 +30,6 @@ class ndShapeStatic_bvh: public ndShapeStaticMesh, public ndAabbPolygonSoup
 	public:
 	D_CLASS_REFLECTION(ndShapeStatic_bvh);
 	D_COLLISION_API ndShapeStatic_bvh(const ndPolygonSoupBuilder& builder);
-	D_COLLISION_API ndShapeStatic_bvh(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeStatic_bvh();
 
 	void *operator new (size_t size);
@@ -42,7 +41,6 @@ class ndShapeStatic_bvh: public ndShapeStaticMesh, public ndAabbPolygonSoup
 	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
-	virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	
 	static ndFloat32 RayHit(void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount);
 	static ndIntersectStatus ShowDebugPolygon(void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);

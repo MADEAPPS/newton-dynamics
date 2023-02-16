@@ -27,8 +27,6 @@
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleTorsionBar.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleTorsionBar)
-
 ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehicle* const vehicle, ndBodyKinematic* const fixedbody)
 	:ndJointBilateralConstraint(1, vehicle->m_chassis->GetAsBodyKinematic(), fixedbody, ndGetIdentityMatrix())
 	,m_springK(ndFloat32 (10.0f))
@@ -41,34 +39,6 @@ ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehi
 	const ndMatrix worldMatrix (vehicle->m_localFrame * chassis->GetMatrix());
 	CalculateLocalMatrix(worldMatrix, m_localMatrix0, m_localMatrix1);
 	SetSolverModel(m_jointkinematicCloseLoop);
-}
-
-ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_springK(ndFloat32(10.0f))
-	,m_damperC(ndFloat32(1.0f))
-	,m_springDamperRegularizer(ndFloat32(0.1f))
-	,m_axleCount(0)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	m_springK = xmlGetFloat(xmlNode, "springK");
-	m_damperC = xmlGetFloat(xmlNode, "damperC");
-	m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
-	m_axleCount = xmlGetInt(xmlNode, "axleCount");
-}
-
-void ndMultiBodyVehicleTorsionBar::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "springK", m_springK);
-	xmlSaveParam(childNode, "damperC", m_damperC);
-	xmlSaveParam(childNode, "springDamperRegularizer", m_springDamperRegularizer);
-	xmlSaveParam(childNode, "axleCount", m_axleCount);
 }
 
 void ndMultiBodyVehicleTorsionBar::SetTorsionTorque(ndFloat32 springK, ndFloat32 damperC, ndFloat32 springDamperRegularizer)

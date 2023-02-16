@@ -31,7 +31,6 @@ class ndShapeConvexHull : public ndShapeConvex
 
 	public:
 	D_CLASS_REFLECTION(ndShapeConvexHull);
-	D_COLLISION_API ndShapeConvexHull(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API ndShapeConvexHull(ndInt32 count, ndInt32 strideInBytes, ndFloat32 tolerance, const ndFloat32* const vertexArray, ndInt32 maxPointsOut = 0x7fffffff);
 	D_COLLISION_API virtual ~ndShapeConvexHull();
 
@@ -41,7 +40,6 @@ class ndShapeConvexHull : public ndShapeConvex
 	bool RemoveCoplanarEdge(ndPolyhedra& convex, const ndBigVector* const hullVertexArray) const;
 	bool Create(ndInt32 count, ndInt32 strideInBytes, const ndFloat32* const vertexArray, ndFloat32 tolerance, ndInt32 maxPointsOut);
 	virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
-	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	private:
 	ndVector SupportVertexBruteForce(const ndVector& dir, ndInt32* const vertexIndex) const;

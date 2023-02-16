@@ -31,7 +31,6 @@
 
 #define D_MINIMUM_MASS	ndFloat32(1.0e-5f)
 #define D_INFINITE_MASS	ndFloat32(1.0e15f)
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyKinematic);
 
 ndVector ndBodyKinematic::m_velocTol(ndVector(ndFloat32(1.0e-8f)) & ndVector::m_triplexMask);
 
@@ -125,72 +124,11 @@ ndBodyKinematic::ndBodyKinematic()
 	SetMassMatrix(ndVector::m_zero);
 }
 
-ndBodyKinematic::ndBodyKinematic(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndBody(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_invWorldInertiaMatrix(ndGetZeroMatrix())
-	,m_shapeInstance(new ndShapeNull)
-	,m_mass(ndVector::m_zero)
-	,m_invMass(ndVector::m_zero)
-	,m_accel(ndVector::m_zero)
-	,m_alpha(ndVector::m_zero)
-	,m_gyroAlpha(ndVector::m_zero)
-	,m_gyroTorque(ndVector::m_zero)
-	,m_gyroRotation()
-	,m_jointList()
-	,m_contactList()
-	,m_lock()
-	,m_scene(nullptr)
-	,m_islandParent(nullptr)
-	,m_sceneNode(nullptr)
-	,m_skeletonContainer(nullptr)
-	,m_spetialUpdateNode(nullptr)
-	,m_weigh(ndFloat32(0.0f))
-	,m_index(0)
-	,m_bodyNodeIndex(-1)
-	,m_buildSkelIndex(0)
-	,m_sceneNodeIndex(-1)
-	,m_buildBodyNodeIndex(-1)
-	,m_buildSceneNodeIndex(-1)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	m_invWorldInertiaMatrix[3][3] = ndFloat32(1.0f);
-	ndShapeInstance instance(xmlNode->FirstChild("ndShapeInstance"), *desc.m_shapeMap);
-	SetCollisionShape(instance);
-	
-	ndFloat32 invMass = xmlGetFloat(xmlNode, "invMass");
-	SetMassMatrix(ndVector::m_zero);
-	if (invMass > ndFloat32 (0.0f))
-	{
-		ndVector invInertia(xmlGetVector3(xmlNode, "invPrincipalInertia"));
-		SetMassMatrix(ndFloat32 (1.0f)/invInertia.m_x, ndFloat32(1.0f) / invInertia.m_y, ndFloat32(1.0f) / invInertia.m_z, ndFloat32(1.0f) / invMass);
-	}
-
-	m_maxAngleStep = xmlGetFloat(xmlNode, "maxAngleStep");
-	m_maxLinearStep = xmlGetFloat(xmlNode, "maxLinearStep");
-}
-
 ndBodyKinematic::~ndBodyKinematic()
 {
 	ndAssert(m_scene == nullptr);
 	ndAssert(m_sceneNode == nullptr);
 	ndAssert(m_spetialUpdateNode == nullptr);
-}
-
-void ndBodyKinematic::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBody::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "invMass", m_invMass.m_w);
-	ndVector invInertia(m_invMass & ndVector::m_triplexMask);
-	xmlSaveParam(childNode, "invPrincipalInertia", invInertia);
-
-	xmlSaveParam(childNode, "maxAngleStep", m_maxAngleStep);
-	xmlSaveParam(childNode, "maxLinearStep", m_maxLinearStep);
-
-	m_shapeInstance.Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
 void ndBodyKinematic::SetSleepState(bool state)

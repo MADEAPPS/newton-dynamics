@@ -24,8 +24,6 @@
 #include "ndBodyNotify.h"
 #include "ndBodyKinematic.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyNotify)
-
 ndBodyNotify::ndBodyNotify(const ndVector& defaultGravity)
 	:ndContainersFreeListAlloc<ndBodyNotify>()
 	,m_defaultGravity(defaultGravity)
@@ -33,25 +31,9 @@ ndBodyNotify::ndBodyNotify(const ndVector& defaultGravity)
 {
 }
 
-ndBodyNotify::ndBodyNotify(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndContainersFreeListAlloc<ndBodyNotify>()
-	,m_body(nullptr)
-{
-	const nd::TiXmlNode* const rootNode = desc.m_rootNode;
-	m_defaultGravity = xmlGetVector3(rootNode, "gravity");
-}
-
 ndBodyNotify::~ndBodyNotify()
 {
 
-}
-
-void ndBodyNotify::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-
-	xmlSaveParam(childNode, "gravity", m_defaultGravity);
 }
 
 ndBody* ndBodyNotify::GetBody()

@@ -34,68 +34,10 @@ class ndJointBilateralConstraint;
 class ndCharacterForwardDynamicNode;
 class ndCharacterInverseDynamicNode;
 
-class ndCharacterLoadDescriptor: public ndLoadSaveBase::ndLoadDescriptor
-{
-	public:
-	ndCharacterLoadDescriptor()
-		:ndLoadSaveBase::ndLoadDescriptor()
-		,m_limbMap(nullptr)
-	{
-	}
-
-	ndCharacterLoadDescriptor(const ndLoadSaveBase::ndLoadDescriptor& desc)
-		:ndLoadDescriptor(desc)
-		,m_limbMap(nullptr)
-	{
-		ndCharacterLoadDescriptor* const modelDesc = (ndCharacterLoadDescriptor*)&desc;
-		m_rootNode = desc.m_rootNode;
-		m_limbMap = modelDesc->m_limbMap;
-	}
-
-	ndCharacterLoadDescriptor(const ndLoadSaveBase::ndLoadDescriptor& desc, ndTree<const ndCharacterNode*, ndUnsigned32>* const limbMap)
-		:ndLoadDescriptor(desc)
-		,m_limbMap(limbMap)
-	{
-	}
-
-	ndCharacterLoadDescriptor(const ndCharacterLoadDescriptor& desc)
-		:ndLoadDescriptor(desc)
-		,m_limbMap(desc.m_limbMap)
-	{
-	}
-
-	ndTree<const ndCharacterNode*, ndUnsigned32>* m_limbMap;
-};
-
-class ndCharacterSaveDescriptor: public ndLoadSaveBase::ndSaveDescriptor
-{
-	public:
-	ndCharacterSaveDescriptor()
-		:ndLoadSaveBase::ndSaveDescriptor()
-		,m_limbMap(nullptr)
-	{
-	}
-
-	ndCharacterSaveDescriptor(const ndLoadSaveBase::ndSaveDescriptor& desc)
-		:ndLoadSaveBase::ndSaveDescriptor(desc)
-		,m_limbMap(nullptr)
-	{
-	}
-
-	ndCharacterSaveDescriptor(const ndCharacterSaveDescriptor& desc, nd::TiXmlNode* const rootNode)
-		:ndLoadSaveBase::ndSaveDescriptor(desc, rootNode)
-		,m_limbMap(desc.m_limbMap)
-	{
-	}
-
-	ndTree<ndInt32, const ndCharacterNode*>* m_limbMap;
-};
-
 class ndCharacterNode: public ndNodeHierarchy<ndCharacterNode>
 {
 	public:
 	D_CLASS_REFLECTION(ndCharacterNode);
-	D_NEWTON_API ndCharacterNode(const ndCharacterLoadDescriptor& desc);
 	D_NEWTON_API ndCharacterNode(ndCharacterNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterNode ();
 
@@ -118,8 +60,6 @@ class ndCharacterNode: public ndNodeHierarchy<ndCharacterNode>
 
 	protected:
 	D_NEWTON_API ndCharacterNode* CreateClone() const;
-	D_NEWTON_API virtual void Save(const ndCharacterSaveDescriptor& desc) const;
-
 	ndMatrix m_localPose;
 };
 

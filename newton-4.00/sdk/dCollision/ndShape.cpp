@@ -54,19 +54,6 @@ ndShape::~ndShape()
 	ndAssert(m_refCount.load() == 0);
 }
 
-void ndShape::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-
-	xmlSaveParam(childNode, "inertia", m_inertia);
-	xmlSaveParam(childNode, "crossInertia", m_crossInertia);
-	xmlSaveParam(childNode, "centerOfMass", m_centerOfMass);
-	xmlSaveParam(childNode, "boxSize", m_boxSize);
-	xmlSaveParam(childNode, "boxOrigin", m_boxOrigin);
-}
-
 void ndShape::MassProperties()
 {
 	// using general central theorem, to extract the Inertia relative to the center of mass 

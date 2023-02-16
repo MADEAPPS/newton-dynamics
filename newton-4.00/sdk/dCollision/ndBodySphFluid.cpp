@@ -232,29 +232,9 @@ ndBodySphFluid::ndBodySphFluid()
 	SetRestDensity(m_restDensity);
 }
 
-ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndBodyParticleSet(desc)
-	,m_workingBuffers(new ndWorkingBuffers)
-	,m_mass(ndFloat32(1.0f))
-	,m_viscosity(ndFloat32(1.0f))
-	,m_restDensity(ndFloat32(1000.0f))
-	,m_gasConstant(ndFloat32(1.0f))
-{
-	// nothing was saved
-	ndAssert(0);
-}
-
 ndBodySphFluid::~ndBodySphFluid()
 {
 	delete m_workingBuffers;
-}
-
-//void ndBodySphFluid::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-void ndBodySphFluid::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
-{
-	ndAssert(0);
-	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodySphFluid", nodeid);
-	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
 }
 
 void ndBodySphFluid::SortBuckets(ndThreadPool* const threadPool)
@@ -1418,29 +1398,9 @@ ndBodySphFluid::ndBodySphFluid()
 	SetRestDensity(m_restDensity);
 }
 
-ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndBodyParticleSet(desc)
-	,m_workingBuffers(new ndWorkingBuffers)
-	,m_mass(ndFloat32(0.02f))
-	,m_viscosity(ndFloat32(1.0f))
-	,m_restDensity(ndFloat32(1000.0f))
-	,m_gasConstant(ndFloat32(1.0f))
-{
-	// nothing was saved
-	ndAssert(0);
-}
-
 ndBodySphFluid::~ndBodySphFluid()
 {
 	delete m_workingBuffers;
-}
-
-//void ndBodySphFluid::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-void ndBodySphFluid::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
-{
-	ndAssert(0);
-	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodySphFluid", nodeid);
-	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
 }
 
 void ndBodySphFluid::SortBuckets(ndThreadPool* const threadPool)

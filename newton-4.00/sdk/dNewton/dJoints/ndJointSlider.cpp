@@ -16,8 +16,6 @@
 #define D_MAX_SLIDER_RECOVERY_SPEED	ndFloat32 (0.5f)
 #define D_MAX_SLIDER_PENETRATION	ndFloat32 (0.05f)
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointSlider)
-
 ndJointSlider::ndJointSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 	,m_posit(ndFloat32 (0.0f))
@@ -49,51 +47,8 @@ ndJointSlider::ndJointSlider(const ndMatrix& pinAndPivotInChild, const ndMatrix&
 	CalculateLocalMatrix(pinAndPivotInParent, tmp, m_localMatrix1);
 }
 
-ndJointSlider::ndJointSlider(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_posit(ndFloat32(0.0f))
-	,m_speed(ndFloat32(0.0f))
-	,m_springK(ndFloat32(0.0f))
-	,m_damperC(ndFloat32(0.0f))
-	,m_minLimit(ndFloat32(-1.0e10f))
-	,m_maxLimit(ndFloat32(1.0e10f))
-	,m_positOffset(ndFloat32(0.0f))
-	,m_springDamperRegularizer(ndFloat32(0.1f))
-	,m_limitState(0)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	m_posit = xmlGetFloat(xmlNode, "posit");
-	m_speed = xmlGetFloat(xmlNode, "speed");
-	m_springK = xmlGetFloat(xmlNode, "springK");
-	m_damperC = xmlGetFloat(xmlNode, "damperC");
-	m_minLimit = xmlGetFloat(xmlNode, "minLimit");
-	m_maxLimit = xmlGetFloat(xmlNode, "maxLimit");
-	m_positOffset = xmlGetFloat(xmlNode, "positOffset");
-	m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
-	m_limitState = ndInt8(xmlGetInt(xmlNode, "limitState"));
-}
-
 ndJointSlider::~ndJointSlider()
 {
-}
-
-void ndJointSlider::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "posit", m_posit);
-	xmlSaveParam(childNode, "speed", m_speed);
-	xmlSaveParam(childNode, "springK", m_springK);
-	xmlSaveParam(childNode, "damperC", m_damperC);
-	xmlSaveParam(childNode, "minLimit", m_minLimit);
-	xmlSaveParam(childNode, "maxLimit", m_maxLimit);
-	xmlSaveParam(childNode, "positOffset", m_positOffset);
-	xmlSaveParam(childNode, "springDamperRegularizer", m_springDamperRegularizer);
-	xmlSaveParam(childNode, "limitState", m_limitState);
 }
 
 ndFloat32 ndJointSlider::GetSpeed() const

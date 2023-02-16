@@ -45,20 +45,6 @@ class SplinePathBody : public ndBodyDynamic
 		CreateSplinePath();
 	}
 
-	SplinePathBody(const ndLoadSaveBase::ndLoadDescriptor& desc)
-		:ndBodyDynamic(ndLoadSaveBase::ndLoadDescriptor(desc))
-	{
-		CreateSplinePath();
-	}
-
-	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-	{
-		nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-		desc.m_rootNode->LinkEndChild(childNode);
-		childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-		ndBodyDynamic::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-	}
-
 	void CreateSplinePath()
 	{
 		//ndDemoEntity* const rollerCosterPath = (ndDemoEntity*)GetNotifyCallback()->GetUserData();
@@ -81,7 +67,6 @@ class SplinePathBody : public ndBodyDynamic
 
 	ndBezierSpline m_spline;
 };
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(SplinePathBody)
 
 class ndJointFollowSplinePath : public ndJointFollowPath
 {
@@ -90,19 +75,6 @@ class ndJointFollowSplinePath : public ndJointFollowPath
 	ndJointFollowSplinePath(const ndMatrix& pinAndPivotFrame, ndBodyDynamic* const child, ndBodyDynamic* const pathBody)
 		:ndJointFollowPath(pinAndPivotFrame, child, pathBody)
 	{
-	}
-
-	ndJointFollowSplinePath(const ndLoadSaveBase::ndLoadDescriptor& desc)
-		:ndJointFollowPath(ndLoadSaveBase::ndLoadDescriptor(desc))
-	{
-	}
-
-	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-	{
-		nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-		desc.m_rootNode->LinkEndChild(childNode);
-		childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-		ndJointFollowPath::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 	}
 
 	void GetPointAndTangentAtLocation(const ndVector& location, ndVector& positOut, ndVector& tangentOut) const
@@ -121,7 +93,6 @@ class ndJointFollowSplinePath : public ndJointFollowPath
 		tangentOut = tangent;
 	}
 };
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointFollowSplinePath)
 
 static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndSharedPtr<ndDemoMeshInterface> mesh, ndFloat32 mass)
 {

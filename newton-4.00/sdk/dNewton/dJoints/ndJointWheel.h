@@ -49,7 +49,6 @@ class ndJointWheel: public ndJointBilateralConstraint, public ndJointBilateralCo
 {
 	public:
 	D_CLASS_REFLECTION(ndJointWheel);
-	D_NEWTON_API ndJointWheel(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& desc);
 	D_NEWTON_API virtual ~ndJointWheel();
 
@@ -67,7 +66,6 @@ class ndJointWheel: public ndJointBilateralConstraint, public ndJointBilateralCo
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	ndMatrix m_baseFrame;
 	ndWheelDescriptor m_info;

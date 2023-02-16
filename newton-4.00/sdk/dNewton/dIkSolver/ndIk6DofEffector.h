@@ -26,7 +26,6 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	};
 
 	D_CLASS_REFLECTION(ndIk6DofEffector);
-	D_NEWTON_API ndIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndIk6DofEffector(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIk6DofEffector();
 
@@ -52,7 +51,6 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	D_NEWTON_API void SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);

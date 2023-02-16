@@ -213,24 +213,8 @@ namespace ndQuadruped_2
 			}
 		}
 
-		ndQuadrupedModel(const ndLoadSaveBase::ndLoadDescriptor& desc)
-			:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
-			,m_invDynamicsSolver()
-			,m_rootBody(nullptr)
-			,m_effectorsInfo()
-			,m_effectorsJoints()
-		{
-			ndAssert(0);
-		}
-
 		~ndQuadrupedModel()
 		{
-		}
-
-		//void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-		void Save(const ndLoadSaveBase::ndSaveDescriptor&) const
-		{
-			ndAssert(0);
 		}
 
 		void Debug(ndConstraintDebugCallback& context) const
@@ -317,8 +301,7 @@ namespace ndQuadruped_2
 		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
 		ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
 	};
-	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndQuadrupedModel);
-
+	
 	class ndModelUI : public ndUIEntity
 	{
 		public:

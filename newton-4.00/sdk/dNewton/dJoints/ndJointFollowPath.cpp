@@ -13,8 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointFollowPath.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointFollowPath)
-
 ndJointFollowPath::ndJointFollowPath (const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 {
@@ -22,22 +20,8 @@ ndJointFollowPath::ndJointFollowPath (const ndMatrix& pinAndPivotFrame, ndBodyKi
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
-ndJointFollowPath::ndJointFollowPath(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-{
-	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-}
-
 ndJointFollowPath::~ndJointFollowPath()
 {
-}
-
-void ndJointFollowPath::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
 void ndJointFollowPath::JacobianDerivative(ndConstraintDescritor& desc)

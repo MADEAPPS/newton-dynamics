@@ -16,8 +16,6 @@
 #define D_MAX_HINGE_RECOVERY_SPEED	ndFloat32 (0.25f)
 #define D_MAX_HINGE_PENETRATION		(ndFloat32 (4.0f) * ndDegreeToRad)
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointHinge)
-
 ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	,m_angle(ndFloat32(0.0f))
@@ -49,51 +47,8 @@ ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& p
 	CalculateLocalMatrix(pinAndPivotInParent, tmp, m_localMatrix1);
 }
 
-ndJointHinge::ndJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_angle(ndFloat32(0.0f))
-	,m_omega(ndFloat32(0.0f))
-	,m_springK(ndFloat32(0.0f))
-	,m_damperC(ndFloat32(0.0f))
-	,m_minLimit(ndFloat32(-1.0e10f))
-	,m_maxLimit(ndFloat32(1.0e10f))
-	,m_offsetAngle(ndFloat32(0.0f))
-	,m_springDamperRegularizer(ndFloat32(0.1f))
-	,m_limitState(0)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	m_angle = xmlGetFloat(xmlNode, "angle");
-	m_omega = xmlGetFloat(xmlNode, "omega");
-	m_springK = xmlGetFloat(xmlNode, "springK");
-	m_damperC = xmlGetFloat(xmlNode, "damperC");
-	m_minLimit = xmlGetFloat(xmlNode, "minLimit");
-	m_maxLimit = xmlGetFloat(xmlNode, "maxLimit");
-	m_offsetAngle = xmlGetFloat(xmlNode, "offsetAngle");
-	m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
-	m_limitState = ndInt8 (xmlGetInt(xmlNode, "limitState"));
-}
-
 ndJointHinge::~ndJointHinge()
 {
-}
-
-void ndJointHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "angle", m_angle);
-	xmlSaveParam(childNode, "omega", m_omega);
-	xmlSaveParam(childNode, "springK", m_springK);
-	xmlSaveParam(childNode, "damperC", m_damperC);
-	xmlSaveParam(childNode, "minLimit", m_minLimit);
-	xmlSaveParam(childNode, "maxLimit", m_maxLimit);
-	xmlSaveParam(childNode, "offsetAngle", m_offsetAngle);
-	xmlSaveParam(childNode, "springDamperRegularizer", m_springDamperRegularizer);
-	xmlSaveParam(childNode, "limitState", m_limitState);
 }
 
 ndFloat32 ndJointHinge::GetAngle() const

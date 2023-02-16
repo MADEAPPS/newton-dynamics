@@ -13,8 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointKinematicController.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointKinematicController)
-
 #define D_NOMINAL_TIMESTEP ndFloat32(1.0f / 60.0f)
 
 #if 0
@@ -183,41 +181,9 @@ ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const re
 	Init(attachmentMatrixInGlobalSpace);
 }
 
-ndJointKinematicController::ndJointKinematicController(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	ndMatrix attachmentMatrixInGlobalSpace(m_localMatrix0 * GetBody0()->GetMatrix());
-	Init(attachmentMatrixInGlobalSpace);
-
-	m_maxSpeed = xmlGetFloat(xmlNode, "maxSpeed");
-	m_maxOmega = xmlGetFloat(xmlNode, "maxOmega");
-	m_maxLinearFriction = xmlGetFloat(xmlNode, "maxLinearFriction");
-	m_maxAngularFriction = xmlGetFloat(xmlNode, "maxAngularFriction");
-	m_angularFrictionCoefficient = xmlGetFloat(xmlNode, "angularFrictionCoefficient");
-	m_controlMode = ndControlModes(xmlGetInt(xmlNode, "controlMode"));
-	m_autoSleepState = xmlGetInt(xmlNode, "autoSleepState") ? true : false;
-}
-
 ndJointKinematicController::~ndJointKinematicController()
 {
 	m_body0->SetAutoSleep(m_autoSleepState);
-}
-
-void ndJointKinematicController::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "maxSpeed", m_maxSpeed);
-	xmlSaveParam(childNode, "maxOmega", m_maxOmega);
-	xmlSaveParam(childNode, "maxLinearFriction", m_maxLinearFriction);
-	xmlSaveParam(childNode, "maxAngularFriction", m_maxAngularFriction);
-	xmlSaveParam(childNode, "angularFrictionCoefficient", m_angularFrictionCoefficient);
-	xmlSaveParam(childNode, "controlMode", ndInt32(m_controlMode));
-	xmlSaveParam(childNode, "autoSleepState", ndInt32(m_autoSleepState));
 }
 
 void ndJointKinematicController::Init(const ndMatrix& globalMatrix)

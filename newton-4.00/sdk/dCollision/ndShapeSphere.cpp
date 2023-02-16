@@ -26,7 +26,6 @@
 #include "ndContactSolver.h"
 
 #define D_SPHERE_EDGE_COUNT 96
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeSphere)
 
 ndInt32 ndShapeSphere::m_shapeRefCount = 0;
 ndVector ndShapeSphere::m_unitSphere[D_SPHERE_VERTEX_COUNT];
@@ -38,14 +37,6 @@ ndShapeSphere::ndShapeSphere(ndFloat32 radius)
 	Init(radius);
 }
 
-ndShapeSphere::ndShapeSphere(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndShapeConvex(m_sphere)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	ndFloat32 radius = xmlGetFloat(xmlNode, "radius");
-	Init(radius);
-}
-
 ndShapeSphere::~ndShapeSphere()
 {
 	m_shapeRefCount--;
@@ -53,16 +44,6 @@ ndShapeSphere::~ndShapeSphere()
 
 	ndShapeConvex::m_simplex = nullptr;
 	ndShapeConvex::m_vertex = nullptr;
-}
-
-void ndShapeSphere::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "radius", m_radius);
 }
 
 void ndShapeSphere::TesselateTriangle(ndInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, ndInt32& count, ndVector* const ouput) const

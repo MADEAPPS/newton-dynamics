@@ -13,8 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointFix6dof.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointFix6dof)
-
 ndJointFix6dof::ndJointFix6dof(const ndMatrix& frameInGlbalSpace, ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 	:ndJointBilateralConstraint(6, body0, body1, frameInGlbalSpace)
 	,m_softness(ndFloat32(0.0f))
@@ -31,33 +29,8 @@ ndJointFix6dof::ndJointFix6dof(ndBodyKinematic* const body0, ndBodyKinematic* co
 {
 }
 
-ndJointFix6dof::ndJointFix6dof(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_softness(ndFloat32(0.0f))
-	,m_maxForce(D_MAX_BOUND)
-	,m_maxTorque(D_MAX_BOUND)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	
-	m_softness = xmlGetFloat(xmlNode, "softness");
-	m_maxForce = xmlGetFloat(xmlNode, "maxForce");
-	m_maxTorque = xmlGetFloat(xmlNode, "maxTorque");
-}
-
 ndJointFix6dof::~ndJointFix6dof()
 {
-}
-
-void ndJointFix6dof::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "m_softness", m_softness);
-	xmlSaveParam(childNode, "m_softness", m_maxForce);
-	xmlSaveParam(childNode, "m_softness", m_maxTorque);
 }
 
 void ndJointFix6dof::SetAsSoftJoint(bool)

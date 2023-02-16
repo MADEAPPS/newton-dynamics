@@ -76,7 +76,6 @@ class ndMultiBodyVehicle: public ndModel
 	};
 
 	D_CLASS_REFLECTION(ndMultiBodyVehicle);
-	D_NEWTON_API ndMultiBodyVehicle(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndMultiBodyVehicle(const ndVector& frontDir, const ndVector& upDir);
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
 
@@ -118,7 +117,6 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	D_NEWTON_API virtual void Update(ndWorld* const world, ndFloat32 timestep);
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
-	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	ndMatrix m_localFrame;
 	ndBodyKinematic* m_chassis;

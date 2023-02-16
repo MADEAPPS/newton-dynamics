@@ -39,31 +39,6 @@ ndBodyParticleSet::ndBodyParticleSet()
 {
 }
 
-ndBodyParticleSet::ndBodyParticleSet(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndBody(desc)
-	,ndBackgroundTask()
-	,m_box0(ndFloat32(-1e10f))
-	,m_box1(ndFloat32(1e10f))
-	,m_gravity(ndVector::m_zero)
-	,m_posit(1024)
-	,m_veloc(1024)
-	,m_listNode(nullptr)
-	,m_radius(ndFloat32(0.125f))
-	,m_updateInBackground(true)
-{
-	//xmlNode->FirstChild("ndBodyKinematic"), shapesCache
-	// nothing was saved
-	ndAssert(0);
-}
-
 ndBodyParticleSet::~ndBodyParticleSet()
 {
-}
-
-//void ndBodyParticleSet::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-void ndBodyParticleSet::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
-{
-	ndAssert(0);
-	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyParticleSet", nodeid);
-	//ndBody::Save(paramNode, assetPath, nodeid, shapesCache);
 }

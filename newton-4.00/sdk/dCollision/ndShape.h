@@ -257,8 +257,6 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	virtual ndMatrix CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const;
 	virtual ndFloat32 CalculateMassProperties(const ndMatrix& offset, ndVector& inertia, ndVector& crossInertia, ndVector& centerOfMass) const;
 
-	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
-
 	protected:
 	D_COLLISION_API ndShape(ndShapeID id);
 	D_COLLISION_API ndShape (const ndShape& source);

@@ -17,9 +17,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndGameControlerInputs.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndVehicleSelector)
-
-
 ndVehicleNotify::ndVehicleNotify(ndVehicleCommon* const me, ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody)
 	:ndDemoEntityNotify(manager, entity, parentBody)
 	,m_vehicle(me)
@@ -214,20 +211,6 @@ ndVehicleSelector::ndVehicleSelector()
 	:ndModel()
 	,m_changeVehicle()
 {
-}
-
-ndVehicleSelector::ndVehicleSelector(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_changeVehicle()
-{
-}
-
-void ndVehicleSelector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndModel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
 void ndVehicleSelector::SelectNext(ndWorld* const world)

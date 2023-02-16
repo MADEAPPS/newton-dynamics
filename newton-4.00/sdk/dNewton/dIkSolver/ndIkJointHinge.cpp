@@ -13,8 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndIkJointHinge.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIkJointHinge)
-
 ndIkJointHinge::ndIkJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointHinge(pinAndPivotFrame, child, parent)
 	,ndJointBilateralConstraint::ndIkInterface()
@@ -27,22 +25,8 @@ ndIkJointHinge::ndIkJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatri
 {
 }
 
-ndIkJointHinge::ndIkJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointHinge(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,ndJointBilateralConstraint::ndIkInterface()
-{
-}
-
 ndIkJointHinge::~ndIkJointHinge()
 {
-}
-
-void ndIkJointHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointHinge::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
 void ndIkJointHinge::JacobianDerivative(ndConstraintDescritor& desc)

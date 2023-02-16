@@ -54,7 +54,6 @@ class ndCharacter: public ndModel
 
 	D_CLASS_REFLECTION(ndCharacter);
 	D_NEWTON_API ndCharacter();
-	D_NEWTON_API ndCharacter(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API virtual ~ndCharacter ();
 
 	D_NEWTON_API ndCharacterRootNode* CreateRoot(ndBodyDynamic* const body);
@@ -81,7 +80,6 @@ class ndCharacter: public ndModel
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	D_NEWTON_API virtual void Update(ndWorld* const world, ndFloat32 timestep);
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
-	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	
 	ndCharacterRootNode* m_rootNode;
 	//ndCharacterPoseController* m_controller;

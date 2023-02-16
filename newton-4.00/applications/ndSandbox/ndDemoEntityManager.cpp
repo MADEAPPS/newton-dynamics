@@ -975,7 +975,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			char fileName[1024];
 			if (dGetLoadNdFileName(fileName, 1024))
 			{
-				m_world->LoadScene(fileName);
+				ndAssert(0);
+				//m_world->LoadScene(fileName);
 			}
 			break;
 		}
@@ -986,7 +987,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			char fileName[1024];
 			if (dGetSaveNdFileName(fileName, 1024))
 			{
-				m_world->SaveScene(fileName);
+				ndAssert(0);
+				//m_world->SaveScene(fileName);
 			}
 			break;
 		}
@@ -997,7 +999,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			char fileName[1024];
 			if (dGetSaveNdFileName(fileName, 1024))
 			{
-				m_world->SaveSceneModel(fileName);
+				ndAssert(0);
+				//m_world->SaveSceneModel(fileName);
 			}
 			break;
 		}

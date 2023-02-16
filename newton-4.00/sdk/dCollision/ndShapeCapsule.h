@@ -29,7 +29,6 @@ class ndShapeCapsule : public ndShapeConvex
 {
 	public:
 	D_CLASS_REFLECTION(ndShapeCapsule);
-	D_COLLISION_API ndShapeCapsule(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API ndShapeCapsule (ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height);
 
 	virtual ndShapeCapsule* GetAsShapeCapsule() { return this; }
@@ -44,7 +43,6 @@ class ndShapeCapsule : public ndShapeConvex
 	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin, ndInt32* const vertexIndex) const;
 	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
-	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 	void TesselateTriangle(ndInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, ndInt32& count, ndVector* ouput) const;

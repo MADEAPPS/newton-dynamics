@@ -19,7 +19,6 @@ class ndJointRoller: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointRoller);
-	D_NEWTON_API ndJointRoller(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndJointRoller(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API ndJointRoller(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointRoller();
@@ -55,7 +54,6 @@ class ndJointRoller: public ndJointBilateralConstraint
 	D_NEWTON_API void SubmitSpringDamperPosit(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 	D_NEWTON_API void ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 

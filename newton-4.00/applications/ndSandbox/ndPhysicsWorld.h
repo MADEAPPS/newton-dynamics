@@ -40,11 +40,6 @@ class ndPhysicsWorld: public ndWorld
 	void AdvanceTime(ndFloat32 timestep);
 	ndDemoEntityManager* GetManager() const;
 	ndSoundManager* GetSoundManager() const;
-
-	bool LoadScene(const char* const path);
-	void SaveScene(const char* const path);
-	void SaveSceneModel(const char* const path);
-
 	void RemoveEntity(ndDemoEntity* const entity);
 
 	private:

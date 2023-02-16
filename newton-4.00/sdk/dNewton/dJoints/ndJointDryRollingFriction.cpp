@@ -13,8 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointDryRollingFriction.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointDryRollingFriction)
-
 ndJointDryRollingFriction::ndJointDryRollingFriction(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndFloat32 coefficient)
 	:ndJointBilateralConstraint(1, body0, body1, ndGetIdentityMatrix())
 	,m_coefficient(ndClamp (coefficient, ndFloat32(0.0f), ndFloat32 (1.0f)))
@@ -26,28 +24,8 @@ ndJointDryRollingFriction::ndJointDryRollingFriction(ndBodyKinematic* const body
 	SetSolverModel(m_jointIterativeSoft);
 }
 
-ndJointDryRollingFriction::ndJointDryRollingFriction(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	m_coefficient = xmlGetFloat(xmlNode, "coefficient");
-	m_contactTrail = xmlGetFloat(xmlNode, "contactTrail");
-}
-
 ndJointDryRollingFriction::~ndJointDryRollingFriction()
 {
-}
-
-void ndJointDryRollingFriction::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "coefficient", m_coefficient);
-	xmlSaveParam(childNode, "contactTrail", m_contactTrail);
 }
 
 // rolling friction works as follow: the idealization of the contact of a spherical object 

@@ -13,30 +13,14 @@
 #include "ndNewtonStdafx.h"
 #include "ndIkJointSpherical.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIkJointSpherical)
-
 ndIkJointSpherical::ndIkJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointSpherical(pinAndPivotFrame, child, parent)
 	,ndJointBilateralConstraint::ndIkInterface()
 {
 }
 
-ndIkJointSpherical::ndIkJointSpherical(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointSpherical(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,ndJointBilateralConstraint::ndIkInterface()
-{
-}
-
 ndIkJointSpherical::~ndIkJointSpherical()
 {
-}
-
-void ndIkJointSpherical::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointSpherical::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
 void ndIkJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) const

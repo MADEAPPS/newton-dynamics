@@ -27,8 +27,6 @@
 #include "ndPolygonMeshDesc.h"
 #include "ndShapeStatic_bvh.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeStatic_bvh)
-
 class ndCollisionBvhShowPolyContext
 {
 	public:
@@ -80,53 +78,8 @@ ndShapeStatic_bvh::ndShapeStatic_bvh(const ndPolygonSoupBuilder& builder)
 	m_trianglesCount = data.m_triangleCount;
 }
 
-ndShapeStatic_bvh::ndShapeStatic_bvh(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndShapeStaticMesh(m_boundingBoxHierachy)
-	,ndAabbPolygonSoup()
-	,m_trianglesCount(0)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	const char* const assetName = xmlGetString(xmlNode, "assetName");
-	char pathCopy[1024];
-	sprintf(pathCopy, "%s/%s", desc.m_assetPath, assetName);
-	Deserialize(pathCopy);
-
-	ndVector p0;
-	ndVector p1;
-	GetAABB(p0, p1);
-	m_boxSize = (p1 - p0) * ndVector::m_half;
-	m_boxOrigin = (p1 + p0) * ndVector::m_half;
-
-	ndMeshVertexListIndexList data;
-	data.m_indexList = nullptr;
-	data.m_userDataList = nullptr;
-	data.m_maxIndexCount = 1000000000;
-	data.m_triangleCount = 0;
-	ndVector zero(ndVector::m_zero);
-	ndFastAabb box(ndGetIdentityMatrix(), ndVector(ndFloat32(1.0e15f)));
-	ForAllSectors(box, zero, ndFloat32(1.0f), GetTriangleCount, &data);
-	m_trianglesCount = data.m_triangleCount;
-}
-
 ndShapeStatic_bvh::~ndShapeStatic_bvh(void)
 {
-}
-
-void ndShapeStatic_bvh::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeStaticMesh::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	char fileName[1024];
-	sprintf(fileName, "%s_%d.bin", desc.m_assetName, desc.m_assetIndex);
-	xmlSaveParam(childNode, "assetName", "string", fileName);
-
-	char filePathName[2 * 1024];
-	sprintf(filePathName, "%s/%s", desc.m_assetPath, fileName);
-	desc.m_assetIndex++;
-	Serialize(filePathName);
 }
 
 ndIntersectStatus ndShapeStatic_bvh::GetTriangleCount(void* const context, const ndFloat32* const, ndInt32, const ndInt32* const, ndInt32 indexCount, ndFloat32)

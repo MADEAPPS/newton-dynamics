@@ -284,6 +284,10 @@ class ndTriplex
 	ndFloat32 m_z;
 };
 
+#define D_CLASS_REFLECTION(Class)								\
+	const virtual char* ClassName() {return #Class;}			\
+	const virtual char* SuperClassName() { return #Class; }
+
 #define D_OPERATOR_NEW_AND_DELETE			\
 inline void *operator new (size_t size)		\
 {											\

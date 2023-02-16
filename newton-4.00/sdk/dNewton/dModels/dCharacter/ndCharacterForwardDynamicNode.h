@@ -31,7 +31,6 @@ class ndCharacterForwardDynamicNode: public ndCharacterNode
 {
 	public:
 	D_CLASS_REFLECTION(ndCharacterForwardDynamicNode);
-	D_NEWTON_API ndCharacterForwardDynamicNode(const ndCharacterLoadDescriptor& desc);
 	D_NEWTON_API ndCharacterForwardDynamicNode(const ndMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterForwardDynamicNode ();
 
@@ -39,8 +38,6 @@ class ndCharacterForwardDynamicNode: public ndCharacterNode
 	virtual ndJointBilateralConstraint* GetJoint() const;
 
 	protected:
-	void Save(const ndCharacterSaveDescriptor& desc) const;
-
 	ndBodyDynamic* m_body;
 	ndJointSpherical* m_joint;
 };

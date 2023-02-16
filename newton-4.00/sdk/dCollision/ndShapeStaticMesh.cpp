@@ -26,28 +26,13 @@
 #include "ndCollisionStdafx.h"
 #include "ndShapeStaticMesh.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeStaticMesh)
-
 ndShapeStaticMesh::ndShapeStaticMesh(ndShapeID id)
 	:ndShape(id)
 {
 }
 
-ndShapeStaticMesh::ndShapeStaticMesh(const ndLoadSaveBase::ndLoadDescriptor&)
-	:ndShape(m_staticMesh)
-{
-}
-
 ndShapeStaticMesh::~ndShapeStaticMesh()
 {
-}
-
-void ndShapeStaticMesh::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShape::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
 void ndShapeStaticMesh::CalculateAabb(const ndMatrix& matrix, ndVector &p0, ndVector &p1) const

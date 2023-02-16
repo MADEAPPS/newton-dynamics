@@ -24,8 +24,6 @@
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyDynamic)
-
 ndBodyDynamic::ndBodyDynamic()
 	:ndBodyKinematic()
 	,m_externalForce(ndVector::m_zero)
@@ -41,38 +39,8 @@ ndBodyDynamic::ndBodyDynamic()
 	m_isDynamics = 1;
 }
 
-ndBodyDynamic::ndBodyDynamic(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndBodyKinematic(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_externalForce(ndVector::m_zero)
-	,m_externalTorque(ndVector::m_zero)
-	,m_impulseForce(ndVector::m_zero)
-	,m_impulseTorque(ndVector::m_zero)
-	,m_savedExternalForce(ndVector::m_zero)
-	,m_savedExternalTorque(ndVector::m_zero)
-	,m_dampCoef(ndVector::m_zero)
-	,m_cachedDampCoef(ndVector::m_one)
-	,m_cachedTimeStep(ndFloat32(0.0f))
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	m_isDynamics = 1;
-	m_dampCoef = xmlGetVector3(xmlNode, "angularDampCoef");
-	m_dampCoef.m_w = xmlGetFloat(xmlNode, "linearDampCoef");
-}
-
 ndBodyDynamic::~ndBodyDynamic()
 {
-}
-
-void ndBodyDynamic::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBodyKinematic::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "linearDampCoef", m_dampCoef.m_w);
-	xmlSaveParam(childNode, "angularDampCoef", m_dampCoef);
 }
 
 void ndBodyDynamic::SetForce(const ndVector& force)

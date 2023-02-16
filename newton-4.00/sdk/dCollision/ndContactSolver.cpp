@@ -2365,7 +2365,7 @@ ndInt32 ndContactSolver::CalculateContactsDiscrete()
 	}
 	else
 	{
-		ndTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->SubClassName(), m_instance1.GetShape()->SubClassName()));
+		ndTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->ClassName(), m_instance1.GetShape()->ClassName()));
 		ndAssert(0);
 	}
 
@@ -2545,7 +2545,7 @@ ndInt32 ndContactSolver::CompoundContactsDiscrete()
 		}
 		else
 		{
-			ndTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->SubClassName(), m_instance1.GetShape()->SubClassName()));
+			ndTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->ClassName(), m_instance1.GetShape()->ClassName()));
 			ndAssert(0);
 		}
 	}
@@ -2558,7 +2558,7 @@ ndInt32 ndContactSolver::CompoundContactsDiscrete()
 		}
 		else
 		{
-			ndTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->SubClassName(), m_instance1.GetShape()->SubClassName()));
+			ndTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->ClassName(), m_instance1.GetShape()->ClassName()));
 			ndAssert(0);
 		}
 	}

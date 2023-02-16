@@ -19,7 +19,6 @@ class ndIkJointSpherical: public ndJointSpherical, public ndJointBilateralConstr
 {
 	public:
 	D_CLASS_REFLECTION(ndIkJointSpherical);
-	D_NEWTON_API ndIkJointSpherical(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndIkJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIkJointSpherical();
 
@@ -29,7 +28,6 @@ class ndIkJointSpherical: public ndJointSpherical, public ndJointBilateralConstr
 	protected:
 	D_NEWTON_API void SubmitAccel(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 };
 

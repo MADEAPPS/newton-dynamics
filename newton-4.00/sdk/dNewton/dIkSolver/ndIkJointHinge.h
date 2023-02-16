@@ -19,7 +19,6 @@ class ndIkJointHinge: public ndJointHinge, public ndJointBilateralConstraint::nd
 {
 	public:
 	D_CLASS_REFLECTION(ndIkJointHinge);
-	D_NEWTON_API ndIkJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndIkJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API ndIkJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIkJointHinge();
@@ -29,7 +28,6 @@ class ndIkJointHinge: public ndJointHinge, public ndJointBilateralConstraint::nd
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 };
 
 #endif 

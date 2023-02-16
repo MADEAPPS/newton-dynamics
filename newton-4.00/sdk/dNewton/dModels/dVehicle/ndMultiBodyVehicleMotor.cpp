@@ -27,8 +27,6 @@
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleMotor)
-
 ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel)
 	:ndJointBilateralConstraint(3, motor, vehicelModel->m_chassis, motor->GetMatrix())
 	,m_omega(ndFloat32(0.0f))
@@ -39,32 +37,6 @@ ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, n
 	,m_internalFriction(ndFloat32(100.0f))
 	,m_vehicelModel(vehicelModel)
 {
-}
-
-ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_omega(ndFloat32(0.0f))
-	,m_maxOmega(ndFloat32(100.0f))
-	,m_engineTorque(ndFloat32(0.0f))
-	,m_internalFriction(ndFloat32(100.0f))
-	,m_vehicelModel(nullptr)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	m_maxOmega = xmlGetFloat(xmlNode, "maxOmega");
-	m_omegaStep = xmlGetFloat(xmlNode, "omegaStep");
-	m_internalFriction = xmlGetFloat(xmlNode, "internalFriction");
-}
-
-void ndMultiBodyVehicleMotor::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "maxOmega", m_maxOmega);
-	xmlSaveParam(childNode, "omegaStep", m_omegaStep);
-	xmlSaveParam(childNode, "internalFriction", m_internalFriction);
 }
 
 void ndMultiBodyVehicleMotor::AlignMatrix()

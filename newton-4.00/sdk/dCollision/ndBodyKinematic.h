@@ -83,7 +83,6 @@ class ndBodyKinematic : public ndBody
 
 	D_CLASS_REFLECTION(ndBodyKinematic);
 	D_COLLISION_API ndBodyKinematic();
-	D_COLLISION_API ndBodyKinematic(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndBodyKinematic();
 
 	ndScene* GetScene() const;
@@ -127,7 +126,6 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API virtual ndMatrix CalculateInvInertiaMatrix() const;
 	
 	D_COLLISION_API virtual void IntegrateVelocity(ndFloat32 timestep);
-	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	void UpdateInvInertiaMatrix();
 	void SetMassMatrix(const ndVector& massMatrix);

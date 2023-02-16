@@ -13,24 +13,12 @@
 #include "ndContactCallback.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndArchimedesBuoyancyVolume);
-
 ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume()
 	:ndBodyTriggerVolume()
 	,m_plane(ndVector::m_zero)
 	,m_density(1.0f)
 	,m_hasPlane(0)
 {
-}
-
-ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndBodyTriggerVolume(ndLoadSaveBase::ndLoadDescriptor(desc))
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	m_plane = xmlGetVector3(xmlNode, "planeNormal");
-	m_plane.m_w = xmlGetFloat(xmlNode, "planeDist");
-	m_density = xmlGetFloat(xmlNode, "density");
-	m_hasPlane = xmlGetInt(xmlNode, "hasPlane") ? true : false;
 }
 
 void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)
@@ -134,17 +122,3 @@ void ndArchimedesBuoyancyVolume::OnTriggerExit(ndBodyKinematic* const, ndFloat32
 {
 	//dTrace(("exit trigger body: %d\n", body->GetId()));
 }
-
-void ndArchimedesBuoyancyVolume::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBodyTriggerVolume::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "planeNormal", m_plane);
-	xmlSaveParam(childNode, "planeDist", m_plane.m_w);
-	xmlSaveParam(childNode, "density", m_density);
-	xmlSaveParam(childNode, "hasPlane", m_hasPlane ? 1 : 0);
-}
-

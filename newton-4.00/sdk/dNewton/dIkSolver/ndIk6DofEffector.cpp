@@ -13,8 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndIk6DofEffector.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIk6DofEffector)
-
 ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotChild, pinAndPivotParent)
 	,m_targetFrame(pinAndPivotChild * pinAndPivotParent.Inverse())
@@ -32,62 +30,8 @@ ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& pinAndPivotChild, const ndMat
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
-ndIk6DofEffector::ndIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_targetFrame(ndGetIdentityMatrix())
-	,m_angularSpring(ndFloat32(1000.0f))
-	,m_angularDamper(ndFloat32(50.0f))
-	,m_angularMaxTorque(D_LCP_MAX_VALUE)
-	,m_angularRegularizer(ndFloat32(5.0e-3f))
-	,m_linearSpring(ndFloat32(1000.0f))
-	,m_linearDamper(ndFloat32(50.0f))
-	,m_linearMaxForce(D_LCP_MAX_VALUE)
-	,m_linearRegularizer(ndFloat32(5.0e-3f))
-	,m_rotationType(m_disabled)
-	,m_controlDofOptions(0xff)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	
-	m_targetFrame = xmlGetMatrix(xmlNode, "targetFrame");
-
-	m_angularSpring = xmlGetFloat(xmlNode, "angularSpring");
-	m_angularDamper = xmlGetFloat(xmlNode, "angularDamper");
-	m_angularMaxTorque = xmlGetFloat(xmlNode, "angularMaxTorque");
-	m_angularRegularizer = xmlGetFloat(xmlNode, "angularRegularizer");
-	
-	m_linearSpring = xmlGetFloat(xmlNode, "linearSpring");
-	m_linearDamper = xmlGetFloat(xmlNode, "linearDamper");
-	m_linearMaxForce = xmlGetFloat(xmlNode, "linearMaxForce");
-	m_linearRegularizer = xmlGetFloat(xmlNode, "linearRegularizer");
-
-	m_rotationType = ndRotationType(xmlGetInt(xmlNode, "rotationType"));
-	m_controlDofOptions = ndUnsigned8(xmlGetInt(xmlNode, "controlDofOptions"));
-
-	//SetTargetOffset(m_targetPosit);
-}
-
 ndIk6DofEffector::~ndIk6DofEffector()
 {
-}
-
-void ndIk6DofEffector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "targetFrame", m_targetFrame);
-	xmlSaveParam(childNode, "angularSpring", m_angularSpring);
-	xmlSaveParam(childNode, "angularDamper", m_angularDamper);
-	xmlSaveParam(childNode, "angularMaxTorque", m_angularMaxTorque);
-	xmlSaveParam(childNode, "angularRegularizer", m_angularRegularizer);
-	xmlSaveParam(childNode, "linearSpring", m_linearSpring);
-	xmlSaveParam(childNode, "linearDamper", m_linearDamper);
-	xmlSaveParam(childNode, "linearMaxForce", m_linearMaxForce);
-	xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
-	xmlSaveParam(childNode, "rotationType", m_rotationType);
-	xmlSaveParam(childNode, "controlDofOptions", m_controlDofOptions);
 }
 
 void ndIk6DofEffector::EnableAxisX(bool state)

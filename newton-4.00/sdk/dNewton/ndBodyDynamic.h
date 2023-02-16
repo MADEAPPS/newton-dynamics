@@ -44,15 +44,12 @@ class ndBodyDynamic: public ndBodyKinematic
 	public:
 	D_CLASS_REFLECTION(ndBodyDynamic);
 	D_NEWTON_API ndBodyDynamic();
-	D_NEWTON_API ndBodyDynamic(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API virtual ~ndBodyDynamic ();
 
 	D_NEWTON_API virtual ndBodyDynamic* GetAsBodyDynamic() { return this; }
 	D_NEWTON_API virtual void ApplyExternalForces(ndInt32 threadIndex, ndFloat32 timestep);
 	D_NEWTON_API virtual void AddDampingAcceleration(ndFloat32 timestep);
 	D_NEWTON_API virtual void IntegrateVelocity(ndFloat32 timestep);
-
-	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	D_NEWTON_API void SetForce(const ndVector& force);
 	D_NEWTON_API void SetTorque(const ndVector& torque);

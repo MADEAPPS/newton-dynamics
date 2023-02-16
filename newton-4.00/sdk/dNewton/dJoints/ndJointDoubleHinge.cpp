@@ -13,8 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointDoubleHinge.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointDoubleHinge)
-
 ndJointDoubleHinge::ndAxisParam::ndAxisParam()
 	:m_angle(ndFloat32(0.0f))
 	,m_omega(ndFloat32(0.0f))
@@ -58,40 +56,8 @@ ndJointDoubleHinge::ndJointDoubleHinge(const ndMatrix& pinAndPivotFrame, ndBodyK
 {
 }
 
-ndJointDoubleHinge::ndJointDoubleHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_axis0()
-	,m_axis1()
-{
-	ndAssert(m_maxDof == 8);
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	const nd::TiXmlNode* const axis0 = xmlFind(xmlNode, "axis0");
-	m_axis0.Load((nd::TiXmlElement*)axis0);
-
-	const nd::TiXmlNode* const axis1 = xmlFind(xmlNode, "axis1");
-	m_axis1.Load((nd::TiXmlElement*)axis1);
-}
-
 ndJointDoubleHinge::~ndJointDoubleHinge()
 {
-}
-
-void ndJointDoubleHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	nd::TiXmlElement* const axis0 = new nd::TiXmlElement("axis0");
-	childNode->LinkEndChild(axis0);
-	m_axis0.Save(axis0);
-
-	nd::TiXmlElement* const axis1 = new nd::TiXmlElement("axis1");
-	childNode->LinkEndChild(axis1);
-	m_axis1.Save(axis1);
-
 }
 
 ndFloat32 ndJointDoubleHinge::GetAngle0() const

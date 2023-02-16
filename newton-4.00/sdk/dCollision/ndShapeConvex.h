@@ -62,7 +62,6 @@ class ndShapeConvex: public ndShape
 	D_COLLISION_API virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& globalPlane, const ndShapeInstance& parentScale) const;
 	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
-	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	bool SanityCheck(ndPolyhedra& hull) const;
 	bool SanityCheck(ndInt32 count, const ndVector& normal, ndVector* const contactsOut) const;
 	ndInt32 RectifyConvexSlice(ndInt32 count, const ndVector& normal, ndVector* const contactsOut) const;

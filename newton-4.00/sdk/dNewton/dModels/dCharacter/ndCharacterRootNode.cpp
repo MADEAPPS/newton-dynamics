@@ -25,8 +25,6 @@
 #include "ndBodyDynamic.h"
 #include "ndCharacterRootNode.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterRootNode)
-
 ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body)
 	:ndCharacterNode(nullptr)
 	,m_coronalFrame(ndGetIdentityMatrix())
@@ -36,48 +34,9 @@ ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic
 	SetCoronalFrame(m_body->GetMatrix());
 }
 
-ndCharacterRootNode::ndCharacterRootNode(const ndCharacterLoadDescriptor& desc)
-	:ndCharacterNode(desc)
-	,m_coronalFrame(ndGetIdentityMatrix())
-	,m_owner(nullptr)
-	,m_body(nullptr)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	//const char* const name = xmlGetString(xmlNode, "name");
-	//SetName(name);
-	ndAssert(0);
-	m_localPose = xmlGetMatrix(xmlNode, "localPose");
-
-	ndInt32 bodyHash = xmlGetInt(xmlNode, "bodyHash");
-	m_body = (ndBodyDynamic*)desc.m_bodyMap->Find(bodyHash)->GetInfo();
-	m_coronalFrame = xmlGetMatrix(xmlNode, "coronalFrame");
-}
-
 ndCharacterRootNode::~ndCharacterRootNode()
 {
 	delete m_body;
-}
-
-void ndCharacterRootNode::Save(const ndCharacterSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
-	ndCharacterNode::Save(ndCharacterSaveDescriptor(desc, childNode));
-	
-	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* bodyNode = desc.m_bodyMap->Find(m_body);
-	if (!bodyNode)
-	{
-		bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_body);
-	}
-	ndAssert(bodyNode);
-
-	ndAssert(0);
-	//xmlSaveParam(childNode, "name", GetName().GetStr());
-	xmlSaveParam(childNode, "localPose", m_localPose);
-	xmlSaveParam(childNode, "bodyHash", bodyNode->GetInfo());
-	xmlSaveParam(childNode, "coronalFrame", m_coronalFrame);
 }
 
 //void ndCharacterRootNode::SetCoronalFrame(const dMatrix& frameInGlobalSpace)

@@ -25,8 +25,6 @@
 #define PLAYER_WALK_SPEED				8.0f
 #define PLAYER_JUMP_SPEED				5.0f
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBasicPlayerCapsule)
-
 //#define PLAYER_FIRST_PERSON	
 
 #ifdef PLAYER_FIRST_PERSON	
@@ -146,48 +144,12 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	////m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
 }
 
-ndBasicPlayerCapsule::ndBasicPlayerCapsule(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndBodyPlayerCapsule(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_scene(nullptr)
-	,m_isPlayer(false)
-	//,m_output()
-	//,m_animBlendTree(nullptr)
-{
-	//ndAssert(0);
-	//for now do not load the player configuration, we can do that is the postprocess pass. 
-	//m_isPlayer = xmlGetInt(xmlNode, "isPlayer") ? true : false;
-	//m_scene = world->GetManager();
-	//if (m_isPlayer)
-	//{
-	//	m_scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
-	//}
-	//
-	//ndDemoEntity* const entity = new ndDemoEntity(m_localFrame, nullptr);
-	//const ndShapeInstance& shape = GetCollisionShape();
-	//ndDemoMesh* const mesh = new ndDemoMesh("shape", m_scene->GetShaderCache(), &shape, "smilli.tga", "marble.tga", "marble.tga");
-	//entity->SetMesh(mesh, dGetIdentityMatrix());
-	//mesh->Release();
-	//
-	//m_scene->AddEntity(entity);
-	//SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
-}
-
 ndBasicPlayerCapsule::~ndBasicPlayerCapsule()
 {
 	//if (m_animBlendTree)
 	//{
 	//	delete m_animBlendTree;
 	//}
-}
-
-void ndBasicPlayerCapsule::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBodyPlayerCapsule::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	//xmlSaveParam(paramNode, "isPlayer", m_isPlayer ? 1 : 0);
 }
 
 void ndBasicPlayerCapsule::ApplyInputs(ndFloat32 timestep)

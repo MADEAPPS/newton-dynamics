@@ -26,8 +26,6 @@
 #include "ndShapeBox.h"
 #include "ndContactSolver.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeBox)
-
 ndInt32 ndShapeBox::m_initSimplex = 0;
 ndShapeConvex::ndConvexSimplexEdge ndShapeBox::m_edgeArray[24];
 ndShapeConvex::ndConvexSimplexEdge* ndShapeBox::m_edgeEdgeMap[12];
@@ -51,32 +49,10 @@ ndShapeBox::ndShapeBox(ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z)
 	Init(size_x, size_y, size_z);
 }
 
-ndShapeBox::ndShapeBox(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndShapeConvex(m_box)
-{
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	ndFloat32 size_x = xmlGetFloat(xmlNode, "size_x");
-	ndFloat32 size_y = xmlGetFloat(xmlNode, "size_y");
-	ndFloat32 size_z = xmlGetFloat(xmlNode, "size_z");
-	Init(size_x, size_y, size_z);
-}
-
 ndShapeBox::~ndShapeBox()
 {
 	ndShapeConvex::m_simplex = nullptr;
 	ndShapeConvex::m_vertex = nullptr;
-}
-
-D_COLLISION_API void ndShapeBox::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "size_x", m_size[0][0] * ndFloat32(2.0f));
-	xmlSaveParam(childNode, "size_y", m_size[0][1] * ndFloat32(2.0f));
-	xmlSaveParam(childNode, "size_z", m_size[0][2] * ndFloat32(2.0f));
 }
 
 void ndShapeBox::Init(ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z)

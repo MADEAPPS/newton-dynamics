@@ -23,7 +23,6 @@ class ndJointSpherical: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointSpherical);
-	D_NEWTON_API ndJointSpherical(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointSpherical();
 
@@ -38,7 +37,6 @@ class ndJointSpherical: public ndJointBilateralConstraint
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	D_NEWTON_API ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;

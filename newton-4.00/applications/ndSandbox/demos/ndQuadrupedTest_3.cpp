@@ -379,53 +379,6 @@ namespace ndQuadruped_3
 			m_animBlendTree = m_walk;
 		}
 
-		ndQuadrupedModel(const ndLoadSaveBase::ndLoadDescriptor& desc)
-			:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
-			,m_invDynamicsSolver()
-			,m_walk(nullptr)
-			,m_animBlendTree(nullptr)
-			,m_output()
-			,m_walkCycle(0.75f)
-			,m_trotCycle(0.4f)
-			,m_bodyArray()
-			,m_effectorsInfo()
-			,m_effectorsJoints()
-		{
-			const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
-
-			ndAssert(0);
-			const nd::TiXmlNode* const bodies = modelRootNode->FirstChild("bodies");
-			for (const nd::TiXmlNode* node = bodies->FirstChild(); node; node = node->NextSibling())
-			{
-				ndInt32 hashId;
-				const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-				element->Attribute("int32", &hashId);
-				//ndBodyLoaderCache::ndNode* const bodyNode = desc.m_bodyMap->Find(hashId);
-				//ndBody* const body = (ndBody*)bodyNode->GetInfo();
-			}
-
-			const nd::TiXmlNode* const joints = modelRootNode->FirstChild("joints");
-			for (const nd::TiXmlNode* node = joints->FirstChild(); node; node = node->NextSibling())
-			{
-				ndInt32 hashId;
-				const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-				element->Attribute("int32", &hashId);
-				//ndJointLoaderCache::ndNode* const jointNode = desc.m_jointMap->Find(hashId);
-				//ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)jointNode->GetInfo();
-			}
-
-			// load root body
-			//ndBodyLoaderCache::ndNode* const rootBodyNode = desc.m_bodyMap->Find(xmlGetInt(modelRootNode, "rootBodyHash"));
-			//ndBodyDynamic* const rootBody = ((ndBody*)rootBodyNode->GetInfo())->GetAsBodyDynamic();
-
-			// load effector joint
-			const nd::TiXmlNode* const endEffectorNode = modelRootNode->FirstChild("endEffector");
-			if (xmlGetInt(endEffectorNode, "hasEffector"))
-			{
-				ndAssert(0);
-			}
-		}
-
 		~ndQuadrupedModel()
 		{
 			if (m_animBlendTree)
@@ -483,56 +436,6 @@ namespace ndQuadruped_3
 				}
 				body->SetMassMatrix(inertia);
 			}
-		}
-
-		void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-		{
-			nd::TiXmlElement* const modelRootNode = new nd::TiXmlElement(ClassName());
-			desc.m_rootNode->LinkEndChild(modelRootNode);
-			modelRootNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-			ndModel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, modelRootNode));
-
-			ndAssert(0);
-			// save all bodies.
-			//nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("bodies");
-			//modelRootNode->LinkEndChild(bodiesNode);
-			//for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
-			//{
-			//	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("body");
-			//	bodiesNode->LinkEndChild(paramNode);
-			//
-			//	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const bodyPartNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_bodyArray[i]);
-			//	paramNode->SetAttribute("int32", bodyPartNode->GetInfo());
-			//}
-			//
-			//// save all joints
-			//nd::TiXmlElement* const jointsNode = new nd::TiXmlElement("joints");
-			//modelRootNode->LinkEndChild(jointsNode);
-			//for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
-			//{
-			//	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
-			//	jointsNode->LinkEndChild(paramNode);
-			//
-			//	ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* const jointPartNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_jointArray[i]);
-			//	paramNode->SetAttribute("int32", jointPartNode->GetInfo());
-			//}
-			//
-			//// indicate which body is the root
-			//xmlSaveParam(modelRootNode, "rootBodyHash", desc.m_bodyMap->Find(m_rootBody)->GetInfo());
-			//
-			//// save end effector info
-			//nd::TiXmlElement* const endEffectorNode = new nd::TiXmlElement("endEffector");
-			//modelRootNode->LinkEndChild(endEffectorNode);
-			//
-			//ndAssert(0);
-			////xmlSaveParam(endEffectorNode, "hasEffector", m_effector ? 1 : 0);
-			////if (m_effector)
-			////{
-			////	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody0 = desc.m_bodyMap->Find(m_effector->GetBody0());
-			////	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody1 = desc.m_bodyMap->Find(m_effector->GetBody1());
-			////	xmlSaveParam(endEffectorNode, "body0Hash", effectBody0->GetInfo());
-			////	xmlSaveParam(endEffectorNode, "body1Hash", effectBody1->GetInfo());
-			////}
 		}
 
 		ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
@@ -717,8 +620,7 @@ namespace ndQuadruped_3
 		ndReal m_param_x0;
 		ndParamMapper m_param_xxxx;
 	};
-	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndQuadruped_3::ndQuadrupedModel);
-
+	
 	class ndModelUI : public ndUIEntity
 	{
 		public:

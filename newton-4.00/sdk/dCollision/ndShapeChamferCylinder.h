@@ -33,7 +33,6 @@ class ndShapeChamferCylinder: public ndShapeConvex
 	public:
 	D_CLASS_REFLECTION(ndShapeChamferCylinder);
 	D_COLLISION_API ndShapeChamferCylinder(ndFloat32 radius, ndFloat32 height);
-	D_COLLISION_API ndShapeChamferCylinder(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeChamferCylinder();
 
 	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return this; }
@@ -49,7 +48,6 @@ class ndShapeChamferCylinder: public ndShapeConvex
 	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin, ndInt32* const vertexIndex) const;
 	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
-	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 

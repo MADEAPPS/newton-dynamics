@@ -32,7 +32,6 @@ class ndShapeCone : public ndShapeConvex
 	public:
 	D_CLASS_REFLECTION(ndShapeCone);
 	D_COLLISION_API ndShapeCone(ndFloat32 radio, ndFloat32 height);
-	D_COLLISION_API ndShapeCone(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API ~ndShapeCone();
 
 	virtual ndShapeCone* GetAsShapeCone() { return this; }
@@ -47,7 +46,6 @@ class ndShapeCone : public ndShapeConvex
 	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin, ndInt32* const vertexIndex) const;
 	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
-	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 

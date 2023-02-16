@@ -27,8 +27,6 @@
 #define D_CONVEX_VERTEX_SPLIT_BOX			8
 #define D_CONVEX_VERTEX_BRUTE_FORCE_SPLIT	(3 * D_CONVEX_VERTEX_SPLIT_BOX)
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeConvexHull)
-
 D_MSV_NEWTON_ALIGN_32
 class ndShapeConvexHull::ndConvexBox
 {
@@ -69,30 +67,6 @@ ndShapeConvexHull::ndShapeConvexHull (ndInt32 count, ndInt32 strideInBytes, ndFl
 	//}
 }
 
-ndShapeConvexHull::ndShapeConvexHull(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndShapeConvex(m_convexHull)
-	,m_supportTree(nullptr)
-	,m_faceArray(nullptr)
-	,m_soa_x(nullptr)
-	,m_soa_y(nullptr)
-	,m_soa_z(nullptr)
-	,m_soa_index(nullptr)
-	,m_vertexToEdgeMapping(nullptr)
-	,m_faceCount(0)
-	,m_soaVertexCount(0)
-	,m_supportTreeCount(0)
-{
-	m_edgeCount = 0;
-	m_vertexCount = 0;
-	m_vertex = nullptr;
-	m_simplex = nullptr;
-
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	ndArray<ndVector> array;
-	xmlGetFloatArray3(xmlNode, "vextexArray3", array);
-	Create(array.GetCount(), sizeof (ndVector), &array[0].m_x, ndFloat32 (0.0f), 0x7fffffff);
-}
-
 ndShapeConvexHull::~ndShapeConvexHull()
 {
 	if (m_vertexToEdgeMapping) 
@@ -117,22 +91,6 @@ ndShapeConvexHull::~ndShapeConvexHull()
 		ndMemory::Free(m_soa_z);
 		ndMemory::Free(m_soa_index);
 	}
-}
-
-void ndShapeConvexHull::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	ndArray<ndVector> array;
-	array.SetCount(m_vertexCount);
-	for (ndInt32 i = 0; i < m_vertexCount; ++i)
-	{
-		array[i] = m_vertex[i];
-	}
-	xmlSaveParam(childNode, "vextexArray3", array);
 }
 
 bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFloat32* const vertexArray, ndFloat32 tolerance, ndInt32 maxPointsOut)
