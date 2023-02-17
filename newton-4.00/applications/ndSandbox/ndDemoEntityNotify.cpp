@@ -21,6 +21,7 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDem
 	,m_parentBody(parentBody)
 	,m_manager(manager)
 {
+	static ndFileDemoEntityNotify registerClass;
 }
 
 ndDemoEntityNotify::~ndDemoEntityNotify()

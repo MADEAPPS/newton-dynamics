@@ -23,6 +23,23 @@ class ndDemoMeshInterface;
 class ndDemoEntityNotify: public ndBodyNotify
 {
 	public:
+	class ndFileDemoEntityNotify: public ndFileFormatNotify
+	{
+		public:
+		ndFileDemoEntityNotify()
+			:ndFileFormatNotify(ndDemoEntityNotify::StaticClassName())
+		{
+		}
+
+		void SaveNotify(nd::TiXmlElement* const parentNode, ndBodyNotify* const notify)
+		{
+			nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndDemoEntityNotify::StaticClassName());
+			parentNode->LinkEndChild(classNode);
+			ndFileFormatNotify::SaveNotify(classNode, notify);
+		}
+	};
+
+
 	D_CLASS_REFLECTION(ndDemoEntityNotify, ndBodyNotify)
 	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody = nullptr, ndFloat32 gravity = DEMO_GRAVITY);
 	virtual ~ndDemoEntityNotify();
