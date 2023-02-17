@@ -1644,9 +1644,10 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 
 	for (ndInt32 i = 0; i < 3; ++i) 
 	{
+		ndAssert(covariance[i][i] > ndFloat32(0.0f));
 		if (ndAbs(covariance[i][i]) < (1.0e-6f)) 
 		{
-			for (ndInt32 j = 0; j < 3; ++j) 
+			for (ndInt32 j = i + 1; j < 3; ++j) 
 			{
 				covariance[i][j] = ndFloat32(0.0f);
 				covariance[j][i] = ndFloat32(0.0f);
