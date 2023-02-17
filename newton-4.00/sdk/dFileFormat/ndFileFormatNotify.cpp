@@ -36,9 +36,5 @@ void ndFileFormatNotify::SaveNotify(nd::TiXmlElement* const parentNode, ndBodyNo
 {
 	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndBodyNotify::StaticClassName());
 	parentNode->LinkEndChild(classNode);
-
-	//xmlSaveParam(classNode, "transform", body->GetMatrix());
-	//xmlSaveParam(classNode, "omega", body->GetOmega());
-	//xmlSaveParam(classNode, "velocity", body->GetVelocity());
-	//xmlSaveParam(classNode, "centerOfMass", body->GetCentreOfMass());
+	xmlSaveParam(classNode, "gravity", notify->GetGravity());
 }

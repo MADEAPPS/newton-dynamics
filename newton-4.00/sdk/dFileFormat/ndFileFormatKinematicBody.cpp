@@ -38,4 +38,21 @@ void ndFileFormatKinematicBody::SaveBody(nd::TiXmlElement* const parentNode, ndB
 	parentNode->LinkEndChild(classNode);
 	ndFileFormatBody::SaveBody(classNode, body);
 
+	ndBodyKinematic* const kinematic = body->GetAsBodyKinematic();
+	ndAssert(kinematic);
+	
+	ndFloat32 invMass = kinematic->GetInvMass();
+	xmlSaveParam(classNode, "invMass", invMass);
+	if (invMass > ndFloat32(0.0f))
+	{
+		ndVector invInertia(kinematic->GetInvInertia());
+		//xmlSaveParam(classNode, "invMass", invMass);
+		//ndVector invInertia(m_invMass & ndVector::m_triplexMask);
+		xmlSaveParam(classNode, "invPrincipalInertia", invInertia);
+	}
+	xmlSaveParam(classNode, "maxAngleStep", kinematic->GetMaxAngularStep());
+	xmlSaveParam(classNode, "maxLinearStep", kinematic->GetMaxLinearStep());
+
+	//m_shapeInstance.Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
 }
