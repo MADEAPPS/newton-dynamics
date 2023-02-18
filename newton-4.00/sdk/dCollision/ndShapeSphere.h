@@ -58,6 +58,7 @@ class ndShapeSphere: public ndShapeConvex
 	static ndInt32 m_shapeRefCount;
 	static ndVector m_unitSphere[];
 	static ndConvexSimplexEdge m_edgeArray[];
+	friend class ndFileFormatShapeConvexSphere;
 
 } D_GCC_NEWTON_ALIGN_32;
 

@@ -56,15 +56,6 @@ static void CleanWhiteSpace(const char* const value)
 
 #if 0
 
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt64 value)
-{
-	char buffer[1024];
-	long long x = value;
-	sprintf(buffer, "%llu", x);
-	xmlSaveParam(rootNode, name, "int64", buffer);
-}
-
-
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value)
 {
 	xmlSaveParam(rootNode, name, "string", value);
@@ -309,15 +300,18 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	node->SetAttribute(type, value);
 }
 
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const ndMatrix& value)
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndMatrix& value)
 {
+	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
+	rootNode->LinkEndChild(node);
+
 	ndVector euler0;
 	ndVector euler1;
 	value.CalcPitchYawRoll(euler0, euler1);
 	euler0 = euler0.Scale(ndRadToDegree);
 
-	xmlSaveParam(rootNode, "posit", value.m_posit);
-	xmlSaveParam(rootNode, "angle", euler0);
+	xmlSaveParam(node, "posit", value.m_posit);
+	xmlSaveParam(node, "angles", euler0);
 }
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 value)
@@ -325,6 +319,14 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndIn
 	char buffer[1024];
 	sprintf(buffer, "%d", value);
 	xmlSaveParam(rootNode, name, "int32", buffer);
+}
+
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt64 value)
+{
+	char buffer[1024];
+	long long x = value;
+	sprintf(buffer, "%llu", x);
+	xmlSaveParam(rootNode, name, "int64", buffer);
 }
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndFloat32 value)
