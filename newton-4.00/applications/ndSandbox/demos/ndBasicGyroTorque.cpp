@@ -20,40 +20,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"
 
-class ndAsymetricInertiaBody: public ndBodyDynamic
-{
-	public:
-	ndAsymetricInertiaBody()
-		:ndBodyDynamic()
-		,m_principalAxis(ndGetIdentityMatrix())
-	{
-	}
-	
-	virtual void SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia)
-	{
-		m_principalAxis = inertia;
-		ndVector eigenValues(m_principalAxis.EigenVectors());
-		ndMatrix massMatrix(ndGetIdentityMatrix());
-		massMatrix[0][0] = eigenValues[0];
-		massMatrix[1][1] = eigenValues[1];
-		massMatrix[2][2] = eigenValues[2];
-		ndBodyDynamic::SetMassMatrix(mass, massMatrix);
-	}
-
-	virtual ndMatrix CalculateInvInertiaMatrix() const
-	{
-		ndMatrix matrix(m_principalAxis * m_matrix);
-		matrix.m_posit = ndVector::m_wOne;
-		ndMatrix diagonal(ndGetIdentityMatrix());
-		diagonal[0][0] = m_invMass[0];
-		diagonal[1][1] = m_invMass[1];
-		diagonal[2][2] = m_invMass[2];
-		return matrix * diagonal * matrix.Inverse();
-	}
-	
-	ndMatrix m_principalAxis;
-};
-
 static void DzhanibekovEffect(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 angularSpeed, const ndVector& origin)
 {
 	ndMatrix matrix(ndGetIdentityMatrix());
@@ -114,7 +80,8 @@ static void Phitop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 a
 
 static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, const ndVector& origin)
 {
-	ndMatrix matrix(ndPitchMatrix(15.0f * ndDegreeToRad));
+	ndMatrix matrix(ndYawMatrix(45.0f * ndDegreeToRad));
+	//ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -124,11 +91,10 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, const n
 	matrix.m_posit.m_y += floor.m_y + 0.4f;
 
 	ndMatrix shapeMatrix(ndYawMatrix(5.0f * ndDegreeToRad));
+	//ndMatrix shapeMatrix(ndYawMatrix(10.0f * ndDegreeToRad));
 
 	ndShapeInstance shape(new ndShapeSphere(1.0f));
-	shape.SetLocalMatrix(shapeMatrix);
 	shape.SetScale(ndVector(0.3f, 0.25f, 1.0f, 0.0f));
-
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
 
 	ndBodyKinematic* const body = new ndBodyDynamic();
@@ -138,7 +104,9 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, const n
 
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, shape);
+	// skew the inertia matrix for rattle effect
+	shape.SetLocalMatrix(shapeMatrix);
+	body->SetMassMatrix(mass, shape, true);
 	body->SetCentreOfMass(ndVector(0.0f, -0.1f, 0.0f, 0.0f));
 
 	ndSharedPtr<ndBody> bodyPtr(body);
@@ -245,7 +213,7 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	PrecessingTop(scene, ndVector(5.0f, 0.0f, -4.0f, 0.0f));
 	PrecessingTop(scene, ndVector(5.0f, 0.0f, 0.0f, 0.0f));
 	PrecessingTop(scene, ndVector(5.0f, 0.0f, 4.0f, 0.0f));
-	
+
 	RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f, -4.0f, 0.0f));
 	RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f, 0.0f, 0.0f));
 	RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f,  4.0f, 0.0f));

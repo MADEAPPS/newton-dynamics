@@ -120,6 +120,7 @@ ndBodyPlayerCapsule::~ndBodyPlayerCapsule()
 
 void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactSolver, ndFloat32 timestep)
 {
+	ndAssert(0);
 	ndMatrix matrix(m_matrix);
 	ndVector savedVeloc(m_veloc);
 
@@ -320,6 +321,7 @@ ndBodyPlayerCapsule::dCollisionState ndBodyPlayerCapsule::TestPredictCollision(c
 
 ndFloat32 ndBodyPlayerCapsule::PredictTimestep(ndBodyPlayerCapsuleContactSolver& contactSolver, ndFloat32 timestep)
 {
+	ndAssert(0);
 	ndMatrix matrix(m_matrix);
 	ndVector veloc(GetVelocity());
 	ndBodyKinematic::IntegrateVelocity(timestep);
@@ -732,6 +734,7 @@ void ndBodyPlayerCapsule::SpecialUpdate(ndFloat32 timestep)
 #endif
 	m_equilibrium0 = 0;
 
+	ndAssert(0);
 	// set player orientation
 	ndMatrix matrix(ndYawMatrix(GetHeadingAngle()));
 	matrix.m_posit = m_matrix.m_posit;

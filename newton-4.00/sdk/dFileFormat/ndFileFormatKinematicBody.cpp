@@ -45,10 +45,12 @@ void ndFileFormatKinematicBody::SaveBody(nd::TiXmlElement* const parentNode, ndB
 	xmlSaveParam(classNode, "invMass", invMass);
 	if (invMass > ndFloat32(0.0f))
 	{
-		ndVector invInertia(kinematic->GetInvInertia());
-		//xmlSaveParam(classNode, "invMass", invMass);
-		//ndVector invInertia(m_invMass & ndVector::m_triplexMask);
-		xmlSaveParam(classNode, "invPrincipalInertia", invInertia);
+		ndVector euler0;
+		ndVector euler1;
+		ndVector inertia(kinematic->GetMassMatrix());
+		xmlSaveParam(classNode, "inertia", inertia);
+		kinematic->GetPrincipalAxis().CalcPitchYawRoll(euler0, euler1);
+		xmlSaveParam(classNode, "principalAxis", euler0);
 	}
 	xmlSaveParam(classNode, "maxAngleStep", kinematic->GetMaxAngularStep());
 	xmlSaveParam(classNode, "maxLinearStep", kinematic->GetMaxLinearStep());

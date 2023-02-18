@@ -39,7 +39,7 @@ class ndDemoEntityNotify: public ndBodyNotify
 
 			nd::TiXmlElement* const visualNode = new nd::TiXmlElement("visual");
 			classNode->LinkEndChild(visualNode);
-			xmlSaveParam(visualNode, "useCollisionforVisual", 1);
+			xmlSaveParam(visualNode, "useCollisionForVisual", 1);
 		}
 	};
 

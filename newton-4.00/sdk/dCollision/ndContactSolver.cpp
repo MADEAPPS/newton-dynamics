@@ -1644,8 +1644,7 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 
 	for (ndInt32 i = 0; i < 3; ++i) 
 	{
-		ndAssert(covariance[i][i] > ndFloat32(0.0f));
-		if (ndAbs(covariance[i][i]) < (1.0e-6f)) 
+		if (ndAbs(covariance[i][i]) < ndFloat32(1.0e-8f)) 
 		{
 			for (ndInt32 j = i + 1; j < 3; ++j) 
 			{
@@ -1653,6 +1652,7 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 				covariance[j][i] = ndFloat32(0.0f);
 			}
 		}
+		covariance[i][i] = ndMax(covariance[i][i], ndFloat32(1.0e-8f));
 	}
 
 	ndVector eigen(covariance.EigenVectors());
@@ -2415,9 +2415,33 @@ ndInt32 ndContactSolver::ConvexContactsDiscrete()
 		}
 	}
 
-	if (m_pruneContacts && (count > 1))
+	if (m_pruneContacts)
 	{
-		count = PruneContacts(count, 16);
+		switch (count)
+		{
+			case 0:
+			case 1:
+				break;
+
+			case 2:
+			{
+				ndVector length(m_contactBuffer[1].m_point - m_contactBuffer[0].m_point);
+				ndFloat32 mag2 = length.DotProduct(length & ndVector::m_triplexMask).GetScalar();
+				if (mag2 < ndFloat32(2.0e-3f) * ndFloat32(2.0e-3f))
+				{
+					m_contactBuffer[0].m_point = ndVector::m_half * (m_contactBuffer[1].m_point + m_contactBuffer[0].m_point);
+					count = 1;
+				}
+				break;
+			}
+
+			case 3:
+				// could special case triangles but for now, just call prune
+				//break;
+
+			default:
+				count = PruneContacts(count, 16);
+		}
 	}
 
 	const ndVector offset(origin0 & ndVector::m_triplexMask);

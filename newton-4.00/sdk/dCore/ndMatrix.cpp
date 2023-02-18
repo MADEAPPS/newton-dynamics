@@ -507,7 +507,7 @@ ndVector ndMatrix::EigenVectors ()
 		d = b; 
 	}
 
-#ifdef _DEBUG
+#ifdef _DEBUG_____
 		ndMatrix diag(ndGetIdentityMatrix());
 		diag[0][0] = d[0];
 		diag[1][1] = d[1];
@@ -517,6 +517,9 @@ ndVector ndMatrix::EigenVectors ()
 		ndMatrix tempMatrix(E * diag * E.Transpose());
 		tempMatrix = tempMatrix.Inverse4x4();
 		ndMatrix unitMatrix(tempMatrix* originalMatrix);
+
+
+
 
 		for (ndInt32 j = 0; j < 3; ++j) 
 		{
