@@ -32,13 +32,13 @@ ndFileFormatKinematicBody::ndFileFormatKinematicBody(const char* const className
 {
 }
 
-void ndFileFormatKinematicBody::SaveBody(nd::TiXmlElement* const parentNode, ndBody* const body)
+void ndFileFormatKinematicBody::SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
 	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndBodyKinematic::StaticClassName());
 	parentNode->LinkEndChild(classNode);
 	ndFileFormatBody::SaveBody(classNode, body);
 
-	ndBodyKinematic* const kinematic = body->GetAsBodyKinematic();
+	ndBodyKinematic* const kinematic = ((ndBody*)body)->GetAsBodyKinematic();
 	ndAssert(kinematic);
 	
 	ndFloat32 invMass = kinematic->GetInvMass();
@@ -55,6 +55,13 @@ void ndFileFormatKinematicBody::SaveBody(nd::TiXmlElement* const parentNode, ndB
 	xmlSaveParam(classNode, "maxAngleStep", kinematic->GetMaxAngularStep());
 	xmlSaveParam(classNode, "maxLinearStep", kinematic->GetMaxLinearStep());
 
-	//m_shapeInstance.Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
+	const ndShapeInstance* const collision = &kinematic->GetCollisionShape();
+	ndFileFormatRegistry* const handler = ndFileFormatRegistry::GetHandler(collision->ClassName());
+	ndAssert(handler);
+	if (handler)
+	{
+		nd::TiXmlElement* const shapeNode = new nd::TiXmlElement("Collision");
+		classNode->LinkEndChild(shapeNode);
+		handler->SaveCollision(shapeNode, collision);
+	}
 }

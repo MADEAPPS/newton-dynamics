@@ -19,22 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_FILE_FORMAT_SHAPE_INSTANCE_H__
+#define _ND_FILE_FORMAT_SHAPE_INSTANCE_H__
+
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatDynamicBody.h"
+#include "ndFileFormatRegistry.h"
 
-ndFileFormatDynamicBody::ndFileFormatDynamicBody()
-	:ndFileFormatKinematicBody(ndBodyDynamic::StaticClassName())
+class ndFileFormatShapeInstance : public ndFileFormatRegistry
 {
-}
+	public: 
+	ndFileFormatShapeInstance();
+	ndFileFormatShapeInstance(const char* const className);
 
-ndFileFormatDynamicBody::ndFileFormatDynamicBody(const char* const className)
-	:ndFileFormatKinematicBody(className)
-{
-}
+	virtual void SaveCollision(nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision);
+};
 
-void ndFileFormatDynamicBody::SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body)
-{
-	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndBodyDynamic::StaticClassName());
-	parentNode->LinkEndChild(classNode);
-	ndFileFormatKinematicBody::SaveBody(classNode, body);
-}
+#endif 
+

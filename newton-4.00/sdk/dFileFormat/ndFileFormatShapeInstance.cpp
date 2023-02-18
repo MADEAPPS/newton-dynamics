@@ -20,21 +20,21 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatDynamicBody.h"
+#include "ndFileFormatShapeInstance.h"
 
-ndFileFormatDynamicBody::ndFileFormatDynamicBody()
-	:ndFileFormatKinematicBody(ndBodyDynamic::StaticClassName())
+ndFileFormatShapeInstance::ndFileFormatShapeInstance()
+	:ndFileFormatRegistry(ndShapeInstance::StaticClassName())
 {
 }
 
-ndFileFormatDynamicBody::ndFileFormatDynamicBody(const char* const className)
-	:ndFileFormatKinematicBody(className)
+ndFileFormatShapeInstance::ndFileFormatShapeInstance(const char* const className)
+	:ndFileFormatRegistry(className)
 {
 }
 
-void ndFileFormatDynamicBody::SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body)
+void ndFileFormatShapeInstance::SaveCollision(nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision)
 {
-	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndBodyDynamic::StaticClassName());
+	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndShapeInstance::StaticClassName());
 	parentNode->LinkEndChild(classNode);
-	ndFileFormatKinematicBody::SaveBody(classNode, body);
+
 }

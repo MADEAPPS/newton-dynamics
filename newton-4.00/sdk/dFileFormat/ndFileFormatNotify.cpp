@@ -32,7 +32,7 @@ ndFileFormatNotify::ndFileFormatNotify(const char* const className)
 {
 }
 
-void ndFileFormatNotify::SaveNotify(nd::TiXmlElement* const parentNode, ndBodyNotify* const notify)
+void ndFileFormatNotify::SaveNotify(nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
 {
 	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndBodyNotify::StaticClassName());
 	parentNode->LinkEndChild(classNode);

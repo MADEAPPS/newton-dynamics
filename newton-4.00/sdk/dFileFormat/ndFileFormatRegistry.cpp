@@ -25,6 +25,7 @@
 #include "ndFileFormatNotify.h"
 #include "ndFileFormatDynamicBody.h"
 #include "ndFileFormatKinematicBody.h"
+#include "ndFileFormatShapeInstance.h"
 
 ndFixSizeArray<ndFileFormatRegistry*, 256> ndFileFormatRegistry::m_registry;
 
@@ -57,9 +58,12 @@ ndFileFormatRegistry::~ndFileFormatRegistry()
 void ndFileFormatRegistry::Init()
 {
 	static ndFileFormatBody body;
-	static ndFileFormatDynamicBody dynamicBody;
-	static ndFileFormatKinematicBody kinematicBody;
 	static ndFileFormatNotify bodyNotiy;
+	static ndFileFormatDynamicBody dynamicBody;
+	static ndFileFormatShapeInstance collision;
+	static ndFileFormatKinematicBody kinematicBody;
+	
+	
 }
 
 ndFileFormatRegistry* ndFileFormatRegistry::GetHandler(const char* const className)
@@ -67,19 +71,17 @@ ndFileFormatRegistry* ndFileFormatRegistry::GetHandler(const char* const classNa
 	ndUnsigned64 hash = dCRC64(className);
 	ndInt32 i0 = 0;
 	ndInt32 i1 = m_registry.GetCount() - 1;
-	//ndFreeListDictionary& me = *this;
 	while ((i1 - i0 > 4))
 	{
-		ndAssert(0);
-	//	ndInt32 mid = (i1 + i0) / 2;
-	//	if (me[mid].m_schunkSize <= size)
-	//	{
-	//		i0 = mid;
-	//	}
-	//	else
-	//	{
-	//		i1 = mid;
-	//	}
+		ndInt32 mid = (i1 + i0) / 2;
+		if (m_registry[mid]->m_hash <= hash)
+		{
+			i0 = mid;
+		}
+		else
+		{
+			i1 = mid;
+		}
 	}
 	
 	for (ndInt32 i = i0; i <= i1; ++i)

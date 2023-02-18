@@ -31,7 +31,7 @@ class ndDemoEntityNotify: public ndBodyNotify
 		{
 		}
 
-		void SaveNotify(nd::TiXmlElement* const parentNode, ndBodyNotify* const notify)
+		void SaveNotify(nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
 		{
 			nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndDemoEntityNotify::StaticClassName());
 			parentNode->LinkEndChild(classNode);

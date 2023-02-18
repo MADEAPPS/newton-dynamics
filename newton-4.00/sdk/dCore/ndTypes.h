@@ -283,15 +283,15 @@ class ndTriplex
 };
 
 #define D_BASE_CLASS_REFLECTION(Class)						\
-	virtual const char* ClassName() {return #Class;}		\
+	virtual const char* ClassName() const {return #Class;}	\
 	static const char* StaticClassName() {return #Class;}	\
-	virtual const char* SuperClassName() {return "";}
+	virtual const char* SuperClassName() const {return "";}
 
 
 #define D_CLASS_REFLECTION(Class,SuperClass)					\
-	virtual const char* ClassName() {return #Class;}			\
+	virtual const char* ClassName() const {return #Class;}		\
 	static const char* StaticClassName() {return #Class;}		\
-	virtual const char* SuperClassName() {return #SuperClass;}
+	virtual const char* SuperClassName() const {return #SuperClass;}
 
 #define D_OPERATOR_NEW_AND_DELETE			\
 inline void *operator new (size_t size)		\

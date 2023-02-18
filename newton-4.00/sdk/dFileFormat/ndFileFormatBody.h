@@ -31,7 +31,7 @@ class ndFileFormatBody : public ndFileFormatRegistry
 	ndFileFormatBody();
 	ndFileFormatBody(const char* const className);
 
-	virtual void SaveBody(nd::TiXmlElement* const parentNode, ndBody* const body);
+	virtual void SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body);
 };
 
 #endif 

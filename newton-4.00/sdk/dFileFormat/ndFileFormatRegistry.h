@@ -32,8 +32,9 @@ class ndFileFormatRegistry : public ndClassAlloc
 	virtual ~ndFileFormatRegistry();
 	
 	public:
-	virtual void SaveBody(nd::TiXmlElement* const parentNode, ndBody* const body);
-	virtual void SaveNotify(nd::TiXmlElement* const parentNode, ndBodyNotify* const notify);
+	virtual void SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body);
+	virtual void SaveNotify(nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify);
+	virtual void SaveCollision(nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision);
 
 	static ndFileFormatRegistry* GetHandler(const char* const className);
 
@@ -45,15 +46,19 @@ class ndFileFormatRegistry : public ndClassAlloc
 	friend class ndFileFormat;
 };
 
-inline void ndFileFormatRegistry::SaveBody(nd::TiXmlElement* const, ndBody* const)
+inline void ndFileFormatRegistry::SaveBody(nd::TiXmlElement* const, const ndBody* const)
 {
 	ndAssert(0);
 }
 
-inline void ndFileFormatRegistry::SaveNotify(nd::TiXmlElement* const, ndBodyNotify* const)
+inline void ndFileFormatRegistry::SaveNotify(nd::TiXmlElement* const, const ndBodyNotify* const)
 {
 	ndAssert(0);
 }
 
+inline void ndFileFormatRegistry::SaveCollision(nd::TiXmlElement* const, const ndShapeInstance* const)
+{
+	ndAssert(0);
+}
 #endif 
 

@@ -124,6 +124,10 @@ class ndShapeInstance: public ndContainersFreeListAlloc<ndShapeInstance>
 	D_COLLISION_API static ndVector GetBoxPadding();
 
 	D_COLLISION_API void SavePLY(const char* const fileName) const;
+
+	const char* ClassName() const;
+	static const char* StaticClassName();
+	const char* SuperClassName() const;
 	
 	ndShape* GetShape();
 	const ndShape* GetShape() const;
@@ -393,6 +397,22 @@ inline void ndShapeInstance::SetShape(ndShape* const shape)
 	}
 	m_shape = shape ? shape->AddRef() : shape;
 }
+
+inline const char* ndShapeInstance::ClassName() const 
+{ 
+	return "ndShapeInstance"; 
+}
+
+inline const char* ndShapeInstance::StaticClassName() 
+{ 
+	return "ndShapeInstance"; 
+}
+
+inline const char* ndShapeInstance::SuperClassName() const 
+{ 
+	return "ndShapeInstance"; 
+}
+
 #endif 
 
 

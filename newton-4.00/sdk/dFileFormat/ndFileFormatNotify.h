@@ -31,7 +31,7 @@ class ndFileFormatNotify : public ndFileFormatRegistry
 	ndFileFormatNotify();
 	ndFileFormatNotify(const char* const className);
 
-	virtual void SaveNotify(nd::TiXmlElement* const parentNode, ndBodyNotify* const notify);
+	virtual void SaveNotify(nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify);
 };
 
 #endif 
