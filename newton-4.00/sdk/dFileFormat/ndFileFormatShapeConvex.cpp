@@ -20,36 +20,32 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatBody.h"
-#include "ndFileFormatNotify.h"
+#include "ndFileFormatShapeConvex.h"
 
-ndFileFormatBody::ndFileFormatBody()
-	:ndFileFormatRegistrar(ndBody::StaticClassName())
+ndFileFormatShapeConvex::ndFileFormatShapeConvex()
+	:ndFileFormatShape(ndShapeConvex::StaticClassName())
 {
 }
 
-ndFileFormatBody::ndFileFormatBody(const char* const className)
-	:ndFileFormatRegistrar(className)
+ndFileFormatShapeConvex::ndFileFormatShapeConvex(const char* const className)
+	:ndFileFormatShape(className)
 {
 }
 
-void ndFileFormatBody::SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body)
+void ndFileFormatShapeConvex::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndBody::StaticClassName());
+	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndShapeConvex::StaticClassName());
 	parentNode->LinkEndChild(classNode);
+	ndFileFormatShape::SaveShape(classNode, shape);
 
-	xmlSaveParam(classNode, body->GetMatrix());
-	xmlSaveParam(classNode, "omega", body->GetOmega());
-	xmlSaveParam(classNode, "velocity", body->GetVelocity());
-	xmlSaveParam(classNode, "centerOfMass", body->GetCentreOfMass());
-
-	ndBodyNotify* const notity = body->GetNotifyCallback();
-	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(notity->ClassName());
-	ndAssert(handler);
-	if (handler)
+	ndArray<ndVector> points;
+	const ndShapeConvex* const convexShape = (ndShapeConvex*)shape;
+	for (ndInt32 i = 0; i < convexShape->m_vertexCount; ++i)
 	{
-		nd::TiXmlElement* const notifyNode = new nd::TiXmlElement("Notify");
-		classNode->LinkEndChild(notifyNode);
-		handler->SaveNotify(notifyNode, notity);
+		points.PushBack(convexShape->m_vertex[i]);
 	}
+	xmlSaveParam(classNode, "points", points);
+	//xmlSaveParam(classNode, "boxMinRadius", convexShape->m_boxMinRadius);
+	//xmlSaveParam(classNode, "inertia", convexShape->m_boxMaxRadius);
+	//xmlSaveParam(classNode, "inertia", convexShape->m_simplexVolume);
 }

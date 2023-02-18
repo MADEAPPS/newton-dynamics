@@ -54,6 +54,8 @@ class ndShapeCapsule : public ndShapeConvex
 	ndFloat32 m_height;
 	ndFloat32 m_radius0;
 	ndFloat32 m_radius1;
+
+	friend class ndFileFormatShapeConvexCapsule;
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif 

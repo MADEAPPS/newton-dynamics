@@ -20,36 +20,27 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatBody.h"
-#include "ndFileFormatNotify.h"
+#include "ndFileFormatShapeConvexCapsule.h"
 
-ndFileFormatBody::ndFileFormatBody()
-	:ndFileFormatRegistrar(ndBody::StaticClassName())
+ndFileFormatShapeConvexCapsule::ndFileFormatShapeConvexCapsule()
+	:ndFileFormatShapeConvex(ndShapeCapsule::StaticClassName())
 {
 }
 
-ndFileFormatBody::ndFileFormatBody(const char* const className)
-	:ndFileFormatRegistrar(className)
+ndFileFormatShapeConvexCapsule::ndFileFormatShapeConvexCapsule(const char* const className)
+	:ndFileFormatShapeConvex(className)
 {
 }
 
-void ndFileFormatBody::SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body)
+void ndFileFormatShapeConvexCapsule::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndBody::StaticClassName());
+	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndShapeCapsule::StaticClassName());
 	parentNode->LinkEndChild(classNode);
+	ndFileFormatShapeConvex::SaveShape(classNode, shape);
 
-	xmlSaveParam(classNode, body->GetMatrix());
-	xmlSaveParam(classNode, "omega", body->GetOmega());
-	xmlSaveParam(classNode, "velocity", body->GetVelocity());
-	xmlSaveParam(classNode, "centerOfMass", body->GetCentreOfMass());
+	const ndShapeCapsule* const capsule = (ndShapeCapsule*)shape;
 
-	ndBodyNotify* const notity = body->GetNotifyCallback();
-	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(notity->ClassName());
-	ndAssert(handler);
-	if (handler)
-	{
-		nd::TiXmlElement* const notifyNode = new nd::TiXmlElement("Notify");
-		classNode->LinkEndChild(notifyNode);
-		handler->SaveNotify(notifyNode, notity);
-	}
+	xmlSaveParam(classNode, "height", capsule->m_height);
+	xmlSaveParam(classNode, "radius0", capsule->m_radius0);
+	xmlSaveParam(classNode, "radius1", capsule->m_radius1);
 }

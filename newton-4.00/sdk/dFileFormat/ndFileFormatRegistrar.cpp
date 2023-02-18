@@ -20,16 +20,19 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatRegistry.h"
+#include "ndFileFormatRegistrar.h"
 #include "ndFileFormatBody.h"
+#include "ndFileFormatShape.h"
 #include "ndFileFormatNotify.h"
+#include "ndFileFormatShapeConvex.h"
 #include "ndFileFormatDynamicBody.h"
 #include "ndFileFormatKinematicBody.h"
 #include "ndFileFormatShapeInstance.h"
+#include "ndFileFormatShapeConvexCapsule.h"
 
-ndFixSizeArray<ndFileFormatRegistry*, 256> ndFileFormatRegistry::m_registry;
+ndFixSizeArray<ndFileFormatRegistrar*, 256> ndFileFormatRegistrar::m_registry;
 
-ndFileFormatRegistry::ndFileFormatRegistry(const char* const className)
+ndFileFormatRegistrar::ndFileFormatRegistrar(const char* const className)
 	:ndClassAlloc()
 	,m_hash(dCRC64(className))
 {
@@ -38,7 +41,7 @@ ndFileFormatRegistry::ndFileFormatRegistry(const char* const className)
 	m_registry.PushBack(this);
 	for (ndInt32 i = m_registry.GetCount() - 2; i >= 0; --i)
 	{
-		ndFileFormatRegistry* const entry = m_registry[i];
+		ndFileFormatRegistrar* const entry = m_registry[i];
 		if (entry->m_hash > m_hash)
 		{
 			m_registry[i] = this;
@@ -51,22 +54,23 @@ ndFileFormatRegistry::ndFileFormatRegistry(const char* const className)
 	}
 }
 
-ndFileFormatRegistry::~ndFileFormatRegistry()
+ndFileFormatRegistrar::~ndFileFormatRegistrar()
 {
 }
 
-void ndFileFormatRegistry::Init()
+void ndFileFormatRegistrar::Init()
 {
 	static ndFileFormatBody body;
+	static ndFileFormatShape shape;
 	static ndFileFormatNotify bodyNotiy;
+	static ndFileFormatShapeConvex shapeConvex;
 	static ndFileFormatDynamicBody dynamicBody;
 	static ndFileFormatShapeInstance collision;
 	static ndFileFormatKinematicBody kinematicBody;
-	
-	
+	static ndFileFormatShapeConvexCapsule shapeCapsule;
 }
 
-ndFileFormatRegistry* ndFileFormatRegistry::GetHandler(const char* const className)
+ndFileFormatRegistrar* ndFileFormatRegistrar::GetHandler(const char* const className)
 {
 	ndUnsigned64 hash = dCRC64(className);
 	ndInt32 i0 = 0;

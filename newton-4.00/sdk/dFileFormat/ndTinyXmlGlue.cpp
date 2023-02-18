@@ -71,25 +71,6 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 }
 
 //void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 count, const ndVector* const array)
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndVector>& array)
-{
-	char* const buffer = ndAlloca(char, array.GetCount() * 4 * 12 + 256);
-	char* ptr = buffer;
-	for (ndInt32 i = 0; i < array.GetCount(); ++i)
-	{
-		for (ndInt32 j = 0; j < 4; ++j)
-		{
-			ptr = FloatToString(ptr, array[i][j]);
-		}
-	}
-	CleanWhiteSpace(buffer);
-
-	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
-	rootNode->LinkEndChild(node);
-	
-	node->SetAttribute("count", array.GetCount());
-	node->SetAttribute("float4Array", buffer);
-}
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndFloat32>& array)
 {
@@ -360,4 +341,24 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	char* ptr1 = FloatToString(ptr0, value.m_y);
 	FloatToString(ptr1, value.m_z);
 	xmlSaveParam(rootNode, name, "float3", buffer);
+}
+
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndVector>& array)
+{
+	char* const buffer = ndAlloca(char, array.GetCount() * 4 * 12 + 256);
+	char* ptr = buffer;
+	for (ndInt32 i = 0; i < array.GetCount(); ++i)
+	{
+		for (ndInt32 j = 0; j < 4; ++j)
+		{
+			ptr = FloatToString(ptr, array[i][j]);
+		}
+	}
+	CleanWhiteSpace(buffer);
+
+	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
+	rootNode->LinkEndChild(node);
+
+	node->SetAttribute("count", array.GetCount());
+	node->SetAttribute("float4Array", buffer);
 }

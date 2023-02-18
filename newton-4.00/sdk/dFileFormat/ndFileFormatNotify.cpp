@@ -23,12 +23,12 @@
 #include "ndFileFormatNotify.h"
 
 ndFileFormatNotify::ndFileFormatNotify()
-	:ndFileFormatRegistry(ndBodyNotify::StaticClassName())
+	:ndFileFormatRegistrar(ndBodyNotify::StaticClassName())
 {
 }
 
 ndFileFormatNotify::ndFileFormatNotify(const char* const className)
-	:ndFileFormatRegistry(className)
+	:ndFileFormatRegistrar(className)
 {
 }
 

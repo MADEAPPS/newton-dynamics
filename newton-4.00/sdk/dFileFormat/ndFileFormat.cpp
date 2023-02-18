@@ -21,12 +21,12 @@
 
 #include "ndFileFormatStdafx.h"
 #include "ndFileFormat.h"
-#include "ndFileFormatRegistry.h"
+#include "ndFileFormatRegistrar.h"
 
 ndFileFormat::ndFileFormat()
 	:ndClassAlloc()
 {
-	ndFileFormatRegistry::Init();
+	ndFileFormatRegistrar::Init();
 }
 
 void ndFileFormat::SaveBody(const char* const path, ndBody* const body)
@@ -38,7 +38,7 @@ void ndFileFormat::SaveBody(const char* const path, ndBody* const body)
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
 	asciifile.LinkEndChild(rootNode);
 	
-	ndFileFormatRegistry* const handler = ndFileFormatRegistry::GetHandler(body->ClassName());
+	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(body->ClassName());
 	if (handler)
 	{
 		nd::TiXmlElement* const bodyNode = new nd::TiXmlElement("RigidBody");

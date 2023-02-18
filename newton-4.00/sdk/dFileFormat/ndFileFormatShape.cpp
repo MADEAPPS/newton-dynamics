@@ -20,36 +20,27 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatBody.h"
-#include "ndFileFormatNotify.h"
+#include "ndFileFormatShape.h"
 
-ndFileFormatBody::ndFileFormatBody()
-	:ndFileFormatRegistrar(ndBody::StaticClassName())
+ndFileFormatShape::ndFileFormatShape()
+	:ndFileFormatRegistrar(ndShape::StaticClassName())
 {
 }
 
-ndFileFormatBody::ndFileFormatBody(const char* const className)
+ndFileFormatShape::ndFileFormatShape(const char* const className)
 	:ndFileFormatRegistrar(className)
 {
 }
 
-void ndFileFormatBody::SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body)
+void ndFileFormatShape::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndBody::StaticClassName());
+	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndShape::StaticClassName());
 	parentNode->LinkEndChild(classNode);
 
-	xmlSaveParam(classNode, body->GetMatrix());
-	xmlSaveParam(classNode, "omega", body->GetOmega());
-	xmlSaveParam(classNode, "velocity", body->GetVelocity());
-	xmlSaveParam(classNode, "centerOfMass", body->GetCentreOfMass());
-
-	ndBodyNotify* const notity = body->GetNotifyCallback();
-	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(notity->ClassName());
-	ndAssert(handler);
-	if (handler)
-	{
-		nd::TiXmlElement* const notifyNode = new nd::TiXmlElement("Notify");
-		classNode->LinkEndChild(notifyNode);
-		handler->SaveNotify(notifyNode, notity);
-	}
+	xmlSaveParam(classNode, "inertia", shape->m_inertia);
+	xmlSaveParam(classNode, "crossInertia", shape->m_crossInertia);
+	xmlSaveParam(classNode, "centerOfMass", shape->m_centerOfMass);
+	xmlSaveParam(classNode, "boxSize", shape->m_boxSize);
+	xmlSaveParam(classNode, "boxOrigin", shape->m_boxOrigin);
+	xmlSaveParam(classNode, "collisionId", ndInt32 (shape->m_collisionId));
 }

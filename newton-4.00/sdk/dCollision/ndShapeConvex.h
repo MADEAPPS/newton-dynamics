@@ -98,6 +98,7 @@ class ndShapeConvex: public ndShape
 	ndUnsigned16 m_vertexCount;
 	friend class ndMeshEffect;
 	friend class ndContactSolver;
+	friend class ndFileFormatShapeConvex;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #endif 

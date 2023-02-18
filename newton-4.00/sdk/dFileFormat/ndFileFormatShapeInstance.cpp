@@ -23,12 +23,12 @@
 #include "ndFileFormatShapeInstance.h"
 
 ndFileFormatShapeInstance::ndFileFormatShapeInstance()
-	:ndFileFormatRegistry(ndShapeInstance::StaticClassName())
+	:ndFileFormatRegistrar(ndShapeInstance::StaticClassName())
 {
 }
 
 ndFileFormatShapeInstance::ndFileFormatShapeInstance(const char* const className)
-	:ndFileFormatRegistry(className)
+	:ndFileFormatRegistrar(className)
 {
 }
 
@@ -37,4 +37,13 @@ void ndFileFormatShapeInstance::SaveCollision(nd::TiXmlElement* const parentNode
 	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndShapeInstance::StaticClassName());
 	parentNode->LinkEndChild(classNode);
 
+	const ndShape* const shape = collision->GetShape();
+	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
+	ndAssert(handler);
+
+	nd::TiXmlElement* const shapeNode = new nd::TiXmlElement("Shape");
+	classNode->LinkEndChild(shapeNode);
+	handler->SaveShape(shapeNode, shape);
+
+	ndAssert(0);
 }

@@ -19,19 +19,19 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_FILE_FORMAT_BODY_H__
-#define _ND_FILE_FORMAT_BODY_H__
+#ifndef _ND_FILE_FORMAT_SHAPE_CONVEX_H__
+#define _ND_FILE_FORMAT_SHAPE_CONVEX_H__
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatRegistrar.h"
+#include "ndFileFormatShape.h"
 
-class ndFileFormatBody : public ndFileFormatRegistrar
+class ndFileFormatShapeConvex : public ndFileFormatShape
 {
 	public: 
-	ndFileFormatBody();
-	ndFileFormatBody(const char* const className);
+	ndFileFormatShapeConvex();
+	ndFileFormatShapeConvex(const char* const className);
 
-	virtual void SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body);
+	virtual void SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape);
 };
 
 #endif 

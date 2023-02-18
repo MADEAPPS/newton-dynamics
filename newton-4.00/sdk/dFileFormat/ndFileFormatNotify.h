@@ -23,9 +23,9 @@
 #define _ND_FILE_FORMAT_NOTIFY_H__
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatRegistry.h"
+#include "ndFileFormatRegistrar.h"
 
-class ndFileFormatNotify : public ndFileFormatRegistry
+class ndFileFormatNotify : public ndFileFormatRegistrar
 {
 	public: 
 	ndFileFormatNotify();

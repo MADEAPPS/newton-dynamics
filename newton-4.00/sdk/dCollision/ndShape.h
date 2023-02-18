@@ -270,6 +270,8 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	ndShapeID m_collisionId;
 	static ndVector m_flushZero;
 
+	friend class ndFileFormatShape;
+
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndInt32 ndShape::GetConvexVertexCount() const

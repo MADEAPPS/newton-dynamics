@@ -25,38 +25,44 @@
 #include "ndFileFormatStdafx.h"
 #include "ndTinyXmlGlue.h"
 
-class ndFileFormatRegistry : public ndClassAlloc
+class ndFileFormatRegistrar : public ndClassAlloc
 {
 	protected:	
-	ndFileFormatRegistry(const char* const className);
-	virtual ~ndFileFormatRegistry();
+	ndFileFormatRegistrar(const char* const className);
+	virtual ~ndFileFormatRegistrar();
 	
 	public:
 	virtual void SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body);
+	virtual void SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape);
 	virtual void SaveNotify(nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify);
 	virtual void SaveCollision(nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision);
 
-	static ndFileFormatRegistry* GetHandler(const char* const className);
+	static ndFileFormatRegistrar* GetHandler(const char* const className);
 
 	private:
 	static void Init();
-	static ndFixSizeArray<ndFileFormatRegistry*, 256> m_registry;
+	static ndFixSizeArray<ndFileFormatRegistrar*, 256> m_registry;
 
 	ndUnsigned64 m_hash;
 	friend class ndFileFormat;
 };
 
-inline void ndFileFormatRegistry::SaveBody(nd::TiXmlElement* const, const ndBody* const)
+inline void ndFileFormatRegistrar::SaveBody(nd::TiXmlElement* const, const ndBody* const)
 {
 	ndAssert(0);
 }
 
-inline void ndFileFormatRegistry::SaveNotify(nd::TiXmlElement* const, const ndBodyNotify* const)
+inline void ndFileFormatRegistrar::SaveNotify(nd::TiXmlElement* const, const ndBodyNotify* const)
 {
 	ndAssert(0);
 }
 
-inline void ndFileFormatRegistry::SaveCollision(nd::TiXmlElement* const, const ndShapeInstance* const)
+inline void ndFileFormatRegistrar::SaveShape(nd::TiXmlElement* const, const ndShape* const)
+{
+	ndAssert(0);
+}
+
+inline void ndFileFormatRegistrar::SaveCollision(nd::TiXmlElement* const, const ndShapeInstance* const)
 {
 	ndAssert(0);
 }

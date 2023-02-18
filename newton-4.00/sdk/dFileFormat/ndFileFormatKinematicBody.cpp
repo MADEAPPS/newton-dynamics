@@ -56,12 +56,10 @@ void ndFileFormatKinematicBody::SaveBody(nd::TiXmlElement* const parentNode, con
 	xmlSaveParam(classNode, "maxLinearStep", kinematic->GetMaxLinearStep());
 
 	const ndShapeInstance* const collision = &kinematic->GetCollisionShape();
-	ndFileFormatRegistry* const handler = ndFileFormatRegistry::GetHandler(collision->ClassName());
+	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(collision->ClassName());
 	ndAssert(handler);
-	if (handler)
-	{
-		nd::TiXmlElement* const shapeNode = new nd::TiXmlElement("Collision");
-		classNode->LinkEndChild(shapeNode);
-		handler->SaveCollision(shapeNode, collision);
-	}
+	//nd::TiXmlElement* const shapeNode = new nd::TiXmlElement("Collision");
+	//classNode->LinkEndChild(shapeNode);
+	handler->SaveCollision(classNode, collision);
+
 }

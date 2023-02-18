@@ -23,9 +23,9 @@
 #define _ND_FILE_FORMAT_SHAPE_INSTANCE_H__
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatRegistry.h"
+#include "ndFileFormatRegistrar.h"
 
-class ndFileFormatShapeInstance : public ndFileFormatRegistry
+class ndFileFormatShapeInstance : public ndFileFormatRegistrar
 {
 	public: 
 	ndFileFormatShapeInstance();
