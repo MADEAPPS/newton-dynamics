@@ -297,7 +297,7 @@ nd::TiXmlElement* xmlCreateClassNode(nd::TiXmlElement* const parent, const char*
 {
 	nd::TiXmlElement* const node = new nd::TiXmlElement(className);
 	parent->LinkEndChild(node);
-	node->SetAttribute("name", name);
+	node->SetAttribute("className", name);
 	return node;
 }
 

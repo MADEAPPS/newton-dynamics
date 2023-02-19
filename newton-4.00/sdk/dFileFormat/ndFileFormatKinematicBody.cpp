@@ -39,7 +39,12 @@ void ndFileFormatKinematicBody::SaveBody(nd::TiXmlElement* const parentNode, con
 
 	ndBodyKinematic* const kinematic = ((ndBody*)body)->GetAsBodyKinematic();
 	ndAssert(kinematic);
-	
+
+	const ndShapeInstance* const collision = &kinematic->GetCollisionShape();
+	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(collision->ClassName());
+	ndAssert(handler);
+	handler->SaveCollision(classNode, collision);
+
 	ndFloat32 invMass = kinematic->GetInvMass();
 	xmlSaveParam(classNode, "invMass", invMass);
 	if (invMass > ndFloat32(0.0f))
@@ -49,13 +54,10 @@ void ndFileFormatKinematicBody::SaveBody(nd::TiXmlElement* const parentNode, con
 		ndVector inertia(kinematic->GetMassMatrix());
 		xmlSaveParam(classNode, "inertia", inertia);
 		kinematic->GetPrincipalAxis().CalcPitchYawRoll(euler0, euler1);
+		euler0 = euler0.Scale(ndRadToDegree);
 		xmlSaveParam(classNode, "principalAxis", euler0);
 	}
-	xmlSaveParam(classNode, "maxAngleStep", kinematic->GetMaxAngularStep());
+	
 	xmlSaveParam(classNode, "maxLinearStep", kinematic->GetMaxLinearStep());
-
-	const ndShapeInstance* const collision = &kinematic->GetCollisionShape();
-	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(collision->ClassName());
-	ndAssert(handler);
-	handler->SaveCollision(classNode, collision);
+	xmlSaveParam(classNode, "maxAngleStep", kinematic->GetMaxAngularStep() * ndRadToDegree);
 }

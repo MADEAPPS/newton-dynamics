@@ -37,18 +37,13 @@ void ndFileFormatBody::SaveBody(nd::TiXmlElement* const parentNode, const ndBody
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBody::StaticClassName());
 
+	ndBodyNotify* const notity = body->GetNotifyCallback();
+	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(notity->ClassName());
+	ndAssert(handler);
+	handler->SaveNotify(classNode, notity);
+
 	xmlSaveParam(classNode, "matrix", body->GetMatrix());
 	xmlSaveParam(classNode, "omega", body->GetOmega());
 	xmlSaveParam(classNode, "velocity", body->GetVelocity());
 	xmlSaveParam(classNode, "centerOfMass", body->GetCentreOfMass());
-
-	ndBodyNotify* const notity = body->GetNotifyCallback();
-	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(notity->ClassName());
-	ndAssert(handler);
-	if (handler)
-	{
-		nd::TiXmlElement* const notifyNode = new nd::TiXmlElement("Notify");
-		classNode->LinkEndChild(notifyNode);
-		handler->SaveNotify(notifyNode, notity);
-	}
 }
