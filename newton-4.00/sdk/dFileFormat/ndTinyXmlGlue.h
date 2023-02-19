@@ -27,13 +27,6 @@
 
 
 #if 0
-
-
-
-
-
-
-
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value);
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndFloat32>& array);
 
@@ -57,6 +50,7 @@ const nd::TiXmlNode* xmlFind(const nd::TiXmlNode* const rootNode, const char* co
 
 #endif
 
+void xmlReserClassId();
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const type, const char* const value);
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 value);

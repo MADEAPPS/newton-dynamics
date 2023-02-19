@@ -26,6 +26,7 @@
 ndFileFormat::ndFileFormat()
 	:ndClassAlloc()
 {
+	xmlReserClassId();
 	ndFileFormatRegistrar::Init();
 }
 

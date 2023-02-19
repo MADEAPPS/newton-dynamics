@@ -293,11 +293,19 @@ const nd::TiXmlNode* xmlFind(const nd::TiXmlNode* const rootNode, const char* co
 #endif
 
 
+static ndInt32 g_classId = 0;
+void xmlReserClassId()
+{
+	g_classId = 0;
+}
+
 nd::TiXmlElement* xmlCreateClassNode(nd::TiXmlElement* const parent, const char* const className, const char* const name)
 {
 	nd::TiXmlElement* const node = new nd::TiXmlElement(className);
 	parent->LinkEndChild(node);
 	node->SetAttribute("className", name);
+	node->SetAttribute("classId", g_classId);
+	g_classId++;
 	return node;
 }
 
