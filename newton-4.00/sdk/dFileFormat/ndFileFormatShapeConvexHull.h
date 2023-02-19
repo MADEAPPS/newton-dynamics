@@ -19,24 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_FILE_FORMAT_SHAPE_CONVEX_HULL_H__
+#define _ND_FILE_FORMAT_SHAPE_CONVEX_HULL_H__
+
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatShapeConvexSphere.h"
+#include "ndFileFormatShapeConvex.h"
 
-ndFileFormatShapeConvexSphere::ndFileFormatShapeConvexSphere()
-	:ndFileFormatShapeConvex(ndShapeSphere::StaticClassName())
+class ndFileFormatShapeConvexHull : public ndFileFormatShapeConvex
 {
-}
+	public: 
+	ndFileFormatShapeConvexHull();
+	ndFileFormatShapeConvexHull(const char* const className);
 
-ndFileFormatShapeConvexSphere::ndFileFormatShapeConvexSphere(const char* const className)
-	:ndFileFormatShapeConvex(className)
-{
-}
+	virtual void SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape);
+};
 
-void ndFileFormatShapeConvexSphere::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
-{
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeSphere::StaticClassName());
-	ndFileFormatShapeConvex::SaveShape(classNode, shape);
+#endif 
 
-	const ndShapeSphere* const subShape = (ndShapeSphere*)shape;
-	xmlSaveParam(classNode, "radius", subShape->m_radius);
-}

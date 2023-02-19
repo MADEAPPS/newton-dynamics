@@ -1004,6 +1004,17 @@ void ndShapeCompound::EndAddRemove()
 	}
 }
 
+//void ndShapeCompound::RemoveNode(ndTreeArray::ndNode* const node)
+void ndShapeCompound::RemoveNode(ndTreeArray::ndNode* const)
+{
+	ndAssert(0);
+}
+
+ndShapeInstance* ndShapeCompound::GetShapeInstance(ndTreeArray::ndNode* const node)
+{
+	return node->GetInfo()->GetShape();
+}
+
 ndShapeCompound::ndTreeArray::ndNode* ndShapeCompound::AddCollision(ndShapeInstance* const subInstance)
 {
 	ndAssert(m_myInstance);

@@ -29,8 +29,13 @@ class ndFileFormat : public ndClassAlloc
 {
 	public: 
 	ndFileFormat();
+	~ndFileFormat();
 
-	void SaveBody(const char* const path, ndBody* const body);
+	void CollectScene(const ndWorld* const world);
+
+	void SaveBodies(const char* const path);
+
+	ndArray<ndBody*> m_bodies;
 };
 
 #endif 

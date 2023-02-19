@@ -20,20 +20,32 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatShapeConvex.h"
+#include "ndFileFormatShapeCompound.h"
 
-ndFileFormatShapeConvex::ndFileFormatShapeConvex()
-	:ndFileFormatShape(ndShapeConvex::StaticClassName())
+ndFileFormatShapeCompound::ndFileFormatShapeCompound()
+	:ndFileFormatShape(ndShapeCompound::StaticClassName())
 {
 }
 
-ndFileFormatShapeConvex::ndFileFormatShapeConvex(const char* const className)
+ndFileFormatShapeCompound::ndFileFormatShapeCompound(const char* const className)
 	:ndFileFormatShape(className)
 {
 }
 
-void ndFileFormatShapeConvex::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
+void ndFileFormatShapeCompound::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeConvex::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeCompound::StaticClassName());
 	ndFileFormatShape::SaveShape(classNode, shape);
+
+	ndShapeCompound* const compoundShape = (ndShapeCompound*)shape;
+	const ndShapeCompound::ndTreeArray& shapeList = compoundShape->GetTree();
+
+	ndShapeCompound::ndTreeArray::Iterator it(shapeList);
+	for (it.Begin(); it; it++)
+	{
+		ndShapeInstance* const childInstance = compoundShape->GetShapeInstance(it.GetNode());
+		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(childInstance->ClassName());
+		ndAssert(handler);
+		handler->SaveCollision(classNode, childInstance);
+	}
 }

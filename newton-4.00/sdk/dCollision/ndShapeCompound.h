@@ -55,7 +55,9 @@ class ndShapeCompound: public ndShape
 	D_COLLISION_API const ndTreeArray& GetTree() const;
 
 	D_COLLISION_API virtual void BeginAddRemove();
+	D_COLLISION_API virtual void RemoveNode(ndTreeArray::ndNode* const node);
 	D_COLLISION_API virtual ndTreeArray::ndNode* AddCollision(ndShapeInstance* const part);
+	D_COLLISION_API virtual ndShapeInstance* GetShapeInstance(ndTreeArray::ndNode* const node);
 	D_COLLISION_API virtual void EndAddRemove();
 
 	protected:
@@ -101,6 +103,7 @@ class ndShapeCompound: public ndShape
 	friend class ndBodyKinematic;
 	friend class ndShapeInstance;
 	friend class ndContactSolver;
+	friend class ndFileFormatShapeCompound;
 };
 
 inline ndShapeCompound* ndShapeCompound::GetAsShapeCompound()

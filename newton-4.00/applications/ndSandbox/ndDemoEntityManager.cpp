@@ -41,9 +41,9 @@
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
-//#define DEFAULT_SCENE	4		// conservation of momentum 
+#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
-#define DEFAULT_SCENE	6		// basic Trigger
+//#define DEFAULT_SCENE	6		// basic Trigger
 //#define DEFAULT_SCENE	7		// particle fluid
 //#define DEFAULT_SCENE	8		// static mesh collision 
 //#define DEFAULT_SCENE	9		// static user mesh collision 

@@ -28,8 +28,10 @@
 #include "ndFileFormatDynamicBody.h"
 #include "ndFileFormatKinematicBody.h"
 #include "ndFileFormatShapeInstance.h"
+#include "ndFileFormatShapeCompound.h"
 #include "ndFileFormatShapeConvexBox.h"
 #include "ndFileFormatShapeConvexCone.h"
+#include "ndFileFormatShapeConvexHull.h"
 #include "ndFileFormatBodyTriggerVolume.h"
 #include "ndFileFormatKinematicBodyBase.h"
 #include "ndFileFormatShapeConvexSphere.h"
@@ -70,17 +72,19 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatBody body;
 	static ndFileFormatShape shape;
 	static ndFileFormatNotify bodyNotiy;
-	static ndFileFormatShapeConvex shapeConvex;
 	static ndFileFormatDynamicBody dynamicBody;
 	static ndFileFormatShapeInstance collision;
 	static ndFileFormatKinematicBody kinematicBody;
 	static ndFileFormatBodyTriggerVolume triggerVolume;
 	static ndFileFormatKinematicBodyBase kinematicBodyBase;
 
+	static ndFileFormatShapeConvex shapeConvex;
 	static ndFileFormatShapeConvexBox shapeBox;
 	static ndFileFormatShapeConvexCone shapeCone;
+	static ndFileFormatShapeCompound shapeCompound;
 	static ndFileFormatShapeConvexSphere shapeSphere;
 	static ndFileFormatShapeConvexCapsule shapeCapsule;
+	static ndFileFormatShapeConvexHull shapeConvexHull;
 	static ndFileFormatShapeConvexCylinder shapeCylinder;
 	static ndFileFormatShapeConvexChamferCylinder shapeChamferCylinder;
 }

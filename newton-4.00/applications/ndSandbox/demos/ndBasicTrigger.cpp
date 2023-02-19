@@ -105,22 +105,15 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 	};
 
 	AddBox(scene, PlaceMatrix(0.0f, 20.0f, -3.0f), 0.6f, 10.0f);
-	//AddSphere1(scene, PlaceMatrix(0.0f, 5.0f, 0.0f), 0.5f, 10.0f);
-	//AddCapsule(scene, PlaceMatrix(0.0f, 5.0f, 3.0f), 0.7f, 10.0f);
-	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f, -2.0f), 7, 1.0f, 1.5f, 0.8f, 10.0f);
-	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  2.0f), 21, 1.0f, 1.5f, 0.7f, 10.0f);
-	//AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 210, 1.0f, 1.5f, 0.9f, 10.0f);
+	AddSphere1(scene, PlaceMatrix(0.0f, 5.0f, 0.0f), 0.5f, 10.0f);
+	AddCapsule(scene, PlaceMatrix(0.0f, 5.0f, 3.0f), 0.7f, 10.0f);
+	AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f, -2.0f), 7, 1.0f, 1.5f, 0.8f, 10.0f);
+	AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  2.0f), 21, 1.0f, 1.5f, 0.7f, 10.0f);
+	AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 210, 1.0f, 1.5f, 0.9f, 10.0f);
 
-
-	int xxxxxx = 0;
-	for (ndBodyListView::ndNode* node = scene->GetWorld()->GetBodyList().GetFirst(); node; node = node->GetNext())
-	{
-		char name[64];
-		ndFileFormat xxxx;
-		sprintf(name, "xxxx%d.nd", xxxxxx);
-		xxxxxx++;
-		xxxx.SaveBody(name, *node->GetInfo());
-	}
+	//ndFileFormat xxxx;
+	//xxxx.CollectScene(scene->GetWorld());
+	//xxxx.SaveBodies("xxxx.nd");
 
 	ndQuaternion rot;
 	ndVector origin(-40.0f, 5.0f, 0.0f, 1.0f);

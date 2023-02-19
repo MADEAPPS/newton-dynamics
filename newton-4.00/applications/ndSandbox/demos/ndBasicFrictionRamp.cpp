@@ -166,15 +166,9 @@ void ndBasicFrictionRamp (ndDemoEntityManager* const scene)
 	//ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 
 	
-	//int xxxxxx = 0;
-	//for (ndBodyListView::ndNode* node = scene->GetWorld()->GetBodyList().GetFirst(); node; node = node->GetNext())
-	//{
-	//	char name[64];
-	//	ndFileFormat xxxx;
-	//	sprintf(name, "xxxx%d.nd", xxxxxx);
-	//	xxxxxx++;
-	//	xxxx.SaveBody(name, *node->GetInfo());
-	//}
+	ndFileFormat xxxx;
+	xxxx.CollectScene(scene->GetWorld());
+	xxxx.SaveBodies("xxxx.nd");
 
 	ndMatrix camMatrix(ndRollMatrix(10.0f * ndDegreeToRad) *  ndYawMatrix(20.0f * ndDegreeToRad));
 	ndQuaternion rot(camMatrix);

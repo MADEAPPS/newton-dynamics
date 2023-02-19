@@ -25,29 +25,48 @@
 
 ndFileFormat::ndFileFormat()
 	:ndClassAlloc()
+	,m_bodies()
 {
 	xmlReserClassId();
 	ndFileFormatRegistrar::Init();
 }
 
-void ndFileFormat::SaveBody(const char* const path, ndBody* const body)
+ndFileFormat::~ndFileFormat()
+{
+}
+
+void ndFileFormat::CollectScene(const ndWorld* const world)
+{
+	m_bodies.SetCount(0);
+	for (ndBodyListView::ndNode* node = world->GetBodyList().GetFirst(); node; node = node->GetNext())
+	{
+		ndBody* const body = *node->GetInfo();
+		m_bodies.PushBack(body);
+	}
+}
+
+
+//void ndFileFormat::SaveBody(const char* const path, ndBody* const body)
+void ndFileFormat::SaveBodies(const char* const path)
 {
 	nd::TiXmlDocument asciifile;
 	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
 	asciifile.LinkEndChild(decl);
-
+	
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
 	asciifile.LinkEndChild(rootNode);
 	
-	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(body->ClassName());
-	ndAssert(handler);
-	if (handler)
+	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 	{
-		//nd::TiXmlElement* const bodyNode = new nd::TiXmlElement("RigidBody");
-		//rootNode->LinkEndChild(bodyNode);
-		handler->SaveBody(rootNode, body);
+		ndBody* const body = m_bodies[i];
+		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(body->ClassName());
+		ndAssert(handler);
+		if (handler)
+		{
+			handler->SaveBody(rootNode, body);
+		}
 	}
-
+	
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");
 	asciifile.SaveFile(path);

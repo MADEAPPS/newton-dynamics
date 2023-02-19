@@ -34,8 +34,7 @@ ndFileFormatShapeConvexCylinder::ndFileFormatShapeConvexCylinder(const char* con
 
 void ndFileFormatShapeConvexCylinder::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndShapeCylinder::StaticClassName());
-	parentNode->LinkEndChild(classNode);
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeCylinder::StaticClassName());
 	ndFileFormatShapeConvex::SaveShape(classNode, shape);
 
 	const ndShapeCylinder* const cylinder = (ndShapeCylinder*)shape;

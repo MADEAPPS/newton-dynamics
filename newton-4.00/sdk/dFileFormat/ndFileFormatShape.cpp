@@ -34,12 +34,12 @@ ndFileFormatShape::ndFileFormatShape(const char* const className)
 
 void ndFileFormatShape::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShape::StaticClassName());
-
-	xmlSaveParam(classNode, "inertia", shape->m_inertia);
-	xmlSaveParam(classNode, "crossInertia", shape->m_crossInertia);
-	xmlSaveParam(classNode, "centerOfMass", shape->m_centerOfMass);
-	xmlSaveParam(classNode, "boxSize", shape->m_boxSize);
-	xmlSaveParam(classNode, "boxOrigin", shape->m_boxOrigin);
-	xmlSaveParam(classNode, "collisionId", ndInt32 (shape->m_collisionId));
+	xmlCreateClassNode(parentNode, "ndShape", ndShape::StaticClassName());
+	//nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShape::StaticClassName());
+	//xmlSaveParam(classNode, "inertia", shape->m_inertia);
+	//xmlSaveParam(classNode, "crossInertia", shape->m_crossInertia);
+	//xmlSaveParam(classNode, "centerOfMass", shape->m_centerOfMass);
+	//xmlSaveParam(classNode, "boxSize", shape->m_boxSize);
+	//xmlSaveParam(classNode, "boxOrigin", shape->m_boxOrigin);
+	//xmlSaveParam(classNode, "collisionId", ndInt32 (shape->m_collisionId));
 }

@@ -201,9 +201,9 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, ndGetIdentityMatrix()); 
 
 	// should spins very slowly, with a tilt angle of 30 degrees
-	//CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -12.0f, 0.0f), 10.0f, 50.0f, 0.6f, 0.5f, 30.0f);
-	//CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -10.0f, 0.0f), 10.0f, 100.0f, 0.6f, 0.5f, 0.0f);
-	//CreateFlyWheel(scene, ndVector(15.0f, 0.0f,  -8.0f, 0.0f), 10.0f, -30.0f, 0.6f, 0.5f, 0.0f);
+	CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -12.0f, 0.0f), 10.0f, 50.0f, 0.6f, 0.5f, 30.0f);
+	CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -10.0f, 0.0f), 10.0f, 100.0f, 0.6f, 0.5f, 0.0f);
+	CreateFlyWheel(scene, ndVector(15.0f, 0.0f,  -8.0f, 0.0f), 10.0f, -30.0f, 0.6f, 0.5f, 0.0f);
 	
 	DzhanibekovEffect(scene, 10.0f, 5.0f, ndVector(15.0f, 0.0f, -4.0f, 0.0f));
 	DzhanibekovEffect(scene, 10.0f, -5.0f, ndVector(15.0f, 0.0f, 0.0f, 0.0f));
@@ -223,15 +223,10 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	
 	scene->GetCameraManager()->SetPickMode(true);
 
-	//int xxxxxx = 0;
-	//for (ndBodyListView::ndNode* node = scene->GetWorld()->GetBodyList().GetFirst(); node; node = node->GetNext())
-	//{
-	//	char name[64];
-	//	ndFileFormat xxxx;
-	//	sprintf(name, "xxxx%d.nd", xxxxxx);
-	//	xxxxxx++;
-	//	xxxx.SaveBody(name, *node->GetInfo());
-	//}
+
+	ndFileFormat xxxx;
+	xxxx.CollectScene(scene->GetWorld());
+	xxxx.SaveBodies("xxxx.nd");
 
 	ndQuaternion rot;
 	ndVector origin(-15.0f, 5.0f, 0.0f, 1.0f);

@@ -20,23 +20,28 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatShapeConvexSphere.h"
+#include "ndFileFormatShapeConvexHull.h"
 
-ndFileFormatShapeConvexSphere::ndFileFormatShapeConvexSphere()
-	:ndFileFormatShapeConvex(ndShapeSphere::StaticClassName())
+ndFileFormatShapeConvexHull::ndFileFormatShapeConvexHull()
+	:ndFileFormatShapeConvex(ndShapeConvexHull::StaticClassName())
 {
 }
 
-ndFileFormatShapeConvexSphere::ndFileFormatShapeConvexSphere(const char* const className)
+ndFileFormatShapeConvexHull::ndFileFormatShapeConvexHull(const char* const className)
 	:ndFileFormatShapeConvex(className)
 {
 }
 
-void ndFileFormatShapeConvexSphere::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
+void ndFileFormatShapeConvexHull::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeSphere::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeConvexHull::StaticClassName());
 	ndFileFormatShapeConvex::SaveShape(classNode, shape);
 
-	const ndShapeSphere* const subShape = (ndShapeSphere*)shape;
-	xmlSaveParam(classNode, "radius", subShape->m_radius);
+	ndArray<ndVector> points;
+	const ndShapeConvexHull* const convexShape = (ndShapeConvexHull*)shape;
+	for (ndInt32 i = 0; i < convexShape->m_vertexCount; ++i)
+	{
+		points.PushBack(convexShape->m_vertex[i]);
+	}
+	xmlSaveParam(classNode, "points", points);
 }
