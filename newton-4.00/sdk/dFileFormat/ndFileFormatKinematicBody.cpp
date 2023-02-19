@@ -34,8 +34,7 @@ ndFileFormatKinematicBody::ndFileFormatKinematicBody(const char* const className
 
 void ndFileFormatKinematicBody::SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
-	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndBodyKinematic::StaticClassName());
-	parentNode->LinkEndChild(classNode);
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBodyKinematic::StaticClassName());
 	ndFileFormatBody::SaveBody(classNode, body);
 
 	ndBodyKinematic* const kinematic = ((ndBody*)body)->GetAsBodyKinematic();
@@ -58,8 +57,5 @@ void ndFileFormatKinematicBody::SaveBody(nd::TiXmlElement* const parentNode, con
 	const ndShapeInstance* const collision = &kinematic->GetCollisionShape();
 	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(collision->ClassName());
 	ndAssert(handler);
-	//nd::TiXmlElement* const shapeNode = new nd::TiXmlElement("Collision");
-	//classNode->LinkEndChild(shapeNode);
 	handler->SaveCollision(classNode, collision);
-
 }

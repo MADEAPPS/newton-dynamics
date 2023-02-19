@@ -34,8 +34,7 @@ ndFileFormatShape::ndFileFormatShape(const char* const className)
 
 void ndFileFormatShape::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndShape::StaticClassName());
-	parentNode->LinkEndChild(classNode);
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShape::StaticClassName());
 
 	xmlSaveParam(classNode, "inertia", shape->m_inertia);
 	xmlSaveParam(classNode, "crossInertia", shape->m_crossInertia);

@@ -78,10 +78,10 @@ static void Phitop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 a
 	scene->AddEntity(entity);
 }
 
-static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, const ndVector& origin)
+static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 speed, const ndVector& origin)
 {
 	ndMatrix matrix(ndYawMatrix(45.0f * ndDegreeToRad));
-	//ndMatrix matrix(ndGetIdentityMatrix());
+
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -108,6 +108,9 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, const n
 	shape.SetLocalMatrix(shapeMatrix);
 	body->SetMassMatrix(mass, shape, true);
 	body->SetCentreOfMass(ndVector(0.0f, -0.1f, 0.0f, 0.0f));
+
+	ndVector omega(0.01f, speed, 0.0f, 0.0f);
+	body->SetOmega(omega);
 
 	ndSharedPtr<ndBody> bodyPtr(body);
 	world->AddBody(bodyPtr);
@@ -206,29 +209,29 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	DzhanibekovEffect(scene, 10.0f, -5.0f, ndVector(15.0f, 0.0f, 0.0f, 0.0f));
 	DzhanibekovEffect(scene, 10.0f, 10.0f, ndVector(15.0f, 0.0f, 4.0f, 0.0f));
 	
-	Phitop(scene, 10.0f,  25.0f, ndVector(10.0f, 0.0f, -6.0f, 0.0f));
-	Phitop(scene, 10.0f, -25.0f, ndVector(10.0f, 0.0f, 0.0f, 0.0f));
-	Phitop(scene, 10.0f,  35.0f, ndVector(10.0f, 0.0f, 6.0f, 0.0f));
+	Phitop(scene, 10.0f,  25.0f, ndVector(25.0f, 0.0f, -10.0f, 0.0f));
+	Phitop(scene, 10.0f, -25.0f, ndVector(25.0f, 0.0f, 0.0f, 0.0f));
+	Phitop(scene, 10.0f,  35.0f, ndVector(25.0f, 0.0f, 10.0f, 0.0f));
 	
 	PrecessingTop(scene, ndVector(5.0f, 0.0f, -4.0f, 0.0f));
 	PrecessingTop(scene, ndVector(5.0f, 0.0f, 0.0f, 0.0f));
 	PrecessingTop(scene, ndVector(5.0f, 0.0f, 4.0f, 0.0f));
 
-	RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f, -4.0f, 0.0f));
-	RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f, 0.0f, 0.0f));
-	RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f,  4.0f, 0.0f));
+	RattleBack(scene, 10.0f, -5.0f, ndVector(0.0f, 0.0f, -4.0f, 0.0f));
+	RattleBack(scene, 10.0f, 5.0f, ndVector(0.0f, 0.0f, 0.0f, 0.0f));
+	RattleBack(scene, 10.0f, -5.0f, ndVector(0.0f, 0.0f,  4.0f, 0.0f));
 	
 	scene->GetCameraManager()->SetPickMode(true);
 
-	int xxxxxx = 0;
-	for (ndBodyListView::ndNode* node = scene->GetWorld()->GetBodyList().GetFirst(); node; node = node->GetNext())
-	{
-		char name[64];
-		ndFileFormat xxxx;
-		sprintf(name, "xxxx%d.nd", xxxxxx);
-		xxxxxx++;
-		xxxx.SaveBody(name, *node->GetInfo());
-	}
+	//int xxxxxx = 0;
+	//for (ndBodyListView::ndNode* node = scene->GetWorld()->GetBodyList().GetFirst(); node; node = node->GetNext())
+	//{
+	//	char name[64];
+	//	ndFileFormat xxxx;
+	//	sprintf(name, "xxxx%d.nd", xxxxxx);
+	//	xxxxxx++;
+	//	xxxx.SaveBody(name, *node->GetInfo());
+	//}
 
 	ndQuaternion rot;
 	ndVector origin(-15.0f, 5.0f, 0.0f, 1.0f);

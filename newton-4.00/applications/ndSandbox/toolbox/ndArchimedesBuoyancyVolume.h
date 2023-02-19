@@ -19,6 +19,28 @@
 class ndArchimedesBuoyancyVolume: public ndBodyTriggerVolume
 {
 	public:
+
+	class ndFileDemoArchimedesBuoyancyVolume : public ndFileFormatBodyTriggerVolume
+	{
+		public:
+		ndFileDemoArchimedesBuoyancyVolume()
+			:ndFileFormatBodyTriggerVolume(ndArchimedesBuoyancyVolume::StaticClassName())
+		{
+		}
+
+		void SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body)
+		{
+			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndArchimedesBuoyancyVolume::StaticClassName());
+			ndFileFormatBodyTriggerVolume::SaveBody(classNode, body);
+
+			ndArchimedesBuoyancyVolume* const buoyancy = (ndArchimedesBuoyancyVolume*)body;
+			xmlSaveParam(classNode, "planeNormal", buoyancy->m_plane);
+			xmlSaveParam(classNode, "planeDistance", -buoyancy->m_plane.m_w);
+			xmlSaveParam(classNode, "density", buoyancy->m_density);
+			xmlSaveParam(classNode, "hasPlane", buoyancy->m_hasPlane ? 1 : 0);
+		}
+	};
+
 	D_CLASS_REFLECTION(ndArchimedesBuoyancyVolume, ndBodyTriggerVolume)
 	ndArchimedesBuoyancyVolume();
 

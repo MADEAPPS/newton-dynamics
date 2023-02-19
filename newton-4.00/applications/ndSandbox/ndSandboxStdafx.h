@@ -107,6 +107,7 @@
 #include <ndFileFormat.h>
 #include <ndFileFormatNotify.h>
 #include <ndFileFormatRegistrar.h>
+#include <ndFileFormatBodyTriggerVolume.h>
 
 void dGetWorkingFileName (const char* const name, char* const outPathName);
 

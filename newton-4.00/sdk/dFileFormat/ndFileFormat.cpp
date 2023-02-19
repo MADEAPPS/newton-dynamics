@@ -39,11 +39,12 @@ void ndFileFormat::SaveBody(const char* const path, ndBody* const body)
 	asciifile.LinkEndChild(rootNode);
 	
 	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(body->ClassName());
+	ndAssert(handler);
 	if (handler)
 	{
-		nd::TiXmlElement* const bodyNode = new nd::TiXmlElement("RigidBody");
-		rootNode->LinkEndChild(bodyNode);
-		handler->SaveBody(bodyNode, body);
+		//nd::TiXmlElement* const bodyNode = new nd::TiXmlElement("RigidBody");
+		//rootNode->LinkEndChild(bodyNode);
+		handler->SaveBody(rootNode, body);
 	}
 
 	char* const oldloc = setlocale(LC_ALL, 0);

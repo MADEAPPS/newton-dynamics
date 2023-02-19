@@ -19,6 +19,7 @@ ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume()
 	,m_density(1.0f)
 	,m_hasPlane(0)
 {
+	static ndFileDemoArchimedesBuoyancyVolume loadSave;
 }
 
 void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)

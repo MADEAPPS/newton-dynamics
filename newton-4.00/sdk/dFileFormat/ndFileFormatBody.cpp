@@ -35,8 +35,7 @@ ndFileFormatBody::ndFileFormatBody(const char* const className)
 
 void ndFileFormatBody::SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
-	nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndBody::StaticClassName());
-	parentNode->LinkEndChild(classNode);
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBody::StaticClassName());
 
 	xmlSaveParam(classNode, "matrix", body->GetMatrix());
 	xmlSaveParam(classNode, "omega", body->GetOmega());

@@ -27,7 +27,6 @@
 ndBodyTriggerVolume::ndBodyTriggerVolume()
 	:ndBodyKinematicBase()
 {
-	//m_contactTestOnly = 1;
 }
 
 ndBodyTriggerVolume::~ndBodyTriggerVolume()

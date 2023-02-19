@@ -33,13 +33,12 @@ class ndDemoEntityNotify: public ndBodyNotify
 
 		void SaveNotify(nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
 		{
-			nd::TiXmlElement* const classNode = new nd::TiXmlElement(ndDemoEntityNotify::StaticClassName());
-			parentNode->LinkEndChild(classNode);
+			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndNotifyClass", ndDemoEntityNotify::StaticClassName());
 			ndFileFormatNotify::SaveNotify(classNode, notify);
 
-			nd::TiXmlElement* const visualNode = new nd::TiXmlElement("visual");
-			classNode->LinkEndChild(visualNode);
-			xmlSaveParam(visualNode, "useCollisionForVisual", 1);
+			//nd::TiXmlElement* const visualNode = new nd::TiXmlElement("visual");
+			//classNode->LinkEndChild(visualNode);
+			xmlSaveParam(classNode, "useCollisionForVisual", 1);
 		}
 	};
 

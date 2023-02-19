@@ -30,8 +30,11 @@
 #include "ndFileFormatShapeInstance.h"
 #include "ndFileFormatShapeConvexBox.h"
 #include "ndFileFormatShapeConvexCone.h"
+#include "ndFileFormatBodyTriggerVolume.h"
+#include "ndFileFormatKinematicBodyBase.h"
 #include "ndFileFormatShapeConvexSphere.h"
 #include "ndFileFormatShapeConvexCapsule.h"
+
 
 ndFixSizeArray<ndFileFormatRegistrar*, 256> ndFileFormatRegistrar::m_registry;
 
@@ -70,6 +73,8 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatDynamicBody dynamicBody;
 	static ndFileFormatShapeInstance collision;
 	static ndFileFormatKinematicBody kinematicBody;
+	static ndFileFormatBodyTriggerVolume triggerVolume;
+	static ndFileFormatKinematicBodyBase kinematicBodyBase;
 
 	static ndFileFormatShapeConvexBox shapeBox;
 	static ndFileFormatShapeConvexCone shapeCone;

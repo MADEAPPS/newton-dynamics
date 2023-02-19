@@ -19,25 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_FILE_FORMAT_KINEMATIC_BODY_BASE_H__
+#define _ND_FILE_FORMAT_KINEMATIC_BODY_BASE_H__
+
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatDynamicBody.h"
+#include "ndFileFormatKinematicBody.h"
 
-ndFileFormatDynamicBody::ndFileFormatDynamicBody()
-	:ndFileFormatKinematicBody(ndBodyDynamic::StaticClassName())
+class ndFileFormatKinematicBodyBase : public ndFileFormatKinematicBody
 {
-}
+	public: 
+	ndFileFormatKinematicBodyBase();
+	ndFileFormatKinematicBodyBase(const char* const className);
 
-ndFileFormatDynamicBody::ndFileFormatDynamicBody(const char* const className)
-	:ndFileFormatKinematicBody(className)
-{
-}
+	virtual void SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body);
+};
 
-void ndFileFormatDynamicBody::SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body)
-{
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBodyDynamic::StaticClassName());
-	ndFileFormatKinematicBody::SaveBody(classNode, body);
+#endif 
 
-	const ndBodyDynamic* const dynamic = ((ndBodyDynamic*)body)->GetAsBodyDynamic();
-	xmlSaveParam(classNode, "linearDampCoef", dynamic->m_dampCoef.m_w);
-	xmlSaveParam(classNode, "angularDampCoef", dynamic->m_dampCoef);
-}
