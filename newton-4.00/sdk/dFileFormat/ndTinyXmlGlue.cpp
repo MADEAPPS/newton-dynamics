@@ -368,7 +368,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	char* ptr = buffer;
 	for (ndInt32 i = 0; i < array.GetCount(); ++i)
 	{
-		for (ndInt32 j = 0; j < 4; ++j)
+		for (ndInt32 j = 0; j < 3; ++j)
 		{
 			ptr = FloatToString(ptr, array[i][j]);
 		}
@@ -379,5 +379,5 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	rootNode->LinkEndChild(node);
 
 	node->SetAttribute("count", array.GetCount());
-	node->SetAttribute("float4Array", buffer);
+	node->SetAttribute("float3Array", buffer);
 }
