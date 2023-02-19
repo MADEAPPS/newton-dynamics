@@ -56,6 +56,7 @@ void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)
 
 void ndArchimedesBuoyancyVolume::OnTriggerEnter(ndBodyKinematic* const body, ndFloat32)
 {
+	ndTrace(("enter trigger body %d\n", body->GetId()));
 	CalculatePlane(body);
 }
 	
@@ -118,7 +119,7 @@ void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, ndFlo
 	}
 }
 
-void ndArchimedesBuoyancyVolume::OnTriggerExit(ndBodyKinematic* const, ndFloat32)
+void ndArchimedesBuoyancyVolume::OnTriggerExit(ndBodyKinematic* const body, ndFloat32)
 {
-	//dTrace(("exit trigger body: %d\n", body->GetId()));
+	ndTrace(("exit trigger body: %d\n", body->GetId()));
 }

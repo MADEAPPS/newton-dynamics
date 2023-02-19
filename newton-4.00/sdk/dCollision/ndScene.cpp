@@ -392,13 +392,12 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 			contact->SetActive(true);
 			if (contactSolver.m_intersectionTestOnly)
 			{
-				if (!contact->m_isIntersetionTestOnly)
+				ndBodyTriggerVolume* const trigger = body1->GetAsBodyTriggerVolume();
+				if (trigger && !contact->m_inTrigger)
 				{
-					ndBodyTriggerVolume* const trigger = body1->GetAsBodyTriggerVolume();
-					if (trigger)
-					{
-						trigger->OnTriggerEnter(body0, m_timestep);
-					}
+					contact->m_inTrigger = 1;
+					ndAssert(contact->m_isIntersetionTestOnly);
+					trigger->OnTriggerEnter(body0, m_timestep);
 				}
 				contact->m_isIntersetionTestOnly = 1;
 			}
@@ -415,9 +414,11 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 			if (contactSolver.m_intersectionTestOnly)
 			{
 				ndBodyTriggerVolume* const trigger = body1->GetAsBodyTriggerVolume();
-				if (trigger)
+				if (trigger && contact->m_inTrigger)
 				{
-					body1->GetAsBodyTriggerVolume()->OnTriggerExit(body0, m_timestep);
+					contact->m_inTrigger = 0;
+					ndAssert(contact->m_isIntersetionTestOnly);
+					trigger->GetAsBodyTriggerVolume()->OnTriggerExit(body0, m_timestep);
 				}
 				contact->m_isIntersetionTestOnly = 1;
 			}

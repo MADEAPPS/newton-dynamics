@@ -42,7 +42,7 @@ void ndBodyTriggerVolume::SpecialUpdate(ndFloat32 timestep)
 	for (it.Begin(); it; it++)
 	{
 		const ndContact* const contact = *it;
-		if (contact->IsActive())
+		if (contact->IsActive() && contact->IsInTrigger())
 		{
 			OnTrigger(contact->GetBody0(), timestep);
 		}
