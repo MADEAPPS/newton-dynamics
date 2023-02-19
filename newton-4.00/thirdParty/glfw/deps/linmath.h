@@ -192,7 +192,7 @@ static inline void mat4x4_rotate(mat4x4 R, mat4x4 M, float x, float y, float z, 
 	vec3 u = {x, y, z};
 
 	if(vec3_len(u) > 1e-4) {
-		mat4x4 T, C, S;
+		mat4x4 T, C, S = {{0}};
 
 		vec3_norm(u, u);
 		mat4x4_from_vec3_mul_outer(T, u, u);
@@ -237,9 +237,9 @@ static inline void mat4x4_rotate_Y(mat4x4 Q, mat4x4 M, float angle)
 	float s = sinf(angle);
 	float c = cosf(angle);
 	mat4x4 R = {
-		{   c, 0.f,   s, 0.f},
+		{   c, 0.f,  -s, 0.f},
 		{ 0.f, 1.f, 0.f, 0.f},
-		{  -s, 0.f,   c, 0.f},
+		{   s, 0.f,   c, 0.f},
 		{ 0.f, 0.f, 0.f, 1.f}
 	};
 	mat4x4_mul(Q, M, R);

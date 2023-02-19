@@ -1,6 +1,6 @@
 //========================================================================
 // Window re-opener (open/close stress test)
-// Copyright (c) Camilla Berglund <elmindreda@glfw.org>
+// Copyright (c) Camilla Löwy <elmindreda@glfw.org>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -33,7 +33,8 @@
 //
 //========================================================================
 
-#include <glad/glad.h>
+#include <glad/gl.h>
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 #include <time.h>
@@ -43,6 +44,7 @@
 #include "linmath.h"
 
 static const char* vertex_shader_text =
+"#version 110\n"
 "uniform mat4 MVP;\n"
 "attribute vec2 vPos;\n"
 "void main()\n"
@@ -51,6 +53,7 @@ static const char* vertex_shader_text =
 "}\n";
 
 static const char* fragment_shader_text =
+"#version 110\n"
 "void main()\n"
 "{\n"
 "    gl_FragColor = vec4(1.0);\n"
@@ -162,7 +165,7 @@ int main(int argc, char** argv)
         glfwSetKeyCallback(window, key_callback);
 
         glfwMakeContextCurrent(window);
-        gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+        gladLoadGL(glfwGetProcAddress);
         glfwSwapInterval(1);
 
         vertex_shader = glCreateShader(GL_VERTEX_SHADER);
