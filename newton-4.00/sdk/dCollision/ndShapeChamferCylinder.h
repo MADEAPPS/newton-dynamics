@@ -60,8 +60,8 @@ class ndShapeChamferCylinder: public ndShapeConvex
 	static ndConvexSimplexEdge m_edgeArray[];
 	static ndVector m_shapesDirs[];
 	static ndVector m_yzMask;
-
-	friend class dgWorld;
+	
+	friend class ndFileFormatShapeConvexChamferCylinder;
 };
 
 #endif 
