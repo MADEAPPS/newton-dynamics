@@ -1224,9 +1224,9 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 				const ndVector dist(node->m_minBox - origin);
 				const ndVector posit(invSize * dist);
 				const ndVector intPosit(posit.GetInt());
-				m_bvhBuildState.m_cellBuffer0[i].m_x = intPosit.m_ix;
-				m_bvhBuildState.m_cellBuffer0[i].m_y = intPosit.m_iy;
-				m_bvhBuildState.m_cellBuffer0[i].m_z = intPosit.m_iz;
+				m_bvhBuildState.m_cellBuffer0[i].m_x = ndInt32(intPosit.m_ix);
+				m_bvhBuildState.m_cellBuffer0[i].m_y = ndInt32(intPosit.m_iy);
+				m_bvhBuildState.m_cellBuffer0[i].m_z = ndInt32(intPosit.m_iz);
 				m_bvhBuildState.m_cellBuffer0[i].m_node = node;
 				max_x = ndMax(ndInt32(intPosit.m_ix), max_x);
 				max_y = ndMax(ndInt32(intPosit.m_iy), max_y);

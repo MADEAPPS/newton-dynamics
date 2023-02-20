@@ -96,10 +96,10 @@ namespace ndZmp
 				effector->SetLocalTargetPosition(posit);
 			}
 
-			ndFloat32 m_yaw;
-			ndFloat32 m_roll;
-			ndFloat32 m_height;
-			ndFloat32 m_swivel;
+			ndReal m_yaw;
+			ndReal m_roll;
+			ndReal m_height;
+			ndReal m_swivel;
 			ndSharedPtr<ndIkSwivelPositionEffector> m_joint;
 		};
 

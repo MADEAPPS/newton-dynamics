@@ -676,7 +676,7 @@ int _glfwPlatformPollJoystick(_GLFWjoystick* js, int mode)
                     if (stateIndex < 0 || stateIndex > 8)
                         stateIndex = 8;
 
-                    _glfwInputJoystickHat(js, pi, states[stateIndex]);
+                    _glfwInputJoystickHat(js, pi, (char)(states[stateIndex]));
                     pi++;
                     break;
                 }
@@ -736,7 +736,7 @@ int _glfwPlatformPollJoystick(_GLFWjoystick* js, int mode)
         if (xis.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT)
             dpad |= GLFW_HAT_LEFT;
 
-        _glfwInputJoystickHat(js, 0, dpad);
+        _glfwInputJoystickHat(js, 0, (char)dpad);
     }
 
     return GLFW_TRUE;
