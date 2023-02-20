@@ -10,8 +10,9 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-option("NEWTON_EXCLUDE_UNIX_TEST" "generate unit test projects" "OFF")
-option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" "ON")
+option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" ON)
+option("NEWTON_BUILD_PHYSIC_EDITOR" "generates authoring tool" OFF)
+option("NEWTON_EXCLUDE_UNIX_TEST" "generate unit test projects" OFF)
 option("NEWTON_BUILD_PROFILER" "build profiler" OFF)
 option("NEWTON_BUILD_SINGLE_THREADED" "single threaded" OFF)
 option("NEWTON_BUILD_SHARED_LIBS" "build shared library" ON)

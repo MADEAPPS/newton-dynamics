@@ -10,11 +10,15 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
+add_subdirectory(toolsAndWrapers)
+
 if (NEWTON_BUILD_TEST)
 	add_subdirectory(ndTest)
 endif()
 
-add_subdirectory(toolsAndWrapers)
+if (NEWTON_BUILD_PHYSIC_EDITOR)
+    add_subdirectory(ndPhysed)
+endif()
 
 if (NEWTON_BUILD_SANDBOX_DEMOS)
 	add_subdirectory(ndSandbox)
