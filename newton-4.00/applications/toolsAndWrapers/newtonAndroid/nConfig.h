@@ -48,7 +48,8 @@
 #define D_OPERATOR_NEW_AND_DELETE
 
 #ifndef D_CLASS_REFLECTION
-	#define D_CLASS_REFLECTION(x)
+	#define D_BASE_CLASS_REFLECTION(x)
+	#define D_CLASS_REFLECTION(x,y)
 #endif
 
 #ifndef D_MSV_NEWTON_ALIGN_16
