@@ -40,7 +40,7 @@ void ndFileFormatBody::SaveBody(ndFileFormat* const scene, nd::TiXmlElement* con
 	ndBodyNotify* const notity = body->GetNotifyCallback();
 	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(notity->ClassName());
 	ndAssert(handler);
-	handler->SaveNotify(classNode, notity);
+	handler->SaveNotify(scene, classNode, notity);
 
 	xmlSaveParam(classNode, "matrix", body->GetMatrix());
 	xmlSaveParam(classNode, "omega", body->GetOmega());

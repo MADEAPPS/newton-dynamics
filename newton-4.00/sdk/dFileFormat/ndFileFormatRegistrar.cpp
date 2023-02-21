@@ -127,17 +127,17 @@ void ndFileFormatRegistrar::SaveBody(ndFileFormat* const, nd::TiXmlElement* cons
 	ndAssert(0);
 }
 
-void ndFileFormatRegistrar::SaveNotify(nd::TiXmlElement* const, const ndBodyNotify* const)
+void ndFileFormatRegistrar::SaveNotify(ndFileFormat* const, nd::TiXmlElement* const, const ndBodyNotify* const)
 {
 	ndAssert(0);
 }
 
-void ndFileFormatRegistrar::SaveShape(nd::TiXmlElement* const, const ndShape* const)
+void ndFileFormatRegistrar::SaveShape(ndFileFormat* const, nd::TiXmlElement* const, const ndShape* const)
 {
 	ndAssert(0);
 }
 
-void ndFileFormatRegistrar::SaveCollision(nd::TiXmlElement* const, const ndShapeInstance* const)
+void ndFileFormatRegistrar::SaveCollision(ndFileFormat* const, nd::TiXmlElement* const, const ndShapeInstance* const)
 {
 	ndAssert(0);
 }

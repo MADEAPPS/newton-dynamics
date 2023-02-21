@@ -32,10 +32,10 @@ ndFileFormatShapeConvexBox::ndFileFormatShapeConvexBox(const char* const classNa
 {
 }
 
-void ndFileFormatShapeConvexBox::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
+void ndFileFormatShapeConvexBox::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeBox::StaticClassName());
-	ndFileFormatShapeConvex::SaveShape(classNode, shape);
+	ndFileFormatShapeConvex::SaveShape(scene, classNode, shape);
 
 	const ndShapeBox* const subShape = (ndShapeBox*)shape;
 

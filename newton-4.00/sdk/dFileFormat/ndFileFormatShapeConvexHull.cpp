@@ -32,10 +32,10 @@ ndFileFormatShapeConvexHull::ndFileFormatShapeConvexHull(const char* const class
 {
 }
 
-void ndFileFormatShapeConvexHull::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
+void ndFileFormatShapeConvexHull::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeConvexHull::StaticClassName());
-	ndFileFormatShapeConvex::SaveShape(classNode, shape);
+	ndFileFormatShapeConvex::SaveShape(scene, classNode, shape);
 
 	ndArray<ndVector> points;
 	const ndShapeConvexHull* const convexShape = (ndShapeConvexHull*)shape;

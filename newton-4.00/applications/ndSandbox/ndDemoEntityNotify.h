@@ -31,10 +31,10 @@ class ndDemoEntityNotify: public ndBodyNotify
 		{
 		}
 
-		void SaveNotify(nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
+		void SaveNotify(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
 		{
 			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndNotifyClass", ndDemoEntityNotify::StaticClassName());
-			ndFileFormatNotify::SaveNotify(classNode, notify);
+			ndFileFormatNotify::SaveNotify(scene, classNode, notify);
 
 			//nd::TiXmlElement* const visualNode = new nd::TiXmlElement("visual");
 			//classNode->LinkEndChild(visualNode);

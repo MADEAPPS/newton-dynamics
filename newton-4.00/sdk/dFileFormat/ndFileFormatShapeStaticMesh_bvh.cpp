@@ -32,10 +32,10 @@ ndFileFormatShapeStaticMesh_bvh::ndFileFormatShapeStaticMesh_bvh(const char* con
 {
 }
 
-void ndFileFormatShapeStaticMesh_bvh::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
+void ndFileFormatShapeStaticMesh_bvh::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeStatic_bvh::StaticClassName());
-	ndFileFormatShapeStaticMesh::SaveShape(classNode, shape);
+	ndFileFormatShapeStaticMesh::SaveShape(scene, classNode, shape);
 	//ndAssert(0);
 
 	ndShapeStatic_bvh* const staticMesh = (ndShapeStatic_bvh*)shape;

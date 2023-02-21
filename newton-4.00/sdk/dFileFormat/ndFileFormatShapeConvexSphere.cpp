@@ -32,10 +32,10 @@ ndFileFormatShapeConvexSphere::ndFileFormatShapeConvexSphere(const char* const c
 {
 }
 
-void ndFileFormatShapeConvexSphere::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
+void ndFileFormatShapeConvexSphere::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeSphere::StaticClassName());
-	ndFileFormatShapeConvex::SaveShape(classNode, shape);
+	ndFileFormatShapeConvex::SaveShape(scene, classNode, shape);
 
 	const ndShapeSphere* const subShape = (ndShapeSphere*)shape;
 	xmlSaveParam(classNode, "radius", subShape->m_radius);

@@ -43,7 +43,7 @@ void ndFileFormatKinematicBody::SaveBody(ndFileFormat* const scene, nd::TiXmlEle
 	const ndShapeInstance* const collision = &kinematic->GetCollisionShape();
 	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(collision->ClassName());
 	ndAssert(handler);
-	handler->SaveCollision(classNode, collision);
+	handler->SaveCollision(scene, classNode, collision);
 
 	ndFloat32 invMass = kinematic->GetInvMass();
 	xmlSaveParam(classNode, "invMass", invMass);

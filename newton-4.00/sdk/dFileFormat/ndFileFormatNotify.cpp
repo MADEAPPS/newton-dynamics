@@ -32,7 +32,7 @@ ndFileFormatNotify::ndFileFormatNotify(const char* const className)
 {
 }
 
-void ndFileFormatNotify::SaveNotify(nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
+void ndFileFormatNotify::SaveNotify(ndFileFormat* const, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndNotifyClass", ndBodyNotify::StaticClassName());
 	xmlSaveParam(classNode, "gravity", notify->GetGravity());

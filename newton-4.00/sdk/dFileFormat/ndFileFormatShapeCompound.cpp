@@ -32,10 +32,10 @@ ndFileFormatShapeCompound::ndFileFormatShapeCompound(const char* const className
 {
 }
 
-void ndFileFormatShapeCompound::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
+void ndFileFormatShapeCompound::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeCompound::StaticClassName());
-	ndFileFormatShape::SaveShape(classNode, shape);
+	ndFileFormatShape::SaveShape(scene, classNode, shape);
 
 	ndShapeCompound* const compoundShape = (ndShapeCompound*)shape;
 	const ndShapeCompound::ndTreeArray& shapeList = compoundShape->GetTree();
@@ -46,6 +46,6 @@ void ndFileFormatShapeCompound::SaveShape(nd::TiXmlElement* const parentNode, co
 		ndShapeInstance* const childInstance = compoundShape->GetShapeInstance(it.GetNode());
 		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(childInstance->ClassName());
 		ndAssert(handler);
-		handler->SaveCollision(classNode, childInstance);
+		handler->SaveCollision(scene, classNode, childInstance);
 	}
 }

@@ -32,7 +32,7 @@ ndFileFormatShapeInstance::ndFileFormatShapeInstance(const char* const className
 {
 }
 
-void ndFileFormatShapeInstance::SaveCollision(nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision)
+void ndFileFormatShapeInstance::SaveCollision(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeInstanceClass", ndShapeInstance::StaticClassName());
 
@@ -40,7 +40,7 @@ void ndFileFormatShapeInstance::SaveCollision(nd::TiXmlElement* const parentNode
 	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
 	ndAssert(handler);
 
-	handler->SaveShape(classNode, shape);
+	handler->SaveShape(scene, classNode, shape);
 	xmlSaveParam(classNode, "scale", collision->m_scale);
 	xmlSaveParam(classNode, "skinMargin", collision->m_skinMargin);
 	xmlSaveParam(classNode, "localMatrix", collision->m_localMatrix);
