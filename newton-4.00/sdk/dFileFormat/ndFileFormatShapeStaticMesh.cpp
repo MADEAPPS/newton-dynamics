@@ -20,19 +20,20 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatShape.h"
+#include "ndFileFormatShapeStaticMesh.h"
 
-ndFileFormatShape::ndFileFormatShape()
-	:ndFileFormatRegistrar(ndShape::StaticClassName())
+ndFileFormatShapeStaticMesh::ndFileFormatShapeStaticMesh()
+	:ndFileFormatShape(ndShapeStaticMesh::StaticClassName())
 {
 }
 
-ndFileFormatShape::ndFileFormatShape(const char* const className)
-	:ndFileFormatRegistrar(className)
+ndFileFormatShapeStaticMesh::ndFileFormatShapeStaticMesh(const char* const className)
+	:ndFileFormatShape(className)
 {
 }
 
-void ndFileFormatShape::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
+void ndFileFormatShapeStaticMesh::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	xmlCreateClassNode(parentNode, "ndShape", ndShape::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeStaticMesh::StaticClassName());
+	ndFileFormatShape::SaveShape(classNode, shape);
 }

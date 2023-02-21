@@ -256,6 +256,11 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 	ndVector origin(ndVector::m_zero);
 
+ndFileFormat xxxx;
+xxxx.CollectScene(scene->GetWorld());
+xxxx.SaveBodies("xxxx.nd");
+
+
 	//ndInt32 pyramidHigh = 10;
 	//ndInt32 pyramidHigh = 20;
 	ndInt32 pyramidHigh = 30;

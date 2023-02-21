@@ -19,20 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_FILE_FORMAT_SHAPE_STATIC_MESH_H__
+#define _ND_FILE_FORMAT_SHAPE_STATIC_MESH_H__
+
 #include "ndFileFormatStdafx.h"
 #include "ndFileFormatShape.h"
 
-ndFileFormatShape::ndFileFormatShape()
-	:ndFileFormatRegistrar(ndShape::StaticClassName())
+class ndFileFormatShapeStaticMesh : public ndFileFormatShape
 {
-}
+	public: 
+	ndFileFormatShapeStaticMesh();
+	ndFileFormatShapeStaticMesh(const char* const className);
 
-ndFileFormatShape::ndFileFormatShape(const char* const className)
-	:ndFileFormatRegistrar(className)
-{
-}
+	virtual void SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape);
+};
 
-void ndFileFormatShape::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
-{
-	xmlCreateClassNode(parentNode, "ndShape", ndShape::StaticClassName());
-}
+#endif 
+
