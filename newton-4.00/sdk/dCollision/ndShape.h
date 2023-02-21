@@ -181,6 +181,10 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeInfo
 {
 	public:
+	ndShapeInfo()
+	{
+		memset(this, 0, sizeof(ndShapeInfo));
+	}
 	ndMatrix m_offsetMatrix;
 	ndVector m_scale;
 	ndShapeMaterial m_shapeMaterial;
@@ -241,6 +245,7 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 
 	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const = 0;
 
+	virtual ndUnsigned64 GetHash() const;
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual ndFloat32 GetVolume() const = 0;
 	virtual ndFloat32 GetBoxMinRadius() const = 0;
@@ -304,6 +309,12 @@ inline ndVector ndShape::GetObbSize() const
 inline ndFloat32 ndShape::GetUmbraClipSize() const
 {
 	return ndFloat32(3.0f) * GetBoxMaxRadius();
+}
+
+inline ndUnsigned64 ndShape::GetHash() const
+{
+	ndAssert(0);
+	return 0;
 }
 
 #endif 

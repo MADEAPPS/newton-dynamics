@@ -34,9 +34,12 @@ class ndFileFormat : public ndClassAlloc
 	void CollectScene(const ndWorld* const world);
 
 	void SaveBodies(const char* const path);
-
+		
 	ndArray<ndBody*> m_bodies;
 	ndString m_fileName;
+
+	private:
+	ndTree<ndShape*, ndUnsigned64> m_uniqueShapes;
 };
 
 #endif 

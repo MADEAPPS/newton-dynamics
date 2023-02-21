@@ -56,6 +56,15 @@ void ndFileFormat::SaveBodies(const char* const path)
 	
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
 	asciifile.LinkEndChild(rootNode);
+
+	m_uniqueShapes.RemoveAll();
+	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+	{
+		ndBodyKinematic* const body = m_bodies[i]->GetAsBodyKinematic();
+		ndShape* const shape = body->GetCollisionShape().GetShape();
+		//ndUnsigned64 hash = shape->GetHash();
+		//m_uniqueShapes.Insert(shape, hash);
+	}
 	
 	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 	{
