@@ -20,6 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
+#include "ndFileFormat.h"
 #include "ndFileFormatShapeStaticMesh_bvh.h"
 
 ndFileFormatShapeStaticMesh_bvh::ndFileFormatShapeStaticMesh_bvh()
@@ -36,16 +37,16 @@ void ndFileFormatShapeStaticMesh_bvh::SaveShape(ndFileFormat* const scene, nd::T
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeStatic_bvh::StaticClassName());
 	ndFileFormatShapeStaticMesh::SaveShape(scene, classNode, shape);
-	//ndAssert(0);
 
+	char fileName[1024];
 	ndShapeStatic_bvh* const staticMesh = (ndShapeStatic_bvh*)shape;
-	//char fileName[1024];
-	//sprintf(fileName, "%s_%d.bin", desc.m_assetName, desc.m_assetIndex);
-	//xmlSaveParam(childNode, "assetName", "string", fileName);
-	//
-	//char filePathName[2 * 1024];
-	//sprintf(filePathName, "%s/%s", desc.m_assetPath, fileName);
-	//desc.m_assetIndex++;
-	//Serialize(filePathName);
-
+	sprintf(fileName, "%s", scene->m_fileName.GetStr());
+	char* const ptr = strrchr(fileName, '.');
+	if (ptr)
+	{
+		ndInt32 nodeId = xmlGetNodeId(classNode);
+		sprintf(ptr, "_%d.bin", nodeId);
+	}
+	xmlSaveParam(classNode, "assetName", "string", fileName);
+	staticMesh->Serialize(fileName);
 }

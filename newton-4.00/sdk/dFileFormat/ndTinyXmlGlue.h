@@ -31,7 +31,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndFloat32>& array);
 
 
-ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name);
+
 ndInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name);
 ndFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name);
 ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name);
@@ -51,6 +51,7 @@ const nd::TiXmlNode* xmlFind(const nd::TiXmlNode* const rootNode, const char* co
 #endif
 
 void xmlReserClassId();
+
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const type, const char* const value);
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 value);
@@ -63,6 +64,8 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 nd::TiXmlElement* xmlCreateClassNode(nd::TiXmlElement* const parent, const char* const className, const char* const name);
 
 
+ndInt32 xmlGetNodeId(const nd::TiXmlNode* const rootNode);
+ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name);
 
 #endif
 

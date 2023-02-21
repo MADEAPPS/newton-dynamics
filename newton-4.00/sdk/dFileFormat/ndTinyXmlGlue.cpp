@@ -99,14 +99,6 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 }
 #endif
 
-ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name)
-{
-	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
-	ndAssert(element);
-	ndInt32 value;
-	element->Attribute("int32", &value);
-	return value;
-}
 
 ndInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name)
 {
@@ -304,7 +296,7 @@ nd::TiXmlElement* xmlCreateClassNode(nd::TiXmlElement* const parent, const char*
 	nd::TiXmlElement* const node = new nd::TiXmlElement(className);
 	parent->LinkEndChild(node);
 	node->SetAttribute("className", name);
-	node->SetAttribute("classId", g_classId);
+	node->SetAttribute("nodeId", g_classId);
 	g_classId++;
 	return node;
 }
@@ -380,4 +372,21 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 
 	node->SetAttribute("count", array.GetCount());
 	node->SetAttribute("float3Array", buffer);
+}
+
+ndInt32 xmlGetNodeId(const nd::TiXmlNode* const rootNode)
+{
+	ndInt32 id;
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode;
+	element->Attribute("nodeId", &id);
+	return id;
+}
+
+ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);
+	ndAssert(element);
+	ndInt32 value;
+	element->Attribute("int32", &value);
+	return value;
 }

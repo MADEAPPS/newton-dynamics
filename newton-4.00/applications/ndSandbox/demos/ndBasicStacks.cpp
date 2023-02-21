@@ -256,11 +256,6 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 	ndVector origin(ndVector::m_zero);
 
-ndFileFormat xxxx;
-xxxx.CollectScene(scene->GetWorld());
-xxxx.SaveBodies("xxxx.nd");
-
-
 	//ndInt32 pyramidHigh = 10;
 	//ndInt32 pyramidHigh = 20;
 	ndInt32 pyramidHigh = 30;
@@ -293,6 +288,10 @@ xxxx.SaveBodies("xxxx.nd");
 
 	origin.m_x -= 15.0f;
 	origin.m_z += 15.0f;
+
+	ndFileFormat xxxx;
+	xxxx.CollectScene(scene->GetWorld());
+	xxxx.SaveBodies("xxxx.nd");
 
 	ndQuaternion rot(ndYawMatrix(45.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);
