@@ -45,10 +45,11 @@ void ndFileFormat::CollectScene(const ndWorld* const world)
 	}
 }
 
-
-//void ndFileFormat::SaveBody(const char* const path, ndBody* const body)
 void ndFileFormat::SaveBodies(const char* const path)
 {
+	// save the path for use with generated assets.
+	m_fileName = path;
+
 	nd::TiXmlDocument asciifile;
 	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
 	asciifile.LinkEndChild(decl);

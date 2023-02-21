@@ -36,6 +36,7 @@ class ndFileFormat : public ndClassAlloc
 	void SaveBodies(const char* const path);
 
 	ndArray<ndBody*> m_bodies;
+	ndString m_fileName;
 };
 
 #endif 
