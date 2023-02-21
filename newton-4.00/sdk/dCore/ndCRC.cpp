@@ -118,7 +118,7 @@ ndUnsigned64 dCRC64 (const void* const buffer, ndInt32 size, ndUnsigned64 crcAcc
 {
 	const unsigned char* const ptr = (unsigned char*)buffer;
 
-	const ndInt32 bitshift = (sizeof (ndUnsigned64)<<3) - 8;
+    const ndInt32 bitshift = 8;
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
 		unsigned char c = ptr[i];

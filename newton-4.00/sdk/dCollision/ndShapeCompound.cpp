@@ -1227,3 +1227,17 @@ ndMatrix ndShapeCompound::CalculateInertiaAndCenterOfMass(const ndMatrix& alignM
 	return inertia;
 }
 
+ndUnsigned64 ndShapeCompound::GetHash(ndUnsigned64 hash) const
+{
+	ndUnsigned64 crc = hash;
+	ndShapeCompound::ndTreeArray::Iterator it(GetTree());
+
+	ndShapeCompound* const compoundShape = (ndShapeCompound*)this;
+	for (it.Begin(); it; it++)
+	{
+		const ndShapeInstance* const childInstance = compoundShape->GetShapeInstance(it.GetNode());
+		const ndShape* const childShape = childInstance->GetShape();
+		crc = childShape->GetHash(crc);
+	}
+	return crc;
+}

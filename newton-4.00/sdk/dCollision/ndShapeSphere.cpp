@@ -265,3 +265,8 @@ void ndShapeSphere::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debug
 	}
 }
 
+ndUnsigned64 ndShapeSphere::GetHash(ndUnsigned64 hash) const
+{
+	ndShapeInfo info(GetShapeInfo());
+	return info.GetHash(hash);
+}

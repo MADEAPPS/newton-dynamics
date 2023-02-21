@@ -467,8 +467,8 @@ ndShapeInfo ndShapeBox::GetShapeInfo() const
 	return info;
 }
 
-ndUnsigned64 ndShapeBox::GetHash() const
+ndUnsigned64 ndShapeBox::GetHash(ndUnsigned64 hash) const
 {
 	ndShapeInfo info(GetShapeInfo());
-	return dCRC64(&info, sizeof(ndShapeInfo), 0);
+	return info.GetHash(hash);
 }

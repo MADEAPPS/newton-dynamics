@@ -500,3 +500,8 @@ void ndShapeCapsule::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVecto
 	p1 = max_q0.GetMax(max_q1) & ndVector::m_triplexMask;
 }
 
+ndUnsigned64 ndShapeCapsule::GetHash(ndUnsigned64 hash) const
+{
+	ndShapeInfo info(GetShapeInfo());
+	return info.GetHash(hash);
+}

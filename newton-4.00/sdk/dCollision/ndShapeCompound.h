@@ -53,6 +53,7 @@ class ndShapeCompound: public ndShape
 	void SetOwner(const ndShapeInstance* const myInstance);
 
 	D_COLLISION_API const ndTreeArray& GetTree() const;
+	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
 
 	D_COLLISION_API virtual void BeginAddRemove();
 	D_COLLISION_API virtual void RemoveNode(ndTreeArray::ndNode* const node);
@@ -63,6 +64,7 @@ class ndShapeCompound: public ndShape
 	protected:
 	class ndSpliteInfo;
 	ndShapeCompound(const ndShapeCompound& source, const ndShapeInstance* const myInstance);
+
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;

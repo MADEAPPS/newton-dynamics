@@ -181,10 +181,9 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeInfo
 {
 	public:
-	ndShapeInfo()
-	{
-		memset(this, 0, sizeof(ndShapeInfo));
-	}
+	ndShapeInfo();
+	ndUnsigned64 GetHash(ndUnsigned64 hash);
+
 	ndMatrix m_offsetMatrix;
 	ndVector m_scale;
 	ndShapeMaterial m_shapeMaterial;
@@ -203,9 +202,9 @@ class ndShapeInfo
 		ndHeighfieldInfo m_heightfield;
 		ndProceduralInfo m_procedural;
 		ndChamferCylinderInfo m_chamferCylinder;
-		
 		ndFloat32 m_paramArray[32];
 	};
+
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -245,11 +244,11 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 
 	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const = 0;
 
-	virtual ndUnsigned64 GetHash() const;
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual ndFloat32 GetVolume() const = 0;
 	virtual ndFloat32 GetBoxMinRadius() const = 0;
 	virtual ndFloat32 GetBoxMaxRadius() const = 0;
+	virtual ndUnsigned64 GetHash(ndUnsigned64 hash = 0) const;
 
 	virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const = 0;
 	virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const = 0;
@@ -274,10 +273,21 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	mutable ndAtomic<ndInt32> m_refCount;
 	ndShapeID m_collisionId;
 	static ndVector m_flushZero;
-
 	friend class ndFileFormatShape;
-
 } D_GCC_NEWTON_ALIGN_32;
+
+inline ndShapeInfo::ndShapeInfo()
+{
+	memset(this, 0, sizeof(ndShapeInfo));
+}
+
+inline ndUnsigned64 ndShapeInfo::GetHash(ndUnsigned64 hash)
+{
+	ndInt32 id = m_collisionType;
+	hash = dCRC64(m_paramArray, sizeof (m_paramArray), hash);
+	hash = dCRC64(&id, sizeof(id), hash);
+	return hash;
+}
 
 inline ndInt32 ndShape::GetConvexVertexCount() const
 {
@@ -311,10 +321,10 @@ inline ndFloat32 ndShape::GetUmbraClipSize() const
 	return ndFloat32(3.0f) * GetBoxMaxRadius();
 }
 
-inline ndUnsigned64 ndShape::GetHash() const
+inline ndUnsigned64 ndShape::GetHash(ndUnsigned64 hash) const
 {
 	ndAssert(0);
-	return 0;
+	return hash;
 }
 
 #endif 

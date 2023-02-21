@@ -41,6 +41,7 @@ class ndShapeSphere: public ndShapeConvex
 	D_COLLISION_API virtual void MassProperties();
 
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
+	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
 	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
 	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	D_COLLISION_API virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;

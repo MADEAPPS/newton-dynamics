@@ -350,3 +350,8 @@ void ndShapeCone::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& 
 	ndShapeConvex::CalculateAabb(matrix, p0, p1);
 }
 
+ndUnsigned64 ndShapeCone::GetHash(ndUnsigned64 hash) const
+{
+	ndShapeInfo info(GetShapeInfo());
+	return info.GetHash(hash);
+}

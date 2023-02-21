@@ -417,3 +417,8 @@ void ndShapeCylinder::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVect
 	ndShapeConvex::CalculateAabb(matrix, p0, p1);
 }
 
+ndUnsigned64 ndShapeCylinder::GetHash(ndUnsigned64 hash) const
+{
+	ndShapeInfo info(GetShapeInfo());
+	return info.GetHash(hash);
+}
