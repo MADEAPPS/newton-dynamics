@@ -196,3 +196,17 @@ void ndShapeStatic_bvh::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	ForAllSectors(*data, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
 
+ndUnsigned64 ndShapeStatic_bvh::GetHash(ndUnsigned64 hash) const
+{
+	const ndFloat32* array = GetLocalVertexPool();
+	ndInt32 vertexCount = GetVertexCount();
+	ndInt32 stride = GetStrideInBytes() / ndInt32 (sizeof(ndFloat32));
+
+	ndAssert(0);
+	for (ndInt32 i = 0; i < vertexCount; ++i)
+	{
+		hash = dCRC64(array, 3 * ndInt32 (sizeof(ndFloat32)), hash);
+		array += stride;
+	}
+	return hash;
+}

@@ -397,3 +397,8 @@ ndInt32 ndShapeChamferCylinder::CalculatePlaneIntersection(const ndVector& norma
 	return count;
 }
 
+ndUnsigned64 ndShapeChamferCylinder::GetHash(ndUnsigned64 hash) const
+{
+	ndShapeInfo info(GetShapeInfo());
+	return info.GetHash(hash);
+}

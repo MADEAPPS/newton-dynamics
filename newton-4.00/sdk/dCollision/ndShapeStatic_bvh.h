@@ -37,6 +37,7 @@ class ndShapeStatic_bvh: public ndShapeStaticMesh, public ndAabbPolygonSoup
 
 	protected:
 	virtual ndShapeInfo GetShapeInfo() const;
+	virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
 	virtual ndShapeStatic_bvh* GetAsShapeStaticBVH() { return this; }
 	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
