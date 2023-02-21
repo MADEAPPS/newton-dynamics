@@ -47,24 +47,5 @@ class ndFileFormatRegistrar : public ndClassAlloc
 	friend class ndFileFormat;
 };
 
-inline void ndFileFormatRegistrar::SaveBody(nd::TiXmlElement* const, const ndBody* const)
-{
-	ndAssert(0);
-}
-
-inline void ndFileFormatRegistrar::SaveNotify(nd::TiXmlElement* const, const ndBodyNotify* const)
-{
-	ndAssert(0);
-}
-
-inline void ndFileFormatRegistrar::SaveShape(nd::TiXmlElement* const, const ndShape* const)
-{
-	ndAssert(0);
-}
-
-inline void ndFileFormatRegistrar::SaveCollision(nd::TiXmlElement* const, const ndShapeInstance* const)
-{
-	ndAssert(0);
-}
 #endif 
 

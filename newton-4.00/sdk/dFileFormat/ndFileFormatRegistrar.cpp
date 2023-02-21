@@ -122,3 +122,22 @@ ndFileFormatRegistrar* ndFileFormatRegistrar::GetHandler(const char* const class
 	return nullptr;
 }
 
+void ndFileFormatRegistrar::SaveBody(nd::TiXmlElement* const, const ndBody* const)
+{
+	ndAssert(0);
+}
+
+void ndFileFormatRegistrar::SaveNotify(nd::TiXmlElement* const, const ndBodyNotify* const)
+{
+	ndAssert(0);
+}
+
+void ndFileFormatRegistrar::SaveShape(nd::TiXmlElement* const, const ndShape* const)
+{
+	ndAssert(0);
+}
+
+void ndFileFormatRegistrar::SaveCollision(nd::TiXmlElement* const, const ndShapeInstance* const)
+{
+	ndAssert(0);
+}

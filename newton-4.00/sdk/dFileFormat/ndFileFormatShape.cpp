@@ -32,7 +32,7 @@ ndFileFormatShape::ndFileFormatShape(const char* const className)
 {
 }
 
-void ndFileFormatShape::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape)
+void ndFileFormatShape::SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const)
 {
 	xmlCreateClassNode(parentNode, "ndShape", ndShape::StaticClassName());
 }
