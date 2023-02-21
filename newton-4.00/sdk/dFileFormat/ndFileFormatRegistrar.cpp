@@ -122,7 +122,7 @@ ndFileFormatRegistrar* ndFileFormatRegistrar::GetHandler(const char* const class
 	return nullptr;
 }
 
-void ndFileFormatRegistrar::SaveBody(nd::TiXmlElement* const, const ndBody* const)
+void ndFileFormatRegistrar::SaveBody(ndFileFormat* const, nd::TiXmlElement* const, const ndBody* const)
 {
 	ndAssert(0);
 }

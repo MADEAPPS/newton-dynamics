@@ -31,7 +31,7 @@ class ndFileFormatDynamicBody : public ndFileFormatKinematicBody
 	ndFileFormatDynamicBody();
 	ndFileFormatDynamicBody(const char* const className);
 
-	virtual void SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body);
+	virtual void SaveBody(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
 };
 
 #endif 

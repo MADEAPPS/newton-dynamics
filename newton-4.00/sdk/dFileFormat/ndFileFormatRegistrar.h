@@ -25,6 +25,8 @@
 #include "ndFileFormatStdafx.h"
 #include "ndTinyXmlGlue.h"
 
+class ndFileFormat;
+
 class ndFileFormatRegistrar : public ndClassAlloc
 {
 	protected:	
@@ -32,7 +34,7 @@ class ndFileFormatRegistrar : public ndClassAlloc
 	virtual ~ndFileFormatRegistrar();
 	
 	public:
-	virtual void SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body);
+	virtual void SaveBody(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
 	virtual void SaveShape(nd::TiXmlElement* const parentNode, const ndShape* const shape);
 	virtual void SaveNotify(nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify);
 	virtual void SaveCollision(nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision);

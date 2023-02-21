@@ -33,7 +33,7 @@ ndFileFormatBody::ndFileFormatBody(const char* const className)
 {
 }
 
-void ndFileFormatBody::SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body)
+void ndFileFormatBody::SaveBody(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBody::StaticClassName());
 

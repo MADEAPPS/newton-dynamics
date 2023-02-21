@@ -32,10 +32,10 @@ ndFileFormatDynamicBody::ndFileFormatDynamicBody(const char* const className)
 {
 }
 
-void ndFileFormatDynamicBody::SaveBody(nd::TiXmlElement* const parentNode, const ndBody* const body)
+void ndFileFormatDynamicBody::SaveBody(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBodyDynamic::StaticClassName());
-	ndFileFormatKinematicBody::SaveBody(classNode, body);
+	ndFileFormatKinematicBody::SaveBody(scene, classNode, body);
 
 	const ndBodyDynamic* const dynamic = ((ndBodyDynamic*)body)->GetAsBodyDynamic();
 	xmlSaveParam(classNode, "linearDampCoef", dynamic->m_dampCoef.m_w);
