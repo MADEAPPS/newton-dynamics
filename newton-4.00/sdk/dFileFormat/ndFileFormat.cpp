@@ -105,7 +105,7 @@ void ndFileFormat::SaveBodies(const char* const path)
 		ndAssert(handler);
 		if (handler)
 		{
-//			handler->SaveBody(this, rootNode, body);
+			handler->SaveBody(this, rootNode, body);
 		}
 	}
 	

@@ -20,6 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
+#include "ndFileFormat.h"
 #include "ndFileFormatShapeInstance.h"
 
 ndFileFormatShapeInstance::ndFileFormatShapeInstance()
@@ -37,10 +38,14 @@ void ndFileFormatShapeInstance::SaveCollision(ndFileFormat* const scene, nd::TiX
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeInstanceClass", ndShapeInstance::StaticClassName());
 
 	const ndShape* const shape = collision->GetShape();
-	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
-	ndAssert(handler);
+	ndUnsigned64 hash = shape->GetHash();
+	//ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
+	//ndAssert(handler);
+	//handler->SaveShape(scene, classNode, shape);
+	ndTree<ndInt32, ndUnsigned64>::ndNode* const shapeNode = scene->m_uniqueShapes.Find(hash);
+	ndAssert(shapeNode);
 
-	handler->SaveShape(scene, classNode, shape);
+	xmlSaveParam(classNode, "shapeNodeIdRef", shapeNode->GetInfo());
 	xmlSaveParam(classNode, "scale", collision->m_scale);
 	xmlSaveParam(classNode, "skinMargin", collision->m_skinMargin);
 	xmlSaveParam(classNode, "localMatrix", collision->m_localMatrix);
