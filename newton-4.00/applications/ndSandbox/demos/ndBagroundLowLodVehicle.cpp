@@ -294,4 +294,8 @@ void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene)
 	mapBody->GetCollisionShape().SetMaterial(mapMaterial);
 	
 	AddAiVehicle(scene);
+
+	ndFileFormat xxxx;
+	xxxx.CollectScene(scene->GetWorld());
+	xxxx.SaveBodies("xxxx.nd");
 }
