@@ -35,8 +35,8 @@ class ndShapeConvexHull : public ndShapeConvex
 	D_COLLISION_API virtual ~ndShapeConvexHull();
 
 	protected:
-	ndShapeInfo GetShapeInfo() const;
-	ndUnsigned64 GetHash(ndUnsigned64 hash) const;
+	D_COLLISION_API ndShapeInfo GetShapeInfo() const;
+	D_COLLISION_API ndUnsigned64 GetHash(ndUnsigned64 hash) const;
 	ndBigVector FaceNormal(const ndEdge *face, const ndBigVector* const pool) const;
 	bool RemoveCoplanarEdge(ndPolyhedra& convex, const ndBigVector* const hullVertexArray) const;
 	bool Create(ndInt32 count, ndInt32 strideInBytes, const ndFloat32* const vertexArray, ndFloat32 tolerance, ndInt32 maxPointsOut);

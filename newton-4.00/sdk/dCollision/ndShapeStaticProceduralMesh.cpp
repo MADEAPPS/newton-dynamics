@@ -208,3 +208,8 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	data->m_vertexStrideInBytes = sizeof(ndVector);
 }
 
+ndUnsigned64 ndShapeStaticProceduralMesh::GetHash(ndUnsigned64 hash) const
+{
+	ndAssert(0);
+	return 32;
+}

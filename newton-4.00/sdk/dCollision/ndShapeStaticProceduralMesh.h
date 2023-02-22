@@ -59,12 +59,14 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	D_CLASS_REFLECTION(ndShapeStaticProceduralMesh, ndShapeStaticMesh)
 	D_COLLISION_API ndShapeStaticProceduralMesh(ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez);
 	D_COLLISION_API virtual ~ndShapeStaticProceduralMesh();
-	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
 
 	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return this; }
 	virtual void GetCollidingFaces(const ndVector& minBox, const ndVector& maxBox, ndArray<ndVector>& vertex, ndArray<ndInt32>& faceList, ndArray<ndInt32>& faceMaterial, ndArray<ndInt32>& indexListList) const;
 
 	protected:
+	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
+	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
+
 	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
 
 	private:
@@ -72,7 +74,9 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	
 	ndVector m_minBox;
 	ndVector m_maxBox;
+
 	friend class ndContactSolver;
+	friend class ndFileFormatShapeStaticProceduralMesh;
 };
 
 inline void ndShapeStaticProceduralMesh::GetCollidingFaces(const ndVector&, const ndVector&, ndArray<ndVector>&, ndArray<ndInt32>&, ndArray<ndInt32>&, ndArray<ndInt32>&) const
