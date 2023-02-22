@@ -132,9 +132,10 @@ void ndFileFormatRegistrar::SaveNotify(ndFileFormat* const, nd::TiXmlElement* co
 	ndAssert(0);
 }
 
-void ndFileFormatRegistrar::SaveShape(ndFileFormat* const, nd::TiXmlElement* const, const ndShape* const)
+ndInt32 ndFileFormatRegistrar::SaveShape(ndFileFormat* const, nd::TiXmlElement* const, const ndShape* const)
 {
 	ndAssert(0);
+	return 0;
 }
 
 void ndFileFormatRegistrar::SaveCollision(ndFileFormat* const, nd::TiXmlElement* const, const ndShapeInstance* const)

@@ -32,7 +32,7 @@ ndFileFormatShapeConvexCylinder::ndFileFormatShapeConvexCylinder(const char* con
 {
 }
 
-void ndFileFormatShapeConvexCylinder::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
+ndInt32 ndFileFormatShapeConvexCylinder::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeCylinder::StaticClassName());
 	ndFileFormatShapeConvex::SaveShape(scene, classNode, shape);
@@ -42,4 +42,5 @@ void ndFileFormatShapeConvexCylinder::SaveShape(ndFileFormat* const scene, nd::T
 	xmlSaveParam(classNode, "height", cylinder->m_height);
 	xmlSaveParam(classNode, "radius0", cylinder->m_radius0);
 	xmlSaveParam(classNode, "radius1", cylinder->m_radius1);
+	return xmlGetNodeId(classNode);
 }

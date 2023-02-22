@@ -32,7 +32,7 @@ ndFileFormatShapeConvexHull::ndFileFormatShapeConvexHull(const char* const class
 {
 }
 
-void ndFileFormatShapeConvexHull::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
+ndInt32 ndFileFormatShapeConvexHull::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeConvexHull::StaticClassName());
 	ndFileFormatShapeConvex::SaveShape(scene, classNode, shape);
@@ -44,4 +44,5 @@ void ndFileFormatShapeConvexHull::SaveShape(ndFileFormat* const scene, nd::TiXml
 		points.PushBack(convexShape->m_vertex[i]);
 	}
 	xmlSaveParam(classNode, "points", points);
+	return xmlGetNodeId(classNode);
 }

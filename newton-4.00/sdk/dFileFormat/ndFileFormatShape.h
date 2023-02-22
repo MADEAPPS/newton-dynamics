@@ -31,7 +31,7 @@ class ndFileFormatShape : public ndFileFormatRegistrar
 	ndFileFormatShape();
 	ndFileFormatShape(const char* const className);
 
-	virtual void SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
+	virtual ndInt32 SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
 };
 
 #endif 

@@ -45,6 +45,45 @@ void ndFileFormat::CollectScene(const ndWorld* const world)
 	}
 }
 
+void ndFileFormat::SaveCollisionShapes(nd::TiXmlElement* const rootNode)
+{
+	m_uniqueShapes.RemoveAll();
+
+	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+	{
+		ndBodyKinematic* const body = m_bodies[i]->GetAsBodyKinematic();
+		ndShape* const shape = body->GetCollisionShape().GetShape();
+		if (!shape->GetAsShapeCompound())
+		{
+			ndUnsigned64 hash = shape->GetHash();
+			ndTree<ndInt32, ndUnsigned64>::ndNode* const node = m_uniqueShapes.Insert(hash);
+			if (node)
+			{
+				ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
+				ndInt32 id = handler->SaveShape(this, rootNode, shape);
+				node->GetInfo() = id;
+			}
+		}
+	}
+
+	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+	{
+		ndBodyKinematic* const body = m_bodies[i]->GetAsBodyKinematic();
+		ndShape* const shape = body->GetCollisionShape().GetShape();
+		if (shape->GetAsShapeCompound())
+		{
+			ndUnsigned64 hash = shape->GetHash();
+			ndTree<ndInt32, ndUnsigned64>::ndNode* const node = m_uniqueShapes.Insert(hash);
+			if (node)
+			{
+				ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
+				ndInt32 id = handler->SaveShape(this, rootNode, shape);
+				node->GetInfo() = id;
+			}
+		}
+	}
+}
+
 void ndFileFormat::SaveBodies(const char* const path)
 {
 	// save the path for use with generated assets.
@@ -57,18 +96,7 @@ void ndFileFormat::SaveBodies(const char* const path)
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
 	asciifile.LinkEndChild(rootNode);
 
-	m_uniqueShapes.RemoveAll();
-	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-	{
-		ndBodyKinematic* const body = m_bodies[i]->GetAsBodyKinematic();
-		ndShape* const shape = body->GetCollisionShape().GetShape();
-		ndUnsigned64 hash = shape->GetHash();
-		if (m_uniqueShapes.Insert(shape, hash))
-		{
-			ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
-			handler->SaveShape(this, rootNode, shape);
-		}
-	}
+	SaveCollisionShapes(rootNode);
 	
 	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 	{
@@ -77,7 +105,7 @@ void ndFileFormat::SaveBodies(const char* const path)
 		ndAssert(handler);
 		if (handler)
 		{
-			handler->SaveBody(this, rootNode, body);
+//			handler->SaveBody(this, rootNode, body);
 		}
 	}
 	
@@ -85,4 +113,6 @@ void ndFileFormat::SaveBodies(const char* const path)
 	setlocale(LC_ALL, "C");
 	asciifile.SaveFile(path);
 	setlocale(LC_ALL, oldloc);
+	m_uniqueShapes.RemoveAll();
 }
+

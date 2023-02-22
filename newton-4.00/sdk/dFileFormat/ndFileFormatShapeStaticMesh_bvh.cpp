@@ -33,7 +33,7 @@ ndFileFormatShapeStaticMesh_bvh::ndFileFormatShapeStaticMesh_bvh(const char* con
 {
 }
 
-void ndFileFormatShapeStaticMesh_bvh::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
+ndInt32 ndFileFormatShapeStaticMesh_bvh::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeStatic_bvh::StaticClassName());
 	ndFileFormatShapeStaticMesh::SaveShape(scene, classNode, shape);
@@ -49,4 +49,5 @@ void ndFileFormatShapeStaticMesh_bvh::SaveShape(ndFileFormat* const scene, nd::T
 	}
 	xmlSaveParam(classNode, "assetName", "string", fileName);
 	staticMesh->Serialize(fileName);
+	return xmlGetNodeId(classNode);
 }

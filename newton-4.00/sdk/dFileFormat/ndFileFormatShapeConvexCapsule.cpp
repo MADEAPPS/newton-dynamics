@@ -32,7 +32,7 @@ ndFileFormatShapeConvexCapsule::ndFileFormatShapeConvexCapsule(const char* const
 {
 }
 
-void ndFileFormatShapeConvexCapsule::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
+ndInt32 ndFileFormatShapeConvexCapsule::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeCapsule::StaticClassName());
 	ndFileFormatShapeConvex::SaveShape(scene, classNode, shape);
@@ -42,4 +42,5 @@ void ndFileFormatShapeConvexCapsule::SaveShape(ndFileFormat* const scene, nd::Ti
 	xmlSaveParam(classNode, "height", capsule->m_height);
 	xmlSaveParam(classNode, "radius0", capsule->m_radius0);
 	xmlSaveParam(classNode, "radius1", capsule->m_radius1);
+	return xmlGetNodeId(classNode);
 }

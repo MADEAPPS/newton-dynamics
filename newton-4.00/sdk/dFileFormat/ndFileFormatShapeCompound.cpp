@@ -20,6 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
+#include "ndFileFormat.h"
 #include "ndFileFormatShapeCompound.h"
 
 ndFileFormatShapeCompound::ndFileFormatShapeCompound()
@@ -32,20 +33,34 @@ ndFileFormatShapeCompound::ndFileFormatShapeCompound(const char* const className
 {
 }
 
-void ndFileFormatShapeCompound::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
+ndInt32 ndFileFormatShapeCompound::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeCompound::StaticClassName());
-	ndFileFormatShape::SaveShape(scene, classNode, shape);
-
 	ndShapeCompound* const compoundShape = (ndShapeCompound*)shape;
 	const ndShapeCompound::ndTreeArray& shapeList = compoundShape->GetTree();
 
 	ndShapeCompound::ndTreeArray::Iterator it(shapeList);
 	for (it.Begin(); it; it++)
 	{
-		ndShapeInstance* const childInstance = compoundShape->GetShapeInstance(it.GetNode());
+		const ndShapeInstance* const childInstance = compoundShape->GetShapeInstance(it.GetNode());
+		const ndShape* const childShape = childInstance->GetShape();
+		ndUnsigned64 hash = childShape->GetHash();
+		ndTree<ndInt32, ndUnsigned64>::ndNode* const node = scene->m_uniqueShapes.Insert(hash);
+		if (node)
+		{
+			ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(childShape->ClassName());
+			ndInt32 id = handler->SaveShape(scene, parentNode, childShape);
+			node->GetInfo() = id;
+		}
+	}
+
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeCompound::StaticClassName());
+	ndFileFormatShape::SaveShape(scene, classNode, shape);
+	for (it.Begin(); it; it++)
+	{
+		const ndShapeInstance* const childInstance = compoundShape->GetShapeInstance(it.GetNode());
 		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(childInstance->ClassName());
 		ndAssert(handler);
 		handler->SaveCollision(scene, classNode, childInstance);
 	}
+	return xmlGetNodeId(classNode);
 }

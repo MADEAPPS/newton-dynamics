@@ -34,12 +34,14 @@ class ndFileFormat : public ndClassAlloc
 	void CollectScene(const ndWorld* const world);
 
 	void SaveBodies(const char* const path);
-		
-	ndArray<ndBody*> m_bodies;
+	
 	ndString m_fileName;
+	ndArray<ndBody*> m_bodies;
+	ndTree<ndInt32, ndUnsigned64> m_uniqueShapes;
 
 	private:
-	ndTree<ndShape*, ndUnsigned64> m_uniqueShapes;
+	void SaveCollisionShapes(nd::TiXmlElement* const rootNode);
+	
 };
 
 #endif 
