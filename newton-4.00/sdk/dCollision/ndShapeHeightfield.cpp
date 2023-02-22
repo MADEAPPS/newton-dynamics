@@ -756,5 +756,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 
 ndUnsigned64 ndShapeHeightfield::GetHash(ndUnsigned64 hash) const
 {
-	return 32;
+	hash = dCRC64(&m_atributeMap[0], m_atributeMap.GetCount() * ndInt32(sizeof(ndInt8)), hash);
+	hash = dCRC64(&m_elevationMap[0], m_elevationMap.GetCount() * ndInt32(sizeof(ndReal)), hash);
+	return hash;
 }
