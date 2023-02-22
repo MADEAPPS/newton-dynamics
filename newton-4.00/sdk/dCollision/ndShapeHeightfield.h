@@ -69,6 +69,7 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 
 	protected:
 	virtual ndShapeInfo GetShapeInfo() const;
+	virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
 	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return this; }
 	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
@@ -99,7 +100,9 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	static ndVector m_padding;
 	static ndVector m_elevationPadding;
 	static ndInt32 m_cellIndices[][4];
+
 	friend class ndContactSolver;
+	friend class ndFileFormatShapeStaticHeightfield;
 };
 
 inline ndArray<ndReal>& ndShapeHeightfield::GetElevationMap()

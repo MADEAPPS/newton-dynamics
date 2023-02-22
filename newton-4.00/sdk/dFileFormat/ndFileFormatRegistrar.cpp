@@ -39,6 +39,7 @@
 #include "ndFileFormatShapeConvexCapsule.h"
 #include "ndFileFormatShapeConvexCylinder.h"
 #include "ndFileFormatShapeStaticMesh_bvh.h"
+#include "ndFileFormatShapeStaticHeightfield.h"
 #include "ndFileFormatShapeConvexChamferCylinder.h"
 
 ndFixSizeArray<ndFileFormatRegistrar*, 256> ndFileFormatRegistrar::m_registry;
@@ -90,6 +91,7 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatShapeStaticMesh shapeStaticMesh;
 	static ndFileFormatShapeConvexCylinder shapeCylinder;
 	static ndFileFormatShapeStaticMesh_bvh shapeStaticBvh;
+	static ndFileFormatShapeStaticHeightfield shapeHeightfield;
 	static ndFileFormatShapeConvexChamferCylinder shapeChamferCylinder;
 }
 

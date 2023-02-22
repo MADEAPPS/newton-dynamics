@@ -754,3 +754,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	}
 }
 
+ndUnsigned64 ndShapeHeightfield::GetHash(ndUnsigned64 hash) const
+{
+	return 32;
+}
