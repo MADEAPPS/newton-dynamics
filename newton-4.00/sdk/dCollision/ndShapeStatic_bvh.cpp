@@ -196,17 +196,33 @@ void ndShapeStatic_bvh::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	ForAllSectors(*data, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
 
+
+ndIntersectStatus ndShapeStatic_bvh::CalculateHash(
+	void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes,
+	const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32)
+{
+	ndUnsigned64* hash = (ndUnsigned64*)context;
+
+	ndInt32 stride = strideInBytes / ndInt32 (sizeof(ndFloat32));
+	for (ndInt32 i = 0; i < indexCount; ++i)
+	{
+		ndInt32 j = indexArray[i];
+		ndVector p(polygon[j * stride + 0], polygon[j * stride + 1], polygon[j * stride + 2], ndFloat32(0.0f));
+		*hash = dCRC64(&p.m_x, ndInt32 (sizeof(ndVector)), *hash);
+	}
+	*hash = dCRC64(&indexArray[indexCount], ndInt32 (sizeof(ndInt32)), *hash);
+
+	return m_continueSearh;
+}
+
 ndUnsigned64 ndShapeStatic_bvh::GetHash(ndUnsigned64 hash) const
 {
-	const ndFloat32* array = GetLocalVertexPool();
-	ndInt32 vertexCount = GetVertexCount();
-	ndInt32 stride = GetStrideInBytes() / ndInt32 (sizeof(ndFloat32));
+	ndVector p0(ndFloat32(-1.0e15f), ndFloat32(-1.0e15f), ndFloat32(-1.0e15f), ndFloat32(0.0f));
+	ndVector p1(ndFloat32(1.0e15f), ndFloat32(1.0e15f), ndFloat32(1.0e15f), ndFloat32(0.0f));
+	ndFastAabb aabb(p0, p1);
 
-	ndAssert(0);
-	for (ndInt32 i = 0; i < vertexCount; ++i)
-	{
-		hash = dCRC64(array, 3 * ndInt32 (sizeof(ndFloat32)), hash);
-		array += stride;
-	}
-	return hash;
+	ndUnsigned64 tempHash = hash;
+	ForAllSectors(aabb, ndVector::m_zero, ndFloat32 (0.0f), CalculateHash, &tempHash);
+
+	return tempHash;
 }
