@@ -19,33 +19,22 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_FILE_FORMAT_H__
-#define _ND_FILE_FORMAT_H__
-
 #include "ndFileFormatStdafx.h"
+#include "ndFileFormatWorld.h"
 
-
-class ndFileFormat : public ndClassAlloc
+ndFileFormatWorld::ndFileFormatWorld()
+	:ndFileFormatRegistrar(ndWorld::StaticClassName())
 {
-	public: 
-	ndFileFormat();
-	~ndFileFormat();
+}
 
-	void CollectScene(const ndWorld* const world);
+ndFileFormatWorld::ndFileFormatWorld(const char* const className)
+	:ndFileFormatRegistrar(className)
+{
+}
 
-	void SaveWorld(const char* const path);
-	void SaveBodies(const char* const path);
-	
-	
-	ndString m_fileName;
-	ndArray<ndBody*> m_bodies;
-	ndTree<ndInt32, ndUnsigned64> m_uniqueShapes;
-
-	private:
-	void SaveWorld(nd::TiXmlElement* const rootNode);
-	void SaveBodies(nd::TiXmlElement* const rootNode);
-	void SaveCollisionShapes(nd::TiXmlElement* const rootNode);
-};
-
-#endif 
-
+void ndFileFormatWorld::SaveWorld(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndWorld* const world)
+{
+	nd::TiXmlElement* const node = xmlCreateClassNode(parentNode, "ndWorld", ndWorld::StaticClassName());
+	ndAssert(0);
+	//return xmlGetNodeId(node);
+}

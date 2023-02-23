@@ -45,6 +45,20 @@ void ndFileFormat::CollectScene(const ndWorld* const world)
 	}
 }
 
+void ndFileFormat::SaveBodies(nd::TiXmlElement* const rootNode)
+{
+	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+	{
+		ndBody* const body = m_bodies[i];
+		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(body->ClassName());
+		ndAssert(handler);
+		if (handler)
+		{
+			handler->SaveBody(this, rootNode, body);
+		}
+	}
+}
+
 void ndFileFormat::SaveCollisionShapes(nd::TiXmlElement* const rootNode)
 {
 	m_uniqueShapes.RemoveAll();
@@ -97,17 +111,7 @@ void ndFileFormat::SaveBodies(const char* const path)
 	asciifile.LinkEndChild(rootNode);
 
 	SaveCollisionShapes(rootNode);
-	
-	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-	{
-		ndBody* const body = m_bodies[i];
-		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(body->ClassName());
-		ndAssert(handler);
-		if (handler)
-		{
-			handler->SaveBody(this, rootNode, body);
-		}
-	}
+	SaveBodies(rootNode);
 	
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");
@@ -116,3 +120,23 @@ void ndFileFormat::SaveBodies(const char* const path)
 	m_uniqueShapes.RemoveAll();
 }
 
+void ndFileFormat::SaveWorld(const char* const path)
+{
+	m_fileName = path;
+
+	nd::TiXmlDocument asciifile;
+	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
+	asciifile.LinkEndChild(decl);
+
+	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
+	asciifile.LinkEndChild(rootNode);
+
+	SaveCollisionShapes(rootNode);
+	SaveBodies(rootNode);
+
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+	asciifile.SaveFile(path);
+	setlocale(LC_ALL, oldloc);
+	m_uniqueShapes.RemoveAll();
+}

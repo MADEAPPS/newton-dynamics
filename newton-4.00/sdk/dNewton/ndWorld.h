@@ -56,6 +56,7 @@ class ndWorld: public ndClassAlloc
 		ndSyclSolverGpu,
 	};
 
+	D_BASE_CLASS_REFLECTION(ndWorld)
 	D_NEWTON_API ndWorld();
 	D_NEWTON_API virtual ~ndWorld();
 

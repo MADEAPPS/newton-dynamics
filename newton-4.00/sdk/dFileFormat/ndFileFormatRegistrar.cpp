@@ -22,6 +22,7 @@
 #include "ndFileFormatStdafx.h"
 #include "ndFileFormatRegistrar.h"
 #include "ndFileFormatBody.h"
+#include "ndFileFormatWorld.h"
 #include "ndFileFormatShape.h"
 #include "ndFileFormatNotify.h"
 #include "ndFileFormatShapeConvex.h"
@@ -75,6 +76,7 @@ void ndFileFormatRegistrar::Init()
 {
 	static ndFileFormatBody body;
 	static ndFileFormatShape shape;
+	static ndFileFormatWorld world;
 	static ndFileFormatNotify bodyNotiy;
 	static ndFileFormatDynamicBody dynamicBody;
 	static ndFileFormatShapeInstance collision;
@@ -124,6 +126,11 @@ ndFileFormatRegistrar* ndFileFormatRegistrar::GetHandler(const char* const class
 	}
 
 	return nullptr;
+}
+
+void ndFileFormatRegistrar::SaveWorld(ndFileFormat* const, nd::TiXmlElement* const, const ndWorld* const)
+{
+	ndAssert(0);
 }
 
 void ndFileFormatRegistrar::SaveBody(ndFileFormat* const, nd::TiXmlElement* const, const ndBody* const)

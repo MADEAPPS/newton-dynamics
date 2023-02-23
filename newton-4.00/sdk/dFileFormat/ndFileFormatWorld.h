@@ -19,32 +19,19 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_FILE_FORMAT_H__
-#define _ND_FILE_FORMAT_H__
+#ifndef _ND_FILE_FORMAT_WORLD_H__
+#define _ND_FILE_FORMAT_WORLD_H__
 
 #include "ndFileFormatStdafx.h"
+#include "ndFileFormatRegistrar.h"
 
-
-class ndFileFormat : public ndClassAlloc
+class ndFileFormatWorld : public ndFileFormatRegistrar
 {
 	public: 
-	ndFileFormat();
-	~ndFileFormat();
+	ndFileFormatWorld();
+	ndFileFormatWorld(const char* const className);
 
-	void CollectScene(const ndWorld* const world);
-
-	void SaveWorld(const char* const path);
-	void SaveBodies(const char* const path);
-	
-	
-	ndString m_fileName;
-	ndArray<ndBody*> m_bodies;
-	ndTree<ndInt32, ndUnsigned64> m_uniqueShapes;
-
-	private:
-	void SaveWorld(nd::TiXmlElement* const rootNode);
-	void SaveBodies(nd::TiXmlElement* const rootNode);
-	void SaveCollisionShapes(nd::TiXmlElement* const rootNode);
+	virtual void SaveWorld(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndWorld* const world);
 };
 
 #endif 
