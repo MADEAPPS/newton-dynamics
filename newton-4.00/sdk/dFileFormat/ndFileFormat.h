@@ -36,8 +36,8 @@ class ndFileFormat : public ndClassAlloc
 	void SaveWorld(const char* const path);
 	void SaveBodies(const char* const path);
 	
-	
 	ndString m_fileName;
+	const ndWorld* m_world;
 	ndArray<ndBody*> m_bodies;
 	ndTree<ndInt32, ndUnsigned64> m_uniqueShapes;
 

@@ -37,6 +37,7 @@ ndFileFormat::~ndFileFormat()
 
 void ndFileFormat::CollectScene(const ndWorld* const world)
 {
+	m_world = world;
 	m_bodies.SetCount(0);
 	for (ndBodyListView::ndNode* node = world->GetBodyList().GetFirst(); node; node = node->GetNext())
 	{
@@ -110,13 +111,6 @@ void ndFileFormat::SaveBodies(const char* const path)
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
 	asciifile.LinkEndChild(rootNode);
 
-	//ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(body->ClassName());
-	//ndAssert(handler);
-	//if (handler)
-	//{
-	//	handler->SaveBody(this, rootNode, body);
-	//}
-
 	SaveCollisionShapes(rootNode);
 	SaveBodies(rootNode);
 	
@@ -138,8 +132,14 @@ void ndFileFormat::SaveWorld(const char* const path)
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
 	asciifile.LinkEndChild(rootNode);
 
-	SaveCollisionShapes(rootNode);
-	SaveBodies(rootNode);
+	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(m_world->ClassName());
+	ndAssert(handler);
+	if (handler)
+	{
+		handler->SaveWorld(this, rootNode, m_world);
+		SaveCollisionShapes(rootNode);
+		SaveBodies(rootNode);
+	}
 
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");
