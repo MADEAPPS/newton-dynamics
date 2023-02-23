@@ -137,14 +137,19 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 
 	// build a floor
 	//BuildPlayArena(scene);
-	BuildFlatPlane(scene, true);
+	//BuildFlatPlane(scene, true);
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildCompoundScene(scene, ndGetIdentityMatrix());
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
-	//BuildHeightFieldTerrain(scene, heighfieldLocation);
+	BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 
 	ndMatrix location(ndGetIdentityMatrix());
+
+ndFileFormat xxxx;
+xxxx.CollectScene(scene->GetWorld());
+xxxx.SaveBodies("xxxx.nd");
+
 
 	AddSphere(scene);
 	AddEmptyBox(scene);

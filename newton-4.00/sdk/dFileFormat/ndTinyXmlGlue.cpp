@@ -22,7 +22,6 @@
 #include "ndFileFormatStdafx.h"
 #include "ndTinyXmlGlue.h"
 
-
 static char* FloatToString(char* const buffer, ndFloat32 value)
 {
 	sprintf(buffer, "%f", value);
@@ -42,7 +41,6 @@ static char* FloatToString(char* const buffer, ndFloat32 value)
 	*ptr = 0;
 	return ptr;
 }
-
 
 static void CleanWhiteSpace(const char* const value)
 {
@@ -352,6 +350,42 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	char* ptr1 = FloatToString(ptr0, value.m_y);
 	FloatToString(ptr1, value.m_z);
 	xmlSaveParam(rootNode, name, "float3", buffer);
+}
+
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndInt32>& array)
+{
+	char* const buffer = ndAlloca(char, array.GetCount() * 24 + 256);
+	char* ptr = buffer;
+	for (ndInt32 i = 0; i < array.GetCount(); ++i)
+	{
+		sprintf(ptr, "%d ", array[i]);
+		ptr += strlen(ptr);
+	}
+	CleanWhiteSpace(buffer);
+
+	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
+	rootNode->LinkEndChild(node);
+
+	node->SetAttribute("count", array.GetCount());
+	node->SetAttribute("intArray", buffer);
+}
+
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndInt64>& array)
+{
+	char* const buffer = ndAlloca(char, array.GetCount() * 24 + 256);
+	char* ptr = buffer;
+	for (ndInt32 i = 0; i < array.GetCount(); ++i)
+	{
+		sprintf(ptr, "%lld ", array[i]);
+		ptr += strlen(ptr);
+	}
+	CleanWhiteSpace(buffer);
+
+	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
+	rootNode->LinkEndChild(node);
+
+	node->SetAttribute("count", array.GetCount());
+	node->SetAttribute("int64Array", buffer);
 }
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndVector>& array)

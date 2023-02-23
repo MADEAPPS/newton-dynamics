@@ -59,7 +59,10 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndIn
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndFloat32 value);
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndVector& value);
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndMatrix& value);
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndInt32>& array);
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndInt64>& array);
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndVector>& array);
+
 
 nd::TiXmlElement* xmlCreateClassNode(nd::TiXmlElement* const parent, const char* const className, const char* const name);
 

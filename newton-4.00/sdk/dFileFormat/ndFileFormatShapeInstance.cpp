@@ -51,12 +51,19 @@ void ndFileFormatShapeInstance::SaveCollision(ndFileFormat* const scene, nd::TiX
 	xmlSaveParam(classNode, "localMatrix", collision->m_localMatrix);
 	xmlSaveParam(classNode, "alignmentMatrix", collision->m_alignmentMatrix);
 
-	xmlSaveParam(classNode, "extra0", collision->m_shapeMaterial.m_userId);
-	xmlSaveParam(classNode, "extra1", ndInt64(collision->m_shapeMaterial.m_data.m_alignPad));
+	//xmlSaveParam(classNode, "extra0", collision->m_shapeMaterial.m_userId);
+	//xmlSaveParam(classNode, "extra1", ndInt64(collision->m_shapeMaterial.m_data.m_alignPad));
+
+	ndArray<ndInt64> material;
+	material.PushBack(collision->m_shapeMaterial.m_userId);
+	material.PushBack(ndInt64(collision->m_shapeMaterial.m_data.m_alignPad));
 	for (ndInt32 i = 0; i < sizeof(collision->m_shapeMaterial.m_userParam) / sizeof(collision->m_shapeMaterial.m_userParam[0]); ++i)
 	{
-		char label[64];
-		sprintf(label, "extra%d", i + 2);
-		xmlSaveParam(classNode, label, ndInt64(collision->m_shapeMaterial.m_userParam[i].m_intData));
+		//char label[64];
+		//sprintf(label, "extra%d", i + 2);
+		//xmlSaveParam(classNode, label, ndInt64(collision->m_shapeMaterial.m_userParam[i].m_intData));
+		material.PushBack(ndInt64 (collision->m_shapeMaterial.m_userParam[i].m_intData));
 	}
+
+	xmlSaveParam(classNode, "material", material);
 }
