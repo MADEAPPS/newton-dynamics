@@ -110,6 +110,13 @@ void ndFileFormat::SaveBodies(const char* const path)
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
 	asciifile.LinkEndChild(rootNode);
 
+	//ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(body->ClassName());
+	//ndAssert(handler);
+	//if (handler)
+	//{
+	//	handler->SaveBody(this, rootNode, body);
+	//}
+
 	SaveCollisionShapes(rootNode);
 	SaveBodies(rootNode);
 	
