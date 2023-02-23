@@ -25,12 +25,34 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 	public:
 	D_CLASS_REFLECTION(ndRegularProceduralGrid, ndShapeStaticProceduralMesh)
 
+	class ndRegularProceduralGridSaveLoad : public ndFileFormatShapeStaticProceduralMesh
+	{
+		public:
+		ndRegularProceduralGridSaveLoad()
+			:ndFileFormatShapeStaticProceduralMesh(ndRegularProceduralGrid::StaticClassName())
+		{
+		}
+
+		virtual ndInt32 SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
+		{
+			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndRegularProceduralGrid", ndRegularProceduralGrid::StaticClassName());
+			ndFileFormatShapeStaticProceduralMesh::SaveShape(scene, classNode, shape);
+
+			ndRegularProceduralGrid* const grid = (ndRegularProceduralGrid*)shape;
+			xmlSaveParam(classNode, "planeNormal", grid->m_planeEquation);
+			xmlSaveParam(classNode, "planeDistance", grid->m_planeEquation.m_w);
+			xmlSaveParam(classNode, "gridSize", grid->m_gridSize);
+			return xmlGetNodeId(classNode);
+		}
+	};
+
 	ndRegularProceduralGrid(ndFloat32 gridSize, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const ndVector& planeEquation)
 		:ndShapeStaticProceduralMesh(sizex, sizey, sizez)
 		,m_planeEquation(planeEquation)
 		,m_gridSize(gridSize)
 		,m_invGridSize(ndFloat32 (1.0f)/ m_gridSize)
 	{
+		static ndRegularProceduralGridSaveLoad saveLoad;
 	}
 
 	virtual void DebugShape(const ndMatrix&, ndShapeDebugNotify& notify) const
@@ -140,6 +162,13 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 				faceMaterial.PushBack(0);
 			}
 		}
+	}
+
+	virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const
+	{
+		hash = dCRC64(&m_planeEquation[0], sizeof(ndVector), hash);
+		hash = dCRC64(&m_gridSize, sizeof(ndFloat32), hash);
+		return hash;
 	}
 
 	ndVector m_planeEquation;

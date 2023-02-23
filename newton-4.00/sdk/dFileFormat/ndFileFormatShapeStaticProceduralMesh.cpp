@@ -37,33 +37,5 @@ ndInt32 ndFileFormatShapeStaticProceduralMesh::SaveShape(ndFileFormat* const sce
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeStaticProceduralMesh::StaticClassName());
 	ndFileFormatShapeStaticMesh::SaveShape(scene, classNode, shape);
-
-	//char fileName[1024];
-	//ndShapeHeightfield* const staticMesh = (ndShapeHeightfield*)shape;
-	//sprintf(fileName, "%s", scene->m_fileName.GetStr());
-	//char* const ptr = strrchr(fileName, '.');
-	//if (ptr)
-	//{
-	//	ndInt32 nodeId = xmlGetNodeId(classNode);
-	//	sprintf(ptr, "_%d.bin", nodeId);
-	//}
-	//
-	//xmlSaveParam(classNode, "assetName", "string", fileName);
-	//xmlSaveParam(classNode, "minBox", staticMesh->m_minBox);
-	//xmlSaveParam(classNode, "maxBox", staticMesh->m_maxBox);
-	//xmlSaveParam(classNode, "horizontalScale_x", staticMesh->m_horizontalScale_x);
-	//xmlSaveParam(classNode, "horizontalScale_z", staticMesh->m_horizontalScale_z);
-	//xmlSaveParam(classNode, "width", staticMesh->m_width);
-	//xmlSaveParam(classNode, "height", staticMesh->m_height);
-	//xmlSaveParam(classNode, "diagonalMode", ndInt32(staticMesh->m_diagonalMode));
-	//
-	//FILE* const file = fopen(fileName, "wb");
-	//if (file)
-	//{
-	//	fwrite(&staticMesh->m_elevationMap[0], sizeof(ndReal), size_t(staticMesh->m_elevationMap.GetCount()), file);
-	//	fwrite(&staticMesh->m_atributeMap[0], sizeof(ndInt8), size_t(staticMesh->m_atributeMap.GetCount()), file);
-	//	fclose(file);
-	//}
-	
 	return xmlGetNodeId(classNode);
 }

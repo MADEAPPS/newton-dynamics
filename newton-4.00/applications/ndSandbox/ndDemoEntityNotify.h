@@ -35,9 +35,6 @@ class ndDemoEntityNotify: public ndBodyNotify
 		{
 			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndNotifyClass", ndDemoEntityNotify::StaticClassName());
 			ndFileFormatNotify::SaveNotify(scene, classNode, notify);
-
-			//nd::TiXmlElement* const visualNode = new nd::TiXmlElement("visual");
-			//classNode->LinkEndChild(visualNode);
 			xmlSaveParam(classNode, "useCollisionForVisual", 1);
 		}
 	};

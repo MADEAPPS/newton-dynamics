@@ -141,15 +141,10 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildCompoundScene(scene, ndGetIdentityMatrix());
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
-	BuildHeightFieldTerrain(scene, heighfieldLocation);
-	//BuildProceduralMap(scene, 120, 4.0f, 0.0f);
+	//BuildHeightFieldTerrain(scene, heighfieldLocation);
+	BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 
 	ndMatrix location(ndGetIdentityMatrix());
-
-ndFileFormat xxxx;
-xxxx.CollectScene(scene->GetWorld());
-xxxx.SaveBodies("xxxx.nd");
-
 
 	AddSphere(scene);
 	AddEmptyBox(scene);
@@ -157,7 +152,7 @@ xxxx.SaveBodies("xxxx.nd");
 	location.m_posit.m_y = 0.5f;
 	location.m_posit.m_z = -3.0f;
 	AddSimpleConcaveMesh(scene, location, "bowl.fbx", 4);
-	
+
 	location.m_posit.m_x = 5.0f;
 	location.m_posit.m_z = -2.0f;
 	location.m_posit.m_y = 1.7f;
@@ -175,4 +170,8 @@ xxxx.SaveBodies("xxxx.nd");
 	origin.m_w = 1.0f;
 	ndQuaternion rot(ndYawMatrix(45.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);
+
+	ndFileFormat xxxx;
+	xxxx.CollectScene(scene->GetWorld());
+	xxxx.SaveBodies("xxxx.nd");
 }

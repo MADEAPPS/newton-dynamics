@@ -108,6 +108,7 @@
 #include <ndFileFormatNotify.h>
 #include <ndFileFormatRegistrar.h>
 #include <ndFileFormatBodyTriggerVolume.h>
+#include <ndFileFormatShapeStaticProceduralMesh.h>
 
 void dGetWorkingFileName (const char* const name, char* const outPathName);
 
