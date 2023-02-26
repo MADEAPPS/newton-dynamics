@@ -92,7 +92,8 @@ static void AddSphere(ndDemoEntityManager* const scene)
 	for (ndInt32 i = 0; i < 4; ++i)
 	{
 		ndDemoEntity* const entity = origEntity->CreateClone();
-		mOrigMatrix.m_posit.m_y += 1.0f;
+		ndVector floor(FindFloor(*scene->GetWorld(), mOrigMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		mOrigMatrix.m_posit.m_y = floor.m_y + 1.0f;
 		AddRigidBody(scene, mOrigMatrix, originShape, entity, 1.0);
 	}
 	delete origEntity;
@@ -109,6 +110,9 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 
 	ndMatrix mBodyMatrix = ndGetIdentityMatrix();
 	mBodyMatrix.m_posit = ndVector(-2.0f, 5.0f, -5.0f, 1.0f);
+	ndVector floor(FindFloor(*scene->GetWorld(), mBodyMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	mBodyMatrix.m_posit.m_y = floor.m_y + 1.0f;
+
 	AddRigidBody(scene, mBodyMatrix, compoundShapeInstance, compEntity, 10.0);
 }
 
@@ -117,12 +121,14 @@ static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatri
 	ndDemoEntity* const bowlEntity = ndDemoEntity::LoadFbx(meshName, scene);
 	ndShapeInstance* const compoundShapeInstance = bowlEntity->CreateCompoundFromMesh();
 	
-	ndMatrix mOrigMatrix = matrix;
+	ndMatrix originMatrix (matrix);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndDemoEntity* const entity = bowlEntity->CreateClone();
-		mOrigMatrix.m_posit.m_z += 2.0f;
-		AddRigidBody(scene, mOrigMatrix, *compoundShapeInstance, entity, 5.0f);
+		originMatrix.m_posit.m_z += 2.0f;
+		ndVector floor(FindFloor(*scene->GetWorld(), originMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		originMatrix.m_posit.m_y = floor.m_y + 2.0f;
+		AddRigidBody(scene, originMatrix, *compoundShapeInstance, entity, 5.0f);
 	}
 	
 	delete compoundShapeInstance;
@@ -141,8 +147,8 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildCompoundScene(scene, ndGetIdentityMatrix());
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
-	//BuildHeightFieldTerrain(scene, heighfieldLocation);
-	BuildProceduralMap(scene, 120, 4.0f, 0.0f);
+	BuildHeightFieldTerrain(scene, heighfieldLocation);
+	//BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 
 	ndMatrix location(ndGetIdentityMatrix());
 

@@ -4093,7 +4093,6 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDe
 	ndContact* const contactJoint = m_contact;
 	const ndInt32* const indexArray = &query.m_faceVertexIndex[0];
 
-//static int xxxx;
 	data.SortFaceArray();
 	for (ndInt32 i = query.m_faceIndexCount.GetCount() - 1; (i >= 0) && (count < 32); --i)
 	{
@@ -4117,23 +4116,12 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDe
 		m_maxCount = countleft;
 		m_vertexIndex = 0;
 		m_contactBuffer = &contactOut[count];
-//xxxx++;
-//if (xxxx == 213)
-//xxxx *= 1;
 
 		ndInt32 count1 = polygon.CalculateContactToConvexHullDescrete(&polySoupInstance, *this);
 		closestDist = ndMin(closestDist, m_separationDistance);
 
 		if (count1 > 0)
 		{
-			//for (int k = 0; k < count1; ++k)
-			//{
-			//	ndVector xxx(m_instance0.m_globalMatrix.UntransformVector(m_contactBuffer[k].m_point));
-			//	ndAssert(ndAbs(xxx.m_x) <= 0.501f);
-			//	ndAssert(ndAbs(xxx.m_y) <= 0.128f);
-			//	ndAssert(ndAbs(xxx.m_z) <= 0.501f);
-			//}
-
 			if (!m_intersectionTestOnly)
 			{
 				count += count1;
