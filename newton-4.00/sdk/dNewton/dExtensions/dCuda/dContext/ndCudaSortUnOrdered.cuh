@@ -117,6 +117,8 @@ __global__ void ndCudaCountItemsUnordered(const ndKernelParams params, const ndA
 	}
 }
 
+//#define D_USE_BITONIC_SORT
+#ifdef D_USE_BITONIC_SORT
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaMergeBucketsUnordered(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
@@ -222,13 +224,15 @@ __global__ void ndCudaMergeBucketsUnordered(const ndKernelParams params, const n
 	}
 }
 
+#else
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
 	__shared__  T cachedItems[D_DEVICE_UNORDERED_SORT_BLOCK_SIZE];
+
+	__shared__  int scanBaseAdress[D_HOST_MAX_RADIX_SIZE];
 	__shared__  int itemRadix[D_DEVICE_UNORDERED_SORT_BLOCK_SIZE];
 	__shared__  int radixDstOffset[D_DEVICE_UNORDERED_SORT_BLOCK_SIZE];
-	__shared__  int scanBaseAdress[D_HOST_MAX_RADIX_SIZE];
 
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
@@ -268,7 +272,7 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 		bashSize += blockSride;
 	}
 }
-
+#endif
 
 template <class T, int exponentRadix, typename ndEvaluateRadix>
 void ndCountingSortUnOrdered(ndCudaContextImplement* const context, ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndEvaluateRadix evaluateRadix)

@@ -618,14 +618,15 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 
 
 	// ***********************************
+	m_src.SetCount(8);
 	//m_src.SetCount(20);
 	//m_src.SetCount(512);
 	//m_src.SetCount(512 + 99);
-	m_src.SetCount(1000000);
+	//m_src.SetCount(1000000);
 	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
-		m_src[i] = rand() % 256;
-		//m_src[i] = rand() % 8;
+		//m_src[i] = rand() % 256;
+		m_src[i] = rand() % 8 + ((m_src.GetCount() - 1 + i) << 10);
 	}
 
 	m_scan0.SetCount(1024 * 256);
@@ -642,17 +643,17 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 		public:
 		int GetRadix(int item) const
 		{
-			return item & 0xff;
-			//return item & 0x07;
+			//return item & 0xff;
+			return item & 0x07;
 		};
 	};
 	
-	ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
-	//ndCountingSort<int, GetKey, 3>(m_src, m_dst0, m_scan0);
+	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
+	ndCountingSort<int, GetKey, 3>(m_src, m_dst0, m_scan0);
 	for (int i = 1; i < m_dst0.GetCount(); ++i)
 	{
 		int a = m_dst0[i - 1];
-		int b = m_dst0[i];
+		int b = m_dst0[i - 0];
 		ndAssert(a <= b);
 	}
 }

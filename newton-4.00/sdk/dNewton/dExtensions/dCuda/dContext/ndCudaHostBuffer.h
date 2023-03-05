@@ -314,8 +314,9 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		}
 	};
 
-#if 1
-	auto MergeBuckectsBitonic = [&](int blockIdx, int blocksCount, int computeUnits)
+//#define D_USE_BITONIC_MERGE
+#ifdef D_USE_BITONIC_MERGE
+	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
 		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
 		int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
@@ -425,20 +426,21 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	};
 
 #else
-	auto MergeBuckectsOrdered = [&](int blockIdx, int blocksCount, int computeUnits)
+	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
 		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
+
 		int itemRadix[D_HOST_SORT_BLOCK_SIZE];
-		int radixDstOffset[D_HOST_SORT_BLOCK_SIZE];
 		int scanBaseAdress[D_HOST_MAX_RADIX_SIZE];
+		int radixDstOffset[D_HOST_SORT_BLOCK_SIZE];
 
 		int size = src.GetCount();
-		int radixStride = (1 << exponentRadix);
 		int blockStride = D_HOST_SORT_BLOCK_SIZE;
+		int radixStride = (1 << exponentRadix);
 		int radixBase = blockIdx * radixStride;
-		int bashSize = blocksCount * blockStride * blockIdx;
 		int radixPrefixOffset = computeUnits * radixStride;
-		 
+		int bashSize = blocksCount * blockStride * blockIdx;
+
 		for (int threadId = 0; threadId < radixStride; ++threadId)
 		{
 			scanBaseAdress[threadId] = scansBuffer[radixPrefixOffset + threadId] + scansBuffer[radixBase + threadId];
@@ -448,7 +450,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		for (int i = 0; i < blocksCount; ++i)
 		{
 			for (int threadId = 0; threadId < blockStride; ++threadId)
-			{
+			{ 
 				int index = bashSize + threadId;
 				if (index < size)
 				{
@@ -456,20 +458,23 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					int radix = evaluator.GetRadix(cachedItems[threadId]);
 					itemRadix[threadId] = radix;
 				}
+				//__syncthreads();
 			}
 		
-			for (int j = 0; j < blockStride; ++j)
+			for (int threadId = 0; threadId < blockStride; ++threadId)
 			{
-				int index = bashSize + j;
+				int index = bashSize + threadId;
 				if (index < size)
 				{
-					int key = itemRadix[j];
+					int key = itemRadix[threadId];
+					//radixDstOffset[threadId] = atomicAdd(&scanBaseAdress[key], 1);
 					int adressIndex = scanBaseAdress[key];
-					radixDstOffset[j] = adressIndex;
+					radixDstOffset[threadId] = adressIndex;
 					scanBaseAdress[key] = adressIndex + 1;
 				}
+				//	__syncthreads();
 			}
-		
+
 			for (int threadId = 0; threadId < blockStride; ++threadId)
 			{
 				int index = bashSize + threadId;
@@ -479,7 +484,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					dst[address] = cachedItems[threadId];
 				}
 			}
-		
 			bashSize += blockStride;
 		}
 	};
@@ -508,8 +512,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 
 	for (int block = 0; block < computeUnits; ++block)
 	{
-		MergeBuckectsBitonic(block, bashCount, computeUnits);
-		//MergeBuckectsOrdered(block, bashCount, computeUnits);
+		MergeBuckects(block, bashCount, computeUnits);
 	}
 }
 

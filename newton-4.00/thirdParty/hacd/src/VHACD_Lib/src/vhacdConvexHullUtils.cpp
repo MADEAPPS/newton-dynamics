@@ -199,7 +199,7 @@ namespace nd_
 				uint64_t carrier = 0;
 				//int bits = uint64_t(LeadingZeros (mantissaAcc[0]) - 2);
 				int bits = LeadingZeros(mantissaAcc[0]) - 2;
-				for (int i = 0; i < 2 * VHACD_GOOGOL_SIZE; i++)
+				for (int i = 0; i < 2 * VHACD_GOOGOL_SIZE; ++i)
 				{
 					const int k = 2 * VHACD_GOOGOL_SIZE - 1 - i;
 					uint64_t a = mantissaAcc[k];
@@ -349,7 +349,7 @@ namespace nd_
 			if (bits > 0)
 			{
 				carrier <<= (64 - bits);
-				for (int i = 0; i < VHACD_GOOGOL_SIZE; i++)
+				for (int i = 0; i < VHACD_GOOGOL_SIZE; ++i)
 				{
 					uint64_t a = mantissa[i];
 					mantissa[i] = (a >> bits) | carrier;
@@ -391,7 +391,7 @@ namespace nd_
 				while (!mantissa[0] && bits > (-64 * VHACD_GOOGOL_SIZE))
 				{
 					bits -= 64;
-					for (int i = 1; i < VHACD_GOOGOL_SIZE; i++) {
+					for (int i = 1; i < VHACD_GOOGOL_SIZE; ++i) {
 						mantissa[i - 1] = mantissa[i];
 					}
 					mantissa[VHACD_GOOGOL_SIZE - 1] = 0;
@@ -416,7 +416,7 @@ namespace nd_
 						// this is very rare but it does happens, whee the leading zeros of the mantissa is an exact multiple of 64
 						uint64_t carrier = 0;
 						int shift = -n;
-						for (int i = 0; i < VHACD_GOOGOL_SIZE; i++)
+						for (int i = 0; i < VHACD_GOOGOL_SIZE; ++i)
 						{
 							uint64_t a = mantissa[i];
 							mantissa[i] = (a >> shift) | carrier;
@@ -525,7 +525,7 @@ namespace nd_
 			double sign = double(-1.0f);
 			double det = double(0.0f);
 			double accError = double(0.0f);
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < 3; ++i)
 			{
 				double cofactor[2][2];
 				for (int j = 0; j < 2; ++j)
@@ -564,7 +564,7 @@ namespace nd_
 			Googol negOne(double(-1.0f));
 			Googol sign(double(-1.0f));
 			Googol det = double(0.0f);
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < 3; ++i)
 			{
 				Googol cofactor[2][2];
 				for (int j = 0; j < 2; ++j)
@@ -628,10 +628,10 @@ namespace nd_
 
 		Queue::Queue()
 			:List<Job*>()
-			, m_mutex()
-			, m_jobs(0)
+			,m_mutex()
+			,m_jobs(0)
 		{
-			for (int i = 0; i < VHACD_WORKERS_THREADS; i++)
+			for (int i = 0; i < VHACD_WORKERS_THREADS; ++i)
 			{
 				m_threads[i].m_threadID = i;
 				m_threads[i].m_queue = this;
@@ -640,7 +640,7 @@ namespace nd_
 
 		Queue::~Queue()
 		{
-			for (int i = 0; i < VHACD_WORKERS_THREADS; i++)
+			for (int i = 0; i < VHACD_WORKERS_THREADS; ++i)
 			{
 				m_threads[i].Terminate();
 				m_threads[i].join();
@@ -652,7 +652,7 @@ namespace nd_
 			std::unique_lock<std::mutex> lock(m_mutex);
 			Append(job);
 			m_jobs.fetch_add(1);
-			for (int i = 0; i < VHACD_WORKERS_THREADS; i++)
+			for (int i = 0; i < VHACD_WORKERS_THREADS; ++i)
 			{
 				m_threads[i].Signal();
 			}
@@ -686,8 +686,8 @@ namespace nd_
 
 		Thread::Thread()
 			:Semaphore()
-			, std::thread(&Thread::ThreadFunctionCallback, this)
-			, m_queue(nullptr)
+			,std::thread(&Thread::ThreadFunctionCallback, this)
+			,m_queue(nullptr)
 		{
 		}
 
