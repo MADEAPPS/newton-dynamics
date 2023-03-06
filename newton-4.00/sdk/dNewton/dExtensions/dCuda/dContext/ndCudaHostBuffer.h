@@ -429,10 +429,11 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
 		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
+		//int itemRadix[D_HOST_SORT_BLOCK_SIZE];
 
-		int itemRadix[D_HOST_SORT_BLOCK_SIZE];
+		int sortAdress[D_HOST_SORT_BLOCK_SIZE];
 		int scanBaseAdress[D_HOST_MAX_RADIX_SIZE];
-		int radixDstOffset[D_HOST_SORT_BLOCK_SIZE];
+		//int radixDstOffset[D_HOST_SORT_BLOCK_SIZE];
 
 		int size = src.GetCount();
 		int blockStride = D_HOST_SORT_BLOCK_SIZE;
@@ -450,40 +451,36 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		for (int i = 0; i < blocksCount; ++i)
 		{
 			for (int threadId = 0; threadId < blockStride; ++threadId)
-			{ 
-				int index = bashSize + threadId;
-				if (index < size)
-				{
-					cachedItems[threadId] = src[index];
-					int radix = evaluator.GetRadix(cachedItems[threadId]);
-					itemRadix[threadId] = radix;
-				}
-				//__syncthreads();
-			}
-		
-			for (int threadId = 0; threadId < blockStride; ++threadId)
 			{
 				int index = bashSize + threadId;
 				if (index < size)
 				{
-					int key = itemRadix[threadId];
+					T item = src[index];
+					int radix = evaluator.GetRadix(item);
+
 					//radixDstOffset[threadId] = atomicAdd(&scanBaseAdress[key], 1);
-					int adressIndex = scanBaseAdress[key];
-					radixDstOffset[threadId] = adressIndex;
-					scanBaseAdress[key] = adressIndex + 1;
+					int adressIndex = scanBaseAdress[radix] ++;
+					//scanBaseAdress[radix] = adressIndex + 1;
+					//dst[adressIndex] = item;
+
+					cachedItems[adressIndex] = item;
+					sortAdress[adressIndex] = (radix << 16) + adressIndex;
 				}
-				//	__syncthreads();
 			}
+
+			cuSwap(sortAdress[0], sortAdress[1]);
+			cuSwap(sortAdress[5], sortAdress[6]);
 
 			for (int threadId = 0; threadId < blockStride; ++threadId)
 			{
 				int index = bashSize + threadId;
 				if (index < size)
 				{
-					int address = radixDstOffset[threadId];
-					dst[address] = cachedItems[threadId];
+					int adressIndex = sortAdress[threadId] & 0xffff;
+					dst[adressIndex] = cachedItems[threadId];
 				}
 			}
+		
 			bashSize += blockStride;
 		}
 	};

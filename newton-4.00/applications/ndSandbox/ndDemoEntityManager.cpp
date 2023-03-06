@@ -37,10 +37,10 @@
 	//#define REPLAY_RECORD
 #endif
 
-//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
-#define DEFAULT_SCENE	3		// basic compound shapes
+//#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
@@ -427,10 +427,10 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
 	//m_autoSleepMode = false;
-	//m_solverMode = ndWorld::ndCudaSolver;
+	m_solverMode = ndWorld::ndCudaSolver;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
 	//m_solverMode = ndWorld::ndSyclSolverCpu;
-	m_solverMode = ndWorld::ndStandardSolver;
+	//m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
 	//m_solverPasses = 4;
 	m_workerThreads = 1;
