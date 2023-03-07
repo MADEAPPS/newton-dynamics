@@ -117,11 +117,11 @@ __global__ void ndCudaCountItemsUnordered(const ndKernelParams params, const ndA
 	}
 }
 
-#define D_USE_BITONIC_SORT
+//#define D_USE_BITONIC_SORT
 
 #ifdef D_USE_BITONIC_SORT
 template <typename T, typename SortKeyPredicate>
-__global__ void ndCudaMergeBucketsUnordered(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
+__global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
 	__shared__  T cachedItems[D_DEVICE_UNORDERED_SORT_BLOCK_SIZE];
 	__shared__  int sortedRadix[D_DEVICE_UNORDERED_SORT_BLOCK_SIZE];
