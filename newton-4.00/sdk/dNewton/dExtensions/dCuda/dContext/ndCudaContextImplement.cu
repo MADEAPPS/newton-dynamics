@@ -667,7 +667,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	{
 		int a = key.GetRadix(m_dst0[i - 1]);
 		int b = key.GetRadix(m_dst0[i - 0]);
-		//ndAssert(a <= b);
+		ndAssert(a <= b);
 	}
 }
 
