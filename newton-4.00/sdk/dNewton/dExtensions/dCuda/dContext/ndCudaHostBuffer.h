@@ -432,13 +432,12 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 //#define D_SEPATE_LOOPS
 	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
-		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
-
-		int scanBaseAdress[D_HOST_MAX_RADIX_SIZE];
 #ifdef D_SEPATE_LOOPS
+		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
 		int itemRadix[D_HOST_SORT_BLOCK_SIZE];
 		int radixDstOffset[D_HOST_SORT_BLOCK_SIZE];
 #endif
+		int scanBaseAdress[D_HOST_MAX_RADIX_SIZE];
 
 		int size = src.GetCount();
 		int blockIndex = blockIdx;
@@ -495,11 +494,11 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				int index = bashSize + threadId;
 				if (index < size)
 				{
-					cachedItems[threadId] = src[index];
-					int radix = evaluator.GetRadix(cachedItems[threadId]);
+					const T item(src[index]);
+					int radix = evaluator.GetRadix(item);
 					//int address = atomicAdd(&scanBaseAdress[radix], 1);
 					int address = scanBaseAdress[radix]++;
-					dst[address] = cachedItems[threadId];
+					dst[address] = item;
 				}
 			}
 #endif
