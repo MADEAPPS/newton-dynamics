@@ -428,13 +428,17 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	};
 
 #else
+
+//#define D_SEPATE_LOOPS
 	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
 		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
 
-		int itemRadix[D_HOST_SORT_BLOCK_SIZE];
 		int scanBaseAdress[D_HOST_MAX_RADIX_SIZE];
+#ifdef D_SEPATE_LOOPS
+		int itemRadix[D_HOST_SORT_BLOCK_SIZE];
 		int radixDstOffset[D_HOST_SORT_BLOCK_SIZE];
+#endif
 
 		int size = src.GetCount();
 		int blockIndex = blockIdx;
@@ -450,9 +454,9 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		}
 
 		ndEvaluateKey evaluator;
-		//for (int i = 0; i < params.m_blocksPerKernel; ++i)
 		for (int i = 0; i < blocksCount; ++i)
 		{
+#ifdef D_SEPATE_LOOPS
 			for (int threadId = 0; threadId < blockStride; ++threadId)
 			{
 				int index = bashSize + threadId;
@@ -469,9 +473,9 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				int index = bashSize + threadId;
 				if (index < size)
 				{
-					int key = itemRadix[threadId];
-					//radixDstOffset[threadId] = atomicAdd(&scanBaseAdress[key], 1);
-					radixDstOffset[threadId] = scanBaseAdress[key]++;
+					int radix = itemRadix[threadId];
+					//radixDstOffset[threadId] = atomicAdd(&scanBaseAdress[radix], 1);
+					radixDstOffset[threadId] = scanBaseAdress[radix]++;
 				}
 			}
 
@@ -484,6 +488,21 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					dst[address] = cachedItems[threadId];
 				}
 			}
+
+#else
+			for (int threadId = 0; threadId < blockStride; ++threadId)
+			{
+				int index = bashSize + threadId;
+				if (index < size)
+				{
+					cachedItems[threadId] = src[index];
+					int radix = evaluator.GetRadix(cachedItems[threadId]);
+					//int address = atomicAdd(&scanBaseAdress[radix], 1);
+					int address = scanBaseAdress[radix]++;
+					dst[address] = cachedItems[threadId];
+				}
+			}
+#endif
 			bashSize += blockStride;
 		}
 	};
