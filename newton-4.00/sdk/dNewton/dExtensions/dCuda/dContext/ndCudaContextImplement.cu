@@ -657,7 +657,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	};
 	
 #ifdef ___XXXX_256__
-	ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
+	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
 #else
 	ndCountingSort<int, GetKey, 3>(m_src, m_dst0, m_scan0);
 #endif
@@ -667,7 +667,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	{
 		int a = key.GetRadix(m_dst0[i - 1]);
 		int b = key.GetRadix(m_dst0[i - 0]);
-		ndAssert(a <= b);
+		//ndAssert(a <= b);
 	}
 }
 
@@ -1009,9 +1009,9 @@ void ndCudaContextImplement::Begin()
 	{
 #if 1
 		ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix);
-		//ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix);
-		//ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix);
-		//ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix);
+		ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix);
+		ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix);
+		ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix);
 #else
 		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix);
 		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix);

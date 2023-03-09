@@ -31,9 +31,9 @@
 #include "ndCudaHostBuffer.h"
 #include "ndCudaDeviceBuffer.h"
 
-//#define D_DEVICE_UNORDERED_SORT_BLOCK_SIZE	(1<<8)
+#define D_DEVICE_UNORDERED_SORT_BLOCK_SIZE	(1<<8)
 //#define D_DEVICE_UNORDERED_SORT_BLOCK_SIZE	(1<<9)
-#define D_DEVICE_UNORDERED_SORT_BLOCK_SIZE	(1<<10)
+//#define D_DEVICE_UNORDERED_SORT_BLOCK_SIZE	(1<<10)
 
 #define D_DEVICE_UNORDERED_MAX_RADIX_SIZE	(1<<8)
 
@@ -117,17 +117,18 @@ __global__ void ndCudaCountItemsUnordered(const ndKernelParams params, const ndA
 	}
 }
 
-//#define D_USE_BITONIC_SORT
+#define D_USE_BITONIC_SORT
 
 #ifdef D_USE_BITONIC_SORT
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
 	__shared__  T cachedItems[D_DEVICE_UNORDERED_SORT_BLOCK_SIZE];
-	__shared__  int sortedRadix[D_DEVICE_UNORDERED_SORT_BLOCK_SIZE];
+	__shared__  int sortedRadix[D_DEVICE_UNORDERED_SORT_BLOCK_SIZE + 1];
 	__shared__  int radixPrefixCount[D_DEVICE_UNORDERED_MAX_RADIX_SIZE];
 	__shared__  int radixPrefixStart[D_DEVICE_UNORDERED_MAX_RADIX_SIZE];
 	__shared__  int radixPrefixScan[D_DEVICE_UNORDERED_MAX_RADIX_SIZE / 2 + D_DEVICE_UNORDERED_MAX_RADIX_SIZE + 1];
+	__shared__  int passes[1];
 
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
@@ -161,7 +162,7 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 		} 
 		else
 		{
-			sortedRadix[threadId] = (radixStride << 16) + threadId;
+			sortedRadix[threadId] = (radixStride << 16);
 		}
 		__syncthreads();
 
@@ -184,6 +185,7 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 			}
 		}
 
+#if 1
 		int threadId0 = threadId;
 		for (int k = 2; k <= blockSride; k = k << 1)
 		{
@@ -198,14 +200,66 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 					const int mask0 = (-(threadId0 & k)) >> 31;
 					const int mask1 = -(a > b);
 					const int mask2 = mask0 ^ mask1;
-					const int a1 = mask2 ? b : a;
-					const int b1 = mask2 ? a : b;
-					sortedRadix[threadId0] = a1;
-					sortedRadix[threadId1] = b1;
+					//const int a1 = mask2 ? b : a;
+					//const int b1 = mask2 ? a : b;
+					//sortedRadix[threadId0] = a1;
+					//sortedRadix[threadId1] = b1;
+					if (mask2)
+					{
+						sortedRadix[threadId0] = b;
+						sortedRadix[threadId1] = a;
+					}
 				}
 				__syncthreads();
 			}
 		}
+#else
+		if (threadId == 0)
+		{
+			passes[0] = 1;
+			sortedRadix[blockSride] = (radixStride << 16);
+		}
+		__syncthreads();
+		while (passes[0])
+		{
+			if (threadId == 0)
+			{
+				passes[0] = 0;
+			}
+			__syncthreads();
+
+			if (threadId < blockSride / 2)
+			{
+				int id0 = threadId * 2 + 0;
+				int id1 = threadId * 2 + 1;
+				const int a = sortedRadix[id0];
+				const int b = sortedRadix[id1];
+				if (b > a)
+				{
+					passes[0] = 1;
+					sortedRadix[id0] = b;
+					sortedRadix[id1] = a;
+				}
+			}
+			__syncthreads();
+
+			if (threadId < blockSride / 2)
+			{
+				int id0 = threadId * 2 + 1;
+				int id1 = threadId * 2 + 2;
+				const int a = sortedRadix[id0];
+				const int b = sortedRadix[id1];
+				if (b > a)
+				{
+					passes[0] = 1;
+					sortedRadix[id0] = b;
+					sortedRadix[id1] = a;
+				}
+			}
+			__syncthreads();
+		}
+
+#endif
 
 		if (index < input.m_size)
 		{
@@ -230,12 +284,7 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
-	__shared__  T cachedItems[D_DEVICE_UNORDERED_SORT_BLOCK_SIZE];
-	
-	__shared__  int itemRadix[D_DEVICE_UNORDERED_SORT_BLOCK_SIZE];
 	__shared__  int scanBaseAdress[D_DEVICE_UNORDERED_MAX_RADIX_SIZE];
-	__shared__  int radixDstOffset[D_DEVICE_UNORDERED_SORT_BLOCK_SIZE];
-
 	int threadId = threadIdx.x;
 	int blockIndex = blockIdx.x;
 	int blockStride = blockDim.x;
@@ -247,29 +296,17 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 	{
 		scanBaseAdress[threadId] = scansBuffer[radixPrefixOffset + threadId] + scansBuffer[radixBase + threadId];
 	}
+	__syncthreads();
 
 	for (int i = 0; i < params.m_blocksPerKernel; ++i)
 	{
 		int index = bashSize + threadId;
 		if (index < input.m_size)
 		{
-			cachedItems[threadId] = input[index];
-			int radix = getRadix(cachedItems[threadId]);
-			itemRadix[threadId] = radix;
-		}
-		__syncthreads();
-
-		if (index < input.m_size)
-		{
-			int key = itemRadix[threadId];
-			radixDstOffset[threadId] = atomicAdd(&scanBaseAdress[key], 1);
-		}
-		__syncthreads();
-
-		if (index < input.m_size)
-		{
-			int address = radixDstOffset[threadId];
-			output[address] = cachedItems[threadId];
+			T item(input[index]);
+			int radix = getRadix(item);
+			int address = atomicAdd(&scanBaseAdress[radix], 1);
+			output[address] = item;
 		}
 		bashSize += blockStride;
 	}
