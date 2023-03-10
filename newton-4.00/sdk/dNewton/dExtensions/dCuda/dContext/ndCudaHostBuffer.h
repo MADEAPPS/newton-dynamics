@@ -452,12 +452,45 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				}
 			}
 
-			int sortedRadix1[D_HOST_SORT_BLOCK_SIZE];
+			int sortedRadix1[D_HOST_SORT_BLOCK_SIZE + 1];
 			for (int threadId = 0; threadId < blockStride; ++threadId)
 			{
 				int radix = sortedRadix[threadId];
 				int address = radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + radix]++;
 				sortedRadix1[address] = (radix << 16) + threadId;
+			}
+			sortedRadix1[D_HOST_SORT_BLOCK_SIZE] = radixStride << 16;
+			int passes = 1;
+			while (passes)
+			{
+				passes = 0;
+				for (int threadId = 0; threadId < blockStride / 2; ++threadId)
+				{
+					int id0 = threadId * 2 + 0;
+					int id1 = threadId * 2 + 1;
+					int key0 = sortedRadix1[id0];
+					int key1 = sortedRadix1[id1];
+					if (key1 < key0)
+					{
+						passes = 1;
+						sortedRadix1[id0] = key1;
+						sortedRadix1[id1] = key0;
+					}
+				}
+
+				for (int threadId = 0; threadId < blockStride / 2; ++threadId)
+				{
+					int id0 = threadId * 2 + 1;
+					int id1 = threadId * 2 + 2;
+					int key0 = sortedRadix1[id0];
+					int key1 = sortedRadix1[id1];
+					if (key1 < key0)
+					{
+						passes = 1;
+						sortedRadix1[id0] = key1;
+						sortedRadix1[id1] = key0;
+					}
+				}
 			}
 
 #endif

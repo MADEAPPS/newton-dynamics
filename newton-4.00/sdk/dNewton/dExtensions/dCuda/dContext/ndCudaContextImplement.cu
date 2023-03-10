@@ -634,6 +634,11 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 #endif
 	}
 
+	m_src[10] = 0;
+	m_src[11] = 1;
+	m_src[20] = 0;
+	m_src[21] = 1;
+
 	m_scan0.SetCount(1024 * 256);
 	m_scan1.SetCount(1024 * 256);
 	m_dst0.SetCount(m_src.GetCount());
