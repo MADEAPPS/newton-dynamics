@@ -128,7 +128,6 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 	__shared__  int radixPrefixCount[D_DEVICE_UNORDERED_MAX_RADIX_SIZE];
 	__shared__  int radixPrefixStart[D_DEVICE_UNORDERED_MAX_RADIX_SIZE];
 	__shared__  int radixPrefixScan[D_DEVICE_UNORDERED_MAX_RADIX_SIZE / 2 + D_DEVICE_UNORDERED_MAX_RADIX_SIZE + 1];
-	__shared__  int passes[1];
 
 	int threadId = threadIdx.x;
 	int blockSride = blockDim.x;
@@ -214,6 +213,7 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 			}
 		}
 #else
+		__shared__  int passes[1];
 		if (threadId == 0)
 		{
 			passes[0] = 1;

@@ -315,7 +315,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		}
 	};
 
-//#define D_USE_BITONIC_MERGE
+#define D_USE_BITONIC_MERGE
 
 #ifdef D_USE_BITONIC_MERGE
 	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
@@ -347,7 +347,8 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			{
 				radixPrefixCount[threadId] = 0;
 			}
-		
+
+#if 1
 			for (int threadId = 0; threadId < blockStride; ++threadId)
 			{
 				int index = bashSize + threadId;
@@ -360,6 +361,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				}
 				else
 				{
+					ndAssert(0);
 					sortedRadix[threadId] = (radixStride << 16) + threadId;
 				}
 			}
@@ -396,10 +398,11 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 							const int mask0 = (-(threadId0 & k)) >> 31;
 							const int mask1 = -(a > b);
 							const int mask2 = mask0 ^ mask1;
-							const int a1 = mask2 ? b : a;
-							const int b1 = mask2 ? a : b;
-							sortedRadix[threadId0] = a1;
-							sortedRadix[threadId1] = b1;
+							if (mask2)
+							{
+								sortedRadix[threadId0] = b;
+								sortedRadix[threadId1] = a;
+							}
 						}
 					}
 				}
@@ -418,25 +421,51 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					dst[dstOffset0 + dstOffset1] = cachedItems[keyLow];
 				}
 			}
+#else
+			for (int threadId = 0; threadId < blockStride; ++threadId)
+			{
+				int index = bashSize + threadId;
+				if (index < size)
+				{
+					cachedItems[threadId] = src[index];
+					int radix = evaluator.GetRadix(cachedItems[threadId]);
+					radixPrefixCount[radix] ++;
+				}
+			}
+
+			for (int threadId = 0; threadId < radixStride; ++threadId)
+			{
+				radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + threadId + 1] = radixPrefixCount[threadId];
+			}
+
+			for (int k = 1; k < radixStride; k = k << 1)
+			{
+				int sumReg[D_HOST_MAX_RADIX_SIZE];
+				for (int threadId = 0; threadId < radixStride; ++threadId)
+				{
+					sumReg[threadId] = radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + threadId] + radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + threadId - k];
+				}
+				for (int threadId = 0; threadId < radixStride; ++threadId)
+				{
+					radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + threadId] = sumReg[threadId];
+				}
+			}
+
+#endif
 
 			for (int threadId = 0; threadId < radixStride; ++threadId)
 			{
 				radixPrefixStart[threadId] += radixPrefixCount[threadId];
 			}
+
 			bashSize += blockStride;
 		}
 	};
 
 #else
 
-//#define D_SEPATE_LOOPS
 	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
-#ifdef D_SEPATE_LOOPS
-		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
-		int itemRadix[D_HOST_SORT_BLOCK_SIZE];
-		int radixDstOffset[D_HOST_SORT_BLOCK_SIZE];
-#endif
 		int scanBaseAdress[D_HOST_MAX_RADIX_SIZE];
 
 		int size = src.GetCount();
@@ -455,40 +484,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		ndEvaluateKey evaluator;
 		for (int i = 0; i < blocksCount; ++i)
 		{
-#ifdef D_SEPATE_LOOPS
-			for (int threadId = 0; threadId < blockStride; ++threadId)
-			{
-				int index = bashSize + threadId;
-				if (index < size)
-				{
-					cachedItems[threadId] = src[index];
-					int radix = evaluator.GetRadix(cachedItems[threadId]);
-					itemRadix[threadId] = radix;
-				}
-			}
-
-			for (int threadId = 0; threadId < blockStride; ++threadId)
-			{
-				int index = bashSize + threadId;
-				if (index < size)
-				{
-					int radix = itemRadix[threadId];
-					//radixDstOffset[threadId] = atomicAdd(&scanBaseAdress[radix], 1);
-					radixDstOffset[threadId] = scanBaseAdress[radix]++;
-				}
-			}
-
-			for (int threadId = 0; threadId < blockStride; ++threadId)
-			{
-				int index = bashSize + threadId;
-				if (index < size)
-				{
-					int address = radixDstOffset[threadId];
-					dst[address] = cachedItems[threadId];
-				}
-			}
-
-#else
 			for (int threadId = 0; threadId < blockStride; ++threadId)
 			{
 				int index = bashSize + threadId;
@@ -501,7 +496,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					dst[address] = item;
 				}
 			}
-#endif
 			bashSize += blockStride;
 		}
 	};

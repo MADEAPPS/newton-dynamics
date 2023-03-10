@@ -207,9 +207,7 @@ void gpu_prescan(unsigned int* const d_out,
 	}
 }
 
-void sum_scan_blelloch(unsigned int* const d_out,
-	const unsigned int* const d_in,
-	const size_t numElems)
+void sum_scan_blelloch(unsigned int* const d_out, const unsigned int* const d_in, const size_t numElems)
 {
 	// Zero out d_out
 	checkCudaErrors(cudaMemset(d_out, 0, numElems * sizeof(unsigned int)));
@@ -240,7 +238,8 @@ void sum_scan_blelloch(unsigned int* const d_out,
 
 	// Sum scan data allocated to each block
 	//gpu_sum_scan_blelloch<<<grid_sz, block_sz, sizeof(unsigned int) * max_elems_per_block >>>(d_out, d_in, d_block_sums, numElems);
-	gpu_prescan << <grid_sz, block_sz, sizeof(unsigned int)* shmem_sz >> > (d_out,
+	gpu_prescan << <grid_sz, block_sz, sizeof(unsigned int)* shmem_sz >> > (
+		d_out,
 		d_in,
 		d_block_sums,
 		numElems,
@@ -621,7 +620,8 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	// ***********************************
 	//m_src.SetCount(8);
 	//m_src.SetCount(20);
-	m_src.SetCount(512);
+	m_src.SetCount(256);
+	//m_src.SetCount(512);
 	//m_src.SetCount(512 + 99);
 	//m_src.SetCount(1000000);
 	for (int i = 0; i < m_src.GetCount(); ++i)
@@ -657,7 +657,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	};
 	
 #ifdef ___XXXX_256__
-	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
+	ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
 #else
 	ndCountingSort<int, GetKey, 3>(m_src, m_dst0, m_scan0);
 #endif
@@ -667,7 +667,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	{
 		int a = key.GetRadix(m_dst0[i - 1]);
 		int b = key.GetRadix(m_dst0[i - 0]);
-		//ndAssert(a <= b);
+		ndAssert(a <= b);
 	}
 }
 
