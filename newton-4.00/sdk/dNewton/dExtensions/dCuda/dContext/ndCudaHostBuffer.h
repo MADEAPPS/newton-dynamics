@@ -430,6 +430,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					cachedItems[threadId] = src[index];
 					int radix = evaluator.GetRadix(cachedItems[threadId]);
 					radixPrefixCount[radix] ++;
+					sortedRadix[threadId] = radix;
 				}
 			}
 
@@ -449,6 +450,14 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				{
 					radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + threadId] = sumReg[threadId];
 				}
+			}
+
+			int sortedRadix1[D_HOST_SORT_BLOCK_SIZE];
+			for (int threadId = 0; threadId < blockStride; ++threadId)
+			{
+				int radix = sortedRadix[threadId];
+				int address = radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + radix]++;
+				sortedRadix1[address] = (radix << 16) + threadId;
 			}
 
 #endif
