@@ -175,7 +175,9 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 			__syncthreads();
 			if (threadId < radixStride)
 			{
-				sum = radixPrefixScan[D_DEVICE_UNORDERED_MAX_RADIX_SIZE / 2 + threadId] + radixPrefixScan[D_DEVICE_UNORDERED_MAX_RADIX_SIZE / 2 + threadId - k];
+				int a = radixPrefixScan[D_DEVICE_UNORDERED_MAX_RADIX_SIZE / 2 + threadId];
+				int b = radixPrefixScan[D_DEVICE_UNORDERED_MAX_RADIX_SIZE / 2 + threadId - k];
+				sum = a + b;
 			}
 			__syncthreads();
 			if (threadId < radixStride)
@@ -185,28 +187,27 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 		}
 
 #if 1
-		int threadId0 = threadId;
+		int id0 = threadId;
 		for (int k = 2; k <= blockSride; k = k << 1)
 		{
 			for (int j = k >> 1; j > 0; j = j >> 1)
 			{
-				int threadId1 = threadId0 ^ j;
+				int id1 = id0 ^ j;
 
-				if (threadId1 > threadId0)
+				if (id1 > id0)
 				{
-					const int a = sortedRadix[threadId0];
-					const int b = sortedRadix[threadId1];
-					const int mask0 = (-(threadId0 & k)) >> 31;
+					const int a = sortedRadix[id0];
+					const int b = sortedRadix[id1];
+					//const int mask0 = (-(id0 & k)) >> 31;
+					//const int mask1 = -(a > b);
+					//const int mask2 = mask0 ^ mask1;
+					const int mask0 = -(id0 & k);
 					const int mask1 = -(a > b);
-					const int mask2 = mask0 ^ mask1;
-					//const int a1 = mask2 ? b : a;
-					//const int b1 = mask2 ? a : b;
-					//sortedRadix[threadId0] = a1;
-					//sortedRadix[threadId1] = b1;
+					const int mask2 = (mask0 ^ mask1) & 0x80000000;
 					if (mask2)
 					{
-						sortedRadix[threadId0] = b;
-						sortedRadix[threadId1] = a;
+						sortedRadix[id0] = b;
+						sortedRadix[id1] = a;
 					}
 				}
 				__syncthreads();
