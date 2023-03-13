@@ -315,10 +315,10 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		}
 	};
 
-#define D_USE_BUBBLE_MERGE
-//#define D_USE_BITONIC_MERGE
+#define D_USE_CPU_BUBBLE_MERGE
+//#define D_USE_CPU_BITONIC_MERGE
 
-#ifdef D_USE_BITONIC_MERGE
+#ifdef D_USE_CPU_BITONIC_MERGE
 	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
 		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
@@ -437,16 +437,16 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		}
 	};
 
-#elif defined (D_USE_BUBBLE_MERGE)
+#elif defined (D_USE_CPU_BUBBLE_MERGE)
 	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
 		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
-		int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
-		int sortedRadix1[D_HOST_SORT_BLOCK_SIZE + 1];
+		int unSortedRadix[D_HOST_SORT_BLOCK_SIZE];
+		int sortedRadix[D_HOST_SORT_BLOCK_SIZE + 1];
 		int radixPrefixCount[D_HOST_MAX_RADIX_SIZE];
 		int radixPrefixStart[D_HOST_MAX_RADIX_SIZE];
 		int radixPrefixScan[2 * D_HOST_MAX_RADIX_SIZE + 1];
-		int passes;
+		int passes[D_HOST_SORT_BLOCK_SIZE / 2];
 
 		int size = src.GetCount();
 		int radixStride = (1 << exponentRadix);
@@ -458,7 +458,10 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		ndEvaluateKey evaluator;
 		for (int threadId = 0; threadId < radixStride; ++threadId)
 		{
-			radixPrefixStart[threadId] = scansBuffer[radixBase + threadId] + scansBuffer[radixPrefixOffset + threadId];
+			//radixPrefixStart[threadId] = scansBuffer[radixBase + threadId] + scansBuffer[radixPrefixOffset + threadId];
+			int a = scansBuffer[radixBase + threadId];
+			int b = scansBuffer[radixPrefixOffset + threadId];
+			radixPrefixStart[threadId] = a + b;
 		}
 
 		for (int i = 0; i < blocksCount; ++i)
@@ -468,20 +471,21 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				radixPrefixCount[threadId] = 0;
 				radixPrefixScan[threadId + 1] = 0;
 			}
-			
+
 			for (int threadId = 0; threadId < blockStride; ++threadId)
 			{
 				int index = bashSize + threadId;
 				if (index < size)
 				{
-					cachedItems[threadId] = src[index];
-					int radix = evaluator.GetRadix(cachedItems[threadId]);
+					T item(src[index]);
+					cachedItems[threadId] = item;
+					int radix = evaluator.GetRadix(item);
 					radixPrefixCount[radix] ++;
-					sortedRadix[threadId] = radix;
+					unSortedRadix[threadId] = radix;
 				}
 				else
 				{
-					sortedRadix[threadId] = radixStride;
+					unSortedRadix[threadId] = radixStride-1;
 				}
 			}
 			
@@ -510,55 +514,74 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				radixPrefixScan[threadId] = radixPrefixScan[D_HOST_MAX_RADIX_SIZE + threadId];
 			}
 
-			sortedRadix1[D_HOST_SORT_BLOCK_SIZE] = (radixStride + 1) << 16;
+			sortedRadix[D_HOST_SORT_BLOCK_SIZE] = (radixStride + 1) << 16;
 			radixPrefixScan[2 * D_HOST_MAX_RADIX_SIZE] = radixPrefixScan[2 * D_HOST_MAX_RADIX_SIZE - 1];
 			
 			for (int threadId = 0; threadId < blockStride; ++threadId)
 			{
-				int radix = sortedRadix[threadId];
+				int radix = unSortedRadix[threadId];
 				int address = radixPrefixScan[D_HOST_MAX_RADIX_SIZE + radix]++;
-				sortedRadix1[address] = (radix << 16) + threadId;
+				sortedRadix[address] = (radix << 16) + threadId;
 			}
-			
-			passes = 1;
-			while (passes)
+
+			//cuSwap(sortedRadix[3], sortedRadix[7]);
+for (int threadId = 0; threadId < blockStride; ++threadId)
+{
+	sortedRadix[threadId] = blockStride - threadId;
+}
+int xxxx = 0;
+			do 
 			{
-				passes = 0;
+				for (int threadId = 0; threadId < blockStride / 2; ++threadId)
+				{
+					passes[threadId] = 0;
+				}
+
 				for (int threadId = 0; threadId < blockStride / 2; ++threadId)
 				{
 					int id0 = threadId * 2 + 0;
 					int id1 = threadId * 2 + 1;
-					int key0 = sortedRadix1[id0];
-					int key1 = sortedRadix1[id1];
+					int key0 = sortedRadix[id0];
+					int key1 = sortedRadix[id1];
 					if (key1 < key0)
 					{
-						passes = 1;
-						sortedRadix1[id0] = key1;
-						sortedRadix1[id1] = key0;
+						sortedRadix[id0] = key1;
+						sortedRadix[id1] = key0;
+						passes[threadId] = 1;
 					}
 				}
-			
-				for (int threadId = 0; threadId < blockStride / 2; ++threadId)
+
+				for (int threadId = 0; threadId < (blockStride / 2) - 1; ++threadId)
 				{
 					int id0 = threadId * 2 + 1;
 					int id1 = threadId * 2 + 2;
-					int key0 = sortedRadix1[id0];
-					int key1 = sortedRadix1[id1];
+					int key0 = sortedRadix[id0];
+					int key1 = sortedRadix[id1];
 					if (key1 < key0)
 					{
-						passes = 1;
-						sortedRadix1[id0] = key1;
-						sortedRadix1[id1] = key0;
+						sortedRadix[id0] = key1;
+						sortedRadix[id1] = key0;
+						passes[threadId] = 1;
 					}
 				}
-			}
+
+				for (int block = blockStride / 4; !passes[0] && block; block >>= 1)
+				{
+					for (int threadId = 0; threadId < block; ++threadId)
+					{
+						passes[threadId] += passes[block + threadId];
+					}
+				}
+				xxxx++;
+
+			} while (passes[0]);
 			
 			for (int threadId = 0; threadId < blockStride; ++threadId)
 			{
 				int index = bashSize + threadId;
 				if (index < size)
 				{
-					int keyValue = sortedRadix1[threadId];
+					int keyValue = sortedRadix[threadId];
 					int keyHigh = keyValue >> 16;
 					int keyLow = keyValue & 0xffff;
 					int dstOffset1 = radixPrefixStart[keyHigh];
