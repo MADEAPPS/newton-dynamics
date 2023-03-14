@@ -117,8 +117,8 @@ __global__ void ndCudaCountItemsUnordered(const ndKernelParams params, const ndA
 	}
 }
 
-#define D_USE_CUDA_BUBBLE_MERGE
-//#define D_USE_CUDA_BITONIC_MERGE
+//#define D_USE_CUDA_BUBBLE_MERGE
+#define D_USE_CUDA_BITONIC_MERGE
 
 #ifdef D_USE_CUDA_BITONIC_MERGE
 template <typename T, typename SortKeyPredicate>
