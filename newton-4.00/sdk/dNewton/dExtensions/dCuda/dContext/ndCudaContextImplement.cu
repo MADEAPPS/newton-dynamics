@@ -619,12 +619,15 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 
 	// ***********************************
 	//m_src.SetCount(8);
+	m_src.SetCount(17);
 	//m_src.SetCount(81);
 	//m_src.SetCount(256);
 	//m_src.SetCount(300);
 	//m_src.SetCount(512);
 	//m_src.SetCount(512 + 99);
-	m_src.SetCount(1000000);
+	//m_src.SetCount(10000);
+	//m_src.SetCount(100000);
+	//m_src.SetCount(1000000);
 	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
 #ifdef ___XXXX_256__
@@ -635,9 +638,9 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 #endif
 	}
 
-	m_src[1] = 1;
-	m_src[2] = 1;
-	m_src[3] = 1;
+	m_src[4] = 1;
+	m_src[9] = 1;
+	m_src[14] = 1;
 	m_src[0] = 255;
 	//m_src[11] = 1;
 	//m_src[20] = 0;
@@ -1034,10 +1037,9 @@ void ndCudaContextImplement::Begin()
 	float totalTime;
 	cudaEventElapsedTime(&totalTime, start_event, stop_event);
 
-	float gigKeys = m_buf0.GetCount() * 1.e-9f;
-	float average = 1.0e-3f * totalTime / numIterations;
-	//printf("newton sort, throughput = %f MElements/s, Time = %f s, Size = %u elements\n", megkeys / average, average, m_buf0.GetCount());
-	cudaExpandTraceMessage("newton sort, throughput = %f gigaKeys/seconds, time = %f s, size = %u elements\n", gigKeys / average, average, m_buf0.GetCount());
+	totalTime = totalTime * 1.0e-3f;
+	float gigKeys = float (m_buf0.GetCount() * numIterations) * 1.0e-9f;
+	cudaExpandTraceMessage("newton sort, throughput = %f gigaKeys/seconds, time = %f s, size = %u elements\n", gigKeys / totalTime, totalTime/numIterations, m_buf0.GetCount());
 
 	#if 1
 	m_device->SyncDevice();
