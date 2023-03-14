@@ -1034,9 +1034,10 @@ void ndCudaContextImplement::Begin()
 	float totalTime;
 	cudaEventElapsedTime(&totalTime, start_event, stop_event);
 
-	float megkeys = m_buf0.GetCount() * 1.e-6f;
+	float gigKeys = m_buf0.GetCount() * 1.e-9f;
 	float average = 1.0e-3f * totalTime / numIterations;
-	printf("newton sort, throughput = %f MElements/s, Time = %f s, Size = %u elements\n", megkeys / average, average, m_buf0.GetCount());
+	//printf("newton sort, throughput = %f MElements/s, Time = %f s, Size = %u elements\n", megkeys / average, average, m_buf0.GetCount());
+	cudaExpandTraceMessage("newton sort, throughput = %f gigaKeys/seconds, time = %f s, size = %u elements\n", gigKeys / average, average, m_buf0.GetCount());
 
 	#if 1
 	m_device->SyncDevice();

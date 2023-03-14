@@ -54,7 +54,6 @@ void operator delete (void* ptr)
 	g_free(ptr);
 }
 
-#ifdef CUDA_TRACE
 void cudaExpandTraceMessage(const char* const fmt, ...)
 {
 	va_list v_args;
@@ -71,5 +70,3 @@ void cudaExpandTraceMessage(const char* const fmt, ...)
 		printf("%s\n", text);
 	#endif
 }
-
-#endif

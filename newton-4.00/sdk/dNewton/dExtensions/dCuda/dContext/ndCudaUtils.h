@@ -44,8 +44,9 @@
 	#endif
 #endif
 
+void cudaExpandTraceMessage(const char* const fmt, ...);
+
 #ifdef CUDA_TRACE
-	void cudaExpandTraceMessage(const char* const fmt, ...);
 	#define cuTrace(x) cudaExpandTraceMessage x;
 #else
 	#define cuTrace(x);
