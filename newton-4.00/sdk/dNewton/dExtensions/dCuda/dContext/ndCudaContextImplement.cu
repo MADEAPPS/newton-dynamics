@@ -615,7 +615,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//*m_sceneInfoCpu = ndCudaSceneInfo();
 	m_sortPrefixBuffer.SetCount(m_sortPrefixBuffer.GetCapacity());
 
-#define ___XXXX_256__
+//#define ___XXXX_256__
 
 	// ***********************************
 	//m_src.SetCount(8);

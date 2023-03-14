@@ -487,7 +487,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			
 			for (int threadId = 0; threadId < radixStride; ++threadId)
 			{
-				radixPrefixScan[D_HOST_MAX_RADIX_SIZE + threadId + 1] = radixPrefixCount[threadId];
+				radixPrefixScan[radixStride + threadId + 1] = radixPrefixCount[threadId];
 			}
 			
 			for (int k = 1; k < radixStride; k = k << 1)
@@ -495,20 +495,20 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				int sumReg[D_HOST_MAX_RADIX_SIZE];
 				for (int threadId = 0; threadId < radixStride; ++threadId)
 				{
-					int a = radixPrefixScan[D_HOST_MAX_RADIX_SIZE + threadId];
-					int b = radixPrefixScan[D_HOST_MAX_RADIX_SIZE + threadId - k];
+					int a = radixPrefixScan[radixStride + threadId];
+					int b = radixPrefixScan[radixStride + threadId - k];
 					sumReg[threadId] = a + b;
 				}
 				for (int threadId = 0; threadId < radixStride; ++threadId)
 				{
-					radixPrefixScan[D_HOST_MAX_RADIX_SIZE + threadId] = sumReg[threadId];
+					radixPrefixScan[radixStride + threadId] = sumReg[threadId];
 				}
 			}
 
-			radixPrefixScan[2 * D_HOST_MAX_RADIX_SIZE] += radixPrefixScan[2 * D_HOST_MAX_RADIX_SIZE - 1];
+			radixPrefixScan[2 * radixStride] += radixPrefixScan[2 * radixStride - 1];
 			for (int threadId = 0; threadId < radixStride; ++threadId)
 			{
-				radixPrefixScan[threadId] = radixPrefixScan[D_HOST_MAX_RADIX_SIZE + 1 + threadId] - 1;
+				radixPrefixScan[threadId] = radixPrefixScan[radixStride + 1 + threadId] - 1;
 			}
 			
 			for (int threadId = 0; threadId < blockStride; ++threadId)
@@ -573,7 +573,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					int keyHigh = keyValue >> 16;
 					int keyLow = keyValue & 0xffff;
 					int dstOffset1 = radixPrefixStart[keyHigh];
-					int dstOffset0 = threadId - radixPrefixScan[keyHigh + D_HOST_MAX_RADIX_SIZE];
+					int dstOffset0 = threadId - radixPrefixScan[keyHigh + radixStride];
 					dst[dstOffset0 + dstOffset1] = cachedItems[keyLow];
 				}
 			}
