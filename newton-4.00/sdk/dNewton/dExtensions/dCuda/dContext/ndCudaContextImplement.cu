@@ -1048,7 +1048,7 @@ void ndCudaContextImplement::Begin()
 	{
 		int a = GetRadix(m_dst1[i - 1]);
 		int b = GetRadix(m_dst1[i - 0]);
-		//ndAssert(a <= b);
+		ndAssert(a <= b);
 	}
 	m_buf0.WriteData(&m_dst1[0], m_dst1.GetCount());
 	#endif

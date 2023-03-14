@@ -63,7 +63,11 @@ add_definitions(-D_D_CUDA_EXPORT_DLL)
 add_library(${projectName} SHARED ${CPP_SOURCE})
 
 set_target_properties(${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON CUDA_RESOLVE_DEVICE_SYMBOLS ON)
-target_compile_options(${projectName} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_60,code=sm_60>)
+
+#it seem this is the fucking problem
+#target_compile_options(${projectName} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_60 code=sm_60>)
+#target_compile_options(${projectName} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode compute_60,sm_60>)
+#target_compile_options(${projectName} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_52 code=sm_52>)
 
 install(FILES ${HEADERS} DESTINATION include/${projectName})
 install(FILES $<TARGET_PDB_FILE:${projectName}> DESTINATION bin OPTIONAL)
