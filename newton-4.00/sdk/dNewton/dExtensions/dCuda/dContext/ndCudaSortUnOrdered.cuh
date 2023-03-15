@@ -117,10 +117,10 @@ __global__ void ndCudaCountItemsUnordered(const ndKernelParams params, const ndA
 	}
 }
 
-#define D_USE_CUDA_BUBBLE_MERGE
-#define D_USE_CUDA_BITONIC_MERGE
+//#define D_USE_LOCAL_BITONIC_SORT
+#define D_USE_LOCAL_COUNTING_SORT
 
-#ifdef D_USE_CUDA_BITONIC_MERGE
+#ifdef D_USE_LOCAL_BITONIC_SORT
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
@@ -237,19 +237,17 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 	}
 }
 
-#elif defined (D_USE_CUDA_BUBBLE_MERGE)
+#elif defined (D_USE_LOCAL_COUNTING_SORT)
 
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
 	__shared__  T cachedItems[D_DEVICE_UNORDERED_SORT_BLOCK_SIZE];
-	__shared__  int unSortedRadix[D_DEVICE_UNORDERED_SORT_BLOCK_SIZE];
 	__shared__  int sortedRadix[D_DEVICE_UNORDERED_SORT_BLOCK_SIZE];
 	__shared__  int radixPrefixCount[D_DEVICE_UNORDERED_MAX_RADIX_SIZE];
 	__shared__  int radixPrefixStart[D_DEVICE_UNORDERED_MAX_RADIX_SIZE];
-	__shared__  int radixPrefixScan[2 * D_DEVICE_UNORDERED_MAX_RADIX_SIZE + 1];
-	__shared__  int sortPasses;
-	
+	__shared__  int radixPrefixScan[D_DEVICE_UNORDERED_MAX_RADIX_SIZE / 2 + D_DEVICE_UNORDERED_MAX_RADIX_SIZE + 1];
+
 	int threadId = threadIdx.x;
 	int blockStride = blockDim.x;
 	int blockIndex = blockIdx.x;
@@ -262,6 +260,8 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 		int a = scansBuffer[radixBase + threadId];
 		int b = scansBuffer[radixPrefixOffset + threadId];
 		radixPrefixStart[threadId] = a + b;
+
+		radixPrefixScan[threadId] = 0;
 	}
 
 	for (int i = 0; i < params.m_blocksPerKernel; ++i)
@@ -269,125 +269,78 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 		if (threadId < radixStride)
 		{
 			radixPrefixCount[threadId] = 0;
-			radixPrefixScan[threadId + 1] = 0;
 		}
 		__syncthreads();
-		
-		int radix = radixStride - 1;
+
 		int index = bashSize + threadId;
 		if (index < input.m_size)
 		{
-			T item(input[index]);
-			cachedItems[threadId] = item;
-			radix = getRadix(item);
+			cachedItems[threadId] = input[index];
+			int radix = getRadix(cachedItems[threadId]);
+			atomicAdd(&radixPrefixCount[radix], 1);
+			sortedRadix[threadId] = (radix << 16) + threadId;
 		}
-		atomicAdd(&radixPrefixCount[radix], 1);
-		unSortedRadix[threadId] = radix;
+		else
+		{
+			sortedRadix[threadId] = (radixStride << 16);
+		}
 		__syncthreads();
 
 		if (threadId < radixStride)
 		{
-			radixPrefixScan[radixStride + threadId + 1] = radixPrefixCount[threadId];
+			radixPrefixScan[radixStride / 2 + threadId + 1] = radixPrefixCount[threadId];
 		}
-		
 		for (int k = 1; k < radixStride; k = k << 1)
 		{
 			int sum;
 			__syncthreads();
 			if (threadId < radixStride)
 			{
-				int a = radixPrefixScan[radixStride + threadId];
-				int b = radixPrefixScan[radixStride + threadId - k];
+				int a = radixPrefixScan[radixStride / 2 + threadId];
+				int b = radixPrefixScan[radixStride / 2 + threadId - k];
 				sum = a + b;
 			}
 			__syncthreads();
 			if (threadId < radixStride)
 			{
-				radixPrefixScan[radixStride + threadId] = sum;
+				radixPrefixScan[radixStride / 2 + threadId] = sum;
 			}
 		}
-		__syncthreads();
 
-		if (threadId == 0)
+		int id0 = threadId;
+		for (int k = 2; k <= blockStride; k = k << 1)
 		{
-			radixPrefixScan[2 * radixStride] += radixPrefixScan[2 * radixStride - 1];
+			for (int j = k >> 1; j > 0; j = j >> 1)
+			{
+				int id1 = id0 ^ j;
+
+				if (id1 > id0)
+				{
+					const int a = sortedRadix[id0];
+					const int b = sortedRadix[id1];
+					const int mask0 = -(id0 & k);
+					const int mask1 = -(a > b);
+					const int mask2 = (mask0 ^ mask1) & 0x80000000;
+					if (mask2)
+					{
+						sortedRadix[id0] = b;
+						sortedRadix[id1] = a;
+					}
+				}
+				__syncthreads();
+			}
 		}
-		__syncthreads();
-		radixPrefixScan[threadId] = radixPrefixScan[radixStride + threadId + 1] - 1;
-		__syncthreads();
-		
-		radix = unSortedRadix[threadId];
-		int address = atomicAdd(&radixPrefixScan[radix], -1);
-		sortedRadix[address] = (radix << 16) + threadId;
-		__syncthreads();
 
-		int test = 1;
-		do
-		{
-			//if (threadId < blockStride / 2)
-			if (threadId == 0)
-			{
-				sortPasses = 0;
-			}
-			__syncthreads();
-		
-			if (threadId < blockStride / 2)
-			{
-				int id0 = threadId * 2 + 0;
-				int id1 = threadId * 2 + 1;
-				int key0 = sortedRadix[id0];
-				int key1 = sortedRadix[id1];
-				if (key1 < key0)
-				{
-					sortedRadix[id0] = key1;
-					sortedRadix[id1] = key0;
-					sortPasses = 1;
-				}
-			}
-			__syncthreads();
-		
-			if (threadId < (blockStride / 2 - 1))
-			{
-				int id0 = threadId * 2 + 1;
-				int id1 = threadId * 2 + 2;
-				int key0 = sortedRadix[id0];
-				int key1 = sortedRadix[id1];
-				if (key1 < key0)
-				{
-					sortedRadix[id0] = key1;
-					sortedRadix[id1] = key0;
-					sortPasses = 1;
-				}
-			}
-			__syncthreads();
-		
-			//for (int block = blockStride / 4; !thisIsShit[0] && block; block >>= 1)
-			//test = !thisIsShit[0];
-			//for (int block = blockStride / 4; test && block; block = block / 2)
-			//for (int block = blockStride / 4; block; block = block / 2)
-			//{
-			//	if (threadId < block)
-			//	{
-			//		thisIsShit[threadId] += thisIsShit[block + threadId];
-			//	}
-			//	__syncthreads();
-			//	test = !thisIsShit[0];
-			//}
-			test = sortPasses;
-			__syncthreads();
-        } while (test);
-		
 		if (index < input.m_size)
 		{
 			int keyValue = sortedRadix[threadId];
 			int keyHigh = keyValue >> 16;
 			int keyLow = keyValue & 0xffff;
 			int dstOffset1 = radixPrefixStart[keyHigh];
-			int dstOffset0 = threadId - radixPrefixScan[radixStride + keyHigh];
+			int dstOffset0 = threadId - radixPrefixScan[radixStride / 2 + keyHigh];
 			output[dstOffset0 + dstOffset1] = cachedItems[keyLow];
 		}
 		__syncthreads();
-		
 		if (threadId < radixStride)
 		{
 			radixPrefixStart[threadId] += radixPrefixCount[threadId];

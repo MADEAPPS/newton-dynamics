@@ -619,7 +619,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 
 	// ***********************************
 	//m_src.SetCount(8);
-	//m_src.SetCount(17);
+	m_src.SetCount(17);
 	//m_src.SetCount(81);
 	//m_src.SetCount(256);
 	//m_src.SetCount(300);
@@ -674,13 +674,13 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	ndCountingSort<int, GetKey, 3>(m_src, m_dst0, m_scan0);
 #endif
 
-	//GetKey key;
-	//for (int i = 1; i < m_dst0.GetCount(); ++i)
-	//{
-	//	int a = key.GetRadix(m_dst0[i - 1]);
-	//	int b = key.GetRadix(m_dst0[i - 0]);
-	//	ndAssert(a <= b);
-	//}
+	GetKey key;
+	for (int i = 1; i < m_dst0.GetCount(); ++i)
+	{
+		int a = key.GetRadix(m_dst0[i - 1]);
+		int b = key.GetRadix(m_dst0[i - 0]);
+		ndAssert(a <= b);
+	}
 }
 
 ndCudaContextImplement::~ndCudaContextImplement()
@@ -1080,8 +1080,7 @@ void ndCudaContextImplement::End()
 	m_device->m_timeAcc += elapsedTime;
 	if (m_device->m_timerFrames >= 60)
 	{
-		float time = m_device->m_timeAcc / m_device->m_timerFrames;
-		printf("kernels average time = %f ms\n", time);
+		cuTrace (("kernels average time = %f ms\n", m_device->m_timeAcc / m_device->m_timerFrames));
 		m_device->m_timerFrames = 0;
 		m_device->m_timeAcc = 0.0f;
 	}
