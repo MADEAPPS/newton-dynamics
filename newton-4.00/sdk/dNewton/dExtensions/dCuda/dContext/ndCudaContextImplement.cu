@@ -615,11 +615,11 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//*m_sceneInfoCpu = ndCudaSceneInfo();
 	m_sortPrefixBuffer.SetCount(m_sortPrefixBuffer.GetCapacity());
 
-//#define ___XXXX_256__
+#define ___XXXX_256__
 
 	// ***********************************
 	//m_src.SetCount(8);
-	m_src.SetCount(17);
+	//m_src.SetCount(17);
 	//m_src.SetCount(81);
 	//m_src.SetCount(256);
 	//m_src.SetCount(300);
@@ -627,7 +627,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//m_src.SetCount(512 + 99);
 	//m_src.SetCount(10000);
 	//m_src.SetCount(100000);
-	//m_src.SetCount(1000000);
+	m_src.SetCount(1000000);
 	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
 #ifdef ___XXXX_256__
@@ -1014,8 +1014,8 @@ void ndCudaContextImplement::Begin()
 	cudaEventCreate(&start_event);
 	cudaEventCreate(&stop_event);
 
-	//int numIterations = 1;
-	int numIterations = 100;
+	int numIterations = 1;
+	//int numIterations = 100;
 	cudaEventRecord(start_event, 0);
 	for (int i = 0; i < numIterations; ++i)
 	{
