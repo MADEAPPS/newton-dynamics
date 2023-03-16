@@ -29,8 +29,8 @@
 
 //#define D_HOST_SORT_BLOCK_SIZE	(8)
 //#define D_HOST_SORT_BLOCK_SIZE	(16)
-#define D_HOST_SORT_BLOCK_SIZE		(1<<8)
-//#define D_HOST_SORT_BLOCK_SIZE	(1<<9)
+//#define D_HOST_SORT_BLOCK_SIZE		(1<<8)
+#define D_HOST_SORT_BLOCK_SIZE	(1<<9)
 //#define D_HOST_SORT_BLOCK_SIZE	(1<<10)
 
 #define D_HOST_MAX_RADIX_SIZE	(1<<8)
@@ -439,10 +439,10 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	{
 		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
 		int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
-		int dstLocalOffset[D_HOST_MAX_RADIX_SIZE];
+		int dstLocalOffset[D_HOST_SORT_BLOCK_SIZE];
 		int radixPrefixCount[D_HOST_MAX_RADIX_SIZE];
 		int radixPrefixStart[D_HOST_MAX_RADIX_SIZE];
-		int radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + D_HOST_MAX_RADIX_SIZE + 1];
+		int radixPrefixScan[D_HOST_SORT_BLOCK_SIZE / 2 + D_HOST_SORT_BLOCK_SIZE + 1];
 
 		int size = src.GetCount();
 		int radixStride = (1 << exponentRadix);
@@ -457,6 +457,10 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			int a = scansBuffer[radixBase + threadId];
 			int b = scansBuffer[radixPrefixOffset + threadId];
 			radixPrefixStart[threadId] = a + b;
+			
+		}
+		for (int threadId = 0; threadId < blockStride; ++threadId)
+		{
 			radixPrefixScan[threadId] = 0;
 		}
 
@@ -478,12 +482,13 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				}
 				radixPrefixCount[radix] ++;
 				sortedRadix[threadId] = (threadId << 16) + radix;
+				radixPrefixScan[threadId] = 0;
 			}
 
 			int bit = 1;
-			for (int j = radixStride; j; j = j >> 1)
+			for (int j = blockStride; j; j = j >> 1)
 			{
-				int keyReg[D_HOST_MAX_RADIX_SIZE];
+				int keyReg[D_HOST_SORT_BLOCK_SIZE];
 				for (int threadId = 0; threadId < blockStride; ++threadId)
 				{
 					keyReg[threadId] = sortedRadix[threadId];
@@ -494,29 +499,29 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					int test = keyReg[threadId] & bit;
 					int mask = test ? 1 : 0;
 					dstLocalOffset[threadId] = mask;
-					radixPrefixScan[radixStride / 2 + threadId + 1] = mask ? 1<<16 : 1;
+					radixPrefixScan[blockStride / 2 + threadId + 1] = mask ? 1<<16 : 1;
 				}
 
-				for (int k = 1; k < radixStride; k = k << 1)
+				for (int k = 1; k < blockStride; k = k << 1)
 				{
-					int sumReg[D_HOST_MAX_RADIX_SIZE];
-					for (int threadId = 0; threadId < radixStride; ++threadId)
+					int sumReg[D_HOST_SORT_BLOCK_SIZE];
+					for (int threadId = 0; threadId < blockStride; ++threadId)
 					{
-						int a = radixPrefixScan[radixStride / 2 + threadId];
-						int b = radixPrefixScan[radixStride / 2 + threadId - k];
+						int a = radixPrefixScan[blockStride / 2 + threadId];
+						int b = radixPrefixScan[blockStride / 2 + threadId - k];
 						sumReg[threadId] = a + b;
 					}
-					for (int threadId = 0; threadId < radixStride; ++threadId)
+					for (int threadId = 0; threadId < blockStride; ++threadId)
 					{
-						radixPrefixScan[radixStride / 2 + threadId] = sumReg[threadId];
+						radixPrefixScan[blockStride / 2 + threadId] = sumReg[threadId];
 					}
 				}
 
-				int base = (radixPrefixScan[radixStride / 2 + radixStride] + radixPrefixScan[radixStride / 2 + radixStride - 1]) << 16;
+				int base = (radixPrefixScan[blockStride / 2 + blockStride] + radixPrefixScan[blockStride / 2 + blockStride - 1]) << 16;
 				for (int threadId = 0; threadId < blockStride; ++threadId)
 				{
-					int a = radixPrefixScan[radixStride / 2 + threadId] & 0xffff;
-					int b = (radixPrefixScan[radixStride / 2 + threadId] + base) >> 16;
+					int a = radixPrefixScan[blockStride / 2 + threadId] & 0xffff;
+					int b = (radixPrefixScan[blockStride / 2 + threadId] + base) >> 16;
 					dstLocalOffset[threadId] = dstLocalOffset[threadId] ? b : a;
 				}
 
@@ -601,7 +606,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				{
 					const T item(src[index]);
 					int radix = evaluator.GetRadix(item);
-					//int address = atomicAdd(&scanBaseAdress[radix], 1);
 					int address = scanBaseAdress[radix]++;
 					dst[address] = item;
 				}
