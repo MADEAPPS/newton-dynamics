@@ -66,12 +66,12 @@ ndCudaDevice::ndCudaDevice()
 	cuTrace(("warp size: %d\n", m_prop.warpSize));
 	cuTrace(("multiprocessors: %d\n", m_prop.multiProcessorCount));
 	cuTrace(("max threads per blocks %d\n", m_prop.maxThreadsPerBlock));
-	cuTrace(("blocks per multiprocessors %d\n", m_prop.maxBlocksPerMultiProcessor));
 	cuTrace(("memory bus width: %d bits\n", m_prop.memoryBusWidth));
 	cuTrace(("shared memory: (kbytes) %d\n", m_prop.sharedMemPerBlock / 1024));
 	cuTrace(("global memory: (mbytes) %d\n", m_prop.totalGlobalMem / (1024 * 1024)));
+	cuTrace(("blocks per multiprocessors %d\n", m_prop.maxBlocksPerMultiProcessor));
 
-	m_workGroupSize = std::min(m_prop.maxThreadsPerBlock, 512);
+	m_workGroupSize = std::min(m_prop.maxThreadsPerBlock, 1024);
 	m_computeUnits = std::min(4 * m_prop.multiProcessorCount, 512);
 
 	m_lastError = cudaMallocManaged(&m_statusMemory, D_STATUS_ERROR_SIZE * sizeof(int));
@@ -145,7 +145,7 @@ ndKernelParams::ndKernelParams(const ndCudaDevice* const device, int workGroupSi
 {
 	ndAssert(workGroupSize);
 	ndAssert(!(workGroupSize & (workGroupSize - 1)));
-	//int deviceComputeUnits = device->GetComputeUnits();
+	ndAssert(workGroupSize <= device->m_workGroupSize);
 	int computeUnitsBashCount = (itemCount + m_workGroupSize - 1) / m_workGroupSize;
 
 	m_blocksPerKernel = (computeUnitsBashCount + m_deviceComputeUnits - 1) / m_deviceComputeUnits;
