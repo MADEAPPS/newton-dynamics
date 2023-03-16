@@ -619,7 +619,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 
 	// ***********************************
 	//m_src.SetCount(8);
-	m_src.SetCount(17);
+	//m_src.SetCount(17);
 	//m_src.SetCount(81);
 	//m_src.SetCount(256);
 	//m_src.SetCount(300);
@@ -638,10 +638,10 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 #endif
 	}
 
-	m_src[4] = 1;
-	m_src[9] = 1;
-	m_src[14] = 1;
-	m_src[0] = 255;
+	//m_src[4] = 1;
+	//m_src[9] = 1;
+	//m_src[14] = 1;
+	//m_src[0] = 255;
 	//m_src[11] = 1;
 	//m_src[20] = 0;
 	//m_src[21] = 1;
