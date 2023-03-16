@@ -1014,8 +1014,8 @@ void ndCudaContextImplement::Begin()
 	cudaEventCreate(&start_event);
 	cudaEventCreate(&stop_event);
 
-	int numIterations = 1;
-	//int numIterations = 100;
+	//int numIterations = 1;
+	int numIterations = 100;
 	cudaEventRecord(start_event, 0);
 	for (int i = 0; i < numIterations; ++i)
 	{
