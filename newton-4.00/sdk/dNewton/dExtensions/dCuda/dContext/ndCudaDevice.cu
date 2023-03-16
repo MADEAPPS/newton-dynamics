@@ -68,7 +68,8 @@ ndCudaDevice::ndCudaDevice()
 	cuTrace(("threads per blocks %d\n", m_prop.maxThreadsPerBlock));
 	cuTrace(("blocks per multiprocessors %d\n", m_prop.maxBlocksPerMultiProcessor));
 	cuTrace(("memory bus with: %d bits\n", m_prop.memoryBusWidth));
-	cuTrace(("memory: (mbytes) %d\n", m_prop.totalGlobalMem / (1024 * 1024)));
+	cuTrace(("shared memory: (kbytes) %d\n", m_prop.sharedMemPerBlock / 1024));
+	cuTrace(("global memory: (mbytes) %d\n", m_prop.totalGlobalMem / (1024 * 1024)));
 
 	m_workGroupSize = std::min(m_prop.maxThreadsPerBlock, 512);
 	m_computeUnits = std::min(4 * m_prop.multiProcessorCount, 512);
@@ -89,8 +90,8 @@ ndCudaDevice::ndCudaDevice()
 	m_lastError = cudaStreamCreateWithFlags(&m_childStream, cudaStreamDefault);
 	ndAssert(m_lastError == cudaSuccess);
 
-	m_timerFrames = 0;
 	m_timeAcc = 0.0f;
+	m_timerFrames = 0;
 }
 
 ndCudaDevice::~ndCudaDevice()
