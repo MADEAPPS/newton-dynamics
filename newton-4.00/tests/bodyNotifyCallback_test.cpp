@@ -88,11 +88,11 @@ TEST(RigidBodyNotify, MoveWithUnitForceDifferentMasses)
   ndVector errVec;
   // Verify that the sphere moved 0.5 meters in the X-direction.
   errVec = sphere0->GetPosition() - ndVector(0.5f, 0.f, 0.f, 1.f);
-  float err = errVec.DotProduct(errVec & ndVector::m_triplexMask).GetScalar();
+  float err = float(errVec.DotProduct(errVec & ndVector::m_triplexMask).GetScalar());
   EXPECT_NEAR(err, 0, 1E-4);
 
   // Verify that the sphere moved 0.25 meters in the X-direction.
   errVec = sphere1->GetPosition() - ndVector(0.25f, 0.f, 2.5f, 1.f);
-  err = errVec.DotProduct(errVec & ndVector::m_triplexMask).GetScalar();
+  err = float(errVec.DotProduct(errVec & ndVector::m_triplexMask).GetScalar());
   EXPECT_NEAR(err, 0, 1E-4);
 }

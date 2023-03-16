@@ -65,9 +65,9 @@ ndCudaDevice::ndCudaDevice()
 	
 	cuTrace(("warp size: %d\n", m_prop.warpSize));
 	cuTrace(("multiprocessors: %d\n", m_prop.multiProcessorCount));
-	cuTrace(("threads per blocks %d\n", m_prop.maxThreadsPerBlock));
+	cuTrace(("max threads per blocks %d\n", m_prop.maxThreadsPerBlock));
 	cuTrace(("blocks per multiprocessors %d\n", m_prop.maxBlocksPerMultiProcessor));
-	cuTrace(("memory bus with: %d bits\n", m_prop.memoryBusWidth));
+	cuTrace(("memory bus width: %d bits\n", m_prop.memoryBusWidth));
 	cuTrace(("shared memory: (kbytes) %d\n", m_prop.sharedMemPerBlock / 1024));
 	cuTrace(("global memory: (mbytes) %d\n", m_prop.totalGlobalMem / (1024 * 1024)));
 

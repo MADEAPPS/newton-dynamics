@@ -45,15 +45,16 @@ Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -rdc=true")
 Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -rdc=true")
 Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} -rdc=true")
 
+#Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} --ptxas-options=-v")
+#Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} --ptxas-options=-v")
+#Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} --ptxas-options=-v")
+
 Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} --device-debug")
 Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} --device-debug")
 
 #Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -use_fast_math")
 #Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -use_fast_math")
 #Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} -use_fast_math")
-
-#target_link_options(${projectName} PRIVATE $<DEVICE_LINK:-Xcompiler "/wd4100 /WX">)
-#target_link_options(${projectName} PRIVATE $<DEVICE_LINK:-Xcompiler "/wd4100">)
 
 message ("cuda debug options ${CMAKE_CUDA_FLAGS_DEBUG}")
 message ("cuda release options ${CMAKE_CUDA_FLAGS_RELEASE}")
@@ -64,7 +65,7 @@ add_library(${projectName} SHARED ${CPP_SOURCE})
 
 set_target_properties(${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON CUDA_RESOLVE_DEVICE_SYMBOLS ON)
 
-#it seem this is the fucking problem
+#it seems this is the broken
 #target_compile_options(${projectName} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_60 code=sm_60>)
 #target_compile_options(${projectName} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode compute_60,sm_60>)
 #target_compile_options(${projectName} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_52 code=sm_52>)

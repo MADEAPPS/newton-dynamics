@@ -488,9 +488,14 @@ static ndBodyDynamic* BuildBunny(const ndVector& pos, const ndVector& gravity = 
 	body->SetMatrix(matrix);
 
 	int pointCount = BUNNY_NUM_VERTICES;
-
+	
 	// Make a convex hull shape from the bunny vertices
-	ndShapeInstance bunny(new ndShapeConvexHull(pointCount, 3 * sizeof(ndFloat32), 1.0e-5, gVerticesBunny));
+	ndArray<ndFloat32> temp;
+	for (ndInt32 i = 0; i < sizeof (gVerticesBunny) / sizeof (REAL); i++)
+	{
+		temp.PushBack(ndFloat32 (gVerticesBunny[i]));
+	}
+	ndShapeInstance bunny(new ndShapeConvexHull(pointCount, 3 * sizeof(ndFloat32), 1.0e-5, &temp[0]));
 	body->SetCollisionShape(bunny);
 	body->SetMassMatrix(2.0f, bunny);
 

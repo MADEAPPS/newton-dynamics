@@ -1413,7 +1413,7 @@ static ndBodyDynamic* BuildStaticBunny(const ndVector& pos, const ndVector& grav
 	body->SetMatrix(matrix);
 
 	// pointer to the beginning of the float array of bunny vertices
-	const ndFloat32* const verticesBegin = gVerticesBunny;
+	const REAL* const verticesBegin = gVerticesBunny;
 
 	ndUnsigned32 triCount = numElementsInArray(gIndicesBunny);
 
@@ -1429,13 +1429,13 @@ static ndBodyDynamic* BuildStaticBunny(const ndVector& pos, const ndVector& grav
 		ndVector triangle[3];
 		for (int j = 0; j < 3; ++j)
 		{
-			const ndFloat32* const vertexBegin = verticesBegin + triIndices[j] * 3;
+			const REAL* const vertexBegin = verticesBegin + triIndices[j] * 3;
 
 			// the next 3 floats are the x,y,z components of a triangle vertex
-			triangle[j].m_x = *(vertexBegin + 0);
-			triangle[j].m_y = *(vertexBegin + 1);
-			triangle[j].m_z = *(vertexBegin + 2);
-			triangle[j].m_w = 0.0f;
+			triangle[j].m_x = ndFloat32 (*(vertexBegin + 0));
+			triangle[j].m_y = ndFloat32(*(vertexBegin + 1));
+			triangle[j].m_z = ndFloat32(*(vertexBegin + 2));
+			triangle[j].m_w = ndFloat32(0.0f);
 		}
 
 		ndInt32 materialId = faceMaterialId[i];
