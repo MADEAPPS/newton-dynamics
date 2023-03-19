@@ -77,7 +77,6 @@ class ndCudaBodyAabbCell
 	};
 };
 
-
 template <class T>
 class ndCudaBuffer
 {

@@ -631,7 +631,8 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
 #ifdef ___XXXX_256__
-		m_src[i] = rand() % 256;
+		//m_src[i] = rand() % 256;
+		m_src[i] = rand() & 0x7fffffff;
 #else
 		//m_src[i] = rand() % 8 + ((m_src.GetCount() - 1 + i) << 10);
 		m_src[i] = rand() % 8;
@@ -1005,17 +1006,32 @@ void ndCudaContextImplement::Begin()
 	//ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
 
 #if 1
-	auto GetRadix = []  __host__ __device__(int item)
+	auto GetRadix0 = []  __host__ __device__(int item)
 	{
 		return item & 0xff;
+	};
+
+	auto GetRadix1 = []  __host__ __device__(int item)
+	{
+		return (item >> 8) & 0xff;
+	};
+
+	auto GetRadix2 = []  __host__ __device__(int item)
+	{
+		return (item >> 16) & 0xff;
+	};
+
+	auto GetRadix3 = []  __host__ __device__(int item)
+	{
+		return (item >> 24) & 0xff;
 	};
 
 	cudaEvent_t start_event, stop_event;
 	cudaEventCreate(&start_event);
 	cudaEventCreate(&stop_event);
 
-	int numIterations = 1;
-	//int numIterations = 100;
+	//int numIterations = 1;
+	int numIterations = 100;
 	cudaEventRecord(start_event, 0);
 	for (int i = 0; i < numIterations; ++i)
 	{
@@ -1025,10 +1041,10 @@ void ndCudaContextImplement::Begin()
 		ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix);
 		ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix);
 #else
-		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix);
-		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix);
-		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix);
-		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix);
+		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
+		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix1);
+		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix2);
+		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix3);
 #endif
 	}
 	cudaEventRecord(stop_event, 0);
@@ -1049,9 +1065,11 @@ void ndCudaContextImplement::Begin()
 	
 	for (int i = 1; i < m_dst1.GetCount(); ++i)
 	{
-		int a = GetRadix(m_dst1[i - 1]);
-		int b = GetRadix(m_dst1[i - 0]);
-		//ndAssert(a <= b);
+		//int a = GetRadix(m_dst1[i - 1]);
+		//int b = GetRadix(m_dst1[i - 0]);
+		int a = m_dst1[i - 1];
+		int b = m_dst1[i - 0];
+		ndAssert(a <= b);
 	}
 	m_buf0.WriteData(&m_dst1[0], m_dst1.GetCount());
 	#endif

@@ -229,6 +229,33 @@ void ndCudaHostBuffer<T>::WriteData(T* const dst, int elements, cudaStream_t str
 	}
 }
 
+#define D_LOG_BANK_COUNT 5
+#define D_BANK_COUNT	(1<<D_LOG_BANK_COUNT)
+template <int size>
+class ndBankFreeArray
+{
+	public:
+	ndBankFreeArray()
+	{
+	}
+
+	int GetBankAddress(int address) const
+	{
+		int j = address & (D_BANK_COUNT - 1);
+		int k = (address >> D_LOG_BANK_COUNT) * (D_BANK_COUNT + 1);
+		ndAssert((k + j) >= 0);
+		ndAssert((k + j) < (sizeof(m_array) / sizeof(int)));
+		return k + j;
+	}
+
+	int& operator[] (int address)
+	{
+		return m_array[GetBankAddress(address)];
+	}
+
+	int m_array[(D_BANK_COUNT + 1) * ((size + D_BANK_COUNT - 1) >> D_LOG_BANK_COUNT)];
+};
+
 template <class T, class ndEvaluateKey, int exponentRadix>
 void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, ndCudaHostBuffer<int>& scansBuffer)
 {
@@ -316,17 +343,19 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	};
 
 
-//#define D_USE_CPU_LOCAL_BITONIC_SORT
+#define D_USE_CPU_LOCAL_BITONIC_SORT
 #define D_USE_CPU_LOCAL_COUNTING_SORT
 
 #ifdef D_USE_CPU_LOCAL_BITONIC_SORT
 	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
 		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
-		int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
+		//int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
 		int radixPrefixCount[D_HOST_MAX_RADIX_SIZE];
 		int radixPrefixStart[D_HOST_MAX_RADIX_SIZE];
-		int radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + D_HOST_MAX_RADIX_SIZE + 1];
+		ndBankFreeArray<D_HOST_SORT_BLOCK_SIZE> sortedRadix;
+		//int radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + D_HOST_MAX_RADIX_SIZE + 1];
+		ndBankFreeArray<D_HOST_MAX_RADIX_SIZE> radixPrefixScan;
 		
 		int size = src.GetCount();
 		int radixStride = (1 << exponentRadix);
@@ -366,12 +395,103 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					sortedRadix[threadId] = (radixStride << 16);
 				}
 			}
-		
+
+#if 1
+			for (int threadId = 0; threadId < radixStride; ++threadId)
+			{
+				//radixPrefixScan[threadId] = radixPrefixCount[threadId];
+				radixPrefixScan[threadId] = 1;
+			}
+
+			int radixBit = 0;
+			for (int k = 1; k < radixStride; k = k * 2)
+			{
+				radixBit++;
+				//for (int threadId = 0; threadId < (radixStride >> radixBit); threadId++)
+				//{
+				//	cuTrace(("%d ", threadId));
+				//}
+				//cuTrace(("\n"));
+
+				//for (int threadId = 0; threadId < (radixStride >> radixBit); threadId ++)
+				//{
+				//	int id0 = ((threadId + 1) << radixBit) - 1;
+				//	//cuTrace(("%d ", sortedRadix.GetBankAddress(id0) % D_BANK_COUNT));
+				//	//cuTrace(("%d ", id0));
+				//}
+				//cuTrace(("\n"));
+
+				for (int threadId = 0; threadId < (radixStride >> radixBit); threadId++)
+				{
+					int id0 = ((threadId + 1) << radixBit) - 1;
+					int id1 = id0 - (1 << (radixBit - 1));
+					//cuTrace(("%d ", sortedRadix.GetBankAddress(id1) % D_BANK_COUNT));
+					//cuTrace(("%d ", id1));
+
+					int a = radixPrefixScan[id0];
+					int b = radixPrefixScan[id1];
+					radixPrefixScan[id0] = a + b;
+				}
+				//cuTrace(("\n"));
+
+				//for (int threadId = 0; threadId < radixStride; threadId++)
+				//{
+				//	cuTrace(("%d ", radixPrefixScan[threadId]));
+				//}
+				//cuTrace(("\n"));
+				//cuTrace(("\n"));
+			}
+
+			radixPrefixScan[radixStride - 1] = 0;
+			for (int k = 1; k < radixStride; k = k * 2)
+			{
+				//for (int threadId = 0; threadId < k; threadId++)
+				//{
+				//	cuTrace(("%d ", threadId));
+				//}
+				//cuTrace(("\n"));
+
+				//for (int threadId = 0; threadId < k; threadId++)
+				//{
+				//	int id0 = ((threadId + 1) << radixBit) - 1;
+				//	cuTrace(("%d ", id0));
+				//}
+				//cuTrace(("\n"));
+
+				for (int threadId = 0; threadId < k; threadId++)
+				{
+					int id0 = ((threadId + 1) << radixBit) - 1;
+					int id1 = id0 - (1 << (radixBit - 1));
+					//cuTrace(("%d ", id1));
+
+					int a = radixPrefixScan[id0];
+					int b = radixPrefixScan[id1] + a;
+
+					radixPrefixScan[id0] = b;
+					radixPrefixScan[id1] = a;
+				}
+				//cuTrace(("\n"));
+
+				//for (int threadId = 0; threadId < radixStride; threadId++)
+				//{
+				//	cuTrace(("%d ", radixPrefixScan[threadId]));
+				//}
+				//cuTrace(("\n"));
+				//
+				//cuTrace(("\n"));
+				radixBit--;
+			}
+
+			for (int threadId = 0; threadId < radixStride; threadId++)
+			{
+				cuTrace(("%d ", radixPrefixScan[threadId]));
+			}
+			cuTrace(("\n"));
+#else
 			for (int threadId = 0; threadId < radixStride; ++threadId)
 			{
 				radixPrefixScan[radixStride / 2 + threadId + 1] = radixPrefixCount[threadId];
 			}
-		
 			for (int k = 1; k < radixStride; k = k << 1)
 			{
 				int sumReg[D_HOST_MAX_RADIX_SIZE];
@@ -386,27 +506,36 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					radixPrefixScan[radixStride / 2 + threadId] = sumReg[threadId];
 				}
 			}
-		
-			for (int k = 2; k <= blockStride; k = k << 1)
+#endif
+
+
+			for (int k = 1; k < blockStride; k = k << 1)
 			{
-				for (int j = k >> 1; j > 0; j = j >> 1)
+				for (int j = k; j > 0; j = j >> 1)
 				{
-					for (int id0 = 0; id0 < blockStride; ++id0)
+					int highMask = -j;
+					int lowMask = ~highMask;
+					for (int threadId = 0; threadId < blockStride / 2; ++threadId)
 					{
-						int id1 = id0 ^ j;
-						if (id1 > id0)
-						{
-							const int a = sortedRadix[id0];
-							const int b = sortedRadix[id1];
-							const int mask0 = -(id0 & k);
-							const int mask1 = -(a > b);
-							const int mask2 = (mask0 ^ mask1) & 0x80000000;
-							if (mask2)
-							{
-								sortedRadix[id0] = b;
-								sortedRadix[id1] = a;
-							}
-						}
+						int lowIndex = threadId & lowMask;
+						int highIndex = (threadId & highMask) * 2;
+
+						int id0 = highIndex + lowIndex;
+						int id1 = highIndex + lowIndex + j;
+						int oddEven = highIndex & k * 2;
+
+						int a = sortedRadix[id0];
+						int b = sortedRadix[id1];
+
+						int test = a < b;
+						int a1 = test ? a : b;
+						int b1 = test ? b : a;
+
+						int a2 = oddEven ? b1 : a1;
+						int b2 = oddEven ? a1 : b1;
+
+						sortedRadix[id0] = a2;
+						sortedRadix[id1] = b2;
 					}
 				}
 			}

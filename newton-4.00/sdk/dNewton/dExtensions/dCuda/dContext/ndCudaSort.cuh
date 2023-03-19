@@ -116,16 +116,41 @@ __global__ void ndCudaCountItems(const ndKernelParams params, const ndAssessor<T
 	}
 }
 
-#ifdef D_USE_LOCAL_BITONIC_SORT
 #define D_USE_LOCAL_BITONIC_SORT
+
+#ifdef D_USE_LOCAL_BITONIC_SORT
+
+
+#define D_LOG_BANK_COUNT_GPU	5
+#define D_BANK_COUNT_GPU		(1<<D_LOG_BANK_COUNT_GPU)
+
+template <int size>
+class cuBankFreeArray
+{
+	public:
+	__device__ cuBankFreeArray()
+	{
+	}
+
+	__device__ int& operator[] (int i)
+	{
+		int j = i & (D_BANK_COUNT_GPU - 1);
+		int k = (i >> D_LOG_BANK_COUNT_GPU) * (D_BANK_COUNT_GPU + 1);
+		return m_array[k + j];
+	}
+
+	int m_array[(D_BANK_COUNT_GPU + 1) * ((size + (D_BANK_COUNT_GPU - 1)) >> D_LOG_BANK_COUNT_GPU)];
+};
+
 
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
 	__shared__  T cachedItems[D_DEVICE_SORT_BLOCK_SIZE];
-	__shared__  int sortedRadix[D_DEVICE_SORT_BLOCK_SIZE];
+	//__shared__  int sortedRadix[D_DEVICE_SORT_BLOCK_SIZE];
 	__shared__  int radixPrefixCount[D_DEVICE_MAX_RADIX_SIZE];
 	__shared__  int radixPrefixStart[D_DEVICE_MAX_RADIX_SIZE];
+	__shared__  cuBankFreeArray<D_DEVICE_SORT_BLOCK_SIZE> sortedRadix;
 	__shared__  int radixPrefixScan[D_DEVICE_MAX_RADIX_SIZE / 2 + D_DEVICE_MAX_RADIX_SIZE + 1];
 
 	int threadId = threadIdx.x;
@@ -169,6 +194,7 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 		{
 			radixPrefixScan[radixStride / 2 + threadId + 1] = radixPrefixCount[threadId];
 		}
+
 		for (int k = 1; k < radixStride; k = k << 1)
 		{
 			int sum;
@@ -186,13 +212,61 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 			}
 		}
 
+		//int value = 1;
+		//int laneId = threadIdx.x & 0x1f;
+		//int size___ = 32;
+		//for (int i = 1; i <= size___; i *= 2)
+		//{
+		//	int n = __shfl_up_sync(0xffffffff, value, i, size___);
+		//	if ((laneId & (size___ - 1)) >= i)
+		//	{
+		//		value += n;
+		//	}
+		//}
+		//radixPrefixScan[threadIdx.x] = value;
+
+
+
+#if 1
+		for (int k = 1; k < blockStride; k = k << 1)
+		{
+			for (int j = k; j > 0; j = j >> 1)
+			{
+				if (threadId < blockStride / 2)
+				{
+					int highMask = -j;
+					int lowMask = ~highMask;
+					int lowIndex = threadId & lowMask;
+					int highIndex = (threadId & highMask) * 2;
+
+					int id0 = highIndex + lowIndex;
+					int id1 = highIndex + lowIndex + j;
+					int oddEven = highIndex & k * 2;
+
+					int a = sortedRadix[id0];
+					int b = sortedRadix[id1];
+					
+					int test = a < b;
+					int a1 = test ? a : b;
+					int b1 = test ? b : a;
+					
+					int a2 = oddEven ? b1 : a1;
+					int b2 = oddEven ? a1 : b1;
+					
+					sortedRadix[id0] = a2;
+					sortedRadix[id1] = b2;
+				}
+				__syncthreads();
+			}
+		}
+#else		
 		int id0 = threadId;
 		for (int k = 2; k <= blockStride; k = k << 1)
 		{
 			for (int j = k >> 1; j > 0; j = j >> 1)
 			{
 				int id1 = id0 ^ j;
-
+		
 				if (id1 > id0)
 				{
 					const int a = sortedRadix[id0];
@@ -209,6 +283,7 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 				__syncthreads();
 			}
 		}
+#endif
 
 		if (index < input.m_size)
 		{

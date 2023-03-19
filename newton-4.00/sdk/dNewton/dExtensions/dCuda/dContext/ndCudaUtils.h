@@ -24,46 +24,6 @@
 
 #include "ndCudaStdafx.h"
 
-//int bits = 1;
-////for (int k = 2; k <= blockStride; k = k << 1)
-//for (int k = 2; k <= 64; k = k << 1)
-//{
-//	int highMask = -bits;
-//	int lowMask = ~highMask;
-//	for (int j = k >> 1; j > 0; j = j >> 1)
-//	{
-//		//for (int threadId = 0; threadId < blockStride / 2; ++threadId)
-//		for (int threadId = 0; threadId < 64 / 2; ++threadId)
-//		{
-//			//int id0 = threadId;
-//			int lowIndex = threadId & lowMask;
-//			int highIndex = (threadId & highMask) * 2;
-//
-//			int id0 = highIndex + lowIndex;
-//			int id1 = highIndex + lowIndex + bits;
-//			//cuTrace(("%d ", id0));
-//			cuTrace(("%d ", id1));
-//			//int id1 = id0 ^ j;
-//			//if (id1 > id0)
-//			//{
-//			//	const int a = sortedRadix[id0];
-//			//	const int b = sortedRadix[id1];
-//			//	const int mask0 = -(id0 & k);
-//			//	const int mask1 = -(a > b);
-//			//	const int mask2 = (mask0 ^ mask1) & 0x80000000;
-//			//	if (mask2)
-//			//	{
-//			//		sortedRadix[id0] = b;
-//			//		sortedRadix[id1] = a;
-//			//	}
-//			//}
-//		}
-//		cuTrace(("\n"));
-//	}
-//	bits *= 2;
-//}
-
-
 #ifdef D_DISABLE_ASSERT
 	#define ndAssert(x)
 #else 
