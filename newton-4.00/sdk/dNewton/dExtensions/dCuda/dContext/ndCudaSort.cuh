@@ -31,8 +31,8 @@
 #include "ndCudaHostBuffer.h"
 #include "ndCudaDeviceBuffer.h"
 
-//#define D_DEVICE_SORT_BLOCK_SIZE	(1<<8)
-#define D_DEVICE_SORT_BLOCK_SIZE	(1<<9)
+#define D_DEVICE_SORT_BLOCK_SIZE	(1<<8)
+//#define D_DEVICE_SORT_BLOCK_SIZE	(1<<9)
 //#define D_DEVICE_SORT_BLOCK_SIZE	(1<<10)
 #define D_DEVICE_MAX_RADIX_SIZE		(1<<8)
 
@@ -151,7 +151,8 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 	__shared__  int radixPrefixCount[D_DEVICE_MAX_RADIX_SIZE];
 	__shared__  int radixPrefixStart[D_DEVICE_MAX_RADIX_SIZE];
 	__shared__  cuBankFreeArray<D_DEVICE_SORT_BLOCK_SIZE> sortedRadix;
-	__shared__  int radixPrefixScan[D_DEVICE_MAX_RADIX_SIZE / 2 + D_DEVICE_MAX_RADIX_SIZE + 1];
+	//__shared__  int radixPrefixScan[D_DEVICE_MAX_RADIX_SIZE / 2 + D_DEVICE_MAX_RADIX_SIZE + 1];
+	__shared__  cuBankFreeArray<D_DEVICE_MAX_RADIX_SIZE> radixPrefixScan;
 
 	int threadId = threadIdx.x;
 	int blockStride = blockDim.x;
@@ -190,28 +191,100 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 		}
 		__syncthreads();
 
-		if (threadId < radixStride)
+
+		//if (threadId < radixStride)
+		//{
+		//	radixPrefixScan[radixStride / 2 + threadId + 1] = radixPrefixCount[threadId];
+		//}
+		//for (int k = 1; k < radixStride; k = k << 1)
+		//{
+		//	int sum;
+		//	__syncthreads();
+		//	if (threadId < radixStride)
+		//	{
+		//		int a = radixPrefixScan[radixStride / 2 + threadId];
+		//		int b = radixPrefixScan[radixStride / 2 + threadId - k];
+		//		sum = a + b;
+		//	}
+		//	__syncthreads();
+		//	if (threadId < radixStride)
+		//	{
+		//		radixPrefixScan[radixStride / 2 + threadId] = sum;
+		//	}
+		//}
+
+		radixPrefixScan[threadId] = 1;
+		int radixBit = 0;
+		int xxxxx = 64;
+
+		//__shared__  int xxxxxxxxxxxxxx[D_DEVICE_MAX_RADIX_SIZE];
+		for (int k = 1; k < 64; k = k * 2)
 		{
-			radixPrefixScan[radixStride / 2 + threadId + 1] = radixPrefixCount[threadId];
+			radixBit++;
+
+			int base = (threadId & -32) * 2;
+			int bankIndex = threadId & 0x1f;
+
+			//xxxxxxxxxxxxxx[threadId] = -1;
+			if ((threadId < radixStride / 2) && (bankIndex < (xxxxx >> radixBit)))
+			{
+				int id1 = ((bankIndex + 1) << radixBit) - 1;
+				int id0 = id1 - (1 << (radixBit - 1));
+				radixPrefixScan[base + id1] += radixPrefixScan[base + id0];
+				//printf("thread=%d id0=%d id1=%d bit=%d\n", threadId, id0, id1, radixBit);
+				//printf("thread=%d bit=%d base=%d id0=%d \n", threadId, radixBit, base, id0);
+				//xxxxxxxxxxxxxx[threadId] = id0;
+				//printf("thread=%d bit=%d base=%d id0=%d \n", threadId, radixBit, base, id0);
+			}
+
+			//__syncthreads();
+			//if (threadId == 0)
+			//{
+			//	//printf("thread=%d bit=%d base=%d\n", k, radixBit, base);
+			//	printf("bit=%d\n", radixBit);
+			//	for (int base = 0; base < radixStride/2; base += 32)
+			//	{
+			//		for (int k = 0; k < 32; ++k)
+			//		{
+			//			printf("%d ", xxxxxxxxxxxxxx[base + k]);
+			//		}
+			//		printf("\n");
+			//	}
+			//	printf("\n");
+			//}
+			//__syncthreads();
+		}
+		//__syncthreads();
+
+		//radixPrefixScan[xxxxx - 1] = 0;
+		////for (int k = 1; k < xxxxx; k = k * 2)
+		//for (int k = 1; k < 2; k = k * 2)
+		//{
+		//	int base = (threadId & -32) * 2;
+		//	int bankIndex = threadId & 0x1f;
+		//	int id1 = ((bankIndex + 1) << radixBit) - 1;
+		//	int id0 = id1 - (1 << (radixBit - 1));
+		//	
+		//	printf("thread=%d id0=%d id1=%d bit=%d\n", threadId, id0, id1, radixBit);
+		//	//int a = radixPrefixScan[id1];
+		//	//int b = radixPrefixScan[id0] + a;
+		//	//
+		//	//radixPrefixScan[id0] = a;
+		//	//radixPrefixScan[id1] = b;
+		//
+		//	radixBit--;
+		//}
+
+
+		if (threadId == 0)
+		{
+			for (int k = 0; k < radixStride; ++k)
+			{
+				printf("thread(%d)=%d\n", k, radixPrefixScan[k]);
+			}
 		}
 
-		for (int k = 1; k < radixStride; k = k << 1)
-		{
-			int sum;
-			__syncthreads();
-			if (threadId < radixStride)
-			{
-				int a = radixPrefixScan[radixStride / 2 + threadId];
-				int b = radixPrefixScan[radixStride / 2 + threadId - k];
-				sum = a + b;
-			}
-			__syncthreads();
-			if (threadId < radixStride)
-			{
-				radixPrefixScan[radixStride / 2 + threadId] = sum;
-			}
-		}
-
+/*
 		//int value = 1;
 		//int laneId = threadIdx.x & 0x1f;
 		//int size___ = 32;
@@ -299,6 +372,7 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 		{
 			radixPrefixStart[threadId] += radixPrefixCount[threadId];
 		}
+*/
 		bashSize += blockStride;
 	}
 }
