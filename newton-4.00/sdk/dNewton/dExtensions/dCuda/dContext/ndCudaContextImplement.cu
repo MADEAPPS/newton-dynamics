@@ -632,7 +632,8 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	{
 #ifdef ___XXXX_256__
 		//m_src[i] = rand() % 256;
-		m_src[i] = rand() & 0x7fffffff;
+		//m_src[i] = rand() & 0x7fffffff;
+		m_src[i] = m_src.GetCount() - i - 1;
 #else
 		//m_src[i] = rand() % 8 + ((m_src.GetCount() - 1 + i) << 10);
 		m_src[i] = rand() % 8;

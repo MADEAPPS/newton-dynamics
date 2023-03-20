@@ -241,19 +241,19 @@ class ndBankFreeArray
 
 	int GetBankAddress(int address) const
 	{
-		int j = address & (D_BANK_COUNT - 1);
-		int k = (address >> D_LOG_BANK_COUNT) * (D_BANK_COUNT + 1);
-		ndAssert((k + j) >= 0);
-		ndAssert((k + j) < (sizeof(m_array) / sizeof(int)));
-		return k + j;
+		int low = address & -D_BANK_COUNT;
+		int high = address >> D_LOG_BANK_COUNT;
+		return high * (D_BANK_COUNT + 1) + low;
 	}
 
 	int& operator[] (int address)
 	{
-		return m_array[GetBankAddress(address)];
+		int low = address & -D_BANK_COUNT;
+		int high = address >> D_LOG_BANK_COUNT;
+		return m_array[high][low];
 	}
 
-	int m_array[(D_BANK_COUNT + 1) * ((size + D_BANK_COUNT - 1) >> D_LOG_BANK_COUNT)];
+	int m_array[(size + D_BANK_COUNT - 1) >> D_LOG_BANK_COUNT][D_BANK_COUNT + 1];
 };
 
 template <class T, class ndEvaluateKey, int exponentRadix>
@@ -343,10 +343,267 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	};
 
 
+#define D_USE_CPU_BANK_COUNTING_SORT
 #define D_USE_CPU_LOCAL_BITONIC_SORT
 #define D_USE_CPU_LOCAL_COUNTING_SORT
 
-#ifdef D_USE_CPU_LOCAL_BITONIC_SORT
+#ifdef D_USE_CPU_BANK_COUNTING_SORT
+
+	auto ShufleUp = [&](const int* in, int* out, int offset)
+	{
+		for (int i = 0; i < offset; ++i)
+		{
+			out[i] = in[i];
+		}
+
+		for (int i = D_BANK_COUNT - offset - 1; i >= 0; --i)
+		{
+			out[i + offset] = in[i];
+		}
+	};
+
+	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
+	{
+		//T cachedItems[D_HOST_SORT_BLOCK_SIZE];
+		//int radixPrefixCount[D_HOST_MAX_RADIX_SIZE];
+		//int radixPrefixStart[D_HOST_MAX_RADIX_SIZE];
+		//ndBankFreeArray<D_HOST_SORT_BLOCK_SIZE> sortedRadix;
+		//ndBankFreeArray<D_HOST_MAX_RADIX_SIZE> radixPrefixScan;
+
+		int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
+		int dstLocalOffset[D_HOST_SORT_BLOCK_SIZE];
+		//ndBankFreeArray<D_HOST_MAX_RADIX_SIZE> radixPrefixScan;
+
+		int size = src.GetCount();
+		int radixStride = (1 << exponentRadix);
+		int blockStride = D_HOST_SORT_BLOCK_SIZE;
+		int radixBase = blockIdx * radixStride;
+		int bashSize = blocksCount * blockStride * blockIdx;
+		int radixPrefixOffset = computeUnits * radixStride;
+
+		ndEvaluateKey evaluator;
+		//for (int threadId = 0; threadId < radixStride; ++threadId)
+		//{
+		//	int a = scansBuffer[radixBase + threadId];
+		//	int b = scansBuffer[radixPrefixOffset + threadId];
+		//	radixPrefixStart[threadId] = a + b;
+		//	radixPrefixScan[threadId] = 0;
+		//}
+
+		for (int i = 0; i < blocksCount; ++i)
+		{
+			//for (int threadId = 0; threadId < radixStride; ++threadId)
+			//{
+			//	radixPrefixCount[threadId] = 0;
+			//}
+
+			for (int threadId = 0; threadId < blockStride; ++threadId)
+			{
+				int index = bashSize + threadId;
+				//int sortKey = radixStride << 16;
+				int sortKey = radixStride;
+				if (index < size)
+				{
+					const T item(src[index]);
+					//cachedItems[threadId] = src[index];
+					int radix = evaluator.GetRadix(item);
+					//radixPrefixCount[radix] ++;
+					//sortKey = (radix << 16) + threadId;
+					sortKey = radix;
+				}
+				sortedRadix[threadId] = sortKey;
+			}
+
+			//for (int threadId = 0; threadId < radixStride; ++threadId)
+			//{
+			//	//radixPrefixScan[threadId] = radixPrefixCount[threadId];
+			//	radixPrefixScan[threadId] = 1;
+			//}
+			//
+			////radixStride = 64;
+			//int radixBit = 0;
+			//int xxxxx = 64;
+			//for (int k = 1; k < xxxxx; k = k * 2)
+			//{
+			//	radixBit++;
+			//	//for (int threadId = 0; threadId < (radixStride >> radixBit); threadId++)
+			//	//{
+			//	//	cuTrace(("%d ", threadId));
+			//	//}
+			//	//cuTrace(("\n"));
+			//
+			//	//cuTrace(("thread=%d bit=%d base=%d\n", k, radixBit, base));
+			//	cuTrace(("bit=%d\n", radixBit));
+			//	for (int base = 0; base < radixStride; base += 64)
+			//	{
+			//		for (int threadId = 0; threadId < (xxxxx >> radixBit); threadId++)
+			//		{
+			//			int bankIndex = threadId & 0x1f;
+			//			//int id0 = ((threadId + 1) << radixBit) - 1;
+			//			int id1 = ((bankIndex + 1) << radixBit) - 1;
+			//			int id0 = id1 - (1 << (radixBit - 1));
+			//			//cuTrace(("%d ", sortedRadix.GetBankAddress(id0) % D_BANK_COUNT));
+			//			//cuTrace(("%d ", base + id0));
+			//			cuTrace(("%d ", id0));
+			//		}
+			//		cuTrace(("\n"));
+			//	}
+			//	cuTrace(("\n"));
+			//
+			//	//for (int threadId = 0; threadId < (radixStride >> radixBit); threadId++)
+			//	//{
+			//	//	int id1 = ((threadId + 1) << radixBit) - 1;
+			//	//	int id0 = id1 - (1 << (radixBit - 1));
+			//	//	//cuTrace(("%d ", sortedRadix.GetBankAddress(id0) % D_BANK_COUNT));
+			//	//	//cuTrace(("%d ", id0));
+			//	//
+			//	//	//int a = radixPrefixScan[id1];
+			//	//	//int b = radixPrefixScan[id0];
+			//	//	radixPrefixScan[id1] += radixPrefixScan[id0];
+			//	//}
+			//	//cuTrace(("\n"));
+			//
+			//	//for (int threadId = 0; threadId < radixStride; threadId++)
+			//	//{
+			//	//	cuTrace(("%d ", radixPrefixScan[threadId]));
+			//	//}
+			//	//cuTrace(("\n"));
+			//	//cuTrace(("\n"));
+			//}
+			//
+			////radixPrefixScan[radixStride - 1] = 0;
+			////for (int k = 1; k < radixStride; k = k * 2)
+			////{
+			////	//for (int threadId = 0; threadId < k; threadId++)
+			////	//{
+			////	//	cuTrace(("%d ", threadId));
+			////	//}
+			////	//cuTrace(("\n"));
+			////
+			////	for (int threadId = 0; threadId < k; threadId++)
+			////	{
+			////		int id0 = ((threadId + 1) << radixBit) - 1;
+			////		cuTrace(("%d ", id0));
+			////	}
+			////	cuTrace(("\n"));
+			////
+			////	for (int threadId = 0; threadId < k; threadId++)
+			////	{
+			////		int id1 = ((threadId + 1) << radixBit) - 1;
+			////		int id0 = id1 - (1 << (radixBit - 1));
+			////		cuTrace(("%d ", id1));
+			////
+			////		int a = radixPrefixScan[id1];
+			////		int b = radixPrefixScan[id0] + a;
+			////
+			////		radixPrefixScan[id0] = a;
+			////		radixPrefixScan[id1] = b;
+			////	}
+			////	cuTrace(("\n"));
+			////
+			////	//for (int threadId = 0; threadId < radixStride; threadId++)
+			////	//{
+			////	//	cuTrace(("%d ", radixPrefixScan[threadId]));
+			////	//}
+			////	//cuTrace(("\n"));
+			////	
+			////	cuTrace(("\n"));
+			////	radixBit--;
+			////}
+			//
+			////for (int threadId = 0; threadId < radixStride; threadId++)
+			////{
+			////	cuTrace(("%d ", radixPrefixScan[threadId]));
+			////}
+			//cuTrace(("\n"));
+
+
+			// *************
+			for (int bank = 0; bank < blockStride; bank += D_BANK_COUNT)
+			{
+				for (int bit = 1; bit < 256; bit <<= 1)
+				{
+					int keyReg[D_BANK_COUNT];
+					for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
+					{
+						keyReg[threadId] = sortedRadix[bank + threadId];
+					}
+
+					int radixPrefixScanReg[D_BANK_COUNT + 1];
+					for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
+					{
+						int test = keyReg[threadId] & bit;
+						int mask = test ? 1 : 0;
+						dstLocalOffset[threadId] = mask;
+						//radixPrefixScan[blockStride / 2 + threadId + 1] = mask ? 1 << 16 : 1;
+						radixPrefixScanReg[threadId] = mask ? 1 << 16 : 1;
+					}
+
+					for (int n = 1; n < D_BANK_COUNT; n *= 2)
+					{
+						int radixPrefixScanReg1[D_BANK_COUNT];
+						ShufleUp(radixPrefixScanReg, radixPrefixScanReg1, n);
+						for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
+						{
+							if ((threadId & (D_BANK_COUNT - 1)) >= n)
+							{
+								radixPrefixScanReg[threadId] += radixPrefixScanReg1[threadId];
+							}
+						}
+					}
+					int base = (radixPrefixScanReg[D_BANK_COUNT - 1]) << 16;
+					for (int threadId = D_BANK_COUNT-1; threadId >= 0; --threadId)
+					{
+						radixPrefixScanReg[threadId + 1] = radixPrefixScanReg[threadId];
+					}
+					radixPrefixScanReg[0] = 0;
+
+					for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
+					{
+						int key = radixPrefixScanReg[threadId];
+						int a = key & 0xffff;
+						int b = (key + base) >> 16;
+						dstLocalOffset[threadId] = dstLocalOffset[threadId] ? b : a;
+					}
+					
+					//for (int threadId = 0; threadId < blockStride; ++threadId)
+					for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
+					{
+						int dstIndex = dstLocalOffset[threadId];
+						sortedRadix[bank + dstIndex] = keyReg[threadId];
+					}
+				}
+				cuTrace(("\n"));
+			}
+
+			cuTrace(("\n"));
+			
+			//for (int threadId = 0; threadId < blockStride; ++threadId)
+			//{
+			//	int index = bashSize + threadId;
+			//	if (index < size)
+			//	{
+			//		int keyValue = sortedRadix[threadId];
+			//		int keyHigh = keyValue >> 16;
+			//		int keyLow = keyValue & 0xffff;
+			//		int dstOffset1 = radixPrefixStart[keyHigh];
+			//		int dstOffset0 = threadId - radixPrefixScan[radixStride / 2 + keyHigh];
+			//		dst[dstOffset0 + dstOffset1] = cachedItems[keyLow];
+			//	}
+			//}
+			//
+			//for (int threadId = 0; threadId < radixStride; ++threadId)
+			//{
+			//	radixPrefixStart[threadId] += radixPrefixCount[threadId];
+			//}
+
+			bashSize += blockStride;
+		}
+	};
+
+
+//#ifdef D_USE_CPU_LOCAL_BITONIC_SORT
+#elif defined (D_USE_CPU_LOCAL_BITONIC_SORT)
 	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
 		T cachedItems[D_HOST_SORT_BLOCK_SIZE];

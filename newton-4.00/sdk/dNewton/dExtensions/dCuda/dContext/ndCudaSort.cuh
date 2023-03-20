@@ -132,16 +132,15 @@ class cuBankFreeArray
 	{
 	}
 
-	__device__ int& operator[] (int i)
+	__device__ int& operator[] (int address)
 	{
-		int j = i & (D_BANK_COUNT_GPU - 1);
-		int k = (i >> D_LOG_BANK_COUNT_GPU) * (D_BANK_COUNT_GPU + 1);
-		return m_array[k + j];
+		int low = address & -D_BANK_COUNT_GPU;
+		int high = address >> D_LOG_BANK_COUNT_GPU;
+		return m_array[high][low];
 	}
 
-	int m_array[(D_BANK_COUNT_GPU + 1) * ((size + (D_BANK_COUNT_GPU - 1)) >> D_LOG_BANK_COUNT_GPU)];
+	int m_array[(size + D_BANK_COUNT_GPU - 1) >> D_LOG_BANK_COUNT_GPU][D_BANK_COUNT_GPU + 1];
 };
-
 
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
