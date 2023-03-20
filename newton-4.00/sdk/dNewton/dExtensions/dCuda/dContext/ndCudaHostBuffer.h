@@ -1119,7 +1119,8 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			}
 
 			//for (int bit = 11; bit < radixStride; bit <<= 2)
-			for (int bit = 0; bit < 4; ++bit)
+			//for (int bit = 0; bit < 4; ++bit)
+			for (int bit = 0; (1<<(bit * 2)) < radixStride; ++bit)
 			{
 				int keyReg[D_HOST_SORT_BLOCK_SIZE];
 				for (int threadId = 0; threadId < D_HOST_SORT_BLOCK_SIZE; ++threadId)
@@ -1153,7 +1154,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 						}
 					}
 				}
-				// write to memory and sunc;
+				// write to memory and sync;
 				for (int threadId = 0; threadId < D_HOST_SORT_BLOCK_SIZE; ++threadId)
 				{
 					radixPrefixScan[threadId + 1] = radixPrefixScanReg[threadId];
