@@ -1158,23 +1158,52 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 						}
 					}
 				}
-				// write to memory and sync;
+				// write to memory add finish the prefix scan
 				for (int threadId = 0; threadId < D_HOST_SORT_BLOCK_SIZE; ++threadId)
 				{
 					radixPrefixScan[threadId + 1] = radixPrefixScanReg0[threadId];
 					radixPrefixScan[threadId + 1 + D_HOST_SORT_BLOCK_SIZE + 1] = radixPrefixScanReg1[threadId];
 				}
-				// add finish the prefix scan
+
+
+				int scale = 1;
+				for (int segment = blockStride; segment > D_BANK_COUNT; segment >>= 1)
+				{
+					for (int scanBank = 0; scanBank < blockStride; scanBank += (D_BANK_COUNT * 2) * scale)
+					{
+						int xxx = scanBank + D_BANK_COUNT * scale + 1 - 1;
+						int xxx1 = scanBank + D_BANK_COUNT * scale + 1 - 1;
+						//int base0 = radixPrefixScan[scanBank + step - 1 + 1];
+						//int base1 = radixPrefixScan[scanBank + step - 1 + 1];
+					//	for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
+					//	{
+					//		radixPrefixScan[scanBank * 2 + D_BANK_COUNT + threadId + 1] += base0;
+					//	}
+					}
+
+					//for (int threadId = 0; threadId < blockStride / 2; ++threadId)
+					//for (int bankBase = 0; bankBase < blockStride / 2; bankBase += D_BANK_COUNT)
+					for (int threadId = 0; threadId < blockStride / 2; threadId += D_BANK_COUNT * scale)
+					{
+						int base = (threadId >> ((D_BANK_COUNT * 2) * scale)) + D_BANK_COUNT * scale + 1 - 1;
+						int base1 = (threadId >> ((D_BANK_COUNT * 2) * scale)) + D_BANK_COUNT * scale + 1 - 1;
+					}
+					scale *= 2;
+				}
+				
 				// ...........
 				
-				//int base = radixPrefixScanReg[D_BANK_COUNT - 1];
-				//base = base + (base << 8);
+				//int base0 = radixPrefixScanReg0[D_HOST_SORT_BLOCK_SIZE - 1];
+				//int base1 = radixPrefixScanReg[2 * (D_HOST_SORT_BLOCK_SIZE + 1) - 2];
+				//base0 = base0 + (base0 << 16);
+				//base1 = base1 + (base1 << 16);
 				//base = (base + (base << 16)) << 8;
 				//for (int threadId = D_BANK_COUNT - 1; threadId >= 0; --threadId)
 				//{
-				//	radixPrefixScanReg[threadId + 1] = radixPrefixScanReg[threadId];
+				//	radixPrefixScanReg0[threadId + 1] = radixPrefixScanReg0[threadId];
+				//	radixPrefixScanReg1[threadId + 1] = radixPrefixScanReg1[threadId];
 				//}
-				//radixPrefixScanReg[0] = 0;
+				radixPrefixScanReg0[0] = 0;
 				//
 				//for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
 				//{
