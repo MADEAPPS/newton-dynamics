@@ -229,10 +229,6 @@ void ndCudaHostBuffer<T>::WriteData(T* const dst, int elements, cudaStream_t str
 	}
 }
 
-#define D_SORTING_ALGORITHM 0	
-
-
-
 #define D_LOG_BANK_COUNT 5
 #define D_BANK_COUNT	(1<<D_LOG_BANK_COUNT)
 #define D_BANK_PADD		1
@@ -1060,7 +1056,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 
 		int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
 		int dstLocalOffset[D_HOST_SORT_BLOCK_SIZE];
-		int radixPrefixScan[D_HOST_MAX_RADIX_SIZE + 1];
+		int radixPrefixScan[2 * (D_HOST_SORT_BLOCK_SIZE + 1)];
 		//ndBankFreeArray<D_HOST_MAX_RADIX_SIZE> radixPrefixScan;
 
 		auto ShufleUp = [&](const int* in, int* out, int offset)
@@ -1093,6 +1089,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		//}
 
 		radixPrefixScan[0] = 0;
+		radixPrefixScan[D_HOST_SORT_BLOCK_SIZE + 1] = 0;
 
 		for (int i = 0; i < blocksCount; ++i)
 		{
@@ -1118,8 +1115,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				sortedRadix[threadId] = sortKey;
 			}
 
-			//for (int bit = 11; bit < radixStride; bit <<= 2)
-			//for (int bit = 0; bit < 4; ++bit)
 			for (int bit = 0; (1<<(bit * 2)) < radixStride; ++bit)
 			{
 				int keyReg[D_HOST_SORT_BLOCK_SIZE];
@@ -1128,13 +1123,19 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					keyReg[threadId] = sortedRadix[threadId];
 				}
 
-				//int radixPrefixScanReg[D_HOST_SORT_BLOCK_SIZE + 1];
-				int radixPrefixScanReg[D_HOST_SORT_BLOCK_SIZE];
+				int radixPrefixScanReg0[D_HOST_SORT_BLOCK_SIZE];
+				int radixPrefixScanReg1[D_HOST_SORT_BLOCK_SIZE];
 				for (int threadId = 0; threadId < D_HOST_SORT_BLOCK_SIZE; ++threadId)
 				{
 					int test = (keyReg[threadId] >> (bit * 2)) & 0x3;
 					dstLocalOffset[threadId] = test;
-					radixPrefixScanReg[threadId] = 1 << (test << 3);
+					//radixPrefixScanReg[threadId] = 1 << (test << 3);
+					int bit0 = (test == 0) ? 1 : 0;
+					int bit1 = (test == 1) ? 1 << 16 :  0;
+					int bit2 = (test == 2) ? 1 : 0;
+					int bit3 = (test == 3) ? 1 << 16 : 0;
+					radixPrefixScanReg0[threadId] = bit0 + bit1;
+					radixPrefixScanReg1[threadId] = bit2 + bit3;
 				}
 
 				// sync free loop
@@ -1142,14 +1143,17 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				{
 					for (int n = 1; n < D_BANK_COUNT; n *= 2)
 					{
-						//	int radixPrefixScanReg1[D_BANK_COUNT];
-						int radixPrefixScanReg1[D_HOST_SORT_BLOCK_SIZE];
-						ShufleUp(&radixPrefixScanReg[bankBase], &radixPrefixScanReg1[bankBase], n);
+						//int radixPrefixScanReg1[D_BANK_COUNT];
+						int radixPrefixScanRegTemp0[D_HOST_SORT_BLOCK_SIZE];
+						int radixPrefixScanRegTemp1[D_HOST_SORT_BLOCK_SIZE];
+						ShufleUp(&radixPrefixScanReg0[bankBase], &radixPrefixScanRegTemp0[bankBase], n);
+						ShufleUp(&radixPrefixScanReg1[bankBase], &radixPrefixScanRegTemp1[bankBase], n);
 						for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
 						{
 							if ((threadId & (D_BANK_COUNT - 1)) >= n)
 							{
-								radixPrefixScanReg[bankBase + threadId] += radixPrefixScanReg1[bankBase + threadId];
+								radixPrefixScanReg0[bankBase + threadId] += radixPrefixScanRegTemp0[bankBase + threadId];
+								radixPrefixScanReg1[bankBase + threadId] += radixPrefixScanRegTemp1[bankBase + threadId];
 							}
 						}
 					}
@@ -1157,7 +1161,8 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				// write to memory and sync;
 				for (int threadId = 0; threadId < D_HOST_SORT_BLOCK_SIZE; ++threadId)
 				{
-					radixPrefixScan[threadId + 1] = radixPrefixScanReg[threadId];
+					radixPrefixScan[threadId + 1] = radixPrefixScanReg0[threadId];
+					radixPrefixScan[threadId + 1 + D_HOST_SORT_BLOCK_SIZE + 1] = radixPrefixScanReg1[threadId];
 				}
 				// add finish the prefix scan
 				// ...........
