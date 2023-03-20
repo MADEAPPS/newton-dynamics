@@ -414,114 +414,11 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				sortedRadix[threadId] = sortKey;
 			}
 
-			//for (int threadId = 0; threadId < radixStride; ++threadId)
-			//{
-			//	//radixPrefixScan[threadId] = radixPrefixCount[threadId];
-			//	radixPrefixScan[threadId] = 1;
-			//}
-			//
-			////radixStride = 64;
-			//int radixBit = 0;
-			//int xxxxx = 64;
-			//for (int k = 1; k < xxxxx; k = k * 2)
-			//{
-			//	radixBit++;
-			//	//for (int threadId = 0; threadId < (radixStride >> radixBit); threadId++)
-			//	//{
-			//	//	cuTrace(("%d ", threadId));
-			//	//}
-			//	//cuTrace(("\n"));
-			//
-			//	//cuTrace(("thread=%d bit=%d base=%d\n", k, radixBit, base));
-			//	cuTrace(("bit=%d\n", radixBit));
-			//	for (int base = 0; base < radixStride; base += 64)
-			//	{
-			//		for (int threadId = 0; threadId < (xxxxx >> radixBit); threadId++)
-			//		{
-			//			int bankIndex = threadId & 0x1f;
-			//			//int id0 = ((threadId + 1) << radixBit) - 1;
-			//			int id1 = ((bankIndex + 1) << radixBit) - 1;
-			//			int id0 = id1 - (1 << (radixBit - 1));
-			//			//cuTrace(("%d ", sortedRadix.GetBankAddress(id0) % D_BANK_COUNT));
-			//			//cuTrace(("%d ", base + id0));
-			//			cuTrace(("%d ", id0));
-			//		}
-			//		cuTrace(("\n"));
-			//	}
-			//	cuTrace(("\n"));
-			//
-			//	//for (int threadId = 0; threadId < (radixStride >> radixBit); threadId++)
-			//	//{
-			//	//	int id1 = ((threadId + 1) << radixBit) - 1;
-			//	//	int id0 = id1 - (1 << (radixBit - 1));
-			//	//	//cuTrace(("%d ", sortedRadix.GetBankAddress(id0) % D_BANK_COUNT));
-			//	//	//cuTrace(("%d ", id0));
-			//	//
-			//	//	//int a = radixPrefixScan[id1];
-			//	//	//int b = radixPrefixScan[id0];
-			//	//	radixPrefixScan[id1] += radixPrefixScan[id0];
-			//	//}
-			//	//cuTrace(("\n"));
-			//
-			//	//for (int threadId = 0; threadId < radixStride; threadId++)
-			//	//{
-			//	//	cuTrace(("%d ", radixPrefixScan[threadId]));
-			//	//}
-			//	//cuTrace(("\n"));
-			//	//cuTrace(("\n"));
-			//}
-			//
-			////radixPrefixScan[radixStride - 1] = 0;
-			////for (int k = 1; k < radixStride; k = k * 2)
-			////{
-			////	//for (int threadId = 0; threadId < k; threadId++)
-			////	//{
-			////	//	cuTrace(("%d ", threadId));
-			////	//}
-			////	//cuTrace(("\n"));
-			////
-			////	for (int threadId = 0; threadId < k; threadId++)
-			////	{
-			////		int id0 = ((threadId + 1) << radixBit) - 1;
-			////		cuTrace(("%d ", id0));
-			////	}
-			////	cuTrace(("\n"));
-			////
-			////	for (int threadId = 0; threadId < k; threadId++)
-			////	{
-			////		int id1 = ((threadId + 1) << radixBit) - 1;
-			////		int id0 = id1 - (1 << (radixBit - 1));
-			////		cuTrace(("%d ", id1));
-			////
-			////		int a = radixPrefixScan[id1];
-			////		int b = radixPrefixScan[id0] + a;
-			////
-			////		radixPrefixScan[id0] = a;
-			////		radixPrefixScan[id1] = b;
-			////	}
-			////	cuTrace(("\n"));
-			////
-			////	//for (int threadId = 0; threadId < radixStride; threadId++)
-			////	//{
-			////	//	cuTrace(("%d ", radixPrefixScan[threadId]));
-			////	//}
-			////	//cuTrace(("\n"));
-			////	
-			////	cuTrace(("\n"));
-			////	radixBit--;
-			////}
-			//
-			////for (int threadId = 0; threadId < radixStride; threadId++)
-			////{
-			////	cuTrace(("%d ", radixPrefixScan[threadId]));
-			////}
-			//cuTrace(("\n"));
-
-
-			// *************
+			
 			for (int bank = 0; bank < blockStride; bank += D_BANK_COUNT)
 			{
-				for (int bit = 1; bit < 256; bit <<= 1)
+				//for (int bit = 11; bit < radixStride; bit <<= 2)
+				for (int bit = 0; bit < 4; ++bit )
 				{
 					int keyReg[D_BANK_COUNT];
 					for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
@@ -532,11 +429,9 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					int radixPrefixScanReg[D_BANK_COUNT + 1];
 					for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
 					{
-						int test = keyReg[threadId] & bit;
-						int mask = test ? 1 : 0;
-						dstLocalOffset[threadId] = mask;
-						//radixPrefixScan[blockStride / 2 + threadId + 1] = mask ? 1 << 16 : 1;
-						radixPrefixScanReg[threadId] = mask ? 1 << 16 : 1;
+						int test = (keyReg[threadId] >> (bit * 2)) & 0x3;
+						dstLocalOffset[threadId] = test;
+						radixPrefixScanReg[threadId] = 1 << (test << 3);
 					}
 
 					for (int n = 1; n < D_BANK_COUNT; n *= 2)
@@ -551,7 +446,10 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 							}
 						}
 					}
-					int base = (radixPrefixScanReg[D_BANK_COUNT - 1]) << 16;
+
+					int base = radixPrefixScanReg[D_BANK_COUNT - 1];
+					base = base + (base << 8);
+					base = (base + (base << 16)) << 8;
 					for (int threadId = D_BANK_COUNT-1; threadId >= 0; --threadId)
 					{
 						radixPrefixScanReg[threadId + 1] = radixPrefixScanReg[threadId];
@@ -561,12 +459,11 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
 					{
 						int key = radixPrefixScanReg[threadId];
-						int a = key & 0xffff;
-						int b = (key + base) >> 16;
-						dstLocalOffset[threadId] = dstLocalOffset[threadId] ? b : a;
+						int shift = dstLocalOffset[threadId] << 3;
+						int keyIndex = ((key + base) >> shift) & 0xff;
+						dstLocalOffset[threadId] = keyIndex;
 					}
-					
-					//for (int threadId = 0; threadId < blockStride; ++threadId)
+
 					for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
 					{
 						int dstIndex = dstLocalOffset[threadId];
