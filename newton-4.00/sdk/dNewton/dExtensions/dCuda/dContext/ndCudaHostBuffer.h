@@ -1129,7 +1129,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				}
 
 				// sync free loop
-				for (int bankBase = 0; bankBase < D_HOST_SORT_BLOCK_SIZE; bankBase += D_BANK_COUNT)
+				for (int bankBase = 0; bankBase < blockStride; bankBase += D_BANK_COUNT)
 				{
 					for (int n = 1; n < D_BANK_COUNT; n *= 2)
 					{
@@ -1148,7 +1148,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					}
 				}
 				// write to memory add finish the prefix scan
-				for (int threadId = 0; threadId < D_HOST_SORT_BLOCK_SIZE; ++threadId)
+				for (int threadId = 0; threadId < blockStride; ++threadId)
 				{
 					radixPrefixScan[threadId + 1] = radixPrefixScanReg0[threadId];
 					radixPrefixScan[threadId + 1 + D_HOST_SORT_BLOCK_SIZE + 1] = radixPrefixScanReg1[threadId];
@@ -1192,19 +1192,21 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					dstIndex += (shift == 2) ? base2 + (key1 & 0xffff) : 0;
 					sortedRadix[dstIndex] = keyReg[threadId];
 				}
-				cuTrace(("\n"));
 			}
 
-			cuTrace(("\n"));
-
+#if 0
+			// radixStride / 32 memory transactions, one sync
 			for (int threadId = 0; threadId < radixStride; ++threadId)
 			{
 				radixPrefixScan[threadId] = 0;
 			}
+			// 2 * (radixStride / 32) memory transactions, one sync
 			for (int threadId = 0; threadId < radixStride; ++threadId)
 			{
 				radixPrefixScan[radixStride / 2 + threadId + 1] = radixPrefixCount[threadId];
 			}
+
+			// 4 * (radixStride / 32) memory transactions, 2 * (log (radixStride / 32) + 1) sync
 			for (int k = 1; k < radixStride; k = k << 1)
 			{
 				int sumReg[D_HOST_MAX_RADIX_SIZE];
@@ -1220,6 +1222,52 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				}
 			}
 
+#else
+			int radixPrefixScanReg[D_HOST_MAX_RADIX_SIZE];
+			// radixStride / 32 memory transactions, one sync
+			for (int threadId = 0; threadId < radixStride; ++threadId)
+			{
+				radixPrefixScanReg[threadId] = radixPrefixCount[threadId];
+			}
+			// this loop has zero memory transactions, one sync
+			for (int bankBase = 0; bankBase < radixStride; bankBase += D_BANK_COUNT)
+			{
+				for (int n = 1; n < D_BANK_COUNT; n *= 2)
+				{
+					int radixPrefixScanRegTemp[D_HOST_MAX_RADIX_SIZE];
+					ShufleUp(&radixPrefixScanReg[bankBase], &radixPrefixScanRegTemp[bankBase], n);
+					for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
+					{
+						if ((threadId & (D_BANK_COUNT - 1)) >= n)
+						{
+							radixPrefixScanReg[bankBase + threadId] += radixPrefixScanRegTemp[bankBase + threadId];
+						}
+					}
+				}
+			}
+			// radixStride / 32 memory transactions, one sync
+			for (int threadId = 0; threadId < radixStride; ++threadId)
+			{
+				radixPrefixScan[threadId + 1] = radixPrefixScanReg[threadId];
+			}
+			int scale = 0;
+			// 3 * ((radixStride / 32) memory transactions, log (radixStride / 64) + 1 sync
+			for (int segment = radixStride; segment > D_BANK_COUNT; segment >>= 1)
+			{
+				for (int threadId = 0; threadId < blockStride / 2; ++threadId)
+				{
+					int baseBank = threadId >> (D_LOG_BANK_COUNT + scale);
+					int baseIndex = (baseBank << (D_LOG_BANK_COUNT + scale + 1)) + (1 << (D_LOG_BANK_COUNT + scale)) + 1 - 1;
+					int bankIndex = threadId & ((1 << (D_LOG_BANK_COUNT + scale)) - 1);
+					int scanIndex = baseIndex + bankIndex + 1;
+
+					int base0 = radixPrefixScan[baseIndex];
+					radixPrefixScan[scanIndex] += base0;
+				}
+				scale++;
+			}
+#endif
+
 			for (int threadId = 0; threadId < blockStride; ++threadId)
 			{
 				int index = bashSize + threadId;
@@ -1229,7 +1277,8 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					int keyHigh = keyValue >> 16;
 					int keyLow = keyValue & 0xffff;
 					int dstOffset1 = radixPrefixStart[keyLow];
-					int dstOffset0 = threadId - radixPrefixScan[radixStride / 2 + keyLow];
+					//int dstOffset0 = threadId - radixPrefixScan[radixStride / 2 + keyLow];
+					int dstOffset0 = threadId - radixPrefixScan[keyLow];
 					dst[dstOffset0 + dstOffset1] = cachedItems[keyHigh];
 				}
 			}
