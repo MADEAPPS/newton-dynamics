@@ -1173,37 +1173,39 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					{
 						int baseBank = threadId >> (D_LOG_BANK_COUNT + scale);
 						int baseIndex = (baseBank << (D_LOG_BANK_COUNT + scale + 1)) + (1 << (D_LOG_BANK_COUNT + scale)) + 1 - 1;
-						int base = radixPrefixScan[baseIndex];
-
 						int bankIndex = threadId & ((1 << (D_LOG_BANK_COUNT + scale)) - 1);
 						int scanIndex = baseIndex + bankIndex + 1;
-						radixPrefixScan[scanIndex] += base;
+
+						int base0 = radixPrefixScan[baseIndex];
+						int base1 = radixPrefixScan[D_HOST_SORT_BLOCK_SIZE + 1 + baseIndex];
+						radixPrefixScan[scanIndex] += base0;
+						radixPrefixScan[D_HOST_SORT_BLOCK_SIZE + 1 + scanIndex] += base1;
 					}
 					scale ++;
 				}
 				
-				// ...........
-				
-				//int base0 = radixPrefixScanReg0[D_HOST_SORT_BLOCK_SIZE - 1];
-				//int base1 = radixPrefixScanReg[2 * (D_HOST_SORT_BLOCK_SIZE + 1) - 2];
-				//base0 = base0 + (base0 << 16);
-				//base1 = base1 + (base1 << 16);
-				//base = (base + (base << 16)) << 8;
+				int base0 = radixPrefixScan[1 * (D_HOST_SORT_BLOCK_SIZE + 1) - 1];
+				int base1 = radixPrefixScan[2 * (D_HOST_SORT_BLOCK_SIZE + 1) - 1];
+				base0 = base0 + (base0 << 16);
+				int val = (base0 & 0xffff0000) + (base0 >> 16);
+				base1 = base1 + (base1 << 16) + val;
+				base1 = (base1 << 16) + (base0 >> 16);
+				base0 = (base0 << 16);
 				//for (int threadId = D_BANK_COUNT - 1; threadId >= 0; --threadId)
 				//{
 				//	radixPrefixScanReg0[threadId + 1] = radixPrefixScanReg0[threadId];
 				//	radixPrefixScanReg1[threadId + 1] = radixPrefixScanReg1[threadId];
 				//}
-				radixPrefixScanReg0[0] = 0;
-				//
-				//for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
-				//{
+				//radixPrefixScanReg0[0] = 0;
+				
+				for (int threadId = 0; threadId < D_HOST_SORT_BLOCK_SIZE; ++threadId)
+				{
 				//	int key = radixPrefixScanReg[threadId];
 				//	int shift = dstLocalOffset[threadId] << 3;
 				//	int keyIndex = ((key + base) >> shift) & 0xff;
 				//	dstLocalOffset[threadId] = keyIndex;
-				//}
-				//
+				}
+				
 				//for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
 				//{
 				//	int dstIndex = dstLocalOffset[threadId];
