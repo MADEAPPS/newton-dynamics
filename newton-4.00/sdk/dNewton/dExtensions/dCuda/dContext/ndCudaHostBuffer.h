@@ -1200,8 +1200,9 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				
 				for (int threadId = 0; threadId < D_HOST_SORT_BLOCK_SIZE; ++threadId)
 				{
-				//	int key = radixPrefixScanReg[threadId];
-				//	int shift = dstLocalOffset[threadId] << 3;
+					int key0 = radixPrefixScan[threadId];
+					int key1 = radixPrefixScan[threadId + D_HOST_SORT_BLOCK_SIZE + 1];
+					int shift = dstLocalOffset[threadId] << 3;
 				//	int keyIndex = ((key + base) >> shift) & 0xff;
 				//	dstLocalOffset[threadId] = keyIndex;
 				}
