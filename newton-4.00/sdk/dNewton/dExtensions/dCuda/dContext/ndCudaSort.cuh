@@ -116,25 +116,20 @@ __global__ void ndCudaCountItems(const ndKernelParams params, const ndAssessor<T
 	}
 }
 
-#define D_USE_LOCAL_BITONIC_SORT
-
-#ifdef D_USE_LOCAL_BITONIC_SORT
-
-
 #define D_LOG_BANK_COUNT_GPU	5
 #define D_BANK_COUNT_GPU		(1<<D_LOG_BANK_COUNT_GPU)
 
 template <int size>
 class cuBankFreeArray
 {
-	public:
+public:
 	__device__ cuBankFreeArray()
 	{
 	}
 
 	__device__ int& operator[] (int address)
 	{
-		int low = address & (D_BANK_COUNT_GPU-1);
+		int low = address & (D_BANK_COUNT_GPU - 1);
 		int high = address >> D_LOG_BANK_COUNT_GPU;
 		int dst = high * (D_BANK_COUNT + 1) + low;
 		return m_array[dst];
@@ -143,6 +138,11 @@ class cuBankFreeArray
 	//int m_array[(size + D_BANK_COUNT_GPU - 1) >> D_LOG_BANK_COUNT_GPU][D_BANK_COUNT_GPU + 1];
 	int m_array[((size + D_BANK_COUNT_GPU - 1) >> D_LOG_BANK_COUNT_GPU) * (D_BANK_COUNT_GPU + 1)];
 };
+
+
+#if 0
+#define D_USE_LOCAL_BITONIC_SORT
+#ifdef D_USE_LOCAL_BITONIC_SORT
 
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
@@ -501,8 +501,179 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 		bashSize += blockStride;
 	}
 }
+#endif
 
 #endif
+
+#define D_GPU_SORTING_ALGORITHM 0
+
+#if (D_GPU_SORTING_ALGORITHM == 0)
+
+// using simple prefix scan sum
+// using a simple bitonic sort, the sort has a two ways bank conflict
+template <typename T, typename SortKeyPredicate>
+__global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
+{
+	__shared__  T cachedItems[D_DEVICE_SORT_BLOCK_SIZE];
+	__shared__  int sortedRadix[D_DEVICE_SORT_BLOCK_SIZE];
+	__shared__  int radixPrefixCount[D_DEVICE_MAX_RADIX_SIZE];
+	__shared__  int radixPrefixStart[D_DEVICE_MAX_RADIX_SIZE];
+	//__shared__  cuBankFreeArray<D_DEVICE_SORT_BLOCK_SIZE> sortedRadix;
+	__shared__  int radixPrefixScan[D_DEVICE_MAX_RADIX_SIZE / 2 + D_DEVICE_MAX_RADIX_SIZE + 1];
+	//__shared__  cuBankFreeArray<D_DEVICE_MAX_RADIX_SIZE> radixPrefixScan;
+
+	int threadId = threadIdx.x;
+	int blockStride = blockDim.x;
+	int blockIndex = blockIdx.x;
+	int radixBase = blockIndex * radixStride;
+	int radixPrefixOffset = params.m_kernelCount * radixStride;
+	int bashSize = params.m_blocksPerKernel * params.m_workGroupSize * blockIndex;
+
+	if (threadId < radixStride)
+	{
+		int a = scansBuffer[radixBase + threadId];
+		int b = scansBuffer[radixPrefixOffset + threadId];
+		radixPrefixStart[threadId] = a + b;
+		radixPrefixScan[threadId] = 0;
+	}
+
+	for (int i = 0; i < params.m_blocksPerKernel; ++i)
+	{
+		if (threadId < radixStride)
+		{
+			radixPrefixCount[threadId] = 0;
+		}
+		__syncthreads();
+
+		int index = bashSize + threadId;
+		int sortedRadixKey = (radixStride << 16);
+		if (index < input.m_size)
+		{
+			cachedItems[threadId] = input[index];
+			int radix = getRadix(cachedItems[threadId]);
+			atomicAdd(&radixPrefixCount[radix], 1);
+			sortedRadixKey = (radix << 16) + threadId;
+		}
+		sortedRadix[threadId] = sortedRadixKey;
+		__syncthreads();
+
+		if (threadId < radixStride)
+		{
+			radixPrefixScan[radixStride / 2 + threadId + 1] = radixPrefixCount[threadId];
+		}
+		for (int k = 1; k < radixStride; k = k << 1)
+		{
+			int sum;
+			__syncthreads();
+			if (threadId < radixStride)
+			{
+				int a = radixPrefixScan[radixStride / 2 + threadId];
+				int b = radixPrefixScan[radixStride / 2 + threadId - k];
+				sum = a + b;
+			}
+			__syncthreads();
+			if (threadId < radixStride)
+			{
+				radixPrefixScan[radixStride / 2 + threadId] = sum;
+			}
+		}
+
+		//int value = 1;
+		//int laneId = threadIdx.x & 0x1f;
+		//int size___ = 32;
+		//for (int i = 1; i <= size___; i *= 2)
+		//{
+		//	int n = __shfl_up_sync(0xffffffff, value, i, size___);
+		//	if ((laneId & (size___ - 1)) >= i)
+		//	{
+		//		value += n;
+		//	}
+		//}
+		//radixPrefixScan[threadIdx.x] = value;
+
+		#if 1
+			for (int k = 1; k < blockStride; k = k << 1)
+			{
+				for (int j = k; j > 0; j = j >> 1)
+				{
+					if (threadId < blockStride / 2)
+					{
+						int highMask = -j;
+						int lowMask = ~highMask;
+						int lowIndex = threadId & lowMask;
+						int highIndex = (threadId & highMask) * 2;
+
+						int id0 = highIndex + lowIndex;
+						int id1 = highIndex + lowIndex + j;
+						int oddEven = highIndex & k * 2;
+
+						int a = sortedRadix[id0];
+						int b = sortedRadix[id1];
+
+						int test = a < b;
+						int a1 = test ? a : b;
+						int b1 = test ? b : a;
+
+						int a2 = oddEven ? b1 : a1;
+						int b2 = oddEven ? a1 : b1;
+
+						sortedRadix[id0] = a2;
+						sortedRadix[id1] = b2;
+					}
+					__syncthreads();
+				}
+			}
+		#else
+			int id0 = threadId;
+			for (int k = 2; k <= blockStride; k = k << 1)
+			{
+				for (int j = k >> 1; j > 0; j = j >> 1)
+				{
+					int id1 = id0 ^ j;
+
+					if (id1 > id0)
+					{
+						const int a = sortedRadix[id0];
+						const int b = sortedRadix[id1];
+						const int mask0 = -(id0 & k);
+						const int mask1 = -(a > b);
+						const int mask2 = (mask0 ^ mask1) & 0x80000000;
+						if (mask2)
+						{
+							sortedRadix[id0] = b;
+							sortedRadix[id1] = a;
+						}
+					}
+					__syncthreads();
+				}
+			}
+		#endif
+
+		if (index < input.m_size)
+		{
+			int keyValue = sortedRadix[threadId];
+			int keyHigh = keyValue >> 16;
+			int keyLow = keyValue & 0xffff;
+			int dstOffset1 = radixPrefixStart[keyHigh];
+			int dstOffset0 = threadId - radixPrefixScan[radixStride / 2 + keyHigh];
+			output[dstOffset0 + dstOffset1] = cachedItems[keyLow];
+		}
+		__syncthreads();
+		if (threadId < radixStride)
+		{
+			radixPrefixStart[threadId] += radixPrefixCount[threadId];
+		}
+
+		bashSize += blockStride;
+	}
+}
+
+#elif (D_GPU_SORTING_ALGORITHM == 1)
+	#error implement new local gpu sort and merge algorthm?
+#else
+	#error implement new local gpu sort and merge algorthm?
+#endif
+
 
 template <class T, int exponentRadix, typename ndEvaluateRadix>
 void ndCountingSort(ndCudaContextImplement* const context, const ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndEvaluateRadix evaluateRadix)

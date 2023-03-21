@@ -913,18 +913,17 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 #endif
 
 
-#define D_SORTING_ALGORITHM 1
+#define D_SORTING_ALGORITHM 0
 
 #if (D_SORTING_ALGORITHM == 0)
 	// using simple prefix scan sum
-	// using a simple bitonix sort, the sort has a two ways bank conflit
+	// using a simple bitonic sort, the sort has a two ways bank conflict
 	auto MergeBuckects = [&](int blockIdx, int blocksCount, int computeUnits)
 	{
 		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
+		int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
 		int radixPrefixCount[D_HOST_MAX_RADIX_SIZE];
 		int radixPrefixStart[D_HOST_MAX_RADIX_SIZE];
-		//ndBankFreeArray<D_HOST_SORT_BLOCK_SIZE> sortedRadix;
-		int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
 		int radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + D_HOST_MAX_RADIX_SIZE + 1];
 
 		int size = src.GetCount();
@@ -952,20 +951,18 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 
 			for (int threadId = 0; threadId < blockStride; ++threadId)
 			{
+				int sortedRadixReg[D_HOST_SORT_BLOCK_SIZE];
 				int index = bashSize + threadId;
+				sortedRadixReg[threadId] = (radixStride << 16);
 				if (index < size)
 				{
 					cachedItems[threadId] = src[index];
 					int radix = evaluator.GetRadix(cachedItems[threadId]);
 					radixPrefixCount[radix] ++;
-					sortedRadix[threadId] = (radix << 16) + threadId;
+					sortedRadixReg[threadId] = (radix << 16) + threadId;
 				}
-				else
-				{
-					sortedRadix[threadId] = (radixStride << 16);
-				}
+				sortedRadix[threadId] = sortedRadixReg[threadId];
 			}
-
 
 			for (int threadId = 0; threadId < radixStride; ++threadId)
 			{
@@ -1000,7 +997,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 						int id0 = highIndex + lowIndex;
 						int id1 = highIndex + lowIndex + j;
 						int oddEven = highIndex & k * 2;
-						cuTrace(("%d ", id0 % D_BANK_COUNT));
+						//cuTrace(("%d ", id0 % D_BANK_COUNT));
 						//cuTrace(("%d ", sortedRadix.GetBankAddress(id0) % D_BANK_COUNT));
 			
 						int a = sortedRadix[id0];
@@ -1016,9 +1013,9 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 						sortedRadix[id0] = a2;
 						sortedRadix[id1] = b2;
 					}
-					cuTrace(("\n"));
+					//cuTrace(("\n"));
 				}
-				cuTrace(("\n"));
+				//cuTrace(("\n"));
 			}
 			
 			for (int threadId = 0; threadId < blockStride; ++threadId)
