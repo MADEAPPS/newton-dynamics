@@ -786,10 +786,14 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 
 			int sum0 = radixPrefixScan[1 * (D_HOST_SORT_BLOCK_SIZE + 1) - 1];
 			int sum1 = radixPrefixScan[2 * (D_HOST_SORT_BLOCK_SIZE + 1) - 1];
+			//int base0 = 0;
+			//int base1 = sum0 & 0xffff;
+			//int base2 = base1 + (sum1 & 0xffff);
+			//int base3 = base2 + (sum1 >> 16);
 			int base0 = 0;
 			int base1 = sum0 & 0xffff;
-			int base2 = base1 + (sum1 & 0xffff);
-			int base3 = base2 + (sum1 >> 16);
+			int base2 = base1 + (sum0 >> 16);
+			int base3 = base2 + (sum1 & 0xffff);
 
 			int key0 = radixPrefixScan[threadId];
 			int key1 = radixPrefixScan[threadId + D_HOST_SORT_BLOCK_SIZE + 1];
