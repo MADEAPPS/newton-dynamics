@@ -913,7 +913,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 #endif
 
 
-#define D_SORTING_ALGORITHM 1
+#define D_SORTING_ALGORITHM 0
 
 #if (D_SORTING_ALGORITHM == 0)
 	// using simple prefix scan sum

@@ -131,7 +131,7 @@ public:
 	{
 		int low = address & (D_BANK_COUNT_GPU - 1);
 		int high = address >> D_LOG_BANK_COUNT_GPU;
-		int dst = high * (D_BANK_COUNT + 1) + low;
+		int dst = high * (D_BANK_COUNT_GPU + 1) + low;
 		return m_array[dst];
 	}
 
@@ -505,6 +505,22 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 
 #endif
 
+
+inline int __device__ LocalWarpScanPrefix(int input, int threadId)
+{
+	int temp = input;
+	int lane = threadId & (D_BANK_COUNT_GPU - 1);
+	for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
+	{
+		int temp = __shfl_up_sync(0xffffffff, input, n, D_BANK_COUNT_GPU);
+		if (lane >= n)
+		{
+			input += temp;
+		}
+	}
+	return input;
+}
+
 #define D_GPU_SORTING_ALGORITHM 1
 
 #if (D_GPU_SORTING_ALGORITHM == 0)
@@ -791,7 +807,7 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 		{
 			radixPrefixCountReg = radixPrefixCount[threadId];
 			int scanReg = radixPrefixCountReg;
-			for (int n = 1; n < D_BANK_COUNT; n *= 2)
+			for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
 			{
 				int radixPrefixScanRegTemp = __shfl_up_sync(0xffffffff, scanReg, n, D_BANK_COUNT_GPU);
 				if (lane >= n)
