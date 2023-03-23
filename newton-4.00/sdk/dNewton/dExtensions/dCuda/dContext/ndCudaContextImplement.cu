@@ -615,12 +615,10 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//*m_sceneInfoCpu = ndCudaSceneInfo();
 	m_sortPrefixBuffer.SetCount(m_sortPrefixBuffer.GetCapacity());
 
-#define ___XXXX_256__
-
 	// ***********************************
 	//m_src.SetCount(8);
 	//m_src.SetCount(17);
-	//m_src.SetCount(81);
+	//m_src.SetCount(64);
 	//m_src.SetCount(256);
 	m_src.SetCount(301);
 	//m_src.SetCount(512);
@@ -630,15 +628,10 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//m_src.SetCount(1000000);
 	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
-#ifdef ___XXXX_256__
 		//m_src[i] = rand() % 256;
 		//m_src[i] = rand() & 0x7fffffff;
 		m_src[i] = m_src.GetCount() - i - 1;
 		m_src[i] = m_src[i] & 0xff;
-#else
-		//m_src[i] = rand() % 8 + ((m_src.GetCount() - 1 + i) << 10);
-		m_src[i] = rand() % 8;
-#endif
 	}
 
 	//m_src[4] = 1;
@@ -658,30 +651,34 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	m_buf0.ReadData(&m_src[0], m_src.GetCount());
 	m_buf1.ReadData(&m_dst1[0], m_dst1.GetCount());
 
-	class GetKey
+	class GetKey0
 	{
 		public:
 		int GetRadix(int item) const
 		{
-#ifdef ___XXXX_256__
 			return item & 0xff;
-#else
-			return item & 0x07;
-#endif
 		};
 	};
-	
-#ifdef ___XXXX_256__
-	ndCountingSort<int, GetKey, 8>(m_src, m_dst0, m_scan0);
-#else
-	ndCountingSort<int, GetKey, 3>(m_src, m_dst0, m_scan0);
-#endif
 
-	GetKey key;
+	class GetKey1
+	{
+		public:
+		int GetRadix(int item) const
+		{
+			return (item >> 8) & 0xff;
+		};
+	};
+
+	ndCountingSort<int, GetKey0, 8>(m_src, m_dst0, m_scan0);
+	ndCountingSort<int, GetKey1, 8>(m_dst0, m_src, m_scan1);
+
+	GetKey0 key;
 	for (int i = 1; i < m_dst0.GetCount(); ++i)
 	{
-		int a = key.GetRadix(m_dst0[i - 1]);
-		int b = key.GetRadix(m_dst0[i - 0]);
+		//int a = key.GetRadix(m_dst0[i - 1]);
+		//int b = key.GetRadix(m_dst0[i - 0]);
+		int a = m_src[i - 1];
+		int b = m_src[i - 0];
 		ndAssert(a <= b);
 	}
 }
@@ -1044,7 +1041,7 @@ void ndCudaContextImplement::Begin()
 		ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix);
 #else
 		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
-		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix1);
+		ndCountingSort<int, 8>(this, m_buf1, m_buf0, GetRadix1);
 		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix2);
 		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix3);
 #endif
@@ -1061,8 +1058,7 @@ void ndCudaContextImplement::Begin()
 
 	#if 1
 	m_device->SyncDevice();
-	//m_buf0.WriteData(&m_dst1[0], m_dst1.GetCount());
-	m_buf1.WriteData(&m_dst1[0], m_dst1.GetCount());
+	m_buf0.WriteData(&m_dst1[0], m_dst1.GetCount());
 	m_sortPrefixBuffer.WriteData(&m_scan1[0], m_scan1.GetCount());
 	
 	for (int i = 1; i < m_dst1.GetCount(); ++i)

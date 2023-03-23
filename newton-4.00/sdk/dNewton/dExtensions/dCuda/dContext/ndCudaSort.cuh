@@ -506,20 +506,20 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 #endif
 
 
-inline int __device__ LocalWarpScanPrefix(int input, int threadId)
-{
-	int temp = input;
-	int lane = threadId & (D_BANK_COUNT_GPU - 1);
-	for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
-	{
-		int temp = __shfl_up_sync(0xffffffff, input, n, D_BANK_COUNT_GPU);
-		if (lane >= n)
-		{
-			input += temp;
-		}
-	}
-	return input;
-}
+//inline int __device__ LocalWarpScanPrefix(int input, int threadId)
+//{
+//	int temp = input;
+//	int lane = threadId & (D_BANK_COUNT_GPU - 1);
+//	for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
+//	{
+//		int temp = __shfl_up_sync(0xffffffff, input, n, D_BANK_COUNT_GPU);
+//		if (lane >= n)
+//		{
+//			input += temp;
+//		}
+//	}
+//	return input;
+//}
 
 #define D_GPU_SORTING_ALGORITHM 1
 
@@ -786,10 +786,6 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 
 			int sum0 = radixPrefixScan[1 * (D_HOST_SORT_BLOCK_SIZE + 1) - 1];
 			int sum1 = radixPrefixScan[2 * (D_HOST_SORT_BLOCK_SIZE + 1) - 1];
-			//int base0 = 0;
-			//int base1 = sum0 & 0xffff;
-			//int base2 = base1 + (sum1 & 0xffff);
-			//int base3 = base2 + (sum1 >> 16);
 			int base0 = 0;
 			int base1 = sum0 & 0xffff;
 			int base2 = base1 + (sum0 >> 16);
