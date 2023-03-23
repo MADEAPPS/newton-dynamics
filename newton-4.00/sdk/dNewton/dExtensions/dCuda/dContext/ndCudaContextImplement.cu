@@ -619,7 +619,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//m_src.SetCount(8);
 	//m_src.SetCount(17);
 	//m_src.SetCount(64);
-	//m_src.SetCount(256);
+	m_src.SetCount(256);
 	//m_src.SetCount(301);
 	//m_src.SetCount(512);
 	//m_src.SetCount(512 + 99);
@@ -679,7 +679,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 		//int b = key.GetRadix(m_dst0[i - 0]);
 		int a = m_src[i - 1];
 		int b = m_src[i - 0];
-		//ndAssert(a <= b);
+		ndAssert(a <= b);
 	}
 }
 

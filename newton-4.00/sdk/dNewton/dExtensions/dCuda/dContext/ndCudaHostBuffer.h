@@ -913,7 +913,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 #endif
 
 
-#define D_SORTING_ALGORITHM 1
+#define D_SORTING_ALGORITHM 0
 
 #if (D_SORTING_ALGORITHM == 0)
 	// using simple prefix scan sum
@@ -934,13 +934,26 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		int radixPrefixOffset = computeUnits * radixStride;
 
 		ndEvaluateKey evaluator;
+		int startReg[D_HOST_MAX_RADIX_SIZE];
 		for (int threadId = 0; threadId < radixStride; ++threadId)
 		{
-			int a = scansBuffer[radixBase + threadId];
-			int b = scansBuffer[radixPrefixOffset + threadId];
-			radixPrefixStart[threadId] = a + b;
+			startReg[threadId] = scansBuffer[radixBase + threadId] + scansBuffer[radixPrefixOffset + threadId];
+			radixPrefixStart[threadId] = startReg[threadId];
 			radixPrefixScan[threadId] = 0;
 		}
+
+		auto ShufleUp = [&](const int* in, int* out, int offset)
+		{
+			for (int i = 0; i < offset; ++i)
+			{
+				out[i] = in[i];
+			}
+
+			for (int i = D_BANK_COUNT - offset - 1; i >= 0; --i)
+			{
+				out[i + offset] = in[i];
+			}
+		};
 
 		for (int i = 0; i < blocksCount; ++i)
 		{
@@ -964,9 +977,12 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				sortedRadix[threadId] = sortedRadixReg[threadId];
 			}
 
+#if 0
+			int radixPrefixCountReg[D_HOST_MAX_RADIX_SIZE];
 			for (int threadId = 0; threadId < radixStride; ++threadId)
 			{
-				radixPrefixScan[radixStride / 2 + threadId + 1] = radixPrefixCount[threadId];
+				radixPrefixCountReg[threadId] = radixPrefixCount[threadId];
+				radixPrefixScan[radixStride / 2 + threadId + 1] = radixPrefixCountReg[threadId];
 			}
 			for (int k = 1; k < radixStride; k = k << 1)
 			{
@@ -982,6 +998,53 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					radixPrefixScan[radixStride / 2 + threadId] = sumReg[threadId];
 				}
 			}
+#else
+			int radixPrefixScanReg[D_HOST_MAX_RADIX_SIZE];
+			int radixPrefixCountReg[D_HOST_MAX_RADIX_SIZE];
+			// radixStride / 32 memory transactions, one sync
+			for (int threadId = 0; threadId < radixStride; ++threadId)
+			{
+				radixPrefixCountReg[threadId] = radixPrefixCount[threadId];
+				radixPrefixScanReg[threadId] = radixPrefixCountReg[threadId];
+			}
+			// this loop has zero memory transactions, one sync
+			for (int bankBase = 0; bankBase < radixStride; bankBase += D_BANK_COUNT)
+			{
+				for (int n = 1; n < D_BANK_COUNT; n *= 2)
+				{
+					int radixPrefixScanRegTemp[D_HOST_MAX_RADIX_SIZE];
+					ShufleUp(&radixPrefixScanReg[bankBase], &radixPrefixScanRegTemp[bankBase], n);
+					for (int threadId = 0; threadId < D_BANK_COUNT; ++threadId)
+					{
+						int laneId = threadId & (D_BANK_COUNT - 1);
+						if (laneId >= n)
+						{
+							radixPrefixScanReg[bankBase + threadId] += radixPrefixScanRegTemp[bankBase + threadId];
+						}
+					}
+				}
+			}
+			// radixStride / 32 memory transactions, one sync
+			for (int threadId = 0; threadId < radixStride; ++threadId)
+			{
+				radixPrefixScan[radixStride / 2 + threadId + 1] = radixPrefixScanReg[threadId];
+			}
+			int scale = 0;
+			// 3 * ((radixStride / 32) memory transactions, log (radixStride / 64) + 1 sync
+			for (int segment = radixStride; segment > D_BANK_COUNT; segment >>= 1)
+			{
+				for (int threadId = 0; threadId < radixStride / 2; ++threadId)
+				{
+					int baseBank = threadId >> (D_LOG_BANK_COUNT + scale);
+					int baseIndex = (baseBank << (D_LOG_BANK_COUNT + scale + 1)) + (1 << (D_LOG_BANK_COUNT + scale)) + 1 - 1;
+					int bankIndex = threadId & ((1 << (D_LOG_BANK_COUNT + scale)) - 1);
+					int scanIndex = baseIndex + bankIndex + 1;
+
+					radixPrefixScan[radixStride / 2 + scanIndex] += radixPrefixScan[radixStride / 2 + baseIndex];
+				}
+				scale++;
+			}
+#endif
 
 			for (int k = 1; k < blockStride; k = k << 1)
 			{
@@ -1034,7 +1097,8 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			
 			for (int threadId = 0; threadId < radixStride; ++threadId)
 			{
-				radixPrefixStart[threadId] += radixPrefixCount[threadId];
+				startReg[threadId] += radixPrefixCountReg[threadId];
+				radixPrefixStart[threadId] = startReg[threadId];
 			}
 
 			bashSize += blockStride;
