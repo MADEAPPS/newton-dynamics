@@ -293,7 +293,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		{
 			localPrefixScan[blockDim / 2 + threadId + 1] = sum[threadId];
 		}
-		
 		for (int i = 1; i < blockDim; i = i << 1)
 		{
 			for (int threadId = 0; threadId < blockDim; ++threadId)
@@ -926,7 +925,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
 		int radixPrefixCount[D_HOST_MAX_RADIX_SIZE];
 		int radixPrefixStart[D_HOST_MAX_RADIX_SIZE];
-		//int radixPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + D_HOST_MAX_RADIX_SIZE + 1];
 		int radixPrefixScan____[D_HOST_MAX_RADIX_SIZE + 1];
 
 		int size = src.GetCount();
