@@ -352,6 +352,11 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			}
 		}
 
+for (int threadId = 0; threadId < blockDim; ++threadId)
+{
+	sumReg[threadId] = 1;
+}
+
 		for (int bankBase = 0; bankBase < blockDim; bankBase += D_BANK_COUNT_HOST)
 		{
 			for (int n = 1; n < D_BANK_COUNT_HOST; n *= 2)
@@ -369,6 +374,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			}
 		}
 
+#if 1
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
 			localPrefixScan[threadId + 1] = sumReg[threadId];
@@ -388,6 +394,48 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			}
 			scale++;
 		}
+#else
+
+		for (int threadId = 0; threadId < blockDim; ++threadId)
+		{
+			localPrefixScan[threadId] = -1;
+		}
+
+		int scale = 0;
+		int bankMask = 1;
+		for (int segment = blockDim; segment > D_BANK_COUNT_HOST; segment >>= 1)
+		{
+			for (int threadId = 0; threadId < blockDim; ++threadId)
+			//for (int threadId = 0; threadId < blockDim; threadId+= D_BANK_COUNT_HOST)
+			{
+				int mask = threadId & (1 << (D_LOG_BANK_COUNT_HOST + scale));
+				if (!mask)
+				{
+					int test = ((threadId >> D_LOG_BANK_COUNT_HOST) & bankMask) + 1;
+					if (test == (1 << scale))
+					{
+						//localPrefixScan[threadId + D_BANK_COUNT_HOST - 1] = sumReg[threadId];
+						//localPrefixScan[threadId + 1] = sumReg[threadId];
+						localPrefixScan[threadId] = sumReg[threadId];
+					}
+				}
+			}
+
+			//for (int threadId = 0; threadId < blockDim; ++threadId)
+			for (int threadId = 0; threadId < blockDim; threadId += D_BANK_COUNT_HOST)
+			{
+				//int baseBank = threadId >> (D_LOG_BANK_COUNT_HOST + scale);
+				//int baseIndex = (baseBank << (D_LOG_BANK_COUNT_HOST + scale + 1)) + (1 << (D_LOG_BANK_COUNT_HOST + scale)) + 1 - 1;
+				//int bankIndex = threadId & ((1 << (D_LOG_BANK_COUNT_HOST + scale)) - 1);
+				//int scanIndex = baseIndex + bankIndex + 1;
+				//int scanIndex = threadId & (D_BANK_COUNT_HOST - 1);
+				//localPrefixScan[scanIndex] += localPrefixScan[baseIndex];
+			}
+
+			scale++;
+			bankMask = bankMask * 2 + 1;
+		}
+#endif
 
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
