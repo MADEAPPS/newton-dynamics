@@ -25,7 +25,9 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-#define D_GRANULARITY	(1024 * 64)
+#define D_GRANULARITY			(1024 * 64)
+#define D_LOG_BANK_COUNT_GPU	5
+#define D_BANK_COUNT_GPU		(1<<D_LOG_BANK_COUNT_GPU)
 
 template <class T>
 inline T __device__ __host__ cuAbs(T A)

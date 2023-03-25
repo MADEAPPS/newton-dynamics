@@ -28,6 +28,7 @@
 
 #include "ndCudaDevice.h"
 #include "ndCudaContext.h"
+#include "ndCudaIntrinsics.h"
 #include "ndCudaDeviceBuffer.h"
 
 #define D_DEVICE_SORT_BLOCK_SIZE	(1<<8)
@@ -49,9 +50,6 @@ void ndCountingSort(ndCudaContextImplement* const context, const ndCudaDeviceBuf
 // support function implementation 
 //
 // *****************************************************************
-
-#define D_LOG_BANK_COUNT_GPU	5
-#define D_BANK_COUNT_GPU		(1<<D_LOG_BANK_COUNT_GPU)
 
 template <int size>
 class cuBankFreeArray
