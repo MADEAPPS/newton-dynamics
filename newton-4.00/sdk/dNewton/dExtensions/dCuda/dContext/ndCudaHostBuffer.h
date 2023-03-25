@@ -262,7 +262,7 @@ class ndBankFreeArray
 template <class T, class ndEvaluateKey, int exponentRadix>
 void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, ndCudaHostBuffer<int>& scansBuffer)
 {
-#if 1
+#if 0
 	auto AddPrefix = [&](int blockIdx, int blockDim, int computeUnits)
 	{
 		int sum[D_HOST_MAX_RADIX_SIZE];
@@ -287,6 +287,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			}
 		}
 		
+		//un optimized Hillis-Steele prefix scan sum
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
 			localPrefixScan[blockDim / 2 + threadId + 1] = sum[threadId];
@@ -348,11 +349,12 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			}
 		}
 
-for (int threadId = 0; threadId < blockDim; ++threadId)
-{
-	sumReg[threadId] = 1;
-}
+//for (int threadId = 0; threadId < blockDim; ++threadId)
+//{
+//	sumReg[threadId] = 1;
+//}
 
+		//optimized Hillis-Steele prefix scan sum
 		for (int bankBase = 0; bankBase < blockDim; bankBase += D_BANK_COUNT_GPU)
 		{
 			for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
@@ -370,10 +372,12 @@ for (int threadId = 0; threadId < blockDim; ++threadId)
 			}
 		}
 
-#if 1
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
-			localPrefixScan[threadId + 1] = sumReg[threadId];
+			if (!(threadId & D_BANK_COUNT_GPU))
+			{
+				localPrefixScan[threadId + 1] = sumReg[threadId];
+			}
 		}
 
 		int scale = 0;
@@ -386,52 +390,11 @@ for (int threadId = 0; threadId < blockDim; ++threadId)
 				int bankIndex = threadId & ((1 << (D_LOG_BANK_COUNT_GPU + scale)) - 1);
 				int scanIndex = baseIndex + bankIndex + 1;
 
-				localPrefixScan[scanIndex] += localPrefixScan[baseIndex];
+				sumReg[scanIndex - 1] += localPrefixScan[baseIndex];
+				localPrefixScan[scanIndex] = sumReg[scanIndex - 1];
 			}
 			scale++;
 		}
-#else
-
-		for (int threadId = 0; threadId < blockDim; ++threadId)
-		{
-			localPrefixScan[threadId] = -1;
-		}
-
-		int scale = 0;
-		int bankMask = 1;
-		for (int segment = blockDim; segment > D_BANK_COUNT_GPU; segment >>= 1)
-		{
-			for (int threadId = 0; threadId < blockDim; ++threadId)
-			//for (int threadId = 0; threadId < blockDim; threadId+= D_BANK_COUNT_GPU)
-			{
-				int mask = threadId & (1 << (D_LOG_BANK_COUNT_GPU + scale));
-				if (!mask)
-				{
-					int test = ((threadId >> D_LOG_BANK_COUNT_GPU) & bankMask) + 1;
-					if (test == (1 << scale))
-					{
-						//localPrefixScan[threadId + D_BANK_COUNT_GPU - 1] = sumReg[threadId];
-						//localPrefixScan[threadId + 1] = sumReg[threadId];
-						localPrefixScan[threadId] = sumReg[threadId];
-					}
-				}
-			}
-
-			//for (int threadId = 0; threadId < blockDim; ++threadId)
-			for (int threadId = 0; threadId < blockDim; threadId += D_BANK_COUNT_GPU)
-			{
-				//int baseBank = threadId >> (D_LOG_BANK_COUNT_GPU + scale);
-				//int baseIndex = (baseBank << (D_LOG_BANK_COUNT_GPU + scale + 1)) + (1 << (D_LOG_BANK_COUNT_GPU + scale)) + 1 - 1;
-				//int bankIndex = threadId & ((1 << (D_LOG_BANK_COUNT_GPU + scale)) - 1);
-				//int scanIndex = baseIndex + bankIndex + 1;
-				//int scanIndex = threadId & (D_BANK_COUNT_GPU - 1);
-				//localPrefixScan[scanIndex] += localPrefixScan[baseIndex];
-			}
-
-			scale++;
-			bankMask = bankMask * 2 + 1;
-		}
-#endif
 
 		for (int threadId = 0; threadId < blockDim; ++threadId)
 		{
