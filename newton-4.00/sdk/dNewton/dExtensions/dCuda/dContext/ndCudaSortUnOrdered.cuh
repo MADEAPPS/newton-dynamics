@@ -61,7 +61,7 @@ void ndCountingSortUnOrdered(ndCudaContextImplement* const context, const ndCuda
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaAddPrefixUnordered(const ndKernelParams params, const ndAssessor<T> dommy, ndAssessor<int> scansBuffer, SortKeyPredicate getRadix)
 {
-#if 1
+#if 0
 	//un optimized Hillis-Steele prefix scan sum
 	__shared__  int localPrefixScan[D_DEVICE_UNORDERED_MAX_RADIX_SIZE / 2 + D_DEVICE_UNORDERED_MAX_RADIX_SIZE + 1];
 
@@ -114,7 +114,6 @@ __global__ void ndCudaAddPrefixUnordered(const ndKernelParams params, const ndAs
 		offset += blockStride;
 	}
 
-sum = 1;
 	int lane = threadId & (D_BANK_COUNT_GPU - 1);
 	for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
 	{
@@ -134,16 +133,13 @@ sum = 1;
 	__syncthreads();
 	for (int segment = blockStride; segment > D_BANK_COUNT_GPU; segment >>= 1)
 	{
-		if (threadId < blockStride / 2)
+		int bank = 1 << (D_LOG_BANK_COUNT_GPU + scale);
+		int warpBase = threadId & bank;
+		if (warpBase)
 		{
-			int baseBank = threadId >> (D_LOG_BANK_COUNT_GPU + scale);
-			int baseIndex = (baseBank << (D_LOG_BANK_COUNT_GPU + scale + 1)) + (1 << (D_LOG_BANK_COUNT_GPU + scale)) + 1 - 1;
-			int bankIndex = threadId & ((1 << (D_LOG_BANK_COUNT_GPU + scale)) - 1);
-			int scanIndex = baseIndex + bankIndex + 1;
-
-			//localPrefixScan[scanIndex] += localPrefixScan[baseIndex];
-			sum += localPrefixScan[baseIndex];
-			localPrefixScan[scanIndex] = sum;
+			int warpSumIndex = threadId & (-warpBase);
+			sum += localPrefixScan[warpSumIndex - 1 + 1];
+			localPrefixScan[threadId + 1] = sum;
 		}
 		scale++;
 		__syncthreads();

@@ -47,6 +47,7 @@ class ndCudaHostBuffer
 {
 	public:
 	ndCudaHostBuffer();
+	ndCudaHostBuffer(const ndCudaHostBuffer<T>& src);
 	~ndCudaHostBuffer();
 
 	int GetCount() const;
@@ -58,6 +59,8 @@ class ndCudaHostBuffer
 
 	T& operator[] (int i);
 	const T& operator[] (int i) const;
+
+	ndCudaHostBuffer& operator= (const ndCudaHostBuffer<T>& src);
 
 	void Swap(ndCudaHostBuffer& buffer);
 
@@ -83,6 +86,15 @@ ndCudaHostBuffer<T>::ndCudaHostBuffer()
 {
 	SetCount(D_GRANULARITY);
 	SetCount(0);
+}
+
+template<class T>
+ndCudaHostBuffer<T>::ndCudaHostBuffer(const ndCudaHostBuffer<T>& src)
+	:m_array(SetCount(src.GetCount()))
+	,m_size(src.m_size)
+	,m_capacity(src.m_capacity)
+{
+	*this = src;
 }
 
 template<class T>
@@ -114,6 +126,14 @@ T& ndCudaHostBuffer<T>::operator[] (int i)
 	ndAssert(i >= 0);
 	ndAssert(i < m_size);
 	return m_array[i];
+}
+
+template<class T>
+ndCudaHostBuffer<T>& ndCudaHostBuffer<T>::operator=(const ndCudaHostBuffer<T>& src)
+{
+	SetCount(src.GetCount());
+	cudaMemcpy(m_array, src.m_array, m_size * sizeof(T), cudaMemcpyHostToHost);
+	return* this;
 }
 
 template<class T>
@@ -164,7 +184,7 @@ void ndCudaHostBuffer<T>::Resize(int newSize)
 		ndAssert(cudaStatus == cudaSuccess);
 		if (m_array)
 		{
-			cudaStatus = cudaMemcpy(newArray, m_array, m_size * sizeof(T), cudaMemcpyDeviceToDevice);
+			cudaStatus = cudaMemcpy(newArray, m_array, m_size * sizeof(T), cudaMemcpyHostToHost);
 			ndAssert(cudaStatus == cudaSuccess);
 			cudaStatus = cudaFreeHost(m_array);
 			ndAssert(cudaStatus == cudaSuccess);
@@ -179,7 +199,8 @@ void ndCudaHostBuffer<T>::Resize(int newSize)
 		cudaStatus = cudaMallocHost((void**)&newArray, newSize * sizeof(T));
 		if (m_array)
 		{
-			cudaStatus = cudaMemcpy(newArray, m_array, newSize * sizeof(T), cudaMemcpyDeviceToDevice);
+			ndAssert(0);
+			cudaStatus = cudaMemcpy(newArray, m_array, newSize * sizeof(T), cudaMemcpyHostToHost);
 			cudaStatus = cudaFreeHost(m_array);
 			ndAssert(cudaStatus == cudaSuccess);
 		}
@@ -262,56 +283,7 @@ class ndBankFreeArray
 template <class T, class ndEvaluateKey, int exponentRadix>
 void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, ndCudaHostBuffer<int>& scansBuffer)
 {
-#if 0
-	auto AddPrefix = [&](int blockIdx, int blockDim, int computeUnits)
-	{
-		int sum[D_HOST_MAX_RADIX_SIZE];
-		int offset[D_HOST_MAX_RADIX_SIZE];
-		int localPrefixScan[D_HOST_MAX_RADIX_SIZE / 2 + D_HOST_MAX_RADIX_SIZE + 1];
-		
-		for (int threadId = 0; threadId < blockDim; ++threadId)
-		{
-			sum[threadId] = 0;
-			localPrefixScan[threadId] = 0;
-			offset[threadId] = threadId;
-		}
-		
-		for (int i = 0; i < computeUnits; ++i)
-		{
-			for (int threadId = 0; threadId < blockDim; ++threadId)
-			{
-				int count = scansBuffer[offset[threadId]];
-				scansBuffer[offset[threadId]] = sum[threadId];
-				sum[threadId] += count;
-				offset[threadId] += blockDim;
-			}
-		}
-		
-		//un optimized Hillis-Steele prefix scan sum
-		for (int threadId = 0; threadId < blockDim; ++threadId)
-		{
-			localPrefixScan[blockDim / 2 + threadId + 1] = sum[threadId];
-		}
-		for (int i = 1; i < blockDim; i = i << 1)
-		{
-			for (int threadId = 0; threadId < blockDim; ++threadId)
-			{
-				sum[threadId] = localPrefixScan[blockDim / 2 + threadId] + localPrefixScan[blockDim / 2 - i + threadId];
-			}
-			for (int threadId = 0; threadId < blockDim; ++threadId)
-			{
-				localPrefixScan[blockDim / 2 + threadId] = sum[threadId];
-			}
-		}
-		
-		for (int threadId = 0; threadId < blockDim; ++threadId)
-		{
-			scansBuffer[offset[threadId]] = localPrefixScan[blockDim / 2 + threadId];
-		}
-	};
-
-#else
-
+#if 1
 	auto AddPrefix = [&](int blockIdx, int blockDim, int computeUnits)
 	{
 		int localPrefixScan[D_HOST_MAX_RADIX_SIZE + 1];
@@ -349,11 +321,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			}
 		}
 
-//for (int threadId = 0; threadId < blockDim; ++threadId)
-//{
-//	sumReg[threadId] = 1;
-//}
-
 		//optimized Hillis-Steele prefix scan sum
 		for (int bankBase = 0; bankBase < blockDim; bankBase += D_BANK_COUNT_GPU)
 		{
@@ -383,15 +350,16 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		int scale = 0;
 		for (int segment = blockDim; segment > D_BANK_COUNT_GPU; segment >>= 1)
 		{
-			for (int threadId = 0; threadId < blockDim / 2; ++threadId)
+			for (int threadId = 0; threadId < blockDim; ++threadId)
 			{
-				int baseBank = threadId >> (D_LOG_BANK_COUNT_GPU + scale);
-				int baseIndex = (baseBank << (D_LOG_BANK_COUNT_GPU + scale + 1)) + (1 << (D_LOG_BANK_COUNT_GPU + scale)) + 1 - 1;
-				int bankIndex = threadId & ((1 << (D_LOG_BANK_COUNT_GPU + scale)) - 1);
-				int scanIndex = baseIndex + bankIndex + 1;
-
-				sumReg[scanIndex - 1] += localPrefixScan[baseIndex];
-				localPrefixScan[scanIndex] = sumReg[scanIndex - 1];
+				int bank = 1 << (D_LOG_BANK_COUNT_GPU + scale);
+				int warpBase = threadId & bank;
+				if (warpBase)
+				{
+					int warpSumIndex = threadId & (-warpBase);
+					sumReg[threadId] += localPrefixScan[warpSumIndex - 1 + 1];
+					localPrefixScan[threadId + 1] = sumReg[threadId];
+				}
 			}
 			scale++;
 		}
@@ -401,6 +369,10 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			scansBuffer[offsetReg[threadId]] = localPrefixScan[threadId];
 		}
 	};
+#else
+
+	ndAssert(0);
+
 #endif
 
 
