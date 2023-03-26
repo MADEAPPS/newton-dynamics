@@ -282,7 +282,8 @@ void ndCudaHostBuffer<T>::WriteData(T* const dst, int elements, cudaStream_t str
 	}
 }
 
-template <int size>
+
+template <class T, int size>
 class ndBankFreeArray
 {
 	public:
@@ -292,28 +293,26 @@ class ndBankFreeArray
 
 	int GetBankAddress(int address) const
 	{
-		int low = address & (D_BANK_COUNT_GPU -1);
+		int low = address & (D_BANK_COUNT_GPU - 1);
 		int high = address >> D_LOG_BANK_COUNT_GPU;
 		int dst = high * (D_BANK_COUNT_GPU + 1) + low;
 		return dst;
 	}
 
-	int& operator[] (int address)
+	T& operator[] (int address)
 	{
-		//int low = address & (D_BANK_COUNT_GPU - 1);
-		//int high = address >> D_LOG_BANK_COUNT_GPU;
 		int index = GetBankAddress(address);
 		return m_array[index];
 	}
 
-	int m_array[((size + D_BANK_COUNT_GPU - 1) >> D_LOG_BANK_COUNT_GPU) * (D_BANK_COUNT_GPU + 1)];
+	T m_array[((size + D_BANK_COUNT_GPU - 1) >> D_LOG_BANK_COUNT_GPU) * (D_BANK_COUNT_GPU + 1)];
 };
-
 
 template <class T, class ndEvaluateKey, int exponentRadix>
 void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, ndCudaHostBuffer<int>& scansBuffer)
 {
-#if 1
+#if 0
+	//optimized Hillis-Steele prefix scan sum
 	auto AddPrefix = [&](int blockIdx, int blockDim, int computeUnits)
 	{
 		int localPrefixScan[D_HOST_MAX_RADIX_SIZE + 1];
@@ -351,7 +350,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			}
 		}
 
-		//optimized Hillis-Steele prefix scan sum
 		for (int bankBase = 0; bankBase < blockDim; bankBase += D_BANK_COUNT_GPU)
 		{
 			for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
@@ -401,8 +399,98 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	};
 #else
 
-	ndAssert(0);
+	//optimized implementation of the Blelloch scan
+	auto AddPrefix = [&](int blockIdx, int blockDim, int computeUnits)
+	{
+		int sumReg[D_HOST_MAX_RADIX_SIZE];
+		int offsetReg[D_HOST_MAX_RADIX_SIZE];
+		int localPrefixScan[D_HOST_MAX_RADIX_SIZE + 1];
+		//ndBankFreeArray<T, D_HOST_MAX_RADIX_SIZE + 1> localPrefixScan;
 
+		for (int threadId = 0; threadId < blockDim; ++threadId)
+		{
+			sumReg[threadId] = 0;
+			offsetReg[threadId] = threadId;
+		}
+
+		for (int i = 0; i < computeUnits; ++i)
+		{
+			for (int threadId = 0; threadId < blockDim; ++threadId)
+			{
+				int count = scansBuffer[offsetReg[threadId]];
+				scansBuffer[offsetReg[threadId]] = sumReg[threadId];
+				sumReg[threadId] += count;
+				offsetReg[threadId] += blockDim;
+			}
+		}
+
+for (int threadId = 0; threadId < blockDim; ++threadId)
+{
+	sumReg[threadId] = 1;
+}
+
+		for (int threadId = 0; threadId < blockDim; ++threadId)
+		{
+			localPrefixScan[threadId] = sumReg[threadId];
+		}
+
+		int mask = 1;
+		int radixBit = 0;
+		for (int k = 1; k < D_BANK_COUNT_GPU; k = k * 2)
+		{
+			radixBit++;
+			for (int threadId = 0; threadId < blockDim; threadId++)
+			{
+				if ((threadId & mask) == mask)
+				{
+					int halfStepIndex = threadId - (1<<(radixBit-1));
+					sumReg[threadId] += localPrefixScan[halfStepIndex];
+				}
+				localPrefixScan[threadId] = sumReg[threadId];
+			}
+			mask = mask * 2 + 1;
+			cuTrace(("\n"));
+		}
+		cuTrace(("\n"));
+
+		//for (int k = 1; k < blockDim; k = k * 2)
+		//{
+		//	radixBit++;
+		//	for (int threadId = 0; threadId < (blockDim >> radixBit); threadId++)
+		//	{
+		//		int id1 = ((threadId + 1) << radixBit) - 1;
+		//		int id0 = id1 - (1 << (radixBit - 1));
+		//		cuTrace(("%d ", localPrefixScan.GetBankAddress(id0) % D_BANK_COUNT));
+		//		//cuTrace(("%d ", id0));
+		//	//	//int a = radixPrefixScan[id1];
+		//	//	//int b = radixPrefixScan[id0];
+		//	//	localPrefixScan[id1] += localPrefixScan[id0];
+		//	}
+		//	cuTrace(("\n"));
+		//}
+		cuTrace(("\n"));
+
+		//localPrefixScan[blockDim - 1] = 0;
+		//for (int k = 1; k < blockDim; k = k * 2)
+		//{
+		//	for (int threadId = 0; threadId < k; threadId++)
+		//	{
+		//		int id1 = ((threadId + 1) << radixBit) - 1;
+		//		int id0 = id1 - (1 << (radixBit - 1));
+		//		int a = localPrefixScan[id1];
+		//		int b = localPrefixScan[id0] + a;
+		//
+		//		localPrefixScan[id0] = a;
+		//		localPrefixScan[id1] = b;
+		//	}
+		//	radixBit--;
+		//}
+
+		for (int threadId = 0; threadId < blockDim; ++threadId)
+		{
+			scansBuffer[offsetReg[threadId]] = localPrefixScan[threadId];
+		}
+	};
 #endif
 
 
