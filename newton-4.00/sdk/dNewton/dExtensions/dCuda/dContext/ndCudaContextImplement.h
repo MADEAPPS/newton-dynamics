@@ -97,6 +97,7 @@ class ndCudaContextImplement
 	ndCudaHostBuffer<int> m_src;
 	ndCudaHostBuffer<int> m_dst0;
 	ndCudaHostBuffer<int> m_dst1;
+	ndCudaDeviceBuffer<int> m_buf;
 	ndCudaDeviceBuffer<int> m_buf0;
 	ndCudaDeviceBuffer<int> m_buf1;
 };

@@ -94,7 +94,13 @@ ndCudaHostBuffer<T>::ndCudaHostBuffer(const ndCudaHostBuffer<T>& src)
 	,m_size(src.m_size)
 	,m_capacity(src.m_capacity)
 {
-	*this = src;
+	cudaError_t cudaStatus = cudaSuccess;
+	cudaStatus = cudaMemcpy(m_array, src.m_array, m_size * sizeof(T), cudaMemcpyHostToHost);
+	ndAssert(cudaStatus == cudaSuccess);
+	if (cudaStatus != cudaSuccess)
+	{
+		ndAssert(0);
+	}
 }
 
 template<class T>
@@ -131,8 +137,14 @@ T& ndCudaHostBuffer<T>::operator[] (int i)
 template<class T>
 ndCudaHostBuffer<T>& ndCudaHostBuffer<T>::operator=(const ndCudaHostBuffer<T>& src)
 {
+	cudaError_t cudaStatus;
 	SetCount(src.GetCount());
-	cudaMemcpy(m_array, src.m_array, m_size * sizeof(T), cudaMemcpyHostToHost);
+	cudaStatus = cudaMemcpy(m_array, src.m_array, m_size * sizeof(T), cudaMemcpyHostToHost);
+	ndAssert(cudaStatus == cudaSuccess);
+	if (cudaStatus != cudaSuccess)
+	{
+		ndAssert(0);
+	}
 	return* this;
 }
 

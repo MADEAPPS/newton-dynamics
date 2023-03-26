@@ -31,9 +31,10 @@
 #include "ndCudaHostBuffer.h"
 #include "ndCudaDeviceBuffer.h"
 
+#define D_DEVICE_UNORDERED_SORT_BLOCK_SIZE	(1<<10)
+
 //#define D_DEVICE_UNORDERED_MAX_RADIX_SIZE	(1<<8)
 #define D_DEVICE_UNORDERED_MAX_RADIX_SIZE	(1<<10)
-#define D_DEVICE_UNORDERED_SORT_BLOCK_SIZE	(1<<10)
 
 #if D_DEVICE_UNORDERED_MAX_RADIX_SIZE > D_DEVICE_UNORDERED_SORT_BLOCK_SIZE
 	#error counting sort diget larger that block
@@ -49,9 +50,8 @@
 /// <param name="src">source input array</param>
 /// <param name="dst">destination output array</param>
 /// <param name="evaluateRadix">lambda function to get radix form items in array</param>
-/// <param name="inplace">if true src array is copied to dst, and the result is in src</param>
 template <class T, int exponentRadix, typename ndEvaluateRadix>
-void ndCountingSortUnOrdered(ndCudaContextImplement* const context, const ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndEvaluateRadix evaluateRadix, bool inPlace);
+void ndCountingSortUnOrdered(ndCudaContextImplement* const context, const ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndEvaluateRadix evaluateRadix);
 
 // *****************************************************************
 // 
@@ -61,39 +61,7 @@ void ndCountingSortUnOrdered(ndCudaContextImplement* const context, const ndCuda
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaAddPrefixUnordered(const ndKernelParams params, const ndAssessor<T> dommy, ndAssessor<int> scansBuffer, SortKeyPredicate getRadix)
 {
-#if 0
-	//un optimized Hillis-Steele prefix scan sum
-	__shared__  int localPrefixScan[D_DEVICE_UNORDERED_MAX_RADIX_SIZE / 2 + D_DEVICE_UNORDERED_MAX_RADIX_SIZE + 1];
-
-	int threadId = threadIdx.x;
-	int radixSize = blockDim.x;
-	int radixHalfSize = radixSize / 2;
-
-	int sum = 0;
-	int offset = 0;
-	localPrefixScan[threadId] = 0;
-	for (int i = 0; i < params.m_kernelCount; ++i)
-	{
-		int count = scansBuffer[offset + threadId];
-		scansBuffer[offset + threadId] = sum;
-		sum += count;
-		offset += radixSize;
-	}
-
-
-	localPrefixScan[radixHalfSize + threadId + 1] = sum;
-	__syncthreads();
-
-	for (int i = 1; i < radixSize; i = i << 1)
-	{
-		int acc = localPrefixScan[radixHalfSize + threadId] + localPrefixScan[radixHalfSize - i + threadId];
-		__syncthreads();
-		localPrefixScan[radixHalfSize + threadId] = acc;
-		__syncthreads();
-	}
-	scansBuffer[offset + threadId] = localPrefixScan[radixHalfSize + threadId];
-
-#else
+#if 1
 	//optimized Hillis-Steele prefix scan sum
 	__shared__  int localPrefixScan[D_DEVICE_UNORDERED_MAX_RADIX_SIZE + 1];
 
@@ -138,20 +106,25 @@ __global__ void ndCudaAddPrefixUnordered(const ndKernelParams params, const ndAs
 		if (warpBase)
 		{
 			int warpSumIndex = threadId & (-warpBase);
-			sum += localPrefixScan[warpSumIndex - 1 + 1];
+			sum += localPrefixScan[warpSumIndex];
 			localPrefixScan[threadId + 1] = sum;
 		}
 		scale++;
 		__syncthreads();
 	}
 	scansBuffer[offset + threadId] = localPrefixScan[threadId];
+
+#else
+	xxxxxxxxxx
 #endif
 }
 
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaCountItemsAndCopyUnordered(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
-	__shared__  int radixCountBuffer[D_DEVICE_UNORDERED_MAX_RADIX_SIZE];
+	// the bank free template does not seems to make any difference.
+	//__shared__  int radixCountBuffer[D_DEVICE_UNORDERED_MAX_RADIX_SIZE];
+	__shared__ cuBankFreeArray<int, D_DEVICE_UNORDERED_MAX_RADIX_SIZE> radixCountBuffer;
 
 	int threadId = threadIdx.x;
 	int blockStride = blockDim.x;
@@ -188,7 +161,9 @@ __global__ void ndCudaCountItemsAndCopyUnordered(const ndKernelParams params, co
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
-	__shared__  int scanBaseAdress[D_DEVICE_UNORDERED_MAX_RADIX_SIZE];
+	// the bank free template does not seems to make any difference.
+	//__shared__  int radixCountBuffer[D_DEVICE_UNORDERED_MAX_RADIX_SIZE];
+	__shared__ cuBankFreeArray<int, D_DEVICE_UNORDERED_MAX_RADIX_SIZE> radixCountBuffer;
 	
 	int threadId = threadIdx.x;
 	int blockIndex = blockIdx.x;
@@ -199,7 +174,7 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 
 	if (threadId < radixStride)
 	{
-		scanBaseAdress[threadId] = scansBuffer[radixPrefixOffset + threadId] + scansBuffer[radixBase + threadId];
+		radixCountBuffer[threadId] = scansBuffer[radixPrefixOffset + threadId] + scansBuffer[radixBase + threadId];
 	}
 	__syncthreads();
 
@@ -210,7 +185,7 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 		{
 			T item(input[index]);
 			int radix = getRadix(item);
-			int address = atomicAdd(&scanBaseAdress[radix], 1);
+			int address = atomicAdd(&radixCountBuffer[radix], 1);
 			output[address] = item;
 		}
 		bashSize += blockStride;
@@ -218,7 +193,7 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 }
 
 template <class T, int exponentRadix, typename ndEvaluateRadix>
-void ndCountingSortUnOrdered(ndCudaContextImplement* const context, const ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndEvaluateRadix evaluateRadix, bool inPlace)
+void ndCountingSortUnOrdered(ndCudaContextImplement* const context, const ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndEvaluateRadix evaluateRadix)
 {
 	ndAssessor<T> output(dst);
 	ndAssessor<T> input(src);
@@ -229,16 +204,9 @@ void ndCountingSortUnOrdered(ndCudaContextImplement* const context, const ndCuda
 	ndAssert((1 << exponentRadix) <= D_DEVICE_UNORDERED_MAX_RADIX_SIZE);
 
 	int radixStride = 1 << exponentRadix;
-	if (inPlace)
-	{
-		ndCudaCountItemsAndCopyUnordered << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, input, output, prefixScanBuffer, radixStride, evaluateRadix);
-		ndCudaAddPrefixUnordered << <1, radixStride, 0 >> > (params, input, prefixScanBuffer, evaluateRadix);
-		ndCudaMergeBucketsUnOrdered << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, output, input, prefixScanBuffer, radixStride, evaluateRadix);
-	}
-	else
-	{
-		ndAssert(0);
-	}
+	ndCudaCountItemsAndCopyUnordered << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, input, output, prefixScanBuffer, radixStride, evaluateRadix);
+	ndCudaAddPrefixUnordered << <1, radixStride, 0 >> > (params, input, prefixScanBuffer, evaluateRadix);
+	ndCudaMergeBucketsUnOrdered << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, output, input, prefixScanBuffer, radixStride, evaluateRadix);
 }
 
 #endif

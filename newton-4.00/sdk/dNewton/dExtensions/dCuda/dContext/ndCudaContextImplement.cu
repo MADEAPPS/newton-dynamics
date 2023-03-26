@@ -649,10 +649,14 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 
 	//m_scan0.SetCount(1024 * 256);
 	//m_scan1.SetCount(1024 * 256);
+	m_buf.SetCount(m_src.GetCount());
 	m_buf0.SetCount(m_src.GetCount());
 	m_buf1.SetCount(m_src.GetCount());
-	m_buf0.ReadData(&m_src[0], m_src.GetCount());
-	m_buf1.ReadData(&m_dst1[0], m_dst1.GetCount());
+	m_buf.ReadData(&m_src[0], m_src.GetCount());
+	m_buf0 = m_buf;
+	m_buf1 = m_buf;
+	//m_buf0.ReadData(&m_src[0], m_src.GetCount());
+	//m_buf1.ReadData(&m_dst1[0], m_dst1.GetCount());
 
 	class GetKey0
 	{
@@ -1021,13 +1025,14 @@ void ndCudaContextImplement::Begin()
 #if 1
 		auto GetRadix = []  __host__ __device__(int item)
 		{
-			return item & (1024 - 1);
+			//return item & (1024 - 1);
+			return item & (256 - 1);
 		};
 
-		ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix, true);
-		//ndCountingSortUnOrdered<int, 8>(this, m_buf1, m_buf0, GetRadix);
+		ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix);
 		//ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix);
-		//ndCountingSortUnOrdered<int, 8>(this, m_buf1, m_buf0, GetRadix);
+		//ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix);
+		//ndCountingSortUnOrdered<int, 8>(this, m_buf0, m_buf1, GetRadix);
 #else
 		auto GetRadix0 = []  __host__ __device__(int item)
 		{
@@ -1061,20 +1066,17 @@ void ndCudaContextImplement::Begin()
 	float totalTime;
 	cudaEventElapsedTime(&totalTime, start_event, stop_event);
 
-	totalTime = totalTime * 1.0e-3f;
-	float gigKeys = float (m_buf0.GetCount() * numIterations) * 1.0e-9f;
-	cudaExpandTraceMessage("newton sort, throughput = %f gigaKeys/seconds, time = %f s, size = %u elements\n", gigKeys / totalTime, totalTime/numIterations, m_buf0.GetCount());
+	//totalTime = totalTime * 1.0e-3f;
+	float gigKeys = float (m_buf0.GetCount() * numIterations) * (1.0e-9f * 1.0e3f);
+	cudaExpandTraceMessage("newton sort, throughput = %f gigaKeys/seconds, time = %f ms, size = %u elements\n", gigKeys / totalTime, totalTime/numIterations, m_buf0.GetCount());
 
 #if 1
 	m_device->SyncDevice();
 	//m_buf1.WriteData(&m_dst0[0], m_dst0.GetCount());
 	m_buf0.WriteData(&m_dst0[0], m_dst0.GetCount());
-	//m_sortPrefixBuffer.WriteData(&m_scan1[0], m_scan1.GetCount());
 	
 	for (int i = 1; i < m_dst1.GetCount(); ++i)
 	{
-		//int a = GetRadix(m_dst1[i - 1]);
-		//int b = GetRadix(m_dst1[i - 0]);
 		int a = m_dst0[i - 1];
 		int b = m_dst0[i - 0];
 		ndAssert(a <= b);

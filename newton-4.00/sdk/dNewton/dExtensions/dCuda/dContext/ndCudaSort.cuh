@@ -51,25 +51,6 @@ void ndCountingSort(ndCudaContextImplement* const context, const ndCudaDeviceBuf
 //
 // *****************************************************************
 
-template <int size>
-class cuBankFreeArray
-{
-	public:
-	__device__ cuBankFreeArray()
-	{
-	}
-
-	__device__ int& operator[] (int address)
-	{
-		int low = address & (D_BANK_COUNT_GPU - 1);
-		int high = address >> D_LOG_BANK_COUNT_GPU;
-		int dst = high * (D_BANK_COUNT_GPU + 1) + low;
-		return m_array[dst];
-	}
-
-	int m_array[((size + D_BANK_COUNT_GPU - 1) >> D_LOG_BANK_COUNT_GPU) * (D_BANK_COUNT_GPU + 1)];
-};
-
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaAddPrefix(const ndKernelParams params, const ndAssessor<T> dommy, ndAssessor<int> scansBuffer, SortKeyPredicate getRadix)
 {
