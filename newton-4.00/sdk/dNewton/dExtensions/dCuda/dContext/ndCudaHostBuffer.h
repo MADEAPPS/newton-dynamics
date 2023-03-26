@@ -43,6 +43,9 @@
 #define D_SORTING_ALGORITHM		0
 
 template<class T>
+class ndCudaDeviceBuffer;
+
+template<class T>
 class ndCudaHostBuffer
 {
 	public:
@@ -61,6 +64,7 @@ class ndCudaHostBuffer
 	const T& operator[] (int i) const;
 
 	ndCudaHostBuffer& operator= (const ndCudaHostBuffer<T>& src);
+	ndCudaHostBuffer& operator= (const ndCudaDeviceBuffer<T>& src);
 
 	void Swap(ndCudaHostBuffer& buffer);
 
@@ -146,6 +150,20 @@ ndCudaHostBuffer<T>& ndCudaHostBuffer<T>::operator=(const ndCudaHostBuffer<T>& s
 		ndAssert(0);
 	}
 	return* this;
+}
+
+template<class T>
+ndCudaHostBuffer<T>& ndCudaHostBuffer<T>::operator=(const ndCudaDeviceBuffer<T>& src)
+{
+	cudaError_t cudaStatus;
+	SetCount(src.GetCount());
+	cudaStatus = cudaMemcpy(m_array, src.m_array, m_size * sizeof(T), cudaMemcpyDeviceToHost);
+	ndAssert(cudaStatus == cudaSuccess);
+	if (cudaStatus != cudaSuccess)
+	{
+		ndAssert(0);
+	}
+	return*this;
 }
 
 template<class T>

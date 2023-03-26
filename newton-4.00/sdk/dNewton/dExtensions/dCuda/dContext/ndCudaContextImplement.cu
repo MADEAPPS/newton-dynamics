@@ -1066,8 +1066,10 @@ void ndCudaContextImplement::Begin()
 #if 1
 	m_device->SyncDevice();
 	//m_buf1.WriteData(&m_dst0[0], m_dst0.GetCount());
-	m_buf0.WriteData(&m_dst0[0], m_dst0.GetCount());
-	
+	//m_buf0.WriteData(&m_dst0[0], m_dst0.GetCount());
+
+	//m_dst0 = m_buf1;
+	m_dst0 = m_buf0;
 	for (int i = 1; i < m_dst1.GetCount(); ++i)
 	{
 		int a = m_dst0[i - 1];
