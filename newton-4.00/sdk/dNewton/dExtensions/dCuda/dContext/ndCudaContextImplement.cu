@@ -74,7 +74,8 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//m_src.SetCount(8);
 	//m_src.SetCount(17);
 	//m_src.SetCount(64);
-	m_src.SetCount(256);
+	m_src.SetCount(235);
+	//m_src.SetCount(256);
 	//m_src.SetCount(301);
 	//m_src.SetCount(512);
 	//m_src.SetCount(512 + 99);
@@ -127,13 +128,15 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	ndCudaHostBuffer<int> scan;
 	scan.SetCount(1024 * 256);
 	ndCountingSort<int, GetKey0, 8>(m_src, m_dst0, scan);
-	ndCountingSort<int, GetKey1, 8>(m_dst0, m_src, scan);
+	//ndCountingSort<int, GetKey1, 8>(m_dst0, m_src, scan);
 	for (int i = 1; i < m_dst0.GetCount(); ++i)
 	{
-		//int a = key.GetRadix(m_dst0[i - 1]);
-		//int b = key.GetRadix(m_dst0[i - 0]);
-		int a = m_src[i - 1];
-		int b = m_src[i - 0];
+		//int a = m_src[i - 1];
+		//int b = m_src[i - 0];
+
+		int a = m_dst0[i - 1];
+		int b = m_dst0[i - 0];
+
 		ndAssert(a <= b);
 	}
 }
