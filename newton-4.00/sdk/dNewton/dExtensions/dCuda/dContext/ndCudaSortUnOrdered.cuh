@@ -61,7 +61,6 @@ void ndCountingSortUnOrdered(ndCudaContextImplement* const context, const ndCuda
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaAddPrefixUnordered(const ndKernelParams params, const ndAssessor<T> dommy, ndAssessor<int> scansBuffer, SortKeyPredicate getRadix)
 {
-#if 1
 	//optimized Hillis-Steele prefix scan sum
 	__shared__  int localPrefixScan[D_DEVICE_UNORDERED_MAX_RADIX_SIZE + 1];
 
@@ -113,16 +112,12 @@ __global__ void ndCudaAddPrefixUnordered(const ndKernelParams params, const ndAs
 		__syncthreads();
 	}
 	scansBuffer[offset + threadId] = localPrefixScan[threadId];
-
-#else
-	xxxxxxxxxx
-#endif
 }
 
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaCountItemsAndCopyUnordered(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
-	// the bank free template does not seems to make any difference.
+	// the bank free template does not seems to make any difference, but I use it anyway.
 	//__shared__  int radixCountBuffer[D_DEVICE_UNORDERED_MAX_RADIX_SIZE];
 	__shared__ cuBankFreeArray<int, D_DEVICE_UNORDERED_MAX_RADIX_SIZE> radixCountBuffer;
 
@@ -161,7 +156,7 @@ __global__ void ndCudaCountItemsAndCopyUnordered(const ndKernelParams params, co
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
-	// the bank free template does not seems to make any difference.
+	// the bank free template does not seems to make any difference, but I use it anyway.
 	//__shared__  int radixCountBuffer[D_DEVICE_UNORDERED_MAX_RADIX_SIZE];
 	__shared__ cuBankFreeArray<int, D_DEVICE_UNORDERED_MAX_RADIX_SIZE> radixCountBuffer;
 	
