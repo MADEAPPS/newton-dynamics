@@ -647,16 +647,9 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	m_dst1 = m_src;
 	m_dst0 = m_src;
 
-	//m_scan0.SetCount(1024 * 256);
-	//m_scan1.SetCount(1024 * 256);
-	m_buf.SetCount(m_src.GetCount());
-	m_buf0.SetCount(m_src.GetCount());
-	m_buf1.SetCount(m_src.GetCount());
-	m_buf.ReadData(&m_src[0], m_src.GetCount());
+	m_buf = m_src;
 	m_buf0 = m_buf;
 	m_buf1 = m_buf;
-	//m_buf0.ReadData(&m_src[0], m_src.GetCount());
-	//m_buf1.ReadData(&m_dst1[0], m_dst1.GetCount());
 
 	class GetKey0
 	{
