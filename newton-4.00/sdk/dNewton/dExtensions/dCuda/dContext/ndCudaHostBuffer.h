@@ -486,8 +486,8 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 
 
 #if (D_SORTING_ALGORITHM == 0)
-	// using simple prefix scan sum
-	// using a simple bitonic sort with two ways bank conflict
+	//optimized Hillis-Steele prefix scan sum
+	//using a simple bitonic sort with two ways bank conflict
 	auto CountAndSortBlockItems = [&](int blockIndex, int blocksCount)
 	{
 		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
@@ -540,7 +540,6 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 						int id1 = highIndex + lowIndex + j;
 						int oddEven = highIndex & k * 2;
 						//cuTrace(("%d ", id0 % D_BANK_COUNT));
-						//cuTrace(("%d ", sortedRadix.GetBankAddress(id0) % D_BANK_COUNT));
 
 						int a = sortedRadix[id0];
 						int b = sortedRadix[id1];
@@ -638,8 +637,9 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				sortedRadixReg[threadId] = (radixStride << 16);
 				if (index < size)
 				{
-					cachedItems[threadId] = src[index];
-					int radix = evaluator.GetRadix(cachedItems[threadId]);
+					const T item(src[index]);
+					cachedItems[threadId] = item;
+					int radix = evaluator.GetRadix(item);
 					radixPrefixCount[radix] ++;
 					sortedRadixReg[threadId] = (radix << 16) + threadId;
 				}
@@ -752,10 +752,28 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	};
 
 #elif (D_SORTING_ALGORITHM == 1)
-
+	//optimized Hillis-Steele prefix scan sum
+	//using a two bits counting sort
 	auto CountAndSortBlockItems = [&](int blockIndex, int blocksCount)
 	{
-		int radixCountBuffer[D_HOST_MAX_RADIX_SIZE];
+		T cachedItems[D_HOST_SORT_BLOCK_SIZE];
+		T sortedCoalesedItems[D_HOST_SORT_BLOCK_SIZE];
+		int sortedRadix[D_HOST_SORT_BLOCK_SIZE];
+		int radixPrefixCount[D_HOST_MAX_RADIX_SIZE];
+		int radixPrefixScan[2 * (D_HOST_SORT_BLOCK_SIZE + 1)];
+
+		auto ShufleUp = [&](const int* in, int* out, int offset)
+		{
+			for (int i = 0; i < offset; ++i)
+			{
+				out[i] = in[i];
+			}
+
+			for (int i = D_BANK_COUNT_GPU - offset - 1; i >= 0; --i)
+			{
+				out[i + offset] = in[i];
+			}
+		};
 
 		int size = src.GetCount();
 		int radixStride = 1 << exponentRadix;
@@ -765,24 +783,146 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		ndEvaluateKey evaluator;
 		for (int threadId = 0; threadId < radixStride; ++threadId)
 		{
-			radixCountBuffer[threadId] = 0;
+			radixPrefixCount[threadId] = 0;
 		}
+
+		radixPrefixScan[0] = 0;
+		radixPrefixScan[D_HOST_SORT_BLOCK_SIZE + 1] = 0;
 
 		for (int i = 0; i < blocksCount; ++i)
 		{
 			for (int threadId = 0; threadId < blockStride; ++threadId)
 			{
 				int index = bashSize + threadId;
+				int radix = radixStride - 1;
+				int sortKey = radix;
 				if (index < size)
 				{
-					int radix = evaluator.GetRadix(src[index]);
-					radixCountBuffer[radix] ++;
+					const T item(src[index]);
+					cachedItems[threadId] = src[index];
+					radix = evaluator.GetRadix(item);
+					sortKey = (threadId << 16) + radix;
+				}
+				radixPrefixCount[radix] ++;
+				sortedRadix[threadId] = sortKey;
+			}
+
+			int memoryTransactions = 0;
+			for (int bit = 0; (1 << (bit * 2)) < radixStride; ++bit)
+			{
+				int keyReg[D_HOST_SORT_BLOCK_SIZE];
+				for (int threadId = 0; threadId < blockStride; ++threadId)
+				{
+					keyReg[threadId] = sortedRadix[threadId];
+					memoryTransactions += 1 * ((threadId & (D_BANK_COUNT_GPU - 1)) == 1);
+				}
+
+				int dstLocalOffsetReg[D_HOST_SORT_BLOCK_SIZE];
+				int radixPrefixScanReg0[D_HOST_SORT_BLOCK_SIZE];
+				int radixPrefixScanReg1[D_HOST_SORT_BLOCK_SIZE];
+				for (int threadId = 0; threadId < blockStride; ++threadId)
+				{
+					int test = (keyReg[threadId] >> (bit * 2)) & 0x3;
+					dstLocalOffsetReg[threadId] = test;
+					int bit0 = (test == 0) ? 1 : 0;
+					int bit1 = (test == 1) ? 1 << 16 : 0;
+					int bit2 = (test == 2) ? 1 : 0;
+					int bit3 = (test == 3) ? 1 << 16 : 0;
+					radixPrefixScanReg0[threadId] = bit0 + bit1;
+					radixPrefixScanReg1[threadId] = bit2 + bit3;
+				}
+				
+				for (int bankBase = 0; bankBase < blockStride; bankBase += D_BANK_COUNT_GPU)
+				{
+					for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
+					{
+						int radixPrefixScanRegTemp0[D_HOST_SORT_BLOCK_SIZE];
+						int radixPrefixScanRegTemp1[D_HOST_SORT_BLOCK_SIZE];
+						ShufleUp(&radixPrefixScanReg0[bankBase], &radixPrefixScanRegTemp0[bankBase], n);
+						ShufleUp(&radixPrefixScanReg1[bankBase], &radixPrefixScanRegTemp1[bankBase], n);
+						for (int threadId = 0; threadId < D_BANK_COUNT_GPU; ++threadId)
+						{
+							if ((threadId & (D_BANK_COUNT_GPU - 1)) >= n)
+							{
+								radixPrefixScanReg0[bankBase + threadId] += radixPrefixScanRegTemp0[bankBase + threadId];
+								radixPrefixScanReg1[bankBase + threadId] += radixPrefixScanRegTemp1[bankBase + threadId];
+							}
+						}
+					}
+				}
+				
+				for (int threadId = 0; threadId < blockStride; ++threadId)
+				{
+					if (!(threadId & D_BANK_COUNT_GPU))
+					{
+						radixPrefixScan[threadId + 1] = radixPrefixScanReg0[threadId];
+						radixPrefixScan[threadId + 1 + D_HOST_SORT_BLOCK_SIZE + 1] = radixPrefixScanReg1[threadId];
+						memoryTransactions += 2 * ((threadId & (D_BANK_COUNT_GPU - 1)) == 1);
+					}
+				}
+				
+				int scale = 0;
+				for (int segment = blockStride; segment > D_BANK_COUNT_GPU; segment >>= 1)
+				{
+					for (int threadId = 0; threadId < blockStride; ++threadId)
+					{
+						int bank = 1 << (D_LOG_BANK_COUNT_GPU + scale);
+						int warpBase = threadId & bank;
+						if (warpBase)
+						{
+							int warpSumIndex = threadId & (-warpBase);
+
+							radixPrefixScanReg0[threadId] += radixPrefixScan[warpSumIndex - 1 + 1];
+							radixPrefixScan[threadId + 1] = radixPrefixScanReg0[threadId];
+
+							radixPrefixScanReg1[threadId] += radixPrefixScan[D_HOST_SORT_BLOCK_SIZE + 1 + warpSumIndex - 1 + 1];
+							radixPrefixScan[D_HOST_SORT_BLOCK_SIZE + 1 + threadId + 1] = radixPrefixScanReg1[threadId];
+
+							memoryTransactions += 4 * ((threadId & (D_BANK_COUNT_GPU - 1)) == 1);
+						}
+					}
+					scale++;
+				}
+				
+				int sum0 = radixPrefixScan[1 * (D_HOST_SORT_BLOCK_SIZE + 1) - 1];
+				int sum1 = radixPrefixScan[2 * (D_HOST_SORT_BLOCK_SIZE + 1) - 1];
+				int base0 = 0;
+				int base1 = sum0 & 0xffff;
+				int base2 = base1 + (sum0 >> 16);
+				int base3 = base2 + (sum1 & 0xffff);
+				
+				for (int threadId = 0; threadId < blockStride; ++threadId)
+				{
+					int key0 = radixPrefixScan[threadId];
+					int key1 = radixPrefixScan[threadId + D_HOST_SORT_BLOCK_SIZE + 1];
+					int shift = dstLocalOffsetReg[threadId];
+				
+					int dstIndex = 0;
+					dstIndex += (shift == 1) ? base1 + (key0 >> 16) : 0;
+					dstIndex += (shift == 3) ? base3 + (key1 >> 16) : 0;
+					dstIndex += (shift == 0) ? base0 + (key0 & 0xffff) : 0;
+					dstIndex += (shift == 2) ? base2 + (key1 & 0xffff) : 0;
+				
+					ndAssert(dstIndex >= 0);
+					ndAssert(dstIndex < blockStride);
+					sortedRadix[dstIndex] = keyReg[threadId];
 				}
 			}
 
+			for (int threadId = 0; threadId < blockStride; ++threadId)
+			{
+				int keyIndex = sortedRadix[threadId] >> 16;
+				sortedCoalesedItems[threadId] = cachedItems[keyIndex];
+			}
 
-
-
+			for (int threadId = 0; threadId < blockStride; ++threadId)
+			{
+				int index = bashSize + threadId;
+				if (index < size)
+				{
+					dst[index] = sortedCoalesedItems[threadId];
+				}
+			}
 
 			bashSize += blockStride;
 		}
@@ -790,7 +930,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		for (int threadId = 0; threadId < radixStride; ++threadId)
 		{
 			int index = threadId + radixStride * blockIndex;
-			scansBuffer[index] = radixCountBuffer[threadId];
+			scansBuffer[index] = radixPrefixCount[threadId];
 		}
 	};
 
