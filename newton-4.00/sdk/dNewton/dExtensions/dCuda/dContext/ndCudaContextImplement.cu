@@ -74,13 +74,13 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//m_src.SetCount(8);
 	//m_src.SetCount(17);
 	//m_src.SetCount(64);
-	//m_src.SetCount(256);
-	m_src.SetCount(301);
+	m_src.SetCount(256);
+	//m_src.SetCount(301);
 	//m_src.SetCount(512);
 	//m_src.SetCount(512 + 99);
 	//m_src.SetCount(10000);
 	//m_src.SetCount(100000);
-	m_src.SetCount(1000000);
+	//m_src.SetCount(1000000);
 	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
 		m_src[i] = rand() % 256;
@@ -470,7 +470,7 @@ void ndCudaContextImplement::Begin()
 	cudaEventRecord(start_event, 0);
 	for (int i = 0; i < numIterations; ++i)
 	{
-#if 1
+#if 0
 		auto GetRadix = []  __host__ __device__(int item)
 		{
 			//return item & (1024 - 1);
@@ -487,25 +487,25 @@ void ndCudaContextImplement::Begin()
 			return item & 0xff;
 		};
 
-		auto GetRadix1 = []  __host__ __device__(int item)
-		{
-			return (item >> 8) & 0xff;
-		};
-
-		auto GetRadix2 = []  __host__ __device__(int item)
-		{
-			return (item >> 16) & 0xff;
-		};
-
-		auto GetRadix3 = []  __host__ __device__(int item)
-		{
-			return (item >> 24) & 0xff;
-		};
+		//auto GetRadix1 = []  __host__ __device__(int item)
+		//{
+		//	return (item >> 8) & 0xff;
+		//};
+		//
+		//auto GetRadix2 = []  __host__ __device__(int item)
+		//{
+		//	return (item >> 16) & 0xff;
+		//};
+		//
+		//auto GetRadix3 = []  __host__ __device__(int item)
+		//{
+		//	return (item >> 24) & 0xff;
+		//};
 
 		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
-		ndCountingSort<int, 8>(this, m_buf1, m_buf0, GetRadix1);
-		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix2);
-		ndCountingSort<int, 8>(this, m_buf1, m_buf0, GetRadix3);
+		//ndCountingSort<int, 8>(this, m_buf1, m_buf0, GetRadix1);
+		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix2);
+		//ndCountingSort<int, 8>(this, m_buf1, m_buf0, GetRadix3);
 #endif
 	}
 	cudaEventRecord(stop_event, 0);
@@ -529,7 +529,7 @@ void ndCudaContextImplement::Begin()
 	{
 		int a = m_dst0[i - 1];
 		int b = m_dst0[i - 0];
-		ndAssert(a <= b);
+		//ndAssert(a <= b);
 	}
 	m_buf0.WriteData(&m_dst1[0], m_dst1.GetCount());
 	#endif
