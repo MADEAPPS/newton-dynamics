@@ -506,9 +506,9 @@ void ndCudaContextImplement::Begin()
 		//};
 
 		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
-		//ndCountingSort<int, 8>(this, m_buf1, m_buf0, GetRadix1);
+		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix1);
 		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix2);
-		//ndCountingSort<int, 8>(this, m_buf1, m_buf0, GetRadix3);
+		//ndCountingSort<int, 8>(this, m_buf1, m_buf1, GetRadix3);
 #endif
 	}
 	cudaEventRecord(stop_event, 0);

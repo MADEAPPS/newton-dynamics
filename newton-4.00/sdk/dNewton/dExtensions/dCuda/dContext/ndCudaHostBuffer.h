@@ -40,7 +40,7 @@
 	#error counting sort diget larger that block
 #endif
 
-#define D_SORTING_ALGORITHM		0
+#define D_SORTING_ALGORITHM		1
 
 template<class T>
 class ndCudaDeviceBuffer;
@@ -799,7 +799,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				if (index < size)
 				{
 					const T item(src[index]);
-					cachedItems[threadId] = src[index];
+					cachedItems[threadId] = item;
 					radix = evaluator.GetRadix(item);
 					sortKey = (threadId << 16) + radix;
 				}

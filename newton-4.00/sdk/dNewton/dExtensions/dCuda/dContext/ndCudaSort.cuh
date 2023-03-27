@@ -36,7 +36,7 @@
 //#define D_DEVICE_SORT_BLOCK_SIZE	(1<<10)
 #define D_DEVICE_MAX_RADIX_SIZE		(1<<8)
 
-#define D_GPU_SORTING_ALGORITHM		0
+#define D_GPU_SORTING_ALGORITHM		1
 
 #if D_DEVICE_MAX_RADIX_SIZE > D_DEVICE_SORT_BLOCK_SIZE
 	#error counting sort diget larger that block
@@ -128,9 +128,8 @@ template <typename T, typename SortKeyPredicate>
 __global__ void CountAndSortBlockItems(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
 	__shared__  T cachedItems[D_DEVICE_SORT_BLOCK_SIZE];
-	__shared__  T sortedCoalesedItems[D_DEVICE_SORT_BLOCK_SIZE];
-	__shared__  int radixCountBuffer[D_DEVICE_MAX_RADIX_SIZE];
 	__shared__  int sortedRadix[D_DEVICE_SORT_BLOCK_SIZE];
+	__shared__  int radixCountBuffer[D_DEVICE_MAX_RADIX_SIZE];
 
 	int threadId = threadIdx.x;
 	int blockIndex = blockIdx.x;
@@ -191,13 +190,10 @@ __global__ void CountAndSortBlockItems(const ndKernelParams params, const ndAsse
 			}
 		}
 
-		int keyIndex = sortedRadix[threadId] & 0xffff;
-		sortedCoalesedItems[threadId] = cachedItems[keyIndex];
-		//__syncthreads();
-
 		if (index < input.m_size)
 		{
-			output[index] = sortedCoalesedItems[threadId];
+			int keyIndex = sortedRadix[threadId] & 0xffff;
+			output[index] = cachedItems[keyIndex];
 		}
 
 		bashSize += blockStride;
@@ -345,13 +341,15 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 }
 
 #elif (D_GPU_SORTING_ALGORITHM == 1)
-// using simple two bit counting sort, that is four passes per 8 bit digit
-// zero bank conflit and reduced syncronization
-
+//optimized Hillis-Steele prefix scan sum
+//using a two bits counting sort, in theory, not bank conflits
 template <typename T, typename SortKeyPredicate>
-__global__ void CountAndSortBlockItems(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
+__global__ void CountAndSortBlockItems(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, ndAssessor<int> scansBuffer, int radixStride, SortKeyPredicate getRadix)
 {
-	__shared__  int radixCountBuffer[D_DEVICE_MAX_RADIX_SIZE];
+	__shared__ T cachedItems[D_DEVICE_SORT_BLOCK_SIZE];
+	__shared__ int sortedRadix[D_DEVICE_SORT_BLOCK_SIZE];
+	__shared__ int radixPrefixCount[D_DEVICE_MAX_RADIX_SIZE];
+	__shared__ int radixPrefixScan[2 * (D_DEVICE_SORT_BLOCK_SIZE + 1)];
 
 	int threadId = threadIdx.x;
 	int blockStride = blockDim.x;
@@ -360,18 +358,111 @@ __global__ void CountAndSortBlockItems(const ndKernelParams params, const ndAsse
 
 	if (threadId < radixStride)
 	{
-		radixCountBuffer[threadId] = 0;
+		radixPrefixCount[threadId] = 0;
+		if (threadId == 0)
+		{
+			radixPrefixScan[0] = 0;
+			radixPrefixScan[D_DEVICE_SORT_BLOCK_SIZE + 1] = 0;
+		}
 	}
 	__syncthreads();
 
 	for (int i = 0; i < params.m_blocksPerKernel; ++i)
 	{
 		int index = bashSize + threadId;
+		int radix = radixStride - 1;
+		int sortKey = radix;
 		if (index < input.m_size)
 		{
-			int radix = getRadix(input[index]);
-			atomicAdd(&radixCountBuffer[radix], 1);
+			const T item(input[index]);
+			cachedItems[threadId] = item;
+			int radix = getRadix(item);
+			atomicAdd(&radixPrefixCount[radix], 1);
+			sortKey = (threadId << 16) + radix;
 		}
+		radixPrefixCount[radix] ++;
+		sortedRadix[threadId] = sortKey;
+		__syncthreads();
+
+		for (int bit = 0; (1 << (bit * 2)) < radixStride; ++bit)
+		{
+			int keyReg = sortedRadix[threadId];
+			int test = (keyReg >> (bit * 2)) & 0x3;
+			int dstLocalOffsetReg = test;
+			int bit0 = (test == 0) ? 1 : 0;
+			int bit1 = (test == 1) ? 1 << 16 : 0;
+			int bit2 = (test == 2) ? 1 : 0;
+			int bit3 = (test == 3) ? 1 << 16 : 0;
+			int radixPrefixScanReg0 = bit0 + bit1;
+			int radixPrefixScanReg1 = bit2 + bit3;
+
+			int lane = threadId & (D_BANK_COUNT_GPU - 1);
+			int bankBase = threadId & -D_BANK_COUNT_GPU;
+			for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
+			{
+				int radixPrefixScanRegTemp0 = __shfl_up_sync(0xffffffff, radixPrefixScanReg0, n, D_BANK_COUNT_GPU);
+				int radixPrefixScanRegTemp1 = __shfl_up_sync(0xffffffff, radixPrefixScanReg1, n, D_BANK_COUNT_GPU);
+				if (lane >= n)
+				{
+					radixPrefixScanReg0 += radixPrefixScanRegTemp0;
+					radixPrefixScanReg1 += radixPrefixScanRegTemp1;
+				}
+			}
+
+			if (!(threadId & D_BANK_COUNT_GPU))
+			{
+				radixPrefixScan[threadId + 1] = radixPrefixScanReg0;
+				radixPrefixScan[threadId + 1 + D_DEVICE_SORT_BLOCK_SIZE + 1] = radixPrefixScanReg1;
+			}
+
+			int scale = 0;
+			__syncthreads();
+			for (int segment = blockStride; segment > D_BANK_COUNT_GPU; segment >>= 1)
+			{
+				int bank = 1 << (D_LOG_BANK_COUNT_GPU + scale);
+				int warpBase = threadId & bank;
+				if (warpBase)
+				{
+					int warpSumIndex = threadId & (-warpBase);
+				
+					radixPrefixScanReg0 += radixPrefixScan[warpSumIndex - 1 + 1];
+					radixPrefixScan[threadId + 1] = radixPrefixScanReg0;
+				
+					radixPrefixScanReg1 += radixPrefixScan[D_DEVICE_SORT_BLOCK_SIZE + 1 + warpSumIndex - 1 + 1];
+					radixPrefixScan[D_DEVICE_SORT_BLOCK_SIZE + 1 + threadId + 1] = radixPrefixScanReg1;
+				}
+
+				scale++;
+				__syncthreads();
+			}
+			
+			int sum0 = radixPrefixScan[1 * (D_DEVICE_SORT_BLOCK_SIZE + 1) - 1];
+			int sum1 = radixPrefixScan[2 * (D_DEVICE_SORT_BLOCK_SIZE + 1) - 1];
+			int base0 = 0;
+			int base1 = sum0 & 0xffff;
+			int base2 = base1 + (sum0 >> 16);
+			int base3 = base2 + (sum1 & 0xffff);
+			
+			int key0 = radixPrefixScan[threadId];
+			int key1 = radixPrefixScan[threadId + D_DEVICE_SORT_BLOCK_SIZE + 1];
+			int shift = dstLocalOffsetReg;
+			
+			int dstIndex = 0;
+			dstIndex += (shift == 1) ? base1 + (key0 >> 16) : 0;
+			dstIndex += (shift == 3) ? base3 + (key1 >> 16) : 0;
+			dstIndex += (shift == 0) ? base0 + (key0 & 0xffff) : 0;
+			dstIndex += (shift == 2) ? base2 + (key1 & 0xffff) : 0;
+			
+			sortedRadix[dstIndex] = keyReg;
+			__syncthreads();
+		}
+
+		if (index < input.m_size)
+		{
+			int keyIndex = sortedRadix[threadId] >> 16;
+			output[index] = cachedItems[keyIndex];
+		}
+
 		bashSize += blockStride;
 	}
 
@@ -379,7 +470,7 @@ __global__ void CountAndSortBlockItems(const ndKernelParams params, const ndAsse
 	if (threadId < radixStride)
 	{
 		int index = threadId + radixStride * blockIndex;
-		scansBuffer[index] = radixCountBuffer[threadId];
+		scansBuffer[index] = radixPrefixCount[threadId];
 	}
 }
 
