@@ -471,38 +471,39 @@ __global__ void ndSortGrids(ndCudaSphFluid::Image* fluid,
 {
 	if (fluid->m_error == ndCudaSphFluid::Image::m_noError)
 	{
-		cudaStream_t stream = fluid->m_childStream;
-		//cudaStreamCreateWithFlags(&stream, cudaStreamDefault);
-		
-		ndKernelParams params(fluid->m_param, D_DEVICE_SORT_BLOCK_SIZE, fluid->m_activeHashGridMapSize);
-
-		int radixSize = 1 << D_SPH_CUDA_HASH_BITS;
-		ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, radixSize, sort_xLow);
-		ndCudaAddPrefix << <1, radixSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, sort_xLow);
-		ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1, fluid->m_gridScans, radixSize, sort_xLow);
-		ndSwapGrids << <1, 1, 0 >> > (fluid);
-		if (fluid->m_gridSizeX >= radixSize)
-		{
-			printf("xxxxxxxxxxx %d\n", fluid->m_gridSizeX);
-			ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, radixSize, sort_xHigh);
-			ndCudaAddPrefix << <1, radixSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, sort_xHigh);
-			ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1, fluid->m_gridScans, radixSize, sort_xHigh);
-			ndSwapGrids << <1, 1, 0 >> > (fluid);
-		}
-		
-		ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, 256, sort_zLow);
-		ndCudaAddPrefix << <1, radixSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, sort_zLow);
-		ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1, fluid->m_gridScans, 256, sort_zLow);
-		ndSwapGrids << <1, 1, 0 >> > (fluid);
-		if (fluid->m_gridSizeZ >= radixSize)
-		{
-			printf("zzzzzzzz %d\n", fluid->m_gridSizeZ);
-			ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, radixSize, sort_zHigh);
-			ndCudaAddPrefix << <1, radixSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, sort_zHigh);
-			ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1, fluid->m_gridScans, radixSize, sort_zHigh);
-			ndSwapGrids << <1, 1, 0 >> > (fluid);
-		}
-		//cudaStreamDestroy(stream);
+		//ndAssert(0);
+		//cudaStream_t stream = fluid->m_childStream;
+		////cudaStreamCreateWithFlags(&stream, cudaStreamDefault);
+		//
+		//ndKernelParams params(fluid->m_param, D_DEVICE_SORT_BLOCK_SIZE, fluid->m_activeHashGridMapSize);
+		//
+		//int radixSize = 1 << D_SPH_CUDA_HASH_BITS;
+		//ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, radixSize, sort_xLow);
+		//ndCudaAddPrefix << <1, radixSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, sort_xLow);
+		//ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1, fluid->m_gridScans, radixSize, sort_xLow);
+		//ndSwapGrids << <1, 1, 0 >> > (fluid);
+		//if (fluid->m_gridSizeX >= radixSize)
+		//{
+		//	printf("xxxxxxxxxxx %d\n", fluid->m_gridSizeX);
+		//	ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, radixSize, sort_xHigh);
+		//	ndCudaAddPrefix << <1, radixSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, sort_xHigh);
+		//	ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1, fluid->m_gridScans, radixSize, sort_xHigh);
+		//	ndSwapGrids << <1, 1, 0 >> > (fluid);
+		//}
+		//
+		//ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, 256, sort_zLow);
+		//ndCudaAddPrefix << <1, radixSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, sort_zLow);
+		//ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1, fluid->m_gridScans, 256, sort_zLow);
+		//ndSwapGrids << <1, 1, 0 >> > (fluid);
+		//if (fluid->m_gridSizeZ >= radixSize)
+		//{
+		//	printf("zzzzzzzz %d\n", fluid->m_gridSizeZ);
+		//	ndCudaCountItems << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, radixSize, sort_zHigh);
+		//	ndCudaAddPrefix << <1, radixSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_gridScans, sort_zHigh);
+		//	ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0, stream >> > (params, fluid->m_sortHashGridMap0, fluid->m_sortHashGridMap1, fluid->m_gridScans, radixSize, sort_zHigh);
+		//	ndSwapGrids << <1, 1, 0 >> > (fluid);
+		//}
+		////cudaStreamDestroy(stream);
 	}
 }
 
@@ -728,6 +729,7 @@ void ndCudaSphFluid::SortGrids()
 		return item.m_zHigh;
 	};
 
+	ndAssert(0);
 	ndSortGrids << < 1, 1, 0 >>> (m_imageGpu, GetRadix_xLow, GetRadix_xHigh, GetRadix_zLow, GetRadix_zHigh);
 
 	//ndAssert(TraceHashes()); 

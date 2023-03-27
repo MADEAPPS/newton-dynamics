@@ -317,7 +317,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 	{
 		int localPrefixScan[D_HOST_MAX_RADIX_SIZE + 1];
 
-		auto ShufleUp = [&](const int* in, int* out, int offset)
+		auto ShuffleUp = [&](const int* in, int* out, int offset)
 		{
 			for (int i = 0; i < offset; ++i)
 			{
@@ -356,7 +356,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 			for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
 			{
 				int sumTempReg[D_HOST_MAX_RADIX_SIZE];
-				ShufleUp(&sumReg[bankBase], &sumTempReg[bankBase], n);
+				ShuffleUp(&sumReg[bankBase], &sumTempReg[bankBase], n);
 				for (int threadId = 0; threadId < D_BANK_COUNT_GPU; ++threadId)
 				{
 					int laneId = threadId & (D_BANK_COUNT_GPU - 1);
@@ -404,9 +404,9 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 
 #else
 
-	//implementation of the Blelloch scan, not beter than optimized Hillis-Steele prefix scan sum
-	//actually three tiem slower,
-	//however this is still good for porting to hardware without shufle instructions
+	//implementation of the Blelloch scan, not better than optimized Hillis-Steele prefix scan sum
+	//actually three time slower,
+	//however this is still good for porting to hardware without shuffle instructions
 	auto AddPrefix = [&](int blockIdx, int blockDim, int computeUnits)
 	{
 		int sumReg[D_HOST_MAX_RADIX_SIZE];
@@ -610,7 +610,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		}
 		radixPrefixScan[0] = 0;
 
-		auto ShufleUp = [&](const int* in, int* out, int offset)
+		auto ShuffleUp = [&](const int* in, int* out, int offset)
 		{
 			for (int i = 0; i < offset; ++i)
 			{
@@ -660,7 +660,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
 				{
 					int radixPrefixScanRegTemp[D_HOST_MAX_RADIX_SIZE];
-					ShufleUp(&radixPrefixScanReg[bankBase], &radixPrefixScanRegTemp[bankBase], n);
+					ShuffleUp(&radixPrefixScanReg[bankBase], &radixPrefixScanRegTemp[bankBase], n);
 					for (int threadId = 0; threadId < D_BANK_COUNT_GPU; ++threadId)
 					{
 						int laneId = threadId & (D_BANK_COUNT_GPU - 1);
@@ -762,7 +762,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		int radixPrefixCount[D_HOST_MAX_RADIX_SIZE];
 		int radixPrefixScan[2 * (D_HOST_SORT_BLOCK_SIZE + 1)];
 
-		auto ShufleUp = [&](const int* in, int* out, int offset)
+		auto ShuffleUp = [&](const int* in, int* out, int offset)
 		{
 			for (int i = 0; i < offset; ++i)
 			{
@@ -838,8 +838,8 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					{
 						int radixPrefixScanRegTemp0[D_HOST_SORT_BLOCK_SIZE];
 						int radixPrefixScanRegTemp1[D_HOST_SORT_BLOCK_SIZE];
-						ShufleUp(&radixPrefixScanReg0[bankBase], &radixPrefixScanRegTemp0[bankBase], n);
-						ShufleUp(&radixPrefixScanReg1[bankBase], &radixPrefixScanRegTemp1[bankBase], n);
+						ShuffleUp(&radixPrefixScanReg0[bankBase], &radixPrefixScanRegTemp0[bankBase], n);
+						ShuffleUp(&radixPrefixScanReg1[bankBase], &radixPrefixScanRegTemp1[bankBase], n);
 						for (int threadId = 0; threadId < D_BANK_COUNT_GPU; ++threadId)
 						{
 							if ((threadId & (D_BANK_COUNT_GPU - 1)) >= n)
@@ -943,7 +943,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 		int radixPrefixStart[D_HOST_MAX_RADIX_SIZE];
 		int radixPrefixScan[2 * (D_HOST_SORT_BLOCK_SIZE + 1)];
 
-		auto ShufleUp = [&](const int* in, int* out, int offset)
+		auto ShuffleUp = [&](const int* in, int* out, int offset)
 		{
 			for (int i = 0; i < offset; ++i)
 			{
@@ -1029,8 +1029,8 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 					{
 						int radixPrefixScanRegTemp0[D_HOST_SORT_BLOCK_SIZE];
 						int radixPrefixScanRegTemp1[D_HOST_SORT_BLOCK_SIZE];
-						ShufleUp(&radixPrefixScanReg0[bankBase], &radixPrefixScanRegTemp0[bankBase], n);
-						ShufleUp(&radixPrefixScanReg1[bankBase], &radixPrefixScanRegTemp1[bankBase], n);
+						ShuffleUp(&radixPrefixScanReg0[bankBase], &radixPrefixScanRegTemp0[bankBase], n);
+						ShuffleUp(&radixPrefixScanReg1[bankBase], &radixPrefixScanRegTemp1[bankBase], n);
 						for (int threadId = 0; threadId < D_BANK_COUNT_GPU; ++threadId)
 						{
 							if ((threadId & (D_BANK_COUNT_GPU - 1)) >= n)
@@ -1103,7 +1103,7 @@ void ndCountingSort(const ndCudaHostBuffer<T>& src, ndCudaHostBuffer<T>& dst, nd
 				for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
 				{
 					int radixPrefixScanRegTemp[D_HOST_MAX_RADIX_SIZE];
-					ShufleUp(&radixPrefixScanReg[bankBase], &radixPrefixScanRegTemp[bankBase], n);
+					ShuffleUp(&radixPrefixScanReg[bankBase], &radixPrefixScanRegTemp[bankBase], n);
 					for (int threadId = 0; threadId < D_BANK_COUNT_GPU; ++threadId)
 					{
 						if ((threadId & (D_BANK_COUNT_GPU - 1)) >= n)

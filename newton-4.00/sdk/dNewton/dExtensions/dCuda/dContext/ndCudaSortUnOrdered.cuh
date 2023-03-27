@@ -47,11 +47,11 @@
 /// <typeparam name="T">item class or type</typeparam>
 /// <typeparam name="ndEvaluateRadix">radix sort size in bits</typeparam>
 /// <param name="context">cuda context class, for internal temporary scan array and other info</param>
-/// <param name="src">source input array</param>
-/// <param name="dst">destination output array</param>
+/// <param name="buffer">source input array, data will be sort on this buffer</param>
+/// <param name="auxiliaryBuffer">temporary scratch buffer for intemidiate work, must be the same size as buffer</param>
 /// <param name="evaluateRadix">lambda function to get radix form items in array</param>
 template <class T, int exponentRadix, typename ndEvaluateRadix>
-void ndCountingSortUnOrdered(ndCudaContextImplement* const context, const ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndEvaluateRadix evaluateRadix);
+void ndCountingSortUnOrdered(ndCudaContextImplement* const context, ndCudaDeviceBuffer<T>& buffer, ndCudaDeviceBuffer<T>& auxiliaryBuffer, ndEvaluateRadix evaluateRadix);
 
 // *****************************************************************
 // 
@@ -188,20 +188,20 @@ __global__ void ndCudaMergeBucketsUnOrdered(const ndKernelParams params, const n
 }
 
 template <class T, int exponentRadix, typename ndEvaluateRadix>
-void ndCountingSortUnOrdered(ndCudaContextImplement* const context, const ndCudaDeviceBuffer<T>& src, ndCudaDeviceBuffer<T>& dst, ndEvaluateRadix evaluateRadix)
+void ndCountingSortUnOrdered(ndCudaContextImplement* const context, ndCudaDeviceBuffer<T>& buffer, ndCudaDeviceBuffer<T>& auxiliaryBuffer, ndEvaluateRadix evaluateRadix)
 {
-	ndAssessor<T> output(dst);
-	ndAssessor<T> input(src);
+	ndAssessor<T> assessor0(buffer);
+	ndAssessor<T> assessor1(auxiliaryBuffer);
 	ndAssessor<int> prefixScanBuffer(context->GetPrefixScanBuffer());
-	ndKernelParams params(context->GetDevice(), D_DEVICE_UNORDERED_SORT_BLOCK_SIZE, src.GetCount());
+	ndKernelParams params(context->GetDevice(), D_DEVICE_UNORDERED_SORT_BLOCK_SIZE, buffer.GetCount());
 
-	ndAssert(src.GetCount() == dst.GetCount());
+	ndAssert(buffer.GetCount() == auxiliaryBuffer.GetCount());
 	ndAssert((1 << exponentRadix) <= D_DEVICE_UNORDERED_MAX_RADIX_SIZE);
 
 	int radixStride = 1 << exponentRadix;
-	ndCudaCountItemsAndCopyUnordered << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, input, output, prefixScanBuffer, radixStride, evaluateRadix);
+	ndCudaCountItemsAndCopyUnordered << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, assessor0, assessor1, prefixScanBuffer, radixStride, evaluateRadix);
 	ndCudaAddPrefixUnordered << <1, radixStride, 0 >> > (params, input, prefixScanBuffer, evaluateRadix);
-	ndCudaMergeBucketsUnOrdered << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, output, input, prefixScanBuffer, radixStride, evaluateRadix);
+	ndCudaMergeBucketsUnOrdered << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, assessor1, assessor0, prefixScanBuffer, radixStride, evaluateRadix);
 }
 
 #endif
