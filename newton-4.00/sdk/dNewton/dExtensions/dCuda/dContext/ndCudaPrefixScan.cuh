@@ -24,6 +24,20 @@
 
 #include <cuda.h>
 
+#include "ndCudaDevice.h"
+#include "ndCudaContext.h"
+#include "ndCudaIntrinsics.h"
+#include "ndCudaDeviceBuffer.h"
+
+#define D_DEVICE_SORT_BLOCK_SIZE		(1<<8)
+#define D_DEVICE_SORT_MAX_RADIX_SIZE	(1<<8)
+
+#if D_DEVICE_SORT_MAX_RADIX_SIZE > D_DEVICE_SORT_BLOCK_SIZE
+	#error counting sort diget larger that block
+#endif
+
+__global__ void ndCudaAddPrefix(const ndKernelParams params, ndAssessor<int> scanBuffer);
+
 #if 0
 class ndCudaSceneInfo;
 

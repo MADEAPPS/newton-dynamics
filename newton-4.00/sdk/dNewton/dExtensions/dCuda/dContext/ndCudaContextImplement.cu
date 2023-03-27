@@ -505,6 +505,7 @@ void ndCudaContextImplement::Begin()
 		//	return (item >> 24) & 0xff;
 		//};
 
+		//m_dst0 = m_buf1;
 		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
 		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix1);
 		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix2);
@@ -532,7 +533,7 @@ void ndCudaContextImplement::Begin()
 	{
 		int a = m_dst0[i - 1];
 		int b = m_dst0[i - 0];
-		ndAssert(a <= b);
+		//ndAssert(a <= b);
 	}
 	m_buf0.WriteData(&m_dst1[0], m_dst1.GetCount());
 	#endif

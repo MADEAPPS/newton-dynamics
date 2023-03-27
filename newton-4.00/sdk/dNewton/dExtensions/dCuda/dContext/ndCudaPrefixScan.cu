@@ -26,7 +26,10 @@
 #include "ndCudaContext.h"
 #include "ndCudaSceneInfo.h"
 #include "ndCudaIntrinsics.h"
+
+#include "ndCudaSort.cuh"
 #include "ndCudaPrefixScan.cuh"
+
 
 #if 0
 #define D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE	1024
@@ -263,3 +266,60 @@ __global__ void ndCudaHillisSteelePrefixScan(ndCudaSceneInfo& info)
 }
 
 #endif
+
+
+//optimized single block Hillis-Steele prefix scan sum
+__global__ void ndCudaAddPrefix(const ndKernelParams params, ndAssessor<int> scanBuffer)
+{
+	__shared__  int localPrefixScan[D_DEVICE_SORT_MAX_RADIX_SIZE + 1];
+
+	int threadId = threadIdx.x;
+	int blockStride = blockDim.x;
+
+	int sum = 0;
+	int offset = 0;
+	if (threadId == 0)
+	{
+		localPrefixScan[0] = 0;
+	}
+	for (int i = 0; i < params.m_kernelCount; ++i)
+	{
+		int count = scanBuffer[offset + threadId];
+		scanBuffer[offset + threadId] = sum;
+		sum += count;
+		offset += blockStride;
+	}
+
+	int lane = threadId & (D_BANK_COUNT_GPU - 1);
+	for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
+	{
+		int radixPrefixScanRegTemp = __shfl_up_sync(0xffffffff, sum, n, D_BANK_COUNT_GPU);
+		if (lane >= n)
+		{
+			sum += radixPrefixScanRegTemp;
+		}
+	}
+
+	if (!(threadId & D_BANK_COUNT_GPU))
+	{
+		localPrefixScan[threadId + 1] = sum;
+	}
+
+	int scale = 0;
+	__syncthreads();
+	for (int segment = blockStride; segment > D_BANK_COUNT_GPU; segment >>= 1)
+	{
+		int bank = 1 << (D_LOG_BANK_COUNT_GPU + scale);
+		int warpBase = threadId & bank;
+		if (warpBase)
+		{
+			int warpSumIndex = threadId & (-warpBase);
+			sum += localPrefixScan[warpSumIndex];
+			localPrefixScan[threadId + 1] = sum;
+		}
+		scale++;
+		__syncthreads();
+	}
+	scanBuffer[offset + threadId] = localPrefixScan[threadId];
+}
+
