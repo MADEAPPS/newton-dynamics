@@ -75,13 +75,14 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//m_src.SetCount(17);
 	//m_src.SetCount(64);
 	m_src.SetCount(235);
-	//m_src.SetCount(256);
-	m_src.SetCount(301);
+	//m_src.SetCount(256 + 99);
+	//m_src.SetCount(301);
 	//m_src.SetCount(512);
-	//m_src.SetCount(512 + 99);
+	//m_src.SetCount(512 + 100);
+	m_src.SetCount(512 + 99);
 	//m_src.SetCount(10000);
 	//m_src.SetCount(100000);
-	m_src.SetCount(1000000);
+	//m_src.SetCount(1000000);
 	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
 		m_src[i] = rand() % 256;
@@ -523,13 +524,13 @@ void ndCudaContextImplement::Begin()
 	//m_buf1.WriteData(&m_dst0[0], m_dst0.GetCount());
 	//m_buf0.WriteData(&m_dst0[0], m_dst0.GetCount());
 
-	//m_dst0 = m_buf1;
-	m_dst0 = m_buf1;
-	for (int i = 1; i < m_dst1.GetCount(); ++i)
+	m_dst0 = m_buf0;
+	m_dst1 = m_buf1;
+	for (int i = 1; i < m_dst0.GetCount(); ++i)
 	{
 		int a = m_dst0[i - 1];
 		int b = m_dst0[i - 0];
-		//ndAssert(a <= b);
+		ndAssert(a <= b);
 	}
 	m_buf0.WriteData(&m_dst1[0], m_dst1.GetCount());
 	#endif

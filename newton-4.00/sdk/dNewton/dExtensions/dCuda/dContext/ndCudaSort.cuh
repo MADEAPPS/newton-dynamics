@@ -33,7 +33,7 @@
 #include "ndCudaPrefixScan.cuh"
 
 
-#define D_GPU_SORTING_ALGORITHM		1
+#define D_GPU_SORTING_ALGORITHM		0
 
 template <class T, int exponentRadix, typename ndEvaluateRadix>
 void ndCountingSort(ndCudaContextImplement* const context, ndCudaDeviceBuffer<T>& buffer, ndCudaDeviceBuffer<T>& auxiliaryBuffer, ndEvaluateRadix evaluateRadix);
@@ -192,8 +192,6 @@ __global__ void CountAndSortBlockItems(const ndKernelParams params, const ndAsse
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scanBuffer, int radixStride, SortKeyPredicate getRadix)
 {
-	__shared__  T cachedItems[D_DEVICE_SORT_BLOCK_SIZE];
-	__shared__  int sortedRadix[D_DEVICE_SORT_BLOCK_SIZE];
 	__shared__  int radixPrefixCount[D_DEVICE_SORT_MAX_RADIX_SIZE];
 	__shared__  int radixPrefixStart[D_DEVICE_SORT_MAX_RADIX_SIZE];
 	__shared__  int radixPrefixScan[D_DEVICE_SORT_MAX_RADIX_SIZE + 1];
@@ -205,11 +203,14 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 	int radixPrefixOffset = params.m_kernelCount * radixStride;
 	int bashSize = params.m_blocksPerKernel * params.m_workGroupSize * blockIndex;
 
-	int startReg = 0;
+	int radixPrefixStartReg;
 	if (threadId < radixStride)
 	{
-		startReg = scanBuffer[radixBase + threadId] + scanBuffer[radixPrefixOffset + threadId];
-		radixPrefixStart[threadId] = startReg;
+		int a = scanBuffer[radixBase + threadId];
+		int b = scanBuffer[radixPrefixOffset + threadId];
+		radixPrefixStartReg = a + b;
+		radixPrefixStart[threadId] = radixPrefixStartReg;
+
 		if (threadId == 0)
 		{
 			radixPrefixScan[0] = 0;
@@ -224,98 +225,79 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 		}
 		__syncthreads();
 
+		T cachedItemsReg;
+		int sortedRadixReg;
 		int index = bashSize + threadId;
-		int sortedRadixKey = (radixStride << 16);
+		int radix = radixStride - 1;
+		sortedRadixReg = radix;
 		if (index < input.m_size)
 		{
-			cachedItems[threadId] = input[index];
-			int radix = getRadix(cachedItems[threadId]);
-			atomicAdd(&radixPrefixCount[radix], 1);
-			sortedRadixKey = (radix << 16) + threadId;
+			const T item(input[index]);
+			cachedItemsReg = item;
+			radix = getRadix(item);
+			sortedRadixReg = radix;
 		}
-		sortedRadix[threadId] = sortedRadixKey;
+		atomicAdd(&radixPrefixCount[radix], 1);
 		__syncthreads();
 
-		int  radixPrefixCountReg = 0;
+		int radixPrefixScanReg;
+		int radixPrefixCountReg;
 		if (threadId < radixStride)
 		{
-			int lane = threadId & (D_BANK_COUNT_GPU - 1);
 			radixPrefixCountReg = radixPrefixCount[threadId];
-			int scanReg = radixPrefixCountReg;
-			for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
+			radixPrefixScanReg = radixPrefixCountReg;
+		}
+
+		int lane = threadId & (D_BANK_COUNT_GPU - 1);
+		for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
+		{
+			int radixPrefixScanRegTemp = __shfl_up_sync(0xffffffff, radixPrefixScanReg, n, D_BANK_COUNT_GPU);
+			if (lane >= n)
 			{
-				int radixPrefixScanRegTemp = __shfl_up_sync(0xffffffff, scanReg, n, D_BANK_COUNT_GPU);
-				if (lane >= n)
-				{
-					scanReg += radixPrefixScanRegTemp;
-				}
+				radixPrefixScanReg += radixPrefixScanRegTemp;
 			}
-			radixPrefixScan[threadId + 1] = scanReg;
+		}
+
+		if (threadId < radixStride)
+		{
+			if (!(threadId & D_BANK_COUNT_GPU))
+			{
+				radixPrefixScan[threadId + 1] = radixPrefixScanReg;
+			}
 		}
 
 		int scale = 0;
 		__syncthreads();
-		for (int segment = blockStride; segment > D_BANK_COUNT_GPU; segment >>= 1)
+		for (int segment = radixStride; segment > D_BANK_COUNT_GPU; segment >>= 1)
 		{
-			if (threadId < radixStride / 2)
+			if (threadId < radixStride)
 			{
-				int baseBank = threadId >> (D_LOG_BANK_COUNT_GPU + scale);
-				int baseIndex = (baseBank << (D_LOG_BANK_COUNT_GPU + scale + 1)) + (1 << (D_LOG_BANK_COUNT_GPU + scale)) + 1 - 1;
-				int bankIndex = threadId & ((1 << (D_LOG_BANK_COUNT_GPU + scale)) - 1);
-				int scanIndex = baseIndex + bankIndex + 1;
-
-				radixPrefixScan[scanIndex] += radixPrefixScan[baseIndex];
+				int bank = 1 << (D_LOG_BANK_COUNT_GPU + scale);
+				int warpBase = threadId & bank;
+				if (warpBase)
+				{
+					int warpSumIndex = threadId & (-warpBase);
+					radixPrefixScanReg += radixPrefixScan[warpSumIndex];
+					radixPrefixScan[threadId + 1] = radixPrefixScanReg;
+				}
 			}
 			scale++;
 			__syncthreads();
 		}
 
-		for (int k = 1; k < blockStride; k = k << 1)
-		{
-			for (int j = k; j > 0; j = j >> 1)
-			{
-				if (threadId < blockStride / 2)
-				{
-					int highMask = -j;
-					int lowMask = ~highMask;
-					int lowIndex = threadId & lowMask;
-					int highIndex = (threadId & highMask) * 2;
-
-					int id0 = highIndex + lowIndex;
-					int id1 = highIndex + lowIndex + j;
-					int oddEven = highIndex & k * 2;
-
-					int a = sortedRadix[id0];
-					int b = sortedRadix[id1];
-
-					int test = a < b;
-					int a1 = test ? a : b;
-					int b1 = test ? b : a;
-
-					int a2 = oddEven ? b1 : a1;
-					int b2 = oddEven ? a1 : b1;
-
-					sortedRadix[id0] = a2;
-					sortedRadix[id1] = b2;
-				}
-				__syncthreads();
-			}
-		}
-
 		if (index < input.m_size)
 		{
-			int keyValue = sortedRadix[threadId];
-			int keyHigh = keyValue >> 16;
-			int keyLow = keyValue & 0xffff;
-			int dstOffset1 = radixPrefixStart[keyHigh];
-			int dstOffset0 = threadId - radixPrefixScan[keyHigh];
-			output[dstOffset0 + dstOffset1] = cachedItems[keyLow];
+			int keyLow = sortedRadixReg;
+			int dstOffset1 = radixPrefixStart[keyLow];
+			int dstOffset0 = threadId - radixPrefixScan[keyLow];
+			output[dstOffset0 + dstOffset1] = cachedItemsReg;
 		}
+
 		__syncthreads();
 		if (threadId < radixStride)
 		{
-			startReg += radixPrefixCountReg;
-			radixPrefixStart[threadId] = startReg;
+			radixPrefixStartReg += radixPrefixCountReg;
+			radixPrefixStart[threadId] = radixPrefixStartReg;
 		}
 
 		bashSize += blockStride;
@@ -458,8 +440,6 @@ __global__ void CountAndSortBlockItems(const ndKernelParams params, const ndAsse
 template <typename T, typename SortKeyPredicate>
 __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor<T> input, ndAssessor<T> output, const ndAssessor<int> scanBuffer, int radixStride, SortKeyPredicate getRadix)
 {
-	//__shared__  T cachedItems[D_DEVICE_SORT_BLOCK_SIZE];
-	//__shared__  int sortedRadix[D_DEVICE_SORT_BLOCK_SIZE];
 	__shared__  int radixPrefixCount[D_DEVICE_SORT_MAX_RADIX_SIZE];
 	__shared__  int radixPrefixStart[D_DEVICE_SORT_MAX_RADIX_SIZE];
 	__shared__  int radixPrefixScan[D_DEVICE_SORT_MAX_RADIX_SIZE + 1];
@@ -470,158 +450,6 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 	int radixBase = blockIndex * radixStride;
 	int radixPrefixOffset = params.m_kernelCount * radixStride;
 	int bashSize = params.m_blocksPerKernel * params.m_workGroupSize * blockIndex;
-
-	//int startReg = 0;
-	//if (threadId < radixStride)
-	//{
-	//	startReg = scanBuffer[radixBase + threadId] + scanBuffer[radixPrefixOffset + threadId];
-	//	radixPrefixStart[threadId] = startReg;
-	//}
-	//if (threadId == 0)
-	//{
-	//	radixPrefixScan[0] = 0;
-	//	radixPrefixScan[D_DEVICE_SORT_BLOCK_SIZE + 1] = 0;
-	//}
-	//
-	//for (int i = 0; i < params.m_blocksPerKernel; ++i)
-	//{
-	//	if (threadId < radixStride)
-	//	{
-	//		radixPrefixCount[threadId] = 0;
-	//	}
-	//	__syncthreads();
-	//	
-	//	int index = bashSize + threadId;
-	//
-	//	int radix = radixStride - 1;
-	//	int sortKey = radix;
-	//	if (index < input.m_size)
-	//	{
-	//		const T item(input[index]);
-	//		cachedItems[threadId] = item;
-	//		radix = getRadix(item);
-	//		sortKey = (threadId << 16) + radix;
-	//	}
-	//	atomicAdd(&radixPrefixCount[radix], 1);
-	//	sortedRadix[threadId] = sortKey;
-	//	__syncthreads();
-	//
-	//	int lane = threadId & (D_BANK_COUNT_GPU - 1);
-	//	for (int bit = 0; (1 << (bit * 2)) < radixStride; ++bit)
-	//	{
-	//		int keyReg = sortedRadix[threadId];
-	//		int bitIndex = (keyReg >> (bit * 2)) & 0x3;
-	//
-	//		int bit0 = (bitIndex == 0) ? 1 : 0;
-	//		int bit1 = (bitIndex == 1) ? 1 << 16 : 0;
-	//		int bit2 = (bitIndex == 2) ? 1 : 0;
-	//		int bit3 = (bitIndex == 3) ? 1 << 16 : 0;
-	//		int radixPrefixScanReg0 = bit0 + bit1;
-	//		int radixPrefixScanReg1 = bit2 + bit3;
-	//
-	//		for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
-	//		{
-	//			int radixPrefixScanRegTemp0 = __shfl_up_sync(0xffffffff, radixPrefixScanReg0, n, D_BANK_COUNT_GPU);
-	//			int radixPrefixScanRegTemp1 = __shfl_up_sync(0xffffffff, radixPrefixScanReg1, n, D_BANK_COUNT_GPU);
-	//			if (lane >= n)
-	//			{
-	//				radixPrefixScanReg0 += radixPrefixScanRegTemp0;
-	//				radixPrefixScanReg1 += radixPrefixScanRegTemp1;
-	//			}
-	//		}
-	//
-	//		radixPrefixScan[threadId + 1] = radixPrefixScanReg0;
-	//		radixPrefixScan[threadId + 1 + D_DEVICE_SORT_BLOCK_SIZE + 1] = radixPrefixScanReg1;
-	//
-	//		int scale = 0;
-	//		__syncthreads();
-	//		for (int segment = blockStride; segment > D_BANK_COUNT_GPU; segment >>= 1)
-	//		{
-	//			if (threadId < blockStride / 2)
-	//			{
-	//				int baseBank = threadId >> (D_LOG_BANK_COUNT_GPU + scale);
-	//				int baseIndex = (baseBank << (D_LOG_BANK_COUNT_GPU + scale + 1)) + (1 << (D_LOG_BANK_COUNT_GPU + scale)) + 1 - 1;
-	//				int bankIndex = threadId & ((1 << (D_LOG_BANK_COUNT_GPU + scale)) - 1);
-	//				int scanIndex = baseIndex + bankIndex + 1;
-	//
-	//				radixPrefixScan[scanIndex] += radixPrefixScan[baseIndex];
-	//				radixPrefixScan[D_DEVICE_SORT_BLOCK_SIZE + 1 + scanIndex] += radixPrefixScan[D_DEVICE_SORT_BLOCK_SIZE + 1 + baseIndex];
-	//			}
-	//			scale++;
-	//			__syncthreads();
-	//		}
-	//
-	//		int sum0 = radixPrefixScan[1 * (D_DEVICE_SORT_BLOCK_SIZE + 1) - 1];
-	//		int sum1 = radixPrefixScan[2 * (D_DEVICE_SORT_BLOCK_SIZE + 1) - 1];
-	//		int base0 = 0;
-	//		int base1 = sum0 & 0xffff;
-	//		int base2 = base1 + (sum0 >> 16);
-	//		int base3 = base2 + (sum1 & 0xffff);
-	//
-	//		int key0 = radixPrefixScan[threadId];
-	//		int key1 = radixPrefixScan[threadId + D_DEVICE_SORT_BLOCK_SIZE + 1];
-	//
-	//		int dstIndex = 0;
-	//		dstIndex += (bitIndex == 1) ? base1 + (key0 >> 16) : 0;
-	//		dstIndex += (bitIndex == 3) ? base3 + (key1 >> 16) : 0;
-	//		dstIndex += (bitIndex == 0) ? base0 + (key0 & 0xffff) : 0;
-	//		dstIndex += (bitIndex == 2) ? base2 + (key1 & 0xffff) : 0;
-	//		sortedRadix[dstIndex] = keyReg;
-	//	}
-	//
-	//	int  radixPrefixCountReg = 0;
-	//	if (threadId < radixStride)
-	//	{
-	//		radixPrefixCountReg = radixPrefixCount[threadId];
-	//		int scanReg = radixPrefixCountReg;
-	//		for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
-	//		{
-	//			int radixPrefixScanRegTemp = __shfl_up_sync(0xffffffff, scanReg, n, D_BANK_COUNT_GPU);
-	//			if (lane >= n)
-	//			{
-	//				scanReg += radixPrefixScanRegTemp;
-	//			}
-	//		}
-	//
-	//		radixPrefixScan[threadId + 1] = scanReg;
-	//	}
-	//
-	//	int scale = 0;
-	//	__syncthreads();
-	//	for (int segment = blockStride; segment > D_BANK_COUNT_GPU; segment >>= 1)
-	//	{
-	//		if (threadId < radixStride / 2)
-	//		{
-	//			int baseBank = threadId >> (D_LOG_BANK_COUNT_GPU + scale);
-	//			int baseIndex = (baseBank << (D_LOG_BANK_COUNT_GPU + scale + 1)) + (1 << (D_LOG_BANK_COUNT_GPU + scale)) + 1 - 1;
-	//			int bankIndex = threadId & ((1 << (D_LOG_BANK_COUNT_GPU + scale)) - 1);
-	//			int scanIndex = baseIndex + bankIndex + 1;
-	//
-	//			radixPrefixScan[scanIndex] += radixPrefixScan[baseIndex];
-	//		}
-	//		scale++;
-	//		__syncthreads();
-	//	}
-	//
-	//	if (index < input.m_size)
-	//	{
-	//		int keyValue = sortedRadix[threadId];
-	//		int keyHigh = keyValue >> 16;
-	//		int keyLow = keyValue & 0xffff;
-	//		int dstOffset1 = radixPrefixStart[keyLow];
-	//		int dstOffset0 = threadId - radixPrefixScan[keyLow];
-	//		output[dstOffset0 + dstOffset1] = cachedItems[keyHigh];
-	//	}
-	//	__syncthreads();
-	//	if (threadId < radixStride)
-	//	{
-	//		startReg += radixPrefixCountReg;
-	//		radixPrefixStart[threadId] = startReg;
-	//	}
-	//
-	//	bashSize += blockStride;
-	//}
-
 
 	int radixPrefixStartReg;
 	if (threadId < radixStride)
@@ -648,19 +476,16 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 		T cachedItemsReg;
 		int sortedRadixReg;
 		int index = bashSize + threadId;
-		if (threadId < blockStride)
+		int radix = radixStride - 1;
+		sortedRadixReg = radix;
+		if (index < input.m_size)
 		{
-			int radix = radixStride - 1;
+			const T item(input[index]);
+			cachedItemsReg = item;
+			radix = getRadix(item);
 			sortedRadixReg = radix;
-			if (index < input.m_size)
-			{
-				const T item(input[index]);
-				cachedItemsReg = item;
-				radix = getRadix(item);
-				sortedRadixReg = radix;
-			}
-			atomicAdd(&radixPrefixCount[radix], 1);
 		}
+		atomicAdd(&radixPrefixCount[radix], 1);
 		__syncthreads();
 
 		int radixPrefixScanReg;
@@ -672,15 +497,12 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 		}
 	
 		int lane = threadId & (D_BANK_COUNT_GPU - 1);
-		for (int bankBase = 0; bankBase < radixStride; bankBase += D_BANK_COUNT_GPU)
+		for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
 		{
-			for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
+			int radixPrefixScanRegTemp = __shfl_up_sync(0xffffffff, radixPrefixScanReg, n, D_BANK_COUNT_GPU);
+			if (lane >= n)
 			{
-				int radixPrefixScanRegTemp = __shfl_up_sync(0xffffffff, radixPrefixScanReg, n, D_BANK_COUNT_GPU);
-				if (lane >= n)
-				{
-					radixPrefixScanReg += radixPrefixScanRegTemp;
-				}
+				radixPrefixScanReg += radixPrefixScanRegTemp;
 			}
 		}
 
@@ -728,8 +550,8 @@ __global__ void ndCudaMergeBuckets(const ndKernelParams params, const ndAssessor
 	
 		bashSize += blockStride;
 	}
-
 }
+
 #else
 	#error implement new local gpu sort and merge algorthm?
 #endif
@@ -749,7 +571,7 @@ void ndCountingSort(ndCudaContextImplement* const context, ndCudaDeviceBuffer<T>
 	int radixStride = 1 << exponentRadix;
 	CountAndSortBlockItems << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, assessor0, assessor1, prefixScanBuffer, radixStride, evaluateRadix);
 	ndCudaAddPrefix <<< 1, radixStride, 0 >>>  (params, prefixScanBuffer);
-	//ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, assessor1, assessor0, prefixScanBuffer, radixStride, evaluateRadix);
+	ndCudaMergeBuckets << <params.m_kernelCount, params.m_workGroupSize, 0 >> > (params, assessor1, assessor0, prefixScanBuffer, radixStride, evaluateRadix);
 }
 
 #endif
