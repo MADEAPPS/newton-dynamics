@@ -33,7 +33,7 @@
 #include "ndCudaPrefixScan.cuh"
 
 
-#define D_GPU_SORTING_ALGORITHM		0
+#define D_GPU_SORTING_ALGORITHM		1
 
 template <class T, int exponentRadix, typename ndEvaluateRadix>
 void ndCountingSort(ndCudaContextImplement* const context, ndCudaDeviceBuffer<T>& buffer, ndCudaDeviceBuffer<T>& auxiliaryBuffer, ndEvaluateRadix evaluateRadix);
@@ -340,11 +340,10 @@ __global__ void CountAndSortBlockItems(const ndKernelParams params, const ndAsse
 		{
 			const T item(input[index]);
 			cachedItems[threadId] = item;
-			int radix = getRadix(item);
+			radix = getRadix(item);
 			atomicAdd(&radixPrefixCount[radix], 1);
 			sortKey = (threadId << 16) + radix;
 		}
-		radixPrefixCount[radix] ++;
 		sortedRadix[threadId] = sortKey;
 		__syncthreads();
 

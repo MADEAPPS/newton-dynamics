@@ -82,7 +82,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	m_src.SetCount(512 + 99);
 	//m_src.SetCount(10000);
 	//m_src.SetCount(100000);
-	//m_src.SetCount(1000000);
+	m_src.SetCount(1000000);
 	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
 		m_src[i] = rand() % 256;
@@ -503,6 +503,9 @@ void ndCudaContextImplement::Begin()
 		//};
 
 		//m_dst0 = m_buf1;
+		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
+		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
+		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
 		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
 		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix1);
 		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix2);
