@@ -306,7 +306,8 @@ void ndCountingSort(ndCudaHostBuffer<T>& buffer, ndCudaHostBuffer<T>& auxiliaryB
 
 		auto ShuffleUp = [&](const int* in, int* out, int offset)
 		{
-			for (int i = 0; i < offset; ++i)
+			//for (int i = 0; i < offset; ++i)
+			for (int i = 0; i < D_BANK_COUNT_GPU; ++i)
 			{
 				out[i] = in[i];
 			}
@@ -575,7 +576,8 @@ void ndCountingSort(ndCudaHostBuffer<T>& buffer, ndCudaHostBuffer<T>& auxiliaryB
 
 		auto ShuffleUp = [&](const int* in, int* out, int offset)
 		{
-			for (int i = 0; i < offset; ++i)
+			//for (int i = 0; i < offset; ++i)
+			for (int i = 0; i < D_BANK_COUNT_GPU; ++i)
 			{
 				out[i] = in[i];
 			}
@@ -716,10 +718,12 @@ void ndCountingSort(ndCudaHostBuffer<T>& buffer, ndCudaHostBuffer<T>& auxiliaryB
 		int sortedRadix[D_DEVICE_SORT_BLOCK_SIZE];
 		int radixPrefixCount[D_DEVICE_SORT_MAX_RADIX_SIZE];
 		int radixPrefixScan[2 * (D_DEVICE_SORT_BLOCK_SIZE + 1)];
+		int skipDigit[D_BANK_COUNT_GPU];
 
 		auto ShuffleUp = [&](const int* in, int* out, int offset)
 		{
-			for (int i = 0; i < offset; ++i)
+			//for (int i = 0; i < offset; ++i)
+			for (int i = 0; i < D_BANK_COUNT_GPU; ++i)
 			{
 				out[i] = in[i];
 			}
@@ -729,6 +733,20 @@ void ndCountingSort(ndCudaHostBuffer<T>& buffer, ndCudaHostBuffer<T>& auxiliaryB
 				out[i + offset] = in[i];
 			}
 		};
+
+		auto ShuffleDown = [&](const int* in, int* out, int offset)
+		{
+			for (int i = 0; i < D_BANK_COUNT_GPU; ++i)
+			{
+				out[i] = in[i];
+			}
+
+			for (int i = D_BANK_COUNT_GPU - offset - 1; i >= 0; --i)
+			{
+				out[i] = in[i + offset];
+			}
+		};
+
 
 		int size = buffer.GetCount();
 		int radixStride = 1 << exponentRadix;
@@ -761,6 +779,49 @@ void ndCountingSort(ndCudaHostBuffer<T>& buffer, ndCudaHostBuffer<T>& auxiliaryB
 				radixPrefixCount[radix] ++;
 				sortedRadix[threadId] = sortKey;
 			}
+
+#if 0
+			int keyTest = sortedRadix[0] & 0xff;
+			int sortedRadixReg[D_DEVICE_SORT_BLOCK_SIZE];
+			for (int threadId = 0; threadId < blockStride; ++threadId)
+			{
+				sortedRadixReg[threadId] = (~(sortedRadix[threadId] ^ keyTest)) & 0xff;
+			}
+			for (int bankBase = 0; bankBase < blockStride; bankBase += D_BANK_COUNT_GPU)
+			{
+				for (int n = D_BANK_COUNT_GPU / 2; n; n = n / 2)
+				{
+					int radixPrefixScanRegTemp[D_DEVICE_SORT_BLOCK_SIZE];
+					ShuffleDown(&sortedRadixReg[bankBase], &radixPrefixScanRegTemp[bankBase], n);
+					for (int threadId = 0; threadId < D_BANK_COUNT_GPU; ++threadId)
+					{
+						sortedRadixReg[bankBase + threadId] = sortedRadixReg[bankBase + threadId] & radixPrefixScanRegTemp[bankBase + threadId];
+					}
+				}
+			}
+			for (int threadId = 0; threadId < D_BANK_COUNT_GPU; ++threadId)
+			{
+				skipDigit[threadId] = 0xff;
+			}
+			for (int threadId = 0; threadId < blockStride; threadId += D_BANK_COUNT_GPU)
+			{
+				skipDigit[threadId >> D_LOG_BANK_COUNT_GPU] = sortedRadixReg[threadId];
+			}
+			int skipDigitReg[D_BANK_COUNT_GPU];
+			for (int threadId = 0; threadId < D_BANK_COUNT_GPU; ++threadId)
+			{
+				skipDigitReg[threadId] = skipDigit[threadId];
+			}
+			for (int n = D_BANK_COUNT_GPU / 2; n; n = n / 2)
+			{
+				int radixPrefixScanRegTemp[D_DEVICE_SORT_BLOCK_SIZE];
+				ShuffleDown(&skipDigitReg[0], &radixPrefixScanRegTemp[0], n);
+				for (int threadId = 0; threadId < D_BANK_COUNT_GPU; ++threadId)
+				{
+					skipDigitReg[threadId] = skipDigitReg[threadId] & radixPrefixScanRegTemp[threadId];
+				}
+			}
+#endif
 
 			int memoryTransactions = 0;
 			for (int bit = 0; (1 << (bit * 2)) < radixStride; ++bit)
@@ -892,7 +953,8 @@ void ndCountingSort(ndCudaHostBuffer<T>& buffer, ndCudaHostBuffer<T>& auxiliaryB
 
 		auto ShuffleUp = [&](const int* in, int* out, int offset)
 		{
-			for (int i = 0; i < offset; ++i)
+			//for (int i = 0; i < offset; ++i)
+			for (int i = 0; i < D_BANK_COUNT_GPU; ++i)
 			{
 				out[i] = in[i];
 			}
