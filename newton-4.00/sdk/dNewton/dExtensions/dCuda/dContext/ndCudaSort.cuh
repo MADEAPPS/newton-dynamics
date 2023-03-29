@@ -255,6 +255,7 @@ __global__ void CountAndSortBlockItems(const ndKernelParams params, const ndAsse
 	__shared__ int sortedRadix[D_DEVICE_SORT_BLOCK_SIZE];
 	__shared__ int radixPrefixCount[D_DEVICE_SORT_MAX_RADIX_SIZE];
 	__shared__ int radixPrefixScan[2 * (D_DEVICE_SORT_BLOCK_SIZE + 1)];
+	__shared__ int skipDigit[D_BANK_COUNT_GPU];
 
 	int threadId = threadIdx.x;
 	int blockStride = blockDim.x;
@@ -272,6 +273,7 @@ __global__ void CountAndSortBlockItems(const ndKernelParams params, const ndAsse
 	}
 	__syncthreads();
 
+	int lane = threadId & (D_BANK_COUNT_GPU - 1);
 	for (int i = 0; i < params.m_blocksPerKernel; ++i)
 	{
 		int index = bashSize + threadId;
@@ -288,6 +290,47 @@ __global__ void CountAndSortBlockItems(const ndKernelParams params, const ndAsse
 		sortedRadix[threadId] = sortKey;
 		__syncthreads();
 
+#if 0
+		int keyTest = sortedRadix[0];
+		int sortedRadixReg = (~(sortedRadix[threadId] ^ keyTest)) & 0xff;
+		for (int bankBase = 0; bankBase < blockStride; bankBase += D_BANK_COUNT_GPU)
+		{
+			for (int n = D_BANK_COUNT_GPU / 2; n; n = n / 2)
+			{
+				int radixPrefixScanRegTemp = __shfl_down_sync(0xffffffff, sortedRadixReg, n, D_BANK_COUNT_GPU);
+				sortedRadixReg = sortedRadixReg & radixPrefixScanRegTemp;
+			}
+		}
+		if (threadId < D_BANK_COUNT_GPU)
+		{
+			skipDigit[threadId] = 0xff;
+		}
+		__syncthreads();
+		skipDigit[threadId >> D_LOG_BANK_COUNT_GPU] = sortedRadixReg;
+		__syncthreads();
+		
+		if (threadId < D_BANK_COUNT_GPU)
+		{
+			keyTest = skipDigit[threadId];
+			for (int n = D_BANK_COUNT_GPU / 2; n; n = n / 2)
+			{
+			//	int radixPrefixScanRegTemp[D_DEVICE_SORT_BLOCK_SIZE];
+			//	ShuffleDown(&skipDigitReg[0], &radixPrefixScanRegTemp[0], n);
+			//	for (int threadId = 0; threadId < D_BANK_COUNT_GPU; ++threadId)
+			//	{
+			//		skipDigitReg[threadId] = skipDigitReg[threadId] & radixPrefixScanRegTemp[threadId];
+			//	}
+			}
+
+			if (threadId == 0)
+			{
+				skipDigit[0] = keyTest;
+			}
+		}
+		__syncthreads();
+		keyTest = skipDigit[0];
+#endif
+
 		for (int bit = 0; (1 << (bit * 2)) < radixStride; ++bit)
 		{
 			int keyReg = sortedRadix[threadId];
@@ -300,7 +343,6 @@ __global__ void CountAndSortBlockItems(const ndKernelParams params, const ndAsse
 			int radixPrefixScanReg0 = bit0 + bit1;
 			int radixPrefixScanReg1 = bit2 + bit3;
 
-			int lane = threadId & (D_BANK_COUNT_GPU - 1);
 			for (int n = 1; n < D_BANK_COUNT_GPU; n *= 2)
 			{
 				int radixPrefixScanRegTemp0 = __shfl_up_sync(0xffffffff, radixPrefixScanReg0, n, D_BANK_COUNT_GPU);

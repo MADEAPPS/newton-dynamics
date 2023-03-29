@@ -747,7 +747,6 @@ void ndCountingSort(ndCudaHostBuffer<T>& buffer, ndCudaHostBuffer<T>& auxiliaryB
 			}
 		};
 
-
 		int size = buffer.GetCount();
 		int radixStride = 1 << exponentRadix;
 		int blockStride = D_DEVICE_SORT_BLOCK_SIZE;
