@@ -82,7 +82,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	m_src.SetCount(512 + 99);
 	//m_src.SetCount(10000);
 	//m_src.SetCount(100000);
-	m_src.SetCount(1000000);
+	//m_src.SetCount(1000000);
 	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
 		m_src[i] = rand() % 256;
@@ -91,6 +91,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 		//m_src[i] = m_src.GetCount() - i - 1;
 		//m_src[i] = m_src[i] & 0xff;
 		//m_src[i] = m_src.GetCount() - 1 - i;
+		m_src[i] = (m_src[i] & 0xf03) + 8;
 	}
 
 	//m_src[4] = 1;
