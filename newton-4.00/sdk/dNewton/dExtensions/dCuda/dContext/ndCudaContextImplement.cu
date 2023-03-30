@@ -74,24 +74,23 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//m_src.SetCount(8);
 	//m_src.SetCount(17);
 	//m_src.SetCount(64);
-	m_src.SetCount(256);
+	//m_src.SetCount(256);
 	//m_src.SetCount(256 + 99);
 	//m_src.SetCount(301);
 	//m_src.SetCount(512);
 	//m_src.SetCount(512 + 100);
 	//m_src.SetCount(512 + 99);
-	//m_src.SetCount(10000);
+	m_src.SetCount(10000);
 	//m_src.SetCount(100000);
 	//m_src.SetCount(1000000);
 	for (int i = 0; i < m_src.GetCount(); ++i)
 	{
-		m_src[i] = rand() % 256;
-		//m_src[i] = rand() % 1024;
+		//m_src[i] = rand() % 256;
+		m_src[i] = rand() % (256 * 256);
 		//m_src[i] = rand() & 0x7fffffff;
 		//m_src[i] = m_src.GetCount() - i - 1;
 		//m_src[i] = m_src[i] & 0xff;
 		//m_src[i] = m_src.GetCount() - 1 - i;
-		m_src[i] = (m_src[i] & 0xf03) + 8;
 	}
 
 	//m_src[4] = 1;
@@ -130,6 +129,7 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	ndCudaHostBuffer<int> scan;
 	scan.SetCount(1024 * 256);
 	ndCountingSort<int, GetKey0, 8>(m_src, m_dst0, scan);
+	ndCountingSort<int, GetKey1, 8>(m_src, m_dst0, scan);
 	//ndCountingSort<int, GetKey1, 8>(m_dst0, m_src, scan);
 	for (int i = 1; i < m_src.GetCount(); ++i)
 	{
@@ -488,11 +488,11 @@ void ndCudaContextImplement::Begin()
 			return item & 0xff;
 		};
 
-		//auto GetRadix1 = []  __host__ __device__(int item)
-		//{
-		//	return (item >> 8) & 0xff;
-		//};
-		//
+		auto GetRadix1 = []  __host__ __device__(int item)
+		{
+			return (item >> 8) & 0xff;
+		};
+		
 		//auto GetRadix2 = []  __host__ __device__(int item)
 		//{
 		//	return (item >> 16) & 0xff;
@@ -504,11 +504,13 @@ void ndCudaContextImplement::Begin()
 		//};
 
 		//m_dst0 = m_buf1;
+		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
+		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
+		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
+		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
+		 
 		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
-		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
-		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
-		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
-		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix1);
+		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix1);
 		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix2);
 		//ndCountingSort<int, 8>(this, m_buf1, m_buf1, GetRadix3);
 #endif
