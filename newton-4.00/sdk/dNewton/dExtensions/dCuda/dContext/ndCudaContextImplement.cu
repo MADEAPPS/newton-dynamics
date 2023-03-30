@@ -74,12 +74,12 @@ ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	//m_src.SetCount(8);
 	//m_src.SetCount(17);
 	//m_src.SetCount(64);
-	m_src.SetCount(235);
+	m_src.SetCount(256);
 	//m_src.SetCount(256 + 99);
 	//m_src.SetCount(301);
 	//m_src.SetCount(512);
 	//m_src.SetCount(512 + 100);
-	m_src.SetCount(512 + 99);
+	//m_src.SetCount(512 + 99);
 	//m_src.SetCount(10000);
 	//m_src.SetCount(100000);
 	//m_src.SetCount(1000000);
@@ -505,9 +505,9 @@ void ndCudaContextImplement::Begin()
 
 		//m_dst0 = m_buf1;
 		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
-		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
-		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
-		ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
+		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
+		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
+		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix0);
 		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix1);
 		//ndCountingSort<int, 8>(this, m_buf0, m_buf1, GetRadix2);
 		//ndCountingSort<int, 8>(this, m_buf1, m_buf1, GetRadix3);
