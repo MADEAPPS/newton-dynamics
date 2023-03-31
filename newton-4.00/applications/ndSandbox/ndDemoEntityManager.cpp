@@ -37,7 +37,7 @@
 	//#define REPLAY_RECORD
 #endif
 
-#define DEFAULT_SCENE	0		// basic rigidbody
+//#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
@@ -52,7 +52,7 @@
 //#define DEFAULT_SCENE	12		// heavy vehicle
 //#define DEFAULT_SCENE	13		// background vehicle prop
 //#define DEFAULT_SCENE	14		// simple industrial robot
-//#define DEFAULT_SCENE	15		// advanced industrial robot
+#define DEFAULT_SCENE	15		// advanced industrial robot
 //#define DEFAULT_SCENE	16		// basic player
 //#define DEFAULT_SCENE	17		// rag doll
 //#define DEFAULT_SCENE	18		// zero moment point
@@ -427,10 +427,10 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
 	//m_autoSleepMode = false;
-	m_solverMode = ndWorld::ndCudaSolver;
+	//m_solverMode = ndWorld::ndCudaSolver;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
 	//m_solverMode = ndWorld::ndSyclSolverCpu;
-	//m_solverMode = ndWorld::ndStandardSolver;
+	m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
 	//m_solverPasses = 4;
 	m_workerThreads = 1;
@@ -620,52 +620,58 @@ bool ndDemoEntityManager::JoystickDetected() const
 
 void ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues)
 {
-	ndAssert(JoystickDetected());
-	ndInt32 axisCount = 0;
-	axisValues.SetCount(0);
-	const float* const axis = glfwGetJoystickAxes(0, &axisCount);
-	axisCount = ndMin (axisCount, axisValues.GetCapacity());
-	for (ndInt32 i = 0; i < axisCount; ++i) 
+	//ndAssert(JoystickDetected());
+	if (JoystickDetected())
 	{
-		axisValues.PushBack(axis[i]);
-	}
+		ndInt32 axisCount = 0;
+		axisValues.SetCount(0);
+		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
+		axisCount = ndMin(axisCount, axisValues.GetCapacity());
+		for (ndInt32 i = 0; i < axisCount; ++i)
+		{
+			axisValues.PushBack(axis[i]);
+		}
 
-#ifdef ENABLE_REPLAY
-	#ifdef REPLAY_RECORD
-		fwrite(&axisCount, sizeof(axisCount), 1, m_replayLogFile);
-		fwrite(&axisValues[0], sizeof(ndFloat32) * axisValues.GetCapacity(), 1, m_replayLogFile);
-		fflush(m_replayLogFile);
-	#else 
-		fread(&axisCount, sizeof(axisCount), 1, m_replayLogFile);
-		fread(&axisValues[0], sizeof(ndFloat32) * axisValues.GetCapacity(), 1, m_replayLogFile);
-	#endif
-#endif
+		#ifdef ENABLE_REPLAY
+			#ifdef REPLAY_RECORD
+					fwrite(&axisCount, sizeof(axisCount), 1, m_replayLogFile);
+					fwrite(&axisValues[0], sizeof(ndFloat32) * axisValues.GetCapacity(), 1, m_replayLogFile);
+					fflush(m_replayLogFile);
+			#else 
+					fread(&axisCount, sizeof(axisCount), 1, m_replayLogFile);
+					fread(&axisValues[0], sizeof(ndFloat32) * axisValues.GetCapacity(), 1, m_replayLogFile);
+			#endif
+		#endif
+	}
 }
 
 void ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbuttons)
 {
-	ndAssert(JoystickDetected());
-	ndInt32 buttonsCount = 0;
-	axisbuttons.SetCount(0);
-	const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
-	buttonsCount = ndMin (buttonsCount, axisbuttons.GetCapacity());
-
-	for (ndInt32 i = 0; i < buttonsCount; ++i) 
+	//ndAssert(JoystickDetected());
+	if (JoystickDetected())
 	{
-		axisbuttons.PushBack(char(buttons[i]));
-		//if (buttons[i]) ndTrace(("%d %d\n", i, buttons[i]));
-	}
+		ndInt32 buttonsCount = 0;
+		axisbuttons.SetCount(0);
+		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
+		buttonsCount = ndMin(buttonsCount, axisbuttons.GetCapacity());
 
-#ifdef ENABLE_REPLAY
-	#ifdef REPLAY_RECORD
-		fwrite(&buttonsCount, sizeof(buttonsCount), 1, m_replayLogFile);
-		fwrite(&axisbuttons[0], sizeof(axisbuttons.GetCapacity()), 1, m_replayLogFile);
-		fflush(m_replayLogFile);
-	#else 
-		fread(&buttonsCount, sizeof(buttonsCount), 1, m_replayLogFile);
-		fread(&axisbuttons[0], sizeof(axisbuttons.GetCapacity()), 1, m_replayLogFile);
-	#endif
-#endif
+		for (ndInt32 i = 0; i < buttonsCount; ++i)
+		{
+			axisbuttons.PushBack(char(buttons[i]));
+			//if (buttons[i]) ndTrace(("%d %d\n", i, buttons[i]));
+		}
+
+		#ifdef ENABLE_REPLAY
+			#ifdef REPLAY_RECORD
+					fwrite(&buttonsCount, sizeof(buttonsCount), 1, m_replayLogFile);
+					fwrite(&axisbuttons[0], sizeof(axisbuttons.GetCapacity()), 1, m_replayLogFile);
+					fflush(m_replayLogFile);
+			#else 
+					fread(&buttonsCount, sizeof(buttonsCount), 1, m_replayLogFile);
+					fread(&axisbuttons[0], sizeof(axisbuttons.GetCapacity()), 1, m_replayLogFile);
+			#endif
+		#endif
+	}
 }
 
 void ndDemoEntityManager::ResetTimer()

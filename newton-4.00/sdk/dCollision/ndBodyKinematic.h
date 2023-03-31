@@ -263,7 +263,6 @@ inline const ndVector& ndBodyKinematic::GetMassMatrix() const
 
 inline const ndMatrix& ndBodyKinematic::GetInvInertiaMatrix() const
 {
-	ndAssert(0);
 	return m_invWorldInertiaMatrix;
 }
 

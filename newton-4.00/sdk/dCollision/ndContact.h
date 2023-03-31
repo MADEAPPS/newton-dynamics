@@ -192,7 +192,7 @@ inline const ndContactPointList& ndContact::GetContactPoints() const
 
 inline bool ndContact::IsSkeletonSelftCollision() const
 {
-	return m_skeletonSelftCollision ? true : false;;
+	return m_skeletonSelftCollision ? true : false;
 }
 
 inline bool ndContact::IsInTrigger() const
