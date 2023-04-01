@@ -99,33 +99,33 @@ static ndUnsigned64 randBits0[] =
 // calculate a 32 bit crc of a string
 ndUnsigned64 dCRC64 (const char* const name, ndUnsigned64 crcAcc)
 {
-	if (name) 
-	{
-		//const ndInt32 bitshift = (sizeof (ndUnsigned64)<<3) - 8;
+    if (name) 
+    {
+        //const ndInt32 bitshift = (sizeof (ndUnsigned64)<<3) - 8;
         const ndInt32 bitshift = 8;
-		for (ndInt32 i = 0; name[i]; ++i) 
-		{
-			char c = name[i];
+        for (ndInt32 i = 0; name[i]; ++i) 
+        {
+            char c = name[i];
             ndInt32 index = ndInt32 (((crcAcc >> bitshift) ^ c) & 0xff);
-			ndUnsigned64 val = randBits0[index];
-			crcAcc = (crcAcc << 8) ^ val;
-		}
-	}
-	return crcAcc;
+            ndUnsigned64 val = randBits0[index];
+            crcAcc = (crcAcc << 8) ^ val;
+        }
+    }
+    return crcAcc;
 }
 
 ndUnsigned64 dCRC64 (const void* const buffer, ndInt32 size, ndUnsigned64 crcAcc)
 {
-	const unsigned char* const ptr = (unsigned char*)buffer;
+    const unsigned char* const ptr = (unsigned char*)buffer;
 
     const ndInt32 bitshift = 8;
-	for (ndInt32 i = 0; i < size; ++i) 
-	{
-		unsigned char c = ptr[i];
-		ndUnsigned64  val = randBits0[((crcAcc >> bitshift) ^ c) & 0xff];
-		crcAcc = (crcAcc << 8) ^ val;
-	}
-	return crcAcc;
+    for (ndInt32 i = 0; i < size; ++i) 
+    {
+	    unsigned char c = ptr[i];
+	    ndUnsigned64  val = randBits0[((crcAcc >> bitshift) ^ c) & 0xff];
+	    crcAcc = (crcAcc << 8) ^ val;
+    }
+    return crcAcc;
 }
 
 

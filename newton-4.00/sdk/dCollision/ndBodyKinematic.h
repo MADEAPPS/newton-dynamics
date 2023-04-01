@@ -188,7 +188,6 @@ class ndBodyKinematic : public ndBody
 	
 	ndMatrix m_inertiaPrincipalAxis;
 	ndMatrix m_invWorldInertiaMatrix;
-	
 	ndShapeInstance m_shapeInstance;
 	ndVector m_mass;
 	ndVector m_invMass;

@@ -108,8 +108,6 @@ class ndContact: public ndConstraint
 	ndContact* GetAsContact();
 	virtual ndUnsigned32 GetRowsCount() const;
 
-	
-
 	const ndMaterial* GetMaterial() const;
 	virtual void JacobianDerivative(ndConstraintDescritor& desc);
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
