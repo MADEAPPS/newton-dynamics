@@ -585,10 +585,7 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 	ndJacobian zero;
 	zero.m_linear = ndVector::m_zero;
 	zero.m_angular = ndVector::m_zero;
-	for (ndInt32 index = 0; index < m_auxiliaryRowCount; ++index)
-	{
-		tempArray[index] = zero;
-	}
+	ndMemSet(tempArray, zero, m_auxiliaryRowCount);
 
 	for (ndInt32 index = 0; index < m_auxiliaryRowCount; ++index) 
 	{
@@ -621,40 +618,6 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 			const ndInt32 m0_j = m_pairs[k].m_m0;
 			const ndInt32 m1_j = m_pairs[k].m_m1;
 
-#if 0
-			ndVector acc(ndVector::m_zero);
-			bool hasEffect = false;
-			if (m0_i == m0_j) 
-			{
-				hasEffect = true;
-				acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
-			}
-			else if (m0_i == m1_j) 
-			{
-				hasEffect = true;
-				acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
-			}
-			
-			if (m1_i == m1_j) 
-			{
-				hasEffect = true;
-				acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
-			}
-			else if (m1_i == m0_j) 
-			{
-				hasEffect = true;
-				acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
-			}
-			
-			if (hasEffect) 
-			{
-				acc = acc.AddHorizontal();
-				ndFloat32 offDiagValue = acc.GetScalar();
-				matrixRow11[j] = offDiagValue;
-				m_massMatrix11[j * m_auxiliaryRowCount + index] = offDiagValue;
-			}
-
-#else
 			ndVector acc1(row_j->m_Jt.m_jacobianM0.m_linear * tempArray[m0_j].m_linear);
 			acc1 = acc1.MulAdd(row_j->m_Jt.m_jacobianM0.m_angular, tempArray[m0_j].m_angular);
 			acc1 = acc1.MulAdd(row_j->m_Jt.m_jacobianM1.m_linear, tempArray[m1_j].m_linear);
@@ -664,7 +627,6 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 			ndFloat32 offDiagValue = acc1.GetScalar();
 			matrixRow11[j] = offDiagValue;
 			m_massMatrix11[j * m_auxiliaryRowCount + index] = offDiagValue;
-#endif
 		}
 
 		ndFloat32* const matrixRow10 = &m_massMatrix10[primaryCount * index];
@@ -675,39 +637,6 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 
 			const ndInt32 m0_j = m_pairs[j].m_m0;
 			const ndInt32 m1_j = m_pairs[j].m_m1;
-#if 0
-			ndVector acc(ndVector::m_zero);
-			bool hasEffect = false;
-			if (m0_i == m0_j) 
-			{
-				hasEffect = true;
-				acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
-			}
-			else if (m0_i == m1_j) 
-			{
-				hasEffect = true;
-				acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
-			}
-			
-			if (m1_i == m1_j) 
-			{
-				hasEffect = true;
-				acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
-			}
-			else if (m1_i == m0_j) 
-			{
-				hasEffect = true;
-				acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
-			}
-			
-			if (hasEffect) 
-			{
-				acc = acc.AddHorizontal();
-				ndFloat32 val = acc.GetScalar();
-				matrixRow10[j] = val;
-			}
-
-#else
 			ndVector acc1(row_j->m_Jt.m_jacobianM0.m_linear * tempArray[m0_j].m_linear);
 			acc1 = acc1.MulAdd(row_j->m_Jt.m_jacobianM0.m_angular, tempArray[m0_j].m_angular);
 			acc1 = acc1.MulAdd(row_j->m_Jt.m_jacobianM1.m_linear, tempArray[m1_j].m_linear);
@@ -715,7 +644,6 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 			acc1 = acc1.AddHorizontal();
 			ndFloat32 offDiagValue = acc1.GetScalar();
 			matrixRow10[j] = offDiagValue;
-#endif
 		}
 
 		tempArray[m0_i] = zero;
@@ -983,12 +911,12 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 
 	for (ndInt32 i = 1; i < auxiliaryIndex; ++i) 
 	{
-		ndInt32 j = i;
-		ndInt32 tmpBoundRow = boundRow[j];
-		ndNodePair tmpPair(m_pairs[primaryCount + j]);
-		ndInt32 tmpFrictionIndex = m_frictionIndex[primaryCount + j];
-		ndInt32 tmpMatrixRowsIndex = m_matrixRowsIndex[primaryCount + j];
+		ndInt32 tmpBoundRow = boundRow[i];
+		ndNodePair tmpPair(m_pairs[primaryCount + i]);
+		ndInt32 tmpFrictionIndex = m_frictionIndex[primaryCount + i];
+		ndInt32 tmpMatrixRowsIndex = m_matrixRowsIndex[primaryCount + i];
 
+		ndInt32 j = i;
 		for (; j && (boundRow[j - 1] < tmpBoundRow); j--) 
 		{
 			ndAssert(j > 0);
@@ -1004,8 +932,10 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 	}
 
 	ndFloat32* const diagDamp = ndAlloca(ndFloat32, m_auxiliaryRowCount);
-	memset(m_massMatrix10, 0, primaryCount * m_auxiliaryRowCount * sizeof(ndFloat32));
-	memset(m_massMatrix11, 0, m_auxiliaryRowCount * m_auxiliaryRowCount * sizeof(ndFloat32));
+	//memset(m_massMatrix10, 0, primaryCount * m_auxiliaryRowCount * sizeof(ndFloat32));
+	//memset(m_massMatrix11, 0, m_auxiliaryRowCount * m_auxiliaryRowCount * sizeof(ndFloat32));
+	ndMemSet(m_massMatrix10, ndFloat32(0.0f), primaryCount * m_auxiliaryRowCount);
+	ndMemSet(m_massMatrix11, ndFloat32(0.0f), m_auxiliaryRowCount * m_auxiliaryRowCount);
 
 	CalculateLoopMassMatrixCoefficients(diagDamp);
 	ConditionMassMatrix();
@@ -1020,7 +950,8 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 
 		for (ndInt32 i = 0; i < m_blockSize; ++i) 
 		{
-			memset(acc, 0, boundedSize * sizeof(ndFloat32));
+			//memset(acc, 0, boundedSize * sizeof(ndFloat32));
+			ndMemSet(acc, ndFloat32(0.0f), boundedSize);
 			const ndFloat32* const row = &m_massMatrix11[rowStart];
 			for (ndInt32 j = 0; j < i; ++j)  
 			{
@@ -1043,7 +974,8 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 
 		for (ndInt32 i = m_blockSize - 1; i >= 0; i--) 
 		{
-			memset(acc, 0, boundedSize * sizeof(ndFloat32));
+			//memset(acc, 0, boundedSize * sizeof(ndFloat32));
+			ndMemSet(acc, ndFloat32(0.0f), boundedSize);
 			for (ndInt32 j = i + 1; j < m_blockSize; ++j)  
 			{
 				const ndFloat32 s = m_massMatrix11[j * m_auxiliaryRowCount + i];

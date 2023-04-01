@@ -145,6 +145,16 @@ inline T ndAnglesAdd (T angleInRadiand1, T angleInRadiand0)
 	return T(ndAtan2(s, c));
 }
 
+template <class T>
+inline void ndMemSet(T* const buffer, const T& value, int elements)
+{
+	for (ndInt32 i = 0; i < elements; i++)
+	{
+		buffer[i] = value;
+	}
+}
+
+
 #ifndef _MSC_VER 
 	#define _stricmp(x,y) strcasecmp(x,y)
 #endif
