@@ -87,15 +87,14 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y += floor.m_y + 0.4f;
-
 	ndMatrix shapeMatrix(ndYawMatrix(5.0f * ndDegreeToRad));
 	//ndMatrix shapeMatrix(ndYawMatrix(10.0f * ndDegreeToRad));
 
 	ndShapeInstance shape(new ndShapeSphere(1.0f));
 	shape.SetScale(ndVector(0.3f, 0.25f, 1.0f, 0.0f));
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
+
+	matrix = FindFloor(*world, matrix, shape, 200.0f);
 
 	ndBodyKinematic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
@@ -106,7 +105,8 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat
 	body->SetCollisionShape(shape);
 	// skew the inertia matrix for rattle effect
 	shape.SetLocalMatrix(shapeMatrix);
-	body->SetMassMatrix(mass, shape, true);
+	//body->SetMassMatrix(mass, shape, true);
+	body->SetMassMatrix(mass, shape);
 	body->SetCentreOfMass(ndVector(0.0f, -0.1f, 0.0f, 0.0f));
 
 	ndVector omega(0.01f, speed, 0.0f, 0.0f);
@@ -201,25 +201,25 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, ndGetIdentityMatrix()); 
 
 	// should spins very slowly, with a tilt angle of 30 degrees
-	CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -12.0f, 0.0f), 10.0f, 50.0f, 0.6f, 0.5f, 30.0f);
-	CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -10.0f, 0.0f), 10.0f, 100.0f, 0.6f, 0.5f, 5.0f);
-	CreateFlyWheel(scene, ndVector(15.0f, 0.0f,  -8.0f, 0.0f), 10.0f, -60.0f, 0.6f, 0.5f, 5.0f);
-	
-	DzhanibekovEffect(scene, 10.0f, 5.0f, ndVector(15.0f, 0.0f, -4.0f, 0.0f));
-	DzhanibekovEffect(scene, 10.0f, -5.0f, ndVector(15.0f, 0.0f, 0.0f, 0.0f));
-	DzhanibekovEffect(scene, 10.0f, 10.0f, ndVector(15.0f, 0.0f, 4.0f, 0.0f));
-	
-	Phitop(scene, 10.0f,  25.0f, ndVector(25.0f, 0.0f, -10.0f, 0.0f));
-	Phitop(scene, 10.0f, -25.0f, ndVector(25.0f, 0.0f, 0.0f, 0.0f));
-	Phitop(scene, 10.0f,  35.0f, ndVector(25.0f, 0.0f, 10.0f, 0.0f));
-	
-	PrecessingTop(scene, ndVector(5.0f, 0.0f, -4.0f, 0.0f));
-	PrecessingTop(scene, ndVector(5.0f, 0.0f, 0.0f, 0.0f));
-	PrecessingTop(scene, ndVector(5.0f, 0.0f, 4.0f, 0.0f));
+	//CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -12.0f, 0.0f), 10.0f, 50.0f, 0.6f, 0.5f, 30.0f);
+	//CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -10.0f, 0.0f), 10.0f, 100.0f, 0.6f, 0.5f, 5.0f);
+	//CreateFlyWheel(scene, ndVector(15.0f, 0.0f,  -8.0f, 0.0f), 10.0f, -60.0f, 0.6f, 0.5f, 5.0f);
+	//
+	//DzhanibekovEffect(scene, 10.0f, 5.0f, ndVector(15.0f, 0.0f, -4.0f, 0.0f));
+	//DzhanibekovEffect(scene, 10.0f, -5.0f, ndVector(15.0f, 0.0f, 0.0f, 0.0f));
+	//DzhanibekovEffect(scene, 10.0f, 10.0f, ndVector(15.0f, 0.0f, 4.0f, 0.0f));
+	//
+	//Phitop(scene, 10.0f,  25.0f, ndVector(25.0f, 0.0f, -10.0f, 0.0f));
+	//Phitop(scene, 10.0f, -25.0f, ndVector(25.0f, 0.0f, 0.0f, 0.0f));
+	//Phitop(scene, 10.0f,  35.0f, ndVector(25.0f, 0.0f, 10.0f, 0.0f));
+	//
+	//PrecessingTop(scene, ndVector(5.0f, 0.0f, -4.0f, 0.0f));
+	//PrecessingTop(scene, ndVector(5.0f, 0.0f, 0.0f, 0.0f));
+	//PrecessingTop(scene, ndVector(5.0f, 0.0f, 4.0f, 0.0f));
 
 	RattleBack(scene, 10.0f, -5.0f, ndVector(0.0f, 0.0f, -4.0f, 0.0f));
-	RattleBack(scene, 10.0f, 5.0f, ndVector(0.0f, 0.0f, 0.0f, 0.0f));
-	RattleBack(scene, 10.0f, -5.0f, ndVector(0.0f, 0.0f,  4.0f, 0.0f));
+	//RattleBack(scene, 10.0f, 5.0f, ndVector(0.0f, 0.0f, 0.0f, 0.0f));
+	//RattleBack(scene, 10.0f, -5.0f, ndVector(0.0f, 0.0f,  4.0f, 0.0f));
 	
 	scene->GetCameraManager()->SetPickMode(true);
 

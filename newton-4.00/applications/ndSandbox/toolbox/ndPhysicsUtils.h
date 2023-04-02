@@ -28,6 +28,7 @@ void AddPlanks(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat
 void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, ndInt32 rows_x, ndInt32 rows_z, ndInt32 columHigh);
 
 ndVector FindFloor(const ndWorld& world, const ndVector& origin, ndFloat32 dist);
+ndMatrix FindFloor(const ndWorld& world, const ndMatrix& origin, const ndShapeInstance& shape, ndFloat32 dist);
 ndBodyKinematic* MousePickBody(ndWorld* const nWorld, const ndVector& origin, const ndVector& end, ndFloat32& paramter, ndVector& positionOut, ndVector& normalOut);
 
 class ndParamMapper
