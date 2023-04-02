@@ -1660,17 +1660,26 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 	if (eigen[1] < eigen[2]) 
 	{
 		ndSwap(eigen[1], eigen[2]);
-		ndSwap(covariance[1], covariance[2]);
+		for (ndInt32 i = 0; i < 4; ++i)
+		{
+			ndSwap(covariance[i][1], covariance[i][2]);
+		}
 	}
 	if (eigen[0] < eigen[1]) 
 	{
 		ndSwap(eigen[0], eigen[1]);
-		ndSwap(covariance[0], covariance[1]);
+		for (ndInt32 i = 0; i < 4; ++i)
+		{
+			ndSwap(covariance[i][0], covariance[i][1]);
+		}
 	}
 	if (eigen[1] < eigen[2]) 
 	{
 		ndSwap(eigen[1], eigen[2]);
-		ndSwap(covariance[1], covariance[2]);
+		for (ndInt32 i = 0; i < 4; ++i)
+		{
+			ndSwap(covariance[i][1], covariance[i][2]);
+		}
 	}
 
 	const ndFloat32 eigenValueError = ndFloat32(1.0e-4f);
