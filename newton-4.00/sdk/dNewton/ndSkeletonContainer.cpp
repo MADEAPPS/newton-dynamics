@@ -585,6 +585,7 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 	ndJacobian zero;
 	zero.m_linear = ndVector::m_zero;
 	zero.m_angular = ndVector::m_zero;
+	//memset(tempArray, 0, m_auxiliaryRowCount * sizeof (ndJacobian));
 	ndMemSet(tempArray, zero, m_auxiliaryRowCount);
 
 	for (ndInt32 index = 0; index < m_auxiliaryRowCount; ++index) 

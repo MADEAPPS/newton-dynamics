@@ -299,6 +299,23 @@ void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia)
 		m_invMass.m_z = ndFloat32(1.0f) / Izz1;
 		m_invMass.m_w = ndFloat32(1.0f) / mass;
 	}
+
+//#ifdef _DEBUG
+#if 0
+	dgBodyMasterList& me = *m_world;
+	for (dgBodyMasterList::dNode* refNode = me.GetFirst(); refNode; refNode = refNode->GetNext()) {
+		dgBody* const body0 = refNode->GetInfo().GetBody();
+		dVector invMass(body0->GetInvMass());
+		if (invMass.m_w != 0.0f) {
+			for (; refNode; refNode = refNode->GetNext()) {
+				dgBody* const body1 = refNode->GetInfo().GetBody();
+				dVector invMass1(body1->GetInvMass());
+				dAssert(invMass1.m_w != 0.0f);
+			}
+			break;
+		}
+	}
+#endif
 }
 
 bool ndBodyKinematic::RayCast(ndRayCastNotify& callback, const ndFastRay& ray, ndFloat32 maxT) const
