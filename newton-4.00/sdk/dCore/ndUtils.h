@@ -146,9 +146,18 @@ inline T ndAnglesAdd (T angleInRadiand1, T angleInRadiand0)
 }
 
 template <class T>
-inline void ndMemSet(T* const buffer, const T& value, int elements)
+inline void ndMemSet(T* const buffer, const T& val, ndInt32 elements)
 {
-	for (ndInt32 i = 0; i < elements; i++)
+	T value(val);
+	const ndInt32 n = elements & (-0x04);
+	for (ndInt32 i = 0; i < n; i += 4)
+	{
+		buffer[i + 0] = value;
+		buffer[i + 1] = value;
+		buffer[i + 2] = value;
+		buffer[i + 3] = value;
+	}
+	for (ndInt32 i = n; i < elements; ++i)
 	{
 		buffer[i] = value;
 	}

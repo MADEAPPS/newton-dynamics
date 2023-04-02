@@ -1646,13 +1646,13 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 	{
 		if (ndAbs(covariance[i][i]) < ndFloat32(1.0e-8f)) 
 		{
-			for (ndInt32 j = i + 1; j < 3; ++j) 
+			for (ndInt32 j = 0; j < 3; ++j) 
 			{
 				covariance[i][j] = ndFloat32(0.0f);
 				covariance[j][i] = ndFloat32(0.0f);
 			}
+			covariance[i][i] = ndFloat32(1.0e-8f);
 		}
-		covariance[i][i] = ndMax(covariance[i][i], ndFloat32(1.0e-8f));
 	}
 
 	ndVector eigen(covariance.EigenVectors());
@@ -2436,7 +2436,7 @@ ndInt32 ndContactSolver::ConvexContactsDiscrete()
 			}
 
 			case 3:
-				// could special case triangles but for now, just call prune
+				// could write special case for triangles, but for now, just call prune
 				//break;
 
 			default:
