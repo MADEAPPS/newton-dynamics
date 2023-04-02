@@ -230,12 +230,6 @@ void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndShapeInstance& shape
 	for (ndInt32 i = 0; i < 3; ++i)
 	{
 		inertia[i] = inertia[i].Scale(mass);
-		//inertia[i][i] = (inertia[i][i] + origin[i] * origin[i]) * mass;
-		//for (ndInt32 j = i + 1; j < 3; ++j) {
-		//	ndFloat32 crossIJ = origin[i] * origin[j];
-		//	inertia[i][j] = (inertia[i][j] + crossIJ) * mass;
-		//	inertia[j][i] = (inertia[j][i] + crossIJ) * mass;
-		//}
 	}
 
 	// although the engine fully supports asymmetric inertia, I will ignore cross inertia for now

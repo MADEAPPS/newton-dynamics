@@ -27,6 +27,8 @@
 #include "ndConstraint.h"
 #include "ndBodyListView.h"
 
+//#define D_USE_FULL_INERTIA
+
 class ndScene;
 class ndModel;
 class ndSkeletonContainer;
@@ -122,22 +124,21 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API virtual ndVector CalculateAngularMomentum() const;
 	D_COLLISION_API ndFloat32 TotalEnergy() const;
 
+	D_COLLISION_API virtual void IntegrateVelocity(ndFloat32 timestep);
+	D_COLLISION_API void SetMatrixUpdateScene(const ndMatrix& matrix);
+	D_COLLISION_API virtual ndContact* FindContact(const ndBody* const otherBody) const;
+
 	D_COLLISION_API ndMatrix CalculateInertiaMatrix() const;
 	D_COLLISION_API virtual ndMatrix CalculateInvInertiaMatrix() const;
+	D_COLLISION_API virtual void SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia);
+	D_COLLISION_API void SetMassMatrix(ndFloat32 mass, const ndShapeInstance& shapeInstance, bool fullInertia = false);
 	
-	D_COLLISION_API virtual void IntegrateVelocity(ndFloat32 timestep);
-
 	void UpdateInvInertiaMatrix();
 	void SetMassMatrix(const ndVector& massMatrix);
 	void SetMassMatrix(ndFloat32 Ixx, ndFloat32 Iyy, ndFloat32 Izz, ndFloat32 mass);
-	D_COLLISION_API virtual void SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia);
-	D_COLLISION_API void SetMassMatrix(ndFloat32 mass, const ndShapeInstance& shapeInstance, bool fullInertia = false);
 
 	ndMatrix GetPrincipalAxis() const;
 	void GetMassMatrix(ndFloat32& Ixx, ndFloat32& Iyy, ndFloat32& Izz, ndFloat32& mass);
-
-	D_COLLISION_API void SetMatrixUpdateScene(const ndMatrix& matrix);
-	D_COLLISION_API virtual ndContact* FindContact(const ndBody* const otherBody) const;
 
 	virtual ndBodyKinematic* GetAsBodyKinematic();
 
