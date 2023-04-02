@@ -330,38 +330,39 @@ using namespace ndSimpleRobot;
 void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, ndGetIdentityMatrix());
+	ndBodyKinematic* const floor = BuildFloorBox(scene, ndGetIdentityMatrix());
 	
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	ndDemoEntity* const robotEntity = ndDemoEntity::LoadFbx("robot.fbx", scene);
+	//ndDemoEntity* const robotEntity = ndDemoEntity::LoadFbx("robot.fbx", scene);
+	ndSharedPtr<ndDemoEntity> robotEntity(ndDemoEntity::LoadFbx("robot.fbx", scene));
 	
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-90.0f * ndDegreeToRad));
-	ndIndustrialRobot* const robot = new ndIndustrialRobot(scene, robotEntity, matrix);
+	ndIndustrialRobot* const robot = new ndIndustrialRobot(scene, *robotEntity, matrix);
 	scene->SetSelectedModel(robot);
 
 	ndSharedPtr<ndModel> robotPtr(robot);
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), world->GetSentinelBody()));
+	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), world->GetSentinelBody()));
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), floor));
 	world->AddModel(robotPtr);
 	world->AddJoint (fixJoint);
 	
 	ndRobotUI* const robotUI = new ndRobotUI(scene, robot);
 	ndSharedPtr<ndUIEntity> robotUIPtr(robotUI);
 	scene->Set2DDisplayRenderFunction(robotUIPtr);
+	//delete robotEntity;
 	
-	//matrix.m_posit.m_x += 2.0f;
-	//matrix.m_posit.m_z -= 2.0f;
-	//scene->GetWorld()->AddModel(new ndIndustrialRobot(scene, robotEntity, matrix));
-	//ndMatrix location(matrix);
-	//location = ndRollMatrix(-65 * ndDegreeToRad) * location;
-	//location.m_posit.m_x += 1.5f;
-	//location.m_posit.m_y += 1.5f;
-	//location.m_posit.m_z += 1.5f;
-	//AddBox(scene, location, 5.0f, 0.5f, 3.0f, 4.0f);
-	//location.m_posit.m_z += 1.5f;
-	//AddBox(scene, location, 5.0f, 0.5f, 3.0f, 4.0f);
-	
-	delete robotEntity;
+	ndMatrix location(matrix * ndYawMatrix(90.0f * ndDegreeToRad));
+	location.m_posit.m_x += 1.5f;
+	location.m_posit.m_z += 1.5f;
+	AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f);
+	AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f);
+
+	location = ndYawMatrix(90.0f * ndDegreeToRad) * location;
+	location.m_posit.m_x += 1.0f;
+	location.m_posit.m_z += 0.5f;
+	AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f);
+	AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f);
 	
 	matrix.m_posit.m_x -= 6.0f;
 	matrix.m_posit.m_y += 2.0f;

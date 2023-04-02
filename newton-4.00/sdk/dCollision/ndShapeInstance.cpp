@@ -457,9 +457,9 @@ ndFloat32 ndShapeInstance::CalculateBuoyancyCenterOfPresure(ndVector& com, const
 	return volume;
 }
 
-ndVector ndShapeInstance::GetBoxPadding()
+ndFloat32 ndShapeInstance::GetBoxPadding()
 {
-	return m_padding;
+	return m_padding.m_x;
 }
 
 bool ndShapeInstance::ndDistanceCalculator::ClosestPoint()

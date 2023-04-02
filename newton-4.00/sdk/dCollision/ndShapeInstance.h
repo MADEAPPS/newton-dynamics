@@ -121,7 +121,7 @@ class ndShapeInstance: public ndContainersFreeListAlloc<ndShapeInstance>
 	D_COLLISION_API ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API ndFloat32 CalculateBuoyancyCenterOfPresure(ndVector& com, const ndMatrix& matrix, const ndVector& fluidPlane) const;
 
-	D_COLLISION_API static ndVector GetBoxPadding();
+	D_COLLISION_API static ndFloat32 GetBoxPadding();
 
 	D_COLLISION_API void SavePLY(const char* const fileName) const;
 
