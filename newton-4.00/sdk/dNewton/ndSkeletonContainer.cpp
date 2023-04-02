@@ -580,13 +580,13 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 	D_TRACKTIME();
 	const ndInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
 
-	ndJacobian* const tempArray = ndAlloca(ndJacobian, m_auxiliaryRowCount + 4);
+	ndJacobian* const tempArray = ndAlloca(ndJacobian, m_rowCount + 4);
 
 	ndJacobian zero;
 	zero.m_linear = ndVector::m_zero;
 	zero.m_angular = ndVector::m_zero;
-	//memset(tempArray, 0, m_auxiliaryRowCount * sizeof (ndJacobian));
-	ndMemSet(tempArray, zero, m_auxiliaryRowCount);
+	//memset(tempArray, 0, m_rowCount * sizeof (ndJacobian));
+	ndMemSet(tempArray, zero, m_rowCount);
 
 	for (ndInt32 index = 0; index < m_auxiliaryRowCount; ++index) 
 	{
@@ -608,6 +608,8 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 		const ndInt32 m0_i = m_pairs[primaryCount + index].m_m0;
 		const ndInt32 m1_i = m_pairs[primaryCount + index].m_m1;
 
+		ndAssert(m0_i < m_rowCount);
+		ndAssert(m1_i < m_rowCount);
 		tempArray[m0_i] = row_i->m_JMinv.m_jacobianM0;
 		tempArray[m1_i] = row_i->m_JMinv.m_jacobianM1;
 		for (ndInt32 j = index + 1; j < m_auxiliaryRowCount; ++j)  
