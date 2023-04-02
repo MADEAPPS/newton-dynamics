@@ -187,7 +187,9 @@ class ndBodyKinematic : public ndBody
 	
 	D_COLLISION_API virtual void EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeAccel2);
 	
+#ifdef D_USE_FULL_INERTIA
 	ndMatrix m_inertiaPrincipalAxis;
+#endif
 	ndMatrix m_invWorldInertiaMatrix;
 	ndShapeInstance m_shapeInstance;
 	ndVector m_mass;
@@ -300,7 +302,12 @@ inline void ndBodyKinematic::SetMassMatrix(ndFloat32 Ixx, ndFloat32 Iyy, ndFloat
 
 inline ndMatrix ndBodyKinematic::GetPrincipalAxis() const
 {
+#ifdef D_USE_FULL_INERTIA	
+	ndAssert(0);
 	return m_inertiaPrincipalAxis;
+#else
+	return ndGetIdentityMatrix();
+#endif
 }
 
 inline ndBodyKinematic* ndBodyKinematic::GetAsBodyKinematic() 

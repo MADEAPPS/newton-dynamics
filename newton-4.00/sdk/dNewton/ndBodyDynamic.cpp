@@ -245,8 +245,14 @@ void ndBodyDynamic::AddDampingAcceleration(ndFloat32 timestep)
 	}
 
 	const ndVector omegaDamp(m_cachedDampCoef & ndVector::m_triplexMask);
+#ifdef D_USE_FULL_INERTIA	
+	ndAssert(0);
 	const ndVector omega(m_inertiaPrincipalAxis.UnrotateVector(m_matrix.UnrotateVector(m_omega)) * omegaDamp);
 	m_omega = m_matrix.RotateVector(m_inertiaPrincipalAxis.RotateVector(omega));
+#else
+	const ndVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
+	m_omega = m_matrix.RotateVector(omega);
+#endif
 	m_veloc = m_veloc.Scale(m_cachedDampCoef.m_w);
 }
 
