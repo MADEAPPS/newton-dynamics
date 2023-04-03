@@ -828,6 +828,7 @@ void ndSkeletonContainer::FactorizeMatrix(ndInt32 size, ndInt32 stride, ndFloat3
 	}
 }
 
+static int xxxx;
 void ndSkeletonContainer::InitLoopMassMatrix()
 {
 	CalculateBufferSizeInBytes();
@@ -842,6 +843,8 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 	m_deltaForce = &m_massMatrix10[m_auxiliaryRowCount * primaryCount];
 	
 	ndInt32* const boundRow = ndAlloca(ndInt32, m_auxiliaryRowCount);
+
+xxxx++;
 
 	m_blockSize = 0;
 	ndInt32 primaryIndex = 0;
