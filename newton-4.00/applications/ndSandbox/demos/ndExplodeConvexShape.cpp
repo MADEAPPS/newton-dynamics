@@ -69,19 +69,19 @@ static void makePointCloud(ndExplodeConvexShapeModel::ndDesc& desc)
 	}
 }
 
-static ndVector CalculateLocation(ndExplodeConvexShapeModel* const manager, const ndMatrix& matrix, const ndShapeInstance& shape)
-{
-	ndVector minBox;
-	ndVector maxBox;
-	shape.CalculateAabb(ndGetIdentityMatrix(), minBox, maxBox);
-
-	ndWorld* const world = manager->m_scene->GetWorld();
-	ndVector floor(FindFloor(*world, ndVector(matrix.m_posit.m_x, 100.0f, matrix.m_posit.m_z, ndFloat32(0.0f)), 2.0f * 100.0f));
-
-	ndVector boxPadding(ndShapeInstance::GetBoxPadding());
-	floor.m_y += (maxBox.m_y - minBox.m_y) * 0.5f - boxPadding.m_y;
-	return floor;
-}
+//static ndVector CalculateLocation(ndExplodeConvexShapeModel* const manager, const ndMatrix& matrix, const ndShapeInstance& shape)
+//{
+//	ndVector minBox;
+//	ndVector maxBox;
+//	shape.CalculateAabb(ndGetIdentityMatrix(), minBox, maxBox);
+//
+//	ndWorld* const world = manager->m_scene->GetWorld();
+//	ndVector floor(FindFloor(*world, ndVector(matrix.m_posit.m_x, 100.0f, matrix.m_posit.m_z, ndFloat32(0.0f)), 2.0f * 100.0f));
+//
+//	ndVector boxPadding(ndShapeInstance::GetBoxPadding());
+//	floor.m_y += (maxBox.m_y - minBox.m_y) * 0.5f - boxPadding.m_y;
+//	return floor;
+//}
 
 static void AddBoxEffect(ndExplodeConvexShapeModel* const manager, const ndMatrix& matrix)
 {
@@ -102,8 +102,9 @@ static void AddBoxEffect(ndExplodeConvexShapeModel* const manager, const ndMatri
 	ndExplodeConvexShapeModel::ndEffect effect(manager, desc);
 
 	// get a location in the scene
-	ndMatrix location(matrix);
-	location.m_posit = CalculateLocation(manager, matrix, shape);
+	//ndMatrix location(matrix);
+	//location.m_posit = CalculateLocation(manager, matrix, shape);
+	ndMatrix location(FindFloor(*manager->m_scene->GetWorld(), matrix, shape, 100.0f));
 
 	// place few instance of the same effect in the scene.
 	const ndInt32 count = 5;
@@ -131,8 +132,9 @@ static void AddCapsuleEffect(ndExplodeConvexShapeModel* const manager, const ndM
 	desc.m_innerTexture = "wood_1.tga";
 	desc.m_breakImpactSpeed = 10.0f;
 
-	ndMatrix location(matrix);
-	location.m_posit = CalculateLocation(manager, matrix, shape);
+	//ndMatrix location(matrix);
+	//location.m_posit = CalculateLocation(manager, matrix, shape);
+	ndMatrix location(FindFloor(*manager->m_scene->GetWorld(), matrix, shape, 100.0f));
 
 	makePointCloud(desc);
 	ndExplodeConvexShapeModel::ndEffect effect(manager, desc);
@@ -162,8 +164,9 @@ static void AddCylinderEffect(ndExplodeConvexShapeModel* const manager, const nd
 	desc.m_innerTexture = "wood_4.tga";
 	desc.m_breakImpactSpeed = 10.0f;
 
-	ndMatrix location(matrix);
-	location.m_posit = CalculateLocation(manager, matrix, shape);
+	//ndMatrix location(matrix);
+	//location.m_posit = CalculateLocation(manager, matrix, shape);
+	ndMatrix location(FindFloor(*manager->m_scene->GetWorld(), matrix, shape, 100.0f));
 
 	makePointCloud(desc);
 	ndExplodeConvexShapeModel::ndEffect effect(manager, desc);

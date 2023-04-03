@@ -260,6 +260,7 @@ void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia)
 	ndShape* const shape = m_shapeInstance.GetShape();
 
 #ifdef D_USE_FULL_INERTIA
+	ndAssert(0);
 	m_inertiaPrincipalAxis = ndGetIdentityMatrix();
 	if ((mass < D_MINIMUM_MASS) || shape->GetAsShapeNull() || shape->GetAsShapeStaticMesh())
 	{
@@ -445,6 +446,7 @@ ndMatrix ndBodyKinematic::CalculateInvInertiaMatrix() const
 	const ndVector invIzz(m_invMass[2]);
 
 #ifdef D_USE_FULL_INERTIA
+	ndAssert(0);
 	const ndMatrix matrix(m_inertiaPrincipalAxis * m_matrix);
 	return ndMatrix(
 		matrix.m_front.Scale(matrix.m_front[0]) * invIxx +
@@ -484,6 +486,7 @@ ndMatrix ndBodyKinematic::CalculateInertiaMatrix() const
 	const ndVector Izz(m_mass.m_z);
 
 #ifdef D_USE_FULL_INERTIA
+	ndAssert(0);
 	const ndMatrix matrix(m_inertiaPrincipalAxis * m_matrix);
 	return ndMatrix(
 		matrix.m_front.Scale(matrix.m_front[0]) * Ixx +
@@ -524,6 +527,7 @@ ndVector ndBodyKinematic::CalculateLinearMomentum() const
 ndVector ndBodyKinematic::CalculateAngularMomentum() const
 {
 #ifdef D_USE_FULL_INERTIA
+	ndAssert(0);
 	const ndVector localOmega(m_inertiaPrincipalAxis.UnrotateVector (m_matrix.UnrotateVector(m_omega)));
 	const ndVector localAngularMomentum(m_mass * localOmega);
 	return m_matrix.RotateVector(m_inertiaPrincipalAxis.RotateVector(localAngularMomentum));
@@ -618,6 +622,7 @@ void ndBodyKinematic::IntegrateExternalForce(ndFloat32 timestep)
 		// Iz * az + (Iy - Ix) * dwx * ay + (Iy - Ix) * dwy * ax = Tz - (Iy - Ix) * wx * wy
 		
 #ifdef D_USE_FULL_INERTIA
+		ndAssert(0);
 		const ndMatrix matrix(m_inertiaPrincipalAxis * m_matrix);
 		ndVector localOmega(matrix.UnrotateVector(m_omega));
 		const ndVector localAngularMomentum(m_mass * localOmega);
@@ -657,6 +662,7 @@ void ndBodyKinematic::IntegrateExternalForce(ndFloat32 timestep)
 		localOmega += gradientStep;
 		
 #ifdef D_USE_FULL_INERTIA
+		ndAssert(0);
 		const ndVector alpha(matrix.RotateVector(localTorque * m_invMass));
 		
 		SetAccel(accel);
