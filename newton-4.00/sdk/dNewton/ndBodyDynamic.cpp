@@ -313,6 +313,9 @@ void ndBodyDynamic::IntegrateGyroSubstep(const ndVector& timestep)
 	const ndFloat32 tol = (ndFloat32(0.0125f) * ndDegreeToRad);
 	if (omegaMag2 > (tol * tol))
 	{
+#ifdef D_USE_FULL_INERTIA
+		ndAssert(0);
+#else
 		const ndFloat32 omegaAngle = ndSqrt(omegaMag2);
 		const ndVector omegaAxis(m_omega.Scale(ndFloat32(1.0f) / omegaAngle));
 		const ndQuaternion rotationStep(omegaAxis, omegaAngle * timestep.GetScalar());
@@ -320,9 +323,6 @@ void ndBodyDynamic::IntegrateGyroSubstep(const ndVector& timestep)
 		ndAssert((m_gyroRotation.DotProduct(m_gyroRotation).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-5f));
 		
 		// calculate new Gyro torque and Gyro acceleration
-#ifdef D_USE_FULL_INERTIA
-		ndAssert(0);
-#else
 		const ndMatrix matrix(m_gyroRotation, ndVector::m_wOne);
 #endif
 

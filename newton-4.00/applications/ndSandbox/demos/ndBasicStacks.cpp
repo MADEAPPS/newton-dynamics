@@ -55,7 +55,7 @@ static void BuildSphereColumn(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	baseMatrix.m_posit.m_z = origin.m_z;
 	//ndVector floor(FindFloor(*world, baseMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	//baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_x;
-	baseMatrix = FindFloor(*world, baseMatrix, shape, 100.0f);
+	//baseMatrix = FindFloor(*world, baseMatrix, shape, 100.0f);
 
 	ndSharedPtr<ndDemoMeshIntance> geometry(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "earthmap.tga", "earthmap.tga", "earthmap.tga", 1.0f, ndRollMatrix(ndFloat32(-90.0f) * ndDegreeToRad)));
 
@@ -64,8 +64,9 @@ static void BuildSphereColumn(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	
 	for (ndInt32 i = 0; i < count; ++i)
 	{
+		baseMatrix = FindFloor(*world, baseMatrix, shape, 100.0f);
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
-		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x * 2.0f);
+		//baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x * 2.0f);
 	}
 }
 
@@ -89,7 +90,7 @@ static void BuildBoxColumn(ndDemoEntityManager* const scene, ndFloat32 mass, con
 
 	//ndVector floor(FindFloor(*world, baseMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	//baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y * 0.5f;
-	baseMatrix = FindFloor(*world, baseMatrix, shape, 100.0f);
+	//baseMatrix = FindFloor(*world, baseMatrix, shape, 100.0f);
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
@@ -97,6 +98,7 @@ static void BuildBoxColumn(ndDemoEntityManager* const scene, ndFloat32 mass, con
 	ndMatrix rotation(ndYawMatrix(20.0f * ndDegreeToRad));
 	for (ndInt32 i = 0; i < count; ++i) 
 	{
+		baseMatrix = FindFloor(*world, baseMatrix, shape, 100.0f);
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
 		baseMatrix = rotation * baseMatrix;
@@ -123,7 +125,7 @@ static void BuildCylinderColumn(ndDemoEntityManager* const scene, ndFloat32 mass
 
 	//ndVector floor(FindFloor(*world, baseMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	//baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_z * 0.5f;
-	baseMatrix = FindFloor(*world, baseMatrix, shape, 100.0f);
+	//baseMatrix = FindFloor(*world, baseMatrix, shape, 100.0f);
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
@@ -132,6 +134,7 @@ static void BuildCylinderColumn(ndDemoEntityManager* const scene, ndFloat32 mass
 
 	for (ndInt32 i = 0; i < count; ++i)
 	{
+		baseMatrix = FindFloor(*world, baseMatrix, shape, 100.0f);
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_z);
 		baseMatrix = rotation * baseMatrix;
@@ -151,7 +154,7 @@ static void BuildPyramid(ndDemoEntityManager* const scene,
 
 	//ndVector floor(FindFloor(*world, origin + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	//matrix.m_posit.m_y = floor.m_y;
-	matrix = FindFloor(*world, matrix, shape, 100.0f);
+	//matrix = FindFloor(*world, matrix, shape, 100.0f);
 	
 	ndFloat32 stepz = boxSize.m_z + 1.0e-2f;
 	ndFloat32 stepy = boxSize.m_y + 1.0e-2f;
@@ -166,13 +169,14 @@ static void BuildPyramid(ndDemoEntityManager* const scene,
 	for (ndInt32 j = 0; j < count; ++j) 
 	{
 		matrix.m_posit.m_z = z0;
+		matrix = FindFloor(*world, matrix, shape, 100.0f);
 		for (ndInt32 i = 0; i < (count - j); ++i) 
 		{
 			AddRigidBody(scene, matrix, shape, rootEntity, mass);
 			matrix.m_posit.m_z += stepz;
 		}
 		z0 += stepz * 0.5f;
-		matrix.m_posit.m_y += stepy;
+		//matrix.m_posit.m_y += stepy;
 	}
 }
 
@@ -261,12 +265,12 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 	ndVector origin(ndVector::m_zero);
 
+	ndInt32 pyramidHigh = 2;
 	//ndInt32 pyramidHigh = 10;
 	//ndInt32 pyramidHigh = 20;
-	ndInt32 pyramidHigh = 30;
+	//ndInt32 pyramidHigh = 30;
 	//ndInt32 pyramidHigh = 60;
-	for (ndInt32 i = 0; i < 4; ++i)
-	//for (ndInt32 i = 0; i < 1; ++i)
+	for (ndInt32 i = 0; i < 1; ++i)
 	{
 		BuildPyramidStacks(scene, 1.0f, origin, ndVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
 		origin.m_x += 4.0f;
@@ -275,17 +279,17 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	origin = ndVector::m_zero;
 	origin.m_x -= 2.0f;
 	origin.m_z -= 3.0f;
-	BuildSphereColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+	//BuildSphereColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 
 	origin.m_z += 6.0f;
-	BuildBoxColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+	//BuildBoxColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 	
 	origin.m_z += 6.0f;
-	BuildCylinderColumn(scene, 10.0f, origin, ndVector(0.75f, 0.6f, 1.0f, 0.0f), 20);
+	//BuildCylinderColumn(scene, 10.0f, origin, ndVector(0.75f, 0.6f, 1.0f, 0.0f), 20);
 
 	origin.m_x -= 6.0f;
 	origin.m_z -= 6.0f;
-	BuildCapsuleStack(scene, 10.0f, origin, ndVector(0.25f, 0.25f, 2.0f, 0.0f), 20);
+	//BuildCapsuleStack(scene, 10.0f, origin, ndVector(0.25f, 0.25f, 2.0f, 0.0f), 20);
 
 	origin = ndVector::m_wOne;
 	origin.m_x -= 3.0f;
