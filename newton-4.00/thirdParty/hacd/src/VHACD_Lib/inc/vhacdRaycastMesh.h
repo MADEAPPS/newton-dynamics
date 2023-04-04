@@ -30,7 +30,7 @@ namespace nd_
 
 			virtual void release(void) = 0;
 		protected:
-			virtual ~RaycastMesh(void) { };
+			virtual ~RaycastMesh(void) { }
 		};
 
 	} // end of VHACD namespace

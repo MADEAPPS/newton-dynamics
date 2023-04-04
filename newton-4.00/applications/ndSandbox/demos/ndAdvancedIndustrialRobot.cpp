@@ -345,7 +345,7 @@ namespace ndAdvancedRobot
 
 		ndIndustrialRobot* m_robot;
 	};
-};
+}
 
 using namespace ndAdvancedRobot;
 void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)

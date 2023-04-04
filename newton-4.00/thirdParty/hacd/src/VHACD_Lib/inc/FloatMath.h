@@ -384,8 +384,8 @@ namespace nd_
 		void fm_planeToMatrix(const double plane[4], double matrix[16]); // convert a plane equation to a 4x4 rotation matrix
 		void fm_planeToQuat(const double plane[4], double quat[4], double pos[3]); // convert a plane equation to a quaternion and translation
 
-		inline void fm_doubleToFloat3(const double p[3], float t[3]) { t[0] = (float)p[0]; t[1] = (float)p[1]; t[2] = (float)p[2]; };
-		inline void fm_floatToDouble3(const float p[3], double t[3]) { t[0] = (double)p[0]; t[1] = (double)p[1]; t[2] = (double)p[2]; };
+		inline void fm_doubleToFloat3(const double p[3], float t[3]) { t[0] = (float)p[0]; t[1] = (float)p[1]; t[2] = (float)p[2]; }
+		inline void fm_floatToDouble3(const float p[3], double t[3]) { t[0] = (double)p[0]; t[1] = (double)p[1]; t[2] = (double)p[2]; }
 
 
 		void  fm_eulerMatrix(float ax, float ay, float az, float matrix[16]); // convert euler (in radians) to a dest 4x4 matrix (translation set to zero)
@@ -523,7 +523,7 @@ namespace nd_
 		bool fm_isValidTriangle(const double *p1, const double *p2, const double *p3, double epsilon = 0.00001f);
 
 
-	}; // end of namespace
+	} // end of namespace
 }
 
 #endif

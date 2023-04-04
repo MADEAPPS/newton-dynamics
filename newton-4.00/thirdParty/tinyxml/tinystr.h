@@ -353,7 +353,7 @@ public :
 
 } ;
 
-}; // end nd namespace
+} // end nd namespace
 
 #endif	// TIXML_STRING_INCLUDED
 #endif	// TIXML_USE_STL

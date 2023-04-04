@@ -1016,7 +1016,7 @@ namespace biped2
 
 		ndHumanoidModel* m_biped;
 	};
-};
+}
 
 using namespace biped2;
 

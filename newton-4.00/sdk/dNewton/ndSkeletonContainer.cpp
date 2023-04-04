@@ -626,13 +626,13 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 			const ndInt32 index_m0_j = (index_m0_j_m0_i_mask & 1) | (index_m0_j_m1_i_mask & 2);
 			const ndInt32 index_m1_j = (index_m1_j_m0_i_mask & 1) | (index_m1_j_m1_i_mask & 2);
 
-			ndVector acc1(row_j->m_Jt.m_jacobianM0.m_linear * tempArray[index_m0_j].m_linear);
-			acc1 = acc1.MulAdd(row_j->m_Jt.m_jacobianM0.m_angular, tempArray[index_m0_j].m_angular);
-			acc1 = acc1.MulAdd(row_j->m_Jt.m_jacobianM1.m_linear, tempArray[index_m1_j].m_linear);
-			acc1 = acc1.MulAdd(row_j->m_Jt.m_jacobianM1.m_angular, tempArray[index_m1_j].m_angular);
-			acc1 = acc1.AddHorizontal();
+			ndVector acc(row_j->m_Jt.m_jacobianM0.m_linear * tempArray[index_m0_j].m_linear);
+			acc = acc.MulAdd(row_j->m_Jt.m_jacobianM0.m_angular, tempArray[index_m0_j].m_angular);
+			acc = acc.MulAdd(row_j->m_Jt.m_jacobianM1.m_linear, tempArray[index_m1_j].m_linear);
+			acc = acc.MulAdd(row_j->m_Jt.m_jacobianM1.m_angular, tempArray[index_m1_j].m_angular);
+			acc = acc.AddHorizontal();
 
-			ndFloat32 offDiagValue = acc1.GetScalar();
+			ndFloat32 offDiagValue = acc.GetScalar();
 			matrixRow11[j] = offDiagValue;
 			m_massMatrix11[j * m_auxiliaryRowCount + index] = offDiagValue;
 		}
@@ -654,13 +654,12 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 			const ndInt32 index_m0_j = (index_m0_j_m0_i_mask & 1) | (index_m0_j_m1_i_mask & 2);
 			const ndInt32 index_m1_j = (index_m1_j_m0_i_mask & 1) | (index_m1_j_m1_i_mask & 2);
 
-			ndVector acc1(row_j->m_Jt.m_jacobianM0.m_linear * tempArray[index_m0_j].m_linear);
-			acc1 = acc1.MulAdd(row_j->m_Jt.m_jacobianM0.m_angular, tempArray[index_m0_j].m_angular);
-			acc1 = acc1.MulAdd(row_j->m_Jt.m_jacobianM1.m_linear, tempArray[index_m1_j].m_linear);
-			acc1 = acc1.MulAdd(row_j->m_Jt.m_jacobianM1.m_angular, tempArray[index_m1_j].m_angular);
-			acc1 = acc1.AddHorizontal();
-			ndFloat32 offDiagValue = acc1.GetScalar();
-			matrixRow10[j] = offDiagValue;
+			ndVector acc(row_j->m_Jt.m_jacobianM0.m_linear * tempArray[index_m0_j].m_linear);
+			acc = acc.MulAdd(row_j->m_Jt.m_jacobianM0.m_angular, tempArray[index_m0_j].m_angular);
+			acc = acc.MulAdd(row_j->m_Jt.m_jacobianM1.m_linear, tempArray[index_m1_j].m_linear);
+			acc = acc.MulAdd(row_j->m_Jt.m_jacobianM1.m_angular, tempArray[index_m1_j].m_angular);
+			acc = acc.AddHorizontal();
+			matrixRow10[j] = acc.GetScalar();
 		}
 	}
 }

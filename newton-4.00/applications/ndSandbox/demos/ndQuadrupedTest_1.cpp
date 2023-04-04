@@ -885,7 +885,7 @@ namespace ndQuadruped_1
 
 		ndState m_state;
 	};
-};
+}
 
 using namespace ndQuadruped_1;
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene)

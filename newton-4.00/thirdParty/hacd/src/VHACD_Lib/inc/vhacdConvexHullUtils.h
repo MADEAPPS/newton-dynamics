@@ -370,7 +370,7 @@ namespace nd_
 		};
 
 		template <class dItem, class dKey>
-		class ndDownHeap : public ndHeap<dItem, ndDownHeapCompare<dKey>>
+		class ndDownHeap : public ndHeap<dItem, ndDownHeapCompare<dKey> >
 		{
 			public:
 			ndDownHeap(int maxElements)
@@ -423,7 +423,7 @@ namespace nd_
 		};
 
 		template <class dItem, class dKey>
-		class ndUpHeap : public ndHeap<dItem, ndUpHeapCompare<dKey>>
+		class ndUpHeap : public ndHeap<dItem, ndUpHeapCompare<dKey> >
 		{
 			public:
 			ndUpHeap(int maxElements)

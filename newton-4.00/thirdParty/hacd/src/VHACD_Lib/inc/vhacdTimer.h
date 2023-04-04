@@ -41,8 +41,8 @@ namespace nd_
 				m_start.QuadPart = 0;
 				m_stop.QuadPart = 0;
 				QueryPerformanceFrequency(&m_freq);
-			};
-			~Timer(void) {};
+			}
+			~Timer(void) {}
 			void Tic()
 			{
 				QueryPerformanceCounter(&m_start);

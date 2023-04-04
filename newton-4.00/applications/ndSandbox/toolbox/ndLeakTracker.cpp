@@ -151,4 +151,4 @@ ndSetAllocators::ndSetAllocators()
 	{
 		ndMemory::SetMemoryAllocators(PhysicsAlloc, PhysicsFree);
 	}
-};
+}

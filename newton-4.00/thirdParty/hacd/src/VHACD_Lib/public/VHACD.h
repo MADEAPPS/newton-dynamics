@@ -48,7 +48,7 @@ namespace nd_
 			public:
 			class IUserCallback {
 				public:
-				virtual ~IUserCallback() {};
+				virtual ~IUserCallback() {}
 				virtual void Update(const double overallProgress,
 					const double stageProgress,
 					const double operationProgress,
@@ -59,7 +59,7 @@ namespace nd_
 
 			class IUserLogger {
 				public:
-				virtual ~IUserLogger() {};
+				virtual ~IUserLogger() {}
 				virtual void Log(const char* const msg) = 0;
 			};
 

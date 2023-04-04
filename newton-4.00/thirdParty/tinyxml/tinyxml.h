@@ -1816,7 +1816,7 @@ private:
 	TIXML_STRING lineBreak;
 };
 
-}; // end nd namespace
+} // end nd namespace
 
 #ifdef _MSC_VER
 #pragma warning( pop )

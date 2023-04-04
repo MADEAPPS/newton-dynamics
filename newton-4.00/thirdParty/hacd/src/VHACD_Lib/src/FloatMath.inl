@@ -52,7 +52,7 @@ namespace nd_
 
 		}
 
-		REAL fm_squared(REAL x) { return x*x; };
+		REAL fm_squared(REAL x) { return x*x; }
 
 		void fm_decomposeTransform(const REAL local_transform[16],REAL trans[3],REAL rot[4],REAL scale[3])
 		{
@@ -813,7 +813,7 @@ namespace nd_
 			ret = true;
 
 		  return ret;
-		};
+		}
 
 
 		bool  fm_insideTriangleXZ(const REAL *p,const REAL *p1,const REAL *p2,const REAL *p3)
@@ -1886,13 +1886,13 @@ namespace nd_
 		  }
 
 
-		  int32_t NumVertices(void) const { return mVcount; };
+		  int32_t NumVertices(void) const { return mVcount; }
 
 		  const point<Type>& Vertex(int32_t index)
 		  {
 			if ( index < 0 ) index+=mVcount;
 			return mVertices[index];
-		  };
+		  }
 
 
 		  void set(const point<Type> *pts,int32_t count)
@@ -2415,7 +2415,7 @@ namespace nd_
 		  }
 
 
-		  uint32_t getIndex(void) const { return mIndex; };
+		  uint32_t getIndex(void) const { return mIndex; }
 
 		  void search(Axes axis,const double *pos,double radius,uint32_t &count,uint32_t maxObjects,KdTreeFindNode *found,const KdTreeInterface *iface)
 		  {
@@ -2920,7 +2920,7 @@ namespace nd_
 			return ret;
 		  }
 
-		  uint32_t getVcount(void) const { return mVcount; };
+		  uint32_t getVcount(void) const { return mVcount; }
 
 		  void setUseDouble(bool useDouble)
 		  {
@@ -2936,7 +2936,7 @@ namespace nd_
 		  FloatVector             mVerticesFloat;
 		};
 
-		}; // end of namespace VERTEX_INDEX
+		} // end of namespace VERTEX_INDEX
 
 		class MyVertexIndex : public fm_VertexIndex
 		{
@@ -3477,7 +3477,7 @@ namespace nd_
 		template <class T> class Rect3d
 		{
 		public:
-		  Rect3d(void) { };
+		  Rect3d(void) { }
 
 		  Rect3d(const T *bmin,const T *bmax)
 		  {
@@ -4593,8 +4593,8 @@ namespace nd_
 		class TVec
 		{
 		public:
-			TVec(double _x,double _y,double _z) { x = _x; y = _y; z = _z; };
-			TVec(void) { };
+			TVec(double _x,double _y,double _z) { x = _x; y = _y; z = _z; }
+			TVec(void) { }
 
 		  double x;
 		  double y;
@@ -5273,5 +5273,5 @@ namespace nd_
 
 			return dist;
 		}
-	}; // end of namespace
+	} // end of namespace
 }

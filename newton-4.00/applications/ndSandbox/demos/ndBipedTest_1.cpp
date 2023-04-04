@@ -587,7 +587,7 @@ namespace biped_1
 
 		ndHumanoidModel* m_biped;
 	};
-};
+}
 
 using namespace biped_1;
 void ndBipedTest_1(ndDemoEntityManager* const scene)

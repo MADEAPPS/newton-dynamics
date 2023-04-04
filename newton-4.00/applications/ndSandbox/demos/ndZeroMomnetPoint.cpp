@@ -428,7 +428,7 @@ ndTrace(("%d: invTorque=%f %f\n", xxxx, torque0.m_z, torqueB___.m_z));
 
 		ndZeroMomentModel* m_model;
 	};
-};
+}
 
 using namespace ndZmp;
 void ndZeroMomentPoint(ndDemoEntityManager* const scene)

@@ -63,7 +63,7 @@ namespace ndSoa
 		ndVector m_lowerBoundFrictionCoefficent;
 		ndVector m_upperBoundFrictionCoefficent;
 	};
-};
+}
 
 D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdateSoa: public ndDynamicsUpdate

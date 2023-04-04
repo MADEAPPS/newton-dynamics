@@ -324,7 +324,7 @@ namespace ndSimpleRobot
 
 		ndIndustrialRobot* m_robot;
 	};
-};
+}
 
 using namespace ndSimpleRobot;
 void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)

@@ -287,7 +287,7 @@ namespace ndRagdoll
 
 		ndBodyDynamic* m_rootBody;
 	};
-};
+}
 
 using namespace ndRagdoll;
 void ndRagdollTest (ndDemoEntityManager* const scene)

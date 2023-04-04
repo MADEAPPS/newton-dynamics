@@ -659,7 +659,7 @@ namespace ndQuadruped_3
 
 		ndQuadrupedModel* m_model;
 	};
-};
+}
 
 using namespace ndQuadruped_3;
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
