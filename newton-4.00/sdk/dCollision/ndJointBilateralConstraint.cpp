@@ -169,7 +169,7 @@ void ndJointBilateralConstraint::SetMassSpringDamperAcceleration(ndConstraintDes
 	const ndJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0;
 	const ndJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1;
 
-	const ndFloat32 relPosit = desc.m_penetration[index];
+	const ndFloat32 relPosit = desc.m_penetration____[index];
 	const ndFloat32 relVeloc = (jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 	const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, spring, -relPosit, damper, relVeloc);
 
@@ -288,7 +288,8 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 	const ndFloat32 relAccel = accelError + relCentr + relGyro;
 	desc.m_flags[index] = 0;
 	desc.m_jointAccel[index] = relAccel;
-	desc.m_penetration[index] = relPosit;
+	desc.m_penetration____[index] = relPosit;
+	desc.m_jointSpeed[index] = relVeloc;
 	desc.m_restitution[index] = ndFloat32(0.0f);
 	desc.m_penetrationStiffness[index] = ndFloat32(0.0f);
 	desc.m_forceBounds[index].m_jointForce = jointForce;
@@ -341,7 +342,8 @@ void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& de
 	ndFloat32 alphaError = num / den;
 
 	desc.m_flags[index] = 0;
-	desc.m_penetration[index] = relAngle;
+	desc.m_jointSpeed[index] = relOmega;
+	desc.m_penetration____[index] = relAngle;
 	desc.m_jointAccel[index] = alphaError + relGyro;
 	desc.m_restitution[index] = ndFloat32(0.0f);
 	desc.m_penetrationStiffness[index] = ndFloat32(0.0f);

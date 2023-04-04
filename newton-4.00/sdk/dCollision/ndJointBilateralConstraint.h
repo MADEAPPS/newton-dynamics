@@ -108,6 +108,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndVector GetForceBody1() const;
 	ndVector GetTorqueBody1() const;
 
+	bool IsSkeleton() const;
 	bool IsInWorld() const;
 	bool IsBilateral() const;
 	bool IsCollidable() const;
@@ -115,14 +116,17 @@ class ndJointBilateralConstraint : public ndConstraint
 	bool GetSkeletonFlag() const;
 	void SetSkeletonFlag(bool flag);
 	void CalculateGlobalMatrix(ndMatrix& matrix0, ndMatrix& matrix1) const;
-	ndFloat32 GetMotorZeroAcceleration(ndConstraintDescritor& desc) const;
+
 	void SetHighFriction(ndConstraintDescritor& desc, ndFloat32 friction);
 	void SetLowerFriction(ndConstraintDescritor& desc, ndFloat32 friction);
+	void SetJointErrorPosit(ndConstraintDescritor& desc, ndFloat32 errorPosit);
 	void SetMotorAcceleration(ndConstraintDescritor& desc, ndFloat32 acceleration);
-	ndFloat32 GetDiagonalRegularizer(const ndConstraintDescritor& desc) const;
 	void SetDiagonalRegularizer(ndConstraintDescritor& desc, ndFloat32 regularizer);
 
-	bool IsSkeleton() const;
+	ndFloat32 GetJointErrorPosit(ndConstraintDescritor& desc) const;
+	ndFloat32 GetJointErrorSpeed(ndConstraintDescritor& desc) const;
+	ndFloat32 GetMotorZeroAcceleration(ndConstraintDescritor& desc) const;
+	ndFloat32 GetDiagonalRegularizer(const ndConstraintDescritor& desc) const;
 
 	protected:
 	// inverse dynamics interface
@@ -226,6 +230,14 @@ inline void ndJointBilateralConstraint::SetMotorAcceleration(ndConstraintDescrit
 	desc.m_flags[index] = 0;
 	m_motorAcceleration[index] = acceleration;
 	desc.m_jointAccel[index] = acceleration;
+}
+
+inline void ndJointBilateralConstraint::SetJointErrorPosit(ndConstraintDescritor& desc, ndFloat32 errorPosit)
+{
+	const ndInt32 index = desc.m_rowsCount - 1;
+	ndAssert(index >= 0);
+	ndAssert(index < ndInt32(m_maxDof));
+	desc.m_penetration____[index] = errorPosit;
 }
 
 inline void ndJointBilateralConstraint::SetLowerFriction(ndConstraintDescritor& desc, ndFloat32 friction)
@@ -336,6 +348,22 @@ inline void ndJointBilateralConstraint::SetDiagonalRegularizer(ndConstraintDescr
 	ndAssert(index >= 0);
 	ndAssert(index < ndInt32(m_maxDof));
 	desc.m_diagonalRegularizer[index] = ndClamp(regularizer, ndFloat32(0.0f), ndFloat32(1.0f));
+}
+
+inline ndFloat32 ndJointBilateralConstraint::GetJointErrorPosit(ndConstraintDescritor& desc) const
+{
+	const ndInt32 index = desc.m_rowsCount - 1;
+	ndAssert(index >= 0);
+	ndAssert(index < ndInt32(m_maxDof));
+	return desc.m_penetration____[index];
+}
+
+inline ndFloat32 ndJointBilateralConstraint::GetJointErrorSpeed(ndConstraintDescritor& desc) const
+{
+	const ndInt32 index = desc.m_rowsCount - 1;
+	ndAssert(index >= 0);
+	ndAssert(index < ndInt32(m_maxDof));
+	return desc.m_jointSpeed[index];
 }
 
 inline bool ndJointBilateralConstraint::IsInWorld() const

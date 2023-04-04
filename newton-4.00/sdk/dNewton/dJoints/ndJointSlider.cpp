@@ -155,6 +155,9 @@ void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatr
 	// add spring damper row
 	const ndVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_positOffset));
 	AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
+
+	ndFloat32 posit = GetJointErrorPosit(desc);
+	ndTrace(("xxxxxxxxxx %f\n", posit));
 	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 }
 
@@ -198,7 +201,6 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 
 	if (m_springDamperRegularizer && ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f))))
 	{
-		// spring damper with limits
 		SubmitSpringDamper(desc, matrix0, matrix1);
 	}
 
