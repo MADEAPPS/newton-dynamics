@@ -125,6 +125,7 @@ class ndJointBilateralConstraint : public ndConstraint
 
 	ndFloat32 GetJointErrorPosit(ndConstraintDescritor& desc) const;
 	ndFloat32 GetJointErrorSpeed(ndConstraintDescritor& desc) const;
+	ndFloat32 GetMotorAcceleration(ndConstraintDescritor& desc) const;
 	ndFloat32 GetMotorZeroAcceleration(ndConstraintDescritor& desc) const;
 	ndFloat32 GetDiagonalRegularizer(const ndConstraintDescritor& desc) const;
 
@@ -230,6 +231,14 @@ inline void ndJointBilateralConstraint::SetMotorAcceleration(ndConstraintDescrit
 	desc.m_flags[index] = 0;
 	m_motorAcceleration[index] = acceleration;
 	desc.m_jointAccel[index] = acceleration;
+}
+
+inline ndFloat32 ndJointBilateralConstraint::GetMotorAcceleration(ndConstraintDescritor& desc) const
+{
+	const ndInt32 index = desc.m_rowsCount - 1;
+	ndAssert(index >= 0);
+	ndAssert(index < ndInt32(m_maxDof));
+	return desc.m_jointAccel[index];
 }
 
 inline void ndJointBilateralConstraint::SetJointErrorPosit(ndConstraintDescritor& desc, ndFloat32 errorPosit)

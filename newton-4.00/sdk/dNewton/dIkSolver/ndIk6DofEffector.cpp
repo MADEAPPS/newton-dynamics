@@ -211,6 +211,10 @@ void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix&
 			const ndVector pin = axisDir[i];
 			AddLinearRowJacobian(desc, posit0, posit1, pin);
 			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper*2.0f);
+
+			ndFloat32 posit = GetJointErrorPosit(desc);
+			ndTrace(("xxxxxxxxxx %f %f\n", posit, GetMotorAcceleration(desc)));
+
 			SetLowerFriction(desc, -m_linearMaxForce);
 			SetHighFriction(desc, m_linearMaxForce);
 		}
