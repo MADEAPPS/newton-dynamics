@@ -169,7 +169,7 @@ namespace ndAdvancedRobot
 			
 							ndFloat32 relaxation = 0.003f;
 							m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
-							m_effector->SetLinearSpringDamper(relaxation, 1500.0f, 100.0f);
+							m_effector->SetLinearSpringDamper(relaxation, 1500.0f, 200.0f);
 							m_effector->SetAngularSpringDamper(relaxation, 1500.0f, 100.0f);
 							m_effector->SetMaxForce(10000.0f);
 							m_effector->SetMaxTorque(10000.0f);
@@ -381,16 +381,17 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	ndMatrix location(matrix * ndYawMatrix(0.0f * ndDegreeToRad));
 	location.m_posit.m_x += 1.5f;
 	location.m_posit.m_z += 1.5f;
-	AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f);
-	location = ndYawMatrix(60.0f * ndDegreeToRad) * location;
-	AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f);
-	
-	location = ndYawMatrix(60.0f * ndDegreeToRad) * location;
-	location.m_posit.m_x += 1.0f;
-	location.m_posit.m_z += 0.5f;
-	AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f);
-	location = ndYawMatrix(45.0f * ndDegreeToRad) * location;
-	AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f);
+AddBox(scene, location, 2.0f, 2.0f, 0.5f, 2.0f);
+	//AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f);
+	//location = ndYawMatrix(60.0f * ndDegreeToRad) * location;
+	//AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f);
+	//
+	//location = ndYawMatrix(60.0f * ndDegreeToRad) * location;
+	//location.m_posit.m_x += 1.0f;
+	//location.m_posit.m_z += 0.5f;
+	//AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f);
+	//location = ndYawMatrix(45.0f * ndDegreeToRad) * location;
+	//AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f);
 	
 	matrix.m_posit.m_x -= 6.0f;
 	matrix.m_posit.m_y += 2.0f;

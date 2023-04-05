@@ -94,6 +94,8 @@ class ndPolygonMeshDesc: public ndFastAabb
 	D_COLLISION_API ndFloat32 GetFaceSize(const ndInt32* const faceIndexArray, ndInt32 indexCount) const;
 	D_COLLISION_API const ndInt32* GetAdjacentFaceEdgeNormalArray(const ndInt32* const faceIndexArray, ndInt32 indexCount) const;
 
+	void Init();
+
 	ndVector m_boxDistanceTravelInMeshSpace;
 	ndInt32 m_vertexStrideInBytes;
 	ndFloat32 m_skinMargin;
@@ -108,6 +110,16 @@ class ndPolygonMeshDesc: public ndFastAabb
 	ndInt32 m_threadId;
 	bool m_doContinueCollisionTest;
 } D_GCC_NEWTON_ALIGN_32;
+
+
+class ndPolygonMeshLocalDesc : public ndPolygonMeshDesc
+{
+	public:
+	D_COLLISION_API ndPolygonMeshLocalDesc(ndContactSolver& proxy, bool ccdMode);
+
+	ndPolygonMeshDesc::ndStaticMeshFaceQuery m_localStaticMeshQuery;
+	ndPolygonMeshDesc::ndProceduralStaticMeshFaceQuery m_localProceduralStaticMeshQuery;
+};
 
 #endif 
 

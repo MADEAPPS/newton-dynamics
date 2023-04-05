@@ -185,6 +185,7 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 	friend class ndPolygonMeshDesc;
 	friend class ndConvexCastNotify;
 	friend class ndShapeConvexPolygon;
+	friend class ndPolygonMeshLocalDesc;
 	friend class ndBodyPlayerCapsuleContactSolver;
 } D_GCC_NEWTON_ALIGN_32;
 

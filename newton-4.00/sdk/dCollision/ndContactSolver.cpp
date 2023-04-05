@@ -3940,16 +3940,14 @@ return 0;
 
 ndInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 {
-ndAssert(0);
-return 0;
-#if 0
 	ndAssert(m_instance0.GetConvexVertexCount());
 	ndAssert(!m_instance0.GetShape()->GetAsShapeNull());
 	ndAssert(m_instance0.GetShape()->GetAsShapeConvex());
 	ndAssert(m_instance1.GetShape()->GetAsShapeStaticMesh());
 
 	ndInt32 count = 0;
-	ndPolygonMeshDesc data(*this, true);
+	//ndPolygonMeshDesc data(*this, true);
+	ndPolygonMeshLocalDesc data(*this, true);
 
 	ndVector relVeloc(m_contact->m_body0->GetVelocity() - m_contact->m_body1->GetVelocity());
 	ndFloat32 baseLinearSpeed = ndSqrt(relVeloc.DotProduct(relVeloc).GetScalar());
@@ -3969,7 +3967,8 @@ return 0;
 	ndShapeStaticMesh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticMesh();
 	polysoup->GetCollidingFaces(&data);
 
-	if (data.m_faceCount)
+	//if (data.m_faceCount)
+	if (data.m_staticMeshQuery->m_faceIndexCount.GetCount())
 	{
 		m_separationDistance = ndSqrt(relVeloc.DotProduct(relVeloc).GetScalar()) * m_timestep;
 		count = CalculatePolySoupToHullContactsContinue(data);
@@ -3993,7 +3992,6 @@ return 0;
 	}
 
 	return count;
-#endif
 }
 
 void ndContactSolver::CalculateContacts(

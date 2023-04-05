@@ -20,10 +20,12 @@ ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& pinAndPivotChild, const ndMat
 	,m_angularDamper(ndFloat32(50.0f))
 	,m_angularMaxTorque(D_LCP_MAX_VALUE)
 	,m_angularRegularizer(ndFloat32(5.0e-3f))
+	,m_angularMaxSpringRamp(ndFloat32(1.0e10f))
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearMaxForce(D_LCP_MAX_VALUE)
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
+	,m_linearMaxSpringRamp(ndFloat32(1.0e10f))
 	,m_rotationType(m_disabled)
 	,m_controlDofOptions(0xff)
 {
@@ -210,13 +212,16 @@ void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix&
 		{
 			const ndVector pin = axisDir[i];
 			AddLinearRowJacobian(desc, posit0, posit1, pin);
-			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper*2.0f);
 
-			ndFloat32 posit = GetJointErrorPosit(desc);
-			ndTrace(("xxxxxxxxxx %f %f\n", posit, GetMotorAcceleration(desc)));
+			//m_linearMaxSpringRamp = 0.1f;
+			//ndFloat32 springError = ndClamp (GetJointErrorPosit(desc), -m_linearMaxSpringRamp, m_linearMaxSpringRamp);
+			//SetJointErrorPosit(desc, springError);
+			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+			
+			//ndTrace(("xxxxxxxxxx %f %f\n", springError, GetMotorAcceleration(desc)));
 
-			SetLowerFriction(desc, -m_linearMaxForce);
-			SetHighFriction(desc, m_linearMaxForce);
+			SetLowerFriction(desc, -m_linearMaxForce * 0.1f);
+			SetHighFriction(desc, m_linearMaxForce * 0.1f);
 		}
 	}
 #else
