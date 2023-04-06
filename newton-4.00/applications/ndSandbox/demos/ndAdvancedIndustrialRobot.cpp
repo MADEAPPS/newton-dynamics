@@ -378,10 +378,14 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	//world->AddModel(robotUIPtr1);
 	//delete robotEntity;
 	
-	ndMatrix location(matrix * ndYawMatrix(0.0f * ndDegreeToRad));
-	location.m_posit.m_x += 1.5f;
-	location.m_posit.m_z += 1.5f;
-AddBox(scene, location, 2.0f, 2.0f, 0.5f, 2.0f);
+	ndMatrix location(matrix * ndYawMatrix(45.0f * ndDegreeToRad));
+	location.m_posit.m_z += 1.75f;
+	location.m_posit.m_x += 1.75f;
+	AddBox(scene, location, 2.0f, 2.0f, 0.5f, 2.0f);
+
+	//ndMatrix location(matrix * ndYawMatrix(0.0f * ndDegreeToRad));
+	//location.m_posit.m_x += 1.5f;
+	//location.m_posit.m_z += 1.5f;
 	//AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f);
 	//location = ndYawMatrix(60.0f * ndDegreeToRad) * location;
 	//AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f);
