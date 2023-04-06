@@ -248,7 +248,6 @@ void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndShapeInstance& shape
 		inertia[2][2] = eigenValues[2];
 	}
 #else
-	ndAssert(0);
 	fullInertia = false;
 	ndMatrix matrix(inertia);
 	ndVector eigenValues(matrix.EigenVectors());
@@ -495,7 +494,6 @@ ndMatrix ndBodyKinematic::CalculateInertiaMatrix() const
 	const ndVector Izz(m_mass.m_z);
 
 #ifdef D_USE_FULL_INERTIA
-	ndAssert(0);
 	const ndMatrix matrix(m_inertiaPrincipalAxis * m_matrix);
 	return ndMatrix(
 		matrix.m_front.Scale(matrix.m_front[0]) * Ixx +
@@ -630,24 +628,17 @@ void ndBodyKinematic::IntegrateExternalForce(ndFloat32 timestep)
 		// Iz * az + (Iy - Ix) * dwx * ay + (Iy - Ix) * dwy * ax = Tz - (Iy - Ix) * wx * wy
 		
 #ifdef D_USE_FULL_INERTIA
-		ndAssert(0);
 		const ndMatrix matrix(m_inertiaPrincipalAxis * m_matrix);
+#else
+		const ndMatrix& matrix = m_matrix;
+#endif
+
 		ndVector localOmega(matrix.UnrotateVector(m_omega));
 		const ndVector localAngularMomentum(m_mass * localOmega);
 		const ndVector angularMomentum(matrix.RotateVector(localAngularMomentum));
 		const ndVector gyroTorque(m_omega.CrossProduct(angularMomentum));
 		const ndVector localTorque(matrix.UnrotateVector(torque - gyroTorque));
-#else
-		ndVector localOmega(m_matrix.UnrotateVector(m_omega));
-		const ndVector localAngularMomentum(m_mass * localOmega);
-		const ndVector angularMomentum(m_matrix.RotateVector(localAngularMomentum));
-		const ndVector gyroTorque(m_omega.CrossProduct(angularMomentum));
-		const ndVector localTorque(m_matrix.UnrotateVector(torque - gyroTorque));
-#endif
-		
 		// and solving for alpha we get the angular acceleration at t + dt
-		// calculate gradient at a full time step
-		//const ndVector gradient(localTorque.Scale(timestep));
 		
 		// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
 		const ndVector dw(localOmega.Scale(ndFloat32(0.5f) * timestep));
@@ -669,23 +660,12 @@ void ndBodyKinematic::IntegrateExternalForce(ndFloat32 timestep)
 		const ndVector gradientStep (jacobianMatrix.SolveByGaussianElimination(localTorque.Scale(timestep)));
 		localOmega += gradientStep;
 		
-#ifdef D_USE_FULL_INERTIA
-		ndAssert(0);
 		const ndVector alpha(matrix.RotateVector(localTorque * m_invMass));
 		
 		SetAccel(accel);
 		SetAlpha(alpha);
 		m_veloc += accel.Scale(timestep);
 		m_omega = matrix.RotateVector(localOmega);
-
-#else
-		const ndVector alpha(m_matrix.RotateVector(localTorque * m_invMass));
-		
-		SetAccel(accel);
-		SetAlpha(alpha);
-		m_veloc += accel.Scale(timestep);
-		m_omega = m_matrix.RotateVector(localOmega);
-#endif
 	}
 	else
 	{
