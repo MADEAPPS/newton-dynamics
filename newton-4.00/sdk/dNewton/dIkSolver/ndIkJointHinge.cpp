@@ -32,7 +32,7 @@ ndIkJointHinge::~ndIkJointHinge()
 {
 }
 
-ndFloat32 ndIkJointHinge::GetMaxTorque(ndFloat32 maxTrque) const
+ndFloat32 ndIkJointHinge::GetMaxTorque() const
 {
 	return m_maxTorque;
 }

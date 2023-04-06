@@ -303,7 +303,6 @@ inline void ndBodyKinematic::SetMassMatrix(ndFloat32 Ixx, ndFloat32 Iyy, ndFloat
 inline ndMatrix ndBodyKinematic::GetPrincipalAxis() const
 {
 #ifdef D_USE_FULL_INERTIA	
-	ndAssert(0);
 	return m_inertiaPrincipalAxis;
 #else
 	return ndGetIdentityMatrix();

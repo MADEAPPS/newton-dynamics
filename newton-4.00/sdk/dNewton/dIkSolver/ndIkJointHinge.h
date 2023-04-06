@@ -29,8 +29,8 @@ class ndIkJointHinge: public ndJointHinge, public ndJointBilateralConstraint::nd
 	// inverse dynamics interface
 	D_ADD_IK_INTERFACE()
 
+	D_NEWTON_API ndFloat32 GetMaxTorque() const;
 	D_NEWTON_API void SetMaxTorque(ndFloat32 maxTorque);
-	D_NEWTON_API ndFloat32 GetMaxTorque(ndFloat32 maxTorque) const;
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);

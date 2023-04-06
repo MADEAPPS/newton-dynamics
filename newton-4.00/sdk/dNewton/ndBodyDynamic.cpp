@@ -246,8 +246,7 @@ void ndBodyDynamic::AddDampingAcceleration(ndFloat32 timestep)
 
 	const ndVector omegaDamp(m_cachedDampCoef & ndVector::m_triplexMask);
 #ifdef D_USE_FULL_INERTIA	
-	ndAssert(0);
-	const ndVector omega(m_inertiaPrincipalAxis.UnrotateVector(m_matrix.UnrotateVector(m_omega)) * omegaDamp);
+	const ndVector omega(omegaDamp * m_inertiaPrincipalAxis.UnrotateVector(m_matrix.UnrotateVector(m_omega)));
 	m_omega = m_matrix.RotateVector(m_inertiaPrincipalAxis.RotateVector(omega));
 #else
 	const ndVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
@@ -265,13 +264,15 @@ void ndBodyDynamic::IntegrateVelocity(ndFloat32 timestep)
 ndJacobian ndBodyDynamic::IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const
 {
 	ndJacobian velocStep;
-#ifdef D_USE_FULL_INERTIA
-	ndAssert(0);
-#else
+
 	const ndMatrix matrix(m_gyroRotation, ndVector::m_wOne);
-#endif
+#ifdef D_USE_FULL_INERTIA
+	const ndVector localOmega(m_inertiaPrincipalAxis.UnrotateVector(matrix.UnrotateVector(m_omega)));
+	const ndVector localTorque(m_inertiaPrincipalAxis.UnrotateVector(matrix.UnrotateVector(torque)));
+#else
 	const ndVector localOmega(matrix.UnrotateVector(m_omega));
 	const ndVector localTorque(matrix.UnrotateVector(torque));
+#endif
 	
 	// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
 	const ndVector dw(localOmega * timestep);
@@ -285,7 +286,11 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const ndVector& force, const nd
 	// calculate gradient at a full time step
 	const ndVector gradientStep(jacobianMatrix.SolveByGaussianElimination(localTorque * timestep));
 
+#ifdef D_USE_FULL_INERTIA
+	velocStep.m_angular = matrix.RotateVector(m_inertiaPrincipalAxis.RotateVector(gradientStep));
+#else
 	velocStep.m_angular = matrix.RotateVector(gradientStep);
+#endif
 	velocStep.m_linear = force.Scale(m_invMass.m_w) * timestep;
 
 #ifdef _DEBUG
@@ -313,23 +318,26 @@ void ndBodyDynamic::IntegrateGyroSubstep(const ndVector& timestep)
 	const ndFloat32 tol = (ndFloat32(0.0125f) * ndDegreeToRad);
 	if (omegaMag2 > (tol * tol))
 	{
-#ifdef D_USE_FULL_INERTIA
-		ndAssert(0);
-#else
 		const ndFloat32 omegaAngle = ndSqrt(omegaMag2);
 		const ndVector omegaAxis(m_omega.Scale(ndFloat32(1.0f) / omegaAngle));
 		const ndQuaternion rotationStep(omegaAxis, omegaAngle * timestep.GetScalar());
 		m_gyroRotation = m_gyroRotation * rotationStep;
 		ndAssert((m_gyroRotation.DotProduct(m_gyroRotation).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-5f));
-		
+
 		// calculate new Gyro torque and Gyro acceleration
 		const ndMatrix matrix(m_gyroRotation, ndVector::m_wOne);
-#endif
 
+#ifdef D_USE_FULL_INERTIA
+		const ndVector localOmega(m_inertiaPrincipalAxis.UnrotateVector(matrix.UnrotateVector(m_omega)));
+		const ndVector localGyroTorque(localOmega.CrossProduct(m_mass * localOmega));
+		m_gyroTorque = matrix.RotateVector(m_inertiaPrincipalAxis.RotateVector(localGyroTorque));
+		m_gyroAlpha = matrix.RotateVector(m_inertiaPrincipalAxis.RotateVector(localGyroTorque * m_invMass));
+#else
 		const ndVector localOmega(matrix.UnrotateVector(m_omega));
 		const ndVector localGyroTorque(localOmega.CrossProduct(m_mass * localOmega));
 		m_gyroTorque = matrix.RotateVector(localGyroTorque);
 		m_gyroAlpha = matrix.RotateVector(localGyroTorque * m_invMass);
+#endif
 	}
 	else
 	{

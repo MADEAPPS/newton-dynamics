@@ -238,7 +238,6 @@ void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndShapeInstance& shape
 	SetCentreOfMass(origin);
 
 #ifdef D_USE_FULL_INERTIA
-	ndAssert(0);
 	if (!fullInertia)
 	{
 		ndMatrix matrix (inertia);
@@ -249,7 +248,15 @@ void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndShapeInstance& shape
 		inertia[2][2] = eigenValues[2];
 	}
 #else
+	ndAssert(0);
 	fullInertia = false;
+	ndMatrix matrix(inertia);
+	ndVector eigenValues(matrix.EigenVectors());
+	inertia = ndGetIdentityMatrix();
+	inertia[0][0] = eigenValues[0];
+	inertia[1][1] = eigenValues[1];
+	inertia[2][2] = eigenValues[2];
+
 #endif
 	SetMassMatrix(mass, inertia);
 }
@@ -260,7 +267,6 @@ void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia)
 	ndShape* const shape = m_shapeInstance.GetShape();
 
 #ifdef D_USE_FULL_INERTIA
-	ndAssert(0);
 	m_inertiaPrincipalAxis = ndGetIdentityMatrix();
 	if ((mass < D_MINIMUM_MASS) || shape->GetAsShapeNull() || shape->GetAsShapeStaticMesh())
 	{
@@ -277,8 +283,12 @@ void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia)
 	}
 	else
 	{
-		m_inertiaPrincipalAxis = inertia;
-		ndVector eigenValues(m_inertiaPrincipalAxis.EigenVectors());
+		ndVector eigenValues(inertia[0][0], inertia[1][1], inertia[2][2], ndFloat32(0.0f));
+		if (!((inertia[0][1] == ndFloat32(0.0f)) && (inertia[0][2] == ndFloat32(0.0f)) && (inertia[1][2] == ndFloat32(0.0f))))
+		{
+			m_inertiaPrincipalAxis = inertia;
+			eigenValues = m_inertiaPrincipalAxis.EigenVectors();
+		}
 
 		ndFloat32 Ixx = ndAbs(eigenValues[0]);
 		ndFloat32 Iyy = ndAbs(eigenValues[1]);
@@ -446,7 +456,6 @@ ndMatrix ndBodyKinematic::CalculateInvInertiaMatrix() const
 	const ndVector invIzz(m_invMass[2]);
 
 #ifdef D_USE_FULL_INERTIA
-	ndAssert(0);
 	const ndMatrix matrix(m_inertiaPrincipalAxis * m_matrix);
 	return ndMatrix(
 		matrix.m_front.Scale(matrix.m_front[0]) * invIxx +
@@ -527,7 +536,6 @@ ndVector ndBodyKinematic::CalculateLinearMomentum() const
 ndVector ndBodyKinematic::CalculateAngularMomentum() const
 {
 #ifdef D_USE_FULL_INERTIA
-	ndAssert(0);
 	const ndVector localOmega(m_inertiaPrincipalAxis.UnrotateVector (m_matrix.UnrotateVector(m_omega)));
 	const ndVector localAngularMomentum(m_mass * localOmega);
 	return m_matrix.RotateVector(m_inertiaPrincipalAxis.RotateVector(localAngularMomentum));
