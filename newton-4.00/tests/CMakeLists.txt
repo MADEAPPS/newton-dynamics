@@ -52,11 +52,20 @@ add_executable(
   bodyNotifyCallback_test.cpp
 )
 
-target_link_libraries(
-  ${PROJECT_NAME}
-  GTest::gtest_main
-)
-target_link_libraries (${PROJECT_NAME} ndNewton ndSolverAvx2)
+target_link_libraries(${PROJECT_NAME} GTest::gtest_main)
+target_link_libraries(${PROJECT_NAME} ndNewton ndSolverAvx2)
+
+if(NEWTON_ENABLE_AVX2_SOLVER)
+	target_link_libraries (${PROJECT_NAME} ndSolverAvx2)
+endif()
+
+if (NEWTON_ENABLE_CUDA_SOLVER)
+	target_link_libraries (${PROJECT_NAME} ndSolverCuda)
+endif()
+
+if (NEWTON_ENABLE_SYCL_SOLVER)
+	target_link_libraries (${PROJECT_NAME} ndSolverSycl)
+endif()
 
 if (MSVC)
 	target_compile_options(${PROJECT_NAME} PRIVATE "/W4")
