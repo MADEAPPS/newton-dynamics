@@ -40,13 +40,14 @@ namespace ndAdvancedRobot
 		ndFloat32 m_mass;
 		ndFloat32 m_minLimit;
 		ndFloat32 m_maxLimit;
+		ndFloat32 m_maxStrength;
 	};
 
 	static ndDefinition jointsDefinition[] =
 	{
 		{ "base", ndDefinition::m_root, 100.0f, 0.0f, 0.0f},
-		{ "base_rotator", ndDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f},
-		{ "arm_0", ndDefinition::m_hinge , 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad},
+		{ "base_rotator", ndDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f, 5.0e4f},
+		{ "arm_0", ndDefinition::m_hinge , 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad, 5.0e4f},
 		{ "arm_1", ndDefinition::m_hinge , 5.0f, -30.0f * ndDegreeToRad, 110.0f * ndDegreeToRad},
 		{ "arm_2", ndDefinition::m_hinge , 5.0f, -1.0e10f, 1.0e10f},
 		{ "arm_3", ndDefinition::m_hinge , 3.0f, -1.0e10f, 1.0e10f},
@@ -131,6 +132,11 @@ namespace ndAdvancedRobot
 							if ((definition.m_minLimit > -1000.0f) && (definition.m_maxLimit < 1000.0f))
 							{
 								hinge->SetLimitState(true);
+							}
+
+							if (definition.m_maxStrength != 0.0f)
+							{
+								hinge->SetMaxTorque(definition.m_maxStrength);
 							}
 							m_jointArray.PushBack(hinge);
 
@@ -386,7 +392,7 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	ndMatrix location(matrix * ndYawMatrix(45.0f * ndDegreeToRad));
 	location.m_posit.m_z += 1.75f;
 	location.m_posit.m_x += 1.75f;
-	AddBox(scene, location, 2.0f, 2.0f, 0.5f, 2.0f);
+	AddBox(scene, location, 10.0f, 2.0f, 0.5f, 2.0f);
 
 	//ndMatrix location(matrix * ndYawMatrix(0.0f * ndDegreeToRad));
 	//location.m_posit.m_x += 1.5f;

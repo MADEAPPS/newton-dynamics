@@ -15,6 +15,9 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointHinge.h"
 
+// setting to a value larger that D_IK_HINGE_MAX_TORQUE, disable torque limit
+#define D_IK_HINGE_MAX_TORQUE ndFloat32 (1.0e10f)
+
 class ndIkJointHinge: public ndJointHinge, public ndJointBilateralConstraint::ndIkInterface
 {
 	public:
@@ -26,8 +29,13 @@ class ndIkJointHinge: public ndJointHinge, public ndJointBilateralConstraint::nd
 	// inverse dynamics interface
 	D_ADD_IK_INTERFACE()
 
+	D_NEWTON_API void SetMaxTorque(ndFloat32 maxTorque);
+	D_NEWTON_API ndFloat32 GetMaxTorque(ndFloat32 maxTorque) const;
+
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+
+	ndFloat32 m_maxTorque;
 };
 
 #endif 

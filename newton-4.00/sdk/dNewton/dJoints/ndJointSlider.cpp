@@ -17,7 +17,7 @@
 #define D_MAX_SLIDER_PENETRATION	ndFloat32 (0.05f)
 
 ndJointSlider::ndJointSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
+	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	,m_posit(ndFloat32 (0.0f))
 	,m_speed(ndFloat32(0.0f))
 	,m_springK(ndFloat32(0.0f))

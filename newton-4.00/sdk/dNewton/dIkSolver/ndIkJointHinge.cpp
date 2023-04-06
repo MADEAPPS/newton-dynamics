@@ -13,20 +13,33 @@
 #include "ndNewtonStdafx.h"
 #include "ndIkJointHinge.h"
 
+
 ndIkJointHinge::ndIkJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointHinge(pinAndPivotFrame, child, parent)
 	,ndJointBilateralConstraint::ndIkInterface()
+	,m_maxTorque (D_IK_HINGE_MAX_TORQUE)
 {
 }
 
 ndIkJointHinge::ndIkJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointHinge(pinAndPivotInChild, pinAndPivotInParent, child, parent)
 	,ndJointBilateralConstraint::ndIkInterface()
+	,m_maxTorque(D_IK_HINGE_MAX_TORQUE)
 {
 }
 
 ndIkJointHinge::~ndIkJointHinge()
 {
+}
+
+ndFloat32 ndIkJointHinge::GetMaxTorque(ndFloat32 maxTrque) const
+{
+	return m_maxTorque;
+}
+
+void ndIkJointHinge::SetMaxTorque(ndFloat32 maxTorque)
+{
+	m_maxTorque = ndAbs(maxTorque);
 }
 
 void ndIkJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
@@ -43,6 +56,11 @@ void ndIkJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 		AddAngularRowJacobian(desc, pin, 0.0f);
 		SetMotorAcceleration(desc, accel);
 		SetDiagonalRegularizer(desc, m_defualRegularizer);
+		if (m_maxTorque < D_IK_HINGE_MAX_TORQUE)
+		{
+			SetHighFriction(desc, m_maxTorque);
+			SetLowerFriction(desc, -m_maxTorque);
+		}
 	}
 	SubmitLimits(desc, matrix0, matrix1);
 }

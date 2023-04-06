@@ -143,7 +143,6 @@ namespace ndSimpleRobot
 							const ndMatrix pivotMatrix(childBody->GetMatrix());
 							ndJointSlider* const slider = new ndJointSlider(pivotMatrix, childBody, parentBody);
 							slider->SetLimits(definition.m_minLimit, definition.m_maxLimit);
-							slider->SetLimitState(true);
 							slider->SetAsSpringDamper(0.005f, 2000.0f, 200.0f);
 			
 							if (!strstr(definition.m_boneName, "Left"))
