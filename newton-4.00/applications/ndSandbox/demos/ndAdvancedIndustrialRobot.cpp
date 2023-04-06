@@ -47,7 +47,7 @@ namespace ndAdvancedRobot
 		{ "base", ndDefinition::m_root, 100.0f, 0.0f, 0.0f},
 		{ "base_rotator", ndDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f},
 		{ "arm_0", ndDefinition::m_hinge , 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad},
-		{ "arm_1", ndDefinition::m_hinge , 5.0f, -30.0f * ndDegreeToRad, 120.0f * ndDegreeToRad},
+		{ "arm_1", ndDefinition::m_hinge , 5.0f, -30.0f * ndDegreeToRad, 110.0f * ndDegreeToRad},
 		{ "arm_2", ndDefinition::m_hinge , 5.0f, -1.0e10f, 1.0e10f},
 		{ "arm_3", ndDefinition::m_hinge , 3.0f, -1.0e10f, 1.0e10f},
 		{ "arm_4", ndDefinition::m_hinge , 2.0f, -1.0e10f, 1.0e10f},
@@ -128,6 +128,10 @@ namespace ndAdvancedRobot
 							// here we use a ik joints instead of a regular one.
 							ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
 							hinge->SetLimits(definition.m_minLimit, definition.m_maxLimit);
+							if ((definition.m_minLimit > -1000.0f) && (definition.m_maxLimit < 1000.0f))
+							{
+								hinge->SetLimitState(true);
+							}
 							m_jointArray.PushBack(hinge);
 
 							ndSharedPtr<ndJointBilateralConstraint> hingePtr(hinge);
@@ -142,6 +146,7 @@ namespace ndAdvancedRobot
 							const ndMatrix pivotMatrix(childBody->GetMatrix());
 							ndJointSlider* const slider = new ndJointSlider(pivotMatrix, childBody, parentBody);
 							slider->SetLimits(definition.m_minLimit, definition.m_maxLimit);
+							slider->SetLimitState(true);
 							slider->SetAsSpringDamper(0.01f, 2000.0f, 100.0f);
 			
 							if (!strstr(definition.m_boneName, "Left"))
