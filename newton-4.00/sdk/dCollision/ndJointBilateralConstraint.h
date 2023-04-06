@@ -108,12 +108,13 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndVector GetForceBody1() const;
 	ndVector GetTorqueBody1() const;
 
-	bool IsSkeleton() const;
 	bool IsInWorld() const;
+	bool IsSkeleton() const;
 	bool IsBilateral() const;
 	bool IsCollidable() const;
-	void SetCollidable(bool state);
 	bool GetSkeletonFlag() const;
+
+	void SetCollidable(bool state);
 	void SetSkeletonFlag(bool flag);
 	void CalculateGlobalMatrix(ndMatrix& matrix0, ndMatrix& matrix1) const;
 
@@ -246,7 +247,7 @@ inline void ndJointBilateralConstraint::SetJointErrorPosit(ndConstraintDescritor
 	const ndInt32 index = desc.m_rowsCount - 1;
 	ndAssert(index >= 0);
 	ndAssert(index < ndInt32(m_maxDof));
-	desc.m_penetration____[index] = errorPosit;
+	desc.m_penetration[index] = errorPosit;
 }
 
 inline void ndJointBilateralConstraint::SetLowerFriction(ndConstraintDescritor& desc, ndFloat32 friction)
@@ -364,7 +365,7 @@ inline ndFloat32 ndJointBilateralConstraint::GetJointErrorPosit(ndConstraintDesc
 	const ndInt32 index = desc.m_rowsCount - 1;
 	ndAssert(index >= 0);
 	ndAssert(index < ndInt32(m_maxDof));
-	return desc.m_penetration____[index];
+	return desc.m_penetration[index];
 }
 
 inline ndFloat32 ndJointBilateralConstraint::GetJointErrorSpeed(ndConstraintDescritor& desc) const

@@ -31,6 +31,11 @@ D_MSV_NEWTON_ALIGN_32
 class ndRay: public ndClassAlloc
 {
 	public:
+	ndRay()
+		:ndClassAlloc()
+	{
+	}
+
 	ndRay(const ndVector& l0, const ndVector& l1)
 		:ndClassAlloc()
 		,m_p0(l0 & ndVector::m_triplexMask)

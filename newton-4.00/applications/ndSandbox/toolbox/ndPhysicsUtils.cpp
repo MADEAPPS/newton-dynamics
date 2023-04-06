@@ -35,8 +35,6 @@ ndVector FindFloor(const ndWorld& world, const ndVector& origin, ndFloat32 dist)
 	return p1;
 }
 
-//bool ndWorld::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const
-
 ndMatrix FindFloor(const ndWorld& world, const ndMatrix& origin, const ndShapeInstance& shape, ndFloat32 dist)
 {
 	class ndFindFloorConvexCast : public ndConvexCastNotify
@@ -50,30 +48,24 @@ ndMatrix FindFloor(const ndWorld& world, const ndMatrix& origin, const ndShapeIn
 			world.ConvexCast(*this, shape, origin, dst);
 		}
 
-		virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
+		virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const, const ndShapeInstance* const)
 		{
 			return 1;
 		}
 	};
 
-	//ndConvexCastNotifyTest convexCast;
-	//convexCast.m_tire = tire->GetBody0();
-	//convexCast.m_chassis = m_chassis;
-
-	//convexCast.CastShape(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix());
-	//m_chassis->GetScene()->ConvexCast(convexCast, tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest);
-
-	ndMatrix matrix(origin);
 	//ndVector boxMin;
 	//ndVector boxMax;
-	//
 	//ndVector floor(FindFloor(world, matrix.m_posit + ndVector(0.0f, dist * 0.5f, 0.0f, 0.0f), dist));
 	//shape.CalculateAabb(shape.GetLocalMatrix() * matrix, boxMin, boxMax);
 	//floor.m_y += (boxMax.m_y - boxMin.m_y) * 0.5f;
 	//floor.m_y -= ndShapeInstance::GetBoxPadding();
 	//matrix.m_posit.m_y = ndMax(floor.m_y, matrix.m_posit.m_y);
-	ndFindFloorConvexCast castShape(world, origin, shape, dist);
 
+	ndMatrix matrix(origin);
+	matrix.m_posit.m_y += dist * 0.5f;
+	ndFindFloorConvexCast castShape(world, matrix, shape, dist);
+	matrix.m_posit.m_y -= dist * castShape.m_param;
 	return matrix;
 }
 

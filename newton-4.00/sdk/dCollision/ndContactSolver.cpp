@@ -3817,15 +3817,12 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 	return contactCount;
 }
 
-//ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDesc& data)
-ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDesc&)
+ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDesc& data)
 {
-ndAssert(0);
-return 0;
-#if 0
-	ndAssert(data.m_faceCount);
 	ndShapeConvexPolygon polygon;
 	ndShapeInstance polySoupInstance(m_instance1);
+
+	ndAssert(data.m_staticMeshQuery->m_faceIndexCount.GetCount());
 	m_instance1.m_shape->Release();
 	m_instance1.m_shape = polygon.AddRef();
 	m_instance1.SetScale(ndVector::m_one);
@@ -3856,7 +3853,9 @@ return 0;
 	ndAssert(m_instance1.m_scaleType == ndShapeInstance::m_unit);
 
 	ndContactPoint* const contactOut = m_contactBuffer;
-	ndInt32* const indexArray = (ndInt32*)data.m_faceVertexIndex;
+
+	ndPolygonMeshDesc::ndStaticMeshFaceQuery& query = *data.m_staticMeshQuery;
+	ndInt32* const indexArray = (ndInt32*)&query.m_faceVertexIndex[0];
 	data.SortFaceArray();
 
 	ndVector separatingVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f));
@@ -3866,12 +3865,14 @@ return 0;
 	ndFloat32 savedTimestep = m_timestep;
 	ndFloat32 epsilon = ndFloat32(-1.0e-3f) * m_timestep;
 
-	for (ndInt32 i = 0; (i < data.m_faceCount) && (m_timestep >= (data.m_hitDistance[i] * savedTimestep)); ++i)
+	//for (ndInt32 i = 0; (i < meshQuery.m_faceCount) && (m_timestep >= (data.m_hitDistance[i] * savedTimestep)); ++i)
+	//for (ndInt32 i = query.m_faceIndexCount.GetCount() - 1; (i >= 0) && (count < 32); --i)
+	for (ndInt32 i = 0; (i < query.m_faceIndexCount.GetCount()) && (m_timestep >= (query.m_hitDistance[i] * savedTimestep)); ++i)
 	{
-		ndInt32 address = data.m_faceIndexStart[i];
+		ndInt32 address = query.m_faceIndexStart[i];
 		const ndInt32* const localIndexArray = &indexArray[address];
 		polygon.m_vertexIndex = localIndexArray;
-		polygon.m_count = data.m_faceIndexCount[i];
+		polygon.m_count = query.m_faceIndexCount[i];
 		polygon.m_paddedCount = polygon.m_count;
 		polygon.m_adjacentFaceEdgeNormalIndex = data.GetAdjacentFaceEdgeNormalArray(localIndexArray, polygon.m_count);
 		polygon.m_faceId = data.GetFaceId(localIndexArray, polygon.m_count);
@@ -3935,7 +3936,6 @@ return 0;
 	}
 
 	return count;
-#endif
 }
 
 ndInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()

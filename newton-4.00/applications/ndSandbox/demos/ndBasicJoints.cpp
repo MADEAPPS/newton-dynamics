@@ -779,14 +779,6 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 
-	//ndMatrix location(ndGetIdentityMatrix());
-	//location.m_posit.m_y += 1.0f;
-	//for (int i = 0; i < 20; i++)
-	//{
-	//	AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f);
-	//	location.m_posit.m_z += 1.0f;
-	//}
-
 	BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
 	BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
 	BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);

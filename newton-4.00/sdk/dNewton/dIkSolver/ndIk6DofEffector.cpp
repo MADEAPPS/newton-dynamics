@@ -220,8 +220,8 @@ void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix&
 			
 			//ndTrace(("xxxxxxxxxx %f %f\n", springError, GetMotorAcceleration(desc)));
 
-			SetLowerFriction(desc, -m_linearMaxForce * 0.1f);
-			SetHighFriction(desc, m_linearMaxForce * 0.1f);
+			SetLowerFriction(desc, -m_linearMaxForce);
+			SetHighFriction(desc, m_linearMaxForce);
 		}
 	}
 #else
