@@ -178,7 +178,7 @@ TEST(RayCast, rayCastFilter)
 	// this first body we hit should be at the origin
 	EXPECT_TRUE(info.pickedBody->GetMatrix().m_posit.m_z == 0.0f);
 
-	// the first body hitpoint z coordinate position should be at body z coord + HALF_BOX_DIM
+	// the first body hit point z coordinate position should be at body z cord + HALF_BOX_DIM
 	EXPECT_TRUE(info.position.m_z == info.pickedBody->GetMatrix().m_posit.m_z + HALF_BOX_DIM);
 
 	// now make this node we just hit unpickable
