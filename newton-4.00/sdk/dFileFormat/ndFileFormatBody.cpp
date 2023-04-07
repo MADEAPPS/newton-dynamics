@@ -20,6 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
+#include "ndFileFormat.h"
 #include "ndFileFormatBody.h"
 #include "ndFileFormatNotify.h"
 
@@ -41,6 +42,15 @@ void ndFileFormatBody::SaveBody(ndFileFormat* const scene, nd::TiXmlElement* con
 	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(notity->ClassName());
 	ndAssert(handler);
 	handler->SaveNotify(scene, classNode, notity);
+
+	ndTree<ndInt32, ndUnsigned64>::ndNode* const node = scene->m_bodiesIds.Insert(body->GetId());
+	ndAssert(node);
+	if (node)
+	{
+		ndInt32 id;
+		classNode->Attribute("nodeId", &id);
+		node->GetInfo() = id;
+	}
 
 	xmlSaveParam(classNode, "matrix", body->GetMatrix());
 	xmlSaveParam(classNode, "omega", body->GetOmega());

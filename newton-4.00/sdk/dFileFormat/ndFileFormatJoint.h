@@ -19,23 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_FILE_FORMAT_JOINT_H__
+#define _ND_FILE_FORMAT_JOINT_H__
+
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatWorld.h"
+#include "ndFileFormatRegistrar.h"
 
-ndFileFormatWorld::ndFileFormatWorld()
-	:ndFileFormatRegistrar(ndWorld::StaticClassName())
+class ndFileFormatJoint : public ndFileFormatRegistrar
 {
-}
+	public: 
+	ndFileFormatJoint();
+	ndFileFormatJoint(const char* const className);
 
-ndFileFormatWorld::ndFileFormatWorld(const char* const className)
-	:ndFileFormatRegistrar(className)
-{
-}
+	virtual void SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint);
+};
 
-void ndFileFormatWorld::SaveWorld(ndFileFormat* const, nd::TiXmlElement* const parentNode, const ndWorld* const world)
-{
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndWorld", ndWorld::StaticClassName());
+#endif 
 
-	xmlSaveParam(classNode, "subSteps", world->GetSubSteps());
-	xmlSaveParam(classNode, "iterations", world->GetSolverIterations());
-}

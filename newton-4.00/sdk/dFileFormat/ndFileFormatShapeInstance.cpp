@@ -42,7 +42,7 @@ void ndFileFormatShapeInstance::SaveCollision(ndFileFormat* const scene, nd::TiX
 	//ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
 	//ndAssert(handler);
 	//handler->SaveShape(scene, classNode, shape);
-	ndTree<ndInt32, ndUnsigned64>::ndNode* const shapeNode = scene->m_uniqueShapes.Find(hash);
+	ndTree<ndInt32, ndUnsigned64>::ndNode* const shapeNode = scene->m_uniqueShapesIds.Find(hash);
 	ndAssert(shapeNode);
 
 	xmlSaveParam(classNode, "shapeNodeIdRef", shapeNode->GetInfo());

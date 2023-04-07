@@ -26,6 +26,9 @@
 ndFileFormat::ndFileFormat()
 	:ndClassAlloc()
 	,m_bodies()
+	,m_joints()
+	,m_bodiesIds()
+	,m_uniqueShapesIds()
 {
 	xmlReserClassId();
 	ndFileFormatRegistrar::Init();
@@ -38,16 +41,25 @@ ndFileFormat::~ndFileFormat()
 void ndFileFormat::CollectScene(const ndWorld* const world)
 {
 	m_world = world;
+	m_joints.SetCount(0);
 	m_bodies.SetCount(0);
+
 	for (ndBodyListView::ndNode* node = world->GetBodyList().GetFirst(); node; node = node->GetNext())
 	{
 		ndBody* const body = *node->GetInfo();
 		m_bodies.PushBack(body);
 	}
+
+	for (ndJointList::ndNode* node = world->GetJointList().GetFirst(); node; node = node->GetNext())
+	{
+		ndJointBilateralConstraint* const joint = *node->GetInfo();
+		m_joints.PushBack(joint);
+	}
 }
 
 void ndFileFormat::SaveBodies(nd::TiXmlElement* const rootNode)
 {
+	m_bodiesIds.RemoveAll();
 	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 	{
 		ndBody* const body = m_bodies[i];
@@ -60,10 +72,26 @@ void ndFileFormat::SaveBodies(nd::TiXmlElement* const rootNode)
 	}
 }
 
+void ndFileFormat::SaveJoints(nd::TiXmlElement* const rootNode)
+{
+	for (ndInt32 i = 0; i < m_joints.GetCount(); ++i)
+	{
+		ndJointBilateralConstraint* const joint = m_joints[i];
+		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(joint->ClassName());
+		ndTrace(("xxxxxxxxxx"));
+		//ndAssert(handler);
+		if (handler)
+		{
+			handler->SaveJoint(this, rootNode, joint);
+		}
+	}
+}
+
 void ndFileFormat::SaveCollisionShapes(nd::TiXmlElement* const rootNode)
 {
-	m_uniqueShapes.RemoveAll();
+	m_uniqueShapesIds.RemoveAll();
 
+	// save bodies without compound shapes.
 	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 	{
 		ndBodyKinematic* const body = m_bodies[i]->GetAsBodyKinematic();
@@ -71,7 +99,7 @@ void ndFileFormat::SaveCollisionShapes(nd::TiXmlElement* const rootNode)
 		if (!shape->GetAsShapeCompound())
 		{
 			ndUnsigned64 hash = shape->GetHash();
-			ndTree<ndInt32, ndUnsigned64>::ndNode* const node = m_uniqueShapes.Insert(hash);
+			ndTree<ndInt32, ndUnsigned64>::ndNode* const node = m_uniqueShapesIds.Insert(hash);
 			if (node)
 			{
 				ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
@@ -81,6 +109,7 @@ void ndFileFormat::SaveCollisionShapes(nd::TiXmlElement* const rootNode)
 		}
 	}
 
+	// save bodies with compound shapes.
 	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 	{
 		ndBodyKinematic* const body = m_bodies[i]->GetAsBodyKinematic();
@@ -88,7 +117,7 @@ void ndFileFormat::SaveCollisionShapes(nd::TiXmlElement* const rootNode)
 		if (shape->GetAsShapeCompound())
 		{
 			ndUnsigned64 hash = shape->GetHash();
-			ndTree<ndInt32, ndUnsigned64>::ndNode* const node = m_uniqueShapes.Insert(hash);
+			ndTree<ndInt32, ndUnsigned64>::ndNode* const node = m_uniqueShapesIds.Insert(hash);
 			if (node)
 			{
 				ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
@@ -103,7 +132,7 @@ void ndFileFormat::SaveBodies(const char* const path)
 {
 	// save the path for use with generated assets.
 	m_fileName = path;
-
+	
 	nd::TiXmlDocument asciifile;
 	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
 	asciifile.LinkEndChild(decl);
@@ -118,7 +147,8 @@ void ndFileFormat::SaveBodies(const char* const path)
 	setlocale(LC_ALL, "C");
 	asciifile.SaveFile(path);
 	setlocale(LC_ALL, oldloc);
-	m_uniqueShapes.RemoveAll();
+
+	m_uniqueShapesIds.RemoveAll();
 }
 
 void ndFileFormat::SaveWorld(const char* const path)
@@ -139,11 +169,14 @@ void ndFileFormat::SaveWorld(const char* const path)
 		handler->SaveWorld(this, rootNode, m_world);
 		SaveCollisionShapes(rootNode);
 		SaveBodies(rootNode);
+		SaveJoints(rootNode);
 	}
 
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");
 	asciifile.SaveFile(path);
 	setlocale(LC_ALL, oldloc);
-	m_uniqueShapes.RemoveAll();
+
+	m_bodiesIds.RemoveAll();
+	m_uniqueShapesIds.RemoveAll();
 }

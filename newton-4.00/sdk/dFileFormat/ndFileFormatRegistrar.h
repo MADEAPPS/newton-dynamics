@@ -39,6 +39,7 @@ class ndFileFormatRegistrar : public ndClassAlloc
 	virtual ndInt32 SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
 	virtual void SaveNotify(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify);
 	virtual void SaveCollision(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision);
+	virtual void SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint);
 
 	static ndFileFormatRegistrar* GetHandler(const char* const className);
 

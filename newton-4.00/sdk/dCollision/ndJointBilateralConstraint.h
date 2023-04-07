@@ -52,6 +52,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndJointBilateralConstraint : public ndConstraint
 {
 	public:
+	D_BASE_CLASS_REFLECTION(ndJointBilateralConstraint);
 	class ndJointList : public ndList<ndSharedPtr<ndJointBilateralConstraint>, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>
 	{
 		public:
@@ -75,7 +76,7 @@ class ndJointBilateralConstraint : public ndConstraint
 		bool m_ikMode;
 	};
 
-	D_CLASS_REFLECTION(ndJointBilateralConstraint, ndConstraint)
+	//D_CLASS_REFLECTION(ndJointBilateralConstraint, ndConstraint)
 	D_COLLISION_API ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrix);
 	D_COLLISION_API ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrixBody0,  const ndMatrix& globalMatrixBody1);
 	D_COLLISION_API virtual ~ndJointBilateralConstraint();

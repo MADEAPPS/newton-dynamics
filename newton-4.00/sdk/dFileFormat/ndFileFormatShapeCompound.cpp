@@ -44,7 +44,7 @@ ndInt32 ndFileFormatShapeCompound::SaveShape(ndFileFormat* const scene, nd::TiXm
 		const ndShapeInstance* const childInstance = compoundShape->GetShapeInstance(it.GetNode());
 		const ndShape* const childShape = childInstance->GetShape();
 		ndUnsigned64 hash = childShape->GetHash();
-		ndTree<ndInt32, ndUnsigned64>::ndNode* const node = scene->m_uniqueShapes.Insert(hash);
+		ndTree<ndInt32, ndUnsigned64>::ndNode* const node = scene->m_uniqueShapesIds.Insert(hash);
 		if (node)
 		{
 			ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(childShape->ClassName());

@@ -39,12 +39,21 @@ class ndFileFormat : public ndClassAlloc
 	ndString m_fileName;
 	const ndWorld* m_world;
 	ndArray<ndBody*> m_bodies;
-	ndTree<ndInt32, ndUnsigned64> m_uniqueShapes;
-
+	ndArray<ndJointBilateralConstraint*> m_joints;
+	
 	private:
+	ndTree<ndInt32, ndUnsigned64> m_bodiesIds;
+	ndTree<ndInt32, ndUnsigned64> m_uniqueShapesIds;
+
 	void SaveWorld(nd::TiXmlElement* const rootNode);
 	void SaveBodies(nd::TiXmlElement* const rootNode);
+	void SaveJoints(nd::TiXmlElement* const rootNode);
 	void SaveCollisionShapes(nd::TiXmlElement* const rootNode);
+
+	friend class ndFileFormatBody;
+	friend class ndFileFormatJoint;
+	friend class ndFileFormatShapeInstance;
+	friend class ndFileFormatShapeCompound;
 };
 
 #endif 

@@ -153,3 +153,8 @@ void ndFileFormatRegistrar::SaveCollision(ndFileFormat* const, nd::TiXmlElement*
 {
 	ndAssert(0);
 }
+
+void ndFileFormatRegistrar::SaveJoint(ndFileFormat* const, nd::TiXmlElement* const, const ndJointBilateralConstraint* const)
+{
+	ndAssert(0);
+}
