@@ -21,6 +21,23 @@ class ndDemoEntityManager;
 class ndPhysicsWorld: public ndWorld
 {
 	public:
+	D_CLASS_REFLECTION(ndPhysicsWorld, ndWorld)
+
+	class ndPhysicsWorldSaveLoad : public ndFileFormatWorld
+	{
+		public:
+		ndPhysicsWorldSaveLoad()
+			:ndFileFormatWorld(ndPhysicsWorld::StaticClassName())
+		{
+		}
+
+		void SaveWorld(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndWorld* const world)
+		{
+			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndPhysicsWorld", ndPhysicsWorld::StaticClassName());
+			ndFileFormatWorld::SaveWorld(scene, classNode, world);
+		}
+	};
+
 	class ndDefferentDeleteEntities : public ndArray<ndDemoEntity*>
 	{
 		public:

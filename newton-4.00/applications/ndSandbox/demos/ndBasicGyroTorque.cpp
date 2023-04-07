@@ -225,7 +225,8 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 
 	ndFileFormat xxxx;
 	xxxx.CollectScene(scene->GetWorld());
-	xxxx.SaveBodies("xxxx.nd");
+	//xxxx.SaveBodies("xxxx.nd");
+	xxxx.SaveWorld("xxxx.nd");
 
 	ndQuaternion rot;
 	ndVector origin(-15.0f, 5.0f, 0.0f, 1.0f);

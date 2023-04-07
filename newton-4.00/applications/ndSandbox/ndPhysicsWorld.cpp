@@ -32,6 +32,7 @@ ndPhysicsWorld::ndDefferentDeleteEntities::ndDefferentDeleteEntities(ndDemoEntit
 	,m_manager(manager)
 	,m_renderThreadId(std::this_thread::get_id())
 {
+	static ndPhysicsWorldSaveLoad saveLoad;
 }
 
 void ndPhysicsWorld::ndDefferentDeleteEntities::Update()
