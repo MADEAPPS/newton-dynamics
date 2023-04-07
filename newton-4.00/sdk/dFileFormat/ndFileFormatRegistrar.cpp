@@ -39,6 +39,7 @@
 #include "ndFileFormatShapeConvexCone.h"
 #include "ndFileFormatShapeConvexHull.h"
 #include "ndFileFormatShapeStaticMesh.h"
+#include "ndFileFormatJointDoubleHinge.h"
 #include "ndFileFormatBodyTriggerVolume.h"
 #include "ndFileFormatKinematicBodyBase.h"
 #include "ndFileFormatShapeConvexSphere.h"
@@ -94,6 +95,7 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatJointHinge jointHinge;
 	static ndFileFormatJointSlider jointSlider;
 	static ndFileFormatJointSpherical jointSpherical;
+	static ndFileFormatJointDoubleHinge jointDoubleHinge;
 
 	static ndFileFormatShapeConvex shapeConvex;
 	static ndFileFormatShapeConvexBox shapeBox;
