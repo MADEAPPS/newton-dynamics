@@ -22,7 +22,6 @@
 #include "ndFileFormatStdafx.h"
 #include "ndFileFormat.h"
 #include "ndFileFormatJoint.h"
-#include "ndFileFormatNotify.h"
 
 ndFileFormatJoint::ndFileFormatJoint()
 	:ndFileFormatRegistrar(ndJointBilateralConstraint::StaticClassName())
@@ -40,17 +39,12 @@ void ndFileFormatJoint::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* c
 
 	ndBodyKinematic* const body0 = joint->GetBody0();
 	ndBodyKinematic* const body1 = joint->GetBody1();
-	//const ndShapeInstance* const collision = &kinematic->GetCollisionShape();
-	//ndFileFormatRegistrar* const handlerBody0 = ndFileFormatRegistrar::GetHandler(body0->ClassName());
-	//ndAssert(handlerBody0);
-	//handler->SaveCollision(scene, classNode, collision);
 
 	ndTree<ndInt32, ndUnsigned64>::ndNode* const node0 = scene->m_bodiesIds.Find(body0->GetId());
 	ndTree<ndInt32, ndUnsigned64>::ndNode* const node1 = scene->m_bodiesIds.Find(body1->GetId());
 	ndAssert(node0);
-	ndAssert(node1);
 	ndInt32 body0NodeId = node0->GetInfo();
-	ndInt32 body1NodeId = node1->GetInfo();
+	ndInt32 body1NodeId = node1 ? node1->GetInfo() : -1;
 
 	xmlSaveParam(classNode, "body0", body0NodeId);
 	xmlSaveParam(classNode, "body1", body1NodeId);

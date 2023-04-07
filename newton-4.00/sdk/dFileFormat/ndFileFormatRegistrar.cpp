@@ -24,12 +24,14 @@
 #include "ndFileFormatBody.h"
 #include "ndFileFormatWorld.h"
 #include "ndFileFormatShape.h"
+#include "ndFileFormatJoint.h"
 #include "ndFileFormatNotify.h"
 #include "ndFileFormatShapeConvex.h"
 #include "ndFileFormatDynamicBody.h"
 #include "ndFileFormatKinematicBody.h"
 #include "ndFileFormatShapeInstance.h"
 #include "ndFileFormatShapeCompound.h"
+#include "ndFileFormatJointSpherical.h"
 #include "ndFileFormatShapeConvexBox.h"
 #include "ndFileFormatShapeConvexCone.h"
 #include "ndFileFormatShapeConvexHull.h"
@@ -83,6 +85,9 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatKinematicBody kinematicBody;
 	static ndFileFormatBodyTriggerVolume triggerVolume;
 	static ndFileFormatKinematicBodyBase kinematicBodyBase;
+
+	static ndFileFormatJoint joint;
+	static ndFileFormatJointSpherical jointSpherical;
 
 	static ndFileFormatShapeConvex shapeConvex;
 	static ndFileFormatShapeConvexBox shapeBox;
