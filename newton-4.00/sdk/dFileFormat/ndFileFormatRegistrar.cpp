@@ -31,6 +31,7 @@
 #include "ndFileFormatJointSlider.h"
 #include "ndFileFormatShapeConvex.h"
 #include "ndFileFormatDynamicBody.h"
+#include "ndFileFormatJointRoller.h"
 #include "ndFileFormatKinematicBody.h"
 #include "ndFileFormatShapeInstance.h"
 #include "ndFileFormatShapeCompound.h"
@@ -94,6 +95,7 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatJointGear jointGear;
 	static ndFileFormatJointHinge jointHinge;
 	static ndFileFormatJointSlider jointSlider;
+	static ndFileFormatJointRoller jointRoller;
 	static ndFileFormatJointSpherical jointSpherical;
 	static ndFileFormatJointDoubleHinge jointDoubleHinge;
 

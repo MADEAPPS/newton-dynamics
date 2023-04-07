@@ -37,30 +37,37 @@ void ndFileFormatJointDoubleHinge::SaveJoint(ndFileFormat* const scene, nd::TiXm
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointDoubleHinge", ndJointDoubleHinge::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
-	//ndFloat32 spring0;
-	//ndFloat32 damper0;
-	//ndFloat32 regularizer0;
+	ndFloat32 spring0;
+	ndFloat32 damper0;
+	ndFloat32 regularizer0;
 	ndFloat32 minTwistAngle0; 
 	ndFloat32 maxTwistAngle0;
+
+	ndFloat32 spring1;
+	ndFloat32 damper1;
+	ndFloat32 regularizer1;
 	ndFloat32 minTwistAngle1;
 	ndFloat32 maxTwistAngle1;
 
 	ndJointDoubleHinge* const exportJoint = (ndJointDoubleHinge*)joint;
-	
-	//exportJoint->GetSpringDamper(regularizer, spring, damper);
+
 	exportJoint->GetLimits0(minTwistAngle0, maxTwistAngle0);
 	exportJoint->GetLimits1(minTwistAngle1, maxTwistAngle1);
+	exportJoint->GetSpringDamper0(regularizer0, spring0, damper0);
+	exportJoint->GetSpringDamper1(regularizer1, spring1, damper1);
 	
 	xmlSaveParam(classNode, "offsetAngle0", exportJoint->GetOffsetAngle0() * ndRadToDegree);
-	//xmlSaveParam(classNode, "springConstant", spring);
-	//xmlSaveParam(classNode, "damperConstant", damper);
-	//xmlSaveParam(classNode, "springRegularizer", regularizer);
+	xmlSaveParam(classNode, "springConstant0", spring0);
+	xmlSaveParam(classNode, "damperConstant0", damper0);
+	xmlSaveParam(classNode, "springRegularizer0", regularizer0);
 	xmlSaveParam(classNode, "minTwistAngle0", minTwistAngle0 * ndRadToDegree);
 	xmlSaveParam(classNode, "maxTwistAngle0", minTwistAngle0 * ndRadToDegree);
 	//xmlSaveParam(classNode, "limitState", exportJoint->GetLimitState() ? 1 : 0);
 
 	xmlSaveParam(classNode, "offsetAngle1", exportJoint->GetOffsetAngle1() * ndRadToDegree);
-
+	xmlSaveParam(classNode, "springConstant1", spring1);
+	xmlSaveParam(classNode, "damperConstant1", damper1);
+	xmlSaveParam(classNode, "springRegularizer1", regularizer1);
 	xmlSaveParam(classNode, "minTwistAngle1", minTwistAngle1 * ndRadToDegree);
 	xmlSaveParam(classNode, "maxTwistAngle1", minTwistAngle1 * ndRadToDegree);
 }
