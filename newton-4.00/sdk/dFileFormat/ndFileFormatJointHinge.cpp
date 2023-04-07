@@ -20,21 +20,21 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatJointSpherical.h"
+#include "ndFileFormatJointHinge.h"
 
-ndFileFormatJointSpherical::ndFileFormatJointSpherical()
-	:ndFileFormatJoint(ndJointSpherical::StaticClassName())
+ndFileFormatJointHinge::ndFileFormatJointHinge()
+	:ndFileFormatJoint(ndJointHinge::StaticClassName())
 {
 }
 
-ndFileFormatJointSpherical::ndFileFormatJointSpherical(const char* const className)
+ndFileFormatJointHinge::ndFileFormatJointHinge(const char* const className)
 	:ndFileFormatJoint(className)
 {
 }
 
-void ndFileFormatJointSpherical::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+void ndFileFormatJointHinge::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointSpherical", ndJointSpherical::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointHinge", ndJointHinge::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndFloat32 spring;
@@ -42,16 +42,16 @@ void ndFileFormatJointSpherical::SaveJoint(ndFileFormat* const scene, nd::TiXmlE
 	ndFloat32 regularizer;
 	ndFloat32 minTwistAngle; 
 	ndFloat32 maxTwistAngle;
-	ndJointSpherical* const exportJoint = (ndJointSpherical*)joint;
+	ndJointHinge* const exportJoint = (ndJointHinge*)joint;
 
 	exportJoint->GetSpringDamper(regularizer, spring, damper);
-	exportJoint->GetTwistLimits(minTwistAngle, maxTwistAngle);
+	exportJoint->GetLimits(minTwistAngle, maxTwistAngle);
 
-	xmlSaveParam(classNode, "rotationTarget", exportJoint->GetOffsetRotation());
+	xmlSaveParam(classNode, "offsetAngle", exportJoint->GetOffsetAngle() * ndRadToDegree);
 	xmlSaveParam(classNode, "springConstant", spring);
 	xmlSaveParam(classNode, "damperConstant", damper);
 	xmlSaveParam(classNode, "springRegularizer", regularizer);
 	xmlSaveParam(classNode, "minTwistAngle", minTwistAngle * ndRadToDegree);
 	xmlSaveParam(classNode, "maxTwistAngle", minTwistAngle * ndRadToDegree);
-	xmlSaveParam(classNode, "maxConeAngle", exportJoint->GetConeLimit() * ndRadToDegree);
+	xmlSaveParam(classNode, "limitState", exportJoint->GetLimitState() ? 1 : 0);
 }

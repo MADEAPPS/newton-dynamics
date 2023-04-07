@@ -78,7 +78,7 @@ void ndFileFormat::SaveJoints(nd::TiXmlElement* const rootNode)
 	{
 		ndJointBilateralConstraint* const joint = m_joints[i];
 		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(joint->ClassName());
-		ndTrace(("xxxxxxxxxx"));
+		ndTrace(("joint type: %s not exported\n", joint->ClassName()));
 		//ndAssert(handler);
 		if (handler)
 		{
