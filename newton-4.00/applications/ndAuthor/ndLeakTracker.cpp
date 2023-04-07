@@ -9,7 +9,7 @@
 * freely
 */
 
-#include "ndPhysedStdafx.h"
+#include "ndAuthorStdafx.h"
 #include "ndLeakTracker.h"
 
 class ndLeakTrackerAllocator

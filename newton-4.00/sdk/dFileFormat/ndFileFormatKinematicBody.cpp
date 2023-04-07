@@ -52,10 +52,13 @@ void ndFileFormatKinematicBody::SaveBody(ndFileFormat* const scene, nd::TiXmlEle
 		ndVector euler0;
 		ndVector euler1;
 		ndVector inertia(kinematic->GetMassMatrix());
-		xmlSaveParam(classNode, "inertia", inertia);
-		kinematic->GetPrincipalAxis().CalcPitchYawRoll(euler0, euler1);
+		ndMatrix matrix(kinematic->GetPrincipalAxis());
+		matrix.CalcPitchYawRoll(euler0, euler1);
 		euler0 = euler0.Scale(ndRadToDegree);
+
+		xmlSaveParam(classNode, "inertia", inertia);
 		xmlSaveParam(classNode, "principalAxis", euler0);
+		xmlSaveParam(classNode, "useSkewInertia", matrix.TestIdentity() ? 0 : 1);
 	}
 	
 	xmlSaveParam(classNode, "maxLinearStep", kinematic->GetMaxLinearStep());

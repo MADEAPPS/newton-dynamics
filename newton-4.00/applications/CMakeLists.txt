@@ -17,7 +17,7 @@ if (NEWTON_BUILD_TEST)
 endif()
 
 if (NEWTON_BUILD_PHYSIC_EDITOR)
-    add_subdirectory(ndPhysed)
+    add_subdirectory(ndAuthor)
 endif()
 
 if (NEWTON_BUILD_SANDBOX_DEMOS)

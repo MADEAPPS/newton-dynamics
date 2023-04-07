@@ -26,11 +26,11 @@
 //class ndWireFrameDebugMesh;
 //class ndFlatShadedDebugMesh;
 
-class ndPhysed
+class ndAuthor
 {
 	public:
-	//typedef void (*LaunchSDKDemoCallback) (ndPhysed* const scene);
-	//typedef void(*UpdateCameraCallback) (ndPhysed* const manager, void* const context, ndFloat32 timestep);
+	//typedef void (*LaunchSDKDemoCallback) (ndAuthor* const scene);
+	//typedef void(*UpdateCameraCallback) (ndAuthor* const manager, void* const context, ndFloat32 timestep);
 	//
 	//enum ndMenuSelection
 	//{
@@ -121,8 +121,8 @@ class ndPhysed
 	//	bool m_memory1;
 	//};
 
-	ndPhysed ();
-	~ndPhysed ();
+	ndAuthor ();
+	~ndAuthor ();
 
 	void Run();
 
@@ -270,45 +270,45 @@ class ndPhysed
 };
 
 #if 0
-inline ndPhysicsWorld* ndPhysed::GetWorld() const
+inline ndPhysicsWorld* ndAuthor::GetWorld() const
 {
 	return m_world;
 }
 
-inline ndInt32 ndPhysed::GetWidth() const 
+inline ndInt32 ndAuthor::GetWidth() const 
 { 
 	ImGuiIO& io = ImGui::GetIO();
 	return (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
 }
 
-inline ndInt32 ndPhysed::GetHeight() const 
+inline ndInt32 ndAuthor::GetHeight() const 
 { 
 	ImGuiIO& io = ImGui::GetIO();
 	return (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 }
 
-inline ndInt32 ndPhysed::GetDebugDisplay() const
+inline ndInt32 ndAuthor::GetDebugDisplay() const
 {
 	ndAssert (0);
 	return 0;
 }
 
-inline void ndPhysed::SetDebugDisplay(ndInt32) const
+inline void ndAuthor::SetDebugDisplay(ndInt32) const
 {
 	ndAssert (0);
 }
 
-inline const ndShaderCache& ndPhysed::GetShaderCache() const
+inline const ndShaderCache& ndAuthor::GetShaderCache() const
 {
 	return m_shaderCache;
 }
 
-inline ndDemoCameraManager* ndPhysed::GetCameraManager() const
+inline ndDemoCameraManager* ndAuthor::GetCameraManager() const
 {
 	return m_cameraManager;
 }
 
-inline void ndPhysed::SetSelectedModel(ndModel* const model)
+inline void ndAuthor::SetSelectedModel(ndModel* const model)
 {
 	m_selectedModel = model;
 }

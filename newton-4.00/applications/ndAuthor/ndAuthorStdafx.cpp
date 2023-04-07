@@ -13,7 +13,7 @@
 // NewView.pch will be the pre-compiled header
 // stdafx.obj will contain the pre-compiled type information
 
-#include "ndPhysedStdafx.h"
+#include "ndAuthorStdafx.h"
 
 // Windows user assets path
 void dGetWorkingFileName (const char* const name, char* const outPathName)

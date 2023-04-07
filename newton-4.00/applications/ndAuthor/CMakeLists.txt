@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-set (projectName "ndPhysed")
+set (projectName "ndAuthor")
 message (${projectName})
 
 # source and header files
@@ -75,8 +75,8 @@ if(MSVC OR MINGW)
 	target_link_options(${projectName} PUBLIC "/DEBUG") 
 
     if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
-		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundPhysedStdafx.h")
-		set_source_files_properties(ndPhysedStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndPhysedStdafx.h")
+		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundAuthorStdafx.h")
+		set_source_files_properties(ndAuthorStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndAuthorStdafx.h")
 		set_source_files_properties(ndFileBrowser.cpp PROPERTIES COMPILE_FLAGS "/Y-")
     endif()
 endif()

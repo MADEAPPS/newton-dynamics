@@ -9,15 +9,16 @@
 * freely
 */
 
-#include "ndPhysedStdafx.h"
+#include "ndAuthorStdafx.h"
+#include "ndAuthor.h"
+#include "ndLeakTracker.h"
 
-#ifdef _DEBUG
-	#define ND_USE_LEAK_TRACKER
-#endif
-
-class ndSetAllocators
+int main(int, char**)
 {
-	public:
-	ndSetAllocators();
-};
+	ndSetAllocators setAllocators;
+
+	ndAuthor authoring;
+	authoring.Run();
+	return 0;
+}
 

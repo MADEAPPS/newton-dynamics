@@ -9,8 +9,8 @@
 * freely
 */
 
-#include "ndPhysedStdafx.h"
-#include "ndPhysed.h"
+#include "ndAuthorStdafx.h"
+#include "ndAuthor.h"
 //#include "ndSkyBox.h"
 //#include "ndDemoMesh.h"
 //#include "ndVehicleUI.h"
@@ -27,7 +27,7 @@
 //#include "ndDemoDebugMesh.h"
 //#include "ndTargaToOpenGl.h"
 //#include "ndDemoEntityNotify.h"
-//#include "ndPhysed.h"
+//#include "ndAuthor.h"
 //#include "ndDemoCameraManager.h"
 //#include "ndDemoCameraManager.h"
 //#include "ndAnimationSequence.h"
@@ -65,38 +65,38 @@
 //#define DEFAULT_SCENE	28		// skin peel voronoi fracture
 						 
 // demos forward declaration 
-void ndRagdollTest(ndPhysed* const scene);
-void ndBipedTest_1(ndPhysed* const scene);
-void ndBipedTest_2(ndPhysed* const scene);
-void ndBasicStacks(ndPhysed* const scene);
-void ndBasicJoints(ndPhysed* const scene);
-void ndBasicVehicle(ndPhysed* const scene);
-void ndHeavyVehicle(ndPhysed* const scene);
-void ndBasicTrigger(ndPhysed* const scene);
-void ndBasicGpuTest0(ndPhysed* const scene);
-void ndBasicRigidBody(ndPhysed* const scene);
-void ndZeroMomentPoint(ndPhysed* const scene);
-void ndQuadrupedTest_1(ndPhysed* const scene);
-void ndQuadrupedTest_2(ndPhysed* const scene);
-void ndQuadrupedTest_3(ndPhysed* const scene);
-void ndBasicGpuRigidBody(ndPhysed* const scene);
-void ndBasicFrictionRamp(ndPhysed* const scene);
-void ndPlayerCapsuleDemo(ndPhysed* const scene);
-void ndBipedTest_2Trainer(ndPhysed* const scene);
-void ndBasicParticleFluid(ndPhysed* const scene);
-void ndBasicAngularMomentum(ndPhysed* const scene);
-void ndBagroundLowLodVehicle(ndPhysed* const scene);
-void ndSimpleIndustrialRobot(ndPhysed* const scene);
-void ndBasicCompoundShapeDemo(ndPhysed* const scene);
-void ndAdvancedIndustrialRobot(ndPhysed* const scene);
-void ndBasicExplodeConvexShape(ndPhysed* const scene);
-//void ndBasicFracture_0(ndPhysed* const scene);
-//void ndBasicFracture_2(ndPhysed* const scene);
-//void ndBasicFracture_4(ndPhysed* const scene);
-void ndStaticMeshCollisionDemo(ndPhysed* const scene);
-void ndStaticUserMeshCollisionDemo(ndPhysed* const scene);
+void ndRagdollTest(ndAuthor* const scene);
+void ndBipedTest_1(ndAuthor* const scene);
+void ndBipedTest_2(ndAuthor* const scene);
+void ndBasicStacks(ndAuthor* const scene);
+void ndBasicJoints(ndAuthor* const scene);
+void ndBasicVehicle(ndAuthor* const scene);
+void ndHeavyVehicle(ndAuthor* const scene);
+void ndBasicTrigger(ndAuthor* const scene);
+void ndBasicGpuTest0(ndAuthor* const scene);
+void ndBasicRigidBody(ndAuthor* const scene);
+void ndZeroMomentPoint(ndAuthor* const scene);
+void ndQuadrupedTest_1(ndAuthor* const scene);
+void ndQuadrupedTest_2(ndAuthor* const scene);
+void ndQuadrupedTest_3(ndAuthor* const scene);
+void ndBasicGpuRigidBody(ndAuthor* const scene);
+void ndBasicFrictionRamp(ndAuthor* const scene);
+void ndPlayerCapsuleDemo(ndAuthor* const scene);
+void ndBipedTest_2Trainer(ndAuthor* const scene);
+void ndBasicParticleFluid(ndAuthor* const scene);
+void ndBasicAngularMomentum(ndAuthor* const scene);
+void ndBagroundLowLodVehicle(ndAuthor* const scene);
+void ndSimpleIndustrialRobot(ndAuthor* const scene);
+void ndBasicCompoundShapeDemo(ndAuthor* const scene);
+void ndAdvancedIndustrialRobot(ndAuthor* const scene);
+void ndBasicExplodeConvexShape(ndAuthor* const scene);
+//void ndBasicFracture_0(ndAuthor* const scene);
+//void ndBasicFracture_2(ndAuthor* const scene);
+//void ndBasicFracture_4(ndAuthor* const scene);
+void ndStaticMeshCollisionDemo(ndAuthor* const scene);
+void ndStaticUserMeshCollisionDemo(ndAuthor* const scene);
 
-ndPhysed::SDKDemos ndPhysed::m_demosSelection[] = 
+ndAuthor::SDKDemos ndAuthor::m_demosSelection[] = 
 {
 	{ "basic rigidbody", ndBasicRigidBody },
 	{ "basic gpu rigidbody", ndBasicGpuRigidBody },
@@ -129,21 +129,21 @@ ndPhysed::SDKDemos ndPhysed::m_demosSelection[] =
 	//{ "simple skin peeling fracture", ndBasicFracture_4 },
 };
 
-ndPhysed::ButtonKey::ButtonKey (bool state)
+ndAuthor::ButtonKey::ButtonKey (bool state)
 	:m_state(state)
 	,m_memory0(false)
 	,m_memory1(false)
 {
 }
 
-ndInt32 ndPhysed::ButtonKey::UpdateTrigger (bool triggerValue)
+ndInt32 ndAuthor::ButtonKey::UpdateTrigger (bool triggerValue)
 {
 	m_memory0 = m_memory1;
 	m_memory1 = triggerValue;
 	return (!m_memory0 & m_memory1) ? 1 : 0;
 }
 
-ndInt32 ndPhysed::ButtonKey::UpdatePushButton (bool triggerValue)
+ndInt32 ndAuthor::ButtonKey::UpdatePushButton (bool triggerValue)
 {
 	if (UpdateTrigger (triggerValue)) 
 	{
@@ -219,7 +219,7 @@ void Test1__()
 	//}
 }
 
-class ndPhysed::ndPhysed::ndDebuMesh
+class ndAuthor::ndAuthor::ndDebuMesh
 {
 	public:
 	ndDebuMesh()
@@ -234,13 +234,13 @@ class ndPhysed::ndPhysed::ndDebuMesh
 	ndSharedPtr<ndWireFrameDebugMesh> m_wireFrameShareEdge;
 };
 
-class ndPhysed::ndPhysed::ndDebugMeshCache : public ndTree<ndDebuMesh, const ndShape*>
+class ndAuthor::ndAuthor::ndDebugMeshCache : public ndTree<ndDebuMesh, const ndShape*>
 {
 };
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
-ndPhysed::ndPhysed ()
+ndAuthor::ndAuthor ()
 	:m_mainFrame(nullptr)
 	,m_defaultFont(0)
 	,m_sky(nullptr)
@@ -461,12 +461,12 @@ ndPhysed::ndPhysed ()
 	//Test1__();
 	ndTestDeedBrian();
 
-	//ndSharedPtr<ndPhysed> xxx(this);
-	//ndPhysed* xxx1 = *xxx;
-	//ndPhysed* xxx2 = *xxx;
+	//ndSharedPtr<ndAuthor> xxx(this);
+	//ndAuthor* xxx1 = *xxx;
+	//ndAuthor* xxx2 = *xxx;
 }
 
-ndPhysed::~ndPhysed ()
+ndAuthor::~ndAuthor ()
 {
 	if (m_replayLogFile)
 	{
@@ -509,7 +509,7 @@ ndPhysed::~ndPhysed ()
 }
 
 #ifdef _DEBUG
-void ndPhysed::OpenMessageCallback(GLenum source,
+void ndAuthor::OpenMessageCallback(GLenum source,
 	GLenum type,
 	GLuint id,
 	GLenum severity,
@@ -531,12 +531,12 @@ void ndPhysed::OpenMessageCallback(GLenum source,
 }
 #endif
 
-ndDemoCamera* ndPhysed::GetCamera() const
+ndDemoCamera* ndAuthor::GetCamera() const
 {
 	return m_cameraManager->GetCamera();
 }
 
-bool ndPhysed::GetKeyState(ndInt32 key) const
+bool ndAuthor::GetKeyState(ndInt32 key) const
 {
 	const ImGuiIO& io = ImGui::GetIO();
 	bool state = io.KeysDown[key];
@@ -554,7 +554,7 @@ bool ndPhysed::GetKeyState(ndInt32 key) const
 	return state;
 }
 
-ndAnimationSequence* ndPhysed::GetAnimationSequence(const char* const fileName)
+ndAnimationSequence* ndAuthor::GetAnimationSequence(const char* const fileName)
 {
 	ndTree<ndAnimationSequence*, ndString>::ndNode* node = m_animationCache.Find(fileName);
 	if (!node)
@@ -568,54 +568,54 @@ ndAnimationSequence* ndPhysed::GetAnimationSequence(const char* const fileName)
 	return node ? node->GetInfo() : nullptr;
 }
 
-bool ndPhysed::IsShiftKeyDown () const
+bool ndAuthor::IsShiftKeyDown () const
 {
 	const ImGuiIO& io = ImGui::GetIO();
 	bool state = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
 	return state;
 }
 
-bool ndPhysed::IsControlKeyDown () const
+bool ndAuthor::IsControlKeyDown () const
 {
 	const ImGuiIO& io = ImGui::GetIO();
 	bool state = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
 	return state;
 }
 
-bool ndPhysed::GetCaptured() const
+bool ndAuthor::GetCaptured() const
 {
 	ImGuiIO& io = ImGui::GetIO();
 	return io.WantCaptureMouse;
 }
 
-bool ndPhysed::GetMouseKeyState (ndInt32 button) const
+bool ndAuthor::GetMouseKeyState (ndInt32 button) const
 {
 	ImGuiIO& io = ImGui::GetIO();
 	return io.MouseDown[button];
 }
 
-void ndPhysed::Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>& demoGui)
+void ndAuthor::Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>& demoGui)
 {
 	m_renderDemoGUI = demoGui;
 }
 
-void* ndPhysed::GetUpdateCameraContext() const
+void* ndAuthor::GetUpdateCameraContext() const
 {
 	return m_updateCameraContext;
 }
 
-void ndPhysed::SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context)
+void ndAuthor::SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context)
 {
 	m_updateCamera = callback;
 	m_updateCameraContext = context;
 }
 
-bool ndPhysed::JoystickDetected() const
+bool ndAuthor::JoystickDetected() const
 {
 	return glfwJoystickPresent(0) ? true : false;
 }
 
-void ndPhysed::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues)
+void ndAuthor::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues)
 {
 	ndAssert(JoystickDetected());
 	ndInt32 axisCount = 0;
@@ -639,7 +639,7 @@ void ndPhysed::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues)
 #endif
 }
 
-void ndPhysed::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbuttons)
+void ndAuthor::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbuttons)
 {
 	ndAssert(JoystickDetected());
 	ndInt32 buttonsCount = 0;
@@ -665,27 +665,27 @@ void ndPhysed::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbuttons)
 #endif
 }
 
-void ndPhysed::ResetTimer()
+void ndAuthor::ResetTimer()
 {
 	dResetTimer();
 	m_microsecunds = ndGetTimeInMicroseconds ();
 }
 
-void ndPhysed::AddEntity(ndDemoEntity* const ent)
+void ndAuthor::AddEntity(ndDemoEntity* const ent)
 {
 	ndScopeSpinLock lock(m_addDeleteLock);
 	ndAssert(!ent->m_rootNode);
 	ent->m_rootNode = Append(ent);
 }
 
-void ndPhysed::RemoveEntity (ndDemoEntity* const ent)
+void ndAuthor::RemoveEntity (ndDemoEntity* const ent)
 {
 	ndScopeSpinLock lock(m_addDeleteLock);
 	ndAssert(ent->m_rootNode);
 	Remove(ent->m_rootNode);
 }
 
-void ndPhysed::Cleanup ()
+void ndAuthor::Cleanup ()
 {
 	// is we are run asynchronous we need make sure no update in on flight.
 	if (m_world) 
@@ -753,7 +753,7 @@ void ndPhysed::Cleanup ()
 	m_renderDemoGUI = ndSharedPtr<ndUIEntity>();
 }
 
-void ndPhysed::LoadFont()
+void ndAuthor::LoadFont()
 {
 	// Build texture atlas
 	ImGuiIO& io = ImGui::GetIO();
@@ -798,7 +798,7 @@ void ndPhysed::LoadFont()
 	glBindTexture(GL_TEXTURE_2D, GLuint(last_texture));
 }
 
-void ndPhysed::ApplyMenuOptions()
+void ndAuthor::ApplyMenuOptions()
 {
 	m_world->Sync();
 	m_world->SetSubSteps(m_solverSubSteps);
@@ -818,7 +818,7 @@ void ndPhysed::ApplyMenuOptions()
 	m_solverMode = m_world->GetSelectedSolver();
 }
 
-void ndPhysed::ShowMainMenuBar()
+void ndAuthor::ShowMainMenuBar()
 {
 	ndMenuSelection menuSelection = m_none;
 	if (ImGui::BeginMainMenuBar())
@@ -1018,7 +1018,7 @@ void ndPhysed::ShowMainMenuBar()
 	}
 }
 
-void ndPhysed::LoadDemo(ndInt32 menu)
+void ndAuthor::LoadDemo(ndInt32 menu)
 {
 	char newTitle[256];
 	Cleanup();
@@ -1033,14 +1033,14 @@ void ndPhysed::LoadDemo(ndInt32 menu)
 	ResetTimer();
 }
 
-void ndPhysed::ErrorCallback(ndInt32 error, const char* description)
+void ndAuthor::ErrorCallback(ndInt32 error, const char* description)
 {
 	ndTrace (("Error %d: %s\n", error, description));
 	fprintf(stderr, "Error %d: %s\n", error, description);
 	ndAssert (0);
 }
 
-void ndPhysed::MouseButtonCallback(GLFWwindow*, ndInt32 button, ndInt32 action, ndInt32)
+void ndAuthor::MouseButtonCallback(GLFWwindow*, ndInt32 button, ndInt32 action, ndInt32)
 {
 	if (button >= 0 && button < 3) 
 	{
@@ -1056,19 +1056,19 @@ void ndPhysed::MouseButtonCallback(GLFWwindow*, ndInt32 button, ndInt32 action, 
 	}
 }
 
-void ndPhysed::MouseScrollCallback(GLFWwindow* const, double, double y)
+void ndAuthor::MouseScrollCallback(GLFWwindow* const, double, double y)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	io.MouseWheel += float (y);
 }
 
-void ndPhysed::CursorposCallback  (GLFWwindow* , double x, double y)
+void ndAuthor::CursorposCallback  (GLFWwindow* , double x, double y)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	io.MousePos = ImVec2((float)x, (float)y);
 }
 
-bool ndPhysed::GetMouseSpeed(ndFloat32& speedX, ndFloat32& speedY) const
+bool ndAuthor::GetMouseSpeed(ndFloat32& speedX, ndFloat32& speedY) const
 {
 	ImVec2 speed(ImGui::GetMouseDragDelta(0, 0.0f));
 	speedX = speed.x;
@@ -1076,7 +1076,7 @@ bool ndPhysed::GetMouseSpeed(ndFloat32& speedX, ndFloat32& speedY) const
 	return true;
 }
 
-bool ndPhysed::GetMousePosition (ndFloat32& posX, ndFloat32& posY) const
+bool ndAuthor::GetMousePosition (ndFloat32& posX, ndFloat32& posY) const
 {
 	ImVec2 posit(ImGui::GetMousePos());
 	posX = posit.x;
@@ -1084,14 +1084,14 @@ bool ndPhysed::GetMousePosition (ndFloat32& posX, ndFloat32& posY) const
 	return true;
 }
 
-void ndPhysed::CharCallback(GLFWwindow*, ndUnsigned32 ch)
+void ndAuthor::CharCallback(GLFWwindow*, ndUnsigned32 ch)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	io.AddInputCharacter((unsigned short)ch);
 }
 
 
-void ndPhysed::KeyCallback(GLFWwindow* const window, ndInt32 key, ndInt32, ndInt32 action, ndInt32 mods)
+void ndAuthor::KeyCallback(GLFWwindow* const window, ndInt32 key, ndInt32, ndInt32 action, ndInt32 mods)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	if (action == GLFW_PRESS)
@@ -1106,7 +1106,7 @@ void ndPhysed::KeyCallback(GLFWwindow* const window, ndInt32 key, ndInt32, ndInt
 	io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 	
 	static ndInt32 prevKey;
-	ndPhysed* const manager = (ndPhysed*)glfwGetWindowUserPointer(window);
+	ndAuthor* const manager = (ndAuthor*)glfwGetWindowUserPointer(window);
 	if ((key == GLFW_KEY_F10) && (key != prevKey)) 
 	{
 		manager->m_profilerMode = true;
@@ -1127,7 +1127,7 @@ void ndPhysed::KeyCallback(GLFWwindow* const window, ndInt32 key, ndInt32, ndInt
 	prevKey = io.KeysDown[key] ? key : 0;
 }
 
-void ndPhysed::ToggleProfiler()
+void ndAuthor::ToggleProfiler()
 {
 	#ifdef D_PROFILER
 		ndAssert(m_world);
@@ -1137,7 +1137,7 @@ void ndPhysed::ToggleProfiler()
 	#endif
 }
 
-void ndPhysed::BeginFrame()
+void ndAuthor::BeginFrame()
 {
 	// Poll and handle events (inputs, window resize, etc.)
 	// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -1170,7 +1170,7 @@ void ndPhysed::BeginFrame()
 	ImGui::NewFrame();
 }
 
-ndInt32 ndPhysed::ParticleCount() const
+ndInt32 ndAuthor::ParticleCount() const
 {
 	ndInt32 count = 0;
 	const ndBodyList& particles = m_world->GetParticleList();
@@ -1182,7 +1182,7 @@ ndInt32 ndPhysed::ParticleCount() const
 	return count;
 }
 
-void ndPhysed::SetParticleUpdateMode() const
+void ndAuthor::SetParticleUpdateMode() const
 {
 	const ndBodyList& particles = m_world->GetParticleList();
 	for (ndBodyList::ndNode* node = particles.GetFirst(); node; node = node->GetNext())
@@ -1192,7 +1192,7 @@ void ndPhysed::SetParticleUpdateMode() const
 	}
 }
 
-void ndPhysed::RenderStats()
+void ndAuthor::RenderStats()
 {
 	if (m_showStats) 
 	{
@@ -1256,7 +1256,7 @@ void ndPhysed::RenderStats()
 	ShowMainMenuBar();
 }
 
-void ndPhysed::CalculateFPS(ndFloat32 timestep)
+void ndAuthor::CalculateFPS(ndFloat32 timestep)
 {
 	m_framesCount ++;
 	m_timestepAcc += timestep;
@@ -1278,7 +1278,7 @@ void ndPhysed::CalculateFPS(ndFloat32 timestep)
 	}
 }
 
-void ndPhysed::CreateSkyBox()
+void ndAuthor::CreateSkyBox()
 {
 	if (!m_sky)
 	{
@@ -1290,7 +1290,7 @@ void ndPhysed::CreateSkyBox()
 	}
 }
 
-void ndPhysed::PushTransparentMesh (const ndDemoMeshInterface* const mesh, const ndMatrix& modelMatrix)
+void ndAuthor::PushTransparentMesh (const ndDemoMeshInterface* const mesh, const ndMatrix& modelMatrix)
 {
 	ndVector dist (m_cameraManager->GetCamera()->GetViewMatrix().TransformVector(modelMatrix.m_posit));
 	TransparentMesh entry (modelMatrix, (ndDemoMesh*) mesh);
@@ -1298,15 +1298,15 @@ void ndPhysed::PushTransparentMesh (const ndDemoMeshInterface* const mesh, const
 }
 
 
-//void ndPhysed::ImportPLYfile (const char* const fileName)
-void ndPhysed::ImportPLYfile(const char* const)
+//void ndAuthor::ImportPLYfile (const char* const fileName)
+void ndAuthor::ImportPLYfile(const char* const)
 {
 	ndAssert(0);
 	//m_collisionDisplayMode = 2;
 	//CreatePLYMesh (this, fileName, true);
 }
 
-ndInt32 ndPhysed::Print (const ndVector&, const char *fmt, ... ) const
+ndInt32 ndAuthor::Print (const ndVector&, const char *fmt, ... ) const
 {
 	va_list argptr;
 	char string[1024];
@@ -1318,12 +1318,12 @@ ndInt32 ndPhysed::Print (const ndVector&, const char *fmt, ... ) const
 	return 0;
 }
 
-void ndPhysed::SetCameraMatrix (const ndQuaternion& rotation, const ndVector& position)
+void ndAuthor::SetCameraMatrix (const ndQuaternion& rotation, const ndVector& position)
 {
 	m_cameraManager->SetCameraMatrix(rotation, position);
 }
 
-void ndPhysed::UpdatePhysics(ndFloat32 timestep)
+void ndAuthor::UpdatePhysics(ndFloat32 timestep)
 {
 	// update the physics
 	if (m_world && !m_suspendPhysicsUpdate) 
@@ -1332,7 +1332,7 @@ void ndPhysed::UpdatePhysics(ndFloat32 timestep)
 	}
 }
 
-ndFloat32 ndPhysed::CalculateInteplationParam () const
+ndFloat32 ndAuthor::CalculateInteplationParam () const
 {
 	ndUnsigned64 timeStep = ndGetTimeInMicroseconds () - m_microsecunds;		
 	ndFloat32 param = (ndFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
@@ -1345,7 +1345,7 @@ ndFloat32 ndPhysed::CalculateInteplationParam () const
 }
 
 
-void ndPhysed::RenderScene(ImDrawData* const draw_data)
+void ndAuthor::RenderScene(ImDrawData* const draw_data)
 {
 	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
 	ImGuiIO& io = ImGui::GetIO();
@@ -1357,7 +1357,7 @@ void ndPhysed::RenderScene(ImDrawData* const draw_data)
 		return;
 	}
 
-	ndPhysed* const window = (ndPhysed*)io.UserData;
+	ndAuthor* const window = (ndAuthor*)io.UserData;
 
 	ImVec4 clearColor = ImColor(114, 144, 154);
 	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
@@ -1435,7 +1435,7 @@ void ndPhysed::RenderScene(ImDrawData* const draw_data)
 	glPopAttrib();
 }
 
-void ndPhysed::DrawDebugShapes()
+void ndAuthor::DrawDebugShapes()
 {
 	const ndVector awakeColor(1.0f, 1.0f, 1.0f, 1.0f);
 	const ndVector sleepColor(0.42f, 0.73f, 0.98f, 1.0f);
@@ -1524,7 +1524,7 @@ void ndPhysed::DrawDebugShapes()
 	RenderParticles(this);
 }
 
-void ndPhysed::RenderScene()
+void ndAuthor::RenderScene()
 {
 	D_TRACKTIME();
 	ndFloat32 timestep = dGetElapsedSeconds();	
@@ -1649,7 +1649,7 @@ void ndPhysed::RenderScene()
 	}
 }
 
-void ndPhysed::TestImGui()
+void ndAuthor::TestImGui()
 {
 	// Main loop
 	bool show_demo_window = true;
@@ -1697,7 +1697,7 @@ void ndPhysed::TestImGui()
 	}
 }
 
-void ndPhysed::Run()
+void ndAuthor::Run()
 {
 	// Main loop
 	ndFloatExceptions exception;
@@ -1728,15 +1728,15 @@ void ndPhysed::Run()
 #endif
 
 
-ndPhysed::ndPhysed()
+ndAuthor::ndAuthor()
 {
 
 }
 
-ndPhysed::~ndPhysed()
+ndAuthor::~ndAuthor()
 {
 }
 
-void ndPhysed::Run()
+void ndAuthor::Run()
 {
 }
