@@ -27,6 +27,7 @@
 #include "ndFileFormatJoint.h"
 #include "ndFileFormatNotify.h"
 #include "ndFileFormatJointHinge.h"
+#include "ndFileFormatJointSlider.h"
 #include "ndFileFormatShapeConvex.h"
 #include "ndFileFormatDynamicBody.h"
 #include "ndFileFormatKinematicBody.h"
@@ -89,6 +90,7 @@ void ndFileFormatRegistrar::Init()
 
 	static ndFileFormatJoint joint;
 	static ndFileFormatJointHinge jointHinge;
+	static ndFileFormatJointSlider jointSlider;
 	static ndFileFormatJointSpherical jointSpherical;
 
 	static ndFileFormatShapeConvex shapeConvex;
