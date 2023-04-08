@@ -13,7 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndIkJointHinge.h"
 
-
 ndIkJointHinge::ndIkJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointHinge(pinAndPivotFrame, child, parent)
 	,ndJointBilateralConstraint::ndIkInterface()

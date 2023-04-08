@@ -41,13 +41,16 @@
 #include "ndFileFormatShapeConvexCone.h"
 #include "ndFileFormatShapeConvexHull.h"
 #include "ndFileFormatShapeStaticMesh.h"
+#include "ndFileFormatJointFollowPath.h"
 #include "ndFileFormatJointDoubleHinge.h"
+#include "ndFileFormatJointFixDistance.h"
 #include "ndFileFormatBodyTriggerVolume.h"
 #include "ndFileFormatKinematicBodyBase.h"
 #include "ndFileFormatShapeConvexSphere.h"
 #include "ndFileFormatShapeConvexCapsule.h"
 #include "ndFileFormatShapeConvexCylinder.h"
 #include "ndFileFormatShapeStaticMesh_bvh.h"
+#include "ndFileFormatJointRollingFriction.h"
 #include "ndFileFormatShapeStaticHeightfield.h"
 #include "ndFileFormatShapeStaticProceduralMesh.h"
 #include "ndFileFormatShapeConvexChamferCylinder.h"
@@ -99,7 +102,10 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatJointRoller jointRoller;
 	static ndFileFormatJointSpherical jointSpherical;
 	static ndFileFormatJointCylinder jointCylindrical;
+	static ndFileFormatJointFollowPath jointFollowPath;
 	static ndFileFormatJointDoubleHinge jointDoubleHinge;
+	static ndFileFormatJointFixDistance jointFixDistance;
+	static ndFileFormatJointRollingFriction jointRollingFriction;
 
 	static ndFileFormatShapeConvex shapeConvex;
 	static ndFileFormatShapeConvexBox shapeBox;

@@ -28,6 +28,12 @@ class ndJointDryRollingFriction: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointDryRollingFriction(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndFloat32 coefficient);
 	D_NEWTON_API virtual ~ndJointDryRollingFriction();
 
+	D_NEWTON_API void SetContactTrail(ndFloat32 trail);
+	D_NEWTON_API void SetFrictionCoefficient(ndFloat32 friction);
+	
+	D_NEWTON_API ndFloat32 GetContactTrail() const;
+	D_NEWTON_API ndFloat32 GetFrictionCoefficient() const;
+
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 

@@ -14,27 +14,39 @@
 #include "ndJointFixDistance.h"
 
 ndJointFixDistance::ndJointFixDistance(const ndVector& pivotInChildInGlobalSpace, const ndVector& pivotInParentInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(3, child, parent, ndGetIdentityMatrix())
-	,m_distance(ndFloat32 (0.0f))
+	:ndJointBilateralConstraint(1, child, parent, ndGetIdentityMatrix())
 {
+	//ndMatrix childMatrix(ndGetIdentityMatrix());
+	//ndMatrix parentMatrix(ndGetIdentityMatrix());
+	//childMatrix.m_posit = pivotInChildInGlobalSpace;
+	//parentMatrix.m_posit = pivotInParentInGlobalSpace;
+	//childMatrix.m_posit.m_w = 1.0f;
+	//parentMatrix.m_posit.m_w = 1.0f;
+	//ndMatrix dummy;
+	//CalculateLocalMatrix(childMatrix, m_localMatrix0, dummy);
+	//CalculateLocalMatrix(parentMatrix, dummy, m_localMatrix1);
+
+	m_localMatrix0 = ndGetIdentityMatrix();
+	m_localMatrix1 = ndGetIdentityMatrix();
+	m_localMatrix0.m_posit = child->GetMatrix().UntransformVector(pivotInChildInGlobalSpace);
+	m_localMatrix1.m_posit = parent->GetMatrix().UntransformVector(pivotInParentInGlobalSpace);
+
 	ndVector dist(pivotInChildInGlobalSpace - pivotInParentInGlobalSpace);
 	m_distance = ndSqrt(dist.DotProduct(dist).GetScalar());
-
-	ndMatrix childMatrix(ndGetIdentityMatrix());
-	ndMatrix parentMatrix(ndGetIdentityMatrix());
-
-	childMatrix.m_posit = pivotInChildInGlobalSpace;
-	parentMatrix.m_posit = pivotInParentInGlobalSpace;
-	childMatrix.m_posit.m_w = 1.0f;
-	parentMatrix.m_posit.m_w = 1.0f;
-
-	ndMatrix dummy;
-	CalculateLocalMatrix(childMatrix, m_localMatrix0, dummy);
-	CalculateLocalMatrix(parentMatrix, dummy, m_localMatrix1);
 }
 
 ndJointFixDistance::~ndJointFixDistance()
 {
+}
+
+ndFloat32 ndJointFixDistance::GetDistance() const
+{
+	return m_distance;
+}
+
+void ndJointFixDistance::SetDistance(ndFloat32 dist)
+{
+	m_distance = dist;
 }
 
 void ndJointFixDistance::JacobianDerivative(ndConstraintDescritor& desc)
@@ -50,13 +62,6 @@ void ndJointFixDistance::JacobianDerivative(ndConstraintDescritor& desc)
 
 	ndVector dir(p1 - p0);
 	ndFloat32 mag2 = dir.DotProduct(dir).GetScalar();
-	//if (mag2 < ndFloat32 (1.0e-3f)) 
-	//{
-	//	AddLinearRowJacobian(desc, p0, p1, matrix0.m_front);
-	//	AddLinearRowJacobian(desc, p0, p1, matrix0.m_up);
-	//	AddLinearRowJacobian(desc, p0, p1, matrix0.m_right);
-	//} 
-	//else 
 	if (mag2 > ndFloat32(1.0e-3f))
 	{
 		dir = dir.Scale(1.0f / ndSqrt(mag2));
