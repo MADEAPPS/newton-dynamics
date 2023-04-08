@@ -268,8 +268,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	origin.m_z += 15.0f;
 
 	ndFileFormat xxxx;
-	xxxx.CollectScene(scene->GetWorld());
-	xxxx.SaveBodies("xxxx.nd");
+	xxxx.SaveBodies(scene->GetWorld(), "xxxx.nd");
 
 	ndQuaternion rot(ndYawMatrix(45.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);

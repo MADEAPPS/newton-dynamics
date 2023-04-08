@@ -31,29 +31,29 @@ class ndFileFormat : public ndClassAlloc
 	ndFileFormat();
 	~ndFileFormat();
 
-	void CollectScene(const ndWorld* const world);
-
-	void SaveWorld(const char* const path);
-	void SaveBodies(const char* const path);
-	
-	ndString m_fileName;
-	const ndWorld* m_world;
-	ndArray<ndBody*> m_bodies;
-	ndArray<ndJointBilateralConstraint*> m_joints;
+	void SaveWorld(const ndWorld* const world, const char* const path);
+	void SaveBodies(const ndWorld* const world, const char* const path);
 	
 	private:
-	ndTree<ndInt32, ndUnsigned64> m_bodiesIds;
-	ndTree<ndInt32, ndUnsigned64> m_uniqueShapesIds;
-
+	void CollectScene(const ndWorld* const world);
 	void SaveWorld(nd::TiXmlElement* const rootNode);
 	void SaveBodies(nd::TiXmlElement* const rootNode);
 	void SaveJoints(nd::TiXmlElement* const rootNode);
 	void SaveCollisionShapes(nd::TiXmlElement* const rootNode);
 
+	ndString m_fileName;
+	const ndWorld* m_world;
+	ndArray<ndBody*> m_bodies;
+	ndArray<ndJointBilateralConstraint*> m_joints;
+	ndTree<ndInt32, ndUnsigned64> m_bodiesIds;
+	ndTree<ndInt32, ndUnsigned64> m_uniqueShapesIds;
+
 	friend class ndFileFormatBody;
 	friend class ndFileFormatJoint;
 	friend class ndFileFormatShapeInstance;
 	friend class ndFileFormatShapeCompound;
+	friend class ndFileFormatShapeStaticMesh_bvh;
+	friend class ndFileFormatShapeStaticHeightfield;
 };
 
 #endif 

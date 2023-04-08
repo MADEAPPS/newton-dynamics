@@ -178,6 +178,5 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	scene->SetCameraMatrix(rot, origin);
 
 	ndFileFormat xxxx;
-	xxxx.CollectScene(scene->GetWorld());
-	xxxx.SaveBodies("xxxx.nd");
+	xxxx.SaveBodies(scene->GetWorld(), "xxxx.nd");
 }

@@ -994,8 +994,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			char fileName[1024];
 			if (dGetSaveNdFileName(fileName, 1024))
 			{
-				ndAssert(0);
-				//m_world->SaveScene(fileName);
+				ndFileFormat fileSave;
+				fileSave.SaveWorld(m_world, fileName);
 			}
 			break;
 		}

@@ -128,7 +128,7 @@ void ndFileFormat::SaveCollisionShapes(nd::TiXmlElement* const rootNode)
 	}
 }
 
-void ndFileFormat::SaveBodies(const char* const path)
+void ndFileFormat::SaveBodies(const ndWorld* const world, const char* const path)
 {
 	// save the path for use with generated assets.
 	m_fileName = path;
@@ -140,6 +140,7 @@ void ndFileFormat::SaveBodies(const char* const path)
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
 	asciifile.LinkEndChild(rootNode);
 
+	CollectScene(world);
 	SaveCollisionShapes(rootNode);
 	SaveBodies(rootNode);
 	
@@ -151,7 +152,7 @@ void ndFileFormat::SaveBodies(const char* const path)
 	m_uniqueShapesIds.RemoveAll();
 }
 
-void ndFileFormat::SaveWorld(const char* const path)
+void ndFileFormat::SaveWorld(const ndWorld* const world, const char* const path)
 {
 	m_fileName = path;
 
@@ -162,10 +163,11 @@ void ndFileFormat::SaveWorld(const char* const path)
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
 	asciifile.LinkEndChild(rootNode);
 
-	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(m_world->ClassName());
+	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(world->ClassName());
 	ndAssert(handler);
 	if (handler)
 	{
+		CollectScene(world);
 		handler->SaveWorld(this, rootNode, m_world);
 		SaveCollisionShapes(rootNode);
 		SaveBodies(rootNode);
