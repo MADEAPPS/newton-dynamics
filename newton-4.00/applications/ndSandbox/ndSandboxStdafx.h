@@ -108,6 +108,7 @@
 #include <ndFileFormatWorld.h>
 #include <ndFileFormatNotify.h>
 #include <ndFileFormatRegistrar.h>
+#include <ndFileFormatDynamicBody.h>
 #include <ndFileFormatBodyTriggerVolume.h>
 #include <ndFileFormatShapeStaticProceduralMesh.h>
 
