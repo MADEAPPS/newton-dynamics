@@ -168,10 +168,10 @@ namespace ndSimpleRobot
 			
 							m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
 			
-							ndFloat32 relaxation = 0.003f;
+							ndFloat32 relaxation = 0.002f;
 							m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
-							m_effector->SetLinearSpringDamper(relaxation, 1500.0f, 200.0f);
-							m_effector->SetAngularSpringDamper(relaxation, 1500.0f, 100.0f);
+							m_effector->SetLinearSpringDamper(relaxation, 2000.0f, 200.0f);
+							m_effector->SetAngularSpringDamper(relaxation, 2000.0f, 200.0f);
 							m_effector->SetMaxForce(10000.0f);
 							m_effector->SetMaxTorque(10000.0f);
 			
@@ -373,4 +373,7 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z += 6.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 45.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
+
+	ndFileFormat xxxx;
+	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 }

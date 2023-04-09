@@ -23,11 +23,11 @@ class ndDemoMeshInterface;
 class ndDemoEntityNotify: public ndBodyNotify
 {
 	public:
-	class ndFileDemoEntityNotify: public ndFileFormatNotify
+	class ndDemoEntityNotifyFileLoadSave: public ndFileFormatNotify
 	{
 		public:
-		ndFileDemoEntityNotify()
-			:ndFileFormatNotify(ndDemoEntityNotify::StaticClassName())
+		ndDemoEntityNotifyFileLoadSave(const char* const className = ndDemoEntityNotify::StaticClassName())
+			:ndFileFormatNotify(className)
 		{
 		}
 
@@ -67,6 +67,27 @@ class ndBindingRagdollEntityNotify : public ndDemoEntityNotify
 {
 	public:
 	D_CLASS_REFLECTION(ndBindingRagdollEntityNotify, ndDemoEntityNotify)
+
+	class ndBindingRagdollEntityNotifyFileSaveLoad : public ndDemoEntityNotifyFileLoadSave
+	{
+		public:
+		ndBindingRagdollEntityNotifyFileSaveLoad()
+			:ndDemoEntityNotifyFileLoadSave(ndBindingRagdollEntityNotify::StaticClassName())
+		{
+		}
+
+		void SaveNotify(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
+		{
+			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBindingNotifyClass", ndBindingRagdollEntityNotify::StaticClassName());
+			ndDemoEntityNotifyFileLoadSave::SaveNotify(scene, classNode, notify);
+
+			ndBindingRagdollEntityNotify* const bindNotiFy = (ndBindingRagdollEntityNotify*)notify;
+			xmlSaveParam(classNode, "bindMatrix", bindNotiFy->m_bindMatrix);
+			xmlSaveParam(classNode, "capSpeed", bindNotiFy->m_capSpeed);
+		}
+	};
+
+
 	ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody, ndFloat32 campSpeed);
 
 	void OnTransform(ndInt32, const ndMatrix& matrix);

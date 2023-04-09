@@ -827,7 +827,6 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	ndVector origin(-20.0f, 5.0f, 0.0f, 1.0f);
 
 	ndFileFormat xxxx;
-	//xxxx.SaveBodies(scene->GetWorld(), "xxxx.nd");
 	xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 
 	scene->SetCameraMatrix(rot, origin);

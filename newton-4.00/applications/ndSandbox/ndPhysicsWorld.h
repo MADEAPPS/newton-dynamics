@@ -23,10 +23,10 @@ class ndPhysicsWorld: public ndWorld
 	public:
 	D_CLASS_REFLECTION(ndPhysicsWorld, ndWorld)
 
-	class ndPhysicsWorldSaveLoad : public ndFileFormatWorld
+	class ndPhysicsWorldFileLoadSave : public ndFileFormatWorld
 	{
 		public:
-		ndPhysicsWorldSaveLoad()
+		ndPhysicsWorldFileLoadSave()
 			:ndFileFormatWorld(ndPhysicsWorld::StaticClassName())
 		{
 		}

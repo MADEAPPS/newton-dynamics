@@ -21,7 +21,7 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDem
 	,m_parentBody(parentBody)
 	,m_manager(manager)
 {
-	static ndFileDemoEntityNotify registerClass;
+	static ndDemoEntityNotifyFileLoadSave registerClass;
 }
 
 ndDemoEntityNotify::~ndDemoEntityNotify()
@@ -89,6 +89,7 @@ ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* 
 	,m_bindMatrix(ndGetIdentityMatrix())
 	,m_capSpeed(capSpeed)
 {
+	static ndBindingRagdollEntityNotifyFileSaveLoad registerClass;
 	ndDemoEntity* const parentEntity = m_parentBody ? (ndDemoEntity*)(parentBody->GetNotifyCallback()->GetUserData()) : nullptr;
 	m_bindMatrix = entity->GetParent()->CalculateGlobalMatrix(parentEntity).Inverse();
 }

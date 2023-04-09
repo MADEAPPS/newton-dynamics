@@ -335,6 +335,6 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	origin.m_z -= 2.0f;
 	scene->SetCameraMatrix(playerMatrix, origin);
 	
-	//ndLoadSave loadScene;
-	//loadScene.SaveModel("xxxxxx", ragdoll);
+	ndFileFormat xxxx;
+	xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 }
