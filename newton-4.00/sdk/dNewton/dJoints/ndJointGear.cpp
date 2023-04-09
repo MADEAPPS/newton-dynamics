@@ -40,6 +40,17 @@ ndJointGear::~ndJointGear()
 {
 }
 
+
+ndFloat32 ndJointGear::GetRatio() const
+{
+	return m_gearRatio;
+}
+
+void ndJointGear::SetRatio(ndFloat32 ratio)
+{
+	m_gearRatio = ratio;
+}
+
 void ndJointGear::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;

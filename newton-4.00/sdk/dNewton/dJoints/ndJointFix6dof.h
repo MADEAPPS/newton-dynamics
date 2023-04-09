@@ -24,7 +24,12 @@ class ndJointFix6dof: public ndJointBilateralConstraint
 	D_NEWTON_API virtual ~ndJointFix6dof();
 
 	D_NEWTON_API void SetAsSoftJoint(bool mode);
+
+	D_NEWTON_API ndFloat32 GetRegularizer() const;
 	D_NEWTON_API void SetRegularizer(ndFloat32 regularizer);
+
+	D_NEWTON_API ndFloat32 GetMaxForce() const;
+	D_NEWTON_API ndFloat32 GetMaxTorque() const;
 
 	private:
 	void JacobianDerivative(ndConstraintDescritor& desc);

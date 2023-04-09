@@ -44,6 +44,21 @@ void ndJointFix6dof::SetRegularizer(ndFloat32 regularizer)
 	m_softness = ndClamp(regularizer, ndFloat32(0.0f), ndFloat32(1.0f));
 }
 
+ndFloat32 ndJointFix6dof::GetRegularizer() const
+{
+	return m_softness;
+}
+
+ndFloat32 ndJointFix6dof::GetMaxForce() const
+{
+	return m_maxForce;
+}
+
+ndFloat32 ndJointFix6dof::GetMaxTorque() const
+{
+	return m_maxTorque;
+}
+
 void ndJointFix6dof::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;

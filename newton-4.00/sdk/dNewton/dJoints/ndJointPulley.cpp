@@ -40,6 +40,16 @@ ndJointPulley::~ndJointPulley()
 {
 }
 
+ndFloat32 ndJointPulley::GetRatio() const
+{
+	return m_gearRatio;
+}
+
+void ndJointPulley::SetRatio(ndFloat32 ratio)
+{
+	m_gearRatio = ratio;
+}
+
 void ndJointPulley::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;

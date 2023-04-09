@@ -24,8 +24,8 @@ class ndJointGear: public ndJointBilateralConstraint
 		const ndVector& body1Pin, ndBodyKinematic* const body1);
 	D_NEWTON_API virtual ~ndJointGear();
 
-	ndFloat32 GetRatio() const;
-	void SetRatio(ndFloat32 ratio);
+	D_NEWTON_API ndFloat32 GetRatio() const;
+	D_NEWTON_API void SetRatio(ndFloat32 ratio);
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
@@ -33,15 +33,6 @@ class ndJointGear: public ndJointBilateralConstraint
 	ndFloat32 m_gearRatio;
 };
 
-inline ndFloat32 ndJointGear::GetRatio() const
-{
-	return m_gearRatio;
-}
-
-inline void ndJointGear::SetRatio(ndFloat32 ratio)
-{
-	m_gearRatio = ratio;
-}
 
 
 #endif 

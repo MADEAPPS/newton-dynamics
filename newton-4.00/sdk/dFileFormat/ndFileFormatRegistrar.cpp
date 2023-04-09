@@ -27,11 +27,15 @@
 #include "ndFileFormatJoint.h"
 #include "ndFileFormatNotify.h"
 #include "ndFileFormatJointGear.h"
+#include "ndFileFormatJointPlane.h"
 #include "ndFileFormatJointHinge.h"
 #include "ndFileFormatJointSlider.h"
+#include "ndFileFormatJointPulley.h"
 #include "ndFileFormatShapeConvex.h"
 #include "ndFileFormatDynamicBody.h"
 #include "ndFileFormatJointRoller.h"
+#include "ndFileFormatJointFix6dof.h"
+#include "ndFileFormatJointIkHinge.h"
 #include "ndFileFormatKinematicBody.h"
 #include "ndFileFormatShapeInstance.h"
 #include "ndFileFormatShapeCompound.h"
@@ -44,6 +48,7 @@
 #include "ndFileFormatJointFollowPath.h"
 #include "ndFileFormatJointDoubleHinge.h"
 #include "ndFileFormatJointFixDistance.h"
+#include "ndFileFormatJointIkSpherical.h"
 #include "ndFileFormatBodyTriggerVolume.h"
 #include "ndFileFormatKinematicBodyBase.h"
 #include "ndFileFormatShapeConvexSphere.h"
@@ -98,12 +103,17 @@ void ndFileFormatRegistrar::Init()
 
 	static ndFileFormatJoint joint;
 	static ndFileFormatJointGear jointGear;
+	static ndFileFormatJointFix6dof fix6Dof;
+	static ndFileFormatJointPlane jointPlane;
 	static ndFileFormatJointHinge jointHinge;
 	static ndFileFormatJointSlider jointSlider;
 	static ndFileFormatJointRoller jointRoller;
+	static ndFileFormatJointPulley jointPulley;
+	static ndFileFormatJointIkHinge jointIkHinge;
 	static ndFileFormatJointSpherical jointSpherical;
 	static ndFileFormatJointCylinder jointCylindrical;
 	static ndFileFormatJointFollowPath jointFollowPath;
+	static ndFileFormatJointIkSpherical jointIkSpherical;
 	static ndFileFormatJointDoubleHinge jointDoubleHinge;
 	static ndFileFormatJointFixDistance jointFixDistance;
 	static ndFileFormatJointRollingFriction jointRollingFriction;

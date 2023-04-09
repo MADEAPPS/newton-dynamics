@@ -33,10 +33,14 @@
 #include <ndFileFormatRegistrar.h>
 #include <ndFileFormatJointGear.h>
 #include <ndFileFormatJointHinge.h>
+#include <ndFileFormatJointPlane.h>
 #include <ndFileFormatJointRoller.h>
 #include <ndFileFormatDynamicBody.h>
 #include <ndFileFormatJointSlider.h>
+#include <ndFileFormatJointPulley.h>
 #include <ndFileFormatShapeConvex.h>
+#include <ndFileFormatJointIkHinge.h>
+#include <ndFileFormatJointFix6dof.h>
 #include <ndFileFormatShapeInstance.h>
 #include <ndFileFormatShapeCompound.h>
 #include <ndFileFormatJointCylinder.h>
@@ -47,6 +51,7 @@
 #include <ndFileFormatShapeConvexCone.h>
 #include <ndFileFormatJointFollowPath.h>
 #include <ndFileFormatShapeConvexHull.h>
+#include <ndFileFormatJointIkSpherical.h>
 #include <ndFileFormatJointDoubleHinge.h>
 #include <ndFileFormatJointFixDistance.h>
 #include <ndFileFormatBodyTriggerVolume.h>
