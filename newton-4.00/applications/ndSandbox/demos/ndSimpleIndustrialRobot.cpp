@@ -375,5 +375,5 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 
 	ndFileFormat xxxx;
-	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
+	xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 }

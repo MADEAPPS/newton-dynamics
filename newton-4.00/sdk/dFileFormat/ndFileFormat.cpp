@@ -58,86 +58,114 @@ void ndFileFormat::CollectScene(const ndWorld* const world)
 	}
 }
 
+void ndFileFormat::SaveCollisionShapes(nd::TiXmlElement* const rootNode)
+{
+	// save bodies without compound shapes.
+	if (m_bodies.GetCount())
+	{
+		nd::TiXmlElement* const shapeNode = new nd::TiXmlElement("ndShape");
+		rootNode->LinkEndChild(shapeNode);
+		for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+		{
+			ndBodyKinematic* const body = m_bodies[i]->GetAsBodyKinematic();
+			ndShape* const shape = body->GetCollisionShape().GetShape();
+			if (!shape->GetAsShapeCompound())
+			{
+				ndUnsigned64 hash = shape->GetHash();
+				ndTree<ndInt32, ndUnsigned64>::ndNode* const node = m_uniqueShapesIds.Insert(hash);
+				if (node)
+				{
+					ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
+					if (!handler)
+					{
+						ndTrace(("failed to save shape type: %s\n", shape->ClassName()));
+						ndAssert(0);
+					}
+
+					ndInt32 id = handler->SaveShape(this, shapeNode, shape);
+					node->GetInfo() = id;
+				}
+			}
+		}
+
+		// save bodies with compound shapes.
+		for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+		{
+			ndBodyKinematic* const body = m_bodies[i]->GetAsBodyKinematic();
+			ndShape* const shape = body->GetCollisionShape().GetShape();
+			if (shape->GetAsShapeCompound())
+			{
+				ndUnsigned64 hash = shape->GetHash();
+				ndTree<ndInt32, ndUnsigned64>::ndNode* const node = m_uniqueShapesIds.Insert(hash);
+				if (node)
+				{
+					ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
+					ndInt32 id = handler->SaveShape(this, shapeNode, shape);
+					node->GetInfo() = id;
+				}
+			}
+		}
+	}
+}
+
 void ndFileFormat::SaveBodies(nd::TiXmlElement* const rootNode)
 {
-	
-	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+	if (m_bodies.GetCount())
 	{
-		ndBody* const body = m_bodies[i];
-		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(body->ClassName());
-		ndAssert(handler);
-		if (!handler)
+		nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("ndBodies");
+		rootNode->LinkEndChild(bodiesNode);
+
+		for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 		{
-			ndTrace(("failed to save body type: %s\n", body->ClassName()));
-			ndAssert(0);
-		}
-		if (handler)
-		{
-			handler->SaveBody(this, rootNode, body);
+			ndBody* const body = m_bodies[i];
+			ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(body->ClassName());
+			ndAssert(handler);
+			if (!handler)
+			{
+				ndTrace(("failed to save body type: %s\n", body->ClassName()));
+				ndAssert(0);
+			}
+			if (handler)
+			{
+				handler->SaveBody(this, bodiesNode, body);
+			}
 		}
 	}
 }
 
 void ndFileFormat::SaveJoints(nd::TiXmlElement* const rootNode)
 {
-	for (ndInt32 i = 0; i < m_joints.GetCount(); ++i)
+	if (m_joints.GetCount())
 	{
-		ndJointBilateralConstraint* const joint = m_joints[i];
-		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(joint->ClassName());
-		if (!handler)
+		nd::TiXmlElement* const jointsNode = new nd::TiXmlElement("ndJoints");
+		rootNode->LinkEndChild(jointsNode);
+
+		for (ndInt32 i = 0; i < m_joints.GetCount(); ++i)
 		{
-			ndTrace(("failed to save joint type: %s\n", joint->ClassName()));
-			ndAssert(0);
-		}
-		if (handler)
-		{
-			handler->SaveJoint(this, rootNode, joint);
+			ndJointBilateralConstraint* const joint = m_joints[i];
+			ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(joint->ClassName());
+			if (!handler)
+			{
+				ndTrace(("failed to save joint type: %s\n", joint->ClassName()));
+				ndAssert(0);
+			}
+			if (handler)
+			{
+				handler->SaveJoint(this, jointsNode, joint);
+			}
 		}
 	}
 }
 
-void ndFileFormat::SaveCollisionShapes(nd::TiXmlElement* const rootNode)
+void ndFileFormat::SaveWorld(nd::TiXmlElement* const rootNode)
 {
-	// save bodies without compound shapes.
-	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(m_world->ClassName());
+	ndAssert(handler);
+	if (handler)
 	{
-		ndBodyKinematic* const body = m_bodies[i]->GetAsBodyKinematic();
-		ndShape* const shape = body->GetCollisionShape().GetShape();
-		if (!shape->GetAsShapeCompound())
-		{
-			ndUnsigned64 hash = shape->GetHash();
-			ndTree<ndInt32, ndUnsigned64>::ndNode* const node = m_uniqueShapesIds.Insert(hash);
-			if (node)
-			{
-				ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
-				if (!handler)
-				{
-					ndTrace(("failed to save shape type: %s\n", shape->ClassName()));
-					ndAssert(0);
-				}
-
-				ndInt32 id = handler->SaveShape(this, rootNode, shape);
-				node->GetInfo() = id;
-			}
-		}
-	}
-
-	// save bodies with compound shapes.
-	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-	{
-		ndBodyKinematic* const body = m_bodies[i]->GetAsBodyKinematic();
-		ndShape* const shape = body->GetCollisionShape().GetShape();
-		if (shape->GetAsShapeCompound())
-		{
-			ndUnsigned64 hash = shape->GetHash();
-			ndTree<ndInt32, ndUnsigned64>::ndNode* const node = m_uniqueShapesIds.Insert(hash);
-			if (node)
-			{
-				ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
-				ndInt32 id = handler->SaveShape(this, rootNode, shape);
-				node->GetInfo() = id;
-			}
-		}
+		nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
+		rootNode->LinkEndChild(worldNode);
+		handler->SaveWorld(this, worldNode, m_world);
 	}
 }
 
@@ -182,16 +210,11 @@ void ndFileFormat::SaveWorld(const ndWorld* const world, const char* const path)
 	m_bodiesIds.RemoveAll();
 	m_uniqueShapesIds.RemoveAll();
 
-	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(world->ClassName());
-	ndAssert(handler);
-	if (handler)
-	{
-		CollectScene(world);
-		handler->SaveWorld(this, rootNode, m_world);
-		SaveCollisionShapes(rootNode);
-		SaveBodies(rootNode);
-		SaveJoints(rootNode);
-	}
+	CollectScene(world);
+	SaveWorld(rootNode);
+	SaveCollisionShapes(rootNode);
+	SaveBodies(rootNode);
+	SaveJoints(rootNode);
 
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");

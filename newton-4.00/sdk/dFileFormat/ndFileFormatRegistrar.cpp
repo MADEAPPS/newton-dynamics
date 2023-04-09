@@ -48,6 +48,7 @@
 #include "ndFileFormatKinematicBodyBase.h"
 #include "ndFileFormatShapeConvexSphere.h"
 #include "ndFileFormatShapeConvexCapsule.h"
+#include "ndFileFormatJointIk6DofEffector.h"
 #include "ndFileFormatShapeConvexCylinder.h"
 #include "ndFileFormatShapeStaticMesh_bvh.h"
 #include "ndFileFormatJointRollingFriction.h"
@@ -117,6 +118,7 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatShapeStaticMesh shapeStaticMesh;
 	static ndFileFormatShapeConvexCylinder shapeCylinder;
 	static ndFileFormatShapeStaticMesh_bvh shapeStaticBvh;
+	static ndFileFormatJointIk6DofEffector ik6DofEffector;
 	static ndFileFormatShapeStaticHeightfield shapeHeightfield;
 	static ndFileFormatShapeStaticProceduralMesh shapeProceduralMesh;
 	static ndFileFormatShapeConvexChamferCylinder shapeChamferCylinder;

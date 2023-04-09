@@ -55,6 +55,7 @@
 #include <ndFileFormatShapeConvexCapsule.h>
 #include <ndFileFormatShapeConvexCylinder.h>
 #include <ndFileFormatShapeStaticMesh_bvh.h>
+#include <ndFileFormatJointIk6DofEffector.h>
 #include <ndFileFormatJointRollingFriction.h>
 #include <ndFileFormatShapeStaticHeightfield.h>
 #include <ndFileFormatShapeStaticProceduralMesh.h>

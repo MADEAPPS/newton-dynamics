@@ -45,22 +45,22 @@ void ndFileFormatJoint::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* c
 	ndAssert(node0);
 
 	ndInt32 body0NodeId = node0->GetInfo();
-	ndInt32 body1NodeId = node1 ? node1->GetInfo() : -1;
+	ndInt32 body1NodeId = node1 ? node1->GetInfo() : 0;
 
 	union Key
 	{
-		ndUnsigned64 m_key;
+		ndUnsigned64 m_hash;
 		struct
 		{
-			ndInt32 m_low;
-			ndInt32 m_high;
+			ndInt32 m_body0;
+			ndInt32 m_body1;
 		};
 	};
 
 	Key key;
-	key.m_low = body1NodeId;
-	key.m_high = body0NodeId;
-	ndTree<ndInt32, ndUnsigned64>::ndNode* const node = scene->m_jointsIds.Insert(key.m_key);
+	key.m_body0 = body0NodeId;
+	key.m_body1 = body1NodeId;
+	ndTree<ndInt32, ndUnsigned64>::ndNode* const node = scene->m_jointsIds.Insert(key.m_hash);
 	ndAssert(node);
 	if (node)
 	{

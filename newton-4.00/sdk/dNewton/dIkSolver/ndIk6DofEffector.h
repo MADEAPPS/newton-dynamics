@@ -34,6 +34,11 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void EnableAxisZ(bool state);
 	D_NEWTON_API void EnableRotationAxis(ndRotationType type);
 
+	D_NEWTON_API bool GetAxisX() const;
+	D_NEWTON_API bool GetAxisY() const;
+	D_NEWTON_API bool GetAxisZ() const;
+	D_NEWTON_API ndRotationType GetRotationAxis() const;
+
 	D_NEWTON_API ndMatrix GetOffsetMatrix() const;
 	D_NEWTON_API void SetOffsetMatrix(const ndMatrix& matrix);
 	
@@ -58,6 +63,7 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void SubmitShortestPathAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	
 	ndMatrix m_targetFrame;
+
 	ndFloat32 m_angularSpring;
 	ndFloat32 m_angularDamper;
 	ndFloat32 m_angularMaxTorque;

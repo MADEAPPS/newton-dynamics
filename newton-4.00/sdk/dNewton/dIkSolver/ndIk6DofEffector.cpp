@@ -51,9 +51,29 @@ void ndIk6DofEffector::EnableAxisZ(bool state)
 	m_axisZ = ndUnsigned8(state ? 1 : 0);
 }
 
+bool ndIk6DofEffector::GetAxisX() const
+{
+	return m_axisX ? true : false;
+}
+
+bool ndIk6DofEffector::GetAxisY() const
+{
+	return m_axisY ? true : false;
+}
+
+bool ndIk6DofEffector::GetAxisZ() const
+{
+	return m_axisZ ? true : false;
+}
+
 void ndIk6DofEffector::EnableRotationAxis(ndRotationType type)
 {
 	m_rotationType = type;
+}
+
+ndIk6DofEffector::ndRotationType ndIk6DofEffector::GetRotationAxis() const
+{
+	return m_rotationType;
 }
 
 ndMatrix ndIk6DofEffector::GetOffsetMatrix() const
