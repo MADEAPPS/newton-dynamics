@@ -40,6 +40,7 @@
 #include "ndFileFormatShapeInstance.h"
 #include "ndFileFormatShapeCompound.h"
 #include "ndFileFormatJointCylinder.h"
+#include "ndFileFormatJointUpVector.h"
 #include "ndFileFormatJointSpherical.h"
 #include "ndFileFormatShapeConvexBox.h"
 #include "ndFileFormatShapeConvexCone.h"
@@ -110,6 +111,7 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatJointRoller jointRoller;
 	static ndFileFormatJointPulley jointPulley;
 	static ndFileFormatJointIkHinge jointIkHinge;
+	static ndFileFormatJointUpVector jointUpVector;
 	static ndFileFormatJointSpherical jointSpherical;
 	static ndFileFormatJointCylinder jointCylindrical;
 	static ndFileFormatJointFollowPath jointFollowPath;

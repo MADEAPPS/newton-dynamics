@@ -15,7 +15,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-// This joint is useful to for implementing character controllers, and also precise object picking
+// This joint is useful to for implementing simple character controllers
 class ndJointUpVector: public ndJointBilateralConstraint
 {
 	public:

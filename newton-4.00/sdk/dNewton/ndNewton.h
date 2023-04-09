@@ -54,6 +54,7 @@
 #include <ndContactSolver.h>
 #include <ndJointCylinder.h>
 #include <ndCharacterNode.h>
+#include <ndJointUpVector.h>
 #include <ndIk6DofEffector.h>
 #include <ndJointSpherical.h>
 #include <ndDynamicsUpdate.h>

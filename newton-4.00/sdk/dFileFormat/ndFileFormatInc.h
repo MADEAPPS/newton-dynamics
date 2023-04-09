@@ -44,6 +44,7 @@
 #include <ndFileFormatShapeInstance.h>
 #include <ndFileFormatShapeCompound.h>
 #include <ndFileFormatJointCylinder.h>
+#include <ndFileFormatJointUpVector.h>
 #include <ndFileFormatKinematicBody.h>
 #include <ndFileFormatShapeConvexBox.h>
 #include <ndFileFormatJointSpherical.h>
