@@ -28,6 +28,7 @@ ndFileFormat::ndFileFormat()
 	,m_bodies()
 	,m_joints()
 	,m_bodiesIds()
+	,m_jointsIds()
 	,m_uniqueShapesIds()
 {
 	xmlReserClassId();
@@ -59,7 +60,7 @@ void ndFileFormat::CollectScene(const ndWorld* const world)
 
 void ndFileFormat::SaveBodies(nd::TiXmlElement* const rootNode)
 {
-	m_bodiesIds.RemoveAll();
+	
 	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 	{
 		ndBody* const body = m_bodies[i];
@@ -97,8 +98,6 @@ void ndFileFormat::SaveJoints(nd::TiXmlElement* const rootNode)
 
 void ndFileFormat::SaveCollisionShapes(nd::TiXmlElement* const rootNode)
 {
-	m_uniqueShapesIds.RemoveAll();
-
 	// save bodies without compound shapes.
 	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 	{
@@ -154,6 +153,10 @@ void ndFileFormat::SaveBodies(const ndWorld* const world, const char* const path
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
 	asciifile.LinkEndChild(rootNode);
 
+	m_jointsIds.RemoveAll();
+	m_bodiesIds.RemoveAll();
+	m_uniqueShapesIds.RemoveAll();
+
 	CollectScene(world);
 	SaveCollisionShapes(rootNode);
 	SaveBodies(rootNode);
@@ -162,8 +165,6 @@ void ndFileFormat::SaveBodies(const ndWorld* const world, const char* const path
 	setlocale(LC_ALL, "C");
 	asciifile.SaveFile(path);
 	setlocale(LC_ALL, oldloc);
-
-	m_uniqueShapesIds.RemoveAll();
 }
 
 void ndFileFormat::SaveWorld(const ndWorld* const world, const char* const path)
@@ -176,6 +177,10 @@ void ndFileFormat::SaveWorld(const ndWorld* const world, const char* const path)
 
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
 	asciifile.LinkEndChild(rootNode);
+
+	m_jointsIds.RemoveAll();
+	m_bodiesIds.RemoveAll();
+	m_uniqueShapesIds.RemoveAll();
 
 	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(world->ClassName());
 	ndAssert(handler);
@@ -192,7 +197,4 @@ void ndFileFormat::SaveWorld(const ndWorld* const world, const char* const path)
 	setlocale(LC_ALL, "C");
 	asciifile.SaveFile(path);
 	setlocale(LC_ALL, oldloc);
-
-	m_bodiesIds.RemoveAll();
-	m_uniqueShapesIds.RemoveAll();
 }

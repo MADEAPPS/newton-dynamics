@@ -44,7 +44,9 @@ class ndFileFormat : public ndClassAlloc
 	const ndWorld* m_world;
 	ndArray<ndBody*> m_bodies;
 	ndArray<ndJointBilateralConstraint*> m_joints;
+
 	ndTree<ndInt32, ndUnsigned64> m_bodiesIds;
+	ndTree<ndInt32, ndUnsigned64> m_jointsIds;
 	ndTree<ndInt32, ndUnsigned64> m_uniqueShapesIds;
 
 	friend class ndFileFormatBody;

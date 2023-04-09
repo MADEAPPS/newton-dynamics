@@ -43,8 +43,31 @@ void ndFileFormatJoint::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* c
 	ndTree<ndInt32, ndUnsigned64>::ndNode* const node0 = scene->m_bodiesIds.Find(body0->GetId());
 	ndTree<ndInt32, ndUnsigned64>::ndNode* const node1 = scene->m_bodiesIds.Find(body1->GetId());
 	ndAssert(node0);
+
 	ndInt32 body0NodeId = node0->GetInfo();
 	ndInt32 body1NodeId = node1 ? node1->GetInfo() : -1;
+
+	union Key
+	{
+		ndUnsigned64 m_key;
+		struct
+		{
+			ndInt32 m_low;
+			ndInt32 m_high;
+		};
+	};
+
+	Key key;
+	key.m_low = body1NodeId;
+	key.m_high = body0NodeId;
+	ndTree<ndInt32, ndUnsigned64>::ndNode* const node = scene->m_jointsIds.Insert(key.m_key);
+	ndAssert(node);
+	if (node)
+	{
+		ndInt32 id;
+		classNode->Attribute("nodeId", &id);
+		node->GetInfo() = id;
+	}
 
 	xmlSaveParam(classNode, "body0", body0NodeId);
 	xmlSaveParam(classNode, "body1", body1NodeId);
