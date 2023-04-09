@@ -103,14 +103,15 @@
 #include "ndBrainReplayBuffer.h"
 #include <ndBrainParallelTrainer.h>
 
-#include <ndFileFormatStdafx.h>
-#include <ndFileFormat.h>
-#include <ndFileFormatWorld.h>
-#include <ndFileFormatNotify.h>
-#include <ndFileFormatRegistrar.h>
-#include <ndFileFormatDynamicBody.h>
-#include <ndFileFormatBodyTriggerVolume.h>
-#include <ndFileFormatShapeStaticProceduralMesh.h>
+#include <ndFileFormatInc.h>
+//#include <ndFileFormatStdafx.h>
+//#include <ndFileFormat.h>
+//#include <ndFileFormatWorld.h>
+//#include <ndFileFormatNotify.h>
+//#include <ndFileFormatRegistrar.h>
+//#include <ndFileFormatDynamicBody.h>
+//#include <ndFileFormatBodyTriggerVolume.h>
+//#include <ndFileFormatShapeStaticProceduralMesh.h>
 
 void dGetWorkingFileName (const char* const name, char* const outPathName);
 

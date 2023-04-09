@@ -21,28 +21,27 @@
 #include "ndDemoSplinePathMesh.h"
 #include "ndDemoInstanceEntity.h"
 
-class SplinePathBody : public ndBodyDynamic
+class ndSplinePathBody : public ndBodyDynamic
 {
 	public:
-	D_CLASS_REFLECTION(SplinePathBody, ndBodyDynamic)
+	D_CLASS_REFLECTION(ndSplinePathBody, ndBodyDynamic)
 
 	class ndSplinePathBodySaveLoad : public ndFileFormatDynamicBody
 	{
 		public:
 		ndSplinePathBodySaveLoad()
-			:ndFileFormatDynamicBody(SplinePathBody::StaticClassName())
+			:ndFileFormatDynamicBody(ndSplinePathBody::StaticClassName())
 		{
 		}
 
 		void SaveBody(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 		{
-			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndSplinePathBody", SplinePathBody::StaticClassName());
+			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndSplinePathBody", ndSplinePathBody::StaticClassName());
 			ndFileFormatDynamicBody::SaveBody(scene, classNode, body);
 		}
 	};
 
-
-	SplinePathBody(ndDemoEntityManager* const scene, ndMatrix& matrix)
+	ndSplinePathBody(ndDemoEntityManager* const scene, ndMatrix& matrix)
 		:ndBodyDynamic()
 	{
 		static ndSplinePathBodySaveLoad loadSave;
@@ -89,14 +88,31 @@ class ndJointFollowSplinePath : public ndJointFollowPath
 {
 	public:
 	D_CLASS_REFLECTION(ndJointFollowSplinePath, ndJointFollowPath)
+
+	class ndJointFollowSplinePathSaveLoad : public ndFileFormatJointFollowPath
+	{
+		public:
+		ndJointFollowSplinePathSaveLoad()
+			:ndFileFormatJointFollowPath(ndJointFollowSplinePath::StaticClassName())
+		{
+		}
+
+		void SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+		{
+			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointFollowSplinePath", ndJointFollowSplinePath::StaticClassName());
+			ndFileFormatJointFollowPath::SaveJoint(scene, classNode, joint);
+		}
+	};
+
 	ndJointFollowSplinePath(const ndMatrix& pinAndPivotFrame, ndBodyDynamic* const child, ndBodyDynamic* const pathBody)
 		:ndJointFollowPath(pinAndPivotFrame, child, pathBody)
 	{
+		static ndJointFollowSplinePathSaveLoad loadSave;
 	}
 
 	void GetPointAndTangentAtLocation(const ndVector& location, ndVector& positOut, ndVector& tangentOut) const
 	{
-		const SplinePathBody* const splineBody = (SplinePathBody*)GetBody1();
+		const ndSplinePathBody* const splineBody = (ndSplinePathBody*)GetBody1();
 		const ndBezierSpline& spline = splineBody->m_spline;
 		
 		ndMatrix matrix(splineBody->GetMatrix());
@@ -701,7 +717,7 @@ static void BuildPathFollow(ndDemoEntityManager* const scene, const ndVector& or
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = origin;
 	
-	SplinePathBody* const pathBody = new SplinePathBody(scene, matrix);
+	ndSplinePathBody* const pathBody = new ndSplinePathBody(scene, matrix);
 	ndDemoEntity* const rollerCosterPath = (ndDemoEntity*)pathBody->GetNotifyCallback()->GetUserData();
 	
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoSplinePathMesh(pathBody->m_spline, scene->GetShaderCache(), 500));
@@ -796,15 +812,15 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 
-	//BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
-	//BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
-	//BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
-	//BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	//BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
-	//BuildRoller(scene, ndVector(0.0f, 0.0f, 9.0f, 1.0f), 10.0f, 0.75f);
-	//BuildCylindrical(scene, ndVector(0.0f, 0.0f, 12.0f, 1.0f), 10.0f, 0.75f);
-	//BuildFixDistanceJoints(scene, ndVector( 4.0f, 0.0f, -5.0f, 1.0f));
-	//BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
+	BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
+	BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
+	BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
+	BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
+	BuildRoller(scene, ndVector(0.0f, 0.0f, 9.0f, 1.0f), 10.0f, 0.75f);
+	BuildCylindrical(scene, ndVector(0.0f, 0.0f, 12.0f, 1.0f), 10.0f, 0.75f);
+	BuildFixDistanceJoints(scene, ndVector( 4.0f, 0.0f, -5.0f, 1.0f));
+	BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
 	BuildPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	ndQuaternion rot;

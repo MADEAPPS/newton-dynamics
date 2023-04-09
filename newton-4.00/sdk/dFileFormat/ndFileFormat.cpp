@@ -65,6 +65,11 @@ void ndFileFormat::SaveBodies(nd::TiXmlElement* const rootNode)
 		ndBody* const body = m_bodies[i];
 		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(body->ClassName());
 		ndAssert(handler);
+		if (!handler)
+		{
+			ndAssert(0);
+			ndTrace(("failed to save body type: %s\n", body->ClassName()));
+		}
 		if (handler)
 		{
 			handler->SaveBody(this, rootNode, body);
@@ -80,6 +85,7 @@ void ndFileFormat::SaveJoints(nd::TiXmlElement* const rootNode)
 		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(joint->ClassName());
 		if (!handler)
 		{
+			ndAssert(0);
 			ndTrace(("failed to save joint type: %s\n", joint->ClassName()));
 		}
 		if (handler)
@@ -105,6 +111,12 @@ void ndFileFormat::SaveCollisionShapes(nd::TiXmlElement* const rootNode)
 			if (node)
 			{
 				ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
+				if (!handler)
+				{
+					ndAssert(0);
+					ndTrace(("failed to save shape type: %s\n", shape->ClassName()));
+				}
+
 				ndInt32 id = handler->SaveShape(this, rootNode, shape);
 				node->GetInfo() = id;
 			}

@@ -24,7 +24,6 @@
 
 #include "ndFileFormatStdafx.h"
 
-
 class ndFileFormat : public ndClassAlloc
 {
 	public: 

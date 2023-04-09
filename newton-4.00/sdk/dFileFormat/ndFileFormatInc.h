@@ -1,0 +1,65 @@
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely, subject to the following restrictions:
+* 
+* 1. The origin of this software must not be misrepresented; you must not
+* claim that you wrote the original software. If you use this software
+* in a product, an acknowledgment in the product documentation would be
+* appreciated but is not required.
+* 
+* 2. Altered source versions must be plainly marked as such, and must not be
+* misrepresented as being the original software.
+* 
+* 3. This notice may not be removed or altered from any source distribution.
+*/
+
+#ifndef _ND_FILE_FORMAT_INC_H__
+#define _ND_FILE_FORMAT_INC_H__
+
+#include <ndFileFormatStdafx.h>
+
+#include <ndFileFormat.h>
+#include <ndFileFormatBody.h>
+#include <ndFileFormatWorld.h>
+#include <ndFileFormatShape.h>
+#include <ndFileFormatJoint.h>
+#include <ndFileFormatNotify.h>
+#include <ndFileFormatRegistrar.h>
+#include <ndFileFormatJointGear.h>
+#include <ndFileFormatJointHinge.h>
+#include <ndFileFormatJointRoller.h>
+#include <ndFileFormatDynamicBody.h>
+#include <ndFileFormatJointSlider.h>
+#include <ndFileFormatShapeConvex.h>
+#include <ndFileFormatShapeInstance.h>
+#include <ndFileFormatShapeCompound.h>
+#include <ndFileFormatJointCylinder.h>
+#include <ndFileFormatKinematicBody.h>
+#include <ndFileFormatShapeConvexBox.h>
+#include <ndFileFormatJointSpherical.h>
+#include <ndFileFormatShapeStaticMesh.h>
+#include <ndFileFormatShapeConvexCone.h>
+#include <ndFileFormatJointFollowPath.h>
+#include <ndFileFormatShapeConvexHull.h>
+#include <ndFileFormatJointDoubleHinge.h>
+#include <ndFileFormatJointFixDistance.h>
+#include <ndFileFormatBodyTriggerVolume.h>
+#include <ndFileFormatKinematicBodyBase.h>
+#include <ndFileFormatShapeConvexSphere.h>
+#include <ndFileFormatShapeConvexCapsule.h>
+#include <ndFileFormatShapeConvexCylinder.h>
+#include <ndFileFormatShapeStaticMesh_bvh.h>
+#include <ndFileFormatJointRollingFriction.h>
+#include <ndFileFormatShapeStaticHeightfield.h>
+#include <ndFileFormatShapeStaticProceduralMesh.h>
+#include <ndFileFormatShapeConvexChamferCylinder.h>
+
+
+#endif 
+

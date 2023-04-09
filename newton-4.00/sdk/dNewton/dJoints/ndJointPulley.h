@@ -15,7 +15,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-
 class ndJointPulley: public ndJointBilateralConstraint
 {
 	public:
