@@ -73,6 +73,7 @@
 #include <ndFileFormatJointKinematicController.h>
 #include <ndFileFormatShapeStaticProceduralMesh.h>
 #include <ndFileFormatShapeConvexChamferCylinder.h>
+#include <ndFileFormatJointVehicleDifferentialAxle.h>
 #include <ndFileFormatJointIkSwivelPositionEffector.h>
 
 #endif 

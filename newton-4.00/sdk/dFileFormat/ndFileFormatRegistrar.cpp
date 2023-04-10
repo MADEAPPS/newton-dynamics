@@ -68,6 +68,7 @@
 #include "ndFileFormatJointKinematicController.h"
 #include "ndFileFormatShapeStaticProceduralMesh.h"
 #include "ndFileFormatShapeConvexChamferCylinder.h"
+#include "ndFileFormatJointVehicleDifferentialAxle.h"
 #include "ndFileFormatJointIkSwivelPositionEffector.h"
 
 ndFixSizeArray<ndFileFormatRegistrar*, 256> ndFileFormatRegistrar::m_registry;
@@ -132,8 +133,10 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatJointIkDoubleHinge jointIkDoubleHinge;
 	static ndFileFormatJointVehicleGearBox jointVehicleGearBox;
 	static ndFileFormatJointRollingFriction jointRollingFriction;
+
 	static ndFileFormatJointVehicleTorsionBar jointVehicleTorsionBar;
 	static ndFileFormatJointKinematicController jointkinematicController;
+	static ndFileFormatJointVehicleDifferentialAxle jointVehicleDiffAxle;
 	static ndFileFormatJointIkSwivelPositionEffector jointIkSwivelPositionEffector;
 
 	static ndFileFormatShapeConvex shapeConvex;

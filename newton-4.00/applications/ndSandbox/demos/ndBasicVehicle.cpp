@@ -710,5 +710,5 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->SetCameraMatrix(rot, origin);
 
 	ndFileFormat xxxx;
-	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
+	xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 }
