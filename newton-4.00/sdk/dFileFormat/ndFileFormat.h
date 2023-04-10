@@ -55,6 +55,7 @@ class ndFileFormat : public ndClassAlloc
 	friend class ndFileFormatShapeCompound;
 	friend class ndFileFormatShapeStaticMesh_bvh;
 	friend class ndFileFormatShapeStaticHeightfield;
+	friend class ndFileFormatJointVehicleTorsionBar;
 };
 
 #endif 

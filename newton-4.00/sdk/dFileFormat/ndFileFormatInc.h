@@ -62,11 +62,13 @@
 #include <ndFileFormatJointVehicleMotor.h>
 #include <ndFileFormatJointIkDoubleHinge.h>
 #include <ndFileFormatShapeConvexCapsule.h>
+#include <ndFileFormatJointVehicleGearBox.h>
 #include <ndFileFormatShapeConvexCylinder.h>
 #include <ndFileFormatShapeStaticMesh_bvh.h>
 #include <ndFileFormatJointIk6DofEffector.h>
 #include <ndFileFormatJointRollingFriction.h>
 #include <ndFileFormatShapeStaticHeightfield.h>
+#include <ndFileFormatJointVehicleTorsionBar.h>
 #include <ndFileFormatJointKinematicController.h>
 #include <ndFileFormatShapeStaticProceduralMesh.h>
 #include <ndFileFormatShapeConvexChamferCylinder.h>
