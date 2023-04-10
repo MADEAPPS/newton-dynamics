@@ -71,6 +71,7 @@
 #include <ndFileFormatShapeStaticHeightfield.h>
 #include <ndFileFormatJointVehicleTorsionBar.h>
 #include <ndFileFormatJointKinematicController.h>
+#include <ndFileFormatJointVehicleDifferential.h>
 #include <ndFileFormatShapeStaticProceduralMesh.h>
 #include <ndFileFormatShapeConvexChamferCylinder.h>
 #include <ndFileFormatJointVehicleDifferentialAxle.h>

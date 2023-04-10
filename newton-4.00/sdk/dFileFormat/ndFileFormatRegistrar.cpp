@@ -66,6 +66,7 @@
 #include "ndFileFormatJointVehicleTorsionBar.h"
 #include "ndFileFormatShapeStaticHeightfield.h"
 #include "ndFileFormatJointKinematicController.h"
+#include "ndFileFormatJointVehicleDifferential.h"
 #include "ndFileFormatShapeStaticProceduralMesh.h"
 #include "ndFileFormatShapeConvexChamferCylinder.h"
 #include "ndFileFormatJointVehicleDifferentialAxle.h"
@@ -133,8 +134,8 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatJointIkDoubleHinge jointIkDoubleHinge;
 	static ndFileFormatJointVehicleGearBox jointVehicleGearBox;
 	static ndFileFormatJointRollingFriction jointRollingFriction;
-
 	static ndFileFormatJointVehicleTorsionBar jointVehicleTorsionBar;
+	static ndFileFormatJointVehicleDifferential jointVehicleDiffrential;
 	static ndFileFormatJointKinematicController jointkinematicController;
 	static ndFileFormatJointVehicleDifferentialAxle jointVehicleDiffAxle;
 	static ndFileFormatJointIkSwivelPositionEffector jointIkSwivelPositionEffector;
