@@ -59,6 +59,7 @@
 #include "ndFileFormatShapeStaticMesh_bvh.h"
 #include "ndFileFormatJointRollingFriction.h"
 #include "ndFileFormatShapeStaticHeightfield.h"
+#include "ndFileFormatJointKinematicController.h"
 #include "ndFileFormatShapeStaticProceduralMesh.h"
 #include "ndFileFormatShapeConvexChamferCylinder.h"
 
@@ -104,21 +105,22 @@ void ndFileFormatRegistrar::Init()
 
 	static ndFileFormatJoint joint;
 	static ndFileFormatJointGear jointGear;
-	static ndFileFormatJointFix6dof fix6Dof;
 	static ndFileFormatJointPlane jointPlane;
 	static ndFileFormatJointHinge jointHinge;
 	static ndFileFormatJointSlider jointSlider;
 	static ndFileFormatJointRoller jointRoller;
 	static ndFileFormatJointPulley jointPulley;
+	static ndFileFormatJointFix6dof jointFix6Dof;
 	static ndFileFormatJointIkHinge jointIkHinge;
 	static ndFileFormatJointUpVector jointUpVector;
+	static ndFileFormatJointCylinder jointCylinder;
 	static ndFileFormatJointSpherical jointSpherical;
-	static ndFileFormatJointCylinder jointCylindrical;
 	static ndFileFormatJointFollowPath jointFollowPath;
 	static ndFileFormatJointIkSpherical jointIkSpherical;
 	static ndFileFormatJointDoubleHinge jointDoubleHinge;
 	static ndFileFormatJointFixDistance jointFixDistance;
 	static ndFileFormatJointRollingFriction jointRollingFriction;
+	static ndFileFormatJointKinematicController jointkinematicController;
 
 	static ndFileFormatShapeConvex shapeConvex;
 	static ndFileFormatShapeConvexBox shapeBox;

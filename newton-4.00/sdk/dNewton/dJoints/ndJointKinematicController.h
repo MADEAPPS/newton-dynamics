@@ -38,6 +38,13 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	void SetMaxAngularFriction(ndFloat32 torque);
 	void SetAngularViscousFrictionCoefficient(ndFloat32 coefficient);
 
+	ndFloat32 GetMaxSpeed() const;
+	ndFloat32 GetMaxOmega() const;
+	ndControlModes GetControlMode() const;
+	ndFloat32 GetMaxLinearFriction() const;
+	ndFloat32 GetMaxAngularFriction() const;
+	ndFloat32 GetAngularViscousFrictionCoefficient() const;
+
 	ndMatrix GetTargetMatrix() const;
 	void SetTargetPosit(const ndVector& posit);
 	void SetTargetRotation(const ndQuaternion& rotation);
@@ -113,6 +120,36 @@ inline ndMatrix ndJointKinematicController::GetTargetMatrix() const
 inline bool ndJointKinematicController::IsBilateral() const
 {
 	return true;
+}
+
+inline ndFloat32 ndJointKinematicController::GetMaxSpeed() const
+{
+	return m_maxSpeed;
+}
+
+inline ndFloat32 ndJointKinematicController::GetMaxOmega() const
+{
+	return m_maxOmega;
+}
+
+inline ndJointKinematicController::ndControlModes ndJointKinematicController::GetControlMode() const
+{
+	return m_controlMode;
+}
+
+inline ndFloat32 ndJointKinematicController::GetMaxLinearFriction() const
+{
+	return m_maxLinearFriction;
+}
+
+inline ndFloat32 ndJointKinematicController::GetMaxAngularFriction() const
+{
+	return m_maxAngularFriction;
+}
+
+inline ndFloat32 ndJointKinematicController::GetAngularViscousFrictionCoefficient() const
+{
+	return m_angularFrictionCoefficient;
 }
 
 #endif 

@@ -64,6 +64,7 @@
 #include <ndFileFormatJointIk6DofEffector.h>
 #include <ndFileFormatJointRollingFriction.h>
 #include <ndFileFormatShapeStaticHeightfield.h>
+#include <ndFileFormatJointKinematicController.h>
 #include <ndFileFormatShapeStaticProceduralMesh.h>
 #include <ndFileFormatShapeConvexChamferCylinder.h>
 
