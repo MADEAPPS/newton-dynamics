@@ -63,7 +63,6 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void SubmitShortestPathAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	
 	ndMatrix m_targetFrame;
-
 	ndFloat32 m_angularSpring;
 	ndFloat32 m_angularDamper;
 	ndFloat32 m_angularMaxTorque;

@@ -34,6 +34,7 @@
 #include <ndFileFormatJointGear.h>
 #include <ndFileFormatJointHinge.h>
 #include <ndFileFormatJointPlane.h>
+#include <ndFileFormatJointWheel.h>
 #include <ndFileFormatJointRoller.h>
 #include <ndFileFormatDynamicBody.h>
 #include <ndFileFormatJointSlider.h>

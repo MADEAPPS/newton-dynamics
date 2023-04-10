@@ -29,6 +29,7 @@
 #include "ndFileFormatJointGear.h"
 #include "ndFileFormatJointPlane.h"
 #include "ndFileFormatJointHinge.h"
+#include "ndFileFormatJointWheel.h"
 #include "ndFileFormatJointSlider.h"
 #include "ndFileFormatJointPulley.h"
 #include "ndFileFormatShapeConvex.h"
@@ -105,8 +106,9 @@ void ndFileFormatRegistrar::Init()
 
 	static ndFileFormatJoint joint;
 	static ndFileFormatJointGear jointGear;
-	static ndFileFormatJointPlane jointPlane;
 	static ndFileFormatJointHinge jointHinge;
+	static ndFileFormatJointPlane jointPlane;
+	static ndFileFormatJointWheel jopintWheel;
 	static ndFileFormatJointSlider jointSlider;
 	static ndFileFormatJointRoller jointRoller;
 	static ndFileFormatJointPulley jointPulley;
