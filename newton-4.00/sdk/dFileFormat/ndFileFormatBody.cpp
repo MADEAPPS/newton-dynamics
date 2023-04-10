@@ -39,9 +39,12 @@ void ndFileFormatBody::SaveBody(ndFileFormat* const scene, nd::TiXmlElement* con
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBody::StaticClassName());
 
 	ndBodyNotify* const notity = body->GetNotifyCallback();
-	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(notity->ClassName());
-	ndAssert(handler);
-	handler->SaveNotify(scene, classNode, notity);
+	if (notity)
+	{
+		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(notity->ClassName());
+		ndAssert(handler);
+		handler->SaveNotify(scene, classNode, notity);
+	}
 
 	ndTree<ndInt32, ndUnsigned64>::ndNode* const node = scene->m_bodiesIds.Insert(body->GetId());
 	ndAssert(node);

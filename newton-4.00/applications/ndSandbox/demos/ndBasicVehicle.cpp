@@ -687,16 +687,17 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->Set2DDisplayRenderFunction(vehicleUIPtr);
 	
 	ndSharedPtr<ndModel> vehicle0 (new ndBasicMultiBodyVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), vehicleUI));
-	ndSharedPtr<ndModel> vehicle1 (new ndBasicMultiBodyVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)), vehicleUI));
-	ndSharedPtr<ndModel> vehicle2 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), vehicleUI));
-	ndSharedPtr<ndModel> vehicle3 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), vehicleUI));
+	//ndSharedPtr<ndModel> vehicle1 (new ndBasicMultiBodyVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)), vehicleUI));
+	//ndSharedPtr<ndModel> vehicle2 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), vehicleUI));
+	//ndSharedPtr<ndModel> vehicle3 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), vehicleUI));
 
 	world->AddModel(vehicle0);
-	world->AddModel(vehicle1);
-	world->AddModel(vehicle2);
-	world->AddModel(vehicle3);
+	//world->AddModel(vehicle1);
+	//world->AddModel(vehicle2);
+	//world->AddModel(vehicle3);
 
-	ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle3;
+	//ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle3;
+	ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle0;
 	vehicle->SetAsPlayer(scene);
 	matrix.m_posit.m_x += 5.0f;
 	TestPlayerCapsuleInteraction(scene, matrix);
@@ -708,6 +709,6 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndVector origin(-10.0f, 2.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 
-	//ndLoadSave loadScene;
-	//loadScene.SaveModel("xxxxxx", vehicle);
+	ndFileFormat xxxx;
+	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 }
