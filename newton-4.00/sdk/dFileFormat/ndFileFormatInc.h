@@ -53,6 +53,7 @@
 #include <ndFileFormatShapeConvexCone.h>
 #include <ndFileFormatJointFollowPath.h>
 #include <ndFileFormatShapeConvexHull.h>
+#include <ndFileFormatJointVehicleTire.h>
 #include <ndFileFormatJointIkSpherical.h>
 #include <ndFileFormatJointDoubleHinge.h>
 #include <ndFileFormatJointFixDistance.h>

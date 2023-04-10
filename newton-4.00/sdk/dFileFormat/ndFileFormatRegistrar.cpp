@@ -51,6 +51,7 @@
 #include "ndFileFormatJointDoubleHinge.h"
 #include "ndFileFormatJointFixDistance.h"
 #include "ndFileFormatJointIkSpherical.h"
+#include "ndFileFormatJointVehicleTire.h"
 #include "ndFileFormatJointVehicleMotor.h"
 #include "ndFileFormatBodyTriggerVolume.h"
 #include "ndFileFormatKinematicBodyBase.h"
@@ -126,6 +127,7 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatJointIkSpherical jointIkSpherical;
 	static ndFileFormatJointDoubleHinge jointDoubleHinge;
 	static ndFileFormatJointFixDistance jointFixDistance;
+	static ndFileFormatJointVehicleTire jointVehicleTire;
 	static ndFileFormatJointVehicleMotor jointVehicleMotor;
 	static ndFileFormatJointIkDoubleHinge jointIkDoubleHinge;
 	static ndFileFormatJointVehicleGearBox jointVehicleGearBox;

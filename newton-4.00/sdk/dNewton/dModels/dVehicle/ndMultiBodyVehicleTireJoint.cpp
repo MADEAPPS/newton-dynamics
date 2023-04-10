@@ -40,6 +40,11 @@ ndFloat32 ndMultiBodyVehicleTireJoint::GetLongitudinalSlip() const
 	return m_longitudinalSlip;
 }
 
+const ndTireFrictionModel& ndMultiBodyVehicleTireJoint::GetFrictionModel() const
+{
+	return m_frictionModel;
+}
+
 void ndMultiBodyVehicleTireJoint::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	m_regularizer = m_info.m_regularizer * m_vehicle->m_downForce.m_suspensionStiffnessModifier;

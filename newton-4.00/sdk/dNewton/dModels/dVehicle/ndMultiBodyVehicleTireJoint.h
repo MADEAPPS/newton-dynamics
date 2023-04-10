@@ -58,6 +58,8 @@ class ndMultiBodyVehicleTireJoint: public ndJointWheel
 	D_NEWTON_API ndFloat32 GetSideSlip() const;
 	D_NEWTON_API ndFloat32 GetLongitudinalSlip() const;
 
+	D_NEWTON_API const ndTireFrictionModel& GetFrictionModel() const;
+
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
