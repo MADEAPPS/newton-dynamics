@@ -59,6 +59,7 @@
 #include <ndFileFormatBodyTriggerVolume.h>
 #include <ndFileFormatKinematicBodyBase.h>
 #include <ndFileFormatShapeConvexSphere.h>
+#include <ndFileFormatJointVehicleMotor.h>
 #include <ndFileFormatJointIkDoubleHinge.h>
 #include <ndFileFormatShapeConvexCapsule.h>
 #include <ndFileFormatShapeConvexCylinder.h>

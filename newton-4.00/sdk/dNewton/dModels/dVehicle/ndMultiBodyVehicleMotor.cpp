@@ -45,8 +45,6 @@ void ndMultiBodyVehicleMotor::AlignMatrix()
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	//matrix1.m_posit += matrix1.m_up.Scale(1.0f);
-
 	m_body0->SetMatrixNoSleep(matrix1);
 	m_body0->SetVelocityNoSleep(m_body1->GetVelocity());
 
