@@ -59,6 +59,7 @@
 #include <ndFileFormatBodyTriggerVolume.h>
 #include <ndFileFormatKinematicBodyBase.h>
 #include <ndFileFormatShapeConvexSphere.h>
+#include <ndFileFormatJointIkDoubleHinge.h>
 #include <ndFileFormatShapeConvexCapsule.h>
 #include <ndFileFormatShapeConvexCylinder.h>
 #include <ndFileFormatShapeStaticMesh_bvh.h>
@@ -68,7 +69,7 @@
 #include <ndFileFormatJointKinematicController.h>
 #include <ndFileFormatShapeStaticProceduralMesh.h>
 #include <ndFileFormatShapeConvexChamferCylinder.h>
-
+#include <ndFileFormatJointIkSwivelPositionEffector.h>
 
 #endif 
 

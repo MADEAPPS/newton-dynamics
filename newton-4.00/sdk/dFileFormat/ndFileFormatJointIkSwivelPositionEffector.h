@@ -19,17 +19,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_FILE_FORMAT_JOINT_IK_6DOF_EFECTOR_H__
-#define _ND_FILE_FORMAT_JOINT_IK_6DOF_EFECTOR_H__
+#ifndef _ND_FILE_FORMAT_JOINT_IK_SWIVEL_POSITION_EFFECTOR_H__
+#define _ND_FILE_FORMAT_JOINT_IK_SWIVEL_POSITION_EFFECTOR_H__
 
 #include "ndFileFormatStdafx.h"
 #include "ndFileFormatJoint.h"
 
-class ndFileFormatJointIk6DofEffector : public ndFileFormatJoint
+class ndFileFormatJointIkSwivelPositionEffector : public ndFileFormatJoint
 {
 	public: 
-	ndFileFormatJointIk6DofEffector();
-	ndFileFormatJointIk6DofEffector(const char* const className);
+	ndFileFormatJointIkSwivelPositionEffector();
+	ndFileFormatJointIkSwivelPositionEffector(const char* const className);
 
 	virtual void SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint);
 };
