@@ -32,6 +32,24 @@ namespace ndQuadruped_2
 		public:
 		D_CLASS_REFLECTION(ndQuadruped_2::ndQuadrupedModel, ndModel)
 
+		class ndQuadrupedModelSaveLoad : public ndFileFormatModel
+		{
+			public:
+			ndQuadrupedModelSaveLoad()
+				:ndFileFormatModel(ndQuadrupedModel::StaticClassName())
+			{
+			}
+
+			void SaveModel(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
+			{
+				nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndQuadrupedModel2", ndQuadrupedModel::StaticClassName());
+				ndFileFormatModel::SaveModel(scene, classNode, model);
+
+				ndQuadrupedModel* const quadruped = (ndQuadrupedModel*)model;
+				xmlSaveParam(classNode, "rootBody", scene->FindBodyId(quadruped->m_rootBody));
+			}
+		};
+
 		class ndEffectorInfo
 		{
 			public:
@@ -77,6 +95,8 @@ namespace ndQuadruped_2
 			,m_effectorsInfo()
 			,m_effectorsJoints()
 		{
+
+			static ndQuadrupedModelSaveLoad loadSaveModel;
 			ndFloat32 mass = 10.0f;
 			ndFloat32 radius = 0.25f;
 			ndFloat32 limbMass = 0.5f;

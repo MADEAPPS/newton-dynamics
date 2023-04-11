@@ -33,7 +33,8 @@ ndFileFormatModel::ndFileFormatModel(const char* const className)
 {
 }
 
-void ndFileFormatModel::SaveModel(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
+void ndFileFormatModel::SaveModel(ndFileFormat* const, nd::TiXmlElement* const parentNode, const ndModel* const)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndModelClass", ndModel::StaticClassName());
+	//nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndModelClass", ndModel::StaticClassName());
+	xmlCreateClassNode(parentNode, "ndModelClass", ndModel::StaticClassName());
 }

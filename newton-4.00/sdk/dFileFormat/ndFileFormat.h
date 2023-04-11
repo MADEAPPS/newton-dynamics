@@ -33,6 +33,8 @@ class ndFileFormat : public ndClassAlloc
 	void SaveWorld(const ndWorld* const world, const char* const path);
 	void SaveBodies(const ndWorld* const world, const char* const path);
 	void SaveModels(const ndWorld* const world, const char* const path);
+
+	ndInt32 FindBodyId(const ndBody* const body) const;
 	
 	private:
 	void CollectScene(const ndWorld* const world);

@@ -40,6 +40,14 @@ ndFileFormat::~ndFileFormat()
 {
 }
 
+ndInt32 ndFileFormat::FindBodyId(const ndBody* const body) const
+{
+	ndTree<ndInt32, ndUnsigned64>::ndNode* const node0 = m_bodiesIds.Find(body->GetId());
+	ndAssert(node0);
+	return node0 ? node0->GetInfo() : 0;
+
+}
+
 void ndFileFormat::CollectScene(const ndWorld* const world)
 {
 	m_world = world;
@@ -183,6 +191,7 @@ void ndFileFormat::SaveModels(nd::TiXmlElement* const rootNode)
 			}
 			if (handler)
 			{
+				handler->SaveModel(this, modelsNode, model);
 			}
 		}
 	}
