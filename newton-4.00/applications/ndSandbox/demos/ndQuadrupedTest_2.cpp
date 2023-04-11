@@ -47,6 +47,16 @@ namespace ndQuadruped_2
 
 				ndQuadrupedModel* const quadruped = (ndQuadrupedModel*)model;
 				xmlSaveParam(classNode, "rootBody", scene->FindBodyId(quadruped->m_rootBody));
+
+				const ndBodyKinematic::ndJointList& jointList = quadruped->m_rootBody->GetJointList();
+				//for (ndInt32 i = 0; i < quadruped->m_effectorsInfo.GetCount(); ++i)
+				//{
+				//	const ndEffectorInfo& info = quadruped->m_effectorsInfo[i];
+				//	ndJointBilateralConstraint* const effector = info.m_effector;
+				//	//ndBodyKinematic* const body = effector->GetBody0();
+				//	//ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
+				//	//ndBodyKinematic::ndContactMap& contactMap1 = body->GetContactMap();
+				//}
 			}
 		};
 

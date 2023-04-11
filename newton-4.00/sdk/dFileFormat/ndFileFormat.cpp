@@ -45,7 +45,33 @@ ndInt32 ndFileFormat::FindBodyId(const ndBody* const body) const
 	ndTree<ndInt32, ndUnsigned64>::ndNode* const node0 = m_bodiesIds.Find(body->GetId());
 	ndAssert(node0);
 	return node0 ? node0->GetInfo() : 0;
+}
 
+ndInt32 ndFileFormat::FindJointId(const ndJointBilateralConstraint* const joint) const
+{
+	ndTree<ndInt32, ndUnsigned64>::ndNode* const node0 = m_bodiesIds.Find(joint->GetBody0()->GetId());
+	ndTree<ndInt32, ndUnsigned64>::ndNode* const node1 = m_bodiesIds.Find(joint->GetBody1()->GetId());
+	ndAssert(node0);
+
+	ndInt32 body0NodeId = node0->GetInfo();
+	ndInt32 body1NodeId = node1 ? node1->GetInfo() : 0;
+
+	union Key
+	{
+		ndUnsigned64 m_hash;
+		struct
+		{
+			ndInt32 m_body0;
+			ndInt32 m_body1;
+		};
+	};
+
+	Key key;
+	key.m_body0 = body0NodeId;
+	key.m_body1 = body1NodeId;
+	ndTree<ndInt32, ndUnsigned64>::ndNode* const node = m_jointsIds.Find(key.m_hash);
+
+	return node ? node->GetInfo() : 0;
 }
 
 void ndFileFormat::CollectScene(const ndWorld* const world)

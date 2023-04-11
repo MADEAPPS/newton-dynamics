@@ -35,6 +35,7 @@ class ndFileFormat : public ndClassAlloc
 	void SaveModels(const ndWorld* const world, const char* const path);
 
 	ndInt32 FindBodyId(const ndBody* const body) const;
+	ndInt32 FindJointId(const ndJointBilateralConstraint* const joint) const;
 	
 	private:
 	void CollectScene(const ndWorld* const world);
