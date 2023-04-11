@@ -237,6 +237,19 @@ namespace ndQuadruped_2
 		{
 		}
 
+		void GetContacts(ndFixSizeArray<ndVector, 4>& contacts) const 
+		{
+			for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); ++i)
+			{
+				const ndEffectorInfo& info = m_effectorsInfo[i];
+				ndJointBilateralConstraint* const effector = info.m_effector;
+				ndBodyKinematic* const body = effector->GetBody0();
+				ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
+				ndBodyKinematic::ndContactMap& contactMap1 = body->GetContactMap();
+
+			}
+		}
+
 		void Debug(ndConstraintDebugCallback& context) const
 		{
 			ndVector upVector(m_rootBody->GetMatrix().m_up);
@@ -263,6 +276,59 @@ namespace ndQuadruped_2
 				//posit1.m_y += 1.0f;
 				//context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(0.0f, 0.0f, 0.0f, 1.0f));
 			}
+
+			ndFixSizeArray<ndVector, 4> contacts;
+			GetContacts(contacts);
+
+			//ndFixSizeArray<ndVector, 16> contactPoints;
+			//ndGaitController::ndSupportContacts support(m_state.GetSupportContacts());
+			//for (ndInt32 i = 0; i < m_state.m_posit.GetCount(); ++i)
+			//{
+			//	const ndEffectorPosit& effectPosit = m_state.m_posit[i];
+			//	ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)effectPosit.m_effector;
+			//	joint->DebugJoint(context);
+			//	if (support[i])
+			//	{
+			//		ndBodyKinematic* const body = joint->GetBody0();
+			//		contactPoints.PushBack(body->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
+			//	}
+			//}
+			//
+			//ndMatrix comMatrix(m_localFrame * m_bodyArray[0]->GetMatrix());
+			//comMatrix.m_posit = CalculateCenterOfMass().m_linear;
+			//context.DrawFrame(comMatrix);
+			//
+			//if (contactPoints.GetCount() >= 3)
+			//{
+			//	ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
+			//	rotation.TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
+			//	ndInt32 supportCount = ndConvexHull2d(&contactPoints[0], contactPoints.GetCount());
+			//	rotation.Inverse().TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
+			//	ndVector p0(contactPoints[supportCount - 1]);
+			//	ndBigVector bigPolygon[16];
+			//	for (ndInt32 i = 0; i < supportCount; ++i)
+			//	{
+			//		bigPolygon[i] = contactPoints[i];
+			//		context.DrawLine(contactPoints[i], p0, ndVector::m_zero);
+			//		p0 = contactPoints[i];
+			//	}
+			//
+			//	ndBigVector p0Out;
+			//	ndBigVector p1Out;
+			//	ndBigVector ray_p0(comMatrix.m_posit);
+			//	ndBigVector ray_p1(comMatrix.m_posit);
+			//	ray_p1.m_y -= 1.0f;
+			//
+			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
+			//
+			//	context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
+			//	context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
+			//}
+			//else if (contactPoints.GetCount() == 2)
+			//{
+			//	ndAssert(0);
+			//}
+
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
