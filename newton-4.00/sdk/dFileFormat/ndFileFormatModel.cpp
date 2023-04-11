@@ -33,30 +33,7 @@ ndFileFormatModel::ndFileFormatModel(const char* const className)
 {
 }
 
-void ndFileFormatModel::SaveModel(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model);
+void ndFileFormatModel::SaveModel(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndModelClass", ndModel::StaticClassName());
-
-	ndAssert(0);
-	//ndModelNotify* const notity = body->GetNotifyCallback();
-	//if (notity)
-	//{
-	//	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(notity->ClassName());
-	//	ndAssert(handler);
-	//	handler->SaveNotify(scene, classNode, notity);
-	//}
-	//
-	//ndTree<ndInt32, ndUnsigned64>::ndNode* const node = scene->m_bodiesIds.Insert(body->GetId());
-	//ndAssert(node);
-	//if (node)
-	//{
-	//	ndInt32 id;
-	//	classNode->Attribute("nodeId", &id);
-	//	node->GetInfo() = id;
-	//}
-	//
-	//xmlSaveParam(classNode, "matrix", body->GetMatrix());
-	//xmlSaveParam(classNode, "omega", body->GetOmega());
-	//xmlSaveParam(classNode, "velocity", body->GetVelocity());
-	//xmlSaveParam(classNode, "centerOfMass", body->GetCentreOfMass());
 }
