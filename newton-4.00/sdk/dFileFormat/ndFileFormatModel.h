@@ -19,25 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_FILE_FORMAT_MODEL_H__
+#define _ND_FILE_FORMAT_MODEL_H__
+
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatShapeConvexSphere.h"
+#include "ndFileFormatRegistrar.h"
 
-ndFileFormatShapeConvexSphere::ndFileFormatShapeConvexSphere()
-	:ndFileFormatShapeConvex(ndShapeSphere::StaticClassName())
+class ndFileFormatModel : public ndFileFormatRegistrar
 {
-}
+	public: 
+	ndFileFormatModel();
+	ndFileFormatModel(const char* const className);
 
-ndFileFormatShapeConvexSphere::ndFileFormatShapeConvexSphere(const char* const className)
-	:ndFileFormatShapeConvex(className)
-{
-}
+	virtual void SaveModel(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model);
+};
 
-ndInt32 ndFileFormatShapeConvexSphere::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
-{
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeClass", ndShapeSphere::StaticClassName());
-	ndFileFormatShapeConvex::SaveShape(scene, classNode, shape);
+#endif 
 
-	const ndShapeSphere* const subShape = (ndShapeSphere*)shape;
-	xmlSaveParam(classNode, "radius", subShape->m_radius);
-	return xmlGetNodeId(classNode);
-}

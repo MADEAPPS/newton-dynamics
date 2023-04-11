@@ -33,9 +33,10 @@ class ndFileFormatRegistrar : public ndClassAlloc
 	ndFileFormatRegistrar(const char* const className);
 	virtual ~ndFileFormatRegistrar();
 	
-	public:
+	//public:
 	virtual void SaveWorld(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndWorld* const world);
 	virtual void SaveBody(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
+	virtual void SaveModel(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model);
 	virtual ndInt32 SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
 	virtual void SaveNotify(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify);
 	virtual void SaveCollision(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision);
@@ -49,6 +50,9 @@ class ndFileFormatRegistrar : public ndClassAlloc
 
 	ndUnsigned64 m_hash;
 	friend class ndFileFormat;
+	friend class ndFileFormatBody;
+	friend class ndFileFormatKinematicBody;
+	friend class ndFileFormatShapeCompound;
 };
 
 #endif 

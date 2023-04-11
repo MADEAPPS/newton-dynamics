@@ -53,7 +53,7 @@ ndInt32 ndFileFormatShapeCompound::SaveShape(ndFileFormat* const scene, nd::TiXm
 		}
 	}
 
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShape", ndShapeCompound::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeClass", ndShapeCompound::StaticClassName());
 	ndFileFormatShape::SaveShape(scene, classNode, shape);
 	for (it.Begin(); it; it++)
 	{

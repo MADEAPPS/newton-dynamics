@@ -29,6 +29,7 @@
 #include <ndFileFormatWorld.h>
 #include <ndFileFormatShape.h>
 #include <ndFileFormatJoint.h>
+#include <ndFileFormatModel.h>
 #include <ndFileFormatNotify.h>
 #include <ndFileFormatRegistrar.h>
 #include <ndFileFormatJointGear.h>

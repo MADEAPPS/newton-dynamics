@@ -25,6 +25,7 @@
 #include "ndFileFormatWorld.h"
 #include "ndFileFormatShape.h"
 #include "ndFileFormatJoint.h"
+#include "ndFileFormatModel.h"
 #include "ndFileFormatNotify.h"
 #include "ndFileFormatJointGear.h"
 #include "ndFileFormatJointPlane.h"
@@ -212,6 +213,11 @@ void ndFileFormatRegistrar::SaveCollision(ndFileFormat* const, nd::TiXmlElement*
 }
 
 void ndFileFormatRegistrar::SaveJoint(ndFileFormat* const, nd::TiXmlElement* const, const ndJointBilateralConstraint* const)
+{
+	ndAssert(0);
+}
+
+void ndFileFormatRegistrar::SaveModel(ndFileFormat* const, nd::TiXmlElement* const, const ndModel* const)
 {
 	ndAssert(0);
 }
