@@ -26,6 +26,7 @@
 ndFileFormat::ndFileFormat()
 	:ndClassAlloc()
 	,m_bodies()
+	,m_models()
 	,m_joints()
 	,m_bodiesIds()
 	,m_jointsIds()
@@ -44,6 +45,7 @@ void ndFileFormat::CollectScene(const ndWorld* const world)
 	m_world = world;
 	m_joints.SetCount(0);
 	m_bodies.SetCount(0);
+	m_models.SetCount(0);
 
 	for (ndBodyListView::ndNode* node = world->GetBodyList().GetFirst(); node; node = node->GetNext())
 	{
@@ -55,6 +57,12 @@ void ndFileFormat::CollectScene(const ndWorld* const world)
 	{
 		ndJointBilateralConstraint* const joint = *node->GetInfo();
 		m_joints.PushBack(joint);
+	}
+
+	for (ndModelList::ndNode* node = world->GetModelList().GetFirst(); node; node = node->GetNext())
+	{
+		ndModel* const model = *node->GetInfo();
+		m_models.PushBack(model);
 	}
 }
 
@@ -157,6 +165,29 @@ void ndFileFormat::SaveJoints(nd::TiXmlElement* const rootNode)
 	}
 }
 
+void ndFileFormat::SaveModels(nd::TiXmlElement* const rootNode)
+{
+	if (m_models.GetCount())
+	{
+		nd::TiXmlElement* const modelsNode = new nd::TiXmlElement("ndModels");
+		rootNode->LinkEndChild(modelsNode);
+
+		for (ndInt32 i = 0; i < m_models.GetCount(); ++i)
+		{
+			ndModel* const model = m_models[i];
+			ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(model->ClassName());
+			if (!handler)
+			{
+				ndTrace(("failed to save model type: %s\n", model->ClassName()));
+				ndAssert(0);
+			}
+			if (handler)
+			{
+			}
+		}
+	}
+}
+
 void ndFileFormat::SaveWorld(nd::TiXmlElement* const rootNode)
 {
 	ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(m_world->ClassName());
@@ -195,6 +226,33 @@ void ndFileFormat::SaveBodies(const ndWorld* const world, const char* const path
 	setlocale(LC_ALL, oldloc);
 }
 
+void ndFileFormat::SaveModels(const ndWorld* const world, const char* const path)
+{
+	// save the path for use with generated assets.
+	m_fileName = path;
+
+	nd::TiXmlDocument asciifile;
+	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
+	asciifile.LinkEndChild(decl);
+
+	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
+	asciifile.LinkEndChild(rootNode);
+
+	m_jointsIds.RemoveAll();
+	m_bodiesIds.RemoveAll();
+	m_uniqueShapesIds.RemoveAll();
+
+	ndAssert(0);
+	CollectScene(world);
+	//SaveCollisionShapes(rootNode);
+	//SaveBodies(rootNode);
+
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+	asciifile.SaveFile(path);
+	setlocale(LC_ALL, oldloc);
+}
+
 void ndFileFormat::SaveWorld(const ndWorld* const world, const char* const path)
 {
 	m_fileName = path;
@@ -215,6 +273,7 @@ void ndFileFormat::SaveWorld(const ndWorld* const world, const char* const path)
 	SaveCollisionShapes(rootNode);
 	SaveBodies(rootNode);
 	SaveJoints(rootNode);
+	SaveModels(rootNode);
 
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");

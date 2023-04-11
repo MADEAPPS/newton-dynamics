@@ -32,17 +32,20 @@ class ndFileFormat : public ndClassAlloc
 
 	void SaveWorld(const ndWorld* const world, const char* const path);
 	void SaveBodies(const ndWorld* const world, const char* const path);
+	void SaveModels(const ndWorld* const world, const char* const path);
 	
 	private:
 	void CollectScene(const ndWorld* const world);
 	void SaveWorld(nd::TiXmlElement* const rootNode);
 	void SaveBodies(nd::TiXmlElement* const rootNode);
 	void SaveJoints(nd::TiXmlElement* const rootNode);
+	void SaveModels(nd::TiXmlElement* const rootNode);
 	void SaveCollisionShapes(nd::TiXmlElement* const rootNode);
 
 	ndString m_fileName;
 	const ndWorld* m_world;
 	ndArray<ndBody*> m_bodies;
+	ndArray<ndModel*> m_models;
 	ndArray<ndJointBilateralConstraint*> m_joints;
 
 	ndTree<ndInt32, ndUnsigned64> m_bodiesIds;
