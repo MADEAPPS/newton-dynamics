@@ -48,13 +48,36 @@ namespace ndQuadruped_2
 				ndQuadrupedModel* const quadruped = (ndQuadrupedModel*)model;
 				xmlSaveParam(classNode, "rootBody", scene->FindBodyId(quadruped->m_rootBody));
 
+				nd::TiXmlElement* const limbsArrayNode = new nd::TiXmlElement("limbsArray");
+				classNode->LinkEndChild(limbsArrayNode);
+				limbsArrayNode->SetAttribute("count", quadruped->m_effectorsInfo.GetCount());
+
 				for (ndInt32 i = 0; i < quadruped->m_effectorsInfo.GetCount(); ++i)
 				{
+					nd::TiXmlElement* const limbNode = new nd::TiXmlElement("limb");
+					limbsArrayNode->LinkEndChild(limbNode);
 					const ndEffectorInfo& info = quadruped->m_effectorsInfo[i];
 					ndJointBilateralConstraint* const effector = info.m_effector;
+
+					//ndVector m_basePosition;
+					//ndIkSwivelPositionEffector* m_effector;
+					//ndJointHinge* m_lookAtJoint;
+					//ndReal m_swivel;
+					//ndReal m_x;
+					//ndReal m_y;
+					//ndReal m_z;
+					//ndParamMapper m_x_mapper;
+					//ndParamMapper m_y_mapper;
+					//ndParamMapper m_z_mapper;
+					//ndParamMapper m_swivel_mapper;
+
+					ndAssert(info.m_lookAtJoint);
+					xmlSaveParam(limbNode, "lookAtJoint", scene->FindJointId(info.m_lookAtJoint));
+					xmlSaveParam(limbNode, "effectorBasePosition", info.m_basePosition);
+
 					ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(effector->ClassName());
 					ndAssert(handler);
-					handler->SaveJoint(scene, classNode, effector);
+					handler->SaveJoint(scene, limbNode, effector);
 				}
 			}
 		};
