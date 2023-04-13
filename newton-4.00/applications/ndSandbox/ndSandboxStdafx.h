@@ -92,6 +92,7 @@
 
 // SDK includes
 #include <ndNewton.h>
+#include <ndModelInc.h>
 #include <ndBrainInc.h>
 #include <ndFileFormatInc.h>
 

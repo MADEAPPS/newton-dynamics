@@ -19,6 +19,7 @@ if (NEWTON_BUILD_PROFILER)
 endif()
 
 add_subdirectory(dBrain)
+add_subdirectory(dModel)
 add_subdirectory(dFileFormat)
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
