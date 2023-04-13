@@ -30,8 +30,8 @@ class ndModelBase: public ndModel
 	ndModelBase();
 	virtual ~ndModelBase();
 
-	ndList<ndBody*> m_bodies;
-	ndList<ndJointBilateralConstraint*> m_joints;
+	ndList<ndSharedPtr<ndBody>> m_bodies;
+	ndList< ndSharedPtr<ndJointBilateralConstraint>> m_joints;
 };
 
 #endif 

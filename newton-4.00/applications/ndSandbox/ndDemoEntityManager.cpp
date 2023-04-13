@@ -54,10 +54,10 @@
 //#define DEFAULT_SCENE	14		// simple industrial robot
 //#define DEFAULT_SCENE	15		// advanced industrial robot
 //#define DEFAULT_SCENE	16		// basic player
-//#define DEFAULT_SCENE	17		// rag doll
+#define DEFAULT_SCENE	17		// rag doll
 //#define DEFAULT_SCENE	18		// zero moment point
 //#define DEFAULT_SCENE	19		// quadruped test 1
-#define DEFAULT_SCENE	20		// quadruped test 2
+//#define DEFAULT_SCENE	20		// quadruped test 2
 //#define DEFAULT_SCENE	21		// quadruped test 3
 //#define DEFAULT_SCENE	22		// biped test 1
 //#define DEFAULT_SCENE	23		// biped test 2

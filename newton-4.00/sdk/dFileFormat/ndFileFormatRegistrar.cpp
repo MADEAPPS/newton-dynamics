@@ -103,6 +103,21 @@ ndFileFormatRegistrar::~ndFileFormatRegistrar()
 
 void ndFileFormatRegistrar::Init()
 {
+	static ndFileFormatShapeConvex shapeConvex;
+	static ndFileFormatShapeConvexBox shapeBox;
+	static ndFileFormatShapeConvexCone shapeCone;
+	static ndFileFormatShapeCompound shapeCompound;
+	static ndFileFormatShapeConvexSphere shapeSphere;
+	static ndFileFormatShapeConvexCapsule shapeCapsule;
+	static ndFileFormatShapeConvexHull shapeConvexHull;
+	static ndFileFormatShapeStaticMesh shapeStaticMesh;
+	static ndFileFormatShapeConvexCylinder shapeCylinder;
+	static ndFileFormatShapeStaticMesh_bvh shapeStaticBvh;
+	static ndFileFormatJointIk6DofEffector ik6DofEffector;
+	static ndFileFormatShapeStaticHeightfield shapeHeightfield;
+	static ndFileFormatShapeStaticProceduralMesh shapeProceduralMesh;
+	static ndFileFormatShapeConvexChamferCylinder shapeChamferCylinder;
+
 	static ndFileFormatBody body;
 	static ndFileFormatShape shape;
 	static ndFileFormatWorld world;
@@ -141,20 +156,7 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatJointVehicleDifferentialAxle jointVehicleDiffAxle;
 	static ndFileFormatJointIkSwivelPositionEffector jointIkSwivelPositionEffector;
 
-	static ndFileFormatShapeConvex shapeConvex;
-	static ndFileFormatShapeConvexBox shapeBox;
-	static ndFileFormatShapeConvexCone shapeCone;
-	static ndFileFormatShapeCompound shapeCompound;
-	static ndFileFormatShapeConvexSphere shapeSphere;
-	static ndFileFormatShapeConvexCapsule shapeCapsule;
-	static ndFileFormatShapeConvexHull shapeConvexHull;
-	static ndFileFormatShapeStaticMesh shapeStaticMesh;
-	static ndFileFormatShapeConvexCylinder shapeCylinder;
-	static ndFileFormatShapeStaticMesh_bvh shapeStaticBvh;
-	static ndFileFormatJointIk6DofEffector ik6DofEffector;
-	static ndFileFormatShapeStaticHeightfield shapeHeightfield;
-	static ndFileFormatShapeStaticProceduralMesh shapeProceduralMesh;
-	static ndFileFormatShapeConvexChamferCylinder shapeChamferCylinder;
+	static ndFileFormatModel model;
 }
 
 ndFileFormatRegistrar* ndFileFormatRegistrar::GetHandler(const char* const className)

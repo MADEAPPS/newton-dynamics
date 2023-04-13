@@ -115,6 +115,8 @@ namespace ndRagdoll
 	class ndHumanoidModel : public ndModel
 	{
 		public:
+		//D_CLASS_REFLECTION(ndHumanoidModel, ndModel)
+
 		ndHumanoidModel(ndDemoEntityManager* const scene, ndDemoEntity* const ragdollMesh, const ndMatrix& location)
 			:ndModel()
 			,m_rootBody(nullptr)
@@ -173,7 +175,6 @@ namespace ndRagdoll
 						massWeight.PushBack(ragdollDefinition[i].m_massWeight);
 			
 						//connect this body part to its parentBody with a ragdoll joint
-						//ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBone, definition);
 						ndSharedPtr<ndJointBilateralConstraint> joint = ConnectBodyParts(childBody, parentBone, definition);
 						world->AddJoint(joint);
 			
