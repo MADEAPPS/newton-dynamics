@@ -24,6 +24,8 @@
 #define _ND_FILE_FORMAT_STDAFX_H__
 
 #include <ndNewton.h>
+#include <ndModelInc.h>
+
 #include <tinyxml.h>
 
 #endif 

@@ -19,16 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndModelStdafx.h"
-#include "ndModelBase.h"
+#ifndef _ND_FILE_FORMAT_MODEL_BASE_H__
+#define _ND_FILE_FORMAT_MODEL_BASE_H__
 
-ndModelBase::ndModelBase()
-	:ndModel()
-	,m_bodies()
-	,m_joints()
-{
-}
+#include "ndFileFormatStdafx.h"
+#include "ndFileFormatModel.h"
 
-ndModelBase::~ndModelBase()
+class ndFileFormatModelBase : public ndFileFormatModel
 {
-}
+	public: 
+	ndFileFormatModelBase();
+	ndFileFormatModelBase(const char* const className);
+
+	virtual void SaveModel(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model);
+};
+
+#endif 
+

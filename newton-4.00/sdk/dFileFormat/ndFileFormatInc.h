@@ -31,6 +31,7 @@
 #include <ndFileFormatJoint.h>
 #include <ndFileFormatModel.h>
 #include <ndFileFormatNotify.h>
+#include <ndFileFormatModelBase.h>
 #include <ndFileFormatRegistrar.h>
 #include <ndFileFormatJointGear.h>
 #include <ndFileFormatJointHinge.h>

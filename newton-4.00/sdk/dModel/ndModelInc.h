@@ -24,5 +24,7 @@
 
 #include <ndModelStdafx.h>
 
+#include <ndModelBase.h>
+
 #endif 
 

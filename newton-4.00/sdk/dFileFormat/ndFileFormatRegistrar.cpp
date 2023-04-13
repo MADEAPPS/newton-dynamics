@@ -21,12 +21,14 @@
 
 #include "ndFileFormatStdafx.h"
 #include "ndFileFormatRegistrar.h"
+
 #include "ndFileFormatBody.h"
 #include "ndFileFormatWorld.h"
 #include "ndFileFormatShape.h"
 #include "ndFileFormatJoint.h"
 #include "ndFileFormatModel.h"
 #include "ndFileFormatNotify.h"
+#include "ndFileFormatModelBase.h"
 #include "ndFileFormatJointGear.h"
 #include "ndFileFormatJointPlane.h"
 #include "ndFileFormatJointHinge.h"
@@ -157,6 +159,7 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatJointIkSwivelPositionEffector jointIkSwivelPositionEffector;
 
 	static ndFileFormatModel model;
+	static ndFileFormatModelBase modelBase;
 }
 
 ndFileFormatRegistrar* ndFileFormatRegistrar::GetHandler(const char* const className)

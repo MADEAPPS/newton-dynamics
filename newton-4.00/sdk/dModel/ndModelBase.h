@@ -27,6 +27,8 @@
 class ndModelBase: public ndModel
 {
 	public: 
+	D_CLASS_REFLECTION(ndModelBase, ndModel)
+
 	ndModelBase();
 	virtual ~ndModelBase();
 
