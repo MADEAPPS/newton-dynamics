@@ -54,7 +54,7 @@ include_directories(../../thirdParty/openalRuntime/win32sdk/include)
 
 add_executable(${projectName} ${CPP_SOURCE})
 
-target_link_libraries (${projectName} ndNewton ndBrain ndFileFormat vhacd openfbx glfw imgui glatter ndTinyxml)
+target_link_libraries (${projectName} ndNewton ndBrain ndModel ndFileFormat vhacd openfbx glfw imgui glatter ndTinyxml)
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndCollision ndCore)

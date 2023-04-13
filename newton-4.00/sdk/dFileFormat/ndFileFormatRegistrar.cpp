@@ -61,6 +61,7 @@
 #include "ndFileFormatShapeConvexSphere.h"
 #include "ndFileFormatShapeConvexCapsule.h"
 #include "ndFileFormatJointIkDoubleHinge.h"
+#include "ndFileFormatModelPassiveRadoll.h"
 #include "ndFileFormatJointIk6DofEffector.h"
 #include "ndFileFormatShapeConvexCylinder.h"
 #include "ndFileFormatShapeStaticMesh_bvh.h"
@@ -160,6 +161,7 @@ void ndFileFormatRegistrar::Init()
 
 	static ndFileFormatModel model;
 	static ndFileFormatModelBase modelBase;
+	static ndFileFormatModelPassiveRadoll modelPassiveRagdoll;
 }
 
 ndFileFormatRegistrar* ndFileFormatRegistrar::GetHandler(const char* const className)

@@ -335,7 +335,11 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	origin.m_y += 1.0f;
 	origin.m_z -= 2.0f;
 	scene->SetCameraMatrix(playerMatrix, origin);
-	
+
+	//ndModelPassiveRagdoll* xxxxxxxxxxx = new ndModelPassiveRagdoll;;
+	ndSharedPtr<ndModel> xxxxxxxxxxx (new ndModelPassiveRagdoll);
+	scene->GetWorld()->AddModel(xxxxxxxxxxx);
+
 	ndFileFormat xxxx;
 	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 	xxxx.SaveModels(scene->GetWorld(), "xxxx.nd");

@@ -65,6 +65,7 @@
 #include <ndFileFormatJointVehicleMotor.h>
 #include <ndFileFormatJointIkDoubleHinge.h>
 #include <ndFileFormatShapeConvexCapsule.h>
+#include <ndFileFormatModelPassiveRadoll.h>
 #include <ndFileFormatJointVehicleGearBox.h>
 #include <ndFileFormatShapeConvexCylinder.h>
 #include <ndFileFormatShapeStaticMesh_bvh.h>
