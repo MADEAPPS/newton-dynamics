@@ -19,11 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_MODEL_BASE_H__
+#define _ND_MODEL_BASE_H__
 
-#ifndef _ND_MODEL_STDAFX_H__
-#define _ND_MODEL_STDAFX_H__
+#include "ndModelStdafx.h"
 
-#include <ndNewton.h>
+class ndModelBase: public ndModel
+{
+	public: 
+	ndModelBase();
+	virtual ~ndModelBase();
+
+	ndList<ndBody*> m_bodies;
+	ndList<ndJointBilateralConstraint*> m_joints;
+};
 
 #endif 
 

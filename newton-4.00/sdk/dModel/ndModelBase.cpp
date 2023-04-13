@@ -19,11 +19,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#include "ndModelStdafx.h"
+#include "ndModelBase.h"
 
-#ifndef _ND_MODEL_STDAFX_H__
-#define _ND_MODEL_STDAFX_H__
 
-#include <ndNewton.h>
+ndModelBase::ndModelBase()
+	:ndModel()
+	,m_bodies()
+	,m_joints()
+{
+}
 
-#endif 
-
+ndModelBase::~ndModelBase()
+{
+}
