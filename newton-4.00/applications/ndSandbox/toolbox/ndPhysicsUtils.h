@@ -46,7 +46,7 @@ class ndParamMapper
 	{
 	}
 
-	ndFloat32 Interpolate(const ndFloat32 t)
+	ndFloat32 Interpolate(const ndFloat32 t) const
 	{
 		return m_x0 + m_scale * t;
 	}

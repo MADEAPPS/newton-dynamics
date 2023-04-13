@@ -75,6 +75,18 @@ namespace ndQuadruped_2
 					xmlSaveParam(limbNode, "lookAtJoint", scene->FindJointId(info.m_lookAtJoint));
 					xmlSaveParam(limbNode, "effectorBasePosition", info.m_basePosition);
 
+					xmlSaveParam(limbNode, "x_mapper_x0", info.m_x_mapper.Interpolate(-1.0f));
+					xmlSaveParam(limbNode, "x_mapper_x1", info.m_x_mapper.Interpolate( 1.0f));
+																		  
+					xmlSaveParam(limbNode, "y_mapper_x0", info.m_y_mapper.Interpolate(-1.0f));
+					xmlSaveParam(limbNode, "y_mapper_x1", info.m_y_mapper.Interpolate( 1.0f));
+																		  
+					xmlSaveParam(limbNode, "z_mapper_x0", info.m_z_mapper.Interpolate(-1.0f));
+					xmlSaveParam(limbNode, "z_mapper_x1", info.m_z_mapper.Interpolate( 1.0f));
+
+					xmlSaveParam(limbNode, "swivel_mapper_x0", info.m_swivel_mapper.Interpolate(-1.0f));
+					xmlSaveParam(limbNode, "swivel_mapper_x1", info.m_swivel_mapper.Interpolate( 1.0f));
+
 					ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(effector->ClassName());
 					ndAssert(handler);
 					handler->SaveJoint(scene, limbNode, effector);
