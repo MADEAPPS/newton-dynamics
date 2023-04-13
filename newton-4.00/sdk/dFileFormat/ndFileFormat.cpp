@@ -277,8 +277,8 @@ void ndFileFormat::SaveModels(const ndWorld* const world, const char* const path
 	m_bodiesIds.RemoveAll();
 	m_uniqueShapesIds.RemoveAll();
 
-	ndAssert(0);
-	CollectScene(world);
+	//ndAssert(0);
+	//CollectScene(world);
 	//SaveCollisionShapes(rootNode);
 	//SaveBodies(rootNode);
 

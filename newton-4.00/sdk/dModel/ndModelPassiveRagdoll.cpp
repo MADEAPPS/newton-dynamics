@@ -19,13 +19,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_MODEL_INC_H__
-#define _ND_MODEL_INC_H__
+#include "ndModelStdafx.h"
+#include "ndModelPassiveRagdoll.h"
 
-#include <ndModelStdafx.h>
+ndModelPassiveRagdoll::ndModelPassiveRagdoll()
+	:ndModelBase()
+	,m_rootBody(nullptr)
+{
+}
 
-#include <ndModelBase.h>
-#include <ndModelPassiveRagdoll.h>
+ndModelPassiveRagdoll::~ndModelPassiveRagdoll()
+{
+}
 
-#endif 
+void ndModelPassiveRagdoll::AddRootBody(ndBodyDynamic* const rootBody)
+{
+	ndAssert(0);
+}
 
+void ndModelPassiveRagdoll::AddLimb(ndJointBilateralConstraint* const limbJoint)
+{
+	ndAssert(0);
+}

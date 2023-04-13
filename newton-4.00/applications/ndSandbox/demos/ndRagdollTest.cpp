@@ -337,5 +337,6 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	scene->SetCameraMatrix(playerMatrix, origin);
 	
 	ndFileFormat xxxx;
-	xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
+	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
+	xxxx.SaveModels(scene->GetWorld(), "xxxx.nd");
 }

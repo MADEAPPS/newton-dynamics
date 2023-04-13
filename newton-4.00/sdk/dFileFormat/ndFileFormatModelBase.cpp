@@ -37,38 +37,25 @@ void ndFileFormatModelBase::SaveModel(ndFileFormat* const scene, nd::TiXmlElemen
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndModelBase", ndModelBase::StaticClassName());
 	ndFileFormatModel::SaveModel(scene, classNode, model);
 	
-	//ndFloat32 spring;
-	//ndFloat32 damper;
-	//ndFloat32 regularizer;
-	//ndFloat32 minTwistAngle; 
-	//ndFloat32 maxTwistAngle;
-	//
-	//ndFloat32 spring1;
-	//ndFloat32 damper1;
-	//ndFloat32 regularizer1;
-	//ndFloat32 minPositLimit;
-	//ndFloat32 maxPositLimit;
-	//
-	//ndModelBase* const exportJoint = (ndModelBase*)joint;
-	//
-	//exportJoint->GetLimitsAngle(minTwistAngle, maxTwistAngle);
-	//exportJoint->GetLimitsPosit(minPositLimit, maxPositLimit);
-	//exportJoint->GetSpringDamperAngle(regularizer, spring, damper);
-	//exportJoint->GetSpringDamperPosit(regularizer1, spring1, damper1);
-	//
-	//xmlSaveParam(classNode, "offsetAngle", exportJoint->GetOffsetAngle() * ndRadToDegree);
-	//xmlSaveParam(classNode, "springConstantAngle", spring);
-	//xmlSaveParam(classNode, "damperConstantAngle", damper);
-	//xmlSaveParam(classNode, "springRegularizerAngle", regularizer);
-	//xmlSaveParam(classNode, "minTwistAngle", minTwistAngle * ndRadToDegree);
-	//xmlSaveParam(classNode, "maxTwistAngle", minTwistAngle * ndRadToDegree);
-	//xmlSaveParam(classNode, "limitStateAngle", exportJoint->GetLimitStateAngle() ? 1 : 0);
-	//
-	//xmlSaveParam(classNode, "offsetPosit", exportJoint->GetOffsetPosit());
-	//xmlSaveParam(classNode, "springConstantPosit", spring1);
-	//xmlSaveParam(classNode, "damperConstantPosit", damper1);
-	//xmlSaveParam(classNode, "springRegularizerPosit", regularizer1);
-	//xmlSaveParam(classNode, "minPositLimit", minPositLimit);
-	//xmlSaveParam(classNode, "maxPositLimit", maxPositLimit);
-	//xmlSaveParam(classNode, "limitStatePosit", exportJoint->GetLimitStatePosit() ? 1 : 0);
+	ndModelBase* const modelBase = (ndModelBase*)model;
+
+	if (modelBase->m_bodies.GetCount())
+	{
+		ndAssert(0);
+		nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("bodies");
+		classNode->LinkEndChild(bodiesNode);
+		bodiesNode->SetAttribute("count", modelBase->m_bodies.GetCount());
+		for (ndList<ndSharedPtr<ndBody>>::ndNode* node = modelBase->m_bodies.GetFirst(); node; node = node->GetNext())
+		{
+			ndAssert(0);
+		}
+
+		nd::TiXmlElement* const jointsNode = new nd::TiXmlElement("joints");
+		classNode->LinkEndChild(jointsNode);
+		jointsNode->SetAttribute("count", modelBase->m_joints.GetCount());
+		for (ndList< ndSharedPtr<ndJointBilateralConstraint>>::ndNode* node = modelBase->m_joints.GetFirst(); node; node = node->GetNext())
+		{
+			ndAssert(0);
+		}
+	}
 }

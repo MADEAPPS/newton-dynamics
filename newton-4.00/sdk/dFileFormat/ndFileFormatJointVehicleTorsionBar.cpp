@@ -59,12 +59,6 @@ void ndFileFormatJointVehicleTorsionBar::SaveJoint(ndFileFormat* const scene, nd
 			nd::TiXmlElement* const axleNodePair = new nd::TiXmlElement("axle");
 			axleNode->LinkEndChild(axleNodePair);
 
-			//ndTree<ndInt32, ndUnsigned64>::ndNode* const node0 = scene->m_bodiesIds.Find(axles[i].m_leftTire->GetId());
-			//ndTree<ndInt32, ndUnsigned64>::ndNode* const node1 = scene->m_bodiesIds.Find(axles[i].m_rightTire->GetId());
-			//ndAssert(node0);
-			//ndAssert(node1);
-			//ndInt32 body0NodeId = node0->GetInfo();
-			//ndInt32 body1NodeId = node1->GetInfo();
 			ndInt32 body0NodeId = scene->FindBodyId(axles[i].m_leftTire);
 			ndInt32 body1NodeId = scene->FindBodyId(axles[i].m_rightTire);
 
