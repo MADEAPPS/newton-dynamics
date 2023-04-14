@@ -25,6 +25,10 @@
 
 ndFileFormat::ndFileFormat()
 	:ndClassAlloc()
+	,m_fileName()
+	,m_oldloc(nullptr)
+	,m_world(nullptr)
+	,m_doc(nullptr)
 	,m_bodies()
 	,m_models()
 	,m_joints()
@@ -74,26 +78,26 @@ ndInt32 ndFileFormat::FindJointId(const ndJointBilateralConstraint* const joint)
 	return node ? node->GetInfo() : 0;
 }
 
-void ndFileFormat::CollectScene(const ndWorld* const world)
+void ndFileFormat::CollectScene()
 {
-	m_world = world;
+	//m_world = world;
 	m_joints.SetCount(0);
 	m_bodies.SetCount(0);
 	m_models.SetCount(0);
 
-	for (ndBodyListView::ndNode* node = world->GetBodyList().GetFirst(); node; node = node->GetNext())
+	for (ndBodyListView::ndNode* node = m_world->GetBodyList().GetFirst(); node; node = node->GetNext())
 	{
 		ndBody* const body = *node->GetInfo();
 		m_bodies.PushBack(body);
 	}
 
-	for (ndJointList::ndNode* node = world->GetJointList().GetFirst(); node; node = node->GetNext())
+	for (ndJointList::ndNode* node = m_world->GetJointList().GetFirst(); node; node = node->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = *node->GetInfo();
 		m_joints.PushBack(joint);
 	}
 
-	for (ndModelList::ndNode* node = world->GetModelList().GetFirst(); node; node = node->GetNext())
+	for (ndModelList::ndNode* node = m_world->GetModelList().GetFirst(); node; node = node->GetNext())
 	{
 		ndModel* const model = *node->GetInfo();
 		m_models.PushBack(model);
@@ -235,48 +239,74 @@ void ndFileFormat::SaveWorld(nd::TiXmlElement* const rootNode)
 	}
 }
 
-void ndFileFormat::SaveBodies(const ndWorld* const world, const char* const path)
+void ndFileFormat::BeginSave(const ndWorld* const world, const char* const path)
 {
+	xmlReserClassId();
+
+	m_world = world;
 	// save the path for use with generated assets.
 	m_fileName = path;
-	
-	nd::TiXmlDocument asciifile;
+
+	m_doc = new nd::TiXmlDocument("ndFile");
 	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
-	asciifile.LinkEndChild(decl);
+	m_doc->LinkEndChild(decl);
 	
-	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
-	asciifile.LinkEndChild(rootNode);
+	//asciifile->LinkEndChild(m_doc);
+
+	m_oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+
+	m_bodies.SetCount(0);
+	m_models.SetCount(0);
+	m_joints.SetCount(0);
 
 	m_jointsIds.RemoveAll();
 	m_bodiesIds.RemoveAll();
 	m_uniqueShapesIds.RemoveAll();
+}
 
-	CollectScene(world);
+void ndFileFormat::EndSave()
+{
+	m_doc->SaveFile(m_fileName.GetStr());
+	setlocale(LC_ALL, m_oldloc);
+
+	delete m_doc;
+}
+
+void ndFileFormat::SaveBodies(const ndWorld* const world, const char* const path)
+{
+	BeginSave(world, path);
+
+	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
+	m_doc->LinkEndChild(rootNode);
+
+	CollectScene();
 	SaveCollisionShapes(rootNode);
 	SaveBodies(rootNode);
 	
-	char* const oldloc = setlocale(LC_ALL, 0);
-	setlocale(LC_ALL, "C");
-	asciifile.SaveFile(path);
-	setlocale(LC_ALL, oldloc);
+	EndSave();
+}
+
+void ndFileFormat::SaveWorld(const ndWorld* const world, const char* const path)
+{
+	BeginSave(world, path);
+
+	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
+	m_doc->LinkEndChild(rootNode);
+
+	CollectScene();
+	SaveWorld(rootNode);
+	SaveCollisionShapes(rootNode);
+	SaveBodies(rootNode);
+	SaveJoints(rootNode);
+	SaveModels(rootNode);
+
+	EndSave();
 }
 
 void ndFileFormat::SaveModels(const ndWorld* const world, const char* const path)
 {
-	// save the path for use with generated assets.
-	m_fileName = path;
-
-	nd::TiXmlDocument asciifile;
-	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
-	asciifile.LinkEndChild(decl);
-
-	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
-	asciifile.LinkEndChild(rootNode);
-
-	m_world = world;
-	m_jointsIds.RemoveAll();
-	m_bodiesIds.RemoveAll();
-	m_uniqueShapesIds.RemoveAll();
+	BeginSave(world, path);
 
 	ndTree<ndBody*, ndBody*> bodyFilter;
 	for (ndModelList::ndNode* node = world->GetModelList().GetFirst(); node; node = node->GetNext())
@@ -286,7 +316,7 @@ void ndFileFormat::SaveModels(const ndWorld* const world, const char* const path
 		if (model)
 		{
 			for (ndList<ndSharedPtr<ndJointBilateralConstraint>>::ndNode* mopdelNode = model->m_joints.GetFirst(); mopdelNode; mopdelNode = mopdelNode->GetNext())
-			{ 
+			{
 				ndJointBilateralConstraint* const joint = *mopdelNode->GetInfo();
 				ndBodyKinematic* const body0 = joint->GetBody0();
 				if (!bodyFilter.Find(body0))
@@ -302,7 +332,7 @@ void ndFileFormat::SaveModels(const ndWorld* const world, const char* const path
 				}
 				m_joints.PushBack(joint);
 			}
-			
+
 			for (ndList<ndSharedPtr<ndBody>>::ndNode* mopdelNode = model->m_bodies.GetFirst(); mopdelNode; mopdelNode = mopdelNode->GetNext())
 			{
 				ndBodyKinematic* const body = mopdelNode->GetInfo()->GetAsBodyKinematic();
@@ -315,42 +345,20 @@ void ndFileFormat::SaveModels(const ndWorld* const world, const char* const path
 		}
 	}
 
+	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
+	m_doc->LinkEndChild(rootNode);
+
 	SaveWorld(rootNode);
 	SaveCollisionShapes(rootNode);
 	SaveBodies(rootNode);
 	SaveJoints(rootNode);
 	SaveModels(rootNode);
 
-	char* const oldloc = setlocale(LC_ALL, 0);
-	setlocale(LC_ALL, "C");
-	asciifile.SaveFile(path);
-	setlocale(LC_ALL, oldloc);
+	EndSave();
 }
 
-void ndFileFormat::SaveWorld(const ndWorld* const world, const char* const path)
+
+void ndFileFormat::Load(const ndWorld* const world, const char* const path)
 {
-	m_fileName = path;
 
-	nd::TiXmlDocument asciifile;
-	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
-	asciifile.LinkEndChild(decl);
-
-	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
-	asciifile.LinkEndChild(rootNode);
-
-	m_jointsIds.RemoveAll();
-	m_bodiesIds.RemoveAll();
-	m_uniqueShapesIds.RemoveAll();
-
-	CollectScene(world);
-	SaveWorld(rootNode);
-	SaveCollisionShapes(rootNode);
-	SaveBodies(rootNode);
-	SaveJoints(rootNode);
-	SaveModels(rootNode);
-
-	char* const oldloc = setlocale(LC_ALL, 0);
-	setlocale(LC_ALL, "C");
-	asciifile.SaveFile(path);
-	setlocale(LC_ALL, oldloc);
 }

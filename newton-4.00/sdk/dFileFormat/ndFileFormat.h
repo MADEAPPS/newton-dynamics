@@ -30,6 +30,8 @@ class ndFileFormat : public ndClassAlloc
 	ndFileFormat();
 	~ndFileFormat();
 
+	void Load(const ndWorld* const world, const char* const path);
+
 	void SaveWorld(const ndWorld* const world, const char* const path);
 	void SaveBodies(const ndWorld* const world, const char* const path);
 	void SaveModels(const ndWorld* const world, const char* const path);
@@ -38,7 +40,10 @@ class ndFileFormat : public ndClassAlloc
 	ndInt32 FindJointId(const ndJointBilateralConstraint* const joint) const;
 	
 	private:
-	void CollectScene(const ndWorld* const world);
+	void BeginSave(const ndWorld* const world, const char* const path);
+	void EndSave();
+
+	void CollectScene();
 	void SaveWorld(nd::TiXmlElement* const rootNode);
 	void SaveBodies(nd::TiXmlElement* const rootNode);
 	void SaveJoints(nd::TiXmlElement* const rootNode);
@@ -46,7 +51,9 @@ class ndFileFormat : public ndClassAlloc
 	void SaveCollisionShapes(nd::TiXmlElement* const rootNode);
 
 	ndString m_fileName;
+	char* m_oldloc;
 	const ndWorld* m_world;
+	nd::TiXmlDocument* m_doc;
 	ndArray<ndBody*> m_bodies;
 	ndArray<ndModel*> m_models;
 	ndArray<ndJointBilateralConstraint*> m_joints;
