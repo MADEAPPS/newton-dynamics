@@ -20,6 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
+#include "ndFileFormat.h"
 #include "ndFileFormatModelPassiveRadoll.h"
 
 ndFileFormatModelPassiveRadoll::ndFileFormatModelPassiveRadoll()
@@ -36,5 +37,30 @@ void ndFileFormatModelPassiveRadoll::SaveModel(ndFileFormat* const scene, nd::Ti
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndModelPassiveRagdoll", ndModelPassiveRagdoll::StaticClassName());
 	ndFileFormatModelBase::SaveModel(scene, classNode, model);
-	
+
+	ndModelPassiveRagdoll* const ragDoll = (ndModelPassiveRagdoll*)model;
+
+	if (ragDoll->GetRoot())
+	{
+		ndFixSizeArray<ndModelPassiveRagdoll::ndRagdollNode*, 256> stack;
+		stack.PushBack(ragDoll->GetRoot());
+		while (stack.GetCount())
+		{
+			ndInt32 index = stack.GetCount() - 1;
+			ndModelPassiveRagdoll::ndRagdollNode* const node = stack[index];
+			stack.SetCount(index);
+
+			nd::TiXmlElement* const limbNode = new nd::TiXmlElement("limb");
+			classNode->LinkEndChild(limbNode);
+			ndInt32 childId = scene->FindBodyId(node->m_body);
+			ndInt32 parentId = node->GetParent() ? scene->FindBodyId(node->GetParent()->m_body) : 0;
+			xmlSaveParam(limbNode, "childBody", childId);
+			xmlSaveParam(limbNode, "parentBody", parentId);
+
+			for (ndModelPassiveRagdoll::ndRagdollNode* child = node->GetFirstChild(); child; child = child->GetNext())
+			{
+				stack.PushBack(child);
+			}
+		}
+	}
 }

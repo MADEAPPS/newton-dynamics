@@ -56,7 +56,8 @@ void ndFileFormatModelBase::SaveModel(ndFileFormat* const scene, nd::TiXmlElemen
 		jointsNode->SetAttribute("count", modelBase->m_joints.GetCount());
 		for (ndList< ndSharedPtr<ndJointBilateralConstraint>>::ndNode* node = modelBase->m_joints.GetFirst(); node; node = node->GetNext())
 		{
-			ndAssert(0);
+			ndInt32 nodeId = scene->FindJointId(*node->GetInfo());
+			xmlSaveParam(jointsNode, "joint", nodeId);
 		}
 	}
 }

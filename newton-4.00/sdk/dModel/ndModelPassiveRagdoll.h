@@ -42,8 +42,9 @@ class ndModelPassiveRagdoll: public ndModelBase
 	ndModelPassiveRagdoll();
 	virtual ~ndModelPassiveRagdoll();
 
+	ndRagdollNode* GetRoot() const;
 	ndRagdollNode* AddRootBody(ndSharedPtr<ndBody>& rootBody);
-	ndRagdollNode* AddLimb(ndRagdollNode* const parent, ndBodyDynamic* const body);
+	ndRagdollNode* AddLimb(ndRagdollNode* const parent, ndSharedPtr<ndBody>& body, ndSharedPtr<ndJointBilateralConstraint>& joint);
 
 	protected:
 	ndRagdollNode* m_rootNode;

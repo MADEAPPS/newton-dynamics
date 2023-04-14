@@ -89,25 +89,25 @@ namespace ndRagdoll
 	{
 		{ "root", ndDefinition::m_root, 1.0f, {}, {} },
 		{ "lowerback", ndDefinition::m_spherical, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-		{ "upperback", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "lowerneck", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "upperneck", ndDefinition::m_spherical, 1.0f,{ -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-
-		{ "lclavicle", ndDefinition::m_spherical, 1.0f, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
-		{ "lhumerus", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "lradius", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-
-		{ "rclavicle", ndDefinition::m_spherical, 1.0f, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		{ "rhumerus", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "rradius", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-
-		{ "rhipjoint", ndDefinition::m_spherical, 1.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
-		{ "rfemur", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "rtibia", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-
-		{ "lhipjoint", ndDefinition::m_spherical, 1.0f,{ -45.0f, 45.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		{ "lfemur", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "ltibia", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//{ "upperback", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		//{ "lowerneck", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		//{ "upperneck", ndDefinition::m_spherical, 1.0f,{ -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		//
+		//{ "lclavicle", ndDefinition::m_spherical, 1.0f, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+		//{ "lhumerus", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "lradius", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//
+		//{ "rclavicle", ndDefinition::m_spherical, 1.0f, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		//{ "rhumerus", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "rradius", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//
+		//{ "rhipjoint", ndDefinition::m_spherical, 1.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+		//{ "rfemur", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "rtibia", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//
+		//{ "lhipjoint", ndDefinition::m_spherical, 1.0f,{ -45.0f, 45.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		//{ "lfemur", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "ltibia", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 		{ "", ndDefinition::m_root,{},{} },
 	};
@@ -308,6 +308,51 @@ namespace ndRagdoll
 		return body;
 	}
 
+	ndJointBilateralConstraint* ConnectBodyParts(ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const ndDefinition& definition)
+	{
+		ndMatrix matrix(childBody->GetMatrix());
+		ndDefinition::ndOffsetFrameMatrix frameAngle(definition.m_frameBasics);
+		ndMatrix pinAndPivotInGlobalSpace(ndPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * ndYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * ndRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
+
+		ndDefinition::ndJointLimits jointLimits(definition.m_jointLimits);
+
+		switch (definition.m_limbType)
+		{
+			case ndDefinition::m_spherical:
+			{
+				ndJointSpherical* const joint = new ndJointSpherical(pinAndPivotInGlobalSpace, childBody, parentBody);
+				joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
+				joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+				joint->SetAsSpringDamper(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
+				return joint;
+			}
+
+			case ndDefinition::m_hinge:
+			{
+				ndJointHinge* const joint = new ndJointHinge(pinAndPivotInGlobalSpace, childBody, parentBody);
+				joint->SetLimitState(true);
+				joint->SetLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+				joint->SetAsSpringDamper(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
+				return joint;
+			}
+
+			case ndDefinition::m_doubleHinge:
+			{
+				ndJointDoubleHinge* const joint = new ndJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBody);
+				joint->SetLimits0(-30.0f * ndDegreeToRad, 30.0f * ndDegreeToRad);
+				joint->SetLimits1(-45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
+				joint->SetAsSpringDamper0(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
+				joint->SetAsSpringDamper1(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
+				return joint;
+			}
+
+			default:
+				ndAssert(0);
+		}
+		return nullptr;
+	}
+
+
 	ndModelPassiveRagdoll* BuildRagDoll(ndDemoEntityManager* const scene, ndDemoEntity* const ragdollMesh, const ndMatrix& location)
 	{
 		ndModelPassiveRagdoll* const ragdoll = new ndModelPassiveRagdoll();
@@ -325,14 +370,69 @@ namespace ndRagdoll
 
 		ndSharedPtr<ndBody> rootBody(CreateBodyPart(scene, rootEntity, nullptr));
 
+		// set the root transform matrix
+		rootBody->GetNotifyCallback()->OnTransform(0, matrix);
+
 		// add body to the world
 		world->AddBody(rootBody);
 
 		// add the root body to the model
-		ragdoll->AddRootBody(rootBody);
+		ndModelPassiveRagdoll::ndRagdollNode* const ragDollNode = ragdoll->AddRootBody(rootBody);
 
-		// set the root transform matrix
-		rootBody->GetNotifyCallback()->OnTransform(0, matrix);
+		ndInt32 stack = 0;
+		//ndFixSizeArray<ndFloat32, 64> massWeight;
+		//ndFixSizeArray<ndBodyDynamic*, 64> bodies;
+		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
+		ndFixSizeArray<ndModelPassiveRagdoll::ndRagdollNode*, 32> parentBones;
+
+		// parse the 3d model and add all the limb
+		for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
+		{
+			childEntities[stack] = child;
+			parentBones[stack] = ragDollNode;
+			stack++;
+		}
+
+		while (stack)
+		{
+			stack--;
+			ndDemoEntity* const childEntity = childEntities[stack];
+			ndModelPassiveRagdoll::ndRagdollNode* parentBone = parentBones[stack];
+			const char* const name = childEntity->GetName().GetStr();
+			//ndTrace(("name: %s\n", name));
+
+			for (ndInt32 i = 0; ragdollDefinition[i].m_boneName[0]; ++i)
+			{
+				const ndDefinition& definition = ragdollDefinition[i];
+
+				if (!strcmp(definition.m_boneName, name))
+				{
+					//ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone->m_body);
+					ndSharedPtr<ndBody> childBody (CreateBodyPart(scene, childEntity, parentBone->m_body));
+					//bodies.PushBack(childBody);
+					//massWeight.PushBack(ragdollDefinition[i].m_massWeight);
+					
+					//connect this body part to its parentBody with a ragdoll joint
+					ndSharedPtr<ndJointBilateralConstraint> joint = ConnectBodyParts(childBody->GetAsBodyDynamic(), parentBone->m_body, definition);
+					world->AddJoint(joint);
+
+					// add body to the world.
+					world->AddBody(childBody);
+
+					// add this child body to the radgoll model.
+					parentBone = ragdoll->AddLimb(parentBone, childBody, joint);
+					break;
+				}
+			}
+
+			for (ndDemoEntity* child = childEntity->GetFirstChild(); child; child = child->GetNext())
+			{
+				childEntities[stack] = child;
+				parentBones[stack] = parentBone;
+				stack++;
+			}
+		}
+
 		return ragdoll;
 	}
 }

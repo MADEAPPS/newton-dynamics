@@ -50,6 +50,11 @@ ndModelPassiveRagdoll::~ndModelPassiveRagdoll()
 	}
 }
 
+ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::GetRoot() const
+{
+	return m_rootNode;
+}
+
 ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::AddRootBody(ndSharedPtr<ndBody>& rootBody)
 {
 	ndAssert(!m_rootNode);
@@ -58,10 +63,13 @@ ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::AddRootBody(ndShare
 	return m_rootNode;
 }
 
-ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::AddLimb(ndRagdollNode* const parent, ndBodyDynamic* const body)
+ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::AddLimb(ndRagdollNode* const parent, ndSharedPtr<ndBody>& body, ndSharedPtr<ndJointBilateralConstraint>& joint)
 {
 	ndAssert(m_rootNode);
-	ndRagdollNode* const node = new ndRagdollNode(body, parent);
+	ndAssert(joint->GetBody1() == parent->m_body);
+	ndAssert(joint->GetBody0() == body->GetAsBodyKinematic());
+	ndRagdollNode* const node = new ndRagdollNode(body->GetAsBodyDynamic(), parent);
 	m_bodies.Append(body);
+	m_joints.Append(joint);
 	return node;
 }
