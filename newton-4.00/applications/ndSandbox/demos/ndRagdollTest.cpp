@@ -352,7 +352,6 @@ namespace ndRagdoll
 		return nullptr;
 	}
 
-
 	ndModelPassiveRagdoll* BuildRagDoll(ndDemoEntityManager* const scene, ndDemoEntity* const ragdollMesh, const ndMatrix& location)
 	{
 		ndModelPassiveRagdoll* const ragdoll = new ndModelPassiveRagdoll();
@@ -433,6 +432,8 @@ namespace ndRagdoll
 			}
 		}
 
+		// make entire body weight 100.0 kg
+		ragdoll->NormalizeMassDistribution(100.0f);
 		return ragdoll;
 	}
 }

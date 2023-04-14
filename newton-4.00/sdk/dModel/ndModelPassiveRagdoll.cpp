@@ -73,3 +73,44 @@ ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::AddLimb(ndRagdollNo
 	m_joints.Append(joint);
 	return node;
 }
+
+
+//void NormalizeMassDistribution(ndFloat32 mass, const ndFixSizeArray<ndBodyDynamic*, 64>& bodyArray, const ndFixSizeArray<ndFloat32, 64>& massWeight) const
+void ndModelPassiveRagdoll::NormalizeMassDistribution(ndFloat32 totalMass)
+{
+	ndFixSizeArray<ndBodyDynamic*, 256> bodyArray;
+	ndFixSizeArray<ndModelPassiveRagdoll::ndRagdollNode*, 256> stack;
+	if (GetRoot())
+	{
+		stack.PushBack(GetRoot());
+		while (stack.GetCount())
+		{
+			ndInt32 index = stack.GetCount() - 1;
+			ndModelPassiveRagdoll::ndRagdollNode* const node = stack[index];
+			stack.SetCount(index);
+
+			bodyArray.PushBack(node->m_body);
+			for (ndModelPassiveRagdoll::ndRagdollNode* child = node->GetFirstChild(); child; child = child->GetNext())
+			{
+				stack.PushBack(child);
+			}
+		}
+	}
+
+	ndFloat32 volume = 0.0f;
+	for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
+	{
+		//volume += bodyArray[i]->GetCollisionShape().GetVolume() * massWeight[i];
+		volume += bodyArray[i]->GetCollisionShape().GetVolume();
+	}
+	ndFloat32 density = totalMass / volume;
+	
+	for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
+	{
+		ndBodyDynamic* const body = bodyArray[i];
+		//ndFloat32 scale = density * body->GetCollisionShape().GetVolume() * massWeight[i];
+		ndFloat32 scale = density * body->GetCollisionShape().GetVolume();
+		ndVector inertia(body->GetMassMatrix().Scale(scale));
+		body->SetMassMatrix(inertia);
+	}
+}

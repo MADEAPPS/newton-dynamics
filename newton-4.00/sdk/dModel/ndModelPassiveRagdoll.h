@@ -46,6 +46,8 @@ class ndModelPassiveRagdoll: public ndModelBase
 	ndRagdollNode* AddRootBody(ndSharedPtr<ndBody>& rootBody);
 	ndRagdollNode* AddLimb(ndRagdollNode* const parent, ndSharedPtr<ndBody>& body, ndSharedPtr<ndJointBilateralConstraint>& joint);
 
+	void NormalizeMassDistribution(ndFloat32 totalMass);
+
 	protected:
 	ndRagdollNode* m_rootNode;
 };
