@@ -291,7 +291,7 @@ namespace ndRagdoll
 	};
 */
 
-	ndSharedPtr<ndBody> CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
+	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
 	{
 		ndSharedPtr<ndShapeInstance> shapePtr(entityPart->CreateCollisionFromChildren());
 		ndShapeInstance* const shape = *shapePtr;
@@ -300,16 +300,12 @@ namespace ndRagdoll
 		// create the rigid body that will make this body
 		ndMatrix matrix(entityPart->CalculateGlobalMatrix());
 
-		ndBodyKinematic* const body = new ndBodyDynamic();
+		ndBodyDynamic* const body = new ndBodyDynamic();
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(*shape);
 		body->SetMassMatrix(1.0f, *shape);
 		body->SetNotifyCallback(new ndBindingRagdollEntityNotify(scene, entityPart, parentBone, 100.0f));
-
-		ndSharedPtr<ndBody> bodyPtr(body);
-		scene->GetWorld()->AddBody(bodyPtr);
-
-		return bodyPtr;
+		return body;
 	}
 
 	ndModelPassiveRagdoll* BuildRagDoll(ndDemoEntityManager* const scene, ndDemoEntity* const ragdollMesh, const ndMatrix& location)
@@ -327,12 +323,16 @@ namespace ndRagdoll
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y + 1.5f;
 
-		//ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
 		ndSharedPtr<ndBody> rootBody(CreateBodyPart(scene, rootEntity, nullptr));
-		rootBody->GetNotifyCallback()->OnTransform(0, matrix);
 
+		// add body to the world
+		world->AddBody(rootBody);
+
+		// add the root body to the model
 		ragdoll->AddRootBody(rootBody);
 
+		// set the root transform matrix
+		rootBody->GetNotifyCallback()->OnTransform(0, matrix);
 		return ragdoll;
 	}
 }
