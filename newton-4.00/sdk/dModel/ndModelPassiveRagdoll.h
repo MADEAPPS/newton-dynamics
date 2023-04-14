@@ -30,13 +30,23 @@ class ndModelPassiveRagdoll: public ndModelBase
 	public: 
 	D_CLASS_REFLECTION(ndModelPassiveRagdoll, ndModelBase)
 
+	class ndRagdollNode : public ndNodeHierarchy<ndRagdollNode>
+	{
+		public:
+		ndRagdollNode(ndBodyDynamic* const body, ndRagdollNode* const parent);
+		virtual ~ndRagdollNode();
+		
+		ndBodyDynamic* m_body;
+	};
+
 	ndModelPassiveRagdoll();
 	virtual ~ndModelPassiveRagdoll();
 
-	void AddRootBody(ndBodyDynamic* const rootBody);
-	void AddLimb(ndJointBilateralConstraint* const limbJoint);
+	ndRagdollNode* AddRootBody(ndSharedPtr<ndBody>& rootBody);
+	ndRagdollNode* AddLimb(ndRagdollNode* const parent, ndBodyDynamic* const body);
 
-	ndBodyDynamic* m_rootBody;
+	protected:
+	ndRagdollNode* m_rootNode;
 };
 
 #endif 

@@ -290,6 +290,51 @@ namespace ndRagdoll
 		ndBodyDynamic* m_rootBody;
 	};
 */
+
+	ndSharedPtr<ndBody> CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
+	{
+		ndSharedPtr<ndShapeInstance> shapePtr(entityPart->CreateCollisionFromChildren());
+		ndShapeInstance* const shape = *shapePtr;
+		ndAssert(shape);
+
+		// create the rigid body that will make this body
+		ndMatrix matrix(entityPart->CalculateGlobalMatrix());
+
+		ndBodyKinematic* const body = new ndBodyDynamic();
+		body->SetMatrix(matrix);
+		body->SetCollisionShape(*shape);
+		body->SetMassMatrix(1.0f, *shape);
+		body->SetNotifyCallback(new ndBindingRagdollEntityNotify(scene, entityPart, parentBone, 100.0f));
+
+		ndSharedPtr<ndBody> bodyPtr(body);
+		scene->GetWorld()->AddBody(bodyPtr);
+
+		return bodyPtr;
+	}
+
+	ndModelPassiveRagdoll* BuildRagDoll(ndDemoEntityManager* const scene, ndDemoEntity* const ragdollMesh, const ndMatrix& location)
+	{
+		ndModelPassiveRagdoll* const ragdoll = new ndModelPassiveRagdoll();
+
+		ndWorld* const world = scene->GetWorld();
+		ndDemoEntity* const entity = ragdollMesh->CreateClone();
+		scene->AddEntity(entity);
+
+		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
+		ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
+
+		// find the floor location 
+		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		matrix.m_posit.m_y = floor.m_y + 1.5f;
+
+		//ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
+		ndSharedPtr<ndBody> rootBody(CreateBodyPart(scene, rootEntity, nullptr));
+		rootBody->GetNotifyCallback()->OnTransform(0, matrix);
+
+		ragdoll->AddRootBody(rootBody);
+
+		return ragdoll;
+	}
 }
 
 using namespace ndRagdoll;
@@ -311,7 +356,8 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	//scene->GetWorld()->AddModel(ragdollPtr);
 	//scene->GetWorld()->AddJoint(fixJoint);
 
-	ndSharedPtr<ndModel> ragdoll(new ndModelPassiveRagdoll);
+	ndModel* const model = BuildRagDoll(scene, ragdollMesh, matrix);
+	ndSharedPtr<ndModel> ragdoll(model);
 	scene->GetWorld()->AddModel(ragdoll);
 	
 	matrix.m_posit.m_x += 1.4f;

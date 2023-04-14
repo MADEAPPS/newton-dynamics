@@ -22,22 +22,46 @@
 #include "ndModelStdafx.h"
 #include "ndModelPassiveRagdoll.h"
 
+ndModelPassiveRagdoll::ndRagdollNode::ndRagdollNode(ndBodyDynamic* const body, ndRagdollNode* const parent)
+	:ndNodeHierarchy<ndRagdollNode>()
+	,m_body(body)
+{
+	if (parent)
+	{
+		Attach(parent);
+	}
+}
+
+ndModelPassiveRagdoll::ndRagdollNode::~ndRagdollNode()
+{
+}
+
 ndModelPassiveRagdoll::ndModelPassiveRagdoll()
 	:ndModelBase()
-	,m_rootBody(nullptr)
+	,m_rootNode(nullptr)
 {
 }
 
 ndModelPassiveRagdoll::~ndModelPassiveRagdoll()
 {
+	if (m_rootNode)
+	{
+		delete m_rootNode;
+	}
 }
 
-void ndModelPassiveRagdoll::AddRootBody(ndBodyDynamic* const rootBody)
+ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::AddRootBody(ndSharedPtr<ndBody>& rootBody)
 {
-	ndAssert(0);
+	ndAssert(!m_rootNode);
+	m_rootNode = new ndRagdollNode(rootBody->GetAsBodyDynamic(), nullptr);
+	m_bodies.Append(rootBody);
+	return m_rootNode;
 }
 
-void ndModelPassiveRagdoll::AddLimb(ndJointBilateralConstraint* const limbJoint)
+ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::AddLimb(ndRagdollNode* const parent, ndBodyDynamic* const body)
 {
-	ndAssert(0);
+	ndAssert(m_rootNode);
+	ndRagdollNode* const node = new ndRagdollNode(body, parent);
+	m_bodies.Append(body);
+	return node;
 }

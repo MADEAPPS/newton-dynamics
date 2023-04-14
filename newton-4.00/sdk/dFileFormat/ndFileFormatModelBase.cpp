@@ -20,6 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
+#include "ndFileFormat.h"
 #include "ndFileFormatModelBase.h"
 
 ndFileFormatModelBase::ndFileFormatModelBase()
@@ -41,13 +42,13 @@ void ndFileFormatModelBase::SaveModel(ndFileFormat* const scene, nd::TiXmlElemen
 
 	if (modelBase->m_bodies.GetCount())
 	{
-		ndAssert(0);
 		nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("bodies");
 		classNode->LinkEndChild(bodiesNode);
 		bodiesNode->SetAttribute("count", modelBase->m_bodies.GetCount());
 		for (ndList<ndSharedPtr<ndBody>>::ndNode* node = modelBase->m_bodies.GetFirst(); node; node = node->GetNext())
 		{
-			ndAssert(0);
+			ndInt32 nodeId = scene->FindBodyId(*node->GetInfo());
+			xmlSaveParam(bodiesNode, "body", nodeId);
 		}
 
 		nd::TiXmlElement* const jointsNode = new nd::TiXmlElement("joints");
