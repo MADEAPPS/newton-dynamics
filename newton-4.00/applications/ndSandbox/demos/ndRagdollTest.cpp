@@ -52,8 +52,8 @@ namespace ndRagdoll
 
 			ndDampData(ndFloat32 spring, ndFloat32 damper, ndFloat32 regularizer)
 				:m_spring(spring)
-				, m_damper(damper)
-				, m_regularizer(regularizer)
+				,m_damper(damper)
+				,m_regularizer(regularizer)
 			{
 			}
 
@@ -112,6 +112,7 @@ namespace ndRagdoll
 		{ "", ndDefinition::m_root,{},{} },
 	};
 
+/*
 	class ndHumanoidModel : public ndModel
 	{
 		public:
@@ -288,6 +289,7 @@ namespace ndRagdoll
 
 		ndBodyDynamic* m_rootBody;
 	};
+*/
 }
 
 using namespace ndRagdoll;
@@ -302,13 +304,15 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
 	ndMatrix playerMatrix(matrix);
-	ndHumanoidModel* const ragdoll = new ndHumanoidModel(scene, ragdollMesh, matrix);
-	scene->SetSelectedModel(ragdoll);
-
-	ndSharedPtr<ndModel> ragdollPtr(ragdoll);
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(ragdoll->m_rootBody->GetMatrix(), ragdoll->m_rootBody, scene->GetWorld()->GetSentinelBody()));
-	scene->GetWorld()->AddModel(ragdollPtr);
+	//ndHumanoidModel* const ragdoll = new ndHumanoidModel(scene, ragdollMesh, matrix);
+	//scene->SetSelectedModel(ragdoll);
+	//ndSharedPtr<ndModel> ragdollPtr(ragdoll);
+	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(ragdoll->m_rootBody->GetMatrix(), ragdoll->m_rootBody, scene->GetWorld()->GetSentinelBody()));
+	//scene->GetWorld()->AddModel(ragdollPtr);
 	//scene->GetWorld()->AddJoint(fixJoint);
+
+	ndSharedPtr<ndModel> ragdoll(new ndModelPassiveRagdoll);
+	scene->GetWorld()->AddModel(ragdoll);
 	
 	matrix.m_posit.m_x += 1.4f;
 	//TestPlayerCapsuleInteraction(scene, matrix);
@@ -335,10 +339,6 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	origin.m_y += 1.0f;
 	origin.m_z -= 2.0f;
 	scene->SetCameraMatrix(playerMatrix, origin);
-
-	//ndModelPassiveRagdoll* xxxxxxxxxxx = new ndModelPassiveRagdoll;;
-	ndSharedPtr<ndModel> xxxxxxxxxxx (new ndModelPassiveRagdoll);
-	scene->GetWorld()->AddModel(xxxxxxxxxxx);
 
 	ndFileFormat xxxx;
 	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");

@@ -25,6 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndModelList.h"
 
+class ndModelBase;
 class ndMultiBodyVehicle;
 class ndConstraintDebugCallback;
 
@@ -48,6 +49,7 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	virtual ~ndModel ();
 
 	virtual ndModel* GetAsModel();
+	virtual ndModelBase* GetAsModelBase();
 	virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 
@@ -85,6 +87,11 @@ inline ndModel::~ndModel()
 inline ndModel* ndModel::GetAsModel()
 { 
 	return this; 
+}
+
+inline ndModelBase* ndModel::GetAsModelBase()
+{
+	return nullptr;
 }
 
 inline ndMultiBodyVehicle* ndModel::GetAsMultiBodyVehicle()

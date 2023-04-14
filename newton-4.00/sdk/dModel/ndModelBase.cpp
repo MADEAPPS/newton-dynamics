@@ -32,3 +32,8 @@ ndModelBase::ndModelBase()
 ndModelBase::~ndModelBase()
 {
 }
+
+ndModelBase* ndModelBase::GetAsModelBase()
+{
+	return this;
+}

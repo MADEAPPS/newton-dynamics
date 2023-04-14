@@ -273,14 +273,53 @@ void ndFileFormat::SaveModels(const ndWorld* const world, const char* const path
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndFile");
 	asciifile.LinkEndChild(rootNode);
 
+	m_world = world;
 	m_jointsIds.RemoveAll();
 	m_bodiesIds.RemoveAll();
 	m_uniqueShapesIds.RemoveAll();
 
-	//ndAssert(0);
-	//CollectScene(world);
-	//SaveCollisionShapes(rootNode);
-	//SaveBodies(rootNode);
+	ndTree<ndBody*, ndBody*> bodyFilter;
+	for (ndModelList::ndNode* node = world->GetModelList().GetFirst(); node; node = node->GetNext())
+	{
+		ndModelBase* const model = node->GetInfo()->GetAsModelBase();
+		m_models.PushBack(model);
+		if (model)
+		{
+			for (ndList<ndSharedPtr<ndJointBilateralConstraint>>::ndNode* mopdelNode = model->m_joints.GetFirst(); mopdelNode; mopdelNode = mopdelNode->GetNext())
+			{ 
+				ndJointBilateralConstraint* const joint = *mopdelNode->GetInfo();
+				ndBodyKinematic* const body0 = joint->GetBody0();
+				if (!bodyFilter.Find(body0))
+				{
+					m_bodies.PushBack(body0);
+					bodyFilter.Insert(body0, body0);
+				}
+				ndBodyKinematic* const body1 = joint->GetBody0();
+				if (!bodyFilter.Find(body1))
+				{
+					m_bodies.PushBack(body1);
+					bodyFilter.Insert(body1, body1);
+				}
+				m_joints.PushBack(joint);
+			}
+			
+			for (ndList<ndSharedPtr<ndBody>>::ndNode* mopdelNode = model->m_bodies.GetFirst(); mopdelNode; mopdelNode = mopdelNode->GetNext())
+			{
+				ndBodyKinematic* const body = mopdelNode->GetInfo()->GetAsBodyKinematic();
+				if (!bodyFilter.Find(body))
+				{
+					m_bodies.PushBack(body);
+					bodyFilter.Insert(body, body);
+				}
+			}
+		}
+	}
+
+	SaveWorld(rootNode);
+	SaveCollisionShapes(rootNode);
+	SaveBodies(rootNode);
+	SaveJoints(rootNode);
+	SaveModels(rootNode);
 
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");

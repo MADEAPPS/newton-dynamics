@@ -32,6 +32,8 @@ class ndModelBase: public ndModel
 	ndModelBase();
 	virtual ~ndModelBase();
 
+	virtual ndModelBase* GetAsModelBase();
+
 	ndList<ndSharedPtr<ndBody>> m_bodies;
 	ndList< ndSharedPtr<ndJointBilateralConstraint>> m_joints;
 };
