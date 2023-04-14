@@ -445,7 +445,7 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 	
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	ndDemoEntity* const ragdollMesh = ndDemoEntity::LoadFbx("walker.fbx", scene);
+	ndSharedPtr<ndDemoEntity> ragdollMesh (ndDemoEntity::LoadFbx("walker.fbx", scene));
 	
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
@@ -457,7 +457,7 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	//scene->GetWorld()->AddModel(ragdollPtr);
 	//scene->GetWorld()->AddJoint(fixJoint);
 
-	ndModel* const model = BuildRagDoll(scene, ragdollMesh, matrix);
+	ndModel* const model = BuildRagDoll(scene, *ragdollMesh, matrix);
 	ndSharedPtr<ndModel> ragdoll(model);
 	scene->GetWorld()->AddModel(ragdoll);
 	
@@ -475,7 +475,6 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	
 	matrix.m_posit.m_z = 2.0f;
 	//scene->GetWorld()->AddModel(new ndHumanoidModel(scene, ragdollMesh, matrix));
-	delete ragdollMesh;
 	
 	origin1.m_x += 20.0f;
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
