@@ -69,6 +69,10 @@ nd::TiXmlElement* xmlCreateClassNode(nd::TiXmlElement* const parent, const char*
 
 ndInt32 xmlGetNodeId(const nd::TiXmlNode* const rootNode);
 ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name);
+ndFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name);
+ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name);
+const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name);
+void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndVector>& array);
 
 #endif
 

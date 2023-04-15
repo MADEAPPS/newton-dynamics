@@ -31,6 +31,7 @@ class ndFileFormatShapeConvexBox : public ndFileFormatShapeConvex
 	ndFileFormatShapeConvexBox();
 	ndFileFormatShapeConvexBox(const char* const className);
 
+	virtual ndShape* LoadShape(const nd::TiXmlElement* const nNode);
 	virtual ndInt32 SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
 };
 

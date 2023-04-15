@@ -34,6 +34,8 @@ class ndFileFormatRegistrar : public ndClassAlloc
 	virtual ~ndFileFormatRegistrar();
 	
 	public:
+	static ndFileFormatRegistrar* GetHandler(const char* const className);
+
 	virtual void SaveWorld(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndWorld* const world);
 	virtual void SaveBody(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
 	virtual void SaveModel(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model);
@@ -42,7 +44,7 @@ class ndFileFormatRegistrar : public ndClassAlloc
 	virtual void SaveCollision(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision);
 	virtual void SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint);
 
-	static ndFileFormatRegistrar* GetHandler(const char* const className);
+	virtual ndShape* LoadShape(const nd::TiXmlElement* const node);
 
 	private:
 	static void Init();

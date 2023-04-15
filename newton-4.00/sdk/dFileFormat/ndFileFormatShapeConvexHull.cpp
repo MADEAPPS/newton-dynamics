@@ -46,3 +46,10 @@ ndInt32 ndFileFormatShapeConvexHull::SaveShape(ndFileFormat* const scene, nd::Ti
 	xmlSaveParam(classNode, "points", points);
 	return xmlGetNodeId(classNode);
 }
+
+ndShape* ndFileFormatShapeConvexHull::LoadShape(const nd::TiXmlElement* const node)
+{
+	ndArray<ndVector> points;
+	xmlGetFloatArray3(node, "points", points);
+	return new ndShapeConvexHull(points.GetCount(), sizeof(ndVector), (0.0f), &points[0].m_x);
+}

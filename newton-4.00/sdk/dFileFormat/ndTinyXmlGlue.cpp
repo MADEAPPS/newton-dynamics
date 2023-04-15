@@ -109,15 +109,6 @@ ndInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name)
 	return ndInt64 (value);
 }
 
-ndFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name)
-{
-	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
-	ndAssert(element);
-	ndFloat64 value;
-	element->Attribute("float", &value);
-	return ndFloat32 (value);
-}
-
 #ifdef D_NEWTON_USE_DOUBLE
 void xmlGetFloatArray(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndReal>& array)
 {
@@ -168,65 +159,7 @@ void xmlGetFloatArray(const nd::TiXmlNode* const rootNode, const char* const nam
 	}
 }
 
-void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndVector>& array)
-{
-	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
-	ndAssert(element);
-	ndInt32 count;
-	element->Attribute("count", &count);
-	array.Resize(count);
-	array.SetCount(count);
 
-	const char* const data = element->Attribute("float4Array");
-	
-	size_t start = 0;
-	ndVector point(ndVector::m_zero);
-	for (ndInt32 i = 0; i < count; ++i)
-	{
-		char x[64];
-		char y[64];
-		char z[64];
-		char w[64];
-		sscanf(&data[start], "%[^ ] %[^ ] %[^ ] %[^ ]", x, y, z, w);
-		start += strlen(x) + strlen(y) + strlen(z) + strlen(w) + 4;
-
-		ndFloat64 fx;
-		ndFloat64 fy;
-		ndFloat64 fz;
-		ndFloat64 fw;
-		
-		sscanf(x, "%lf", &fx);
-		sscanf(y, "%lf", &fy);
-		sscanf(z, "%lf", &fz);
-		sscanf(w, "%lf", &fw);
-
-		point.m_x = ndFloat32(fx);
-		point.m_y = ndFloat32(fy);
-		point.m_z = ndFloat32(fz);
-		point.m_w = ndFloat32(fw);
-
-		array[i] = point;
-	}
-}
-
-ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name)
-{
-	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
-	ndAssert(element);
-
-	const char* const positData = element->Attribute("float3");
-
-	ndFloat64 fx;
-	ndFloat64 fy;
-	ndFloat64 fz;
-	sscanf(positData, "%lf %lf %lf", &fx, &fy, &fz);
-
-	ndVector posit(ndVector::m_zero);
-	posit.m_x = ndFloat32(fx);
-	posit.m_y = ndFloat32(fy);
-	posit.m_z = ndFloat32(fz);
-	return posit;
-}
 
 ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name)
 {
@@ -260,12 +193,6 @@ ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const nam
 	return matrix;
 }
 
-const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name)
-{
-	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
-	ndAssert(element);
-	return element->Attribute("string");
-}
 
 const nd::TiXmlNode* xmlFind(const nd::TiXmlNode* const rootNode, const char* const name)
 {
@@ -423,4 +350,86 @@ ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name)
 	ndInt32 value;
 	element->Attribute("int32", &value);
 	return value;
+}
+
+
+const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);
+	ndAssert(element);
+	return element->Attribute("string");
+}
+
+ndFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);
+	ndAssert(element);
+	ndFloat64 value;
+	element->Attribute("float", &value);
+	return ndFloat32(value);
+}
+
+ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);
+	ndAssert(element);
+
+	const char* const positData = element->Attribute("float3");
+
+	ndFloat64 fx;
+	ndFloat64 fy;
+	ndFloat64 fz;
+	sscanf(positData, "%lf %lf %lf", &fx, &fy, &fz);
+
+	ndVector posit(ndVector::m_zero);
+	posit.m_x = ndFloat32(fx);
+	posit.m_y = ndFloat32(fy);
+	posit.m_z = ndFloat32(fz);
+	return posit;
+}
+
+void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndVector>& array)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);
+	ndAssert(element);
+	ndInt32 count;
+	element->Attribute("count", &count);
+	array.Resize(count);
+	array.SetCount(count);
+
+	//const char* const data = element->Attribute("float4Array");
+	const char* const data = element->Attribute("float3Array");
+
+	size_t start = 0;
+	ndVector point(ndVector::m_zero);
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		char x[64];
+		char y[64];
+		char z[64];
+		//char w[64];
+		//sscanf(&data[start], "%[^ ] %[^ ] %[^ ] %[^ ]", x, y, z, w);
+		//start += strlen(x) + strlen(y) + strlen(z) + strlen(w) + 4;
+
+		sscanf(&data[start], "%[^ ] %[^ ] %[^ ]", x, y, z);
+		start += strlen(x) + strlen(y) + strlen(z) + 3;
+
+		ndFloat64 fx;
+		ndFloat64 fy;
+		ndFloat64 fz;
+		//ndFloat64 fw;
+
+		sscanf(x, "%lf", &fx);
+		sscanf(y, "%lf", &fy);
+		sscanf(z, "%lf", &fz);
+		//sscanf(w, "%lf", &fw);
+
+		point.m_x = ndFloat32(fx);
+		point.m_y = ndFloat32(fy);
+		point.m_z = ndFloat32(fz);
+		//point.m_w = ndFloat32(fw);
+		point.m_w = ndFloat32(0.0f);
+
+		array[i] = point;
+	}
 }

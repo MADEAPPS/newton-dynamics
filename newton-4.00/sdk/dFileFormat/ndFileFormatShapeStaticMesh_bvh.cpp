@@ -38,15 +38,18 @@ ndInt32 ndFileFormatShapeStaticMesh_bvh::SaveShape(ndFileFormat* const scene, nd
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeClass", ndShapeStatic_bvh::StaticClassName());
 	ndFileFormatShapeStaticMesh::SaveShape(scene, classNode, shape);
 
+	ndAssert(0);
 	char fileName[1024];
+	//sprintf(fileName, "%s", scene->m_fileName.GetStr());
+	//char* const ptr = strrchr(fileName, '.');
+	//if (ptr)
+	//{
+	//	ndInt32 nodeId = xmlGetNodeId(classNode);
+	//	sprintf(ptr, "_%d.bin", nodeId);
+	//}
+	sprintf(fileName, "%s_%s_%d.bin", scene->m_assetPath.GetStr(), ndShapeHeightfield::StaticClassName(), xmlGetNodeId(classNode));
+
 	ndShapeStatic_bvh* const staticMesh = (ndShapeStatic_bvh*)shape;
-	sprintf(fileName, "%s", scene->m_fileName.GetStr());
-	char* const ptr = strrchr(fileName, '.');
-	if (ptr)
-	{
-		ndInt32 nodeId = xmlGetNodeId(classNode);
-		sprintf(ptr, "_%d.bin", nodeId);
-	}
 	xmlSaveParam(classNode, "assetName", "string", fileName);
 	staticMesh->Serialize(fileName);
 	return xmlGetNodeId(classNode);

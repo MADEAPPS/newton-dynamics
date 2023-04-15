@@ -48,9 +48,14 @@ class ndFileFormat : public ndClassAlloc
 	void SaveBodies(nd::TiXmlElement* const rootNode);
 	void SaveJoints(nd::TiXmlElement* const rootNode);
 	void SaveModels(nd::TiXmlElement* const rootNode);
-	void SaveCollisionShapes(nd::TiXmlElement* const rootNode);
+	void SaveShapes(nd::TiXmlElement* const rootNode);
 
-	ndString m_fileName;
+	void LoadShapes(const nd::TiXmlElement* const rootNode, ndTree<ndShape*, ndInt32>& shapeMap);
+
+
+	void GetAssetPath();
+	ndString m_path;
+	ndString m_assetPath;
 	char* m_oldloc;
 	const ndWorld* m_world;
 	nd::TiXmlDocument* m_doc;

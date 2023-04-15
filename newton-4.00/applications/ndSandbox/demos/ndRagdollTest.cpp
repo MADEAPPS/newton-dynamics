@@ -298,6 +298,6 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 
 	ndFileFormat xxxx;
 	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
-	xxxx.SaveModels(scene->GetWorld(), "xxxx.nd");
-	xxxx.Load(scene->GetWorld(), "xxxx.nd");
+	//xxxx.SaveModels(scene->GetWorld(), "xxxx.nd");
+	//xxxx.Load(scene->GetWorld(), "xxxx.nd");
 }
