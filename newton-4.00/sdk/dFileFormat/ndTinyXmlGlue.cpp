@@ -159,41 +159,6 @@ void xmlGetFloatArray(const nd::TiXmlNode* const rootNode, const char* const nam
 	}
 }
 
-
-
-ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name)
-{
-	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
-	ndAssert(element);
-	
-	const char* const positData = element->Attribute("position");
-	const char* const angleData = element->Attribute("angles");
-
-	ndVector posit(ndVector::m_one);
-	ndVector euler(ndVector::m_zero);
-
-	ndFloat64 fx;
-	ndFloat64 fy;
-	ndFloat64 fz;
-	//sscanf(positData, "%f %f %f", &posit.m_x, &posit.m_y, &posit.m_z);
-	sscanf(positData, "%lf %lf %lf", &fx, &fy, &fz);
-	posit.m_x = ndFloat32(fx);
-	posit.m_y = ndFloat32(fy);
-	posit.m_z = ndFloat32(fz);
-
-	//sscanf(angleData, "%f %f %f", &euler.m_x, &euler.m_y, &euler.m_z);
-	sscanf(angleData, "%lf %lf %lf", &fx, &fy, &fz);
-	euler.m_x = ndFloat32(fx);
-	euler.m_y = ndFloat32(fy);
-	euler.m_z = ndFloat32(fz);
-	euler = euler.Scale(ndDegreeToRad);
-
-	ndMatrix matrix (ndPitchMatrix(euler.m_x) * ndYawMatrix(euler.m_y) * ndRollMatrix(euler.m_z));
-	matrix.m_posit = posit;
-	return matrix;
-}
-
-
 const nd::TiXmlNode* xmlFind(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	//for (const nd::TiXmlElement* node = (nd::TiXmlElement*) rootNode->FirstChild(name); node; node = (nd::TiXmlElement*) node->NextSibling())
@@ -386,6 +351,19 @@ ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const na
 	posit.m_y = ndFloat32(fy);
 	posit.m_z = ndFloat32(fz);
 	return posit;
+}
+
+ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);
+	ndAssert(element);
+
+	ndVector posit(xmlGetVector3(element, "posit"));
+	ndVector euler(xmlGetVector3(element, "angles"));
+	ndMatrix matrix(ndPitchMatrix(euler.m_x) * ndYawMatrix(euler.m_y) * ndRollMatrix(euler.m_z));
+	matrix.m_posit = posit;
+	matrix.m_posit.m_w = ndFloat32(1.0f);
+	return matrix;
 }
 
 void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndVector>& array)

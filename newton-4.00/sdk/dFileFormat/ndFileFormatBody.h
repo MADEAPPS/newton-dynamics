@@ -32,6 +32,10 @@ class ndFileFormatBody : public ndFileFormatRegistrar
 	ndFileFormatBody(const char* const className);
 
 	virtual void SaveBody(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
+
+	protected:
+	virtual void LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body);
+
 };
 
 #endif 

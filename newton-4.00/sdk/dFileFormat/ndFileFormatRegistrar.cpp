@@ -214,12 +214,6 @@ ndInt32 ndFileFormatRegistrar::SaveShape(ndFileFormat* const, nd::TiXmlElement* 
 	return 0;
 }
 
-ndShape* ndFileFormatRegistrar::LoadShape(const nd::TiXmlElement* const)
-{
-	ndAssert(0);
-	return nullptr;
-}
-
 void ndFileFormatRegistrar::SaveCollision(ndFileFormat* const, nd::TiXmlElement* const, const ndShapeInstance* const)
 {
 	ndAssert(0);
@@ -233,4 +227,16 @@ void ndFileFormatRegistrar::SaveJoint(ndFileFormat* const, nd::TiXmlElement* con
 void ndFileFormatRegistrar::SaveModel(ndFileFormat* const, nd::TiXmlElement* const, const ndModel* const)
 {
 	ndAssert(0);
+}
+
+ndShape* ndFileFormatRegistrar::LoadShape(const nd::TiXmlElement* const)
+{
+	ndAssert(0);
+	return nullptr;
+}
+
+ndBody* ndFileFormatRegistrar::LoadBody(const nd::TiXmlElement* const, const ndTree<ndShape*, ndInt32>&)
+{
+	ndAssert(0);
+	return nullptr;
 }

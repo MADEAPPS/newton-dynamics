@@ -51,7 +51,7 @@ class ndFileFormat : public ndClassAlloc
 	void SaveShapes(nd::TiXmlElement* const rootNode);
 
 	void LoadShapes(const nd::TiXmlElement* const rootNode, ndTree<ndShape*, ndInt32>& shapeMap);
-
+	void LoadBodies(const nd::TiXmlElement* const rootNode, const ndTree<ndShape*, ndInt32>& shapeMap, ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap);
 
 	void GetAssetPath();
 	ndString m_path;

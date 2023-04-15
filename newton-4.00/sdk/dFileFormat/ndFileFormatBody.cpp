@@ -60,3 +60,16 @@ void ndFileFormatBody::SaveBody(ndFileFormat* const scene, nd::TiXmlElement* con
 	xmlSaveParam(classNode, "velocity", body->GetVelocity());
 	xmlSaveParam(classNode, "centerOfMass", body->GetCentreOfMass());
 }
+
+void ndFileFormatBody::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>&, ndBody* const body)
+{
+	ndMatrix matrix(xmlGetMatrix(node, "matrix"));
+	ndVector omega(xmlGetVector3(node, "omega"));
+	ndVector veloc(xmlGetVector3(node, "velocity"));
+	ndVector com(xmlGetVector3(node, "centerOfMass"));
+
+	body->SetMatrix(matrix);
+	body->SetOmega(omega);
+	body->SetVelocity(veloc);
+	body->SetCentreOfMass(com);
+}

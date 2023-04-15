@@ -41,3 +41,18 @@ void ndFileFormatDynamicBody::SaveBody(ndFileFormat* const scene, nd::TiXmlEleme
 	xmlSaveParam(classNode, "linearDampCoef", dynamic->m_dampCoef.m_w);
 	xmlSaveParam(classNode, "angularDampCoef", dynamic->m_dampCoef);
 }
+
+
+ndBody* ndFileFormatDynamicBody::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap)
+{
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	LoadBody(node, shapeMap, body);
+
+	return body;
+}
+
+void ndFileFormatDynamicBody::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body)
+{
+	ndFileFormatKinematicBody::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
+	ndAssert(0);
+}

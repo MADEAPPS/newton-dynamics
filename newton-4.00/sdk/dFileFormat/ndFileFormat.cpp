@@ -202,7 +202,6 @@ void ndFileFormat::LoadShapes(const nd::TiXmlElement* const rootNode, ndTree<ndS
 	}
 }
 
-
 void ndFileFormat::SaveBodies(nd::TiXmlElement* const rootNode)
 {
 	if (m_bodies.GetCount())
@@ -224,6 +223,41 @@ void ndFileFormat::SaveBodies(nd::TiXmlElement* const rootNode)
 			{
 				handler->SaveBody(this, bodiesNode, body);
 			}
+		}
+	}
+}
+
+void ndFileFormat::LoadBodies(const nd::TiXmlElement* const rootNode, const ndTree<ndShape*, ndInt32>& shapeMap, ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	const nd::TiXmlNode* const bodies = rootNode->FirstChild("ndBodies");
+	if (bodies)
+	{
+		for (const nd::TiXmlNode* node = bodies->FirstChild(); node; node = node->NextSibling())
+		{
+			nd::TiXmlElement* element = (nd::TiXmlElement*)node;
+			ndFileFormatRegistrar* handler = ndFileFormatRegistrar::GetHandler(element->Attribute("className"));
+			if (!handler)
+			{
+				nd::TiXmlNode* childNode = (nd::TiXmlNode*)node;
+				do {
+					const char* const className = childNode->Value();
+					if (strcmp(className, "ndBodyClass"))
+					{
+						break;
+					}
+					element = (nd::TiXmlElement*)childNode;
+					ndTrace(("warning class %s not found\n", element->Attribute("className")));
+					handler = ndFileFormatRegistrar::GetHandler(element->Attribute("className"));
+					childNode = childNode->FirstChild();
+				} while (!handler);
+			}
+			ndAssert(handler);
+
+			ndInt32 nodeId;
+			element->Attribute("nodeId", &nodeId);
+			ndSharedPtr<ndBody> body (handler->LoadBody(element, shapeMap));
+			ndAssert(0);
+			//bodyMap.Insert(body, nodeId);
 		}
 	}
 }
@@ -438,7 +472,10 @@ void ndFileFormat::Load(const ndWorld* const world, const char* const path)
 	const nd::TiXmlElement* const rootNode = m_doc->RootElement();
 
 	ndTree<ndShape*, ndInt32> shapeMap;
+	ndTree<ndSharedPtr<ndBody>, ndInt32> bodyMap;
+
 	LoadShapes(rootNode, shapeMap);
+	LoadBodies(rootNode, shapeMap, bodyMap);
 
 	ndTree<ndShape*, ndInt32>::Iterator it (shapeMap);
 	for (it.Begin(); it; it++)

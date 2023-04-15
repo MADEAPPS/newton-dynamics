@@ -64,3 +64,32 @@ void ndFileFormatKinematicBody::SaveBody(ndFileFormat* const scene, nd::TiXmlEle
 	xmlSaveParam(classNode, "maxLinearStep", kinematic->GetMaxLinearStep());
 	xmlSaveParam(classNode, "maxAngleStep", kinematic->GetMaxAngularStep() * ndRadToDegree);
 }
+
+void ndFileFormatKinematicBody::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body)
+{
+	ndFileFormatBody::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
+
+	ndBodyKinematic* const kinBody = (ndBodyKinematic*)body;
+
+
+
+	ndFloat32 invMass = xmlGetFloat(node, "invMass");
+	if (invMass > ndFloat32(0.0f))
+	{
+		ndAssert(0);
+		//ndVector euler0;
+		//ndVector euler1;
+		//ndVector inertia(kinematic->GetMassMatrix());
+		//ndMatrix matrix(kinematic->GetPrincipalAxis());
+		//matrix.CalcPitchYawRoll(euler0, euler1);
+		//euler0 = euler0.Scale(ndRadToDegree);
+		//
+		//xmlSaveParam(classNode, "inertia", inertia);
+		//xmlSaveParam(classNode, "principalAxis", euler0);
+		//xmlSaveParam(classNode, "useSkewInertia", matrix.TestIdentity() ? 0 : 1);
+	}
+
+	ndFloat32 stepInUnitPerSeconds = xmlGetFloat(node, "maxLinearStep");
+	ndFloat32 angleInRadian = xmlGetFloat(node, "maxAngleStep") * ndDegreeToRad;
+	kinBody->SetDebugMaxLinearAndAngularIntegrationStep(angleInRadian, stepInUnitPerSeconds);
+}
