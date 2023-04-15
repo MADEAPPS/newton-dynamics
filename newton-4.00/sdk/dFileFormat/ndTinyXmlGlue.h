@@ -50,7 +50,7 @@ const nd::TiXmlNode* xmlFind(const nd::TiXmlNode* const rootNode, const char* co
 
 #endif
 
-void xmlReserClassId();
+void xmlResetClassId();
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const type, const char* const value);
 

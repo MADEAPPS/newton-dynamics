@@ -36,126 +36,116 @@ namespace nd
 {
 	xmlFree	 __free__ = free;
 	xmlAlloc __alloc__ = malloc;
-	//xmlFree	 __free__ = nullptr;
-	//xmlAlloc __alloc__ = nullptr;
 
-// Error value for find primitive
-const TiXmlString::size_type TiXmlString::npos = static_cast< TiXmlString::size_type >(-1);
+	// Error value for find primitive
+	const TiXmlString::size_type TiXmlString::npos = static_cast< TiXmlString::size_type >(-1);
 
 
-// Null rep.
-TiXmlString::Rep TiXmlString::nullrep_ = { 0, 0, { '\0' } };
+	// Null rep.
+	TiXmlString::Rep TiXmlString::nullrep_ = { 0, 0, { '\0' } };
 
 
-void *TiXmlString::operator new (size_t size)
-{
-	//return dMemory::Malloc(size);
-	return __alloc__(size);
-}
+	void *TiXmlString::operator new (size_t size)
+	{
+		return __alloc__(size);
+	}
 
-void *TiXmlString::operator new[](size_t size)
-{
-	//return dMemory::Malloc(size);
-	return __alloc__(size);
-}
+	void *TiXmlString::operator new[](size_t size)
+	{
+		return __alloc__(size);
+	}
 
-void TiXmlString::operator delete (void* ptr)
-{
-	//dMemory::Free(ptr);
-	__free__(ptr);
-}
+	void TiXmlString::operator delete (void* ptr)
+	{
+		__free__(ptr);
+	}
 
-void TiXmlString::operator delete[](void* ptr)
-{
-	//dMemory::Free(ptr);
-	__free__(ptr);
-}
+	void TiXmlString::operator delete[](void* ptr)
+	{
+		__free__(ptr);
+	}
 
-void* TiXmlString::Malloc(size_type size)
-{
-	//return dMemory::Malloc(size);
-	return __alloc__(size);
-}
+	void* TiXmlString::Malloc(size_type size)
+	{
+		return __alloc__(size);
+	}
 
-void TiXmlString::Free(void* ptr)
-{
-	//dMemory::Free(ptr);
-	__free__(ptr);
-}
+	void TiXmlString::Free(void* ptr)
+	{
+		__free__(ptr);
+	}
+
+	void TiXmlString::reserve (size_type cap)
+	{
+		if (cap > capacity())
+		{
+			TiXmlString tmp;
+			tmp.init(length(), cap);
+			memcpy(tmp.start(), data(), length());
+			swap(tmp);
+		}
+	}
 
 
-void TiXmlString::reserve (size_type cap)
-{
-	if (cap > capacity())
+	TiXmlString& TiXmlString::assign(const char* str, size_type len)
+	{
+		size_type cap = capacity();
+		if (len > cap || cap > 3*(len + 8))
+		{
+			TiXmlString tmp;
+			tmp.init(len);
+			memcpy(tmp.start(), str, len);
+			swap(tmp);
+		}
+		else
+		{
+			memmove(start(), str, len);
+			set_size(len);
+		}
+		return *this;
+	}
+
+
+	TiXmlString& TiXmlString::append(const char* str, size_type len)
+	{
+		size_type newsize = length() + len;
+		if (newsize > capacity())
+		{
+			reserve (newsize + capacity());
+		}
+		memmove(finish(), str, len);
+		set_size(newsize);
+		return *this;
+	}
+
+
+	TiXmlString operator + (const TiXmlString & a, const TiXmlString & b)
 	{
 		TiXmlString tmp;
-		tmp.init(length(), cap);
-		memcpy(tmp.start(), data(), length());
-		swap(tmp);
+		tmp.reserve(a.length() + b.length());
+		tmp += a;
+		tmp += b;
+		return tmp;
 	}
-}
 
-
-TiXmlString& TiXmlString::assign(const char* str, size_type len)
-{
-	size_type cap = capacity();
-	if (len > cap || cap > 3*(len + 8))
+	TiXmlString operator + (const TiXmlString & a, const char* b)
 	{
 		TiXmlString tmp;
-		tmp.init(len);
-		memcpy(tmp.start(), str, len);
-		swap(tmp);
+		TiXmlString::size_type b_len = static_cast<TiXmlString::size_type>( strlen(b) );
+		tmp.reserve(a.length() + b_len);
+		tmp += a;
+		tmp.append(b, b_len);
+		return tmp;
 	}
-	else
+
+	TiXmlString operator + (const char* a, const TiXmlString & b)
 	{
-		memmove(start(), str, len);
-		set_size(len);
+		TiXmlString tmp;
+		TiXmlString::size_type a_len = static_cast<TiXmlString::size_type>( strlen(a) );
+		tmp.reserve(a_len + b.length());
+		tmp.append(a, a_len);
+		tmp += b;
+		return tmp;
 	}
-	return *this;
-}
-
-
-TiXmlString& TiXmlString::append(const char* str, size_type len)
-{
-	size_type newsize = length() + len;
-	if (newsize > capacity())
-	{
-		reserve (newsize + capacity());
-	}
-	memmove(finish(), str, len);
-	set_size(newsize);
-	return *this;
-}
-
-
-TiXmlString operator + (const TiXmlString & a, const TiXmlString & b)
-{
-	TiXmlString tmp;
-	tmp.reserve(a.length() + b.length());
-	tmp += a;
-	tmp += b;
-	return tmp;
-}
-
-TiXmlString operator + (const TiXmlString & a, const char* b)
-{
-	TiXmlString tmp;
-	TiXmlString::size_type b_len = static_cast<TiXmlString::size_type>( strlen(b) );
-	tmp.reserve(a.length() + b_len);
-	tmp += a;
-	tmp.append(b, b_len);
-	return tmp;
-}
-
-TiXmlString operator + (const char* a, const TiXmlString & b)
-{
-	TiXmlString tmp;
-	TiXmlString::size_type a_len = static_cast<TiXmlString::size_type>( strlen(a) );
-	tmp.reserve(a_len + b.length());
-	tmp.append(a, a_len);
-	tmp += b;
-	return tmp;
-}
-
 } // end nd namespace
 #endif	// TIXML_USE_STL

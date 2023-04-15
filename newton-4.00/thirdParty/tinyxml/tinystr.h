@@ -42,9 +42,8 @@ distribution.
 #include <assert.h>
 #include <string.h>
 
-
-typedef void* (*xmlAlloc) (size_t size);
 typedef void (*xmlFree) (void*);
+typedef void* (*xmlAlloc) (size_t size);
 
 //#if defined(_MSC_VER)
 //	#define D_TINYXML_EXPORT __declspec(dllexport)

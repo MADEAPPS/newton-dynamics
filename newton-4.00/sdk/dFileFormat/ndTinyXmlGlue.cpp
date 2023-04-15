@@ -284,7 +284,7 @@ const nd::TiXmlNode* xmlFind(const nd::TiXmlNode* const rootNode, const char* co
 
 
 static ndInt32 g_classId = 0;
-void xmlReserClassId()
+void xmlResetClassId()
 {
 	g_classId = 0;
 }

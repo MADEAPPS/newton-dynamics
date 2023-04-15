@@ -36,7 +36,7 @@ ndFileFormat::ndFileFormat()
 	,m_jointsIds()
 	,m_uniqueShapesIds()
 {
-	xmlReserClassId();
+	xmlResetClassId();
 	ndFileFormatRegistrar::Init();
 }
 
@@ -241,7 +241,7 @@ void ndFileFormat::SaveWorld(nd::TiXmlElement* const rootNode)
 
 void ndFileFormat::BeginSave(const ndWorld* const world, const char* const path)
 {
-	xmlReserClassId();
+	xmlResetClassId();
 
 	m_world = world;
 	// save the path for use with generated assets.
@@ -360,5 +360,55 @@ void ndFileFormat::SaveModels(const ndWorld* const world, const char* const path
 
 void ndFileFormat::Load(const ndWorld* const world, const char* const path)
 {
+	// save the path for use with generated assets.
+	m_fileName = path;
 
+	xmlResetClassId();
+	m_oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+
+	m_world = world;
+	m_doc = new nd::TiXmlDocument(m_fileName.GetStr());
+	 
+	m_doc->LoadFile();
+	if (m_doc->Error())
+	{
+		setlocale(LC_ALL, m_oldloc);
+		delete m_doc;
+		return;
+	}
+	ndAssert(!m_doc->Error());
+	
+	if (!m_doc->FirstChild("ndFile"))
+	{
+		setlocale(LC_ALL, m_oldloc);
+		delete m_doc;
+		return;
+	}
+
+	//char assetPath[1024];
+	//strcpy(assetPath, path);
+	//char* namePtr = strrchr(assetPath, '/');
+	//if (!namePtr)
+	//{
+	//	namePtr = strrchr(assetPath, '\\');
+	//}
+	//namePtr[0] = 0;
+
+	const nd::TiXmlElement* const rootNode = m_doc->RootElement();
+	//const nd::TiXmlElement* const worldNode = doc.RootElement();
+	//ndShapeLoaderCache shapesMap;
+	//ndBodySentinel sentinel;
+	//m_bodyMap.Insert(&sentinel, 0);
+	//LoadSceneSettings(worldNode, assetPath);
+	//LoadShapes(worldNode, assetPath, shapesMap);
+	//LoadBodies(worldNode, assetPath, shapesMap);
+	//LoadJoints(worldNode, assetPath);
+	//LoadModels(worldNode, assetPath);
+	//m_bodyMap.Remove(0);
+
+
+
+	setlocale(LC_ALL, m_oldloc);
+	delete m_doc;
 }
