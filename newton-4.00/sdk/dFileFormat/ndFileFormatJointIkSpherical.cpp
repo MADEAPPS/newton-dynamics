@@ -32,7 +32,7 @@ ndFileFormatJointIkSpherical::ndFileFormatJointIkSpherical(const char* const cla
 {
 }
 
-void ndFileFormatJointIkSpherical::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+void ndFileFormatJointIkSpherical::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndIkJointSpherical", ndIkJointSpherical::StaticClassName());
 	ndFileFormatJointSpherical::SaveJoint(scene, classNode, joint);

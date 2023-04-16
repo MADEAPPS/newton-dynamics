@@ -32,7 +32,7 @@ ndFileFormatJointIkSwivelPositionEffector::ndFileFormatJointIkSwivelPositionEffe
 {
 }
 
-void ndFileFormatJointIkSwivelPositionEffector::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+void ndFileFormatJointIkSwivelPositionEffector::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndIkSwivelPositionEffector", ndIkSwivelPositionEffector::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);

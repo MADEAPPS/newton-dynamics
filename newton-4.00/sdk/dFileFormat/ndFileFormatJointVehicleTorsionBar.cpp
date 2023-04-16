@@ -20,7 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormat.h"
+#include "ndFileFormatSave.h"
 #include "ndFileFormatJointVehicleTorsionBar.h"
 
 ndFileFormatJointVehicleTorsionBar::ndFileFormatJointVehicleTorsionBar()
@@ -33,7 +33,7 @@ ndFileFormatJointVehicleTorsionBar::ndFileFormatJointVehicleTorsionBar(const cha
 {
 }
 
-void ndFileFormatJointVehicleTorsionBar::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+void ndFileFormatJointVehicleTorsionBar::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndMultiBodyVehicleTorsionBar", ndMultiBodyVehicleTorsionBar::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);

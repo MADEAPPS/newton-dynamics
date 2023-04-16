@@ -61,6 +61,8 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeInstance: public ndContainersFreeListAlloc<ndShapeInstance>
 {
 	public:
+	//D_BASE_CLASS_REFLECTION(ndShapeInstance)
+
 	class ndDistanceCalculator
 	{
 		public:

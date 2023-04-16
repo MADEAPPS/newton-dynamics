@@ -20,7 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormat.h"
+#include "ndFileFormatSave.h"
 #include "ndFileFormatBody.h"
 #include "ndFileFormatNotify.h"
 
@@ -34,7 +34,7 @@ ndFileFormatBody::ndFileFormatBody(const char* const className)
 {
 }
 
-void ndFileFormatBody::SaveBody(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
+void ndFileFormatBody::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBody::StaticClassName());
 
@@ -42,8 +42,17 @@ void ndFileFormatBody::SaveBody(ndFileFormat* const scene, nd::TiXmlElement* con
 	if (notity)
 	{
 		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(notity->ClassName());
-		ndAssert(handler);
-		handler->SaveNotify(scene, classNode, notity);
+		if (handler)
+		{
+			handler->SaveNotify(scene, classNode, notity);
+		}
+		else
+		{
+			ndTrace(("subclass %s not found, instead saving baseclass %s", notity->ClassName(), notity->SuperClassName()));
+			ndFileFormatRegistrar* const superHandler = ndFileFormatRegistrar::GetHandler(notity->SuperClassName());
+			ndAssert(superHandler);
+			superHandler->SaveNotify(scene, classNode, notity);
+		}
 	}
 
 	ndTree<ndInt32, ndUnsigned64>::ndNode* const node = scene->m_bodiesIds.Insert(body->GetId());

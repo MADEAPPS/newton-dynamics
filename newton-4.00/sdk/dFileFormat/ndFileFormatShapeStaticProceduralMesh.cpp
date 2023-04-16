@@ -20,7 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormat.h"
+#include "ndFileFormatSave.h"
 #include "ndFileFormatShapeStaticProceduralMesh.h"
 
 ndFileFormatShapeStaticProceduralMesh::ndFileFormatShapeStaticProceduralMesh()
@@ -33,7 +33,7 @@ ndFileFormatShapeStaticProceduralMesh::ndFileFormatShapeStaticProceduralMesh(con
 {
 }
 
-ndInt32 ndFileFormatShapeStaticProceduralMesh::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
+ndInt32 ndFileFormatShapeStaticProceduralMesh::SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeClass", ndShapeStaticProceduralMesh::StaticClassName());
 	ndFileFormatShapeStaticMesh::SaveShape(scene, classNode, shape);

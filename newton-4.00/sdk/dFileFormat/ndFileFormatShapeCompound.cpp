@@ -20,7 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormat.h"
+#include "ndFileFormatSave.h"
 #include "ndFileFormatShapeCompound.h"
 
 ndFileFormatShapeCompound::ndFileFormatShapeCompound()
@@ -33,7 +33,7 @@ ndFileFormatShapeCompound::ndFileFormatShapeCompound(const char* const className
 {
 }
 
-ndInt32 ndFileFormatShapeCompound::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
+ndInt32 ndFileFormatShapeCompound::SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
 	ndShapeCompound* const compoundShape = (ndShapeCompound*)shape;
 	const ndShapeCompound::ndTreeArray& shapeList = compoundShape->GetTree();

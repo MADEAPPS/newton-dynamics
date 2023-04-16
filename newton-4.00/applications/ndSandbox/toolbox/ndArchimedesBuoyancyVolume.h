@@ -28,7 +28,7 @@ class ndArchimedesBuoyancyVolume: public ndBodyTriggerVolume
 		{
 		}
 
-		void SaveBody(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
+		void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 		{
 			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndArchimedesBuoyancyVolume::StaticClassName());
 			ndFileFormatBodyTriggerVolume::SaveBody(scene, classNode, body);

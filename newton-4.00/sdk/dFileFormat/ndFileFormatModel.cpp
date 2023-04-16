@@ -20,7 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormat.h"
+#include "ndFileFormatSave.h"
 #include "ndFileFormatModel.h"
 
 ndFileFormatModel::ndFileFormatModel()
@@ -33,7 +33,7 @@ ndFileFormatModel::ndFileFormatModel(const char* const className)
 {
 }
 
-void ndFileFormatModel::SaveModel(ndFileFormat* const, nd::TiXmlElement* const parentNode, const ndModel* const)
+void ndFileFormatModel::SaveModel(ndFileFormatSave* const, nd::TiXmlElement* const parentNode, const ndModel* const)
 {
 	//nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndModelClass", ndModel::StaticClassName());
 	xmlCreateClassNode(parentNode, "ndModelClass", ndModel::StaticClassName());

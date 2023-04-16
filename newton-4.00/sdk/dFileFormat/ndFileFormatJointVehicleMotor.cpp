@@ -32,7 +32,7 @@ ndFileFormatJointVehicleMotor::ndFileFormatJointVehicleMotor(const char* const c
 {
 }
 
-void ndFileFormatJointVehicleMotor::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+void ndFileFormatJointVehicleMotor::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndMultiBodyVehicleMotor", ndMultiBodyVehicleMotor::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);

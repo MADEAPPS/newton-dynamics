@@ -32,7 +32,7 @@ ndFileFormatJointFixDistance::ndFileFormatJointFixDistance(const char* const cla
 {
 }
 
-void ndFileFormatJointFixDistance::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+void ndFileFormatJointFixDistance::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointFixDistance", ndJointFixDistance::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);

@@ -20,7 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormat.h"
+#include "ndFileFormatSave.h"
 #include "ndFileFormatModelPassiveRadoll.h"
 
 ndFileFormatModelPassiveRadoll::ndFileFormatModelPassiveRadoll()
@@ -33,7 +33,7 @@ ndFileFormatModelPassiveRadoll::ndFileFormatModelPassiveRadoll(const char* const
 {
 }
 
-void ndFileFormatModelPassiveRadoll::SaveModel(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
+void ndFileFormatModelPassiveRadoll::SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndModelPassiveRagdoll", ndModelPassiveRagdoll::StaticClassName());
 	ndFileFormatModelBase::SaveModel(scene, classNode, model);

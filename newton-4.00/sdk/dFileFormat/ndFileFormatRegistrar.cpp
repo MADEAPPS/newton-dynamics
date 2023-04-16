@@ -193,38 +193,38 @@ ndFileFormatRegistrar* ndFileFormatRegistrar::GetHandler(const char* const class
 	return nullptr;
 }
 
-void ndFileFormatRegistrar::SaveWorld(ndFileFormat* const, nd::TiXmlElement* const, const ndWorld* const)
+void ndFileFormatRegistrar::SaveWorld(ndFileFormatSave* const, nd::TiXmlElement* const, const ndWorld* const)
 {
 	ndAssert(0);
 }
 
-void ndFileFormatRegistrar::SaveBody(ndFileFormat* const, nd::TiXmlElement* const, const ndBody* const)
+void ndFileFormatRegistrar::SaveBody(ndFileFormatSave* const, nd::TiXmlElement* const, const ndBody* const)
 {
 	ndAssert(0);
 }
 
-void ndFileFormatRegistrar::SaveNotify(ndFileFormat* const, nd::TiXmlElement* const, const ndBodyNotify* const)
+void ndFileFormatRegistrar::SaveNotify(ndFileFormatSave* const, nd::TiXmlElement* const, const ndBodyNotify* const)
 {
 	ndAssert(0);
 }
 
-ndInt32 ndFileFormatRegistrar::SaveShape(ndFileFormat* const, nd::TiXmlElement* const, const ndShape* const)
+ndInt32 ndFileFormatRegistrar::SaveShape(ndFileFormatSave* const, nd::TiXmlElement* const, const ndShape* const)
 {
 	ndAssert(0);
 	return 0;
 }
 
-void ndFileFormatRegistrar::SaveCollision(ndFileFormat* const, nd::TiXmlElement* const, const ndShapeInstance* const)
+void ndFileFormatRegistrar::SaveCollision(ndFileFormatSave* const, nd::TiXmlElement* const, const ndShapeInstance* const)
 {
 	ndAssert(0);
 }
 
-void ndFileFormatRegistrar::SaveJoint(ndFileFormat* const, nd::TiXmlElement* const, const ndJointBilateralConstraint* const)
+void ndFileFormatRegistrar::SaveJoint(ndFileFormatSave* const, nd::TiXmlElement* const, const ndJointBilateralConstraint* const)
 {
 	ndAssert(0);
 }
 
-void ndFileFormatRegistrar::SaveModel(ndFileFormat* const, nd::TiXmlElement* const, const ndModel* const)
+void ndFileFormatRegistrar::SaveModel(ndFileFormatSave* const, nd::TiXmlElement* const, const ndModel* const)
 {
 	ndAssert(0);
 }

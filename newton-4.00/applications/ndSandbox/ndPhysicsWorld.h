@@ -31,7 +31,7 @@ class ndPhysicsWorld: public ndWorld
 		{
 		}
 
-		void SaveWorld(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndWorld* const world)
+		void SaveWorld(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndWorld* const world)
 		{
 			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndPhysicsWorld", ndPhysicsWorld::StaticClassName());
 			ndFileFormatWorld::SaveWorld(scene, classNode, world);

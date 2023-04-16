@@ -32,7 +32,7 @@ ndFileFormatJointIk6DofEffector::ndFileFormatJointIk6DofEffector(const char* con
 {
 }
 
-void ndFileFormatJointIk6DofEffector::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+void ndFileFormatJointIk6DofEffector::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndIk6DofEffector", ndIk6DofEffector::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);

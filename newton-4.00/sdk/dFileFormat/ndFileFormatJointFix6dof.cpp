@@ -32,7 +32,7 @@ ndFileFormatJointFix6dof::ndFileFormatJointFix6dof(const char* const className)
 {
 }
 
-void ndFileFormatJointFix6dof::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+void ndFileFormatJointFix6dof::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointFix6dof", ndJointFix6dof::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);

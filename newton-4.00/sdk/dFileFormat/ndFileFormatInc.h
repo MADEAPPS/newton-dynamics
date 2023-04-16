@@ -25,6 +25,8 @@
 #include <ndFileFormatStdafx.h>
 
 #include <ndFileFormat.h>
+#include <ndFileFormatLoad.h>
+#include <ndFileFormatSave.h>
 #include <ndFileFormatBody.h>
 #include <ndFileFormatWorld.h>
 #include <ndFileFormatShape.h>

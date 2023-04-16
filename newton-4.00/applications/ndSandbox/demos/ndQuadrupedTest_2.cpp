@@ -40,7 +40,7 @@ namespace ndQuadruped_2
 			{
 			}
 
-			void SaveModel(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
+			void SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
 			{
 				nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndQuadrupedModel2", ndQuadrupedModel::StaticClassName());
 				ndFileFormatModel::SaveModel(scene, classNode, model);
@@ -514,6 +514,6 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 
-	ndFileFormat xxxx;
+	ndFileFormatSave xxxx;
 	xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 }

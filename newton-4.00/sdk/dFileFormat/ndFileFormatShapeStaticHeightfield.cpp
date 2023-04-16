@@ -20,7 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormat.h"
+#include "ndFileFormatSave.h"
 #include "ndFileFormatShapeStaticHeightfield.h"
 
 ndFileFormatShapeStaticHeightfield::ndFileFormatShapeStaticHeightfield()
@@ -33,7 +33,7 @@ ndFileFormatShapeStaticHeightfield::ndFileFormatShapeStaticHeightfield(const cha
 {
 }
 
-ndInt32 ndFileFormatShapeStaticHeightfield::SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
+ndInt32 ndFileFormatShapeStaticHeightfield::SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeClass", ndShapeHeightfield::StaticClassName());
 	ndFileFormatShapeStaticMesh::SaveShape(scene, classNode, shape);

@@ -31,7 +31,7 @@ class ndFileFormatWorld : public ndFileFormatRegistrar
 	ndFileFormatWorld();
 	ndFileFormatWorld(const char* const className);
 
-	virtual void SaveWorld(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndWorld* const world);
+	virtual void SaveWorld(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndWorld* const world);
 };
 
 #endif 

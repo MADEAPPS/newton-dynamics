@@ -19,19 +19,34 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_FILE_FORMAT_SHAPE_COMPOUND_H__
-#define _ND_FILE_FORMAT_SHAPE_COMPOUND_H__
+#ifndef _ND_FILE_FORMAT_LOAD_H__
+#define _ND_FILE_FORMAT_LOAD_H__
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatShape.h"
+#include "ndFileFormat.h"
 
-class ndFileFormatShapeCompound : public ndFileFormatShape
+class ndFileFormatLoad : public ndFileFormat
 {
 	public: 
-	ndFileFormatShapeCompound();
-	ndFileFormatShapeCompound(const char* const className);
+	ndFileFormatLoad();
+	~ndFileFormatLoad();
 
-	virtual ndInt32 SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
+	void Load(const ndWorld* const world, const char* const path);
+	
+	private:
+	void LoadShapes(const nd::TiXmlElement* const rootNode, ndTree<ndShape*, ndInt32>& shapeMap);
+	void LoadBodies(const nd::TiXmlElement* const rootNode, const ndTree<ndShape*, ndInt32>& shapeMap, ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap);
+
+	//ndWorld* m_world;
+	//nd::TiXmlDocument* m_doc;
+
+	friend class ndFileFormatBody;
+	friend class ndFileFormatJoint;
+	friend class ndFileFormatShapeInstance;
+	friend class ndFileFormatShapeCompound;
+	friend class ndFileFormatShapeStaticMesh_bvh;
+	friend class ndFileFormatShapeStaticHeightfield;
+	friend class ndFileFormatJointVehicleTorsionBar;
 };
 
 #endif 

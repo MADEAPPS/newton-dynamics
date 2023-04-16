@@ -177,6 +177,6 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	ndQuaternion rot(ndYawMatrix(45.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);
 
-	ndFileFormat xxxx;
+	ndFileFormatSave xxxx;
 	xxxx.SaveBodies(scene->GetWorld(), "xxxx.nd");
 }

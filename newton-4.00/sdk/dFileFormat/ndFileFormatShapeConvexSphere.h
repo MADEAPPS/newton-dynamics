@@ -32,7 +32,7 @@ class ndFileFormatShapeConvexSphere : public ndFileFormatShapeConvex
 	ndFileFormatShapeConvexSphere(const char* const className);
 
 	virtual ndShape* LoadShape(const nd::TiXmlElement* const nNode);
-	virtual ndInt32 SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
+	virtual ndInt32 SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
 };
 
 #endif 

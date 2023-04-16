@@ -32,7 +32,7 @@ ndFileFormatJointCylinder::ndFileFormatJointCylinder(const char* const className
 {
 }
 
-void ndFileFormatJointCylinder::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+void ndFileFormatJointCylinder::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointCylinder", ndJointCylinder::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);

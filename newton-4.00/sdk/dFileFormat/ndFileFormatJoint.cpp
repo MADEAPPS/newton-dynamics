@@ -20,7 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormat.h"
+#include "ndFileFormatSave.h"
 #include "ndFileFormatJoint.h"
 
 ndFileFormatJoint::ndFileFormatJoint()
@@ -33,7 +33,7 @@ ndFileFormatJoint::ndFileFormatJoint(const char* const className)
 {
 }
 
-void ndFileFormatJoint::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+void ndFileFormatJoint::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointBilateralConstraint::StaticClassName());
 

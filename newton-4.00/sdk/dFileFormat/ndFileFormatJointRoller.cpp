@@ -32,7 +32,7 @@ ndFileFormatJointRoller::ndFileFormatJointRoller(const char* const className)
 {
 }
 
-void ndFileFormatJointRoller::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+void ndFileFormatJointRoller::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointRoller", ndJointRoller::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);

@@ -31,7 +31,7 @@ class ndFileFormatModelPassiveRadoll : public ndFileFormatModelBase
 	ndFileFormatModelPassiveRadoll();
 	ndFileFormatModelPassiveRadoll(const char* const className);
 
-	virtual void SaveModel(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model);
+	virtual void SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model);
 };
 
 #endif 

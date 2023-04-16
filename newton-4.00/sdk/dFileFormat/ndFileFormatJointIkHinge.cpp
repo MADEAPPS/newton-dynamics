@@ -32,7 +32,7 @@ ndFileFormatJointIkHinge::ndFileFormatJointIkHinge(const char* const className)
 {
 }
 
-void ndFileFormatJointIkHinge::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+void ndFileFormatJointIkHinge::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndIkJointHinge", ndIkJointHinge::StaticClassName());
 	ndFileFormatJointHinge::SaveJoint(scene, classNode, joint);

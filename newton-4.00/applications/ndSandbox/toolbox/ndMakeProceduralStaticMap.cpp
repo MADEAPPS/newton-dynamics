@@ -33,7 +33,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 		{
 		}
 
-		virtual ndInt32 SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
+		virtual ndInt32 SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 		{
 			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndRegularProceduralGrid", ndRegularProceduralGrid::StaticClassName());
 			ndFileFormatShapeStaticProceduralMesh::SaveShape(scene, classNode, shape);

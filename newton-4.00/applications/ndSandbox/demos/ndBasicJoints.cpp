@@ -34,7 +34,7 @@ class ndSplinePathBody : public ndBodyDynamic
 		{
 		}
 
-		void SaveBody(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
+		void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 		{
 			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndSplinePathBody", ndSplinePathBody::StaticClassName());
 			ndFileFormatDynamicBody::SaveBody(scene, classNode, body);
@@ -97,7 +97,7 @@ class ndJointFollowSplinePath : public ndJointFollowPath
 		{
 		}
 
-		void SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+		void SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 		{
 			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointFollowSplinePath", ndJointFollowSplinePath::StaticClassName());
 			ndFileFormatJointFollowPath::SaveJoint(scene, classNode, joint);
@@ -826,7 +826,7 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	ndQuaternion rot;
 	ndVector origin(-20.0f, 5.0f, 0.0f, 1.0f);
 
-	ndFileFormat xxxx;
+	ndFileFormatSave xxxx;
 	xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 
 	scene->SetCameraMatrix(rot, origin);

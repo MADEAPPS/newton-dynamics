@@ -31,7 +31,7 @@ class ndFileFormatShapeInstance : public ndFileFormatRegistrar
 	ndFileFormatShapeInstance();
 	ndFileFormatShapeInstance(const char* const className);
 
-	virtual void SaveCollision(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision);
+	virtual void SaveCollision(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision);
 	virtual void LoadCollision(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBodyKinematic* const body);
 };
 

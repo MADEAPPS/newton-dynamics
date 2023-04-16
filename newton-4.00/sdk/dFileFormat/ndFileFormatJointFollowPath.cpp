@@ -32,7 +32,7 @@ ndFileFormatJointFollowPath::ndFileFormatJointFollowPath(const char* const class
 {
 }
 
-void ndFileFormatJointFollowPath::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+void ndFileFormatJointFollowPath::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointFollowPath", ndJointFollowPath::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);

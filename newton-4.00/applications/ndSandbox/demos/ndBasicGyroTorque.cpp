@@ -223,7 +223,7 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	scene->GetCameraManager()->SetPickMode(true);
 
 
-	ndFileFormat xxxx;
+	ndFileFormatSave xxxx;
 	//xxxx.SaveBodies(scene->GetWorld(), "xxxx.nd");
 	xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 

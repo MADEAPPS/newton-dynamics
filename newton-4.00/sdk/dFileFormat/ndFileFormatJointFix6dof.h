@@ -31,7 +31,7 @@ class ndFileFormatJointFix6dof : public ndFileFormatJoint
 	ndFileFormatJointFix6dof();
 	ndFileFormatJointFix6dof(const char* const className);
 
-	virtual void SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint);
+	virtual void SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint);
 };
 
 #endif 

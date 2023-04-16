@@ -32,7 +32,7 @@ ndFileFormatKinematicBodyBase::ndFileFormatKinematicBodyBase(const char* const c
 {
 }
 
-void ndFileFormatKinematicBodyBase::SaveBody(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
+void ndFileFormatKinematicBodyBase::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBodyKinematicBase::StaticClassName());
 	ndFileFormatKinematicBody::SaveBody(scene, classNode, body);

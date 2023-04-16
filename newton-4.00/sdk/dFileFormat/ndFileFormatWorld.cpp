@@ -32,7 +32,7 @@ ndFileFormatWorld::ndFileFormatWorld(const char* const className)
 {
 }
 
-void ndFileFormatWorld::SaveWorld(ndFileFormat* const, nd::TiXmlElement* const parentNode, const ndWorld* const world)
+void ndFileFormatWorld::SaveWorld(ndFileFormatSave* const, nd::TiXmlElement* const parentNode, const ndWorld* const world)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndWorld", ndWorld::StaticClassName());
 

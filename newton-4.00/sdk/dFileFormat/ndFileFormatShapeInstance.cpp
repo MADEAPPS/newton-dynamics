@@ -20,7 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormat.h"
+#include "ndFileFormatSave.h"
 #include "ndFileFormatShapeInstance.h"
 
 ndFileFormatShapeInstance::ndFileFormatShapeInstance()
@@ -33,7 +33,7 @@ ndFileFormatShapeInstance::ndFileFormatShapeInstance(const char* const className
 {
 }
 
-void ndFileFormatShapeInstance::SaveCollision(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision)
+void ndFileFormatShapeInstance::SaveCollision(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeInstanceClass", ndShapeInstance::StaticClassName());
 

@@ -30,50 +30,16 @@ class ndFileFormat : public ndClassAlloc
 	ndFileFormat();
 	~ndFileFormat();
 
-	void Load(const ndWorld* const world, const char* const path);
+	void SetPath(const char* const pathName);
 
-	void SaveWorld(const ndWorld* const world, const char* const path);
-	void SaveBodies(const ndWorld* const world, const char* const path);
-	void SaveModels(const ndWorld* const world, const char* const path);
-
-	ndInt32 FindBodyId(const ndBody* const body) const;
-	ndInt32 FindJointId(const ndJointBilateralConstraint* const joint) const;
-	
-	private:
-	void BeginSave(const ndWorld* const world, const char* const path);
-	void EndSave();
-
-	void CollectScene();
-	void SaveWorld(nd::TiXmlElement* const rootNode);
-	void SaveBodies(nd::TiXmlElement* const rootNode);
-	void SaveJoints(nd::TiXmlElement* const rootNode);
-	void SaveModels(nd::TiXmlElement* const rootNode);
-	void SaveShapes(nd::TiXmlElement* const rootNode);
-
-	void LoadShapes(const nd::TiXmlElement* const rootNode, ndTree<ndShape*, ndInt32>& shapeMap);
-	void LoadBodies(const nd::TiXmlElement* const rootNode, const ndTree<ndShape*, ndInt32>& shapeMap, ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap);
-
-	void GetAssetPath();
+	protected:
 	ndString m_path;
 	ndString m_assetPath;
-	char* m_oldloc;
-	ndWorld* m_world;
-	nd::TiXmlDocument* m_doc;
+	ndString m_oldloc;
+
 	ndArray<ndBody*> m_bodies;
 	ndArray<ndModel*> m_models;
 	ndArray<ndJointBilateralConstraint*> m_joints;
-
-	ndTree<ndInt32, ndUnsigned64> m_bodiesIds;
-	ndTree<ndInt32, ndUnsigned64> m_jointsIds;
-	ndTree<ndInt32, ndUnsigned64> m_uniqueShapesIds;
-
-	friend class ndFileFormatBody;
-	friend class ndFileFormatJoint;
-	friend class ndFileFormatShapeInstance;
-	friend class ndFileFormatShapeCompound;
-	friend class ndFileFormatShapeStaticMesh_bvh;
-	friend class ndFileFormatShapeStaticHeightfield;
-	friend class ndFileFormatJointVehicleTorsionBar;
 };
 
 #endif 

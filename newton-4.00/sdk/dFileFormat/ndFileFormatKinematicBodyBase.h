@@ -31,7 +31,7 @@ class ndFileFormatKinematicBodyBase : public ndFileFormatKinematicBody
 	ndFileFormatKinematicBodyBase();
 	ndFileFormatKinematicBodyBase(const char* const className);
 
-	virtual void SaveBody(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
+	virtual void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
 };
 
 #endif 

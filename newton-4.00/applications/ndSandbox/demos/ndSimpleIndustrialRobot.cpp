@@ -374,6 +374,6 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 45.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 
-	ndFileFormat xxxx;
+	ndFileFormatSave xxxx;
 	xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 }

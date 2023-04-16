@@ -32,7 +32,7 @@ ndFileFormatJointVehicleDifferentialAxle::ndFileFormatJointVehicleDifferentialAx
 {
 }
 
-void ndFileFormatJointVehicleDifferentialAxle::SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
+void ndFileFormatJointVehicleDifferentialAxle::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndMultiBodyVehicleDifferentialAxle", ndMultiBodyVehicleDifferentialAxle::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);

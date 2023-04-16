@@ -709,6 +709,6 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndVector origin(-10.0f, 2.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 
-	ndFileFormat xxxx;
+	ndFileFormatSave xxxx;
 	xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 }

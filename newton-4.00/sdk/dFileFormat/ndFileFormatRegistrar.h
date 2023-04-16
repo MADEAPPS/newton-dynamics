@@ -25,7 +25,7 @@
 #include "ndFileFormatStdafx.h"
 #include "ndTinyXmlGlue.h"
 
-class ndFileFormat;
+class ndFileFormatSave;
 
 class ndFileFormatRegistrar : public ndClassAlloc
 {
@@ -36,13 +36,13 @@ class ndFileFormatRegistrar : public ndClassAlloc
 	public:
 	static ndFileFormatRegistrar* GetHandler(const char* const className);
 
-	virtual void SaveWorld(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndWorld* const world);
-	virtual void SaveBody(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
-	virtual void SaveModel(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model);
-	virtual ndInt32 SaveShape(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
-	virtual void SaveNotify(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify);
-	virtual void SaveCollision(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision);
-	virtual void SaveJoint(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint);
+	virtual void SaveWorld(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndWorld* const world);
+	virtual void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
+	virtual void SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model);
+	virtual ndInt32 SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
+	virtual void SaveNotify(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify);
+	virtual void SaveCollision(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision);
+	virtual void SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint);
 
 	virtual ndShape* LoadShape(const nd::TiXmlElement* const node);
 	virtual ndBody* LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap);
@@ -54,6 +54,7 @@ class ndFileFormatRegistrar : public ndClassAlloc
 
 	ndUnsigned64 m_hash;
 	friend class ndFileFormat;
+	friend class ndFileFormatSave;
 	friend class ndFileFormatBody;
 	friend class ndFileFormatKinematicBody;
 	friend class ndFileFormatShapeCompound;
