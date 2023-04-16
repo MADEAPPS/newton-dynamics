@@ -52,6 +52,10 @@ class ndFileFormatSave : public ndFileFormat
 	ndWorld* m_world;
 	nd::TiXmlDocument* m_doc;
 
+	ndArray<ndBody*> m_bodies;
+	ndArray<ndModel*> m_models;
+	ndArray<ndJointBilateralConstraint*> m_joints;
+
 	ndTree<ndInt32, ndUnsigned64> m_bodiesIds;
 	ndTree<ndInt32, ndUnsigned64> m_jointsIds;
 	ndTree<ndInt32, ndUnsigned64> m_uniqueShapesIds;

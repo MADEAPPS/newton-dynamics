@@ -20,6 +20,7 @@
 */
 
 #include "ndFileFormatStdafx.h"
+#include "ndFileFormat.h"
 #include "ndFileFormatSave.h"
 #include "ndFileFormatBody.h"
 #include "ndFileFormatNotify.h"
@@ -81,4 +82,17 @@ void ndFileFormatBody::LoadBody(const nd::TiXmlElement* const node, const ndTree
 	body->SetOmega(omega);
 	body->SetVelocity(veloc);
 	body->SetCentreOfMass(com);
+
+	nd::TiXmlNode* notiFyNode = (nd::TiXmlNode*)node->FirstChild("ndNotifyClass");
+	while (notiFyNode && !ndFileFormatRegistrar::GetHandler(((nd::TiXmlElement*)notiFyNode)->Attribute("className")))
+	{
+		notiFyNode = (nd::TiXmlNode*)notiFyNode->FirstChild("ndNotifyClass");
+	}
+	if (notiFyNode)
+	{
+		const nd::TiXmlElement* const element = (nd::TiXmlElement*)notiFyNode;
+		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(element->Attribute("className"));
+		ndBodyNotify* const notify = handler->LoadNotify(element);
+		body->SetNotifyCallback(notify);
+	}
 }

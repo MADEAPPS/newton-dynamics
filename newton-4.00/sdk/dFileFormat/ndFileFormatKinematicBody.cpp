@@ -78,7 +78,7 @@ void ndFileFormatKinematicBody::LoadBody(const nd::TiXmlElement* const node, con
 	ndFloat32 invMass = xmlGetFloat(node, "invMass");
 	if (invMass > ndFloat32(0.0f))
 	{
-		ndInt32 useSkew = xmlGetFloat(node, "useSkewInertia");
+		ndInt32 useSkew = xmlGetInt(node, "useSkewInertia");
 		ndVector inertia(xmlGetVector3(node, "inertia"));
 		ndMatrix II(ndGetIdentityMatrix());
 		II[0][0] = inertia.m_x;

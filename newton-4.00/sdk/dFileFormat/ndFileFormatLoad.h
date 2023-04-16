@@ -31,14 +31,13 @@ class ndFileFormatLoad : public ndFileFormat
 	ndFileFormatLoad();
 	~ndFileFormatLoad();
 
-	void Load(const ndWorld* const world, const char* const path);
+	void Load(const char* const path);
 	
 	private:
 	void LoadShapes(const nd::TiXmlElement* const rootNode, ndTree<ndShape*, ndInt32>& shapeMap);
 	void LoadBodies(const nd::TiXmlElement* const rootNode, const ndTree<ndShape*, ndInt32>& shapeMap, ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap);
 
-	//ndWorld* m_world;
-	//nd::TiXmlDocument* m_doc;
+	ndList<ndSharedPtr<ndBody>> m_bodies;
 
 	friend class ndFileFormatBody;
 	friend class ndFileFormatJoint;

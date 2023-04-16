@@ -25,6 +25,7 @@
 
 ndFileFormatLoad::ndFileFormatLoad()
 	:ndFileFormat()
+	,m_bodies()
 {
 }
 
@@ -91,27 +92,23 @@ void ndFileFormatLoad::LoadBodies(const nd::TiXmlElement* const rootNode, const 
 				bodyMap.Insert(body, nodeId);
 				alliasNode = alliasNode->FirstChild();
 			} while (!strcmp(alliasNode->Value(), "ndBodyClass"));
-			
-			//m_world->AddBody(body);
+
+			m_bodies.Append(body);
 		}
 	}
 }
 
-void ndFileFormatLoad::Load(const ndWorld* const world, const char* const path)
+void ndFileFormatLoad::Load(const char* const path)
 {
 	// save the path for use with generated assets.
-	xmlResetClassId();
+	SetPath(path);
 
 	m_oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");
 
-	SetPath(path);
-
-	//m_world = (ndWorld*)world;
 	nd::TiXmlDocument doc(m_path.GetStr());
-	//m_doc = new nd::TiXmlDocument(m_path.GetStr());
-	 
 	doc.LoadFile();
+
 	if (doc.Error())
 	{
 		setlocale(LC_ALL, m_oldloc.GetStr());
@@ -128,6 +125,8 @@ void ndFileFormatLoad::Load(const ndWorld* const world, const char* const path)
 
 	ndTree<ndShape*, ndInt32> shapeMap;
 	ndTree<ndSharedPtr<ndBody>, ndInt32> bodyMap;
+
+	m_bodies.RemoveAll();
 
 	LoadShapes(rootNode, shapeMap);
 	LoadBodies(rootNode, shapeMap, bodyMap);

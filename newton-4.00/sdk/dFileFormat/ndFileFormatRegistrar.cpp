@@ -37,6 +37,7 @@
 #include "ndFileFormatJointPulley.h"
 #include "ndFileFormatShapeConvex.h"
 #include "ndFileFormatDynamicBody.h"
+#include "ndFileFormatModelNotify.h"
 #include "ndFileFormatJointRoller.h"
 #include "ndFileFormatJointFix6dof.h"
 #include "ndFileFormatJointIkHinge.h"
@@ -125,6 +126,7 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatShape shape;
 	static ndFileFormatWorld world;
 	static ndFileFormatNotify bodyNotiy;
+	static ndFileFormatModelNotify modelNotify;
 	static ndFileFormatDynamicBody dynamicBody;
 	static ndFileFormatShapeInstance collision;
 	static ndFileFormatKinematicBody kinematicBody;
@@ -244,4 +246,10 @@ ndBody* ndFileFormatRegistrar::LoadBody(const nd::TiXmlElement* const, const ndT
 void ndFileFormatRegistrar::LoadCollision(const nd::TiXmlElement* const, const ndTree<ndShape*, ndInt32>&, ndBodyKinematic* const)
 {
 	ndAssert(0);
+}
+
+ndBodyNotify* ndFileFormatRegistrar::LoadNotify(const nd::TiXmlElement* const)
+{
+	ndAssert(0);
+	return nullptr;
 }

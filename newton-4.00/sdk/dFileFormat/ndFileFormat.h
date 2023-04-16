@@ -36,10 +36,6 @@ class ndFileFormat : public ndClassAlloc
 	ndString m_path;
 	ndString m_assetPath;
 	ndString m_oldloc;
-
-	ndArray<ndBody*> m_bodies;
-	ndArray<ndModel*> m_models;
-	ndArray<ndJointBilateralConstraint*> m_joints;
 };
 
 #endif 

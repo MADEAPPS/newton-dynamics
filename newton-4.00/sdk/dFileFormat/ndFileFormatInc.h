@@ -39,6 +39,7 @@
 #include <ndFileFormatJointHinge.h>
 #include <ndFileFormatJointPlane.h>
 #include <ndFileFormatJointWheel.h>
+#include <ndFileFormatModelNotify.h>
 #include <ndFileFormatJointRoller.h>
 #include <ndFileFormatDynamicBody.h>
 #include <ndFileFormatJointSlider.h>

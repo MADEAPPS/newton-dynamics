@@ -20,33 +20,32 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatNotify.h"
+#include "ndFileFormatModelNotify.h"
 
-ndFileFormatNotify::ndFileFormatNotify()
-	:ndFileFormatRegistrar(ndBodyNotify::StaticClassName())
+ndFileFormatModelNotify::ndFileFormatModelNotify()
+	:ndFileFormatNotify(ndModelNotify::StaticClassName())
 {
 }
 
-ndFileFormatNotify::ndFileFormatNotify(const char* const className)
-	:ndFileFormatRegistrar(className)
+ndFileFormatModelNotify::ndFileFormatModelNotify(const char* const className)
+	:ndFileFormatNotify(className)
 {
 }
 
-void ndFileFormatNotify::SaveNotify(ndFileFormatSave* const, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
+void ndFileFormatModelNotify::SaveNotify(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndNotifyClass", ndBodyNotify::StaticClassName());
-	xmlSaveParam(classNode, "gravity", notify->GetGravity());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndNotifyClass", ndModelNotify::StaticClassName());
+	ndFileFormatNotify::SaveNotify(scene, classNode, notify);
 }
 
-void ndFileFormatNotify::LoadNotify(const nd::TiXmlElement* const node, ndBodyNotify* const notify)
+ndBodyNotify* ndFileFormatModelNotify::LoadNotify(const nd::TiXmlElement* const node)
 {
-	ndVector gravity(xmlGetVector3(node, "gravity"));
-	notify->SetGravity(gravity);
-}
-
-ndBodyNotify* ndFileFormatNotify::LoadNotify(const nd::TiXmlElement* const node)
-{
-	ndBodyNotify* const notify = new ndBodyNotify(ndVector::m_zero);
+	ndModelNotify* const notify = new ndModelNotify();
 	LoadNotify(node, notify);
 	return notify;
+}
+
+void ndFileFormatModelNotify::LoadNotify(const nd::TiXmlElement* const node, ndBodyNotify* const notify)
+{
+	ndFileFormatNotify::LoadNotify((nd::TiXmlElement*)node->FirstChild("ndNotifyClass"), notify);
 }

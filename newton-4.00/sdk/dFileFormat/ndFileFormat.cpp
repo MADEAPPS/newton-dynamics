@@ -28,9 +28,6 @@ ndFileFormat::ndFileFormat()
 	,m_path()
 	,m_assetPath()
 	,m_oldloc(nullptr)
-	,m_bodies()
-	,m_models()
-	,m_joints()
 {
 	xmlResetClassId();
 	ndFileFormatRegistrar::Init();
@@ -64,6 +61,6 @@ void ndFileFormat::SetPath(const char* const pathName)
 	namePtr[0] = 0;
 
 	m_path = pathName;
-	m_assetPath = namePtr;
+	m_assetPath = assetPath;
 }
 

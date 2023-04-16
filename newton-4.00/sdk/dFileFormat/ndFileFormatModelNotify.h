@@ -19,17 +19,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_FILE_FORMAT_NOTIFY_H__
-#define _ND_FILE_FORMAT_NOTIFY_H__
+#ifndef _ND_FILE_FORMAT_MODEL_NOTIFY_H__
+#define _ND_FILE_FORMAT_MODEL_NOTIFY_H__
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatRegistrar.h"
+#include "ndFileFormatNotify.h"
 
-class ndFileFormatNotify : public ndFileFormatRegistrar
+class ndFileFormatModelNotify : public ndFileFormatNotify
 {
 	public: 
-	ndFileFormatNotify();
-	ndFileFormatNotify(const char* const className);
+	ndFileFormatModelNotify();
+	ndFileFormatModelNotify(const char* const className);
 
 	virtual ndBodyNotify* LoadNotify(const nd::TiXmlElement* const node);
 	virtual void SaveNotify(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify);

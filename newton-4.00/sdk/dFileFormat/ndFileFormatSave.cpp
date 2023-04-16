@@ -27,6 +27,9 @@ ndFileFormatSave::ndFileFormatSave()
 	:ndFileFormat()
 	,m_world(nullptr)
 	,m_doc(nullptr)
+	,m_bodies()
+	,m_models()
+	,m_joints()
 	,m_bodiesIds()
 	,m_jointsIds()
 	,m_uniqueShapesIds()
@@ -259,6 +262,13 @@ void ndFileFormatSave::EndSave()
 	m_doc->SaveFile(m_path.GetStr());
 	setlocale(LC_ALL, m_oldloc.GetStr());
 
+	m_bodies.SetCount(0);
+	m_models.SetCount(0);
+	m_joints.SetCount(0);
+
+	m_jointsIds.RemoveAll();
+	m_bodiesIds.RemoveAll();
+	m_uniqueShapesIds.RemoveAll();
 	delete m_doc;
 }
 
@@ -345,3 +355,4 @@ void ndFileFormatSave::SaveModels(const ndWorld* const world, const char* const 
 
 	EndSave();
 }
+
