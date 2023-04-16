@@ -98,16 +98,6 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 #endif
 
 
-ndInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name)
-{
-	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
-	ndAssert(element);
-	const char* const data = element->Attribute("int64");
-
-	long long int value;
-	sscanf(data, "%lld", &value);
-	return ndInt64 (value);
-}
 
 #ifdef D_NEWTON_USE_DOUBLE
 void xmlGetFloatArray(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndReal>& array)
@@ -317,6 +307,16 @@ ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name)
 	return value;
 }
 
+ndInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);
+	ndAssert(element);
+	const char* const data = element->Attribute("int64");
+
+	long long int value;
+	sscanf(data, "%lld", &value);
+	return ndInt64(value);
+}
 
 const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name)
 {
@@ -360,10 +360,36 @@ ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const nam
 
 	ndVector posit(xmlGetVector3(element, "posit"));
 	ndVector euler(xmlGetVector3(element, "angles"));
-	ndMatrix matrix(ndPitchMatrix(euler.m_x) * ndYawMatrix(euler.m_y) * ndRollMatrix(euler.m_z));
+	ndMatrix matrix(ndPitchMatrix(euler.m_x * ndDegreeToRad) * ndYawMatrix(euler.m_y * ndDegreeToRad) * ndRollMatrix(euler.m_z * ndDegreeToRad));
+
 	matrix.m_posit = posit;
 	matrix.m_posit.m_w = ndFloat32(1.0f);
 	return matrix;
+}
+
+void xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndInt64>& array)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);
+	ndAssert(element);
+	ndInt32 count;
+	element->Attribute("count", &count);
+	array.Resize(count);
+	array.SetCount(count);
+
+	const char* const data = element->Attribute("int64Array");
+
+	size_t start = 0;
+	ndVector point(ndVector::m_zero);
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		char x[64];
+		sscanf(&data[start], "%[^ ]", x);
+		start += strlen(x) + 1;
+
+		ndInt64 fx;
+		sscanf(x, "%ld", &fx);
+		array[i] = fx;
+	}
 }
 
 void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndVector>& array)

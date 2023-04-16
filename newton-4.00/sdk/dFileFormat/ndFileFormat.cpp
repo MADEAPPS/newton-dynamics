@@ -253,11 +253,18 @@ void ndFileFormat::LoadBodies(const nd::TiXmlElement* const rootNode, const ndTr
 			}
 			ndAssert(handler);
 
-			ndInt32 nodeId;
-			element->Attribute("nodeId", &nodeId);
 			ndSharedPtr<ndBody> body (handler->LoadBody(element, shapeMap));
-			ndAssert(0);
-			//bodyMap.Insert(body, nodeId);
+
+			const nd::TiXmlNode* alliasNode = node;
+			do {
+				ndInt32 nodeId;
+				nd::TiXmlElement* const alliasElement = (nd::TiXmlElement*)alliasNode;
+				alliasElement->Attribute("nodeId", &nodeId);
+				bodyMap.Insert(body, nodeId);
+				alliasNode = alliasNode->FirstChild();
+			} while (!strcmp(alliasNode->Value(), "ndBodyClass"));
+			
+			m_world->AddBody(body);
 		}
 	}
 }
@@ -326,7 +333,7 @@ void ndFileFormat::BeginSave(const ndWorld* const world, const char* const path)
 {
 	xmlResetClassId();
 
-	m_world = world;
+	m_world = (ndWorld*)world;
 	// save the path for use with generated assets.
 	m_path = path;
 	GetAssetPath();
@@ -451,7 +458,7 @@ void ndFileFormat::Load(const ndWorld* const world, const char* const path)
 	m_path = path;
 	GetAssetPath();
 
-	m_world = world;
+	m_world = (ndWorld*)world;
 	m_doc = new nd::TiXmlDocument(m_path.GetStr());
 	 
 	m_doc->LoadFile();

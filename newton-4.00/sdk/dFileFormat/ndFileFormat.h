@@ -57,7 +57,7 @@ class ndFileFormat : public ndClassAlloc
 	ndString m_path;
 	ndString m_assetPath;
 	char* m_oldloc;
-	const ndWorld* m_world;
+	ndWorld* m_world;
 	nd::TiXmlDocument* m_doc;
 	ndArray<ndBody*> m_bodies;
 	ndArray<ndModel*> m_models;

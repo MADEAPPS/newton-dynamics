@@ -240,3 +240,8 @@ ndBody* ndFileFormatRegistrar::LoadBody(const nd::TiXmlElement* const, const ndT
 	ndAssert(0);
 	return nullptr;
 }
+
+void ndFileFormatRegistrar::LoadCollision(const nd::TiXmlElement* const, const ndTree<ndShape*, ndInt32>&, ndBodyKinematic* const)
+{
+	ndAssert(0);
+}

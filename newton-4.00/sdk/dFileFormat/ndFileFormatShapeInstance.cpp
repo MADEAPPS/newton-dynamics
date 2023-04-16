@@ -39,9 +39,6 @@ void ndFileFormatShapeInstance::SaveCollision(ndFileFormat* const scene, nd::TiX
 
 	const ndShape* const shape = collision->GetShape();
 	ndUnsigned64 hash = shape->GetHash();
-	//ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(shape->ClassName());
-	//ndAssert(handler);
-	//handler->SaveShape(scene, classNode, shape);
 	ndTree<ndInt32, ndUnsigned64>::ndNode* const shapeNode = scene->m_uniqueShapesIds.Find(hash);
 	ndAssert(shapeNode);
 
@@ -50,20 +47,51 @@ void ndFileFormatShapeInstance::SaveCollision(ndFileFormat* const scene, nd::TiX
 	xmlSaveParam(classNode, "skinMargin", collision->m_skinMargin);
 	xmlSaveParam(classNode, "localMatrix", collision->m_localMatrix);
 	xmlSaveParam(classNode, "alignmentMatrix", collision->m_alignmentMatrix);
-
-	//xmlSaveParam(classNode, "extra0", collision->m_shapeMaterial.m_userId);
-	//xmlSaveParam(classNode, "extra1", ndInt64(collision->m_shapeMaterial.m_data.m_alignPad));
+	xmlSaveParam(classNode, "mode", collision->GetCollisionMode() ? 1 : 0);
+	xmlSaveParam(classNode, "scaleType", ndInt32 (collision->GetScaleType()));
 
 	ndArray<ndInt64> material;
 	material.PushBack(collision->m_shapeMaterial.m_userId);
 	material.PushBack(ndInt64(collision->m_shapeMaterial.m_data.m_alignPad));
 	for (ndInt32 i = 0; i < sizeof(collision->m_shapeMaterial.m_userParam) / sizeof(collision->m_shapeMaterial.m_userParam[0]); ++i)
 	{
-		//char label[64];
-		//sprintf(label, "extra%d", i + 2);
-		//xmlSaveParam(classNode, label, ndInt64(collision->m_shapeMaterial.m_userParam[i].m_intData));
 		material.PushBack(ndInt64 (collision->m_shapeMaterial.m_userParam[i].m_intData));
 	}
 
 	xmlSaveParam(classNode, "material", material);
+}
+
+void ndFileFormatShapeInstance::LoadCollision(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBodyKinematic* const body)
+{
+	ndArray<ndInt64> materialData;
+	ndVector scale(xmlGetVector3(node, "scale"));
+	ndInt32 shapeRef = xmlGetInt(node, "shapeNodeIdRef");
+	ndInt32 mode = xmlGetInt(node, "mode") ? true : false;
+	ndShapeInstance::ndScaleType scaleType = ndShapeInstance::ndScaleType (xmlGetInt(node, "scaleType"));
+	ndFloat32 skinMargin = xmlGetFloat(node, "skinMargin");
+	ndMatrix localMatrix (xmlGetMatrix(node, "localMatrix"));
+	ndMatrix aligmentMatrix(xmlGetMatrix(node, "alignmentMatrix"));
+	xmlGetInt64(node, "material", materialData);
+
+	ndTree<ndShape*, ndInt32>::ndNode* const shapeNode = shapeMap.Find(shapeRef);
+	ndAssert(shapeNode);
+	ndShapeInstance instance(shapeNode->GetInfo());
+
+	instance.SetScale(scale);
+	instance.SetLocalMatrix(localMatrix);
+	instance.SetCollisionMode(mode ? true : false);
+	instance.m_scaleType = scaleType;
+	instance.m_alignmentMatrix = localMatrix;
+	instance.m_skinMargin = skinMargin;
+
+	ndShapeMaterial material;
+	material.m_userId = materialData[0];
+	material.m_data.m_alignPad = ndUnsigned64(materialData[1]);
+	for (ndInt32 i = 0; i < sizeof(material.m_userParam) / sizeof(material.m_userParam[0]); ++i)
+	{
+		material.m_userParam[i].m_intData = ndUnsigned64(materialData[2 + i]);
+	}
+	instance.SetMaterial(material);
+
+	body->SetCollisionShape(instance);
 }

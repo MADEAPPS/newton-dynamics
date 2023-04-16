@@ -54,5 +54,11 @@ ndBody* ndFileFormatDynamicBody::LoadBody(const nd::TiXmlElement* const node, co
 void ndFileFormatDynamicBody::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body)
 {
 	ndFileFormatKinematicBody::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
-	ndAssert(0);
+
+	ndFloat32 linearDamp = xmlGetFloat(node, "linearDampCoef");
+	ndVector angularDamp(xmlGetVector3(node, "angularDampCoef"));
+
+	ndBodyDynamic* const dynBody = (ndBodyDynamic*)body;
+	dynBody->SetLinearDamping(linearDamp);
+	dynBody->SetAngularDamping(angularDamp);
 }

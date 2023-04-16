@@ -71,22 +71,26 @@ void ndFileFormatKinematicBody::LoadBody(const nd::TiXmlElement* const node, con
 
 	ndBodyKinematic* const kinBody = (ndBodyKinematic*)body;
 
-
+	ndFileFormatRegistrar* const collisionHandler = ndFileFormatRegistrar::GetHandler(ndShapeInstance::StaticClassName());
+	ndAssert(collisionHandler);
+	collisionHandler->LoadCollision((nd::TiXmlElement*)node->FirstChild("ndShapeInstanceClass"), shapeMap, kinBody);
 
 	ndFloat32 invMass = xmlGetFloat(node, "invMass");
 	if (invMass > ndFloat32(0.0f))
 	{
-		ndAssert(0);
-		//ndVector euler0;
-		//ndVector euler1;
-		//ndVector inertia(kinematic->GetMassMatrix());
-		//ndMatrix matrix(kinematic->GetPrincipalAxis());
-		//matrix.CalcPitchYawRoll(euler0, euler1);
-		//euler0 = euler0.Scale(ndRadToDegree);
-		//
-		//xmlSaveParam(classNode, "inertia", inertia);
-		//xmlSaveParam(classNode, "principalAxis", euler0);
-		//xmlSaveParam(classNode, "useSkewInertia", matrix.TestIdentity() ? 0 : 1);
+		ndInt32 useSkew = xmlGetFloat(node, "useSkewInertia");
+		ndVector inertia(xmlGetVector3(node, "inertia"));
+		ndMatrix II(ndGetIdentityMatrix());
+		II[0][0] = inertia.m_x;
+		II[1][1] = inertia.m_y;
+		II[2][2] = inertia.m_z;
+		if (useSkew)
+		{
+			ndVector euler(xmlGetVector3(node, "principalAxis"));
+			ndMatrix principalAxisMatrix (ndPitchMatrix(euler.m_x * ndDegreeToRad) * ndYawMatrix(euler.m_y * ndDegreeToRad) * ndRollMatrix(euler.m_z * ndDegreeToRad));
+			principalAxisMatrix = principalAxisMatrix * II * principalAxisMatrix.Inverse();
+		}
+		kinBody->SetMassMatrix(ndFloat32(1.0f) / invMass, II);
 	}
 
 	ndFloat32 stepInUnitPerSeconds = xmlGetFloat(node, "maxLinearStep");

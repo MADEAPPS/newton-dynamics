@@ -32,7 +32,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 
 
 
-ndInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name);
+
 ndFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name);
 ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name);
 ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name);
@@ -65,10 +65,13 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 
 ndInt32 xmlGetNodeId(const nd::TiXmlNode* const rootNode);
 ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name);
+ndInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name);
 ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name);
 ndFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name);
 ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name);
 const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name);
+
+void xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndInt64>& array);
 void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndVector>& array);
 
 #endif

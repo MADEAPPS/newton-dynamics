@@ -88,26 +88,26 @@ namespace ndRagdoll
 	static ndDefinition ragdollDefinition[] =
 	{
 		{ "root", ndDefinition::m_root, 1.0f, {}, {} },
-		{ "lowerback", ndDefinition::m_spherical, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-		{ "upperback", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "lowerneck", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "upperneck", ndDefinition::m_spherical, 1.0f,{ -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		
-		{ "lclavicle", ndDefinition::m_spherical, 1.0f, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
-		{ "lhumerus", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "lradius", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-		
-		{ "rclavicle", ndDefinition::m_spherical, 1.0f, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		{ "rhumerus", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "rradius", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-		
-		{ "rhipjoint", ndDefinition::m_spherical, 1.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
-		{ "rfemur", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "rtibia", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-		
-		{ "lhipjoint", ndDefinition::m_spherical, 1.0f,{ -45.0f, 45.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		{ "lfemur", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "ltibia", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//{ "lowerback", ndDefinition::m_spherical, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+		//{ "upperback", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		//{ "lowerneck", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		//{ "upperneck", ndDefinition::m_spherical, 1.0f,{ -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		//
+		//{ "lclavicle", ndDefinition::m_spherical, 1.0f, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+		//{ "lhumerus", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "lradius", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//
+		//{ "rclavicle", ndDefinition::m_spherical, 1.0f, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		//{ "rhumerus", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "rradius", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//
+		//{ "rhipjoint", ndDefinition::m_spherical, 1.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+		//{ "rfemur", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "rtibia", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//
+		//{ "lhipjoint", ndDefinition::m_spherical, 1.0f,{ -45.0f, 45.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		//{ "lfemur", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "ltibia", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 		{ "", ndDefinition::m_root,{},{} },
 	};
@@ -191,6 +191,7 @@ namespace ndRagdoll
 		ndSharedPtr<ndBody> rootBody(CreateBodyPart(scene, rootEntity, nullptr));
 
 		// set the root transform matrix
+		rootBody->SetMatrix(matrix);
 		rootBody->GetNotifyCallback()->OnTransform(0, matrix);
 
 		// add body to the world
@@ -267,37 +268,34 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	matrix.m_posit.m_y = 0.5f;
 	ndMatrix playerMatrix(matrix);
 
+matrix.m_posit.m_x += 1.5f;
+
 	ndModel* const model = BuildRagDoll(scene, *ragdollMesh, matrix);
 	ndSharedPtr<ndModel> ragdoll(model);
 	scene->GetWorld()->AddModel(ragdoll);
 	
-	matrix.m_posit.m_x += 1.4f;
+	//matrix.m_posit.m_x += 1.4f;
 	//TestPlayerCapsuleInteraction(scene, matrix);
-	
-	matrix.m_posit.m_x += 2.0f;
-	matrix.m_posit.m_y += 2.0f;
+	//matrix.m_posit.m_x += 2.0f;
+	//matrix.m_posit.m_y += 2.0f;
 	//ndBodyKinematic* const reckingBall = AddSphere(scene, matrix.m_posit, 25.0f, 0.25f);
 	//reckingBall->SetVelocity(ndVector(-5.0f, 0.0f, 0.0f, 0.0f));
-	
-	matrix.m_posit.m_x += 2.0f;
-	matrix.m_posit.m_z -= 2.0f;
+	//matrix.m_posit.m_x += 2.0f;
+	//matrix.m_posit.m_z -= 2.0f;
 	//scene->GetWorld()->AddModel(new ndHumanoidModel(scene, ragdollMesh, matrix));
-	
-	matrix.m_posit.m_z = 2.0f;
+	//matrix.m_posit.m_z = 2.0f;
 	//scene->GetWorld()->AddModel(new ndHumanoidModel(scene, ragdollMesh, matrix));
-	
-	origin1.m_x += 20.0f;
+	//origin1.m_x += 20.0f;
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 	
 	ndFloat32 angle = ndFloat32(90.0f * ndDegreeToRad);
 	playerMatrix = ndYawMatrix(angle) * playerMatrix;
 	ndVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-5.0f));
 	origin.m_y += 1.0f;
-	origin.m_z -= 2.0f;
+	//origin.m_z += 4.0f;
 	scene->SetCameraMatrix(playerMatrix, origin);
 
 	ndFileFormat xxxx;
-	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
-	//xxxx.SaveModels(scene->GetWorld(), "xxxx.nd");
-	//xxxx.Load(scene->GetWorld(), "xxxx.nd");
+	xxxx.SaveModels(scene->GetWorld(), "xxxx.nd");
+	xxxx.Load(scene->GetWorld(), "xxxx.nd");
 }
