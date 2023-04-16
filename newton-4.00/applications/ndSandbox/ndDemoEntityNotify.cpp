@@ -16,12 +16,12 @@
 #include "ndDemoEntityNotify.h"
 
 ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody, ndFloat32 gravity)
-	:ndBodyNotify(ndVector (ndFloat32 (0.0f), gravity, ndFloat32(0.0f), ndFloat32(0.0f)))
+	//:ndBodyNotify(ndVector (ndFloat32 (0.0f), gravity, ndFloat32(0.0f), ndFloat32(0.0f)))
+	:ndModelNotify(parentBody, ndVector(0.0f, gravity, 0.0f, 0.0f))
 	,m_entity(entity)
-	,m_parentBody(parentBody)
 	,m_manager(manager)
 {
-	static ndDemoEntityNotifyFileLoadSave registerClass;
+	//static ndDemoEntityNotifyFileLoadSave registerClass;
 }
 
 ndDemoEntityNotify::~ndDemoEntityNotify()
@@ -37,39 +37,17 @@ void ndDemoEntityNotify::OnObjectPick() const
 	ndTrace(("picked body id: %d\n", GetBody()->GetId()));
 }
 
-void ndDemoEntityNotify::OnApplyExternalForce(ndInt32, ndFloat32)
-{
-	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
-	ndAssert(body);
-	if (body->GetInvMass() > 0.0f)
-	{
-		ndVector massMatrix(body->GetMassMatrix());
-		ndVector force(GetGravity().Scale(massMatrix.m_w));
-		body->SetForce(force);
-		body->SetTorque(ndVector::m_zero);
-	}
-}
-
 void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 {
 	// apply this transformation matrix to the application user data.
 	if (m_entity)
 	{
-		const ndBody* const body = GetBody();
-		if (!m_parentBody)
-		{
-			const ndQuaternion rot(body->GetRotation());
-			m_entity->SetMatrix(rot, matrix.m_posit);
-		}
-		else
-		{
-			const ndMatrix parentMatrix(m_parentBody->GetMatrix());
-			const ndMatrix localMatrix(matrix * parentMatrix.Inverse());
-			const ndQuaternion rot(localMatrix);
-			m_entity->SetMatrix(rot, localMatrix.m_posit);
-		}
+		ndVector posit;
+		ndQuaternion rot;
+		CalculateMatrix(matrix, rot, posit);
+		m_entity->SetMatrix(rot, posit);
 	}
-
+	
 	if (!CheckInWorld(matrix))
 	{
 		RemoveBody();
@@ -89,7 +67,7 @@ ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* 
 	,m_bindMatrix(ndGetIdentityMatrix())
 	,m_capSpeed(capSpeed)
 {
-	static ndBindingRagdollEntityNotifyFileSaveLoad registerClass;
+	//static ndBindingRagdollEntityNotifyFileSaveLoad registerClass;
 	ndDemoEntity* const parentEntity = m_parentBody ? (ndDemoEntity*)(parentBody->GetNotifyCallback()->GetUserData()) : nullptr;
 	m_bindMatrix = entity->GetParent()->CalculateGlobalMatrix(parentEntity).Inverse();
 }
@@ -124,7 +102,7 @@ void ndBindingRagdollEntityNotify::OnApplyExternalForce(ndInt32 thread, ndFloat3
 	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
 	ndAssert(body && body->GetInvMass() > 0.0f);
 
-	// clamp execive velocites.
+	// clamp excessive velocities.
 	ndVector omega(body->GetOmega());
 	ndVector veloc(body->GetVelocity());
 	ndFloat32 omega2(omega.DotProduct(omega).GetScalar());

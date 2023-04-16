@@ -25,6 +25,7 @@
 #include <ndModelStdafx.h>
 
 #include <ndModelBase.h>
+#include <ndModelNotify.h>
 #include <ndModelPassiveRagdoll.h>
 
 #endif 

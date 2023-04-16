@@ -296,6 +296,6 @@ matrix.m_posit.m_x += 1.5f;
 	scene->SetCameraMatrix(playerMatrix, origin);
 
 	ndFileFormat xxxx;
-	xxxx.SaveModels(scene->GetWorld(), "xxxx.nd");
-	xxxx.Load(scene->GetWorld(), "xxxx.nd");
+	//xxxx.SaveModels(scene->GetWorld(), "xxxx.nd");
+	//xxxx.Load(scene->GetWorld(), "xxxx.nd");
 }
