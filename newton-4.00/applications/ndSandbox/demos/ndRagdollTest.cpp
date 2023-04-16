@@ -88,7 +88,7 @@ namespace ndRagdoll
 	static ndDefinition ragdollDefinition[] =
 	{
 		{ "root", ndDefinition::m_root, 1.0f, {}, {} },
-		//{ "lowerback", ndDefinition::m_spherical, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+		{ "lowerback", ndDefinition::m_spherical, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
 		//{ "upperback", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
 		//{ "lowerneck", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
 		//{ "upperneck", ndDefinition::m_spherical, 1.0f,{ -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
@@ -191,8 +191,9 @@ namespace ndRagdoll
 		ndSharedPtr<ndBody> rootBody(CreateBodyPart(scene, rootEntity, nullptr));
 
 		// set the root transform matrix
-		rootBody->SetMatrix(matrix);
 		rootBody->GetNotifyCallback()->OnTransform(0, matrix);
+		rootBody->GetNotifyCallback()->OnTransform(0, matrix);
+		rootBody->SetMatrix(rootEntity->CalculateGlobalMatrix());
 
 		// add body to the world
 		world->AddBody(rootBody);
