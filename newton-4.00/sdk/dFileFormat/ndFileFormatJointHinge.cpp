@@ -55,3 +55,31 @@ void ndFileFormatJointHinge::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlE
 	xmlSaveParam(classNode, "maxTwistAngle", minTwistAngle * ndRadToDegree);
 	xmlSaveParam(classNode, "limitState", exportJoint->GetLimitState() ? 1 : 0);
 }
+
+
+ndJointBilateralConstraint* ndFileFormatJointHinge::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndJointHinge* const joint = new ndJointHinge();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointHinge::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+
+	ndFloat32 offsetAngle = xmlGetFloat(node, "offsetAngle") * ndDegreeToRad;
+	ndFloat32 spring = xmlGetFloat(node, "springConstant");
+	ndFloat32 damper = xmlGetFloat(node, "damperConstant");
+	ndFloat32 regularizer = xmlGetFloat(node, "springRegularizer");
+	ndFloat32 minTwistAngle = xmlGetFloat(node, "minTwistAngle") * ndDegreeToRad;
+	ndFloat32 maxTwistAngle = xmlGetFloat(node, "maxTwistAngle") * ndDegreeToRad;
+	ndInt32 state = xmlGetInt(node, "limitState");
+
+	ndJointHinge* const inportJoint = (ndJointHinge*)joint;
+
+	inportJoint->SetOffsetAngle(offsetAngle);
+	inportJoint->SetAsSpringDamper(regularizer, spring, damper);
+	inportJoint->SetLimits(minTwistAngle, maxTwistAngle);
+	inportJoint->SetLimitState(state ? true : false);
+}

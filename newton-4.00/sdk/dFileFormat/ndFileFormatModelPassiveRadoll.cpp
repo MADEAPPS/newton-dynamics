@@ -42,25 +42,39 @@ void ndFileFormatModelPassiveRadoll::SaveModel(ndFileFormatSave* const scene, nd
 
 	if (ragDoll->GetRoot())
 	{
+		xmlSaveParam(classNode, "rootBody", scene->FindBodyId(ragDoll->GetRoot()->m_body));
+		nd::TiXmlElement* const limbsNode = new nd::TiXmlElement("limbs");
+		classNode->LinkEndChild(limbsNode);
+
 		ndFixSizeArray<ndModelPassiveRagdoll::ndRagdollNode*, 256> stack;
-		stack.PushBack(ragDoll->GetRoot());
+		for (ndModelPassiveRagdoll::ndRagdollNode* child = ragDoll->GetRoot()->GetFirstChild(); child; child = child->GetNext())
+		{
+			stack.PushBack(child);
+		}
+		ndInt32 count = 0;
 		while (stack.GetCount())
 		{
+			count++;
 			ndInt32 index = stack.GetCount() - 1;
 			ndModelPassiveRagdoll::ndRagdollNode* const node = stack[index];
 			stack.SetCount(index);
-
+		
 			nd::TiXmlElement* const limbNode = new nd::TiXmlElement("limb");
-			classNode->LinkEndChild(limbNode);
+			limbsNode->LinkEndChild(limbNode);
 			ndInt32 childId = scene->FindBodyId(node->m_body);
-			ndInt32 parentId = node->GetParent() ? scene->FindBodyId(node->GetParent()->m_body) : 0;
-			xmlSaveParam(limbNode, "childBody", childId);
-			xmlSaveParam(limbNode, "parentBody", parentId);
-
+			ndInt32 parentId = scene->FindBodyId(node->GetParent()->m_body);
+			ndAssert(childId != 0);
+			ndAssert(parentId != 0);
+			limbNode->SetAttribute("childBody", childId);
+			limbNode->SetAttribute("parentBody", parentId);
+			//xmlSaveParam(limbNode, "childBody", childId);
+			//xmlSaveParam(limbNode, "parentBody", parentId);
+		
 			for (ndModelPassiveRagdoll::ndRagdollNode* child = node->GetFirstChild(); child; child = child->GetNext())
 			{
 				stack.PushBack(child);
 			}
 		}
+		limbsNode->SetAttribute("count", count);
 	}
 }
