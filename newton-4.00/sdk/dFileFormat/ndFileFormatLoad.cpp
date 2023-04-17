@@ -173,3 +173,16 @@ void ndFileFormatLoad::Load(const char* const path)
 	
 	setlocale(LC_ALL, m_oldloc.GetStr());
 }
+
+void ndFileFormatLoad::AddToWorld(ndWorld* const world)
+{
+	for (ndList<ndSharedPtr<ndBody>>::ndNode* node = m_bodies.GetFirst(); node; node = node->GetNext())
+	{
+		world->AddBody(node->GetInfo());
+	}
+
+	for (ndList<ndSharedPtr<ndJointBilateralConstraint>>::ndNode* node = m_joints.GetFirst(); node; node = node->GetNext())
+	{
+		world->AddJoint(node->GetInfo());
+	}
+}

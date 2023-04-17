@@ -52,7 +52,7 @@ void ndFileFormatJointSpherical::SaveJoint(ndFileFormatSave* const scene, nd::Ti
 	xmlSaveParam(classNode, "damperConstant", damper);
 	xmlSaveParam(classNode, "springRegularizer", regularizer);
 	xmlSaveParam(classNode, "minTwistAngle", minTwistAngle * ndRadToDegree);
-	xmlSaveParam(classNode, "maxTwistAngle", minTwistAngle * ndRadToDegree);
+	xmlSaveParam(classNode, "maxTwistAngle", maxTwistAngle * ndRadToDegree);
 	xmlSaveParam(classNode, "maxConeAngle", exportJoint->GetConeLimit() * ndRadToDegree);
 }
 

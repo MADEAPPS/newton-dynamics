@@ -52,10 +52,9 @@ void ndFileFormatJointHinge::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlE
 	xmlSaveParam(classNode, "damperConstant", damper);
 	xmlSaveParam(classNode, "springRegularizer", regularizer);
 	xmlSaveParam(classNode, "minTwistAngle", minTwistAngle * ndRadToDegree);
-	xmlSaveParam(classNode, "maxTwistAngle", minTwistAngle * ndRadToDegree);
+	xmlSaveParam(classNode, "maxTwistAngle", maxTwistAngle * ndRadToDegree);
 	xmlSaveParam(classNode, "limitState", exportJoint->GetLimitState() ? 1 : 0);
 }
-
 
 ndJointBilateralConstraint* ndFileFormatJointHinge::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
 {

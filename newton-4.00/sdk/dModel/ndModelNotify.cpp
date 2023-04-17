@@ -58,6 +58,6 @@ void ndModelNotify::CalculateMatrix(const ndMatrix& matrix, ndQuaternion& rot, n
 
 void ndModelNotify::OnTransform(ndInt32, const ndMatrix&)
 {
-	ndAssert(0);
+	//ndAssert(0);
 }
 
