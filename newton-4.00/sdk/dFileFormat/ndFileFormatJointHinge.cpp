@@ -34,7 +34,7 @@ ndFileFormatJointHinge::ndFileFormatJointHinge(const char* const className)
 
 void ndFileFormatJointHinge::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointHinge", ndJointHinge::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointHinge::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndFloat32 spring;

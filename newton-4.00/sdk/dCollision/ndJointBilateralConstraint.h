@@ -76,7 +76,7 @@ class ndJointBilateralConstraint : public ndConstraint
 		bool m_ikMode;
 	};
 
-	//D_CLASS_REFLECTION(ndJointBilateralConstraint, ndConstraint)
+	D_COLLISION_API ndJointBilateralConstraint();
 	D_COLLISION_API ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrix);
 	D_COLLISION_API ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrixBody0,  const ndMatrix& globalMatrixBody1);
 	D_COLLISION_API virtual ~ndJointBilateralConstraint();
@@ -166,11 +166,13 @@ class ndJointBilateralConstraint : public ndConstraint
 	friend class ndWorld;
 	friend class ndIkSolver;
 	friend class ndDynamicsUpdate;
+	friend class ndFileFormatJoint;
 	friend class ndSkeletonContainer;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateSycl;
 	friend class ndDynamicsUpdateCuda;
+	
 };
 
 inline ndJointBilateralSolverModel ndJointBilateralConstraint::GetSolverModel() const

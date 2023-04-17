@@ -23,6 +23,7 @@ class ndJointSpherical: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointSpherical, ndJointBilateralConstraint)
+	D_NEWTON_API ndJointSpherical();
 	D_NEWTON_API ndJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointSpherical();
 

@@ -34,7 +34,7 @@ ndFileFormatJointPlane::ndFileFormatJointPlane(const char* const className)
 
 void ndFileFormatJointPlane::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointPlane", ndJointPlane::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointPlane::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndJointPlane* const exportJoint = (ndJointPlane*)joint;

@@ -76,3 +76,33 @@ void ndFileFormatJoint::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElemen
 	xmlSaveParam(classNode, "localMatrix1", joint->GetLocalMatrix1());
 	xmlSaveParam(classNode, "solverMode", joint->GetSolverModel());
 }
+
+ndJointBilateralConstraint* ndFileFormatJoint::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndAssert(0);
+	return nullptr;
+}
+
+void ndFileFormatJoint::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndInt32 idBody0 = xmlGetInt(node, "body0");
+	ndInt32 idBody1 = xmlGetInt(node, "body1");
+
+	ndTree<ndSharedPtr<ndBody>, ndInt32>::ndNode* const node0 = bodyMap.Find(idBody0);
+	ndTree<ndSharedPtr<ndBody>, ndInt32>::ndNode* const node1 = bodyMap.Find(idBody1);
+
+	ndAssert(node0);
+	ndAssert(node1);
+	ndBodyKinematic* const body0 = node0->GetInfo()->GetAsBodyKinematic();
+	ndBodyKinematic* const body1 = node1->GetInfo()->GetAsBodyKinematic();
+
+	ndMatrix matrix0(xmlGetMatrix(node, "localMatrix0"));
+	ndMatrix matrix1(xmlGetMatrix(node, "localMatrix1"));
+	ndInt32 solverModel = xmlGetInt(node, "solverMode");
+
+	joint->m_body0 = body0;
+	joint->m_body1 = body1;
+	joint->m_localMatrix0 = matrix0;
+	joint->m_localMatrix1 = matrix1;
+	joint->m_solverModel = ndJointBilateralSolverModel(solverModel);
+}

@@ -47,6 +47,7 @@ class ndFileFormatRegistrar : public ndClassAlloc
 	virtual ndShape* LoadShape(const nd::TiXmlElement* const node);
 	virtual ndBodyNotify* LoadNotify(const nd::TiXmlElement* const node);
 	virtual ndBody* LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap);
+	virtual ndJointBilateralConstraint* LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap);
 	virtual void LoadCollision(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBodyKinematic* const body);
 
 	private:

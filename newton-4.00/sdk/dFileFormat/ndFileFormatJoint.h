@@ -31,7 +31,12 @@ class ndFileFormatJoint : public ndFileFormatRegistrar
 	ndFileFormatJoint();
 	ndFileFormatJoint(const char* const className);
 
+	virtual ndJointBilateralConstraint* LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap);
 	virtual void SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint);
+
+	protected:
+	virtual void LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint);
+
 };
 
 #endif 

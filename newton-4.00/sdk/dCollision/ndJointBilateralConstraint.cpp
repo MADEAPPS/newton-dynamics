@@ -24,8 +24,34 @@
 #include "ndBodyKinematic.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_VEL_DAMP			 ndFloat32(100.0f)
-#define D_POS_DAMP			 ndFloat32(1500.0f)
+#define D_VEL_DAMP	ndFloat32(100.0f)
+#define D_POS_DAMP	ndFloat32(1500.0f)
+
+ndJointBilateralConstraint::ndJointBilateralConstraint()
+	:ndConstraint()
+	,m_forceBody0(ndVector::m_zero)
+	,m_torqueBody0(ndVector::m_zero)
+	,m_forceBody1(ndVector::m_zero)
+	,m_torqueBody1(ndVector::m_zero)
+	,m_body0(nullptr)
+	,m_body1(nullptr)
+	,m_worldNode(nullptr)
+	,m_body0Node(nullptr)
+	,m_body1Node(nullptr)
+{
+	m_mark0 = 0;
+	m_mark1 = 0;
+	m_maxDof = 0;
+	m_rowIsMotor = 0;
+	m_markedForRemoved = 0;
+	m_isInSkeleton = 0;
+	m_enableCollision = 0;
+	m_solverModel = m_jointkinematicOpenLoop;
+	m_defualtDiagonalRegularizer = ndFloat32(0.0f);
+
+	memset(m_jointForce, 0, sizeof(m_jointForce));
+	memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
+}
 
 ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrix)
 	:ndConstraint()

@@ -34,7 +34,7 @@ ndFileFormatJointKinematicController::ndFileFormatJointKinematicController(const
 
 void ndFileFormatJointKinematicController::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointKinematicController", ndJointKinematicController::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointKinematicController::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndJointKinematicController* const exportJoint = (ndJointKinematicController*)joint;

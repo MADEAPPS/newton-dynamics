@@ -34,7 +34,7 @@ ndFileFormatJointSlider::ndFileFormatJointSlider(const char* const className)
 
 void ndFileFormatJointSlider::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointSlider", ndJointSlider::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointSlider::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndFloat32 spring;

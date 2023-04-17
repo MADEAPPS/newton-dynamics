@@ -99,7 +99,7 @@ class ndJointFollowSplinePath : public ndJointFollowPath
 
 		void SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 		{
-			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointFollowSplinePath", ndJointFollowSplinePath::StaticClassName());
+			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointFollowSplinePath::StaticClassName());
 			ndFileFormatJointFollowPath::SaveJoint(scene, classNode, joint);
 		}
 	};

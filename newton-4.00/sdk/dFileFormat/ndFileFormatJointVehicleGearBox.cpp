@@ -34,6 +34,6 @@ ndFileFormatJointVehicleGearBox::ndFileFormatJointVehicleGearBox(const char* con
 
 void ndFileFormatJointVehicleGearBox::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndMultiBodyVehicleGearBox", ndMultiBodyVehicleGearBox::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndMultiBodyVehicleGearBox::StaticClassName());
 	ndFileFormatJointGear::SaveJoint(scene, classNode, joint);
 }

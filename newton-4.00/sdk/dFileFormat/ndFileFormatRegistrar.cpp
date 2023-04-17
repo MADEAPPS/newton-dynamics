@@ -253,3 +253,10 @@ ndBodyNotify* ndFileFormatRegistrar::LoadNotify(const nd::TiXmlElement* const)
 	ndAssert(0);
 	return nullptr;
 }
+
+
+ndJointBilateralConstraint* ndFileFormatRegistrar::LoadJoint(const nd::TiXmlElement* const, const ndTree<ndSharedPtr<ndBody>, ndInt32>&)
+{
+	ndAssert(0);
+	return nullptr;
+}

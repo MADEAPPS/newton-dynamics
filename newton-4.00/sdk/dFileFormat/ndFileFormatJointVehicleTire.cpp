@@ -34,7 +34,7 @@ ndFileFormatJointVehicleTire::ndFileFormatJointVehicleTire(const char* const cla
 
 void ndFileFormatJointVehicleTire::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndMultiBodyVehicleTireJoint", ndMultiBodyVehicleTireJoint::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndMultiBodyVehicleTireJoint::StaticClassName());
 	ndFileFormatJointWheel::SaveJoint(scene, classNode, joint);
 
 	ndMultiBodyVehicleTireJoint* const exportJoint = (ndMultiBodyVehicleTireJoint*)joint;

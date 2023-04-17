@@ -13,6 +13,19 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointSpherical.h"
 
+ndJointSpherical::ndJointSpherical()
+	:ndJointBilateralConstraint()
+	,m_rotation(ndGetIdentityMatrix())
+	,m_springK(ndFloat32(0.0f))
+	,m_damperC(ndFloat32(0.0f))
+	,m_maxConeAngle(ndFloat32(1.0e10f))
+	,m_minTwistAngle(-ndFloat32(1.0e10f))
+	,m_maxTwistAngle(ndFloat32(1.0e10f))
+	,m_springDamperRegularizer(ndFloat32(0.0f))
+{
+	m_maxDof = 9;
+}
+
 ndJointSpherical::ndJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(9, child, parent, pinAndPivotFrame)
 	,m_rotation(ndGetIdentityMatrix())

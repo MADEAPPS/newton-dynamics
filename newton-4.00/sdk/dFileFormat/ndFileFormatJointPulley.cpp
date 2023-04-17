@@ -34,7 +34,7 @@ ndFileFormatJointPulley::ndFileFormatJointPulley(const char* const className)
 
 void ndFileFormatJointPulley::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointPulley", ndJointPulley::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointPulley::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndJointPulley* const exportJoint = (ndJointPulley*)joint;

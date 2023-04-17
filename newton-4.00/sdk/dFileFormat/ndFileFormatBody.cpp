@@ -83,14 +83,14 @@ void ndFileFormatBody::LoadBody(const nd::TiXmlElement* const node, const ndTree
 	body->SetVelocity(veloc);
 	body->SetCentreOfMass(com);
 
-	nd::TiXmlNode* notiFyNode = (nd::TiXmlNode*)node->FirstChild("ndNotifyClass");
-	while (notiFyNode && !ndFileFormatRegistrar::GetHandler(((nd::TiXmlElement*)notiFyNode)->Attribute("className")))
+	nd::TiXmlNode* notifyNode = (nd::TiXmlNode*)node->FirstChild("ndNotifyClass");
+	while (notifyNode && !ndFileFormatRegistrar::GetHandler(((nd::TiXmlElement*)notifyNode)->Attribute("className")))
 	{
-		notiFyNode = (nd::TiXmlNode*)notiFyNode->FirstChild("ndNotifyClass");
+		notifyNode = (nd::TiXmlNode*)notifyNode->FirstChild("ndNotifyClass");
 	}
-	if (notiFyNode)
+	if (notifyNode)
 	{
-		const nd::TiXmlElement* const element = (nd::TiXmlElement*)notiFyNode;
+		const nd::TiXmlElement* const element = (nd::TiXmlElement*)notifyNode;
 		ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(element->Attribute("className"));
 		ndBodyNotify* const notify = handler->LoadNotify(element);
 		body->SetNotifyCallback(notify);

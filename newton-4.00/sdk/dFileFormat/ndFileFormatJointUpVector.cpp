@@ -34,6 +34,6 @@ ndFileFormatJointUpVector::ndFileFormatJointUpVector(const char* const className
 
 void ndFileFormatJointUpVector::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointUpVector", ndJointUpVector::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointUpVector::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 }

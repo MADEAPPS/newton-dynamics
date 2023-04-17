@@ -34,7 +34,7 @@ ndFileFormatJointSpherical::ndFileFormatJointSpherical(const char* const classNa
 
 void ndFileFormatJointSpherical::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointSpherical", ndJointSpherical::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointSpherical::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndFloat32 spring;
@@ -54,4 +54,30 @@ void ndFileFormatJointSpherical::SaveJoint(ndFileFormatSave* const scene, nd::Ti
 	xmlSaveParam(classNode, "minTwistAngle", minTwistAngle * ndRadToDegree);
 	xmlSaveParam(classNode, "maxTwistAngle", minTwistAngle * ndRadToDegree);
 	xmlSaveParam(classNode, "maxConeAngle", exportJoint->GetConeLimit() * ndRadToDegree);
+}
+
+ndJointBilateralConstraint* ndFileFormatJointSpherical::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndJointSpherical* const joint = new ndJointSpherical();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointSpherical::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+
+	ndMatrix target(xmlGetMatrix(node, "rotationTarget"));
+	ndFloat32 spring = xmlGetFloat(node, "springConstant");
+	ndFloat32 damper = xmlGetFloat(node, "damperConstant");
+	ndFloat32 regularizer = xmlGetFloat(node, "springRegularizer");
+	ndFloat32 minTwistAngle = xmlGetFloat(node, "minTwistAngle") * ndDegreeToRad;
+	ndFloat32 maxTwistAngle = xmlGetFloat(node, "maxTwistAngle") * ndDegreeToRad;
+	ndFloat32 maxConeAngle = xmlGetFloat(node, "maxConeAngle") * ndDegreeToRad;
+
+	ndJointSpherical* const inportJoint = (ndJointSpherical*)joint;
+
+	inportJoint->SetAsSpringDamper(regularizer, spring, damper);
+	inportJoint->SetTwistLimits(minTwistAngle, maxTwistAngle);
+	inportJoint->SetConeLimit(maxConeAngle);
 }

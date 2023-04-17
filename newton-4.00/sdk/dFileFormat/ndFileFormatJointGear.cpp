@@ -34,7 +34,7 @@ ndFileFormatJointGear::ndFileFormatJointGear(const char* const className)
 
 void ndFileFormatJointGear::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointGear", ndJointGear::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointGear::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndJointGear* const exportJoint = (ndJointGear*)joint;

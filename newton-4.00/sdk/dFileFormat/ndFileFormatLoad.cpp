@@ -26,6 +26,7 @@
 ndFileFormatLoad::ndFileFormatLoad()
 	:ndFileFormat()
 	,m_bodies()
+	,m_joints()
 {
 }
 
@@ -63,37 +64,65 @@ void ndFileFormatLoad::LoadBodies(const nd::TiXmlElement* const rootNode, const 
 	{
 		for (const nd::TiXmlNode* node = bodies->FirstChild(); node; node = node->NextSibling())
 		{
-			nd::TiXmlElement* element = (nd::TiXmlElement*)node;
-			ndFileFormatRegistrar* handler = ndFileFormatRegistrar::GetHandler(element->Attribute("className"));
-			if (!handler)
+			nd::TiXmlNode* bodyNode = (nd::TiXmlNode*)node;
+			while (bodyNode && !ndFileFormatRegistrar::GetHandler(((nd::TiXmlElement*)bodyNode)->Attribute("className")))
 			{
-				nd::TiXmlNode* childNode = (nd::TiXmlNode*)node;
-				do {
-					const char* const className = childNode->Value();
-					if (strcmp(className, "ndBodyClass"))
-					{
-						break;
-					}
-					element = (nd::TiXmlElement*)childNode;
-					ndTrace(("warning class %s not found\n", element->Attribute("className")));
-					handler = ndFileFormatRegistrar::GetHandler(element->Attribute("className"));
-					childNode = childNode->FirstChild();
-				} while (!handler);
+				bodyNode = (nd::TiXmlNode*)bodyNode->FirstChild("ndBodyClass");
 			}
-			ndAssert(handler);
 
-			ndSharedPtr<ndBody> body (handler->LoadBody(element, shapeMap));
+			ndAssert(bodyNode);
+			if (bodyNode)
+			{
+				const nd::TiXmlElement* const element = (nd::TiXmlElement*)bodyNode;
+				ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(element->Attribute("className"));
+				ndSharedPtr<ndBody> body(handler->LoadBody(element, shapeMap));
 
-			const nd::TiXmlNode* alliasNode = node;
-			do {
-				ndInt32 nodeId;
-				nd::TiXmlElement* const alliasElement = (nd::TiXmlElement*)alliasNode;
-				alliasElement->Attribute("nodeId", &nodeId);
-				bodyMap.Insert(body, nodeId);
-				alliasNode = alliasNode->FirstChild();
-			} while (!strcmp(alliasNode->Value(), "ndBodyClass"));
+				const nd::TiXmlNode* alliasNode = node;
+				do {
+					ndInt32 nodeId;
+					nd::TiXmlElement* const alliasElement = (nd::TiXmlElement*)alliasNode;
+					alliasElement->Attribute("nodeId", &nodeId);
+					bodyMap.Insert(body, nodeId);
+					alliasNode = alliasNode->FirstChild();
+				} while (!strcmp(alliasNode->Value(), "ndBodyClass"));
 
-			m_bodies.Append(body);
+				m_bodies.Append(body);
+			}
+		}
+	}
+}
+
+void ndFileFormatLoad::LoadJoints(const nd::TiXmlElement* const rootNode, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap)
+{
+	const nd::TiXmlNode* const joints = rootNode->FirstChild("ndJoints");
+	if (joints)
+	{
+		for (const nd::TiXmlNode* node = joints->FirstChild(); node; node = node->NextSibling())
+		{
+			nd::TiXmlNode* jointNode = (nd::TiXmlNode*)node;
+			while (jointNode && !ndFileFormatRegistrar::GetHandler(((nd::TiXmlElement*)jointNode)->Attribute("className")))
+			{
+				jointNode = (nd::TiXmlNode*)jointNode->FirstChild("ndJointClass");
+			}
+
+			ndAssert(jointNode);
+			if (jointNode)
+			{
+				const nd::TiXmlElement* const element = (nd::TiXmlElement*)jointNode;
+				ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(element->Attribute("className"));
+				ndSharedPtr<ndJointBilateralConstraint> joint (handler->LoadJoint(element, bodyMap));
+
+				const nd::TiXmlNode* alliasNode = node;
+				do {
+					ndInt32 nodeId;
+					nd::TiXmlElement* const alliasElement = (nd::TiXmlElement*)alliasNode;
+					alliasElement->Attribute("nodeId", &nodeId);
+					jointMap.Insert(joint, nodeId);
+					alliasNode = alliasNode->FirstChild();
+				} while (!strcmp(alliasNode->Value(), "ndJointClass"));
+
+				m_joints.Append(joint);
+			}
 		}
 	}
 }
@@ -125,11 +154,14 @@ void ndFileFormatLoad::Load(const char* const path)
 
 	ndTree<ndShape*, ndInt32> shapeMap;
 	ndTree<ndSharedPtr<ndBody>, ndInt32> bodyMap;
+	ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32> jointMap;
 
 	m_bodies.RemoveAll();
+	m_joints.RemoveAll();
 
 	LoadShapes(rootNode, shapeMap);
 	LoadBodies(rootNode, shapeMap, bodyMap);
+	LoadJoints(rootNode, bodyMap, jointMap);
 
 	ndTree<ndShape*, ndInt32>::Iterator it (shapeMap);
 	for (it.Begin(); it; it++)
