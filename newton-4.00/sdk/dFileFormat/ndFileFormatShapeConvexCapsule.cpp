@@ -50,5 +50,5 @@ ndShape* ndFileFormatShapeConvexCapsule::LoadShape(const nd::TiXmlElement* const
 	ndFloat32 height = xmlGetFloat(node, "height");
 	ndFloat32 radius0 = xmlGetFloat(node, "radius0");
 	ndFloat32 radius1 = xmlGetFloat(node, "radius1");
-	return new ndShapeCapsule(radius0, radius1, height);
+	return new ndShapeCapsule(radius0, radius1, height * ndFloat32 (2.0f));
 }
