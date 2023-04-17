@@ -254,8 +254,9 @@ ndConvexFracture::ndDebrisNotify::ndDebrisNotify(ndDemoEntityManager* const mana
 
 void ndConvexFracture::ndDebrisNotify::OnObjectPick() const
 {
+	ndAssert(0);
 	ndTrace(("debris entity id: %d    ", ((ndConvexFractureEntity*)m_entity)->m_enumerator));
-	ndDemoEntityNotify::OnObjectPick();
+	//ndDemoEntityNotify::OnObjectPick();
 }
 
 ndConvexFracture::ndConvexFracture()

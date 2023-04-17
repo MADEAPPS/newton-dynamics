@@ -49,7 +49,7 @@ class ndDemoEntityNotify : public ndModelNotify
 		return m_entity;
 	}
 
-	virtual void OnObjectPick() const;
+	//virtual void OnObjectPick() const;
 	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
 
 	void RemoveBody();

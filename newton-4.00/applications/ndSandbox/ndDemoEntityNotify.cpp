@@ -32,10 +32,10 @@ ndDemoEntityNotify::~ndDemoEntityNotify()
 	}
 }
 
-void ndDemoEntityNotify::OnObjectPick() const
-{
-	ndTrace(("picked body id: %d\n", GetBody()->GetId()));
-}
+//void ndDemoEntityNotify::OnObjectPick() const
+//{
+//	ndTrace(("picked body id: %d\n", GetBody()->GetId()));
+//}
 
 void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 {

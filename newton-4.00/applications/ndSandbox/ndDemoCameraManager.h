@@ -52,7 +52,6 @@ class ndDemoCameraManager: public ndClassAlloc
 	ndVector m_pickedBodyLocalAtachmentNormal;
 
 	ndDemoCamera* m_camera;
-	ndBodyKinematic* m_targetPicked;
 	ndSharedPtr<ndJointBilateralConstraint> m_pickJoint;
 	ndFloat32 m_mousePosX;
 	ndFloat32 m_mousePosY;

@@ -48,7 +48,6 @@ ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const)
 	,m_pickedBodyLocalAtachmentPoint(ndVector::m_wOne)
 	,m_pickedBodyLocalAtachmentNormal(ndVector::m_zero)
 	,m_camera(new ndDemoCamera())
-	,m_targetPicked(nullptr)
 	,m_pickJoint(nullptr)
 	,m_mousePosX(0)
 	,m_mousePosY(0)
@@ -67,7 +66,7 @@ ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const)
 
 ndDemoCameraManager::~ndDemoCameraManager()
 {
-	if (m_targetPicked) 
+	if (*m_pickJoint)
 	{
 		ResetPickBody();
 	}
@@ -126,7 +125,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, ndFloat32
 
 	// do camera rotation, only if we do not have anything picked
 	bool buttonState = m_mouseLockState || mouseState;
-	if (!m_targetPicked && buttonState) 
+	if (!*m_pickJoint && buttonState)
 	{
 		ndFloat32 mouseSpeedX = mouseX - m_mousePosX;
 		ndFloat32 mouseSpeedY = mouseY - m_mousePosY;
@@ -209,7 +208,7 @@ void ndDemoCameraManager::SetCameraMouseLock (bool loockState)
 
 void ndDemoCameraManager::RenderPickedTarget () const
 {
-	if (m_targetPicked) 
+	if (*m_pickJoint)
 	{
 		ndAssert(0);
 		//ndMatrix matrix;
@@ -240,7 +239,7 @@ void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene,
 void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool mousePickState, const ndVector& p0, const ndVector& p1, ndFloat32) 
 {
 	// handle pick body from the screen
-	if (!m_targetPicked) 
+	if (!*m_pickJoint)
 	{
 		if (!m_prevMouseState && mousePickState) 
 		{
@@ -251,19 +250,13 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 			ndBodyKinematic* const body = MousePickBody (scene->GetWorld(), p0, p1, param, posit, normal);
 			if (body) 
 			{
-				ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
+				ndBodyNotify* const notify = body->GetNotifyCallback();
 				if (notify)
 				{
-					notify->OnObjectPick();
-					m_targetPicked = body;
+					ndTrace(("picked body id: %d\n", body->GetId()));
 		
 					m_pickedBodyParam = param;
-					if (*m_pickJoint)
-					{
-						scene->GetWorld()->RemoveJoint(*m_pickJoint);
-					}
-		
-					ndVector mass(m_targetPicked->GetMassMatrix());
+					ndVector mass(body->GetMassMatrix());
 		
 					//change this to make the grabbing stronger or weaker
 					//const ndFloat32 angularFritionAccel = 10.0f;
@@ -298,10 +291,7 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 		} 
 		else 
 		{
-			if (*m_pickJoint)
-			{
-				scene->GetWorld()->RemoveJoint(*m_pickJoint);
-			}
+			scene->GetWorld()->RemoveJoint(*m_pickJoint);
 			ResetPickBody();
 		}
 	}
@@ -311,15 +301,11 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 
 void ndDemoCameraManager::ResetPickBody()
 {
-	if (m_targetPicked) 
+	if (*m_pickJoint)
 	{
-		m_targetPicked->SetSleepState(false);
-	}
-	if (*m_pickJoint) 
-	{
+		m_pickJoint->GetBody0()->SetSleepState(false);
 		ndDemoCameraPickBodyJoint* const pickJoint = (ndDemoCameraPickBodyJoint*)*m_pickJoint;
 		pickJoint->m_manager = nullptr;
 	}
 	m_pickJoint = ndSharedPtr<ndJointBilateralConstraint>(nullptr);
-	m_targetPicked = nullptr;
 }
