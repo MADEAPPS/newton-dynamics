@@ -81,8 +81,8 @@ void ndFileFormatShapeInstance::LoadCollision(const nd::TiXmlElement* const node
 	instance.SetLocalMatrix(localMatrix);
 	instance.SetCollisionMode(mode ? true : false);
 	instance.m_scaleType = scaleType;
-	instance.m_alignmentMatrix = localMatrix;
 	instance.m_skinMargin = skinMargin;
+	instance.m_alignmentMatrix = aligmentMatrix;
 
 	ndShapeMaterial material;
 	material.m_userId = materialData[0];
