@@ -4265,11 +4265,6 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 	ndAssert(m_instance0.GetShape()->GetAsShapeConvex());
 	ndAssert(m_instance1.GetShape()->GetAsShapeConvex());
 
-//static int xxxx;
-//xxxx++;
-//if (xxxx == 63)
-//xxxx *= 1;
-
 	ndInt32 count = 0;
 	ndInt32 count1 = 0;
 	const ndInt32 baseCount = 16;
