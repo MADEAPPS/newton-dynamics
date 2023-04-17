@@ -173,12 +173,12 @@ namespace ndRagdoll
 		return nullptr;
 	}
 
-	ndModelPassiveRagdoll* BuildRagDoll(ndDemoEntityManager* const scene, ndDemoEntity* const ragdollMesh, const ndMatrix& location)
+	ndModelPassiveRagdoll* BuildRagDoll(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
 	{
 		ndModelPassiveRagdoll* const ragdoll = new ndModelPassiveRagdoll();
 
 		ndWorld* const world = scene->GetWorld();
-		ndDemoEntity* const entity = ragdollMesh->CreateClone();
+		ndDemoEntity* const entity = modelMesh->CreateClone();
 		scene->AddEntity(entity);
 
 		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
@@ -263,13 +263,13 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 	
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	ndSharedPtr<ndDemoEntity> ragdollMesh (ndDemoEntity::LoadFbx("walker.fbx", scene));
+	ndSharedPtr<ndDemoEntity> modelMesh (ndDemoEntity::LoadFbx("walker.fbx", scene));
 	
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
 	ndMatrix playerMatrix(matrix);
 
-	ndModel* const model = BuildRagDoll(scene, *ragdollMesh, matrix);
+	ndModel* const model = BuildRagDoll(scene, *modelMesh, matrix);
 	ndSharedPtr<ndModel> ragdoll(model);
 	scene->GetWorld()->AddModel(ragdoll);
 	
@@ -281,9 +281,9 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	//reckingBall->SetVelocity(ndVector(-5.0f, 0.0f, 0.0f, 0.0f));
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
-	//scene->GetWorld()->AddModel(new ndHumanoidModel(scene, ragdollMesh, matrix));
+	//scene->GetWorld()->AddModel(new ndHumanoidModel(scene, modelMesh, matrix));
 	//matrix.m_posit.m_z = 2.0f;
-	//scene->GetWorld()->AddModel(new ndHumanoidModel(scene, ragdollMesh, matrix));
+	//scene->GetWorld()->AddModel(new ndHumanoidModel(scene, modelMesh, matrix));
 	//origin1.m_x += 20.0f;
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 	

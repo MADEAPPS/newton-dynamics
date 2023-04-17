@@ -32,8 +32,8 @@ namespace biped_1
 		{
 			m_root,
 			m_fix,
-			m_hinge,
-			m_spherical,
+			m_ikHinge,
+			m_ikSpherical,
 			m_doubleHinge,
 			m_effector
 		};
@@ -62,38 +62,26 @@ namespace biped_1
 	static ndDefinition ragdollDefinition[] =
 	{
 		{ "root", ndDefinition::m_root,{},{} },
-#if 0
-		//{ "lowerback", ndDefinition::m_spherical, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-		//{ "upperback", ndDefinition::m_spherical, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		//{ "lowerneck", ndDefinition::m_spherical, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		//{ "upperneck", ndDefinition::m_spherical, { -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		//{ "lclavicle", ndDefinition::m_spherical, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
-		//{ "lhumerus", ndDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		//{ "lradius", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-		//{ "rclavicle", ndDefinition::m_spherical, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		//{ "rhumerus", ndDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		//{ "rradius", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-
-#else
 		{ "lowerback", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
 		{ "upperback", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
 		{ "lowerneck", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
 		{ "upperneck", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+
 		{ "lclavicle", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
 		{ "lhumerus", ndDefinition::m_fix, 1, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 		{ "lradius", ndDefinition::m_fix, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+
 		{ "rclavicle", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
 		{ "rhumerus", ndDefinition::m_fix, 1, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 		{ "rradius", ndDefinition::m_fix, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-#endif
 
-		{ "rhipjoint", ndDefinition::m_spherical, 0,{ -60.0f, 60.0f, 80.0f },{ 0.0f, -60.0f, 0.0f } },
-		{ "rfemur", ndDefinition::m_hinge, 1, { 0.5f, 120.0f, 0.0f },{ 0.0f, 90.0f, 0.0f } },
+		{ "rhipjoint", ndDefinition::m_ikSpherical, 0,{ -60.0f, 60.0f, 80.0f },{ 0.0f, -60.0f, 0.0f } },
+		{ "rfemur", ndDefinition::m_ikHinge, 1, { 0.5f, 120.0f, 0.0f },{ 0.0f, 90.0f, 0.0f } },
 		{ "rfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
 		{ "rtibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-		//{ "lhipjoint", ndDefinition::m_spherical, 0, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		//{ "lfemur", ndDefinition::m_hinge, 1, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "lhipjoint", ndDefinition::m_ikSpherical, 0, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		//{ "lfemur", ndDefinition::m_ikHinge, 1, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 		//{ "lfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
 		//{ "ltibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
@@ -141,6 +129,7 @@ namespace biped_1
 		}
 	};
 
+#if 0
 	class ndHumanoidModel : public ndModel
 	{
 		public:
@@ -412,7 +401,7 @@ namespace biped_1
 					return joint;
 				}
 
-				case ndDefinition::m_spherical:
+				case ndDefinition::m_ikSpherical:
 				{
 					ndIkJointSpherical* const joint = new ndIkJointSpherical(pinAndPivotInGlobalSpace, childBody, parentBone);
 					//ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
@@ -421,7 +410,7 @@ namespace biped_1
 					return joint;
 				}
 
-				case ndDefinition::m_hinge:
+				case ndDefinition::m_ikHinge:
 				{
 					ndIkJointHinge* const joint = new ndIkJointHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
 
@@ -587,6 +576,18 @@ namespace biped_1
 
 		ndHumanoidModel* m_biped;
 	};
+#endif
+
+	ndModelPassiveRagdoll* BuildRagDoll(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
+	{
+		ndModelPassiveRagdoll* const ragdoll = new ndModelPassiveRagdoll();
+
+		ndWorld* const world = scene->GetWorld();
+		ndDemoEntity* const entity = modelMesh->CreateClone();
+		scene->AddEntity(entity);
+
+		return ragdoll;
+	}
 }
 
 using namespace biped_1;
@@ -607,23 +608,27 @@ void ndBipedTest_1(ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
 	
 	ndMatrix origin(ndGetIdentityMatrix());
-	origin.m_posit.m_x += 20.0f;
+	//origin.m_posit.m_x += 20.0f;
 	//AddCapsulesStacks(scene, origin, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 	
-	origin.m_posit.m_x -= 20.0f;
+	//origin.m_posit.m_x -= 20.0f;
 	ndSharedPtr<ndDemoEntity> modelMesh = ndDemoEntity::LoadFbx("walker.fbx", scene);
 	
-	ndWorld* const world = scene->GetWorld();
-	ndHumanoidModel* const model = new ndHumanoidModel(scene, *modelMesh, origin, ragdollDefinition);
-	ndSharedPtr<ndModel> modelPtr(model);
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
-	world->AddModel(modelPtr);
-	world->AddJoint(fixJoint);
+	//ndWorld* const world = scene->GetWorld();
+	//ndHumanoidModel* const model = new ndHumanoidModel(scene, *modelMesh, origin, ragdollDefinition);
+	//ndSharedPtr<ndModel> modelPtr(model);
+	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
+	//world->AddModel(modelPtr);
+	//world->AddJoint(fixJoint);
+	//
+	//ndModelUI* const bipedUI = new ndModelUI(scene, model);
+	//ndSharedPtr<ndUIEntity> bipedUIPtr(bipedUI);
+	//scene->Set2DDisplayRenderFunction(bipedUIPtr);
 
-	ndModelUI* const bipedUI = new ndModelUI(scene, model);
-	ndSharedPtr<ndUIEntity> bipedUIPtr(bipedUI);
-	scene->Set2DDisplayRenderFunction(bipedUIPtr);
-	
+	ndModel* const model = BuildRagDoll(scene, *modelMesh, origin);
+	ndSharedPtr<ndModel> ragdoll(model);
+	scene->GetWorld()->AddModel(ragdoll);
+		
 	ndQuaternion rot;
 	origin.m_posit.m_x -= 5.0f;
 	origin.m_posit.m_y = 2.0f;
