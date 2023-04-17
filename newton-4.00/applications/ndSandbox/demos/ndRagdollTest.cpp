@@ -88,7 +88,7 @@ namespace ndRagdoll
 	static ndDefinition ragdollDefinition[] =
 	{
 		{ "root", ndDefinition::m_root, 1.0f, {}, {} },
-		{ "lowerback", ndDefinition::m_spherical, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+		//{ "lowerback", ndDefinition::m_spherical, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
 		//{ "upperback", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
 		//{ "lowerneck", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
 		//{ "upperneck", ndDefinition::m_spherical, 1.0f,{ -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
@@ -269,8 +269,6 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	matrix.m_posit.m_y = 0.5f;
 	ndMatrix playerMatrix(matrix);
 
-//matrix.m_posit.m_x += 1.5f;
-
 	ndModel* const model = BuildRagDoll(scene, *ragdollMesh, matrix);
 	ndSharedPtr<ndModel> ragdoll(model);
 	scene->GetWorld()->AddModel(ragdoll);
@@ -292,7 +290,7 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	ndFloat32 angle = ndFloat32(90.0f * ndDegreeToRad);
 	playerMatrix = ndYawMatrix(angle) * playerMatrix;
 	ndVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-5.0f));
-	origin.m_y += 1.5f;
+	origin.m_y += 1.0f;
 	origin.m_z += -3.0f;
 	scene->SetCameraMatrix(playerMatrix, origin);
 
@@ -302,5 +300,14 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	ndFileFormatLoad xxxxLoad;
 	xxxxLoad.Load("xxxx.nd");
 
-	//xxxxLoad.AddToWorld(scene->GetWorld());
+	// offset bodies positions for calibraion;
+	const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
+	for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	{
+		ndSharedPtr<ndBody>& body = node->GetInfo();
+		ndMatrix matrix (body->GetMatrix());
+		matrix.m_posit.m_x += 0.17f;
+		body->SetMatrix(matrix);
+	}
+	xxxxLoad.AddToWorld(scene->GetWorld());
 }

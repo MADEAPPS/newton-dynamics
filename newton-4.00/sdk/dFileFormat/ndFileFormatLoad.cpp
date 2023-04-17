@@ -174,6 +174,11 @@ void ndFileFormatLoad::Load(const char* const path)
 	setlocale(LC_ALL, m_oldloc.GetStr());
 }
 
+const ndList<ndSharedPtr<ndBody>>& ndFileFormatLoad::GetBodyList() const
+{
+	return m_bodies;
+}
+
 void ndFileFormatLoad::AddToWorld(ndWorld* const world)
 {
 	for (ndList<ndSharedPtr<ndBody>>::ndNode* node = m_bodies.GetFirst(); node; node = node->GetNext())

@@ -33,6 +33,8 @@ class ndFileFormatLoad : public ndFileFormat
 
 	void Load(const char* const path);
 	void AddToWorld(ndWorld* const world);
+
+	const ndList<ndSharedPtr<ndBody>>& GetBodyList() const;
 	
 	private:
 	void LoadShapes(const nd::TiXmlElement* const rootNode, ndTree<ndShape*, ndInt32>& shapeMap);
