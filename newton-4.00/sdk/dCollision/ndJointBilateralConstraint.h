@@ -172,7 +172,6 @@ class ndJointBilateralConstraint : public ndConstraint
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateSycl;
 	friend class ndDynamicsUpdateCuda;
-	
 };
 
 inline ndJointBilateralSolverModel ndJointBilateralConstraint::GetSolverModel() const
