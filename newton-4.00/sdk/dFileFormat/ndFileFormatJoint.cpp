@@ -77,7 +77,7 @@ void ndFileFormatJoint::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElemen
 	xmlSaveParam(classNode, "solverMode", joint->GetSolverModel());
 }
 
-ndJointBilateralConstraint* ndFileFormatJoint::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+ndJointBilateralConstraint* ndFileFormatJoint::LoadJoint(const nd::TiXmlElement* const, const ndTree<ndSharedPtr<ndBody>, ndInt32>&)
 {
 	ndAssert(0);
 	return nullptr;

@@ -25,6 +25,14 @@ ndJointDoubleHinge::ndAxisParam::ndAxisParam()
 {
 }
 
+ndJointDoubleHinge::ndJointDoubleHinge()
+	:ndJointBilateralConstraint()
+	,m_axis0()
+	,m_axis1()
+{
+	m_maxDof = 8;
+}
+
 ndJointDoubleHinge::ndJointDoubleHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
 	,m_axis0()

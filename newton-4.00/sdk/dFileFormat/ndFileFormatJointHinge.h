@@ -36,7 +36,6 @@ class ndFileFormatJointHinge : public ndFileFormatJoint
 	virtual ndJointBilateralConstraint* LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap);
 	protected:
 	virtual void LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint);
-
 };
 
 #endif 
