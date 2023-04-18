@@ -94,6 +94,10 @@ void ndFileFormatModelPassiveRadoll::LoadModel(const nd::TiXmlElement* const nod
 	ndModelPassiveRagdoll* const modelBase = (ndModelPassiveRagdoll*)model;
 
 	ndInt32 rootBodyId = xmlGetInt(node, "rootBody");
+	ndTree<ndSharedPtr<ndBody>, ndInt32>::ndNode* const rootBodyNode = bodyMap.Find(rootBodyId);
+
+	ndTree<ndModelPassiveRagdoll::ndRagdollNode*, ndInt32> filter;
+	filter.Insert (modelBase->AddRootBody(rootBodyNode->GetInfo()), rootBodyId);
 
 	const nd::TiXmlNode* const limbsNode = node->FirstChild("limbs");
 	ndAssert(limbsNode);
@@ -105,6 +109,9 @@ void ndFileFormatModelPassiveRadoll::LoadModel(const nd::TiXmlElement* const nod
 		((nd::TiXmlElement*)childNode)->Attribute("parentBody", &parentId);
 		ndTree<ndSharedPtr<ndBody>, ndInt32>::ndNode* const childBodyNode = bodyMap.Find(childId);
 		ndTree<ndSharedPtr<ndBody>, ndInt32>::ndNode* const parentBodyNode = bodyMap.Find(parentId);
-	//	modelBase->m_bodies.Append(bodyNode->GetInfo());
+
+		//ndAssert(filter.Find(parentId));
+		//ndModelPassiveRagdoll::ndRagdollNode* const parent = filter.Find(parentId)->GetInfo();
+		//parent->AddLimb(parent, childBodyNode->GetInfo(), ndSharedPtr<ndJointBilateralConstraint>&joint);
 	}
 }

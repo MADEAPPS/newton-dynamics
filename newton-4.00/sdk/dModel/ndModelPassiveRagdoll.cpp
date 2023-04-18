@@ -74,8 +74,6 @@ ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::AddLimb(ndRagdollNo
 	return node;
 }
 
-
-//void NormalizeMassDistribution(ndFloat32 mass, const ndFixSizeArray<ndBodyDynamic*, 64>& bodyArray, const ndFixSizeArray<ndFloat32, 64>& massWeight) const
 void ndModelPassiveRagdoll::NormalizeMassDistribution(ndFloat32 totalMass)
 {
 	ndFixSizeArray<ndBodyDynamic*, 256> bodyArray;
