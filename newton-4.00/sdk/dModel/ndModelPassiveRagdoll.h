@@ -33,10 +33,11 @@ class ndModelPassiveRagdoll: public ndModelBase
 	class ndRagdollNode : public ndNodeHierarchy<ndRagdollNode>
 	{
 		public:
-		ndRagdollNode(ndBodyDynamic* const body, ndRagdollNode* const parent);
+		ndRagdollNode(ndBodyDynamic* const body, ndRagdollNode* const parent, ndJointBilateralConstraint* const joint);
 		virtual ~ndRagdollNode();
 		
 		ndBodyDynamic* m_body;
+		ndJointBilateralConstraint* m_joint;
 	};
 
 	ndModelPassiveRagdoll();

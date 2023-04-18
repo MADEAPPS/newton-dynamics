@@ -107,13 +107,15 @@ void ndJointHinge::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 
 	if (m_angle > m_maxLimit)
 	{
-		const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_maxLimit);
-		m_angle = m_maxLimit + deltaAngle;
+		//const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_maxLimit);
+		//m_angle = m_maxLimit + deltaAngle;
+		m_angle = m_maxLimit;
 	} 
 	else if (m_angle < m_minLimit)
 	{
-		const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_minLimit);
-		m_angle = m_minLimit + deltaAngle;
+		//const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_minLimit);
+		//m_angle = m_minLimit + deltaAngle;
+		m_angle = m_minLimit;
 	}
 }
 

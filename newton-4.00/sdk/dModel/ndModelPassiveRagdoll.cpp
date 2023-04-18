@@ -22,9 +22,10 @@
 #include "ndModelStdafx.h"
 #include "ndModelPassiveRagdoll.h"
 
-ndModelPassiveRagdoll::ndRagdollNode::ndRagdollNode(ndBodyDynamic* const body, ndRagdollNode* const parent)
+ndModelPassiveRagdoll::ndRagdollNode::ndRagdollNode(ndBodyDynamic* const body, ndRagdollNode* const parent, ndJointBilateralConstraint* const joint)
 	:ndNodeHierarchy<ndRagdollNode>()
 	,m_body(body)
+	,m_joint(joint)
 {
 	if (parent)
 	{
@@ -58,7 +59,7 @@ ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::GetRoot() const
 ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::AddRootBody(ndSharedPtr<ndBody>& rootBody)
 {
 	ndAssert(!m_rootNode);
-	m_rootNode = new ndRagdollNode(rootBody->GetAsBodyDynamic(), nullptr);
+	m_rootNode = new ndRagdollNode(rootBody->GetAsBodyDynamic(), nullptr, nullptr);
 	m_bodies.Append(rootBody);
 	return m_rootNode;
 }
@@ -68,7 +69,7 @@ ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::AddLimb(ndRagdollNo
 	ndAssert(m_rootNode);
 	ndAssert(joint->GetBody1() == parent->m_body);
 	ndAssert(joint->GetBody0() == body->GetAsBodyKinematic());
-	ndRagdollNode* const node = new ndRagdollNode(body->GetAsBodyDynamic(), parent);
+	ndRagdollNode* const node = new ndRagdollNode(body->GetAsBodyDynamic(), parent, *joint);
 	m_bodies.Append(body);
 	m_joints.Append(joint);
 	return node;

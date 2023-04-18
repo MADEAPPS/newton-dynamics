@@ -63,12 +63,13 @@ void ndFileFormatModelPassiveRadoll::SaveModel(ndFileFormatSave* const scene, nd
 			limbsNode->LinkEndChild(limbNode);
 			ndInt32 childId = scene->FindBodyId(node->m_body);
 			ndInt32 parentId = scene->FindBodyId(node->GetParent()->m_body);
+			ndInt32 jointId = scene->FindJointId(node->m_joint);
 			ndAssert(childId != 0);
 			ndAssert(parentId != 0);
+			ndAssert(jointId != 0);
 			limbNode->SetAttribute("childBody", childId);
 			limbNode->SetAttribute("parentBody", parentId);
-			//xmlSaveParam(limbNode, "childBody", childId);
-			//xmlSaveParam(limbNode, "parentBody", parentId);
+			limbNode->SetAttribute("joint", jointId);
 		
 			for (ndModelPassiveRagdoll::ndRagdollNode* child = node->GetFirstChild(); child; child = child->GetNext())
 			{
@@ -104,14 +105,19 @@ void ndFileFormatModelPassiveRadoll::LoadModel(const nd::TiXmlElement* const nod
 	for (const nd::TiXmlNode* childNode = limbsNode->FirstChild("limb"); childNode; childNode = childNode->NextSibling())
 	{
 		ndInt32 childId;
+		ndInt32 jointId;
 		ndInt32 parentId;
+
+		((nd::TiXmlElement*)childNode)->Attribute("joint", &jointId);
 		((nd::TiXmlElement*)childNode)->Attribute("childBody", &childId);
 		((nd::TiXmlElement*)childNode)->Attribute("parentBody", &parentId);
-		ndTree<ndSharedPtr<ndBody>, ndInt32>::ndNode* const childBodyNode = bodyMap.Find(childId);
-		ndTree<ndSharedPtr<ndBody>, ndInt32>::ndNode* const parentBodyNode = bodyMap.Find(parentId);
 
-		//ndAssert(filter.Find(parentId));
-		//ndModelPassiveRagdoll::ndRagdollNode* const parent = filter.Find(parentId)->GetInfo();
-		//parent->AddLimb(parent, childBodyNode->GetInfo(), ndSharedPtr<ndJointBilateralConstraint>&joint);
+		ndTree<ndSharedPtr<ndBody>, ndInt32>::ndNode* const childBodyNode = bodyMap.Find(childId);
+		ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>::ndNode* const jointNode = jointMap.Find(jointId);
+
+		ndAssert(filter.Find(parentId));
+		ndModelPassiveRagdoll::ndRagdollNode* const parent = filter.Find(parentId)->GetInfo();
+		ndModelPassiveRagdoll::ndRagdollNode* const child = modelBase->AddLimb(parent, childBodyNode->GetInfo(), jointNode->GetInfo());
+		filter.Insert(child, childId);
 	}
 }
