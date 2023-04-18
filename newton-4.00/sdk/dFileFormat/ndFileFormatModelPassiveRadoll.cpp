@@ -35,7 +35,7 @@ ndFileFormatModelPassiveRadoll::ndFileFormatModelPassiveRadoll(const char* const
 
 void ndFileFormatModelPassiveRadoll::SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndModelPassiveRagdoll", ndModelPassiveRagdoll::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndModelClass", ndModelPassiveRagdoll::StaticClassName());
 	ndFileFormatModelBase::SaveModel(scene, classNode, model);
 
 	ndModelPassiveRagdoll* const ragDoll = (ndModelPassiveRagdoll*)model;

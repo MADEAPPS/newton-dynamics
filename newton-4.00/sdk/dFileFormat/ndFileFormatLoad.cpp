@@ -34,6 +34,11 @@ ndFileFormatLoad::~ndFileFormatLoad()
 {
 }
 
+const ndList<ndSharedPtr<ndBody>>& ndFileFormatLoad::GetBodyList() const
+{
+	return m_bodies;
+}
+
 void ndFileFormatLoad::LoadShapes(const nd::TiXmlElement* const rootNode, ndTree<ndShape*, ndInt32>& shapeMap)
 {
 	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndShapes");
@@ -127,6 +132,31 @@ void ndFileFormatLoad::LoadJoints(const nd::TiXmlElement* const rootNode, const 
 	}
 }
 
+void ndFileFormatLoad::LoadModels(const nd::TiXmlElement* const rootNode, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap)
+{
+	const nd::TiXmlNode* const models = rootNode->FirstChild("ndModels");
+	if (models)
+	{
+		for (const nd::TiXmlNode* node = models->FirstChild(); node; node = node->NextSibling())
+		{
+			nd::TiXmlNode* modelNode = (nd::TiXmlNode*)node;
+			while (modelNode && !ndFileFormatRegistrar::GetHandler(((nd::TiXmlElement*)modelNode)->Attribute("className")))
+			{
+				modelNode = (nd::TiXmlNode*)modelNode->FirstChild("ndModelClass");
+			}
+		
+			ndAssert(modelNode);
+			if (modelNode)
+			{
+				const nd::TiXmlElement* const element = (nd::TiXmlElement*)modelNode;
+				ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(element->Attribute("className"));
+				ndSharedPtr<ndModel> model(handler->LoadModel(element, bodyMap, jointMap));
+				m_models.Append(model);
+			}
+		}
+	}
+}
+
 void ndFileFormatLoad::Load(const char* const path)
 {
 	// save the path for use with generated assets.
@@ -162,6 +192,7 @@ void ndFileFormatLoad::Load(const char* const path)
 	LoadShapes(rootNode, shapeMap);
 	LoadBodies(rootNode, shapeMap, bodyMap);
 	LoadJoints(rootNode, bodyMap, jointMap);
+	//LoadModels(rootNode, bodyMap, jointMap);
 
 	ndTree<ndShape*, ndInt32>::Iterator it (shapeMap);
 	for (it.Begin(); it; it++)
@@ -174,11 +205,6 @@ void ndFileFormatLoad::Load(const char* const path)
 	setlocale(LC_ALL, m_oldloc.GetStr());
 }
 
-const ndList<ndSharedPtr<ndBody>>& ndFileFormatLoad::GetBodyList() const
-{
-	return m_bodies;
-}
-
 void ndFileFormatLoad::AddToWorld(ndWorld* const world)
 {
 	for (ndList<ndSharedPtr<ndBody>>::ndNode* node = m_bodies.GetFirst(); node; node = node->GetNext())
@@ -189,5 +215,10 @@ void ndFileFormatLoad::AddToWorld(ndWorld* const world)
 	for (ndList<ndSharedPtr<ndJointBilateralConstraint>>::ndNode* node = m_joints.GetFirst(); node; node = node->GetNext())
 	{
 		world->AddJoint(node->GetInfo());
+	}
+
+	for (ndList<ndSharedPtr<ndModel>>::ndNode* node = m_models.GetFirst(); node; node = node->GetNext())
+	{
+		world->AddModel(node->GetInfo());
 	}
 }

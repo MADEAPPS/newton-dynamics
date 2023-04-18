@@ -40,8 +40,10 @@ class ndFileFormatLoad : public ndFileFormat
 	void LoadShapes(const nd::TiXmlElement* const rootNode, ndTree<ndShape*, ndInt32>& shapeMap);
 	void LoadBodies(const nd::TiXmlElement* const rootNode, const ndTree<ndShape*, ndInt32>& shapeMap, ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap);
 	void LoadJoints(const nd::TiXmlElement* const rootNode, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap);
+	void LoadModels(const nd::TiXmlElement* const rootNode, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap);
 
 	ndList<ndSharedPtr<ndBody>> m_bodies;
+	ndList<ndSharedPtr<ndModel>> m_models;
 	ndList<ndSharedPtr<ndJointBilateralConstraint>> m_joints;
 
 	friend class ndFileFormatBody;
