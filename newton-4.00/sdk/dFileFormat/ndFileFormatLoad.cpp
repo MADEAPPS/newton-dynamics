@@ -192,7 +192,7 @@ void ndFileFormatLoad::Load(const char* const path)
 	LoadShapes(rootNode, shapeMap);
 	LoadBodies(rootNode, shapeMap, bodyMap);
 	LoadJoints(rootNode, bodyMap, jointMap);
-	//LoadModels(rootNode, bodyMap, jointMap);
+	LoadModels(rootNode, bodyMap, jointMap);
 
 	ndTree<ndShape*, ndInt32>::Iterator it (shapeMap);
 	for (it.Begin(); it; it++)
