@@ -61,3 +61,36 @@ void ndFileFormatModelBase::SaveModel(ndFileFormatSave* const scene, nd::TiXmlEl
 		}
 	}
 }
+
+ndModel* ndFileFormatModelBase::LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap)
+{
+	ndModelBase* const model = new ndModelBase();
+	LoadModel(node, bodyMap, jointMap, model);
+	return model;
+}
+
+void ndFileFormatModelBase::LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap, ndModel* const model)
+{
+	//ndFileFormatModel::LoadModel((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, jointMap, model);
+
+	ndModelBase* const modelBase = (ndModelBase*)model;
+	const nd::TiXmlNode* const bodiesNode = node->FirstChild("bodies");
+	ndAssert(bodiesNode);
+	for (const nd::TiXmlNode* childNode = bodiesNode->FirstChild("body"); childNode; childNode = childNode->NextSibling())
+	{
+		ndInt32 bodyId;
+		((nd::TiXmlElement*)childNode)->Attribute("int32", &bodyId);
+		ndTree<ndSharedPtr<ndBody>, ndInt32>::ndNode* const bodyNode = bodyMap.Find(bodyId);
+		modelBase->m_bodies.Append(bodyNode->GetInfo());
+	}
+
+	const nd::TiXmlNode* const jointsNode = node->FirstChild("joints");
+	ndAssert(jointsNode);
+	for (const nd::TiXmlNode* childNode = jointsNode->FirstChild("joint"); childNode; childNode = childNode->NextSibling())
+	{
+		ndInt32 jointId;
+		((nd::TiXmlElement*)childNode)->Attribute("int32", &jointId);
+		ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>::ndNode* const bodyNode = jointMap.Find(jointId);
+		modelBase->m_joints.Append(bodyNode->GetInfo());
+	}
+}

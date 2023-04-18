@@ -32,6 +32,7 @@ class ndFileFormatModel : public ndFileFormatRegistrar
 	ndFileFormatModel(const char* const className);
 
 	virtual void SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model);
+	virtual ndModel* LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap);
 };
 
 #endif 
