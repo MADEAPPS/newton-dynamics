@@ -30,13 +30,12 @@ class ndFileFormatDynamicBody : public ndFileFormatKinematicBody
 	public: 
 	ndFileFormatDynamicBody();
 	ndFileFormatDynamicBody(const char* const className);
-
-	virtual ndBody* LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap);
+	
 	virtual void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
 
+	virtual ndBody* LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap);
 	protected:
 	virtual void LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body);
-	
 };
 
 #endif 

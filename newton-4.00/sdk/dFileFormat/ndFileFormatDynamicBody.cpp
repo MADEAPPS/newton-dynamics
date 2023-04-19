@@ -47,7 +47,6 @@ ndBody* ndFileFormatDynamicBody::LoadBody(const nd::TiXmlElement* const node, co
 {
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	LoadBody(node, shapeMap, body);
-
 	return body;
 }
 

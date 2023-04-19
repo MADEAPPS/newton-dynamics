@@ -1363,13 +1363,14 @@ void ndScene::UpdateBodyList()
 	if (m_bodyList.UpdateView())
 	{
 		ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
-		#ifdef _DEBUG
-		for (ndInt32 i = 0; i < view.GetCount(); ++i)
-		{
-			ndBodyKinematic* const body = view[i];
-			ndAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
-		}
-		#endif
+		// allow for bodies with null shape to be part of the simulation.
+		//#ifdef _DEBUG
+		//for (ndInt32 i = 0; i < view.GetCount(); ++i)
+		//{
+		//	ndBodyKinematic* const body = view[i];
+		//	ndAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
+		//}
+		//#endif
 		view.PushBack(m_sentinelBody);
 	}
 }
@@ -1418,7 +1419,9 @@ void ndScene::InitBodyArray()
 				ndAssert(bodyNode->m_body == body);
 				ndAssert(!bodyNode->GetLeft());
 				ndAssert(!bodyNode->GetRight());
-				ndAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
+
+				// allow for bodies with null shape to be part of the simulation.
+				//ndAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
 
 				body->UpdateCollisionMatrix();
 				const ndInt32 test = ndBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);

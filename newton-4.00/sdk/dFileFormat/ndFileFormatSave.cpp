@@ -169,12 +169,13 @@ void ndFileFormatSave::SaveBodies(nd::TiXmlElement* const rootNode)
 		for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 		{
 			ndBody* const body = m_bodies[i];
-			ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(body->ClassName());
+			ndFileFormatRegistrar* handler = ndFileFormatRegistrar::GetHandler(body->ClassName());
 			ndAssert(handler);
 			if (!handler)
 			{
-				ndTrace(("failed to save body type: %s\n", body->ClassName()));
 				ndAssert(0);
+				ndTrace(("failed to save body type: %s\n", body->ClassName()));
+				handler = ndFileFormatRegistrar::GetHandler(body->SuperClassName());
 			}
 			if (handler)
 			{
@@ -194,11 +195,11 @@ void ndFileFormatSave::SaveJoints(nd::TiXmlElement* const rootNode)
 		for (ndInt32 i = 0; i < m_joints.GetCount(); ++i)
 		{
 			ndJointBilateralConstraint* const joint = m_joints[i];
-			ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(joint->ClassName());
+			ndFileFormatRegistrar* handler = ndFileFormatRegistrar::GetHandler(joint->ClassName());
 			if (!handler)
 			{
 				ndTrace(("failed to save joint type: %s\n", joint->ClassName()));
-				ndAssert(0);
+				handler = ndFileFormatRegistrar::GetHandler(joint->SuperClassName());
 			}
 			if (handler)
 			{
@@ -218,11 +219,12 @@ void ndFileFormatSave::SaveModels(nd::TiXmlElement* const rootNode)
 		for (ndInt32 i = 0; i < m_models.GetCount(); ++i)
 		{
 			ndModel* const model = m_models[i];
-			ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(model->ClassName());
+			ndFileFormatRegistrar* handler = ndFileFormatRegistrar::GetHandler(model->ClassName());
 			if (!handler)
 			{
-				ndTrace(("failed to save model type: %s\n", model->ClassName()));
 				ndAssert(0);
+				ndTrace(("failed to save model type: %s\n", model->ClassName()));
+				handler = ndFileFormatRegistrar::GetHandler(model->SuperClassName());
 			}
 			if (handler)
 			{

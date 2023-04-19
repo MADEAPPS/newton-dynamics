@@ -65,6 +65,13 @@ void ndFileFormatKinematicBody::SaveBody(ndFileFormatSave* const scene, nd::TiXm
 	xmlSaveParam(classNode, "maxAngleStep", kinematic->GetMaxAngularStep() * ndRadToDegree);
 }
 
+ndBody* ndFileFormatKinematicBody::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap)
+{
+	ndBodyKinematic* const body = new ndBodyKinematic();
+	LoadBody(node, shapeMap, body);
+	return body;
+}
+
 void ndFileFormatKinematicBody::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body)
 {
 	ndFileFormatBody::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);

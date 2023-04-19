@@ -148,6 +148,8 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	class ndJointSphericalMotor : public ndJointSpherical
 	{
 		public:
+		D_CLASS_REFLECTION(ndJointSphericalMotor, ndJointSpherical)
+
 		ndJointSphericalMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 			:ndJointSpherical(pinAndPivotFrame, child, parent)
 			,m_rollAngle(0.0f)
@@ -196,7 +198,6 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		ndMatrix bodyMatrix0(pinAlign * body->GetMatrix());
 		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
 		ndBodyKinematic* const fixBody = world->GetSentinelBody();
-		//ndJointSpherical* const joint = new ndJointSphericalMotor(bodyMatrix0, body, fixBody);
 		ndSharedPtr<ndJointBilateralConstraint> joint (new ndJointSphericalMotor(bodyMatrix0, body, fixBody));
 		world->AddJoint(joint);
 	}
@@ -228,8 +229,6 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 			pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
 			ndJointSpherical* const joint = new ndJointSpherical(pinMatrix, array[i - 1], array[i - 0]);
 			joint->SetAsSpringDamper(regularizer, spring, friction);
-			//joint->SetConeLimit(60.0f * ndDegreeToRad);
-			//joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 			ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
 			world->AddJoint(jointPtr);
 		}
@@ -239,8 +238,6 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		ndBodyKinematic* const fixBody = world->GetSentinelBody();
 		ndJointSpherical* const joint = new ndJointSpherical(bodyMatrix0, array[count - 1], fixBody);
 		joint->SetAsSpringDamper(regularizer, spring, friction);
-		//joint->SetConeLimit(60.0f * ndDegreeToRad);
-		//joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
 		world->AddJoint(jointPtr);
 	}
@@ -829,18 +826,18 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	ndFileFormatSave xxxxSave;
 	xxxxSave.SaveWorld(scene->GetWorld(), "xxxx.nd");
 
-	//ndFileFormatLoad xxxxLoad;
-	//xxxxLoad.Load("xxxx.nd");
-	//// offset bodies positions for calibraion;
-	//const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
-	//for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndSharedPtr<ndBody>& body = node->GetInfo();
-	//	ndMatrix bodyMatrix(body->GetMatrix());
-	//	bodyMatrix.m_posit.m_x += 0.5f;
-	//	body->SetMatrix(bodyMatrix);
-	//}
-	//xxxxLoad.AddToWorld(scene->GetWorld());
+	ndFileFormatLoad xxxxLoad;
+	xxxxLoad.Load("xxxx.nd");
+	// offset bodies positions for calibraion;
+	const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
+	for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	{
+		ndSharedPtr<ndBody>& body = node->GetInfo();
+		ndMatrix bodyMatrix(body->GetMatrix());
+		bodyMatrix.m_posit.m_x += 2.0f;
+		body->SetMatrix(bodyMatrix);
+	}
+	xxxxLoad.AddToWorld(scene->GetWorld());
 
 	scene->SetCameraMatrix(rot, origin);
 }
