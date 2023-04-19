@@ -31,6 +31,7 @@ class ndFileFormatShapeConvexCylinder : public ndFileFormatShapeConvex
 	ndFileFormatShapeConvexCylinder();
 	ndFileFormatShapeConvexCylinder(const char* const className);
 
+	virtual ndShape* LoadShape(const nd::TiXmlElement* const nNode);
 	virtual ndInt32 SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
 };
 

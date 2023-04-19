@@ -44,3 +44,11 @@ ndInt32 ndFileFormatShapeConvexCylinder::SaveShape(ndFileFormatSave* const scene
 	xmlSaveParam(classNode, "radius1", cylinder->m_radius1);
 	return xmlGetNodeId(classNode);
 }
+
+ndShape* ndFileFormatShapeConvexCylinder::LoadShape(const nd::TiXmlElement* const node)
+{
+	ndFloat32 height = xmlGetFloat(node, "height");
+	ndFloat32 radius0 = xmlGetFloat(node, "radius0");
+	ndFloat32 radius1 = xmlGetFloat(node, "radius1");
+	return new ndShapeCylinder(radius0, radius1, height * ndFloat32(2.0f));
+}
