@@ -80,16 +80,26 @@ void ndFileFormatSave::CollectScene()
 	m_bodies.SetCount(0);
 	m_models.SetCount(0);
 
-	for (ndBodyListView::ndNode* node = m_world->GetBodyList().GetFirst(); node; node = node->GetNext())
-	{
-		ndBody* const body = *node->GetInfo();
-		m_bodies.PushBack(body);
-	}
-
+	bool saveSentinel = true;
 	for (ndJointList::ndNode* node = m_world->GetJointList().GetFirst(); node; node = node->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = *node->GetInfo();
 		m_joints.PushBack(joint);
+		if (saveSentinel)
+		{
+			ndBody* const body = node->GetInfo()->GetBody1();
+			if (body == m_world->GetSentinelBody())
+			{
+				saveSentinel = false;
+				m_bodies.PushBack(body);
+			}
+		}
+	}
+
+	for (ndBodyListView::ndNode* node = m_world->GetBodyList().GetFirst(); node; node = node->GetNext())
+	{
+		ndBody* const body = *node->GetInfo();
+		m_bodies.PushBack(body);
 	}
 
 	for (ndModelList::ndNode* node = m_world->GetModelList().GetFirst(); node; node = node->GetNext())
@@ -317,13 +327,28 @@ void ndFileFormatSave::SaveModels(const ndWorld* const world, const char* const 
 			for (ndList<ndSharedPtr<ndJointBilateralConstraint>>::ndNode* mopdelNode = model->m_joints.GetFirst(); mopdelNode; mopdelNode = mopdelNode->GetNext())
 			{
 				ndJointBilateralConstraint* const joint = *mopdelNode->GetInfo();
+
+				ndBodyKinematic* const body1 = joint->GetBody1();
+				if (body1 == m_world->GetSentinelBody())
+				{
+					m_bodies.PushBack(body1);
+					bodyFilter.Insert(body1, body1);
+					break;
+				}
+			}
+
+			for (ndList<ndSharedPtr<ndJointBilateralConstraint>>::ndNode* mopdelNode = model->m_joints.GetFirst(); mopdelNode; mopdelNode = mopdelNode->GetNext())
+			{
+				ndJointBilateralConstraint* const joint = *mopdelNode->GetInfo();
+
 				ndBodyKinematic* const body0 = joint->GetBody0();
 				if (!bodyFilter.Find(body0))
 				{
 					m_bodies.PushBack(body0);
 					bodyFilter.Insert(body0, body0);
 				}
-				ndBodyKinematic* const body1 = joint->GetBody0();
+
+				ndBodyKinematic* const body1 = joint->GetBody1();
 				if (!bodyFilter.Find(body1))
 				{
 					m_bodies.PushBack(body1);
