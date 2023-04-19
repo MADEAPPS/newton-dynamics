@@ -33,6 +33,7 @@
 #include <ndFileFormatJoint.h>
 #include <ndFileFormatModel.h>
 #include <ndFileFormatNotify.h>
+#include <ndFileFormatShapeNull.h>
 #include <ndFileFormatModelBase.h>
 #include <ndFileFormatRegistrar.h>
 #include <ndFileFormatJointGear.h>

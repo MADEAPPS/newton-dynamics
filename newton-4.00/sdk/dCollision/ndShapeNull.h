@@ -28,6 +28,7 @@
 class ndShapeNull : public ndShape
 {
 	public:
+	D_CLASS_REFLECTION(ndShapeNull, ndShape)
 	ndShapeNull();
 	virtual ~ndShapeNull();
 
@@ -37,6 +38,7 @@ class ndShapeNull : public ndShape
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual ndFloat32 GetBoxMinRadius() const;
 	virtual ndFloat32 GetBoxMaxRadius() const;
+	virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
 	virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
 	virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
@@ -124,5 +126,9 @@ inline ndInt32 ndShapeNull::CalculatePlaneIntersection(const ndVector&, const nd
 	return 0;
 }
 
+inline ndUnsigned64 ndShapeNull::GetHash(ndUnsigned64) const
+{
+	return 12345678;
+}
 #endif 
 

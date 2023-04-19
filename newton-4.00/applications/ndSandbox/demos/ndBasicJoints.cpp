@@ -812,7 +812,7 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 
-	//BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
+	BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
 	//BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
 	//BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
 	//BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
@@ -829,19 +829,18 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	ndFileFormatSave xxxxSave;
 	xxxxSave.SaveWorld(scene->GetWorld(), "xxxx.nd");
 
-	ndFileFormatLoad xxxxLoad;
-	xxxxLoad.Load("xxxx.nd");
-
-	// offset bodies positions for calibraion;
-	const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
-	for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
-	{
-		ndSharedPtr<ndBody>& body = node->GetInfo();
-		ndMatrix bodyMatrix(body->GetMatrix());
-		bodyMatrix.m_posit.m_x += 0.5f;
-		body->SetMatrix(bodyMatrix);
-	}
-	xxxxLoad.AddToWorld(scene->GetWorld());
+	//ndFileFormatLoad xxxxLoad;
+	//xxxxLoad.Load("xxxx.nd");
+	//// offset bodies positions for calibraion;
+	//const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
+	//for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndSharedPtr<ndBody>& body = node->GetInfo();
+	//	ndMatrix bodyMatrix(body->GetMatrix());
+	//	bodyMatrix.m_posit.m_x += 0.5f;
+	//	body->SetMatrix(bodyMatrix);
+	//}
+	//xxxxLoad.AddToWorld(scene->GetWorld());
 
 	scene->SetCameraMatrix(rot, origin);
 }

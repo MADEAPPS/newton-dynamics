@@ -28,6 +28,7 @@
 #include "ndFileFormatJoint.h"
 #include "ndFileFormatModel.h"
 #include "ndFileFormatNotify.h"
+#include "ndFileFormatShapeNull.h"
 #include "ndFileFormatModelBase.h"
 #include "ndFileFormatJointGear.h"
 #include "ndFileFormatJointPlane.h"
@@ -107,6 +108,7 @@ ndFileFormatRegistrar::~ndFileFormatRegistrar()
 
 void ndFileFormatRegistrar::Init()
 {
+	static ndFileFormatShapeNull shapeNull;
 	static ndFileFormatShapeConvex shapeConvex;
 	static ndFileFormatShapeConvexBox shapeBox;
 	static ndFileFormatShapeConvexCone shapeCone;
