@@ -38,3 +38,8 @@ ndInt32 ndFileFormatShapeNull::SaveShape(ndFileFormatSave* const scene, nd::TiXm
 	ndFileFormatShape::SaveShape(scene, classNode, shape);
 	return xmlGetNodeId(classNode);
 }
+
+ndShape* ndFileFormatShapeNull::LoadShape(const nd::TiXmlElement* const)
+{
+	return new ndShapeNull();
+}

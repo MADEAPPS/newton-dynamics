@@ -31,6 +31,7 @@ class ndFileFormatShapeNull : public ndFileFormatShape
 	ndFileFormatShapeNull();
 	ndFileFormatShapeNull(const char* const className);
 
+	virtual ndShape* LoadShape(const nd::TiXmlElement* const nNode);
 	virtual ndInt32 SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
 };
 
