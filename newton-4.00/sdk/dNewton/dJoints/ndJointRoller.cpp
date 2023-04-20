@@ -122,6 +122,17 @@ void ndJointRoller::SetLimitStateAngle(bool state)
 
 void ndJointRoller::SetLimitsAngle(ndFloat32 minLimit, ndFloat32 maxLimit)
 {
+#ifdef _DEBUG
+	if (minLimit > 0.0f)
+	{
+		ndTrace(("warning: %s minLimit %f larger than zero\n", __FUNCTION__, minLimit))
+	}
+	if (maxLimit < 0.0f)
+	{
+		ndTrace(("warning: %s m_maxLimit %f smaller than zero\n", __FUNCTION__, maxLimit))
+	}
+#endif
+
 	ndAssert(minLimit <= 0.0f);
 	ndAssert(maxLimit >= 0.0f);
 	m_minLimitAngle = minLimit;
@@ -129,13 +140,15 @@ void ndJointRoller::SetLimitsAngle(ndFloat32 minLimit, ndFloat32 maxLimit)
 
 	if (m_angle > m_maxLimitAngle)
 	{
-		const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_maxLimitAngle);
-		m_angle = m_maxLimitAngle + deltaAngle;
+		//const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_maxLimitAngle);
+		//m_angle = m_maxLimitAngle + deltaAngle;
+		m_angle = m_maxLimitAngle;
 	} 
 	else if (m_angle < m_minLimitAngle)
 	{
-		const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_minLimitAngle);
-		m_angle = m_minLimitAngle + deltaAngle;
+		//const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_minLimitAngle);
+		//m_angle = m_minLimitAngle + deltaAngle;
+		m_angle = m_minLimitAngle;
 	}
 }
 
@@ -192,14 +205,37 @@ bool ndJointRoller::GetLimitStatePosit() const
 void ndJointRoller::SetLimitStatePosit(bool state)
 {
 	m_limitStatePosit = state ? 1 : 0;
+	if (m_limitStateAngle)
+	{
+		SetLimitsAngle(m_minLimitAngle, m_maxLimitAngle);
+	}
 }
 
 void ndJointRoller::SetLimitsPosit(ndFloat32 minLimit, ndFloat32 maxLimit)
 {
 	ndAssert(minLimit <= 0.0f);
 	ndAssert(maxLimit >= 0.0f);
+#ifdef _DEBUG
+	if (minLimit > 0.0f)
+	{
+		ndTrace(("warning: %s minLimit %f larger than zero\n", __FUNCTION__, minLimit))
+	}
+	if (maxLimit < 0.0f)
+	{
+		ndTrace(("warning: %s m_maxLimit %f smaller than zero\n", __FUNCTION__, maxLimit))
+	}
+#endif
+
 	m_minLimitPosit = minLimit;
 	m_maxLimitPosit = maxLimit;
+	if (m_posit > m_maxLimitPosit)
+	{
+		m_posit = m_maxLimitPosit;
+	}
+	else if (m_posit < m_minLimitPosit)
+	{
+		m_posit = m_minLimitPosit;
+	}
 }
 
 void ndJointRoller::GetLimitsPosit(ndFloat32& minLimit, ndFloat32& maxLimit) const

@@ -19,6 +19,30 @@
 #define D_MAX_HINGE_RECOVERY_SPEED	ndFloat32 (0.25f)
 #define D_MAX_HINGE_PENETRATION		(ndFloat32 (4.0f) * ndDegreeToRad)
 
+ndJointCylinder::ndJointCylinder()
+	:ndJointBilateralConstraint()
+	,m_angle(ndFloat32(0.0f))
+	,m_omega(ndFloat32(0.0f))
+	,m_springKAngle(ndFloat32(0.0f))
+	,m_damperCAngle(ndFloat32(0.0f))
+	,m_minLimitAngle(ndFloat32(-1.0e10f))
+	,m_maxLimitAngle(ndFloat32(1.0e10f))
+	,m_offsetAngle(ndFloat32(0.0f))
+	,m_springDamperRegularizerAngle(ndFloat32(0.1f))
+	,m_posit(ndFloat32(0.0f))
+	,m_speed(ndFloat32(0.0f))
+	,m_springKPosit(ndFloat32(0.0f))
+	,m_damperCPosit(ndFloat32(0.0f))
+	,m_minLimitPosit(ndFloat32(-1.0e10f))
+	,m_maxLimitPosit(ndFloat32(1.0e10f))
+	,m_offsetPosit(ndFloat32(0.0f))
+	,m_springDamperRegularizerPosit(ndFloat32(0.1f))
+	,m_limitStatePosit(0)
+	,m_limitStateAngle(0)
+{
+	m_maxDof = 8;
+}
+
 ndJointCylinder::ndJointCylinder(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
 	,m_angle(ndFloat32(0.0f))
@@ -98,20 +122,31 @@ void ndJointCylinder::SetLimitStateAngle(bool state)
 
 void ndJointCylinder::SetLimitsAngle(ndFloat32 minLimit, ndFloat32 maxLimit)
 {
-	ndAssert(minLimit <= 0.0f);
-	ndAssert(maxLimit >= 0.0f);
+#ifdef _DEBUG
+	if (minLimit > 0.0f)
+	{
+		ndTrace(("warning: %s minLimit %f larger than zero\n", __FUNCTION__, minLimit))
+	}
+	if (maxLimit < 0.0f)
+	{
+		ndTrace(("warning: %s m_maxLimit %f smaller than zero\n", __FUNCTION__, maxLimit))
+	}
+#endif
+
 	m_minLimitAngle = minLimit;
 	m_maxLimitAngle = maxLimit;
 
 	if (m_angle > m_maxLimitAngle)
 	{
-		const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_maxLimitAngle);
-		m_angle = m_maxLimitAngle + deltaAngle;
+		//const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_maxLimitAngle);
+		//m_angle = m_maxLimitAngle + deltaAngle;
+		m_angle = m_maxLimitAngle;
 	} 
 	else if (m_angle < m_minLimitAngle)
 	{
-		const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_minLimitAngle);
-		m_angle = m_minLimitAngle + deltaAngle;
+		//const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_minLimitAngle);
+		//m_angle = m_minLimitAngle + deltaAngle;
+		m_angle = m_minLimitAngle;
 	}
 }
 
@@ -168,14 +203,38 @@ bool ndJointCylinder::GetLimitStatePosit() const
 void ndJointCylinder::SetLimitStatePosit(bool state)
 {
 	m_limitStatePosit = state ? 1 : 0;
+	if (m_limitStatePosit)
+	{
+		SetLimitsPosit(m_minLimitPosit, m_maxLimitPosit);
+	}
 }
 
 void ndJointCylinder::SetLimitsPosit(ndFloat32 minLimit, ndFloat32 maxLimit)
 {
 	ndAssert(minLimit <= 0.0f);
 	ndAssert(maxLimit >= 0.0f);
+
+#ifdef _DEBUG
+	if (minLimit > 0.0f)
+	{
+		ndTrace(("warning: %s minLimit %f larger than zero\n", __FUNCTION__, minLimit))
+	}
+	if (maxLimit < 0.0f)
+	{
+		ndTrace(("warning: %s m_maxLimit %f smaller than zero\n", __FUNCTION__, maxLimit))
+	}
+#endif
+
 	m_minLimitPosit = minLimit;
 	m_maxLimitPosit = maxLimit;
+	if (m_posit > m_maxLimitPosit)
+	{
+		m_posit = m_maxLimitPosit;
+	}
+	else if (m_posit < m_minLimitPosit)
+	{
+		m_posit = m_minLimitPosit;
+	}
 }
 
 void ndJointCylinder::GetLimitsPosit(ndFloat32& minLimit, ndFloat32& maxLimit) const

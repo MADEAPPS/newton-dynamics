@@ -107,9 +107,9 @@ void ndJointSlider::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 	{
 		ndTrace(("warning: %s minLimit %f larger than zero\n", __FUNCTION__, minLimit))
 	}
-	if (m_maxLimit < 0.0f)
+	if (maxLimit < 0.0f)
 	{
-		ndTrace(("warning: %s m_maxLimit %f smaller than zero\n", __FUNCTION__, minLimit))
+		ndTrace(("warning: %s m_maxLimit %f smaller than zero\n", __FUNCTION__, maxLimit))
 	}
 #endif
 
