@@ -40,3 +40,20 @@ void ndFileFormatJointPlane::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlE
 	ndJointPlane* const exportJoint = (ndJointPlane*)joint;
 	xmlSaveParam(classNode, "ControlRotation", exportJoint->GetEnableControlRotation() ? 1 : 0);
 }
+
+ndJointBilateralConstraint* ndFileFormatJointPlane::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndJointPlane* const joint = new ndJointPlane();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointPlane::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+
+	ndJointPlane* const inportJoint = (ndJointPlane*)joint;
+
+	ndInt32 ControlRotation = xmlGetFloat(node, "ControlRotation");
+	inportJoint->EnableControlRotation(ControlRotation ? true : false);
+}

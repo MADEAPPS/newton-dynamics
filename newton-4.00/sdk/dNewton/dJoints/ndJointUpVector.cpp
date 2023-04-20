@@ -13,6 +13,12 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointUpVector.h"
 
+ndJointUpVector::ndJointUpVector()
+	:ndJointBilateralConstraint()
+{
+	m_maxDof = 2;
+}
+
 ndJointUpVector::ndJointUpVector(const ndVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(2, child, parent, ndGetIdentityMatrix())
 {

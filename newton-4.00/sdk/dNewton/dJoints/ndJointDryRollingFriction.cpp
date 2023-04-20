@@ -13,6 +13,14 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointDryRollingFriction.h"
 
+ndJointDryRollingFriction::ndJointDryRollingFriction()
+	:ndJointBilateralConstraint()
+	,m_coefficient(ndFloat32(0.5f))
+	,m_contactTrail(ndFloat32(0.1f))
+{
+	m_maxDof = 1;
+}
+
 ndJointDryRollingFriction::ndJointDryRollingFriction(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndFloat32 coefficient)
 	:ndJointBilateralConstraint(1, body0, body1, ndGetIdentityMatrix())
 	,m_coefficient(ndClamp (coefficient, ndFloat32(0.0f), ndFloat32 (1.0f)))

@@ -13,6 +13,13 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointPlane.h"
 
+ndJointPlane::ndJointPlane()
+	:ndJointBilateralConstraint()
+	,m_enableControlRotation(true)
+{
+	m_maxDof = 5;
+}
+
 ndJointPlane::ndJointPlane (const ndVector& pivot, const ndVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(5, child, parent, ndGetIdentityMatrix())
 	,m_enableControlRotation(true)

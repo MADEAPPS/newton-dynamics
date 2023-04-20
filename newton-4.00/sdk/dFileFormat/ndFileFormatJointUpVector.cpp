@@ -37,3 +37,15 @@ void ndFileFormatJointUpVector::SaveJoint(ndFileFormatSave* const scene, nd::TiX
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointUpVector::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 }
+
+ndJointBilateralConstraint* ndFileFormatJointUpVector::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndJointUpVector* const joint = new ndJointUpVector();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointUpVector::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+}

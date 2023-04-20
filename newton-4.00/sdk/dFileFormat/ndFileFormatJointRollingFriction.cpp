@@ -41,3 +41,22 @@ void ndFileFormatJointRollingFriction::SaveJoint(ndFileFormatSave* const scene, 
 	xmlSaveParam(classNode, "contactTrail", exportJoint->GetContactTrail());
 	xmlSaveParam(classNode, "frictionCoefficient", exportJoint->GetFrictionCoefficient());
 }
+
+ndJointBilateralConstraint* ndFileFormatJointRollingFriction::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndJointDryRollingFriction* const joint = new ndJointDryRollingFriction();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointRollingFriction::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+
+	ndJointDryRollingFriction* const inportJoint = (ndJointDryRollingFriction*)joint;
+
+	ndFloat32 contactTrail = xmlGetFloat(node, "contactTrail");
+	ndFloat32 frictionCoefficient = xmlGetFloat(node, "frictionCoefficient");
+	inportJoint->SetContactTrail(contactTrail);
+	inportJoint->SetFrictionCoefficient(frictionCoefficient);
+}
