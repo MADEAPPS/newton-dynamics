@@ -791,7 +791,7 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
 	BuildRoller(scene, ndVector(0.0f, 0.0f, 9.0f, 1.0f), 10.0f, 0.75f);
 	BuildCylindrical(scene, ndVector(0.0f, 0.0f, 12.0f, 1.0f), 10.0f, 0.75f);
-	//BuildFixDistanceJoints(scene, ndVector( 4.0f, 0.0f, -5.0f, 1.0f));
+	BuildFixDistanceJoints(scene, ndVector( 4.0f, 0.0f, -5.0f, 1.0f));
 	//BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
 	//BuildPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
@@ -809,7 +809,7 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	{
 		ndSharedPtr<ndBody>& body = node->GetInfo();
 		ndMatrix bodyMatrix(body->GetMatrix());
-		bodyMatrix.m_posit.m_x += 2.0f;
+		bodyMatrix.m_posit.m_x += 4.0f;
 		body->SetMatrix(bodyMatrix);
 	}
 	xxxxLoad.AddToWorld(scene->GetWorld());
