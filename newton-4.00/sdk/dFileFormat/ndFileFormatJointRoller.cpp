@@ -73,7 +73,6 @@ void ndFileFormatJointRoller::SaveJoint(ndFileFormatSave* const scene, nd::TiXml
 	xmlSaveParam(classNode, "limitStatePosit", exportJoint->GetLimitStatePosit() ? 1 : 0);
 }
 
-
 ndJointBilateralConstraint* ndFileFormatJointRoller::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
 {
 	ndJointRoller* const joint = new ndJointRoller();
