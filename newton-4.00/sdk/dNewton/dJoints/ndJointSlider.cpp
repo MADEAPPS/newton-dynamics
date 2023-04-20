@@ -16,6 +16,21 @@
 #define D_MAX_SLIDER_RECOVERY_SPEED	ndFloat32 (0.5f)
 #define D_MAX_SLIDER_PENETRATION	ndFloat32 (0.05f)
 
+ndJointSlider::ndJointSlider()
+	:ndJointBilateralConstraint()
+	,m_posit(ndFloat32(0.0f))
+	,m_speed(ndFloat32(0.0f))
+	,m_springK(ndFloat32(0.0f))
+	,m_damperC(ndFloat32(0.0f))
+	,m_minLimit(ndFloat32(-1.0e10f))
+	,m_maxLimit(ndFloat32(1.0e10f))
+	,m_positOffset(ndFloat32(0.0f))
+	,m_springDamperRegularizer(ndFloat32(0.1f))
+	,m_limitState(0)
+{
+	m_maxDof = 7;
+}
+
 ndJointSlider::ndJointSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	,m_posit(ndFloat32 (0.0f))
@@ -79,14 +94,35 @@ bool ndJointSlider::GetLimitState() const
 void ndJointSlider::SetLimitState(bool state)
 {
 	m_limitState = state ? 1 : 0;
+	if (m_limitState)
+	{
+		SetLimits(m_minLimit, m_maxLimit);
+	}
 }
 
 void ndJointSlider::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 {
-	ndAssert(minLimit <= 0.0f);
-	ndAssert(maxLimit >= 0.0f);
+#ifdef _DEBUG
+	if (minLimit > 0.0f)
+	{
+		ndTrace(("warning: %s minLimit %f larger than zero\n", __FUNCTION__, minLimit))
+	}
+	if (m_maxLimit < 0.0f)
+	{
+		ndTrace(("warning: %s m_maxLimit %f smaller than zero\n", __FUNCTION__, minLimit))
+	}
+#endif
+
 	m_minLimit = minLimit;
 	m_maxLimit = maxLimit;
+	if (m_posit > m_maxLimit)
+	{
+		m_posit = m_maxLimit;
+	}
+	else if (m_posit < m_minLimit)
+	{
+		m_posit = m_minLimit;
+	}
 }
 
 void ndJointSlider::GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit) const

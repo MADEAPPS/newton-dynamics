@@ -322,9 +322,8 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 		public:
 		ndJointSliderOscillator(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 			:ndJointSlider(pinAndPivotFrame, child, parent)
-			, m_angle(0.0f)
+			,m_angle(0.0f)
 		{
-	
 		}
 	
 		void JacobianDerivative(ndConstraintDescritor& desc)
@@ -358,6 +357,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 		ndJointSlider* const joint = new ndJointSlider(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
 		joint->SetAsSpringDamper(0.1f, 100.0f, 5.0f);
 		joint->SetLimits(-1.0f, 1.0f);
+		joint->SetLimitState(true);
 		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
 		world->AddJoint(jointPtr);
 	}
@@ -369,6 +369,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 		ndJointSlider* const joint = new ndJointSlider(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
 		joint->SetAsSpringDamper(0.1f, 0.0f, 10.0f);
 		joint->SetLimits(-1.0f, 1.0f);
+		joint->SetLimitState(true);
 		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
 		world->AddJoint(jointPtr);
 	}
@@ -380,6 +381,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 		ndJointSlider* const joint = new ndJointSliderOscillator(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
 		joint->SetAsSpringDamper(0.1f, 500.0f, 10.0f);
 		joint->SetLimits(-1.0f, 1.0f);
+		joint->SetLimitState(true);
 		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
 		world->AddJoint(jointPtr);
 	}
@@ -445,6 +447,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 		ndJointHinge* const joint = new ndJointHinge(matrix, body, fixBody);
 		joint->SetAsSpringDamper(0.1f, 20.0f, 1.0f);
 		joint->SetLimits(-3.0f, 3.0f);
+		joint->SetLimitState(true);
 		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
 		world->AddJoint(jointPtr);
 	}
@@ -456,6 +459,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 		ndJointHinge* const joint = new ndJointHinge(matrix, body, fixBody);
 		joint->SetAsSpringDamper(0.1f, 0.0f, 1.0f);
 		joint->SetLimits(-10.0f, 15.0f);
+		joint->SetLimitState(true);
 		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
 		world->AddJoint(jointPtr);
 	}
@@ -809,11 +813,11 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 
-	BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
-	BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
-	//BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
+	//BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
+	//BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
+	BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
 	//BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
+	//BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
 	//BuildRoller(scene, ndVector(0.0f, 0.0f, 9.0f, 1.0f), 10.0f, 0.75f);
 	//BuildCylindrical(scene, ndVector(0.0f, 0.0f, 12.0f, 1.0f), 10.0f, 0.75f);
 	//BuildFixDistanceJoints(scene, ndVector( 4.0f, 0.0f, -5.0f, 1.0f));

@@ -40,18 +40,45 @@ void ndFileFormatJointSlider::SaveJoint(ndFileFormatSave* const scene, nd::TiXml
 	ndFloat32 spring;
 	ndFloat32 damper;
 	ndFloat32 regularizer;
-	ndFloat32 minTwistAngle; 
-	ndFloat32 maxTwistAngle;
+	ndFloat32 minTwistPosit; 
+	ndFloat32 maxTwistPosit;
 	ndJointSlider* const exportJoint = (ndJointSlider*)joint;
 
 	exportJoint->GetSpringDamper(regularizer, spring, damper);
-	exportJoint->GetLimits(minTwistAngle, maxTwistAngle);
+	exportJoint->GetLimits(minTwistPosit, maxTwistPosit);
 
 	xmlSaveParam(classNode, "offsetPosit", exportJoint->GetOffsetPosit());
 	xmlSaveParam(classNode, "springConstant", spring);
 	xmlSaveParam(classNode, "damperConstant", damper);
 	xmlSaveParam(classNode, "springRegularizer", regularizer);
-	xmlSaveParam(classNode, "minTwistAngle", minTwistAngle * ndRadToDegree);
-	xmlSaveParam(classNode, "maxTwistAngle", minTwistAngle * ndRadToDegree);
+	xmlSaveParam(classNode, "minTwistPosit", minTwistPosit);
+	xmlSaveParam(classNode, "maxTwistPosit", maxTwistPosit);
 	xmlSaveParam(classNode, "limitState", exportJoint->GetLimitState() ? 1 : 0);
+}
+
+ndJointBilateralConstraint* ndFileFormatJointSlider::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndJointSlider* const joint = new ndJointSlider();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointSlider::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+
+	ndFloat32 offsetPosit = xmlGetFloat(node, "offsetPosit");
+	ndFloat32 spring = xmlGetFloat(node, "springConstant");
+	ndFloat32 damper = xmlGetFloat(node, "damperConstant");
+	ndFloat32 regularizer = xmlGetFloat(node, "springRegularizer");
+	ndFloat32 minTwistPosit = xmlGetFloat(node, "minTwistPosit");
+	ndFloat32 maxTwistPosit = xmlGetFloat(node, "maxTwistPosit");
+	ndInt32 state = xmlGetInt(node, "limitState");
+
+	ndJointSlider* const inportJoint = (ndJointSlider*)joint;
+
+	inportJoint->SetOffsetPosit(offsetPosit);
+	inportJoint->SetAsSpringDamper(regularizer, spring, damper);
+	inportJoint->SetLimits(minTwistPosit, maxTwistPosit);
+	inportJoint->SetLimitState(state ? true : false);
 }

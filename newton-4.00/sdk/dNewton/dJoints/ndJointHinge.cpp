@@ -102,9 +102,9 @@ void ndJointHinge::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 		ndTrace(("warning: %s m_maxLimit %f smaller than zero\n", __FUNCTION__, minLimit))
 	}
 	#endif
+
 	m_minLimit = minLimit;
 	m_maxLimit = maxLimit;
-
 	if (m_angle > m_maxLimit)
 	{
 		//const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_maxLimit);
