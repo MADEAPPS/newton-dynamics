@@ -222,7 +222,6 @@ void ndFileFormatSave::SaveModels(nd::TiXmlElement* const rootNode)
 			ndFileFormatRegistrar* handler = ndFileFormatRegistrar::GetHandler(model->ClassName());
 			if (!handler)
 			{
-				ndAssert(0);
 				ndTrace(("failed to save model type: %s\n", model->ClassName()));
 				handler = ndFileFormatRegistrar::GetHandler(model->SuperClassName());
 			}
