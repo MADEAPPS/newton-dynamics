@@ -13,6 +13,12 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointGear.h"
 
+ndJointGear::ndJointGear()
+	:ndJointBilateralConstraint()
+{
+	m_maxDof = 1;
+}
+
 ndJointGear::ndJointGear(ndFloat32 gearRatio,
 	const ndVector& body0Pin, ndBodyKinematic* const body0,
 	const ndVector& body1Pin, ndBodyKinematic* const body1)

@@ -19,6 +19,8 @@ class ndJointRoller: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointRoller, ndJointBilateralConstraint)
+
+	D_NEWTON_API ndJointRoller();
 	D_NEWTON_API ndJointRoller(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API ndJointRoller(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointRoller();

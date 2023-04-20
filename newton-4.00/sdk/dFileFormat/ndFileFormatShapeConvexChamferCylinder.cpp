@@ -40,6 +40,13 @@ ndInt32 ndFileFormatShapeConvexChamferCylinder::SaveShape(ndFileFormatSave* cons
 	const ndShapeChamferCylinder* const cylinder = (ndShapeChamferCylinder*)shape;
 
 	xmlSaveParam(classNode, "height", cylinder->m_height);
-	xmlSaveParam(classNode, "radius0", cylinder->m_radius);
+	xmlSaveParam(classNode, "radius", cylinder->m_radius);
 	return xmlGetNodeId(classNode);
+}
+
+ndShape* ndFileFormatShapeConvexChamferCylinder::LoadShape(const nd::TiXmlElement* const node)
+{
+	ndFloat32 height = xmlGetFloat(node, "height");
+	ndFloat32 radius = xmlGetFloat(node, "radius");
+	return new ndShapeChamferCylinder(radius, height * ndFloat32(2.0f));
 }

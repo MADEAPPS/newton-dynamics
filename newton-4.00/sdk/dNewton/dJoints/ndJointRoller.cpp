@@ -19,6 +19,30 @@
 #define D_MAX_HINGE_RECOVERY_SPEED	ndFloat32 (0.25f)
 #define D_MAX_HINGE_PENETRATION		(ndFloat32 (4.0f) * ndDegreeToRad)
 
+ndJointRoller::ndJointRoller()
+	:ndJointBilateralConstraint()
+	,m_angle(ndFloat32(0.0f))
+	,m_omega(ndFloat32(0.0f))
+	,m_springKAngle(ndFloat32(0.0f))
+	,m_damperCAngle(ndFloat32(0.0f))
+	,m_minLimitAngle(ndFloat32(-1.0e10f))
+	,m_maxLimitAngle(ndFloat32(1.0e10f))
+	,m_offsetAngle(ndFloat32(0.0f))
+	,m_springDamperRegularizerAngle(ndFloat32(0.1f))
+	,m_posit(ndFloat32(0.0f))
+	,m_speed(ndFloat32(0.0f))
+	,m_springKPosit(ndFloat32(0.0f))
+	,m_damperCPosit(ndFloat32(0.0f))
+	,m_minLimitPosit(ndFloat32(-1.0e10f))
+	,m_maxLimitPosit(ndFloat32(1.0e10f))
+	,m_offsetPosit(ndFloat32(0.0f))
+	,m_springDamperRegularizerPosit(ndFloat32(0.1f))
+	,m_limitStatePosit(0)
+	,m_limitStateAngle(0)
+{
+	m_maxDof = 8;
+}
+
 ndJointRoller::ndJointRoller(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
 	,m_angle(ndFloat32(0.0f))
