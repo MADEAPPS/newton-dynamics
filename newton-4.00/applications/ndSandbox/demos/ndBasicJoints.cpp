@@ -36,10 +36,22 @@ class ndSplinePathBody : public ndBodyDynamic
 
 		void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 		{
-			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndSplinePathBody", ndSplinePathBody::StaticClassName());
+			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndSplinePathBody::StaticClassName());
 			ndFileFormatDynamicBody::SaveBody(scene, classNode, body);
 		}
+
+		virtual ndBody* LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap)
+		{
+			ndSplinePathBody* const body = new ndSplinePathBody();
+			ndFileFormatDynamicBody::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
+			return body;
+		}
 	};
+
+	ndSplinePathBody()
+		:ndBodyDynamic()
+	{
+	}
 
 	ndSplinePathBody(ndDemoEntityManager* const scene, ndMatrix& matrix)
 		:ndBodyDynamic()
@@ -102,12 +114,24 @@ class ndJointFollowSplinePath : public ndJointFollowPath
 			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointFollowSplinePath::StaticClassName());
 			ndFileFormatJointFollowPath::SaveJoint(scene, classNode, joint);
 		}
+
+		ndJointBilateralConstraint* LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+		{
+			ndJointFollowSplinePath* const joint = new ndJointFollowSplinePath();
+			ndFileFormatJointFollowPath::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+			return joint;
+		}
 	};
+
+	ndJointFollowSplinePath()
+		:ndJointFollowPath()
+	{
+	}
 
 	ndJointFollowSplinePath(const ndMatrix& pinAndPivotFrame, ndBodyDynamic* const child, ndBodyDynamic* const pathBody)
 		:ndJointFollowPath(pinAndPivotFrame, child, pathBody)
 	{
-		static ndJointFollowSplinePathSaveLoad loadSave;
+		//static ndJointFollowSplinePathSaveLoad loadSave;
 	}
 
 	void GetPointAndTangentAtLocation(const ndVector& location, ndVector& positOut, ndVector& tangentOut) const
@@ -793,7 +817,7 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	BuildCylindrical(scene, ndVector(0.0f, 0.0f, 12.0f, 1.0f), 10.0f, 0.75f);
 	BuildFixDistanceJoints(scene, ndVector( 4.0f, 0.0f, -5.0f, 1.0f));
 	BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
-	//BuildPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
+	BuildPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	ndQuaternion rot;
 	ndVector origin(-20.0f, 5.0f, 0.0f, 1.0f);

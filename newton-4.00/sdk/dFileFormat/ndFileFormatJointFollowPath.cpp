@@ -36,8 +36,17 @@ void ndFileFormatJointFollowPath::SaveJoint(ndFileFormatSave* const scene, nd::T
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointFollowPath::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
+}
 
-	//ndJointFollowPath* const exportJoint = (ndJointFollowPath*)joint;
-	//xmlSaveParam(classNode, "contactTrail", exportJoint->GetContactTrail());
-	//xmlSaveParam(classNode, "frictionCoefficient", exportJoint->GetFrictionCoefficient());
+ndJointBilateralConstraint* ndFileFormatJointFollowPath::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndJointFollowPath* const joint = new ndJointFollowPath();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointFollowPath::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+	//ndJointFollowPath* const inportJoint = (ndJointFollowPath*)joint;
 }

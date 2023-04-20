@@ -13,6 +13,12 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointFollowPath.h"
 
+ndJointFollowPath::ndJointFollowPath()
+	:ndJointBilateralConstraint()
+{
+	m_maxDof = 6;
+}
+
 ndJointFollowPath::ndJointFollowPath (const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 {
