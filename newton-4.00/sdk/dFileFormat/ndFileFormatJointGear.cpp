@@ -52,8 +52,8 @@ void ndFileFormatJointGear::LoadJoint(const nd::TiXmlElement* const node, const 
 {
 	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
 
-	ndFloat32 ratio = xmlGetFloat(node, "ratio");
-
 	ndJointGear* const inportJoint = (ndJointGear*)joint;
+
+	ndFloat32 ratio = xmlGetFloat(node, "ratio");
 	inportJoint->SetRatio(ratio);
 }

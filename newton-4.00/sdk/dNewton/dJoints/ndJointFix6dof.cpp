@@ -13,6 +13,15 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointFix6dof.h"
 
+ndJointFix6dof::ndJointFix6dof()
+	:ndJointBilateralConstraint()
+	,m_softness(ndFloat32(0.0f))
+	,m_maxForce(D_MAX_BOUND)
+	,m_maxTorque(D_MAX_BOUND)
+{
+	m_maxDof = 6;
+}
+
 ndJointFix6dof::ndJointFix6dof(const ndMatrix& frameInGlbalSpace, ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 	:ndJointBilateralConstraint(6, body0, body1, frameInGlbalSpace)
 	,m_softness(ndFloat32(0.0f))

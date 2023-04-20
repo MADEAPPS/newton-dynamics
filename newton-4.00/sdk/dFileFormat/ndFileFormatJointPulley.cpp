@@ -40,3 +40,20 @@ void ndFileFormatJointPulley::SaveJoint(ndFileFormatSave* const scene, nd::TiXml
 	ndJointPulley* const exportJoint = (ndJointPulley*)joint;
 	xmlSaveParam(classNode, "ratio", exportJoint->GetRatio());
 }
+
+ndJointBilateralConstraint* ndFileFormatJointPulley::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndJointPulley* const joint = new ndJointPulley();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointPulley::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+
+	ndJointPulley* const inportJoint = (ndJointPulley*)joint;
+
+	ndFloat32 ratio = xmlGetFloat(node, "ratio");
+	inportJoint->SetRatio(ratio);
+}

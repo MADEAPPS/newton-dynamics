@@ -40,3 +40,20 @@ void ndFileFormatJointFix6dof::SaveJoint(ndFileFormatSave* const scene, nd::TiXm
 	ndJointFix6dof* const exportJoint = (ndJointFix6dof*)joint;
 	xmlSaveParam(classNode, "softness", exportJoint->GetRegularizer());
 }
+
+ndJointBilateralConstraint* ndFileFormatJointFix6dof::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndJointFix6dof* const joint = new ndJointFix6dof();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointFix6dof::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+
+	ndJointFix6dof* const inportJoint = (ndJointFix6dof*)joint;
+
+	ndFloat32 softness = xmlGetFloat(node, "softness");
+	inportJoint->SetRegularizer(softness);
+}

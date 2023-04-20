@@ -13,6 +13,13 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointPulley.h"
 
+ndJointPulley::ndJointPulley()
+	:ndJointBilateralConstraint()
+	,m_gearRatio(ndFloat32 (1.0f))
+{
+	m_maxDof = 1;
+}
+
 ndJointPulley::ndJointPulley(ndFloat32 gearRatio,
 	const ndVector& body0Pin, ndBodyKinematic* const body0,
 	const ndVector& body1Pin, ndBodyKinematic* const body1)

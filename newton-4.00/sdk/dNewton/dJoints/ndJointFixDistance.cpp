@@ -13,19 +13,15 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointFixDistance.h"
 
+ndJointFixDistance::ndJointFixDistance()
+	:ndJointBilateralConstraint()
+{
+	m_maxDof = 1;
+}
+
 ndJointFixDistance::ndJointFixDistance(const ndVector& pivotInChildInGlobalSpace, const ndVector& pivotInParentInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(1, child, parent, ndGetIdentityMatrix())
 {
-	//ndMatrix childMatrix(ndGetIdentityMatrix());
-	//ndMatrix parentMatrix(ndGetIdentityMatrix());
-	//childMatrix.m_posit = pivotInChildInGlobalSpace;
-	//parentMatrix.m_posit = pivotInParentInGlobalSpace;
-	//childMatrix.m_posit.m_w = 1.0f;
-	//parentMatrix.m_posit.m_w = 1.0f;
-	//ndMatrix dummy;
-	//CalculateLocalMatrix(childMatrix, m_localMatrix0, dummy);
-	//CalculateLocalMatrix(parentMatrix, dummy, m_localMatrix1);
-
 	m_localMatrix0 = ndGetIdentityMatrix();
 	m_localMatrix1 = ndGetIdentityMatrix();
 	m_localMatrix0.m_posit = child->GetMatrix().UntransformVector(pivotInChildInGlobalSpace);
