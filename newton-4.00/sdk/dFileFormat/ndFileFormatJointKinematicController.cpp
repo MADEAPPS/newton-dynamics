@@ -46,3 +46,31 @@ void ndFileFormatJointKinematicController::SaveJoint(ndFileFormatSave* const sce
 	xmlSaveParam(classNode, "maxAngularFriction", exportJoint->GetMaxAngularFriction());
 	xmlSaveParam(classNode, "angularFrictionCoefficient", exportJoint->GetAngularViscousFrictionCoefficient());
 }
+
+ndJointBilateralConstraint* ndFileFormatJointKinematicController::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndJointHinge* const joint = new ndJointHinge();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointKinematicController::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+
+	ndJointKinematicController* const inportJoint = (ndJointKinematicController*)joint;
+
+	ndFloat32 maxSpeed = xmlGetFloat(node, "maxSpeed");
+	ndFloat32 maxOmega = xmlGetFloat(node, "maxOmega");
+	ndInt32 controlMode = xmlGetInt(node, "controlMode");
+	ndFloat32 maxLinearFriction = xmlGetFloat(node, "maxLinearFriction");
+	ndFloat32 maxAngularFriction = xmlGetFloat(node, "maxAngularFriction");
+	ndFloat32 angularFrictionCoefficient = xmlGetFloat(node, "angularFrictionCoefficient");
+
+	inportJoint->SetMaxSpeed(maxSpeed);
+	inportJoint->SetMaxOmega(maxOmega);
+	inportJoint->SetMaxLinearFriction(maxLinearFriction);
+	inportJoint->SetMaxAngularFriction(maxAngularFriction);
+	inportJoint->SetAngularViscousFrictionCoefficient(angularFrictionCoefficient);
+	inportJoint->SetControlMode(ndJointKinematicController::ndControlModes(controlMode));
+}

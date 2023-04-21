@@ -26,6 +26,8 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	};
 
 	D_CLASS_REFLECTION(ndJointKinematicController, ndJointBilateralConstraint)
+
+	D_NEWTON_API ndJointKinematicController();
 	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const ndVector& attachmentPointInGlobalSpace);
 	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const ndMatrix& attachmentMatrixInGlobalSpace);
 	D_NEWTON_API virtual ~ndJointKinematicController();

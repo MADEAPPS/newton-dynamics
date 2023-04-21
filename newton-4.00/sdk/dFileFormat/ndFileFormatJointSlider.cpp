@@ -67,6 +67,8 @@ void ndFileFormatJointSlider::LoadJoint(const nd::TiXmlElement* const node, cons
 {
 	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
 
+	ndJointSlider* const inportJoint = (ndJointSlider*)joint;
+
 	ndFloat32 offsetPosit = xmlGetFloat(node, "offsetPosit");
 	ndFloat32 spring = xmlGetFloat(node, "springConstant");
 	ndFloat32 damper = xmlGetFloat(node, "damperConstant");
@@ -74,8 +76,6 @@ void ndFileFormatJointSlider::LoadJoint(const nd::TiXmlElement* const node, cons
 	ndFloat32 minTwistPosit = xmlGetFloat(node, "minTwistPosit");
 	ndFloat32 maxTwistPosit = xmlGetFloat(node, "maxTwistPosit");
 	ndInt32 state = xmlGetInt(node, "limitState");
-
-	ndJointSlider* const inportJoint = (ndJointSlider*)joint;
 
 	inportJoint->SetOffsetPosit(offsetPosit);
 	inportJoint->SetAsSpringDamper(regularizer, spring, damper);

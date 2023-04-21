@@ -67,6 +67,8 @@ void ndFileFormatJointHinge::LoadJoint(const nd::TiXmlElement* const node, const
 {
 	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
 
+	ndJointHinge* const inportJoint = (ndJointHinge*)joint;
+
 	ndFloat32 offsetAngle = xmlGetFloat(node, "offsetAngle") * ndDegreeToRad;
 	ndFloat32 spring = xmlGetFloat(node, "springConstant");
 	ndFloat32 damper = xmlGetFloat(node, "damperConstant");
@@ -74,8 +76,6 @@ void ndFileFormatJointHinge::LoadJoint(const nd::TiXmlElement* const node, const
 	ndFloat32 minTwistAngle = xmlGetFloat(node, "minTwistAngle") * ndDegreeToRad;
 	ndFloat32 maxTwistAngle = xmlGetFloat(node, "maxTwistAngle") * ndDegreeToRad;
 	ndInt32 state = xmlGetInt(node, "limitState");
-
-	ndJointHinge* const inportJoint = (ndJointHinge*)joint;
 
 	inportJoint->SetOffsetAngle(offsetAngle);
 	inportJoint->SetAsSpringDamper(regularizer, spring, damper);

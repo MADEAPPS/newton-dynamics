@@ -67,6 +67,8 @@ void ndFileFormatJointSpherical::LoadJoint(const nd::TiXmlElement* const node, c
 {
 	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
 
+	ndJointSpherical* const inportJoint = (ndJointSpherical*)joint;
+
 	ndMatrix target(xmlGetMatrix(node, "rotationTarget"));
 	ndFloat32 spring = xmlGetFloat(node, "springConstant");
 	ndFloat32 damper = xmlGetFloat(node, "damperConstant");
@@ -74,8 +76,6 @@ void ndFileFormatJointSpherical::LoadJoint(const nd::TiXmlElement* const node, c
 	ndFloat32 minTwistAngle = xmlGetFloat(node, "minTwistAngle") * ndDegreeToRad;
 	ndFloat32 maxTwistAngle = xmlGetFloat(node, "maxTwistAngle") * ndDegreeToRad;
 	ndFloat32 maxConeAngle = xmlGetFloat(node, "maxConeAngle") * ndDegreeToRad;
-
-	ndJointSpherical* const inportJoint = (ndJointSpherical*)joint;
 
 	inportJoint->SetAsSpringDamper(regularizer, spring, damper);
 	inportJoint->SetTwistLimits(minTwistAngle, maxTwistAngle);

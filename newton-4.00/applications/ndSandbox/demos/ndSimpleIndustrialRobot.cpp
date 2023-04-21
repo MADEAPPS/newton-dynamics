@@ -56,6 +56,7 @@ namespace ndSimpleRobot
 		{ "effector", ndDefinition::m_effector , 0.0f, 0.0f, 0.0f},
 	};
 
+#if 0
 	class ndIndustrialRobot : public ndModel
 	{
 		public:
@@ -328,6 +329,12 @@ namespace ndSimpleRobot
 
 		ndIndustrialRobot* m_robot;
 	};
+#endif
+
+	ndModelPassiveRagdoll* BuildRagDoll(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
+	{
+		return nullptr;
+	}
 }
 
 using namespace ndSimpleRobot;
@@ -337,42 +344,44 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndBodyKinematic* const floor = BuildFloorBox(scene, ndGetIdentityMatrix());
 	
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	//ndDemoEntity* const robotEntity = ndDemoEntity::LoadFbx("robot.fbx", scene);
 	ndSharedPtr<ndDemoEntity> robotEntity(ndDemoEntity::LoadFbx("robot.fbx", scene));
 	
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-90.0f * ndDegreeToRad));
-	ndIndustrialRobot* const robot = new ndIndustrialRobot(scene, *robotEntity, matrix);
-	scene->SetSelectedModel(robot);
 
-	ndSharedPtr<ndModel> robotPtr(robot);
-	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), world->GetSentinelBody()));
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), floor));
-	world->AddModel(robotPtr);
-	world->AddJoint (fixJoint);
-	
-	ndRobotUI* const robotUI = new ndRobotUI(scene, robot);
-	ndSharedPtr<ndUIEntity> robotUIPtr(robotUI);
-	scene->Set2DDisplayRenderFunction(robotUIPtr);
-	//delete robotEntity;
-	
-	ndMatrix location(matrix * ndYawMatrix(90.0f * ndDegreeToRad));
-	location.m_posit.m_x += 1.5f;
-	location.m_posit.m_z += 1.5f;
-	AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f);
-	AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f);
-
-	location = ndYawMatrix(90.0f * ndDegreeToRad) * location;
-	location.m_posit.m_x += 1.0f;
-	location.m_posit.m_z += 0.5f;
-	AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f);
-	AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f);
+	//ndIndustrialRobot* const robot = new ndIndustrialRobot(scene, *robotEntity, matrix);
+	//scene->SetSelectedModel(robot);
+	//
+	//ndSharedPtr<ndModel> robotPtr(robot);
+	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), floor));
+	//world->AddModel(robotPtr);
+	//world->AddJoint (fixJoint);
+	//
+	//ndRobotUI* const robotUI = new ndRobotUI(scene, robot);
+	//ndSharedPtr<ndUIEntity> robotUIPtr(robotUI);
+	//scene->Set2DDisplayRenderFunction(robotUIPtr);
+	//
+	//ndMatrix location(matrix * ndYawMatrix(90.0f * ndDegreeToRad));
+	//location.m_posit.m_x += 1.5f;
+	//location.m_posit.m_z += 1.5f;
+	//AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f);
+	//AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f);
+	//
+	//location = ndYawMatrix(90.0f * ndDegreeToRad) * location;
+	//location.m_posit.m_x += 1.0f;
+	//location.m_posit.m_z += 0.5f;
+	//AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f);
+	//AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f);
 	
 	matrix.m_posit.m_x -= 6.0f;
 	matrix.m_posit.m_y += 2.0f;
 	matrix.m_posit.m_z += 6.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 45.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
+
+	//ndModel* const model = BuildRagDoll(scene, *modelMesh, matrix);
+	//ndSharedPtr<ndModel> ragdoll(model);
+	//scene->GetWorld()->AddModel(ragdoll);
 
 	ndFileFormatSave xxxxSave;
 	xxxxSave.SaveWorld(scene->GetWorld(), "xxxx.nd");

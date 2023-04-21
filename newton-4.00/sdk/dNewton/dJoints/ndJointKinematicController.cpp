@@ -164,6 +164,12 @@ void ndJointKinematicController::SubmitConstraints (dFloat32 timestep, dInt32 th
 }
 #endif
 
+ndJointKinematicController::ndJointKinematicController()
+	:ndJointBilateralConstraint()
+{
+	m_maxDof = 6;
+}
+
 ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const body, ndBodyKinematic* const referenceBody, const ndVector& attachmentPointInGlobalSpace)
 	:ndJointBilateralConstraint(6, body, referenceBody, ndMatrix(attachmentPointInGlobalSpace))
 {
