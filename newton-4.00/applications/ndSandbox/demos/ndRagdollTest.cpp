@@ -173,9 +173,9 @@ namespace ndRagdoll
 		return nullptr;
 	}
 
-	ndModelPassiveRagdoll* BuildRagDoll(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
+	ndModelPassiveRagdoll* BuildModel(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
 	{
-		ndModelPassiveRagdoll* const ragdoll = new ndModelPassiveRagdoll();
+		ndModelPassiveRagdoll* const model = new ndModelPassiveRagdoll();
 
 		ndWorld* const world = scene->GetWorld();
 		ndDemoEntity* const entity = modelMesh->CreateClone();
@@ -199,7 +199,7 @@ namespace ndRagdoll
 		world->AddBody(rootBody);
 
 		// add the root body to the model
-		ndModelPassiveRagdoll::ndRagdollNode* const ragDollNode = ragdoll->AddRootBody(rootBody);
+		ndModelPassiveRagdoll::ndRagdollNode* const ragDollNode = model->AddRootBody(rootBody);
 
 		ndInt32 stack = 0;
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
@@ -237,7 +237,7 @@ namespace ndRagdoll
 					world->AddBody(childBody);
 
 					// add this child body to the radgoll model.
-					parentBone = ragdoll->AddLimb(parentBone, childBody, joint);
+					parentBone = model->AddLimb(parentBone, childBody, joint);
 					break;
 				}
 			}
@@ -251,8 +251,8 @@ namespace ndRagdoll
 		}
 
 		// make entire body weight 100.0 kg
-		ragdoll->NormalizeMassDistribution(100.0f);
-		return ragdoll;
+		model->NormalizeMassDistribution(100.0f);
+		return model;
 	}
 }
 
@@ -269,7 +269,7 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	matrix.m_posit.m_y = 0.5f;
 	ndMatrix playerMatrix(matrix);
 
-	ndModel* const model = BuildRagDoll(scene, *modelMesh, matrix);
+	ndModel* const model = BuildModel(scene, *modelMesh, matrix);
 	ndSharedPtr<ndModel> ragdoll(model);
 	scene->GetWorld()->AddModel(ragdoll);
 	
