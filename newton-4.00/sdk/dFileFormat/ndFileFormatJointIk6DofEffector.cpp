@@ -47,21 +47,51 @@ void ndFileFormatJointIk6DofEffector::SaveJoint(ndFileFormatSave* const scene, n
 	ndIk6DofEffector* const exportJoint = (ndIk6DofEffector*)joint;
 
 	exportJoint->GetLinearSpringDamper(regularizer0, spring0, damper0);
+	xmlSaveParam(classNode, "targetFrame", exportJoint->GetOffsetMatrix());
+
 	xmlSaveParam(classNode, "linearSpringConstant", spring0);
 	xmlSaveParam(classNode, "linearDamperConstant", damper0);
 	xmlSaveParam(classNode, "linearSpringRegularizer", regularizer0);
-	//xmlSaveParam(classNode, "linearSpringRamp", exportJoint->Get);
 	xmlSaveParam(classNode, "maxForce", exportJoint->GetMaxForce());
 
 	exportJoint->GetAngularSpringDamper(regularizer1, spring1, damper1);
 	xmlSaveParam(classNode, "angularSpringConstant", spring1);
 	xmlSaveParam(classNode, "angularDamperConstant", damper1);
 	xmlSaveParam(classNode, "angularSpringRegularizer", regularizer1);
-	//xmlSaveParam(classNode, "angularSpringRamp", exportJoint->Get);
 	xmlSaveParam(classNode, "maxTorque", exportJoint->GetMaxTorque());
 
 	xmlSaveParam(classNode, "axisX", exportJoint->GetAxisX() ? 1 : 0);
 	xmlSaveParam(classNode, "axisY", exportJoint->GetAxisY() ? 1 : 0);
 	xmlSaveParam(classNode, "axisZ", exportJoint->GetAxisZ() ? 1 : 0);
 	xmlSaveParam(classNode, "rotationType", ndInt32(exportJoint->GetRotationAxis()));
+}
+
+ndJointBilateralConstraint* ndFileFormatJointIk6DofEffector::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndIk6DofEffector* const joint = new ndIk6DofEffector();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointIk6DofEffector::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+
+	ndIk6DofEffector* const inportJoint = (ndIk6DofEffector*)joint;
+
+	ndMatrix targetFrame (xmlGetMatrix(node, "targetFrame"));
+	//ndFloat32 offsetAngle = xmlGetFloat(node, "offsetAngle") * ndDegreeToRad;
+	//ndFloat32 spring = xmlGetFloat(node, "springConstant");
+	//ndFloat32 damper = xmlGetFloat(node, "damperConstant");
+	//ndFloat32 regularizer = xmlGetFloat(node, "springRegularizer");
+	//ndFloat32 minTwistAngle = xmlGetFloat(node, "minTwistAngle") * ndDegreeToRad;
+	//ndFloat32 maxTwistAngle = xmlGetFloat(node, "maxTwistAngle") * ndDegreeToRad;
+	//ndInt32 state = xmlGetInt(node, "limitState");
+	//
+	//inportJoint->SetOffsetAngle(offsetAngle);
+	//inportJoint->SetAsSpringDamper(regularizer, spring, damper);
+	//inportJoint->SetLimits(minTwistAngle, maxTwistAngle);
+	//inportJoint->SetLimitState(state ? true : false);
+
+	inportJoint->SetOffsetMatrix(targetFrame);
 }

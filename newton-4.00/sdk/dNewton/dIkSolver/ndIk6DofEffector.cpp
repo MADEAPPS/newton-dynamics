@@ -13,6 +13,25 @@
 #include "ndNewtonStdafx.h"
 #include "ndIk6DofEffector.h"
 
+ndIk6DofEffector::ndIk6DofEffector()
+	:ndJointBilateralConstraint()
+	,m_targetFrame(ndGetIdentityMatrix())
+	,m_angularSpring(ndFloat32(1000.0f))
+	,m_angularDamper(ndFloat32(50.0f))
+	,m_angularMaxTorque(D_LCP_MAX_VALUE)
+	,m_angularRegularizer(ndFloat32(5.0e-3f))
+	,m_angularMaxSpringRamp(ndFloat32(1.0e10f))
+	,m_linearSpring(ndFloat32(1000.0f))
+	,m_linearDamper(ndFloat32(50.0f))
+	,m_linearMaxForce(D_LCP_MAX_VALUE)
+	,m_linearRegularizer(ndFloat32(5.0e-3f))
+	,m_linearMaxSpringRamp(ndFloat32(1.0e10f))
+	,m_rotationType(m_disabled)
+	,m_controlDofOptions(0xff)
+{
+	m_maxDof = 6;
+}
+
 ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotChild, pinAndPivotParent)
 	,m_targetFrame(pinAndPivotChild * pinAndPivotParent.Inverse())

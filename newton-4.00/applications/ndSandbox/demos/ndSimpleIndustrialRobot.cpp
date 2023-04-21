@@ -53,7 +53,7 @@ namespace ndSimpleRobot
 		{ "arm_4", ndDefinition::m_hinge , 2.0f, -1.0e10f, 1.0e10f},
 		{ "gripperLeft", ndDefinition::m_slider , 1.0f, -0.2f, 0.03f},
 		{ "gripperRight", ndDefinition::m_slider , 1.0f, -0.2f, 0.03f},
-		//{ "effector", ndDefinition::m_effector , 0.0f, 0.0f, 0.0f},
+		{ "effector", ndDefinition::m_effector , 0.0f, 0.0f, 0.0f},
 	};
 
 #if 0
@@ -444,15 +444,12 @@ namespace ndSimpleRobot
 					}
 					else if (definition.m_type == ndDefinition::m_effector)
 					{
-						//ndBodyDynamic* const childBody = parentBody;
 						ndBodyDynamic* const childBody = parentBone->m_body;
 					
 						const ndMatrix pivotFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
 						const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
 
-						//m_effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, modelNode->m_body);
 						ndIk6DofEffector* const effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, modelNode->m_body);
-					
 						//m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
 					
 						ndFloat32 relaxation = 0.002f;
@@ -531,16 +528,16 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndFileFormatSave xxxxSave;
 	xxxxSave.SaveWorld(scene->GetWorld(), "xxxx.nd");
 
-	//ndFileFormatLoad xxxxLoad;
-	//xxxxLoad.Load("xxxx.nd");
-	//// offset bodies positions for calibraion;
-	//const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
-	//for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndSharedPtr<ndBody>& body = node->GetInfo();
-	//	ndMatrix bodyMatrix(body->GetMatrix());
-	//	bodyMatrix.m_posit.m_x += 4.0f;
-	//	body->SetMatrix(bodyMatrix);
-	//}
-	//xxxxLoad.AddToWorld(scene->GetWorld());
+	ndFileFormatLoad xxxxLoad;
+	xxxxLoad.Load("xxxx.nd");
+	// offset bodies positions for calibration;
+	const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
+	for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	{
+		ndSharedPtr<ndBody>& body = node->GetInfo();
+		ndMatrix bodyMatrix(body->GetMatrix());
+		bodyMatrix.m_posit.m_x += 4.0f;
+		body->SetMatrix(bodyMatrix);
+	}
+	xxxxLoad.AddToWorld(scene->GetWorld());
 }
