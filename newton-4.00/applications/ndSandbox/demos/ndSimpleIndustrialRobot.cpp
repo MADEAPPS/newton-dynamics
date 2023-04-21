@@ -53,7 +53,7 @@ namespace ndSimpleRobot
 		{ "arm_4", ndDefinition::m_hinge , 2.0f, -1.0e10f, 1.0e10f},
 		{ "gripperLeft", ndDefinition::m_slider , 1.0f, -0.2f, 0.03f},
 		{ "gripperRight", ndDefinition::m_slider , 1.0f, -0.2f, 0.03f},
-		{ "effector", ndDefinition::m_effector , 0.0f, 0.0f, 0.0f},
+		//{ "effector", ndDefinition::m_effector , 0.0f, 0.0f, 0.0f},
 	};
 
 #if 0
@@ -351,10 +351,6 @@ namespace ndSimpleRobot
 	ndModelPassiveRagdoll* BuildModel(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
 	{
 		// make a clone of the mesh and add it to the scene
-		//ndDemoEntity* const rootEntity = robotMesh->CreateClone();
-		//scene->AddEntity(rootEntity);
-		//ndWorld* const world = scene->GetWorld();
-
 		ndModelPassiveRagdoll* const model = new ndModelPassiveRagdoll();
 
 		ndWorld* const world = scene->GetWorld();
@@ -372,8 +368,6 @@ namespace ndSimpleRobot
 		rootEntity->ResetMatrix(matrix);
 
 		//// add the root body
-		//m_rootBody = CreateBodyPart(scene, rootEntity, jointsDefinition[0].m_mass, nullptr);
-		//m_bodyArray.PushBack(m_rootBody);
 		ndSharedPtr<ndBody> rootBody(CreateBodyPart(scene, rootEntity, jointsDefinition[0].m_mass, nullptr));
 
 		rootBody->SetMatrix(rootEntity->CalculateGlobalMatrix());
@@ -384,8 +378,6 @@ namespace ndSimpleRobot
 		// add the root body to the model
 		ndModelPassiveRagdoll::ndRagdollNode* const modelNode = model->AddRootBody(rootBody);
 		
-		//ndFixSizeArray<ndDemoEntity*, 32> childEntities;
-		//ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
 		ndInt32 stack = 0;
 
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
@@ -401,8 +393,6 @@ namespace ndSimpleRobot
 		while (stack)
 		{
 			stack--;
-			//ndBodyDynamic* parentBody = parentBones[stack];
-			//ndDemoEntity* const childEntity = childEntities[stack];
 			ndDemoEntity* const childEntity = childEntities[stack];
 			ndModelPassiveRagdoll::ndRagdollNode* parentBone = parentBones[stack];
 
@@ -413,67 +403,69 @@ namespace ndSimpleRobot
 				if (!strcmp(definition.m_boneName, name))
 				{
 					ndTrace(("name: %s\n", name));
-					//if (definition.m_type == ndDefinition::m_hinge)
-					//{
-					//	ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-					//	m_bodyArray.PushBack(childBody);
-					//	const ndMatrix pivotMatrix(childBody->GetMatrix());
-					//	ndJointHinge* const hinge = new ndJointHinge(pivotMatrix, childBody, parentBody);
-					//	hinge->SetLimits(definition.m_minLimit, definition.m_maxLimit);
-					//	if ((definition.m_minLimit > -1000.0f) && (definition.m_maxLimit < 1000.0f))
-					//	{
-					//		hinge->SetLimitState(true);
-					//	}
-					//	m_jointArray.PushBack(hinge);
-					//
-					//	ndSharedPtr<ndJointBilateralConstraint> hingePtr(hinge);
-					//	world->AddJoint(hingePtr);
-					//	parentBody = childBody;
-					//}
-					//else if (definition.m_type == ndDefinition::m_slider)
-					//{
-					//	ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-					//	m_bodyArray.PushBack(childBody);
-					//
-					//	const ndMatrix pivotMatrix(childBody->GetMatrix());
-					//	ndJointSlider* const slider = new ndJointSlider(pivotMatrix, childBody, parentBody);
-					//	slider->SetLimits(definition.m_minLimit, definition.m_maxLimit);
-					//	slider->SetAsSpringDamper(0.005f, 2000.0f, 200.0f);
-					//
-					//	if (!strstr(definition.m_boneName, "Left"))
-					//	{
-					//		m_leftGripper = slider;
-					//	}
-					//	else
-					//	{
-					//		m_rightGripper = slider;
-					//	}
-					//	ndSharedPtr<ndJointBilateralConstraint> sliderPtr(slider);
-					//	world->AddJoint(sliderPtr);
-					//
-					//	parentBody = childBody;
-					//}
-					//else
-					//{
-					//	ndBodyDynamic* const childBody = parentBody;
-					//
-					//	const ndMatrix pivotFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
-					//	const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
-					//	m_effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, m_rootBody);
-					//
-					//	m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
-					//
-					//	ndFloat32 relaxation = 0.002f;
-					//	m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
-					//	m_effector->SetLinearSpringDamper(relaxation, 2000.0f, 200.0f);
-					//	m_effector->SetAngularSpringDamper(relaxation, 2000.0f, 200.0f);
-					//	m_effector->SetMaxForce(10000.0f);
-					//	m_effector->SetMaxTorque(10000.0f);
-					//
-					//	// the effector is part of the rig
-					//	ndSharedPtr<ndJointBilateralConstraint> effectorPtr(m_effector);
-					//	world->AddJoint(effectorPtr);
-					//}
+					if (definition.m_type == ndDefinition::m_hinge)
+					{
+						ndSharedPtr<ndBody> childBody (CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body));
+						world->AddBody(childBody);
+
+						const ndMatrix pivotMatrix(childBody->GetMatrix());
+						ndJointHinge* const hinge = new ndJointHinge(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body);
+						hinge->SetLimits(definition.m_minLimit, definition.m_maxLimit);
+						if ((definition.m_minLimit > -1000.0f) && (definition.m_maxLimit < 1000.0f))
+						{
+							hinge->SetLimitState(true);
+						}
+					
+						ndSharedPtr<ndJointBilateralConstraint> jointPtr(hinge);
+						world->AddJoint(jointPtr);
+						parentBone = model->AddLimb(parentBone, childBody, jointPtr);
+					}
+					else if (definition.m_type == ndDefinition::m_slider)
+					{
+						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body));
+						world->AddBody(childBody);
+
+						const ndMatrix pivotMatrix(childBody->GetMatrix());
+						ndJointSlider* const slider = new ndJointSlider(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body);
+						slider->SetLimits(definition.m_minLimit, definition.m_maxLimit);
+						slider->SetAsSpringDamper(0.005f, 2000.0f, 200.0f);
+					
+						if (!strstr(definition.m_boneName, "Left"))
+						{
+							//m_leftGripper = slider;
+						}
+						else
+						{
+							//m_rightGripper = slider;
+						}
+						ndSharedPtr<ndJointBilateralConstraint> jointPtr(slider);
+						world->AddJoint(jointPtr);
+						parentBone = model->AddLimb(parentBone, childBody, jointPtr);
+					}
+					else if (definition.m_type == ndDefinition::m_effector)
+					{
+						//ndBodyDynamic* const childBody = parentBody;
+						ndBodyDynamic* const childBody = parentBone->m_body;
+					
+						const ndMatrix pivotFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
+						const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
+
+						//m_effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, modelNode->m_body);
+						ndIk6DofEffector* const effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, modelNode->m_body);
+					
+						//m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
+					
+						ndFloat32 relaxation = 0.002f;
+						effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
+						effector->SetLinearSpringDamper(relaxation, 2000.0f, 200.0f);
+						effector->SetAngularSpringDamper(relaxation, 2000.0f, 200.0f);
+						effector->SetMaxForce(10000.0f);
+						effector->SetMaxTorque(10000.0f);
+					
+						// the effector is part of the rig
+						ndSharedPtr<ndJointBilateralConstraint> jointPtr(effector);
+						world->AddJoint(jointPtr);
+					}
 					break;
 				}
 			}
