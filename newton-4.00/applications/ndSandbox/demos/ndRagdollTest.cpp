@@ -199,7 +199,7 @@ namespace ndRagdoll
 		world->AddBody(rootBody);
 
 		// add the root body to the model
-		ndModelPassiveRagdoll::ndRagdollNode* const ragDollNode = model->AddRootBody(rootBody);
+		ndModelPassiveRagdoll::ndRagdollNode* const modelNode = model->AddRootBody(rootBody);
 
 		ndInt32 stack = 0;
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
@@ -209,7 +209,7 @@ namespace ndRagdoll
 		for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
 		{
 			childEntities[stack] = child;
-			parentBones[stack] = ragDollNode;
+			parentBones[stack] = modelNode;
 			stack++;
 		}
 
