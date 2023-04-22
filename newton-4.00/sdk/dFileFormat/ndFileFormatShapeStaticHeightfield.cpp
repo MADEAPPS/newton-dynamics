@@ -38,18 +38,11 @@ ndInt32 ndFileFormatShapeStaticHeightfield::SaveShape(ndFileFormatSave* const sc
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeClass", ndShapeHeightfield::StaticClassName());
 	ndFileFormatShapeStaticMesh::SaveShape(scene, classNode, shape);
 
-	ndAssert(0);
 	char fileName[1024];
 	sprintf(fileName, "%s_%s_%d.bin", scene->m_assetPath.GetStr(), ndShapeHeightfield::StaticClassName(), xmlGetNodeId(classNode));
-	//char* const ptr = strrchr(fileName, '.');
-	//if (ptr)
-	//{
-	//	ndInt32 nodeId = xmlGetNodeId(classNode);
-	//	sprintf(ptr, "_%d.bin", nodeId);
-	//}
 
 	ndShapeHeightfield* const staticMesh = (ndShapeHeightfield*)shape;
-	xmlSaveParam(classNode, "assetName", "string", fileName);
+	xmlSaveParam(classNode, "assetName", fileName);
 	xmlSaveParam(classNode, "minBox", staticMesh->m_minBox);
 	xmlSaveParam(classNode, "maxBox", staticMesh->m_maxBox);
 	xmlSaveParam(classNode, "horizontalScale_x", staticMesh->m_horizontalScale_x);
@@ -67,4 +60,30 @@ ndInt32 ndFileFormatShapeStaticHeightfield::SaveShape(ndFileFormatSave* const sc
 	}
 
 	return xmlGetNodeId(classNode);
+}
+
+ndShape* ndFileFormatShapeStaticHeightfield::LoadShape(const nd::TiXmlElement* const node)
+{
+	const char* const filename = xmlGetString(node, "assetName");
+	ndVector minBox (xmlGetVector3(node, "minBox"));
+	ndVector maxBox(xmlGetVector3(node, "maxBox"));
+	ndInt32 width = xmlGetInt(node, "width");
+	ndInt32 height = xmlGetInt(node, "height");
+	ndInt32 diagonalMode = xmlGetInt(node, "diagonalMode");
+	ndFloat32 horizontalScale_x = xmlGetFloat(node, "horizontalScale_x");
+	ndFloat32 horizontalScale_z = xmlGetFloat(node, "horizontalScale_z");
+
+	ndShapeHeightfield* const staticMesh = new ndShapeHeightfield(width, height, ndShapeHeightfield::ndGridConstruction (diagonalMode), horizontalScale_x, horizontalScale_z);
+
+	FILE* const file = fopen(filename, "rb");
+	if (file)
+	{
+		ndAssert(staticMesh->m_atributeMap.GetCount() == width * height);
+		ndAssert(staticMesh->m_elevationMap.GetCount() == width * height);
+
+		fread(&staticMesh->m_elevationMap[0], sizeof(ndReal), size_t(staticMesh->m_elevationMap.GetCount()), file);
+		fread(&staticMesh->m_atributeMap[0], sizeof(ndInt8), size_t(staticMesh->m_atributeMap.GetCount()), file);
+		fclose(file);
+	}
+	return staticMesh;
 }

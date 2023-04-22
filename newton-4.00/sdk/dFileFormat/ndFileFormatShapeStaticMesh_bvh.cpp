@@ -50,7 +50,8 @@ ndInt32 ndFileFormatShapeStaticMesh_bvh::SaveShape(ndFileFormatSave* const scene
 	sprintf(fileName, "%s_%s_%d.bin", scene->m_assetPath.GetStr(), ndShapeHeightfield::StaticClassName(), xmlGetNodeId(classNode));
 
 	ndShapeStatic_bvh* const staticMesh = (ndShapeStatic_bvh*)shape;
-	xmlSaveParam(classNode, "assetName", "string", fileName);
+	//xmlSaveParam(classNode, "assetName", "string", fileName);
+	xmlSaveParam(classNode, "assetName", fileName);
 	staticMesh->Serialize(fileName);
 	return xmlGetNodeId(classNode);
 }

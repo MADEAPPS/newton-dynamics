@@ -101,7 +101,6 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	uvMatrix[2][2] *= 0.25f;
 	uvMatrix.m_posit = ndVector(-0.5f, -0.5f, 0.0f, 1.0f);
 	const char* const textureName = "wood_3.tga";
-	//ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, textureName, textureName, textureName, 1.0f, uvMatrix);
 	ndSharedPtr<ndDemoMeshInterface> geometry (new ndDemoMesh("box", scene->GetShaderCache(), &box, textureName, textureName, textureName, 1.0f, uvMatrix));
 
 	FrictionMaterial material;

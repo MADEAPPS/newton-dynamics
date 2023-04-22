@@ -181,12 +181,17 @@ nd::TiXmlElement* xmlCreateClassNode(nd::TiXmlElement* const parent, const char*
 	return node;
 }
 
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const type, const char* const value)
+static void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const type, const char* const value)
 {
 	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
 	rootNode->LinkEndChild(node);
 	CleanWhiteSpace(value);
 	node->SetAttribute(type, value);
+}
+
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value)
+{
+	xmlSaveParam(rootNode, name, "string", value);
 }
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndMatrix& value)

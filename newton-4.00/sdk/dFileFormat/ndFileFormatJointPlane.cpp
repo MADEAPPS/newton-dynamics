@@ -54,6 +54,6 @@ void ndFileFormatJointPlane::LoadJoint(const nd::TiXmlElement* const node, const
 
 	ndJointPlane* const inportJoint = (ndJointPlane*)joint;
 
-	ndInt32 ControlRotation = xmlGetFloat(node, "ControlRotation");
-	inportJoint->EnableControlRotation(ControlRotation ? true : false);
+	ndInt32 controlRotation = xmlGetInt(node, "ControlRotation");
+	inportJoint->EnableControlRotation(controlRotation ? true : false);
 }
