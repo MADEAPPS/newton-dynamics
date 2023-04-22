@@ -179,7 +179,6 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 
 	ndFileFormatSave xxxxSave;
 	xxxxSave.SaveWorld(scene->GetWorld(), "xxxx.nd");
-
 	ndFileFormatLoad xxxxLoad;
 	xxxxLoad.Load("xxxx.nd");
 	// offset bodies positions for calibration;

@@ -3907,10 +3907,11 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDe
 			ndAssert(countleft >= 0);
 			if (count >= maxReduceLimit)
 			{
-				ndAssert(0);
+				m_contactBuffer = contactOut;
 				//count = PruneContacts(count, contactOut, ndFloat32(1.0e-2f), 16);
-				//countleft = maxContacts - count;
-				//ndAssert(countleft >= 0);
+				count = PruneContacts(count, 16);
+				countleft = maxContacts - count;
+				ndAssert(countleft >= 0);
 				//proxy.m_maxContacts = countleft;
 			}
 		}

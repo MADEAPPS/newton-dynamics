@@ -48,7 +48,7 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
-	ndDemoEntity* const man = ndDemoEntity::LoadFbx("walker.fbx", scene);
+	ndSharedPtr<ndDemoEntity> man(ndDemoEntity::LoadFbx("walker.fbx", scene));
 
 	//ndFloat32 height = 1.9f;
 	//ndFloat32 radio = 0.5f;
@@ -86,9 +86,23 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 
 	//AddCapsulesStacks(scene, PlaceMatrix(45.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 5, 8, 7);
 
-	delete man;
 	ndQuaternion rot(ndYawMatrix(30.0f * ndDegreeToRad));
 	//ndVector origin(-5.0f, 4.0f, 0.0f, 1.0f);
 	ndVector origin(-3.0f, 0.0f, 2.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
+
+	//ndFileFormatSave xxxxSave;
+	//xxxxSave.SaveWorld(scene->GetWorld(), "xxxx.nd");
+	//ndFileFormatLoad xxxxLoad;
+	//xxxxLoad.Load("xxxx.nd");
+	//// offset bodies positions for calibration;
+	//const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
+	//for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndSharedPtr<ndBody>& body = node->GetInfo();
+	//	ndMatrix bodyMatrix(body->GetMatrix());
+	//	bodyMatrix.m_posit.m_x += 4.0f;
+	//	body->SetMatrix(bodyMatrix);
+	//}
+	//xxxxLoad.AddToWorld(scene->GetWorld());
 }
