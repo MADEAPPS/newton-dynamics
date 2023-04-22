@@ -31,6 +31,7 @@ class ndFileFormatShapeStaticProceduralMesh : public ndFileFormatShapeStaticMesh
 	ndFileFormatShapeStaticProceduralMesh();
 	ndFileFormatShapeStaticProceduralMesh(const char* const className);
 
+	virtual ndShape* LoadShape(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap);
 	virtual ndInt32 SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
 };
 

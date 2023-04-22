@@ -37,5 +37,13 @@ ndInt32 ndFileFormatShapeStaticProceduralMesh::SaveShape(ndFileFormatSave* const
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeClass", ndShapeStaticProceduralMesh::StaticClassName());
 	ndFileFormatShapeStaticMesh::SaveShape(scene, classNode, shape);
+	//xmlSaveParam(classNode, "size", shape->GetObbSize());
 	return xmlGetNodeId(classNode);
+}
+
+ndShape* ndFileFormatShapeStaticProceduralMesh::LoadShape(const nd::TiXmlElement* const, const ndTree<ndShape*, ndInt32>&)
+{
+	//ndVector size (xmlGetVector3(node, "size") * ndVector::m_two);
+	ndShapeStaticProceduralMesh* const staticMesh = new ndShapeStaticProceduralMesh(ndFloat32 (0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+	return staticMesh;
 }

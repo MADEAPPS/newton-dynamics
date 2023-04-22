@@ -53,6 +53,14 @@ class ndBvhRay: public ndFastRay
 	const ndShapeStatic_bvh* m_me;
 } D_GCC_NEWTON_ALIGN_32;
 
+
+ndShapeStatic_bvh::ndShapeStatic_bvh()
+	:ndShapeStaticMesh(m_boundingBoxHierachy)
+	,ndAabbPolygonSoup()
+	,m_trianglesCount(0)
+{
+}
+
 ndShapeStatic_bvh::ndShapeStatic_bvh(const ndPolygonSoupBuilder& builder)
 	:ndShapeStaticMesh(m_boundingBoxHierachy)
 	,ndAabbPolygonSoup()

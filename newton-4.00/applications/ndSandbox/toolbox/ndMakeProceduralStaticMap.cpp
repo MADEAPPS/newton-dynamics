@@ -39,10 +39,22 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 			ndFileFormatShapeStaticProceduralMesh::SaveShape(scene, classNode, shape);
 
 			ndRegularProceduralGrid* const grid = (ndRegularProceduralGrid*)shape;
+			xmlSaveParam(classNode, "boxSize", grid->GetObbSize());
 			xmlSaveParam(classNode, "planeNormal", grid->m_planeEquation);
 			xmlSaveParam(classNode, "planeDistance", grid->m_planeEquation.m_w);
 			xmlSaveParam(classNode, "gridSize", grid->m_gridSize);
 			return xmlGetNodeId(classNode);
+		}
+
+		ndShape* LoadShape(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>&)
+		{
+			ndVector boxSize (xmlGetVector3(node, "boxSize") * ndVector::m_two);
+			ndVector planeNormal (xmlGetVector3(node, "planeNormal"));
+			ndFloat32 planeDist = xmlGetFloat(node, "planeDistance");
+			ndFloat32 gridSize = xmlGetFloat(node, "gridSize");
+
+			planeNormal.m_w = planeDist;
+			return new ndRegularProceduralGrid(gridSize, boxSize.m_x, boxSize.m_y, boxSize.m_z, planeNormal);
 		}
 	};
 

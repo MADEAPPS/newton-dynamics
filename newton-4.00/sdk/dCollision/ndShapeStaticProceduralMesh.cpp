@@ -29,10 +29,9 @@
 
 ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez)
 	:ndShapeStaticMesh(m_staticProceduralMesh)
-	,m_minBox(ndVector::m_negOne * ndVector::m_half * ndVector(sizex, sizey, sizez, ndFloat32(0.0f)))
-	,m_maxBox(ndVector::m_half * ndVector(sizex, sizey, sizez, ndFloat32(0.0f)))
 {
-	CalculateLocalObb();
+	m_boxOrigin = ndVector::m_zero;
+	m_boxSize = ndVector(sizex, sizey, sizez, ndFloat32 (0.0f)) * ndVector::m_half;
 }
 
 ndShapeStaticProceduralMesh::~ndShapeStaticProceduralMesh(void)
@@ -44,12 +43,6 @@ ndShapeInfo ndShapeStaticProceduralMesh::GetShapeInfo() const
 	ndShapeInfo info(ndShapeStaticMesh::GetShapeInfo());
 	info.m_procedural.m_noUsed = 0;
 	return info;
-}
-
-void ndShapeStaticProceduralMesh::CalculateLocalObb()
-{
-	m_boxSize = (m_maxBox - m_minBox) * ndVector::m_half;
-	m_boxOrigin = (m_maxBox + m_minBox) * ndVector::m_half;
 }
 
 void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const data) const

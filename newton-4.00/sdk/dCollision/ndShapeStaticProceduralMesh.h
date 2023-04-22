@@ -70,11 +70,6 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
 
 	private:
-	void CalculateLocalObb();
-	
-	ndVector m_minBox;
-	ndVector m_maxBox;
-
 	friend class ndContactSolver;
 	friend class ndFileFormatShapeStaticProceduralMesh;
 };

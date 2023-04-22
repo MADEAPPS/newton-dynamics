@@ -29,6 +29,8 @@ class ndShapeStatic_bvh: public ndShapeStaticMesh, public ndAabbPolygonSoup
 {
 	public:
 	D_CLASS_REFLECTION(ndShapeStatic_bvh,ndShapeStaticMesh)
+
+	D_COLLISION_API ndShapeStatic_bvh();
 	D_COLLISION_API ndShapeStatic_bvh(const ndPolygonSoupBuilder& builder);
 	D_COLLISION_API virtual ~ndShapeStatic_bvh();
 
