@@ -45,9 +45,9 @@ static ndBodyDynamic* AddRigidBody(
 
 static void AddToCompoundShape(const ndMatrix& mLocalMatrix, ndShapeInstance& parentShape, ndShapeInstance& childInstance)
 {
-	auto pCompoundShape = parentShape.GetShape()->GetAsShapeCompound();
+	ndShapeCompound* const compoundShape = parentShape.GetShape()->GetAsShapeCompound();
 	childInstance.SetLocalMatrix(mLocalMatrix);
-	pCompoundShape->AddCollision(&childInstance);
+	compoundShape->AddCollision(&childInstance);
 }
 
 static void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
@@ -69,14 +69,14 @@ static void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
 	//mFloorLocal = ndYawMatrix(3.14f / 4.0f);//45 degree
 	mFloorLocal.m_posit = ndVector(0.0f, -1.0f, 0.0f, 1.0f);
 
-	auto pCompoundShape = parentInstance.GetShape()->GetAsShapeCompound();
-	pCompoundShape->BeginAddRemove();
+	ndShapeCompound* const compoundShape = parentInstance.GetShape()->GetAsShapeCompound();
+	compoundShape->BeginAddRemove();
 	AddToCompoundShape(mWall1Local, parentInstance, wall1);
 	AddToCompoundShape(mWall2Local, parentInstance, wall2);
 	AddToCompoundShape(mWall3Local, parentInstance, wall3);
 	AddToCompoundShape(mWall4Local, parentInstance, wall4);
 	AddToCompoundShape(mFloorLocal, parentInstance, floor);
-	pCompoundShape->EndAddRemove();
+	compoundShape->EndAddRemove();
 }
 
 static void AddSphere(ndDemoEntityManager* const scene)
@@ -157,17 +157,17 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	
 	location.m_posit.m_y = 0.5f;
 	location.m_posit.m_z = -3.0f;
-	AddSimpleConcaveMesh(scene, location, "bowl.fbx", 4);
+	//AddSimpleConcaveMesh(scene, location, "bowl.fbx", 4);
 
 	location.m_posit.m_x = 5.0f;
 	location.m_posit.m_z = -2.0f;
 	location.m_posit.m_y = 1.7f;
-	AddSimpleConcaveMesh(scene, location, "camel.fbx", 4);
+	//AddSimpleConcaveMesh(scene, location, "camel.fbx", 4);
 	
 	location.m_posit.m_x = 10.0f;
 	location.m_posit.m_z = 5.0f;
 	location.m_posit.m_y = 2.0f;
-	AddSimpleConcaveMesh(scene, location, "dino.fbx", 4);
+	//AddSimpleConcaveMesh(scene, location, "dino.fbx", 4);
 
 	ndVector origin(ndVector::m_zero);
 	origin.m_x -= 10.0f;
@@ -177,6 +177,19 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	ndQuaternion rot(ndYawMatrix(45.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);
 
-	ndFileFormatSave xxxx;
-	xxxx.SaveBodies(scene->GetWorld(), "xxxx.nd");
+	ndFileFormatSave xxxxSave;
+	xxxxSave.SaveWorld(scene->GetWorld(), "xxxx.nd");
+
+	ndFileFormatLoad xxxxLoad;
+	xxxxLoad.Load("xxxx.nd");
+	// offset bodies positions for calibration;
+	const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
+	for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	{
+		ndSharedPtr<ndBody>& body = node->GetInfo();
+		ndMatrix bodyMatrix(body->GetMatrix());
+		bodyMatrix.m_posit.m_x += 4.0f;
+		body->SetMatrix(bodyMatrix);
+	}
+	xxxxLoad.AddToWorld(scene->GetWorld());
 }

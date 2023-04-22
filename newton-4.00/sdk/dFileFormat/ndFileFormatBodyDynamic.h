@@ -19,21 +19,24 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_FILE_FORMAT_BODY_DYNAMIC_H__
+#define _ND_FILE_FORMAT_BODY_DYNAMIC_H__
+
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatKinematicBodyBase.h"
+#include "ndFileFormatBodyKinematic.h"
 
-ndFileFormatKinematicBodyBase::ndFileFormatKinematicBodyBase()
-	:ndFileFormatKinematicBody(ndBodyKinematicBase::StaticClassName())
+class ndFileFormatBodyDynamic : public ndFileFormatBodyKinematic
 {
-}
+	public: 
+	ndFileFormatBodyDynamic();
+	ndFileFormatBodyDynamic(const char* const className);
+	
+	virtual void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
 
-ndFileFormatKinematicBodyBase::ndFileFormatKinematicBodyBase(const char* const className)
-	:ndFileFormatKinematicBody(className)
-{
-}
+	virtual ndBody* LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap);
+	protected:
+	virtual void LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body);
+};
 
-void ndFileFormatKinematicBodyBase::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
-{
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBodyKinematicBase::StaticClassName());
-	ndFileFormatKinematicBody::SaveBody(scene, classNode, body);
-}
+#endif 
+

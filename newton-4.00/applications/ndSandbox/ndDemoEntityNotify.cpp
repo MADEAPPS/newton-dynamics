@@ -16,7 +16,6 @@
 #include "ndDemoEntityNotify.h"
 
 ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody, ndFloat32 gravity)
-	//:ndBodyNotify(ndVector (ndFloat32 (0.0f), gravity, ndFloat32(0.0f), ndFloat32(0.0f)))
 	:ndModelNotify(parentBody, ndVector(0.0f, gravity, 0.0f, 0.0f))
 	,m_entity(entity)
 	,m_manager(manager)

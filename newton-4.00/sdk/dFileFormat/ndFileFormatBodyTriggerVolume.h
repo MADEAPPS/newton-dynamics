@@ -23,9 +23,9 @@
 #define _ND_FILE_FORMAT_TRIGGER_VOLUME_H__
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatKinematicBodyBase.h"
+#include "ndFileFormatBodyKinematicBase.h"
 
-class ndFileFormatBodyTriggerVolume : public ndFileFormatKinematicBodyBase
+class ndFileFormatBodyTriggerVolume : public ndFileFormatBodyKinematicBase
 {
 	public: 
 	ndFileFormatBodyTriggerVolume();

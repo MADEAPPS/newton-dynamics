@@ -47,7 +47,7 @@ ndInt32 ndFileFormatShapeConvexHull::SaveShape(ndFileFormatSave* const scene, nd
 	return xmlGetNodeId(classNode);
 }
 
-ndShape* ndFileFormatShapeConvexHull::LoadShape(const nd::TiXmlElement* const node)
+ndShape* ndFileFormatShapeConvexHull::LoadShape(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>&)
 {
 	ndArray<ndVector> points;
 	xmlGetFloatArray3(node, "points", points);

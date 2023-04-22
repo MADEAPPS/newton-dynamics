@@ -23,17 +23,17 @@
 #include "ndFileFormatBodyTriggerVolume.h"
 
 ndFileFormatBodyTriggerVolume::ndFileFormatBodyTriggerVolume()
-	:ndFileFormatKinematicBodyBase(ndBodyTriggerVolume::StaticClassName())
+	:ndFileFormatBodyKinematicBase(ndBodyTriggerVolume::StaticClassName())
 {
 }
 
 ndFileFormatBodyTriggerVolume::ndFileFormatBodyTriggerVolume(const char* const className)
-	:ndFileFormatKinematicBodyBase(className)
+	:ndFileFormatBodyKinematicBase(className)
 {
 }
 
 void ndFileFormatBodyTriggerVolume::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBodyTriggerVolume::StaticClassName());
-	ndFileFormatKinematicBodyBase::SaveBody(scene, classNode, body);
+	ndFileFormatBodyKinematicBase::SaveBody(scene, classNode, body);
 }

@@ -20,22 +20,22 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatDynamicBody.h"
+#include "ndFileFormatBodyDynamic.h"
 
-ndFileFormatDynamicBody::ndFileFormatDynamicBody()
-	:ndFileFormatKinematicBody(ndBodyDynamic::StaticClassName())
+ndFileFormatBodyDynamic::ndFileFormatBodyDynamic()
+	:ndFileFormatBodyKinematic(ndBodyDynamic::StaticClassName())
 {
 }
 
-ndFileFormatDynamicBody::ndFileFormatDynamicBody(const char* const className)
-	:ndFileFormatKinematicBody(className)
+ndFileFormatBodyDynamic::ndFileFormatBodyDynamic(const char* const className)
+	:ndFileFormatBodyKinematic(className)
 {
 }
 
-void ndFileFormatDynamicBody::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
+void ndFileFormatBodyDynamic::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBodyDynamic::StaticClassName());
-	ndFileFormatKinematicBody::SaveBody(scene, classNode, body);
+	ndFileFormatBodyKinematic::SaveBody(scene, classNode, body);
 
 	const ndBodyDynamic* const dynamic = ((ndBodyDynamic*)body)->GetAsBodyDynamic();
 	xmlSaveParam(classNode, "linearDampCoef", dynamic->m_dampCoef.m_w);
@@ -43,16 +43,16 @@ void ndFileFormatDynamicBody::SaveBody(ndFileFormatSave* const scene, nd::TiXmlE
 }
 
 
-ndBody* ndFileFormatDynamicBody::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap)
+ndBody* ndFileFormatBodyDynamic::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap)
 {
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	LoadBody(node, shapeMap, body);
 	return body;
 }
 
-void ndFileFormatDynamicBody::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body)
+void ndFileFormatBodyDynamic::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body)
 {
-	ndFileFormatKinematicBody::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
+	ndFileFormatBodyKinematic::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
 
 	ndFloat32 linearDamp = xmlGetFloat(node, "linearDampCoef");
 	ndVector angularDamp(xmlGetVector3(node, "angularDampCoef"));

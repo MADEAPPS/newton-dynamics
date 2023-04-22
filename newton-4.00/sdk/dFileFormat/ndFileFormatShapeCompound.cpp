@@ -64,3 +64,22 @@ ndInt32 ndFileFormatShapeCompound::SaveShape(ndFileFormatSave* const scene, nd::
 	}
 	return xmlGetNodeId(classNode);
 }
+
+
+ndShape* ndFileFormatShapeCompound::LoadShape(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap)
+{
+	ndShapeInstance rootInstance(new ndShapeCompound());
+	ndShapeCompound* const compoundShape = (ndShapeCompound*)rootInstance.GetShape();
+
+	compoundShape->BeginAddRemove();
+
+	ndFileFormatRegistrar* const collisionHandler = ndFileFormatRegistrar::GetHandler(ndShapeInstance::StaticClassName());
+	ndAssert(collisionHandler);
+	for (const nd::TiXmlNode* childNode = node->FirstChild("ndShapeInstanceClass"); childNode; childNode = childNode->NextSibling())
+	{
+		ndSharedPtr<ndShapeInstance> instance(collisionHandler->LoadCollision((nd::TiXmlElement*)childNode, shapeMap));
+		compoundShape->AddCollision(*instance);
+	}
+	compoundShape->EndAddRemove();
+	return new ndShapeCompound(*compoundShape, nullptr);
+}

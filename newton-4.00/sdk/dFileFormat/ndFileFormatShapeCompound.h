@@ -31,6 +31,7 @@ class ndFileFormatShapeCompound : public ndFileFormatShape
 	ndFileFormatShapeCompound();
 	ndFileFormatShapeCompound(const char* const className);
 
+	virtual ndShape* LoadShape(const nd::TiXmlElement* const nNode, const ndTree<ndShape*, ndInt32>& shapeMap);
 	virtual ndInt32 SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
 };
 

@@ -42,7 +42,7 @@
 #include <ndFileFormatJointWheel.h>
 #include <ndFileFormatModelNotify.h>
 #include <ndFileFormatJointRoller.h>
-#include <ndFileFormatDynamicBody.h>
+#include <ndFileFormatBodyDynamic.h>
 #include <ndFileFormatJointSlider.h>
 #include <ndFileFormatJointPulley.h>
 #include <ndFileFormatShapeConvex.h>
@@ -52,7 +52,7 @@
 #include <ndFileFormatShapeCompound.h>
 #include <ndFileFormatJointCylinder.h>
 #include <ndFileFormatJointUpVector.h>
-#include <ndFileFormatKinematicBody.h>
+#include <ndFileFormatBodyKinematic.h>
 #include <ndFileFormatShapeConvexBox.h>
 #include <ndFileFormatJointSpherical.h>
 #include <ndFileFormatShapeStaticMesh.h>
@@ -64,7 +64,7 @@
 #include <ndFileFormatJointDoubleHinge.h>
 #include <ndFileFormatJointFixDistance.h>
 #include <ndFileFormatBodyTriggerVolume.h>
-#include <ndFileFormatKinematicBodyBase.h>
+#include <ndFileFormatBodyKinematicBase.h>
 #include <ndFileFormatShapeConvexSphere.h>
 #include <ndFileFormatJointVehicleMotor.h>
 #include <ndFileFormatJointIkDoubleHinge.h>

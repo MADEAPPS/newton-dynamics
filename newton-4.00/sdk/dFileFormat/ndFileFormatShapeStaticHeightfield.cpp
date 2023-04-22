@@ -62,7 +62,7 @@ ndInt32 ndFileFormatShapeStaticHeightfield::SaveShape(ndFileFormatSave* const sc
 	return xmlGetNodeId(classNode);
 }
 
-ndShape* ndFileFormatShapeStaticHeightfield::LoadShape(const nd::TiXmlElement* const node)
+ndShape* ndFileFormatShapeStaticHeightfield::LoadShape(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>&)
 {
 	const char* const filename = xmlGetString(node, "assetName");
 	ndVector minBox (xmlGetVector3(node, "minBox"));

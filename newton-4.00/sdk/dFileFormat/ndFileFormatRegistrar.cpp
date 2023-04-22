@@ -37,12 +37,12 @@
 #include "ndFileFormatJointSlider.h"
 #include "ndFileFormatJointPulley.h"
 #include "ndFileFormatShapeConvex.h"
-#include "ndFileFormatDynamicBody.h"
+#include "ndFileFormatBodyDynamic.h"
 #include "ndFileFormatModelNotify.h"
 #include "ndFileFormatJointRoller.h"
 #include "ndFileFormatJointFix6dof.h"
 #include "ndFileFormatJointIkHinge.h"
-#include "ndFileFormatKinematicBody.h"
+#include "ndFileFormatBodyKinematic.h"
 #include "ndFileFormatShapeInstance.h"
 #include "ndFileFormatShapeCompound.h"
 #include "ndFileFormatJointCylinder.h"
@@ -59,7 +59,7 @@
 #include "ndFileFormatJointVehicleTire.h"
 #include "ndFileFormatJointVehicleMotor.h"
 #include "ndFileFormatBodyTriggerVolume.h"
-#include "ndFileFormatKinematicBodyBase.h"
+#include "ndFileFormatBodyKinematicBase.h"
 #include "ndFileFormatShapeConvexSphere.h"
 #include "ndFileFormatShapeConvexCapsule.h"
 #include "ndFileFormatJointIkDoubleHinge.h"
@@ -129,11 +129,11 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatWorld world;
 	static ndFileFormatNotify bodyNotiy;
 	static ndFileFormatModelNotify modelNotify;
-	static ndFileFormatDynamicBody dynamicBody;
+	static ndFileFormatBodyDynamic dynamicBody;
 	static ndFileFormatShapeInstance collision;
-	static ndFileFormatKinematicBody kinematicBody;
+	static ndFileFormatBodyKinematic kinematicBody;
 	static ndFileFormatBodyTriggerVolume triggerVolume;
-	static ndFileFormatKinematicBodyBase kinematicBodyBase;
+	static ndFileFormatBodyKinematicBase kinematicBodyBase;
 
 	static ndFileFormatJoint joint;
 	static ndFileFormatJointGear jointGear;
@@ -233,7 +233,7 @@ void ndFileFormatRegistrar::SaveModel(ndFileFormatSave* const, nd::TiXmlElement*
 	ndAssert(0);
 }
 
-ndShape* ndFileFormatRegistrar::LoadShape(const nd::TiXmlElement* const)
+ndShape* ndFileFormatRegistrar::LoadShape(const nd::TiXmlElement* const, const ndTree<ndShape*, ndInt32>&)
 {
 	ndAssert(0);
 	return nullptr;
@@ -245,9 +245,10 @@ ndBody* ndFileFormatRegistrar::LoadBody(const nd::TiXmlElement* const, const ndT
 	return nullptr;
 }
 
-void ndFileFormatRegistrar::LoadCollision(const nd::TiXmlElement* const, const ndTree<ndShape*, ndInt32>&, ndBodyKinematic* const)
+ndShapeInstance* ndFileFormatRegistrar::LoadCollision(const nd::TiXmlElement* const, const ndTree<ndShape*, ndInt32>&)
 {
 	ndAssert(0);
+	return nullptr;
 }
 
 ndBodyNotify* ndFileFormatRegistrar::LoadNotify(const nd::TiXmlElement* const)

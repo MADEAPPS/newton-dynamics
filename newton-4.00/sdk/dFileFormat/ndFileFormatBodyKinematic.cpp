@@ -20,19 +20,19 @@
 */
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatKinematicBody.h"
+#include "ndFileFormatBodyKinematic.h"
 
-ndFileFormatKinematicBody::ndFileFormatKinematicBody()
+ndFileFormatBodyKinematic::ndFileFormatBodyKinematic()
 	:ndFileFormatBody(ndBodyKinematic::StaticClassName())
 {
 }
 
-ndFileFormatKinematicBody::ndFileFormatKinematicBody(const char* const className)
+ndFileFormatBodyKinematic::ndFileFormatBodyKinematic(const char* const className)
 	: ndFileFormatBody(className)
 {
 }
 
-void ndFileFormatKinematicBody::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
+void ndFileFormatBodyKinematic::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBodyKinematic::StaticClassName());
 	ndFileFormatBody::SaveBody(scene, classNode, body);
@@ -65,23 +65,25 @@ void ndFileFormatKinematicBody::SaveBody(ndFileFormatSave* const scene, nd::TiXm
 	xmlSaveParam(classNode, "maxAngleStep", kinematic->GetMaxAngularStep() * ndRadToDegree);
 }
 
-ndBody* ndFileFormatKinematicBody::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap)
+ndBody* ndFileFormatBodyKinematic::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap)
 {
 	ndBodyKinematic* const body = new ndBodyKinematic();
 	LoadBody(node, shapeMap, body);
 	return body;
 }
 
-void ndFileFormatKinematicBody::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body)
+void ndFileFormatBodyKinematic::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body)
 {
 	ndFileFormatBody::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
-
+	
 	ndBodyKinematic* const kinBody = (ndBodyKinematic*)body;
-
+	
 	ndFileFormatRegistrar* const collisionHandler = ndFileFormatRegistrar::GetHandler(ndShapeInstance::StaticClassName());
 	ndAssert(collisionHandler);
-	collisionHandler->LoadCollision((nd::TiXmlElement*)node->FirstChild("ndShapeInstanceClass"), shapeMap, kinBody);
-
+	ndSharedPtr<ndShapeInstance> instance(collisionHandler->LoadCollision((nd::TiXmlElement*)node->FirstChild("ndShapeInstanceClass"), shapeMap));
+	//collisionHandler->LoadCollision((nd::TiXmlElement*)node->FirstChild("ndShapeInstanceClass"), shapeMap, kinBody);
+	kinBody->SetCollisionShape(*(*instance));
+	
 	ndFloat32 invMass = xmlGetFloat(node, "invMass");
 	if (invMass > ndFloat32(0.0f))
 	{
@@ -99,7 +101,7 @@ void ndFileFormatKinematicBody::LoadBody(const nd::TiXmlElement* const node, con
 		}
 		kinBody->SetMassMatrix(ndFloat32(1.0f) / invMass, II);
 	}
-
+	
 	ndFloat32 stepInUnitPerSeconds = xmlGetFloat(node, "maxLinearStep");
 	ndFloat32 angleInRadian = xmlGetFloat(node, "maxAngleStep") * ndDegreeToRad;
 	kinBody->SetDebugMaxLinearAndAngularIntegrationStep(angleInRadian, stepInUnitPerSeconds);

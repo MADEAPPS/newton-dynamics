@@ -31,7 +31,7 @@ class ndFileFormatShapeConvexHull : public ndFileFormatShapeConvex
 	ndFileFormatShapeConvexHull();
 	ndFileFormatShapeConvexHull(const char* const className);
 
-	virtual ndShape* LoadShape(const nd::TiXmlElement* const nNode);
+	virtual ndShape* LoadShape(const nd::TiXmlElement* const nNode, const ndTree<ndShape*, ndInt32>& shapeMap);
 	virtual ndInt32 SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape);
 };
 

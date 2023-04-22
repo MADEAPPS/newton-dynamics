@@ -26,24 +26,24 @@ class ndSplinePathBody : public ndBodyDynamic
 	public:
 	D_CLASS_REFLECTION(ndSplinePathBody, ndBodyDynamic)
 
-	class ndSplinePathBodySaveLoad : public ndFileFormatDynamicBody
+	class ndSplinePathBodySaveLoad : public ndFileFormatBodyDynamic
 	{
 		public:
 		ndSplinePathBodySaveLoad()
-			:ndFileFormatDynamicBody(ndSplinePathBody::StaticClassName())
+			:ndFileFormatBodyDynamic(ndSplinePathBody::StaticClassName())
 		{
 		}
 
 		void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 		{
 			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndSplinePathBody::StaticClassName());
-			ndFileFormatDynamicBody::SaveBody(scene, classNode, body);
+			ndFileFormatBodyDynamic::SaveBody(scene, classNode, body);
 		}
 
 		virtual ndBody* LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap)
 		{
 			ndSplinePathBody* const body = new ndSplinePathBody();
-			ndFileFormatDynamicBody::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
+			ndFileFormatBodyDynamic::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
 			return body;
 		}
 	};

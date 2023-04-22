@@ -44,11 +44,11 @@ class ndFileFormatRegistrar : public ndClassAlloc
 	virtual void SaveCollision(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision);
 	virtual void SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint);
 
-	virtual ndShape* LoadShape(const nd::TiXmlElement* const node);
 	virtual ndBodyNotify* LoadNotify(const nd::TiXmlElement* const node);
 	virtual ndBody* LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap);
+	virtual ndShape* LoadShape(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap);
+	virtual ndShapeInstance* LoadCollision(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap);
 	virtual ndJointBilateralConstraint* LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap);
-	virtual void LoadCollision(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBodyKinematic* const body);
 	virtual ndModel* LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap);
 
 	private:
@@ -59,7 +59,7 @@ class ndFileFormatRegistrar : public ndClassAlloc
 	friend class ndFileFormat;
 	friend class ndFileFormatSave;
 	friend class ndFileFormatBody;
-	friend class ndFileFormatKinematicBody;
+	friend class ndFileFormatBodyKinematic;
 	friend class ndFileFormatShapeCompound;
 };
 

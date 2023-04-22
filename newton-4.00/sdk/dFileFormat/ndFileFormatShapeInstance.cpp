@@ -61,7 +61,8 @@ void ndFileFormatShapeInstance::SaveCollision(ndFileFormatSave* const scene, nd:
 	xmlSaveParam(classNode, "material", material);
 }
 
-void ndFileFormatShapeInstance::LoadCollision(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBodyKinematic* const body)
+//void ndFileFormatShapeInstance::LoadCollision(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBodyKinematic* const body)
+ndShapeInstance* ndFileFormatShapeInstance::LoadCollision(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap)
 {
 	ndArray<ndInt64> materialData;
 	ndVector scale(xmlGetVector3(node, "scale"));
@@ -75,14 +76,15 @@ void ndFileFormatShapeInstance::LoadCollision(const nd::TiXmlElement* const node
 
 	ndTree<ndShape*, ndInt32>::ndNode* const shapeNode = shapeMap.Find(shapeRef);
 	ndAssert(shapeNode);
-	ndShapeInstance instance(shapeNode->GetInfo());
+	//ndShapeInstance instance(shapeNode->GetInfo());
+	ndShapeInstance* const instance = new ndShapeInstance(shapeNode->GetInfo());
 
-	instance.SetScale(scale);
-	instance.SetLocalMatrix(localMatrix);
-	instance.SetCollisionMode(mode ? true : false);
-	instance.m_scaleType = scaleType;
-	instance.m_skinMargin = skinMargin;
-	instance.m_alignmentMatrix = aligmentMatrix;
+	instance->SetScale(scale);
+	instance->SetLocalMatrix(localMatrix);
+	instance->SetCollisionMode(mode ? true : false);
+	instance->m_scaleType = scaleType;
+	instance->m_skinMargin = skinMargin;
+	instance->m_alignmentMatrix = aligmentMatrix;
 
 	ndShapeMaterial material;
 	material.m_userId = materialData[0];
@@ -91,7 +93,8 @@ void ndFileFormatShapeInstance::LoadCollision(const nd::TiXmlElement* const node
 	{
 		material.m_userParam[i].m_intData = ndUnsigned64(materialData[2 + i]);
 	}
-	instance.SetMaterial(material);
+	instance->SetMaterial(material);
 
-	body->SetCollisionShape(instance);
+	//body->SetCollisionShape(instance);
+	return instance;
 }

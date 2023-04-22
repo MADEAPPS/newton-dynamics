@@ -46,8 +46,6 @@ void ndFileFormatLoad::LoadShapes(const nd::TiXmlElement* const rootNode, ndTree
 	{
 		for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
 		{
-			//const char* const name = node->Value();
-			//const char* const name1 = node->Value();
 			const nd::TiXmlElement* const element = (nd::TiXmlElement*)node;
 			const char* const className = element->Attribute("className");
 			ndFileFormatRegistrar* const handler = ndFileFormatRegistrar::GetHandler(className);
@@ -55,7 +53,7 @@ void ndFileFormatLoad::LoadShapes(const nd::TiXmlElement* const rootNode, ndTree
 
 			ndInt32 nodeId;
 			element->Attribute("nodeId", &nodeId);
-			ndShape* const shape = handler->LoadShape(element);
+			ndShape* const shape = handler->LoadShape(element, shapeMap);
 			shape->AddRef();
 			shapeMap.Insert(shape, nodeId);
 		}

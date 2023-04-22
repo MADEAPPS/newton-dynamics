@@ -44,7 +44,7 @@ ndInt32 ndFileFormatShapeConvexBox::SaveShape(ndFileFormatSave* const scene, nd:
 	return xmlGetNodeId(classNode);
 }
 
-ndShape* ndFileFormatShapeConvexBox::LoadShape(const nd::TiXmlElement* const node)
+ndShape* ndFileFormatShapeConvexBox::LoadShape(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>&)
 {
 	ndVector size(xmlGetVector3(node, "size"));
 	return new ndShapeBox(size.m_x, size.m_y, size.m_z);

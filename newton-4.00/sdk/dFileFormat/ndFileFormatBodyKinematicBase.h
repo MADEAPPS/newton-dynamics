@@ -19,23 +19,19 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_FILE_FORMAT_KINEMATIC_BODY_H__
-#define _ND_FILE_FORMAT_KINEMATIC_BODY_H__
+#ifndef _ND_FILE_FORMAT_KINEMATIC_BODY_BASE_H__
+#define _ND_FILE_FORMAT_KINEMATIC_BODY_BASE_H__
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatBody.h"
+#include "ndFileFormatBodyKinematic.h"
 
-class ndFileFormatKinematicBody : public ndFileFormatBody
+class ndFileFormatBodyKinematicBase : public ndFileFormatBodyKinematic
 {
 	public: 
-	ndFileFormatKinematicBody();
-	ndFileFormatKinematicBody(const char* const className);
+	ndFileFormatBodyKinematicBase();
+	ndFileFormatBodyKinematicBase(const char* const className);
 
 	virtual void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
-
-	virtual ndBody* LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap);
-	protected:
-	virtual void LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body);
 };
 
 #endif 

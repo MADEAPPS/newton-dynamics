@@ -44,7 +44,7 @@ ndInt32 ndFileFormatShapeConvexChamferCylinder::SaveShape(ndFileFormatSave* cons
 	return xmlGetNodeId(classNode);
 }
 
-ndShape* ndFileFormatShapeConvexChamferCylinder::LoadShape(const nd::TiXmlElement* const node)
+ndShape* ndFileFormatShapeConvexChamferCylinder::LoadShape(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>&)
 {
 	ndFloat32 height = xmlGetFloat(node, "height");
 	ndFloat32 radius = xmlGetFloat(node, "radius");

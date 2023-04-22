@@ -42,7 +42,7 @@ ndInt32 ndFileFormatShapeConvexSphere::SaveShape(ndFileFormatSave* const scene, 
 	return xmlGetNodeId(classNode);
 }
 
-ndShape* ndFileFormatShapeConvexSphere::LoadShape(const nd::TiXmlElement* const node)
+ndShape* ndFileFormatShapeConvexSphere::LoadShape(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>&)
 {
 	ndFloat32 radius = xmlGetFloat(node, "radius");
 	return new ndShapeSphere(radius);

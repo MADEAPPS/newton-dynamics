@@ -40,7 +40,7 @@
 //#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
-//#define DEFAULT_SCENE	3		// basic compound shapes
+#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
@@ -51,7 +51,7 @@
 //#define DEFAULT_SCENE	11		// basic vehicle
 //#define DEFAULT_SCENE	12		// heavy vehicle
 //#define DEFAULT_SCENE	13		// background vehicle prop
-#define DEFAULT_SCENE	14		// simple industrial robot
+//#define DEFAULT_SCENE	14		// simple industrial robot
 //#define DEFAULT_SCENE	15		// advanced industrial robot
 //#define DEFAULT_SCENE	16		// basic player
 //#define DEFAULT_SCENE	17		// rag doll
