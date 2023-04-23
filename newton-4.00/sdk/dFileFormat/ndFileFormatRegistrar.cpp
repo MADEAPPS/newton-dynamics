@@ -75,6 +75,7 @@
 #include "ndFileFormatJointVehicleDifferential.h"
 #include "ndFileFormatShapeStaticProceduralMesh.h"
 #include "ndFileFormatShapeConvexChamferCylinder.h"
+#include "ndFileFormatBodyKinematicPlayerCapsule.h"
 #include "ndFileFormatJointVehicleDifferentialAxle.h"
 #include "ndFileFormatJointIkSwivelPositionEffector.h"
 
@@ -134,6 +135,7 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatBodyKinematic kinematicBody;
 	static ndFileFormatBodyTriggerVolume triggerVolume;
 	static ndFileFormatBodyKinematicBase kinematicBodyBase;
+	static ndFileFormatBodyKinematicPlayerCapsule kinematicPlayerCapsule;
 
 	static ndFileFormatJoint joint;
 	static ndFileFormatJointGear jointGear;

@@ -57,7 +57,7 @@ void ndFileFormatBodyDynamic::LoadBody(const nd::TiXmlElement* const node, const
 	ndFloat32 linearDamp = xmlGetFloat(node, "linearDampCoef");
 	ndVector angularDamp(xmlGetVector3(node, "angularDampCoef"));
 
-	ndBodyDynamic* const dynBody = (ndBodyDynamic*)body;
+	ndBodyDynamic* const dynBody = ((ndBody*)body)->GetAsBodyDynamic();
 	dynBody->SetLinearDamping(linearDamp);
 	dynBody->SetAngularDamping(angularDamp);
 }

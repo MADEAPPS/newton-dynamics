@@ -170,13 +170,12 @@ void ndFileFormatSave::SaveBodies(nd::TiXmlElement* const rootNode)
 		{
 			ndBody* const body = m_bodies[i];
 			ndFileFormatRegistrar* handler = ndFileFormatRegistrar::GetHandler(body->ClassName());
-			ndAssert(handler);
 			if (!handler)
 			{
-				ndAssert(0);
 				ndTrace(("failed to save body type: %s\n", body->ClassName()));
 				handler = ndFileFormatRegistrar::GetHandler(body->SuperClassName());
 			}
+			ndAssert(handler);
 			if (handler)
 			{
 				handler->SaveBody(this, bodiesNode, body);

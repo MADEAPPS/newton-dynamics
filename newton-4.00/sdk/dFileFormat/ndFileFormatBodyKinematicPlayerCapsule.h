@@ -19,17 +19,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_FILE_FORMAT_BODY_KINEMATIC_H__
-#define _ND_FILE_FORMAT_BODY_KINEMATIC_H__
+#ifndef _ND_FILE_FORMAT_KINEMATIC_PLAYER_CAPSULE_H__
+#define _ND_FILE_FORMAT_KINEMATIC_PLAYER_CAPSULE_H__
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatBody.h"
+#include "ndFileFormatBodyKinematicBase.h"
 
-class ndFileFormatBodyKinematic : public ndFileFormatBody
+class ndFileFormatBodyKinematicPlayerCapsule : public ndFileFormatBodyKinematicBase
 {
 	public: 
-	ndFileFormatBodyKinematic();
-	ndFileFormatBodyKinematic(const char* const className);
+	ndFileFormatBodyKinematicPlayerCapsule();
+	ndFileFormatBodyKinematicPlayerCapsule(const char* const className);
 
 	virtual void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
 

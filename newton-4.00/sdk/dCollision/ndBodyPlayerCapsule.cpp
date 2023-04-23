@@ -76,8 +76,23 @@ class ndBodyPlayerCapsuleImpulseSolver
 	ndInt32 m_rowCount;
 } D_GCC_NEWTON_ALIGN_32;
 
+
+ndBodyPlayerCapsule::ndBodyPlayerCapsule()
+	:ndBodyKinematicBase()
+{
+}
+
 ndBodyPlayerCapsule::ndBodyPlayerCapsule(const ndMatrix& localAxis, ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight)
 	:ndBodyKinematicBase()
+{
+	Init(localAxis, mass, radius, height, stepHeight);
+}
+
+ndBodyPlayerCapsule::~ndBodyPlayerCapsule()
+{
+}
+
+void ndBodyPlayerCapsule::Init(const ndMatrix& localAxis, ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight)
 {
 	//m_contactTestOnly = 1;
 	m_impulse = ndVector::m_zero;
@@ -97,30 +112,25 @@ ndBodyPlayerCapsule::ndBodyPlayerCapsule(const ndMatrix& localAxis, ndFloat32 ma
 	ndMatrix shapeMatrix(localAxis);
 	shapeMatrix.m_posit = shapeMatrix.m_front.Scale(height * 0.5f);
 	shapeMatrix.m_posit.m_w = 1.0f;
-	
+
 	height = ndMax(height - 2.0f * radius / m_weistScale, ndFloat32(0.1f));
 	ndShapeInstance instance(new ndShapeCapsule(radius / m_weistScale, radius / m_weistScale, height));
 	instance.SetLocalMatrix(shapeMatrix);
-	instance.SetScale(ndVector (ndFloat32 (1.0f), m_weistScale, m_weistScale, ndFloat32 (0.0f)));
+	instance.SetScale(ndVector(ndFloat32(1.0f), m_weistScale, m_weistScale, ndFloat32(0.0f)));
 	ndBodyKinematic::SetCollisionShape(instance);
-	
+
 	SetMassMatrix(mass, instance);
 	m_invMass = GetInvMass();
 	m_mass = ndBodyKinematic::m_mass.m_w;
-		
+
 	m_localFrame = shapeMatrix;
 	m_localFrame.m_posit = ndVector::m_wOne;
 	m_contactPatch = radius / m_weistScale;
 	m_stepHeight = ndMax(stepHeight, m_contactPatch * ndFloat32(2.0f));
 }
 
-ndBodyPlayerCapsule::~ndBodyPlayerCapsule()
-{
-}
-
 void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactSolver, ndFloat32 timestep)
 {
-	ndAssert(0);
 	ndMatrix matrix(m_matrix);
 	ndVector savedVeloc(m_veloc);
 
@@ -321,7 +331,6 @@ ndBodyPlayerCapsule::dCollisionState ndBodyPlayerCapsule::TestPredictCollision(c
 
 ndFloat32 ndBodyPlayerCapsule::PredictTimestep(ndBodyPlayerCapsuleContactSolver& contactSolver, ndFloat32 timestep)
 {
-	ndAssert(0);
 	ndMatrix matrix(m_matrix);
 	ndVector veloc(GetVelocity());
 	ndBodyKinematic::IntegrateVelocity(timestep);
@@ -373,7 +382,6 @@ ndFloat32 ndBodyPlayerCapsule::PredictTimestep(ndBodyPlayerCapsuleContactSolver&
 			}
 			timestep += dt;
 		}
-		ndAssert(0);
 	}
 
 	return timestep;
@@ -734,7 +742,6 @@ void ndBodyPlayerCapsule::SpecialUpdate(ndFloat32 timestep)
 #endif
 	m_equilibrium0 = 0;
 
-	ndAssert(0);
 	// set player orientation
 	ndMatrix matrix(ndYawMatrix(GetHeadingAngle()));
 	matrix.m_posit = m_matrix.m_posit;

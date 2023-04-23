@@ -33,6 +33,8 @@ class ndBodyPlayerCapsule : public ndBodyKinematicBase
 {
 	public:
 	D_CLASS_REFLECTION(ndBodyPlayerCapsule, ndBodyKinematicBase)
+
+	D_COLLISION_API ndBodyPlayerCapsule();
 	D_COLLISION_API ndBodyPlayerCapsule(const ndMatrix& localAxis, ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight);
 	D_COLLISION_API virtual ~ndBodyPlayerCapsule();
 
@@ -63,7 +65,8 @@ class ndBodyPlayerCapsule : public ndBodyKinematicBase
 	virtual void IntegrateExternalForce(ndFloat32 timestep);
 	D_COLLISION_API virtual void SpecialUpdate(ndFloat32 timestep);
 	virtual void SetCollisionShape(const ndShapeInstance& shapeInstance);
-	
+
+	void Init(const ndMatrix& localAxis, ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight);
 	void UpdatePlayerStatus(ndBodyPlayerCapsuleContactSolver& contactSolver);
 	void ResolveStep(ndBodyPlayerCapsuleContactSolver& contactSolver, ndFloat32 timestep);
 	void ResolveCollision(ndBodyPlayerCapsuleContactSolver& contactSolver, ndFloat32 timestep);
@@ -90,6 +93,7 @@ class ndBodyPlayerCapsule : public ndBodyKinematicBase
 	bool m_isAirbone;
 	bool m_isOnFloor;
 	bool m_isCrouched;
+	friend class ndFileFormatBodyKinematicPlayerCapsule;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule()

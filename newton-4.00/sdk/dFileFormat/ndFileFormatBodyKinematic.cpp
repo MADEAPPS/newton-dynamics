@@ -76,12 +76,11 @@ void ndFileFormatBodyKinematic::LoadBody(const nd::TiXmlElement* const node, con
 {
 	ndFileFormatBody::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
 	
-	ndBodyKinematic* const kinBody = (ndBodyKinematic*)body;
+	ndBodyKinematic* const kinBody = ((ndBody*)body)->GetAsBodyKinematic();
 	
 	ndFileFormatRegistrar* const collisionHandler = ndFileFormatRegistrar::GetHandler(ndShapeInstance::StaticClassName());
 	ndAssert(collisionHandler);
 	ndSharedPtr<ndShapeInstance> instance(collisionHandler->LoadCollision((nd::TiXmlElement*)node->FirstChild("ndShapeInstanceClass"), shapeMap));
-	//collisionHandler->LoadCollision((nd::TiXmlElement*)node->FirstChild("ndShapeInstanceClass"), shapeMap, kinBody);
 	kinBody->SetCollisionShape(*(*instance));
 	
 	ndFloat32 invMass = xmlGetFloat(node, "invMass");

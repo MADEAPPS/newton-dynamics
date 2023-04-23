@@ -155,23 +155,23 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	ndArray<ndFloat32>& hitDistance = query.m_hitDistance;
 	if (data->m_doContinueCollisionTest) 
 	{
-		ndAssert(0);
-		//dFastRay ray(ndVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
-		//for (ndInt32 i = 0; i < faceCount; ++i) 
-		//{
-		//	const ndInt32* const indexArray = &indices[faceIndexCount1];
-		//	const ndVector& faceNormal = vertex[indexArray[4]];
-		//	ndFloat32 dist = data->PolygonBoxRayDistance(faceNormal, 3, indexArray, stride, &vertex[0].m_x, ray);
-		//	if (dist < ndFloat32(1.0f)) 
-		//	{
-		//		hitDistance[faceCount0] = dist;
-		//		address[faceCount0] = faceIndexCount0;
-		//		memcpy(&indices[faceIndexCount0], indexArray, 9 * sizeof(ndInt32));
-		//		faceCount0++;
-		//		faceIndexCount0 += 9;
-		//	}
-		//	faceIndexCount1 += 9;
-		//}
+		ndFastRay ray(ndVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
+		for (ndInt32 i = 0; i < faceList.GetCount(); ++i)
+		{
+			const ndInt32 vertexCount = faceIndexCount[i];
+			const ndInt32* const indexArray = &indices[faceIndexCount1];
+			const ndVector& faceNormal = vertex[indexArray[4]];
+			ndFloat32 dist = data->PolygonBoxRayDistance(faceNormal, 3, indexArray, stride, &vertex[0].m_x, ray);
+			if (dist < ndFloat32(1.0f)) 
+			{
+				hitDistance.PushBack(dist);
+				address.PushBack(faceIndexCount0);
+				memcpy(&indices[faceIndexCount0], indexArray, (vertexCount * 2 + 3) * sizeof(ndInt32));
+				faceCount0++;
+				faceIndexCount0 += vertexCount * 2 + 3;
+			}
+			faceIndexCount1 += vertexCount * 2 + 3;
+		}
 	}
 	else 
 	{
@@ -183,8 +183,6 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 			ndFloat32 dist = data->PolygonBoxDistance(faceNormal, vertexCount, indexArray, stride, &vertex[0].m_x);
 			if (dist > ndFloat32(0.0f)) 
 			{
-				//hitDistance[faceCount0] = dist;
-				//address[faceCount0] = faceIndexCount0;
 				hitDistance.PushBack(dist);
 				address.PushBack(faceIndexCount0);
 				memcpy(&indices[faceIndexCount0], indexArray, (vertexCount * 2 + 3) * sizeof(ndInt32));
@@ -203,6 +201,5 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 
 ndUnsigned64 ndShapeStaticProceduralMesh::GetHash(ndUnsigned64 hash) const
 {
-	ndAssert(0);
-	return 32;
+	return hash + 1;
 }

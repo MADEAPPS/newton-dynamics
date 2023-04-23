@@ -81,8 +81,10 @@
 #include <ndFileFormatJointVehicleDifferential.h>
 #include <ndFileFormatShapeStaticProceduralMesh.h>
 #include <ndFileFormatShapeConvexChamferCylinder.h>
+#include <ndFileFormatBodyKinematicPlayerCapsule.h>
 #include <ndFileFormatJointVehicleDifferentialAxle.h>
 #include <ndFileFormatJointIkSwivelPositionEffector.h>
+
 
 #endif 
 

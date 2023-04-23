@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_FILE_FORMAT_KINEMATIC_BODY_BASE_H__
-#define _ND_FILE_FORMAT_KINEMATIC_BODY_BASE_H__
+#ifndef _ND_FILE_FORMAT_BODY_KINEMATIC_BASE_H__
+#define _ND_FILE_FORMAT_BODY_KINEMATIC_BASE_H__
 
 #include "ndFileFormatStdafx.h"
 #include "ndFileFormatBodyKinematic.h"
@@ -32,6 +32,10 @@ class ndFileFormatBodyKinematicBase : public ndFileFormatBodyKinematic
 	ndFileFormatBodyKinematicBase(const char* const className);
 
 	virtual void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
+
+	virtual ndBody* LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap);
+	protected:
+	virtual void LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body);
 };
 
 #endif 
