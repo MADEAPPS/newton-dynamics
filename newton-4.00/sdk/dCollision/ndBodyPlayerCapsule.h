@@ -63,18 +63,17 @@ class ndBodyPlayerCapsule : public ndBodyKinematicBase
 	};
 
 	virtual void IntegrateExternalForce(ndFloat32 timestep);
-	D_COLLISION_API virtual void SpecialUpdate(ndFloat32 timestep);
 	virtual void SetCollisionShape(const ndShapeInstance& shapeInstance);
-
-	void Init(const ndMatrix& localAxis, ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight);
 	void UpdatePlayerStatus(ndBodyPlayerCapsuleContactSolver& contactSolver);
 	void ResolveStep(ndBodyPlayerCapsuleContactSolver& contactSolver, ndFloat32 timestep);
 	void ResolveCollision(ndBodyPlayerCapsuleContactSolver& contactSolver, ndFloat32 timestep);
 	ndFloat32 PredictTimestep(ndBodyPlayerCapsuleContactSolver& contactSolver, ndFloat32 timestep);
 	dCollisionState TestPredictCollision(const ndBodyPlayerCapsuleContactSolver& contactSolver, const ndVector& veloc) const;
 	void ResolveInterpenetrations(ndBodyPlayerCapsuleContactSolver& contactSolver, ndBodyPlayerCapsuleImpulseSolver& impulseSolver);
-
 	void IntegrateVelocity(ndFloat32 timestep);
+
+	D_COLLISION_API virtual void SpecialUpdate(ndFloat32 timestep);
+	D_COLLISION_API void Init(const ndMatrix& localAxis, ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight);
 
 	protected: 
 	ndMatrix m_localFrame;

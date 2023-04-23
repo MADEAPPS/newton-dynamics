@@ -47,6 +47,7 @@ class ndShapeCompound: public ndShape
 	};
 
 	D_CLASS_REFLECTION(ndShapeCompound,ndShape)
+
 	D_COLLISION_API ndShapeCompound();
 	D_COLLISION_API virtual ~ndShapeCompound();
 
@@ -63,7 +64,7 @@ class ndShapeCompound: public ndShape
 
 	protected:
 	class ndSpliteInfo;
-	ndShapeCompound(const ndShapeCompound& source, const ndShapeInstance* const myInstance);
+	D_COLLISION_API ndShapeCompound(const ndShapeCompound& source, const ndShapeInstance* const myInstance);
 
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
