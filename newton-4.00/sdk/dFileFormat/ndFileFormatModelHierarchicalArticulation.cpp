@@ -21,33 +21,33 @@
 
 #include "ndFileFormatStdafx.h"
 #include "ndFileFormatSave.h"
-#include "ndFileFormatModelPassiveRadoll.h"
+#include "ndFileFormatModelHierarchicalArticulation.h"
 
-ndFileFormatModelPassiveRadoll::ndFileFormatModelPassiveRadoll()
-	:ndFileFormatModelBase(ndModelPassiveRagdoll::StaticClassName())
+ndFileFormatModelHierarchicalArticulation::ndFileFormatModelHierarchicalArticulation()
+	:ndFileFormatModelBase(ndModelHierarchicalArticulation::StaticClassName())
 {
 }
 
-ndFileFormatModelPassiveRadoll::ndFileFormatModelPassiveRadoll(const char* const className)
+ndFileFormatModelHierarchicalArticulation::ndFileFormatModelHierarchicalArticulation(const char* const className)
 	:ndFileFormatModelBase(className)
 {
 }
 
-void ndFileFormatModelPassiveRadoll::SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
+void ndFileFormatModelHierarchicalArticulation::SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_MODEL_CLASS, ndModelPassiveRagdoll::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_MODEL_CLASS, ndModelHierarchicalArticulation::StaticClassName());
 	ndFileFormatModelBase::SaveModel(scene, classNode, model);
 
-	ndModelPassiveRagdoll* const ragDoll = (ndModelPassiveRagdoll*)model;
+	ndModelHierarchicalArticulation* const articulatedModel = (ndModelHierarchicalArticulation*)model;
 
-	if (ragDoll->GetRoot())
+	if (articulatedModel->GetRoot())
 	{
-		xmlSaveParam(classNode, "rootBody", scene->FindBodyId(ragDoll->GetRoot()->m_body));
+		xmlSaveParam(classNode, "rootBody", scene->FindBodyId(articulatedModel->GetRoot()->m_body));
 		nd::TiXmlElement* const limbsNode = new nd::TiXmlElement("limbs");
 		classNode->LinkEndChild(limbsNode);
 
-		ndFixSizeArray<ndModelPassiveRagdoll::ndRagdollNode*, 256> stack;
-		for (ndModelPassiveRagdoll::ndRagdollNode* child = ragDoll->GetRoot()->GetFirstChild(); child; child = child->GetNext())
+		ndFixSizeArray<ndModelHierarchicalArticulation::ndNode*, 256> stack;
+		for (ndModelHierarchicalArticulation::ndNode* child = articulatedModel->GetRoot()->GetFirstChild(); child; child = child->GetNext())
 		{
 			stack.PushBack(child);
 		}
@@ -56,7 +56,7 @@ void ndFileFormatModelPassiveRadoll::SaveModel(ndFileFormatSave* const scene, nd
 		{
 			count++;
 			ndInt32 index = stack.GetCount() - 1;
-			ndModelPassiveRagdoll::ndRagdollNode* const node = stack[index];
+			ndModelHierarchicalArticulation::ndNode* const node = stack[index];
 			stack.SetCount(index);
 		
 			nd::TiXmlElement* const limbNode = new nd::TiXmlElement("limb");
@@ -71,7 +71,7 @@ void ndFileFormatModelPassiveRadoll::SaveModel(ndFileFormatSave* const scene, nd
 			limbNode->SetAttribute("parentBody", parentId);
 			limbNode->SetAttribute("joint", jointId);
 		
-			for (ndModelPassiveRagdoll::ndRagdollNode* child = node->GetFirstChild(); child; child = child->GetNext())
+			for (ndModelHierarchicalArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
 			{
 				stack.PushBack(child);
 			}
@@ -81,23 +81,23 @@ void ndFileFormatModelPassiveRadoll::SaveModel(ndFileFormatSave* const scene, nd
 }
 
 
-ndModel* ndFileFormatModelPassiveRadoll::LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap)
+ndModel* ndFileFormatModelHierarchicalArticulation::LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap)
 {
-	ndModelPassiveRagdoll* const model = new ndModelPassiveRagdoll();
+	ndModelHierarchicalArticulation* const model = new ndModelHierarchicalArticulation();
 	LoadModel(node, bodyMap, jointMap, model);
 	return model;
 }
 
-void ndFileFormatModelPassiveRadoll::LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap, ndModel* const model)
+void ndFileFormatModelHierarchicalArticulation::LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap, ndModel* const model)
 {
 	ndFileFormatModelBase::LoadModel((nd::TiXmlElement*)node->FirstChild(D_MODEL_CLASS), bodyMap, jointMap, model);
 
-	ndModelPassiveRagdoll* const modelBase = (ndModelPassiveRagdoll*)model;
+	ndModelHierarchicalArticulation* const modelBase = (ndModelHierarchicalArticulation*)model;
 
 	ndInt32 rootBodyId = xmlGetInt(node, "rootBody");
 	ndTree<ndSharedPtr<ndBody>, ndInt32>::ndNode* const rootBodyNode = bodyMap.Find(rootBodyId);
 
-	ndTree<ndModelPassiveRagdoll::ndRagdollNode*, ndInt32> filter;
+	ndTree<ndModelHierarchicalArticulation::ndNode*, ndInt32> filter;
 	filter.Insert (modelBase->AddRootBody(rootBodyNode->GetInfo()), rootBodyId);
 
 	const nd::TiXmlNode* const limbsNode = node->FirstChild("limbs");
@@ -116,8 +116,8 @@ void ndFileFormatModelPassiveRadoll::LoadModel(const nd::TiXmlElement* const nod
 		ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>::ndNode* const jointNode = jointMap.Find(jointId);
 
 		ndAssert(filter.Find(parentId));
-		ndModelPassiveRagdoll::ndRagdollNode* const parent = filter.Find(parentId)->GetInfo();
-		ndModelPassiveRagdoll::ndRagdollNode* const child = modelBase->AddLimb(parent, childBodyNode->GetInfo(), jointNode->GetInfo());
+		ndModelHierarchicalArticulation::ndNode* const parent = filter.Find(parentId)->GetInfo();
+		ndModelHierarchicalArticulation::ndNode* const child = modelBase->AddLimb(parent, childBodyNode->GetInfo(), jointNode->GetInfo());
 		filter.Insert(child, childId);
 	}
 }

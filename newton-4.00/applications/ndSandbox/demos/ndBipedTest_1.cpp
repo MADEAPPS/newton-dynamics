@@ -62,28 +62,29 @@ namespace biped_1
 	static ndDefinition ragdollDefinition[] =
 	{
 		{ "root", ndDefinition::m_root,{},{} },
-		{ "lowerback", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-		{ "upperback", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "lowerneck", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "upperneck", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
 
-		{ "lclavicle", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
-		{ "lhumerus", ndDefinition::m_fix, 1, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "lradius", ndDefinition::m_fix, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-
-		{ "rclavicle", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		{ "rhumerus", ndDefinition::m_fix, 1, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "rradius", ndDefinition::m_fix, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-
-		{ "rhipjoint", ndDefinition::m_ikSpherical, 0,{ -60.0f, 60.0f, 80.0f },{ 0.0f, -60.0f, 0.0f } },
-		{ "rfemur", ndDefinition::m_ikHinge, 1, { 0.5f, 120.0f, 0.0f },{ 0.0f, 90.0f, 0.0f } },
-		{ "rfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
-		{ "rtibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-
-		//{ "lhipjoint", ndDefinition::m_ikSpherical, 0, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		//{ "lfemur", ndDefinition::m_ikHinge, 1, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		//{ "lfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
-		//{ "ltibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//{ "lowerback", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+		//{ "upperback", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		//{ "lowerneck", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		//{ "upperneck", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		//
+		//{ "lclavicle", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+		//{ "lhumerus", ndDefinition::m_fix, 1, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "lradius", ndDefinition::m_fix, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//
+		//{ "rclavicle", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		//{ "rhumerus", ndDefinition::m_fix, 1, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "rradius", ndDefinition::m_fix, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//
+		//{ "rhipjoint", ndDefinition::m_ikSpherical, 0,{ -60.0f, 60.0f, 80.0f },{ 0.0f, -60.0f, 0.0f } },
+		//{ "rfemur", ndDefinition::m_ikHinge, 1, { 0.5f, 120.0f, 0.0f },{ 0.0f, 90.0f, 0.0f } },
+		//{ "rfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+		//{ "rtibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//
+		////{ "lhipjoint", ndDefinition::m_ikSpherical, 0, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		////{ "lfemur", ndDefinition::m_ikHinge, 1, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		////{ "lfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+		////{ "ltibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 		{ "", ndDefinition::m_root, 0,{},{} },
 	};
@@ -578,15 +579,187 @@ namespace biped_1
 	};
 #endif
 
-	ndModelPassiveRagdoll* BuildRagDoll(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
+	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndModel* const model, const ndDefinition& definition, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
 	{
-		ndModelPassiveRagdoll* const ragdoll = new ndModelPassiveRagdoll();
+		ndSharedPtr<ndShapeInstance> shapePtr(entityPart->CreateCollisionFromChildren());
+		ndShapeInstance* const shape = *shapePtr;
+		ndAssert(shape);
+
+		// create the rigid body that will make this body
+		ndMatrix matrix(entityPart->CalculateGlobalMatrix());
+
+		ndBodyKinematic* const body = new ndBodyDynamic();
+		body->SetMatrix(matrix);
+		body->SetCollisionShape(*shape);
+		body->SetMassMatrix(1.0f, *shape);
+		body->SetNotifyCallback(new ndBindingRagdollEntityNotify(scene, entityPart, parentBone, 100.0f));
+
+		// save the shape material type
+		ndShapeInstance& instanceShape = body->GetCollisionShape();
+		instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
+		instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(model);
+		instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_materialFlags].m_intData = ndUnsigned64(definition.m_selfCollide);
+
+		return body->GetAsBodyDynamic();
+	}
+
+	ndModelHierarchicalArticulation* BuildModel(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
+	{
+		ndModelHierarchicalArticulation* const model = new ndModelHierarchicalArticulation();
 
 		ndWorld* const world = scene->GetWorld();
 		ndDemoEntity* const entity = modelMesh->CreateClone();
 		scene->AddEntity(entity);
 
-		return ragdoll;
+		//// find the floor location 
+		//ndMatrix entMatrix(entity->CalculateGlobalMatrix() * location);
+		//ndVector floor(FindFloor(*world, entMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		//entMatrix.m_posit.m_y = floor.m_y + 1.1f;
+		//entity->ResetMatrix(entMatrix);
+
+		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
+		ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
+
+		// find the floor location 
+		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		matrix.m_posit.m_y = floor.m_y + 1.5f;
+
+		rootEntity->ResetMatrix(matrix);
+		entity->ResetMatrix(ndGetIdentityMatrix());
+		
+		//// add the root body
+		//ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
+		//ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr, ragdollDefinition[0]);
+		//
+		//ndInt32 stack = 0;
+		//ndFixSizeArray<ndFloat32, 64> massWeight;
+		//ndFixSizeArray<ndBodyDynamic*, 32> parentBones;
+		//ndFixSizeArray<ndDemoEntity*, 32> childEntities;
+		//
+		//parentBones.SetCount(32);
+		//childEntities.SetCount(32);
+		//
+		//parentBones.SetCount(32);
+		//childEntities.SetCount(32);
+
+		ndSharedPtr<ndBody> rootBody(CreateBodyPart(scene, model, ragdollDefinition[0], rootEntity, nullptr));
+		world->AddBody(rootBody);
+
+		ndInt32 stack = 0;
+		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
+		ndFixSizeArray<ndModelHierarchicalArticulation::ndNode*, 32> parentBones;
+
+		ndModelHierarchicalArticulation::ndNode* const modelNode = model->AddRootBody(rootBody);
+
+		for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
+		{
+			childEntities[stack] = child;
+			parentBones[stack] = modelNode;
+			stack++;
+		}
+		
+		// walk model hierarchic adding all children designed as rigid body bones. 
+		while (stack)
+		{
+			stack--;
+		//	ndBodyDynamic* parentBody = parentBones[stack];
+		//	ndDemoEntity* const childEntity = childEntities[stack];
+		//	const char* const name = childEntity->GetName().GetStr();
+		 
+			ndDemoEntity* const childEntity = childEntities[stack];
+			ndModelHierarchicalArticulation::ndNode* parentBone = parentBones[stack];
+			const char* const name = childEntity->GetName().GetStr();
+
+			for (ndInt32 i = 0; ragdollDefinition[i].m_boneName[0]; ++i)
+			{
+				if (!strcmp(ragdollDefinition[i].m_boneName, name))
+				{
+					if (ragdollDefinition[i].m_type != ndDefinition::m_effector)
+					{
+						ndAssert(0);
+						//ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBody, definition[i]);
+						//
+						//// connect this body part to its parentBody with a robot joint
+						//ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBody, definition[i]);
+						//
+						//ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+						//world->AddJoint(jointPtr);
+						//parentBody = childBody;
+					}
+					else
+					{
+						ndAssert(0);
+						//ndDemoEntityNotify* const childNotify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
+						//ndAssert(childNotify);
+						//ndDemoEntityNotify* const midNotify = (ndDemoEntityNotify*)childNotify->m_parentBody->GetNotifyCallback();
+						//ndAssert(midNotify);
+						//ndDemoEntityNotify* const pivotNotify = (ndDemoEntityNotify*)midNotify->m_parentBody->GetNotifyCallback();
+						//ndAssert(pivotNotify);
+						//
+						//ndBodyDynamic* const childBody = childNotify->GetBody()->GetAsBodyDynamic();
+						//ndBodyDynamic* const pivotBody = pivotNotify->GetBody()->GetAsBodyDynamic();
+						//
+						//ndDemoEntity* const pivotFrameNode = midNotify->m_entity->FindBySubString("reference");
+						//ndDemoEntity* const childFrameNode = childNotify->m_entity->FindBySubString("effector");
+						//ndAssert(pivotFrameNode);
+						//ndAssert(childFrameNode);
+						//ndAssert(childFrameNode == childEntity);
+						//
+						//ndMatrix pivotFrame(pivotFrameNode->CalculateGlobalMatrix());
+						//ndMatrix effectorFrame(childFrameNode->CalculateGlobalMatrix());
+						//
+						//ndFloat32 regularizer = 0.001f;
+						//ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, childBody, pivotBody);
+						//effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+						//effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+						//
+						//const ndVector kneePoint(childFrameNode->GetParent()->CalculateGlobalMatrix().m_posit);
+						//const ndVector dist0(effectorFrame.m_posit - kneePoint);
+						//const ndVector dist1(kneePoint - pivotFrame.m_posit);
+						//const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
+						//effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.999f);
+						//
+						//ndEffectorInfo info(effector);
+						//info.m_x_mapper = ndParamMapper(0.0f, workSpace * 0.995f);
+						//info.m_y_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
+						//info.m_z_mapper = ndParamMapper(-120.0f * ndDegreeToRad, 120.0f * ndDegreeToRad);
+						//info.m_swivel_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+						//
+						//// set the default pose param.
+						//ndVector localPosit(effector->GetLocalTargetPosition());
+						//info.m_x = ndReal(info.m_x_mapper.CalculateParam(ndSqrt(localPosit.DotProduct(localPosit & ndVector::m_triplexMask).GetScalar())));
+						//
+						////ndVector localPositDir(localPosit.Normalize());
+						////ndFloat32 yawAngle = ndAtan2(-localPositDir.m_z, localPositDir.m_x);;
+						////info.m_y = info.m_y_mapper.CalculateParam(yawAngle);
+						////ndFloat32 rollAngle = ndSin(localPositDir.m_y);
+						////info.m_z = info.m_z_mapper.CalculateParam(rollAngle);
+						//
+						//// verify the param is correct
+						////const ndMatrix yaw(ndYawMatrix(info.m_y_mapper.Interpolate(info.m_y)));
+						////const ndMatrix roll(ndRollMatrix(info.m_z_mapper.Interpolate(info.m_z)));
+						////ndVector posit(info.m_x_mapper.Interpolate(info.m_x), 0.0f, 0.0f, 1.0f);
+						////posit = roll.RotateVector(posit);
+						////posit = yaw.RotateVector(posit);
+						////info.m_effector->SetPosition(posit);
+						//
+						//m_effectors.PushBack(info);
+						//m_effectorsJoints.PushBack(info.m_effector);
+					}
+					break;
+				}
+			}
+		
+			for (ndDemoEntity* child = childEntity->GetFirstChild(); child; child = child->GetNext())
+			{
+				childEntities[stack] = child;
+				parentBones[stack] = parentBone;
+				stack++;
+			}
+		}
+		
+		model->NormalizeMassDistribution(100.0f);
+		return model;
 	}
 }
 
@@ -594,7 +767,7 @@ using namespace biped_1;
 void ndBipedTest_1(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, ndGetIdentityMatrix());
+	ndBodyKinematic* const floor = BuildFloorBox(scene, ndGetIdentityMatrix());
 	
 	ndBipedMaterial material;
 	material.m_restitution = 0.1f;
@@ -614,7 +787,7 @@ void ndBipedTest_1(ndDemoEntityManager* const scene)
 	//origin.m_posit.m_x -= 20.0f;
 	ndSharedPtr<ndDemoEntity> modelMesh = ndDemoEntity::LoadFbx("walker.fbx", scene);
 	
-	//ndWorld* const world = scene->GetWorld();
+	ndWorld* const world = scene->GetWorld();
 	//ndHumanoidModel* const model = new ndHumanoidModel(scene, *modelMesh, origin, ragdollDefinition);
 	//ndSharedPtr<ndModel> modelPtr(model);
 	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
@@ -625,9 +798,12 @@ void ndBipedTest_1(ndDemoEntityManager* const scene)
 	//ndSharedPtr<ndUIEntity> bipedUIPtr(bipedUI);
 	//scene->Set2DDisplayRenderFunction(bipedUIPtr);
 
-	ndModel* const model = BuildRagDoll(scene, *modelMesh, origin);
-	ndSharedPtr<ndModel> ragdoll(model);
-	scene->GetWorld()->AddModel(ragdoll);
+	ndSharedPtr<ndModel> model (BuildModel(scene, *modelMesh, origin));
+	ndBodyKinematic* const rootBody = model->GetAsModelHierarchicalArticulation()->GetRoot()->m_body;
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(rootBody->GetMatrix(), rootBody, floor));
+	
+	world->AddModel(model);
+	world->AddJoint(fixJoint);
 		
 	ndQuaternion rot;
 	origin.m_posit.m_x -= 5.0f;

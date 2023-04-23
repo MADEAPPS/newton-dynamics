@@ -348,10 +348,10 @@ namespace ndSimpleRobot
 		return body->GetAsBodyDynamic();
 	}
 
-	ndModelPassiveRagdoll* BuildModel(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
+	ndModelHierarchicalArticulation* BuildModel(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
 	{
 		// make a clone of the mesh and add it to the scene
-		ndModelPassiveRagdoll* const model = new ndModelPassiveRagdoll();
+		ndModelHierarchicalArticulation* const model = new ndModelHierarchicalArticulation();
 
 		ndWorld* const world = scene->GetWorld();
 		ndDemoEntity* const entity = modelMesh->CreateClone();
@@ -376,12 +376,12 @@ namespace ndSimpleRobot
 		world->AddBody(rootBody);
 
 		// add the root body to the model
-		ndModelPassiveRagdoll::ndRagdollNode* const modelNode = model->AddRootBody(rootBody);
+		ndModelHierarchicalArticulation::ndNode* const modelNode = model->AddRootBody(rootBody);
 		
 		ndInt32 stack = 0;
 
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
-		ndFixSizeArray<ndModelPassiveRagdoll::ndRagdollNode*, 32> parentBones;
+		ndFixSizeArray<ndModelHierarchicalArticulation::ndNode*, 32> parentBones;
 		for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
 		{
 			childEntities[stack] = child;
@@ -394,7 +394,7 @@ namespace ndSimpleRobot
 		{
 			stack--;
 			ndDemoEntity* const childEntity = childEntities[stack];
-			ndModelPassiveRagdoll::ndRagdollNode* parentBone = parentBones[stack];
+			ndModelHierarchicalArticulation::ndNode* parentBone = parentBones[stack];
 
 			const char* const name = childEntity->GetName().GetStr();
 			for (ndInt32 i = 0; i < definitionCount; ++i)
@@ -516,7 +516,7 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	//AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f);
 
 	ndSharedPtr<ndModel> model(BuildModel(scene, *modelMesh, matrix));
-	ndModelPassiveRagdoll* const robot = (ndModelPassiveRagdoll*)*model;
+	ndModelHierarchicalArticulation* const robot = (ndModelHierarchicalArticulation*)*model;
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->m_body->GetMatrix(), robot->GetRoot()->m_body, floor));
 	world->AddModel(model);

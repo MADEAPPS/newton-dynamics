@@ -63,7 +63,6 @@
 #include "ndFileFormatShapeConvexSphere.h"
 #include "ndFileFormatShapeConvexCapsule.h"
 #include "ndFileFormatJointIkDoubleHinge.h"
-#include "ndFileFormatModelPassiveRadoll.h"
 #include "ndFileFormatJointIk6DofEffector.h"
 #include "ndFileFormatShapeConvexCylinder.h"
 #include "ndFileFormatShapeStaticMesh_bvh.h"
@@ -78,6 +77,7 @@
 #include "ndFileFormatBodyKinematicPlayerCapsule.h"
 #include "ndFileFormatJointVehicleDifferentialAxle.h"
 #include "ndFileFormatJointIkSwivelPositionEffector.h"
+#include "ndFileFormatModelHierarchicalArticulation.h"
 
 ndFixSizeArray<ndFileFormatRegistrar*, 256> ndFileFormatRegistrar::m_registry;
 
@@ -167,7 +167,7 @@ void ndFileFormatRegistrar::Init()
 
 	static ndFileFormatModel model;
 	static ndFileFormatModelBase modelBase;
-	static ndFileFormatModelPassiveRadoll modelPassiveRagdoll;
+	static ndFileFormatModelHierarchicalArticulation modelHierachicalArticulation;
 }
 
 ndFileFormatRegistrar* ndFileFormatRegistrar::GetHandler(const char* const className)

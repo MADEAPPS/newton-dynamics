@@ -19,17 +19,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_FILE_FORMAT_MODEL_PASSIVE_RAGDOLL_H__
-#define _ND_FILE_FORMAT_MODEL_PASSIVE_RAGDOLL_H__
+#ifndef _ND_FILE_FORMAT_MODEL_HIERARCHICAL_ARTICULATION_H__
+#define _ND_FILE_FORMAT_MODEL_HIERARCHICAL_ARTICULATION_H__
 
 #include "ndFileFormatStdafx.h"
 #include "ndFileFormatModelBase.h"
 
-class ndFileFormatModelPassiveRadoll : public ndFileFormatModelBase
+class ndFileFormatModelHierarchicalArticulation : public ndFileFormatModelBase
 {
 	public: 
-	ndFileFormatModelPassiveRadoll();
-	ndFileFormatModelPassiveRadoll(const char* const className);
+	ndFileFormatModelHierarchicalArticulation();
+	ndFileFormatModelHierarchicalArticulation(const char* const className);
 
 	virtual void SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model);
 

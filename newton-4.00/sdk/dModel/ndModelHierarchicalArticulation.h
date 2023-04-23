@@ -19,38 +19,40 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_MODEL_PASSIVE_RAGDOLL_H__
-#define _ND_MODEL_PASSIVE_RAGDOLL_H__
+#ifndef _ND_MODEL_HIERARCHICAL_ARTICULATION_H__
+#define _ND_MODEL_HIERARCHICAL_ARTICULATION_H__
 
 #include "ndModelStdafx.h"
 #include "ndModelBase.h"
 
-class ndModelPassiveRagdoll: public ndModelBase
+class ndModelHierarchicalArticulation: public ndModelBase
 {
 	public: 
-	D_CLASS_REFLECTION(ndModelPassiveRagdoll, ndModelBase)
+	D_CLASS_REFLECTION(ndModelHierarchicalArticulation, ndModelBase)
 
-	class ndRagdollNode : public ndNodeHierarchy<ndRagdollNode>
+	class ndNode : public ndNodeHierarchy<ndNode>
 	{
 		public:
-		ndRagdollNode(ndBodyDynamic* const body, ndRagdollNode* const parent, ndJointBilateralConstraint* const joint);
-		virtual ~ndRagdollNode();
+		ndNode(ndBodyDynamic* const body, ndNode* const parent, ndJointBilateralConstraint* const joint);
+		virtual ~ndNode();
 		
 		ndBodyDynamic* m_body;
 		ndJointBilateralConstraint* m_joint;
 	};
 
-	ndModelPassiveRagdoll();
-	virtual ~ndModelPassiveRagdoll();
+	ndModelHierarchicalArticulation();
+	virtual ~ndModelHierarchicalArticulation();
 
-	ndRagdollNode* GetRoot() const;
-	ndRagdollNode* AddRootBody(ndSharedPtr<ndBody>& rootBody);
-	ndRagdollNode* AddLimb(ndRagdollNode* const parent, ndSharedPtr<ndBody>& body, ndSharedPtr<ndJointBilateralConstraint>& joint);
+	ndNode* GetRoot() const;
+	ndNode* AddRootBody(ndSharedPtr<ndBody>& rootBody);
+	ndNode* AddLimb(ndNode* const parent, ndSharedPtr<ndBody>& body, ndSharedPtr<ndJointBilateralConstraint>& joint);
+
+	ndModelHierarchicalArticulation* GetAsModelHierarchicalArticulation();
 
 	void NormalizeMassDistribution(ndFloat32 totalMass);
 
 	protected:
-	ndRagdollNode* m_rootNode;
+	ndNode* m_rootNode;
 };
 
 #endif 

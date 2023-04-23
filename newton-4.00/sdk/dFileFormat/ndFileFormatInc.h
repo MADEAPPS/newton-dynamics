@@ -69,7 +69,6 @@
 #include <ndFileFormatJointVehicleMotor.h>
 #include <ndFileFormatJointIkDoubleHinge.h>
 #include <ndFileFormatShapeConvexCapsule.h>
-#include <ndFileFormatModelPassiveRadoll.h>
 #include <ndFileFormatJointVehicleGearBox.h>
 #include <ndFileFormatShapeConvexCylinder.h>
 #include <ndFileFormatShapeStaticMesh_bvh.h>
@@ -84,7 +83,7 @@
 #include <ndFileFormatBodyKinematicPlayerCapsule.h>
 #include <ndFileFormatJointVehicleDifferentialAxle.h>
 #include <ndFileFormatJointIkSwivelPositionEffector.h>
-
+#include <ndFileFormatModelHierarchicalArticulation.h>
 
 #endif 
 

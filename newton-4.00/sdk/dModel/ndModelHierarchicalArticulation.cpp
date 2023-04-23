@@ -20,10 +20,10 @@
 */
 
 #include "ndModelStdafx.h"
-#include "ndModelPassiveRagdoll.h"
+#include "ndModelHierarchicalArticulation.h"
 
-ndModelPassiveRagdoll::ndRagdollNode::ndRagdollNode(ndBodyDynamic* const body, ndRagdollNode* const parent, ndJointBilateralConstraint* const joint)
-	:ndNodeHierarchy<ndRagdollNode>()
+ndModelHierarchicalArticulation::ndNode::ndNode(ndBodyDynamic* const body, ndNode* const parent, ndJointBilateralConstraint* const joint)
+	:ndNodeHierarchy<ndNode>()
 	,m_body(body)
 	,m_joint(joint)
 {
@@ -33,17 +33,17 @@ ndModelPassiveRagdoll::ndRagdollNode::ndRagdollNode(ndBodyDynamic* const body, n
 	}
 }
 
-ndModelPassiveRagdoll::ndRagdollNode::~ndRagdollNode()
+ndModelHierarchicalArticulation::ndNode::~ndNode()
 {
 }
 
-ndModelPassiveRagdoll::ndModelPassiveRagdoll()
+ndModelHierarchicalArticulation::ndModelHierarchicalArticulation()
 	:ndModelBase()
 	,m_rootNode(nullptr)
 {
 }
 
-ndModelPassiveRagdoll::~ndModelPassiveRagdoll()
+ndModelHierarchicalArticulation::~ndModelHierarchicalArticulation()
 {
 	if (m_rootNode)
 	{
@@ -51,45 +51,50 @@ ndModelPassiveRagdoll::~ndModelPassiveRagdoll()
 	}
 }
 
-ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::GetRoot() const
+ndModelHierarchicalArticulation* ndModelHierarchicalArticulation::GetAsModelHierarchicalArticulation()
+{
+	return this;
+}
+
+ndModelHierarchicalArticulation::ndNode* ndModelHierarchicalArticulation::GetRoot() const
 {
 	return m_rootNode;
 }
 
-ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::AddRootBody(ndSharedPtr<ndBody>& rootBody)
+ndModelHierarchicalArticulation::ndNode* ndModelHierarchicalArticulation::AddRootBody(ndSharedPtr<ndBody>& rootBody)
 {
 	ndAssert(!m_rootNode);
-	m_rootNode = new ndRagdollNode(rootBody->GetAsBodyDynamic(), nullptr, nullptr);
+	m_rootNode = new ndNode(rootBody->GetAsBodyDynamic(), nullptr, nullptr);
 	m_bodies.Append(rootBody);
 	return m_rootNode;
 }
 
-ndModelPassiveRagdoll::ndRagdollNode* ndModelPassiveRagdoll::AddLimb(ndRagdollNode* const parent, ndSharedPtr<ndBody>& body, ndSharedPtr<ndJointBilateralConstraint>& joint)
+ndModelHierarchicalArticulation::ndNode* ndModelHierarchicalArticulation::AddLimb(ndNode* const parent, ndSharedPtr<ndBody>& body, ndSharedPtr<ndJointBilateralConstraint>& joint)
 {
 	ndAssert(m_rootNode);
 	ndAssert(joint->GetBody1() == parent->m_body);
 	ndAssert(joint->GetBody0() == body->GetAsBodyKinematic());
-	ndRagdollNode* const node = new ndRagdollNode(body->GetAsBodyDynamic(), parent, *joint);
+	ndNode* const node = new ndNode(body->GetAsBodyDynamic(), parent, *joint);
 	m_bodies.Append(body);
 	m_joints.Append(joint);
 	return node;
 }
 
-void ndModelPassiveRagdoll::NormalizeMassDistribution(ndFloat32 totalMass)
+void ndModelHierarchicalArticulation::NormalizeMassDistribution(ndFloat32 totalMass)
 {
 	ndFixSizeArray<ndBodyDynamic*, 256> bodyArray;
-	ndFixSizeArray<ndModelPassiveRagdoll::ndRagdollNode*, 256> stack;
+	ndFixSizeArray<ndModelHierarchicalArticulation::ndNode*, 256> stack;
 	if (GetRoot())
 	{
 		stack.PushBack(GetRoot());
 		while (stack.GetCount())
 		{
 			ndInt32 index = stack.GetCount() - 1;
-			ndModelPassiveRagdoll::ndRagdollNode* const node = stack[index];
+			ndModelHierarchicalArticulation::ndNode* const node = stack[index];
 			stack.SetCount(index);
 
 			bodyArray.PushBack(node->m_body);
-			for (ndModelPassiveRagdoll::ndRagdollNode* child = node->GetFirstChild(); child; child = child->GetNext())
+			for (ndModelHierarchicalArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
 			{
 				stack.PushBack(child);
 			}

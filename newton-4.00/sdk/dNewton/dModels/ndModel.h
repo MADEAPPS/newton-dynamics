@@ -28,6 +28,7 @@
 class ndModelBase;
 class ndMultiBodyVehicle;
 class ndConstraintDebugCallback;
+class ndModelHierarchicalArticulation;
 
 D_MSV_NEWTON_ALIGN_32
 class ndModel: public ndContainersFreeListAlloc<ndModel>
@@ -51,6 +52,7 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	virtual ndModel* GetAsModel();
 	virtual ndModelBase* GetAsModelBase();
 	virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
+	virtual ndModelHierarchicalArticulation* GetAsModelHierarchicalArticulation();
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 
 	protected:
@@ -97,6 +99,11 @@ inline ndModelBase* ndModel::GetAsModelBase()
 inline ndMultiBodyVehicle* ndModel::GetAsMultiBodyVehicle()
 { 
 	return nullptr; 
+}
+
+inline ndModelHierarchicalArticulation* ndModel::GetAsModelHierarchicalArticulation()
+{
+	return nullptr;
 }
 
 inline void ndModel::Debug(ndConstraintDebugCallback&) const

@@ -26,7 +26,7 @@
 
 #include <ndModelBase.h>
 #include <ndModelNotify.h>
-#include <ndModelPassiveRagdoll.h>
+#include <ndModelHierarchicalArticulation.h>
 
 #endif 
 
