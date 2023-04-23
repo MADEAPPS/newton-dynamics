@@ -35,7 +35,7 @@ ndFileFormatModelPassiveRadoll::ndFileFormatModelPassiveRadoll(const char* const
 
 void ndFileFormatModelPassiveRadoll::SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "D_MODEL_CLASS", ndModelPassiveRagdoll::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_MODEL_CLASS, ndModelPassiveRagdoll::StaticClassName());
 	ndFileFormatModelBase::SaveModel(scene, classNode, model);
 
 	ndModelPassiveRagdoll* const ragDoll = (ndModelPassiveRagdoll*)model;
@@ -90,7 +90,7 @@ ndModel* ndFileFormatModelPassiveRadoll::LoadModel(const nd::TiXmlElement* const
 
 void ndFileFormatModelPassiveRadoll::LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap, ndModel* const model)
 {
-	ndFileFormatModelBase::LoadModel((nd::TiXmlElement*)node->FirstChild("D_MODEL_CLASS"), bodyMap, jointMap, model);
+	ndFileFormatModelBase::LoadModel((nd::TiXmlElement*)node->FirstChild(D_MODEL_CLASS), bodyMap, jointMap, model);
 
 	ndModelPassiveRagdoll* const modelBase = (ndModelPassiveRagdoll*)model;
 

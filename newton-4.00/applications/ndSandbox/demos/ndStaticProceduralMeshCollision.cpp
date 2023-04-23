@@ -72,18 +72,18 @@ void ndStaticUserMeshCollisionDemo (ndDemoEntityManager* const scene)
 	ndVector origin(-5.0f, 4.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 
-	ndFileFormatSave xxxxSave;
-	xxxxSave.SaveWorld(scene->GetWorld(), "xxxx.nd");
-	ndFileFormatLoad xxxxLoad;
-	xxxxLoad.Load("xxxx.nd");
-	// offset bodies positions for calibration;
-	const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
-	for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
-	{
-		ndSharedPtr<ndBody>& body = node->GetInfo();
-		ndMatrix bodyMatrix(body->GetMatrix());
-		bodyMatrix.m_posit.m_x += 4.0f;
-		body->SetMatrix(bodyMatrix);
-	}
-	xxxxLoad.AddToWorld(scene->GetWorld());
+	//ndFileFormatSave xxxxSave;
+	//xxxxSave.SaveWorld(scene->GetWorld(), "xxxx.nd");
+	//ndFileFormatLoad xxxxLoad;
+	//xxxxLoad.Load("xxxx.nd");
+	//// offset bodies positions for calibration;
+	//const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
+	//for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndSharedPtr<ndBody>& body = node->GetInfo();
+	//	ndMatrix bodyMatrix(body->GetMatrix());
+	//	bodyMatrix.m_posit.m_x += 4.0f;
+	//	body->SetMatrix(bodyMatrix);
+	//}
+	//xxxxLoad.AddToWorld(scene->GetWorld());
 }

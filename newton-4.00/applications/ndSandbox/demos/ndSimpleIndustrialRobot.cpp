@@ -515,9 +515,12 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	//AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f);
 	//AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f);
 
-	ndModel* const model = BuildModel(scene, *modelMesh, matrix);
-	ndSharedPtr<ndModel> ragdoll(model);
-	//scene->GetWorld()->AddModel(ragdoll);
+	ndSharedPtr<ndModel> model(BuildModel(scene, *modelMesh, matrix));
+	ndModelPassiveRagdoll* const robot = (ndModelPassiveRagdoll*)*model;
+
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->m_body->GetMatrix(), robot->GetRoot()->m_body, floor));
+	world->AddModel(model);
+	world->AddJoint (fixJoint);
 
 	matrix.m_posit.m_x -= 5.0f;
 	matrix.m_posit.m_y += 2.0f;
@@ -527,17 +530,16 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 
 	ndFileFormatSave xxxxSave;
 	xxxxSave.SaveWorld(scene->GetWorld(), "xxxx.nd");
-
-	ndFileFormatLoad xxxxLoad;
-	xxxxLoad.Load("xxxx.nd");
-	// offset bodies positions for calibration;
-	const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
-	for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
-	{
-		ndSharedPtr<ndBody>& body = node->GetInfo();
-		ndMatrix bodyMatrix(body->GetMatrix());
-		bodyMatrix.m_posit.m_x += 4.0f;
-		body->SetMatrix(bodyMatrix);
-	}
-	xxxxLoad.AddToWorld(scene->GetWorld());
+	//ndFileFormatLoad xxxxLoad;
+	//xxxxLoad.Load("xxxx.nd");
+	//// offset bodies positions for calibration;
+	//const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
+	//for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndSharedPtr<ndBody>& body = node->GetInfo();
+	//	ndMatrix bodyMatrix(body->GetMatrix());
+	//	bodyMatrix.m_posit.m_x += 4.0f;
+	//	body->SetMatrix(bodyMatrix);
+	//}
+	//xxxxLoad.AddToWorld(scene->GetWorld());
 }

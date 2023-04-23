@@ -35,7 +35,7 @@ ndFileFormatModelBase::ndFileFormatModelBase(const char* const className)
 
 void ndFileFormatModelBase::SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "D_MODEL_CLASS", ndModelBase::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_MODEL_CLASS, ndModelBase::StaticClassName());
 	ndFileFormatModel::SaveModel(scene, classNode, model);
 	
 	ndModelBase* const modelBase = (ndModelBase*)model;
