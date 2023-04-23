@@ -34,7 +34,7 @@ ndFileFormatJointPulley::ndFileFormatJointPulley(const char* const className)
 
 void ndFileFormatJointPulley::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointPulley::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndJointPulley::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndJointPulley* const exportJoint = (ndJointPulley*)joint;
@@ -50,7 +50,7 @@ ndJointBilateralConstraint* ndFileFormatJointPulley::LoadJoint(const nd::TiXmlEl
 
 void ndFileFormatJointPulley::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
 {
-	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
 
 	ndJointPulley* const inportJoint = (ndJointPulley*)joint;
 

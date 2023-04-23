@@ -53,7 +53,7 @@ ndInt32 ndFileFormatShapeCompound::SaveShape(ndFileFormatSave* const scene, nd::
 		}
 	}
 
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeClass", ndShapeCompound::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_SHAPE_CLASS, ndShapeCompound::StaticClassName());
 	ndFileFormatShape::SaveShape(scene, classNode, shape);
 	for (it.Begin(); it; it++)
 	{
@@ -75,7 +75,7 @@ ndShape* ndFileFormatShapeCompound::LoadShape(const nd::TiXmlElement* const node
 
 	ndFileFormatRegistrar* const collisionHandler = ndFileFormatRegistrar::GetHandler(ndShapeInstance::StaticClassName());
 	ndAssert(collisionHandler);
-	for (const nd::TiXmlNode* childNode = node->FirstChild("ndShapeInstanceClass"); childNode; childNode = childNode->NextSibling())
+	for (const nd::TiXmlNode* childNode = node->FirstChild(D_INSTANCE_CLASS); childNode; childNode = childNode->NextSibling())
 	{
 		ndSharedPtr<ndShapeInstance> instance(collisionHandler->LoadCollision((nd::TiXmlElement*)childNode, shapeMap));
 		compoundShape->AddCollision(*instance);

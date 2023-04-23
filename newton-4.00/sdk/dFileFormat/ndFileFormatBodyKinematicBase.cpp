@@ -34,7 +34,7 @@ ndFileFormatBodyKinematicBase::ndFileFormatBodyKinematicBase(const char* const c
 
 void ndFileFormatBodyKinematicBase::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBodyKinematicBase::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_BODY_CLASS, ndBodyKinematicBase::StaticClassName());
 	ndFileFormatBodyKinematic::SaveBody(scene, classNode, body);
 }
 
@@ -49,6 +49,6 @@ ndBody* ndFileFormatBodyKinematicBase::LoadBody(const nd::TiXmlElement* const, c
 
 void ndFileFormatBodyKinematicBase::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body)
 {
-	ndFileFormatBodyKinematic::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
+	ndFileFormatBodyKinematic::LoadBody((nd::TiXmlElement*)node->FirstChild(D_BODY_CLASS), shapeMap, body);
 	//ndBodyKinematicBase* const kinBody = ((ndBody*)body)->GetAsBodyKinematicSpecial();
 }

@@ -238,7 +238,7 @@ void ndFileFormatSave::SaveWorld(nd::TiXmlElement* const rootNode)
 	ndAssert(handler);
 	if (handler)
 	{
-		nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
+		nd::TiXmlElement* const worldNode = new nd::TiXmlElement(D_WORD_CLASS);
 		rootNode->LinkEndChild(worldNode);
 		handler->SaveWorld(this, worldNode, m_world);
 	}

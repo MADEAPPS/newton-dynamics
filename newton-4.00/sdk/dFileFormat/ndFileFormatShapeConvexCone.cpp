@@ -34,7 +34,7 @@ ndFileFormatShapeConvexCone::ndFileFormatShapeConvexCone(const char* const class
 
 ndInt32 ndFileFormatShapeConvexCone::SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeClass", ndShapeCone::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_SHAPE_CLASS, ndShapeCone::StaticClassName());
 	ndFileFormatShapeConvex::SaveShape(scene, classNode, shape);
 
 	const ndShapeCone* const subShape = (ndShapeCone*)shape;

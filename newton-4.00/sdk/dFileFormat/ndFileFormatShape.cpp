@@ -34,6 +34,6 @@ ndFileFormatShape::ndFileFormatShape(const char* const className)
 
 ndInt32 ndFileFormatShape::SaveShape(ndFileFormatSave* const, nd::TiXmlElement* const parentNode, const ndShape* const)
 {
-	nd::TiXmlElement* const node = xmlCreateClassNode(parentNode, "ndShapeClass", ndShape::StaticClassName());
+	nd::TiXmlElement* const node = xmlCreateClassNode(parentNode, D_SHAPE_CLASS, ndShape::StaticClassName());
 	return xmlGetNodeId(node);
 }

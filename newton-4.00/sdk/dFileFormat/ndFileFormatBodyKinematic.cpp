@@ -34,7 +34,7 @@ ndFileFormatBodyKinematic::ndFileFormatBodyKinematic(const char* const className
 
 void ndFileFormatBodyKinematic::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBodyKinematic::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_BODY_CLASS, ndBodyKinematic::StaticClassName());
 	ndFileFormatBody::SaveBody(scene, classNode, body);
 
 	ndBodyKinematic* const kinematic = ((ndBody*)body)->GetAsBodyKinematic();
@@ -74,13 +74,13 @@ ndBody* ndFileFormatBodyKinematic::LoadBody(const nd::TiXmlElement* const node, 
 
 void ndFileFormatBodyKinematic::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body)
 {
-	ndFileFormatBody::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
+	ndFileFormatBody::LoadBody((nd::TiXmlElement*)node->FirstChild(D_BODY_CLASS), shapeMap, body);
 	
 	ndBodyKinematic* const kinBody = ((ndBody*)body)->GetAsBodyKinematic();
 	
 	ndFileFormatRegistrar* const collisionHandler = ndFileFormatRegistrar::GetHandler(ndShapeInstance::StaticClassName());
 	ndAssert(collisionHandler);
-	ndSharedPtr<ndShapeInstance> instance(collisionHandler->LoadCollision((nd::TiXmlElement*)node->FirstChild("ndShapeInstanceClass"), shapeMap));
+	ndSharedPtr<ndShapeInstance> instance(collisionHandler->LoadCollision((nd::TiXmlElement*)node->FirstChild(D_INSTANCE_CLASS), shapeMap));
 	kinBody->SetCollisionShape(*(*instance));
 	
 	ndFloat32 invMass = xmlGetFloat(node, "invMass");

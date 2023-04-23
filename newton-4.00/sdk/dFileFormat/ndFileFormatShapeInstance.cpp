@@ -35,7 +35,7 @@ ndFileFormatShapeInstance::ndFileFormatShapeInstance(const char* const className
 
 void ndFileFormatShapeInstance::SaveCollision(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShapeInstance* const collision)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeInstanceClass", ndShapeInstance::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_INSTANCE_CLASS, ndShapeInstance::StaticClassName());
 
 	const ndShape* const shape = collision->GetShape();
 	ndUnsigned64 hash = shape->GetHash();

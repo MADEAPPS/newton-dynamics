@@ -35,7 +35,7 @@ class ndDemoEntityNotify : public ndModelNotify
 	//
 	//	void SaveNotify(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
 	//	{
-	//		nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndNotifyClass", ndDemoEntityNotify::StaticClassName());
+	//		nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_NOTIFY_CLASS, ndDemoEntityNotify::StaticClassName());
 	//		ndFileFormatNotify::SaveNotify(scene, classNode, notify);
 	//		xmlSaveParam(classNode, "useCollisionForVisual", 1);
 	//	}

@@ -28,7 +28,7 @@ class ndModelNotify: public ndBodyNotify
 	//
 	//	void SaveNotify(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
 	//	{
-	//		nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndNotifyClass", ndModelNotify::StaticClassName());
+	//		nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_NOTIFY_CLASS, ndModelNotify::StaticClassName());
 	//		ndFileFormatNotify::SaveNotify(scene, classNode, notify);
 	//		xmlSaveParam(classNode, "useCollisionForVisual", 1);
 	//	}

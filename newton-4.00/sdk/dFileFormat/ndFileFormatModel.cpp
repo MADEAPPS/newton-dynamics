@@ -35,7 +35,7 @@ ndFileFormatModel::ndFileFormatModel(const char* const className)
 
 void ndFileFormatModel::SaveModel(ndFileFormatSave* const, nd::TiXmlElement* const parentNode, const ndModel* const)
 {
-	xmlCreateClassNode(parentNode, "ndModelClass", ndModel::StaticClassName());
+	xmlCreateClassNode(parentNode, "D_MODEL_CLASS", ndModel::StaticClassName());
 }
 
 

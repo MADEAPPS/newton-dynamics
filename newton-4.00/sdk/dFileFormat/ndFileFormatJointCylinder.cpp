@@ -34,7 +34,7 @@ ndFileFormatJointCylinder::ndFileFormatJointCylinder(const char* const className
 
 void ndFileFormatJointCylinder::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointCylinder::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndJointCylinder::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndFloat32 spring;
@@ -82,7 +82,7 @@ ndJointBilateralConstraint* ndFileFormatJointCylinder::LoadJoint(const nd::TiXml
 
 void ndFileFormatJointCylinder::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
 {
-	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
 
 	ndJointCylinder* const inportJoint = (ndJointCylinder*)joint;
 

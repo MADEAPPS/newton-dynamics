@@ -20,10 +20,8 @@
 #include "ndDemoEntityManager.h"
 #include "ndHeightFieldPrimitive.h"
 
-//#define D_TERRAIN_WIDTH			1024
-//#define D_TERRAIN_HEIGHT			1024
-#define D_TERRAIN_WIDTH				256
-#define D_TERRAIN_HEIGHT			256
+#define D_TERRAIN_WIDTH				1024
+#define D_TERRAIN_HEIGHT			1024
 #define D_TERRAIN_NOISE_OCTAVES		8
 #define D_TERRAIN_NOISE_PERSISTANCE	0.5f
 #define D_TERRAIN_NOISE_GRID_SCALE  (1.0f / 500.0f)

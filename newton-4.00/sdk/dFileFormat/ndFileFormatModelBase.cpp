@@ -35,7 +35,7 @@ ndFileFormatModelBase::ndFileFormatModelBase(const char* const className)
 
 void ndFileFormatModelBase::SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndModelClass", ndModelBase::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "D_MODEL_CLASS", ndModelBase::StaticClassName());
 	ndFileFormatModel::SaveModel(scene, classNode, model);
 	
 	ndModelBase* const modelBase = (ndModelBase*)model;
@@ -71,7 +71,7 @@ ndModel* ndFileFormatModelBase::LoadModel(const nd::TiXmlElement* const node, co
 
 void ndFileFormatModelBase::LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap, ndModel* const model)
 {
-	//ndFileFormatModel::LoadModel((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, jointMap, model);
+	//ndFileFormatModel::LoadModel((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, jointMap, model);
 
 	ndModelBase* const modelBase = (ndModelBase*)model;
 	const nd::TiXmlNode* const bodiesNode = node->FirstChild("bodies");

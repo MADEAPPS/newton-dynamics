@@ -34,7 +34,7 @@ ndFileFormatModelNotify::ndFileFormatModelNotify(const char* const className)
 
 void ndFileFormatModelNotify::SaveNotify(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndNotifyClass", ndModelNotify::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_NOTIFY_CLASS, ndModelNotify::StaticClassName());
 	ndFileFormatNotify::SaveNotify(scene, classNode, notify);
 }
 
@@ -47,5 +47,5 @@ ndBodyNotify* ndFileFormatModelNotify::LoadNotify(const nd::TiXmlElement* const 
 
 void ndFileFormatModelNotify::LoadNotify(const nd::TiXmlElement* const node, ndBodyNotify* const notify)
 {
-	ndFileFormatNotify::LoadNotify((nd::TiXmlElement*)node->FirstChild("ndNotifyClass"), notify);
+	ndFileFormatNotify::LoadNotify((nd::TiXmlElement*)node->FirstChild(D_NOTIFY_CLASS), notify);
 }

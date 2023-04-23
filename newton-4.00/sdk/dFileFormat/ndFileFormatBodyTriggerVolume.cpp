@@ -34,6 +34,6 @@ ndFileFormatBodyTriggerVolume::ndFileFormatBodyTriggerVolume(const char* const c
 
 void ndFileFormatBodyTriggerVolume::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBodyTriggerVolume::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_BODY_CLASS, ndBodyTriggerVolume::StaticClassName());
 	ndFileFormatBodyKinematicBase::SaveBody(scene, classNode, body);
 }

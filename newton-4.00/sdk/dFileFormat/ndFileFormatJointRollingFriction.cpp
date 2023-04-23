@@ -34,7 +34,7 @@ ndFileFormatJointRollingFriction::ndFileFormatJointRollingFriction(const char* c
 
 void ndFileFormatJointRollingFriction::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointDryRollingFriction::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndJointDryRollingFriction::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndJointDryRollingFriction* const exportJoint = (ndJointDryRollingFriction*)joint;
@@ -51,7 +51,7 @@ ndJointBilateralConstraint* ndFileFormatJointRollingFriction::LoadJoint(const nd
 
 void ndFileFormatJointRollingFriction::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
 {
-	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
 
 	ndJointDryRollingFriction* const inportJoint = (ndJointDryRollingFriction*)joint;
 

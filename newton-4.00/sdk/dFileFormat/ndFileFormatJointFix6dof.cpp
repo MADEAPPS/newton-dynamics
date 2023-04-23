@@ -34,7 +34,7 @@ ndFileFormatJointFix6dof::ndFileFormatJointFix6dof(const char* const className)
 
 void ndFileFormatJointFix6dof::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointFix6dof::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndJointFix6dof::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndJointFix6dof* const exportJoint = (ndJointFix6dof*)joint;
@@ -50,7 +50,7 @@ ndJointBilateralConstraint* ndFileFormatJointFix6dof::LoadJoint(const nd::TiXmlE
 
 void ndFileFormatJointFix6dof::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
 {
-	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
 
 	ndJointFix6dof* const inportJoint = (ndJointFix6dof*)joint;
 

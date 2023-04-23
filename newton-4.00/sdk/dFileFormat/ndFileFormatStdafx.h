@@ -25,8 +25,15 @@
 
 #include <ndNewton.h>
 #include <ndModelInc.h>
-
 #include <tinyxml.h>
+
+#define D_WORD_CLASS		"ndWorld"
+#define D_BODY_CLASS		"ndBodyClass"
+#define D_JOINT_CLASS		"ndJointClass"
+#define D_SHAPE_CLASS		"ndShapeClass"
+#define D_MODEL_CLASS		"ndModelClass"
+#define D_NOTIFY_CLASS		"ndNotifyClass"
+#define D_INSTANCE_CLASS	"ndShapeInstanceClass"
 
 #endif 
 

@@ -34,7 +34,7 @@ ndFileFormatJointFollowPath::ndFileFormatJointFollowPath(const char* const class
 
 void ndFileFormatJointFollowPath::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointFollowPath::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndJointFollowPath::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 }
 
@@ -47,6 +47,6 @@ ndJointBilateralConstraint* ndFileFormatJointFollowPath::LoadJoint(const nd::TiX
 
 void ndFileFormatJointFollowPath::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
 {
-	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
 	//ndJointFollowPath* const inportJoint = (ndJointFollowPath*)joint;
 }

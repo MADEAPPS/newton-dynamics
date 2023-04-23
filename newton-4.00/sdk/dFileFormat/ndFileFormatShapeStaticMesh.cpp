@@ -34,7 +34,7 @@ ndFileFormatShapeStaticMesh::ndFileFormatShapeStaticMesh(const char* const class
 
 ndInt32 ndFileFormatShapeStaticMesh::SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeClass", ndShapeStaticMesh::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_SHAPE_CLASS, ndShapeStaticMesh::StaticClassName());
 	ndFileFormatShape::SaveShape(scene, classNode, shape);
 	return xmlGetNodeId(classNode);
 }

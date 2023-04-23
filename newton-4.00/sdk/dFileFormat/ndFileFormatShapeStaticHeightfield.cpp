@@ -35,7 +35,7 @@ ndFileFormatShapeStaticHeightfield::ndFileFormatShapeStaticHeightfield(const cha
 
 ndInt32 ndFileFormatShapeStaticHeightfield::SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeClass", ndShapeHeightfield::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_SHAPE_CLASS, ndShapeHeightfield::StaticClassName());
 	ndFileFormatShapeStaticMesh::SaveShape(scene, classNode, shape);
 
 	char fileName[1024];

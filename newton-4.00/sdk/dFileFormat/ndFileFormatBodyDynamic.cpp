@@ -34,7 +34,7 @@ ndFileFormatBodyDynamic::ndFileFormatBodyDynamic(const char* const className)
 
 void ndFileFormatBodyDynamic::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBodyDynamic::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_BODY_CLASS, ndBodyDynamic::StaticClassName());
 	ndFileFormatBodyKinematic::SaveBody(scene, classNode, body);
 
 	const ndBodyDynamic* const dynamic = ((ndBodyDynamic*)body)->GetAsBodyDynamic();
@@ -52,7 +52,7 @@ ndBody* ndFileFormatBodyDynamic::LoadBody(const nd::TiXmlElement* const node, co
 
 void ndFileFormatBodyDynamic::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body)
 {
-	ndFileFormatBodyKinematic::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
+	ndFileFormatBodyKinematic::LoadBody((nd::TiXmlElement*)node->FirstChild(D_BODY_CLASS), shapeMap, body);
 
 	ndFloat32 linearDamp = xmlGetFloat(node, "linearDampCoef");
 	ndVector angularDamp(xmlGetVector3(node, "angularDampCoef"));

@@ -34,7 +34,7 @@ ndFileFormatShapeConvexCapsule::ndFileFormatShapeConvexCapsule(const char* const
 
 ndInt32 ndFileFormatShapeConvexCapsule::SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeClass", ndShapeCapsule::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_SHAPE_CLASS, ndShapeCapsule::StaticClassName());
 	ndFileFormatShapeConvex::SaveShape(scene, classNode, shape);
 
 	const ndShapeCapsule* const capsule = (ndShapeCapsule*)shape;

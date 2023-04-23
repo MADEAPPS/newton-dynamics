@@ -41,6 +41,19 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 		bool m_jump;
 	};
 
+	class ndFileBasicPlayerCapsule : public ndFileFormatBodyKinematicPlayerCapsule
+	{
+		public:
+		ndFileBasicPlayerCapsule()
+			:ndFileFormatBodyKinematicPlayerCapsule(ndBasicPlayerCapsule::StaticClassName())
+		{
+		}
+
+		virtual ndBody* LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap);
+		virtual void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
+	};
+
+	ndBasicPlayerCapsule();
 	ndBasicPlayerCapsule(
 		ndDemoEntityManager* const scene, const ndDemoEntity* const modelEntity,
 		const ndMatrix& localAxis, const ndMatrix& location, 
@@ -50,10 +63,10 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 	void ApplyInputs(ndFloat32 timestep);
 	ndFloat32 ContactFrictionCallback(const ndVector& position, const ndVector& normal, ndInt32 contactId, const ndBodyKinematic* const otherbody) const;
 
-	void SetCamera();
+	void SetCamera(ndDemoEntityManager* const scene);
 	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, ndFloat32 timestep);
 
-	ndDemoEntityManager* m_scene;
+	//ndDemoEntityManager* m_scene;
 	PlayerInputs m_playerInput;
 	bool m_isPlayer;
 

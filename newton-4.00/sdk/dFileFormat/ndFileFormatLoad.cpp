@@ -70,7 +70,7 @@ void ndFileFormatLoad::LoadBodies(const nd::TiXmlElement* const rootNode, const 
 			nd::TiXmlNode* bodyNode = (nd::TiXmlNode*)node;
 			while (bodyNode && !ndFileFormatRegistrar::GetHandler(((nd::TiXmlElement*)bodyNode)->Attribute("className")))
 			{
-				bodyNode = (nd::TiXmlNode*)bodyNode->FirstChild("ndBodyClass");
+				bodyNode = (nd::TiXmlNode*)bodyNode->FirstChild(D_BODY_CLASS);
 			}
 
 			ndAssert(bodyNode);
@@ -87,7 +87,7 @@ void ndFileFormatLoad::LoadBodies(const nd::TiXmlElement* const rootNode, const 
 					alliasElement->Attribute("nodeId", &nodeId);
 					bodyMap.Insert(body, nodeId);
 					alliasNode = alliasNode->FirstChild();
-				} while (!strcmp(alliasNode->Value(), "ndBodyClass"));
+				} while (!strcmp(alliasNode->Value(), D_BODY_CLASS));
 
 				m_bodies.Append(body);
 			}
@@ -105,7 +105,7 @@ void ndFileFormatLoad::LoadJoints(const nd::TiXmlElement* const rootNode, const 
 			nd::TiXmlNode* jointNode = (nd::TiXmlNode*)node;
 			while (jointNode && !ndFileFormatRegistrar::GetHandler(((nd::TiXmlElement*)jointNode)->Attribute("className")))
 			{
-				jointNode = (nd::TiXmlNode*)jointNode->FirstChild("ndJointClass");
+				jointNode = (nd::TiXmlNode*)jointNode->FirstChild(D_JOINT_CLASS);
 			}
 
 			ndAssert(jointNode);
@@ -122,7 +122,7 @@ void ndFileFormatLoad::LoadJoints(const nd::TiXmlElement* const rootNode, const 
 					alliasElement->Attribute("nodeId", &nodeId);
 					jointMap.Insert(joint, nodeId);
 					alliasNode = alliasNode->FirstChild();
-				} while (!strcmp(alliasNode->Value(), "ndJointClass"));
+				} while (!strcmp(alliasNode->Value(), D_JOINT_CLASS));
 
 				m_joints.Append(joint);
 			}
@@ -140,7 +140,7 @@ void ndFileFormatLoad::LoadModels(const nd::TiXmlElement* const rootNode, const 
 			nd::TiXmlNode* modelNode = (nd::TiXmlNode*)node;
 			while (modelNode && !ndFileFormatRegistrar::GetHandler(((nd::TiXmlElement*)modelNode)->Attribute("className")))
 			{
-				modelNode = (nd::TiXmlNode*)modelNode->FirstChild("ndModelClass");
+				modelNode = (nd::TiXmlNode*)modelNode->FirstChild("D_MODEL_CLASS");
 			}
 		
 			ndAssert(modelNode);

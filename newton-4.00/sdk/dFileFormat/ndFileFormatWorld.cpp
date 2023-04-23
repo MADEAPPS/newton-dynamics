@@ -34,7 +34,7 @@ ndFileFormatWorld::ndFileFormatWorld(const char* const className)
 
 void ndFileFormatWorld::SaveWorld(ndFileFormatSave* const, nd::TiXmlElement* const parentNode, const ndWorld* const world)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndWorld", ndWorld::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_WORD_CLASS, ndWorld::StaticClassName());
 
 	xmlSaveParam(classNode, "subSteps", world->GetSubSteps());
 	xmlSaveParam(classNode, "iterations", world->GetSolverIterations());

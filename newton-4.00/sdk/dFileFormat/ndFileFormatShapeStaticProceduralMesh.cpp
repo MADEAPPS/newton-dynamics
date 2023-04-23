@@ -35,7 +35,7 @@ ndFileFormatShapeStaticProceduralMesh::ndFileFormatShapeStaticProceduralMesh(con
 
 ndInt32 ndFileFormatShapeStaticProceduralMesh::SaveShape(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndShape* const shape)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndShapeClass", ndShapeStaticProceduralMesh::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_SHAPE_CLASS, ndShapeStaticProceduralMesh::StaticClassName());
 	ndFileFormatShapeStaticMesh::SaveShape(scene, classNode, shape);
 	//xmlSaveParam(classNode, "size", shape->GetObbSize());
 	return xmlGetNodeId(classNode);

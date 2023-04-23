@@ -35,7 +35,7 @@ ndFileFormatJointVehicleTorsionBar::ndFileFormatJointVehicleTorsionBar(const cha
 
 void ndFileFormatJointVehicleTorsionBar::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndMultiBodyVehicleTorsionBar::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndMultiBodyVehicleTorsionBar::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndFloat32 spring;

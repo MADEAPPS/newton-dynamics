@@ -34,7 +34,7 @@ ndFileFormatJointFixDistance::ndFileFormatJointFixDistance(const char* const cla
 
 void ndFileFormatJointFixDistance::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointFixDistance::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndJointFixDistance::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndJointFixDistance* const exportJoint = (ndJointFixDistance*)joint;
@@ -50,7 +50,7 @@ ndJointBilateralConstraint* ndFileFormatJointFixDistance::LoadJoint(const nd::Ti
 
 void ndFileFormatJointFixDistance::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
 {
-	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
 
 	ndJointFixDistance* const inportJoint = (ndJointFixDistance*)joint;
 

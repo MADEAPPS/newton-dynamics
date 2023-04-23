@@ -33,6 +33,19 @@
 	#define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 #endif
 
+void ndBasicPlayerCapsule::ndFileBasicPlayerCapsule::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
+{
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_BODY_CLASS, ndBasicPlayerCapsule::StaticClassName());
+	ndFileFormatBodyKinematicPlayerCapsule::SaveBody(scene, classNode, body);
+}
+
+ndBody* ndBasicPlayerCapsule::ndFileBasicPlayerCapsule::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap)
+{
+	ndBasicPlayerCapsule* const player = new ndBasicPlayerCapsule();
+	ndFileFormatBodyKinematicPlayerCapsule::LoadBody((nd::TiXmlElement*)node->FirstChild(D_BODY_CLASS), shapeMap, player);
+	return player;
+}
+
 class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 {
 	public:
@@ -72,16 +85,24 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 	ndQuaternion m_meshOrigin;
 };
 
+ndBasicPlayerCapsule::ndBasicPlayerCapsule()
+	:ndBodyPlayerCapsule()
+	,m_isPlayer(false)
+{
+}
+
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndDemoEntityManager* const scene, const ndDemoEntity* const modelEntity,
 	const ndMatrix& localAxis, const ndMatrix& location,
 	ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight, bool isPlayer)
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
-	,m_scene(scene)
+	//,m_scene(scene)
 	,m_isPlayer(isPlayer)
 	//,m_output()
 	//,m_animBlendTree(nullptr)
 {
+	static ndFileBasicPlayerCapsule loadSave;
+
 	ndMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
@@ -183,11 +204,11 @@ ndFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const ndVector&, const n
 	return ndFloat32(2.0f);
 }
 
-void ndBasicPlayerCapsule::SetCamera()
+void ndBasicPlayerCapsule::SetCamera(ndDemoEntityManager* const scene)
 {
 	if (m_isPlayer)
 	{
-		ndDemoCamera* const camera = m_scene->GetCamera();
+		ndDemoCamera* const camera = scene->GetCamera();
 		ndMatrix camMatrix(camera->GetNextMatrix());
 
 		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)GetNotifyCallback();
@@ -207,19 +228,19 @@ void ndBasicPlayerCapsule::SetCamera()
 		ndFloat32 error = ndAnglesAdd(angle1, -angle0);
 
 		if ((ndAbs (error) > 1.0e-3f) ||
-			m_scene->GetKeyState(' ') ||
-			m_scene->GetKeyState('A') ||
-			m_scene->GetKeyState('D') ||
-			m_scene->GetKeyState('W') ||
-			m_scene->GetKeyState('S'))
+			scene->GetKeyState(' ') ||
+			scene->GetKeyState('A') ||
+			scene->GetKeyState('D') ||
+			scene->GetKeyState('W') ||
+			scene->GetKeyState('S'))
 		{
 			SetSleepState(false);
 		}
 
 		m_playerInput.m_heading = camera->GetYawAngle();
-		m_playerInput.m_forwardSpeed = (ndFloat32)(ndInt32(m_scene->GetKeyState('W')) - ndInt32(m_scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
-		m_playerInput.m_strafeSpeed = (ndFloat32)(ndInt32(m_scene->GetKeyState('D')) - ndInt32(m_scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
-		m_playerInput.m_jump = m_scene->GetKeyState(' ') && IsOnFloor();
+		m_playerInput.m_forwardSpeed = (ndFloat32)(ndInt32(scene->GetKeyState('W')) - ndInt32(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
+		m_playerInput.m_strafeSpeed = (ndFloat32)(ndInt32(scene->GetKeyState('D')) - ndInt32(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
+		m_playerInput.m_jump = scene->GetKeyState(' ') && IsOnFloor();
 
 		if (m_playerInput.m_forwardSpeed && m_playerInput.m_strafeSpeed)
 		{
@@ -230,9 +251,8 @@ void ndBasicPlayerCapsule::SetCamera()
 	}
 }
 
-//void ndBasicPlayerCapsule::UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, ndFloat32 timestep)
-void ndBasicPlayerCapsule::UpdateCameraCallback(ndDemoEntityManager* const, void* const context, ndFloat32)
+void ndBasicPlayerCapsule::UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, ndFloat32)
 {
 	ndBasicPlayerCapsule* const me = (ndBasicPlayerCapsule*)context;
-	me->SetCamera();
+	me->SetCamera(manager);
 }

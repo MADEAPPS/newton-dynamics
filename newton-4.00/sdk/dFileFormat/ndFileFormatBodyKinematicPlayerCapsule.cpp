@@ -34,7 +34,7 @@ ndFileFormatBodyKinematicPlayerCapsule::ndFileFormatBodyKinematicPlayerCapsule(c
 
 void ndFileFormatBodyKinematicPlayerCapsule::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBodyPlayerCapsule::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_BODY_CLASS, ndBodyPlayerCapsule::StaticClassName());
 	ndFileFormatBodyKinematicBase::SaveBody(scene, classNode, body);
 
 	const ndBodyPlayerCapsule* const exportBody = ((ndBody*)body)->GetAsBodyPlayerCapsule();
@@ -67,7 +67,7 @@ ndBody* ndFileFormatBodyKinematicPlayerCapsule::LoadBody(const nd::TiXmlElement*
 
 void ndFileFormatBodyKinematicPlayerCapsule::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap, ndBody* const body)
 {
-	ndFileFormatBodyKinematicBase::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
+	ndFileFormatBodyKinematicBase::LoadBody((nd::TiXmlElement*)node->FirstChild(D_BODY_CLASS), shapeMap, body);
 
 	ndMatrix localFrame (xmlGetMatrix (node, "localFrame"));
 	ndFloat32 mass = xmlGetFloat(node, "mass");

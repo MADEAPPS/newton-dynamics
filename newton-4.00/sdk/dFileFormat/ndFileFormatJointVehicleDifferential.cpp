@@ -34,6 +34,6 @@ ndFileFormatJointVehicleDifferential::ndFileFormatJointVehicleDifferential(const
 
 void ndFileFormatJointVehicleDifferential::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndMultiBodyVehicleDifferential::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndMultiBodyVehicleDifferential::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 }

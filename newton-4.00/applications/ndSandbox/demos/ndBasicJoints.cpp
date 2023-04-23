@@ -36,14 +36,14 @@ class ndSplinePathBody : public ndBodyDynamic
 
 		void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 		{
-			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndSplinePathBody::StaticClassName());
+			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_BODY_CLASS, ndSplinePathBody::StaticClassName());
 			ndFileFormatBodyDynamic::SaveBody(scene, classNode, body);
 		}
 
 		virtual ndBody* LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap)
 		{
 			ndSplinePathBody* const body = new ndSplinePathBody();
-			ndFileFormatBodyDynamic::LoadBody((nd::TiXmlElement*)node->FirstChild("ndBodyClass"), shapeMap, body);
+			ndFileFormatBodyDynamic::LoadBody((nd::TiXmlElement*)node->FirstChild(D_BODY_CLASS), shapeMap, body);
 			return body;
 		}
 	};
@@ -111,14 +111,14 @@ class ndJointFollowSplinePath : public ndJointFollowPath
 
 		void SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 		{
-			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointFollowSplinePath::StaticClassName());
+			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndJointFollowSplinePath::StaticClassName());
 			ndFileFormatJointFollowPath::SaveJoint(scene, classNode, joint);
 		}
 
 		ndJointBilateralConstraint* LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
 		{
 			ndJointFollowSplinePath* const joint = new ndJointFollowSplinePath();
-			ndFileFormatJointFollowPath::LoadJoint((nd::TiXmlElement*)node->FirstChild("ndJointClass"), bodyMap, joint);
+			ndFileFormatJointFollowPath::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
 			return joint;
 		}
 	};

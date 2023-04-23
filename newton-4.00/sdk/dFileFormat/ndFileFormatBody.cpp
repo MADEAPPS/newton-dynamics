@@ -37,7 +37,7 @@ ndFileFormatBody::ndFileFormatBody(const char* const className)
 
 void ndFileFormatBody::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBodyClass", ndBody::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_BODY_CLASS, ndBody::StaticClassName());
 
 	ndBodyNotify* const notity = body->GetNotifyCallback();
 	if (notity)
@@ -83,10 +83,10 @@ void ndFileFormatBody::LoadBody(const nd::TiXmlElement* const node, const ndTree
 	body->SetVelocity(veloc);
 	body->SetCentreOfMass(com);
 
-	nd::TiXmlNode* notifyNode = (nd::TiXmlNode*)node->FirstChild("ndNotifyClass");
+	nd::TiXmlNode* notifyNode = (nd::TiXmlNode*)node->FirstChild(D_NOTIFY_CLASS);
 	while (notifyNode && !ndFileFormatRegistrar::GetHandler(((nd::TiXmlElement*)notifyNode)->Attribute("className")))
 	{
-		notifyNode = (nd::TiXmlNode*)notifyNode->FirstChild("ndNotifyClass");
+		notifyNode = (nd::TiXmlNode*)notifyNode->FirstChild(D_NOTIFY_CLASS);
 	}
 	if (notifyNode)
 	{

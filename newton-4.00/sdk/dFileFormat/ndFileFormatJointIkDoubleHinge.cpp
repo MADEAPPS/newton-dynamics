@@ -34,6 +34,6 @@ ndFileFormatJointIkDoubleHinge::ndFileFormatJointIkDoubleHinge(const char* const
 
 void ndFileFormatJointIkDoubleHinge::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndIkJointDoubleHinge::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndIkJointDoubleHinge::StaticClassName());
 	ndFileFormatJointHinge::SaveJoint(scene, classNode, joint);
 }

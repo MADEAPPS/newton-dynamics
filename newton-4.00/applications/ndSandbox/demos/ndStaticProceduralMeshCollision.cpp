@@ -86,5 +86,4 @@ void ndStaticUserMeshCollisionDemo (ndDemoEntityManager* const scene)
 		body->SetMatrix(bodyMatrix);
 	}
 	xxxxLoad.AddToWorld(scene->GetWorld());
-
 }

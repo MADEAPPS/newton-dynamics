@@ -35,7 +35,7 @@ ndFileFormatJoint::ndFileFormatJoint(const char* const className)
 
 void ndFileFormatJoint::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndJointBilateralConstraint::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndJointBilateralConstraint::StaticClassName());
 
 	ndBodyKinematic* const body0 = joint->GetBody0();
 	ndBodyKinematic* const body1 = joint->GetBody1();

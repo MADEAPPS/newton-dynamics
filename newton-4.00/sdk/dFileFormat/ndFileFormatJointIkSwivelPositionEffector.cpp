@@ -34,7 +34,7 @@ ndFileFormatJointIkSwivelPositionEffector::ndFileFormatJointIkSwivelPositionEffe
 
 void ndFileFormatJointIkSwivelPositionEffector::SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndJointClass", ndIkSwivelPositionEffector::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndIkSwivelPositionEffector::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
 
 	ndFloat32 spring0;
