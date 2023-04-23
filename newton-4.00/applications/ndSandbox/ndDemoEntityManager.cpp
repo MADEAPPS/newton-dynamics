@@ -969,10 +969,12 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		case m_new:
 		{
 			// menu new 
+			ndMatrix matrix (GetCamera()->GetCurrentMatrix());
 			Cleanup();
 			ApplyMenuOptions();
 			ResetTimer();
 			m_currentScene = -1;
+			SetCameraMatrix(ndQuaternion(matrix), matrix.m_posit);
 			break;
 		}
 
@@ -982,8 +984,9 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			char fileName[1024];
 			if (dGetLoadNdFileName(fileName, 1024))
 			{
-				ndAssert(0);
-				//m_world->LoadScene(fileName);
+				ndFileFormatLoad fileLoad;
+				fileLoad.Load(fileName);
+				fileLoad.AddToWorld(m_world);
 			}
 			break;
 		}
