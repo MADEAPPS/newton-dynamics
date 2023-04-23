@@ -76,6 +76,8 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual bool AddBody(ndSharedPtr<ndBody>& body);
 	D_COLLISION_API virtual bool RemoveBody(ndSharedPtr<ndBody>& body);
 
+	D_COLLISION_API ndSharedPtr<ndBody> GetBody(ndBody* const body) const;
+
 	D_COLLISION_API virtual void Begin();
 	D_COLLISION_API virtual void End();
 	D_COLLISION_API virtual void Sync();

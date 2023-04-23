@@ -176,19 +176,22 @@ ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInsta
 	ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
 	ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("shape", scene->GetShaderCache(), &shape, textName, textName, textName));
 
-	ndBodyKinematic* const body = new ndBodyDynamic();
+	//ndBodyKinematic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBody> body(new ndBodyDynamic());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(mesh);
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 
-	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, shape);
+	ndBodyKinematic* const kinBody = body->GetAsBodyKinematic();
+	kinBody->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 
-	ndSharedPtr<ndBody> bodyPtr(body);
-	world->AddBody(bodyPtr);
+	kinBody->SetMatrix(matrix);
+	kinBody->SetCollisionShape(shape);
+	kinBody->SetMassMatrix(mass, shape);
+
+	//ndSharedPtr<ndBody> bodyPtr(body);
+	world->AddBody(body);
 	scene->AddEntity(entity);
-	return body;
+	return kinBody;
 }
 
 ndBodyKinematic* AddBox(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName)

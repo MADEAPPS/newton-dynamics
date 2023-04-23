@@ -369,6 +369,11 @@ bool ndWorld::AddBody(ndSharedPtr<ndBody>& body)
 	return m_scene->AddBody(body);
 }
 
+ndSharedPtr<ndBody> ndWorld::GetBody(ndBody* const body) const
+{
+	return m_scene->GetBody(body);
+}
+
 void ndWorld::AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 {
 	// if the second body is nullPtr, replace it the sentinel

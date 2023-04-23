@@ -255,7 +255,20 @@ bool ndScene::AddBody(ndSharedPtr<ndBody>& body)
 	return false;
 }
 
-//bool ndScene::RemoveBody(ndBodyKinematic* const body)
+ndSharedPtr<ndBody> ndScene::GetBody(ndBody* const body) const
+{
+	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	if (kinematicBody)
+	{
+		return kinematicBody->m_sceneNode->GetInfo();
+	}
+	else
+	{
+		ndAssert(0);
+		return ndSharedPtr<ndBody>(nullptr);
+	}
+}
+
 bool ndScene::RemoveBody(ndSharedPtr<ndBody>& body)
 {
 	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();

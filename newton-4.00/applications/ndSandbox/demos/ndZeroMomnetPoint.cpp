@@ -27,6 +27,7 @@
 
 namespace ndZmp
 {
+#if 0
 	class ndZeroMomentModel : public ndModel
 	{
 		public:
@@ -428,6 +429,67 @@ ndTrace(("%d: invTorque=%f %f\n", xxxx, torque0.m_z, torqueB___.m_z));
 
 		ndZeroMomentModel* m_model;
 	};
+#endif
+
+	void AddLimb(ndDemoEntityManager* const scene, ndModelHierarchicalArticulation* const model, ndMatrix& matrix)
+	{
+		ndFloat32 limbMass = 0.5f;
+		ndFloat32 limbLength = 0.3f;
+		ndFloat32 limbRadio = 0.025f;
+		
+		ndPhysicsWorld* const world = scene->GetWorld();
+		ndModelHierarchicalArticulation::ndNode* const modelRoot = model->GetRoot();
+		
+		// add single leg
+		ndSharedPtr<ndBody> legBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "smilli.tga")));
+		ndMatrix legLocation(ndRollMatrix(-90.0f * ndDegreeToRad) * matrix);
+		legLocation.m_posit.m_y -= limbLength * 0.5f;
+		legBody->SetMatrix(legLocation);
+		ndMatrix legPivot(ndYawMatrix(90.0f * ndDegreeToRad) * legLocation);
+		legPivot.m_posit.m_y += limbLength * 0.5f;
+		ndSharedPtr<ndJointBilateralConstraint> legJoint(new ndJointHinge(legPivot, legBody->GetAsBodyKinematic(), modelRoot->m_body));
+		world->AddJoint(legJoint);
+		
+		// add wheel
+		ndFloat32 wheelRadio = 4.0f * limbRadio;
+		ndSharedPtr<ndBody> wheelBody(world->GetBody(AddSphere(scene, ndGetIdentityMatrix(), 2.0f * limbMass, wheelRadio, "smilli.tga")));
+		ndMatrix wheelMatrix(legPivot);
+		wheelMatrix.m_posit.m_y -= limbLength;
+		wheelBody->SetMatrix(wheelMatrix);
+		ndSharedPtr<ndJointBilateralConstraint> wheelJoint(new ndJointSpherical(wheelMatrix, wheelBody->GetAsBodyKinematic(), legBody->GetAsBodyKinematic()));
+		world->AddJoint(wheelJoint);
+		
+		// add model limbs
+		ndModelHierarchicalArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
+		model->AddLimb(legLimb, wheelBody, wheelJoint);
+	}
+
+	ndModelHierarchicalArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	{
+		ndModelHierarchicalArticulation* const model = new ndModelHierarchicalArticulation();
+
+		ndFloat32 mass = 10.0f;
+		ndFloat32 xSize = 0.25f;
+		ndFloat32 ySize = 0.50f;
+		ndFloat32 zSize = 0.40f;
+
+		ndPhysicsWorld* const world = scene->GetWorld();
+		
+		// add hip body
+		ndSharedPtr<ndBody> hipBody(world->GetBody(AddBox(scene, location, mass, xSize, ySize, zSize, "smilli.tga")));
+		model->AddRootBody(hipBody);
+
+		ndMatrix matrix(hipBody->GetMatrix());
+		matrix.m_posit.m_y += 0.5f;
+		hipBody->SetMatrix(matrix);
+		ndMatrix limbLocation(matrix);
+		limbLocation.m_posit.m_z += zSize * 0.0f;
+		limbLocation.m_posit.m_y -= ySize * 0.5f;
+		
+		AddLimb(scene, model, limbLocation);
+
+		return model;
+	}
 }
 
 using namespace ndZmp;
@@ -441,25 +503,28 @@ void ndZeroMomentPoint(ndDemoEntityManager* const scene)
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 	//matrix.m_posit.m_x = 1.0f;
 	
-	ndZeroMomentModel* const robot = new ndZeroMomentModel(scene, matrix);
-	scene->SetSelectedModel(robot);
-	ndSharedPtr<ndModel> modelPtr(robot);
-	world->AddModel(modelPtr);
+	//ndZeroMomentModel* const robot = new ndZeroMomentModel(scene, matrix);
+	//scene->SetSelectedModel(robot);
+	//ndSharedPtr<ndModel> modelPtr(robot);
+	//world->AddModel(modelPtr);
+	//
+	//ndModelUI* const quadrupedUI = new ndModelUI(scene, robot);
+	//ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
+	//scene->Set2DDisplayRenderFunction(quadrupedUIPtr);
 
-	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), world->GetSentinelBody()));
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane (robot->GetRoot()->GetMatrix().m_posit, ndVector (0.0f, 0.0f, 1.0f, 0.0f), robot->GetRoot(), world->GetSentinelBody()));
-	//world->AddJoint(fixJoint);
+	ndSharedPtr<ndModel> model(BuildModel(scene, matrix));
+	scene->GetWorld()->AddModel(model);
 
-	ndModelUI* const quadrupedUI = new ndModelUI(scene, robot);
-	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
-	scene->Set2DDisplayRenderFunction(quadrupedUIPtr);
+	ndModelHierarchicalArticulation* const articulation = model->GetAsModelHierarchicalArticulation();
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(articulation->GetRoot()->m_body->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), articulation->GetRoot()->m_body, world->GetSentinelBody()));
+	world->AddJoint(fixJoint);
 	
 	matrix.m_posit.m_x -= 0.0f;
-	matrix.m_posit.m_y += 1.5f;
-	matrix.m_posit.m_z += 4.0f;
+	matrix.m_posit.m_y += 0.5f;
+	matrix.m_posit.m_z += 2.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 
-	ndFileFormatSave xxxx;
-	xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
+	//ndFileFormatSave xxxx;
+	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 }
