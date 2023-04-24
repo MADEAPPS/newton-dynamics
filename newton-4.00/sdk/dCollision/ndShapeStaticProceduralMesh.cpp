@@ -166,7 +166,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 			{
 				hitDistance.PushBack(dist);
 				address.PushBack(faceIndexCount0);
-				memcpy(&indices[faceIndexCount0], indexArray, (vertexCount * 2 + 3) * sizeof(ndInt32));
+				ndMemCpy(&indices[faceIndexCount0], indexArray, vertexCount * 2 + 3);
 				faceCount0++;
 				faceIndexCount0 += vertexCount * 2 + 3;
 			}
@@ -185,7 +185,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 			{
 				hitDistance.PushBack(dist);
 				address.PushBack(faceIndexCount0);
-				memcpy(&indices[faceIndexCount0], indexArray, (vertexCount * 2 + 3) * sizeof(ndInt32));
+				ndMemCpy(&indices[faceIndexCount0], indexArray, vertexCount * 2 + 3);
 				faceCount0++;
 				faceIndexCount0 += vertexCount * 2 + 3;
 			}

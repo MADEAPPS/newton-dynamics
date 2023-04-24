@@ -156,7 +156,8 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	ndArray<ndInt32>& bodyJointIndex = GetJointForceIndexBuffer();
 	const ndInt32 bodyJointIndexCount = scene->GetActiveBodyArray().GetCount() + 1;
 	bodyJointIndex.SetCount(bodyJointIndexCount);
-	ClearBuffer(&bodyJointIndex[0], bodyJointIndexCount * ndInt32 (sizeof(ndInt32)));
+	//ClearBuffer(&bodyJointIndex[0], bodyJointIndexCount * ndInt32 (sizeof(ndInt32)));
+	ndMemSet(&bodyJointIndex[0], 0, bodyJointIndexCount);
 
 	for (ndInt32 i = 0; i < jointArray.GetCount(); ++i)
 	{

@@ -717,11 +717,9 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 				ndFloat32 dist = data->PolygonBoxRayDistance(faceNormal, 3, indexArray, stride, &vertex[0].m_x, ray);
 				if (dist < ndFloat32(1.0f)) 
 				{
-					//hitDistance[faceCount0] = dist;
-					//address[faceCount0] = faceIndexCount0;
 					hitDistance.PushBack(dist);
 					address.PushBack(faceIndexCount0);
-					memcpy(&indices[faceIndexCount0], indexArray, 9 * sizeof(ndInt32));
+					ndMemCpy(&indices[faceIndexCount0], indexArray, 9);
 					faceCount0++;
 					faceIndexCount0 += 9;
 				}
@@ -738,11 +736,9 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 				ndFloat32 dist = data->PolygonBoxDistance(faceNormal, 3, indexArray, stride, &vertex[0].m_x);
 				if (dist > ndFloat32(0.0f)) 
 				{
-					//hitDistance[faceCount0] = dist;
-					//address[faceCount0] = faceIndexCount0;
 					hitDistance.PushBack(dist);
 					address.PushBack(faceIndexCount0);
-					memcpy(&indices[faceIndexCount0], indexArray, 9 * sizeof(ndInt32));
+					ndMemCpy(&indices[faceIndexCount0], indexArray, 9);
 					faceCount0++;
 					faceIndexCount0 += 9;
 				}

@@ -814,7 +814,6 @@ void ndSkeletonContainer::FactorizeMatrix(ndInt32 size, ndInt32 stride, ndFloat3
 	ndFloat32* const backupMatrix = ndAlloca(ndFloat32, size * stride);
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
-		//memcpy(&backupMatrix[dstLine], &matrix[srcLine], size * sizeof(ndFloat32));
 		ndMemCpy(&backupMatrix[dstLine], &matrix[srcLine], size);
 		dstLine += size;
 		srcLine += stride;
@@ -826,7 +825,6 @@ void ndSkeletonContainer::FactorizeMatrix(ndInt32 size, ndInt32 stride, ndFloat3
 		dstLine = 0;
 		for (ndInt32 i = 0; i < size; ++i)
 		{
-			//memcpy(&matrix[dstLine], &backupMatrix[srcLine], size * sizeof(ndFloat32));
 			ndMemCpy(&matrix[dstLine], &backupMatrix[srcLine], size);
 			diagDamp[i] *= ndFloat32(4.0f);
 			matrix[dstLine + i] += diagDamp[i];

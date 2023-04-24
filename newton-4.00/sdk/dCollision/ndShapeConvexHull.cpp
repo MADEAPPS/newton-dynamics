@@ -329,7 +329,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		}
 	}
 	m_faceArray = (ndConvexSimplexEdge **)ndMemory::Malloc(size_t(m_faceCount * sizeof(ndConvexSimplexEdge *)));
-	memcpy(m_faceArray, &faceArray[0], m_faceCount * sizeof(ndConvexSimplexEdge *));
+	ndMemCpy(m_faceArray, &faceArray[0], m_faceCount);
 	
 	ndFixSizeArray<ndVector, D_CONVEX_VERTEX_BRUTE_FORCE_SPLIT> array;
 	array.SetCount(D_CONVEX_VERTEX_BRUTE_FORCE_SPLIT);
@@ -538,7 +538,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		
 		m_supportTreeCount = boxCount;
 		m_supportTree = (ndConvexBox*)ndMemory::Malloc(size_t(boxCount * sizeof(ndConvexBox)));
-		memcpy(m_supportTree, &boxTree[0], boxCount * sizeof(ndConvexBox));
+		ndMemCpy(m_supportTree, &boxTree[0], boxCount);
 		
 		for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 		{

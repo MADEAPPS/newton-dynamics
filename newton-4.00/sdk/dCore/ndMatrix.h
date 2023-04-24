@@ -115,7 +115,7 @@ inline ndMatrix::ndMatrix ()
 
 inline ndMatrix::ndMatrix (const ndFloat32* const array)
 {
-	memcpy (&m_front.m_x, array, sizeof (ndMatrix)) ;
+	ndMemCpy(&m_front.m_x, array, sizeof(ndMatrix) / sizeof (ndFloat32));
 }
 
 inline ndMatrix::ndMatrix (const ndVector &front, const ndVector &up, const ndVector &right, const ndVector &posit)

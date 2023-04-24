@@ -196,7 +196,7 @@ static ndInt32 SortVertices(
 	{
 		ndInt32 dst = (baseCount + i) * stride;
 		ndInt32 src = remapIndex[i].m_vertexIndex * stride;
-		memcpy(&vertListOut[dst], &vertexList[src], stride * sizeof(ndFloat64));
+		ndMemCpy(&vertListOut[dst], &vertexList[src], stride);
 	}
 	
 	for (ndInt32 i = 0; i < cluster.m_count; ++i)

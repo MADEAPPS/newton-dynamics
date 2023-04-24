@@ -473,8 +473,9 @@ void ndAabbPolygonSoup::CalculateAdjacent ()
 	
 		ndInt32 oldCount = GetVertexCount();
 		ndTriplex* const vertexArray1 = (ndTriplex*)ndMemory::Malloc (sizeof (ndTriplex) * (oldCount + newNormalCount));
-		memcpy (vertexArray1, GetLocalVertexPool(), sizeof (ndTriplex) * oldCount);
-		memcpy (&vertexArray1[oldCount], &pool[0].m_x, sizeof (ndTriplex) * newNormalCount);
+		ndMemCpy(vertexArray1, (ndTriplex*)GetLocalVertexPool(), oldCount);
+		ndMemCpy(&vertexArray1[oldCount], &pool[0], newNormalCount);
+
 		ndMemory::Free(GetLocalVertexPool());
 	
 		m_localVertex = &vertexArray1[0].m_x;

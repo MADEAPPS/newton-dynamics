@@ -500,7 +500,7 @@ ndInt32 ndShapeConvex::RectifyConvexSlice(ndInt32 count, const ndVector& normal,
 		index++;
 		ptr = ptr->m_next;
 	} while (ptr != hullPoint);
-	memcpy(contactsOut, &contactsOut[start], count * sizeof(ndVector));
+	ndMemCpy(contactsOut, &contactsOut[start], count);
 
 	ndAssert(SanityCheck(count, normal, contactsOut));
 	return count;

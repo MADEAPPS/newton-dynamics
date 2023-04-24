@@ -79,8 +79,6 @@ class ndDynamicsUpdate : public ndClassAlloc
 
 	virtual const char* GetStringId() const;
 	ndInt32 GetUnconstrainedBodyCount() const;
-	void ClearBuffer(void* const buffer, ndInt32 sizeInByte) const;
-	void ClearJacobianBuffer(ndInt32 count, ndJacobian* const dst) const;
 
 	ndVector GetVelocTol() const;
 	ndFloat32 GetTimestepRK() const;
@@ -198,29 +196,6 @@ inline ndArray<ndDynamicsUpdate::ndJointBodyPairIndex>& ndDynamicsUpdate::GetJoi
 inline ndArray<ndInt32>& ndDynamicsUpdate::GetJointForceIndexBuffer()
 {
 	return m_jointForcesIndex;
-}
-
-inline void ndDynamicsUpdate::ClearJacobianBuffer(ndInt32 count, ndJacobian* const buffer) const
-{
-	const ndVector zero(ndVector::m_zero);
-	ndVector* const dst = &buffer[0].m_linear;
-	for (ndInt32 i = 0; i < count; ++i)
-	{
-		dst[i * 2 + 0] = zero;
-		dst[i * 2 + 1] = zero;
-	}
-}
-
-inline void ndDynamicsUpdate::ClearBuffer(void* const buffer, ndInt32 sizeInByte) const
-{
-	D_TRACKTIME();
-	ndInt32 sizeInJacobian = ndInt32 (sizeInByte / sizeof(ndJacobian));
-	ClearJacobianBuffer(sizeInJacobian, (ndJacobian*)buffer);
-	char* const ptr = (char*)buffer;
-	for (ndInt32 i = ndInt32 (sizeInJacobian * sizeof(ndJacobian)); i < sizeInByte; ++i)
-	{
-		ptr[i] = 0;
-	}
 }
 
 inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* const body)
