@@ -166,7 +166,6 @@ inline void ndMemSet(T* const dst, const T& val, ndInt32 elements)
 template <class T>
 inline void ndMemCpy(T* const dst, const T* const src, ndInt32 elements)
 {
-	T value(val);
 	const ndInt32 n = elements & (-0x04);
 	for (ndInt32 i = 0; i < n; i += 4)
 	{

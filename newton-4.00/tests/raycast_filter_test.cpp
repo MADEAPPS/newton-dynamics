@@ -167,7 +167,7 @@ TEST(RayCast, rayCastFilter)
 
 	PickInfo info;
 	info.rayStart = ndVector(0.0f, 0.0f, 10.0f, 1.0f);
-	info.rayEnd = ndVector(0.0f, 0.0f, -10.0f, 1.0);
+	info.rayEnd = ndVector(0.0f, 0.0f, -10.0f, 1.0f);
 
 	// fire the pick ray
 	rayCast(world, info);
