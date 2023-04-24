@@ -100,7 +100,11 @@ bool ndCholeskyFactorizationAddRow(ndInt32, ndInt32 stride, ndInt32 n, T* const 
 		if (n == j) 
 		{
 			T diag = rowN[n] - s;
-			if (diag < T(1.0e-6f)) 
+			#ifdef D_NEWTON_USE_DOUBLE
+			if (diag < T(1.0e-12f)) 
+			#else
+			if (diag < T(1.0e-6f))
+			#endif
 			{
 				return false;
 			}

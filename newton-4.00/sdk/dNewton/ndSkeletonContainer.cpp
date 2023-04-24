@@ -603,10 +603,6 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 		const ndInt32 m0_i = m_pairs[primaryCount + index].m_m0;
 		const ndInt32 m1_i = m_pairs[primaryCount + index].m_m1;
 
-		//ndAssert(m0_i < m_rowCount);
-		//ndAssert(m1_i < m_rowCount);
-		//tempArray[m0_i] = row_i->m_JMinv.m_jacobianM0;
-		//tempArray[m1_i] = row_i->m_JMinv.m_jacobianM1;
 		tempArray[1] = row_i->m_JMinv.m_jacobianM0;
 		tempArray[2] = row_i->m_JMinv.m_jacobianM1;
 		for (ndInt32 j = index + 1; j < m_auxiliaryRowCount; ++j)  

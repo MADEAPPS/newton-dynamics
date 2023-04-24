@@ -148,7 +148,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 
     // lower the floor 
     ndMatrix matrix(pFloorBody->GetMatrix());
-    matrix.m_posit.m_y -= 4.0f;
+    //matrix.m_posit.m_y -= 4.0f;
     pFloorBody->SetMatrix(matrix);
 
     ndQuaternion rot;
