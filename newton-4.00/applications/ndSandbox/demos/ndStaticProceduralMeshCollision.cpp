@@ -30,8 +30,8 @@ void ndStaticUserMeshCollisionDemo (ndDemoEntityManager* const scene)
 	location.m_posit.m_y += 2.0f;
 
 	ndMatrix localAxis(ndGetIdentityMatrix());
-	localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
-	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
+	localAxis[0] = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+	localAxis[1] = ndVector(1.0f, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
 	ndSharedPtr<ndDemoEntity> man (ndDemoEntity::LoadFbx("walker.fbx", scene));

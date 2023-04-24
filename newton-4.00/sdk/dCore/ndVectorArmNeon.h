@@ -84,6 +84,23 @@ class ndVector
 		,m_w(ndFloat32(ptr[3]))
 	{
 	}
+
+	inline ndVector(ndFloat64 x, ndFloat64 y, ndFloat64 z, ndFloat64 w)
+		:m_x(ndFloat32(x))
+		,m_y(ndFloat32(y))
+		,m_z(ndFloat32(z))
+		,m_w(ndFloat32(w))
+	{
+	}
+
+	inline ndVector(const ndBigVector& copy)
+		:m_x(ndFloat32(((ndFloat64*)&copy)[0]))
+		,m_y(ndFloat32(((ndFloat64*)&copy)[1]))
+		,m_z(ndFloat32(((ndFloat64*)&copy)[2]))
+		,m_w(ndFloat32(((ndFloat64*)&copy)[3]))
+	{
+		ndAssert(ndCheckVector((*this)));
+	}
 #endif
 
 	inline ndVector(ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w)
@@ -96,17 +113,6 @@ class ndVector
 		:m_ix(ix), m_iy(iy), m_iz(iz), m_iw(iw)
 	{
 	}
-
-#ifndef  D_NEWTON_USE_DOUBLE 
-	inline ndVector(const ndBigVector& copy)
-		:m_x(ndFloat32(((ndFloat64*)&copy)[0]))
-		,m_y(ndFloat32(((ndFloat64*)&copy)[1]))
-		,m_z(ndFloat32(((ndFloat64*)&copy)[2]))
-		,m_w(ndFloat32(((ndFloat64*)&copy)[3]))
-	{
-		ndAssert(ndCheckVector((*this)));
-	}
-#endif
 
 	inline ndFloat32 GetScalar() const
 	{

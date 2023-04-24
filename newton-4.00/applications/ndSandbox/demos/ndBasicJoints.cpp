@@ -749,8 +749,8 @@ static void BuildPathFollow(ndDemoEntityManager* const scene, const ndVector& or
 	ndPhysicsWorld* const world = scene->GetWorld();
 	for (ndInt32 i = 0; i < count; ++i) 
 	{
-		ndVector location0(positions[i + 0].m_x, positions[i + 0].m_y, positions[i + 0].m_z, 0.0);
-		ndVector location1(positions[i + 1].m_x, positions[i + 1].m_y, positions[i + 1].m_z, 0.0);
+		ndVector location0(positions[i + 0].m_x, positions[i + 0].m_y, positions[i + 0].m_z, ndFloat32 (0.0f));
+		ndVector location1(positions[i + 1].m_x, positions[i + 1].m_y, positions[i + 1].m_z, ndFloat32(0.0f));
 		
 		location0 = pathBodyMatrix.TransformVector(location0);
 		location1 = pathBodyMatrix.TransformVector(location1);
@@ -761,7 +761,7 @@ static void BuildPathFollow(ndDemoEntityManager* const scene, const ndVector& or
 		matrix.m_right = matrix.m_front.CrossProduct(matrix.m_up);
 		matrix.m_right = matrix.m_right.Scale(1.0f / ndSqrt(matrix.m_right.DotProduct(matrix.m_right).GetScalar()));
 		matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front);
-		matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y - attachmentOffset, positions[i].m_z, 1.0));
+		matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y - attachmentOffset, positions[i].m_z, ndFloat32(1.0f)));
 		ndMatrix matrix1(ndYawMatrix(0.5f * ndPi) * matrix);
 		
 		ndBodyKinematic* const body = new ndBodyDynamic();
@@ -776,7 +776,7 @@ static void BuildPathFollow(ndDemoEntityManager* const scene, const ndVector& or
 		world->AddBody(bodyPtr);
 		
 		bodies[i] = body->GetAsBodyDynamic();
-		matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y, positions[i].m_z, 1.0));
+		matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y, positions[i].m_z, ndFloat32(1.0f)));
 
 		ndJointFollowSplinePath* const joint = new ndJointFollowSplinePath(matrix, body->GetAsBodyDynamic(), pathBody);
 		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);

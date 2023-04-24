@@ -146,23 +146,40 @@ inline T ndAnglesAdd (T angleInRadiand1, T angleInRadiand0)
 }
 
 template <class T>
-inline void ndMemSet(T* const buffer, const T& val, ndInt32 elements)
+inline void ndMemSet(T* const dst, const T& val, ndInt32 elements)
 {
 	T value(val);
 	const ndInt32 n = elements & (-0x04);
 	for (ndInt32 i = 0; i < n; i += 4)
 	{
-		buffer[i + 0] = value;
-		buffer[i + 1] = value;
-		buffer[i + 2] = value;
-		buffer[i + 3] = value;
+		dst[i + 0] = value;
+		dst[i + 1] = value;
+		dst[i + 2] = value;
+		dst[i + 3] = value;
 	}
 	for (ndInt32 i = n; i < elements; ++i)
 	{
-		buffer[i] = value;
+		dst[i] = value;
 	}
 }
 
+template <class T>
+inline void ndMemCpy(T* const dst, const T* const src, ndInt32 elements)
+{
+	T value(val);
+	const ndInt32 n = elements & (-0x04);
+	for (ndInt32 i = 0; i < n; i += 4)
+	{
+		dst[i + 0] = src[i + 0];
+		dst[i + 1] = src[i + 1];
+		dst[i + 2] = src[i + 2];
+		dst[i + 3] = src[i + 3];
+	}
+	for (ndInt32 i = n; i < elements; ++i)
+	{
+		dst[i] = src[i];
+	}
+}
 
 #ifndef _MSC_VER 
 	#define _stricmp(x,y) strcasecmp(x,y)
