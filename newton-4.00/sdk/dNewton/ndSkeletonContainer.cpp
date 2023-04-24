@@ -945,8 +945,6 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 	}
 
 	ndFloat32* const diagDamp = ndAlloca(ndFloat32, m_auxiliaryRowCount);
-	//memset(m_massMatrix10, 0, primaryCount * m_auxiliaryRowCount * sizeof(ndFloat32));
-	//memset(m_massMatrix11, 0, m_auxiliaryRowCount * m_auxiliaryRowCount * sizeof(ndFloat32));
 	ndMemSet(m_massMatrix10, ndFloat32(0.0f), primaryCount * m_auxiliaryRowCount);
 	ndMemSet(m_massMatrix11, ndFloat32(0.0f), m_auxiliaryRowCount * m_auxiliaryRowCount);
 
@@ -963,7 +961,6 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 
 		for (ndInt32 i = 0; i < m_blockSize; ++i) 
 		{
-			//memset(acc, 0, boundedSize * sizeof(ndFloat32));
 			ndMemSet(acc, ndFloat32(0.0f), boundedSize);
 			const ndFloat32* const row = &m_massMatrix11[rowStart];
 			for (ndInt32 j = 0; j < i; ++j)  
@@ -987,7 +984,6 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 
 		for (ndInt32 i = m_blockSize - 1; i >= 0; i--) 
 		{
-			//memset(acc, 0, boundedSize * sizeof(ndFloat32));
 			ndMemSet(acc, ndFloat32(0.0f), boundedSize);
 			for (ndInt32 j = i + 1; j < m_blockSize; ++j)  
 			{
