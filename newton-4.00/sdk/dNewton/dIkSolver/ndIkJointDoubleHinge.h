@@ -19,6 +19,8 @@ class ndIkJointDoubleHinge: public ndJointDoubleHinge, public ndJointBilateralCo
 {
 	public:
 	D_CLASS_REFLECTION(ndIkJointDoubleHinge, ndJointDoubleHinge)
+
+	D_NEWTON_API ndIkJointDoubleHinge();
 	D_NEWTON_API ndIkJointDoubleHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIkJointDoubleHinge();
 

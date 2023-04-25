@@ -451,8 +451,9 @@ ndTrace(("%d: invTorque=%f %f\n", xxxx, torque0.m_z, torqueB___.m_z));
 		world->AddJoint(legJoint);
 		
 		// add wheel
+		ndFloat32 wheelMass = 2.0f * limbMass;
 		ndFloat32 wheelRadio = 4.0f * limbRadio;
-		ndSharedPtr<ndBody> wheelBody(world->GetBody(AddSphere(scene, ndGetIdentityMatrix(), 2.0f * limbMass, wheelRadio, "smilli.tga")));
+		ndSharedPtr<ndBody> wheelBody(world->GetBody(AddSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "smilli.tga")));
 		ndMatrix wheelMatrix(legPivot);
 		wheelMatrix.m_posit.m_y -= limbLength;
 		wheelBody->SetMatrix(wheelMatrix);
@@ -470,8 +471,8 @@ ndTrace(("%d: invTorque=%f %f\n", xxxx, torque0.m_z, torqueB___.m_z));
 
 		ndFloat32 mass = 10.0f;
 		ndFloat32 xSize = 0.25f;
-		ndFloat32 ySize = 0.50f;
-		ndFloat32 zSize = 0.40f;
+		ndFloat32 ySize = 0.40f;
+		ndFloat32 zSize = 0.30f;
 
 		ndPhysicsWorld* const world = scene->GetWorld();
 		

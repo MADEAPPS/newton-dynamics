@@ -40,6 +40,14 @@ void ndFileFormatJointIkSpherical::SaveJoint(ndFileFormatSave* const scene, nd::
 
 ndJointBilateralConstraint* ndFileFormatJointIkSpherical::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
 {
-	ndAssert(0);
-	return nullptr;
+	ndIkJointSpherical* const joint = new ndIkJointSpherical();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
 }
+
+void ndFileFormatJointIkSpherical::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
+	//ndIkJointSpherical* const inportJoint = (ndIkJointSpherical*)joint;
+}
+

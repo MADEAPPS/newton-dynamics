@@ -13,6 +13,12 @@
 #include "ndNewtonStdafx.h"
 #include "ndIkJointSpherical.h"
 
+ndIkJointSpherical::ndIkJointSpherical()
+	:ndJointSpherical()
+	,ndJointBilateralConstraint::ndIkInterface()
+{
+}
+
 ndIkJointSpherical::ndIkJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointSpherical(pinAndPivotFrame, child, parent)
 	,ndJointBilateralConstraint::ndIkInterface()

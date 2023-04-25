@@ -36,4 +36,24 @@ void ndFileFormatJointIkHinge::SaveJoint(ndFileFormatSave* const scene, nd::TiXm
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndIkJointHinge::StaticClassName());
 	ndFileFormatJointHinge::SaveJoint(scene, classNode, joint);
+
+	ndIkJointHinge* const exportJoint = (ndIkJointHinge*)joint;
+	xmlSaveParam(classNode, "maxTorque", exportJoint->GetMaxTorque());
 }
+
+ndJointBilateralConstraint* ndFileFormatJointIkHinge::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndIkJointHinge* const joint = new ndIkJointHinge();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointIkHinge::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
+
+	ndIkJointHinge* const inportJoint = (ndIkJointHinge*)joint;
+	ndFloat32 torque = xmlGetFloat(node, "maxTorque");
+	inportJoint->SetMaxTorque(torque);
+}
+

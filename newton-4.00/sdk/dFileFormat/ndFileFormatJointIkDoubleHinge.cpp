@@ -37,3 +37,17 @@ void ndFileFormatJointIkDoubleHinge::SaveJoint(ndFileFormatSave* const scene, nd
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndIkJointDoubleHinge::StaticClassName());
 	ndFileFormatJointHinge::SaveJoint(scene, classNode, joint);
 }
+
+
+ndJointBilateralConstraint* ndFileFormatJointIkDoubleHinge::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndIkJointDoubleHinge* const joint = new ndIkJointDoubleHinge();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointIkDoubleHinge::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
+	//ndIkJointDoubleHinge* const inportJoint = (ndIkJointDoubleHinge*)joint;
+}

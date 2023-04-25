@@ -13,17 +13,17 @@
 #include "ndNewtonStdafx.h"
 #include "ndIkJointDoubleHinge.h"
 
+ndIkJointDoubleHinge::ndIkJointDoubleHinge()
+	:ndJointDoubleHinge()
+	,ndJointBilateralConstraint::ndIkInterface()
+{
+}
+
 ndIkJointDoubleHinge::ndIkJointDoubleHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointDoubleHinge(pinAndPivotFrame, child, parent)
 	,ndJointBilateralConstraint::ndIkInterface()
 {
 }
-
-//ndIkJointDoubleHinge::ndIkJointDoubleHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-//	:ndJointDoubleHinge(pinAndPivotInChild, pinAndPivotInParent, child, parent)
-//	,ndIkInterface()
-//{
-//}
 
 ndIkJointDoubleHinge::~ndIkJointDoubleHinge()
 {

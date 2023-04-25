@@ -19,6 +19,8 @@ class ndIkJointSpherical: public ndJointSpherical, public ndJointBilateralConstr
 {
 	public:
 	D_CLASS_REFLECTION(ndIkJointSpherical, ndJointSpherical)
+
+	D_NEWTON_API ndIkJointSpherical();
 	D_NEWTON_API ndIkJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIkJointSpherical();
 

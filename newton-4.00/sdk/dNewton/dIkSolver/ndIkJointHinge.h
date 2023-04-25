@@ -22,6 +22,8 @@ class ndIkJointHinge: public ndJointHinge, public ndJointBilateralConstraint::nd
 {
 	public:
 	D_CLASS_REFLECTION(ndIkJointHinge, ndJointHinge)
+
+	D_NEWTON_API ndIkJointHinge();
 	D_NEWTON_API ndIkJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API ndIkJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIkJointHinge();
