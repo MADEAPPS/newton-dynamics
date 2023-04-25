@@ -182,7 +182,7 @@ void ndIkSolver::UpdateJointAcceleration(ndConstraint* const joint)
 	constraintParam.m_timestep = m_timestep;
 	constraintParam.m_invTimestep = m_invTimestep;
 	joint->JacobianDerivative(constraintParam);
-	//const ndInt32 dof = constraintParam.m_rowsCount;
+
 	ndAssert(dof <= joint->m_rowCount);
 	ndAssert(dof == constraintParam.m_rowsCount);
 	joint->m_rowCount = dof;
@@ -466,7 +466,6 @@ void ndIkSolver::Solve()
 		{
 			ndBodyKinematic* const body = m_bodies[i];
 			ndAssert(body->m_index == i);
-			//const ndInt32 index = body->m_index;
 			
 			const ndVector invMass(body->GetInvMass());
 			const ndMatrix& invInertia = body->GetInvInertiaMatrix();
