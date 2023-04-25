@@ -51,8 +51,8 @@ class ndDefaultMatrixOperator
 		}
 #endif
 
-		// trying Gauss sidel preconditoner later, but does no seem to get any better reasult than Jacobi.
-		//memcpy(A, matrix, sizeof(A));
+		// trying Gauss sidle preconditioned later, but does no seem to get any better result than Jacobi.
+		//ndMemCpy(A, matrix, sizeof(A)/sizeof(A[0][0]));
 		//
 		//dCholeskyFactorization(size, size, &A[0][0]);
 		//for (ndInt32 i = 2; i < 6; ++i)

@@ -4009,10 +4009,14 @@ void ndContactSolver::CalculateContacts(
 	ndShape* const shapeB = (ndShape*)(instanceB->GetShape());
 
 	m_instance0.SetShape(shapeA);
-	m_instance0.SetGlobalMatrix(matrixA);      // Setting the global matrix before setting the collision shape of the body
+	//Setting the global matrix before setting the collision shape of the body
+	//m_instance0.SetGlobalMatrix(matrixA);
+	m_instance0.SetGlobalMatrix(m_instance0.GetLocalMatrix() * matrixA);
 
 	m_instance1.SetShape(shapeB);
-	m_instance1.SetGlobalMatrix(matrixB);      // Setting the global matrix before setting the collision shape of the body
+	// Setting the global matrix before setting the collision shape of the body
+	//m_instance1.SetGlobalMatrix(matrixB);
+	m_instance1.SetGlobalMatrix(m_instance1.GetLocalMatrix() * matrixB);
 
 	bodyA.SetCollisionShape(m_instance0);
 	bodyB.SetCollisionShape(m_instance1);

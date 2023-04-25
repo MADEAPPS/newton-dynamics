@@ -34,7 +34,7 @@ ndGoogol::ndGoogol(void)
 	:m_sign(0)
 	,m_exponent(0)
 {
-	memset (m_mantissa, 0, sizeof (m_mantissa));
+	ndMemSet(m_mantissa, ndUnsigned64(0), sizeof(m_mantissa) / sizeof(m_mantissa[0]));
 }
 
 ndGoogol::ndGoogol(ndFloat64 value)
@@ -47,7 +47,8 @@ ndGoogol::ndGoogol(ndFloat64 value)
 	m_exponent = ndInt16 (exp);
 	m_sign = (value >= 0) ? 0 : 1;
 
-	memset (m_mantissa, 0, sizeof (m_mantissa));
+	ndMemSet(m_mantissa, ndUnsigned64(0), sizeof(m_mantissa) / sizeof(m_mantissa[0]));
+
 	m_mantissa[0] = ndUnsigned64 (ndFloat64 (ndUnsigned64(1)<<62) * mantissa);
 
 	// it looks like GCC have problems with this
@@ -57,7 +58,7 @@ ndGoogol::ndGoogol(ndFloat64 value)
 
 void ndGoogol::CopySignedMantissa (ndUnsigned64* const mantissa) const
 {
-	memcpy (mantissa, m_mantissa, sizeof (m_mantissa));
+	ndMemCpy(mantissa, m_mantissa, sizeof(m_mantissa) / sizeof(m_mantissa[0]));
 	if (m_sign) 
 	{
 		NegateMantissa (mantissa);
@@ -126,7 +127,7 @@ ndGoogol ndGoogol::operator+ (const ndGoogol &A) const
 			tmp.m_exponent =  ndInt16 (exponent + bits);
 		}
 
-		memcpy (tmp.m_mantissa, mantissa, sizeof (m_mantissa));
+		ndMemCpy(tmp.m_mantissa, mantissa, sizeof(m_mantissa) / sizeof(m_mantissa[0]));
 	} 
 	else if (A.m_mantissa[0]) 
 	{
@@ -182,14 +183,14 @@ ndGoogol ndGoogol::operator* (const ndGoogol &A) const
 	if (m_mantissa[0] && A.m_mantissa[0]) 
 	{
 		ndUnsigned64 mantissaAcc[ND_GOOGOL_SIZE * 2];
-		memset (mantissaAcc, 0, sizeof (mantissaAcc));
+		ndMemSet(mantissaAcc, ndUnsigned64(0), sizeof(mantissaAcc)/ sizeof(mantissaAcc[0]));
 		for (ndInt32 i = ND_GOOGOL_SIZE - 1; i >= 0; i --) 
 		{
 			ndUnsigned64 a = m_mantissa[i];
 			if (a) 
 			{
 				ndUnsigned64 mantissaScale[2 * ND_GOOGOL_SIZE];
-				memset (mantissaScale, 0, sizeof (mantissaScale));
+				ndMemSet(mantissaScale, ndUnsigned64(0), sizeof(mantissaScale)/sizeof (mantissaScale[0]));
 				A.ScaleMantissa (&mantissaScale[i], a);
 
 				ndUnsigned64 carrier = 0;
@@ -220,7 +221,7 @@ ndGoogol ndGoogol::operator* (const ndGoogol &A) const
 		ndGoogol tmp;
 		tmp.m_sign = m_sign ^ A.m_sign;
 		tmp.m_exponent = ndInt16 (exp);
-		memcpy (tmp.m_mantissa, mantissaAcc, sizeof (m_mantissa));
+		ndMemCpy(tmp.m_mantissa, mantissaAcc, sizeof(m_mantissa)/sizeof (m_mantissa[0]));
 
 		return tmp;
 	} 

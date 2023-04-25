@@ -149,9 +149,9 @@ ndPolygonSoupBuilder::ndPolygonSoupBuilder (const ndPolygonSoupBuilder& source)
 	m_vertexIndex.SetCount(source.m_vertexIndex.GetCount());
 	m_vertexPoints.SetCount(source.m_vertexPoints.GetCount());
 	
-	memcpy (&m_vertexIndex[0], &source.m_vertexIndex[0], sizeof (ndInt32) * source.m_vertexIndex.GetCount());
-	memcpy (&m_faceVertexCount[0], &source.m_faceVertexCount[0], sizeof (ndInt32) * source.m_faceVertexCount.GetCount());
-	memcpy (&m_vertexPoints[0], &source.m_vertexPoints[0], sizeof (ndBigVector) * source.m_vertexPoints.GetCount());
+	ndMemCpy(&m_vertexIndex[0], &source.m_vertexIndex[0], source.m_vertexIndex.GetCount());
+	ndMemCpy(&m_faceVertexCount[0], &source.m_faceVertexCount[0], source.m_faceVertexCount.GetCount());
+	ndMemCpy(&m_vertexPoints[0], &source.m_vertexPoints[0], source.m_vertexPoints.GetCount());
 
 	if (m_normalPoints.GetCount())
 	{
@@ -160,8 +160,8 @@ ndPolygonSoupBuilder::ndPolygonSoupBuilder (const ndPolygonSoupBuilder& source)
 		m_normalIndex.SetCount(source.m_normalIndex.GetCount());
 		m_normalPoints.SetCount(source.m_normalPoints.GetCount());
 
-		memcpy (&m_normalIndex[0], &source.m_normalIndex[0], sizeof (ndInt32) * source.m_normalIndex.GetCount());
-		memcpy (&m_normalPoints[0], &source.m_normalPoints[0], sizeof (ndBigVector) * source.m_normalPoints.GetCount());
+		ndMemCpy(&m_normalIndex[0], &source.m_normalIndex[0], source.m_normalIndex.GetCount());
+		ndMemCpy(&m_normalPoints[0], &source.m_normalPoints[0], source.m_normalPoints.GetCount());
 	}
 }
 

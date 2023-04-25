@@ -129,7 +129,7 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 
 	m_vertexCount = ndUnsigned16(index);
 	ndShapeConvex::m_vertex = (ndVector*)ndMemory::Malloc(size_t(m_vertexCount * sizeof(ndVector)));
-	memcpy(ndShapeConvex::m_vertex, tempVertex, m_vertexCount * sizeof(ndVector));
+	ndMemCpy(ndShapeConvex::m_vertex, tempVertex, m_vertexCount);
 
 	ndPolyhedra polyhedra;
 	polyhedra.BeginFace();

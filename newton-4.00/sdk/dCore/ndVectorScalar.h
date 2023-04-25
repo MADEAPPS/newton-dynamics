@@ -86,9 +86,9 @@ class ndVector
 
 	inline ndVector(ndFloat64 x, ndFloat64 y, ndFloat64 z, ndFloat64 w)
 		:m_x(ndFloat32(x))
-		, m_y(ndFloat32(y))
-		, m_z(ndFloat32(z))
-		, m_w(ndFloat32(w))
+		,m_y(ndFloat32(y))
+		,m_z(ndFloat32(z))
+		,m_w(ndFloat32(w))
 	{
 	}
 

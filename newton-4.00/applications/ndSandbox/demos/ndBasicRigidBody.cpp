@@ -19,7 +19,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
+#if 1
 void ndBasicRigidBody (ndDemoEntityManager* const scene)
 {
 	// build a floor
