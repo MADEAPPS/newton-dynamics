@@ -80,18 +80,29 @@ void ndFileFormatJointIk6DofEffector::LoadJoint(const nd::TiXmlElement* const no
 	ndIk6DofEffector* const inportJoint = (ndIk6DofEffector*)joint;
 
 	ndMatrix targetFrame (xmlGetMatrix(node, "targetFrame"));
-	//ndFloat32 offsetAngle = xmlGetFloat(node, "offsetAngle") * ndDegreeToRad;
-	//ndFloat32 spring = xmlGetFloat(node, "springConstant");
-	//ndFloat32 damper = xmlGetFloat(node, "damperConstant");
-	//ndFloat32 regularizer = xmlGetFloat(node, "springRegularizer");
-	//ndFloat32 minTwistAngle = xmlGetFloat(node, "minTwistAngle") * ndDegreeToRad;
-	//ndFloat32 maxTwistAngle = xmlGetFloat(node, "maxTwistAngle") * ndDegreeToRad;
-	//ndInt32 state = xmlGetInt(node, "limitState");
-	//
-	//inportJoint->SetOffsetAngle(offsetAngle);
-	//inportJoint->SetAsSpringDamper(regularizer, spring, damper);
-	//inportJoint->SetLimits(minTwistAngle, maxTwistAngle);
-	//inportJoint->SetLimitState(state ? true : false);
 
+	ndFloat32 linearSpringConstant = xmlGetFloat(node, "linearSpringConstant");
+	ndFloat32 linearDamperConstant = xmlGetFloat(node, "linearDamperConstant");
+	ndFloat32 linearSpringRegularizer = xmlGetFloat(node, "linearSpringRegularizer");
+	ndFloat32 maxForce = xmlGetFloat(node, "maxForce");
+
+	ndFloat32 angularSpringConstant = xmlGetFloat(node, "angularSpringConstant");
+	ndFloat32 angularDamperConstant = xmlGetFloat(node, "angularDamperConstant");
+	ndFloat32 angularSpringRegularizer = xmlGetFloat(node, "angularSpringRegularizer");
+	ndFloat32 maxTorque = xmlGetFloat(node, "maxTorque");
+
+	ndInt32 axisX = xmlGetInt(node, "axisX");
+	ndInt32 axisY = xmlGetInt(node, "axisY");
+	ndInt32 axisZ = xmlGetInt(node, "axisZ");
+	ndInt32 rotationType = xmlGetInt(node, "rotationType");
+
+	inportJoint->SetMaxForce(maxForce);
+	inportJoint->SetMaxTorque(maxTorque);
 	inportJoint->SetOffsetMatrix(targetFrame);
+	inportJoint->EnableAxisX(axisX ? true : false);
+	inportJoint->EnableAxisY(axisY ? true : false);
+	inportJoint->EnableAxisZ(axisZ ? true : false);
+	inportJoint->EnableRotationAxis(ndIk6DofEffector::ndRotationType (rotationType));
+	inportJoint->GetLinearSpringDamper(linearSpringRegularizer, linearSpringConstant, linearDamperConstant);
+	inportJoint->GetLinearSpringDamper(angularSpringRegularizer, angularSpringConstant, angularDamperConstant);
 }

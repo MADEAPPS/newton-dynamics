@@ -95,12 +95,11 @@ void ndFileFormatJointIkSwivelPositionEffector::LoadJoint(const nd::TiXmlElement
 	ndInt32 rotationOrder = xmlGetInt(node, "rotationOrder");
 	ndInt32 enableSwivelControlr = xmlGetInt(node, "enableSwivelControl");
 
-	inportJoint->GetLinearSpringDamper(linearSpringRegularizer, linearSpringConstant, linearDamperConstant);
-	inportJoint->GetLinearSpringDamper(angularSpringRegularizer, angularSpringConstant, angularDamperConstant);
-
 	inportJoint->SetMaxForce(maxForce);
 	inportJoint->SetMaxTorque(maxTorque);
 	inportJoint->SetSwivelMode(enableSwivelControlr ? true : false);
 	inportJoint->SetWorkSpaceConstraints(minWorkSpaceRadio, maxWorkSpaceRadio);
 	inportJoint->SetRotationOrder(ndIkSwivelPositionEffector::ndRotationOrder(rotationOrder));
+	inportJoint->GetLinearSpringDamper(linearSpringRegularizer, linearSpringConstant, linearDamperConstant);
+	inportJoint->GetLinearSpringDamper(angularSpringRegularizer, angularSpringConstant, angularDamperConstant);
 }
