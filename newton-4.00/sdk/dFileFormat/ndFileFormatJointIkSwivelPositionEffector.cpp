@@ -63,5 +63,44 @@ void ndFileFormatJointIkSwivelPositionEffector::SaveJoint(ndFileFormatSave* cons
 	exportJoint->GetWorkSpaceConstraints(minRadio, maxRadio);
 	xmlSaveParam(classNode, "minWorkSpaceRadio", minRadio);
 	xmlSaveParam(classNode, "maxWorkSpaceRadio", maxRadio);
+	xmlSaveParam(classNode, "rotationOrder", ndInt32 (exportJoint->GetRotationOrder()));
 	xmlSaveParam(classNode, "enableSwivelControl", exportJoint->GetSwivelMode() ? 1 : 0);
+}
+
+ndJointBilateralConstraint* ndFileFormatJointIkSwivelPositionEffector::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndIkSwivelPositionEffector* const joint = new ndIkSwivelPositionEffector();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointIkSwivelPositionEffector::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
+	ndIkSwivelPositionEffector* const inportJoint = (ndIkSwivelPositionEffector*)joint;
+
+	ndFloat32 linearSpringConstant = xmlGetFloat(node, "linearSpringConstant");
+	ndFloat32 linearDamperConstant = xmlGetFloat(node, "linearDamperConstant");
+	ndFloat32 linearSpringRegularizer = xmlGetFloat(node, "linearSpringRegularizer");
+	ndFloat32 maxForce = xmlGetFloat(node, "maxForce");
+
+	ndFloat32 angularSpringConstant = xmlGetFloat(node, "angularSpringConstant");
+	ndFloat32 angularDamperConstant = xmlGetFloat(node, "angularDamperConstant");
+	ndFloat32 angularSpringRegularizer = xmlGetFloat(node, "angularSpringRegularizer");
+	ndFloat32 maxTorque = xmlGetFloat(node, "maxTorque");
+
+	ndFloat32 minWorkSpaceRadio = xmlGetFloat(node, "minWorkSpaceRadio");
+	ndFloat32 maxWorkSpaceRadio = xmlGetFloat(node, "maxWorkSpaceRadio");
+
+	ndInt32 rotationOrder = xmlGetInt(node, "rotationOrder");
+	ndInt32 enableSwivelControlr = xmlGetInt(node, "enableSwivelControl");
+
+	inportJoint->GetLinearSpringDamper(linearSpringRegularizer, linearSpringConstant, linearDamperConstant);
+	inportJoint->GetLinearSpringDamper(angularSpringRegularizer, angularSpringConstant, angularDamperConstant);
+
+	inportJoint->SetMaxForce(maxForce);
+	inportJoint->SetMaxTorque(maxTorque);
+	inportJoint->SetSwivelMode(enableSwivelControlr ? true : false);
+	inportJoint->SetWorkSpaceConstraints(minWorkSpaceRadio, maxWorkSpaceRadio);
+	inportJoint->SetRotationOrder(ndIkSwivelPositionEffector::ndRotationOrder(rotationOrder));
 }

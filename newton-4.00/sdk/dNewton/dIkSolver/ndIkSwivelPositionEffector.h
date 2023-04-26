@@ -25,6 +25,8 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	};
 
 	D_CLASS_REFLECTION(ndIkSwivelPositionEffector, ndJointBilateralConstraint)
+
+	D_NEWTON_API ndIkSwivelPositionEffector();
 	D_NEWTON_API ndIkSwivelPositionEffector(const ndVector& childPivot, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIkSwivelPositionEffector();
 
@@ -54,6 +56,9 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	
 	D_NEWTON_API ndFloat32 GetMaxTorque() const;
 	D_NEWTON_API void SetMaxTorque(ndFloat32 torque);
+
+	D_NEWTON_API ndRotationOrder GetRotationOrder() const;
+	D_NEWTON_API void SetRotationOrder(ndRotationOrder order);
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
