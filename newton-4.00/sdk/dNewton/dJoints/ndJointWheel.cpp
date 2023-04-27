@@ -13,6 +13,21 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointWheel.h"
 
+ndJointWheel::ndJointWheel()
+	:ndJointBilateralConstraint()
+	,m_baseFrame(m_localMatrix1)
+	,m_info()
+	,m_posit(ndFloat32(0.0f))
+	,m_speed(ndFloat32(0.0f))
+	,m_regularizer(m_info.m_regularizer)
+	,m_normalizedBrake(ndFloat32(0.0f))
+	,m_normalidedSteering(ndFloat32(0.0f))
+	,m_normalizedHandBrake(ndFloat32(0.0f))
+	,m_vcdMode(false)
+{
+	m_maxDof = 7;
+}
+
 ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	//,ndJointBilateralConstraint::ndIkInterface()
@@ -41,7 +56,6 @@ void ndJointWheel::SetInfo(const ndWheelDescriptor& info)
 {
 	m_info = info;
 }
-
 
 void ndJointWheel::SetBrake(ndFloat32 normalizedBrake)
 {
