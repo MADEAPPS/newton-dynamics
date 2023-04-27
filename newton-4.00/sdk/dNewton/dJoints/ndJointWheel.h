@@ -42,7 +42,8 @@ class ndWheelDescriptor
 	ndFloat32 m_steeringAngle;
 };
 
-class ndJointWheel: public ndJointBilateralConstraint, public ndJointBilateralConstraint::ndIkInterface
+//class ndJointWheel: public ndJointBilateralConstraint, public ndJointBilateralConstraint::ndIkInterface
+class ndJointWheel : public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointWheel, ndJointBilateralConstraint)

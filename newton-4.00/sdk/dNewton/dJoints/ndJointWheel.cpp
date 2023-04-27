@@ -15,7 +15,7 @@
 
 ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
-	,ndJointBilateralConstraint::ndIkInterface()
+	//,ndJointBilateralConstraint::ndIkInterface()
 	,m_baseFrame(m_localMatrix1)
 	,m_info(info)
 	,m_posit(ndFloat32 (0.0f))
