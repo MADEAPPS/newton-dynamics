@@ -26,9 +26,17 @@
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 
-ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, ndMultiBodyVehicle* const chassis)
-	:ndJointGear(ndFloat32 (1.0f), motor->GetMatrix().m_front, differential,	motor->GetMatrix().m_front, motor)
-	,m_chassis(chassis)
+ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox()
+	:ndJointGear()
+	,m_idleOmega(ndFloat32(1.0f))
+	,m_clutchTorque(ndFloat32(1.0e5f))
+	,m_driveTrainResistanceTorque(ndFloat32(1000.0f))
+{
+}
+
+//ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, ndMultiBodyVehicle* const chassis)
+ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, ndMultiBodyVehicle* const)
+	:ndJointGear(ndFloat32 (1.0f), motor->GetMatrix().m_front, differential, motor->GetMatrix().m_front, motor)
 	,m_idleOmega(ndFloat32(1.0f))
 	,m_clutchTorque(ndFloat32 (1.0e5f))
 	,m_driveTrainResistanceTorque(ndFloat32(1000.0f))
@@ -50,6 +58,21 @@ void ndMultiBodyVehicleGearBox::SetClutchTorque(ndFloat32 torqueInNewtonMeters)
 void ndMultiBodyVehicleGearBox::SetInternalTorqueLoss(ndFloat32 torqueInNewtonMeters)
 {
 	m_driveTrainResistanceTorque = ndAbs(torqueInNewtonMeters);
+}
+
+ndFloat32 ndMultiBodyVehicleGearBox::GetIdleOmega() const
+{
+	return m_idleOmega;
+}
+
+ndFloat32 ndMultiBodyVehicleGearBox::GetClutchTorque() const
+{
+	return m_clutchTorque;
+}
+
+ndFloat32 ndMultiBodyVehicleGearBox::GetInternalTorqueLoss() const
+{
+	return m_driveTrainResistanceTorque;
 }
 
 void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)

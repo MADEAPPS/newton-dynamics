@@ -23,6 +23,12 @@
 #include "ndNewtonStdafx.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
 
+ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle()
+	:ndJointBilateralConstraint()
+{
+	m_maxDof = 1;
+}
+
 ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle(
 	const ndVector& pin0, const ndVector& upPin, ndBodyKinematic* const differentialBody0,
 	const ndVector& pin1, ndBodyKinematic* const body1)

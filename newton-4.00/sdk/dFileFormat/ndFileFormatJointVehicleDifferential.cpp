@@ -36,4 +36,24 @@ void ndFileFormatJointVehicleDifferential::SaveJoint(ndFileFormatSave* const sce
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndMultiBodyVehicleDifferential::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
+
+	ndMultiBodyVehicleDifferential* const exportJoint = (ndMultiBodyVehicleDifferential*)joint;
+	xmlSaveParam(classNode, "slipOmega", exportJoint->GetSlipOmega());
+}
+
+ndJointBilateralConstraint* ndFileFormatJointVehicleDifferential::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndMultiBodyVehicleDifferential* const joint = new ndMultiBodyVehicleDifferential();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointVehicleDifferential::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
+
+	ndMultiBodyVehicleDifferential* const importJoint = (ndMultiBodyVehicleDifferential*)joint;
+
+	ndFloat32 slipOmega = xmlGetFloat(node, "slipOmega");
+	importJoint->SetSlipOmega(slipOmega);
 }
