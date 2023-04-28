@@ -27,6 +27,22 @@
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleTorsionBar.h"
 
+ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar()
+	:ndJointBilateralConstraint()
+	,m_axles()
+	,m_springK(ndFloat32(10.0f))
+	,m_damperC(ndFloat32(1.0f))
+	,m_springDamperRegularizer(ndFloat32(0.1f))
+{
+	m_maxDof = 1;
+	//const ndBodyKinematic* const chassis = vehicle->m_chassis;
+	//ndAssert(chassis);
+	//const ndMatrix worldMatrix(vehicle->m_localFrame * chassis->GetMatrix());
+	//CalculateLocalMatrix(worldMatrix, m_localMatrix0, m_localMatrix1);
+	SetSolverModel(m_jointkinematicCloseLoop);
+}
+
+
 ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehicle* const vehicle, ndBodyKinematic* const fixedbody)
 	:ndJointBilateralConstraint(1, vehicle->m_chassis->GetAsBodyKinematic(), fixedbody, ndGetIdentityMatrix())
 	,m_axles()

@@ -35,8 +35,8 @@ class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 		public:
 		ndAxles()
 			:m_leftTire(nullptr)
-			, m_rightTire(nullptr)
-			, m_axleAngle(ndFloat32(0.0f))
+			,m_rightTire(nullptr)
+			,m_axleAngle(ndFloat32(0.0f))
 		{
 		}
 		const ndBodyKinematic* m_leftTire;
@@ -45,6 +45,7 @@ class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 	};
 
 	D_CLASS_REFLECTION(ndMultiBodyVehicleTorsionBar, ndJointBilateralConstraint)
+	D_NEWTON_API ndMultiBodyVehicleTorsionBar();
 	D_NEWTON_API ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehicle* const chassis, ndBodyKinematic* const fixedbody);
 
 	D_NEWTON_API const ndFixSizeArray<ndAxles, 2>& GetAxels() const;

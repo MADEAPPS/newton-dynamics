@@ -27,6 +27,21 @@
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 
+ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor()
+	:ndJointBilateralConstraint()
+	,m_omega(ndFloat32(0.0f))
+	,m_maxOmega(ndFloat32(100.0f))
+	,m_omegaStep(ndFloat32(16.0f))
+	,m_targetOmega(ndFloat32(0.0f))
+	,m_engineTorque(ndFloat32(0.0f))
+	,m_internalFriction(ndFloat32(100.0f))
+	//,m_vehicelModel(vehicelModel)
+	,m_vehicelModel(nullptr)
+{
+	m_maxDof = 3;
+	ndAssert(0);
+}
+
 ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel)
 	:ndJointBilateralConstraint(3, motor, vehicelModel->m_chassis, motor->GetMatrix())
 	,m_omega(ndFloat32(0.0f))

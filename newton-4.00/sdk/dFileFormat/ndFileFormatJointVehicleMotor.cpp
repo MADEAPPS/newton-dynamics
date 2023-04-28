@@ -36,4 +36,27 @@ void ndFileFormatJointVehicleMotor::SaveJoint(ndFileFormatSave* const scene, nd:
 {
 	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndMultiBodyVehicleMotor::StaticClassName());
 	ndFileFormatJoint::SaveJoint(scene, classNode, joint);
+	ndAssert(0);
+}
+
+ndJointBilateralConstraint* ndFileFormatJointVehicleMotor::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndMultiBodyVehicleMotor* const joint = new ndMultiBodyVehicleMotor();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointVehicleMotor::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
+
+	ndAssert(0);
+	//ndMultiBodyVehicleMotor* const importJoint = (ndMultiBodyVehicleMotor*)joint;
+	//ndFloat32 idleOmega = xmlGetFloat(node, "idleOmega");
+	//ndFloat32 clutchTorque = xmlGetFloat(node, "clutchTorque");
+	//ndFloat32 internalTorqueLoss = xmlGetFloat(node, "internalTorqueLoss");
+	//
+	//importJoint->SetIdleOmega(idleOmega);
+	//importJoint->SetClutchTorque(clutchTorque);
+	//importJoint->SetInternalTorqueLoss(internalTorqueLoss);
 }

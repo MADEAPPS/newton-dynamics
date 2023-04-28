@@ -14,6 +14,17 @@
 #include "ndMultiBodyVehicle.h"
 #include "ndMultiBodyVehicleTireJoint.h"
 
+ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint()
+	:ndJointWheel()
+	,m_vehicle(nullptr)
+	,m_frictionModel()
+	,m_lateralSlip(ndFloat32(0.0f))
+	,m_longitudinalSlip(ndFloat32(0.0f))
+	,m_normalizedAligningTorque(ndFloat32(0.0f))
+{
+	ndAssert(0);
+}
+
 ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndMultiBodyVehicleTireJointInfo& info, ndMultiBodyVehicle* const vehicle)
 	:ndJointWheel(pinAndPivotFrame, child, parent, info)
 	,m_vehicle(vehicle)

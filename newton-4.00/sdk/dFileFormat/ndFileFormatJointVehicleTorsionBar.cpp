@@ -48,6 +48,7 @@ void ndFileFormatJointVehicleTorsionBar::SaveJoint(ndFileFormatSave* const scene
 	xmlSaveParam(classNode, "damperConstant", damper);
 	xmlSaveParam(classNode, "springRegularizer", regularizer);
 
+	ndAssert(0);
 	const ndFixSizeArray<ndMultiBodyVehicleTorsionBar::ndAxles, 2>& axles = exportJoint->GetAxels();
 	if (axles.GetCount())
 	{
@@ -66,4 +67,26 @@ void ndFileFormatJointVehicleTorsionBar::SaveJoint(ndFileFormatSave* const scene
 			xmlSaveParam(axleNodePair, "rightTireBody", body1NodeId);
 		}
 	}
+}
+
+ndJointBilateralConstraint* ndFileFormatJointVehicleTorsionBar::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
+{
+	ndMultiBodyVehicleTorsionBar* const joint = new ndMultiBodyVehicleTorsionBar();
+	LoadJoint(node, bodyMap, joint);
+	return joint;
+}
+
+void ndFileFormatJointVehicleTorsionBar::LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, ndJointBilateralConstraint* const joint)
+{
+	ndFileFormatJoint::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
+
+	ndAssert(0);
+	//ndMultiBodyVehicleTorsionBar* const importJoint = (ndMultiBodyVehicleTorsionBar*)joint;
+	//ndFloat32 idleOmega = xmlGetFloat(node, "idleOmega");
+	//ndFloat32 clutchTorque = xmlGetFloat(node, "clutchTorque");
+	//ndFloat32 internalTorqueLoss = xmlGetFloat(node, "internalTorqueLoss");
+	//
+	//importJoint->SetIdleOmega(idleOmega);
+	//importJoint->SetClutchTorque(clutchTorque);
+	//importJoint->SetInternalTorqueLoss(internalTorqueLoss);
 }

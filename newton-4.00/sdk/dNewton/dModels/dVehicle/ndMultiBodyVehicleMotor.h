@@ -31,6 +31,8 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndMultiBodyVehicleMotor, ndJointBilateralConstraint)
+
+	D_NEWTON_API ndMultiBodyVehicleMotor();
 	D_NEWTON_API ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel);
 
 	D_NEWTON_API ndFloat32 GetRpm() const;
