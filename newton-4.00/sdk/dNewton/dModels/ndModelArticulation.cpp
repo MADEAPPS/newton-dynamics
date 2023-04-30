@@ -44,6 +44,7 @@ ndModelArticulation::ndNode::~ndNode()
 ndModelArticulation::ndModelArticulation()
 	:ndModel()
 	,m_rootNode(nullptr)
+	,m_closeLoops()
 {
 }
 
@@ -105,6 +106,11 @@ void ndModelArticulation::OnAddToWorld()
 			}
 		}
 	}
+
+	for (ndSharedList<ndJointBilateralConstraint>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
+	{
+		m_world->AddJoint(node->GetInfo());
+	}
 }
 
 void ndModelArticulation::OnRemoveFromToWorld()
@@ -113,6 +119,14 @@ void ndModelArticulation::OnRemoveFromToWorld()
 	ndFixSizeArray<ndNode*, 256> stack;
 	if (m_rootNode)
 	{
+		for (ndSharedList<ndJointBilateralConstraint>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
+		{
+			if (node->GetInfo()->m_worldNode)
+			{
+				m_world->RemoveJoint(node->GetInfo());
+			}
+		}
+
 		stack.PushBack(m_rootNode);
 		while (stack.GetCount())
 		{
@@ -137,4 +151,49 @@ void ndModelArticulation::OnRemoveFromToWorld()
 			}
 		}
 	}
+}
+
+void ndModelArticulation::AddCloseLoop(ndSharedPtr<ndJointBilateralConstraint>& joint)
+{
+	#ifdef _DEBUG
+
+	auto Check = [&](const ndBodyKinematic* const body)
+	{
+		if (body->GetInvMass() == ndFloat32(0.0f))
+		{
+			return false;
+		}
+		ndFixSizeArray<ndNode*, 256> stack;
+		stack.PushBack(m_rootNode);
+		while (stack.GetCount())
+		{
+			ndInt32 index = stack.GetCount() - 1;
+			ndNode* const node = stack[index];
+			stack.SetCount(index);
+			if (node->m_body->GetAsBodyKinematic() == body)
+			{
+				return true;
+			}
+
+			for (ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+			{
+				stack.PushBack(child);
+			}
+		}
+
+		return false;
+	};
+
+	ndAssert(Check(joint->GetBody0()) || Check(joint->GetBody1()));
+	#endif
+
+	for (ndSharedList<ndJointBilateralConstraint>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
+	{
+		if (*node->GetInfo() == *joint)
+		{
+			return;
+		}
+	}
+
+	m_closeLoops.Append(joint);
 }

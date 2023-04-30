@@ -50,12 +50,17 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API ndNode* AddRootBody(ndSharedPtr<ndBody>& rootBody);
 	D_NEWTON_API ndNode* AddLimb(ndNode* const parent, ndSharedPtr<ndBody>& body, ndSharedPtr<ndJointBilateralConstraint>& joint);
 
+	D_NEWTON_API void AddCloseLoop(ndSharedPtr<ndJointBilateralConstraint>& joint);
+
 	D_NEWTON_API virtual void OnAddToWorld();
 	D_NEWTON_API virtual void OnRemoveFromToWorld();
 
-
 	protected:
 	ndNode* m_rootNode;
+	ndSharedList<ndJointBilateralConstraint> m_closeLoops;
+
+	friend class ndFileFormatSave;
+	friend class ndFileFormatModelArticulation;
 };
 
 #endif 

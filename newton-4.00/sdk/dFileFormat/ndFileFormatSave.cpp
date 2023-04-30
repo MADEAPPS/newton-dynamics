@@ -325,48 +325,6 @@ void ndFileFormatSave::SaveModels(const ndWorld* const world, const char* const 
 		if (baseModel && baseModel->GetAsModelArticulation())
 		{
 			ndModelArticulation* const model = baseModel->GetAsModelArticulation();
-			//for (ndList<ndSharedPtr<ndJointBilateralConstraint>>::ndNode* modelNode = model->m_joints.GetFirst(); modelNode; modelNode = modelNode->GetNext())
-			//{
-			//	ndJointBilateralConstraint* const joint = *modelNode->GetInfo();
-			//
-			//	ndBodyKinematic* const body1 = joint->GetBody1();
-			//	if (body1 == m_world->GetSentinelBody())
-			//	{
-			//		m_bodies.PushBack(body1);
-			//		bodyFilter.Insert(body1, body1);
-			//		break;
-			//	}
-			//}
-			//
-			//for (ndList<ndSharedPtr<ndJointBilateralConstraint>>::ndNode* modelNode = model->m_joints.GetFirst(); modelNode; modelNode = modelNode->GetNext())
-			//{
-			//	ndJointBilateralConstraint* const joint = *modelNode->GetInfo();
-			//
-			//	ndBodyKinematic* const body0 = joint->GetBody0();
-			//	if (!bodyFilter.Find(body0))
-			//	{
-			//		m_bodies.PushBack(body0);
-			//		bodyFilter.Insert(body0, body0);
-			//	}
-			//
-			//	ndBodyKinematic* const body1 = joint->GetBody1();
-			//	if (!bodyFilter.Find(body1))
-			//	{
-			//		m_bodies.PushBack(body1);
-			//		bodyFilter.Insert(body1, body1);
-			//	}
-			//	m_joints.PushBack(joint);
-			//}
-			//
-			//for (ndList<ndSharedPtr<ndBody>>::ndNode* modelNode = model->m_bodies.GetFirst(); modelNode; modelNode = modelNode->GetNext())
-			//{
-			//	ndBodyKinematic* const body = modelNode->GetInfo()->GetAsBodyKinematic();
-			//	if (!bodyFilter.Find(body))
-			//	{
-			//		m_bodies.PushBack(body);
-			//		bodyFilter.Insert(body, body);
-			//	}
-			//}
 
 			ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
 			if (model->GetRoot())
@@ -389,6 +347,11 @@ void ndFileFormatSave::SaveModels(const ndWorld* const world, const char* const 
 						stack.PushBack(child);
 					}
 				}
+			}
+
+			for (ndSharedList<ndJointBilateralConstraint>::ndNode* node = model->m_closeLoops.GetFirst(); node; node = node->GetNext())
+			{
+				m_joints.PushBack(node->GetInfo()->GetAsBilateral());
 			}
 		}
 	}

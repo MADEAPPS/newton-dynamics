@@ -348,10 +348,10 @@ namespace ndSimpleRobot
 		return body->GetAsBodyDynamic();
 	}
 
-	ndModelPassiveRagdoll* BuildModel(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
+	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
 	{
 		// make a clone of the mesh and add it to the scene
-		ndModelPassiveRagdoll* const model = new ndModelPassiveRagdoll();
+		ndModelArticulation* const model = new ndModelArticulation();
 
 		ndWorld* const world = scene->GetWorld();
 		ndDemoEntity* const entity = modelMesh->CreateClone();
@@ -373,15 +373,15 @@ namespace ndSimpleRobot
 		rootBody->SetMatrix(rootEntity->CalculateGlobalMatrix());
 
 		// add body to the world
-		world->AddBody(rootBody);
+		//world->AddBody(rootBody);
 
 		// add the root body to the model
-		ndModelPassiveRagdoll::ndNode* const modelNode = model->AddRootBody(rootBody);
+		ndModelArticulation::ndNode* const modelNode = model->AddRootBody(rootBody);
 		
 		ndInt32 stack = 0;
 
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
-		ndFixSizeArray<ndModelPassiveRagdoll::ndNode*, 32> parentBones;
+		ndFixSizeArray<ndModelArticulation::ndNode*, 32> parentBones;
 		for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
 		{
 			childEntities[stack] = child;
@@ -394,7 +394,7 @@ namespace ndSimpleRobot
 		{
 			stack--;
 			ndDemoEntity* const childEntity = childEntities[stack];
-			ndModelPassiveRagdoll::ndNode* parentBone = parentBones[stack];
+			ndModelArticulation::ndNode* parentBone = parentBones[stack];
 
 			const char* const name = childEntity->GetName().GetStr();
 			for (ndInt32 i = 0; i < definitionCount; ++i)
@@ -405,66 +405,63 @@ namespace ndSimpleRobot
 					ndTrace(("name: %s\n", name));
 					if (definition.m_type == ndDefinition::m_hinge)
 					{
-						ndAssert(0);
-						//ndSharedPtr<ndBody> childBody (CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body));
+						ndSharedPtr<ndBody> childBody (CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body->GetAsBodyDynamic()));
 						//world->AddBody(childBody);
-						//
-						//const ndMatrix pivotMatrix(childBody->GetMatrix());
-						//ndJointHinge* const hinge = new ndJointHinge(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body);
-						//hinge->SetLimits(definition.m_minLimit, definition.m_maxLimit);
-						//if ((definition.m_minLimit > -1000.0f) && (definition.m_maxLimit < 1000.0f))
-						//{
-						//	hinge->SetLimitState(true);
-						//}
-						//
-						//ndSharedPtr<ndJointBilateralConstraint> jointPtr(hinge);
-						//world->AddJoint(jointPtr);
-						//parentBone = model->AddLimb(parentBone, childBody, jointPtr);
+						
+						const ndMatrix pivotMatrix(childBody->GetMatrix());
+						ndSharedPtr<ndJointBilateralConstraint> hinge (new ndJointHinge(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body->GetAsBodyKinematic()));
+
+						ndJointHinge* const hingeJoint = (ndJointHinge*)*hinge;
+						hingeJoint->SetLimits(definition.m_minLimit, definition.m_maxLimit);
+						if ((definition.m_minLimit > -1000.0f) && (definition.m_maxLimit < 1000.0f))
+						{
+							hingeJoint->SetLimitState(true);
+						}
+
+						parentBone = model->AddLimb(parentBone, childBody, hinge);
 					}
 					else if (definition.m_type == ndDefinition::m_slider)
 					{
-						ndAssert(0);
-						//ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body));
-						//world->AddBody(childBody);
-						//
-						//const ndMatrix pivotMatrix(childBody->GetMatrix());
-						//ndJointSlider* const slider = new ndJointSlider(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body);
-						//slider->SetLimits(definition.m_minLimit, definition.m_maxLimit);
-						//slider->SetAsSpringDamper(0.005f, 2000.0f, 200.0f);
-						//
-						//if (!strstr(definition.m_boneName, "Left"))
-						//{
-						//	//m_leftGripper = slider;
-						//}
-						//else
-						//{
-						//	//m_rightGripper = slider;
-						//}
-						//ndSharedPtr<ndJointBilateralConstraint> jointPtr(slider);
+						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body->GetAsBodyDynamic()));
+						
+						const ndMatrix pivotMatrix(childBody->GetMatrix());
+						ndSharedPtr<ndJointBilateralConstraint> slider (new ndJointSlider(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body->GetAsBodyKinematic()));
+
+						ndJointSlider* const sliderJoint = (ndJointSlider*)*slider;
+						sliderJoint->SetLimits(definition.m_minLimit, definition.m_maxLimit);
+						sliderJoint->SetAsSpringDamper(0.005f, 2000.0f, 200.0f);
+						
+						if (!strstr(definition.m_boneName, "Left"))
+						{
+							//m_leftGripper = slider;
+						}
+						else
+						{
+							//m_rightGripper = slider;
+						}
 						//world->AddJoint(jointPtr);
-						//parentBone = model->AddLimb(parentBone, childBody, jointPtr);
+						parentBone = model->AddLimb(parentBone, childBody, slider);
 					}
 					else if (definition.m_type == ndDefinition::m_effector)
 					{
-						ndAssert(0);
-						//ndBodyDynamic* const childBody = parentBone->m_body;
-						//
-						//const ndMatrix pivotFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
-						//const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
-						//
-						//ndIk6DofEffector* const effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, modelNode->m_body);
-						////m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
-						//
-						//ndFloat32 relaxation = 0.002f;
-						//effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
-						//effector->SetLinearSpringDamper(relaxation, 2000.0f, 200.0f);
-						//effector->SetAngularSpringDamper(relaxation, 2000.0f, 200.0f);
-						//effector->SetMaxForce(10000.0f);
-						//effector->SetMaxTorque(10000.0f);
-						//
-						//// the effector is part of the rig
-						//ndSharedPtr<ndJointBilateralConstraint> jointPtr(effector);
-						//world->AddJoint(jointPtr);
+						ndBodyDynamic* const childBody = parentBone->m_body->GetAsBodyDynamic();
+						
+						const ndMatrix pivotFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
+						const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
+						
+						ndSharedPtr<ndJointBilateralConstraint> effector (new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, modelNode->m_body->GetAsBodyKinematic()));
+						
+						ndIk6DofEffector* const effectorJoint = (ndIk6DofEffector*)*effector;
+						ndFloat32 relaxation = 0.002f;
+						//m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
+						effectorJoint->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
+						effectorJoint->SetLinearSpringDamper(relaxation, 2000.0f, 200.0f);
+						effectorJoint->SetAngularSpringDamper(relaxation, 2000.0f, 200.0f);
+						effectorJoint->SetMaxForce(10000.0f);
+						effectorJoint->SetMaxTorque(10000.0f);
+						
+						// the effector is part of the rig
+						model->AddCloseLoop(effector);
 					}
 					break;
 				}
@@ -518,13 +515,13 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	//AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f);
 	//AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f);
 
-	ndAssert(0);
-	//ndSharedPtr<ndModel> model(BuildModel(scene, *modelMesh, matrix));
-	//ndModelPassiveRagdoll* const robot = (ndModelPassiveRagdoll*)*model;
-	//
-	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->m_body->GetMatrix(), robot->GetRoot()->m_body, floor));
-	//world->AddModel(model);
-	//world->AddJoint (fixJoint);
+	ndSharedPtr<ndModel> model(BuildModel(scene, *modelMesh, matrix));
+	ndModelArticulation* const robot = (ndModelArticulation*)*model;
+
+	ndBodyKinematic* const baseBody = robot->GetRoot()->m_body->GetAsBodyKinematic();
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(baseBody->GetMatrix(), baseBody, floor));
+	world->AddModel(model);
+	world->AddJoint (fixJoint);
 
 	matrix.m_posit.m_x -= 5.0f;
 	matrix.m_posit.m_y += 2.0f;
@@ -532,8 +529,8 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 45.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 
-	ndFileFormatSave xxxxSave;
-	xxxxSave.SaveWorld(scene->GetWorld(), "xxxx.nd");
+	//ndFileFormatSave xxxxSave;
+	//xxxxSave.SaveModels(scene->GetWorld(), "xxxx.nd");
 	//ndFileFormatLoad xxxxLoad;
 	//xxxxLoad.Load("xxxx.nd");
 	//// offset bodies positions for calibration;

@@ -77,9 +77,24 @@ void ndFileFormatModelArticulation::SaveModel(ndFileFormatSave* const scene, nd:
 			}
 		}
 		limbsNode->SetAttribute("count", count);
+
+		if (articulatedModel->m_closeLoops.GetCount())
+		{
+			nd::TiXmlElement* const loopsNode = new nd::TiXmlElement("closeLoops");
+			classNode->LinkEndChild(loopsNode);
+
+			loopsNode->SetAttribute("count", articulatedModel->m_closeLoops.GetCount());
+
+			for (ndSharedList<ndJointBilateralConstraint>::ndNode* node = articulatedModel->m_closeLoops.GetFirst(); node; node = node->GetNext())
+			{
+				ndInt32 jointId = scene->FindJointId(node->GetInfo()->GetAsBilateral());
+				nd::TiXmlElement* const loopNode = new nd::TiXmlElement("loopJoint");
+				loopsNode->LinkEndChild(loopNode);
+				loopNode->SetAttribute("joint", jointId);
+			}
+		}
 	}
 }
-
 
 ndModel* ndFileFormatModelArticulation::LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap)
 {
@@ -91,15 +106,15 @@ ndModel* ndFileFormatModelArticulation::LoadModel(const nd::TiXmlElement* const 
 void ndFileFormatModelArticulation::LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap, ndModel* const model)
 {
 	ndFileFormatModel::LoadModel((nd::TiXmlElement*)node->FirstChild(D_MODEL_CLASS), bodyMap, jointMap, model);
-	
+
 	ndModelArticulation* const modelBase = (ndModelArticulation*)model;
-	
+
 	ndInt32 rootBodyId = xmlGetInt(node, "rootBody");
 	ndTree<ndSharedPtr<ndBody>, ndInt32>::ndNode* const rootBodyNode = bodyMap.Find(rootBodyId);
-	
+
 	ndTree<ndModelArticulation::ndNode*, ndInt32> filter;
-	filter.Insert (modelBase->AddRootBody(rootBodyNode->GetInfo()), rootBodyId);
-	
+	filter.Insert(modelBase->AddRootBody(rootBodyNode->GetInfo()), rootBodyId);
+
 	const nd::TiXmlNode* const limbsNode = node->FirstChild("limbs");
 	ndAssert(limbsNode);
 	for (const nd::TiXmlNode* childNode = limbsNode->FirstChild("limb"); childNode; childNode = childNode->NextSibling())
@@ -107,17 +122,27 @@ void ndFileFormatModelArticulation::LoadModel(const nd::TiXmlElement* const node
 		ndInt32 childId;
 		ndInt32 jointId;
 		ndInt32 parentId;
-	
+
 		((nd::TiXmlElement*)childNode)->Attribute("joint", &jointId);
 		((nd::TiXmlElement*)childNode)->Attribute("childBody", &childId);
 		((nd::TiXmlElement*)childNode)->Attribute("parentBody", &parentId);
-	
+
 		ndTree<ndSharedPtr<ndBody>, ndInt32>::ndNode* const childBodyNode = bodyMap.Find(childId);
 		ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>::ndNode* const jointNode = jointMap.Find(jointId);
-	
+
 		ndAssert(filter.Find(parentId));
 		ndModelArticulation::ndNode* const parent = filter.Find(parentId)->GetInfo();
 		ndModelArticulation::ndNode* const child = modelBase->AddLimb(parent, childBodyNode->GetInfo(), jointNode->GetInfo());
 		filter.Insert(child, childId);
+	}
+
+	const nd::TiXmlNode* const closeLoopsNode = node->FirstChild("closeLoops");
+	ndAssert(closeLoopsNode);
+	for (const nd::TiXmlNode* childNode = closeLoopsNode->FirstChild("loopJoint"); childNode; childNode = childNode->NextSibling())
+	{
+		ndInt32 jointId;
+		((nd::TiXmlElement*)childNode)->Attribute("joint", &jointId);
+		ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>::ndNode* const jointNode = jointMap.Find(jointId);
+		modelBase->AddCloseLoop(jointNode->GetInfo());
 	}
 }

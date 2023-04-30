@@ -44,6 +44,6 @@ ndModel* ndFileFormatModel::LoadModel(const nd::TiXmlElement* const, const ndTre
 	return nullptr;
 }
 
-void ndFileFormatModel::LoadModel(const nd::TiXmlElement* const, const ndTree<ndSharedPtr<ndBody>, ndInt32>&, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap, ndModel* const)
+void ndFileFormatModel::LoadModel(const nd::TiXmlElement* const, const ndTree<ndSharedPtr<ndBody>, ndInt32>&, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>&, ndModel* const)
 {
 }

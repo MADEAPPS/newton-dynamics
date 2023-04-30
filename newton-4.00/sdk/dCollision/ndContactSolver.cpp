@@ -1216,7 +1216,7 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 	ndAssert(totalArea >= ndFloat32(0.0f));
 	bool hasLinearCombination = true;
 	ndConvexFaceNode* hullPoint = &convexHull[0];
-	while (hasLinearCombination)
+	while (hasLinearCombination && (hullCount > 1))
 	{
 		sortHeap.Flush();
 		hasLinearCombination = false;
@@ -1242,6 +1242,7 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 					hullPoint = corner->m_prev;
 				}
 				hullCount--;
+				ndAssert(hullCount >= 1);
 				hasLinearCombination = true;
 				corner->m_prev->m_mask = 0;
 				corner->m_next->m_prev = corner->m_prev;

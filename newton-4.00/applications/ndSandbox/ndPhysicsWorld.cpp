@@ -114,7 +114,7 @@ void ndPhysicsWorld::PreUpdate(ndFloat32 timestep)
 		const ndBodyListView& bodyList = GetBodyList();
 		if (bodyList.GetCount() > 1)
 		{
-			ndInt32 index = ndInt32(ndRandInt() % (bodyList.GetCount() - 1) + 1);
+			//ndInt32 index = ndInt32(ndRandInt() % (bodyList.GetCount() - 1) + 1);
 			//RemoveBody(bodyList.GetView()[index]);
 		}
 	}
