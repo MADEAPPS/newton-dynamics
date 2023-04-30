@@ -55,6 +55,17 @@ public:
 	}
 	~NewtonPhantom() = default;
 
+	virtual void OnAddToWorld()
+	{
+		// do nothing since is does not uses bodies or joints
+	}
+
+	virtual void OnRemoveFromToWorld()
+	{
+		// do nothing since is does not uses bodies or joints
+	}
+
+
 	void transform(const ndMatrix& matrix) { worldMatrix = matrix; }
 	ndInt32 getContactCount() const { return contactCount; }
 	ndVector getContactPoint() const { return contactPoint; }
