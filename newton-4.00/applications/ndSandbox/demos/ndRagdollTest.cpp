@@ -173,9 +173,9 @@ namespace ndRagdoll
 		return nullptr;
 	}
 
-	ndModelHierarchicalArticulation* BuildModel(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
+	ndModelPassiveRagdoll* BuildModel(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
 	{
-		ndModelHierarchicalArticulation* const model = new ndModelHierarchicalArticulation();
+		ndModelPassiveRagdoll* const model = new ndModelPassiveRagdoll();
 
 		ndWorld* const world = scene->GetWorld();
 		ndDemoEntity* const entity = modelMesh->CreateClone();
@@ -199,14 +199,14 @@ namespace ndRagdoll
 		rootBody->SetMatrix(rootEntity->CalculateGlobalMatrix());
 
 		// add body to the world
-		world->AddBody(rootBody);
+		//world->AddBody(rootBody);
 
 		// add the root body to the model
-		ndModelHierarchicalArticulation::ndNode* const modelNode = model->AddRootBody(rootBody);
+		ndModelPassiveRagdoll::ndNode* const modelNode = model->AddRootBody(rootBody);
 
 		ndInt32 stack = 0;
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
-		ndFixSizeArray<ndModelHierarchicalArticulation::ndNode*, 32> parentBones;
+		ndFixSizeArray<ndModelPassiveRagdoll::ndNode*, 32> parentBones;
 
 		// parse the 3d model and add all the limb
 		for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
@@ -220,7 +220,7 @@ namespace ndRagdoll
 		{
 			stack--;
 			ndDemoEntity* const childEntity = childEntities[stack];
-			ndModelHierarchicalArticulation::ndNode* parentBone = parentBones[stack];
+			ndModelPassiveRagdoll::ndNode* parentBone = parentBones[stack];
 			const char* const name = childEntity->GetName().GetStr();
 			//ndTrace(("name: %s\n", name));
 
@@ -230,15 +230,14 @@ namespace ndRagdoll
 
 				if (!strcmp(definition.m_boneName, name))
 				{
-					ndSharedPtr<ndBody> childBody (CreateBodyPart(scene, childEntity, parentBone->m_body));
+					ndSharedPtr<ndBody> childBody (CreateBodyPart(scene, childEntity, parentBone->m_body->GetAsBodyDynamic()));
 					
-					//connect this body part to its parentBody with a ragdoll joint
-					ndSharedPtr<ndJointBilateralConstraint> joint = ConnectBodyParts(childBody->GetAsBodyDynamic(), parentBone->m_body, definition);
-					world->AddJoint(joint);
+					//connect this body part to its parentBody with a rag doll joint
+					ndSharedPtr<ndJointBilateralConstraint> joint (ConnectBodyParts(childBody->GetAsBodyDynamic(), parentBone->m_body->GetAsBodyDynamic(), definition));
 
-					// add body to the world.
-					world->AddBody(childBody);
-
+					//world->AddJoint(joint);
+					//world->AddBody(childBody);
+					
 					// add this child body to the rad doll model.
 					parentBone = model->AddLimb(parentBone, childBody, joint);
 					break;
@@ -293,21 +292,20 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	playerMatrix = ndYawMatrix(angle) * playerMatrix;
 	ndVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-5.0f));
 	origin.m_y += 1.0f;
-	origin.m_z += -3.0f;
+	origin.m_z += -0.0f;
 	scene->SetCameraMatrix(playerMatrix, origin);
 
-	ndFileFormatSave xxxxSave;
-	xxxxSave.SaveModels(scene->GetWorld(), "xxxx.nd");
-
+	//ndFileFormatSave xxxxSave;
+	//xxxxSave.SaveModels(scene->GetWorld(), "xxxx.nd");
 	//ndFileFormatLoad xxxxLoad;
 	//xxxxLoad.Load("xxxx.nd");
-	//// offset bodies positions for calibraion;
+	//// offset bodies positions for calibration
 	//const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
 	//for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
 	//{
 	//	ndSharedPtr<ndBody>& body = node->GetInfo();
 	//	ndMatrix bodyMatrix (body->GetMatrix());
-	//	bodyMatrix.m_posit.m_x += 0.5f;
+	//	bodyMatrix.m_posit.m_x += 1.0f;
 	//	body->SetMatrix(bodyMatrix);
 	//}
 	//xxxxLoad.AddToWorld(scene->GetWorld());

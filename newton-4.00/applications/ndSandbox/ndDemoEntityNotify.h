@@ -86,6 +86,7 @@ class ndBindingRagdollEntityNotify : public ndDemoEntityNotify
 	//};
 
 	ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody, ndFloat32 campSpeed);
+	~ndBindingRagdollEntityNotify();
 
 	void OnTransform(ndInt32, const ndMatrix& matrix);
 	void OnApplyExternalForce(ndInt32 thread, ndFloat32 timestep);

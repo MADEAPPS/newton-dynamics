@@ -50,24 +50,25 @@ void ndModelList::UpdateDirtyList()
 
 void ndModelList::AddModel(ndSharedPtr<ndModel>& model, ndWorld* const world)
 {
-	ndAssert(!model->m_node);
-	if (!model->m_node)
+	ndAssert(!model->m_worldNode);
+	if (!model->m_worldNode)
 	{
 		m_dirty = true;
-		ndNode* const node = Append(model);
-		model->m_node = node;
-		model->AddToWorld(world);
+		model->m_world = world;
+		model->m_worldNode = Append(model);
+		model->OnAddToWorld();
 	}
 }
 
 void ndModelList::RemoveModel(ndSharedPtr<ndModel>& model)
 {
-	ndNode* const node = model->m_node;
+	ndNode* const node = model->m_worldNode;
 	if (node)
 	{
 		m_dirty = true;
-		model->RemoveFromToWorld();
-		model->m_node = nullptr;
+		model->OnRemoveFromToWorld();
+		model->m_world = nullptr;
+		model->m_worldNode = nullptr;
 		Remove(node);
 	}
 }

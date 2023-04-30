@@ -33,7 +33,6 @@ ndBodyNotify::ndBodyNotify(const ndVector& defaultGravity)
 
 ndBodyNotify::~ndBodyNotify()
 {
-
 }
 
 ndBody* ndBodyNotify::GetBody()

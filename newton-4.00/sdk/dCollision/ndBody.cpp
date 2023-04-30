@@ -38,6 +38,7 @@ ndBody::ndBody()
 	,m_maxAabb(ndVector::m_wOne)
 	,m_rotation()
 	,m_notifyCallback(nullptr)
+	,m_deletedNode(nullptr)
 	,m_uniqueId(m_uniqueIdCount)
 	,m_flags(0)
 	,m_isStatic(0)
@@ -49,7 +50,6 @@ ndBody::ndBody()
 	,m_isConstrained(0)
 	,m_sceneForceUpdate(1)
 	,m_sceneEquilibrium(0)
-	,m_markedForRemoved(0)
 {
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;
@@ -57,6 +57,7 @@ ndBody::ndBody()
 
 ndBody::~ndBody()
 {
+	ndAssert(!m_deletedNode);
 	if (m_notifyCallback)
 	{
 		delete m_notifyCallback;

@@ -77,6 +77,9 @@ class ndExplodeConvexShapeModel: public ndModel
 	ndExplodeConvexShapeModel(ndDemoEntityManager* const scene);
 	~ndExplodeConvexShapeModel();
 
+	virtual void OnAddToWorld() { ndAssert(0); }
+	virtual void OnRemoveFromToWorld() { ndAssert(0); }
+
 	void AddEffect(const ndEffect& effect, ndFloat32 mass, const ndMatrix& location);
 
 	virtual void Update(ndWorld* const world, ndFloat32 timestep);

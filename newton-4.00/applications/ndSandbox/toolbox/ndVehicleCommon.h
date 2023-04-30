@@ -239,6 +239,9 @@ class ndVehicleSelector : public ndModel
 	D_CLASS_REFLECTION(ndVehicleSelector, ndModel)
 	ndVehicleSelector();
 
+	virtual void OnAddToWorld() {}
+	virtual void OnRemoveFromToWorld() {}
+
 	void Update(ndWorld* const, ndFloat32){}
 	void PostUpdate(ndWorld* const world, ndFloat32);
 

@@ -50,9 +50,6 @@ ndGoogol::ndGoogol(ndFloat64 value)
 	ndMemSet(m_mantissa, ndUnsigned64(0), sizeof(m_mantissa) / sizeof(m_mantissa[0]));
 
 	m_mantissa[0] = ndUnsigned64 (ndFloat64 (ndUnsigned64(1)<<62) * mantissa);
-
-	// it looks like GCC have problems with this
-	//ndAssert (m_mantissa[0] >= 0);
 	ndAssert ((m_mantissa[0] & ndUnsigned64(1)<<63) == 0);
 }
 

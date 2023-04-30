@@ -13,7 +13,6 @@
 #define __DEMO_MODEL_NOTIFY_H__
 
 #include "ndModelStdafx.h"
-#include "ndModelBase.h"
 
 class ndModelNotify: public ndBodyNotify
 {

@@ -27,23 +27,13 @@
 
 class ndModelBase;
 class ndMultiBodyVehicle;
+class ndModelArticulation;
 class ndConstraintDebugCallback;
-class ndModelHierarchicalArticulation;
 
 D_MSV_NEWTON_ALIGN_32
 class ndModel: public ndContainersFreeListAlloc<ndModel>
 {
 	public:
-	template<class T>
-	class ndReferencedObjects : public ndList<ndSharedPtr<T>, ndContainersFreeListAlloc<ndSharedPtr<T>*>>
-	{
-		public:
-		ndReferencedObjects()
-			:ndList<ndSharedPtr<T>, ndContainersFreeListAlloc<ndSharedPtr<T>*>>()
-		{
-		}
-	};
-
 	D_BASE_CLASS_REFLECTION(ndModel)
 
 	ndModel();
@@ -52,20 +42,21 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	virtual ndModel* GetAsModel();
 	virtual ndModelBase* GetAsModelBase();
 	virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
-	virtual ndModelHierarchicalArticulation* GetAsModelHierarchicalArticulation();
+	virtual ndModelArticulation* GetAsModelArticulation();
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 
 	protected:
-	virtual void AddToWorld(ndWorld* const world);
-	virtual void RemoveFromToWorld();
+	virtual void OnAddToWorld() = 0;
+	virtual void OnRemoveFromToWorld() = 0;
+
 	virtual void Update(ndWorld* const world, ndFloat32 timestep);
 	virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
 	virtual void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep);
 
 	ndWorld* m_world;
 	private:
-	ndModelList::ndNode* m_node;
-	ndInt8 m_markedForRemoved;
+	ndModelList::ndNode* m_worldNode;
+	ndSpecialList<ndModel>::ndNode* m_deletedNode;
 
 	friend class ndWorld;
 	friend class ndLoadSave;
@@ -76,14 +67,15 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 inline ndModel::ndModel()
 	:ndContainersFreeListAlloc<ndModel>()
 	,m_world(nullptr)
-	,m_node(nullptr)
-	,m_markedForRemoved(0)
+	,m_worldNode(nullptr)
+	,m_deletedNode(nullptr)
 {
 }
 
 inline ndModel::~ndModel()
 {
-	ndAssert(!m_node);
+	ndAssert(!m_worldNode);
+	ndAssert(!m_deletedNode);
 }
 
 inline ndModel* ndModel::GetAsModel()
@@ -101,7 +93,7 @@ inline ndMultiBodyVehicle* ndModel::GetAsMultiBodyVehicle()
 	return nullptr; 
 }
 
-inline ndModelHierarchicalArticulation* ndModel::GetAsModelHierarchicalArticulation()
+inline ndModelArticulation* ndModel::GetAsModelArticulation()
 {
 	return nullptr;
 }
@@ -121,17 +113,6 @@ inline void ndModel::PostUpdate(ndWorld* const, ndFloat32)
 inline void ndModel::PostTransformUpdate(ndWorld* const, ndFloat32)
 {
 }
-
-inline void ndModel::AddToWorld(ndWorld* const world)
-{
-	m_world = world;
-}
-
-inline void ndModel::RemoveFromToWorld()
-{
-	m_world = nullptr;
-}
-
 
 #endif 
 

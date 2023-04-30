@@ -139,7 +139,6 @@ namespace ndQuadruped_2
 			,m_effectorsInfo()
 			,m_effectorsJoints()
 		{
-
 			static ndQuadrupedModelSaveLoad loadSaveModel;
 			ndFloat32 mass = 10.0f;
 			ndFloat32 radius = 0.25f;
@@ -280,6 +279,9 @@ namespace ndQuadruped_2
 		~ndQuadrupedModel()
 		{
 		}
+
+		virtual void OnAddToWorld() { ndAssert(0); }
+		virtual void OnRemoveFromToWorld() { ndAssert(0); }
 
 		void GetContacts(ndFixSizeArray<ndVector, 4>& contacts) const 
 		{
@@ -431,7 +433,7 @@ namespace ndQuadruped_2
 		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
 		ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
 	};
-	
+
 	class ndModelUI : public ndUIEntity
 	{
 		public:

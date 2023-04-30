@@ -185,7 +185,7 @@ class ndBodyKinematic : public ndBody
 	virtual void AddDampingAcceleration(ndFloat32 timestep);
 	
 	D_COLLISION_API virtual void EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeAccel2);
-	
+
 #ifdef D_USE_FULL_INERTIA
 	ndMatrix m_inertiaPrincipalAxis;
 #endif
@@ -229,6 +229,7 @@ class ndBodyKinematic : public ndBody
 	friend class ndWorldSceneCuda;
 	friend class ndBvhSceneManager;
 	friend class ndSkeletonContainer;
+	friend class ndModelArticulation;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateSycl;

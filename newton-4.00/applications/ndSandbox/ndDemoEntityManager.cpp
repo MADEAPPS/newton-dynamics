@@ -443,7 +443,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
-	//m_collisionDisplayMode = 3;		// solid wire frame
+	m_collisionDisplayMode = 3;		// solid wire frame
 	m_synchronousPhysicsUpdate = true;
 	m_synchronousParticlesUpdate = true;
 
@@ -1102,7 +1102,6 @@ void ndDemoEntityManager::CharCallback(GLFWwindow*, ndUnsigned32 ch)
 	io.AddInputCharacter((unsigned short)ch);
 }
 
-
 void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, ndInt32 key, ndInt32, ndInt32 action, ndInt32 mods)
 {
 	ImGuiIO& io = ImGui::GetIO();
@@ -1355,7 +1354,6 @@ ndFloat32 ndDemoEntityManager::CalculateInteplationParam () const
 	}
 	return param;
 }
-
 
 void ndDemoEntityManager::RenderScene(ImDrawData* const draw_data)
 {

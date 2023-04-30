@@ -83,23 +83,34 @@ ndNodeHierarchy<T>::~ndNodeHierarchy ()
 	}
 	if (m_parent)
 	{
-		ndAssert(!m_prev);
 		if (m_next)
 		{
-			m_next->m_prev = nullptr;
+			m_next->m_prev = m_prev;
 		}
-		m_parent->m_firstChild = m_next;
-		if (!m_next)
+		else
 		{
-			m_parent->m_lastChild = nullptr;
+			m_parent->m_lastChild = m_prev;
+		}
+		if (m_prev)
+		{
+			m_prev->m_next = m_next;
+		}
+		else
+		{
+			m_parent->m_firstChild = m_next;
 		}
 	} 
 	else if (m_next)
 	{
-		m_next->m_prev = nullptr;
+		m_next->m_prev = m_prev;
+	}
+	else if (m_prev)
+	{
+		m_prev->m_next = m_next;
 	}
 	m_next = nullptr;
-	ndAssert(!m_prev);
+	m_prev = nullptr;
+
 	ndAssert(!m_lastChild);
 	ndAssert(!m_firstChild);
 }

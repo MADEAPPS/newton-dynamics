@@ -457,32 +457,34 @@ void ndVehicleUI::RenderUI()
 	ndFloat32 x = gageSize / 2 + 20.0f;
 	ndFloat32 maxRpm = m_vehicle->m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm;
 	maxRpm += 500.0f;
-	ndFloat32 rpm = (m_vehicle->m_motor->GetRpm() / maxRpm) * 2.85f;
-	
-	glUseProgram(m_shaderHandle);
-	
-	glActiveTexture(GL_TEXTURE0);
-	
-	RenderGageUI(m_tachometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
-	
-	ndFloat32 s = gageSize * 0.7f;
-	RenderGageUI(m_redNeedle, -x, -y, s * 0.5f, rpm, -0.0f, 90.0f);
-	
-	x += gageSize;
-	RenderGageUI(m_odometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
-	
-	ndFloat32 speed = (m_vehicle->GetSpeed() / 100.0f) * 2.85f;
-	RenderGageUI(m_greenNeedle, -x, -y, s * 0.5f, ndAbs(speed), -0.0f, 90.0f);
-	
-	// draw the current gear
-	ndInt32 gearMap[8];
-	gearMap[sizeof(m_vehicle->m_configuration.m_transmission.m_forwardRatios) / sizeof(m_vehicle->m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
-	gearMap[sizeof(m_vehicle->m_configuration.m_transmission.m_forwardRatios) / sizeof(m_vehicle->m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
-	for (ndInt32 i = 0; i < m_vehicle->m_configuration.m_transmission.m_gearsCount; ++i)
-	{
-		gearMap[i] = i + 2;
-	}
-	RenderGearUI(gearMap[m_vehicle->m_currentGear], m_gears, -x, -y, gageSize);
-	
-	glUseProgram(0);
+
+	ndAssert(0);
+	//ndFloat32 rpm = (m_vehicle->m_motor->GetRpm() / maxRpm) * 2.85f;
+	//
+	//glUseProgram(m_shaderHandle);
+	//
+	//glActiveTexture(GL_TEXTURE0);
+	//
+	//RenderGageUI(m_tachometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
+	//
+	//ndFloat32 s = gageSize * 0.7f;
+	//RenderGageUI(m_redNeedle, -x, -y, s * 0.5f, rpm, -0.0f, 90.0f);
+	//
+	//x += gageSize;
+	//RenderGageUI(m_odometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
+	//
+	//ndFloat32 speed = (m_vehicle->GetSpeed() / 100.0f) * 2.85f;
+	//RenderGageUI(m_greenNeedle, -x, -y, s * 0.5f, ndAbs(speed), -0.0f, 90.0f);
+	//
+	//// draw the current gear
+	//ndInt32 gearMap[8];
+	//gearMap[sizeof(m_vehicle->m_configuration.m_transmission.m_forwardRatios) / sizeof(m_vehicle->m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
+	//gearMap[sizeof(m_vehicle->m_configuration.m_transmission.m_forwardRatios) / sizeof(m_vehicle->m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
+	//for (ndInt32 i = 0; i < m_vehicle->m_configuration.m_transmission.m_gearsCount; ++i)
+	//{
+	//	gearMap[i] = i + 2;
+	//}
+	//RenderGearUI(gearMap[m_vehicle->m_currentGear], m_gears, -x, -y, gageSize);
+	//
+	//glUseProgram(0);
 }

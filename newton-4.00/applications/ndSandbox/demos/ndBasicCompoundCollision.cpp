@@ -158,7 +158,7 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	location.m_posit.m_y = 0.5f;
 	location.m_posit.m_z = -3.0f;
 	AddSimpleConcaveMesh(scene, location, "bowl.fbx", 4);
-
+	
 	location.m_posit.m_x = 5.0f;
 	location.m_posit.m_z = -2.0f;
 	location.m_posit.m_y = 1.7f;

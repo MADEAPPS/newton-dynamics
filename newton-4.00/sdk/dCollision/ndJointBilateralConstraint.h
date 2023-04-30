@@ -152,6 +152,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndJointList::ndNode* m_worldNode;
 	ndBodyKinematic::ndJointList::ndNode* m_body0Node;
 	ndBodyKinematic::ndJointList::ndNode* m_body1Node;
+	ndSpecialList<ndJointBilateralConstraint>::ndNode* m_deletedNode;
 
 	ndFloat32 m_defualtDiagonalRegularizer;
 	ndUnsigned32 m_maxDof			: 6;
@@ -160,13 +161,13 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndUnsigned32 m_isInSkeleton		: 1;
 	ndUnsigned32 m_enableCollision	: 1;
 	ndInt8 m_rowIsMotor;
-	ndInt8 m_markedForRemoved;
 	ndJointBilateralSolverModel m_solverModel;
 
 	friend class ndWorld;
 	friend class ndIkSolver;
 	friend class ndDynamicsUpdate;
 	friend class ndFileFormatJoint;
+	friend class ndModelArticulation;
 	friend class ndSkeletonContainer;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;

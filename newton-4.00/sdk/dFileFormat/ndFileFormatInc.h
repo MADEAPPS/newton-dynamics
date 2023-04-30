@@ -34,7 +34,6 @@
 #include <ndFileFormatModel.h>
 #include <ndFileFormatNotify.h>
 #include <ndFileFormatShapeNull.h>
-#include <ndFileFormatModelBase.h>
 #include <ndFileFormatRegistrar.h>
 #include <ndFileFormatJointGear.h>
 #include <ndFileFormatJointHinge.h>
@@ -63,12 +62,14 @@
 #include <ndFileFormatJointIkSpherical.h>
 #include <ndFileFormatJointDoubleHinge.h>
 #include <ndFileFormatJointFixDistance.h>
+#include <ndFileFormatModelArticulation.h>
 #include <ndFileFormatBodyTriggerVolume.h>
 #include <ndFileFormatBodyKinematicBase.h>
 #include <ndFileFormatShapeConvexSphere.h>
 #include <ndFileFormatJointVehicleMotor.h>
 #include <ndFileFormatJointIkDoubleHinge.h>
 #include <ndFileFormatShapeConvexCapsule.h>
+#include <ndFileFormatModelPassiveRagdoll.h>
 #include <ndFileFormatJointVehicleGearBox.h>
 #include <ndFileFormatShapeConvexCylinder.h>
 #include <ndFileFormatShapeStaticMesh_bvh.h>
@@ -83,7 +84,6 @@
 #include <ndFileFormatBodyKinematicPlayerCapsule.h>
 #include <ndFileFormatJointVehicleDifferentialAxle.h>
 #include <ndFileFormatJointIkSwivelPositionEffector.h>
-#include <ndFileFormatModelHierarchicalArticulation.h>
 
 #endif 
 

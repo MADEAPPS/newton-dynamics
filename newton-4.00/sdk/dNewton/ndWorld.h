@@ -68,8 +68,6 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API void Update(ndFloat32 timestep);
 	D_NEWTON_API void CollisionUpdate(ndFloat32 timestep);
 
-	D_NEWTON_API virtual void OnPostUpdate(ndFloat32 timestep);
-
 	D_NEWTON_API ndInt32 GetThreadCount() const;
 	D_NEWTON_API void SetThreadCount(ndInt32 count);
 
@@ -124,16 +122,18 @@ class ndWorld: public ndClassAlloc
 
 	private:
 	void ThreadFunction();
-	void PostUpdate(ndFloat32 timestep);
 	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();
 	D_NEWTON_API virtual void UpdateTransforms();
 	D_NEWTON_API virtual void PostModelTransform();
 
+	D_NEWTON_API virtual void PreUpdate(ndFloat32 timestep);
+	D_NEWTON_API virtual void PostUpdate(ndFloat32 timestep);
+
 	private:
+	//void RemoveModel(ndSharedPtr<ndModel>& model);
 	void RemoveBody(ndSharedPtr<ndBody>& body);
-	void RemoveModel(ndSharedPtr<ndModel>& model);
 	void RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
 
 	class dgSolverProgressiveSleepEntry
@@ -165,9 +165,9 @@ class ndWorld: public ndClassAlloc
 	ndJointList m_jointList;
 	ndModelList m_modelList;
 	ndSkeletonList m_skeletonList;
-	ndArray<ndBody*> m_deletedBodies;
-	ndArray<ndModel*> m_deletedModels;
-	ndArray<ndJointBilateralConstraint*> m_deletedJoints;
+	ndSpecialList<ndBody> m_deletedBodies;
+	ndSpecialList<ndModel> m_deletedModels;
+	ndSpecialList<ndJointBilateralConstraint> m_deletedJoints;
 	ndArray<ndSkeletonContainer*> m_activeSkeletons;
 	ndSpinLock m_deletedLock;
 
@@ -190,6 +190,7 @@ class ndWorld: public ndClassAlloc
 	friend class ndBodyDynamic;
 	friend class ndDynamicsUpdate;
 	friend class ndSkeletonContainer;
+	friend class ndModelArticulation;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateSycl;

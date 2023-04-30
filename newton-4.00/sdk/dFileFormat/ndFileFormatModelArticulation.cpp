@@ -21,33 +21,33 @@
 
 #include "ndFileFormatStdafx.h"
 #include "ndFileFormatSave.h"
-#include "ndFileFormatModelHierarchicalArticulation.h"
+#include "ndFileFormatModelArticulation.h"
 
-ndFileFormatModelHierarchicalArticulation::ndFileFormatModelHierarchicalArticulation()
-	:ndFileFormatModelBase(ndModelHierarchicalArticulation::StaticClassName())
+ndFileFormatModelArticulation::ndFileFormatModelArticulation()
+	:ndFileFormatModel(ndModelArticulation::StaticClassName())
 {
 }
 
-ndFileFormatModelHierarchicalArticulation::ndFileFormatModelHierarchicalArticulation(const char* const className)
-	:ndFileFormatModelBase(className)
+ndFileFormatModelArticulation::ndFileFormatModelArticulation(const char* const className)
+	:ndFileFormatModel(className)
 {
 }
 
-void ndFileFormatModelHierarchicalArticulation::SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
+void ndFileFormatModelArticulation::SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_MODEL_CLASS, ndModelHierarchicalArticulation::StaticClassName());
-	ndFileFormatModelBase::SaveModel(scene, classNode, model);
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_MODEL_CLASS, ndModelArticulation::StaticClassName());
+	ndFileFormatModel::SaveModel(scene, classNode, model);
 
-	ndModelHierarchicalArticulation* const articulatedModel = (ndModelHierarchicalArticulation*)model;
+	ndModelArticulation* const articulatedModel = (ndModelArticulation*)model;
 
 	if (articulatedModel->GetRoot())
 	{
-		xmlSaveParam(classNode, "rootBody", scene->FindBodyId(articulatedModel->GetRoot()->m_body));
+		xmlSaveParam(classNode, "rootBody", scene->FindBodyId(articulatedModel->GetRoot()->m_body->GetAsBodyKinematic()));
 		nd::TiXmlElement* const limbsNode = new nd::TiXmlElement("limbs");
 		classNode->LinkEndChild(limbsNode);
 
-		ndFixSizeArray<ndModelHierarchicalArticulation::ndNode*, 256> stack;
-		for (ndModelHierarchicalArticulation::ndNode* child = articulatedModel->GetRoot()->GetFirstChild(); child; child = child->GetNext())
+		ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
+		for (ndModelArticulation::ndNode* child = articulatedModel->GetRoot()->GetFirstChild(); child; child = child->GetNext())
 		{
 			stack.PushBack(child);
 		}
@@ -56,14 +56,14 @@ void ndFileFormatModelHierarchicalArticulation::SaveModel(ndFileFormatSave* cons
 		{
 			count++;
 			ndInt32 index = stack.GetCount() - 1;
-			ndModelHierarchicalArticulation::ndNode* const node = stack[index];
+			ndModelArticulation::ndNode* const node = stack[index];
 			stack.SetCount(index);
 		
 			nd::TiXmlElement* const limbNode = new nd::TiXmlElement("limb");
 			limbsNode->LinkEndChild(limbNode);
-			ndInt32 childId = scene->FindBodyId(node->m_body);
-			ndInt32 parentId = scene->FindBodyId(node->GetParent()->m_body);
-			ndInt32 jointId = scene->FindJointId(node->m_joint);
+			ndInt32 childId = scene->FindBodyId(node->m_body->GetAsBodyKinematic());
+			ndInt32 parentId = scene->FindBodyId(node->GetParent()->m_body->GetAsBodyKinematic());
+			ndInt32 jointId = scene->FindJointId(node->m_joint->GetAsBilateral());
 			ndAssert(childId != 0);
 			ndAssert(parentId != 0);
 			ndAssert(jointId != 0);
@@ -71,7 +71,7 @@ void ndFileFormatModelHierarchicalArticulation::SaveModel(ndFileFormatSave* cons
 			limbNode->SetAttribute("parentBody", parentId);
 			limbNode->SetAttribute("joint", jointId);
 		
-			for (ndModelHierarchicalArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+			for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
 			{
 				stack.PushBack(child);
 			}
@@ -81,25 +81,25 @@ void ndFileFormatModelHierarchicalArticulation::SaveModel(ndFileFormatSave* cons
 }
 
 
-ndModel* ndFileFormatModelHierarchicalArticulation::LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap)
+ndModel* ndFileFormatModelArticulation::LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap)
 {
-	ndModelHierarchicalArticulation* const model = new ndModelHierarchicalArticulation();
+	ndModelArticulation* const model = new ndModelArticulation();
 	LoadModel(node, bodyMap, jointMap, model);
 	return model;
 }
 
-void ndFileFormatModelHierarchicalArticulation::LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap, ndModel* const model)
+void ndFileFormatModelArticulation::LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap, ndModel* const model)
 {
-	ndFileFormatModelBase::LoadModel((nd::TiXmlElement*)node->FirstChild(D_MODEL_CLASS), bodyMap, jointMap, model);
-
-	ndModelHierarchicalArticulation* const modelBase = (ndModelHierarchicalArticulation*)model;
-
+	ndFileFormatModel::LoadModel((nd::TiXmlElement*)node->FirstChild(D_MODEL_CLASS), bodyMap, jointMap, model);
+	
+	ndModelArticulation* const modelBase = (ndModelArticulation*)model;
+	
 	ndInt32 rootBodyId = xmlGetInt(node, "rootBody");
 	ndTree<ndSharedPtr<ndBody>, ndInt32>::ndNode* const rootBodyNode = bodyMap.Find(rootBodyId);
-
-	ndTree<ndModelHierarchicalArticulation::ndNode*, ndInt32> filter;
+	
+	ndTree<ndModelArticulation::ndNode*, ndInt32> filter;
 	filter.Insert (modelBase->AddRootBody(rootBodyNode->GetInfo()), rootBodyId);
-
+	
 	const nd::TiXmlNode* const limbsNode = node->FirstChild("limbs");
 	ndAssert(limbsNode);
 	for (const nd::TiXmlNode* childNode = limbsNode->FirstChild("limb"); childNode; childNode = childNode->NextSibling())
@@ -107,17 +107,17 @@ void ndFileFormatModelHierarchicalArticulation::LoadModel(const nd::TiXmlElement
 		ndInt32 childId;
 		ndInt32 jointId;
 		ndInt32 parentId;
-
+	
 		((nd::TiXmlElement*)childNode)->Attribute("joint", &jointId);
 		((nd::TiXmlElement*)childNode)->Attribute("childBody", &childId);
 		((nd::TiXmlElement*)childNode)->Attribute("parentBody", &parentId);
-
+	
 		ndTree<ndSharedPtr<ndBody>, ndInt32>::ndNode* const childBodyNode = bodyMap.Find(childId);
 		ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>::ndNode* const jointNode = jointMap.Find(jointId);
-
+	
 		ndAssert(filter.Find(parentId));
-		ndModelHierarchicalArticulation::ndNode* const parent = filter.Find(parentId)->GetInfo();
-		ndModelHierarchicalArticulation::ndNode* const child = modelBase->AddLimb(parent, childBodyNode->GetInfo(), jointNode->GetInfo());
+		ndModelArticulation::ndNode* const parent = filter.Find(parentId)->GetInfo();
+		ndModelArticulation::ndNode* const child = modelBase->AddLimb(parent, childBodyNode->GetInfo(), jointNode->GetInfo());
 		filter.Insert(child, childId);
 	}
 }

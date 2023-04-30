@@ -57,6 +57,7 @@ namespace ndAdvancedRobot
 		{ "effector", ndDefinition::m_effector , 0.0f, 0.0f, 0.0f},
 	};
 
+#if 0
 	class ndIndustrialRobot : public ndModel
 	{
 		public:
@@ -305,7 +306,7 @@ namespace ndAdvancedRobot
 		ndReal m_yaw;
 		ndReal m_roll;
 	};
-	
+
 	class ndRobotUI : public ndUIEntity
 	{
 		public:
@@ -356,6 +357,7 @@ namespace ndAdvancedRobot
 
 		ndIndustrialRobot* m_robot;
 	};
+#endif
 }
 
 using namespace ndAdvancedRobot;
@@ -368,20 +370,21 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	//ndDemoEntity* const robotEntity = ndDemoEntity::LoadFbx("robot.fbx", scene);
 	ndSharedPtr<ndDemoEntity> robotEntity(ndDemoEntity::LoadFbx("robot.fbx", scene));
 	
-	ndWorld* const world = scene->GetWorld();
+	ndAssert(0);
+	//ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-90.0f * ndDegreeToRad));
-	ndIndustrialRobot* const robot = new ndIndustrialRobot(scene, *robotEntity, matrix);
-	scene->SetSelectedModel(robot);
-
-	ndSharedPtr<ndModel> robotPtr(robot);
-	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), world->GetSentinelBody()));
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), floor));
-	world->AddModel(robotPtr);
-	world->AddJoint(fixJoint);
-	
-	ndRobotUI* const robotUI = new ndRobotUI(scene, robot);
-	ndSharedPtr<ndUIEntity> robotUIPtr(robotUI);
-	scene->Set2DDisplayRenderFunction(robotUIPtr);
+	//ndIndustrialRobot* const robot = new ndIndustrialRobot(scene, *robotEntity, matrix);
+	//scene->SetSelectedModel(robot);
+	//
+	//ndSharedPtr<ndModel> robotPtr(robot);
+	////ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), world->GetSentinelBody()));
+	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), floor));
+	//world->AddModel(robotPtr);
+	//world->AddJoint(fixJoint);
+	//
+	//ndRobotUI* const robotUI = new ndRobotUI(scene, robot);
+	//ndSharedPtr<ndUIEntity> robotUIPtr(robotUI);
+	//scene->Set2DDisplayRenderFunction(robotUIPtr);
 	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
@@ -389,11 +392,11 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	//world->AddModel(robotUIPtr1);
 	//delete robotEntity;
 	
-	ndMatrix location(matrix * ndYawMatrix(45.0f * ndDegreeToRad));
-	location.m_posit.m_z += 1.75f;
-	location.m_posit.m_x += 1.75f;
-	AddBox(scene, location, 10.0f, 2.0f, 0.5f, 2.0f);
-
+	//ndMatrix location(matrix * ndYawMatrix(45.0f * ndDegreeToRad));
+	//location.m_posit.m_z += 1.75f;
+	//location.m_posit.m_x += 1.75f;
+	//AddBox(scene, location, 10.0f, 2.0f, 0.5f, 2.0f);
+	
 	//ndMatrix location(matrix * ndYawMatrix(0.0f * ndDegreeToRad));
 	//location.m_posit.m_x += 1.5f;
 	//location.m_posit.m_z += 1.5f;

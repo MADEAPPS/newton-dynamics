@@ -320,50 +320,74 @@ void ndFileFormatSave::SaveModels(const ndWorld* const world, const char* const 
 	ndTree<ndBody*, ndBody*> bodyFilter;
 	for (ndModelList::ndNode* node = world->GetModelList().GetFirst(); node; node = node->GetNext())
 	{
-		ndModelBase* const model = node->GetInfo()->GetAsModelBase();
-		m_models.PushBack(model);
-		if (model)
+		ndModel* const baseModel = node->GetInfo()->GetAsModel();
+		m_models.PushBack(baseModel);
+		if (baseModel && baseModel->GetAsModelArticulation())
 		{
-			for (ndList<ndSharedPtr<ndJointBilateralConstraint>>::ndNode* mopdelNode = model->m_joints.GetFirst(); mopdelNode; mopdelNode = mopdelNode->GetNext())
+			ndModelArticulation* const model = baseModel->GetAsModelArticulation();
+			//for (ndList<ndSharedPtr<ndJointBilateralConstraint>>::ndNode* modelNode = model->m_joints.GetFirst(); modelNode; modelNode = modelNode->GetNext())
+			//{
+			//	ndJointBilateralConstraint* const joint = *modelNode->GetInfo();
+			//
+			//	ndBodyKinematic* const body1 = joint->GetBody1();
+			//	if (body1 == m_world->GetSentinelBody())
+			//	{
+			//		m_bodies.PushBack(body1);
+			//		bodyFilter.Insert(body1, body1);
+			//		break;
+			//	}
+			//}
+			//
+			//for (ndList<ndSharedPtr<ndJointBilateralConstraint>>::ndNode* modelNode = model->m_joints.GetFirst(); modelNode; modelNode = modelNode->GetNext())
+			//{
+			//	ndJointBilateralConstraint* const joint = *modelNode->GetInfo();
+			//
+			//	ndBodyKinematic* const body0 = joint->GetBody0();
+			//	if (!bodyFilter.Find(body0))
+			//	{
+			//		m_bodies.PushBack(body0);
+			//		bodyFilter.Insert(body0, body0);
+			//	}
+			//
+			//	ndBodyKinematic* const body1 = joint->GetBody1();
+			//	if (!bodyFilter.Find(body1))
+			//	{
+			//		m_bodies.PushBack(body1);
+			//		bodyFilter.Insert(body1, body1);
+			//	}
+			//	m_joints.PushBack(joint);
+			//}
+			//
+			//for (ndList<ndSharedPtr<ndBody>>::ndNode* modelNode = model->m_bodies.GetFirst(); modelNode; modelNode = modelNode->GetNext())
+			//{
+			//	ndBodyKinematic* const body = modelNode->GetInfo()->GetAsBodyKinematic();
+			//	if (!bodyFilter.Find(body))
+			//	{
+			//		m_bodies.PushBack(body);
+			//		bodyFilter.Insert(body, body);
+			//	}
+			//}
+
+			ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
+			if (model->GetRoot())
 			{
-				ndJointBilateralConstraint* const joint = *mopdelNode->GetInfo();
-
-				ndBodyKinematic* const body1 = joint->GetBody1();
-				if (body1 == m_world->GetSentinelBody())
+				stack.PushBack(model->GetRoot());
+				while (stack.GetCount())
 				{
-					m_bodies.PushBack(body1);
-					bodyFilter.Insert(body1, body1);
-					break;
-				}
-			}
+					ndInt32 index = stack.GetCount() - 1;
+					ndModelArticulation::ndNode* const limbNode = stack[index];
+					stack.SetCount(index);
+					m_bodies.PushBack(*limbNode->m_body);
+					bodyFilter.Insert(*limbNode->m_body, *limbNode->m_body);
+					if (*limbNode->m_joint)
+					{
+						m_joints.PushBack(limbNode->m_joint->GetAsBilateral());
+					}
 
-			for (ndList<ndSharedPtr<ndJointBilateralConstraint>>::ndNode* mopdelNode = model->m_joints.GetFirst(); mopdelNode; mopdelNode = mopdelNode->GetNext())
-			{
-				ndJointBilateralConstraint* const joint = *mopdelNode->GetInfo();
-
-				ndBodyKinematic* const body0 = joint->GetBody0();
-				if (!bodyFilter.Find(body0))
-				{
-					m_bodies.PushBack(body0);
-					bodyFilter.Insert(body0, body0);
-				}
-
-				ndBodyKinematic* const body1 = joint->GetBody1();
-				if (!bodyFilter.Find(body1))
-				{
-					m_bodies.PushBack(body1);
-					bodyFilter.Insert(body1, body1);
-				}
-				m_joints.PushBack(joint);
-			}
-
-			for (ndList<ndSharedPtr<ndBody>>::ndNode* mopdelNode = model->m_bodies.GetFirst(); mopdelNode; mopdelNode = mopdelNode->GetNext())
-			{
-				ndBodyKinematic* const body = mopdelNode->GetInfo()->GetAsBodyKinematic();
-				if (!bodyFilter.Find(body))
-				{
-					m_bodies.PushBack(body);
-					bodyFilter.Insert(body, body);
+					for (ndModelArticulation::ndNode* child = limbNode->GetFirstChild(); child; child = child->GetNext())
+					{
+						stack.PushBack(child);
+					}
 				}
 			}
 		}

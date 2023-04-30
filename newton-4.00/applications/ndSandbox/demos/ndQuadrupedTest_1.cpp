@@ -730,6 +730,9 @@ namespace ndQuadruped_1
 		{
 		}
 
+		virtual void OnAddToWorld() { ndAssert(0); }
+		virtual void OnRemoveFromToWorld() { ndAssert(0); }
+
 		ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
 		{
 			ndShapeInstance* const shape = entityPart->CreateCollisionFromChildren();

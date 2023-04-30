@@ -603,9 +603,9 @@ namespace biped_1
 		return body->GetAsBodyDynamic();
 	}
 
-	ndModelHierarchicalArticulation* BuildModel(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
+	ndModelPassiveRagdoll* BuildModel(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
 	{
-		ndModelHierarchicalArticulation* const model = new ndModelHierarchicalArticulation();
+		ndModelPassiveRagdoll* const model = new ndModelPassiveRagdoll();
 
 		ndWorld* const world = scene->GetWorld();
 		ndDemoEntity* const entity = modelMesh->CreateClone();
@@ -647,9 +647,9 @@ namespace biped_1
 
 		ndInt32 stack = 0;
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
-		ndFixSizeArray<ndModelHierarchicalArticulation::ndNode*, 32> parentBones;
+		ndFixSizeArray<ndModelPassiveRagdoll::ndNode*, 32> parentBones;
 
-		ndModelHierarchicalArticulation::ndNode* const modelNode = model->AddRootBody(rootBody);
+		ndModelPassiveRagdoll::ndNode* const modelNode = model->AddRootBody(rootBody);
 
 		for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
 		{
@@ -667,7 +667,7 @@ namespace biped_1
 		//	const char* const name = childEntity->GetName().GetStr();
 		 
 			ndDemoEntity* const childEntity = childEntities[stack];
-			ndModelHierarchicalArticulation::ndNode* parentBone = parentBones[stack];
+			ndModelPassiveRagdoll::ndNode* parentBone = parentBones[stack];
 			const char* const name = childEntity->GetName().GetStr();
 
 			for (ndInt32 i = 0; ragdollDefinition[i].m_boneName[0]; ++i)
@@ -799,12 +799,12 @@ void ndBipedTest_1(ndDemoEntityManager* const scene)
 	//scene->Set2DDisplayRenderFunction(bipedUIPtr);
 
 	ndSharedPtr<ndModel> model (BuildModel(scene, *modelMesh, origin));
-	ndBodyKinematic* const rootBody = model->GetAsModelHierarchicalArticulation()->GetRoot()->m_body;
+	ndBodyKinematic* const rootBody = model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(rootBody->GetMatrix(), rootBody, floor));
 	
 	world->AddModel(model);
 	world->AddJoint(fixJoint);
-		
+	
 	ndQuaternion rot;
 	origin.m_posit.m_x -= 5.0f;
 	origin.m_posit.m_y = 2.0f;

@@ -326,13 +326,14 @@ ndVehicleCommon::ndVehicleCommon(const ndVehicleDectriptor& desc)
 
 ndVehicleCommon::~ndVehicleCommon()
 {
-	ndWorld* const world = m_chassis->GetScene()->GetWorld();
-	world->RemoveBody(m_chassis);
-	for (ndReferencedObjects<ndMultiBodyVehicleTireJoint>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
-	{
-		ndBodyKinematic* const tireBody = node->GetInfo()->GetBody0();
-		world->RemoveBody(tireBody);
-	}
+	ndAssert(0);
+	//ndWorld* const world = m_chassis->GetScene()->GetWorld();
+	//world->RemoveBody(m_chassis);
+	//for (ndReferencedObjects<ndMultiBodyVehicleTireJoint>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndBodyKinematic* const tireBody = node->GetInfo()->GetBody0();
+	//	world->RemoveBody(tireBody);
+	//}
 }
 
 void ndVehicleCommon::SetAsPlayer(ndDemoEntityManager* const, bool mode)
@@ -474,158 +475,160 @@ void ndVehicleCommon::PostUpdate(ndWorld* const world, ndFloat32 timestep)
 
 void ndVehicleCommon::ApplyInputs(ndWorld* const world, ndFloat32)
 {
-	if (m_isPlayer && *m_motor)
-	{
-		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+	ndAssert(0);
 
-		m_inputs.Update(scene);
-		const ndFixSizeArray<ndFloat32, 8>& axis = m_inputs.m_axis;
-		const ndFixSizeArray<char, 32>& buttons = m_inputs.m_buttons;
-		
-		ndFloat32 brake = axis[m_brakePedal];
-		ndFloat32 throttle = axis[m_gasPedal];
-		ndFloat32 steerAngle = axis[m_steeringWheel];
-		ndFloat32 handBrake = buttons[m_handBreakButton] ? 1.0f : 0.0f;
-
-		if (m_parking.Update(buttons[m_parkingButton] ? true : false))
-		{
-			m_isParked = !m_isParked;
-		}
-
-		if (m_ignition.Update(buttons[m_ignitionButton] ? true : false))
-		{
-			m_startEngine = !m_startEngine;
-		}
-
-		if (m_manualTransmission.Update(buttons[m_automaticGearBoxButton] ? true : false))
-		{
-			m_isManualTransmission = !m_isManualTransmission;
-		}
-
-		// transmission front gear up
-		if (m_forwardGearUp.Update(buttons[m_upGearButton] ? true : false))
-		{
-			m_isParked = false;
-			if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
-			{
-				m_currentGear = 0;
-			}
-			else
-			{
-				m_currentGear++;
-				if (m_currentGear >= m_configuration.m_transmission.m_gearsCount)
-				{
-					m_currentGear = m_configuration.m_transmission.m_gearsCount - 1;
-				}
-			}
-			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-			m_gearBox->SetRatio(gearGain);
-			m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
-		}
-
-		// transmission front gear down
-		if (m_forwardGearDown.Update(buttons[m_downGearButton] ? true : false))
-		{
-			m_isParked = false;
-			if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
-			{
-				m_currentGear = 0;
-			}
-			else
-			{
-				m_currentGear--;
-				if (m_currentGear <= 0)
-				{
-					m_currentGear = 0;
-				}
-			}
-			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-			m_gearBox->SetRatio(gearGain);
-			m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
-		}
-
-		const ndFloat32 omega = m_motor->GetRpm() / dRadPerSecToRpm;
-		if (!m_isManualTransmission && (m_autoGearShiftTimer < 0))
-		{
-			if (m_currentGear < m_configuration.m_transmission.m_gearsCount)
-			{
-				if (omega < m_configuration.m_engine.GetLowGearShiftRadPerSec())
-				{
-					if (m_currentGear > 0)
-					{
-						m_currentGear--;
-						ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-						m_gearBox->SetRatio(gearGain);
-						m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
-					}
-				}
-				else if (omega > m_configuration.m_engine.GetHighGearShiftRadPerSec())
-				{
-					if (m_currentGear < (m_configuration.m_transmission.m_gearsCount - 1))
-					{
-						m_currentGear++;
-						ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-						m_gearBox->SetRatio(gearGain);
-						m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
-					}
-				}
-			}
-		}
-		m_autoGearShiftTimer--;
-		//ndTrace(("gear:%d gearGain:%f\n", m_currentGear, m_configuration.m_transmission.m_forwardRatios[m_currentGear]));
-
-		// neural gear
-		if (m_neutralGear.Update(buttons[m_neutralGearButton] ? true : false))
-		{
-			m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
-			m_gearBox->SetRatio(0.0f);
-		}
-
-		// reverse gear
-		if (m_reverseGear.Update(buttons[m_reverseGearButton] ? true : false))
-		{
-			m_isParked = false;
-			m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]);
-
-			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-			m_gearBox->SetRatio(gearGain);
-		}
-
-		if (m_isParked)
-		{
-			brake = 1.0f;
-		}
-
-		for (ndReferencedObjects<ndMultiBodyVehicleTireJoint>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
-		{
-			ndMultiBodyVehicleTireJoint* const tire = *node->GetInfo();
-			tire->SetBrake(brake);
-			tire->SetSteering(steerAngle);
-			tire->SetHandBrake(handBrake);
-		}
-
-		// set the transmission Torque converter when the power reverses.
-		m_gearBox->SetInternalTorqueLoss(m_configuration.m_transmission.m_torqueConverter);
-		if (omega <= (m_configuration.m_engine.GetIdleRadPerSec() * 1.01f))
-		{
-			m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_idleClutchTorque);
-		}
-		else
-		{
-			m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_lockedClutchTorque);
-		}
-
-		if (m_startEngine)
-		{
-			ndFloat32 currentOmega = m_motor->GetRpm() / dRadPerSecToRpm;
-			ndFloat32 desiredOmega = ndMax(m_configuration.m_engine.GetIdleRadPerSec(), throttle * m_configuration.m_engine.GetRedLineRadPerSec());
-			ndFloat32 torqueFromCurve = m_configuration.m_engine.GetTorque(currentOmega);
-			m_motor->SetTorqueAndRpm(torqueFromCurve, desiredOmega * dRadPerSecToRpm);
-			m_chassis->SetSleepState(false);
-		}
-		else
-		{
-			m_motor->SetTorqueAndRpm(0.0f, 0.0f);
-		}
-	}
+	//if (m_isPlayer && *m_motor)
+	//{
+	//	ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+	//
+	//	m_inputs.Update(scene);
+	//	const ndFixSizeArray<ndFloat32, 8>& axis = m_inputs.m_axis;
+	//	const ndFixSizeArray<char, 32>& buttons = m_inputs.m_buttons;
+	//	
+	//	ndFloat32 brake = axis[m_brakePedal];
+	//	ndFloat32 throttle = axis[m_gasPedal];
+	//	ndFloat32 steerAngle = axis[m_steeringWheel];
+	//	ndFloat32 handBrake = buttons[m_handBreakButton] ? 1.0f : 0.0f;
+	//
+	//	if (m_parking.Update(buttons[m_parkingButton] ? true : false))
+	//	{
+	//		m_isParked = !m_isParked;
+	//	}
+	//
+	//	if (m_ignition.Update(buttons[m_ignitionButton] ? true : false))
+	//	{
+	//		m_startEngine = !m_startEngine;
+	//	}
+	//
+	//	if (m_manualTransmission.Update(buttons[m_automaticGearBoxButton] ? true : false))
+	//	{
+	//		m_isManualTransmission = !m_isManualTransmission;
+	//	}
+	//
+	//	// transmission front gear up
+	//	if (m_forwardGearUp.Update(buttons[m_upGearButton] ? true : false))
+	//	{
+	//		m_isParked = false;
+	//		if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
+	//		{
+	//			m_currentGear = 0;
+	//		}
+	//		else
+	//		{
+	//			m_currentGear++;
+	//			if (m_currentGear >= m_configuration.m_transmission.m_gearsCount)
+	//			{
+	//				m_currentGear = m_configuration.m_transmission.m_gearsCount - 1;
+	//			}
+	//		}
+	//		ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+	//		m_gearBox->SetRatio(gearGain);
+	//		m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
+	//	}
+	//
+	//	// transmission front gear down
+	//	if (m_forwardGearDown.Update(buttons[m_downGearButton] ? true : false))
+	//	{
+	//		m_isParked = false;
+	//		if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
+	//		{
+	//			m_currentGear = 0;
+	//		}
+	//		else
+	//		{
+	//			m_currentGear--;
+	//			if (m_currentGear <= 0)
+	//			{
+	//				m_currentGear = 0;
+	//			}
+	//		}
+	//		ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+	//		m_gearBox->SetRatio(gearGain);
+	//		m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
+	//	}
+	//
+	//	const ndFloat32 omega = m_motor->GetRpm() / dRadPerSecToRpm;
+	//	if (!m_isManualTransmission && (m_autoGearShiftTimer < 0))
+	//	{
+	//		if (m_currentGear < m_configuration.m_transmission.m_gearsCount)
+	//		{
+	//			if (omega < m_configuration.m_engine.GetLowGearShiftRadPerSec())
+	//			{
+	//				if (m_currentGear > 0)
+	//				{
+	//					m_currentGear--;
+	//					ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+	//					m_gearBox->SetRatio(gearGain);
+	//					m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
+	//				}
+	//			}
+	//			else if (omega > m_configuration.m_engine.GetHighGearShiftRadPerSec())
+	//			{
+	//				if (m_currentGear < (m_configuration.m_transmission.m_gearsCount - 1))
+	//				{
+	//					m_currentGear++;
+	//					ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+	//					m_gearBox->SetRatio(gearGain);
+	//					m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
+	//				}
+	//			}
+	//		}
+	//	}
+	//	m_autoGearShiftTimer--;
+	//	//ndTrace(("gear:%d gearGain:%f\n", m_currentGear, m_configuration.m_transmission.m_forwardRatios[m_currentGear]));
+	//
+	//	// neural gear
+	//	if (m_neutralGear.Update(buttons[m_neutralGearButton] ? true : false))
+	//	{
+	//		m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
+	//		m_gearBox->SetRatio(0.0f);
+	//	}
+	//
+	//	// reverse gear
+	//	if (m_reverseGear.Update(buttons[m_reverseGearButton] ? true : false))
+	//	{
+	//		m_isParked = false;
+	//		m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]);
+	//
+	//		ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+	//		m_gearBox->SetRatio(gearGain);
+	//	}
+	//
+	//	if (m_isParked)
+	//	{
+	//		brake = 1.0f;
+	//	}
+	//
+	//	for (ndReferencedObjects<ndMultiBodyVehicleTireJoint>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	//	{
+	//		ndMultiBodyVehicleTireJoint* const tire = *node->GetInfo();
+	//		tire->SetBrake(brake);
+	//		tire->SetSteering(steerAngle);
+	//		tire->SetHandBrake(handBrake);
+	//	}
+	//
+	//	// set the transmission Torque converter when the power reverses.
+	//	m_gearBox->SetInternalTorqueLoss(m_configuration.m_transmission.m_torqueConverter);
+	//	if (omega <= (m_configuration.m_engine.GetIdleRadPerSec() * 1.01f))
+	//	{
+	//		m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_idleClutchTorque);
+	//	}
+	//	else
+	//	{
+	//		m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_lockedClutchTorque);
+	//	}
+	//
+	//	if (m_startEngine)
+	//	{
+	//		ndFloat32 currentOmega = m_motor->GetRpm() / dRadPerSecToRpm;
+	//		ndFloat32 desiredOmega = ndMax(m_configuration.m_engine.GetIdleRadPerSec(), throttle * m_configuration.m_engine.GetRedLineRadPerSec());
+	//		ndFloat32 torqueFromCurve = m_configuration.m_engine.GetTorque(currentOmega);
+	//		m_motor->SetTorqueAndRpm(torqueFromCurve, desiredOmega * dRadPerSecToRpm);
+	//		m_chassis->SetSleepState(false);
+	//	}
+	//	else
+	//	{
+	//		m_motor->SetTorqueAndRpm(0.0f, 0.0f);
+	//	}
+	//}
 }

@@ -60,7 +60,8 @@ class ndPhysicsWorld: public ndWorld
 	void RemoveEntity(ndDemoEntity* const entity);
 
 	private:
-	void OnPostUpdate(ndFloat32 timestep);
+	void PreUpdate(ndFloat32 timestep);
+	void PostUpdate(ndFloat32 timestep);
 
 	ndDemoEntityManager* m_manager;
 	ndSoundManager* m_soundManager;

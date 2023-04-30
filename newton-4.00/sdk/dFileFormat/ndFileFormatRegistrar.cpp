@@ -29,7 +29,6 @@
 #include "ndFileFormatModel.h"
 #include "ndFileFormatNotify.h"
 #include "ndFileFormatShapeNull.h"
-#include "ndFileFormatModelBase.h"
 #include "ndFileFormatJointGear.h"
 #include "ndFileFormatJointPlane.h"
 #include "ndFileFormatJointHinge.h"
@@ -57,6 +56,7 @@
 #include "ndFileFormatJointFixDistance.h"
 #include "ndFileFormatJointIkSpherical.h"
 #include "ndFileFormatJointVehicleTire.h"
+#include "ndFileFormatModelArticulation.h"
 #include "ndFileFormatJointVehicleMotor.h"
 #include "ndFileFormatBodyTriggerVolume.h"
 #include "ndFileFormatBodyKinematicBase.h"
@@ -67,6 +67,7 @@
 #include "ndFileFormatShapeConvexCylinder.h"
 #include "ndFileFormatShapeStaticMesh_bvh.h"
 #include "ndFileFormatJointVehicleGearBox.h"
+#include "ndFileFormatModelPassiveRagdoll.h"
 #include "ndFileFormatJointRollingFriction.h"
 #include "ndFileFormatJointVehicleTorsionBar.h"
 #include "ndFileFormatShapeStaticHeightfield.h"
@@ -77,7 +78,7 @@
 #include "ndFileFormatBodyKinematicPlayerCapsule.h"
 #include "ndFileFormatJointVehicleDifferentialAxle.h"
 #include "ndFileFormatJointIkSwivelPositionEffector.h"
-#include "ndFileFormatModelHierarchicalArticulation.h"
+
 
 ndFixSizeArray<ndFileFormatRegistrar*, 256> ndFileFormatRegistrar::m_registry;
 
@@ -166,8 +167,8 @@ void ndFileFormatRegistrar::Init()
 	static ndFileFormatJointIkSwivelPositionEffector jointIkSwivelPositionEffector;
 
 	static ndFileFormatModel model;
-	static ndFileFormatModelBase modelBase;
-	static ndFileFormatModelHierarchicalArticulation modelHierachicalArticulation;
+	static ndFileFormatModelArticulation modelArticulation;
+	static ndFileFormatModelPassiveRagdoll modelPassiveRagdoll;
 }
 
 ndFileFormatRegistrar* ndFileFormatRegistrar::GetHandler(const char* const className)

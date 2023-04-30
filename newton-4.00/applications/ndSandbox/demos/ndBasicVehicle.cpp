@@ -471,96 +471,97 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
 	{
-		ndVehicleCommon::ApplyInputs(world, timestep);
-
-		if (*m_motor)
-		{
-			//ndTrace(("%d %d\n", m_startEngineMemory, m_startEngine));
-			if (m_startEngineMemory ^ m_startEngine)
-			{
-				m_startEngineMemory = m_startEngine;
-				if (m_startEngine)
-				{
-					m_startSound->Play();
-					m_engineRpmSound->Play();
-					m_engineRpmSound->SetPitch(0.5f);
-					m_engineRpmSound->SetVolume(0.25f);
-				}
-				else
-				{
-					if (m_startSound->IsPlaying())
-					{
-						m_startSound->Stop();
-					}
-				}
-			}
-
-			ndFloat32 rpm = m_motor->GetRpm();
-			if (rpm > 1.0f)
-			{
-				if (!m_engineRpmSound->IsPlaying())
-				{
-					m_engineRpmSound->Play();
-				}
-				// up to two decibels of volume
-				ndFloat32 maxRpm = 9000.0f;
-				rpm = rpm / maxRpm;
-				ndFloat32 pitchFactor = 0.5f + 0.7f * rpm;
-				ndFloat32 volumeFactor = 0.25f + 0.75f * rpm;
-
-				m_engineRpmSound->SetPitch(pitchFactor);
-				m_engineRpmSound->SetVolume(volumeFactor);
-
-				// apply positional sound
-				const ndMatrix& location = m_chassis->GetMatrix();
-				m_engineRpmSound->SetPosition(location.m_posit);
-				m_engineRpmSound->SetVelocity(m_chassis->GetVelocity());
-			}
-			else
-			{
-				if (m_engineRpmSound->IsPlaying())
-				{
-					m_engineRpmSound->Stop();
-				}
-			}
-		}
-
-		// test convex cast for now
-		if (0)
-		{
-			// test convex cast
-			ndMultiBodyVehicleTireJoint* const tire = m_tireList.GetCount() ? *m_tireList.GetFirst()->GetInfo() : nullptr;
-			if (tire)
-			{
-				const ndWheelDescriptor& info = tire->GetInfo();
-				const ndMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
-				const ndVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_lowerStop - info.m_upperStop));
-				class ndConvexCastNotifyTest : public ndConvexCastNotify
-				{
-					public:
-					ndConvexCastNotifyTest()
-						:ndConvexCastNotify()
-					{
-					}
-
-					virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
-					{
-						return ndUnsigned32(!((body == m_chassis) || (body == m_tire)));
-					}
-
-					ndBodyKinematic* m_tire;
-					ndBodyKinematic* m_chassis;
-				};
-
-				ndConvexCastNotifyTest convexCast;
-				convexCast.m_tire = tire->GetBody0();
-				convexCast.m_chassis = m_chassis;
-
-				//convexCast.CastShape(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix());
-				m_chassis->GetScene()->ConvexCast(convexCast, tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest);
-				convexCast.m_param = 0.0f;
-			}
-		}
+		ndAssert(0);
+		//ndVehicleCommon::ApplyInputs(world, timestep);
+		//
+		//if (*m_motor)
+		//{
+		//	//ndTrace(("%d %d\n", m_startEngineMemory, m_startEngine));
+		//	if (m_startEngineMemory ^ m_startEngine)
+		//	{
+		//		m_startEngineMemory = m_startEngine;
+		//		if (m_startEngine)
+		//		{
+		//			m_startSound->Play();
+		//			m_engineRpmSound->Play();
+		//			m_engineRpmSound->SetPitch(0.5f);
+		//			m_engineRpmSound->SetVolume(0.25f);
+		//		}
+		//		else
+		//		{
+		//			if (m_startSound->IsPlaying())
+		//			{
+		//				m_startSound->Stop();
+		//			}
+		//		}
+		//	}
+		//
+		//	ndFloat32 rpm = m_motor->GetRpm();
+		//	if (rpm > 1.0f)
+		//	{
+		//		if (!m_engineRpmSound->IsPlaying())
+		//		{
+		//			m_engineRpmSound->Play();
+		//		}
+		//		// up to two decibels of volume
+		//		ndFloat32 maxRpm = 9000.0f;
+		//		rpm = rpm / maxRpm;
+		//		ndFloat32 pitchFactor = 0.5f + 0.7f * rpm;
+		//		ndFloat32 volumeFactor = 0.25f + 0.75f * rpm;
+		//
+		//		m_engineRpmSound->SetPitch(pitchFactor);
+		//		m_engineRpmSound->SetVolume(volumeFactor);
+		//
+		//		// apply positional sound
+		//		const ndMatrix& location = m_chassis->GetMatrix();
+		//		m_engineRpmSound->SetPosition(location.m_posit);
+		//		m_engineRpmSound->SetVelocity(m_chassis->GetVelocity());
+		//	}
+		//	else
+		//	{
+		//		if (m_engineRpmSound->IsPlaying())
+		//		{
+		//			m_engineRpmSound->Stop();
+		//		}
+		//	}
+		//}
+		//
+		//// test convex cast for now
+		//if (0)
+		//{
+		//	// test convex cast
+		//	ndMultiBodyVehicleTireJoint* const tire = m_tireList.GetCount() ? *m_tireList.GetFirst()->GetInfo() : nullptr;
+		//	if (tire)
+		//	{
+		//		const ndWheelDescriptor& info = tire->GetInfo();
+		//		const ndMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
+		//		const ndVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_lowerStop - info.m_upperStop));
+		//		class ndConvexCastNotifyTest : public ndConvexCastNotify
+		//		{
+		//			public:
+		//			ndConvexCastNotifyTest()
+		//				:ndConvexCastNotify()
+		//			{
+		//			}
+		//
+		//			virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
+		//			{
+		//				return ndUnsigned32(!((body == m_chassis) || (body == m_tire)));
+		//			}
+		//
+		//			ndBodyKinematic* m_tire;
+		//			ndBodyKinematic* m_chassis;
+		//		};
+		//
+		//		ndConvexCastNotifyTest convexCast;
+		//		convexCast.m_tire = tire->GetBody0();
+		//		convexCast.m_chassis = m_chassis;
+		//
+		//		//convexCast.CastShape(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix());
+		//		m_chassis->GetScene()->ConvexCast(convexCast, tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest);
+		//		convexCast.m_param = 0.0f;
+		//	}
+		//}
 	}
 
 	void PostTransformUpdate(ndWorld* const, ndFloat32)
@@ -686,19 +687,19 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndUIEntity> vehicleUIPtr(vehicleUI);
 	scene->Set2DDisplayRenderFunction(vehicleUIPtr);
 	
-	ndSharedPtr<ndModel> vehicle0 (new ndBasicMultiBodyVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), vehicleUI));
-	ndSharedPtr<ndModel> vehicle1 (new ndBasicMultiBodyVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)), vehicleUI));
-	ndSharedPtr<ndModel> vehicle2 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), vehicleUI));
-	ndSharedPtr<ndModel> vehicle3 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), vehicleUI));
+	//ndSharedPtr<ndModel> vehicle0 (new ndBasicMultiBodyVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), vehicleUI));
+	//ndSharedPtr<ndModel> vehicle1 (new ndBasicMultiBodyVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)), vehicleUI));
+	//ndSharedPtr<ndModel> vehicle2 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), vehicleUI));
+	//ndSharedPtr<ndModel> vehicle3 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), vehicleUI));
 
-	world->AddModel(vehicle0);
-	world->AddModel(vehicle1);
-	world->AddModel(vehicle2);
-	world->AddModel(vehicle3);
+	//world->AddModel(vehicle0);
+	//world->AddModel(vehicle1);
+	//world->AddModel(vehicle2);
+	//world->AddModel(vehicle3);
 
-	ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle3;
+	//ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle3;
 	//ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle0;
-	vehicle->SetAsPlayer(scene);
+	//vehicle->SetAsPlayer(scene);
 	matrix.m_posit.m_x += 5.0f;
 	TestPlayerCapsuleInteraction(scene, matrix);
 	
@@ -709,6 +710,18 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndVector origin(-10.0f, 2.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 
-	ndFileFormatSave xxxx;
-	xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
+	//ndFileFormatSave xxxxSave;
+	//xxxxSave.SaveWorld(scene->GetWorld(), "xxxx.nd");
+	//ndFileFormatLoad xxxxLoad;
+	//xxxxLoad.Load("xxxx.nd");
+	//// offset bodies positions for calibration
+	//const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
+	//for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndSharedPtr<ndBody>& body = node->GetInfo();
+	//	ndMatrix bodyMatrix(body->GetMatrix());
+	//	bodyMatrix.m_posit.m_x += 4.0f;
+	//	body->SetMatrix(bodyMatrix);
+	//}
+	//xxxxLoad.AddToWorld(scene->GetWorld());
 }

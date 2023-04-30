@@ -23,36 +23,15 @@
 #define _ND_MODEL_HIERARCHICAL_ARTICULATION_H__
 
 #include "ndModelStdafx.h"
-#include "ndModelBase.h"
 
-class ndModelHierarchicalArticulation: public ndModelBase
+class ndModelPassiveRagdoll: public ndModelArticulation
 {
 	public: 
-	D_CLASS_REFLECTION(ndModelHierarchicalArticulation, ndModelBase)
+	D_CLASS_REFLECTION(ndModelPassiveRagdoll, ndModelArticulation)
 
-	class ndNode : public ndNodeHierarchy<ndNode>
-	{
-		public:
-		ndNode(ndBodyDynamic* const body, ndNode* const parent, ndJointBilateralConstraint* const joint);
-		virtual ~ndNode();
-		
-		ndBodyDynamic* m_body;
-		ndJointBilateralConstraint* m_joint;
-	};
-
-	ndModelHierarchicalArticulation();
-	virtual ~ndModelHierarchicalArticulation();
-
-	ndNode* GetRoot() const;
-	ndNode* AddRootBody(ndSharedPtr<ndBody>& rootBody);
-	ndNode* AddLimb(ndNode* const parent, ndSharedPtr<ndBody>& body, ndSharedPtr<ndJointBilateralConstraint>& joint);
-
-	ndModelHierarchicalArticulation* GetAsModelHierarchicalArticulation();
-
+	ndModelPassiveRagdoll();
+	virtual ~ndModelPassiveRagdoll();
 	void NormalizeMassDistribution(ndFloat32 totalMass);
-
-	protected:
-	ndNode* m_rootNode;
 };
 
 #endif 

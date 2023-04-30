@@ -346,7 +346,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 		public:
 		ndJointSliderOscillator(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 			:ndJointSlider(pinAndPivotFrame, child, parent)
-			,m_angle(0.0f)
+			, m_angle(0.0f)
 		{
 		}
 	
@@ -826,7 +826,7 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	//xxxxSave.SaveWorld(scene->GetWorld(), "xxxx.nd");
 	//ndFileFormatLoad xxxxLoad;
 	//xxxxLoad.Load("xxxx.nd");
-	//// offset bodies positions for calibraion;
+	//// offset bodies positions for calibration
 	//const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
 	//for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
 	//{

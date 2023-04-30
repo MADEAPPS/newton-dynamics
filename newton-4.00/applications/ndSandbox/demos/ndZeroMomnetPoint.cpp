@@ -431,14 +431,14 @@ ndTrace(("%d: invTorque=%f %f\n", xxxx, torque0.m_z, torqueB___.m_z));
 	};
 #endif
 
-	void AddLimb(ndDemoEntityManager* const scene, ndModelHierarchicalArticulation* const model, ndMatrix& matrix)
+	void AddLimb(ndDemoEntityManager* const scene, ndModelPassiveRagdoll* const model, ndMatrix& matrix)
 	{
 		ndFloat32 limbMass = 0.5f;
 		ndFloat32 limbLength = 0.3f;
 		ndFloat32 limbRadio = 0.025f;
 		
 		ndPhysicsWorld* const world = scene->GetWorld();
-		ndModelHierarchicalArticulation::ndNode* const modelRoot = model->GetRoot();
+		ndModelPassiveRagdoll::ndNode* const modelRoot = model->GetRoot();
 		
 		// add single leg
 		ndSharedPtr<ndBody> legBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "smilli.tga")));
@@ -447,8 +447,8 @@ ndTrace(("%d: invTorque=%f %f\n", xxxx, torque0.m_z, torqueB___.m_z));
 		legBody->SetMatrix(legLocation);
 		ndMatrix legPivot(ndYawMatrix(90.0f * ndDegreeToRad) * legLocation);
 		legPivot.m_posit.m_y += limbLength * 0.5f;
-		ndSharedPtr<ndJointBilateralConstraint> legJoint(new ndJointHinge(legPivot, legBody->GetAsBodyKinematic(), modelRoot->m_body));
-		world->AddJoint(legJoint);
+		ndSharedPtr<ndJointBilateralConstraint> legJoint(new ndJointHinge(legPivot, legBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
+		//world->AddJoint(legJoint);
 		
 		// add wheel
 		ndFloat32 wheelMass = 2.0f * limbMass;
@@ -458,16 +458,16 @@ ndTrace(("%d: invTorque=%f %f\n", xxxx, torque0.m_z, torqueB___.m_z));
 		wheelMatrix.m_posit.m_y -= limbLength;
 		wheelBody->SetMatrix(wheelMatrix);
 		ndSharedPtr<ndJointBilateralConstraint> wheelJoint(new ndJointSpherical(wheelMatrix, wheelBody->GetAsBodyKinematic(), legBody->GetAsBodyKinematic()));
-		world->AddJoint(wheelJoint);
+		//world->AddJoint(wheelJoint);
 		
 		// add model limbs
-		ndModelHierarchicalArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
+		ndModelPassiveRagdoll::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
 		model->AddLimb(legLimb, wheelBody, wheelJoint);
 	}
 
-	ndModelHierarchicalArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	ndModelPassiveRagdoll* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
-		ndModelHierarchicalArticulation* const model = new ndModelHierarchicalArticulation();
+		ndModelPassiveRagdoll* const model = new ndModelPassiveRagdoll();
 
 		ndFloat32 mass = 10.0f;
 		ndFloat32 xSize = 0.25f;
@@ -516,8 +516,9 @@ void ndZeroMomentPoint(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndModel> model(BuildModel(scene, matrix));
 	scene->GetWorld()->AddModel(model);
 
-	ndModelHierarchicalArticulation* const articulation = model->GetAsModelHierarchicalArticulation();
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(articulation->GetRoot()->m_body->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), articulation->GetRoot()->m_body, world->GetSentinelBody()));
+	ndModelPassiveRagdoll* const articulation = (ndModelPassiveRagdoll*)model->GetAsModelArticulation();
+	ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
 	world->AddJoint(fixJoint);
 	
 	matrix.m_posit.m_x -= 0.0f;
@@ -526,6 +527,18 @@ void ndZeroMomentPoint(ndDemoEntityManager* const scene)
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 
-	//ndFileFormatSave xxxx;
-	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
+	//ndFileFormatSave xxxxSave;
+	//xxxxSave.SaveModels(scene->GetWorld(), "xxxx.nd");
+	//ndFileFormatLoad xxxxLoad;
+	//xxxxLoad.Load("xxxx.nd");
+	//// offset bodies positions for calibration
+	//const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
+	//for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndSharedPtr<ndBody>& body = node->GetInfo();
+	//	ndMatrix bodyMatrix (body->GetMatrix());
+	//	bodyMatrix.m_posit.m_x += 1.0f;
+	//	body->SetMatrix(bodyMatrix);
+	//}
+	//xxxxLoad.AddToWorld(scene->GetWorld());
 }

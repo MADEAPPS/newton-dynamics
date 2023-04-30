@@ -24,6 +24,7 @@
 
 #include "ndCollisionStdafx.h"
 #include "ndShapeInstance.h"
+#include "ndBodyListView.h"
 
 class ndContact;
 class ndBodyNotify;
@@ -99,6 +100,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	ndVector m_maxAabb;
 	ndQuaternion m_rotation;
 	ndBodyNotify* m_notifyCallback;
+	ndSpecialList<ndBody>::ndNode* m_deletedNode;
 
 	ndUnsigned32 m_uniqueId;
 	union
@@ -125,7 +127,6 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	ndUnsigned8 m_isConstrained;
 	ndUnsigned8 m_sceneForceUpdate;
 	ndUnsigned8 m_sceneEquilibrium;
-	ndUnsigned8 m_markedForRemoved;
 	
 	D_COLLISION_API static ndUnsigned32 m_uniqueIdCount;
 

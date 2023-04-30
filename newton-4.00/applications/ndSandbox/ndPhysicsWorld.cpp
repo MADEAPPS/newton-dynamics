@@ -24,8 +24,6 @@
 
 #define MAX_PHYSICS_STEPS			1
 #define MAX_PHYSICS_FPS				60.0f
-//#define MAX_PHYSICS_RECOVER_STEPS	2
-
 
 ndPhysicsWorld::ndDefferentDeleteEntities::ndDefferentDeleteEntities(ndDemoEntityManager* const manager)
 	:ndArray<ndDemoEntity*>()
@@ -105,8 +103,26 @@ ndSoundManager* ndPhysicsWorld::GetSoundManager() const
 	return m_soundManager;
 }
 
-void ndPhysicsWorld::OnPostUpdate(ndFloat32 timestep)
+void ndPhysicsWorld::PreUpdate(ndFloat32 timestep)
 {
+	ndWorld::PreUpdate(timestep);
+
+	static ndInt32 xxxx = 0;
+	xxxx++;
+	if (xxxx % 200 == 0)
+	{
+		const ndBodyListView& bodyList = GetBodyList();
+		if (bodyList.GetCount() > 1)
+		{
+			ndInt32 index = ndInt32(ndRandInt() % (bodyList.GetCount() - 1) + 1);
+			RemoveBody(bodyList.GetView()[index]);
+		}
+	}
+}
+
+void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
+{
+	ndWorld::PostUpdate(timestep);
 	m_manager->m_cameraManager->FixUpdate(m_manager, timestep);
 	if (m_manager->m_updateCamera)
 	{

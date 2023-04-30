@@ -191,6 +191,7 @@ namespace biped2
 		}
 	};
 
+#if 0
 	class ndHumanoidModel : public ndModel
 	{
 		public:
@@ -1016,6 +1017,7 @@ namespace biped2
 
 		ndHumanoidModel* m_biped;
 	};
+#endif
 }
 
 using namespace biped2;
@@ -1043,16 +1045,17 @@ void ndBipedTest_2(ndDemoEntityManager* const scene)
 	origin.m_posit.m_x -= 20.0f;
 	ndSharedPtr<ndDemoEntity> modelMesh = ndDemoEntity::LoadFbx("walker.fbx", scene);
 	
-	ndWorld* const world = scene->GetWorld();
-	ndHumanoidModel* const model = new ndHumanoidModel(scene, *modelMesh, origin, ragdollDefinition);
-	ndSharedPtr<ndModel> modelPtr(model);
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
-	world->AddModel(modelPtr);
-	//world->AddJoint(fixJoint);
-	
-	ndModelUI* const bipedUI = new ndModelUI(scene, model);
-	ndSharedPtr<ndUIEntity> bipedUIPtr(bipedUI);
-	scene->Set2DDisplayRenderFunction(bipedUIPtr);
+	ndAssert(0);
+	//ndWorld* const world = scene->GetWorld();
+	//ndHumanoidModel* const model = new ndHumanoidModel(scene, *modelMesh, origin, ragdollDefinition);
+	//ndSharedPtr<ndModel> modelPtr(model);
+	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
+	//world->AddModel(modelPtr);
+	////world->AddJoint(fixJoint);
+	//
+	//ndModelUI* const bipedUI = new ndModelUI(scene, model);
+	//ndSharedPtr<ndUIEntity> bipedUIPtr(bipedUI);
+	//scene->Set2DDisplayRenderFunction(bipedUIPtr);
 
 	ndQuaternion rot;
 	origin.m_posit.m_x -= 5.0f;
@@ -1086,18 +1089,19 @@ void ndBipedTest_2Trainer(ndDemoEntityManager* const scene)
 	
 	ndSharedPtr<ndDemoEntity> modelMesh(ndDemoEntity::LoadFbx("walker.fbx", scene));
 	
-	ndWorld* const world = scene->GetWorld();
-	ndHumanoidTraningModel* const model = new ndHumanoidTraningModel(scene, *modelMesh, origin, ragdollDefinition);
-	ndSharedPtr<ndModel> modelPtr(model);
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
-	world->AddModel(modelPtr);
-	//world->AddJoint(fixJoint);
-	
-	//scene->Set2DDisplayRenderFunction(ndHumanoidTraningModel::TrainingLoop, nullptr, model);
-	//scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
-	ndModelUI* const bipedUI = new ndModelUI(scene, model);
-	ndSharedPtr<ndUIEntity> bipedUIPtr(bipedUI);
-	scene->Set2DDisplayRenderFunction(bipedUIPtr);
+	ndAssert(0);
+	//ndWorld* const world = scene->GetWorld();
+	//ndHumanoidTraningModel* const model = new ndHumanoidTraningModel(scene, *modelMesh, origin, ragdollDefinition);
+	//ndSharedPtr<ndModel> modelPtr(model);
+	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
+	//world->AddModel(modelPtr);
+	////world->AddJoint(fixJoint);
+	//
+	////scene->Set2DDisplayRenderFunction(ndHumanoidTraningModel::TrainingLoop, nullptr, model);
+	////scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
+	//ndModelUI* const bipedUI = new ndModelUI(scene, model);
+	//ndSharedPtr<ndUIEntity> bipedUIPtr(bipedUI);
+	//scene->Set2DDisplayRenderFunction(bipedUIPtr);
 	
 	ndQuaternion rot(ndYawMatrix(ndPi * 0.5f));
 	//origin.m_posit.m_x -= 5.0f;

@@ -24,9 +24,8 @@
 
 #include <ndModelStdafx.h>
 
-#include <ndModelBase.h>
 #include <ndModelNotify.h>
-#include <ndModelHierarchicalArticulation.h>
+#include <ndModelPassiveRagdoll.h>
 
 #endif 
 

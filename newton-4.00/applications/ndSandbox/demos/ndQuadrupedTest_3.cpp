@@ -387,6 +387,9 @@ namespace ndQuadruped_3
 			}
 		}
 
+		virtual void OnAddToWorld() { ndAssert(0); }
+		virtual void OnRemoveFromToWorld() { ndAssert(0); }
+
 		void NormalizeMassDistribution(ndFloat32 mass) const
 		{
 			ndFloat32 volumeRatio = 0.02f;
@@ -620,7 +623,7 @@ namespace ndQuadruped_3
 		ndReal m_param_x0;
 		ndParamMapper m_param_xxxx;
 	};
-	
+
 	class ndModelUI : public ndUIEntity
 	{
 		public:

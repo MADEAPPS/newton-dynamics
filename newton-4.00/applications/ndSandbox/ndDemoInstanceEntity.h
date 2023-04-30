@@ -44,7 +44,6 @@ class ndDemoInstanceEntity: public ndDemoEntity
 
 	static ndArray<ndMatrix>& GetMatrixStack();
 
-	//ndDemoMeshIntance* m_instanceMesh;
 	ndSharedPtr<ndDemoMeshIntance> m_instanceMesh;
 };
 

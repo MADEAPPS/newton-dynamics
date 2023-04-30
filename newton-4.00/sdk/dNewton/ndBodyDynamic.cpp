@@ -273,7 +273,7 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const ndVector& force, const nd
 	const ndVector localOmega(matrix.UnrotateVector(m_omega));
 	const ndVector localTorque(matrix.UnrotateVector(torque));
 #endif
-	
+
 	// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
 	const ndVector dw(localOmega * timestep);
 	const ndMatrix jacobianMatrix(
@@ -323,7 +323,7 @@ void ndBodyDynamic::IntegrateGyroSubstep(const ndVector& timestep)
 		const ndQuaternion rotationStep(omegaAxis, omegaAngle * timestep.GetScalar());
 		m_gyroRotation = m_gyroRotation * rotationStep;
 		ndAssert((m_gyroRotation.DotProduct(m_gyroRotation).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-5f));
-
+		
 		// calculate new Gyro torque and Gyro acceleration
 		const ndMatrix matrix(m_gyroRotation, ndVector::m_wOne);
 

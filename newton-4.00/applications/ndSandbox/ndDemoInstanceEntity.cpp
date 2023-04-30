@@ -307,20 +307,23 @@ void ndDemoInstanceEntity::Render(ndFloat32, ndDemoEntityManager* const scene, c
 		count++;
 	}
 	
-	// prepare the transforms buffer form all the children matrices
-	ndInt32 index = 0;
-	ndArray<ndMatrix>& matrixStack = GetMatrixStack();
-	matrixStack.SetCount(count);
-	
-	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	if (count)
 	{
-		matrixStack[index] = child->GetCurrentMatrix();
-		index++;
-	}
+		// prepare the transforms buffer form all the children matrices
+		ndInt32 index = 0;
+		ndArray<ndMatrix>& matrixStack = GetMatrixStack();
+		matrixStack.SetCount(count);
 
-	ndDemoMeshIntance* const instanceMesh = (ndDemoMeshIntance*)*m_instanceMesh;
-	instanceMesh->SetTransforms(count, &matrixStack[0]);
-	
-	ndMatrix nodeMatrix(m_matrix * matrix);
-	instanceMesh->Render(scene, nodeMatrix);
+		for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+		{
+			matrixStack[index] = child->GetCurrentMatrix();
+			index++;
+		}
+
+		ndDemoMeshIntance* const instanceMesh = (ndDemoMeshIntance*)*m_instanceMesh;
+		instanceMesh->SetTransforms(count, &matrixStack[0]);
+
+		ndMatrix nodeMatrix(m_matrix * matrix);
+		instanceMesh->Render(scene, nodeMatrix);
+	}
 }

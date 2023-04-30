@@ -38,9 +38,12 @@ void ndFileFormatModel::SaveModel(ndFileFormatSave* const, nd::TiXmlElement* con
 	xmlCreateClassNode(parentNode, D_MODEL_CLASS, ndModel::StaticClassName());
 }
 
-
 ndModel* ndFileFormatModel::LoadModel(const nd::TiXmlElement* const, const ndTree<ndSharedPtr<ndBody>, ndInt32>&, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>&)
 {
 	ndAssert(0);
 	return nullptr;
+}
+
+void ndFileFormatModel::LoadModel(const nd::TiXmlElement* const, const ndTree<ndSharedPtr<ndBody>, ndInt32>&, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap, ndModel* const)
+{
 }

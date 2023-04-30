@@ -19,23 +19,23 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_MODEL_BASE_H__
-#define _ND_MODEL_BASE_H__
+#ifndef _ND_FILE_FORMAT_MODEL_HIERARCHICAL_ARTICULATION_H__
+#define _ND_FILE_FORMAT_MODEL_HIERARCHICAL_ARTICULATION_H__
 
-#include "ndModelStdafx.h"
+#include "ndFileFormatStdafx.h"
+#include "ndFileFormatModel.h"
 
-class ndModelBase: public ndModel
+class ndFileFormatModelArticulation : public ndFileFormatModel
 {
 	public: 
-	D_CLASS_REFLECTION(ndModelBase, ndModel)
+	ndFileFormatModelArticulation();
+	ndFileFormatModelArticulation(const char* const className);
 
-	ndModelBase();
-	virtual ~ndModelBase();
+	virtual void SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model);
 
-	virtual ndModelBase* GetAsModelBase();
-
-	ndList<ndSharedPtr<ndBody>> m_bodies;
-	ndList< ndSharedPtr<ndJointBilateralConstraint>> m_joints;
+	virtual ndModel* LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap);
+	protected:
+	virtual void LoadModel(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap, const ndTree<ndSharedPtr<ndJointBilateralConstraint>, ndInt32>& jointMap, ndModel* const model);
 };
 
 #endif 

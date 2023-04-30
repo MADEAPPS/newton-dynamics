@@ -23,13 +23,13 @@
 #define _ND_FILE_FORMAT_MODEL_BASE_H__
 
 #include "ndFileFormatStdafx.h"
-#include "ndFileFormatModel.h"
+#include "ndFileFormatModelArticulation.h"
 
-class ndFileFormatModelBase : public ndFileFormatModel
+class ndFileFormatModelPassiveRagdoll : public ndFileFormatModelArticulation
 {
 	public: 
-	ndFileFormatModelBase();
-	ndFileFormatModelBase(const char* const className);
+	ndFileFormatModelPassiveRagdoll();
+	ndFileFormatModelPassiveRagdoll(const char* const className);
 
 	virtual void SaveModel(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndModel* const model);
 

@@ -25,9 +25,17 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDem
 
 ndDemoEntityNotify::~ndDemoEntityNotify()
 {
-	if (m_entity && m_entity->m_rootNode)
+	if (m_entity)
 	{
-		m_manager->GetWorld()->RemoveEntity(m_entity);
+		if (m_entity->m_rootNode)
+		{
+			m_manager->GetWorld()->RemoveEntity(m_entity);
+		}
+		else
+		{
+			// it is a child mesh, probably and instance
+			delete m_entity;
+		}
 	}
 }
 
@@ -46,7 +54,7 @@ void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 		CalculateMatrix(matrix, rot, posit);
 		m_entity->SetMatrix(rot, posit);
 	}
-	
+
 	if (!CheckInWorld(matrix))
 	{
 		RemoveBody();
@@ -69,6 +77,21 @@ ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* 
 	//static ndBindingRagdollEntityNotifyFileSaveLoad registerClass;
 	ndDemoEntity* const parentEntity = m_parentBody ? (ndDemoEntity*)(parentBody->GetNotifyCallback()->GetUserData()) : nullptr;
 	m_bindMatrix = entity->GetParent()->CalculateGlobalMatrix(parentEntity).Inverse();
+}
+
+ndBindingRagdollEntityNotify::~ndBindingRagdollEntityNotify()
+{
+	if (m_entity)
+	{
+		if (m_entity->GetParent())
+		{
+			m_entity = nullptr;
+		}
+		else
+		{
+			ndAssert(0);
+		}
+	}
 }
 
 void ndBindingRagdollEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)

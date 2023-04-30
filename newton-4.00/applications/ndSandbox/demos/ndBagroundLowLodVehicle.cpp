@@ -76,8 +76,12 @@ class BackGroundVehicleController : public ndModel
 		,m_dPreviousError(0.0f)
 		,m_dCombinedMaximumForce()
 	{
-		m_dCombinedMaximumForce = pBody->GetMassMatrix().m_w * ndFloat32(6.0);      // Mass * Maximum acceleration of 6m/s/s
+		// Mass * Maximum acceleration of 6m/s/s
+		m_dCombinedMaximumForce = pBody->GetMassMatrix().m_w * ndFloat32(6.0);      
 	}
+
+	virtual void OnAddToWorld() { ndAssert(0); }
+	virtual void OnRemoveFromToWorld() { ndAssert(0); }
 
 	protected:
 	virtual void Update(ndWorld* const, ndFloat32 timestep) override
