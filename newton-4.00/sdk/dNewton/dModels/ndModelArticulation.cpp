@@ -25,7 +25,7 @@
 #include "ndModel.h"
 #include "ndModelArticulation.h"
 
-ndModelArticulation::ndNode::ndNode(ndSharedPtr<ndBody>& body, ndSharedPtr <ndJointBilateralConstraint>& joint, ndNode* const parent)
+ndModelArticulation::ndNode::ndNode(const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint, ndNode* const parent)
 	:ndNodeHierarchy<ndNode>()
 	,m_body(body)
 	,m_joint(joint)
@@ -66,7 +66,7 @@ ndModelArticulation::ndNode* ndModelArticulation::GetRoot() const
 	return m_rootNode;
 }
 
-ndModelArticulation::ndNode* ndModelArticulation::AddRootBody(ndSharedPtr<ndBody>& rootBody)
+ndModelArticulation::ndNode* ndModelArticulation::AddRootBody(const ndSharedPtr<ndBody>& rootBody)
 {
 	ndAssert(!m_rootNode);
 	ndSharedPtr <ndJointBilateralConstraint> dommyJoint;
@@ -74,7 +74,7 @@ ndModelArticulation::ndNode* ndModelArticulation::AddRootBody(ndSharedPtr<ndBody
 	return m_rootNode;
 }
 
-ndModelArticulation::ndNode* ndModelArticulation::AddLimb(ndNode* const parent, ndSharedPtr<ndBody>& body, ndSharedPtr<ndJointBilateralConstraint>& joint)
+ndModelArticulation::ndNode* ndModelArticulation::AddLimb(ndNode* const parent, const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint)
 {
 	ndAssert(m_rootNode);
 	ndAssert(joint->GetBody0() == body->GetAsBodyKinematic());
@@ -153,7 +153,7 @@ void ndModelArticulation::OnRemoveFromToWorld()
 	}
 }
 
-void ndModelArticulation::AddCloseLoop(ndSharedPtr<ndJointBilateralConstraint>& joint)
+void ndModelArticulation::AddCloseLoop(const ndSharedPtr<ndJointBilateralConstraint>& joint)
 {
 	#ifdef _DEBUG
 

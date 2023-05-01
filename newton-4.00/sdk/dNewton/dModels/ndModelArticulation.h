@@ -35,7 +35,7 @@ class ndModelArticulation: public ndModel
 	class ndNode : public ndNodeHierarchy<ndNode>
 	{
 		public:
-		D_NEWTON_API ndNode(ndSharedPtr<ndBody>& body, ndSharedPtr <ndJointBilateralConstraint>& joint, ndNode* const parent);
+		D_NEWTON_API ndNode(const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint, ndNode* const parent);
 		D_NEWTON_API virtual ~ndNode();
 		
 		ndSharedPtr<ndBody> m_body;
@@ -48,10 +48,10 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API virtual ndModelArticulation* GetAsModelArticulation();
 
 	D_NEWTON_API ndNode* GetRoot() const;
-	D_NEWTON_API ndNode* AddRootBody(ndSharedPtr<ndBody>& rootBody);
-	D_NEWTON_API ndNode* AddLimb(ndNode* const parent, ndSharedPtr<ndBody>& body, ndSharedPtr<ndJointBilateralConstraint>& joint);
+	D_NEWTON_API ndNode* AddRootBody(const ndSharedPtr<ndBody>& rootBody);
+	D_NEWTON_API ndNode* AddLimb(ndNode* const parent, const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint);
 
-	D_NEWTON_API void AddCloseLoop(ndSharedPtr<ndJointBilateralConstraint>& joint);
+	D_NEWTON_API void AddCloseLoop(const ndSharedPtr<ndJointBilateralConstraint>& joint);
 
 	D_NEWTON_API virtual void OnAddToWorld();
 	D_NEWTON_API virtual void OnRemoveFromToWorld();

@@ -188,7 +188,6 @@ ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInsta
 	kinBody->SetCollisionShape(shape);
 	kinBody->SetMassMatrix(mass, shape);
 
-	//ndSharedPtr<ndBody> bodyPtr(body);
 	world->AddBody(body);
 	scene->AddEntity(entity);
 	return kinBody;

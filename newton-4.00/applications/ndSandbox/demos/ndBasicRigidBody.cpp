@@ -19,7 +19,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 1
+#if 0
 void ndBasicRigidBody (ndDemoEntityManager* const scene)
 {
 	// build a floor
@@ -60,68 +60,99 @@ class ndCustomJointHinge : public ndJointHinge
     }
 };
 
-static void BuildOrthoNormalBasis(ndVector& u, ndVector& v, ndVector& w)
+class ndModelDragLine : public ndModelArticulation
 {
-    w.Normalize();
-
-    if (ndAbs(w.GetX()) >= ndAbs(w.GetY()) && ndAbs(w.GetX()) >= ndAbs(w.GetZ()))
+    public:
+    ndModelDragLine(ndDemoEntityManager* const scene, ndMatrix& origin)
+        :ndModelArticulation()
+        ,m_controlJoint(nullptr)
     {
-        u.SetX(-w.GetY());
-        u.SetY(w.GetX());
-        u.SetZ(0.0);
+        auto pMainBody = AddBox(scene, origin, 1500000.0, 4.0, 8.0, 8.0);
+        auto pAxleBody = AddBox(scene, ndGetIdentityMatrix(), 100.0, 0.2, 1.3, 0.4);
+        auto pCamLeverBody = AddBox(scene, ndGetIdentityMatrix(), 100.0, 0.2, 1.3, 0.4);
+        auto pLegBody = AddBox(scene, ndGetIdentityMatrix(), 1000.0, 0.4, 3.0, 1.0);
+
+        pMainBody->SetAutoSleep(false);
+
+        ndSharedPtr<ndJointBilateralConstraint> axleHinge (CreateHinge(pMainBody, pAxleBody, ndVector(-2.1, -2.5, 0.0, 1.0), ndVector(0.0, -0.45, 0.0, 1.0), ndVector(1.0, 0.0, 0.0, 0.0), ndVector(1.0, 0.0, 0.0, 0.0)));
+        ndSharedPtr<ndJointBilateralConstraint> camHinge(CreateHinge(pMainBody, pCamLeverBody, ndVector(-2.47, -1.0, 0.0, 1.0), ndVector(0.0, -0.45, 0.0, 1.0), ndVector(1.0, 0.0, 0.0, 0.0), ndVector(1.0, 0.0, 0.0, 0.0)));
+        ndSharedPtr<ndJointBilateralConstraint> axleLegHinge (CreateHinge(pAxleBody, pLegBody, ndVector(0.0, 0.3, 0.0, 1.0), ndVector(0.37, -0.35, 0.35, 1.0), ndVector(1.0, 0.0, 0.0, 0.0), ndVector(1.0, 0.0, 0.0, 0.0)));
+        ndSharedPtr<ndJointBilateralConstraint> camLegHinge (CreateHinge(pCamLeverBody, pLegBody, ndVector(0.0, 0.45, 0.0, 1.0), ndVector(0.0, 1.25, 0.25, 1.0), ndVector(1.0, 0.0, 0.0, 0.0), ndVector(1.0, 0.0, 0.0, 0.0)));
+
+        // build the articulated model structure
+        ndWorld* const world = scene->GetWorld();
+
+        ndNode* const rootNode = AddRootBody(world->GetBody(pMainBody));
+        
+        ndNode* const axleNode = AddLimb(rootNode, world->GetBody(pAxleBody), axleHinge);
+        AddLimb(axleNode, world->GetBody(pLegBody), axleLegHinge);
+         
+        ndNode* const camNode = AddLimb(rootNode, world->GetBody(pCamLeverBody), camHinge);
+        AddLimb(camNode, world->GetBody(pLegBody), camLegHinge);
+
+        m_angle = 0.0;
+        m_controlJoint = (ndCustomJointHinge*) *axleHinge;
+
+        m_controlJoint->SetAsSpringDamper(0.0001, 2000.0f, 30.0f);
     }
-    else
+
+    void BuildOrthoNormalBasis(ndVector& u, ndVector& v, ndVector& w)
     {
-        u.SetX(0.0);
-        u.SetY(w.GetZ());
-        u.SetZ(-w.GetY());
+        w.Normalize();
+
+        if (ndAbs(w.GetX()) >= ndAbs(w.GetY()) && ndAbs(w.GetX()) >= ndAbs(w.GetZ()))
+        {
+            u.SetX(-w.GetY());
+            u.SetY(w.GetX());
+            u.SetZ(0.0);
+        }
+        else
+        {
+            u.SetX(0.0);
+            u.SetY(w.GetZ());
+            u.SetZ(-w.GetY());
+        }
+
+        u.Normalize();
+        v = w.CrossProduct(u);
     }
 
-    u.Normalize();
-    v = w.CrossProduct(u);
-}
+    ndJointBilateralConstraint* CreateHinge(ndBodyKinematic* const pBodyA, ndBodyKinematic* pBodyB, const ndVector& vPivotA, const ndVector& vPivotB, const ndVector& vAxisA, const ndVector& vAxisB)
+    {
+        ndMatrix mFrameA = ndGetIdentityMatrix();
+        ndVector vAx = vAxisA, vAy, vAz;
+        BuildOrthoNormalBasis(vAy, vAz, vAx);
+        mFrameA.m_posit = vPivotA;
+        mFrameA.m_front = ndVector(vAx.GetX(), vAx.GetY(), vAx.GetZ(), ndFloat32(0.0));
+        mFrameA.m_up = ndVector(vAy.GetX(), vAy.GetY(), vAy.GetZ(), ndFloat32(0.0));
+        mFrameA.m_right = ndVector(vAz.GetX(), vAz.GetY(), vAz.GetZ(), ndFloat32(0.0));
 
-static ndMatrix OrthoInvert(const ndMatrix& mFrame)
-{
-    ndMatrix mRet = ndGetIdentityMatrix();
-    mRet.m_front = ndVector(mFrame.m_front[0], mFrame.m_up[0], mFrame.m_right[0], ndFloat32 (0.0));
-    mRet.m_up = ndVector(mFrame.m_front[1], mFrame.m_up[1], mFrame.m_right[1], ndFloat32(0.0));
-    mRet.m_right = ndVector(mFrame.m_front[2], mFrame.m_up[2], mFrame.m_right[2], ndFloat32(0.0));
-    mRet.m_posit = ndVector(-mFrame.m_front[0] * mFrame.m_posit.GetX() - mFrame.m_front[1] * mFrame.m_posit.GetY() - mFrame.m_front[2] * mFrame.m_posit.GetZ(),
-        -mFrame.m_up[0] * mFrame.m_posit.GetX() - mFrame.m_up[1] * mFrame.m_posit.GetY() - mFrame.m_up[2] * mFrame.m_posit.GetZ(),
-        -mFrame.m_right[0] * mFrame.m_posit.GetX() - mFrame.m_right[1] * mFrame.m_posit.GetY() - mFrame.m_right[2] * mFrame.m_posit.GetZ(), ndFloat32(1.0));
+        ndMatrix mFrameB = ndGetIdentityMatrix();
+        ndVector vBx = vAxisB, vBy, vBz;
+        BuildOrthoNormalBasis(vBy, vBz, vBx);
+        mFrameB.m_posit = vPivotB;
+        mFrameB.m_front = ndVector(vBx.GetX(), vBx.GetY(), vBx.GetZ(), ndFloat32(0.0));
+        mFrameB.m_up = ndVector(vBy.GetX(), vBy.GetY(), vBy.GetZ(), ndFloat32(0.0));
+        mFrameB.m_right = ndVector(vBz.GetX(), vBz.GetY(), vBz.GetZ(), ndFloat32(0.0));
 
-    return mRet;
-}
+        ndMatrix mBodyB = ndGetIdentityMatrix();
+        //mBodyB = OrthoInvert(mFrameB) * mFrameA * pBodyA->GetMatrix();
+        mBodyB = mFrameB.Inverse() * mFrameA * pBodyA->GetMatrix();
+        pBodyB->SetMatrix(mBodyB);
 
-static void CreateHinge(ndPhysicsWorld* const pWorld, ndBodyKinematic* const pBodyA, ndBodyKinematic* pBodyB, const ndVector& vPivotA, const ndVector& vPivotB, const ndVector& vAxisA, const ndVector& vAxisB)
-{
-    ndMatrix mFrameA = ndGetIdentityMatrix();
-    ndVector vAx = vAxisA, vAy, vAz;
-    BuildOrthoNormalBasis(vAy, vAz, vAx);
-    mFrameA.m_posit = vPivotA;
-    mFrameA.m_front = ndVector(vAx.GetX(), vAx.GetY(), vAx.GetZ(), ndFloat32(0.0));
-    mFrameA.m_up = ndVector(vAy.GetX(), vAy.GetY(), vAy.GetZ(), ndFloat32(0.0));
-    mFrameA.m_right = ndVector(vAz.GetX(), vAz.GetY(), vAz.GetZ(), ndFloat32(0.0));
+        return new ndCustomJointHinge(mFrameB, mFrameA, pBodyB, pBodyA);
+    }
 
-    ndMatrix mFrameB = ndGetIdentityMatrix();
-    ndVector vBx = vAxisB, vBy, vBz;
-    BuildOrthoNormalBasis(vBy, vBz, vBx);
-    mFrameB.m_posit = vPivotB;
-    mFrameB.m_front = ndVector(vBx.GetX(), vBx.GetY(), vBx.GetZ(), ndFloat32(0.0));
-    mFrameB.m_up = ndVector(vBy.GetX(), vBy.GetY(), vBy.GetZ(), ndFloat32(0.0));
-    mFrameB.m_right = ndVector(vBz.GetX(), vBz.GetY(), vBz.GetZ(), ndFloat32(0.0));
+    void Update(ndWorld* const, ndFloat32 timestep)
+    {
+        m_angle += ndFmod(1.0f * timestep, 2.0f * ndPi);
+        ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
+        m_controlJoint->SetOffsetAngle(dist);
+    }
 
-    ndMatrix mBodyB = ndGetIdentityMatrix();
-    mBodyB = OrthoInvert(mFrameB) * mFrameA * pBodyA->GetMatrix();
-    pBodyB->SetMatrix(mBodyB);
-
-    ndCustomJointHinge* const joint = new ndCustomJointHinge(mFrameB, mFrameA, pBodyB, pBodyA);
-    joint->SetLimits(1.0, 0.0);      // Full rotation
-    joint->SetLimitState(true);
-    ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-    pWorld->AddJoint(jointPtr);
-}
+    ndFloat32 m_angle;
+    ndJointHinge* m_controlJoint;
+};
 
 //void ndDraglineLeg(ndDemoEntityManager* const scene)
 void ndBasicRigidBody(ndDemoEntityManager* const scene)
@@ -132,19 +163,8 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
     ndMatrix origin1(ndGetIdentityMatrix());
     origin1.m_posit = ndVector(0.0, 4.0, 0.0, 1.0);
 
-    // Bodies
-    auto pMainBody = AddBox(scene, origin1, 1500000.0, 4.0, 8.0, 8.0);
-    auto pAxleBody = AddBox(scene, ndGetIdentityMatrix(), 100.0, 0.2, 1.3, 0.4);
-    auto pCamLeverBody = AddBox(scene, ndGetIdentityMatrix(), 100.0, 0.2, 1.3, 0.4);
-    auto pLegBody = AddBox(scene, ndGetIdentityMatrix(), 1000.0, 0.4, 3.0, 1.0);
-
-    pMainBody->SetAutoSleep(false);
-
-    // Joints
-    CreateHinge(scene->GetWorld(), pMainBody, pAxleBody, ndVector(-2.1, -2.5, 0.0, 1.0), ndVector(0.0, -0.45, 0.0, 1.0), ndVector(1.0, 0.0, 0.0, 0.0), ndVector(1.0, 0.0, 0.0, 0.0));
-    CreateHinge(scene->GetWorld(), pMainBody, pCamLeverBody, ndVector(-2.47, -1.0, 0.0, 1.0), ndVector(0.0, -0.45, 0.0, 1.0), ndVector(1.0, 0.0, 0.0, 0.0), ndVector(1.0, 0.0, 0.0, 0.0));
-    CreateHinge(scene->GetWorld(), pAxleBody, pLegBody, ndVector(0.0, 0.3, 0.0, 1.0), ndVector(0.37, -0.35, 0.35, 1.0), ndVector(1.0, 0.0, 0.0, 0.0), ndVector(1.0, 0.0, 0.0, 0.0));
-    CreateHinge(scene->GetWorld(), pCamLeverBody, pLegBody, ndVector(0.0, 0.45, 0.0, 1.0), ndVector(0.0, 1.25, 0.25, 1.0), ndVector(1.0, 0.0, 0.0, 0.0), ndVector(1.0, 0.0, 0.0, 0.0));
+    ndSharedPtr<ndModel> dragLine(new ndModelDragLine(scene, origin1));
+    scene->GetWorld()->AddModel(dragLine);
 
     // lower the floor 
     ndMatrix matrix(pFloorBody->GetMatrix());
@@ -155,6 +175,5 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
     ndVector origin(-60.0f, 5.0f, 0.0f, 1.0f);
     scene->SetCameraMatrix(rot, origin);
 }
-
 
 #endif
