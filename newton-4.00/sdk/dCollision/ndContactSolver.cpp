@@ -1216,7 +1216,7 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 	ndAssert(totalArea >= ndFloat32(0.0f));
 	bool hasLinearCombination = true;
 	ndConvexFaceNode* hullPoint = &convexHull[0];
-	while (hasLinearCombination && (hullCount > 1))
+	while (hasLinearCombination)
 	{
 		sortHeap.Flush();
 		hasLinearCombination = false;
@@ -1242,7 +1242,6 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 					hullPoint = corner->m_prev;
 				}
 				hullCount--;
-				ndAssert(hullCount >= 1);
 				hasLinearCombination = true;
 				corner->m_prev->m_mask = 0;
 				corner->m_next->m_prev = corner->m_prev;
@@ -1277,6 +1276,7 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 					hullPoint = corner->m_prev;
 				}
 				hullCount--;
+				ndAssert(hullCount >= 1);
 				hasLinearCombination = true;
 				corner->m_prev->m_mask = 0;
 				corner->m_next->m_prev = corner->m_prev;
@@ -1624,6 +1624,7 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 {
 	ndVector origin(ndVector::m_zero);
 	ndContactPoint* const contactArray = m_contactBuffer;
+
 	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		origin += contactArray[i].m_point;
@@ -1656,7 +1657,9 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 		}
 	}
 
-	ndVector eigen(covariance.EigenVectors());
+	ndVector eigen(covariance.EigenVectors() & ndVector::m_triplexMask);
+	ndAssert(eigen.DotProduct(eigen).GetScalar() > ndFloat32(0.0f));
+	eigen = eigen.Normalize();
 	covariance.m_posit = origin;
 	if (eigen[1] < eigen[2]) 
 	{

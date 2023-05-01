@@ -41,7 +41,8 @@ class ndSharedList : public ndList<ndSharedPtr<T>, ndContainersFreeListAlloc<ndS
 	ndSharedList();
 };
 
-class ndBodyList : public ndList<ndSharedPtr<ndBody>, ndContainersFreeListAlloc<ndSharedPtr<ndBody>*>>
+//class ndBodyList : public ndList<ndSharedPtr<ndBody>, ndContainersFreeListAlloc<ndSharedPtr<ndBody>*>>
+class ndBodyList : public ndSharedList<ndBody>
 {
 	public:
 	ndBodyList();
@@ -78,7 +79,8 @@ ndSharedList<T>::ndSharedList()
 }
 
 inline ndBodyList::ndBodyList()
-	:ndList<ndSharedPtr<ndBody>, ndContainersFreeListAlloc<ndSharedPtr<ndBody>*>>()
+	//:ndList<ndSharedPtr<ndBody>, ndContainersFreeListAlloc<ndSharedPtr<ndBody>*>>()
+	:ndSharedList<ndBody>()
 {
 }
 
