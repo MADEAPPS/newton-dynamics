@@ -349,9 +349,9 @@ void ndFileFormatSave::SaveModels(const ndWorld* const world, const char* const 
 				}
 			}
 
-			for (ndSharedList<ndJointBilateralConstraint>::ndNode* node = model->m_closeLoops.GetFirst(); node; node = node->GetNext())
+			for (ndSharedList<ndJointBilateralConstraint>::ndNode* loopNode = model->m_closeLoops.GetFirst(); loopNode; loopNode = loopNode->GetNext())
 			{
-				m_joints.PushBack(node->GetInfo()->GetAsBilateral());
+				m_joints.PushBack(loopNode->GetInfo()->GetAsBilateral());
 			}
 		}
 	}

@@ -1165,6 +1165,11 @@ ndInt32 ndContactSolver::PruneSupport(ndInt32 count, const ndVector& dir, const 
 
 ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
 {
+	if (count <= 3)
+	{
+		return count;
+	}
+
 	class ndConvexFaceNode
 	{
 		public:
@@ -1174,6 +1179,7 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 		ndInt32 m_mask;
 	};
 	
+	ndFixSizeArray<ndContactPoint, 32> buffer;
 	ndFixSizeArray<ndVector, D_MAX_CONTATCS> array;
 	ndFixSizeArray<ndConvexFaceNode, D_MAX_CONTATCS> convexHull;
 	const ndVector xyMask(ndVector::m_xMask | ndVector::m_yMask);
@@ -1185,11 +1191,21 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 		p.m_w = ndFloat32(i);
 		array.PushBack(p);
 	}
-	if (count == 3) 
-	{
-		return 3;
-	}
 	ndInt32 hullCount = ndConvexHull2d(&array[0], array.GetCount());
+	if (hullCount <= 3)
+	{
+		for (ndInt32 i = hullCount - 1; i >= 0; --i)
+		{
+			ndInt32 index = ndInt32 (array[i].m_w);
+			buffer.PushBack(contactArray[index]);
+		}
+
+		for (ndInt32 i = hullCount - 1; i >= 0; --i)
+		{
+			contactArray[i] = buffer[i];
+		}
+		return hullCount;
+	}
 
 	ndInt32 last = hullCount - 1;
 	convexHull.SetCount(hullCount + 1);
@@ -1286,22 +1302,23 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 		}
 	}
 
-	hullCount = 0;
-	ndContactPoint buffer[32];
+	//hullCount = 0;
 	ndConvexFaceNode* ptr = hullPoint;
 	do
 	{
 		ndInt32 index = ndInt32(ptr->m_point2d.m_w);
-		buffer[hullCount] = contactArray[index];
-		hullCount++;
+		//buffer[hullCount] = contactArray[index];
+		buffer.PushBack(contactArray[index]);
+		//hullCount++;
 		ptr = ptr->m_next;
 	} while (ptr != hullPoint);
 
-	for (ndInt32 i = hullCount-1; i >= 0; --i)
+	//for (ndInt32 i = hullCount-1; i >= 0; --i)
+	for (ndInt32 i = buffer.GetCount() - 1; i >= 0; --i)
 	{
 		contactArray[i] = buffer[i];
 	}
-	return hullCount;
+	return buffer.GetCount();
 }
 
 ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const

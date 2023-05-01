@@ -25,6 +25,7 @@
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndModel.h"
+#include "ndIkSolver.h"
 
 class ndModelArticulation: public ndModel
 {
@@ -57,6 +58,7 @@ class ndModelArticulation: public ndModel
 
 	protected:
 	ndNode* m_rootNode;
+	ndIkSolver m_invDynamicsSolver;
 	ndSharedList<ndJointBilateralConstraint> m_closeLoops;
 
 	friend class ndFileFormatSave;

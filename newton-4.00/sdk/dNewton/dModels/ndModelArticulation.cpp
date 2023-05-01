@@ -25,7 +25,6 @@
 #include "ndModel.h"
 #include "ndModelArticulation.h"
 
-//ndModelArticulation::ndNode::ndNode(ndBodyDynamic* const body, ndNode* const parent, ndJointBilateralConstraint* const joint)
 ndModelArticulation::ndNode::ndNode(ndSharedPtr<ndBody>& body, ndSharedPtr <ndJointBilateralConstraint>& joint, ndNode* const parent)
 	:ndNodeHierarchy<ndNode>()
 	,m_body(body)
@@ -44,6 +43,7 @@ ndModelArticulation::ndNode::~ndNode()
 ndModelArticulation::ndModelArticulation()
 	:ndModel()
 	,m_rootNode(nullptr)
+	,m_invDynamicsSolver()
 	,m_closeLoops()
 {
 }

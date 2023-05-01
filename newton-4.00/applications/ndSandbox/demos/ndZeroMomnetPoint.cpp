@@ -27,7 +27,27 @@
 
 namespace ndZmp
 {
-	void AddLimb(ndDemoEntityManager* const scene, ndModelArticulation* const model, ndMatrix& matrix)
+	class ndModelUnicycle : public ndModelArticulation
+	{
+		public:
+		ndModelUnicycle()
+			:ndModelArticulation()
+			,m_controlJoint(nullptr)
+		{
+		}
+
+		void Update(ndWorld* const world, ndFloat32 timestep)
+		{
+			static ndFloat32 tick = 0.0f;
+			tick += timestep;
+			ndFloat32 angle = 15.0f * ndDegreeToRad * ndSin(ndPi * tick / 0.5f);
+			m_controlJoint->SetOffsetAngle(angle);
+		}
+
+		ndJointHinge* m_controlJoint;
+	};
+
+	void AddLimb(ndDemoEntityManager* const scene, ndModelUnicycle* const model, ndMatrix& matrix)
 	{
 		ndFloat32 limbMass = 0.5f;
 		ndFloat32 limbLength = 0.3f;
@@ -47,6 +67,7 @@ namespace ndZmp
 		ndSharedPtr<ndJointBilateralConstraint> legJoint(new ndJointHinge(legPivot, legBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
 		ndJointHinge* const hinge = (ndJointHinge*)*legJoint;
 		hinge->SetAsSpringDamper(0.001f, 1500, 40.0f);
+		model->m_controlJoint = hinge;
 		
 		// make wheel
 		ndFloat32 wheelMass = 2.0f * limbMass;
@@ -87,7 +108,7 @@ namespace ndZmp
 
 	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
-		ndModelArticulation* const model = new ndModelArticulation();
+		ndModelUnicycle* const model = new ndModelUnicycle();
 
 		ndFloat32 mass = 10.0f;
 		ndFloat32 xSize = 0.25f;
