@@ -90,9 +90,9 @@ class ndModelDragLine : public ndModelArticulation
         ndNode* const camNode = AddLimb(rootNode, world->GetBody(pCamLeverBody), camHinge);
         AddLimb(camNode, world->GetBody(pLegBody), camLegHinge);
 
+        // save the motor joint. for controlling
         m_angle = 0.0;
         m_controlJoint = (ndCustomJointHinge*) *axleHinge;
-
         m_controlJoint->SetAsSpringDamper(0.0001, 2000.0f, 30.0f);
     }
 
