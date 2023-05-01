@@ -38,28 +38,66 @@ namespace ndZmp
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
-			static ndFloat32 tick = 0.0f;
-			tick += timestep;
-			ndFloat32 angle = 15.0f * ndDegreeToRad * ndSin(ndPi * tick / 0.5f);
-			m_controlJoint->SetOffsetAngle(angle);
+			//static ndFloat32 tick = 0.0f;
+			//tick += timestep;
+			//ndFloat32 angle = 15.0f * ndDegreeToRad * ndSin(ndPi * tick / 0.5f);
+			//m_controlJoint->SetOffsetAngle(angle);
+
+			ndSkeletonContainer* const skeleton = m_rootNode->m_body->GetAsBodyDynamic()->GetSkeleton();
+			ndAssert(skeleton);
+
+			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+			m_invDynamicsSolver.Solve();
+
+			ndVector force(ndVector::m_zero);
+			ndVector torque(ndVector::m_zero);
+			for (ndNode* node = m_rootNode->IteratorFirst(); node; node = node->IteratorNext())
+			{
+				force += m_invDynamicsSolver.GetBodyForce(node->m_body->GetAsBodyDynamic());
+				torque += m_invDynamicsSolver.GetBodyTorque(node->m_body->GetAsBodyDynamic());
+			}
+			if (ndAbs(torque.m_z) > 0.1f)
+			{
+				ndTrace(("apply com correction %f\n", torque.m_z));
+				//ndAssert(0);
+			}
+			m_invDynamicsSolver.SolverEnd();
 		}
 
 		ndJointHinge* m_controlJoint;
 	};
 
-	void AddLimb(ndDemoEntityManager* const scene, ndModelUnicycle* const model, ndMatrix& matrix)
+	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
+		ndModelUnicycle* const model = new ndModelUnicycle();
+
+		ndFloat32 mass = 10.0f;
+		ndFloat32 xSize = 0.25f;
+		ndFloat32 ySize = 0.40f;
+		ndFloat32 zSize = 0.30f;
+
+		ndPhysicsWorld* const world = scene->GetWorld();
+		
+		// add hip body
+		ndSharedPtr<ndBody> hipBody(world->GetBody(AddBox(scene, location, mass, xSize, ySize, zSize, "smilli.tga")));
+		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(hipBody);
+
+		ndMatrix matrix(hipBody->GetMatrix());
+		matrix.m_posit.m_y += 0.5f;
+		hipBody->SetMatrix(matrix);
+
+		ndMatrix limbLocation(matrix);
+		limbLocation.m_posit.m_z += zSize * 0.0f;
+		limbLocation.m_posit.m_y -= ySize * 0.5f;
+		limbLocation.m_posit.m_x += xSize * 0.5f * 0.0f;
+
+		// make single leg
 		ndFloat32 limbMass = 0.5f;
 		ndFloat32 limbLength = 0.3f;
 		ndFloat32 limbRadio = 0.025f;
-		
-		ndPhysicsWorld* const world = scene->GetWorld();
-		ndModelArticulation::ndNode* const modelRoot = model->GetRoot();
-		ndMatrix rootMatrix(modelRoot->m_body->GetMatrix());
-		
-		// make single leg
+
 		ndSharedPtr<ndBody> legBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "smilli.tga")));
-		ndMatrix legLocation(ndRollMatrix(-90.0f * ndDegreeToRad) * matrix);
+		ndMatrix legLocation(ndRollMatrix(-90.0f * ndDegreeToRad) * limbLocation);
 		legLocation.m_posit.m_y -= limbLength * 0.5f;
 		legBody->SetMatrix(legLocation);
 		ndMatrix legPivot(ndYawMatrix(90.0f * ndDegreeToRad) * legLocation);
@@ -68,7 +106,7 @@ namespace ndZmp
 		ndJointHinge* const hinge = (ndJointHinge*)*legJoint;
 		hinge->SetAsSpringDamper(0.001f, 1500, 40.0f);
 		model->m_controlJoint = hinge;
-		
+
 		// make wheel
 		ndFloat32 wheelMass = 2.0f * limbMass;
 		ndFloat32 wheelRadio = 4.0f * limbRadio;
@@ -84,7 +122,8 @@ namespace ndZmp
 		ndMatrix floor(FindFloor(*world, probeMatrix, wheelBody->GetAsBodyKinematic()->GetCollisionShape(), 20.0f));
 		ndFloat32 dist = wheelMatrix.m_posit.m_y - floor.m_posit.m_y;
 
-		dist = 0;
+		//dist = 0;
+		ndMatrix rootMatrix(modelRoot->m_body->GetMatrix());
 
 		rootMatrix.m_posit.m_y -= dist;
 		wheelMatrix.m_posit.m_y -= dist;
@@ -101,39 +140,11 @@ namespace ndZmp
 		// add the joints manually, because on this model teh whell is not activally actuated.
 		world->AddJoint(legJoint);
 		world->AddJoint(wheelJoint);
-		
+
 		// add model limbs
 		//ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
 		//model->AddLimb(legLimb, wheelBody, wheelJoint);
 		model->AddLimb(modelRoot, legBody, legJoint);
-	}
-
-	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& location)
-	{
-		ndModelUnicycle* const model = new ndModelUnicycle();
-
-		ndFloat32 mass = 10.0f;
-		ndFloat32 xSize = 0.25f;
-		ndFloat32 ySize = 0.40f;
-		ndFloat32 zSize = 0.30f;
-
-		ndPhysicsWorld* const world = scene->GetWorld();
-		
-		// add hip body
-		ndSharedPtr<ndBody> hipBody(world->GetBody(AddBox(scene, location, mass, xSize, ySize, zSize, "smilli.tga")));
-		model->AddRootBody(hipBody);
-
-		ndMatrix matrix(hipBody->GetMatrix());
-		matrix.m_posit.m_y += 0.5f;
-		hipBody->SetMatrix(matrix);
-
-		ndMatrix limbLocation(matrix);
-		limbLocation.m_posit.m_z += zSize * 0.0f;
-		limbLocation.m_posit.m_y -= ySize * 0.5f;
-		limbLocation.m_posit.m_x += xSize * 0.5f * 0.0f;
-		
-		AddLimb(scene, model, limbLocation);
-
 		return model;
 	}
 }
