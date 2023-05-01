@@ -84,6 +84,8 @@ namespace ndZmp
 		ndMatrix floor(FindFloor(*world, probeMatrix, wheelBody->GetAsBodyKinematic()->GetCollisionShape(), 20.0f));
 		ndFloat32 dist = wheelMatrix.m_posit.m_y - floor.m_posit.m_y;
 
+		dist = 0;
+
 		rootMatrix.m_posit.m_y -= dist;
 		wheelMatrix.m_posit.m_y -= dist;
 		legLocation.m_posit.m_y -= dist;
