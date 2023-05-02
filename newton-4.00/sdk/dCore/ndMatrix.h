@@ -59,6 +59,7 @@ class ndMatrix
 	ndVector& operator[] (ndInt32 i);
 	const ndVector& operator[] (ndInt32 i) const;
 	
+	ndMatrix Inverse() const;
 	ndMatrix OrthoInverse() const;
 	ndMatrix Transpose3x3 () const;
 	ndMatrix Transpose4X4 () const;
@@ -216,17 +217,16 @@ inline ndPlane ndMatrix::UntransformPlane (const ndPlane &globalPlane) const
 	return ndPlane (UnrotateVector (globalPlane), globalPlane.Evalue(m_posit));
 }
 
-/*
-inline void ndMatrix::EigenVectors ()
+
+inline ndMatrix ndMatrix::Inverse() const
 {
-	ndVector eigenValues;
-	EigenVectors (eigenValues);
+	ndTrace(("funtion: %s deprecated, use ndMatrix::OrthoInverse instead", __FUNCTION__));
+	ndAssert(0);
+	return OrthoInverse();
 }
-*/
 
 inline ndMatrix ndMatrix::OrthoInverse () const
 {
-	// much faster inverse
 	ndMatrix inv;
 	ndVector::Transpose4x4 (inv[0], inv[1], inv[2], inv[3], m_front, m_up, m_right, ndVector::m_wOne);
 	inv.m_posit -= inv[0] * m_posit.BroadcastX() + inv[1] * m_posit.BroadcastY() + inv[2] * m_posit.BroadcastZ();
