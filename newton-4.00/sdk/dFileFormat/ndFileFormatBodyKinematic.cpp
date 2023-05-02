@@ -96,7 +96,7 @@ void ndFileFormatBodyKinematic::LoadBody(const nd::TiXmlElement* const node, con
 		{
 			ndVector euler(xmlGetVector3(node, "principalAxis"));
 			ndMatrix principalAxisMatrix (ndPitchMatrix(euler.m_x * ndDegreeToRad) * ndYawMatrix(euler.m_y * ndDegreeToRad) * ndRollMatrix(euler.m_z * ndDegreeToRad));
-			principalAxisMatrix = principalAxisMatrix * II * principalAxisMatrix.Inverse();
+			principalAxisMatrix = principalAxisMatrix * II * principalAxisMatrix.OrthoInverse();
 		}
 		kinBody->SetMassMatrix(ndFloat32(1.0f) / invMass, II);
 	}

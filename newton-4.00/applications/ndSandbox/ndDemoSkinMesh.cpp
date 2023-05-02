@@ -61,7 +61,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 		ndDemoEntity* const entity = pool[stack];
 		const ndMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix[stack]);
 	
-		const ndMatrix bindMatrix(shapeBindMatrix * boneMatrix.Inverse());
+		const ndMatrix bindMatrix(shapeBindMatrix * boneMatrix.OrthoInverse());
 		entityArray.PushBack(entity);
 		bindMatrixArray.PushBack(bindMatrix);
 	
@@ -332,7 +332,7 @@ ndInt32 ndDemoSkinMesh::CalculateMatrixPalette(ndMatrix* const bindMatrix) const
 	int count = 0;
 	pool[0] = root;
 	parentMatrix[0] = ndGetIdentityMatrix();
-	ndMatrix shapeBindMatrix((m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix()).Inverse());
+	ndMatrix shapeBindMatrix((m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix()).OrthoInverse());
 	while (stack) 
 	{
 		stack--;

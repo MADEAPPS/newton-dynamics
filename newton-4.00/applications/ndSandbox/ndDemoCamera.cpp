@@ -100,7 +100,7 @@ ndMatrix ndDemoCamera::CreateLookAtMatrix(const ndVector& eyepoint, const ndVect
 	result[1] = YAxis;
 	result[2] = zAxis;
 	result[3] = ndVector::m_wOne;
-	result = result.Transpose();
+	result = result.Transpose3x3();
 
 	ndVector negEye (eyepoint);
 	negEye = negEye.Scale(-1.0f);

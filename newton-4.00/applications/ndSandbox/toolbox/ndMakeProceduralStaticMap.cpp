@@ -93,7 +93,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 				ndVector maxP;
 				ndMatrix matrix(body0->GetMatrix());
 				//collision.CalculateAabb(matrix.Inverse(), minP, maxP);
-				collision.CalculateAabb(matrix * myMatrix.Inverse(), minP, maxP);
+				collision.CalculateAabb(matrix * myMatrix.OrthoInverse(), minP, maxP);
 
 				vertex.SetCount(0);
 				faceList.SetCount(0);

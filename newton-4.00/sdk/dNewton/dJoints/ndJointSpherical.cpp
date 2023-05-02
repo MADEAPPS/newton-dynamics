@@ -270,7 +270,7 @@ void ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 			}
 		}
 
-		const ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+		const ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.OrthoInverse());
 		const ndFloat32 pitchAngle = -ndAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 		SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 	}
@@ -286,7 +286,7 @@ void ndJointSpherical::ApplyBaseRows(const ndMatrix& matrix0, const ndMatrix& ma
 void ndJointSpherical::SubmitSpringDamper(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	const ndMatrix matrix11(m_rotation * matrix1);
-	const ndQuaternion rotation(matrix0.Inverse() * matrix11);
+	const ndQuaternion rotation(matrix0.OrthoInverse() * matrix11);
 	const ndVector pin(rotation & ndVector::m_triplexMask);
 	const ndFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
 	const ndFloat32 tol = ndFloat32(3.0f * ndPi / 180.0f);

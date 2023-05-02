@@ -73,8 +73,8 @@ class ndContactSolver::ndBoxBoxDistance2
 		:m_matrix0(matrix0)
 		,m_matrix1(matrix1)
 	{
-		m_localMatrix0 = m_matrix1 * m_matrix0.Inverse();
-		m_localMatrix1 = m_localMatrix0.Inverse();
+		m_localMatrix0 = m_matrix1 * m_matrix0.OrthoInverse();
+		m_localMatrix1 = m_localMatrix0.OrthoInverse();
 
 		ndInt32 index = 0;
 		for (ndInt32 i = 0; i < 3; ++i)
@@ -3678,7 +3678,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 	ndShapeInstance* const compoundInstance = &compoundBody->GetCollisionShape();
 
 	const ndMatrix& compoundMatrix = compoundInstance->GetGlobalMatrix();
-	const ndMatrix matrix(convexInstance->GetGlobalMatrix() * compoundMatrix.Inverse());
+	const ndMatrix matrix(convexInstance->GetGlobalMatrix() * compoundMatrix.OrthoInverse());
 
 	ndShapeCompound* const compoundShape = m_instance1.GetShape()->GetAsShapeCompound();
 	ndAssert(compoundShape);

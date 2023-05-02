@@ -63,7 +63,7 @@ void ndPolygonMeshDesc::Init()
 	const ndMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();
 
 	ndMatrix& matrix = *this;
-	matrix = hullMatrix * soupMatrix.Inverse();
+	matrix = hullMatrix * soupMatrix.OrthoInverse();
 	ndMatrix convexMatrix(ndGetIdentityMatrix());
 
 	m_staticMeshQuery->Reset();
@@ -89,7 +89,7 @@ void ndPolygonMeshDesc::Init()
 		{
 			const ndVector& invScale = m_polySoupInstance->GetInvScale();
 			ndMatrix tmp(matrix[0] * invScale, matrix[1] * invScale, matrix[2] * invScale, ndVector::m_wOne);
-			convexMatrix = tmp * matrix.Inverse();
+			convexMatrix = tmp * matrix.OrthoInverse();
 			convexMatrix.m_posit = ndVector::m_wOne;
 			matrix.m_posit = matrix.m_posit * (invScale | ndVector::m_wOne);
 			break;

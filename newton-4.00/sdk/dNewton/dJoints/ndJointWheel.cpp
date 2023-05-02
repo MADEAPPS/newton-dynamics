@@ -86,7 +86,7 @@ void ndJointWheel::UpdateTireSteeringAngleMatrix()
 	ndMatrix newTireMatrix(ndPitchMatrix(spinAngle) * chassisMatrix);
 	newTireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(distance);
 
-	const ndMatrix tireBodyMatrix(m_localMatrix0.Inverse() * newTireMatrix);
+	const ndMatrix tireBodyMatrix(m_localMatrix0.OrthoInverse() * newTireMatrix);
 	m_body0->SetMatrix(tireBodyMatrix);
 }
 

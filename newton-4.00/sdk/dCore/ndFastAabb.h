@@ -109,7 +109,7 @@ inline void ndFastAabb::SetSeparatingDistance(const ndFloat32 distance)
 
 inline void ndFastAabb::SetTransposeAbsMatrix(const ndMatrix& matrix)
 {
-	m_absDir = matrix.Transpose();
+	m_absDir = matrix.Transpose3x3();
 	m_absDir[0] = m_absDir[0].Abs();
 	m_absDir[1] = m_absDir[1].Abs();
 	m_absDir[2] = m_absDir[2].Abs();

@@ -88,7 +88,7 @@ ndMatrix ndFastAabb::MakeFaceMatrix(const ndVector& faceNormal, ndInt32, const n
 	faceMatrix[1] = faceMatrix[1].Normalize();
 	faceMatrix[2] = faceMatrix[0].CrossProduct(faceMatrix[1]);
 	faceMatrix[3] = origin | ndVector::m_wOne;
-	return faceMatrix.Inverse();
+	return faceMatrix.OrthoInverse();
 }
 
 ndFloat32 ndFastAabb::PolygonBoxRayDistance(const ndVector& faceNormal, ndInt32 indexCount, const ndInt32* const indexArray, ndInt32 stride, const ndFloat32* const vertexArray, const ndFastRay& ray) const

@@ -376,7 +376,7 @@ void ndDemoEntity::RenderBone(ndDemoEntityManager* const scene, const ndMatrix& 
 	if (parent)
 	{
 		//glDisable(GL_TEXTURE_2D);
-		ndMatrix parentMatrix(m_matrix.Inverse() * nodeMatrix);
+		ndMatrix parentMatrix(m_matrix.OrthoInverse() * nodeMatrix);
 		ndVector p0(nodeMatrix.m_posit);
 		ndVector p1(parentMatrix.m_posit);
 		ndVector color(0.0f, 0.0f, 0.0f, 1.0f);

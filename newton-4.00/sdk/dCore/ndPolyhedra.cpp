@@ -1429,7 +1429,7 @@ void ndPolyhedra::RefineTriangulation (const ndFloat64* const vertex, ndInt32 st
 	matrix.m_front = ndVector (p1p0.Scale (ndFloat64 (1.0f) / sqrt (mag2)));
 	matrix.m_right = ndVector (normal.Scale (ndFloat64 (1.0f) / sqrt (normal.DotProduct(normal).GetScalar())));
 	matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front);
-	matrix = matrix.Inverse();
+	matrix = matrix.OrthoInverse();
 	ndAssert (matrix.m_posit.m_w == ndFloat32 (1.0f));
 
 	ndInt32 maxCount = dignonals.GetCount() * dignonals.GetCount();

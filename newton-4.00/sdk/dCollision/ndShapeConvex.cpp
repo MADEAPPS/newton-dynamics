@@ -209,7 +209,7 @@ ndMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const ndMatrix& alignMat
 		inertia[2][0] = m_crossInertia[1] * mag2;
 		inertia[1][2] = m_crossInertia[0] * mag2;
 		inertia[2][1] = m_crossInertia[0] * mag2;
-		inertia = matrix.Inverse() * inertia * matrix;
+		inertia = matrix.OrthoInverse() * inertia * matrix;
 	
 		ndAssert(localScale.m_w == ndFloat32(0.0f));
 		ndVector origin(matrix.TransformVector(m_centerOfMass * localScale));

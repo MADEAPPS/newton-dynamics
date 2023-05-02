@@ -363,7 +363,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 //m_maxAngularFriction = 10000.0f;
 //matrix1 = ndPitchMatrix(125.0f * ndDegreeToRad) * ndYawMatrix(-60.0f * ndDegreeToRad) * ndRollMatrix(80.0f * ndDegreeToRad);
 
-		const ndQuaternion rotation(matrix0.Inverse() * matrix1);
+		const ndQuaternion rotation(matrix0.OrthoInverse() * matrix1);
 		const ndVector pin(rotation & ndVector::m_triplexMask);
 		const ndFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
 		const ndFloat32 tol = ndFloat32(3.0f * ndPi / 180.0f);

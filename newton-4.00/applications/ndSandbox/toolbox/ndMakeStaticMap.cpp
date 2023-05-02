@@ -212,7 +212,7 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 	ndMeshEffectNode* entBuffer[1024];
 	
 	entBuffer[0] = meshEffectNode;
-	matrixBuffer[0] = meshEffectNode->m_matrix.Inverse();
+	matrixBuffer[0] = meshEffectNode->m_matrix.OrthoInverse();
 	
 	while (stack)
 	{
@@ -290,7 +290,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	ndMeshEffectNode* entBuffer[1024];
 
 	entBuffer[0] = meshEffectNode;
-	matrixBuffer[0] = meshEffectNode->m_matrix.Inverse();
+	matrixBuffer[0] = meshEffectNode->m_matrix.OrthoInverse();
 
 	while (stack)
 	{

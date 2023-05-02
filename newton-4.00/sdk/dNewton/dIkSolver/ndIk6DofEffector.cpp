@@ -34,7 +34,7 @@ ndIk6DofEffector::ndIk6DofEffector()
 
 ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotChild, pinAndPivotParent)
-	,m_targetFrame(pinAndPivotChild * pinAndPivotParent.Inverse())
+	,m_targetFrame(pinAndPivotChild * pinAndPivotParent.OrthoInverse())
 	,m_angularSpring(ndFloat32(1000.0f))
 	,m_angularDamper(ndFloat32(50.0f))
 	,m_angularMaxTorque(D_LCP_MAX_VALUE)
@@ -167,7 +167,7 @@ void ndIk6DofEffector::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 
 void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	const ndQuaternion rotation(matrix0.Inverse() * matrix1);
+	const ndQuaternion rotation(matrix0.OrthoInverse() * matrix1);
 	const ndVector pin(rotation & ndVector::m_triplexMask);
 	const ndFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
 	const ndFloat32 tol = ndFloat32(3.0f * ndPi / 180.0f);

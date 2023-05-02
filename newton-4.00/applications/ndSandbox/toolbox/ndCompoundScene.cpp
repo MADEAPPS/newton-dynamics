@@ -92,7 +92,7 @@ static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const me
 	ndMeshEffectNode* entBuffer[1024];
 	
 	entBuffer[0] = meshEffectNode;
-	matrixBuffer[0] = meshEffectNode->m_matrix.Inverse();
+	matrixBuffer[0] = meshEffectNode->m_matrix.OrthoInverse();
 	
 	while (stack)
 	{

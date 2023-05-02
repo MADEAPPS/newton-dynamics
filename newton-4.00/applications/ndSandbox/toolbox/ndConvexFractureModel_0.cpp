@@ -121,7 +121,7 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 			matrix.m_right = face0.m_plane & ndVector::m_triplexMask;
 			matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front) & ndVector::m_triplexMask;
 			matrix.m_posit.m_w = 1.0f;
-			matrix = matrix.Inverse();
+			matrix = matrix.OrthoInverse();
 
 			ndFaceInfo transformedFace;
 			for (ndInt32 j = 0; j < face0.m_count; ++j)

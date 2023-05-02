@@ -142,7 +142,7 @@ void ndJointFix6dof::SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatr
 	SetDiagonalRegularizer(desc, m_softness);
 
 	// calculate pitch angle
-	ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+	ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.OrthoInverse());
 	ndFloat32 pitchAngle = ndAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 	AddAngularRowJacobian(desc, matrix0.m_front, pitchAngle);
 	SetLowerFriction(desc, -m_maxTorque);

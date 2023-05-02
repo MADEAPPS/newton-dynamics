@@ -595,7 +595,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShape
 	
 	ndVector hullBoxP0;
 	ndVector hullBoxP1;
-	ndMatrix hullMatrix(contactSolver.m_instance0.m_globalMatrix * polygonMatrix.Inverse());
+	ndMatrix hullMatrix(contactSolver.m_instance0.m_globalMatrix * polygonMatrix.OrthoInverse());
 	contactSolver.m_instance0.CalculateAabb(hullMatrix, hullBoxP0, hullBoxP1);
 	ndVector minBox(polyBoxP0 - hullBoxP1);
 	ndVector maxBox(polyBoxP1 - hullBoxP0);

@@ -137,7 +137,7 @@ class ndModelDragLine : public ndModelArticulation
 
         ndMatrix mBodyB = ndGetIdentityMatrix();
         //mBodyB = OrthoInvert(mFrameB) * mFrameA * pBodyA->GetMatrix();
-        mBodyB = mFrameB.Inverse() * mFrameA * pBodyA->GetMatrix();
+        mBodyB = mFrameB.OrthoInverse() * mFrameA * pBodyA->GetMatrix();
         pBodyB->SetMatrix(mBodyB);
 
         return new ndCustomJointHinge(mFrameB, mFrameA, pBodyB, pBodyA);

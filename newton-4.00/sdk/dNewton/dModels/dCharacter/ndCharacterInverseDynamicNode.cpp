@@ -31,7 +31,7 @@ ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const ndMatrix& mat
 	,m_body(body)
 	,m_joint(new ndJointSpherical(matrixInGlobalSpace, body, parent->GetBody()))
 {
-	m_localPose = m_body->GetMatrix() * parent->GetBody()->GetMatrix().Inverse();
+	m_localPose = m_body->GetMatrix() * parent->GetBody()->GetMatrix().OrthoInverse();
 }
 
 ndCharacterInverseDynamicNode::~ndCharacterInverseDynamicNode()

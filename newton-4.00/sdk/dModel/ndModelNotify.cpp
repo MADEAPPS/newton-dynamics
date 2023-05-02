@@ -51,7 +51,7 @@ void ndModelNotify::CalculateMatrix(const ndMatrix& matrix, ndQuaternion& rot, n
 		return;
 	}
 	const ndMatrix parentMatrix(m_parentBody->GetMatrix());
-	const ndMatrix localMatrix(matrix * parentMatrix.Inverse());
+	const ndMatrix localMatrix(matrix * parentMatrix.OrthoInverse());
 	rot = localMatrix;
 	posit = localMatrix.m_posit;
 }

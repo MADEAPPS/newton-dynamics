@@ -65,7 +65,7 @@ ndMatrix::ndMatrix (const ndMatrix& transformMatrix, const ndVector& scale, cons
 		stretchAxis[1].Scale(scale[1]),
 		stretchAxis[2].Scale(scale[2]),
 		stretchAxis[3]);
-	*this = stretchAxis.Transpose() * scaledAxis * transformMatrix;
+	*this = stretchAxis.Transpose3x3() * scaledAxis * transformMatrix;
 }
 
 ndMatrix ndMatrix::Multiply3X3 (const ndMatrix &B) const
@@ -360,7 +360,7 @@ void ndMatrix::PolarDecomposition (ndMatrix& transformMatrix, ndVector& scale, n
 
 	const ndMatrix& me = *this;
 	ndFloat32 sign = ndSign (me[2].DotProduct(me[0].CrossProduct(me[1])).GetScalar());
-	stretchAxis = me * Transpose();
+	stretchAxis = me * Transpose3x3();
 	scale = stretchAxis.EigenVectors();
 
 	// I need to deal with by seeing of some of the Scale are duplicated
@@ -377,7 +377,7 @@ void ndMatrix::PolarDecomposition (ndMatrix& transformMatrix, ndVector& scale, n
 	scaledAxis[1] = stretchAxis[1].Scale (ndFloat32 (1.0f) / scale[1]);
 	scaledAxis[2] = stretchAxis[2].Scale (ndFloat32 (1.0f) / scale[2]);
 	scaledAxis[3] = stretchAxis[3];
-	ndMatrix symetricInv (stretchAxis.Transpose() * scaledAxis);
+	ndMatrix symetricInv (stretchAxis.Transpose3x3() * scaledAxis);
 
 	transformMatrix = symetricInv * (*this);
 	transformMatrix.m_posit = m_posit;
@@ -512,9 +512,9 @@ ndVector ndMatrix::EigenVectors ()
 		diag[0][0] = d[0];
 		diag[1][1] = d[1];
 		diag[2][2] = d[2];
-		ndMatrix E(eigenVectors.Transpose());
+		ndMatrix E(eigenVectors.Transpose3x3());
 		ndMatrix originalMatrix(*this);
-		ndMatrix tempMatrix(E * diag * E.Transpose());
+		ndMatrix tempMatrix(E * diag * E.Transpose3x3());
 		tempMatrix = tempMatrix.Inverse4x4();
 		ndMatrix unitMatrix(tempMatrix* originalMatrix);
 

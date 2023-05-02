@@ -63,7 +63,7 @@ inline const ndMatrix& ndCharacterRootNode::GetCoronalFrame() const
 
 inline void ndCharacterRootNode::SetCoronalFrame(const ndMatrix& frameInGlobalSpace)
 {
-	m_coronalFrame = frameInGlobalSpace * m_body->GetMatrix().Inverse();
+	m_coronalFrame = frameInGlobalSpace * m_body->GetMatrix().OrthoInverse();
 	m_coronalFrame.m_posit = ndVector::m_wOne;
 }
 

@@ -167,8 +167,8 @@ ndFloat32 ndJointBilateralConstraint::CalculateAngle(const ndVector& pin, const 
 void ndJointBilateralConstraint::CalculateLocalMatrix(const ndMatrix& globalMatrix, ndMatrix& localMatrix0, ndMatrix& localMatrix1) const
 {
 	ndAssert(globalMatrix.TestOrthogonal());
-	localMatrix0 = globalMatrix * m_body0->GetMatrix().Inverse();
-	localMatrix1 = globalMatrix * m_body1->GetMatrix().Inverse();
+	localMatrix0 = globalMatrix * m_body0->GetMatrix().OrthoInverse();
+	localMatrix1 = globalMatrix * m_body1->GetMatrix().OrthoInverse();
 }
 
 ndFloat32 ndJointBilateralConstraint::CalculateSpringDamperAcceleration(ndFloat32 dt, ndFloat32 ks, ndFloat32 x, ndFloat32 kd, ndFloat32 v) const

@@ -817,7 +817,7 @@ namespace ndQuadruped_1
 				ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
 				rotation.TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
 				ndInt32 supportCount = ndConvexHull2d(&contactPoints[0], contactPoints.GetCount());
-				rotation.Inverse().TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
+				rotation.OrthoInverse().TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
 				ndVector p0(contactPoints[supportCount - 1]);
 				ndBigVector bigPolygon[16];
 				for (ndInt32 i = 0; i < supportCount; ++i)

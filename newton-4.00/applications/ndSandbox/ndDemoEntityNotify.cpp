@@ -76,7 +76,7 @@ ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* 
 {
 	//static ndBindingRagdollEntityNotifyFileSaveLoad registerClass;
 	ndDemoEntity* const parentEntity = m_parentBody ? (ndDemoEntity*)(parentBody->GetNotifyCallback()->GetUserData()) : nullptr;
-	m_bindMatrix = entity->GetParent()->CalculateGlobalMatrix(parentEntity).Inverse();
+	m_bindMatrix = entity->GetParent()->CalculateGlobalMatrix(parentEntity).OrthoInverse();
 }
 
 ndBindingRagdollEntityNotify::~ndBindingRagdollEntityNotify()
@@ -105,7 +105,7 @@ void ndBindingRagdollEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 	else
 	{
 		const ndMatrix parentMatrix(m_parentBody->GetMatrix());
-		const ndMatrix localMatrix(matrix * parentMatrix.Inverse() * m_bindMatrix);
+		const ndMatrix localMatrix(matrix * parentMatrix.OrthoInverse() * m_bindMatrix);
 		const ndQuaternion rot(localMatrix);
 		m_entity->SetMatrix(rot, localMatrix.m_posit);
 	}

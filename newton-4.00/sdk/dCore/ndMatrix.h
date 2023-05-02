@@ -58,18 +58,19 @@ class ndMatrix
 
 	ndVector& operator[] (ndInt32 i);
 	const ndVector& operator[] (ndInt32 i) const;
-
-	ndMatrix Inverse () const;
-	D_CORE_API ndMatrix Inverse4x4 () const;
-	ndMatrix Transpose () const;
+	
+	ndMatrix OrthoInverse() const;
+	ndMatrix Transpose3x3 () const;
 	ndMatrix Transpose4X4 () const;
 	ndVector RotateVector (const ndVector &v) const;
 	ndVector UnrotateVector (const ndVector &v) const;
 	ndVector TransformVector (const ndVector &v) const;
 	ndVector UntransformVector (const ndVector &v) const;
+	ndVector TransformVector1x4(const ndVector& v) const;
 	ndPlane TransformPlane (const ndPlane &localPlane) const;
 	ndPlane UntransformPlane (const ndPlane &globalPlane) const;
-	ndVector TransformVector1x4(const ndVector &v) const;
+
+	D_CORE_API ndMatrix Inverse4x4() const;
 	D_CORE_API ndVector SolveByGaussianElimination(const ndVector &v) const;
 	D_CORE_API void TransformBBox (const ndVector& p0local, const ndVector& p1local, ndVector& p0, ndVector& p1) const;
 
@@ -166,7 +167,7 @@ inline const ndVector& ndMatrix::operator[] (ndInt32  i) const
 	return (&m_front)[i];
 }
 
-inline ndMatrix ndMatrix::Transpose () const
+inline ndMatrix ndMatrix::Transpose3x3 () const
 {
 	ndMatrix inv;
 	ndVector::Transpose4x4(inv[0], inv[1], inv[2], inv[3], m_front, m_up, m_right, ndVector::m_wOne);
@@ -192,13 +193,12 @@ inline ndVector ndMatrix::UnrotateVector (const ndVector &v) const
 
 inline ndVector ndMatrix::TransformVector (const ndVector &v) const
 {
-	return RotateVector(v) + m_posit;
+	return m_front * v.BroadcastX() + m_up * v.BroadcastY() + m_right * v.BroadcastZ() + m_posit;
 }
 
 inline ndVector ndMatrix::TransformVector1x4(const ndVector &v) const
 {
-	return m_front * v.BroadcastX() + m_up * v.BroadcastY() +
-		   m_right * v.BroadcastZ() + m_posit * v.BroadcastW();
+	return m_front * v.BroadcastX() + m_up * v.BroadcastY() + m_right * v.BroadcastZ() + m_posit * v.BroadcastW();
 }
 
 inline ndVector ndMatrix::UntransformVector (const ndVector &v) const
@@ -224,7 +224,7 @@ inline void ndMatrix::EigenVectors ()
 }
 */
 
-inline ndMatrix ndMatrix::Inverse () const
+inline ndMatrix ndMatrix::OrthoInverse () const
 {
 	// much faster inverse
 	ndMatrix inv;
