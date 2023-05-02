@@ -238,6 +238,7 @@ void ndIkSolver::BuildJacobianMatrix (ndConstraint* const joint)
 	const ndMatrix& invInertia1 = body1->m_invWorldInertiaMatrix;
 	const ndVector invMass0(body0->m_invMass[3]);
 	const ndVector invMass1(body1->m_invMass[3]);
+	const ndFloat32 diagDampScale = joint->GetAsContact() ? ndFloat32(0.1f) : ndFloat32(1.0f);
 
 	for (ndInt32 i = 0; i < count; ++i)
 	{
@@ -258,9 +259,9 @@ void ndIkSolver::BuildJacobianMatrix (ndConstraint* const joint)
 			JMinvM0.m_linear * JtM0.m_linear + JMinvM0.m_angular * JtM0.m_angular +
 			JMinvM1.m_linear * JtM1.m_linear + JMinvM1.m_angular * JtM1.m_angular);
 		
-		ndFloat32 diag = tmpDiag.AddHorizontal().GetScalar();
-		ndAssert(diag > ndFloat32(0.0f));
-		rhs->m_diagDamp = diag * rhs->m_diagonalRegularizer;
+		//ndFloat32 diag = tmpDiag.AddHorizontal().GetScalar() * diagDampScale;
+		ndAssert(tmpDiag.AddHorizontal().GetScalar() * diagDampScale > ndFloat32(0.0f));
+		rhs->m_diagDamp = tmpDiag.AddHorizontal().GetScalar() * diagDampScale * rhs->m_diagonalRegularizer;
 	}
 }
 
