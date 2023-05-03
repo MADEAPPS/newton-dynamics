@@ -23,8 +23,10 @@
 #define __ND_JOINT_BILATERAL_CONSTRAINT_H__
 
 #include "ndCollisionStdafx.h"
+#include "ndJointList.h"
 #include "ndConstraint.h"
 #include "ndBodyKinematic.h"
+
 
 #define ND_BILATERAL_CONTRAINT_DOF	12
 
@@ -53,14 +55,14 @@ class ndJointBilateralConstraint : public ndConstraint
 {
 	public:
 	D_BASE_CLASS_REFLECTION(ndJointBilateralConstraint);
-	class ndJointList : public ndList<ndSharedPtr<ndJointBilateralConstraint>, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>
-	{
-		public:
-		ndJointList()
-			:ndList<ndSharedPtr<ndJointBilateralConstraint>, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>()
-		{
-		}
-	};
+	//class ndJointList : public ndList<ndSharedPtr<ndJointBilateralConstraint>, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>
+	//{
+	//	public:
+	//	ndJointList()
+	//		:ndList<ndSharedPtr<ndJointBilateralConstraint>, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>()
+	//	{
+	//	}
+	//};
 
 	class ndIkInterface
 	{

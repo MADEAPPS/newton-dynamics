@@ -434,7 +434,6 @@ void ndContactSolver::SupportVertex(const ndVector& dir0, ndInt32 vertexIndex)
 {
 	ndAssert(dir0.m_w == ndFloat32(0.0f));
 	ndAssert(ndAbs(dir0.DotProduct(dir0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
-	//ndVector dir1 (dir0.Scale(ndFloat32 (-1.0f)));
 	ndVector dir1(dir0 * ndVector::m_negOne);
 	
 	const ndMatrix& matrix0 = m_instance0.m_globalMatrix;
