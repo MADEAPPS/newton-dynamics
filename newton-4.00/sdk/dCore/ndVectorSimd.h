@@ -358,7 +358,6 @@ class ndVector
 
 	inline ndVector TestZero() const
 	{
-		//return ndVector (_mm_cmpeq_epi32 (m_typeInt, m_zero.m_typeInt)) & m_negOne;
 		return m_negOne & (*this == m_zero);
 	}
 
@@ -471,6 +470,25 @@ class ndVector
 	inline ndVector ShiftRightLogical (ndInt32 bits) const
 	{
 		return ndVector (_mm_srli_epi32(m_typeInt, bits)); 
+	}
+
+	inline ndVector OptimizedVectorUnrotate(const ndVector& front, const ndVector& up, const ndVector& right) const
+	{
+		__m128 tmp0(_mm_mul_ps(m_type, front.m_type));
+		__m128 tmp1(_mm_mul_ps(m_type, up.m_type));
+
+		__m128 tmp2(_mm_unpacklo_ps(tmp0, tmp1));
+		__m128 tmp3(_mm_unpackhi_ps(tmp0, tmp1));
+
+		__m128 tmp5(_mm_mul_ps(m_type, right.m_type));
+		__m128 tmp6(_mm_shuffle_ps(tmp5, tmp5, PERMUTE_MASK(3, 2, 3, 0)));
+		__m128 tmp4(_mm_add_ps(tmp2, tmp3));
+
+		__m128 tmp7(_mm_shuffle_ps(tmp5, tmp5, PERMUTE_MASK(3, 3, 3, 1)));
+		__m128 tmp8(_mm_add_ps(tmp6, tmp7));
+		__m128 tmp9(_mm_movelh_ps(tmp4, tmp8));
+		__m128 tmp10(_mm_movehl_ps(tmp8, tmp4));
+		return ndVector(_mm_add_ps(tmp9, tmp10));
 	}
 
 	inline static void Transpose4x4 (ndVector& dst0, ndVector& dst1, ndVector& dst2, ndVector& dst3, const ndVector& src0, const ndVector& src1, const ndVector& src2, const ndVector& src3)

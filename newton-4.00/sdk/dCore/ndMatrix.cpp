@@ -52,10 +52,6 @@ ndMatrix::ndMatrix (const ndQuaternion &quat, const ndVector &position)
 	m_right = ndVector (xz + yw, yz - xw, ndFloat32(1.0f) - x2 - y2, ndFloat32(0.0f));
 
 	m_posit = position;
-	//m_posit.m_x = position.m_x;
-	//m_posit.m_y = position.m_y;
-	//m_posit.m_z = position.m_z;
-	//m_posit.m_w = ndFloat32(1.0f);
 }
 
 ndMatrix::ndMatrix (const ndMatrix& transformMatrix, const ndVector& scale, const ndMatrix& stretchAxis)

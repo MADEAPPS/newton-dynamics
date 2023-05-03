@@ -189,7 +189,13 @@ inline ndVector ndMatrix::RotateVector (const ndVector &v) const
 
 inline ndVector ndMatrix::UnrotateVector (const ndVector &v) const
 {
+#if 1
 	return ndVector ((m_front * v).AddHorizontal().GetScalar(), (m_up * v).AddHorizontal().GetScalar(), (m_right * v).AddHorizontal().GetScalar(), ndFloat32 (0.0f));
+#else
+	//ndVector xxx0((m_front * v).AddHorizontal().GetScalar(), (m_up * v).AddHorizontal().GetScalar(), (m_right * v).AddHorizontal().GetScalar(), ndFloat32(0.0f));
+	//ndVector xxx1(v.OptimizedVertcoRotate(m_front, m_up, m_right));
+	return v.OptimizedVectorUnrotate(m_front, m_up, m_right);
+#endif
 }
 
 inline ndVector ndMatrix::TransformVector (const ndVector &v) const
@@ -217,10 +223,9 @@ inline ndPlane ndMatrix::UntransformPlane (const ndPlane &globalPlane) const
 	return ndPlane (UnrotateVector (globalPlane), globalPlane.Evalue(m_posit));
 }
 
-
 inline ndMatrix ndMatrix::Inverse() const
 {
-	ndTrace(("funtion: %s deprecated, use ndMatrix::OrthoInverse instead", __FUNCTION__));
+	ndTrace(("funtion: %s deprecated, please use ndMatrix::OrthoInverse instead", __FUNCTION__));
 	ndAssert(0);
 	return OrthoInverse();
 }
