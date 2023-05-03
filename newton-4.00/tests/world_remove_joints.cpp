@@ -58,17 +58,16 @@ TEST(RemoveJoints, CreateWorld)
 	ndBodyKinematic::ndJointList jl = bodies[1]->GetJointList();
 	ndBodyKinematic::ndJointList::ndNode* jln = jl.GetFirst();
 
-	std::cout << "Joint to remove: " + std::to_string((long long)jln);
+	std::cout << "Joint to remove: " + std::to_string((long long)jln) + "\n";
 	world->RemoveJoint(jln->GetInfo());
 	jln = jln->GetNext();
 
-	std::cout << "Next Joint from removed: " + std::to_string((long long)jln);
-
+	std::cout << "Next Joint from removed: " + std::to_string((long long)jln) + "\n";
+	std::cout << "\n";
 	jl = bodies[1]->GetJointList();
 	jln = jl.GetFirst();
 
-
-	std::cout << "First Joint after remove: " + std::to_string((long long)jln);
-
+	std::cout << "First Joint after remove: " + std::to_string((long long)jln) + "\n";
+	std::cout << "\n";
 	world->CleanUp();
 }
