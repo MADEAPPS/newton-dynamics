@@ -55,7 +55,8 @@ TEST(RemoveJoints, CreateWorld)
 
 	std::cout << "started";
 
-	ndBodyKinematic::ndJointList jl = bodies[1]->GetJointList();
+	// do not make a list instance, instead get the reference 
+	const ndBodyKinematic::ndJointList& jl = bodies[1]->GetJointList();
 	ndBodyKinematic::ndJointList::ndNode* jln = jl.GetFirst();
 
 	std::cout << "Joint to remove: " + std::to_string((long long)jln) + "\n";
@@ -63,11 +64,23 @@ TEST(RemoveJoints, CreateWorld)
 	jln = jln->GetNext();
 
 	std::cout << "Next Joint from removed: " + std::to_string((long long)jln) + "\n";
-	std::cout << "\n";
-	jl = bodies[1]->GetJointList();
+	// not need to get the list again
+	//jl = bodies[1]->GetJointList();
 	jln = jl.GetFirst();
 
 	std::cout << "First Joint after remove: " + std::to_string((long long)jln) + "\n";
+	std::cout << "Joints in body before tick: " + std::to_string(jl.GetCount()) + "\n";
+
+	// after an update dead object should be removed for the deleted batches.
+	world->Update(0.02);
+
 	std::cout << "\n";
+	// again, not need to get the list again
+	//jl = bodies[1]->GetJointList();
+	jln = jl.GetFirst();
+	std::cout << "First Joint after remove afte next tick: " + std::to_string((long long)jln) + "\n";
+	std::cout << "Joints in body after tick: " + std::to_string(jl.GetCount()) + "\n";
+
 	world->CleanUp();
+	delete world;
 }
