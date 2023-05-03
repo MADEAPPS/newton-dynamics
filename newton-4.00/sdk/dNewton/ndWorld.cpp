@@ -428,30 +428,8 @@ void ndWorld::ThreadFunction()
 {
 	D_TRACKTIME();
 	ndUnsigned64 timeAcc = ndGetTimeInMicroseconds();
-	m_inUpdate = true;
-	m_scene->Begin();
 
-	m_scene->SetTimestep(m_timestep);
-
-	PreUpdate(m_timestep);
-
-	ndInt32 const steps = m_subSteps;
-	ndFloat32 timestep = m_timestep / (ndFloat32)steps;
-	for (ndInt32 i = 0; i < steps; ++i)
-	{
-		SubStepUpdate(timestep);
-	}
-
-	m_scene->SetTimestep(m_timestep);
-		
-	ParticleUpdate(m_timestep);
-		
-	UpdateTransforms();
-	PostModelTransform();
-	PostUpdate(m_timestep);
-
-	m_inUpdate = false;
-
+	// clean up all batched deletd objects, before update
 	while (m_deletedModels.GetCount())
 	{
 		ndAssert(0);
@@ -494,9 +472,32 @@ void ndWorld::ThreadFunction()
 		m_deletedBodies.Remove(m_deletedBodies.GetFirst());
 
 		body->m_deletedNode = nullptr;
-		ndSharedPtr<ndBody> sharedBody (GetBody(body));
+		ndSharedPtr<ndBody> sharedBody(GetBody(body));
 		RemoveBody(sharedBody);
 	}
+
+	m_inUpdate = true;
+	m_scene->Begin();
+
+	m_scene->SetTimestep(m_timestep);
+
+	PreUpdate(m_timestep);
+
+	ndInt32 const steps = m_subSteps;
+	ndFloat32 timestep = m_timestep / (ndFloat32)steps;
+	for (ndInt32 i = 0; i < steps; ++i)
+	{
+		SubStepUpdate(timestep);
+	}
+
+	m_scene->SetTimestep(m_timestep);
+		
+	ParticleUpdate(m_timestep);
+		
+	UpdateTransforms();
+	PostModelTransform();
+	PostUpdate(m_timestep);
+	m_inUpdate = false;
 
 	m_scene->End();
 	

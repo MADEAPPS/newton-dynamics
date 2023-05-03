@@ -38,19 +38,12 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 include(GoogleTest)
 
+file(GLOB CPP_SOURCE *.cpp)
+
 # ----------------------------------------------------------------------
 # Compile the test cases into a single binary.
 # ----------------------------------------------------------------------
-add_executable(
-  ${PROJECT_NAME}
-  world_test.cpp
-  phantom_test.cpp
-  rigidBody_test.cpp
-  staticBody_test.cpp
-  instancing_test.cpp
-  raycast_filter_test.cpp
-  bodyNotifyCallback_test.cpp
-)
+add_executable(${PROJECT_NAME} ${CPP_SOURCE})
 
 target_link_libraries(${PROJECT_NAME} GTest::gtest_main)
 target_link_libraries(${PROJECT_NAME} ndNewton ndSolverAvx2)
