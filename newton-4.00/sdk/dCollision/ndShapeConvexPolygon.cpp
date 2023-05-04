@@ -652,7 +652,8 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShape
 		if (inside & !contactSolver.m_intersectionTestOnly) 
 		{
 			const ndMatrix& matrixInstance0 = contactSolver.m_instance0.m_globalMatrix;
-			const ndVector normalInHull(matrixInstance0.UnrotateVector(m_normal.Scale(ndFloat32(-1.0f))));
+			//const ndVector normalInHull(matrixInstance0.UnrotateVector(m_normal.Scale(ndFloat32(-1.0f))));
+			const ndVector normalInHull(matrixInstance0.UnrotateVector(m_normal * ndVector::m_negOne));
 			ndVector pointInHull(contactSolver.m_instance0.SupportVertex(normalInHull));
 			const ndVector p0(matrixInstance0.TransformVector(pointInHull));
 	

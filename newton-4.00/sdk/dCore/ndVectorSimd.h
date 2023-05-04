@@ -932,11 +932,21 @@ class ndBigVector
 
 	inline ndBigVector OptimizedVectorUnrotate(const ndBigVector& front, const ndBigVector& up, const ndBigVector& right) const
 	{
+#if 1
+		__m128d tmp0(_mm_add_pd(_mm_mul_pd(m_typeLow, front.m_typeLow), _mm_mul_pd(m_typeHigh, front.m_typeHigh)));
+		__m128d tmp1(_mm_add_pd(_mm_mul_pd(m_typeLow, up.m_typeLow), _mm_mul_pd(m_typeHigh, up.m_typeHigh)));
+		__m128d tmp2(_mm_add_pd(_mm_mul_pd(m_typeLow, right.m_typeLow), _mm_mul_pd(m_typeHigh, right.m_typeHigh)));
+
+		__m128d tmp3(_mm_add_pd(_mm_unpacklo_pd(tmp0, tmp1), _mm_unpackhi_pd(tmp0, tmp1)));
+		__m128d tmp4(_mm_unpackhi_pd (_mm_add_pd(tmp2, _mm_unpacklo_pd(tmp2, tmp2)), right.m_typeHigh));
+		return ndBigVector(tmp3, tmp4);
+#else
 		return ndBigVector(
 			m_x * front.m_x + m_y * front.m_y + m_z * front.m_z,
 			m_x * up.m_x + m_y * up.m_y + m_z * up.m_z,
 			m_x * right.m_x + m_y * right.m_y + m_z * right.m_z,
 			ndFloat64(0.0f));
+#endif
 	}
 
 	inline static void Transpose4x4(ndBigVector& dst0, ndBigVector& dst1, ndBigVector& dst2, ndBigVector& dst3,
