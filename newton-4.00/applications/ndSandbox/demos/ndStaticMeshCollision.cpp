@@ -22,6 +22,7 @@
 #include "ndBasicPlayerCapsule.h"
 #include "ndHeightFieldPrimitive.h"
 
+#if 0
 void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
 	ndMatrix heighfieldLocation (ndGetIdentityMatrix());
@@ -106,3 +107,79 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	//}
 	//xxxxLoad.AddToWorld(scene->GetWorld());
 }
+#else
+
+
+static void BuildHeightField(ndDemoEntityManager* const scene)
+{
+	size_t iDim = 64;
+	ndFloat32 dSize = 128, dMaxHeight = 0.5;
+	std::vector<ndFloat32> aData; aData.resize(iDim * iDim);
+	ndFloat32 fHorizontalScale = ndFloat32(128.0 / ndFloat32(iDim - 1));
+	ndShapeInstance shape(new ndShapeHeightfield(ndInt32 (iDim), ndInt32(iDim), ndShapeHeightfield::m_normalDiagonals, fHorizontalScale, fHorizontalScale));
+	ndMatrix mLocal(ndGetIdentityMatrix());
+	mLocal.m_posit = ndVector(-(dSize * 0.5), 0.0, -(dSize * 0.5), 1.0);
+	shape.SetLocalMatrix(mLocal);
+	auto pShapeHeightField = shape.GetShape()->GetAsShapeHeightfield();
+
+	for (int i = 0; i < ndInt32(iDim * iDim); ++i)
+		pShapeHeightField->GetElevationMap()[i] = ndFloat32(rand()) * ndFloat32 (2.0) * dMaxHeight / RAND_MAX;
+
+	pShapeHeightField->UpdateElevationMapAabb();
+	ndMatrix uvMatrix(ndGetIdentityMatrix());
+	uvMatrix[0][0] *= 0.025f;
+	uvMatrix[1][1] *= 0.025f;
+	uvMatrix[2][2] *= 0.025f;
+
+	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &shape, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix, false));
+	ndMatrix location(ndGetIdentityMatrix());
+	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
+	entity->SetMesh(geometry);
+
+	ndBodyKinematic* const body = new ndBodyDynamic();
+	body->SetMatrix(location);
+	body->SetCollisionShape(shape);
+	ndSharedPtr<ndBody> bodyPtr(body);
+	scene->GetWorld()->AddBody(bodyPtr);
+	scene->AddEntity(entity);
+}
+
+static void AddBodies(ndDemoEntityManager* const scene)
+{
+	const int NUM_BOXES_ROWS = 10;
+	const int NUM_BOXES_COLS = 10;
+	ndFloat32 dUsableSpace = 128;
+	ndFloat32 dSpacing_x = dUsableSpace / (NUM_BOXES_COLS + 1);
+	ndFloat32 dSpacing_z = dUsableSpace / (NUM_BOXES_ROWS + 1);
+	ndFloat32 dStart = -dUsableSpace * 0.5f;
+	ndVector vStart(dStart, 10.0f, dStart, 1.0f);
+	ndMatrix location(ndGetIdentityMatrix());
+	ndMatrix uvMatrix(ndGetIdentityMatrix());
+	uvMatrix[0][0] *= 0.025f;
+	uvMatrix[1][1] *= 0.025f;
+	uvMatrix[2][2] *= 0.025f;
+
+	for (int i = 0; i < NUM_BOXES_ROWS; ++i)
+	{
+		for (int j = 0; j < NUM_BOXES_COLS; ++j)
+		{
+			ndFloat32 dOffset_x = dSpacing_x * ndFloat32(j + 1);
+			ndFloat32 dOffset_z = dSpacing_z * ndFloat32(i + 1);
+			location.m_posit = vStart + ndVector(dOffset_x, ndFloat32(0.0), dOffset_z, ndFloat32(0.0));
+			AddBox(scene, location, 1.0f, 1.0f, 1.0f, 1.0f);
+		}
+	}
+}
+
+//void ndHeightFieldTest(ndDemoEntityManager* const scene)
+void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene)
+{
+	// build the height field
+	BuildHeightField(scene);
+	AddBodies(scene);
+
+	ndQuaternion rot;
+	ndVector origin(0.0f, 5.0f, 0.0f, 1.0f);
+	scene->SetCameraMatrix(rot, origin);
+}
+#endif
