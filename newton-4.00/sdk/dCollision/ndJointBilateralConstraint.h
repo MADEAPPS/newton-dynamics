@@ -55,14 +55,6 @@ class ndJointBilateralConstraint : public ndConstraint
 {
 	public:
 	D_BASE_CLASS_REFLECTION(ndJointBilateralConstraint);
-	//class ndJointList : public ndList<ndSharedPtr<ndJointBilateralConstraint>, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>
-	//{
-	//	public:
-	//	ndJointList()
-	//		:ndList<ndSharedPtr<ndJointBilateralConstraint>, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>()
-	//	{
-	//	}
-	//};
 
 	class ndIkInterface
 	{

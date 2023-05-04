@@ -376,6 +376,7 @@ void ndWorld::AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 	// if the second body is nullPtr, replace it the sentinel
 	ndAssert(joint->m_body0);
 	ndAssert(joint->m_body1);
+	ndAssert(joint->IsActive());
 	if (joint->m_worldNode == nullptr)
 	{
 		ndAssert(joint->m_body0Node == nullptr);
@@ -1129,6 +1130,8 @@ void ndWorld::RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 				skeleton->Clear();
 			}
 		}
+
+		joint->SetActive(true);
 		joint->m_worldNode = nullptr;
 		joint->m_body0Node = nullptr;
 		joint->m_body1Node = nullptr;
@@ -1153,6 +1156,7 @@ void ndWorld::RemoveJoint(ndJointBilateralConstraint* const joint)
 	{
 		if (joint->m_worldNode)
 		{
+			joint->SetActive(false);
 			joint->m_deletedNode = m_deletedJoints.Append(joint);
 		}
 	}

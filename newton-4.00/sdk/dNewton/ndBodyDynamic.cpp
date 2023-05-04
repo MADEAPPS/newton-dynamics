@@ -364,7 +364,12 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 		ndAssert((!m_isConstrained && !m_weigh) || (m_isConstrained && m_weigh));
 
 		#ifdef _DEBUG
-		ndInt32 checkConnection = m_jointList.GetCount();
+		ndInt32 checkConnection = 0;
+		for (ndJointList::ndNode* node = m_jointList.GetFirst(); node; node = node->GetNext())
+		{
+			checkConnection += node->GetInfo()->IsActive() ? 1 : 0;
+		}
+
 		ndContactMap::Iterator it(m_contactList);
 		for (it.Begin(); it; it++)
 		{

@@ -44,9 +44,9 @@ TEST(RemoveJoints, CreateWorld)
 	ndSharedPtr<ndBody> bp2(bodies[2]);
 	world->AddBody(bp2);
 
-	ndJointFixDistance* joint = new ndJointFixDistance(bodies[0]->GetMatrix().m_posit, bodies[1]->GetMatrix().m_posit, bodies[0], bodies[1]);
-	ndSharedPtr<ndJointBilateralConstraint> jp(joint);
-	world->AddJoint(jp);
+	ndJointFixDistance* joint0 = new ndJointFixDistance(bodies[0]->GetMatrix().m_posit, bodies[1]->GetMatrix().m_posit, bodies[0], bodies[1]);
+	ndSharedPtr<ndJointBilateralConstraint> jp0(joint0);
+	world->AddJoint(jp0);
 	ndJointFixDistance* joint1 = new ndJointFixDistance(bodies[1]->GetMatrix().m_posit, bodies[2]->GetMatrix().m_posit, bodies[1], bodies[2]);
 	ndSharedPtr<ndJointBilateralConstraint> jp1(joint1);
 	world->AddJoint(jp1);
@@ -64,8 +64,6 @@ TEST(RemoveJoints, CreateWorld)
 	jln = jln->GetNext();
 
 	std::cout << "Next Joint from removed: " + std::to_string((long long)jln) + "\n";
-	// not need to get the list again
-	//jl = bodies[1]->GetJointList();
 	jln = jl.GetFirst();
 
 	std::cout << "First Joint after remove: " + std::to_string((long long)jln) + "\n";
@@ -75,8 +73,6 @@ TEST(RemoveJoints, CreateWorld)
 	world->Update(0.02);
 
 	std::cout << "\n";
-	// again, not need to get the list again
-	//jl = bodies[1]->GetJointList();
 	jln = jl.GetFirst();
 	std::cout << "First Joint after remove afte next tick: " + std::to_string((long long)jln) + "\n";
 	std::cout << "Joints in body after tick: " + std::to_string(jl.GetCount()) + "\n";
