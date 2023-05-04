@@ -322,8 +322,8 @@ void ndShapeConvexPolygon::GenerateConvexCap(const ndShapeInstance* const parent
 		const ndVector adjacentNormal(CalculateGlobalNormal(parentMesh, localAdjacentNormal & ndVector::m_triplexMask));
 
 		//TODO: 
-		//this could be a big problem, the edge share by tow face sould ne perpendicular to the two normal
-		//and it is not, I need to debug this. with a repro, but for now just ignore it.
+		//this could be a big problem, the edge share by two faces should be perpendicular to the two normal
+		//and it is not, I need to debug this with a repro, but for now just ignore it.
 		//ndAssert(edge.DotProduct(adjacentNormal).GetScalar() < ndFloat32(5.0e-2f));
 		ndAssert(edge.DotProduct(adjacentNormal).GetScalar() < ndFloat32(2.0e-1f));
 
