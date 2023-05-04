@@ -245,8 +245,6 @@ class ndVector
 	// return 4d dot product
 	inline ndVector DotProduct(const ndVector& A) const
 	{
-		//const ndVector tmp(_mm_mul_ps(m_type, A.m_type));
-		//return tmp.AddHorizontal();
 		return (*this * A).AddHorizontal();
 	}
 
@@ -555,7 +553,6 @@ class ndVector
 } D_GCC_NEWTON_ALIGN_16 ;
 #endif
 
-
 // *****************************************************************************************
 //
 // 4 x 1 double precision SSE2 vector class declaration
@@ -685,7 +682,6 @@ class ndBigVector
 
 	inline ndFloat64 GetScalar() const
 	{
-		//return m_x;
 		return _mm_cvtsd_f64(m_typeLow);
 	}
 
@@ -932,6 +928,15 @@ class ndBigVector
 	inline ndBigVector TestZero() const
 	{
 		return m_negOne & (*this == m_zero);
+	}
+
+	inline ndBigVector OptimizedVectorUnrotate(const ndBigVector& front, const ndBigVector& up, const ndBigVector& right) const
+	{
+		return ndBigVector(
+			m_x * front.m_x + m_y * front.m_y + m_z * front.m_z,
+			m_x * up.m_x + m_y * up.m_y + m_z * up.m_z,
+			m_x * right.m_x + m_y * right.m_y + m_z * right.m_z,
+			ndFloat64(0.0f));
 	}
 
 	inline static void Transpose4x4(ndBigVector& dst0, ndBigVector& dst1, ndBigVector& dst2, ndBigVector& dst3,

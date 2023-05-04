@@ -123,7 +123,7 @@ static void BuildHeightField(ndDemoEntityManager* const scene)
 	auto pShapeHeightField = shape.GetShape()->GetAsShapeHeightfield();
 
 	for (int i = 0; i < ndInt32(iDim * iDim); ++i)
-		pShapeHeightField->GetElevationMap()[i] = ndFloat32(rand()) * ndFloat32 (2.0) * dMaxHeight / RAND_MAX;
+		pShapeHeightField->GetElevationMap()[i] = ndReal(ndFloat32(rand()) * ndFloat32 (2.0) * dMaxHeight / RAND_MAX);
 
 	pShapeHeightField->UpdateElevationMapAabb();
 	ndMatrix uvMatrix(ndGetIdentityMatrix());

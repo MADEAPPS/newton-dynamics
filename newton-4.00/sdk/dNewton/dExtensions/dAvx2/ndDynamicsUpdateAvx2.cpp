@@ -57,11 +57,13 @@
 		{
 		}
 
-		#ifdef D_USE_VECTOR_AVX
+		#ifdef D_SCALAR_VECTOR_CLASS
 			inline ndAvxFloat(const ndVector& low, const ndVector& high)
-				:m_low(low.m_type)
-				,m_high(high.m_type)
+				//:m_low(low.m_type)
+				//,m_high(high.m_type)
 			{
+				m_vector8.m_linear = low;
+				m_vector8.m_angular = high;
 			}
 		#else
 			inline ndAvxFloat(const ndVector& low, const ndVector& high)

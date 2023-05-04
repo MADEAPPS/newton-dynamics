@@ -189,11 +189,9 @@ inline ndVector ndMatrix::RotateVector (const ndVector &v) const
 
 inline ndVector ndMatrix::UnrotateVector (const ndVector &v) const
 {
-#if 1
+#if 0
 	return ndVector ((m_front * v).AddHorizontal().GetScalar(), (m_up * v).AddHorizontal().GetScalar(), (m_right * v).AddHorizontal().GetScalar(), ndFloat32 (0.0f));
 #else
-	//ndVector xxx0((m_front * v).AddHorizontal().GetScalar(), (m_up * v).AddHorizontal().GetScalar(), (m_right * v).AddHorizontal().GetScalar(), ndFloat32(0.0f));
-	//ndVector xxx1(v.OptimizedVertcoRotate(m_front, m_up, m_right));
 	return v.OptimizedVectorUnrotate(m_front, m_up, m_right);
 #endif
 }

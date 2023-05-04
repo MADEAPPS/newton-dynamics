@@ -105,6 +105,7 @@
 
 #if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 	#include <immintrin.h>
+	#define D_USE_SSE3
 #endif
 
 #if defined(__arm__) && defined(__aarch64__) 
