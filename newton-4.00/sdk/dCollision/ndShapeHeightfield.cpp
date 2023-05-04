@@ -707,7 +707,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 
 		if (data->m_doContinueCollisionTest) 
 		{
-			ndAssert(0);
+			//ndAssert(0);
 			ndInt32* const indices = &quadDataArray[0];
 			ndFastRay ray(ndVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
 			for (ndInt32 i = 0; i < quadCount * 2; ++i)
