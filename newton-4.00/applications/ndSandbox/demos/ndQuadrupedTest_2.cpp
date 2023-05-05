@@ -516,6 +516,6 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 
-	ndFileFormatSave xxxx;
-	xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
+	//ndFileFormatSave xxxx;
+	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 }

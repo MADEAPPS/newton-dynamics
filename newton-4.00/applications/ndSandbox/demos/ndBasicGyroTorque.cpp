@@ -222,12 +222,10 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	
 	scene->GetCameraManager()->SetPickMode(true);
 
-
-	ndFileFormatSave xxxx;
-	//xxxx.SaveBodies(scene->GetWorld(), "xxxx.nd");
-	xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
-
-	ndQuaternion rot;
-	ndVector origin(-15.0f, 5.0f, 0.0f, 1.0f);
-	scene->SetCameraMatrix(rot, origin);
+	//ndFileFormatSave xxxx;
+	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
+	//
+	//ndQuaternion rot;
+	//ndVector origin(-15.0f, 5.0f, 0.0f, 1.0f);
+	//scene->SetCameraMatrix(rot, origin);
 }
