@@ -166,8 +166,11 @@ static void AddBodies(ndDemoEntityManager* const scene)
 			ndFloat32 dOffset_x = dSpacing_x * ndFloat32(j + 1);
 			ndFloat32 dOffset_z = dSpacing_z * ndFloat32(i + 1);
 			location.m_posit = vStart + ndVector(dOffset_x, ndFloat32(0.0), dOffset_z, ndFloat32(0.0));
-			ndBodyKinematic* const body = AddBox(scene, location, 1.0f, 1.0f, 1.0f, 1.0f);
-			body->SetMatrix(location);
+			if (j == 6 && i == 5)
+			{
+				ndBodyKinematic* const body = AddBox(scene, location, 1.0f, 1.0f, 1.0f, 1.0f);
+				body->SetMatrix(location);
+			}
 		}
 	}
 }
