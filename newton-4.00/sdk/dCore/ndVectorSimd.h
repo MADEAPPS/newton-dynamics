@@ -830,14 +830,69 @@ class ndBigVector
 		return ndBigVector(_mm_min_pd(m_typeLow, data.m_typeLow), _mm_min_pd(m_typeHigh, data.m_typeHigh));
 	}
 
+	inline ndBigVector Floor() const
+	{
+		return ndBigVector(floor(m_x), floor(m_y), floor(m_z), floor(m_w));
+	}
+
 	inline ndBigVector GetInt() const
 	{
+#if 1
 		ndBigVector temp(Floor());
 		ndInt64 x = _mm_cvtsd_si32(temp.m_typeLow);
 		ndInt64 y = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeLow, temp.m_typeLow, PERMUT_MASK_DOUBLE(1, 1)));
 		ndInt64 z = _mm_cvtsd_si32(temp.m_typeHigh);
 		ndInt64 w = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeHigh, temp.m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
 		return ndBigVector(_mm_set_epi64x(y, x), _mm_set_epi64x(w, z));
+#else
+
+		//ndBigVector temp(Floor());
+		ndInt64 x = _mm_cvtsd_si64(m_typeLow);
+		ndInt64 y = _mm_cvtsd_si64(_mm_unpackhi_pd(m_typeLow, m_typeLow));
+		ndInt64 z = _mm_cvtsd_si64(m_typeHigh);
+		ndInt64 w = _mm_cvtsd_si64(_mm_unpackhi_pd(m_typeHigh, m_typeHigh));
+		//ndBigVector truncate (_mm_set_epi64x(y, x), _mm_set_epi64x(w, z));
+		//ndBigVector mask (ndVector::m_one & (*this < truncate)));
+
+		//__m128d xy(_mm_unpacklo_pd(_mm_cvtsi64_sd(temp.m_typeLow, x), _mm_cvtsi64_sd(temp.m_typeLow, y)));
+		//__m128d zw(_mm_unpacklo_pd(_mm_cvtsi64_sd(temp.m_typeLow, z), _mm_cvtsi64_sd(temp.m_typeLow, w)));
+		//__m128i xy(_mm_unpacklo_pd(_mm_cvtsi64x_si128 (x), _mm_cvtsi64_sd(temp.m_typeLow, y)));
+
+		__m128i xy(_mm_set_epi64x(y, x));
+		__m128i zw(_mm_set_epi64x(w, z));
+		
+
+		//__m128i round_xy(__m128i (_mm_cmplt_pd(_mm_cvtepi32_ps(xy, m_typeLow)));
+		//__m128d round_xy(_mm_cmplt_pd(xy, m_typeLow));
+		//__m128d round_zw(_mm_cmplt_pd(xy, m_typeHigh));
+		
+		//return ndBigVector(_mm_set_epi64x(y, x), _mm_set_epi64x(w, z));
+
+		//ndBigVector temp(Floor());
+		//ndInt64 x_ = _mm_cvtsd_si32(temp.m_typeLow);
+		//ndInt64 y_ = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeLow, temp.m_typeLow, PERMUT_MASK_DOUBLE(1, 1)));
+		//ndInt64 z_ = _mm_cvtsd_si32(temp.m_typeHigh);
+		//ndInt64 w_ = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeHigh, temp.m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
+		//ndBigVector xxxxx (_mm_set_epi64x(y_, x_), _mm_set_epi64x(w_, z_));
+		//
+		//ndInt64 x = _mm_cvtsd_si64(temp.m_typeLow);
+		//ndInt64 y = _mm_cvtsd_si64(_mm_unpackhi_pd(temp.m_typeLow, temp.m_typeLow));
+		//ndInt64 z = _mm_cvtsd_si64(temp.m_typeHigh);
+		//ndInt64 w = _mm_cvtsd_si64(_mm_unpackhi_pd(temp.m_typeHigh, temp.m_typeHigh));
+		//ndBigVector xxxxx1(_mm_set_epi64x(y, x), _mm_set_epi64x(w, z));
+		//
+		//ndVector ret(truncated - (ndVector::m_one & (*this < truncated)));
+		//ndAssert(ret.m_f[0] == ndFloor(m_f[0]));
+		//ndAssert(ret.m_f[1] == ndFloor(m_f[1]));
+		//ndAssert(ret.m_f[2] == ndFloor(m_f[2]));
+		//ndAssert(ret.m_f[3] == ndFloor(m_f[3]));
+		//
+		//return xxxxx1;
+		//__m128i xy(_mm_set_epi64x(y, x));
+		//__m128i zw(_mm_set_epi64x(y, x));
+		return ndBigVector(xy, zw);
+
+#endif
 	}
 
 	// relational operators
@@ -918,11 +973,6 @@ class ndBigVector
 	inline ndInt32 GetSignMask() const
 	{
 		return _mm_movemask_pd(m_typeLow) | (_mm_movemask_pd(m_typeHigh) << 2);
-	}
-
-	inline ndBigVector Floor() const
-	{
-		return ndBigVector(floor(m_x), floor(m_y), floor(m_z), floor(m_w));
 	}
 
 	inline ndBigVector TestZero() const
