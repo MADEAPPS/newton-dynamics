@@ -4125,6 +4125,12 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDe
 	ndContact* const contactJoint = m_contact;
 	const ndInt32* const indexArray = &query.m_faceVertexIndex[0];
 
+static int xxxx;
+ndTrace(("%d\n", xxxx));
+if (xxxx > 270)
+xxxx *= 1;
+xxxx++;
+
 	data.SortFaceArray();
 	for (ndInt32 i = query.m_faceIndexCount.GetCount() - 1; (i >= 0) && (count < 32); --i)
 	{
