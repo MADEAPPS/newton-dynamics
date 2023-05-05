@@ -3931,8 +3931,6 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDe
 	ndFloat32 savedTimestep = m_timestep;
 	ndFloat32 epsilon = ndFloat32(-1.0e-3f) * m_timestep;
 
-	//for (ndInt32 i = 0; (i < meshQuery.m_faceCount) && (m_timestep >= (data.m_hitDistance[i] * savedTimestep)); ++i)
-	//for (ndInt32 i = query.m_faceIndexCount.GetCount() - 1; (i >= 0) && (count < 32); --i)
 	for (ndInt32 i = 0; (i < query.m_faceIndexCount.GetCount()) && (m_timestep >= (query.m_hitDistance[i] * savedTimestep)); ++i)
 	{
 		ndInt32 address = query.m_faceIndexStart[i];
@@ -3974,11 +3972,9 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDe
 			if (count >= maxReduceLimit)
 			{
 				m_contactBuffer = contactOut;
-				//count = PruneContacts(count, contactOut, ndFloat32(1.0e-2f), 16);
 				count = PruneContacts(count, 16);
 				countleft = maxContacts - count;
 				ndAssert(countleft >= 0);
-				//proxy.m_maxContacts = countleft;
 			}
 		}
 
@@ -4013,7 +4009,6 @@ ndInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 	ndAssert(m_instance1.GetShape()->GetAsShapeStaticMesh());
 
 	ndInt32 count = 0;
-	//ndPolygonMeshDesc data(*this, true);
 	ndPolygonMeshLocalDesc data(*this, true);
 
 	ndVector relVeloc(m_contact->m_body0->GetVelocity() - m_contact->m_body1->GetVelocity());

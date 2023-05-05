@@ -857,65 +857,10 @@ class ndBigVector
 #endif
 	}
 
-	//inline ndBigVector GetInt_0() const
-	//{
-	//	ndBigVector temp(Floor());
-	//	ndInt64 x = _mm_cvtsd_si64(temp.m_typeLow);
-	//	ndInt64 y = _mm_cvtsd_si64(_mm_unpackhi_pd(temp.m_typeLow, temp.m_typeLow));
-	//	ndInt64 z = _mm_cvtsd_si64(temp.m_typeHigh);
-	//	ndInt64 w = _mm_cvtsd_si64(_mm_unpackhi_pd(temp.m_typeHigh, temp.m_typeHigh));
-	//	return ndBigVector(_mm_set_epi64x(y, x), _mm_set_epi64x(w, z));
-	//}
-	//inline ndBigVector GetInt_1() const
-	//{
-	//	ndBigVector temp(Floor());
-	//	ndInt64 x = _mm_cvtsd_si64(temp.m_typeLow);
-	//	ndInt64 y = _mm_cvtsd_si64(_mm_unpackhi_pd(temp.m_typeLow, temp.m_typeLow));
-	//	ndInt64 z = _mm_cvtsd_si64(temp.m_typeHigh);
-	//	ndInt64 w = _mm_cvtsd_si64(_mm_unpackhi_pd(temp.m_typeHigh, temp.m_typeHigh));
-	//	return ndBigVector(_mm_set_epi64x(y, x), _mm_set_epi64x(w, z));
-	//}
-	//inline ndBigVector GetInt_2() const
-	//{
-	//	ndInt64 x = _mm_cvtsd_si64(m_typeLow);
-	//	ndInt64 y = _mm_cvtsd_si64(_mm_unpackhi_pd(m_typeLow, m_typeLow));
-	//	ndInt64 z = _mm_cvtsd_si64(m_typeHigh);
-	//	ndInt64 w = _mm_cvtsd_si64(_mm_unpackhi_pd(m_typeHigh, m_typeHigh));
-	//
-	//	__m128i xy(_mm_set_epi64x(y, x));
-	//	__m128i zw(_mm_set_epi64x(w, z));
-	//
-	//	__m128d xy_f(_mm_unpacklo_pd(_mm_cvtsi64_sd(m_typeHigh, x), _mm_cvtsi64_sd(m_typeHigh, y)));
-	//	__m128d zw_f(_mm_unpacklo_pd(_mm_cvtsi64_sd(m_typeHigh, z), _mm_cvtsi64_sd(m_typeHigh, w)));
-	//
-	//	__m128i xy_round(_mm_castpd_si128(_mm_cmplt_pd(m_typeLow, xy_f)));
-	//	__m128i zw_round(_mm_castpd_si128(_mm_cmplt_pd(m_typeHigh, zw_f)));
-	//
-	//	return ndBigVector(_mm_add_epi64(xy, xy_round), _mm_add_epi64(zw, zw_round));
-	//}
-
 	inline ndBigVector GetInt() const
 	{
 #if 0
-		//ndBigVector xxx0(GetInt_0());
-		//ndBigVector xxx1(GetInt_1());
-		//ndBigVector xxx2(GetInt_2());
-		//
-		//ndAssert(xxx0.m_ix == xxx1.m_ix);
-		//ndAssert(xxx0.m_iy == xxx1.m_iy);
-		//ndAssert(xxx0.m_iz == xxx1.m_iz);
-		//ndAssert(xxx0.m_iw == xxx1.m_iw);
-		//
-		//ndAssert(xxx0.m_ix == xxx2.m_ix);
-		//ndAssert(xxx0.m_iy == xxx2.m_iy);
-		//ndAssert(xxx0.m_iz == xxx2.m_iz);
-		//ndAssert(xxx0.m_iw == xxx2.m_iw);
-
 		ndBigVector temp(Floor());
-		//ndInt64 x = _mm_cvtsd_si32(temp.m_typeLow);
-		//ndInt64 y = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeLow, temp.m_typeLow, PERMUT_MASK_DOUBLE(1, 1)));
-		//ndInt64 z = _mm_cvtsd_si32(temp.m_typeHigh);
-		//ndInt64 w = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeHigh, temp.m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
 		ndInt64 x = _mm_cvtsd_si64(temp.m_typeLow);
 		ndInt64 y = _mm_cvtsd_si64(_mm_unpackhi_pd(temp.m_typeLow, temp.m_typeLow));
 		ndInt64 z = _mm_cvtsd_si64(temp.m_typeHigh);
