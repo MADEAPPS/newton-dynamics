@@ -117,13 +117,15 @@ static void BuildHeightField(ndDemoEntityManager* const scene)
 	std::vector<ndFloat32> aData; aData.resize(iDim * iDim);
 	ndFloat32 fHorizontalScale = ndFloat32(128.0 / ndFloat32(iDim - 1));
 	ndShapeInstance shape(new ndShapeHeightfield(ndInt32 (iDim), ndInt32(iDim), ndShapeHeightfield::m_normalDiagonals, fHorizontalScale, fHorizontalScale));
+	//ndShapeInstance shape(new ndShapeHeightfield(ndInt32(iDim), ndInt32(iDim), ndShapeHeightfield::m_invertedDiagonals, fHorizontalScale, fHorizontalScale));
 	ndMatrix mLocal(ndGetIdentityMatrix());
 	mLocal.m_posit = ndVector(-(dSize * 0.5), 0.0, -(dSize * 0.5), 1.0);
 	shape.SetLocalMatrix(mLocal);
 	auto pShapeHeightField = shape.GetShape()->GetAsShapeHeightfield();
-
 	for (int i = 0; i < ndInt32(iDim * iDim); ++i)
-		pShapeHeightField->GetElevationMap()[i] = ndReal(ndFloat32(rand()) * ndFloat32 (2.0) * dMaxHeight / RAND_MAX);
+	{
+		pShapeHeightField->GetElevationMap()[i] = ndReal(ndFloat32(rand()) * ndFloat32(2.0) * dMaxHeight / RAND_MAX);
+	}
 
 	pShapeHeightField->UpdateElevationMapAabb();
 	ndMatrix uvMatrix(ndGetIdentityMatrix());
@@ -166,11 +168,8 @@ static void AddBodies(ndDemoEntityManager* const scene)
 			ndFloat32 dOffset_x = dSpacing_x * ndFloat32(j + 1);
 			ndFloat32 dOffset_z = dSpacing_z * ndFloat32(i + 1);
 			location.m_posit = vStart + ndVector(dOffset_x, ndFloat32(0.0), dOffset_z, ndFloat32(0.0));
-			if (j == 0 && i == 2)
-			{
-				ndBodyKinematic* const body = AddBox(scene, location, 1.0f, 1.0f, 1.0f, 1.0f);
-				body->SetMatrix(location);
-			}
+			ndBodyKinematic* const body = AddBox(scene, location, 1.0f, 1.0f, 1.0f, 1.0f);
+			body->SetMatrix(location);
 		}
 	}
 }

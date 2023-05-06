@@ -426,7 +426,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
-	m_autoSleepMode = false;
+	//m_autoSleepMode = false;
 	//m_solverMode = ndWorld::ndCudaSolver;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
 	//m_solverMode = ndWorld::ndSyclSolverCpu;
@@ -438,12 +438,12 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
 	//m_showNormalForces = true;
-	m_showContactPoints = true;
+	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
 	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
-	m_collisionDisplayMode = 3;		// solid wire frame
+	//m_collisionDisplayMode = 3;		// solid wire frame
 	m_synchronousPhysicsUpdate = true;
 	m_synchronousParticlesUpdate = true;
 
