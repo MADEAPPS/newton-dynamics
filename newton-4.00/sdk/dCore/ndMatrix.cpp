@@ -148,8 +148,8 @@ void ndMatrix::TransformBBox (const ndVector& p0local, const ndVector& p1local, 
 	ndVector size ((p1local - p0local) * ndVector::m_half);
 	ndVector center (TransformVector ((p1local + p0local) * ndVector::m_half));
 	ndVector extends (size.m_x * ndAbs(matrix[0][0]) + size.m_y * ndAbs(matrix[1][0]) + size.m_z * ndAbs(matrix[2][0]),  
-					 size.m_x * ndAbs(matrix[0][1]) + size.m_y * ndAbs(matrix[1][1]) + size.m_z * ndAbs(matrix[2][1]),  
-	                 size.m_x * ndAbs(matrix[0][2]) + size.m_y * ndAbs(matrix[1][2]) + size.m_z * ndAbs(matrix[2][2]), ndFloat32 (0.0f));  
+					  size.m_x * ndAbs(matrix[0][1]) + size.m_y * ndAbs(matrix[1][1]) + size.m_z * ndAbs(matrix[2][1]),  
+	                  size.m_x * ndAbs(matrix[0][2]) + size.m_y * ndAbs(matrix[1][2]) + size.m_z * ndAbs(matrix[2][2]), ndFloat32 (0.0f));  
 
 	p0 = center - extends;
 	p1 = center + extends;
