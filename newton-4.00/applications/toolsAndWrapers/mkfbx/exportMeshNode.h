@@ -34,6 +34,7 @@ class exportMeshNode
 	static exportMeshNode* ImportBvhSkeleton(const char* const name);
 	static exportMeshNode* ImportAsfSkeleton(const char* const asfName, const char* const amcName);
 
+	static void ConvertToLocal(exportMeshNode* const root);
 	private:
 	void ImportAmcAnimation(const char* const amcName, const std::map<std::string, exportMeshNode*>& map, const std::map<std::string, animDof>& animBlueprint);
 

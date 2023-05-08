@@ -3,6 +3,55 @@
 
 #define POSITION_SCALE 6.0f
 
+void exportMeshNode::ConvertToLocal(exportMeshNode* const root)
+{
+	int stack = 1;
+	exportMeshNode* stackPool[128];
+	exportMatrix parentMatrixPool[128];
+
+	stackPool[0] = root;
+	parentMatrixPool[0] = exportMatrix();
+	while (stack)
+	{
+		stack--;
+		exportMeshNode* const bone = stackPool[stack];
+		exportMatrix pitch(ndPitchMatrix(bone->m_eulers.m_x));
+		exportMatrix yaw(ndYawMatrix(bone->m_eulers.m_y));
+		exportMatrix roll(ndRollMatrix(bone->m_eulers.m_z));
+		exportMatrix globalMatrix(pitch * yaw * roll);
+		globalMatrix.m_posit = bone->m_matrix.m_posit + parentMatrixPool[stack].m_posit;
+		globalMatrix.m_posit.m_w = 1.0f;
+		bone->m_matrix = globalMatrix;
+		for (std::list<exportMeshNode*>::const_iterator iter = bone->m_children.begin();
+			iter != bone->m_children.end(); iter++)
+		{
+			stackPool[stack] = *iter;
+			parentMatrixPool[stack] = globalMatrix;
+			stack++;
+		}
+	}
+
+	stack = 1;
+	stackPool[0] = root;
+	parentMatrixPool[0] = exportMatrix();
+	while (stack)
+	{
+		stack--;
+		exportMeshNode* const bone = stackPool[stack];
+		exportMatrix globalMatrix(bone->m_matrix);
+		exportMatrix localMatrix(globalMatrix * parentMatrixPool[stack].Inverse());
+		bone->m_eulers = localMatrix.CalcPitchYawRoll();
+		bone->m_matrix = localMatrix;
+		for (std::list<exportMeshNode*>::const_iterator iter = bone->m_children.begin();
+			iter != bone->m_children.end(); iter++)
+		{
+			stackPool[stack] = *iter;
+			parentMatrixPool[stack] = globalMatrix;
+			stack++;
+		}
+	}
+}
+
 exportMeshNode* exportMeshNode::ImportAsfSkeleton(const char* const asfName, const char* const amcName)
 {
 	FILE* const fp = fopen(asfName, "rt");
@@ -182,6 +231,7 @@ exportMeshNode* exportMeshNode::ImportAsfSkeleton(const char* const asfName, con
 		}
 		fclose(fp);
 
+#if 0
 		int stack = 1;
 		exportMeshNode* stackPool[128];
 		exportMatrix parentMatrixPool[128];
@@ -206,7 +256,7 @@ exportMeshNode* exportMeshNode::ImportAsfSkeleton(const char* const asfName, con
 				stack++;
 			}
 		}
-
+		
 		stack = 1;
 		stackPool[0] = entity;
 		parentMatrixPool[0] = exportMatrix();
@@ -226,6 +276,9 @@ exportMeshNode* exportMeshNode::ImportAsfSkeleton(const char* const asfName, con
 				stack++;
 			}
 		}
+#else
+		exportMeshNode::ConvertToLocal(entity);
+#endif
 	}
 
 	if (entity && amcName)
@@ -275,6 +328,7 @@ void exportMeshNode::ImportAmcAnimation(const char* const amcName, const std::ma
 		while (!feof(fp))
 		{
 			ReadToken();
+			xxxxxxxxxxxxx
 			const std::map<std::string, exportMeshNode*>::const_iterator nodeIter = nodeMap.find(token);
 			if (nodeIter != nodeMap.end())
 			{
