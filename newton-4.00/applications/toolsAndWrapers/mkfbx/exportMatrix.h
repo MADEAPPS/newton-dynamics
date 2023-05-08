@@ -82,7 +82,7 @@ inline exportVector exportMatrix::CalcPitchYawRoll() const
 	// Assuming the angles are in radians.
 	if (matrix[0][2] > float(0.99995f))
 	{
-		float picth0 = -atan2(matrix[2][1], matrix[1][1]);
+		float picth0 = float (-atan2(matrix[2][1], matrix[1][1]));
 		float yaw0 = -float(M_PI * float(0.5f));
 		float roll0 = float(0.0f);
 
@@ -98,7 +98,7 @@ inline exportVector exportMatrix::CalcPitchYawRoll() const
 	}
 	else if (matrix[0][2] < float(-0.99995f))
 	{
-		float picth0 = -atan2(matrix[2][1], matrix[1][1]);
+		float picth0 = float(-atan2(matrix[2][1], matrix[1][1]));
 		float yaw0 = float(M_PI * float(0.5f));
 		float roll0 = float(0.0f);
 		euler0[0] = picth0;
@@ -116,11 +116,11 @@ inline exportVector exportMatrix::CalcPitchYawRoll() const
 		float yaw0 = -asinf(matrix[0][2]);
 		float yaw1 = M_PI - yaw0;
 
-		float picth0 = atan2(matrix[1][2], matrix[2][2]);
-		float picth1 = atan2(-matrix[1][2], -matrix[2][2]);
+		float picth0 = float (atan2(matrix[1][2], matrix[2][2]));
+		float picth1 = float (atan2(-matrix[1][2], -matrix[2][2]));
 
-		float roll0 = atan2(matrix[0][1], matrix[0][0]);
-		float roll1 = atan2(-matrix[0][1], -matrix[0][0]);
+		float roll0 = float (atan2(matrix[0][1], matrix[0][0]));
+		float roll1 = float (atan2(-matrix[0][1], -matrix[0][0]));
 
 		if (yaw1 > M_PI)
 		{
