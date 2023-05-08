@@ -84,6 +84,7 @@ class ndPolygonMeshDesc: public ndFastAabb
 	// colliding box in polygonSoup local space
 	D_COLLISION_API ndPolygonMeshDesc();
 	D_COLLISION_API ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode);
+	D_COLLISION_API ~ndPolygonMeshDesc();
 
 	D_COLLISION_API void SortFaceArray();
 	D_COLLISION_API ndFloat32 GetSeparetionDistance() const;
@@ -108,6 +109,7 @@ class ndPolygonMeshDesc: public ndFastAabb
 	ndProceduralStaticMeshFaceQuery* m_proceduralStaticMeshFaceQuery;
 	ndFloat32 m_maxT;
 	ndInt32 m_threadId;
+	bool m_ownTempBuffers;
 	bool m_doContinueCollisionTest;
 } D_GCC_NEWTON_ALIGN_32;
 
