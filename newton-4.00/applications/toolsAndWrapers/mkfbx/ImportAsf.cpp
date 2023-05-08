@@ -324,11 +324,11 @@ void exportMeshNode::ImportAmcAnimation(const char* const amcName, const std::ma
 			}
 		}
 
-		ReadInt();
+		//ReadInt();
+		int frameIndex = ReadInt();
 		while (!feof(fp))
 		{
 			ReadToken();
-			xxxxxxxxxxxxx
 			const std::map<std::string, exportMeshNode*>::const_iterator nodeIter = nodeMap.find(token);
 			if (nodeIter != nodeMap.end())
 			{
@@ -357,6 +357,11 @@ void exportMeshNode::ImportAmcAnimation(const char* const amcName, const std::ma
 
 				node->m_positionsKeys.push_back(posit);
 				node->m_rotationsKeys.push_back(rotation.Scale (M_PI / 180.0f));
+			}
+			else
+			{
+				xxxxxxxxxxx
+				sscanf(token, "%d", &frameIndex);
 			}
 		}
 		fclose(fp);
