@@ -99,7 +99,6 @@ exportMeshNode* exportMeshNode::ImportAsfSkeleton(const char* const asfName, con
 				float length = ReadFloat();
 				if (dir.DotProduct(dir) > 1.e-5f)
 				{
-					//dir = dir.Normalize().Scale(length * distScale);
 					dir = dir.Normalize().Scale(length * POSITION_SCALE);
 				}
 				dir.m_w = 1.0f;
@@ -112,7 +111,6 @@ exportMeshNode* exportMeshNode::ImportAsfSkeleton(const char* const asfName, con
 				euler.m_z = ReadFloat();
 				euler.m_w = 0.0f;
 				bone->m_eulers = euler.Scale(angleScale);
-				//if (bone->m_name != "ltibia") bone->m_eulers = euler.Scale(0.0f);
 				bone->m_matrix.m_posit = dir;
 
 				bool isAnimated = false;

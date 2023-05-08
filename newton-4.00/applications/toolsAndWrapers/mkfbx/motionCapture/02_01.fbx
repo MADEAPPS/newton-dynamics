@@ -1,0 +1,1141 @@
+; FBX 7.5.0 project file
+; ----------------------------------------------------
+
+FBXHeaderExtension:  {
+	FBXHeaderVersion: 1003
+	FBXVersion: 7500
+	CreationTimeStamp:  {
+		Version: 1000
+		Year: 2023
+		Month: 5
+		Day: 7
+		Hour: 18
+		Minute: 35
+		Second: 28
+		Millisecond: 302
+	}
+	Creator: "FBX SDK/FBX Plugins version 2019.0"
+	SceneInfo: "SceneInfo::GlobalInfo", "UserData" {
+		Type: "UserData"
+		Version: 100
+		MetaData:  {
+			Version: 100
+			Title: "motion capture skeleton"
+			Subject: "convert motion capture skeleton"
+			Author: "Newton Dynamics"
+			Keywords: ""
+			Revision: "rev. 1.0"
+			Comment: ""
+		}
+		Properties70:  {
+			P: "DocumentUrl", "KString", "Url", "", "motioncapture\02_01.fbx"
+			P: "SrcDocumentUrl", "KString", "Url", "", "motioncapture\02_01.fbx"
+			P: "Original", "Compound", "", ""
+			P: "Original|ApplicationVendor", "KString", "", "", ""
+			P: "Original|ApplicationName", "KString", "", "", ""
+			P: "Original|ApplicationVersion", "KString", "", "", ""
+			P: "Original|DateTime_GMT", "DateTime", "", "", ""
+			P: "Original|FileName", "KString", "", "", ""
+			P: "LastSaved", "Compound", "", ""
+			P: "LastSaved|ApplicationVendor", "KString", "", "", ""
+			P: "LastSaved|ApplicationName", "KString", "", "", ""
+			P: "LastSaved|ApplicationVersion", "KString", "", "", ""
+			P: "LastSaved|DateTime_GMT", "DateTime", "", "", ""
+		}
+	}
+}
+GlobalSettings:  {
+	Version: 1000
+	Properties70:  {
+		P: "UpAxis", "int", "Integer", "",1
+		P: "UpAxisSign", "int", "Integer", "",1
+		P: "FrontAxis", "int", "Integer", "",2
+		P: "FrontAxisSign", "int", "Integer", "",1
+		P: "CoordAxis", "int", "Integer", "",0
+		P: "CoordAxisSign", "int", "Integer", "",1
+		P: "OriginalUpAxis", "int", "Integer", "",-1
+		P: "OriginalUpAxisSign", "int", "Integer", "",1
+		P: "UnitScaleFactor", "double", "Number", "",1
+		P: "OriginalUnitScaleFactor", "double", "Number", "",1
+		P: "AmbientColor", "ColorRGB", "Color", "",0,0,0
+		P: "DefaultCamera", "KString", "", "", "Producer Perspective"
+		P: "TimeMode", "enum", "", "",0
+		P: "TimeProtocol", "enum", "", "",2
+		P: "SnapOnFrameMode", "enum", "", "",0
+		P: "TimeSpanStart", "KTime", "Time", "",0
+		P: "TimeSpanStop", "KTime", "Time", "",46186158000
+		P: "CustomFrameRate", "double", "Number", "",-1
+		P: "TimeMarker", "Compound", "", ""
+		P: "CurrentTimeMarker", "int", "Integer", "",-1
+	}
+}
+
+; Documents Description
+;------------------------------------------------------------------
+
+Documents:  {
+	Count: 1
+	Document: 1695762804352, "My Scene", "Scene" {
+		Properties70:  {
+			P: "SourceObject", "object", "", ""
+			P: "ActiveAnimStackName", "KString", "", "", ""
+		}
+		RootNode: 0
+	}
+}
+
+; Document References
+;------------------------------------------------------------------
+
+References:  {
+}
+
+; Object definitions
+;------------------------------------------------------------------
+
+Definitions:  {
+	Version: 100
+	Count: 73
+	ObjectType: "GlobalSettings" {
+		Count: 1
+	}
+	ObjectType: "Model" {
+		Count: 31
+		PropertyTemplate: "FbxNode" {
+			Properties70:  {
+				P: "QuaternionInterpolate", "enum", "", "",0
+				P: "RotationOffset", "Vector3D", "Vector", "",0,0,0
+				P: "RotationPivot", "Vector3D", "Vector", "",0,0,0
+				P: "ScalingOffset", "Vector3D", "Vector", "",0,0,0
+				P: "ScalingPivot", "Vector3D", "Vector", "",0,0,0
+				P: "TranslationActive", "bool", "", "",0
+				P: "TranslationMin", "Vector3D", "Vector", "",0,0,0
+				P: "TranslationMax", "Vector3D", "Vector", "",0,0,0
+				P: "TranslationMinX", "bool", "", "",0
+				P: "TranslationMinY", "bool", "", "",0
+				P: "TranslationMinZ", "bool", "", "",0
+				P: "TranslationMaxX", "bool", "", "",0
+				P: "TranslationMaxY", "bool", "", "",0
+				P: "TranslationMaxZ", "bool", "", "",0
+				P: "RotationOrder", "enum", "", "",0
+				P: "RotationSpaceForLimitOnly", "bool", "", "",0
+				P: "RotationStiffnessX", "double", "Number", "",0
+				P: "RotationStiffnessY", "double", "Number", "",0
+				P: "RotationStiffnessZ", "double", "Number", "",0
+				P: "AxisLen", "double", "Number", "",10
+				P: "PreRotation", "Vector3D", "Vector", "",0,0,0
+				P: "PostRotation", "Vector3D", "Vector", "",0,0,0
+				P: "RotationActive", "bool", "", "",0
+				P: "RotationMin", "Vector3D", "Vector", "",0,0,0
+				P: "RotationMax", "Vector3D", "Vector", "",0,0,0
+				P: "RotationMinX", "bool", "", "",0
+				P: "RotationMinY", "bool", "", "",0
+				P: "RotationMinZ", "bool", "", "",0
+				P: "RotationMaxX", "bool", "", "",0
+				P: "RotationMaxY", "bool", "", "",0
+				P: "RotationMaxZ", "bool", "", "",0
+				P: "InheritType", "enum", "", "",0
+				P: "ScalingActive", "bool", "", "",0
+				P: "ScalingMin", "Vector3D", "Vector", "",0,0,0
+				P: "ScalingMax", "Vector3D", "Vector", "",1,1,1
+				P: "ScalingMinX", "bool", "", "",0
+				P: "ScalingMinY", "bool", "", "",0
+				P: "ScalingMinZ", "bool", "", "",0
+				P: "ScalingMaxX", "bool", "", "",0
+				P: "ScalingMaxY", "bool", "", "",0
+				P: "ScalingMaxZ", "bool", "", "",0
+				P: "GeometricTranslation", "Vector3D", "Vector", "",0,0,0
+				P: "GeometricRotation", "Vector3D", "Vector", "",0,0,0
+				P: "GeometricScaling", "Vector3D", "Vector", "",1,1,1
+				P: "MinDampRangeX", "double", "Number", "",0
+				P: "MinDampRangeY", "double", "Number", "",0
+				P: "MinDampRangeZ", "double", "Number", "",0
+				P: "MaxDampRangeX", "double", "Number", "",0
+				P: "MaxDampRangeY", "double", "Number", "",0
+				P: "MaxDampRangeZ", "double", "Number", "",0
+				P: "MinDampStrengthX", "double", "Number", "",0
+				P: "MinDampStrengthY", "double", "Number", "",0
+				P: "MinDampStrengthZ", "double", "Number", "",0
+				P: "MaxDampStrengthX", "double", "Number", "",0
+				P: "MaxDampStrengthY", "double", "Number", "",0
+				P: "MaxDampStrengthZ", "double", "Number", "",0
+				P: "PreferedAngleX", "double", "Number", "",0
+				P: "PreferedAngleY", "double", "Number", "",0
+				P: "PreferedAngleZ", "double", "Number", "",0
+				P: "LookAtProperty", "object", "", ""
+				P: "UpVectorProperty", "object", "", ""
+				P: "Show", "bool", "", "",1
+				P: "NegativePercentShapeSupport", "bool", "", "",1
+				P: "DefaultAttributeIndex", "int", "Integer", "",-1
+				P: "Freeze", "bool", "", "",0
+				P: "LODBox", "bool", "", "",0
+				P: "Lcl Translation", "Lcl Translation", "", "A",0,0,0
+				P: "Lcl Rotation", "Lcl Rotation", "", "A",0,0,0
+				P: "Lcl Scaling", "Lcl Scaling", "", "A",1,1,1
+				P: "Visibility", "Visibility", "", "A",1
+				P: "Visibility Inheritance", "Visibility Inheritance", "", "",1
+			}
+		}
+	}
+	ObjectType: "NodeAttribute" {
+		Count: 31
+		PropertyTemplate: "FbxSkeleton" {
+			Properties70:  {
+				P: "Color", "ColorRGB", "Color", "",0.8,0.8,0.8
+				P: "Size", "double", "Number", "",100
+				P: "LimbLength", "double", "Number", "H",1
+			}
+		}
+	}
+	ObjectType: "AnimationStack" {
+		Count: 1
+		PropertyTemplate: "FbxAnimStack" {
+			Properties70:  {
+				P: "Description", "KString", "", "", ""
+				P: "LocalStart", "KTime", "Time", "",0
+				P: "LocalStop", "KTime", "Time", "",0
+				P: "ReferenceStart", "KTime", "Time", "",0
+				P: "ReferenceStop", "KTime", "Time", "",0
+			}
+		}
+	}
+	ObjectType: "AnimationLayer" {
+		Count: 1
+		PropertyTemplate: "FbxAnimLayer" {
+			Properties70:  {
+				P: "Weight", "Number", "", "A",100
+				P: "Mute", "bool", "", "",0
+				P: "Solo", "bool", "", "",0
+				P: "Lock", "bool", "", "",0
+				P: "Color", "ColorRGB", "Color", "",0.8,0.8,0.8
+				P: "BlendMode", "enum", "", "",0
+				P: "RotationAccumulationMode", "enum", "", "",0
+				P: "ScaleAccumulationMode", "enum", "", "",0
+				P: "BlendModeBypass", "ULongLong", "", "",0
+			}
+		}
+	}
+	ObjectType: "AnimationCurveNode" {
+		Count: 2
+		PropertyTemplate: "FbxAnimCurveNode" {
+			Properties70:  {
+				P: "d", "Compound", "", ""
+			}
+		}
+	}
+	ObjectType: "AnimationCurve" {
+		Count: 6
+	}
+}
+
+; Object properties
+;------------------------------------------------------------------
+
+Objects:  {
+	NodeAttribute: 1695762824752, "NodeAttribute::root", "Root" {
+		TypeFlags: "Null", "Skeleton", "Root"
+	}
+	NodeAttribute: 1695762824992, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763182320, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763184944, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763187248, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763222336, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763241040, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763130224, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763250672, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763283696, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763283936, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763284176, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763317200, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763317440, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763317680, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763241280, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763354336, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763355776, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763354096, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763355056, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763356016, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763356256, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763352896, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763356496, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763353136, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763354576, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763355536, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763354816, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763355296, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763353376, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	NodeAttribute: 1695763353616, "NodeAttribute::root", "LimbNode" {
+		Properties70:  {
+			P: "Size", "double", "Number", "",0.100000001490116
+		}
+		TypeFlags: "Skeleton"
+	}
+	Model: 1695763135136, "Model::root", "Root" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763169984, "Model::lowerback", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0.117671847343445,12.3269758224487,-0.846693992614746
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763180256, "Model::upperback", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0.061262845993042,12.3861360549927,-0.355262041091919
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763182880, "Model::thorax", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0.00905425846576691,12.4083251953125,0.0482194423675537
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763185184, "Model::rclavicle", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",-20.988094329834,4.55963897705078,-1.95693325996399
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763187488, "Model::rhumerus", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",-30.1589393615723,0,0
+			P: "Lcl Rotation", "Lcl Rotation", "", "A+",-179.999984741211,30,90
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763238976, "Model::rradius", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,-20.1858596801758,0
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763246544, "Model::rwrist", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,-10.0929641723633,0
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",-179.999984741211,60,-179.999984741211
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763248608, "Model::rthumb", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",3.58717846870422,-3.58718109130859,0
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",1.03738875623094e-06,-0,45
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763253056, "Model::rhand", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,-4.38243865966797,0
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",-8.15253066769855e-29,-0,9.71940148001488e-22
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763275760, "Model::rfingers", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,-3.53323364257813,0
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",-1.63050613353971e-28,-0,1.8650816491345e-21
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763255120, "Model::lclavicle", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",21.2522983551025,5.42617416381836,-1.0418267250061
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763261312, "Model::lhumerus", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",29.1907787322998,0,0
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",-179.999984741211,-30,-90
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763250992, "Model::lradius", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,-20.1332397460938,0
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763273696, "Model::lwrist", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,-10.0666198730469,1.9073486328125e-06
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",-179.999984741211,-60,179.999984741211
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763257184, "Model::lthumb", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",-3.24717307090759,-3.24716949462891,0
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",1.03738875623094e-06,-0,-45
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763265440, "Model::lhand", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,-3.96704864501953,0
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",-8.15253066769855e-29,-0,-9.71940148001488e-22
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763259248, "Model::lfingers", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,-3.19834136962891,0
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",-1.63050613353971e-28,-0,-1.8650816491345e-21
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763277824, "Model::lowerneck", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0.0427772551774979,9.40267181396484,0.898099184036255
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763263376, "Model::upperneck", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0.205714672803879,9.36245727539063,-0.600348591804504
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763267504, "Model::head", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0.0783061981201172,9.75357055664063,-0.315889954566956
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763269568, "Model::rhipjoint", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",-9.66420650482178,-10.8169364929199,3.74858736991882
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763279888, "Model::rfemur", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",-15.5701284408569,-42.7786102294922,0
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",0,-0,-19.9999980926514
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763271632, "Model::rtibia", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",1.1444091796875e-05,-43.2922821044922,0
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763419728, "Model::rfoot", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",3.814697265625e-06,-4.03905487060547,12.8020524978638
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",-90,-7.62851954219971e-16,0
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763399088, "Model::rtoes", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,-6.69413948059082,0
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",0,3.33453177022041e-23,-7.6285200715953e-16
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763411472, "Model::lhipjoint", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",9.94041919708252,-10.8169326782227,3.74859666824341
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763432112, "Model::lfemur", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",15.5832014083862,-42.814525604248,0
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",0,-0,19.9999980926514
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763407344, "Model::ltibia", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",-1.1444091796875e-05,-43.7230224609375,0
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763425920, "Model::lfoot", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",-3.814697265625e-06,-3.45660400390625,12.8748664855957
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",-90,7.62851954219971e-16,0
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	Model: 1695763413536, "Model::ltoes", "LimbNode" {
+		Version: 232
+		Properties70:  {
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,-6.67494010925293,0
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",0,-3.33453177022041e-23,7.6285200715953e-16
+		}
+		Shading: Y
+		Culling: "CullingOff"
+	}
+	AnimationStack: 1695759245456, "AnimStack::animStack", "" {
+	}
+	AnimationCurve: 1695762833600, "AnimCurve::", "" {
+		Default: 0
+		KeyVer: 4009
+		KeyTime: *343 {
+			a: 0,769769340,1539538680,2309308020,3079077360,3848846700,4618616040,5388385381,6158154721,6927924061,7697693401,8467462741,9237232081,10007001421,10776770762,11546540102,12316309442,13086078782,13855848122,14625617462,15395386802,16165156143,16934925483,17704694823,18474464163,19244233503,20014002843,20783772183,21553541524,22323310864,23093080204,23862849544,24632618884,25402388224,26172157564,26941926905,27711696245,28481465585,29251234925,30021004265,30790773605,31560542946,32330312286,33100081626,33869850966,34639620306,35409389646,36179158986,36948928327,37718697667,38488467007,39258236347,40028005687,40797775027,41567544367,42337313708,43107083048,43876852388,44646621728,45416391068,46186160408,46955929748,47725699089,48495468429,49265237769,50035007109,50804776449,51574545789,52344315129,53114084470,53883853810,54653623150,55423392490,56193161830,56962931170,57732700510,58502469851,59272239191,60042008531,60811777871,61581547211,62351316551,63121085892,63890855232,64660624572,65430393912,66200163252,66969932592,67739701932,68509471273,69279240613,70049009953,70818779293,71588548633,72358317973,73128087313,73897856654,74667625994,75437395334,76207164674,76976934014,77746703354,78516472694,79286242035,80056011375,80825780715,81595550055,82365319395,83135088735,83904858075,84674627416,85444396756,86214166096,86983935436,87753704776,88523474116,89293243457,90063012797,90832782137,91602551477,92372320817,93142090157,93911859497,94681628838,95451398178,96221167518,96990936858,97760706198,98530475538,99300244878,100070014219,100839783559,101609552899,102379322239,103149091579,103918860919,104688630259,105458399600,106228168940,106997938280,107767707620,108537476960,109307246300,110077015640,110846784981,111616554321,112386323661,113156093001,113925862341,114695631681,115465401021,116235170362,117004939702,117774709042,118544478382,119314247722,120084017062,120853786403,121623555743,122393325083,123163094423,123932863763,124702633103,125472402443,126242171784,127011941124,127781710464,128551479804,
+129321249144,130091018484,130860787824,131630557165,132400326505,133170095845,133939865185,134709634525,135479403865,136249173205,137018942546,137788711886,138558481226,139328250566,140098019906,140867789246,141637558586,142407327927,143177097267,143946866607,144716635947,145486405287,146256174627,147025943968,147795713308,148565482648,149335251988,150105021328,150874790668,151644560008,152414329349,153184098689,153953868029,154723637369,155493406709,156263176049,157032945389,157802714730,158572484070,159342253410,160112022750,160881792090,161651561430,162421330770,163191100111,163960869451,164730638791,165500408131,166270177471,167039946811,167809716151,168579485492,169349254832,170119024172,170888793512,171658562852,172428332192,173198101532,173967870873,174737640213,175507409553,176277178893,177046948233,177816717573,178586486914,179356256254,180126025594,180895794934,181665564274,182435333614,183205102954,183974872295,184744641635,185514410975,186284180315,187053949655,187823718995,188593488335,189363257676,190133027016,190902796356,191672565696,192442335036,193212104376,193981873716,194751643057,195521412397,196291181737,197060951077,197830720417,198600489757,199370259097,200140028438,200909797778,201679567118,202449336458,203219105798,203988875138,204758644478,205528413819,206298183159,207067952499,207837721839,208607491179,209377260519,210147029860,210916799200,211686568540,212456337880,213226107220,213995876560,214765645900,215535415241,216305184581,217074953921,217844723261,218614492601,219384261941,220154031281,220923800622,221693569962,222463339302,223233108642,224002877982,224772647322,225542416662,226312186003,227081955343,227851724683,228621494023,229391263363,230161032703,230930802043,231700571384,232470340724,233240110064,234009879404,234779648744,235549418084,236319187425,237088956765,237858726105,238628495445,239398264785,240168034125,240937803465,241707572806,242477342146,243247111486,244016880826,244786650166,245556419506,246326188846,247095958187,247865727527,248635496867,249405266207,250175035547,
+250944804887,251714574227,252484343568,253254112908,254023882248,254793651588,255563420928,256333190268,257102959608,257872728949,258642498289,259412267629,260182036969,260951806309,261721575649,262491344989,263261114330
+		} 
+		KeyValueFloat: *343 {
+			a: 62.5164,62.4702,62.4222,62.3706,62.3046,62.2416,62.1594,62.0748,62.0058,61.938,61.8678,61.776,61.6872,61.5918,61.4826,61.4106,61.3584,61.3044,61.2696,61.2474,61.2318,61.2054,61.1754,61.146,61.1016,61.053,61.002,60.9546,60.9144,60.8736,60.8448,60.8388,60.858,60.861,60.8172,60.7632,60.7134,60.651,60.6024,60.555,60.4884,60.4332,60.3852,60.3408,60.312,60.2466,60.1296,60.0384,59.9853,59.92542,59.86212,59.80926,59.7525,59.68782,59.62344,59.5683,59.52486,59.481,59.439,59.4048,59.3706,59.34792,59.33988,59.30376,59.24394,59.17956,59.10726,59.01558,58.89882,58.79886,58.71708,58.59978,58.48344,58.39536,58.30434,58.22754,58.1781,58.11054,58.03152,57.99798,57.99528,57.98628,57.9615,57.88212,57.75756,57.657,57.57618,57.48864,57.39228,57.2964,57.2205,57.16158,57.11592,57.06984,57.02472,56.99838,56.98278,56.95236,56.88504,56.77146,56.68638,56.679,56.66736,56.6385,56.62644,56.6301,56.66982,56.70498,56.70156,56.7324,56.78238,56.76624,56.7723,56.83362,56.87562,56.89638,56.91594,56.94324,56.98212,57.0312,57.08718,57.14364,57.1851,57.22014,57.25026,57.28734,57.3528,57.41706,57.474,57.52836,57.59208,57.67452,57.73308,57.79668,57.9069,57.99342,58.04394,58.09296,58.11732,58.1481,58.2072,58.28952,58.38168,58.43076,58.45962,58.5093,58.53666,58.52436,58.54446,58.62036,58.70238,58.78638,58.90254,59.04306,59.13312,59.16414,59.23716,59.34588,59.41746,59.45916,59.53506,59.65278,59.73432,59.76528,59.82594,59.8926,59.94516,60.036,60.126,60.1644,60.213,60.2742,60.2946,60.318,60.354,60.3714,60.4086,60.4758,60.4998,60.498,60.498,60.4962,60.5088,60.5298,60.5388,60.5472,60.5598,60.5568,60.5694,60.582,60.5346,60.4878,60.519,60.5898,60.642,60.6528,60.6318,60.633,60.6342,60.5658,60.465,60.4032,60.3576,60.3114,60.2868,60.2424,60.1482,60.0576,59.99844,59.95854,59.9406,59.92422,59.91108,59.90028,59.8392,59.74326,59.67954,59.64006,59.56698,59.45814,59.3556,59.27172,59.19264,59.14524,59.15598,59.15538,59.1369,59.14104,59.14764,59.17944,59.25774,59.31462,59.3112,59.2968,59.31294,59.33874,59.3484,59.37804,59.43294,59.45676,59.45604,59.5104,59.6049,
+59.68668,59.77842,59.86038,59.92116,59.96244,59.9973,60.0666,60.1608,60.2688,60.36,60.4308,60.513,60.5952,60.6678,60.7614,60.8442,60.9234,61.0248,61.1142,61.2228,61.3296,61.4298,61.599,61.7832,61.8948,62.0058,62.1252,62.217,62.3436,62.5092,62.7012,62.9034,63.0498,63.1212,63.1776,63.306,63.462,63.5664,63.687,63.8748,64.1016,64.3158,64.4862,64.6092,64.6974,64.8054,64.9548,65.076,65.1588,65.1936,65.1948,65.31599,65.4498,65.5302,65.6328,65.8314,65.9928,66.0192,65.9862,66.0066,66.0372,66.0498,66.1152,66.2064,66.276,66.3396,66.4566,66.5742,66.5484,66.49921,66.5688,66.8028,66.5604,66.6864,66.4308,66.4248,66.6192,66.483,66.435,66.4026,66.5016,66.5916,66.6252,66.6264,66.6132,66.5814,66.4698,66.6726,66.7092,66.6132,66.537,66.3714,66.3318,66.3036,66.252,66.1854,66.19141,66.2154,66.1938,66.1422
+		} 
+		;KeyAttrFlags: Cubic|TangeantAuto|GenericTimeIndependent
+		KeyAttrFlags: *1 {
+			a: 8456
+		} 
+		;KeyAttrDataFloat: RightAuto:0, NextLeftAuto:0
+		KeyAttrDataFloat: *4 {
+			a: 0,0,218434821,0
+		} 
+		KeyAttrRefCount: *1 {
+			a: 343
+		} 
+	}
+	AnimationCurve: 1695762834224, "AnimCurve::", "" {
+		Default: 0
+		KeyVer: 4009
+		KeyTime: *343 {
+			a: 0,769769340,1539538680,2309308020,3079077360,3848846700,4618616040,5388385381,6158154721,6927924061,7697693401,8467462741,9237232081,10007001421,10776770762,11546540102,12316309442,13086078782,13855848122,14625617462,15395386802,16165156143,16934925483,17704694823,18474464163,19244233503,20014002843,20783772183,21553541524,22323310864,23093080204,23862849544,24632618884,25402388224,26172157564,26941926905,27711696245,28481465585,29251234925,30021004265,30790773605,31560542946,32330312286,33100081626,33869850966,34639620306,35409389646,36179158986,36948928327,37718697667,38488467007,39258236347,40028005687,40797775027,41567544367,42337313708,43107083048,43876852388,44646621728,45416391068,46186160408,46955929748,47725699089,48495468429,49265237769,50035007109,50804776449,51574545789,52344315129,53114084470,53883853810,54653623150,55423392490,56193161830,56962931170,57732700510,58502469851,59272239191,60042008531,60811777871,61581547211,62351316551,63121085892,63890855232,64660624572,65430393912,66200163252,66969932592,67739701932,68509471273,69279240613,70049009953,70818779293,71588548633,72358317973,73128087313,73897856654,74667625994,75437395334,76207164674,76976934014,77746703354,78516472694,79286242035,80056011375,80825780715,81595550055,82365319395,83135088735,83904858075,84674627416,85444396756,86214166096,86983935436,87753704776,88523474116,89293243457,90063012797,90832782137,91602551477,92372320817,93142090157,93911859497,94681628838,95451398178,96221167518,96990936858,97760706198,98530475538,99300244878,100070014219,100839783559,101609552899,102379322239,103149091579,103918860919,104688630259,105458399600,106228168940,106997938280,107767707620,108537476960,109307246300,110077015640,110846784981,111616554321,112386323661,113156093001,113925862341,114695631681,115465401021,116235170362,117004939702,117774709042,118544478382,119314247722,120084017062,120853786403,121623555743,122393325083,123163094423,123932863763,124702633103,125472402443,126242171784,127011941124,127781710464,128551479804,
+129321249144,130091018484,130860787824,131630557165,132400326505,133170095845,133939865185,134709634525,135479403865,136249173205,137018942546,137788711886,138558481226,139328250566,140098019906,140867789246,141637558586,142407327927,143177097267,143946866607,144716635947,145486405287,146256174627,147025943968,147795713308,148565482648,149335251988,150105021328,150874790668,151644560008,152414329349,153184098689,153953868029,154723637369,155493406709,156263176049,157032945389,157802714730,158572484070,159342253410,160112022750,160881792090,161651561430,162421330770,163191100111,163960869451,164730638791,165500408131,166270177471,167039946811,167809716151,168579485492,169349254832,170119024172,170888793512,171658562852,172428332192,173198101532,173967870873,174737640213,175507409553,176277178893,177046948233,177816717573,178586486914,179356256254,180126025594,180895794934,181665564274,182435333614,183205102954,183974872295,184744641635,185514410975,186284180315,187053949655,187823718995,188593488335,189363257676,190133027016,190902796356,191672565696,192442335036,193212104376,193981873716,194751643057,195521412397,196291181737,197060951077,197830720417,198600489757,199370259097,200140028438,200909797778,201679567118,202449336458,203219105798,203988875138,204758644478,205528413819,206298183159,207067952499,207837721839,208607491179,209377260519,210147029860,210916799200,211686568540,212456337880,213226107220,213995876560,214765645900,215535415241,216305184581,217074953921,217844723261,218614492601,219384261941,220154031281,220923800622,221693569962,222463339302,223233108642,224002877982,224772647322,225542416662,226312186003,227081955343,227851724683,228621494023,229391263363,230161032703,230930802043,231700571384,232470340724,233240110064,234009879404,234779648744,235549418084,236319187425,237088956765,237858726105,238628495445,239398264785,240168034125,240937803465,241707572806,242477342146,243247111486,244016880826,244786650166,245556419506,246326188846,247095958187,247865727527,248635496867,249405266207,250175035547,
+250944804887,251714574227,252484343568,253254112908,254023882248,254793651588,255563420928,256333190268,257102959608,257872728949,258642498289,259412267629,260182036969,260951806309,261721575649,262491344989,263261114330
+		} 
+		KeyValueFloat: *343 {
+			a: 100.2288,100.104,100.0494,100.0176,99.8928,99.6918,99.429,99.3858,99.4518,99.2196,98.9982,99.13499,99.1992,99.2448,99.2328,99.18961,99.2496,99.4122,99.56999,99.6354,99.66479,99.7764,99.9264,100.0548,100.158,100.2372,100.32,100.4394,100.6128,100.7778,100.893,101.037,101.1954,101.3046,101.4036,101.4462,101.4186,101.5044,101.694,101.8044,101.7402,101.6286,101.664,101.7174,101.7066,101.6898,101.6478,101.5974,101.649,101.733,101.754,101.7654,101.7486,101.7732,101.8818,101.946,101.9226,101.8692,101.8614,101.9094,101.9106,101.8416,101.8548,101.8566,101.8314,101.8188,101.8104,101.7168,101.55,101.4066,101.3328,101.2602,101.1282,100.9122,100.803,100.7406,100.7142,100.7046,100.7334,100.7316,100.6998,100.7166,100.7556,100.779,100.8294,100.9374,101.0178,101.0196,101.0994,101.3466,101.5716,101.676,101.7714,101.88,101.9784,102.123,102.2778,102.3978,102.5316,102.6516,102.7272,102.8058,102.8946,103.0656,103.0332,103.0278,103.0086,102.969,102.945,102.9402,102.8796,102.8124,102.798,102.7854,102.7704,102.7722,102.8298,102.975,103.062,103.0632,103.0908,103.122,103.17,103.2246,103.2348,103.2546,103.242,103.1688,103.1226,103.1514,103.1166,103.0212,102.8916,102.774,102.7254,102.6744,102.5886,102.5124,102.4314,102.3522,102.3252,102.3366,102.3294,102.3372,102.3744,102.294,102.3456,102.3924,102.4338,102.4932,102.5568,102.6702,102.7974,102.9048,103.0566,103.2528,103.4742,103.5162,103.65,103.815,103.959,104.0964,104.2038,104.3286,104.451,104.5458,104.6826,104.8302,104.8866,104.8548,104.8506,104.9328,104.9814,104.9514,104.8872,104.7552,104.6124,104.4924,104.4342,104.4468,104.4696,104.4474,104.4066,104.4336,104.5128,104.5806,104.6292,104.6514,104.6082,104.613,104.6652,104.6262,104.5698,104.6094,104.6136,104.616,104.5914,104.4786,104.3652,104.2782,104.1504,103.9938,103.8594,103.7484,103.6068,103.3242,103.1994,103.272,103.2654,103.236,103.188,103.0074,102.9288,102.8772,102.8646,102.8544,102.8508,102.8574,102.8904,102.9462,103.0128,103.0692,103.116,103.2162,103.3536,103.4856,103.5948,103.6458,103.701,103.8588,104.0184,104.1174,104.2182,
+104.3304,104.4336,104.5296,104.6478,104.7486,104.8014,104.799,104.7432,104.691,104.706,104.7864,104.8392,104.8308,104.856,104.9448,104.985,104.9568,105.0072,105.1176,105.2142,105.3396,105.441,105.4716,105.5064,105.4944,105.4416,105.3798,105.3276,105.267,105.189,105.0924,105.0054,104.937,104.8374,104.7138,104.6094,104.5182,104.4204,104.3922,104.4012,104.3586,104.3532,104.3478,104.1276,104.0172,103.9818,103.9206,103.9266,104.019,104.172,104.3826,104.4828,104.5236,104.712,104.9268,105.1428,105.4782,105.3702,105.4338,105.5964,105.7692,105.9288,106.0452,106.1628,106.2708,106.3416,106.4826,106.6188,106.5564,106.5792,106.7118,106.68,106.4562,106.4112,106.5486,106.5558,106.5282,106.542,106.5882,106.5396,106.4142,106.2888,106.3632,106.368,106.4556,106.4262,106.4022,106.4328,106.4586,106.5222,106.6242,106.743,106.7808,106.7838,106.7604,106.6686,106.53,106.4154,106.278,106.2318,106.0956,105.9798,105.8616,105.6954,105.4944,105.2358,105.213,105.0408,104.9718,105.012
+		} 
+		;KeyAttrFlags: Cubic|TangeantAuto|GenericTimeIndependent
+		KeyAttrFlags: *1 {
+			a: 8456
+		} 
+		;KeyAttrDataFloat: RightAuto:0, NextLeftAuto:0
+		KeyAttrDataFloat: *4 {
+			a: 0,0,218434821,0
+		} 
+		KeyAttrRefCount: *1 {
+			a: 343
+		} 
+	}
+	AnimationCurve: 1695762832976, "AnimCurve::", "" {
+		Default: 0
+		KeyVer: 4009
+		KeyTime: *343 {
+			a: 0,769769340,1539538680,2309308020,3079077360,3848846700,4618616040,5388385381,6158154721,6927924061,7697693401,8467462741,9237232081,10007001421,10776770762,11546540102,12316309442,13086078782,13855848122,14625617462,15395386802,16165156143,16934925483,17704694823,18474464163,19244233503,20014002843,20783772183,21553541524,22323310864,23093080204,23862849544,24632618884,25402388224,26172157564,26941926905,27711696245,28481465585,29251234925,30021004265,30790773605,31560542946,32330312286,33100081626,33869850966,34639620306,35409389646,36179158986,36948928327,37718697667,38488467007,39258236347,40028005687,40797775027,41567544367,42337313708,43107083048,43876852388,44646621728,45416391068,46186160408,46955929748,47725699089,48495468429,49265237769,50035007109,50804776449,51574545789,52344315129,53114084470,53883853810,54653623150,55423392490,56193161830,56962931170,57732700510,58502469851,59272239191,60042008531,60811777871,61581547211,62351316551,63121085892,63890855232,64660624572,65430393912,66200163252,66969932592,67739701932,68509471273,69279240613,70049009953,70818779293,71588548633,72358317973,73128087313,73897856654,74667625994,75437395334,76207164674,76976934014,77746703354,78516472694,79286242035,80056011375,80825780715,81595550055,82365319395,83135088735,83904858075,84674627416,85444396756,86214166096,86983935436,87753704776,88523474116,89293243457,90063012797,90832782137,91602551477,92372320817,93142090157,93911859497,94681628838,95451398178,96221167518,96990936858,97760706198,98530475538,99300244878,100070014219,100839783559,101609552899,102379322239,103149091579,103918860919,104688630259,105458399600,106228168940,106997938280,107767707620,108537476960,109307246300,110077015640,110846784981,111616554321,112386323661,113156093001,113925862341,114695631681,115465401021,116235170362,117004939702,117774709042,118544478382,119314247722,120084017062,120853786403,121623555743,122393325083,123163094423,123932863763,124702633103,125472402443,126242171784,127011941124,127781710464,128551479804,
+129321249144,130091018484,130860787824,131630557165,132400326505,133170095845,133939865185,134709634525,135479403865,136249173205,137018942546,137788711886,138558481226,139328250566,140098019906,140867789246,141637558586,142407327927,143177097267,143946866607,144716635947,145486405287,146256174627,147025943968,147795713308,148565482648,149335251988,150105021328,150874790668,151644560008,152414329349,153184098689,153953868029,154723637369,155493406709,156263176049,157032945389,157802714730,158572484070,159342253410,160112022750,160881792090,161651561430,162421330770,163191100111,163960869451,164730638791,165500408131,166270177471,167039946811,167809716151,168579485492,169349254832,170119024172,170888793512,171658562852,172428332192,173198101532,173967870873,174737640213,175507409553,176277178893,177046948233,177816717573,178586486914,179356256254,180126025594,180895794934,181665564274,182435333614,183205102954,183974872295,184744641635,185514410975,186284180315,187053949655,187823718995,188593488335,189363257676,190133027016,190902796356,191672565696,192442335036,193212104376,193981873716,194751643057,195521412397,196291181737,197060951077,197830720417,198600489757,199370259097,200140028438,200909797778,201679567118,202449336458,203219105798,203988875138,204758644478,205528413819,206298183159,207067952499,207837721839,208607491179,209377260519,210147029860,210916799200,211686568540,212456337880,213226107220,213995876560,214765645900,215535415241,216305184581,217074953921,217844723261,218614492601,219384261941,220154031281,220923800622,221693569962,222463339302,223233108642,224002877982,224772647322,225542416662,226312186003,227081955343,227851724683,228621494023,229391263363,230161032703,230930802043,231700571384,232470340724,233240110064,234009879404,234779648744,235549418084,236319187425,237088956765,237858726105,238628495445,239398264785,240168034125,240937803465,241707572806,242477342146,243247111486,244016880826,244786650166,245556419506,246326188846,247095958187,247865727527,248635496867,249405266207,250175035547,
+250944804887,251714574227,252484343568,253254112908,254023882248,254793651588,255563420928,256333190268,257102959608,257872728949,258642498289,259412267629,260182036969,260951806309,261721575649,262491344989,263261114330
+		} 
+		KeyValueFloat: *343 {
+			a: -180.6018,-179.5008,-178.3914,-177.24,-176.0682,-174.8922,-173.7204,-172.5252,-171.3018,-170.1138,-168.9672,-167.8338,-166.7364,-165.6522,-164.5752,-163.491,-162.393,-161.3052,-160.2396,-159.192,-158.1876,-157.2078,-156.2274,-155.2872,-154.3872,-153.4806,-152.559,-151.626,-150.693,-149.7588,-148.8024,-147.8274,-146.856,-145.8768,-144.912,-144.0006,-143.1462,-142.3278,-141.4212,-140.466,-139.584,-138.7002,-137.7636,-136.8204,-135.8952,-134.9682,-134.0166,-133.0896,-132.186,-131.2428,-130.2966,-129.3846,-128.4372,-127.416,-126.4032,-125.4276,-124.4472,-123.4704,-122.4936,-121.4874,-120.4716,-119.448,-118.3854,-117.3318,-116.313,-115.2798,-114.1986,-113.0868,-112.0062,-110.934,-109.8186,-108.6786,-107.5074,-106.3092,-105.1092,-103.8894,-102.6246,-101.376,-100.1664,-98.9568,-97.75861,-96.561,-95.3706,-94.2444,-93.1566,-92.0448,-90.9492,-89.94839,-88.9962,-88.0122,-87.0246,-86.0712,-85.1502,-84.2538,-83.3442,-82.416,-81.501,-80.5914,-79.6896,-78.81841,-77.97,-77.085,-76.1712,-75.2496,-74.3472,-73.4466,-72.5562,-71.658,-70.7592,-69.888,-69.0216,-68.1042,-67.1676,-66.2538,-65.31599,-64.3596,-63.4296,-62.49,-61.527,-60.5604,-59.57328,-58.56684,-57.57582,-56.59062,-55.60218,-54.60678,-53.5815,-52.55502,-51.52782,-50.47884,-49.40982,-48.3183,-47.22678,-46.11594,-44.95944,-43.8012,-42.66246,-41.50026,-40.27146,-38.9895,-37.7274,-36.49314,-35.22,-33.93714,-32.68002,-31.45242,-30.23844,-29.04144,-27.85008,-26.652,-25.47984,-24.34032,-23.217,-22.13172,-21.10692,-20.07804,-18.99384,-17.96856,-16.95288,-15.97026,-15.0042,-13.99848,-13.07724,-12.1794,-11.17806,-10.19808,-9.25956,-8.25828,-7.23768,-6.271501,-5.296446,-4.30917,-3.399204,-2.491746,-1.535574,-0.5671938,0.5026476,1.55766,2.454372,3.3786,4.396362,5.430186,6.47124,7.5111,8.532599,9.54816,10.60968,11.68344,12.71208,13.7508,14.8548,15.97356,17.0586,18.13326,19.21848,20.36562,21.55824,22.6836,23.79348,24.95118,26.11548,27.29286,28.48176,29.69424,30.9534,32.23692,33.50214,34.75548,36.03684,37.32246,38.60772,39.88692,41.1648,42.40818,43.58178,44.70252,45.83202,
+46.98468,48.09156,49.1337,50.13072,51.08532,52.03554,53.00358,53.97192,54.92832,55.88646,56.8269,57.75456,58.79364,59.85774,60.8046,61.746,62.697,63.624,64.58279,65.5452,66.4788,67.4184,68.382,69.2886,70.15981,71.1516,72.1806,73.1076,74.0808,75.1098,76.0602,76.9362,77.7702,78.7308,79.8126,80.8188,81.7764,82.761,83.7186,84.6828,85.758,86.82539,87.83279,88.866,89.943,91.0344,92.0652,93.1338,94.34219,95.5962,96.7794,97.9398,99.11281,100.2774,101.5062,102.7776,104.1408,105.5352,106.7724,107.9244,109.0728,110.2536,111.4044,112.4736,113.5938,114.7542,115.9608,117.1494,118.2372,119.2848,120.2292,121.128,122.1864,123.2586,124.2846,125.2116,126.0594,126.9234,127.8798,128.7618,129.6894,130.7568,131.7732,132.6456,133.5228,134.5368,135.4818,136.3308,137.1774,138.1158,139.2006,140.1618,141.1836,142.416,143.4762,144.3978,145.296,146.1696,147.3456,148.1334,148.9608,149.835,150.7566,151.8312,152.8998,153.9768,154.995,155.997,157.0548,158.145,159.2868,160.4208,161.5296,162.5232,163.5798,164.7012,165.888,167.1096,168.1998,169.4544,170.6922,171.8814,173.076,174.306,175.5636,176.7228
+		} 
+		;KeyAttrFlags: Cubic|TangeantAuto|GenericTimeIndependent
+		KeyAttrFlags: *1 {
+			a: 8456
+		} 
+		;KeyAttrDataFloat: RightAuto:0, NextLeftAuto:0
+		KeyAttrDataFloat: *4 {
+			a: 0,0,218434821,0
+		} 
+		KeyAttrRefCount: *1 {
+			a: 343
+		} 
+	}
+	AnimationCurve: 1695762833808, "AnimCurve::", "" {
+		Default: -179.999984741211
+		KeyVer: 4009
+		KeyTime: *343 {
+			a: 0,769769340,1539538680,2309308020,3079077360,3848846700,4618616040,5388385381,6158154721,6927924061,7697693401,8467462741,9237232081,10007001421,10776770762,11546540102,12316309442,13086078782,13855848122,14625617462,15395386802,16165156143,16934925483,17704694823,18474464163,19244233503,20014002843,20783772183,21553541524,22323310864,23093080204,23862849544,24632618884,25402388224,26172157564,26941926905,27711696245,28481465585,29251234925,30021004265,30790773605,31560542946,32330312286,33100081626,33869850966,34639620306,35409389646,36179158986,36948928327,37718697667,38488467007,39258236347,40028005687,40797775027,41567544367,42337313708,43107083048,43876852388,44646621728,45416391068,46186160408,46955929748,47725699089,48495468429,49265237769,50035007109,50804776449,51574545789,52344315129,53114084470,53883853810,54653623150,55423392490,56193161830,56962931170,57732700510,58502469851,59272239191,60042008531,60811777871,61581547211,62351316551,63121085892,63890855232,64660624572,65430393912,66200163252,66969932592,67739701932,68509471273,69279240613,70049009953,70818779293,71588548633,72358317973,73128087313,73897856654,74667625994,75437395334,76207164674,76976934014,77746703354,78516472694,79286242035,80056011375,80825780715,81595550055,82365319395,83135088735,83904858075,84674627416,85444396756,86214166096,86983935436,87753704776,88523474116,89293243457,90063012797,90832782137,91602551477,92372320817,93142090157,93911859497,94681628838,95451398178,96221167518,96990936858,97760706198,98530475538,99300244878,100070014219,100839783559,101609552899,102379322239,103149091579,103918860919,104688630259,105458399600,106228168940,106997938280,107767707620,108537476960,109307246300,110077015640,110846784981,111616554321,112386323661,113156093001,113925862341,114695631681,115465401021,116235170362,117004939702,117774709042,118544478382,119314247722,120084017062,120853786403,121623555743,122393325083,123163094423,123932863763,124702633103,125472402443,126242171784,127011941124,127781710464,128551479804,
+129321249144,130091018484,130860787824,131630557165,132400326505,133170095845,133939865185,134709634525,135479403865,136249173205,137018942546,137788711886,138558481226,139328250566,140098019906,140867789246,141637558586,142407327927,143177097267,143946866607,144716635947,145486405287,146256174627,147025943968,147795713308,148565482648,149335251988,150105021328,150874790668,151644560008,152414329349,153184098689,153953868029,154723637369,155493406709,156263176049,157032945389,157802714730,158572484070,159342253410,160112022750,160881792090,161651561430,162421330770,163191100111,163960869451,164730638791,165500408131,166270177471,167039946811,167809716151,168579485492,169349254832,170119024172,170888793512,171658562852,172428332192,173198101532,173967870873,174737640213,175507409553,176277178893,177046948233,177816717573,178586486914,179356256254,180126025594,180895794934,181665564274,182435333614,183205102954,183974872295,184744641635,185514410975,186284180315,187053949655,187823718995,188593488335,189363257676,190133027016,190902796356,191672565696,192442335036,193212104376,193981873716,194751643057,195521412397,196291181737,197060951077,197830720417,198600489757,199370259097,200140028438,200909797778,201679567118,202449336458,203219105798,203988875138,204758644478,205528413819,206298183159,207067952499,207837721839,208607491179,209377260519,210147029860,210916799200,211686568540,212456337880,213226107220,213995876560,214765645900,215535415241,216305184581,217074953921,217844723261,218614492601,219384261941,220154031281,220923800622,221693569962,222463339302,223233108642,224002877982,224772647322,225542416662,226312186003,227081955343,227851724683,228621494023,229391263363,230161032703,230930802043,231700571384,232470340724,233240110064,234009879404,234779648744,235549418084,236319187425,237088956765,237858726105,238628495445,239398264785,240168034125,240937803465,241707572806,242477342146,243247111486,244016880826,244786650166,245556419506,246326188846,247095958187,247865727527,248635496867,249405266207,250175035547,
+250944804887,251714574227,252484343568,253254112908,254023882248,254793651588,255563420928,256333190268,257102959608,257872728949,258642498289,259412267629,260182036969,260951806309,261721575649,262491344989,263261114330
+		} 
+		KeyValueFloat: *343 {
+			a: 14.8795,14.6305,14.3985,14.2787,14.3777,14.3995,14.4498,14.801,14.6013,14.2338,13.8752,13.3374,12.7085,12.0067,11.5491,11.2784,10.6611,10.5135,10.6689,10.3516,10.4121,10.39,9.863389,9.28047,8.586899,7.963619,7.49798,6.87938,6.0822,5.214469,4.316309,3.65041,3.31174,3.12564,2.60953,2.15749,2.28764,1.91939,0.7238809,0.232295,0.397736,0.05157509,-0.74536,-1.1618,-1.30752,-1.7342,-1.8768,-1.6048,-1.6497,-1.94009,-2.03975,-2.47669,-3.2863,-3.54227,-3.77036,-4.40196,-4.81822,-5.210229,-5.67943,-6.554959,-7.680319,-8.14813,-8.407689,-9.06098,-10.0721,-11.1164,-11.9003,-12.6672,-13.7246,-14.4991,-14.7268,-14.964,-15.6306,-16.6898,-17.3861,-18.0973,-19.2789,-19.9231,-19.864,-19.9667,-20.0566,-19.9469,-20.0304,-20.1832,-20.2607,-20.4068,-20.531,-20.3578,-20.0851,-19.907,-19.553,-19.3505,-19.3702,-18.8226,-17.8094,-16.8455,-16.249,-15.866,-15.469,-15.0726,-14.0518,-12.3626,-10.5649,-8.92985,-7.89965,-7.086259,-5.487269,-3.32636,-1.41624,0.8522999,3.66804,4.70351,4.12247,4.77485,6.3652,7.660129,8.72073,9.58525,10.601,11.5882,12.2265,12.7473,13.2828,13.8704,14.5324,15.329,16.1423,16.656,16.8331,16.8411,16.8455,17.0838,17.3825,17.4226,17.4419,17.3998,17.2959,17.217,16.9034,16.6941,16.8142,16.8761,16.6218,16.201,15.861,15.4234,14.8124,14.4825,14.4073,14.1027,13.3933,12.6423,12.4472,12.4193,12.1562,11.8901,11.7997,11.7585,11.5748,11.8216,11.9707,11.2469,10.5291,9.96332,9.4472,9.14264,8.772269,8.24754,7.614369,6.491789,5.19926,4.390649,3.47736,2.91855,2.58198,1.38438,0.195823,-0.7367219,-2.14283,-3.3399,-4.03239,-5.453599,-7.223159,-8.27407,-9.03299,-10.1847,-12.0734,-13.9216,-14.6071,-15.1007,-16.5184,-18.2181,-19.6857,-20.4749,-20.815,-21.4953,-22.491,-23.3531,-24.1531,-24.672,-24.5835,-25.1294,-25.6204,-26.1059,-26.1396,-26.1248,-26.0626,-26.0466,-25.975,-25.9138,-26.015,-26.1676,-26.3103,-26.4477,-26.6479,-26.9021,-27.0297,-25.8323,-25.8557,-26.6694,-26.9367,-26.3112,-25.8466,-25.5389,-24.9868,-24.2003,-23.5806,-23.0112,-22.3785,-21.7811,-20.6888,-19.2158,-17.8889,-16.6186,-15.185,-13.5188,-11.9422,-10.3419,-8.199399,
+-6.12961,-4.78331,-3.69476,-2.16907,-0.378186,1.34759,2.55562,3.42577,4.88209,6.46429,7.421579,8.19114,9.15586,10.4169,11.6764,12.1604,12.2264,12.7264,13.4205,13.8034,13.9905,14.3959,14.9686,15.1716,15.0654,15.1402,15.3478,15.4587,15.1338,14.6673,15.0319,15.5504,15.2508,14.973,15.1348,15.0325,14.7524,14.4551,13.9141,13.3928,13.1122,12.8642,12.3612,12.0323,12.1644,12.4976,12.6666,12.5594,12.6443,12.8205,12.7553,12.8793,13.2429,13.3102,12.9343,12.2355,11.3867,11.3759,10.9573,10.3424,10.0651,9.664009,8.88685,7.92329,7.262109,7.218219,7.25286,5.69876,2.93181,1.28376,0.4814589,-1.16635,-3.3443,-4.561679,-5.133619,-6.87082,-8.445189,-9.898639,-11.7636,-13.9852,-16.2428,-16.6142,-18.1447,-20.5079,-21.6147,-21.5011,-21.6653,-24.1381,-25.6932,-25.2139,-24.7541,-26.9483,-27.2289,-29.7268,-29.5586,-31.1695,-32.3857,-31.1151,-28.9551,-29.5579,-32.4987,-33.4654,-33.9481,-34.3173
+		} 
+		;KeyAttrFlags: Cubic|TangeantAuto|GenericTimeIndependent
+		KeyAttrFlags: *1 {
+			a: 8456
+		} 
+		;KeyAttrDataFloat: RightAuto:0, NextLeftAuto:0
+		KeyAttrDataFloat: *4 {
+			a: 0,0,218434821,0
+		} 
+		KeyAttrRefCount: *1 {
+			a: 343
+		} 
+	}
+	AnimationCurve: 1695762835888, "AnimCurve::", "" {
+		Default: 30
+		KeyVer: 4009
+		KeyTime: *343 {
+			a: 0,769769340,1539538680,2309308020,3079077360,3848846700,4618616040,5388385381,6158154721,6927924061,7697693401,8467462741,9237232081,10007001421,10776770762,11546540102,12316309442,13086078782,13855848122,14625617462,15395386802,16165156143,16934925483,17704694823,18474464163,19244233503,20014002843,20783772183,21553541524,22323310864,23093080204,23862849544,24632618884,25402388224,26172157564,26941926905,27711696245,28481465585,29251234925,30021004265,30790773605,31560542946,32330312286,33100081626,33869850966,34639620306,35409389646,36179158986,36948928327,37718697667,38488467007,39258236347,40028005687,40797775027,41567544367,42337313708,43107083048,43876852388,44646621728,45416391068,46186160408,46955929748,47725699089,48495468429,49265237769,50035007109,50804776449,51574545789,52344315129,53114084470,53883853810,54653623150,55423392490,56193161830,56962931170,57732700510,58502469851,59272239191,60042008531,60811777871,61581547211,62351316551,63121085892,63890855232,64660624572,65430393912,66200163252,66969932592,67739701932,68509471273,69279240613,70049009953,70818779293,71588548633,72358317973,73128087313,73897856654,74667625994,75437395334,76207164674,76976934014,77746703354,78516472694,79286242035,80056011375,80825780715,81595550055,82365319395,83135088735,83904858075,84674627416,85444396756,86214166096,86983935436,87753704776,88523474116,89293243457,90063012797,90832782137,91602551477,92372320817,93142090157,93911859497,94681628838,95451398178,96221167518,96990936858,97760706198,98530475538,99300244878,100070014219,100839783559,101609552899,102379322239,103149091579,103918860919,104688630259,105458399600,106228168940,106997938280,107767707620,108537476960,109307246300,110077015640,110846784981,111616554321,112386323661,113156093001,113925862341,114695631681,115465401021,116235170362,117004939702,117774709042,118544478382,119314247722,120084017062,120853786403,121623555743,122393325083,123163094423,123932863763,124702633103,125472402443,126242171784,127011941124,127781710464,128551479804,
+129321249144,130091018484,130860787824,131630557165,132400326505,133170095845,133939865185,134709634525,135479403865,136249173205,137018942546,137788711886,138558481226,139328250566,140098019906,140867789246,141637558586,142407327927,143177097267,143946866607,144716635947,145486405287,146256174627,147025943968,147795713308,148565482648,149335251988,150105021328,150874790668,151644560008,152414329349,153184098689,153953868029,154723637369,155493406709,156263176049,157032945389,157802714730,158572484070,159342253410,160112022750,160881792090,161651561430,162421330770,163191100111,163960869451,164730638791,165500408131,166270177471,167039946811,167809716151,168579485492,169349254832,170119024172,170888793512,171658562852,172428332192,173198101532,173967870873,174737640213,175507409553,176277178893,177046948233,177816717573,178586486914,179356256254,180126025594,180895794934,181665564274,182435333614,183205102954,183974872295,184744641635,185514410975,186284180315,187053949655,187823718995,188593488335,189363257676,190133027016,190902796356,191672565696,192442335036,193212104376,193981873716,194751643057,195521412397,196291181737,197060951077,197830720417,198600489757,199370259097,200140028438,200909797778,201679567118,202449336458,203219105798,203988875138,204758644478,205528413819,206298183159,207067952499,207837721839,208607491179,209377260519,210147029860,210916799200,211686568540,212456337880,213226107220,213995876560,214765645900,215535415241,216305184581,217074953921,217844723261,218614492601,219384261941,220154031281,220923800622,221693569962,222463339302,223233108642,224002877982,224772647322,225542416662,226312186003,227081955343,227851724683,228621494023,229391263363,230161032703,230930802043,231700571384,232470340724,233240110064,234009879404,234779648744,235549418084,236319187425,237088956765,237858726105,238628495445,239398264785,240168034125,240937803465,241707572806,242477342146,243247111486,244016880826,244786650166,245556419506,246326188846,247095958187,247865727527,248635496867,249405266207,250175035547,
+250944804887,251714574227,252484343568,253254112908,254023882248,254793651588,255563420928,256333190268,257102959608,257872728949,258642498289,259412267629,260182036969,260951806309,261721575649,262491344989,263261114330
+		} 
+		KeyValueFloat: *343 {
+			a: -82.1974,-81.98219,-81.9469,-82.17019,-82.46269,-82.54639,-82.55529,-82.5439,-83.16369,-83.63169,-84.00759,-84.3669,-84.7104,-85.1867,-85.6049,-85.7916,-86.15829,-86.70869,-87.05329,-87.3364,-87.59329,-87.75759,-87.9284,-88.1629,-88.3951,-88.4781,-88.451,-88.41549,-88.32059,-88.16579,-88.0351,-87.9772,-88.02539,-88.0136,-87.70589,-87.42509,-87.36179,-87.2278,-87.0201,-86.73429,-86.4184,-86.27149,-86.1241,-85.882,-85.60089,-85.2796,-85.16519,-85.25999,-85.17909,-84.9436,-84.7142,-84.3431,-84.0045,-84.03179,-83.92389,-83.5323,-83.28259,-82.9108,-82.4783,-82.0491,-81.53079,-81.22369,-80.88039,-80.28869,-79.4848,-78.645,-77.90489,-76.97049,-75.91239,-75.1656,-74.6705,-74.11489,-73.25809,-72.2811,-71.68829,-70.9501,-69.9119,-69.3196,-69.14299,-68.8277,-68.7327,-68.9409,-68.78399,-68.55759,-68.601,-68.8431,-69.2862,-69.7517,-70.19299,-70.80859,-71.62049,-72.26299,-72.83429,-73.72959,-74.8699,-76.04449,-76.92619,-77.61319,-78.33849,-79.06159,-80.07059,-81.24509,-82.1907,-83.10729,-83.97519,-84.67349,-85.37409,-86.03049,-86.6319,-87.3964,-88.1594,-88.31189,-87.91459,-87.65019,-87.65249,-87.66309,-87.68939,-87.6619,-87.42579,-87.12109,-86.83779,-86.48169,-86.14439,-85.78649,-85.48199,-85.2236,-84.6983,-84.19109,-83.97369,-83.79489,-83.49529,-83.1489,-82.91969,-82.7388,-82.4654,-82.33669,-82.3082,-82.19019,-82.11259,-82.0397,-82.08979,-82.29419,-82.46249,-82.5883,-82.85279,-83.2837,-83.7718,-84.2204,-84.41249,-84.54239,-85.02299,-85.63709,-85.91,-86.11879,-86.4445,-86.70939,-86.9169,-87.15459,-87.41599,-87.5701,-87.7839,-88.06799,-88.2224,-88.25849,-88.37289,-88.47279,-88.32619,-88.16979,-88.10909,-87.86669,-87.59629,-87.34809,-86.95919,-86.77279,-86.6218,-86.19749,-85.76439,-85.1749,-84.3285,-83.6807,-83.16199,-82.31609,-81.31929,-80.42789,-79.59809,-78.60979,-77.3468,-76.1555,-75.37959,-74.5448,-73.0486,-71.271,-69.70639,-68.67139,-67.7788,-66.56749,-65.3174,-64.1216,-62.7277,-61.5903,-61.25059,-60.1529,-59.24509,-58.20539,-57.9079,-57.8227,-57.7626,-57.5406,-57.35669,-57.3237,-57.2387,-56.9887,-56.9275,
+-56.9693,-56.9701,-57.075,-56.9809,-58.87559,-59.5309,-59.4504,-60.123,-61.9495,-63.48389,-64.83159,-66.39119,-68.15679,-69.82489,-71.2501,-72.53259,-73.76669,-75.22599,-76.93689,-78.51669,-79.7072,-80.90799,-82.1898,-83.18769,-84.1498,-85.3373,-86.28349,-86.87299,-87.46009,-87.9157,-88.1549,-88.4176,-88.6209,-88.757,-88.93209,-89.05849,-89.0705,-88.8776,-88.5385,-88.21309,-87.87989,-87.64359,-87.4266,-87.07339,-86.69819,-86.3457,-85.94559,-85.55029,-85.2699,-85.05309,-84.94209,-84.90309,-84.6826,-84.4029,-84.4016,-84.5304,-84.38069,-84.1044,-84.04489,-84.11399,-84.20889,-84.3476,-84.42209,-84.43669,-84.57369,-84.7587,-84.84119,-84.9633,-85.1565,-85.42889,-85.85009,-86.16799,-86.4063,-86.56929,-86.66959,-87.05359,-87.50569,-87.73509,-87.8802,-88.11359,-88.4044,-88.56719,-88.58899,-88.75839,-88.8662,-88.9074,-89.00529,-89.03179,-88.79449,-88.63529,-88.5285,-88.50009,-88.67269,-88.403,-87.58159,-86.92879,-86.58419,-86.0179,-85.11929,-84.3907,-84.0793,-83.33379,-82.44719,-81.60529,-80.8564,-79.8957,-78.84799,-77.65659,-76.6005,-74.58719,-72.71479,-72.38719,-71.4999,-68.6503,-66.41509,-65.67649,-64.2926,-63.56689,-65.13719,-60.6702,-60.00509,-56.2033,-53.1865,-54.2659,-57.3594,-57.231,-52.3126,-48.681,-46.1462,-47.1111
+		} 
+		;KeyAttrFlags: Cubic|TangeantAuto|GenericTimeIndependent
+		KeyAttrFlags: *1 {
+			a: 8456
+		} 
+		;KeyAttrDataFloat: RightAuto:0, NextLeftAuto:0
+		KeyAttrDataFloat: *4 {
+			a: 0,0,218434821,0
+		} 
+		KeyAttrRefCount: *1 {
+			a: 343
+		} 
+	}
+	AnimationCurve: 1695762834016, "AnimCurve::", "" {
+		Default: 90
+		KeyVer: 4009
+		KeyTime: *343 {
+			a: 0,769769340,1539538680,2309308020,3079077360,3848846700,4618616040,5388385381,6158154721,6927924061,7697693401,8467462741,9237232081,10007001421,10776770762,11546540102,12316309442,13086078782,13855848122,14625617462,15395386802,16165156143,16934925483,17704694823,18474464163,19244233503,20014002843,20783772183,21553541524,22323310864,23093080204,23862849544,24632618884,25402388224,26172157564,26941926905,27711696245,28481465585,29251234925,30021004265,30790773605,31560542946,32330312286,33100081626,33869850966,34639620306,35409389646,36179158986,36948928327,37718697667,38488467007,39258236347,40028005687,40797775027,41567544367,42337313708,43107083048,43876852388,44646621728,45416391068,46186160408,46955929748,47725699089,48495468429,49265237769,50035007109,50804776449,51574545789,52344315129,53114084470,53883853810,54653623150,55423392490,56193161830,56962931170,57732700510,58502469851,59272239191,60042008531,60811777871,61581547211,62351316551,63121085892,63890855232,64660624572,65430393912,66200163252,66969932592,67739701932,68509471273,69279240613,70049009953,70818779293,71588548633,72358317973,73128087313,73897856654,74667625994,75437395334,76207164674,76976934014,77746703354,78516472694,79286242035,80056011375,80825780715,81595550055,82365319395,83135088735,83904858075,84674627416,85444396756,86214166096,86983935436,87753704776,88523474116,89293243457,90063012797,90832782137,91602551477,92372320817,93142090157,93911859497,94681628838,95451398178,96221167518,96990936858,97760706198,98530475538,99300244878,100070014219,100839783559,101609552899,102379322239,103149091579,103918860919,104688630259,105458399600,106228168940,106997938280,107767707620,108537476960,109307246300,110077015640,110846784981,111616554321,112386323661,113156093001,113925862341,114695631681,115465401021,116235170362,117004939702,117774709042,118544478382,119314247722,120084017062,120853786403,121623555743,122393325083,123163094423,123932863763,124702633103,125472402443,126242171784,127011941124,127781710464,128551479804,
+129321249144,130091018484,130860787824,131630557165,132400326505,133170095845,133939865185,134709634525,135479403865,136249173205,137018942546,137788711886,138558481226,139328250566,140098019906,140867789246,141637558586,142407327927,143177097267,143946866607,144716635947,145486405287,146256174627,147025943968,147795713308,148565482648,149335251988,150105021328,150874790668,151644560008,152414329349,153184098689,153953868029,154723637369,155493406709,156263176049,157032945389,157802714730,158572484070,159342253410,160112022750,160881792090,161651561430,162421330770,163191100111,163960869451,164730638791,165500408131,166270177471,167039946811,167809716151,168579485492,169349254832,170119024172,170888793512,171658562852,172428332192,173198101532,173967870873,174737640213,175507409553,176277178893,177046948233,177816717573,178586486914,179356256254,180126025594,180895794934,181665564274,182435333614,183205102954,183974872295,184744641635,185514410975,186284180315,187053949655,187823718995,188593488335,189363257676,190133027016,190902796356,191672565696,192442335036,193212104376,193981873716,194751643057,195521412397,196291181737,197060951077,197830720417,198600489757,199370259097,200140028438,200909797778,201679567118,202449336458,203219105798,203988875138,204758644478,205528413819,206298183159,207067952499,207837721839,208607491179,209377260519,210147029860,210916799200,211686568540,212456337880,213226107220,213995876560,214765645900,215535415241,216305184581,217074953921,217844723261,218614492601,219384261941,220154031281,220923800622,221693569962,222463339302,223233108642,224002877982,224772647322,225542416662,226312186003,227081955343,227851724683,228621494023,229391263363,230161032703,230930802043,231700571384,232470340724,233240110064,234009879404,234779648744,235549418084,236319187425,237088956765,237858726105,238628495445,239398264785,240168034125,240937803465,241707572806,242477342146,243247111486,244016880826,244786650166,245556419506,246326188846,247095958187,247865727527,248635496867,249405266207,250175035547,
+250944804887,251714574227,252484343568,253254112908,254023882248,254793651588,255563420928,256333190268,257102959608,257872728949,258642498289,259412267629,260182036969,260951806309,261721575649,262491344989,263261114330
+		} 
+		KeyValueFloat: *343 {
+			a: -9.402729,-8.669849,-8.501769,-8.68107,-8.885579,-8.94255,-8.99603,-9.04388,-9.46188,-9.940599,-10.3454,-10.7201,-10.9953,-11.4226,-12.224,-12.8363,-13.2385,-13.7447,-14.1527,-14.5919,-15.1582,-15.6491,-15.897,-16.1283,-16.5241,-16.8583,-17.0793,-17.422,-17.8831,-18.407,-19.13,-19.6971,-20.3023,-21.3135,-22.1225,-22.8116,-23.6438,-24.4104,-25.2787,-26.423,-27.4111,-28.2659,-29.2569,-30.2418,-31.1955,-32.0372,-33.0197,-34.09209,-34.78,-35.6295,-36.7519,-37.3706,-37.73809,-38.4563,-39.0841,-39.555,-40.2164,-40.8824,-41.6418,-42.3004,-42.5821,-42.9236,-43.4477,-43.9039,-44.2742,-44.6654,-45.0717,-45.4392,-45.7677,-46.07529,-46.4809,-46.93999,-47.1554,-47.2947,-47.6922,-47.9627,-47.9507,-48.1286,-48.4744,-48.469,-48.1368,-47.9285,-47.8166,-47.6515,-47.4648,-47.1249,-46.5145,-45.8321,-45.2079,-44.622,-43.9353,-43.0658,-42.1427,-41.29029,-40.373,-39.2492,-38.15599,-37.27629,-36.5379,-35.4523,-34.0912,-33.03469,-32.0136,-30.8145,-29.7479,-28.7429,-27.7165,-26.9292,-26.4348,-26.0238,-25.5474,-24.7839,-23.6983,-22.915,-22.2866,-21.3427,-20.5169,-19.8571,-19.1619,-18.485,-17.8057,-17.1016,-16.3715,-15.606,-15.0377,-14.571,-13.7685,-12.978,-12.4072,-11.8168,-11.1077,-10.4152,-10.1459,-9.96076,-9.47506,-9.070119,-9.02323,-9.108959,-9.128029,-9.130539,-9.48563,-10.1613,-10.5124,-10.8385,-11.4937,-12.2247,-12.9636,-13.5769,-14.4279,-15.7674,-16.8641,-17.4932,-18.1407,-18.9409,-19.6677,-20.1422,-20.4134,-20.8422,-21.4337,-21.8629,-22.3063,-22.8467,-23.0893,-23.28,-23.9829,-24.7698,-25.2545,-25.732,-26.3053,-26.8571,-27.5145,-28.2491,-28.9875,-29.9024,-30.7708,-31.1773,-31.6515,-32.5387,-33.3773,-34.2679,-35.0821,-35.767,-36.63,-37.6143,-38.5058,-39.15269,-39.7191,-40.5812,-41.7107,-42.6358,-43.4924,-44.597,-45.8195,-46.8925,-47.8843,-49.02069,-50.1229,-51.0917,-52.0329,-52.8212,-53.4409,-54.369,-54.8409,-55.49,-55.9444,-56.11819,-56.3193,-56.7131,-57.054,-57.0965,-56.9748,-56.94699,-56.7659,-56.5466,-56.3199,-55.8848,-55.6719,-54.6832,-53.8931,-53.1973,-52.4038,-51.18,-50.0115,-48.8678,-47.56689,-46.209,-44.8796,
+-43.6729,-42.41619,-41.0466,-39.6598,-38.1282,-36.6716,-35.5494,-34.3523,-33.0432,-31.9934,-30.6897,-29.0141,-27.7808,-26.7756,-25.56,-24.6622,-23.9314,-22.8176,-21.8468,-21.0939,-20.081,-19.1571,-18.4255,-17.5992,-16.6224,-15.5205,-14.5853,-13.8946,-13.0758,-12.2673,-11.5098,-10.597,-9.844329,-9.05698,-8.247999,-7.766709,-7.29607,-6.82154,-6.5155,-6.10223,-5.657929,-5.54188,-5.46402,-5.391019,-5.63709,-6.06449,-6.56425,-7.11041,-7.6047,-8.01404,-8.472809,-9.04015,-9.693529,-10.5268,-11.5489,-12.5384,-13.3239,-13.8788,-14.3107,-14.4832,-14.5068,-15.0792,-15.8161,-16.1364,-16.2906,-16.4193,-16.7604,-17.0213,-17.048,-17.5908,-18.3421,-18.8883,-19.9507,-21.1787,-21.7064,-22.1081,-22.5521,-23.1716,-23.9816,-24.7417,-25.5561,-25.9756,-26.5033,-27.4086,-28.7815,-30.5232,-31.2837,-31.4898,-32.46799,-33.3312,-33.8497,-34.4666,-34.546,-37.05899,-38.1152,-38.79029,-41.3849,-42.77,-44.2481,-46.3684,-48.3517,-50.1482,-53.1337,-52.444,-50.3507,-53.0722,-54.2429,-57.1374,-59.35799,-59.54,-58.5258,-58.3508,-60.6629,-63.3308,-65.01059,-63.7887
+		} 
+		;KeyAttrFlags: Cubic|TangeantAuto|GenericTimeIndependent
+		KeyAttrFlags: *1 {
+			a: 8456
+		} 
+		;KeyAttrDataFloat: RightAuto:0, NextLeftAuto:0
+		KeyAttrDataFloat: *4 {
+			a: 0,0,218434821,0
+		} 
+		KeyAttrRefCount: *1 {
+			a: 343
+		} 
+	}
+	AnimationCurveNode: 1695763549216, "AnimCurveNode::T", "" {
+		Properties70:  {
+			P: "d|X", "Number", "", "A",0
+			P: "d|Y", "Number", "", "A",0
+			P: "d|Z", "Number", "", "A",0
+		}
+	}
+	AnimationCurveNode: 1695763553824, "AnimCurveNode::R", "" {
+		Properties70:  {
+			P: "d|X", "Number", "", "A",-179.999984741211
+			P: "d|Y", "Number", "", "A",30
+			P: "d|Z", "Number", "", "A",90
+		}
+	}
+	AnimationLayer: 1695763317920, "AnimLayer::baseLayer", "" {
+	}
+}
+
+; Object connections
+;------------------------------------------------------------------
+
+Connections:  {
+	
+	;Model::root, Model::RootNode
+	C: "OO",1695763135136,0
+	
+	;NodeAttribute::root, Model::root
+	C: "OO",1695762824752,1695763135136
+	
+	;Model::lowerback, Model::root
+	C: "OO",1695763169984,1695763135136
+	
+	;Model::rhipjoint, Model::root
+	C: "OO",1695763269568,1695763135136
+	
+	;Model::lhipjoint, Model::root
+	C: "OO",1695763411472,1695763135136
+	
+	;AnimCurveNode::T, Model::root
+	C: "OP",1695763549216,1695763135136, "Lcl Translation"
+	
+	;NodeAttribute::root, Model::lowerback
+	C: "OO",1695762824992,1695763169984
+	
+	;Model::upperback, Model::lowerback
+	C: "OO",1695763180256,1695763169984
+	
+	;NodeAttribute::root, Model::upperback
+	C: "OO",1695763182320,1695763180256
+	
+	;Model::thorax, Model::upperback
+	C: "OO",1695763182880,1695763180256
+	
+	;NodeAttribute::root, Model::thorax
+	C: "OO",1695763184944,1695763182880
+	
+	;Model::rclavicle, Model::thorax
+	C: "OO",1695763185184,1695763182880
+	
+	;Model::lclavicle, Model::thorax
+	C: "OO",1695763255120,1695763182880
+	
+	;Model::lowerneck, Model::thorax
+	C: "OO",1695763277824,1695763182880
+	
+	;NodeAttribute::root, Model::rclavicle
+	C: "OO",1695763187248,1695763185184
+	
+	;Model::rhumerus, Model::rclavicle
+	C: "OO",1695763187488,1695763185184
+	
+	;NodeAttribute::root, Model::rhumerus
+	C: "OO",1695763222336,1695763187488
+	
+	;Model::rradius, Model::rhumerus
+	C: "OO",1695763238976,1695763187488
+	
+	;AnimCurveNode::R, Model::rhumerus
+	C: "OP",1695763553824,1695763187488, "Lcl Rotation"
+	
+	;NodeAttribute::root, Model::rradius
+	C: "OO",1695763241040,1695763238976
+	
+	;Model::rwrist, Model::rradius
+	C: "OO",1695763246544,1695763238976
+	
+	;NodeAttribute::root, Model::rwrist
+	C: "OO",1695763130224,1695763246544
+	
+	;Model::rthumb, Model::rwrist
+	C: "OO",1695763248608,1695763246544
+	
+	;Model::rhand, Model::rwrist
+	C: "OO",1695763253056,1695763246544
+	
+	;NodeAttribute::root, Model::rthumb
+	C: "OO",1695763250672,1695763248608
+	
+	;NodeAttribute::root, Model::rhand
+	C: "OO",1695763283696,1695763253056
+	
+	;Model::rfingers, Model::rhand
+	C: "OO",1695763275760,1695763253056
+	
+	;NodeAttribute::root, Model::rfingers
+	C: "OO",1695763283936,1695763275760
+	
+	;NodeAttribute::root, Model::lclavicle
+	C: "OO",1695763284176,1695763255120
+	
+	;Model::lhumerus, Model::lclavicle
+	C: "OO",1695763261312,1695763255120
+	
+	;NodeAttribute::root, Model::lhumerus
+	C: "OO",1695763317200,1695763261312
+	
+	;Model::lradius, Model::lhumerus
+	C: "OO",1695763250992,1695763261312
+	
+	;NodeAttribute::root, Model::lradius
+	C: "OO",1695763317440,1695763250992
+	
+	;Model::lwrist, Model::lradius
+	C: "OO",1695763273696,1695763250992
+	
+	;NodeAttribute::root, Model::lwrist
+	C: "OO",1695763317680,1695763273696
+	
+	;Model::lthumb, Model::lwrist
+	C: "OO",1695763257184,1695763273696
+	
+	;Model::lhand, Model::lwrist
+	C: "OO",1695763265440,1695763273696
+	
+	;NodeAttribute::root, Model::lthumb
+	C: "OO",1695763241280,1695763257184
+	
+	;NodeAttribute::root, Model::lhand
+	C: "OO",1695763354336,1695763265440
+	
+	;Model::lfingers, Model::lhand
+	C: "OO",1695763259248,1695763265440
+	
+	;NodeAttribute::root, Model::lfingers
+	C: "OO",1695763355776,1695763259248
+	
+	;NodeAttribute::root, Model::lowerneck
+	C: "OO",1695763354096,1695763277824
+	
+	;Model::upperneck, Model::lowerneck
+	C: "OO",1695763263376,1695763277824
+	
+	;NodeAttribute::root, Model::upperneck
+	C: "OO",1695763355056,1695763263376
+	
+	;Model::head, Model::upperneck
+	C: "OO",1695763267504,1695763263376
+	
+	;NodeAttribute::root, Model::head
+	C: "OO",1695763356016,1695763267504
+	
+	;NodeAttribute::root, Model::rhipjoint
+	C: "OO",1695763356256,1695763269568
+	
+	;Model::rfemur, Model::rhipjoint
+	C: "OO",1695763279888,1695763269568
+	
+	;NodeAttribute::root, Model::rfemur
+	C: "OO",1695763352896,1695763279888
+	
+	;Model::rtibia, Model::rfemur
+	C: "OO",1695763271632,1695763279888
+	
+	;NodeAttribute::root, Model::rtibia
+	C: "OO",1695763356496,1695763271632
+	
+	;Model::rfoot, Model::rtibia
+	C: "OO",1695763419728,1695763271632
+	
+	;NodeAttribute::root, Model::rfoot
+	C: "OO",1695763353136,1695763419728
+	
+	;Model::rtoes, Model::rfoot
+	C: "OO",1695763399088,1695763419728
+	
+	;NodeAttribute::root, Model::rtoes
+	C: "OO",1695763354576,1695763399088
+	
+	;NodeAttribute::root, Model::lhipjoint
+	C: "OO",1695763355536,1695763411472
+	
+	;Model::lfemur, Model::lhipjoint
+	C: "OO",1695763432112,1695763411472
+	
+	;NodeAttribute::root, Model::lfemur
+	C: "OO",1695763354816,1695763432112
+	
+	;Model::ltibia, Model::lfemur
+	C: "OO",1695763407344,1695763432112
+	
+	;NodeAttribute::root, Model::ltibia
+	C: "OO",1695763355296,1695763407344
+	
+	;Model::lfoot, Model::ltibia
+	C: "OO",1695763425920,1695763407344
+	
+	;NodeAttribute::root, Model::lfoot
+	C: "OO",1695763353376,1695763425920
+	
+	;Model::ltoes, Model::lfoot
+	C: "OO",1695763413536,1695763425920
+	
+	;NodeAttribute::root, Model::ltoes
+	C: "OO",1695763353616,1695763413536
+	
+	;AnimLayer::baseLayer, AnimStack::animStack
+	C: "OO",1695763317920,1695759245456
+	
+	;AnimCurveNode::T, AnimLayer::baseLayer
+	C: "OO",1695763549216,1695763317920
+	
+	;AnimCurveNode::R, AnimLayer::baseLayer
+	C: "OO",1695763553824,1695763317920
+	
+	;AnimCurve::, AnimCurveNode::T
+	C: "OP",1695762833600,1695763549216, "d|X"
+	
+	;AnimCurve::, AnimCurveNode::T
+	C: "OP",1695762834224,1695763549216, "d|Y"
+	
+	;AnimCurve::, AnimCurveNode::T
+	C: "OP",1695762832976,1695763549216, "d|Z"
+	
+	;AnimCurve::, AnimCurveNode::R
+	C: "OP",1695762833808,1695763553824, "d|X"
+	
+	;AnimCurve::, AnimCurveNode::R
+	C: "OP",1695762835888,1695763553824, "d|Y"
+	
+	;AnimCurve::, AnimCurveNode::R
+	C: "OP",1695762834016,1695763553824, "d|Z"
+}
+;Takes section
+;----------------------------------------------------
+
+Takes:  {
+	Current: ""
+	Take: "animStack" {
+		FileName: "animStack.tak"
+		LocalTime: 0,263261114330
+		ReferenceTime: 0,263261114330
+	}
+}

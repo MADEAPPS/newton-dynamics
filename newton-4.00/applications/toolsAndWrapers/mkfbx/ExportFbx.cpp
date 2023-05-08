@@ -15,13 +15,14 @@
 
 #ifdef IOS_REF
 	#undef  IOS_REF
-	#define IOS_REF (*(manager->GetIOSettings()))
+	#define IOS_REF (*(fbsManager->GetIOSettings()))
 #endif
 
-static int InitializeSdkObjects(FbxManager*& manager, FbxScene*& pScene);
-static FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* pScene);
-static bool CreateScene(const exportMeshNode* const model, FbxManager *fbxManager, FbxScene* pScene);
-static bool SaveScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename, int pFileFormat = -1, bool pEmbedMedia = false);
+static int InitializeSdkObjects(FbxManager*& fbxManager, FbxScene*& fbxScene);
+static FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* const fbxScene);
+static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const fbxScene, FbxNode* const fbxModelRoot);
+static bool CreateScene(const exportMeshNode* const model, FbxManager* const fbxManager, FbxScene* const fbxScene);
+static bool SaveScene(FbxManager* const fbxManager, FbxDocument* const fbxScene, const char* const filename, int fileFormat = -1, bool embedMedia = false);
 
 bool ExportFbx(const exportMeshNode* const scene, const char* const name)
 {
@@ -33,43 +34,21 @@ bool ExportFbx(const exportMeshNode* const scene, const char* const name)
 		return 0;
 	}
 
-	//if (ConvertToFbx(bvhSkeleton, fbxScene, exportSkeleton, exportAnimations))
-	//{
-	////	if (exportAnimations) {
-	////		char name[1024];
-	////		strcpy(name, argv[1]);
-	////		_strlwr(name);
-	////		char* ptr = strstr(name, ".fbx");
-	////		ptr[0] = 0;
-	////		strcat(name, ".anm");
-	////		ExportAnimation(name, *bvhScene);
-	////	}
-	////	else {
-	////		char name[1024];
-	////		strcpy(name, argv[1]);
-	////		_strlwr(name);
-	////		char* ptr = strstr(name, ".fbx");
-	////		ptr[0] = 0;
-	////		strcat(name, ".ngd");
-	////		bvhScene->Serialize(name);
-	////	}
-	//}
-
 	// Create the scene.
 	bool lResult = CreateScene(scene, fbxManager, fbxScene);
 
 	if (lResult == false)
 	{
-		FBXSDK_printf("\n\nAn error occurred while creating the scene...\n");
+		FBXSDK_printf("\n\nAn error occurred while creating the fbsScene...\n");
 		fbxManager->Destroy();
 		return 0;
 	}
 
-	// Save the scene.
+	// Save the fbsScene.
 	lResult = SaveScene(fbxManager, fbxScene, name);
 	if (lResult == false)
 	{
-		FBXSDK_printf("\n\nAn error occurred while saving the scene...\n");
+		FBXSDK_printf("\n\nAn error occurred while saving the fbsScene...\n");
 		fbxManager->Destroy();
 		return 0;
 	}
@@ -78,36 +57,36 @@ bool ExportFbx(const exportMeshNode* const scene, const char* const name)
 	return true;
 }
 
-int InitializeSdkObjects(FbxManager*& manager, FbxScene*& pScene)
+int InitializeSdkObjects(FbxManager*& fbsManager, FbxScene*& fbsScene)
 {
 	//The first thing to do is to create the FBX Manager which is the object allocator for almost all the classes in the SDK
-	manager = FbxManager::Create();
-	if (!manager)
+	fbsManager = FbxManager::Create();
+	if (!fbsManager)
 	{
 		FBXSDK_printf("Error: Unable to create FBX Manager!\n");
 		exit(1);
 	}
-	else FBXSDK_printf("Autodesk FBX SDK version %s\n", manager->GetVersion());
+	else FBXSDK_printf("Autodesk FBX SDK version %s\n", fbsManager->GetVersion());
 
 	//Create an IOSettings object. This object holds all import/export settings.
-	FbxIOSettings* ios = FbxIOSettings::Create(manager, IOSROOT);
-	manager->SetIOSettings(ios);
+	FbxIOSettings* ios = FbxIOSettings::Create(fbsManager, IOSROOT);
+	fbsManager->SetIOSettings(ios);
 
 	//Load plugins from the executable directory (optional)
 	FbxString lPath = FbxGetApplicationDirectory();
-	manager->LoadPluginsDirectory(lPath.Buffer());
+	fbsManager->LoadPluginsDirectory(lPath.Buffer());
 
-	//Create an FBX scene. This object holds most objects imported/exported from/to files.
-	pScene = FbxScene::Create(manager, "My Scene");
-	if (!pScene)
+	//Create an FBX fbsScene. This object holds most objects imported/exported from/to files.
+	fbsScene = FbxScene::Create(fbsManager, "My Scene");
+	if (!fbsScene)
 	{
-		FBXSDK_printf("Error: Unable to create FBX scene!\n");
+		FBXSDK_printf("Error: Unable to create FBX fbsScene!\n");
 		return 0;
 	}
 	return 1;
 }
 
-bool SaveScene(FbxManager* manager, FbxDocument* scene, const char* name, int fileFormat, bool embedMedia)
+bool SaveScene(FbxManager* const fbsManager, FbxDocument* const fbsScene, const char* const name, int fileFormat, bool embedMedia)
 {
 	int major, minor, revision;
 	bool status = true;
@@ -123,21 +102,21 @@ bool SaveScene(FbxManager* manager, FbxDocument* scene, const char* name, int fi
 	strcat(filename, ".fbx");
 
 	// Create an exporter.
-	FbxExporter* lExporter = FbxExporter::Create(manager, "");
+	FbxExporter* const fbxExporter = FbxExporter::Create(fbsManager, "");
 
-	if (fileFormat < 0 || fileFormat >= manager->GetIOPluginRegistry()->GetWriterFormatCount())
+	if (fileFormat < 0 || fileFormat >= fbsManager->GetIOPluginRegistry()->GetWriterFormatCount())
 	{
 		// Write in fall back format in less no ASCII format found
-		fileFormat = manager->GetIOPluginRegistry()->GetNativeWriterFormat();
+		fileFormat = fbsManager->GetIOPluginRegistry()->GetNativeWriterFormat();
 
 		//Try to export in ASCII if possible
-		int	lFormatCount = manager->GetIOPluginRegistry()->GetWriterFormatCount();
+		int	lFormatCount = fbsManager->GetIOPluginRegistry()->GetWriterFormatCount();
 
 		for (int lFormatIndex = 0; lFormatIndex < lFormatCount; lFormatIndex++)
 		{
-			if (manager->GetIOPluginRegistry()->WriterIsFBX(lFormatIndex))
+			if (fbsManager->GetIOPluginRegistry()->WriterIsFBX(lFormatIndex))
 			{
-				FbxString lDesc = manager->GetIOPluginRegistry()->GetWriterFormatDescription(lFormatIndex);
+				FbxString lDesc = fbsManager->GetIOPluginRegistry()->GetWriterFormatDescription(lFormatIndex);
 				const char *lASCII = "ascii";
 				//const char *lASCII = "binary";
 				if (lDesc.Find(lASCII) >= 0)
@@ -161,25 +140,25 @@ bool SaveScene(FbxManager* manager, FbxDocument* scene, const char* name, int fi
 	IOS_REF.SetBoolProp(EXP_FBX_GLOBAL_SETTINGS, true);
 
 	// Initialize the exporter by providing a filename.
-	if (lExporter->Initialize(filename, fileFormat, manager->GetIOSettings()) == false)
+	if (fbxExporter->Initialize(filename, fileFormat, fbsManager->GetIOSettings()) == false)
 	{
 		FBXSDK_printf("Call to FbxExporter::Initialize() failed.\n");
-		FBXSDK_printf("Error returned: %s\n\n", lExporter->GetStatus().GetErrorString());
+		FBXSDK_printf("Error returned: %s\n\n", fbxExporter->GetStatus().GetErrorString());
 		return false;
 	}
 
 	FbxManager::GetFileFormatVersion(major, minor, revision);
 	FBXSDK_printf("FBX file format version %d.%d.%d\n\n", major, minor, revision);
 
-	// Export the scene.
-	status = lExporter->Export(scene);
+	// Export the fbsScene.
+	status = fbxExporter->Export(fbsScene);
 
 	// Destroy the exporter.
-	lExporter->Destroy();
+	fbxExporter->Destroy();
 	return status;
 }
 
-FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* pScene)
+FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* const fbxScene)
 {
 	int stack = 1;
 	FbxNode* fbxNodesParent[256];
@@ -192,17 +171,18 @@ FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* pScene)
 	while (stack)
 	{
 		stack--;
-		const exportMeshNode* const bvhNode = bvhNodePool[stack];
+		const exportMeshNode* const node = bvhNodePool[stack];
 		FbxNode* const fbxParent = fbxNodesParent[stack];
 
-		FbxNode* const fbxNode = FbxNode::Create(pScene, bvhNode->m_name.c_str());
-		exportVector posit(bvhNode->m_matrix.m_posit);
-		exportVector euler(bvhNode->m_eulers.Scale(180.0f / M_PI));
+		FbxNode* const fbxNode = FbxNode::Create(fbxScene, node->m_name.c_str());
+		exportVector posit(node->m_matrix.m_posit);
+		exportVector euler(node->m_eulers.Scale(180.0f / M_PI));
+		node->m_fbxNode = fbxNode;
 
 		fbxNode->LclRotation.Set(FbxVector4(euler.m_x, euler.m_y, euler.m_z));
 		fbxNode->LclTranslation.Set(FbxVector4(posit.m_x, posit.m_y, posit.m_z));
 
-		FbxSkeleton* const attribute = FbxSkeleton::Create(pScene, model->m_name.c_str());
+		FbxSkeleton* const attribute = FbxSkeleton::Create(fbxScene, model->m_name.c_str());
 		if (fbxParent)
 		{
 			attribute->Size.Set(0.1f);
@@ -220,8 +200,8 @@ FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* pScene)
 			skeleton = fbxNode;
 		}
 
-		for (std::list<exportMeshNode*>::const_iterator iter = bvhNode->m_children.begin();
-			iter != bvhNode->m_children.end(); iter++)
+		for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
+			iter != node->m_children.end(); iter++)
 		{
 			bvhNodePool[stack] = *iter;
 			fbxNodesParent[stack] = fbxNode;
@@ -231,10 +211,130 @@ FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* pScene)
 
 	return skeleton;
 }
-bool CreateScene(const exportMeshNode* const model, FbxManager *pSdkManager, FbxScene* pScene)
+
+static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const fbxScene, FbxNode* const fbxModelRoot)
 {
-	// create scene info
-	FbxDocumentInfo* sceneInfo = FbxDocumentInfo::Create(pSdkManager, "SceneInfo");
+	FbxAnimStack* const animStack = FbxAnimStack::Create(fbxScene, "animStack");
+	FbxAnimLayer* const animLayer = FbxAnimLayer::Create(fbxScene, "baseLayer");	// the AnimLayer object name is "Base Layer"
+	animStack->AddMember(animLayer);
+
+
+	double fps = 1.0f / 60.0f;
+	int stack = 1;
+	const exportMeshNode* nodePool[256];
+	nodePool[0] = model;
+	while (stack) 
+	{
+		stack--;
+		const exportMeshNode* const root = nodePool[stack];
+
+if (root->m_name == "root")
+
+		if (root->m_positionsKeys.size())
+		{
+			FbxNode* const fbxNode = root->m_fbxNode;
+			fbxNode->LclTranslation.GetCurveNode(animLayer, true);
+			FbxAnimCurve* const curveX = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X, true);
+			FbxAnimCurve* const curveY = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y, true);
+			FbxAnimCurve* const curveZ = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z, true);
+			
+			FbxTime lTime;
+			curveX->KeyModifyBegin();
+			curveY->KeyModifyBegin();
+			curveZ->KeyModifyBegin();
+			for (int i = 0; i < root->m_positionsKeys.size(); ++i)
+			{
+				double time = double(i) * fps;
+				lTime.SetSecondDouble(time);
+			
+				exportVector posit(root->m_positionsKeys[i]);
+				int keyIndexX = curveX->KeyAdd(lTime);
+				curveX->KeySetValue(keyIndexX, posit.m_x);
+				curveX->KeySetInterpolation(keyIndexX, FbxAnimCurveDef::eInterpolationCubic);
+			
+				int keyIndexY = curveY->KeyAdd(lTime);
+				curveY->KeySetValue(keyIndexY, posit.m_y);
+				curveY->KeySetInterpolation(keyIndexY, FbxAnimCurveDef::eInterpolationCubic);
+			
+				int keyIndexZ = curveZ->KeyAdd(lTime);
+				curveZ->KeySetValue(keyIndexZ, posit.m_z);
+				curveZ->KeySetInterpolation(keyIndexZ, FbxAnimCurveDef::eInterpolationCubic);
+			}
+			curveX->KeyModifyEnd();
+			curveY->KeyModifyEnd();
+			curveZ->KeyModifyEnd();
+		}
+
+//if ((root->m_name == "lowerback") || 
+//	(root->m_name == "thorax") ||
+//	(root->m_name == "lowerneck") ||
+//	(root->m_name == "upperneck") ||
+//	(root->m_name == "head") ||
+//	(root->m_name == "rclavicle") ||
+//	(root->m_name == "rhumerus") ||
+//	//(root->m_name == "rradius") ||
+//	//(root->m_name == "rwrist") ||
+//	//(root->m_name == "rhand") ||
+//	//(root->m_name == "rfingers") ||
+//	//(root->m_name == "rthumb") ||
+//
+//	(root->m_name == "upperback"))
+if (root->m_name == "rhumerus")
+
+		if (root->m_rotationsKeys.size())
+		{
+			FbxNode* const fbxNode = root->m_fbxNode;
+			fbxNode->LclRotation.GetCurveNode(animLayer, true);
+			FbxAnimCurve* const curveX = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X, true);
+			FbxAnimCurve* const curveY = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y, true);
+			FbxAnimCurve* const curveZ = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z, true);
+
+			FbxTime lTime;
+			curveX->KeyModifyBegin();
+			curveY->KeyModifyBegin();
+			curveZ->KeyModifyBegin();
+			for (int i = 0; i < root->m_rotationsKeys.size(); ++i)
+			{
+				double time = double(i) * fps;
+				lTime.SetSecondDouble(time);
+
+				exportVector eulers(root->m_rotationsKeys[i]);
+
+				eulers.m_x = root->m_rotationsKeys[i].m_y;
+				eulers.m_y = root->m_rotationsKeys[i].m_z;
+				eulers.m_z = root->m_rotationsKeys[i].m_x;
+				eulers = eulers.Scale(180.0f / M_PI);
+
+				int keyIndexX = curveX->KeyAdd(lTime);
+				curveX->KeySetValue(keyIndexX, eulers.m_x);
+				curveX->KeySetInterpolation(keyIndexX, FbxAnimCurveDef::eInterpolationCubic);
+
+				int keyIndexY = curveY->KeyAdd(lTime);
+				curveY->KeySetValue(keyIndexY, eulers.m_y);
+				curveY->KeySetInterpolation(keyIndexY, FbxAnimCurveDef::eInterpolationCubic);
+
+				int keyIndexZ = curveZ->KeyAdd(lTime);
+				curveZ->KeySetValue(keyIndexZ, eulers.m_z);
+				curveZ->KeySetInterpolation(keyIndexZ, FbxAnimCurveDef::eInterpolationCubic);
+			}
+			curveX->KeyModifyEnd();
+			curveY->KeyModifyEnd();
+			curveZ->KeyModifyEnd();
+		}
+
+		for (std::list<exportMeshNode*>::const_iterator iter = root->m_children.begin();
+			iter != root->m_children.end(); iter++)
+		{
+			nodePool[stack] = *iter;
+			stack++;
+		}
+	}
+}
+
+bool CreateScene(const exportMeshNode* const model, FbxManager* const sdkManager, FbxScene* const sbxScene)
+{
+	// create sbxScene info
+	FbxDocumentInfo* const sceneInfo = FbxDocumentInfo::Create(sdkManager, "SceneInfo");
 	sceneInfo->mTitle = "motion capture skeleton";
 	sceneInfo->mSubject = "convert motion capture skeleton";
 	sceneInfo->mAuthor = "Newton Dynamics";
@@ -243,24 +343,22 @@ bool CreateScene(const exportMeshNode* const model, FbxManager *pSdkManager, Fbx
 	sceneInfo->mComment = "";
 
 	// we need to add the sceneInfo before calling AddThumbNailToScene because
-	// that function is asking the scene for the sceneInfo.
-	pScene->SetSceneInfo(sceneInfo);
+	// that function is asking the sbxScene for the sceneInfo.
+	sbxScene->SetSceneInfo(sceneInfo);
 
-	//FbxNode* lPatch = CreatePatch(pScene, "Patch");
-	FbxNode* lSkeletonRoot = CreateSkeleton(model, pScene);
+	//FbxNode* lPatch = CreatePatch(sbxScene, "Patch");
+	FbxNode* const fbxModelRootNode = CreateSkeleton(model, sbxScene);
 
-	// Build the node tree.
-	FbxNode* lRootNode = pScene->GetRootNode();
-	//lRootNode->AddChild(lPatch);
-	lRootNode->AddChild(lSkeletonRoot);
+	FbxNode* const fbxSceneRootNode = sbxScene->GetRootNode();
+	fbxSceneRootNode->AddChild(fbxModelRootNode);
 
 	//// Store poses
-	//LinkPatchToSkeleton(pScene, lPatch, lSkeletonRoot);
-	//StoreBindPose(pScene, lPatch);
-	//StoreRestPose(pScene, lSkeletonRoot);
-	//
-	//// Animation
-	//AnimateSkeleton(pScene, lSkeletonRoot);
+	//LinkPatchToSkeleton(sbxScene, lPatch, fbxModelRootNode);
+	//StoreBindPose(sbxScene, lPatch);
+	//StoreRestPose(sbxScene, fbxModelRootNode);
+	
+	// Animation
+	AnimateSkeleton(model, sbxScene, fbxModelRootNode);
 
 	return true;
 }

@@ -41,6 +41,7 @@ class exportMeshNode
 	exportMatrix m_matrix;
 	exportVector m_eulers;
 	std::string m_name;
+	mutable FbxNode* m_fbxNode;
 	exportMeshNode* m_parent;
 	std::list<exportMeshNode*> m_children;
 

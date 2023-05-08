@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 	if (!asfName)
 	{
 		printf("asf2fbx asf_file_name [amc_file_name]\n");
-		printf("file_name = skeleton file name\n");
+		printf("asf_file_name = skeleton file name\n");
 		printf("[amc_file_name] = optional animation file name\n");
 		return 0;
 	}

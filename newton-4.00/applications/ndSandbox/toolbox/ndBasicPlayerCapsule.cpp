@@ -113,9 +113,6 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	//entity->ResetMatrix(matrix);
 
 	SetMatrix(matrix);
-	ndSharedPtr<ndBody> bodyPtr(this);
-	world->AddBody(bodyPtr);
-
 	scene->AddEntity(entity);
 
 	SetNotifyCallback(new ndBasicPlayerCapsuleNotify(scene, entity));

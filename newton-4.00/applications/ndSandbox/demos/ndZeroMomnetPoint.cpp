@@ -53,8 +53,9 @@ namespace ndZmp
 			ndVector torque(ndVector::m_zero);
 			for (ndNode* node = m_rootNode->IteratorFirst(); node; node = node->IteratorNext())
 			{
-				force += m_invDynamicsSolver.GetBodyForce(node->m_body->GetAsBodyDynamic());
-				torque += m_invDynamicsSolver.GetBodyTorque(node->m_body->GetAsBodyDynamic());
+				ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+				force += m_invDynamicsSolver.GetBodyForce(body);
+				torque += m_invDynamicsSolver.GetBodyTorque(body);
 			}
 			if (ndAbs(torque.m_z) > 0.1f)
 			{
@@ -137,7 +138,8 @@ namespace ndZmp
 		wheelBody->GetNotifyCallback()->OnTransform(0, wheelMatrix);
 		modelRoot->m_body->GetNotifyCallback()->OnTransform(0, rootMatrix);
 
-		// add the joints manually, because on this model teh whell is not activally actuated.
+#if 0
+		// add the joints manually, because on this model the wheel is not activate actuated.
 		world->AddJoint(legJoint);
 		world->AddJoint(wheelJoint);
 
@@ -145,6 +147,11 @@ namespace ndZmp
 		//ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
 		//model->AddLimb(legLimb, wheelBody, wheelJoint);
 		model->AddLimb(modelRoot, legBody, legJoint);
+#else
+		// add model limbs
+		ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
+		model->AddLimb(legLimb, wheelBody, wheelJoint);
+#endif
 		return model;
 	}
 }

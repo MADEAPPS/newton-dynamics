@@ -4,6 +4,7 @@
 exportMeshNode::exportMeshNode()
 	:m_matrix()
 	,m_eulers(0.0f, 0.0f, 0.0f, 0.0f)
+	,m_fbxNode(nullptr)
 	,m_parent(nullptr)
 	,m_positionsKeys()
 	,m_rotationsKeys()
@@ -13,6 +14,7 @@ exportMeshNode::exportMeshNode()
 exportMeshNode::exportMeshNode(exportMeshNode* const parent)
 	:m_matrix()
 	,m_eulers(0.0f, 0.0f, 0.0f, 0.0f)
+	,m_fbxNode(nullptr)
 	,m_parent(parent)
 {
 	_ASSERT(parent);
