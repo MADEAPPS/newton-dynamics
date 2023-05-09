@@ -2582,11 +2582,13 @@ ndInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 
 					for (ndInt32 i = count - 1; i >= 0; --i)
 					{
-						ndBigVector point(m_buffer[i]);
+						//ndBigVector point(m_buffer[i]);
+						ndBigVector point(m_buffer[i] - convexPolygon->m_normal * (m_buffer[i] - poly[0]).DotProduct(convexPolygon->m_normal));
 						ndBigVector pointInPoly(ndPointToPolygonDistance(point, &poly[0], convexPolygon->m_count));
 
 						const ndBigVector error(point - pointInPoly);
 						ndFloat64 dist2 = error.DotProduct(error & ndBigVector::m_triplexMask).GetScalar();
+
 						if (dist2 > ndFloat64 (5.0e-4f))
 						{
 							count--;
