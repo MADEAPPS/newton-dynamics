@@ -36,7 +36,6 @@ ndPolygonMeshDesc::ndPolygonMeshDesc()
 	,m_ownTempBuffers(false)
 	,m_doContinueCollisionTest(false)
 {
-	ndAssert(0);
 }
 
 ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)

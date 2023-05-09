@@ -20,7 +20,7 @@ option("NEWTON_ENABLE_AVX2_SOLVER" "enable AVX2 solver"  ON)
 option("NEWTON_ENABLE_CUDA_SOLVER" "enable cuda solver" OFF)
 option("NEWTON_ENABLE_SYCL_SOLVER" "enable sycl solver" OFF)
 option("NEWTON_DOUBLE_PRECISION" "generate double precision" OFF)
-option("NEWTON_NO_SIMD_INTRINSICS" "generate simd vector class" OFF)
+option("NEWTON_SCALAR_VECTOR_CLASS" "generate simd vector class" OFF)
 option("NEWTON_BUILD_NEWTON_JAVA" "build a sharp wrapper" OFF)
 option("NEWTON_BUILD_NEWTON_PYTHON" "build python wrapper" OFF)
 option("NEWTON_BUILD_NEWTON_C_SHARP" "build a sharp wrapper" OFF)
@@ -43,7 +43,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Don't use e.g. GNU extension (like -std=gnu++11) for portability
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(NEWTON_NO_SIMD_INTRINSICS)
+if(NEWTON_SCALAR_VECTOR_CLASS)
 	add_definitions(-DD_SCALAR_VECTOR_CLASS)
 endif()
 
