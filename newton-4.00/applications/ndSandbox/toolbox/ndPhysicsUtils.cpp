@@ -176,7 +176,6 @@ ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInsta
 	ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
 	ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("shape", scene->GetShaderCache(), &shape, textName, textName, textName));
 
-	//ndBodyKinematic* const body = new ndBodyDynamic();
 	ndSharedPtr<ndBody> body(new ndBodyDynamic());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(mesh);

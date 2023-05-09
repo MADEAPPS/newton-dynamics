@@ -109,7 +109,7 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 }
 #else
 
-
+#if 0
 static void BuildHeightField(ndDemoEntityManager* const scene)
 {
 	size_t iDim = 64;
@@ -185,4 +185,73 @@ void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene)
 	ndVector origin(0.0f, 5.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
+
+#else
+ndBodyKinematic* AddChamferCylinder(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, ndFloat32 width, const char* const textName)
+{
+	ndShapeInstance shape(new ndShapeChamferCylinder(0.5, 1.0));
+	shape.SetScale(ndVector(width, radius, radius, ndFloat32 (1.0)));
+	ndBodyKinematic* const body = CreateBody(scene, shape, location, mass, textName);
+	return body;
+}
+
+static void BuildHeightField(ndDemoEntityManager* const scene)
+{
+	size_t iDim = 120;
+	ndFloat32 dSize = 15, dMaxHeight = 0.0;
+	std::vector<ndFloat32> aData; aData.resize(iDim * iDim);
+	ndFloat32 fHorizontalScale = ndFloat32(dSize / ndFloat32(iDim - 1));
+	ndShapeInstance shape(new ndShapeHeightfield(ndInt32(iDim), ndInt32(iDim), ndShapeHeightfield::m_normalDiagonals, fHorizontalScale, fHorizontalScale));
+	//ndShapeInstance shape(new ndShapeHeightfield(ndInt32(iDim), ndInt32(iDim), ndShapeHeightfield::m_invertedDiagonals, fHorizontalScale, fHorizontalScale));
+	ndMatrix mLocal(ndGetIdentityMatrix());
+	mLocal.m_posit = ndVector(-(dSize * 0.5), 0.0, -(dSize * 0.5), 1.0);
+	shape.SetLocalMatrix(mLocal);
+	auto pShapeHeightField = shape.GetShape()->GetAsShapeHeightfield();
+	for (int i = 0; i < ndInt32(iDim * iDim); ++i)
+	{
+		pShapeHeightField->GetElevationMap()[i] = ndReal(ndFloat32(rand()) * ndFloat32(2.0) * dMaxHeight / RAND_MAX);
+	}
+
+	pShapeHeightField->UpdateElevationMapAabb();
+	ndMatrix uvMatrix(ndGetIdentityMatrix());
+	uvMatrix[0][0] *= 0.025f;
+	uvMatrix[1][1] *= 0.025f;
+	uvMatrix[2][2] *= 0.025f;
+
+	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &shape, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix, false));
+	ndMatrix location(ndGetIdentityMatrix());
+	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
+	entity->SetMesh(geometry);
+
+	ndBodyKinematic* const body = new ndBodyDynamic();
+	body->SetMatrix(location);
+	body->SetCollisionShape(shape);
+	ndSharedPtr<ndBody> bodyPtr(body);
+	scene->GetWorld()->AddBody(bodyPtr);
+	scene->AddEntity(entity);
+}
+
+static void AddBodies(ndDemoEntityManager* const scene)
+{
+	ndVector vStart(0.0f, 3.0f, 0.0f, 1.0f);
+	ndMatrix location(ndRollMatrix(10.0 * ndDegreeToRad));
+	location.m_posit = vStart;
+
+	ndBodyKinematic* const body = AddChamferCylinder(scene, location, 1.0f, 1.0f, 1.25f, "wood_0.tga");
+	body->SetMatrix(location);
+}
+
+//void ndHeightFieldTest(ndDemoEntityManager* const scene)
+void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene)
+{
+	// build the height field
+	BuildHeightField(scene);
+	AddBodies(scene);
+
+	ndQuaternion rot;
+	ndVector origin(-15.0f, 5.0f, 0.0f, 1.0f);
+	scene->SetCameraMatrix(rot, origin);
+}
+
+#endif
 #endif
