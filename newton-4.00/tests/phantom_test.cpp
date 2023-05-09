@@ -47,10 +47,11 @@ class NewtonPhantom : public ndModel
 	// information with other ndBody's without effecting the simulation
 
 public:
-	NewtonPhantom() :
+	NewtonPhantom(ndScene* scene) :
 		ndModel(),
 		phantomShape(new ndShapeBox(1.0f, 1.0f, 1.0f)),
-		worldMatrix(ndGetIdentityMatrix())
+		worldMatrix(ndGetIdentityMatrix()),
+		notification(scene)
 	{
 	}
 	~NewtonPhantom() = default;
@@ -141,7 +142,7 @@ TEST(CollisionShape, Phantom)
 	world.AddBody(sphere);
 
 	// create a Phantom model that contains a collision shape and transform matrix
-	NewtonPhantom* const phantom = new NewtonPhantom;
+	NewtonPhantom* const phantom = new NewtonPhantom(world.GetScene());
 	ndSharedPtr<ndModel> phantomPtr(phantom);
 	world.AddModel(phantomPtr);
 
