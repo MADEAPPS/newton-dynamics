@@ -228,7 +228,7 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 			// test User contact calculation.
 			#ifdef D_TEST_CALCULATE_CONTACTS
 			ndContactSolver solver;
-			ndContactNotify notification;
+			ndContactNotify notification(world->GetScene());
 			ndFixSizeArray<ndContactPoint, 16> contactOut;
 			ndBodyKinematic* bodyA = contact->GetBody0();
 			ndBodyKinematic* bodyB = contact->GetBody1();

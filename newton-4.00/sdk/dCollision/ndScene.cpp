@@ -60,7 +60,7 @@ ndScene::ndScene()
 	,m_lock()
 	,m_rootNode(nullptr)
 	,m_sentinelBody(nullptr)
-	,m_contactNotifyCallback(new ndContactNotify())
+	,m_contactNotifyCallback(new ndContactNotify(nullptr))
 	,m_timestep(ndFloat32 (0.0f))
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_frameNumber(0)
@@ -207,7 +207,7 @@ void ndScene::SetContactNotify(ndContactNotify* const notify)
 	}
 	else
 	{
-		m_contactNotifyCallback = new ndContactNotify();
+		m_contactNotifyCallback = new ndContactNotify(nullptr);
 	}
 	m_contactNotifyCallback->m_scene = this;
 }
@@ -912,9 +912,10 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPo
 
 	ndAssert(globalOrigin.TestOrthogonal());
 	convexShape.CalculateAabb(globalOrigin, boxP0, boxP1);
-
+	
 	callback.m_contacts.SetCount(0);
 	callback.m_param = ndFloat32(1.2f);
+	callback.m_cachedScene = (ndScene*)this;
 	while (stack && (stack < (D_SCENE_MAX_STACK_DEPTH - 4)))
 	{
 		stack--;
@@ -937,7 +938,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPo
 					ndConvexCastNotify savedNotification(callback);
 					ndBodyKinematic* const kinBody = body->GetAsBodyKinematic();
 					callback.m_contacts.SetCount(0);
-					if (callback.CastShape(convexShape, globalOrigin, globalDest, kinBody))
+					if (callback.CastShape____(convexShape, globalOrigin, globalDest, kinBody))
 					{
 						// found new contacts, see how the are managed
 						if (ndAbs(savedNotification.m_param - callback.m_param) < ndFloat32(-1.0e-3f))
@@ -1039,6 +1040,8 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPo
 			}
 		}
 	}
+
+	callback.m_cachedScene = nullptr;
 	return callback.m_contacts.GetCount() > 0;
 }
 

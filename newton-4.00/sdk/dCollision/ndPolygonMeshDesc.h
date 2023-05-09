@@ -82,7 +82,7 @@ class ndPolygonMeshDesc: public ndFastAabb
 	};
 
 	// colliding box in polygonSoup local space
-	D_COLLISION_API ndPolygonMeshDesc();
+	//D_COLLISION_API ndPolygonMeshDesc();
 	D_COLLISION_API ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode);
 	D_COLLISION_API ~ndPolygonMeshDesc();
 
@@ -109,19 +109,19 @@ class ndPolygonMeshDesc: public ndFastAabb
 	ndProceduralStaticMeshFaceQuery* m_proceduralStaticMeshFaceQuery;
 	ndFloat32 m_maxT;
 	ndInt32 m_threadId;
-	bool m_ownTempBuffers;
+	//bool m_ownTempBuffers;
 	bool m_doContinueCollisionTest;
 } D_GCC_NEWTON_ALIGN_32;
 
 
-class ndPolygonMeshLocalDesc : public ndPolygonMeshDesc
-{
-	public:
-	D_COLLISION_API ndPolygonMeshLocalDesc(ndContactSolver& proxy, bool ccdMode);
-
-	ndPolygonMeshDesc::ndStaticMeshFaceQuery m_localStaticMeshQuery;
-	ndPolygonMeshDesc::ndProceduralStaticMeshFaceQuery m_localProceduralStaticMeshQuery;
-};
+//class ndPolygonMeshLocalDesc : public ndPolygonMeshDesc
+//{
+//	public:
+//	D_COLLISION_API ndPolygonMeshLocalDesc(ndContactSolver& proxy, bool ccdMode);
+//
+//	ndPolygonMeshDesc::ndStaticMeshFaceQuery m_localStaticMeshQuery;
+//	ndPolygonMeshDesc::ndProceduralStaticMeshFaceQuery m_localProceduralStaticMeshQuery;
+//};
 
 #endif 
 

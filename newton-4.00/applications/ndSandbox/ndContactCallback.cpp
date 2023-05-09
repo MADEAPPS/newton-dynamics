@@ -67,7 +67,7 @@ ndMaterialGraph::~ndMaterialGraph()
 }
 
 ndContactCallback::ndContactCallback()
-	:ndContactNotify()
+	:ndContactNotify(nullptr)
 	,m_materialGraph()
 	,m_defaultMaterial()
 {

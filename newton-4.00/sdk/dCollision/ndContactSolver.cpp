@@ -4011,7 +4011,8 @@ ndInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 	ndAssert(m_instance1.GetShape()->GetAsShapeStaticMesh());
 
 	ndInt32 count = 0;
-	ndPolygonMeshLocalDesc data(*this, true);
+	//ndPolygonMeshLocalDesc data(*this, true);
+	ndPolygonMeshDesc data(*this, true);
 
 	ndVector relVeloc(m_contact->m_body0->GetVelocity() - m_contact->m_body1->GetVelocity());
 	ndFloat32 baseLinearSpeed = ndSqrt(relVeloc.DotProduct(relVeloc).GetScalar());

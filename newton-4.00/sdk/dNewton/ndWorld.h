@@ -77,8 +77,8 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API ndSolverModes GetSelectedSolver() const;
 	D_NEWTON_API void SelectSolver(ndSolverModes solverMode);
 
-	D_NEWTON_API bool IsHighPerformanceCompute() const;
 	D_NEWTON_API ndScene* GetScene() const;
+	D_NEWTON_API bool IsHighPerformanceCompute() const;
 	D_NEWTON_API const char* GetSolverString() const;
 	D_NEWTON_API ndBodyKinematic* GetSentinelBody() const;
 

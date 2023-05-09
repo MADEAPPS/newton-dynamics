@@ -61,9 +61,9 @@ D_MSV_NEWTON_ALIGN_32
 class ndContactNotify: public ndClassAlloc
 {
 	public:
-	ndContactNotify()
+	ndContactNotify(ndScene* const scene)
 		:ndClassAlloc()
-		,m_scene(nullptr)
+		,m_scene(scene)
 	{
 	}
 
@@ -102,8 +102,11 @@ class ndContactNotify: public ndClassAlloc
 
 	protected:
 	ndMaterial m_default;
+
+	private:
 	ndScene* m_scene;
 	friend class ndScene;
+	friend class ndPolygonMeshDesc;
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif

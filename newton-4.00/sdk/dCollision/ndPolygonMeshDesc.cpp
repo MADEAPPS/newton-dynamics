@@ -28,15 +28,15 @@
 #include "ndShapeInstance.h"
 #include "ndPolygonMeshDesc.h"
 
-ndPolygonMeshDesc::ndPolygonMeshDesc()
-	:ndFastAabb()
-	,m_boxDistanceTravelInMeshSpace(ndVector::m_zero)
-	,m_maxT(ndFloat32(1.0f))
-	,m_threadId(0)
-	,m_ownTempBuffers(false)
-	,m_doContinueCollisionTest(false)
-{
-}
+//ndPolygonMeshDesc::ndPolygonMeshDesc()
+//	:ndFastAabb()
+//	,m_boxDistanceTravelInMeshSpace(ndVector::m_zero)
+//	,m_maxT(ndFloat32(1.0f))
+//	,m_threadId(0)
+//	,m_ownTempBuffers(false)
+//	,m_doContinueCollisionTest(false)
+//{
+//}
 
 ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)
 	:ndFastAabb()
@@ -50,31 +50,36 @@ ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)
 	,m_proceduralStaticMeshFaceQuery(nullptr)
 	,m_maxT(ndFloat32(1.0f))
 	,m_threadId(proxy.m_threadId)
-	,m_ownTempBuffers(false)
+	//,m_ownTempBuffers(false)
 	,m_doContinueCollisionTest(ccdMode)
 {
-	ndScene* const scene = proxy.m_contact->GetBody0()->GetScene();
-	if (scene)
-	{
-		m_staticMeshQuery = &scene->m_staticMeshQuery[proxy.m_threadId];
-		m_proceduralStaticMeshFaceQuery = &scene->m_proceduralStaticMeshQuery[proxy.m_threadId];
-	}
-	else
-	{
-		m_ownTempBuffers = true;
-		m_staticMeshQuery = new ndStaticMeshFaceQuery;
-		m_proceduralStaticMeshFaceQuery = new ndProceduralStaticMeshFaceQuery;
-	}
+	ndAssert(proxy.m_notification->m_scene);
+	//ndScene* const scene = proxy.m_contact->GetBody0()->GetScene();
+	//if (scene)
+	//{
+	//	m_staticMeshQuery = &scene->m_staticMeshQuery[proxy.m_threadId];
+	//	m_proceduralStaticMeshFaceQuery = &scene->m_proceduralStaticMeshQuery[proxy.m_threadId];
+	//}
+	//else
+	//{
+	//	m_ownTempBuffers = true;
+	//	m_staticMeshQuery = new ndStaticMeshFaceQuery;
+	//	m_proceduralStaticMeshFaceQuery = new ndProceduralStaticMeshFaceQuery;
+	//}
+
+	ndScene* const scene = proxy.m_notification->m_scene;
+	m_staticMeshQuery = &scene->m_staticMeshQuery[proxy.m_threadId];
+	m_proceduralStaticMeshFaceQuery = &scene->m_proceduralStaticMeshQuery[proxy.m_threadId];
 	Init();
 }
 
 ndPolygonMeshDesc::~ndPolygonMeshDesc()
 {
-	if (m_ownTempBuffers)
-	{
-		delete m_proceduralStaticMeshFaceQuery;
-		delete m_staticMeshQuery;
-	}
+	//if (m_ownTempBuffers)
+	//{
+	//	delete m_proceduralStaticMeshFaceQuery;
+	//	delete m_staticMeshQuery;
+	//}
 }
 
 void ndPolygonMeshDesc::Init()
@@ -269,21 +274,21 @@ void ndPolygonMeshDesc::SortFaceArray()
 	#endif
 }
 
-ndPolygonMeshLocalDesc::ndPolygonMeshLocalDesc(ndContactSolver& proxy, bool ccdMode)
-	:ndPolygonMeshDesc()
-	,m_localStaticMeshQuery()
-	,m_localProceduralStaticMeshQuery()
-{
-	m_vertex = nullptr;
-	m_vertexStrideInBytes = 0;
-	m_skinMargin = proxy.m_skinMargin;
-	m_convexInstance = &proxy.m_instance0;
-	m_polySoupInstance = &proxy.m_instance1;
-
-	m_ownTempBuffers = false;
-	m_doContinueCollisionTest = ccdMode;
-
-	m_staticMeshQuery = &m_localStaticMeshQuery;
-	m_proceduralStaticMeshFaceQuery = &m_localProceduralStaticMeshQuery;
-	Init();
-}
+//ndPolygonMeshLocalDesc::ndPolygonMeshLocalDesc(ndContactSolver& proxy, bool ccdMode)
+//	:ndPolygonMeshDesc(proxy, ccdMode)
+//	,m_localStaticMeshQuery()
+//	,m_localProceduralStaticMeshQuery()
+//{
+//	m_vertex = nullptr;
+//	m_vertexStrideInBytes = 0;
+//	m_skinMargin = proxy.m_skinMargin;
+//	m_convexInstance = &proxy.m_instance0;
+//	m_polySoupInstance = &proxy.m_instance1;
+//
+//	m_ownTempBuffers = false;
+//	m_doContinueCollisionTest = ccdMode;
+//
+//	m_staticMeshQuery = &m_localStaticMeshQuery;
+//	m_proceduralStaticMeshFaceQuery = &m_localProceduralStaticMeshQuery;
+//	Init();
+//}
