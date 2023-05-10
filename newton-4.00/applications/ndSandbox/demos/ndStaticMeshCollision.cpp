@@ -109,23 +109,101 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 }
 #else
 
-#if 0
-static void BuildHeightField(ndDemoEntityManager* const scene)
+#if 1
+
+#include "ndDemoDebugMesh.h"
+class CConvexCaster : public ndModel
 {
-	size_t iDim = 64;
-	ndFloat32 dSize = 128, dMaxHeight = 0.5;
-	std::vector<ndFloat32> aData; aData.resize(iDim * iDim);
-	ndFloat32 fHorizontalScale = ndFloat32(128.0 / ndFloat32(iDim - 1));
-	ndShapeInstance shape(new ndShapeHeightfield(ndInt32 (iDim), ndInt32(iDim), ndShapeHeightfield::m_normalDiagonals, fHorizontalScale, fHorizontalScale));
-	//ndShapeInstance shape(new ndShapeHeightfield(ndInt32(iDim), ndInt32(iDim), ndShapeHeightfield::m_invertedDiagonals, fHorizontalScale, fHorizontalScale));
+	public:
+	class CConvexCastCallBack : public ndConvexCastNotify
+	{
+		public:
+		CConvexCastCallBack()
+			: ndConvexCastNotify()
+		{}
+
+		virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const) override
+		{
+			return 1;
+		}
+
+		virtual ndFloat32 OnRayCastAction(const ndContactPoint&, ndFloat32) override
+		{
+			return 0;
+		}
+	};
+
+	CConvexCaster(ndDemoEntityManager* const pScene, ndBodyKinematic* const pParentBody)
+		: ndModel()
+		, m_CastShape(new ndShapeSphere(5.0))
+		, m_pParentBody(pParentBody)
+		, m_pKinJoint(nullptr)
+		, m_pScene(pScene)
+	{
+	}
+
+	virtual void OnAddToWorld() override {}
+	virtual void OnRemoveFromToWorld() override {}
+
+	virtual void Update(ndWorld* const, ndFloat32) override
+	{
+		CConvexCastCallBack castCallback;
+
+		//if (m_world->ConvexCast(castCallback, m_CastShape, ndGetIdentityMatrix(), ndVector(0.0, 0.001, 0.0, 1.0)))
+		if (m_world->ConvexCast(castCallback, m_CastShape, ndGetIdentityMatrix(), ndVector(0.0, 0.0, 0.001, 1.0)))
+		{
+
+			if (castCallback.m_contacts.GetCount() > 0)
+			{
+				if (castCallback.m_contacts[0].m_body1)
+				{
+					auto pHitBody = castCallback.m_contacts[0].m_body1->GetNotifyCallback()->GetBody()->GetAsBodyKinematic();
+					auto pUserData = static_cast<ndDemoEntity*>(castCallback.m_contacts[0].m_body1->GetNotifyCallback()->GetUserData());
+
+					ndAssert(pUserData->GetName() == "My Collision Object");
+
+					if (!m_pKinJoint)
+					{
+						m_pKinJoint = new ndJointKinematicController(pHitBody, m_pParentBody, castCallback.m_contacts[0].m_point);
+						m_pKinJoint->SetMaxAngularFriction(1000);
+						m_pKinJoint->SetMaxLinearFriction(1000);
+						ndSharedPtr<ndJointBilateralConstraint> jointPtr(m_pKinJoint);
+						m_world->AddJoint(jointPtr);
+					}
+				}
+			}
+		}
+	}
+
+	virtual void Debug(ndConstraintDebugCallback&) const override
+	{
+		ndWireFrameDebugMesh sharedEdgeMesh = ndWireFrameDebugMesh(m_pScene->GetShaderCache(), &m_CastShape);
+		const ndVector color(0.5f, 0.5f, 0.5f, 1.0f);
+		sharedEdgeMesh.SetColor(color);
+		sharedEdgeMesh.Render(m_pScene, ndGetIdentityMatrix());
+	}
+
+private:
+	ndShapeInstance m_CastShape;
+	ndBodyKinematic* m_pParentBody;
+	ndJointKinematicController* m_pKinJoint;
+	ndDemoEntityManager* m_pScene;
+};
+
+static ndBodyKinematic* BuildHeightField(ndDemoEntityManager* const scene)
+{
+	ndInt32 iDim = 64;
+	ndFloat32 dSize = 128, dMaxHeight = 0.0;
+	std::vector<ndFloat32> aData; aData.resize(size_t(iDim * iDim));
+	ndFloat32 fHorizontalScale = ndFloat32(128.0) / ndFloat32(iDim - 1);
+	ndShapeInstance shape(new ndShapeHeightfield(iDim, iDim, ndShapeHeightfield::m_normalDiagonals, fHorizontalScale, fHorizontalScale));
 	ndMatrix mLocal(ndGetIdentityMatrix());
 	mLocal.m_posit = ndVector(-(dSize * 0.5), 0.0, -(dSize * 0.5), 1.0);
 	shape.SetLocalMatrix(mLocal);
 	auto pShapeHeightField = shape.GetShape()->GetAsShapeHeightfield();
-	for (int i = 0; i < ndInt32(iDim * iDim); ++i)
-	{
-		pShapeHeightField->GetElevationMap()[i] = ndReal(ndFloat32(rand()) * ndFloat32(2.0) * dMaxHeight / RAND_MAX);
-	}
+
+	for (int i = 0; i < iDim * iDim; ++i)
+		pShapeHeightField->GetElevationMap()[i] = ndReal (rand() * 2.0 * dMaxHeight / RAND_MAX);
 
 	pShapeHeightField->UpdateElevationMapAabb();
 	ndMatrix uvMatrix(ndGetIdentityMatrix());
@@ -144,45 +222,30 @@ static void BuildHeightField(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndBody> bodyPtr(body);
 	scene->GetWorld()->AddBody(bodyPtr);
 	scene->AddEntity(entity);
+	return body;
 }
 
-static void AddBodies(ndDemoEntityManager* const scene)
+static void AddBody(ndDemoEntityManager* const scene)
 {
-	const int NUM_BOXES_ROWS = 10;
-	const int NUM_BOXES_COLS = 10;
-	ndFloat32 dUsableSpace = 128;
-	ndFloat32 dSpacing_x = dUsableSpace / (NUM_BOXES_COLS + 1);
-	ndFloat32 dSpacing_z = dUsableSpace / (NUM_BOXES_ROWS + 1);
-	ndFloat32 dStart = -dUsableSpace * 0.5f;
-	ndVector vStart(dStart, 10.0f, dStart, 1.0f);
+	ndVector vStart(5.0, 10.0, 0.0, 1.0);
 	ndMatrix location(ndGetIdentityMatrix());
-	ndMatrix uvMatrix(ndGetIdentityMatrix());
-	uvMatrix[0][0] *= 0.025f;
-	uvMatrix[1][1] *= 0.025f;
-	uvMatrix[2][2] *= 0.025f;
-
-	for (int i = 0; i < NUM_BOXES_ROWS; ++i)
-	{
-		for (int j = 0; j < NUM_BOXES_COLS; ++j)
-		{
-			ndFloat32 dOffset_x = dSpacing_x * ndFloat32(j + 1);
-			ndFloat32 dOffset_z = dSpacing_z * ndFloat32(i + 1);
-			location.m_posit = vStart + ndVector(dOffset_x, ndFloat32(0.0), dOffset_z, ndFloat32(0.0));
-			ndBodyKinematic* const body = AddBox(scene, location, 1.0f, 1.0f, 1.0f, 1.0f);
-			body->SetMatrix(location);
-		}
-	}
+	location.m_posit = vStart;
+	auto pBody = AddBox(scene, location, 1.0f, 1.0f, 1.0f, 1.0f);
+	auto pUserData = static_cast<ndDemoEntity*>(pBody->GetNotifyCallback()->GetUserData());
+	pUserData->SetName("My Collision Object");
 }
 
-//void ndHeightFieldTest(ndDemoEntityManager* const scene)
+//void ndConvexCastTest(ndDemoEntityManager* const scene)
 void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene)
 {
 	// build the height field
-	BuildHeightField(scene);
-	AddBodies(scene);
+	auto pFloorBody = BuildHeightField(scene);
+	AddBody(scene);
+	ndSharedPtr<ndModel> convexCaster(new CConvexCaster(scene, pFloorBody));
+	scene->GetWorld()->AddModel(convexCaster);
 
 	ndQuaternion rot;
-	ndVector origin(0.0f, 5.0f, 0.0f, 1.0f);
+	ndVector origin(-10.0f, 5.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
 

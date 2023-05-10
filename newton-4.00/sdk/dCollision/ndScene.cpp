@@ -938,7 +938,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPo
 					ndConvexCastNotify savedNotification(callback);
 					ndBodyKinematic* const kinBody = body->GetAsBodyKinematic();
 					callback.m_contacts.SetCount(0);
-					if (callback.CastShape____(convexShape, globalOrigin, globalDest, kinBody))
+					if (callback.CastShape(convexShape, globalOrigin, globalDest, kinBody))
 					{
 						// found new contacts, see how the are managed
 						if (ndAbs(savedNotification.m_param - callback.m_param) < ndFloat32(-1.0e-3f))

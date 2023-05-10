@@ -27,7 +27,7 @@
 #include "ndShapeInstance.h"
 #include "ndConvexCastNotify.h"
 
-bool ndConvexCastNotify::CastShape____(const ndShapeInstance& castingInstance, const ndMatrix& globalOrigin, const ndVector& globalDest, ndBodyKinematic* const targetBody)
+bool ndConvexCastNotify::CastShape(const ndShapeInstance& castingInstance, const ndMatrix& globalOrigin, const ndVector& globalDest, ndBodyKinematic* const targetBody)
 {
 	ndAssert(m_cachedScene);
 	ndContact contactJoint;
@@ -69,7 +69,7 @@ bool ndConvexCastNotify::CastShape____(const ndShapeInstance& castingInstance, c
 	return count > 0;
 }
 
-bool ndConvexCastNotify::CastShape____(
+bool ndConvexCastNotify::CastShape(
 	const ndShapeInstance& castingInstance, 
 	const ndMatrix& globalOrigin, 
 	const ndVector& globalDest, 
@@ -84,7 +84,7 @@ bool ndConvexCastNotify::CastShape____(
 	ndShapeInstance& shape1 = body1.GetCollisionShape();
 	shape1.SetGlobalMatrix(shape1.GetLocalMatrix() * body1.GetMatrix());
 
-	bool cast = CastShape____(castingInstance, globalOrigin, globalDest, &body1);
+	bool cast = CastShape(castingInstance, globalOrigin, globalDest, &body1);
 	for (ndInt32 i = 0; i < m_contacts.GetCount(); ++i)
 	{
 		ndContactPoint& contact = m_contacts[i];
