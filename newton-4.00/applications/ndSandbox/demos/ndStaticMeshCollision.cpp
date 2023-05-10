@@ -125,7 +125,7 @@ class CConvexCaster : public ndModel
 		virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const) override
 		{
 			// filter teh floor
-			ndUnsigned32 ret = body->GetInvMass() ? 1 : 0;
+			ndUnsigned32 ret = ndUnsigned32(body->GetInvMass() ? 1 : 0);
 			return ret;
 		}
 
@@ -155,24 +155,19 @@ class CConvexCaster : public ndModel
 		//if (m_world->ConvexCast(castCallback, m_CastShape, ndGetIdentityMatrix(), ndVector(0.0, 0.0, 0.001, 1.0)))
 		if (m_world->ConvexCast(castCallback, m_CastShape, ndGetIdentityMatrix(), ndVector(0.001, 0.0, 0.0, 1.0)))
 		{
-
 			if (castCallback.m_contacts.GetCount() > 0)
 			{
-				if (castCallback.m_contacts[0].m_body1)
+				ndBodyKinematic* const pHitBody = (ndBodyKinematic*)castCallback.m_contacts[0].m_body1;
+				ndAssert(pHitBody);
+				auto pUserData = static_cast<ndDemoEntity*>(pHitBody->GetNotifyCallback()->GetUserData());
+				ndAssert(pUserData->GetName() == "My Collision Object");
+				if (!m_pKinJoint)
 				{
-					auto pHitBody = castCallback.m_contacts[0].m_body1->GetNotifyCallback()->GetBody()->GetAsBodyKinematic();
-					auto pUserData = static_cast<ndDemoEntity*>(castCallback.m_contacts[0].m_body1->GetNotifyCallback()->GetUserData());
-
-					ndAssert(pUserData->GetName() == "My Collision Object");
-
-					if (!m_pKinJoint)
-					{
-						m_pKinJoint = new ndJointKinematicController(pHitBody, m_pParentBody, castCallback.m_contacts[0].m_point);
-						m_pKinJoint->SetMaxAngularFriction(1000);
-						m_pKinJoint->SetMaxLinearFriction(1000);
-						ndSharedPtr<ndJointBilateralConstraint> jointPtr(m_pKinJoint);
-						m_world->AddJoint(jointPtr);
-					}
+					m_pKinJoint = new ndJointKinematicController(pHitBody, m_pParentBody, castCallback.m_contacts[0].m_point);
+					m_pKinJoint->SetMaxAngularFriction(1000);
+					m_pKinJoint->SetMaxLinearFriction(1000);
+					ndSharedPtr<ndJointBilateralConstraint> jointPtr(m_pKinJoint);
+					m_world->AddJoint(jointPtr);
 				}
 			}
 		}

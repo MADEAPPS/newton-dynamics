@@ -58,7 +58,9 @@ bool ndConvexCastNotify::CastShape(const ndShapeInstance& castingInstance, const
 		{
 			ndContactPoint& contact = contactBuffer[i];
 			contact.m_body0 = nullptr;
+			contact.m_body1 = targetBody;
 			contact.m_shapeInstance0 = &castingInstance;
+			contact.m_shapeInstance1 = &targetBody->GetCollisionShape();
 			m_contacts.PushBack(contactBuffer[i]);
 		}
 		m_param = contactSolver.m_timestep;
