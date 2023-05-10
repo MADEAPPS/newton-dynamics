@@ -391,9 +391,9 @@ void xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name, nd
 		sscanf(&data[start], "%[^ ]", x);
 		start += strlen(x) + 1;
 
-		ndInt64 fx;
+		long long int fx;
 		sscanf(x, "%lld", &fx);
-		array[i] = fx;
+		array[i] = ndInt64 (fx);
 	}
 }
 

@@ -86,7 +86,7 @@ int main(int, const char**)
 
   // Install our own ContactNotify callback handler. Newton will call its
   // various methods to signal AABB overlaps or contact events.
-  world.SetContactNotify(new MyContactNotify());
+  world.SetContactNotify(new MyContactNotify(world.GetScene()));
 
   // Create a ball above a floor box.
   //ndBodyDynamic *sphere = BuildSphere();

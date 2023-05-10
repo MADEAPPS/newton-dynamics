@@ -78,11 +78,12 @@ ndShape* ndFileFormatShapeStaticHeightfield::LoadShape(const nd::TiXmlElement* c
 	FILE* const file = fopen(filename, "rb");
 	if (file)
 	{
+		size_t ret;
 		ndAssert(staticMesh->m_atributeMap.GetCount() == width * height);
 		ndAssert(staticMesh->m_elevationMap.GetCount() == width * height);
 
-		fread(&staticMesh->m_elevationMap[0], sizeof(ndReal), size_t(staticMesh->m_elevationMap.GetCount()), file);
-		fread(&staticMesh->m_atributeMap[0], sizeof(ndInt8), size_t(staticMesh->m_atributeMap.GetCount()), file);
+		ret = fread(&staticMesh->m_elevationMap[0], sizeof(ndReal), size_t(staticMesh->m_elevationMap.GetCount()), file);
+		ret = fread(&staticMesh->m_atributeMap[0], sizeof(ndInt8), size_t(staticMesh->m_atributeMap.GetCount()), file);
 		fclose(file);
 	}
 	return staticMesh;
