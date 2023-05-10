@@ -124,7 +124,9 @@ class CConvexCaster : public ndModel
 
 		virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const) override
 		{
-			return 1;
+			// filter teh floor
+			ndUnsigned32 ret = body->GetInvMass() ? 1 : 0;
+			return ret;
 		}
 
 		virtual ndFloat32 OnRayCastAction(const ndContactPoint&, ndFloat32) override
@@ -150,7 +152,8 @@ class CConvexCaster : public ndModel
 		CConvexCastCallBack castCallback;
 
 		//if (m_world->ConvexCast(castCallback, m_CastShape, ndGetIdentityMatrix(), ndVector(0.0, 0.001, 0.0, 1.0)))
-		if (m_world->ConvexCast(castCallback, m_CastShape, ndGetIdentityMatrix(), ndVector(0.0, 0.0, 0.001, 1.0)))
+		//if (m_world->ConvexCast(castCallback, m_CastShape, ndGetIdentityMatrix(), ndVector(0.0, 0.0, 0.001, 1.0)))
+		if (m_world->ConvexCast(castCallback, m_CastShape, ndGetIdentityMatrix(), ndVector(0.001, 0.0, 0.0, 1.0)))
 		{
 
 			if (castCallback.m_contacts.GetCount() > 0)
