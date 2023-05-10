@@ -263,7 +263,8 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	char* ptr = buffer;
 	for (ndInt32 i = 0; i < array.GetCount(); ++i)
 	{
-		sprintf(ptr, "%lld ", long long int (array[i]));
+		long long int value = array[i];
+		sprintf(ptr, "%lld ", value);
 		ptr += strlen(ptr);
 	}
 	CleanWhiteSpace(buffer);
