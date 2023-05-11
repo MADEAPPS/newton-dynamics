@@ -17,18 +17,22 @@
 //
 // In this particular case we override `OnContactCallback` to get notified
 // whenever the ball hits the ground.
-class MyContactNotify : public ndContactNotify {
-public:
-  MyContactNotify() {};
+class MyContactNotify : public ndContactNotify 
+{
+    public:
+    MyContactNotify(ndScene* const scene) 
+        :ndContactNotify(scene)
+    {
+    }
 
-  virtual void OnContactCallback(const ndContact *const contact,
-                                 ndFloat32 timestep) {
-    ndBody *body0 = contact->GetBody0();
-    ndBody *body1 = contact->GetBody1();
-    printf("OnContactCallback: Pos1.y=%.1f -- Pos2.y%.1f\n",
-           body0->GetMatrix().m_posit.m_y,
-           body1->GetMatrix().m_posit.m_y);
-  }
+    virtual void OnContactCallback(const ndContact *const contact, ndFloat32 timestep) 
+    {
+        ndBody *body0 = contact->GetBody0();
+        ndBody *body1 = contact->GetBody1();
+        printf("OnContactCallback: Pos1.y=%.1f -- Pos2.y%.1f\n",
+                body0->GetMatrix().m_posit.m_y,
+                body1->GetMatrix().m_posit.m_y);
+    }
 };
 
 // Create box that will serve as a static floor and return a pointer to it.
