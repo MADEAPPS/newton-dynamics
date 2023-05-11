@@ -14,7 +14,6 @@ include_directories(../sdk/dNewton/dModels)
 include_directories(../sdk/dNewton/dIkSolver)
 include_directories(../sdk/dNewton/dParticles)
 include_directories(../sdk/dNewton/dModels/dVehicle)
-include_directories(../sdk/dNewton/dModels/dCharacter)
 
 # ----------------------------------------------------------------------
 # Google Test Settings.

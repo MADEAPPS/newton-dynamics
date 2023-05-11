@@ -40,7 +40,6 @@ include_directories(../../sdk/dNewton/dJoints)
 include_directories(../../sdk/dNewton/dModels)
 include_directories(../../sdk/dNewton/dIkSolver)
 include_directories(../../sdk/dNewton/dModels/dVehicle)
-include_directories(../../sdk/dNewton/dModels/dCharacter)
 
 include_directories(../../thirdParty/glfw/)
 include_directories(../../thirdParty/imgui/)

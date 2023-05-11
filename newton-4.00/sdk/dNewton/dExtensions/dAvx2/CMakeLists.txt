@@ -22,7 +22,6 @@ include_directories(../../../dNewton/dJoints)
 include_directories(../../../dNewton/dModels)
 include_directories(../../../dNewton/dIkSolver)
 include_directories(../../../dNewton/dModels/dVehicle)
-include_directories(../../../dNewton/dModels/dCharacter)
 
 file(GLOB CPP_SOURCE *.c *.cpp *.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
