@@ -19,7 +19,6 @@ void exportMeshNode::ConvertToLocal()
 		exportMatrix yaw(ndYawMatrix(bone->m_globalEuler.m_y));
 		exportMatrix roll(ndRollMatrix(bone->m_globalEuler.m_z));
 		exportMatrix globalMatrix(pitch * yaw * roll);
-		//globalMatrix.m_posit = bone->m_matrix.m_posit + parentMatrixPool[stack].m_posit;
 		globalMatrix.m_posit = bone->m_globalPosit + parentMatrixPool[stack].m_posit;
 		globalMatrix.m_posit.m_w = 1.0f;
 		bone->m_localMatrix = globalMatrix;
@@ -41,7 +40,6 @@ void exportMeshNode::ConvertToLocal()
 		exportMeshNode* const bone = stackPool[stack];
 		exportMatrix globalMatrix(bone->m_localMatrix);
 		exportMatrix localMatrix(globalMatrix * parentMatrixPool[stack].Inverse());
-		//bone->m_globalEuler = localMatrix.CalcPitchYawRoll();
 		bone->m_localMatrix = localMatrix;
 		for (std::list<exportMeshNode*>::const_iterator iter = bone->m_children.begin();
 			iter != bone->m_children.end(); iter++)
@@ -310,7 +308,6 @@ void exportMeshNode::ResetPose()
 			iter != bone->m_children.end(); iter++)
 		{
 			stackPool[stack] = *iter;
-			//parentMatrixPool[stack] = globalMatrix;
 			stack++;
 		}
 	}
@@ -351,9 +348,8 @@ void exportMeshNode::ImportAmcAnimation(const char* const amcName, const std::ma
 			}
 		}
 
-		//ReadInt();
-		int frameIndex = ReadInt() - 1;
 		ResetPose();
+		int frameIndex = ReadInt() - 1;
 		while (!feof(fp))
 		{
 			ReadToken();
@@ -364,15 +360,13 @@ void exportMeshNode::ImportAmcAnimation(const char* const amcName, const std::ma
 				_ASSERT(animIter != animBlueprint.end());
 				animDof dof = animIter->second;
 				exportMeshNode* const node = nodeIter->second;
-				//dof.m_values[0] = node->m_matrix.m_posit.m_x;
-				//dof.m_values[1] = node->m_matrix.m_posit.m_y;
-				//dof.m_values[2] = node->m_matrix.m_posit.m_z;
 
-				dof.m_values[0] = node->m_globalPosit.m_x / POSITION_SCALE;
-				dof.m_values[1] = node->m_globalPosit.m_y / POSITION_SCALE;
-				dof.m_values[2] = node->m_globalPosit.m_z / POSITION_SCALE;
+				//dof.m_values[0] = node->m_globalPosit.m_x / POSITION_SCALE;
+				//dof.m_values[1] = node->m_globalPosit.m_y / POSITION_SCALE;
+				//dof.m_values[2] = node->m_globalPosit.m_z / POSITION_SCALE;
 				for (int i = 0; i < 6; i++)
 				{
+					dof.m_values[i] = 0.0;
 					if (dof.m_channels[i])
 					{
 						dof.m_values[i] = ReadFloat();
@@ -380,17 +374,10 @@ void exportMeshNode::ImportAmcAnimation(const char* const amcName, const std::ma
 				}
 
 				exportVector posit(dof.m_values[0], dof.m_values[1], dof.m_values[2], 1.0f);
-				//if (dof.m_channels[0])
-				//{
-				//	posit = posit.Scale(POSITION_SCALE);
-				//	posit.m_w = 1.0f;
-				//}
 				posit = posit.Scale(POSITION_SCALE);
 				posit.m_w = 1.0;
 
 				exportVector rotation(dof.m_values[3], dof.m_values[4], dof.m_values[5], 0.0f);
-				//node->m_positionsKeys.push_back(posit);
-				//node->m_rotationsKeys.push_back(rotation.Scale (M_PI / 180.0f));
 				node->m_positionsKeys[frameIndex] = posit;
 				node->m_rotationsKeys[frameIndex] = rotation.Scale(M_PI / 180.0f);
 			}
@@ -405,13 +392,18 @@ void exportMeshNode::ImportAmcAnimation(const char* const amcName, const std::ma
 				{
 					stack--;
 					exportMeshNode* const bone = stackPool[stack];
-					exportMatrix pitch(ndPitchMatrix(bone->m_rotationsKeys[frameIndex].m_x));
-					exportMatrix yaw(ndYawMatrix(bone->m_rotationsKeys[frameIndex].m_y));
-					exportMatrix roll(ndRollMatrix(bone->m_rotationsKeys[frameIndex].m_z));
-					exportMatrix globalMatrix(pitch * yaw * roll);
-					globalMatrix.m_posit = bone->m_positionsKeys[frameIndex] + parentMatrixPool[stack].m_posit;
-					globalMatrix.m_posit.m_w = 1.0f;
-					bone->m_localMatrix = globalMatrix;
+					//exportMatrix pitch(ndPitchMatrix(bone->m_rotationsKeys[frameIndex].m_x));
+					//exportMatrix yaw(ndYawMatrix(bone->m_rotationsKeys[frameIndex].m_y));
+					//exportMatrix roll(ndRollMatrix(bone->m_rotationsKeys[frameIndex].m_z));
+					//exportMatrix globalMatrix(pitch * yaw * roll);
+					//globalMatrix.m_posit = bone->m_positionsKeys[frameIndex] + parentMatrixPool[stack].m_posit;
+					//globalMatrix.m_posit.m_w = 1.0f;
+					//globalMatrix.m_posit = bone->m_positionsKeys[frameIndex];
+					//bone->m_localMatrix = globalMatrix * bone->m_localMatrix;
+
+					exportMatrix globalMatrix(bone->m_localMatrix * parentMatrixPool[stack]);
+					//bone->m_localMatrix = globalMatrix;
+
 					for (std::list<exportMeshNode*>::const_iterator iter = bone->m_children.begin();
 						iter != bone->m_children.end(); iter++)
 					{
@@ -429,12 +421,20 @@ void exportMeshNode::ImportAmcAnimation(const char* const amcName, const std::ma
 					stack--;
 					exportMeshNode* const bone = stackPool[stack];
 					exportMatrix globalMatrix(bone->m_localMatrix);
-					exportMatrix localMatrix(globalMatrix * parentMatrixPool[stack].Inverse());
-					bone->m_localMatrix = localMatrix;
+					//exportMatrix localMatrix(globalMatrix * parentMatrixPool[stack].Inverse());
+					//bone->m_localMatrix = localMatrix;
+					//bone->m_positionsKeys[frameIndex] = localMatrix.m_posit;
+					//bone->m_rotationsKeys[frameIndex] = localMatrix.CalcPitchYawRoll();
 
-					bone->m_positionsKeys[frameIndex] = localMatrix.m_posit;
-					bone->m_rotationsKeys[frameIndex] = localMatrix.CalcPitchYawRoll();
+					bone->m_positionsKeys[frameIndex] = bone->m_localMatrix.m_posit;
+					bone->m_rotationsKeys[frameIndex] = bone->m_localMatrix.CalcPitchYawRoll();
 
+					exportMatrix pitch(ndPitchMatrix(bone->m_rotationsKeys[frameIndex].m_x));
+					exportMatrix yaw(ndYawMatrix(bone->m_rotationsKeys[frameIndex].m_y));
+					exportMatrix roll(ndRollMatrix(bone->m_rotationsKeys[frameIndex].m_z));
+					exportMatrix globalMatrix111(pitch * yaw * roll);
+					exportMatrix globalMatrix112(pitch * yaw * roll);
+				
 					for (std::list<exportMeshNode*>::const_iterator iter = bone->m_children.begin();
 						iter != bone->m_children.end(); iter++)
 					{

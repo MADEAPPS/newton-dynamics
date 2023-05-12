@@ -309,9 +309,9 @@ static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const f
 
 				exportVector eulers(root->m_rotationsKeys[i]);
 
-				eulers.m_x = root->m_rotationsKeys[i].m_y;
-				eulers.m_y = root->m_rotationsKeys[i].m_z;
-				eulers.m_z = root->m_rotationsKeys[i].m_x;
+				eulers.m_x = root->m_rotationsKeys[i].m_x;
+				eulers.m_y = root->m_rotationsKeys[i].m_y;
+				eulers.m_z = root->m_rotationsKeys[i].m_z;
 				eulers = eulers.Scale(180.0f / M_PI);
 
 				int keyIndexX = curveX->KeyAdd(lTime);
