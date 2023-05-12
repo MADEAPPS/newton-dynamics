@@ -106,6 +106,11 @@
 #if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 	#include <immintrin.h>
 	#define D_USE_SSE3
+
+	//#if defined (_M_AMD64) && (_M_AMD64 == 100) && !defined (_M_ARM64EC)
+	#if defined (_M_AMD64) || defined (_M_X64)
+		#define D_USE_64_BIT_SIMD_INT
+	#endif
 #endif
 
 #if defined(__arm__) && defined(__aarch64__) 
