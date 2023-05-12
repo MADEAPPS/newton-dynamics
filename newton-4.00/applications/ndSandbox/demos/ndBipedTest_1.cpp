@@ -597,7 +597,7 @@ namespace biped_1
 		// save the shape material type
 		ndShapeInstance& instanceShape = body->GetCollisionShape();
 		instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
-		instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(model);
+		instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_ptrData = model;
 		instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_materialFlags].m_intData = ndUnsigned64(definition.m_selfCollide);
 
 		return body->GetAsBodyDynamic();

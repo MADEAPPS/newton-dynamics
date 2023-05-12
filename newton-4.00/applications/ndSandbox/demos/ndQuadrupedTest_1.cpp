@@ -749,7 +749,7 @@ namespace ndQuadruped_1
 
 			ndShapeInstance& instanceShape = body->GetCollisionShape();
 			instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
-			instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(this);
+			instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_ptrData = this;
 
 			delete shape;
 			// add body to the world

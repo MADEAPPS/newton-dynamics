@@ -268,6 +268,16 @@ typedef double ndFloat64;
 	};
 #endif
 
+union ndIntPtr
+{
+	ndIntPtr()
+		:m_int(0)
+	{
+	}
+	void* m_ptr;
+	ndInt64 m_int;
+};
+
 union ndDoubleInt
 {
 	struct 

@@ -537,10 +537,13 @@ ndIntersectStatus ndAabbPolygonSoup::CalculateAllFaceEdgeNormals(void* const con
 	ndInt32 face[256];
 	ndInt64 data[256];
 	ndPolyhedra& adjacency = *((ndPolyhedra*)context);
+
+	ndIntPtr userData;
+	userData.m_ptr = (void*)indexArray;
 	for (ndInt32 i = 0; i < indexCount; ++i)
 	{
 		face[i] = indexArray[i];
-		data[i] = ndInt64(ndUnsigned64(indexArray));
+		data[i] = userData.m_int;
 	}
 	adjacency.AddFace(indexCount, face, data);
 	return m_continueSearh;

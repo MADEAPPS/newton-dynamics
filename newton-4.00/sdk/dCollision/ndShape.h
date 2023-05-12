@@ -93,6 +93,7 @@ class ndShapeMaterial
 
 	union dExtraData
 	{
+		void* m_ptrData;
 		ndFloat32 m_floatData;
 		ndUnsigned64 m_intData;
 	} m_userParam[6];

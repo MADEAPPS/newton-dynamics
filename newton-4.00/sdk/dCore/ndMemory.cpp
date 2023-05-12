@@ -45,14 +45,15 @@ ndInt32 ndMemory::CalculateBufferSize(size_t size)
 
 void* ndMemory::Malloc(size_t size)
 {
+	ndIntPtr metToVal;
 	size += ndGetBufferSize;
-	void* const ptr = m_allocMemory(size);
-	ndUnsigned64 val = ndUnsigned64(ptr) + ndGetBufferSize;
+	metToVal.m_ptr = m_allocMemory(size);
+	ndUnsigned64 val = ndUnsigned64(metToVal.m_int) + ndGetBufferSize;
 	ndInt64 mask = -ndInt64(D_MEMORY_ALIGMNET);
 	val = val & mask;
 	ndMemoryHeader* const ret = (ndMemoryHeader*)val;
 	ndMemoryHeader* const info = ret - 1;
-	info->m_ptr = ptr;
+	info->m_ptr = metToVal.m_ptr;
 	info->m_size = ndInt32 (size);
 	m_memoryUsed.fetch_add(size);
 	return ret;

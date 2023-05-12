@@ -352,7 +352,7 @@ void ndVehicleCommon::SetChassis(ndBodyKinematic* const chassis)
 	// assign chassis material id.
 	ndShapeInstance& instanceShape = chassis->GetCollisionShape();
 	instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
-	instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(this);
+	instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_ptrData = this;
 }
 
 void ndVehicleCommon::CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const
@@ -413,7 +413,7 @@ ndBodyKinematic* ndVehicleCommon::CreateTireBody(ndDemoEntityManager* const scen
 
 	ndShapeInstance& instanceShape = tireBody->GetCollisionShape();
 	instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicleTirePart;
-	instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(this);
+	instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_ptrData = (void*)this;
 
 	return tireBody;
 }
