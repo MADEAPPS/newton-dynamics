@@ -81,9 +81,13 @@ exportMeshNode* exportMeshNode::ImportBvhSkeleton(const char* const name)
 				else if (!strcmp(token, "OFFSET"))
 				{
 					exportMeshNode* const node = stackPool[stack - 1];
-					node->m_matrix.m_posit.m_x = ReadFloat() * scale;
-					node->m_matrix.m_posit.m_y = ReadFloat() * scale;
-					node->m_matrix.m_posit.m_z = ReadFloat() * scale;
+					//node->m_matrix.m_posit.m_x = ReadFloat() * scale;
+					//node->m_matrix.m_posit.m_y = ReadFloat() * scale;
+					//node->m_matrix.m_posit.m_z = ReadFloat() * scale;
+					node->m_globalPosit.m_x = ReadFloat() * scale;
+					node->m_globalPosit.m_y = ReadFloat() * scale;
+					node->m_globalPosit.m_z = ReadFloat() * scale;
+					node->m_globalPosit.m_w = 1.0f;
 				}
 				else if (!strcmp(token, "CHANNELS"))
 				{

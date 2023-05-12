@@ -34,13 +34,17 @@ class exportMeshNode
 	static exportMeshNode* ImportBvhSkeleton(const char* const name);
 	static exportMeshNode* ImportAsfSkeleton(const char* const asfName, const char* const amcName);
 
-	static void ConvertToLocal(exportMeshNode* const root);
 	private:
+	
+	void ResetPose();
+	void ConvertToLocal();
+	
 	void ImportAmcAnimation(const char* const amcName, const std::map<std::string, exportMeshNode*>& map, const std::map<std::string, animDof>& animBlueprint);
 
 	public:
-	exportMatrix m_matrix;
-	exportVector m_eulers;
+	exportMatrix m_localMatrix;
+	exportVector m_globalEuler;
+	exportVector m_globalPosit;
 	std::string m_name;
 	mutable FbxNode* m_fbxNode;
 	exportMeshNode* m_parent;

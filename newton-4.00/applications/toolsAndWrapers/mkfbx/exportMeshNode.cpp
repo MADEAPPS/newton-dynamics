@@ -2,8 +2,9 @@
 #include "exportMeshNode.h"
 
 exportMeshNode::exportMeshNode()
-	:m_matrix()
-	,m_eulers(0.0f, 0.0f, 0.0f, 0.0f)
+	:m_localMatrix()
+	,m_globalEuler(0.0f, 0.0f, 0.0f, 0.0f)
+	,m_globalPosit(0.0f, 0.0f, 0.0f, 1.0f)
 	,m_fbxNode(nullptr)
 	,m_parent(nullptr)
 	,m_positionsKeys()
@@ -12,8 +13,9 @@ exportMeshNode::exportMeshNode()
 }
 
 exportMeshNode::exportMeshNode(exportMeshNode* const parent)
-	:m_matrix()
-	,m_eulers(0.0f, 0.0f, 0.0f, 0.0f)
+	:m_localMatrix()
+	,m_globalEuler(0.0f, 0.0f, 0.0f, 0.0f)
+	,m_globalPosit(0.0f, 0.0f, 0.0f, 1.0f)
 	,m_fbxNode(nullptr)
 	,m_parent(parent)
 {

@@ -175,8 +175,10 @@ FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* const fbxSc
 		FbxNode* const fbxParent = fbxNodesParent[stack];
 
 		FbxNode* const fbxNode = FbxNode::Create(fbxScene, node->m_name.c_str());
-		exportVector posit(node->m_matrix.m_posit);
-		exportVector euler(node->m_eulers.Scale(180.0f / M_PI));
+		//exportVector posit(node->m_matrix.m_posit);
+		//exportVector euler(node->m_globalEuler.Scale(180.0f / M_PI));
+		exportVector posit(node->m_localMatrix.m_posit);
+		exportVector euler(node->m_localMatrix.CalcPitchYawRoll().Scale(180.0f / M_PI));
 		node->m_fbxNode = fbxNode;
 
 		fbxNode->LclRotation.Set(FbxVector4(euler.m_x, euler.m_y, euler.m_z));
@@ -228,7 +230,7 @@ static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const f
 		stack--;
 		const exportMeshNode* const root = nodePool[stack];
 
-if (root->m_name == "root")
+//if (root->m_name == "root")
 
 		if (root->m_positionsKeys.size())
 		{
@@ -248,6 +250,13 @@ if (root->m_name == "root")
 				lTime.SetSecondDouble(time);
 			
 				exportVector posit(root->m_positionsKeys[i]);
+
+				if (root->m_name == "root")
+				{
+					posit.m_x = 0;
+					posit.m_z = 0;
+				}
+
 				int keyIndexX = curveX->KeyAdd(lTime);
 				curveX->KeySetValue(keyIndexX, posit.m_x);
 				curveX->KeySetInterpolation(keyIndexX, FbxAnimCurveDef::eInterpolationCubic);
@@ -279,7 +288,7 @@ if (root->m_name == "root")
 //	//(root->m_name == "rthumb") ||
 //
 //	(root->m_name == "upperback"))
-if (root->m_name == "rhumerus")
+//if (root->m_name == "rhumerus")
 
 		if (root->m_rotationsKeys.size())
 		{
