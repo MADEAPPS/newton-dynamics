@@ -15,6 +15,7 @@
 
 int main(int argc, char** argv)
 {
+#if 0
 	const char* asfName = nullptr;
 	const char* acmName = nullptr;
 	for (int i = 1; i < argc; i++)
@@ -28,7 +29,7 @@ int main(int argc, char** argv)
 			acmName = argv[i];
 		}
 	}
-
+	
 	if (!asfName)
 	{
 		printf("asf2fbx asf_file_name [amc_file_name]\n");
@@ -36,18 +37,34 @@ int main(int argc, char** argv)
 		printf("[amc_file_name] = optional animation file name\n");
 		return 0;
 	}
-
 	exportMeshNode* const skeleton = exportMeshNode::ImportAsfSkeleton(asfName, acmName);
-	if (!skeleton)
+
+#else
+	const char* bvhName = nullptr;
+	if (strstr(argv[1], ".bvh"))
 	{
-		printf("failed to load %s\n", asfName);
+		bvhName = argv[1];
+	}
+	if (!bvhName)
+	{
+		printf("asf2fbx bvh_file_name\n");
+		printf("bvh_file_name = skeleton file name\n");
 		return 0;
 	}
 
-	const char* const exportName = acmName ? acmName : asfName;
-	if (!ExportFbx(skeleton, exportName))
+	exportMeshNode* const skeleton = exportMeshNode::ImportBvhSkeleton(bvhName);
+#endif
+
+	if (!skeleton)
 	{
-		printf("failed to export %s\n", exportName);
+		printf("failed to load %s\n", bvhName);
+		return 0;
+	}
+
+	//const char* const exportName = acmName ? acmName : asfName;
+	if (!ExportFbx(skeleton, bvhName))
+	{
+		printf("failed to export %s\n", bvhName);
 	}
 
 	delete skeleton;

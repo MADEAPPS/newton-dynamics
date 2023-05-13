@@ -175,12 +175,12 @@ FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* const fbxSc
 		FbxNode* const fbxParent = fbxNodesParent[stack];
 
 		FbxNode* const fbxNode = FbxNode::Create(fbxScene, node->m_name.c_str());
-		//exportVector posit(node->m_matrix.m_posit);
-		//exportVector euler(node->m_globalEuler.Scale(180.0f / M_PI));
-		exportVector posit(node->m_localMatrix.m_posit);
-		exportVector euler(node->m_localMatrix.CalcPitchYawRoll().Scale(180.0f / M_PI));
+		exportVector posit(node->m_matrix.m_posit);
+		exportVector euler1;
+		exportVector euler0(node->m_matrix.CalcPitchYawRoll(euler1));
 		node->m_fbxNode = fbxNode;
 
+		exportVector euler(euler0.Scale(180.0f / M_PI));
 		fbxNode->LclRotation.Set(FbxVector4(euler.m_x, euler.m_y, euler.m_z));
 		fbxNode->LclTranslation.Set(FbxVector4(posit.m_x, posit.m_y, posit.m_z));
 
@@ -230,8 +230,6 @@ static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const f
 		stack--;
 		const exportMeshNode* const root = nodePool[stack];
 
-//if (root->m_name == "root")
-
 		if (root->m_positionsKeys.size())
 		{
 			FbxNode* const fbxNode = root->m_fbxNode;
@@ -251,9 +249,9 @@ static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const f
 			
 				exportVector posit(root->m_positionsKeys[i]);
 
-				if (root->m_name == "root")
+				if (root->m_name == "Hips")
 				{
-					posit.m_x = 0;
+					//posit.m_x = 0;
 					posit.m_z = 0;
 				}
 
@@ -273,22 +271,6 @@ static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const f
 			curveY->KeyModifyEnd();
 			curveZ->KeyModifyEnd();
 		}
-
-//if ((root->m_name == "lowerback") || 
-//	(root->m_name == "thorax") ||
-//	(root->m_name == "lowerneck") ||
-//	(root->m_name == "upperneck") ||
-//	(root->m_name == "head") ||
-//	(root->m_name == "rclavicle") ||
-//	(root->m_name == "rhumerus") ||
-//	//(root->m_name == "rradius") ||
-//	//(root->m_name == "rwrist") ||
-//	//(root->m_name == "rhand") ||
-//	//(root->m_name == "rfingers") ||
-//	//(root->m_name == "rthumb") ||
-//
-//	(root->m_name == "upperback"))
-//if (root->m_name == "rhumerus")
 
 		if (root->m_rotationsKeys.size())
 		{

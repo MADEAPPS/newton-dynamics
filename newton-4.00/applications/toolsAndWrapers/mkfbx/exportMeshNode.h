@@ -9,21 +9,14 @@ class exportMeshNode
 		public:
 		animDof()
 		{
-			m_channels[0] = false;
-			m_channels[1] = false;
-			m_channels[2] = false;
-			m_channels[3] = false;
-			m_channels[4] = false;
-			m_channels[5] = false;
-			m_values[0] = 0.0f;
-			m_values[1] = 0.0f;
-			m_values[2] = 0.0f;
-			m_values[3] = 0.0f;
-			m_values[4] = 0.0f;
-			m_values[5] = 0.0f;
+			m_channel[0] = -1;
+			m_channel[1] = -1;
+			m_channel[2] = -1;
+			m_channel[3] = -1;
+			m_channel[4] = -1;
+			m_channel[5] = -1;
 		}
-		float m_values[6];
-		bool m_channels[6];
+		int m_channel[6];
 	};
 
 	exportMeshNode();
@@ -32,24 +25,17 @@ class exportMeshNode
 	virtual ~exportMeshNode();
 
 	static exportMeshNode* ImportBvhSkeleton(const char* const name);
-	static exportMeshNode* ImportAsfSkeleton(const char* const asfName, const char* const amcName);
-
-	private:
-	
-	void ResetPose();
-	void ConvertToLocal();
-	
-	void ImportAmcAnimation(const char* const amcName, const std::map<std::string, exportMeshNode*>& map, const std::map<std::string, animDof>& animBlueprint);
 
 	public:
-	exportMatrix m_localMatrix;
-	exportVector m_globalEuler;
-	exportVector m_globalPosit;
+	float CalculateDeltaAngle(float angle1, float angle0) const;
+
 	std::string m_name;
+	exportMatrix m_matrix;
 	mutable FbxNode* m_fbxNode;
 	exportMeshNode* m_parent;
 	std::list<exportMeshNode*> m_children;
 
+	animDof m_animDof;
 	std::vector<exportVector> m_positionsKeys;
 	std::vector<exportVector> m_rotationsKeys;
 };

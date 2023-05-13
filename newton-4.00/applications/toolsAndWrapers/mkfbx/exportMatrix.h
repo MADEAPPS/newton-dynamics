@@ -4,7 +4,6 @@
 class exportMatrix
 {
 	public:
-
 	exportMatrix();
 	~exportMatrix();
 	exportMatrix(const exportVector &front, const exportVector &up, const exportVector &right, const exportVector &posit);
@@ -13,7 +12,7 @@ class exportMatrix
 	const exportVector& operator[] (int i) const;
 
 	exportMatrix Inverse () const;
-	exportVector CalcPitchYawRoll() const;
+	exportVector CalcPitchYawRoll(exportVector& euler) const;
 	exportVector UntransformVector(const exportVector &v) const;
 	
 	exportMatrix operator* (const exportMatrix &B) const;
@@ -71,14 +70,12 @@ inline exportMatrix exportMatrix::Inverse() const
 	return matrix;
 }
 
-inline exportVector exportMatrix::CalcPitchYawRoll() const
+inline exportVector exportMatrix::CalcPitchYawRoll(exportVector& euler1) const
 {
 	const exportMatrix& matrix = *this;
-	//ndAssert(matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() > 0.0f);
-	//ndAssert(ndAbs(matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() - float(1.0f)) < float(1.0e-4f));
 
 	exportVector euler0;
-	exportVector euler1;
+	//exportVector euler1;
 	// Assuming the angles are in radians.
 	if (matrix[0][2] > float(0.99995f))
 	{
@@ -93,8 +90,6 @@ inline exportVector exportMatrix::CalcPitchYawRoll() const
 		euler1[0] = picth0;
 		euler1[1] = yaw0;
 		euler1[2] = roll0;
-		//exportMatrix xxxx(ndPitchMatrix(picth0) * ndYawMatrix(yaw0) * ndRollMatrix(roll0));
-		//exportMatrix xxxx1(ndPitchMatrix(picth0) * ndYawMatrix(yaw0) * ndRollMatrix(roll0));
 	}
 	else if (matrix[0][2] < float(-0.99995f))
 	{
@@ -108,8 +103,6 @@ inline exportVector exportMatrix::CalcPitchYawRoll() const
 		euler1[0] = picth0;
 		euler1[1] = yaw0;
 		euler1[2] = roll0;
-		//exportMatrix xxxx(ndPitchMatrix(picth0) * ndYawMatrix(yaw0) * ndRollMatrix(roll0));
-		//exportMatrix xxxx1(ndPitchMatrix(picth0) * ndYawMatrix(yaw0) * ndRollMatrix(roll0));
 	}
 	else
 	{

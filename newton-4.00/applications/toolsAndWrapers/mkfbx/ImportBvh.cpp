@@ -29,9 +29,9 @@ exportMeshNode* exportMeshNode::ImportBvhSkeleton(const char* const name)
 
 	int stack = 0;
 	exportMeshNode* stackPool[128];
-	std::vector<exportMeshNode*> entityList;
+	std::vector<exportMeshNode*> nodeIndex;
 	
-	float scale = 6.0f;
+	float scale = 1.0f;
 	if (fp)
 	{
 		ReadToken();
@@ -43,7 +43,7 @@ exportMeshNode* exportMeshNode::ImportBvhSkeleton(const char* const name)
 				if (!strcmp(token, "ROOT"))
 				{
 					entity = new exportMeshNode();
-					entityList.push_back(entity);
+					nodeIndex.push_back(entity);
 					ReadToken();
 					entity->m_name = token;
 					stackPool[stack] = entity;
@@ -52,49 +52,70 @@ exportMeshNode* exportMeshNode::ImportBvhSkeleton(const char* const name)
 				}
 				else if (!strcmp(token, "JOINT"))
 				{
-					exportMeshNode* const child = new exportMeshNode(stackPool[stack - 1]);
-					entityList.push_back(child);
+					exportMeshNode* const node = new exportMeshNode(stackPool[stack - 1]);
+					nodeIndex.push_back(node);
 					ReadToken();
-					if (child->m_parent->m_parent)
+					if (node->m_parent->m_parent)
 					{
-						strcat(token, "_bone");
+						//strcat(token, "_bone");
 					}
 					else
 					{
-						strcat(token, "_ref");
+						//strcat(token, "_ref");
 					}
-					child->m_name = token;
-					stackPool[stack] = child;
+					node->m_name = token;
+					stackPool[stack] = node;
 					stack++;
 					ReadToken();
 				}
 				else if (!strcmp(token, "End"))
 				{
-					exportMeshNode* const child = new exportMeshNode(stackPool[stack - 1]);
-					entityList.push_back(child);
+					exportMeshNode* const node = new exportMeshNode(stackPool[stack - 1]);
 					ReadToken();
-					child->m_name = "effector";
-					stackPool[stack] = child;
+					node->m_name = "effector";
+					stackPool[stack] = node;
 					stack++;
 					ReadToken();
 				}
 				else if (!strcmp(token, "OFFSET"))
 				{
 					exportMeshNode* const node = stackPool[stack - 1];
-					//node->m_matrix.m_posit.m_x = ReadFloat() * scale;
-					//node->m_matrix.m_posit.m_y = ReadFloat() * scale;
-					//node->m_matrix.m_posit.m_z = ReadFloat() * scale;
-					node->m_globalPosit.m_x = ReadFloat() * scale;
-					node->m_globalPosit.m_y = ReadFloat() * scale;
-					node->m_globalPosit.m_z = ReadFloat() * scale;
-					node->m_globalPosit.m_w = 1.0f;
+					node->m_matrix.m_posit.m_x = ReadFloat() * scale;
+					node->m_matrix.m_posit.m_y = ReadFloat() * scale;
+					node->m_matrix.m_posit.m_z = ReadFloat() * scale;
+					node->m_matrix.m_posit.m_w = 1.0f;
 				}
 				else if (!strcmp(token, "CHANNELS"))
 				{
-					int skips = ReadInt();
-					for (int i = 0; i < skips; ++i)
+					int count = ReadInt();
+					exportMeshNode* const node = stackPool[stack - 1];
+					for (int i = 0; i < count; ++i)
 					{
 						ReadToken();
+						if (!strcmp(token, "Xposition"))
+						{
+							node->m_animDof.m_channel[i] = 3;
+						} 
+						else if (!strcmp(token, "Yposition"))
+						{
+							node->m_animDof.m_channel[i] = 4;
+						}
+						else if (!strcmp(token, "Zposition"))
+						{
+							node->m_animDof.m_channel[i] = 5;
+						}
+						else if (!strcmp(token, "Xrotation"))
+						{
+							node->m_animDof.m_channel[i] = 0;
+						}
+						else if (!strcmp(token, "Yrotation"))
+						{
+							node->m_animDof.m_channel[i] = 1;
+						}
+						else if (!strcmp(token, "Zrotation"))
+						{
+							node->m_animDof.m_channel[i] = 2;
+						}
 					}
 				}
 				else if (!strcmp(token, "}"))
@@ -108,17 +129,90 @@ exportMeshNode* exportMeshNode::ImportBvhSkeleton(const char* const name)
 			}
 		}
 
+		ReadToken();
+		int frameCount = ReadInt();
+		ReadToken();
+		ReadToken();
+		float frameTime = ReadFloat();
+		for (int i = 0; i < frameCount; ++i)
+		{
+			for (int j = 0; j < nodeIndex.size(); ++j)
+			{
+				float values[6];
+				exportMeshNode* const node = nodeIndex[j];
+				
+				values[0] = 0.0f;
+				values[1] = 0.0f;
+				values[2] = 0.0f;
+				values[3] = node->m_matrix.m_posit.m_x;
+				values[4] = node->m_matrix.m_posit.m_y;
+				values[5] = node->m_matrix.m_posit.m_z;
+				for (int k = 0; k < 6; ++k)
+				{
+					int index = node->m_animDof.m_channel[k];
+					if (index != -1)
+					{
+						float value = ReadFloat();
+						values[index] = value;
+					}
+				}
+
+				exportMatrix pitch(ndPitchMatrix(values[0] * M_PI / 180.0f));
+				exportMatrix yaw(ndYawMatrix(values[1] * M_PI / 180.0f));
+				exportMatrix roll(ndRollMatrix(values[2] * M_PI / 180.0f));
+				exportMatrix matrix(yaw * pitch * roll);
+				matrix.m_posit = node->m_matrix.m_posit;
+				if (node->m_parent == entity)
+				{
+					matrix.m_posit = exportVector(values[3], values[4], values[5], 1.0f);
+				}
+				node->m_matrix = matrix;
+			}
+
+			int stack = 1;
+			exportMeshNode* stackPool[128];
+
+			stack = 1;
+			stackPool[0] = entity;
+			while (stack)
+			{
+				stack--;
+
+				exportMeshNode* const node = stackPool[stack];
+				exportMatrix matrix(node->m_matrix);
+				exportVector euler1;
+				exportVector euler0(matrix.CalcPitchYawRoll(euler1));
+
+				if (i != 0)
+				{
+					float error = node->CalculateDeltaAngle(euler0.m_x, node->m_rotationsKeys[i-1].m_x);
+					if (fabsf(error) > 90.0 * M_PI / 180.0f)
+					{
+						euler0 = euler1;
+					}
+
+					float deltax = node->CalculateDeltaAngle(euler0.m_x, node->m_rotationsKeys[i - 1].m_x);
+					float deltay = node->CalculateDeltaAngle(euler0.m_y, node->m_rotationsKeys[i - 1].m_y);
+					float deltaz = node->CalculateDeltaAngle(euler0.m_z, node->m_rotationsKeys[i - 1].m_z);
+
+					euler0.m_x = node->m_rotationsKeys[i - 1].m_x + deltax;
+					euler0.m_y = node->m_rotationsKeys[i - 1].m_y + deltay;
+					euler0.m_z = node->m_rotationsKeys[i - 1].m_z + deltaz;
+				}
+				node->m_rotationsKeys.push_back(euler0);
+				node->m_positionsKeys.push_back(matrix.m_posit);
+
+				for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
+					iter != node->m_children.end(); iter++)
+				{
+					stackPool[stack] = *iter;
+					stack++;
+				}
+			}
+		}
+
 		fclose(fp);
 	}
-
-	//bvhMatrix rotation(ndYawMatrix(90.0f * ndDegreeToRad));
-	//bvhMatrix invRotation(rotation.Inverse());
-	//for (int i = 0; i < entityList.GetCount(); ++i)
-	//{
-	//	exportMeshNode* const child = entityList[i];
-	//	bvhMatrix matrix(invRotation * child->GetRenderMatrix() * rotation);
-	//	child->ResetMatrix(matrix);
-	//}
 	
 	return entity;
 }

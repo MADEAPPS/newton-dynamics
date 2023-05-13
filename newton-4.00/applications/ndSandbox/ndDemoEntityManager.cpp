@@ -374,7 +374,6 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	glfwSetWindowUserPointer(m_mainFrame, this);
 
 	#if defined (_DEBUG)
-	//glDebugMessageCallback((GLDEBUGPROC)OpenMessageCallback, m_mainFrame);
 	glDebugMessageCallback(OpenMessageCallback, m_mainFrame);
 	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
