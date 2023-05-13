@@ -70,12 +70,14 @@ exportMeshNode* exportMeshNode::ImportBvhSkeleton(const char* const name)
 				}
 				else if (!strcmp(token, "End"))
 				{
-					exportMeshNode* const node = new exportMeshNode(stackPool[stack - 1]);
-					ReadToken();
-					node->m_name = "effector";
-					stackPool[stack] = node;
-					stack++;
-					ReadToken();
+					//exportMeshNode* const node = new exportMeshNode(stackPool[stack - 1]);
+					//ReadToken();
+					//node->m_name = "effector";
+					//stackPool[stack] = node;
+					//stack++;
+					//ReadToken();
+					while (strcmp(token, "}"))
+						ReadToken();
 				}
 				else if (!strcmp(token, "OFFSET"))
 				{
