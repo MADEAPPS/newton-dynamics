@@ -220,7 +220,6 @@ static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const f
 	FbxAnimLayer* const animLayer = FbxAnimLayer::Create(fbxScene, "baseLayer");	// the AnimLayer object name is "Base Layer"
 	animStack->AddMember(animLayer);
 
-
 	double fps = 1.0f / 60.0f;
 	int stack = 1;
 	const exportMeshNode* nodePool[256];

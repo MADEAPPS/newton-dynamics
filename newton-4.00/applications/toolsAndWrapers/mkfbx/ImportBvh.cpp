@@ -31,6 +31,35 @@ void exportMeshNode::SetFrame(int index)
 	}
 }
 
+void exportMeshNode::DeleteEffector()
+{
+	int stack = 1;
+	exportMeshNode* stackPool[128];
+
+	stack = 1;
+	stackPool[0] = this;
+	while (stack)
+	{
+		stack--;
+		exportMeshNode* const node = stackPool[stack];
+
+		if (node->m_name == "effector")
+		{
+			node->m_parent->m_children.clear();
+			delete node;
+		}
+		else
+		{
+			for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
+				iter != node->m_children.end(); iter++)
+			{
+				stackPool[stack] = *iter;
+				stack++;
+			}
+		}
+	}
+}
+
 void exportMeshNode::CalculateTpose()
 {
 	exportMeshNode* stackPool[128];
@@ -310,6 +339,8 @@ exportMeshNode* exportMeshNode::ImportBvhSkeleton(const char* const name)
 
 	//entity->SetFrame(0);
 	//entity->CalculateTpose();
+
+	entity->DeleteEffector();
 	return entity;
 }
 

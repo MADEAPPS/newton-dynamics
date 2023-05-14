@@ -32,6 +32,8 @@ class exportMeshNode
 	void CalculateTpose();
 	void SetFrame(int index);
 
+	void DeleteEffector();
+
 	std::string m_name;
 	exportMatrix m_matrix;
 	exportMatrix m_tPoseMatrix;
