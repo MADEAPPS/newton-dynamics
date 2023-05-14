@@ -17,9 +17,13 @@
 //
 // In this particular case we override `OnContactCallback` to get notified
 // whenever the ball hits the ground.
-class MyContactNotify : public ndContactNotify {
+class MyContactNotify : public ndContactNotify 
+{
 public:
-  MyContactNotify() {};
+  MyContactNotify(ndScene* const scene) 
+      :ndContactNotify (scene)
+  {
+  }
 
   virtual void OnContactCallback(const ndContact *const contact,
                                  ndFloat32 timestep) {
@@ -86,7 +90,7 @@ int main(int, const char**)
 
   // Install our own ContactNotify callback handler. Newton will call its
   // various methods to signal AABB overlaps or contact events.
-  world.SetContactNotify(new MyContactNotify());
+  world.SetContactNotify(new MyContactNotify(world->GetScene()));
 
   // Create a ball above a floor box.
   //ndBodyDynamic *sphere = BuildSphere();
