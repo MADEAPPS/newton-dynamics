@@ -13,15 +13,7 @@ void exportMeshNode::SetFrame(int index)
 		stack--;
 
 		exportMeshNode* const node = stackPool[stack];
-
-		_ASSERT(0);
-		//exportVector euler(node->m_rotationsKeys[index]);
-		//exportMatrix pitch(ndPitchMatrix(euler.m_x));
-		//exportMatrix yaw(ndYawMatrix(euler.m_y));
-		//exportMatrix roll(ndRollMatrix(euler.m_z));
-		//exportMatrix matrix(pitch * yaw * roll);
-		//matrix.m_posit = node->m_matrix.m_posit;
-		//node->m_matrix = matrix;
+		node->m_matrix = node->m_keyFrame[index];
 
 		for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
 			iter != node->m_children.end(); iter++)
@@ -31,8 +23,67 @@ void exportMeshNode::SetFrame(int index)
 		}
 	}
 }
+void exportMeshNode::AlignFrames()
+{
+	int stack = 1;
+	exportMeshNode* stackPool[128];
+	exportMatrix alignFrame[128];
 
-void exportMeshNode::DeleteEffector()
+	stack = 0;
+	for (std::list<exportMeshNode*>::const_iterator iter = m_children.begin();
+		iter != m_children.end(); iter++)
+	{
+		stackPool[stack] = *iter;
+		alignFrame[stack] = exportMatrix();
+		stack++;
+	}
+
+	while (stack)
+	{
+		stack--;
+
+		exportMeshNode* const node = stackPool[stack];
+
+		exportMatrix parentAlign (alignFrame[stack]);
+
+		if (node->m_keyFrame.size())
+		{
+			if (node->m_children.size())
+			{
+				exportMeshNode* const childNode = *node->m_children.begin();
+				exportVector dir(childNode->m_matrix.m_posit);
+				exportMatrix childAlign(dir);
+
+				for (int i = 0; i < node->m_keyFrame.size(); ++i)
+				{
+					exportMatrix animMatrix(node->m_keyFrame[i]);
+					exportMatrix matrix(childAlign * animMatrix * parentAlign);
+					node->m_keyFrame[i] = matrix;
+				}
+				parentAlign = childAlign.Inverse();
+			}
+			else
+			{
+				for (int i = 0; i < node->m_keyFrame.size(); ++i)
+				{
+					exportMatrix animMatrix(node->m_keyFrame[i]);
+					exportMatrix matrix(animMatrix * parentAlign);
+					node->m_keyFrame[i] = matrix;
+				}
+			}
+		}
+
+		for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
+			iter != node->m_children.end(); iter++)
+		{
+			stackPool[stack] = *iter;
+			alignFrame[stack] = parentAlign;
+			stack++;
+		}
+	}
+}
+
+void exportMeshNode::DeleteEffectors()
 {
 	int stack = 1;
 	exportMeshNode* stackPool[128];
@@ -92,7 +143,6 @@ exportMeshNode* exportMeshNode::ImportBvhSkeleton(const char* const name)
 	std::vector<exportMeshNode*> nodeIndex;
 	
 	float scale = 1.0f;
-	int framesCount = 0;
 	if (fp)
 	{
 		ReadToken();
@@ -192,11 +242,12 @@ exportMeshNode* exportMeshNode::ImportBvhSkeleton(const char* const name)
 		}
 
 		ReadToken();
-		framesCount = ReadInt();
+		int framesCount = ReadInt();
 		ReadToken();
 		ReadToken();
 		float frameTime = ReadFloat();
 		
+		//framesCount = 1;
 		for (int i = 0; i < framesCount; ++i)
 		{
 			for (int j = 0; j < nodeIndex.size(); ++j)
@@ -229,59 +280,17 @@ exportMeshNode* exportMeshNode::ImportBvhSkeleton(const char* const name)
 				{
 					matrix.m_posit = exportVector(values[3], values[4], values[5], 1.0f);
 				}
-				//node->m_matrix = matrix;
 				node->m_keyFrame.push_back(matrix);
 			}
-
-			//int stack = 1;
-			//exportMeshNode* stackPool[128];
-			//stack = 1;
-			//stackPool[0] = entity;
-			//while (stack)
-			//{
-			//	stack--;
-			//
-			//	exportMeshNode* const node = stackPool[stack];
-			//	exportMatrix matrix(node->m_matrix);
-			//	exportVector euler1;
-			//	exportVector euler0(matrix.CalcPitchYawRoll(euler1));
-			//
-			//	if (i != 0)
-			//	{
-			//		float error = node->CalculateDeltaAngle(euler0.m_x, node->m_rotationsKeys[i-1].m_x);
-			//		if (fabsf(error) > 90.0 * M_PI / 180.0f)
-			//		{
-			//			euler0 = euler1;
-			//		}
-			//
-			//		float deltax = node->CalculateDeltaAngle(euler0.m_x, node->m_rotationsKeys[i - 1].m_x);
-			//		float deltay = node->CalculateDeltaAngle(euler0.m_y, node->m_rotationsKeys[i - 1].m_y);
-			//		float deltaz = node->CalculateDeltaAngle(euler0.m_z, node->m_rotationsKeys[i - 1].m_z);
-			//
-			//		euler0.m_x = node->m_rotationsKeys[i - 1].m_x + deltax;
-			//		euler0.m_y = node->m_rotationsKeys[i - 1].m_y + deltay;
-			//		euler0.m_z = node->m_rotationsKeys[i - 1].m_z + deltaz;
-			//	}
-			//	_ASSERT(0);
-			//	node->m_rotationsKeys.push_back(euler0);
-			//	node->m_positionsKeys.push_back(matrix.m_posit);
-			//
-			//	for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
-			//		iter != node->m_children.end(); iter++)
-			//	{
-			//		stackPool[stack] = *iter;
-			//		stack++;
-			//	}
-			//}
 		}
 
 		fclose(fp);
 	}
 
-	//entity->SetFrame(0);
-	//entity->CalculateTpose();
+	entity->DeleteEffectors();
+	entity->AlignFrames();
 
-	entity->DeleteEffector();
+	//entity->SetFrame(0);
 	return entity;
 }
 

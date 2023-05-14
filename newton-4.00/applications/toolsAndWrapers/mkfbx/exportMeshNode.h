@@ -27,7 +27,8 @@ class exportMeshNode
 	static exportMeshNode* ImportBvhSkeleton(const char* const name);
 
 	public:
-	void DeleteEffector();
+	void AlignFrames();
+	void DeleteEffectors();
 	void SetFrame(int index);
 	float CalculateDeltaAngle(float angle1, float angle0) const;
 

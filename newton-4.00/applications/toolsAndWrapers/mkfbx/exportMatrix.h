@@ -8,11 +8,14 @@ class exportMatrix
 	~exportMatrix();
 	exportMatrix(const exportVector &front, const exportVector &up, const exportVector &right, const exportVector &posit);
 	
+	exportMatrix(const exportVector &front);
+
 	exportVector& operator[] (int i);
 	const exportVector& operator[] (int i) const;
 
 	exportMatrix Inverse () const;
 	exportVector CalcPitchYawRoll(exportVector& euler) const;
+	exportVector TransformVector(const exportVector &v) const;
 	exportVector UntransformVector(const exportVector &v) const;
 	
 	exportMatrix operator* (const exportMatrix &B) const;
@@ -38,6 +41,24 @@ inline exportMatrix::exportMatrix(const exportVector &front, const exportVector 
 	,m_right(right)
 	,m_posit(posit)
 {
+}
+
+inline exportMatrix::exportMatrix(const exportVector& front)
+	:m_front(front)
+	,m_posit(0.0f, 0.0f, 0.0f, 1.0f)
+{
+	m_front.m_w = 0.0f;
+	m_front = m_front.Normalize();
+	if (fabsf(m_front.m_z) > 0.577f)
+	{
+		m_right = m_front.CrossProduct(exportVector(-m_front.m_y, m_front.m_z, 0.0f, 0.0f));
+	}
+	else
+	{
+		m_right = m_front.CrossProduct(exportVector(-m_front.m_y, m_front.m_x, 0.0f, 0.0f));
+	}
+	m_right = m_right.Normalize();
+	m_up = m_right.CrossProduct(m_front);
 }
 
 inline exportMatrix::~exportMatrix()
@@ -131,6 +152,16 @@ inline exportVector exportMatrix::CalcPitchYawRoll(exportVector& euler1) const
 	euler0[3] = float(0.0f);
 	euler1[3] = float(0.0f);
 	return euler0;
+}
+
+inline exportVector exportMatrix::TransformVector(const exportVector &v) const
+{
+	exportVector out;
+	exportVector v1(v);
+	const exportMatrix& me = *this;
+	out = me[0].Scale (v.m_x) + me[1].Scale(v.m_y) + me[2].Scale(v.m_z) + me[3];
+	out.m_w = 1.0f;
+	return out;
 }
 
 inline exportVector exportMatrix::UntransformVector(const exportVector &v) const
