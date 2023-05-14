@@ -23,6 +23,7 @@
 #include <map>
 #include <list>
 #include <vector>
+#include <string>
 #include <fbxsdk.h>
 
 #ifndef M_PI

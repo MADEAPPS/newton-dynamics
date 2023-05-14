@@ -75,11 +75,10 @@ inline exportVector exportMatrix::CalcPitchYawRoll(exportVector& euler1) const
 	const exportMatrix& matrix = *this;
 
 	exportVector euler0;
-	//exportVector euler1;
-	// Assuming the angles are in radians.
+	//Assuming the angles are in radians.
 	if (matrix[0][2] > float(0.99995f))
 	{
-		float picth0 = float (-atan2(matrix[2][1], matrix[1][1]));
+		float picth0 = float(-atan2(matrix[2][1], matrix[1][1]));
 		float yaw0 = -float(M_PI * float(0.5f));
 		float roll0 = float(0.0f);
 

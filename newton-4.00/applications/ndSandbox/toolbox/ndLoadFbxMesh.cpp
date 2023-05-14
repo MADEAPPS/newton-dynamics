@@ -294,7 +294,6 @@ class dFbxAnimationTrack
 		dCurve::ndNode* positNode = m_position.GetFirst();
 		for (dCurve::ndNode* rotationNode = m_rotation.GetFirst(); rotationNode; rotationNode = rotationNode->GetNext()) 
 		{
-			
 			dCurveValue& scaleValue = scaleNode->GetInfo();
 			dCurveValue& positValue = positNode->GetInfo();
 			dCurveValue& rotationValue = rotationNode->GetInfo();

@@ -3,23 +3,19 @@
 
 exportMeshNode::exportMeshNode()
 	:m_matrix()
-	,m_tPoseMatrix()
-	,m_fbxNode(nullptr)
 	,m_parent(nullptr)
+	,m_fbxNode(nullptr)
 	,m_animDof()
-	,m_positionsKeys()
-	,m_rotationsKeys()
+	,m_keyFrame()
 {
 }
 
 exportMeshNode::exportMeshNode(exportMeshNode* const parent)
 	:m_matrix()
-	,m_tPoseMatrix()
-	,m_fbxNode(nullptr)
 	,m_parent(parent)
+	,m_fbxNode(nullptr)
 	,m_animDof()
-	,m_positionsKeys()
-	,m_rotationsKeys()
+	,m_keyFrame()
 {
 	_ASSERT(parent);
 	m_parent->m_children.push_back(this);
@@ -37,13 +33,13 @@ exportMeshNode::~exportMeshNode()
 
 float exportMeshNode::CalculateDeltaAngle(float angle1, float angle0) const
 {
-	float s1 = sin(angle1);
-	float c1 = cos(angle1);
-	float s0 = sin(angle0);
-	float c0 = cos(angle0);
+	float s1 = (float)sin(angle1);
+	float c1 = (float)cos(angle1);
+	float s0 = (float)sin(angle0);
+	float c0 = (float)cos(angle0);
 
 	float s = s1 * c0 - s0 * c1;
 	float c = c1 * c0 + s0 * s1;
-	float delta = atan2(s, c);
+	float delta = (float)atan2(s, c);
 	return delta;
 }

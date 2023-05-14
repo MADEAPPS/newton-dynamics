@@ -27,22 +27,17 @@ class exportMeshNode
 	static exportMeshNode* ImportBvhSkeleton(const char* const name);
 
 	public:
-	float CalculateDeltaAngle(float angle1, float angle0) const;
-
-	void CalculateTpose();
-	void SetFrame(int index);
-
 	void DeleteEffector();
+	void SetFrame(int index);
+	float CalculateDeltaAngle(float angle1, float angle0) const;
 
 	std::string m_name;
 	exportMatrix m_matrix;
-	exportMatrix m_tPoseMatrix;
-	mutable FbxNode* m_fbxNode;
 	exportMeshNode* m_parent;
+	mutable FbxNode* m_fbxNode;
 	std::list<exportMeshNode*> m_children;
 
 	animDof m_animDof;
-	std::vector<exportVector> m_positionsKeys;
-	std::vector<exportVector> m_rotationsKeys;
+	std::vector<exportMatrix> m_keyFrame;
 };
 
