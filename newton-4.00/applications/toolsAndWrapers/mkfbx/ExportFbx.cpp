@@ -175,9 +175,9 @@ FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* const fbxSc
 		FbxNode* const fbxParent = fbxNodesParent[stack];
 
 		FbxNode* const fbxNode = FbxNode::Create(fbxScene, node->m_name.c_str());
-		exportVector posit(node->m_matrix.m_posit);
+		exportVector posit(node->m_tPoseMatrix.m_posit);
 		exportVector euler1;
-		exportVector euler0(node->m_matrix.CalcPitchYawRoll(euler1));
+		exportVector euler0(node->m_tPoseMatrix.CalcPitchYawRoll(euler1));
 		node->m_fbxNode = fbxNode;
 
 		exportVector euler(euler0.Scale(180.0f / M_PI));

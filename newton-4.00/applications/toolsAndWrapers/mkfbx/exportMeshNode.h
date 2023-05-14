@@ -29,8 +29,12 @@ class exportMeshNode
 	public:
 	float CalculateDeltaAngle(float angle1, float angle0) const;
 
+	void CalculateTpose();
+	void SetFrame(int index);
+
 	std::string m_name;
 	exportMatrix m_matrix;
+	exportMatrix m_tPoseMatrix;
 	mutable FbxNode* m_fbxNode;
 	exportMeshNode* m_parent;
 	std::list<exportMeshNode*> m_children;

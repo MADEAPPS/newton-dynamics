@@ -199,9 +199,8 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
 	rootNode->LinkEndChild(node);
 
-	ndVector euler0;
 	ndVector euler1;
-	value.CalcPitchYawRoll(euler0, euler1);
+	ndVector euler0 (value.CalcPitchYawRoll(euler1));
 	euler0 = euler0.Scale(ndRadToDegree);
 
 	xmlSaveParam(node, "posit", value.m_posit);

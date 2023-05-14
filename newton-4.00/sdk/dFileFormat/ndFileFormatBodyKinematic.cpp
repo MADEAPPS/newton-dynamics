@@ -49,11 +49,10 @@ void ndFileFormatBodyKinematic::SaveBody(ndFileFormatSave* const scene, nd::TiXm
 	xmlSaveParam(classNode, "invMass", invMass);
 	if (invMass > ndFloat32(0.0f))
 	{
-		ndVector euler0;
 		ndVector euler1;
 		ndVector inertia(kinematic->GetMassMatrix());
 		ndMatrix matrix(kinematic->GetPrincipalAxis());
-		matrix.CalcPitchYawRoll(euler0, euler1);
+		ndVector euler0 (matrix.CalcPitchYawRoll(euler1));
 		euler0 = euler0.Scale(ndRadToDegree);
 
 		xmlSaveParam(classNode, "inertia", inertia);

@@ -267,11 +267,14 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 	return ret;
 }
 
-void ndMatrix::CalcPitchYawRoll (ndVector& euler0, ndVector& euler1) const
+ndVector ndMatrix::CalcPitchYawRoll (ndVector& euler1) const
 {
 	const ndMatrix& matrix = *this;
 	ndAssert (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() > 0.0f);
 	ndAssert (ndAbs (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-4f));
+
+	euler1 = ndVector::m_zero;
+	ndVector euler0(ndVector::m_zero);
 
 	// Assuming the angles are in radians.
 	if (matrix[0][2] > ndFloat32 (0.99995f)) 
@@ -347,6 +350,7 @@ void ndMatrix::CalcPitchYawRoll (ndVector& euler0, ndVector& euler1) const
 		}
 	}
 #endif
+	return euler0;
 }
 
 void ndMatrix::PolarDecomposition (ndMatrix& transformMatrix, ndVector& scale, ndMatrix& stretchAxis) const

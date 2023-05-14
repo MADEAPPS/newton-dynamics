@@ -75,10 +75,8 @@ class ndMatrix
 	D_CORE_API ndVector SolveByGaussianElimination(const ndVector &v) const;
 	D_CORE_API void TransformBBox (const ndVector& p0local, const ndVector& p1local, ndVector& p0, ndVector& p1) const;
 
-	D_CORE_API void CalcPitchYawRoll (ndVector& euler0, ndVector& euler1) const;
-	D_CORE_API void TransformTriplex (
-		ndFloat32* const dst, ndInt32 dstStrideInBytes,
-		const ndFloat32* const src, ndInt32 srcStrideInBytes, ndInt32 count) const;
+	D_CORE_API ndVector CalcPitchYawRoll (ndVector& euler) const;
+	D_CORE_API void TransformTriplex (ndFloat32* const dst, ndInt32 dstStrideInBytes, const ndFloat32* const src, ndInt32 srcStrideInBytes, ndInt32 count) const;
 
 #ifndef D_NEWTON_USE_DOUBLE
 	D_CORE_API void TransformTriplex (

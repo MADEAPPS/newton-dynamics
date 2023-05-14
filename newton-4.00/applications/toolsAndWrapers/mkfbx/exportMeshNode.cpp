@@ -3,6 +3,7 @@
 
 exportMeshNode::exportMeshNode()
 	:m_matrix()
+	,m_tPoseMatrix()
 	,m_fbxNode(nullptr)
 	,m_parent(nullptr)
 	,m_animDof()
@@ -13,6 +14,7 @@ exportMeshNode::exportMeshNode()
 
 exportMeshNode::exportMeshNode(exportMeshNode* const parent)
 	:m_matrix()
+	,m_tPoseMatrix()
 	,m_fbxNode(nullptr)
 	,m_parent(parent)
 	,m_animDof()
@@ -32,7 +34,6 @@ exportMeshNode::~exportMeshNode()
 		delete child;
 	}
 }
-
 
 float exportMeshNode::CalculateDeltaAngle(float angle1, float angle0) const
 {

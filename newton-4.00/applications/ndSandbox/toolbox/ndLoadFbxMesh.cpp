@@ -236,12 +236,11 @@ class dFbxAnimationTrack
 	void AddKeyframe(ndFloat32 time, const ndMatrix& matrix)
 	{
 		ndVector scale;
-		ndVector euler0;
 		ndVector euler1;
 		ndMatrix transform;
 		ndMatrix eigenScaleAxis;
 		matrix.PolarDecomposition(transform, scale, eigenScaleAxis);
-		transform.CalcPitchYawRoll(euler0, euler1);
+		ndVector euler0 (transform.CalcPitchYawRoll(euler1));
 
 		AddScale(time, scale.m_x, scale.m_y, scale.m_z);
 		AddPosition(time, matrix.m_posit.m_x, matrix.m_posit.m_y, matrix.m_posit.m_z);
@@ -295,9 +294,7 @@ class dFbxAnimationTrack
 		dCurve::ndNode* positNode = m_position.GetFirst();
 		for (dCurve::ndNode* rotationNode = m_rotation.GetFirst(); rotationNode; rotationNode = rotationNode->GetNext()) 
 		{
-			ndVector euler0;
-			ndVector euler1;
-
+			
 			dCurveValue& scaleValue = scaleNode->GetInfo();
 			dCurveValue& positValue = positNode->GetInfo();
 			dCurveValue& rotationValue = rotationNode->GetInfo();
@@ -311,10 +308,11 @@ class dFbxAnimationTrack
 			ndMatrix matrix(invert * m * transform);
 
 			ndVector scale;
+			ndVector euler1;
 			ndMatrix output;
 			ndMatrix eigenScaleAxis;
 			matrix.PolarDecomposition(output, scale, eigenScaleAxis);
-			output.CalcPitchYawRoll(euler0, euler1);
+			ndVector euler0 (output.CalcPitchYawRoll(euler1));
 			//dTrace(("%d %f %f %f\n", m_rotation.GetCount(), euler0.m_x * dRadToDegree, euler0.m_y * dRadToDegree, euler0.m_z * dRadToDegree));
 
 			scaleValue.m_x = scale.m_x;
@@ -588,13 +586,12 @@ static void LoadAnimationCurve(ofbx::IScene* const, const ofbx::Object* const bo
 	ndFloat32 timestep = animation.m_timestep;
 
 	ndVector scale1;
-	ndVector euler0;
 	ndVector euler1;
 	ndMatrix transform;
 	ndMatrix eigenScaleAxis;
 	ndMatrix boneMatrix(ofbxMatrix2dMatrix(bone->getLocalTransform()));
 	boneMatrix.PolarDecomposition(transform, scale1, eigenScaleAxis);
-	transform.CalcPitchYawRoll(euler0, euler1);
+	ndVector euler0 (transform.CalcPitchYawRoll(euler1));
 	for (ndInt32 i = 0; i < animation.m_framesCount; ++i)
 	{
 		scale.x = scale1.m_x;
