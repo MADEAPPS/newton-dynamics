@@ -130,7 +130,7 @@ else()
 			set_source_files_properties(dCore/ndCoreStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcndCoreStdafx.h")
 		endif()
 
-		if (NEWTON_BUILD_TEST AND NEWTON_BUILD_SHARED_LIBS)
+		if (NEWTON_BUILD_SHARED_LIBS)
 			add_custom_command(
 				TARGET ${projectName} POST_BUILD
 				COMMAND ${CMAKE_COMMAND}
