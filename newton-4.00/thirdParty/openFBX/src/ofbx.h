@@ -364,6 +364,8 @@ namespace ofbx
 		virtual const Skin* getSkin() const = 0;
 		virtual const BlendShape* getBlendShape() const = 0;
 		virtual const int* getMaterials() const = 0;
+
+		virtual Color getRgbDisplayColor() const = 0;
 	};
 
 

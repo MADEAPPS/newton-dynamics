@@ -1205,6 +1205,7 @@ struct GeometryImpl : Geometry
 	std::vector<Vec3> tangents;
 	std::vector<int> materials;
 
+	Color rgbDisplayColor;
 	const Skin* skin = nullptr;
 	const BlendShape* blendShape = nullptr;
 
@@ -1215,6 +1216,9 @@ struct GeometryImpl : Geometry
 	GeometryImpl(const Scene& _scene, const IElement& _element)
 		: Geometry(_scene, _element)
 	{
+		rgbDisplayColor.r = 1.0f;
+		rgbDisplayColor.g = 1.0f;
+		rgbDisplayColor.b = 1.0f;
 	}
 
 
@@ -1230,6 +1234,7 @@ struct GeometryImpl : Geometry
 	const Skin* getSkin() const override { return skin; }
 	const BlendShape* getBlendShape() const override { return blendShape; }
 	const int* getMaterials() const override { return materials.empty() ? nullptr : &materials[0]; }
+	Color getRgbDisplayColor() const override { return rgbDisplayColor; }
 };
 
 
@@ -2716,6 +2721,41 @@ static OptionalError<Object*> parseGeometryNormals(
 static OptionalError<Object*> parseGeometry(const Element& element, bool triangulate, GeometryImpl* geom)
 {
 	assert(element.first_property);
+
+	const Element* displayColor = findChild(element, "Properties70");
+	if (displayColor)
+	{
+		const IElement* colorElement = displayColor->getFirstChild();
+		const IElementProperty* color0 = colorElement->getFirstProperty();
+		const IElementProperty* color1 = color0->getNext();
+		const IElementProperty* color2 = color1->getNext();
+		const IElementProperty* color3 = color2->getNext();
+		Property* red = (Property*)color3->getNext();
+		Property* green = (Property*)red->getNext();
+		Property* blue = (Property*)green->getNext();
+
+		Vec3 color;
+		color.x = geom->rgbDisplayColor.r;
+		color.y = geom->rgbDisplayColor.g;
+		color.z = geom->rgbDisplayColor.b;
+		if (red->value.is_binary)
+		{
+			parseDouble(*red, &color.x);
+			parseDouble(*green, &color.y);
+			parseDouble(*blue, &color.z);
+		}
+		else
+		{
+			red->getValues(&color.x, sizeof(double));
+			green->getValues(&color.y, sizeof(double));
+			blue->getValues(&color.z, sizeof(double));
+		}
+
+		geom->rgbDisplayColor.r = (float)color.x;
+		geom->rgbDisplayColor.g = (float)color.y;
+		geom->rgbDisplayColor.b = (float)color.z;
+
+	}
 
 	const Element* vertices_element = findChild(element, "Vertices");
 	if (!vertices_element || !vertices_element->first_property)

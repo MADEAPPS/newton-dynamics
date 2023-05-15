@@ -42,7 +42,9 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	ndFloat32 mass = 100.0f;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndSharedPtr<ndDemoEntity> entity(ndDemoEntity::LoadFbx("walker.fbx", scene));
+	//ndSharedPtr<ndDemoEntity> entity(ndDemoEntity::LoadFbx("walker.fbx", scene));
+	ndSharedPtr<ndDemoEntity> entity(ndDemoEntity::LoadFbx("mopCapWalker.fbx", scene));
+	//ndSharedPtr<ndDemoEntity> entity(ndDemoEntity::LoadFbx("box.fbx", scene));
 	
 	ndSharedPtr<ndBody> player0(new ndBasicPlayerCapsule(scene, *entity, localAxis, location, mass, radio, height, height / 4.0f, true));
 	world->AddBody(player0);

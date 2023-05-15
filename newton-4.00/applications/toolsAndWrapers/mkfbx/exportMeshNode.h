@@ -28,6 +28,7 @@ class exportMeshNode
 
 	public:
 	void AlignFrames();
+	void GenerateTpose();
 	void DeleteEffectors();
 	void SetFrame(int index);
 	float CalculateDeltaAngle(float angle1, float angle0) const;

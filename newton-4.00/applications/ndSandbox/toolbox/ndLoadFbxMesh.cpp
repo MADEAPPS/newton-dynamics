@@ -129,8 +129,14 @@ static void ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const
 	ndInt32 materialCount = fbxMesh->getMaterialCount();
 	if (materialCount == 0)
 	{
-		ndMeshEffect::ndMaterial defaultMaterial;
-		materialArray.PushBack(defaultMaterial);
+		ndMeshEffect::ndMaterial material;
+		const ofbx::Geometry* const geom = fbxMesh->getGeometry();
+		Color color(geom->getRgbDisplayColor());
+		material.m_diffuse = ndVector(color.r, color.g, color.b, 1.0f);
+		material.m_ambient = ndVector(color.r, color.g, color.b, 1.0f);
+		material.m_specular = ndVector(color.r, color.g, color.b, 1.0f);
+
+		materialArray.PushBack(material);
 	}
 	else
 	{

@@ -23,6 +23,7 @@ void exportMeshNode::SetFrame(int index)
 		}
 	}
 }
+
 void exportMeshNode::AlignFrames()
 {
 	int stack = 1;
@@ -48,30 +49,66 @@ void exportMeshNode::AlignFrames()
 
 		if (node->m_keyFrame.size())
 		{
+			exportMatrix childAlign;
 			if (node->m_children.size())
 			{
 				exportMeshNode* const childNode = *node->m_children.begin();
-				exportVector dir(childNode->m_matrix.m_posit);
-				exportMatrix childAlign(dir);
+				childAlign = exportMatrix(childNode->m_matrix.m_posit);
+			}
 
-				for (int i = 0; i < node->m_keyFrame.size(); ++i)
-				{
-					exportMatrix animMatrix(node->m_keyFrame[i]);
-					exportMatrix matrix(childAlign * animMatrix * parentAlign);
-					node->m_keyFrame[i] = matrix;
-				}
-				parentAlign = childAlign.Inverse();
-			}
-			else
+			for (int i = 0; i < node->m_keyFrame.size(); ++i)
 			{
-				for (int i = 0; i < node->m_keyFrame.size(); ++i)
-				{
-					exportMatrix animMatrix(node->m_keyFrame[i]);
-					exportMatrix matrix(animMatrix * parentAlign);
-					node->m_keyFrame[i] = matrix;
-				}
+				exportMatrix animMatrix(node->m_keyFrame[i]);
+				exportMatrix matrix(childAlign * animMatrix * parentAlign);
+				node->m_keyFrame[i] = matrix;
 			}
+			parentAlign = childAlign.Inverse();
 		}
+
+		for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
+			iter != node->m_children.end(); iter++)
+		{
+			stackPool[stack] = *iter;
+			alignFrame[stack] = parentAlign;
+			stack++;
+		}
+	}
+}
+
+void exportMeshNode::GenerateTpose()
+{
+	int stack = 1;
+	exportMeshNode* stackPool[128];
+	exportMatrix alignFrame[128];
+
+	stack = 0;
+	for (std::list<exportMeshNode*>::const_iterator iter = m_children.begin();
+		iter != m_children.end(); iter++)
+	{
+		stackPool[stack] = *iter;
+		alignFrame[stack] = exportMatrix();
+		stack++;
+	}
+
+	while (stack)
+	{
+		stack--;
+
+		exportMeshNode* const node = stackPool[stack];
+
+		exportMatrix childAlign;
+		exportMatrix parentAlign(alignFrame[stack]);
+		
+		if (node->m_children.size())
+		{
+			exportMeshNode* const childNode = *node->m_children.begin();
+			childAlign = exportMatrix(childNode->m_matrix.m_posit);
+		}
+
+		exportMatrix animMatrix(node->m_matrix);
+		exportMatrix matrix(childAlign * animMatrix * parentAlign);
+		node->m_matrix = matrix;
+		parentAlign = childAlign.Inverse();
 
 		for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
 			iter != node->m_children.end(); iter++)
@@ -247,7 +284,7 @@ exportMeshNode* exportMeshNode::ImportBvhSkeleton(const char* const name)
 		ReadToken();
 		float frameTime = ReadFloat();
 		
-		//framesCount = 1;
+		//framesCount = 0;
 		for (int i = 0; i < framesCount; ++i)
 		{
 			for (int j = 0; j < nodeIndex.size(); ++j)
@@ -288,9 +325,9 @@ exportMeshNode* exportMeshNode::ImportBvhSkeleton(const char* const name)
 	}
 
 	entity->DeleteEffectors();
+	//entity->GenerateTpose();
 	entity->AlignFrames();
 
-	//entity->SetFrame(0);
 	return entity;
 }
 

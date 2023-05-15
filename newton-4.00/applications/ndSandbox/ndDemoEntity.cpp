@@ -86,7 +86,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 
 		entity->SetName(effectNode->GetName().GetStr());
 
-		ndSharedPtr<ndMeshEffect> meshEffect = effectNode->GetMesh();
+		ndSharedPtr<ndMeshEffect> meshEffect (effectNode->GetMesh());
 		if (*meshEffect)
 		{
 			//ndDemoMeshInterface* mesh = nullptr;
@@ -174,11 +174,11 @@ void ndDemoEntity::SetName(const ndString& name)
 ndDemoEntity* ndDemoEntity::LoadFbx(const char* const filename, ndDemoEntityManager* const scene)
 {
 	ndDemoEntity* rootEntity = nullptr;
-	ndMeshEffectNode* const fbxEntity = LoadFbxMeshEffectNode(filename);
-	if (fbxEntity)
+	//ndMeshEffectNode* const fbxEntity = LoadFbxMeshEffectNode(filename);
+	ndSharedPtr<ndMeshEffectNode> fbxEntity (LoadFbxMeshEffectNode(filename));
+	if (*fbxEntity)
 	{
-		rootEntity = new ndDemoEntity(scene, fbxEntity);
-		delete fbxEntity;
+		rootEntity = new ndDemoEntity(scene, *fbxEntity);
 	}
 	return rootEntity;
 }
