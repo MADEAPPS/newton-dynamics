@@ -1012,6 +1012,48 @@ static void ApplyTransform(ndMeshEffectNode* const entity, const ndMatrix& trans
 	}
 }
 
+static void AlignToWorld(ndMeshEffectNode* const entity)
+{
+	ndMeshEffectNode* entBuffer[1024];
+	
+	ndInt32 stack = 0;
+	ndMatrix rotation(entity->m_matrix);
+	ndVector posit(rotation.m_posit);
+	rotation.m_posit = ndVector::m_wOne;
+
+	ndMatrix invRotation(rotation.OrthoInverse());
+	for (ndMeshEffectNode* child = entity->GetFirstChild(); child; child = child->GetNext())
+	{
+		entBuffer[stack] = child;
+		stack++;
+	}
+
+	entity->m_matrix = ndGetIdentityMatrix();
+	entity->m_matrix.m_posit = posit;
+	while (stack)
+	{
+		stack--;
+		ndMeshEffectNode* const ent = entBuffer[stack];
+	
+		ndMatrix entMatrix(invRotation * ent->m_matrix * rotation);
+		ent->m_matrix = entMatrix;
+	
+		ndSharedPtr<ndMeshEffect> mesh = ent->GetMesh();
+		if (*mesh)
+		{
+			ndMatrix meshMatrix(invRotation * ent->m_meshMatrix * rotation);
+			ent->m_meshMatrix = meshMatrix;
+			mesh->ApplyTransform(rotation);
+		}
+	
+		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
+		{
+			entBuffer[stack] = child;
+			stack++;
+		}
+	}
+}
+
 ndMeshEffectNode* LoadFbxMeshEffectNode(const char* const meshName)
 {
 	char outPathName[1024];
@@ -1044,6 +1086,8 @@ ndMeshEffectNode* LoadFbxMeshEffectNode(const char* const meshName)
 	{
 		meshEffectNode->m_matrix = meshEffectNode->m_matrix * ndRollMatrix(-90.0f * ndDegreeToRad);
 	}
+
+	AlignToWorld(meshEffectNode);
 
 	fbxScene->destroy();
 	return meshEffectNode;
