@@ -205,13 +205,12 @@ namespace ndZmp
 			ndAssert(skeleton);
 			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
 
-			ndVector alpha(CalculateAlpha());
-
 			static int xxx;
-			//if (xxx >= 110)
-			//	xxx *= 1;
-
 			xxx++;
+			if (xxx >= 500)
+				xxx *= 1;
+
+			ndVector alpha(CalculateAlpha());
 			if (ndAbs(alpha.m_z) > ndFloat32 (1.0e-3f))
 			{
 				ndFloat32 angle = m_controlJoint->GetOffsetAngle();

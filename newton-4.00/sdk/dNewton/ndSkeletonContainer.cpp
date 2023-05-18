@@ -1652,6 +1652,11 @@ void ndSkeletonContainer::SolveImmediate(ndIkSolver& solverInfo)
 	ndForcePair* const force = ndAlloca(ndForcePair, nodeCount);
 	ndForcePair* const accel = ndAlloca(ndForcePair, nodeCount);
 
+static int xxxxx;
+xxxxx++;
+if (xxxxx == 500)
+xxxxx *= 1;
+
 	CalculateJointAccelImmediate(&solverInfo.m_internalForces[0], accel);
 	CalculateForce(force, accel);
 	if (m_auxiliaryRowCount)
@@ -1666,6 +1671,11 @@ void ndSkeletonContainer::SolveImmediate(ndIkSolver& solverInfo)
 
 void ndSkeletonContainer::CalculateReactionForces(ndJacobian* const internalForces)
 {
+static int xxxxx;
+xxxxx++;
+if (xxxxx == 1997)
+xxxxx *= 1;
+
 	if (!m_isResting)
 	{
 		D_TRACKTIME();
