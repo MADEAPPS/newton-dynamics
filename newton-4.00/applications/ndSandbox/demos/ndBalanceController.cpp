@@ -174,15 +174,20 @@ namespace ndZmp
 		//g) Bcg = (Icg ^ -1) * (T0 + T1)
 		ndVector CalculateAlpha()
 		{
-			//ndVector force(ndVector::m_zero);
 			ndVector torque(ndVector::m_zero);
+			//ndVector torque0(ndVector::m_zero);
 
 			m_invDynamicsSolver.Solve();
 			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 			{
 				ndBodyDynamic* const body = m_bodies[i];
-				torque += m_comDist[i].CrossProduct(m_invDynamicsSolver.GetBodyForce(body));
-				torque += m_invDynamicsSolver.GetBodyTorque(body);
+				//torque0 += m_invDynamicsSolver.GetBodyTorque(body);
+				//torque0 += m_comDist[i].CrossProduct(m_invDynamicsSolver.GetBodyForce(body));
+				
+				ndVector r(m_comDist[i]);
+				ndVector f(m_invDynamicsSolver.GetBodyForce(body));
+				ndVector t(m_invDynamicsSolver.GetBodyTorque(body));
+				torque += (f + r.CrossProduct(f));
 			}
 			return m_invInertia.RotateVector(torque);
 		}
@@ -203,12 +208,16 @@ namespace ndZmp
 			ndVector alpha(CalculateAlpha());
 
 			static int xxx;
-			xxx++;
-			if (xxx >= 110)
-				xxx *= 1;
+			//if (xxx >= 110)
+			//	xxx *= 1;
 
-			//if (ndAbs(alpha.m_z) > ndFloat32 (1.0e-3f))
-			//{
+			xxx++;
+			if (ndAbs(alpha.m_z) > ndFloat32 (1.0e-3f))
+			{
+				ndFloat32 angle = m_controlJoint->GetOffsetAngle();
+				ndFloat32 deltaAngle = - ndSign(alpha.m_z) * 0.0003f;
+				//m_controlJoint->SetOffsetAngle(angle + deltaAngle);
+				ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle, deltaAngle));
 			//	do
 			//	{
 			//		ndTrace(("%f %f %f\n", alpha.m_x, alpha.m_y, alpha.m_z));
@@ -218,7 +227,7 @@ namespace ndZmp
 			//		m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
 			//		alpha = CalculateAlpha();
 			//	} while (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f));
-			//}
+			}
 			
 			m_invDynamicsSolver.SolverEnd();
 		}
@@ -238,10 +247,12 @@ namespace ndZmp
 		ndModelUnicycle* const model = new ndModelUnicycle();
 
 		ndFloat32 mass = 10.0f;
+		ndFloat32 limbMass = 1.0f;
+		ndFloat32 wheelMass = 1.0f;
+
 		ndFloat32 xSize = 0.25f;
 		ndFloat32 ySize = 0.40f;
 		ndFloat32 zSize = 0.30f;
-
 		ndPhysicsWorld* const world = scene->GetWorld();
 		
 		// add hip body
@@ -258,7 +269,6 @@ namespace ndZmp
 		limbLocation.m_posit.m_x += xSize * 0.5f * 0.0f;
 
 		// make single leg
-		ndFloat32 limbMass = 0.5f;
 		ndFloat32 limbLength = 0.3f;
 		ndFloat32 limbRadio = 0.025f;
 
@@ -274,7 +284,6 @@ namespace ndZmp
 		model->m_controlJoint = hinge;
 
 		// make wheel
-		ndFloat32 wheelMass = 2.0f * limbMass;
 		ndFloat32 wheelRadio = 4.0f * limbRadio;
 		ndSharedPtr<ndBody> wheelBody(world->GetBody(AddSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "smilli.tga")));
 		ndMatrix wheelMatrix(legPivot);

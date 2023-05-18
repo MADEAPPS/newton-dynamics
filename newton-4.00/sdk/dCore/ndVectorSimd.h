@@ -472,6 +472,13 @@ class ndVector
 
 	inline ndVector OptimizedVectorUnrotate(const ndVector& front, const ndVector& up, const ndVector& right) const
 	{
+#if 0
+		return ndVector(
+			m_x * front.m_x + m_y * front.m_y + m_z * front.m_z,
+			m_x * up.m_x + m_y * up.m_y + m_z * up.m_z,
+			m_x * right.m_x + m_y * right.m_y + m_z * right.m_z,
+			ndFloat32(0.0f));
+#else
 		__m128 tmp0(_mm_mul_ps(m_type, front.m_type));
 		__m128 tmp1(_mm_mul_ps(m_type, up.m_type));
 		__m128 tmp2(_mm_unpacklo_ps(tmp0, tmp1));
@@ -486,6 +493,7 @@ class ndVector
 		__m128 tmp9(_mm_movelh_ps(tmp4, tmp8));
 		__m128 tmp10(_mm_movehl_ps(tmp8, tmp4));
 		return ndVector(_mm_add_ps(tmp9, tmp10));
+#endif
 	}
 
 	inline static void Transpose4x4 (ndVector& dst0, ndVector& dst1, ndVector& dst2, ndVector& dst3, const ndVector& src0, const ndVector& src1, const ndVector& src2, const ndVector& src3)
@@ -843,14 +851,6 @@ class ndBigVector
 		
 		__m128d xy_round(_mm_and_pd(one, _mm_cmplt_pd(m_typeLow, xy)));
 		__m128d zw_round(_mm_and_pd(one, _mm_cmplt_pd(m_typeHigh, zw)));
-
-		//#ifdef _DEBUG
-		//		ndBigVector test(_mm_sub_pd(xy, xy_round), _mm_sub_pd(zw, zw_round));
-		//		ndAssert(test.m_x == floor(m_x));
-		//		ndAssert(test.m_y == floor(m_y));
-		//		ndAssert(test.m_z == floor(m_z));
-		//		ndAssert(test.m_w == floor(m_w));
-		//#endif
 		return ndBigVector(_mm_sub_pd(xy, xy_round), _mm_sub_pd(zw, zw_round));
 #else
 		return ndBigVector(floor(m_x), floor(m_y), floor(m_z), floor(m_w));
@@ -875,13 +875,6 @@ class ndBigVector
 		__m128i zw_round(_mm_castpd_si128(_mm_cmplt_pd(m_typeHigh, zw_float)));
 		return ndBigVector(_mm_add_epi64(xy_int, xy_round), _mm_add_epi64(zw_int, zw_round));
 #else
-		//ndBigVector temp(Floor());
-		//ndInt64 x = _mm_cvtsd_si64(temp.m_typeLow);
-		//ndInt64 y = _mm_cvtsd_si64(_mm_unpackhi_pd(temp.m_typeLow, temp.m_typeLow));
-		//ndInt64 z = _mm_cvtsd_si64(temp.m_typeHigh);
-		//ndInt64 w = _mm_cvtsd_si64(_mm_unpackhi_pd(temp.m_typeHigh, temp.m_typeHigh));
-		//return ndBigVector(_mm_set_epi64x(y, x), _mm_set_epi64x(w, z));
-
 		ndBigVector temp(Floor());
 		ndInt64 x = _mm_cvtsd_si32(temp.m_typeLow);
 		ndInt64 y = _mm_cvtsd_si32(_mm_unpackhi_pd(temp.m_typeLow, temp.m_typeLow));
