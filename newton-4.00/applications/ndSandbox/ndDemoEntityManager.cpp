@@ -78,10 +78,10 @@ void ndHeavyVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
-void ndZeroMomentPoint(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_2(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
+void ndBalanceController(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
@@ -119,7 +119,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
 	{ "basic player", ndPlayerCapsuleDemo },
 	{ "rag doll", ndRagdollTest },
-	{ "zero moment point", ndZeroMomentPoint },
+	{ "balance controller", ndBalanceController },
 	{ "quadruped test one", ndQuadrupedTest_1 },
 	{ "quadruped test two", ndQuadrupedTest_2 },
 	{ "quadruped test three", ndQuadrupedTest_3},

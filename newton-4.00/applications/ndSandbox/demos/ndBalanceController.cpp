@@ -207,18 +207,18 @@ namespace ndZmp
 			if (xxx >= 110)
 				xxx *= 1;
 
-			if (ndAbs(alpha.m_z) > ndFloat32 (1.0e-3f))
-			{
-				do
-				{
-					ndTrace(("%f %f %f\n", alpha.m_x, alpha.m_y, alpha.m_z));
-					ndFloat32 angle = m_controlJoint->GetOffsetAngle();
-					angle -= alpha.m_z * 0.1f;
-					m_controlJoint->SetOffsetAngle(angle);
-					m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
-					alpha = CalculateAlpha();
-				} while (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f));
-			}
+			//if (ndAbs(alpha.m_z) > ndFloat32 (1.0e-3f))
+			//{
+			//	do
+			//	{
+			//		ndTrace(("%f %f %f\n", alpha.m_x, alpha.m_y, alpha.m_z));
+			//		ndFloat32 angle = m_controlJoint->GetOffsetAngle();
+			//		angle -= alpha.m_z * 0.1f;
+			//		m_controlJoint->SetOffsetAngle(angle);
+			//		m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
+			//		alpha = CalculateAlpha();
+			//	} while (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f));
+			//}
 			
 			m_invDynamicsSolver.SolverEnd();
 		}
@@ -324,7 +324,7 @@ namespace ndZmp
 }
 
 using namespace ndZmp;
-void ndZeroMomentPoint(ndDemoEntityManager* const scene)
+void ndBalanceController(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
