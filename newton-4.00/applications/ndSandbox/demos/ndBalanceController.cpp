@@ -219,6 +219,11 @@ namespace ndZmp
 			ndAssert(skeleton);
 			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
 
+			if (xxx >= 610)
+			{
+				xxx *= 1;
+			}
+
 			ndVector alpha(CalculateAlpha());
 			if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f))
 			{
@@ -233,7 +238,12 @@ namespace ndZmp
 					m_controlJoint->SetOffsetAngle(angle + deltaAngle);
 					m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
 					alpha = CalculateAlpha();
-					ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle, deltaAngle));
+					ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle + deltaAngle, deltaAngle));
+				}
+				if (xxx >= 610)
+				{
+					xxx *= 1;
+					alpha = CalculateAlpha();
 				}
 				ndTrace(("\n"));
 			}
