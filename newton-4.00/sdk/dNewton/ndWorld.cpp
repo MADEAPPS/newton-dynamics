@@ -1173,3 +1173,8 @@ void ndWorld::RemoveModel(ndModel* const model)
 		}
 	}
 }
+
+void ndWorld::CalculateJointContacts(ndContact* const contact)
+{
+	m_scene->CalculateJointContacts(0, contact);
+}

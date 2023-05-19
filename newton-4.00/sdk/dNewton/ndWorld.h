@@ -120,6 +120,8 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API bool RayCast(ndRayCastNotify& callback, const ndVector& globalOrigin, const ndVector& globalDest) const;
 	D_NEWTON_API bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 
+	D_NEWTON_API void CalculateJointContacts(ndContact* const contact);
+
 	private:
 	void ThreadFunction();
 	
