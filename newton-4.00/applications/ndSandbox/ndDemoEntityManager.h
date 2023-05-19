@@ -165,7 +165,8 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	void SetDebugDisplay(ndInt32 mode) const;
 
 	const ndShaderCache& GetShaderCache() const;  
-	ndAnimationSequence* GetAnimationSequence(const char* const meshName);
+	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(const char* const meshName);
+	
 	
 	private:
 	void BeginFrame();
@@ -218,7 +219,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 
 	ndUnsigned64 m_microsecunds;
 	TransparentHeap m_transparentHeap;
-	ndTree<ndAnimationSequence*, ndString> m_animationCache;
+	ndTree<ndSharedPtr<ndAnimationSequence>, ndString> m_animationCache;
 
 	ndInt32 m_currentScene;
 	ndInt32 m_lastCurrentScene;

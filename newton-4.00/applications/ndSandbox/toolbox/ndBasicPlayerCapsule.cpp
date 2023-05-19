@@ -126,6 +126,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 
 	//// create bind pose to animation sequences.
 	//ndAnimationSequence* const sequence = scene->GetAnimationSequence("white_Man_idle.fbx");
+	//ndSharedPtr<ndAnimationSequence> sequence(scene->GetAnimationSequence("mocapWalker_walk.fbx"));
+
 	//const ndList<ndAnimationKeyFramesTrack>& tracks = sequence->GetTracks();
 	//for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext()) 
 	//{

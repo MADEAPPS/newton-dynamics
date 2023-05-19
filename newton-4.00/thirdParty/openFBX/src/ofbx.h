@@ -537,7 +537,7 @@ namespace ofbx
 		virtual DataView getEmbeddedData(int index) const = 0;
 		virtual DataView getEmbeddedFilename(int index) const = 0;
 
-	protected:
+	//protected:
 		virtual ~IScene() {}
 	};
 

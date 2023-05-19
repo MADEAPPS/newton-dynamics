@@ -444,6 +444,15 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 
 		FreezeScale(entity, source);
 		ApplyTransform(matrix);
+
+		//FreezeScale(meshEffectNode);
+		//ApplyTransform(meshEffectNode, convertMatrix);
+		//if (fbxScene->getGlobalSettings()->UpAxis == UpVector_AxisY)
+		//{
+		//	meshEffectNode->m_matrix = meshEffectNode->m_matrix * ndRollMatrix(-90.0f * ndDegreeToRad);
+		//}
+		//AlignToWorld(entity);
+
 		OptimizeCurves();
 	}
 
@@ -1059,7 +1068,7 @@ ndMeshEffectNode* LoadFbxMeshEffectNode(const char* const meshName)
 	char outPathName[1024];
 	dGetWorkingFileName(meshName, outPathName);
 
-	FILE* fp = fopen(outPathName, "rb");
+	FILE* const fp = fopen(outPathName, "rb");
 	if (!fp)
 	{
 		ndAssert(0);
@@ -1074,22 +1083,21 @@ ndMeshEffectNode* LoadFbxMeshEffectNode(const char* const meshName)
 	ndArray<ofbx::u8> content;
 	content.SetCount(file_size);
 	readBytes = fread(&content[0], 1, size_t(file_size), fp);
-	ofbx::IScene* const fbxScene = ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
+	//ofbx::IScene* const fbxScene = ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
+	ndSharedPtr<ofbx::IScene> fbxScene (ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE));
 
-	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(fbxScene));
+	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(*fbxScene));
+	ndMeshEffectNode* const meshEffectNode = FbxToMeshEffectNode(*fbxScene);
 
-	ndMeshEffectNode* const meshEffectNode = FbxToMeshEffectNode(fbxScene);
 	FreezeScale(meshEffectNode);
 	ApplyTransform(meshEffectNode, convertMatrix);
-
 	if (fbxScene->getGlobalSettings()->UpAxis == UpVector_AxisY)
 	{
 		meshEffectNode->m_matrix = meshEffectNode->m_matrix * ndRollMatrix(-90.0f * ndDegreeToRad);
 	}
-
 	AlignToWorld(meshEffectNode);
 
-	fbxScene->destroy();
+	//fbxScene->destroy();
 	return meshEffectNode;
 }
 
@@ -1098,7 +1106,7 @@ ndAnimationSequence* LoadFbxAnimation(const char* const fileName)
 	char outPathName[1024];
 	dGetWorkingFileName(fileName, outPathName);
 
-	FILE* fp = fopen(outPathName, "rb");
+	FILE* const fp = fopen(outPathName, "rb");
 	if (!fp)
 	{
 		ndAssert(0);
@@ -1113,19 +1121,19 @@ ndAnimationSequence* LoadFbxAnimation(const char* const fileName)
 	ndArray<ofbx::u8> content;
 	content.SetCount(file_size);
 	readBytes = fread(&content[0], 1, size_t(file_size), fp);
-	ofbx::IScene* const fbxScene = ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
+	//ofbx::IScene* const fbxScene = ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
+	ndSharedPtr<ofbx::IScene> fbxScene = ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
 
-	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(fbxScene));
+	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(*fbxScene));
 
 	dFbxAnimation animation;
-	LoadAnimation(fbxScene, animation);
+	LoadAnimation(*fbxScene, animation);
 	//ndMeshEffectNode* const entity = FbxToEntity(fbxScene);
-	ndAssert(0);
-	ndMeshEffectNode* const entity = FbxToMeshEffectNode(fbxScene);
-	dFbxAnimation newAnimation(animation, entity, convertMatrix);
-
-	delete entity;
-	fbxScene->destroy();
+	//ndMeshEffectNode* const entity = FbxToMeshEffectNode(fbxScene);
+	ndSharedPtr<ndMeshEffectNode> entity (FbxToMeshEffectNode(*fbxScene));
+	dFbxAnimation newAnimation(animation, *entity, convertMatrix);
+	
+	//fbxScene->destroy();
 
 	return newAnimation.CreateSequence(fileName);
 }

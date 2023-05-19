@@ -53,9 +53,9 @@
 //#define DEFAULT_SCENE	13		// background vehicle prop
 //#define DEFAULT_SCENE	14		// simple industrial robot
 //#define DEFAULT_SCENE	15		// advanced industrial robot
-//#define DEFAULT_SCENE	16		// basic player
+#define DEFAULT_SCENE	16		// basic player
 //#define DEFAULT_SCENE	17		// rag doll
-#define DEFAULT_SCENE	18		// zero moment point
+//#define DEFAULT_SCENE	18		// unit cycle controller
 //#define DEFAULT_SCENE	19		// quadruped test 1
 //#define DEFAULT_SCENE	20		// quadruped test 2
 //#define DEFAULT_SCENE	21		// quadruped test 3
@@ -557,9 +557,9 @@ bool ndDemoEntityManager::GetKeyState(ndInt32 key) const
 	return state;
 }
 
-ndAnimationSequence* ndDemoEntityManager::GetAnimationSequence(const char* const fileName)
+ndSharedPtr<ndAnimationSequence> ndDemoEntityManager::GetAnimationSequence(const char* const fileName)
 {
-	ndTree<ndAnimationSequence*, ndString>::ndNode* node = m_animationCache.Find(fileName);
+	ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fileName);
 	if (!node)
 	{
 		ndAnimationSequence* const sequence = LoadFbxAnimation(fileName);
@@ -702,11 +702,11 @@ void ndDemoEntityManager::Cleanup ()
 		m_world->Sync();
 	}
 	
-	ndTree<ndAnimationSequence*, ndString>::Iterator iter(m_animationCache);
-	for (iter.Begin(); iter; iter++)
-	{
-		delete *iter;
-	}
+	//ndTree<ndAnimationSequence*, ndString>::Iterator iter(m_animationCache);
+	//for (iter.Begin(); iter; iter++)
+	//{
+	//	delete *iter;
+	//}
 	m_animationCache.RemoveAll();
 	
 	while (m_debugShapeCache->GetRoot())
