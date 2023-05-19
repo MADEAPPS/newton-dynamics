@@ -124,8 +124,6 @@ namespace ndZmp
 			inertia.m_posit = ndVector::m_wOne;
 			m_invInertia = inertia.Inverse4x4();
 
-
-			ndScene* const scene = world->GetScene();
 			for (ndInt32 i = contacts.GetCount() - 1; i >= 0; --i)
 			{
 				world->CalculateJointContacts(contacts[i]);
@@ -211,25 +209,26 @@ namespace ndZmp
 
 			static int xxx;
 			xxx++;
-			if (xxx >= 500)
+			if (xxx >= 600)
 				xxx *= 1;
 
 			ndVector alpha(CalculateAlpha());
 			if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f))
 			{
 				ndFloat32 angle = m_controlJoint->GetOffsetAngle();
-				ndFloat32 deltaAngle = -ndSign(alpha.m_z) * 0.0003f;
+				//ndFloat32 deltaAngle = -ndSign(alpha.m_z) * 0.0003f;
 				//m_controlJoint->SetOffsetAngle(angle + deltaAngle);
-				ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle, deltaAngle));
-				//	do
-				//	{
-				//		ndTrace(("%f %f %f\n", alpha.m_x, alpha.m_y, alpha.m_z));
-				//		ndFloat32 angle = m_controlJoint->GetOffsetAngle();
-				//		angle -= alpha.m_z * 0.1f;
-				//		m_controlJoint->SetOffsetAngle(angle);
-				//		m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
-				//		alpha = CalculateAlpha();
-				//	} while (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f));
+
+				ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle, 0.0f));
+				for (ndInt32 i = 0; (i < 8) && ndAbs(alpha.m_z) > ndFloat32(1.0e-3f); ++i)
+				{
+					ndFloat32 deltaAngle = alpha.m_z * 0.02f;
+					m_controlJoint->SetOffsetAngle(angle + deltaAngle);
+					m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
+					alpha = CalculateAlpha();
+					ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle, deltaAngle));
+				}
+				ndTrace(("\n"));
 			}
 			m_invDynamicsSolver.SolverEnd();
 		}
