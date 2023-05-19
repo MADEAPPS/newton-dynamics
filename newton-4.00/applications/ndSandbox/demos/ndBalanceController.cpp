@@ -34,6 +34,7 @@ namespace ndZmp
 			:ndModelArticulation()
 			,m_controlJoint(nullptr)
 		{
+			xxx = 0;
 		}
 
 		void Init()
@@ -167,7 +168,6 @@ namespace ndZmp
 			ndAssert(skeleton);
 			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
 
-			static int xxx;
 			xxx++;
 			if (xxx >= 500)
 				xxx *= 1;
@@ -192,6 +192,18 @@ namespace ndZmp
 			
 			m_invDynamicsSolver.SolverEnd();
 #endif
+			if (xxx >= 610)
+				xxx *= 1;
+
+			ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
+			ndAssert(skeleton);
+			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+			ndVector alpha(CalculateAlpha());
+			if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f))
+			{
+				ndTrace(("%d alpha(%f) angle(%f)\n", xxx, alpha.m_z, m_controlJoint->GetOffsetAngle()));
+			}
+			m_invDynamicsSolver.SolverEnd();
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -206,11 +218,6 @@ namespace ndZmp
 			ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
 			ndAssert(skeleton);
 			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
-
-			static int xxx;
-			xxx++;
-			if (xxx >= 600)
-				xxx *= 1;
 
 			ndVector alpha(CalculateAlpha());
 			if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f))
@@ -231,6 +238,8 @@ namespace ndZmp
 				ndTrace(("\n"));
 			}
 			m_invDynamicsSolver.SolverEnd();
+
+			xxx++;
 		}
 
 		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
@@ -241,6 +250,8 @@ namespace ndZmp
 		ndVector m_gyroTorque;
 		ndFloat32 m_totalMass;
 		ndMatrix m_invInertia;
+
+		int xxx;
 	};
 
 	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& location)
