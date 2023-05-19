@@ -1452,12 +1452,12 @@ void ndSkeletonContainer::CalculateJointAccelImmediate(const ndJacobian* const i
 		ndAssert(node->m_body);
 		a.m_body = zero;
 		a.m_joint = zero;
-		a.m_body[0] = internalForces[m].m_linear.m_x;
-		a.m_body[1] = internalForces[m].m_linear.m_y;
-		a.m_body[2] = internalForces[m].m_linear.m_z;
-		a.m_body[3] = internalForces[m].m_angular.m_x;
-		a.m_body[4] = internalForces[m].m_angular.m_y;
-		a.m_body[5] = internalForces[m].m_angular.m_z;
+		//a.m_body[0] = internalForces[m].m_linear.m_x;
+		//a.m_body[1] = internalForces[m].m_linear.m_y;
+		//a.m_body[2] = internalForces[m].m_linear.m_z;
+		//a.m_body[3] = internalForces[m].m_angular.m_x;
+		//a.m_body[4] = internalForces[m].m_angular.m_y;
+		//a.m_body[5] = internalForces[m].m_angular.m_z;
 
 		ndAssert(node->m_joint);
 		ndJointBilateralConstraint* const joint = node->m_joint;
@@ -1477,13 +1477,13 @@ void ndSkeletonContainer::CalculateJointAccelImmediate(const ndJacobian* const i
 	ndForcePair& a = accel[nodeCount - 1];
 	a.m_body = zero;
 	a.m_joint = zero;
-	const ndInt32 m = m_nodesOrder[nodeCount - 1]->m_body->m_index;
-	a.m_body[0] = internalForces[m].m_linear.m_x;
-	a.m_body[1] = internalForces[m].m_linear.m_y;
-	a.m_body[2] = internalForces[m].m_linear.m_z;
-	a.m_body[3] = internalForces[m].m_angular.m_x;
-	a.m_body[4] = internalForces[m].m_angular.m_y;
-	a.m_body[5] = internalForces[m].m_angular.m_z;
+	//const ndInt32 m = m_nodesOrder[nodeCount - 1]->m_body->m_index;
+	//a.m_body[0] = internalForces[m].m_linear.m_x;
+	//a.m_body[1] = internalForces[m].m_linear.m_y;
+	//a.m_body[2] = internalForces[m].m_linear.m_z;
+	//a.m_body[3] = internalForces[m].m_angular.m_x;
+	//a.m_body[4] = internalForces[m].m_angular.m_y;
+	//a.m_body[5] = internalForces[m].m_angular.m_z;
 }
 
 inline void ndSkeletonContainer::UpdateForcesImmediate(ndArray<ndBodyKinematic*>& bodyArray, const ndForcePair* const force) const

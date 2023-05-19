@@ -382,6 +382,7 @@ void ndIkSolver::BuildMassMatrix()
 		const ndVector gyroTorque(body->m_omega.CrossProduct(body->CalculateAngularMomentum()));
 		m_internalForces[i].m_linear = body->GetForce();
 		m_internalForces[i].m_angular = body->GetTorque() - gyroTorque;
+		body->m_gyroTorque = gyroTorque;
 	}
 	
 	for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
@@ -455,6 +456,8 @@ void ndIkSolver::Solve()
 			ndBodyKinematic* const body = m_bodies[i];
 			body->m_accel = zero;
 			body->m_alpha = zero;
+			m_internalForces[i].m_linear = body->GetForce();
+			m_internalForces[i].m_angular = body->GetTorque() - body->GetGyroTorque();
 		}
 		m_skeleton->SolveImmediate(*this);
 
