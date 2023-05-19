@@ -35,7 +35,7 @@ class fbxImportndMeshEffectNodeStackData
 
 	fbxImportndMeshEffectNodeStackData(const ofbx::Object* const fbxNode, ndMeshEffectNode* const parentNode)
 		:m_fbxNode(fbxNode)
-		, m_parentNode(parentNode)
+		,m_parentNode(parentNode)
 	{
 	}
 
@@ -188,6 +188,125 @@ static void ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const
 	}
 }
 
+static void FreezeScale(ndMeshEffectNode* const entity)
+{
+	ndInt32 stack = 1;
+	ndMeshEffectNode* entBuffer[1024];
+	ndMatrix parentMatrix[1024];
+	entBuffer[0] = entity;
+	parentMatrix[0] = ndGetIdentityMatrix();
+	while (stack)
+	{
+		stack--;
+		ndMatrix scaleMatrix(parentMatrix[stack]);
+		ndMeshEffectNode* const ent = entBuffer[stack];
+
+		ndMatrix transformMatrix;
+		ndMatrix stretchAxis;
+		ndVector scale;
+		ndMatrix matrix(ent->m_matrix * scaleMatrix);
+		matrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
+		ent->m_matrix = transformMatrix;
+		scaleMatrix = ndMatrix(ndGetIdentityMatrix(), scale, stretchAxis);
+
+		ndSharedPtr<ndMeshEffect> mesh = ent->GetMesh();
+		if (*mesh)
+		{
+			matrix = ent->m_meshMatrix * scaleMatrix;
+			matrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
+			ent->m_meshMatrix = transformMatrix;
+			ndMatrix meshMatrix(ndGetIdentityMatrix(), scale, stretchAxis);
+			mesh->ApplyTransform(meshMatrix);
+		}
+
+		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
+		{
+			entBuffer[stack] = child;
+			parentMatrix[stack] = scaleMatrix;
+			stack++;
+		}
+	}
+}
+
+static void ApplyTransform(ndMeshEffectNode* const entity, const ndMatrix& transform)
+{
+	ndInt32 stack = 1;
+	ndMeshEffectNode* entBuffer[1024];
+	entBuffer[0] = entity;
+	ndMatrix invTransform(transform.Inverse4x4());
+	while (stack)
+	{
+		stack--;
+		ndMeshEffectNode* const ent = entBuffer[stack];
+
+		ndMatrix entMatrix(invTransform * ent->m_matrix * transform);
+		ent->m_matrix = entMatrix;
+
+		ndSharedPtr<ndMeshEffect> mesh = ent->GetMesh();
+		if (*mesh)
+		{
+			ndMatrix meshMatrix(invTransform * ent->m_meshMatrix * transform);
+			ent->m_meshMatrix = meshMatrix;
+			mesh->ApplyTransform(transform);
+		}
+
+		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
+		{
+			entBuffer[stack] = child;
+			stack++;
+		}
+	}
+}
+
+static void AlignToWorld(ndMeshEffectNode* const entity)
+{
+	ndMeshEffectNode* entBuffer[1024];
+
+	ndInt32 stack = 0;
+	ndMatrix rotation(entity->m_matrix);
+	ndVector posit(rotation.m_posit);
+	rotation.m_posit = ndVector::m_wOne;
+
+	ndMatrix invRotation(rotation.OrthoInverse());
+	for (ndMeshEffectNode* child = entity->GetFirstChild(); child; child = child->GetNext())
+	{
+		entBuffer[stack] = child;
+		stack++;
+	}
+
+	entity->m_matrix = ndGetIdentityMatrix();
+	entity->m_matrix.m_posit = posit;
+	while (stack)
+	{
+		stack--;
+		ndMeshEffectNode* const ent = entBuffer[stack];
+
+		ndMatrix entMatrix(invRotation * ent->m_matrix * rotation);
+		ent->m_matrix = entMatrix;
+
+		ndSharedPtr<ndMeshEffect> mesh = ent->GetMesh();
+		if (*mesh)
+		{
+			ndMatrix meshMatrix(invRotation * ent->m_meshMatrix * rotation);
+			ent->m_meshMatrix = meshMatrix;
+			mesh->ApplyTransform(rotation);
+		}
+
+		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
+		{
+			entBuffer[stack] = child;
+			stack++;
+		}
+	}
+}
+
+static void ApplyAllTransforms(ndMeshEffectNode* const meshEffectNode, const ndMatrix& unitMatrix, const ndMatrix& upAxis)
+{
+	FreezeScale(meshEffectNode);
+	ApplyTransform(meshEffectNode, unitMatrix);
+	meshEffectNode->m_matrix = meshEffectNode->m_matrix * upAxis;
+	AlignToWorld(meshEffectNode);
+}
 
 class dFbxAnimationTrack
 {
@@ -268,74 +387,74 @@ class dFbxAnimationTrack
 		return matrix;
 	}
 
-	void OptimizeCurves()
-	{
-		if (m_scale.GetCount()) 
-		{
-			OptimizeCurve(m_scale);
-		}
-		if (m_position.GetCount()) 
-		{
-			OptimizeCurve(m_position);
-		}
-		if (m_rotation.GetCount()) 
-		{
-			for (dCurve::ndNode* node = m_rotation.GetFirst(); node->GetNext(); node = node->GetNext()) 
-			{
-				const dCurveValue& value0 = node->GetInfo();
-				dCurveValue& value1 = node->GetNext()->GetInfo();
-				value1.m_x = FixAngleAlias(value0.m_x, value1.m_x);
-				value1.m_y = FixAngleAlias(value0.m_y, value1.m_y);
-				value1.m_z = FixAngleAlias(value0.m_z, value1.m_z);
-			}
-
-			OptimizeCurve(m_rotation);
-		}
-	}
-
-	void ApplyTransform(const ndMatrix& transform)
-	{
-		ndMatrix invert(transform.Inverse4x4());
-		dCurve::ndNode* scaleNode = m_scale.GetFirst();
-		dCurve::ndNode* positNode = m_position.GetFirst();
-		for (dCurve::ndNode* rotationNode = m_rotation.GetFirst(); rotationNode; rotationNode = rotationNode->GetNext()) 
-		{
-			dCurveValue& scaleValue = scaleNode->GetInfo();
-			dCurveValue& positValue = positNode->GetInfo();
-			dCurveValue& rotationValue = rotationNode->GetInfo();
-
-			ndMatrix scaleMatrix(ndGetIdentityMatrix());
-			scaleMatrix[0][0] = scaleValue.m_x;
-			scaleMatrix[1][1] = scaleValue.m_y;
-			scaleMatrix[2][2] = scaleValue.m_z;
-			ndMatrix m(scaleMatrix * ndPitchMatrix(rotationValue.m_x) * ndYawMatrix(rotationValue.m_y) * ndRollMatrix(rotationValue.m_z));
-			m.m_posit = ndVector(positValue.m_x, positValue.m_y, positValue.m_z, 1.0f);
-			ndMatrix matrix(invert * m * transform);
-
-			ndVector scale;
-			ndVector euler1;
-			ndMatrix output;
-			ndMatrix eigenScaleAxis;
-			matrix.PolarDecomposition(output, scale, eigenScaleAxis);
-			ndVector euler0 (output.CalcPitchYawRoll(euler1));
-			//dTrace(("%d %f %f %f\n", m_rotation.GetCount(), euler0.m_x * dRadToDegree, euler0.m_y * dRadToDegree, euler0.m_z * dRadToDegree));
-
-			scaleValue.m_x = scale.m_x;
-			scaleValue.m_y = scale.m_y;
-			scaleValue.m_z = scale.m_z;
-
-			rotationValue.m_x = euler0.m_x;
-			rotationValue.m_y = euler0.m_y;
-			rotationValue.m_z = euler0.m_z;
-
-			positValue.m_x = output.m_posit.m_x;
-			positValue.m_y = output.m_posit.m_y;
-			positValue.m_z = output.m_posit.m_z;
-
-			positNode = positNode->GetNext();
-			scaleNode = scaleNode->GetNext();
-		}
-	}
+	//void OptimizeCurves()
+	//{
+	//	if (m_scale.GetCount()) 
+	//	{
+	//		OptimizeCurve(m_scale);
+	//	}
+	//	if (m_position.GetCount()) 
+	//	{
+	//		OptimizeCurve(m_position);
+	//	}
+	//	if (m_rotation.GetCount()) 
+	//	{
+	//		for (dCurve::ndNode* node = m_rotation.GetFirst(); node->GetNext(); node = node->GetNext()) 
+	//		{
+	//			const dCurveValue& value0 = node->GetInfo();
+	//			dCurveValue& value1 = node->GetNext()->GetInfo();
+	//			value1.m_x = FixAngleAlias(value0.m_x, value1.m_x);
+	//			value1.m_y = FixAngleAlias(value0.m_y, value1.m_y);
+	//			value1.m_z = FixAngleAlias(value0.m_z, value1.m_z);
+	//		}
+	//
+	//		OptimizeCurve(m_rotation);
+	//	}
+	//}
+	//
+	//void ApplyTransform(const ndMatrix& transform)
+	//{
+	//	ndMatrix invert(transform.Inverse4x4());
+	//	dCurve::ndNode* scaleNode = m_scale.GetFirst();
+	//	dCurve::ndNode* positNode = m_position.GetFirst();
+	//	for (dCurve::ndNode* rotationNode = m_rotation.GetFirst(); rotationNode; rotationNode = rotationNode->GetNext()) 
+	//	{
+	//		dCurveValue& scaleValue = scaleNode->GetInfo();
+	//		dCurveValue& positValue = positNode->GetInfo();
+	//		dCurveValue& rotationValue = rotationNode->GetInfo();
+	//
+	//		ndMatrix scaleMatrix(ndGetIdentityMatrix());
+	//		scaleMatrix[0][0] = scaleValue.m_x;
+	//		scaleMatrix[1][1] = scaleValue.m_y;
+	//		scaleMatrix[2][2] = scaleValue.m_z;
+	//		ndMatrix m(scaleMatrix * ndPitchMatrix(rotationValue.m_x) * ndYawMatrix(rotationValue.m_y) * ndRollMatrix(rotationValue.m_z));
+	//		m.m_posit = ndVector(positValue.m_x, positValue.m_y, positValue.m_z, 1.0f);
+	//		ndMatrix matrix(invert * m * transform);
+	//
+	//		ndVector scale;
+	//		ndVector euler1;
+	//		ndMatrix output;
+	//		ndMatrix eigenScaleAxis;
+	//		matrix.PolarDecomposition(output, scale, eigenScaleAxis);
+	//		ndVector euler0 (output.CalcPitchYawRoll(euler1));
+	//		//dTrace(("%d %f %f %f\n", m_rotation.GetCount(), euler0.m_x * dRadToDegree, euler0.m_y * dRadToDegree, euler0.m_z * dRadToDegree));
+	//
+	//		scaleValue.m_x = scale.m_x;
+	//		scaleValue.m_y = scale.m_y;
+	//		scaleValue.m_z = scale.m_z;
+	//
+	//		rotationValue.m_x = euler0.m_x;
+	//		rotationValue.m_y = euler0.m_y;
+	//		rotationValue.m_z = euler0.m_z;
+	//
+	//		positValue.m_x = output.m_posit.m_x;
+	//		positValue.m_y = output.m_posit.m_y;
+	//		positValue.m_z = output.m_posit.m_z;
+	//
+	//		positNode = positNode->GetNext();
+	//		scaleNode = scaleNode->GetNext();
+	//	}
+	//}
 
 	private:
 	void AddScale(ndFloat32 time, ndFloat32 x, ndFloat32 y, ndFloat32 z)
@@ -365,52 +484,52 @@ class dFbxAnimationTrack
 		value.m_time = time;
 	}
 
-	ndFloat32 FixAngleAlias(ndFloat32 angleA, ndFloat32 angleB) const
-	{
-		ndFloat32 sinA = ndSin(angleA);
-		ndFloat32 cosA = ndCos(angleA);
-		ndFloat32 sinB = ndSin(angleB);
-		ndFloat32 cosB = ndCos(angleB);
-
-		ndFloat32 num = sinB * cosA - cosB * sinA;
-		ndFloat32 den = cosA * cosB + sinA * sinB;
-		angleB = angleA + ndAtan2(num, den);
-		return angleB;
-	}
-
-	ndFloat32 Interpolate(ndFloat32 x0, ndFloat32 t0, ndFloat32 x1, ndFloat32 t1, ndFloat32 t) const
-	{
-		return x0 + (x1 - x0) * (t - t0) / (t1 - t0);
-	}
-
-	void OptimizeCurve(ndList<dCurveValue>& curve)
-	{
-		const ndFloat32 tol = 5.0e-5f;
-		const ndFloat32 tol2 = tol * tol;
-		for (dCurve::ndNode* node0 = curve.GetFirst(); node0->GetNext(); node0 = node0->GetNext()) 
-		{
-			const dCurveValue& value0 = node0->GetInfo();
-			for (dCurve::ndNode* node1 = node0->GetNext()->GetNext(); node1; node1 = node1->GetNext()) 
-			{
-				const dCurveValue& value1 = node1->GetPrev()->GetInfo();
-				const dCurveValue& value2 = node1->GetInfo();
-				ndVector p1(value1.m_x, value1.m_y, value1.m_z, ndFloat32(0.0f));
-				ndVector p2(value2.m_x, value2.m_y, value2.m_z, ndFloat32(0.0f));
-		
-				ndFloat32 dist_x = value1.m_x - Interpolate(value0.m_x, value0.m_time, value2.m_x, value2.m_time, value1.m_time);
-				ndFloat32 dist_y = value1.m_y - Interpolate(value0.m_y, value0.m_time, value2.m_y, value2.m_time, value1.m_time);
-				ndFloat32 dist_z = value1.m_z - Interpolate(value0.m_z, value0.m_time, value2.m_z, value2.m_time, value1.m_time);
-		
-				ndVector err(dist_x, dist_y, dist_z, 0.0f);
-				ndFloat32 mag2 = err.DotProduct(err).GetScalar();
-				if (mag2 > tol2) 
-				{
-					break;
-				}
-				curve.Remove(node1->GetPrev());
-			}
-		}
-	}
+	//ndFloat32 FixAngleAlias(ndFloat32 angleA, ndFloat32 angleB) const
+	//{
+	//	ndFloat32 sinA = ndSin(angleA);
+	//	ndFloat32 cosA = ndCos(angleA);
+	//	ndFloat32 sinB = ndSin(angleB);
+	//	ndFloat32 cosB = ndCos(angleB);
+	//
+	//	ndFloat32 num = sinB * cosA - cosB * sinA;
+	//	ndFloat32 den = cosA * cosB + sinA * sinB;
+	//	angleB = angleA + ndAtan2(num, den);
+	//	return angleB;
+	//}
+	//
+	//ndFloat32 Interpolate(ndFloat32 x0, ndFloat32 t0, ndFloat32 x1, ndFloat32 t1, ndFloat32 t) const
+	//{
+	//	return x0 + (x1 - x0) * (t - t0) / (t1 - t0);
+	//}
+	//
+	//void OptimizeCurve(ndList<dCurveValue>& curve)
+	//{
+	//	const ndFloat32 tol = 5.0e-5f;
+	//	const ndFloat32 tol2 = tol * tol;
+	//	for (dCurve::ndNode* node0 = curve.GetFirst(); node0->GetNext(); node0 = node0->GetNext()) 
+	//	{
+	//		const dCurveValue& value0 = node0->GetInfo();
+	//		for (dCurve::ndNode* node1 = node0->GetNext()->GetNext(); node1; node1 = node1->GetNext()) 
+	//		{
+	//			const dCurveValue& value1 = node1->GetPrev()->GetInfo();
+	//			const dCurveValue& value2 = node1->GetInfo();
+	//			ndVector p1(value1.m_x, value1.m_y, value1.m_z, ndFloat32(0.0f));
+	//			ndVector p2(value2.m_x, value2.m_y, value2.m_z, ndFloat32(0.0f));
+	//	
+	//			ndFloat32 dist_x = value1.m_x - Interpolate(value0.m_x, value0.m_time, value2.m_x, value2.m_time, value1.m_time);
+	//			ndFloat32 dist_y = value1.m_y - Interpolate(value0.m_y, value0.m_time, value2.m_y, value2.m_time, value1.m_time);
+	//			ndFloat32 dist_z = value1.m_z - Interpolate(value0.m_z, value0.m_time, value2.m_z, value2.m_time, value1.m_time);
+	//	
+	//			ndVector err(dist_x, dist_y, dist_z, 0.0f);
+	//			ndFloat32 mag2 = err.DotProduct(err).GetScalar();
+	//			if (mag2 > tol2) 
+	//			{
+	//				break;
+	//			}
+	//			curve.Remove(node1->GetPrev());
+	//		}
+	//	}
+	//}
 
 	dCurve m_scale;
 	dCurve m_position;
@@ -430,119 +549,109 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 	{
 	}
 
-	dFbxAnimation(const dFbxAnimation& source, ndMeshEffectNode* const entity, const ndMatrix& matrix)
-		:ndTree <dFbxAnimationTrack, ndString>()
-		,m_length(source.m_length)
-		,m_timestep(source.m_timestep)
-		,m_framesCount(source.m_framesCount)
-	{
-		Iterator iter(source);
-		for (iter.Begin(); iter; iter++)
-		{
-			Insert(iter.GetKey());
-		}
-
-		FreezeScale(entity, source);
-		ApplyTransform(matrix);
-
-		//FreezeScale(meshEffectNode);
-		//ApplyTransform(meshEffectNode, convertMatrix);
-		//if (fbxScene->getGlobalSettings()->UpAxis == UpVector_AxisY)
-		//{
-		//	meshEffectNode->m_matrix = meshEffectNode->m_matrix * ndRollMatrix(-90.0f * ndDegreeToRad);
-		//}
-		//AlignToWorld(entity);
-
-		OptimizeCurves();
-	}
-
-	void OptimizeCurves()
-	{
-		Iterator iter(*this);
-		for (iter.Begin(); iter; iter++)
-		{
-			dFbxAnimationTrack& track = iter.GetNode()->GetInfo();
-			track.OptimizeCurves();
-		}
-	}
-
-	void FreezeScale(ndMeshEffectNode* const entity, const dFbxAnimation& source)
-	{
-		ndMatrix parentMatrixStack[1024];
-		ndMeshEffectNode* stackPool[1024];
-
-		ndFloat32 deltaTimeAcc = ndFloat32 (0.0f);
-		for (ndInt32 i = 0; i < m_framesCount; ++i)
-		{
-			//for (ndMeshEffectNode* node = (ndMeshEffectNode*)entity->GetFirst(); node; node = (ndMeshEffectNode*)node->GetNext())
-			for (ndMeshEffectNode* node = entity->GetFirstChild(); node; node = node->GetNext())
-			{
-				const dFbxAnimation::ndNode* const aniNode = source.Find(node->GetName());
-				if (aniNode)
-				{
-					const dFbxAnimationTrack& track = aniNode->GetInfo();
-					const ndMatrix matrix(track.GetKeyframe(deltaTimeAcc));
-					ndAssert(0);
-					//node->SetMeshMatrix(matrix);
-				}
-			}
-
-			ndInt32 stack = 1;
-			stackPool[0] = entity;
-			parentMatrixStack[0] = ndGetIdentityMatrix();
-			while (stack)
-			{
-				stack--;
-				ndMatrix parentMatrix(parentMatrixStack[stack]);
-				ndMeshEffectNode* const rootNode = stackPool[stack];
-
-				ndAssert(0);
-				//ndMatrix transform(rootNode->GetMeshMatrix() * parentMatrix);
-				ndMatrix transform(parentMatrix);
-				ndMatrix matrix;
-				ndMatrix stretchAxis;
-				ndVector scale;
-				transform.PolarDecomposition(matrix, scale, stretchAxis);
-
-				ndMatrix scaledAxis(ndGetIdentityMatrix());
-				scaledAxis[0][0] = scale[0];
-				scaledAxis[1][1] = scale[1];
-				scaledAxis[2][2] = scale[2];
-				ndMatrix newParentMatrix(stretchAxis * scaledAxis);
-
-				dFbxAnimation::ndNode* const aniNode = Find(rootNode->GetName());
-				if (aniNode)
-				{
-					dFbxAnimationTrack& track = aniNode->GetInfo();
-					track.AddKeyframe(deltaTimeAcc, matrix);
-				}
-
-				for (ndMeshEffectNode* node = rootNode->GetFirstChild(); node; node = node->GetNext())
-				{
-					stackPool[stack] = node;
-					parentMatrixStack[stack] = newParentMatrix;
-					stack++;
-				}
-			}
-			deltaTimeAcc += m_timestep;
-		}
-	}
-
-	void ApplyTransform(const ndMatrix& transform)
-	{
-		Iterator iter(*this);
-		for (iter.Begin(); iter; iter++)
-		{
-			dFbxAnimationTrack& track = iter.GetNode()->GetInfo();
-			track.ApplyTransform(transform);
-		}
-	}
+	//dFbxAnimation(const dFbxAnimation& source, ndMeshEffectNode* const entity, const ndMatrix& matrix)
+	//	:ndTree <dFbxAnimationTrack, ndString>()
+	//	,m_length(source.m_length)
+	//	,m_timestep(source.m_timestep)
+	//	,m_framesCount(source.m_framesCount)
+	//{
+	//	Iterator iter(source);
+	//	for (iter.Begin(); iter; iter++)
+	//	{
+	//		Insert(iter.GetKey());
+	//	}
+	//
+	//	//FreezeScale(entity, source);
+	//	//ApplyTransform(matrix);
+	//	//OptimizeCurves();
+	//}
+	//
+	//void OptimizeCurves()
+	//{
+	//	Iterator iter(*this);
+	//	for (iter.Begin(); iter; iter++)
+	//	{
+	//		dFbxAnimationTrack& track = iter.GetNode()->GetInfo();
+	//		track.OptimizeCurves();
+	//	}
+	//}
+	//
+	//void FreezeScale(ndMeshEffectNode* const entity, const dFbxAnimation& source)
+	//{
+	//	ndMatrix parentMatrixStack[1024];
+	//	ndMeshEffectNode* stackPool[1024];
+	//
+	//	ndFloat32 deltaTimeAcc = ndFloat32 (0.0f);
+	//	for (ndInt32 i = 0; i < m_framesCount; ++i)
+	//	{
+	//		//for (ndMeshEffectNode* node = (ndMeshEffectNode*)entity->GetFirst(); node; node = (ndMeshEffectNode*)node->GetNext())
+	//		for (ndMeshEffectNode* node = entity->GetFirstChild(); node; node = node->GetNext())
+	//		{
+	//			const dFbxAnimation::ndNode* const aniNode = source.Find(node->GetName());
+	//			if (aniNode)
+	//			{
+	//				const dFbxAnimationTrack& track = aniNode->GetInfo();
+	//				const ndMatrix matrix(track.GetKeyframe(deltaTimeAcc));
+	//				ndAssert(0);
+	//				//node->SetMeshMatrix(matrix);
+	//			}
+	//		}
+	//
+	//		ndInt32 stack = 1;
+	//		stackPool[0] = entity;
+	//		parentMatrixStack[0] = ndGetIdentityMatrix();
+	//		while (stack)
+	//		{
+	//			stack--;
+	//			ndMatrix parentMatrix(parentMatrixStack[stack]);
+	//			ndMeshEffectNode* const rootNode = stackPool[stack];
+	//
+	//			ndAssert(0);
+	//			//ndMatrix transform(rootNode->GetMeshMatrix() * parentMatrix);
+	//			ndMatrix transform(parentMatrix);
+	//			ndMatrix matrix;
+	//			ndMatrix stretchAxis;
+	//			ndVector scale;
+	//			transform.PolarDecomposition(matrix, scale, stretchAxis);
+	//
+	//			ndMatrix scaledAxis(ndGetIdentityMatrix());
+	//			scaledAxis[0][0] = scale[0];
+	//			scaledAxis[1][1] = scale[1];
+	//			scaledAxis[2][2] = scale[2];
+	//			ndMatrix newParentMatrix(stretchAxis * scaledAxis);
+	//
+	//			dFbxAnimation::ndNode* const aniNode = Find(rootNode->GetName());
+	//			if (aniNode)
+	//			{
+	//				dFbxAnimationTrack& track = aniNode->GetInfo();
+	//				track.AddKeyframe(deltaTimeAcc, matrix);
+	//			}
+	//
+	//			for (ndMeshEffectNode* node = rootNode->GetFirstChild(); node; node = node->GetNext())
+	//			{
+	//				stackPool[stack] = node;
+	//				parentMatrixStack[stack] = newParentMatrix;
+	//				stack++;
+	//			}
+	//		}
+	//		deltaTimeAcc += m_timestep;
+	//	}
+	//}
+	//
+	//void ApplyTransform(const ndMatrix& transform)
+	//{
+	//	Iterator iter(*this);
+	//	for (iter.Begin(); iter; iter++)
+	//	{
+	//		dFbxAnimationTrack& track = iter.GetNode()->GetInfo();
+	//		track.ApplyTransform(transform);
+	//	}
+	//}
 
 	ndAnimationSequence* CreateSequence(const char* const name) const
 	{
 		ndAnimationSequence* const sequence = new ndAnimationSequence;
 		sequence->SetName(name);
-		ndAssert(0);
 		//sequence->m_period = m_length;
 
 		Iterator iter(*this);
@@ -576,7 +685,58 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 			}
 		}
 
+		ndAssert(0);
 		return sequence;
+	}
+
+	void CopyTransform(ndMeshEffectNode* const dst, const ndMeshEffectNode* const src)
+	{
+		ndMeshEffectNode* dstBuffer[1024];
+		const ndMeshEffectNode* srcBuffer[1024];
+
+		ndInt32 stack = 1;
+		dstBuffer[0] = dst;
+		srcBuffer[0] = src;
+
+		while (stack)
+		{
+			stack--;
+			ndMeshEffectNode* const dstEnt = dstBuffer[stack];
+			const ndMeshEffectNode* const srcEnt = srcBuffer[stack];
+
+			dstEnt->m_matrix = srcEnt->m_matrix;
+
+			ndMeshEffectNode* dstChild = dstEnt->GetFirstChild();
+			for (ndMeshEffectNode* srcChild = srcEnt->GetFirstChild(); srcChild; srcChild = srcChild->GetNext())
+			{
+				srcBuffer[stack] = srcChild;
+				dstBuffer[stack] = dstChild;
+				dstChild = dstChild->GetNext();
+				stack++;
+			}
+		}
+	}
+
+	void SetFrame(ndMeshEffectNode* const model, ndInt32 frame)
+	{
+
+	}
+
+	void GetFrame(ndMeshEffectNode* const model, ndInt32 frame)
+	{
+
+	}
+
+	void ApplyTransforms(const ndMeshEffectNode* const meshEffectNode, const ndMatrix& unitMatrix, const ndMatrix& upAxis)
+	{
+		ndMeshEffectNode workingModel (*meshEffectNode);
+		for (ndInt32 i = 0; i < m_framesCount; ++i)
+		{
+			CopyTransform(&workingModel, meshEffectNode);
+			SetFrame(&workingModel, i);
+			ApplyAllTransforms(&workingModel, unitMatrix, upAxis);
+			GetFrame(&workingModel, i);
+		}
 	}
 
 	ndFloat32 m_length;
@@ -684,8 +844,7 @@ static void LoadAnimation(ofbx::IScene* const fbxScene, dFbxAnimation& animation
 			layerCount++;
 		}
 	}
-
-	animation.OptimizeCurves();
+	//animation.OptimizeCurves();
 }
 
 static void ImportMeshNode(ofbx::Object* const fbxNode, fbxMeshEffectNodeGlobalNodeMap& nodeMap)
@@ -951,118 +1110,6 @@ static ndMeshEffectNode* FbxToMeshEffectNode(ofbx::IScene* const fbxScene)
 	return entity;
 }
 
-static void FreezeScale(ndMeshEffectNode* const entity)
-{
-	ndInt32 stack = 1;
-	ndMeshEffectNode* entBuffer[1024];
-	ndMatrix parentMatrix[1024];
-	entBuffer[0] = entity;
-	parentMatrix[0] = ndGetIdentityMatrix();
-	while (stack)
-	{
-		stack--;
-		ndMatrix scaleMatrix(parentMatrix[stack]);
-		ndMeshEffectNode* const ent = entBuffer[stack];
-
-		ndMatrix transformMatrix;
-		ndMatrix stretchAxis;
-		ndVector scale;
-		ndMatrix matrix(ent->m_matrix * scaleMatrix);
-		matrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
-		ent->m_matrix = transformMatrix;
-		scaleMatrix = ndMatrix(ndGetIdentityMatrix(), scale, stretchAxis);
-
-		ndSharedPtr<ndMeshEffect> mesh = ent->GetMesh();
-		if (*mesh)
-		{
-			matrix = ent->m_meshMatrix * scaleMatrix;
-			matrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
-			ent->m_meshMatrix = transformMatrix;
-			ndMatrix meshMatrix(ndGetIdentityMatrix(), scale, stretchAxis);
-			mesh->ApplyTransform(meshMatrix);
-		}
-
-		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
-		{
-			entBuffer[stack] = child;
-			parentMatrix[stack] = scaleMatrix;
-			stack++;
-		}
-	}
-}
-
-static void ApplyTransform(ndMeshEffectNode* const entity, const ndMatrix& transform)
-{
-	ndInt32 stack = 1;
-	ndMeshEffectNode* entBuffer[1024];
-	entBuffer[0] = entity;
-	ndMatrix invTransform(transform.Inverse4x4());
-	while (stack)
-	{
-		stack--;
-		ndMeshEffectNode* const ent = entBuffer[stack];
-
-		ndMatrix entMatrix(invTransform * ent->m_matrix * transform);
-		ent->m_matrix = entMatrix;
-
-		ndSharedPtr<ndMeshEffect> mesh = ent->GetMesh();
-		if (*mesh)
-		{
-			ndMatrix meshMatrix(invTransform * ent->m_meshMatrix * transform);
-			ent->m_meshMatrix = meshMatrix;
-			mesh->ApplyTransform(transform);
-		}
-
-		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
-		{
-			entBuffer[stack] = child;
-			stack++;
-		}
-	}
-}
-
-static void AlignToWorld(ndMeshEffectNode* const entity)
-{
-	ndMeshEffectNode* entBuffer[1024];
-	
-	ndInt32 stack = 0;
-	ndMatrix rotation(entity->m_matrix);
-	ndVector posit(rotation.m_posit);
-	rotation.m_posit = ndVector::m_wOne;
-
-	ndMatrix invRotation(rotation.OrthoInverse());
-	for (ndMeshEffectNode* child = entity->GetFirstChild(); child; child = child->GetNext())
-	{
-		entBuffer[stack] = child;
-		stack++;
-	}
-
-	entity->m_matrix = ndGetIdentityMatrix();
-	entity->m_matrix.m_posit = posit;
-	while (stack)
-	{
-		stack--;
-		ndMeshEffectNode* const ent = entBuffer[stack];
-	
-		ndMatrix entMatrix(invRotation * ent->m_matrix * rotation);
-		ent->m_matrix = entMatrix;
-	
-		ndSharedPtr<ndMeshEffect> mesh = ent->GetMesh();
-		if (*mesh)
-		{
-			ndMatrix meshMatrix(invRotation * ent->m_meshMatrix * rotation);
-			ent->m_meshMatrix = meshMatrix;
-			mesh->ApplyTransform(rotation);
-		}
-	
-		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
-		{
-			entBuffer[stack] = child;
-			stack++;
-		}
-	}
-}
-
 ndMeshEffectNode* LoadFbxMeshEffectNode(const char* const meshName)
 {
 	char outPathName[1024];
@@ -1089,15 +1136,17 @@ ndMeshEffectNode* LoadFbxMeshEffectNode(const char* const meshName)
 	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(*fbxScene));
 	ndMeshEffectNode* const meshEffectNode = FbxToMeshEffectNode(*fbxScene);
 
-	FreezeScale(meshEffectNode);
-	ApplyTransform(meshEffectNode, convertMatrix);
-	if (fbxScene->getGlobalSettings()->UpAxis == UpVector_AxisY)
-	{
-		meshEffectNode->m_matrix = meshEffectNode->m_matrix * ndRollMatrix(-90.0f * ndDegreeToRad);
-	}
-	AlignToWorld(meshEffectNode);
+	//FreezeScale(meshEffectNode);
+	//ApplyTransform(meshEffectNode, convertMatrix);
+	//if (fbxScene->getGlobalSettings()->UpAxis == UpVector_AxisY)
+	//{
+	//	meshEffectNode->m_matrix = meshEffectNode->m_matrix * ndRollMatrix(-90.0f * ndDegreeToRad);
+	//}
+	//AlignToWorld(meshEffectNode);
 
-	//fbxScene->destroy();
+	ndMatrix upAxis((fbxScene->getGlobalSettings()->UpAxis != UpVector_AxisY) ? ndGetIdentityMatrix() : ndRollMatrix(-90.0f * ndDegreeToRad));
+	ApplyAllTransforms(meshEffectNode, convertMatrix, upAxis);
+
 	return meshEffectNode;
 }
 
@@ -1125,15 +1174,14 @@ ndAnimationSequence* LoadFbxAnimation(const char* const fileName)
 	ndSharedPtr<ofbx::IScene> fbxScene = ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
 
 	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(*fbxScene));
-
+	ndSharedPtr<ndMeshEffectNode> entity(FbxToMeshEffectNode(*fbxScene));
 	dFbxAnimation animation;
 	LoadAnimation(*fbxScene, animation);
-	//ndMeshEffectNode* const entity = FbxToEntity(fbxScene);
-	//ndMeshEffectNode* const entity = FbxToMeshEffectNode(fbxScene);
-	ndSharedPtr<ndMeshEffectNode> entity (FbxToMeshEffectNode(*fbxScene));
-	dFbxAnimation newAnimation(animation, *entity, convertMatrix);
-	
-	//fbxScene->destroy();
 
-	return newAnimation.CreateSequence(fileName);
+	ndMatrix upAxis((fbxScene->getGlobalSettings()->UpAxis != UpVector_AxisY) ? ndGetIdentityMatrix() : ndRollMatrix(-90.0f * ndDegreeToRad));
+	animation.ApplyTransforms(*entity, convertMatrix, upAxis);
+	
+	//dFbxAnimation newAnimation(animation, *entity, convertMatrix);
+	//fbxScene->destroy();
+	return animation.CreateSequence(fileName);
 }

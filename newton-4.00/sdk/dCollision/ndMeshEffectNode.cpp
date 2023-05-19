@@ -43,7 +43,6 @@ ndMeshEffectNode::ndMeshEffectNode(const ndMeshEffectNode& src)
 	,m_name(src.m_name)
 	,m_mesh(src.m_mesh)
 {
-	ndAssert(0);
 }
 
 ndMeshEffectNode::~ndMeshEffectNode()
