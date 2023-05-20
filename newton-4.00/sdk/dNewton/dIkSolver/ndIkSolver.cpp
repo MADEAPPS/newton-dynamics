@@ -417,6 +417,7 @@ void ndIkSolver::SolverBegin(ndSkeletonContainer* const skeleton, ndJointBilater
 	m_timestep = timestep;
 	m_invTimestep = ndFloat32(1.0f) / timestep;
 
+	m_skeleton->ClearCloseLoopJoints();
 	for (ndInt32 i = jointCount - 1; i >= 0; --i)
 	{
 		m_skeleton->AddCloseLoopJoint((ndConstraint*)joints[i]);

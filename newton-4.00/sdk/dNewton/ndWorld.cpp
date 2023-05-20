@@ -546,7 +546,7 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	// Update Particle base physics
 	//ParticleUpdate();
 
-	// u[pate skeleton topologies
+	// update skeletons topologies
 	UpdateSkeletons();
 
 	// Update all models

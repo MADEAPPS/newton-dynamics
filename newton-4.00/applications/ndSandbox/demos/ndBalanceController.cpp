@@ -192,7 +192,7 @@ namespace ndZmp
 			
 			m_invDynamicsSolver.SolverEnd();
 #endif
-			if (xxx >= 610)
+			if (xxx >= 611)
 				xxx *= 1;
 
 			ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
@@ -213,17 +213,18 @@ namespace ndZmp
 			//ndFloat32 angle = 15.0f * ndDegreeToRad * ndSin(ndPi * tick / 0.5f);
 			//m_controlJoint->SetOffsetAngle(angle);
 			//ModelState state(this, world, timestep);
-			InitState(world);
-
-			ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
-			ndAssert(skeleton);
-			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
 
 			if (xxx >= 610)
 			{
 				xxx *= 1;
 			}
 
+			InitState(world);
+
+			ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
+			ndAssert(skeleton);
+
+			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
 			ndVector alpha(CalculateAlpha());
 			if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f))
 			{
