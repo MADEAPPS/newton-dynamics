@@ -2454,15 +2454,10 @@ ndInt32 ndContactSolver::CalculateContactsDiscrete()
 
 ndInt32 ndContactSolver::ConvexContactsDiscrete()
 {
-#if 1
 	const ndVector origin0(m_instance0.m_globalMatrix.m_posit);
 	const ndVector origin1(m_instance1.m_globalMatrix.m_posit);
 	m_instance0.m_globalMatrix.m_posit = ndVector::m_wOne;
 	m_instance1.m_globalMatrix.m_posit -= (origin0 & ndVector::m_triplexMask);
-#else
-	const ndVector origin0(ndVector::m_zero);
-	const ndVector origin1(ndVector::m_zero);
-#endif
 
 	// handle rare case of two shapes located exactly at the same origin
 	const ndVector error(m_instance1.m_globalMatrix.m_posit - m_instance0.m_globalMatrix.m_posit);
@@ -4407,22 +4402,6 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 
 		if (count0)
 		{
-			//ndVector aaaaaa[8];
-			//ndShapeConvexPolygon* xxxxxx = m_instance1.GetShape()->GetAsShapeAsConvexPolygon();
-			//for (int k = 0; k < xxxxxx->m_count; ++k)
-			//{
-			//	aaaaaa[k] = m_instance0.m_globalMatrix.UntransformVector(m_instance1.m_globalMatrix.TransformVector(xxxxxx->m_localPoly[k]));
-			//}
-			//ndVector nnnnnn_0(m_instance0.m_globalMatrix.UnrotateVector(normal));
-			//ndVector aaaaaa_0(m_instance0.m_globalMatrix.UntransformVector(point0));
-			//ndVector aaaaaa_1(m_instance0.m_globalMatrix.UntransformVector(point1));
-			//
-			//ndVector bbbbbb[8];
-			//for (ndInt32 i = 0; i < count1; ++i)
-			//{
-			//	bbbbbb[i] = matrix0.UntransformVector(shape1[i]);
-			//}
-
 			for (ndInt32 i = 0; i < count0; ++i)
 			{
 				shape0[i] = matrix0.TransformVector(shape0[i]);

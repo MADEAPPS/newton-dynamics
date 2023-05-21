@@ -392,13 +392,13 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 		ndAssert(!body0->GetAsBodyTriggerVolume());
 		ndAssert(!body0->GetCollisionShape().GetShape()->GetAsShapeNull());
 		ndAssert(!body1->GetCollisionShape().GetShape()->GetAsShapeNull());
-			
+
 		ndContactPoint contactBuffer[D_MAX_CONTATCS];
 		ndContactSolver contactSolver(contact, m_contactNotifyCallback, m_timestep, threadIndex);
 		contactSolver.m_separatingVector = contact->m_separatingVector;
 		contactSolver.m_contactBuffer = contactBuffer;
 		contactSolver.m_intersectionTestOnly = body0->m_contactTestOnly | body1->m_contactTestOnly;
-		
+
 		ndInt32 count = contactSolver.CalculateContactsDiscrete ();
 		if (count)
 		{
