@@ -205,9 +205,9 @@ bool ndJointRoller::GetLimitStatePosit() const
 void ndJointRoller::SetLimitStatePosit(bool state)
 {
 	m_limitStatePosit = state ? 1 : 0;
-	if (m_limitStateAngle)
+	if (m_limitStatePosit)
 	{
-		SetLimitsAngle(m_minLimitAngle, m_maxLimitAngle);
+		SetLimitsPosit(m_minLimitPosit, m_maxLimitPosit);
 	}
 }
 
@@ -402,15 +402,15 @@ void ndJointRoller::SubmitLimitsPosit(ndConstraintDescritor& desc, const ndMatri
 	{
 		if ((m_minLimitPosit == ndFloat32(0.0f)) && (m_maxLimitPosit == ndFloat32(0.0f)))
 		{
-			AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
+			AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 		}
 		else
 		{
 			ndFloat32 x = m_posit + m_speed * desc.m_timestep;
 			if (x < m_minLimitPosit)
 			{
-				ndVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_minLimitPosit));
-				AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
+				const ndVector p1(matrix1.m_posit + matrix1.m_up.Scale(m_minLimitPosit));
+				AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_up);
 				const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 				const ndFloat32 penetration = x - m_minLimitPosit;
 				const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationSpeed(-penetration);
@@ -419,7 +419,7 @@ void ndJointRoller::SubmitLimitsPosit(ndConstraintDescritor& desc, const ndMatri
 			}
 			else if (x > m_maxLimitPosit)
 			{
-				AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1.m_front);
+				AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1.m_up);
 				const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 				const ndFloat32 penetration = x - m_maxLimitPosit;
 				const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationSpeed(penetration);
