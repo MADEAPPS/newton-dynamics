@@ -449,8 +449,8 @@ void ndJointCylinder::JacobianDerivative(ndConstraintDescritor& desc)
 		SubmitSpringDamperPosit(desc, matrix0, matrix1);
 	}
 
-	SubmitLimitsAngle(desc, matrix0, matrix1);
 	SubmitLimitsPosit(desc, matrix0, matrix1);
+	SubmitLimitsAngle(desc, matrix0, matrix1);
 }
 
 
