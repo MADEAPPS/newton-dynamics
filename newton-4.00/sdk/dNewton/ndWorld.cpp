@@ -1176,5 +1176,10 @@ void ndWorld::RemoveModel(ndModel* const model)
 
 void ndWorld::CalculateJointContacts(ndContact* const contact)
 {
+	ndBodyKinematic* const body0 = contact->GetBody0();
+	ndBodyKinematic* const body1 = contact->GetBody1();
+	body0->UpdateCollisionMatrix();
+	body1->UpdateCollisionMatrix();
+
 	m_scene->CalculateJointContacts(0, contact);
 }
