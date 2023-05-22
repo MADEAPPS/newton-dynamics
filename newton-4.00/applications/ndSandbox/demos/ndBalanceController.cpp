@@ -113,9 +113,9 @@ namespace ndZmp
 				ndMatrix covariance(comDist, comDist);
 				ndMatrix bodyInertia(body->CalculateInertiaMatrix());
 				
-				inertia.m_front += (bodyInertia.m_front + bodyInertia.m_front.Scale (mass));
-				inertia.m_up += (bodyInertia.m_up + bodyInertia.m_up.Scale(mass));
-				inertia.m_right += (bodyInertia.m_right + bodyInertia.m_right.Scale(mass));
+				inertia.m_front += (bodyInertia.m_front + covariance.m_front.Scale (mass));
+				inertia.m_up += (bodyInertia.m_up + covariance.m_up.Scale(mass));
+				inertia.m_right += (bodyInertia.m_right + covariance.m_right.Scale(mass));
 
 				gyroTorque += omega.DotProduct(bodyInertia.RotateVector(omega));
 			}
