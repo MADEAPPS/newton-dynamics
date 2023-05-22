@@ -34,6 +34,7 @@ namespace ndZmp
 			:ndModelArticulation()
 			,m_controlJoint(nullptr)
 		{
+			xxx = 0;
 		}
 
 		void Init()
@@ -178,27 +179,29 @@ namespace ndZmp
 
 			ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
 			ndAssert(skeleton);
-
-			static int xxx;
-			xxx++;
-
+			
 			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
 			ndVector alpha(CalculateAlpha());
-			if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f))
+			if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f) || xxx == 500)
 			{
 				ndFloat32 angle = m_controlJoint->GetOffsetAngle();
 				ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle, 0.0f));
-				for (ndInt32 i = 0; (i < 8) && ndAbs(alpha.m_z) > ndFloat32(1.0e-3f); ++i)
+				ndInt32 passes = 8;
+				do
 				{
-					ndFloat32 deltaAngle = alpha.m_z * 0.02f;
-					m_controlJoint->SetOffsetAngle(angle + deltaAngle);
+					passes--;
+					ndFloat32 deltaAngle = alpha.m_z * 0.001f;
+					angle += deltaAngle;
+					m_controlJoint->SetOffsetAngle(angle);
 					m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
 					alpha = CalculateAlpha();
 					ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle + deltaAngle, deltaAngle));
-				}
+				} while ((ndAbs(alpha.m_z) > ndFloat32(1.0e-3f)) && passes);
 				ndTrace(("\n"));
 			}
 			m_invDynamicsSolver.SolverEnd();
+
+			xxx++;
 		}
 
 		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
@@ -209,6 +212,7 @@ namespace ndZmp
 		ndVector m_gyroTorque;
 		ndFloat32 m_totalMass;
 		ndMatrix m_invInertia;
+		int xxx;
 	};
 
 	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& location)
