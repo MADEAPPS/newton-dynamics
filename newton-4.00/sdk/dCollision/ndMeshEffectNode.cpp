@@ -29,6 +29,9 @@ ndMeshEffectNode::ndMeshEffectNode(ndMeshEffectNode* const parent)
 	,m_meshMatrix(ndGetIdentityMatrix())
 	,m_name()
 	,m_mesh()
+	,m_scale()
+	,m_posit()
+	,m_rotation()
 {
 	if (parent)
 	{
@@ -42,7 +45,24 @@ ndMeshEffectNode::ndMeshEffectNode(const ndMeshEffectNode& src)
 	,m_meshMatrix(src.m_meshMatrix)
 	,m_name(src.m_name)
 	,m_mesh(src.m_mesh)
+	,m_scale()
+	,m_posit()
+	,m_rotation()
 {
+	for (ndCurve::ndNode* node = src.m_scale.GetFirst(); node; node = node->GetNext())
+	{
+		m_scale.Append(node->GetInfo());
+	}
+
+	for (ndCurve::ndNode* node = src.m_posit.GetFirst(); node; node = node->GetNext())
+	{
+		m_posit.Append(node->GetInfo());
+	}
+
+	for (ndCurve::ndNode* node = src.m_rotation.GetFirst(); node; node = node->GetNext())
+	{
+		m_rotation.Append(node->GetInfo());
+	}
 }
 
 ndMeshEffectNode::~ndMeshEffectNode()
@@ -52,6 +72,21 @@ ndMeshEffectNode::~ndMeshEffectNode()
 const ndString& ndMeshEffectNode::GetName() const
 {
 	return m_name;
+}
+
+ndMeshEffectNode::ndCurve& ndMeshEffectNode::GetScaleCurve()
+{
+	return m_scale;
+}
+
+ndMeshEffectNode::ndCurve& ndMeshEffectNode::GetPositCurve()
+{
+	return m_posit;
+}
+
+ndMeshEffectNode::ndCurve& ndMeshEffectNode::GetRotationCurve()
+{
+	return m_rotation;
 }
 
 void ndMeshEffectNode::SetName(const ndString& name)

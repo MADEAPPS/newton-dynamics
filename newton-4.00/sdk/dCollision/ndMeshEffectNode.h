@@ -28,6 +28,24 @@
 class ndMeshEffectNode : public ndNodeHierarchy<ndMeshEffectNode>
 {
 	public:
+	class ndCurveValue
+	{
+		public:
+		ndFloat32 m_x;
+		ndFloat32 m_y;
+		ndFloat32 m_z;
+		ndFloat32 m_time;
+	};
+
+	class ndCurve: public ndList<ndCurveValue>
+	{
+		public:
+		ndCurve()
+			:ndList<ndCurveValue>()
+		{
+		}
+	};
+
 	D_COLLISION_API ndMeshEffectNode(ndMeshEffectNode* const parent);
 	D_COLLISION_API ndMeshEffectNode(const ndMeshEffectNode& src);
 
@@ -40,12 +58,19 @@ class ndMeshEffectNode : public ndNodeHierarchy<ndMeshEffectNode>
 	D_COLLISION_API const ndString& GetName() const;
 	D_COLLISION_API void SetName(const ndString& name);
 
+	D_COLLISION_API ndCurve& GetScaleCurve();
+	D_COLLISION_API ndCurve& GetPositCurve();
+	D_COLLISION_API ndCurve& GetRotationCurve();
+
 	ndMatrix m_matrix;
 	ndMatrix m_meshMatrix;
 
 	protected:
 	ndString m_name;
 	ndSharedPtr<ndMeshEffect> m_mesh;
+	ndCurve m_scale;
+	ndCurve m_posit;
+	ndCurve m_rotation;
 };
 
 #endif
