@@ -337,6 +337,9 @@ static void ApplyTransform(ndMeshEffectNode* const entity, const ndMatrix& trans
 				positValue.m_x = animTransformMatrix.m_posit.m_x;
 				positValue.m_y = animTransformMatrix.m_posit.m_y;
 				positValue.m_z = animTransformMatrix.m_posit.m_z;
+
+				positNode = positNode->GetNext();
+				rotationNode = rotationNode->GetNext();
 			}
 		}
 
@@ -417,6 +420,9 @@ static void AlignToWorld(ndMeshEffectNode* const entity)
 				positValue.m_x = animTransformMatrix.m_posit.m_x;
 				positValue.m_y = animTransformMatrix.m_posit.m_y;
 				positValue.m_z = animTransformMatrix.m_posit.m_z;
+
+				positNode = positNode->GetNext();
+				rotationNode = rotationNode->GetNext();
 			}
 		}
 
@@ -686,6 +692,41 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 		}
 	}
 
+	static void OptimizeCurve(ndMeshEffectNode::ndCurve& curve)
+	{
+		const ndFloat32 tol = 5.0e-5f;
+		const ndFloat32 tol2 = tol * tol;
+
+		auto Interpolate = [](ndFloat32 x0, ndFloat32 t0, ndFloat32 x1, ndFloat32 t1, ndFloat32 t)
+		{
+			return x0 + (x1 - x0) * (t - t0) / (t1 - t0);
+		};
+
+		for (ndMeshEffectNode::ndCurve::ndNode* node0 = curve.GetFirst(); node0->GetNext(); node0 = node0->GetNext())
+		{
+			const ndMeshEffectNode::ndCurveValue& value0 = node0->GetInfo();
+			for (ndMeshEffectNode::ndCurve::ndNode* node1 = node0->GetNext()->GetNext(); node1; node1 = node1->GetNext())
+			{
+				const ndMeshEffectNode::ndCurveValue& value1 = node1->GetPrev()->GetInfo();
+				const ndMeshEffectNode::ndCurveValue& value2 = node1->GetInfo();
+				ndVector p1(value1.m_x, value1.m_y, value1.m_z, ndFloat32(0.0f));
+				ndVector p2(value2.m_x, value2.m_y, value2.m_z, ndFloat32(0.0f));
+		
+				ndFloat32 dist_x = value1.m_x - Interpolate(value0.m_x, value0.m_time, value2.m_x, value2.m_time, value1.m_time);
+				ndFloat32 dist_y = value1.m_y - Interpolate(value0.m_y, value0.m_time, value2.m_y, value2.m_time, value1.m_time);
+				ndFloat32 dist_z = value1.m_z - Interpolate(value0.m_z, value0.m_time, value2.m_z, value2.m_time, value1.m_time);
+		
+				ndVector err(dist_x, dist_y, dist_z, 0.0f);
+				ndFloat32 mag2 = err.DotProduct(err).GetScalar();
+				if (mag2 > tol2) 
+				{
+					break;
+				}
+				curve.Remove(node1->GetPrev());
+			}
+		}
+	}
+
 	static ndAnimationSequence* CreateSequence(ndMeshEffectNode* const model, const char* const name)
 	{
 		ndAnimationSequence* const sequence = new ndAnimationSequence;
@@ -706,7 +747,9 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 				track->m_name = ent->GetName();
 				//dTrace(("name: %s\n", track->m_name.GetStr()));
 
-				for (ndMeshEffectNode::ndCurve::ndNode* srcNode = ent->GetPositCurve().GetFirst(); srcNode; srcNode = srcNode->GetNext())
+				ndMeshEffectNode::ndCurve& positCurve = ent->GetPositCurve();
+				OptimizeCurve(positCurve);
+				for (ndMeshEffectNode::ndCurve::ndNode* srcNode = positCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 				{
 					ndMeshEffectNode::ndCurveValue& keyFrame = srcNode->GetInfo();
 					track->m_position.m_param.PushBack(keyFrame.m_time);
