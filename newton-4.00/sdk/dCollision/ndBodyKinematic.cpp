@@ -688,7 +688,7 @@ void ndBodyKinematic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32)
 	else
 	{
 		ndInt32 count = 0;
-		ndAssert(!m_isConstrained);
+		//ndAssert(!m_isConstrained);
 
 		ndUnsigned8 equilibrium = (m_invMass.m_w == ndFloat32(0.0f)) ? 1 : (m_autoSleep & ~m_equilibriumOverride);
 		const ndVector isMovingMask(m_veloc + m_omega);

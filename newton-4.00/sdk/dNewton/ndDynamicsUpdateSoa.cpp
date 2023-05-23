@@ -1204,8 +1204,10 @@ void ndDynamicsUpdateSoa::IntegrateBodiesVelocity()
 			ndBodyKinematic* const body = bodyArray[i];
 
 			ndAssert(body);
-			ndAssert(body->GetAsBodyDynamic());
 			ndAssert(body->m_isConstrained);
+			// no necessary anymore because the virtual function handle it.
+			//ndAssert(body->GetAsBodyDynamic());
+
 			const ndInt32 index = body->m_index;
 			const ndJacobian& forceAndTorque = internalForces[index];
 			const ndVector force(body->GetForce() + forceAndTorque.m_linear);
