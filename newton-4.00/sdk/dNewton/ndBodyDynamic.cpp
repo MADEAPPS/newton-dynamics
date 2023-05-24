@@ -376,13 +376,19 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 			ndContact* const contact = it.GetNode()->GetInfo();
 			if (contact->IsActive())
 			{
-				//ndBodyKinematic* const body0 = contact->GetBody0();
-				//ndBodyKinematic* const body1 = contact->GetBody1();
-				////if (body0->GetAsBodyDynamic() && body1->GetAsBodyDynamic())
-				//{
-				//	checkConnection++;
-				//}
-				checkConnection++;
+				ndBodyKinematic* const body0 = contact->GetBody0();
+				ndBodyKinematic* const body1 = contact->GetBody1();
+				if (body0->GetAsBodyDynamic() && body1->GetAsBodyDynamic())
+				{
+					checkConnection++;
+				}
+				else
+				{
+					if (!body1->GetAsBodyKinematicSpecial())
+					{
+						checkConnection++;
+					}
+				}
 			}
 		}
 		ndAssert(count == checkConnection);
