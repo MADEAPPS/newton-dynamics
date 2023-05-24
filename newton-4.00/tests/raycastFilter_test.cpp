@@ -20,17 +20,26 @@ constexpr float BOX_DIM = 1.0f;
 constexpr float HALF_BOX_DIM = BOX_DIM * 0.5f;
 constexpr float Z_OFFSET = -4.0f;
 
-class ClientNode : public std::enable_shared_from_this<ClientNode>
+class ClientNode : public ndClassAlloc, public std::enable_shared_from_this<ClientNode>
 {
 public:
-	static ClientNodePtr create() { return std::make_shared<ClientNode>(); }
+	static ClientNodePtr create() 
+	{ 
+		//return std::make_shared<ClientNode>(); 
+		return std::shared_ptr<class ClientNode>(new ClientNode);
+	}
 
-	ClientNodePtr getPtr() { return shared_from_this(); }
+	ClientNodePtr getPtr() 
+	{ 
+		return shared_from_this(); 
+	}
 
-	ClientNode() :
-		worldMatrix(ndGetIdentityMatrix())
+	ClientNode() 
+		:ndClassAlloc()
+		,worldMatrix(ndGetIdentityMatrix())
 	{
 	}
+
 	~ClientNode() = default;
 
 	void* getUserdata() { return userdata; }
