@@ -1179,6 +1179,45 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 		}
 	};
 
+	class ndSortCell_xHigh
+	{
+		public:
+		ndSortCell_xHigh(const void* const)
+		{
+		}
+
+		ndInt32 GetKey(const ndBottomUpCell& cell) const
+		{
+			return (cell.m_x >> 16) & 0xff;
+		}
+	};
+
+	class ndSortCell_yHigh
+	{
+		public:
+		ndSortCell_yHigh(const void* const)
+		{
+		}
+
+		ndInt32 GetKey(const ndBottomUpCell& cell) const
+		{
+			return (cell.m_y >> 16) & 0xff;
+		}
+	};
+
+	class ndSortCell_zHigh
+	{
+		public:
+		ndSortCell_zHigh(const void* const)
+		{
+		}
+
+		ndInt32 GetKey(const ndBottomUpCell& cell) const
+		{
+			return (cell.m_z >> 16) & 0xff;
+		}
+	};
+
 	class ndSortCellCount
 	{
 		public:
@@ -1250,21 +1289,33 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 		if (maxGrids[0][0] > 256)
 		{
 			ndCountingSort<ndBottomUpCell, ndSortCell_xMid, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
-			ndAssert(maxGrids[0][0] < 256 * 256);
+			if (maxGrids[0][0] > 256 * 256)
+			{
+				ndCountingSort<ndBottomUpCell, ndSortCell_xHigh, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
+				ndAssert(maxGrids[0][0] < 256 * 256 * 256);
+			}
 		}
 
 		ndCountingSort<ndBottomUpCell, ndSortCell_ylow, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
 		if (maxGrids[0][1] > 256)
 		{
 			ndCountingSort<ndBottomUpCell, ndSortCell_yMid, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
-			ndAssert(maxGrids[0][1] < 256 * 256);
+			if (maxGrids[0][1] > 256 * 256)
+			{
+				ndCountingSort<ndBottomUpCell, ndSortCell_yHigh, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
+				ndAssert(maxGrids[0][1] < 256 * 256 * 256);
+			}
 		}
 
 		ndCountingSort<ndBottomUpCell, ndSortCell_zlow, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
 		if (maxGrids[0][2] > 256)
 		{
 			ndCountingSort<ndBottomUpCell, ndSortCell_zMid, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
-			ndAssert(maxGrids[0][2] < 256 * 256);
+			if (maxGrids[0][2] > 256 * 256)
+			{
+				ndCountingSort<ndBottomUpCell, ndSortCell_zHigh, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
+				ndAssert(maxGrids[0][2] < 256 * 256 * 256);
+			}
 		}
 
 		ndBottomUpCell sentinelCell;
