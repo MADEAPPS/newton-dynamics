@@ -51,7 +51,7 @@ TEST(Collisions, TriggerCollision)
 	ndSharedPtr<ndBody> triggerPtr(triggerbody);
 	world.AddBody(triggerPtr);
 
-	matrix.m_posit.m_y = 5;
+	//matrix.m_posit.m_y = 5; <--- commenting out this line makes the body start in the trigger
 
 	ndBodyDynamic* movingbody = new ndBodyDynamic();
 	movingbody->SetNotifyCallback(new ndBodyNotify(ndBigVector(ndFloat32(0), ndFloat32(-9.81f), ndFloat32(0), ndFloat32(0))));

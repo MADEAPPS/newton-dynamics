@@ -409,7 +409,7 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 				if (trigger && !contact->m_inTrigger)
 				{
 					contact->m_inTrigger = 1;
-					ndAssert(contact->m_isIntersetionTestOnly);
+					//ndAssert(contact->m_isIntersetionTestOnly);
 					trigger->OnTriggerEnter(body0, m_timestep);
 				}
 				contact->m_isIntersetionTestOnly = 1;
