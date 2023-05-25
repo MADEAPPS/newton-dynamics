@@ -13,14 +13,18 @@
 #define __D_ANIMIMATION_SEQUENCE_h__
 
 #include "ndSandboxStdafx.h"
-#include "ndAnimationSequenceBase.h"
 #include "ndAnimationKeyframesTrack.h"
 
-class ndAnimationSequence: public ndAnimationSequenceBase
+class ndAnimationPose;
+
+class ndAnimationSequence : public ndClassAlloc
 {
 	public:
 	ndAnimationSequence();
 	virtual ~ndAnimationSequence();
+
+	const ndString& GetName() const;
+	void SetName(const char* const name);
 
 	ndAnimationKeyFramesTrack* AddTrack();
 	ndList<ndAnimationKeyFramesTrack>& GetTracks();
@@ -28,6 +32,7 @@ class ndAnimationSequence: public ndAnimationSequenceBase
 
 	private:
 	ndList<ndAnimationKeyFramesTrack> m_tracks;
+	ndString m_name;
 };
 
 #endif

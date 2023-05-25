@@ -21,9 +21,9 @@
 #include "ndAnimationPose.h"
 #include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
+#include "ndAnimationSequence.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
-#include "ndAnimationSequenceBase.h"
 #include "ndAnimationSequencePlayer.h"
 
 namespace ndQuadruped_1

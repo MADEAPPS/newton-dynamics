@@ -14,13 +14,24 @@
 #include "ndAnimationSequence.h"
 
 ndAnimationSequence::ndAnimationSequence()
-	:ndAnimationSequenceBase()
+	:ndClassAlloc()
 	,m_tracks()
+	,m_name("")
 {
 }
 
 ndAnimationSequence::~ndAnimationSequence()
 {
+}
+
+const ndString& ndAnimationSequence::GetName() const
+{
+	return m_name;
+}
+
+void ndAnimationSequence::SetName(const char* const name)
+{
+	m_name = name;
 }
 
 ndList<ndAnimationKeyFramesTrack>& ndAnimationSequence::GetTracks()

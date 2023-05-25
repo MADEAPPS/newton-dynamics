@@ -11,10 +11,10 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndAnimationPose.h"
-#include "ndAnimationSequenceBase.h"
+#include "ndAnimationSequence.h"
 #include "ndAnimationSequencePlayer.h"
 
-ndAnimationSequencePlayer::ndAnimationSequencePlayer(ndAnimationSequenceBase* const sequence)
+ndAnimationSequencePlayer::ndAnimationSequencePlayer(ndSharedPtr<ndAnimationSequence>& sequence)
 	:ndAnimationBlendTreeNode(nullptr)
 	,m_sequence(sequence)
 	,m_param(ndFloat32 (0.0f))
@@ -35,7 +35,7 @@ void ndAnimationSequencePlayer::SetParam(ndFloat32 param)
 	m_param = ndMod(param, ndFloat32 (1.0f));
 }
 
-ndAnimationSequenceBase* ndAnimationSequencePlayer::GetSequence()
+ndSharedPtr<ndAnimationSequence>& ndAnimationSequencePlayer::GetSequence()
 {
 	return m_sequence;
 }

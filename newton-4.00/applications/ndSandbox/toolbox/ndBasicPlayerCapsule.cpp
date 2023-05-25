@@ -98,8 +98,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 	//,m_scene(scene)
 	,m_isPlayer(isPlayer)
-	//,m_output()
-	//,m_animBlendTree(nullptr)
+	,m_output()
+	,m_animBlendTree(nullptr)
 {
 	static ndFileBasicPlayerCapsule loadSave;
 
@@ -128,23 +128,25 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	//ndAnimationSequence* const sequence = scene->GetAnimationSequence("white_Man_idle.fbx");
 	ndSharedPtr<ndAnimationSequence> sequence(scene->GetAnimationSequence("mocapWalker_walk.fbx"));
 
-	//const ndList<ndAnimationKeyFramesTrack>& tracks = sequence->GetTracks();
-	//for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext()) 
-	//{
-	//	ndAnimationKeyFramesTrack& track = node->GetInfo();
-	//	ndDemoEntity* const ent = entity->Find(track.GetName().GetStr());
-	//	ndAnimKeyframe keyFrame;
-	//	keyFrame.m_userData = ent;
-	//	m_output.PushBack(keyFrame);
-	//}
-	//
+	const ndList<ndAnimationKeyFramesTrack>& tracks = sequence->GetTracks();
+	for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext()) 
+	{
+		ndAnimationKeyFramesTrack& track = node->GetInfo();
+		ndDemoEntity* const ent = entity->Find(track.GetName().GetStr());
+		ndAnimKeyframe keyFrame;
+		keyFrame.m_userData = ent;
+		m_output.PushBack(keyFrame);
+	}
+	
 	//// create an animation blend tree
 	//ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("white_Man_idle.fbx");
 	//ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("white_man_walk.fbx");
 	//ndAnimationSequence* const runSequence = scene->GetAnimationSequence("white_man_run.fbx");
-	//
+
+	ndSharedPtr<ndAnimationSequence> walkSequence(scene->GetAnimationSequence("mocapWalker_walk.fbx"));
+	
 	//ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
-	//ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
+	ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
 	//ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
 	//
 	//////dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
@@ -157,7 +159,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	//idleMoveBlend->SetParam(1.0f);
 	////walkRunBlend->SetTimeDilation1(scale1);
 	//m_animBlendTree = idleMoveBlend;
-	//
+	m_animBlendTree = walk;
+	 
 	//// evaluate twice that interpolation is reset
 	//ndAssert(0);
 	////m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
@@ -166,10 +169,10 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 
 ndBasicPlayerCapsule::~ndBasicPlayerCapsule()
 {
-	//if (m_animBlendTree)
-	//{
-	//	delete m_animBlendTree;
-	//}
+	if (m_animBlendTree)
+	{
+		delete m_animBlendTree;
+	}
 }
 
 void ndBasicPlayerCapsule::ApplyInputs(ndFloat32 timestep)

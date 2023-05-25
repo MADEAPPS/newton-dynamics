@@ -21,7 +21,6 @@
 #include "ndAnimationPose.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
-#include "ndAnimationSequenceBase.h"
 #include "ndAnimationSequencePlayer.h"
 
 

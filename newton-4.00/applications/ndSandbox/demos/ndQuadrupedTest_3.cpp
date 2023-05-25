@@ -22,8 +22,8 @@
 #include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
+#include "ndAnimationSequence.h"
 #include "ndDemoInstanceEntity.h"
-#include "ndAnimationSequenceBase.h"
 #include "ndAnimationSequencePlayer.h"
 
 namespace ndQuadruped_3
@@ -106,7 +106,8 @@ namespace ndQuadruped_3
 		}
 	};
 
-	class ndWalkSequence : public ndAnimationSequenceBase
+	//class ndWalkSequence : public ndAnimationSequenceBase
+	class ndWalkSequence : public ndAnimationSequence
 	{
 		public:
 		class ndSegment
@@ -148,7 +149,7 @@ namespace ndQuadruped_3
 		};
 
 		ndWalkSequence(ndFloat32 midParam)
-			:ndAnimationSequenceBase()
+			:ndAnimationSequence()
 			,m_segment0()
 			,m_segment1()
 			,m_xBias(0.11f)
@@ -375,7 +376,8 @@ namespace ndQuadruped_3
 			m_param_xxxx = ndParamMapper(0.0, 0.75f);
 			
 			m_output.SetCount(4);
-			m_walk = new ndAnimationSequencePlayer(&m_walkCycle);
+			ndAssert(0);
+			//m_walk = new ndAnimationSequencePlayer(&m_walkCycle);
 			m_animBlendTree = m_walk;
 		}
 
