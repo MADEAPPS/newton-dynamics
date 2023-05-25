@@ -17,12 +17,12 @@
 using ClientNodePtr = std::shared_ptr<class ClientNode>;
 
 constexpr float BOX_DIM = 1.0f;
-constexpr float HALF_BOX_DIM = BOX_DIM * 0.5f;
 constexpr float Z_OFFSET = -4.0f;
+constexpr float HALF_BOX_DIM = BOX_DIM * 0.5f;
 
 class ClientNode : public ndClassAlloc, public std::enable_shared_from_this<ClientNode>
 {
-public:
+	public:
 	static ClientNodePtr create() 
 	{ 
 		//return std::make_shared<ClientNode>(); 
@@ -51,7 +51,7 @@ public:
 	void setTransform(const ndMatrix& matrix) { worldMatrix = matrix; }
 	const ndMatrix& getTransform() const {return worldMatrix;}
 
-private:
+	private:
 	void* userdata = nullptr;
 	ndMatrix worldMatrix;
 	bool pickable = true;
@@ -59,17 +59,19 @@ private:
 
 class NotifyClientNode : public ndBodyNotify
 {
-public:
+	public:
 	NotifyClientNode(ClientNodePtr& clientNode) :
 		ndBodyNotify(ndVector::m_zero), // 0 gravity
 		node(clientNode)
 	{
 	}
+
 	~NotifyClientNode() = default;
 
 	void OnTransform(ndInt32, const ndMatrix&) override
 	{
 	}
+
 	void OnApplyExternalForce(ndInt32, ndFloat32) override
 	{
 	}
@@ -80,7 +82,7 @@ public:
 		return node.get();
 	}
 
-private:
+	private:
 	ClientNodePtr node;
 };
 

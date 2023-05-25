@@ -648,7 +648,6 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 				break;
 			}
 		}
-		//animation.OptimizeCurves();
 
 		ndInt32 stack = 1;
 		ndMeshEffectNode* entBuffer[1024];
@@ -725,10 +724,36 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 				curve.Remove(node1->GetPrev());
 			}
 		}
+
+		if (curve.GetCount() == 2)
+		{
+			const ndMeshEffectNode::ndCurveValue& value0 = curve.GetFirst()->GetInfo();
+			const ndMeshEffectNode::ndCurveValue& value1 = curve.GetFirst()->GetNext()->GetInfo();
+
+			ndFloat32 dist_x = value1.m_x - value0.m_x;
+			ndFloat32 dist_y = value1.m_y - value0.m_y;
+			ndFloat32 dist_z = value1.m_z - value0.m_z;
+
+			ndVector err(dist_x, dist_y, dist_z, 0.0f);
+			ndFloat32 mag2 = err.DotProduct(err).GetScalar();
+			if (mag2 < tol2)
+			{
+				curve.Remove(curve.GetFirst()->GetNext());
+			}
+		}
+	}
+
+	static void OptimizeRotationCurve(ndMeshEffectNode::ndCurve& curve)
+	{
+
+		OptimizeCurve(curve);
 	}
 
 	static ndAnimationSequence* CreateSequence(ndMeshEffectNode* const model, const char* const name)
 	{
+		const ndFloat32 tol = 5.0e-5f;
+		const ndFloat32 tol2 = tol * tol;
+
 		ndAnimationSequence* const sequence = new ndAnimationSequence;
 		sequence->SetName(name);
 		//sequence->m_period = m_length;
@@ -749,24 +774,51 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 
 				ndMeshEffectNode::ndCurve& positCurve = ent->GetPositCurve();
 				OptimizeCurve(positCurve);
-				for (ndMeshEffectNode::ndCurve::ndNode* srcNode = positCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
+				if (positCurve.GetCount() == 1)
 				{
-					ndMeshEffectNode::ndCurveValue& keyFrame = srcNode->GetInfo();
-					track->m_position.m_param.PushBack(keyFrame.m_time);
-					track->m_position.PushBack(ndVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, ndFloat32(1.0f)));
+					const ndMeshEffectNode::ndCurveValue& value = positCurve.GetFirst()->GetInfo();
+
+					ndFloat32 dist_x = value.m_x - ent->m_matrix.m_posit.m_x;
+					ndFloat32 dist_y = value.m_y - ent->m_matrix.m_posit.m_y;
+					ndFloat32 dist_z = value.m_z - ent->m_matrix.m_posit.m_z;
+
+					ndVector err(dist_x, dist_y, dist_z, 0.0f);
+					ndFloat32 mag2 = err.DotProduct(err).GetScalar();
+					if (mag2 < tol2)
+					{
+						positCurve.RemoveAll();
+					}
+				}
+				else
+				{
+					for (ndMeshEffectNode::ndCurve::ndNode* srcNode = positCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
+					{
+						ndMeshEffectNode::ndCurveValue& keyFrame = srcNode->GetInfo();
+						track->m_position.m_param.PushBack(keyFrame.m_time);
+						track->m_position.PushBack(ndVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, ndFloat32(1.0f)));
+					}
 				}
 
-				for (ndMeshEffectNode::ndCurve::ndNode* srcNode = ent->GetRotationCurve().GetFirst(); srcNode; srcNode = srcNode->GetNext())
+				ndMeshEffectNode::ndCurve& rotationCurve = ent->GetRotationCurve();
+				OptimizeRotationCurve(rotationCurve);
+				if (rotationCurve.GetCount() == 1)
 				{
-					ndMeshEffectNode::ndCurveValue& keyFrame = srcNode->GetInfo();
-					
-					const ndMatrix transform(ndPitchMatrix(keyFrame.m_x) * ndYawMatrix(keyFrame.m_y) * ndRollMatrix(keyFrame.m_z));
-					const ndQuaternion quat(transform);
-					ndAssert(quat.DotProduct(quat).GetScalar() > 0.999f);
-					ndAssert(quat.DotProduct(quat).GetScalar() < 1.001f);
+					ndAssert(0);
+				}
+				else
+				{
+					for (ndMeshEffectNode::ndCurve::ndNode* srcNode = rotationCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
+					{
+						ndMeshEffectNode::ndCurveValue& keyFrame = srcNode->GetInfo();
 
-					track->m_rotation.PushBack(quat);
-					track->m_rotation.m_param.PushBack(keyFrame.m_time);
+						const ndMatrix transform(ndPitchMatrix(keyFrame.m_x) * ndYawMatrix(keyFrame.m_y) * ndRollMatrix(keyFrame.m_z));
+						const ndQuaternion quat(transform);
+						ndAssert(quat.DotProduct(quat).GetScalar() > 0.999f);
+						ndAssert(quat.DotProduct(quat).GetScalar() < 1.001f);
+
+						track->m_rotation.PushBack(quat);
+						track->m_rotation.m_param.PushBack(keyFrame.m_time);
+					}
 				}
 			}
 
