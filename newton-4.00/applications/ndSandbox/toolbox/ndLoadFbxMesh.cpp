@@ -501,45 +501,6 @@ class dFbxAnimationTrack
 		AddRotation(time, euler0.m_x, euler0.m_y, euler0.m_z);
 	}
 
-	//ndMatrix GetKeyframe(ndFloat32 time) const
-	//{
-	//	ndMeshEffectNode::ndCurveValue scale(m_scale.Evaluate(time));
-	//	ndMeshEffectNode::ndCurveValue position(m_position.Evaluate(time));
-	//	ndMeshEffectNode::ndCurveValue rotation(m_rotation.Evaluate(time));
-	//
-	//	ndMatrix scaleMatrix(ndGetIdentityMatrix());
-	//	scaleMatrix[0][0] = scale.m_x;
-	//	scaleMatrix[1][1] = scale.m_y;
-	//	scaleMatrix[2][2] = scale.m_z;
-	//	ndMatrix matrix(scaleMatrix * ndPitchMatrix(rotation.m_x) * ndYawMatrix(rotation.m_y) * ndRollMatrix(rotation.m_z));
-	//	matrix.m_posit = ndVector(position.m_x, position.m_y, position.m_z, 1.0f);
-	//	return matrix;
-	//}
-
-	//void OptimizeCurves()
-	//{
-	//	if (m_scale.GetCount()) 
-	//	{
-	//		OptimizeCurve(m_scale);
-	//	}
-	//	if (m_position.GetCount()) 
-	//	{
-	//		OptimizeCurve(m_position);
-	//	}
-	//	if (m_rotation.GetCount()) 
-	//	{
-	//		for (dCurve::ndNode* node = m_rotation.GetFirst(); node->GetNext(); node = node->GetNext()) 
-	//		{
-	//			const dCurveValue& value0 = node->GetInfo();
-	//			dCurveValue& value1 = node->GetNext()->GetInfo();
-	//			value1.m_x = FixAngleAlias(value0.m_x, value1.m_x);
-	//			value1.m_y = FixAngleAlias(value0.m_y, value1.m_y);
-	//			value1.m_z = FixAngleAlias(value0.m_z, value1.m_z);
-	//		}
-	//
-	//		OptimizeCurve(m_rotation);
-	//	}
-	//}
 
 	private:
 	void AddScale(ndFloat32 time, ndFloat32 x, ndFloat32 y, ndFloat32 z)
@@ -568,53 +529,6 @@ class dFbxAnimationTrack
 		value.m_z = z;
 		value.m_time = time;
 	}
-
-	//ndFloat32 FixAngleAlias(ndFloat32 angleA, ndFloat32 angleB) const
-	//{
-	//	ndFloat32 sinA = ndSin(angleA);
-	//	ndFloat32 cosA = ndCos(angleA);
-	//	ndFloat32 sinB = ndSin(angleB);
-	//	ndFloat32 cosB = ndCos(angleB);
-	//
-	//	ndFloat32 num = sinB * cosA - cosB * sinA;
-	//	ndFloat32 den = cosA * cosB + sinA * sinB;
-	//	angleB = angleA + ndAtan2(num, den);
-	//	return angleB;
-	//}
-	//
-	//ndFloat32 Interpolate(ndFloat32 x0, ndFloat32 t0, ndFloat32 x1, ndFloat32 t1, ndFloat32 t) const
-	//{
-	//	return x0 + (x1 - x0) * (t - t0) / (t1 - t0);
-	//}
-	//
-	//void OptimizeCurve(ndList<dCurveValue>& curve)
-	//{
-	//	const ndFloat32 tol = 5.0e-5f;
-	//	const ndFloat32 tol2 = tol * tol;
-	//	for (dCurve::ndNode* node0 = curve.GetFirst(); node0->GetNext(); node0 = node0->GetNext()) 
-	//	{
-	//		const dCurveValue& value0 = node0->GetInfo();
-	//		for (dCurve::ndNode* node1 = node0->GetNext()->GetNext(); node1; node1 = node1->GetNext()) 
-	//		{
-	//			const dCurveValue& value1 = node1->GetPrev()->GetInfo();
-	//			const dCurveValue& value2 = node1->GetInfo();
-	//			ndVector p1(value1.m_x, value1.m_y, value1.m_z, ndFloat32(0.0f));
-	//			ndVector p2(value2.m_x, value2.m_y, value2.m_z, ndFloat32(0.0f));
-	//	
-	//			ndFloat32 dist_x = value1.m_x - Interpolate(value0.m_x, value0.m_time, value2.m_x, value2.m_time, value1.m_time);
-	//			ndFloat32 dist_y = value1.m_y - Interpolate(value0.m_y, value0.m_time, value2.m_y, value2.m_time, value1.m_time);
-	//			ndFloat32 dist_z = value1.m_z - Interpolate(value0.m_z, value0.m_time, value2.m_z, value2.m_time, value1.m_time);
-	//	
-	//			ndVector err(dist_x, dist_y, dist_z, 0.0f);
-	//			ndFloat32 mag2 = err.DotProduct(err).GetScalar();
-	//			if (mag2 > tol2) 
-	//			{
-	//				break;
-	//			}
-	//			curve.Remove(node1->GetPrev());
-	//		}
-	//	}
-	//}
 
 	dCurve m_scale;
 	dCurve m_position;
@@ -745,6 +659,30 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 
 	static void OptimizeRotationCurve(ndMeshEffectNode::ndCurve& curve)
 	{
+		auto AngleAlias = [](ndFloat32 angleA, ndFloat32 angleB)
+		{
+			ndFloat32 s1 = ndSin(angleB);
+			ndFloat32 c1 = ndCos(angleB);
+			ndFloat32 s0 = ndSin(angleA);
+			ndFloat32 c0 = ndCos(angleA);
+			
+			ndFloat32 s = s1 * c0 - s0 * c1;
+			ndFloat32 c = c1 * c0 + s0 * s1;
+			ndFloat32 delta = ndAtan2(s, c);
+			return delta;
+		};
+
+		ndMeshEffectNode::ndCurveValue eulerRef(curve.GetFirst()->GetInfo());
+		for (ndMeshEffectNode::ndCurve::ndNode* node = curve.GetFirst()->GetNext(); node->GetNext(); node = node->GetNext())
+		{
+			ndMeshEffectNode::ndCurveValue value (node->GetInfo());
+			ndFloat32 angleError = AngleAlias(value.m_z, eulerRef.m_z);
+			if (ndAbs(angleError) > ndPi * ndFloat32(0.5f))
+			{
+				ndAssert(0);
+			}
+			eulerRef = value;
+		}
 
 		OptimizeCurve(curve);
 	}
@@ -807,17 +745,29 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 				}
 				else
 				{
+					ndQuaternion rotation;
 					for (ndMeshEffectNode::ndCurve::ndNode* srcNode = rotationCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 					{
 						ndMeshEffectNode::ndCurveValue& keyFrame = srcNode->GetInfo();
 
 						const ndMatrix transform(ndPitchMatrix(keyFrame.m_x) * ndYawMatrix(keyFrame.m_y) * ndRollMatrix(keyFrame.m_z));
-						const ndQuaternion quat(transform);
+						ndQuaternion quat(transform);
 						ndAssert(quat.DotProduct(quat).GetScalar() > 0.999f);
 						ndAssert(quat.DotProduct(quat).GetScalar() < 1.001f);
 
+						if (track->m_rotation.GetCount())
+						{
+							ndFloat32 dot = quat.DotProduct(rotation).GetScalar();
+							if (dot < ndFloat32(0.0f))
+							{
+								quat = quat.Scale(ndFloat32 (-1.0f));
+							}
+						}
+
 						track->m_rotation.PushBack(quat);
 						track->m_rotation.m_param.PushBack(keyFrame.m_time);
+
+						rotation = quat;
 					}
 				}
 			}
@@ -1229,23 +1179,6 @@ ndMeshEffectNode* LoadFbxMeshEffectNode(const char* const fileName)
 {
 	return LoadFbxMesh(fileName);
 }
-
-//static void LoadAnimation(ofbx::IScene* const fbxScene, dFbxAnimation& animation)
-//{
-//	ndInt32 animationCount = fbxScene->getAnimationStackCount();
-//	for (ndInt32 i = 0; i < animationCount; ++i)
-//	{
-//		const ofbx::AnimationStack* const animStack = fbxScene->getAnimationStack(i);
-//		
-//		ndInt32 layerCount = 0;
-//		while (const ofbx::AnimationLayer* const animLayer = animStack->getLayer(layerCount))
-//		{
-//			LoadAnimationLayer(fbxScene, animLayer, animation);
-//			layerCount++;
-//		}
-//	}
-//	//animation.OptimizeCurves();
-//}
 
 ndAnimationSequence* LoadFbxAnimation(const char* const fileName)
 {
