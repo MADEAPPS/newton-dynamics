@@ -12,8 +12,8 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
+#include "ndFbxLoader.h"
 #include "ndDemoCamera.h"
-#include "ndLoadFbxMesh.h"
 #include "ndDemoSkinMesh.h"
 #include "ndAnimationPose.h"
 
@@ -173,9 +173,9 @@ void ndDemoEntity::SetName(const ndString& name)
 
 ndDemoEntity* ndDemoEntity::LoadFbx(const char* const filename, ndDemoEntityManager* const scene)
 {
+	ndFbxLoader loader;
 	ndDemoEntity* rootEntity = nullptr;
-	//ndMeshEffectNode* const fbxEntity = LoadFbxMeshEffectNode(filename);
-	ndSharedPtr<ndMeshEffectNode> fbxEntity (LoadFbxMeshEffectNode(filename));
+	ndSharedPtr<ndMeshEffectNode> fbxEntity (loader.LoadMesh(filename));
 	if (*fbxEntity)
 	{
 		rootEntity = new ndDemoEntity(scene, *fbxEntity);

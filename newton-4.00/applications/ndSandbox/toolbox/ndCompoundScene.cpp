@@ -11,8 +11,8 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndDemoMesh.h"
+#include "ndFbxLoader.h"
 #include "ndDemoEntity.h"
-#include "ndLoadFbxMesh.h"
 #include "ndPhysicsWorld.h"
 #include "ndCompoundScene.h"
 #include "ndDemoEntityNotify.h"
@@ -76,7 +76,8 @@ static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInsta
 
 static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const ndMatrix& location)
 {
-	ndMeshEffectNode* const meshEffectNode = LoadFbxMeshEffectNode(meshName);
+	ndFbxLoader loader;
+	ndMeshEffectNode* const meshEffectNode = loader.LoadMesh(meshName);
 	ndAssert(meshEffectNode);
 	meshEffectNode->m_matrix = location;
 

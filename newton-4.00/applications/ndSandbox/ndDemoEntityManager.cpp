@@ -562,7 +562,8 @@ ndSharedPtr<ndAnimationSequence> ndDemoEntityManager::GetAnimationSequence(const
 	ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fileName);
 	if (!node)
 	{
-		ndAnimationSequence* const sequence = LoadFbxAnimation(fileName);
+		ndFbxLoader loader;
+		ndAnimationSequence* const sequence = loader.LoadAnimation(fileName);
 		if (sequence)
 		{
 			node = m_animationCache.Insert(sequence, fileName);
