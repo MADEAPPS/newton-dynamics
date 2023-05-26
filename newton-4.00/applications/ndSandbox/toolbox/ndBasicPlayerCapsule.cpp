@@ -55,20 +55,14 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 
 	void OnTransform(ndInt32, const ndMatrix& matrix)
 	{
-		//ndDemoEntityNotify::OnTransform(thread, matrix);
 		const ndBody* const body = GetBody();
 		const ndQuaternion rot(body->GetRotation());
 		m_entity->SetMatrix(m_localRotation * rot, matrix.TransformVector(m_meshOrigin));
 		ndWorld* const word = m_manager->GetWorld();
 		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
 
-		//ndAssert(0);
-		//ndTrace(("Play animation here!!!!\n"));
 		ndFloat32 timestep = word->GetScene()->GetTimestep();
 		timestep *= 0.25f;
-		//timestep = 1.0f/(30.0f * 4.0f);
-		//timestep *= 0.05f;
-		//player->m_animBlendTree->Evaluate(player->m_output, timestep);
 		static ndFloat32 xxxx = 0.0f;
 		player->m_walkCycle->SetParam(xxxx);
 		xxxx += 5.0e-3f;
