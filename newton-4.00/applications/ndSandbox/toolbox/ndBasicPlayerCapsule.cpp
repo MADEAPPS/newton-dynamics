@@ -30,7 +30,7 @@
 #ifdef PLAYER_FIRST_PERSON	
 	#define PLAYER_THIRD_PERSON_VIEW_DIST	0.0f
 #else
-	#define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
+	#define PLAYER_THIRD_PERSON_VIEW_DIST	6.0f
 #endif
 
 void ndBasicPlayerCapsule::ndFileBasicPlayerCapsule::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
@@ -66,7 +66,7 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
 
 		//ndAssert(0);
-		ndTrace(("Play animation here!!!!\n"));
+		//ndTrace(("Play animation here!!!!\n"));
 		ndFloat32 timestep = word->GetScene()->GetTimestep();
 		timestep *= 0.25f;
 		//timestep = 1.0f/(30.0f * 4.0f);

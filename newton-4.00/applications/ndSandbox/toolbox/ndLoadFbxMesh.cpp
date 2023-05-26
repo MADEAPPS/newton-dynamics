@@ -689,9 +689,6 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 
 	static ndAnimationSequence* CreateSequence(ndMeshEffectNode* const model, const char* const name)
 	{
-		const ndFloat32 tol = 5.0e-5f;
-		const ndFloat32 tol2 = tol * tol;
-
 		ndAnimationSequence* const sequence = new ndAnimationSequence;
 		sequence->SetName(name);
 		//sequence->m_period = m_length;
@@ -712,63 +709,38 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 
 				ndMeshEffectNode::ndCurve& positCurve = ent->GetPositCurve();
 				OptimizeCurve(positCurve);
-				if (positCurve.GetCount() == 1)
+				for (ndMeshEffectNode::ndCurve::ndNode* srcNode = positCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 				{
-					const ndMeshEffectNode::ndCurveValue& value = positCurve.GetFirst()->GetInfo();
-
-					ndFloat32 dist_x = value.m_x - ent->m_matrix.m_posit.m_x;
-					ndFloat32 dist_y = value.m_y - ent->m_matrix.m_posit.m_y;
-					ndFloat32 dist_z = value.m_z - ent->m_matrix.m_posit.m_z;
-
-					ndVector err(dist_x, dist_y, dist_z, 0.0f);
-					ndFloat32 mag2 = err.DotProduct(err).GetScalar();
-					if (mag2 < tol2)
-					{
-						positCurve.RemoveAll();
-					}
-				}
-				else
-				{
-					for (ndMeshEffectNode::ndCurve::ndNode* srcNode = positCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
-					{
-						ndMeshEffectNode::ndCurveValue& keyFrame = srcNode->GetInfo();
-						track->m_position.m_param.PushBack(keyFrame.m_time);
-						track->m_position.PushBack(ndVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, ndFloat32(1.0f)));
-					}
+					ndMeshEffectNode::ndCurveValue& keyFrame = srcNode->GetInfo();
+					track->m_position.m_param.PushBack(keyFrame.m_time);
+					track->m_position.PushBack(ndVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, ndFloat32(1.0f)));
 				}
 
+				ndQuaternion rotation;
 				ndMeshEffectNode::ndCurve& rotationCurve = ent->GetRotationCurve();
 				OptimizeRotationCurve(rotationCurve);
-				if (rotationCurve.GetCount() == 1)
+				for (ndMeshEffectNode::ndCurve::ndNode* srcNode = rotationCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 				{
-					ndAssert(0);
-				}
-				else
-				{
-					ndQuaternion rotation;
-					for (ndMeshEffectNode::ndCurve::ndNode* srcNode = rotationCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
+					ndMeshEffectNode::ndCurveValue& keyFrame = srcNode->GetInfo();
+
+					const ndMatrix transform(ndPitchMatrix(keyFrame.m_x) * ndYawMatrix(keyFrame.m_y) * ndRollMatrix(keyFrame.m_z));
+					ndQuaternion quat(transform);
+					ndAssert(quat.DotProduct(quat).GetScalar() > 0.999f);
+					ndAssert(quat.DotProduct(quat).GetScalar() < 1.001f);
+
+					if (track->m_rotation.GetCount())
 					{
-						ndMeshEffectNode::ndCurveValue& keyFrame = srcNode->GetInfo();
-
-						const ndMatrix transform(ndPitchMatrix(keyFrame.m_x) * ndYawMatrix(keyFrame.m_y) * ndRollMatrix(keyFrame.m_z));
-						ndQuaternion quat(transform);
-						ndAssert(quat.DotProduct(quat).GetScalar() > 0.999f);
-						ndAssert(quat.DotProduct(quat).GetScalar() < 1.001f);
-
-						if (track->m_rotation.GetCount())
+						ndFloat32 dot = quat.DotProduct(rotation).GetScalar();
+						if (dot < ndFloat32(0.0f))
 						{
-							ndFloat32 dot = quat.DotProduct(rotation).GetScalar();
-							if (dot < ndFloat32(0.0f))
-							{
-								quat = quat.Scale(ndFloat32 (-1.0f));
-							}
+							quat = quat.Scale(ndFloat32 (-1.0f));
 						}
-
-						track->m_rotation.PushBack(quat);
-						track->m_rotation.m_param.PushBack(keyFrame.m_time);
-
-						rotation = quat;
 					}
+
+					track->m_rotation.PushBack(quat);
+					track->m_rotation.m_param.PushBack(keyFrame.m_time);
+
+					rotation = quat;
 				}
 			}
 

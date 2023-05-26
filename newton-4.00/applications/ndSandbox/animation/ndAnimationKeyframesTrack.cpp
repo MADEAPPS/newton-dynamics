@@ -78,6 +78,10 @@ void ndAnimationKeyFramesTrack::InterpolatePosition(ndFloat32 param, ndVector& p
 			const ndFloat32 t = (param - t0) / (t1 - t0 + ndFloat32(1.0e-6f));
 			posit = p0 + (p1 - p0).Scale(t);
 		}
+		else if (m_position.GetCount() == 1)
+		{
+			posit = m_position[0];
+		}
 		else
 		{
 			ndAssert(0);
