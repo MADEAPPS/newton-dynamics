@@ -20,6 +20,7 @@ class ndDemoEntity;
 class ndPhysicsWorld;
 class ndDemoEntityManager;
 class ndAnimationBlendTreeNode;
+class ndAnimationSequencePlayer;
 
 class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 {
@@ -71,7 +72,8 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 	bool m_isPlayer;
 
 	ndAnimationPose m_output;
-	ndAnimationBlendTreeNode* m_animBlendTree;
+	ndAnimationSequencePlayer* m_walkCycle;
+	ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 };
 
 #endif

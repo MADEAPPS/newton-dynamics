@@ -72,6 +72,9 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		//timestep = 1.0f/(30.0f * 4.0f);
 		//timestep *= 0.05f;
 		//player->m_animBlendTree->Evaluate(player->m_output, timestep);
+		static ndFloat32 xxxx = 0.0f;
+		player->m_walkCycle->SetParam(xxxx);
+		xxxx += 5.0e-3f;
 		player->m_animBlendTree->Evaluate(player->m_output);
 		
 		for (ndInt32 i = 0; i < player->m_output.GetCount(); ++i)
@@ -100,6 +103,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	//,m_scene(scene)
 	,m_isPlayer(isPlayer)
 	,m_output()
+	,m_walkCycle(nullptr)
 	,m_animBlendTree(nullptr)
 {
 	static ndFileBasicPlayerCapsule loadSave;
@@ -122,8 +126,6 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	{
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 	}
-
-	ndTrace(("Not animation yet  !!!!\n"));
 
 	//// create bind pose to animation sequences.
 	//ndAnimationSequence* const sequence = scene->GetAnimationSequence("white_Man_idle.fbx");
@@ -160,7 +162,9 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	//idleMoveBlend->SetParam(1.0f);
 	////walkRunBlend->SetTimeDilation1(scale1);
 	//m_animBlendTree = idleMoveBlend;
-	m_animBlendTree = walk;
+	m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode> (walk);
+
+	m_walkCycle = walk;
 	 
 	//// evaluate twice that interpolation is reset
 	//ndAssert(0);
@@ -170,10 +174,6 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 
 ndBasicPlayerCapsule::~ndBasicPlayerCapsule()
 {
-	if (m_animBlendTree)
-	{
-		delete m_animBlendTree;
-	}
 }
 
 void ndBasicPlayerCapsule::ApplyInputs(ndFloat32 timestep)
