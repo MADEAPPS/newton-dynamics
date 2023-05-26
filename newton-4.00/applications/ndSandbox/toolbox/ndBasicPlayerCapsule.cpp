@@ -75,6 +75,10 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		static ndFloat32 xxxx = 0.0f;
 		player->m_walkCycle->SetParam(xxxx);
 		xxxx += 5.0e-3f;
+		if (xxxx > 1.0f)
+		{
+			xxxx -= 1.0f;
+		}
 		player->m_animBlendTree->Evaluate(player->m_output);
 		
 		for (ndInt32 i = 0; i < player->m_output.GetCount(); ++i)
