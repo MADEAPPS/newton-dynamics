@@ -1745,7 +1745,31 @@ struct AnimationCurveNodeImpl : AnimationCurveNode
 
 			if (fbx_time < times[0]) fbx_time = times[0];
 			if (fbx_time > times[count - 1]) fbx_time = times[count - 1];
-			for (int i = 1; i < count; ++i)
+			//for (int i = 1; i < count; ++i)
+			//{
+			//	if (times[i] >= fbx_time)
+			//	{
+			//		float t = float(double(fbx_time - times[i - 1]) / double(times[i] - times[i - 1]));
+			//		return values[i - 1] * (1 - t) + values[i] * t;
+			//	}
+			//}
+			int i0 = 1;
+			int i2 = count - 1;
+			while ((i2 - i0) >= 4)
+			{
+				int i1 = (i2 + i0) >> 1;
+				const i64 midTime = times[i1];
+				if (midTime > fbx_time)
+				{
+					i2 = i1;
+				}
+				else
+				{
+					i0 = i1;
+				}
+			}
+			assert(times[i2] >= fbx_time);
+			for (int i = i0; i < count; ++i)
 			{
 				if (times[i] >= fbx_time)
 				{
@@ -1753,6 +1777,7 @@ struct AnimationCurveNodeImpl : AnimationCurveNode
 					return values[i - 1] * (1 - t) + values[i] * t;
 				}
 			}
+
 			return values[0];
 		};
 

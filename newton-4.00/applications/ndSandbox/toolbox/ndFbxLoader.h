@@ -48,7 +48,7 @@ class ndFbxLoader
 	ndMeshEffectNode* LoadMeshEffectNodeHierarchy(ofbx::IScene* const fbxScene, ndFbxMeshEffectNodeGlobalNodeMap& nodeMap);
 	ndMatrix GetKeyframe(ndMeshEffectNode::ndCurveValue& scale, ndMeshEffectNode::ndCurveValue& position, ndMeshEffectNode::ndCurveValue& rotation);
 	void LoadAnimationLayer(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const fbxScene, const ofbx::AnimationLayer* const animLayer);
-	void LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, ndFloat32 timestep, int framesCount);
+	void LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, ndFloat32 duration, ndFloat32 timestep, ndInt32 framesCount);
 };
 
 #endif

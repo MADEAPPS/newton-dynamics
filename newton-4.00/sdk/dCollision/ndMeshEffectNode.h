@@ -42,8 +42,10 @@ class ndMeshEffectNode : public ndNodeHierarchy<ndMeshEffectNode>
 		public:
 		ndCurve()
 			:ndList<ndCurveValue>()
+			,m_lenght(ndFloat32 (0.0f))
 		{
 		}
+		ndFloat32 m_lenght;
 	};
 
 	D_COLLISION_API ndMeshEffectNode(ndMeshEffectNode* const parent);

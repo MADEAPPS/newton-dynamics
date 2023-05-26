@@ -57,6 +57,13 @@ class ndFbxAnimationTrack
 	{
 	}
 
+	void SetDuration(ndFloat32 duration)
+	{
+		m_scale.m_lenght = duration;
+		m_position.m_lenght = duration;
+		m_rotation.m_lenght = duration;
+	}
+
 	void AddKeyframe(ndFloat32 time, const ndMatrix& matrix)
 	{
 		ndVector scale;
@@ -718,7 +725,7 @@ ndMeshEffectNode* ndFbxLoader::FbxToMeshEffectNode(ofbx::IScene* const fbxScene)
 	return entity;
 }
 
-void ndFbxLoader::LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, ndFloat32 timestep, int framesCount)
+void ndFbxLoader::LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, ndFloat32 duration, ndFloat32 timestep, int framesCount)
 {
 	const ofbx::AnimationCurveNode* const scaleNode = animLayer->getCurveNode(*bone, "Lcl Scaling");
 	const ofbx::AnimationCurveNode* const rotationNode = animLayer->getCurveNode(*bone, "Lcl Rotation");
@@ -726,13 +733,11 @@ void ndFbxLoader::LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tra
 	if (scaleNode || rotationNode || translationNode)
 	{
 		ndFbxAnimationTrack& track = tracks.Insert(bone->name)->GetInfo();
+		track.SetDuration(duration);
 
 		Vec3 scale;
 		Vec3 rotation;
 		Vec3 translation;
-
-		ndFloat32 timeAcc = 0.0f;
-		//ndFloat32 timestep = m_timestep;
 
 		ndVector scale1;
 		ndVector euler1;
@@ -742,7 +747,8 @@ void ndFbxLoader::LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tra
 		boneMatrix.PolarDecomposition(transform, scale1, eigenScaleAxis);
 		ndVector euler0(transform.CalcPitchYawRoll(euler1));
 		euler0 = euler0.Scale(180.0f / ndPi);
-		//for (ndInt32 i = 0; i < m_framesCount; ++i)
+
+		ndFloat32 timeAcc = 0.0f;
 		for (ndInt32 i = 0; i < framesCount; ++i)
 		{
 			scale.x = scale1.m_x;
@@ -785,8 +791,6 @@ void ndFbxLoader::LoadAnimationLayer(ndTree <ndFbxAnimationTrack, ndString>& tra
 	stack = GetChildrenNodes(rootNode, stackPool);
 
 	const ofbx::TakeInfo* const animationInfo = fbxScene->getTakeInfo(0);
-	//animation.m_length = ndFloat32(animationInfo->local_time_to - animationInfo->local_time_from);
-
 	ndFloat32 period = ndFloat32(animationInfo->local_time_to - animationInfo->local_time_from);
 	ndFloat32 framesFloat = period * D_ANIM_BASE_FREQ;
 
@@ -794,27 +798,18 @@ void ndFbxLoader::LoadAnimationLayer(ndTree <ndFbxAnimationTrack, ndString>& tra
 	ndAssert(frames > 0);
 	ndFloat32 timestep = period / (ndFloat32)frames;
 
-	//m_length = period;
-	//m_timestep = timestep;
-	//m_framesCount = frames;
-
 	while (stack)
 	{
 		stack--;
 		ofbx::Object* const bone = stackPool[stack];
-		LoadAnimationCurve(tracks, fbxScene, bone, animLayer, timestep, frames);
+		LoadAnimationCurve(tracks, fbxScene, bone, animLayer, period, timestep, frames);
 
 		stack += GetChildrenNodes(bone, &stackPool[stack]);
 		ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0]) - 64));
 	}
 }
 
-//dFbxAnimation(const ofbx::IScene* const fbxScene, ndMeshEffectNode* const model)
 void ndFbxLoader::LoadAnimation(const ofbx::IScene* const fbxScene, ndMeshEffectNode* const model)
-//	:ndTree <ndFbxAnimationTrack, ndString>()
-//	, m_length(0.0f)
-//	, m_timestep(0.0f)
-//	, m_framesCount(0)
 {
 	ndInt32 animationCount = fbxScene->getAnimationStackCount();
 	// only load one animation per file
@@ -842,7 +837,6 @@ void ndFbxLoader::LoadAnimation(const ofbx::IScene* const fbxScene, ndMeshEffect
 	{
 		stack--;
 		ndMeshEffectNode* const ent = entBuffer[stack];
-		//ndNode* const node = Find(ent->GetName());
 		ndTree <ndFbxAnimationTrack, ndString>::ndNode* node = tracks.Find(ent->GetName());
 		if (node)
 		{
@@ -850,6 +844,7 @@ void ndFbxLoader::LoadAnimation(const ofbx::IScene* const fbxScene, ndMeshEffect
 
 			ndMeshEffectNode::ndCurve& scale = ent->GetScaleCurve();
 			scale.RemoveAll();
+			scale.m_lenght = track->m_scale.m_lenght;
 			for (ndMeshEffectNode::ndCurve::ndNode* srcNode = track->m_scale.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 			{
 				scale.Append(srcNode->GetInfo());
@@ -857,6 +852,7 @@ void ndFbxLoader::LoadAnimation(const ofbx::IScene* const fbxScene, ndMeshEffect
 
 			ndMeshEffectNode::ndCurve& posit = ent->GetPositCurve();
 			posit.RemoveAll();
+			posit.m_lenght = track->m_position.m_lenght;
 			for (ndMeshEffectNode::ndCurve::ndNode* srcNode = track->m_position.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 			{
 				posit.Append(srcNode->GetInfo());
@@ -864,6 +860,7 @@ void ndFbxLoader::LoadAnimation(const ofbx::IScene* const fbxScene, ndMeshEffect
 
 			ndMeshEffectNode::ndCurve& rotation = ent->GetRotationCurve();
 			rotation.RemoveAll();
+			rotation.m_lenght = track->m_rotation.m_lenght;
 			for (ndMeshEffectNode::ndCurve::ndNode* srcNode = track->m_rotation.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 			{
 				rotation.Append(srcNode->GetInfo());
@@ -979,7 +976,6 @@ ndAnimationSequence* ndFbxLoader::CreateSequence(ndMeshEffectNode* const model, 
 		{
 			ndAnimationKeyFramesTrack* const track = sequence->AddTrack();
 			track->m_name = ent->GetName();
-			//dTrace(("name: %s\n", track->m_name.GetStr()));
 
 			ndMeshEffectNode::ndCurve& positCurve = ent->GetPositCurve();
 			OptimizeCurve(positCurve);
@@ -1054,7 +1050,6 @@ ndMeshEffectNode* ndFbxLoader::LoadFbxMesh(const char* const fileName, bool load
 	ndMeshEffectNode* const meshEffectNode = FbxToMeshEffectNode(*fbxScene);
 	if (loadAnimation)
 	{
-		//dFbxAnimation animation (*fbxScene, meshEffectNode);
 		LoadAnimation(*fbxScene, meshEffectNode);
 	}
 

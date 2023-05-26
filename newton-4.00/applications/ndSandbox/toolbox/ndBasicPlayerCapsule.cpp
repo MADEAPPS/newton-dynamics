@@ -72,9 +72,10 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		static ndFloat32 xxxx = 0.0f;
 		player->m_walkCycle->SetParam(xxxx);
 		xxxx += 5.0e-3f;
-		if (xxxx > 1.0f)
+		float xxxxxx = 1.0f;
+		if (xxxx > xxxxxx)
 		{
-			xxxx -= 1.0f;
+			xxxx -= xxxxxx;
 		}
 		player->m_animBlendTree->Evaluate(player->m_output);
 		
