@@ -17,10 +17,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndAnimationSequence.h"
 #include "ndBasicPlayerCapsule.h"
-#include "ndAnimationTwoWayBlend.h"
-#include "ndAnimationSequencePlayer.h"
 
 #define PLAYER_WALK_SPEED				8.0f
 #define PLAYER_JUMP_SPEED				5.0f

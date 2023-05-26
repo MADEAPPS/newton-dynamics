@@ -21,15 +21,12 @@ file(GLOB CPP_SOURCE
 	demos/*.cpp
 	toolbox/*.h
 	toolbox/*.cpp 
-	animation/*.h
-	animation/*.cpp 
 )
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(.)
 include_directories(toolbox)
-include_directories(animation)
 include_directories(../../sdk/dCore)
 include_directories(../../sdk/dBrain)
 include_directories(../../sdk/dModel)

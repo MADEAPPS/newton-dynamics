@@ -31,8 +31,8 @@ class ndAnimationSequencePlayer: public ndAnimationBlendTreeNode
 	ndSharedPtr<ndAnimationSequence>& GetSequence();
 
 	private:
-	ndFloat32 m_param;
 	ndSharedPtr<ndAnimationSequence> m_sequence;
+	ndFloat32 m_param;
 };
 
 #endif

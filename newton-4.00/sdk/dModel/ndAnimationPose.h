@@ -12,8 +12,6 @@
 #ifndef __D_ANIMATION_POSE_h__
 #define __D_ANIMATION_POSE_h__
 
-#include "ndSandboxStdafx.h"
-
 class ndAnimKeyframe
 {
 	public:

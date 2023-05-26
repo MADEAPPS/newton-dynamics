@@ -29,7 +29,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"
 #include "ndDemoCameraManager.h"
-#include "ndAnimationSequence.h"
 #include "ndHighResolutionTimer.h"
 
 //#define ENABLE_REPLAY

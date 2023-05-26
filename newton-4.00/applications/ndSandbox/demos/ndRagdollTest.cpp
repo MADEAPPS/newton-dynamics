@@ -20,12 +20,7 @@
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
-
-#include "ndAnimationPose.h"
-#include "ndAnimationSequence.h"
 #include "ndBasicPlayerCapsule.h"
-#include "ndAnimationKeyframesTrack.h"
-#include "ndAnimationSequencePlayer.h"
 
 namespace ndRagdoll
 {

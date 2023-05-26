@@ -15,7 +15,6 @@
 #include "ndFbxLoader.h"
 #include "ndDemoCamera.h"
 #include "ndDemoSkinMesh.h"
-#include "ndAnimationPose.h"
 
 ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 	:ndNodeHierarchy<ndDemoEntity>()

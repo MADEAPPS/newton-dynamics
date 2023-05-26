@@ -16,7 +16,6 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
-#include "ndAnimationSequence.h"
 
 using namespace ofbx;
 

@@ -9,7 +9,7 @@
 * freely
 */
 
-#include "ndSandboxStdafx.h"
+#include "ndModelStdafx.h"
 #include "ndAnimationPose.h"
 #include "ndAnimationBlendTreeNode.h"
 

@@ -13,7 +13,6 @@
 #define _D_BASIC_PLAYER_CAPSULE_H_
 
 #include "ndSandboxStdafx.h"
-#include "ndAnimationPose.h"
 
 class ndDemoMesh;
 class ndDemoEntity;

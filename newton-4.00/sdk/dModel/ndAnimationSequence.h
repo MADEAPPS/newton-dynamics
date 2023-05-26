@@ -12,7 +12,6 @@
 #ifndef __D_ANIMIMATION_SEQUENCE_h__
 #define __D_ANIMIMATION_SEQUENCE_h__
 
-#include "ndSandboxStdafx.h"
 #include "ndAnimationKeyframesTrack.h"
 
 class ndAnimationPose;

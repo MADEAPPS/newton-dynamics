@@ -18,11 +18,8 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
-#include "ndAnimationPose.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
-#include "ndAnimationSequencePlayer.h"
-
 
 namespace ndZmp
 {

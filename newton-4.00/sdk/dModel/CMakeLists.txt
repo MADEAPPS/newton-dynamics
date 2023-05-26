@@ -24,7 +24,13 @@ include_directories(../dNewton/dModels)
 include_directories(../dNewton/dIkSolver)
 include_directories(../dNewton/dModels/dVehicle)
 
-file(GLOB CPP_SOURCE *.cpp *.h)
+include_directories(animation)
+
+file(GLOB CPP_SOURCE 
+	*.h
+	*.cpp
+)
+
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 add_library(${projectName} STATIC ${CPP_SOURCE})

@@ -18,10 +18,8 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
-#include "ndAnimationPose.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
-#include "ndAnimationSequencePlayer.h"
 
 namespace ndQuadruped_2
 {
@@ -290,7 +288,6 @@ namespace ndQuadruped_2
 				ndBodyKinematic* const body = effector->GetBody0();
 				ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
 				ndBodyKinematic::ndContactMap& contactMap1 = body->GetContactMap();
-
 			}
 		}
 

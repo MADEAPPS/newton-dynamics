@@ -18,13 +18,10 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
-#include "ndAnimationPose.h"
 #include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndAnimationSequence.h"
 #include "ndDemoInstanceEntity.h"
-#include "ndAnimationSequencePlayer.h"
 
 namespace ndQuadruped_3
 {

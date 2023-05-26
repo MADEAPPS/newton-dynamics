@@ -25,7 +25,13 @@
 #include <ndModelStdafx.h>
 
 #include <ndModelNotify.h>
+#include <ndAnimationPose.h>
+#include <ndAnimationSequence.h>
 #include <ndModelPassiveRagdoll.h>
+#include <ndAnimationTwoWayBlend.h>
+#include <ndAnimationBlendTreeNode.h>
+#include <ndAnimationKeyframesTrack.h>
+#include <ndAnimationSequencePlayer.h>
 
 #endif 
 
