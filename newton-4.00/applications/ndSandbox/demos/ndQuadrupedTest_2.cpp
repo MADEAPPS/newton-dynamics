@@ -13,8 +13,8 @@
 #include "ndSkyBox.h"
 #include "ndUIEntity.h"
 #include "ndDemoMesh.h"
+#include "ndFbxLoader.h"
 #include "ndDemoCamera.h"
-#include "ndLoadFbxMesh.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
@@ -22,7 +22,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 #include "ndAnimationSequencePlayer.h"
-
 
 namespace ndQuadruped_2
 {

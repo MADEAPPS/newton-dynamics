@@ -108,3 +108,82 @@ void ndMeshEffectNode::SetMesh(const ndSharedPtr<ndMeshEffect>& mesh)
 {
 	m_mesh = mesh;
 }
+
+void ndMeshEffectNode::ApplyTransform(const ndMatrix& transform)
+{
+	ndInt32 stack = 1;
+	ndMeshEffectNode* entBuffer[1024];
+
+	auto GetKeyframe = [](const ndCurveValue& scale, const ndCurveValue& position, const ndCurveValue& rotation)
+	{
+		ndMatrix scaleMatrix(ndGetIdentityMatrix());
+		scaleMatrix[0][0] = scale.m_x;
+		scaleMatrix[1][1] = scale.m_y;
+		scaleMatrix[2][2] = scale.m_z;
+		ndMatrix matrix(scaleMatrix * ndPitchMatrix(rotation.m_x) * ndYawMatrix(rotation.m_y) * ndRollMatrix(rotation.m_z));
+		matrix.m_posit = ndVector(position.m_x, position.m_y, position.m_z, 1.0f);
+		return matrix;
+	};
+
+	entBuffer[0] = this;
+	ndMatrix invTransform(transform.Inverse4x4());
+	while (stack)
+	{
+		stack--;
+		ndMeshEffectNode* const ent = entBuffer[stack];
+
+		ndMatrix entMatrix(invTransform * ent->m_matrix * transform);
+		ent->m_matrix = entMatrix;
+
+		ndSharedPtr<ndMeshEffect> mesh = ent->GetMesh();
+		if (*mesh)
+		{
+			ndMatrix meshMatrix(invTransform * ent->m_meshMatrix * transform);
+			ent->m_meshMatrix = meshMatrix;
+			mesh->ApplyTransform(transform);
+		}
+
+		if (ent->GetScaleCurve().GetCount())
+		{
+			ndMeshEffectNode::ndCurve::ndNode* positNode = ent->GetPositCurve().GetFirst();
+			ndMeshEffectNode::ndCurve::ndNode* rotationNode = ent->GetRotationCurve().GetFirst();
+
+			ndMeshEffectNode::ndCurveValue scaleValue;
+			scaleValue.m_x = 1.0f;
+			scaleValue.m_y = 1.0f;
+			scaleValue.m_z = 1.0f;
+			for (ndInt32 i = 0; i < ent->GetScaleCurve().GetCount(); ++i)
+			{
+				ndMeshEffectNode::ndCurveValue& positValue = positNode->GetInfo();
+				ndMeshEffectNode::ndCurveValue& rotationValue = rotationNode->GetInfo();
+
+				ndVector animScale;
+				ndMatrix stretchAxis;
+				ndMatrix animTransformMatrix;
+				ndMatrix keyframe(invTransform * GetKeyframe(scaleValue, positValue, rotationValue) * transform);
+				keyframe.PolarDecomposition(animTransformMatrix, animScale, stretchAxis);
+
+				ndVector euler0;
+				ndVector euler(animTransformMatrix.CalcPitchYawRoll(euler0));
+
+				rotationValue.m_x = euler.m_x;
+				rotationValue.m_y = euler.m_y;
+				rotationValue.m_z = euler.m_z;
+
+				positValue.m_x = animTransformMatrix.m_posit.m_x;
+				positValue.m_y = animTransformMatrix.m_posit.m_y;
+				positValue.m_z = animTransformMatrix.m_posit.m_z;
+
+				positNode = positNode->GetNext();
+				rotationNode = rotationNode->GetNext();
+			}
+		}
+
+		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
+		{
+			entBuffer[stack] = child;
+			stack++;
+			ndAssert(stack < sizeof(entBuffer) / sizeof (entBuffer[0]));
+		}
+	}
+}

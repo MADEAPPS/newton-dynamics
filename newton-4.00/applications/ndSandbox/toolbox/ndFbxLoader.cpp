@@ -362,68 +362,69 @@ void ndFbxLoader::FreezeScale(ndMeshEffectNode* const entity)
 
 void ndFbxLoader::ApplyTransform(ndMeshEffectNode* const entity, const ndMatrix& transform)
 {
-	ndInt32 stack = 1;
-	ndMeshEffectNode* entBuffer[1024];
-	entBuffer[0] = entity;
-	ndMatrix invTransform(transform.Inverse4x4());
-	while (stack)
-	{
-		stack--;
-		ndMeshEffectNode* const ent = entBuffer[stack];
-
-		ndMatrix entMatrix(invTransform * ent->m_matrix * transform);
-		ent->m_matrix = entMatrix;
-
-		ndSharedPtr<ndMeshEffect> mesh = ent->GetMesh();
-		if (*mesh)
-		{
-			ndMatrix meshMatrix(invTransform * ent->m_meshMatrix * transform);
-			ent->m_meshMatrix = meshMatrix;
-			mesh->ApplyTransform(transform);
-		}
-
-		if (ent->GetScaleCurve().GetCount())
-		{
-			ndMeshEffectNode::ndCurve::ndNode* positNode = ent->GetPositCurve().GetFirst();
-			ndMeshEffectNode::ndCurve::ndNode* rotationNode = ent->GetRotationCurve().GetFirst();
-
-			ndMeshEffectNode::ndCurveValue scaleValue;
-			scaleValue.m_x = 1.0f;
-			scaleValue.m_y = 1.0f;
-			scaleValue.m_z = 1.0f;
-			for (ndInt32 i = 0; i < ent->GetScaleCurve().GetCount(); ++i)
-			{
-				ndMeshEffectNode::ndCurveValue& positValue = positNode->GetInfo();
-				ndMeshEffectNode::ndCurveValue& rotationValue = rotationNode->GetInfo();
-
-				ndVector animScale;
-				ndMatrix stretchAxis;
-				ndMatrix animTransformMatrix;
-				ndMatrix keyframe(invTransform * GetKeyframe(scaleValue, positValue, rotationValue) * transform);
-				keyframe.PolarDecomposition(animTransformMatrix, animScale, stretchAxis);
-
-				ndVector euler0;
-				ndVector euler(animTransformMatrix.CalcPitchYawRoll(euler0));
-
-				rotationValue.m_x = euler.m_x;
-				rotationValue.m_y = euler.m_y;
-				rotationValue.m_z = euler.m_z;
-
-				positValue.m_x = animTransformMatrix.m_posit.m_x;
-				positValue.m_y = animTransformMatrix.m_posit.m_y;
-				positValue.m_z = animTransformMatrix.m_posit.m_z;
-
-				positNode = positNode->GetNext();
-				rotationNode = rotationNode->GetNext();
-			}
-		}
-
-		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
-		{
-			entBuffer[stack] = child;
-			stack++;
-		}
-	}
+	entity->ApplyTransform(transform);
+	//ndInt32 stack = 1;
+	//ndMeshEffectNode* entBuffer[1024];
+	//entBuffer[0] = entity;
+	//ndMatrix invTransform(transform.Inverse4x4());
+	//while (stack)
+	//{
+	//	stack--;
+	//	ndMeshEffectNode* const ent = entBuffer[stack];
+	//
+	//	ndMatrix entMatrix(invTransform * ent->m_matrix * transform);
+	//	ent->m_matrix = entMatrix;
+	//
+	//	ndSharedPtr<ndMeshEffect> mesh = ent->GetMesh();
+	//	if (*mesh)
+	//	{
+	//		ndMatrix meshMatrix(invTransform * ent->m_meshMatrix * transform);
+	//		ent->m_meshMatrix = meshMatrix;
+	//		mesh->ApplyTransform(transform);
+	//	}
+	//
+	//	if (ent->GetScaleCurve().GetCount())
+	//	{
+	//		ndMeshEffectNode::ndCurve::ndNode* positNode = ent->GetPositCurve().GetFirst();
+	//		ndMeshEffectNode::ndCurve::ndNode* rotationNode = ent->GetRotationCurve().GetFirst();
+	//
+	//		ndMeshEffectNode::ndCurveValue scaleValue;
+	//		scaleValue.m_x = 1.0f;
+	//		scaleValue.m_y = 1.0f;
+	//		scaleValue.m_z = 1.0f;
+	//		for (ndInt32 i = 0; i < ent->GetScaleCurve().GetCount(); ++i)
+	//		{
+	//			ndMeshEffectNode::ndCurveValue& positValue = positNode->GetInfo();
+	//			ndMeshEffectNode::ndCurveValue& rotationValue = rotationNode->GetInfo();
+	//
+	//			ndVector animScale;
+	//			ndMatrix stretchAxis;
+	//			ndMatrix animTransformMatrix;
+	//			ndMatrix keyframe(invTransform * GetKeyframe(scaleValue, positValue, rotationValue) * transform);
+	//			keyframe.PolarDecomposition(animTransformMatrix, animScale, stretchAxis);
+	//
+	//			ndVector euler0;
+	//			ndVector euler(animTransformMatrix.CalcPitchYawRoll(euler0));
+	//
+	//			rotationValue.m_x = euler.m_x;
+	//			rotationValue.m_y = euler.m_y;
+	//			rotationValue.m_z = euler.m_z;
+	//
+	//			positValue.m_x = animTransformMatrix.m_posit.m_x;
+	//			positValue.m_y = animTransformMatrix.m_posit.m_y;
+	//			positValue.m_z = animTransformMatrix.m_posit.m_z;
+	//
+	//			positNode = positNode->GetNext();
+	//			rotationNode = rotationNode->GetNext();
+	//		}
+	//	}
+	//
+	//	for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
+	//	{
+	//		entBuffer[stack] = child;
+	//		stack++;
+	//	}
+	//}
 }
 
 void ndFbxLoader::AlignToWorld(ndMeshEffectNode* const entity)

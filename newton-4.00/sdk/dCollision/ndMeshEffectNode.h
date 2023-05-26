@@ -62,6 +62,8 @@ class ndMeshEffectNode : public ndNodeHierarchy<ndMeshEffectNode>
 	D_COLLISION_API ndCurve& GetPositCurve();
 	D_COLLISION_API ndCurve& GetRotationCurve();
 
+	D_COLLISION_API void ApplyTransform(const ndMatrix& transform);
+
 	ndMatrix m_matrix;
 	ndMatrix m_meshMatrix;
 

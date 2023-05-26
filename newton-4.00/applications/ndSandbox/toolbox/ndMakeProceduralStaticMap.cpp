@@ -11,8 +11,8 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndDemoMesh.h"
+#include "ndFbxLoader.h"
 #include "ndDemoEntity.h"
-#include "ndLoadFbxMesh.h"
 #include "ndDebugDisplay.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
