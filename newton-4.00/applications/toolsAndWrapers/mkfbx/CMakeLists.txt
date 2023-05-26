@@ -20,4 +20,7 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/MT")
 set(CMAKE_CXX_FLAGS_RELEASE "/MT")
 
 add_executable(${projectName} ${CPP_SOURCE})
+
+target_link_libraries (${projectName} "zlib-mt.lib")
+target_link_libraries (${projectName} "libxml2-mt.lib")
 target_link_libraries (${projectName} "libfbxsdk-mt.lib")
