@@ -12,10 +12,6 @@
 #ifndef _D_LOAD_FBX_MESH_H_
 #define _D_LOAD_FBX_MESH_H_
 
-#include "ndSandboxStdafx.h"
-#include "ndDemoEntity.h"
-
-class ndDemoEntityManager;
 class ndAnimationSequence;
 class ndFbxAnimationTrack;
 class ndFbxMeshEffectNodeGlobalNodeMap;

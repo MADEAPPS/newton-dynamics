@@ -10,12 +10,7 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndDemoMesh.h"
 #include "ndFbxLoader.h"
-#include "ndDemoSkinMesh.h"
-#include "ndPhysicsUtils.h"
-#include "ndPhysicsWorld.h"
-#include "ndDemoEntityManager.h"
 
 using namespace ofbx;
 
