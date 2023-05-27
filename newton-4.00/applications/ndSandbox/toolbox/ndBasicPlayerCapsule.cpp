@@ -93,7 +93,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule()
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndDemoEntityManager* const scene, const ndDemoEntity* const modelEntity,
-	const ndMatrix& localAxis, const ndMatrix& location,
+	const ndMatrix& localAxis, const ndMatrix& location, float meshScale,
 	ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight, bool isPlayer)
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 	//,m_scene(scene)
@@ -125,7 +125,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 
 	//// create bind pose to animation sequences.
 	//ndAnimationSequence* const sequence = scene->GetAnimationSequence("white_Man_idle.fbx");
-	ndSharedPtr<ndAnimationSequence> sequence(scene->GetAnimationSequence("mocapWalker_walk.fbx"));
+	ndSharedPtr<ndAnimationSequence> sequence(scene->GetAnimationSequence("mocapWalker_walk.fbx", meshScale));
 
 	const ndList<ndAnimationKeyFramesTrack>& tracks = sequence->GetTracks();
 	for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext()) 
@@ -142,7 +142,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	//ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("white_man_walk.fbx");
 	//ndAnimationSequence* const runSequence = scene->GetAnimationSequence("white_man_run.fbx");
 
-	ndSharedPtr<ndAnimationSequence> walkSequence(scene->GetAnimationSequence("mocapWalker_walk.fbx"));
+	ndSharedPtr<ndAnimationSequence> walkSequence(scene->GetAnimationSequence("mocapWalker_walk.fbx", meshScale));
 	
 	//ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
 	ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);

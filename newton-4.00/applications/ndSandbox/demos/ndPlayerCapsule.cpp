@@ -12,7 +12,6 @@
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
-#include "ndFbxLoader.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
@@ -41,23 +40,25 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	ndFloat32 radio = 0.5f;
 	ndFloat32 mass = 100.0f;
 
+	ndFloat32 meshScale = 1.2f;
+
 	ndPhysicsWorld* const world = scene->GetWorld();
 	//ndSharedPtr<ndDemoEntity> entity(ndDemoEntity::LoadFbx("walker.fbx", scene));
-	ndSharedPtr<ndDemoEntity> entity(ndDemoEntity::LoadFbx("mocapWalker.fbx", scene));
+	ndSharedPtr<ndDemoEntity> entity(ndDemoEntity::LoadFbx("mocapWalker.fbx", scene, meshScale));
 	//ndSharedPtr<ndDemoEntity> entity(ndDemoEntity::LoadFbx("box.fbx", scene));
 	
-	ndSharedPtr<ndBody> player0(new ndBasicPlayerCapsule(scene, *entity, localAxis, location, mass, radio, height, height / 4.0f, true));
+	ndSharedPtr<ndBody> player0(new ndBasicPlayerCapsule(scene, *entity, localAxis, location, meshScale, mass, radio, height, height / 4.0f, true));
 	world->AddBody(player0);
 
-	ndSharedPtr<ndBody> player1(new ndBasicPlayerCapsule(scene, *entity, localAxis, location, mass, radio, height, height/4.0f));
+	ndSharedPtr<ndBody> player1(new ndBasicPlayerCapsule(scene, *entity, localAxis, location, meshScale, mass, radio, height, height/4.0f));
 	//world->AddBody(player1);
 
 	location.m_posit.m_z += 2.0f;
-	ndSharedPtr<ndBody> player2(new ndBasicPlayerCapsule(scene, *entity, localAxis, location, mass, radio, height, height / 4.0f));
+	ndSharedPtr<ndBody> player2(new ndBasicPlayerCapsule(scene, *entity, localAxis, location, meshScale, mass, radio, height, height / 4.0f));
 	//world->AddBody(player2);
 	
 	location.m_posit.m_z += 2.0f;
-	ndSharedPtr<ndBody> player3(new ndBasicPlayerCapsule(scene, *entity, localAxis, location, mass, radio, height, height / 4.0f));
+	ndSharedPtr<ndBody> player3(new ndBasicPlayerCapsule(scene, *entity, localAxis, location, meshScale, mass, radio, height, height / 4.0f));
 	//world->AddBody(player3);
 
 	class PlaceMatrix : public ndMatrix

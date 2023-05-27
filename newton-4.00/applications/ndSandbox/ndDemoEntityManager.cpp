@@ -12,8 +12,8 @@
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
-#include "ndFbxLoader.h"
 #include "ndVehicleUI.h"
+#include "ndMeshLoader.h"
 #include "ndDemoEntity.h"
 #include "ndDemoCamera.h"
 #include "ndShaderCache.h"
@@ -556,12 +556,12 @@ bool ndDemoEntityManager::GetKeyState(ndInt32 key) const
 	return state;
 }
 
-ndSharedPtr<ndAnimationSequence> ndDemoEntityManager::GetAnimationSequence(const char* const fileName)
+ndSharedPtr<ndAnimationSequence> ndDemoEntityManager::GetAnimationSequence(const char* const fileName, ndFloat32 scale)
 {
 	ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fileName);
 	if (!node)
 	{
-		ndFbxLoader loader;
+		ndMeshLoader loader(scale);
 		ndAnimationSequence* const sequence = loader.LoadAnimation(fileName);
 		if (sequence)
 		{

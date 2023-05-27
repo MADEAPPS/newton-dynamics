@@ -25,6 +25,7 @@ include_directories(../dNewton/dModels)
 include_directories(../dNewton/dIkSolver)
 include_directories(../dNewton/dModels/dVehicle)
 include_directories(../../thirdParty/tinyxml)
+include_directories(../../thirdParty/openFBX/src)
 
 file(GLOB CPP_SOURCE *.cpp *.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})

@@ -28,7 +28,7 @@ class ndDemoEntity: public ndNodeHierarchy<ndDemoEntity>
 	ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* const meshEffect);
 	virtual ~ndDemoEntity(void);
 
-	static ndDemoEntity* LoadFbx (const char* const filename, ndDemoEntityManager* const scene);
+	static ndDemoEntity* LoadFbx (const char* const filename, ndDemoEntityManager* const scene, ndFloat32 scale = 1.0f);
 
 	ndSharedPtr<ndDemoMeshInterface> GetMesh();
 	void SetMesh(ndSharedPtr<ndDemoMeshInterface> mesh, const ndMatrix& meshMatrix = ndGetIdentityMatrix());

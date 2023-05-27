@@ -56,7 +56,7 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 	ndBasicPlayerCapsule();
 	ndBasicPlayerCapsule(
 		ndDemoEntityManager* const scene, const ndDemoEntity* const modelEntity,
-		const ndMatrix& localAxis, const ndMatrix& location, 
+		const ndMatrix& localAxis, const ndMatrix& location, float meshScale,
 		ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight, bool isPlayer = false);
 	~ndBasicPlayerCapsule();
 

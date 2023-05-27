@@ -13,7 +13,6 @@
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
 #include "ndVehicleUI.h"
-#include "ndFbxLoader.h"
 #include "ndDemoCamera.h"
 #include "ndSoundManager.h"
 #include "ndPhysicsUtils.h"

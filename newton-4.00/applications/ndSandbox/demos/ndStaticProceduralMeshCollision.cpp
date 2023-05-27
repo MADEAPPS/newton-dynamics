@@ -12,7 +12,6 @@
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
-#include "ndFbxLoader.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
@@ -39,14 +38,14 @@ void ndStaticUserMeshCollisionDemo (ndDemoEntityManager* const scene)
 	ndFloat32 height = 1.9f;
 	ndFloat32 radio = 0.5f;
 	ndFloat32 mass = 100.0f;
-	new ndBasicPlayerCapsule(scene, *man, localAxis, location, mass, radio, height, height/4.0f, true);
+	new ndBasicPlayerCapsule(scene, *man, localAxis, location, 1.0f, mass, radio, height, height/4.0f, true);
 	
 	location.m_posit.m_x += 8.0f;
 	location.m_posit.m_z -= 2.0f;
-	new ndBasicPlayerCapsule(scene, *man, localAxis, location, mass, radio, height, height / 4.0f);
+	new ndBasicPlayerCapsule(scene, *man, localAxis, location, 1.0f, mass, radio, height, height / 4.0f);
 	
 	location.m_posit.m_z += 4.0f;
-	new ndBasicPlayerCapsule(scene, *man, localAxis, location, mass, radio, height, height / 4.0f);
+	new ndBasicPlayerCapsule(scene, *man, localAxis, location, 1.0f, mass, radio, height, height / 4.0f);
 
 	class PlaceMatrix: public ndMatrix
 	{

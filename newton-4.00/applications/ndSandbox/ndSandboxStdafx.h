@@ -84,7 +84,6 @@
 #endif
 
 // some third party libraries includes here
-#include <ofbx.h>
 #include <VHACD.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>

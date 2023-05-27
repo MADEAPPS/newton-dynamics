@@ -24,6 +24,9 @@ include_directories(../dNewton/dModels)
 include_directories(../dNewton/dIkSolver)
 include_directories(../dNewton/dModels/dVehicle)
 
+include_directories(../../thirdParty/tinyxml)
+include_directories(../../thirdParty/openFBX/src)
+
 include_directories(animation)
 
 file(GLOB CPP_SOURCE 

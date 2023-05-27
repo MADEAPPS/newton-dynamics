@@ -165,8 +165,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	void SetDebugDisplay(ndInt32 mode) const;
 
 	const ndShaderCache& GetShaderCache() const;  
-	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(const char* const meshName);
-	
+	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(const char* const meshName, ndFloat32 scale = 1.0f);
 	
 	private:
 	void BeginFrame();

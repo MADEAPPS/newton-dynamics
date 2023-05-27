@@ -23,8 +23,8 @@
 #define _ND_MODEL_INC_H__
 
 #include <ndModelStdafx.h>
-
 #include <ndModelNotify.h>
+#include <ndFbxMeshLoader.h>
 #include <ndAnimationPose.h>
 #include <ndAnimationSequence.h>
 #include <ndModelPassiveRagdoll.h>

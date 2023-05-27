@@ -11,7 +11,7 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndDemoMesh.h"
-#include "ndFbxLoader.h"
+#include "ndMeshLoader.h"
 #include "ndDemoEntity.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
@@ -198,7 +198,7 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 
 ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized)
 {
-	ndFbxLoader loader;
+	ndMeshLoader loader;
 	ndMeshEffectNode* const meshEffectNode = loader.LoadMesh(meshName);
 	ndAssert(meshEffectNode);
 
@@ -279,7 +279,7 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 
 ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 {
-	ndFbxLoader loader;
+	ndMeshLoader loader;
 	ndMeshEffectNode* const meshEffectNode = loader.LoadMesh ("playerarena.fbx");
 	ndDemoEntity* const entity = new ndDemoEntity(scene, meshEffectNode);
 	scene->AddEntity(entity);

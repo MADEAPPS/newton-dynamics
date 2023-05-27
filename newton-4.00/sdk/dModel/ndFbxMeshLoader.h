@@ -9,25 +9,25 @@
 * freely
 */
 
-#ifndef _D_LOAD_FBX_MESH_H_
-#define _D_LOAD_FBX_MESH_H_
+#ifndef _ND_FBX_MESH_LOADER_H_
+#define _ND_FBX_MESH_LOADER_H_
 
 class ndAnimationSequence;
-class ndFbxAnimationTrack;
-class ndFbxMeshEffectNodeGlobalNodeMap;
 
-class ndFbxLoader
+using namespace ofbx;
+
+class ndFbxMeshLoader : public ndClassAlloc
 {
+	class ndFbxAnimationTrack;
+	class ndFbxMeshEffectNodeGlobalNodeMap;
+	class ndFbxImportMeshEffectNodeStackData;
+
 	public:
-	ndFbxLoader();
-	virtual ~ndFbxLoader();
+	ndFbxMeshLoader();
+	virtual ~ndFbxMeshLoader();
 
-	virtual void OnPostLoad(ndMeshEffectNode* const)
-	{
-	}
-
-	ndMeshEffectNode* LoadMesh(const char* const meshName);
-	ndAnimationSequence* LoadAnimation(const char* const meshName);
+	virtual ndAnimationSequence* LoadAnimation(const char* const fullPathName);
+	virtual ndMeshEffectNode* LoadMesh(const char* const fullPathName, bool loadAnimation = false);
 
 	private:
 	void FreezeScale(ndMeshEffectNode* const entity);
@@ -40,7 +40,6 @@ class ndFbxLoader
 	void ApplyTransform(ndMeshEffectNode* const entity, const ndMatrix& transform);
 	void ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const mesh);
 	ndInt32 GetChildrenNodes(const ofbx::Object* const node, ofbx::Object** buffer);
-	ndMeshEffectNode* LoadFbxMesh(const char* const fileName, bool loadAnimation = false);
 	void LoadAnimation(const ofbx::IScene* const fbxScene, ndMeshEffectNode* const model);
 	ndAnimationSequence* CreateSequence(ndMeshEffectNode* const model, const char* const name);
 	void ImportMeshNode(ofbx::Object* const fbxNode, ndFbxMeshEffectNodeGlobalNodeMap& nodeMap);
