@@ -1755,7 +1755,7 @@ struct AnimationCurveNodeImpl : AnimationCurveNode
 			//}
 			int i0 = 1;
 			int i2 = count - 1;
-			while ((i2 - i0) >= 4)
+			while ((i2 - i0) >= 8)
 			{
 				int i1 = (i2 + i0) >> 1;
 				const i64 midTime = times[i1];
@@ -1768,7 +1768,7 @@ struct AnimationCurveNodeImpl : AnimationCurveNode
 					i0 = i1;
 				}
 			}
-			assert(times[i2] >= fbx_time);
+			assert(times[i0 - 1] <= fbx_time);
 			for (int i = i0; i < count; ++i)
 			{
 				if (times[i] >= fbx_time)
