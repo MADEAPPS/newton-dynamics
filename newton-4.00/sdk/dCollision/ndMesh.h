@@ -25,7 +25,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndMeshEffect.h"
 
-class ndMeshEffectNode : public ndNodeHierarchy<ndMeshEffectNode>
+class ndMesh : public ndNodeHierarchy<ndMesh>
 {
 	public:
 	class ndCurveValue
@@ -48,13 +48,14 @@ class ndMeshEffectNode : public ndNodeHierarchy<ndMeshEffectNode>
 		ndFloat32 m_lenght;
 	};
 
-	D_COLLISION_API ndMeshEffectNode(ndMeshEffectNode* const parent);
-	D_COLLISION_API ndMeshEffectNode(const ndMeshEffectNode& src);
+	D_COLLISION_API ndMesh(ndMesh* const parent);
+	D_COLLISION_API ndMesh(const ndMesh& src);
 
-	D_COLLISION_API ~ndMeshEffectNode();
-	D_COLLISION_API ndMeshEffectNode* CreateClone() const;
+	D_COLLISION_API ~ndMesh();
+	D_COLLISION_API ndMesh* CreateClone() const;
 
-	D_COLLISION_API ndSharedPtr<ndMeshEffect> GetMesh();
+	D_COLLISION_API ndSharedPtr<ndMeshEffect>& GetMesh();
+	D_COLLISION_API const ndSharedPtr<ndMeshEffect>& GetMesh() const;
 	D_COLLISION_API void SetMesh(const ndSharedPtr<ndMeshEffect>& mesh);
 
 	D_COLLISION_API const ndString& GetName() const;
@@ -64,7 +65,14 @@ class ndMeshEffectNode : public ndNodeHierarchy<ndMeshEffectNode>
 	D_COLLISION_API ndCurve& GetPositCurve();
 	D_COLLISION_API ndCurve& GetRotationCurve();
 
+	D_COLLISION_API const ndCurve& GetScaleCurve() const;
+	D_COLLISION_API const ndCurve& GetPositCurve() const;
+	D_COLLISION_API const ndCurve& GetRotationCurve() const;
+
 	D_COLLISION_API void ApplyTransform(const ndMatrix& transform);
+
+	D_COLLISION_API static ndMesh* Load(const char* const fullPathName);
+	D_COLLISION_API static void Save(const ndMesh* const mesh, const char* const fullPathName);
 
 	ndMatrix m_matrix;
 	ndMatrix m_meshMatrix;

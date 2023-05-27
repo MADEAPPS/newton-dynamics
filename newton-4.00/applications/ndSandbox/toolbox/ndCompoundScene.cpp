@@ -77,7 +77,7 @@ static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInsta
 static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const ndMatrix& location)
 {
 	ndMeshLoader loader;
-	ndMeshEffectNode* const meshEffectNode = loader.LoadMesh(meshName);
+	ndMesh* const meshEffectNode = loader.LoadMesh(meshName);
 	ndAssert(meshEffectNode);
 	meshEffectNode->m_matrix = location;
 
@@ -90,7 +90,7 @@ static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const me
 	
 	ndInt32 stack = 1;
 	ndMatrix matrixBuffer[1024];
-	ndMeshEffectNode* entBuffer[1024];
+	ndMesh* entBuffer[1024];
 	
 	entBuffer[0] = meshEffectNode;
 	matrixBuffer[0] = meshEffectNode->m_matrix.OrthoInverse();
@@ -98,7 +98,7 @@ static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const me
 	while (stack)
 	{
 		stack--;
-		ndMeshEffectNode* const ent = entBuffer[stack];
+		ndMesh* const ent = entBuffer[stack];
 		ndMatrix matrix(ent->m_matrix * matrixBuffer[stack]);
 	
 		ndSharedPtr<ndMeshEffect> meshEffect = ent->GetMesh();
@@ -135,7 +135,7 @@ static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const me
 			}
 		}
 	
-		for (ndMeshEffectNode* child = (ndMeshEffectNode*)ent->GetFirstChild(); child; child = (ndMeshEffectNode*)child->GetNext())
+		for (ndMesh* child = (ndMesh*)ent->GetFirstChild(); child; child = (ndMesh*)child->GetNext())
 		{
 			entBuffer[stack] = child;
 			matrixBuffer[stack] = matrix;

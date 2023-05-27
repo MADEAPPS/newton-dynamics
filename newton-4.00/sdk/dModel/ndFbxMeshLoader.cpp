@@ -24,28 +24,28 @@ class ndFbxMeshLoader::ndFbxImportMeshEffectNodeStackData
 	{
 	}
 
-	ndFbxImportMeshEffectNodeStackData(const ofbx::Object* const fbxNode, ndMeshEffectNode* const parentNode)
+	ndFbxImportMeshEffectNodeStackData(const ofbx::Object* const fbxNode, ndMesh* const parentNode)
 		:m_fbxNode(fbxNode)
 		,m_parentNode(parentNode)
 	{
 	}
 
 	const ofbx::Object* m_fbxNode;
-	ndMeshEffectNode* m_parentNode;
+	ndMesh* m_parentNode;
 };
 
-class ndFbxMeshLoader::ndFbxMeshEffectNodeGlobalNodeMap : public ndTree<ndMeshEffectNode*, const ofbx::Object*>
+class ndFbxMeshLoader::ndFbxMeshEffectNodeGlobalNodeMap : public ndTree<ndMesh*, const ofbx::Object*>
 {
 };
 
 class ndFbxMeshLoader::ndFbxAnimationTrack
 {
 	public:
-	class dCurve : public ndMeshEffectNode::ndCurve
+	class dCurve : public ndMesh::ndCurve
 	{
 		public:
 		dCurve()
-			:ndMeshEffectNode::ndCurve()
+			:ndMesh::ndCurve()
 		{
 		}
 	};
@@ -81,7 +81,7 @@ class ndFbxMeshLoader::ndFbxAnimationTrack
 
 	void AddScale(ndFloat32 time, ndFloat32 x, ndFloat32 y, ndFloat32 z)
 	{
-		ndMeshEffectNode::ndCurveValue& value = m_scale.Append()->GetInfo();
+		ndMesh::ndCurveValue& value = m_scale.Append()->GetInfo();
 		value.m_x = x;
 		value.m_y = y;
 		value.m_z = z;
@@ -90,7 +90,7 @@ class ndFbxMeshLoader::ndFbxAnimationTrack
 
 	void AddPosition(ndFloat32 time, ndFloat32 x, ndFloat32 y, ndFloat32 z)
 	{
-		ndMeshEffectNode::ndCurveValue& value = m_position.Append()->GetInfo();
+		ndMesh::ndCurveValue& value = m_position.Append()->GetInfo();
 		value.m_x = x;
 		value.m_y = y;
 		value.m_z = z;
@@ -99,7 +99,7 @@ class ndFbxMeshLoader::ndFbxAnimationTrack
 
 	void AddRotation(ndFloat32 time, ndFloat32 x, ndFloat32 y, ndFloat32 z)
 	{
-		ndMeshEffectNode::ndCurveValue& value = m_rotation.Append()->GetInfo();
+		ndMesh::ndCurveValue& value = m_rotation.Append()->GetInfo();
 		value.m_x = x;
 		value.m_y = y;
 		value.m_z = z;
@@ -265,7 +265,7 @@ void ndFbxMeshLoader::ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEff
 	}
 }
 
-ndMatrix ndFbxMeshLoader::GetKeyframe(ndMeshEffectNode::ndCurveValue& scale, ndMeshEffectNode::ndCurveValue& position, ndMeshEffectNode::ndCurveValue& rotation)
+ndMatrix ndFbxMeshLoader::GetKeyframe(ndMesh::ndCurveValue& scale, ndMesh::ndCurveValue& position, ndMesh::ndCurveValue& rotation)
 {
 	ndMatrix scaleMatrix(ndGetIdentityMatrix());
 	scaleMatrix[0][0] = scale.m_x;
@@ -276,11 +276,11 @@ ndMatrix ndFbxMeshLoader::GetKeyframe(ndMeshEffectNode::ndCurveValue& scale, ndM
 	return matrix;
 }
 
-void ndFbxMeshLoader::FreezeScale(ndMeshEffectNode* const entity)
+void ndFbxMeshLoader::FreezeScale(ndMesh* const entity)
 {
 	ndInt32 stack = 1;
 	ndMatrix parentMatrix[1024];
-	ndMeshEffectNode* entBuffer[1024];
+	ndMesh* entBuffer[1024];
 	
 	entBuffer[0] = entity;
 	parentMatrix[0] = ndGetIdentityMatrix();
@@ -289,7 +289,7 @@ void ndFbxMeshLoader::FreezeScale(ndMeshEffectNode* const entity)
 	{
 		stack--;
 		ndMatrix scaleMatrix(parentMatrix[stack]);
-		ndMeshEffectNode* const ent = entBuffer[stack];
+		ndMesh* const ent = entBuffer[stack];
 
 		ndVector scale;
 		ndMatrix stretchAxis;
@@ -312,16 +312,16 @@ void ndFbxMeshLoader::FreezeScale(ndMeshEffectNode* const entity)
 
 		if (ent->GetScaleCurve().GetCount())
 		{
-			ndMeshEffectNode::ndCurve::ndNode* scaleNode = ent->GetScaleCurve().GetFirst();
-			ndMeshEffectNode::ndCurve::ndNode* positNode = ent->GetPositCurve().GetFirst();
-			ndMeshEffectNode::ndCurve::ndNode* rotationNode = ent->GetRotationCurve().GetFirst();
+			ndMesh::ndCurve::ndNode* scaleNode = ent->GetScaleCurve().GetFirst();
+			ndMesh::ndCurve::ndNode* positNode = ent->GetPositCurve().GetFirst();
+			ndMesh::ndCurve::ndNode* rotationNode = ent->GetRotationCurve().GetFirst();
 
 			ndMatrix parentAnimScale (parentMatrix[stack]);
 			for (ndInt32 i = 0; i < ent->GetScaleCurve().GetCount(); ++i)
 			{
-				ndMeshEffectNode::ndCurveValue& scaleValue = scaleNode->GetInfo();
-				ndMeshEffectNode::ndCurveValue& positValue = positNode->GetInfo();
-				ndMeshEffectNode::ndCurveValue& rotationValue = rotationNode->GetInfo();
+				ndMesh::ndCurveValue& scaleValue = scaleNode->GetInfo();
+				ndMesh::ndCurveValue& positValue = positNode->GetInfo();
+				ndMesh::ndCurveValue& rotationValue = rotationNode->GetInfo();
 
 				ndVector animScale;
 				ndMatrix animTransformMatrix;
@@ -353,7 +353,7 @@ void ndFbxMeshLoader::FreezeScale(ndMeshEffectNode* const entity)
 			}
 		}
 
-		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
+		for (ndMesh* child = ent->GetFirstChild(); child; child = child->GetNext())
 		{
 			entBuffer[stack] = child;
 			parentMatrix[stack] = scaleMatrix;
@@ -362,14 +362,14 @@ void ndFbxMeshLoader::FreezeScale(ndMeshEffectNode* const entity)
 	}
 }
 
-void ndFbxMeshLoader::ApplyTransform(ndMeshEffectNode* const entity, const ndMatrix& transform)
+void ndFbxMeshLoader::ApplyTransform(ndMesh* const entity, const ndMatrix& transform)
 {
 	entity->ApplyTransform(transform);
 }
 
-void ndFbxMeshLoader::AlignToWorld(ndMeshEffectNode* const entity)
+void ndFbxMeshLoader::AlignToWorld(ndMesh* const entity)
 {
-	ndMeshEffectNode* entBuffer[1024];
+	ndMesh* entBuffer[1024];
 
 	ndInt32 stack = 0;
 	ndMatrix rotation(entity->m_matrix);
@@ -377,7 +377,7 @@ void ndFbxMeshLoader::AlignToWorld(ndMeshEffectNode* const entity)
 	rotation.m_posit = ndVector::m_wOne;
 
 	ndMatrix invRotation(rotation.OrthoInverse());
-	for (ndMeshEffectNode* child = entity->GetFirstChild(); child; child = child->GetNext())
+	for (ndMesh* child = entity->GetFirstChild(); child; child = child->GetNext())
 	{
 		entBuffer[stack] = child;
 		stack++;
@@ -393,32 +393,32 @@ void ndFbxMeshLoader::AlignToWorld(ndMeshEffectNode* const entity)
 	while (stack)
 	{
 		stack--;
-		ndMeshEffectNode* const ent = entBuffer[stack];
+		ndMesh* const meshNode = entBuffer[stack];
 
-		ndMatrix entMatrix(invRotation * ent->m_matrix * rotation);
-		ent->m_matrix = entMatrix;
+		ndMatrix entMatrix(invRotation * meshNode->m_matrix * rotation);
+		meshNode->m_matrix = entMatrix;
 
-		ndSharedPtr<ndMeshEffect> mesh = ent->GetMesh();
+		ndSharedPtr<ndMeshEffect> mesh = meshNode->GetMesh();
 		if (*mesh)
 		{
-			ndMatrix meshMatrix(invRotation * ent->m_meshMatrix * rotation);
-			ent->m_meshMatrix = meshMatrix;
+			ndMatrix meshMatrix(invRotation * meshNode->m_meshMatrix * rotation);
+			meshNode->m_meshMatrix = meshMatrix;
 			mesh->ApplyTransform(rotation);
 		}
 
-		if (ent->GetScaleCurve().GetCount())
+		if (meshNode->GetScaleCurve().GetCount())
 		{
-			ndMeshEffectNode::ndCurve::ndNode* positNode = ent->GetPositCurve().GetFirst();
-			ndMeshEffectNode::ndCurve::ndNode* rotationNode = ent->GetRotationCurve().GetFirst();
+			ndMesh::ndCurve::ndNode* positNode = meshNode->GetPositCurve().GetFirst();
+			ndMesh::ndCurve::ndNode* rotationNode = meshNode->GetRotationCurve().GetFirst();
 
-			ndMeshEffectNode::ndCurveValue scaleValue;
+			ndMesh::ndCurveValue scaleValue;
 			scaleValue.m_x = 1.0f;
 			scaleValue.m_y = 1.0f;
 			scaleValue.m_z = 1.0f;
-			for (ndInt32 i = 0; i < ent->GetScaleCurve().GetCount(); ++i)
+			for (ndInt32 i = 0; i < meshNode->GetScaleCurve().GetCount(); ++i)
 			{
-				ndMeshEffectNode::ndCurveValue& positValue = positNode->GetInfo();
-				ndMeshEffectNode::ndCurveValue& rotationValue = rotationNode->GetInfo();
+				ndMesh::ndCurveValue& positValue = positNode->GetInfo();
+				ndMesh::ndCurveValue& rotationValue = rotationNode->GetInfo();
 
 				ndVector animScale;
 				ndMatrix stretchAxis;
@@ -440,9 +440,10 @@ void ndFbxMeshLoader::AlignToWorld(ndMeshEffectNode* const entity)
 				positNode = positNode->GetNext();
 				rotationNode = rotationNode->GetNext();
 			}
+			//meshNode->GetScaleCurve().RemoveAll();
 		}
 
-		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
+		for (ndMesh* child = meshNode->GetFirstChild(); child; child = child->GetNext())
 		{
 			entBuffer[stack] = child;
 			stack++;
@@ -450,10 +451,10 @@ void ndFbxMeshLoader::AlignToWorld(ndMeshEffectNode* const entity)
 	}
 }
 
-void ndFbxMeshLoader::ApplyAllTransforms(ndMeshEffectNode* const meshEffectNode, const ndMatrix& unitMatrix, const ndMatrix& upAxis)
+void ndFbxMeshLoader::ApplyAllTransforms(ndMesh* const meshEffectNode, const ndMatrix& coordinateSystem, const ndMatrix& upAxis)
 {
 	FreezeScale(meshEffectNode);
-	ApplyTransform(meshEffectNode, unitMatrix);
+	ApplyTransform(meshEffectNode, coordinateSystem);
 	meshEffectNode->m_matrix = meshEffectNode->m_matrix * upAxis;
 	if (meshEffectNode->GetScaleCurve().GetCount())
 	{
@@ -467,7 +468,7 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbxMeshEffec
 	const ofbx::Mesh* const fbxMesh = (ofbx::Mesh*)fbxNode;
 
 	ndAssert(nodeMap.Find(fbxNode));
-	ndMeshEffectNode* const entity = nodeMap.Find(fbxNode)->GetInfo();
+	ndMesh* const entity = nodeMap.Find(fbxNode)->GetInfo();
 	ndSharedPtr<ndMeshEffect> mesh(new ndMeshEffect());
 	
 	ndMatrix pivotMatrix(ofbxMatrix2dMatrix(fbxMesh->getGeometricMatrix()));
@@ -605,7 +606,7 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbxMeshEffec
 	//mesh->RepairTJoints();
 }
 
-ndMeshEffectNode* ndFbxMeshLoader::LoadMeshEffectNodeHierarchy(ofbx::IScene* const fbxScene, ndFbxMeshEffectNodeGlobalNodeMap& nodeMap)
+ndMesh* ndFbxMeshLoader::LoadMeshEffectNodeHierarchy(ofbx::IScene* const fbxScene, ndFbxMeshEffectNodeGlobalNodeMap& nodeMap)
 {
 	ndInt32 stack = 0;
 	ndFixSizeArray<ofbx::Object*, 1024> buffer;
@@ -618,10 +619,10 @@ ndMeshEffectNode* ndFbxMeshLoader::LoadMeshEffectNodeHierarchy(ofbx::IScene* con
 	ndAssert(rootNode);
 	stack = GetChildrenNodes(rootNode, &buffer[0]);
 	
-	ndMeshEffectNode* rootEntity = nullptr;
+	ndMesh* rootEntity = nullptr;
 	if (stack > 1)
 	{
-		rootEntity = new ndMeshEffectNode(nullptr);
+		rootEntity = new ndMesh(nullptr);
 		rootEntity->SetName("dommyRoot");
 	}
 	
@@ -636,7 +637,7 @@ ndMeshEffectNode* ndFbxMeshLoader::LoadMeshEffectNodeHierarchy(ofbx::IScene* con
 		stack--;
 		ndFbxImportMeshEffectNodeStackData data(nodeStack[stack]);
 	
-		ndMeshEffectNode* const node = new ndMeshEffectNode(data.m_parentNode);
+		ndMesh* const node = new ndMesh(data.m_parentNode);
 		if (!rootEntity)
 		{
 			rootEntity = node;
@@ -661,10 +662,10 @@ ndMeshEffectNode* ndFbxMeshLoader::LoadMeshEffectNodeHierarchy(ofbx::IScene* con
 	return rootEntity;
 }
 
-ndMeshEffectNode* ndFbxMeshLoader::FbxToMeshEffectNode(ofbx::IScene* const fbxScene)
+ndMesh* ndFbxMeshLoader::FbxToMeshEffectNode(ofbx::IScene* const fbxScene)
 {
 	ndFbxMeshEffectNodeGlobalNodeMap nodeMap;
-	ndMeshEffectNode* const entity = LoadMeshEffectNodeHierarchy(fbxScene, nodeMap);
+	ndMesh* const entity = LoadMeshEffectNodeHierarchy(fbxScene, nodeMap);
 
 	ndFbxMeshEffectNodeGlobalNodeMap::Iterator iter(nodeMap);
 	for (iter.Begin(); iter; iter++)
@@ -809,7 +810,7 @@ void ndFbxMeshLoader::LoadAnimationLayer(ndTree <ndFbxAnimationTrack, ndString>&
 	}
 }
 
-void ndFbxMeshLoader::LoadAnimation(const ofbx::IScene* const fbxScene, ndMeshEffectNode* const model)
+void ndFbxMeshLoader::LoadAnimation(const ofbx::IScene* const fbxScene, ndMesh* const model)
 {
 	ndInt32 animationCount = fbxScene->getAnimationStackCount();
 	// only load one animation per file
@@ -831,43 +832,43 @@ void ndFbxMeshLoader::LoadAnimation(const ofbx::IScene* const fbxScene, ndMeshEf
 	}
 
 	ndInt32 stack = 1;
-	ndMeshEffectNode* entBuffer[1024];
+	ndMesh* entBuffer[1024];
 	entBuffer[0] = model;
 	while (stack)
 	{
 		stack--;
-		ndMeshEffectNode* const ent = entBuffer[stack];
+		ndMesh* const ent = entBuffer[stack];
 		ndTree <ndFbxAnimationTrack, ndString>::ndNode* node = tracks.Find(ent->GetName());
 		if (node)
 		{
 			ndFbxAnimationTrack* const track = &node->GetInfo();
 
-			ndMeshEffectNode::ndCurve& scale = ent->GetScaleCurve();
+			ndMesh::ndCurve& scale = ent->GetScaleCurve();
 			scale.RemoveAll();
 			scale.m_lenght = track->m_scale.m_lenght;
-			for (ndMeshEffectNode::ndCurve::ndNode* srcNode = track->m_scale.GetFirst(); srcNode; srcNode = srcNode->GetNext())
+			for (ndMesh::ndCurve::ndNode* srcNode = track->m_scale.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 			{
 				scale.Append(srcNode->GetInfo());
 			}
 
-			ndMeshEffectNode::ndCurve& posit = ent->GetPositCurve();
+			ndMesh::ndCurve& posit = ent->GetPositCurve();
 			posit.RemoveAll();
 			posit.m_lenght = track->m_position.m_lenght;
-			for (ndMeshEffectNode::ndCurve::ndNode* srcNode = track->m_position.GetFirst(); srcNode; srcNode = srcNode->GetNext())
+			for (ndMesh::ndCurve::ndNode* srcNode = track->m_position.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 			{
 				posit.Append(srcNode->GetInfo());
 			}
 
-			ndMeshEffectNode::ndCurve& rotation = ent->GetRotationCurve();
+			ndMesh::ndCurve& rotation = ent->GetRotationCurve();
 			rotation.RemoveAll();
 			rotation.m_lenght = track->m_rotation.m_lenght;
-			for (ndMeshEffectNode::ndCurve::ndNode* srcNode = track->m_rotation.GetFirst(); srcNode; srcNode = srcNode->GetNext())
+			for (ndMesh::ndCurve::ndNode* srcNode = track->m_rotation.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 			{
 				rotation.Append(srcNode->GetInfo());
 			}
 		}
 
-		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
+		for (ndMesh* child = ent->GetFirstChild(); child; child = child->GetNext())
 		{
 			entBuffer[stack] = child;
 			stack++;
@@ -875,7 +876,7 @@ void ndFbxMeshLoader::LoadAnimation(const ofbx::IScene* const fbxScene, ndMeshEf
 	}
 }
 
-void ndFbxMeshLoader::OptimizeCurve(ndMeshEffectNode::ndCurve& curve)
+void ndFbxMeshLoader::OptimizeCurve(ndMesh::ndCurve& curve)
 {
 	const ndFloat32 tol = 5.0e-5f;
 	const ndFloat32 tol2 = tol * tol;
@@ -885,13 +886,13 @@ void ndFbxMeshLoader::OptimizeCurve(ndMeshEffectNode::ndCurve& curve)
 		return x0 + (x1 - x0) * (t - t0) / (t1 - t0);
 	};
 
-	for (ndMeshEffectNode::ndCurve::ndNode* node0 = curve.GetFirst(); node0->GetNext(); node0 = node0->GetNext())
+	for (ndMesh::ndCurve::ndNode* node0 = curve.GetFirst(); node0->GetNext(); node0 = node0->GetNext())
 	{
-		const ndMeshEffectNode::ndCurveValue& value0 = node0->GetInfo();
-		for (ndMeshEffectNode::ndCurve::ndNode* node1 = node0->GetNext()->GetNext(); node1; node1 = node1->GetNext())
+		const ndMesh::ndCurveValue& value0 = node0->GetInfo();
+		for (ndMesh::ndCurve::ndNode* node1 = node0->GetNext()->GetNext(); node1; node1 = node1->GetNext())
 		{
-			const ndMeshEffectNode::ndCurveValue& value1 = node1->GetPrev()->GetInfo();
-			const ndMeshEffectNode::ndCurveValue& value2 = node1->GetInfo();
+			const ndMesh::ndCurveValue& value1 = node1->GetPrev()->GetInfo();
+			const ndMesh::ndCurveValue& value2 = node1->GetInfo();
 			ndVector p1(value1.m_x, value1.m_y, value1.m_z, ndFloat32(0.0f));
 			ndVector p2(value2.m_x, value2.m_y, value2.m_z, ndFloat32(0.0f));
 
@@ -911,8 +912,8 @@ void ndFbxMeshLoader::OptimizeCurve(ndMeshEffectNode::ndCurve& curve)
 
 	if (curve.GetCount() == 2)
 	{
-		const ndMeshEffectNode::ndCurveValue& value0 = curve.GetFirst()->GetInfo();
-		const ndMeshEffectNode::ndCurveValue& value1 = curve.GetFirst()->GetNext()->GetInfo();
+		const ndMesh::ndCurveValue& value0 = curve.GetFirst()->GetInfo();
+		const ndMesh::ndCurveValue& value1 = curve.GetFirst()->GetNext()->GetInfo();
 
 		ndFloat32 dist_x = value1.m_x - value0.m_x;
 		ndFloat32 dist_y = value1.m_y - value0.m_y;
@@ -927,7 +928,7 @@ void ndFbxMeshLoader::OptimizeCurve(ndMeshEffectNode::ndCurve& curve)
 	}
 }
 
-void ndFbxMeshLoader::OptimizeRotationCurve(ndMeshEffectNode::ndCurve& curve)
+void ndFbxMeshLoader::OptimizeRotationCurve(ndMesh::ndCurve& curve)
 {
 	auto AngleAlias = [](ndFloat32 angleA, ndFloat32 angleB)
 	{
@@ -942,10 +943,10 @@ void ndFbxMeshLoader::OptimizeRotationCurve(ndMeshEffectNode::ndCurve& curve)
 		return delta;
 	};
 
-	ndMeshEffectNode::ndCurveValue eulerRef(curve.GetFirst()->GetInfo());
-	for (ndMeshEffectNode::ndCurve::ndNode* node = curve.GetFirst()->GetNext(); node->GetNext(); node = node->GetNext())
+	ndMesh::ndCurveValue eulerRef(curve.GetFirst()->GetInfo());
+	for (ndMesh::ndCurve::ndNode* node = curve.GetFirst()->GetNext(); node->GetNext(); node = node->GetNext())
 	{
-		ndMeshEffectNode::ndCurveValue value(node->GetInfo());
+		ndMesh::ndCurveValue value(node->GetInfo());
 		ndFloat32 angleError = AngleAlias(value.m_z, eulerRef.m_z);
 		if (ndAbs(angleError) > ndPi * ndFloat32(0.5f))
 		{
@@ -958,40 +959,40 @@ void ndFbxMeshLoader::OptimizeRotationCurve(ndMeshEffectNode::ndCurve& curve)
 }
 
 
-ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMeshEffectNode* const model, const char* const name)
+ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMesh* const model, const char* const name)
 {
 	ndAnimationSequence* const sequence = new ndAnimationSequence;
 	sequence->SetName(name);
 	//sequence->m_period = m_length;
 
 	ndInt32 stack = 1;
-	ndMeshEffectNode* entBuffer[1024];
+	ndMesh* entBuffer[1024];
 	entBuffer[0] = model;
 	while (stack)
 	{
 		stack--;
-		ndMeshEffectNode* const ent = entBuffer[stack];
+		ndMesh* const ent = entBuffer[stack];
 
 		if (ent->GetScaleCurve().GetCount())
 		{
 			ndAnimationKeyFramesTrack* const track = sequence->AddTrack();
 			track->m_name = ent->GetName();
 
-			ndMeshEffectNode::ndCurve& positCurve = ent->GetPositCurve();
+			ndMesh::ndCurve& positCurve = ent->GetPositCurve();
 			OptimizeCurve(positCurve);
-			for (ndMeshEffectNode::ndCurve::ndNode* srcNode = positCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
+			for (ndMesh::ndCurve::ndNode* srcNode = positCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 			{
-				ndMeshEffectNode::ndCurveValue& keyFrame = srcNode->GetInfo();
+				ndMesh::ndCurveValue& keyFrame = srcNode->GetInfo();
 				track->m_position.m_param.PushBack(keyFrame.m_time);
 				track->m_position.PushBack(ndVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, ndFloat32(1.0f)));
 			}
 
 			ndQuaternion rotation;
-			ndMeshEffectNode::ndCurve& rotationCurve = ent->GetRotationCurve();
+			ndMesh::ndCurve& rotationCurve = ent->GetRotationCurve();
 			OptimizeRotationCurve(rotationCurve);
-			for (ndMeshEffectNode::ndCurve::ndNode* srcNode = rotationCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
+			for (ndMesh::ndCurve::ndNode* srcNode = rotationCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 			{
-				ndMeshEffectNode::ndCurveValue& keyFrame = srcNode->GetInfo();
+				ndMesh::ndCurveValue& keyFrame = srcNode->GetInfo();
 
 				const ndMatrix transform(ndPitchMatrix(keyFrame.m_x) * ndYawMatrix(keyFrame.m_y) * ndRollMatrix(keyFrame.m_z));
 				ndQuaternion quat(transform);
@@ -1014,7 +1015,7 @@ ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMeshEffectNode* const mod
 			}
 		}
 
-		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
+		for (ndMesh* child = ent->GetFirstChild(); child; child = child->GetNext())
 		{
 			entBuffer[stack] = child;
 			stack++;
@@ -1024,10 +1025,10 @@ ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMeshEffectNode* const mod
 	return sequence;
 }
 
-ndMeshEffectNode* ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bool loadAnimation)
+ndMesh* ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bool loadAnimation)
 {
-	FILE* const fp = fopen(fullPathName, "rb");
-	if (!fp)
+	FILE* const file = fopen(fullPathName, "rb");
+	if (!file)
 	{
 		ndAssert(0);
 		return nullptr;
@@ -1035,16 +1036,17 @@ ndMeshEffectNode* ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bool
 
 	size_t readBytes = 0;
 	readBytes++;
-	fseek(fp, 0, SEEK_END);
-	long file_size = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
+	fseek(file, 0, SEEK_END);
+	long file_size = ftell(file);
+	fseek(file, 0, SEEK_SET);
 	ndArray<ofbx::u8> content;
 	content.SetCount(file_size);
-	readBytes = fread(&content[0], 1, size_t(file_size), fp);
-	ndSharedPtr<ofbx::IScene> fbxScene(ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE));
+	readBytes = fread(&content[0], 1, size_t(file_size), file);
+	fclose(file);
 
+	ndSharedPtr<ofbx::IScene> fbxScene(ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE));
 	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(*fbxScene));
-	ndMeshEffectNode* const meshEffectNode = FbxToMeshEffectNode(*fbxScene);
+	ndMesh* const meshEffectNode = FbxToMeshEffectNode(*fbxScene);
 	if (loadAnimation)
 	{
 		LoadAnimation(*fbxScene, meshEffectNode);
@@ -1057,7 +1059,7 @@ ndMeshEffectNode* ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bool
 
 ndAnimationSequence* ndFbxMeshLoader::LoadAnimation(const char* const fullPathName)
 {
-	ndSharedPtr<ndMeshEffectNode> entity(LoadMesh(fullPathName, true));
+	ndSharedPtr<ndMesh> entity(LoadMesh(fullPathName, true));
 	ndAnimationSequence* const sequence = CreateSequence(*entity, fullPathName);
 	return sequence;
 }

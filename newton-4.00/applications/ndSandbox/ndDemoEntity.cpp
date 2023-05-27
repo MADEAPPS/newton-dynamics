@@ -37,7 +37,7 @@ ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 	}
 }
 
-ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* const meshEffectNode)
+ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshEffectNode)
 	:ndNodeHierarchy<ndDemoEntity>()
 	,m_matrix(meshEffectNode->m_matrix)
 	,m_curPosition(meshEffectNode->m_matrix.m_posit)
@@ -54,20 +54,20 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 {
 	ndInt32 stack = 1;
 	ndDemoEntity* parentEntityBuffer[256];
-	ndMeshEffectNode* effectNodeBuffer[256];
+	ndMesh* effectNodeBuffer[256];
 	struct EntityMeshPair
 	{
 		EntityMeshPair()
 		{
 		}
 
-		EntityMeshPair(ndDemoEntity* const entity, ndMeshEffectNode* const effectNode)
+		EntityMeshPair(ndDemoEntity* const entity, ndMesh* const effectNode)
 			:m_entity(entity)
 			,m_effectNode(effectNode)
 		{
 		}
 		ndDemoEntity* m_entity;
-		ndMeshEffectNode* m_effectNode;
+		ndMesh* m_effectNode;
 	};
 	ndFixSizeArray<EntityMeshPair, 1024> meshArray;
 
@@ -78,7 +78,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 	{
 		stack--;
 		ndDemoEntity* const parent = parentEntityBuffer[stack];
-		ndMeshEffectNode* const effectNode = effectNodeBuffer[stack];
+		ndMesh* const effectNode = effectNodeBuffer[stack];
 
 		ndDemoEntity* const entity = isRoot ? this : new ndDemoEntity(effectNode->m_matrix, parent);
 		isRoot = false;
@@ -107,7 +107,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 			meshArray.PushBack(EntityMeshPair(entity, effectNode));
 		}
 
-		for (ndMeshEffectNode* child = effectNode->GetLastChild(); child; child = child->GetPrev())
+		for (ndMesh* child = effectNode->GetLastChild(); child; child = child->GetPrev())
 		{
 			effectNodeBuffer[stack] = child;
 			parentEntityBuffer[stack] = entity;
@@ -118,10 +118,10 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 	for (ndInt32 i = 0; i < meshArray.GetCount(); ++i)
 	{
 		ndDemoEntity* const entity = meshArray[i].m_entity;
-		ndMeshEffectNode* const effectNode = meshArray[i].m_effectNode;
+		ndMesh* const effectNode = meshArray[i].m_effectNode;
 		ndDemoMeshInterface* mesh = nullptr;
 
-		ndSharedPtr<ndMeshEffect> meshEffect = effectNode->GetMesh();
+		ndSharedPtr<ndMeshEffect> meshEffect (effectNode->GetMesh());
 		if (!meshEffect->GetCluster().GetCount())
 		{
 			mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
@@ -174,7 +174,7 @@ ndDemoEntity* ndDemoEntity::LoadFbx(const char* const filename, ndDemoEntityMana
 {
 	ndMeshLoader loader(scale);
 	ndDemoEntity* rootEntity = nullptr;
-	ndSharedPtr<ndMeshEffectNode> fbxEntity (loader.LoadMesh(filename));
+	ndSharedPtr<ndMesh> fbxEntity (loader.LoadMesh(filename));
 	if (*fbxEntity)
 	{
 		rootEntity = new ndDemoEntity(scene, *fbxEntity);

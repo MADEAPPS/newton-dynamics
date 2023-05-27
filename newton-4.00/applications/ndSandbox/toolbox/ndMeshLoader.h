@@ -19,7 +19,7 @@ class ndMeshLoader: public ndFbxMeshLoader
 	virtual ~ndMeshLoader();
 
 	ndAnimationSequence* LoadAnimation(const char* const meshName);
-	ndMeshEffectNode* LoadMesh(const char* const meshName, bool loadAnimation = false);
+	ndMesh* LoadMesh(const char* const meshName, bool loadAnimation = false);
 
 	ndFloat32 m_scale;
 };

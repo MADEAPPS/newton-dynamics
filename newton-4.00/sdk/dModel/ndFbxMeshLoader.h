@@ -27,25 +27,25 @@ class ndFbxMeshLoader : public ndClassAlloc
 	virtual ~ndFbxMeshLoader();
 
 	virtual ndAnimationSequence* LoadAnimation(const char* const fullPathName);
-	virtual ndMeshEffectNode* LoadMesh(const char* const fullPathName, bool loadAnimation = false);
+	virtual ndMesh* LoadMesh(const char* const fullPathName, bool loadAnimation = false);
 
 	private:
-	void FreezeScale(ndMeshEffectNode* const entity);
-	void AlignToWorld(ndMeshEffectNode* const entity);
-	void OptimizeCurve(ndMeshEffectNode::ndCurve& curve);
+	void FreezeScale(ndMesh* const entity);
+	void AlignToWorld(ndMesh* const entity);
+	void OptimizeCurve(ndMesh::ndCurve& curve);
+	void OptimizeRotationCurve(ndMesh::ndCurve& curve);
+	ndMesh* FbxToMeshEffectNode(ofbx::IScene* const fbxScene);
 	ndMatrix ofbxMatrix2dMatrix(const ofbx::Matrix& fbxMatrix);
-	void OptimizeRotationCurve(ndMeshEffectNode::ndCurve& curve);
 	ndMatrix GetCoordinateSystemMatrix(ofbx::IScene* const fbxScene);
-	ndMeshEffectNode* FbxToMeshEffectNode(ofbx::IScene* const fbxScene);
-	void ApplyTransform(ndMeshEffectNode* const entity, const ndMatrix& transform);
+	void ApplyTransform(ndMesh* const entity, const ndMatrix& transform);
+	void LoadAnimation(const ofbx::IScene* const fbxScene, ndMesh* const model);
 	void ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const mesh);
 	ndInt32 GetChildrenNodes(const ofbx::Object* const node, ofbx::Object** buffer);
-	void LoadAnimation(const ofbx::IScene* const fbxScene, ndMeshEffectNode* const model);
-	ndAnimationSequence* CreateSequence(ndMeshEffectNode* const model, const char* const name);
+	ndAnimationSequence* CreateSequence(ndMesh* const model, const char* const name);
 	void ImportMeshNode(ofbx::Object* const fbxNode, ndFbxMeshEffectNodeGlobalNodeMap& nodeMap);
-	void ApplyAllTransforms(ndMeshEffectNode* const meshEffectNode, const ndMatrix& unitMatrix, const ndMatrix& upAxis);
-	ndMeshEffectNode* LoadMeshEffectNodeHierarchy(ofbx::IScene* const fbxScene, ndFbxMeshEffectNodeGlobalNodeMap& nodeMap);
-	ndMatrix GetKeyframe(ndMeshEffectNode::ndCurveValue& scale, ndMeshEffectNode::ndCurveValue& position, ndMeshEffectNode::ndCurveValue& rotation);
+	void ApplyAllTransforms(ndMesh* const meshEffectNode, const ndMatrix& unitMatrix, const ndMatrix& upAxis);
+	ndMesh* LoadMeshEffectNodeHierarchy(ofbx::IScene* const fbxScene, ndFbxMeshEffectNodeGlobalNodeMap& nodeMap);
+	ndMatrix GetKeyframe(ndMesh::ndCurveValue& scale, ndMesh::ndCurveValue& position, ndMesh::ndCurveValue& rotation);
 	void LoadAnimationLayer(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const fbxScene, const ofbx::AnimationLayer* const animLayer);
 	void LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, ndFloat32 duration, ndFloat32 timestep, ndInt32 framesCount);
 };

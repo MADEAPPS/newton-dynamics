@@ -25,7 +25,7 @@ class ndDemoEntity: public ndNodeHierarchy<ndDemoEntity>
 	public:
 	ndDemoEntity(const ndDemoEntity& copyFrom);
 	ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent);
-	ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* const meshEffect);
+	ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshEffect);
 	virtual ~ndDemoEntity(void);
 
 	static ndDemoEntity* LoadFbx (const char* const filename, ndDemoEntityManager* const scene, ndFloat32 scale = 1.0f);

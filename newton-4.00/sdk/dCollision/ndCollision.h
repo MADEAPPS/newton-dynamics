@@ -29,6 +29,7 @@
 
 #include <ndCore.h>
 #include <ndCollisionStdafx.h>
+#include <ndMesh.h>
 #include <ndBody.h>
 #include <ndScene.h>
 #include <ndShape.h>
@@ -56,7 +57,6 @@
 #include <ndContactNotify.h>
 #include <ndShapeCompound.h>
 #include <ndContactOptions.h>
-#include <ndMeshEffectNode.h>
 #include <ndBodyParticleSet.h>
 #include <ndPolygonMeshDesc.h>
 #include <ndShapeStatic_bvh.h>

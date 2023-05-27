@@ -22,11 +22,11 @@ ndMeshLoader::~ndMeshLoader()
 {
 }
 
-ndMeshEffectNode* ndMeshLoader::LoadMesh(const char* const fbxMeshName, bool loadAnimation)
+ndMesh* ndMeshLoader::LoadMesh(const char* const fbxMeshName, bool loadAnimation)
 {
 	char pathName[1024];
 	dGetWorkingFileName(fbxMeshName, pathName);
-	ndMeshEffectNode* const mesh = ndFbxMeshLoader::LoadMesh(pathName, loadAnimation);
+	ndMesh* const mesh = ndFbxMeshLoader::LoadMesh(pathName, loadAnimation);
 	if (m_scale != ndFloat32(1.0f))
 	{
 		ndMatrix scaleMatrix(ndGetIdentityMatrix());
@@ -36,6 +36,7 @@ ndMeshEffectNode* ndMeshLoader::LoadMesh(const char* const fbxMeshName, bool loa
 		mesh->ApplyTransform(scaleMatrix);
 	}
 
+	//ndMesh::Save(mesh, "xxx.ndm");
 	return mesh;
 }
 
