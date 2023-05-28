@@ -59,6 +59,18 @@ class ndMopcapMeshLoader : public ndMeshLoader
 	virtual ndAnimationSequence* LoadAnimation(const char* const clipName)
 	{
 		ndAnimationSequence* const sequence = ndMeshLoader::LoadAnimation(clipName);
+		ndAssert(sequence);
+		ndList<ndAnimationKeyFramesTrack>& tracks = sequence->GetTracks();
+
+		ndString prefixName("mixamorig");
+		for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext())
+		{
+			ndAnimationKeyFramesTrack& track = node->GetInfo();
+			if (track.m_name.Find(prefixName) != -1)
+			{
+				track.m_name = prefixName + track.m_name.SubString(track.m_name.Find(":"));
+			}
+		}
 
 		return sequence;
 	}
@@ -87,7 +99,8 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 
 	ndMopcapMeshLoader loader(1.0f);
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("dummy.fbx", scene));
+	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("dummy.fbx", scene));
+	ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("robotsuit.fbx", scene));
 	
 	ndSharedPtr<ndBody> player0(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f, true));
 	world->AddBody(player0);
