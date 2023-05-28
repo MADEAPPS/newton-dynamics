@@ -15,7 +15,9 @@
 #include "ndSandboxStdafx.h"
 #include "ndOpenGlUtil.h"
 
+class ndDemoMesh;
 class ndDemoEntity;
+class ndDemoSkinMesh;
 class ndDemoEntityManager;
 
 class ndDemoSubMeshMaterial
@@ -63,7 +65,9 @@ class ndDemoMeshInterface : public ndClassAlloc
 	bool GetVisible () const;
 	void SetVisible (bool visibilityFlag);
 
-	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const) { ndAssert(0); return nullptr; }
+	virtual ndDemoMesh* GetAsDemoMesh();
+	virtual ndDemoSkinMesh* GetAsDemoSkinMesh();
+	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const entityOwner);
 
 	virtual void Render (ndDemoEntityManager* const scene, const ndMatrix& modelMatrix) = 0;
 	virtual void RenderTransparency(ndDemoEntityManager* const, const ndMatrix&) {}
@@ -71,6 +75,22 @@ class ndDemoMeshInterface : public ndClassAlloc
 	ndString m_name;
 	bool m_isVisible;
 };
+
+inline ndDemoMesh* ndDemoMeshInterface::GetAsDemoMesh() 
+{ 
+	return nullptr; 
+}
+
+inline ndDemoSkinMesh* ndDemoMeshInterface::GetAsDemoSkinMesh() 
+{ 
+	return nullptr; 
+}
+
+inline ndDemoMeshInterface* ndDemoMeshInterface::Clone(ndDemoEntity* const) 
+{ 
+	ndAssert(0); 
+	return nullptr; 
+}
 
 
 #endif 

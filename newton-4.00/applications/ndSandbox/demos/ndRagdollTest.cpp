@@ -12,6 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
+#include "ndMeshLoader.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
@@ -259,7 +260,8 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 	
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	ndSharedPtr<ndDemoEntity> modelMesh (ndDemoEntity::LoadFbx("walker.fbx", scene));
+	ndMeshLoader loader;
+	ndSharedPtr<ndDemoEntity> modelMesh (loader.LoadEntity("walker.fbx", scene));
 	
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;

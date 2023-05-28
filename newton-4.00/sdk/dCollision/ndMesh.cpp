@@ -300,36 +300,20 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 			fprintf(file, "\t\tmaterials: %d\n", materialsCount);
 			fprintf(file, "\t\t{\n");
 			ndInt32 segmentStart = 0;
-			//bool hasTransparency = false;
 			const ndArray<ndMeshEffect::ndMaterial>& materialArray = effectMesh->GetMaterials();
 			for (ndInt32 handle = effectMesh->GetFirstMaterial(geometryHandle); handle != -1; handle = effectMesh->GetNextMaterial(geometryHandle, handle))
 			{
-				fprintf(file, "\t\t\tmaterial:\n");
-				
 				ndInt32 materialIndex = effectMesh->GetMaterialID(geometryHandle, handle);
-				//ndDemoSubMesh* const segment = AddSubMesh();
 			
 				const ndMeshEffect::ndMaterial& material = materialArray[materialIndex];
-			//	segment->m_material.m_ambient = glVector4(material.m_ambient);
-			//	segment->m_material.m_diffuse = glVector4(material.m_diffuse);
-			//	segment->m_material.m_specular = glVector4(material.m_specular);
-			//	segment->m_material.m_opacity = GLfloat(material.m_opacity);
-			//	segment->m_material.m_shiness = GLfloat(material.m_shiness);
-			//	segment->m_material.SetTextureName(material.m_textureName);
-			//	GLint tex = GLint(LoadTexture(material.m_textureName));
-			//	if (tex == 0)
-			//	{
-			//		tex = GLint(LoadTexture("default.tga"));
-			//	}
-			//	segment->m_material.SetTexture(tex);
-			//	ReleaseTexture(GLuint(tex));
-			//	segment->SetOpacity(material.m_opacity);
-			//	hasTransparency = hasTransparency | segment->m_hasTranparency;
+
+				fprintf(file, "\t\t\tambience: %f %f %f %f\n", material.m_ambient.m_x, material.m_ambient.m_y, material.m_ambient.m_z, material.m_ambient.m_w);
+				fprintf(file, "\t\t\tdiffuse: %f %f %f %f\n", material.m_diffuse.m_x, material.m_diffuse.m_y, material.m_diffuse.m_z, material.m_diffuse.m_w);
+				fprintf(file, "\t\t\topacity: %f\n", material.m_opacity);
+				fprintf(file, "\t\t\tshiness: %f\n", material.m_shiness);
+				fprintf(file, "\t\t\ttexture: %s\n", material.m_textureName);
 			
-				//segment->m_indexCount = effectMesh->GetMaterialIndexCount(geometryHandle, handle);
 				ndInt32 triangleIndexCount = effectMesh->GetMaterialIndexCount(geometryHandle, handle);
-			
-			//	segment->m_segmentStart = segmentStart;
 				effectMesh->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
 
 				fprintf(file, "\t\t\ttriangles: %d\n", triangleIndexCount / 3);
@@ -343,9 +327,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 			fprintf(file, "\t\t}\n");
 			effectMesh->MaterialGeometryEnd(geometryHandle);
 
-
 			fprintf(file, "\t}\n");
-
 		}
 
 		if (node->GetScaleCurve().GetCount())

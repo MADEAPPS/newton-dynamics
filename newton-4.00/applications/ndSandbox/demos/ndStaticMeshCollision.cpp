@@ -12,6 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
+#include "ndMeshLoader.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
@@ -48,7 +49,8 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	localAxis[1] = ndVector(1.0f, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
-	ndSharedPtr<ndDemoEntity> man(ndDemoEntity::LoadFbx("walker.fbx", scene));
+	ndMeshLoader loader;
+	ndSharedPtr<ndDemoEntity> man(loader.LoadEntity("walker.fbx", scene));
 
 	//ndFloat32 height = 1.9f;
 	//ndFloat32 radio = 0.5f;

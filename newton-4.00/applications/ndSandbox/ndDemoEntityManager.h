@@ -19,6 +19,7 @@ struct ImDrawData;
 class ndDemoMesh;
 class ndUIEntity;
 class ndDemoEntity;
+class ndMeshLoader;
 class ndDemoCamera;
 class ndPhysicsWorld;
 class ndAnimationSequence;
@@ -165,7 +166,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	void SetDebugDisplay(ndInt32 mode) const;
 
 	const ndShaderCache& GetShaderCache() const;  
-	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(const char* const meshName, ndFloat32 scale = 1.0f);
+	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(ndMeshLoader& loader, const char* const meshName);
 	
 	private:
 	void BeginFrame();

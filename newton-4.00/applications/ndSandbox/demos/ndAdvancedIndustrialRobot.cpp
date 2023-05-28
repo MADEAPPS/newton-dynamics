@@ -13,6 +13,7 @@
 #include "ndSkyBox.h"
 #include "ndUIEntity.h"
 #include "ndDemoMesh.h"
+#include "ndMeshLoader.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
@@ -363,12 +364,11 @@ using namespace ndAdvancedRobot;
 void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 {
 	// build a floor
+	ndMeshLoader loader;
 	ndBodyKinematic* const floor = BuildFloorBox(scene, ndGetIdentityMatrix());
-	
+	ndSharedPtr<ndDemoEntity> robotEntity(loader.LoadEntity("robot.fbx", scene));
+
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	//ndDemoEntity* const robotEntity = ndDemoEntity::LoadFbx("robot.fbx", scene);
-	ndSharedPtr<ndDemoEntity> robotEntity(ndDemoEntity::LoadFbx("robot.fbx", scene));
-	
 	ndAssert(0);
 	//ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-90.0f * ndDegreeToRad));

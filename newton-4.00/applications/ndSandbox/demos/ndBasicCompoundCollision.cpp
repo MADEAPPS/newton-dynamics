@@ -12,6 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
+#include "ndMeshLoader.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
@@ -117,7 +118,8 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 
 static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatrix& matrix, const char* const meshName, int count = 1)
 {
-	ndDemoEntity* const bowlEntity = ndDemoEntity::LoadFbx(meshName, scene);
+	ndMeshLoader loader;
+	ndDemoEntity* const bowlEntity = loader.LoadEntity(meshName, scene);
 	ndShapeInstance* const compoundShapeInstance = bowlEntity->CreateCompoundFromMesh();
 	
 	ndMatrix originMatrix (matrix);

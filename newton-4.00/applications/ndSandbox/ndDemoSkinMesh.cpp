@@ -76,6 +76,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 			pool[stack] = node;
 			parentMatrix[stack] = boneMatrix;
 			stack++;
+			ndAssert(stack < sizeof(pool) / sizeof(pool[0]));
 		}
 	}
 	
@@ -246,16 +247,21 @@ ndDemoSkinMesh::ndDemoSkinMesh(const ndDemoSkinMesh& source, ndDemoEntity* const
 	,m_matrixPalette(source.m_matrixPalette)
 {
 	m_bindingMatrixArray.SetCount(source.m_bindingMatrixArray.GetCount());
-	memcpy(&m_bindingMatrixArray[0], &source.m_bindingMatrixArray[0], source.m_bindingMatrixArray.GetCount() * sizeof(ndMatrix));
+	ndMemCpy(&m_bindingMatrixArray[0], &source.m_bindingMatrixArray[0], source.m_bindingMatrixArray.GetCount());
 }
 
 ndDemoSkinMesh::~ndDemoSkinMesh()
 {
 }
 
+ndDemoSkinMesh* ndDemoSkinMesh::GetAsDemoSkinMesh()
+{ 
+	return this; 
+}
+
 ndDemoMeshInterface* ndDemoSkinMesh::Clone(ndDemoEntity* const owner)
 {
-	return (ndDemoSkinMesh*)new ndDemoSkinMesh(*this, owner);
+	return new ndDemoSkinMesh(*this, owner);
 }
 
 void ndDemoSkinMesh::CreateRenderMesh(

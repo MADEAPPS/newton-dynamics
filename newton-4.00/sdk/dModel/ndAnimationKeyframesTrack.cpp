@@ -110,6 +110,10 @@ void ndAnimationKeyFramesTrack::InterpolateRotation(ndFloat32 param, ndQuaternio
 			ndAssert(rot0.DotProduct(rot1).GetScalar() > 0.0f);
 			rotation = rot0.Slerp(rot1, t);
 		}
+		else if (m_position.GetCount() == 1)
+		{
+			rotation = m_rotation[0];
+		}
 		else
 		{
 			ndAssert(0);

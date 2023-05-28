@@ -13,6 +13,7 @@
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
 #include "ndVehicleUI.h"
+#include "ndMeshLoader.h"
 #include "ndDemoCamera.h"
 #include "ndSoundManager.h"
 #include "ndPhysicsUtils.h"
@@ -417,7 +418,8 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 
 	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename)
 	{
-		ndDemoEntity* const vehicleEntity = ndDemoEntity::LoadFbx(filename, scene);
+		ndMeshLoader loader;
+		ndDemoEntity* const vehicleEntity = loader.LoadEntity(filename, scene);
 		scene->AddEntity(vehicleEntity);
 		return vehicleEntity;
 	}

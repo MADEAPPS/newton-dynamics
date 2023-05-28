@@ -55,8 +55,8 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 
 	ndBasicPlayerCapsule();
 	ndBasicPlayerCapsule(
-		ndDemoEntityManager* const scene, const ndDemoEntity* const modelEntity,
-		const ndMatrix& localAxis, const ndMatrix& location, float meshScale,
+		ndDemoEntityManager* const scene, ndMeshLoader& loader,
+		const ndDemoEntity* const modelEntity, const ndMatrix& localAxis, const ndMatrix& location,
 		ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight, bool isPlayer = false);
 	~ndBasicPlayerCapsule();
 
@@ -71,6 +71,7 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 	bool m_isPlayer;
 
 	ndAnimationPose m_output;
+	ndAnimationSequencePlayer* m_idleCycle;
 	ndAnimationSequencePlayer* m_walkCycle;
 	ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 };

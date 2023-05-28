@@ -19,8 +19,8 @@ using namespace ofbx;
 class ndFbxMeshLoader : public ndClassAlloc
 {
 	class ndFbxAnimationTrack;
-	class ndFbxMeshEffectNodeGlobalNodeMap;
-	class ndFbxImportMeshEffectNodeStackData;
+	class ndFbx2ndMeshNodeMap;
+	class ndFbx2MeshNodeStackData;
 
 	public:
 	ndFbxMeshLoader();
@@ -34,17 +34,17 @@ class ndFbxMeshLoader : public ndClassAlloc
 	void AlignToWorld(ndMesh* const entity);
 	void OptimizeCurve(ndMesh::ndCurve& curve);
 	void OptimizeRotationCurve(ndMesh::ndCurve& curve);
-	ndMesh* FbxToMeshEffectNode(ofbx::IScene* const fbxScene);
+	ndMesh* FbxTondMesh(ofbx::IScene* const fbxScene);
 	ndMatrix ofbxMatrix2dMatrix(const ofbx::Matrix& fbxMatrix);
 	ndMatrix GetCoordinateSystemMatrix(ofbx::IScene* const fbxScene);
 	void ApplyTransform(ndMesh* const entity, const ndMatrix& transform);
 	void LoadAnimation(const ofbx::IScene* const fbxScene, ndMesh* const model);
+	void ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNodeMap& nodeMap);
 	void ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const mesh);
 	ndInt32 GetChildrenNodes(const ofbx::Object* const node, ofbx::Object** buffer);
 	ndAnimationSequence* CreateSequence(ndMesh* const model, const char* const name);
-	void ImportMeshNode(ofbx::Object* const fbxNode, ndFbxMeshEffectNodeGlobalNodeMap& nodeMap);
-	void ApplyAllTransforms(ndMesh* const meshEffectNode, const ndMatrix& unitMatrix, const ndMatrix& upAxis);
-	ndMesh* LoadMeshEffectNodeHierarchy(ofbx::IScene* const fbxScene, ndFbxMeshEffectNodeGlobalNodeMap& nodeMap);
+	ndMesh* CreateMeshHierarchy(ofbx::IScene* const fbxScene, ndFbx2ndMeshNodeMap& nodeMap);
+	void ApplyAllTransforms(ndMesh* const mesh, const ndMatrix& unitMatrix, const ndMatrix& upAxis);
 	ndMatrix GetKeyframe(ndMesh::ndCurveValue& scale, ndMesh::ndCurveValue& position, ndMesh::ndCurveValue& rotation);
 	void LoadAnimationLayer(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const fbxScene, const ofbx::AnimationLayer* const animLayer);
 	void LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, ndFloat32 duration, ndFloat32 timestep, ndInt32 framesCount);

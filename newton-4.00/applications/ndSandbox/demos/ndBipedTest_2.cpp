@@ -13,6 +13,7 @@
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
 #include "ndUIEntity.h"
+#include "ndMeshLoader.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
@@ -1042,7 +1043,8 @@ void ndBipedTest_2(ndDemoEntityManager* const scene)
 	//AddCapsulesStacks(scene, origin, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 	
 	origin.m_posit.m_x -= 20.0f;
-	ndSharedPtr<ndDemoEntity> modelMesh = ndDemoEntity::LoadFbx("walker.fbx", scene);
+	ndMeshLoader loader;
+	ndSharedPtr<ndDemoEntity> modelMesh = loader.LoadEntity("walker.fbx", scene);
 	
 	ndAssert(0);
 	//ndWorld* const world = scene->GetWorld();
@@ -1085,8 +1087,8 @@ void ndBipedTest_2Trainer(ndDemoEntityManager* const scene)
 	//AddCapsulesStacks(scene, origin, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 	
 	origin.m_posit.m_x -= 20.0f;
-	
-	ndSharedPtr<ndDemoEntity> modelMesh(ndDemoEntity::LoadFbx("walker.fbx", scene));
+	ndMeshLoader loader;
+	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("walker.fbx", scene));
 	
 	ndAssert(0);
 	//ndWorld* const world = scene->GetWorld();

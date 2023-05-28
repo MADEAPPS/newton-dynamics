@@ -154,6 +154,10 @@ ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	,m_isDead(false)
 	,m_isVisible(copyFrom.m_isVisible)
 {
+	if (*m_mesh && m_mesh->GetAsDemoSkinMesh())
+	{
+		m_mesh = ndSharedPtr<ndDemoMeshInterface> (m_mesh->Clone(this));
+	}
 }
 
 ndDemoEntity::~ndDemoEntity(void)
@@ -168,18 +172,6 @@ const ndString& ndDemoEntity::GetName() const
 void ndDemoEntity::SetName(const ndString& name)
 {
 	m_name = name;
-}
-
-ndDemoEntity* ndDemoEntity::LoadFbx(const char* const filename, ndDemoEntityManager* const scene, ndFloat32 scale)
-{
-	ndMeshLoader loader(scale);
-	ndDemoEntity* rootEntity = nullptr;
-	ndSharedPtr<ndMesh> fbxEntity (loader.LoadMesh(filename));
-	if (*fbxEntity)
-	{
-		rootEntity = new ndDemoEntity(scene, *fbxEntity);
-	}
-	return rootEntity;
 }
 
 ndDemoEntity* ndDemoEntity::CreateClone () const

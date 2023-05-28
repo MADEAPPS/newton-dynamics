@@ -27,7 +27,9 @@ class ndDemoMesh: public ndDemoMeshInterface, public ndList<ndDemoSubMesh>
 	ndDemoMesh(const ndDemoMesh& mesh, const ndShaderCache& shaderCache);
 	ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache);
 	ndDemoMesh(const char* const name, const ndShaderCache& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, ndFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = ndGetIdentityMatrix(), bool stretchMaping = true);
+	virtual ~ndDemoMesh();
 
+	ndDemoMesh* GetAsDemoMesh();
 	ndDemoSubMesh* AddSubMesh();
 	virtual const char* GetTextureName (const ndDemoSubMesh* const subMesh) const;
 
@@ -40,7 +42,6 @@ class ndDemoMesh: public ndDemoMeshInterface, public ndList<ndDemoSubMesh>
 	void GetIndexArray(ndArray<ndInt32>& indexList) const;
 
 	protected:
-	virtual ~ndDemoMesh();
 	void ResetOptimization();
 	void RenderGeometry(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 

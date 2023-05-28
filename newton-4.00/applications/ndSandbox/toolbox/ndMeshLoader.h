@@ -12,16 +12,17 @@
 #ifndef _ND_MESH_LOADER_H_
 #define _ND_MESH_LOADER_H_
 
+class ndDemoEntity;
+class ndDemoEntityManager;
+
 class ndMeshLoader: public ndFbxMeshLoader
 {
 	public:
-	ndMeshLoader(ndFloat32 scale = 1.0f);
+	ndMeshLoader();
 	virtual ~ndMeshLoader();
 
-	ndAnimationSequence* LoadAnimation(const char* const meshName);
-	ndMesh* LoadMesh(const char* const meshName, bool loadAnimation = false);
-
-	ndFloat32 m_scale;
+	virtual ndMesh* LoadMesh(const char* const fbxMeshName, bool loadAnimation = false);
+	virtual ndDemoEntity* LoadEntity(const char* const fbxMeshName, ndDemoEntityManager* const scene);
 };
 
 #endif

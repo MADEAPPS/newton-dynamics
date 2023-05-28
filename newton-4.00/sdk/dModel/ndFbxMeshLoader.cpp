@@ -17,14 +17,14 @@ using namespace ofbx;
 
 #define D_ANIM_BASE_FREQ ndFloat32 (30.0f)
 
-class ndFbxMeshLoader::ndFbxImportMeshEffectNodeStackData
+class ndFbxMeshLoader::ndFbx2MeshNodeStackData
 {
 	public:
-	ndFbxImportMeshEffectNodeStackData()
+	ndFbx2MeshNodeStackData()
 	{
 	}
 
-	ndFbxImportMeshEffectNodeStackData(const ofbx::Object* const fbxNode, ndMesh* const parentNode)
+	ndFbx2MeshNodeStackData(const ofbx::Object* const fbxNode, ndMesh* const parentNode)
 		:m_fbxNode(fbxNode)
 		,m_parentNode(parentNode)
 	{
@@ -34,7 +34,7 @@ class ndFbxMeshLoader::ndFbxImportMeshEffectNodeStackData
 	ndMesh* m_parentNode;
 };
 
-class ndFbxMeshLoader::ndFbxMeshEffectNodeGlobalNodeMap : public ndTree<ndMesh*, const ofbx::Object*>
+class ndFbxMeshLoader::ndFbx2ndMeshNodeMap : public ndTree<ndMesh*, const ofbx::Object*>
 {
 };
 
@@ -199,9 +199,9 @@ ndMatrix ndFbxMeshLoader::ofbxMatrix2dMatrix(const ofbx::Matrix& fbxMatrix)
 	return matrix;
 }
 
-void ndFbxMeshLoader::ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const mesh)
+void ndFbxMeshLoader::ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const meshEffect)
 {
-	ndArray<ndMeshEffect::ndMaterial>& materialArray = mesh->GetMaterials();
+	ndArray<ndMeshEffect::ndMaterial>& materialArray = meshEffect->GetMaterials();
 	
 	ndInt32 materialCount = fbxMesh->getMaterialCount();
 	if (materialCount == 0)
@@ -276,13 +276,13 @@ ndMatrix ndFbxMeshLoader::GetKeyframe(ndMesh::ndCurveValue& scale, ndMesh::ndCur
 	return matrix;
 }
 
-void ndFbxMeshLoader::FreezeScale(ndMesh* const entity)
+void ndFbxMeshLoader::FreezeScale(ndMesh* const mesh)
 {
 	ndInt32 stack = 1;
 	ndMatrix parentMatrix[1024];
 	ndMesh* entBuffer[1024];
 	
-	entBuffer[0] = entity;
+	entBuffer[0] = mesh;
 	parentMatrix[0] = ndGetIdentityMatrix();
 
 	while (stack)
@@ -300,14 +300,14 @@ void ndFbxMeshLoader::FreezeScale(ndMesh* const entity)
 		meshNode->m_matrix = transformMatrix;
 		scaleMatrix = ndMatrix(ndGetIdentityMatrix(), scale, stretchAxis);
 
-		ndSharedPtr<ndMeshEffect> mesh (meshNode->GetMesh());
-		if (*mesh)
+		ndSharedPtr<ndMeshEffect> effectMesh (meshNode->GetMesh());
+		if (*effectMesh)
 		{
 			matrix = meshNode->m_meshMatrix * scaleMatrix;
 			matrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
 			meshNode->m_meshMatrix = transformMatrix;
 			ndMatrix meshMatrix(ndGetIdentityMatrix(), scale, stretchAxis);
-			mesh->ApplyTransform(meshMatrix);
+			effectMesh->ApplyTransform(meshMatrix);
 		}
 
 		ndMesh::ndCurve& scaleCurve = meshNode->GetScaleCurve();
@@ -368,30 +368,30 @@ void ndFbxMeshLoader::FreezeScale(ndMesh* const entity)
 	}
 }
 
-void ndFbxMeshLoader::ApplyTransform(ndMesh* const entity, const ndMatrix& transform)
+void ndFbxMeshLoader::ApplyTransform(ndMesh* const mesh, const ndMatrix& transform)
 {
-	entity->ApplyTransform(transform);
+	mesh->ApplyTransform(transform);
 }
 
-void ndFbxMeshLoader::AlignToWorld(ndMesh* const entity)
+void ndFbxMeshLoader::AlignToWorld(ndMesh* const mesh)
 {
 	ndMesh* entBuffer[1024];
 
 	ndInt32 stack = 0;
-	ndMatrix rotation(entity->m_matrix);
+	ndMatrix rotation(mesh->m_matrix);
 	ndVector posit(rotation.m_posit);
 	rotation.m_posit = ndVector::m_wOne;
 
 	ndMatrix invRotation(rotation.OrthoInverse());
-	for (ndMesh* child = entity->GetFirstChild(); child; child = child->GetNext())
+	for (ndMesh* child = mesh->GetFirstChild(); child; child = child->GetNext())
 	{
 		entBuffer[stack] = child;
 		stack++;
 	}
 
-	entity->m_matrix = ndGetIdentityMatrix();
-	entity->m_matrix.m_posit = posit;
-	if (entity->GetScaleCurve().GetCount())
+	mesh->m_matrix = ndGetIdentityMatrix();
+	mesh->m_matrix.m_posit = posit;
+	if (mesh->GetScaleCurve().GetCount())
 	{
 		ndAssert(0);
 	}
@@ -404,12 +404,12 @@ void ndFbxMeshLoader::AlignToWorld(ndMesh* const entity)
 		ndMatrix entMatrix(invRotation * meshNode->m_matrix * rotation);
 		meshNode->m_matrix = entMatrix;
 
-		ndSharedPtr<ndMeshEffect> mesh = meshNode->GetMesh();
-		if (*mesh)
+		ndSharedPtr<ndMeshEffect> effectMesh (meshNode->GetMesh());
+		if (*effectMesh)
 		{
 			ndMatrix meshMatrix(invRotation * meshNode->m_meshMatrix * rotation);
 			meshNode->m_meshMatrix = meshMatrix;
-			mesh->ApplyTransform(rotation);
+			effectMesh->ApplyTransform(rotation);
 		}
 
 		ndMesh::ndCurve& scaleCurve = meshNode->GetScaleCurve();
@@ -463,25 +463,25 @@ void ndFbxMeshLoader::AlignToWorld(ndMesh* const entity)
 	}
 }
 
-void ndFbxMeshLoader::ApplyAllTransforms(ndMesh* const meshEffectNode, const ndMatrix& coordinateSystem, const ndMatrix& upAxis)
+void ndFbxMeshLoader::ApplyAllTransforms(ndMesh* const mesh, const ndMatrix& coordinateSystem, const ndMatrix& upAxis)
 {
-	FreezeScale(meshEffectNode);
-	ApplyTransform(meshEffectNode, coordinateSystem);
-	meshEffectNode->m_matrix = meshEffectNode->m_matrix * upAxis;
-	if (meshEffectNode->GetScaleCurve().GetCount())
+	FreezeScale(mesh);
+	ApplyTransform(mesh, coordinateSystem);
+	mesh->m_matrix = mesh->m_matrix * upAxis;
+	if (mesh->GetScaleCurve().GetCount())
 	{
 		ndAssert(0);
 	}
-	AlignToWorld(meshEffectNode);
+	AlignToWorld(mesh);
 }
 
-void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbxMeshEffectNodeGlobalNodeMap& nodeMap)
+void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNodeMap& nodeMap)
 {
 	const ofbx::Mesh* const fbxMesh = (ofbx::Mesh*)fbxNode;
 
 	ndAssert(nodeMap.Find(fbxNode));
 	ndMesh* const entity = nodeMap.Find(fbxNode)->GetInfo();
-	ndSharedPtr<ndMeshEffect> mesh(new ndMeshEffect());
+	ndSharedPtr<ndMeshEffect> meshEffect(new ndMeshEffect());
 	
 	ndMatrix pivotMatrix(ofbxMatrix2dMatrix(fbxMesh->getGeometricMatrix()));
 	entity->m_meshMatrix = pivotMatrix;
@@ -509,11 +509,11 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbxMeshEffec
 	faceIndexArray.SetCount(faceCount);
 	faceMaterialArray.SetCount(faceCount);
 	
-	ImportMaterials(fbxMesh, *mesh);
+	ImportMaterials(fbxMesh, *meshEffect);
 	
 	ndInt32 count = 0;
 	ndInt32 faceIndex = 0;
-	const ndArray<ndMeshEffect::ndMaterial>& materialArray = mesh->GetMaterials();
+	const ndArray<ndMeshEffect::ndMaterial>& materialArray = meshEffect->GetMaterials();
 	ndInt32 materialId = (materialArray.GetCount() <= 1) ? 0 : -1;
 	for (ndInt32 i = 0; i < indexCount; ++i)
 	{
@@ -598,7 +598,7 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbxMeshEffec
 			const ofbx::Object* const fbxBone = fbxCluster->getLink();
 			if (nodeMap.Find(fbxBone))
 			{
-				ndMeshEffect::dVertexCluster* const cluster = mesh->CreateCluster(fbxBone->name);
+				ndMeshEffect::dVertexCluster* const cluster = meshEffect->CreateCluster(fbxBone->name);
 	
 				ndAssert(fbxCluster->getIndicesCount() == fbxCluster->getWeightsCount());
 				ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
@@ -613,16 +613,16 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbxMeshEffec
 		}
 	}
 	
-	mesh->BuildFromIndexList(&format);
-	entity->SetMesh(mesh);
+	meshEffect->BuildFromIndexList(&format);
+	entity->SetMesh(meshEffect);
 	//mesh->RepairTJoints();
 }
 
-ndMesh* ndFbxMeshLoader::LoadMeshEffectNodeHierarchy(ofbx::IScene* const fbxScene, ndFbxMeshEffectNodeGlobalNodeMap& nodeMap)
+ndMesh* ndFbxMeshLoader::CreateMeshHierarchy(ofbx::IScene* const fbxScene, ndFbx2ndMeshNodeMap& nodeMap)
 {
 	ndInt32 stack = 0;
 	ndFixSizeArray<ofbx::Object*, 1024> buffer;
-	ndFixSizeArray <ndFbxImportMeshEffectNodeStackData, 1024> nodeStack;
+	ndFixSizeArray <ndFbx2MeshNodeStackData, 1024> nodeStack;
 
 	buffer.SetCount(1024);
 	nodeStack.SetCount(1024);
@@ -631,28 +631,28 @@ ndMesh* ndFbxMeshLoader::LoadMeshEffectNodeHierarchy(ofbx::IScene* const fbxScen
 	ndAssert(rootNode);
 	stack = GetChildrenNodes(rootNode, &buffer[0]);
 	
-	ndMesh* rootEntity = nullptr;
+	ndMesh* mesh = nullptr;
 	if (stack > 1)
 	{
-		rootEntity = new ndMesh(nullptr);
-		rootEntity->SetName("dommyRoot");
+		mesh = new ndMesh(nullptr);
+		mesh->SetName("dommyRoot");
 	}
 	
 	for (ndInt32 i = 0; i < stack; ++i)
 	{
 		ofbx::Object* const child = buffer[stack - i - 1];
-		nodeStack[i] = ndFbxImportMeshEffectNodeStackData(child, rootEntity);
+		nodeStack[i] = ndFbx2MeshNodeStackData(child, mesh);
 	}
 	
 	while (stack)
 	{
 		stack--;
-		ndFbxImportMeshEffectNodeStackData data(nodeStack[stack]);
+		ndFbx2MeshNodeStackData data(nodeStack[stack]);
 	
 		ndMesh* const node = new ndMesh(data.m_parentNode);
-		if (!rootEntity)
+		if (!mesh)
 		{
-			rootEntity = node;
+			mesh = node;
 		}
 	
 		const ndMatrix localMatrix(ofbxMatrix2dMatrix(data.m_fbxNode->getLocalTransform()));
@@ -665,21 +665,21 @@ ndMesh* ndFbxMeshLoader::LoadMeshEffectNodeHierarchy(ofbx::IScene* const fbxScen
 		for (ndInt32 i = 0; i < count; ++i)
 		{
 			ofbx::Object* const child = buffer[count - i - 1];
-			nodeStack[stack] = ndFbxImportMeshEffectNodeStackData(child, node);
+			nodeStack[stack] = ndFbx2MeshNodeStackData(child, node);
 			stack++;
 			ndAssert(stack < ndInt32(sizeof(nodeStack) / sizeof(nodeStack[0])));
 		}
 	}
 
-	return rootEntity;
+	return mesh;
 }
 
-ndMesh* ndFbxMeshLoader::FbxToMeshEffectNode(ofbx::IScene* const fbxScene)
+ndMesh* ndFbxMeshLoader::FbxTondMesh(ofbx::IScene* const fbxScene)
 {
-	ndFbxMeshEffectNodeGlobalNodeMap nodeMap;
-	ndMesh* const entity = LoadMeshEffectNodeHierarchy(fbxScene, nodeMap);
+	ndFbx2ndMeshNodeMap nodeMap;
+	ndMesh* const mesh = CreateMeshHierarchy(fbxScene, nodeMap);
 
-	ndFbxMeshEffectNodeGlobalNodeMap::Iterator iter(nodeMap);
+	ndFbx2ndMeshNodeMap::Iterator iter(nodeMap);
 	for (iter.Begin(); iter; iter++)
 	{
 		ofbx::Object* const fbxNode = (ofbx::Object*)iter.GetKey();
@@ -735,7 +735,7 @@ ndMesh* ndFbxMeshLoader::FbxToMeshEffectNode(ofbx::IScene* const fbxScene)
 		}
 	}
 
-	return entity;
+	return mesh;
 }
 
 void ndFbxMeshLoader::LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, ndFloat32 duration, ndFloat32 timestep, int framesCount)
@@ -1058,15 +1058,15 @@ ndMesh* ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bool loadAnima
 
 	ndSharedPtr<ofbx::IScene> fbxScene(ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE));
 	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(*fbxScene));
-	ndMesh* const meshEffectNode = FbxToMeshEffectNode(*fbxScene);
+	ndMesh* const mesh = FbxTondMesh(*fbxScene);
 	if (loadAnimation)
 	{
-		LoadAnimation(*fbxScene, meshEffectNode);
+		LoadAnimation(*fbxScene, mesh);
 	}
 
 	ndMatrix upAxis((fbxScene->getGlobalSettings()->UpAxis != UpVector_AxisY) ? ndGetIdentityMatrix() : ndRollMatrix(-90.0f * ndDegreeToRad));
-	ApplyAllTransforms(meshEffectNode, convertMatrix, upAxis);
-	return meshEffectNode;
+	ApplyAllTransforms(mesh, convertMatrix, upAxis);
+	return mesh;
 }
 
 ndAnimationSequence* ndFbxMeshLoader::LoadAnimation(const char* const fullPathName)

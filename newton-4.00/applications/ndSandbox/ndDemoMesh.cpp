@@ -303,6 +303,11 @@ ndDemoMesh::~ndDemoMesh()
 	ResetOptimization();
 }
 
+ndDemoMesh* ndDemoMesh::GetAsDemoMesh()
+{ 
+	return this; 
+}
+
 const char* ndDemoMesh::GetTextureName(const ndDemoSubMesh* const subMesh) const
 {
 	return subMesh->m_material.GetTextureName();

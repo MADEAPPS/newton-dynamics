@@ -13,6 +13,7 @@
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
 #include "ndUIEntity.h"
+#include "ndMeshLoader.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
@@ -485,7 +486,8 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndBodyKinematic* const floor = BuildFloorBox(scene, ndGetIdentityMatrix());
 	
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	ndSharedPtr<ndDemoEntity> modelMesh(ndDemoEntity::LoadFbx("robot.fbx", scene));
+	ndMeshLoader loader;
+	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("robot.fbx", scene));
 	
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-90.0f * ndDegreeToRad));

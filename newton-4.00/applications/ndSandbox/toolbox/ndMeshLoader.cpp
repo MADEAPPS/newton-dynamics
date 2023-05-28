@@ -11,10 +11,10 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndMeshLoader.h"
+#include "ndDemoEntity.h"
 
-ndMeshLoader::ndMeshLoader(ndFloat32 scale)
+ndMeshLoader::ndMeshLoader()
 	:ndFbxMeshLoader()
-	,m_scale(scale)
 {
 }
 
@@ -27,20 +27,12 @@ ndMesh* ndMeshLoader::LoadMesh(const char* const fbxMeshName, bool loadAnimation
 	char pathName[1024];
 	dGetWorkingFileName(fbxMeshName, pathName);
 	ndMesh* const mesh = ndFbxMeshLoader::LoadMesh(pathName, loadAnimation);
-	if (m_scale != ndFloat32(1.0f))
-	{
-		ndMatrix scaleMatrix(ndGetIdentityMatrix());
-		scaleMatrix[0][0] = m_scale;
-		scaleMatrix[1][1] = m_scale;
-		scaleMatrix[2][2] = m_scale;
-		mesh->ApplyTransform(scaleMatrix);
-	}
-
-	//ndMesh::Save(mesh, "xxx.ndm");
 	return mesh;
 }
 
-ndAnimationSequence* ndMeshLoader::LoadAnimation(const char* const meshName)
+ndDemoEntity* ndMeshLoader::LoadEntity(const char* const fbxMeshName, ndDemoEntityManager* const scene)
 {
-	return ndFbxMeshLoader::LoadAnimation(meshName);
+	ndSharedPtr<ndMesh> fbxEntity(LoadMesh(fbxMeshName, false));
+	ndDemoEntity* const rootEntity = *fbxEntity ? new ndDemoEntity(scene, *fbxEntity) : nullptr;
+	return rootEntity;
 }

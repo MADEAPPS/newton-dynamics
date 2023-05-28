@@ -556,12 +556,11 @@ bool ndDemoEntityManager::GetKeyState(ndInt32 key) const
 	return state;
 }
 
-ndSharedPtr<ndAnimationSequence> ndDemoEntityManager::GetAnimationSequence(const char* const fileName, ndFloat32 scale)
+ndSharedPtr<ndAnimationSequence> ndDemoEntityManager::GetAnimationSequence(ndMeshLoader& loader, const char* const fileName)
 {
 	ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fileName);
 	if (!node)
 	{
-		ndMeshLoader loader(scale);
 		ndAnimationSequence* const sequence = loader.LoadAnimation(fileName);
 		if (sequence)
 		{

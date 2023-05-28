@@ -12,6 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
+#include "ndMeshLoader.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
@@ -20,6 +21,44 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"
+
+class ndMopcapMeshLoader : public ndMeshLoader
+{
+	public:
+	ndMopcapMeshLoader(ndFloat32 scale)
+		:ndMeshLoader()
+		,m_scale(scale)
+	{
+	}
+
+	virtual ~ndMopcapMeshLoader()
+	{
+	}
+
+	ndMesh* LoadMesh(const char* const fbxMeshName, bool loadAnimation)
+	{
+		ndMesh* const mesh = ndMeshLoader::LoadMesh(fbxMeshName, loadAnimation);
+
+		if (m_scale != ndFloat32(1.0f))
+		{
+			ndMatrix scaleMatrix(ndGetIdentityMatrix());
+			scaleMatrix[0][0] = m_scale;
+			scaleMatrix[1][1] = m_scale;
+			scaleMatrix[2][2] = m_scale;
+			mesh->ApplyTransform(scaleMatrix);
+		}
+		return mesh;
+	}
+
+	virtual ndAnimationSequence* LoadAnimation(const char* const clipName)
+	{
+		ndAnimationSequence* const sequence = ndMeshLoader::LoadAnimation(clipName);
+
+		return sequence;
+	}
+
+	ndFloat32 m_scale;
+};
 
 void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 {
@@ -40,25 +79,26 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	ndFloat32 radio = 0.5f;
 	ndFloat32 mass = 100.0f;
 
-	ndFloat32 meshScale = 1.2f;
+	//ndMeshLoader loader;
+	//ndSharedPtr<ndMesh> fbxEntity(loader.LoadMesh("mocapWalker.fbx"));
+	//ndMesh::Save(*fbxEntity, "xxx.ndm");
 
+	ndMopcapMeshLoader loader(1.0f);
 	ndPhysicsWorld* const world = scene->GetWorld();
-	//ndSharedPtr<ndDemoEntity> entity(ndDemoEntity::LoadFbx("walker.fbx", scene));
-	ndSharedPtr<ndDemoEntity> entity(ndDemoEntity::LoadFbx("mocapWalker.fbx", scene, meshScale));
-	//ndSharedPtr<ndDemoEntity> entity(ndDemoEntity::LoadFbx("box.fbx", scene));
+	ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("dummy.fbx", scene));
 	
-	ndSharedPtr<ndBody> player0(new ndBasicPlayerCapsule(scene, *entity, localAxis, location, meshScale, mass, radio, height, height / 4.0f, true));
+	ndSharedPtr<ndBody> player0(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f, true));
 	world->AddBody(player0);
 
-	ndSharedPtr<ndBody> player1(new ndBasicPlayerCapsule(scene, *entity, localAxis, location, meshScale, mass, radio, height, height/4.0f));
+	ndSharedPtr<ndBody> player1(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height/4.0f));
 	//world->AddBody(player1);
 
 	location.m_posit.m_z += 2.0f;
-	ndSharedPtr<ndBody> player2(new ndBasicPlayerCapsule(scene, *entity, localAxis, location, meshScale, mass, radio, height, height / 4.0f));
+	ndSharedPtr<ndBody> player2(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f));
 	//world->AddBody(player2);
 	
 	location.m_posit.m_z += 2.0f;
-	ndSharedPtr<ndBody> player3(new ndBasicPlayerCapsule(scene, *entity, localAxis, location, meshScale, mass, radio, height, height / 4.0f));
+	ndSharedPtr<ndBody> player3(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f));
 	//world->AddBody(player3);
 
 	class PlaceMatrix : public ndMatrix

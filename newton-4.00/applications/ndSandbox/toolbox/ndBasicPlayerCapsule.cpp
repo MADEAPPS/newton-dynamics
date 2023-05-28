@@ -64,8 +64,9 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		ndFloat32 timestep = word->GetScene()->GetTimestep();
 		timestep *= 0.25f;
 		static ndFloat32 xxxx = 0.0f;
-		player->m_walkCycle->SetParam(xxxx);
-		xxxx += 5.0e-3f;
+		//player->m_walkCycle->SetParam(xxxx);
+		player->m_idleCycle->SetParam(xxxx);
+		xxxx += 1.0e-2f;
 		float xxxxxx = 1.0f;
 		if (xxxx > xxxxxx)
 		{
@@ -92,13 +93,14 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule()
 }
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(
-	ndDemoEntityManager* const scene, const ndDemoEntity* const modelEntity,
-	const ndMatrix& localAxis, const ndMatrix& location, float meshScale,
+	ndDemoEntityManager* const scene, ndMeshLoader& loader,
+	const ndDemoEntity* const modelEntity, const ndMatrix& localAxis, const ndMatrix& location,
 	ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight, bool isPlayer)
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 	//,m_scene(scene)
 	,m_isPlayer(isPlayer)
 	,m_output()
+	,m_idleCycle(nullptr)
 	,m_walkCycle(nullptr)
 	,m_animBlendTree(nullptr)
 {
@@ -110,8 +112,6 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	matrix.m_posit.m_y = floor.m_y;
 	
 	ndDemoEntity* const entity = modelEntity->CreateClone();
-	//entity->ResetMatrix(entity->GetRenderMatrix() * matrix);
-	//entity->ResetMatrix(matrix);
 
 	SetMatrix(matrix);
 	scene->AddEntity(entity);
@@ -123,10 +123,9 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 	}
 
-	//// create bind pose to animation sequences.
-	//ndAnimationSequence* const sequence = scene->GetAnimationSequence("white_Man_idle.fbx");
-	ndSharedPtr<ndAnimationSequence> sequence(scene->GetAnimationSequence("mocapWalker_walk.fbx", meshScale));
-
+	// create bind pose to animation sequences.
+	ndSharedPtr<ndAnimationSequence> sequence(scene->GetAnimationSequence(loader, "mocap_ide.fbx"));
+	
 	const ndList<ndAnimationKeyFramesTrack>& tracks = sequence->GetTracks();
 	for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext()) 
 	{
@@ -138,14 +137,11 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	}
 	
 	//// create an animation blend tree
-	//ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("white_Man_idle.fbx");
-	//ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("white_man_walk.fbx");
-	//ndAnimationSequence* const runSequence = scene->GetAnimationSequence("white_man_run.fbx");
-
-	ndSharedPtr<ndAnimationSequence> walkSequence(scene->GetAnimationSequence("mocapWalker_walk.fbx", meshScale));
+	ndSharedPtr<ndAnimationSequence> idleSequence (scene->GetAnimationSequence(loader, "mocap_ide.fbx"));
+	ndSharedPtr<ndAnimationSequence> walkSequence(scene->GetAnimationSequence(loader, "mocap_walk.fbx"));
 	
-	//ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
-	ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
+	ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
+	//ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
 	//ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
 	//
 	//////dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
@@ -158,9 +154,10 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	//idleMoveBlend->SetParam(1.0f);
 	////walkRunBlend->SetTimeDilation1(scale1);
 	//m_animBlendTree = idleMoveBlend;
-	m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode> (walk);
+	m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode> (idle);
 
-	m_walkCycle = walk;
+	m_idleCycle = idle;
+	//m_walkCycle = walk;
 	 
 	//// evaluate twice that interpolation is reset
 	//ndAssert(0);
