@@ -155,7 +155,7 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 		ndMatrix entMatrix(invTransform * node->m_matrix * transform);
 		node->m_matrix = entMatrix;
 
-		ndSharedPtr<ndMeshEffect> mesh = node->GetMesh();
+		ndSharedPtr<ndMeshEffect> mesh (node->GetMesh());
 		if (*mesh)
 		{
 			ndMatrix meshMatrix(invTransform * node->m_meshMatrix * transform);
@@ -163,7 +163,9 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 			mesh->ApplyTransform(transform);
 		}
 
-		if (node->GetScaleCurve().GetCount())
+		ndMesh::ndCurve& positCurve = node->GetPositCurve();
+		ndMesh::ndCurve& rotationCurve = node->GetRotationCurve();
+		if (positCurve.GetCount() || rotationCurve.GetCount())
 		{
 			ndMesh::ndCurve::ndNode* positNode = node->GetPositCurve().GetFirst();
 			ndMesh::ndCurve::ndNode* rotationNode = node->GetRotationCurve().GetFirst();
@@ -172,7 +174,7 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 			scaleValue.m_x = 1.0f;
 			scaleValue.m_y = 1.0f;
 			scaleValue.m_z = 1.0f;
-			for (ndInt32 i = 0; i < node->GetScaleCurve().GetCount(); ++i)
+			for (ndInt32 i = 0; i < positCurve.GetCount(); ++i)
 			{
 				ndMesh::ndCurveValue& positValue = positNode->GetInfo();
 				ndMesh::ndCurveValue& rotationValue = rotationNode->GetInfo();

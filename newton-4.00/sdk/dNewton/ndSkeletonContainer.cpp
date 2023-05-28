@@ -1446,12 +1446,13 @@ void ndSkeletonContainer::CalculateJointAccelImmediate(const ndJacobian* const i
 	{
 		ndNode* const node = m_nodesOrder[i];
 		ndAssert(i == node->m_index);
-		const ndInt32 m = node->m_body->m_index;
 
 		ndForcePair& a = accel[i];
 		ndAssert(node->m_body);
 		a.m_body = zero;
 		a.m_joint = zero;
+
+		//const ndInt32 m = node->m_body->m_index;
 		//a.m_body[0] = internalForces[m].m_linear.m_x;
 		//a.m_body[1] = internalForces[m].m_linear.m_y;
 		//a.m_body[2] = internalForces[m].m_linear.m_z;

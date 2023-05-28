@@ -1,26 +1,18 @@
-* This software is provided 'as-is', without any express or implied
-* warranty. In no event will the authors be held liable for any damages
-* arising from the use of this software.
-* 
-* Permission is granted to anyone to use this software for any purpose,
-* including commercial applications, and to alter it and redistribute it
-* freely
+This tool convert bvh and newton propieratry ndm files to autodesk FBX.
 
+unfortunatlly the autodesk fbx sdk, is only free to use but not reditributable
+therefore in order to build the tool, you most download a sdk version from autodesk.
+At the time of this build that url is: 
+https://www.autodesk.com/developer-network/platform-technologies/fbx-sdk-2020-0
 
-========================================================================
-    CONSOLE APPLICATION : FbxtoNgd Project Overview
-========================================================================
-
-AppWizard has created this FbxtoNgd application for you.
-
-This file contains a summary of what you will find in each of the files that
-make up your FbxtoNgd application.
-
-This application requires the user to downlaod and install FBX SDK 2019.0 VS2015 
-
-after instalaction you need to create enviroment variable FBX_SDK and point to the root directory of the SDK
+after downloading and installing the SDK, you also need to create an user enviroment 
+variable to point to the instalation folder FBX_SDK=[sdk_path]
 for example:
-FBX_SDK=C:\Program Files\Autodesk\FBX\FBX SDK\2019.0
 
+FBX_SDK=C:\Program Files\Autodesk\FBX\FBX SDK\2020.0.1
 
-
+-open cmake and open the source folder
+-select a build folder.
+-click build
+-open visual studio
+-compile the tool

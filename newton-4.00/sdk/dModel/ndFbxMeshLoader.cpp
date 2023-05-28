@@ -289,35 +289,41 @@ void ndFbxMeshLoader::FreezeScale(ndMesh* const entity)
 	{
 		stack--;
 		ndMatrix scaleMatrix(parentMatrix[stack]);
-		ndMesh* const ent = entBuffer[stack];
+		ndMesh* const meshNode = entBuffer[stack];
 
 		ndVector scale;
 		ndMatrix stretchAxis;
 		ndMatrix transformMatrix;
 		
-		ndMatrix matrix(ent->m_matrix * scaleMatrix);
+		ndMatrix matrix(meshNode->m_matrix * scaleMatrix);
 		matrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
-		ent->m_matrix = transformMatrix;
+		meshNode->m_matrix = transformMatrix;
 		scaleMatrix = ndMatrix(ndGetIdentityMatrix(), scale, stretchAxis);
 
-		ndSharedPtr<ndMeshEffect> mesh = ent->GetMesh();
+		ndSharedPtr<ndMeshEffect> mesh (meshNode->GetMesh());
 		if (*mesh)
 		{
-			matrix = ent->m_meshMatrix * scaleMatrix;
+			matrix = meshNode->m_meshMatrix * scaleMatrix;
 			matrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
-			ent->m_meshMatrix = transformMatrix;
+			meshNode->m_meshMatrix = transformMatrix;
 			ndMatrix meshMatrix(ndGetIdentityMatrix(), scale, stretchAxis);
 			mesh->ApplyTransform(meshMatrix);
 		}
 
-		if (ent->GetScaleCurve().GetCount())
+		ndMesh::ndCurve& scaleCurve = meshNode->GetScaleCurve();
+		ndMesh::ndCurve& positCurve = meshNode->GetPositCurve();
+		ndMesh::ndCurve& rotationCurve = meshNode->GetRotationCurve();
+		if (scaleCurve.GetCount() || positCurve.GetCount() || rotationCurve.GetCount())
 		{
-			ndMesh::ndCurve::ndNode* scaleNode = ent->GetScaleCurve().GetFirst();
-			ndMesh::ndCurve::ndNode* positNode = ent->GetPositCurve().GetFirst();
-			ndMesh::ndCurve::ndNode* rotationNode = ent->GetRotationCurve().GetFirst();
+			ndMesh::ndCurve::ndNode* scaleNode = scaleCurve.GetFirst();
+			ndMesh::ndCurve::ndNode* positNode = positCurve.GetFirst();
+			ndMesh::ndCurve::ndNode* rotationNode = rotationCurve.GetFirst();
+
+			ndAssert(scaleCurve.GetCount() == positCurve.GetCount());
+			ndAssert(scaleCurve.GetCount() == rotationCurve.GetCount());
 
 			ndMatrix parentAnimScale (parentMatrix[stack]);
-			for (ndInt32 i = 0; i < ent->GetScaleCurve().GetCount(); ++i)
+			for (ndInt32 i = 0; i < scaleCurve.GetCount(); ++i)
 			{
 				ndMesh::ndCurveValue& scaleValue = scaleNode->GetInfo();
 				ndMesh::ndCurveValue& positValue = positNode->GetInfo();
@@ -353,7 +359,7 @@ void ndFbxMeshLoader::FreezeScale(ndMesh* const entity)
 			}
 		}
 
-		for (ndMesh* child = ent->GetFirstChild(); child; child = child->GetNext())
+		for (ndMesh* child = meshNode->GetFirstChild(); child; child = child->GetNext())
 		{
 			entBuffer[stack] = child;
 			parentMatrix[stack] = scaleMatrix;
@@ -406,16 +412,22 @@ void ndFbxMeshLoader::AlignToWorld(ndMesh* const entity)
 			mesh->ApplyTransform(rotation);
 		}
 
-		if (meshNode->GetScaleCurve().GetCount())
+		ndMesh::ndCurve& scaleCurve = meshNode->GetScaleCurve();
+		ndMesh::ndCurve& positCurve = meshNode->GetPositCurve();
+		ndMesh::ndCurve& rotationCurve = meshNode->GetRotationCurve();
+		if (scaleCurve.GetCount() || positCurve.GetCount() || rotationCurve.GetCount())
 		{
-			ndMesh::ndCurve::ndNode* positNode = meshNode->GetPositCurve().GetFirst();
-			ndMesh::ndCurve::ndNode* rotationNode = meshNode->GetRotationCurve().GetFirst();
+			ndMesh::ndCurve::ndNode* positNode = positCurve.GetFirst();
+			ndMesh::ndCurve::ndNode* rotationNode = rotationCurve.GetFirst();
+
+			ndAssert(scaleCurve.GetCount() == positCurve.GetCount());
+			ndAssert(scaleCurve.GetCount() == rotationCurve.GetCount());
 
 			ndMesh::ndCurveValue scaleValue;
 			scaleValue.m_x = 1.0f;
 			scaleValue.m_y = 1.0f;
 			scaleValue.m_z = 1.0f;
-			for (ndInt32 i = 0; i < meshNode->GetScaleCurve().GetCount(); ++i)
+			for (ndInt32 i = 0; i < scaleCurve.GetCount(); ++i)
 			{
 				ndMesh::ndCurveValue& positValue = positNode->GetInfo();
 				ndMesh::ndCurveValue& rotationValue = rotationNode->GetInfo();
@@ -440,7 +452,7 @@ void ndFbxMeshLoader::AlignToWorld(ndMesh* const entity)
 				positNode = positNode->GetNext();
 				rotationNode = rotationNode->GetNext();
 			}
-			//meshNode->GetScaleCurve().RemoveAll();
+			scaleCurve.RemoveAll();
 		}
 
 		for (ndMesh* child = meshNode->GetFirstChild(); child; child = child->GetNext())
@@ -958,7 +970,6 @@ void ndFbxMeshLoader::OptimizeRotationCurve(ndMesh::ndCurve& curve)
 	OptimizeCurve(curve);
 }
 
-
 ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMesh* const model, const char* const name)
 {
 	ndAnimationSequence* const sequence = new ndAnimationSequence;
@@ -971,14 +982,16 @@ ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMesh* const model, const 
 	while (stack)
 	{
 		stack--;
-		ndMesh* const ent = entBuffer[stack];
+		ndMesh* const meshNode = entBuffer[stack];
 
-		if (ent->GetScaleCurve().GetCount())
+		ndMesh::ndCurve& scaleCurve = meshNode->GetScaleCurve();
+		ndMesh::ndCurve& positCurve = meshNode->GetPositCurve();
+		ndMesh::ndCurve& rotationCurve = meshNode->GetRotationCurve();
+		if (scaleCurve.GetCount() || positCurve.GetCount() || rotationCurve.GetCount())
 		{
 			ndAnimationKeyFramesTrack* const track = sequence->AddTrack();
-			track->m_name = ent->GetName();
+			track->m_name = meshNode->GetName();
 
-			ndMesh::ndCurve& positCurve = ent->GetPositCurve();
 			OptimizeCurve(positCurve);
 			for (ndMesh::ndCurve::ndNode* srcNode = positCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 			{
@@ -988,7 +1001,6 @@ ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMesh* const model, const 
 			}
 
 			ndQuaternion rotation;
-			ndMesh::ndCurve& rotationCurve = ent->GetRotationCurve();
 			OptimizeRotationCurve(rotationCurve);
 			for (ndMesh::ndCurve::ndNode* srcNode = rotationCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 			{
@@ -1015,7 +1027,7 @@ ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMesh* const model, const 
 			}
 		}
 
-		for (ndMesh* child = ent->GetFirstChild(); child; child = child->GetNext())
+		for (ndMesh* child = meshNode->GetFirstChild(); child; child = child->GetNext())
 		{
 			entBuffer[stack] = child;
 			stack++;
