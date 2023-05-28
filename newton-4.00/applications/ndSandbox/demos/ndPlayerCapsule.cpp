@@ -47,6 +47,12 @@ class ndMopcapMeshLoader : public ndMeshLoader
 			scaleMatrix[2][2] = m_scale;
 			mesh->ApplyTransform(scaleMatrix);
 		}
+
+		if (!loadAnimation)
+		{
+			ndMesh::Save(mesh, "xxx.ndm");
+		}
+
 		return mesh;
 	}
 
@@ -78,10 +84,6 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	ndFloat32 height = 1.9f;
 	ndFloat32 radio = 0.5f;
 	ndFloat32 mass = 100.0f;
-
-	//ndMeshLoader loader;
-	//ndSharedPtr<ndMesh> fbxEntity(loader.LoadMesh("mocapWalker.fbx"));
-	//ndMesh::Save(*fbxEntity, "xxx.ndm");
 
 	ndMopcapMeshLoader loader(1.0f);
 	ndPhysicsWorld* const world = scene->GetWorld();

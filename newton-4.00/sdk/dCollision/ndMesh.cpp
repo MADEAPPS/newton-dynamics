@@ -212,7 +212,15 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 
 ndMesh* ndMesh::Load(const char* const fullPathName)
 {
+	FILE* const file = fopen(fullPathName, "rb");
+	if (!file)
+	{
+		ndAssert(0);
+		return nullptr;
+	}
 	ndAssert(0);
+
+	fclose(file);
 	return nullptr;
 }
 
@@ -278,17 +286,15 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 			
 			ndArray<dTmpData> tmp;
 			ndArray<ndInt32> indices;
-			//ndArray<glPositionNormalUV> points;
 			
-			indices.SetCount(indexCount);
-			//points.SetCount(vertexCount);
 			tmp.SetCount(vertexCount);
+			indices.SetCount(indexCount);
 			
 			effectMesh->GetVertexChannel(sizeof(dTmpData), &tmp[0].m_posit[0]);
 			effectMesh->GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
 			effectMesh->GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
 			
-			fprintf(file, "\t\tpoints(x,y,x,nx,ny,nz,u,v): %d\n", vertexCount);
+			fprintf(file, "\t\tpoints(x y x nx ny nz u v): %d\n", vertexCount);
 			for (ndInt32 i = 0; i < vertexCount; ++i)
 			{
 				fprintf(file, "\t\t\t%f %f %f %f %f %f %f %f\n",
