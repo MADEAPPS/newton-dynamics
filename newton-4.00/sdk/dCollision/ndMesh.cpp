@@ -210,189 +210,394 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 	}
 }
 
+void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
+{
+	FILE* const file = fopen(fullPathName, "wb");
+	if (file)
+	{
+		mesh->Save(file);
+		fclose(file);
+	}
+}
+
+void ndMesh::Save(FILE* const file, ndInt32 level) const
+{
+	auto PrintTabs = [file](ndInt32 level)
+	{
+		for (ndInt32 i = 0; i < level; i++)
+		{
+			fprintf(file, "\t");
+		}
+	};
+
+	PrintTabs(level);
+	fprintf(file, "node:\n");
+
+	PrintTabs(level);
+	fprintf(file, "{\n");
+
+	PrintTabs(level);
+	fprintf(file, "\tname: %s\n", GetName().GetStr());
+
+	ndVector euler1;
+	ndVector euler(m_matrix.CalcPitchYawRoll(euler1).Scale(ndRadToDegree));
+	PrintTabs(level);
+	fprintf(file, "\teulers: %f %f %f\n", euler.m_x, euler.m_y, euler.m_z);
+	PrintTabs(level);
+	fprintf(file, "\tposition: %f %f %f\n", m_matrix.m_posit.m_x, m_matrix.m_posit.m_y, m_matrix.m_posit.m_z);
+
+	if (*m_mesh)
+	{ 
+		PrintTabs(level);
+		fprintf(file, "\tmeshData:\n");
+		PrintTabs(level);
+		fprintf(file, "\t{\n");
+		PrintTabs(level);
+		fprintf(file, "\t\teulers: %f %f %f\n", euler.m_x, euler.m_y, euler.m_z);
+		PrintTabs(level);
+		fprintf(file, "\t\tposition: %f %f %f\n", m_meshMatrix.m_posit.m_x, m_meshMatrix.m_posit.m_y, m_meshMatrix.m_posit.m_z);
+	
+		ndSharedPtr<ndMeshEffect> effectMesh (GetMesh());
+		ndIndexArray* const geometryHandle = effectMesh->MaterialGeometryBegin();
+		
+		// extract vertex data  from the newton mesh		
+		ndInt32 indexCount = 0;
+		ndInt32 vertexCount = effectMesh->GetPropertiesCount();
+		ndInt32 materialsCount = 0;
+		for (ndInt32 handle = effectMesh->GetFirstMaterial(geometryHandle); handle != -1; handle = effectMesh->GetNextMaterial(geometryHandle, handle))
+		{
+			materialsCount++;
+			indexCount += effectMesh->GetMaterialIndexCount(geometryHandle, handle);
+		}
+		
+		struct dTmpData
+		{
+			ndReal m_posit[3];
+			ndReal m_normal[3];
+			ndReal m_uv[2];
+		};
+		
+		ndArray<dTmpData> tmp;
+		ndArray<ndInt32> indices;
+		
+		tmp.SetCount(vertexCount);
+		indices.SetCount(indexCount);
+		
+		effectMesh->GetVertexChannel(sizeof(dTmpData), &tmp[0].m_posit[0]);
+		effectMesh->GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
+		effectMesh->GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
+
+		PrintTabs(level);
+		fprintf(file, "\t\tpoints(x y x nx ny nz u v): %d\n", vertexCount);
+
+		PrintTabs(level);
+		fprintf(file, "\t\t{\n");
+
+		for (ndInt32 i = 0; i < vertexCount; ++i)
+		{
+			PrintTabs(level);
+			fprintf(file, "\t\t\t%f %f %f %f %f %f %f %f\n",
+				tmp[i].m_posit[0], tmp[i].m_posit[1], tmp[i].m_posit[2],
+				tmp[i].m_normal[0], tmp[i].m_normal[1], tmp[i].m_normal[2],
+				tmp[i].m_uv[0], tmp[i].m_uv[1]);
+		}
+		PrintTabs(level);
+		fprintf(file, "\t\t}\n");
+	
+		//PrintTabs(level);
+		//fprintf(file, "\t\tmaterials: %d\n", materialsCount);
+
+		ndInt32 segmentStart = 0;
+		const ndArray<ndMeshEffect::ndMaterial>& materialArray = effectMesh->GetMaterials();
+		for (ndInt32 handle = effectMesh->GetFirstMaterial(geometryHandle); handle != -1; handle = effectMesh->GetNextMaterial(geometryHandle, handle))
+		{
+			PrintTabs(level);
+			fprintf(file, "\t\tmaterial:\n");
+			PrintTabs(level);
+			fprintf(file, "\t\t{\n");
+
+			ndInt32 materialIndex = effectMesh->GetMaterialID(geometryHandle, handle);
+		
+			const ndMeshEffect::ndMaterial& material = materialArray[materialIndex];
+	
+			PrintTabs(level);
+			fprintf(file, "\t\t\tambience: %f %f %f %f\n", material.m_ambient.m_x, material.m_ambient.m_y, material.m_ambient.m_z, material.m_ambient.m_w);
+			PrintTabs(level);
+			fprintf(file, "\t\t\tdiffuse: %f %f %f %f\n", material.m_diffuse.m_x, material.m_diffuse.m_y, material.m_diffuse.m_z, material.m_diffuse.m_w);
+			PrintTabs(level);
+			fprintf(file, "\t\t\topacity: %f\n", material.m_opacity);
+			PrintTabs(level);
+			fprintf(file, "\t\t\tshiness: %f\n", material.m_shiness);
+			PrintTabs(level);
+			fprintf(file, "\t\t\ttexture: %s\n", material.m_textureName);
+		
+			ndInt32 triangleIndexCount = effectMesh->GetMaterialIndexCount(geometryHandle, handle);
+			effectMesh->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
+	
+			PrintTabs(level);
+			fprintf(file, "\t\t\ttriangles: %d\n", triangleIndexCount / 3);
+			PrintTabs(level);
+			fprintf(file, "\t\t\t{\n");
+			for (ndInt32 i = 0; i < triangleIndexCount; i += 3)
+			{
+				PrintTabs(level);
+				fprintf(file, "\t\t\t\t%d %d %d\n", indices[segmentStart + i], indices[segmentStart + i + 1], indices[segmentStart + i + 2]);
+			}
+			PrintTabs(level);
+			fprintf(file, "\t\t\t}\n");
+			segmentStart += triangleIndexCount;
+
+			PrintTabs(level);
+			fprintf(file, "\t\t}\n");
+		}
+		effectMesh->MaterialGeometryEnd(geometryHandle);
+	
+		if (GetPositCurve().GetCount())
+		{
+			//ndAssert(0);
+		}
+		
+		if (GetRotationCurve().GetCount())
+		{
+			//ndAssert(0);
+		}
+
+		PrintTabs(level);
+		fprintf(file, "\t}\n");
+	}
+
+	for (ndMesh* child = GetFirstChild(); child; child = child->GetNext())
+	{
+		child->Save(file, level + 1);
+	}
+
+	PrintTabs(level);
+	fprintf(file, "}\n");
+}
+
 ndMesh* ndMesh::Load(const char* const fullPathName)
 {
 	FILE* const file = fopen(fullPathName, "rb");
-	if (!file)
+	if (file)
 	{
-		ndAssert(0);
-		return nullptr;
+		char token[256];
+		fscanf(file, "%s", token);
+		ndMesh* root = nullptr;
+		if (!strcmp(token, "node:"))
+		{
+			root = new ndMesh(nullptr);
+			root->Load(file);
+		}
+
+		fclose(file);
+		return root;
 	}
-	ndAssert(0);
 
-	fclose(file);
-	return nullptr;
-}
-
-void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
-{
+/*
 	ndInt32 stack = 1;
-	ndInt32 indexStack[1024];
-	const ndMesh* entBuffer[1024];
+	ndMesh* parentMesh[1024];
 
-	FILE* const file = fopen(fullPathName, "wb");
-	if (!file)
+	char token[256];
+	auto ReadToken = [file, &token]()
 	{
-		ndAssert(0);
-		return;
-	}
+		fscanf(file, "%s", token);
+	};
 
-	ndInt32 index = 0;
-	indexStack[0] = -1;
-	entBuffer[0] = mesh;
-	while (stack)
+	auto ReadMatrix = [file, &token]()
 	{
-		stack--;
-		const ndMesh* const node = entBuffer[stack];
-		
-		fprintf(file, "node: %d\n", index);
-		fprintf(file, "{\n");
-		fprintf(file, "\tparentNode: %d\n", indexStack[stack]);
-		fprintf(file, "\tnodeName: %s\n", node->GetName().GetStr());
+		ndVector posit;
+		ndVector eulers;
+		fscanf(file, "%s", token);
+		fscanf(file, "%f %f %f", &eulers.m_x, &eulers.m_y, &eulers.m_z);
+		fscanf(file, "%s", token);
+		fscanf(file, "%f %f %f", &posit.m_x, &posit.m_y, &posit.m_z);
+		posit.m_w = ndFloat32(1.0f);
 
-		ndVector euler1;
-		ndVector euler(node->m_matrix.CalcPitchYawRoll(euler1).Scale(ndRadToDegree));
-		fprintf(file, "\teulers: %f %f %f\n", euler.m_x, euler.m_y, euler.m_z);
-		fprintf(file, "\tposition: %f %f %f\n", node->m_matrix.m_posit.m_x, node->m_matrix.m_posit.m_y, node->m_matrix.m_posit.m_z);
+		ndMatrix matrix(ndPitchMatrix(eulers.m_x * ndDegreeToRad) * ndYawMatrix(eulers.m_y * ndDegreeToRad) * ndRollMatrix(eulers.m_z * ndDegreeToRad));
+		matrix.m_posit = posit;
+		return matrix;
+	};
 
-		if (*node->m_mesh)
-		{ 
-			euler = node->m_meshMatrix.CalcPitchYawRoll(euler1).Scale(ndRadToDegree);
+	ndMesh* rootMesh = nullptr;
+	ndMesh* meshNode = nullptr;
 
-			fprintf(file, "\tmeshData: 1\n");
-			fprintf(file, "\t{\n");
-			fprintf(file, "\t\tmeshEulers: %f %f %f\n", euler.m_x, euler.m_y, euler.m_z);
-			fprintf(file, "\t\tmeshPosition: %f %f %f\n", node->m_meshMatrix.m_posit.m_x, node->m_meshMatrix.m_posit.m_y, node->m_meshMatrix.m_posit.m_z);
-
-			ndSharedPtr<ndMeshEffect> effectMesh (node->GetMesh());
-			ndIndexArray* const geometryHandle = effectMesh->MaterialGeometryBegin();
-			
-			// extract vertex data  from the newton mesh		
-			ndInt32 indexCount = 0;
-			ndInt32 vertexCount = effectMesh->GetPropertiesCount();
-			ndInt32 materialsCount = 0;
-			for (ndInt32 handle = effectMesh->GetFirstMaterial(geometryHandle); handle != -1; handle = effectMesh->GetNextMaterial(geometryHandle, handle))
+	stack = 1;
+	parentMesh[0] = rootMesh;
+	while (!feof(file))
+	{
+		ReadToken();
+		if (!strcmp(token, "node:"))
+		{
+			ReadToken();
+			meshNode = new ndMesh(nullptr);
+			map.Insert(meshNode, nodeNumber);
+		}
+		else if (!strcmp(token, "parentNode:"))
+		{
+			ndInt32 parentNumber;
+			fscanf(file, "%d", &parentNumber);
+			if (parentNumber == -1)
 			{
-				materialsCount++;
-				indexCount += effectMesh->GetMaterialIndexCount(geometryHandle, handle);
+				rootMesh = meshNode;
 			}
-			
+			else
+			{
+				ndTree<ndMesh*, ndInt32>::ndNode* const parentNode = map.Find(parentNumber);
+				ndAssert(parentNode);
+				meshNode->Attach(parentNode->GetInfo());
+			}
+		}
+		else if (!strcmp(token, "nodeName:"))
+		{
+			ReadToken();
+			meshNode->SetName(token);
+			meshNode->m_matrix = ReadMatrix();
+		}
+		else if (!strcmp(token, "meshData:"))
+		{
+			ReadToken();
+			meshNode->m_meshMatrix = ReadMatrix();
+			fscanf(file, "%s", token);
+			fscanf(file, "%s", token);
+			fscanf(file, "%s", token);
+			fscanf(file, "%s", token);
+			fscanf(file, "%s", token);
+			fscanf(file, "%s", token);
+			fscanf(file, "%s", token);
+			fscanf(file, "%s", token);
+
+			ndInt32 pointsCount;
+			fscanf(file, "%d", &pointsCount);
+
 			struct dTmpData
 			{
 				ndReal m_posit[3];
 				ndReal m_normal[3];
 				ndReal m_uv[2];
 			};
-			
 			ndArray<dTmpData> tmp;
-			ndArray<ndInt32> indices;
-			
-			tmp.SetCount(vertexCount);
-			indices.SetCount(indexCount);
-			
-			effectMesh->GetVertexChannel(sizeof(dTmpData), &tmp[0].m_posit[0]);
-			effectMesh->GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
-			effectMesh->GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
-			
-			fprintf(file, "\t\tpoints(x y x nx ny nz u v): %d\n", vertexCount);
-			for (ndInt32 i = 0; i < vertexCount; ++i)
+			for (ndInt32 i = 0; i < pointsCount; ++i)
 			{
-				fprintf(file, "\t\t\t%f %f %f %f %f %f %f %f\n",
-					tmp[i].m_posit[0], tmp[i].m_posit[1], tmp[i].m_posit[2],
-					tmp[i].m_normal[0], tmp[i].m_normal[1], tmp[i].m_normal[2],
-					tmp[i].m_uv[0], tmp[i].m_uv[1]);
+				dTmpData point;
+				fscanf(file, "%f %f %f", &point.m_posit[0], &point.m_posit[1], &point.m_posit[2]);
+				fscanf(file, "%f %f %f", &point.m_normal[0], &point.m_normal[1], &point.m_normal[2]);
+				fscanf(file, "%f %f", &point.m_uv[0], &point.m_uv[1]);
+				tmp.PushBack(point);
 			}
-			
-			fprintf(file, "\t\tmaterials: %d\n", materialsCount);
-			fprintf(file, "\t\t{\n");
-			ndInt32 segmentStart = 0;
-			const ndArray<ndMeshEffect::ndMaterial>& materialArray = effectMesh->GetMaterials();
-			for (ndInt32 handle = effectMesh->GetFirstMaterial(geometryHandle); handle != -1; handle = effectMesh->GetNextMaterial(geometryHandle, handle))
+
+			ndInt32 materialsCount;
+			ReadToken();
+			ndAssert(!strcmp(token, "materials:"));
+			fscanf(file, "%d", &materialsCount);
+			for (ndInt32 i = 0; i < materialsCount; ++i)
 			{
-				ndInt32 materialIndex = effectMesh->GetMaterialID(geometryHandle, handle);
-			
-				const ndMeshEffect::ndMaterial& material = materialArray[materialIndex];
+				ReadToken();
 
-				fprintf(file, "\t\t\tambience: %f %f %f %f\n", material.m_ambient.m_x, material.m_ambient.m_y, material.m_ambient.m_z, material.m_ambient.m_w);
-				fprintf(file, "\t\t\tdiffuse: %f %f %f %f\n", material.m_diffuse.m_x, material.m_diffuse.m_y, material.m_diffuse.m_z, material.m_diffuse.m_w);
-				fprintf(file, "\t\t\topacity: %f\n", material.m_opacity);
-				fprintf(file, "\t\t\tshiness: %f\n", material.m_shiness);
-				fprintf(file, "\t\t\ttexture: %s\n", material.m_textureName);
-			
-				ndInt32 triangleIndexCount = effectMesh->GetMaterialIndexCount(geometryHandle, handle);
-				effectMesh->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
 
-				fprintf(file, "\t\t\ttriangles: %d\n", triangleIndexCount / 3);
-				for (ndInt32 i = 0; i < triangleIndexCount; i += 3)
-				{
-					fprintf(file, "\t\t\t\t%d %d %d\n", indices[segmentStart + i], indices[segmentStart + i + 1], indices[segmentStart + i + 2]);
-				}
 
-				segmentStart += triangleIndexCount;
+				ReadToken();
 			}
-			fprintf(file, "\t\t}\n");
-			effectMesh->MaterialGeometryEnd(geometryHandle);
 
-			fprintf(file, "\t}\n");
 		}
-
-		if (node->GetScaleCurve().GetCount())
+		else if (!strcmp(token, "}"))
+		{
+			// close bracket, do nothing;
+		}
+		else
 		{
 			ndAssert(0);
-			//ndMesh::ndCurve::ndNode* positNode = ent->GetPositCurve().GetFirst();
-			//ndMesh::ndCurve::ndNode* rotationNode = ent->GetRotationCurve().GetFirst();
-			//
-			//ndMesh::ndCurveValue scaleValue;
-			//scaleValue.m_x = 1.0f;
-			//scaleValue.m_y = 1.0f;
-			//scaleValue.m_z = 1.0f;
-			//for (ndInt32 i = 0; i < ent->GetScaleCurve().GetCount(); ++i)
-			//{
-			//	ndMesh::ndCurveValue& positValue = positNode->GetInfo();
-			//	ndMesh::ndCurveValue& rotationValue = rotationNode->GetInfo();
-			//
-			//	ndVector animScale;
-			//	ndMatrix stretchAxis;
-			//	ndMatrix animTransformMatrix;
-			//	ndMatrix keyframe(invTransform * GetKeyframe(scaleValue, positValue, rotationValue) * transform);
-			//	keyframe.PolarDecomposition(animTransformMatrix, animScale, stretchAxis);
-			//
-			//	ndVector euler0;
-			//	ndVector euler(animTransformMatrix.CalcPitchYawRoll(euler0));
-			//
-			//	rotationValue.m_x = euler.m_x;
-			//	rotationValue.m_y = euler.m_y;
-			//	rotationValue.m_z = euler.m_z;
-			//
-			//	positValue.m_x = animTransformMatrix.m_posit.m_x;
-			//	positValue.m_y = animTransformMatrix.m_posit.m_y;
-			//	positValue.m_z = animTransformMatrix.m_posit.m_z;
-			//
-			//	positNode = positNode->GetNext();
-			//	rotationNode = rotationNode->GetNext();
-			//}
 		}
-
-		if (node->GetPositCurve().GetCount())
-		{
-			//ndAssert(0);
-		}
-
-		if (node->GetRotationCurve().GetCount())
-		{
-			//ndAssert(0);
-		}
-
-		fprintf(file, "}\n\n");
-		for (ndMesh* child = node->GetFirstChild(); child; child = child->GetNext())
-		{
-			entBuffer[stack] = child;
-			indexStack[stack] = index;
-			stack++;
-			ndAssert(stack < sizeof(entBuffer) / sizeof(entBuffer[0]));
-		}
-		index++;
 	}
+*/
 
-	fclose(file);
+	return nullptr;
+}
+
+void ndMesh::Load(FILE* const file)
+{
+	char token[256];
+	auto ReadToken = [file, &token]()
+	{
+		fscanf(file, "%s", token);
+	};
+
+	auto ReadMatrix = [file, &token]()
+	{
+		ndVector posit;
+		ndVector eulers;
+		fscanf(file, "%s", token);
+		fscanf(file, "%f %f %f", &eulers.m_x, &eulers.m_y, &eulers.m_z);
+		fscanf(file, "%s", token);
+		fscanf(file, "%f %f %f", &posit.m_x, &posit.m_y, &posit.m_z);
+		posit.m_w = ndFloat32(1.0f);
+
+		ndMatrix matrix(ndPitchMatrix(eulers.m_x * ndDegreeToRad) * ndYawMatrix(eulers.m_y * ndDegreeToRad) * ndRollMatrix(eulers.m_z * ndDegreeToRad));
+		matrix.m_posit = posit;
+		return matrix;
+	};
+
+	struct dTmpData
+	{
+		ndReal m_posit[3];
+		ndReal m_normal[3];
+		ndReal m_uv[2];
+	};
+	ndArray<dTmpData> tmp;
+
+	ReadToken();
+	ReadToken();
+	while (strcmp(token, "}"))
+	{
+		if (!strcmp(token, "node:"))
+		{
+			ndMesh* const child = new ndMesh(this);
+			child->Load(file);
+		}
+		else if (!strcmp(token, "name:"))
+		{
+			ReadToken();
+			SetName(token);
+			m_matrix = ReadMatrix();
+		}
+		else if (!strcmp(token, "meshData:"))
+		{
+			ReadToken();
+			m_meshMatrix = ReadMatrix();
+		}
+		else if (!strcmp(token, "points(x"))
+		{
+			fscanf(file, "%s", token);
+			fscanf(file, "%s", token);
+			fscanf(file, "%s", token);
+			fscanf(file, "%s", token);
+			fscanf(file, "%s", token);
+			fscanf(file, "%s", token);
+			fscanf(file, "%s", token);
+
+			ndInt32 pointsCount;
+			fscanf(file, "%d", &pointsCount);
+			ReadToken();
+			for (ndInt32 i = 0; i < pointsCount; ++i)
+			{
+				dTmpData point;
+				fscanf(file, "%f %f %f", &point.m_posit[0], &point.m_posit[1], &point.m_posit[2]);
+				fscanf(file, "%f %f %f", &point.m_normal[0], &point.m_normal[1], &point.m_normal[2]);
+				fscanf(file, "%f %f", &point.m_uv[0], &point.m_uv[1]);
+				tmp.PushBack(point);
+			}
+			ReadToken();
+		}
+		else if (!strcmp(token, "material:"))
+		{
+			ReadToken();
+			ndAssert(0);
+
+			ReadToken();
+		}
+		else
+		{
+			ndAssert(0);
+		}
+		ReadToken();
+	}
 }

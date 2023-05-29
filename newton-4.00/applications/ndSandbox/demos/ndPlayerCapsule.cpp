@@ -37,7 +37,8 @@ class ndMopcapMeshLoader : public ndMeshLoader
 
 	ndMesh* LoadMesh(const char* const fbxMeshName, bool loadAnimation)
 	{
-		ndMesh* const mesh = ndMeshLoader::LoadMesh(fbxMeshName, loadAnimation);
+		//ndMesh* const mesh = ndMeshLoader::LoadMesh(fbxMeshName, loadAnimation);
+		ndMesh* mesh = ndMeshLoader::LoadMesh(fbxMeshName, loadAnimation);
 
 		if (m_scale != ndFloat32(1.0f))
 		{
@@ -51,6 +52,8 @@ class ndMopcapMeshLoader : public ndMeshLoader
 		if (!loadAnimation)
 		{
 			ndMesh::Save(mesh, "xxx.ndm");
+			//delete mesh;
+			//mesh = ndMesh::Load("xxx.ndm");
 		}
 
 		return mesh;

@@ -77,6 +77,10 @@ class ndMesh : public ndNodeHierarchy<ndMesh>
 	ndMatrix m_matrix;
 	ndMatrix m_meshMatrix;
 
+	private:
+	void Load(FILE* const file);
+	void Save(FILE* const file, ndInt32 level = 0) const;
+
 	protected:
 	ndString m_name;
 	ndSharedPtr<ndMeshEffect> m_mesh;
