@@ -548,7 +548,6 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	ndArray<ndVector> normalArray;
 	if (geom->getNormals())
 	{
-		//normalArray.Resize(indexCount);
 		normalArray.SetCount(indexCount);
 		const ofbx::Vec3* const normals = geom->getNormals();
 		for (ndInt32 i = 0; i < indexCount; ++i)

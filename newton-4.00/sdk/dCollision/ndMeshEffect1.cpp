@@ -3809,7 +3809,8 @@ ndIndexArray* ndMeshEffect::MaterialGeometryBegin()
 
 	ndInt32 mark = IncLRU();
 	ndPolyhedra::Iterator iter(*this);
-	memset(streamIndexMap, 0, sizeof(streamIndexMap));
+	//memset(streamIndexMap, 0, sizeof(streamIndexMap));
+	ndMemSet(streamIndexMap, 0, sizeof(streamIndexMap) / sizeof(streamIndexMap[0]));
 	for (iter.Begin(); iter; iter++)
 	{
 		ndEdge* const edge = &(*iter);
