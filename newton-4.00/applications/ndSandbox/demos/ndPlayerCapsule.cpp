@@ -22,16 +22,16 @@
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"
 
-class ndMopcapMeshLoader : public ndMeshLoader
+class ndMopcapRetargetMeshLoader : public ndMeshLoader
 {
 	public:
-	ndMopcapMeshLoader(ndFloat32 scale)
+	ndMopcapRetargetMeshLoader(ndFloat32 scale)
 		:ndMeshLoader()
 		,m_scale(scale)
 	{
 	}
 
-	virtual ~ndMopcapMeshLoader()
+	virtual ~ndMopcapRetargetMeshLoader()
 	{
 	}
 
@@ -39,6 +39,49 @@ class ndMopcapMeshLoader : public ndMeshLoader
 	{
 		//ndMesh* const mesh = ndMeshLoader::LoadMesh(fbxMeshName, loadAnimation);
 		ndMesh* mesh = ndMeshLoader::LoadMesh(fbxMeshName, loadAnimation);
+
+		// re target bone and nodes names
+		for (ndMesh* node = mesh->IteratorFirst(); node; node = node->IteratorNext())
+		{
+			const char* const ptr = strchr(node->GetName().GetStr(), ':');
+			if (ptr)
+			{
+				node->SetName(ptr + 1);
+			}
+
+			ndSharedPtr<ndMeshEffect> meshEffect(node->GetMesh());
+			if (*meshEffect)
+			{
+				ndMeshEffect::ndClusterMap::Iterator it(meshEffect->GetCluster());
+				for (it.Begin(); it; it++)
+				{
+					const ndString& name = it.GetKey();
+					const char* const bonePtr = strchr(name.GetStr(), ':');
+					if (bonePtr)
+					{
+						ndMeshEffect::ndVertexCluster& cluster = it.GetNode()->GetInfo();
+						ndMeshEffect::ndVertexCluster* const newCluster = meshEffect->CreateCluster(bonePtr + 1);
+						ndAssert(cluster.m_vertexIndex.GetCount() == cluster.m_vertexWeigh.GetCount());
+						for (ndInt32 i = 0; i < cluster.m_vertexIndex.GetCount(); ++i)
+						{
+							newCluster->m_vertexIndex.PushBack(cluster.m_vertexIndex[i]);
+							newCluster->m_vertexWeigh.PushBack(cluster.m_vertexWeigh[i]);
+						}
+					}
+				}
+
+				for (it.Begin(); it; )
+				{
+					const ndString& name = it.GetKey();
+					it++;
+					const char* const bonePtr = strchr(name.GetStr(), ':');
+					if (bonePtr)
+					{
+						meshEffect->DeleteCluster(name.GetStr());
+					}
+				}
+			}
+		}
 
 		if (m_scale != ndFloat32(1.0f))
 		{
@@ -49,13 +92,13 @@ class ndMopcapMeshLoader : public ndMeshLoader
 			mesh->ApplyTransform(scaleMatrix);
 		}
 
-		if (!loadAnimation)
-		{
-			ndMesh::Save(mesh, "xxx.ndm");
-			delete mesh;
-			mesh = ndMesh::Load("xxx.ndm");
-			mesh->m_matrix = ndRollMatrix(ndPi * 0.5f);
-		}
+		//if (!loadAnimation)
+		//{
+		//	ndMesh::Save(mesh, "xxx.ndm");
+		//	delete mesh;
+		//	mesh = ndMesh::Load("xxx.ndm");
+		//	mesh->m_matrix = ndRollMatrix(ndPi * 0.5f);
+		//}
 
 		return mesh;
 	}
@@ -64,18 +107,6 @@ class ndMopcapMeshLoader : public ndMeshLoader
 	{
 		ndAnimationSequence* const sequence = ndMeshLoader::LoadAnimation(clipName);
 		ndAssert(sequence);
-		ndList<ndAnimationKeyFramesTrack>& tracks = sequence->GetTracks();
-
-		ndString prefixName("mixamorig");
-		for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext())
-		{
-			ndAnimationKeyFramesTrack& track = node->GetInfo();
-			if (track.m_name.Find(prefixName) != -1)
-			{
-				track.m_name = prefixName + track.m_name.SubString(track.m_name.Find(":"));
-			}
-		}
-
 		return sequence;
 	}
 
@@ -101,7 +132,7 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	ndFloat32 radio = 0.5f;
 	ndFloat32 mass = 100.0f;
 
-	ndMopcapMeshLoader loader(1.0f);
+	ndMopcapRetargetMeshLoader loader(1.0f);
 	ndPhysicsWorld* const world = scene->GetWorld();
 	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("dummy.fbx", scene));
 	ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("robotsuit.fbx", scene));

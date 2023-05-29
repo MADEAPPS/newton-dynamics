@@ -536,7 +536,7 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 		}
 	}
 	
-	ndMeshEffect::dMeshVertexFormat format;
+	ndMeshEffect::ndMeshVertexFormat format;
 	format.m_vertex.m_data = &vertices[0].x;
 	format.m_vertex.m_indexList = &indexArray[0];
 	format.m_vertex.m_strideInBytes = sizeof(ofbx::Vec3);
@@ -597,7 +597,7 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 			const ofbx::Object* const fbxBone = fbxCluster->getLink();
 			if (nodeMap.Find(fbxBone))
 			{
-				ndMeshEffect::dVertexCluster* const cluster = meshEffect->CreateCluster(fbxBone->name);
+				ndMeshEffect::ndVertexCluster* const cluster = meshEffect->CreateCluster(fbxBone->name);
 	
 				ndAssert(fbxCluster->getIndicesCount() == fbxCluster->getWeightsCount());
 				ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();

@@ -322,6 +322,8 @@ void ndMesh::Save(FILE* const file, ndInt32 level) const
 			PrintTabs(level);
 			fprintf(file, "\t\t\tdiffuse: %f %f %f %f\n", material.m_diffuse.m_x, material.m_diffuse.m_y, material.m_diffuse.m_z, material.m_diffuse.m_w);
 			PrintTabs(level);
+			fprintf(file, "\t\t\tm_specular: %f %f %f %f\n", material.m_specular.m_x, material.m_specular.m_y, material.m_specular.m_z, material.m_specular.m_w);
+			PrintTabs(level);
 			fprintf(file, "\t\t\topacity: %f\n", material.m_opacity);
 			PrintTabs(level);
 			fprintf(file, "\t\t\tshiness: %f\n", material.m_shiness);
@@ -426,8 +428,6 @@ void ndMesh::Load(FILE* const file)
 	ndArray<ndTmpVertex> vertex;
 	ndArray<ndNornalUV> normalUV;
 	ndArray<ndInt32> indexArray;
-	ndArray<ndInt32> faceIndexArray;
-	ndArray<ndInt32> faceMaterialArray;
 
 	ReadToken();
 	ReadToken();
@@ -463,13 +463,16 @@ void ndMesh::Load(FILE* const file)
 			ndInt32 pointsCount;
 			fscanf(file, "%d", &pointsCount);
 			ReadToken();
+
+			vertex.SetCount(0);
+			normalUV.SetCount(0);
 			for (ndInt32 i = 0; i < pointsCount; ++i)
 			{
 				ndNornalUV nuv;
 				ndTmpVertex point;
 				
-				ndBigVector normal;
 				ndBigVector uv;
+				ndBigVector normal;
 				fscanf(file, "%lf %lf %lf", &point.m_posit[0], &point.m_posit[1], &point.m_posit[2]);
 				fscanf(file, "%lf %lf %lf", &normal.m_x, &normal.m_y, &normal.m_z);
 				fscanf(file, "%lf %lf", &uv.m_x, &uv.m_y);
@@ -482,7 +485,6 @@ void ndMesh::Load(FILE* const file)
 
 				vertex.PushBack(point);
 				normalUV.PushBack(nuv);
-				indexArray.PushBack(i);
 			}
 			ReadToken();
 		}
@@ -499,6 +501,10 @@ void ndMesh::Load(FILE* const file)
 			ReadToken();
 			fscanf(file, "%lf %lf %lf %lf", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
 			material.m_diffuse = ndVector(val);
+
+			ReadToken();
+			fscanf(file, "%lf %lf %lf %lf", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
+			material.m_specular = ndVector(val);
 
 			ReadToken();
 			fscanf(file, "%lf", &val.m_x);
@@ -519,6 +525,7 @@ void ndMesh::Load(FILE* const file)
 			ReadToken();
 			fscanf(file, "%d", &triangleCount);
 			ReadToken();
+			indexArray.SetCount(0);
 			for (ndInt32 i = 0; i < triangleCount; ++i)
 			{
 				ndInt32 i0;
@@ -528,8 +535,7 @@ void ndMesh::Load(FILE* const file)
 				indexArray.PushBack(i0);
 				indexArray.PushBack(i1);
 				indexArray.PushBack(i2);
-				faceIndexArray.PushBack(3);
-				faceMaterialArray.PushBack(materialIndex);
+				indexArray.PushBack(materialIndex);
 			}
 			ReadToken();
 			ReadToken();
@@ -546,24 +552,21 @@ void ndMesh::Load(FILE* const file)
 
 	if (*m_mesh)
 	{
-		ndMeshEffect::dMeshVertexFormat format;
-
-		format.m_faceCount = faceIndexArray.GetCount();
-		format.m_faceIndexCount = &faceIndexArray[0];
-		format.m_faceMaterial = &faceMaterialArray[0];
-
-		format.m_vertex.m_data = &vertex[0].m_posit[0];
-		format.m_vertex.m_indexList = &indexArray[0];
-		format.m_vertex.m_strideInBytes = sizeof(ndTmpVertex);
-
-		format.m_normal.m_data = &normalUV[0].m_normal[0];
-		format.m_normal.m_indexList = &indexArray[0];
-		format.m_normal.m_strideInBytes = sizeof(ndNornalUV);
-
-		format.m_uv0.m_data = &normalUV[0].m_uv[0];
-		format.m_uv0.m_indexList = &indexArray[0];
-		format.m_uv0.m_strideInBytes = sizeof(ndNornalUV);
-
-		m_mesh->BuildFromIndexList(&format);
+		m_mesh->BeginBuild();
+		for (ndInt32 i = 0; i < indexArray.GetCount(); i += 4)
+		{
+			m_mesh->BeginBuildFace();
+			ndInt32 matIndex = indexArray[i + 3];
+			for (ndInt32 j = 0; j < 3; j++)
+			{
+				ndInt32 index = indexArray[i + j];
+				m_mesh->AddMaterial(matIndex);
+				m_mesh->AddPoint(vertex[index].m_posit[0], vertex[index].m_posit[1], vertex[index].m_posit[2]);
+				m_mesh->AddNormal(normalUV[index].m_normal[0], normalUV[index].m_normal[1], normalUV[index].m_normal[2]);
+				m_mesh->AddUV0(normalUV[index].m_uv[0], normalUV[index].m_uv[1]);
+			}
+			m_mesh->EndBuildFace();
+		}
+		m_mesh->EndBuild();
 	}
 }

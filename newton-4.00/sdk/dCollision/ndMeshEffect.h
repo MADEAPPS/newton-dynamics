@@ -336,57 +336,80 @@ class ndMeshEffect: public ndPolyhedra
 		char m_textureName[32];
 	};
 
-	class dMeshVertexFormat
+	class ndMeshVertexFormat
 	{
 		public:
-		class dDoubleData
+		class ndDoubleData
 		{
 			public:
 			const ndFloat64* m_data;
 			const ndInt32* m_indexList;
 			ndInt32 m_strideInBytes;
+
+			void Clear()
+			{
+				m_data = nullptr;
+				m_indexList = nullptr;
+				m_strideInBytes = 0;
+			}
 		};
 
-		class dFloatData
+		class ndFloatData
 		{
 			public:
 			const ndFloat32* m_data;
 			const ndInt32* m_indexList;
 			ndInt32 m_strideInBytes;
+
+			void Clear()
+			{
+				m_data = nullptr;
+				m_indexList = nullptr;
+				m_strideInBytes = 0;
+			}
 		};
 
-		dMeshVertexFormat()
+		ndMeshVertexFormat()
 		{
 			Clear();
 		}
 
 		void Clear()
 		{
-			memset(this, 0, sizeof(dMeshVertexFormat));
+			m_faceCount = 0;
+			m_faceMaterial = nullptr;
+			m_faceIndexCount = nullptr;
+
+			m_uv0.Clear();
+			m_uv1.Clear();
+			m_vertex.Clear();
+			m_normal.Clear();
+			m_binormal.Clear();
+			m_vertexColor.Clear();
 		}
 
 		ndInt32 m_faceCount;
-		const ndInt32* m_faceIndexCount;
 		const ndInt32* m_faceMaterial;
-		dDoubleData m_vertex;
-		dFloatData m_normal;
-		dFloatData m_binormal;
-		dFloatData m_uv0;
-		dFloatData m_uv1;
-		dFloatData m_vertexColor;
+		const ndInt32* m_faceIndexCount;
+		ndDoubleData m_vertex;
+		ndFloatData m_normal;
+		ndFloatData m_binormal;
+		ndFloatData m_uv0;
+		ndFloatData m_uv1;
+		ndFloatData m_vertexColor;
 	};
 
-	class dVertexCluster
+	class ndVertexCluster
 	{
 		public:
-		dVertexCluster()
+		ndVertexCluster()
 		{
 		}
 		ndArray<ndInt32> m_vertexIndex;
 		ndArray<ndFloat32> m_vertexWeigh;
 	};
 
-	class dClusterMap: public ndTree<dVertexCluster, const ndString>
+	class ndClusterMap: public ndTree<ndVertexCluster, const ndString>
 	{
 	};
 	
@@ -412,9 +435,10 @@ class ndMeshEffect: public ndPolyhedra
 
 	ndInt32 GetFaceMaterial(ndEdge* const faceEdge) const;
 
-	const dClusterMap& GetCluster() const;
-	D_COLLISION_API dVertexCluster* CreateCluster(const char* const name);
-	D_COLLISION_API dVertexCluster* FindCluster(const char* const name) const;
+	D_COLLISION_API const ndClusterMap& GetCluster() const;
+	D_COLLISION_API void DeleteCluster(const char* const name);
+	D_COLLISION_API ndVertexCluster* CreateCluster(const char* const name);
+	D_COLLISION_API ndVertexCluster* FindCluster(const char* const name) const;
 
 	D_COLLISION_API ndFloat64 CalculateVolume() const;
 	D_COLLISION_API ndMatrix CalculateOOBB(ndBigVector& size) const;
@@ -422,7 +446,7 @@ class ndMeshEffect: public ndPolyhedra
 
 	D_COLLISION_API void ApplyTransform(const ndMatrix& matrix);
 	D_COLLISION_API void CalculateNormals(ndFloat64 angleInRadians);
-	D_COLLISION_API void BuildFromIndexList(const dMeshVertexFormat* const format);
+	D_COLLISION_API void BuildFromIndexList(const ndMeshVertexFormat* const format);
 	
 	D_COLLISION_API void GetVertexIndexChannel(ndInt32* const bufferOut) const;
 	D_COLLISION_API void GetVertexChannel64(ndInt32 strideInByte, ndFloat64* const bufferOut) const;
@@ -497,7 +521,7 @@ class ndMeshEffect: public ndPolyhedra
 	ndString m_name;
 	ndPointFormat m_points;
 	ndAttibutFormat m_attrib;
-	dClusterMap m_clusters;
+	ndClusterMap m_clusters;
 	ndArray<ndMaterial> m_materials;
 	ndInt32 m_vertexBaseCount;
 	ndInt32 m_constructionIndex;
@@ -614,8 +638,11 @@ inline void ndMeshEffect::ndPointFormat::SetCount(ndInt32 count)
 	m_vertex.Resize(count);
 	m_vertex.SetCount(count);
 
-	m_layers.Resize(count);
-	m_layers.SetCount(count);
+	if (m_layers.GetCount())
+	{
+		m_layers.Resize(count);
+		m_layers.SetCount(count);
+	}
 }
 
 inline ndMeshEffect::ndAttibutFormat::ndAttibutFormat()
@@ -657,26 +684,47 @@ inline void ndMeshEffect::ndAttibutFormat::Clear()
 
 inline void ndMeshEffect::ndAttibutFormat::SetCount(ndInt32 count)
 {
-	m_pointChannel.Resize(count);
-	m_pointChannel.SetCount(count);
+	if (m_pointChannel.GetCount())
+	{
+		m_pointChannel.Resize(count);
+		m_pointChannel.SetCount(count);
+	}
 
-	m_materialChannel.Resize(count);
-	m_materialChannel.SetCount(count);
+	if (m_materialChannel.GetCount())
+	{
+		m_materialChannel.Resize(count);
+		m_materialChannel.SetCount(count);
+	}
 
-	m_normalChannel.Resize(count);
-	m_normalChannel.SetCount(count);
+	if (m_normalChannel.GetCount())
+	{
+		m_normalChannel.Resize(count);
+		m_normalChannel.SetCount(count);
+	}
 
-	m_binormalChannel.Resize(count);
-	m_binormalChannel.SetCount(count);
+	if (m_binormalChannel.GetCount())
+	{
+		m_binormalChannel.Resize(count);
+		m_binormalChannel.SetCount(count);
+	}
 
-	m_colorChannel.Resize(count);
-	m_colorChannel.SetCount(count);
+	if (m_colorChannel.GetCount())
+	{
+		m_colorChannel.Resize(count);
+		m_colorChannel.SetCount(count);
+	}
 
-	m_uv0Channel.Resize(count);
-	m_uv0Channel.SetCount(count);
+	if (m_uv0Channel.GetCount())
+	{
+		m_uv0Channel.Resize(count);
+		m_uv0Channel.SetCount(count);
+	}
 
-	m_uv1Channel.Resize(count);
-	m_uv1Channel.SetCount(count);
+	if (m_uv1Channel.GetCount())
+	{
+		m_uv1Channel.Resize(count);
+		m_uv1Channel.SetCount(count);
+	}
 }
 
 inline ndInt32 ndMeshEffect::GetPropertiesCount() const
@@ -731,11 +779,6 @@ inline ndMeshEffect* ndMeshEffect::GetNextLayer(ndMeshEffect* const layerSegment
 		return nullptr;
 	}
 	return GetNextLayer(layerSegment->IncLRU() - 1);
-}
-
-inline const ndMeshEffect::dClusterMap& ndMeshEffect::GetCluster() const
-{
-	return m_clusters;
 }
 
 #endif

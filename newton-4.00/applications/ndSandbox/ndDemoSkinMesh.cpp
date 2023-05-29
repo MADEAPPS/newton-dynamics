@@ -53,7 +53,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	ndMatrix shapeBindMatrix(m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix());
 
 	ndTree<ndInt32, ndString> boneClusterRemapIndex;
-	const ndMeshEffect::dClusterMap& clusterMap = meshNode->GetCluster();
+	const ndMeshEffect::ndClusterMap& clusterMap = meshNode->GetCluster();
 	
 	while (stack) 
 	{
@@ -65,7 +65,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 		entityArray.PushBack(entity);
 		bindMatrixArray.PushBack(bindMatrix);
 	
-		ndMeshEffect::dClusterMap::ndNode* const clusterNode = clusterMap.Find(entity->GetName());
+		ndMeshEffect::ndClusterMap::ndNode* const clusterNode = clusterMap.Find(entity->GetName());
 		if (clusterNode) 
 		{
 			boneClusterRemapIndex.Insert(entityArray.GetCount() - 1, entity->GetName());
@@ -95,10 +95,10 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	memset(&skinBone[0], -1, meshNode->GetVertexCount() * sizeof(dWeightBoneIndex));
 	
 	ndInt32 vCount = 0;
-	ndMeshEffect::dClusterMap::Iterator iter(clusterMap);
+	ndMeshEffect::ndClusterMap::Iterator iter(clusterMap);
 	for (iter.Begin(); iter; iter++) 
 	{
-		const ndMeshEffect::dVertexCluster* const cluster = &iter.GetNode()->GetInfo();
+		const ndMeshEffect::ndVertexCluster* const cluster = &iter.GetNode()->GetInfo();
 		ndInt32 boneIndex = boneClusterRemapIndex.Find(iter.GetKey())->GetInfo();
 		for (ndInt32 i = 0; i < cluster->m_vertexIndex.GetCount(); ++i) 
 		{

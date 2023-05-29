@@ -2816,7 +2816,7 @@ bool ndMeshEffect::EndFace()
 	return !state;
 }
 
-void ndMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
+void ndMeshEffect::BuildFromIndexList(const ndMeshVertexFormat* const format)
 {
 	BeginBuild();
 	ndAssert(format->m_vertex.m_data);
@@ -4049,7 +4049,7 @@ ndMeshEffect::ndMeshEffect(const ndFloat64* const vertexCloud, ndInt32 count, nd
 			ndStack<ndInt32> vertexIndexListPool(convexHull.GetCount() * 3);
 	
 			ndInt32 index = 0;
-			dMeshVertexFormat format;
+			ndMeshVertexFormat format;
 			format.m_faceCount = convexHull.GetCount();
 			format.m_faceIndexCount = &faceCountPool[0];
 			format.m_vertex.m_indexList = &vertexIndexListPool[0];
@@ -4132,7 +4132,7 @@ ndMeshEffect::ndMeshEffect(const ndShapeInstance& shapeInstance)
 	ndInt32* const indexList = &indexListBuffer[0];
 	ndVertexListToIndexList(&builder.m_vertex[0].m_x, sizeof(ndBigVector), 4, builder.m_vertex.GetCount(), &indexList[0], DG_VERTEXLIST_INDEXLIST_TOL);
 
-	ndMeshEffect::dMeshVertexFormat vertexFormat;
+	ndMeshEffect::ndMeshVertexFormat vertexFormat;
 
 	vertexFormat.m_faceCount = builder.m_faceIndexCount.GetCount();
 	vertexFormat.m_faceIndexCount = &builder.m_faceIndexCount[0];
@@ -4606,9 +4606,14 @@ void dgMeshEffect::GetWeightIndexChannel(dgInt32 strideInByte, dgInt32* const bu
 }
 */
 
-ndMeshEffect::dVertexCluster* ndMeshEffect::FindCluster(const char* const name) const
+const ndMeshEffect::ndClusterMap& ndMeshEffect::GetCluster() const
 {
-	ndTree<dVertexCluster, const ndString>::ndNode* const node = m_clusters.Find(name);
+	return m_clusters;
+}
+
+ndMeshEffect::ndVertexCluster* ndMeshEffect::FindCluster(const char* const name) const
+{
+	ndTree<ndVertexCluster, const ndString>::ndNode* const node = m_clusters.Find(name);
 	if (node)
 	{
 		return &node->GetInfo();
@@ -4616,9 +4621,18 @@ ndMeshEffect::dVertexCluster* ndMeshEffect::FindCluster(const char* const name) 
 	return nullptr;
 }
 
-ndMeshEffect::dVertexCluster* ndMeshEffect::CreateCluster(const char* const name)
+void ndMeshEffect::DeleteCluster(const char* const name)
 {
-	ndTree<dVertexCluster, const ndString>::ndNode* node = m_clusters.Find(name);
+	ndTree<ndVertexCluster, const ndString>::ndNode* const node = m_clusters.Find(name);
+	if (node)
+	{
+		m_clusters.Remove(node);
+	}
+}
+
+ndMeshEffect::ndVertexCluster* ndMeshEffect::CreateCluster(const char* const name)
+{
+	ndTree<ndVertexCluster, const ndString>::ndNode* node = m_clusters.Find(name);
 	if (!node)
 	{
 		node = m_clusters.Insert(name);
