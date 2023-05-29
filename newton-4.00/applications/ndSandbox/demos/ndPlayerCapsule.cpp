@@ -52,8 +52,9 @@ class ndMopcapMeshLoader : public ndMeshLoader
 		if (!loadAnimation)
 		{
 			ndMesh::Save(mesh, "xxx.ndm");
-			//delete mesh;
-			//mesh = ndMesh::Load("xxx.ndm");
+			delete mesh;
+			mesh = ndMesh::Load("xxx.ndm");
+			mesh->m_matrix = ndRollMatrix(ndPi * 0.5f);
 		}
 
 		return mesh;
