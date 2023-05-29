@@ -303,9 +303,6 @@ void ndMesh::Save(FILE* const file, ndInt32 level) const
 		}
 		PrintTabs(level);
 		fprintf(file, "\t\t}\n");
-	
-		//PrintTabs(level);
-		//fprintf(file, "\t\tmaterials: %d\n", materialsCount);
 
 		ndInt32 segmentStart = 0;
 		const ndArray<ndMeshEffect::ndMaterial>& materialArray = effectMesh->GetMaterials();
@@ -333,7 +330,7 @@ void ndMesh::Save(FILE* const file, ndInt32 level) const
 		
 			ndInt32 triangleIndexCount = effectMesh->GetMaterialIndexCount(geometryHandle, handle);
 			effectMesh->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
-	
+
 			PrintTabs(level);
 			fprintf(file, "\t\t\ttriangles: %d\n", triangleIndexCount / 3);
 			PrintTabs(level);
@@ -534,6 +531,7 @@ void ndMesh::Load(FILE* const file)
 				faceIndexArray.PushBack(3);
 				faceMaterialArray.PushBack(materialIndex);
 			}
+			ReadToken();
 			ReadToken();
 			ReadToken();
 			
