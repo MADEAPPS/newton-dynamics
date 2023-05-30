@@ -487,12 +487,17 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	entity->m_meshMatrix = pivotMatrix;
 	
 	const ofbx::Geometry* const geom = fbxMesh->getGeometry();
-	const ofbx::Vec3* const vertices = geom->getVertices();
 	ndInt32 indexCount = geom->getIndexCount();
 	
+	ndArray<ndVector> uvArray;
+	ndArray<ndVector> normalArray;
+
 	ndArray<ndInt32> indexArray;
+	ndArray<ndInt32> faceIndexArray;
+	ndArray<ndInt32> faceMaterialArray;
+	ndMeshEffect::ndMeshVertexFormat format;
+
 	indexArray.SetCount(indexCount);
-	//memcpy(&indexArray[0], geom->getFaceIndices(), indexCount * sizeof(ndInt32));
 	ndMemCpy(&indexArray[0], geom->getFaceIndices(), indexCount);
 	
 	ndInt32 faceCount = 0;
@@ -504,16 +509,12 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 		}
 	}
 	
-	ndArray<ndInt32> faceIndexArray;
-	ndArray<ndInt32> faceMaterialArray;
+	ndInt32 count = 0;
+	ndInt32 faceIndex = 0;
 
 	faceIndexArray.SetCount(faceCount);
 	faceMaterialArray.SetCount(faceCount);
-	
 	ImportMaterials(fbxMesh, *meshEffect);
-	
-	ndInt32 count = 0;
-	ndInt32 faceIndex = 0;
 	const ndArray<ndMeshEffect::ndMaterial>& materialArray = meshEffect->GetMaterials();
 	ndInt32 materialId = (materialArray.GetCount() <= 1) ? 0 : -1;
 	for (ndInt32 i = 0; i < indexCount; ++i)
@@ -536,8 +537,8 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 			faceIndex++;
 		}
 	}
-	
-	ndMeshEffect::ndMeshVertexFormat format;
+
+	const ofbx::Vec3* const vertices = geom->getVertices();
 	format.m_vertex.m_data = &vertices[0].x;
 	format.m_vertex.m_indexList = &indexArray[0];
 	format.m_vertex.m_strideInBytes = sizeof(ofbx::Vec3);
@@ -546,7 +547,6 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	format.m_faceIndexCount = &faceIndexArray[0];
 	format.m_faceMaterial = &faceMaterialArray[0];
 	
-	ndArray<ndVector> normalArray;
 	if (geom->getNormals())
 	{
 		normalArray.SetCount(indexCount);
@@ -562,10 +562,8 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 		format.m_normal.m_strideInBytes = sizeof(ndVector);
 	}
 	
-	ndArray<ndVector> uvArray;
 	if (geom->getUVs())
 	{
-		//uvArray.Resize(indexCount);
 		uvArray.SetCount(indexCount);
 		const ofbx::Vec2* const uv = geom->getUVs();
 		for (ndInt32 i = 0; i < indexCount; ++i)
