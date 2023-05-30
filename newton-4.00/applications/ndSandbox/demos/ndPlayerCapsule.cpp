@@ -134,7 +134,8 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 
 	ndMopcapRetargetMeshLoader loader(1.0f);
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("dummy.fbx", scene));
+	ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("skinTest.fbx", scene));
+	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("dummy.fbx", scene));
 	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("robotsuit.fbx", scene));
 	
 	ndSharedPtr<ndBody> player0(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f, true));
