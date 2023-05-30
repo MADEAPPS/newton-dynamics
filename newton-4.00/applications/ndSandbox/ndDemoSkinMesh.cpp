@@ -89,16 +89,14 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	
 	ndArray<ndVector> weight;
 	ndArray<ndWeightBoneIndex> skinBone;
+	ndWeightBoneIndex weightNull;
+
+	weightNull.Clear();
 	weight.SetCount(meshNode->GetVertexCount());
 	skinBone.SetCount(meshNode->GetVertexCount());
 
-	ndWeightBoneIndex weightNull;
-	weightNull.Clear();
-
-	//memset(&weight[0], 0, meshNode->GetVertexCount() * sizeof(ndVector));
-	//memset(&skinBone[0], -1, meshNode->GetVertexCount() * sizeof(dWeightBoneIndex));
-	ndMemSet(&weight[0], ndVector::m_zero, meshNode->GetVertexCount());
 	ndMemSet(&skinBone[0], weightNull, meshNode->GetVertexCount());
+	ndMemSet(&weight[0], ndVector::m_zero, meshNode->GetVertexCount());
 	
 	ndInt32 vCount = 0;
 	ndMeshEffect::ndClusterMap::Iterator iter(clusterMap);
@@ -116,7 +114,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 				weight[vertexIndex][3] = vertexWeight;
 				skinBone[vertexIndex].m_boneIndex[3] = boneIndex;
 			
-				for (ndInt32 j = 2; j >= 0; j--) 
+				for (ndInt32 j = 2; j >= 0; --j)
 				{
 					if (weight[vertexIndex][j] < weight[vertexIndex][j + 1]) 
 					{
@@ -132,13 +130,9 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	for (ndInt32 i = 0; i < weight.GetCount(); ++i)
 	{
 		ndVector w(weight[i]);
-		ndFloat32 invMag = w.m_x + w.m_y + w.m_z + w.m_w;
+		ndFloat32 invMag = w.AddHorizontal().GetScalar();
 		ndAssert(invMag > 0.0f);
-		invMag = 1.0f / invMag;
-		weight[i].m_x = w.m_x * invMag;
-		weight[i].m_y = w.m_y * invMag;
-		weight[i].m_z = w.m_z * invMag;
-		weight[i].m_w = w.m_w * invMag;
+		weight[i] = w.Scale(ndFloat32 (1.0f) / invMag);
 	
 		ndAssert(skinBone[i].m_boneIndex[0] != -1);
 		for (ndInt32 j = 0; j < 4; ++j) 

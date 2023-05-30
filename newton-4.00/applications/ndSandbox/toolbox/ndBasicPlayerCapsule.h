@@ -66,7 +66,6 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 	void SetCamera(ndDemoEntityManager* const scene);
 	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, ndFloat32 timestep);
 
-	//ndDemoEntityManager* m_scene;
 	PlayerInputs m_playerInput;
 	bool m_isPlayer;
 
