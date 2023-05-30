@@ -492,7 +492,8 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	
 	ndArray<ndInt32> indexArray;
 	indexArray.SetCount(indexCount);
-	memcpy(&indexArray[0], geom->getFaceIndices(), indexCount * sizeof(ndInt32));
+	//memcpy(&indexArray[0], geom->getFaceIndices(), indexCount * sizeof(ndInt32));
+	ndMemCpy(&indexArray[0], geom->getFaceIndices(), indexCount);
 	
 	ndInt32 faceCount = 0;
 	for (ndInt32 i = 0; i < indexCount; ++i)
@@ -602,7 +603,7 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 				ndAssert(fbxCluster->getIndicesCount() == fbxCluster->getWeightsCount());
 				ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
 				const ndInt32* const indices = fbxCluster->getIndices();
-				const double* const weights = fbxCluster->getWeights();
+				const ndFloat64* const weights = fbxCluster->getWeights();
 				for (ndInt32 j = 0; j < clusterIndexCount; ++j)
 				{
 					cluster->m_vertexIndex.PushBack(indices[j]);

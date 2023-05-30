@@ -24,8 +24,16 @@ class ndDemoEntityManager;
 class ndDemoSkinMesh: public ndDemoMeshInterface
 {
 	public:
-	struct dWeightBoneIndex
+	struct ndWeightBoneIndex
 	{
+		void Clear()
+		{
+			m_boneIndex[0] = -1;
+			m_boneIndex[0] = -1;
+			m_boneIndex[0] = -1;
+			m_boneIndex[0] = -1;
+		}
+
 		ndInt32 m_boneIndex[4];
 	};
 

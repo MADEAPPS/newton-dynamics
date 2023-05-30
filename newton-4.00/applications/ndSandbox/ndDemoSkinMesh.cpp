@@ -88,11 +88,17 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	}
 	
 	ndArray<ndVector> weight;
-	ndArray<dWeightBoneIndex> skinBone;
+	ndArray<ndWeightBoneIndex> skinBone;
 	weight.SetCount(meshNode->GetVertexCount());
 	skinBone.SetCount(meshNode->GetVertexCount());
-	memset(&weight[0], 0, meshNode->GetVertexCount() * sizeof(ndVector));
-	memset(&skinBone[0], -1, meshNode->GetVertexCount() * sizeof(dWeightBoneIndex));
+
+	ndWeightBoneIndex weightNull;
+	weightNull.Clear();
+
+	//memset(&weight[0], 0, meshNode->GetVertexCount() * sizeof(ndVector));
+	//memset(&skinBone[0], -1, meshNode->GetVertexCount() * sizeof(dWeightBoneIndex));
+	ndMemSet(&weight[0], ndVector::m_zero, meshNode->GetVertexCount());
+	ndMemSet(&skinBone[0], weightNull, meshNode->GetVertexCount());
 	
 	ndInt32 vCount = 0;
 	ndMeshEffect::ndClusterMap::Iterator iter(clusterMap);
