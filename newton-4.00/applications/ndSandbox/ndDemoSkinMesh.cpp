@@ -59,17 +59,15 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	{
 		stack--;
 		ndDemoEntity* const entity = pool[stack];
-		const ndMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix[stack]);
-	
-		const ndMatrix bindMatrix(shapeBindMatrix * boneMatrix.OrthoInverse());
-		entityArray.PushBack(entity);
-		bindMatrixArray.PushBack(bindMatrix);
-	
 		ndMeshEffect::ndClusterMap::ndNode* const clusterNode = clusterMap.Find(entity->GetName());
 		if (clusterNode) 
 		{
-			boneClusterRemapIndex.Insert(entityArray.GetCount() - 1, entity->GetName());
+			boneClusterRemapIndex.Insert(entityArray.GetCount(), entity->GetName());
 		}
+
+		const ndMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix[stack]);
+		entityArray.PushBack(entity);
+		bindMatrixArray.PushBack(shapeBindMatrix * boneMatrix.OrthoInverse());
 	
 		for (ndDemoEntity* node = entity->GetFirstChild(); node; node = node->GetNext()) 
 		{
@@ -89,14 +87,11 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	
 	ndArray<ndVector> weight;
 	ndArray<ndWeightBoneIndex> skinBone;
-	ndWeightBoneIndex weightNull;
-
-	weightNull.Clear();
 	weight.SetCount(meshNode->GetVertexCount());
 	skinBone.SetCount(meshNode->GetVertexCount());
 
-	ndMemSet(&skinBone[0], weightNull, meshNode->GetVertexCount());
 	ndMemSet(&weight[0], ndVector::m_zero, meshNode->GetVertexCount());
+	ndMemSet(&skinBone[0], ndWeightBoneIndex(), meshNode->GetVertexCount());
 	
 	ndInt32 vCount = 0;
 	ndMeshEffect::ndClusterMap::Iterator iter(clusterMap);

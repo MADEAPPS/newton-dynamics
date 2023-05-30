@@ -26,7 +26,7 @@ class ndDemoSkinMesh: public ndDemoMeshInterface
 	public:
 	struct ndWeightBoneIndex
 	{
-		void Clear()
+		ndWeightBoneIndex()
 		{
 			m_boneIndex[0] = -1;
 			m_boneIndex[0] = -1;
