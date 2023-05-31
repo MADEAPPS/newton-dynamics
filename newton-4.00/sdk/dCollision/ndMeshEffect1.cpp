@@ -2767,7 +2767,6 @@ bool ndMeshEffect::EndFace()
 			{
 				if (ptr->m_incidentFace > 0)
 				{
-					//m_attrib.m_pointChannel[ndInt32 (ptr->m_userData)] = m_points.m_vertex.m_count - 1;
 					ndInt32 index = ndInt32(ptr->m_userData);
 					m_attrib.m_pointChannel.PushBack(m_points.m_vertex.GetCount() - 1);
 					if (m_attrib.m_materialChannel.GetCount())
@@ -3799,6 +3798,7 @@ void ndMeshEffect::GetVertexColorChannel(ndInt32 strideInByte, ndFloat32* const 
 ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<ndUnsigned8>& buffer) const
 {
 	ndInt32 faceCount = 0;
+	ndInt32 indexCount = 0;
 	ndInt32 lru = IncLRU();
 	Iterator iter(*this);
 	for (iter.Begin(); iter; iter++)
@@ -3811,37 +3811,74 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 			ptr = edge;
 			do
 			{
+				indexCount++;
 				ptr->m_mark = lru;
 				ptr = ptr->m_next;
 			} while (ptr != edge);
 		}
 	}
 
-	ndInt32 totalSize = 0;
-	ndInt32 vertexStrideInBytes = 3 * sizeof(ndFloat64);
+	ndAssert(indexCount == m_points.m_vertex.GetCount());
 
+	ndInt32 totalSize = 0;
+	ndInt32 uvStrideInBytes = 2 * sizeof(ndFloat32);
+	ndInt32 normalStrideInBytes = 3 * sizeof(ndFloat32);
+	ndInt32 vertexStrideInBytes = 3 * sizeof(ndFloat64);
+	
 	ndInt32 vertexOffset = totalSize;
 	totalSize += m_points.m_vertex.GetCount() * vertexStrideInBytes;
 
-	ndInt32 vertexIndexOffset = totalSize;
-	totalSize += m_points.m_vertex.GetCount() * sizeof (ndInt32);
+	ndInt32 normalOffset = 0;
+	if (m_attrib.m_normalChannel.m_isValid)
+	{
+		normalOffset = totalSize;
+		totalSize += m_attrib.m_normalChannel.GetCount() * normalStrideInBytes;
+	}
+
+	ndInt32 uvOffset = 0;
+	if (m_attrib.m_uv0Channel.m_isValid)
+	{
+		uvOffset = totalSize;
+		totalSize += m_attrib.m_uv0Channel.GetCount() * uvStrideInBytes;
+	}
 
 	ndInt32 faceCountOffset = totalSize;
 	totalSize += faceCount * sizeof(ndInt32);
 
 	ndInt32 faceMaterialOffset = totalSize;
 	totalSize += faceCount * sizeof(ndInt32);
+	
+	ndInt32 vertexIndexOffset = totalSize;
+	totalSize += indexCount * sizeof (ndInt32);
+	
+	ndInt32 normalIndexOffset = 0;
+	if (m_attrib.m_normalChannel.m_isValid)
+	{
+		normalIndexOffset = totalSize;
+		totalSize += indexCount * sizeof(ndInt32);
+	}
+
+	ndInt32 uvIndexOffset = 0;
+	if (m_attrib.m_uv0Channel.m_isValid)
+	{
+		uvIndexOffset = totalSize;
+		totalSize += indexCount * sizeof(ndInt32);
+	}
 
 	buffer.SetCount(totalSize);
 	ndFloat64* const vertexBuffer = (ndFloat64*)&buffer[vertexOffset];
+	ndFloat32* const normalBuffer = (ndFloat32*)&buffer[normalOffset];
+	ndFloat32* const uvBuffer = (ndFloat32*)&buffer[uvOffset];
 	ndInt32* const vertexIndexBuffer = (ndInt32*)&buffer[vertexIndexOffset];
 	ndInt32* const faceIndexBuffer = (ndInt32*)&buffer[faceCountOffset];
 	ndInt32* const faceMaterialBuffer = (ndInt32*)&buffer[faceMaterialOffset];
-
+	ndInt32* const normalIndexBuffer = (ndInt32*)&buffer[normalIndexOffset];
+	ndInt32* const uvIndexBuffer = (ndInt32*)&buffer[uvIndexOffset];
+	
 	format.m_faceCount = faceCount;
 	format.m_faceIndexCount = faceIndexBuffer;
 	format.m_faceMaterial = faceMaterialBuffer;
-
+	
 	format.m_vertex.m_data = vertexBuffer;
 	format.m_vertex.m_indexList = vertexIndexBuffer;
 	format.m_vertex.m_strideInBytes = vertexStrideInBytes;
@@ -3849,12 +3886,38 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 	ndAssert(m_points.m_vertex.GetCount() == m_points.m_layers.GetCount());
 	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); ++i)
 	{
-		vertexIndexBuffer[i] = i;
+		//vertexIndexBuffer[i] = i;
 		vertexBuffer[i * 3 + 0] = m_points.m_vertex[i].m_x;
 		vertexBuffer[i * 3 + 1] = m_points.m_vertex[i].m_y;
 		vertexBuffer[i * 3 + 2] = m_points.m_vertex[i].m_z;
 	}
 
+	if (normalOffset)
+	{
+		format.m_normal.m_data = normalBuffer;
+		format.m_normal.m_indexList = normalIndexBuffer;
+		format.m_normal.m_strideInBytes = normalStrideInBytes;
+		for (ndInt32 i = 0; i < m_attrib.m_normalChannel.GetCount(); ++i)
+		{
+			normalBuffer[i * 3 + 0] = m_attrib.m_normalChannel[i].m_x;
+			normalBuffer[i * 3 + 1] = m_attrib.m_normalChannel[i].m_y;
+			normalBuffer[i * 3 + 2] = m_attrib.m_normalChannel[i].m_z;
+		}
+	}
+
+	if (uvOffset)
+	{
+		format.m_uv0.m_data = uvBuffer;
+		format.m_uv0.m_indexList = uvIndexBuffer;
+		format.m_uv0.m_strideInBytes = normalStrideInBytes;
+
+		for (ndInt32 i = 0; i < m_attrib.m_uv0Channel.GetCount(); ++i)
+		{
+			normalBuffer[i * 2 + 0] = m_attrib.m_uv0Channel[i].m_u;
+			normalBuffer[i * 2 + 1] = m_attrib.m_uv0Channel[i].m_v;
+		}
+	}
+	
 	faceCount = 0;
 	lru = IncLRU();
 	for (iter.Begin(); iter; iter++)
@@ -3869,9 +3932,10 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 			{
 				ptr->m_mark = lru;
 				count++;
-				//if (attibutes.m_normalChannel.m_isValid)
+				//if (normalOffset)
 				//{
-				//	m_attrib.m_normalChannel.PushBack(attibutes.m_normalChannel[ndInt32(ptr->m_userData)]);
+				//	ndAssert(0);
+				//	//m_attrib.m_normalChannel.PushBack(attibutes.m_normalChannel[ndInt32(ptr->m_userData)]);
 				//}
 				//
 				//if (attibutes.m_binormalChannel.m_isValid)
@@ -3898,7 +3962,7 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 				//attributeCount++;
 				ptr = ptr->m_next;
 			} while (ptr != edge);
-
+	
 			faceIndexBuffer[faceCount] = count;
 			faceMaterialBuffer[faceCount] = m_attrib.m_materialChannel[faceCount];
 			faceCount++;
