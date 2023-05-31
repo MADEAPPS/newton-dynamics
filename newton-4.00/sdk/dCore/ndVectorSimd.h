@@ -509,17 +509,6 @@ class ndVector
 		dst3 = ndVector (_mm_movehl_ps (tmp3, tmp2));
 	}
 
-#ifdef _DEBUG
-	//inline void Trace(char* const name) const
-	inline void Trace(char* const) const
-	{
-		ndAssert(0);
-		//dTrace(("%s %f %f %f %f\n", name, m_x, m_y, m_z, m_w));
-	}
-#else 
-	inline void Trace(char* const) const {}
-#endif
-
 	union 
 	{
 		ndFloat32 m_f[4];

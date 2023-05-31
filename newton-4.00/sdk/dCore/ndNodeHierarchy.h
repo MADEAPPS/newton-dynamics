@@ -33,8 +33,8 @@ class ndNodeHierarchy: public ndContainersFreeListAlloc<T>
 	T* GetNext () const;
 	T* GetRoot () const;
 
-	T* IteratorFirst() const;
-	T* IteratorNext() const;
+	T* GetFirstIterator() const;
+	T* GetNextIterator() const;
 
 	protected:
 	ndNodeHierarchy (const ndNodeHierarchy<T>& clone);
@@ -187,7 +187,7 @@ T* ndNodeHierarchy<T>::GetRoot () const
 }
 
 template<class T>
-T* ndNodeHierarchy<T>::IteratorFirst() const
+T* ndNodeHierarchy<T>::GetFirstIterator() const
 {
 	const ndNodeHierarchy<T>* ptr = this;
 	for (; ptr->m_firstChild; ptr = ptr->m_firstChild);
@@ -195,11 +195,11 @@ T* ndNodeHierarchy<T>::IteratorFirst() const
 }
 
 template<class T>
-T* ndNodeHierarchy<T>::IteratorNext() const
+T* ndNodeHierarchy<T>::GetNextIterator() const
 {
 	if (m_next)
 	{
-		return m_next->IteratorFirst();
+		return m_next->GetFirstIterator();
 	}
 
 	const ndNodeHierarchy<T>* x = this;

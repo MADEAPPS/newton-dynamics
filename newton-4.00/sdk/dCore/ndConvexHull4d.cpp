@@ -374,8 +374,9 @@ void ndConvexHull4d::Save(const char* const filename) const
 {
 	FILE* const file = fopen(filename, "wb");
 	ndInt32 index = 0;
-	//	fprintf (file, "final\n");
-	for (ndNode* nodePtr = GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
+	//fprintf (file, "final\n");
+	for (ndNode* nodePtr = GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) 
+	{
 		fprintf(file, "tetra %d\n", index);
 		index++;
 		const ndConvexHull4dTetraherum& face = nodePtr->GetInfo();

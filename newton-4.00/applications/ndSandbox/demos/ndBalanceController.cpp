@@ -35,7 +35,7 @@ namespace ndZmp
 		void Init()
 		{
 			m_totalMass = ndFloat32(0.0f);
-			for (ndNode* node = m_rootNode->IteratorFirst(); node; node = node->IteratorNext())
+			for (ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
 				ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
 				m_bodies.PushBack(body);

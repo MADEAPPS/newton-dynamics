@@ -844,10 +844,10 @@ void ndMeshEffect::dMeshBVH::FaceRayCast(const ndBigVector& p0, const ndBigVecto
 
 ndMeshEffect::ndMeshEffect(dgMemoryAllocator* const allocator, const ndMatrix& planeMatrix, ndFloat32 witdth, ndFloat32 breadth, ndInt32 material, const ndMatrix& textureMatrix0, const ndMatrix& textureMatrix1)
 	:ndPolyhedra(allocator)
-	, m_points(allocator)
-	, m_attrib(allocator)
-	, m_vertexBaseCount(-1)
-	, m_constructionIndex(0)
+	,m_points(allocator)
+	,m_attrib(allocator)
+	,m_vertexBaseCount(-1)
+	,m_constructionIndex(0)
 {
 	ndAssert(0);
 	Init();
@@ -902,20 +902,20 @@ ndMeshEffect::ndMeshEffect(dgMemoryAllocator* const allocator, const ndMatrix& p
 
 ndMeshEffect::ndMeshEffect(const ndMeshEffect& source)
 	:ndPolyhedra(source)
-	, m_points(source.m_points)
-	, m_attrib(source.m_attrib)
-	, m_vertexBaseCount(-1)
-	, m_constructionIndex(0)
+	,m_points(source.m_points)
+	,m_attrib(source.m_attrib)
+	,m_vertexBaseCount(-1)
+	,m_constructionIndex(0)
 {
 	Init();
 }
 
 ndMeshEffect::ndMeshEffect(dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData)
 	:ndPolyhedra(allocator)
-	, m_points(allocator)
-	, m_attrib(allocator)
-	, m_vertexBaseCount(-1)
-	, m_constructionIndex(0)
+	,m_points(allocator)
+	,m_attrib(allocator)
+	,m_vertexBaseCount(-1)
+	,m_constructionIndex(0)
 {
 	Init();
 	ndAssert(0);
@@ -3794,6 +3794,153 @@ void ndMeshEffect::GetVertexColorChannel(ndInt32 strideInByte, ndFloat32* const 
 		bufferOut[j + 2] = ndFloat32(m_attrib.m_colorChannel[i].m_z);
 		bufferOut[j + 3] = ndFloat32(m_attrib.m_colorChannel[i].m_w);
 	}
+}
+
+ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<ndInt32>& buffer) const
+{
+	ndInt32 vertexStrideInBytes = 3 * sizeof(ndFloat64);
+
+	ndInt32 faceCount = 0;
+	ndInt32 lru = IncLRU();
+	Iterator iter(*this);
+	for (iter.Begin(); iter; iter++)
+	{
+		ndEdge* const edge = &iter.GetNode()->GetInfo();
+		if ((edge->m_incidentFace > 0) && (edge->m_mark != lru))
+		{
+			faceCount++;
+			ndEdge* ptr = edge;
+			ptr = edge;
+			do
+			{
+				ptr->m_mark = lru;
+				//m_attrib.m_pointChannel.PushBack(ptr->m_incidentVertex);
+				//
+				//if (attibutes.m_materialChannel.m_isValid)
+				//{
+				//	m_attrib.m_materialChannel.PushBack(attibutes.m_materialChannel[ndInt32(ptr->m_userData)]);
+				//}
+				//
+				//if (attibutes.m_normalChannel.m_isValid)
+				//{
+				//	m_attrib.m_normalChannel.PushBack(attibutes.m_normalChannel[ndInt32(ptr->m_userData)]);
+				//}
+				//
+				//if (attibutes.m_binormalChannel.m_isValid)
+				//{
+				//	m_attrib.m_binormalChannel.PushBack(attibutes.m_binormalChannel[ndInt32(ptr->m_userData)]);
+				//}
+				//
+				//if (attibutes.m_colorChannel.m_isValid)
+				//{
+				//	m_attrib.m_colorChannel.PushBack(attibutes.m_colorChannel[ndInt32(ptr->m_userData)]);
+				//}
+				//
+				//if (attibutes.m_uv0Channel.m_isValid)
+				//{
+				//	m_attrib.m_uv0Channel.PushBack(attibutes.m_uv0Channel[ndInt32(ptr->m_userData)]);
+				//}
+				//
+				//if (attibutes.m_uv1Channel.m_isValid)
+				//{
+				//	m_attrib.m_uv1Channel.PushBack(attibutes.m_uv1Channel[ndInt32(ptr->m_userData)]);
+				//}
+				//
+				//ptr->m_userData = ndUnsigned64(attributeCount);
+				//attributeCount++;
+				ptr = ptr->m_next;
+			} while (ptr != edge);
+		}
+	}
+
+	ndInt32 totalSize = 0;
+
+	ndInt32 vertexOffet = totalSize;
+	totalSize += m_points.m_vertex.GetCount() * vertexStrideInBytes / ndInt32(sizeof(ndInt32));
+
+	ndInt32 vertexIndexOffet = totalSize;
+	totalSize += m_points.m_vertex.GetCount();
+
+	ndInt32 faceCountOffet = totalSize;
+	totalSize += faceCount;
+
+	buffer.SetCount(totalSize);
+	ndFloat64* const vertexBuffer = (ndFloat64*)&buffer[vertexOffet];
+	ndInt32* const vertexIndexBuffer = (ndInt32*)&buffer[vertexIndexOffet];
+	ndInt32* const faceIndexBuffer = (ndInt32*)&buffer[faceCountOffet];
+
+	format.m_faceCount = faceCount;
+	format.m_faceIndexCount = faceIndexBuffer;
+
+	format.m_vertex.m_data = vertexBuffer;
+	format.m_vertex.m_indexList = vertexIndexBuffer;
+	format.m_vertex.m_strideInBytes = vertexStrideInBytes;
+
+	ndAssert(m_points.m_vertex.GetCount() == m_points.m_layers.GetCount());
+	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); ++i)
+	{
+		vertexIndexBuffer[i] = i;
+		vertexBuffer[i * 3 + 0] = m_points.m_vertex[i].m_x;
+		vertexBuffer[i * 3 + 1] = m_points.m_vertex[i].m_y;
+		vertexBuffer[i * 3 + 2] = m_points.m_vertex[i].m_z;
+	}
+
+	faceCount = 0;
+	lru = IncLRU();
+	for (iter.Begin(); iter; iter++)
+	{
+		ndEdge* const edge = &iter.GetNode()->GetInfo();
+		if ((edge->m_incidentFace > 0) && (edge->m_mark != lru))
+		{
+			ndEdge* ptr = edge;
+			ndInt32 count = 0;
+			ptr = edge;
+			do
+			{
+				ptr->m_mark = lru;
+				count++;
+				//m_attrib.m_pointChannel.PushBack(ptr->m_incidentVertex);
+				//
+				//if (attibutes.m_materialChannel.m_isValid)
+				//{
+				//	m_attrib.m_materialChannel.PushBack(attibutes.m_materialChannel[ndInt32(ptr->m_userData)]);
+				//}
+				//
+				//if (attibutes.m_normalChannel.m_isValid)
+				//{
+				//	m_attrib.m_normalChannel.PushBack(attibutes.m_normalChannel[ndInt32(ptr->m_userData)]);
+				//}
+				//
+				//if (attibutes.m_binormalChannel.m_isValid)
+				//{
+				//	m_attrib.m_binormalChannel.PushBack(attibutes.m_binormalChannel[ndInt32(ptr->m_userData)]);
+				//}
+				//
+				//if (attibutes.m_colorChannel.m_isValid)
+				//{
+				//	m_attrib.m_colorChannel.PushBack(attibutes.m_colorChannel[ndInt32(ptr->m_userData)]);
+				//}
+				//
+				//if (attibutes.m_uv0Channel.m_isValid)
+				//{
+				//	m_attrib.m_uv0Channel.PushBack(attibutes.m_uv0Channel[ndInt32(ptr->m_userData)]);
+				//}
+				//
+				//if (attibutes.m_uv1Channel.m_isValid)
+				//{
+				//	m_attrib.m_uv1Channel.PushBack(attibutes.m_uv1Channel[ndInt32(ptr->m_userData)]);
+				//}
+				//
+				//ptr->m_userData = ndUnsigned64(attributeCount);
+				//attributeCount++;
+				ptr = ptr->m_next;
+			} while (ptr != edge);
+			faceIndexBuffer[faceCount] = count;
+			faceCount++;
+		}
+	}
+
+	return m_points.m_vertex.GetCount();
 }
 
 ndIndexArray* ndMeshEffect::MaterialGeometryBegin()

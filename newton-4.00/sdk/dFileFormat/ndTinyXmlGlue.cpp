@@ -25,6 +25,8 @@
 static char* FloatToString(char* const buffer, ndFloat32 value)
 {
 	sprintf(buffer, "%f", value);
+	ndTrace (("remeber using %g instead of %f\n"))
+	ndAssert(0);
 	char* ptr = buffer + strlen(buffer);
 	while (*(--ptr) == '0')
 	{

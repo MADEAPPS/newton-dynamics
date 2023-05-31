@@ -210,16 +210,6 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 	}
 }
 
-void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
-{
-	FILE* const file = fopen(fullPathName, "wb");
-	if (file)
-	{
-		mesh->Save(file);
-		fclose(file);
-	}
-}
-
 ndMesh* ndMesh::Load(const char* const fullPathName)
 {
 	ndMesh* root = nullptr;
@@ -239,196 +229,6 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 	return root;
 }
 
-void ndMesh::Save(FILE* const file, ndInt32 level) const
-{
-	auto PrintTabs = [file](ndInt32 level)
-	{
-		for (ndInt32 i = 0; i < level; i++)
-		{
-			fprintf(file, "\t");
-		}
-	};
-
-	PrintTabs(level);
-	fprintf(file, "node:\n");
-
-	PrintTabs(level);
-	fprintf(file, "{\n");
-
-	PrintTabs(level);
-	fprintf(file, "\tname: %s\n", GetName().GetStr());
-
-	ndVector euler1;
-	ndVector euler(m_matrix.CalcPitchYawRoll(euler1).Scale(ndRadToDegree));
-	PrintTabs(level);
-	fprintf(file, "\teulers: %f %f %f\n", euler.m_x, euler.m_y, euler.m_z);
-	PrintTabs(level);
-	fprintf(file, "\tposition: %f %f %f\n", m_matrix.m_posit.m_x, m_matrix.m_posit.m_y, m_matrix.m_posit.m_z);
-
-	if (*m_mesh)
-	{
-		PrintTabs(level);
-		fprintf(file, "\tgeometry:\n");
-		PrintTabs(level);
-		fprintf(file, "\t{\n");
-		PrintTabs(level);
-		fprintf(file, "\t\teulers: %f %f %f\n", euler.m_x, euler.m_y, euler.m_z);
-		PrintTabs(level);
-		fprintf(file, "\t\tposition: %f %f %f\n", m_meshMatrix.m_posit.m_x, m_meshMatrix.m_posit.m_y, m_meshMatrix.m_posit.m_z);
-
-		ndSharedPtr<ndMeshEffect> effectMesh(GetMesh());
-		ndIndexArray* const geometryHandle = effectMesh->MaterialGeometryBegin();
-
-		// extract vertex data  from the newton mesh		
-		ndInt32 indexCount = 0;
-		ndInt32 vertexCount = effectMesh->GetPropertiesCount();
-		ndInt32 materialsCount = 0;
-		for (ndInt32 handle = effectMesh->GetFirstMaterial(geometryHandle); handle != -1; handle = effectMesh->GetNextMaterial(geometryHandle, handle))
-		{
-			materialsCount++;
-			indexCount += effectMesh->GetMaterialIndexCount(geometryHandle, handle);
-		}
-
-		struct ndTmpData
-		{
-			ndFloat32 m_posit[3];
-			ndFloat32 m_normal[3];
-			ndFloat32 m_uv[2];
-		};
-
-		ndArray<ndTmpData> tmp;
-		ndArray<ndInt32> indices;
-
-		tmp.SetCount(vertexCount);
-		indices.SetCount(indexCount);
-
-		effectMesh->GetVertexChannel(sizeof(ndTmpData), &tmp[0].m_posit[0]);
-		effectMesh->GetNormalChannel(sizeof(ndTmpData), &tmp[0].m_normal[0]);
-		effectMesh->GetUV0Channel(sizeof(ndTmpData), &tmp[0].m_uv[0]);
-
-		PrintTabs(level);
-		fprintf(file, "\t\tpoints(x y x nx ny nz u v): %d\n", vertexCount);
-
-		PrintTabs(level);
-		fprintf(file, "\t\t{\n");
-
-		for (ndInt32 i = 0; i < vertexCount; ++i)
-		{
-			PrintTabs(level);
-			fprintf(file, "\t\t\t%f %f %f %f %f %f %f %f\n",
-				tmp[i].m_posit[0], tmp[i].m_posit[1], tmp[i].m_posit[2],
-				tmp[i].m_normal[0], tmp[i].m_normal[1], tmp[i].m_normal[2],
-				tmp[i].m_uv[0], tmp[i].m_uv[1]);
-		}
-		PrintTabs(level);
-		fprintf(file, "\t\t}\n");
-
-		ndInt32 segmentStart = 0;
-		const ndArray<ndMeshEffect::ndMaterial>& materialArray = effectMesh->GetMaterials();
-		for (ndInt32 handle = effectMesh->GetFirstMaterial(geometryHandle); handle != -1; handle = effectMesh->GetNextMaterial(geometryHandle, handle))
-		{
-			PrintTabs(level);
-			fprintf(file, "\t\tmaterial:\n");
-			PrintTabs(level);
-			fprintf(file, "\t\t{\n");
-
-			ndInt32 materialIndex = effectMesh->GetMaterialID(geometryHandle, handle);
-
-			const ndMeshEffect::ndMaterial& material = materialArray[materialIndex];
-
-			PrintTabs(level);
-			fprintf(file, "\t\t\tambience: %f %f %f %f\n", material.m_ambient.m_x, material.m_ambient.m_y, material.m_ambient.m_z, material.m_ambient.m_w);
-			PrintTabs(level);
-			fprintf(file, "\t\t\tdiffuse: %f %f %f %f\n", material.m_diffuse.m_x, material.m_diffuse.m_y, material.m_diffuse.m_z, material.m_diffuse.m_w);
-			PrintTabs(level);
-			fprintf(file, "\t\t\tm_specular: %f %f %f %f\n", material.m_specular.m_x, material.m_specular.m_y, material.m_specular.m_z, material.m_specular.m_w);
-			PrintTabs(level);
-			fprintf(file, "\t\t\topacity: %f\n", material.m_opacity);
-			PrintTabs(level);
-			fprintf(file, "\t\t\tshiness: %f\n", material.m_shiness);
-			PrintTabs(level);
-			fprintf(file, "\t\t\ttexture: %s\n", material.m_textureName);
-
-			ndInt32 triangleIndexCount = effectMesh->GetMaterialIndexCount(geometryHandle, handle);
-			effectMesh->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
-
-			PrintTabs(level);
-			fprintf(file, "\t\t\ttriangles: %d\n", triangleIndexCount / 3);
-			PrintTabs(level);
-			fprintf(file, "\t\t\t{\n");
-			for (ndInt32 i = 0; i < triangleIndexCount; i += 3)
-			{
-				PrintTabs(level);
-				fprintf(file, "\t\t\t\t%d %d %d\n", indices[segmentStart + i], indices[segmentStart + i + 1], indices[segmentStart + i + 2]);
-			}
-			PrintTabs(level);
-			fprintf(file, "\t\t\t}\n");
-			segmentStart += triangleIndexCount;
-
-			PrintTabs(level);
-			fprintf(file, "\t\t}\n");
-		}
-		effectMesh->MaterialGeometryEnd(geometryHandle);
-
-		const ndMeshEffect::ndClusterMap& clusters = effectMesh->GetCluster();
-		if (clusters.GetCount())
-		{
-			ndMeshEffect::ndClusterMap::Iterator it(clusters);
-			for (it.Begin(); it; it++)
-			{
-				PrintTabs(level);
-				fprintf(file, "\t\tskinCluster: %s\n", it.GetKey().GetStr());
-				PrintTabs(level);
-				fprintf(file, "\t\t{\n");
-				
-				ndMeshEffect::ndVertexCluster& cluster = it.GetNode()->GetInfo();
-				
-				PrintTabs(level);
-				fprintf(file, "\t\t\tindexCount: %d\n", cluster.m_vertexIndex.GetCount());
-				
-				PrintTabs(level);
-				fprintf(file, "\t\t\tvertexIndex: ");
-				for (ndInt32 i = 0; i < cluster.m_vertexIndex.GetCount(); ++i)
-				{
-					fprintf(file, "%d ", cluster.m_vertexIndex[i]);
-				}
-				fprintf(file, "\t\t\t\n");
-				
-				PrintTabs(level);
-				fprintf(file, "\t\t\tvertexWeight: ");
-				for (ndInt32 i = 0; i < cluster.m_vertexWeigh.GetCount(); ++i)
-				{
-					fprintf(file, "%f ", cluster.m_vertexWeigh[i]);
-				}
-				fprintf(file, "\t\t\t\n");
-				
-				PrintTabs(level);
-				fprintf(file, "\t\t}\n");
-			}
-		}
-
-		PrintTabs(level);
-		fprintf(file, "\t}\n");
-	}
-
-	if (GetPositCurve().GetCount())
-	{
-		//ndAssert(0);
-	}
-
-	if (GetRotationCurve().GetCount())
-	{
-		//ndAssert(0);
-	}
-
-	for (ndMesh* child = GetFirstChild(); child; child = child->GetNext())
-	{
-		child->Save(file, level + 1);
-	}
-
-	PrintTabs(level);
-	fprintf(file, "}\n");
-}
 
 void ndMesh::Load(FILE* const file)
 {
@@ -664,4 +464,233 @@ void ndMesh::Load(FILE* const file)
 			break;
 		}
 	}
+}
+
+void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
+{
+	FILE* const file = fopen(fullPathName, "wb");
+	if (file)
+	{
+		ndTree<ndInt32, const ndMeshEffect*> meshEffects;
+		for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
+		{
+			if (*node->m_mesh)
+			{
+				meshEffects.Insert(meshEffects.GetCount(), *node->m_mesh);
+			}
+		}
+
+		if (meshEffects.GetCount())
+		{
+			fprintf(file, "geometries: %d\n", meshEffects.GetCount());
+			fprintf(file, "{\n");
+
+			ndTree<ndInt32, const ndMeshEffect*>::Iterator it(meshEffects);
+			for (it.Begin(); it; it++)
+			{
+				fprintf(file, "\tgeometry: %d\n", it.GetNode()->GetInfo());
+				fprintf(file, "\t{\n");
+
+				ndMeshEffect* effectMesh = (ndMeshEffect*)it.GetKey();
+				ndIndexArray* const geometryHandle = effectMesh->MaterialGeometryBegin();
+				
+				// extract vertex data  from the newton mesh		
+				ndInt32 indexCount = 0;
+				ndInt32 materialsCount = 0;
+				for (ndInt32 handle = effectMesh->GetFirstMaterial(geometryHandle); handle != -1; handle = effectMesh->GetNextMaterial(geometryHandle, handle))
+				{
+					materialsCount++;
+					indexCount += effectMesh->GetMaterialIndexCount(geometryHandle, handle);
+				}
+				
+				//struct ndTmpData
+				//{
+				//	ndFloat32 m_posit[3];
+				//	ndFloat32 m_normal[3];
+				//	ndFloat32 m_uv[2];
+				//};
+				//
+				//ndArray<ndTmpData> tmp;
+				//ndArray<ndInt32> indices;
+				//
+				////ndInt32 vertexCount = effectMesh->GetPropertiesCount();
+				//ndInt32 vertexCount = effectMesh->GetVertexCount();
+				//tmp.SetCount(vertexCount);
+				//indices.SetCount(indexCount);
+				//
+				//ndInt32 stride = ndInt32 (effectMesh->GetVertexStrideInByte() / sizeof (ndFloat64));
+				//const ndFloat64* const vertexBuffer = effectMesh->GetVertexPool();
+				//effectMesh->GetVertexChannel(sizeof(ndTmpData), &tmp[0].m_posit[0]);
+				//effectMesh->GetNormalChannel(sizeof(ndTmpData), &tmp[0].m_normal[0]);
+				//effectMesh->GetUV0Channel(sizeof(ndTmpData), &tmp[0].m_uv[0]);
+
+				ndArray<ndInt32> tmpBuffer;
+				ndMeshEffect::ndMeshVertexFormat format;
+				ndInt32 vertexCount = effectMesh->GenerateVertexFormat(format, tmpBuffer);
+
+				//fprintf(file, "\t\tpoints(x y x nx ny nz u v): %d\n", vertexCount);
+				fprintf(file, "\t\tpoints: %d\n", vertexCount);
+				fprintf(file, "\t\t{\n");
+				ndInt32 stride = format.m_vertex.m_strideInBytes / ndInt32 (sizeof(ndFloat64));
+				for (ndInt32 i = 0; i < vertexCount; ++i)
+				{
+				//	fprintf(file, "\t\t\t%g %g %g %g %g %g %g %g\n",
+				//		tmp[i].m_posit[0], tmp[i].m_posit[1], tmp[i].m_posit[2],
+				//		tmp[i].m_normal[0], tmp[i].m_normal[1], tmp[i].m_normal[2],
+				//		tmp[i].m_uv[0], tmp[i].m_uv[1]);
+					ndFloat64 x;
+					ndFloat64 y;
+					ndFloat64 z;
+					x = format.m_vertex.m_data[i * stride + 0];
+					y = format.m_vertex.m_data[i * stride + 0];
+					z = format.m_vertex.m_data[i * stride + 0];
+					fprintf(file, "\t\t\t%g %g %g\n", x, y, z);
+				}
+				fprintf(file, "\t\t}\n");
+				
+				//ndInt32 segmentStart = 0;
+				//const ndArray<ndMeshEffect::ndMaterial>& materialArray = effectMesh->GetMaterials();
+				//for (ndInt32 handle = effectMesh->GetFirstMaterial(geometryHandle); handle != -1; handle = effectMesh->GetNextMaterial(geometryHandle, handle))
+				//{
+				//	PrintTabs(level);
+				//	fprintf(file, "\t\tmaterial:\n");
+				//	PrintTabs(level);
+				//	fprintf(file, "\t\t{\n");
+				//
+				//	ndInt32 materialIndex = effectMesh->GetMaterialID(geometryHandle, handle);
+				//
+				//	const ndMeshEffect::ndMaterial& material = materialArray[materialIndex];
+				//
+				//	PrintTabs(level);
+				//	fprintf(file, "\t\t\tambience: %g %g %g %g\n", material.m_ambient.m_x, material.m_ambient.m_y, material.m_ambient.m_z, material.m_ambient.m_w);
+				//	PrintTabs(level);
+				//	fprintf(file, "\t\t\tdiffuse: %g %g %g %g\n", material.m_diffuse.m_x, material.m_diffuse.m_y, material.m_diffuse.m_z, material.m_diffuse.m_w);
+				//	PrintTabs(level);
+				//	fprintf(file, "\t\t\tm_specular: %g %g %g %g\n", material.m_specular.m_x, material.m_specular.m_y, material.m_specular.m_z, material.m_specular.m_w);
+				//	PrintTabs(level);
+				//	fprintf(file, "\t\t\topacity: %g\n", material.m_opacity);
+				//	PrintTabs(level);
+				//	fprintf(file, "\t\t\tshiness: %g\n", material.m_shiness);
+				//	PrintTabs(level);
+				//	fprintf(file, "\t\t\ttexture: %s\n", material.m_textureName);
+				//
+				//	ndInt32 triangleIndexCount = effectMesh->GetMaterialIndexCount(geometryHandle, handle);
+				//	effectMesh->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
+				//
+				//	PrintTabs(level);
+				//	fprintf(file, "\t\t\ttriangles: %d\n", triangleIndexCount / 3);
+				//	PrintTabs(level);
+				//	fprintf(file, "\t\t\t{\n");
+				//	for (ndInt32 i = 0; i < triangleIndexCount; i += 3)
+				//	{
+				//		PrintTabs(level);
+				//		fprintf(file, "\t\t\t\t%d %d %d\n", indices[segmentStart + i], indices[segmentStart + i + 1], indices[segmentStart + i + 2]);
+				//	}
+				//	PrintTabs(level);
+				//	fprintf(file, "\t\t\t}\n");
+				//	segmentStart += triangleIndexCount;
+				//
+				//	PrintTabs(level);
+				//	fprintf(file, "\t\t}\n");
+				//}
+				effectMesh->MaterialGeometryEnd(geometryHandle);
+				
+				const ndMeshEffect::ndClusterMap& clusters = effectMesh->GetCluster();
+				if (clusters.GetCount())
+				{
+					ndMeshEffect::ndClusterMap::Iterator clusterIter(clusters);
+					for (clusterIter.Begin(); clusterIter; clusterIter++)
+					{
+						fprintf(file, "\t\tskinCluster: %s\n", clusterIter.GetKey().GetStr());
+						fprintf(file, "\t\t{\n");
+				
+						ndMeshEffect::ndVertexCluster& cluster = clusterIter.GetNode()->GetInfo();
+				
+						fprintf(file, "\t\t\tindexCount: %d\n", cluster.m_vertexIndex.GetCount());
+				
+						fprintf(file, "\t\t\tvertexIndex: ");
+						for (ndInt32 i = 0; i < cluster.m_vertexIndex.GetCount(); ++i)
+						{
+							fprintf(file, "%d ", cluster.m_vertexIndex[i]);
+						}
+						fprintf(file, "\t\t\t\n");
+				
+						fprintf(file, "\t\t\tvertexWeight: ");
+						for (ndInt32 i = 0; i < cluster.m_vertexWeigh.GetCount(); ++i)
+						{
+							fprintf(file, "%g ", cluster.m_vertexWeigh[i]);
+						}
+						fprintf(file, "\t\t\t\n");
+				
+						fprintf(file, "\t\t}\n");
+					}
+				}
+				
+				fprintf(file, "\t}\n");
+			}
+
+			fprintf(file, "}\n");
+			fprintf(file, "\n");
+		}
+
+		mesh->Save(file, meshEffects);
+		fclose(file);
+	}
+}
+
+void ndMesh::Save(FILE* const file, const ndTree<ndInt32, const ndMeshEffect*>& meshEffects, ndInt32 level) const
+{
+	auto PrintTabs = [file](ndInt32 level)
+	{
+		for (ndInt32 i = 0; i < level; i++)
+		{
+			fprintf(file, "\t");
+		}
+	};
+
+	PrintTabs(level);
+	fprintf(file, "node:\n");
+
+	PrintTabs(level);
+	fprintf(file, "{\n");
+
+	PrintTabs(level);
+	fprintf(file, "\tname: %s\n", GetName().GetStr());
+
+	ndVector euler1;
+	ndVector euler(m_matrix.CalcPitchYawRoll(euler1).Scale(ndRadToDegree));
+	PrintTabs(level);
+	fprintf(file, "\teulers: %g %g %g\n", euler.m_x, euler.m_y, euler.m_z);
+	PrintTabs(level);
+	fprintf(file, "\tposition: %g %g %g\n", m_matrix.m_posit.m_x, m_matrix.m_posit.m_y, m_matrix.m_posit.m_z);
+
+	PrintTabs(level);
+	euler = m_meshMatrix.CalcPitchYawRoll(euler1).Scale(ndRadToDegree);
+	fprintf(file, "\tgeometryEulers: %g %g %g\n", euler.m_x, euler.m_y, euler.m_z);
+	PrintTabs(level);
+	fprintf(file, "\tgeometryPosition: %g %g %g\n", m_meshMatrix.m_posit.m_x, m_meshMatrix.m_posit.m_y, m_meshMatrix.m_posit.m_z);
+
+	if (*m_mesh)
+	{
+		PrintTabs(level);
+		fprintf(file, "\tgeometry: %d\n", meshEffects.Find(*m_mesh)->GetInfo());
+	}
+
+	if (GetPositCurve().GetCount())
+	{
+		//ndAssert(0);
+	}
+
+	if (GetRotationCurve().GetCount())
+	{
+		//ndAssert(0);
+	}
+
+	for (ndMesh* child = GetFirstChild(); child; child = child->GetNext())
+	{
+		child->Save(file, meshEffects, level + 1);
+	}
+
+	PrintTabs(level);
+	fprintf(file, "}\n");
 }

@@ -41,7 +41,7 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 		ndMesh* mesh = ndMeshLoader::LoadMesh(fbxMeshName, loadAnimation);
 
 		// re target bone and nodes names
-		for (ndMesh* node = mesh->IteratorFirst(); node; node = node->IteratorNext())
+		for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
 		{
 			const char* const ptr = strchr(node->GetName().GetStr(), ':');
 			if (ptr)

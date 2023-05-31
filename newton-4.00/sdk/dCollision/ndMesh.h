@@ -79,7 +79,7 @@ class ndMesh : public ndNodeHierarchy<ndMesh>
 
 	private:
 	void Load(FILE* const file);
-	void Save(FILE* const file, ndInt32 level = 0) const;
+	void Save(FILE* const file, const ndTree<ndInt32, const ndMeshEffect*>& meshEffects, ndInt32 level = 0) const;
 
 	protected:
 	ndString m_name;

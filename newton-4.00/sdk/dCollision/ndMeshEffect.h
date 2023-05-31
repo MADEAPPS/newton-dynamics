@@ -434,6 +434,7 @@ class ndMeshEffect: public ndPolyhedra
 	const ndFloat64* GetVertexPool() const;
 
 	ndInt32 GetFaceMaterial(ndEdge* const faceEdge) const;
+	ndInt32 GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<ndInt32>& buffer) const;
 
 	D_COLLISION_API const ndClusterMap& GetCluster() const;
 	D_COLLISION_API void DeleteCluster(const char* const name);

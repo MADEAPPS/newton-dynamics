@@ -258,8 +258,9 @@ void ndConvexHull3d::Save(const char* const filename) const
 {
 	FILE* const file = fopen(filename, "wb");
 	ndInt32 index = 0;
-	//	fprintf(file, "final\n");
-	for (ndNode* nodePtr = GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
+	//fprintf(file, "final\n");
+	for (ndNode* nodePtr = GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) 
+	{
 		fprintf(file, "triangle %d\n", index);
 		index++;
 		const ndConvexHull3dFace& face = nodePtr->GetInfo();
