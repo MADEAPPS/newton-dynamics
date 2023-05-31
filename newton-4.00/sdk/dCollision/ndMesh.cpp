@@ -484,10 +484,10 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 		{
 			auto PrintVertexChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndDoubleData& channel, ndInt32 vertexCount)
 			{
-				fprintf(file, "\t\tvertex: %d\n", vertexCount);
+				fprintf(file, "\t\tvertex:\n");
 				fprintf(file, "\t\t{\n");
 
-				fprintf(file, "\t\t\tindices:\n");
+				fprintf(file, "\t\t\tindices: %d\n", vertexCount);
 				fprintf(file, "\t\t\t{\n");
 				ndInt32 positCount = 0;
 				fprintf(file, "\t\t\t\t");
@@ -518,10 +518,10 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 
 			auto PrintNormalChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndFloatData& channel, ndInt32 vertexCount)
 			{
-				fprintf(file, "\t\tnormal: %d\n", vertexCount);
+				fprintf(file, "\t\tnormal\n");
 				fprintf(file, "\t\t{\n");
 
-				fprintf(file, "\t\t\tindices:\n");
+				fprintf(file, "\t\t\tindices: %d\n", vertexCount);
 				fprintf(file, "\t\t\t{\n");
 				ndInt32 positCount = 0;
 				fprintf(file, "\t\t\t\t");
@@ -552,10 +552,10 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 
 			auto PrintUVChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndFloatData& channel, ndInt32 vertexCount)
 			{
-				fprintf(file, "\t\tuv: %d\n", vertexCount);
+				fprintf(file, "\t\tuv:");
 				fprintf(file, "\t\t{\n");
 
-				fprintf(file, "\t\t\tindices:\n");
+				fprintf(file, "\t\t\tindices %d\n", vertexCount);
 				fprintf(file, "\t\t\t{\n");
 				ndInt32 positCount = 0;
 				fprintf(file, "\t\t\t\t");
@@ -592,16 +592,6 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				fprintf(file, "\t{\n");
 
 				ndMeshEffect* effectMesh = (ndMeshEffect*)it.GetKey();
-				ndIndexArray* const geometryHandle = effectMesh->MaterialGeometryBegin();
-
-				// extract vertex data  from the newton mesh		
-				ndInt32 indexCount = 0;
-				ndInt32 materialsCount = 0;
-				for (ndInt32 handle = effectMesh->GetFirstMaterial(geometryHandle); handle != -1; handle = effectMesh->GetNextMaterial(geometryHandle, handle))
-				{
-					materialsCount++;
-					indexCount += effectMesh->GetMaterialIndexCount(geometryHandle, handle);
-				}
 
 				ndArray<ndUnsigned8> tmpBuffer;
 				ndMeshEffect::ndMeshVertexFormat format;
@@ -616,15 +606,13 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 					PrintUVChannel(format.m_uv0, vertexCount);
 				}
 
-				ndInt32 segmentStart = 0;
 				const ndArray<ndMeshEffect::ndMaterial>& materialArray = effectMesh->GetMaterials();
-				for (ndInt32 handle = effectMesh->GetFirstMaterial(geometryHandle); handle != -1; handle = effectMesh->GetNextMaterial(geometryHandle, handle))
+				for (ndInt32 i = 0; i < materialArray.GetCount(); ++i)
 				{
 					fprintf(file, "\t\tmaterial:\n");
 					fprintf(file, "\t\t{\n");
 				
-					ndInt32 materialIndex = effectMesh->GetMaterialID(geometryHandle, handle);
-					const ndMeshEffect::ndMaterial& material = materialArray[materialIndex];
+					const ndMeshEffect::ndMaterial& material = materialArray[i];
 				
 					fprintf(file, "\t\t\tambience: %g %g %g %g\n", material.m_ambient.m_x, material.m_ambient.m_y, material.m_ambient.m_z, material.m_ambient.m_w);
 					fprintf(file, "\t\t\tdiffuse: %g %g %g %g\n", material.m_diffuse.m_x, material.m_diffuse.m_y, material.m_diffuse.m_z, material.m_diffuse.m_w);
@@ -632,24 +620,36 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 					fprintf(file, "\t\t\topacity: %g\n", material.m_opacity);
 					fprintf(file, "\t\t\tshiness: %g\n", material.m_shiness);
 					fprintf(file, "\t\t\ttexture: %s\n", material.m_textureName);
+
+					ndInt32 faceCount = 0;
+					for (ndInt32 j = 0; j < format.m_faceCount; ++j)
+					{
+						if (format.m_faceMaterial[j] == i)
+						{
+							faceCount++;
+						}
+					}
 				
-					//ndInt32 triangleIndexCount = effectMesh->GetMaterialIndexCount(geometryHandle, handle);
-					//effectMesh->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
-					//
-					//fprintf(file, "\t\t\ttriangles: %d\n", triangleIndexCount / 3);
-					//PrintTabs(level);
-					//fprintf(file, "\t\t\t{\n");
-					//for (ndInt32 i = 0; i < triangleIndexCount; i += 3)
-					//{
-					//	PrintTabs(level);
-					//	fprintf(file, "\t\t\t\t%d %d %d\n", indices[segmentStart + i], indices[segmentStart + i + 1], indices[segmentStart + i + 2]);
-					//}
-					//fprintf(file, "\t\t\t}\n");
-					//segmentStart += triangleIndexCount;
+					ndInt32 indexAcc = 0;
+					fprintf(file, "\t\t\tfaces: %d\n", faceCount);
+					fprintf(file, "\t\t\t{\n");
+					for (ndInt32 j = 0; j < format.m_faceCount; ++j)
+					{
+						if (format.m_faceMaterial[j] == i)
+						{
+							fprintf(file, "\t\t\t\t%d: ", format.m_faceIndexCount[j]);
+							for (ndInt32 k = 0; k < format.m_faceIndexCount[j]; ++k)
+							{
+								fprintf(file, "%d ", format.m_vertex.m_indexList[indexAcc + k]);
+							}
+							fprintf(file, "\n");
+						}
+						indexAcc += format.m_faceIndexCount[j];
+					}
+					fprintf(file, "\t\t\t}\n");
 
 					fprintf(file, "\t\t}\n");
 				}
-				effectMesh->MaterialGeometryEnd(geometryHandle);
 				
 				const ndMeshEffect::ndClusterMap& clusters = effectMesh->GetCluster();
 				if (clusters.GetCount())
