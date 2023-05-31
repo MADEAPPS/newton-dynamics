@@ -524,7 +524,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				//effectMesh->GetNormalChannel(sizeof(ndTmpData), &tmp[0].m_normal[0]);
 				//effectMesh->GetUV0Channel(sizeof(ndTmpData), &tmp[0].m_uv[0]);
 
-				ndArray<ndInt32> tmpBuffer;
+				ndArray<ndUnsigned8> tmpBuffer;
 				ndMeshEffect::ndMeshVertexFormat format;
 				ndInt32 vertexCount = effectMesh->GenerateVertexFormat(format, tmpBuffer);
 
@@ -548,51 +548,39 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				}
 				fprintf(file, "\t\t}\n");
 				
-				//ndInt32 segmentStart = 0;
-				//const ndArray<ndMeshEffect::ndMaterial>& materialArray = effectMesh->GetMaterials();
-				//for (ndInt32 handle = effectMesh->GetFirstMaterial(geometryHandle); handle != -1; handle = effectMesh->GetNextMaterial(geometryHandle, handle))
-				//{
-				//	PrintTabs(level);
-				//	fprintf(file, "\t\tmaterial:\n");
-				//	PrintTabs(level);
-				//	fprintf(file, "\t\t{\n");
-				//
-				//	ndInt32 materialIndex = effectMesh->GetMaterialID(geometryHandle, handle);
-				//
-				//	const ndMeshEffect::ndMaterial& material = materialArray[materialIndex];
-				//
-				//	PrintTabs(level);
-				//	fprintf(file, "\t\t\tambience: %g %g %g %g\n", material.m_ambient.m_x, material.m_ambient.m_y, material.m_ambient.m_z, material.m_ambient.m_w);
-				//	PrintTabs(level);
-				//	fprintf(file, "\t\t\tdiffuse: %g %g %g %g\n", material.m_diffuse.m_x, material.m_diffuse.m_y, material.m_diffuse.m_z, material.m_diffuse.m_w);
-				//	PrintTabs(level);
-				//	fprintf(file, "\t\t\tm_specular: %g %g %g %g\n", material.m_specular.m_x, material.m_specular.m_y, material.m_specular.m_z, material.m_specular.m_w);
-				//	PrintTabs(level);
-				//	fprintf(file, "\t\t\topacity: %g\n", material.m_opacity);
-				//	PrintTabs(level);
-				//	fprintf(file, "\t\t\tshiness: %g\n", material.m_shiness);
-				//	PrintTabs(level);
-				//	fprintf(file, "\t\t\ttexture: %s\n", material.m_textureName);
-				//
-				//	ndInt32 triangleIndexCount = effectMesh->GetMaterialIndexCount(geometryHandle, handle);
-				//	effectMesh->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
-				//
-				//	PrintTabs(level);
-				//	fprintf(file, "\t\t\ttriangles: %d\n", triangleIndexCount / 3);
-				//	PrintTabs(level);
-				//	fprintf(file, "\t\t\t{\n");
-				//	for (ndInt32 i = 0; i < triangleIndexCount; i += 3)
-				//	{
-				//		PrintTabs(level);
-				//		fprintf(file, "\t\t\t\t%d %d %d\n", indices[segmentStart + i], indices[segmentStart + i + 1], indices[segmentStart + i + 2]);
-				//	}
-				//	PrintTabs(level);
-				//	fprintf(file, "\t\t\t}\n");
-				//	segmentStart += triangleIndexCount;
-				//
-				//	PrintTabs(level);
-				//	fprintf(file, "\t\t}\n");
-				//}
+				ndInt32 segmentStart = 0;
+				const ndArray<ndMeshEffect::ndMaterial>& materialArray = effectMesh->GetMaterials();
+				for (ndInt32 handle = effectMesh->GetFirstMaterial(geometryHandle); handle != -1; handle = effectMesh->GetNextMaterial(geometryHandle, handle))
+				{
+					fprintf(file, "\t\tmaterial:\n");
+					fprintf(file, "\t\t{\n");
+				
+					ndInt32 materialIndex = effectMesh->GetMaterialID(geometryHandle, handle);
+					const ndMeshEffect::ndMaterial& material = materialArray[materialIndex];
+				
+					fprintf(file, "\t\t\tambience: %g %g %g %g\n", material.m_ambient.m_x, material.m_ambient.m_y, material.m_ambient.m_z, material.m_ambient.m_w);
+					fprintf(file, "\t\t\tdiffuse: %g %g %g %g\n", material.m_diffuse.m_x, material.m_diffuse.m_y, material.m_diffuse.m_z, material.m_diffuse.m_w);
+					fprintf(file, "\t\t\tm_specular: %g %g %g %g\n", material.m_specular.m_x, material.m_specular.m_y, material.m_specular.m_z, material.m_specular.m_w);
+					fprintf(file, "\t\t\topacity: %g\n", material.m_opacity);
+					fprintf(file, "\t\t\tshiness: %g\n", material.m_shiness);
+					fprintf(file, "\t\t\ttexture: %s\n", material.m_textureName);
+				
+					//ndInt32 triangleIndexCount = effectMesh->GetMaterialIndexCount(geometryHandle, handle);
+					//effectMesh->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
+					//
+					//fprintf(file, "\t\t\ttriangles: %d\n", triangleIndexCount / 3);
+					//PrintTabs(level);
+					//fprintf(file, "\t\t\t{\n");
+					//for (ndInt32 i = 0; i < triangleIndexCount; i += 3)
+					//{
+					//	PrintTabs(level);
+					//	fprintf(file, "\t\t\t\t%d %d %d\n", indices[segmentStart + i], indices[segmentStart + i + 1], indices[segmentStart + i + 2]);
+					//}
+					//fprintf(file, "\t\t\t}\n");
+					//segmentStart += triangleIndexCount;
+
+					fprintf(file, "\t\t}\n");
+				}
 				effectMesh->MaterialGeometryEnd(geometryHandle);
 				
 				const ndMeshEffect::ndClusterMap& clusters = effectMesh->GetCluster();

@@ -297,8 +297,8 @@ class ndMeshEffect: public ndPolyhedra
 
 		void Clear();
 		void SetCount(ndInt32 count);
-		void CopyFrom(const ndAttibutFormat& source);
-		void CopyEntryFrom(ndInt32 index, const ndAttibutFormat& source, ndInt32 sourceIndex);
+		//void CopyFrom(const ndAttibutFormat& source);
+		//void CopyEntryFrom(ndInt32 index, const ndAttibutFormat& source, ndInt32 sourceIndex);
 		void CompactVertexData(const ndPointFormat& points, ndInt32* const indexList, ndFloat32 tol);
 
 		private:
@@ -434,7 +434,7 @@ class ndMeshEffect: public ndPolyhedra
 	const ndFloat64* GetVertexPool() const;
 
 	ndInt32 GetFaceMaterial(ndEdge* const faceEdge) const;
-	ndInt32 GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<ndInt32>& buffer) const;
+	ndInt32 GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<ndUnsigned8>& buffer) const;
 
 	D_COLLISION_API const ndClusterMap& GetCluster() const;
 	D_COLLISION_API void DeleteCluster(const char* const name);

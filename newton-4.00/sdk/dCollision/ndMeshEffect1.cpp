@@ -3796,10 +3796,8 @@ void ndMeshEffect::GetVertexColorChannel(ndInt32 strideInByte, ndFloat32* const 
 	}
 }
 
-ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<ndInt32>& buffer) const
+ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<ndUnsigned8>& buffer) const
 {
-	ndInt32 vertexStrideInBytes = 3 * sizeof(ndFloat64);
-
 	ndInt32 faceCount = 0;
 	ndInt32 lru = IncLRU();
 	Iterator iter(*this);
@@ -3814,63 +3812,35 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 			do
 			{
 				ptr->m_mark = lru;
-				//m_attrib.m_pointChannel.PushBack(ptr->m_incidentVertex);
-				//
-				//if (attibutes.m_materialChannel.m_isValid)
-				//{
-				//	m_attrib.m_materialChannel.PushBack(attibutes.m_materialChannel[ndInt32(ptr->m_userData)]);
-				//}
-				//
-				//if (attibutes.m_normalChannel.m_isValid)
-				//{
-				//	m_attrib.m_normalChannel.PushBack(attibutes.m_normalChannel[ndInt32(ptr->m_userData)]);
-				//}
-				//
-				//if (attibutes.m_binormalChannel.m_isValid)
-				//{
-				//	m_attrib.m_binormalChannel.PushBack(attibutes.m_binormalChannel[ndInt32(ptr->m_userData)]);
-				//}
-				//
-				//if (attibutes.m_colorChannel.m_isValid)
-				//{
-				//	m_attrib.m_colorChannel.PushBack(attibutes.m_colorChannel[ndInt32(ptr->m_userData)]);
-				//}
-				//
-				//if (attibutes.m_uv0Channel.m_isValid)
-				//{
-				//	m_attrib.m_uv0Channel.PushBack(attibutes.m_uv0Channel[ndInt32(ptr->m_userData)]);
-				//}
-				//
-				//if (attibutes.m_uv1Channel.m_isValid)
-				//{
-				//	m_attrib.m_uv1Channel.PushBack(attibutes.m_uv1Channel[ndInt32(ptr->m_userData)]);
-				//}
-				//
-				//ptr->m_userData = ndUnsigned64(attributeCount);
-				//attributeCount++;
 				ptr = ptr->m_next;
 			} while (ptr != edge);
 		}
 	}
 
 	ndInt32 totalSize = 0;
+	ndInt32 vertexStrideInBytes = 3 * sizeof(ndFloat64);
 
-	ndInt32 vertexOffet = totalSize;
-	totalSize += m_points.m_vertex.GetCount() * vertexStrideInBytes / ndInt32(sizeof(ndInt32));
+	ndInt32 vertexOffset = totalSize;
+	totalSize += m_points.m_vertex.GetCount() * vertexStrideInBytes;
 
-	ndInt32 vertexIndexOffet = totalSize;
-	totalSize += m_points.m_vertex.GetCount();
+	ndInt32 vertexIndexOffset = totalSize;
+	totalSize += m_points.m_vertex.GetCount() * sizeof (ndInt32);
 
-	ndInt32 faceCountOffet = totalSize;
-	totalSize += faceCount;
+	ndInt32 faceCountOffset = totalSize;
+	totalSize += faceCount * sizeof(ndInt32);
+
+	ndInt32 faceMaterialOffset = totalSize;
+	totalSize += faceCount * sizeof(ndInt32);
 
 	buffer.SetCount(totalSize);
-	ndFloat64* const vertexBuffer = (ndFloat64*)&buffer[vertexOffet];
-	ndInt32* const vertexIndexBuffer = (ndInt32*)&buffer[vertexIndexOffet];
-	ndInt32* const faceIndexBuffer = (ndInt32*)&buffer[faceCountOffet];
+	ndFloat64* const vertexBuffer = (ndFloat64*)&buffer[vertexOffset];
+	ndInt32* const vertexIndexBuffer = (ndInt32*)&buffer[vertexIndexOffset];
+	ndInt32* const faceIndexBuffer = (ndInt32*)&buffer[faceCountOffset];
+	ndInt32* const faceMaterialBuffer = (ndInt32*)&buffer[faceMaterialOffset];
 
 	format.m_faceCount = faceCount;
 	format.m_faceIndexCount = faceIndexBuffer;
+	format.m_faceMaterial = faceMaterialBuffer;
 
 	format.m_vertex.m_data = vertexBuffer;
 	format.m_vertex.m_indexList = vertexIndexBuffer;
@@ -3899,13 +3869,6 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 			{
 				ptr->m_mark = lru;
 				count++;
-				//m_attrib.m_pointChannel.PushBack(ptr->m_incidentVertex);
-				//
-				//if (attibutes.m_materialChannel.m_isValid)
-				//{
-				//	m_attrib.m_materialChannel.PushBack(attibutes.m_materialChannel[ndInt32(ptr->m_userData)]);
-				//}
-				//
 				//if (attibutes.m_normalChannel.m_isValid)
 				//{
 				//	m_attrib.m_normalChannel.PushBack(attibutes.m_normalChannel[ndInt32(ptr->m_userData)]);
@@ -3935,7 +3898,9 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 				//attributeCount++;
 				ptr = ptr->m_next;
 			} while (ptr != edge);
+
 			faceIndexBuffer[faceCount] = count;
+			faceMaterialBuffer[faceCount] = m_attrib.m_materialChannel[faceCount];
 			faceCount++;
 		}
 	}
