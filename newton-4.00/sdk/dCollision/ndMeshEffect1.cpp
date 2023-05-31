@@ -3886,7 +3886,6 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 	ndAssert(m_points.m_vertex.GetCount() == m_points.m_layers.GetCount());
 	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); ++i)
 	{
-		//vertexIndexBuffer[i] = i;
 		vertexBuffer[i * 3 + 0] = m_points.m_vertex[i].m_x;
 		vertexBuffer[i * 3 + 1] = m_points.m_vertex[i].m_y;
 		vertexBuffer[i * 3 + 2] = m_points.m_vertex[i].m_z;
@@ -3913,12 +3912,13 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 
 		for (ndInt32 i = 0; i < m_attrib.m_uv0Channel.GetCount(); ++i)
 		{
-			normalBuffer[i * 2 + 0] = m_attrib.m_uv0Channel[i].m_u;
-			normalBuffer[i * 2 + 1] = m_attrib.m_uv0Channel[i].m_v;
+			uvBuffer[i * 2 + 0] = m_attrib.m_uv0Channel[i].m_u;
+			uvBuffer[i * 2 + 1] = m_attrib.m_uv0Channel[i].m_v;
 		}
 	}
 	
 	faceCount = 0;
+	indexCount = 0;
 	lru = IncLRU();
 	for (iter.Begin(); iter; iter++)
 	{
@@ -3932,12 +3932,20 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 			{
 				ptr->m_mark = lru;
 				count++;
-				//if (normalOffset)
-				//{
-				//	ndAssert(0);
-				//	//m_attrib.m_normalChannel.PushBack(attibutes.m_normalChannel[ndInt32(ptr->m_userData)]);
-				//}
-				//
+
+				vertexIndexBuffer[indexCount] = ptr->m_incidentVertex;
+				if (normalOffset)
+				{
+					//normalIndexBuffer[indexCount] = m_attrib.m_normalChannel[ndInt32(ptr->m_userData)];
+					normalIndexBuffer[indexCount] = ndInt32(ptr->m_userData);
+				}
+
+				if (uvOffset)
+				{
+					//m_attrib.m_uv0Channel.PushBack(attibutes.m_uv0Channel[ndInt32(ptr->m_userData)]);
+					uvIndexBuffer[indexCount] = ndInt32(ptr->m_userData);
+				}
+
 				//if (attibutes.m_binormalChannel.m_isValid)
 				//{
 				//	m_attrib.m_binormalChannel.PushBack(attibutes.m_binormalChannel[ndInt32(ptr->m_userData)]);
@@ -3948,11 +3956,6 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 				//	m_attrib.m_colorChannel.PushBack(attibutes.m_colorChannel[ndInt32(ptr->m_userData)]);
 				//}
 				//
-				//if (attibutes.m_uv0Channel.m_isValid)
-				//{
-				//	m_attrib.m_uv0Channel.PushBack(attibutes.m_uv0Channel[ndInt32(ptr->m_userData)]);
-				//}
-				//
 				//if (attibutes.m_uv1Channel.m_isValid)
 				//{
 				//	m_attrib.m_uv1Channel.PushBack(attibutes.m_uv1Channel[ndInt32(ptr->m_userData)]);
@@ -3960,6 +3963,8 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 				//
 				//ptr->m_userData = ndUnsigned64(attributeCount);
 				//attributeCount++;
+
+				indexCount++;
 				ptr = ptr->m_next;
 			} while (ptr != edge);
 	
@@ -3968,7 +3973,7 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 			faceCount++;
 		}
 	}
-
+	ndAssert(indexCount == m_points.m_vertex.GetCount());
 	return m_points.m_vertex.GetCount();
 }
 

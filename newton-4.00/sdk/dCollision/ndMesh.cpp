@@ -482,6 +482,106 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 
 		if (meshEffects.GetCount())
 		{
+			auto PrintVertexChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndDoubleData& channel, ndInt32 vertexCount)
+			{
+				fprintf(file, "\t\tvertex: %d\n", vertexCount);
+				fprintf(file, "\t\t{\n");
+
+				fprintf(file, "\t\t\tindices:\n");
+				fprintf(file, "\t\t\t{\n");
+				ndInt32 positCount = 0;
+				fprintf(file, "\t\t\t\t");
+				for (ndInt32 i = 0; i < vertexCount; ++i)
+				{
+					fprintf(file, "%d ", channel.m_indexList[i]);
+					positCount = ndMax(positCount, channel.m_indexList[i] + 1);
+				}
+				fprintf(file, "\n");
+				fprintf(file, "\t\t\t}\n");
+
+				fprintf(file, "\t\t\tposits: %d\n", positCount);
+				fprintf(file, "\t\t\t{\n");
+				ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndFloat64));
+				for (ndInt32 i = 0; i < positCount; ++i)
+				{
+					ndFloat64 x;
+					ndFloat64 y;
+					ndFloat64 z;
+					x = channel.m_data[i * stride + 0];
+					y = channel.m_data[i * stride + 1];
+					z = channel.m_data[i * stride + 2];
+					fprintf(file, "\t\t\t\t%lg %lg %lg\n", x, y, z);
+				}
+				fprintf(file, "\t\t\t}\n");
+				fprintf(file, "\t\t}\n");
+			};
+
+			auto PrintNormalChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndFloatData& channel, ndInt32 vertexCount)
+			{
+				fprintf(file, "\t\tnormal: %d\n", vertexCount);
+				fprintf(file, "\t\t{\n");
+
+				fprintf(file, "\t\t\tindices:\n");
+				fprintf(file, "\t\t\t{\n");
+				ndInt32 positCount = 0;
+				fprintf(file, "\t\t\t\t");
+				for (ndInt32 i = 0; i < vertexCount; ++i)
+				{
+					fprintf(file, "%d ", channel.m_indexList[i]);
+					positCount = ndMax(positCount, channel.m_indexList[i] + 1);
+				}
+				fprintf(file, "\n");
+				fprintf(file, "\t\t\t}\n");
+
+				fprintf(file, "\t\t\tposits: %d\n", positCount);
+				fprintf(file, "\t\t\t{\n");
+				ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndFloat32));
+				for (ndInt32 i = 0; i < positCount; ++i)
+				{
+					ndFloat32 x;
+					ndFloat32 y;
+					ndFloat32 z;
+					x = channel.m_data[i * stride + 0];
+					y = channel.m_data[i * stride + 1];
+					z = channel.m_data[i * stride + 2];
+					fprintf(file, "\t\t\t\t%g %g %g\n", x, y, z);
+				}
+				fprintf(file, "\t\t\t}\n");
+				fprintf(file, "\t\t}\n");
+			};
+
+			auto PrintUVChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndFloatData& channel, ndInt32 vertexCount)
+			{
+				fprintf(file, "\t\tuv: %d\n", vertexCount);
+				fprintf(file, "\t\t{\n");
+
+				fprintf(file, "\t\t\tindices:\n");
+				fprintf(file, "\t\t\t{\n");
+				ndInt32 positCount = 0;
+				fprintf(file, "\t\t\t\t");
+				for (ndInt32 i = 0; i < vertexCount; ++i)
+				{
+					fprintf(file, "%d ", channel.m_indexList[i]);
+					positCount = ndMax(positCount, channel.m_indexList[i] + 1);
+				}
+				fprintf(file, "\n");
+				fprintf(file, "\t\t\t}\n");
+
+				fprintf(file, "\t\t\tposits: %d\n", positCount);
+				fprintf(file, "\t\t\t{\n");
+				ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndFloat32));
+				for (ndInt32 i = 0; i < positCount; ++i)
+				{
+					ndFloat32 x;
+					ndFloat32 y;
+					x = channel.m_data[i * stride + 0];
+					y = channel.m_data[i * stride + 1];
+					fprintf(file, "\t\t\t\t%g %g\n", x, y);
+				}
+				fprintf(file, "\t\t\t}\n");
+				fprintf(file, "\t\t}\n");
+			};
+
 			fprintf(file, "geometries: %d\n", meshEffects.GetCount());
 			fprintf(file, "{\n");
 
@@ -493,7 +593,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 
 				ndMeshEffect* effectMesh = (ndMeshEffect*)it.GetKey();
 				ndIndexArray* const geometryHandle = effectMesh->MaterialGeometryBegin();
-				
+
 				// extract vertex data  from the newton mesh		
 				ndInt32 indexCount = 0;
 				ndInt32 materialsCount = 0;
@@ -502,52 +602,20 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 					materialsCount++;
 					indexCount += effectMesh->GetMaterialIndexCount(geometryHandle, handle);
 				}
-				
-				//struct ndTmpData
-				//{
-				//	ndFloat32 m_posit[3];
-				//	ndFloat32 m_normal[3];
-				//	ndFloat32 m_uv[2];
-				//};
-				//
-				//ndArray<ndTmpData> tmp;
-				//ndArray<ndInt32> indices;
-				//
-				////ndInt32 vertexCount = effectMesh->GetPropertiesCount();
-				//ndInt32 vertexCount = effectMesh->GetVertexCount();
-				//tmp.SetCount(vertexCount);
-				//indices.SetCount(indexCount);
-				//
-				//ndInt32 stride = ndInt32 (effectMesh->GetVertexStrideInByte() / sizeof (ndFloat64));
-				//const ndFloat64* const vertexBuffer = effectMesh->GetVertexPool();
-				//effectMesh->GetVertexChannel(sizeof(ndTmpData), &tmp[0].m_posit[0]);
-				//effectMesh->GetNormalChannel(sizeof(ndTmpData), &tmp[0].m_normal[0]);
-				//effectMesh->GetUV0Channel(sizeof(ndTmpData), &tmp[0].m_uv[0]);
 
 				ndArray<ndUnsigned8> tmpBuffer;
 				ndMeshEffect::ndMeshVertexFormat format;
 				ndInt32 vertexCount = effectMesh->GenerateVertexFormat(format, tmpBuffer);
-
-				//fprintf(file, "\t\tpoints(x y x nx ny nz u v): %d\n", vertexCount);
-				fprintf(file, "\t\tpoints: %d\n", vertexCount);
-				fprintf(file, "\t\t{\n");
-				ndInt32 stride = format.m_vertex.m_strideInBytes / ndInt32 (sizeof(ndFloat64));
-				for (ndInt32 i = 0; i < vertexCount; ++i)
+				PrintVertexChannel(format.m_vertex, vertexCount);
+				if (format.m_normal.m_data)
 				{
-				//	fprintf(file, "\t\t\t%g %g %g %g %g %g %g %g\n",
-				//		tmp[i].m_posit[0], tmp[i].m_posit[1], tmp[i].m_posit[2],
-				//		tmp[i].m_normal[0], tmp[i].m_normal[1], tmp[i].m_normal[2],
-				//		tmp[i].m_uv[0], tmp[i].m_uv[1]);
-					ndFloat64 x;
-					ndFloat64 y;
-					ndFloat64 z;
-					x = format.m_vertex.m_data[i * stride + 0];
-					y = format.m_vertex.m_data[i * stride + 0];
-					z = format.m_vertex.m_data[i * stride + 0];
-					fprintf(file, "\t\t\t%g %g %g\n", x, y, z);
+					PrintNormalChannel(format.m_normal, vertexCount);
 				}
-				fprintf(file, "\t\t}\n");
-				
+				if (format.m_uv0.m_data)
+				{
+					PrintUVChannel(format.m_uv0, vertexCount);
+				}
+
 				ndInt32 segmentStart = 0;
 				const ndArray<ndMeshEffect::ndMaterial>& materialArray = effectMesh->GetMaterials();
 				for (ndInt32 handle = effectMesh->GetFirstMaterial(geometryHandle); handle != -1; handle = effectMesh->GetNextMaterial(geometryHandle, handle))
