@@ -487,19 +487,13 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				fprintf(file, "\t\tvertex:\n");
 				fprintf(file, "\t\t{\n");
 
-				fprintf(file, "\t\t\tindices: %d\n", vertexCount);
-				fprintf(file, "\t\t\t{\n");
 				ndInt32 positCount = 0;
-				fprintf(file, "\t\t\t\t");
 				for (ndInt32 i = 0; i < vertexCount; ++i)
 				{
-					fprintf(file, "%d ", channel.m_indexList___[i]);
 					positCount = ndMax(positCount, channel.m_indexList___[i] + 1);
 				}
-				fprintf(file, "\n");
-				fprintf(file, "\t\t\t}\n");
 
-				fprintf(file, "\t\t\tposits: %d\n", positCount);
+				fprintf(file, "\t\t\tposition: %d\n", positCount);
 				fprintf(file, "\t\t\t{\n");
 				ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndFloat64));
 				for (ndInt32 i = 0; i < positCount; ++i)
@@ -513,6 +507,17 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 					fprintf(file, "\t\t\t\t%lg %lg %lg\n", x, y, z);
 				}
 				fprintf(file, "\t\t\t}\n");
+
+				fprintf(file, "\t\t\tindices: %d\n", vertexCount);
+				fprintf(file, "\t\t\t{\n");
+				fprintf(file, "\t\t\t\t");
+				for (ndInt32 i = 0; i < vertexCount; ++i)
+				{
+					fprintf(file, "%d ", channel.m_indexList___[i]);
+				}
+				fprintf(file, "\n");
+				fprintf(file, "\t\t\t}\n");
+
 				fprintf(file, "\t\t}\n");
 			};
 
@@ -521,19 +526,13 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				fprintf(file, "\t\tnormal\n");
 				fprintf(file, "\t\t{\n");
 
-				fprintf(file, "\t\t\tindices: %d\n", vertexCount);
-				fprintf(file, "\t\t\t{\n");
 				ndInt32 positCount = 0;
-				fprintf(file, "\t\t\t\t");
 				for (ndInt32 i = 0; i < vertexCount; ++i)
 				{
-					fprintf(file, "%d ", channel.m_indexList___[i]);
 					positCount = ndMax(positCount, channel.m_indexList___[i] + 1);
 				}
-				fprintf(file, "\n");
-				fprintf(file, "\t\t\t}\n");
 
-				fprintf(file, "\t\t\tposits: %d\n", positCount);
+				fprintf(file, "\t\t\tposition: %d\n", positCount);
 				fprintf(file, "\t\t\t{\n");
 				ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndFloat32));
 				for (ndInt32 i = 0; i < positCount; ++i)
@@ -547,6 +546,17 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 					fprintf(file, "\t\t\t\t%g %g %g\n", x, y, z);
 				}
 				fprintf(file, "\t\t\t}\n");
+
+				fprintf(file, "\t\t\tindices: %d\n", vertexCount);
+				fprintf(file, "\t\t\t{\n");
+				fprintf(file, "\t\t\t\t");
+				for (ndInt32 i = 0; i < vertexCount; ++i)
+				{
+					fprintf(file, "%d ", channel.m_indexList___[i]);
+				}
+				fprintf(file, "\n");
+				fprintf(file, "\t\t\t}\n");
+
 				fprintf(file, "\t\t}\n");
 			};
 
@@ -555,19 +565,13 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				fprintf(file, "\t\tuv:\n");
 				fprintf(file, "\t\t{\n");
 
-				fprintf(file, "\t\t\tindices %d\n", vertexCount);
-				fprintf(file, "\t\t\t{\n");
 				ndInt32 positCount = 0;
-				fprintf(file, "\t\t\t\t");
 				for (ndInt32 i = 0; i < vertexCount; ++i)
 				{
-					fprintf(file, "%d ", channel.m_indexList___[i]);
 					positCount = ndMax(positCount, channel.m_indexList___[i] + 1);
 				}
-				fprintf(file, "\n");
-				fprintf(file, "\t\t\t}\n");
 
-				fprintf(file, "\t\t\tposits: %d\n", positCount);
+				fprintf(file, "\t\t\tposition: %d\n", positCount);
 				fprintf(file, "\t\t\t{\n");
 				ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndFloat32));
 				for (ndInt32 i = 0; i < positCount; ++i)
@@ -579,6 +583,17 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 					fprintf(file, "\t\t\t\t%g %g\n", x, y);
 				}
 				fprintf(file, "\t\t\t}\n");
+
+				fprintf(file, "\t\t\tindices %d\n", vertexCount);
+				fprintf(file, "\t\t\t{\n");
+				fprintf(file, "\t\t\t\t");
+				for (ndInt32 i = 0; i < vertexCount; ++i)
+				{
+					fprintf(file, "%d ", channel.m_indexList___[i]);
+				}
+				fprintf(file, "\n");
+				fprintf(file, "\t\t\t}\n");
+
 				fprintf(file, "\t\t}\n");
 			};
 
