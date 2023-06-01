@@ -3909,7 +3909,7 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 	{
 		//format.m_uv0.m_data = uvBuffer;
 		//format.m_uv0.m_indexList = uvIndexBuffer;
-		format.m_uv0.m_strideInBytes = normalStrideInBytes;
+		format.m_uv0.m_strideInBytes = uvStrideInBytes;
 		for (ndInt32 i = 0; i < m_attrib.m_uv0Channel.GetCount(); ++i)
 		{
 			format.m_uv0.m_data___[i * 2 + 0] = m_attrib.m_uv0Channel[i].m_u;
@@ -3981,6 +3981,34 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 	for (ndInt32 i = 0; i < indexCount; i++)
 	{
 		format.m_vertex.m_indexList___[i] = tempIndex[i];
+	}
+
+	if (format.m_normal.m_data___)
+	{
+		ndVertexListToIndexList(format.m_normal.m_data___, format.m_normal.m_strideInBytes, 3, indexCount, &tempIndex[0]);
+		for (ndInt32 i = 0; i < indexCount; i++)
+		{
+			format.m_normal.m_indexList___[i] = tempIndex[i];
+		}
+	}
+
+	if (format.m_uv0.m_data___)
+	{
+		ndArray<ndVector> array;
+		for (ndInt32 i = 0; i < indexCount; i++)
+		{
+			array.PushBack(ndVector(format.m_uv0.m_data___[i * 2 + 0], format.m_uv0.m_data___[i * 2 + 1], ndFloat32(0.0f), ndFloat32(0.0f)));
+		}
+		ndInt32 count = ndVertexListToIndexList(&array[0].m_x, sizeof (ndVector), 3, indexCount, &tempIndex[0]);
+		for (ndInt32 i = 0; i < count; i++)
+		{
+			format.m_uv0.m_data___[i * 2 + 0] = array[i].m_x;
+			format.m_uv0.m_data___[i * 2 + 1] = array[i].m_y;
+		}
+		for (ndInt32 i = 0; i < indexCount; i++)
+		{
+			format.m_uv0.m_indexList___[i] = tempIndex[i];
+		}
 	}
 
 	return m_points.m_vertex.GetCount();
