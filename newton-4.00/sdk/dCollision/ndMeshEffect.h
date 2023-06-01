@@ -339,34 +339,25 @@ class ndMeshEffect: public ndPolyhedra
 	class ndMeshVertexFormat
 	{
 		public:
-		class ndDoubleData
+		template <class T>
+		class ndData
 		{
 			public:
-			const ndFloat64* m_data;
-			const ndInt32* m_indexList;
-			ndInt32 m_strideInBytes;
+			ndData()
+			{
+				Clear();
+			}
 
 			void Clear()
 			{
-				m_data = nullptr;
-				m_indexList = nullptr;
+				m_data___ = nullptr;
+				m_indexList___ = nullptr;
 				m_strideInBytes = 0;
 			}
-		};
 
-		class ndFloatData
-		{
-			public:
-			const ndFloat32* m_data;
-			const ndInt32* m_indexList;
+			T* m_data___;
+			ndInt32* m_indexList___;
 			ndInt32 m_strideInBytes;
-
-			void Clear()
-			{
-				m_data = nullptr;
-				m_indexList = nullptr;
-				m_strideInBytes = 0;
-			}
 		};
 
 		ndMeshVertexFormat()
@@ -391,12 +382,12 @@ class ndMeshEffect: public ndPolyhedra
 		ndInt32 m_faceCount;
 		const ndInt32* m_faceMaterial;
 		const ndInt32* m_faceIndexCount;
-		ndDoubleData m_vertex;
-		ndFloatData m_normal;
-		ndFloatData m_binormal;
-		ndFloatData m_uv0;
-		ndFloatData m_uv1;
-		ndFloatData m_vertexColor;
+		ndData<ndFloat64> m_vertex;
+		ndData<ndFloat32> m_normal;
+		ndData<ndFloat32> m_binormal;
+		ndData<ndFloat32> m_uv0;
+		ndData<ndFloat32> m_uv1;
+		ndData<ndFloat32> m_vertexColor;
 	};
 
 	class ndVertexCluster

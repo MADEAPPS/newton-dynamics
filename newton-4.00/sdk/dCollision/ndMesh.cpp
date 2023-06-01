@@ -482,7 +482,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 
 		if (meshEffects.GetCount())
 		{
-			auto PrintVertexChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndDoubleData& channel, ndInt32 vertexCount)
+			auto PrintVertexChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndData<ndFloat64>& channel, ndInt32 vertexCount)
 			{
 				fprintf(file, "\t\tvertex:\n");
 				fprintf(file, "\t\t{\n");
@@ -493,8 +493,8 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				fprintf(file, "\t\t\t\t");
 				for (ndInt32 i = 0; i < vertexCount; ++i)
 				{
-					fprintf(file, "%d ", channel.m_indexList[i]);
-					positCount = ndMax(positCount, channel.m_indexList[i] + 1);
+					fprintf(file, "%d ", channel.m_indexList___[i]);
+					positCount = ndMax(positCount, channel.m_indexList___[i] + 1);
 				}
 				fprintf(file, "\n");
 				fprintf(file, "\t\t\t}\n");
@@ -507,16 +507,16 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 					ndFloat64 x;
 					ndFloat64 y;
 					ndFloat64 z;
-					x = channel.m_data[i * stride + 0];
-					y = channel.m_data[i * stride + 1];
-					z = channel.m_data[i * stride + 2];
+					x = channel.m_data___[i * stride + 0];
+					y = channel.m_data___[i * stride + 1];
+					z = channel.m_data___[i * stride + 2];
 					fprintf(file, "\t\t\t\t%lg %lg %lg\n", x, y, z);
 				}
 				fprintf(file, "\t\t\t}\n");
 				fprintf(file, "\t\t}\n");
 			};
 
-			auto PrintNormalChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndFloatData& channel, ndInt32 vertexCount)
+			auto PrintNormalChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndData<ndFloat32>& channel, ndInt32 vertexCount)
 			{
 				fprintf(file, "\t\tnormal\n");
 				fprintf(file, "\t\t{\n");
@@ -527,8 +527,8 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				fprintf(file, "\t\t\t\t");
 				for (ndInt32 i = 0; i < vertexCount; ++i)
 				{
-					fprintf(file, "%d ", channel.m_indexList[i]);
-					positCount = ndMax(positCount, channel.m_indexList[i] + 1);
+					fprintf(file, "%d ", channel.m_indexList___[i]);
+					positCount = ndMax(positCount, channel.m_indexList___[i] + 1);
 				}
 				fprintf(file, "\n");
 				fprintf(file, "\t\t\t}\n");
@@ -541,16 +541,16 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 					ndFloat32 x;
 					ndFloat32 y;
 					ndFloat32 z;
-					x = channel.m_data[i * stride + 0];
-					y = channel.m_data[i * stride + 1];
-					z = channel.m_data[i * stride + 2];
+					x = channel.m_data___[i * stride + 0];
+					y = channel.m_data___[i * stride + 1];
+					z = channel.m_data___[i * stride + 2];
 					fprintf(file, "\t\t\t\t%g %g %g\n", x, y, z);
 				}
 				fprintf(file, "\t\t\t}\n");
 				fprintf(file, "\t\t}\n");
 			};
 
-			auto PrintUVChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndFloatData& channel, ndInt32 vertexCount)
+			auto PrintUVChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndData<ndFloat32>& channel, ndInt32 vertexCount)
 			{
 				fprintf(file, "\t\tuv:\n");
 				fprintf(file, "\t\t{\n");
@@ -561,8 +561,8 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				fprintf(file, "\t\t\t\t");
 				for (ndInt32 i = 0; i < vertexCount; ++i)
 				{
-					fprintf(file, "%d ", channel.m_indexList[i]);
-					positCount = ndMax(positCount, channel.m_indexList[i] + 1);
+					fprintf(file, "%d ", channel.m_indexList___[i]);
+					positCount = ndMax(positCount, channel.m_indexList___[i] + 1);
 				}
 				fprintf(file, "\n");
 				fprintf(file, "\t\t\t}\n");
@@ -574,8 +574,8 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				{
 					ndFloat32 x;
 					ndFloat32 y;
-					x = channel.m_data[i * stride + 0];
-					y = channel.m_data[i * stride + 1];
+					x = channel.m_data___[i * stride + 0];
+					y = channel.m_data___[i * stride + 1];
 					fprintf(file, "\t\t\t\t%g %g\n", x, y);
 				}
 				fprintf(file, "\t\t\t}\n");
@@ -597,11 +597,11 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				ndMeshEffect::ndMeshVertexFormat format;
 				ndInt32 vertexCount = effectMesh->GenerateVertexFormat(format, tmpBuffer);
 				PrintVertexChannel(format.m_vertex, vertexCount);
-				if (format.m_normal.m_data)
+				if (format.m_normal.m_data___)
 				{
 					PrintNormalChannel(format.m_normal, vertexCount);
 				}
-				if (format.m_uv0.m_data)
+				if (format.m_uv0.m_data___)
 				{
 					PrintUVChannel(format.m_uv0, vertexCount);
 				}
@@ -640,7 +640,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 							fprintf(file, "\t\t\t\t%d: ", format.m_faceIndexCount[j]);
 							for (ndInt32 k = 0; k < format.m_faceIndexCount[j]; ++k)
 							{
-								fprintf(file, "%d ", format.m_vertex.m_indexList[indexAcc + k]);
+								fprintf(file, "%d ", format.m_vertex.m_indexList___[indexAcc + k]);
 							}
 							fprintf(file, "\n");
 						}
