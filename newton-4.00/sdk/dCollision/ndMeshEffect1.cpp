@@ -2721,7 +2721,7 @@ bool ndMeshEffect::EndFace()
 		const ndInt32 currentCount = m_points.m_vertex.GetCount();
 		ndStack<ndInt8> verterCollisionBuffer(currentCount);
 		ndInt8* const verterCollision = &verterCollisionBuffer[0];
-		memset(&verterCollision[0], 0, size_t(verterCollisionBuffer.GetSizeInBytes()));
+		ndMemSet(&verterCollision[0], ndInt8(0), currentCount);
 
 		Iterator iter(*this);
 		ndInt32 mark = IncLRU();
@@ -2861,7 +2861,7 @@ void ndMeshEffect::BuildFromIndexList(const ndMeshVertexFormat* const format)
 	ndInt32 vertexColorStride = ndInt32(format->m_vertexColor.m_strideInBytes / sizeof(ndFloat32));
 
 	ndStack<ndInt8> faceMark(format->m_faceCount);
-	memset(&faceMark[0], 0, size_t(faceMark.GetSizeInBytes()));
+	ndMemSet(&faceMark[0], ndInt8(0), format->m_faceCount);
 	const ndInt32* const vertexIndex = format->m_vertex.m_indexList;
 
 	while (pendingFaces)
@@ -3138,7 +3138,7 @@ void ndMeshEffect::PackAttibuteData()
 		}
 	}
 
-	memset(attrIndexMap, -1, sizeof(ndInt32) * m_attrib.m_pointChannel.GetCount());
+	ndMemSet(attrIndexMap, -1, m_attrib.m_pointChannel.GetCount());
 	ndAttibutFormat tmpFormat(m_attrib);
 	m_attrib.Clear();
 
@@ -3973,7 +3973,16 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 			faceCount++;
 		}
 	}
+	                              
 	ndAssert(indexCount == m_points.m_vertex.GetCount());
+
+	ndStack<ndInt32> tempIndex(indexCount);
+	ndVertexListToIndexList(vertexBuffer, format.m_vertex.m_strideInBytes, 3, indexCount, &tempIndex[0]);
+	for (ndInt32 i = 0; i < indexCount; i++)
+	{
+		vertexIndexBuffer[i] = tempIndex[i];
+	}
+
 	return m_points.m_vertex.GetCount();
 }
 

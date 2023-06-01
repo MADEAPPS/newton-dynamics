@@ -552,7 +552,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 
 			auto PrintUVChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndFloatData& channel, ndInt32 vertexCount)
 			{
-				fprintf(file, "\t\tuv:");
+				fprintf(file, "\t\tuv:\n");
 				fprintf(file, "\t\t{\n");
 
 				fprintf(file, "\t\t\tindices %d\n", vertexCount);
