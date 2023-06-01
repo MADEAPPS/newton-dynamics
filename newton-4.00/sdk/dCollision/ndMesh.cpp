@@ -267,7 +267,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 
 			auto PrintNormalChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndData<ndFloat32>& channel, ndInt32 vertexCount)
 			{
-				fprintf(file, "\t\tnormal\n");
+				fprintf(file, "\t\tnormal:\n");
 				fprintf(file, "\t\t{\n");
 
 				ndInt32 positCount = 0;
@@ -598,7 +598,7 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 			fscanf(file, "%d", &geomntryCount);
 			ReadToken();
 
-			for (ndInt32 i = 0; i < geomntryCount; i++)
+			for (ndInt32 k = 0; k < geomntryCount; k++)
 			{
 				ndInt32 meshId;
 				ReadToken();
@@ -778,14 +778,60 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 				//	ReadToken();
 				//};
 				
+				ndArray<ndBigVector> positions;
+				ndArray<ndInt32> positionsIndex;
+				ndMeshEffect::ndMeshVertexFormat format;
+
+				ReadToken();
 				while (strcmp(token, "}"))
 				{
-					ReadToken();
 					if (!strcmp(token, "vertex:"))
 					{
+						ndInt32 vertexCount;
+						ReadToken();
+						ReadToken();
+						fscanf(file, "%d", &vertexCount);
+						ReadToken();
+						for (ndInt32 i = 0; i < vertexCount; ++i)
+						{
+							ndFloat64 x;
+							ndFloat64 y;
+							ndFloat64 z;
+							fscanf(file, "%lf %lf %lf", &x, &y, &z);
+							positions.PushBack(ndBigVector(x, y, z, ndFloat64(0.0f)));
+						}
+						ReadToken();
+
+						int indexCount;
+						ReadToken();
+						fscanf(file, "%d", &indexCount);
+						ReadToken();
+						for (ndInt32 i = 0; i < indexCount; ++i)
+						{
+							ndInt32 index;
+							fscanf(file, "%d" , &index);
+							positionsIndex.PushBack(index);
+						}
+						ReadToken();
+
+						format.m_vertex.m_data___ = &positions[0].m_x;
+						format.m_vertex.m_indexList___ = &positionsIndex[0];
+						format.m_vertex.m_strideInBytes = sizeof(ndBigVector);
+						ReadToken();
+					}
+					else if (!strcmp(token, "normal:"))
+					{
+						ndInt32 vertexCount;
+						ReadToken();
+						ReadToken();
+						fscanf(file, "%d", &vertexCount);
 
 					}
+
+					ReadToken();
 				}
+
+				
 
 				ReadToken();
 			}
