@@ -514,7 +514,7 @@ void ndMesh::Save(FILE* const file, const ndTree<ndInt32, const ndMeshEffect*>& 
 	fprintf(file, "}\n");
 }
 
-void ndMesh::Load(FILE* const file)
+void ndMesh::Load(FILE* const file, const ndTree<ndSharedPtr<ndMeshEffect>, ndInt32>& meshEffects)
 {
 	char token[256];
 	auto ReadToken = [file, &token]()
@@ -564,12 +564,14 @@ void ndMesh::Load(FILE* const file)
 		else if (!strcmp(token, "node:"))
 		{
 			ndMesh* const child = new ndMesh(this);
-			child->Load(file);
+			child->Load(file, meshEffects);
 		}
 		else if (!strcmp(token, "geometry:"))
 		{
-			ndAssert(0);
-			//LoadGeometry(this);
+			ndInt32 nodeId;
+			fscanf(file, "%d", &nodeId);
+			ndAssert(meshEffects.Find(nodeId));
+			m_mesh = meshEffects.Find(nodeId)->GetInfo();
 		}
 		else
 		{
@@ -789,44 +791,36 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 						ReadToken();
 						fscanf(file, "%d", &indexCount);
 						
-						//ndMeshEffect::ndVertexCluster* const cluster = node->m_mesh->CreateCluster(boneName);
-						//ReadToken();
-						//for (ndInt32 i = 0; i < indexCount; ++i)
-						//{
-						//	ndInt32 index;
-						//	fscanf(file, "%d", &index);
-						//	cluster->m_vertexIndex.PushBack(index);
-						//}
-						//
-						//ReadToken();
-						//for (ndInt32 i = 0; i < indexCount; ++i)
-						//{
-						//	ndFloat64 weight;
-						//	fscanf(file, "%lf", &weight);
-						//	cluster->m_vertexWeigh.PushBack(ndFloat32(weight));
-						//}
-						//SkipToken();
-
+						ndMeshEffect::ndVertexCluster* const cluster = effectMesh->CreateCluster(boneName);
+						ReadToken();
+						for (ndInt32 i = 0; i < indexCount; ++i)
+						{
+							ndInt32 index;
+							fscanf(file, "%d", &index);
+							cluster->m_vertexIndex.PushBack(index);
+						}
+						
+						ReadToken();
+						for (ndInt32 i = 0; i < indexCount; ++i)
+						{
+							ndFloat64 weight;
+							fscanf(file, "%lf", &weight);
+							cluster->m_vertexWeigh.PushBack(ndFloat32(weight));
+						}
+						ReadToken();
 					}
-
-
 					ReadToken();
 				}
-
-				
-
 				ReadToken();
+				effectMesh->BuildFromIndexList(&format);
 			}
-
-
-			ReadToken();
 			ReadToken();
 		}
 
 		if (!strcmp(token, "node:"))
 		{
 			root = new ndMesh(nullptr);
-			root->Load(file);
+			root->Load(file, meshEffects);
 		}
 
 		fclose(file);

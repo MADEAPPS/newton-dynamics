@@ -1944,7 +1944,7 @@ void ndMeshEffect::ndPointFormat::CompactVertexData(ndInt32* const indexList, nd
 }
 
 void ndMeshEffect::ndAttibutFormat::CompressData(
-	ndAttibutFormat& output,	const ndPointFormat& points, ndInt32* const indexList, 
+	ndAttibutFormat& output, const ndPointFormat& points, ndInt32* const indexList, 
 	ndSortKey* const remapIndex, const ndSortCluster& cluster, ndFloat32 tol)
 {
 	const ndBigVector origin (cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
