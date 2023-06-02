@@ -861,6 +861,9 @@ ndMeshEffect* ndMeshEffect::Intersection (const dMatrix& matrix, const ndMeshEff
 // return -2 if function fail
 ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* const convexFace)
 {
+ndAssert(0);
+return 0;
+#if 0
 	ndAssert(convexFace->m_incidentFace > 0);
 
 	ndBigVector normal(convexMesh.FaceNormal(convexFace, &convexMesh.m_points.m_vertex[0].m_x, sizeof(ndBigVector)));
@@ -1167,6 +1170,7 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 	}
 
 	return retValue;
+#endif
 }
 ndMeshEffect* ndMeshEffect::ConvexMeshIntersection(const ndMeshEffect* const convexMeshSrc) const
 {
@@ -1210,6 +1214,9 @@ ndMeshEffect* ndMeshEffect::ConvexMeshIntersection(const ndMeshEffect* const con
 
 ndMeshEffect* ndMeshEffect::InverseConvexMeshIntersection(const ndMeshEffect* const convexMeshSrc) const
 {
+	ndAssert(0);
+	return 0;
+#if 0
 	ndMeshEffect concaveMesh(*convexMeshSrc);
 	concaveMesh.ConvertToPolygons();
 
@@ -1293,5 +1300,6 @@ ndMeshEffect* ndMeshEffect::InverseConvexMeshIntersection(const ndMeshEffect* co
 	}
 	mergedOutput->RemoveUnusedVertices(nullptr);
 	return mergedOutput;
+#endif
 }
 
