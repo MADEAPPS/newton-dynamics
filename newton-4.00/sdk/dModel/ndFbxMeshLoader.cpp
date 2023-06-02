@@ -489,8 +489,8 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	const ofbx::Geometry* const geom = fbxMesh->getGeometry();
 	ndInt32 indexCount = geom->getIndexCount();
 	
-	ndArray<ndVector> uvArray;
-	ndArray<ndVector> normalArray;
+	ndArray<ndMeshEffect::ndUV> uvArray;
+	ndArray<ndMeshEffect::ndNormal> normalArray;
 
 	ndArray<ndInt32> indexArray;
 	ndArray<ndInt32> faceIndexArray;
@@ -554,12 +554,12 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 		for (ndInt32 i = 0; i < indexCount; ++i)
 		{
 			ofbx::Vec3 n = normals[i];
-			normalArray[i] = ndVector(ndFloat32(n.x), ndFloat32(n.y), ndFloat32(n.z), ndFloat32(0.0f));
+			normalArray[i] = ndMeshEffect::ndNormal(ndFloat32(n.x), ndFloat32(n.y), ndFloat32(n.z));
 		}
 	
 		format.m_normal.m_data = &normalArray[0].m_x;
 		format.m_normal.m_indexList = &indexArray[0];
-		format.m_normal.m_strideInBytes = sizeof(ndVector);
+		format.m_normal.m_strideInBytes = sizeof(ndMeshEffect::ndNormal);
 	}
 	
 	if (geom->getUVs())
@@ -569,11 +569,11 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 		for (ndInt32 i = 0; i < indexCount; ++i)
 		{
 			ofbx::Vec2 n = uv[i];
-			uvArray[i] = ndVector(ndFloat32(n.x), ndFloat32(n.y), ndFloat32(0.0f), ndFloat32(0.0f));
+			uvArray[i] = ndMeshEffect::ndUV(ndFloat32(n.x), ndFloat32(n.y));
 		}
-		format.m_uv0.m_data = &uvArray[0].m_x;
+		format.m_uv0.m_data = &uvArray[0].m_u;
 		format.m_uv0.m_indexList = &indexArray[0];
-		format.m_uv0.m_strideInBytes = sizeof(ndVector);
+		format.m_uv0.m_strideInBytes = sizeof(ndMeshEffect::ndUV);
 	}
 	
 	// import skin if there is any
@@ -605,7 +605,7 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 				for (ndInt32 j = 0; j < clusterIndexCount; ++j)
 				{
 					cluster->m_vertexIndex.PushBack(indices[j]);
-					cluster->m_vertexWeigh.PushBack(ndFloat32(weights[j]));
+					cluster->m_vertexWeigh.PushBack(ndReal(weights[j]));
 				}
 			}
 		}

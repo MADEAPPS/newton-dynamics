@@ -238,6 +238,57 @@ class ndMeshEffect: public ndPolyhedra
 		bool m_isValid;
 	};
 
+	public:
+	class ndUV
+	{
+		public:
+		ndUV()
+		{
+		}
+
+		ndUV(ndFloat32 x, ndFloat32 y)
+			:m_u(ndReal(x))
+			,m_v(ndReal(y))
+		{
+		}
+		ndReal m_u;
+		ndReal m_v;
+	};
+
+	class ndNormal
+	{
+		public:
+		ndNormal()
+		{
+		}
+		ndNormal(ndFloat32 x, ndFloat32 y, ndFloat32 z)
+			:m_x(ndReal(x))
+			,m_y(ndReal(y))
+			,m_z(ndReal(z))
+		{
+		}
+		ndReal m_x;
+		ndReal m_y;
+		ndReal m_z;
+	};
+
+	class ndColor : public ndNormal
+	{
+		public:
+		ndColor()
+			:ndNormal()
+		{
+		}
+
+		ndColor(ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w)
+			:ndNormal(x, y, z)
+			,m_w(ndReal(w))
+		{
+		}
+
+		ndReal m_w;
+	};
+
 	class ndFormat
 	{
 		public:
@@ -284,56 +335,6 @@ class ndMeshEffect: public ndPolyhedra
 	class ndAttibutFormat: public ndFormat
 	{
 		public:
-		class ndUV
-		{
-			public:
-			ndUV()
-			{
-			}
-
-			ndUV(ndFloat32 x, ndFloat32 y)
-				:m_u(ndReal(x))
-				,m_v(ndReal(y))
-			{
-			}
-			ndReal m_u;
-			ndReal m_v;
-		};
-
-		class ndNormal
-		{
-			public:
-			ndNormal()
-			{
-			}
-			ndNormal(ndFloat32 x, ndFloat32 y, ndFloat32 z)
-				:m_x(ndReal(x))
-				,m_y(ndReal(y))
-				,m_z(ndReal(z))
-			{
-			}
-			ndReal m_x;
-			ndReal m_y;
-			ndReal m_z;
-		};
-
-		class ndColor: public ndNormal
-		{
-			public:
-			ndColor()
-				:ndNormal()
-			{
-			}
-
-			ndColor(ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w)
-				:ndNormal(x, y, z)
-				,m_w(ndReal(w))
-			{
-			}
-
-			ndReal m_w;
-		};
-
 		ndAttibutFormat();
 		ndAttibutFormat(const ndAttibutFormat& source);
 		~ndAttibutFormat();
@@ -357,7 +358,6 @@ class ndMeshEffect: public ndPolyhedra
 		ndChannel<ndUV, m_uv1> m_uv1Channel;
 	};
 
-	public:
 	class ndMaterial
 	{
 		public:
@@ -426,11 +426,11 @@ class ndMeshEffect: public ndPolyhedra
 		ndInt32* m_faceMaterial;
 		ndInt32* m_faceIndexCount;
 		ndData<ndFloat64> m_vertex;
-		ndData<ndFloat32> m_normal;
-		ndData<ndFloat32> m_binormal;
-		ndData<ndFloat32> m_uv0;
-		ndData<ndFloat32> m_uv1;
-		ndData<ndFloat32> m_vertexColor;
+		ndData<ndReal> m_normal;
+		ndData<ndReal> m_binormal;
+		ndData<ndReal> m_uv0;
+		ndData<ndReal> m_uv1;
+		ndData<ndReal> m_vertexColor;
 	};
 
 	class ndVertexCluster
@@ -440,7 +440,7 @@ class ndMeshEffect: public ndPolyhedra
 		{
 		}
 		ndArray<ndInt32> m_vertexIndex;
-		ndArray<ndFloat32> m_vertexWeigh;
+		ndArray<ndReal> m_vertexWeigh;
 	};
 
 	class ndClusterMap: public ndTree<ndVertexCluster, const ndString>

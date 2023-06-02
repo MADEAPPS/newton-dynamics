@@ -265,7 +265,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				fprintf(file, "\t\t}\n");
 			};
 
-			auto PrintNormalChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndData<ndFloat32>& channel, ndInt32 vertexCount)
+			auto PrintNormalChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndData<ndReal>& channel, ndInt32 vertexCount)
 			{
 				fprintf(file, "\t\tnormal:\n");
 				fprintf(file, "\t\t{\n");
@@ -278,12 +278,12 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 
 				fprintf(file, "\t\t\tposition: %d\n", positCount);
 				fprintf(file, "\t\t\t{\n");
-				ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndFloat32));
+				ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndReal));
 				for (ndInt32 i = 0; i < positCount; ++i)
 				{
-					ndFloat32 x;
-					ndFloat32 y;
-					ndFloat32 z;
+					ndReal x;
+					ndReal y;
+					ndReal z;
 					x = channel.m_data[i * stride + 0];
 					y = channel.m_data[i * stride + 1];
 					z = channel.m_data[i * stride + 2];
@@ -304,7 +304,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				fprintf(file, "\t\t}\n");
 			};
 
-			auto PrintUVChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndData<ndFloat32>& channel, ndInt32 vertexCount)
+			auto PrintUVChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndData<ndReal>& channel, ndInt32 vertexCount)
 			{
 				fprintf(file, "\t\tuv:\n");
 				fprintf(file, "\t\t{\n");
@@ -317,11 +317,11 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 
 				fprintf(file, "\t\t\tposition: %d\n", positCount);
 				fprintf(file, "\t\t\t{\n");
-				ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndFloat32));
+				ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndReal));
 				for (ndInt32 i = 0; i < positCount; ++i)
 				{
-					ndFloat32 x;
-					ndFloat32 y;
+					ndReal x;
+					ndReal y;
 					x = channel.m_data[i * stride + 0];
 					y = channel.m_data[i * stride + 1];
 					fprintf(file, "\t\t\t\t%g %g\n", x, y);
@@ -611,9 +611,9 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 				meshEffects.Insert(effectMesh, meshId);
 				ReadToken();
 				
-				ndArray<ndVector> uvs;
-				ndArray<ndVector> normals;
 				ndArray<ndBigVector> positions;
+				ndArray<ndMeshEffect::ndUV> uvs;
+				ndArray<ndMeshEffect::ndNormal> normals;
 
 				ndArray<ndInt32> uvIndex;
 				ndArray<ndInt32> faceArray;
@@ -674,7 +674,7 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 							ndReal y;
 							ndReal z;
 							fscanf(file, "%f %f %f", &x, &y, &z);
-							normals.PushBack(ndVector(x, y, z, ndReal(0.0f)));
+							normals.PushBack(ndMeshEffect::ndNormal(x, y, z));
 						}
 						ReadToken();
 
@@ -692,7 +692,7 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 
 						format.m_normal.m_data = &normals[0].m_x;
 						format.m_normal.m_indexList = &normalsIndex[0];
-						format.m_normal.m_strideInBytes = sizeof(ndVector);
+						format.m_normal.m_strideInBytes = sizeof(ndMeshEffect::ndNormal);
 						ReadToken();
 					}
 					else if (!strcmp(token, "uv:"))
@@ -708,7 +708,7 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 							ndReal x;
 							ndReal y;
 							fscanf(file, "%f %f", &x, &y);
-							uvs.PushBack(ndVector(x, y, ndReal(0.0f), ndReal(0.0f)));
+							uvs.PushBack(ndMeshEffect::ndUV(x, y));
 						}
 						ReadToken();
 
@@ -724,9 +724,9 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 						}
 						ReadToken();
 
-						format.m_uv0.m_data = &uvs[0].m_x;
+						format.m_uv0.m_data = &uvs[0].m_u;
 						format.m_uv0.m_indexList = &uvIndex[0];
-						format.m_uv0.m_strideInBytes = sizeof(ndVector);
+						format.m_uv0.m_strideInBytes = sizeof(ndMeshEffect::ndUV);
 						ReadToken();
 					}
 					else if (!strcmp(token, "material:"))
@@ -805,9 +805,9 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 						ReadToken();
 						for (ndInt32 i = 0; i < indexCount; ++i)
 						{
-							ndFloat64 weight;
-							fscanf(file, "%lf", &weight);
-							cluster->m_vertexWeigh.PushBack(ndFloat32(weight));
+							ndReal weight;
+							fscanf(file, "%f", &weight);
+							cluster->m_vertexWeigh.PushBack(ndReal(weight));
 						}
 						ReadToken();
 					}

@@ -2399,27 +2399,27 @@ void ndMeshEffect::AddLayer(ndInt32 layer)
 
 void ndMeshEffect::AddVertexColor(ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w)
 {
-	m_attrib.m_colorChannel.PushBack(ndAttibutFormat::ndColor(x, y, z, w));
+	m_attrib.m_colorChannel.PushBack(ndColor(x, y, z, w));
 }
 
 void ndMeshEffect::AddNormal(ndFloat32 x, ndFloat32 y, ndFloat32 z)
 {
-	m_attrib.m_normalChannel.PushBack(ndAttibutFormat::ndNormal(x, y, z));
+	m_attrib.m_normalChannel.PushBack(ndNormal(x, y, z));
 }
 
 void ndMeshEffect::AddBinormal(ndFloat32 x, ndFloat32 y, ndFloat32 z)
 {
-	m_attrib.m_binormalChannel.PushBack(ndAttibutFormat::ndNormal(x, y, z));
+	m_attrib.m_binormalChannel.PushBack(ndNormal(x, y, z));
 }
 
 void ndMeshEffect::AddUV0(ndFloat32 u, ndFloat32 v)
 {
-	m_attrib.m_uv0Channel.PushBack(ndAttibutFormat::ndUV(u, v));
+	m_attrib.m_uv0Channel.PushBack(ndUV(u, v));
 }
 
 void ndMeshEffect::AddUV1(ndFloat32 u, ndFloat32 v)
 {
-	m_attrib.m_uv1Channel.PushBack(ndAttibutFormat::ndUV(u, v));
+	m_attrib.m_uv1Channel.PushBack(ndUV(u, v));
 }
 
 void ndMeshEffect::AddMaterial(ndInt32 materialIndex)
@@ -2843,11 +2843,11 @@ void ndMeshEffect::BuildFromIndexList(const ndMeshVertexFormat* const format)
 	//ndInt32 layerBase = 0;
 	ndInt32 attributeCount = 0;
 
-	ndInt32 normalStride = ndInt32(format->m_normal.m_strideInBytes / sizeof(ndFloat32));
-	ndInt32 binormalStride = ndInt32(format->m_binormal.m_strideInBytes / sizeof(ndFloat32));
-	ndInt32 uv0Stride = ndInt32(format->m_uv0.m_strideInBytes / sizeof(ndFloat32));
-	ndInt32 uv1Stride = ndInt32(format->m_uv1.m_strideInBytes / sizeof(ndFloat32));
-	ndInt32 vertexColorStride = ndInt32(format->m_vertexColor.m_strideInBytes / sizeof(ndFloat32));
+	ndInt32 uv0Stride = ndInt32(format->m_uv0.m_strideInBytes / sizeof(ndReal));
+	ndInt32 uv1Stride = ndInt32(format->m_uv1.m_strideInBytes / sizeof(ndReal));
+	ndInt32 normalStride = ndInt32(format->m_normal.m_strideInBytes / sizeof(ndReal));
+	ndInt32 binormalStride = ndInt32(format->m_binormal.m_strideInBytes / sizeof(ndReal));
+	ndInt32 vertexColorStride = ndInt32(format->m_vertexColor.m_strideInBytes / sizeof(ndReal));
 
 	ndStack<ndInt8> faceMark(format->m_faceCount);
 	ndMemSet(&faceMark[0], ndInt8(0), format->m_faceCount);
@@ -2905,7 +2905,7 @@ void ndMeshEffect::BuildFromIndexList(const ndMeshVertexFormat* const format)
 								ndFloat32 x = format->m_normal.m_data[m + 0];
 								ndFloat32 y = format->m_normal.m_data[m + 1];
 								ndFloat32 z = format->m_normal.m_data[m + 2];
-								m_attrib.m_normalChannel.PushBack(ndAttibutFormat::ndNormal(x, y, z));
+								m_attrib.m_normalChannel.PushBack(ndNormal(x, y, z));
 							}
 						}
 
@@ -2918,7 +2918,7 @@ void ndMeshEffect::BuildFromIndexList(const ndMeshVertexFormat* const format)
 								ndFloat32 x = format->m_binormal.m_data[m + 0];
 								ndFloat32 y = format->m_binormal.m_data[m + 1];
 								ndFloat32 z = format->m_binormal.m_data[m + 2];
-								m_attrib.m_binormalChannel.PushBack(ndAttibutFormat::ndNormal(x, y, z));
+								m_attrib.m_binormalChannel.PushBack(ndNormal(x, y, z));
 							}
 						}
 
@@ -2928,7 +2928,7 @@ void ndMeshEffect::BuildFromIndexList(const ndMeshVertexFormat* const format)
 							{
 								ndInt32 k = attributeCount + i;
 								ndInt32 m = format->m_vertexColor.m_indexList[k] * vertexColorStride;
-								ndAttibutFormat::ndColor color(format->m_vertexColor.m_data[m + 0], format->m_vertexColor.m_data[m + 1], format->m_vertexColor.m_data[m + 2], format->m_vertexColor.m_data[m + 3]);
+								ndColor color(format->m_vertexColor.m_data[m + 0], format->m_vertexColor.m_data[m + 1], format->m_vertexColor.m_data[m + 2], format->m_vertexColor.m_data[m + 3]);
 								m_attrib.m_colorChannel.PushBack(color);
 							}
 						}
@@ -2941,7 +2941,7 @@ void ndMeshEffect::BuildFromIndexList(const ndMeshVertexFormat* const format)
 								ndInt32 m = format->m_uv0.m_indexList[k] * uv0Stride;
 								ndFloat32 u = format->m_uv0.m_data[m + 0];
 								ndFloat32 v = format->m_uv0.m_data[m + 1];
-								m_attrib.m_uv0Channel.PushBack(ndAttibutFormat::ndUV(u, v));
+								m_attrib.m_uv0Channel.PushBack(ndUV(u, v));
 							}
 						}
 
@@ -2953,7 +2953,7 @@ void ndMeshEffect::BuildFromIndexList(const ndMeshVertexFormat* const format)
 								ndInt32 m = format->m_uv1.m_indexList[k] * uv1Stride;
 								ndFloat32 u = format->m_uv1.m_data[m + 0];
 								ndFloat32 v = format->m_uv1.m_data[m + 1];
-								m_attrib.m_uv1Channel.PushBack(ndAttibutFormat::ndUV(u, v));
+								m_attrib.m_uv1Channel.PushBack(ndUV(u, v));
 							}
 						}
 						attributeCount += indexCount;
@@ -3282,9 +3282,9 @@ ndInt32 ndMeshEffect::AddInterpolatedHalfAttribute(ndEdge* const edge, ndInt32 m
 	}
 	if (m_attrib.m_normalChannel.m_isValid)
 	{
-		ndAttibutFormat::ndNormal edgeNormal0(m_attrib.m_normalChannel[ndInt32(edge->m_userData)]);
-		ndAttibutFormat::ndNormal edgeNormal1(m_attrib.m_normalChannel[ndInt32(edge->m_next->m_userData)]);
-		ndAttibutFormat::ndNormal edgeNormal(
+		ndNormal edgeNormal0(m_attrib.m_normalChannel[ndInt32(edge->m_userData)]);
+		ndNormal edgeNormal1(m_attrib.m_normalChannel[ndInt32(edge->m_next->m_userData)]);
+		ndNormal edgeNormal(
 			edgeNormal0.m_x * ndFloat32(t0) + edgeNormal1.m_x * ndFloat32(t1),
 			edgeNormal0.m_y * ndFloat32(t0) + edgeNormal1.m_y * ndFloat32(t1),
 			edgeNormal0.m_z * ndFloat32(t0) + edgeNormal1.m_z * ndFloat32(t1));
@@ -3297,9 +3297,9 @@ ndInt32 ndMeshEffect::AddInterpolatedHalfAttribute(ndEdge* const edge, ndInt32 m
 
 	if (m_attrib.m_uv0Channel.m_isValid)
 	{
-		ndAttibutFormat::ndUV edgeUV0(m_attrib.m_uv0Channel[ndInt32(edge->m_userData)]);
-		ndAttibutFormat::ndUV edgeUV1(m_attrib.m_uv0Channel[ndInt32(edge->m_next->m_userData)]);
-		ndAttibutFormat::ndUV edgeUV(edgeUV0.m_u * ndFloat32(t0) + edgeUV1.m_u * ndFloat32(t1),	edgeUV0.m_v * ndFloat32(t0) + edgeUV1.m_v * ndFloat32(t1));
+		ndUV edgeUV0(m_attrib.m_uv0Channel[ndInt32(edge->m_userData)]);
+		ndUV edgeUV1(m_attrib.m_uv0Channel[ndInt32(edge->m_next->m_userData)]);
+		ndUV edgeUV(edgeUV0.m_u * ndFloat32(t0) + edgeUV1.m_u * ndFloat32(t1),	edgeUV0.m_v * ndFloat32(t0) + edgeUV1.m_v * ndFloat32(t1));
 		m_attrib.m_uv0Channel.PushBack(edgeUV);
 	}
 
@@ -3804,8 +3804,8 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 	ndAssert(indexCount == m_points.m_vertex.GetCount());
 
 	ndInt32 totalSize = 0;
-	ndInt32 uvStrideInBytes = 2 * sizeof(ndFloat32);
-	ndInt32 normalStrideInBytes = 3 * sizeof(ndFloat32);
+	ndInt32 uvStrideInBytes = sizeof(ndUV);
+	ndInt32 normalStrideInBytes = sizeof(ndNormal);
 	ndInt32 vertexStrideInBytes = 3 * sizeof(ndFloat64);
 	
 	ndInt32 vertexOffset = totalSize;
@@ -3858,8 +3858,8 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 	ndInt32* const faceIndexBuffer = (ndInt32*)&buffer[faceCountOffset];
 	ndInt32* const faceMaterialBuffer = (ndInt32*)&buffer[faceMaterialOffset];
 
-	format.m_uv0.m_data = m_attrib.m_uv0Channel.m_isValid ? (ndFloat32*)&buffer[uvOffset] : nullptr;
-	format.m_normal.m_data = m_attrib.m_normalChannel.m_isValid ? (ndFloat32*)&buffer[normalOffset] : nullptr;
+	format.m_uv0.m_data = m_attrib.m_uv0Channel.m_isValid ? (ndReal*)&buffer[uvOffset] : nullptr;
+	format.m_normal.m_data = m_attrib.m_normalChannel.m_isValid ? (ndReal*)&buffer[normalOffset] : nullptr;
 	format.m_uv0.m_indexList = m_attrib.m_uv0Channel.m_isValid ? (ndInt32*)&buffer[uvIndexOffset] : nullptr;
 	format.m_normal.m_indexList = m_attrib.m_normalChannel.m_isValid ? (ndInt32*)&buffer[normalIndexOffset] : nullptr;
 	
@@ -3978,6 +3978,7 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 		{
 			count = ndMax(count, format.m_normal.m_indexList[i] + 1);
 		}
+
 		ndVertexListToIndexList(format.m_normal.m_data, format.m_normal.m_strideInBytes, 3, count, &tempIndex[0]);
 		for (ndInt32 i = 0; i < indexCount; i++)
 		{
@@ -4001,8 +4002,8 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 		ndInt32 vCount = ndVertexListToIndexList(&array[0].m_x, sizeof (ndVector), 3, count, &tempIndex[0]);
 		for (ndInt32 i = 0; i < vCount; i++)
 		{
-			format.m_uv0.m_data[i * 2 + 0] = array[i].m_x;
-			format.m_uv0.m_data[i * 2 + 1] = array[i].m_y;
+			format.m_uv0.m_data[i * 2 + 0] = ndReal(array[i].m_x);
+			format.m_uv0.m_data[i * 2 + 1] = ndReal(array[i].m_y);
 		}
 		for (ndInt32 i = 0; i < indexCount; i++)
 		{
@@ -4159,7 +4160,7 @@ void ndMeshEffect::ApplyTransform(const ndMatrix& matrix)
 		//m_attrib.m_normalChannel[i].m_x = n.m_x;
 		//m_attrib.m_normalChannel[i].m_y = n.m_y;
 		//m_attrib.m_normalChannel[i].m_z = n.m_z;
-		m_attrib.m_normalChannel[i] = ndAttibutFormat::ndNormal(n.m_x, n.m_y, n.m_z);
+		m_attrib.m_normalChannel[i] = ndNormal(n.m_x, n.m_y, n.m_z);
 	}
 
 	for (ndInt32 i = 0; i < m_attrib.m_binormalChannel.GetCount(); ++i)
@@ -4172,7 +4173,7 @@ void ndMeshEffect::ApplyTransform(const ndMatrix& matrix)
 		//m_attrib.m_binormalChannel[i].m_x = n.m_x;
 		//m_attrib.m_binormalChannel[i].m_y = n.m_y;
 		//m_attrib.m_binormalChannel[i].m_z = n.m_z;
-		m_attrib.m_binormalChannel[i] = ndAttibutFormat::ndNormal(n.m_x, n.m_y, n.m_z);
+		m_attrib.m_binormalChannel[i] = ndNormal(n.m_x, n.m_y, n.m_z);
 	}
 
 	ndFloat32 det = matrix.m_right.DotProduct(matrix.m_front.CrossProduct(matrix.m_up)).GetScalar();
@@ -4711,17 +4712,17 @@ void ndMeshEffect::AddInterpolatedEdgeAttribute(ndEdge* const edge, ndFloat64 pa
 
 	if (m_attrib.m_normalChannel.GetCount())
 	{
-		ndAttibutFormat::ndNormal edgeNormal0(m_attrib.m_normalChannel[ndInt32(edge->m_userData)]);
-		ndAttibutFormat::ndNormal edgeNormal1(m_attrib.m_normalChannel[ndInt32(edge->m_next->m_userData)]);
-		ndAttibutFormat::ndNormal edgeNormal(
+		ndNormal edgeNormal0(m_attrib.m_normalChannel[ndInt32(edge->m_userData)]);
+		ndNormal edgeNormal1(m_attrib.m_normalChannel[ndInt32(edge->m_next->m_userData)]);
+		ndNormal edgeNormal(
 			edgeNormal0.m_x * ndFloat32(t0) + edgeNormal1.m_x * ndFloat32(t1),
 			edgeNormal0.m_y * ndFloat32(t0) + edgeNormal1.m_y * ndFloat32(t1),
 			edgeNormal0.m_z * ndFloat32(t0) + edgeNormal1.m_z * ndFloat32(t1));
 		m_attrib.m_normalChannel.PushBack(edgeNormal);
 
-		ndAttibutFormat::ndNormal twinNormal0(m_attrib.m_normalChannel[ndInt32(edge->m_twin->m_next->m_userData)]);
-		ndAttibutFormat::ndNormal twinNormal1(m_attrib.m_normalChannel[ndInt32(edge->m_twin->m_userData)]);
-		ndAttibutFormat::ndNormal twinNormal(
+		ndNormal twinNormal0(m_attrib.m_normalChannel[ndInt32(edge->m_twin->m_next->m_userData)]);
+		ndNormal twinNormal1(m_attrib.m_normalChannel[ndInt32(edge->m_twin->m_userData)]);
+		ndNormal twinNormal(
 			twinNormal0.m_x * ndFloat32(t0) + twinNormal1.m_x * ndFloat32(t1),
 			twinNormal0.m_y * ndFloat32(t0) + twinNormal1.m_y * ndFloat32(t1),
 			twinNormal0.m_z* ndFloat32(t0) + twinNormal1.m_z * ndFloat32(t1));
@@ -4734,16 +4735,16 @@ void ndMeshEffect::AddInterpolatedEdgeAttribute(ndEdge* const edge, ndFloat64 pa
 
 	if (m_attrib.m_uv0Channel.GetCount()) 
 	{
-		ndAttibutFormat::ndUV edgeUV0(m_attrib.m_uv0Channel[ndInt32(edge->m_userData)]);
-		ndAttibutFormat::ndUV edgeUV1(m_attrib.m_uv0Channel[ndInt32(edge->m_next->m_userData)]);
-		ndAttibutFormat::ndUV edgeUV(
+		ndUV edgeUV0(m_attrib.m_uv0Channel[ndInt32(edge->m_userData)]);
+		ndUV edgeUV1(m_attrib.m_uv0Channel[ndInt32(edge->m_next->m_userData)]);
+		ndUV edgeUV(
 				edgeUV0.m_u * ndFloat32(t0) + edgeUV1.m_u * ndFloat32(t1),
 				edgeUV0.m_v * ndFloat32(t0) + edgeUV1.m_v * ndFloat32(t1));
 		m_attrib.m_uv0Channel.PushBack(edgeUV);
 
-		ndAttibutFormat::ndUV twinUV0(m_attrib.m_uv0Channel[ndInt32(edge->m_twin->m_next->m_userData)]);
-		ndAttibutFormat::ndUV twinUV1(m_attrib.m_uv0Channel[ndInt32(edge->m_twin->m_userData)]);
-		ndAttibutFormat::ndUV twinUV(
+		ndUV twinUV0(m_attrib.m_uv0Channel[ndInt32(edge->m_twin->m_next->m_userData)]);
+		ndUV twinUV1(m_attrib.m_uv0Channel[ndInt32(edge->m_twin->m_userData)]);
+		ndUV twinUV(
 			twinUV0.m_u * ndFloat32(t0) + twinUV1.m_u * ndFloat32(t1),
 			twinUV0.m_v * ndFloat32(t0) + twinUV1.m_v * ndFloat32(t1));
 		m_attrib.m_uv0Channel.PushBack(twinUV);

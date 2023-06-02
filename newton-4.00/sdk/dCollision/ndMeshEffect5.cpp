@@ -1114,7 +1114,7 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 					//n.m_x = ndFloat32(normal.m_x);
 					//n.m_y = ndFloat32(normal.m_y);
 					//n.m_z = ndFloat32(normal.m_z);
-					m_attrib.m_normalChannel.PushBack(ndAttibutFormat::ndNormal(normal.m_x, normal.m_y, normal.m_z));
+					m_attrib.m_normalChannel.PushBack(ndNormal(normal.m_x, normal.m_y, normal.m_z));
 				}
 
 				if (m_attrib.m_binormalChannel.GetCount())
@@ -1147,7 +1147,7 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 				//alpha2 = 0.0;
 				if (m_attrib.m_uv0Channel.GetCount() && convexMesh.m_attrib.m_uv0Channel.GetCount())
 				{
-					ndAttibutFormat::ndUV uv(
+					ndUV uv(
 						uv0[0].m_x * alpha0 + uv0[1].m_x * alpha1 + uv0[2].m_x * alpha2,
 						uv0[0].m_y * alpha0 + uv0[1].m_y * alpha1 + uv0[2].m_y * alpha2);
 					m_attrib.m_uv0Channel.PushBack(uv);
@@ -1155,7 +1155,7 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 
 				if (m_attrib.m_uv1Channel.GetCount() && convexMesh.m_attrib.m_uv1Channel.GetCount())
 				{
-					ndAttibutFormat::ndUV uv(
+					ndUV uv(
 						uv1[0].m_x * alpha0 + uv1[1].m_x * alpha1 + uv1[2].m_x * alpha2,
 						uv1[0].m_y * alpha0 + uv1[1].m_y * alpha1 + uv1[2].m_y * alpha2);
 					m_attrib.m_uv1Channel.PushBack(uv);
