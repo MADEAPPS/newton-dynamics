@@ -127,7 +127,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 		ndVector w(weight[i]);
 		ndFloat32 invMag = w.AddHorizontal().GetScalar();
 		ndAssert(invMag > 0.0f);
-		weight[i] = w.Scale(ndFloat32 (1.0f) / invMag);
+		weight[i] = w.Scale(ndFloat32 (1.0f) / (invMag + ndFloat32 (1.0e-8f)));
 	
 		ndAssert(skinBone[i].m_boneIndex[0] != -1);
 		for (ndInt32 j = 0; j < 4; ++j) 

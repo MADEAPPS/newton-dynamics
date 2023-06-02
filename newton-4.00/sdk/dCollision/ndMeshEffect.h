@@ -380,8 +380,8 @@ class ndMeshEffect: public ndPolyhedra
 		}
 
 		ndInt32 m_faceCount;
-		const ndInt32* m_faceMaterial;
-		const ndInt32* m_faceIndexCount;
+		ndInt32* m_faceMaterial;
+		ndInt32* m_faceIndexCount;
 		ndData<ndFloat64> m_vertex;
 		ndData<ndFloat32> m_normal;
 		ndData<ndFloat32> m_binormal;
