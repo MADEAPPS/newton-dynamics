@@ -221,6 +221,7 @@ class ndMeshEffect: public ndPolyhedra
 		m_material,
 		m_layer,
 		m_point,
+		m_weight,
 	};
 
 	template<class T, ndChannelType type>
@@ -289,6 +290,22 @@ class ndMeshEffect: public ndPolyhedra
 		ndReal m_w;
 	};
 
+	class ndVertexWeight
+	{
+	public:
+		ndVertexWeight()
+		{
+			for (ndInt32 i = 0; i < sizeof(m_boneId) / sizeof(m_boneId); ++i)
+			{
+				m_boneId[i] = 0;
+				m_weight[i] = ndReal(0.0f);
+			}
+		}
+
+		ndInt32 m_boneId[4];
+		ndReal m_weight[4];
+	};
+
 	class ndFormat
 	{
 		public:
@@ -330,6 +347,7 @@ class ndMeshEffect: public ndPolyhedra
 		public:
 		ndChannel<ndInt32, m_layer> m_layers;
 		ndChannel<ndBigVector, m_point> m_vertex;
+		ndChannel<ndVertexWeight, m_weight> m_skinWeights;
 	};
 
 	class ndAttibutFormat: public ndFormat
@@ -649,12 +667,14 @@ void ndMeshEffect::ndChannel<T, type>::PushBack(const T& element)
 inline ndMeshEffect::ndPointFormat::ndPointFormat()
 	:m_layers()
 	,m_vertex()
+	,m_skinWeights()
 {
 }
 
 inline ndMeshEffect::ndPointFormat::ndPointFormat(const ndPointFormat& source)
 	:m_layers(source.m_layers)
 	,m_vertex(source.m_vertex)
+	,m_skinWeights(source.m_skinWeights)
 {
 }
 
@@ -666,6 +686,7 @@ inline void ndMeshEffect::ndPointFormat::Clear()
 {
 	m_layers.Clear();
 	m_vertex.Clear();
+	m_skinWeights.Clear();
 }
 
 inline void ndMeshEffect::ndPointFormat::SetCount(ndInt32 count)
@@ -677,6 +698,12 @@ inline void ndMeshEffect::ndPointFormat::SetCount(ndInt32 count)
 	{
 		m_layers.Resize(count);
 		m_layers.SetCount(count);
+	}
+
+	if (m_skinWeights.GetCount())
+	{
+		m_skinWeights.Resize(count);
+		m_skinWeights.SetCount(count);
 	}
 }
 
