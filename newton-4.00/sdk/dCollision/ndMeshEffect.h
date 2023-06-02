@@ -350,13 +350,13 @@ class ndMeshEffect: public ndPolyhedra
 
 			void Clear()
 			{
-				m_data___ = nullptr;
-				m_indexList___ = nullptr;
+				m_data = nullptr;
+				m_indexList = nullptr;
 				m_strideInBytes = 0;
 			}
 
-			T* m_data___;
-			ndInt32* m_indexList___;
+			T* m_data;
+			ndInt32* m_indexList;
 			ndInt32 m_strideInBytes;
 		};
 

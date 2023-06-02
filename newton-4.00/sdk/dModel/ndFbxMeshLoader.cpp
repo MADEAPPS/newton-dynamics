@@ -539,8 +539,8 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	}
 
 	const ofbx::Vec3* const vertices = geom->getVertices();
-	format.m_vertex.m_data___ = (ndFloat64*)&vertices[0].x;
-	format.m_vertex.m_indexList___ = &indexArray[0];
+	format.m_vertex.m_data = (ndFloat64*)&vertices[0].x;
+	format.m_vertex.m_indexList = &indexArray[0];
 	format.m_vertex.m_strideInBytes = sizeof(ofbx::Vec3);
 	
 	format.m_faceCount = faceCount;
@@ -557,8 +557,8 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 			normalArray[i] = ndVector(ndFloat32(n.x), ndFloat32(n.y), ndFloat32(n.z), ndFloat32(0.0f));
 		}
 	
-		format.m_normal.m_data___ = &normalArray[0].m_x;
-		format.m_normal.m_indexList___ = &indexArray[0];
+		format.m_normal.m_data = &normalArray[0].m_x;
+		format.m_normal.m_indexList = &indexArray[0];
 		format.m_normal.m_strideInBytes = sizeof(ndVector);
 	}
 	
@@ -571,8 +571,8 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 			ofbx::Vec2 n = uv[i];
 			uvArray[i] = ndVector(ndFloat32(n.x), ndFloat32(n.y), ndFloat32(0.0f), ndFloat32(0.0f));
 		}
-		format.m_uv0.m_data___ = &uvArray[0].m_x;
-		format.m_uv0.m_indexList___ = &indexArray[0];
+		format.m_uv0.m_data = &uvArray[0].m_x;
+		format.m_uv0.m_indexList = &indexArray[0];
 		format.m_uv0.m_strideInBytes = sizeof(ndVector);
 	}
 	

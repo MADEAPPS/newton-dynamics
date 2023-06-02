@@ -234,7 +234,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				ndInt32 positCount = 0;
 				for (ndInt32 i = 0; i < vertexCount; ++i)
 				{
-					positCount = ndMax(positCount, channel.m_indexList___[i] + 1);
+					positCount = ndMax(positCount, channel.m_indexList[i] + 1);
 				}
 
 				fprintf(file, "\t\t\tposition: %d\n", positCount);
@@ -245,9 +245,9 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 					ndFloat64 x;
 					ndFloat64 y;
 					ndFloat64 z;
-					x = channel.m_data___[i * stride + 0];
-					y = channel.m_data___[i * stride + 1];
-					z = channel.m_data___[i * stride + 2];
+					x = channel.m_data[i * stride + 0];
+					y = channel.m_data[i * stride + 1];
+					z = channel.m_data[i * stride + 2];
 					fprintf(file, "\t\t\t\t%lg %lg %lg\n", x, y, z);
 				}
 				fprintf(file, "\t\t\t}\n");
@@ -257,7 +257,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				fprintf(file, "\t\t\t\t");
 				for (ndInt32 i = 0; i < vertexCount; ++i)
 				{
-					fprintf(file, "%d ", channel.m_indexList___[i]);
+					fprintf(file, "%d ", channel.m_indexList[i]);
 				}
 				fprintf(file, "\n");
 				fprintf(file, "\t\t\t}\n");
@@ -273,7 +273,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				ndInt32 positCount = 0;
 				for (ndInt32 i = 0; i < vertexCount; ++i)
 				{
-					positCount = ndMax(positCount, channel.m_indexList___[i] + 1);
+					positCount = ndMax(positCount, channel.m_indexList[i] + 1);
 				}
 
 				fprintf(file, "\t\t\tposition: %d\n", positCount);
@@ -284,9 +284,9 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 					ndFloat32 x;
 					ndFloat32 y;
 					ndFloat32 z;
-					x = channel.m_data___[i * stride + 0];
-					y = channel.m_data___[i * stride + 1];
-					z = channel.m_data___[i * stride + 2];
+					x = channel.m_data[i * stride + 0];
+					y = channel.m_data[i * stride + 1];
+					z = channel.m_data[i * stride + 2];
 					fprintf(file, "\t\t\t\t%g %g %g\n", x, y, z);
 				}
 				fprintf(file, "\t\t\t}\n");
@@ -296,7 +296,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				fprintf(file, "\t\t\t\t");
 				for (ndInt32 i = 0; i < vertexCount; ++i)
 				{
-					fprintf(file, "%d ", channel.m_indexList___[i]);
+					fprintf(file, "%d ", channel.m_indexList[i]);
 				}
 				fprintf(file, "\n");
 				fprintf(file, "\t\t\t}\n");
@@ -312,7 +312,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				ndInt32 positCount = 0;
 				for (ndInt32 i = 0; i < vertexCount; ++i)
 				{
-					positCount = ndMax(positCount, channel.m_indexList___[i] + 1);
+					positCount = ndMax(positCount, channel.m_indexList[i] + 1);
 				}
 
 				fprintf(file, "\t\t\tposition: %d\n", positCount);
@@ -322,18 +322,18 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				{
 					ndFloat32 x;
 					ndFloat32 y;
-					x = channel.m_data___[i * stride + 0];
-					y = channel.m_data___[i * stride + 1];
+					x = channel.m_data[i * stride + 0];
+					y = channel.m_data[i * stride + 1];
 					fprintf(file, "\t\t\t\t%g %g\n", x, y);
 				}
 				fprintf(file, "\t\t\t}\n");
 
-				fprintf(file, "\t\t\tindices %d\n", vertexCount);
+				fprintf(file, "\t\t\tindices: %d\n", vertexCount);
 				fprintf(file, "\t\t\t{\n");
 				fprintf(file, "\t\t\t\t");
 				for (ndInt32 i = 0; i < vertexCount; ++i)
 				{
-					fprintf(file, "%d ", channel.m_indexList___[i]);
+					fprintf(file, "%d ", channel.m_indexList[i]);
 				}
 				fprintf(file, "\n");
 				fprintf(file, "\t\t\t}\n");
@@ -356,11 +356,11 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				ndMeshEffect::ndMeshVertexFormat format;
 				ndInt32 vertexCount = effectMesh->GenerateVertexFormat(format, tmpBuffer);
 				PrintVertexChannel(format.m_vertex, vertexCount);
-				if (format.m_normal.m_data___)
+				if (format.m_normal.m_data)
 				{
 					PrintNormalChannel(format.m_normal, vertexCount);
 				}
-				if (format.m_uv0.m_data___)
+				if (format.m_uv0.m_data)
 				{
 					PrintUVChannel(format.m_uv0, vertexCount);
 				}
@@ -399,7 +399,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 							fprintf(file, "\t\t\t\t%d: ", format.m_faceIndexCount[j]);
 							for (ndInt32 k = 0; k < format.m_faceIndexCount[j]; ++k)
 							{
-								fprintf(file, "%d ", format.m_vertex.m_indexList___[indexAcc + k]);
+								fprintf(file, "%d ", format.m_vertex.m_indexList[indexAcc + k]);
 							}
 							fprintf(file, "\n");
 						}
@@ -418,25 +418,27 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 					{
 						fprintf(file, "\t\tskinCluster: %s\n", clusterIter.GetKey().GetStr());
 						fprintf(file, "\t\t{\n");
-				
+					
 						ndMeshEffect::ndVertexCluster& cluster = clusterIter.GetNode()->GetInfo();
-				
+					
 						fprintf(file, "\t\t\tindexCount: %d\n", cluster.m_vertexIndex.GetCount());
-				
+					
 						fprintf(file, "\t\t\tvertexIndex: ");
 						for (ndInt32 i = 0; i < cluster.m_vertexIndex.GetCount(); ++i)
 						{
-							fprintf(file, "%d ", cluster.m_vertexIndex[i]);
+							//ndInt32 remapIndex = cluster.m_vertexIndex[i];
+							ndInt32 remapIndex = format.m_vertex.m_indexList[cluster.m_vertexIndex[i]];
+							fprintf(file, "%d ", remapIndex);
 						}
 						fprintf(file, "\t\t\t\n");
-				
+					
 						fprintf(file, "\t\t\tvertexWeight: ");
 						for (ndInt32 i = 0; i < cluster.m_vertexWeigh.GetCount(); ++i)
 						{
 							fprintf(file, "%g ", cluster.m_vertexWeigh[i]);
 						}
 						fprintf(file, "\t\t\t\n");
-				
+					
 						fprintf(file, "\t\t}\n");
 					}
 				}
@@ -613,11 +615,11 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 				ndArray<ndVector> normals;
 				ndArray<ndBigVector> positions;
 
-				ndArray<ndInt32> faceArray;
-				ndArray<ndInt32> materialArray;
-				ndArray<ndInt32> indexArray;
 				ndArray<ndInt32> uvIndex;
+				ndArray<ndInt32> faceArray;
+				ndArray<ndInt32> indexArray;
 				ndArray<ndInt32> normalsIndex;
+				ndArray<ndInt32> materialArray;
 				ndArray<ndInt32> positionsIndex;
 				ndMeshEffect::ndMeshVertexFormat format;
 
@@ -653,8 +655,8 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 						}
 						ReadToken();
 
-						format.m_vertex.m_data___ = &positions[0].m_x;
-						format.m_vertex.m_indexList___ = &positionsIndex[0];
+						format.m_vertex.m_data = &positions[0].m_x;
+						format.m_vertex.m_indexList = &positionsIndex[0];
 						format.m_vertex.m_strideInBytes = sizeof(ndBigVector);
 						ReadToken();
 					}
@@ -688,8 +690,8 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 						}
 						ReadToken();
 
-						format.m_normal.m_data___ = &normals[0].m_x;
-						format.m_normal.m_indexList___ = &normalsIndex[0];
+						format.m_normal.m_data = &normals[0].m_x;
+						format.m_normal.m_indexList = &normalsIndex[0];
 						format.m_normal.m_strideInBytes = sizeof(ndVector);
 						ReadToken();
 					}
@@ -722,8 +724,8 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 						}
 						ReadToken();
 
-						format.m_uv0.m_data___ = &uvs[0].m_x;
-						format.m_uv0.m_indexList___ = &uvIndex[0];
+						format.m_uv0.m_data = &uvs[0].m_x;
+						format.m_uv0.m_indexList = &uvIndex[0];
 						format.m_uv0.m_strideInBytes = sizeof(ndVector);
 						ReadToken();
 					}
@@ -812,6 +814,9 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 					ReadToken();
 				}
 				ReadToken();
+				format.m_faceCount = faceArray.GetCount();
+				format.m_faceIndexCount = &faceArray[0];
+				format.m_faceMaterial = &materialArray[0];
 				effectMesh->BuildFromIndexList(&format);
 			}
 			ReadToken();
