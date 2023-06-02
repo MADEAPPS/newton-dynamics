@@ -1110,11 +1110,11 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 				m_attrib.m_pointChannel.PushBack(edge->m_incidentVertex);
 				if (m_attrib.m_normalChannel.GetCount())
 				{
-					ndTriplex n;
-					n.m_x = ndFloat32(normal.m_x);
-					n.m_y = ndFloat32(normal.m_y);
-					n.m_z = ndFloat32(normal.m_z);
-					m_attrib.m_normalChannel.PushBack(n);
+					//ndAttibutFormat::ndNormal n;
+					//n.m_x = ndFloat32(normal.m_x);
+					//n.m_y = ndFloat32(normal.m_y);
+					//n.m_z = ndFloat32(normal.m_z);
+					m_attrib.m_normalChannel.PushBack(ndAttibutFormat::ndNormal(normal.m_x, normal.m_y, normal.m_z));
 				}
 
 				if (m_attrib.m_binormalChannel.GetCount())
@@ -1147,17 +1147,17 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 				//alpha2 = 0.0;
 				if (m_attrib.m_uv0Channel.GetCount() && convexMesh.m_attrib.m_uv0Channel.GetCount())
 				{
-					ndAttibutFormat::dgUV uv;
-					uv.m_u = uv0[0].m_x * alpha0 + uv0[1].m_x * alpha1 + uv0[2].m_x * alpha2;
-					uv.m_v = uv0[0].m_y * alpha0 + uv0[1].m_y * alpha1 + uv0[2].m_y * alpha2;
+					ndAttibutFormat::ndUV uv(
+						uv0[0].m_x * alpha0 + uv0[1].m_x * alpha1 + uv0[2].m_x * alpha2,
+						uv0[0].m_y * alpha0 + uv0[1].m_y * alpha1 + uv0[2].m_y * alpha2);
 					m_attrib.m_uv0Channel.PushBack(uv);
 				}
 
 				if (m_attrib.m_uv1Channel.GetCount() && convexMesh.m_attrib.m_uv1Channel.GetCount())
 				{
-					ndAttibutFormat::dgUV uv;
-					uv.m_u = uv1[0].m_x * alpha0 + uv1[1].m_x * alpha1 + uv1[2].m_x * alpha2;
-					uv.m_v = uv1[0].m_y * alpha0 + uv1[1].m_y * alpha1 + uv1[2].m_y * alpha2;
+					ndAttibutFormat::ndUV uv(
+						uv1[0].m_x * alpha0 + uv1[1].m_x * alpha1 + uv1[2].m_x * alpha2,
+						uv1[0].m_y * alpha0 + uv1[1].m_y * alpha1 + uv1[2].m_y * alpha2);
 					m_attrib.m_uv1Channel.PushBack(uv);
 				}
 

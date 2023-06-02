@@ -284,11 +284,54 @@ class ndMeshEffect: public ndPolyhedra
 	class ndAttibutFormat: public ndFormat
 	{
 		public:
-		class dgUV
+		class ndUV
 		{
 			public:
-			ndFloat32 m_u;
-			ndFloat32 m_v;
+			ndUV()
+			{
+			}
+
+			ndUV(ndFloat32 x, ndFloat32 y)
+				:m_u(ndReal(x))
+				,m_v(ndReal(y))
+			{
+			}
+			ndReal m_u;
+			ndReal m_v;
+		};
+
+		class ndNormal
+		{
+			public:
+			ndNormal()
+			{
+			}
+			ndNormal(ndFloat32 x, ndFloat32 y, ndFloat32 z)
+				:m_x(ndReal(x))
+				,m_y(ndReal(y))
+				,m_z(ndReal(z))
+			{
+			}
+			ndReal m_x;
+			ndReal m_y;
+			ndReal m_z;
+		};
+
+		class ndColor: public ndNormal
+		{
+			public:
+			ndColor()
+				:ndNormal()
+			{
+			}
+
+			ndColor(ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w)
+				:ndNormal(x, y, z)
+				,m_w(ndReal(w))
+			{
+			}
+
+			ndReal m_w;
 		};
 
 		ndAttibutFormat();
@@ -307,11 +350,11 @@ class ndMeshEffect: public ndPolyhedra
 		public:
 		ndChannel<ndInt32, m_vertex> m_pointChannel;
 		ndChannel<ndInt32, m_material> m_materialChannel;
-		ndChannel<ndTriplex, m_normal> m_normalChannel;
-		ndChannel<ndTriplex, m_binormal> m_binormalChannel;
-		ndChannel<ndVector, m_color> m_colorChannel;
-		ndChannel<dgUV, m_uv0> m_uv0Channel;
-		ndChannel<dgUV, m_uv1> m_uv1Channel;
+		ndChannel<ndNormal, m_normal> m_normalChannel;
+		ndChannel<ndNormal, m_binormal> m_binormalChannel;
+		ndChannel<ndColor, m_color> m_colorChannel;
+		ndChannel<ndUV, m_uv0> m_uv0Channel;
+		ndChannel<ndUV, m_uv1> m_uv1Channel;
 	};
 
 	public:
