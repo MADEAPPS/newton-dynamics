@@ -97,7 +97,7 @@ static ndUnsigned64 randBits0[] =
 };
 
 // calculate a 32 bit crc of a string
-ndUnsigned64 dCRC64 (const char* const name, ndUnsigned64 crcAcc)
+ndUnsigned64 ndCRC64 (const char* const name, ndUnsigned64 crcAcc)
 {
     if (name) 
     {
@@ -114,7 +114,7 @@ ndUnsigned64 dCRC64 (const char* const name, ndUnsigned64 crcAcc)
     return crcAcc;
 }
 
-ndUnsigned64 dCRC64 (const void* const buffer, ndInt32 size, ndUnsigned64 crcAcc)
+ndUnsigned64 ndCRC64 (const void* const buffer, ndInt32 size, ndUnsigned64 crcAcc)
 {
     const unsigned char* const ptr = (unsigned char*)buffer;
 

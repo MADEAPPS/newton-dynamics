@@ -297,8 +297,8 @@ inline ndShapeInfo::ndShapeInfo()
 inline ndUnsigned64 ndShapeInfo::GetHash(ndUnsigned64 hash)
 {
 	ndInt32 id = m_collisionType;
-	hash = dCRC64(m_paramArray, sizeof (m_paramArray), hash);
-	hash = dCRC64(&id, sizeof(id), hash);
+	hash = ndCRC64(m_paramArray, sizeof (m_paramArray), hash);
+	hash = ndCRC64(&id, sizeof(id), hash);
 	return hash;
 }
 

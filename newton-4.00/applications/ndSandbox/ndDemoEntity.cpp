@@ -105,17 +105,17 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshE
 		ndMesh* const effectNode = meshArray[i].m_effectNode;
 		ndDemoMeshInterface* mesh = nullptr;
 
-		ndAssert(0);
-		//ndSharedPtr<ndMeshEffect> meshEffect (effectNode->GetMesh());
+		ndSharedPtr<ndMeshEffect> meshEffect (effectNode->GetMesh());
 		//if (!meshEffect->GetCluster().GetCount())
-		//{
-		//	mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
-		//}
-		//else
-		//{
-		//	mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
-		//}
-		//entity->SetMesh(ndSharedPtr<ndDemoMeshInterface>(mesh), effectNode->m_meshMatrix);
+		if (meshEffect->GetVertexWeights().GetCount())
+		{
+			mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
+		}
+		else
+		{
+			mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
+		}
+		entity->SetMesh(ndSharedPtr<ndDemoMeshInterface>(mesh), effectNode->m_meshMatrix);
 		
 		if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
 		{

@@ -14,10 +14,10 @@
 
 #include "ndCoreStdafx.h"
 
-D_CORE_API ndUnsigned64 dCRC64 (const char* const string, ndUnsigned64  crcAcc = 0);
-D_CORE_API ndUnsigned64 dCRC64 (const void* const buffer, ndInt32 size, ndUnsigned64 crcAcc);
+D_CORE_API ndUnsigned64 ndCRC64 (const char* const string, ndUnsigned64  crcAcc = 0);
+D_CORE_API ndUnsigned64 ndCRC64 (const void* const buffer, ndInt32 size, ndUnsigned64 crcAcc);
 
-inline ndUnsigned64 dCombineCRC(ndUnsigned64 a, ndUnsigned64 b)
+inline ndUnsigned64 ndCombineCRC(ndUnsigned64 a, ndUnsigned64 b)
 {
 	return (a << 8) ^ b;
 }

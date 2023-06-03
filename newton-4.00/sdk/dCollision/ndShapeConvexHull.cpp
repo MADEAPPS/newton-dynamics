@@ -983,5 +983,5 @@ void ndShapeConvexHull::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& d
 
 ndUnsigned64 ndShapeConvexHull::GetHash(ndUnsigned64 hash) const
 {
-	return dCRC64(&m_vertex[0].m_x, m_vertexCount * ndInt32 (sizeof(ndVector)), hash);
+	return ndCRC64(&m_vertex[0].m_x, m_vertexCount * ndInt32 (sizeof(ndVector)), hash);
 }

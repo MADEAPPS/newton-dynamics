@@ -491,10 +491,12 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	
 	ndArray<ndMeshEffect::ndUV> uvArray;
 	ndArray<ndMeshEffect::ndNormal> normalArray;
+	ndArray<ndMeshEffect::ndVertexWeight> vertexWeights;
 
 	ndArray<ndInt32> indexArray;
 	ndArray<ndInt32> faceIndexArray;
 	ndArray<ndInt32> faceMaterialArray;
+	ndArray<ndInt32> vertexWeightsIndexArray;
 	ndMeshEffect::ndMeshVertexFormat format;
 
 	indexArray.SetCount(indexCount);
@@ -583,14 +585,12 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 		ndInt32 clusterCount = skin->getClusterCount();
 	
 		ndTree <const ofbx::Cluster*, const Object*> clusterBoneMap;
-		for (ndInt32 i = 0; i < clusterCount; ++i)
-		{
-			const ofbx::Cluster* const cluster = skin->getCluster(i);
-			const ofbx::Object* const link = cluster->getLink();
-			clusterBoneMap.Insert(cluster, link);
-		}
-	
-		ndAssert(0);
+		//for (ndInt32 i = 0; i < clusterCount; ++i)
+		//{
+		//	const ofbx::Cluster* const cluster = skin->getCluster(i);
+		//	const ofbx::Object* const link = cluster->getLink();
+		//	clusterBoneMap.Insert(cluster, link);
+		//}
 		//for (ndInt32 i = 0; i < clusterCount; ++i)
 		//{
 		//	const ofbx::Cluster* const fbxCluster = skin->getCluster(i);
@@ -610,6 +610,32 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 		//		}
 		//	}
 		//}
+
+		//meshEffect->SetVertexWeightChannel();
+		vertexWeights.SetCount(geom->getVertexCount());
+		for (ndInt32 i = 0; i < vertexWeights.GetCount(); ++i)
+		{
+			vertexWeights[i].Clear();
+			vertexWeightsIndexArray.PushBack(i);
+		}
+		for (ndInt32 i = 0; i < clusterCount; ++i)
+		{
+			const ofbx::Cluster* const fbxCluster = skin->getCluster(i);
+			const ofbx::Object* const fbxBone = fbxCluster->getLink();
+
+			ndInt32 hashId = ndInt32(ndCRC64(fbxBone->name) & 0xffffffff);
+			ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
+			const ndInt32* const indices = fbxCluster->getIndices();
+			const ndFloat64* const weights = fbxCluster->getWeights();
+			for (ndInt32 j = 0; j < clusterIndexCount; ++j)
+			{
+				ndInt32 index = indices[j];
+				vertexWeights[index].SetWeight(hashId, ndReal (weights[j]));
+			}
+		}
+		format.m_vertexWeight.m_data = &vertexWeights[0];
+		format.m_vertexWeight.m_indexList = &vertexWeightsIndexArray[0];
+		format.m_vertexWeight.m_strideInBytes = sizeof(ndMeshEffect::ndVertexWeight);
 	}
 	
 	meshEffect->BuildFromIndexList(&format);

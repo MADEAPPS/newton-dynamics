@@ -177,8 +177,8 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 
 	virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const
 	{
-		hash = dCRC64(&m_planeEquation[0], sizeof(ndVector), hash);
-		hash = dCRC64(&m_gridSize, sizeof(ndFloat32), hash);
+		hash = ndCRC64(&m_planeEquation[0], sizeof(ndVector), hash);
+		hash = ndCRC64(&m_gridSize, sizeof(ndFloat32), hash);
 		return hash;
 	}
 

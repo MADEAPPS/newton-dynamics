@@ -295,10 +295,34 @@ class ndMeshEffect: public ndPolyhedra
 		public:
 		ndVertexWeight()
 		{
-			for (ndInt32 i = 0; i < sizeof(m_boneId) / sizeof(m_boneId); ++i)
+			Clear();
+		}
+
+		void Clear()
+		{
+			for (ndInt32 i = 0; i < sizeof(m_boneId) / sizeof(m_boneId[0]); ++i)
 			{
-				m_boneId[i] = 0;
+				m_boneId[i] = -1;
 				m_weight[i] = ndReal(0.0f);
+			}
+		}
+
+		void SetWeight(ndInt32 hash, ndReal weight)
+		{
+			ndInt32 index = sizeof(m_weight) / sizeof(m_weight[0]) - 1;
+			ndReal lowest = m_weight[index];
+			for (ndInt32 i = index - 1; i >= 0; --i)
+			{
+				if (m_weight[i] <= lowest)
+				{
+					index = i;
+					lowest = m_weight[i];
+				}
+			}
+			if (weight > lowest)
+			{
+				m_boneId[index] = hash;
+				m_weight[index] = weight;
 			}
 		}
 
@@ -452,20 +476,6 @@ class ndMeshEffect: public ndPolyhedra
 		ndData<ndReal> m_vertexColor;
 		ndData<ndVertexWeight> m_vertexWeight;
 	};
-
-	//class ndVertexCluster
-	//{
-	//	public:
-	//	ndVertexCluster()
-	//	{
-	//	}
-	//	ndArray<ndInt32> m_vertexIndex;
-	//	ndArray<ndReal> m_vertexWeigh;
-	//};
-	//
-	//class ndClusterMap: public ndTree<ndVertexCluster, const ndString>
-	//{
-	//};
 	
 	D_COLLISION_API ndMeshEffect();
 	D_COLLISION_API ndMeshEffect(const ndMeshEffect& source);
@@ -490,11 +500,7 @@ class ndMeshEffect: public ndPolyhedra
 	ndInt32 GetFaceMaterial(ndEdge* const faceEdge) const;
 	ndInt32 GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<ndUnsigned8>& buffer) const;
 
-	//D_COLLISION_API const ndClusterMap& GetCluster() const;
-	//D_COLLISION_API void DeleteCluster(const char* const name);
-	//D_COLLISION_API ndVertexCluster* CreateCluster(const char* const name);
-	//D_COLLISION_API ndVertexCluster* FindCluster(const char* const name) const;
-
+	ndArray<ndVertexWeight>& GetVertexWeights();
 	D_COLLISION_API ndFloat64 CalculateVolume() const;
 	D_COLLISION_API ndMatrix CalculateOOBB(ndBigVector& size) const;
 	D_COLLISION_API void CalculateAABB(ndBigVector& min, ndBigVector& max) const;
@@ -511,6 +517,7 @@ class ndMeshEffect: public ndPolyhedra
 	D_COLLISION_API void GetUV0Channel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
 	D_COLLISION_API void GetUV1Channel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
 	D_COLLISION_API void GetVertexColorChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
+	D_COLLISION_API void GetVertexWeightChannel(ndInt32 strideInByte, ndVertexWeight* const bufferOut) const;
 
 	D_COLLISION_API ndIndexArray* MaterialGeometryBegin();
 		D_COLLISION_API ndInt32 GetFirstMaterial(ndIndexArray* const handle) const;
@@ -576,7 +583,6 @@ class ndMeshEffect: public ndPolyhedra
 	ndString m_name;
 	ndPointFormat m_points;
 	ndAttibutFormat m_attrib;
-	//ndClusterMap m_clusters;
 	ndArray<ndMaterial> m_materials;
 	ndInt32 m_vertexBaseCount;
 	ndInt32 m_constructionIndex;
@@ -845,4 +851,8 @@ inline ndMeshEffect* ndMeshEffect::GetNextLayer(ndMeshEffect* const layerSegment
 	return GetNextLayer(layerSegment->IncLRU() - 1);
 }
 
+inline ndArray<ndMeshEffect::ndVertexWeight>& ndMeshEffect::GetVertexWeights()
+{
+	return m_points.m_skinWeights;
+}
 #endif

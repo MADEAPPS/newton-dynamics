@@ -37,11 +37,46 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 
 	ndMesh* LoadMesh(const char* const fbxMeshName, bool loadAnimation)
 	{
-		//ndMesh* const mesh = ndMeshLoader::LoadMesh(fbxMeshName, loadAnimation);
 		ndMesh* mesh = ndMeshLoader::LoadMesh(fbxMeshName, loadAnimation);
 
-		// re target bone and nodes names
-		ndAssert(0);
+		// re target animation names
+		ndList<ndSharedPtr<ndMeshEffect>> meshes;
+		for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
+		{
+			ndSharedPtr<ndMeshEffect> meshEffect(node->GetMesh());
+			if (*meshEffect && meshEffect->GetVertexWeights().GetCount())
+			{
+				meshes.Append(meshEffect);
+			}
+		}
+		if (meshes.GetCount())
+		{
+			for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				const char* const ptr = strchr(node->GetName().GetStr(), ':');
+				if (ptr)
+				{
+					ndInt32 newHashId = ndInt32(ndCRC64(ptr + 1) & 0xffffffff);
+					ndInt32 oldHashId = ndInt32(ndCRC64(node->GetName().GetStr()) & 0xffffffff);
+					for (ndList<ndSharedPtr<ndMeshEffect>>::ndNode* meshNode = meshes.GetFirst(); meshNode; meshNode = meshNode->GetNext())
+					{
+						ndArray<ndMeshEffect::ndVertexWeight>& weights = meshNode->GetInfo()->GetVertexWeights();
+						for (ndInt32 i = 0; i < weights.GetCount(); ++i)
+						{
+							for (ndInt32 j = sizeof(weights[0].m_boneId) / sizeof(weights[0].m_boneId[0]) - 1; j >= 0; --j)
+							{
+								if (weights[i].m_boneId[j] == oldHashId)
+								{
+									weights[i].m_boneId[j] = newHashId;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// re target bone names
 		for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
 		{
 			const char* const ptr = strchr(node->GetName().GetStr(), ':');
@@ -49,40 +84,6 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 			{
 				node->SetName(ptr + 1);
 			}
-
-			ndAssert(0);
-			//ndSharedPtr<ndMeshEffect> meshEffect(node->GetMesh());
-			//if (*meshEffect)
-			//{
-			//	ndMeshEffect::ndClusterMap::Iterator it(meshEffect->GetCluster());
-			//	for (it.Begin(); it; it++)
-			//	{
-			//		const ndString& name = it.GetKey();
-			//		const char* const bonePtr = strchr(name.GetStr(), ':');
-			//		if (bonePtr)
-			//		{
-			//			ndMeshEffect::ndVertexCluster& cluster = it.GetNode()->GetInfo();
-			//			ndMeshEffect::ndVertexCluster* const newCluster = meshEffect->CreateCluster(bonePtr + 1);
-			//			ndAssert(cluster.m_vertexIndex.GetCount() == cluster.m_vertexWeigh.GetCount());
-			//			for (ndInt32 i = 0; i < cluster.m_vertexIndex.GetCount(); ++i)
-			//			{
-			//				newCluster->m_vertexIndex.PushBack(cluster.m_vertexIndex[i]);
-			//				newCluster->m_vertexWeigh.PushBack(cluster.m_vertexWeigh[i]);
-			//			}
-			//		}
-			//	}
-			//
-			//	for (it.Begin(); it; )
-			//	{
-			//		const ndString& name = it.GetKey();
-			//		it++;
-			//		const char* const bonePtr = strchr(name.GetStr(), ':');
-			//		if (bonePtr)
-			//		{
-			//			meshEffect->DeleteCluster(name.GetStr());
-			//		}
-			//	}
-			//}
 		}
 
 		if (m_scale != ndFloat32(1.0f))

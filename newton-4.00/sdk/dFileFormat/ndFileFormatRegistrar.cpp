@@ -84,7 +84,7 @@ ndFixSizeArray<ndFileFormatRegistrar*, 256> ndFileFormatRegistrar::m_registry;
 
 ndFileFormatRegistrar::ndFileFormatRegistrar(const char* const className)
 	:ndClassAlloc()
-	,m_hash(dCRC64(className))
+	,m_hash(ndCRC64(className))
 {
 	ndAssert(!GetHandler(className));
 
@@ -173,7 +173,7 @@ void ndFileFormatRegistrar::Init()
 
 ndFileFormatRegistrar* ndFileFormatRegistrar::GetHandler(const char* const className)
 {
-	ndUnsigned64 hash = dCRC64(className);
+	ndUnsigned64 hash = ndCRC64(className);
 	ndInt32 i0 = 0;
 	ndInt32 i1 = m_registry.GetCount() - 1;
 	while ((i1 - i0 > 4))
