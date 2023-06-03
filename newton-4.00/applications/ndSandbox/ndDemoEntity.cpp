@@ -106,7 +106,6 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshE
 		ndDemoMeshInterface* mesh = nullptr;
 
 		ndSharedPtr<ndMeshEffect> meshEffect (effectNode->GetMesh());
-		//if (!meshEffect->GetCluster().GetCount())
 		if (meshEffect->GetVertexWeights().GetCount())
 		{
 			mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());

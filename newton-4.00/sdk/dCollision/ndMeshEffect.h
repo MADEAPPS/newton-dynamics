@@ -293,6 +293,7 @@ class ndMeshEffect: public ndPolyhedra
 	class ndVertexWeight
 	{
 		public:
+		#define ND_VERTEX_WEIGHT_SIZE 4
 		ndVertexWeight()
 		{
 			Clear();
@@ -300,7 +301,7 @@ class ndMeshEffect: public ndPolyhedra
 
 		void Clear()
 		{
-			for (ndInt32 i = 0; i < sizeof(m_boneId) / sizeof(m_boneId[0]); ++i)
+			for (ndInt32 i = 0; i < ND_VERTEX_WEIGHT_SIZE; ++i)
 			{
 				m_boneId[i] = -1;
 				m_weight[i] = ndReal(0.0f);
@@ -309,7 +310,7 @@ class ndMeshEffect: public ndPolyhedra
 
 		void SetWeight(ndInt32 hash, ndReal weight)
 		{
-			ndInt32 index = sizeof(m_weight) / sizeof(m_weight[0]) - 1;
+			ndInt32 index = ND_VERTEX_WEIGHT_SIZE - 1;
 			ndReal lowest = m_weight[index];
 			for (ndInt32 i = index - 1; i >= 0; --i)
 			{
@@ -326,8 +327,8 @@ class ndMeshEffect: public ndPolyhedra
 			}
 		}
 
-		ndInt32 m_boneId[4];
-		ndReal m_weight[4];
+		ndReal m_weight[ND_VERTEX_WEIGHT_SIZE];
+		ndInt32 m_boneId[ND_VERTEX_WEIGHT_SIZE];
 	};
 
 	class ndFormat

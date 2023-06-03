@@ -2025,8 +2025,7 @@ void ndMeshEffect::ndAttibutFormat::CompressData(
 					}
 					if (test && points.m_skinWeights.m_isValid)
 					{
-						ndInt32 size = sizeof(points.m_skinWeights[0].m_boneId) / sizeof(points.m_skinWeights[0].m_boneId[0]);
-						for (ndInt32 k = 0; k < size; ++k)
+						for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
 						{
 							test &= (points.m_skinWeights[iii].m_boneId[k] == points.m_skinWeights[jjj].m_boneId[k]);
 							test &= (points.m_skinWeights[iii].m_weight[k] == points.m_skinWeights[jjj].m_weight[k]);
@@ -3834,10 +3833,6 @@ void ndMeshEffect::GetVertexColorChannel(ndInt32 strideInByte, ndFloat32* const 
 
 ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<ndUnsigned8>& buffer) const
 {
-	ndAssert(0);
-	return 0;
-#if 0
-
 	ndInt32 faceCount = 0;
 	ndInt32 indexCount = 0;
 	ndInt32 lru = IncLRU();
@@ -3859,15 +3854,18 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 		}
 	}
 
-	ndAssert(indexCount == m_points.m_vertex.GetCount());
-
-	ndInt32 totalSize = 0;
+	ndAssert(indexCount == m_points.m_vertex____.GetCount());
+	ndAssert(!m_points.m_layers.m_isValid || indexCount == m_points.m_layers.GetCount());
+	ndAssert(!m_points.m_skinWeights.m_isValid || (indexCount == m_points.m_skinWeights.GetCount()));
+	
 	ndInt32 uvStrideInBytes = sizeof(ndUV);
 	ndInt32 normalStrideInBytes = sizeof(ndNormal);
 	ndInt32 vertexStrideInBytes = 3 * sizeof(ndFloat64);
-	
+	ndInt32 vertexWeightStrideInBytes = sizeof(ndVertexWeight);
+
+	ndInt32 totalSize = 0;
 	ndInt32 vertexOffset = totalSize;
-	totalSize += m_points.m_vertex.GetCount() * vertexStrideInBytes;
+	totalSize += m_points.m_vertex____.GetCount() * vertexStrideInBytes;
 
 	ndInt32 normalOffset = 0;
 	if (m_attrib.m_normalChannel.m_isValid)
@@ -3881,6 +3879,13 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 	{
 		uvOffset = totalSize;
 		totalSize += m_attrib.m_uv0Channel.GetCount() * uvStrideInBytes;
+	}
+
+	ndInt32 vertexWeightsOffset = 0;
+	if (m_points.m_skinWeights.m_isValid)
+	{
+		vertexWeightsOffset = totalSize;
+		totalSize += m_points.m_skinWeights.GetCount() * vertexWeightStrideInBytes;
 	}
 
 	ndInt32 faceCountOffset = totalSize;
@@ -3910,6 +3915,13 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 		totalSize += indexCount * sizeof(ndInt32);
 	}
 
+	ndInt32 weightsIndexOffset = 0;
+	if (m_attrib.m_uv0Channel.m_isValid)
+	{
+		weightsIndexOffset = totalSize;
+		totalSize += indexCount * sizeof(ndInt32);
+	}
+
 	buffer.SetCount(totalSize);
 	format.m_vertex.m_data = (ndFloat64*)&buffer[vertexOffset];
 	format.m_vertex.m_indexList = (ndInt32*)&buffer[vertexIndexOffset];
@@ -3918,21 +3930,31 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 
 	format.m_uv0.m_data = m_attrib.m_uv0Channel.m_isValid ? (ndReal*)&buffer[uvOffset] : nullptr;
 	format.m_normal.m_data = m_attrib.m_normalChannel.m_isValid ? (ndReal*)&buffer[normalOffset] : nullptr;
+	format.m_vertexWeight.m_data = m_points.m_skinWeights.m_isValid ? (ndVertexWeight*)&buffer[vertexWeightsOffset] : nullptr;
+
 	format.m_uv0.m_indexList = m_attrib.m_uv0Channel.m_isValid ? (ndInt32*)&buffer[uvIndexOffset] : nullptr;
 	format.m_normal.m_indexList = m_attrib.m_normalChannel.m_isValid ? (ndInt32*)&buffer[normalIndexOffset] : nullptr;
+	format.m_vertexWeight.m_indexList = m_points.m_skinWeights.m_isValid ? (ndInt32*)&buffer[weightsIndexOffset] : nullptr;
 	
 	format.m_faceCount = faceCount;
 	format.m_faceIndexCount = faceIndexBuffer;
 	format.m_faceMaterial = faceMaterialBuffer;
-	
-	format.m_vertex.m_strideInBytes = vertexStrideInBytes;
 
-	ndAssert(m_points.m_vertex.GetCount() == m_points.m_layers.GetCount());
-	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); ++i)
+	format.m_vertex.m_strideInBytes = vertexStrideInBytes;
+	for (ndInt32 i = 0; i < m_points.m_vertex____.GetCount(); ++i)
 	{
-		format.m_vertex.m_data[i * 3 + 0] = m_points.m_vertex[i].m_x;
-		format.m_vertex.m_data[i * 3 + 1] = m_points.m_vertex[i].m_y;
-		format.m_vertex.m_data[i * 3 + 2] = m_points.m_vertex[i].m_z;
+		format.m_vertex.m_data[i * 3 + 0] = m_points.m_vertex____[i].m_x;
+		format.m_vertex.m_data[i * 3 + 1] = m_points.m_vertex____[i].m_y;
+		format.m_vertex.m_data[i * 3 + 2] = m_points.m_vertex____[i].m_z;
+	}
+
+	if (m_points.m_skinWeights.m_isValid)
+	{
+		format.m_vertexWeight.m_strideInBytes = vertexWeightStrideInBytes;
+		for (ndInt32 i = 0; i < m_points.m_skinWeights.GetCount(); ++i)
+		{
+			format.m_vertexWeight.m_data[i] = m_points.m_skinWeights[i];
+		}
 	}
 
 	if (m_attrib.m_materialChannel.m_isValid)
@@ -3981,6 +4003,8 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 				count++;
 
 				format.m_vertex.m_indexList[indexCount] = ptr->m_incidentVertex;
+				format.m_vertexWeight.m_indexList[indexCount] = ptr->m_incidentVertex;
+
 				if (m_attrib.m_normalChannel.m_isValid)
 				{
 					//normalIndexBuffer[indexCount] = m_attrib.m_normalChannel[ndInt32(ptr->m_userData)];
@@ -4020,13 +4044,47 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 		}
 	}
 
-	ndAssert(indexCount == m_points.m_vertex.GetCount());
+	ndAssert(indexCount == m_points.m_vertex____.GetCount());
 
 	ndStack<ndInt32> tempIndex(indexCount);
-	ndVertexListToIndexList(format.m_vertex.m_data, format.m_vertex.m_strideInBytes, 3, indexCount, &tempIndex[0]);
-	for (ndInt32 i = 0; i < indexCount; i++)
+	if (m_points.m_skinWeights.m_isValid)
 	{
-		format.m_vertex.m_indexList[i] = tempIndex[format.m_vertex.m_indexList[i]];
+		struct ndVertexPositWeight
+		{
+			ndFloat64 m_posit[3];
+			ndVertexWeight m_weights;
+		};
+		ndArray<ndVertexPositWeight> points;
+		for (ndInt32 i = 0; i < indexCount; i++)
+		{
+			ndVertexPositWeight data;
+			data.m_posit[0] = format.m_vertex.m_data[i * 3 + 0];
+			data.m_posit[1] = format.m_vertex.m_data[i * 3 + 1];
+			data.m_posit[2] = format.m_vertex.m_data[i * 3 + 2];
+			data.m_weights = format.m_vertexWeight.m_data[i];
+			points.PushBack(data);
+		}
+		ndInt32 count = ndVertexListToIndexList(&points[0].m_posit[0], sizeof(ndVertexPositWeight), 3, indexCount, &tempIndex[0]);
+		for (ndInt32 i = 0; i < count; i++)
+		{
+			format.m_vertex.m_data[i * 3 + 0] = points[i].m_posit[0];
+			format.m_vertex.m_data[i * 3 + 1] = points[i].m_posit[1];
+			format.m_vertex.m_data[i * 3 + 2] = points[i].m_posit[2];
+			format.m_vertexWeight.m_data[i] = points[i].m_weights;
+		}
+		for (ndInt32 i = 0; i < indexCount; i++)
+		{
+			format.m_vertex.m_indexList[i] = tempIndex[format.m_vertex.m_indexList[i]];
+			format.m_vertexWeight.m_indexList[i] = tempIndex[format.m_vertex.m_indexList[i]];
+		}
+	}
+	else
+	{
+		ndVertexListToIndexList(format.m_vertex.m_data, format.m_vertex.m_strideInBytes, 3, indexCount, &tempIndex[0]);
+		for (ndInt32 i = 0; i < indexCount; i++)
+		{
+			format.m_vertex.m_indexList[i] = tempIndex[format.m_vertex.m_indexList[i]];
+		}
 	}
 	
 	if (format.m_normal.m_data)
@@ -4069,8 +4127,7 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 		}
 	}
 
-	return m_points.m_vertex.GetCount();
-#endif
+	return m_points.m_vertex____.GetCount();
 }
 
 ndIndexArray* ndMeshEffect::MaterialGeometryBegin()

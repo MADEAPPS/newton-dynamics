@@ -51,20 +51,12 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	pool[0] = root;
 	parentMatrix[0] = ndGetIdentityMatrix();
 	ndMatrix shapeBindMatrix(m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix());
-
-	//ndTree<ndInt32, ndString> boneClusterRemapIndex;
-	//const ndMeshEffect::ndClusterMap& clusterMap = meshNode->GetCluster();
 	
 	ndTree<ndInt32, ndInt32> boneHashIdMap;
 	while (stack) 
 	{
 		stack--;
 		ndDemoEntity* const entity = pool[stack];
-	//	ndMeshEffect::ndClusterMap::ndNode* const clusterNode = clusterMap.Find(entity->GetName());
-	//	if (clusterNode) 
-	//	{
-	//		boneClusterRemapIndex.Insert(entityArray.GetCount(), entity->GetName());
-	//	}
 		ndInt32 hash = ndInt32(ndCRC64(entity->GetName().GetStr()) & 0xffffffff);
 		boneHashIdMap.Insert(entityArray.GetCount(), hash);
 	
@@ -87,64 +79,6 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	{
 		m_bindingMatrixArray[i] = bindMatrixArray[i];
 	}
-	
-	//ndArray<ndVector> weight;
-	//ndArray<ndWeightBoneIndex> skinBone;
-	//weight.SetCount(meshNode->GetVertexCount());
-	//skinBone.SetCount(meshNode->GetVertexCount());
-	//
-	//ndMemSet(&weight[0], ndVector::m_zero, meshNode->GetVertexCount());
-	//ndMemSet(&skinBone[0], ndWeightBoneIndex(), meshNode->GetVertexCount());
-	//
-	//ndInt32 vCount = 0;
-	//ndMeshEffect::ndClusterMap::Iterator iter(clusterMap);
-	//for (iter.Begin(); iter; iter++) 
-	//{
-	//	const ndMeshEffect::ndVertexCluster* const cluster = &iter.GetNode()->GetInfo();
-	//	ndInt32 boneIndex = boneClusterRemapIndex.Find(iter.GetKey())->GetInfo();
-	//	for (ndInt32 i = 0; i < cluster->m_vertexIndex.GetCount(); ++i) 
-	//	{
-	//		ndInt32 vertexIndex = cluster->m_vertexIndex[i];
-	//		vCount = ndMax(vertexIndex + 1, vCount);
-	//		ndFloat32 vertexWeight = cluster->m_vertexWeigh[i];
-	//		if (vertexWeight >= weight[vertexIndex][3]) 
-	//		{
-	//			weight[vertexIndex][3] = vertexWeight;
-	//			skinBone[vertexIndex].m_boneIndex[3] = boneIndex;
-	//		
-	//			for (ndInt32 j = 2; j >= 0; --j)
-	//			{
-	//				if (weight[vertexIndex][j] < weight[vertexIndex][j + 1]) 
-	//				{
-	//					ndSwap(weight[vertexIndex][j], weight[vertexIndex][j + 1]);
-	//					ndSwap(skinBone[vertexIndex].m_boneIndex[j], skinBone[vertexIndex].m_boneIndex[j + 1]);
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-	//
-	//ndInt32 weightcount = 0;
-	//for (ndInt32 i = 0; i < weight.GetCount(); ++i)
-	//{
-	//	ndVector w(weight[i]);
-	//	ndFloat32 invMag = w.AddHorizontal().GetScalar();
-	//	ndAssert(invMag > 0.0f);
-	//	weight[i] = w.Scale(ndFloat32 (1.0f) / invMag);
-	//
-	//	ndAssert(skinBone[i].m_boneIndex[0] != -1);
-	//	for (ndInt32 j = 0; j < 4; ++j) 
-	//	{
-	//		if (skinBone[i].m_boneIndex[j] != -1) 
-	//		{
-	//			weightcount = ndMax(weightcount, j + 1);
-	//		}
-	//		else 
-	//		{
-	//			skinBone[i].m_boneIndex[j] = 0;
-	//		}
-	//	}
-	//}
 	
 	// extract the materials index array for mesh
 	ndIndexArray* const geometryHandle = meshNode->MaterialGeometryBegin();
@@ -192,12 +126,9 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 		points[i].m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
 		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
 	
-		//ndInt32 k = vertexIndex[i];
-		for (ndInt32 j = 0; j < 4; ++j)
+		ndAssert(ND_VERTEX_WEIGHT_SIZE == 4);
+		for (ndInt32 j = 0; j < ND_VERTEX_WEIGHT_SIZE; ++j)
 		{
-			//points[i].m_weighs[j] = GLfloat(weight[k][j]);
-			//points[i].m_boneIndex[j] = GLfloat(skinBone[k].m_boneIndex[j]);
-
 			ndInt32 boneIndex = 0;
 			ndInt32 hashId = tmp[i].m_weights.m_boneId[j];
 			if (hashId != -1)

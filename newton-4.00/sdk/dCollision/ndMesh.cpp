@@ -215,6 +215,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 	FILE* const file = fopen(fullPathName, "wb");
 	if (file)
 	{
+		fprintf(file, "# Newton Dynamics Mesh file format.\n\n");
 		ndTree<ndInt32, const ndMeshEffect*> meshEffects;
 		for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
 		{
@@ -341,6 +342,12 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				fprintf(file, "\t\t}\n");
 			};
 
+			//ndTree<ndMesh*, ndInt32> nodeMap;
+			//for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
+			//{
+			//	nodeMap.Insert(node, ndInt32(ndCRC64(node->m_name.GetStr()) & 0xffffffff));
+			//}
+
 			fprintf(file, "geometries: %d\n", meshEffects.GetCount());
 			fprintf(file, "{\n");
 
@@ -409,40 +416,65 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 
 					fprintf(file, "\t\t}\n");
 				}
-				
-				ndAssert(0);
-				//const ndMeshEffect::ndClusterMap& clusters = effectMesh->GetCluster();
-				//if (clusters.GetCount())
-				//{
-				//	ndMeshEffect::ndClusterMap::Iterator clusterIter(clusters);
-				//	for (clusterIter.Begin(); clusterIter; clusterIter++)
-				//	{
-				//		fprintf(file, "\t\tskinCluster: %s\n", clusterIter.GetKey().GetStr());
-				//		fprintf(file, "\t\t{\n");
-				//	
-				//		ndMeshEffect::ndVertexCluster& cluster = clusterIter.GetNode()->GetInfo();
-				//	
-				//		fprintf(file, "\t\t\tindexCount: %d\n", cluster.m_vertexIndex.GetCount());
-				//	
-				//		fprintf(file, "\t\t\tvertexIndex: ");
-				//		for (ndInt32 i = 0; i < cluster.m_vertexIndex.GetCount(); ++i)
-				//		{
-				//			//ndInt32 remapIndex = cluster.m_vertexIndex[i];
-				//			ndInt32 remapIndex = format.m_vertex.m_indexList[cluster.m_vertexIndex[i]];
-				//			fprintf(file, "%d ", remapIndex);
-				//		}
-				//		fprintf(file, "\t\t\t\n");
-				//	
-				//		fprintf(file, "\t\t\tvertexWeight: ");
-				//		for (ndInt32 i = 0; i < cluster.m_vertexWeigh.GetCount(); ++i)
-				//		{
-				//			fprintf(file, "%g ", cluster.m_vertexWeigh[i]);
-				//		}
-				//		fprintf(file, "\t\t\t\n");
-				//	
-				//		fprintf(file, "\t\t}\n");
-				//	}
-				//}
+
+				if (format.m_vertexWeight.m_data)
+				{
+					ndInt32 weightsCount = 0;
+					for (ndInt32 i = 0; i < vertexCount; ++i)
+					{
+						weightsCount = ndMax(weightsCount, format.m_vertexWeight.m_indexList[i] + 1);
+					}
+
+					for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
+					{
+						ndInt32 count = 0;
+						ndInt32 hash = ndInt32(ndCRC64(node->m_name.GetStr()) & 0xffffffff);
+						ndAssert(hash);
+						for (ndInt32 j = 0; j < weightsCount; ++j)
+						{
+							for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
+							{
+								count += (format.m_vertexWeight.m_data[j].m_boneId[k] == hash) ? 1 : 0;
+							}
+						}
+						if (count)
+						{
+							fprintf(file, "\t\tskinCluster: %s\n", node->m_name.GetStr());
+							fprintf(file, "\t\t{\n");
+							
+							fprintf(file, "\t\t\tindexCount: %d\n", count);
+							
+							fprintf(file, "\t\t\tvertexIndex: ");
+							for (ndInt32 j = 0; j < weightsCount; ++j)
+							{
+								for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
+								{
+									if (format.m_vertexWeight.m_data[j].m_boneId[k] == hash)
+									{
+										fprintf(file, "%d ", j);
+									}
+								}
+							}
+							fprintf(file, "\t\t\t\n");
+
+							fprintf(file, "\t\t\tvertexWeight: ");
+							for (ndInt32 j = 0; j < weightsCount; ++j)
+							{
+								for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
+								{
+									if (format.m_vertexWeight.m_data[j].m_boneId[k] == hash)
+									{
+										fprintf(file, "%g ", format.m_vertexWeight.m_data[j].m_weight[k]);
+									}
+								}
+							}
+							fprintf(file, "\t\t\t\n");
+							
+							fprintf(file, "\t\t}\n");
+
+						}
+					}
+				}
 				
 				fprintf(file, "\t}\n");
 			}
