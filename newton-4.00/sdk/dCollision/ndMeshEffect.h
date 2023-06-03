@@ -453,19 +453,19 @@ class ndMeshEffect: public ndPolyhedra
 		ndData<ndVertexWeight> m_vertexWeight;
 	};
 
-	class ndVertexCluster
-	{
-		public:
-		ndVertexCluster()
-		{
-		}
-		ndArray<ndInt32> m_vertexIndex;
-		ndArray<ndReal> m_vertexWeigh;
-	};
-
-	class ndClusterMap: public ndTree<ndVertexCluster, const ndString>
-	{
-	};
+	//class ndVertexCluster
+	//{
+	//	public:
+	//	ndVertexCluster()
+	//	{
+	//	}
+	//	ndArray<ndInt32> m_vertexIndex;
+	//	ndArray<ndReal> m_vertexWeigh;
+	//};
+	//
+	//class ndClusterMap: public ndTree<ndVertexCluster, const ndString>
+	//{
+	//};
 	
 	D_COLLISION_API ndMeshEffect();
 	D_COLLISION_API ndMeshEffect(const ndMeshEffect& source);
@@ -490,10 +490,10 @@ class ndMeshEffect: public ndPolyhedra
 	ndInt32 GetFaceMaterial(ndEdge* const faceEdge) const;
 	ndInt32 GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<ndUnsigned8>& buffer) const;
 
-	D_COLLISION_API const ndClusterMap& GetCluster() const;
-	D_COLLISION_API void DeleteCluster(const char* const name);
-	D_COLLISION_API ndVertexCluster* CreateCluster(const char* const name);
-	D_COLLISION_API ndVertexCluster* FindCluster(const char* const name) const;
+	//D_COLLISION_API const ndClusterMap& GetCluster() const;
+	//D_COLLISION_API void DeleteCluster(const char* const name);
+	//D_COLLISION_API ndVertexCluster* CreateCluster(const char* const name);
+	//D_COLLISION_API ndVertexCluster* FindCluster(const char* const name) const;
 
 	D_COLLISION_API ndFloat64 CalculateVolume() const;
 	D_COLLISION_API ndMatrix CalculateOOBB(ndBigVector& size) const;
@@ -576,7 +576,7 @@ class ndMeshEffect: public ndPolyhedra
 	ndString m_name;
 	ndPointFormat m_points;
 	ndAttibutFormat m_attrib;
-	ndClusterMap m_clusters;
+	//ndClusterMap m_clusters;
 	ndArray<ndMaterial> m_materials;
 	ndInt32 m_vertexBaseCount;
 	ndInt32 m_constructionIndex;

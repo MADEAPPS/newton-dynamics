@@ -590,25 +590,26 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 			clusterBoneMap.Insert(cluster, link);
 		}
 	
-		for (ndInt32 i = 0; i < clusterCount; ++i)
-		{
-			const ofbx::Cluster* const fbxCluster = skin->getCluster(i);
-			const ofbx::Object* const fbxBone = fbxCluster->getLink();
-			if (nodeMap.Find(fbxBone))
-			{
-				ndMeshEffect::ndVertexCluster* const cluster = meshEffect->CreateCluster(fbxBone->name);
-	
-				ndAssert(fbxCluster->getIndicesCount() == fbxCluster->getWeightsCount());
-				ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
-				const ndInt32* const indices = fbxCluster->getIndices();
-				const ndFloat64* const weights = fbxCluster->getWeights();
-				for (ndInt32 j = 0; j < clusterIndexCount; ++j)
-				{
-					cluster->m_vertexIndex.PushBack(indices[j]);
-					cluster->m_vertexWeigh.PushBack(ndReal(weights[j]));
-				}
-			}
-		}
+		ndAssert(0);
+		//for (ndInt32 i = 0; i < clusterCount; ++i)
+		//{
+		//	const ofbx::Cluster* const fbxCluster = skin->getCluster(i);
+		//	const ofbx::Object* const fbxBone = fbxCluster->getLink();
+		//	if (nodeMap.Find(fbxBone))
+		//	{
+		//		ndMeshEffect::ndVertexCluster* const cluster = meshEffect->CreateCluster(fbxBone->name);
+		//
+		//		ndAssert(fbxCluster->getIndicesCount() == fbxCluster->getWeightsCount());
+		//		ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
+		//		const ndInt32* const indices = fbxCluster->getIndices();
+		//		const ndFloat64* const weights = fbxCluster->getWeights();
+		//		for (ndInt32 j = 0; j < clusterIndexCount; ++j)
+		//		{
+		//			cluster->m_vertexIndex.PushBack(indices[j]);
+		//			cluster->m_vertexWeigh.PushBack(ndReal(weights[j]));
+		//		}
+		//	}
+		//}
 	}
 	
 	meshEffect->BuildFromIndexList(&format);

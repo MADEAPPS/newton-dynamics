@@ -410,38 +410,39 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 					fprintf(file, "\t\t}\n");
 				}
 				
-				const ndMeshEffect::ndClusterMap& clusters = effectMesh->GetCluster();
-				if (clusters.GetCount())
-				{
-					ndMeshEffect::ndClusterMap::Iterator clusterIter(clusters);
-					for (clusterIter.Begin(); clusterIter; clusterIter++)
-					{
-						fprintf(file, "\t\tskinCluster: %s\n", clusterIter.GetKey().GetStr());
-						fprintf(file, "\t\t{\n");
-					
-						ndMeshEffect::ndVertexCluster& cluster = clusterIter.GetNode()->GetInfo();
-					
-						fprintf(file, "\t\t\tindexCount: %d\n", cluster.m_vertexIndex.GetCount());
-					
-						fprintf(file, "\t\t\tvertexIndex: ");
-						for (ndInt32 i = 0; i < cluster.m_vertexIndex.GetCount(); ++i)
-						{
-							//ndInt32 remapIndex = cluster.m_vertexIndex[i];
-							ndInt32 remapIndex = format.m_vertex.m_indexList[cluster.m_vertexIndex[i]];
-							fprintf(file, "%d ", remapIndex);
-						}
-						fprintf(file, "\t\t\t\n");
-					
-						fprintf(file, "\t\t\tvertexWeight: ");
-						for (ndInt32 i = 0; i < cluster.m_vertexWeigh.GetCount(); ++i)
-						{
-							fprintf(file, "%g ", cluster.m_vertexWeigh[i]);
-						}
-						fprintf(file, "\t\t\t\n");
-					
-						fprintf(file, "\t\t}\n");
-					}
-				}
+				ndAssert(0);
+				//const ndMeshEffect::ndClusterMap& clusters = effectMesh->GetCluster();
+				//if (clusters.GetCount())
+				//{
+				//	ndMeshEffect::ndClusterMap::Iterator clusterIter(clusters);
+				//	for (clusterIter.Begin(); clusterIter; clusterIter++)
+				//	{
+				//		fprintf(file, "\t\tskinCluster: %s\n", clusterIter.GetKey().GetStr());
+				//		fprintf(file, "\t\t{\n");
+				//	
+				//		ndMeshEffect::ndVertexCluster& cluster = clusterIter.GetNode()->GetInfo();
+				//	
+				//		fprintf(file, "\t\t\tindexCount: %d\n", cluster.m_vertexIndex.GetCount());
+				//	
+				//		fprintf(file, "\t\t\tvertexIndex: ");
+				//		for (ndInt32 i = 0; i < cluster.m_vertexIndex.GetCount(); ++i)
+				//		{
+				//			//ndInt32 remapIndex = cluster.m_vertexIndex[i];
+				//			ndInt32 remapIndex = format.m_vertex.m_indexList[cluster.m_vertexIndex[i]];
+				//			fprintf(file, "%d ", remapIndex);
+				//		}
+				//		fprintf(file, "\t\t\t\n");
+				//	
+				//		fprintf(file, "\t\t\tvertexWeight: ");
+				//		for (ndInt32 i = 0; i < cluster.m_vertexWeigh.GetCount(); ++i)
+				//		{
+				//			fprintf(file, "%g ", cluster.m_vertexWeigh[i]);
+				//		}
+				//		fprintf(file, "\t\t\t\n");
+				//	
+				//		fprintf(file, "\t\t}\n");
+				//	}
+				//}
 				
 				fprintf(file, "\t}\n");
 			}
@@ -786,30 +787,31 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 					}
 					else if (!strcmp(token, "skinCluster:"))
 					{
-						char boneName[128];
-						fscanf(file, "%s", boneName);
-						ndInt32 indexCount;
-						ReadToken();
-						ReadToken();
-						fscanf(file, "%d", &indexCount);
-						
-						ndMeshEffect::ndVertexCluster* const cluster = effectMesh->CreateCluster(boneName);
-						ReadToken();
-						for (ndInt32 i = 0; i < indexCount; ++i)
-						{
-							ndInt32 index;
-							fscanf(file, "%d", &index);
-							cluster->m_vertexIndex.PushBack(index);
-						}
-						
-						ReadToken();
-						for (ndInt32 i = 0; i < indexCount; ++i)
-						{
-							ndReal weight;
-							fscanf(file, "%f", &weight);
-							cluster->m_vertexWeigh.PushBack(ndReal(weight));
-						}
-						ReadToken();
+						ndAssert(0);
+						//char boneName[128];
+						//fscanf(file, "%s", boneName);
+						//ndInt32 indexCount;
+						//ReadToken();
+						//ReadToken();
+						//fscanf(file, "%d", &indexCount);
+						//
+						//ndMeshEffect::ndVertexCluster* const cluster = effectMesh->CreateCluster(boneName);
+						//ReadToken();
+						//for (ndInt32 i = 0; i < indexCount; ++i)
+						//{
+						//	ndInt32 index;
+						//	fscanf(file, "%d", &index);
+						//	cluster->m_vertexIndex.PushBack(index);
+						//}
+						//
+						//ReadToken();
+						//for (ndInt32 i = 0; i < indexCount; ++i)
+						//{
+						//	ndReal weight;
+						//	fscanf(file, "%f", &weight);
+						//	cluster->m_vertexWeigh.PushBack(ndReal(weight));
+						//}
+						//ReadToken();
 					}
 					ReadToken();
 				}

@@ -2324,7 +2324,7 @@ ndMeshEffect::ndMeshEffect()
 	,m_name()
 	,m_points()
 	,m_attrib()
-	,m_clusters()
+	//,m_clusters()
 	,m_materials()
 	,m_vertexBaseCount(-1)
 	,m_constructionIndex(0)
@@ -2336,16 +2336,16 @@ ndMeshEffect::ndMeshEffect(ndPolyhedra& mesh, const ndMeshEffect& source)
 	:ndPolyhedra(mesh)
 	,m_points(source.m_points)
 	,m_attrib(source.m_attrib)
-	,m_clusters()
+	//,m_clusters()
 	,m_materials(source.m_materials)
 	,m_vertexBaseCount(-1)
 	,m_constructionIndex(0)
 {
-	if (source.m_clusters.GetCount())
-	{
-		// remember to copy the clusters
-		ndAssert(0);
-	}
+	//if (source.m_clusters.GetCount())
+	//{
+	//	// remember to copy the clusters
+	//	ndAssert(0);
+	//}
 	Init();
 }
 
@@ -2353,16 +2353,16 @@ ndMeshEffect::ndMeshEffect(const ndMeshEffect& source)
 	:ndPolyhedra(source)
 	,m_points(source.m_points)
 	,m_attrib(source.m_attrib)
-	,m_clusters()
+	//,m_clusters()
 	,m_materials(source.m_materials)
 	,m_vertexBaseCount(-1)
 	,m_constructionIndex(0)
 {
-	if (source.m_clusters.GetCount())
-	{
-		// remember to copy the clusters
-		ndAssert(0);
-	}
+	//if (source.m_clusters.GetCount())
+	//{
+	//	// remember to copy the clusters
+	//	ndAssert(0);
+	//}
 	Init();
 }
 
@@ -4312,7 +4312,7 @@ ndMeshEffect::ndMeshEffect(const ndFloat64* const vertexCloud, ndInt32 count, nd
 	,m_name()
 	,m_points()
 	,m_attrib()
-	,m_clusters()
+	//,m_clusters()
 	,m_materials()
 	,m_vertexBaseCount(0)
 	,m_constructionIndex(0)
@@ -4353,7 +4353,7 @@ ndMeshEffect::ndMeshEffect(const ndShapeInstance& shapeInstance)
 	,m_name()
 	,m_points()
 	,m_attrib()
-	,m_clusters()
+	//,m_clusters()
 	,m_materials()
 	,m_vertexBaseCount(0)
 	,m_constructionIndex(0)
@@ -4844,36 +4844,36 @@ void dgMeshEffect::GetWeightIndexChannel(dgInt32 strideInByte, dgInt32* const bu
 }
 */
 
-const ndMeshEffect::ndClusterMap& ndMeshEffect::GetCluster() const
-{
-	return m_clusters;
-}
-
-ndMeshEffect::ndVertexCluster* ndMeshEffect::FindCluster(const char* const name) const
-{
-	ndTree<ndVertexCluster, const ndString>::ndNode* const node = m_clusters.Find(name);
-	if (node)
-	{
-		return &node->GetInfo();
-	}
-	return nullptr;
-}
-
-void ndMeshEffect::DeleteCluster(const char* const name)
-{
-	ndTree<ndVertexCluster, const ndString>::ndNode* const node = m_clusters.Find(name);
-	if (node)
-	{
-		m_clusters.Remove(node);
-	}
-}
-
-ndMeshEffect::ndVertexCluster* ndMeshEffect::CreateCluster(const char* const name)
-{
-	ndTree<ndVertexCluster, const ndString>::ndNode* node = m_clusters.Find(name);
-	if (!node)
-	{
-		node = m_clusters.Insert(name);
-	}
-	return &node->GetInfo();
-}
+//const ndMeshEffect::ndClusterMap& ndMeshEffect::GetCluster() const
+//{
+//	return m_clusters;
+//}
+//
+//ndMeshEffect::ndVertexCluster* ndMeshEffect::FindCluster(const char* const name) const
+//{
+//	ndTree<ndVertexCluster, const ndString>::ndNode* const node = m_clusters.Find(name);
+//	if (node)
+//	{
+//		return &node->GetInfo();
+//	}
+//	return nullptr;
+//}
+//
+//void ndMeshEffect::DeleteCluster(const char* const name)
+//{
+//	ndTree<ndVertexCluster, const ndString>::ndNode* const node = m_clusters.Find(name);
+//	if (node)
+//	{
+//		m_clusters.Remove(node);
+//	}
+//}
+//
+//ndMeshEffect::ndVertexCluster* ndMeshEffect::CreateCluster(const char* const name)
+//{
+//	ndTree<ndVertexCluster, const ndString>::ndNode* node = m_clusters.Find(name);
+//	if (!node)
+//	{
+//		node = m_clusters.Insert(name);
+//	}
+//	return &node->GetInfo();
+//}

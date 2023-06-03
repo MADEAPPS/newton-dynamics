@@ -88,22 +88,6 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshE
 		ndSharedPtr<ndMeshEffect> meshEffect (effectNode->GetMesh());
 		if (*meshEffect)
 		{
-			//ndDemoMeshInterface* mesh = nullptr;
-			//if (!meshEffect->GetCluster().GetCount())
-			//{
-			//	mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
-			//}
-			//else
-			//{
-			//	mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
-			//}
-			//entity->SetMesh(ndSharedPtr<ndDemoMeshInterface>(mesh), effectNode->m_meshMatrix);
-			//
-			//if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
-			//{
-			//	mesh->m_isVisible = false;
-			//}
-
 			meshArray.PushBack(EntityMeshPair(entity, effectNode));
 		}
 
@@ -121,16 +105,17 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshE
 		ndMesh* const effectNode = meshArray[i].m_effectNode;
 		ndDemoMeshInterface* mesh = nullptr;
 
-		ndSharedPtr<ndMeshEffect> meshEffect (effectNode->GetMesh());
-		if (!meshEffect->GetCluster().GetCount())
-		{
-			mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
-		}
-		else
-		{
-			mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
-		}
-		entity->SetMesh(ndSharedPtr<ndDemoMeshInterface>(mesh), effectNode->m_meshMatrix);
+		ndAssert(0);
+		//ndSharedPtr<ndMeshEffect> meshEffect (effectNode->GetMesh());
+		//if (!meshEffect->GetCluster().GetCount())
+		//{
+		//	mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
+		//}
+		//else
+		//{
+		//	mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
+		//}
+		//entity->SetMesh(ndSharedPtr<ndDemoMeshInterface>(mesh), effectNode->m_meshMatrix);
 		
 		if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
 		{

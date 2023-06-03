@@ -1806,7 +1806,7 @@ void ndMeshEffect::BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const nd
 			ndEdge* ptr = edge;
 			do 
 			{
-				ndBigVector p(scale * buffer[ptr->m_incidentVertex] - ndFloat32(0.5f));
+				ndVector p(scale * buffer[ptr->m_incidentVertex] - ndFloat32(0.5f));
 				ndUV uv(p[u], p[v]);
 				m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)] = uv;
 				m_attrib.m_materialChannel[ndInt32(ptr->m_userData)] = materialArray[index];
@@ -1909,7 +1909,7 @@ void ndMeshEffect::SphericalMapping(ndInt32 material, const ndMatrix& textureMat
 	for (iter.Begin(); iter; iter++) 
 	{
 		ndEdge* const edge = &(*iter);
-		ndUV uv(sphere[edge->m_incidentVertex].m_x, sphere[edge->m_incidentVertex].m_y);
+		ndUV uv(ndFloat32(sphere[edge->m_incidentVertex].m_x), ndFloat32(sphere[edge->m_incidentVertex].m_y));
 		m_attrib.m_uv0Channel[ndInt32(edge->m_userData)] = uv;
 		m_attrib.m_materialChannel[ndInt32(edge->m_userData)] = material;
 	}
