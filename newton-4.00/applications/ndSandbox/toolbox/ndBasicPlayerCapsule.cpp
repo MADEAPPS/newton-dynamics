@@ -62,24 +62,23 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		m_entity->SetMatrix(m_localRotation * rot, matrix.TransformVector(m_meshOrigin));
 		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
 
-		//ndFloat32 timestep = word->GetScene()->GetTimestep();
-		//timestep *= 0.25f;
-		//static ndFloat32 xxxx = 0.0f;
-		////player->m_walkCycle->SetParam(xxxx);
-		//player->m_idleCycle->SetParam(xxxx);
-		//xxxx += 1.0e-2f;
-		//float xxxxxx = 1.0f;
-		//if (xxxx > xxxxxx)
-		//{
-		//	xxxx -= xxxxxx;
-		//}
-		//player->m_animBlendTree->Evaluate(player->m_output);
-		//for (ndInt32 i = 0; i < player->m_output.GetCount(); ++i)
-		//{
-		//	const ndAnimKeyframe& keyFrame = player->m_output[i];
-		//	ndDemoEntity* const entity = (ndDemoEntity*)keyFrame.m_userData;
-		//	entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
-		//}
+		ndFloat32 timestep = word->GetScene()->GetTimestep();
+		static ndFloat32 xxxx = 0.0f;
+		//player->m_walkCycle->SetParam(xxxx);
+		player->m_idleCycle->SetParam(xxxx);
+		xxxx += 1.0e-2f;
+		float xxxxxx = 1.0f;
+		if (xxxx > xxxxxx)
+		{
+			xxxx -= xxxxxx;
+		}
+		player->m_animBlendTree->Evaluate(player->m_output);
+		for (ndInt32 i = 0; i < player->m_output.GetCount(); ++i)
+		{
+			const ndAnimKeyframe& keyFrame = player->m_output[i];
+			ndDemoEntity* const entity = (ndDemoEntity*)keyFrame.m_userData;
+			entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
+		}
 	}
 
 	ndQuaternion m_localRotation;
