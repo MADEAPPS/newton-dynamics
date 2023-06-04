@@ -1662,7 +1662,7 @@ void ndMeshEffect::CalculateNormals(ndFloat64 angleInRadians)
 			ndEdge* edgePtr = edge;
 			do 
 			{
-				ndVector normal(FaceNormal(edgePtr, &m_points.m_vertex____[0].m_x, sizeof(ndBigVector)));
+				ndVector normal(FaceNormal(edgePtr, &m_points.m_vertex[0].m_x, sizeof(ndBigVector)));
 				ndAssert(normal.m_w == ndFloat32(0.0f));
 				normal = normal.Scale(ndFloat32(1.0f) / ndFloat32(sqrt(normal.DotProduct(normal).GetScalar()) + ndFloat32(1.0e-16f)));
 				faceNormal[edgeIndex] = normal;
@@ -1722,23 +1722,23 @@ void ndMeshEffect::CalculateNormals(ndFloat64 angleInRadians)
 ndBigVector ndMeshEffect::GetOrigin()const
 {
 	ndBigVector origin(ndFloat64(0.0f), ndFloat64(0.0f), ndFloat64(0.0f), ndFloat64(0.0f));
-	for (ndInt32 i = 0; i < m_points.m_vertex____.GetCount(); ++i) 
+	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); ++i) 
 	{
-		origin += m_points.m_vertex____[i];
+		origin += m_points.m_vertex[i];
 	}
-	return origin.Scale(ndFloat64(1.0f) / m_points.m_vertex____.GetCount());
+	return origin.Scale(ndFloat64(1.0f) / m_points.m_vertex.GetCount());
 }
 
 void ndMeshEffect::BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const ndMatrix& textureMatrix)
 {
 	ndBigVector origin(GetOrigin());
-	ndStack<ndBigVector> buffer(m_points.m_vertex____.GetCount());
+	ndStack<ndBigVector> buffer(m_points.m_vertex.GetCount());
 	ndBigVector pMin(ndFloat64(1.0e10f), ndFloat64(1.0e10f), ndFloat64(1.0e10f), ndFloat64(0.0f));
 	ndBigVector pMax(ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(0.0f));
 
-	for (ndInt32 i = 0; i < m_points.m_vertex____.GetCount(); ++i)
+	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); ++i)
 	{
-		buffer[i] = textureMatrix.RotateVector(m_points.m_vertex____[i] - origin);
+		buffer[i] = textureMatrix.RotateVector(m_points.m_vertex[i] - origin);
 		const ndBigVector& tmp = buffer[i];
 		pMin.m_x = ndMin(pMin.m_x, tmp.m_x);
 		pMax.m_x = ndMax(pMax.m_x, tmp.m_x);
@@ -1850,7 +1850,7 @@ void ndMeshEffect::UniformBoxMapping(ndInt32 material, const ndMatrix& textureMa
 			ndEdge* const edge = &(*iter);
 			if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) 
 			{
-				ndBigVector n(FaceNormal(edge, &m_points.m_vertex____[0].m_x, sizeof(ndBigVector)));
+				ndBigVector n(FaceNormal(edge, &m_points.m_vertex[0].m_x, sizeof(ndBigVector)));
 				ndVector normal(rotationMatrix.RotateVector(ndVector(n.Normalize())));
 				normal.m_x = ndAbs(normal.m_x);
 				normal.m_y = ndAbs(normal.m_y);
@@ -1861,7 +1861,7 @@ void ndMeshEffect::UniformBoxMapping(ndInt32 material, const ndMatrix& textureMa
 					do 
 					{
 						ptr->m_mark = mark;
-						ndVector point(rotationMatrix.RotateVector(m_points.m_vertex____[ptr->m_incidentVertex]));
+						ndVector point(rotationMatrix.RotateVector(m_points.m_vertex[ptr->m_incidentVertex]));
 						ndVector p(textureMatrix.TransformVector(point));
 						ndUV uv(p.m_x, p.m_y);
 						m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)] = uv;
@@ -1880,10 +1880,10 @@ void ndMeshEffect::UniformBoxMapping(ndInt32 material, const ndMatrix& textureMa
 void ndMeshEffect::SphericalMapping(ndInt32 material, const ndMatrix& textureMatrix)
 {
 	ndBigVector origin(GetOrigin());
-	ndStack<ndBigVector>sphere(m_points.m_vertex____.GetCount());
-	for (ndInt32 i = 0; i < m_points.m_vertex____.GetCount(); ++i)
+	ndStack<ndBigVector>sphere(m_points.m_vertex.GetCount());
+	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); ++i)
 	{
-		ndBigVector geoPoint(m_points.m_vertex____[i] - origin);
+		ndBigVector geoPoint(m_points.m_vertex[i] - origin);
 		ndAssert(geoPoint.m_w == ndFloat32(0.0f));
 		ndVector point(textureMatrix.RotateVector(geoPoint.Normalize()));
 		point.m_x = ndClamp(point.m_x, ndFloat32(-1.0f + 1.0e-6f), ndFloat32(1.0f - 1.0e-6f));

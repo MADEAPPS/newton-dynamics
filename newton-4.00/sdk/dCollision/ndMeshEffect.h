@@ -371,7 +371,7 @@ class ndMeshEffect: public ndPolyhedra
 		
 		public:
 		ndChannel<ndInt32, m_layer> m_layers;
-		ndChannel<ndBigVector, m_point> m_vertex____;
+		ndChannel<ndBigVector, m_point> m_vertex;
 		ndChannel<ndVertexWeight, m_weight> m_skinWeights;
 	};
 
@@ -675,14 +675,14 @@ void ndMeshEffect::ndChannel<T, type>::PushBack(const T& element)
 
 inline ndMeshEffect::ndPointFormat::ndPointFormat()
 	:m_layers()
-	,m_vertex____()
+	,m_vertex()
 	,m_skinWeights()
 {
 }
 
 inline ndMeshEffect::ndPointFormat::ndPointFormat(const ndPointFormat& source)
 	:m_layers(source.m_layers)
-	,m_vertex____(source.m_vertex____)
+	,m_vertex(source.m_vertex)
 	,m_skinWeights(source.m_skinWeights)
 {
 }
@@ -694,14 +694,14 @@ inline ndMeshEffect::ndPointFormat::~ndPointFormat()
 inline void ndMeshEffect::ndPointFormat::Clear()
 {
 	m_layers.Clear();
-	m_vertex____.Clear();
+	m_vertex.Clear();
 	m_skinWeights.Clear();
 }
 
 inline void ndMeshEffect::ndPointFormat::SetCount(ndInt32 count)
 {
-	m_vertex____.Resize(count);
-	m_vertex____.SetCount(count);
+	m_vertex.Resize(count);
+	m_vertex.SetCount(count);
 
 	if (m_layers.GetCount())
 	{
@@ -820,7 +820,7 @@ inline ndArray<ndMeshEffect::ndMaterial>& ndMeshEffect::GetMaterials()
 
 inline ndInt32 ndMeshEffect::GetVertexCount() const
 {
-	return m_points.m_vertex____.GetCount();
+	return m_points.m_vertex.GetCount();
 }
 
 inline ndInt32 ndMeshEffect::GetVertexStrideInByte() const
@@ -830,7 +830,7 @@ inline ndInt32 ndMeshEffect::GetVertexStrideInByte() const
 
 inline const ndFloat64* ndMeshEffect::GetVertexPool() const
 {
-	return &m_points.m_vertex____[0].m_x;
+	return &m_points.m_vertex[0].m_x;
 }
 
 inline ndInt32 ndMeshEffect::GetFaceMaterial(ndEdge* const faceEdge) const

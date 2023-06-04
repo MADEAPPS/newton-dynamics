@@ -1113,10 +1113,6 @@ return 0;
 				m_attrib.m_pointChannel.PushBack(edge->m_incidentVertex);
 				if (m_attrib.m_normalChannel.GetCount())
 				{
-					//ndAttibutFormat::ndNormal n;
-					//n.m_x = ndFloat32(normal.m_x);
-					//n.m_y = ndFloat32(normal.m_y);
-					//n.m_z = ndFloat32(normal.m_z);
 					m_attrib.m_normalChannel.PushBack(ndNormal(normal.m_x, normal.m_y, normal.m_z));
 				}
 
