@@ -2750,7 +2750,6 @@ bool ndMeshEffect::EndFace()
 		ndAssert(!collisionFound.GetFirst() || Sanity());
 		for (ndList<ndNode*>::ndNode* node = collisionFound.GetFirst(); node; node = node->GetNext())
 		{
-			ndAssert(0);
 			state = true;
 			ndEdge* const edge = &node->GetInfo()->GetInfo();
 

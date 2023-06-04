@@ -342,12 +342,6 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 				fprintf(file, "\t\t}\n");
 			};
 
-			//ndTree<ndMesh*, ndInt32> nodeMap;
-			//for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
-			//{
-			//	nodeMap.Insert(node, ndInt32(ndCRC64(node->m_name.GetStr()) & 0xffffffff));
-			//}
-
 			fprintf(file, "geometries: %d\n", meshEffects.GetCount());
 			fprintf(file, "{\n");
 
@@ -627,6 +621,7 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 			fscanf(file, "%s", token);
 		};
 
+		fgets(token, sizeof(token) - 1, file);
 		ReadToken();
 		ndTree<ndSharedPtr<ndMeshEffect>, ndInt32> meshEffects;
 		if (!strcmp(token, "geometries:"))
@@ -647,6 +642,7 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 				ndArray<ndBigVector> positions;
 				ndArray<ndMeshEffect::ndUV> uvs;
 				ndArray<ndMeshEffect::ndNormal> normals;
+				ndArray<ndMeshEffect::ndVertexWeight> vertexWeights;
 
 				ndArray<ndInt32> uvIndex;
 				ndArray<ndInt32> faceArray;
@@ -654,14 +650,15 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 				ndArray<ndInt32> normalsIndex;
 				ndArray<ndInt32> materialArray;
 				ndArray<ndInt32> positionsIndex;
+				
 				ndMeshEffect::ndMeshVertexFormat format;
 
 				ReadToken();
+				ndInt32 vertexCount = 0;
 				while (strcmp(token, "}"))
 				{
 					if (!strcmp(token, "vertex:"))
 					{
-						ndInt32 vertexCount;
 						ReadToken();
 						ReadToken();
 						fscanf(file, "%d", &vertexCount);
@@ -695,13 +692,13 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 					}
 					else if (!strcmp(token, "normal:"))
 					{
-						ndInt32 vertexCount;
+						ndInt32 vCount;
 						ReadToken();
 						ReadToken();
-						fscanf(file, "%d", &vertexCount);
+						fscanf(file, "%d", &vCount);
 
 						ReadToken();
-						for (ndInt32 i = 0; i < vertexCount; ++i)
+						for (ndInt32 i = 0; i < vCount; ++i)
 						{
 							ndReal x;
 							ndReal y;
@@ -730,13 +727,13 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 					}
 					else if (!strcmp(token, "uv:"))
 					{
-						ndInt32 vertexCount;
+						ndInt32 vCount;
 						ReadToken();
 						ReadToken();
-						fscanf(file, "%d", &vertexCount);
+						fscanf(file, "%d", &vCount);
 
 						ReadToken();
-						for (ndInt32 i = 0; i < vertexCount; ++i)
+						for (ndInt32 i = 0; i < vCount; ++i)
 						{
 							ndReal x;
 							ndReal y;
@@ -802,15 +799,15 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 						ReadToken();
 						for (ndInt32 i = 0; i < faceCount; ++i)
 						{
-							ndInt32 vertexCount;
-							fscanf(file, "%d:", &vertexCount);
-							for (ndInt32 j = 0; j < vertexCount; ++j)
+							ndInt32 vCount;
+							fscanf(file, "%d:", &vCount);
+							for (ndInt32 j = 0; j < vCount; ++j)
 							{
 								ndInt32 index;
 								fscanf(file, "%d ", &index);
 								indexArray.PushBack(index);
 							}
-							faceArray.PushBack(vertexCount);
+							faceArray.PushBack(vCount);
 							materialArray.PushBack(materialIndex);
 						}
 						ReadToken();
@@ -819,35 +816,56 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 					}
 					else if (!strcmp(token, "skinCluster:"))
 					{
-						ndAssert(0);
-						//char boneName[128];
-						//fscanf(file, "%s", boneName);
-						//ndInt32 indexCount;
-						//ReadToken();
-						//ReadToken();
-						//fscanf(file, "%d", &indexCount);
-						//
-						//ndMeshEffect::ndVertexCluster* const cluster = effectMesh->CreateCluster(boneName);
-						//ReadToken();
-						//for (ndInt32 i = 0; i < indexCount; ++i)
-						//{
-						//	ndInt32 index;
-						//	fscanf(file, "%d", &index);
-						//	cluster->m_vertexIndex.PushBack(index);
-						//}
-						//
-						//ReadToken();
-						//for (ndInt32 i = 0; i < indexCount; ++i)
-						//{
-						//	ndReal weight;
-						//	fscanf(file, "%f", &weight);
-						//	cluster->m_vertexWeigh.PushBack(ndReal(weight));
-						//}
-						//ReadToken();
+						if (!vertexWeights.GetCount())
+						{
+							vertexWeights.SetCount(vertexCount);
+							for (ndInt32 i = 0; i < vertexWeights.GetCount(); ++i)
+							{
+								vertexWeights[i].Clear();
+							}
+							format.m_vertexWeight.m_data = &vertexWeights[0];
+							format.m_vertexWeight.m_indexList = &positionsIndex[0];
+							format.m_vertexWeight.m_strideInBytes = sizeof(ndMeshEffect::ndVertexWeight);
+						}
+
+						char boneName[128];
+						fscanf(file, "%s", boneName);
+						ndInt32 indexCount;
+						ReadToken();
+						ReadToken();
+						fscanf(file, "%d", &indexCount);
+						
+						ndInt32 hashId = ndInt32(ndCRC64(boneName) & 0xffffffff);
+						ReadToken();
+
+						ndArray<ndInt32> boneIndex;
+						for (ndInt32 i = 0; i < indexCount; ++i)
+						{
+							ndInt32 index;
+							fscanf(file, "%d", &index);
+							boneIndex.PushBack(index);
+						}
+						
+						ReadToken();
+						ndArray<ndReal> vertexWeight;
+						for (ndInt32 i = 0; i < indexCount; ++i)
+						{
+							ndReal weight;
+							fscanf(file, "%f", &weight);
+							vertexWeight.PushBack(weight);
+						}
+						ReadToken();
+
+						for (ndInt32 i = 0; i < indexCount; ++i)
+						{
+							ndInt32 index = boneIndex[i];
+							vertexWeights[index].SetWeight(hashId, ndReal(vertexWeight[i]));
+						}
 					}
 					ReadToken();
 				}
 				ReadToken();
+
 				format.m_faceCount = faceArray.GetCount();
 				format.m_faceIndexCount = &faceArray[0];
 				format.m_faceMaterial = &materialArray[0];
