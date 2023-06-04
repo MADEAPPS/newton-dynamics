@@ -626,14 +626,14 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 		ndTree<ndSharedPtr<ndMeshEffect>, ndInt32> meshEffects;
 		if (!strcmp(token, "geometries:"))
 		{
-			ndInt32 geomntryCount;
-			fscanf(file, "%d", &geomntryCount);
+			ndInt32 geometryCount;
+			fscanf(file, "%d", &geometryCount);
+			ReadToken();
 			ReadToken();
 
-			for (ndInt32 k = 0; k < geomntryCount; k++)
+			for (ndInt32 k = 0; k < geometryCount; k++)
 			{
 				ndInt32 meshId;
-				ReadToken();
 				fscanf(file, "%d", &meshId);
 				ndSharedPtr<ndMeshEffect> effectMesh(new ndMeshEffect());
 				meshEffects.Insert(effectMesh, meshId);

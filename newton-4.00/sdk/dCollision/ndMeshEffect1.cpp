@@ -3897,7 +3897,8 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 	if (m_attrib.m_materialChannel.m_isValid)
 	{
 		faceMaterialOffset = totalSize;
-		totalSize += m_attrib.m_materialChannel.GetCount() * sizeof(ndInt32);
+		//totalSize += m_attrib.m_materialChannel.GetCount() * sizeof(ndInt32);
+		totalSize += faceCount * sizeof(ndInt32);
 	}
 
 	ndInt32 normalIndexOffset = 0;
@@ -3956,14 +3957,6 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 		}
 	}
 
-	if (m_attrib.m_materialChannel.m_isValid)
-	{
-		for (ndInt32 i = 0; i < m_attrib.m_materialChannel.GetCount(); ++i)
-		{
-			format.m_faceMaterial[i] = m_attrib.m_materialChannel[i];
-		}
-	}
-
 	if (m_attrib.m_normalChannel.m_isValid)
 	{
 		format.m_normal.m_strideInBytes = normalStrideInBytes;
@@ -4004,6 +3997,7 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 				format.m_vertex.m_indexList[indexCount] = ptr->m_incidentVertex;
 				format.m_vertexWeight.m_indexList[indexCount] = ptr->m_incidentVertex;
 
+				ndInt32 attribIndex = ndInt32(ptr->m_userData);
 				if (m_attrib.m_normalChannel.m_isValid)
 				{
 					//normalIndexBuffer[indexCount] = m_attrib.m_normalChannel[ndInt32(ptr->m_userData)];
@@ -4038,6 +4032,11 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 				ptr = ptr->m_next;
 			} while (ptr != edge);
 	
+			if (m_attrib.m_materialChannel.m_isValid)
+			{
+				format.m_faceMaterial[faceCount] = m_attrib.m_materialChannel[ndInt32(edge->m_userData)];
+			}
+
 			faceIndexBuffer[faceCount] = count;
 			faceCount++;
 		}
@@ -4045,86 +4044,86 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 
 	ndAssert(indexCount == m_points.m_vertex____.GetCount());
 
-	ndStack<ndInt32> tempIndex(indexCount);
-	if (m_points.m_skinWeights.m_isValid)
-	{
-		struct ndVertexPositWeight
-		{
-			ndFloat64 m_posit[3];
-			ndVertexWeight m_weights;
-		};
-		ndArray<ndVertexPositWeight> points;
-		for (ndInt32 i = 0; i < indexCount; i++)
-		{
-			ndVertexPositWeight data;
-			data.m_posit[0] = format.m_vertex.m_data[i * 3 + 0];
-			data.m_posit[1] = format.m_vertex.m_data[i * 3 + 1];
-			data.m_posit[2] = format.m_vertex.m_data[i * 3 + 2];
-			data.m_weights = format.m_vertexWeight.m_data[i];
-			points.PushBack(data);
-		}
-		ndInt32 count = ndVertexListToIndexList(&points[0].m_posit[0], sizeof(ndVertexPositWeight), 3, indexCount, &tempIndex[0]);
-		for (ndInt32 i = 0; i < count; i++)
-		{
-			format.m_vertex.m_data[i * 3 + 0] = points[i].m_posit[0];
-			format.m_vertex.m_data[i * 3 + 1] = points[i].m_posit[1];
-			format.m_vertex.m_data[i * 3 + 2] = points[i].m_posit[2];
-			format.m_vertexWeight.m_data[i] = points[i].m_weights;
-		}
-		for (ndInt32 i = 0; i < indexCount; i++)
-		{
-			format.m_vertex.m_indexList[i] = tempIndex[format.m_vertex.m_indexList[i]];
-			format.m_vertexWeight.m_indexList[i] = tempIndex[format.m_vertex.m_indexList[i]];
-		}
-	}
-	else
-	{
-		ndVertexListToIndexList(format.m_vertex.m_data, format.m_vertex.m_strideInBytes, 3, indexCount, &tempIndex[0]);
-		for (ndInt32 i = 0; i < indexCount; i++)
-		{
-			format.m_vertex.m_indexList[i] = tempIndex[format.m_vertex.m_indexList[i]];
-		}
-	}
-	
-	if (format.m_normal.m_data)
-	{
-		ndInt32 count = 0;
-		for (ndInt32 i = 0; i < indexCount; i++)
-		{
-			count = ndMax(count, format.m_normal.m_indexList[i] + 1);
-		}
-
-		ndVertexListToIndexList(format.m_normal.m_data, format.m_normal.m_strideInBytes, 3, count, &tempIndex[0]);
-		for (ndInt32 i = 0; i < indexCount; i++)
-		{
-			format.m_normal.m_indexList[i] = tempIndex[format.m_normal.m_indexList[i]];
-		}
-	}
-	
-	if (format.m_uv0.m_data)
-	{
-		ndArray<ndVector> array;
-		ndInt32 count = 0;
-		for (ndInt32 i = 0; i < indexCount; i++)
-		{
-			count = ndMax(count, format.m_uv0.m_indexList[i] + 1);
-		}
-
-		for (ndInt32 i = 0; i < count; i++)
-		{
-			array.PushBack(ndVector(format.m_uv0.m_data[i * 2 + 0], format.m_uv0.m_data[i * 2 + 1], ndFloat32(0.0f), ndFloat32(0.0f)));
-		}
-		ndInt32 vCount = ndVertexListToIndexList(&array[0].m_x, sizeof (ndVector), 3, count, &tempIndex[0]);
-		for (ndInt32 i = 0; i < vCount; i++)
-		{
-			format.m_uv0.m_data[i * 2 + 0] = ndReal(array[i].m_x);
-			format.m_uv0.m_data[i * 2 + 1] = ndReal(array[i].m_y);
-		}
-		for (ndInt32 i = 0; i < indexCount; i++)
-		{
-			format.m_uv0.m_indexList[i] = tempIndex[format.m_uv0.m_indexList[i]];
-		}
-	}
+	//ndStack<ndInt32> tempIndex(indexCount);
+	//if (m_points.m_skinWeights.m_isValid)
+	//{
+	//	struct ndVertexPositWeight
+	//	{
+	//		ndFloat64 m_posit[3];
+	//		ndVertexWeight m_weights;
+	//	};
+	//	ndArray<ndVertexPositWeight> points;
+	//	for (ndInt32 i = 0; i < indexCount; i++)
+	//	{
+	//		ndVertexPositWeight data;
+	//		data.m_posit[0] = format.m_vertex.m_data[i * 3 + 0];
+	//		data.m_posit[1] = format.m_vertex.m_data[i * 3 + 1];
+	//		data.m_posit[2] = format.m_vertex.m_data[i * 3 + 2];
+	//		data.m_weights = format.m_vertexWeight.m_data[i];
+	//		points.PushBack(data);
+	//	}
+	//	ndInt32 count = ndVertexListToIndexList(&points[0].m_posit[0], sizeof(ndVertexPositWeight), 3, indexCount, &tempIndex[0]);
+	//	for (ndInt32 i = 0; i < count; i++)
+	//	{
+	//		format.m_vertex.m_data[i * 3 + 0] = points[i].m_posit[0];
+	//		format.m_vertex.m_data[i * 3 + 1] = points[i].m_posit[1];
+	//		format.m_vertex.m_data[i * 3 + 2] = points[i].m_posit[2];
+	//		format.m_vertexWeight.m_data[i] = points[i].m_weights;
+	//	}
+	//	for (ndInt32 i = 0; i < indexCount; i++)
+	//	{
+	//		format.m_vertex.m_indexList[i] = tempIndex[format.m_vertex.m_indexList[i]];
+	//		format.m_vertexWeight.m_indexList[i] = tempIndex[format.m_vertex.m_indexList[i]];
+	//	}
+	//}
+	//else
+	//{
+	//	ndVertexListToIndexList(format.m_vertex.m_data, format.m_vertex.m_strideInBytes, 3, indexCount, &tempIndex[0]);
+	//	for (ndInt32 i = 0; i < indexCount; i++)
+	//	{
+	//		format.m_vertex.m_indexList[i] = tempIndex[format.m_vertex.m_indexList[i]];
+	//	}
+	//}
+	//
+	//if (format.m_normal.m_data)
+	//{
+	//	ndInt32 count = 0;
+	//	for (ndInt32 i = 0; i < indexCount; i++)
+	//	{
+	//		count = ndMax(count, format.m_normal.m_indexList[i] + 1);
+	//	}
+	//
+	//	ndVertexListToIndexList(format.m_normal.m_data, format.m_normal.m_strideInBytes, 3, count, &tempIndex[0]);
+	//	for (ndInt32 i = 0; i < indexCount; i++)
+	//	{
+	//		format.m_normal.m_indexList[i] = tempIndex[format.m_normal.m_indexList[i]];
+	//	}
+	//}
+	//
+	//if (format.m_uv0.m_data)
+	//{
+	//	ndArray<ndVector> array;
+	//	ndInt32 count = 0;
+	//	for (ndInt32 i = 0; i < indexCount; i++)
+	//	{
+	//		count = ndMax(count, format.m_uv0.m_indexList[i] + 1);
+	//	}
+	//
+	//	for (ndInt32 i = 0; i < count; i++)
+	//	{
+	//		array.PushBack(ndVector(format.m_uv0.m_data[i * 2 + 0], format.m_uv0.m_data[i * 2 + 1], ndFloat32(0.0f), ndFloat32(0.0f)));
+	//	}
+	//	ndInt32 vCount = ndVertexListToIndexList(&array[0].m_x, sizeof (ndVector), 3, count, &tempIndex[0]);
+	//	for (ndInt32 i = 0; i < vCount; i++)
+	//	{
+	//		format.m_uv0.m_data[i * 2 + 0] = ndReal(array[i].m_x);
+	//		format.m_uv0.m_data[i * 2 + 1] = ndReal(array[i].m_y);
+	//	}
+	//	for (ndInt32 i = 0; i < indexCount; i++)
+	//	{
+	//		format.m_uv0.m_indexList[i] = tempIndex[format.m_uv0.m_indexList[i]];
+	//	}
+	//}
 
 	return m_points.m_vertex____.GetCount();
 }
@@ -4142,7 +4141,6 @@ ndIndexArray* ndMeshEffect::MaterialGeometryBegin()
 
 	ndInt32 mark = IncLRU();
 	ndPolyhedra::Iterator iter(*this);
-	//memset(streamIndexMap, 0, sizeof(streamIndexMap));
 	ndMemSet(streamIndexMap, 0, sizeof(streamIndexMap) / sizeof(streamIndexMap[0]));
 	for (iter.Begin(); iter; iter++)
 	{
