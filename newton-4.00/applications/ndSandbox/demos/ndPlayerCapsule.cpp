@@ -98,7 +98,7 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 		static int xxxxx;
 		if (loadAnimation)
 		{
-			if (!xxxxx)
+			if (xxxxx==0)
 			{
 				ndMesh::Save(mesh, "xxx.ndm");
 				//delete mesh;

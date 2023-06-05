@@ -188,13 +188,13 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 				ndVector euler0;
 				ndVector euler(animTransformMatrix.CalcPitchYawRoll(euler0));
 
-				rotationValue.m_x = euler.m_x;
-				rotationValue.m_y = euler.m_y;
-				rotationValue.m_z = euler.m_z;
+				rotationValue.m_x = ndReal (euler.m_x);
+				rotationValue.m_y = ndReal (euler.m_y);
+				rotationValue.m_z = ndReal (euler.m_z);
 
-				positValue.m_x = animTransformMatrix.m_posit.m_x;
-				positValue.m_y = animTransformMatrix.m_posit.m_y;
-				positValue.m_z = animTransformMatrix.m_posit.m_z;
+				positValue.m_x = ndReal (animTransformMatrix.m_posit.m_x);
+				positValue.m_y = ndReal (animTransformMatrix.m_posit.m_y);
+				positValue.m_z = ndReal (animTransformMatrix.m_posit.m_z);
 
 				positNode = positNode->GetNext();
 				rotationNode = rotationNode->GetNext();
@@ -525,7 +525,7 @@ void ndMesh::Save(FILE* const file, const ndTree<ndInt32, const ndMeshEffect*>& 
 	}
 
 	const ndMesh::ndCurve& positCurve = GetPositCurve();
-	if (positCurve.GetCount() && m_name == "Hips")
+	if (positCurve.GetCount())
 	{
 		PrintTabs(level);
 		fprintf(file, "\tkeyFramePosits: %d\n", positCurve.GetCount());
@@ -542,9 +542,25 @@ void ndMesh::Save(FILE* const file, const ndTree<ndInt32, const ndMeshEffect*>& 
 		fprintf(file, "\t}\n");
 	}
 
-	if (GetRotationCurve().GetCount())
+	const ndMesh::ndCurve& rotationCurve = GetRotationCurve();
+	if (rotationCurve.GetCount())
 	{
-		//ndAssert(0);
+		PrintTabs(level);
+		fprintf(file, "\tkeyFrameRotations: %d\n", rotationCurve.GetCount());
+
+		PrintTabs(level);
+		fprintf(file, "\t{\n");
+		for (ndCurve::ndNode* keyFrameNode = rotationCurve.GetFirst(); keyFrameNode; keyFrameNode = keyFrameNode->GetNext())
+		{
+			const ndCurveValue& keyframe = keyFrameNode->GetInfo();
+			PrintTabs(level);
+			ndReal pitch = ndReal(keyframe.m_x * ndRadToDegree);
+			ndReal yaw = ndReal(keyframe.m_y * ndRadToDegree);
+			ndReal roll = ndReal(keyframe.m_z * ndRadToDegree);
+			fprintf(file, "\t\t%g %g %g %g\n", pitch, yaw, roll, keyframe.m_time);
+		}
+		PrintTabs(level);
+		fprintf(file, "\t}\n");
 	}
 
 	for (ndMesh* child = GetFirstChild(); child; child = child->GetNext())

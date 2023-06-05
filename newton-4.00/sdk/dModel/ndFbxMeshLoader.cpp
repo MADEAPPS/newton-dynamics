@@ -953,14 +953,14 @@ void ndFbxMeshLoader::OptimizeRotationCurve(ndMesh::ndCurve& curve)
 			ndMatrix m(ndPitchMatrix(value.m_x) * ndYawMatrix(value.m_y) * ndRollMatrix(value.m_z));
 			ndVector euler1;
 			ndVector euler(m.CalcPitchYawRoll(euler1));
-			angleError = ndAnglesSub(euler.m_z, eulerRef.m_z);
+			angleError = ndAnglesSub(euler.m_z, ndFloat32 (eulerRef.m_z));
 			if (ndAbs(angleError) > ndPi * ndFloat32(0.5f))
 			{
 				euler = euler1;
 			}
-			value.m_x = euler.m_x;
-			value.m_y = euler.m_y;
-			value.m_z = euler.m_z;
+			value.m_x = ndReal(euler.m_x);
+			value.m_y = ndReal(euler.m_y);
+			value.m_z = ndReal(euler.m_z);
 		}
 		eulerRef = value;
 	}
@@ -992,7 +992,7 @@ ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMesh* const model, const 
 
 			if (positCurve.GetCount())
 			{
-				duration = ndMax(duration, positCurve.GetLast()->GetInfo().m_time);
+				duration = ndMax(duration, ndFloat32(positCurve.GetLast()->GetInfo().m_time));
 			}
 
 			OptimizeCurve(positCurve);
@@ -1005,7 +1005,7 @@ ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMesh* const model, const 
 
 			if (rotationCurve.GetCount())
 			{
-				duration = ndMax(duration, rotationCurve.GetLast()->GetInfo().m_time);
+				duration = ndMax(duration, ndFloat32(rotationCurve.GetLast()->GetInfo().m_time));
 			}
 
 			ndQuaternion rotation;
