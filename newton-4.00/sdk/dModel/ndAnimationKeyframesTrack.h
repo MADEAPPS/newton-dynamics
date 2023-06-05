@@ -16,10 +16,10 @@ class ndAnimationKeyFramesTrack
 {
 	public:
 	template<class OBJECT>
-	class dKeyFramesArray: public ndArray<OBJECT>
+	class ndKeyFramesArray: public ndArray<OBJECT>
 	{
 		public:
-		dKeyFramesArray()
+		ndKeyFramesArray()
 			:ndArray<OBJECT>()
 		{
 		}
@@ -53,8 +53,8 @@ class ndAnimationKeyFramesTrack
 	void InterpolateRotation(ndFloat32 param, ndQuaternion& rotationOut) const;
 
 	ndString m_name;
-	dKeyFramesArray<ndVector> m_position;
-	dKeyFramesArray<ndQuaternion> m_rotation;
+	ndKeyFramesArray<ndVector> m_position;
+	ndKeyFramesArray<ndQuaternion> m_rotation;
 };
 
 #endif

@@ -28,10 +28,13 @@ class ndAnimationSequence : public ndClassAlloc
 
 	ndAnimationKeyFramesTrack* AddTrack();
 	ndList<ndAnimationKeyFramesTrack>& GetTracks();
+	ndAnimationKeyFramesTrack& GetTranslationTrack();
+
 	virtual void CalculatePose(ndAnimationPose& output, ndFloat32 param) const;
 
 	private:
 	ndList<ndAnimationKeyFramesTrack> m_tracks;
+	ndAnimationKeyFramesTrack m_translationTrack;
 	ndString m_name;
 	ndFloat32 m_duration;
 

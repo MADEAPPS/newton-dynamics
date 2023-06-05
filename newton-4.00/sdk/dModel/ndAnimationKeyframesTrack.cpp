@@ -13,7 +13,7 @@
 #include "ndAnimationKeyframesTrack.h"
 
 template<class OBJECT>
-ndInt32 ndAnimationKeyFramesTrack::dKeyFramesArray<OBJECT>::GetIndex(ndFloat32 time) const
+ndInt32 ndAnimationKeyFramesTrack::ndKeyFramesArray<OBJECT>::GetIndex(ndFloat32 time) const
 {
 	ndAssert(time >= 0.0f);
 	const ndInt32 count = ndArray<OBJECT>::GetCount();

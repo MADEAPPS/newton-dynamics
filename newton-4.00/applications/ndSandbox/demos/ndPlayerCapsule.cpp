@@ -99,22 +99,22 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 		if (loadAnimation)
 		{
 			// extract translation for hip node.
-			if (!strcmp(fbxMeshName, "mocap_walk.fbx"))
-			{
-				for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
-				{
-					if (node->GetName() == "Hips")
-					{ 
-						ndMesh::ndCurve& translation = node->GetPositCurve();
-						for (ndMesh::ndCurve::ndNode* positNode = translation.GetFirst(); positNode; positNode = positNode->GetNext())
-						{
-							ndMesh::ndCurveValue& point = positNode->GetInfo();
-							point.m_x = ndReal(0.0f);
-						}
-						break;
-					}
-				}
-			}
+			//if (!strcmp(fbxMeshName, "mocap_walk.fbx"))
+			//{
+			//	for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
+			//	{
+			//		if (node->GetName() == "Hips")
+			//		{ 
+			//			ndMesh::ndCurve& translation = node->GetPositCurve();
+			//			for (ndMesh::ndCurve::ndNode* positNode = translation.GetFirst(); positNode; positNode = positNode->GetNext())
+			//			{
+			//				ndMesh::ndCurveValue& point = positNode->GetInfo();
+			//				point.m_x = ndReal(0.0f);
+			//			}
+			//			break;
+			//		}
+			//	}
+			//}
 
 			if (xxxxx==0)
 			{
@@ -132,6 +132,26 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 	{
 		ndAnimationSequence* const sequence = ndMeshLoader::LoadAnimation(clipName);
 		ndAssert(sequence);
+
+		// extract translation for hip node.
+		for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = sequence->GetTracks().GetFirst(); node; node = node->GetNext())
+		{
+			ndAnimationKeyFramesTrack& track = node->GetInfo();
+			if (track.GetName() == "Hips")
+			{
+				ndAnimationKeyFramesTrack& translationTrack = sequence->GetTranslationTrack();
+				ndVector translation(ndVector::m_zero);
+				for (ndInt32 i = 0; i < track.m_position.GetCount(); ++i)
+				{
+					translation.m_x = track.m_position[i].m_x;
+					translationTrack.m_position.PushBack(translation);
+					translationTrack.m_position.m_time.PushBack(track.m_position.m_time[i]);
+					track.m_position[i].m_x = 0.0f;
+				}
+				break;
+			}
+		}
+
 		return sequence;
 	}
 

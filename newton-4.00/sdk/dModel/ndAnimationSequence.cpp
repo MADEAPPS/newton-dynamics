@@ -16,6 +16,7 @@
 ndAnimationSequence::ndAnimationSequence()
 	:ndClassAlloc()
 	,m_tracks()
+	,m_translationTrack()
 	,m_name("")
 	,m_duration(ndFloat32 (0.0f))
 {
@@ -38,6 +39,11 @@ ndFloat32 ndAnimationSequence::GetDuration() const
 void ndAnimationSequence::SetName(const char* const name)
 {
 	m_name = name;
+}
+
+ndAnimationKeyFramesTrack& ndAnimationSequence::GetTranslationTrack()
+{
+	return m_translationTrack;
 }
 
 ndList<ndAnimationKeyFramesTrack>& ndAnimationSequence::GetTracks()
