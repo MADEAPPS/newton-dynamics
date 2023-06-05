@@ -98,6 +98,24 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 		static int xxxxx;
 		if (loadAnimation)
 		{
+			// extract translation for hip node.
+			if (!strcmp(fbxMeshName, "mocap_walk.fbx"))
+			{
+				for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
+				{
+					if (node->GetName() == "Hips")
+					{ 
+						ndMesh::ndCurve& translation = node->GetPositCurve();
+						for (ndMesh::ndCurve::ndNode* positNode = translation.GetFirst(); positNode; positNode = positNode->GetNext())
+						{
+							ndMesh::ndCurveValue& point = positNode->GetInfo();
+							point.m_x = ndReal(0.0f);
+						}
+						break;
+					}
+				}
+			}
+
 			if (xxxxx==0)
 			{
 				ndMesh::Save(mesh, "xxx.ndm");

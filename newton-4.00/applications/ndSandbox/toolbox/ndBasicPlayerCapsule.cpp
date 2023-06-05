@@ -117,9 +117,9 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 
 	//// create an animation blend tree
 	//ndSharedPtr<ndAnimationSequence> idleSequence__(scene->GetAnimationSequence(loader, "box.fbx"));
-	//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_walk.fbx"));
+	ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_walk.fbx"));
 	//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide0.fbx"));
-	ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide1.fbx"));
+	//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide1.fbx"));
 	ndSharedPtr<ndAnimationSequence> walkSequence(scene->GetAnimationSequence(loader, "mocap_walk.fbx"));
 
 	// create bind pose to animation sequences.
