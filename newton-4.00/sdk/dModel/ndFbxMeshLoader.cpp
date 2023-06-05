@@ -16,6 +16,8 @@
 using namespace ofbx;
 
 #define ND_ANIM_BASE_FREQ ndFloat32 (30.0f)
+#define ND_ANIM_ERROR_TOL ndFloat32 (5.0e-5f)
+#define ND_ANIM_ERROR_TOL2 (ND_ANIM_ERROR_TOL * ND_ANIM_ERROR_TOL)
 
 class ndFbxMeshLoader::ndFbx2MeshNodeStackData
 {
@@ -891,9 +893,6 @@ void ndFbxMeshLoader::LoadAnimation(const ofbx::IScene* const fbxScene, ndMesh* 
 
 void ndFbxMeshLoader::OptimizeCurve(ndMesh::ndCurve& curve)
 {
-	const ndFloat32 tol = 5.0e-5f;
-	const ndFloat32 tol2 = tol * tol;
-
 	auto Interpolate = [](ndFloat32 x0, ndFloat32 t0, ndFloat32 x1, ndFloat32 t1, ndFloat32 t)
 	{
 		return x0 + (x1 - x0) * (t - t0) / (t1 - t0);
@@ -906,8 +905,6 @@ void ndFbxMeshLoader::OptimizeCurve(ndMesh::ndCurve& curve)
 		{
 			const ndMesh::ndCurveValue& value1 = node1->GetPrev()->GetInfo();
 			const ndMesh::ndCurveValue& value2 = node1->GetInfo();
-			ndVector p1(value1.m_x, value1.m_y, value1.m_z, ndFloat32(0.0f));
-			ndVector p2(value2.m_x, value2.m_y, value2.m_z, ndFloat32(0.0f));
 
 			ndFloat32 dist_x = value1.m_x - Interpolate(value0.m_x, value0.m_time, value2.m_x, value2.m_time, value1.m_time);
 			ndFloat32 dist_y = value1.m_y - Interpolate(value0.m_y, value0.m_time, value2.m_y, value2.m_time, value1.m_time);
@@ -915,7 +912,7 @@ void ndFbxMeshLoader::OptimizeCurve(ndMesh::ndCurve& curve)
 
 			ndVector err(dist_x, dist_y, dist_z, ndFloat32 (0.0f));
 			ndFloat32 mag2 = err.DotProduct(err).GetScalar();
-			if (mag2 > tol2)
+			if (mag2 > ND_ANIM_ERROR_TOL2)
 			{
 				break;
 			}
@@ -934,7 +931,7 @@ void ndFbxMeshLoader::OptimizeCurve(ndMesh::ndCurve& curve)
 
 		ndVector err(dist_x, dist_y, dist_z, 0.0f);
 		ndFloat32 mag2 = err.DotProduct(err).GetScalar();
-		if (mag2 < tol2)
+		if (mag2 < ND_ANIM_ERROR_TOL2)
 		{
 			curve.Remove(curve.GetFirst()->GetNext());
 		}
@@ -995,7 +992,6 @@ ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMesh* const model, const 
 				duration = ndMax(duration, ndFloat32(positCurve.GetLast()->GetInfo().m_time));
 			}
 
-			OptimizeCurve(positCurve);
 			for (ndMesh::ndCurve::ndNode* srcNode = positCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 			{
 				ndMesh::ndCurveValue& keyFrame = srcNode->GetInfo();
@@ -1009,7 +1005,6 @@ ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMesh* const model, const 
 			}
 
 			ndQuaternion rotation;
-			OptimizeRotationCurve(rotationCurve);
 			for (ndMesh::ndCurve::ndNode* srcNode = rotationCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 			{
 				ndMesh::ndCurveValue& keyFrame = srcNode->GetInfo();
@@ -1046,6 +1041,33 @@ ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMesh* const model, const 
 	return sequence;
 }
 
+void ndFbxMeshLoader::OptimizeAnimation(ndMesh* const model)
+{
+	ndInt32 stack = 1;
+	ndMesh* entBuffer[1024];
+	entBuffer[0] = model;
+	while (stack)
+	{
+		stack--;
+		ndMesh* const meshNode = entBuffer[stack];
+
+		ndMesh::ndCurve& scaleCurve = meshNode->GetScaleCurve();
+		ndMesh::ndCurve& positCurve = meshNode->GetPositCurve();
+		ndMesh::ndCurve& rotationCurve = meshNode->GetRotationCurve();
+		if (scaleCurve.GetCount() || positCurve.GetCount() || rotationCurve.GetCount())
+		{
+			OptimizeCurve(positCurve);
+			OptimizeRotationCurve(rotationCurve);
+		}
+
+		for (ndMesh* child = meshNode->GetFirstChild(); child; child = child->GetNext())
+		{
+			entBuffer[stack] = child;
+			stack++;
+		}
+	}
+}
+
 ndMesh* ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bool loadAnimation)
 {
 	FILE* const file = fopen(fullPathName, "rb");
@@ -1075,12 +1097,17 @@ ndMesh* ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bool loadAnima
 
 	ndMatrix upAxis((fbxScene->getGlobalSettings()->UpAxis != UpVector_AxisY) ? ndGetIdentityMatrix() : ndRollMatrix(-90.0f * ndDegreeToRad));
 	ApplyAllTransforms(mesh, convertMatrix, upAxis);
+
+	if (loadAnimation)
+	{
+		OptimizeAnimation(mesh);
+	}
 	return mesh;
 }
 
 ndAnimationSequence* ndFbxMeshLoader::LoadAnimation(const char* const fullPathName)
 {
-	ndSharedPtr<ndMesh> entity(LoadMesh(fullPathName, true));
-	ndAnimationSequence* const sequence = CreateSequence(*entity, fullPathName);
+	ndSharedPtr<ndMesh> mesh(LoadMesh(fullPathName, true));
+	ndAnimationSequence* const sequence = CreateSequence(*mesh, fullPathName);
 	return sequence;
 }
