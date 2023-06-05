@@ -118,10 +118,9 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 
 			if (xxxxx==0)
 			{
-				ndMesh::Save(mesh, "xxx.ndm");
-				delete mesh;
-				mesh = ndMesh::Load("xxx.ndm");
-				//ndMesh::Load("xxx.ndm");
+				//ndMesh::Save(mesh, "xxx.ndm");
+				//delete mesh;
+				//mesh = ndMesh::Load("xxx.ndm");
 			}
 			xxxxx++;
 		}
