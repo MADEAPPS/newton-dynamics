@@ -23,13 +23,10 @@ class ndAnimationKeyFramesTrack
 			:ndArray<OBJECT>()
 		{
 		}
-		ndInt32 GetIndex(ndFloat32 param) const;
-
-		private:
-		ndInt32 GetIndexDebug(ndFloat32 param) const;
+		ndInt32 GetIndex(ndFloat32 time) const;
 
 		public:
-		ndArray<ndFloat32> m_param;
+		ndArray<ndFloat32> m_time;
 	};
 
 	ndAnimationKeyFramesTrack()

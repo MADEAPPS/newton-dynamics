@@ -47,7 +47,7 @@ class ndFbxMeshLoader : public ndClassAlloc
 	void ApplyAllTransforms(ndMesh* const mesh, const ndMatrix& unitMatrix, const ndMatrix& upAxis);
 	ndMatrix GetKeyframe(ndMesh::ndCurveValue& scale, ndMesh::ndCurveValue& position, ndMesh::ndCurveValue& rotation);
 	void LoadAnimationLayer(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const fbxScene, const ofbx::AnimationLayer* const animLayer);
-	void LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, ndFloat32 duration, ndFloat32 timestep, ndInt32 framesCount);
+	void LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, ndFloat32 duration, ndInt32 framesCount);
 };
 
 #endif

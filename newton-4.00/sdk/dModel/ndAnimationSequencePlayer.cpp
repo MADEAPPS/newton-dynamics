@@ -17,7 +17,7 @@
 ndAnimationSequencePlayer::ndAnimationSequencePlayer(ndSharedPtr<ndAnimationSequence>& sequence)
 	:ndAnimationBlendTreeNode(nullptr)
 	,m_sequence(sequence)
-	,m_param(ndFloat32 (0.0f))
+	,m_time(ndFloat32 (0.0f))
 {
 }
 
@@ -25,14 +25,18 @@ ndAnimationSequencePlayer::~ndAnimationSequencePlayer()
 {
 }
 
-ndFloat32 ndAnimationSequencePlayer::GetParam() const
+ndFloat32 ndAnimationSequencePlayer::GetTime() const
 {
-	return m_param;
+	return m_time;
 }
 
-void ndAnimationSequencePlayer::SetParam(ndFloat32 param)
+void ndAnimationSequencePlayer::SetTime(ndFloat32 time)
 {
-	m_param = ndMod(param, ndFloat32 (1.0f));
+	ndFloat32 duration = m_sequence->GetDuration();
+	ndFloat32 t1 = ndFloat32(2.0f) * time * ndPi / duration;
+	ndFloat32 t0 = ndFloat32 (2.0f) * m_time * ndPi / duration;
+	m_time = ndMod (t0 + ndAnglesSub(t1, t0), ndFloat32(2.0f) * ndPi) * duration / (ndFloat32(2.0f) * ndPi);
+	ndAssert(m_time > 0.0f);
 }
 
 ndSharedPtr<ndAnimationSequence>& ndAnimationSequencePlayer::GetSequence()
@@ -42,7 +46,7 @@ ndSharedPtr<ndAnimationSequence>& ndAnimationSequencePlayer::GetSequence()
 
 void ndAnimationSequencePlayer::Evaluate(ndAnimationPose& output)
 {
-	m_sequence->CalculatePose(output, m_param);
+	m_sequence->CalculatePose(output, m_time);
 }
 
 

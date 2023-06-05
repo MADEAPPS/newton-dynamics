@@ -63,15 +63,9 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
 
 		ndFloat32 timestep = word->GetScene()->GetTimestep();
-		static ndFloat32 xxxx = 0.0f;
 		//player->m_walkCycle->SetParam(xxxx);
-		player->m_idleCycle->SetParam(xxxx);
-		xxxx += 1.0e-2f;
-		float xxxxxx = 1.0f;
-		if (xxxx > xxxxxx)
-		{
-			xxxx -= xxxxxx;
-		}
+		player->m_idleCycle->SetTime(player->m_idleCycle->GetTime() + timestep);
+
 		player->m_animBlendTree->Evaluate(player->m_output);
 		for (ndInt32 i = 0; i < player->m_output.GetCount(); ++i)
 		{
@@ -122,8 +116,11 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	}
 
 	//// create an animation blend tree
+	//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "box.fbx"));
+	//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_walk.fbx"));
+	//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide0.fbx"));
+	ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide1.fbx"));
 	ndSharedPtr<ndAnimationSequence> walkSequence(scene->GetAnimationSequence(loader, "mocap_walk.fbx"));
-	ndSharedPtr<ndAnimationSequence> idleSequence (scene->GetAnimationSequence(loader, "mocap_ide1.fbx"));
 
 	// create bind pose to animation sequences.
 	const ndList<ndAnimationKeyFramesTrack>& tracks = idleSequence->GetTracks();
@@ -136,7 +133,6 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 		m_output.PushBack(keyFrame);
 	}
 
-	
 	ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
 	//ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
 	//ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
@@ -145,21 +141,11 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	////ndFloat32 scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
 	//ndAnimationTwoWayBlend* const walkRunBlend = new ndAnimationTwoWayBlend(walk, run);
 	//ndAnimationTwoWayBlend* const idleMoveBlend = new ndAnimationTwoWayBlend(idle, walkRunBlend);
-	//
-	//walkRunBlend->SetParam(0.0f);
-	////idleMoveBlend->SetParam(0.0f);
-	//idleMoveBlend->SetParam(1.0f);
-	////walkRunBlend->SetTimeDilation1(scale1);
-	//m_animBlendTree = idleMoveBlend;
+
 	m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode> (idle);
 
 	m_idleCycle = idle;
 	//m_walkCycle = walk;
-	 
-	//// evaluate twice that interpolation is reset
-	//ndAssert(0);
-	////m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
-	////m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
 }
 
 ndBasicPlayerCapsule::~ndBasicPlayerCapsule()

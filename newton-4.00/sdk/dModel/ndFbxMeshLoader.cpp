@@ -15,7 +15,7 @@
 
 using namespace ofbx;
 
-#define D_ANIM_BASE_FREQ ndFloat32 (30.0f)
+#define ND_ANIM_BASE_FREQ ndFloat32 (30.0f)
 
 class ndFbxMeshLoader::ndFbx2MeshNodeStackData
 {
@@ -60,9 +60,9 @@ class ndFbxMeshLoader::ndFbxAnimationTrack
 
 	void SetDuration(ndFloat32 duration)
 	{
-		m_scale.m_lenght = duration;
-		m_position.m_lenght = duration;
-		m_rotation.m_lenght = duration;
+		m_scale.m_lenght = ndReal(duration);
+		m_position.m_lenght = ndReal(duration);
+		m_rotation.m_lenght = ndReal(duration);
 	}
 
 	void AddKeyframe(ndFloat32 time, const ndMatrix& matrix)
@@ -82,28 +82,28 @@ class ndFbxMeshLoader::ndFbxAnimationTrack
 	void AddScale(ndFloat32 time, ndFloat32 x, ndFloat32 y, ndFloat32 z)
 	{
 		ndMesh::ndCurveValue& value = m_scale.Append()->GetInfo();
-		value.m_x = x;
-		value.m_y = y;
-		value.m_z = z;
-		value.m_time = time;
+		value.m_x = ndReal(x);
+		value.m_y = ndReal(y);
+		value.m_z = ndReal(z);
+		value.m_time = ndReal(time);
 	}
 
 	void AddPosition(ndFloat32 time, ndFloat32 x, ndFloat32 y, ndFloat32 z)
 	{
 		ndMesh::ndCurveValue& value = m_position.Append()->GetInfo();
-		value.m_x = x;
-		value.m_y = y;
-		value.m_z = z;
-		value.m_time = time;
+		value.m_x = ndReal(x);
+		value.m_y = ndReal(y);
+		value.m_z = ndReal(z);
+		value.m_time = ndReal(time);
 	}
 
 	void AddRotation(ndFloat32 time, ndFloat32 x, ndFloat32 y, ndFloat32 z)
 	{
 		ndMesh::ndCurveValue& value = m_rotation.Append()->GetInfo();
-		value.m_x = x;
-		value.m_y = y;
-		value.m_z = z;
-		value.m_time = time;
+		value.m_x = ndReal(x);
+		value.m_y = ndReal(y);
+		value.m_z = ndReal(z);
+		value.m_time = ndReal(time);
 	}
 
 	dCurve m_scale;
@@ -337,13 +337,13 @@ void ndFbxMeshLoader::FreezeScale(ndMesh* const mesh)
 				ndVector euler0;
 				ndVector euler(animTransformMatrix.CalcPitchYawRoll(euler0));
 
-				rotationValue.m_x = euler.m_x;
-				rotationValue.m_y = euler.m_y;
-				rotationValue.m_z = euler.m_z;
+				rotationValue.m_x = ndReal(euler.m_x);
+				rotationValue.m_y = ndReal(euler.m_y);
+				rotationValue.m_z = ndReal(euler.m_z);
 
-				positValue.m_x = animTransformMatrix.m_posit.m_x;
-				positValue.m_y = animTransformMatrix.m_posit.m_y;
-				positValue.m_z = animTransformMatrix.m_posit.m_z;
+				positValue.m_x = ndReal(animTransformMatrix.m_posit.m_x);
+				positValue.m_y = ndReal(animTransformMatrix.m_posit.m_y);
+				positValue.m_z = ndReal(animTransformMatrix.m_posit.m_z);
 
 				//scaleValue.m_x = animScale.m_x;
 				//scaleValue.m_y = animScale.m_y;
@@ -441,13 +441,13 @@ void ndFbxMeshLoader::AlignToWorld(ndMesh* const mesh)
 				ndVector euler0;
 				ndVector euler(animTransformMatrix.CalcPitchYawRoll(euler0));
 
-				rotationValue.m_x = euler.m_x;
-				rotationValue.m_y = euler.m_y;
-				rotationValue.m_z = euler.m_z;
+				rotationValue.m_x = ndReal(euler.m_x);
+				rotationValue.m_y = ndReal(euler.m_y);
+				rotationValue.m_z = ndReal(euler.m_z);
 
-				positValue.m_x = animTransformMatrix.m_posit.m_x;
-				positValue.m_y = animTransformMatrix.m_posit.m_y;
-				positValue.m_z = animTransformMatrix.m_posit.m_z;
+				positValue.m_x = ndReal(animTransformMatrix.m_posit.m_x);
+				positValue.m_y = ndReal(animTransformMatrix.m_posit.m_y);
+				positValue.m_z = ndReal(animTransformMatrix.m_posit.m_z);
 
 				positNode = positNode->GetNext();
 				rotationNode = rotationNode->GetNext();
@@ -735,11 +735,12 @@ ndMesh* ndFbxMeshLoader::FbxTondMesh(ofbx::IScene* const fbxScene)
 	return mesh;
 }
 
-void ndFbxMeshLoader::LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, ndFloat32 duration, ndFloat32 timestep, int framesCount)
+void ndFbxMeshLoader::LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, ndFloat32 duration, ndInt32 framesCount)
 {
 	const ofbx::AnimationCurveNode* const scaleNode = animLayer->getCurveNode(*bone, "Lcl Scaling");
 	const ofbx::AnimationCurveNode* const rotationNode = animLayer->getCurveNode(*bone, "Lcl Rotation");
 	const ofbx::AnimationCurveNode* const translationNode = animLayer->getCurveNode(*bone, "Lcl Translation");
+
 	if (scaleNode || rotationNode || translationNode)
 	{
 		ndFbxAnimationTrack& track = tracks.Insert(bone->name)->GetInfo();
@@ -759,7 +760,8 @@ void ndFbxMeshLoader::LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>&
 		euler0 = euler0.Scale(180.0f / ndPi);
 
 		ndFloat32 timeAcc = 0.0f;
-		for (ndInt32 i = 0; i < framesCount; ++i)
+		ndFloat32 timestep = duration / ndFloat32 (framesCount);
+		for (ndInt32 i = 0; i <= framesCount; ++i)
 		{
 			scale.x = scale1.m_x;
 			scale.y = scale1.m_y;
@@ -770,6 +772,11 @@ void ndFbxMeshLoader::LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>&
 			translation.x = transform.m_posit.m_x;
 			translation.y = transform.m_posit.m_y;
 			translation.z = transform.m_posit.m_z;
+
+			if (i == framesCount)
+			{
+				timeAcc = duration;
+			}
 
 			if (scaleNode)
 			{
@@ -802,17 +809,14 @@ void ndFbxMeshLoader::LoadAnimationLayer(ndTree <ndFbxAnimationTrack, ndString>&
 
 	const ofbx::TakeInfo* const animationInfo = fbxScene->getTakeInfo(0);
 	ndFloat32 period = ndFloat32(animationInfo->local_time_to - animationInfo->local_time_from);
-	ndFloat32 framesFloat = period * D_ANIM_BASE_FREQ;
-
+	ndFloat32 framesFloat = period * ND_ANIM_BASE_FREQ;
 	ndInt32 frames = ndInt32(ndFloor(framesFloat));
-	ndAssert(frames > 0);
-	ndFloat32 timestep = period / (ndFloat32)frames;
 
 	while (stack)
 	{
 		stack--;
 		ofbx::Object* const bone = stackPool[stack];
-		LoadAnimationCurve(tracks, fbxScene, bone, animLayer, period, timestep, frames);
+		LoadAnimationCurve(tracks, fbxScene, bone, animLayer, period, frames);
 
 		stack += GetChildrenNodes(bone, &stackPool[stack]);
 		ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0]) - 64));
@@ -909,7 +913,7 @@ void ndFbxMeshLoader::OptimizeCurve(ndMesh::ndCurve& curve)
 			ndFloat32 dist_y = value1.m_y - Interpolate(value0.m_y, value0.m_time, value2.m_y, value2.m_time, value1.m_time);
 			ndFloat32 dist_z = value1.m_z - Interpolate(value0.m_z, value0.m_time, value2.m_z, value2.m_time, value1.m_time);
 
-			ndVector err(dist_x, dist_y, dist_z, 0.0f);
+			ndVector err(dist_x, dist_y, dist_z, ndFloat32 (0.0f));
 			ndFloat32 mag2 = err.DotProduct(err).GetScalar();
 			if (mag2 > tol2)
 			{
@@ -939,27 +943,24 @@ void ndFbxMeshLoader::OptimizeCurve(ndMesh::ndCurve& curve)
 
 void ndFbxMeshLoader::OptimizeRotationCurve(ndMesh::ndCurve& curve)
 {
-	auto AngleAlias = [](ndFloat32 angleA, ndFloat32 angleB)
-	{
-		ndFloat32 s1 = ndSin(angleB);
-		ndFloat32 c1 = ndCos(angleB);
-		ndFloat32 s0 = ndSin(angleA);
-		ndFloat32 c0 = ndCos(angleA);
-
-		ndFloat32 s = s1 * c0 - s0 * c1;
-		ndFloat32 c = c1 * c0 + s0 * s1;
-		ndFloat32 delta = ndAtan2(s, c);
-		return delta;
-	};
-
 	ndMesh::ndCurveValue eulerRef(curve.GetFirst()->GetInfo());
-	for (ndMesh::ndCurve::ndNode* node = curve.GetFirst()->GetNext(); node->GetNext(); node = node->GetNext())
+	for (ndMesh::ndCurve::ndNode* node = curve.GetFirst()->GetNext(); node; node = node->GetNext())
 	{
 		ndMesh::ndCurveValue value(node->GetInfo());
-		ndFloat32 angleError = AngleAlias(value.m_z, eulerRef.m_z);
+		ndFloat32 angleError = ndAnglesSub(value.m_z, eulerRef.m_z);
 		if (ndAbs(angleError) > ndPi * ndFloat32(0.5f))
 		{
-			ndAssert(0);
+			ndMatrix m(ndPitchMatrix(value.m_x) * ndYawMatrix(value.m_y) * ndRollMatrix(value.m_z));
+			ndVector euler1;
+			ndVector euler(m.CalcPitchYawRoll(euler1));
+			angleError = ndAnglesSub(euler.m_z, eulerRef.m_z);
+			if (ndAbs(angleError) > ndPi * ndFloat32(0.5f))
+			{
+				euler = euler1;
+			}
+			value.m_x = euler.m_x;
+			value.m_y = euler.m_y;
+			value.m_z = euler.m_z;
 		}
 		eulerRef = value;
 	}
@@ -971,11 +972,11 @@ ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMesh* const model, const 
 {
 	ndAnimationSequence* const sequence = new ndAnimationSequence;
 	sequence->SetName(name);
-	//sequence->m_period = m_length;
 
 	ndInt32 stack = 1;
 	ndMesh* entBuffer[1024];
 	entBuffer[0] = model;
+	ndFloat32 duration = ndFloat32(0.0f);
 	while (stack)
 	{
 		stack--;
@@ -989,12 +990,22 @@ ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMesh* const model, const 
 			ndAnimationKeyFramesTrack* const track = sequence->AddTrack();
 			track->m_name = meshNode->GetName();
 
+			if (positCurve.GetCount())
+			{
+				duration = ndMax(duration, positCurve.GetLast()->GetInfo().m_time);
+			}
+
 			OptimizeCurve(positCurve);
 			for (ndMesh::ndCurve::ndNode* srcNode = positCurve.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 			{
 				ndMesh::ndCurveValue& keyFrame = srcNode->GetInfo();
-				track->m_position.m_param.PushBack(keyFrame.m_time);
+				track->m_position.m_time.PushBack(keyFrame.m_time);
 				track->m_position.PushBack(ndVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, ndFloat32(1.0f)));
+			}
+
+			if (rotationCurve.GetCount())
+			{
+				duration = ndMax(duration, rotationCurve.GetLast()->GetInfo().m_time);
 			}
 
 			ndQuaternion rotation;
@@ -1018,7 +1029,7 @@ ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMesh* const model, const 
 				}
 
 				track->m_rotation.PushBack(quat);
-				track->m_rotation.m_param.PushBack(keyFrame.m_time);
+				track->m_rotation.m_time.PushBack(keyFrame.m_time);
 
 				rotation = quat;
 			}
@@ -1031,6 +1042,7 @@ ndAnimationSequence* ndFbxMeshLoader::CreateSequence(ndMesh* const model, const 
 		}
 	}
 
+	sequence->m_duration = duration;
 	return sequence;
 }
 

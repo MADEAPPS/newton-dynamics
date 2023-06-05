@@ -524,9 +524,22 @@ void ndMesh::Save(FILE* const file, const ndTree<ndInt32, const ndMeshEffect*>& 
 		}
 	}
 
-	if (GetPositCurve().GetCount())
+	const ndMesh::ndCurve& positCurve = GetPositCurve();
+	if (positCurve.GetCount() && m_name == "Hips")
 	{
-		//ndAssert(0);
+		PrintTabs(level);
+		fprintf(file, "\tkeyFramePosits: %d\n", positCurve.GetCount());
+
+		PrintTabs(level);
+		fprintf(file, "\t{\n");
+		for (ndCurve::ndNode* keyFrameNode = positCurve.GetFirst(); keyFrameNode; keyFrameNode = keyFrameNode->GetNext())
+		{
+			const ndCurveValue& keyframe = keyFrameNode->GetInfo();
+			PrintTabs(level);
+			fprintf(file, "\t\t%g %g %g %g\n", keyframe.m_x, keyframe.m_y, keyframe.m_z, keyframe.m_time);
+		}
+		PrintTabs(level);
+		fprintf(file, "\t}\n");
 	}
 
 	if (GetRotationCurve().GetCount())

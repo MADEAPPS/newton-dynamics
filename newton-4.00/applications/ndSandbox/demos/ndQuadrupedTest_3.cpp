@@ -577,18 +577,19 @@ namespace ndQuadruped_3
 			ndFloat32 animSpeed = m_param_xxxx.Interpolate(m_param_x0);
 			m_timer = ndMod(m_timer + timestep * animSpeed, ndFloat32(1.0f));
 
-			m_walk->SetParam(1.0f - m_timer);
-			m_animBlendTree->Evaluate(m_output);
-			for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); i++)
-			{
-				ndEffectorInfo& info = m_effectorsInfo[i];
-				const ndAnimKeyframe& keyFrame = m_output[i];
-				ndVector posit(info.m_basePosition);
-				posit.m_x += keyFrame.m_posit.m_x;
-				posit.m_y += keyFrame.m_posit.m_y;
-				posit.m_z += keyFrame.m_posit.m_z;
-				info.m_effector->SetLocalTargetPosition(posit);
-			}
+			ndAssert(0);
+			//m_walk->SetParam(1.0f - m_timer);
+			//m_animBlendTree->Evaluate(m_output);
+			//for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); i++)
+			//{
+			//	ndEffectorInfo& info = m_effectorsInfo[i];
+			//	const ndAnimKeyframe& keyFrame = m_output[i];
+			//	ndVector posit(info.m_basePosition);
+			//	posit.m_x += keyFrame.m_posit.m_x;
+			//	posit.m_y += keyFrame.m_posit.m_y;
+			//	posit.m_z += keyFrame.m_posit.m_z;
+			//	info.m_effector->SetLocalTargetPosition(posit);
+			//}
 
 			ndSkeletonContainer* const skeleton = m_bodyArray[0]->GetSkeleton();
 			ndAssert(skeleton);

@@ -22,6 +22,7 @@ class ndAnimationSequence : public ndClassAlloc
 	ndAnimationSequence();
 	virtual ~ndAnimationSequence();
 
+	ndFloat32 GetDuration() const;
 	const ndString& GetName() const;
 	void SetName(const char* const name);
 
@@ -32,6 +33,9 @@ class ndAnimationSequence : public ndClassAlloc
 	private:
 	ndList<ndAnimationKeyFramesTrack> m_tracks;
 	ndString m_name;
+	ndFloat32 m_duration;
+
+	friend class ndFbxMeshLoader;
 };
 
 #endif

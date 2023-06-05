@@ -26,13 +26,13 @@ class ndAnimationSequencePlayer: public ndAnimationBlendTreeNode
 
 	virtual void Evaluate(ndAnimationPose& output);
 
-	ndFloat32 GetParam() const;
-	void SetParam(ndFloat32 param);
+	ndFloat32 GetTime() const;
+	void SetTime(ndFloat32 time);
 	ndSharedPtr<ndAnimationSequence>& GetSequence();
 
 	private:
 	ndSharedPtr<ndAnimationSequence> m_sequence;
-	ndFloat32 m_param;
+	ndFloat32 m_time;
 };
 
 #endif

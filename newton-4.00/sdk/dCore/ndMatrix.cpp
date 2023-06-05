@@ -290,8 +290,6 @@ ndVector ndMatrix::CalcPitchYawRoll (ndVector& euler1) const
 		euler1[0] = picth0;
 		euler1[1] = yaw0;
 		euler1[2] = roll0;
-		//ndMatrix xxxx(ndPitchMatrix(picth0) * ndYawMatrix(yaw0) * ndRollMatrix(roll0));
-		//ndMatrix xxxx1(ndPitchMatrix(picth0) * ndYawMatrix(yaw0) * ndRollMatrix(roll0));
 	} 
 	else if (matrix[0][2] < ndFloat32 (-0.99995f)) 
 	{
@@ -305,8 +303,6 @@ ndVector ndMatrix::CalcPitchYawRoll (ndVector& euler1) const
 		euler1[0] = picth0;
 		euler1[1] = yaw0;
 		euler1[2] = roll0;
-		//ndMatrix xxxx(ndPitchMatrix(picth0) * ndYawMatrix(yaw0) * ndRollMatrix(roll0));
-		//ndMatrix xxxx1(ndPitchMatrix(picth0) * ndYawMatrix(yaw0) * ndRollMatrix(roll0));
 	} 
 	else 
 	{

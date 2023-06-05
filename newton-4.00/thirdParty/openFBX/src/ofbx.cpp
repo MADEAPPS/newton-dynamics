@@ -1743,16 +1743,14 @@ struct AnimationCurveNodeImpl : AnimationCurveNode
 			const float* values = curve.curve->getKeyValue();
 			int count = curve.curve->getKeyCount();
 
-			if (fbx_time < times[0]) fbx_time = times[0];
-			if (fbx_time > times[count - 1]) fbx_time = times[count - 1];
-			//for (int i = 1; i < count; ++i)
-			//{
-			//	if (times[i] >= fbx_time)
-			//	{
-			//		float t = float(double(fbx_time - times[i - 1]) / double(times[i] - times[i - 1]));
-			//		return values[i - 1] * (1 - t) + values[i] * t;
-			//	}
-			//}
+			if (fbx_time < times[0])
+			{
+				fbx_time = times[0];
+			}
+			if (fbx_time > times[count - 1])
+			{
+				fbx_time = times[count - 1];
+			}
 			int i0 = 1;
 			int i2 = count - 1;
 			while ((i2 - i0) >= 8)

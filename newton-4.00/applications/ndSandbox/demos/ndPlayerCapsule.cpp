@@ -95,12 +95,16 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 			mesh->ApplyTransform(scaleMatrix);
 		}
 
-		if (!loadAnimation)
+		static int xxxxx;
+		if (loadAnimation)
 		{
-			//ndMesh::Save(mesh, "xxx.ndm");
-			//delete mesh;
-			//mesh = ndMesh::Load("xxx.ndm");
-			//mesh->m_matrix = ndRollMatrix(ndPi * 0.5f);
+			if (!xxxxx)
+			{
+				ndMesh::Save(mesh, "xxx.ndm");
+				//delete mesh;
+				//mesh = ndMesh::Load("xxx.ndm");
+			}
+			xxxxx++;
 		}
 
 		return mesh;

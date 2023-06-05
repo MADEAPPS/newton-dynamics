@@ -31,10 +31,10 @@ class ndMesh : public ndNodeHierarchy<ndMesh>
 	class ndCurveValue
 	{
 		public:
-		ndFloat32 m_x;
-		ndFloat32 m_y;
-		ndFloat32 m_z;
-		ndFloat32 m_time;
+		ndReal m_x;
+		ndReal m_y;
+		ndReal m_z;
+		ndReal m_time;
 	};
 
 	class ndCurve: public ndList<ndCurveValue>
@@ -45,7 +45,7 @@ class ndMesh : public ndNodeHierarchy<ndMesh>
 			,m_lenght(ndFloat32 (0.0f))
 		{
 		}
-		ndFloat32 m_lenght;
+		ndReal m_lenght;
 	};
 
 	D_COLLISION_API ndMesh(ndMesh* const parent);

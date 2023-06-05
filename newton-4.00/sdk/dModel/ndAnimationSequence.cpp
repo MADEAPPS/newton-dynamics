@@ -17,6 +17,7 @@ ndAnimationSequence::ndAnimationSequence()
 	:ndClassAlloc()
 	,m_tracks()
 	,m_name("")
+	,m_duration(ndFloat32 (0.0f))
 {
 }
 
@@ -27,6 +28,11 @@ ndAnimationSequence::~ndAnimationSequence()
 const ndString& ndAnimationSequence::GetName() const
 {
 	return m_name;
+}
+
+ndFloat32 ndAnimationSequence::GetDuration() const
+{
+	return m_duration;
 }
 
 void ndAnimationSequence::SetName(const char* const name)

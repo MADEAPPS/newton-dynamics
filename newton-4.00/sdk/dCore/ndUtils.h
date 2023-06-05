@@ -146,6 +146,19 @@ inline T ndAnglesAdd (T angleInRadiand1, T angleInRadiand0)
 }
 
 template <class T>
+inline T ndAnglesSub(T angleInRadiand1, T angleInRadiand0)
+{
+	T s1 = T(ndSin(angleInRadiand1));
+	T c1 = T(ndCos(angleInRadiand1));
+	T s0 = T(ndSin(angleInRadiand0));
+	T c0 = T(ndCos(angleInRadiand0));
+
+	T s = s1 * c0 - s0 * c1;
+	T c = c1 * c0 + s0 * s1;
+	return T(ndAtan2(s, c));
+}
+
+template <class T>
 inline void ndMemSet(T* const dst, const T& val, ndInt32 elements)
 {
 	T value(val);
