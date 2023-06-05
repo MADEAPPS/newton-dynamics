@@ -98,24 +98,6 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 		static int xxxxx;
 		if (loadAnimation)
 		{
-			// extract translation for hip node.
-			//if (!strcmp(fbxMeshName, "mocap_walk.fbx"))
-			//{
-			//	for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
-			//	{
-			//		if (node->GetName() == "Hips")
-			//		{ 
-			//			ndMesh::ndCurve& translation = node->GetPositCurve();
-			//			for (ndMesh::ndCurve::ndNode* positNode = translation.GetFirst(); positNode; positNode = positNode->GetNext())
-			//			{
-			//				ndMesh::ndCurveValue& point = positNode->GetInfo();
-			//				point.m_x = ndReal(0.0f);
-			//			}
-			//			break;
-			//		}
-			//	}
-			//}
-
 			if (xxxxx==0)
 			{
 				//ndMesh::Save(mesh, "xxx.ndm");
@@ -134,21 +116,24 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 		ndAssert(sequence);
 
 		// extract translation for hip node.
-		for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = sequence->GetTracks().GetFirst(); node; node = node->GetNext())
+		if (!strcmp(clipName, "mocap_walk.fbx"))
 		{
-			ndAnimationKeyFramesTrack& track = node->GetInfo();
-			if (track.GetName() == "Hips")
+			for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = sequence->GetTracks().GetFirst(); node; node = node->GetNext())
 			{
-				ndAnimationKeyFramesTrack& translationTrack = sequence->GetTranslationTrack();
-				ndVector translation(ndVector::m_zero);
-				for (ndInt32 i = 0; i < track.m_position.GetCount(); ++i)
+				ndAnimationKeyFramesTrack& track = node->GetInfo();
+				if (track.GetName() == "Hips")
 				{
-					translation.m_x = track.m_position[i].m_x;
-					translationTrack.m_position.PushBack(translation);
-					translationTrack.m_position.m_time.PushBack(track.m_position.m_time[i]);
-					track.m_position[i].m_x = 0.0f;
+					ndAnimationKeyFramesTrack& translationTrack = sequence->GetTranslationTrack();
+					ndVector translation(ndVector::m_zero);
+					for (ndInt32 i = 0; i < track.m_position.GetCount(); ++i)
+					{
+						translation.m_x = track.m_position[i].m_x;
+						translationTrack.m_position.PushBack(translation);
+						translationTrack.m_position.m_time.PushBack(track.m_position.m_time[i]);
+						track.m_position[i].m_x = 0.0f;
+					}
+					break;
 				}
-				break;
 			}
 		}
 
