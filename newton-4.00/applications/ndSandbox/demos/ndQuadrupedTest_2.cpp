@@ -23,7 +23,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-namespace ndQuadruped_1
+namespace ndQuadruped_2
 {
 	class ndDefinition
 	{
@@ -887,8 +887,9 @@ namespace ndQuadruped_1
 	};
 }
 
-using namespace ndQuadruped_1;
-void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
+using namespace ndQuadruped_2;
+
+void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());

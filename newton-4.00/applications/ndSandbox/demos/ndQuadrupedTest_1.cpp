@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-namespace ndQuadruped_2
+namespace ndQuadruped_1
 {
 	class ndQuadrupedModel : public ndModel
 	{
@@ -275,8 +275,13 @@ namespace ndQuadruped_2
 		{
 		}
 
-		virtual void OnAddToWorld() { ndAssert(0); }
-		virtual void OnRemoveFromToWorld() { ndAssert(0); }
+		virtual void OnAddToWorld() 
+		{ 
+		}
+
+		virtual void OnRemoveFromToWorld() 
+		{ 
+		}
 
 		void GetContacts(ndFixSizeArray<ndVector, 4>& contacts) const 
 		{
@@ -481,8 +486,9 @@ namespace ndQuadruped_2
 	};
 }
 
-using namespace ndQuadruped_2;
-void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
+using namespace ndQuadruped_1;
+
+void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());
