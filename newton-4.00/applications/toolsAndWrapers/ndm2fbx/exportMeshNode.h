@@ -24,7 +24,7 @@ class exportMeshNode
 
 	virtual ~exportMeshNode();
 
-	static exportMeshNode* ImportBvhSkeleton(const char* const name);
+	static exportMeshNode* ImportNdm(const char* const name);
 
 	public:
 	void AlignFrames();
