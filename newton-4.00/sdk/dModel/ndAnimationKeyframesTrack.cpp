@@ -21,7 +21,7 @@ ndInt32 ndAnimationKeyFramesTrack::ndKeyFramesArray<OBJECT>::GetIndex(ndFloat32 
 
 	ndInt32 i0 = 1;
 	ndInt32 i1 = count - 1;
-	while ((i1 - i0) > 8)
+	while ((i1 - i0) > 4)
 	{
 		const ndInt32 mid = (i1 + i0) / 2;
 		if (m_time[mid] > time)
