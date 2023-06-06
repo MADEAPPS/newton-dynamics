@@ -125,9 +125,10 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 				{
 					ndAnimationKeyFramesTrack& translationTrack = sequence->GetTranslationTrack();
 					ndVector translation(ndVector::m_zero);
+					ndReal offset = ndReal(track.m_position[0].m_x);
 					for (ndInt32 i = 0; i < track.m_position.GetCount(); ++i)
 					{
-						translation.m_x = track.m_position[i].m_x;
+						translation.m_x = track.m_position[i].m_x - offset;
 						translationTrack.m_position.PushBack(translation);
 						translationTrack.m_position.m_time.PushBack(track.m_position.m_time[i]);
 						track.m_position[i].m_x = 0.0f;

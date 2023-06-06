@@ -50,8 +50,6 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		:ndDemoEntityNotify(manager, entity)
 		,m_meshOrigin(entity->GetRenderMatrix().m_posit)
 		,m_localRotation(entity->GetRenderMatrix())
-		,m_posit0(0.0f)
-		,m_posit1(0.0f)
 	{
 	}
 
@@ -67,11 +65,9 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		ndFloat32 timestep = word->GetScene()->GetTimestep();
 		player->m_idleCycle->SetTime(player->m_idleCycle->GetTime() + timestep);
 
-		m_posit0 = m_posit1;
-		ndVector translationOut;
-		player->m_animBlendTree->Evaluate(player->m_output, translationOut);
-		m_posit1 = translationOut.m_x;
-		ndTrace(("speed %g\n", (m_posit1 - m_posit0) / timestep));
+		ndVector aninVeloc;
+		player->m_animBlendTree->Evaluate(player->m_output, aninVeloc);
+		ndTrace(("speed %g\n", aninVeloc.m_x));
 
 		for (ndInt32 i = 0; i < player->m_output.GetCount(); ++i)
 		{
@@ -83,8 +79,6 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 	
 	ndQuaternion m_meshOrigin;
 	ndQuaternion m_localRotation;
-	ndFloat32 m_posit0;
-	ndFloat32 m_posit1;
 };
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule()
