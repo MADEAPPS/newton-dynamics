@@ -60,7 +60,6 @@ void ndAnimationBlendTreeNode::dAnimationPose::SetTargetPose() const
 
 ndAnimationBlendTreeNode::ndAnimationBlendTreeNode(ndAnimationBlendTreeNode* const child)
 	:ndClassAlloc()
-//	,m_character(character)
 	,m_input(child)
 {
 }
@@ -73,3 +72,11 @@ ndAnimationBlendTreeNode::~ndAnimationBlendTreeNode()
 	}
 }
 
+void ndAnimationBlendTreeNode::Evaluate(ndAnimationPose& output, ndVector& veloc)
+{
+	veloc = ndVector::m_zero;
+	if (m_input)
+	{
+		m_input->Evaluate(output, veloc);
+	}
+}

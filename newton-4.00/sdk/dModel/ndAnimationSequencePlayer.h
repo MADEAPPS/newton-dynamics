@@ -24,7 +24,7 @@ class ndAnimationSequencePlayer: public ndAnimationBlendTreeNode
 	ndAnimationSequencePlayer(ndSharedPtr<ndAnimationSequence>& sequence);
 	virtual ~ndAnimationSequencePlayer();
 
-	virtual void Evaluate(ndAnimationPose& output);
+	virtual void Evaluate(ndAnimationPose& output, ndVector& veloc);
 
 	ndFloat32 GetTime() const;
 	void SetTime(ndFloat32 time);
@@ -32,6 +32,7 @@ class ndAnimationSequencePlayer: public ndAnimationBlendTreeNode
 
 	private:
 	ndSharedPtr<ndAnimationSequence> m_sequence;
+	ndVector m_veloc;
 	ndFloat32 m_time;
 };
 

@@ -48,8 +48,10 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 	public:
 	ndBasicPlayerCapsuleNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity)
 		:ndDemoEntityNotify(manager, entity)
-		,m_localRotation(entity->GetRenderMatrix())
 		,m_meshOrigin(entity->GetRenderMatrix().m_posit)
+		,m_localRotation(entity->GetRenderMatrix())
+		,m_posit0(0.0f)
+		,m_posit1(0.0f)
 	{
 	}
 
@@ -63,10 +65,14 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
 
 		ndFloat32 timestep = word->GetScene()->GetTimestep();
-		//player->m_walkCycle->SetParam(xxxx);
 		player->m_idleCycle->SetTime(player->m_idleCycle->GetTime() + timestep);
 
-		player->m_animBlendTree->Evaluate(player->m_output);
+		m_posit0 = m_posit1;
+		ndVector translationOut;
+		player->m_animBlendTree->Evaluate(player->m_output, translationOut);
+		m_posit1 = translationOut.m_x;
+		ndTrace(("speed %g\n", (m_posit1 - m_posit0) / timestep));
+
 		for (ndInt32 i = 0; i < player->m_output.GetCount(); ++i)
 		{
 			const ndAnimKeyframe& keyFrame = player->m_output[i];
@@ -74,9 +80,11 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 			entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
 		}
 	}
-
-	ndQuaternion m_localRotation;
+	
 	ndQuaternion m_meshOrigin;
+	ndQuaternion m_localRotation;
+	ndFloat32 m_posit0;
+	ndFloat32 m_posit1;
 };
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule()
