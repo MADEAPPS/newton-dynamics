@@ -34,8 +34,8 @@ ndInt32 ndAnimationKeyFramesTrack::ndKeyFramesArray<OBJECT>::GetIndex(ndFloat32 
 		}
 	}
 
-	ndInt32 index = count - 1;
-	ndAssert(m_time[i0 - 1] <= time);
+	ndInt32 index = i0 - 1;
+	ndAssert(m_time[index] <= time);
 	for (ndInt32 i = i0; i < count; ++i)
 	{
 		if (m_time[i] >= time)
