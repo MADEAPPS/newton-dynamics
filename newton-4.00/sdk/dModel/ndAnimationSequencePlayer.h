@@ -28,6 +28,7 @@ class ndAnimationSequencePlayer: public ndAnimationBlendTreeNode
 
 	ndFloat32 GetTime() const;
 	void SetTime(ndFloat32 time);
+
 	ndSharedPtr<ndAnimationSequence>& GetSequence();
 
 	private:

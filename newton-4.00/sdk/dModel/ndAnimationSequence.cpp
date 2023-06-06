@@ -57,6 +57,13 @@ ndAnimationKeyFramesTrack* ndAnimationSequence::AddTrack()
 	return &node->GetInfo();
 }
 
+ndVector ndAnimationSequence::GetTranslation(ndFloat32 param) const
+{
+	ndVector translation;
+	m_translationTrack.InterpolatePosition(param, translation);
+	return translation;
+}
+
 void ndAnimationSequence::CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 {
 	if (output.GetCount())

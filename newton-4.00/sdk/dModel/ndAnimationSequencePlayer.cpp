@@ -36,10 +36,18 @@ void ndAnimationSequencePlayer::SetTime(ndFloat32 time)
 	ndFloat32 duration = m_sequence->GetDuration();
 	ndFloat32 scale = ndFloat32(2.0f) * ndPi / duration;
 
+	ndFloat32 t0 = m_time;
 	ndFloat32 angle1 = time * scale;
 	ndFloat32 angle0 = m_time * scale;
 	ndFloat32 angle = angle0 + ndAnglesSub(angle1, angle0);
-	m_time = ndMod (angle, ndFloat32(2.0f) * ndPi) / scale;
+	//ndFloat32 t1 = ndMod(angle, ndFloat32(2.0f) * ndPi) / scale;
+	ndFloat32 t1 = angle / scale;
+	m_time = ndMod(angle, ndFloat32(2.0f) * ndPi) / scale;
+
+	ndVector p0(m_sequence->GetTranslation(t0));
+	ndVector p1(m_sequence->GetTranslation(m_time));
+	//m_veloc = m_sequence->CalculateVelocity(t0, t1);
+	
 	ndAssert(m_time >= 0.0f);
 }
 
