@@ -131,7 +131,7 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 						translation.m_x = track.m_position[i].m_x - offset;
 						translationTrack.m_position.PushBack(translation);
 						translationTrack.m_position.m_time.PushBack(track.m_position.m_time[i]);
-						track.m_position[i].m_x = 0.0f;
+						track.m_position[i].m_x = offset;
 					}
 					break;
 				}
