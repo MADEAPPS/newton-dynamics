@@ -50,6 +50,7 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		:ndDemoEntityNotify(manager, entity)
 		,m_meshOrigin(entity->GetRenderMatrix().m_posit)
 		,m_localRotation(entity->GetRenderMatrix())
+		,m_veloc(ndVector::m_zero)
 	{
 	}
 
@@ -64,10 +65,8 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 
 		ndFloat32 timestep = word->GetScene()->GetTimestep();
 		player->m_idleCycle->SetTime(player->m_idleCycle->GetTime() + timestep);
-
-		ndVector aninVeloc;
-		player->m_animBlendTree->Evaluate(player->m_output, aninVeloc);
-		ndTrace(("speed %g\n", aninVeloc.m_x));
+		player->m_animBlendTree->Evaluate(player->m_output, m_veloc);
+		//ndTrace(("speed %g\n", aninVeloc.m_x));
 
 		for (ndInt32 i = 0; i < player->m_output.GetCount(); ++i)
 		{
@@ -79,6 +78,7 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 	
 	ndQuaternion m_meshOrigin;
 	ndQuaternion m_localRotation;
+	ndVector m_veloc;
 };
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule()
@@ -192,7 +192,8 @@ void ndBasicPlayerCapsule::SetCamera(ndDemoEntityManager* const scene)
 		ndDemoCamera* const camera = scene->GetCamera();
 		ndMatrix camMatrix(camera->GetNextMatrix());
 
-		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)GetNotifyCallback();
+		//ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)GetNotifyCallback();
+		ndBasicPlayerCapsuleNotify* const notify = (ndBasicPlayerCapsuleNotify*)GetNotifyCallback();
 		ndDemoEntity* const player = (ndDemoEntity*)notify->GetUserData();
 		ndMatrix playerMatrix(player->GetNextMatrix());
 
@@ -223,9 +224,11 @@ void ndBasicPlayerCapsule::SetCamera(ndDemoEntityManager* const scene)
 		m_playerInput.m_strafeSpeed = (ndFloat32)(ndInt32(scene->GetKeyState('D')) - ndInt32(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
 		m_playerInput.m_jump = scene->GetKeyState(' ') && IsOnFloor();
 
-		if (m_playerInput.m_forwardSpeed && m_playerInput.m_strafeSpeed)
+		if (m_playerInput.m_forwardSpeed || m_playerInput.m_strafeSpeed)
 		{
-			ndFloat32 invMag = PLAYER_WALK_SPEED / ndSqrt(m_playerInput.m_forwardSpeed * m_playerInput.m_forwardSpeed + m_playerInput.m_strafeSpeed * m_playerInput.m_strafeSpeed);
+			ndFloat32 speed = notify->m_veloc.m_x;
+			//ndFloat32 invMag = PLAYER_WALK_SPEED / ndSqrt(m_playerInput.m_forwardSpeed * m_playerInput.m_forwardSpeed + m_playerInput.m_strafeSpeed * m_playerInput.m_strafeSpeed);
+			ndFloat32 invMag = speed / ndSqrt(m_playerInput.m_forwardSpeed * m_playerInput.m_forwardSpeed + m_playerInput.m_strafeSpeed * m_playerInput.m_strafeSpeed);
 			m_playerInput.m_forwardSpeed *= invMag;
 			m_playerInput.m_strafeSpeed *= invMag;
 		}
