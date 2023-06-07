@@ -64,7 +64,8 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
 
 		ndFloat32 timestep = word->GetScene()->GetTimestep();
-		player->m_idleCycle->SetTime(player->m_idleCycle->GetTime() + timestep);
+		//player->m_idleCycle->SetTime(player->m_idleCycle->GetTime() + timestep);
+		player->m_animBlendTree->Update(timestep);
 		player->m_animBlendTree->Evaluate(player->m_output, m_veloc);
 		//ndTrace(("speed %g\n", aninVeloc.m_x));
 
@@ -94,8 +95,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 	,m_isPlayer(isPlayer)
 	,m_output()
-	,m_idleCycle(nullptr)
-	,m_walkCycle(nullptr)
+	,m_idleWalkBlend(nullptr)
 	,m_animBlendTree(nullptr)
 {
 	static ndFileBasicPlayerCapsule loadSave;
@@ -138,17 +138,13 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
 	ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
 	//ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
-	//
-	//////dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
-	////ndFloat32 scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
-	//ndAnimationTwoWayBlend* const walkRunBlend = new ndAnimationTwoWayBlend(walk, run);
-	//ndAnimationTwoWayBlend* const idleMoveBlend = new ndAnimationTwoWayBlend(idle, walkRunBlend);
-	ndAnimationTwoWayBlend* const idleWalkBlend = new ndAnimationTwoWayBlend(idle, walk);
+
+	m_idleWalkBlend = new ndAnimationTwoWayBlend(idle, walk);
 
 	//m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode> (idle);
-	m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(idleWalkBlend);
+	m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_idleWalkBlend);
 
-	m_idleCycle = idle;
+	//m_idleCycle = idle;
 	//m_walkCycle = walk;
 }
 
@@ -225,6 +221,8 @@ void ndBasicPlayerCapsule::SetCamera(ndDemoEntityManager* const scene)
 		m_playerInput.m_forwardSpeed = (ndFloat32)(ndInt32(scene->GetKeyState('W')) - ndInt32(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
 		m_playerInput.m_strafeSpeed = (ndFloat32)(ndInt32(scene->GetKeyState('D')) - ndInt32(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
 		m_playerInput.m_jump = scene->GetKeyState(' ') && IsOnFloor();
+
+		m_idleWalkBlend->SetParam(m_playerInput.m_forwardSpeed ? 1.0f : 0.0f);
 
 		if (m_playerInput.m_forwardSpeed || m_playerInput.m_strafeSpeed)
 		{

@@ -72,6 +72,15 @@ ndAnimationBlendTreeNode::~ndAnimationBlendTreeNode()
 	}
 }
 
+void ndAnimationBlendTreeNode::Update(ndFloat32 dt)
+{
+	ndAssert(0);
+	if (m_input)
+	{
+		m_input->Update(dt);
+	}
+}
+
 void ndAnimationBlendTreeNode::Evaluate(ndAnimationPose& output, ndVector& veloc)
 {
 	veloc = ndVector::m_zero;

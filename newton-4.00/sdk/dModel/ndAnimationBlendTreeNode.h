@@ -20,6 +20,7 @@ class ndAnimationBlendTreeNode: public ndClassAlloc
 	ndAnimationBlendTreeNode(ndAnimationBlendTreeNode* const input);
 	virtual ~ndAnimationBlendTreeNode();
 
+	virtual void Update(ndFloat32 dt);
 	virtual void Evaluate(ndAnimationPose& output, ndVector& veloc);
 
 	ndAnimationBlendTreeNode* m_input;

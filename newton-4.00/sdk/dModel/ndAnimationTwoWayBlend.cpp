@@ -17,8 +17,6 @@ ndAnimationTwoWayBlend::ndAnimationTwoWayBlend(ndAnimationBlendTreeNode* const n
 	:ndAnimationBlendTreeNode(nullptr)
 	,m_node0(node0)
 	,m_node1(node1)
-	,m_timeDilation0(1.0f)
-	,m_timeDilation1(1.0f)
 	,m_param(0.0f)
 {
 }
@@ -27,6 +25,24 @@ ndAnimationTwoWayBlend::~ndAnimationTwoWayBlend()
 {
 	delete m_node0;
 	delete m_node1;
+}
+
+void ndAnimationTwoWayBlend::Update(ndFloat32 timestep)
+{
+	if (m_param < ndFloat32(0.001f))
+	{
+		m_node0->Update(timestep);
+	}
+	else if (m_param > ndFloat32(0.999f))
+	{
+		m_node1->Update(timestep);
+	}
+	else
+	{
+		ndAssert(0);
+		m_node0->Update(timestep);
+		m_node1->Update(timestep);
+	}
 }
 
 void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose& output, ndVector& veloc)

@@ -70,8 +70,7 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 	bool m_isPlayer;
 
 	ndAnimationPose m_output;
-	ndAnimationSequencePlayer* m_idleCycle;
-	ndAnimationSequencePlayer* m_walkCycle;
+	ndAnimationTwoWayBlend* m_idleWalkBlend;
 	ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 };
 

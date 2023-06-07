@@ -36,12 +36,6 @@ void ndAnimationSequencePlayer::SetTime(ndFloat32 time)
 	ndFloat32 duration = m_sequence->GetDuration();
 	ndFloat32 scale = ndFloat32(2.0f) * ndPi / duration;
 
-#if 0
-	ndFloat32 angle1 = time * scale;
-	ndFloat32 angle0 = m_time * scale;
-	ndFloat32 angle = angle0 + ndAnglesSub(angle1, angle0);
-	m_time = ndMod(angle, ndFloat32(2.0f) * ndPi) / scale;
-#else
 	ndFloat32 angle1 = time * scale;
 	ndFloat32 angle0 = m_time * scale;
 	ndFloat32 deltaAngle = ndAnglesSub(angle1, angle0);
@@ -83,10 +77,14 @@ void ndAnimationSequencePlayer::SetTime(ndFloat32 time)
 	{
 		ndAssert(0);
 	}
-#endif
 
 	m_time = t1;
 	ndAssert(m_time >= 0.0f);
+}
+
+void ndAnimationSequencePlayer::Update(ndFloat32 timestep)
+{
+	SetTime (m_time + timestep);
 }
 
 ndSharedPtr<ndAnimationSequence>& ndAnimationSequencePlayer::GetSequence()

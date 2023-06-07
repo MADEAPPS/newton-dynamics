@@ -23,23 +23,12 @@ class ndAnimationTwoWayBlend: public ndAnimationBlendTreeNode
 	ndFloat32 GetParam() const;
 	void SetParam(ndFloat32 param);
 
-	void SetTimeDilation0 (ndFloat32 dilation)
-	{
-		m_timeDilation0 = dilation;
-	}
-
-	void SetTimeDilation1(ndFloat32 dilation)
-	{
-		m_timeDilation1 = dilation;
-	}
-
+	void Update(ndFloat32 dt);
 	void Evaluate(ndAnimationPose& output, ndVector& veloc);
 
 	protected:
 	ndAnimationBlendTreeNode* m_node0;
 	ndAnimationBlendTreeNode* m_node1;
-	ndFloat32 m_timeDilation0;
-	ndFloat32 m_timeDilation1;
 	ndFloat32 m_param;
 };
 
