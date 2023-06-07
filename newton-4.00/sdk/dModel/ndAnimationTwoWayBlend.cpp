@@ -29,20 +29,19 @@ ndAnimationTwoWayBlend::~ndAnimationTwoWayBlend()
 	delete m_node1;
 }
 
-//void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose& output)
-void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose&)
+void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose& output, ndVector& veloc)
 {
-	ndAssert(0);
-	//if (m_param < 0.001f) 
-	//{
-	//	m_node0->Evaluate(output, timestep);
-	//} 
-	//else if (m_param > 0.999f) 
-	//{
-	//	m_node1->Evaluate(output, timestep);
-	//} 
-	//else 
-	//{
+	if (m_param < ndFloat32 (0.001f)) 
+	{
+		m_node0->Evaluate(output, veloc);
+	} 
+	else if (m_param > ndFloat32(0.999f))
+	{
+		m_node1->Evaluate(output, veloc);
+	} 
+	else 
+	{
+		ndAssert(0);
 	//	const int count = output.GetCount();
 	//	ndAnimKeyframe* const buffer = dAlloca(ndAnimKeyframe, count + 32);
 	//	ndAnimationLocalPose localPose(buffer);
@@ -59,5 +58,5 @@ void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose&)
 	//		dstFrame.m_rotation = dstFrame.m_rotation.Slerp(srcFrame.m_rotation, m_param);
 	//		dstFrame.m_posit = dstFrame.m_posit + (srcFrame.m_posit - dstFrame.m_posit).Scale(m_param);
 	//	}
-	//}
+	}
 }

@@ -119,9 +119,9 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 
 	//// create an animation blend tree
 	//ndSharedPtr<ndAnimationSequence> idleSequence__(scene->GetAnimationSequence(loader, "box.fbx"));
-	ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_walk.fbx"));
+	//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_walk.fbx"));
 	//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide0.fbx"));
-	//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide1.fbx"));
+	ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide1.fbx"));
 	ndSharedPtr<ndAnimationSequence> walkSequence(scene->GetAnimationSequence(loader, "mocap_walk.fbx"));
 
 	// create bind pose to animation sequences.
@@ -136,15 +136,17 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	}
 
 	ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
-	//ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
+	ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
 	//ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
 	//
 	//////dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
 	////ndFloat32 scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
 	//ndAnimationTwoWayBlend* const walkRunBlend = new ndAnimationTwoWayBlend(walk, run);
 	//ndAnimationTwoWayBlend* const idleMoveBlend = new ndAnimationTwoWayBlend(idle, walkRunBlend);
+	ndAnimationTwoWayBlend* const idleWalkBlend = new ndAnimationTwoWayBlend(idle, walk);
 
-	m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode> (idle);
+	//m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode> (idle);
+	m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(idleWalkBlend);
 
 	m_idleCycle = idle;
 	//m_walkCycle = walk;

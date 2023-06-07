@@ -33,7 +33,7 @@ class ndAnimationTwoWayBlend: public ndAnimationBlendTreeNode
 		m_timeDilation1 = dilation;
 	}
 
-	virtual void Evaluate(ndAnimationPose& output);
+	void Evaluate(ndAnimationPose& output, ndVector& veloc);
 
 	protected:
 	ndAnimationBlendTreeNode* m_node0;
