@@ -17,14 +17,15 @@ ndInt32 ndAnimationKeyFramesTrack::ndKeyFramesArray<OBJECT>::GetIndex(ndFloat32 
 {
 	ndAssert(time >= 0.0f);
 	const ndInt32 count = ndArray<OBJECT>::GetCount();
-	time = ndClamp(time, m_time[0], m_time[count - 1]);
+	const ndFloat32* const timePtr = &m_time[0];
+	time = ndClamp(time, timePtr[0], timePtr[count - 1]);
 
 	ndInt32 i0 = 1;
 	ndInt32 i1 = count - 1;
 	while ((i1 - i0) > 4)
 	{
 		const ndInt32 mid = (i1 + i0) / 2;
-		if (m_time[mid] > time)
+		if (timePtr[mid] > time)
 		{
 			i1 = mid;
 		}
@@ -35,10 +36,10 @@ ndInt32 ndAnimationKeyFramesTrack::ndKeyFramesArray<OBJECT>::GetIndex(ndFloat32 
 	}
 
 	ndInt32 index = i0 - 1;
-	ndAssert(m_time[index] <= time);
+	ndAssert(timePtr[index] <= time);
 	for (ndInt32 i = i0; i < count; ++i)
 	{
-		if (m_time[i] >= time)
+		if (timePtr[i] >= time)
 		{
 			index = i;
 			break;
