@@ -12,7 +12,7 @@
 #include "ndNewton.h"
 #include <gtest/gtest.h>
 
-#if 0
+#if 1
 class csBodyTrigger : public ndBodyTriggerVolume 
 {
 	public:
@@ -59,6 +59,7 @@ TEST(Collisions, TriggerCollision)
 	movingbody->SetCollisionShape(shapeinst);
 	movingbody->SetMatrix(matrix);
 	movingbody->SetMassMatrix(ndFloat32(10), shapeinst);
+	movingbody->SetDebugMaxLinearAndAngularIntegrationStep(ndPi, ndFloat32(2.0f));
 	ndSharedPtr<ndBody> movingPtr(movingbody);
 	world.AddBody(movingPtr);
 
@@ -75,9 +76,13 @@ TEST(Collisions, TriggerCollision)
 
 class csBodyTrigger : public ndBodyTriggerVolume
 {
-public:
-	csBodyTrigger() :ndBodyTriggerVolume() { }
-	virtual ~csBodyTrigger() { }
+	public:
+	csBodyTrigger() :ndBodyTriggerVolume() 
+	{ 
+	}
+	virtual ~csBodyTrigger() 
+	{ 
+	}
 
 	virtual void OnTrigger(ndBodyKinematic* const, ndFloat32)
 	{
@@ -93,25 +98,25 @@ public:
 	}
 };
 
-class csBodyNotify : public ndBodyNotify
-{
-	public:
-	csBodyNotify(ndBigVector const& defaultGravity) : ndBodyNotify(defaultGravity)
-	{
-	}
-	virtual ~csBodyNotify()
-	{
-	}
-
-	virtual void OnTransform(ndInt32, ndMatrix const&)
-	{
-	}
-
-	virtual void OnApplyExternalForce(ndInt32, ndFloat32 timestep)
-	{
-		GetBody()->GetAsBodyKinematic()->IntegrateVelocity(timestep);
-	}
-};
+//class csBodyNotify : public ndBodyNotify
+//{
+//	public:
+//	csBodyNotify(ndBigVector const& defaultGravity) : ndBodyNotify(defaultGravity)
+//	{
+//	}
+//	virtual ~csBodyNotify()
+//	{
+//	}
+//
+//	virtual void OnTransform(ndInt32, ndMatrix const&)
+//	{
+//	}
+//
+//	virtual void OnApplyExternalForce(ndInt32, ndFloat32 timestep)
+//	{
+//		GetBody()->GetAsBodyKinematic()->IntegrateVelocity(timestep);
+//	}
+//};
 
 TEST(KinematicMovement, TriggerBody)
 {
@@ -123,6 +128,7 @@ TEST(KinematicMovement, TriggerBody)
 	csBodyTrigger* kinebody = new csBodyTrigger();
 	kinebody->SetCollisionShape(shape);
 	kinebody->SetMatrix(matrix);
+	kinebody->SetVelocity(ndVector(ndFloat32(4), ndFloat32(0), ndFloat32(0), ndFloat32(0)));
 	world->AddBody(ndSharedPtr<ndBody>(kinebody));
 
 	matrix.m_posit.m_x += 4;
@@ -133,17 +139,17 @@ TEST(KinematicMovement, TriggerBody)
 	body->SetNotifyCallback(new ndBodyNotify(ndVector(ndFloat32(0), ndFloat32(0), ndFloat32(0), ndFloat32(0))));
 	world->AddBody(ndSharedPtr<ndBody>(body));
 
-	kinebody->SetVelocity(ndVector(ndFloat32(4), ndFloat32(0), ndFloat32(0), ndFloat32(0)));
-	kinebody->SetNotifyCallback(new csBodyNotify(ndVector(ndFloat32(0), ndFloat32(0), ndFloat32(0), ndFloat32(0))));
+	// No movement, since is have infinite mass (static body)
+	world->Update(1.0f / 60.0f);
+	world->Sync();
+	ndAssert(kinebody->GetMatrix().m_posit.m_x == 0);
 
-	// No movement
-	//world->Update(1.0f / 60.0f);
-	//world->Sync();
-	//ndAssert(kinebody->GetMatrix().m_posit.m_x == 0);
-	// Add mass and reset velocity
-	//kinebody->SetMassMatrix(1, shape);
-
+	// Add mass and reset velocity, expect movement because has mass and velocity
+	kinebody->SetMassMatrix(1, shape);
 	kinebody->SetVelocity(ndVector(ndFloat32(4), ndFloat32(0), ndFloat32(0), ndFloat32(0)));
+	world->Update(1.0f / 60.0f);
+	world->Sync();
+	ndAssert(kinebody->GetMatrix().m_posit.m_x != 0);
 
 	// the trigger in the trigger notification 
 	for (int i = 0; i < 480; i++)

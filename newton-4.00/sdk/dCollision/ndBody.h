@@ -108,6 +108,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 		ndUnsigned32 m_flags;
 		struct
 		{
+			ndUnsigned32 m_isDynamics : 1;
 			ndUnsigned32 m_skeletonMark : 1;
 			ndUnsigned32 m_skeletonMark0 : 1;
 			ndUnsigned32 m_skeletonMark1 : 1;
@@ -119,8 +120,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 
 	ndUnsigned8 m_isStatic;
 	ndUnsigned8 m_autoSleep;
-	ndUnsigned8 m_isDynamics;
-	ndUnsigned32 m_equilibrium;
+	ndUnsigned8 m_equilibrium;
 	ndUnsigned8 m_equilibrium0;
 	ndUnsigned8 m_isJointFence0;
 	ndUnsigned8 m_isJointFence1;

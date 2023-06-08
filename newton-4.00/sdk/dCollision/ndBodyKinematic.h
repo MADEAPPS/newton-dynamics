@@ -186,6 +186,8 @@ class ndBodyKinematic : public ndBody
 	
 	D_COLLISION_API virtual void EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeAccel2);
 
+	virtual void SetAcceleration(const ndVector& accel, const ndVector& alpha);
+
 #ifdef D_USE_FULL_INERTIA
 	ndMatrix m_inertiaPrincipalAxis;
 #endif
@@ -382,9 +384,11 @@ inline void ndBodyKinematic::PrepareStep(ndInt32 index)
 	m_buildSkelIndex = 0;
 	m_islandParent = this;
 	m_weigh = ndFloat32(0.0f);
-	
-	ndTrace(("xxxxxxxxxxxxxx\n"));
-	m_isStatic = ndUnsigned8(m_invMass.m_w == ndFloat32(0.0f));
+
+	//m_isStatic = ndUnsigned8(m_invMass.m_w == ndFloat32(0.0f));
+	ndUnsigned8 tier0 = ndUnsigned8(m_invMass.m_w == ndFloat32(0.0f));
+	ndUnsigned8 tier1 = ndUnsigned8(!m_isDynamics & (m_veloc.DotProduct(m_veloc).GetScalar() == ndFloat32(0.0f)));
+	m_isStatic = ndUnsigned8(tier0 | tier1);
 	m_equilibrium = ndUnsigned8 (m_isStatic | m_equilibrium);
 	m_equilibrium0 = m_equilibrium;
 }
@@ -532,5 +536,10 @@ inline void ndBodyKinematic::ApplyExternalForces(ndInt32, ndFloat32)
 {
 }
 
+inline void ndBodyKinematic::SetAcceleration(const ndVector&, const ndVector&)
+{
+	m_accel = ndVector::m_zero;
+	m_alpha = ndVector::m_zero;
+}
 #endif 
 

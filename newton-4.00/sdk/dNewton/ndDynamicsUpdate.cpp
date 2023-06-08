@@ -1103,11 +1103,9 @@ void ndDynamicsUpdate::IntegrateBodies()
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
-			ndInt8 active = !body->m_equilibrium;
-			if (active & body->m_isDynamics)
+			if (!body->m_equilibrium)
 			{
-				body->m_accel = invTime * (body->m_veloc - body->m_accel);
-				body->m_alpha = invTime * (body->m_omega - body->m_alpha);
+				body->SetAcceleration(invTime * (body->m_veloc - body->m_accel), invTime * (body->m_omega - body->m_alpha));
 				body->IntegrateVelocity(timestep);
 			}
 			body->EvaluateSleepState(speedFreeze2, accelFreeze2);

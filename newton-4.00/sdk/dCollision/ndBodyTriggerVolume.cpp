@@ -47,11 +47,3 @@ void ndBodyTriggerVolume::SpecialUpdate(ndFloat32 timestep)
 		}
 	}
 }
-
-//void ndBodyTriggerVolume::ApplyExternalForces(ndInt32 threadIndex, ndFloat32 timestep)
-//{
-//	if (m_notifyCallback)
-//	{
-//		m_notifyCallback->OnApplyExternalForce(threadIndex, timestep);
-//	}
-//}

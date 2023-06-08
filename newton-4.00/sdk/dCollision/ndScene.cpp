@@ -389,7 +389,7 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 	bool processContacts = m_contactNotifyCallback->OnAabbOverlap(contact, m_timestep);
 	if (processContacts)
 	{
-		//ndAssert(!body0->GetAsBodyTriggerVolume());
+		ndAssert(!body0->GetAsBodyTriggerVolume());
 		ndAssert(!body0->GetCollisionShape().GetShape()->GetAsShapeNull());
 		ndAssert(!body1->GetCollisionShape().GetShape()->GetAsShapeNull());
 
@@ -645,12 +645,14 @@ void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, 
 
 	const ndVector boxP0(leafNode->m_minBox);
 	const ndVector boxP1(leafNode->m_maxBox);
-	ndTrace (("xxxxxxxxxxxxxx\n"))
-	const bool body0tier0 = body0->m_invMass.m_w != ndFloat32(0.0f);
-	const bool body0tier1 = body0->GetAsBodyTriggerVolume() != nullptr;
-	const bool body0tier2 = body0->GetCollisionShape().GetCollisionMode();
+
+	//const bool body0tier0 = body0->m_invMass.m_w != ndFloat32(0.0f);
+	//const bool body0tier1 = body0->GetAsBodyTriggerVolume() != nullptr;
+	const ndUnsigned8 body0tier1 = !body0->m_isStatic;
+	const ndUnsigned8 body0tier2 = body0->GetCollisionShape().GetCollisionMode();
 	//const bool test0 = ((body0->m_invMass.m_w != ndFloat32(0.0f)) || body0->GetAsBodyTriggerVolume()) && body0->GetCollisionShape().GetCollisionMode();
-	const ndInt8 test0 = (body0tier0 | body0tier1) & body0tier2;
+	//const ndInt8 test0 = (body0tier0 | body0tier1) & body0tier2;
+	const ndUnsigned8 test0 = ndUnsigned8(body0tier1 & body0tier2);
 
 	pool[0] = node;
 	ndInt32 stack = 1;
@@ -669,12 +671,14 @@ void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, 
 				ndAssert(body1);
 				if (body1->m_sceneEquilibrium || forward)
 				{
-					const bool body1tier0 = body1->m_invMass.m_w != ndFloat32(0.0f);
-					const bool body1tier1 = body1->GetAsBodyTriggerVolume() != nullptr;
-					const bool body1tier2 = body1->GetCollisionShape().GetCollisionMode();
+					//const bool body1tier0 = body1->m_invMass.m_w != ndFloat32(0.0f);
+					//const bool body1tier1 = body1->GetAsBodyTriggerVolume() != nullptr;
+					const ndUnsigned8 body1tier1 = !body1->m_isStatic;
+					const ndUnsigned8 body1tier2 = body1->GetCollisionShape().GetCollisionMode();
 					//const bool test1 = (body1->m_invMass.m_w != ndFloat32(0.0f)) & body1->GetCollisionShape().GetCollisionMode();
-					const ndInt8 test1 = (body1tier0 | body1tier1) & body1tier2;
-					const ndInt8 test = test0 | test1;
+					//const ndInt8 test1 = (body1tier0 | body1tier1) & body1tier2;
+					const ndUnsigned8 test1 = ndUnsigned8(body1tier1 & body1tier2);
+					const ndUnsigned8 test = ndUnsigned8(test0 | test1);
 					if (test)
 					{
 						AddPair(body0, body1, threadId);

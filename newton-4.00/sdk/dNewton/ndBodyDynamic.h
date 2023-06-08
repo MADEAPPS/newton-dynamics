@@ -70,6 +70,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	
 	private:
 	void SaveExternalForces();
+	void SetAcceleration(const ndVector& accel, const ndVector& alpha);
 	D_NEWTON_API virtual void IntegrateGyroSubstep(const ndVector& timestep);
 	D_NEWTON_API virtual ndJacobian IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const;
 	D_NEWTON_API virtual void EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeAccel2);
@@ -111,6 +112,12 @@ inline void ndBodyDynamic::SaveExternalForces()
 inline ndVector ndBodyDynamic::GetCachedDamping() const
 {
 	return m_cachedDampCoef;
+}
+
+inline void ndBodyDynamic::SetAcceleration(const ndVector& accel, const ndVector& alpha)
+{
+	m_accel = accel;
+	m_alpha = alpha;
 }
 
 #endif 
