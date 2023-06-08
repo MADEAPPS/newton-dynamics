@@ -385,10 +385,10 @@ inline void ndBodyKinematic::PrepareStep(ndInt32 index)
 	m_islandParent = this;
 	m_weigh = ndFloat32(0.0f);
 
-	//m_isStatic = ndUnsigned8(m_invMass.m_w == ndFloat32(0.0f));
-	ndUnsigned8 tier0 = ndUnsigned8(m_invMass.m_w == ndFloat32(0.0f));
-	ndUnsigned8 tier1 = ndUnsigned8(!m_isDynamics & (m_veloc.DotProduct(m_veloc).GetScalar() == ndFloat32(0.0f)));
-	m_isStatic = ndUnsigned8(tier0 | tier1);
+	m_isStatic = ndUnsigned8(m_invMass.m_w == ndFloat32(0.0f));
+	//ndUnsigned8 tier0 = ndUnsigned8(m_invMass.m_w == ndFloat32(0.0f));
+	//ndUnsigned8 tier1 = ndUnsigned8(!m_isDynamics & (m_veloc.DotProduct(m_veloc).GetScalar() == ndFloat32(0.0f)));
+	//m_isStatic = ndUnsigned8(tier0 | tier1);
 	m_equilibrium = ndUnsigned8 (m_isStatic | m_equilibrium);
 	m_equilibrium0 = m_equilibrium;
 }
