@@ -79,5 +79,4 @@ inline void ndBodyTriggerVolume::ApplyExternalForces(ndInt32 threadIndex, ndFloa
 		m_notifyCallback->OnApplyExternalForce(threadIndex, timestep);
 	}
 }
-
 #endif

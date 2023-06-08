@@ -645,7 +645,12 @@ void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, 
 
 	const ndVector boxP0(leafNode->m_minBox);
 	const ndVector boxP1(leafNode->m_maxBox);
-	const bool test0 = (body0->m_invMass.m_w != ndFloat32(0.0f)) & body0->GetCollisionShape().GetCollisionMode();
+	ndTrace (("xxxxxxxxxxxxxx\n"))
+	const bool body0tier0 = body0->m_invMass.m_w != ndFloat32(0.0f);
+	const bool body0tier1 = body0->GetAsBodyTriggerVolume() != nullptr;
+	const bool body0tier2 = body0->GetCollisionShape().GetCollisionMode();
+	//const bool test0 = ((body0->m_invMass.m_w != ndFloat32(0.0f)) || body0->GetAsBodyTriggerVolume()) && body0->GetCollisionShape().GetCollisionMode();
+	const ndInt8 test0 = (body0tier0 | body0tier1) & body0tier2;
 
 	pool[0] = node;
 	ndInt32 stack = 1;
@@ -664,8 +669,12 @@ void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, 
 				ndAssert(body1);
 				if (body1->m_sceneEquilibrium || forward)
 				{
-					const bool test1 = (body1->m_invMass.m_w != ndFloat32(0.0f)) & body1->GetCollisionShape().GetCollisionMode();
-					const bool test = test0 | test1;
+					const bool body1tier0 = body1->m_invMass.m_w != ndFloat32(0.0f);
+					const bool body1tier1 = body1->GetAsBodyTriggerVolume() != nullptr;
+					const bool body1tier2 = body1->GetCollisionShape().GetCollisionMode();
+					//const bool test1 = (body1->m_invMass.m_w != ndFloat32(0.0f)) & body1->GetCollisionShape().GetCollisionMode();
+					const ndInt8 test1 = (body1tier0 | body1tier1) & body1tier2;
+					const ndInt8 test = test0 | test1;
 					if (test)
 					{
 						AddPair(body0, body1, threadId);
@@ -1426,8 +1435,7 @@ void ndScene::InitBodyArray()
 			body->PrepareStep(i);
 			ndUnsigned8 sceneEquilibrium = 1;
 			ndUnsigned8 sceneForceUpdate = body->m_sceneForceUpdate;
-			ndUnsigned8 moving = !body->m_equilibrium;
-			//if (ndUnsigned8(!body->m_equilibrium) | sceneForceUpdate)
+			ndUnsigned8 moving = ndUnsigned8(!body->m_equilibrium);
 			if (moving | sceneForceUpdate)
 			{
 				ndBvhLeafNode* const bodyNode = (ndBvhLeafNode*)array[body->m_bodyNodeIndex];
@@ -1435,9 +1443,6 @@ void ndScene::InitBodyArray()
 				ndAssert(bodyNode->m_body == body);
 				ndAssert(!bodyNode->GetLeft());
 				ndAssert(!bodyNode->GetRight());
-
-				// allow for bodies with null shape to be part of the simulation.
-				//ndAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
 
 				body->UpdateCollisionMatrix();
 				const ndInt32 test = ndBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
@@ -1453,62 +1458,6 @@ void ndScene::InitBodyArray()
 	});
 
 	ParallelExecute(BuildBodyArray);
-
-	//ndInt32 scans[D_MAX_THREADS_COUNT][2];
-	//auto CountMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
-	//{
-	//	D_TRACKTIME_NAMED(BuildBodyArray);
-	//	const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
-	//
-	//	ndInt32* const scan = &scans[threadIndex][0];
-	//	scan[0] = 0;
-	//	scan[1] = 0;
-	//
-	//	const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
-	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-	//	{
-	//		ndBodyKinematic* const body = view[i];
-	//		ndInt32 sceneEquilibrium = body->m_sceneEquilibrium;
-	//		scan[sceneEquilibrium] ++;
-	//	}
-	//});
-	//auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
-	//{
-	//	D_TRACKTIME_NAMED(CompactMovingBodies);
-	//	const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
-	//	ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
-	//	ndInt32* const scan = &scans[threadIndex][0];
-	//
-	//	const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
-	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-	//	{
-	//		ndBodyKinematic* const body = view[i];
-	//		const ndInt32 key = body->m_sceneEquilibrium;
-	//		const ndInt32 index = scan[key];
-	//		sceneBodyArray[index] = body;
-	//		scan[key] ++;
-	//	}
-	//});
-	//ParallelExecute(CountMovingBodies);
-	//ndInt32 sum = 0;
-	//ndInt32 threadCount = GetThreadCount();
-	//for (ndInt32 j = 0; j < 2; ++j)
-	//{
-	//	for (ndInt32 i = 0; i < threadCount; ++i)
-	//	{
-	//		const ndInt32 count = scans[i][j];
-	//		scans[i][j] = sum;
-	//		sum += count;
-	//	}
-	//}
-	//
-	//ndInt32 movingBodyCount = scans[0][1] - scans[0][0];
-	//m_sceneBodyArray.SetCount(m_bodyList.GetCount());
-	//if (movingBodyCount)
-	//{
-	//	ParallelExecute(CompactMovingBodies);
-	//}
-	//m_sceneBodyArray.SetCount(movingBodyCount);
 
 	ndUnsigned32 scans[4];
 	class ndSortCompactKey
