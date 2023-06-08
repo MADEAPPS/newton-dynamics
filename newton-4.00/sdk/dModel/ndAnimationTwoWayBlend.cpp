@@ -39,7 +39,6 @@ void ndAnimationTwoWayBlend::Update(ndFloat32 timestep)
 	}
 	else
 	{
-		ndAssert(0);
 		m_node0->Update(timestep);
 		m_node1->Update(timestep);
 	}
@@ -57,22 +56,25 @@ void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose& output, ndVector& veloc)
 	} 
 	else 
 	{
-		ndAssert(0);
-	//	const int count = output.GetCount();
-	//	ndAnimKeyframe* const buffer = dAlloca(ndAnimKeyframe, count + 32);
-	//	ndAnimationLocalPose localPose(buffer);
-	//	localPose.SetCount(count);
-	//	m_node0->Evaluate(output, timestep * m_timeDilation0);
-	//	m_node1->Evaluate(localPose, timestep * m_timeDilation1);
-	//
-	//	ndAnimKeyframe* const dst = &output[0];
-	//	const ndAnimKeyframe* const src = &localPose[0];
-	//	for (ndInt32 i = 0; i < count; ++i) 
-	//	{
-	//		ndAnimKeyframe& dstFrame = dst[i];
-	//		const ndAnimKeyframe& srcFrame = src[i];
-	//		dstFrame.m_rotation = dstFrame.m_rotation.Slerp(srcFrame.m_rotation, m_param);
-	//		dstFrame.m_posit = dstFrame.m_posit + (srcFrame.m_posit - dstFrame.m_posit).Scale(m_param);
-	//	}
+		const int count = output.GetCount();
+		ndAnimKeyframe* const buffer = ndAlloca(ndAnimKeyframe, count + 32);
+		ndAnimationLocalPose localPose(buffer);
+		localPose.SetCount(count);
+
+		ndVector veloc0;
+		ndVector veloc1;
+		m_node0->Evaluate(output, veloc0);
+		m_node1->Evaluate(localPose, veloc1);
+		veloc = veloc0 + (veloc1 - veloc0).Scale(m_param);
+
+		ndAnimKeyframe* const dst = &output[0];
+		const ndAnimKeyframe* const src = &localPose[0];
+		for (ndInt32 i = 0; i < count; ++i) 
+		{
+			ndAnimKeyframe& dstFrame = dst[i];
+			const ndAnimKeyframe& srcFrame = src[i];
+			dstFrame.m_rotation = dstFrame.m_rotation.Slerp(srcFrame.m_rotation, m_param);
+			dstFrame.m_posit = dstFrame.m_posit + (srcFrame.m_posit - dstFrame.m_posit).Scale(m_param);
+		}
 	}
 }

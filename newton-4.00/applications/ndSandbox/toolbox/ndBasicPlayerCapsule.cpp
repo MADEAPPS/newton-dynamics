@@ -88,6 +88,26 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule()
 {
 }
 
+
+class ndAnimationBlendTansition: public ndAnimationTwoWayBlend
+{
+	public:
+	ndAnimationBlendTansition(ndAnimationBlendTreeNode* const node0, ndAnimationBlendTreeNode* const node1)
+		:ndAnimationTwoWayBlend(node0, node1)
+		,m_paramMemory(0.0f)
+	{
+	}
+
+	void SetTransition(ndFloat32 param)
+	{
+		param = m_paramMemory + 0.2f * (param - m_paramMemory);
+		SetParam(param);
+		m_paramMemory = param;
+	}
+
+	ndFloat32 m_paramMemory;
+};
+
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndDemoEntityManager* const scene, ndMeshLoader& loader,
 	const ndDemoEntity* const modelEntity, const ndMatrix& localAxis, const ndMatrix& location,
@@ -139,7 +159,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
 	//ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
 
-	m_idleWalkBlend = new ndAnimationTwoWayBlend(idle, walk);
+	//m_idleWalkBlend = new ndAnimationTwoWayBlend(idle, walk);
+	m_idleWalkBlend = new ndAnimationBlendTansition(idle, walk);
 
 	//m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode> (idle);
 	m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_idleWalkBlend);
@@ -222,7 +243,9 @@ void ndBasicPlayerCapsule::SetCamera(ndDemoEntityManager* const scene)
 		m_playerInput.m_strafeSpeed = (ndFloat32)(ndInt32(scene->GetKeyState('D')) - ndInt32(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
 		m_playerInput.m_jump = scene->GetKeyState(' ') && IsOnFloor();
 
-		m_idleWalkBlend->SetParam(m_playerInput.m_forwardSpeed ? 1.0f : 0.0f);
+		//m_idleWalkBlend->SetParam(m_playerInput.m_forwardSpeed ? 1.0f : 0.0f);
+		ndAnimationBlendTansition* const blender = (ndAnimationBlendTansition*) m_idleWalkBlend;
+		blender->SetTransition(m_playerInput.m_forwardSpeed ? 1.0f : 0.0f);
 
 		if (m_playerInput.m_forwardSpeed || m_playerInput.m_strafeSpeed)
 		{
