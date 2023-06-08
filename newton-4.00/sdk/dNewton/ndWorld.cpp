@@ -360,7 +360,7 @@ void ndWorld::PostUpdate(ndFloat32)
 {
 }
 
-bool ndWorld::AddBody(ndSharedPtr<ndBody> body)
+bool ndWorld::AddBody(const ndSharedPtr<ndBody>& body)
 {
 	ndAssert(GetSentinelBody() != body->GetAsBodyKinematic());
 	return m_scene->AddBody(body);
@@ -371,7 +371,7 @@ ndSharedPtr<ndBody> ndWorld::GetBody(ndBody* const body) const
 	return m_scene->GetBody(body);
 }
 
-void ndWorld::AddJoint(ndSharedPtr<ndJointBilateralConstraint> joint)
+void ndWorld::AddJoint(const ndSharedPtr<ndJointBilateralConstraint>& joint)
 {
 	// if the second body is nullPtr, replace it the sentinel
 	ndAssert(joint->m_body0);
@@ -386,12 +386,12 @@ void ndWorld::AddJoint(ndSharedPtr<ndJointBilateralConstraint> joint)
 			m_skeletonList.m_skelListIsDirty = true;
 		}
 		joint->m_worldNode = m_jointList.Append(joint);
-		joint->m_body0Node = joint->GetBody0()->AttachJoint(*joint);
-		joint->m_body1Node = joint->GetBody1()->AttachJoint(*joint);
+		joint->m_body0Node = joint->GetBody0()->AttachJoint((ndJointBilateralConstraint*)*joint);
+		joint->m_body1Node = joint->GetBody1()->AttachJoint((ndJointBilateralConstraint*)*joint);
 	}
 }
 
-void ndWorld::AddModel(ndSharedPtr<ndModel> model)
+void ndWorld::AddModel(const ndSharedPtr<ndModel>& model)
 {
 	m_modelList.AddModel(model, this);
 }

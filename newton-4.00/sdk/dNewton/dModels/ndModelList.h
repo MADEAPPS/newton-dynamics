@@ -32,8 +32,8 @@ class ndModelList : public ndList<ndSharedPtr<ndModel>, ndContainersFreeListAllo
 
 	void UpdateDirtyList();
 	ndArray<ndModel*>& GetUpdateList();
-	void RemoveModel(ndSharedPtr<ndModel>& model);
-	void AddModel(ndSharedPtr<ndModel>& model, ndWorld* const world);
+	void RemoveModel(const ndSharedPtr<ndModel>& model);
+	void AddModel(const ndSharedPtr<ndModel>& model, ndWorld* const world);
 
 	ndArray<ndModel*> m_updateArray;
 	bool m_dirty;

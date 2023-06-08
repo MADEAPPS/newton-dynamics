@@ -174,7 +174,7 @@ void ndScene::End()
 	m_frameNumber++;
 }
 
-bool ndScene::AddParticle(ndSharedPtr<ndBody>& particle)
+bool ndScene::AddParticle(const ndSharedPtr<ndBody>& particle)
 {
 	ndBodyParticleSet* const particleSet = particle->GetAsBodyParticleSet();
 	ndAssert(particleSet->m_listNode == nullptr);
@@ -183,7 +183,7 @@ bool ndScene::AddParticle(ndSharedPtr<ndBody>& particle)
 	return true;
 }
 
-bool ndScene::RemoveParticle(ndSharedPtr<ndBody>& particle)
+bool ndScene::RemoveParticle(const ndSharedPtr<ndBody>& particle)
 {
 	ndBodyParticleSet* const particleSet = particle->GetAsBodyParticleSet();
 	ndAssert(particleSet->m_listNode);
@@ -225,7 +225,7 @@ void ndScene::DebugScene(ndSceneTreeNotiFy* const notify)
 	}
 }
 
-bool ndScene::AddBody(ndSharedPtr<ndBody>& body)
+bool ndScene::AddBody(const ndSharedPtr<ndBody>& body)
 {
 	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
 	if (kinematicBody)
@@ -269,7 +269,7 @@ ndSharedPtr<ndBody> ndScene::GetBody(ndBody* const body) const
 	}
 }
 
-bool ndScene::RemoveBody(ndSharedPtr<ndBody>& body)
+bool ndScene::RemoveBody(const ndSharedPtr<ndBody>& body)
 {
 	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
 	if (kinematicBody)

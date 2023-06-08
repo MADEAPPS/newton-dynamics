@@ -48,7 +48,7 @@ void ndModelList::UpdateDirtyList()
 	}
 }
 
-void ndModelList::AddModel(ndSharedPtr<ndModel>& model, ndWorld* const world)
+void ndModelList::AddModel(const ndSharedPtr<ndModel>& model, ndWorld* const world)
 {
 	ndAssert(!model->m_worldNode);
 	if (!model->m_worldNode)
@@ -60,7 +60,7 @@ void ndModelList::AddModel(ndSharedPtr<ndModel>& model, ndWorld* const world)
 	}
 }
 
-void ndModelList::RemoveModel(ndSharedPtr<ndModel>& model)
+void ndModelList::RemoveModel(const ndSharedPtr<ndModel>& model)
 {
 	ndNode* const node = model->m_worldNode;
 	if (node)

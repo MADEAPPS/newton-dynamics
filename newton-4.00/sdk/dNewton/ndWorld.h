@@ -82,9 +82,9 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API const char* GetSolverString() const;
 	D_NEWTON_API ndBodyKinematic* GetSentinelBody() const;
 
-	D_NEWTON_API virtual bool AddBody(ndSharedPtr<ndBody> body);
-	D_NEWTON_API virtual void AddModel(ndSharedPtr<ndModel> model);
-	D_NEWTON_API virtual void AddJoint(ndSharedPtr<ndJointBilateralConstraint> joint);
+	D_NEWTON_API virtual bool AddBody(const ndSharedPtr<ndBody>& body);
+	D_NEWTON_API virtual void AddModel(const ndSharedPtr<ndModel>& model);
+	D_NEWTON_API virtual void AddJoint(const ndSharedPtr<ndJointBilateralConstraint>& joint);
 
 	D_NEWTON_API ndSharedPtr<ndBody> GetBody(ndBody* const body) const;
 	//D_NEWTON_API virtual void GetModel(ndSharedPtr<ndModel>& model);

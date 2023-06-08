@@ -22,7 +22,6 @@
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndContact.h"
-#include "ndBodyNotify.h"
 #include "ndBodyTriggerVolume.h"
 
 ndBodyTriggerVolume::ndBodyTriggerVolume()
@@ -49,10 +48,10 @@ void ndBodyTriggerVolume::SpecialUpdate(ndFloat32 timestep)
 	}
 }
 
-void ndBodyTriggerVolume::ApplyExternalForces(ndInt32 threadIndex, ndFloat32 timestep)
-{
-	if (m_notifyCallback)
-	{
-		m_notifyCallback->OnApplyExternalForce(threadIndex, timestep);
-	}
-}
+//void ndBodyTriggerVolume::ApplyExternalForces(ndInt32 threadIndex, ndFloat32 timestep)
+//{
+//	if (m_notifyCallback)
+//	{
+//		m_notifyCallback->OnApplyExternalForce(threadIndex, timestep);
+//	}
+//}
