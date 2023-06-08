@@ -115,6 +115,7 @@ class ndContact: public ndConstraint
 	ndContactPointList& GetContactPoints();
 	const ndContactPointList& GetContactPoints() const;
 
+	bool IsTestOnly() const;
 	bool IsInTrigger() const;
 	bool IsSkeletonSelftCollision() const;
 	//bool IsSkeletonIntraCollision() const;
@@ -196,6 +197,11 @@ inline bool ndContact::IsSkeletonSelftCollision() const
 inline bool ndContact::IsInTrigger() const
 {
 	return m_inTrigger;
+}
+
+inline bool ndContact::IsTestOnly() const
+{
+	return m_isIntersetionTestOnly ? true : false;
 }
 
 //inline bool ndContact::IsSkeletonIntraCollision() const

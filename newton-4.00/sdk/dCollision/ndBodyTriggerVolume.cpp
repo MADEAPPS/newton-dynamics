@@ -43,7 +43,9 @@ void ndBodyTriggerVolume::SpecialUpdate(ndFloat32 timestep)
 		const ndContact* const contact = *it;
 		if (contact->IsActive() && contact->IsInTrigger())
 		{
-			OnTrigger(contact->GetBody0(), timestep);
+			ndBodyKinematic* const body0 = contact->GetBody0();
+			ndBodyKinematic* const body1 = contact->GetBody1();
+			OnTrigger((body1 == this) ? body0 : body1, timestep);
 		}
 	}
 }
