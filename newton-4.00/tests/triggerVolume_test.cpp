@@ -12,7 +12,7 @@
 #include "ndNewton.h"
 #include <gtest/gtest.h>
 
-#if 1
+#if 0
 class csBodyTrigger : public ndBodyTriggerVolume 
 {
 	public:
@@ -97,26 +97,6 @@ class csBodyTrigger : public ndBodyTriggerVolume
 		std::cout << "Exit\n";
 	}
 };
-
-//class csBodyNotify : public ndBodyNotify
-//{
-//	public:
-//	csBodyNotify(ndBigVector const& defaultGravity) : ndBodyNotify(defaultGravity)
-//	{
-//	}
-//	virtual ~csBodyNotify()
-//	{
-//	}
-//
-//	virtual void OnTransform(ndInt32, ndMatrix const&)
-//	{
-//	}
-//
-//	virtual void OnApplyExternalForce(ndInt32, ndFloat32 timestep)
-//	{
-//		GetBody()->GetAsBodyKinematic()->IntegrateVelocity(timestep);
-//	}
-//};
 
 TEST(KinematicMovement, TriggerBody)
 {

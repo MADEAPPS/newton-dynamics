@@ -681,7 +681,14 @@ void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, 
 					const ndUnsigned8 test = ndUnsigned8(test0 | test1);
 					if (test)
 					{
-						AddPair(body0, body1, threadId);
+						if (!body0->GetAsBodyTriggerVolume())
+						{
+							AddPair(body0, body1, threadId);
+						}
+						else if (body1->GetAsBodyDynamic() && (body1->GetInvMass() > ndFloat32 (0.0f)))
+						{
+							AddPair(body1, body0, threadId);
+						}
 					}
 				}
 			}
@@ -1609,25 +1616,8 @@ void ndScene::CalculateContacts()
 		{
 			D_TRACKTIME_NAMED(CalculateContactPoints);
 			const ndInt32 jointCount = m_contactArray.GetCount();
-			#if 0
-			const ndInt32 span = 16;
-			for (ndInt32 i = count.fetch_add(span); i < jointCount; i = count.fetch_add(span))
-			{
-				const ndInt32 run = (i + span) <= jointCount ? i + span : jointCount;
-				for (ndInt32 j = i; j < run; j++)
-				{
-					ndContact* const contact = tmpJointsArray[j];
-					ndAssert(contact);
-					if (!contact->m_isDead)
-					{
-						CalculateContacts(threadIndex, contact);
-					}
-				}
-			}
 
-			#else
 			const ndStartEnd startEnd(jointCount, threadIndex, threadCount);
-			//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			for (ndInt32 i = count.fetch_add(1); i < jointCount; i = count.fetch_add(1))
 			{
 				ndContact* const contact = tmpJointsArray[i];
@@ -1637,7 +1627,6 @@ void ndScene::CalculateContacts()
 					CalculateContacts(threadIndex, contact);
 				}
 			}
-			#endif
 		});
 		ParallelExecute(CalculateContactPoints);
 	}

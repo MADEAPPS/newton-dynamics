@@ -66,7 +66,11 @@ void ndContact::SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const b
 	ndAssert(body1);
 	m_body0 = body0;
 	m_body1 = body1;
-	if (m_body0->GetInvMass() == ndFloat32(0.0f))
+	if (!m_body0->GetAsBodyDynamic())
+	{
+		ndSwap(m_body1, m_body0);
+	}
+	else if (m_body0->GetInvMass() == ndFloat32(0.0f))
 	{
 		ndSwap(m_body1, m_body0);
 	}
