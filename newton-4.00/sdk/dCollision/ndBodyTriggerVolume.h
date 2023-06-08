@@ -43,6 +43,7 @@ class ndBodyTriggerVolume : public ndBodyKinematicBase
 
 	private:
 	virtual void IntegrateExternalForce(ndFloat32 timestep);
+	virtual void ApplyExternalForces(ndInt32 threadIndex, ndFloat32 timestep);
 
 } D_GCC_NEWTON_ALIGN_32;
 

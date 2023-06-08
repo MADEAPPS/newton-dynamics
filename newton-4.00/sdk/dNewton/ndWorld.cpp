@@ -360,7 +360,7 @@ void ndWorld::PostUpdate(ndFloat32)
 {
 }
 
-bool ndWorld::AddBody(ndSharedPtr<ndBody>& body)
+bool ndWorld::AddBody(ndSharedPtr<ndBody> body)
 {
 	ndAssert(GetSentinelBody() != body->GetAsBodyKinematic());
 	return m_scene->AddBody(body);
@@ -371,7 +371,7 @@ ndSharedPtr<ndBody> ndWorld::GetBody(ndBody* const body) const
 	return m_scene->GetBody(body);
 }
 
-void ndWorld::AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
+void ndWorld::AddJoint(ndSharedPtr<ndJointBilateralConstraint> joint)
 {
 	// if the second body is nullPtr, replace it the sentinel
 	ndAssert(joint->m_body0);
@@ -391,7 +391,7 @@ void ndWorld::AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 	}
 }
 
-void ndWorld::AddModel(ndSharedPtr<ndModel>& model)
+void ndWorld::AddModel(ndSharedPtr<ndModel> model)
 {
 	m_modelList.AddModel(model, this);
 }

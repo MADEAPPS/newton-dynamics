@@ -507,7 +507,7 @@ static ndBodyDynamic* BuildBunny(const ndVector& pos, const ndVector& gravity = 
 	return body;
 }
 
-static ndBodyDynamic* BuildBunnyInstance(const ndShapeInstance& collisionShape, const ndVector& pos, const ndVector& gravity = { -9.8f })
+static ndBodyDynamic* BuildBunnyInstance(const ndShapeInstance& collisionShape, const ndVector& pos, const ndVector gravity= ndVector(0.0f, -9.8f, 0.0f, 0.0f) )
 {
 	// Create the rigid body and configure gravity for it.
 	ndBodyDynamic* const body = new ndBodyDynamic();
