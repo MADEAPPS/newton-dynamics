@@ -145,7 +145,7 @@ TEST(KinematicMovement, TriggerBody)
 
 	kinebody->SetVelocity(ndVector(ndFloat32(4), ndFloat32(0), ndFloat32(0), ndFloat32(0)));
 
-	// Moves but throws assertion failures
+	// the trigger in the trigger notification 
 	for (int i = 0; i < 480; i++)
 	{
 		world->Update(1.0f / 60.0f);
