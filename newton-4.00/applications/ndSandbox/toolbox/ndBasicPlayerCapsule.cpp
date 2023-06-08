@@ -100,9 +100,8 @@ class ndAnimationBlendTansition: public ndAnimationTwoWayBlend
 
 	void SetTransition(ndFloat32 param)
 	{
-		param = m_paramMemory + 0.2f * (param - m_paramMemory);
-		SetParam(param);
-		m_paramMemory = param;
+		m_paramMemory = m_paramMemory + 0.15f * (param - m_paramMemory);
+		SetParam(m_paramMemory);
 	}
 
 	ndFloat32 m_paramMemory;
