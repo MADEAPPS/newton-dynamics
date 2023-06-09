@@ -238,87 +238,88 @@ static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const f
 		stack--;
 		const exportMeshNode* const node = nodePool[stack];
 
-		if (node->m_keyFrame.size())
-		{
-			FbxNode* const fbxNode = node->m_fbxNode;
-			fbxNode->LclTranslation.GetCurveNode(animLayer, true);
-			FbxAnimCurve* const curvePositX = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X, true);
-			FbxAnimCurve* const curvePositY = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y, true);
-			FbxAnimCurve* const curvePositZ = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z, true);
-			FbxAnimCurve* const curveRotationX = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X, true);
-			FbxAnimCurve* const curveRotationY = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y, true);
-			FbxAnimCurve* const curveRotationZ = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z, true);
-
-			FbxTime lTime;
-			curvePositX->KeyModifyBegin();
-			curvePositY->KeyModifyBegin();
-			curvePositZ->KeyModifyBegin();
-			curveRotationX->KeyModifyBegin();
-			curveRotationY->KeyModifyBegin();
-			curveRotationZ->KeyModifyBegin();
-
-			exportVector euler1;
-			exportVector eulerRef(node->m_keyFrame[0].CalcPitchYawRoll(euler1));
-			for (int i = 0; i < node->m_keyFrame.size(); ++i)
-			{
-				double time = double(i) * fps;
-				lTime.SetSecondDouble(time);
-			
-				exportVector posit(node->m_keyFrame[i].m_posit);
-			
-				if (node->m_name == "Hips")
-				{
-					//posit.m_x = 0;
-					posit.m_z = 0;
-				}
-			
-				int keyIndexPositX = curvePositX->KeyAdd(lTime);
-				curvePositX->KeySetValue(keyIndexPositX, posit.m_x);
-				curvePositX->KeySetInterpolation(keyIndexPositX, FbxAnimCurveDef::eInterpolationCubic);
-			
-				int keyIndexPositY = curvePositY->KeyAdd(lTime);
-				curvePositY->KeySetValue(keyIndexPositY, posit.m_y);
-				curvePositY->KeySetInterpolation(keyIndexPositY, FbxAnimCurveDef::eInterpolationCubic);
-			
-				int keyIndexPositZ = curvePositZ->KeyAdd(lTime);
-				curvePositZ->KeySetValue(keyIndexPositZ, posit.m_z);
-				curvePositZ->KeySetInterpolation(keyIndexPositZ, FbxAnimCurveDef::eInterpolationCubic);
-
-				exportVector euler0 (node->m_keyFrame[i].CalcPitchYawRoll(euler1));
-				float angleError = node->CalculateDeltaAngle(euler0.m_z, eulerRef.m_z);
-				if (fabsf(angleError) > 90.0 * M_PI / 180.0f)
-				{
-					euler0 = euler1;
-				}
-				float deltax = node->CalculateDeltaAngle(euler0.m_x, eulerRef.m_x);
-				float deltay = node->CalculateDeltaAngle(euler0.m_y, eulerRef.m_y);
-				float deltaz = node->CalculateDeltaAngle(euler0.m_z, eulerRef.m_z);
-
-				eulerRef.m_x += deltax;
-				eulerRef.m_y += deltay;
-				eulerRef.m_z += deltaz;
-				exportVector eulers(eulerRef.Scale(180.0f / M_PI));
-				
-				int keyIndexRotationX = curveRotationX->KeyAdd(lTime);
-				curveRotationX->KeySetValue(keyIndexRotationX, eulers.m_x);
-				curveRotationX->KeySetInterpolation(keyIndexRotationX, FbxAnimCurveDef::eInterpolationCubic);
-				
-				int keyIndexRotationY = curveRotationY->KeyAdd(lTime);
-				curveRotationY->KeySetValue(keyIndexRotationY, eulers.m_y);
-				curveRotationY->KeySetInterpolation(keyIndexRotationY, FbxAnimCurveDef::eInterpolationCubic);
-				
-				int keyIndexRotationZ = curveRotationZ->KeyAdd(lTime);
-				curveRotationZ->KeySetValue(keyIndexRotationZ, eulers.m_z);
-				curveRotationZ->KeySetInterpolation(keyIndexRotationZ, FbxAnimCurveDef::eInterpolationCubic);
-			}
-
-			curvePositX->KeyModifyEnd();
-			curvePositY->KeyModifyEnd();
-			curvePositZ->KeyModifyEnd();
-			curveRotationX->KeyModifyEnd();
-			curveRotationY->KeyModifyEnd();
-			curveRotationZ->KeyModifyEnd();
-		}
+		_ASSERT(0);
+		//if (node->m_keyFrame.size())
+		//{
+		//	FbxNode* const fbxNode = node->m_fbxNode;
+		//	fbxNode->LclTranslation.GetCurveNode(animLayer, true);
+		//	FbxAnimCurve* const curvePositX = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X, true);
+		//	FbxAnimCurve* const curvePositY = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y, true);
+		//	FbxAnimCurve* const curvePositZ = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z, true);
+		//	FbxAnimCurve* const curveRotationX = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X, true);
+		//	FbxAnimCurve* const curveRotationY = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y, true);
+		//	FbxAnimCurve* const curveRotationZ = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z, true);
+		//
+		//	FbxTime lTime;
+		//	curvePositX->KeyModifyBegin();
+		//	curvePositY->KeyModifyBegin();
+		//	curvePositZ->KeyModifyBegin();
+		//	curveRotationX->KeyModifyBegin();
+		//	curveRotationY->KeyModifyBegin();
+		//	curveRotationZ->KeyModifyBegin();
+		//
+		//	exportVector euler1;
+		//	exportVector eulerRef(node->m_keyFrame[0].CalcPitchYawRoll(euler1));
+		//	for (int i = 0; i < node->m_keyFrame.size(); ++i)
+		//	{
+		//		double time = double(i) * fps;
+		//		lTime.SetSecondDouble(time);
+		//	
+		//		exportVector posit(node->m_keyFrame[i].m_posit);
+		//	
+		//		if (node->m_name == "Hips")
+		//		{
+		//			//posit.m_x = 0;
+		//			posit.m_z = 0;
+		//		}
+		//	
+		//		int keyIndexPositX = curvePositX->KeyAdd(lTime);
+		//		curvePositX->KeySetValue(keyIndexPositX, posit.m_x);
+		//		curvePositX->KeySetInterpolation(keyIndexPositX, FbxAnimCurveDef::eInterpolationCubic);
+		//	
+		//		int keyIndexPositY = curvePositY->KeyAdd(lTime);
+		//		curvePositY->KeySetValue(keyIndexPositY, posit.m_y);
+		//		curvePositY->KeySetInterpolation(keyIndexPositY, FbxAnimCurveDef::eInterpolationCubic);
+		//	
+		//		int keyIndexPositZ = curvePositZ->KeyAdd(lTime);
+		//		curvePositZ->KeySetValue(keyIndexPositZ, posit.m_z);
+		//		curvePositZ->KeySetInterpolation(keyIndexPositZ, FbxAnimCurveDef::eInterpolationCubic);
+		//
+		//		exportVector euler0 (node->m_keyFrame[i].CalcPitchYawRoll(euler1));
+		//		float angleError = node->CalculateDeltaAngle(euler0.m_z, eulerRef.m_z);
+		//		if (fabsf(angleError) > 90.0 * M_PI / 180.0f)
+		//		{
+		//			euler0 = euler1;
+		//		}
+		//		float deltax = node->CalculateDeltaAngle(euler0.m_x, eulerRef.m_x);
+		//		float deltay = node->CalculateDeltaAngle(euler0.m_y, eulerRef.m_y);
+		//		float deltaz = node->CalculateDeltaAngle(euler0.m_z, eulerRef.m_z);
+		//
+		//		eulerRef.m_x += deltax;
+		//		eulerRef.m_y += deltay;
+		//		eulerRef.m_z += deltaz;
+		//		exportVector eulers(eulerRef.Scale(180.0f / M_PI));
+		//		
+		//		int keyIndexRotationX = curveRotationX->KeyAdd(lTime);
+		//		curveRotationX->KeySetValue(keyIndexRotationX, eulers.m_x);
+		//		curveRotationX->KeySetInterpolation(keyIndexRotationX, FbxAnimCurveDef::eInterpolationCubic);
+		//		
+		//		int keyIndexRotationY = curveRotationY->KeyAdd(lTime);
+		//		curveRotationY->KeySetValue(keyIndexRotationY, eulers.m_y);
+		//		curveRotationY->KeySetInterpolation(keyIndexRotationY, FbxAnimCurveDef::eInterpolationCubic);
+		//		
+		//		int keyIndexRotationZ = curveRotationZ->KeyAdd(lTime);
+		//		curveRotationZ->KeySetValue(keyIndexRotationZ, eulers.m_z);
+		//		curveRotationZ->KeySetInterpolation(keyIndexRotationZ, FbxAnimCurveDef::eInterpolationCubic);
+		//	}
+		//
+		//	curvePositX->KeyModifyEnd();
+		//	curvePositY->KeyModifyEnd();
+		//	curvePositZ->KeyModifyEnd();
+		//	curveRotationX->KeyModifyEnd();
+		//	curveRotationY->KeyModifyEnd();
+		//	curveRotationZ->KeyModifyEnd();
+		//}
 
 		for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
 			iter != node->m_children.end(); iter++)

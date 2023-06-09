@@ -4,25 +4,26 @@
 
 void exportMeshNode::SetFrame(int index)
 {
-	int stack = 1;
-	exportMeshNode* stackPool[128];
-
-	stack = 1;
-	stackPool[0] = this;
-	while (stack)
-	{
-		stack--;
-
-		exportMeshNode* const node = stackPool[stack];
-		node->m_matrix = node->m_keyFrame[index];
-
-		for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
-			iter != node->m_children.end(); iter++)
-		{
-			stackPool[stack] = *iter;
-			stack++;
-		}
-	}
+	_ASSERT(0);
+	//int stack = 1;
+	//exportMeshNode* stackPool[128];
+	//
+	//stack = 1;
+	//stackPool[0] = this;
+	//while (stack)
+	//{
+	//	stack--;
+	//
+	//	exportMeshNode* const node = stackPool[stack];
+	//	node->m_matrix = node->m_keyFrame[index];
+	//
+	//	for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
+	//		iter != node->m_children.end(); iter++)
+	//	{
+	//		stackPool[stack] = *iter;
+	//		stack++;
+	//	}
+	//}
 }
 
 void exportMeshNode::AlignFrames()
@@ -48,31 +49,32 @@ void exportMeshNode::AlignFrames()
 
 		exportMatrix parentAlign (alignFrame[stack]);
 
-		if (node->m_keyFrame.size())
-		{
-			exportMatrix childAlign;
-			if (node->m_children.size())
-			{
-				exportMeshNode* const childNode = *node->m_children.begin();
-				childAlign = exportMatrix(childNode->m_matrix.m_posit);
-			}
-
-			for (int i = 0; i < node->m_keyFrame.size(); ++i)
-			{
-				exportMatrix animMatrix(node->m_keyFrame[i]);
-				exportMatrix matrix(childAlign * animMatrix * parentAlign);
-				node->m_keyFrame[i] = matrix;
-			}
-			parentAlign = childAlign.Inverse();
-		}
-
-		for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
-			iter != node->m_children.end(); iter++)
-		{
-			stackPool[stack] = *iter;
-			alignFrame[stack] = parentAlign;
-			stack++;
-		}
+		_ASSERT(0);
+		//if (node->m_keyFrame.size())
+		//{
+		//	exportMatrix childAlign;
+		//	if (node->m_children.size())
+		//	{
+		//		exportMeshNode* const childNode = *node->m_children.begin();
+		//		childAlign = exportMatrix(childNode->m_matrix.m_posit);
+		//	}
+		//
+		//	for (int i = 0; i < node->m_keyFrame.size(); ++i)
+		//	{
+		//		exportMatrix animMatrix(node->m_keyFrame[i]);
+		//		exportMatrix matrix(childAlign * animMatrix * parentAlign);
+		//		node->m_keyFrame[i] = matrix;
+		//	}
+		//	parentAlign = childAlign.Inverse();
+		//}
+		//
+		//for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
+		//	iter != node->m_children.end(); iter++)
+		//{
+		//	stackPool[stack] = *iter;
+		//	alignFrame[stack] = parentAlign;
+		//	stack++;
+		//}
 	}
 }
 

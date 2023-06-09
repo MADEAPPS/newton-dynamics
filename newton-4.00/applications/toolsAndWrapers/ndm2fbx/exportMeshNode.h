@@ -28,6 +28,6 @@ class exportMeshNode
 	exportMeshNode* m_parent;
 	mutable FbxNode* m_fbxNode;
 	std::list<exportMeshNode*> m_children;
-	std::vector<exportMatrix> m_keyFrame;
+	//std::vector<exportMatrix> m_keyFrame;
 };
 
