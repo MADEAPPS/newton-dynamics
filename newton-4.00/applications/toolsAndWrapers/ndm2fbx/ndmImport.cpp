@@ -153,12 +153,11 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 {
 	exportMeshNode* entity = nullptr;
 
-	FILE* const fp = fopen(name, "rt");
-	if (fp == nullptr)
+	FILE* const file = fopen(name, "rt");
+	if (file == nullptr)
 	{
 		return entity;
 	}
-
 	
 	//char token[256];
 	//auto ReadToken = [fp, &token]()
@@ -333,8 +332,273 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 	////entity->GenerateTpose();
 	//entity->AlignFrames();
 
-	_ASSERT(0);
+	char token[256];
+	auto ReadToken = [file, &token]()
+	{
+		fscanf(file, "%s", token);
+	};
 
+	fgets(token, sizeof(token) - 1, file);
+	ReadToken();
+	//ndTree<ndSharedPtr<ndMeshEffect>, int> meshEffects;
+	if (!strcmp(token, "geometries:"))
+	{
+		int geometryCount;
+		fscanf(file, "%d", &geometryCount);
+		ReadToken();
+		ReadToken();
+	
+		for (int k = 0; k < geometryCount; k++)
+		{
+			int meshId;
+			fscanf(file, "%d", &meshId);
+	//		ndSharedPtr<ndMeshEffect> effectMesh(new ndMeshEffect());
+	//		meshEffects.Insert(effectMesh, meshId);
+			ReadToken();
+	
+	//		ndArray<exportVector> positions;
+	//		ndArray<ndMeshEffect::ndUV> uvs;
+	//		ndArray<ndMeshEffect::ndNormal> normals;
+	//		ndArray<ndMeshEffect::ndVertexWeight> vertexWeights;
+	//
+	//		ndArray<int> uvIndex;
+	//		ndArray<int> faceArray;
+	//		ndArray<int> indexArray;
+	//		ndArray<int> normalsIndex;
+	//		ndArray<int> materialArray;
+	//		ndArray<int> positionsIndex;
+	//
+	//		ndMeshEffect::ndMeshVertexFormat format;
+	//
+			ReadToken();
+			int vertexCount = 0;
+			while (strcmp(token, "}"))
+			{
+				if (!strcmp(token, "vertex:"))
+				{
+					ReadToken();
+					ReadToken();
+					fscanf(file, "%d", &vertexCount);
+					ReadToken();
+					for (int i = 0; i < vertexCount; ++i)
+					{
+						double x;
+						double y;
+						double z;
+						fscanf(file, "%lf %lf %lf", &x, &y, &z);
+						//positions.PushBack(exportVector(x, y, z, double(0.0f)));
+					}
+					ReadToken();
+	
+					int indexCount;
+					ReadToken();
+					fscanf(file, "%d", &indexCount);
+					ReadToken();
+					for (int i = 0; i < indexCount; ++i)
+					{
+						int index;
+						fscanf(file, "%d", &index);
+	//					positionsIndex.PushBack(index);
+					}
+					ReadToken();
+	
+	//				format.m_vertex.m_data = &positions[0].m_x;
+	//				format.m_vertex.m_indexList = &positionsIndex[0];
+	//				format.m_vertex.m_strideInBytes = sizeof(exportVector);
+					ReadToken();
+				}
+				else if (!strcmp(token, "normal:"))
+				{
+					int vCount;
+					ReadToken();
+					ReadToken();
+					fscanf(file, "%d", &vCount);
+	
+					ReadToken();
+					for (int i = 0; i < vCount; ++i)
+					{
+						float x;
+						float y;
+						float z;
+						fscanf(file, "%f %f %f", &x, &y, &z);
+	//					normals.PushBack(ndMeshEffect::ndNormal(x, y, z));
+					}
+					ReadToken();
+	
+					int indexCount;
+					ReadToken();
+					fscanf(file, "%d", &indexCount);
+					ReadToken();
+					for (int i = 0; i < indexCount; ++i)
+					{
+						int index;
+						fscanf(file, "%d", &index);
+	//					normalsIndex.PushBack(index);
+					}
+					ReadToken();
+	
+	//				format.m_normal.m_data = &normals[0].m_x;
+	//				format.m_normal.m_indexList = &normalsIndex[0];
+	//				format.m_normal.m_strideInBytes = sizeof(ndMeshEffect::ndNormal);
+					ReadToken();
+				}
+				else if (!strcmp(token, "uv:"))
+				{
+					int vCount;
+					ReadToken();
+					ReadToken();
+					fscanf(file, "%d", &vCount);
+	
+					ReadToken();
+					for (int i = 0; i < vCount; ++i)
+					{
+						float x;
+						float y;
+						fscanf(file, "%f %f", &x, &y);
+	//					uvs.PushBack(ndMeshEffect::ndUV(x, y));
+					}
+					ReadToken();
+	
+					int indexCount;
+					ReadToken();
+					fscanf(file, "%d", &indexCount);
+					ReadToken();
+					for (int i = 0; i < indexCount; ++i)
+					{
+						int index;
+						fscanf(file, "%d", &index);
+	//					uvIndex.PushBack(index);
+					}
+					ReadToken();
+	//
+	//				format.m_uv0.m_data = &uvs[0].m_u;
+	//				format.m_uv0.m_indexList = &uvIndex[0];
+	//				format.m_uv0.m_strideInBytes = sizeof(ndMeshEffect::ndUV);
+					ReadToken();
+				}
+				else if (!strcmp(token, "material:"))
+				{
+					exportVector val;
+	//				ndMeshEffect::ndMaterial material;
+	
+					ReadToken();
+					ReadToken();
+					fscanf(file, "%f %f %f %f", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
+	//				material.m_ambient = ndVector(val);
+	
+					ReadToken();
+					fscanf(file, "%f %f %f %f", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
+	//				material.m_diffuse = ndVector(val);
+	//
+					ReadToken();
+					fscanf(file, "%f %f %f %f", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
+	//				material.m_specular = ndVector(val);
+	//
+					ReadToken();
+					fscanf(file, "%f", &val.m_x);
+	//				material.m_opacity = ndFloat32(val.m_x);
+	//
+					ReadToken();
+					fscanf(file, "%f", &val.m_x);
+	//				material.m_shiness = ndFloat32(val.m_x);
+	//
+					ReadToken();
+					ReadToken();
+	//				strcpy(material.m_textureName, token);
+	//
+	//				ndArray<ndMeshEffect::ndMaterial>& materials = effectMesh->GetMaterials();
+	//				int materialIndex = materials.GetCount();
+	//
+					ReadToken();
+					int faceCount;
+					fscanf(file, "%d", &faceCount);
+	
+					ReadToken();
+					for (int i = 0; i < faceCount; ++i)
+					{
+						int vCount;
+						fscanf(file, "%d:", &vCount);
+						for (int j = 0; j < vCount; ++j)
+						{
+							int index;
+							fscanf(file, "%d ", &index);
+	//						indexArray.PushBack(index);
+						}
+	//					faceArray.PushBack(vCount);
+	//					materialArray.PushBack(materialIndex);
+					}
+					ReadToken();
+					ReadToken();
+	//				materials.PushBack(material);
+				}
+				else if (!strcmp(token, "vertexWeightsCluster:"))
+				{
+					_ASSERT(0);
+	//				if (!vertexWeights.GetCount())
+	//				{
+	//					vertexWeights.SetCount(vertexCount);
+	//					for (int i = 0; i < vertexWeights.GetCount(); ++i)
+	//					{
+	//						vertexWeights[i].Clear();
+	//					}
+	//					format.m_vertexWeight.m_data = &vertexWeights[0];
+	//					format.m_vertexWeight.m_indexList = &positionsIndex[0];
+	//					format.m_vertexWeight.m_strideInBytes = sizeof(ndMeshEffect::ndVertexWeight);
+	//				}
+	//
+	//				char boneName[128];
+	//				fscanf(file, "%s", boneName);
+	//				int indexCount;
+	//				ReadToken();
+	//				ReadToken();
+	//				fscanf(file, "%d", &indexCount);
+	//
+	//				int hashId = int(ndCRC64(boneName) & 0xffffffff);
+	//				ReadToken();
+	//
+	//				ndArray<int> boneIndex;
+	//				for (int i = 0; i < indexCount; ++i)
+	//				{
+	//					int index;
+	//					fscanf(file, "%d", &index);
+	//					boneIndex.PushBack(index);
+	//				}
+	//
+	//				ReadToken();
+	//				ndArray<float> vertexWeight;
+	//				for (int i = 0; i < indexCount; ++i)
+	//				{
+	//					float weight;
+	//					fscanf(file, "%f", &weight);
+	//					vertexWeight.PushBack(weight);
+	//				}
+	//				ReadToken();
+	//
+	//				for (int i = 0; i < indexCount; ++i)
+	//				{
+	//					int index = boneIndex[i];
+	//					vertexWeights[index].SetWeight(hashId, float(vertexWeight[i]));
+	//				}
+				}
+				ReadToken();
+			}
+			ReadToken();
+	
+	//		format.m_faceCount = faceArray.GetCount();
+	//		format.m_faceIndexCount = &faceArray[0];
+	//		format.m_faceMaterial = &materialArray[0];
+	//		effectMesh->BuildFromIndexList(&format);
+		}
+		ReadToken();
+	}
+	
+	if (!strcmp(token, "node:"))
+	{
+	//	root = new ndMesh(nullptr);
+	//	root->Load(file, meshEffects);
+	}
+
+	fclose(file);
 	return entity;
 }
 

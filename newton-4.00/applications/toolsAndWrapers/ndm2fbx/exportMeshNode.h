@@ -4,21 +4,6 @@
 class exportMeshNode
 {
 	public:
-	class animDof
-	{
-		public:
-		animDof()
-		{
-			m_channel[0] = -1;
-			m_channel[1] = -1;
-			m_channel[2] = -1;
-			m_channel[3] = -1;
-			m_channel[4] = -1;
-			m_channel[5] = -1;
-		}
-		int m_channel[6];
-	};
-
 	exportMeshNode();
 	exportMeshNode(exportMeshNode* const parent);
 
@@ -38,8 +23,6 @@ class exportMeshNode
 	exportMeshNode* m_parent;
 	mutable FbxNode* m_fbxNode;
 	std::list<exportMeshNode*> m_children;
-
-	animDof m_animDof;
 	std::vector<exportMatrix> m_keyFrame;
 };
 
