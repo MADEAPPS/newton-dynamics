@@ -11,7 +11,7 @@
 
 #include "stdafx.h"
 #include "exportMeshNode.h"
-#include "ExportFbx.h"
+#include "exportFbx_.h"
 
 int main(int argc, char** argv)
 {
