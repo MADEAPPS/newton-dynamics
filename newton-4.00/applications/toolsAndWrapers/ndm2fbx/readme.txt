@@ -9,7 +9,8 @@ after downloading and installing the SDK, you also need to create an user enviro
 variable to point to the instalation folder FBX_SDK=[sdk_path]
 for example:
 
-FBX_SDK=C:\Program Files\Autodesk\FBX\FBX SDK\2020.0.1
+#FBX_SDK=C:\Program Files\Autodesk\FBX\FBX SDK\2020.0.1/
+FBX_SDK=C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.2/
 
 -open cmake and open the source folder
 -select a build folder.

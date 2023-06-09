@@ -10,7 +10,7 @@
 */
 
 #include "stdafx.h"
-#include "exportFbx_.h"
+#include "exportFbx.h"
 #include "exportMeshNode.h"
 
 #ifdef IOS_REF
