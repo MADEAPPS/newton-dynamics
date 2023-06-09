@@ -1,6 +1,7 @@
 #pragma once
 #include "exportMatrix.h"
 
+class exportMesh;
 class exportMeshNode
 {
 	public:
@@ -18,8 +19,12 @@ class exportMeshNode
 	void SetFrame(int index);
 	float CalculateDeltaAngle(float angle1, float angle0) const;
 
+	void LoadNdmSkeleton(FILE* const file, const std::map <int, std::shared_ptr<exportMesh>>& meshEffects);
+
 	std::string m_name;
 	exportMatrix m_matrix;
+	exportMatrix m_meshMatrix;
+	std::shared_ptr<exportMesh> m_mesh;
 	exportMeshNode* m_parent;
 	mutable FbxNode* m_fbxNode;
 	std::list<exportMeshNode*> m_children;

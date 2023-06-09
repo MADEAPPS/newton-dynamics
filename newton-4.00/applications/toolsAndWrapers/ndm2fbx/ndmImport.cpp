@@ -359,11 +359,6 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 	
 	//		std::vector<ndMeshEffect::ndVertexWeight> vertexWeights;
 
-	//		std::vector<int> faceArray;
-	//		std::vector<int> indexArray;
-	//		std::vector<int> materialArray;
-	//		ndMeshEffect::ndMeshVertexFormat format;
-	//
 			ReadToken();
 			int vertexCount = 0;
 			while (strcmp(token, "}"))
@@ -461,35 +456,32 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 				else if (!strcmp(token, "material:"))
 				{
 					exportVector val;
-	//				ndMeshEffect::ndMaterial material;
+					exportMaterial material;
 	
 					ReadToken();
 					ReadToken();
 					fscanf(file, "%f %f %f %f", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
-	//				material.m_ambient = ndVector(val);
+					material.m_ambient = val;
 	
 					ReadToken();
 					fscanf(file, "%f %f %f %f", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
-	//				material.m_diffuse = ndVector(val);
+					material.m_diffuse = val;
 	
 					ReadToken();
 					fscanf(file, "%f %f %f %f", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
-	//				material.m_specular = ndVector(val);
+					material.m_specular = val;
 	
 					ReadToken();
 					fscanf(file, "%f", &val.m_x);
-	//				material.m_opacity = ndFloat32(val.m_x);
+					material.m_opacity = val.m_x;
 	
 					ReadToken();
 					fscanf(file, "%f", &val.m_x);
-	//				material.m_shiness = ndFloat32(val.m_x);
+					material.m_shiness = val.m_x;
 	
 					ReadToken();
 					ReadToken();
-	//				strcpy(material.m_textureName, token);
-	//
-	//				std::vector<ndMeshEffect::ndMaterial>& materials = effectMesh->GetMaterials();
-	//				int materialIndex = materials.GetCount();
+					material.m_texName = token;
 	
 					ReadToken();
 					int faceCount;
@@ -500,18 +492,17 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 					{
 						int vCount;
 						fscanf(file, "%d:", &vCount);
+						material.m_faceIndexCount.push_back(vCount);
 						for (int j = 0; j < vCount; ++j)
 						{
 							int index;
 							fscanf(file, "%d ", &index);
-	//						indexArray.push_back(index);
+							material.m_indexArray.push_back(index);
 						}
-	//					faceArray.push_back(vCount);
-	//					materialArray.push_back(materialIndex);
 					}
 					ReadToken();
 					ReadToken();
-	//				materials.push_back(material);
+					effectMesh->m_materials.push_back(material);
 				}
 				else if (!strcmp(token, "vertexWeightsCluster:"))
 				{
@@ -565,22 +556,119 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 				ReadToken();
 			}
 			ReadToken();
-	
-	//		format.m_faceCount = faceArray.GetCount();
-	//		format.m_faceIndexCount = &faceArray[0];
-	//		format.m_faceMaterial = &materialArray[0];
-	//		effectMesh->BuildFromIndexList(&format);
 		}
 		ReadToken();
 	}
 	
 	if (!strcmp(token, "node:"))
 	{
-	//	root = new ndMesh(nullptr);
-	//	root->Load(file, meshEffects);
+		entity = new exportMeshNode();
+		entity->LoadNdmSkeleton(file, meshEffects);
 	}
 
 	fclose(file);
 	return entity;
 }
 
+
+void exportMeshNode::LoadNdmSkeleton(FILE* const file, const std::map <int, std::shared_ptr<exportMesh>>& meshEffects)
+{
+	char token[256];
+	auto ReadToken = [file, &token]()
+	{
+		fscanf(file, "%s", token);
+	};
+
+	ReadToken();
+	ReadToken();
+/*
+	while (strcmp(token, "}"))
+	{
+		if (!strcmp(token, "name:"))
+		{
+			ReadToken();
+			SetName(token);
+		}
+		else if (!strcmp(token, "eulers:"))
+		{
+			ndBigVector eulers;
+			fscanf(file, "%lf %lf %lf", &eulers.m_x, &eulers.m_y, &eulers.m_z);
+			ndMatrix matrix(ndPitchMatrix(ndFloat32(eulers.m_x) * ndDegreeToRad) * ndYawMatrix(ndFloat32(eulers.m_y) * ndDegreeToRad) * ndRollMatrix(ndFloat32(eulers.m_z) * ndDegreeToRad));
+			matrix.m_posit = m_matrix.m_posit;
+			m_matrix = matrix;
+		}
+		else if (!strcmp(token, "position:"))
+		{
+			ndBigVector posit;
+			fscanf(file, "%lf %lf %lf", &posit.m_x, &posit.m_y, &posit.m_z);
+			posit.m_w = ndFloat32(1.0f);
+			m_matrix.m_posit = ndVector(posit);
+		}
+		else if (!strcmp(token, "geometryEulers:"))
+		{
+			ndBigVector eulers;
+			fscanf(file, "%lf %lf %lf", &eulers.m_x, &eulers.m_y, &eulers.m_z);
+			ndMatrix matrix(ndPitchMatrix(ndFloat32(eulers.m_x) * ndDegreeToRad) * ndYawMatrix(ndFloat32(eulers.m_y) * ndDegreeToRad) * ndRollMatrix(ndFloat32(eulers.m_z) * ndDegreeToRad));
+			matrix.m_posit = m_meshMatrix.m_posit;
+			m_meshMatrix = matrix;
+		}
+		else if (!strcmp(token, "geometryPosition:"))
+		{
+			ndBigVector posit;
+			fscanf(file, "%lf %lf %lf", &posit.m_x, &posit.m_y, &posit.m_z);
+			posit.m_w = ndFloat32(1.0f);
+			m_meshMatrix.m_posit = ndVector(posit);
+		}
+		else if (!strcmp(token, "node:"))
+		{
+			ndMesh* const child = new ndMesh(this);
+			child->Load(file, meshEffects);
+		}
+		else if (!strcmp(token, "geometry:"))
+		{
+			ndInt32 nodeId;
+			fscanf(file, "%d", &nodeId);
+			ndAssert(meshEffects.Find(nodeId));
+			m_mesh = meshEffects.Find(nodeId)->GetInfo();
+		}
+		else if (!strcmp(token, "keyFramePosits:"))
+		{
+			ndInt32 keyFramesCount;
+			fscanf(file, "%d\n", &keyFramesCount);
+
+			ReadToken();
+			ndMesh::ndCurve& curve = GetPositCurve();
+			for (ndInt32 i = 0; i < keyFramesCount; ++i)
+			{
+				ndCurveValue keyframe;
+				fscanf(file, "%f %f %f %f\n", &keyframe.m_x, &keyframe.m_y, &keyframe.m_z, &keyframe.m_time);
+				curve.Append(keyframe);
+			}
+			ReadToken();
+		}
+		else if (!strcmp(token, "keyFrameRotations:"))
+		{
+			ndInt32 keyFramesCount;
+			fscanf(file, "%d\n", &keyFramesCount);
+
+			ReadToken();
+			ndMesh::ndCurve& curve = GetRotationCurve();
+			for (ndInt32 i = 0; i < keyFramesCount; ++i)
+			{
+				ndCurveValue keyframe;
+				fscanf(file, "%f %f %f %f\n", &keyframe.m_x, &keyframe.m_y, &keyframe.m_z, &keyframe.m_time);
+				keyframe.m_x = ndReal(keyframe.m_x * ndDegreeToRad);
+				keyframe.m_y = ndReal(keyframe.m_y * ndDegreeToRad);
+				keyframe.m_z = ndReal(keyframe.m_z * ndDegreeToRad);
+				curve.Append(keyframe);
+			}
+			ReadToken();
+		}
+		else
+		{
+			break;
+		}
+		ReadToken();
+	}
+*/
+}
