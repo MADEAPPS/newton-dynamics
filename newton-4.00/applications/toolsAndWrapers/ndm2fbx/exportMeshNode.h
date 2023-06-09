@@ -19,7 +19,7 @@ class exportMeshNode
 	void SetFrame(int index);
 	float CalculateDeltaAngle(float angle1, float angle0) const;
 
-	void LoadNdmSkeleton(FILE* const file, const std::map <int, std::shared_ptr<exportMesh>>& meshEffects);
+	void LoadNdmSkeleton(FILE* const file, std::map <int, std::shared_ptr<exportMesh>>& meshEffects);
 
 	std::string m_name;
 	exportMatrix m_matrix;

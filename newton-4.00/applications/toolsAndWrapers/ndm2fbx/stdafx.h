@@ -31,4 +31,6 @@
 	#define M_PI 3.14159265f
 #endif
 
+#define ndDegreeToRad (M_PI / 180.0f)
+
 

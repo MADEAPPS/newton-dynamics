@@ -571,7 +571,7 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 }
 
 
-void exportMeshNode::LoadNdmSkeleton(FILE* const file, const std::map <int, std::shared_ptr<exportMesh>>& meshEffects)
+void exportMeshNode::LoadNdmSkeleton(FILE* const file, std::map <int, std::shared_ptr<exportMesh>>& meshEffects)
 {
 	char token[256];
 	auto ReadToken = [file, &token]()
@@ -581,88 +581,90 @@ void exportMeshNode::LoadNdmSkeleton(FILE* const file, const std::map <int, std:
 
 	ReadToken();
 	ReadToken();
-/*
 	while (strcmp(token, "}"))
 	{
 		if (!strcmp(token, "name:"))
 		{
 			ReadToken();
-			SetName(token);
+			m_name = token;
 		}
 		else if (!strcmp(token, "eulers:"))
 		{
-			ndBigVector eulers;
-			fscanf(file, "%lf %lf %lf", &eulers.m_x, &eulers.m_y, &eulers.m_z);
-			ndMatrix matrix(ndPitchMatrix(ndFloat32(eulers.m_x) * ndDegreeToRad) * ndYawMatrix(ndFloat32(eulers.m_y) * ndDegreeToRad) * ndRollMatrix(ndFloat32(eulers.m_z) * ndDegreeToRad));
+			exportVector eulers;
+			fscanf(file, "%f %f %f", &eulers.m_x, &eulers.m_y, &eulers.m_z);
+			exportMatrix matrix(ndPitchMatrix(eulers.m_x * ndDegreeToRad) * ndYawMatrix(eulers.m_y * ndDegreeToRad) * ndRollMatrix(eulers.m_z * ndDegreeToRad));
 			matrix.m_posit = m_matrix.m_posit;
 			m_matrix = matrix;
 		}
 		else if (!strcmp(token, "position:"))
 		{
-			ndBigVector posit;
-			fscanf(file, "%lf %lf %lf", &posit.m_x, &posit.m_y, &posit.m_z);
-			posit.m_w = ndFloat32(1.0f);
-			m_matrix.m_posit = ndVector(posit);
+			exportVector posit;
+			fscanf(file, "%f %f %f", &posit.m_x, &posit.m_y, &posit.m_z);
+			posit.m_w = 1.0f;
+			m_matrix.m_posit = posit;
 		}
 		else if (!strcmp(token, "geometryEulers:"))
 		{
-			ndBigVector eulers;
-			fscanf(file, "%lf %lf %lf", &eulers.m_x, &eulers.m_y, &eulers.m_z);
-			ndMatrix matrix(ndPitchMatrix(ndFloat32(eulers.m_x) * ndDegreeToRad) * ndYawMatrix(ndFloat32(eulers.m_y) * ndDegreeToRad) * ndRollMatrix(ndFloat32(eulers.m_z) * ndDegreeToRad));
+			exportVector eulers;
+			fscanf(file, "%f %f %f", &eulers.m_x, &eulers.m_y, &eulers.m_z);
+			exportMatrix matrix(ndPitchMatrix(eulers.m_x * ndDegreeToRad) * ndYawMatrix(eulers.m_y * ndDegreeToRad) * ndRollMatrix(eulers.m_z * ndDegreeToRad));
 			matrix.m_posit = m_meshMatrix.m_posit;
 			m_meshMatrix = matrix;
 		}
 		else if (!strcmp(token, "geometryPosition:"))
 		{
-			ndBigVector posit;
-			fscanf(file, "%lf %lf %lf", &posit.m_x, &posit.m_y, &posit.m_z);
-			posit.m_w = ndFloat32(1.0f);
-			m_meshMatrix.m_posit = ndVector(posit);
-		}
-		else if (!strcmp(token, "node:"))
-		{
-			ndMesh* const child = new ndMesh(this);
-			child->Load(file, meshEffects);
+			exportVector posit;
+			fscanf(file, "%f %f %f", &posit.m_x, &posit.m_y, &posit.m_z);
+			posit.m_w = 1.0f;
+			m_meshMatrix.m_posit = posit;
 		}
 		else if (!strcmp(token, "geometry:"))
 		{
-			ndInt32 nodeId;
+			int nodeId;
 			fscanf(file, "%d", &nodeId);
-			ndAssert(meshEffects.Find(nodeId));
-			m_mesh = meshEffects.Find(nodeId)->GetInfo();
+			_ASSERT(meshEffects.find(nodeId) != meshEffects.end());
+			//m_mesh = meshEffects.Find(nodeId)->GetInfo();
+			m_mesh = meshEffects[nodeId];
 		}
 		else if (!strcmp(token, "keyFramePosits:"))
 		{
-			ndInt32 keyFramesCount;
-			fscanf(file, "%d\n", &keyFramesCount);
-
-			ReadToken();
-			ndMesh::ndCurve& curve = GetPositCurve();
-			for (ndInt32 i = 0; i < keyFramesCount; ++i)
-			{
-				ndCurveValue keyframe;
-				fscanf(file, "%f %f %f %f\n", &keyframe.m_x, &keyframe.m_y, &keyframe.m_z, &keyframe.m_time);
-				curve.Append(keyframe);
-			}
-			ReadToken();
+			_ASSERT(0);
+		//	int keyFramesCount;
+		//	fscanf(file, "%d\n", &keyFramesCount);
+		//
+		//	ReadToken();
+		//	ndMesh::ndCurve& curve = GetPositCurve();
+		//	for (int i = 0; i < keyFramesCount; ++i)
+		//	{
+		//		ndCurveValue keyframe;
+		//		fscanf(file, "%f %f %f %f\n", &keyframe.m_x, &keyframe.m_y, &keyframe.m_z, &keyframe.m_time);
+		//		curve.Append(keyframe);
+		//	}
+		//	ReadToken();
 		}
 		else if (!strcmp(token, "keyFrameRotations:"))
 		{
-			ndInt32 keyFramesCount;
-			fscanf(file, "%d\n", &keyFramesCount);
-
-			ReadToken();
-			ndMesh::ndCurve& curve = GetRotationCurve();
-			for (ndInt32 i = 0; i < keyFramesCount; ++i)
-			{
-				ndCurveValue keyframe;
-				fscanf(file, "%f %f %f %f\n", &keyframe.m_x, &keyframe.m_y, &keyframe.m_z, &keyframe.m_time);
-				keyframe.m_x = ndReal(keyframe.m_x * ndDegreeToRad);
-				keyframe.m_y = ndReal(keyframe.m_y * ndDegreeToRad);
-				keyframe.m_z = ndReal(keyframe.m_z * ndDegreeToRad);
-				curve.Append(keyframe);
-			}
-			ReadToken();
+			_ASSERT(0);
+		//	int keyFramesCount;
+		//	fscanf(file, "%d\n", &keyFramesCount);
+		//
+		//	ReadToken();
+		//	ndMesh::ndCurve& curve = GetRotationCurve();
+		//	for (int i = 0; i < keyFramesCount; ++i)
+		//	{
+		//		ndCurveValue keyframe;
+		//		fscanf(file, "%f %f %f %f\n", &keyframe.m_x, &keyframe.m_y, &keyframe.m_z, &keyframe.m_time);
+		//		keyframe.m_x = ndReal(keyframe.m_x * ndDegreeToRad);
+		//		keyframe.m_y = ndReal(keyframe.m_y * ndDegreeToRad);
+		//		keyframe.m_z = ndReal(keyframe.m_z * ndDegreeToRad);
+		//		curve.Append(keyframe);
+		//	}
+		//	ReadToken();
+		}
+		else if (!strcmp(token, "node:"))
+		{
+			exportMeshNode* const child = new exportMeshNode(this);
+			child->LoadNdmSkeleton(file, meshEffects);
 		}
 		else
 		{
@@ -670,5 +672,4 @@ void exportMeshNode::LoadNdmSkeleton(FILE* const file, const std::map <int, std:
 		}
 		ReadToken();
 	}
-*/
 }
