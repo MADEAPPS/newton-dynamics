@@ -658,14 +658,7 @@ void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, 
 
 	const ndVector boxP0(leafNode->m_minBox);
 	const ndVector boxP1(leafNode->m_maxBox);
-
-	//const bool body0tier0 = body0->m_invMass.m_w != ndFloat32(0.0f);
-	//const bool body0tier1 = body0->GetAsBodyTriggerVolume() != nullptr;
-	//const ndUnsigned8 body0tier1 = !body0->m_isStatic;
-	//const ndUnsigned8 body0tier2 = body0->GetCollisionShape().GetCollisionMode();
-	//const bool test0 = ((body0->m_invMass.m_w != ndFloat32(0.0f)) || body0->GetAsBodyTriggerVolume()) && body0->GetCollisionShape().GetCollisionMode();
-	//const ndInt8 test0 = (body0tier0 | body0tier1) & body0tier2;
-	//const ndUnsigned8 test0 = ndUnsigned8(body0tier1 & body0tier2);
+	//const bool test0 = (body0->m_invMass.m_w != ndFloat32(0.0f)) & body0->GetCollisionShape().GetCollisionMode();
 	const ndUnsigned8 test0 = ndUnsigned8(!body0->m_equilibrium);
 
 	pool[0] = node;
@@ -685,25 +678,11 @@ void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, 
 				ndAssert(body1);
 				if (body1->m_sceneEquilibrium || forward)
 				{
-					//const bool body1tier0 = body1->m_invMass.m_w != ndFloat32(0.0f);
-					//const bool body1tier1 = body1->GetAsBodyTriggerVolume() != nullptr;
-					//const ndUnsigned8 body1tier1 = !body1->m_isStatic;
-					//const ndUnsigned8 body1tier2 = body1->GetCollisionShape().GetCollisionMode();
 					//const bool test1 = (body1->m_invMass.m_w != ndFloat32(0.0f)) & body1->GetCollisionShape().GetCollisionMode();
-					//const ndInt8 test1 = (body1tier0 | body1tier1) & body1tier2;
-					//const ndUnsigned8 test1 = ndUnsigned8(body1tier1 & body1tier2);
 					const ndUnsigned8 test1 = ndUnsigned8(!body1->m_equilibrium);
 					const ndUnsigned8 test = ndUnsigned8(test0 | test1);
 					if (test)
 					{
-						//if (!body0->GetAsBodyTriggerVolume())
-						//{
-						//	AddPair(body0, body1, threadId);
-						//}
-						//else if (body1->GetAsBodyDynamic() && (body1->GetInvMass() > ndFloat32 (0.0f)))
-						//{
-						//	AddPair(body1, body0, threadId);
-						//}
 						AddPair(body0, body1, threadId);
 					}
 				}

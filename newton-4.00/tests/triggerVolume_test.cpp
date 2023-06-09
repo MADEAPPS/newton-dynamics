@@ -12,7 +12,6 @@
 #include "ndNewton.h"
 #include <gtest/gtest.h>
 
-#if 0
 class csBodyTrigger : public ndBodyTriggerVolume 
 {
 	public:
@@ -27,19 +26,22 @@ class csBodyTrigger : public ndBodyTriggerVolume
 
 	virtual void OnTrigger(ndBodyKinematic* const, ndFloat32) 
 	{ 
-		std::cout << "Trigger\n"; 
+		//std::cout << "Trigger\n"; 
+		ndTrace(("trigger\n"));
 	}
 	virtual void OnTriggerEnter(ndBodyKinematic* const, ndFloat32)
 	{ 
-		std::cout << "Enter\n"; 
+		//std::cout << "Enter\n"; 
+		ndTrace(("enter Trigger\n"));
 	}
 	virtual void OnTriggerExit(ndBodyKinematic* const, ndFloat32)
 	{ 
-		std::cout << "Exit\n"; 
+		//std::cout << "Exit\n"; 
+		ndTrace(("exit Trigger\n"));
 	}
 };
 
-TEST(Collisions, TriggerCollision)
+TEST(StaticTrigger, TriggerCollision)
 {
 	ndWorld world;
 	ndShapeInstance shapeinst(new ndShapeSphere(ndFloat32(0.5f)));
@@ -72,33 +74,7 @@ TEST(Collisions, TriggerCollision)
 	world.CleanUp();
 }
 
-#else
-
-class csBodyTrigger : public ndBodyTriggerVolume
-{
-	public:
-	csBodyTrigger() :ndBodyTriggerVolume() 
-	{ 
-	}
-	virtual ~csBodyTrigger() 
-	{ 
-	}
-
-	virtual void OnTrigger(ndBodyKinematic* const, ndFloat32)
-	{
-		std::cout << "Trigger\n";
-	}
-	virtual void OnTriggerEnter(ndBodyKinematic* const, ndFloat32)
-	{
-		std::cout << "Enter\n";
-	}
-	virtual void OnTriggerExit(ndBodyKinematic* const, ndFloat32)
-	{
-		std::cout << "Exit\n";
-	}
-};
-
-TEST(KinematicMovement, TriggerBody)
+TEST(DynamicsTrigger, TriggerCollision)
 {
 	ndWorld* world = new ndWorld();
 	ndShapeInstance shape(new ndShapeBox(1, 1, 1));
@@ -141,4 +117,3 @@ TEST(KinematicMovement, TriggerBody)
 	world->CleanUp();
 	delete world;
 }
-#endif

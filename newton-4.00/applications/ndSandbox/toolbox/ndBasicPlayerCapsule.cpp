@@ -64,7 +64,6 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
 
 		ndFloat32 timestep = word->GetScene()->GetTimestep();
-		//player->m_idleCycle->SetTime(player->m_idleCycle->GetTime() + timestep);
 		player->m_animBlendTree->Update(timestep);
 		player->m_animBlendTree->Evaluate(player->m_output, m_veloc);
 		//ndTrace(("speed %g\n", aninVeloc.m_x));
@@ -163,9 +162,6 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 
 	//m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode> (idle);
 	m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_idleWalkBlend);
-
-	//m_idleCycle = idle;
-	//m_walkCycle = walk;
 }
 
 ndBasicPlayerCapsule::~ndBasicPlayerCapsule()
