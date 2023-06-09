@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "exportMesh.h"
 #include "exportMeshNode.h"
 
 void exportMeshNode::SetFrame(int index)
@@ -340,7 +341,7 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 
 	fgets(token, sizeof(token) - 1, file);
 	ReadToken();
-	//ndTree<ndSharedPtr<ndMeshEffect>, int> meshEffects;
+	std::map <int, std::shared_ptr<exportMesh>> meshEffects;
 	if (!strcmp(token, "geometries:"))
 	{
 		int geometryCount;
@@ -352,22 +353,15 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 		{
 			int meshId;
 			fscanf(file, "%d", &meshId);
-	//		ndSharedPtr<ndMeshEffect> effectMesh(new ndMeshEffect());
-	//		meshEffects.Insert(effectMesh, meshId);
+			std::shared_ptr<exportMesh> effectMesh(new exportMesh());
+			meshEffects[meshId] = effectMesh;
 			ReadToken();
 	
-	//		ndArray<exportVector> positions;
-	//		ndArray<ndMeshEffect::ndUV> uvs;
-	//		ndArray<ndMeshEffect::ndNormal> normals;
-	//		ndArray<ndMeshEffect::ndVertexWeight> vertexWeights;
-	//
-	//		ndArray<int> uvIndex;
-	//		ndArray<int> faceArray;
-	//		ndArray<int> indexArray;
-	//		ndArray<int> normalsIndex;
-	//		ndArray<int> materialArray;
-	//		ndArray<int> positionsIndex;
-	//
+	//		std::vector<ndMeshEffect::ndVertexWeight> vertexWeights;
+
+	//		std::vector<int> faceArray;
+	//		std::vector<int> indexArray;
+	//		std::vector<int> materialArray;
 	//		ndMeshEffect::ndMeshVertexFormat format;
 	//
 			ReadToken();
@@ -382,11 +376,11 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 					ReadToken();
 					for (int i = 0; i < vertexCount; ++i)
 					{
-						double x;
-						double y;
-						double z;
-						fscanf(file, "%lf %lf %lf", &x, &y, &z);
-						//positions.PushBack(exportVector(x, y, z, double(0.0f)));
+						float x;
+						float y;
+						float z;
+						fscanf(file, "%f %f %f", &x, &y, &z);
+						effectMesh->m_positions.push_back(exportVector(x, y, z, float(0.0f)));
 					}
 					ReadToken();
 	
@@ -398,13 +392,9 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 					{
 						int index;
 						fscanf(file, "%d", &index);
-	//					positionsIndex.PushBack(index);
+						effectMesh->m_positionsIndex.push_back(index);
 					}
 					ReadToken();
-	
-	//				format.m_vertex.m_data = &positions[0].m_x;
-	//				format.m_vertex.m_indexList = &positionsIndex[0];
-	//				format.m_vertex.m_strideInBytes = sizeof(exportVector);
 					ReadToken();
 				}
 				else if (!strcmp(token, "normal:"))
@@ -421,7 +411,7 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 						float y;
 						float z;
 						fscanf(file, "%f %f %f", &x, &y, &z);
-	//					normals.PushBack(ndMeshEffect::ndNormal(x, y, z));
+						effectMesh->m_normals.push_back(exportVector(x, y, z, float(0.0f)));
 					}
 					ReadToken();
 	
@@ -433,13 +423,9 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 					{
 						int index;
 						fscanf(file, "%d", &index);
-	//					normalsIndex.PushBack(index);
+						effectMesh->m_normalsIndex.push_back(index);
 					}
 					ReadToken();
-	
-	//				format.m_normal.m_data = &normals[0].m_x;
-	//				format.m_normal.m_indexList = &normalsIndex[0];
-	//				format.m_normal.m_strideInBytes = sizeof(ndMeshEffect::ndNormal);
 					ReadToken();
 				}
 				else if (!strcmp(token, "uv:"))
@@ -455,7 +441,7 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 						float x;
 						float y;
 						fscanf(file, "%f %f", &x, &y);
-	//					uvs.PushBack(ndMeshEffect::ndUV(x, y));
+						effectMesh->m_uvs.push_back(exportVector(x, y, float(0.0f), float(0.0f)));
 					}
 					ReadToken();
 	
@@ -467,13 +453,9 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 					{
 						int index;
 						fscanf(file, "%d", &index);
-	//					uvIndex.PushBack(index);
+						effectMesh->m_uvIndex.push_back(index);
 					}
 					ReadToken();
-	//
-	//				format.m_uv0.m_data = &uvs[0].m_u;
-	//				format.m_uv0.m_indexList = &uvIndex[0];
-	//				format.m_uv0.m_strideInBytes = sizeof(ndMeshEffect::ndUV);
 					ReadToken();
 				}
 				else if (!strcmp(token, "material:"))
@@ -489,26 +471,26 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 					ReadToken();
 					fscanf(file, "%f %f %f %f", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
 	//				material.m_diffuse = ndVector(val);
-	//
+	
 					ReadToken();
 					fscanf(file, "%f %f %f %f", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
 	//				material.m_specular = ndVector(val);
-	//
+	
 					ReadToken();
 					fscanf(file, "%f", &val.m_x);
 	//				material.m_opacity = ndFloat32(val.m_x);
-	//
+	
 					ReadToken();
 					fscanf(file, "%f", &val.m_x);
 	//				material.m_shiness = ndFloat32(val.m_x);
-	//
+	
 					ReadToken();
 					ReadToken();
 	//				strcpy(material.m_textureName, token);
 	//
-	//				ndArray<ndMeshEffect::ndMaterial>& materials = effectMesh->GetMaterials();
+	//				std::vector<ndMeshEffect::ndMaterial>& materials = effectMesh->GetMaterials();
 	//				int materialIndex = materials.GetCount();
-	//
+	
 					ReadToken();
 					int faceCount;
 					fscanf(file, "%d", &faceCount);
@@ -522,14 +504,14 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 						{
 							int index;
 							fscanf(file, "%d ", &index);
-	//						indexArray.PushBack(index);
+	//						indexArray.push_back(index);
 						}
-	//					faceArray.PushBack(vCount);
-	//					materialArray.PushBack(materialIndex);
+	//					faceArray.push_back(vCount);
+	//					materialArray.push_back(materialIndex);
 					}
 					ReadToken();
 					ReadToken();
-	//				materials.PushBack(material);
+	//				materials.push_back(material);
 				}
 				else if (!strcmp(token, "vertexWeightsCluster:"))
 				{
@@ -556,21 +538,21 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 	//				int hashId = int(ndCRC64(boneName) & 0xffffffff);
 	//				ReadToken();
 	//
-	//				ndArray<int> boneIndex;
+	//				std::vector<int> boneIndex;
 	//				for (int i = 0; i < indexCount; ++i)
 	//				{
 	//					int index;
 	//					fscanf(file, "%d", &index);
-	//					boneIndex.PushBack(index);
+	//					boneIndex.push_back(index);
 	//				}
 	//
 	//				ReadToken();
-	//				ndArray<float> vertexWeight;
+	//				std::vector<float> vertexWeight;
 	//				for (int i = 0; i < indexCount; ++i)
 	//				{
 	//					float weight;
 	//					fscanf(file, "%f", &weight);
-	//					vertexWeight.PushBack(weight);
+	//					vertexWeight.push_back(weight);
 	//				}
 	//				ReadToken();
 	//

@@ -24,6 +24,7 @@
 #include <list>
 #include <vector>
 #include <string>
+#include <iostream>
 #include <fbxsdk.h>
 
 #ifndef M_PI
