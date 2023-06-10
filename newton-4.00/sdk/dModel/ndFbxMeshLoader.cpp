@@ -673,7 +673,7 @@ ndMesh* ndFbxMeshLoader::CreateMeshHierarchy(ofbx::IScene* const fbxScene, ndFbx
 	return mesh;
 }
 
-ndMesh* ndFbxMeshLoader::FbxTondMesh(ofbx::IScene* const fbxScene)
+ndMesh* ndFbxMeshLoader::Fbx2ndMesh(ofbx::IScene* const fbxScene)
 {
 	ndFbx2ndMeshNodeMap nodeMap;
 	ndMesh* const mesh = CreateMeshHierarchy(fbxScene, nodeMap);
@@ -1089,7 +1089,7 @@ ndMesh* ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bool loadAnima
 
 	ndSharedPtr<ofbx::IScene> fbxScene(ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE));
 	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(*fbxScene));
-	ndMesh* const mesh = FbxTondMesh(*fbxScene);
+	ndMesh* const mesh = Fbx2ndMesh(*fbxScene);
 	if (loadAnimation)
 	{
 		LoadAnimation(*fbxScene, mesh);

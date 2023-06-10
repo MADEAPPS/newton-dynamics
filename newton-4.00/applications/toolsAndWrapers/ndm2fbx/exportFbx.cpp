@@ -11,6 +11,7 @@
 
 #include "stdafx.h"
 #include "exportFbx.h"
+#include "exportMesh.h"
 #include "exportMeshNode.h"
 
 #ifdef IOS_REF
@@ -20,6 +21,7 @@
 
 static int InitializeSdkObjects(FbxManager*& fbxManager, FbxScene*& fbxScene);
 static void CreateGeometries(const exportMeshNode* const model, FbxScene* const fbxScene);
+static FbxMesh* CreateGeometry(const exportMeshNode* const node, FbxScene* const fbxScene);
 static FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* const fbxScene);
 static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const fbxScene, FbxNode* const fbxModelRoot);
 static bool CreateScene(const exportMeshNode* const model, FbxManager* const fbxManager, FbxScene* const fbxScene);
@@ -215,62 +217,133 @@ FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* const fbxSc
 	return skeleton;
 }
 
+FbxMesh* CreateGeometry(const exportMeshNode* const node, FbxScene* const fbxScene)
+{
+	//// indices of the vertices per each polygon
+	//static int vtxId[24] = {
+	//	0,1,2,3, // front  face  (Z+)
+	//	1,5,6,2, // right  side  (X+)
+	//	5,4,7,6, // back   face  (Z-)
+	//	4,0,3,7, // left   side  (X-)
+	//	0,4,5,1, // bottom face  (Y-)
+	//	3,2,6,7  // top    face  (Y+)
+	//};
+	//
+	//// control points
+	//static Vector4 lControlPoints[8] = {
+	//	{ -5.0,  0.0,  5.0, 1.0}, {  5.0,  0.0,  5.0, 1.0}, {  5.0,10.0,  5.0, 1.0},    { -5.0,10.0,  5.0, 1.0},
+	//	{ -5.0,  0.0, -5.0, 1.0}, {  5.0,  0.0, -5.0, 1.0}, {  5.0,10.0, -5.0, 1.0},    { -5.0,10.0, -5.0, 1.0}
+	//};
+	//
+	//// normals
+	//static Vector4 lNormals[8] = {
+	//	{-0.577350258827209,-0.577350258827209, 0.577350258827209, 1.0},
+	//	{ 0.577350258827209,-0.577350258827209, 0.577350258827209, 1.0},
+	//	{ 0.577350258827209, 0.577350258827209, 0.577350258827209, 1.0},
+	//	{-0.577350258827209, 0.577350258827209, 0.577350258827209, 1.0},
+	//	{-0.577350258827209,-0.577350258827209,-0.577350258827209, 1.0},
+	//	{ 0.577350258827209,-0.577350258827209,-0.577350258827209, 1.0},
+	//	{ 0.577350258827209, 0.577350258827209,-0.577350258827209, 1.0},
+	//	{-0.577350258827209, 0.577350258827209,-0.577350258827209, 1.0}
+	//};
+	//
+	//// uvs
+	//static Vector2 lUVs[14] = {
+	//	{ 0.0, 1.0},
+	//	{ 1.0, 0.0},
+	//	{ 0.0, 0.0},
+	//	{ 1.0, 1.0}
+	//};
+	//
+	//// indices of the uvs per each polygon
+	//static int uvsId[24] = {
+	//	0,1,3,2,2,3,5,4,4,5,7,6,6,7,9,8,1,10,11,3,12,0,2,13
+	//};
+	//
+	//// create the main structure.
+	//FbxMesh* fbxMesh = FbxMesh::Create(pScene, "");
+	
+	FbxMesh* const fbxMesh = FbxMesh::Create(fbxScene, node->m_name.c_str());
+	const std::shared_ptr<exportMesh>& mesh = node->m_mesh;
+
+	//// Create control points.
+	//fbxMesh->InitControlPoints(8);
+	//FbxVector4* vertex = fbxMesh->GetControlPoints();
+	//memcpy((void*)vertex, (void*)lControlPoints, 8 * sizeof(FbxVector4));
+	//
+	//// create the materials.
+	///* Each polygon face will be assigned a unique material.
+	//*/
+	//FbxGeometryElementMaterial* lMaterialElement = fbxMesh->CreateElementMaterial();
+	//lMaterialElement->SetMappingMode(FbxGeometryElement::eAllSame);
+	//lMaterialElement->SetReferenceMode(FbxGeometryElement::eIndexToDirect);
+	//
+	//lMaterialElement->GetIndexArray().Add(0);
+	//
+	//// Create polygons later after FbxGeometryElementMaterial is created. Assign material indices.
+	//int vId = 0;
+	//for (int f = 0; f < 6; f++)
+	//{
+	//	fbxMesh->BeginPolygon();
+	//	for (int v = 0; v < 4; v++)
+	//		fbxMesh->AddPolygon(vtxId[vId++]);
+	//	fbxMesh->EndPolygon();
+	//}
+	//
+	//// specify normals per control point.
+	//FbxGeometryElementNormal* lNormalElement = fbxMesh->CreateElementNormal();
+	//lNormalElement->SetMappingMode(FbxGeometryElement::eByControlPoint);
+	//lNormalElement->SetReferenceMode(FbxGeometryElement::eDirect);
+	//
+	//for (int n = 0; n < 8; n++)
+	//	lNormalElement->GetDirectArray().Add(FbxVector4(lNormals[n][0], lNormals[n][1], lNormals[n][2]));
+	//
+	//
+	//// Create the node containing the mesh
+	//FbxNode* lNode = FbxNode::Create(pScene, pName);
+	//lNode->LclTranslation.Set(pLclTranslation);
+	//
+	//lNode->SetNodeAttribute(fbxMesh);
+	//lNode->SetShadingMode(FbxNode::eTextureShading);
+	//
+	//// create UVset
+	//FbxGeometryElementUV* lUVElement1 = fbxMesh->CreateElementUV("UVSet1");
+	//FBX_ASSERT(lUVElement1 != NULL);
+	//lUVElement1->SetMappingMode(FbxGeometryElement::eByPolygonVertex);
+	//lUVElement1->SetReferenceMode(FbxGeometryElement::eIndexToDirect);
+	//for (int i = 0; i < 4; i++)
+	//	lUVElement1->GetDirectArray().Add(FbxVector2(lUVs[i][0], lUVs[i][1]));
+	//
+	//for (int i = 0; i < 24; i++)
+	//	lUVElement1->GetIndexArray().Add(uvsId[i % 4]);
+	//
+	//return lNode;
+
+	return fbxMesh;
+}
+
 void CreateGeometries(const exportMeshNode* const model, FbxScene* const fbxScene)
 {
 	int stack = 1;
-	FbxNode* fbxNodesParent[256];
-	const exportMeshNode* bvhNodePool[256];
+	const exportMeshNode* nodeArray[256];
 
-	bvhNodePool[0] = model;
-	fbxNodesParent[0] = nullptr;
-
-	//FbxNode* skeleton = nullptr;
+	nodeArray[0] = model;
 	while (stack)
 	{
 		stack--;
-		
-		//FbxNode* const fbxParent = fbxNodesParent[stack];
-		//
-		//FbxNode* const fbxNode = FbxNode::Create(fbxScene, node->m_name.c_str());
-		//exportVector posit(node->m_matrix.m_posit);
-		//exportVector euler1;
-		//exportVector euler0(node->m_matrix.CalcPitchYawRoll(euler1));
-		//node->m_fbxNode = fbxNode;
-		//
-		//exportVector euler(euler0.Scale(180.0f / M_PI));
-		//fbxNode->LclRotation.Set(FbxVector4(euler.m_x, euler.m_y, euler.m_z));
-		//fbxNode->LclTranslation.Set(FbxVector4(posit.m_x, posit.m_y, posit.m_z));
-		//
-		//FbxSkeleton* const attribute = FbxSkeleton::Create(fbxScene, model->m_name.c_str());
-		//if (fbxParent)
-		//{
-		//	attribute->Size.Set(0.1f);
-		//	attribute->SetSkeletonType(FbxSkeleton::eLimbNode);
-		//	fbxParent->AddChild(fbxNode);
-		//}
-		//else
-		//{
-		//	attribute->SetSkeletonType(FbxSkeleton::eRoot);
-		//}
-		//fbxNode->SetNodeAttribute(attribute);
-		//
-		//if (!skeleton)
-		//{
-		//	skeleton = fbxNode;
-		//}
 
-		const exportMeshNode* const node = bvhNodePool[stack];
-		FbxNode* const fbxNode = node->m_fbxNode;
+		const exportMeshNode* const node = nodeArray[stack];
 		if (node->m_mesh)
 		{
-
+			FbxNode* const fbxNode = node->m_fbxNode;
+			FbxMesh* const mesh = CreateGeometry(node, fbxScene);
+			fbxNode->SetNodeAttribute(mesh);
 		}
-
 
 		for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
 			iter != node->m_children.end(); iter++)
 		{
-			bvhNodePool[stack] = *iter;
+			nodeArray[stack] = *iter;
 			stack++;
 		}
 	}
