@@ -391,22 +391,38 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 					}
 				
 					ndInt32 indexAcc = 0;
-					fprintf(file, "\t\t\tfaces: %d\n", faceCount);
+					fprintf(file, "\t\t\tfacesVertexCount: %d\n", faceCount);
 					fprintf(file, "\t\t\t{\n");
+					fprintf(file, "\t\t\t\t");
 					for (ndInt32 j = 0; j < format.m_faceCount; ++j)
 					{
 						if (format.m_faceMaterial[j] == i)
 						{
-							fprintf(file, "\t\t\t\t%d: ", format.m_faceIndexCount[j]);
+							fprintf(file, "%d ", format.m_faceIndexCount[j]);
+							indexAcc += format.m_faceIndexCount[j];
+						}
+					}
+					fprintf(file, "\n");
+					fprintf(file, "\t\t\t}\n");
+
+					fprintf(file, "\t\t\tfacesIndexList: %d\n", indexAcc);
+					fprintf(file, "\t\t\t{\n");
+					fprintf(file, "\t\t\t\t");
+					indexAcc = 0;
+					for (ndInt32 j = 0; j < format.m_faceCount; ++j)
+					{
+						if (format.m_faceMaterial[j] == i)
+						{
 							for (ndInt32 k = 0; k < format.m_faceIndexCount[j]; ++k)
 							{
-								fprintf(file, "%d ", format.m_vertex.m_indexList[indexAcc + k]);
+								fprintf(file, "%d ", indexAcc + k);
 							}
-							fprintf(file, "\n");
 						}
 						indexAcc += format.m_faceIndexCount[j];
 					}
+					fprintf(file, "\n");
 					fprintf(file, "\t\t\t}\n");
+
 
 					fprintf(file, "\t\t}\n");
 				}
@@ -758,20 +774,25 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 						ReadToken();
 						ndInt32 faceCount;
 						fscanf(file, "%d", &faceCount);
-
 						ReadToken();
 						for (ndInt32 i = 0; i < faceCount; ++i)
 						{
 							ndInt32 vCount;
 							fscanf(file, "%d:", &vCount);
-							for (ndInt32 j = 0; j < vCount; ++j)
-							{
-								ndInt32 index;
-								fscanf(file, "%d ", &index);
-								indexArray.PushBack(index);
-							}
 							faceArray.PushBack(vCount);
 							materialArray.PushBack(materialIndex);
+						}
+						ReadToken();
+
+						ReadToken();
+						ndInt32 indexCount;
+						fscanf(file, "%d", &indexCount);
+						ReadToken();
+						for (ndInt32 i = 0; i < indexCount; ++i)
+						{
+							ndInt32 index;
+							fscanf(file, "%d ", &index);
+							indexArray.PushBack(index);
 						}
 						ReadToken();
 						ReadToken();

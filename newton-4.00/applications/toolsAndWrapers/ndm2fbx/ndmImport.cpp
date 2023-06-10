@@ -241,19 +241,24 @@ exportMeshNode* exportMeshNode::ImportNdm(const char* const name)
 					ReadToken();
 					int faceCount;
 					fscanf(file, "%d", &faceCount);
-	
 					ReadToken();
 					for (int i = 0; i < faceCount; ++i)
 					{
 						int vCount;
 						fscanf(file, "%d:", &vCount);
 						material.m_faceIndexCount.push_back(vCount);
-						for (int j = 0; j < vCount; ++j)
-						{
-							int index;
-							fscanf(file, "%d ", &index);
-							material.m_indexArray.push_back(index);
-						}
+					}
+					ReadToken();
+
+					ReadToken();
+					int indexCount;
+					fscanf(file, "%d", &indexCount);
+					ReadToken();
+					for (int i = 0; i < indexCount; ++i)
+					{
+						int index;
+						fscanf(file, "%d:", &index);
+						material.m_indexArray.push_back(index);
 					}
 					ReadToken();
 					ReadToken();
