@@ -156,7 +156,7 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 		node->m_matrix = entMatrix;
 
 		ndSharedPtr<ndMeshEffect> mesh (node->GetMesh());
-		if (*mesh)
+		if (mesh)
 		{
 			ndMatrix meshMatrix(invTransform * node->m_meshMatrix * transform);
 			node->m_meshMatrix = meshMatrix;
@@ -219,7 +219,7 @@ void ndMesh::Save(const ndMesh* const mesh, const char* const fullPathName)
 		ndTree<ndInt32, const ndMeshEffect*> meshEffects;
 		for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
 		{
-			if (*node->m_mesh)
+			if (node->m_mesh)
 			{
 				meshEffects.Insert(meshEffects.GetCount(), *node->m_mesh);
 			}
@@ -514,7 +514,7 @@ void ndMesh::Save(FILE* const file, const ndTree<ndInt32, const ndMeshEffect*>& 
 	PrintTabs(level);
 	fprintf(file, "\tgeometryPosition: %g %g %g\n", m_meshMatrix.m_posit.m_x, m_meshMatrix.m_posit.m_y, m_meshMatrix.m_posit.m_z);
 
-	if (*m_mesh)
+	if (m_mesh)
 	{
 		ndTree<ndInt32, const ndMeshEffect*>::ndNode* const meshNode = meshEffects.Find(*m_mesh);
 		if (meshNode)

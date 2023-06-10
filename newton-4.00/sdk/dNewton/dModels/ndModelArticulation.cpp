@@ -95,7 +95,7 @@ void ndModelArticulation::OnAddToWorld()
 			ndNode* const node = stack[index];
 			stack.SetCount(index);
 			m_world->AddBody(node->m_body);
-			if (*node->m_joint)
+			if (node->m_joint)
 			{
 				m_world->AddJoint(node->m_joint);
 			}
@@ -133,7 +133,7 @@ void ndModelArticulation::OnRemoveFromToWorld()
 			ndInt32 index = stack.GetCount() - 1;
 			ndNode* const node = stack[index];
 			stack.SetCount(index);
-			if (*node->m_joint)
+			if (node->m_joint)
 			{
 				if (node->m_joint->m_worldNode)
 				{

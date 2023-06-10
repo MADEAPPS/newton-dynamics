@@ -101,10 +101,11 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshE
 
 	for (ndInt32 i = 0; i < meshArray.GetCount(); ++i)
 	{
+		ndDemoMeshInterface* mesh = nullptr;
 		ndDemoEntity* const entity = meshArray[i].m_entity;
 		ndMesh* const effectNode = meshArray[i].m_effectNode;
-		ndDemoMeshInterface* mesh = nullptr;
 
+		ndAssert(effectNode);
 		ndSharedPtr<ndMeshEffect> meshEffect (effectNode->GetMesh());
 		if (meshEffect->GetVertexWeights().GetCount())
 		{

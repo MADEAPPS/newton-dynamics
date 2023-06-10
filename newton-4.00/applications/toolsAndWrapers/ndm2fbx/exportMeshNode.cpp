@@ -6,7 +6,6 @@ exportMeshNode::exportMeshNode()
 	,m_meshMatrix()
 	,m_parent(nullptr)
 	,m_fbxNode(nullptr)
-	//,m_keyFrame()
 {
 }
 
@@ -15,7 +14,6 @@ exportMeshNode::exportMeshNode(exportMeshNode* const parent)
 	,m_meshMatrix()
 	,m_parent(parent)
 	,m_fbxNode(nullptr)
-	//,m_keyFrame()
 {
 	_ASSERT(parent);
 	m_parent->m_children.push_back(this);

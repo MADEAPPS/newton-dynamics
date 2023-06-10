@@ -19,6 +19,7 @@
 #endif
 
 static int InitializeSdkObjects(FbxManager*& fbxManager, FbxScene*& fbxScene);
+static void CreateGeometries(const exportMeshNode* const model, FbxScene* const fbxScene);
 static FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* const fbxScene);
 static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const fbxScene, FbxNode* const fbxModelRoot);
 static bool CreateScene(const exportMeshNode* const model, FbxManager* const fbxManager, FbxScene* const fbxScene);
@@ -214,13 +215,74 @@ FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* const fbxSc
 	return skeleton;
 }
 
-static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const fbxScene, FbxNode* const fbxModelRoot)
+void CreateGeometries(const exportMeshNode* const model, FbxScene* const fbxScene)
+{
+	int stack = 1;
+	FbxNode* fbxNodesParent[256];
+	const exportMeshNode* bvhNodePool[256];
+
+	bvhNodePool[0] = model;
+	fbxNodesParent[0] = nullptr;
+
+	//FbxNode* skeleton = nullptr;
+	while (stack)
+	{
+		stack--;
+		
+		//FbxNode* const fbxParent = fbxNodesParent[stack];
+		//
+		//FbxNode* const fbxNode = FbxNode::Create(fbxScene, node->m_name.c_str());
+		//exportVector posit(node->m_matrix.m_posit);
+		//exportVector euler1;
+		//exportVector euler0(node->m_matrix.CalcPitchYawRoll(euler1));
+		//node->m_fbxNode = fbxNode;
+		//
+		//exportVector euler(euler0.Scale(180.0f / M_PI));
+		//fbxNode->LclRotation.Set(FbxVector4(euler.m_x, euler.m_y, euler.m_z));
+		//fbxNode->LclTranslation.Set(FbxVector4(posit.m_x, posit.m_y, posit.m_z));
+		//
+		//FbxSkeleton* const attribute = FbxSkeleton::Create(fbxScene, model->m_name.c_str());
+		//if (fbxParent)
+		//{
+		//	attribute->Size.Set(0.1f);
+		//	attribute->SetSkeletonType(FbxSkeleton::eLimbNode);
+		//	fbxParent->AddChild(fbxNode);
+		//}
+		//else
+		//{
+		//	attribute->SetSkeletonType(FbxSkeleton::eRoot);
+		//}
+		//fbxNode->SetNodeAttribute(attribute);
+		//
+		//if (!skeleton)
+		//{
+		//	skeleton = fbxNode;
+		//}
+
+		const exportMeshNode* const node = bvhNodePool[stack];
+		FbxNode* const fbxNode = node->m_fbxNode;
+		if (node->m_mesh)
+		{
+
+		}
+
+
+		for (std::list<exportMeshNode*>::const_iterator iter = node->m_children.begin();
+			iter != node->m_children.end(); iter++)
+		{
+			bvhNodePool[stack] = *iter;
+			stack++;
+		}
+	}
+}
+
+void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const fbxScene, FbxNode* const fbxModelRoot)
 {
 	FbxAnimStack* const animStack = FbxAnimStack::Create(fbxScene, "animStack");
 	FbxAnimLayer* const animLayer = FbxAnimLayer::Create(fbxScene, "baseLayer");	// the AnimLayer object name is "Base Layer"
 	animStack->AddMember(animLayer);
 
-	double fps = 1.0f / 60.0f;
+	double fps = 1.0f / 30.0f;
 	const exportMeshNode* nodePool[256];
 	//int stack = 1;
 	//nodePool[0] = model;
@@ -238,7 +300,6 @@ static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const f
 		stack--;
 		const exportMeshNode* const node = nodePool[stack];
 
-		_ASSERT(0);
 		//if (node->m_keyFrame.size())
 		//{
 		//	FbxNode* const fbxNode = node->m_fbxNode;
@@ -267,11 +328,11 @@ static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const f
 		//	
 		//		exportVector posit(node->m_keyFrame[i].m_posit);
 		//	
-		//		if (node->m_name == "Hips")
-		//		{
-		//			//posit.m_x = 0;
-		//			posit.m_z = 0;
-		//		}
+		//		//if (node->m_name == "Hips")
+		//		//{
+		//		//	//posit.m_x = 0;
+		//		//	posit.m_z = 0;
+		//		//}
 		//	
 		//		int keyIndexPositX = curvePositX->KeyAdd(lTime);
 		//		curvePositX->KeySetValue(keyIndexPositX, posit.m_x);
@@ -330,12 +391,12 @@ static void AnimateSkeleton(const exportMeshNode* const model, FbxScene* const f
 	}
 }
 
-bool CreateScene(const exportMeshNode* const model, FbxManager* const sdkManager, FbxScene* const sbxScene)
+bool CreateScene(const exportMeshNode* const model, FbxManager* const sdkManager, FbxScene* const fbxScene)
 {
 	// create sbxScene info
 	FbxDocumentInfo* const sceneInfo = FbxDocumentInfo::Create(sdkManager, "SceneInfo");
-	sceneInfo->mTitle = "motion capture skeleton";
-	sceneInfo->mSubject = "convert motion capture skeleton";
+	sceneInfo->mTitle = "";
+	sceneInfo->mSubject = "";
 	sceneInfo->mAuthor = "Newton Dynamics";
 	sceneInfo->mRevision = "rev. 1.0";
 	sceneInfo->mKeywords = "";
@@ -343,12 +404,11 @@ bool CreateScene(const exportMeshNode* const model, FbxManager* const sdkManager
 
 	// we need to add the sceneInfo before calling AddThumbNailToScene because
 	// that function is asking the sbxScene for the sceneInfo.
-	sbxScene->SetSceneInfo(sceneInfo);
+	fbxScene->SetSceneInfo(sceneInfo);
 
-	//FbxNode* lPatch = CreatePatch(sbxScene, "Patch");
-	FbxNode* const fbxModelRootNode = CreateSkeleton(model, sbxScene);
-
-	FbxNode* const fbxSceneRootNode = sbxScene->GetRootNode();
+	FbxNode* const fbxSceneRootNode = fbxScene->GetRootNode();
+	FbxNode* const fbxModelRootNode = CreateSkeleton(model, fbxScene);
+	CreateGeometries(model, fbxScene);
 	fbxSceneRootNode->AddChild(fbxModelRootNode);
 
 	//// Store poses
@@ -357,7 +417,7 @@ bool CreateScene(const exportMeshNode* const model, FbxManager* const sdkManager
 	//StoreRestPose(sbxScene, fbxModelRootNode);
 	
 	// Animation
-	AnimateSkeleton(model, sbxScene, fbxModelRootNode);
+	AnimateSkeleton(model, fbxScene, fbxModelRootNode);
 
 	return true;
 }

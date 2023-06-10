@@ -14,8 +14,6 @@ class exportMeshNode
 
 	public:
 	void AlignFrames();
-	void GenerateTpose();
-	void DeleteEffectors();
 	void SetFrame(int index);
 	float CalculateDeltaAngle(float angle1, float angle0) const;
 
@@ -29,5 +27,7 @@ class exportMeshNode
 	mutable FbxNode* m_fbxNode;
 	std::list<exportMeshNode*> m_children;
 	//std::vector<exportMatrix> m_keyFrame;
+	std::list<exportVector> m_positionCurve;
+	std::list<exportVector> m_rotationCurve;
 };
 
