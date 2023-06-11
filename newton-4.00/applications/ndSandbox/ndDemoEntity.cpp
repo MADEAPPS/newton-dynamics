@@ -109,11 +109,17 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshE
 		ndSharedPtr<ndMeshEffect> meshEffect (effectNode->GetMesh());
 		if (meshEffect->GetVertexWeights().GetCount())
 		{
-			mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
+			static int xxx;
+			if (xxx == 1)
+				mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
+			xxx++;
 		}
 		else
 		{
-			mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
+			static int xxx;
+			if (xxx == 1)
+				mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
+			xxx++;
 		}
 		entity->SetMesh(ndSharedPtr<ndDemoMeshInterface>(mesh), effectNode->m_meshMatrix);
 		

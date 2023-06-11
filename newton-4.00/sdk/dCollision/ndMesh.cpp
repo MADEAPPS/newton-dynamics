@@ -129,6 +129,16 @@ void ndMesh::SetMesh(const ndSharedPtr<ndMeshEffect>& mesh)
 	m_mesh = mesh;
 }
 
+ndMatrix ndMesh::CalculateGlobalMatrix(ndMesh* const parent) const
+{
+	ndMatrix matrix(ndGetIdentityMatrix());
+	for (const ndMesh* ptr = this; ptr != parent; ptr = ptr->GetParent())
+	{
+		matrix = matrix * ptr->m_matrix;
+	}
+	return matrix;
+}
+
 void ndMesh::ApplyTransform(const ndMatrix& transform)
 {
 	ndInt32 stack = 1;

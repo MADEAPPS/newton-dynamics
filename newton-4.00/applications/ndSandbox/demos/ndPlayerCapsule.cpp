@@ -63,11 +63,12 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 						ndArray<ndMeshEffect::ndVertexWeight>& weights = meshNode->GetInfo()->GetVertexWeights();
 						for (ndInt32 i = 0; i < weights.GetCount(); ++i)
 						{
-							for (ndInt32 j = sizeof(weights[0].m_boneId) / sizeof(weights[0].m_boneId[0]) - 1; j >= 0; --j)
+							ndMeshEffect::ndVertexWeight& w = weights[i];
+							for (ndInt32 j = ND_VERTEX_WEIGHT_SIZE - 1; j >= 0; --j)
 							{
-								if (weights[i].m_boneId[j] == oldHashId)
+								if (w.m_boneId[j] == oldHashId)
 								{
-									weights[i].m_boneId[j] = newHashId;
+									w.m_boneId[j] = newHashId;
 								}
 							}
 						}

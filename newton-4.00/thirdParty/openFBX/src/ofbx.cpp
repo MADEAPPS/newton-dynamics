@@ -2775,40 +2775,6 @@ static OptionalError<Object*> parseGeometry(const Element& element, bool triangu
 {
 	assert(element.first_property);
 
-	//const Element* xxxxx[1024 * 8];
-	//xxxxx[0] = findChild(element, "Properties70");
-	//int stack = 1;
-	//if (xxxxx[0])
-	//{
-	//	while (stack)
-	//	{
-	//		stack--;
-	//		const Element* ele = xxxxx[stack];
-	//
-	//		const IElement* const colorElement = ele->getFirstChild();
-	//		if (colorElement)
-	//		{
-	//			for (const IElementProperty* xxxxxxxxx = colorElement->getFirstProperty(); xxxxxxxxx; xxxxxxxxx = xxxxxxxxx->getNext())
-	//			{
-	//				DataView id = xxxxxxxxx->getValue();
-	//				DataView id1 = xxxxxxxxx->getValue();
-	//			}
-	//		}
-	//
-	//
-	//		for (const Element* sibling = ele->sibling; sibling; sibling = sibling->sibling)
-	//		{
-	//			xxxxx[stack] = sibling;
-	//			stack++;
-	//		}
-	//		for (const Element* child = ele->child; child; child = child->child)
-	//		{
-	//			xxxxx[stack] = child;
-	//			stack++;
-	//		}
-	//	}
-	//}
-
 	const Element* const displayColor = findChild(element, "Properties70");
 	if (displayColor)
 	{

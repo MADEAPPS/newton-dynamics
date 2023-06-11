@@ -70,6 +70,7 @@ class ndMesh : public ndNodeHierarchy<ndMesh>
 	D_COLLISION_API const ndCurve& GetRotationCurve() const;
 
 	D_COLLISION_API void ApplyTransform(const ndMatrix& transform);
+	D_COLLISION_API ndMatrix CalculateGlobalMatrix(ndMesh* const parent = nullptr) const;
 
 	D_COLLISION_API static ndMesh* Load(const char* const fullPathName);
 	D_COLLISION_API static void Save(const ndMesh* const mesh, const char* const fullPathName);

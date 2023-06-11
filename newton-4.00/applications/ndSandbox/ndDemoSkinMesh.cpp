@@ -57,13 +57,15 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	{
 		stack--;
 		ndDemoEntity* const entity = pool[stack];
+
 		ndInt32 hash = ndInt32(ndCRC64(entity->GetName().GetStr()) & 0xffffffff);
 		boneHashIdMap.Insert(entityArray.GetCount(), hash);
-	
+
 		const ndMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix[stack]);
+		const ndMatrix palleteMatrix(shapeBindMatrix * boneMatrix.OrthoInverse());
 		entityArray.PushBack(entity);
-		bindMatrixArray.PushBack(shapeBindMatrix * boneMatrix.OrthoInverse());
-	
+		bindMatrixArray.PushBack(palleteMatrix);
+
 		for (ndDemoEntity* node = entity->GetFirstChild(); node; node = node->GetNext()) 
 		{
 			pool[stack] = node;

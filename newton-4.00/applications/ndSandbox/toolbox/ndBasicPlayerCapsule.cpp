@@ -27,7 +27,8 @@
 #ifdef PLAYER_FIRST_PERSON	
 	#define PLAYER_THIRD_PERSON_VIEW_DIST	0.0f
 #else
-	#define PLAYER_THIRD_PERSON_VIEW_DIST	6.0f
+	//#define PLAYER_THIRD_PERSON_VIEW_DIST	6.0f
+	#define PLAYER_THIRD_PERSON_VIEW_DIST	3.0f
 #endif
 
 void ndBasicPlayerCapsule::ndFileBasicPlayerCapsule::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
@@ -74,7 +75,7 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 			ndDemoEntity* const entity = (ndDemoEntity*)keyFrame.m_userData;
 			if (entity)
 			{
-				entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
+				//entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
 			}
 		}
 	}
@@ -208,7 +209,6 @@ void ndBasicPlayerCapsule::SetCamera(ndDemoEntityManager* const scene)
 		ndDemoCamera* const camera = scene->GetCamera();
 		ndMatrix camMatrix(camera->GetNextMatrix());
 
-		//ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)GetNotifyCallback();
 		ndBasicPlayerCapsuleNotify* const notify = (ndBasicPlayerCapsuleNotify*)GetNotifyCallback();
 		ndDemoEntity* const player = (ndDemoEntity*)notify->GetUserData();
 		ndMatrix playerMatrix(player->GetNextMatrix());
@@ -247,7 +247,6 @@ void ndBasicPlayerCapsule::SetCamera(ndDemoEntityManager* const scene)
 		if (m_playerInput.m_forwardSpeed || m_playerInput.m_strafeSpeed)
 		{
 			ndFloat32 speed = notify->m_veloc.m_x;
-			//ndFloat32 invMag = PLAYER_WALK_SPEED / ndSqrt(m_playerInput.m_forwardSpeed * m_playerInput.m_forwardSpeed + m_playerInput.m_strafeSpeed * m_playerInput.m_strafeSpeed);
 			ndFloat32 invMag = speed / ndSqrt(m_playerInput.m_forwardSpeed * m_playerInput.m_forwardSpeed + m_playerInput.m_strafeSpeed * m_playerInput.m_strafeSpeed);
 			m_playerInput.m_forwardSpeed *= invMag;
 			m_playerInput.m_strafeSpeed *= invMag;

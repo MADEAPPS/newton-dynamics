@@ -581,6 +581,7 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	}
 	
 	// import skin if there is any
+	//if (0)
 	if (geom->getSkin())
 	{
 		const ofbx::Skin* const skin = geom->getSkin();
