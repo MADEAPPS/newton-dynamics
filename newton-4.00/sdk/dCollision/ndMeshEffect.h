@@ -310,20 +310,24 @@ class ndMeshEffect: public ndPolyhedra
 
 		void SetWeight(ndInt32 hash, ndReal weight)
 		{
-			ndInt32 index = ND_VERTEX_WEIGHT_SIZE - 1;
-			ndReal lowest = m_weight[index];
-			for (ndInt32 i = index - 1; i >= 0; --i)
+			ndAssert(weight > ndFloat32(0.0f));
+			if (weight > ndFloat32(1.0e-3f))
 			{
-				if (m_weight[i] <= lowest)
+				ndInt32 index = ND_VERTEX_WEIGHT_SIZE - 1;
+				ndReal lowest = m_weight[index];
+				for (ndInt32 i = index - 1; i >= 0; --i)
 				{
-					index = i;
-					lowest = m_weight[i];
+					if (m_weight[i] <= lowest)
+					{
+						index = i;
+						lowest = m_weight[i];
+					}
 				}
-			}
-			if (weight > lowest)
-			{
-				m_boneId[index] = hash;
-				m_weight[index] = weight;
+				if (weight > lowest)
+				{
+					m_boneId[index] = hash;
+					m_weight[index] = weight;
+				}
 			}
 		}
 

@@ -28,7 +28,7 @@
 	#define PLAYER_THIRD_PERSON_VIEW_DIST	0.0f
 #else
 	//#define PLAYER_THIRD_PERSON_VIEW_DIST	6.0f
-	#define PLAYER_THIRD_PERSON_VIEW_DIST	3.0f
+	#define PLAYER_THIRD_PERSON_VIEW_DIST	5.0f
 #endif
 
 void ndBasicPlayerCapsule::ndFileBasicPlayerCapsule::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
@@ -67,7 +67,6 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		ndFloat32 timestep = word->GetScene()->GetTimestep();
 		player->m_animBlendTree->Update(timestep);
 		player->m_animBlendTree->Evaluate(player->m_output, m_veloc);
-		//ndTrace(("speed %g\n", aninVeloc.m_x));
 
 		for (ndInt32 i = 0; i < player->m_output.GetCount(); ++i)
 		{
@@ -75,7 +74,7 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 			ndDemoEntity* const entity = (ndDemoEntity*)keyFrame.m_userData;
 			if (entity)
 			{
-				//entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
+				entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
 			}
 		}
 	}
