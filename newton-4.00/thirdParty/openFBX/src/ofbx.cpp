@@ -1092,6 +1092,36 @@ struct MaterialImpl : Material
 	MaterialImpl(const Scene& _scene, const IElement& _element)
 		: Material(_scene, _element)
 	{
+		diffuse_color.r = 1.0f;
+		diffuse_color.g = 1.0f;
+		diffuse_color.b = 1.0f;
+
+		specular_color.r = 1.0f;
+		specular_color.g = 1.0f;
+		specular_color.b = 1.0f;
+
+		reflection_color.r = 1.0f;
+		reflection_color.g = 1.0f;
+		reflection_color.b = 1.0f;
+
+		ambient_color.r = 1.0f;
+		ambient_color.g = 1.0f;
+		ambient_color.b = 1.0f;
+
+		emissive_color.r = 1.0f;
+		emissive_color.g = 1.0f;
+		emissive_color.b = 1.0f;
+
+		diffuse_factor = 1.0;
+		specular_factor = 1.0;
+		reflection_factor = 1.0;
+		shininess = 1.0;
+		shininess_exponent = 1.0;
+		ambient_factor = 1.0;
+		bump_factor = 1.0;
+		emissive_factor = 1.0;
+		opacity_factor = 1.0;
+
 		for (const Texture*& tex : textures) tex = nullptr;
 	}
 
@@ -2744,6 +2774,40 @@ static OptionalError<Object*> parseGeometryNormals(
 static OptionalError<Object*> parseGeometry(const Element& element, bool triangulate, GeometryImpl* geom)
 {
 	assert(element.first_property);
+
+	//const Element* xxxxx[1024 * 8];
+	//xxxxx[0] = findChild(element, "Properties70");
+	//int stack = 1;
+	//if (xxxxx[0])
+	//{
+	//	while (stack)
+	//	{
+	//		stack--;
+	//		const Element* ele = xxxxx[stack];
+	//
+	//		const IElement* const colorElement = ele->getFirstChild();
+	//		if (colorElement)
+	//		{
+	//			for (const IElementProperty* xxxxxxxxx = colorElement->getFirstProperty(); xxxxxxxxx; xxxxxxxxx = xxxxxxxxx->getNext())
+	//			{
+	//				DataView id = xxxxxxxxx->getValue();
+	//				DataView id1 = xxxxxxxxx->getValue();
+	//			}
+	//		}
+	//
+	//
+	//		for (const Element* sibling = ele->sibling; sibling; sibling = sibling->sibling)
+	//		{
+	//			xxxxx[stack] = sibling;
+	//			stack++;
+	//		}
+	//		for (const Element* child = ele->child; child; child = child->child)
+	//		{
+	//			xxxxx[stack] = child;
+	//			stack++;
+	//		}
+	//	}
+	//}
 
 	const Element* const displayColor = findChild(element, "Properties70");
 	if (displayColor)
