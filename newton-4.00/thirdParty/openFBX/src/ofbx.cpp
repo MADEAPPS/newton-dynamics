@@ -2745,39 +2745,41 @@ static OptionalError<Object*> parseGeometry(const Element& element, bool triangu
 {
 	assert(element.first_property);
 
-	const Element* displayColor = findChild(element, "Properties70");
+	const Element* const displayColor = findChild(element, "Properties70");
 	if (displayColor)
 	{
-		const IElement* colorElement = displayColor->getFirstChild();
-		const IElementProperty* color0 = colorElement->getFirstProperty();
-		const IElementProperty* color1 = color0->getNext();
-		const IElementProperty* color2 = color1->getNext();
-		const IElementProperty* color3 = color2->getNext();
-		Property* red = (Property*)color3->getNext();
-		Property* green = (Property*)red->getNext();
-		Property* blue = (Property*)green->getNext();
-
-		Vec3 color;
-		color.x = geom->rgbDisplayColor.r;
-		color.y = geom->rgbDisplayColor.g;
-		color.z = geom->rgbDisplayColor.b;
-		if (red->value.is_binary)
+		const IElement* const colorElement = displayColor->getFirstChild();
+		if (colorElement)
 		{
-			parseDouble(*red, &color.x);
-			parseDouble(*green, &color.y);
-			parseDouble(*blue, &color.z);
-		}
-		else
-		{
-			red->getValues(&color.x, sizeof(double));
-			green->getValues(&color.y, sizeof(double));
-			blue->getValues(&color.z, sizeof(double));
-		}
+			const IElementProperty* const color0 = colorElement->getFirstProperty();
+			const IElementProperty* const color1 = color0->getNext();
+			const IElementProperty* const color2 = color1->getNext();
+			const IElementProperty* const color3 = color2->getNext();
+			Property* const red = (Property*)color3->getNext();
+			Property* const green = (Property*)red->getNext();
+			Property* const blue = (Property*)green->getNext();
 
-		geom->rgbDisplayColor.r = (float)color.x;
-		geom->rgbDisplayColor.g = (float)color.y;
-		geom->rgbDisplayColor.b = (float)color.z;
+			Vec3 color;
+			color.x = geom->rgbDisplayColor.r;
+			color.y = geom->rgbDisplayColor.g;
+			color.z = geom->rgbDisplayColor.b;
+			if (red->value.is_binary)
+			{
+				parseDouble(*red, &color.x);
+				parseDouble(*green, &color.y);
+				parseDouble(*blue, &color.z);
+			}
+			else
+			{
+				red->getValues(&color.x, sizeof(double));
+				green->getValues(&color.y, sizeof(double));
+				blue->getValues(&color.z, sizeof(double));
+			}
 
+			geom->rgbDisplayColor.r = (float)color.x;
+			geom->rgbDisplayColor.g = (float)color.y;
+			geom->rgbDisplayColor.b = (float)color.z;
+		}
 	}
 
 	const Element* vertices_element = findChild(element, "Vertices");

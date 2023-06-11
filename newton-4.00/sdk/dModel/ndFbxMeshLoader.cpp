@@ -599,6 +599,7 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 
 			ndInt32 hashId = ndInt32(ndCRC64(fbxBone->name) & 0xffffffff);
 			ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
+			ndAssert(clusterIndexCount);
 			const ndInt32* const indices = fbxCluster->getIndices();
 			const ndFloat64* const weights = fbxCluster->getWeights();
 			for (ndInt32 j = 0; j < clusterIndexCount; ++j)
@@ -630,11 +631,31 @@ ndMesh* ndFbxMeshLoader::CreateMeshHierarchy(ofbx::IScene* const fbxScene, ndFbx
 	ndAssert(rootNode);
 	stack = GetChildrenNodes(rootNode, &buffer[0]);
 	
+	ndFixSizeArray<const ofbx::Mesh*, 32> skinsNodes;
+
 	ndMesh* mesh = nullptr;
 	if (stack > 1)
 	{
-		mesh = new ndMesh(nullptr);
-		mesh->SetName("dommyRoot");
+		for (ndInt32 i = stack - 1; i >= 0; --i)
+		{
+			if (buffer[i]->getType() == ofbx::Object::Type::MESH)
+			{
+				const ofbx::Mesh* const fbxMesh = (ofbx::Mesh*)buffer[i];
+				const ofbx::Geometry* const geom = fbxMesh->getGeometry();
+				if (geom->getSkin())
+				{
+					stack--;
+					buffer[i] = buffer[stack];
+					skinsNodes.PushBack(fbxMesh);
+				}
+			}
+		}
+
+		if (stack > 1)
+		{
+			mesh = new ndMesh(nullptr);
+			mesh->SetName("dommyRoot");
+		}
 	}
 	
 	for (ndInt32 i = 0; i < stack; ++i)
@@ -654,7 +675,7 @@ ndMesh* ndFbxMeshLoader::CreateMeshHierarchy(ofbx::IScene* const fbxScene, ndFbx
 			mesh = node;
 		}
 	
-		const ndMatrix localMatrix(ofbxMatrix2dMatrix(data.m_fbxNode->getLocalTransform()));
+		ndMatrix localMatrix(ofbxMatrix2dMatrix(data.m_fbxNode->getLocalTransform()));
 	
 		node->SetName(data.m_fbxNode->name);
 		node->m_matrix = localMatrix;
@@ -668,6 +689,17 @@ ndMesh* ndFbxMeshLoader::CreateMeshHierarchy(ofbx::IScene* const fbxScene, ndFbx
 			stack++;
 			ndAssert(stack < ndInt32(sizeof(nodeStack) / sizeof(nodeStack[0])));
 		}
+	}
+
+	
+	for (ndInt32 i = 0; i < skinsNodes.GetCount(); ++i)
+	{
+		const ofbx::Mesh* const child = skinsNodes[i];
+		ndMesh* const node = new ndMesh(mesh);
+		node->SetName(child->name);
+		ndMatrix localMatrix(ofbxMatrix2dMatrix(child->getLocalTransform()));
+		node->m_matrix = localMatrix * mesh->m_matrix.Inverse4x4();
+		nodeMap.Insert(node, child);
 	}
 
 	return mesh;

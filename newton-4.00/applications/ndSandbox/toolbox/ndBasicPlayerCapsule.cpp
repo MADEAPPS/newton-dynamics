@@ -72,7 +72,10 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		{
 			const ndAnimKeyframe& keyFrame = player->m_output[i];
 			ndDemoEntity* const entity = (ndDemoEntity*)keyFrame.m_userData;
-			entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
+			if (entity)
+			{
+				entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
+			}
 		}
 	}
 	
