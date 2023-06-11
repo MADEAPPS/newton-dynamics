@@ -117,28 +117,35 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	
 	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
-		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
-		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
-		points[i].m_posit.m_z = GLfloat(tmp[i].m_posit[2]);
-		points[i].m_normal.m_x = GLfloat(tmp[i].m_normal[0]);
-		points[i].m_normal.m_y = GLfloat(tmp[i].m_normal[1]);
-		points[i].m_normal.m_z = GLfloat(tmp[i].m_normal[2]);
-		points[i].m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
-		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
-	
+		glSkinVertex& glPoint = points[i];
+		glPoint.m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
+		glPoint.m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
+		glPoint.m_posit.m_z = GLfloat(tmp[i].m_posit[2]);
+		glPoint.m_normal.m_x = GLfloat(tmp[i].m_normal[0]);
+		glPoint.m_normal.m_y = GLfloat(tmp[i].m_normal[1]);
+		glPoint.m_normal.m_z = GLfloat(tmp[i].m_normal[2]);
+		glPoint.m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
+		glPoint.m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
+		glPoint.m_weighs = glVector4();
+		glPoint.m_boneIndex = glVector4();
+
 		ndAssert(ND_VERTEX_WEIGHT_SIZE == 4);
+		const ndMeshEffect::ndVertexWeight& weights = tmp[i].m_weights;
+
 		for (ndInt32 j = 0; j < ND_VERTEX_WEIGHT_SIZE; ++j)
 		{
 			ndInt32 boneIndex = 0;
-			ndInt32 hashId = tmp[i].m_weights.m_boneId[j];
+			ndInt32 hashId = weights.m_boneId[j];
 			if (hashId != -1)
 			{
 				ndTree<ndInt32, ndInt32>::ndNode* const entNode = boneHashIdMap.Find(hashId);
 				ndAssert(entNode);
 				boneIndex = entNode->GetInfo();
+
+				glPoint.m_boneIndex[j] = GLfloat(boneIndex);
+				glPoint.m_weighs[j] = GLfloat(weights.m_weight[j]);
+				ndAssert(weights.m_weight[j] <= ndFloat32(1.001f));
 			}
-			points[i].m_boneIndex[j] = GLfloat(boneIndex);
-			points[i].m_weighs[j] = GLfloat(tmp[i].m_weights.m_weight[j]);
 		}
 	}
 	
@@ -158,7 +165,6 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 		segment->m_material.m_specular = glVector4(material.m_specular);
 		segment->m_material.m_opacity = GLfloat(material.m_opacity);
 		segment->m_material.m_shiness = GLfloat(material.m_shiness);
-		//strcpy(segment->m_material.m_textureName, material.m_textureName);
 		segment->m_material.SetTextureName(material.m_textureName);
 		ndInt32 tex = ndInt32(LoadTexture(material.m_textureName));
 		segment->m_material.SetTexture(tex);
