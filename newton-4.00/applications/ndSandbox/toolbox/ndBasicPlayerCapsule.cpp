@@ -139,7 +139,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	}
 
 	// create an animation blend tree
-	ndSharedPtr<ndAnimationSequence> idleSequence__(scene->GetAnimationSequence(loader, "box.fbx"));
+	//ndSharedPtr<ndAnimationSequence> idleSequence__(scene->GetAnimationSequence(loader, "box.fbx"));
 	//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide0.fbx"));
 	ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide1.fbx"));
 	ndSharedPtr<ndAnimationSequence> walkSequence(scene->GetAnimationSequence(loader, "mocap_walk.fbx"));
@@ -159,10 +159,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
 	//ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
 
-	//m_idleWalkBlend = new ndAnimationTwoWayBlend(idle, walk);
 	m_idleWalkBlend = new ndAnimationBlendTansition(idle, walk);
-
-	//m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode> (idle);
 	m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_idleWalkBlend);
 }
 

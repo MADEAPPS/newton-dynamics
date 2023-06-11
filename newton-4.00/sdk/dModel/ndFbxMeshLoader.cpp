@@ -124,11 +124,11 @@ ndFbxMeshLoader::~ndFbxMeshLoader()
 
 ndMatrix ndFbxMeshLoader::GetCoordinateSystemMatrix(ofbx::IScene* const fbxScene)
 {
-	const ofbx::GlobalSettings* const globalSettings = fbxScene->getGlobalSettings();
+	const ofbx::GlobalSettings& globalSettings = *fbxScene->getGlobalSettings();
 
 	ndMatrix convertMatrix(ndGetIdentityMatrix());
 
-	ndFloat32 scaleFactor = globalSettings->UnitScaleFactor;
+	ndFloat32 scaleFactor = globalSettings.UnitScaleFactor;
 	convertMatrix[0][0] = ndFloat32(scaleFactor / 100.0f);
 	convertMatrix[1][1] = ndFloat32(scaleFactor / 100.0f);
 	convertMatrix[2][2] = ndFloat32(scaleFactor / 100.0f);
@@ -139,7 +139,7 @@ ndMatrix ndFbxMeshLoader::GetCoordinateSystemMatrix(ofbx::IScene* const fbxScene
 	//axisMatrix.m_right = axisMatrix.m_front.CrossProduct(axisMatrix.m_up);
 	//axisMatrix = axisMatrix.Transpose();
 
-	switch (globalSettings->UpAxis)
+	switch (globalSettings.UpAxis)
 	{
 		case UpVector_AxisX:
 			ndAssert(0);
@@ -465,15 +465,10 @@ void ndFbxMeshLoader::AlignToWorld(ndMesh* const mesh)
 	}
 }
 
-void ndFbxMeshLoader::ApplyAllTransforms(ndMesh* const mesh, const ndMatrix& coordinateSystem, const ndMatrix& upAxis)
+void ndFbxMeshLoader::ApplyAllTransforms(ndMesh* const mesh, const ndMatrix& coordinateSystem)
 {
 	FreezeScale(mesh);
 	ApplyTransform(mesh, coordinateSystem);
-	mesh->m_matrix = mesh->m_matrix * upAxis;
-	if (mesh->GetScaleCurve().GetCount())
-	{
-		ndAssert(0);
-	}
 	AlignToWorld(mesh);
 }
 
@@ -596,17 +591,18 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 		for (ndInt32 i = 0; i < clusterCount; ++i)
 		{
 			const ofbx::Cluster* const fbxCluster = skin->getCluster(i);
-			const ofbx::Object* const fbxBone = fbxCluster->getLink();
-
-			ndInt32 hashId = ndInt32(ndCRC64(fbxBone->name) & 0xffffffff);
 			ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
-			ndAssert(clusterIndexCount);
-			const ndInt32* const indices = fbxCluster->getIndices();
-			const ndFloat64* const weights = fbxCluster->getWeights();
-			for (ndInt32 j = 0; j < clusterIndexCount; ++j)
+			if (clusterIndexCount)
 			{
-				ndInt32 index = indices[j];
-				vertexWeights[index].SetWeight(hashId, ndReal (weights[j]));
+				const ofbx::Object* const fbxBone = fbxCluster->getLink();
+				ndInt32 hashId = ndInt32(ndCRC64(fbxBone->name) & 0xffffffff);
+				const ndInt32* const indices = fbxCluster->getIndices();
+				const ndFloat64* const weights = fbxCluster->getWeights();
+				for (ndInt32 j = 0; j < clusterIndexCount; ++j)
+				{
+					ndInt32 index = indices[j];
+					vertexWeights[index].SetWeight(hashId, ndReal(weights[j]));
+				}
 			}
 		}
 		format.m_vertexWeight.m_data = &vertexWeights[0];
@@ -632,36 +628,19 @@ ndMesh* ndFbxMeshLoader::CreateMeshHierarchy(ofbx::IScene* const fbxScene, ndFbx
 	ndAssert(rootNode);
 	stack = GetChildrenNodes(rootNode, &buffer[0]);
 	
-	ndFixSizeArray<const ofbx::Mesh*, 32> skinsNodes;
+	// putting all node under a dummy root, makes Max and Blender fbx compatible
+	ndMesh* const mesh = new ndMesh(nullptr);
+	mesh->SetName("dommyRoot");
 
-	ndMesh* mesh = nullptr;
-	if (stack > 1)
+	const ofbx::GlobalSettings& globalSettings = *fbxScene->getGlobalSettings();
+	if (globalSettings.UpAxis == UpVector_AxisY)
 	{
-		for (ndInt32 i = stack - 1; i >= 0; --i)
-		{
-			if (buffer[i]->getType() == ofbx::Object::Type::MESH)
-			{
-				const ofbx::Mesh* const fbxMesh = (ofbx::Mesh*)buffer[i];
-				const ofbx::Geometry* const geom = fbxMesh->getGeometry();
-				if (geom->getSkin())
-				{
-					stack--;
-					buffer[i] = buffer[stack];
-					skinsNodes.PushBack(fbxMesh);
-				}
-			}
-		}
-
-		if (stack > 1)
-		{
-			mesh = new ndMesh(nullptr);
-			mesh->SetName("dommyRoot");
-		}
+		mesh->m_matrix = ndPitchMatrix(90.0f * ndDegreeToRad);
 	}
-	
+
 	for (ndInt32 i = 0; i < stack; ++i)
 	{
-		ofbx::Object* const child = buffer[stack - i - 1];
+		ofbx::Object* const child = buffer[i];
 		nodeStack[i] = ndFbx2MeshNodeStackData(child, mesh);
 	}
 	
@@ -671,11 +650,6 @@ ndMesh* ndFbxMeshLoader::CreateMeshHierarchy(ofbx::IScene* const fbxScene, ndFbx
 		ndFbx2MeshNodeStackData data(nodeStack[stack]);
 	
 		ndMesh* const node = new ndMesh(data.m_parentNode);
-		if (!mesh)
-		{
-			mesh = node;
-		}
-	
 		ndMatrix localMatrix(ofbxMatrix2dMatrix(data.m_fbxNode->getLocalTransform()));
 	
 		node->SetName(data.m_fbxNode->name);
@@ -690,17 +664,6 @@ ndMesh* ndFbxMeshLoader::CreateMeshHierarchy(ofbx::IScene* const fbxScene, ndFbx
 			stack++;
 			ndAssert(stack < ndInt32(sizeof(nodeStack) / sizeof(nodeStack[0])));
 		}
-	}
-
-	
-	for (ndInt32 i = 0; i < skinsNodes.GetCount(); ++i)
-	{
-		const ofbx::Mesh* const child = skinsNodes[i];
-		ndMesh* const node = new ndMesh(mesh);
-		node->SetName(child->name);
-		ndMatrix localMatrix(ofbxMatrix2dMatrix(child->getLocalTransform()));
-		node->m_matrix = localMatrix * mesh->m_matrix.Inverse4x4();
-		nodeMap.Insert(node, child);
 	}
 
 	return mesh;
@@ -1121,15 +1084,15 @@ ndMesh* ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bool loadAnima
 	fclose(file);
 
 	ndSharedPtr<ofbx::IScene> fbxScene(ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE));
+
+	//const ofbx::GlobalSettings& globalSettings = *fbxScene->getGlobalSettings();
 	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(*fbxScene));
 	ndMesh* const mesh = Fbx2ndMesh(*fbxScene);
 	if (loadAnimation)
 	{
 		LoadAnimation(*fbxScene, mesh);
 	}
-
-	ndMatrix upAxis((fbxScene->getGlobalSettings()->UpAxis != UpVector_AxisY) ? ndGetIdentityMatrix() : ndRollMatrix(-90.0f * ndDegreeToRad));
-	ApplyAllTransforms(mesh, convertMatrix, upAxis);
+	ApplyAllTransforms(mesh, convertMatrix);
 
 	if (loadAnimation)
 	{

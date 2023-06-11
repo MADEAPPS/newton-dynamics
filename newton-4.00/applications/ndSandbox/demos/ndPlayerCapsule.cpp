@@ -102,8 +102,8 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 			if (xxxxx==0)
 			{
 				//ndMesh::Save(mesh, "xxx.ndm");
-				delete mesh;
-				mesh = ndMesh::Load("xxx.ndm");
+				//delete mesh;
+				//mesh = ndMesh::Load("xxx.ndm");
 			}
 			xxxxx++;
 		}
@@ -170,7 +170,9 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("skinTest.fbx", scene));
 	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("dummy.fbx", scene));
 	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("robotsuit.fbx", scene));
-	ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("robotsuit2.fbx", scene));
+	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("YBot.fbx", scene));
+	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("YBot_mixamo.fbx", scene));
+	ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("YBot_blender.fbx", scene));
 	
 	ndSharedPtr<ndBody> player0(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f, true));
 	world->AddBody(player0);
