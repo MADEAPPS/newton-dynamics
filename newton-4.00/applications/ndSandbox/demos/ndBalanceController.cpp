@@ -194,6 +194,7 @@ namespace ndZmp
 				} while ((ndAbs(alpha.m_z) > ndFloat32(1.0e-3f)) && passes);
 				ndTrace(("\n"));
 			}
+			m_crossValidation____ = CalculateAlpha();
 			m_invDynamicsSolver.SolverEnd();
 
 			xxx++;
@@ -207,6 +208,8 @@ namespace ndZmp
 		ndVector m_gyroTorque;
 		ndFloat32 m_totalMass;
 		ndMatrix m_invInertia;
+
+		ndVector m_crossValidation____;
 		int xxx;
 	};
 
