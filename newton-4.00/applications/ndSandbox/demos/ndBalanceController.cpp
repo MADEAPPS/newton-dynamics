@@ -149,17 +149,17 @@ namespace ndZmp
 			return m_invInertia.RotateVector(torque);
 		}
 
-		void Update(ndWorld* const, ndFloat32)
+		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
-			//ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
-			//ndAssert(skeleton);
-			//m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
-			//ndVector alpha(CalculateAlpha());
-			//if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f))
-			//{
-			//	ndTrace(("%d alpha(%f) angle(%f)\n", xxx, alpha.m_z, m_controlJoint->GetOffsetAngle()));
-			//}
-			//m_invDynamicsSolver.SolverEnd();
+			ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
+			ndAssert(skeleton);
+			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+			ndVector alpha(CalculateAlpha());
+			if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f))
+			{
+				ndTrace(("%d alpha(%f) angle(%f)\n", xxx, alpha.m_z, m_controlJoint->GetOffsetAngle()));
+			}
+			m_invDynamicsSolver.SolverEnd();
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -181,7 +181,7 @@ namespace ndZmp
 			{
 				ndFloat32 angle = m_controlJoint->GetOffsetAngle();
 				ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle, 0.0f));
-				ndInt32 passes = 8;
+				ndInt32 passes = 128;
 				do
 				{
 					passes--;
