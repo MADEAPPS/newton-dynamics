@@ -98,7 +98,6 @@ namespace ndZmp
 			inertia.m_posit = ndVector::m_wOne;
 			m_invInertia = inertia.Inverse4x4();
 
-
 			ndFixSizeArray<ndContact*, 8> contacts;
 			for (ndInt32 i = m_allBodies.GetCount() - 1; i >= 0; --i)
 			{
@@ -134,14 +133,11 @@ namespace ndZmp
 		ndVector CalculateAlpha()
 		{
 			ndVector torque(ndVector::m_zero);
-			//ndVector torque0(ndVector::m_zero);
 
 			m_invDynamicsSolver.Solve();
 			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 			{
 				ndBodyDynamic* const body = m_bodies[i];
-				//torque0 += m_invDynamicsSolver.GetBodyTorque(body);
-				//torque0 += m_comDist[i].CrossProduct(m_invDynamicsSolver.GetBodyForce(body));
 				
 				ndVector r(m_comDist[i]);
 				ndVector f(m_invDynamicsSolver.GetBodyForce(body));
@@ -273,7 +269,6 @@ namespace ndZmp
 		ndMatrix floor(FindFloor(*world, probeMatrix, wheelBody->GetAsBodyKinematic()->GetCollisionShape(), 20.0f));
 		ndFloat32 dist = wheelMatrix.m_posit.m_y - floor.m_posit.m_y;
 
-		//dist = 0;
 		ndMatrix rootMatrix(modelRoot->m_body->GetMatrix());
 
 		rootMatrix.m_posit.m_y -= dist;
@@ -288,18 +283,12 @@ namespace ndZmp
 		wheelBody->GetNotifyCallback()->OnTransform(0, wheelMatrix);
 		modelRoot->m_body->GetNotifyCallback()->OnTransform(0, rootMatrix);
 
-#if 1
-		// add the joints manually, because on this model the wheel is not activate actuated.
+		// add the joints manually, because on this model the wheel is not actuated.
 		world->AddJoint(legJoint);
 		world->AddJoint(wheelJoint);
 
 		// add model limbs
 		model->AddLimb(modelRoot, legBody, legJoint);
-#else
-		// add model limbs
-		ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
-		model->AddLimb(legLimb, wheelBody, wheelJoint);
-#endif
 
 		model->m_allBodies.PushBack(hipBody->GetAsBodyDynamic());
 		model->m_allBodies.PushBack(legBody->GetAsBodyDynamic());
@@ -319,16 +308,6 @@ void ndBalanceController(ndDemoEntityManager* const scene)
 	
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-	//matrix.m_posit.m_x = 1.0f;
-	
-	//ndZeroMomentModel* const robot = new ndZeroMomentModel(scene, matrix);
-	//scene->SetSelectedModel(robot);
-	//ndSharedPtr<ndModel> modelPtr(robot);
-	//world->AddModel(modelPtr);
-	//
-	//ndModelUI* const quadrupedUI = new ndModelUI(scene, robot);
-	//ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
-	//scene->Set2DDisplayRenderFunction(quadrupedUIPtr);
 
 	ndSharedPtr<ndModel> model(BuildModel(scene, matrix));
 	scene->GetWorld()->AddModel(model);
@@ -343,19 +322,4 @@ void ndBalanceController(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z += 2.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
-
-	//ndFileFormatSave xxxxSave;
-	//xxxxSave.SaveModels(scene->GetWorld(), "xxxx.nd");
-	//ndFileFormatLoad xxxxLoad;
-	//xxxxLoad.Load("xxxx.nd");
-	//// offset bodies positions for calibration
-	//const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
-	//for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndSharedPtr<ndBody>& body = node->GetInfo();
-	//	ndMatrix bodyMatrix (body->GetMatrix());
-	//	bodyMatrix.m_posit.m_x += 1.0f;
-	//	body->SetMatrix(bodyMatrix);
-	//}
-	//xxxxLoad.AddToWorld(scene->GetWorld());
 }
