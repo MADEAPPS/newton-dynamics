@@ -61,10 +61,7 @@ namespace ndZmp
 			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
 			//g) Bcg = (Icg ^ -1) * (T0 + T1)
 
-			ndFixSizeArray<ndContact*, 8> contacts;
-
 			ndVector cg(ndVector::m_zero);
-			//ndVector cgVeloc(ndVector::m_zero);
 			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 			{
 				const ndBodyDynamic* const body = m_bodies[i];
@@ -72,25 +69,6 @@ namespace ndZmp
 				const ndMatrix matrix (body->GetMatrix());
 				ndVector veloc(body->GetVelocity());
 				cg += matrix.m_posit.Scale (body->GetMassMatrix().m_w);
-				//cgVeloc += veloc.Scale(body->GetMassMatrix().m_w);
-
-				ndBodyKinematic::ndContactMap::Iterator it(body->GetContactMap());
-				for (it.Begin(); it; it++)
-				{
-					ndContact* const contact = it.GetNode()->GetInfo();
-					if (contact->IsActive())
-					{
-						bool newContact = true;
-						for (ndInt32 j = contacts.GetCount() - 1; j >= 0; --j)
-						{
-							newContact = newContact && (contacts[j] != contact);
-						}
-						if (newContact)
-						{
-							contacts.PushBack(contact);
-						}
-					}
-				}
 			}
 			m_com = cg.Scale(ndFloat32(1.0f) / m_totalMass);
 
@@ -119,6 +97,30 @@ namespace ndZmp
 			m_gyroTorque = gyroTorque;
 			inertia.m_posit = ndVector::m_wOne;
 			m_invInertia = inertia.Inverse4x4();
+
+
+			ndFixSizeArray<ndContact*, 8> contacts;
+			for (ndInt32 i = m_allBodies.GetCount() - 1; i >= 0; --i)
+			{
+				const ndBodyDynamic* const body = m_allBodies[i];
+				ndBodyKinematic::ndContactMap::Iterator it(body->GetContactMap());
+				for (it.Begin(); it; it++)
+				{
+					ndContact* const contact = it.GetNode()->GetInfo();
+					if (contact->IsActive())
+					{
+						bool newContact = true;
+						for (ndInt32 j = contacts.GetCount() - 1; j >= 0; --j)
+						{
+							newContact = newContact && (contacts[j] != contact);
+						}
+						if (newContact)
+						{
+							contacts.PushBack(contact);
+						}
+					}
+				}
+			}
 
 			for (ndInt32 i = contacts.GetCount() - 1; i >= 0; --i)
 			{
@@ -154,6 +156,7 @@ namespace ndZmp
 			ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
 			ndAssert(skeleton);
 			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+
 			ndVector alpha(CalculateAlpha());
 			if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f))
 			{
@@ -194,14 +197,16 @@ namespace ndZmp
 				} while ((ndAbs(alpha.m_z) > ndFloat32(1.0e-3f)) && passes);
 				ndTrace(("\n"));
 			}
+
 			m_crossValidation____ = CalculateAlpha();
 			m_invDynamicsSolver.SolverEnd();
 
 			xxx++;
 		}
 
-		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
 		ndFixSizeArray<ndVector, 8> m_comDist;
+		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
+		ndFixSizeArray<ndBodyDynamic*, 8> m_allBodies;
 		ndJointHinge* m_controlJoint;
 		ndVector m_com;
 		ndVector m_comVel;
@@ -295,6 +300,10 @@ namespace ndZmp
 		ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
 		model->AddLimb(legLimb, wheelBody, wheelJoint);
 #endif
+
+		model->m_allBodies.PushBack(hipBody->GetAsBodyDynamic());
+		model->m_allBodies.PushBack(legBody->GetAsBodyDynamic());
+		model->m_allBodies.PushBack(wheelBody->GetAsBodyDynamic());
 
 		model->Init();
 		return model;
