@@ -149,7 +149,7 @@ namespace ndZmp
 			return m_invInertia.RotateVector(torque);
 		}
 
-		void Update(ndWorld* const world, ndFloat32 timestep)
+		void Update(ndWorld* const, ndFloat32)
 		{
 			//ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
 			//ndAssert(skeleton);
@@ -280,14 +280,12 @@ namespace ndZmp
 		wheelBody->GetNotifyCallback()->OnTransform(0, wheelMatrix);
 		modelRoot->m_body->GetNotifyCallback()->OnTransform(0, rootMatrix);
 
-#if 0
+#if 1
 		// add the joints manually, because on this model the wheel is not activate actuated.
 		world->AddJoint(legJoint);
 		world->AddJoint(wheelJoint);
 
 		// add model limbs
-		//ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
-		//model->AddLimb(legLimb, wheelBody, wheelJoint);
 		model->AddLimb(modelRoot, legBody, legJoint);
 #else
 		// add model limbs

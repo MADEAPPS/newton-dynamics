@@ -52,9 +52,9 @@
 //#define DEFAULT_SCENE	13		// background vehicle prop
 //#define DEFAULT_SCENE	14		// simple industrial robot
 //#define DEFAULT_SCENE	15		// advanced industrial robot
-#define DEFAULT_SCENE	16		// basic player
+//#define DEFAULT_SCENE	16		// basic player
 //#define DEFAULT_SCENE	17		// rag doll
-//#define DEFAULT_SCENE	18		// unit cycle controller
+#define DEFAULT_SCENE	18		// unit cycle controller
 //#define DEFAULT_SCENE	19		// quadruped test 1
 //#define DEFAULT_SCENE	20		// quadruped test 2
 //#define DEFAULT_SCENE	21		// quadruped test 3
@@ -443,7 +443,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
-	//m_collisionDisplayMode = 3;		// solid wire frame
+	m_collisionDisplayMode = 3;		// solid wire frame
 	m_synchronousPhysicsUpdate = true;
 	m_synchronousParticlesUpdate = true;
 
