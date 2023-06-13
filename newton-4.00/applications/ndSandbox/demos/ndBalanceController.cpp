@@ -20,8 +20,9 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-namespace ndZmp
+namespace ndController_0
 {
+	#define ND_ALPHA_TOL ndFloat32 (1.0e-3f)
 	class ndModelUnicycle : public ndModelArticulation
 	{
 		public:
@@ -162,7 +163,7 @@ namespace ndZmp
 			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
 
 			ndVector alpha(CalculateAlpha());
-			if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f))
+			if (ndAbs(alpha.m_z) > ND_ALPHA_TOL)
 			{
 				ndTrace(("%d alpha(%f) angle(%f)\n", xxx, alpha.m_z, m_controlJoint->GetOffsetAngle() * ndRadToDegree));
 			}
@@ -179,10 +180,11 @@ namespace ndZmp
 
 				m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
 				ndVector alpha(CalculateAlpha());
-				if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f))
+				if (ndAbs(alpha.m_z) > ND_ALPHA_TOL)
 				{
 					ndFloat32 angle = m_controlJoint->GetOffsetAngle();
 					ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, 0.0f));
+
 					ndInt32 passes = 128;
 					ndFloat32 angleLimit = ndFloat32(45.0f * ndDegreeToRad);
 					do
@@ -196,7 +198,7 @@ namespace ndZmp
 						m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
 						alpha = CalculateAlpha();
 						ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, deltaAngle));
-					} while ((ndAbs(alpha.m_z) > ndFloat32(1.0e-3f)) && passes);
+					} while ((ndAbs(alpha.m_z) > ND_ALPHA_TOL) && passes);
 					ndTrace(("\n"));
 				}
 
@@ -271,6 +273,7 @@ namespace ndZmp
 		wheelMatrix.m_posit.m_y -= limbLength;
 		wheelBody->SetMatrix(wheelMatrix);
 		ndSharedPtr<ndJointBilateralConstraint> wheelJoint(new ndJointSpherical(wheelMatrix, wheelBody->GetAsBodyKinematic(), legBody->GetAsBodyKinematic()));
+		//((ndJointSpherical*)*wheelJoint)->SetAsSpringDamper(ndFloat32(0.001f), ndFloat32(0.0f), ndFloat32(10.f));
 
 		// teleport the model so that is on the floor
 		ndMatrix probeMatrix(wheelMatrix);
@@ -306,7 +309,7 @@ namespace ndZmp
 	}
 }
 
-using namespace ndZmp;
+using namespace ndController_0;
 void ndBalanceController(ndDemoEntityManager* const scene)
 {
 	// build a floor
