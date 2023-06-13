@@ -27,7 +27,16 @@ namespace ndZmp
 		public:
 		ndModelUnicycle()
 			:ndModelArticulation()
+			,m_invInertia(ndGetZeroMatrix())
+			,m_com(ndVector::m_zero)
+			,m_comVel(ndVector::m_zero)
+			,m_gyroTorque(ndVector::m_zero)
+			,m_comDist()
+			,m_bodies()
+			,m_ballBody(nullptr)
 			,m_controlJoint(nullptr)
+			,m_totalMass(ndFloat32 (0.0f))
+			,m_hasSupport(false)
 		{
 			xxx = 0;
 		}
@@ -98,33 +107,31 @@ namespace ndZmp
 			inertia.m_posit = ndVector::m_wOne;
 			m_invInertia = inertia.Inverse4x4();
 
-			ndFixSizeArray<ndContact*, 8> contacts;
-			for (ndInt32 i = m_allBodies.GetCount() - 1; i >= 0; --i)
+			m_hasSupport = false;
+			ndBodyKinematic::ndContactMap::Iterator it(m_ballBody->GetContactMap());
+			for (it.Begin(); it; it++)
 			{
-				const ndBodyDynamic* const body = m_allBodies[i];
-				ndBodyKinematic::ndContactMap::Iterator it(body->GetContactMap());
-				for (it.Begin(); it; it++)
+				ndContact* const contact = it.GetNode()->GetInfo();
+				if (contact->IsActive())
 				{
-					ndContact* const contact = it.GetNode()->GetInfo();
-					if (contact->IsActive())
-					{
-						bool newContact = true;
-						for (ndInt32 j = contacts.GetCount() - 1; j >= 0; --j)
-						{
-							newContact = newContact && (contacts[j] != contact);
-						}
-						if (newContact)
-						{
-							contacts.PushBack(contact);
-						}
-					}
+					m_hasSupport = true;
+					world->CalculateJointContacts(contact);
+					//bool newContact = true;
+					//for (ndInt32 j = contacts.GetCount() - 1; j >= 0; --j)
+					//{
+					//	newContact = newContact && (contacts[j] != contact);
+					//}
+					//if (newContact)
+					//{
+					//	contacts.PushBack(contact);
+					//}
 				}
 			}
 
-			for (ndInt32 i = contacts.GetCount() - 1; i >= 0; --i)
-			{
-				world->CalculateJointContacts(contacts[i]);
-			}
+			//for (ndInt32 i = contacts.GetCount() - 1; i >= 0; --i)
+			//{
+			//	world->CalculateJointContacts(contacts[i]);
+			//}
 		}
 
 		//e) T0 = sum(w(i) x (I(i) * w(i))
@@ -164,53 +171,53 @@ namespace ndZmp
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
-			//static ndFloat32 tick = 0.0f;
-			//tick += timestep;
-			//ndFloat32 angle = 15.0f * ndDegreeToRad * ndSin(ndPi * tick / 0.5f);
-			//m_controlJoint->SetOffsetAngle(angle);
-			//ModelState state(this, world, timestep);
-
 			InitState(world);
-
-			ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
-			ndAssert(skeleton);
-			
-			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
-			ndVector alpha(CalculateAlpha());
-			if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f) || xxx == 500)
+			if (m_hasSupport)
 			{
-				ndFloat32 angle = m_controlJoint->GetOffsetAngle();
-				ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, 0.0f));
-				ndInt32 passes = 128;
-				do
-				{
-					passes--;
-					ndFloat32 deltaAngle = alpha.m_z * 0.001f;
-					angle += deltaAngle;
-					angle = ndClamp(angle + deltaAngle, -ndFloat32(30.0f * ndDegreeToRad), ndFloat32(30.0f * ndDegreeToRad));
-					m_controlJoint->SetOffsetAngle(angle);
-					m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
-					alpha = CalculateAlpha();
-					ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, deltaAngle));
-				} while ((ndAbs(alpha.m_z) > ndFloat32(1.0e-3f)) && passes);
-				ndTrace(("\n"));
-			}
+				ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
+				ndAssert(skeleton);
 
-			m_crossValidation____ = CalculateAlpha();
-			m_invDynamicsSolver.SolverEnd();
+				m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+				ndVector alpha(CalculateAlpha());
+				if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f))
+				{
+					ndFloat32 angle = m_controlJoint->GetOffsetAngle();
+					ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, 0.0f));
+					ndInt32 passes = 128;
+					ndFloat32 angleLimit = ndFloat32(45.0f * ndDegreeToRad);
+					do
+					{
+						passes--;
+						ndFloat32 deltaAngle = alpha.m_z * 0.001f;
+						angle += deltaAngle;
+						
+						angle = ndClamp(angle + deltaAngle, -angleLimit, angleLimit);
+						m_controlJoint->SetOffsetAngle(angle);
+						m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
+						alpha = CalculateAlpha();
+						ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, deltaAngle));
+					} while ((ndAbs(alpha.m_z) > ndFloat32(1.0e-3f)) && passes);
+					ndTrace(("\n"));
+				}
+
+				m_crossValidation____ = CalculateAlpha();
+				m_invDynamicsSolver.SolverEnd();
+			}
 
 			xxx++;
 		}
 
-		ndFixSizeArray<ndVector, 8> m_comDist;
-		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
-		ndFixSizeArray<ndBodyDynamic*, 8> m_allBodies;
-		ndJointHinge* m_controlJoint;
+		ndMatrix m_invInertia;
 		ndVector m_com;
 		ndVector m_comVel;
 		ndVector m_gyroTorque;
+
+		ndFixSizeArray<ndVector, 8> m_comDist;
+		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
+		ndBodyDynamic* m_ballBody;
+		ndJointHinge* m_controlJoint;
 		ndFloat32 m_totalMass;
-		ndMatrix m_invInertia;
+		bool m_hasSupport;
 
 		ndVector m_crossValidation____;
 		int xxx;
@@ -292,9 +299,7 @@ namespace ndZmp
 		// add model limbs
 		model->AddLimb(modelRoot, legBody, legJoint);
 
-		model->m_allBodies.PushBack(hipBody->GetAsBodyDynamic());
-		model->m_allBodies.PushBack(legBody->GetAsBodyDynamic());
-		model->m_allBodies.PushBack(wheelBody->GetAsBodyDynamic());
+		model->m_ballBody = wheelBody->GetAsBodyDynamic();
 
 		model->Init();
 		return model;
