@@ -91,7 +91,7 @@ namespace ndZmp
 				inertia.m_up += (bodyInertia.m_up + covariance.m_up.Scale(mass));
 				inertia.m_right += (bodyInertia.m_right + covariance.m_right.Scale(mass));
 
-				gyroTorque += omega.DotProduct(bodyInertia.RotateVector(omega));
+				gyroTorque += omega.CrossProduct(bodyInertia.RotateVector(omega));
 			}
 
 			m_gyroTorque = gyroTorque;
@@ -132,7 +132,8 @@ namespace ndZmp
 		//g) Bcg = (Icg ^ -1) * (T0 + T1)
 		ndVector CalculateAlpha()
 		{
-			ndVector torque(ndVector::m_zero);
+			//ndVector torque(ndVector::m_zero);
+			ndVector torque(m_gyroTorque);
 
 			m_invDynamicsSolver.Solve();
 			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
@@ -156,7 +157,7 @@ namespace ndZmp
 			ndVector alpha(CalculateAlpha());
 			if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f))
 			{
-				ndTrace(("%d alpha(%f) angle(%f)\n", xxx, alpha.m_z, m_controlJoint->GetOffsetAngle()));
+				ndTrace(("%d alpha(%f) angle(%f)\n", xxx, alpha.m_z, m_controlJoint->GetOffsetAngle() * ndRadToDegree));
 			}
 			m_invDynamicsSolver.SolverEnd();
 		}
@@ -179,17 +180,18 @@ namespace ndZmp
 			if (ndAbs(alpha.m_z) > ndFloat32(1.0e-3f) || xxx == 500)
 			{
 				ndFloat32 angle = m_controlJoint->GetOffsetAngle();
-				ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle, 0.0f));
+				ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, 0.0f));
 				ndInt32 passes = 128;
 				do
 				{
 					passes--;
 					ndFloat32 deltaAngle = alpha.m_z * 0.001f;
 					angle += deltaAngle;
+					angle = ndClamp(angle + deltaAngle, -ndFloat32(30.0f * ndDegreeToRad), ndFloat32(30.0f * ndDegreeToRad));
 					m_controlJoint->SetOffsetAngle(angle);
 					m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
 					alpha = CalculateAlpha();
-					ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle + deltaAngle, deltaAngle));
+					ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, deltaAngle));
 				} while ((ndAbs(alpha.m_z) > ndFloat32(1.0e-3f)) && passes);
 				ndTrace(("\n"));
 			}
