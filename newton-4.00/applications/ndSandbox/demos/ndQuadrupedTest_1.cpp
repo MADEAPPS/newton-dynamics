@@ -490,11 +490,45 @@ namespace ndQuadruped_1
 	class ndModelQuadruped: public ndModelArticulation
 	{
 		public:
+		class ndEffectorInfo
+		{
+			public:
+			ndEffectorInfo()
+				//:m_basePosition(ndVector::m_wOne)
+				:m_lookAtJoint(nullptr)
+				,m_effector(nullptr)
+				//,m_swivel(0.0f)
+				//,m_x(0.0f)
+				//,m_y(0.0f)
+				//,m_z(0.0f)
+			{
+			}
+
+			
+			//ndEffectorInfo(ndIkSwivelPositionEffector* const effector, ndJointHinge* const lookActJoint)
+			ndEffectorInfo(const ndSharedPtr<ndJointBilateralConstraint>& effector, ndJointHinge* const lookActJoint)
+				//:m_basePosition(effector->GetLocalTargetPosition())
+				:m_lookAtJoint(lookActJoint)
+				,m_effector(effector)
+				//,m_swivel(0.0f)
+				//,m_x(0.0f)
+				//,m_y(0.0f)
+				//,m_z(0.0f)
+			{
+			}
+
+			ndJointHinge* m_lookAtJoint;
+			//ndIkSwivelPositionEffector* m_effector;
+			ndSharedPtr<ndJointBilateralConstraint> m_effector;
+		};
+
+		
 		ndModelQuadruped()
 			:ndModelArticulation()
 		{
 		}
 
+		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
 	};
 
 	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation)
@@ -580,6 +614,7 @@ namespace ndQuadruped_1
 				workSpace += limbLength;
 			}
 		
+			// add calf1
 			ndJointHinge* lookActHinge = nullptr;
 			ndModelArticulation::ndNode* calf1Node = nullptr;
 			{
@@ -612,27 +647,27 @@ namespace ndQuadruped_1
 		
 			// add leg effector
 			{
-		//		ndBodyKinematic* const targetBody = calf1;
-		//
-		//		ndFloat32 angle(i < 2 ? -90.0f : 90.0f);
-		//		ndMatrix effectorToeFrame(ndGetIdentityMatrix());
-		//		ndMatrix effectorRefFrame(ndYawMatrix(angle * ndDegreeToRad));
-		//		effectorRefFrame.m_posit = thighPivot;
-		//		effectorToeFrame.m_posit = limbPivotLocation.m_posit;
-		//
-		//		ndFloat32 regularizer = 0.001f;
-		//		ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame.m_posit, effectorRefFrame, targetBody, torso);
-		//		effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
-		//		effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
-		//		effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
-		//
-		//		ndEffectorInfo info(effector, lookActHinge);
-		//		info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
-		//		info.m_y_mapper = ndParamMapper(-0.4f, 0.1f);
-		//		info.m_z_mapper = ndParamMapper(-0.15f, 0.15f);
-		//		info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
-		//		m_effectorsInfo.PushBack(info);
-		//		m_effectorsJoints.PushBack(effector);
+				ndBodyKinematic* const targetBody = calf1Node->m_body->GetAsBodyKinematic();
+		
+				ndFloat32 angle(i < 2 ? -90.0f : 90.0f);
+				ndMatrix effectorToeFrame(ndGetIdentityMatrix());
+				ndMatrix effectorRefFrame(ndYawMatrix(angle * ndDegreeToRad));
+				effectorRefFrame.m_posit = thighPivot;
+				effectorToeFrame.m_posit = limbPivotLocation.m_posit;
+		
+				ndFloat32 regularizer = 0.001f;
+				ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame.m_posit, effectorRefFrame, targetBody, torso->GetAsBodyKinematic());
+				effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+				effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+				effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
+
+				ndModelQuadruped::ndEffectorInfo info(ndSharedPtr<ndJointBilateralConstraint> (effector), lookActHinge);
+				//info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
+				//info.m_y_mapper = ndParamMapper(-0.4f, 0.1f);
+				//info.m_z_mapper = ndParamMapper(-0.15f, 0.15f);
+				//info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
+				model->m_effectorsInfo.PushBack(info);
+				//m_effectorsJoints.PushBack(effector);
 			}
 		}
 
