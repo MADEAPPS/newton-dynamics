@@ -538,7 +538,6 @@ namespace ndQuadruped_1
 			const ndVector thighPivot(limbPivotLocation.m_posit);
 		
 			ndFloat32 workSpace = 0.0f;
-			//ndSharedPtr<ndBody> thigh;
 			ndModelArticulation::ndNode* thighNode = nullptr;
 			{
 				ndMatrix bodyMatrix(limbPivotLocation);
@@ -554,7 +553,6 @@ namespace ndQuadruped_1
 			}
 		
 			// add calf0
-			//ndSharedPtr<ndBody> calf0;
 			ndModelArticulation::ndNode* calf0Node = nullptr;
 			{
 				limbPivotLocation = ndRollMatrix(-90.0f * ndDegreeToRad) * limbPivotLocation;
@@ -570,53 +568,50 @@ namespace ndQuadruped_1
 				caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
 				caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
 				caffPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
-				//ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0, thigh);
-				 ndSharedPtr<ndJointBilateralConstraint> hingeJoint (new ndIkJointHinge(caffPinAndPivotFrame, calf0->GetAsBodyKinematic(), thighNode->m_body->GetAsBodyKinematic()));
+				ndSharedPtr<ndJointBilateralConstraint> hingeJoint (new ndIkJointHinge(caffPinAndPivotFrame, calf0->GetAsBodyKinematic(), thighNode->m_body->GetAsBodyKinematic()));
 		
 				// add joint limit to prevent knee from flipping
 				 ndIkJointHinge* const hinge = (ndIkJointHinge*)*hingeJoint;
 				hinge->SetLimitState(true);
 				hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
-				//ndSharedPtr<ndJointBilateralConstraint> hingePtr(hinge);
-				//world->AddJoint(hingePtr);
 				calf0Node = model->AddLimb(thighNode, calf0, hingeJoint);
 		
 				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
 				workSpace += limbLength;
 			}
 		
-		//	ndBodyKinematic* calf1 = nullptr;
-		//	ndJointHinge* lookActHinge = nullptr;
-		//	{
-		//		ndFloat32 lenght = limbLength * 0.5f;
-		//		limbPivotLocation = ndRollMatrix(-45.0f * ndDegreeToRad) * limbPivotLocation;
-		//		ndMatrix bodyMatrix(limbPivotLocation);
-		//		bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(lenght * 0.5f);
-		//
-		//		calf1 = AddCapsule(scene, bodyMatrix, limbMass * 0.5f, limbRadios, limbRadios, lenght);
-		//		calf1->SetMatrix(bodyMatrix);
-		//
-		//		ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
-		//		caffPinAndPivotFrame.m_front = limbPivotLocation.m_right.Scale(-1.0f);
-		//		caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
-		//		caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
-		//		caffPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
-		//
-		//		// add joint limit to prevent knee from flipping
-		//		lookActHinge = new ndJointHinge(caffPinAndPivotFrame, calf0, calf1);
-		//		lookActHinge->SetLimitState(true);
-		//		lookActHinge->SetLimits(-60.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
-		//		lookActHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
-		//
-		//		ndSharedPtr<ndJointBilateralConstraint> hingePtr(lookActHinge);
-		//		world->AddJoint(hingePtr);
-		//
-		//		limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(lenght);
-		//		workSpace += lenght;
-		//	}
-		//
-		//	// add leg effector
-		//	{
+			ndJointHinge* lookActHinge = nullptr;
+			ndModelArticulation::ndNode* calf1Node = nullptr;
+			{
+				ndFloat32 lenght = limbLength * 0.5f;
+				limbPivotLocation = ndRollMatrix(-45.0f * ndDegreeToRad) * limbPivotLocation;
+				ndMatrix bodyMatrix(limbPivotLocation);
+				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(lenght * 0.5f);
+		
+				ndSharedPtr<ndBody> calf1 (world->GetBody(AddCapsule(scene, bodyMatrix, limbMass * 0.5f, limbRadios, limbRadios, lenght)));
+				calf1->SetMatrix(bodyMatrix);
+		
+				ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
+				caffPinAndPivotFrame.m_front = limbPivotLocation.m_right.Scale(-1.0f);
+				caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
+				caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
+				caffPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
+		
+				// add joint limit to prevent knee from flipping
+				lookActHinge = new ndJointHinge(caffPinAndPivotFrame, calf1->GetAsBodyKinematic(), calf0Node->m_body->GetAsBodyKinematic());
+				lookActHinge->SetLimitState(true);
+				lookActHinge->SetLimits(-60.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
+				lookActHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
+		
+				ndSharedPtr<ndJointBilateralConstraint> hingePtr(lookActHinge);
+				calf1Node = model->AddLimb(calf0Node, calf1, hingePtr);
+		
+				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(lenght);
+				workSpace += lenght;
+			}
+		
+			// add leg effector
+			{
 		//		ndBodyKinematic* const targetBody = calf1;
 		//
 		//		ndFloat32 angle(i < 2 ? -90.0f : 90.0f);
@@ -638,7 +633,7 @@ namespace ndQuadruped_1
 		//		info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
 		//		m_effectorsInfo.PushBack(info);
 		//		m_effectorsJoints.PushBack(effector);
-		//	}
+			}
 		}
 
 		return model;
