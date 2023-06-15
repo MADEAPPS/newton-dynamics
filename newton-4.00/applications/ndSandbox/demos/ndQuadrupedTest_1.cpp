@@ -512,10 +512,12 @@ namespace ndQuadruped_1
 
 				ndFloat32 high = -0.3f;
 				ndVector base (ndVector::m_zero);
+				base.m_x = 0.4f;
 				base.m_y = high;
 				for (ndInt32 i = 0; i < 4; i++)
 				{
 					output[i].m_posit = base;
+					output[i].m_posit.m_z = m_offset[i];
 					ndFloat32 t = ndMod (param - m_phase[i] + ndFloat32(1.0f), ndFloat32 (1.0f));
 					if (t <= ndFloat32(0.25f))
 					{
@@ -525,6 +527,7 @@ namespace ndQuadruped_1
 			}
 
 			ndFloat32 m_phase[4];
+			ndFloat32 m_offset[4];
 		};
 
 		class ndEffectorInfo
@@ -534,28 +537,16 @@ namespace ndQuadruped_1
 				//:m_basePosition(ndVector::m_wOne)
 				:m_lookAtJoint(nullptr)
 				,m_effector(nullptr)
-				//,m_swivel(0.0f)
-				//,m_x(0.0f)
-				//,m_y(0.0f)
-				//,m_z(0.0f)
 			{
 			}
 
-			
-			//ndEffectorInfo(ndIkSwivelPositionEffector* const effector, ndJointHinge* const lookActJoint)
 			ndEffectorInfo(const ndSharedPtr<ndJointBilateralConstraint>& effector, ndJointHinge* const lookActJoint)
-				//:m_basePosition(effector->GetLocalTargetPosition())
 				:m_lookAtJoint(lookActJoint)
 				,m_effector(effector)
-				//,m_swivel(0.0f)
-				//,m_x(0.0f)
-				//,m_y(0.0f)
-				//,m_z(0.0f)
 			{
 			}
 
 			ndJointHinge* m_lookAtJoint;
-			//ndIkSwivelPositionEffector* m_effector;
 			ndSharedPtr<ndJointBilateralConstraint> m_effector;
 		};
 
@@ -568,7 +559,7 @@ namespace ndQuadruped_1
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndVector veloc;
-			m_animBlendTree->Update(timestep * 0.01f);
+			m_animBlendTree->Update(timestep * 0.02f);
 			m_animBlendTree->Evaluate(m_animPose, veloc);
 
 			ndSkeletonContainer* const skeleton = GetRoot()->m_body->GetAsBodyKinematic()->GetSkeleton();
@@ -580,15 +571,10 @@ namespace ndQuadruped_1
 				ndEffectorInfo& info = m_effectorsInfo[i];
 				joint[i] = *info.m_effector;
 
-				ndIkSwivelPositionEffector* xxxxx = (ndIkSwivelPositionEffector*)*info.m_effector;
-				ndVector posit1(xxxxx->GetLocalTargetPosition());
-				//posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
-				//posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
-				//posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
-				ndVector posit0 (m_animPose[i].m_posit);
-				posit0.m_x = 0.4f;
-				xxxxx->SetLocalTargetPosition(posit0);
-				xxxxx->SetSwivelAngle(0.0f);
+				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info.m_effector;
+				ndVector posit (m_animPose[i].m_posit);
+				effector->SetLocalTargetPosition(posit);
+				effector->SetSwivelAngle(0.0f);
 
 			}
 			m_invDynamicsSolver.SolverBegin(skeleton, joint, 4, world, timestep);
@@ -629,8 +615,8 @@ namespace ndQuadruped_1
 		matrix.m_posit.m_y = -radius * 0.5f;
 		
 		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
-		//ndFloat32 angles[] = { 270.0f, 90.0f, 120.0f, 60.0f };
 		ndFloat32 phase[] = { 0.0f, 0.5f, 0.25f, 0.75f };
+		ndFloat32 offset[] = { -0.2f, 0.2f, -0.2f, 0.2f };
 
 		ndSharedPtr<ndAnimationSequence> sequence(new ndModelQuadruped::ndPoseGenerator());
 		model->m_poseGenerator = new ndAnimationSequencePlayer(sequence);
@@ -738,18 +724,14 @@ namespace ndQuadruped_1
 				effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
 
 				ndModelQuadruped::ndEffectorInfo info(ndSharedPtr<ndJointBilateralConstraint> (effector), lookActHinge);
-				//info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
-				//info.m_y_mapper = ndParamMapper(-0.4f, 0.1f);
-				//info.m_z_mapper = ndParamMapper(-0.15f, 0.15f);
-				//info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
 				model->m_effectorsInfo.PushBack(info);
-				//m_effectorsJoints.PushBack(effector);
 
 				ndAnimKeyframe keyFrame;
 				keyFrame.m_userData = &model->m_effectorsInfo[model->m_effectorsInfo.GetCount() - 1];
 				model->m_animPose.PushBack(keyFrame);
 				poseGenerator->AddTrack();
 				poseGenerator->m_phase[i] = phase[i];
+				poseGenerator->m_offset[i] = offset[i];
 			}
 		}
 
@@ -772,10 +754,6 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 	
-	//ndQuadrupedModel* const robot0 = new ndQuadrupedModel(scene, matrix);
-	//scene->SetSelectedModel(robot0);
-	//ndSharedPtr<ndModel> modelPtr(robot0);
-	//world->AddModel(modelPtr);
 	ndSharedPtr<ndModel> model(BuildModel(scene, matrix));
 	world->AddModel(model);
 
