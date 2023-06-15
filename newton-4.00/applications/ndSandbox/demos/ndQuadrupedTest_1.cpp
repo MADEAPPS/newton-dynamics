@@ -490,6 +490,27 @@ namespace ndQuadruped_1
 	class ndModelQuadruped: public ndModelArticulation
 	{
 		public:
+		class ndPoseGenerator : public ndAnimationSequence
+		{
+			public:
+			ndPoseGenerator()
+				:ndAnimationSequence()
+			{
+				m_duration = ndFloat32 (1.0f);
+			}
+
+			virtual ndVector GetTranslation(ndFloat32 param) const
+			{
+				return ndVector::m_zero;
+			}
+
+			virtual void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
+			{
+				//ndAssert(0);
+				ndTrace((" TODO complete pose generator\n"));
+			}
+		};
+
 		class ndEffectorInfo
 		{
 			public:
@@ -528,7 +549,18 @@ namespace ndQuadruped_1
 		{
 		}
 
+		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndVector veloc;
+			m_animBlendTree->Update(timestep);
+
+			ndAnimationPose output;
+			m_animBlendTree->Evaluate(output, veloc);
+		}
+		
 		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
+		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
+		ndAnimationSequencePlayer* m_poseGenerator;
 	};
 
 	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation)
@@ -559,6 +591,10 @@ namespace ndQuadruped_1
 		
 		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
 		//ndFloat32 angles[] = { 270.0f, 90.0f, 120.0f, 60.0f };
+
+		ndSharedPtr<ndAnimationSequence> sequence(new ndModelQuadruped::ndPoseGenerator());
+		model->m_poseGenerator = new ndAnimationSequencePlayer(sequence);
+		model->m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(model->m_poseGenerator);
 		
 		const ndVector upDir(location.m_up);
 		for (ndInt32 i = 0; i < 4; ++i)
@@ -696,8 +732,8 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndModel> model(BuildModel(scene, matrix));
 	world->AddModel(model);
 
-	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot0->m_rootBody->GetMatrix(), robot0->m_rootBody, world->GetSentinelBody()));
-	//world->AddJoint(fixJoint);
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
+	world->AddJoint(fixJoint);
 
 	//ndModelUI* const quadrupedUI = new ndModelUI(scene, robot0);
 	//ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);

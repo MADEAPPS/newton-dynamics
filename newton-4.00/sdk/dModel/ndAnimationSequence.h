@@ -33,7 +33,7 @@ class ndAnimationSequence : public ndClassAlloc
 	virtual ndVector GetTranslation(ndFloat32 param) const;
 	virtual void CalculatePose(ndAnimationPose& output, ndFloat32 param) const;
 
-	private:
+	protected:
 	ndList<ndAnimationKeyFramesTrack> m_tracks;
 	ndAnimationKeyFramesTrack m_translationTrack;
 	ndString m_name;
