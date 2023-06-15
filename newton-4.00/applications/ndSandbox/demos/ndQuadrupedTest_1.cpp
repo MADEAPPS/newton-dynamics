@@ -556,6 +556,18 @@ namespace ndQuadruped_1
 
 			ndAnimationPose output;
 			m_animBlendTree->Evaluate(output, veloc);
+
+			ndSkeletonContainer* const skeleton = GetRoot()->m_body->GetAsBodyKinematic()->GetSkeleton();
+			ndAssert(skeleton);
+
+			ndJointBilateralConstraint* joint[4];
+			for (ndInt32 i = 0; i < 4; ++i)
+			{
+				joint[i] = *m_effectorsInfo[i].m_effector;
+			}
+			m_invDynamicsSolver.SolverBegin(skeleton, joint, 4, world, timestep);
+			m_invDynamicsSolver.Solve();
+			m_invDynamicsSolver.SolverEnd();
 		}
 		
 		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
