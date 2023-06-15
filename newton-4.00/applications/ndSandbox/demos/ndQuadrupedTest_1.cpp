@@ -509,13 +509,17 @@ namespace ndQuadruped_1
 				// generate a procedural marcth in place gait
 				ndFloat32 amp = 0.2f;
 				ndFloat32 omega = ndPi / 0.25f;
+
+				ndFloat32 high = -0.3f;
+				ndVector base (ndVector::m_zero);
+				base.m_y = high;
 				for (ndInt32 i = 0; i < 4; i++)
 				{
-					output[i].m_posit = ndVector::m_zero;
+					output[i].m_posit = base;
 					ndFloat32 t = ndMod (param - m_phase[i] + ndFloat32(1.0f), ndFloat32 (1.0f));
 					if (t <= ndFloat32(0.25f))
 					{
-						output[i].m_posit.m_y = amp * ndSin(omega * t);
+						output[i].m_posit.m_y += amp * ndSin(omega * t);
 					}
 				}
 			}
@@ -564,7 +568,7 @@ namespace ndQuadruped_1
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndVector veloc;
-			m_animBlendTree->Update(timestep * 0.5f);
+			m_animBlendTree->Update(timestep * 0.01f);
 			m_animBlendTree->Evaluate(m_animPose, veloc);
 
 			ndSkeletonContainer* const skeleton = GetRoot()->m_body->GetAsBodyKinematic()->GetSkeleton();
@@ -614,7 +618,7 @@ namespace ndQuadruped_1
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(torso);
 		
 		ndMatrix location(matrixLocation);
-		location.m_posit.m_y = floor.m_y + 1.0f;
+		location.m_posit.m_y = floor.m_y + 0.5f;
 		torso->SetMatrix(location);
 		
 		ndDemoEntity* const entity = (ndDemoEntity*)torso->GetNotifyCallback()->GetUserData();
@@ -626,6 +630,7 @@ namespace ndQuadruped_1
 		
 		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
 		//ndFloat32 angles[] = { 270.0f, 90.0f, 120.0f, 60.0f };
+		ndFloat32 phase[] = { 0.0f, 0.5f, 0.25f, 0.75f };
 
 		ndSharedPtr<ndAnimationSequence> sequence(new ndModelQuadruped::ndPoseGenerator());
 		model->m_poseGenerator = new ndAnimationSequencePlayer(sequence);
@@ -744,7 +749,7 @@ namespace ndQuadruped_1
 				keyFrame.m_userData = &model->m_effectorsInfo[model->m_effectorsInfo.GetCount() - 1];
 				model->m_animPose.PushBack(keyFrame);
 				poseGenerator->AddTrack();
-				poseGenerator->m_phase[i] = ndFloat32(i) * 0.25f;
+				poseGenerator->m_phase[i] = phase[i];
 			}
 		}
 
@@ -775,7 +780,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	world->AddModel(model);
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
+	//world->AddJoint(fixJoint);
 
 	//ndModelUI* const quadrupedUI = new ndModelUI(scene, robot0);
 	//ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
