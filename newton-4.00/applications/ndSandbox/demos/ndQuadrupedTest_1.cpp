@@ -507,7 +507,7 @@ namespace ndQuadruped_1
 			virtual void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 			{
 				// generate a procedural marcth in place gait
-				ndFloat32 amp = -0.2f;
+				ndFloat32 amp = 0.2f;
 				ndFloat32 omega = ndPi / 0.25f;
 				for (ndInt32 i = 0; i < 4; i++)
 				{
@@ -564,7 +564,7 @@ namespace ndQuadruped_1
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndVector veloc;
-			m_animBlendTree->Update(timestep);
+			m_animBlendTree->Update(timestep * 0.5f);
 			m_animBlendTree->Evaluate(m_animPose, veloc);
 
 			ndSkeletonContainer* const skeleton = GetRoot()->m_body->GetAsBodyKinematic()->GetSkeleton();
@@ -573,7 +573,19 @@ namespace ndQuadruped_1
 			ndJointBilateralConstraint* joint[4];
 			for (ndInt32 i = 0; i < 4; ++i)
 			{
-				joint[i] = *m_effectorsInfo[i].m_effector;
+				ndEffectorInfo& info = m_effectorsInfo[i];
+				joint[i] = *info.m_effector;
+
+				ndIkSwivelPositionEffector* xxxxx = (ndIkSwivelPositionEffector*)*info.m_effector;
+				ndVector posit1(xxxxx->GetLocalTargetPosition());
+				//posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
+				//posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
+				//posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
+				ndVector posit0 (m_animPose[i].m_posit);
+				posit0.m_x = 0.4f;
+				xxxxx->SetLocalTargetPosition(posit0);
+				xxxxx->SetSwivelAngle(0.0f);
+
 			}
 			m_invDynamicsSolver.SolverBegin(skeleton, joint, 4, world, timestep);
 			m_invDynamicsSolver.Solve();
