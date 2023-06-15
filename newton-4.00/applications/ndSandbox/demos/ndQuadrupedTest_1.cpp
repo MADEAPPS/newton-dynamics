@@ -499,16 +499,28 @@ namespace ndQuadruped_1
 				m_duration = ndFloat32 (1.0f);
 			}
 
-			virtual ndVector GetTranslation(ndFloat32 param) const
+			virtual ndVector GetTranslation(ndFloat32) const
 			{
 				return ndVector::m_zero;
 			}
 
 			virtual void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 			{
-				//ndAssert(0);
-				ndTrace((" TODO complete pose generator\n"));
+				// generate a procedural marcth in place gait
+				ndFloat32 amp = -0.2f;
+				ndFloat32 omega = ndPi / 0.25f;
+				for (ndInt32 i = 0; i < 4; i++)
+				{
+					output[i].m_posit = ndVector::m_zero;
+					ndFloat32 t = ndMod (param - m_phase[i] + ndFloat32(1.0f), ndFloat32 (1.0f));
+					if (t <= ndFloat32(0.25f))
+					{
+						output[i].m_posit.m_y = amp * ndSin(omega * t);
+					}
+				}
 			}
+
+			ndFloat32 m_phase[4];
 		};
 
 		class ndEffectorInfo
@@ -553,9 +565,7 @@ namespace ndQuadruped_1
 		{
 			ndVector veloc;
 			m_animBlendTree->Update(timestep);
-
-			ndAnimationPose output;
-			m_animBlendTree->Evaluate(output, veloc);
+			m_animBlendTree->Evaluate(m_animPose, veloc);
 
 			ndSkeletonContainer* const skeleton = GetRoot()->m_body->GetAsBodyKinematic()->GetSkeleton();
 			ndAssert(skeleton);
@@ -569,7 +579,8 @@ namespace ndQuadruped_1
 			m_invDynamicsSolver.Solve();
 			m_invDynamicsSolver.SolverEnd();
 		}
-		
+
+		ndAnimationPose m_animPose;
 		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
 		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 		ndAnimationSequencePlayer* m_poseGenerator;
@@ -607,7 +618,8 @@ namespace ndQuadruped_1
 		ndSharedPtr<ndAnimationSequence> sequence(new ndModelQuadruped::ndPoseGenerator());
 		model->m_poseGenerator = new ndAnimationSequencePlayer(sequence);
 		model->m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(model->m_poseGenerator);
-		
+
+		ndModelQuadruped::ndPoseGenerator* const poseGenerator = (ndModelQuadruped::ndPoseGenerator*)*sequence;
 		const ndVector upDir(location.m_up);
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
@@ -715,6 +727,12 @@ namespace ndQuadruped_1
 				//info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
 				model->m_effectorsInfo.PushBack(info);
 				//m_effectorsJoints.PushBack(effector);
+
+				ndAnimKeyframe keyFrame;
+				keyFrame.m_userData = &model->m_effectorsInfo[model->m_effectorsInfo.GetCount() - 1];
+				model->m_animPose.PushBack(keyFrame);
+				poseGenerator->AddTrack();
+				poseGenerator->m_phase[i] = ndFloat32(i) * 0.25f;
 			}
 		}
 
