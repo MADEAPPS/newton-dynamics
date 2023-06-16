@@ -41,7 +41,7 @@ ndIkSolver::ndIkSolver()
 	,m_timestep(ndFloat32(0.0f))
 	,m_invTimestep(ndFloat32(0.0f))
 	,m_maxAccel(ndFloat32(1.0e3f))
-	,m_maxAlpha(ndFloat32(1.0e3f))
+	,m_maxAlpha(ndFloat32(1.0e4f))
 {
 }
 
