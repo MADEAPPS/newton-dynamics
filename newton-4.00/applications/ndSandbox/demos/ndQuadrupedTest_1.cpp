@@ -496,7 +496,7 @@ namespace ndQuadruped_1
 			ndPoseGenerator()
 				:ndAnimationSequence()
 			{
-				m_duration = ndFloat32 (1.0f);
+				m_duration = ndFloat32 (4.0f);
 			}
 
 			virtual ndVector GetTranslation(ndFloat32) const
@@ -506,9 +506,10 @@ namespace ndQuadruped_1
 
 			virtual void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 			{
-				// generate a procedural march in place gait
+				// generate a procedural in place march gait
+				const ndFloat32 gaitFraction = 0.25f;
 				ndFloat32 amp = 0.2f;
-				ndFloat32 omega = ndPi / 0.25f;
+				ndFloat32 omega = ndPi / gaitFraction;
 
 				ndFloat32 high = -0.3f;
 				ndVector base (ndVector::m_zero);
@@ -519,7 +520,7 @@ namespace ndQuadruped_1
 					output[i].m_posit = base;
 					output[i].m_posit.m_z = m_offset[i];
 					ndFloat32 t = ndMod (param - m_phase[i] + ndFloat32(1.0f), ndFloat32 (1.0f));
-					if (t <= ndFloat32(0.25f))
+					if (t <= gaitFraction)
 					{
 						output[i].m_posit.m_y += amp * ndSin(omega * t);
 					}
@@ -535,6 +536,12 @@ namespace ndQuadruped_1
 			public:
 			ndUIControlNode(ndAnimationBlendTreeNode* const input)
 				:ndAnimationBlendTreeNode(input)
+				,m_x(ndReal(0.0f))
+				,m_y(ndReal(0.0f))
+				,m_z(ndReal(0.0f))
+				,m_pitch(ndReal(0.0f))
+				,m_yaw(ndReal(0.0f))
+				,m_roll(ndReal(0.0f))
 			{
 			}
 
@@ -542,13 +549,18 @@ namespace ndQuadruped_1
 			{
 				ndAnimationBlendTreeNode::Evaluate(output, veloc);
 			}
+			ndReal m_x;
+			ndReal m_y;
+			ndReal m_z;
+			ndReal m_pitch;
+			ndReal m_yaw;
+			ndReal m_roll;
 		};
 
 		class ndEffectorInfo
 		{
 			public:
 			ndEffectorInfo()
-				//:m_basePosition(ndVector::m_wOne)
 				:m_lookAtJoint(nullptr)
 				,m_effector(nullptr)
 			{
@@ -563,7 +575,6 @@ namespace ndQuadruped_1
 			ndJointHinge* m_lookAtJoint;
 			ndSharedPtr<ndJointBilateralConstraint> m_effector;
 		};
-
 		
 		ndModelQuadruped()
 			:ndModelArticulation()
@@ -573,7 +584,7 @@ namespace ndQuadruped_1
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndVector veloc;
-			m_animBlendTree->Update(timestep * 0.02f);
+			m_animBlendTree->Update(timestep * 0.1f);
 			m_animBlendTree->Evaluate(m_animPose, veloc);
 
 			ndSkeletonContainer* const skeleton = GetRoot()->m_body->GetAsBodyKinematic()->GetSkeleton();
@@ -627,35 +638,30 @@ namespace ndQuadruped_1
 			m_scene->Print(color, "Control panel");
 		
 			ndModelQuadruped* const model = (ndModelQuadruped*)*m_model;
-			//ndQuadrupedModel::ndEffectorInfo& info = model->m_effectorsInfo[0];
 			ndModelQuadruped::ndUIControlNode* const control = model->m_control;
 			
-			//bool change = false;
+			bool change = false;
 			ImGui::Text("position x");
-			//change = change | ImGui::SliderFloat("##x", &info.m_x, -1.0f, 1.0f);
-			//ImGui::Text("position y");
-			//change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
-			//ImGui::Text("position z");
-			//change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
-			//
-			//ImGui::Text("swivel");
-			//change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
-			//
-			//if (change)
-			//{
-			//	m_model->m_rootBody->SetSleepState(false);
-			//
-			//	for (ndInt32 i = 1; i < m_model->m_effectorsInfo.GetCount(); ++i)
-			//	{
-			//		m_model->m_effectorsInfo[i].m_x = info.m_x;
-			//		m_model->m_effectorsInfo[i].m_y = info.m_y;
-			//		m_model->m_effectorsInfo[i].m_z = info.m_z;
-			//		m_model->m_effectorsInfo[i].m_swivel = info.m_swivel;
-			//	}
-			//}
+			change = change | ImGui::SliderFloat("##x", &control->m_x, -0.1f, 0.1f);
+			ImGui::Text("position y");
+			change = change | ImGui::SliderFloat("##y", &control->m_y, -0.1f, 0.1f);
+			ImGui::Text("position z");
+			change = change | ImGui::SliderFloat("##z", &control->m_z, -0.1f, 0.1f);
+
+			ImGui::Text("pitch");
+			change = change | ImGui::SliderFloat("##pitch", &control->m_pitch, -10.0f, 10.0f);
+			ImGui::Text("yaw");
+			change = change | ImGui::SliderFloat("##yaw", &control->m_yaw, -10.0f, 10.0f);
+			ImGui::Text("roll");
+			change = change | ImGui::SliderFloat("##roll", &control->m_roll, -10.0f, 10.0f);
+
+			if (change)
+			{
+				// TODO: apply control changes.
+				//ndQuadrupedModel::ndEffectorInfo& info = model->m_effectorsInfo[0];
+			}
 		}
 
-		//ndModelQuadruped* m_model;
 		ndSharedPtr<ndModel> m_model;
 	};
 
@@ -686,8 +692,8 @@ namespace ndQuadruped_1
 		matrix.m_posit.m_y = -radius * 0.5f;
 		
 		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
-		ndFloat32 phase[] = { 0.0f, 0.5f, 0.25f, 0.75f };
 		ndFloat32 offset[] = { -0.3f, 0.3f, -0.3f, 0.3f };
+		ndFloat32 phase[] = { 0.0f, 0.5f, 0.25f, 0.75f };
 
 		ndSharedPtr<ndAnimationSequence> sequence(new ndModelQuadruped::ndPoseGenerator());
 		model->m_poseGenerator = new ndAnimationSequencePlayer(sequence);
@@ -809,9 +815,7 @@ namespace ndQuadruped_1
 
 		return model;
 	}
-
 #endif
-
 }
 
 using namespace ndQuadruped_1;
@@ -832,9 +836,6 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
 	//world->AddJoint(fixJoint);
 
-	//ndModelUI* const quadrupedUI = new ndModelUI(scene, model);
-	//ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
-	//scene->Set2DDisplayRenderFunction(quadrupedUIPtr);
 	ndSharedPtr<ndUIEntity> quadrupedUI (new ndModelUI(scene, model));
 	scene->Set2DDisplayRenderFunction(quadrupedUI);
 	
