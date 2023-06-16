@@ -606,9 +606,11 @@ namespace ndQuadruped_1
 			m_animBlendTree->Update(timestep * m_control->m_animSpeed);
 			m_animBlendTree->Evaluate(m_animPose, veloc);
 
-			ndSkeletonContainer* const skeleton = GetRoot()->m_body->GetAsBodyKinematic()->GetSkeleton();
+			ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
+			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
 			ndAssert(skeleton);
 
+			ndVector upVector(rootBody->GetMatrix().m_up);
 			ndJointBilateralConstraint* joint[4];
 			for (ndInt32 i = 0; i < 4; ++i)
 			{
@@ -620,7 +622,14 @@ namespace ndQuadruped_1
 				effector->SetLocalTargetPosition(posit);
 				effector->SetSwivelAngle(0.0f);
 
+				// calculate lookAt angle
+				ndMatrix lookAtMatrix0;
+				ndMatrix lookAtMatrix1;
+				info.m_lookAtJoint->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
+				const ndFloat32 lookAngle = info.m_lookAtJoint->CalculateAngle(upVector.Scale(-1.0f), lookAtMatrix0[1], lookAtMatrix0[0]);
+				info.m_lookAtJoint->SetOffsetAngle(lookAngle);
 			}
+
 			m_invDynamicsSolver.SolverBegin(skeleton, joint, 4, world, timestep);
 			m_invDynamicsSolver.Solve();
 			m_invDynamicsSolver.SolverEnd();
@@ -676,12 +685,6 @@ namespace ndQuadruped_1
 
 			ImGui::Text("animSpeed");
 			change = change | ImGui::SliderFloat("##animSpeed", &control->m_animSpeed, 0.0f, 1.0f);
-
-			//if (change)
-			//{
-			//	// TODO: apply control changes.
-			//	//ndQuadrupedModel::ndEffectorInfo& info = model->m_effectorsInfo[0];
-			//}
 		}
 
 		ndSharedPtr<ndModel> m_model;
