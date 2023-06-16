@@ -508,7 +508,7 @@ namespace ndQuadruped_1
 			{
 				// generate a procedural in place march gait
 				const ndFloat32 gaitFraction = 0.25f;
-				ndFloat32 amp = 0.2f;
+				ndFloat32 amp = 0.27f;
 				ndFloat32 omega = ndPi / gaitFraction;
 
 				ndFloat32 high = -0.3f;

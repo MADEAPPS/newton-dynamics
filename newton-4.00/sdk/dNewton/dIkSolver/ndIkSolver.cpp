@@ -480,21 +480,21 @@ void ndIkSolver::Solve()
 
 			//ndVector accel(invMass * (body->m_accel + m_internalForces[i].m_linear));
 			//ndVector alpha(invInertia.RotateVector(body->m_alpha + m_internalForces[i].m_angular));
-			const ndVector accel(invMass * body->m_accel);
-			const ndVector alpha(invInertia.RotateVector(body->m_alpha));
+			ndVector accel(invMass * body->m_accel);
+			ndVector alpha(invInertia.RotateVector(body->m_alpha));
 			
 			ndFloat32 maxAccel2 = accel.DotProduct(accel).GetScalar();
 			if (maxAccel2 > (m_maxAccel * m_maxAccel))
 			{
-				ndAssert(0);
-				//accel = accel.Normalize().Scale(m_maxAccel);
+				ndTrace(("inv dynamics exceeding max lineal acceleration\n"));
+				accel = accel.Normalize().Scale(m_maxAccel);
 			}
 			
 			ndFloat32 maxAlpha2 = alpha.DotProduct(alpha).GetScalar();
 			if (maxAlpha2 > (m_maxAlpha * m_maxAlpha))
 			{
-				ndAssert(0);
-				//alpha = alpha.Normalize().Scale(m_maxAlpha);
+				ndTrace(("inv dynamics exceeding max angular acceleration\n"));
+				alpha = alpha.Normalize().Scale(m_maxAlpha);
 			}
 			
 			accelerations[i].m_linear = accel;
