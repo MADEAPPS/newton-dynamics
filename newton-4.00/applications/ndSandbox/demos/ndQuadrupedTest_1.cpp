@@ -800,7 +800,7 @@ namespace ndQuadruped_1
 				// add joint limit to prevent knee from flipping
 				lookActHinge = new ndJointHinge(caffPinAndPivotFrame, calf1->GetAsBodyKinematic(), calf0Node->m_body->GetAsBodyKinematic());
 				lookActHinge->SetLimitState(true);
-				lookActHinge->SetLimits(-60.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
+				lookActHinge->SetLimits(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
 				lookActHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
 		
 				ndSharedPtr<ndJointBilateralConstraint> hingePtr(lookActHinge);
