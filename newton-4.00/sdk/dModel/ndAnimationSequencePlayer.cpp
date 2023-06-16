@@ -73,10 +73,6 @@ void ndAnimationSequencePlayer::SetTime(ndFloat32 time)
 			//ndAssert(0);
 		}
 	}
-	else
-	{
-		ndAssert(0);
-	}
 
 	m_time = t1;
 	ndAssert(m_time >= 0.0f);

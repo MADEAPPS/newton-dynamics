@@ -490,6 +490,25 @@ namespace ndQuadruped_1
 	class ndModelQuadruped: public ndModelArticulation
 	{
 		public:
+		class ndEffectorInfo
+		{
+			public:
+			ndEffectorInfo()
+				:m_lookAtJoint(nullptr)
+				,m_effector(nullptr)
+			{
+			}
+
+			ndEffectorInfo(const ndSharedPtr<ndJointBilateralConstraint>& effector, ndJointHinge* const lookActJoint)
+				:m_lookAtJoint(lookActJoint)
+				,m_effector(effector)
+			{
+			}
+
+			ndJointHinge* m_lookAtJoint;
+			ndSharedPtr<ndJointBilateralConstraint> m_effector;
+		};
+
 		class ndPoseGenerator : public ndAnimationSequence
 		{
 			public:
@@ -512,7 +531,7 @@ namespace ndQuadruped_1
 				ndFloat32 omega = ndPi / gaitFraction;
 
 				ndFloat32 high = -0.3f;
-				ndVector base (ndVector::m_zero);
+				ndVector base (ndVector::m_wOne);
 				base.m_x = 0.4f;
 				base.m_y = high;
 				for (ndInt32 i = 0; i < 4; i++)
@@ -531,7 +550,7 @@ namespace ndQuadruped_1
 			ndFloat32 m_offset[4];
 		};
 
-		class ndUIControlNode : public ndAnimationBlendTreeNode
+		class ndUIControlNode: public ndAnimationBlendTreeNode
 		{
 			public:
 			ndUIControlNode(ndAnimationBlendTreeNode* const input)
@@ -542,38 +561,38 @@ namespace ndQuadruped_1
 				,m_pitch(ndReal(0.0f))
 				,m_yaw(ndReal(0.0f))
 				,m_roll(ndReal(0.0f))
+				,m_animSpeed(ndReal(0.0f))
 			{
 			}
 
 			void Evaluate(ndAnimationPose& output, ndVector& veloc)
 			{
 				ndAnimationBlendTreeNode::Evaluate(output, veloc);
+
+				ndMatrix matrix(ndPitchMatrix(m_pitch * ndDegreeToRad) * ndYawMatrix(m_yaw * ndDegreeToRad) * ndRollMatrix(m_roll * ndDegreeToRad));
+				matrix.m_posit.m_x = m_x;
+				matrix.m_posit.m_y = m_y;
+				matrix.m_posit.m_z = m_z;
+				for (ndInt32 i = 0; i < output.GetCount(); ++i)
+				{
+					ndAnimKeyframe& keyFrame = output[i];
+					ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
+					ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+					const ndMatrix& localMatrix = effector->GetLocalMatrix1();
+					ndVector p0(localMatrix.TransformVector(keyFrame.m_posit));
+					ndVector p1(matrix.TransformVector(p0));
+					ndVector p2(localMatrix.UntransformVector(p1));
+					keyFrame.m_posit = p2;
+				}
 			}
+
 			ndReal m_x;
 			ndReal m_y;
 			ndReal m_z;
 			ndReal m_pitch;
 			ndReal m_yaw;
 			ndReal m_roll;
-		};
-
-		class ndEffectorInfo
-		{
-			public:
-			ndEffectorInfo()
-				:m_lookAtJoint(nullptr)
-				,m_effector(nullptr)
-			{
-			}
-
-			ndEffectorInfo(const ndSharedPtr<ndJointBilateralConstraint>& effector, ndJointHinge* const lookActJoint)
-				:m_lookAtJoint(lookActJoint)
-				,m_effector(effector)
-			{
-			}
-
-			ndJointHinge* m_lookAtJoint;
-			ndSharedPtr<ndJointBilateralConstraint> m_effector;
+			ndReal m_animSpeed;
 		};
 		
 		ndModelQuadruped()
@@ -584,7 +603,7 @@ namespace ndQuadruped_1
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndVector veloc;
-			m_animBlendTree->Update(timestep * 0.1f);
+			m_animBlendTree->Update(timestep * m_control->m_animSpeed);
 			m_animBlendTree->Evaluate(m_animPose, veloc);
 
 			ndSkeletonContainer* const skeleton = GetRoot()->m_body->GetAsBodyKinematic()->GetSkeleton();
@@ -649,17 +668,20 @@ namespace ndQuadruped_1
 			change = change | ImGui::SliderFloat("##z", &control->m_z, -0.1f, 0.1f);
 
 			ImGui::Text("pitch");
-			change = change | ImGui::SliderFloat("##pitch", &control->m_pitch, -10.0f, 10.0f);
+			change = change | ImGui::SliderFloat("##pitch", &control->m_pitch, -15.0f, 15.0f);
 			ImGui::Text("yaw");
-			change = change | ImGui::SliderFloat("##yaw", &control->m_yaw, -10.0f, 10.0f);
+			change = change | ImGui::SliderFloat("##yaw", &control->m_yaw, -15.0f, 15.0f);
 			ImGui::Text("roll");
-			change = change | ImGui::SliderFloat("##roll", &control->m_roll, -10.0f, 10.0f);
+			change = change | ImGui::SliderFloat("##roll", &control->m_roll, -15.0f, 15.0f);
 
-			if (change)
-			{
-				// TODO: apply control changes.
-				//ndQuadrupedModel::ndEffectorInfo& info = model->m_effectorsInfo[0];
-			}
+			ImGui::Text("animSpeed");
+			change = change | ImGui::SliderFloat("##animSpeed", &control->m_animSpeed, 0.0f, 1.0f);
+
+			//if (change)
+			//{
+			//	// TODO: apply control changes.
+			//	//ndQuadrupedModel::ndEffectorInfo& info = model->m_effectorsInfo[0];
+			//}
 		}
 
 		ndSharedPtr<ndModel> m_model;
