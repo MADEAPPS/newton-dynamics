@@ -113,14 +113,14 @@ namespace biped_1
 			const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
 			const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
 
-			ndUnsigned64 pointer0 = material0.m_userParam[ndContactCallback::m_modelPointer].m_intData;
-			ndUnsigned64 pointer1 = material1.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+			ndUnsigned64 pointer0 = material0.m_userParam[ndDemoContactCallback::m_modelPointer].m_intData;
+			ndUnsigned64 pointer1 = material1.m_userParam[ndDemoContactCallback::m_modelPointer].m_intData;
 			if (pointer0 == pointer1)
 			{
 				// here we know the part are from the same model.
 				// we can apply some more filtering by for now we just disable all self model collisions. 
-				ndUnsigned64 selfCollide0 = material0.m_userParam[ndContactCallback::m_materialFlags].m_intData;
-				ndUnsigned64 selfCollide1 = material1.m_userParam[ndContactCallback::m_materialFlags].m_intData;
+				ndUnsigned64 selfCollide0 = material0.m_userParam[ndDemoContactCallback::m_materialFlags].m_intData;
+				ndUnsigned64 selfCollide1 = material1.m_userParam[ndDemoContactCallback::m_materialFlags].m_intData;
 				if (!(selfCollide0 || selfCollide1))
 				{
 					return false;
@@ -596,9 +596,9 @@ namespace biped_1
 
 		// save the shape material type
 		ndShapeInstance& instanceShape = body->GetCollisionShape();
-		instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
-		instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_ptrData = model;
-		instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_materialFlags].m_intData = ndUnsigned64(definition.m_selfCollide);
+		instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+		instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = model;
+		instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_materialFlags].m_intData = ndUnsigned64(definition.m_selfCollide);
 
 		return body->GetAsBodyDynamic();
 	}
@@ -777,8 +777,8 @@ void ndBipedTest_1(ndDemoEntityManager* const scene)
 	material.m_dynamicFriction1 = 0.9f;
 	
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
+	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_default);
+	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
 	
 	ndMatrix origin(ndGetIdentityMatrix());
 	//origin.m_posit.m_x += 20.0f;

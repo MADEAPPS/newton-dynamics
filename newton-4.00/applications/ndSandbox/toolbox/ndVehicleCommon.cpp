@@ -278,8 +278,8 @@ bool ndVehicleMaterial::OnAabbOverlap(const ndContact* const joint, ndFloat32 ti
 	const ndShapeMaterial& material0 = joint->GetBody0()->GetCollisionShape().GetMaterial();
 	const ndShapeMaterial& material1 = joint->GetBody1()->GetCollisionShape().GetMaterial();
 
-	ndUnsigned64 pointer0 = material0.m_userParam[ndContactCallback::m_modelPointer].m_intData;
-	ndUnsigned64 pointer1 = material1.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+	ndUnsigned64 pointer0 = material0.m_userParam[ndDemoContactCallback::m_modelPointer].m_intData;
+	ndUnsigned64 pointer1 = material1.m_userParam[ndDemoContactCallback::m_modelPointer].m_intData;
 	if (pointer0 == pointer1)
 	{
 		// vehicle do not self collide
@@ -351,8 +351,8 @@ void ndVehicleCommon::SetChassis(ndBodyKinematic* const chassis)
 	AddChassis(chassis);
 	// assign chassis material id.
 	ndShapeInstance& instanceShape = chassis->GetCollisionShape();
-	instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
-	instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_ptrData = this;
+	instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+	instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = this;
 }
 
 void ndVehicleCommon::CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const
@@ -412,8 +412,8 @@ ndBodyKinematic* ndVehicleCommon::CreateTireBody(ndDemoEntityManager* const scen
 	tireBody->SetMassMatrix(definition.m_mass, tireCollision);
 
 	ndShapeInstance& instanceShape = tireBody->GetCollisionShape();
-	instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicleTirePart;
-	instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_ptrData = (void*)this;
+	instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_vehicleTirePart;
+	instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = (void*)this;
 
 	return tireBody;
 }

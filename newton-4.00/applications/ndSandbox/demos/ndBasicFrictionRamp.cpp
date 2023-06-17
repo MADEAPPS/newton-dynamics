@@ -49,7 +49,7 @@ class FrictionMaterial : public ndApplicationMaterial
 		for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
 		{
 			ndContactMaterial& contactPoint = contactPointsNode->GetInfo();
-			ndFloat32 friction = contactPoint.m_shapeInstance0->m_shapeMaterial.m_userParam[ndContactCallback::m_friction].m_floatData;
+			ndFloat32 friction = contactPoint.m_shapeInstance0->m_shapeMaterial.m_userParam[ndDemoContactCallback::m_friction].m_floatData;
 			contactPoint.m_material.m_staticFriction0 = friction;
 			contactPoint.m_material.m_staticFriction1 = friction;
 			contactPoint.m_material.m_dynamicFriction0 = friction;
@@ -105,7 +105,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 
 	FrictionMaterial material;
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_frictionTest, ndApplicationMaterial::m_default);
+	callback->RegisterMaterial(material, ndDemoContactCallback::m_frictionTest, ndDemoContactCallback::m_default);
 
 	ndMatrix matrix(ndPitchMatrix(30.0f * ndDegreeToRad));
 	matrix.m_posit.m_y = 5.0f;
@@ -144,14 +144,11 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 
 		// assign material id to the collision shape.
 		ndShapeInstance& instanceShape = boxBody->GetCollisionShape();
-		instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_frictionTest;
+		instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_frictionTest;
 
 		// save fiction coefficient
 		ndFloat32 frictionValue = ndFloat32(i) / 15.0f;
-		instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_friction].m_floatData = frictionValue;
-
-		// set the user flag so that it is read in the contact callback for doing stuff
-		material.m_userFlags |= ndApplicationMaterial::m_playSound;
+		instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_friction].m_floatData = frictionValue;
 	}
 }
 

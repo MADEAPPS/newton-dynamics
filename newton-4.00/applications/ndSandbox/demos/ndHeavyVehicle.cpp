@@ -826,11 +826,11 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	material.m_dynamicFriction1 = 0.8f;
 
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicleTirePart, ndApplicationMaterial::m_default);
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicleTirePart, ndApplicationMaterial::m_modelPart);
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicleTirePart, ndApplicationMaterial::m_vehicleTirePart);
+	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_default);
+	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
+	callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_default);
+	callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_modelPart);
+	callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_vehicleTirePart);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndVector location(0.0f, 2.0f, 0.0f, 1.0f);

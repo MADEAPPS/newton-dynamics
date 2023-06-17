@@ -26,6 +26,7 @@
 #include <ndModelNotify.h>
 #include <ndFbxMeshLoader.h>
 #include <ndAnimationPose.h>
+#include <ndContactCallback.h>
 #include <ndAnimationSequence.h>
 #include <ndModelPassiveRagdoll.h>
 #include <ndAnimationTwoWayBlend.h>

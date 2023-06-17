@@ -10,7 +10,7 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndContactCallback.h"
+#include "ndPhysicsWorld.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
 ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume()
@@ -87,7 +87,7 @@ void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, ndFlo
 
 			ndShapeMaterial material(collision.GetMaterial());
 			body->GetCollisionShape().SetMaterial(material);
-			ndFloat32 density = material.m_userParam[ndContactCallback::m_density].m_floatData;
+			ndFloat32 density = material.m_userParam[ndDemoContactCallback::m_density].m_floatData;
 			ndFloat32 desplacedVolume = density * collision.GetVolume();
 				
 			ndFloat32 displacedMass = mass.m_w * volume / desplacedVolume;

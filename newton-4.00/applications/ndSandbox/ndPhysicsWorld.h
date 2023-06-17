@@ -15,8 +15,42 @@
 
 #define MAX_PHYSICS_FPS			60.0f
 
+class ndDemoEntity;
 class ndSoundManager;
 class ndDemoEntityManager;
+
+class ndDemoContactCallback : public ndContactCallback
+{
+	public:
+	enum ndMaterialUserIDs
+	{
+		m_default = 0,
+		m_frictionTest = 1,
+		m_aiCar = 2,
+		m_aiTerrain = 3,
+		m_modelPart = 4,
+		m_vehicleTirePart = 5,
+		m_dedris = 100,
+	};
+
+	enum ndMaterialFlags
+	{
+		//m_playSound = 1 << 0,
+		//m_debrisBody = 1 << 1,
+	};
+
+	enum ndMaterialShapeUserIDs
+	{
+		m_density,
+		m_friction,
+		m_modelPointer,
+		m_materialFlags,
+		m_soundSpeedThreshold,
+	};
+
+	ndDemoContactCallback();
+	~ndDemoContactCallback();
+};
 
 class ndPhysicsWorld: public ndWorld
 {

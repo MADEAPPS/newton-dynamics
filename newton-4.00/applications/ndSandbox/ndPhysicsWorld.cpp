@@ -25,6 +25,14 @@
 #define MAX_PHYSICS_STEPS			1
 #define MAX_PHYSICS_FPS				60.0f
 
+ndDemoContactCallback::ndDemoContactCallback()
+{
+}
+
+ndDemoContactCallback::~ndDemoContactCallback()
+{
+}
+
 ndPhysicsWorld::ndDefferentDeleteEntities::ndDefferentDeleteEntities(ndDemoEntityManager* const manager)
 	:ndArray<ndDemoEntity*>()
 	,m_manager(manager)
@@ -69,7 +77,7 @@ ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	,m_deadEntities(manager)
 {
 	ClearCache();
-	SetContactNotify(new ndContactCallback);
+	SetContactNotify(new ndDemoContactCallback);
 }
 
 ndPhysicsWorld::~ndPhysicsWorld()

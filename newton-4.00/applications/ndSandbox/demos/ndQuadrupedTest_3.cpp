@@ -91,8 +91,8 @@ namespace ndQuadruped_3
 			const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
 			const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
 
-			ndUnsigned64 pointer0 = material0.m_userParam[ndContactCallback::m_modelPointer].m_intData;
-			ndUnsigned64 pointer1 = material1.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+			ndUnsigned64 pointer0 = material0.m_userParam[ndDemoContactCallback::m_modelPointer].m_intData;
+			ndUnsigned64 pointer1 = material1.m_userParam[ndDemoContactCallback::m_modelPointer].m_intData;
 			if (pointer0 == pointer1)
 			{
 				// here we know the part are from the same model.
@@ -456,8 +456,8 @@ namespace ndQuadruped_3
 			body->SetNotifyCallback(new ndDemoEntityNotify(scene, entityPart, parentBone));
 
 			ndShapeInstance& instanceShape = body->GetCollisionShape();
-			instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
-			instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_ptrData = this;
+			instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+			instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = this;
 
 			// add body to the world
 			ndSharedPtr<ndBody> bodyPtr(body);
@@ -687,8 +687,8 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	material.m_dynamicFriction1 = 0.9f;
 	
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
+	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_default);
+	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
 	
 	ndQuadrupedModel* const robot0 = new ndQuadrupedModel(scene, *modelMesh, matrix);
 	scene->SetSelectedModel(robot0);

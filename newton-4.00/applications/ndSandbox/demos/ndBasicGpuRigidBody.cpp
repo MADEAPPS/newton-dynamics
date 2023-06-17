@@ -45,7 +45,7 @@ static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 
 	// save the density with the body shape.
 	ndShapeMaterial material;
-	material.m_userParam[ndContactCallback::m_density].m_floatData = density;
+	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
 	body->GetCollisionShape().SetMaterial(material);
 
 	ndSharedPtr<ndBody> bodyPtr(body);

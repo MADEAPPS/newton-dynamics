@@ -51,8 +51,9 @@ class ndBodyKinematic : public ndBody
 		union
 		{
 			ndUnsigned64 m_tag;
-			struct
+			class
 			{
+				public:
 				ndUnsigned32 m_tagLow;
 				ndUnsigned32 m_tagHigh;
 			};

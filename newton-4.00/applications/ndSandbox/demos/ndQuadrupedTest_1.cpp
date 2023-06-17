@@ -494,18 +494,18 @@ namespace ndQuadruped_1
 		{
 			public:
 			ndEffectorInfo()
-				:m_lookAtJoint(nullptr)
+				:m_footHinge(nullptr)
 				,m_effector(nullptr)
 			{
 			}
 
-			ndEffectorInfo(const ndSharedPtr<ndJointBilateralConstraint>& effector, ndJointHinge* const lookActJoint)
-				:m_lookAtJoint(lookActJoint)
+			ndEffectorInfo(const ndSharedPtr<ndJointBilateralConstraint>& effector, ndJointHinge* const footHinge)
+				:m_footHinge(footHinge)
 				,m_effector(effector)
 			{
 			}
 
-			ndJointHinge* m_lookAtJoint;
+			ndJointHinge* m_footHinge;
 			ndSharedPtr<ndJointBilateralConstraint> m_effector;
 		};
 
@@ -570,9 +570,9 @@ namespace ndQuadruped_1
 				ndAnimationBlendTreeNode::Evaluate(output, veloc);
 
 				ndMatrix matrix(ndPitchMatrix(m_pitch * ndDegreeToRad) * ndYawMatrix(m_yaw * ndDegreeToRad) * ndRollMatrix(m_roll * ndDegreeToRad));
-				matrix.m_posit.m_x = m_x;
-				matrix.m_posit.m_y = m_y;
-				matrix.m_posit.m_z = m_z;
+				matrix.m_posit.m_x = -m_x;
+				matrix.m_posit.m_y = -m_y;
+				matrix.m_posit.m_z = -m_z;
 				for (ndInt32 i = 0; i < output.GetCount(); ++i)
 				{
 					ndAnimKeyframe& keyFrame = output[i];
@@ -625,9 +625,9 @@ namespace ndQuadruped_1
 				// calculate lookAt angle
 				ndMatrix lookAtMatrix0;
 				ndMatrix lookAtMatrix1;
-				info.m_lookAtJoint->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-				const ndFloat32 lookAngle = info.m_lookAtJoint->CalculateAngle(upVector.Scale(-1.0f), lookAtMatrix0[1], lookAtMatrix0[0]);
-				info.m_lookAtJoint->SetOffsetAngle(lookAngle);
+				info.m_footHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
+				const ndFloat32 lookAngle = info.m_footHinge->CalculateAngle(upVector.Scale(-1.0f), lookAtMatrix0[1], lookAtMatrix0[0]);
+				info.m_footHinge->SetOffsetAngle(lookAngle);
 			}
 
 			m_invDynamicsSolver.SolverBegin(skeleton, joint, 4, world, timestep);
@@ -685,6 +685,12 @@ namespace ndQuadruped_1
 
 			ImGui::Text("animSpeed");
 			change = change | ImGui::SliderFloat("##animSpeed", &control->m_animSpeed, 0.0f, 1.0f);
+
+			if (change)
+			{
+				ndBodyKinematic* const body = m_model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
+				body->SetSleepState(false);
+			}
 		}
 
 		ndSharedPtr<ndModel> m_model;
@@ -780,31 +786,35 @@ namespace ndQuadruped_1
 			}
 		
 			// add calf1
-			ndJointHinge* lookActHinge = nullptr;
-			ndModelArticulation::ndNode* calf1Node = nullptr;
+			ndJointHinge* footHinge = nullptr;
+			ndModelArticulation::ndNode* footNode = nullptr;
 			{
 				ndFloat32 lenght = limbLength * 0.5f;
 				limbPivotLocation = ndRollMatrix(-45.0f * ndDegreeToRad) * limbPivotLocation;
 				ndMatrix bodyMatrix(limbPivotLocation);
 				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(lenght * 0.5f);
 		
-				ndSharedPtr<ndBody> calf1 (world->GetBody(AddCapsule(scene, bodyMatrix, limbMass * 0.5f, limbRadios, limbRadios, lenght)));
-				calf1->SetMatrix(bodyMatrix);
+				ndSharedPtr<ndBody> foot (world->GetBody(AddCapsule(scene, bodyMatrix, limbMass * 0.5f, limbRadios, limbRadios, lenght)));
+				foot->SetMatrix(bodyMatrix);
+
+				// set a Material with zero restitution for the feet
+				ndShapeInstance& instanceShape = foot->GetAsBodyDynamic()->GetCollisionShape();
+				instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_frictionTest;
 		
-				ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
-				caffPinAndPivotFrame.m_front = limbPivotLocation.m_right.Scale(-1.0f);
-				caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
-				caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
-				caffPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
+				ndMatrix footPinAndPivotFrame(ndGetIdentityMatrix());
+				footPinAndPivotFrame.m_front = limbPivotLocation.m_right.Scale(-1.0f);
+				footPinAndPivotFrame.m_up = limbPivotLocation.m_front;
+				footPinAndPivotFrame.m_right = footPinAndPivotFrame.m_front.CrossProduct(footPinAndPivotFrame.m_up);
+				footPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
 		
 				// add joint limit to prevent knee from flipping
-				lookActHinge = new ndJointHinge(caffPinAndPivotFrame, calf1->GetAsBodyKinematic(), calf0Node->m_body->GetAsBodyKinematic());
-				lookActHinge->SetLimitState(true);
-				lookActHinge->SetLimits(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
-				lookActHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
+				footHinge = new ndJointHinge(footPinAndPivotFrame, foot->GetAsBodyKinematic(), calf0Node->m_body->GetAsBodyKinematic());
+				footHinge->SetLimitState(true);
+				footHinge->SetLimits(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
+				footHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
 		
-				ndSharedPtr<ndJointBilateralConstraint> hingePtr(lookActHinge);
-				calf1Node = model->AddLimb(calf0Node, calf1, hingePtr);
+				//ndSharedPtr<ndJointBilateralConstraint> hinge(footHinge);
+				footNode = model->AddLimb(calf0Node, foot, ndSharedPtr<ndJointBilateralConstraint>(footHinge));
 		
 				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(lenght);
 				workSpace += lenght;
@@ -812,7 +822,7 @@ namespace ndQuadruped_1
 		
 			// add leg effector
 			{
-				ndBodyKinematic* const targetBody = calf1Node->m_body->GetAsBodyKinematic();
+				ndBodyKinematic* const targetBody = footNode->m_body->GetAsBodyKinematic();
 		
 				ndFloat32 angle(i < 2 ? -90.0f : 90.0f);
 				ndMatrix effectorToeFrame(ndGetIdentityMatrix());
@@ -826,7 +836,7 @@ namespace ndQuadruped_1
 				effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
 				effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
 
-				ndModelQuadruped::ndEffectorInfo info(ndSharedPtr<ndJointBilateralConstraint> (effector), lookActHinge);
+				ndModelQuadruped::ndEffectorInfo info(ndSharedPtr<ndJointBilateralConstraint> (effector), footHinge);
 				model->m_effectorsInfo.PushBack(info);
 
 				ndAnimKeyframe keyFrame;
@@ -850,6 +860,16 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildFlatPlane(scene, true);
+
+	// register a zero restitution and high friction material for the feet
+	ndApplicationMaterial material;
+	material.m_restitution = 0.0f;
+	material.m_staticFriction0 = 0.8f;
+	material.m_staticFriction1 = 0.8f;
+	material.m_dynamicFriction0 = 0.8f;
+	material.m_dynamicFriction1 = 0.8f;
+	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndDemoContactCallback::m_frictionTest, ndDemoContactCallback::m_default);
 	
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	ndWorld* const world = scene->GetWorld();

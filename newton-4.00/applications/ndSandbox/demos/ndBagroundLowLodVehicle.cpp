@@ -251,7 +251,7 @@ static ndShapeInstance CreateCompondCollision()
 
 	// set material ID
 	ndShapeMaterial material(shapeInstance.GetMaterial());
-	material.m_userId = ndApplicationMaterial::m_aiCar;
+	material.m_userId = ndDemoContactCallback::m_aiCar;
 	shapeInstance.SetMaterial(material);
 	return shapeInstance;
 }
@@ -278,7 +278,7 @@ void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene)
 {
 	BackgroundLowLodCVehicleMaterial material;
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_aiCar, ndApplicationMaterial::m_aiTerrain);
+	callback->RegisterMaterial(material, ndDemoContactCallback::m_aiCar, ndDemoContactCallback::m_aiTerrain);
 
 	ndMatrix heighfieldLocation(ndGetIdentityMatrix());
 	heighfieldLocation.m_posit.m_x = -200.0f;
@@ -294,7 +294,7 @@ void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene)
 	//ndBodyKinematic* const mapBody = BuildStaticMesh(scene, "track.fbx", false);
 
 	ndShapeMaterial mapMaterial(mapBody->GetCollisionShape().GetMaterial());
-	mapMaterial.m_userId = ndApplicationMaterial::m_aiTerrain;
+	mapMaterial.m_userId = ndDemoContactCallback::m_aiTerrain;
 	mapBody->GetCollisionShape().SetMaterial(mapMaterial);
 	
 	AddAiVehicle(scene);
