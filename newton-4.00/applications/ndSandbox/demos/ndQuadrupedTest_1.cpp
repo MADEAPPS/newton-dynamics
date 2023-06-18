@@ -293,13 +293,12 @@ namespace ndQuadruped_1
 				{
 					output[i].m_posit = base;
 					output[i].m_posit.m_z = m_offset[i];
-					output[i].m_rotation.m_w = ndFloat32(1.0f);
 					ndFloat32 t = ndMod (param - m_phase[i] + ndFloat32(1.0f), ndFloat32 (1.0f));
 					if (t <= gaitFraction)
 					{
-						output[i].m_rotation.m_w = ndFloat32(0.0f);
 						output[i].m_posit.m_y += amp * ndSin(omega * t);
 					}
+					output[i].m_rotation.m_w = ((t > ndFloat32(0.0f)) && (t < gaitFraction)) ? ndFloat32(0.0f) : ndFloat32(1.0f);
 				}
 			}
 
@@ -408,22 +407,21 @@ namespace ndQuadruped_1
 					context.DrawLine(contactPoints[i], p0, ndVector::m_zero);
 					p0 = contactPoints[i];
 				}
-			
-			//	ndBigVector p0Out;
-			//	ndBigVector p1Out;
-			//	ndBigVector ray_p0(comMatrix.m_posit);
-			//	ndBigVector ray_p1(comMatrix.m_posit);
-			//	ray_p1.m_y -= 1.0f;
-			//
-			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-			//	context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
-			//	context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
+
+				//ndBigVector p0Out;
+				//ndBigVector p1Out;
+				//ndBigVector ray_p0(comMatrix.m_posit);
+				//ndBigVector ray_p1(comMatrix.m_posit);
+				//ray_p1.m_y -= 1.0f;
+				//
+				//ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
+				//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
+				//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
 			}
 			else if (contactPoints.GetCount() == 2)
 			{
-				//ndAssert(0);
+				context.DrawLine(contactPoints[0], contactPoints[1], ndVector::m_zero);
 			}
-
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
