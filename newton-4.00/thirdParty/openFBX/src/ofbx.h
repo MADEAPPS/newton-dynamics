@@ -1,5 +1,5 @@
-#ifndef __D_OFBX_H__
-#define __D_OFBX_H__
+#ifndef __ND_OFBX_H__
+#define __ND_OFBX_H__
 
 namespace ofbx
 {
@@ -19,34 +19,30 @@ namespace ofbx
 	static_assert(sizeof(u64) == 8, "u64 is not 8 bytes");
 	static_assert(sizeof(i64) == 8, "i64 is not 8 bytes");
 
-
 	using JobFunction = void (*)(void*);
 	using JobProcessor = void (*)(JobFunction, void*, void*, u32, u32);
 
-	enum class LoadFlags : u64 {
+	enum class LoadFlags : u64 
+	{
 		TRIANGULATE = 1 << 0,
 		IGNORE_GEOMETRY = 1 << 1,
 		IGNORE_BLEND_SHAPES = 1 << 2,
 	};
-
 
 	struct Vec2
 	{
 		double x, y;
 	};
 
-
 	struct Vec3
 	{
 		double x, y, z;
 	};
 
-
 	struct Vec4
 	{
 		double x, y, z, w;
 	};
-
 
 	struct Matrix
 	{
@@ -57,18 +53,15 @@ namespace ofbx
 		};
 	};
 
-
 	struct Quat
 	{
 		double x, y, z, w;
 	};
 
-
 	struct Color
 	{
 		float r, g, b;
 	};
-
 
 	struct DataView
 	{
@@ -101,7 +94,6 @@ namespace ofbx
 		}
 	};
 
-
 	struct IElementProperty
 	{
 		enum Type : unsigned char
@@ -129,7 +121,6 @@ namespace ofbx
 		virtual bool getValues(i64* values, int max_size) const = 0;
 	};
 
-
 	struct IElement
 	{
 		virtual ~IElement() = default;
@@ -138,7 +129,6 @@ namespace ofbx
 		virtual DataView getID() const = 0;
 		virtual IElementProperty* getFirstProperty() const = 0;
 	};
-
 
 	enum class RotationOrder
 	{
@@ -151,12 +141,10 @@ namespace ofbx
 		SPHERIC_XYZ // Currently unsupported. Treated as EULER_XYZ.
 	};
 
-
 	struct AnimationCurveNode;
 	struct AnimationLayer;
 	struct Scene;
 	struct IScene;
-
 
 	struct Object
 	{
@@ -209,7 +197,6 @@ namespace ofbx
 		Matrix evalLocal(const Vec3& translation, const Vec3& rotation, const Vec3& scaling) const;
 		bool isNode() const { return is_node; }
 
-
 		template <typename T> T* resolveObjectLink(int idx) const
 		{
 			return static_cast<T*>(resolveObjectLink(T::s_type, nullptr, idx));
@@ -225,15 +212,14 @@ namespace ofbx
 		const Scene& scene;
 	};
 
-
-	struct Pose : Object {
+	struct Pose : Object 
+	{
 		static const Type s_type = Type::POSE;
 		Pose(const Scene& _scene, const IElement& _element);
 
 		virtual Matrix getMatrix() const = 0;
 		virtual const Object* getNode() const = 0;
 	};
-
 
 	struct Texture : Object
 	{
@@ -256,7 +242,6 @@ namespace ofbx
 		virtual DataView getRelativeFileName() const = 0;
 		virtual DataView getEmbeddedData() const = 0;
 	};
-
 
 	struct Material : Object
 	{
@@ -283,7 +268,6 @@ namespace ofbx
 		virtual const Texture* getTexture(Texture::TextureType type) const = 0;
 	};
 
-
 	struct Cluster : Object
 	{
 		static const Type s_type = Type::CLUSTER;
@@ -299,7 +283,6 @@ namespace ofbx
 		virtual const Object* getLink() const = 0;
 	};
 
-
 	struct Skin : Object
 	{
 		static const Type s_type = Type::SKIN;
@@ -309,7 +292,6 @@ namespace ofbx
 		virtual int getClusterCount() const = 0;
 		virtual const Cluster* getCluster(int idx) const = 0;
 	};
-
 
 	struct BlendShapeChannel : Object
 	{
@@ -322,7 +304,6 @@ namespace ofbx
 		virtual const struct Shape* getShape(int idx) const = 0;
 	};
 
-
 	struct BlendShape : Object
 	{
 		static const Type s_type = Type::BLEND_SHAPE;
@@ -333,7 +314,6 @@ namespace ofbx
 		virtual const BlendShapeChannel* getBlendShapeChannel(int idx) const = 0;
 	};
 
-
 	struct NodeAttribute : Object
 	{
 		static const Type s_type = Type::NODE_ATTRIBUTE;
@@ -342,7 +322,6 @@ namespace ofbx
 
 		virtual DataView getAttributeType() const = 0;
 	};
-
 
 	struct Geometry : Object
 	{
@@ -368,7 +347,6 @@ namespace ofbx
 		virtual Color getRgbDisplayColor() const = 0;
 	};
 
-
 	struct Shape : Object
 	{
 		static const Type s_type = Type::SHAPE;
@@ -380,7 +358,6 @@ namespace ofbx
 
 		virtual const Vec3* getNormals() const = 0;
 	};
-
 
 	struct Mesh : Object
 	{
@@ -395,7 +372,6 @@ namespace ofbx
 		virtual int getMaterialCount() const = 0;
 	};
 
-
 	struct AnimationStack : Object
 	{
 		static const Type s_type = Type::ANIMATION_STACK;
@@ -403,7 +379,6 @@ namespace ofbx
 		AnimationStack(const Scene& _scene, const IElement& _element);
 		virtual const AnimationLayer* getLayer(int index) const = 0;
 	};
-
 
 	struct AnimationLayer : Object
 	{
@@ -414,7 +389,6 @@ namespace ofbx
 		virtual const AnimationCurveNode* getCurveNode(int index) const = 0;
 		virtual const AnimationCurveNode* getCurveNode(const Object& bone, const char* property) const = 0;
 	};
-
 
 	struct AnimationCurve : Object
 	{
@@ -427,7 +401,6 @@ namespace ofbx
 		virtual const float* getKeyValue() const = 0;
 	};
 
-
 	struct AnimationCurveNode : Object
 	{
 		static const Type s_type = Type::ANIMATION_CURVE_NODE;
@@ -439,7 +412,6 @@ namespace ofbx
 		virtual const Object* getBone() const = 0;
 	};
 
-
 	struct TakeInfo
 	{
 		DataView name;
@@ -450,7 +422,6 @@ namespace ofbx
 		double reference_time_to;
 	};
 
-
 	// Specifies which canonical axis represents up in the system (typically Y or Z).
 	enum UpVector
 	{
@@ -459,7 +430,6 @@ namespace ofbx
 		UpVector_AxisZ = 2
 	};
 
-
 	// Vector with origin at the screen pointing toward the camera.
 	enum FrontVector
 	{
@@ -467,14 +437,12 @@ namespace ofbx
 		FrontVector_ParityOdd = 1
 	};
 
-
 	// Specifies the third vector of the system.
 	enum CoordSystem
 	{
 		CoordSystem_RightHanded = 0,
 		CoordSystem_LeftHanded = 1
 	};
-
 
 	// http://docs.autodesk.com/FBX/2014/ENU/FBX-SDK-Documentation/index.html?url=cpp_ref/class_fbx_time.html,topicNumber=cpp_ref_class_fbx_time_html29087af6-8c2c-4e9d-aede-7dc5a1c2436c,hash=a837590fd5310ff5df56ffcf7c394787e
 	enum FrameRate
@@ -496,7 +464,6 @@ namespace ofbx
 		FrameRate_CUSTOM = 14,
 	};
 
-
 	struct GlobalSettings
 	{
 		UpVector UpAxis = UpVector_AxisX;
@@ -514,7 +481,6 @@ namespace ofbx
 		FrameRate TimeMode = FrameRate_DEFAULT;
 		float CustomFrameRate = -1.0f;
 	};
-
 
 	struct IScene
 	{
@@ -537,16 +503,14 @@ namespace ofbx
 		virtual DataView getEmbeddedData(int index) const = 0;
 		virtual DataView getEmbeddedFilename(int index) const = 0;
 
-	//protected:
 		virtual ~IScene() {}
 	};
-
 
 	IScene* load(const u8* data, int size, u64 flags, JobProcessor job_processor = nullptr, void* job_user_ptr = nullptr);
 	const char* getError();
 	double fbxTimeToSeconds(i64 value);
 	i64 secondsToFbxTime(double value);
 
-	} // namespace ofbx
+} // namespace ofbx
 
 #endif

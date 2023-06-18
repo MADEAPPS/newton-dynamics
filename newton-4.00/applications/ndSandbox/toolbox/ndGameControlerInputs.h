@@ -9,8 +9,8 @@
 * freely
 */
 
-#ifndef __D_GAME_CONTROLLER_INPUTS__
-#define __D_GAME_CONTROLLER_INPUTS__
+#ifndef __ND_GAME_CONTROLLER_INPUTS__
+#define __ND_GAME_CONTROLLER_INPUTS__
 
 #include "ndSandboxStdafx.h"
 class ndDemoEntityManager;

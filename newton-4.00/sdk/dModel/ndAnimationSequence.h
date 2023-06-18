@@ -9,14 +9,14 @@
 * freely
 */
 
-#ifndef __D_ANIMIMATION_SEQUENCE_h__
-#define __D_ANIMIMATION_SEQUENCE_h__
+#ifndef __ND_ANIMIMATION_SEQUENCE_h__
+#define __ND_ANIMIMATION_SEQUENCE_h__
 
 #include "ndAnimationKeyframesTrack.h"
 
 class ndAnimationPose;
 
-class ndAnimationSequence : public ndClassAlloc
+class ndAnimationSequence : public ndContainersFreeListAlloc<ndAnimationSequence>
 {
 	public:
 	ndAnimationSequence();

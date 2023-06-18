@@ -14,7 +14,7 @@
 #include "ndAnimationSequence.h"
 
 ndAnimationSequence::ndAnimationSequence()
-	:ndClassAlloc()
+	:ndContainersFreeListAlloc<ndAnimationSequence>()
 	,m_tracks()
 	,m_translationTrack()
 	,m_name("")

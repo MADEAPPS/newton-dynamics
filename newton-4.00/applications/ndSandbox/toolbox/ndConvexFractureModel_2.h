@@ -9,8 +9,8 @@
 * freely
 */
 
-#ifndef __D_CONVEX_FRACTURE_2_H__
-#define __D_CONVEX_FRACTURE_2_H__
+#ifndef __ND_CONVEX_FRACTURE_2_H__
+#define __ND_CONVEX_FRACTURE_2_H__
 
 #include "ndSandboxStdafx.h"
 

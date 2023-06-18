@@ -9,12 +9,12 @@
 * freely
 */
 
-#ifndef __D_ANIM_ID_BLENDTREE_NODE_h__
-#define __D_ANIM_ID_BLENDTREE_NODE_h__
+#ifndef __ND_ANIM_ID_BLENDTREE_NODE_h__
+#define __ND_ANIM_ID_BLENDTREE_NODE_h__
 
 class ndAnimationPose;
 
-class ndAnimationBlendTreeNode: public ndClassAlloc
+class ndAnimationBlendTreeNode: public ndContainersFreeListAlloc<ndAnimationBlendTreeNode>
 {
 	public:
 	ndAnimationBlendTreeNode(ndAnimationBlendTreeNode* const input);

@@ -9,8 +9,8 @@
 * freely
 */
 
-#ifndef __D_VEHICLE_COMMON_UTIL__
-#define __D_VEHICLE_COMMON_UTIL__
+#ifndef __ND_VEHICLE_COMMON_UTIL__
+#define __ND_VEHICLE_COMMON_UTIL__
 
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntity.h"

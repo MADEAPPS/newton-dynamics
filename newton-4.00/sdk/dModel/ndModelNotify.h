@@ -9,8 +9,8 @@
 * freely
 */
 
-#ifndef __DEMO_MODEL_NOTIFY_H__
-#define __DEMO_MODEL_NOTIFY_H__
+#ifndef __ND_MODEL_NOTIFY_H__
+#define __ND_MODEL_NOTIFY_H__
 
 #include "ndModelStdafx.h"
 

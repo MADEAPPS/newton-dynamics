@@ -24,8 +24,8 @@
 *  Visual C++ 6.0 created by: Julio Jerez
 *
 ****************************************************************************/
-#ifndef __D_HEAP_H__
-#define __D_HEAP_H__
+#ifndef __ND_HEAP_H__
+#define __ND_HEAP_H__
 
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"

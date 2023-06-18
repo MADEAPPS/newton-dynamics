@@ -8,9 +8,9 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __CONTACT_CALLBACK_H__
-#define __CONTACT_CALLBACK_H__
-
+#ifndef __ND_CONTACT_CALLBACK_H__
+#define __ND_CONTACT_CALLBACK_H__
+		  
 class ndApplicationMaterial : public ndMaterial
 {
 	public:

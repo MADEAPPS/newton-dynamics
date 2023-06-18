@@ -27,7 +27,7 @@ class ndFbxMeshLoader : public ndClassAlloc
 	virtual ~ndFbxMeshLoader();
 
 	virtual ndAnimationSequence* LoadAnimation(const char* const fullPathName);
-	virtual ndMesh* LoadMesh(const char* const fullPathName, bool loadAnimation = false);
+	virtual ndMesh* LoadMesh(const char* const fullPathName, bool loadAnimation);
 
 	private:
 	void FreezeScale(ndMesh* const entity);
