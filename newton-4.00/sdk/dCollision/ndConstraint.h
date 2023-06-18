@@ -250,6 +250,9 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	virtual void DebugJoint(ndConstraintDebugCallback&) const;
 	void InitPointParam(ndPointParam& param, const ndVector& p0Global, const ndVector& p1Global) const;
 
+	protected:
+	ndConstraint();
+
 	ndInt32 m_rowCount;
 	ndInt32 m_rowStart;
 	ndUnsigned8 m_active;
@@ -257,9 +260,12 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	ndUnsigned8 m_fence1;
 	ndUnsigned8 m_resting;   // this should be identical to m_fence0, should be removed. 
 	ndUnsigned8 m_isInSkeletonLoop;
-	
-	protected:
-	ndConstraint();
+
+	friend class ndIkSolver;
+	friend class ndDynamicsUpdate;
+	friend class ndSkeletonContainer;
+	friend class ndDynamicsUpdateSoa;
+	friend class ndDynamicsUpdateAvx2;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline ndConstraint::~ndConstraint()

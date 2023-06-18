@@ -53,9 +53,9 @@ class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 
 	D_NEWTON_API void SetTorsionTorque(ndFloat32 springK, ndFloat32 damperC, ndFloat32 springDamperRegularizer);
 	D_NEWTON_API void GetTorsionTorque(ndFloat32& springK, ndFloat32& damperC, ndFloat32& springDamperRegularizer) const;
+	void DebugJoint(ndConstraintDebugCallback&) const {}
 
 	protected:
-	void DebugJoint(ndConstraintDebugCallback&) const {}
 	void JacobianDerivative(ndConstraintDescritor& desc);
 
 	ndFixSizeArray<ndAxles, 2> m_axles;

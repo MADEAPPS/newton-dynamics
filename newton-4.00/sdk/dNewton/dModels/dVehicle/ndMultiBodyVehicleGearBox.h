@@ -42,9 +42,10 @@ class ndMultiBodyVehicleGearBox : public ndJointGear
 	D_NEWTON_API ndFloat32 GetIdleOmega() const;
 	D_NEWTON_API ndFloat32 GetClutchTorque() const;
 	D_NEWTON_API ndFloat32 GetInternalTorqueLoss() const;
+	void DebugJoint(ndConstraintDebugCallback&) const {}
 
 	protected:
-	void DebugJoint(ndConstraintDebugCallback&) const {}
+
 	void JacobianDerivative(ndConstraintDescritor& desc);
 
 	ndFloat32 m_idleOmega;
