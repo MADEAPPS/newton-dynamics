@@ -123,7 +123,6 @@ inline ndMatrix::ndMatrix (const ndFloat32* const array)
 inline ndMatrix::ndMatrix (const ndVector &front, const ndVector &up, const ndVector &right, const ndVector &posit)
 	:m_front (front), m_up(up), m_right(right), m_posit(posit)
 {
-	ndAssert(TestOrthogonal());
 }
 
 inline ndMatrix::~ndMatrix() 

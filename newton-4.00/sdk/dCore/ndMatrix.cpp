@@ -592,5 +592,7 @@ ndMatrix ndGramSchmidt(const ndVector& dir)
 	}
 	right = right.Normalize();
 	ndVector up (right.CrossProduct(front));
+
+	ndAssert(ndMatrix(front, up, right, ndVector::m_wOne).TestOrthogonal());
 	return ndMatrix(front, up, right, ndVector::m_wOne);
 }
