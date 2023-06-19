@@ -19,7 +19,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 1
+#if 0
 void ndBasicRigidBody (ndDemoEntityManager* const scene)
 {
 	// build a floor
@@ -68,20 +68,35 @@ class ndModelDragLine : public ndModelArticulation
         ,m_controlJoint(nullptr)
     {
         auto pMainBody = AddBox(scene, origin, 1500000.0, 4.0, 8.0, 8.0);
+
+        // Misho
+        origin.m_posit.m_y += 20.f;
+        auto pMainBody2 = AddBox(scene, origin, 1500000.0, 4.0, 8.0, 8.0);
+        ndMatrix m(pMainBody2->GetMatrix());
+        m.m_posit.m_y = 20.0f;
+        pMainBody2->SetMatrix(m);
+
+        ndMatrix Gmatrix(ndGetIdentityMatrix());
+        Gmatrix.m_posit = ((pMainBody->GetMatrix().m_posit + pMainBody2->GetMatrix().m_posit).Scale(0.5f));
+        ndJointFix6dof* const joint = new ndJointFix6dof(Gmatrix, pMainBody, pMainBody2);
+        ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+        ndWorld* myworld = scene->GetWorld();
+        myworld->AddJoint(jointPtr);
+
         auto pAxleBody = AddBox(scene, ndGetIdentityMatrix(), 100.0, 0.2, 1.3, 0.4);
         auto pCamLeverBody = AddBox(scene, ndGetIdentityMatrix(), 100.0, 0.2, 1.3, 0.4);
         auto pLegBody = AddBox(scene, ndGetIdentityMatrix(), 1000.0, 0.4, 3.0, 1.0);
-
+        
         pMainBody->SetAutoSleep(false);
-
+        
         ndSharedPtr<ndJointBilateralConstraint> axleHinge (CreateHinge(pMainBody, pAxleBody, ndVector(-2.1, -2.5, 0.0, 1.0), ndVector(0.0, -0.45, 0.0, 1.0), ndVector(1.0, 0.0, 0.0, 0.0), ndVector(1.0, 0.0, 0.0, 0.0)));
         ndSharedPtr<ndJointBilateralConstraint> camHinge(CreateHinge(pMainBody, pCamLeverBody, ndVector(-2.47, -1.0, 0.0, 1.0), ndVector(0.0, -0.45, 0.0, 1.0), ndVector(1.0, 0.0, 0.0, 0.0), ndVector(1.0, 0.0, 0.0, 0.0)));
         ndSharedPtr<ndJointBilateralConstraint> axleLegHinge (CreateHinge(pAxleBody, pLegBody, ndVector(0.0, 0.3, 0.0, 1.0), ndVector(0.37, -0.35, 0.35, 1.0), ndVector(1.0, 0.0, 0.0, 0.0), ndVector(1.0, 0.0, 0.0, 0.0)));
         ndSharedPtr<ndJointBilateralConstraint> camLegHinge (CreateHinge(pCamLeverBody, pLegBody, ndVector(0.0, 0.45, 0.0, 1.0), ndVector(0.0, 1.25, 0.25, 1.0), ndVector(1.0, 0.0, 0.0, 0.0), ndVector(1.0, 0.0, 0.0, 0.0)));
-
+        
         // build the articulated model structure
         ndWorld* const world = scene->GetWorld();
-
+        
         ndNode* const rootNode = AddRootBody(world->GetBody(pMainBody));
         
         ndNode* const axleNode = AddLimb(rootNode, world->GetBody(pAxleBody), axleHinge);
@@ -89,7 +104,7 @@ class ndModelDragLine : public ndModelArticulation
          
         ndNode* const camNode = AddLimb(rootNode, world->GetBody(pCamLeverBody), camHinge);
         AddLimb(camNode, world->GetBody(pLegBody), camLegHinge);
-
+        
         // save the motor joint. for controlling
         m_angle = 0.0;
         m_controlJoint = (ndCustomJointHinge*) *axleHinge;
@@ -145,9 +160,12 @@ class ndModelDragLine : public ndModelArticulation
 
     void Update(ndWorld* const, ndFloat32 timestep)
     {
-        m_angle += ndFmod(1.0f * timestep, 2.0f * ndPi);
-        ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
-        m_controlJoint->SetOffsetAngle(dist);
+        if (m_controlJoint)
+        {
+            m_angle += ndFmod(1.0f * timestep, 2.0f * ndPi);
+            ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
+            m_controlJoint->SetOffsetAngle(dist);
+        }
     }
 
     ndFloat32 m_angle;
