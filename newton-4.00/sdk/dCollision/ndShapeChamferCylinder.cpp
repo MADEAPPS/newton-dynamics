@@ -375,7 +375,7 @@ ndInt32 ndShapeChamferCylinder::CalculatePlaneIntersection(const ndVector& norma
 	const ndFloat32 inclination = ndFloat32(0.9999f);
 	if (normal.m_x < -inclination) 
 	{
-		ndMatrix matrix(normal);
+		ndMatrix matrix(ndGramSchmidt(normal));
 		ndFloat32 x = ndSqrt(ndMax(m_height * m_height - origin.m_x * origin.m_x, ndFloat32(0.0f)));
 		matrix.m_posit.m_x = origin.m_x;
 		count = BuildCylinderCapPoly(m_radius + x, matrix, contactsOut);
@@ -383,7 +383,7 @@ ndInt32 ndShapeChamferCylinder::CalculatePlaneIntersection(const ndVector& norma
 	}
 	else if (normal.m_x > inclination) 
 	{
-		ndMatrix matrix(normal);
+		ndMatrix matrix(ndGramSchmidt(normal));
 		ndFloat32 x = ndSqrt(ndMax(m_height * m_height - origin.m_x * origin.m_x, ndFloat32(0.0f)));
 		matrix.m_posit.m_x = origin.m_x;
 		count = BuildCylinderCapPoly(m_radius + x, matrix, contactsOut);

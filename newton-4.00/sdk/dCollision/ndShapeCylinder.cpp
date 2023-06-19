@@ -282,7 +282,7 @@ ndInt32 ndShapeCylinder::CalculatePlaneIntersection(const ndVector& normal, cons
 	{
 		if (normal.m_x < -inclination) 
 		{
-			ndMatrix matrix(normal);
+			ndMatrix matrix(ndGramSchmidt (normal));
 			matrix.m_posit.m_x = origin.m_x;
 			count = BuildCylinderCapPoly(m_radius0, matrix, contactsOut);
 			//count = RectifyConvexSlice(n, normal, contactsOut);
@@ -330,7 +330,7 @@ ndInt32 ndShapeCylinder::CalculatePlaneIntersection(const ndVector& normal, cons
 	{
 		if (normal.m_x > inclination) 
 		{
-			ndMatrix matrix(normal);
+			ndMatrix matrix(ndGramSchmidt(normal));
 			matrix.m_posit.m_x = origin.m_x;
 			count = BuildCylinderCapPoly(m_radius1, matrix, contactsOut);
 			//count = RectifyConvexSlice(n, normal, contactsOut);

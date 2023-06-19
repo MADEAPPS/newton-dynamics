@@ -46,7 +46,7 @@ void ndJointFollowPath::JacobianDerivative(ndConstraintDescritor& desc)
 		pathTangent = pathTangent.Scale (-1.0f);
 	}
 
-	matrix1 = ndMatrix(pathTangent);
+	matrix1 = ndMatrix(ndGramSchmidt(pathTangent));
 	matrix1.m_posit = pathPosit;
 	matrix1.m_posit.m_w = 1.0f;
 	

@@ -63,7 +63,7 @@ void ndJointFixDistance::JacobianDerivative(ndConstraintDescritor& desc)
 		dir = dir.Scale(1.0f / ndSqrt(mag2));
 		ndFloat32 x = ndSqrt (mag2) - m_distance;
 
-		ndMatrix matrix(dir);
+		ndMatrix matrix(ndGramSchmidt(dir));
 		ndVector com0(m_body0->GetCentreOfMass());
 		ndMatrix body0Matrix(m_body0->GetMatrix());
 		ndVector veloc0(m_body0->GetVelocityAtPoint(p0));

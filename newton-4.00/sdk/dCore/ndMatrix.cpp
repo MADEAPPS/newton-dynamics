@@ -535,7 +535,7 @@ const ndMatrix& ndGetIdentityMatrix()
 		ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
 		ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
 		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f)),
-		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+		ndVector::m_wOne);
 	return identityMatrix;
 }
 
@@ -553,7 +553,7 @@ ndMatrix ndPitchMatrix(ndFloat32 ang)
 		ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
 		ndVector(ndFloat32(0.0f), cosAng, sinAng, ndFloat32(0.0f)),
 		ndVector(ndFloat32(0.0f), -sinAng, cosAng, ndFloat32(0.0f)),
-		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+		ndVector::m_wOne);
 }
 
 ndMatrix ndYawMatrix(ndFloat32 ang)
@@ -564,7 +564,7 @@ ndMatrix ndYawMatrix(ndFloat32 ang)
 		ndVector(cosAng, ndFloat32(0.0f), -sinAng, ndFloat32(0.0f)),
 		ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
 		ndVector(sinAng, ndFloat32(0.0f), cosAng, ndFloat32(0.0f)),
-		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+		ndVector::m_wOne);
 }
 
 ndMatrix ndRollMatrix(ndFloat32 ang)
@@ -574,6 +574,23 @@ ndMatrix ndRollMatrix(ndFloat32 ang)
 	return ndMatrix(ndVector(cosAng, sinAng, ndFloat32(0.0f), ndFloat32(0.0f)),
 		ndVector(-sinAng, cosAng, ndFloat32(0.0f), ndFloat32(0.0f)),
 		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f)),
-		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+		ndVector::m_wOne);
 }
 
+ndMatrix ndGramSchmidt(const ndVector& dir)
+{
+	ndVector right;
+	ndVector front((dir & ndVector::m_triplexMask).Normalize());
+	
+	if (ndAbs(front.m_z) > ndFloat32(0.577f))
+	{
+		right = front.CrossProduct(ndVector(-front.m_y, front.m_z, ndFloat32(0.0f), ndFloat32(0.0f)));
+	}
+	else
+	{
+		right = front.CrossProduct(ndVector(-front.m_y, front.m_x, ndFloat32(0.0f), ndFloat32(0.0f)));
+	}
+	right = right.Normalize();
+	ndVector up (right.CrossProduct(front));
+	return ndMatrix(front, up, right, ndVector::m_wOne);
+}

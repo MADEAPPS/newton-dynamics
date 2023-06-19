@@ -22,7 +22,7 @@ ndJointUpVector::ndJointUpVector()
 ndJointUpVector::ndJointUpVector(const ndVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(2, child, parent, ndGetIdentityMatrix())
 {
-	ndMatrix matrix(normal);
+	ndMatrix matrix(ndGramSchmidt(normal));
 	matrix.m_posit = child->GetMatrix().m_posit;
 
 	CalculateLocalMatrix (matrix, m_localMatrix0, m_localMatrix1);
@@ -35,7 +35,7 @@ ndJointUpVector::~ndJointUpVector()
 // by animating the orientation of the pin vector the application can change the orientation of the picked object
 void ndJointUpVector::SetPinDir (const ndVector& pin)
 {
-	m_localMatrix1 = ndMatrix(pin);
+	m_localMatrix1 = ndGramSchmidt(pin);
 }
 
 void ndJointUpVector::JacobianDerivative(ndConstraintDescritor& desc)

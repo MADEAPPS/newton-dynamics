@@ -30,12 +30,12 @@ ndJointPulley::ndJointPulley(ndFloat32 gearRatio,
 	ndMatrix dommyMatrix;
 
 	// calculate the local matrix for body body0
-	ndMatrix pinAndPivot0(body0Pin);
+	ndMatrix pinAndPivot0(ndGramSchmidt(body0Pin));
 	CalculateLocalMatrix(pinAndPivot0, m_localMatrix0, dommyMatrix);
 	m_localMatrix0.m_posit = ndVector::m_wOne;
 
 	// calculate the local matrix for body body1  
-	ndMatrix pinAndPivot1(body1Pin);
+	ndMatrix pinAndPivot1(ndGramSchmidt(body1Pin));
 	CalculateLocalMatrix(pinAndPivot1, dommyMatrix, m_localMatrix1);
 	m_localMatrix1.m_posit = ndVector::m_wOne;
 

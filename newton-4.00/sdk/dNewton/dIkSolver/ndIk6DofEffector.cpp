@@ -173,7 +173,7 @@ void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndM
 	const ndFloat32 tol = ndFloat32(3.0f * ndPi / 180.0f);
 	if (dirMag2 > (tol * tol))
 	{
-		const ndMatrix basis(pin);
+		const ndMatrix basis(ndGramSchmidt(pin));
 		const ndFloat32 dirMag = ndSqrt(dirMag2);
 		const ndFloat32 angle = ndAtan2(dirMag, rotation.m_w);
 		AddAngularRowJacobian(desc, basis[0], angle);

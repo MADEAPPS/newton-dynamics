@@ -263,7 +263,7 @@ ndInt32 ndShapeCone::CalculatePlaneIntersection(const ndVector& normal, const nd
 		const ndFloat32 inclination = ndFloat32(0.9998f);
 		if (normal.m_x < -inclination) 
 		{
-			ndMatrix matrix(normal);
+			ndMatrix matrix(ndGramSchmidt(normal));
 			matrix.m_posit.m_x = origin.m_x;
 			count = BuildCylinderCapPoly(m_radius, matrix, contactsOut);
 		}

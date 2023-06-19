@@ -36,6 +36,7 @@ D_CORE_API const ndMatrix& ndGetIdentityMatrix();
 D_CORE_API ndMatrix ndPitchMatrix(ndFloat32 ang);
 D_CORE_API ndMatrix ndYawMatrix(ndFloat32 ang);
 D_CORE_API ndMatrix ndRollMatrix(ndFloat32 ang);
+D_CORE_API ndMatrix ndGramSchmidt(const ndVector& dir);
 
 D_MSV_NEWTON_ALIGN_32
 class ndMatrix
@@ -51,7 +52,8 @@ class ndMatrix
 	~ndMatrix();
 
 	// create a orthonormal normal vector basis, front become m_front vector, and m_up and m_right are mutualiperpendicular to fron and to each other
-	ndMatrix (const ndVector &front);
+	// please use function ndGramSchmidt
+	//ndMatrix (const ndVector &front);
 
 	// create a covariance Matrix = transpose(p) * q 
 	ndMatrix (const ndVector& p, const ndVector& q);
@@ -121,6 +123,7 @@ inline ndMatrix::ndMatrix (const ndFloat32* const array)
 inline ndMatrix::ndMatrix (const ndVector &front, const ndVector &up, const ndVector &right, const ndVector &posit)
 	:m_front (front), m_up(up), m_right(right), m_posit(posit)
 {
+	ndAssert(TestOrthogonal());
 }
 
 inline ndMatrix::~ndMatrix() 
@@ -135,22 +138,22 @@ inline ndMatrix::ndMatrix (const ndVector& p, const ndVector& q)
 {
 }
 
-inline ndMatrix::ndMatrix (const ndVector& front)
-	:m_front((front & ndVector::m_triplexMask).Normalize())
-	,m_posit(ndVector::m_wOne)
-{
-	if (ndAbs(m_front.m_z) > ndFloat32 (0.577f)) 
-	{
-		m_right = m_front.CrossProduct(ndVector(-m_front.m_y, m_front.m_z, ndFloat32(0.0f), ndFloat32(0.0f)));
-	}
-	else 
-	{
-		m_right = m_front.CrossProduct(ndVector(-m_front.m_y, m_front.m_x, ndFloat32(0.0f), ndFloat32(0.0f)));
-	}
-	m_right = m_right.Normalize();
-	m_up = m_right.CrossProduct(m_front);
-	ndAssert(TestOrthogonal());
-}
+//inline ndMatrix::ndMatrix (const ndVector& front)
+//	:m_front((front & ndVector::m_triplexMask).Normalize())
+//	,m_posit(ndVector::m_wOne)
+//{
+//	if (ndAbs(m_front.m_z) > ndFloat32 (0.577f)) 
+//	{
+//		m_right = m_front.CrossProduct(ndVector(-m_front.m_y, m_front.m_z, ndFloat32(0.0f), ndFloat32(0.0f)));
+//	}
+//	else 
+//	{
+//		m_right = m_front.CrossProduct(ndVector(-m_front.m_y, m_front.m_x, ndFloat32(0.0f), ndFloat32(0.0f)));
+//	}
+//	m_right = m_right.Normalize();
+//	m_up = m_right.CrossProduct(m_front);
+//	ndAssert(TestOrthogonal());
+//}
 
 inline ndVector& ndMatrix::operator[] (ndInt32  i)
 {

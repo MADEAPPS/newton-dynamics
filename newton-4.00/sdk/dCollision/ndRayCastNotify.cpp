@@ -29,7 +29,7 @@ bool ndRayCastNotify::TraceShape(const ndVector& globalOrigin, const ndVector& g
 	ndContactPoint contactOut;
 
 	ndBodyKinematic tmpBody;
-	tmpBody.SetMatrix(globalOrigin);
+	tmpBody.SetMatrix(ndGramSchmidt(globalOrigin));
 	tmpBody.SetCollisionShape(shapeInstance);
 	tmpBody.SetMassMatrix(ndVector::m_one);
 
