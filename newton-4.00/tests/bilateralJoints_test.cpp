@@ -13,7 +13,7 @@
 #include <gtest/gtest.h>
 
 /* Baseline test: create and destroy an empty Newton world. */
-TEST(RemoveJoints, CreateWorld) 
+TEST(BilateralJoints, CreateWorld) 
 {
 	ndWorld* world = new ndWorld();
 	ndShapeInstance shape(new ndShapeSphere(0.25));
@@ -44,10 +44,11 @@ TEST(RemoveJoints, CreateWorld)
 	ndSharedPtr<ndBody> bp2(bodies[2]);
 	world->AddBody(bp2);
 
-	ndJointFixDistance* joint0 = new ndJointFixDistance(bodies[0]->GetMatrix().m_posit, bodies[1]->GetMatrix().m_posit, bodies[0], bodies[1]);
+	ndJointFixDistance* const joint0 = new ndJointFixDistance(bodies[0]->GetMatrix().m_posit, bodies[1]->GetMatrix().m_posit, bodies[0], bodies[1]);
 	ndSharedPtr<ndJointBilateralConstraint> jp0(joint0);
 	world->AddJoint(jp0);
-	ndJointFixDistance* joint1 = new ndJointFixDistance(bodies[1]->GetMatrix().m_posit, bodies[2]->GetMatrix().m_posit, bodies[1], bodies[2]);
+
+	ndJointFixDistance* const joint1 = new ndJointFixDistance(bodies[1]->GetMatrix().m_posit, bodies[2]->GetMatrix().m_posit, bodies[1], bodies[2]);
 	ndSharedPtr<ndJointBilateralConstraint> jp1(joint1);
 	world->AddJoint(jp1);
 
