@@ -73,7 +73,7 @@ void ndShape::MassProperties()
 	ndVector origin(m_centerOfMass);
 	ndFloat32 originMag2 = origin.DotProduct(origin & ndVector::m_triplexMask).GetScalar();
 
-	ndMatrix Covariance(origin, origin);
+	ndMatrix Covariance(ndCovarianceMatrix(origin, origin));
 	ndMatrix parallel(ndGetIdentityMatrix());
 	for (ndInt32 i = 0; i < 3; ++i) 
 	{

@@ -95,7 +95,7 @@ namespace ndController_0
 				const ndVector comDist(bodiesCom[i] - m_com);
 
 				m_comDist[i] = comDist;
-				ndMatrix covariance(comDist, comDist);
+				ndMatrix covariance(ndCovarianceMatrix(comDist, comDist));
 				ndMatrix bodyInertia(body->CalculateInertiaMatrix());
 				
 				ndFloat32 mass = body->GetMassMatrix().m_w;

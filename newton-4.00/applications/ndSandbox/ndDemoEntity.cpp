@@ -187,7 +187,7 @@ void ndDemoEntity::SetMeshMatrix(const ndMatrix& matrix)
 
 ndMatrix ndDemoEntity::GetCurrentMatrix () const
 {
-	return ndMatrix (m_curRotation, m_curPosition);
+	return ndCalculateMatrix(m_curRotation, m_curPosition);
 }
 
 ndAnimKeyframe ndDemoEntity::GetCurrentTransform() const
@@ -197,7 +197,7 @@ ndAnimKeyframe ndDemoEntity::GetCurrentTransform() const
 
 ndMatrix ndDemoEntity::GetNextMatrix () const
 {
-	return ndMatrix (m_nextRotation, m_nextPosition);
+	return ndCalculateMatrix(m_nextRotation, m_nextPosition);
 }
 
 ndMatrix ndDemoEntity::CalculateGlobalMatrix (const ndDemoEntity* const root) const
@@ -262,7 +262,7 @@ void ndDemoEntity::InterpolateMatrix(ndFloat32 param)
 
 		ndVector posit(p0 + (p1 - p0).Scale(param));
 		ndQuaternion rotation(r0.Slerp(r1, param));
-		m_matrix = ndMatrix(rotation, posit);
+		m_matrix = ndCalculateMatrix(rotation, posit);
 	}
 
 	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext()) 

@@ -117,12 +117,12 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 		if (mag2 > ndFloat32 (1.0e-4f)) 
 		{
 			lateralDir = lateralDir.Scale(ndFloat32 (1.0f) / ndSqrt(mag2));
-			coneRotation = ndMatrix(ndQuaternion(lateralDir, ndAcos(ndClamp(cosAngleCos, ndFloat32(-1.0f), ndFloat32(1.0f)))), matrix1.m_posit);
+			coneRotation = ndCalculateMatrix(ndQuaternion(lateralDir, ndAcos(ndClamp(cosAngleCos, ndFloat32(-1.0f), ndFloat32(1.0f)))), matrix1.m_posit);
 		}
 		else 
 		{
 			lateralDir = matrix0.m_up.Scale(-ndFloat32 (1.0f));
-			coneRotation = ndMatrix(ndQuaternion(matrix0.m_up, ndFloat32 (180.0f) * ndDegreeToRad), matrix1.m_posit);
+			coneRotation = ndCalculateMatrix(ndQuaternion(matrix0.m_up, ndFloat32 (180.0f) * ndDegreeToRad), matrix1.m_posit);
 		}
 	}
 	else if (cosAngleCos < -ndFloat32 (0.9999f)) 
@@ -243,7 +243,7 @@ void ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 		ndAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
 		lateralDir = lateralDir.Normalize();
 		const ndFloat32 coneAngle = ndAcos(ndClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
-		const ndMatrix coneRotation(ndQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+		const ndMatrix coneRotation(ndCalculateMatrix(ndQuaternion(lateralDir, coneAngle), matrix1.m_posit));
 		if (coneAngle > m_maxConeAngle)
 		{
 			if (m_maxConeAngle > (ndFloat32(1.0f) * ndDegreeToRad))

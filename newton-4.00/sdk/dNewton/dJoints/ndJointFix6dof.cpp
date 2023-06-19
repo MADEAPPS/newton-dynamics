@@ -128,7 +128,7 @@ void ndJointFix6dof::SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatr
 	ndAssert(lateralDir.DotProduct(lateralDir).GetScalar() > ndFloat32 (1.0e-6f));
 	lateralDir = lateralDir.Normalize();
 	ndFloat32 coneAngle = ndAcos(ndClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
-	ndMatrix coneRotation(ndQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+	ndMatrix coneRotation(ndCalculateMatrix(ndQuaternion(lateralDir, coneAngle), matrix1.m_posit));
 
 	AddAngularRowJacobian(desc, lateralDir, -coneAngle);
 	SetLowerFriction(desc, -m_maxTorque);

@@ -212,7 +212,7 @@ ndAssert (0);
 
 void ndDemoCamera::SetMatrix (const ndQuaternion& rotation, const ndVector& position)
 {
-	ndMatrix matrix (rotation, position);
+	ndMatrix matrix (ndCalculateMatrix(rotation, position));
 	m_cameraPitch = ndAsin (matrix.m_front.m_y);
 	m_cameraYaw = ndAtan2 (-matrix.m_front.m_z, matrix.m_front.m_x);
 

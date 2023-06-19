@@ -216,7 +216,7 @@ ndMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const ndMatrix& alignMat
 	
 		origin.m_w = ndFloat32(0.0f);
 		ndFloat32 originMag2 = origin.DotProduct(origin).GetScalar();
-		ndMatrix Covariance(origin, origin);
+		ndMatrix Covariance(ndCovarianceMatrix(origin, origin));
 		ndMatrix parallel(ndGetIdentityMatrix());
 		for (ndInt32 i = 0; i < 3; ++i) 
 		{

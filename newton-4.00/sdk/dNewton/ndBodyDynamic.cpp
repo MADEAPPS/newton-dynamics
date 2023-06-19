@@ -265,7 +265,7 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const ndVector& force, const nd
 {
 	ndJacobian velocStep;
 
-	const ndMatrix matrix(m_gyroRotation, ndVector::m_wOne);
+	const ndMatrix matrix(ndCalculateMatrix(m_gyroRotation, ndVector::m_wOne));
 #ifdef D_USE_FULL_INERTIA
 	const ndVector localOmega(m_inertiaPrincipalAxis.UnrotateVector(matrix.UnrotateVector(m_omega)));
 	const ndVector localTorque(m_inertiaPrincipalAxis.UnrotateVector(matrix.UnrotateVector(torque)));
@@ -325,7 +325,7 @@ void ndBodyDynamic::IntegrateGyroSubstep(const ndVector& timestep)
 		ndAssert((m_gyroRotation.DotProduct(m_gyroRotation).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-5f));
 		
 		// calculate new Gyro torque and Gyro acceleration
-		const ndMatrix matrix(m_gyroRotation, ndVector::m_wOne);
+		const ndMatrix matrix(ndCalculateMatrix(m_gyroRotation, ndVector::m_wOne));
 
 #ifdef D_USE_FULL_INERTIA
 		const ndVector localOmega(m_inertiaPrincipalAxis.UnrotateVector(matrix.UnrotateVector(m_omega)));

@@ -117,7 +117,7 @@ static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndF
 			{
 				ndVector posit(step * (ndFloat32)(i - count/2), step * (ndFloat32)j, step * (ndFloat32)(k - count / 2), 0.0f);
 				ndQuaternion rotation(ndGaussianRandom(0.0f, 1.0f), ndGaussianRandom(0.0f, 1.0f), ndGaussianRandom(0.0f, 1.0f), ndGaussianRandom(0.0f, 1.0f) + 0.1f);
-				ndMatrix location(rotation, origin + posit);
+				ndMatrix location(ndCalculateMatrix(rotation, origin + posit));
 				AddShape(scene, location, rootEntity, shape, 10.0f, density);
 			}
 		}

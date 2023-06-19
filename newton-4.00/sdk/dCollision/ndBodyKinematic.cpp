@@ -588,7 +588,7 @@ void ndBodyKinematic::IntegrateVelocity(ndFloat32 timestep)
 		const ndQuaternion rotation(m_rotation * rotationStep);
 		m_rotation = rotation.Normalize();
 		ndAssert((m_rotation.DotProduct(m_rotation).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-5f));
-		m_matrix = ndMatrix(m_rotation, m_matrix.m_posit);
+		m_matrix = ndCalculateMatrix(m_rotation, m_matrix.m_posit);
 	}
 
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);

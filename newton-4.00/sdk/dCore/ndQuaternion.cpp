@@ -71,7 +71,7 @@ ndQuaternion::ndQuaternion(const ndMatrix& matrix)
 
 #ifdef _DEBUG
 
-	ndMatrix tmp (*this, matrix.m_posit);
+	ndMatrix tmp (ndCalculateMatrix(*this, matrix.m_posit));
 	ndMatrix unitMatrix (tmp * matrix.OrthoInverse());
 	for (ndInt32 i = 0; i < 4; ++i) 
 	{

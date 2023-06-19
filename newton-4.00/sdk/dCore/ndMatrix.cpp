@@ -25,7 +25,8 @@
 #include "ndQuaternion.h"
 #include "ndGeneralMatrix.h"
 
-ndMatrix::ndMatrix (const ndQuaternion &quat, const ndVector &position)
+//ndMatrix::ndMatrix (const ndQuaternion &quat, const ndVector &position)
+ndMatrix ndCalculateMatrix(const ndQuaternion& quat, const ndVector& position)
 {
 	ndAssert((quat.DotProduct(quat).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 	const ndQuaternion quat0(quat);
@@ -47,11 +48,11 @@ ndMatrix::ndMatrix (const ndQuaternion &quat, const ndVector &position)
 	const ndFloat32 yw = quat0.m_y * quat1.m_w;
 	const ndFloat32 zw = quat0.m_z * quat1.m_w;
 
-	m_front = ndVector (ndFloat32(1.0f) - y2 - z2, xy + zw, xz - yw, ndFloat32(0.0f));
-	m_up    = ndVector (xy - zw, ndFloat32(1.0f) - x2 - z2, yz + xw, ndFloat32(0.0f));
-	m_right = ndVector (xz + yw, yz - xw, ndFloat32(1.0f) - x2 - y2, ndFloat32(0.0f));
-
-	m_posit = position;
+	ndVector front (ndFloat32(1.0f) - y2 - z2, xy + zw, xz - yw, ndFloat32(0.0f));
+	ndVector up    (xy - zw, ndFloat32(1.0f) - x2 - z2, yz + xw, ndFloat32(0.0f));
+	ndVector right (xz + yw, yz - xw, ndFloat32(1.0f) - x2 - y2, ndFloat32(0.0f));
+	//ndVector posit (position);
+	return ndMatrix(front, up, right, position);
 }
 
 ndMatrix::ndMatrix (const ndMatrix& transformMatrix, const ndVector& scale, const ndMatrix& stretchAxis)
@@ -575,6 +576,11 @@ ndMatrix ndRollMatrix(ndFloat32 ang)
 		ndVector(-sinAng, cosAng, ndFloat32(0.0f), ndFloat32(0.0f)),
 		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f)),
 		ndVector::m_wOne);
+}
+
+ndMatrix ndCovarianceMatrix(const ndVector& p, const ndVector& q)
+{
+	return ndMatrix(q * p.BroadcastX(), q * p.BroadcastY(), q * p.BroadcastZ(), ndVector::m_wOne);
 }
 
 ndMatrix ndGramSchmidt(const ndVector& dir)

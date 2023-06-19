@@ -37,6 +37,8 @@ D_CORE_API ndMatrix ndPitchMatrix(ndFloat32 ang);
 D_CORE_API ndMatrix ndYawMatrix(ndFloat32 ang);
 D_CORE_API ndMatrix ndRollMatrix(ndFloat32 ang);
 D_CORE_API ndMatrix ndGramSchmidt(const ndVector& dir);
+D_CORE_API ndMatrix ndCovarianceMatrix(const ndVector& p, const ndVector& q);
+D_CORE_API ndMatrix ndCalculateMatrix(const ndQuaternion& rotation, const ndVector& position);
 
 D_MSV_NEWTON_ALIGN_32
 class ndMatrix
@@ -47,7 +49,9 @@ class ndMatrix
 	ndMatrix ();
 	ndMatrix (const ndFloat32* const array);
 	ndMatrix (const ndVector &front, const ndVector &up, const ndVector &right, const ndVector &posit);
-	D_CORE_API ndMatrix (const ndQuaternion &rotation, const ndVector &position);
+
+	// please use function ndGetTransform()
+	//D_CORE_API ndMatrix (const ndQuaternion &rotation, const ndVector &position);
 
 	~ndMatrix();
 
@@ -56,7 +60,8 @@ class ndMatrix
 	//ndMatrix (const ndVector &front);
 
 	// create a covariance Matrix = transpose(p) * q 
-	ndMatrix (const ndVector& p, const ndVector& q);
+	// please use function ndCovariance
+	//ndMatrix (const ndVector& p, const ndVector& q);
 
 	ndVector& operator[] (ndInt32 i);
 	const ndVector& operator[] (ndInt32 i) const;
@@ -129,14 +134,14 @@ inline ndMatrix::~ndMatrix()
 {
 }
 
-inline ndMatrix::ndMatrix (const ndVector& p, const ndVector& q)
-	:m_front(q * p.BroadcastX())
-	,m_up   (q * p.BroadcastY())
-	,m_right(q * p.BroadcastZ())
-	,m_posit (ndVector::m_wOne)
-{
-}
-
+//inline ndMatrix::ndMatrix (const ndVector& p, const ndVector& q)
+//	:m_front(q * p.BroadcastX())
+//	,m_up   (q * p.BroadcastY())
+//	,m_right(q * p.BroadcastZ())
+//	,m_posit (ndVector::m_wOne)
+//{
+//}
+//
 //inline ndMatrix::ndMatrix (const ndVector& front)
 //	:m_front((front & ndVector::m_triplexMask).Normalize())
 //	,m_posit(ndVector::m_wOne)

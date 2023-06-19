@@ -109,7 +109,7 @@ inline void ndJointKinematicController::SetTargetPosit(const ndVector& posit)
 
 inline void ndJointKinematicController::SetTargetRotation(const ndQuaternion& rotation)
 {
-	ndMatrix matrix(rotation, m_localMatrix1.m_posit);
+	ndMatrix matrix(ndCalculateMatrix(rotation, m_localMatrix1.m_posit));
 	SetTargetMatrix(matrix);
 }
 
