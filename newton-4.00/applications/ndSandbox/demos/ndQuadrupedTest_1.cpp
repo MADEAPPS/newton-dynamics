@@ -356,6 +356,20 @@ namespace ndQuadruped_1
 		{
 		}
 
+		ndVector CalculateCom() const
+		{
+			ndVector com(ndVector::m_zero);
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				const ndBodyKinematic* const body = m_bodies[i];
+				const ndMatrix matrix(body->GetMatrix());
+				com += matrix.TransformVector(body->GetCentreOfMass() * body->GetMassMatrix().m_w);
+			}
+			com = com.Scale(m_invMass);
+			com.m_w = ndFloat32(1.0f);
+			return com;
+		}
+
 		void Debug(ndConstraintDebugCallback& context) const
 		{
 			ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
@@ -388,10 +402,9 @@ namespace ndQuadruped_1
 				}
 			}
 
-			//GetContacts(contacts);
-			//ndMatrix comMatrix(m_localFrame * m_bodyArray[0]->GetMatrix());
-			//comMatrix.m_posit = CalculateCenterOfMass().m_linear;
-			//context.DrawFrame(comMatrix);
+			ndMatrix comMatrix(m_rootNode->m_body->GetAsBodyKinematic()->GetMatrix());
+			comMatrix.m_posit = CalculateCom();
+			context.DrawFrame(comMatrix);
 
 			if (contactPoints.GetCount() >= 3)
 			{
@@ -408,20 +421,82 @@ namespace ndQuadruped_1
 					p0 = contactPoints[i];
 				}
 
-				//ndBigVector p0Out;
-				//ndBigVector p1Out;
-				//ndBigVector ray_p0(comMatrix.m_posit);
-				//ndBigVector ray_p1(comMatrix.m_posit);
-				//ray_p1.m_y -= 1.0f;
-				//
-				//ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-				//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
-				//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
+				ndBigVector p0Out;
+				ndBigVector p1Out;
+				ndBigVector ray_p0(comMatrix.m_posit);
+				ndBigVector ray_p1(comMatrix.m_posit);
+				ray_p1.m_y -= 1.0f;
+				
+				ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
+				context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
+				context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
 			}
 			else if (contactPoints.GetCount() == 2)
 			{
 				context.DrawLine(contactPoints[0], contactPoints[1], ndVector::m_zero);
 			}
+		}
+
+		void InitState()
+		{
+			//a) Mt = sum(M(i))
+			//b) cg = sum(p(i) * M(i)) / Mt
+			//c) Vcg = sum(v(i) * M(i)) / Mt
+			//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
+			//e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x(m(i) * V(i))]
+			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
+			//g) Bcg = (Icg ^ -1) * (T0 + T1)
+
+			//a) Mt = sum(m(i))
+			//b) cg = sum(p(i) * m(i)) / Mt
+			//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
+			//e) T0 = sum(w(i) x (I(i) * w(i))
+			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
+			//g) Bcg = (Icg ^ -1) * (T0 + T1)
+
+			ndVector com(ndVector::m_zero);
+			ndFixSizeArray<ndVector, 32> bodiesCom;
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				const ndBodyKinematic* const body = m_bodies[i];
+				const ndMatrix matrix(body->GetMatrix());
+				ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+				bodiesCom.PushBack(bodyCom);
+				//com += matrix.TransformVector(body->GetCentreOfMass() * body->GetMassMatrix().m_w);
+				com += bodyCom.Scale(body->GetMassMatrix().m_w);
+			}
+			com = com.Scale(m_invMass);
+
+			ndVector gyroTorque(ndVector::m_zero);
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				const ndBodyKinematic* const body = m_bodies[i];
+
+				const ndMatrix matrix(body->GetMatrix());
+				const ndVector omega(body->GetOmega());
+				const ndVector comDist(matrix.TransformVector(body->GetCentreOfMass()) - com);
+				m_comDist[i] = comDist;
+				ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+				gyroTorque += omega.CrossProduct(bodyInertia.RotateVector(omega));
+			}
+
+			m_gyroTorque = gyroTorque;
+		}
+
+		ndVector CalculateTorque()
+		{
+			ndVector torque(m_gyroTorque);
+			m_invDynamicsSolver.Solve();
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				const ndBodyKinematic* const body = m_bodies[i];
+
+				ndVector r(m_comDist[i]);
+				ndVector f(m_invDynamicsSolver.GetBodyForce(body));
+				ndVector t(m_invDynamicsSolver.GetBodyTorque(body));
+				torque += (t + r.CrossProduct(f));
+			}
+			return torque;
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -438,7 +513,6 @@ namespace ndQuadruped_1
 			ndJointBilateralConstraint* joint[4];
 			for (ndInt32 i = 0; i < 4; ++i)
 			{
-				//ndEffectorInfo& info = m_effectorsInfo[i];
 				ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
 				ndAssert(info == &m_effectorsInfo[i]);
 				joint[i] = *info->m_effector;
@@ -456,8 +530,13 @@ namespace ndQuadruped_1
 				info->m_footHinge->SetOffsetAngle(lookAngle);
 			}
 
+			InitState();
+
 			m_invDynamicsSolver.SolverBegin(skeleton, joint, 4, world, timestep);
-			m_invDynamicsSolver.Solve();
+			//m_invDynamicsSolver.Solve();
+			ndVector torque(CalculateTorque());
+			ndTrace(("%f %f %f\n", torque.m_x, torque.m_y, torque.m_z));
+
 			m_invDynamicsSolver.SolverEnd();
 		}
 
@@ -467,6 +546,11 @@ namespace ndQuadruped_1
 
 		ndUIControlNode* m_control;
 		ndAnimationSequencePlayer* m_poseGenerator;
+
+		ndVector m_gyroTorque;
+		ndFixSizeArray<ndVector, 32> m_comDist;
+		ndFixSizeArray<ndBodyKinematic*, 32> m_bodies;
+		ndFloat32 m_invMass;
 	};
 
 	class ndModelUI: public ndUIEntity
@@ -673,6 +757,17 @@ namespace ndQuadruped_1
 				poseGenerator->m_offset[i] = offset[i];
 			}
 		}
+
+		// init physics pre-computed values
+		ndFloat32 totalMass = ndFloat32(0.0f);
+		for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+		{
+			ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+			model->m_bodies.PushBack(body);
+			model->m_comDist.PushBack(ndVector::m_zero);
+			totalMass += body->GetMassMatrix().m_w;
+		}
+		model->m_invMass = ndFloat32(1.0f) / totalMass;
 
 		return model;
 	}

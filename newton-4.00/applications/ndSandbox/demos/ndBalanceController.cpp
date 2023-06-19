@@ -36,7 +36,7 @@ namespace ndController_0
 			,m_bodies()
 			,m_ballBody(nullptr)
 			,m_controlJoint(nullptr)
-			,m_totalMass(ndFloat32 (0.0f))
+			,m_invMass(ndFloat32 (0.0f))
 			,m_hasSupport(false)
 		{
 			xxx = 0;
@@ -44,23 +44,24 @@ namespace ndController_0
 
 		void Init()
 		{
-			m_totalMass = ndFloat32(0.0f);
+			ndFloat32 mass = ndFloat32(0.0f);
 			for (ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
 				ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
 				m_bodies.PushBack(body);
-				m_totalMass += body->GetMassMatrix().m_w;
+				mass += body->GetMassMatrix().m_w;
 			}
+			m_invMass = ndFloat32(1.0f) / mass;
 			m_comDist.SetCount(m_bodies.GetCount());
 		}
 
 		void InitState(ndWorld* const world)
 		{
-			//a) Mt = sum(M(i))
-			//b) cg = sum(p(i) * M(i)) / Mt
-			//c) Vcg = sum(v(i) * M(i)) / Mt
+			//a) Mt = sum(m(i))
+			//b) cg = sum(p(i) * m(i)) / Mt
+			//c) Vcg = sum(v(i) * m(i)) / Mt
 			//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
-			//e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x(m(i) * V(i))]
+			//e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
 			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
 			//g) Bcg = (Icg ^ -1) * (T0 + T1)
 
@@ -71,16 +72,17 @@ namespace ndController_0
 			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
 			//g) Bcg = (Icg ^ -1) * (T0 + T1)
 
-			ndVector cg(ndVector::m_zero);
+			ndVector com(ndVector::m_zero);
+			ndFixSizeArray<ndVector, 8> bodiesCom;
 			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 			{
 				const ndBodyDynamic* const body = m_bodies[i];
-
 				const ndMatrix matrix (body->GetMatrix());
-				ndVector veloc(body->GetVelocity());
-				cg += matrix.m_posit.Scale (body->GetMassMatrix().m_w);
+				ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+				bodiesCom.PushBack(bodyCom);
+				com += bodyCom.Scale (body->GetMassMatrix().m_w);
 			}
-			m_com = cg.Scale(ndFloat32(1.0f) / m_totalMass);
+			m_com = com.Scale(m_invMass);
 
 			ndMatrix inertia(ndGetZeroMatrix());
 			ndVector gyroTorque(ndVector::m_zero);
@@ -90,13 +92,13 @@ namespace ndController_0
 
 				const ndMatrix matrix(body->GetMatrix());
 				const ndVector omega(body->GetOmega());
-				const ndVector comDist(matrix.m_posit - m_com);
-				ndFloat32 mass = body->GetMassMatrix().m_w;
+				const ndVector comDist(bodiesCom[i] - m_com);
 
 				m_comDist[i] = comDist;
 				ndMatrix covariance(comDist, comDist);
 				ndMatrix bodyInertia(body->CalculateInertiaMatrix());
 				
+				ndFloat32 mass = body->GetMassMatrix().m_w;
 				inertia.m_front += (bodyInertia.m_front + covariance.m_front.Scale (mass));
 				inertia.m_up += (bodyInertia.m_up + covariance.m_up.Scale(mass));
 				inertia.m_right += (bodyInertia.m_right + covariance.m_right.Scale(mass));
@@ -117,22 +119,8 @@ namespace ndController_0
 				{
 					m_hasSupport = true;
 					world->CalculateJointContacts(contact);
-					//bool newContact = true;
-					//for (ndInt32 j = contacts.GetCount() - 1; j >= 0; --j)
-					//{
-					//	newContact = newContact && (contacts[j] != contact);
-					//}
-					//if (newContact)
-					//{
-					//	contacts.PushBack(contact);
-					//}
 				}
 			}
-
-			//for (ndInt32 i = contacts.GetCount() - 1; i >= 0; --i)
-			//{
-			//	world->CalculateJointContacts(contacts[i]);
-			//}
 		}
 
 		//e) T0 = sum(w(i) x (I(i) * w(i))
@@ -140,7 +128,6 @@ namespace ndController_0
 		//g) Bcg = (Icg ^ -1) * (T0 + T1)
 		ndVector CalculateAlpha()
 		{
-			//ndVector torque(ndVector::m_zero);
 			ndVector torque(m_gyroTorque);
 
 			m_invDynamicsSolver.Solve();
@@ -151,7 +138,7 @@ namespace ndController_0
 				ndVector r(m_comDist[i]);
 				ndVector f(m_invDynamicsSolver.GetBodyForce(body));
 				ndVector t(m_invDynamicsSolver.GetBodyTorque(body));
-				torque += (f + r.CrossProduct(f));
+				torque += (t + r.CrossProduct(f));
 			}
 			return m_invInertia.RotateVector(torque);
 		}
@@ -190,7 +177,7 @@ namespace ndController_0
 					do
 					{
 						passes--;
-						ndFloat32 deltaAngle = alpha.m_z * 0.001f;
+						ndFloat32 deltaAngle = -alpha.m_z * 0.001f;
 						angle += deltaAngle;
 						
 						angle = ndClamp(angle + deltaAngle, -angleLimit, angleLimit);
@@ -218,7 +205,7 @@ namespace ndController_0
 		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
 		ndBodyDynamic* m_ballBody;
 		ndJointHinge* m_controlJoint;
-		ndFloat32 m_totalMass;
+		ndFloat32 m_invMass;
 		bool m_hasSupport;
 
 		ndVector m_crossValidation____;
@@ -275,7 +262,7 @@ namespace ndController_0
 		ndSharedPtr<ndJointBilateralConstraint> wheelJoint(new ndJointSpherical(wheelMatrix, wheelBody->GetAsBodyKinematic(), legBody->GetAsBodyKinematic()));
 		//((ndJointSpherical*)*wheelJoint)->SetAsSpringDamper(ndFloat32(0.001f), ndFloat32(0.0f), ndFloat32(10.f));
 
-		// teleport the model so that is on the floor
+		// tele port the model so that is on the floor
 		ndMatrix probeMatrix(wheelMatrix);
 		probeMatrix.m_posit.m_x += 1.0f;
 		ndMatrix floor(FindFloor(*world, probeMatrix, wheelBody->GetAsBodyKinematic()->GetCollisionShape(), 20.0f));
