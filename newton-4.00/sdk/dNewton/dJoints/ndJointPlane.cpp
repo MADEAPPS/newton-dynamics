@@ -24,7 +24,7 @@ ndJointPlane::ndJointPlane (const ndVector& pivot, const ndVector& normal, ndBod
 	:ndJointBilateralConstraint(5, child, parent, ndGetIdentityMatrix())
 	,m_enableControlRotation(true)
 {
-	ndMatrix pinAndPivotFrame(ndGramSchmidt(normal));
+	ndMatrix pinAndPivotFrame(ndGramSchmidtMatrix(normal));
 	pinAndPivotFrame.m_posit = pivot;
 	pinAndPivotFrame.m_posit.m_w = 1.0f;
 	// calculate the two local matrix of the pivot point

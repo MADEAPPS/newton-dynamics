@@ -171,7 +171,7 @@ ndJointKinematicController::ndJointKinematicController()
 }
 
 ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const body, ndBodyKinematic* const referenceBody, const ndVector& attachmentPointInGlobalSpace)
-	:ndJointBilateralConstraint(6, body, referenceBody, ndGramSchmidt(attachmentPointInGlobalSpace))
+	:ndJointBilateralConstraint(6, body, referenceBody, ndGramSchmidtMatrix(attachmentPointInGlobalSpace))
 {
 	ndAssert(GetBody0() == body);
 	ndMatrix matrix(body->GetMatrix());
@@ -369,7 +369,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		const ndFloat32 tol = ndFloat32(3.0f * ndPi / 180.0f);
 		if (dirMag2 > (tol * tol))
 		{
-			const ndMatrix basis(ndGramSchmidt(pin));
+			const ndMatrix basis(ndGramSchmidtMatrix(pin));
 			const ndFloat32 dirMag = ndSqrt(dirMag2);
 			const ndFloat32 angle = ndAtan2(dirMag, rotation.m_w);
 			AddAngularRowJacobian(desc, basis[0], angle);

@@ -292,7 +292,7 @@ void ndJointSpherical::SubmitSpringDamper(const ndMatrix& matrix0, const ndMatri
 	const ndFloat32 tol = ndFloat32(3.0f * ndPi / 180.0f);
 	if (dirMag2 > (tol * tol))
 	{
-		const ndMatrix basis(ndGramSchmidt(pin));
+		const ndMatrix basis(ndGramSchmidtMatrix(pin));
 		const ndFloat32 dirMag = ndSqrt(dirMag2);
 		const ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
 

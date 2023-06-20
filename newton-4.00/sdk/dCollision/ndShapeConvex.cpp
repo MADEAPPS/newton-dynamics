@@ -216,12 +216,12 @@ ndMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const ndMatrix& alignMat
 	
 		origin.m_w = ndFloat32(0.0f);
 		ndFloat32 originMag2 = origin.DotProduct(origin).GetScalar();
-		ndMatrix Covariance(ndCovarianceMatrix(origin, origin));
+		ndMatrix covariance(ndCovarianceMatrix(origin, origin));
 		ndMatrix parallel(ndGetIdentityMatrix());
 		for (ndInt32 i = 0; i < 3; ++i) 
 		{
 			parallel[i][i] = originMag2;
-			inertia[i] += (parallel[i] - Covariance[i]);
+			inertia[i] += (parallel[i] - covariance[i]);
 			ndAssert(inertia[i][i] > ndFloat32(0.0f));
 		}
 	

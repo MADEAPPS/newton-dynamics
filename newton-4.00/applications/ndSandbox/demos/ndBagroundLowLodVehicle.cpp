@@ -86,7 +86,7 @@ class BackGroundVehicleController : public ndModel
 	protected:
 	virtual void Update(ndWorld* const, ndFloat32 timestep) override
 	{
-		ndMatrix mMatrix(ndCalculateMatrix(m_pAiBody->GetRotation(), ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0))));
+		ndMatrix mMatrix(ndCalculateMatrix(m_pAiBody->GetRotation(), ndVector::m_wOne));
 		ndVector vForward = mMatrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0)));
 		ndVector vVelocity = m_pAiBody->GetVelocity();
 		m_dCurrentSpeed = (vForward.DotProduct(vVelocity)).GetScalar();
@@ -129,7 +129,7 @@ class BackGroundVehicleController : public ndModel
 
 	void _ApplyLateralForces(ndFloat32 dTimestep)
 	{
-		ndMatrix mMatrix(ndCalculateMatrix(m_pAiBody->GetRotation(), ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0))));
+		ndMatrix mMatrix(ndCalculateMatrix(m_pAiBody->GetRotation(), ndVector::m_wOne));
 		ndVector vForward = mMatrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0)));
 		vForward.m_w = ndFloat32(0.0);
 		ndVector vUp = mMatrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0), ndFloat32(0.0)));

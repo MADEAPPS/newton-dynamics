@@ -36,7 +36,7 @@ ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle(
 {
 	ndMatrix temp;
 	ndMatrix matrix0(pin0, upPin, pin0.CrossProduct(upPin), ndVector::m_wOne);
-	ndMatrix matrix1(ndGramSchmidt(pin1));
+	ndMatrix matrix1(ndGramSchmidtMatrix(pin1));
 	CalculateLocalMatrix(matrix0, m_localMatrix0, temp);
 	CalculateLocalMatrix(matrix1, temp, m_localMatrix1);
 	SetSolverModel(m_jointkinematicCloseLoop);

@@ -33,10 +33,10 @@ class ndQuaternion;
 
 D_CORE_API const ndMatrix& ndGetZeroMatrix ();
 D_CORE_API const ndMatrix& ndGetIdentityMatrix();
-D_CORE_API ndMatrix ndPitchMatrix(ndFloat32 ang);
 D_CORE_API ndMatrix ndYawMatrix(ndFloat32 ang);
 D_CORE_API ndMatrix ndRollMatrix(ndFloat32 ang);
-D_CORE_API ndMatrix ndGramSchmidt(const ndVector& dir);
+D_CORE_API ndMatrix ndPitchMatrix(ndFloat32 ang);
+D_CORE_API ndMatrix ndGramSchmidtMatrix(const ndVector& dir);
 D_CORE_API ndMatrix ndCovarianceMatrix(const ndVector& p, const ndVector& q);
 D_CORE_API ndMatrix ndCalculateMatrix(const ndQuaternion& rotation, const ndVector& position);
 

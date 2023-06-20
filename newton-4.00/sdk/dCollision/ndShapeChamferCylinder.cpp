@@ -373,21 +373,28 @@ ndInt32 ndShapeChamferCylinder::CalculatePlaneIntersection(const ndVector& norma
 {
 	ndInt32 count = 0;
 	const ndFloat32 inclination = ndFloat32(0.9999f);
-	if (normal.m_x < -inclination) 
+	//if (normal.m_x < -inclination) 
+	//{
+	//	ndMatrix matrix(ndGramSchmidtMatrix(normal));
+	//	ndFloat32 x = ndSqrt(ndMax(m_height * m_height - origin.m_x * origin.m_x, ndFloat32(0.0f)));
+	//	matrix.m_posit.m_x = origin.m_x;
+	//	count = BuildCylinderCapPoly(m_radius + x, matrix, contactsOut);
+	//	//count = RectifyConvexSlice(n, normal, contactsOut);
+	//}
+	//else if (normal.m_x > inclination) 
+	//{
+	//	ndMatrix matrix(ndGramSchmidtMatrix(normal));
+	//	ndFloat32 x = ndSqrt(ndMax(m_height * m_height - origin.m_x * origin.m_x, ndFloat32(0.0f)));
+	//	matrix.m_posit.m_x = origin.m_x;
+	//	count = BuildCylinderCapPoly(m_radius + x, matrix, contactsOut);
+	//	//count = RectifyConvexSlice(n, normal, contactsOut);
+	//}
+	if (ndAbs(normal.m_x) > inclination)
 	{
-		ndMatrix matrix(ndGramSchmidt(normal));
+		ndMatrix matrix(ndGramSchmidtMatrix(normal));
 		ndFloat32 x = ndSqrt(ndMax(m_height * m_height - origin.m_x * origin.m_x, ndFloat32(0.0f)));
 		matrix.m_posit.m_x = origin.m_x;
 		count = BuildCylinderCapPoly(m_radius + x, matrix, contactsOut);
-		//count = RectifyConvexSlice(n, normal, contactsOut);
-	}
-	else if (normal.m_x > inclination) 
-	{
-		ndMatrix matrix(ndGramSchmidt(normal));
-		ndFloat32 x = ndSqrt(ndMax(m_height * m_height - origin.m_x * origin.m_x, ndFloat32(0.0f)));
-		matrix.m_posit.m_x = origin.m_x;
-		count = BuildCylinderCapPoly(m_radius + x, matrix, contactsOut);
-		//count = RectifyConvexSlice(n, normal, contactsOut);
 	}
 	else 
 	{

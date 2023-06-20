@@ -2047,7 +2047,7 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 		ndAssert(e0.m_w == ndFloat32(0.0f));
 		ndAssert(e0.DotProduct(e0).GetScalar() > ndFloat32(0.0f));
 		//ndMatrix matrix(e0.Scale(ndRsqrt(e0.DotProduct(e0).GetScalar())));
-		ndMatrix matrix(ndGramSchmidt(e0));
+		ndMatrix matrix(ndGramSchmidtMatrix(e0));
 		ndMatrix rotation(ndPitchMatrix(ndFloat32(45.0f * ndDegreeToRad)));
 		ndFloat32 maxArea = ndFloat32(0.0f);
 		for (ndInt32 i = 0; i < 8; ++i) 
