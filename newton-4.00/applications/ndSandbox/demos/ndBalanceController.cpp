@@ -39,7 +39,6 @@ namespace ndController_0
 			,m_invMass(ndFloat32 (0.0f))
 			,m_hasSupport(false)
 		{
-			xxx = 0;
 		}
 
 		void Init()
@@ -145,6 +144,8 @@ namespace ndController_0
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
+			ndModelArticulation::Update(world, timestep);
+
 			ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
 			ndAssert(skeleton);
 			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
@@ -152,13 +153,15 @@ namespace ndController_0
 			ndVector alpha(CalculateAlpha());
 			if (ndAbs(alpha.m_z) > ND_ALPHA_TOL)
 			{
-				ndTrace(("%d alpha(%f) angle(%f)\n", xxx, alpha.m_z, m_controlJoint->GetOffsetAngle() * ndRadToDegree));
+				//ndTrace(("%d alpha(%f) angle(%f)\n", xxx, alpha.m_z, m_controlJoint->GetOffsetAngle() * ndRadToDegree));
 			}
 			m_invDynamicsSolver.SolverEnd();
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
+			ndModelArticulation::PostUpdate(world, timestep);
+
 			InitState(world);
 			if (m_hasSupport)
 			{
@@ -170,7 +173,7 @@ namespace ndController_0
 				if (ndAbs(alpha.m_z) > ND_ALPHA_TOL)
 				{
 					ndFloat32 angle = m_controlJoint->GetOffsetAngle();
-					ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, 0.0f));
+					//ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, 0.0f));
 
 					ndInt32 passes = 128;
 					ndFloat32 angleLimit = ndFloat32(45.0f * ndDegreeToRad);
@@ -184,7 +187,7 @@ namespace ndController_0
 						m_controlJoint->SetOffsetAngle(angle);
 						m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
 						alpha = CalculateAlpha();
-						ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, deltaAngle));
+						//ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, deltaAngle));
 					} while ((ndAbs(alpha.m_z) > ND_ALPHA_TOL) && passes);
 					ndTrace(("\n"));
 				}
@@ -192,8 +195,6 @@ namespace ndController_0
 				m_crossValidation____ = CalculateAlpha();
 				m_invDynamicsSolver.SolverEnd();
 			}
-
-			xxx++;
 		}
 
 		ndMatrix m_invInertia;
@@ -209,13 +210,30 @@ namespace ndController_0
 		bool m_hasSupport;
 
 		ndVector m_crossValidation____;
-		int xxx;
 	};
 
-	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	// implements a DQN to keep the robot balanced
+	class ndModelUnicycleTrainer : public ndModelUnicycle
 	{
-		ndModelUnicycle* const model = new ndModelUnicycle();
+		public:
+		ndModelUnicycleTrainer()
+			:ndModelUnicycle()
+		{
+		}
 
+		void Update(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndModelArticulation::Update(world, timestep);
+		}
+
+		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndModelArticulation::PostUpdate(world, timestep);
+		}
+	};
+
+	void BuildModel(ndModelUnicycle* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
+	{
 		ndFloat32 mass = 10.0f;
 		ndFloat32 limbMass = 1.0f;
 		ndFloat32 wheelMass = 1.0f;
@@ -292,6 +310,21 @@ namespace ndController_0
 		model->m_ballBody = wheelBody->GetAsBodyDynamic();
 
 		model->Init();
+	}
+
+	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	{
+		ndModelUnicycle* const model = new ndModelUnicycle();
+		BuildModel(model, scene, location);
+
+		return model;
+	}
+
+	ndModelArticulation* CreateTrainer(ndDemoEntityManager* const scene, const ndMatrix& location)
+	{
+		ndModelUnicycleTrainer* const model = new ndModelUnicycleTrainer();
+		BuildModel(model, scene, location);
+
 		return model;
 	}
 }
@@ -306,7 +339,8 @@ void ndBalanceController(ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
-	ndSharedPtr<ndModel> model(BuildModel(scene, matrix));
+	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	//ndSharedPtr<ndModel> model(CreateTrainer(scene, matrix));
 	scene->GetWorld()->AddModel(model);
 
 	ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
