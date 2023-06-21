@@ -91,16 +91,21 @@ namespace ndController_0
 
 				const ndMatrix matrix(body->GetMatrix());
 				const ndVector omega(body->GetOmega());
-				const ndVector comDist(bodiesCom[i] - m_com);
+				const ndVector comDist((bodiesCom[i] - m_com) & ndVector::m_triplexMask);
 
 				m_comDist[i] = comDist;
 				ndMatrix covariance(ndCovarianceMatrix(comDist, comDist));
 				ndMatrix bodyInertia(body->CalculateInertiaMatrix());
 				
 				ndFloat32 mass = body->GetMassMatrix().m_w;
-				inertia.m_front += (bodyInertia.m_front + covariance.m_front.Scale (mass));
-				inertia.m_up += (bodyInertia.m_up + covariance.m_up.Scale(mass));
-				inertia.m_right += (bodyInertia.m_right + covariance.m_right.Scale(mass));
+				inertia.m_front += (bodyInertia.m_front - covariance.m_front.Scale (mass));
+				inertia.m_up += (bodyInertia.m_up - covariance.m_up.Scale(mass));
+				inertia.m_right += (bodyInertia.m_right - covariance.m_right.Scale(mass));
+
+				ndFloat32 massDist2 = comDist.DotProduct(comDist).GetScalar() * mass;
+				inertia.m_front.m_x += massDist2;
+				inertia.m_front.m_y += massDist2;
+				inertia.m_front.m_z += massDist2;
 
 				gyroTorque += omega.CrossProduct(bodyInertia.RotateVector(omega));
 			}
@@ -221,6 +226,79 @@ namespace ndController_0
 		ndModelUnicycleTrainer()
 			:ndModelUnicycle()
 		{
+		}
+
+		void InitState(ndWorld* const world)
+		{
+			//a) Mt = sum(m(i))
+			//b) cg = sum(p(i) * m(i)) / Mt
+			//c) Vcg = sum(v(i) * m(i)) / Mt
+			//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
+			//e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
+			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
+			//g) Bcg = (Icg ^ -1) * (T0 + T1)
+
+			//a) Mt = sum(m(i))
+			//b) cg = sum(p(i) * m(i)) / Mt
+			//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
+			//e) T0 = sum(w(i) x (I(i) * w(i))
+			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
+			//g) Bcg = (Icg ^ -1) * (T0 + T1)
+
+			ndVector com(ndVector::m_zero);
+			ndFixSizeArray<ndVector, 8> bodiesCom;
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				const ndBodyDynamic* const body = m_bodies[i];
+				const ndMatrix matrix(body->GetMatrix());
+				ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+				bodiesCom.PushBack(bodyCom);
+				com += bodyCom.Scale(body->GetMassMatrix().m_w);
+			}
+			m_com = com.Scale(m_invMass);
+
+			ndMatrix inertia(ndGetZeroMatrix());
+			ndVector gyroTorque(ndVector::m_zero);
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				const ndBodyDynamic* const body = m_bodies[i];
+
+				const ndMatrix matrix(body->GetMatrix());
+				const ndVector omega(body->GetOmega());
+				const ndVector comDist((bodiesCom[i] - m_com) & ndVector::m_triplexMask);
+
+				m_comDist[i] = comDist;
+				ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+				ndMatrix covariance(ndCovarianceMatrix(comDist, comDist));
+
+				ndFloat32 mass = body->GetMassMatrix().m_w;
+				inertia.m_front += (bodyInertia.m_front - covariance.m_front.Scale(mass));
+				inertia.m_up += (bodyInertia.m_up - covariance.m_up.Scale(mass));
+				inertia.m_right += (bodyInertia.m_right - covariance.m_right.Scale(mass));
+
+				ndFloat32 massDist2 = comDist.DotProduct(comDist).GetScalar();
+				inertia.m_front.m_x += massDist2;
+				inertia.m_front.m_y += massDist2;
+				inertia.m_front.m_z += massDist2;
+
+				gyroTorque += omega.CrossProduct(bodyInertia.RotateVector(omega));
+			}
+
+			m_gyroTorque = gyroTorque;
+			inertia.m_posit = ndVector::m_wOne;
+			m_invInertia = inertia.Inverse4x4();
+
+			m_hasSupport = false;
+			ndBodyKinematic::ndContactMap::Iterator it(m_ballBody->GetContactMap());
+			for (it.Begin(); it; it++)
+			{
+				ndContact* const contact = it.GetNode()->GetInfo();
+				if (contact->IsActive())
+				{
+					world->CalculateJointContacts(contact);
+					m_hasSupport = true;
+				}
+			}
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
