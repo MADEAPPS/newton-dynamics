@@ -116,8 +116,8 @@ namespace ndController_0
 				ndContact* const contact = it.GetNode()->GetInfo();
 				if (contact->IsActive())
 				{
-					m_hasSupport = true;
 					world->CalculateJointContacts(contact);
+					m_hasSupport = true;
 				}
 			}
 		}
@@ -145,17 +145,16 @@ namespace ndController_0
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
-
-			ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
-			ndAssert(skeleton);
-			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
-
-			ndVector alpha(CalculateAlpha());
-			if (ndAbs(alpha.m_z) > ND_ALPHA_TOL)
-			{
-				//ndTrace(("%d alpha(%f) angle(%f)\n", xxx, alpha.m_z, m_controlJoint->GetOffsetAngle() * ndRadToDegree));
-			}
-			m_invDynamicsSolver.SolverEnd();
+			//ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
+			//ndAssert(skeleton);
+			//m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+			//
+			//ndVector alpha(CalculateAlpha());
+			//if (ndAbs(alpha.m_z) > ND_ALPHA_TOL)
+			//{
+			//	//ndTrace(("%d alpha(%f) angle(%f)\n", xxx, alpha.m_z, m_controlJoint->GetOffsetAngle() * ndRadToDegree));
+			//}
+			//m_invDynamicsSolver.SolverEnd();
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -163,38 +162,41 @@ namespace ndController_0
 			ndModelArticulation::PostUpdate(world, timestep);
 
 			InitState(world);
-			if (m_hasSupport)
-			{
-				ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
-				ndAssert(skeleton);
-
-				m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
-				ndVector alpha(CalculateAlpha());
-				if (ndAbs(alpha.m_z) > ND_ALPHA_TOL)
-				{
-					ndFloat32 angle = m_controlJoint->GetOffsetAngle();
-					//ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, 0.0f));
-
-					ndInt32 passes = 128;
-					ndFloat32 angleLimit = ndFloat32(45.0f * ndDegreeToRad);
-					do
-					{
-						passes--;
-						ndFloat32 deltaAngle = -alpha.m_z * 0.001f;
-						angle += deltaAngle;
-						
-						angle = ndClamp(angle + deltaAngle, -angleLimit, angleLimit);
-						m_controlJoint->SetOffsetAngle(angle);
-						m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
-						alpha = CalculateAlpha();
-						//ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, deltaAngle));
-					} while ((ndAbs(alpha.m_z) > ND_ALPHA_TOL) && passes);
-					ndTrace(("\n"));
-				}
-
-				m_crossValidation____ = CalculateAlpha();
-				m_invDynamicsSolver.SolverEnd();
-			}
+			//if (m_hasSupport)
+			//{
+			//	ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
+			//	ndAssert(skeleton);
+			//
+			//	ndFloat32 xxx0 = m_controlJoint->GetOffsetAngle();
+			//	m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+			//	ndVector alpha(CalculateAlpha());
+			//	if (ndAbs(alpha.m_z) > ND_ALPHA_TOL)
+			//	{
+			//		ndFloat32 angle = m_controlJoint->GetOffsetAngle();
+			//		//ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, 0.0f));
+			//
+			//		ndInt32 passes = 128;
+			//		ndFloat32 angleLimit = ndFloat32(45.0f * ndDegreeToRad);
+			//		do
+			//		{
+			//			passes--;
+			//			ndFloat32 deltaAngle = -alpha.m_z * 0.001f;
+			//			angle += deltaAngle;
+			//			
+			//			angle = ndClamp(angle + deltaAngle, -angleLimit, angleLimit);
+			//			m_controlJoint->SetOffsetAngle(angle);
+			//			m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
+			//			alpha = CalculateAlpha();
+			//			//ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, deltaAngle));
+			//		} while ((ndAbs(alpha.m_z) > ND_ALPHA_TOL) && passes);
+			//		//ndTrace(("\n"));
+			//	}
+			//	m_crossValidation____ = CalculateAlpha();
+			//
+			//	xxx0 = m_controlJoint->GetOffsetAngle() - xxx0;
+			//	ndTrace(("deltaAngle(%f)\n", xxx0 * ndRadToDegree));
+			//	m_invDynamicsSolver.SolverEnd();
+			//}
 		}
 
 		ndMatrix m_invInertia;

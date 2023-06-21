@@ -389,7 +389,6 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 	bool processContacts = m_contactNotifyCallback->OnAabbOverlap(contact, m_timestep);
 	if (processContacts)
 	{
-		//ndAssert(!body0->GetAsBodyTriggerVolume());
 		ndAssert(!body0->GetCollisionShape().GetShape()->GetAsShapeNull());
 		ndAssert(!body1->GetCollisionShape().GetShape()->GetAsShapeNull());
 
