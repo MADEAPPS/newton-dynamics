@@ -287,8 +287,11 @@ namespace ndController_0
 			m_gyroTorque = gyroTorque;
 			inertia.m_posit = ndVector::m_wOne;
 			m_invInertia = inertia.Inverse4x4();
+		}
 
-			m_hasSupport = false;
+		bool ValidateContact(ndWorld* const world)
+		{
+			bool hasSupport = false;
 			ndBodyKinematic::ndContactMap::Iterator it(m_ballBody->GetContactMap());
 			for (it.Begin(); it; it++)
 			{
@@ -296,14 +299,19 @@ namespace ndController_0
 				if (contact->IsActive())
 				{
 					world->CalculateJointContacts(contact);
-					m_hasSupport = true;
+					hasSupport = true;
 				}
 			}
+			return hasSupport;
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
+			if (ValidateContact(world))
+			{
+
+			}
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -419,8 +427,8 @@ void ndBalanceController(ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
-	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	//ndSharedPtr<ndModel> model(CreateTrainer(scene, matrix));
+	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	ndSharedPtr<ndModel> model(CreateTrainer(scene, matrix));
 	scene->GetWorld()->AddModel(model);
 
 	ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
