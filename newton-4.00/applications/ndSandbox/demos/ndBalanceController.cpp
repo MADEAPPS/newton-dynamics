@@ -28,16 +28,15 @@ namespace ndController_0
 		public:
 		ndModelUnicycle()
 			:ndModelArticulation()
-			,m_invInertia(ndGetZeroMatrix())
-			,m_com(ndVector::m_zero)
-			,m_comVel(ndVector::m_zero)
-			,m_gyroTorque(ndVector::m_zero)
-			,m_comDist()
+			//,m_invInertia(ndGetZeroMatrix())
+			//,m_com(ndVector::m_zero)
+			//,m_comVel(ndVector::m_zero)
+			//,m_gyroTorque(ndVector::m_zero)
+			//,m_comDist()
 			,m_bodies()
 			,m_ballBody(nullptr)
 			,m_controlJoint(nullptr)
 			,m_invMass(ndFloat32 (0.0f))
-			,m_hasSupport(false)
 		{
 		}
 
@@ -51,9 +50,26 @@ namespace ndController_0
 				mass += body->GetMassMatrix().m_w;
 			}
 			m_invMass = ndFloat32(1.0f) / mass;
-			m_comDist.SetCount(m_bodies.GetCount());
+			//m_comDist.SetCount(m_bodies.GetCount());
 		}
 
+		bool ValidateContact(ndWorld* const world)
+		{
+			bool hasSupport = false;
+			ndBodyKinematic::ndContactMap::Iterator it(m_ballBody->GetContactMap());
+			for (it.Begin(); it; it++)
+			{
+				ndContact* const contact = it.GetNode()->GetInfo();
+				if (contact->IsActive())
+				{
+					world->CalculateJointContacts(contact);
+					hasSupport = true;
+				}
+			}
+			return hasSupport;
+		}
+
+#if 0
 		void InitState(ndWorld* const world)
 		{
 			//a) Mt = sum(m(i))
@@ -204,20 +220,78 @@ namespace ndController_0
 				m_invDynamicsSolver.SolverEnd();
 			}
 		}
+#else
+		void Update(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndModelArticulation::Update(world, timestep);
+		}
 
-		ndMatrix m_invInertia;
-		ndVector m_com;
-		ndVector m_comVel;
-		ndVector m_gyroTorque;
+		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndModelArticulation::PostUpdate(world, timestep);
+			if (ValidateContact(world))
+			{
+				ndAssert(m_bodies[0]->GetSkeleton());
+				ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
+
+				m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+
+				//a) Mt = sum(m(i))
+				//b) cg = sum(p(i) * m(i)) / Mt
+				//c) Vcg = sum(v(i) * m(i)) / Mt
+				//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
+				//e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
+				//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
+				//g) Bcg = (Icg ^ -1) * (T0 + T1)
+
+				//a) Mt = sum(m(i))
+				//b) cg = sum(p(i) * m(i)) / Mt
+				//f) T = sum[(p(i) - cg) x Fext(i) + Text(i) + w(i) x (I(i) * w(i)]
+
+				m_invDynamicsSolver.Solve();
+				ndVector com(ndVector::m_zero);
+				ndFixSizeArray<ndVector, 8> bodiesCom;
+				for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+				{
+					const ndBodyDynamic* const body = m_bodies[i];
+					const ndMatrix matrix(body->GetMatrix());
+					ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+					bodiesCom.PushBack(bodyCom);
+					com += bodyCom.Scale(body->GetMassMatrix().m_w);
+				}
+				com = com.Scale(m_invMass);
+
+				ndVector torque(ndVector::m_zero);
+				for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+				{
+					const ndBodyDynamic* const body = m_bodies[i];
+					const ndVector omega(body->GetOmega());
+					const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+					const ndVector force(m_invDynamicsSolver.GetBodyForce(body));
+					const ndVector comDist((bodiesCom[i] - com) & ndVector::m_triplexMask);
+
+					torque += m_invDynamicsSolver.GetBodyTorque(body);
+					torque += comDist.CrossProduct(force);
+					torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
+				}
+
+				m_invDynamicsSolver.SolverEnd();
+			}
+		}
+#endif
+
+		//ndMatrix m_invInertia;
+		//ndVector m_com;
+		//ndVector m_comVel;
+		//ndVector m_gyroTorque;
 
 		ndFixSizeArray<ndVector, 8> m_comDist;
 		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
 		ndBodyDynamic* m_ballBody;
 		ndJointHinge* m_controlJoint;
 		ndFloat32 m_invMass;
-		bool m_hasSupport;
-
-		ndVector m_crossValidation____;
+		//bool m_hasSupport;
+		//ndVector m_crossValidation____;
 	};
 
 	// implements a DQN to keep the robot balanced
@@ -278,6 +352,8 @@ namespace ndController_0
 
 		void InitState()
 		{
+			ndAssert(0);
+#if 0
 			//a) Mt = sum(m(i))
 			//b) cg = sum(p(i) * m(i)) / Mt
 			//c) Vcg = sum(v(i) * m(i)) / Mt
@@ -303,7 +379,7 @@ namespace ndController_0
 				bodiesCom.PushBack(bodyCom);
 				com += bodyCom.Scale(body->GetMassMatrix().m_w);
 			}
-			m_com = com.Scale(m_invMass);
+			com = com.Scale(m_invMass);
 
 			ndMatrix inertia(ndGetZeroMatrix());
 			ndVector gyroTorque(ndVector::m_zero);
@@ -335,22 +411,7 @@ namespace ndController_0
 			m_gyroTorque = gyroTorque;
 			inertia.m_posit = ndVector::m_wOne;
 			m_invInertia = inertia.Inverse4x4();
-		}
-
-		bool ValidateContact(ndWorld* const world)
-		{
-			bool hasSupport = false;
-			ndBodyKinematic::ndContactMap::Iterator it(m_ballBody->GetContactMap());
-			for (it.Begin(); it; it++)
-			{
-				ndContact* const contact = it.GetNode()->GetInfo();
-				if (contact->IsActive())
-				{
-					world->CalculateJointContacts(contact);
-					hasSupport = true;
-				}
-			}
-			return hasSupport;
+#endif
 		}
 
 		void InitTraning()
