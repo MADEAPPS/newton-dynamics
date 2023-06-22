@@ -176,18 +176,18 @@ void ndBrainReplayBuffer<statesSize, actionsSize>::SetCount(ndInt32 replayBuffer
 template<ndInt32 statesSize, ndInt32 actionsSize>
 void ndBrainReplayBuffer<statesSize, actionsSize>::AddTransition(const ndBrainReiforcementTransition<statesSize, actionsSize>& transition)
 {
-	if (GetCount() <= GetCapacity())
+	ndInt32 count = ndArray<ndBrainReiforcementTransition<statesSize, actionsSize>>::GetCount();
+	if (count <= ndArray<ndBrainReiforcementTransition<statesSize, actionsSize>>::GetCapacity())
 	{
-		ndAssert(GetCount() == m_replayBufferIndex);
-		PushBack(transition);
-		m_replayBufferIndex = GetCount();
+		ndAssert(count == m_replayBufferIndex);
+		ndArray<ndBrainReiforcementTransition<statesSize, actionsSize>>::PushBack(transition);
+		m_replayBufferIndex = ndArray<ndBrainReiforcementTransition<statesSize, actionsSize>>::GetCount();
 	}
 	else
 	{
-
 		//m_replayBufferIndex += (m_replayBufferIndex + 1) % GetCapacity();
 	}
-	m_replayBufferIndex += (m_replayBufferIndex + 1) % GetCapacity();
+	m_replayBufferIndex += (m_replayBufferIndex + 1) % ndArray<ndBrainReiforcementTransition<statesSize, actionsSize>>::GetCapacity();
 	
 }
 #endif 
