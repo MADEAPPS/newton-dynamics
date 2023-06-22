@@ -34,13 +34,12 @@ class ndBrainAgent: public ndClassAlloc
 	virtual ~ndBrainAgent();
 
 	virtual void LearnStep() = 0;
-	virtual void PredictAccion(ndBrainReiforcementTransition& transition);
-	virtual void GetTransition(ndBrainReiforcementTransition& transition) const = 0;
+	//virtual void PredictAccion(ndBrainReiforcementTransition& transition);
+	//virtual void GetTransition(ndBrainReiforcementTransition& transition) const = 0;
 
 	ndBrainInstance m_network;
-	ndBrainReplayBuffer m_replayBuffer;
-	
-	ndFloat32 m_exploration;
+	//ndBrainReplayBuffer m_replayBuffer;
+	//ndFloat32 m_exploration;
 };
 
 #endif 

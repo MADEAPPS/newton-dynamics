@@ -223,12 +223,59 @@ namespace ndController_0
 	class ndModelUnicycleTrainer : public ndModelUnicycle
 	{
 		public:
+		enum ndTrainingStage
+		{
+			m_initTraining,
+			m_tickTrainingEpoch,
+			m_endTraining,
+		};
+
+		class ndBasePose
+		{
+			public:
+			ndBasePose()
+			{
+			}
+
+			ndBasePose(ndBodyDynamic* const body)
+				:m_veloc(body->GetVelocity())
+				,m_omega(body->GetOmega())
+				,m_posit(body->GetPosition())
+				,m_rotation(body->GetRotation())
+				,m_body(body)
+			{
+			}
+
+			void SetPose()
+			{
+				m_body->SetMatrix(ndCalculateMatrix(m_rotation, m_posit));
+				m_body->SetOmega(m_omega);
+				m_body->SetVelocity(m_veloc);
+			}
+
+			ndVector m_veloc;
+			ndVector m_omega;
+			ndVector m_posit;
+			ndQuaternion m_rotation;
+			ndBodyDynamic* m_body;
+		};
+
 		ndModelUnicycleTrainer()
 			:ndModelUnicycle()
+			,m_currentTransition()
+			,m_replayBuffer()
+			,m_basePose()
+			,m_traingCounter(0)
+			,m_trainingState(m_initTraining)
 		{
+			// memories size 100000, batch size 256
+			m_replayBuffer.SetCount(100000, 256);
+
+			//ndBrainReiforcementTransition<2, 15> xxxxx;
+			//m_replayBuffer.AddTransition(xxxxx);
 		}
 
-		void InitState(ndWorld* const world)
+		void InitState()
 		{
 			//a) Mt = sum(m(i))
 			//b) cg = sum(p(i) * m(i)) / Mt
@@ -305,9 +352,58 @@ namespace ndController_0
 			return hasSupport;
 		}
 
+		void InitTraning()
+		{
+			for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
+			{
+				m_basePose[i].SetPose();
+			}
+
+			m_currentTransition.Clear();
+
+			//m_rollAngle = 0;
+			m_traingCounter++;
+			//m_epochCounter = 0;
+			//m_dqnAgent.m_exploration = ndMax(ndFloat32(0.01f), ndFloat32(m_dqnAgent.m_exploration - 0.01f));
+			//
+			//m_trainingState = (m_traingCounter < 200) ? m_tickTrainingEpoch : m_endTraining;
+			m_trainingState = (m_traingCounter < 1000) ? m_tickTrainingEpoch : m_endTraining;
+		}
+
+		void TrainingLoopBegin(ndWorld* const, ndFloat32)
+		{
+			switch (m_trainingState)
+			{
+				case m_initTraining:
+				{
+					InitTraning();
+					break;
+				}
+
+				case m_tickTrainingEpoch:
+				{
+					break;
+				}
+
+				case m_endTraining:
+				default:;
+					ndAssert(0);
+			}
+		}
+
+		void TrainingLoopEnd(ndWorld* const, ndFloat32)
+		{
+			//if (m_trainingState == m_tickTrainingEpoch)
+			//{
+			//	TickEpoch(world, timestep);
+			//}
+		}
+
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
+			TrainingLoopBegin(world, timestep);
+
 			if (ValidateContact(world))
 			{
 
@@ -317,7 +413,15 @@ namespace ndController_0
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
+
+			TrainingLoopEnd(world, timestep);
 		}
+
+		ndBrainReiforcementTransition<2, 15> m_currentTransition;
+		ndBrainReplayBuffer<2, 15> m_replayBuffer;
+		ndFixSizeArray<ndBasePose, 32> m_basePose;
+		ndInt32 m_traingCounter;
+		ndTrainingStage m_trainingState;
 	};
 
 	void BuildModel(ndModelUnicycle* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -412,6 +516,13 @@ namespace ndController_0
 	{
 		ndModelUnicycleTrainer* const model = new ndModelUnicycleTrainer();
 		BuildModel(model, scene, location);
+
+		//for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+		for (ndInt32 i = 0; i < model->m_bodies.GetCount(); ++i)
+		{
+			model->m_basePose.PushBack(model->m_bodies[i]);
+		}
+		model->m_basePose.PushBack(model->m_ballBody);
 
 		return model;
 	}

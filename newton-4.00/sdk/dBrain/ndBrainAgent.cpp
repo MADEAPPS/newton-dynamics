@@ -24,16 +24,17 @@
 
 ndBrainAgent::ndBrainAgent(ndBrain* const agent)
 	:m_network(agent)
-	,m_replayBuffer()
-	,m_exploration(1.0f)
+	//,m_replayBuffer()
+	//,m_exploration(1.0f)
 {
+	ndAssert(0);
 }
 
 ndBrainAgent::~ndBrainAgent()
 {
 }
 
-void ndBrainAgent::PredictAccion(ndBrainReiforcementTransition& transition)
-{
-	m_network.MakePrediction(transition.m_state, transition.m_action);
-}
+//void ndBrainAgent::PredictAccion(ndBrainReiforcementTransition& transition)
+//{
+//	m_network.MakePrediction(transition.m_state, transition.m_action);
+//}

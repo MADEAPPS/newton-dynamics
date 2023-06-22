@@ -683,7 +683,7 @@ namespace biped2
 
 	class ndHumanoidTraningModel : public ndHumanoidModel
 	{
-		enum ndTraningStage
+		enum ndTrainingStage
 		{
 			m_initTraining,
 			m_tickTrainingEpoch,
@@ -960,7 +960,7 @@ namespace biped2
 		ndFloat32 m_rollAngle;
 		ndInt32 m_traingCounter;
 		ndInt32 m_epochCounter;
-		ndTraningStage m_trainingState;
+		ndTrainingStage m_trainingState;
 	};
 
 	class ndModelUI : public ndUIEntity

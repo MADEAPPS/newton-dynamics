@@ -32,7 +32,7 @@ class ndBrainAgentDQN: public ndBrainAgent
 	virtual ~ndBrainAgentDQN();
 
 	virtual void LearnStep();
-	virtual void PredictAccion(ndBrainReiforcementTransition& transition);
+	//virtual void PredictAccion(ndBrainReiforcementTransition& transition);
 
 	ndBrainInstance m_targetNetwork;
 };
