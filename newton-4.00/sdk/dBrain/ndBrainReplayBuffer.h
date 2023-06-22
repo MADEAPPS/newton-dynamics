@@ -88,10 +88,10 @@ ndBrainBufferPart<size>::ndBrainBufferPart()
 template<ndInt32 size>
 void ndBrainBufferPart<size>::Clear()
 {
-	SetCount(0);
+	ndFixSizeArray<ndReal, size>::SetCount(0);
 	for (ndInt32 i = 0; i < size; ++i)
 	{
-		PushBack(ndReal(0.0f));
+		ndFixSizeArray<ndReal, size>::PushBack(ndReal(0.0f));
 	}
 }
 
