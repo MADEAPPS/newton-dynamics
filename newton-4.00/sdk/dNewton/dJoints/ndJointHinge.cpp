@@ -24,7 +24,7 @@ ndJointHinge::ndJointHinge()
 	,m_damperC(ndFloat32(0.0f))
 	,m_minLimit(ndFloat32(-1.0e10f))
 	,m_maxLimit(ndFloat32(1.0e10f))
-	,m_offsetAngle(ndFloat32(0.0f))
+	,m_targetAngle(ndFloat32(0.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))
 	,m_limitState(0)
 {
@@ -39,7 +39,7 @@ ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* co
 	,m_damperC(ndFloat32(0.0f))
 	,m_minLimit(ndFloat32(-1.0e10f))
 	,m_maxLimit(ndFloat32(1.0e10f))
-	,m_offsetAngle(ndFloat32(0.0f))
+	,m_targetAngle(ndFloat32(0.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))
 	,m_limitState(0)
 {
@@ -53,7 +53,7 @@ ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& p
 	,m_damperC(ndFloat32(0.0f))
 	,m_minLimit(ndFloat32(-1.0e10f))
 	,m_maxLimit(ndFloat32(1.0e10f))
-	,m_offsetAngle(ndFloat32(0.0f))
+	,m_targetAngle(ndFloat32(0.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))
 	,m_limitState(0)
 {
@@ -125,14 +125,14 @@ void ndJointHinge::GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit)
 	maxLimit = m_maxLimit;
 }
 
-ndFloat32 ndJointHinge::GetOffsetAngle() const
+ndFloat32 ndJointHinge::GetTargetAngle() const
 {
-	return m_offsetAngle;
+	return m_targetAngle;
 }
 
-void ndJointHinge::SetOffsetAngle(ndFloat32 angle)
+void ndJointHinge::SetTargetAngle(ndFloat32 angle)
 {
-	m_offsetAngle = angle;
+	m_targetAngle = angle;
 }
 
 void ndJointHinge::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
@@ -191,7 +191,7 @@ void ndJointHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 void ndJointHinge::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& )
 {
 	// add spring damper row
-	AddAngularRowJacobian(desc, matrix0.m_front, m_offsetAngle - m_angle);
+	AddAngularRowJacobian(desc, matrix0.m_front, m_targetAngle - m_angle);
 	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 }
 

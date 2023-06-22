@@ -527,7 +527,7 @@ namespace ndQuadruped_1
 				ndMatrix lookAtMatrix1;
 				info->m_footHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
 				const ndFloat32 lookAngle = info->m_footHinge->CalculateAngle(upVector.Scale(-1.0f), lookAtMatrix0[1], lookAtMatrix0[0]);
-				info->m_footHinge->SetOffsetAngle(lookAngle);
+				info->m_footHinge->SetTargetAngle(lookAngle);
 			}
 
 			InitState();

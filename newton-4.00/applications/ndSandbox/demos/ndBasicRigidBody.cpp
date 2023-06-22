@@ -164,7 +164,7 @@ class ndModelDragLine : public ndModelArticulation
         {
             m_angle += ndFmod(1.0f * timestep, 2.0f * ndPi);
             ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
-            m_controlJoint->SetOffsetAngle(dist);
+            m_controlJoint->SetTargetAngle(dist);
         }
     }
 

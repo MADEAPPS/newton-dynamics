@@ -167,41 +167,42 @@ namespace ndController_0
 			ndModelArticulation::PostUpdate(world, timestep);
 
 			InitState(world);
-			//if (m_hasSupport)
-			//{
-			//	ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
-			//	ndAssert(skeleton);
-			//
-			//	ndFloat32 xxx0 = m_controlJoint->GetOffsetAngle();
-			//	m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
-			//	ndVector alpha(CalculateAlpha());
-			//	if (ndAbs(alpha.m_z) > ND_ALPHA_TOL)
-			//	{
-			//		ndFloat32 angle = m_controlJoint->GetOffsetAngle();
-			//		//ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, 0.0f));
-			//
-			//		ndInt32 passes = 128;
-			//		ndFloat32 angleLimit = ndFloat32(45.0f * ndDegreeToRad);
-			//		do
-			//		{
-			//			passes--;
-			//			ndFloat32 deltaAngle = -alpha.m_z * 0.001f;
-			//			angle += deltaAngle;
-			//			
-			//			angle = ndClamp(angle + deltaAngle, -angleLimit, angleLimit);
-			//			m_controlJoint->SetOffsetAngle(angle);
-			//			m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
-			//			alpha = CalculateAlpha();
-			//			//ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, deltaAngle));
-			//		} while ((ndAbs(alpha.m_z) > ND_ALPHA_TOL) && passes);
-			//		//ndTrace(("\n"));
-			//	}
-			//	m_crossValidation____ = CalculateAlpha();
-			//
-			//	xxx0 = m_controlJoint->GetOffsetAngle() - xxx0;
-			//	ndTrace(("deltaAngle(%f)\n", xxx0 * ndRadToDegree));
-			//	m_invDynamicsSolver.SolverEnd();
-			//}
+			if (m_hasSupport)
+			//if (0)
+			{
+				ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
+				ndAssert(skeleton);
+			
+				m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+				ndVector alpha(CalculateAlpha());
+				if (ndAbs(alpha.m_z) > ND_ALPHA_TOL)
+				{
+					//ndFloat32 angle = m_controlJoint->GetOffsetAngle();
+					ndFloat32 angle = m_controlJoint->GetAngle();
+					//ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, 0.0f));
+			
+					ndInt32 passes = 1;
+					ndFloat32 angleLimit = ndFloat32(45.0f * ndDegreeToRad);
+					do
+					{
+						passes--;
+						ndFloat32 deltaAngle = alpha.m_z * 0.002f;
+						angle += deltaAngle;
+						
+						angle = ndClamp(angle + deltaAngle, -angleLimit, angleLimit);
+						m_controlJoint->SetTargetAngle(angle);
+						m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
+						alpha = CalculateAlpha();
+						//ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, deltaAngle));
+					} while ((ndAbs(alpha.m_z) > ND_ALPHA_TOL) && passes);
+					//ndTrace(("\n"));
+				}
+				m_crossValidation____ = CalculateAlpha();
+			
+				ndFloat32 xxx0 = m_controlJoint->GetTargetAngle() - m_controlJoint->GetAngle();
+				ndTrace(("deltaAngle(%f)\n", xxx0 * ndRadToDegree));
+				m_invDynamicsSolver.SolverEnd();
+			}
 		}
 
 		ndMatrix m_invInertia;
@@ -402,19 +403,19 @@ namespace ndController_0
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
-			TrainingLoopBegin(world, timestep);
-
-			if (ValidateContact(world))
-			{
-
-			}
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
 
-			TrainingLoopEnd(world, timestep);
+			TrainingLoopBegin(world, timestep);
+			if (ValidateContact(world))
+			{
+				
+			}
+
+			//TrainingLoopEnd(world, timestep);
 		}
 
 		ndBrainReiforcementTransition<2, 15> m_currentTransition;
@@ -446,7 +447,7 @@ namespace ndController_0
 		ndMatrix limbLocation(matrix);
 		limbLocation.m_posit.m_z += zSize * 0.0f;
 		limbLocation.m_posit.m_y -= ySize * 0.5f;
-		limbLocation.m_posit.m_x += xSize * 0.5f * 0.0f;
+		limbLocation.m_posit.m_x += xSize * 0.5f * 0.5f;
 
 		// make single leg
 		ndFloat32 limbLength = 0.3f;
@@ -538,8 +539,8 @@ void ndBalanceController(ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
-	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	ndSharedPtr<ndModel> model(CreateTrainer(scene, matrix));
+	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	//ndSharedPtr<ndModel> model(CreateTrainer(scene, matrix));
 	scene->GetWorld()->AddModel(model);
 
 	ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();

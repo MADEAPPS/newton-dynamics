@@ -713,8 +713,8 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 			if (wakeUpVehicle)
 			{
 				m_chassis->SetSleepState(false);
-				m_armHinge->SetOffsetAngle(m_armAngle);
-				m_bucketHinge->SetOffsetAngle(m_bucketAngle);
+				m_armHinge->SetTargetAngle(m_armAngle);
+				m_bucketHinge->SetTargetAngle(m_bucketAngle);
 			}
 		}
 	}

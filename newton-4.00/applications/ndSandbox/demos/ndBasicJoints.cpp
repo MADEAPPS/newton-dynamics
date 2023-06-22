@@ -426,7 +426,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 		{
 			m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
 			ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
-			SetOffsetAngle(dist);
+			SetTargetAngle(dist);
 			ndJointHinge::JacobianDerivative(desc);
 		}
 	
@@ -445,7 +445,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 		void JacobianDerivative(ndConstraintDescritor& desc)
 		{
 			ndFloat32 angle = GetAngle();
-			SetOffsetAngle(angle + m_speed * desc.m_timestep);
+			SetTargetAngle(angle + m_speed * desc.m_timestep);
 			ndJointHinge::JacobianDerivative(desc);
 		}
 		ndFloat32 m_speed;
