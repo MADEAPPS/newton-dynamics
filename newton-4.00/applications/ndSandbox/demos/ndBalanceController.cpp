@@ -479,8 +479,8 @@ namespace ndController_0
 			//TrainingLoopEnd(world, timestep);
 		}
 
-		ndBrainReiforcementTransition<2, 15> m_currentTransition;
-		ndBrainReplayBuffer<2, 15> m_replayBuffer;
+		ndBrainReiforcementTransition<ndInt32, 15> m_currentTransition;
+		ndBrainReplayBuffer<ndInt32, 15> m_replayBuffer;
 		ndFixSizeArray<ndBasePose, 32> m_basePose;
 		ndInt32 m_traingCounter;
 		ndTrainingStage m_trainingState;

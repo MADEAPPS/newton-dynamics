@@ -27,17 +27,7 @@
 #include "ndBrainMatrix.h"
 #include "ndBrainInstance.h"
 
-
-template<ndInt32 size>
-class ndBrainBufferPart : public ndFixSizeArray <ndReal, size>
-{
-	public:
-	ndBrainBufferPart();
-
-	void Clear();
-};
-
-template<ndInt32 statesSize, ndInt32 actionsSize>
+template<class Action, ndInt32 size>
 class ndBrainReiforcementTransition
 {
 	public:
@@ -46,15 +36,17 @@ class ndBrainReiforcementTransition
 	void Clear();
 	//void CopyFrom(const ndBrainReiforcementTransition& src);
 
-	ndBrainBufferPart<statesSize> m_state;
-	ndBrainBufferPart<statesSize> m_nextState;
-	ndBrainBufferPart<actionsSize> m_action;
+	//ndBrainBufferPart<statesSize> m_state;
+	//ndBrainBufferPart<statesSize> m_nextState;
+	ndFixSizeArray<ndReal, size> m_state;
+	ndFixSizeArray<ndReal, size> m_nextState;
+	Action m_action;
 	ndReal m_reward;
 	bool m_terminalState;
 };
 
-template<ndInt32 statesSize, ndInt32 actionsSize>
-class ndBrainReplayBuffer : public ndArray<ndBrainReiforcementTransition<statesSize, actionsSize>>
+template<class Action, ndInt32 size>
+class ndBrainReplayBuffer : public ndArray<ndBrainReiforcementTransition<Action, size>>
 {
 	public:
 	ndBrainReplayBuffer();
@@ -63,7 +55,7 @@ class ndBrainReplayBuffer : public ndArray<ndBrainReiforcementTransition<statesS
 	//void SetCount(ndInt32 replayBufferSize, ndInt32 replayBatchSize, ndInt32 stateSize, ndInt32 actionSize);
 	void SetCount(ndInt32 replayBufferSize, ndInt32 replayBatchSize);
 
-	void AddTransition(const ndBrainReiforcementTransition<statesSize, actionsSize>& transition);
+	void AddTransition(const ndBrainReiforcementTransition<Action, size>& transition);
 	//ndBrainReiforcementTransition& GetTransitionEntry();
 	//void MakeRandomBatch();
 
@@ -78,25 +70,8 @@ class ndBrainReplayBuffer : public ndArray<ndBrainReiforcementTransition<statesS
 	ndInt32 m_replayBufferIndex;
 };
 
-template<ndInt32 size>
-ndBrainBufferPart<size>::ndBrainBufferPart()
-	:ndFixSizeArray<ndReal, size>()
-{
-	Clear();
-}
-
-template<ndInt32 size>
-void ndBrainBufferPart<size>::Clear()
-{
-	ndFixSizeArray<ndReal, size>::SetCount(0);
-	for (ndInt32 i = 0; i < size; ++i)
-	{
-		ndFixSizeArray<ndReal, size>::PushBack(ndReal(0.0f));
-	}
-}
-
-template<ndInt32 statesSize, ndInt32 actionsSize>
-ndBrainReiforcementTransition<statesSize, actionsSize>::ndBrainReiforcementTransition()
+template<class Action, ndInt32 size>
+ndBrainReiforcementTransition<Action, size>::ndBrainReiforcementTransition()
 	:m_state()
 	,m_nextState()
 	,m_action()
@@ -105,19 +80,25 @@ ndBrainReiforcementTransition<statesSize, actionsSize>::ndBrainReiforcementTrans
 {
 }
 
-template<ndInt32 statesSize, ndInt32 actionsSize>
-void ndBrainReiforcementTransition<statesSize, actionsSize>::Clear()
+template<class Action, ndInt32 size>
+void ndBrainReiforcementTransition<Action, size>::Clear()
 {
-	m_state.Clear();
-	m_nextState.Clear();
-	m_action.Clear();
+	m_state.SetCount(0);
+	m_nextState.SetCount(0);
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		m_state.PushBack(ndReal(0.0f));
+		m_nextState.PushBack(ndReal(0.0f));
+	}
+
+	m_action = 0;
 	m_reward = ndReal(0.0f);
 	m_terminalState = false;
 }
 
-template<ndInt32 statesSize, ndInt32 actionsSize>
-ndBrainReplayBuffer<statesSize, actionsSize>::ndBrainReplayBuffer()
-	:ndArray<ndBrainReiforcementTransition<statesSize, actionsSize>>()
+template<class Action, ndInt32 size>
+ndBrainReplayBuffer<Action, size>::ndBrainReplayBuffer()
+	:ndArray<ndBrainReiforcementTransition<Action, size>>()
 	,m_randomShaffle()
 	//,m_inputBatch()
 	//,m_outputBatch()
@@ -130,13 +111,13 @@ ndBrainReplayBuffer<statesSize, actionsSize>::ndBrainReplayBuffer()
 {
 }
 
-template<ndInt32 statesSize, ndInt32 actionsSize>
-ndBrainReplayBuffer<statesSize, actionsSize>::~ndBrainReplayBuffer()
+template<class Action, ndInt32 size>
+ndBrainReplayBuffer<Action, size>::~ndBrainReplayBuffer()
 {
 }
 
-template<ndInt32 statesSize, ndInt32 actionsSize>
-void ndBrainReplayBuffer<statesSize, actionsSize>::SetCount(ndInt32 replayBufferSize, ndInt32)
+template<class Action, ndInt32 size>
+void ndBrainReplayBuffer<Action, size>::SetCount(ndInt32 replayBufferSize, ndInt32)
 {
 	////ndAssert(GetCount() == 0);
 	////ndAssert(m_learnBatchSize == 0);
@@ -145,10 +126,10 @@ void ndBrainReplayBuffer<statesSize, actionsSize>::SetCount(ndInt32 replayBuffer
 	m_replayBufferIndex = 0;
 	////m_learnBatchSize = replayBatchSize;
 	m_randomShaffle.Resize(replayBufferSize);
-	ndArray<ndBrainReiforcementTransition<statesSize, actionsSize>>::Resize(replayBufferSize);
+	ndArray<ndBrainReiforcementTransition<Action, size>>::Resize(replayBufferSize);
 
 	m_randomShaffle.SetCount(0);
-	ndArray<ndBrainReiforcementTransition<statesSize, actionsSize>>::SetCount(0);
+	ndArray<ndBrainReiforcementTransition<Action, size>>::SetCount(0);
 	//for (ndInt32 i = 0; i < replayBufferSize; i++)
 	//{
 	//	ndBrainReiforcementTransition& transition = (*this)[i];
@@ -173,21 +154,21 @@ void ndBrainReplayBuffer<statesSize, actionsSize>::SetCount(ndInt32 replayBuffer
 	////m_groundTruthBatch.Init(m_learnBatchSize, actionSize);
 }
 
-template<ndInt32 statesSize, ndInt32 actionsSize>
-void ndBrainReplayBuffer<statesSize, actionsSize>::AddTransition(const ndBrainReiforcementTransition<statesSize, actionsSize>& transition)
+template<class Action, ndInt32 size>
+void ndBrainReplayBuffer<Action, size>::AddTransition(const ndBrainReiforcementTransition<Action, size>& transition)
 {
-	ndInt32 count = ndArray<ndBrainReiforcementTransition<statesSize, actionsSize>>::GetCount();
-	if (count <= ndArray<ndBrainReiforcementTransition<statesSize, actionsSize>>::GetCapacity())
+	ndInt32 count = ndArray<ndBrainReiforcementTransition<Action, size>>::GetCount();
+	if (count <= ndArray<ndBrainReiforcementTransition<Action, size>>::GetCapacity())
 	{
 		ndAssert(count == m_replayBufferIndex);
-		ndArray<ndBrainReiforcementTransition<statesSize, actionsSize>>::PushBack(transition);
-		m_replayBufferIndex = ndArray<ndBrainReiforcementTransition<statesSize, actionsSize>>::GetCount();
+		ndArray<ndBrainReiforcementTransition<Action, size>>::PushBack(transition);
+		m_replayBufferIndex = ndArray<ndBrainReiforcementTransition<Action, size>>::GetCount();
 	}
 	else
 	{
 		//m_replayBufferIndex += (m_replayBufferIndex + 1) % GetCapacity();
 	}
-	m_replayBufferIndex += (m_replayBufferIndex + 1) % ndArray<ndBrainReiforcementTransition<statesSize, actionsSize>>::GetCapacity();
+	m_replayBufferIndex += (m_replayBufferIndex + 1) % ndArray<ndBrainReiforcementTransition<Action, size>>::GetCapacity();
 	
 }
 #endif 
