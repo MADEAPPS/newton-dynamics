@@ -38,6 +38,17 @@ namespace ndController_0
 			,m_controlJoint(nullptr)
 			,m_invMass(ndFloat32 (0.0f))
 		{
+			m_actionMap[0] = ndFloat32(-4.0f) * ndDegreeToRad;
+			m_actionMap[1] = ndFloat32(-2.0f) * ndDegreeToRad;
+			m_actionMap[2] = ndFloat32(-1.0f) * ndDegreeToRad;
+			m_actionMap[3] = ndFloat32(-0.5f) * ndDegreeToRad;
+			m_actionMap[4] = ndFloat32(-0.25f) * ndDegreeToRad;
+			m_actionMap[5] = ndFloat32(-0.0f) * ndDegreeToRad;
+			m_actionMap[6] = ndFloat32(0.25f) * ndDegreeToRad;
+			m_actionMap[7] = ndFloat32(0.5f) * ndDegreeToRad;
+			m_actionMap[8] = ndFloat32(1.0f) * ndDegreeToRad;
+			m_actionMap[9] = ndFloat32(2.0f) * ndDegreeToRad;
+			m_actionMap[10] = ndFloat32(4.0f) * ndDegreeToRad;
 		}
 
 		void Init()
@@ -290,6 +301,7 @@ namespace ndController_0
 		ndBodyDynamic* m_ballBody;
 		ndJointHinge* m_controlJoint;
 		ndFloat32 m_invMass;
+		ndReal m_actionMap[11];
 		//bool m_hasSupport;
 		//ndVector m_crossValidation____;
 	};
@@ -300,9 +312,12 @@ namespace ndController_0
 		public:
 		enum ndTrainingStage
 		{
-			m_initTraining,
-			m_tickTrainingEpoch,
-			m_endTraining,
+			m_initExploration,
+			m_exploration,
+			m_exploitExplore,
+			//m_initTraining,
+			//m_tickTrainingEpoch,
+			//m_endTraining,
 		};
 
 		class ndBasePose
@@ -341,7 +356,7 @@ namespace ndController_0
 			,m_replayBuffer()
 			,m_basePose()
 			,m_traingCounter(0)
-			,m_trainingState(m_initTraining)
+			,m_trainingState(m_initExploration)
 		{
 			// memories size 100000, batch size 256
 			m_replayBuffer.SetCount(100000, 256);
@@ -414,51 +429,98 @@ namespace ndController_0
 #endif
 		}
 
-		void InitTraning()
+		//void InitTraning()
+		//{
+		//	for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
+		//	{
+		//		m_basePose[i].SetPose();
+		//	}
+		//
+		//	m_currentTransition.Clear();
+		//
+		//	//m_rollAngle = 0;
+		//	m_traingCounter++;
+		//	//m_epochCounter = 0;
+		//	//m_dqnAgent.m_exploration = ndMax(ndFloat32(0.01f), ndFloat32(m_dqnAgent.m_exploration - 0.01f));
+		//	//
+		//	//m_trainingState = (m_traingCounter < 200) ? m_tickTrainingEpoch : m_endTraining;
+		//	m_trainingState = (m_traingCounter < 1000) ? m_tickTrainingEpoch : m_endTraining;
+		//}
+
+		void StartEpisode()
 		{
 			for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
 			{
 				m_basePose[i].SetPose();
 			}
-
 			m_currentTransition.Clear();
-
-			//m_rollAngle = 0;
-			m_traingCounter++;
+			m_currentTransition.m_action = ndUnsigned32(sizeof(m_actionMap) / sizeof(m_actionMap[0])) / 2 + 1;
+			//m_traingCounter = 0;
 			//m_epochCounter = 0;
 			//m_dqnAgent.m_exploration = ndMax(ndFloat32(0.01f), ndFloat32(m_dqnAgent.m_exploration - 0.01f));
 			//
 			//m_trainingState = (m_traingCounter < 200) ? m_tickTrainingEpoch : m_endTraining;
-			m_trainingState = (m_traingCounter < 1000) ? m_tickTrainingEpoch : m_endTraining;
 		}
 
 		void TrainingLoopBegin(ndWorld* const, ndFloat32)
 		{
 			switch (m_trainingState)
 			{
-				case m_initTraining:
+				case m_initExploration:
 				{
-					InitTraning();
+					ndSetRandSeed(42);
+					StartEpisode();
+					m_traingCounter = 0;
+					//m_trainingState = (m_traingCounter < 1000) ? m_tickTrainingEpoch : m_endTraining;
+					m_trainingState = m_exploration;
 					break;
 				}
 
-				case m_tickTrainingEpoch:
+				case m_exploration:
 				{
+					m_traingCounter++;
+					if (m_traingCounter > 256)
+					{
+						//m_trainingState = m_exploitExplore;
+					}
 					break;
 				}
 
-				case m_endTraining:
+				case m_exploitExplore:
+				{
+					ndAssert(0);
+					break;
+				}
+
+				//case m_initTraining:
+				//{
+				//	InitTraning();
+				//	break;
+				//}
+				//
+				//case m_tickTrainingEpoch:
+				//{
+				//	break;
+				//}
+				//
+				//case m_endTraining:
 				default:;
 					ndAssert(0);
 			}
 		}
 
-		void TrainingLoopEnd(ndWorld* const, ndFloat32)
+		//void TrainingLoopEnd(ndWorld* const, ndFloat32)
+		//{
+		//	//if (m_trainingState == m_tickTrainingEpoch)
+		//	//{
+		//	//	TickEpoch(world, timestep);
+		//	//}
+		//}
+
+		void SelectAction()
 		{
-			//if (m_trainingState == m_tickTrainingEpoch)
-			//{
-			//	TickEpoch(world, timestep);
-			//}
+			ndInt32 accion = ndInt32(ndRandInt() % ndUnsigned32(sizeof(m_actionMap) / sizeof(m_actionMap[0])));
+			m_currentTransition.m_action = accion;
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -471,16 +533,20 @@ namespace ndController_0
 			ndModelArticulation::PostUpdate(world, timestep);
 
 			TrainingLoopBegin(world, timestep);
-			if (ValidateContact(world))
+			//if (ValidateContact(world))
 			{
-				
+
+				SelectAction();
+				ndFloat32 action = m_actionMap[m_currentTransition.m_action];
+				ndFloat32 angle = ndClamp(m_controlJoint->GetAngle() + action, ndFloat32 (-45.0f) * ndDegreeToRad, ndFloat32(45.0f) * ndDegreeToRad);
+				m_controlJoint->SetTargetAngle(angle);
 			}
 
 			//TrainingLoopEnd(world, timestep);
 		}
 
-		ndBrainReiforcementTransition<ndInt32, 15> m_currentTransition;
-		ndBrainReplayBuffer<ndInt32, 15> m_replayBuffer;
+		ndBrainReiforcementTransition<ndInt32, sizeof (m_actionMap) / sizeof (m_actionMap[0])> m_currentTransition;
+		ndBrainReplayBuffer<ndInt32, sizeof(m_actionMap) / sizeof(m_actionMap[0])> m_replayBuffer;
 		ndFixSizeArray<ndBasePose, 32> m_basePose;
 		ndInt32 m_traingCounter;
 		ndTrainingStage m_trainingState;
@@ -508,7 +574,7 @@ namespace ndController_0
 		ndMatrix limbLocation(matrix);
 		limbLocation.m_posit.m_z += zSize * 0.0f;
 		limbLocation.m_posit.m_y -= ySize * 0.5f;
-		limbLocation.m_posit.m_x += xSize * 0.5f * 0.5f;
+		limbLocation.m_posit.m_x += xSize * 0.5f * 0.1f;
 
 		// make single leg
 		ndFloat32 limbLength = 0.3f;
@@ -600,8 +666,8 @@ void ndBalanceController(ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
-	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	//ndSharedPtr<ndModel> model(CreateTrainer(scene, matrix));
+	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	ndSharedPtr<ndModel> model(CreateTrainer(scene, matrix));
 	scene->GetWorld()->AddModel(model);
 
 	ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
