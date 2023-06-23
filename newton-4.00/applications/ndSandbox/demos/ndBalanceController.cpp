@@ -472,7 +472,6 @@ namespace ndController_0
 					ndSetRandSeed(42);
 					StartEpisode();
 					m_traingCounter = 0;
-					//m_trainingState = (m_traingCounter < 1000) ? m_tickTrainingEpoch : m_endTraining;
 					m_trainingState = m_exploration;
 					break;
 				}
@@ -483,6 +482,11 @@ namespace ndController_0
 					if (m_traingCounter > 256)
 					{
 						//m_trainingState = m_exploitExplore;
+					}
+
+					if (m_currentTransition.m_terminalState)
+					{
+						StartEpisode();
 					}
 					break;
 				}
@@ -534,14 +538,16 @@ namespace ndController_0
 			}
 		}
 
+		ndFloat32 GetStateReward()
+		{
+			const ndBodyKinematic* const body = GetRoot()->m_body->GetAsBodyKinematic();
+			ndFloat32 value = body->GetMatrix().m_up.m_y;
+			return value;
+		}
+
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
-
-			// select the action using epsilon greedy method
-			SelectAction();
-
-			//calculate reward for current state;
 			 
 			// apply the accion
 			ndFloat32 action = m_actionMap[m_currentTransition.m_action];
@@ -553,7 +559,6 @@ namespace ndController_0
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
 
-			TrainingLoopBegin(world, timestep);
 			//if (ValidateContact(world))
 			{
 				//Get state t + 1, from model and stored on replay buffer.
@@ -595,12 +600,27 @@ namespace ndController_0
 				}
 				m_invDynamicsSolver.SolverEnd();
 
+				//calculate reward for current state;
+				m_currentTransition.m_reward = GetStateReward();
+
+				// episode done, whne the upright orienta tion is less than 20 degree 
+				if (m_currentTransition.m_reward < ndFloat32(0.94f))
+				{
+					m_currentTransition.m_reward = ndFloat32(0.0f);
+					m_currentTransition.m_terminalState = true;
+				}
+
 				m_currentTransition.m_nextState[0] = torque.m_z;
 				m_currentTransition.m_nextState[1] = m_controlJoint->GetAngle();
 				m_replayBuffer.AddTransition(m_currentTransition);
 
 				// save the next state 
 				m_currentTransition.m_state = m_currentTransition.m_nextState;
+
+				// select the action using epsilon greedy method
+				SelectAction();
+
+				TrainingLoopBegin(world, timestep);
 			}
 
 			//TrainingLoopEnd(world, timestep);
