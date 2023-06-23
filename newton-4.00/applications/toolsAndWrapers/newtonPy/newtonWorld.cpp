@@ -62,8 +62,8 @@ class ndContactCallback : public ndContactNotify
 		};
 	};
 
-	ndContactCallback()
-		:ndContactNotify()
+	ndContactCallback(ndScene* const scene)
+		:ndContactNotify(scene)
 		//,m_materialMap()
 	{
 		//m_materialMap.Insert(ndMaterial(), ndMaterailKey(0, 0));
@@ -88,7 +88,7 @@ NewtonWorld::NewtonWorld()
 	,m_nominalTimestep(ndFloat32 (1.0f) / NOMINAL_FPS)
 {
 	ClearCache();
-	SetContactNotify(new ndContactCallback);
+	SetContactNotify(new ndContactCallback(GetScene()));
 }
 
 NewtonWorld::~NewtonWorld()
