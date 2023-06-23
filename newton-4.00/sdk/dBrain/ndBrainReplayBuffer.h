@@ -164,10 +164,10 @@ void ndBrainReplayBuffer<Action, statesCount>::AddTransition(const ndBrainReifor
 	}
 	else
 	{
+		ndAssert(0);
 		//m_replayBufferIndex += (m_replayBufferIndex + 1) % GetCapacity();
+		m_replayBufferIndex = (m_replayBufferIndex + 1) % ndArray<ndBrainReiforcementTransition<Action, statesCount>>::GetCapacity();
 	}
-	m_replayBufferIndex += (m_replayBufferIndex + 1) % ndArray<ndBrainReiforcementTransition<Action, statesCount>>::GetCapacity();
-	
 }
 #endif 
 

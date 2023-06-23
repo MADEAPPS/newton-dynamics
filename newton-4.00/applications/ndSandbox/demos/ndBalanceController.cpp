@@ -529,7 +529,7 @@ namespace ndController_0
 			}
 			else
 			{
-				// explit accions
+				// exploit accions
 				ndAssert(0);
 			}
 		}
@@ -537,6 +537,16 @@ namespace ndController_0
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
+
+			// select the action using epsilon greedy method
+			SelectAction();
+
+			//calculate reward for current state;
+			 
+			// apply the accion
+			ndFloat32 action = m_actionMap[m_currentTransition.m_action];
+			ndFloat32 angle = ndClamp(m_controlJoint->GetAngle() + action, ndFloat32(-45.0f) * ndDegreeToRad, ndFloat32(45.0f) * ndDegreeToRad);
+			m_controlJoint->SetTargetAngle(angle);
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -546,10 +556,51 @@ namespace ndController_0
 			TrainingLoopBegin(world, timestep);
 			//if (ValidateContact(world))
 			{
-				SelectAction();
-				ndFloat32 action = m_actionMap[m_currentTransition.m_action];
-				ndFloat32 angle = ndClamp(m_controlJoint->GetAngle() + action, ndFloat32 (-45.0f) * ndDegreeToRad, ndFloat32(45.0f) * ndDegreeToRad);
-				m_controlJoint->SetTargetAngle(angle);
+				//Get state t + 1, from model and stored on replay buffer.
+				ndAssert(m_bodies[0]->GetSkeleton());
+				ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
+
+				//a) Mt = sum(m(i))
+				//b) cg = sum(p(i) * m(i)) / Mt
+				//f) T = sum[(p(i) - cg) x Fext(i) + Text(i) + w(i) x (I(i) * w(i)]
+
+				ValidateContact(world);
+				m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+				m_invDynamicsSolver.Solve();
+
+				ndVector com(ndVector::m_zero);
+				ndFixSizeArray<ndVector, 8> bodiesCom;
+				for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+				{
+					const ndBodyDynamic* const body = m_bodies[i];
+					const ndMatrix matrix(body->GetMatrix());
+					ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+					bodiesCom.PushBack(bodyCom);
+					com += bodyCom.Scale(body->GetMassMatrix().m_w);
+				}
+				com = com.Scale(m_invMass);
+
+				ndVector torque(ndVector::m_zero);
+				for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+				{
+					const ndBodyDynamic* const body = m_bodies[i];
+					const ndVector omega(body->GetOmega());
+					const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+					const ndVector force(m_invDynamicsSolver.GetBodyForce(body));
+					const ndVector comDist((bodiesCom[i] - com) & ndVector::m_triplexMask);
+
+					torque += m_invDynamicsSolver.GetBodyTorque(body);
+					torque += comDist.CrossProduct(force);
+					torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
+				}
+				m_invDynamicsSolver.SolverEnd();
+
+				m_currentTransition.m_nextState[0] = torque.m_z;
+				m_currentTransition.m_nextState[1] = m_controlJoint->GetAngle();
+				m_replayBuffer.AddTransition(m_currentTransition);
+
+				// save the next state 
+				m_currentTransition.m_state = m_currentTransition.m_nextState;
 			}
 
 			//TrainingLoopEnd(world, timestep);
