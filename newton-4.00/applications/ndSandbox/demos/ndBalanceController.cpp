@@ -22,7 +22,10 @@
 
 namespace ndController_0
 {
-	#define ND_ALPHA_TOL ndFloat32 (1.0e-3f)
+	//#define ND_ALPHA_TOL ndFloat32 (1.0e-3f)
+	#define ND_ACTIONS			12
+	#define ND_TOTAL_ACTIONS	(2 * ND_ACTIONS + 1)
+
 	class ndModelUnicycle : public ndModelArticulation
 	{
 		public:
@@ -38,21 +41,14 @@ namespace ndController_0
 			,m_controlJoint(nullptr)
 			,m_invMass(ndFloat32 (0.0f))
 		{
-			m_actionMap[0] = ndFloat32(-0.0f) * ndDegreeToRad;
-			m_actionMap[1] = ndFloat32(-0.25f) * ndDegreeToRad;
-			m_actionMap[2] = ndFloat32(0.25f) * ndDegreeToRad;
-			m_actionMap[3] = ndFloat32(-0.5f) * ndDegreeToRad;
-			m_actionMap[4] = ndFloat32(0.5f) * ndDegreeToRad;
-			m_actionMap[5] = ndFloat32(-1.0f) * ndDegreeToRad;
-			m_actionMap[6] = ndFloat32(1.0f) * ndDegreeToRad;
-			m_actionMap[7] = ndFloat32(-2.0f) * ndDegreeToRad;
-			m_actionMap[8] = ndFloat32(2.0f) * ndDegreeToRad;
-			m_actionMap[9] = ndFloat32(-4.0f) * ndDegreeToRad;
-			m_actionMap[10] = ndFloat32(4.0f) * ndDegreeToRad;
-			m_actionMap[11] = ndFloat32(-8.0f) * ndDegreeToRad;
-			m_actionMap[12] = ndFloat32(8.0f) * ndDegreeToRad;
-			m_actionMap[13] = ndFloat32(-16.0f) * ndDegreeToRad;
-			m_actionMap[14] = ndFloat32(16.0f) * ndDegreeToRad;
+			ndFloat32 angleStep = ndFloat32(0.25f) * ndDegreeToRad;
+			for (ndInt32 i = 0; i < ND_TOTAL_ACTIONS; ++i)
+			{
+				m_actionMap[i * 2 + 1] = -angleStep;
+				m_actionMap[i * 2 + 2] = angleStep;
+				angleStep *= ndFloat32(1.5f);
+			}
+			m_actionMap[0] = 0.0f;
 		}
 
 		void Init()
@@ -305,7 +301,7 @@ namespace ndController_0
 		ndBodyDynamic* m_ballBody;
 		ndJointHinge* m_controlJoint;
 		ndFloat32 m_invMass;
-		ndReal m_actionMap[15];
+		ndReal m_actionMap[ND_TOTAL_ACTIONS];
 		//bool m_hasSupport;
 		//ndVector m_crossValidation____;
 	};
@@ -361,6 +357,7 @@ namespace ndController_0
 			,m_basePose()
 			,m_traingCounter(0)
 			,m_trainingState(m_initExploration)
+			,m_epsilonGreedy(ndFloat32 (1.0f))
 		{
 			// memories size 100000, batch size 256
 			m_replayBuffer.SetCount(100000, 256);
@@ -523,8 +520,18 @@ namespace ndController_0
 
 		void SelectAction()
 		{
-			ndInt32 accion = ndInt32(ndRandInt() % ndUnsigned32(sizeof(m_actionMap) / sizeof(m_actionMap[0])));
-			m_currentTransition.m_action = accion;
+			ndFloat32 explore = ndRand();
+			if (explore <= m_epsilonGreedy)
+			{
+				// explore actions;
+				ndInt32 accion = ndInt32(ndRandInt() % ND_TOTAL_ACTIONS);
+				m_currentTransition.m_action = accion;
+			}
+			else
+			{
+				// explit accions
+				ndAssert(0);
+			}
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -539,7 +546,6 @@ namespace ndController_0
 			TrainingLoopBegin(world, timestep);
 			//if (ValidateContact(world))
 			{
-
 				SelectAction();
 				ndFloat32 action = m_actionMap[m_currentTransition.m_action];
 				ndFloat32 angle = ndClamp(m_controlJoint->GetAngle() + action, ndFloat32 (-45.0f) * ndDegreeToRad, ndFloat32(45.0f) * ndDegreeToRad);
@@ -549,11 +555,12 @@ namespace ndController_0
 			//TrainingLoopEnd(world, timestep);
 		}
 
-		ndBrainReiforcementTransition<ndInt32, sizeof (m_actionMap) / sizeof (m_actionMap[0])> m_currentTransition;
-		ndBrainReplayBuffer<ndInt32, sizeof(m_actionMap) / sizeof(m_actionMap[0])> m_replayBuffer;
+		ndBrainReiforcementTransition<ndInt32, 2> m_currentTransition;
+		ndBrainReplayBuffer<ndInt32, 2> m_replayBuffer;
 		ndFixSizeArray<ndBasePose, 32> m_basePose;
 		ndInt32 m_traingCounter;
 		ndTrainingStage m_trainingState;
+		ndFloat32 m_epsilonGreedy;
 	};
 
 	void BuildModel(ndModelUnicycle* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
