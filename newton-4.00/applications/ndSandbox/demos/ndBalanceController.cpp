@@ -38,17 +38,21 @@ namespace ndController_0
 			,m_controlJoint(nullptr)
 			,m_invMass(ndFloat32 (0.0f))
 		{
-			m_actionMap[0] = ndFloat32(-4.0f) * ndDegreeToRad;
-			m_actionMap[1] = ndFloat32(-2.0f) * ndDegreeToRad;
-			m_actionMap[2] = ndFloat32(-1.0f) * ndDegreeToRad;
+			m_actionMap[0] = ndFloat32(-0.0f) * ndDegreeToRad;
+			m_actionMap[1] = ndFloat32(-0.25f) * ndDegreeToRad;
+			m_actionMap[2] = ndFloat32(0.25f) * ndDegreeToRad;
 			m_actionMap[3] = ndFloat32(-0.5f) * ndDegreeToRad;
-			m_actionMap[4] = ndFloat32(-0.25f) * ndDegreeToRad;
-			m_actionMap[5] = ndFloat32(-0.0f) * ndDegreeToRad;
-			m_actionMap[6] = ndFloat32(0.25f) * ndDegreeToRad;
-			m_actionMap[7] = ndFloat32(0.5f) * ndDegreeToRad;
-			m_actionMap[8] = ndFloat32(1.0f) * ndDegreeToRad;
-			m_actionMap[9] = ndFloat32(2.0f) * ndDegreeToRad;
+			m_actionMap[4] = ndFloat32(0.5f) * ndDegreeToRad;
+			m_actionMap[5] = ndFloat32(-1.0f) * ndDegreeToRad;
+			m_actionMap[6] = ndFloat32(1.0f) * ndDegreeToRad;
+			m_actionMap[7] = ndFloat32(-2.0f) * ndDegreeToRad;
+			m_actionMap[8] = ndFloat32(2.0f) * ndDegreeToRad;
+			m_actionMap[9] = ndFloat32(-4.0f) * ndDegreeToRad;
 			m_actionMap[10] = ndFloat32(4.0f) * ndDegreeToRad;
+			m_actionMap[11] = ndFloat32(-8.0f) * ndDegreeToRad;
+			m_actionMap[12] = ndFloat32(8.0f) * ndDegreeToRad;
+			m_actionMap[13] = ndFloat32(-16.0f) * ndDegreeToRad;
+			m_actionMap[14] = ndFloat32(16.0f) * ndDegreeToRad;
 		}
 
 		void Init()
@@ -301,7 +305,7 @@ namespace ndController_0
 		ndBodyDynamic* m_ballBody;
 		ndJointHinge* m_controlJoint;
 		ndFloat32 m_invMass;
-		ndReal m_actionMap[11];
+		ndReal m_actionMap[15];
 		//bool m_hasSupport;
 		//ndVector m_crossValidation____;
 	};
@@ -454,7 +458,7 @@ namespace ndController_0
 				m_basePose[i].SetPose();
 			}
 			m_currentTransition.Clear();
-			m_currentTransition.m_action = ndUnsigned32(sizeof(m_actionMap) / sizeof(m_actionMap[0])) / 2 + 1;
+			m_currentTransition.m_action = 0;
 			//m_traingCounter = 0;
 			//m_epochCounter = 0;
 			//m_dqnAgent.m_exploration = ndMax(ndFloat32(0.01f), ndFloat32(m_dqnAgent.m_exploration - 0.01f));
