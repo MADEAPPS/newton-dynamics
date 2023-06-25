@@ -165,6 +165,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	ndInt32 GetDebugDisplay() const;
 	void SetDebugDisplay(ndInt32 mode) const;
 
+	void SetAcceleratedUpdate(); 
 	const ndShaderCache& GetShaderCache() const;  
 	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(ndMeshLoader& loader, const char* const meshName);
 	
@@ -275,18 +276,6 @@ inline ndPhysicsWorld* ndDemoEntityManager::GetWorld() const
 	return m_world;
 }
 
-inline ndInt32 ndDemoEntityManager::GetWidth() const 
-{ 
-	ImGuiIO& io = ImGui::GetIO();
-	return (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-}
-
-inline ndInt32 ndDemoEntityManager::GetHeight() const 
-{ 
-	ImGuiIO& io = ImGui::GetIO();
-	return (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
-}
-
 inline ndInt32 ndDemoEntityManager::GetDebugDisplay() const
 {
 	ndAssert (0);
@@ -312,5 +301,4 @@ inline void ndDemoEntityManager::SetSelectedModel(ndModel* const model)
 {
 	m_selectedModel = model;
 }
-
 #endif

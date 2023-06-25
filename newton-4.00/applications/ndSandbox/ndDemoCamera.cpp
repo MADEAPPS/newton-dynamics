@@ -21,6 +21,7 @@ ndDemoCamera::ndDemoCamera()
 	:ndDemoEntity (ndGetIdentityMatrix(), nullptr) 
 	,m_viewMatrix(ndGetIdentityMatrix())
 	,m_projectionMatrix(ndGetIdentityMatrix())
+	,m_invProjectionMatrix(ndGetIdentityMatrix())
 	,m_fov(D_CAMERA_ANGLE * ndDegreeToRad)
 	,m_backPlane(2000.0f)
 	,m_frontPlane (0.01f)
@@ -126,6 +127,7 @@ void ndDemoCamera::SetViewMatrix(ndInt32 width, ndInt32 height)
 
 	// calculate projection matrix
 	m_projectionMatrix = CreatePerspectiveMatrix(m_fov, GLfloat(width) / GLfloat(height), m_frontPlane, m_backPlane);
+	m_invProjectionMatrix = m_projectionMatrix.Inverse4x4();
 
 	// set the model view matrix 
 	const ndVector pointOfInterest(m_matrix.m_posit + m_matrix.m_front);
@@ -134,6 +136,7 @@ void ndDemoCamera::SetViewMatrix(ndInt32 width, ndInt32 height)
 
 ndVector ndDemoCamera::ScreenToWorld (const ndVector& screenPoint) const
 {
+#if 0
 	GLdouble winX = screenPoint.m_x; //Store the x cord;
 	GLdouble winY = screenPoint.m_y; //Store the y cord
 	GLdouble winZ = screenPoint.m_z; //Store the Z cord
@@ -159,6 +162,27 @@ ndVector ndDemoCamera::ScreenToWorld (const ndVector& screenPoint) const
 
 	gluUnProject (winX, winY, winZ, modelViewMatrix, projectionViewMatrix, (GLint*)&m_viewport, &objx, &objy, &objz);
 	return ndVector (ndFloat32(objx), ndFloat32(objy), ndFloat32(objz), ndFloat32 (1.0f));
+
+#else
+	ndVector winPoint(screenPoint);
+	winPoint.m_y = (ndFloat32)m_viewport[3] - winPoint.m_y;
+
+	ndVector in(
+		((winPoint.m_x - (ndFloat32)m_viewport[0]) / (ndFloat32)m_viewport[2]) * ndFloat32(2.0f) - ndFloat32(1.0f),
+		((winPoint.m_y - (ndFloat32)m_viewport[1]) / (ndFloat32)m_viewport[3]) * ndFloat32(2.0f) - ndFloat32(1.0f),
+		winPoint.m_z * ndFloat32(2.0f) - ndFloat32(1.0f), ndFloat32(1.0f));
+
+	//ndMatrix projectModel(m_viewMatrix * m_projectionMatrix);
+	//this inverse is add more errors that computing the inverse of the perspective. also more expensive
+	//ndMatrix invProjectModel(projectModel.Inverse4x4());
+	//ndVector out(invProjectModel.TransformVector1x4(in));
+	ndVector out(m_viewMatrix.OrthoInverse().TransformVector1x4(m_invProjectionMatrix.TransformVector1x4(in)));
+	if (out.m_w != 0.0)
+	{
+		out = out.Scale(1.0f / out.m_w);
+	}
+	return out;
+#endif
 }
 
 //ndVector ndDemoCamera::WorldToScreen (const ndVector& worldPoint) const

@@ -93,6 +93,8 @@ class ndPhysicsWorld: public ndWorld
 	ndSoundManager* GetSoundManager() const;
 	void RemoveEntity(ndDemoEntity* const entity);
 
+	void AccelerateUpdates();
+
 	private:
 	void PreUpdate(ndFloat32 timestep);
 	void PostUpdate(ndFloat32 timestep);
@@ -101,6 +103,7 @@ class ndPhysicsWorld: public ndWorld
 	ndSoundManager* m_soundManager;
 	ndFloat32 m_timeAccumulator;
 	ndDefferentDeleteEntities m_deadEntities;
+	bool m_acceleratedUpdate;
 };
 
 #endif

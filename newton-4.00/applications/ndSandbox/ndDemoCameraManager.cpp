@@ -42,7 +42,7 @@ class ndDemoCameraPickBodyJoint: public ndJointKinematicController
 	ndDemoCameraManager* m_manager;
 };
 
-ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const)
+ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const scene)
 	:ndClassAlloc()
 	,m_pickedBodyTargetPosition(ndVector::m_wOne)
 	,m_pickedBodyLocalAtachmentPoint(ndVector::m_wOne)
@@ -62,6 +62,9 @@ ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const)
 	,m_mouseLockState(false)
 	,m_pickingMode(false)
 {
+	ndInt32 display_w = scene->GetWidth();
+	ndInt32 display_h = scene->GetHeight();
+	m_camera->SetViewMatrix(display_w, display_h);
 }
 
 ndDemoCameraManager::~ndDemoCameraManager()
@@ -180,14 +183,14 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, ndFloat32
 		replay.m_mouseState = mouseState ? 1 : 0;
 
 		static FILE* file = fopen("cameraLog.bin", "wb");
-		if (file) 
+		if (file)
 		{
 			fwrite(&replay, sizeof(ndReplay), 1, file);
 			fflush(file);
 		}
 	#else 
 		static FILE* file = fopen("cameraLog.bin", "rb");
-		if (file) 
+		if (file)
 		{
 			fread(&replay, sizeof(ndReplay), 1, file);
 			p0 = replay.m_p0;

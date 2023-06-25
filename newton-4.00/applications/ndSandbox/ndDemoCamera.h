@@ -48,6 +48,7 @@ class ndDemoCamera: public ndDemoEntity
 
 	ndMatrix m_viewMatrix;
 	ndMatrix m_projectionMatrix;
+	ndMatrix m_invProjectionMatrix;
 
 	ndFloat32 m_fov;
 	ndFloat32 m_backPlane;

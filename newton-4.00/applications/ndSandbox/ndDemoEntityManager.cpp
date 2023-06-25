@@ -242,7 +242,7 @@ class ndDemoEntityManager::ndDemoEntityManager::ndDebugMeshCache : public ndTree
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
-ndDemoEntityManager::ndDemoEntityManager ()
+ndDemoEntityManager::ndDemoEntityManager()
 	:m_mainFrame(nullptr)
 	,m_defaultFont(0)
 	,m_sky(nullptr)
@@ -533,6 +533,24 @@ void APIENTRY ndDemoEntityManager::OpenMessageCallback(GLenum source,
 	}
 }
 #endif
+
+ndInt32 ndDemoEntityManager::GetWidth() const
+{
+	//ImGuiIO& io = ImGui::GetIO();
+	//return (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+	ndInt32 w, h;
+	glfwGetWindowSize(m_mainFrame, &w, &h);
+	return w;
+}
+
+ndInt32 ndDemoEntityManager::GetHeight() const
+{
+	//ImGuiIO& io = ImGui::GetIO();
+	//return (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+	ndInt32 w, h;
+	glfwGetWindowSize(m_mainFrame, &w, &h);
+	return h;
+}
 
 ndDemoCamera* ndDemoEntityManager::GetCamera() const
 {
@@ -1532,6 +1550,11 @@ void ndDemoEntityManager::DrawDebugShapes()
 	}
 	
 	RenderParticles(this);
+}
+
+void ndDemoEntityManager::SetAcceleratedUpdate()
+{
+	m_world->AccelerateUpdates();
 }
 
 void ndDemoEntityManager::RenderScene()

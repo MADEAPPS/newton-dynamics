@@ -310,11 +310,13 @@ namespace ndController_0
 	class ndModelUnicycleTrainer : public ndModelUnicycle
 	{
 		public:
-		enum ndTrainingStage
+		enum class ndTrainingStage
 		{
-			m_initExploration,
-			m_exploration,
-			m_exploitExplore,
+			m_starTraining,
+			m_populateReplay,
+			//m_initExploration,
+			//m_exploration,
+			//m_exploitExplore,
 			//m_initTraining,
 			//m_tickTrainingEpoch,
 			//m_endTraining,
@@ -324,6 +326,7 @@ namespace ndController_0
 		{
 			public:
 			ndBasePose()
+				:m_body(nullptr)
 			{
 			}
 
@@ -353,15 +356,16 @@ namespace ndController_0
 		ndModelUnicycleTrainer()
 			:ndModelUnicycle()
 			,m_currentTransition()
-			,m_replayBuffer()
+			,m_replayBuffer(1024 * 128)
 			,m_basePose()
 			,m_traingCounter(0)
-			,m_trainingState(m_initExploration)
+			,m_trainingState(ndTrainingStage::m_starTraining)
 			,m_epsilonGreedy(ndFloat32 (1.0f))
 		{
 			// memories size 100000, batch size 256
-			m_replayBuffer.SetCount(100000, 256);
+			ndSetRandSeed(42);
 
+			//m_trainingState = ndTrainingStage::m_populateReplay;
 			//ndBrainReiforcementTransition<2, 15> xxxxx;
 			//m_replayBuffer.AddTransition(xxxxx);
 		}
@@ -430,24 +434,6 @@ namespace ndController_0
 #endif
 		}
 
-		//void InitTraning()
-		//{
-		//	for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
-		//	{
-		//		m_basePose[i].SetPose();
-		//	}
-		//
-		//	m_currentTransition.Clear();
-		//
-		//	//m_rollAngle = 0;
-		//	m_traingCounter++;
-		//	//m_epochCounter = 0;
-		//	//m_dqnAgent.m_exploration = ndMax(ndFloat32(0.01f), ndFloat32(m_dqnAgent.m_exploration - 0.01f));
-		//	//
-		//	//m_trainingState = (m_traingCounter < 200) ? m_tickTrainingEpoch : m_endTraining;
-		//	m_trainingState = (m_traingCounter < 1000) ? m_tickTrainingEpoch : m_endTraining;
-		//}
-
 		void StartEpisode()
 		{
 			for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
@@ -455,72 +441,42 @@ namespace ndController_0
 				m_basePose[i].SetPose();
 			}
 			m_currentTransition.Clear();
-			m_currentTransition.m_action = 0;
-			//m_traingCounter = 0;
-			//m_epochCounter = 0;
-			//m_dqnAgent.m_exploration = ndMax(ndFloat32(0.01f), ndFloat32(m_dqnAgent.m_exploration - 0.01f));
-			//
-			//m_trainingState = (m_traingCounter < 200) ? m_tickTrainingEpoch : m_endTraining;
+
+			//m_currentTransition.m_action = 0;
+			SelectAction();
 		}
 
 		void TrainingLoopBegin(ndWorld* const, ndFloat32)
 		{
 			switch (m_trainingState)
 			{
-				case m_initExploration:
+				case ndTrainingStage::m_starTraining:
 				{
-					ndSetRandSeed(42);
 					StartEpisode();
-					m_traingCounter = 0;
-					m_trainingState = m_exploration;
+					m_replayBuffer.SetCount(0);
+					m_trainingState = ndTrainingStage::m_populateReplay;
 					break;
 				}
 
-				case m_exploration:
+				case ndTrainingStage::m_populateReplay:
 				{
-					m_traingCounter++;
-					if (m_traingCounter > 256)
-					{
-						//m_trainingState = m_exploitExplore;
-					}
-
 					if (m_currentTransition.m_terminalState)
 					{
 						StartEpisode();
 					}
+
+					if (m_replayBuffer.GetCount() == m_replayBuffer.GetCapacity())
+					{
+						ndAssert(0);
+					}
+
 					break;
 				}
-
-				case m_exploitExplore:
-				{
-					ndAssert(0);
-					break;
-				}
-
-				//case m_initTraining:
-				//{
-				//	InitTraning();
-				//	break;
-				//}
-				//
-				//case m_tickTrainingEpoch:
-				//{
-				//	break;
-				//}
-				//
-				//case m_endTraining:
+				
 				default:;
 					ndAssert(0);
 			}
 		}
-
-		//void TrainingLoopEnd(ndWorld* const, ndFloat32)
-		//{
-		//	//if (m_trainingState == m_tickTrainingEpoch)
-		//	//{
-		//	//	TickEpoch(world, timestep);
-		//	//}
-		//}
 
 		void SelectAction()
 		{
@@ -604,7 +560,7 @@ namespace ndController_0
 				m_currentTransition.m_reward = GetStateReward();
 
 				// episode done, whne the upright orienta tion is less than 20 degree 
-				if (m_currentTransition.m_reward < ndFloat32(0.94f))
+				if (m_currentTransition.m_reward < ndFloat32(0.95f))
 				{
 					m_currentTransition.m_reward = ndFloat32(0.0f);
 					m_currentTransition.m_terminalState = true;
@@ -656,7 +612,7 @@ namespace ndController_0
 		ndMatrix limbLocation(matrix);
 		limbLocation.m_posit.m_z += zSize * 0.0f;
 		limbLocation.m_posit.m_y -= ySize * 0.5f;
-		limbLocation.m_posit.m_x += xSize * 0.5f * 0.1f;
+		limbLocation.m_posit.m_x += xSize * 0.5f * -0.1f;
 
 		// make single leg
 		ndFloat32 limbLength = 0.3f;
@@ -734,6 +690,7 @@ namespace ndController_0
 		}
 		model->m_basePose.PushBack(model->m_ballBody);
 
+		scene->SetAcceleratedUpdate();
 		return model;
 	}
 }
