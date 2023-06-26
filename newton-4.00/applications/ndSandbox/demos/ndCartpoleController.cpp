@@ -20,8 +20,14 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+// this is an implementation of the vanilla dqn training as decrived 
+// on the nature paper below. 
+// https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
+
 namespace ndController_0
 {
+	#define D_REPLAY_BUFFERSIZE (1024 * 64)
+
 	enum ndActionSpace
 	{
 		m_statePut,
@@ -39,29 +45,69 @@ namespace ndController_0
 		m_stateCount
 	};
 
+	class ndCartpoleBase : public ndModelArticulation
+	{
+		public:
+
+		virtual void GetObservation() const = 0;
+
+	};
+
 	class ndDQNTrainer
 	{
 		public:
+		ndDQNTrainer(ndCartpoleBase* const model)
+			:m_replayBuffer(D_REPLAY_BUFFERSIZE)
+			,m_currentTransition()
+			,m_model(model)
+		{
+		}
 
-		ndBrainReplayBuffer<ndInt32, 1> m_replayBuffer;
-		ndBrainReplayTransitionMemory<ndInt32, 1> m_currentTransition;
+		void Train()
+		{
+			m_model->GetObservation();
+		}
+
+		ndBrainReplayBuffer<ndInt32, m_stateCount> m_replayBuffer;
+		ndBrainReplayTransitionMemory<ndInt32, m_stateCount> m_currentTransition;
+		ndCartpoleBase* m_model;
 	};
 
-	class ndCartpole : public ndModelArticulation
+	class ndCartpole : public ndCartpoleBase
 	{
 		public:
 		ndCartpole()
-			:ndModelArticulation()
+			:ndCartpoleBase()
 			,m_trainer(nullptr)
+			,m_cart(nullptr)
+			,m_pole(nullptr)
 		{
+		}
+
+		void GetObservation() const
+		{
+			ndFloat32 posit = m_cart->GetMatrix().m_posit.m_x;
+			ndFloat32 veloc = m_cart->GetVelocity().m_x;
+
+			ndFloat32 angle = ndAsin(m_pole->GetMatrix().m_up.m_y);
+			ndFloat32 omega = m_pole->GetOmega().m_z;
+
+			m_trainer->m_currentTransition.m_state[m_cartPosition] = ndReal(posit);
+			m_trainer->m_currentTransition.m_state[m_cartVelocity] = ndReal(veloc);
+			m_trainer->m_currentTransition.m_state[m_poleAngle] = ndReal(angle);
+			m_trainer->m_currentTransition.m_state[m_poleOmega] = ndReal(omega);
+			//ndTrace(("%f %f %f %f\n", posit, veloc, angle * ndRadToDegree, omega));
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
+			m_trainer->Train();
 		}
 
 		ndSharedPtr<ndDQNTrainer> m_trainer;
+		ndBodyDynamic* m_cart;
+		ndBodyDynamic* m_pole;
 	};
 
 	void BuildModel(ndCartpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -100,6 +146,10 @@ namespace ndController_0
 		ndBodyKinematic* const rootBody = cartBody->GetAsBodyKinematic();
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointSlider(rootBody->GetMatrix(), rootBody, world->GetSentinelBody()));
 		world->AddJoint(fixJoint);
+
+		model->m_cart = rootBody->GetAsBodyDynamic();
+		model->m_pole = poleBody->GetAsBodyDynamic();
+		model->m_trainer = ndSharedPtr<ndDQNTrainer>(new ndDQNTrainer(model));
 	}
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -116,7 +166,8 @@ void ndCartpoleController(ndDemoEntityManager* const scene)
 	// build a floor
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
 	BuildFlatPlane(scene, true);
-	
+
+	ndSetRandSeed(42);
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
