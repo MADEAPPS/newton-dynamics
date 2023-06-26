@@ -255,6 +255,7 @@ namespace ndController_0
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
 
 		ndMatrix matrix(cartBody->GetMatrix());
+		matrix.m_posit.m_y += ySize / 2.0f;
 
 		// make single leg
 		ndFloat32 poleLength = 0.4f;
@@ -274,13 +275,12 @@ namespace ndController_0
 		// add model limbs
 		model->AddLimb(modelRoot, poleBody, poleJoint);
 
-		ndBodyKinematic* const rootBody = cartBody->GetAsBodyKinematic();
-		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointSlider(rootBody->GetMatrix(), rootBody, world->GetSentinelBody()));
+		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointSlider(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
 		world->AddJoint(fixJoint);
 
-		model->m_cart = rootBody->GetAsBodyDynamic();
+		model->m_cart = cartBody->GetAsBodyDynamic();
 		model->m_pole = poleBody->GetAsBodyDynamic();
-		model->m_cartMatrix = rootBody->GetMatrix();
+		model->m_cartMatrix = cartBody->GetMatrix();
 		model->m_poleMatrix = poleBody->GetMatrix();
 
 		model->m_trainer = ndSharedPtr<ndDQNAgent>(new ndDQNAgent(model));
