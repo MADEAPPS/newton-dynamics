@@ -22,7 +22,7 @@
 
 namespace ndController_0
 {
-	enum ndActionMap
+	enum ndActionSpace
 	{
 		m_statePut,
 		m_pushLeft,
@@ -30,7 +30,7 @@ namespace ndController_0
 		m_acctionsCount
 	};
 
-	enum ndStateMap
+	enum ndStateSpace
 	{
 		m_cartPosition,
 		m_cartVelocity,
