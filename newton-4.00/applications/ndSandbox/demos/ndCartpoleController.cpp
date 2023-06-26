@@ -59,16 +59,40 @@ namespace ndController_0
 		virtual void GetObservation(ndReal* const state) const = 0;
 	};
 
-	class ndDQNTrainer
+	class ndQValuePredictor : public ndBrain
 	{
 		public:
-		ndDQNTrainer(ndCartpoleBase* const model)
-			:m_replayBuffer(D_REPLAY_BUFFERSIZE)
+		ndQValuePredictor()
+			:ndBrain()
+		{
+			ndBrainLayer* const inputLayer = new ndBrainLayer(m_stateCount, 128, m_relu);
+			ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), 128, m_relu);
+			ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), 128, m_relu);
+			ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer1->GetOuputSize(), m_acctionsCount, m_lineal);
+
+			BeginAddLayer();
+			AddLayer(inputLayer);
+			AddLayer(hiddenLayer0);
+			AddLayer(hiddenLayer1);
+			AddLayer(ouputLayer);
+			EndAddLayer();
+			InitGaussianWeights(0.0f, 0.125f);
+		}
+	};
+
+	class ndDQNAgent
+	{
+		public:
+		ndDQNAgent(ndCartpoleBase* const model)
+			:m_onlineNetwork()
+			,m_targetNetwork(m_onlineNetwork)
+			,m_replayBuffer(D_REPLAY_BUFFERSIZE)
 			,m_currentTransition()
 			,m_model(model)
 			,m_epsilonGreedy(1.0f)
 			,m_frameCount(0)
 		{
+			//m_targetNetwork.CopyFrom(const ndBrain & src);
 		}
 
 		void Train()
@@ -92,6 +116,8 @@ namespace ndController_0
 			m_frameCount++;
 		}
 
+		ndQValuePredictor m_onlineNetwork;
+		ndQValuePredictor m_targetNetwork;
 		ndBrainReplayBuffer<ndInt32, m_stateCount> m_replayBuffer;
 		ndBrainReplayTransitionMemory<ndInt32, m_stateCount> m_currentTransition;
 		ndCartpoleBase* m_model;
@@ -194,7 +220,7 @@ namespace ndController_0
 		ndMatrix m_poleMatrix;
 		ndBodyDynamic* m_cart;
 		ndBodyDynamic* m_pole;
-		ndSharedPtr<ndDQNTrainer> m_trainer;
+		ndSharedPtr<ndDQNAgent> m_trainer;
 	};
 
 	void BuildModel(ndCartpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -239,7 +265,7 @@ namespace ndController_0
 		model->m_cartMatrix = rootBody->GetMatrix();
 		model->m_poleMatrix = poleBody->GetMatrix();
 
-		model->m_trainer = ndSharedPtr<ndDQNTrainer>(new ndDQNTrainer(model));
+		model->m_trainer = ndSharedPtr<ndDQNAgent>(new ndDQNAgent(model));
 	}
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
