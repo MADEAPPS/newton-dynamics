@@ -364,10 +364,6 @@ namespace ndController_0
 		{
 			// memories size 100000, batch size 256
 			ndSetRandSeed(42);
-
-			//m_trainingState = ndTrainingStage::m_populateReplay;
-			//ndBrainReiforcementTransition<2, 15> xxxxx;
-			//m_replayBuffer.AddTransition(xxxxx);
 		}
 
 		void InitState()
@@ -484,12 +480,12 @@ namespace ndController_0
 			if (explore <= m_epsilonGreedy)
 			{
 				// explore actions;
-				ndInt32 accion = ndInt32(ndRandInt() % ND_TOTAL_ACTIONS);
-				m_currentTransition.m_action = accion;
+				ndInt32 action = ndInt32(ndRandInt() % ND_TOTAL_ACTIONS);
+				m_currentTransition.m_action[0] = action;
 			}
 			else
 			{
-				// exploit accions
+				// exploit actions
 				ndAssert(0);
 			}
 		}
@@ -505,8 +501,8 @@ namespace ndController_0
 		{
 			ndModelArticulation::Update(world, timestep);
 			 
-			// apply the accion
-			ndFloat32 action = m_actionMap[m_currentTransition.m_action];
+			// apply the action
+			ndFloat32 action = m_actionMap[m_currentTransition.m_action[0]];
 			ndFloat32 angle = ndClamp(m_controlJoint->GetAngle() + action, ndFloat32(-45.0f) * ndDegreeToRad, ndFloat32(45.0f) * ndDegreeToRad);
 			m_controlJoint->SetTargetAngle(angle);
 		}
@@ -582,7 +578,7 @@ namespace ndController_0
 			//TrainingLoopEnd(world, timestep);
 		}
 
-		ndBrainReiforcementTransition<ndInt32, 2> m_currentTransition;
+		ndBrainReplayTransitionMemory<ndInt32, 2> m_currentTransition;
 		ndBrainReplayBuffer<ndInt32, 2> m_replayBuffer;
 		ndFixSizeArray<ndBasePose, 32> m_basePose;
 		ndInt32 m_traingCounter;

@@ -1109,8 +1109,8 @@ bool ndDemoEntityManager::GetMouseSpeed(ndFloat32& speedX, ndFloat32& speedY) co
 bool ndDemoEntityManager::GetMousePosition (ndFloat32& posX, ndFloat32& posY) const
 {
 	ImVec2 posit(ImGui::GetMousePos());
-	posX = posit.x;
-	posY = posit.y;
+	posX = ndClamp(posit.x, ndReal(-1.0e10f), ndReal(1.0e10f));
+	posY = ndClamp(posit.y, ndReal(-1.0e10f), ndReal(1.0e10f));
 	return true;
 }
 

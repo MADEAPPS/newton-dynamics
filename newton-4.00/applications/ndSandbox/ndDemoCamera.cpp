@@ -164,24 +164,21 @@ ndVector ndDemoCamera::ScreenToWorld (const ndVector& screenPoint) const
 	return ndVector (ndFloat32(objx), ndFloat32(objy), ndFloat32(objz), ndFloat32 (1.0f));
 
 #else
-	ndVector winPoint(screenPoint);
-	winPoint.m_y = (ndFloat32)m_viewport[3] - winPoint.m_y;
+	ndVector sp(screenPoint);
+	sp.m_y = (ndFloat32)m_viewport[3] - sp.m_y;
 
-	ndVector in(
-		((winPoint.m_x - (ndFloat32)m_viewport[0]) / (ndFloat32)m_viewport[2]) * ndFloat32(2.0f) - ndFloat32(1.0f),
-		((winPoint.m_y - (ndFloat32)m_viewport[1]) / (ndFloat32)m_viewport[3]) * ndFloat32(2.0f) - ndFloat32(1.0f),
-		winPoint.m_z * ndFloat32(2.0f) - ndFloat32(1.0f), ndFloat32(1.0f));
+	sp.m_x = ndFloat32(2.0f) * (sp.m_x - (ndFloat32)m_viewport[0]) / (ndFloat32)m_viewport[2] - ndFloat32(1.0f);
+	sp.m_y = ndFloat32(2.0f) * (sp.m_y - (ndFloat32)m_viewport[1]) / (ndFloat32)m_viewport[3] - ndFloat32(1.0f),
+	sp.m_z = ndFloat32(2.0f) * sp.m_z  - ndFloat32(1.0f);
+	sp.m_w = ndFloat32(1.0f);
 
-	//ndMatrix projectModel(m_viewMatrix * m_projectionMatrix);
-	//this inverse is add more errors that computing the inverse of the perspective. also more expensive
-	//ndMatrix invProjectModel(projectModel.Inverse4x4());
-	//ndVector out(invProjectModel.TransformVector1x4(in));
-	ndVector out(m_viewMatrix.OrthoInverse().TransformVector1x4(m_invProjectionMatrix.TransformVector1x4(in)));
-	if (out.m_w != 0.0)
+	//sp = viewPoint * ViewMatrx * projeMatrix;
+	ndVector viewPoint(m_viewMatrix.OrthoInverse().TransformVector1x4(m_invProjectionMatrix.TransformVector1x4(sp)));
+	if (viewPoint.m_w != 0.0)
 	{
-		out = out.Scale(1.0f / out.m_w);
+		viewPoint = viewPoint.Scale(1.0f / viewPoint.m_w);
 	}
-	return out;
+	return viewPoint;
 #endif
 }
 
