@@ -257,25 +257,28 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 				if (notify)
 				{
 					ndTrace(("picked body id: %d\n", body->GetId()));
-		
 					m_pickedBodyParam = param;
-					ndVector mass(body->GetMassMatrix());
-		
-					//change this to make the grabbing stronger or weaker
-					//const ndFloat32 angularFritionAccel = 10.0f;
-					const ndFloat32 angularFritionAccel = 10.0f;
-					const ndFloat32 linearFrictionAccel = 40.0f * ndMax(ndAbs(DEMO_GRAVITY), ndFloat32(10.0f));
-					const ndFloat32 inertia = ndMax(mass.m_z, ndMax(mass.m_x, mass.m_y));
-		
-					ndDemoCameraPickBodyJoint* const pickJoint = new ndDemoCameraPickBodyJoint(body, scene->GetWorld()->GetSentinelBody(), posit, this);
-					m_pickJoint = ndSharedPtr<ndJointBilateralConstraint>(pickJoint);
-					scene->GetWorld()->AddJoint(m_pickJoint);
-					m_pickingMode ?
-						pickJoint->SetControlMode(ndJointKinematicController::m_linear) :
-						pickJoint->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
-					
-					pickJoint->SetMaxLinearFriction(mass.m_w * linearFrictionAccel);
-					pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
+
+					if (body->GetAsBodyDynamic())
+					{
+						ndVector mass(body->GetMassMatrix());
+
+						//change this to make the grabbing stronger or weaker
+						//const ndFloat32 angularFritionAccel = 10.0f;
+						const ndFloat32 angularFritionAccel = 10.0f;
+						const ndFloat32 linearFrictionAccel = 40.0f * ndMax(ndAbs(DEMO_GRAVITY), ndFloat32(10.0f));
+						const ndFloat32 inertia = ndMax(mass.m_z, ndMax(mass.m_x, mass.m_y));
+
+						ndDemoCameraPickBodyJoint* const pickJoint = new ndDemoCameraPickBodyJoint(body, scene->GetWorld()->GetSentinelBody(), posit, this);
+						m_pickJoint = ndSharedPtr<ndJointBilateralConstraint>(pickJoint);
+						scene->GetWorld()->AddJoint(m_pickJoint);
+						m_pickingMode ?
+							pickJoint->SetControlMode(ndJointKinematicController::m_linear) :
+							pickJoint->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
+
+						pickJoint->SetMaxLinearFriction(mass.m_w * linearFrictionAccel);
+						pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
+					}
 				}
 			}
 		}
