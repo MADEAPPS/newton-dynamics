@@ -52,71 +52,26 @@ namespace ndController_0
 		ndSharedPtr<ndBody> hipBody(world->GetBody(AddBox(scene, location, carMass, xSize, ySize, zSize, "smilli.tga")));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(hipBody);
 
-		//ndMatrix matrix(hipBody->GetMatrix());
-		//matrix.m_posit.m_y += 0.5f;
-		//hipBody->SetMatrix(matrix);
-		//
-		//ndMatrix limbLocation(matrix);
-		//limbLocation.m_posit.m_z += zSize * 0.0f;
-		//limbLocation.m_posit.m_y -= ySize * 0.5f;
-		//limbLocation.m_posit.m_x += xSize * 0.5f * -0.1f;
-		//
-		//// make single leg
-		//ndFloat32 limbLength = 0.3f;
-		//ndFloat32 limbRadio = 0.025f;
-		//
-		//ndSharedPtr<ndBody> legBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "smilli.tga")));
-		//ndMatrix legLocation(ndRollMatrix(-90.0f * ndDegreeToRad) * limbLocation);
-		//legLocation.m_posit.m_y -= limbLength * 0.5f;
-		//legBody->SetMatrix(legLocation);
-		//ndMatrix legPivot(ndYawMatrix(90.0f * ndDegreeToRad) * legLocation);
-		//legPivot.m_posit.m_y += limbLength * 0.5f;
-		//ndSharedPtr<ndJointBilateralConstraint> legJoint(new ndJointHinge(legPivot, legBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
-		//ndJointHinge* const hinge = (ndJointHinge*)*legJoint;
-		//hinge->SetAsSpringDamper(0.001f, 1500, 40.0f);
-		//model->m_controlJoint = hinge;
-		//
-		//// make wheel
-		//ndFloat32 wheelRadio = 4.0f * limbRadio;
-		//ndSharedPtr<ndBody> wheelBody(world->GetBody(AddSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "smilli.tga")));
-		//ndMatrix wheelMatrix(legPivot);
-		//wheelMatrix.m_posit.m_y -= limbLength;
-		//wheelBody->SetMatrix(wheelMatrix);
-		//ndSharedPtr<ndJointBilateralConstraint> wheelJoint(new ndJointSpherical(wheelMatrix, wheelBody->GetAsBodyKinematic(), legBody->GetAsBodyKinematic()));
-		////((ndJointSpherical*)*wheelJoint)->SetAsSpringDamper(ndFloat32(0.001f), ndFloat32(0.0f), ndFloat32(10.f));
-		//
-		//// tele port the model so that is on the floor
-		//ndMatrix probeMatrix(wheelMatrix);
-		//probeMatrix.m_posit.m_x += 1.0f;
-		//ndMatrix floor(FindFloor(*world, probeMatrix, wheelBody->GetAsBodyKinematic()->GetCollisionShape(), 20.0f));
-		//ndFloat32 dist = wheelMatrix.m_posit.m_y - floor.m_posit.m_y;
-		//
-		//ndMatrix rootMatrix(modelRoot->m_body->GetMatrix());
-		//
-		//rootMatrix.m_posit.m_y -= dist;
-		//wheelMatrix.m_posit.m_y -= dist;
-		//legLocation.m_posit.m_y -= dist;
-		//
-		//legBody->SetMatrix(legLocation);
-		//wheelBody->SetMatrix(wheelMatrix);
-		//modelRoot->m_body->SetMatrix(rootMatrix);
-		//
-		//legBody->GetNotifyCallback()->OnTransform(0, legLocation);
-		//wheelBody->GetNotifyCallback()->OnTransform(0, wheelMatrix);
-		//modelRoot->m_body->GetNotifyCallback()->OnTransform(0, rootMatrix);
-		//
-		//// add the joints manually, because on this model the wheel is not actuated.
-		//world->AddJoint(legJoint);
-		//world->AddJoint(wheelJoint);
-		//
-		//// add model limbs
-		//model->AddLimb(modelRoot, legBody, legJoint);
-		//
-		//model->m_ballBody = wheelBody->GetAsBodyDynamic();
-		//
-		//model->Init();
+		ndMatrix matrix(hipBody->GetMatrix());
 
-		//ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
+		// make single leg
+		ndFloat32 poleLength = 0.4f;
+		ndFloat32 poleRadio = 0.025f;
+		
+		ndSharedPtr<ndBody> poleBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), poleMass, poleRadio, poleRadio, poleLength, "smilli.tga")));
+		ndMatrix poleLocation(ndRollMatrix(-90.0f * ndDegreeToRad) * matrix);
+		poleLocation.m_posit.m_y += poleLength * 0.5f;
+		poleBody->SetMatrix(poleLocation);
+
+		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
+		polePivot.m_posit.m_y -= poleLength * 0.5f;
+		ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
+
+		world->AddJoint(poleJoint);
+
+		// add model limbs
+		model->AddLimb(modelRoot, poleBody, poleJoint);
+
 		ndBodyKinematic* const rootBody = hipBody->GetAsBodyKinematic();
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointSlider(rootBody->GetMatrix(), rootBody, world->GetSentinelBody()));
 		world->AddJoint(fixJoint);
@@ -141,7 +96,7 @@ void ndCarpoleController(ndDemoEntityManager* const scene)
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
 	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	scene->GetWorld()->AddModel(model);
+	world->AddModel(model);
 	
 	matrix.m_posit.m_x -= 0.0f;
 	matrix.m_posit.m_y += 0.5f;
