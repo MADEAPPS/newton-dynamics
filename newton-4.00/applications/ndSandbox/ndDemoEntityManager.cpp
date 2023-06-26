@@ -54,7 +54,7 @@
 //#define DEFAULT_SCENE	15		// advanced industrial robot
 //#define DEFAULT_SCENE	16		// basic player
 //#define DEFAULT_SCENE	17		// rag doll
-#define DEFAULT_SCENE	18		// card pole controller
+#define DEFAULT_SCENE	18		// cart pole controller
 //#define DEFAULT_SCENE	19		// unit cycle controller
 //#define DEFAULT_SCENE	20		// quadruped test 1
 //#define DEFAULT_SCENE	21		// quadruped test 2
@@ -81,11 +81,11 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_2(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
-void ndCarpoleController(ndDemoEntityManager* const scene);
 void ndBalanceController(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
+void ndCartpoleController(ndDemoEntityManager* const scene);
 void ndBipedTest_2Trainer(ndDemoEntityManager* const scene);
 void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
@@ -120,7 +120,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
 	{ "basic player", ndPlayerCapsuleDemo },
 	{ "rag doll", ndRagdollTest },
-	{ "carpole controller", ndCarpoleController },
+	{ "carpole controller", ndCartpoleController },
 	{ "balance controller", ndBalanceController },
 	{ "quadruped test one", ndQuadrupedTest_1 },
 	{ "quadruped test two", ndQuadrupedTest_2 },

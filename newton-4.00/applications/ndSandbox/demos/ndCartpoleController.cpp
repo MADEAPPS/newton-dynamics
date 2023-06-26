@@ -22,14 +22,37 @@
 
 namespace ndController_0
 {
-	#define ND_ACTIONS			12
-	#define ND_TOTAL_ACTIONS	(2 * ND_ACTIONS + 1)
+	enum ndActionMap
+	{
+		m_statePut,
+		m_pushLeft,
+		m_pushRight,
+		m_acctionsCount
+	};
 
-	class ndCarpole : public ndModelArticulation
+	enum ndStateMap
+	{
+		m_cartPosition,
+		m_cartVelocity,
+		m_poleAngle,
+		m_poleOmega,
+		m_stateCount
+	};
+
+	class ndDQNTrainer
 	{
 		public:
-		ndCarpole()
+
+		ndBrainReplayBuffer<ndInt32, 1> m_replayBuffer;
+		ndBrainReplayTransitionMemory<ndInt32, 1> m_currentTransition;
+	};
+
+	class ndCartpole : public ndModelArticulation
+	{
+		public:
+		ndCartpole()
 			:ndModelArticulation()
+			,m_trainer(nullptr)
 		{
 		}
 
@@ -37,22 +60,24 @@ namespace ndController_0
 		{
 			ndModelArticulation::Update(world, timestep);
 		}
+
+		ndSharedPtr<ndDQNTrainer> m_trainer;
 	};
 
-	void BuildModel(ndCarpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
+	void BuildModel(ndCartpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		ndFloat32 xSize = 0.25f;
 		ndFloat32 ySize = 0.125f;
 		ndFloat32 zSize = 0.15f;
-		ndFloat32 carMass = 5.0f;
+		ndFloat32 cartMass = 5.0f;
 		ndFloat32 poleMass = 1.0f;
 		ndPhysicsWorld* const world = scene->GetWorld();
 		
 		// add hip body
-		ndSharedPtr<ndBody> hipBody(world->GetBody(AddBox(scene, location, carMass, xSize, ySize, zSize, "smilli.tga")));
-		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(hipBody);
+		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.tga")));
+		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
 
-		ndMatrix matrix(hipBody->GetMatrix());
+		ndMatrix matrix(cartBody->GetMatrix());
 
 		// make single leg
 		ndFloat32 poleLength = 0.4f;
@@ -72,21 +97,21 @@ namespace ndController_0
 		// add model limbs
 		model->AddLimb(modelRoot, poleBody, poleJoint);
 
-		ndBodyKinematic* const rootBody = hipBody->GetAsBodyKinematic();
+		ndBodyKinematic* const rootBody = cartBody->GetAsBodyKinematic();
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointSlider(rootBody->GetMatrix(), rootBody, world->GetSentinelBody()));
 		world->AddJoint(fixJoint);
 	}
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
-		ndCarpole* const model = new ndCarpole();
+		ndCartpole* const model = new ndCartpole();
 		BuildModel(model, scene, location);
 		return model;
 	}
 }
 
 using namespace ndController_0;
-void ndCarpoleController(ndDemoEntityManager* const scene)
+void ndCartpoleController(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
