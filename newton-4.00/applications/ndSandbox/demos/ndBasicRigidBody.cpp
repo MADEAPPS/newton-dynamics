@@ -16,6 +16,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
@@ -38,8 +39,8 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 	scene->SetCameraMatrix(rot, origin);
 }
 
-#else
-
+//#else
+#elif 0
 
 class ndCustomJointHinge : public ndJointHinge
 {
@@ -172,7 +173,6 @@ class ndModelDragLine : public ndModelArticulation
     ndJointHinge* m_controlJoint;
 };
 
-//void ndDraglineLeg(ndDemoEntityManager* const scene)
 void ndBasicRigidBody(ndDemoEntityManager* const scene)
 {
     // build a floor
@@ -192,6 +192,97 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
     ndQuaternion rot;
     ndVector origin(-60.0f, 5.0f, 0.0f, 1.0f);
     scene->SetCameraMatrix(rot, origin);
+}
+
+#else
+
+///* Copyright (c) <2003-2022> <Newton Game Dynamics>
+//*
+//* This software is provided 'as-is', without any express or implied
+//* warranty. In no event will the authors be held liable for any damages
+//* arising from the use of this software.
+//*
+//* Permission is granted to anyone to use this software for any purpose,
+//* including commercial applications, and to alter it and redistribute it
+//* freely
+//*/
+//
+
+
+
+static ndSharedPtr<ndBody> AddBoxBody(ndDemoEntityManager* const scene, ndBigVector vPos, ndBigVector nvSize, ndFloat32 mass, bool Kinematic)
+{
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndShapeInstance box(new ndShapeBox(ndFloat32 (nvSize.m_x), ndFloat32(nvSize.m_y), ndFloat32(nvSize.m_z)));
+	ndMatrix uvMatrix(ndGetIdentityMatrix());
+	const char* const textureName = "default.tga";
+	ndSharedPtr<ndDemoMeshInterface> geometry(new ndDemoMesh("box", scene->GetShaderCache(), &box, textureName, textureName, textureName, 1.0f, uvMatrix));
+
+	ndMatrix matrix(ndGetIdentityMatrix());
+	matrix.m_posit = vPos;
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	entity->SetMesh(geometry);
+
+	ndBodyKinematic* Body;
+	if (Kinematic)
+		Body = new ndBodyKinematic();
+	else
+		Body = new ndBodyDynamic();
+
+	Body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	//    Body->SetNotifyCallback(new ndApplyFixForce());
+	Body->SetMatrix(matrix);
+	Body->SetCollisionShape(box);
+	Body->SetMassMatrix(mass, box);
+	scene->AddEntity(entity);
+
+	ndSharedPtr<ndBody> bodyPtr(Body);
+	world->AddBody(bodyPtr);
+	return bodyPtr;
+
+}
+
+void ndHardLink2Bodies(ndDemoEntityManager* const scene, ndSharedPtr<ndBody> b1, ndSharedPtr<ndBody> b2)
+{
+	ndMatrix Gmatrix(ndGetIdentityMatrix());
+	Gmatrix.m_posit = ((b1->GetMatrix().m_posit + b2->GetMatrix().m_posit).Scale(0.5f));
+	ndJointFix6dof* const joint = new ndJointFix6dof(Gmatrix, b1->GetAsBodyKinematic(), b2->GetAsBodyKinematic());
+	ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+	ndWorld* myworld = scene->GetWorld();
+	myworld->AddJoint(jointPtr);
+}
+
+//void ndMishoTestCase(ndDemoEntityManager* const scene)
+void ndBasicRigidBody(ndDemoEntityManager* const scene)
+{
+	// build a floor
+	BuildFloorBox(scene, ndGetIdentityMatrix());
+
+	ndBigVector BoxSize(10.f, 10.f, 10.f, 1.0f);
+	//ndFloat32 massBox = 1500000.0;
+    ndFloat32 massBox = 1500.0;
+	ndBigVector PlankSize(4.f, 2.f, 40.f, 1.0f);
+	ndFloat32 massPlank = 1500.0;
+
+	ndBigVector posD(60.f, 5.f, -30.f, 1.0f);
+	ndSharedPtr<ndBody> bodyDynamic = AddBoxBody(scene, posD, BoxSize, massBox, false);
+	posD.m_y = 11.f;
+	ndSharedPtr<ndBody> plankDynamic = AddBoxBody(scene, posD, PlankSize, massPlank, false);
+
+	ndBigVector posK(60.f, 5.f, 30.f, 1.0f);
+	ndSharedPtr<ndBody> bodyKinematic = AddBoxBody(scene, posK, BoxSize, massBox, true);
+	posK.m_y = 11.f;
+	ndSharedPtr<ndBody> plankKinematic = AddBoxBody(scene, posK, PlankSize, massPlank, false);
+
+
+	ndHardLink2Bodies(scene, bodyKinematic, plankKinematic);
+	ndHardLink2Bodies(scene, bodyDynamic, plankDynamic);
+
+	ndMatrix FlightSimPosition(ndGetIdentityMatrix());
+
+	ndQuaternion rot;
+	ndVector origin(0.0f, 5.0f, 0.0f, 1.0f);
+	scene->SetCameraMatrix(rot, origin);
 }
 
 #endif
