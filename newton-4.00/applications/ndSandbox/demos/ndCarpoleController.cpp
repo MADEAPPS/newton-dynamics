@@ -20,35 +20,29 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-namespace ndController_1
+namespace ndController_0
 {
-	//#define ND_ALPHA_TOL ndFloat32 (1.0e-3f)
 	#define ND_ACTIONS			12
 	#define ND_TOTAL_ACTIONS	(2 * ND_ACTIONS + 1)
 
-	class ndModelUnicycle : public ndModelArticulation
+	class ndCarpole : public ndModelArticulation
 	{
 		public:
-		ndModelUnicycle()
+		ndCarpole()
 			:ndModelArticulation()
-			//,m_invInertia(ndGetZeroMatrix())
-			//,m_com(ndVector::m_zero)
-			//,m_comVel(ndVector::m_zero)
-			//,m_gyroTorque(ndVector::m_zero)
-			//,m_comDist()
 			,m_bodies()
 			,m_ballBody(nullptr)
 			,m_controlJoint(nullptr)
 			,m_invMass(ndFloat32 (0.0f))
 		{
-			ndFloat32 angleStep = ndFloat32(0.25f) * ndDegreeToRad;
-			for (ndInt32 i = 0; i < ND_TOTAL_ACTIONS; ++i)
-			{
-				m_actionMap[i * 2 + 1] = ndReal(-angleStep);
-				m_actionMap[i * 2 + 2] = ndReal(angleStep);
-				angleStep *= ndFloat32(1.5f);
-			}
-			m_actionMap[0] = 0.0f;
+			//ndFloat32 angleStep = ndFloat32(0.25f) * ndDegreeToRad;
+			//for (ndInt32 i = 0; i < ND_TOTAL_ACTIONS; ++i)
+			//{
+			//	m_actionMap[i * 2 + 1] = -angleStep;
+			//	m_actionMap[i * 2 + 2] = angleStep;
+			//	angleStep *= ndFloat32(1.5f);
+			//}
+			//m_actionMap[0] = 0.0f;
 		}
 
 		void Init()
@@ -306,8 +300,9 @@ namespace ndController_1
 		//ndVector m_crossValidation____;
 	};
 
+#if 0
 	// implements a DQN to keep the robot balanced
-	class ndModelUnicycleTrainer : public ndModelUnicycle
+	class ndCarpoleTrainer : public ndCarpole
 	{
 		public:
 		enum class ndTrainingStage
@@ -353,8 +348,8 @@ namespace ndController_1
 			ndBodyDynamic* m_body;
 		};
 
-		ndModelUnicycleTrainer()
-			:ndModelUnicycle()
+		ndCarpoleTrainer()
+			:ndCarpole()
 			,m_currentTransition()
 			,m_replayBuffer(1024 * 128)
 			,m_basePose()
@@ -553,7 +548,7 @@ namespace ndController_1
 				m_invDynamicsSolver.SolverEnd();
 
 				//calculate reward for current state;
-				m_currentTransition.m_reward = ndReal(GetStateReward());
+				m_currentTransition.m_reward = GetStateReward();
 
 				// episode done, whne the upright orienta tion is less than 20 degree 
 				if (m_currentTransition.m_reward < ndFloat32(0.95f))
@@ -562,8 +557,8 @@ namespace ndController_1
 					m_currentTransition.m_terminalState = true;
 				}
 
-				m_currentTransition.m_nextState[0] = ndReal(torque.m_z);
-				m_currentTransition.m_nextState[1] = ndReal(m_controlJoint->GetAngle());
+				m_currentTransition.m_nextState[0] = torque.m_z;
+				m_currentTransition.m_nextState[1] = m_controlJoint->GetAngle();
 				m_replayBuffer.AddTransition(m_currentTransition);
 
 				// save the next state 
@@ -585,8 +580,9 @@ namespace ndController_1
 		ndTrainingStage m_trainingState;
 		ndFloat32 m_epsilonGreedy;
 	};
+#endif
 
-	void BuildModel(ndModelUnicycle* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
+	void BuildModel(ndCarpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		ndFloat32 mass = 10.0f;
 		ndFloat32 limbMass = 1.0f;
@@ -668,31 +664,31 @@ namespace ndController_1
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
-		ndModelUnicycle* const model = new ndModelUnicycle();
+		ndCarpole* const model = new ndCarpole();
 		BuildModel(model, scene, location);
 
 		return model;
 	}
 
-	ndModelArticulation* CreateTrainer(ndDemoEntityManager* const scene, const ndMatrix& location)
-	{
-		ndModelUnicycleTrainer* const model = new ndModelUnicycleTrainer();
-		BuildModel(model, scene, location);
-
-		//for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-		for (ndInt32 i = 0; i < model->m_bodies.GetCount(); ++i)
-		{
-			model->m_basePose.PushBack(model->m_bodies[i]);
-		}
-		model->m_basePose.PushBack(model->m_ballBody);
-
-		scene->SetAcceleratedUpdate();
-		return model;
-	}
+	//ndModelArticulation* CreateTrainer(ndDemoEntityManager* const scene, const ndMatrix& location)
+	//{
+	//	ndCarpoleTrainer* const model = new ndCarpoleTrainer();
+	//	BuildModel(model, scene, location);
+	//
+	//	//for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+	//	for (ndInt32 i = 0; i < model->m_bodies.GetCount(); ++i)
+	//	{
+	//		model->m_basePose.PushBack(model->m_bodies[i]);
+	//	}
+	//	model->m_basePose.PushBack(model->m_ballBody);
+	//
+	//	scene->SetAcceleratedUpdate();
+	//	return model;
+	//}
 }
 
-using namespace ndController_1;
-void ndBalanceController(ndDemoEntityManager* const scene)
+using namespace ndController_0;
+void ndCarpoleController(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
@@ -701,8 +697,8 @@ void ndBalanceController(ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
-	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	ndSharedPtr<ndModel> model(CreateTrainer(scene, matrix));
+	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	//ndSharedPtr<ndModel> model(CreateTrainer(scene, matrix));
 	scene->GetWorld()->AddModel(model);
 
 	ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();

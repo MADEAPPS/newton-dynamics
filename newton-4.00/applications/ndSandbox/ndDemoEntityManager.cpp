@@ -36,7 +36,7 @@
 	//#define REPLAY_RECORD
 #endif
 
-#define DEFAULT_SCENE	0		// basic rigidbody
+//#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
@@ -54,17 +54,18 @@
 //#define DEFAULT_SCENE	15		// advanced industrial robot
 //#define DEFAULT_SCENE	16		// basic player
 //#define DEFAULT_SCENE	17		// rag doll
-//#define DEFAULT_SCENE	18		// unit cycle controller
-//#define DEFAULT_SCENE	19		// quadruped test 1
-//#define DEFAULT_SCENE	20		// quadruped test 2
-//#define DEFAULT_SCENE	21		// quadruped test 3
-//#define DEFAULT_SCENE	22		// biped test 1
-//#define DEFAULT_SCENE	23		// biped test 2
-//#define DEFAULT_SCENE	24		// train biped test 2
-//#define DEFAULT_SCENE	25		// simple voronoi fracture
-//#define DEFAULT_SCENE	26		// basic voronoi fracture
-//#define DEFAULT_SCENE	27		// linked voronoi fracture
-//#define DEFAULT_SCENE	28		// skin peel voronoi fracture
+#define DEFAULT_SCENE	18		// card pole controller
+//#define DEFAULT_SCENE	19		// unit cycle controller
+//#define DEFAULT_SCENE	20		// quadruped test 1
+//#define DEFAULT_SCENE	21		// quadruped test 2
+//#define DEFAULT_SCENE	22		// quadruped test 3
+//#define DEFAULT_SCENE	23		// biped test 1
+//#define DEFAULT_SCENE	24		// biped test 2
+//#define DEFAULT_SCENE	25		// train biped test 2
+//#define DEFAULT_SCENE	26		// simple voronoi fracture
+//#define DEFAULT_SCENE	27		// basic voronoi fracture
+//#define DEFAULT_SCENE	28		// linked voronoi fracture
+//#define DEFAULT_SCENE	29		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndRagdollTest(ndDemoEntityManager* const scene);
@@ -80,6 +81,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_2(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
+void ndCarpoleController(ndDemoEntityManager* const scene);
 void ndBalanceController(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
@@ -118,6 +120,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
 	{ "basic player", ndPlayerCapsuleDemo },
 	{ "rag doll", ndRagdollTest },
+	{ "carpole controller", ndCarpoleController },
 	{ "balance controller", ndBalanceController },
 	{ "quadruped test one", ndQuadrupedTest_1 },
 	{ "quadruped test two", ndQuadrupedTest_2 },
