@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-// this is an implementation of the vanilla dqn training as decrived 
+// this is an implementation of the vanilla dqn agent trainer as descrived 
 // on the nature paper below. 
 // https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
 
@@ -30,7 +30,7 @@ namespace ndController_0
 	#define D_REPLAY_BUFFERSIZE (1024 * 64)
 	
 
-	#define D_PUSH_FORCE ndFloat32 (10.0f)
+	#define D_PUSH_FORCE ndFloat32 (20.0f)
 
 	enum ndActionSpace
 	{
