@@ -26,7 +26,11 @@
 
 namespace ndController_0
 {
+	#define D_REPLAY_BASH_SIZE	(32)
 	#define D_REPLAY_BUFFERSIZE (1024 * 64)
+	
+
+	#define D_PUSH_FORCE ndFloat32 (10.0f)
 
 	enum ndActionSpace
 	{
@@ -48,9 +52,11 @@ namespace ndController_0
 	class ndCartpoleBase : public ndModelArticulation
 	{
 		public:
-
-		virtual void GetObservation() const = 0;
-
+		virtual void ResetModel() const = 0;
+		virtual bool IsTerminal() const = 0;
+		virtual ndReal GetReward() const = 0;
+		virtual ndInt32 GetAction(ndReal greedy) const = 0;
+		virtual void GetObservation(ndReal* const state) const = 0;
 	};
 
 	class ndDQNTrainer
@@ -60,17 +66,38 @@ namespace ndController_0
 			:m_replayBuffer(D_REPLAY_BUFFERSIZE)
 			,m_currentTransition()
 			,m_model(model)
+			,m_epsilonGreedy(1.0f)
+			,m_frameCount(0)
 		{
 		}
 
 		void Train()
 		{
-			m_model->GetObservation();
+			m_model->GetObservation(&m_currentTransition.m_nextState[0]);
+			m_currentTransition.m_reward = m_model->GetReward();
+			m_currentTransition.m_terminalState = m_model->IsTerminal();
+			m_replayBuffer.AddTransition(m_currentTransition);
+			if (m_currentTransition.m_terminalState)
+			{
+				m_model->ResetModel();
+			}
+
+			m_currentTransition.m_state = m_currentTransition.m_nextState;
+			m_currentTransition.m_action[0] = m_model->GetAction(m_epsilonGreedy);
+
+			if (m_frameCount > D_REPLAY_BASH_SIZE)
+			{
+				// start epsilon annelining
+			}
+			m_frameCount++;
 		}
 
 		ndBrainReplayBuffer<ndInt32, m_stateCount> m_replayBuffer;
 		ndBrainReplayTransitionMemory<ndInt32, m_stateCount> m_currentTransition;
 		ndCartpoleBase* m_model;
+
+		ndReal m_epsilonGreedy;
+		ndInt32 m_frameCount;
 	};
 
 	class ndCartpole : public ndCartpoleBase
@@ -78,13 +105,45 @@ namespace ndController_0
 		public:
 		ndCartpole()
 			:ndCartpoleBase()
-			,m_trainer(nullptr)
+			,m_cartMatrix(ndGetIdentityMatrix())
+			,m_poleMatrix(ndGetIdentityMatrix())
 			,m_cart(nullptr)
 			,m_pole(nullptr)
+			,m_trainer(nullptr)
 		{
 		}
 
-		void GetObservation() const
+		virtual bool IsTerminal() const
+		{
+			const ndMatrix& matrix = m_pole->GetMatrix();
+			bool fail = (matrix.m_front.m_y) < ndFloat32(0.96f);
+			fail = fail || (matrix.m_posit.m_x > ndFloat32(4.0f));
+			fail = fail || (matrix.m_posit.m_x < ndFloat32(-4.0f));
+			return fail;
+		}
+
+		virtual ndReal GetReward() const
+		{
+			return ndReal(m_pole->GetMatrix().m_up.m_y);
+		}
+
+		virtual ndInt32 GetAction(ndReal greedy) const
+		{
+			ndInt32 action = 0;
+			ndFloat32 explore = ndRand();
+			if (explore <= greedy)
+			{
+				action = ndInt32(ndRandInt() % m_acctionsCount);
+			}
+			else
+			{
+				ndAssert(0);
+			}
+
+			return action;
+		}
+
+		void GetObservation(ndReal* const state) const
 		{
 			ndFloat32 posit = m_cart->GetMatrix().m_posit.m_x;
 			ndFloat32 veloc = m_cart->GetVelocity().m_x;
@@ -92,22 +151,50 @@ namespace ndController_0
 			ndFloat32 angle = ndAsin(m_pole->GetMatrix().m_up.m_y);
 			ndFloat32 omega = m_pole->GetOmega().m_z;
 
-			m_trainer->m_currentTransition.m_state[m_cartPosition] = ndReal(posit);
-			m_trainer->m_currentTransition.m_state[m_cartVelocity] = ndReal(veloc);
-			m_trainer->m_currentTransition.m_state[m_poleAngle] = ndReal(angle);
-			m_trainer->m_currentTransition.m_state[m_poleOmega] = ndReal(omega);
-			//ndTrace(("%f %f %f %f\n", posit, veloc, angle * ndRadToDegree, omega));
+			state[m_poleAngle] = ndReal(angle);
+			state[m_poleOmega] = ndReal(omega);
+			state[m_cartPosition] = ndReal(posit);
+			state[m_cartVelocity] = ndReal(veloc);
+		}
+
+		virtual void ResetModel() const
+		{
+			m_cart->SetOmega(ndVector::m_zero);
+			m_cart->SetVelocity(ndVector::m_zero);
+			m_pole->SetOmega(ndVector::m_zero);
+			m_pole->SetVelocity(ndVector::m_zero);
+			m_cart->SetMatrix(m_cartMatrix);
+			m_pole->SetMatrix(m_poleMatrix);
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
+
+			ndVector force(m_pole->GetForce());
+			ndInt32 action = m_trainer->m_currentTransition.m_action[0];
+			if (action == m_pushLeft)
+			{
+				force.m_x = -D_PUSH_FORCE;
+			}
+			else if (action == m_pushRight)
+			{
+				force.m_x = D_PUSH_FORCE;
+			}
+			m_pole->SetForce(force);
+		}
+
+		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndModelArticulation::PostUpdate(world, timestep);
 			m_trainer->Train();
 		}
 
-		ndSharedPtr<ndDQNTrainer> m_trainer;
+		ndMatrix m_cartMatrix;
+		ndMatrix m_poleMatrix;
 		ndBodyDynamic* m_cart;
 		ndBodyDynamic* m_pole;
+		ndSharedPtr<ndDQNTrainer> m_trainer;
 	};
 
 	void BuildModel(ndCartpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -130,7 +217,7 @@ namespace ndController_0
 		ndFloat32 poleRadio = 0.025f;
 		
 		ndSharedPtr<ndBody> poleBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), poleMass, poleRadio, poleRadio, poleLength, "smilli.tga")));
-		ndMatrix poleLocation(ndRollMatrix(-90.0f * ndDegreeToRad) * matrix);
+		ndMatrix poleLocation(ndRollMatrix(90.0f * ndDegreeToRad) * matrix);
 		poleLocation.m_posit.m_y += poleLength * 0.5f;
 		poleBody->SetMatrix(poleLocation);
 
@@ -149,6 +236,9 @@ namespace ndController_0
 
 		model->m_cart = rootBody->GetAsBodyDynamic();
 		model->m_pole = poleBody->GetAsBodyDynamic();
+		model->m_cartMatrix = rootBody->GetMatrix();
+		model->m_poleMatrix = poleBody->GetMatrix();
+
 		model->m_trainer = ndSharedPtr<ndDQNTrainer>(new ndDQNTrainer(model));
 	}
 
