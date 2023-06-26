@@ -92,7 +92,11 @@ namespace ndController_0
 			,m_epsilonGreedy(1.0f)
 			,m_frameCount(0)
 		{
-			//m_targetNetwork.CopyFrom(const ndBrain & src);
+		}
+
+		void BackPropagate()
+		{
+
 		}
 
 		void Train()
@@ -109,10 +113,24 @@ namespace ndController_0
 			m_currentTransition.m_state = m_currentTransition.m_nextState;
 			m_currentTransition.m_action[0] = m_model->GetAction(m_epsilonGreedy);
 
-			if (m_frameCount > D_REPLAY_BASH_SIZE)
+			if (m_frameCount > (D_REPLAY_BASH_SIZE * 4))
 			{
 				// start epsilon annelining
+
 			}
+
+			if (m_frameCount > (D_REPLAY_BASH_SIZE * 8))
+			{
+				// do dack propagation on the 
+				BackPropagate();
+			}
+
+			if ((m_frameCount % 1000) == (1000 - 1))
+			{
+				// update online network
+				m_targetNetwork.CopyFrom(m_onlineNetwork);
+			}
+
 			m_frameCount++;
 		}
 
