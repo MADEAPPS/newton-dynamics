@@ -90,7 +90,8 @@ namespace ndController_0
 			,m_targetNetwork(m_onlineNetwork)
 			,m_input()
 			,m_output()
-			,m_onlineInstance(&m_onlineNetwork)
+			,m_trainer(&m_onlineNetwork)
+			,m_targetInstance(&m_targetNetwork)
 			,m_shuffleBuffer(D_REPLAY_BUFFERSIZE)
 			,m_replayBuffer(D_REPLAY_BUFFERSIZE)
 			,m_currentTransition()
@@ -106,7 +107,70 @@ namespace ndController_0
 
 		void BackPropagate()
 		{
+			class ndTestValidator : public ndBrainTrainer::ndValidation
+			{
+				public:
+				ndTestValidator(ndBrainTrainer& trainer)
+					:ndBrainTrainer::ndValidation(trainer)
+					,m_minError(1.0e10f)
+					,m_step(0)
+					,m_step0(0)
+				{
+				}
+
+				ndReal Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth)
+				{
+					//ndReal error = ndBrainTrainer::ndValidation::Validate(inputBatch, groundTruth);
+					//if (error < m_minError)
+					//{
+					//	m_minError = error;
+					//	ndExpandTraceMessage("%f; %d; %d\n", m_minError, m_step, m_step - m_step0);
+					//	m_step0 = m_step;
+					//}
+					//m_step++;
+					////ndExpandTraceMessage("%f\n", error);
+					//return error;
+					return 0;
+				}
+				ndReal m_minError;
+				ndInt32 m_step;
+				ndInt32 m_step0;
+			};
+
+			
+			ndBrainMatrix inputBatch(D_REPLAY_BASH_SIZE, m_stateCount);
+			ndBrainMatrix groundTruth(D_REPLAY_BASH_SIZE, m_acctionsCount);
+			ndTestValidator validator(m_trainer);
+
+			ndBrainInstance& instance = m_trainer.GetInstance();
+
 			m_shuffleBuffer.RandomShuffle(m_shuffleBuffer.GetCount());
+			for (ndInt32 i = 0; i < D_REPLAY_BASH_SIZE; ++i)
+			{
+				ndInt32 index = m_shuffleBuffer[i];
+				const ndBrainReplayTransitionMemory<ndInt32, m_stateCount>& transition = m_replayBuffer[index];
+
+				for (ndInt32 j = 0; j < m_stateCount; ++j)
+				{
+					m_input[j] = transition.m_state[j];
+				}
+				instance.MakePrediction(m_input, m_output);
+				for (ndInt32 j = 0; j < m_acctionsCount; ++j)
+				{
+					groundTruth[i][j] = m_output[j];
+				}
+
+				for (ndInt32 j = 0; j < m_stateCount; ++j)
+				{
+					m_input[j] = transition.m_nextState[j];
+				}
+				m_targetInstance.MakePrediction(m_input, m_output);
+				for (ndInt32 j = 0; j < m_acctionsCount; ++j)
+				{
+					groundTruth[i][j] = m_output[j];
+				}
+				//Optimize(ndValidation & validator, const ndBrainMatrix & inputBatch, const ndBrainMatrix & groundTruth, ndReal learnRate, ndInt32 steps);
+			}
 		}
 
 		void Train()
@@ -135,13 +199,13 @@ namespace ndController_0
 
 			if (m_frameCount > (D_REPLAY_BASH_SIZE * 8))
 			{
-				// do dack propagation on the 
+				// do back propagation on the 
 				BackPropagate();
 			}
 
 			if ((m_frameCount % 1000) == (1000 - 1))
 			{
-				// update online network
+				// update on line network
 				m_targetNetwork.CopyFrom(m_onlineNetwork);
 			}
 
@@ -154,7 +218,8 @@ namespace ndController_0
 			{
 				m_input[i] = m_currentTransition.m_state[i];
 			}
-			m_onlineInstance.MakePrediction(m_input, m_output);
+			ndBrainInstance& instance = m_trainer.GetInstance();
+			instance.MakePrediction(m_input, m_output);
 
 			ndInt32 action = 0;
 			ndReal maxReward = m_output[0];
@@ -173,7 +238,8 @@ namespace ndController_0
 		ndQValuePredictor m_targetNetwork;
 		mutable ndBrainVector m_input;
 		mutable ndBrainVector m_output;
-		mutable ndBrainInstance m_onlineInstance;
+		mutable ndBrainTrainer m_trainer;
+		mutable ndBrainInstance m_targetInstance;
 		ndArray<ndInt32> m_shuffleBuffer;
 		ndBrainReplayBuffer<ndInt32, m_stateCount> m_replayBuffer;
 		ndBrainReplayTransitionMemory<ndInt32, m_stateCount> m_currentTransition;
