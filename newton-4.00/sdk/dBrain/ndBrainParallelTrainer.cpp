@@ -55,14 +55,15 @@ ndBrainParallelTrainer::ndBrainParallelTrainer(ndBrain* const brain, ndInt32 thr
 	,m_learnRate(0.0f)
 	,m_steps(0)
 {
-	threads = ndMin(threads, D_MAX_THREADS_COUNT);
-	SetThreadCount(threads);
-
-	for (ndInt32 i = 0; i < threads; i++)
-	{
-		ndBrainTrainerChannel* const channel = new ndBrainTrainerChannel(*this);
-		m_threadData.PushBack(channel);
-	}
+	ndAssert(0);
+	//threads = ndMin(threads, D_MAX_THREADS_COUNT);
+	//SetThreadCount(threads);
+	//
+	//for (ndInt32 i = 0; i < threads; i++)
+	//{
+	//	ndBrainTrainerChannel* const channel = new ndBrainTrainerChannel(*this);
+	//	m_threadData.PushBack(channel);
+	//}
 }
 
 ndBrainParallelTrainer::~ndBrainParallelTrainer()

@@ -70,3 +70,4 @@ ndReal ndBrainTrainerBase::ndValidation::Validate(const ndBrainMatrix& inputBatc
 {
 	return m_trainer.Validate(inputBatch, groundTruth, m_output);
 }
+

@@ -37,7 +37,11 @@ class ndBrainTrainer: public ndBrainTrainerBase
 	virtual void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
 	virtual void MakePrediction(const ndBrainVector& input);
 	virtual void BackPropagate(const ndBrainVector& groundTruth);
-	virtual void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
+
+	virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const;
+	virtual void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, ndReal learnRate, ndInt32 steps);
+
+	void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
 
 	protected:
 	void ClearGradientsAcc();
@@ -60,6 +64,7 @@ class ndBrainTrainer: public ndBrainTrainerBase
 	ndBrainVector m_weightGradient_v;
 	ndBrainPrefixScan m_weightGradientsPrefixScan;
 	ndArray <ndBrainMatrix*> m_weightsLayersTranspose;
+	const ndBrainMatrix* m_groundTruthArray;
 	ndReal m_regularizer;
 	ndReal m_bestCost;
 	ndReal m_alpha;
@@ -67,6 +72,7 @@ class ndBrainTrainer: public ndBrainTrainerBase
 	ndReal m_epsilon;
 	ndReal m_alphaAcc;
 	ndReal m_betaAcc;
+	
 	friend class ndBrainTrainerChannel;
 	friend class ndBrainParallelTrainer;
 };

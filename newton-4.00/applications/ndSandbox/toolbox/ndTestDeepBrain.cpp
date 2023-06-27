@@ -68,8 +68,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		groundTruth[i][1] = ((inputBatch[i][0] >= 0.5f) || (inputBatch[i][1] >= 0.5f)) ? 1.0f : 0.0f;
 	}
 	
-	//ndBrainTrainer trainer(&brain);
-	ndBrainParallelTrainer trainer(&brain, 4);
+	ndBrainTrainer trainer(&brain);
+	//ndBrainParallelTrainer trainer(&brain, 4);
 	ndTestValidator testError(trainer);
 
 	trainer.SetMiniBatchSize(16);

@@ -31,6 +31,7 @@ namespace ndController_0
 	#define D_DISCOUNT_FACTOR		ndReal (0.99f)
 	#define D_EPSILON_GREEDY		ndReal (1.0e-4f)
 	#define D_MIN_EXPLARE_FACTOR	ndReal (0.01f)
+	#define D_LEARN_RATE			ndReal (5.0e-4f)
 
 	#define D_PUSH_FORCE ndFloat32 (20.0f)
 
@@ -85,6 +86,28 @@ namespace ndController_0
 	class ndDQNAgent
 	{
 		public:
+		class ndDQNAgentTrainer : public ndBrainTrainer
+		{
+			public:
+			ndDQNAgentTrainer(ndBrain* const brain)
+				:ndBrainTrainer(brain)
+				,m_agent(nullptr)
+			{
+			}
+
+			ndDQNAgentTrainer(const ndDQNAgentTrainer& src)
+				:ndBrainTrainer(src)
+			{
+			}
+
+			virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
+			{
+				m_agent->GetGroundTruth(index, groundTruth, output);
+			}
+
+			ndDQNAgent* m_agent;
+		};
+
 		ndDQNAgent(ndCartpoleBase* const model)
 			:m_onlineNetwork()
 			,m_targetNetwork(m_onlineNetwork)
@@ -100,9 +123,16 @@ namespace ndController_0
 			,m_epsilonGreedy(1.0f)
 			,m_frameCount(0)
 		{
+			m_trainer.m_agent = this;
 			m_shuffleBuffer.SetCount(0);
 			m_input.SetCount(m_stateCount);
 			m_output.SetCount(m_acctionsCount);
+		}
+
+		void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
+		{
+			ndAssert(groundTruth.GetCount() == output.GetCount());
+			groundTruth.Set(output);
 		}
 
 		void BackPropagate()
@@ -150,27 +180,32 @@ namespace ndController_0
 				ndInt32 index = m_shuffleBuffer[i];
 				const ndBrainReplayTransitionMemory<ndInt32, m_stateCount>& transition = m_replayBuffer[index];
 
+				//for (ndInt32 j = 0; j < m_stateCount; ++j)
+				//{
+				//	m_input[j] = transition.m_state[j];
+				//}
+				//instance.MakePrediction(m_input, m_output);
+				//for (ndInt32 j = 0; j < m_acctionsCount; ++j)
+				//{
+				//	groundTruth[i][j] = m_output[j];
+				//}
+				//
+				//for (ndInt32 j = 0; j < m_stateCount; ++j)
+				//{
+				//	m_input[j] = transition.m_nextState[j];
+				//}
+				//m_targetInstance.MakePrediction(m_input, m_output);
+				//for (ndInt32 j = 0; j < m_acctionsCount; ++j)
+				//{
+				//	groundTruth[i][j] = m_output[j];
+				//}
+				
 				for (ndInt32 j = 0; j < m_stateCount; ++j)
 				{
-					m_input[j] = transition.m_state[j];
+					inputBatch[i][j] = transition.m_state[j];
 				}
-				instance.MakePrediction(m_input, m_output);
-				for (ndInt32 j = 0; j < m_acctionsCount; ++j)
-				{
-					groundTruth[i][j] = m_output[j];
-				}
-
-				for (ndInt32 j = 0; j < m_stateCount; ++j)
-				{
-					m_input[j] = transition.m_nextState[j];
-				}
-				m_targetInstance.MakePrediction(m_input, m_output);
-				for (ndInt32 j = 0; j < m_acctionsCount; ++j)
-				{
-					groundTruth[i][j] = m_output[j];
-				}
-				//Optimize(ndValidation & validator, const ndBrainMatrix & inputBatch, const ndBrainMatrix & groundTruth, ndReal learnRate, ndInt32 steps);
 			}
+			m_trainer.Optimize(validator, inputBatch, D_LEARN_RATE, 1);
 		}
 
 		void Train()
@@ -238,7 +273,7 @@ namespace ndController_0
 		ndQValuePredictor m_targetNetwork;
 		mutable ndBrainVector m_input;
 		mutable ndBrainVector m_output;
-		mutable ndBrainTrainer m_trainer;
+		mutable ndDQNAgentTrainer m_trainer;
 		mutable ndBrainInstance m_targetInstance;
 		ndArray<ndInt32> m_shuffleBuffer;
 		ndBrainReplayBuffer<ndInt32, m_stateCount> m_replayBuffer;
