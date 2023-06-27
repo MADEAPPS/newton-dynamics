@@ -50,6 +50,8 @@ class ndBrainReplayBuffer : public ndArray<ndBrainReplayTransitionMemory<actionT
 
 	void Clear();
 	void AddTransition(const ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>& transition);
+
+	ndInt32 m_replayBufferIndex;
 };
 
 template<class actionType, ndInt32 statesDim, ndInt32 actionDim>
@@ -87,6 +89,7 @@ void ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>::Clear()
 template<class actionType, ndInt32 statesDim, ndInt32 actionDim>
 ndBrainReplayBuffer<actionType, statesDim, actionDim>::ndBrainReplayBuffer(ndInt32 size)
 	:ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>()
+	,m_replayBufferIndex(0)
 {
 	ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::SetCount(size);
 	Clear();
@@ -100,6 +103,7 @@ ndBrainReplayBuffer<actionType, statesDim, actionDim>::~ndBrainReplayBuffer()
 template<class actionType, ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainReplayBuffer<actionType, statesDim, actionDim>::Clear()
 {
+	m_replayBufferIndex = 0;
 	ndArray<ndBrainReplayTransitionMemory<actionType, statesDim>>::SetCount(0);
 }
 
@@ -107,15 +111,14 @@ template<class actionType, ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainReplayBuffer<actionType, statesDim, actionDim>::AddTransition(const ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>& transition)
 {
 	ndInt32 count = ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::GetCount();
-	if (count <= ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::GetCapacity())
+	if (count < ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::GetCapacity())
 	{
 		ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::PushBack(transition);
 	}
 	else
 	{
-		ndAssert(0);
-		//m_replayBufferIndex += (m_replayBufferIndex + 1) % GetCapacity();
-		//m_replayBufferIndex = (m_replayBufferIndex + 1) % ndArray<ndBrainReiforcementTransition<Action, statesCount>>::GetCapacity();
+		(*this)[m_replayBufferIndex] = transition;
+		m_replayBufferIndex += (m_replayBufferIndex + 1) % GetCapacity();
 	}
 }
 #endif 

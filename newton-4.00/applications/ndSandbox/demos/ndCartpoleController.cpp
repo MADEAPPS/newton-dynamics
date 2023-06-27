@@ -29,9 +29,11 @@ namespace ndController_0
 	#define D_REPLAY_BASH_SIZE		(32)
 	#define D_REPLAY_BUFFERSIZE		(1024 * 64)
 	#define D_DISCOUNT_FACTOR		ndReal (0.99f)
-	#define D_EPSILON_GREEDY		ndReal (1.0e-4f)
+	#define D_EPSILON_GREEDY		ndReal (5.0e-4f)
 	#define D_MIN_EXPLARE_FACTOR	ndReal (0.01f)
 	#define D_LEARN_RATE			ndReal (5.0e-4f)
+	#define D_TARGET_UPDATE_FREQ	(1000)
+	#define D_EPSILON_GREEDY_FREQ	(D_REPLAY_BASH_SIZE * 2)
 
 	#define D_PUSH_FORCE ndFloat32 (20.0f)
 
@@ -122,6 +124,8 @@ namespace ndController_0
 			,m_gamma(D_DISCOUNT_FACTOR)
 			,m_epsilonGreedy(1.0f)
 			,m_frameCount(0)
+			,m_framesAlive(0)
+			,m_eposideCount(0)
 		{
 			m_trainer.m_agent = this;
 			m_shuffleBuffer.SetCount(0);
@@ -140,7 +144,7 @@ namespace ndController_0
 			ndInt32 action = transition.m_action[0];
 			groundTruth[action] = transition.m_reward;
 
-			static ndFloat32 xxxxx = 0;
+			//static ndFloat32 xxxxx = 0;
 			if (!transition.m_terminalState)
 			{
 				for (ndInt32 i = 0; i < m_stateCount; ++i)
@@ -149,13 +153,12 @@ namespace ndController_0
 				}
 				m_targetInstance.MakePrediction(m_input, m_output);
 				groundTruth[action] += m_gamma * m_output[action];
-				if (groundTruth[action] > xxxxx)
-				{
-					xxxxx = groundTruth[action];
-					//ndTrace(("reward gain: %f\n", groundTruth[action]));
-					ndExpandTraceMessage("reward gain: %f\n", xxxxx);
-				}
-
+				//if (groundTruth[action] > xxxxx)
+				//{
+				//	xxxxx = groundTruth[action];
+				//	//ndTrace(("reward gain: %f\n", groundTruth[action]));
+				//	ndExpandTraceMessage("reward gain: %f\n", xxxxx);
+				//}
 			}
 		}
 
@@ -191,12 +194,9 @@ namespace ndController_0
 				ndInt32 m_step0;
 			};
 
-			
 			ndBrainMatrix inputBatch(D_REPLAY_BASH_SIZE, m_stateCount);
 			ndBrainMatrix groundTruth(D_REPLAY_BASH_SIZE, m_acctionsCount);
 			ndTestValidator validator(m_trainer);
-
-			ndBrainInstance& instance = m_trainer.GetInstance();
 
 			m_shuffleBuffer.RandomShuffle(m_shuffleBuffer.GetCount());
 			for (ndInt32 i = 0; i < D_REPLAY_BASH_SIZE; ++i)
@@ -219,6 +219,8 @@ namespace ndController_0
 			m_replayBuffer.AddTransition(m_currentTransition);
 			if (m_currentTransition.m_terminalState)
 			{
+				m_eposideCount++;
+				m_framesAlive = 0;
 				m_model->ResetModel();
 			}
 
@@ -230,7 +232,7 @@ namespace ndController_0
 			m_currentTransition.m_state = m_currentTransition.m_nextState;
 			m_currentTransition.m_action[0] = m_model->GetAction(m_epsilonGreedy);
 
-			if (m_frameCount % (D_REPLAY_BASH_SIZE * 4) == (D_REPLAY_BASH_SIZE * 4 - 1))
+			if (m_frameCount % D_EPSILON_GREEDY_FREQ == (D_EPSILON_GREEDY_FREQ - 1))
 			{
 				m_epsilonGreedy = ndMax(m_epsilonGreedy - D_EPSILON_GREEDY, D_MIN_EXPLARE_FACTOR);
 			}
@@ -241,13 +243,21 @@ namespace ndController_0
 				BackPropagate();
 			}
 
-			if ((m_frameCount % 1000) == (1000 - 1))
+			if ((m_frameCount % D_TARGET_UPDATE_FREQ) == (D_TARGET_UPDATE_FREQ - 1))
 			{
 				// update on line network
 				m_targetNetwork.CopyFrom(m_onlineNetwork);
 			}
 
+			static ndInt32 xxxxx = 0;
+			if (m_framesAlive > xxxxx)
+			{
+				xxxxx = m_framesAlive;
+				ndExpandTraceMessage("episode:%d framesAlive:%d\n", m_eposideCount, m_framesAlive);
+			}
+
 			m_frameCount++;
+			m_framesAlive++;
 		}
 
 		ndInt32 GetMaxValueAction() const
@@ -286,6 +296,8 @@ namespace ndController_0
 		ndReal m_gamma;
 		ndReal m_epsilonGreedy;
 		ndInt32 m_frameCount;
+		ndInt32 m_framesAlive;
+		ndInt32 m_eposideCount;
 	};
 
 	class ndCartpole : public ndCartpoleBase
@@ -304,9 +316,9 @@ namespace ndController_0
 		virtual bool IsTerminal() const
 		{
 			const ndMatrix& matrix = m_pole->GetMatrix();
-			bool fail = (matrix.m_front.m_y) < ndFloat32(0.96f);
-			fail = fail || (matrix.m_posit.m_x > ndFloat32(4.0f));
-			fail = fail || (matrix.m_posit.m_x < ndFloat32(-4.0f));
+			bool fail = (matrix.m_front.m_y) < ndFloat32(0.91f);
+			fail = fail || (matrix.m_posit.m_x > ndFloat32(8.0f));
+			fail = fail || (matrix.m_posit.m_x < ndFloat32(-8.0f));
 			return fail;
 		}
 
