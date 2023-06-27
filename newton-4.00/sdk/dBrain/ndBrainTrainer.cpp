@@ -424,13 +424,13 @@ void ndBrainTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inpu
 			const ndInt32 count = ((start + miniBatchSize) < inputBatch.GetCount()) ? miniBatchSize : inputBatch.GetCount() - start;
 			for (ndInt32 k = 0; k < count; ++k)
 			{
-					ndInt32 index = randomizeVector[start + k];
-					const ndBrainVector& input = inputBatch[index];
-					MakePrediction(input);
+				ndInt32 index = randomizeVector[start + k];
+				const ndBrainVector& input = inputBatch[index];
+				MakePrediction(input);
 
-					//const ndBrainVector& truth = groundTruth[index];
-					GetGroundTruth(index, truth, m_output);
-					BackPropagate(truth);
+				//const ndBrainVector& truth = groundTruth[index];
+				GetGroundTruth(index, truth, m_output);
+				BackPropagate(truth);
 			}
 			UpdateWeights(learnRate, count);
 		}
@@ -438,11 +438,12 @@ void ndBrainTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inpu
 		randomizeVector.RandomShuffle(randomizeVector.GetCount());
 		
 		//ndReal batchError = validator.Validate(inputBatch, groundTruth);
-		//if (batchError < m_bestCost)
-		//{
-		//	m_bestCost = batchError;
-		//	bestNetwork.CopyFrom(*m_instance.GetBrain());
-		//}
+		ndReal batchError = 0.0f;
+		if (batchError < m_bestCost)
+		{
+			m_bestCost = batchError;
+			bestNetwork.CopyFrom(*m_instance.GetBrain());
+		}
 	}
 	m_instance.GetBrain()->CopyFrom(bestNetwork);
 }

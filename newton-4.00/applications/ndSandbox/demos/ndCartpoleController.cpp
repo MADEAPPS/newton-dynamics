@@ -132,7 +132,31 @@ namespace ndController_0
 		void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
 		{
 			ndAssert(groundTruth.GetCount() == output.GetCount());
+
 			groundTruth.Set(output);
+			ndInt32 k = m_shuffleBuffer[index];
+			const ndBrainReplayTransitionMemory<ndInt32, m_stateCount>& transition = m_replayBuffer[k];
+
+			ndInt32 action = transition.m_action[0];
+			groundTruth[action] = transition.m_reward;
+
+			static ndFloat32 xxxxx = 0;
+			if (!transition.m_terminalState)
+			{
+				for (ndInt32 i = 0; i < m_stateCount; ++i)
+				{
+					m_input[i] = transition.m_nextState[i];
+				}
+				m_targetInstance.MakePrediction(m_input, m_output);
+				groundTruth[action] += m_gamma * m_output[action];
+				if (groundTruth[action] > xxxxx)
+				{
+					xxxxx = groundTruth[action];
+					//ndTrace(("reward gain: %f\n", groundTruth[action]));
+					ndExpandTraceMessage("reward gain: %f\n", xxxxx);
+				}
+
+			}
 		}
 
 		void BackPropagate()
@@ -179,27 +203,6 @@ namespace ndController_0
 			{
 				ndInt32 index = m_shuffleBuffer[i];
 				const ndBrainReplayTransitionMemory<ndInt32, m_stateCount>& transition = m_replayBuffer[index];
-
-				//for (ndInt32 j = 0; j < m_stateCount; ++j)
-				//{
-				//	m_input[j] = transition.m_state[j];
-				//}
-				//instance.MakePrediction(m_input, m_output);
-				//for (ndInt32 j = 0; j < m_acctionsCount; ++j)
-				//{
-				//	groundTruth[i][j] = m_output[j];
-				//}
-				//
-				//for (ndInt32 j = 0; j < m_stateCount; ++j)
-				//{
-				//	m_input[j] = transition.m_nextState[j];
-				//}
-				//m_targetInstance.MakePrediction(m_input, m_output);
-				//for (ndInt32 j = 0; j < m_acctionsCount; ++j)
-				//{
-				//	groundTruth[i][j] = m_output[j];
-				//}
-				
 				for (ndInt32 j = 0; j < m_stateCount; ++j)
 				{
 					inputBatch[i][j] = transition.m_state[j];
@@ -309,7 +312,7 @@ namespace ndController_0
 
 		virtual ndReal GetReward() const
 		{
-			return ndReal(m_pole->GetMatrix().m_up.m_y);
+			return ndReal(m_pole->GetMatrix().m_front.m_y);
 		}
 
 		virtual ndInt32 GetAction(ndReal greedy) const
