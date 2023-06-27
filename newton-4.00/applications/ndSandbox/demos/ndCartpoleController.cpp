@@ -26,9 +26,11 @@
 
 namespace ndController_0
 {
-	#define D_REPLAY_BASH_SIZE	(32)
-	#define D_REPLAY_BUFFERSIZE (1024 * 64)
-	
+	#define D_REPLAY_BASH_SIZE		(32)
+	#define D_REPLAY_BUFFERSIZE		(1024 * 64)
+	#define D_DISCOUNT_FACTOR		ndReal (0.99f)
+	#define D_EPSILON_GREEDY		ndReal (1.0e-4f)
+	#define D_MIN_EXPLARE_FACTOR	ndReal (0.01f)
 
 	#define D_PUSH_FORCE ndFloat32 (20.0f)
 
@@ -86,17 +88,25 @@ namespace ndController_0
 		ndDQNAgent(ndCartpoleBase* const model)
 			:m_onlineNetwork()
 			,m_targetNetwork(m_onlineNetwork)
+			,m_input()
+			,m_output()
+			,m_onlineInstance(&m_onlineNetwork)
+			,m_shuffleBuffer(D_REPLAY_BUFFERSIZE)
 			,m_replayBuffer(D_REPLAY_BUFFERSIZE)
 			,m_currentTransition()
 			,m_model(model)
+			,m_gamma(D_DISCOUNT_FACTOR)
 			,m_epsilonGreedy(1.0f)
 			,m_frameCount(0)
 		{
+			m_shuffleBuffer.SetCount(0);
+			m_input.SetCount(m_stateCount);
+			m_output.SetCount(m_acctionsCount);
 		}
 
 		void BackPropagate()
 		{
-
+			m_shuffleBuffer.RandomShuffle(m_shuffleBuffer.GetCount());
 		}
 
 		void Train()
@@ -110,13 +120,17 @@ namespace ndController_0
 				m_model->ResetModel();
 			}
 
+			if (m_frameCount < D_REPLAY_BUFFERSIZE)
+			{
+				m_shuffleBuffer.PushBack(m_frameCount);
+			}
+
 			m_currentTransition.m_state = m_currentTransition.m_nextState;
 			m_currentTransition.m_action[0] = m_model->GetAction(m_epsilonGreedy);
 
-			if (m_frameCount > (D_REPLAY_BASH_SIZE * 4))
+			if (m_frameCount % (D_REPLAY_BASH_SIZE * 4) == (D_REPLAY_BASH_SIZE * 4 - 1))
 			{
-				// start epsilon annelining
-
+				m_epsilonGreedy = ndMax(m_epsilonGreedy - D_EPSILON_GREEDY, D_MIN_EXPLARE_FACTOR);
 			}
 
 			if (m_frameCount > (D_REPLAY_BASH_SIZE * 8))
@@ -134,12 +148,38 @@ namespace ndController_0
 			m_frameCount++;
 		}
 
+		ndInt32 GetMaxValueAction() const
+		{
+			for (ndInt32 i = 0; i < m_stateCount; ++i)
+			{
+				m_input[i] = m_currentTransition.m_state[i];
+			}
+			m_onlineInstance.MakePrediction(m_input, m_output);
+
+			ndInt32 action = 0;
+			ndReal maxReward = m_output[0];
+			for (ndInt32 i = 1; i < m_acctionsCount; ++i)
+			{
+				if (m_output[i] > maxReward)
+				{
+					action = i;
+					maxReward = m_output[i];
+				}
+			}
+			return action;
+		}
+
 		ndQValuePredictor m_onlineNetwork;
 		ndQValuePredictor m_targetNetwork;
+		mutable ndBrainVector m_input;
+		mutable ndBrainVector m_output;
+		mutable ndBrainInstance m_onlineInstance;
+		ndArray<ndInt32> m_shuffleBuffer;
 		ndBrainReplayBuffer<ndInt32, m_stateCount> m_replayBuffer;
 		ndBrainReplayTransitionMemory<ndInt32, m_stateCount> m_currentTransition;
 		ndCartpoleBase* m_model;
 
+		ndReal m_gamma;
 		ndReal m_epsilonGreedy;
 		ndInt32 m_frameCount;
 	};
@@ -153,7 +193,7 @@ namespace ndController_0
 			,m_poleMatrix(ndGetIdentityMatrix())
 			,m_cart(nullptr)
 			,m_pole(nullptr)
-			,m_trainer(nullptr)
+			,m_agent(nullptr)
 		{
 		}
 
@@ -181,7 +221,7 @@ namespace ndController_0
 			}
 			else
 			{
-				ndAssert(0);
+				action = m_agent->GetMaxValueAction();
 			}
 
 			return action;
@@ -216,7 +256,7 @@ namespace ndController_0
 			ndModelArticulation::Update(world, timestep);
 
 			ndVector force(m_pole->GetForce());
-			ndInt32 action = m_trainer->m_currentTransition.m_action[0];
+			ndInt32 action = m_agent->m_currentTransition.m_action[0];
 			if (action == m_pushLeft)
 			{
 				force.m_x = -D_PUSH_FORCE;
@@ -231,14 +271,14 @@ namespace ndController_0
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
-			m_trainer->Train();
+			m_agent->Train();
 		}
 
 		ndMatrix m_cartMatrix;
 		ndMatrix m_poleMatrix;
 		ndBodyDynamic* m_cart;
 		ndBodyDynamic* m_pole;
-		ndSharedPtr<ndDQNAgent> m_trainer;
+		ndSharedPtr<ndDQNAgent> m_agent;
 	};
 
 	void BuildModel(ndCartpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -283,7 +323,7 @@ namespace ndController_0
 		model->m_cartMatrix = cartBody->GetMatrix();
 		model->m_poleMatrix = poleBody->GetMatrix();
 
-		model->m_trainer = ndSharedPtr<ndDQNAgent>(new ndDQNAgent(model));
+		model->m_agent = ndSharedPtr<ndDQNAgent>(new ndDQNAgent(model));
 	}
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
