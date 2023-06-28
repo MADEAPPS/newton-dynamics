@@ -22,11 +22,11 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainAgentDDPG.h"
 
-ndBrainAgentDDPG::ndBrainAgentDDPG(ndBrain* const agent)
-	:ndBrainAgent(agent)
-{
-}
-
-ndBrainAgentDDPG::~ndBrainAgentDDPG()
-{
-}
+//ndBrainAgentDDPG::ndBrainAgentDDPG(ndBrain* const agent)
+//	:ndBrainAgent()
+//{
+//}
+//
+//ndBrainAgentDDPG::~ndBrainAgentDDPG()
+//{
+//}

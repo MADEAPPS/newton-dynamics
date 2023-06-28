@@ -23,37 +23,37 @@
 #include "ndBrain.h"
 #include "ndBrainAgentDQN.h"
 
-//ndBrainAgentDQN::ndBrainAgentDQN(ndBrain* const agent, ndInt32 replayBufferSize, ndInt32 replayBatchSize)
-ndBrainAgentDQN::ndBrainAgentDQN(ndBrain* const agent, ndInt32, ndInt32)
-	:ndBrainAgent(agent)
-	,m_targetNetwork(new ndBrain(*agent))
-{
-	ndAssert(0);
-	//ndInt32 stateSize = m_network.GetBrain()->GetInputSize();
-	//ndInt32 actionSize = m_network.GetBrain()->GetOutputSize();
-	//m_replayBuffer.SetCount(replayBufferSize, replayBatchSize, stateSize, actionSize);
-}
-
-ndBrainAgentDQN::~ndBrainAgentDQN()
-{
-	delete m_targetNetwork.GetBrain();
-}
-
-//void ndBrainAgentDQN::PredictAccion(ndBrainReiforcementTransition& transition)
+////ndBrainAgentDQN::ndBrainAgentDQN(ndBrain* const agent, ndInt32 replayBufferSize, ndInt32 replayBatchSize)
+//ndBrainAgentDQN::ndBrainAgentDQN(ndBrain* const agent, ndInt32, ndInt32)
+//	:ndBrainAgent(agent)
+//	,m_targetNetwork(new ndBrain(*agent))
 //{
-//	ndBrainAgent::PredictAccion(transition);
+//	ndAssert(0);
+//	//ndInt32 stateSize = m_network.GetBrain()->GetInputSize();
+//	//ndInt32 actionSize = m_network.GetBrain()->GetOutputSize();
+//	//m_replayBuffer.SetCount(replayBufferSize, replayBatchSize, stateSize, actionSize);
 //}
-
-void ndBrainAgentDQN::LearnStep()
-{
-	//ndBrainReiforcementTransition& transition = m_replayBuffer.GetTransitionEntry();
-	//GetTransition(transition);
-	//
-	//if (m_replayBuffer.m_replayBufferIndex < m_replayBuffer.m_learnBatchSize)
-	//{
-	//	return;
-	//}
-	//
-	//m_replayBuffer.MakeRandomBatch();
-	////ndAssert(0);
-}
+//
+//ndBrainAgentDQN::~ndBrainAgentDQN()
+//{
+//	delete m_targetNetwork.GetBrain();
+//}
+//
+////void ndBrainAgentDQN::PredictAccion(ndBrainReiforcementTransition& transition)
+////{
+////	ndBrainAgent::PredictAccion(transition);
+////}
+//
+//void ndBrainAgentDQN::LearnStep()
+//{
+//	//ndBrainReiforcementTransition& transition = m_replayBuffer.GetTransitionEntry();
+//	//GetTransition(transition);
+//	//
+//	//if (m_replayBuffer.m_replayBufferIndex < m_replayBuffer.m_learnBatchSize)
+//	//{
+//	//	return;
+//	//}
+//	//
+//	//m_replayBuffer.MakeRandomBatch();
+//	////ndAssert(0);
+//}

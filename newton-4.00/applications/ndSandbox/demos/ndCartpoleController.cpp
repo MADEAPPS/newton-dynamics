@@ -146,12 +146,12 @@ namespace ndController_0
 		{
 			ndAssert(groundTruth.GetCount() == output.GetCount());
 
-			groundTruth.Set(output);
+			//groundTruth.Set(output);
 			ndInt32 k = m_shuffleBuffer[index];
 			const ndBrainReplayTransitionMemory<ndInt32, m_stateCount>& transition = m_replayBuffer[k];
 
-			ndInt32 action = transition.m_action[0];
-			groundTruth[action] = transition.m_reward;
+			//groundTruth[action] = transition.m_reward;
+			groundTruth.Set(transition.m_reward);
 
 			if (!transition.m_terminalState)
 			{
@@ -160,6 +160,7 @@ namespace ndController_0
 					m_input[i] = transition.m_nextState[i];
 				}
 				m_targetInstance.MakePrediction(m_input, m_output);
+				ndInt32 action = transition.m_action[0];
 				groundTruth[action] += m_gamma * m_output[action];
 			}
 		}
@@ -234,7 +235,7 @@ namespace ndController_0
 					sum += m_movingAverage[i];
 				}
 				sum = sum / ndInt32(sizeof(m_movingAverage) / sizeof(m_movingAverage[0]));
-				ndExpandTraceMessage("moving average alived frames:%d\n", sum);
+				ndExpandTraceMessage("moving average alive frames:%d\n", sum);
 
 			}
 
@@ -334,8 +335,8 @@ namespace ndController_0
 			const ndMatrix& matrix = m_pole->GetMatrix();
 			// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
 			bool fail = ndAbs(matrix.m_front.m_x) > (D_REWARD_MIN_ANGLE * ndFloat32 (2.0f));
-			fail = fail || (matrix.m_posit.m_x > ndFloat32(8.0f));
-			fail = fail || (matrix.m_posit.m_x < ndFloat32(-8.0f));
+			fail = fail || (matrix.m_posit.m_x > ndFloat32(40.0f));
+			fail = fail || (matrix.m_posit.m_x < ndFloat32(-40.0f));
 			return fail;
 		}
 
@@ -343,6 +344,7 @@ namespace ndController_0
 		{
 			const ndMatrix& matrix = m_pole->GetMatrix();
 			ndFloat32 angle = ndMin(ndAbs(matrix.m_front.m_x), D_REWARD_MIN_ANGLE);
+			//ndFloat32 angle = ndAbs(matrix.m_front.m_x);
 			ndFloat32 reward = ndFloat32(1.0f) - angle / D_REWARD_MIN_ANGLE;
 			return ndReal(reward);
 		}

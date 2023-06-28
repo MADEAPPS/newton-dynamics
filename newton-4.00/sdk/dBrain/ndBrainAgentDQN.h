@@ -25,17 +25,31 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainAgent.h"
 
+template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDQN: public ndBrainAgent
 {
 	public: 
-	ndBrainAgentDQN(ndBrain* const agent, ndInt32 replayBufferSize, ndInt32 replayBatchSize);
+	//ndBrainAgentDQN(ndBrain* const agent, ndInt32 replayBufferSize, ndInt32 replayBatchSize);
+	ndBrainAgentDQN();
 	virtual ~ndBrainAgentDQN();
 
 	virtual void LearnStep();
-	//virtual void PredictAccion(ndBrainReiforcementTransition& transition);
-
-	ndBrainInstance m_targetNetwork;
 };
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN()
+{
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndBrainAgentDQN<statesDim, actionDim>::~ndBrainAgentDQN()
+{
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN<statesDim, actionDim>::LearnStep()
+{
+}
 
 #endif 
 

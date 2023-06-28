@@ -28,8 +28,8 @@
 class ndBrainAgentDDPG : public ndBrainAgent
 {
 	public: 
-	ndBrainAgentDDPG(ndBrain* const agent);
-	virtual ~ndBrainAgentDDPG();
+	//ndBrainAgentDDPG(ndBrain* const agent);
+	//virtual ~ndBrainAgentDDPG();
 };
 
 #endif 
