@@ -27,7 +27,7 @@
 #include "ndBrainMatrix.h"
 #include "ndBrainInstance.h"
 
-template<class actionType, ndInt32 statesDim, ndInt32 actionDim = 1>
+template<class actionType, ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainReplayTransitionMemory
 {
 	public:
@@ -41,14 +41,15 @@ class ndBrainReplayTransitionMemory
 	bool m_terminalState;
 };
 
-template<class actionType, ndInt32 statesDim, ndInt32 actionDim = 1>
+template<class actionType, ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainReplayBuffer : public ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>
 {
 	public:
-	ndBrainReplayBuffer(ndInt32 size);
+	ndBrainReplayBuffer();
 	~ndBrainReplayBuffer();
 
 	void Clear();
+	void SetSize(ndInt32 size);
 	void AddTransition(const ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>& transition);
 
 	ndInt32 m_replayBufferIndex;
@@ -87,12 +88,10 @@ void ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>::Clear()
 }
 
 template<class actionType, ndInt32 statesDim, ndInt32 actionDim>
-ndBrainReplayBuffer<actionType, statesDim, actionDim>::ndBrainReplayBuffer(ndInt32 size)
+ndBrainReplayBuffer<actionType, statesDim, actionDim>::ndBrainReplayBuffer()
 	:ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>()
 	,m_replayBufferIndex(0)
 {
-	ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::SetCount(size);
-	Clear();
 }
 
 template<class actionType, ndInt32 statesDim, ndInt32 actionDim>
@@ -104,7 +103,14 @@ template<class actionType, ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainReplayBuffer<actionType, statesDim, actionDim>::Clear()
 {
 	m_replayBufferIndex = 0;
-	ndArray<ndBrainReplayTransitionMemory<actionType, statesDim>>::SetCount(0);
+	ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::SetCount(0);
+}
+
+template<class actionType, ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainReplayBuffer<actionType, statesDim, actionDim>::SetSize(ndInt32 size)
+{
+	ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::SetCount(size);
+	Clear();
 }
 
 template<class actionType, ndInt32 statesDim, ndInt32 actionDim>

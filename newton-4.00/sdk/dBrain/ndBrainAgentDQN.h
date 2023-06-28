@@ -29,15 +29,35 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDQN: public ndBrainAgent
 {
 	public: 
-	//ndBrainAgentDQN(ndBrain* const agent, ndInt32 replayBufferSize, ndInt32 replayBatchSize);
 	ndBrainAgentDQN();
 	virtual ~ndBrainAgentDQN();
 
+	ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& GetTransition();
+
 	virtual void LearnStep();
+
+	protected:
+	ndBrainReplayBuffer<ndInt32, statesDim, 1> m_replayBuffer;
+	ndBrainReplayTransitionMemory<ndInt32, statesDim, 1> m_currentTransition;
+
+	ndReal m_gamma;
+	ndReal m_epsilonGreedy;
+	ndReal m_epsilonGreedyStep;
+	ndReal m_epsilonGreedyFloor;
+	ndInt32 m_frameCount;
+	ndInt32 m_epsilonGreedyFreq;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN()
+	:ndBrainAgent()
+	,m_replayBuffer()
+	,m_gamma(ndReal(0.99f))
+	,m_epsilonGreedy(ndReal(1.0f))
+	,m_epsilonGreedyStep(ndReal(5.0e-4f))
+	,m_epsilonGreedyFloor(ndReal(2.0e-3f))
+	,m_frameCount(0)
+	,m_epsilonGreedyFreq(64)
 {
 }
 
@@ -47,8 +67,32 @@ ndBrainAgentDQN<statesDim, actionDim>::~ndBrainAgentDQN()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
+ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& ndBrainAgentDQN<statesDim, actionDim>::GetTransition()
+{
+	return m_currentTransition;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN<statesDim, actionDim>::LearnStep()
 {
+	GetObservation(&m_currentTransition.m_nextState[0]);
+	m_currentTransition.m_reward = GetReward();
+	m_currentTransition.m_terminalState = IsTerminal();
+
+	m_replayBuffer.AddTransition(m_currentTransition);
+
+	m_currentTransition.m_state = m_currentTransition.m_nextState;
+
+	ndReal actions;
+	//GetAction(&m_currentTransition.m_action[0], m_epsilonGreedy);
+	GetAction(&actions, m_epsilonGreedy);
+	m_currentTransition.m_action[0] = ndInt32(actions);
+
+	if (m_frameCount % m_epsilonGreedyFreq == (m_epsilonGreedyFreq - 1))
+	{
+		m_epsilonGreedy = ndMax(m_epsilonGreedy - m_epsilonGreedyStep, m_epsilonGreedyFloor);
+	}
+
 }
 
 #endif 

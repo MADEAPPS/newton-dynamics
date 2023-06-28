@@ -22,20 +22,10 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainAgent.h"
 
-//ndBrainAgent::ndBrainAgent(ndBrain* const agent)
 ndBrainAgent::ndBrainAgent()
-	//:m_network(agent)
-	//,m_replayBuffer()
-	//,m_exploration(1.0f)
 {
-	ndAssert(0);
 }
 
 ndBrainAgent::~ndBrainAgent()
 {
 }
-
-//void ndBrainAgent::PredictAccion(ndBrainReiforcementTransition& transition)
-//{
-//	m_network.MakePrediction(transition.m_state, transition.m_action);
-//}

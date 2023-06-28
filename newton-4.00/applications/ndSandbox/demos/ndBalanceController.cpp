@@ -356,12 +356,13 @@ namespace ndController_1
 		ndModelUnicycleTrainer()
 			:ndModelUnicycle()
 			,m_currentTransition()
-			,m_replayBuffer(1024 * 128)
+			,m_replayBuffer()
 			,m_basePose()
 			,m_traingCounter(0)
 			,m_trainingState(ndTrainingStage::m_starTraining)
 			,m_epsilonGreedy(ndFloat32 (1.0f))
 		{
+			m_replayBuffer.SetSize(1024 * 128);
 			// memories size 100000, batch size 256
 			ndSetRandSeed(42);
 		}
@@ -578,8 +579,8 @@ namespace ndController_1
 			//TrainingLoopEnd(world, timestep);
 		}
 
-		ndBrainReplayTransitionMemory<ndInt32, 2> m_currentTransition;
-		ndBrainReplayBuffer<ndInt32, 2> m_replayBuffer;
+		ndBrainReplayTransitionMemory<ndInt32, 2, 1> m_currentTransition;
+		ndBrainReplayBuffer<ndInt32, 2, 1> m_replayBuffer;
 		ndFixSizeArray<ndBasePose, 32> m_basePose;
 		ndInt32 m_traingCounter;
 		ndTrainingStage m_trainingState;

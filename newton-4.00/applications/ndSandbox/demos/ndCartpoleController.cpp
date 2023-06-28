@@ -43,14 +43,14 @@ namespace ndController_0
 		m_statePut,
 		m_pushLeft,
 		m_pushRight,
-		m_acctionsCount
+		m_actionsCount
 	};
 
 	enum ndStateSpace
 	{
-		m_cartPosition,
+		m_cartAcceleration,
 		m_cartVelocity,
-		m_poleAngle,
+		m_poleAlpha,
 		m_poleOmega,
 		m_stateCount
 	};
@@ -61,8 +61,8 @@ namespace ndController_0
 		virtual void ResetModel() const = 0;
 		virtual bool IsTerminal() const = 0;
 		virtual ndReal GetReward() const = 0;
-		virtual ndInt32 GetAction(ndReal greedy) const = 0;
 		virtual void GetObservation(ndReal* const state) const = 0;
+		virtual void GetAction(ndReal* const actions, ndReal exploreProbability) const = 0;
 	};
 
 	class ndQValuePredictor : public ndBrain
@@ -74,7 +74,7 @@ namespace ndController_0
 			ndBrainLayer* const inputLayer = new ndBrainLayer(m_stateCount, 128, m_relu);
 			ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), 128, m_relu);
 			ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), 128, m_relu);
-			ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer1->GetOuputSize(), m_acctionsCount, m_lineal);
+			ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer1->GetOuputSize(), m_actionsCount, m_lineal);
 
 			BeginAddLayer();
 			AddLayer(inputLayer);
@@ -86,7 +86,7 @@ namespace ndController_0
 		}
 	};
 
-	class ndDQNAgent
+	class ndDQNAgent: public ndBrainAgentDQN<m_stateCount, 1>
 	{
 		public:
 		class ndDQNAgentTrainer : public ndBrainTrainer
@@ -114,23 +114,31 @@ namespace ndController_0
 		};
 
 		ndDQNAgent(ndCartpoleBase* const model)
-			:m_onlineNetwork()
+			:ndBrainAgentDQN<m_stateCount, 1>()
+			,m_onlineNetwork()
 			,m_targetNetwork(m_onlineNetwork)
 			,m_input()
 			,m_output()
 			,m_trainer(&m_onlineNetwork)
 			,m_targetInstance(&m_targetNetwork)
 			,m_shuffleBuffer(D_REPLAY_BUFFERSIZE)
-			,m_replayBuffer(D_REPLAY_BUFFERSIZE)
-			,m_currentTransition()
 			,m_model(model)
-			,m_gamma(D_DISCOUNT_FACTOR)
-			,m_epsilonGreedy(1.0f)
+			//,m_gamma(D_DISCOUNT_FACTOR)
+			//,m_epsilonGreedy(1.0f)
 			,m_movingAverageCount(0)
 			,m_frameCount(0)
 			,m_framesAlive(0)
 			,m_eposideCount(0)
 		{
+			m_frameCount = 0;
+			m_gamma = D_DISCOUNT_FACTOR;
+			m_epsilonGreedy = ndReal (1.0f);
+			m_epsilonGreedyStep = D_EPSILON_GREEDY;
+			m_epsilonGreedyFloor = D_MIN_EXPLARE_FACTOR;
+			m_epsilonGreedyFreq = D_EPSILON_GREEDY_FREQ;
+			
+			m_replayBuffer.SetSize(D_REPLAY_BUFFERSIZE);
+
 			for (ndInt32 i = 0; i < sizeof(m_movingAverage) / sizeof(m_movingAverage[0]); ++i)
 			{
 				m_movingAverage[i] = 0;
@@ -139,7 +147,27 @@ namespace ndController_0
 			m_trainer.m_agent = this;
 			m_shuffleBuffer.SetCount(0);
 			m_input.SetCount(m_stateCount);
-			m_output.SetCount(m_acctionsCount);
+			m_output.SetCount(m_actionsCount);
+		}
+
+		ndReal GetReward() const
+		{
+			return m_model->GetReward();
+		}
+
+		void GetObservation(ndReal* const state) const
+		{
+			m_model->GetObservation(state);
+		}
+
+		bool IsTerminal() const
+		{
+			return m_model->IsTerminal();
+		}
+
+		void GetAction(ndReal* const actions, ndReal exploreProbability) const
+		{
+			m_model->GetAction(actions, exploreProbability);
 		}
 
 		void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
@@ -148,7 +176,7 @@ namespace ndController_0
 
 			//groundTruth.Set(output);
 			ndInt32 k = m_shuffleBuffer[index];
-			const ndBrainReplayTransitionMemory<ndInt32, m_stateCount>& transition = m_replayBuffer[k];
+			const ndBrainReplayTransitionMemory<ndInt32, m_stateCount, 1>& transition = m_replayBuffer[k];
 
 			//groundTruth[action] = transition.m_reward;
 			groundTruth.Set(transition.m_reward);
@@ -205,7 +233,7 @@ namespace ndController_0
 			for (ndInt32 i = 0; i < D_REPLAY_BASH_SIZE; ++i)
 			{
 				ndInt32 index = m_shuffleBuffer[i];
-				const ndBrainReplayTransitionMemory<ndInt32, m_stateCount>& transition = m_replayBuffer[index];
+				const ndBrainReplayTransitionMemory<ndInt32, m_stateCount, 1>& transition = m_replayBuffer[index];
 				for (ndInt32 j = 0; j < m_stateCount; ++j)
 				{
 					inputBatch[i][j] = transition.m_state[j];
@@ -214,12 +242,15 @@ namespace ndController_0
 			m_trainer.Optimize(validator, inputBatch, D_LEARN_RATE, 1);
 		}
 
-		void Train()
+		void LearnStep()
 		{
-			m_model->GetObservation(&m_currentTransition.m_nextState[0]);
-			m_currentTransition.m_reward = m_model->GetReward();
-			m_currentTransition.m_terminalState = m_model->IsTerminal();
-			m_replayBuffer.AddTransition(m_currentTransition);
+			ndBrainAgentDQN::LearnStep();
+			
+			//m_model->GetObservation(&m_currentTransition.m_nextState[0]);
+			//m_currentTransition.m_reward = m_model->GetReward();
+			//m_currentTransition.m_terminalState = m_model->IsTerminal();
+			//m_replayBuffer.AddTransition(m_currentTransition);
+
 			if (m_currentTransition.m_terminalState)
 			{
 				m_movingAverage[m_movingAverageCount] = m_framesAlive;
@@ -236,7 +267,6 @@ namespace ndController_0
 				}
 				sum = sum / ndInt32(sizeof(m_movingAverage) / sizeof(m_movingAverage[0]));
 				ndExpandTraceMessage("moving average alive frames:%d\n", sum);
-
 			}
 
 			if (m_frameCount < D_REPLAY_BUFFERSIZE)
@@ -244,13 +274,13 @@ namespace ndController_0
 				m_shuffleBuffer.PushBack(m_frameCount);
 			}
 
-			m_currentTransition.m_state = m_currentTransition.m_nextState;
-			m_currentTransition.m_action[0] = m_model->GetAction(m_epsilonGreedy);
+			//m_currentTransition.m_state = m_currentTransition.m_nextState;
+			//m_currentTransition.m_action[0] = m_model->GetAction(m_epsilonGreedy);
 
-			if (m_frameCount % D_EPSILON_GREEDY_FREQ == (D_EPSILON_GREEDY_FREQ - 1))
-			{
-				m_epsilonGreedy = ndMax(m_epsilonGreedy - D_EPSILON_GREEDY, D_MIN_EXPLARE_FACTOR);
-			}
+			//if (m_frameCount % D_EPSILON_GREEDY_FREQ == (D_EPSILON_GREEDY_FREQ - 1))
+			//{
+			//	m_epsilonGreedy = ndMax(m_epsilonGreedy - D_EPSILON_GREEDY, D_MIN_EXPLARE_FACTOR);
+			//}
 
 			if (m_frameCount > (D_REPLAY_BASH_SIZE * 8))
 			{
@@ -286,7 +316,7 @@ namespace ndController_0
 
 			ndInt32 action = 0;
 			ndReal maxReward = m_output[0];
-			for (ndInt32 i = 1; i < m_acctionsCount; ++i)
+			for (ndInt32 i = 1; i < m_actionsCount; ++i)
 			{
 				if (m_output[i] > maxReward)
 				{
@@ -304,12 +334,8 @@ namespace ndController_0
 		mutable ndDQNAgentTrainer m_trainer;
 		mutable ndBrainInstance m_targetInstance;
 		ndArray<ndInt32> m_shuffleBuffer;
-		ndBrainReplayBuffer<ndInt32, m_stateCount> m_replayBuffer;
-		ndBrainReplayTransitionMemory<ndInt32, m_stateCount> m_currentTransition;
 		ndCartpoleBase* m_model;
 
-		ndReal m_gamma;
-		ndReal m_epsilonGreedy;
 		ndInt32 m_movingAverage[32];
 		ndInt32 m_movingAverageCount;
 		ndInt32 m_frameCount;
@@ -333,10 +359,7 @@ namespace ndController_0
 		virtual bool IsTerminal() const
 		{
 			const ndMatrix& matrix = m_pole->GetMatrix();
-			// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
 			bool fail = ndAbs(matrix.m_front.m_x) > (D_REWARD_MIN_ANGLE * ndFloat32 (2.0f));
-			fail = fail || (matrix.m_posit.m_x > ndFloat32(40.0f));
-			fail = fail || (matrix.m_posit.m_x < ndFloat32(-40.0f));
 			return fail;
 		}
 
@@ -349,34 +372,33 @@ namespace ndController_0
 			return ndReal(reward);
 		}
 
-		virtual ndInt32 GetAction(ndReal greedy) const
+		virtual void GetAction(ndReal* const actions, ndReal exploreProbability) const
 		{
 			ndInt32 action = 0;
 			ndFloat32 explore = ndRand();
-			if (explore <= greedy)
+			if (explore <= exploreProbability)
 			{
-				action = ndInt32(ndRandInt() % m_acctionsCount);
+				action = ndInt32(ndRandInt() % m_actionsCount);
 			}
 			else
 			{
 				action = m_agent->GetMaxValueAction();
 			}
-
-			return action;
+		
+			actions[0] = ndReal(action);
 		}
 
 		void GetObservation(ndReal* const state) const
 		{
-			ndFloat32 posit = m_cart->GetMatrix().m_posit.m_x;
-			ndFloat32 veloc = m_cart->GetVelocity().m_x;
+			ndVector omega(m_pole->GetOmega());
+			ndVector alpha(m_pole->GetAlpha());
+			ndVector accel(m_cart->GetAccel());
+			ndVector veloc(m_cart->GetVelocity());
 
-			ndFloat32 angle = ndAsin(m_pole->GetMatrix().m_up.m_y);
-			ndFloat32 omega = m_pole->GetOmega().m_z;
-
-			state[m_poleAngle] = ndReal(angle);
-			state[m_poleOmega] = ndReal(omega);
-			state[m_cartPosition] = ndReal(posit);
-			state[m_cartVelocity] = ndReal(veloc);
+			state[m_poleAlpha] = ndReal(alpha.m_z);
+			state[m_poleOmega] = ndReal(omega.m_z);
+			state[m_cartVelocity] = ndReal(veloc.m_x);
+			state[m_cartAcceleration] = ndReal(accel.m_x);
 		}
 
 		virtual void ResetModel() const
@@ -389,7 +411,7 @@ namespace ndController_0
 
 			ndVector impulse(ndVector::m_zero);
 			impulse.m_x = m_cart->GetMassMatrix().m_w * ndGaussianRandom(0.0f, 0.05f);
-			m_cart->ApplyImpulsePair(impulse, ndVector::m_zero, 1.0f / 60.0f);
+			//m_cart->ApplyImpulsePair(impulse, ndVector::m_zero, 1.0f / 60.0f);
 
 			m_cart->SetMatrix(m_cartMatrix);
 			m_pole->SetMatrix(m_poleMatrix);
@@ -400,7 +422,7 @@ namespace ndController_0
 			ndModelArticulation::Update(world, timestep);
 
 			ndVector force(m_pole->GetForce());
-			ndInt32 action = m_agent->m_currentTransition.m_action[0];
+			ndInt32 action = m_agent->GetTransition().m_action[0];
 			if (action == m_pushLeft)
 			{
 				force.m_x = -D_PUSH_FORCE;
@@ -415,7 +437,7 @@ namespace ndController_0
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
-			m_agent->Train();
+			m_agent->LearnStep();
 		}
 
 		ndMatrix m_cartMatrix;
