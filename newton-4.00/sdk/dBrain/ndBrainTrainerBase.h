@@ -47,7 +47,7 @@ class ndBrainTrainerBase: public ndClassAlloc
 		{
 		}
 
-		virtual ndReal Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth);
+		virtual ndReal Validate(const ndBrainMatrix& inputBatch);
 
 		ndBrainTrainerBase& m_trainer;
 		ndBrainVector m_output;
@@ -64,12 +64,11 @@ class ndBrainTrainerBase: public ndClassAlloc
 	ndBrain* GetBrain() const;
 	ndBrainInstance& GetInstance();
 	const ndBrainInstance& GetInstance() const;
-	void SetMiniBatchSize(ndInt32 m_miniBatchSize);
+	void SetMiniBatchSize(ndInt32 miniBatchSize);
 	virtual ndReal Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndBrainVector& output);
 
 	virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const = 0;
 	virtual void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, ndReal learnRate, ndInt32 steps) = 0;
-	//void Optimize___(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
 
 	protected:
 	ndBrainInstance m_instance;

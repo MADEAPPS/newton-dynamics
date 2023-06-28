@@ -27,15 +27,15 @@
 namespace ndController_0
 {
 	#define D_REPLAY_BASH_SIZE		(32)
-	#define D_REPLAY_BUFFERSIZE		(1024 * 64)
+	#define D_REPLAY_BUFFERSIZE		(1024 * 128)
 	#define D_DISCOUNT_FACTOR		ndReal (0.99f)
 	#define D_EPSILON_GREEDY		ndReal (5.0e-4f)
-	#define D_MIN_EXPLARE_FACTOR	ndReal (0.01f)
+	#define D_MIN_EXPLARE_FACTOR	ndReal (0.002f)
 	#define D_LEARN_RATE			ndReal (5.0e-4f)
 	#define D_TARGET_UPDATE_FREQ	(1000)
 	#define D_EPSILON_GREEDY_FREQ	(D_REPLAY_BASH_SIZE * 2)
 
-	#define D_PUSH_FORCE ndFloat32 (20.0f)
+	#define D_PUSH_FORCE ndFloat32 (10.0f)
 
 	enum ndActionSpace
 	{
@@ -95,6 +95,8 @@ namespace ndController_0
 				:ndBrainTrainer(brain)
 				,m_agent(nullptr)
 			{
+				SetMiniBatchSize(D_REPLAY_BASH_SIZE);
+				//SetRegularizer(GetRegularizer() * 10.0f);
 			}
 
 			ndDQNAgentTrainer(const ndDQNAgentTrainer& src)
@@ -123,10 +125,16 @@ namespace ndController_0
 			,m_model(model)
 			,m_gamma(D_DISCOUNT_FACTOR)
 			,m_epsilonGreedy(1.0f)
+			,m_movingAverageCount(0)
 			,m_frameCount(0)
 			,m_framesAlive(0)
 			,m_eposideCount(0)
 		{
+			for (ndInt32 i = 0; i < sizeof(m_movingAverage) / sizeof(m_movingAverage[0]); ++i)
+			{
+				m_movingAverage[i] = 0;
+			}
+
 			m_trainer.m_agent = this;
 			m_shuffleBuffer.SetCount(0);
 			m_input.SetCount(m_stateCount);
@@ -144,7 +152,6 @@ namespace ndController_0
 			ndInt32 action = transition.m_action[0];
 			groundTruth[action] = transition.m_reward;
 
-			//static ndFloat32 xxxxx = 0;
 			if (!transition.m_terminalState)
 			{
 				for (ndInt32 i = 0; i < m_stateCount; ++i)
@@ -153,12 +160,6 @@ namespace ndController_0
 				}
 				m_targetInstance.MakePrediction(m_input, m_output);
 				groundTruth[action] += m_gamma * m_output[action];
-				//if (groundTruth[action] > xxxxx)
-				//{
-				//	xxxxx = groundTruth[action];
-				//	//ndTrace(("reward gain: %f\n", groundTruth[action]));
-				//	ndExpandTraceMessage("reward gain: %f\n", xxxxx);
-				//}
 			}
 		}
 
@@ -175,7 +176,8 @@ namespace ndController_0
 				{
 				}
 
-				ndReal Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth)
+				//ndReal Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth)
+				ndReal Validate(const ndBrainMatrix& inputBatch)
 				{
 					//ndReal error = ndBrainTrainer::ndValidation::Validate(inputBatch, groundTruth);
 					//if (error < m_minError)
@@ -187,16 +189,15 @@ namespace ndController_0
 					//m_step++;
 					////ndExpandTraceMessage("%f\n", error);
 					//return error;
-					return 0;
+					return 1.0f;
 				}
 				ndReal m_minError;
 				ndInt32 m_step;
 				ndInt32 m_step0;
 			};
 
-			ndBrainMatrix inputBatch(D_REPLAY_BASH_SIZE, m_stateCount);
-			ndBrainMatrix groundTruth(D_REPLAY_BASH_SIZE, m_acctionsCount);
 			ndTestValidator validator(m_trainer);
+			ndBrainMatrix inputBatch(D_REPLAY_BASH_SIZE, m_stateCount);
 
 			m_shuffleBuffer.RandomShuffle(m_shuffleBuffer.GetCount());
 			for (ndInt32 i = 0; i < D_REPLAY_BASH_SIZE; ++i)
@@ -219,9 +220,21 @@ namespace ndController_0
 			m_replayBuffer.AddTransition(m_currentTransition);
 			if (m_currentTransition.m_terminalState)
 			{
+				m_movingAverage[m_movingAverageCount] = m_framesAlive;
+				m_movingAverageCount = (m_movingAverageCount + 1) % ndInt32 (sizeof(m_movingAverage) / sizeof(m_movingAverage[0]));
+
 				m_eposideCount++;
 				m_framesAlive = 0;
 				m_model->ResetModel();
+
+				ndInt32 sum = 0;
+				for (ndInt32 i = 0; i < sizeof(m_movingAverage) / sizeof(m_movingAverage[0]); ++i)
+				{
+					sum += m_movingAverage[i];
+				}
+				sum = sum / ndInt32(sizeof(m_movingAverage) / sizeof(m_movingAverage[0]));
+				ndExpandTraceMessage("moving average alived frames:%d\n", sum);
+
 			}
 
 			if (m_frameCount < D_REPLAY_BUFFERSIZE)
@@ -295,6 +308,8 @@ namespace ndController_0
 
 		ndReal m_gamma;
 		ndReal m_epsilonGreedy;
+		ndInt32 m_movingAverage[32];
+		ndInt32 m_movingAverageCount;
 		ndInt32 m_frameCount;
 		ndInt32 m_framesAlive;
 		ndInt32 m_eposideCount;
@@ -458,6 +473,8 @@ void ndCartpoleController(ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 
 	ndSetRandSeed(42);
+	scene->SetAcceleratedUpdate();
+
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 

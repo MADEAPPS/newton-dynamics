@@ -414,7 +414,7 @@ void ndBrainTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inpu
 	const ndInt32 batchCount = (inputBatch.GetCount() + miniBatchSize - 1) / miniBatchSize;
 	
 	//m_bestCost = validator.Validate(inputBatch, groundTruth);
-	m_bestCost = 1.0f;
+	m_bestCost = validator.Validate(inputBatch);
 	for (ndInt32 i = 0; (i < steps) && (m_bestCost > 0.0f); ++i)
 	{
 		for (ndInt32 j = 0; j < batchCount; ++j)
@@ -428,7 +428,6 @@ void ndBrainTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inpu
 				const ndBrainVector& input = inputBatch[index];
 				MakePrediction(input);
 
-				//const ndBrainVector& truth = groundTruth[index];
 				GetGroundTruth(index, truth, m_output);
 				BackPropagate(truth);
 			}
@@ -437,9 +436,8 @@ void ndBrainTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inpu
 		ApplyWeightTranspose();
 		randomizeVector.RandomShuffle(randomizeVector.GetCount());
 		
-		//ndReal batchError = validator.Validate(inputBatch, groundTruth);
-		ndReal batchError = 0.0f;
-		if (batchError < m_bestCost)
+		ndReal batchError = validator.Validate(inputBatch);
+		if (batchError <= m_bestCost)
 		{
 			m_bestCost = batchError;
 			bestNetwork.CopyFrom(*m_instance.GetBrain());

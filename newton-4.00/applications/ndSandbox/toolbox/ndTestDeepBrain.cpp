@@ -23,18 +23,20 @@ class ndTestValidator : public ndBrainTrainer::ndValidation
 	{
 	}
 
-	ndReal Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth)
+	ndReal Validate(const ndBrainMatrix& inputBatch)
 	{
-		ndReal error = ndBrainTrainer::ndValidation::Validate(inputBatch, groundTruth);
-		if (error < m_minError)
-		{
-			m_minError = error;
-			ndExpandTraceMessage("%f; %d; %d\n", m_minError, m_step, m_step - m_step0);
-			m_step0 = m_step;
-		}
-		m_step++;
-		//ndExpandTraceMessage("%f\n", error);
-		return error;
+		ndAssert(0);
+		return 0;
+		//ndReal error = ndBrainTrainer::ndValidation::Validate(inputBatch, groundTruth);
+		//if (error < m_minError)
+		//{
+		//	m_minError = error;
+		//	ndExpandTraceMessage("%f; %d; %d\n", m_minError, m_step, m_step - m_step0);
+		//	m_step0 = m_step;
+		//}
+		//m_step++;
+		////ndExpandTraceMessage("%f\n", error);
+		//return error;
 	}
 	ndReal m_minError;
 	ndInt32 m_step;

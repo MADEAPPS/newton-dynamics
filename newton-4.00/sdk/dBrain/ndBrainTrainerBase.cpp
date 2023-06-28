@@ -66,8 +66,11 @@ ndReal ndBrainTrainerBase::Validate(const ndBrainMatrix& inputBatch, const ndBra
 	return error;
 }
 
-ndReal ndBrainTrainerBase::ndValidation::Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth)
+//ndReal ndBrainTrainerBase::ndValidation::Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth)
+ndReal ndBrainTrainerBase::ndValidation::Validate(const ndBrainMatrix& inputBatch)
 {
-	return m_trainer.Validate(inputBatch, groundTruth, m_output);
+	ndAssert(0);
+	return 0;
+	//return m_trainer.Validate(inputBatch, groundTruth, m_output);
 }
 

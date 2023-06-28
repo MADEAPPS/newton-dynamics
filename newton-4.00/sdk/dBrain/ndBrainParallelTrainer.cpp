@@ -179,7 +179,9 @@ void ndBrainParallelTrainer::Optimize()
 	const ndInt32 miniBatchSize = ndMin(m_miniBatchSize, inputBatch.GetCount());
 	const ndInt32 batchCount = (inputBatch.GetCount() + miniBatchSize - 1) / miniBatchSize;
 
-	m_bestCost = validator.Validate(inputBatch, groundTruth);
+	ndAssert(0);
+	//m_bestCost = validator.Validate(inputBatch, groundTruth);
+	m_bestCost = validator.Validate(inputBatch);
 	for (ndInt32 i = 0; (i < m_steps) && (m_bestCost > 0.0f); ++i)
 	{
 		for (ndInt32 j = 0; j < batchCount; ++j)
@@ -229,7 +231,8 @@ void ndBrainParallelTrainer::Optimize()
 		ApplyWeightTranspose();
 		randomizeVector.RandomShuffle(randomizeVector.GetCount());
 
-		ndReal batchError = validator.Validate(inputBatch, groundTruth);
+		//ndReal batchError = validator.Validate(inputBatch, groundTruth);
+		ndReal batchError = validator.Validate(inputBatch);
 		if (batchError < m_bestCost)
 		{
 			m_bestCost = batchError;
