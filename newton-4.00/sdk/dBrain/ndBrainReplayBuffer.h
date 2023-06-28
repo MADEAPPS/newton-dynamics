@@ -119,8 +119,7 @@ void ndBrainReplayBuffer<actionType, statesDim, actionDim>::AddTransition(const 
 	{
 		ndBrainReplayBuffer<actionType, statesDim, actionDim>& me = *this;
 		me[m_replayBufferIndex] = transition;
-		//ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::operator[m_replayBufferIndex] = transition;
-		m_replayBufferIndex += (m_replayBufferIndex + 1) % ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::GetCapacity();
+		m_replayBufferIndex = (m_replayBufferIndex + 1) % ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::GetCapacity();
 	}
 }
 #endif 

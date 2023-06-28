@@ -34,6 +34,7 @@ namespace ndController_0
 	#define D_LEARN_RATE			ndReal (5.0e-4f)
 	#define D_TARGET_UPDATE_FREQ	(1000)
 	#define D_EPSILON_GREEDY_FREQ	(D_REPLAY_BASH_SIZE * 2)
+	#define D_REWARD_MIN_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
 
 	#define D_PUSH_FORCE ndFloat32 (10.0f)
 
@@ -331,7 +332,8 @@ namespace ndController_0
 		virtual bool IsTerminal() const
 		{
 			const ndMatrix& matrix = m_pole->GetMatrix();
-			bool fail = (matrix.m_front.m_y) < ndFloat32(0.91f);
+			// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
+			bool fail = ndAbs(matrix.m_front.m_x) > (D_REWARD_MIN_ANGLE * ndFloat32 (2.0f));
 			fail = fail || (matrix.m_posit.m_x > ndFloat32(8.0f));
 			fail = fail || (matrix.m_posit.m_x < ndFloat32(-8.0f));
 			return fail;
@@ -339,7 +341,10 @@ namespace ndController_0
 
 		virtual ndReal GetReward() const
 		{
-			return ndReal(m_pole->GetMatrix().m_front.m_y);
+			const ndMatrix& matrix = m_pole->GetMatrix();
+			ndFloat32 angle = ndMin(ndAbs(matrix.m_front.m_x), D_REWARD_MIN_ANGLE);
+			ndFloat32 reward = ndFloat32(1.0f) - angle / D_REWARD_MIN_ANGLE;
+			return ndReal(reward);
 		}
 
 		virtual ndInt32 GetAction(ndReal greedy) const
@@ -374,10 +379,16 @@ namespace ndController_0
 
 		virtual void ResetModel() const
 		{
-			m_cart->SetOmega(ndVector::m_zero);
-			m_cart->SetVelocity(ndVector::m_zero);
 			m_pole->SetOmega(ndVector::m_zero);
 			m_pole->SetVelocity(ndVector::m_zero);
+
+			m_cart->SetOmega(ndVector::m_zero);
+			m_cart->SetVelocity(ndVector::m_zero);
+
+			ndVector impulse(ndVector::m_zero);
+			impulse.m_x = m_cart->GetMassMatrix().m_w * ndGaussianRandom(0.0f, 0.05f);
+			m_cart->ApplyImpulsePair(impulse, ndVector::m_zero, 1.0f / 60.0f);
+
 			m_cart->SetMatrix(m_cartMatrix);
 			m_pole->SetMatrix(m_poleMatrix);
 		}

@@ -607,23 +607,25 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 		char token[256];
 		auto ReadToken = [file, &token]()
 		{
-			fscanf(file, "%s", token);
+			ndInt32 error = 0;
+			error = fscanf(file, "%s", token);
 		};
 
+		ndInt32 error = 0;
 		fgets(token, sizeof(token) - 1, file);
 		ReadToken();
 		ndTree<ndSharedPtr<ndMeshEffect>, ndInt32> meshEffects;
 		if (!strcmp(token, "geometries:"))
 		{
 			ndInt32 geometryCount;
-			fscanf(file, "%d", &geometryCount);
+			error = fscanf(file, "%d", &geometryCount);
 			ReadToken();
 			ReadToken();
 
 			for (ndInt32 k = 0; k < geometryCount; k++)
 			{
 				ndInt32 meshId;
-				fscanf(file, "%d", &meshId);
+				error = fscanf(file, "%d", &meshId);
 				ndSharedPtr<ndMeshEffect> effectMesh(new ndMeshEffect());
 				meshEffects.Insert(effectMesh, meshId);
 				ReadToken();
@@ -650,26 +652,26 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 					{
 						ReadToken();
 						ReadToken();
-						fscanf(file, "%d", &vertexCount);
+						error = fscanf(file, "%d", &vertexCount);
 						ReadToken();
 						for (ndInt32 i = 0; i < vertexCount; ++i)
 						{
 							ndFloat64 x;
 							ndFloat64 y;
 							ndFloat64 z;
-							fscanf(file, "%lf %lf %lf", &x, &y, &z);
+							error = fscanf(file, "%lf %lf %lf", &x, &y, &z);
 							positions.PushBack(ndBigVector(x, y, z, ndFloat64(0.0f)));
 						}
 						ReadToken();
 
 						int indexCount;
 						ReadToken();
-						fscanf(file, "%d", &indexCount);
+						error = fscanf(file, "%d", &indexCount);
 						ReadToken();
 						for (ndInt32 i = 0; i < indexCount; ++i)
 						{
 							ndInt32 index;
-							fscanf(file, "%d" , &index);
+							error = fscanf(file, "%d" , &index);
 							positionsIndex.PushBack(index);
 						}
 						ReadToken();
@@ -684,7 +686,7 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 						ndInt32 vCount;
 						ReadToken();
 						ReadToken();
-						fscanf(file, "%d", &vCount);
+						error = fscanf(file, "%d", &vCount);
 
 						ReadToken();
 						for (ndInt32 i = 0; i < vCount; ++i)
@@ -692,19 +694,19 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 							ndReal x;
 							ndReal y;
 							ndReal z;
-							fscanf(file, "%f %f %f", &x, &y, &z);
+							error = fscanf(file, "%f %f %f", &x, &y, &z);
 							normals.PushBack(ndMeshEffect::ndNormal(x, y, z));
 						}
 						ReadToken();
 
 						int indexCount;
 						ReadToken();
-						fscanf(file, "%d", &indexCount);
+						error = fscanf(file, "%d", &indexCount);
 						ReadToken();
 						for (ndInt32 i = 0; i < indexCount; ++i)
 						{
 							ndInt32 index;
-							fscanf(file, "%d", &index);
+							error = fscanf(file, "%d", &index);
 							normalsIndex.PushBack(index);
 						}
 						ReadToken();
@@ -719,26 +721,26 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 						ndInt32 vCount;
 						ReadToken();
 						ReadToken();
-						fscanf(file, "%d", &vCount);
+						error = fscanf(file, "%d", &vCount);
 
 						ReadToken();
 						for (ndInt32 i = 0; i < vCount; ++i)
 						{
 							ndReal x;
 							ndReal y;
-							fscanf(file, "%f %f", &x, &y);
+							error = fscanf(file, "%f %f", &x, &y);
 							uvs.PushBack(ndMeshEffect::ndUV(x, y));
 						}
 						ReadToken();
 
 						int indexCount;
 						ReadToken();
-						fscanf(file, "%d", &indexCount);
+						error = fscanf(file, "%d", &indexCount);
 						ReadToken();
 						for (ndInt32 i = 0; i < indexCount; ++i)
 						{
 							ndInt32 index;
-							fscanf(file, "%d", &index);
+							error = fscanf(file, "%d", &index);
 							uvIndex.PushBack(index);
 						}
 						ReadToken();
@@ -755,23 +757,23 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 
 						ReadToken();
 						ReadToken();
-						fscanf(file, "%lf %lf %lf %lf", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
+						error = fscanf(file, "%lf %lf %lf %lf", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
 						material.m_ambient = ndVector(val);
 
 						ReadToken();
-						fscanf(file, "%lf %lf %lf %lf", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
+						error = fscanf(file, "%lf %lf %lf %lf", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
 						material.m_diffuse = ndVector(val);
 
 						ReadToken();
-						fscanf(file, "%lf %lf %lf %lf", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
+						error = fscanf(file, "%lf %lf %lf %lf", &val.m_x, &val.m_y, &val.m_z, &val.m_w);
 						material.m_specular = ndVector(val);
 
 						ReadToken();
-						fscanf(file, "%lf", &val.m_x);
+						error = fscanf(file, "%lf", &val.m_x);
 						material.m_opacity = ndFloat32(val.m_x);
 
 						ReadToken();
-						fscanf(file, "%lf", &val.m_x);
+						error = fscanf(file, "%lf", &val.m_x);
 						material.m_shiness = ndFloat32(val.m_x);
 
 						ReadToken();
@@ -783,12 +785,12 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 
 						ReadToken();
 						ndInt32 faceCount;
-						fscanf(file, "%d", &faceCount);
+						error = fscanf(file, "%d", &faceCount);
 						ReadToken();
 						for (ndInt32 i = 0; i < faceCount; ++i)
 						{
 							ndInt32 vCount;
-							fscanf(file, "%d:", &vCount);
+							error = fscanf(file, "%d:", &vCount);
 							faceArray.PushBack(vCount);
 							materialArray.PushBack(materialIndex);
 						}
@@ -796,12 +798,12 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 
 						ReadToken();
 						ndInt32 indexCount;
-						fscanf(file, "%d", &indexCount);
+						error = fscanf(file, "%d", &indexCount);
 						ReadToken();
 						for (ndInt32 i = 0; i < indexCount; ++i)
 						{
 							ndInt32 index;
-							fscanf(file, "%d ", &index);
+							error = fscanf(file, "%d ", &index);
 							indexArray.PushBack(index);
 						}
 						ReadToken();
@@ -823,11 +825,11 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 						}
 
 						char boneName[128];
-						fscanf(file, "%s", boneName);
+						error = fscanf(file, "%s", boneName);
 						ndInt32 indexCount;
 						ReadToken();
 						ReadToken();
-						fscanf(file, "%d", &indexCount);
+						error = fscanf(file, "%d", &indexCount);
 						
 						ndInt32 hashId = ndInt32(ndCRC64(boneName) & 0xffffffff);
 						ReadToken();
@@ -836,7 +838,7 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 						for (ndInt32 i = 0; i < indexCount; ++i)
 						{
 							ndInt32 index;
-							fscanf(file, "%d", &index);
+							error = fscanf(file, "%d", &index);
 							boneIndex.PushBack(index);
 						}
 						
@@ -845,7 +847,7 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 						for (ndInt32 i = 0; i < indexCount; ++i)
 						{
 							ndReal weight;
-							fscanf(file, "%f", &weight);
+							error = fscanf(file, "%f", &weight);
 							vertexWeight.PushBack(weight);
 						}
 						ReadToken();
@@ -882,9 +884,12 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 void ndMesh::Load(FILE* const file, const ndTree<ndSharedPtr<ndMeshEffect>, ndInt32>& meshEffects)
 {
 	char token[256];
+	ndInt32 error = 0;
+
 	auto ReadToken = [file, &token]()
 	{
-		fscanf(file, "%s", token);
+		ndInt32 error = 0;
+		error = fscanf(file, "%s", token);
 	};
 
 	ReadToken();
@@ -899,7 +904,7 @@ void ndMesh::Load(FILE* const file, const ndTree<ndSharedPtr<ndMeshEffect>, ndIn
 		else if (!strcmp(token, "eulers:"))
 		{
 			ndBigVector eulers;
-			fscanf(file, "%lf %lf %lf", &eulers.m_x, &eulers.m_y, &eulers.m_z);
+			error = fscanf(file, "%lf %lf %lf", &eulers.m_x, &eulers.m_y, &eulers.m_z);
 			ndMatrix matrix(ndPitchMatrix(ndFloat32(eulers.m_x) * ndDegreeToRad) * ndYawMatrix(ndFloat32(eulers.m_y) * ndDegreeToRad) * ndRollMatrix(ndFloat32(eulers.m_z) * ndDegreeToRad));
 			matrix.m_posit = m_matrix.m_posit;
 			m_matrix = matrix;
@@ -907,14 +912,14 @@ void ndMesh::Load(FILE* const file, const ndTree<ndSharedPtr<ndMeshEffect>, ndIn
 		else if (!strcmp(token, "position:"))
 		{
 			ndBigVector posit;
-			fscanf(file, "%lf %lf %lf", &posit.m_x, &posit.m_y, &posit.m_z);
+			error = fscanf(file, "%lf %lf %lf", &posit.m_x, &posit.m_y, &posit.m_z);
 			posit.m_w = ndFloat32(1.0f);
 			m_matrix.m_posit = ndVector(posit);
 		}
 		else if (!strcmp(token, "geometryEulers:"))
 		{
 			ndBigVector eulers;
-			fscanf(file, "%lf %lf %lf", &eulers.m_x, &eulers.m_y, &eulers.m_z);
+			error = fscanf(file, "%lf %lf %lf", &eulers.m_x, &eulers.m_y, &eulers.m_z);
 			ndMatrix matrix(ndPitchMatrix(ndFloat32(eulers.m_x) * ndDegreeToRad) * ndYawMatrix(ndFloat32(eulers.m_y) * ndDegreeToRad) * ndRollMatrix(ndFloat32(eulers.m_z) * ndDegreeToRad));
 			matrix.m_posit = m_meshMatrix.m_posit;
 			m_meshMatrix = matrix;
@@ -922,7 +927,7 @@ void ndMesh::Load(FILE* const file, const ndTree<ndSharedPtr<ndMeshEffect>, ndIn
 		else if (!strcmp(token, "geometryPosition:"))
 		{
 			ndBigVector posit;
-			fscanf(file, "%lf %lf %lf", &posit.m_x, &posit.m_y, &posit.m_z);
+			error = fscanf(file, "%lf %lf %lf", &posit.m_x, &posit.m_y, &posit.m_z);
 			posit.m_w = ndFloat32(1.0f);
 			m_meshMatrix.m_posit = ndVector(posit);
 		}
@@ -934,21 +939,21 @@ void ndMesh::Load(FILE* const file, const ndTree<ndSharedPtr<ndMeshEffect>, ndIn
 		else if (!strcmp(token, "geometry:"))
 		{
 			ndInt32 nodeId;
-			fscanf(file, "%d", &nodeId);
+			error = fscanf(file, "%d", &nodeId);
 			ndAssert(meshEffects.Find(nodeId));
 			m_mesh = meshEffects.Find(nodeId)->GetInfo();
 		}
 		else if (!strcmp(token, "keyFramePosits:"))
 		{
 			ndInt32 keyFramesCount;
-			fscanf(file, "%d\n", &keyFramesCount);
+			error = fscanf(file, "%d\n", &keyFramesCount);
 			
 			ReadToken();
 			ndMesh::ndCurve& curve = GetPositCurve();
 			for (ndInt32 i = 0; i < keyFramesCount; ++i)
 			{
 				ndCurveValue keyframe;
-				fscanf(file, "%f %f %f %f\n", &keyframe.m_x, &keyframe.m_y, &keyframe.m_z, &keyframe.m_time);
+				error = fscanf(file, "%f %f %f %f\n", &keyframe.m_x, &keyframe.m_y, &keyframe.m_z, &keyframe.m_time);
 				curve.Append(keyframe);
 			}
 			ReadToken();
@@ -956,14 +961,14 @@ void ndMesh::Load(FILE* const file, const ndTree<ndSharedPtr<ndMeshEffect>, ndIn
 		else if (!strcmp(token, "keyFrameRotations:"))
 		{
 			ndInt32 keyFramesCount;
-			fscanf(file, "%d\n", &keyFramesCount);
+			error = fscanf(file, "%d\n", &keyFramesCount);
 
 			ReadToken();
 			ndMesh::ndCurve& curve = GetRotationCurve();
 			for (ndInt32 i = 0; i < keyFramesCount; ++i)
 			{
 				ndCurveValue keyframe;
-				fscanf(file, "%f %f %f %f\n", &keyframe.m_x, &keyframe.m_y, &keyframe.m_z, &keyframe.m_time);
+				error = fscanf(file, "%f %f %f %f\n", &keyframe.m_x, &keyframe.m_y, &keyframe.m_z, &keyframe.m_time);
 				keyframe.m_x = ndReal(keyframe.m_x * ndDegreeToRad);
 				keyframe.m_y = ndReal(keyframe.m_y * ndDegreeToRad);
 				keyframe.m_z = ndReal(keyframe.m_z * ndDegreeToRad);
