@@ -36,6 +36,9 @@ class ndBrainAgentDQN: public ndBrainAgent
 
 	virtual void LearnStep();
 
+	private:
+	ndInt32 GetAction() const;
+
 	protected:
 	ndBrainReplayBuffer<ndInt32, statesDim, 1> m_replayBuffer;
 	ndBrainReplayTransitionMemory<ndInt32, statesDim, 1> m_currentTransition;
@@ -45,6 +48,7 @@ class ndBrainAgentDQN: public ndBrainAgent
 	ndReal m_epsilonGreedyStep;
 	ndReal m_epsilonGreedyFloor;
 	ndInt32 m_frameCount;
+	ndInt32 m_eposideCount;
 	ndInt32 m_epsilonGreedyFreq;
 };
 
@@ -57,6 +61,7 @@ ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN()
 	,m_epsilonGreedyStep(ndReal(5.0e-4f))
 	,m_epsilonGreedyFloor(ndReal(2.0e-3f))
 	,m_frameCount(0)
+	,m_eposideCount(0)
 	,m_epsilonGreedyFreq(64)
 {
 }
@@ -73,8 +78,47 @@ ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& ndBrainAgentDQN<statesDim,
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
+ndInt32 ndBrainAgentDQN<statesDim, actionDim>::GetAction() const
+{
+	ndInt32 action = 0;
+	ndFloat32 explore = ndRand();
+	if (explore <= m_epsilonGreedy)
+	{
+		action = ndInt32(ndRandInt() % m_actionsCount);
+	}
+	else
+	{
+		ndAssert(0);
+		//action = m_agent->GetMaxValueAction();
+		//for (ndInt32 i = 0; i < m_stateCount; ++i)
+		//{
+		//	m_input[i] = m_currentTransition.m_state[i];
+		//}
+		//ndBrainInstance& instance = m_trainer.GetInstance();
+		//instance.MakePrediction(m_input, m_output);
+		//
+		//ndReal maxReward = m_output[0];
+		//for (ndInt32 i = 1; i < m_actionsCount; ++i)
+		//{
+		//	if (m_output[i] > maxReward)
+		//	{
+		//		action = i;
+		//		maxReward = m_output[i];
+		//	}
+		//}
+	}
+
+	return action;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN<statesDim, actionDim>::LearnStep()
 {
+	if (!m_frameCount)
+	{
+		ResetModel();
+	}
+
 	GetObservation(&m_currentTransition.m_nextState[0]);
 	m_currentTransition.m_reward = GetReward();
 	m_currentTransition.m_terminalState = IsTerminal();
@@ -82,17 +126,20 @@ void ndBrainAgentDQN<statesDim, actionDim>::LearnStep()
 	m_replayBuffer.AddTransition(m_currentTransition);
 
 	m_currentTransition.m_state = m_currentTransition.m_nextState;
+	m_currentTransition.m_action[0] = GetAction();
 
-	ndReal actions;
-	//GetAction(&m_currentTransition.m_action[0], m_epsilonGreedy);
-	GetAction(&actions, m_epsilonGreedy);
-	m_currentTransition.m_action[0] = ndInt32(actions);
+	if (m_currentTransition.m_terminalState)
+	{
+		m_eposideCount++;
+		ResetModel();
+	}
 
 	if (m_frameCount % m_epsilonGreedyFreq == (m_epsilonGreedyFreq - 1))
 	{
 		m_epsilonGreedy = ndMax(m_epsilonGreedy - m_epsilonGreedyStep, m_epsilonGreedyFloor);
 	}
 
+	m_frameCount++;
 }
 
 #endif 

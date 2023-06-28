@@ -34,10 +34,10 @@ class ndBrainAgent: public ndClassAlloc
 	virtual ~ndBrainAgent();
 
 	virtual void LearnStep() = 0;
+	virtual void ResetModel() const = 0;
 	virtual bool IsTerminal() const = 0;
 	virtual ndReal GetReward() const = 0;
 	virtual void GetObservation(ndReal* const state) const = 0;
-	virtual void GetAction(ndReal* const actions, ndReal exploreProbability) const = 0;
 };
 
 #endif 

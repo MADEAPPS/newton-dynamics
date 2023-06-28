@@ -62,7 +62,6 @@ namespace ndController_0
 		virtual bool IsTerminal() const = 0;
 		virtual ndReal GetReward() const = 0;
 		virtual void GetObservation(ndReal* const state) const = 0;
-		virtual void GetAction(ndReal* const actions, ndReal exploreProbability) const = 0;
 	};
 
 	class ndQValuePredictor : public ndBrain
@@ -123,14 +122,11 @@ namespace ndController_0
 			,m_targetInstance(&m_targetNetwork)
 			,m_shuffleBuffer(D_REPLAY_BUFFERSIZE)
 			,m_model(model)
-			//,m_gamma(D_DISCOUNT_FACTOR)
-			//,m_epsilonGreedy(1.0f)
 			,m_movingAverageCount(0)
-			,m_frameCount(0)
 			,m_framesAlive(0)
-			,m_eposideCount(0)
 		{
 			m_frameCount = 0;
+			m_eposideCount = 0;
 			m_gamma = D_DISCOUNT_FACTOR;
 			m_epsilonGreedy = ndReal (1.0f);
 			m_epsilonGreedyStep = D_EPSILON_GREEDY;
@@ -165,9 +161,9 @@ namespace ndController_0
 			return m_model->IsTerminal();
 		}
 
-		void GetAction(ndReal* const actions, ndReal exploreProbability) const
+		void ResetModel() const
 		{
-			m_model->GetAction(actions, exploreProbability);
+			m_model->ResetModel();
 		}
 
 		void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
@@ -256,10 +252,7 @@ namespace ndController_0
 				m_movingAverage[m_movingAverageCount] = m_framesAlive;
 				m_movingAverageCount = (m_movingAverageCount + 1) % ndInt32 (sizeof(m_movingAverage) / sizeof(m_movingAverage[0]));
 
-				m_eposideCount++;
 				m_framesAlive = 0;
-				m_model->ResetModel();
-
 				ndInt32 sum = 0;
 				for (ndInt32 i = 0; i < sizeof(m_movingAverage) / sizeof(m_movingAverage[0]); ++i)
 				{
@@ -285,7 +278,8 @@ namespace ndController_0
 			if (m_frameCount > (D_REPLAY_BASH_SIZE * 8))
 			{
 				// do back propagation on the 
-				BackPropagate();
+				ndTrace(("xxx\n"));
+				//BackPropagate();
 			}
 
 			if ((m_frameCount % D_TARGET_UPDATE_FREQ) == (D_TARGET_UPDATE_FREQ - 1))
@@ -305,27 +299,27 @@ namespace ndController_0
 			m_framesAlive++;
 		}
 
-		ndInt32 GetMaxValueAction() const
-		{
-			for (ndInt32 i = 0; i < m_stateCount; ++i)
-			{
-				m_input[i] = m_currentTransition.m_state[i];
-			}
-			ndBrainInstance& instance = m_trainer.GetInstance();
-			instance.MakePrediction(m_input, m_output);
-
-			ndInt32 action = 0;
-			ndReal maxReward = m_output[0];
-			for (ndInt32 i = 1; i < m_actionsCount; ++i)
-			{
-				if (m_output[i] > maxReward)
-				{
-					action = i;
-					maxReward = m_output[i];
-				}
-			}
-			return action;
-		}
+		//ndInt32 GetMaxValueAction() const
+		//{
+		//	for (ndInt32 i = 0; i < m_stateCount; ++i)
+		//	{
+		//		m_input[i] = m_currentTransition.m_state[i];
+		//	}
+		//	ndBrainInstance& instance = m_trainer.GetInstance();
+		//	instance.MakePrediction(m_input, m_output);
+		//
+		//	ndInt32 action = 0;
+		//	ndReal maxReward = m_output[0];
+		//	for (ndInt32 i = 1; i < m_actionsCount; ++i)
+		//	{
+		//		if (m_output[i] > maxReward)
+		//		{
+		//			action = i;
+		//			maxReward = m_output[i];
+		//		}
+		//	}
+		//	return action;
+		//}
 
 		ndQValuePredictor m_onlineNetwork;
 		ndQValuePredictor m_targetNetwork;
@@ -338,9 +332,7 @@ namespace ndController_0
 
 		ndInt32 m_movingAverage[32];
 		ndInt32 m_movingAverageCount;
-		ndInt32 m_frameCount;
 		ndInt32 m_framesAlive;
-		ndInt32 m_eposideCount;
 	};
 
 	class ndCartpole : public ndCartpoleBase
@@ -370,22 +362,6 @@ namespace ndController_0
 			//ndFloat32 angle = ndAbs(matrix.m_front.m_x);
 			ndFloat32 reward = ndFloat32(1.0f) - angle / D_REWARD_MIN_ANGLE;
 			return ndReal(reward);
-		}
-
-		virtual void GetAction(ndReal* const actions, ndReal exploreProbability) const
-		{
-			ndInt32 action = 0;
-			ndFloat32 explore = ndRand();
-			if (explore <= exploreProbability)
-			{
-				action = ndInt32(ndRandInt() % m_actionsCount);
-			}
-			else
-			{
-				action = m_agent->GetMaxValueAction();
-			}
-		
-			actions[0] = ndReal(action);
 		}
 
 		void GetObservation(ndReal* const state) const
@@ -421,7 +397,7 @@ namespace ndController_0
 		{
 			ndModelArticulation::Update(world, timestep);
 
-			ndVector force(m_pole->GetForce());
+			ndVector force(m_cart->GetForce());
 			ndInt32 action = m_agent->GetTransition().m_action[0];
 			if (action == m_pushLeft)
 			{
@@ -431,7 +407,8 @@ namespace ndController_0
 			{
 				force.m_x = D_PUSH_FORCE;
 			}
-			m_pole->SetForce(force);
+			//m_pole->SetForce(force);
+			m_cart->SetForce(force);
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
