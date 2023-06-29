@@ -26,6 +26,7 @@
 
 ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
 	:ndBrainTrainerBase(brain)
+	,m_truth()
 	,m_output()
 	,m_zDerivative()
 	,m_biasGradients()
@@ -60,6 +61,7 @@ ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
 
 ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
 	:ndBrainTrainerBase(src)
+	,m_truth(src.m_truth)
 	,m_output(src.m_output)
 	,m_zDerivative(src.m_zDerivative)
 	,m_biasGradients(src.m_biasGradients)
@@ -403,8 +405,8 @@ void ndBrainTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inpu
 	ndBrain bestNetwork(*m_instance.GetBrain());
 	randomizeVector.SetCount(inputBatch.GetCount());
 
-	ndBrainVector truth;
-	truth.SetCount(m_output.GetCount());
+	//ndBrainVector truth;
+	m_truth.SetCount(m_output.GetCount());
 	for (ndInt32 i = 0; i < inputBatch.GetCount(); ++i)
 	{
 		randomizeVector[i] = i;
@@ -428,8 +430,8 @@ void ndBrainTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inpu
 				const ndBrainVector& input = inputBatch[index];
 				MakePrediction(input);
 
-				GetGroundTruth(index, truth, m_output);
-				BackPropagate(truth);
+				GetGroundTruth(index, m_truth, m_output);
+				BackPropagate(m_truth);
 			}
 			UpdateWeights(learnRate, count);
 		}

@@ -23,7 +23,8 @@ class ndTestValidator : public ndBrainTrainer::ndValidation
 	{
 	}
 
-	ndReal Validate(const ndBrainMatrix& inputBatch)
+	//ndReal Validate(const ndBrainMatrix& inputBatch)
+	ndReal Validate(const ndBrainMatrix&)
 	{
 		ndAssert(0);
 		return 0;

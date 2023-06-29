@@ -64,84 +64,62 @@ namespace ndController_0
 		virtual void GetObservation(ndReal* const state) const = 0;
 	};
 
-	class ndQValuePredictor : public ndBrain
-	{
-		public:
-		ndQValuePredictor()
-			:ndBrain()
-		{
-			ndBrainLayer* const inputLayer = new ndBrainLayer(m_stateCount, 128, m_relu);
-			ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), 128, m_relu);
-			ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), 128, m_relu);
-			ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer1->GetOuputSize(), m_actionsCount, m_lineal);
-
-			BeginAddLayer();
-			AddLayer(inputLayer);
-			AddLayer(hiddenLayer0);
-			AddLayer(hiddenLayer1);
-			AddLayer(ouputLayer);
-			EndAddLayer();
-			InitGaussianWeights(0.0f, 0.125f);
-		}
-	};
-
 	class ndDQNAgent: public ndBrainAgentDQN<m_stateCount, 1>
 	{
 		public:
-		class ndDQNAgentTrainer : public ndBrainTrainer
-		{
-			public:
-			ndDQNAgentTrainer(ndBrain* const brain)
-				:ndBrainTrainer(brain)
-				,m_agent(nullptr)
-			{
-				SetMiniBatchSize(D_REPLAY_BASH_SIZE);
-				//SetRegularizer(GetRegularizer() * 10.0f);
-			}
-
-			ndDQNAgentTrainer(const ndDQNAgentTrainer& src)
-				:ndBrainTrainer(src)
-			{
-			}
-
-			virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
-			{
-				m_agent->GetGroundTruth(index, groundTruth, output);
-			}
-
-			ndDQNAgent* m_agent;
-		};
+		//class ndDQNAgentTrainer : public ndBrainTrainer
+		//{
+		//	public:
+		//	ndDQNAgentTrainer(ndBrain* const brain)
+		//		:ndBrainTrainer(brain)
+		//		,m_agent(nullptr)
+		//	{
+		//		SetMiniBatchSize(D_REPLAY_BASH_SIZE);
+		//		//SetRegularizer(GetRegularizer() * 10.0f);
+		//	}
+		//
+		//	ndDQNAgentTrainer(const ndDQNAgentTrainer& src)
+		//		:ndBrainTrainer(src)
+		//	{
+		//	}
+		//
+		//	virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
+		//	{
+		//		m_agent->GetGroundTruth(index, groundTruth, output);
+		//	}
+		//
+		//	ndDQNAgent* m_agent;
+		//};
 
 		ndDQNAgent(ndCartpoleBase* const model, ndSharedPtr<ndBrain>& qValuePredictor)
 			:ndBrainAgentDQN<m_stateCount, 1>(qValuePredictor)
-			,m_onlineNetwork()
-			,m_targetNetwork(m_onlineNetwork)
 			,m_input()
 			,m_output()
-			,m_trainer(&m_onlineNetwork)
-			,m_targetInstance(&m_targetNetwork)
-			,m_shuffleBuffer(D_REPLAY_BUFFERSIZE)
+			//,m_shuffleBuffer(D_REPLAY_BUFFERSIZE)
 			,m_model(model)
 			,m_movingAverageCount(0)
 			,m_framesAlive(0)
 		{
 			m_frameCount = 0;
 			m_eposideCount = 0;
+			m_learnRate = D_LEARN_RATE;
 			m_gamma = D_DISCOUNT_FACTOR;
 			m_epsilonGreedy = ndReal (1.0f);
+			m_bashBufferSize = D_REPLAY_BASH_SIZE;
 			m_epsilonGreedyStep = D_EPSILON_GREEDY;
 			m_epsilonGreedyFloor = D_MIN_EXPLARE_FACTOR;
 			m_epsilonGreedyFreq = D_EPSILON_GREEDY_FREQ;
+			m_targetUpdatePeriod = D_TARGET_UPDATE_FREQ;
 			
-			m_replayBuffer.SetSize(D_REPLAY_BUFFERSIZE);
+			SetBufferSize(D_REPLAY_BUFFERSIZE);
+			//m_replayBuffer.SetSize(D_REPLAY_BUFFERSIZE);
 
 			for (ndInt32 i = 0; i < sizeof(m_movingAverage) / sizeof(m_movingAverage[0]); ++i)
 			{
 				m_movingAverage[i] = 0;
 			}
 
-			m_trainer.m_agent = this;
-			m_shuffleBuffer.SetCount(0);
+			//m_shuffleBuffer.SetCount(0);
 			m_input.SetCount(m_stateCount);
 			m_output.SetCount(m_actionsCount);
 		}
@@ -166,75 +144,75 @@ namespace ndController_0
 			m_model->ResetModel();
 		}
 
-		void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
-		{
-			ndAssert(groundTruth.GetCount() == output.GetCount());
+		//void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
+		//{
+		//	ndAssert(groundTruth.GetCount() == output.GetCount());
+		//
+		//	ndInt32 k = m_shuffleBuffer[index];
+		//	const ndBrainReplayTransitionMemory<ndInt32, m_stateCount, 1>& transition = m_replayBuffer[k];
+		//
+		//	groundTruth.Set(transition.m_reward);
+		//
+		//	if (!transition.m_terminalState)
+		//	{
+		//		for (ndInt32 i = 0; i < m_stateCount; ++i)
+		//		{
+		//			m_input[i] = transition.m_nextState[i];
+		//		}
+		//		m_targetInstance.MakePrediction(m_input, m_output);
+		//		ndInt32 action = transition.m_action[0];
+		//		groundTruth[action] += m_gamma * m_output[action];
+		//	}
+		//}
 
-			ndInt32 k = m_shuffleBuffer[index];
-			const ndBrainReplayTransitionMemory<ndInt32, m_stateCount, 1>& transition = m_replayBuffer[k];
-
-			groundTruth.Set(transition.m_reward);
-
-			if (!transition.m_terminalState)
-			{
-				for (ndInt32 i = 0; i < m_stateCount; ++i)
-				{
-					m_input[i] = transition.m_nextState[i];
-				}
-				m_targetInstance.MakePrediction(m_input, m_output);
-				ndInt32 action = transition.m_action[0];
-				groundTruth[action] += m_gamma * m_output[action];
-			}
-		}
-
-		void BackPropagate()
-		{
-			class ndTestValidator : public ndBrainTrainer::ndValidation
-			{
-				public:
-				ndTestValidator(ndBrainTrainer& trainer)
-					:ndBrainTrainer::ndValidation(trainer)
-					,m_minError(1.0e10f)
-					,m_step(0)
-					,m_step0(0)
-				{
-				}
-
-				//ndReal Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth)
-				ndReal Validate(const ndBrainMatrix& inputBatch)
-				{
-					//ndReal error = ndBrainTrainer::ndValidation::Validate(inputBatch, groundTruth);
-					//if (error < m_minError)
-					//{
-					//	m_minError = error;
-					//	ndExpandTraceMessage("%f; %d; %d\n", m_minError, m_step, m_step - m_step0);
-					//	m_step0 = m_step;
-					//}
-					//m_step++;
-					////ndExpandTraceMessage("%f\n", error);
-					//return error;
-					return 1.0f;
-				}
-				ndReal m_minError;
-				ndInt32 m_step;
-				ndInt32 m_step0;
-			};
-
-			ndTestValidator validator(m_trainer);
-			ndBrainMatrix inputBatch(D_REPLAY_BASH_SIZE, m_stateCount);
-
-			m_shuffleBuffer.RandomShuffle(m_shuffleBuffer.GetCount());
-			for (ndInt32 i = 0; i < D_REPLAY_BASH_SIZE; ++i)
-			{
-				ndInt32 index = m_shuffleBuffer[i];
-				const ndBrainReplayTransitionMemory<ndInt32, m_stateCount, 1>& transition = m_replayBuffer[index];
-				for (ndInt32 j = 0; j < m_stateCount; ++j)
-				{
-					inputBatch[i][j] = transition.m_state[j];
-				}
-			}
-			m_trainer.Optimize(validator, inputBatch, D_LEARN_RATE, 1);
-		}
+		//void BackPropagate()
+		//{
+		//	class ndTestValidator : public ndBrainTrainer::ndValidation
+		//	{
+		//		public:
+		//		ndTestValidator(ndBrainTrainer& trainer)
+		//			:ndBrainTrainer::ndValidation(trainer)
+		//			,m_minError(1.0e10f)
+		//			,m_step(0)
+		//			,m_step0(0)
+		//		{
+		//		}
+		//
+		//		//ndReal Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth)
+		//		ndReal Validate(const ndBrainMatrix& inputBatch)
+		//		{
+		//			//ndReal error = ndBrainTrainer::ndValidation::Validate(inputBatch, groundTruth);
+		//			//if (error < m_minError)
+		//			//{
+		//			//	m_minError = error;
+		//			//	ndExpandTraceMessage("%f; %d; %d\n", m_minError, m_step, m_step - m_step0);
+		//			//	m_step0 = m_step;
+		//			//}
+		//			//m_step++;
+		//			////ndExpandTraceMessage("%f\n", error);
+		//			//return error;
+		//			return 1.0f;
+		//		}
+		//		ndReal m_minError;
+		//		ndInt32 m_step;
+		//		ndInt32 m_step0;
+		//	};
+		//
+		//	ndTestValidator validator(m_trainer);
+		//	ndBrainMatrix inputBatch(D_REPLAY_BASH_SIZE, m_stateCount);
+		//
+		//	m_shuffleBuffer.RandomShuffle(m_shuffleBuffer.GetCount());
+		//	for (ndInt32 i = 0; i < D_REPLAY_BASH_SIZE; ++i)
+		//	{
+		//		ndInt32 index = m_shuffleBuffer[i];
+		//		const ndBrainReplayTransitionMemory<ndInt32, m_stateCount, 1>& transition = m_replayBuffer[index];
+		//		for (ndInt32 j = 0; j < m_stateCount; ++j)
+		//		{
+		//			inputBatch[i][j] = transition.m_state[j];
+		//		}
+		//	}
+		//	m_trainer.Optimize(validator, inputBatch, D_LEARN_RATE, 1);
+		//}
 
 		void LearnStep()
 		{
@@ -260,10 +238,10 @@ namespace ndController_0
 				ndExpandTraceMessage("moving average alive frames:%d\n", sum);
 			}
 
-			if (m_frameCount < D_REPLAY_BUFFERSIZE)
-			{
-				m_shuffleBuffer.PushBack(m_frameCount);
-			}
+			//if (m_frameCount < D_REPLAY_BUFFERSIZE)
+			//{
+			//	m_shuffleBuffer.PushBack(m_frameCount);
+			//}
 
 			//m_currentTransition.m_state = m_currentTransition.m_nextState;
 			//m_currentTransition.m_action[0] = m_model->GetAction(m_epsilonGreedy);
@@ -273,18 +251,16 @@ namespace ndController_0
 			//	m_epsilonGreedy = ndMax(m_epsilonGreedy - D_EPSILON_GREEDY, D_MIN_EXPLARE_FACTOR);
 			//}
 
-			if (m_frameCount > (D_REPLAY_BASH_SIZE * 8))
-			{
-				// do back propagation on the 
-				ndTrace(("xxx\n"));
-				//BackPropagate();
-			}
+			//if (m_frameCount > (D_REPLAY_BASH_SIZE * 8))
+			//{
+			//	BackPropagate();
+			//}
 
-			if ((m_frameCount % D_TARGET_UPDATE_FREQ) == (D_TARGET_UPDATE_FREQ - 1))
-			{
-				// update on line network
-				m_targetNetwork.CopyFrom(m_onlineNetwork);
-			}
+			//if ((m_frameCount % D_TARGET_UPDATE_FREQ) == (D_TARGET_UPDATE_FREQ - 1))
+			//{
+			//	// update on line network
+			//	m_targetNetwork.CopyFrom(m_onlineNetwork);
+			//}
 
 			static ndInt32 xxxxx = 0;
 			if (m_framesAlive > xxxxx)
@@ -293,7 +269,7 @@ namespace ndController_0
 				ndExpandTraceMessage("episode:%d framesAlive:%d\n", m_eposideCount, m_framesAlive);
 			}
 
-			m_frameCount++;
+			//m_frameCount++;
 			m_framesAlive++;
 		}
 
@@ -319,13 +295,9 @@ namespace ndController_0
 		//	return action;
 		//}
 
-		ndQValuePredictor m_onlineNetwork;
-		ndQValuePredictor m_targetNetwork;
 		mutable ndBrainVector m_input;
 		mutable ndBrainVector m_output;
-		mutable ndDQNAgentTrainer m_trainer;
-		mutable ndBrainInstance m_targetInstance;
-		ndArray<ndInt32> m_shuffleBuffer;
+		//ndArray<ndInt32> m_shuffleBuffer;
 		ndCartpoleBase* m_model;
 
 		ndInt32 m_movingAverage[32];
@@ -471,7 +443,7 @@ namespace ndController_0
 		model->m_poleMatrix = poleBody->GetMatrix();
 
 
-		ndSharedPtr<ndBrain> qValuePredictor;
+		ndSharedPtr<ndBrain> qValuePredictor(new ndBrain());
 		ndBrainLayer* const inputLayer = new ndBrainLayer(m_stateCount, 128, m_relu);
 		ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), 128, m_relu);
 		ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), 128, m_relu);
@@ -483,7 +455,6 @@ namespace ndController_0
 		qValuePredictor->AddLayer(hiddenLayer1);
 		qValuePredictor->AddLayer(ouputLayer);
 		qValuePredictor->EndAddLayer();
-		//InitGaussianWeights(0.0f, 0.125f);
 		model->m_agent = ndSharedPtr<ndDQNAgent>(new ndDQNAgent(model, qValuePredictor));
 	}
 

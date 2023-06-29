@@ -53,6 +53,7 @@ class ndBrainTrainer: public ndBrainTrainerBase
 
 	void ApplyAdamCorrection();
 
+	ndBrainVector m_truth;
 	ndBrainVector m_output;
 	ndBrainVector m_zDerivative;
 	ndBrainVector m_biasGradients;
