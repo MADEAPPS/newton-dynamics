@@ -26,6 +26,10 @@
 #include "ndBrainAgent.h"
 #include "ndBrainTrainer.h"
 
+// this is an implementation of the vanilla dqn agent trainer as descrived 
+// on the nature paper below. 
+// https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
+
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDQN: public ndBrainAgent
 {
@@ -38,6 +42,7 @@ class ndBrainAgentDQN: public ndBrainAgent
 			,m_agent(nullptr)
 		{
 			m_inputBatch.SetCount(statesDim);
+			m_outputBatch.SetCount(actionDim);
 		}
 
 		ndOptimizer(const ndOptimizer& src)
@@ -48,74 +53,63 @@ class ndBrainAgentDQN: public ndBrainAgent
 			m_inputBatch.SetCount(statesDim);
 		}
 
-		virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
+		//virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
+		void EvaluateBellmanEquation(ndInt32 index)
 		{
-			ndAssert(0);
-			//m_agent->GetGroundTruth(index, groundTruth, output);
+			ndBrainVector& groundTruth = m_truth;
+			const ndBrainVector& output = m_output;
+			ndAssert(groundTruth.GetCount() == output.GetCount());
+			const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_agent->m_replayBuffer[index];
+			
+			groundTruth.Set(transition.m_reward);
+			if (!transition.m_terminalState)
+			{
+				for (ndInt32 i = 0; i < statesDim; ++i)
+				{
+					m_inputBatch[i] = transition.m_nextState[i];
+				}
+				m_agent->m_targetInstance.MakePrediction(m_inputBatch, m_outputBatch);
+				ndInt32 action = transition.m_action[0];
+				groundTruth[action] += m_agent->m_gamma * m_outputBatch[action];
+			}
 		}
 
-		virtual void Optimize(ndValidation& validator, const ndBrainMatrix&, ndReal learnRate, ndInt32 steps)
+		virtual void Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32 )
 		{
-			ndFloatExceptions exception;
-			//ndAssert(inputBatch.GetCount() == inputBatch.GetCount());
-
-			//ndArray<ndInt32> randomizeVector;
-			//ndBrain bestNetwork(*m_instance.GetBrain());
-			//randomizeVector.SetCount(inputBatch.GetCount());
-			//
-			//ndBrainVector truth;
 			m_truth.SetCount(m_output.GetCount());
-			//for (ndInt32 i = 0; i < inputBatch.GetCount(); ++i)
-			//{
-			//	randomizeVector[i] = i;
-			//}
-	
 			ndArray<ndInt32>& shuffleBuffer = m_agent->m_shuffleBuffer;
 			const ndBrainReplayBuffer<ndInt32, statesDim, 1>& replayBuffer = m_agent->m_replayBuffer;
 
 			shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
-			//const ndInt32 miniBatchSize = ndMin(m_miniBatchSize, inputBatch.GetCount());
-			//const ndInt32 batchCount = (inputBatch.GetCount() + miniBatchSize - 1) / miniBatchSize;
-			//
-			////m_bestCost = validator.Validate(inputBatch, groundTruth);
-			//m_bestCost = validator.Validate(inputBatch);
-			//for (ndInt32 i = 0; (i < steps) && (m_bestCost > 0.0f); ++i)
+			ClearGradientsAcc();
+			for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
+			{
+				ndInt32 index = shuffleBuffer[i];
+				const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& memory = replayBuffer[index];
+				for (ndInt32 j = 0; j < statesDim; ++j)
+				{ 
+					m_inputBatch[j] = memory.m_state[j];
+				}
+				MakePrediction(m_inputBatch);
+				//GetGroundTruth(index, truth, m_output);
+				EvaluateBellmanEquation(index);
+				BackPropagate(m_truth);
+			}
+			UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
+			ApplyWeightTranspose();
+
+			//ndReal batchError = validator.Validate(inputBatch);
+			//if (batchError <= m_bestCost)
 			//{
-			//	for (ndInt32 j = 0; j < m_agent->m_bashBufferSize; ++j)
-			//	{
-					ClearGradientsAcc();
-					//const ndInt32 start = j * miniBatchSize;
-					//const ndInt32 count = ((start + miniBatchSize) < inputBatch.GetCount()) ? miniBatchSize : inputBatch.GetCount() - start;
-					//for (ndInt32 k = 0; k < count; ++k)
-					for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
-					{
-						ndInt32 index = shuffleBuffer[i];
-						//ndBrainVector& input = inputBatch[i];
-						const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& memory = replayBuffer[index];
-						for (ndInt32 j = 0; j < statesDim; ++j)
-						{ 
-							m_inputBatch[j] = memory.m_state[j];
-						}
-						MakePrediction(m_inputBatch);
-						//GetGroundTruth(index, truth, m_output);
-						//BackPropagate(truth);
-					}
-					UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
-			//	}
-			//	ApplyWeightTranspose();
-			//	randomizeVector.RandomShuffle(randomizeVector.GetCount());
-			//
-			//	ndReal batchError = validator.Validate(inputBatch);
-			//	if (batchError <= m_bestCost)
-			//	{
-			//		m_bestCost = batchError;
-			//		bestNetwork.CopyFrom(*m_instance.GetBrain());
-			//	}
+			//	m_bestCost = batchError;
+			//	bestNetwork.CopyFrom(*m_instance.GetBrain());
 			//}
+			
 			//m_instance.GetBrain()->CopyFrom(bestNetwork);
 		}
 
 		ndBrainVector m_inputBatch;
+		ndBrainVector m_outputBatch;
 		ndBrainAgentDQN<statesDim, actionDim>* m_agent;
 	};
 
@@ -133,7 +127,6 @@ class ndBrainAgentDQN: public ndBrainAgent
 	ndInt32 GetAction() const;
 
 	protected:
-	//ndBrainMatrix m_inputBatch;
 	ndSharedPtr<ndBrain> m_onlineNetwork;
 	ndBrain m_targetNetwork;
 	ndOptimizer m_trainer;
@@ -245,46 +238,17 @@ void ndBrainAgentDQN<statesDim, actionDim>::BackPropagate()
 		public:
 		ndTestValidator(ndBrainTrainer& trainer)
 			:ndBrainTrainer::ndValidation(trainer)
-			//,m_minError(1.0e10f)
-			//,m_step(0)
-			//,m_step0(0)
 		{
 		}
 	
-		//ndReal Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth)
-		ndReal Validate(const ndBrainMatrix& inputBatch)
+		ndReal Validate(const ndBrainMatrix&)
 		{
-			//ndReal error = ndBrainTrainer::ndValidation::Validate(inputBatch, groundTruth);
-			//if (error < m_minError)
-			//{
-			//	m_minError = error;
-			//	ndExpandTraceMessage("%f; %d; %d\n", m_minError, m_step, m_step - m_step0);
-			//	m_step0 = m_step;
-			//}
-			//m_step++;
-			////ndExpandTraceMessage("%f\n", error);
-			//return error;
 			return ndReal (1.0f);
 		}
-		//ndReal m_minError;
-		//ndInt32 m_step;
-		//ndInt32 m_step0;
 	};
 
-	ndTestValidator validator(m_trainer);
-	
-	//m_shuffleBuffer.RandomShuffle(m_shuffleBuffer.GetCount());
-	//for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
-	//{
-	//	//ndInt32 index = m_shuffleBuffer[i];
-	//	//const ndBrainReplayTransitionMemory<ndInt32, m_stateCount, 1>& transition = m_replayBuffer[index];
-	//	//for (ndInt32 j = 0; j < m_stateCount; ++j)
-	//	//{
-	//	//	inputBatch[i][j] = transition.m_state[j];
-	//	//}
-	//}
-
 	ndBrainMatrix inputBatch;
+	ndTestValidator validator(m_trainer);
 	m_trainer.Optimize(validator, inputBatch, m_learnRate, 1);
 }
 
@@ -336,4 +300,3 @@ void ndBrainAgentDQN<statesDim, actionDim>::LearnStep()
 }
 
 #endif 
-
