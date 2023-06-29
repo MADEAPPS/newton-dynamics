@@ -48,10 +48,10 @@ namespace ndController_0
 
 	enum ndStateSpace
 	{
-		m_cartAcceleration,
-		m_cartVelocity,
-		m_poleAlpha,
 		m_poleOmega,
+		m_poleAlpha,
+		m_cartVelocity,
+		m_cartAcceleration,
 		m_stateCount
 	};
 
@@ -112,8 +112,8 @@ namespace ndController_0
 			ndDQNAgent* m_agent;
 		};
 
-		ndDQNAgent(ndCartpoleBase* const model)
-			:ndBrainAgentDQN<m_stateCount, 1>()
+		ndDQNAgent(ndCartpoleBase* const model, ndSharedPtr<ndBrain>& qValuePredictor)
+			:ndBrainAgentDQN<m_stateCount, 1>(qValuePredictor)
 			,m_onlineNetwork()
 			,m_targetNetwork(m_onlineNetwork)
 			,m_input()
@@ -170,11 +170,9 @@ namespace ndController_0
 		{
 			ndAssert(groundTruth.GetCount() == output.GetCount());
 
-			//groundTruth.Set(output);
 			ndInt32 k = m_shuffleBuffer[index];
 			const ndBrainReplayTransitionMemory<ndInt32, m_stateCount, 1>& transition = m_replayBuffer[k];
 
-			//groundTruth[action] = transition.m_reward;
 			groundTruth.Set(transition.m_reward);
 
 			if (!transition.m_terminalState)
@@ -351,6 +349,7 @@ namespace ndController_0
 		virtual bool IsTerminal() const
 		{
 			const ndMatrix& matrix = m_pole->GetMatrix();
+			// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
 			bool fail = ndAbs(matrix.m_front.m_x) > (D_REWARD_MIN_ANGLE * ndFloat32 (2.0f));
 			return fail;
 		}
@@ -366,8 +365,9 @@ namespace ndController_0
 
 		void GetObservation(ndReal* const state) const
 		{
-			ndVector omega(m_pole->GetOmega());
-			ndVector alpha(m_pole->GetAlpha());
+			ndVector alpha (m_pole->GetAlpha());
+			ndVector omega (m_pole->GetOmega());
+
 			ndVector accel(m_cart->GetAccel());
 			ndVector veloc(m_cart->GetVelocity());
 
@@ -387,7 +387,7 @@ namespace ndController_0
 
 			ndVector impulse(ndVector::m_zero);
 			impulse.m_x = m_cart->GetMassMatrix().m_w * ndGaussianRandom(0.0f, 0.05f);
-			//m_cart->ApplyImpulsePair(impulse, ndVector::m_zero, 1.0f / 60.0f);
+			m_cart->ApplyImpulsePair(impulse, ndVector::m_zero, 1.0f / 60.0f);
 
 			m_cart->SetMatrix(m_cartMatrix);
 			m_pole->SetMatrix(m_poleMatrix);
@@ -407,7 +407,6 @@ namespace ndController_0
 			{
 				force.m_x = D_PUSH_FORCE;
 			}
-			//m_pole->SetForce(force);
 			m_cart->SetForce(force);
 		}
 
@@ -415,6 +414,11 @@ namespace ndController_0
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
 			m_agent->LearnStep();
+
+			if (ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(40.0f))
+			{
+				ResetModel();
+			}
 		}
 
 		ndMatrix m_cartMatrix;
@@ -466,7 +470,21 @@ namespace ndController_0
 		model->m_cartMatrix = cartBody->GetMatrix();
 		model->m_poleMatrix = poleBody->GetMatrix();
 
-		model->m_agent = ndSharedPtr<ndDQNAgent>(new ndDQNAgent(model));
+
+		ndSharedPtr<ndBrain> qValuePredictor;
+		ndBrainLayer* const inputLayer = new ndBrainLayer(m_stateCount, 128, m_relu);
+		ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), 128, m_relu);
+		ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), 128, m_relu);
+		ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer1->GetOuputSize(), m_actionsCount, m_lineal);
+
+		qValuePredictor->BeginAddLayer();
+		qValuePredictor->AddLayer(inputLayer);
+		qValuePredictor->AddLayer(hiddenLayer0);
+		qValuePredictor->AddLayer(hiddenLayer1);
+		qValuePredictor->AddLayer(ouputLayer);
+		qValuePredictor->EndAddLayer();
+		//InitGaussianWeights(0.0f, 0.125f);
+		model->m_agent = ndSharedPtr<ndDQNAgent>(new ndDQNAgent(model, qValuePredictor));
 	}
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -489,7 +507,6 @@ void ndCartpoleController(ndDemoEntityManager* const scene)
 
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-
 	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
 	world->AddModel(model);
 	

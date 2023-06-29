@@ -29,7 +29,7 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDQN: public ndBrainAgent
 {
 	public: 
-	ndBrainAgentDQN();
+	ndBrainAgentDQN(const ndSharedPtr<ndBrain>& qValuePredictor);
 	virtual ~ndBrainAgentDQN();
 
 	ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& GetTransition();
@@ -40,9 +40,11 @@ class ndBrainAgentDQN: public ndBrainAgent
 	ndInt32 GetAction() const;
 
 	protected:
+	ndSharedPtr<ndBrain> m_onlineNetwork___;
+	ndBrain m_targetNetwork___;
+
 	ndBrainReplayBuffer<ndInt32, statesDim, 1> m_replayBuffer;
 	ndBrainReplayTransitionMemory<ndInt32, statesDim, 1> m_currentTransition;
-
 	ndReal m_gamma;
 	ndReal m_epsilonGreedy;
 	ndReal m_epsilonGreedyStep;
@@ -53,8 +55,10 @@ class ndBrainAgentDQN: public ndBrainAgent
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN()
+ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN(const ndSharedPtr<ndBrain>& qValuePredictor)
 	:ndBrainAgent()
+	,m_onlineNetwork___(qValuePredictor)
+	,m_targetNetwork___(*(*qValuePredictor))
 	,m_replayBuffer()
 	,m_gamma(ndReal(0.99f))
 	,m_epsilonGreedy(ndReal(1.0f))
@@ -64,6 +68,8 @@ ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN()
 	,m_eposideCount(0)
 	,m_epsilonGreedyFreq(64)
 {
+	m_onlineNetwork___->InitGaussianWeights(0.0f, 0.125f);
+	m_targetNetwork___.CopyFrom(*(*m_onlineNetwork___));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
