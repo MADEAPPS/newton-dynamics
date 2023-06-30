@@ -191,7 +191,7 @@ namespace ndController_0
 			{
 				ndVector impulse(ndVector::m_zero);
 				impulse.m_x = m_cart->GetMassMatrix().m_w * ndGaussianRandom(0.0f, 0.05f);
-				//m_cart->ApplyImpulsePair(impulse, ndVector::m_zero, timestep);
+				m_cart->ApplyImpulsePair(impulse, ndVector::m_zero, timestep);
 			}
 		}
 

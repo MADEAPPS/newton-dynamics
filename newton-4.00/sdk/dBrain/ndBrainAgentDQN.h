@@ -66,21 +66,30 @@ class ndBrainAgentDQN: public ndBrainAgent
 		void EvaluateBellmanEquation(ndInt32 index)
 		{
 			ndBrainVector& groundTruth = m_truth;
-			//const ndBrainVector& output = m_output;
 			ndAssert(groundTruth.GetCount() == m_output.GetCount());
 			ndAssert(groundTruth.GetCount() == m_outputBatch.GetCount());
 			const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_agent->m_replayBuffer[index];
 			
-			groundTruth.Set(transition.m_reward);
-			if (!transition.m_terminalState)
+			for (ndInt32 i = 0; i < statesDim; ++i)
+			{
+				m_inputBatch[i] = transition.m_state[i];
+			}
+			MakePrediction(m_inputBatch);
+			groundTruth = m_outputBatch;
+
+			ndInt32 action = transition.m_action[0];
+			if (transition.m_terminalState)
+			{
+				groundTruth[action] = transition.m_reward;
+			}
+			else
 			{
 				for (ndInt32 i = 0; i < statesDim; ++i)
 				{
 					m_inputBatch[i] = transition.m_nextState[i];
 				}
 				m_agent->m_targetInstance.MakePrediction(m_inputBatch, m_outputBatch);
-				ndInt32 action = transition.m_action[0];
-				groundTruth[action] += m_agent->m_gamma * m_outputBatch[action];
+				groundTruth[action] = transition.m_reward + m_agent->m_gamma * m_outputBatch[action];
 			}
 		}
 
@@ -88,19 +97,13 @@ class ndBrainAgentDQN: public ndBrainAgent
 		{
 			m_truth.SetCount(m_output.GetCount());
 			ndArray<ndInt32>& shuffleBuffer = m_agent->m_shuffleBuffer;
-			const ndBrainReplayBuffer<ndInt32, statesDim, 1>& replayBuffer = m_agent->m_replayBuffer;
+			//const ndBrainReplayBuffer<ndInt32, statesDim, 1>& replayBuffer = m_agent->m_replayBuffer;
 
 			shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 			ClearGradientsAcc();
 			for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
 			{
 				ndInt32 index = shuffleBuffer[i];
-				const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& memory = replayBuffer[index];
-				for (ndInt32 j = 0; j < statesDim; ++j)
-				{ 
-					m_inputBatch[j] = memory.m_state[j];
-				}
-				MakePrediction(m_inputBatch);
 				//GetGroundTruth(index, truth, m_output);
 				EvaluateBellmanEquation(index);
 				BackPropagate(m_truth);
@@ -204,13 +207,6 @@ ndInt32 ndBrainAgentDQN<statesDim, actionDim>::GetAction()
 	if (explore <= m_explorationProbability)
 	{
 		ndUnsigned32 randomIndex = ndRandInt();
-		//static int xxxxx;
-		//if (xxxxx % 100 == 0)
-		//{
-		//	ndTrace (("rand %d %d\n", xxxxx, randomIndex))
-		//}
-		//xxxxx++;
-
 		action = ndInt32(randomIndex % actionDim);
 	}
 	else
