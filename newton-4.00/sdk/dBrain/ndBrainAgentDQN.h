@@ -38,11 +38,9 @@ class ndBrainAgentDQN: public ndBrainAgent
 	#define D_REPLAY_BUFFERSIZE			(1024 * 256)
 	#define D_REPLAY_BASH_SIZE			(32)
 	#define D_TARGET_UPDATE_PERIOD		(1000)
-	#define D_STAR_OPTIMIZATION			(D_REPLAY_BUFFERSIZE >> 2)
 	#define D_MIN_EXPLORE_PROBABILITY	ndReal(1.0f/1024.0f)
-	#define D_EXPLORE_UPDATE_PERIOD		(D_REPLAY_BASH_SIZE * 2)
+	#define D_STAR_OPTIMIZATION			(D_REPLAY_BUFFERSIZE / 2)
 	#define D_EXPLORE_ANNELININGING		(D_MIN_EXPLORE_PROBABILITY / ndReal(2.0f))
-
 
 	class ndOptimizer: public ndBrainTrainer
 	{
@@ -147,7 +145,6 @@ class ndBrainAgentDQN: public ndBrainAgent
 	ndInt32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
 	ndInt32 m_startOptimization;
-	ndInt32 m_explorationProbabilityFreq;
 	ndInt32 m_targetUpdatePeriod;
 };
 
@@ -169,10 +166,10 @@ ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN(const ndSharedPtr<ndBrain
 	,m_eposideCount(0)
 	,m_bashBufferSize(D_REPLAY_BASH_SIZE)
 	,m_startOptimization(D_STAR_OPTIMIZATION)
-	,m_explorationProbabilityFreq(D_EXPLORE_UPDATE_PERIOD)
 	,m_targetUpdatePeriod(D_TARGET_UPDATE_PERIOD)
 {
 	m_trainer.m_agent = this;
+	m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / D_STAR_OPTIMIZATION;
 
 	SetBufferSize(D_REPLAY_BUFFERSIZE);
 	m_targetNetwork.CopyFrom(*(*m_onlineNetwork));
@@ -291,11 +288,7 @@ void ndBrainAgentDQN<statesDim, actionDim>::LearnStep()
 		ResetModel();
 	}
 
-	if (m_frameCount % m_explorationProbabilityFreq == (m_explorationProbabilityFreq - 1))
-	{
-		m_explorationProbability = ndMax(m_explorationProbability - m_explorationProbabilityAnnelining, m_minExplorationProbability);
-	}
-
+	m_explorationProbability = ndMax(m_explorationProbability - m_explorationProbabilityAnnelining, m_minExplorationProbability);
 	if (m_frameCount > m_startOptimization)
 	{
 		BackPropagate();
