@@ -509,8 +509,8 @@ namespace ndQuadruped_1
 			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
 			ndAssert(skeleton);
 
-			ndVector upVector(rootBody->GetMatrix().m_up);
 			ndJointBilateralConstraint* joint[4];
+			ndVector upVector(rootBody->GetMatrix().m_up.Scale (-1.0f));
 			for (ndInt32 i = 0; i < 4; ++i)
 			{
 				ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
@@ -526,8 +526,14 @@ namespace ndQuadruped_1
 				ndMatrix lookAtMatrix0;
 				ndMatrix lookAtMatrix1;
 				info->m_footHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-				const ndFloat32 lookAngle = info->m_footHinge->CalculateAngle(upVector.Scale(-1.0f), lookAtMatrix0[1], lookAtMatrix0[0]);
-				info->m_footHinge->SetTargetAngle(lookAngle);
+
+				ndMatrix upMatrix(ndGetIdentityMatrix());
+				upMatrix.m_front = lookAtMatrix1.m_front;
+				upMatrix.m_right = (upMatrix.m_front.CrossProduct(upVector) & ndVector::m_triplexMask).Normalize();
+				upMatrix.m_up = upMatrix.m_right.CrossProduct(upMatrix.m_front);
+				upMatrix = upMatrix * lookAtMatrix0.OrthoInverse();
+				const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
+				info->m_footHinge->SetTargetAngle(angle);
 			}
 
 			InitState();
