@@ -41,11 +41,10 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	void CopyFrom(const ndBrain& src);
 
 	void BeginAddLayer();
-	void EndAddLayer();
+	void EndAddLayer(ndReal randomVariance);
 	bool Compare(const ndBrain& src) const;
-
+	void InitGaussianWeights(ndReal variance);
 	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
-	void InitGaussianWeights(ndReal mean, ndReal variance);
 
 	void* m_memory;
 	ndInt32 m_memorySize;

@@ -56,8 +56,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	brain.AddLayer(inputLayer);
 	brain.AddLayer(hiddenLayer);
 	brain.AddLayer(ouputLayer);
-	brain.EndAddLayer();
-	brain.InitGaussianWeights(0.0f, 0.25f);
+	brain.EndAddLayer(ndReal(0.125f));
 
 	ndInt32 samples = 2000;
 	ndBrainMatrix inputBatch(samples, 2);
@@ -273,8 +272,7 @@ static void MnistTrainingSet()
 		brain.AddLayer(hiddenLayer1);
 		//brain.AddLayer(hiddenLayer2);
 		brain.AddLayer(ouputLayer);
-		brain.EndAddLayer();
-		brain.InitGaussianWeights(0.0f, 0.25f);
+		brain.EndAddLayer(ndReal(0.125f));
 
 		ndBrainTrainer trainer(&brain);
 		//ndBrainParallelTrainer trainer(&brain, 4);

@@ -45,7 +45,7 @@ class ndBrainLayer: public ndBrainMatrix
 
 	virtual ndInt32 GetOuputSize() const;
 	virtual ndInt32 GetInputSize() const;
-	virtual void InitGaussianWeights(ndReal mean, ndReal variance);
+	virtual void InitGaussianWeights(ndReal variance);
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
 	virtual void MakePrediction(ndThreadPool& threadPool, const ndBrainVector& input, ndBrainVector& output);
 

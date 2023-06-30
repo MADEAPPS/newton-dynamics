@@ -225,12 +225,12 @@ void ndBrainLayer::Save(nd::TiXmlElement* const layerNode) const
 }
 #endif
 
-void ndBrainLayer::InitGaussianWeights(ndReal mean, ndReal variance)
+void ndBrainLayer::InitGaussianWeights(ndReal variance)
 {
-	m_bias.Set(0.0f);
+	m_bias.InitGaussianWeights(variance);
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
-		(*this)[i].InitGaussianWeights(mean, variance);
+		(*this)[i].InitGaussianWeights(variance);
 	}
 }
 

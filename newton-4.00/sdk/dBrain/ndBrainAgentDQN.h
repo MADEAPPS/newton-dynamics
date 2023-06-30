@@ -97,15 +97,6 @@ class ndBrainAgentDQN: public ndBrainAgent
 			}
 			UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
 			ApplyWeightTranspose();
-
-			//ndReal batchError = validator.Validate(inputBatch);
-			//if (batchError <= m_bestCost)
-			//{
-			//	m_bestCost = batchError;
-			//	bestNetwork.CopyFrom(*m_instance.GetBrain());
-			//}
-			
-			//m_instance.GetBrain()->CopyFrom(bestNetwork);
 		}
 
 		ndBrainVector m_inputBatch;
@@ -123,8 +114,8 @@ class ndBrainAgentDQN: public ndBrainAgent
 	virtual void LearnStep();
 
 	private:
+	ndInt32 GetAction();
 	void BackPropagate();
-	ndInt32 GetAction() const;
 
 	protected:
 	ndSharedPtr<ndBrain> m_onlineNetwork;
@@ -168,7 +159,6 @@ ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN(const ndSharedPtr<ndBrain
 	,m_targetUpdatePeriod(1000)
 {
 	m_trainer.m_agent = this;
-	m_onlineNetwork->InitGaussianWeights(0.0f, 0.125f);
 	//SetRegularizer(GetRegularizer() * 10.0f);
 
 	SetBufferSize(1024 * 128);
@@ -197,34 +187,42 @@ ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& ndBrainAgentDQN<statesDim,
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDQN<statesDim, actionDim>::GetAction() const
+ndInt32 ndBrainAgentDQN<statesDim, actionDim>::GetAction()
 {
 	ndInt32 action = 0;
 	ndFloat32 explore = ndRand();
 	if (explore <= m_epsilonGreedy)
 	{
-		action = ndInt32(ndRandInt() % actionDim);
+		ndUnsigned32 randomIndex = ndRandInt();
+		static int xxxxx;
+		if (xxxxx % 100 == 0)
+		{
+			ndTrace (("rand %d %d\n", xxxxx, randomIndex))
+		}
+		xxxxx++;
+
+		action = ndInt32(randomIndex % actionDim);
 	}
 	else
 	{
-		ndAssert(0);
-		//action = m_agent->GetMaxValueAction();
-		//for (ndInt32 i = 0; i < m_stateCount; ++i)
-		//{
-		//	m_input[i] = m_currentTransition.m_state[i];
-		//}
-		//ndBrainInstance& instance = m_trainer.GetInstance();
-		//instance.MakePrediction(m_input, m_output);
-		//
-		//ndReal maxReward = m_output[0];
-		//for (ndInt32 i = 1; i < m_actionsCount; ++i)
-		//{
-		//	if (m_output[i] > maxReward)
-		//	{
-		//		action = i;
-		//		maxReward = m_output[i];
-		//	}
-		//}
+		ndBrainVector& inputBatch = m_trainer.m_inputBatch;
+		ndBrainVector& outputBatch = m_trainer.m_outputBatch;
+		for (ndInt32 i = 0; i < statesDim; ++i)
+		{
+			inputBatch[i] = m_currentTransition.m_state[i];
+		}
+		ndBrainInstance& instance = m_trainer.GetInstance();
+		instance.MakePrediction(inputBatch, outputBatch);
+		
+		ndReal maxReward = outputBatch[0];
+		for (ndInt32 i = 1; i < actionDim; ++i)
+		{
+			if (outputBatch[i] > maxReward)
+			{
+				action = i;
+				maxReward = outputBatch[i];
+			}
+		}
 	}
 
 	return action;

@@ -65,11 +65,11 @@ ndBrainVector::~ndBrainVector()
 {
 }
 
-void ndBrainVector::InitGaussianWeights(ndReal mean, ndReal variance)
+void ndBrainVector::InitGaussianWeights(ndReal variance)
 {
 	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
 	{
-		(*this)[i] = ndReal(ndGaussianRandom(mean, variance));
+		(*this)[i] = ndReal(ndGaussianRandom(ndReal (0.0f), variance));
 	}
 }
 

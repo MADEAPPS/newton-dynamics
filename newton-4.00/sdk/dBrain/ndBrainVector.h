@@ -30,7 +30,7 @@ class ndBrainVector: public ndArray<ndReal>
 	ndBrainVector();
 	~ndBrainVector();
 	
-	void InitGaussianWeights(ndReal mean, ndReal variance);
+	void InitGaussianWeights(ndReal variance);
 
 	void Set(ndReal value);
 	void Set(const ndBrainVector& data);

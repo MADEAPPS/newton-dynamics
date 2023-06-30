@@ -43,7 +43,7 @@ ndBrain::ndBrain(const ndBrain& src)
 		ndBrainLayer* const layer = srcLayers[i]->Clone();
 		AddLayer(layer);
 	}
-	EndAddLayer();
+	EndAddLayer(ndReal(0.0f));
 	CopyFrom(src);
 }
 
@@ -98,7 +98,7 @@ void ndBrain::BeginAddLayer()
 	m_isReady = false;
 }
 
-void ndBrain::EndAddLayer()
+void ndBrain::EndAddLayer(ndReal randomVariance)
 {
 	ndInt32 floatsCount = 0;
 	ndInt32 vectorSizeInBytes = 0;
@@ -134,6 +134,7 @@ void ndBrain::EndAddLayer()
 		floatMemory = layer.SetFloatPointers(floatMemory);
 	}
 
+	InitGaussianWeights(randomVariance);
 	m_isReady = true;
 }
 
@@ -166,12 +167,12 @@ bool ndBrain::Compare(const ndBrain& src) const
 	return true;
 }
 
-void ndBrain::InitGaussianWeights(ndReal mean, ndReal variance)
+void ndBrain::InitGaussianWeights(ndReal variance)
 {
 	ndArray<ndBrainLayer*>& layers = *this;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
-		layers[i]->InitGaussianWeights(mean, variance);
+		layers[i]->InitGaussianWeights(variance);
 	}
 }
 

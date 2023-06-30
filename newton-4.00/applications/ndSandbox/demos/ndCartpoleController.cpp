@@ -117,39 +117,17 @@ namespace ndController_0
 						sum += m_movingAverage[i];
 					}
 					sum = sum / ndInt32(sizeof(m_movingAverage) / sizeof(m_movingAverage[0]));
-					ndExpandTraceMessage("moving average alive frames:%d\n", sum);
+					ndExpandTraceMessage("%d moving average alive frames:%d\n", m_frameCount - 1, sum);
 				}
 
 				static ndInt32 xxxxx = 0;
 				if (m_framesAlive > xxxxx)
 				{
 					xxxxx = m_framesAlive;
-					ndExpandTraceMessage("episode:%d framesAlive:%d\n", m_eposideCount, m_framesAlive);
+					ndExpandTraceMessage("%d: episode:%d framesAlive:%d\n", m_frameCount - 1, m_eposideCount, m_framesAlive);
 				}
 				m_framesAlive++;
 			}
-
-			//ndInt32 GetMaxValueAction() const
-			//{
-			//	for (ndInt32 i = 0; i < m_stateCount; ++i)
-			//	{
-			//		m_input[i] = m_currentTransition.m_state[i];
-			//	}
-			//	ndBrainInstance& instance = m_trainer.GetInstance();
-			//	instance.MakePrediction(m_input, m_output);
-			//
-			//	ndInt32 action = 0;
-			//	ndReal maxReward = m_output[0];
-			//	for (ndInt32 i = 1; i < m_actionsCount; ++i)
-			//	{
-			//		if (m_output[i] > maxReward)
-			//		{
-			//			action = i;
-			//			maxReward = m_output[i];
-			//		}
-			//	}
-			//	return action;
-			//}
 
 			ndCartpole* m_model;
 			ndInt32 m_movingAverage[32];
@@ -255,7 +233,7 @@ namespace ndController_0
 		ndFloat32 ySize = 0.125f;
 		ndFloat32 zSize = 0.15f;
 		ndFloat32 cartMass = 5.0f;
-		ndFloat32 poleMass = 1.0f;
+		ndFloat32 poleMass = 5.0f;
 		ndPhysicsWorld* const world = scene->GetWorld();
 		
 		// add hip body
@@ -302,7 +280,7 @@ namespace ndController_0
 		qValuePredictor->AddLayer(hiddenLayer0);
 		qValuePredictor->AddLayer(hiddenLayer1);
 		qValuePredictor->AddLayer(ouputLayer);
-		qValuePredictor->EndAddLayer();
+		qValuePredictor->EndAddLayer(ndReal(0.125f));
 		model->m_agent = ndSharedPtr<ndCartpole::ndDQNAgent>(new ndCartpole::ndDQNAgent(model, qValuePredictor));
 	}
 

@@ -134,31 +134,6 @@ inline ndMatrix::~ndMatrix()
 {
 }
 
-//inline ndMatrix::ndMatrix (const ndVector& p, const ndVector& q)
-//	:m_front(q * p.BroadcastX())
-//	,m_up   (q * p.BroadcastY())
-//	,m_right(q * p.BroadcastZ())
-//	,m_posit (ndVector::m_wOne)
-//{
-//}
-//
-//inline ndMatrix::ndMatrix (const ndVector& front)
-//	:m_front((front & ndVector::m_triplexMask).Normalize())
-//	,m_posit(ndVector::m_wOne)
-//{
-//	if (ndAbs(m_front.m_z) > ndFloat32 (0.577f)) 
-//	{
-//		m_right = m_front.CrossProduct(ndVector(-m_front.m_y, m_front.m_z, ndFloat32(0.0f), ndFloat32(0.0f)));
-//	}
-//	else 
-//	{
-//		m_right = m_front.CrossProduct(ndVector(-m_front.m_y, m_front.m_x, ndFloat32(0.0f), ndFloat32(0.0f)));
-//	}
-//	m_right = m_right.Normalize();
-//	m_up = m_right.CrossProduct(m_front);
-//	ndAssert(TestOrthogonal());
-//}
-
 inline ndVector& ndMatrix::operator[] (ndInt32  i)
 {
 	ndAssert (i < 4);
