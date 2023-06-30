@@ -22,17 +22,8 @@
 
 namespace ndController_0
 {
-	#define D_REPLAY_BASH_SIZE		(32)
-	#define D_REPLAY_BUFFERSIZE		(1024 * 128)
-	#define D_DISCOUNT_FACTOR		ndReal (0.99f)
-	#define D_EPSILON_GREEDY		ndReal (5.0e-4f)
-	#define D_MIN_EXPLARE_FACTOR	ndReal (0.002f)
-	#define D_LEARN_RATE			ndReal (5.0e-4f)
-	#define D_TARGET_UPDATE_FREQ	(1000)
-	#define D_EPSILON_GREEDY_FREQ	(D_REPLAY_BASH_SIZE * 2)
+	#define D_PUSH_ACCEL			ndFloat32 (1.0f)
 	#define D_REWARD_MIN_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
-
-	#define D_PUSH_FORCE ndFloat32 (10.0f)
 
 	enum ndActionSpace
 	{
@@ -60,21 +51,9 @@ namespace ndController_0
 			ndDQNAgent(ndCartpole* const model, ndSharedPtr<ndBrain>& qValuePredictor)
 				:ndBrainAgentDQN<m_stateSize, m_actionsSize>(qValuePredictor)
 				,m_model(model)
-				,m_movingAverageCount(0)
 				,m_framesAlive(0)
+				,m_movingAverageCount(0)
 			{
-				m_frameCount = 0;
-				m_eposideCount = 0;
-				m_learnRate = D_LEARN_RATE;
-				m_gamma = D_DISCOUNT_FACTOR;
-				m_epsilonGreedy = ndReal(1.0f);
-				m_bashBufferSize = D_REPLAY_BASH_SIZE;
-				m_epsilonGreedyStep = D_EPSILON_GREEDY;
-				m_epsilonGreedyFloor = D_MIN_EXPLARE_FACTOR;
-				m_epsilonGreedyFreq = D_EPSILON_GREEDY_FREQ;
-				m_targetUpdatePeriod = D_TARGET_UPDATE_FREQ;
-
-				SetBufferSize(D_REPLAY_BUFFERSIZE);
 				for (ndInt32 i = 0; i < sizeof(m_movingAverage) / sizeof(m_movingAverage[0]); ++i)
 				{
 					m_movingAverage[i] = 0;
@@ -130,9 +109,9 @@ namespace ndController_0
 			}
 
 			ndCartpole* m_model;
-			ndInt32 m_movingAverage[32];
-			ndInt32 m_movingAverageCount;
 			ndInt32 m_framesAlive;
+			ndInt32 m_movingAverageCount;
+			ndInt32 m_movingAverage[32];
 		};
 
 		ndCartpole()
@@ -184,10 +163,6 @@ namespace ndController_0
 			m_cart->SetOmega(ndVector::m_zero);
 			m_cart->SetVelocity(ndVector::m_zero);
 
-			ndVector impulse(ndVector::m_zero);
-			impulse.m_x = m_cart->GetMassMatrix().m_w * ndGaussianRandom(0.0f, 0.05f);
-			m_cart->ApplyImpulsePair(impulse, ndVector::m_zero, 1.0f / 60.0f);
-
 			m_cart->SetMatrix(m_cartMatrix);
 			m_pole->SetMatrix(m_poleMatrix);
 		}
@@ -196,17 +171,28 @@ namespace ndController_0
 		{
 			ndModelArticulation::Update(world, timestep);
 
+			ndDQNAgent* const agent = (ndDQNAgent*)*m_agent;
 			ndVector force(m_cart->GetForce());
-			ndInt32 action = m_agent->GetTransition().m_action[0];
+			ndInt32 action = agent->GetTransition().m_action[0];
 			if (action == m_pushLeft)
 			{
-				force.m_x = -D_PUSH_FORCE;
+				force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
 			}
 			else if (action == m_pushRight)
 			{
-				force.m_x = D_PUSH_FORCE;
+				force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
 			}
 			m_cart->SetForce(force);
+
+			// add random impulse
+			ndUnsigned32 perturbeProbability = 1024;
+			ndUnsigned32 randFreq = ndRandInt() % perturbeProbability;
+			if (randFreq > ndUnsigned32 (ndFloat32 (perturbeProbability) * ndFloat32(0.96f)))
+			{
+				ndVector impulse(ndVector::m_zero);
+				impulse.m_x = m_cart->GetMassMatrix().m_w * ndGaussianRandom(0.0f, 0.05f);
+				//m_cart->ApplyImpulsePair(impulse, ndVector::m_zero, timestep);
+			}
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -224,7 +210,7 @@ namespace ndController_0
 		ndMatrix m_poleMatrix;
 		ndBodyDynamic* m_cart;
 		ndBodyDynamic* m_pole;
-		ndSharedPtr<ndDQNAgent> m_agent;
+		ndSharedPtr<ndBrainAgent> m_agent;
 	};
 
 	void BuildModel(ndCartpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -234,41 +220,43 @@ namespace ndController_0
 		ndFloat32 zSize = 0.15f;
 		ndFloat32 cartMass = 5.0f;
 		ndFloat32 poleMass = 5.0f;
+		ndFloat32 poleLength = 0.4f;
+		ndFloat32 poleRadio = 0.05f;
 		ndPhysicsWorld* const world = scene->GetWorld();
 		
-		// add hip body
+		// make cart
 		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.tga")));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
 
 		ndMatrix matrix(cartBody->GetMatrix());
 		matrix.m_posit.m_y += ySize / 2.0f;
 
-		// make single leg
-		ndFloat32 poleLength = 0.4f;
-		ndFloat32 poleRadio = 0.025f;
-		
+		// make pole leg
 		ndSharedPtr<ndBody> poleBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), poleMass, poleRadio, poleRadio, poleLength, "smilli.tga")));
 		ndMatrix poleLocation(ndRollMatrix(90.0f * ndDegreeToRad) * matrix);
 		poleLocation.m_posit.m_y += poleLength * 0.5f;
 		poleBody->SetMatrix(poleLocation);
 
+		// link cart and body with a hinge
 		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
 		polePivot.m_posit.m_y -= poleLength * 0.5f;
 		ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
 
-		world->AddJoint(poleJoint);
-
-		// add model limbs
-		model->AddLimb(modelRoot, poleBody, poleJoint);
-
+		// make the car move alone the z axis only (2d probpem)
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointSlider(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
 		world->AddJoint(fixJoint);
 
+		// add path to the model
+		world->AddJoint(poleJoint);
+		model->AddLimb(modelRoot, poleBody, poleJoint);
+
+		// save some useful data
 		model->m_cart = cartBody->GetAsBodyDynamic();
 		model->m_pole = poleBody->GetAsBodyDynamic();
 		model->m_cartMatrix = cartBody->GetMatrix();
 		model->m_poleMatrix = poleBody->GetMatrix();
 
+		// build newtral net controller
 		ndSharedPtr<ndBrain> qValuePredictor(new ndBrain());
 		ndBrainLayer* const inputLayer = new ndBrainLayer(m_stateSize, 128, m_relu);
 		ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), 128, m_relu);
@@ -280,8 +268,10 @@ namespace ndController_0
 		qValuePredictor->AddLayer(hiddenLayer0);
 		qValuePredictor->AddLayer(hiddenLayer1);
 		qValuePredictor->AddLayer(ouputLayer);
-		qValuePredictor->EndAddLayer(ndReal(0.125f));
-		model->m_agent = ndSharedPtr<ndCartpole::ndDQNAgent>(new ndCartpole::ndDQNAgent(model, qValuePredictor));
+		qValuePredictor->EndAddLayer(ndReal(0.25f));
+
+		// add a reinforcement learning controler 
+		model->m_agent = ndSharedPtr<ndBrainAgent>(new ndCartpole::ndDQNAgent(model, qValuePredictor));
 	}
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)

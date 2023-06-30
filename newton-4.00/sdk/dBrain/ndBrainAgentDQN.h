@@ -33,6 +33,17 @@
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDQN: public ndBrainAgent
 {
+	#define D_LEARN_RATE				ndReal(2.0e-4f)
+	#define D_DISCOUNT_FACTOR			ndReal (0.99f)
+	#define D_REPLAY_BUFFERSIZE			(1024 * 256)
+	#define D_REPLAY_BASH_SIZE			(32)
+	#define D_TARGET_UPDATE_PERIOD		(1000)
+	#define D_STAR_OPTIMIZATION			(D_REPLAY_BUFFERSIZE >> 2)
+	#define D_MIN_EXPLORE_PROBABILITY	ndReal(1.0f/1024.0f)
+	#define D_EXPLORE_UPDATE_PERIOD		(D_REPLAY_BASH_SIZE * 2)
+	#define D_EXPLORE_ANNELININGING		(D_MIN_EXPLORE_PROBABILITY / ndReal(2.0f))
+
+
 	class ndOptimizer: public ndBrainTrainer
 	{
 		public:
@@ -57,8 +68,9 @@ class ndBrainAgentDQN: public ndBrainAgent
 		void EvaluateBellmanEquation(ndInt32 index)
 		{
 			ndBrainVector& groundTruth = m_truth;
-			const ndBrainVector& output = m_output;
-			ndAssert(groundTruth.GetCount() == output.GetCount());
+			//const ndBrainVector& output = m_output;
+			ndAssert(groundTruth.GetCount() == m_output.GetCount());
+			ndAssert(groundTruth.GetCount() == m_outputBatch.GetCount());
 			const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_agent->m_replayBuffer[index];
 			
 			groundTruth.Set(transition.m_reward);
@@ -128,13 +140,14 @@ class ndBrainAgentDQN: public ndBrainAgent
 	
 	ndReal m_gamma;
 	ndReal m_learnRate;
-	ndReal m_epsilonGreedy;
-	ndReal m_epsilonGreedyStep;
-	ndReal m_epsilonGreedyFloor;
+	ndReal m_explorationProbability;
+	ndReal m_minExplorationProbability;
+	ndReal m_explorationProbabilityAnnelining;
 	ndInt32 m_frameCount;
 	ndInt32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
-	ndInt32 m_epsilonGreedyFreq;
+	ndInt32 m_startOptimization;
+	ndInt32 m_explorationProbabilityFreq;
 	ndInt32 m_targetUpdatePeriod;
 };
 
@@ -147,21 +160,21 @@ ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN(const ndSharedPtr<ndBrain
 	,m_targetInstance(&m_targetNetwork)
 	,m_shuffleBuffer()
 	,m_replayBuffer()
-	,m_gamma(ndReal(0.99f))
-	,m_learnRate(ndReal(5.0e-4f))
-	,m_epsilonGreedy(ndReal(1.0f))
-	,m_epsilonGreedyStep(ndReal(5.0e-4f))
-	,m_epsilonGreedyFloor(ndReal(2.0e-3f))
+	,m_gamma(D_DISCOUNT_FACTOR)
+	,m_learnRate(D_LEARN_RATE)
+	,m_explorationProbability(ndReal(1.0f))
+	,m_minExplorationProbability(D_MIN_EXPLORE_PROBABILITY)
+	,m_explorationProbabilityAnnelining(D_EXPLORE_ANNELININGING)
 	,m_frameCount(0)
 	,m_eposideCount(0)
-	,m_bashBufferSize(32)
-	,m_epsilonGreedyFreq(64)
-	,m_targetUpdatePeriod(1000)
+	,m_bashBufferSize(D_REPLAY_BASH_SIZE)
+	,m_startOptimization(D_STAR_OPTIMIZATION)
+	,m_explorationProbabilityFreq(D_EXPLORE_UPDATE_PERIOD)
+	,m_targetUpdatePeriod(D_TARGET_UPDATE_PERIOD)
 {
 	m_trainer.m_agent = this;
-	//SetRegularizer(GetRegularizer() * 10.0f);
 
-	SetBufferSize(1024 * 128);
+	SetBufferSize(D_REPLAY_BUFFERSIZE);
 	m_targetNetwork.CopyFrom(*(*m_onlineNetwork));
 }
 
@@ -191,15 +204,15 @@ ndInt32 ndBrainAgentDQN<statesDim, actionDim>::GetAction()
 {
 	ndInt32 action = 0;
 	ndFloat32 explore = ndRand();
-	if (explore <= m_epsilonGreedy)
+	if (explore <= m_explorationProbability)
 	{
 		ndUnsigned32 randomIndex = ndRandInt();
-		static int xxxxx;
-		if (xxxxx % 100 == 0)
-		{
-			ndTrace (("rand %d %d\n", xxxxx, randomIndex))
-		}
-		xxxxx++;
+		//static int xxxxx;
+		//if (xxxxx % 100 == 0)
+		//{
+		//	ndTrace (("rand %d %d\n", xxxxx, randomIndex))
+		//}
+		//xxxxx++;
 
 		action = ndInt32(randomIndex % actionDim);
 	}
@@ -278,12 +291,12 @@ void ndBrainAgentDQN<statesDim, actionDim>::LearnStep()
 		ResetModel();
 	}
 
-	if (m_frameCount % m_epsilonGreedyFreq == (m_epsilonGreedyFreq - 1))
+	if (m_frameCount % m_explorationProbabilityFreq == (m_explorationProbabilityFreq - 1))
 	{
-		m_epsilonGreedy = ndMax(m_epsilonGreedy - m_epsilonGreedyStep, m_epsilonGreedyFloor);
+		m_explorationProbability = ndMax(m_explorationProbability - m_explorationProbabilityAnnelining, m_minExplorationProbability);
 	}
 
-	if (m_frameCount > (m_bashBufferSize * 8))
+	if (m_frameCount > m_startOptimization)
 	{
 		BackPropagate();
 	}
