@@ -43,6 +43,7 @@ class ndBrainVector: public ndArray<ndReal>
 	void Sub(const ndBrainVector& a, const ndBrainVector& b);
 	void Mul(const ndBrainVector& a, const ndBrainVector& b);
 
+	void Clamp(ndReal min, ndReal max);
 	void ScaleAdd(const ndBrainVector& a, ndReal b);
 	void MulAdd(const ndBrainVector& a, const ndBrainVector& b);
 	void MulSub(const ndBrainVector& a, const ndBrainVector& b);

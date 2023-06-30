@@ -112,6 +112,17 @@ void ndBrainVector::ScaleSet(const ndBrainVector& a, ndReal scale)
 	ndScaleSet(GetCount(), &(*this)[0], &a[0], scale);
 }
 
+void ndBrainVector::Clamp(ndReal min, ndReal max)
+{
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		ndReal val = (*this)[i];
+		ndAssert(val >= ndReal(-1.0e6f));
+		ndAssert(val <= ndReal(1.0e6f));
+		(*this)[i] = ndClamp(val, min, max);
+	}
+}
+
 void ndBrainVector::ScaleAdd(const ndBrainVector& a, ndReal b)
 {
 	ndAssert(GetCount() == a.GetCount());
