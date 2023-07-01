@@ -33,12 +33,24 @@ class ndBrainAgent: public ndClassAlloc
 	ndBrainAgent();
 	virtual ~ndBrainAgent();
 
-	virtual void LearnStep() = 0;
+	virtual void OptimizeStep() = 0;
+	virtual void GetAction(ndReal* const actionSpace) const = 0;
+
+	protected:
 	virtual void ResetModel() const = 0;
 	virtual bool IsTerminal() const = 0;
 	virtual ndReal GetReward() const = 0;
 	virtual void GetObservation(ndReal* const state) const = 0;
 };
+
+inline ndBrainAgent::ndBrainAgent()
+	:ndClassAlloc()
+{
+}
+
+inline ndBrainAgent::~ndBrainAgent()
+{
+}
 
 #endif 
 

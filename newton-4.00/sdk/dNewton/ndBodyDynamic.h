@@ -26,7 +26,6 @@
 
 #define D_MAX_SPEED_ATT		ndFloat32(0.02f)
 #define D_FREEZE_ACCEL		ndFloat32(1.0f)
-//#define D_FREEZE_ACCEL	ndFloat32(0.5f)
 #define D_FREEZE_SPEED		ndFloat32(0.032f)
 
 #define D_FREEZE_ACCEL2		(D_FREEZE_ACCEL * D_FREEZE_ACCEL)
@@ -65,6 +64,9 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API ndVector GetAngularDamping() const;
 	D_NEWTON_API void SetAngularDamping(const ndVector& angularDamp);
 
+	D_NEWTON_API ndFloat32 GetSleepAccel() const;
+	D_NEWTON_API void SetSleepAccel(ndFloat32 accelMag2);
+
 	virtual ndVector GetForce() const;
 	virtual ndVector GetTorque() const;
 	
@@ -83,7 +85,9 @@ class ndBodyDynamic: public ndBodyKinematic
 	ndVector m_savedExternalTorque;
 	ndVector m_dampCoef;
 	ndVector m_cachedDampCoef;
+	ndVector m_sleepAccelTest2;
 	ndFloat32 m_cachedTimeStep;
+	static ndVector m_sleepAccelTestScale2;
 
 	friend class ndDynamicsUpdate;
 	friend class ndDynamicsUpdateSoa;

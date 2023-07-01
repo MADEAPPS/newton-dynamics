@@ -26,20 +26,57 @@
 #include "ndBrainAgent.h"
 #include "ndBrainTrainer.h"
 
-// this is an implementation of the vanilla dqn agent trainer as descrived 
+// this is an implementation of the vanilla dqn agent trainer as described 
 // on the nature paper below. 
 // https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-class ndBrainAgentDQN: public ndBrainAgent
+class ndBrainAgentDQN : public ndBrainAgent
+{
+	public:
+	ndBrainAgentDQN(const ndSharedPtr<ndBrain>& qValuePredictor)
+		:ndBrainAgent()
+		,m_onlineNetwork(qValuePredictor)
+		,m_instance(*m_onlineNetwork)
+	{
+		m_state.SetCount(statesDim);
+		m_actions.SetCount(actionDim);
+	}
+
+	void GetAction(ndReal* const actionSpace) const
+	{
+		GetObservation(&m_state[0]);
+		m_instance.MakePrediction(m_state, m_actions);
+
+		ndInt32 bestAction = 0;
+		ndReal maxReward = m_actions[0];
+		for (ndInt32 i = 1; i < actionDim; ++i)
+		{
+			if (m_actions[i] > maxReward)
+			{
+				bestAction = i;
+				maxReward = m_actions[i];
+			}
+		}
+		actionSpace[0] = ndReal (bestAction);
+	}
+
+	ndSharedPtr<ndBrain> m_onlineNetwork;
+	mutable ndBrainInstance m_instance;
+	mutable ndBrainVector m_state;
+	mutable ndBrainVector m_actions;
+};
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+class ndBrainAgentDQN_Trainner: public ndBrainAgentDQN<statesDim, actionDim>
 {
 	#define D_LEARN_RATE				ndReal(2.0e-4f)
 	#define D_DISCOUNT_FACTOR			ndReal (0.99f)
-	#define D_REPLAY_BUFFERSIZE			(1024 * 256)
+	#define D_REPLAY_BUFFERSIZE			(1024 * 512)
 	#define D_REPLAY_BASH_SIZE			(32)
 	#define D_TARGET_UPDATE_PERIOD		(1000)
 	#define D_MIN_EXPLORE_PROBABILITY	ndReal(1.0f/1024.0f)
-	#define D_STAR_OPTIMIZATION			(D_REPLAY_BUFFERSIZE / 2)
+	#define D_STAR_OPTIMIZATION			(D_REPLAY_BUFFERSIZE - 1000)
 	#define D_EXPLORE_ANNELININGING		(D_MIN_EXPLORE_PROBABILITY / ndReal(2.0f))
 
 	class ndOptimizer: public ndBrainTrainer
@@ -114,24 +151,22 @@ class ndBrainAgentDQN: public ndBrainAgent
 
 		ndBrainVector m_inputBatch;
 		ndBrainVector m_outputBatch;
-		ndBrainAgentDQN<statesDim, actionDim>* m_agent;
+		ndBrainAgentDQN_Trainner<statesDim, actionDim>* m_agent;
 	};
 
 	public: 
-	ndBrainAgentDQN(const ndSharedPtr<ndBrain>& qValuePredictor);
-	virtual ~ndBrainAgentDQN();
+	ndBrainAgentDQN_Trainner(const ndSharedPtr<ndBrain>& qValuePredictor);
+	virtual ~ndBrainAgentDQN_Trainner();
 
-	void SetBufferSize(ndInt32 size);
-	ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& GetTransition();
-
-	virtual void LearnStep();
-
-	private:
-	ndInt32 GetAction();
-	void BackPropagate();
+	void GetAction(ndReal* const actionSpace) const;
 
 	protected:
-	ndSharedPtr<ndBrain> m_onlineNetwork;
+	virtual void OptimizeStep();
+	
+	void BackPropagate();
+	void SetBufferSize(ndInt32 size);
+	ndInt32 GetExploreExploitAction();
+
 	ndBrain m_targetNetwork;
 	ndOptimizer m_trainer;
 	ndBrainInstance m_targetInstance;
@@ -149,12 +184,12 @@ class ndBrainAgentDQN: public ndBrainAgent
 	ndInt32 m_bashBufferSize;
 	ndInt32 m_startOptimization;
 	ndInt32 m_targetUpdatePeriod;
+	bool m_collectingSamples;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN(const ndSharedPtr<ndBrain>& qValuePredictor)
-	:ndBrainAgent()
-	,m_onlineNetwork(qValuePredictor)
+ndBrainAgentDQN_Trainner<statesDim, actionDim>::ndBrainAgentDQN_Trainner(const ndSharedPtr<ndBrain>& qValuePredictor)
+	:ndBrainAgentDQN<statesDim, actionDim>(qValuePredictor)
 	,m_targetNetwork(*(*m_onlineNetwork))
 	,m_trainer(*m_onlineNetwork)
 	,m_targetInstance(&m_targetNetwork)
@@ -170,6 +205,7 @@ ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN(const ndSharedPtr<ndBrain
 	,m_bashBufferSize(D_REPLAY_BASH_SIZE)
 	,m_startOptimization(D_STAR_OPTIMIZATION)
 	,m_targetUpdatePeriod(D_TARGET_UPDATE_PERIOD)
+	,m_collectingSamples(true)
 {
 	m_trainer.m_agent = this;
 	m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / D_STAR_OPTIMIZATION;
@@ -179,12 +215,12 @@ ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN(const ndSharedPtr<ndBrain
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDQN<statesDim, actionDim>::~ndBrainAgentDQN()
+ndBrainAgentDQN_Trainner<statesDim, actionDim>::~ndBrainAgentDQN_Trainner()
 {
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN<statesDim, actionDim>::SetBufferSize(ndInt32 size)
+void ndBrainAgentDQN_Trainner<statesDim, actionDim>::SetBufferSize(ndInt32 size)
 {
 	m_shuffleBuffer.SetCount(size);
 	m_replayBuffer.SetCount(size);
@@ -194,13 +230,13 @@ void ndBrainAgentDQN<statesDim, actionDim>::SetBufferSize(ndInt32 size)
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& ndBrainAgentDQN<statesDim, actionDim>::GetTransition()
+void ndBrainAgentDQN_Trainner<statesDim, actionDim>::GetAction(ndReal* const actionSpace) const
 {
-	return m_currentTransition;
+	actionSpace[0] = ndReal (m_currentTransition.m_action[0]);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDQN<statesDim, actionDim>::GetAction()
+ndInt32 ndBrainAgentDQN_Trainner<statesDim, actionDim>::GetExploreExploitAction()
 {
 	ndInt32 action = 0;
 	ndFloat32 explore = ndRand();
@@ -211,31 +247,16 @@ ndInt32 ndBrainAgentDQN<statesDim, actionDim>::GetAction()
 	}
 	else
 	{
-		ndBrainVector& inputBatch = m_trainer.m_inputBatch;
-		ndBrainVector& outputBatch = m_trainer.m_outputBatch;
-		for (ndInt32 i = 0; i < statesDim; ++i)
-		{
-			inputBatch[i] = m_currentTransition.m_state[i];
-		}
-		ndBrainInstance& instance = m_trainer.GetInstance();
-		instance.MakePrediction(inputBatch, outputBatch);
-		
-		ndReal maxReward = outputBatch[0];
-		for (ndInt32 i = 1; i < actionDim; ++i)
-		{
-			if (outputBatch[i] > maxReward)
-			{
-				action = i;
-				maxReward = outputBatch[i];
-			}
-		}
+		ndReal maxAction;
+		ndBrainAgentDQN<statesDim, actionDim>::GetAction(&maxAction);
+		action = ndInt32(maxAction);
 	}
 
 	return action;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN<statesDim, actionDim>::BackPropagate()
+void ndBrainAgentDQN_Trainner<statesDim, actionDim>::BackPropagate()
 {
 	class ndTestValidator : public ndBrainTrainer::ndValidation
 	{
@@ -257,11 +278,12 @@ void ndBrainAgentDQN<statesDim, actionDim>::BackPropagate()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN<statesDim, actionDim>::LearnStep()
+void ndBrainAgentDQN_Trainner<statesDim, actionDim>::OptimizeStep()
 {
 	if (!m_frameCount)
 	{
 		ResetModel();
+		m_currentTransition.Clear();
 	}
 
 	GetObservation(&m_currentTransition.m_nextState[0]);
@@ -276,18 +298,28 @@ void ndBrainAgentDQN<statesDim, actionDim>::LearnStep()
 	}
 
 	m_currentTransition.m_state = m_currentTransition.m_nextState;
-	m_currentTransition.m_action[0] = GetAction();
+	m_currentTransition.m_action[0] = GetExploreExploitAction();
 
 	if (m_currentTransition.m_terminalState)
 	{
-		m_eposideCount++;
 		ResetModel();
+		m_currentTransition.Clear();
+		if ((m_frameCount < m_startOptimization) && (m_eposideCount % 32 == 0))
+		{
+			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_startOptimization, m_eposideCount);
+		}
+		m_eposideCount++;
 	}
 
 	m_explorationProbability = ndMax(m_explorationProbability - m_explorationProbabilityAnnelining, m_minExplorationProbability);
 	if (m_frameCount > m_startOptimization)
 	{
 		BackPropagate();
+		if (m_collectingSamples)
+		{
+			ndExpandTraceMessage("%d star training: episode %d\n", m_frameCount, m_eposideCount);
+		}
+		m_collectingSamples = false;
 	}
 
 	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))

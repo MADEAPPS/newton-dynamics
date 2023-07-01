@@ -24,6 +24,8 @@
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
 
+ndVector ndBodyDynamic::m_sleepAccelTestScale2(ndFloat32 (0.0625f));
+
 ndBodyDynamic::ndBodyDynamic()
 	:ndBodyKinematic()
 	,m_externalForce(ndVector::m_zero)
@@ -34,6 +36,7 @@ ndBodyDynamic::ndBodyDynamic()
 	,m_savedExternalTorque(ndVector::m_zero)
 	,m_dampCoef(ndVector::m_zero)
 	,m_cachedDampCoef(ndVector::m_one)
+	,m_sleepAccelTest2(D_SOLVER_MAX_ACCEL_ERROR * D_SOLVER_MAX_ACCEL_ERROR)
 	,m_cachedTimeStep(ndFloat32 (0.0f))
 {
 	m_isDynamics = 1;
@@ -255,6 +258,16 @@ void ndBodyDynamic::AddDampingAcceleration(ndFloat32 timestep)
 	m_veloc = m_veloc.Scale(m_cachedDampCoef.m_w);
 }
 
+ndFloat32 ndBodyDynamic::GetSleepAccel() const
+{
+	return m_sleepAccelTest2.m_x;
+}
+
+void ndBodyDynamic::SetSleepAccel(ndFloat32 accelMag2)
+{
+	m_sleepAccelTest2 = ndVector(accelMag2);
+}
+
 void ndBodyDynamic::IntegrateVelocity(ndFloat32 timestep)
 {
 	ndBodyKinematic::IntegrateVelocity(timestep);
@@ -382,9 +395,10 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 		ndAssert(count == checkConnection);
 		#endif
 
-		const ndFloat32 acc2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
+		//const ndFloat32 acc2 = D_SOLVER_MAX_ACCEL_ERROR * D_SOLVER_MAX_ACCEL_ERROR;
 		//const ndFloat32 maxAccNorm2 = (count > 1) ? acc2 : acc2 * ndFloat32(0.0625f);
-		const ndFloat32 maxAccNorm2 = m_autoSleep ? ((count > 1) ? acc2 : acc2 * ndFloat32(0.0625f)) : ndFloat32((1.0e-3f));
+		//const ndFloat32 maxAccNorm2 = m_autoSleep ? ((count > 1) ? acc2 : acc2 * ndFloat32(0.0625f)) : ndFloat32((1.0e-3f));
+		const ndVector maxAccNorm2 ((count > 1) ? m_sleepAccelTest2 : m_sleepAccelTest2 * m_sleepAccelTestScale2);
 
 		ndVector accelTest((m_accel.DotProduct(m_accel) > maxAccNorm2) | (m_alpha.DotProduct(m_alpha) > maxAccNorm2));
 		m_accel = m_accel & accelTest;

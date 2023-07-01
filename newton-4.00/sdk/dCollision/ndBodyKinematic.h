@@ -34,7 +34,7 @@ class ndJointBilateralConstraint;
 
 #define D_USE_FULL_INERTIA
 #define	D_FREEZZING_VELOCITY_DRAG	ndFloat32 (0.9f)
-#define	D_SOLVER_MAX_ERROR			(D_FREEZE_MAG * ndFloat32 (0.5f))
+#define	D_SOLVER_MAX_ACCEL_ERROR	(D_FREEZE_MAG * ndFloat32 (0.5f))
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodyKinematic : public ndBody

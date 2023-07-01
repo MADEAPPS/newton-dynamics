@@ -45,11 +45,11 @@ namespace ndController_0
 	class ndCartpole: public ndModelArticulation
 	{
 		public:
-		class ndDQNAgent : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
+		class ndDQNAgent : public ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>
 		{
 			public:
 			ndDQNAgent(ndCartpole* const model, ndSharedPtr<ndBrain>& qValuePredictor)
-				:ndBrainAgentDQN<m_stateSize, m_actionsSize>(qValuePredictor)
+				:ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>(qValuePredictor)
 				,m_model(model)
 				,m_framesAlive(0)
 				,m_movingAverageCount(0)
@@ -80,27 +80,31 @@ namespace ndController_0
 				m_model->ResetModel();
 			}
 
-			void LearnStep()
+			void OptimizeStep()
 			{
-				ndBrainAgentDQN::LearnStep();
+				ndInt32 lastEpisode = m_eposideCount;
+				ndBrainAgentDQN_Trainner::OptimizeStep();
 
-				if (m_currentTransition.m_terminalState)
+				if (lastEpisode != m_eposideCount)
 				{
 					m_movingAverage[m_movingAverageCount] = m_framesAlive;
 					m_movingAverageCount = (m_movingAverageCount + 1) % ndInt32(sizeof(m_movingAverage) / sizeof(m_movingAverage[0]));
 
-					m_framesAlive = 0;
 					ndInt32 sum = 0;
+					m_framesAlive = 0;
 					for (ndInt32 i = 0; i < sizeof(m_movingAverage) / sizeof(m_movingAverage[0]); ++i)
 					{
 						sum += m_movingAverage[i];
 					}
 					sum = sum / ndInt32(sizeof(m_movingAverage) / sizeof(m_movingAverage[0]));
-					ndExpandTraceMessage("%d moving average alive frames:%d\n", m_frameCount - 1, sum);
+					if (!m_collectingSamples)
+					{
+						ndExpandTraceMessage("%d moving average alive frames:%d\n", m_frameCount - 1, sum);
+					}
 				}
 
 				static ndInt32 xxxxx = 0;
-				if (m_framesAlive > xxxxx)
+				if (!m_collectingSamples && (m_framesAlive > xxxxx))
 				{
 					xxxxx = m_framesAlive;
 					ndExpandTraceMessage("%d: episode:%d framesAlive:%d\n", m_frameCount - 1, m_eposideCount, m_framesAlive);
@@ -173,7 +177,10 @@ namespace ndController_0
 
 			ndDQNAgent* const agent = (ndDQNAgent*)*m_agent;
 			ndVector force(m_cart->GetForce());
-			ndInt32 action = agent->GetTransition().m_action[0];
+
+			ndReal maxAction;
+			agent->GetAction(&maxAction);
+			ndInt32 action = ndInt32 (maxAction);
 			if (action == m_pushLeft)
 			{
 				force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
@@ -198,7 +205,7 @@ namespace ndController_0
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
-			m_agent->LearnStep();
+			m_agent->OptimizeStep();
 
 			if (ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(40.0f))
 			{
@@ -227,6 +234,7 @@ namespace ndController_0
 		// make cart
 		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.tga")));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
+		cartBody->GetAsBodyDynamic()->SetSleepAccel(cartBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
 
 		ndMatrix matrix(cartBody->GetMatrix());
 		matrix.m_posit.m_y += ySize / 2.0f;
@@ -236,13 +244,14 @@ namespace ndController_0
 		ndMatrix poleLocation(ndRollMatrix(90.0f * ndDegreeToRad) * matrix);
 		poleLocation.m_posit.m_y += poleLength * 0.5f;
 		poleBody->SetMatrix(poleLocation);
+		poleBody->GetAsBodyDynamic()->SetSleepAccel(poleBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
 
 		// link cart and body with a hinge
 		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
 		polePivot.m_posit.m_y -= poleLength * 0.5f;
 		ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
 
-		// make the car move alone the z axis only (2d probpem)
+		// make the car move alone the z axis only (2d problem)
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointSlider(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
 		world->AddJoint(fixJoint);
 
@@ -256,7 +265,7 @@ namespace ndController_0
 		model->m_cartMatrix = cartBody->GetMatrix();
 		model->m_poleMatrix = poleBody->GetMatrix();
 
-		// build newtral net controller
+		// build neutral net controller
 		ndSharedPtr<ndBrain> qValuePredictor(new ndBrain());
 		ndBrainLayer* const inputLayer = new ndBrainLayer(m_stateSize, 128, m_relu);
 		ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), 128, m_relu);
@@ -270,7 +279,7 @@ namespace ndController_0
 		qValuePredictor->AddLayer(ouputLayer);
 		qValuePredictor->EndAddLayer(ndReal(0.25f));
 
-		// add a reinforcement learning controler 
+		// add a reinforcement learning controller 
 		model->m_agent = ndSharedPtr<ndBrainAgent>(new ndCartpole::ndDQNAgent(model, qValuePredictor));
 	}
 
