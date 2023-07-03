@@ -45,6 +45,12 @@ ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
 	m_bias.SetSize(src.GetOuputSize());
 }
 
+ndBrainLayer::~ndBrainLayer()
+{
+	m_size = 0;
+	m_capacity = 0;
+}
+
 #if 0
 ndBrainLayer::ndBrainLayer(const nd::TiXmlNode* layerNode)
 	:ndBrainMatrix()
@@ -78,10 +84,6 @@ ndBrainLayer::ndBrainLayer(const nd::TiXmlNode* layerNode)
 	}
 }
 #endif
-
-ndBrainLayer::~ndBrainLayer()
-{
-}
 
 ndUnsigned8* ndBrainLayer::SetPointers(ndUnsigned8* const memPtr)
 {

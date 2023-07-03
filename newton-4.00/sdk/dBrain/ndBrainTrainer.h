@@ -53,7 +53,7 @@ class ndBrainTrainer: public ndBrainTrainerBase
 
 	void ApplyAdamCorrection();
 
-	ndBrainVector m_truth;
+	//ndBrainVector m_truth;
 	ndBrainVector m_output;
 	ndBrainVector m_zDerivative;
 	ndBrainVector m_biasGradients;
@@ -65,7 +65,7 @@ class ndBrainTrainer: public ndBrainTrainerBase
 	ndBrainVector m_weightGradient_v;
 	ndBrainPrefixScan m_weightGradientsPrefixScan;
 	ndArray <ndBrainMatrix*> m_weightsLayersTranspose;
-	const ndBrainMatrix* m_groundTruthArray;
+	//const ndBrainMatrix* m_groundTruthArray;
 	ndReal m_regularizer;
 	ndReal m_bestCost;
 	ndReal m_alpha;
