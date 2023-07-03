@@ -81,7 +81,7 @@ ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
 	,m_alphaAcc(src.m_alphaAcc)
 	,m_betaAcc(src.m_betaAcc)
 {
-	for (ndInt32 i = 0; i < src.m_weightsLayersTranspose.GetCount(); i++)
+	for (ndInt32 i = 0; i < src.m_weightsLayersTranspose.GetCount(); ++i)
 	{
 		m_weightsLayersTranspose.PushBack(new ndBrainMatrix(*src.m_weightsLayersTranspose[i]));
 	}
@@ -90,9 +90,11 @@ ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
 ndBrainTrainer::~ndBrainTrainer()
 {
 	const ndArray<ndBrainLayer*>& layers = (*m_instance.GetBrain());
-	for (ndInt32 i = 0; i < layers.GetCount(); i++)
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
+		ndAssert(m_weightsLayersTranspose[i]);
 		delete (m_weightsLayersTranspose[i]);
+		m_weightsLayersTranspose[i] = nullptr;
 	}
 }
 

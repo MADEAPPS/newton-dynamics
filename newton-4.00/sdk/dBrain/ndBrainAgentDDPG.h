@@ -24,38 +24,20 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainAgent.h"
+#include "ndBrainTrainer.h"
 
+/*
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDDPG : public ndBrainAgent
 {
 	public:
-	ndBrainAgentDDPG(const ndSharedPtr<ndBrain>& qValuePredictor)
-		:ndBrainAgent()
-		,m_onlineNetwork(qValuePredictor)
-		,m_instance(*m_onlineNetwork)
-	{
-		m_state.SetCount(statesDim);
-		m_actions.SetCount(actionDim);
-	}
+	ndBrainAgentDDPG(const ndSharedPtr<ndBrain>& qValuePredictor);
+	void GetAction(ndReal* const actionSpace) const;
+	void Save(const char* const name) const;
 
-	void GetAction(ndReal* const actionSpace) const
-	{
-		GetObservation(&m_state[0]);
-		m_instance.MakePrediction(m_state, m_actions);
+	static bool Load(const char* const name);
 
-		ndInt32 bestAction = 0;
-		ndReal maxReward = m_actions[0];
-		for (ndInt32 i = 1; i < actionDim; ++i)
-		{
-			if (m_actions[i] > maxReward)
-			{
-				bestAction = i;
-				maxReward = m_actions[i];
-			}
-		}
-		actionSpace[0] = ndReal(bestAction);
-	}
-
+	protected:
 	ndSharedPtr<ndBrain> m_onlineNetwork;
 	mutable ndBrainInstance m_instance;
 	mutable ndBrainVector m_state;
@@ -181,6 +163,19 @@ class ndBrainAgentDDPG_Trainner : public ndBrainAgentDDPG<statesDim, actionDim>
 	ndInt32 m_targetUpdatePeriod;
 	bool m_collectingSamples;
 };
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+bool ndBrainAgentDDPG<statesDim, actionDim>::Load(const char* const name)
+{
+	ndAssert(0);
+	return false;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG<statesDim, actionDim>::Save(const char* const name) const
+{
+	ndAssert(0);
+}
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDDPG_Trainner<statesDim, actionDim>::ndBrainAgentDDPG_Trainner(const ndSharedPtr<ndBrain>& qValuePredictor)
@@ -325,6 +320,6 @@ void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::OptimizeStep()
 
 	m_frameCount++;
 }
-
+*/
 #endif 
 

@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_AGENT_DQN_H__
-#define _ND_BRAIN_AGENT_DQN_H__
+#ifndef _ND_DQN_BRAIN_AGENT_DQN_H__
+#define _ND_DQN_BRAIN_AGENT_DQN_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainAgent.h"
@@ -31,53 +31,37 @@
 // https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-class ndBrainAgentDQN : public ndBrainAgent
+class ndBrainAgentDQN: public ndBrainAgent
 {
 	public:
-	ndBrainAgentDQN(const ndSharedPtr<ndBrain>& qValuePredictor)
-		:ndBrainAgent()
-		,m_onlineNetwork(qValuePredictor)
-		,m_instance(*m_onlineNetwork)
-	{
-		m_state.SetCount(statesDim);
-		m_actions.SetCount(actionDim);
-	}
+	ndBrainAgentDQN(const ndSharedPtr<ndBrain>& qValuePredictor);
 
-	void GetAction(ndReal* const actionSpace) const
-	{
-		GetObservation(&m_state[0]);
-		m_instance.MakePrediction(m_state, m_actions);
+	void Step();
 
-		ndInt32 bestAction = 0;
-		ndReal maxReward = m_actions[0];
-		for (ndInt32 i = 1; i < actionDim; ++i)
-		{
-			if (m_actions[i] > maxReward)
-			{
-				bestAction = i;
-				maxReward = m_actions[i];
-			}
-		}
-		actionSpace[0] = ndReal (bestAction);
-	}
+	protected:
+	void OptimizeStep();
+	virtual ndInt32 SelectBestAction();
 
 	ndSharedPtr<ndBrain> m_onlineNetwork;
-	mutable ndBrainInstance m_instance;
-	mutable ndBrainVector m_state;
-	mutable ndBrainVector m_actions;
+	ndBrainInstance m_instance;
+	ndBrainVector m_state;
+	ndBrainVector m_actions;
+
+	void SaveInternal(ndBrainLoadSave* const loadSave) const;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDQN_Trainner: public ndBrainAgentDQN<statesDim, actionDim>
 {
-	#define D_LEARN_RATE				ndReal(2.0e-4f)
-	#define D_DISCOUNT_FACTOR			ndReal (0.99f)
-	#define D_REPLAY_BUFFERSIZE			(1024 * 512)
-	#define D_REPLAY_BASH_SIZE			(32)
-	#define D_TARGET_UPDATE_PERIOD		(1000)
-	#define D_MIN_EXPLORE_PROBABILITY	ndReal(1.0f/1024.0f)
-	#define D_STAR_OPTIMIZATION			(D_REPLAY_BUFFERSIZE - 1000)
-	#define D_EXPLORE_ANNELININGING		(D_MIN_EXPLORE_PROBABILITY / ndReal(2.0f))
+	// hyper parameters defaults
+	#define D_DQN_LEARN_RATE				ndReal(2.0e-4f)
+	#define D_DQN_DISCOUNT_FACTOR			ndReal (0.99f)
+	#define D_DQN_REPLAY_BUFFERSIZE			(1024 * 512)
+	#define D_DQN_REPLAY_BASH_SIZE			(32)
+	#define D_DQN_TARGET_UPDATE_PERIOD		(1000)
+	#define D_DQN_MIN_EXPLORE_PROBABILITY	ndReal(1.0f/100.0f)
+	#define D_DQN_STAR_OPTIMIZATION			(D_DQN_REPLAY_BUFFERSIZE - 1000)
+	#define D_DQN_EXPLORE_ANNELININGING		(D_DQN_MIN_EXPLORE_PROBABILITY / ndReal(2.0f))
 
 	class ndOptimizer: public ndBrainTrainer
 	{
@@ -158,14 +142,17 @@ class ndBrainAgentDQN_Trainner: public ndBrainAgentDQN<statesDim, actionDim>
 	ndBrainAgentDQN_Trainner(const ndSharedPtr<ndBrain>& qValuePredictor);
 	virtual ~ndBrainAgentDQN_Trainner();
 
-	void GetAction(ndReal* const actionSpace) const;
+	ndInt32 GetFramesCount() const;
+	ndInt32 GetEposideCount() const;
 
 	protected:
-	virtual void OptimizeStep();
+	void OptimizeStep();
 	
+	private:
+	void PrintDebug();
 	void BackPropagate();
 	void SetBufferSize(ndInt32 size);
-	ndInt32 GetExploreExploitAction();
+	virtual ndInt32 SelectBestAction();
 
 	ndBrain m_targetNetwork;
 	ndOptimizer m_trainer;
@@ -184,8 +171,69 @@ class ndBrainAgentDQN_Trainner: public ndBrainAgentDQN<statesDim, actionDim>
 	ndInt32 m_bashBufferSize;
 	ndInt32 m_startOptimization;
 	ndInt32 m_targetUpdatePeriod;
+
+	ndInt32 m_framesAlive;
+	ndInt32 m_movingAverageCount;
+	ndInt32 m_movingAverage[32];
 	bool m_collectingSamples;
 };
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN(const ndSharedPtr<ndBrain>& qValuePredictor)
+	:ndBrainAgent()
+	,m_onlineNetwork(qValuePredictor)
+	,m_instance(*m_onlineNetwork)
+{
+	m_state.SetCount(statesDim);
+	m_actions.SetCount(actionDim);
+	m_state.Set(ndReal(0.0f));
+	m_actions.Set(ndReal(0.0f));
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndInt32 ndBrainAgentDQN<statesDim, actionDim>::SelectBestAction()
+{
+	ndInt32 bestAction = 0;
+	ndReal maxReward = m_actions[0];
+	for (ndInt32 i = 1; i < actionDim; ++i)
+	{
+		if (m_actions[i] > maxReward)
+		{
+			bestAction = i;
+			maxReward = m_actions[i];
+		}
+	}
+	return bestAction;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN<statesDim, actionDim>::Step()
+{
+	GetObservation(&m_state[0]);
+	m_instance.MakePrediction(m_state, m_actions);
+
+	ndReal bestAction = ndReal (SelectBestAction());
+	ApplyActions(&bestAction);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN<statesDim, actionDim>::OptimizeStep()
+{
+}
+
+//template<ndInt32 statesDim, ndInt32 actionDim>
+////bool ndBrainAgentDQN<statesDim, actionDim>::Load(const char* const name)
+//bool ndBrainAgentDQN<statesDim, actionDim>::Load(const char* const)
+//{
+//	ndAssert(0);
+//	return false;
+//}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN<statesDim, actionDim>::SaveInternal(ndBrainLoadSave* const loadSave) const
+{
+	loadSave->Save(*m_onlineNetwork);
+}
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDQN_Trainner<statesDim, actionDim>::ndBrainAgentDQN_Trainner(const ndSharedPtr<ndBrain>& qValuePredictor)
@@ -195,28 +243,47 @@ ndBrainAgentDQN_Trainner<statesDim, actionDim>::ndBrainAgentDQN_Trainner(const n
 	,m_targetInstance(&m_targetNetwork)
 	,m_shuffleBuffer()
 	,m_replayBuffer()
-	,m_gamma(D_DISCOUNT_FACTOR)
-	,m_learnRate(D_LEARN_RATE)
+	,m_gamma(D_DQN_DISCOUNT_FACTOR)
+	,m_learnRate(D_DQN_LEARN_RATE)
 	,m_explorationProbability(ndReal(1.0f))
-	,m_minExplorationProbability(D_MIN_EXPLORE_PROBABILITY)
-	,m_explorationProbabilityAnnelining(D_EXPLORE_ANNELININGING)
+	,m_minExplorationProbability(D_DQN_MIN_EXPLORE_PROBABILITY)
+	,m_explorationProbabilityAnnelining(D_DQN_EXPLORE_ANNELININGING)
 	,m_frameCount(0)
 	,m_eposideCount(0)
-	,m_bashBufferSize(D_REPLAY_BASH_SIZE)
-	,m_startOptimization(D_STAR_OPTIMIZATION)
-	,m_targetUpdatePeriod(D_TARGET_UPDATE_PERIOD)
+	,m_bashBufferSize(D_DQN_REPLAY_BASH_SIZE)
+	,m_startOptimization(D_DQN_STAR_OPTIMIZATION)
+	,m_targetUpdatePeriod(D_DQN_TARGET_UPDATE_PERIOD)
+	,m_framesAlive(0)
+	,m_movingAverageCount(0)
 	,m_collectingSamples(true)
 {
 	m_trainer.m_agent = this;
-	m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / D_STAR_OPTIMIZATION;
+	m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / D_DQN_STAR_OPTIMIZATION;
 
-	SetBufferSize(D_REPLAY_BUFFERSIZE);
+	SetBufferSize(D_DQN_REPLAY_BUFFERSIZE);
 	m_targetNetwork.CopyFrom(*(*m_onlineNetwork));
+
+	for (ndInt32 i = 0; i < sizeof(m_movingAverage) / sizeof(m_movingAverage[0]); ++i)
+	{
+		m_movingAverage[i] = 0;
+	}
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDQN_Trainner<statesDim, actionDim>::~ndBrainAgentDQN_Trainner()
 {
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndInt32 ndBrainAgentDQN_Trainner<statesDim, actionDim>::GetFramesCount() const
+{
+	return m_frameCount;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndInt32 ndBrainAgentDQN_Trainner<statesDim, actionDim>::GetEposideCount() const
+{
+	return m_eposideCount;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -227,32 +294,6 @@ void ndBrainAgentDQN_Trainner<statesDim, actionDim>::SetBufferSize(ndInt32 size)
 
 	m_shuffleBuffer.SetCount(0);
 	m_replayBuffer.SetCount(0);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN_Trainner<statesDim, actionDim>::GetAction(ndReal* const actionSpace) const
-{
-	actionSpace[0] = ndReal (m_currentTransition.m_action[0]);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDQN_Trainner<statesDim, actionDim>::GetExploreExploitAction()
-{
-	ndInt32 action = 0;
-	ndFloat32 explore = ndRand();
-	if (explore <= m_explorationProbability)
-	{
-		ndUnsigned32 randomIndex = ndRandInt();
-		action = ndInt32(randomIndex % actionDim);
-	}
-	else
-	{
-		ndReal maxAction;
-		ndBrainAgentDQN<statesDim, actionDim>::GetAction(&maxAction);
-		action = ndInt32(maxAction);
-	}
-
-	return action;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -278,10 +319,52 @@ void ndBrainAgentDQN_Trainner<statesDim, actionDim>::BackPropagate()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
+ndInt32 ndBrainAgentDQN_Trainner<statesDim, actionDim>::SelectBestAction()
+{
+	ndFloat32 explore = ndRand();
+	if (explore <= m_explorationProbability)
+	{
+		// explore environment
+		ndUnsigned32 randomIndex = ndRandInt();
+		ndInt32 action = ndInt32(randomIndex % actionDim);
+		m_currentTransition.m_action[0] = action;
+		return action;
+	}
+	else
+	{
+		// exploit environment
+		ndInt32 action = ndBrainAgentDQN<statesDim, actionDim>::SelectBestAction();
+		m_currentTransition.m_action[0] = action;
+		return action;
+	}
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN_Trainner<statesDim, actionDim>::PrintDebug()
+{
+	m_movingAverage[m_movingAverageCount] = m_framesAlive;
+	m_movingAverageCount = (m_movingAverageCount + 1) % ndInt32(sizeof(m_movingAverage) / sizeof(m_movingAverage[0]));
+
+	ndInt32 sum = 0;
+	m_framesAlive = 0;
+	for (ndInt32 i = 0; i < sizeof(m_movingAverage) / sizeof(m_movingAverage[0]); ++i)
+	{
+		sum += m_movingAverage[i];
+	}
+	sum = sum / ndInt32(sizeof(m_movingAverage) / sizeof(m_movingAverage[0]));
+	if (!m_collectingSamples)
+	{
+		ndExpandTraceMessage("%d moving average alive frames:%d\n", m_frameCount - 1, sum);
+	}
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainner<statesDim, actionDim>::OptimizeStep()
 {
 	if (!m_frameCount)
 	{
+		ndBrainAgentDQN_Trainner<statesDim, actionDim>::m_state.Set(ndReal (0.0f));
+		ndBrainAgentDQN_Trainner<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
 		ResetModel();
 		m_currentTransition.Clear();
 	}
@@ -289,19 +372,21 @@ void ndBrainAgentDQN_Trainner<statesDim, actionDim>::OptimizeStep()
 	GetObservation(&m_currentTransition.m_nextState[0]);
 	m_currentTransition.m_reward = GetReward();
 	m_currentTransition.m_terminalState = IsTerminal();
+	for (ndInt32 i = 0; i < statesDim; ++i)
+	{
+		m_currentTransition.m_state[i] = ndBrainAgentDQN_Trainner<statesDim, actionDim>::m_state[i];
+	}
 
 	m_replayBuffer.AddTransition(m_currentTransition);
-
 	if (m_frameCount < m_shuffleBuffer.GetCapacity())
 	{
 		m_shuffleBuffer.PushBack(m_frameCount);
 	}
 
-	m_currentTransition.m_state = m_currentTransition.m_nextState;
-	m_currentTransition.m_action[0] = GetExploreExploitAction();
-
 	if (m_currentTransition.m_terminalState)
 	{
+		ndBrainAgentDQN_Trainner<statesDim, actionDim>::m_state.Set(ndReal(0.0f));
+		ndBrainAgentDQN_Trainner<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
 		ResetModel();
 		m_currentTransition.Clear();
 		if ((m_frameCount < m_startOptimization) && (m_eposideCount % 32 == 0))
@@ -309,8 +394,10 @@ void ndBrainAgentDQN_Trainner<statesDim, actionDim>::OptimizeStep()
 			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_startOptimization, m_eposideCount);
 		}
 		m_eposideCount++;
+		ndBrainAgentDQN_Trainner<statesDim, actionDim>::PrintDebug();
 	}
 
+	// begin exploitation only after there are a replay buffer is full of random training samples
 	m_explorationProbability = ndMax(m_explorationProbability - m_explorationProbabilityAnnelining, m_minExplorationProbability);
 	if (m_frameCount > m_startOptimization)
 	{
@@ -327,8 +414,9 @@ void ndBrainAgentDQN_Trainner<statesDim, actionDim>::OptimizeStep()
 		// update on line network
 		m_targetNetwork.CopyFrom(*(*m_onlineNetwork));
 	}
-
+	
 	m_frameCount++;
+	m_framesAlive++;
 }
 
 #endif 

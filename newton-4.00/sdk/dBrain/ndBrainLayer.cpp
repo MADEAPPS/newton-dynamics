@@ -20,6 +20,7 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrain.h"
 #include "ndBrainLayer.h"
 
 ndBrainLayer::ndBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndBrainActivationType activation)
@@ -132,7 +133,7 @@ bool ndBrainLayer::Compare(const ndBrainLayer& src) const
 	}
 	
 	const ndBrainMatrix& me = (*this);
-	for (ndInt32 i = 0; i < me.GetCount(); i++)
+	for (ndInt32 i = 0; i < me.GetCount(); ++i)
 	{
 		const ndBrainVector& row0 = me[i];
 		const ndBrainVector& row1 = src[i];
@@ -178,50 +179,6 @@ void ndBrainLayer::Load(const nd::TiXmlElement* const layerNode)
 	xmlGetFloatArray(layerNode, "biasWeights", tmpRead);
 	ndAssert(tmpRead.GetCount() == m_bias.GetCount());
 	memcpy(&m_bias[0], &tmpRead[0], sizeof(ndReal) * tmpRead.GetCount());
-}
-
-void ndBrainLayer::Save(nd::TiXmlElement* const layerNode) const
-{
-	xmlSaveParam(layerNode, "type", "fullyConnected");
-	xmlSaveParam(layerNode, "inputs", GetColumns());
-	xmlSaveParam(layerNode, "outputs", GetRows());
-	
-	switch (m_activation)
-	{
-		case m_relu:
-			xmlSaveParam(layerNode, "activation", "relu");
-			break;
-
-		case m_lineal:
-			xmlSaveParam(layerNode, "activation", "lineal");
-			break;
-
-		case m_tanh:
-			xmlSaveParam(layerNode, "activation", "tanh");
-			break;
-	
-		case m_softmax:
-			xmlSaveParam(layerNode, "activation", "softmax");
-			break;
-	
-		case m_sigmoid:
-		default:
-			xmlSaveParam(layerNode, "activation", "sigmoid");
-			break;
-	}
-	
-	//xmlSaveParam(layerNode, "biasWeights", m_bias.GetCount(), &m_bias[0]);
-	xmlSaveParam(layerNode, "biasWeights", m_bias);
-	
-	nd::TiXmlElement* const input = new nd::TiXmlElement("inputWeights");
-	layerNode->LinkEndChild(input);
-	for (ndInt32 i = 0; i < GetCount(); i++)
-	{
-		char weight[256];
-		sprintf(weight, "weights%d", i);
-		//xmlSaveParam(input, weight, GetInputSize(), &(*this)[i][0]);
-		xmlSaveParam(input, weight, (*this)[i]);
-	}
 }
 #endif
 
@@ -440,4 +397,64 @@ void ndBrainLayer::MakePrediction(ndThreadPool& threadPool, const ndBrainVector&
 		}
 	});
 	threadPool.ParallelExecute(MakePrediction);
+}
+
+void ndBrainLayer::Save(const ndBrainLoadSave* const loadSave) const
+{
+	char buffer[1024];
+	auto Save = [this, &buffer, &loadSave](const char* const fmt, ...)
+	{
+		va_list v_args;
+		buffer[0] = 0;
+		va_start(v_args, fmt);
+		vsprintf(buffer, fmt, v_args);
+		va_end(v_args);
+		loadSave->SaveData(buffer);
+	};
+	
+	Save("\tlayerType fullyConnected\n");
+	Save("\tinputs %d\n", GetColumns());
+	Save("\toutputs %d\n", GetRows());
+	switch (m_activation)
+	{
+		case m_relu:
+			Save("\tactivation relu\n");
+			break;
+	
+		case m_lineal:
+			Save("\tactivation lineal\n");
+			break;
+	
+		case m_tanh:
+			Save("\tactivation tanh\n");
+			break;
+	
+		case m_softmax:
+			Save("\tactivation softmax\n");
+			break;
+	
+		case m_sigmoid:
+		default:
+			Save("\tactivation sigmoid\n");
+			break;
+	}
+
+	Save("\tbiasWeights: ", m_bias.GetCount());
+	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
+	{
+		Save("%g ", m_bias[i]);
+	}
+	Save("\n");
+
+	Save("\tinputWeights\n");
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		Save("\t\tweights_%d: ", i);
+		const ndBrainVector& row = (*this)[i];
+		for (ndInt32 j = 0; j < GetInputSize(); ++j)
+		{
+			Save("%g ", row[j]);
+		}
+		Save("\n");
+	}
 }

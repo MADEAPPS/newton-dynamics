@@ -23,24 +23,30 @@
 #define _ND_BRAIN_AGENT_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrain.h"
 #include "ndBrainMatrix.h"
 #include "ndBrainInstance.h"
 #include "ndBrainReplayBuffer.h"
 
+//class ndBrainLoadSave;
 class ndBrainAgent: public ndClassAlloc
 {
 	public: 
 	ndBrainAgent();
 	virtual ~ndBrainAgent();
 
+	virtual void Step() = 0;
 	virtual void OptimizeStep() = 0;
-	virtual void GetAction(ndReal* const actionSpace) const = 0;
+
+	void Save(const char* const filename) const;
 
 	protected:
 	virtual void ResetModel() const = 0;
 	virtual bool IsTerminal() const = 0;
 	virtual ndReal GetReward() const = 0;
+	virtual void ApplyActions(ndReal* const actions) const = 0;
 	virtual void GetObservation(ndReal* const state) const = 0;
+	virtual void SaveInternal(ndBrainLoadSave* const loadSave) const = 0;
 };
 
 inline ndBrainAgent::ndBrainAgent()
@@ -52,5 +58,36 @@ inline ndBrainAgent::~ndBrainAgent()
 {
 }
 
+inline void ndBrainAgent::Save(const char* const pathFilename) const
+{
+	class SaveAgent : public ndBrainLoadSave
+	{
+		public:
+		SaveAgent(const char* const pathFilename)
+			:ndBrainLoadSave()
+		{
+			m_file = fopen(pathFilename, "wb");
+			ndAssert(m_file);
+		}
+
+		~SaveAgent()
+		{
+			if (m_file)
+			{
+				fclose(m_file);
+			}
+		}
+
+		void SaveData(const char* data) const
+		{
+			fprintf(m_file, data);
+		}
+
+		FILE* m_file;
+	};
+
+	SaveAgent saveAgent(pathFilename);
+	SaveInternal(&saveAgent);
+}
 #endif 
 

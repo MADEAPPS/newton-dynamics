@@ -51,7 +51,7 @@ ndBrain::~ndBrain()
 {
 	if (m_memory)
 	{
-		for (ndInt32 i = 0; i < GetCount(); i++)
+		for (ndInt32 i = 0; i < GetCount(); ++i)
 		{
 			ndBrainLayer& layer = *(*this)[i];
 			layer.SetFloatPointers(nullptr);
@@ -102,7 +102,7 @@ void ndBrain::EndAddLayer(ndReal randomVariance)
 {
 	ndInt32 floatsCount = 0;
 	ndInt32 vectorSizeInBytes = 0;
-	for (ndInt32 i = 0; i < GetCount(); i++)
+	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
 		ndBrainLayer& layer = *(*this)[i];
 		ndInt32 columnSize = (layer.GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
@@ -118,7 +118,7 @@ void ndBrain::EndAddLayer(ndReal randomVariance)
 
 	// assign vector pointers
 	ndUnsigned8* mem = (ndUnsigned8*)m_memory;
-	for (ndInt32 i = 0; i < GetCount(); i++)
+	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
 		ndBrainLayer& layer = *(*this)[i];
 		mem = layer.SetPointers(mem);
@@ -128,7 +128,7 @@ void ndBrain::EndAddLayer(ndReal randomVariance)
 	metToVal.m_ptr = mem;
 	//ndReal* floatMemory = (ndReal*) ((ndUnsigned64 (mem) + 31) & -32);
 	ndReal* floatMemory = (ndReal*)((ndUnsigned64(metToVal.m_int) + 31) & -32);
-	for (ndInt32 i = 0; i < GetCount(); i++)
+	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
 		ndBrainLayer& layer = *(*this)[i];
 		floatMemory = layer.SetFloatPointers(floatMemory);
@@ -186,7 +186,7 @@ void ndBrain::Save(const char* const pathName) const
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndBrain");
 	asciifile.LinkEndChild(rootNode);
 
-	for (ndInt32 i = 0; i < GetCount(); i++)
+	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
 		ndBrainLayer* const layer = (*this)[i];
 		nd::TiXmlElement* const layerNode = new nd::TiXmlElement("ndLayer");
@@ -257,3 +257,40 @@ bool ndBrain::Load(const char* const pathName)
 	return true;
 }
 #endif
+
+ndBrainLoadSave::ndBrainLoadSave()
+	:ndClassAlloc() 
+{
+}
+
+ndBrainLoadSave::~ndBrainLoadSave() 
+{
+}
+
+
+//ndBrain* Load();
+void ndBrainLoadSave::Save(const ndBrain* const brain)
+{
+	char buffer[1024];
+	auto Save = [this, &buffer](const char* const fmt, ...)
+	{
+		va_list v_args;
+		buffer[0] = 0;
+		va_start(v_args, fmt);
+		vsprintf(buffer, fmt, v_args);
+		va_end(v_args);
+		SaveData(buffer);
+	};
+
+	Save("ndBrain version 1.0\n\n");
+	Save("layersCount %d\n\n", brain->GetCount());
+	
+	for (ndInt32 i = 0; i < brain->GetCount(); ++i)
+	{
+		ndBrainLayer* const layer = (*brain)[i];
+		Save("layer\n");
+		Save("{\n");
+		layer->Save(this);
+		Save("}\n\n");
+	}
+}

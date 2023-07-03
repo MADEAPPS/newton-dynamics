@@ -240,6 +240,11 @@ void ndIkSolver::BuildJacobianMatrix (ndConstraint* const joint)
 	const ndVector invMass1(body1->m_invMass[3]);
 	const ndFloat32 diagDampScale = joint->GetAsContact() ? ndFloat32(0.1f) : ndFloat32(1.0f);
 
+	const ndVector force0(body0->GetForce());
+	const ndVector torque0(body0->GetTorque());
+	const ndVector force1(body1->GetForce());
+	const ndVector torque1(body1->GetTorque());
+
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndLeftHandSide* const row = &m_leftHandSide[index + i];
@@ -249,19 +254,26 @@ void ndIkSolver::BuildJacobianMatrix (ndConstraint* const joint)
 		row->m_JMinv.m_jacobianM0.m_angular = invInertia0.RotateVector(row->m_Jt.m_jacobianM0.m_angular);
 		row->m_JMinv.m_jacobianM1.m_linear = row->m_Jt.m_jacobianM1.m_linear * invMass1;
 		row->m_JMinv.m_jacobianM1.m_angular = invInertia1.RotateVector(row->m_Jt.m_jacobianM1.m_angular);
-		const ndJacobian& JMinvM0 = row->m_JMinv.m_jacobianM0;
-		const ndJacobian& JMinvM1 = row->m_JMinv.m_jacobianM1;
-		rhs->m_force = ndFloat32(0.0f);
-		
+
 		const ndJacobian& JtM0 = row->m_Jt.m_jacobianM0;
 		const ndJacobian& JtM1 = row->m_Jt.m_jacobianM1;
+		const ndJacobian& JMinvM0 = row->m_JMinv.m_jacobianM0;
+		const ndJacobian& JMinvM1 = row->m_JMinv.m_jacobianM1;
+
+		rhs->m_force = ndFloat32(0.0f);
 		const ndVector tmpDiag(
 			JMinvM0.m_linear * JtM0.m_linear + JMinvM0.m_angular * JtM0.m_angular +
 			JMinvM1.m_linear * JtM1.m_linear + JMinvM1.m_angular * JtM1.m_angular);
 		
-		//ndFloat32 diag = tmpDiag.AddHorizontal().GetScalar() * diagDampScale;
 		ndAssert(tmpDiag.AddHorizontal().GetScalar() * diagDampScale > ndFloat32(0.0f));
 		rhs->m_diagDamp = tmpDiag.AddHorizontal().GetScalar() * diagDampScale * rhs->m_diagonalRegularizer;
+
+		const ndVector tmpAccel(
+			JMinvM0.m_linear * force0 + JMinvM0.m_angular * torque0 +
+			JMinvM1.m_linear * force1 + JMinvM1.m_angular * torque1);
+
+		const ndFloat32 extenalAcceleration = -tmpAccel.AddHorizontal().GetScalar();
+		rhs->m_coordenateAccel += extenalAcceleration;
 	}
 }
 
@@ -342,10 +354,14 @@ void ndIkSolver::BuildMassMatrix()
 			if (contact->IsActive())
 			{
 				bool duplicate = false;
-				const ndInt32 loops = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
-				for (ndInt32 j = 0; j < loops; ++j)
+				//const ndInt32 loops = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
+				//for (ndInt32 j = 0; j < loops; ++j)
+				//{
+				//	duplicate = duplicate || (m_skeleton->m_loopingJoints[j] == contact);
+				//}
+				for (ndInt32 j = contacts.GetCount() - 1; j >= 0; --j)
 				{
-					duplicate = duplicate || (m_skeleton->m_loopingJoints[j] == contact);
+					duplicate = duplicate || (contacts[j] == contact);
 				}
 				if (!duplicate)
 				{
@@ -478,8 +494,6 @@ void ndIkSolver::Solve()
 			body->m_accel += m_internalForces[i].m_linear;
 			body->m_alpha += m_internalForces[i].m_angular;
 
-			//ndVector accel(invMass * (body->m_accel + m_internalForces[i].m_linear));
-			//ndVector alpha(invInertia.RotateVector(body->m_alpha + m_internalForces[i].m_angular));
 			ndVector accel(invMass * body->m_accel);
 			ndVector alpha(invInertia.RotateVector(body->m_alpha));
 			
@@ -510,13 +524,5 @@ void ndIkSolver::Solve()
 			joint->SetIkSetAccel(accelerations[index0], accelerations[index1]);
 			joint->SetIkMode(false);
 		}
-
-		//for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
-		//{
-		//	ndBodyKinematic* const body = m_bodies[i];
-		//	const ndInt32 index = body->m_index;
-		//	body->m_accel += m_internalForces[index].m_linear;
-		//	body->m_alpha += m_internalForces[index].m_angular;
-		//}
 	}
 }

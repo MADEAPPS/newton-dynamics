@@ -67,7 +67,7 @@ ndReal ndBrainTrainerBase::Validate(const ndBrainMatrix& inputBatch, const ndBra
 }
 
 //ndReal ndBrainTrainerBase::ndValidation::Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth)
-ndReal ndBrainTrainerBase::ndValidation::Validate(const ndBrainMatrix& inputBatch)
+ndReal ndBrainTrainerBase::ndValidation::Validate(const ndBrainMatrix&)
 {
 	ndAssert(0);
 	return 0;

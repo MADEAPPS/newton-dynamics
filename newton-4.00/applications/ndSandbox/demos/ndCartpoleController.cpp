@@ -51,18 +51,17 @@ namespace ndController_0
 			ndDQNAgent(ndCartpole* const model, ndSharedPtr<ndBrain>& qValuePredictor)
 				:ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>(qValuePredictor)
 				,m_model(model)
-				,m_framesAlive(0)
-				,m_movingAverageCount(0)
 			{
-				for (ndInt32 i = 0; i < sizeof(m_movingAverage) / sizeof(m_movingAverage[0]); ++i)
-				{
-					m_movingAverage[i] = 0;
-				}
 			}
 
 			ndReal GetReward() const
 			{
 				return m_model->GetReward();
+			}
+
+			virtual void ApplyActions(ndReal* const actions) const
+			{
+				m_model->ApplyActions(actions);
 			}
 
 			void GetObservation(ndReal* const state) const
@@ -82,40 +81,17 @@ namespace ndController_0
 
 			void OptimizeStep()
 			{
-				ndInt32 lastEpisode = m_eposideCount;
 				ndBrainAgentDQN_Trainner::OptimizeStep();
-
-				if (lastEpisode != m_eposideCount)
+			
+				ndInt32 stopTraining = GetFramesCount();
+				if (stopTraining > 1000000)
 				{
-					m_movingAverage[m_movingAverageCount] = m_framesAlive;
-					m_movingAverageCount = (m_movingAverageCount + 1) % ndInt32(sizeof(m_movingAverage) / sizeof(m_movingAverage[0]));
-
-					ndInt32 sum = 0;
-					m_framesAlive = 0;
-					for (ndInt32 i = 0; i < sizeof(m_movingAverage) / sizeof(m_movingAverage[0]); ++i)
-					{
-						sum += m_movingAverage[i];
-					}
-					sum = sum / ndInt32(sizeof(m_movingAverage) / sizeof(m_movingAverage[0]));
-					if (!m_collectingSamples)
-					{
-						ndExpandTraceMessage("%d moving average alive frames:%d\n", m_frameCount - 1, sum);
-					}
+					Save("xxx.nn");
+					//ndExpandTraceMessage("%d: episode:%d framesAlive:%d\n", m_frameCount - 1, m_eposideCount, m_framesAlive);
 				}
-
-				static ndInt32 xxxxx = 0;
-				if (!m_collectingSamples && (m_framesAlive > xxxxx))
-				{
-					xxxxx = m_framesAlive;
-					ndExpandTraceMessage("%d: episode:%d framesAlive:%d\n", m_frameCount - 1, m_eposideCount, m_framesAlive);
-				}
-				m_framesAlive++;
 			}
 
 			ndCartpole* m_model;
-			ndInt32 m_framesAlive;
-			ndInt32 m_movingAverageCount;
-			ndInt32 m_movingAverage[32];
 		};
 
 		ndCartpole()
@@ -145,18 +121,45 @@ namespace ndController_0
 			return ndReal(reward);
 		}
 
-		void GetObservation(ndReal* const state) const
+		void ApplyActions(ndReal* const actions) const
 		{
-			ndVector alpha (m_pole->GetAlpha());
-			ndVector omega (m_pole->GetOmega());
+			ndVector force(m_cart->GetForce());
+			ndInt32 action = ndInt32(actions[0]);
+			if (action == m_pushLeft)
+			{
+				force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
+			}
+			else if (action == m_pushRight)
+			{
+				force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
+			}
+			m_cart->SetForce(force);
+		}
 
-			ndVector accel(m_cart->GetAccel());
+		void GetObservation(ndReal* const state)
+		{
+			ndSkeletonContainer* const skeleton = m_cart->GetSkeleton();
+			ndAssert(skeleton);
+
+			ndWorld* const world = m_cart->GetScene()->GetWorld();
+			ndFloat32 timestep = m_cart->GetScene()->GetTimestep();
+			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+			m_invDynamicsSolver.Solve();
+			
+			const ndVector poleTorque(m_invDynamicsSolver.GetBodyTorque(m_pole));
+			ndVector omega(m_pole->GetOmega());
+			ndVector alpha(m_pole->GetInvInertiaMatrix().RotateVector(poleTorque));
+
+			const ndVector cartForce(m_invDynamicsSolver.GetBodyForce(m_cart));
 			ndVector veloc(m_cart->GetVelocity());
-
+			ndVector accel(cartForce.Scale(m_cart->GetInvMass()));
+			
 			state[m_poleAlpha] = ndReal(alpha.m_z);
 			state[m_poleOmega] = ndReal(omega.m_z);
 			state[m_cartVelocity] = ndReal(veloc.m_x);
 			state[m_cartAcceleration] = ndReal(accel.m_x);
+
+			m_invDynamicsSolver.SolverEnd();
 		}
 
 		virtual void ResetModel() const
@@ -174,39 +177,14 @@ namespace ndController_0
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
-
-			ndDQNAgent* const agent = (ndDQNAgent*)*m_agent;
-			ndVector force(m_cart->GetForce());
-
-			ndReal maxAction;
-			agent->GetAction(&maxAction);
-			ndInt32 action = ndInt32 (maxAction);
-			if (action == m_pushLeft)
-			{
-				force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
-			}
-			else if (action == m_pushRight)
-			{
-				force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
-			}
-			m_cart->SetForce(force);
-
-			// add random impulse
-			ndUnsigned32 perturbeProbability = 1024;
-			ndUnsigned32 randFreq = ndRandInt() % perturbeProbability;
-			if (randFreq > ndUnsigned32 (ndFloat32 (perturbeProbability) * ndFloat32(0.96f)))
-			{
-				ndVector impulse(ndVector::m_zero);
-				impulse.m_x = m_cart->GetMassMatrix().m_w * ndGaussianRandom(0.0f, 0.05f);
-				m_cart->ApplyImpulsePair(impulse, ndVector::m_zero, timestep);
-			}
+			m_agent->Step();
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
 			m_agent->OptimizeStep();
-
+		
 			if (ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(40.0f))
 			{
 				ResetModel();
@@ -220,7 +198,7 @@ namespace ndController_0
 		ndSharedPtr<ndBrainAgent> m_agent;
 	};
 
-	void BuildModel(ndCartpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
+	void BuildModel(ndCartpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location, ndBodyKinematic* const floorBody)
 	{
 		ndFloat32 xSize = 0.25f;
 		ndFloat32 ySize = 0.125f;
@@ -233,6 +211,7 @@ namespace ndController_0
 		
 		// make cart
 		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.tga")));
+		//ndSharedPtr<ndBody> cartBody(world->GetBody(AddSphere(scene, location, cartMass, ySize, "smilli.tga")));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
 		cartBody->GetAsBodyDynamic()->SetSleepAccel(cartBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
 
@@ -245,15 +224,17 @@ namespace ndController_0
 		poleLocation.m_posit.m_y += poleLength * 0.5f;
 		poleBody->SetMatrix(poleLocation);
 		poleBody->GetAsBodyDynamic()->SetSleepAccel(poleBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
-
+		
 		// link cart and body with a hinge
 		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
 		polePivot.m_posit.m_y -= poleLength * 0.5f;
 		ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
+		//ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointFix6dof(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
 
 		// make the car move alone the z axis only (2d problem)
-		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointSlider(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
-		world->AddJoint(fixJoint);
+		ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), floorBody));
+		//ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointFix6dof(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), floorBody));
+		world->AddJoint(xDirSlider);
 
 		// add path to the model
 		world->AddJoint(poleJoint);
@@ -283,10 +264,10 @@ namespace ndController_0
 		model->m_agent = ndSharedPtr<ndBrainAgent>(new ndCartpole::ndDQNAgent(model, qValuePredictor));
 	}
 
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, ndBodyKinematic* const floorBody)
 	{
 		ndCartpole* const model = new ndCartpole();
-		BuildModel(model, scene, location);
+		BuildModel(model, scene, location, floorBody);
 		return model;
 	}
 }
@@ -296,14 +277,14 @@ void ndCartpoleController(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
-	BuildFlatPlane(scene, true);
+	ndBodyKinematic* const floorBody = BuildFlatPlane(scene, true);
 
 	ndSetRandSeed(42);
 	scene->SetAcceleratedUpdate();
 
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	ndSharedPtr<ndModel> model(CreateModel(scene, matrix, floorBody));
 	world->AddModel(model);
 	
 	matrix.m_posit.m_x -= 0.0f;

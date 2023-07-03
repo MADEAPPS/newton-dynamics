@@ -1578,14 +1578,22 @@ void ndSkeletonContainer::SolveAuxiliaryImmediate(ndArray<ndBodyKinematic*>& bod
 		const ndInt32 m0 = m_pairs[primaryCount + i].m_m0;
 		const ndInt32 m1 = m_pairs[primaryCount + i].m_m1;
 
-		const ndJacobian& y0 = internalForces[m0];
-		const ndJacobian& y1 = internalForces[m1];
+		//const ndJacobian& y0 = internalForces[m0];
+		//const ndJacobian& y1 = internalForces[m1];
+		const ndBodyKinematic* const body0 = bodyArray[m0];
+		const ndBodyKinematic* const body1 = bodyArray[m1];
 
+		const ndVector& force0 = body0->m_accel;
+		const ndVector& torque0 = body0->m_alpha;
+		const ndVector& force1 = body1->m_accel;
+		const ndVector& torque1 = body1->m_alpha;
 		f[primaryCount + i] = ndFloat32(0.0f);
 
 		ndVector acc(
-			row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
-			row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
+			//row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
+			//row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
+			row->m_JMinv.m_jacobianM0.m_linear * force0 + row->m_JMinv.m_jacobianM0.m_angular * torque0 +
+			row->m_JMinv.m_jacobianM1.m_linear * force1 + row->m_JMinv.m_jacobianM1.m_angular * torque1);
 		b[i] = rhs->m_coordenateAccel - acc.AddHorizontal().GetScalar();
 
 		u0[i] = rhs->m_force;
