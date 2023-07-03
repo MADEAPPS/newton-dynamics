@@ -204,7 +204,7 @@ namespace ndController_0
 		ndFloat32 ySize = 0.125f;
 		ndFloat32 zSize = 0.15f;
 		ndFloat32 cartMass = 5.0f;
-		ndFloat32 poleMass = 5.0f;
+		ndFloat32 poleMass = 10.0f;
 		ndFloat32 poleLength = 0.4f;
 		ndFloat32 poleRadio = 0.05f;
 		ndPhysicsWorld* const world = scene->GetWorld();
@@ -248,9 +248,9 @@ namespace ndController_0
 
 		// build neutral net controller
 		ndSharedPtr<ndBrain> qValuePredictor(new ndBrain());
-		ndBrainLayer* const inputLayer = new ndBrainLayer(m_stateSize, 128, m_relu);
-		ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), 128, m_relu);
-		ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), 128, m_relu);
+		ndBrainLayer* const inputLayer = new ndBrainLayer(m_stateSize, 128, m_tanh);
+		ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), 128, m_tanh);
+		ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), 128, m_tanh);
 		ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer1->GetOuputSize(), m_actionsSize, m_lineal);
 
 		qValuePredictor->BeginAddLayer();

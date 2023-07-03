@@ -263,6 +263,26 @@ void ndBrainLayer::SigmoidDerivative(const ndBrainVector& input, ndBrainVector& 
 	}
 }
 
+void ndBrainLayer::SoftmaxDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
+{
+	ndAssert(input.GetCount() == derivativeOutput.GetCount());
+	
+	// this is not correct, for now use SigmoidDerivative, 
+	// Categorical Cross-Entropy Loss
+	SigmoidDerivative(input, derivativeOutput);
+
+	//for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	//{
+	//	ndReal val = input[i];
+	//	ndReal acc = input[i];
+	//	for (ndInt32 j = input.GetCount() - 1; j >= 0; --j)
+	//	{
+	//		acc -= val * input[j];
+	//	}
+	//	derivativeOutput[i] = acc;
+	//}
+}
+
 void ndBrainLayer::LinealActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
@@ -361,8 +381,7 @@ void ndBrainLayer::ActivationDerivative(const ndBrainVector& input, ndBrainVecto
 
 		case m_softmax:
 		{
-			ndAssert(0);
-			//SoftmaxDerivative(output);
+			SoftmaxDerivative(input, derivativeOutput);
 			break;
 		}
 
