@@ -20,9 +20,11 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+#define D_USE_POLE
+
 namespace ndController_0
 {
-	#define D_PUSH_ACCEL			ndFloat32 (1.0f)
+	#define D_PUSH_ACCEL			ndFloat32 (15.0f)
 	#define D_REWARD_MIN_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
 
 	enum ndActionSpace
@@ -33,6 +35,14 @@ namespace ndController_0
 		m_actionsSize
 	};
 
+#ifdef D_USE_POLE
+	enum ndStateSpace
+	{
+		m_poleAngle,
+		m_poleOmega,
+		m_stateSize
+	};
+#else
 	enum ndStateSpace
 	{
 		m_poleOmega,
@@ -41,6 +51,7 @@ namespace ndController_0
 		m_cartAcceleration,
 		m_stateSize
 	};
+#endif
 
 	class ndCartpole: public ndModelArticulation
 	{
@@ -101,6 +112,7 @@ namespace ndController_0
 			,m_cart(nullptr)
 			,m_pole(nullptr)
 			,m_agent(nullptr)
+			,m_state(0)
 		{
 		}
 
@@ -138,28 +150,37 @@ namespace ndController_0
 
 		void GetObservation(ndReal* const state)
 		{
-			ndSkeletonContainer* const skeleton = m_cart->GetSkeleton();
-			ndAssert(skeleton);
+			#ifdef D_USE_POLE
+				ndVector omega(m_pole->GetOmega());
+				const ndMatrix& matrix = m_pole->GetMatrix();
+				ndFloat32 angle = ndClamp (matrix.m_front.m_x, -2.0f * D_REWARD_MIN_ANGLE, 2.0f * D_REWARD_MIN_ANGLE);
+				state[m_poleAngle] = ndReal(angle);
+				state[m_poleOmega] = ndReal(omega.m_z);
+				
+			#else	
+				ndSkeletonContainer* const skeleton = m_cart->GetSkeleton();
+				ndAssert(skeleton);
 
-			ndWorld* const world = m_cart->GetScene()->GetWorld();
-			ndFloat32 timestep = m_cart->GetScene()->GetTimestep();
-			m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
-			m_invDynamicsSolver.Solve();
+				ndWorld* const world = m_cart->GetScene()->GetWorld();
+				ndFloat32 timestep = m_cart->GetScene()->GetTimestep();
+				m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+				m_invDynamicsSolver.Solve();
 			
-			const ndVector poleTorque(m_invDynamicsSolver.GetBodyTorque(m_pole));
-			ndVector omega(m_pole->GetOmega());
-			ndVector alpha(m_pole->GetInvInertiaMatrix().RotateVector(poleTorque));
+				const ndVector poleTorque(m_invDynamicsSolver.GetBodyTorque(m_pole));
+				ndVector omega(m_pole->GetOmega());
+				ndVector alpha(m_pole->GetInvInertiaMatrix().RotateVector(poleTorque));
 
-			const ndVector cartForce(m_invDynamicsSolver.GetBodyForce(m_cart));
-			ndVector veloc(m_cart->GetVelocity());
-			ndVector accel(cartForce.Scale(m_cart->GetInvMass()));
+				const ndVector cartForce(m_invDynamicsSolver.GetBodyForce(m_cart));
+				ndVector veloc(m_cart->GetVelocity());
+				ndVector accel(cartForce.Scale(m_cart->GetInvMass()));
 			
-			state[m_poleAlpha] = ndReal(alpha.m_z);
-			state[m_poleOmega] = ndReal(omega.m_z);
-			state[m_cartVelocity] = ndReal(veloc.m_x);
-			state[m_cartAcceleration] = ndReal(accel.m_x);
+				state[m_poleAlpha] = ndReal(alpha.m_z);
+				state[m_poleOmega] = ndReal(omega.m_z);
+				state[m_cartVelocity] = ndReal(veloc.m_x);
+				state[m_cartAcceleration] = ndReal(accel.m_x);
 
-			m_invDynamicsSolver.SolverEnd();
+				m_invDynamicsSolver.SolverEnd();
+			#endif
 		}
 
 		virtual void ResetModel() const
@@ -172,23 +193,44 @@ namespace ndController_0
 
 			m_cart->SetMatrix(m_cartMatrix);
 			m_pole->SetMatrix(m_poleMatrix);
+
+			m_state = 0;
+		}
+
+		void RandomePush(ndFloat32 timestep)
+		{
+			ndVector impulsePush(ndVector::m_zero);
+			impulsePush.m_x = ndGaussianRandom(0.0f, 0.5f) * m_cart->GetMassMatrix().m_w;
+			m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, timestep);
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
-			m_agent->Step();
+			if (m_state < 3)
+			{
+				RandomePush(timestep);
+			}
+			else
+			{
+				m_agent->Step();
+			}
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
-			m_agent->OptimizeStep();
+			if (m_state >= 3)
+			{
+				m_agent->OptimizeStep();
+			}
 		
 			if (ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(40.0f))
 			{
 				ResetModel();
 			}
+
+			m_state++;
 		}
 
 		ndMatrix m_cartMatrix;
@@ -196,6 +238,7 @@ namespace ndController_0
 		ndBodyDynamic* m_cart;
 		ndBodyDynamic* m_pole;
 		ndSharedPtr<ndBrainAgent> m_agent;
+		mutable ndInt32 m_state;
 	};
 
 	void BuildModel(ndCartpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location, ndBodyKinematic* const floorBody)
@@ -211,7 +254,6 @@ namespace ndController_0
 		
 		// make cart
 		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.tga")));
-		//ndSharedPtr<ndBody> cartBody(world->GetBody(AddSphere(scene, location, cartMass, ySize, "smilli.tga")));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
 		cartBody->GetAsBodyDynamic()->SetSleepAccel(cartBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
 
@@ -229,11 +271,9 @@ namespace ndController_0
 		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
 		polePivot.m_posit.m_y -= poleLength * 0.5f;
 		ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
-		//ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointFix6dof(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
 
 		// make the car move alone the z axis only (2d problem)
 		ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), floorBody));
-		//ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointFix6dof(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), floorBody));
 		world->AddJoint(xDirSlider);
 
 		// add path to the model
@@ -247,16 +287,17 @@ namespace ndController_0
 		model->m_poleMatrix = poleBody->GetMatrix();
 
 		// build neutral net controller
+		ndInt32 layerSize = 64;
 		ndSharedPtr<ndBrain> qValuePredictor(new ndBrain());
-		ndBrainLayer* const inputLayer = new ndBrainLayer(m_stateSize, 128, m_tanh);
-		ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), 128, m_tanh);
-		ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), 128, m_tanh);
-		ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer1->GetOuputSize(), m_actionsSize, m_lineal);
+		ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
+		ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
+		ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
+		ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_lineal);
 
 		qValuePredictor->BeginAddLayer();
-		qValuePredictor->AddLayer(inputLayer);
-		qValuePredictor->AddLayer(hiddenLayer0);
-		qValuePredictor->AddLayer(hiddenLayer1);
+		qValuePredictor->AddLayer(layer0);
+		qValuePredictor->AddLayer(layer1);
+		qValuePredictor->AddLayer(layer2);
 		qValuePredictor->AddLayer(ouputLayer);
 		qValuePredictor->EndAddLayer(ndReal(0.25f));
 
