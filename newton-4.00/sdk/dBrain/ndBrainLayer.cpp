@@ -362,7 +362,7 @@ void ndBrainLayer::ActivationDerivative(const ndBrainVector& input, ndBrainVecto
 		case m_softmax:
 		{
 			ndAssert(0);
-			//SoftmaxActivation(output);
+			//SoftmaxDerivative(output);
 			break;
 		}
 
