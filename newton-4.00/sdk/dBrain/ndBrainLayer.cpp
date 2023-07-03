@@ -433,9 +433,6 @@ void ndBrainLayer::Save(const ndBrainLoadSave* const loadSave) const
 		loadSave->SaveData(buffer);
 	};
 	
-	Save("\tlayerType fullyConnected\n");
-	Save("\tinputs %d\n", GetColumns());
-	Save("\toutputs %d\n", GetRows());
 	switch (m_activation)
 	{
 		case m_relu:
@@ -459,6 +456,10 @@ void ndBrainLayer::Save(const ndBrainLoadSave* const loadSave) const
 			Save("\tactivation sigmoid\n");
 			break;
 	}
+
+	Save("\tlayerType fullyConnected\n");
+	Save("\tinputs %d\n", GetColumns());
+	Save("\toutputs %d\n", GetRows());
 
 	Save("\tbiasWeights: ", m_bias.GetCount());
 	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
