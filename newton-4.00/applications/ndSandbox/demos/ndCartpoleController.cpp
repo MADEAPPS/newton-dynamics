@@ -56,6 +56,28 @@ namespace ndController_0
 	class ndCartpole: public ndModelArticulation
 	{
 		public:
+		class ndDQNAgent : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
+		{
+			public:
+			ndDQNAgent(ndSharedPtr<ndBrain>& qValuePredictor)
+				:ndBrainAgentDQN<m_stateSize, m_actionsSize>(qValuePredictor)
+				,m_model(nullptr)
+			{
+			}
+
+			void GetObservation(ndReal* const state) const
+			{
+				m_model->GetObservation(state);
+			}
+
+			virtual void ApplyActions(ndReal* const actions) const
+			{
+				m_model->ApplyActions(actions);
+			}
+
+			ndCartpole* m_model;
+		};
+
 		class ndDQNAgent_trainer : public ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>
 		{
 			public:
@@ -92,13 +114,22 @@ namespace ndController_0
 
 			void OptimizeStep()
 			{
-				ndBrainAgentDQN_Trainner::OptimizeStep();
-			
 				ndInt32 stopTraining = GetFramesCount();
-				if (stopTraining > 1000000)
+				if (stopTraining <= 1000000)
 				{
-					Save("xxx.nn");
-					//ndExpandTraceMessage("%d: episode:%d framesAlive:%d\n", m_frameCount - 1, m_eposideCount, m_framesAlive);
+					ndBrainAgentDQN_Trainner::OptimizeStep();
+				}
+			
+				if (stopTraining == 1000000)
+				{
+					char fileName[1024];
+					dGetWorkingFileName("cartpoleDQN.nn", fileName);
+
+					SaveToFile(fileName);
+					ndExpandTraceMessage("\n");
+					ndExpandTraceMessage("training complete\n");
+					ndExpandTraceMessage("save to file: %s\n", fileName);
+					m_model->ResetModel();
 				}
 			}
 
@@ -114,8 +145,6 @@ namespace ndController_0
 			,m_agent(agent)
 			,m_state(0)
 		{
-			ndDQNAgent_trainer* const modelAgent = (ndDQNAgent_trainer*)*m_agent;
-			modelAgent->m_model = this;
 		}
 
 		virtual bool IsTerminal() const
@@ -312,18 +341,27 @@ namespace ndController_0
 
 		// add a reinforcement learning controller 
 		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndDQNAgent_trainer(qValuePredictor));
-
 		ndCartpole* const model = new ndCartpole(agent);
+		((ndCartpole::ndDQNAgent_trainer*)*agent)->m_model = model;
+
 		BuildModel(model, scene, location, floorBody);
+
+		scene->SetAcceleratedUpdate();
 		return model;
 	}
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, ndBodyKinematic* const floorBody)
 	{
-		ndSharedPtr<ndBrain> qValuePredictor(ndBrainLoad::Load("xxx.nn"));
-		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndDQNAgent_trainer(qValuePredictor));
+		char fileName[1024];
+		dGetWorkingFileName("cartpoleDQN.nn", fileName);
+	
+		ndSharedPtr<ndBrain> qValuePredictor(ndBrainLoad::Load(fileName));
+		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndDQNAgent(qValuePredictor));
 
 		ndCartpole* const model = new ndCartpole(agent);
+		((ndCartpole::ndDQNAgent*)*agent)->m_model = model;
+		model->m_state = 100;
+
 		BuildModel(model, scene, location, floorBody);
 		return model;
 	}
@@ -337,12 +375,11 @@ void ndCartpoleController(ndDemoEntityManager* const scene)
 	ndBodyKinematic* const floorBody = BuildFlatPlane(scene, true);
 
 	ndSetRandSeed(42);
-	scene->SetAcceleratedUpdate();
-
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix, floorBody));
-	ndSharedPtr<ndModel> model(CreateTrainModel(scene, matrix, floorBody));
+
+	ndSharedPtr<ndModel> model(CreateModel(scene, matrix, floorBody));
+	//ndSharedPtr<ndModel> model(CreateTrainModel(scene, matrix, floorBody));
 	world->AddModel(model);
 	
 	matrix.m_posit.m_x -= 0.0f;

@@ -19,31 +19,49 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_AGENT_H__
-#define _ND_BRAIN_AGENT_H__
+#include "ndBrainStdafx.h"
+#include "ndBrain.h"
+#include "ndBrainAgent.h"
 
-//#include "ndBrainStdafx.h"
-
-class ndBrainSave;
-class ndBrainAgent: public ndClassAlloc
+ndBrainAgent::ndBrainAgent()
+	:ndClassAlloc()
 {
-	public: 
-	ndBrainAgent();
-	virtual ~ndBrainAgent();
+}
 
-	virtual void Step() = 0;
-	virtual void OptimizeStep() = 0;
+ndBrainAgent::~ndBrainAgent()
+{
+}
 
-	void SaveToFile(const char* const filename) const;
+void ndBrainAgent::SaveToFile(const char* const pathFilename) const
+{
+	class SaveAgent: public ndBrainSave
+	{
+		public:
+		SaveAgent(const char* const pathFilename)
+			:ndBrainSave()
+		{
+			m_file = fopen(pathFilename, "wb");
+			ndAssert(m_file);
+		}
 
-	protected:
-	virtual void ResetModel() const = 0;
-	virtual bool IsTerminal() const = 0;
-	virtual ndReal GetReward() const = 0;
-	virtual void ApplyActions(ndReal* const actions) const = 0;
-	virtual void GetObservation(ndReal* const state) const = 0;
-	virtual void Save(ndBrainSave* const loadSave) const = 0;
-};
+		~SaveAgent()
+		{
+			if (m_file)
+			{
+				fclose(m_file);
+			}
+		}
 
-#endif 
+		void WriteData(const char* data) const
+		{
+			fprintf(m_file, data);
+		}
+
+		FILE* m_file;
+	};
+
+	SaveAgent saveAgent(pathFilename);
+	Save(&saveAgent);
+}
+
 

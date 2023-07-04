@@ -35,9 +35,10 @@ class ndBrainLoad : public ndClassAlloc
 	virtual ~ndBrainLoad() {}
 
 	ndBrain* Load() const;
-	static ndBrain* Load(const char* pathName);
+	static ndBrain* Load(const char* const pathName);
 
 	virtual ndInt32 ReadInt() const = 0;
+	virtual ndFloat32 ReadFloat() const = 0;
 	virtual void ReadString(char* const buffer) const = 0;
 };
 
@@ -46,9 +47,10 @@ class ndBrainSave : public ndClassAlloc
 	public:
 	ndBrainSave() {}
 	virtual ~ndBrainSave() {}
-	virtual void WriteData(const char* data) const = 0;
+	virtual void WriteData(const char* const data) const = 0;
 
 	void Save(const ndBrain* const brain);
+	static void Save(const ndBrain* const brain, const char* const pathName);
 };
 
 class ndBrain: public ndArray<ndBrainLayer*>
@@ -61,8 +63,8 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	ndInt32 GetInputSize() const;
 	ndInt32 GetOutputSize() const;
 
-	bool Load(const char* const pathName);
-	void Save(const char* const pathName) const;
+	//bool Load(const char* const pathName);
+	//void Save(const char* const pathName) const;
 	void CopyFrom(const ndBrain& src);
 
 	void BeginAddLayer();

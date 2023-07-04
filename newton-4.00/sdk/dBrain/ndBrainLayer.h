@@ -27,12 +27,13 @@
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 
+class ndBrainLoad;
 class ndBrainSave;
+
 class ndBrainLayer: public ndBrainMatrix
 {
 	public: 
 	ndBrainLayer(const ndBrainLayer& src);
-	//ndBrainLayer(const nd::TiXmlNode* layerNode);
 	ndBrainLayer(ndInt32 inputs, ndInt32 outputs, ndBrainActivationType type);
 	virtual ~ndBrainLayer();
 
@@ -53,7 +54,7 @@ class ndBrainLayer: public ndBrainMatrix
 	virtual void CopyFrom(const ndBrainLayer& src);
 	virtual bool Compare(const ndBrainLayer& src) const;
 
-	//virtual void Load(const nd::TiXmlElement* const layerNode);
+	virtual void Load(const ndBrainLoad* const loadSave);
 	virtual void Save(const ndBrainSave* const loadSave) const;
 
 	void ApplyActivation(ndBrainVector& output) const;
@@ -71,11 +72,12 @@ class ndBrainLayer: public ndBrainMatrix
 	void HyperbolicTanDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const;
 	void ReluActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const;
 	void LinealActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const;
-	
 
 	ndDeepBrainMemVector m_bias;
 	ndBrainActivationType m_activation;
 	ndInt32 m_columns;
+	friend class ndBrain;
+	friend class ndBrainSave;
 };
 
 inline ndInt32 ndBrainLayer::GetOuputSize() const

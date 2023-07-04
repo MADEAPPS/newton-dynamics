@@ -51,40 +51,6 @@ ndBrainLayer::~ndBrainLayer()
 	m_capacity = 0;
 }
 
-#if 0
-ndBrainLayer::ndBrainLayer(const nd::TiXmlNode* layerNode)
-	:ndBrainMatrix()
-{
-	ndInt32 rows = xmlGetInt(layerNode, "outputs");
-	m_bias.SetSize(rows);
-	m_size = rows;
-	m_capacity = rows + 1;
-	m_columns = xmlGetInt(layerNode, "inputs");
-
-	const char* const activationType = xmlGetString(layerNode, "activation");
-	if (!strcmp(activationType, "tanh"))
-	{
-		m_activation = m_tanh;
-	}
-	else if (!strcmp(activationType, "relu"))
-	{
-		m_activation = m_relu;
-	}
-	else if (!strcmp(activationType, "lineal"))
-	{
-		m_activation = m_tanh;
-	}
-	else if (!strcmp(activationType, "sigmoid"))
-	{
-		m_activation = m_sigmoid;
-	}
-	else
-	{
-		ndAssert(0);
-	}
-}
-#endif
-
 ndUnsigned8* ndBrainLayer::SetPointers(ndUnsigned8* const memPtr)
 {
 	return ndBrainMatrix::SetPointer(memPtr);
@@ -157,32 +123,6 @@ bool ndBrainLayer::Compare(const ndBrainLayer& src) const
 
 	return true;
 }
-
-#if 0
-void ndBrainLayer::Load(const nd::TiXmlElement* const layerNode)
-{
-	const nd::TiXmlNode* const weights = layerNode->FirstChild("inputWeights");
-	ndArray<ndReal> tmpRead;
-	if (weights)
-	{
-		ndBrainMatrix& me = *this;
-		for (ndInt32 i = 0; i < GetOuputSize(); ++i)
-		{
-			char weightRow[256];
-			sprintf(weightRow, "weights%d", i);
-	
-			ndBrainVector& row = me[i];
-			xmlGetFloatArray(weights, weightRow, tmpRead);
-			ndAssert(tmpRead.GetCount() == row.GetCount());
-			memcpy(&row[0], &tmpRead[0], sizeof(ndReal) * tmpRead.GetCount());
-		}
-	}
-
-	xmlGetFloatArray(layerNode, "biasWeights", tmpRead);
-	ndAssert(tmpRead.GetCount() == m_bias.GetCount());
-	memcpy(&m_bias[0], &tmpRead[0], sizeof(ndReal) * tmpRead.GetCount());
-}
-#endif
 
 void ndBrainLayer::InitGaussianWeights(ndReal variance)
 {
@@ -432,36 +372,8 @@ void ndBrainLayer::Save(const ndBrainSave* const loadSave) const
 		va_end(v_args);
 		loadSave->WriteData(buffer);
 	};
-	
-	switch (m_activation)
-	{
-		case m_relu:
-			Save("\tactivation relu\n");
-			break;
-	
-		case m_lineal:
-			Save("\tactivation lineal\n");
-			break;
-	
-		case m_tanh:
-			Save("\tactivation tanh\n");
-			break;
-	
-		case m_softmax:
-			Save("\tactivation softmax\n");
-			break;
-	
-		case m_sigmoid:
-		default:
-			Save("\tactivation sigmoid\n");
-			break;
-	}
 
-	Save("\tlayerType fullyConnected\n");
-	Save("\tinputs %d\n", GetColumns());
-	Save("\toutputs %d\n", GetRows());
-
-	Save("\tbiasWeights: ", m_bias.GetCount());
+	Save("\tbiasWeights ", m_bias.GetCount());
 	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
 	{
 		Save("%g ", m_bias[i]);
@@ -471,12 +383,36 @@ void ndBrainLayer::Save(const ndBrainSave* const loadSave) const
 	Save("\tinputWeights\n");
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
-		Save("\t\tweights_%d: ", i);
+		Save("\t\tweights_%d ", i);
 		const ndBrainVector& row = (*this)[i];
 		for (ndInt32 j = 0; j < GetInputSize(); ++j)
 		{
 			Save("%g ", row[j]);
 		}
 		Save("\n");
+	}
+}
+
+void ndBrainLayer::Load(const ndBrainLoad* const loader)
+{
+	char buffer[1024];
+	loader->ReadString(buffer);
+
+	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
+	{
+		ndFloat32 weight = loader->ReadFloat();
+		m_bias[i] = ndReal(weight);
+	}
+
+	loader->ReadString(buffer);
+	for (ndInt32 i = 0; i < GetOuputSize(); ++i)
+	{
+		loader->ReadString(buffer);
+		ndBrainVector& row = (*this)[i];
+		for (ndInt32 j = 0; j < GetInputSize(); ++j)
+		{
+			ndFloat32 weight = loader->ReadFloat();
+			row[j] = ndReal(weight);
+		}
 	}
 }

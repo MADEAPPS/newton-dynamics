@@ -77,7 +77,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	trainer.SetMiniBatchSize(16);
 	trainer.Optimize(testError, inputBatch, groundTruth, 1.0e-2f, 2000);
 
-	brain.Save("xxx.nn");
+	ndAssert(0);
+	//brain.Save("xxx.nn");
 	//ndBrain brain1;
 	//brain1.Load("xxx.nn");
 	//ndAssert(brain1.Compare(brain));
@@ -288,7 +289,9 @@ static void MnistTrainingSet()
 
 		char path[256];
 		dGetWorkingFileName("mnistDatabase/mnist.nn", path);
-		brain.Save(path);
+		
+		ndAssert(0);
+		//brain.Save(path);
 		ValidateData("training data", brain, trainingLabels, trainingDigits);
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
@@ -314,7 +317,9 @@ static void MnistTestSet()
 		char path[256];
 		ndBrain brain;
 		dGetWorkingFileName("mnistDatabase/mnist.nn", path);
-		brain.Load(path);
+		
+		ndAssert(0);
+		//brain.Load(path);
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		ValidateData("test data", brain, testLabels, testDigits);
 		time = ndGetTimeInMicroseconds() - time;

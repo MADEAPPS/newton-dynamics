@@ -23,8 +23,10 @@
 #define _ND_DQN_BRAIN_AGENT_DQN_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrain.h"
 #include "ndBrainAgent.h"
 #include "ndBrainTrainer.h"
+#include "ndBrainReplayBuffer.h"
 
 // this is an implementation of the vanilla dqn agent trainer as described 
 // on the nature paper below. 
@@ -40,14 +42,16 @@ class ndBrainAgentDQN: public ndBrainAgent
 
 	protected:
 	void OptimizeStep();
+	void ResetModel() const;
+	bool IsTerminal() const;
+	ndReal GetReward() const;
 	virtual ndInt32 SelectBestAction();
+	void Save(ndBrainSave* const loadSave) const;
 
 	ndSharedPtr<ndBrain> m_onlineNetwork;
 	ndBrainInstance m_instance;
 	ndBrainVector m_state;
 	ndBrainVector m_actions;
-
-	void SaveInternal(ndBrainSave* const loadSave) const;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -230,20 +234,29 @@ void ndBrainAgentDQN<statesDim, actionDim>::Step()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
+bool ndBrainAgentDQN<statesDim, actionDim>::IsTerminal() const
+{
+	return false;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndReal ndBrainAgentDQN<statesDim, actionDim>::GetReward() const
+{
+	return ndReal(0.0f);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN<statesDim, actionDim>::ResetModel() const
+{
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN<statesDim, actionDim>::OptimizeStep()
 {
 }
 
-//template<ndInt32 statesDim, ndInt32 actionDim>
-////bool ndBrainAgentDQN<statesDim, actionDim>::Load(const char* const name)
-//bool ndBrainAgentDQN<statesDim, actionDim>::Load(const char* const)
-//{
-//	ndAssert(0);
-//	return false;
-//}
-
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN<statesDim, actionDim>::SaveInternal(ndBrainSave* const loadSave) const
+void ndBrainAgentDQN<statesDim, actionDim>::Save(ndBrainSave* const loadSave) const
 {
 	loadSave->Save(*m_onlineNetwork);
 }
