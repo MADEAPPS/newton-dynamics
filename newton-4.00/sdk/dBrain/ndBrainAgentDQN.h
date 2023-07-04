@@ -65,7 +65,23 @@ class ndBrainAgentDQN_Trainner: public ndBrainAgentDQN<statesDim, actionDim>
 	#define D_DQN_STAR_OPTIMIZATION			(D_DQN_REPLAY_BUFFERSIZE - 1000)
 	#define D_DQN_EXPLORE_ANNELININGING		(D_DQN_MIN_EXPLORE_PROBABILITY / ndReal(2.0f))
 
-	class ndOptimizer: public ndBrainTrainer
+	public: 
+	ndBrainAgentDQN_Trainner(const ndSharedPtr<ndBrain>& qValuePredictor);
+	virtual ~ndBrainAgentDQN_Trainner();
+
+	ndInt32 GetFramesCount() const;
+	ndInt32 GetEposideCount() const;
+
+	protected:
+	void OptimizeStep();
+	
+	private:
+	void PrintDebug();
+	void BackPropagate();
+	void SetBufferSize(ndInt32 size);
+	virtual ndInt32 SelectBestAction();
+
+	class ndOptimizer : public ndBrainTrainer
 	{
 		public:
 		ndOptimizer(ndBrain* const brain)
@@ -99,7 +115,7 @@ class ndBrainAgentDQN_Trainner: public ndBrainAgentDQN<statesDim, actionDim>
 			ndAssert(m_truth.GetCount() == m_output.GetCount());
 			ndAssert(m_truth.GetCount() == m_outputBatch.GetCount());
 			const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_agent->m_replayBuffer[index];
-			
+
 			for (ndInt32 i = 0; i < statesDim; ++i)
 			{
 				m_inputBatch[i] = transition.m_state[i];
@@ -128,12 +144,12 @@ class ndBrainAgentDQN_Trainner: public ndBrainAgentDQN<statesDim, actionDim>
 			}
 		}
 
-		virtual void Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32 )
+		virtual void Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32)
 		{
 			ndArray<ndInt32>& shuffleBuffer = m_agent->m_shuffleBuffer;
 
-			shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 			ClearGradientsAcc();
+			shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 			for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
 			{
 				ndInt32 index = shuffleBuffer[i];
@@ -150,22 +166,6 @@ class ndBrainAgentDQN_Trainner: public ndBrainAgentDQN<statesDim, actionDim>
 		ndBrainVector m_outputBatch;
 		ndBrainAgentDQN_Trainner<statesDim, actionDim>* m_agent;
 	};
-
-	public: 
-	ndBrainAgentDQN_Trainner(const ndSharedPtr<ndBrain>& qValuePredictor);
-	virtual ~ndBrainAgentDQN_Trainner();
-
-	ndInt32 GetFramesCount() const;
-	ndInt32 GetEposideCount() const;
-
-	protected:
-	void OptimizeStep();
-	
-	private:
-	void PrintDebug();
-	void BackPropagate();
-	void SetBufferSize(ndInt32 size);
-	virtual ndInt32 SelectBestAction();
 
 	ndBrain m_targetNetwork;
 	ndOptimizer m_trainer;
