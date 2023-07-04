@@ -54,18 +54,19 @@
 //#define DEFAULT_SCENE	15		// advanced industrial robot
 //#define DEFAULT_SCENE	16		// basic player
 //#define DEFAULT_SCENE	17		// rag doll
-#define DEFAULT_SCENE	18		// cart pole controller
-//#define DEFAULT_SCENE	19		// unit cycle controller
-//#define DEFAULT_SCENE	20		// quadruped test 1
-//#define DEFAULT_SCENE	21		// quadruped test 2
-//#define DEFAULT_SCENE	22		// quadruped test 3
-//#define DEFAULT_SCENE	23		// biped test 1
-//#define DEFAULT_SCENE	24		// biped test 2
-//#define DEFAULT_SCENE	25		// train biped test 2
-//#define DEFAULT_SCENE	26		// simple voronoi fracture
-//#define DEFAULT_SCENE	27		// basic voronoi fracture
-//#define DEFAULT_SCENE	28		// linked voronoi fracture
-//#define DEFAULT_SCENE	29		// skin peel voronoi fracture
+#define DEFAULT_SCENE	18		// cart pole controller player
+//#define DEFAULT_SCENE	19		// cart pole controller trainer
+//#define DEFAULT_SCENE	20		// unit cycle controller
+//#define DEFAULT_SCENE	21		// quadruped test 1
+//#define DEFAULT_SCENE	22		// quadruped test 2
+//#define DEFAULT_SCENE	23		// quadruped test 3
+//#define DEFAULT_SCENE	24		// biped test 1
+//#define DEFAULT_SCENE	25		// biped test 2
+//#define DEFAULT_SCENE	26		// train biped test 2
+//#define DEFAULT_SCENE	27		// simple voronoi fracture
+//#define DEFAULT_SCENE	28		// basic voronoi fracture
+//#define DEFAULT_SCENE	29		// linked voronoi fracture
+//#define DEFAULT_SCENE	30		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndRagdollTest(ndDemoEntityManager* const scene);
@@ -85,7 +86,6 @@ void ndBalanceController(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
-void ndCartpoleController(ndDemoEntityManager* const scene);
 void ndBipedTest_2Trainer(ndDemoEntityManager* const scene);
 void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
@@ -94,6 +94,10 @@ void ndSimpleIndustrialRobot(ndDemoEntityManager* const scene);
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene);
 void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene);
 void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene);
+
+void ndCartpoleControllerPlayer(ndDemoEntityManager* const scene);
+void ndCartpoleControllerTrainer(ndDemoEntityManager* const scene);
+
 //void ndBasicFracture_0(ndDemoEntityManager* const scene);
 //void ndBasicFracture_2(ndDemoEntityManager* const scene);
 //void ndBasicFracture_4(ndDemoEntityManager* const scene);
@@ -120,7 +124,8 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
 	{ "basic player", ndPlayerCapsuleDemo },
 	{ "rag doll", ndRagdollTest },
-	{ "carpole controller", ndCartpoleController },
+	{ "carpole controller player", ndCartpoleControllerPlayer },
+	{ "carpole controller trainer", ndCartpoleControllerTrainer },
 	{ "balance controller", ndBalanceController },
 	{ "quadruped test one", ndQuadrupedTest_1 },
 	{ "quadruped test two", ndQuadrupedTest_2 },

@@ -276,7 +276,7 @@ namespace ndController_0
 		mutable ndInt32 m_state;
 	};
 
-	void BuildModel(ndCartpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location, ndBodyKinematic* const floorBody)
+	void BuildModel(ndCartpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		ndFloat32 xSize = 0.25f;
 		ndFloat32 ySize = 0.125f;
@@ -290,9 +290,11 @@ namespace ndController_0
 		// make cart
 		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.tga")));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
-		cartBody->GetAsBodyDynamic()->SetSleepAccel(cartBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
-
 		ndMatrix matrix(cartBody->GetMatrix());
+		matrix.m_posit.m_y += ySize / 2.0f;
+		cartBody->SetMatrix(matrix);
+		cartBody->GetAsBodyDynamic()->SetSleepAccel(cartBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
+		
 		matrix.m_posit.m_y += ySize / 2.0f;
 
 		// make pole leg
@@ -308,7 +310,7 @@ namespace ndController_0
 		ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
 
 		// make the car move alone the z axis only (2d problem)
-		ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), floorBody));
+		ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
 		world->AddJoint(xDirSlider);
 
 		// add path to the model
@@ -322,7 +324,7 @@ namespace ndController_0
 		model->m_poleMatrix = poleBody->GetMatrix();
 	}
 
-	ndModelArticulation* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location, ndBodyKinematic* const floorBody)
+	ndModelArticulation* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		// build neutral net controller
 		ndInt32 layerSize = 64;
@@ -344,13 +346,13 @@ namespace ndController_0
 		ndCartpole* const model = new ndCartpole(agent);
 		((ndCartpole::ndDQNAgent_trainer*)*agent)->m_model = model;
 
-		BuildModel(model, scene, location, floorBody);
+		BuildModel(model, scene, location);
 
 		scene->SetAcceleratedUpdate();
 		return model;
 	}
 
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, ndBodyKinematic* const floorBody)
+	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		char fileName[1024];
 		dGetWorkingFileName("cartpoleDQN.nn", fileName);
@@ -362,24 +364,42 @@ namespace ndController_0
 		((ndCartpole::ndDQNAgent*)*agent)->m_model = model;
 		model->m_state = 100;
 
-		BuildModel(model, scene, location, floorBody);
+		BuildModel(model, scene, location);
 		return model;
 	}
 }
 
 using namespace ndController_0;
-void ndCartpoleController(ndDemoEntityManager* const scene)
+
+void ndCartpoleControllerPlayer(ndDemoEntityManager* const scene)
 {
-	// build a floor
-	//BuildFloorBox(scene, ndGetIdentityMatrix());
-	ndBodyKinematic* const floorBody = BuildFlatPlane(scene, true);
+	BuildFlatPlane(scene, true);
 
 	ndSetRandSeed(42);
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
-	ndSharedPtr<ndModel> model(CreateModel(scene, matrix, floorBody));
-	//ndSharedPtr<ndModel> model(CreateTrainModel(scene, matrix, floorBody));
+	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	world->AddModel(model);
+
+	matrix.m_posit.m_x -= 0.0f;
+	matrix.m_posit.m_y += 0.5f;
+	matrix.m_posit.m_z += 2.0f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
+	scene->SetCameraMatrix(rotation, matrix.m_posit);
+}
+
+void ndCartpoleControllerTrainer(ndDemoEntityManager* const scene)
+{
+	// build a floor
+	//BuildFloorBox(scene, ndGetIdentityMatrix());
+	BuildFlatPlane(scene, true);
+
+	ndSetRandSeed(42);
+	ndWorld* const world = scene->GetWorld();
+	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
+
+	ndSharedPtr<ndModel> model(CreateTrainModel(scene, matrix));
 	world->AddModel(model);
 	
 	matrix.m_posit.m_x -= 0.0f;
