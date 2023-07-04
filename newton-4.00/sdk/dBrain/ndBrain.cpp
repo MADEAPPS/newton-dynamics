@@ -176,100 +176,7 @@ void ndBrain::InitGaussianWeights(ndReal variance)
 	}
 }
 
-#if 0
-void ndBrain::Save(const char* const pathName) const
-{
-	nd::TiXmlDocument asciifile;
-	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
-	asciifile.LinkEndChild(decl);
-
-	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndBrain");
-	asciifile.LinkEndChild(rootNode);
-
-	for (ndInt32 i = 0; i < GetCount(); ++i)
-	{
-		ndBrainLayer* const layer = (*this)[i];
-		nd::TiXmlElement* const layerNode = new nd::TiXmlElement("ndLayer");
-		rootNode->LinkEndChild(layerNode);
-		layer->Save (layerNode);
-	}
-
-	char* const oldloc = setlocale(LC_ALL, 0);
-	setlocale(LC_ALL, "C");
-	asciifile.SaveFile(pathName);
-	setlocale(LC_ALL, oldloc);
-}
-
-bool ndBrain::Load(const char* const pathName)
-{
-	ndAssert(0);
-
-	char* const oldloc = setlocale(LC_ALL, 0);
-	setlocale(LC_ALL, "C");
-
-	nd::TiXmlDocument doc(pathName);
-	doc.LoadFile();
-	if (doc.Error())
-	{
-		setlocale(LC_ALL, oldloc);
-		return false;
-	}
-	ndAssert(!doc.Error());
-
-	const nd::TiXmlElement* const rootNode = doc.RootElement();
-	if (!rootNode)
-	{
-		return false;
-	}
-
-	BeginAddLayer();
-	for (const nd::TiXmlNode* layerNode = rootNode->FirstChild("ndLayer"); layerNode; layerNode = layerNode->NextSibling())
-	{
-		const char* const layerType = xmlGetString(layerNode, "type");
-		if (layerType)
-		{
-			ndBrainLayer* layer = nullptr;
-			if (!strcmp(layerType, "fullyConnected"))
-			{
-				layer = new ndBrainLayer(layerNode);
-			}
-			else
-			{
-				ndAssert(0);
-			}
-			if (layer)
-			{
-				AddLayer(layer);
-			}
-		}
-	}
-	EndAddLayer();
-
-	ndInt32 index = 0;
-	for (const nd::TiXmlNode* layerNode = rootNode->FirstChild("ndLayer"); layerNode; layerNode = layerNode->NextSibling())
-	{
-		ndBrainLayer* const layer = (*this)[index];
-		layer->Load((nd::TiXmlElement*)layerNode);
-		index++;
-	}
-
-	m_isReady = true;
-	return true;
-}
-#endif
-
-ndBrainLoadSave::ndBrainLoadSave()
-	:ndClassAlloc() 
-{
-}
-
-ndBrainLoadSave::~ndBrainLoadSave() 
-{
-}
-
-
-//ndBrain* Load();
-void ndBrainLoadSave::Save(const ndBrain* const brain)
+void ndBrainSave::Save(const ndBrain* const brain)
 {
 	char buffer[1024];
 	auto Save = [this, &buffer](const char* const fmt, ...)
@@ -279,7 +186,7 @@ void ndBrainLoadSave::Save(const ndBrain* const brain)
 		va_start(v_args, fmt);
 		vsprintf(buffer, fmt, v_args);
 		va_end(v_args);
-		SaveData(buffer);
+		WriteData(buffer);
 	};
 
 	Save("ndBrain version 1.0\n\n");
@@ -293,4 +200,122 @@ void ndBrainLoadSave::Save(const ndBrain* const brain)
 		layer->Save(this);
 		Save("}\n\n");
 	}
+}
+
+ndBrain* ndBrainLoad::Load(const char* pathName)
+{
+	class Loader : public ndBrainLoad
+	{
+		public:
+		Loader(const char* const pathName)
+			:ndBrainLoad()
+		{
+			m_file = fopen(pathName, "rb");
+			ndAssert(m_file);
+		}
+
+		~Loader()
+		{
+			if (m_file)
+			{
+				fclose(m_file);
+			}
+		}
+
+		ndInt32 ReadInt() const
+		{
+			return 0;
+		}
+
+		void ReadString(char* const buffer) const
+		{
+
+		}
+
+
+		FILE* m_file;
+	};
+
+	Loader loader(pathName);
+	return loader.Load();
+}
+
+//bool ndBrain::Load(const char* const pathName)
+ndBrain* ndBrainLoad::Load() const
+{
+	ndAssert(0);
+
+	ndBrain* const brain = new ndBrain;
+
+	char buffer[1024];
+	//auto Read = [this, &buffer](const char* const fmt, ...)
+	//{
+	//	va_list v_args;
+	//	buffer[0] = 0;
+	//	va_start(v_args, fmt);
+	//	vsprintf(buffer, fmt, v_args);
+	//	va_end(v_args);
+	//	SaveData(buffer);
+	//};
+
+	ReadString(buffer);
+	ReadString(buffer);
+	ReadString(buffer);
+
+	//char* const oldloc = setlocale(LC_ALL, 0);
+	//setlocale(LC_ALL, "C");
+	//
+	//nd::TiXmlDocument doc(pathName);
+	//doc.LoadFile();
+	//if (doc.Error())
+	//{
+	//	setlocale(LC_ALL, oldloc);
+	//	return false;
+	//}
+	//ndAssert(!doc.Error());
+	//
+	//const nd::TiXmlElement* const rootNode = doc.RootElement();
+	//if (!rootNode)
+	//{
+	//	return false;
+	//}
+	
+	ReadString(buffer);
+	ndInt32 leayerCount = ReadInt();
+
+	//BeginAddLayer();
+	//for (const nd::TiXmlNode* layerNode = rootNode->FirstChild("ndLayer"); layerNode; layerNode = layerNode->NextSibling())
+	//{
+	//	const char* const layerType = xmlGetString(layerNode, "type");
+	//	if (layerType)
+	//	{
+	//		ndBrainLayer* layer = nullptr;
+	//		if (!strcmp(layerType, "fullyConnected"))
+	//		{
+	//			layer = new ndBrainLayer(layerNode);
+	//		}
+	//		else
+	//		{
+	//			ndAssert(0);
+	//		}
+	//		if (layer)
+	//		{
+	//			AddLayer(layer);
+	//		}
+	//	}
+	//}
+	//EndAddLayer();
+	//
+	//ndInt32 index = 0;
+	//for (const nd::TiXmlNode* layerNode = rootNode->FirstChild("ndLayer"); layerNode; layerNode = layerNode->NextSibling())
+	//{
+	//	ndBrainLayer* const layer = (*this)[index];
+	//	layer->Load((nd::TiXmlElement*)layerNode);
+	//	index++;
+	//}
+	//
+	//m_isReady = true;
+	//return true;
+
+	return brain;
 }

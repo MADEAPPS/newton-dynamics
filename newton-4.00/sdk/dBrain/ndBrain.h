@@ -27,15 +27,28 @@
 #include "ndBrainTrainerBase.h"
 
 class ndBrain;
-class ndBrainLoadSave : public ndClassAlloc
+
+class ndBrainLoad : public ndClassAlloc
 {
 	public:
-	ndBrainLoadSave();
-	virtual ~ndBrainLoadSave();
-	//ndBrain* Load();
-	void Save(const ndBrain* const brain);
+	ndBrainLoad() {}
+	virtual ~ndBrainLoad() {}
 
-	virtual void SaveData(const char* data) const = 0;
+	ndBrain* Load() const;
+	static ndBrain* Load(const char* pathName);
+
+	virtual ndInt32 ReadInt() const = 0;
+	virtual void ReadString(char* const buffer) const = 0;
+};
+
+class ndBrainSave : public ndClassAlloc
+{
+	public:
+	ndBrainSave() {}
+	virtual ~ndBrainSave() {}
+	virtual void WriteData(const char* data) const = 0;
+
+	void Save(const ndBrain* const brain);
 };
 
 class ndBrain: public ndArray<ndBrainLayer*>

@@ -47,7 +47,7 @@ class ndBrainAgentDQN: public ndBrainAgent
 	ndBrainVector m_state;
 	ndBrainVector m_actions;
 
-	void SaveInternal(ndBrainLoadSave* const loadSave) const;
+	void SaveInternal(ndBrainSave* const loadSave) const;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -243,7 +243,7 @@ void ndBrainAgentDQN<statesDim, actionDim>::OptimizeStep()
 //}
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN<statesDim, actionDim>::SaveInternal(ndBrainLoadSave* const loadSave) const
+void ndBrainAgentDQN<statesDim, actionDim>::SaveInternal(ndBrainSave* const loadSave) const
 {
 	loadSave->Save(*m_onlineNetwork);
 }

@@ -46,7 +46,7 @@ class ndBrainAgent: public ndClassAlloc
 	virtual ndReal GetReward() const = 0;
 	virtual void ApplyActions(ndReal* const actions) const = 0;
 	virtual void GetObservation(ndReal* const state) const = 0;
-	virtual void SaveInternal(ndBrainLoadSave* const loadSave) const = 0;
+	virtual void SaveInternal(ndBrainSave* const loadSave) const = 0;
 };
 
 inline ndBrainAgent::ndBrainAgent()
@@ -60,11 +60,11 @@ inline ndBrainAgent::~ndBrainAgent()
 
 inline void ndBrainAgent::Save(const char* const pathFilename) const
 {
-	class SaveAgent : public ndBrainLoadSave
+	class SaveAgent : public ndBrainSave
 	{
 		public:
 		SaveAgent(const char* const pathFilename)
-			:ndBrainLoadSave()
+			:ndBrainSave()
 		{
 			m_file = fopen(pathFilename, "wb");
 			ndAssert(m_file);
@@ -78,7 +78,7 @@ inline void ndBrainAgent::Save(const char* const pathFilename) const
 			}
 		}
 
-		void SaveData(const char* data) const
+		void WriteData(const char* data) const
 		{
 			fprintf(m_file, data);
 		}

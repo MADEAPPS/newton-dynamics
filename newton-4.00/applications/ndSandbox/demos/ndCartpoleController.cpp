@@ -56,12 +56,12 @@ namespace ndController_0
 	class ndCartpole: public ndModelArticulation
 	{
 		public:
-		class ndDQNAgent : public ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>
+		class ndDQNAgent_trainer : public ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>
 		{
 			public:
-			ndDQNAgent(ndCartpole* const model, ndSharedPtr<ndBrain>& qValuePredictor)
+			ndDQNAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
 				:ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>(qValuePredictor)
-				,m_model(model)
+				,m_model(nullptr)
 			{
 			}
 
@@ -105,15 +105,17 @@ namespace ndController_0
 			ndCartpole* m_model;
 		};
 
-		ndCartpole()
+		ndCartpole(const ndSharedPtr<ndBrainAgent>& agent)
 			:ndModelArticulation()
 			,m_cartMatrix(ndGetIdentityMatrix())
 			,m_poleMatrix(ndGetIdentityMatrix())
 			,m_cart(nullptr)
 			,m_pole(nullptr)
-			,m_agent(nullptr)
+			,m_agent(agent)
 			,m_state(0)
 		{
+			ndDQNAgent_trainer* const modelAgent = (ndDQNAgent_trainer*)*m_agent;
+			modelAgent->m_model = this;
 		}
 
 		virtual bool IsTerminal() const
@@ -227,7 +229,11 @@ namespace ndController_0
 		
 			if (ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(40.0f))
 			{
-				ResetModel();
+				//ResetModel();
+				// this will kill the model
+				ndVector impulsePush(ndVector::m_zero);
+				impulsePush.m_x = 5.0f * m_cart->GetMassMatrix().m_w;
+				m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, timestep);
 			}
 
 			m_state++;
@@ -285,7 +291,10 @@ namespace ndController_0
 		model->m_pole = poleBody->GetAsBodyDynamic();
 		model->m_cartMatrix = cartBody->GetMatrix();
 		model->m_poleMatrix = poleBody->GetMatrix();
+	}
 
+	ndModelArticulation* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location, ndBodyKinematic* const floorBody)
+	{
 		// build neutral net controller
 		ndInt32 layerSize = 64;
 		ndSharedPtr<ndBrain> qValuePredictor(new ndBrain());
@@ -302,12 +311,19 @@ namespace ndController_0
 		qValuePredictor->EndAddLayer(ndReal(0.25f));
 
 		// add a reinforcement learning controller 
-		model->m_agent = ndSharedPtr<ndBrainAgent>(new ndCartpole::ndDQNAgent(model, qValuePredictor));
+		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndDQNAgent_trainer(qValuePredictor));
+
+		ndCartpole* const model = new ndCartpole(agent);
+		BuildModel(model, scene, location, floorBody);
+		return model;
 	}
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, ndBodyKinematic* const floorBody)
 	{
-		ndCartpole* const model = new ndCartpole();
+		ndSharedPtr<ndBrain> qValuePredictor(ndBrainLoad::Load("xxx.nn"));
+		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndDQNAgent_trainer(qValuePredictor));
+
+		ndCartpole* const model = new ndCartpole(agent);
 		BuildModel(model, scene, location, floorBody);
 		return model;
 	}
@@ -325,7 +341,8 @@ void ndCartpoleController(ndDemoEntityManager* const scene)
 
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-	ndSharedPtr<ndModel> model(CreateModel(scene, matrix, floorBody));
+	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix, floorBody));
+	ndSharedPtr<ndModel> model(CreateTrainModel(scene, matrix, floorBody));
 	world->AddModel(model);
 	
 	matrix.m_posit.m_x -= 0.0f;

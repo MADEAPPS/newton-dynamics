@@ -27,7 +27,7 @@
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 
-class ndBrainLoadSave;
+class ndBrainSave;
 class ndBrainLayer: public ndBrainMatrix
 {
 	public: 
@@ -54,7 +54,7 @@ class ndBrainLayer: public ndBrainMatrix
 	virtual bool Compare(const ndBrainLayer& src) const;
 
 	//virtual void Load(const nd::TiXmlElement* const layerNode);
-	virtual void Save(const ndBrainLoadSave* const loadSave) const;
+	virtual void Save(const ndBrainSave* const loadSave) const;
 
 	void ApplyActivation(ndBrainVector& output) const;
 	void ActivationDerivative(const ndBrainVector& input, ndBrainVector& outputDerivative) const;

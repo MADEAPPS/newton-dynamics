@@ -420,7 +420,7 @@ void ndBrainLayer::MakePrediction(ndThreadPool& threadPool, const ndBrainVector&
 	threadPool.ParallelExecute(MakePrediction);
 }
 
-void ndBrainLayer::Save(const ndBrainLoadSave* const loadSave) const
+void ndBrainLayer::Save(const ndBrainSave* const loadSave) const
 {
 	char buffer[1024];
 	auto Save = [this, &buffer, &loadSave](const char* const fmt, ...)
@@ -430,7 +430,7 @@ void ndBrainLayer::Save(const ndBrainLoadSave* const loadSave) const
 		va_start(v_args, fmt);
 		vsprintf(buffer, fmt, v_args);
 		va_end(v_args);
-		loadSave->SaveData(buffer);
+		loadSave->WriteData(buffer);
 	};
 	
 	switch (m_activation)
