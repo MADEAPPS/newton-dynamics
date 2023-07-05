@@ -225,10 +225,7 @@ ndBrain* ndBrainLoad::Load(const char* const pathName)
 
 ndBrain* ndBrainLoad::Load() const
 {
-	ndBrain* const brain = new ndBrain;
-
 	char buffer[1024];
-
 	ReadString(buffer);
 	ReadString(buffer);
 	ReadString(buffer);
@@ -236,6 +233,7 @@ ndBrain* ndBrainLoad::Load() const
 	ReadString(buffer);
 	ndInt32 layersCount = ReadInt();
 
+	ndBrain* const brain = new ndBrain;
 	brain->BeginAddLayer();
 	for (ndInt32 i = 0; i < layersCount; ++i)
 	{

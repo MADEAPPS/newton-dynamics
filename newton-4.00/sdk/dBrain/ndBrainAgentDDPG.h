@@ -33,11 +33,10 @@
 // trainer as described in: https://arxiv.org/pdf/1509.02971.pdf
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-class ndBrainAgentDDPG : public ndBrainAgent
+class ndBrainAgentDDPG: public ndBrainAgent
 {
 	public:
-	ndBrainAgentDDPG(const ndSharedPtr<ndBrain>& qValuePredictor);
-
+	ndBrainAgentDDPG(const ndSharedPtr<ndBrain>& actor);
 	void Step();
 
 	protected:
@@ -46,19 +45,103 @@ class ndBrainAgentDDPG : public ndBrainAgent
 	bool IsTerminal() const;
 	ndReal GetReward() const;
 	void ApplyRandomAction() const;
-	virtual ndInt32 SelectBestAction();
+	//virtual ndInt32 SelectBestAction();
 	ndInt32 GetOpmizationDelay() const;
 	void SetOpmizationDelay(ndInt32 delay);
 	void Save(ndBrainSave* const loadSave) const;
 
 	ndSharedPtr<ndBrain> m_actor;
-	ndBrainInstance m_instance;
+	ndBrainInstance m_actorInstance;
 	ndBrainVector m_state;
 	ndBrainVector m_actions;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-class ndBrainAgentDDPG_Trainner : public ndBrainAgentDDPG<statesDim, actionDim>
+ndBrainAgentDDPG<statesDim, actionDim>::ndBrainAgentDDPG(const ndSharedPtr<ndBrain>& actor)
+	:ndBrainAgent()
+	,m_actor(actor)
+	,m_actorInstance(*m_actor)
+{
+	m_state.SetCount(statesDim);
+	m_actions.SetCount(actionDim);
+	m_state.Set(ndReal(0.0f));
+	m_actions.Set(ndReal(0.0f));
+}
+
+//template<ndInt32 statesDim, ndInt32 actionDim>
+//ndInt32 ndBrainAgentDDPG<statesDim, actionDim>::SelectBestAction()
+//{
+//	ndInt32 bestAction = 0;
+//	ndReal maxReward = m_actions[0];
+//	for (ndInt32 i = 1; i < actionDim; ++i)
+//	{
+//		if (m_actions[i] > maxReward)
+//		{
+//			bestAction = i;
+//			maxReward = m_actions[i];
+//		}
+//	}
+//	return bestAction;
+//}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG<statesDim, actionDim>::ApplyRandomAction() const
+{
+	ndAssert(0);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+bool ndBrainAgentDDPG<statesDim, actionDim>::IsTerminal() const
+{
+	return false;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndInt32 ndBrainAgentDDPG<statesDim, actionDim>::GetOpmizationDelay() const
+{
+	return 0;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG<statesDim, actionDim>::SetOpmizationDelay(ndInt32)
+{
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG<statesDim, actionDim>::Step()
+{
+	GetObservation(&m_state[0]);
+	m_actorInstance.MakePrediction(m_state, m_actions);
+	ApplyActions(&m_actions[0]);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndReal ndBrainAgentDDPG<statesDim, actionDim>::GetReward() const
+{
+	return ndReal(0.0f);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG<statesDim, actionDim>::ResetModel() const
+{
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG<statesDim, actionDim>::OptimizeStep()
+{
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG<statesDim, actionDim>::Save(ndBrainSave* const) const
+{
+	ndAssert(0);
+}
+
+// ******************************************************************************
+//
+// ******************************************************************************
+template<ndInt32 statesDim, ndInt32 actionDim>
+class ndBrainAgentDDPG_Trainner: public ndBrainAgent
 {
 	// hyper parameters defaults
 	#define D_DDPG_LEARN_RATE				ndReal(2.0e-4f)
@@ -82,15 +165,17 @@ class ndBrainAgentDDPG_Trainner : public ndBrainAgentDDPG<statesDim, actionDim>
 
 	protected:
 	void OptimizeStep();
+	void Save(ndBrainSave* const loadSave) const;
 
 	private:
+	void Step();
 	void PrintDebug();
 	void BackPropagate();
 	void ApplyRandomAction() const;
 	void SetBufferSize(ndInt32 size);
 	ndInt32 GetOpmizationDelay() const;
 	void SetOpmizationDelay(ndInt32 delay);
-	virtual ndInt32 SelectBestAction();
+	//virtual ndInt32 SelectBestAction();
 
 	class ndOptimizer : public ndBrainTrainer
 	{
@@ -122,7 +207,8 @@ class ndBrainAgentDDPG_Trainner : public ndBrainAgentDDPG<statesDim, actionDim>
 		}
 
 		//virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
-		void EvaluateBellmanEquation(ndInt32 index)
+		//void EvaluateBellmanEquation(ndInt32 index)
+		void EvaluateBellmanEquation(ndInt32)
 		{
 			ndAssert(0);
 			//ndAssert(m_truth.GetCount() == m_output.GetCount());
@@ -181,11 +267,13 @@ class ndBrainAgentDDPG_Trainner : public ndBrainAgentDDPG<statesDim, actionDim>
 		ndBrainAgentDDPG_Trainner<statesDim, actionDim>* m_agent;
 	};
 
+	ndSharedPtr<ndBrain> m_actor;
 	ndSharedPtr<ndBrain> m_critic;
 	ndBrain m_actorTarget;
 	ndBrain m_criticTarget;
 	ndOptimizer m_actorOptimizer;
 	ndOptimizer m_criticOptimizer;
+	ndBrainInstance m_actorTargetInstance;
 	ndBrainInstance m_criticTargetInstance;
 	ndArray<ndInt32> m_movingAverage;
 	ndArray<ndInt32> m_shuffleBuffer;
@@ -211,94 +299,15 @@ class ndBrainAgentDDPG_Trainner : public ndBrainAgentDDPG<statesDim, actionDim>
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDDPG<statesDim, actionDim>::ndBrainAgentDDPG(const ndSharedPtr<ndBrain>& qValuePredictor)
-	:ndBrainAgent()
-	,m_actor(qValuePredictor)
-	,m_instance(*m_actor)
-{
-	m_state.SetCount(statesDim);
-	m_actions.SetCount(actionDim);
-	m_state.Set(ndReal(0.0f));
-	m_actions.Set(ndReal(0.0f));
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDDPG<statesDim, actionDim>::SelectBestAction()
-{
-	ndInt32 bestAction = 0;
-	ndReal maxReward = m_actions[0];
-	for (ndInt32 i = 1; i < actionDim; ++i)
-	{
-		if (m_actions[i] > maxReward)
-		{
-			bestAction = i;
-			maxReward = m_actions[i];
-		}
-	}
-	return bestAction;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG<statesDim, actionDim>::ApplyRandomAction() const
-{
-	ndAssert(0);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG<statesDim, actionDim>::Step()
-{
-	GetObservation(&m_state[0]);
-	m_instance.MakePrediction(m_state, m_actions);
-	ApplyActions(&m_actions[0]);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDDPG<statesDim, actionDim>::GetOpmizationDelay() const
-{
-	return 0;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG<statesDim, actionDim>::SetOpmizationDelay(ndInt32)
-{
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentDDPG<statesDim, actionDim>::IsTerminal() const
-{
-	return false;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndReal ndBrainAgentDDPG<statesDim, actionDim>::GetReward() const
-{
-	return ndReal(0.0f);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG<statesDim, actionDim>::ResetModel() const
-{
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG<statesDim, actionDim>::OptimizeStep()
-{
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG<statesDim, actionDim>::Save(ndBrainSave* const loadSave) const
-{
-	loadSave->Save(*m_actor);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDDPG_Trainner<statesDim, actionDim>::ndBrainAgentDDPG_Trainner(const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic)
-	:ndBrainAgentDDPG<statesDim, actionDim>(actor)
+	:ndBrainAgent()
+	,m_actor(actor)
 	,m_critic(critic)
 	,m_actorTarget(*(*m_actor))
 	,m_criticTarget(*(*m_critic))
 	,m_actorOptimizer(*m_actor)
 	,m_criticOptimizer(*m_critic)
+	,m_actorTargetInstance(&m_actorTarget)
 	,m_criticTargetInstance(&m_criticTarget)
 	,m_movingAverage()
 	,m_shuffleBuffer()
@@ -365,7 +374,7 @@ void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::BackPropagate()
 {
 	class ndTestValidator : public ndBrainTrainer::ndValidation
 	{
-	public:
+		public:
 		ndTestValidator(ndBrainTrainer& trainer)
 			:ndBrainTrainer::ndValidation(trainer)
 		{
@@ -382,26 +391,26 @@ void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::BackPropagate()
 	m_actorOptimizer.Optimize(validator, inputBatch, m_learnRate, 1);
 }
 
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDDPG_Trainner<statesDim, actionDim>::SelectBestAction()
-{
-	ndFloat32 explore = ndRand();
-	if (explore <= m_explorationProbability)
-	{
-		// explore environment
-		ndUnsigned32 randomIndex = ndRandInt();
-		ndInt32 action = ndInt32(randomIndex % actionDim);
-		m_currentTransition.m_action[0] = action;
-		return action;
-	}
-	else
-	{
-		// exploit environment
-		ndInt32 action = ndBrainAgentDDPG<statesDim, actionDim>::SelectBestAction();
-		m_currentTransition.m_action[0] = action;
-		return action;
-	}
-}
+//template<ndInt32 statesDim, ndInt32 actionDim>
+//ndInt32 ndBrainAgentDDPG_Trainner<statesDim, actionDim>::SelectBestAction()
+//{
+//	ndFloat32 explore = ndRand();
+//	if (explore <= m_explorationProbability)
+//	{
+//		// explore environment
+//		ndUnsigned32 randomIndex = ndRandInt();
+//		ndInt32 action = ndInt32(randomIndex % actionDim);
+//		m_currentTransition.m_action[0] = action;
+//		return action;
+//	}
+//	else
+//	{
+//		// exploit environment
+//		ndInt32 action = ndBrainAgentDDPG<statesDim, actionDim>::SelectBestAction();
+//		m_currentTransition.m_action[0] = action;
+//		return action;
+//	}
+//}
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::ApplyRandomAction() const
@@ -438,6 +447,18 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::SetOpmizationDelay(ndInt32 delay)
 {
 	m_optimizationDelay = delay;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::Save(ndBrainSave* const loadSave) const
+{
+	loadSave->Save(*m_actor);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::Step()
+{
+	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
