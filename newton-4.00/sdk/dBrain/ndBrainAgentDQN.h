@@ -51,8 +51,8 @@ class ndBrainAgentDQN: public ndBrainAgent
 	void SetOpmizationDelay(ndInt32 delay);
 	void Save(ndBrainSave* const loadSave) const;
 
-	ndSharedPtr<ndBrain> m_onlineNetwork;
-	ndBrainInstance m_instance;
+	ndSharedPtr<ndBrain> m_actor;
+	ndBrainInstance m_actorInstance;
 	ndBrainVector m_state;
 	ndBrainVector m_actions;
 };
@@ -122,7 +122,6 @@ class ndBrainAgentDQN_Trainner: public ndBrainAgentDQN<statesDim, actionDim>
 		//virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
 		void EvaluateBellmanEquation(ndInt32 index)
 		{
-			//ndBrainVector& groundTruth = m_truth;
 			ndAssert(m_truth.GetCount() == m_output.GetCount());
 			ndAssert(m_truth.GetCount() == m_outputBatch.GetCount());
 			const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_agent->m_replayBuffer[index];
@@ -178,8 +177,8 @@ class ndBrainAgentDQN_Trainner: public ndBrainAgentDQN<statesDim, actionDim>
 		ndBrainAgentDQN_Trainner<statesDim, actionDim>* m_agent;
 	};
 
-	ndBrain m_targetNetwork;
-	ndOptimizer m_trainer;
+	ndBrain m_target;
+	ndOptimizer m_actorOtimizer;
 	ndBrainInstance m_targetInstance;
 	ndArray<ndInt32> m_movingAverage;
 	ndArray<ndInt32> m_shuffleBuffer;
@@ -207,8 +206,8 @@ class ndBrainAgentDQN_Trainner: public ndBrainAgentDQN<statesDim, actionDim>
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN(const ndSharedPtr<ndBrain>& qValuePredictor)
 	:ndBrainAgent()
-	,m_onlineNetwork(qValuePredictor)
-	,m_instance(*m_onlineNetwork)
+	,m_actor(qValuePredictor)
+	,m_actorInstance(*m_actor)
 {
 	m_state.SetCount(statesDim);
 	m_actions.SetCount(actionDim);
@@ -220,13 +219,13 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 ndInt32 ndBrainAgentDQN<statesDim, actionDim>::SelectBestAction()
 {
 	ndInt32 bestAction = 0;
-	ndReal maxReward = m_actions[0];
+	ndReal maxQValue = m_actions[0];
 	for (ndInt32 i = 1; i < actionDim; ++i)
 	{
-		if (m_actions[i] > maxReward)
+		if (m_actions[i] > maxQValue)
 		{
 			bestAction = i;
-			maxReward = m_actions[i];
+			maxQValue = m_actions[i];
 		}
 	}
 	return bestAction;
@@ -242,7 +241,7 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN<statesDim, actionDim>::Step()
 {
 	GetObservation(&m_state[0]);
-	m_instance.MakePrediction(m_state, m_actions);
+	m_actorInstance.MakePrediction(m_state, m_actions);
 
 	ndReal bestAction = ndReal (SelectBestAction());
 	ApplyActions(&bestAction);
@@ -284,15 +283,15 @@ void ndBrainAgentDQN<statesDim, actionDim>::OptimizeStep()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN<statesDim, actionDim>::Save(ndBrainSave* const loadSave) const
 {
-	loadSave->Save(*m_onlineNetwork);
+	loadSave->Save(*m_actor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDQN_Trainner<statesDim, actionDim>::ndBrainAgentDQN_Trainner(const ndSharedPtr<ndBrain>& qValuePredictor)
 	:ndBrainAgentDQN<statesDim, actionDim>(qValuePredictor)
-	,m_targetNetwork(*(*m_onlineNetwork))
-	,m_trainer(*m_onlineNetwork)
-	,m_targetInstance(&m_targetNetwork)
+	,m_target(*(*m_actor))
+	,m_actorOtimizer(*m_actor)
+	,m_targetInstance(&m_target)
 	,m_movingAverage()
 	,m_shuffleBuffer()
 	,m_replayBuffer()
@@ -312,12 +311,12 @@ ndBrainAgentDQN_Trainner<statesDim, actionDim>::ndBrainAgentDQN_Trainner(const n
 	,m_optimizationDelayCount(0)
 	,m_collectingSamples(true)
 {
-	m_trainer.m_agent = this;
-	m_trainer.SetRegularizer(D_DQN_REGULARIZER);
+	m_actorOtimizer.m_agent = this;
+	m_actorOtimizer.SetRegularizer(D_DQN_REGULARIZER);
 	m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / D_DQN_STAR_OPTIMIZATION;
 
 	SetBufferSize(D_DQN_REPLAY_BUFFERSIZE);
-	m_targetNetwork.CopyFrom(*(*m_onlineNetwork));
+	m_target.CopyFrom(*(*m_actor));
 
 	for (ndInt32 i = 0; i < D_DQN_MOVING_AVERAGE; ++i)
 	{
@@ -370,8 +369,8 @@ void ndBrainAgentDQN_Trainner<statesDim, actionDim>::BackPropagate()
 	};
 
 	ndBrainMatrix inputBatch;
-	ndTestValidator validator(m_trainer);
-	m_trainer.Optimize(validator, inputBatch, m_learnRate, 1);
+	ndTestValidator validator(m_actorOtimizer);
+	m_actorOtimizer.Optimize(validator, inputBatch, m_learnRate, 1);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -496,7 +495,7 @@ void ndBrainAgentDQN_Trainner<statesDim, actionDim>::OptimizeStep()
 	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
 	{
 		// update on line network
-		m_targetNetwork.CopyFrom(*(*m_onlineNetwork));
+		m_target.CopyFrom(*(*m_actor));
 	}
 	
 	m_frameCount++;

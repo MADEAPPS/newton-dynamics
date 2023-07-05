@@ -62,9 +62,6 @@ class ndBrain: public ndArray<ndBrainLayer*>
 
 	ndInt32 GetInputSize() const;
 	ndInt32 GetOutputSize() const;
-
-	//bool Load(const char* const pathName);
-	//void Save(const char* const pathName) const;
 	void CopyFrom(const ndBrain& src);
 
 	void BeginAddLayer();

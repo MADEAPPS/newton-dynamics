@@ -57,8 +57,8 @@ namespace ndController_0
 			class ndCartpoleAgent : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
 			{
 				public:
-				ndCartpoleAgent(ndSharedPtr<ndBrain>& qValuePredictor)
-					:ndBrainAgentDQN<m_stateSize, m_actionsSize>(qValuePredictor)
+				ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
+					:ndBrainAgentDQN<m_stateSize, m_actionsSize>(actor)
 					,m_model(nullptr)
 				{
 				}
@@ -141,11 +141,11 @@ namespace ndController_0
 
 		#else
 
-			class ndCartpoleAgent : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
+			class ndCartpoleAgent: public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
 			{
 				public:
-				ndCartpoleAgent(ndSharedPtr<ndBrain>& qValuePredictor)
-					:ndBrainAgentDQN<m_stateSize, m_actionsSize>(qValuePredictor)
+				ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
+					:ndBrainAgentDDPG<m_stateSize, m_actionsSize>(actor)
 					,m_model(nullptr)
 				{
 					//ndAssert(0);
@@ -166,12 +166,12 @@ namespace ndController_0
 				ndCartpole* m_model;
 			};
 
-			class ndCartpoleAgent_trainer : public ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>
+			class ndCartpoleAgent_trainer : public ndBrainAgentDDPG_Trainner<m_stateSize, m_actionsSize>
 			{
 				public:
-				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
-					:ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>(qValuePredictor)
-					, m_model(nullptr)
+				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
+					:ndBrainAgentDDPG_Trainner<m_stateSize, m_actionsSize>(actor, critic)
+					,m_model(nullptr)
 				{
 					ndAssert(0);
 				}
@@ -217,7 +217,7 @@ namespace ndController_0
 					ndInt32 stopTraining = GetFramesCount();
 					if (stopTraining <= 1000000)
 					{
-						ndBrainAgentDQN_Trainner::OptimizeStep();
+						ndBrainAgentDDPG_Trainner::OptimizeStep();
 					}
 
 					if (stopTraining == 1000000)
@@ -245,7 +245,6 @@ namespace ndController_0
 			,m_cart(nullptr)
 			,m_pole(nullptr)
 			,m_agent(agent)
-			,m_state(0)
 		{
 		}
 
@@ -269,17 +268,18 @@ namespace ndController_0
 		{
 			ndVector force(m_cart->GetForce());
 			#ifdef D_USE_POLE_DQN
-			ndInt32 action = ndInt32(actions[0]);
-			if (action == m_pushLeft)
-			{
-				force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
-			}
-			else if (action == m_pushRight)
-			{
-				force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
-			}
+				ndInt32 action = ndInt32(actions[0]);
+				if (action == m_pushLeft)
+				{
+					force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
+				}
+				else if (action == m_pushRight)
+				{
+					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
+				}
 			#else
-				ndAssert(0);
+				ndFloat32 action = actions[0];
+				force.m_x = 2.0f * action * (m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL);
 			#endif
 			m_cart->SetForce(force);
 		}
@@ -303,8 +303,6 @@ namespace ndController_0
 
 			m_cart->SetMatrix(m_cartMatrix);
 			m_pole->SetMatrix(m_poleMatrix);
-
-			m_state = 0;
 		}
 
 		void RandomePush()
@@ -333,8 +331,6 @@ namespace ndController_0
 				impulsePush.m_x = 5.0f * m_cart->GetMassMatrix().m_w;
 				m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, timestep);
 			}
-
-			m_state++;
 		}
 
 		ndMatrix m_cartMatrix;
@@ -342,7 +338,6 @@ namespace ndController_0
 		ndBodyDynamic* m_cart;
 		ndBodyDynamic* m_pole;
 		ndSharedPtr<ndBrainAgent> m_agent;
-		mutable ndInt32 m_state;
 	};
 
 	void BuildModel(ndCartpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -397,21 +392,57 @@ namespace ndController_0
 	{
 		// build neutral net controller
 		ndInt32 layerSize = 64;
-		ndSharedPtr<ndBrain> qValuePredictor(new ndBrain());
-		ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
-		ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
-		ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
-		ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_lineal);
+		#ifdef D_USE_POLE_DQN
+			ndSharedPtr<ndBrain> actor(new ndBrain());
+			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
+			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_lineal);
+			actor->BeginAddLayer();
+			actor->AddLayer(layer0);
+			actor->AddLayer(layer1);
+			actor->AddLayer(layer2);
+			actor->AddLayer(ouputLayer);
+			actor->EndAddLayer(ndReal(0.25f));
 
-		qValuePredictor->BeginAddLayer();
-		qValuePredictor->AddLayer(layer0);
-		qValuePredictor->AddLayer(layer1);
-		qValuePredictor->AddLayer(layer2);
-		qValuePredictor->AddLayer(ouputLayer);
-		qValuePredictor->EndAddLayer(ndReal(0.25f));
+			char fileName[1024];
+			dGetWorkingFileName("cartpoleDQN.nn", fileName);
+			ndBrainSave::Save(*actor, fileName);
 
-		// add a reinforcement learning controller 
-		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(qValuePredictor));
+			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(actor));
+		#else
+
+			ndSharedPtr<ndBrain> actor(new ndBrain());
+			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
+			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_tanh);
+			actor->BeginAddLayer();
+			actor->AddLayer(layer0);
+			actor->AddLayer(layer1);
+			actor->AddLayer(layer2);
+			actor->AddLayer(ouputLayer);
+			actor->EndAddLayer(ndReal(0.25f));
+
+			char fileName[1024];
+			dGetWorkingFileName("cartpoleDDPG.nn", fileName);
+			ndBrainSave::Save(*actor, fileName);
+
+			ndSharedPtr<ndBrain> critic(new ndBrain());
+			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
+			ndBrainLayer* const criticLayer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayer* const criticLayer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(layer2->GetOuputSize(), 1, m_lineal);
+			critic->BeginAddLayer();
+			critic->AddLayer(criticLayer0);
+			critic->AddLayer(criticLayer1);
+			critic->AddLayer(criticLayer2);
+			critic->AddLayer(criticOuputLayer);
+			critic->EndAddLayer(ndReal(0.25f));
+
+			// add a reinforcement learning controller 
+			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(actor, critic));
+		#endif
 		ndCartpole* const model = new ndCartpole(agent);
 		((ndCartpole::ndCartpoleAgent_trainer*)*agent)->m_model = model;
 
@@ -424,15 +455,18 @@ namespace ndController_0
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		char fileName[1024];
+#ifdef D_USE_POLE_DQN
 		dGetWorkingFileName("cartpoleDQN.nn", fileName);
+#else
+		dGetWorkingFileName("cartpoleDDPG.nn", fileName);
+#endif
 	
-		ndSharedPtr<ndBrain> qValuePredictor(ndBrainLoad::Load(fileName));
-		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(qValuePredictor));
+		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(actor));
 
 		ndCartpole* const model = new ndCartpole(agent);
 		((ndCartpole::ndCartpoleAgent*)*agent)->m_model = model;
-		model->m_state = 100;
-
+		
 		BuildModel(model, scene, location);
 		return model;
 	}
