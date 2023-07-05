@@ -388,7 +388,8 @@ void ndBrainTrainer::ClearGradientsAcc()
 //	m_instance.GetBrain()->CopyFrom(bestNetwork);
 //}
 
-void ndBrainTrainer::GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector&) const
+//void ndBrainTrainer::GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector&) const
+void ndBrainTrainer::GetGroundTruth(ndInt32, ndBrainVector&, const ndBrainVector&) const
 {
 	ndAssert(0);
 	//ndAssert(m_groundTruthArray);
@@ -397,7 +398,8 @@ void ndBrainTrainer::GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, c
 	//groundTruth.Set(groundTruthArray[index]);
 }
 
-void ndBrainTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, ndReal learnRate, ndInt32 steps)
+//void ndBrainTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, ndReal learnRate, ndInt32 steps)
+void ndBrainTrainer::Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32)
 {
 	ndAssert(0);
 	//ndFloatExceptions exception;
@@ -450,7 +452,8 @@ void ndBrainTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inpu
 	//m_instance.GetBrain()->CopyFrom(bestNetwork);
 }
 
-void ndBrainTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
+//void ndBrainTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
+void ndBrainTrainer::Optimize(ndValidation&, const ndBrainMatrix&, const ndBrainMatrix&, ndReal, ndInt32)
 {
 	ndAssert(0);
 	//m_groundTruthArray = &groundTruth;

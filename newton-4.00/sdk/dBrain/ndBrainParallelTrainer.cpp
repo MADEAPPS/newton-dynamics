@@ -46,7 +46,8 @@ class ndBrainParallelTrainer::ndBrainTrainerChannel : public ndBrainTrainer
 	}
 };
 
-ndBrainParallelTrainer::ndBrainParallelTrainer(ndBrain* const brain, ndInt32 threads)
+//ndBrainParallelTrainer::ndBrainParallelTrainer(ndBrain* const brain, ndInt32 threads)
+ndBrainParallelTrainer::ndBrainParallelTrainer(ndBrain* const brain, ndInt32)
 	:ndBrainTrainer(brain)
 	,ndThreadPool("neuralNet")
 	,m_inputBatch(nullptr)

@@ -52,7 +52,7 @@ void ndBrainAgent::SaveToFile(const char* const pathFilename) const
 			}
 		}
 
-		void WriteData(const char* data) const
+		void WriteData(const char* const data) const
 		{
 			fprintf(m_file, data);
 		}

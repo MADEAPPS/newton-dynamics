@@ -389,7 +389,7 @@ void ndBrainSave::Save(const ndBrain* const brain, const char* const pathName)
 			}
 		}
 
-		void WriteData(const char* data) const
+		void WriteData(const char* const data) const
 		{
 			fprintf(m_file, data);
 		}
