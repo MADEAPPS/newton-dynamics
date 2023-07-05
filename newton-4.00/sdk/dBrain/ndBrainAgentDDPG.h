@@ -141,7 +141,7 @@ void ndBrainAgentDDPG<statesDim, actionDim>::Save(ndBrainSave* const) const
 //
 // ******************************************************************************
 template<ndInt32 statesDim, ndInt32 actionDim>
-class ndBrainAgentDDPG_Trainner: public ndBrainAgent
+class ndBrainAgentDDPG_Trainer: public ndBrainAgent
 {
 	// hyper parameters defaults
 	#define D_DDPG_LEARN_RATE				ndReal(2.0e-4f)
@@ -157,8 +157,8 @@ class ndBrainAgentDDPG_Trainner: public ndBrainAgent
 	#define D_DDPG_EXPLORE_ANNELININGING	(D_DDPG_MIN_EXPLORE_PROBABILITY / ndReal(2.0f))
 
 	public:
-	ndBrainAgentDDPG_Trainner(const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic);
-	virtual ~ndBrainAgentDDPG_Trainner();
+	ndBrainAgentDDPG_Trainer(const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic);
+	virtual ~ndBrainAgentDDPG_Trainer();
 
 	ndInt32 GetFramesCount() const;
 	ndInt32 GetEposideCount() const;
@@ -264,7 +264,7 @@ class ndBrainAgentDDPG_Trainner: public ndBrainAgent
 		ndBrainVector m_truth;
 		ndBrainVector m_inputBatch;
 		ndBrainVector m_outputBatch;
-		ndBrainAgentDDPG_Trainner<statesDim, actionDim>* m_agent;
+		ndBrainAgentDDPG_Trainer<statesDim, actionDim>* m_agent;
 	};
 
 	ndSharedPtr<ndBrain> m_actor;
@@ -299,7 +299,7 @@ class ndBrainAgentDDPG_Trainner: public ndBrainAgent
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDDPG_Trainner<statesDim, actionDim>::ndBrainAgentDDPG_Trainner(const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic)
+ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic)
 	:ndBrainAgent()
 	,m_actor(actor)
 	,m_critic(critic)
@@ -343,24 +343,24 @@ ndBrainAgentDDPG_Trainner<statesDim, actionDim>::ndBrainAgentDDPG_Trainner(const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDDPG_Trainner<statesDim, actionDim>::~ndBrainAgentDDPG_Trainner()
+ndBrainAgentDDPG_Trainer<statesDim, actionDim>::~ndBrainAgentDDPG_Trainer()
 {
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDDPG_Trainner<statesDim, actionDim>::GetFramesCount() const
+ndInt32 ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetFramesCount() const
 {
 	return m_frameCount;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDDPG_Trainner<statesDim, actionDim>::GetEposideCount() const
+ndInt32 ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetEposideCount() const
 {
 	return m_eposideCount;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::SetBufferSize(ndInt32 size)
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SetBufferSize(ndInt32 size)
 {
 	m_shuffleBuffer.SetCount(size);
 	m_replayBuffer.SetCount(size);
@@ -370,7 +370,7 @@ void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::SetBufferSize(ndInt32 size
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::BackPropagate()
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagate()
 {
 	class ndTestValidator : public ndBrainTrainer::ndValidation
 	{
@@ -392,7 +392,7 @@ void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::BackPropagate()
 }
 
 //template<ndInt32 statesDim, ndInt32 actionDim>
-//ndInt32 ndBrainAgentDDPG_Trainner<statesDim, actionDim>::SelectBestAction()
+//ndInt32 ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SelectBestAction()
 //{
 //	ndFloat32 explore = ndRand();
 //	if (explore <= m_explorationProbability)
@@ -413,13 +413,13 @@ void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::BackPropagate()
 //}
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::ApplyRandomAction() const
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ApplyRandomAction() const
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::PrintDebug()
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PrintDebug()
 {
 	m_movingAverage[m_movingAverageIndex] = m_framesAlive;
 	m_movingAverageIndex = (m_movingAverageIndex + 1) % m_movingAverage.GetCount();
@@ -438,31 +438,31 @@ void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::PrintDebug()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDDPG_Trainner<statesDim, actionDim>::GetOpmizationDelay() const
+ndInt32 ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetOpmizationDelay() const
 {
 	return m_optimizationDelay;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::SetOpmizationDelay(ndInt32 delay)
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SetOpmizationDelay(ndInt32 delay)
 {
 	m_optimizationDelay = delay;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::Save(ndBrainSave* const loadSave) const
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Save(ndBrainSave* const loadSave) const
 {
 	loadSave->Save(*m_actor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::Step()
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::OptimizeStep()
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::OptimizeStep()
 {
 	ndAssert(0);
 	//m_optimizationDelayCount++;
@@ -474,8 +474,8 @@ void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::OptimizeStep()
 	//
 	//if (!m_frameCount)
 	//{
-	//	ndBrainAgentDDPG_Trainner<statesDim, actionDim>::m_state.Set(ndReal(0.0f));
-	//	ndBrainAgentDDPG_Trainner<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
+	//	ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_state.Set(ndReal(0.0f));
+	//	ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
 	//	ResetModel();
 	//	m_currentTransition.Clear();
 	//	m_optimizationDelayCount = 0;
@@ -486,7 +486,7 @@ void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::OptimizeStep()
 	//m_currentTransition.m_terminalState = IsTerminal();
 	//for (ndInt32 i = 0; i < statesDim; ++i)
 	//{
-	//	m_currentTransition.m_state[i] = ndBrainAgentDDPG_Trainner<statesDim, actionDim>::m_state[i];
+	//	m_currentTransition.m_state[i] = ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_state[i];
 	//}
 	//
 	//m_replayBuffer.AddTransition(m_currentTransition);
@@ -497,8 +497,8 @@ void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::OptimizeStep()
 	//
 	//if (m_currentTransition.m_terminalState)
 	//{
-	//	ndBrainAgentDDPG_Trainner<statesDim, actionDim>::m_state.Set(ndReal(0.0f));
-	//	ndBrainAgentDDPG_Trainner<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
+	//	ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_state.Set(ndReal(0.0f));
+	//	ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
 	//	ResetModel();
 	//	m_currentTransition.Clear();
 	//	if ((m_frameCount < m_startOptimization) && (m_eposideCount % 32 == 0))
@@ -507,7 +507,7 @@ void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::OptimizeStep()
 	//	}
 	//	m_eposideCount++;
 	//	m_optimizationDelayCount = 0;
-	//	ndBrainAgentDDPG_Trainner<statesDim, actionDim>::PrintDebug();
+	//	ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PrintDebug();
 	//}
 	//
 	//// begin exploitation only after there are a replay buffer is full of random training samples

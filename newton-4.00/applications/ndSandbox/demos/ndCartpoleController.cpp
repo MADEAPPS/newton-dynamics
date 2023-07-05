@@ -76,11 +76,11 @@ namespace ndController_0
 				ndCartpole* m_model;
 			};
 
-			class ndCartpoleAgent_trainer : public ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>
+			class ndCartpoleAgent_trainer : public ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>
 			{
 				public:
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
-					:ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>(qValuePredictor)
+					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(qValuePredictor)
 					,m_model(nullptr)
 				{
 				}
@@ -120,7 +120,7 @@ namespace ndController_0
 					ndInt32 stopTraining = GetFramesCount();
 					if (stopTraining <= 1000000)
 					{
-						ndBrainAgentDQN_Trainner::OptimizeStep();
+						ndBrainAgentDQN_Trainer::OptimizeStep();
 					}
 			
 					if (stopTraining == 1000000)
@@ -166,11 +166,11 @@ namespace ndController_0
 				ndCartpole* m_model;
 			};
 
-			class ndCartpoleAgent_trainer : public ndBrainAgentDDPG_Trainner<m_stateSize, m_actionsSize>
+			class ndCartpoleAgent_trainer : public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
 			{
 				public:
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
-					:ndBrainAgentDDPG_Trainner<m_stateSize, m_actionsSize>(actor, critic)
+					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 					,m_model(nullptr)
 				{
 					ndAssert(0);
@@ -217,7 +217,7 @@ namespace ndController_0
 					ndInt32 stopTraining = GetFramesCount();
 					if (stopTraining <= 1000000)
 					{
-						ndBrainAgentDDPG_Trainner::OptimizeStep();
+						ndBrainAgentDDPG_Trainer::OptimizeStep();
 					}
 
 					if (stopTraining == 1000000)
