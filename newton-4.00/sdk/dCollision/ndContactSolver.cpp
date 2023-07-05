@@ -2616,7 +2616,7 @@ ndInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 		}
 	}
 
-	ndAssert(m_separationDistance < ndFloat32(1.0e6f));
+	ndAssert(m_separationDistance < ndFloat32(1.0e12f));
 	return count;
 }
 

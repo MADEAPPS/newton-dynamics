@@ -206,7 +206,7 @@ ndBrain* ndBrainLoad::Load(const char* const pathName)
 
 		ndFloat32 ReadFloat() const
 		{
-			ndFloat32 value;
+			ndReal value;
 			fscanf(m_file, "%f", &value);
 			return value;
 		}
