@@ -20,121 +20,223 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#define D_USE_POLE
+#define D_USE_POLE_DQN
 
 namespace ndController_0
 {
 	#define D_PUSH_ACCEL			ndFloat32 (15.0f)
 	#define D_REWARD_MIN_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
 
+#ifdef D_USE_POLE_DQN
 	enum ndActionSpace
 	{
-		m_statePut,
+		m_doNoting,
 		m_pushLeft,
 		m_pushRight,
 		m_actionsSize
 	};
+#else
+	enum ndActionSpace
+	{
+		m_doNoting,
+		m_actionsSize
+	};
+#endif
 
-#ifdef D_USE_POLE
 	enum ndStateSpace
 	{
 		m_poleAngle,
 		m_poleOmega,
 		m_stateSize
 	};
-#else
-	enum ndStateSpace
-	{
-		m_poleOmega,
-		m_poleAlpha,
-		m_cartVelocity,
-		m_cartAcceleration,
-		m_stateSize
-	};
-#endif
 
 	class ndCartpole: public ndModelArticulation
 	{
 		public:
-		class ndDQNAgent : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
-		{
-			public:
-			ndDQNAgent(ndSharedPtr<ndBrain>& qValuePredictor)
-				:ndBrainAgentDQN<m_stateSize, m_actionsSize>(qValuePredictor)
-				,m_model(nullptr)
+		#ifdef D_USE_POLE_DQN
+			class ndCartpoleAgent : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
 			{
-			}
-
-			void GetObservation(ndReal* const state) const
-			{
-				m_model->GetObservation(state);
-			}
-
-			virtual void ApplyActions(ndReal* const actions) const
-			{
-				m_model->ApplyActions(actions);
-			}
-
-			ndCartpole* m_model;
-		};
-
-		class ndDQNAgent_trainer : public ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>
-		{
-			public:
-			ndDQNAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
-				:ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>(qValuePredictor)
-				,m_model(nullptr)
-			{
-			}
-
-			ndReal GetReward() const
-			{
-				return m_model->GetReward();
-			}
-
-			virtual void ApplyActions(ndReal* const actions) const
-			{
-				m_model->ApplyActions(actions);
-			}
-
-			void GetObservation(ndReal* const state) const
-			{
-				m_model->GetObservation(state);
-			}
-
-			bool IsTerminal() const
-			{
-				return m_model->IsTerminal();
-			}
-
-			void ResetModel() const
-			{
-				m_model->ResetModel();
-			}
-
-			void OptimizeStep()
-			{
-				ndInt32 stopTraining = GetFramesCount();
-				if (stopTraining <= 1000000)
+				public:
+				ndCartpoleAgent(ndSharedPtr<ndBrain>& qValuePredictor)
+					:ndBrainAgentDQN<m_stateSize, m_actionsSize>(qValuePredictor)
+					,m_model(nullptr)
 				{
-					ndBrainAgentDQN_Trainner::OptimizeStep();
 				}
-			
-				if (stopTraining == 1000000)
-				{
-					char fileName[1024];
-					dGetWorkingFileName("cartpoleDQN.nn", fileName);
 
-					SaveToFile(fileName);
-					ndExpandTraceMessage("\n");
-					ndExpandTraceMessage("training complete\n");
-					ndExpandTraceMessage("save to file: %s\n", fileName);
+				void GetObservation(ndReal* const state) const
+				{
+					m_model->GetObservation(state);
+				}
+
+				virtual void ApplyActions(ndReal* const actions) const
+				{
+					m_model->ApplyActions(actions);
+				}
+
+				ndCartpole* m_model;
+			};
+
+			class ndCartpoleAgent_trainer : public ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>
+			{
+				public:
+				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
+					:ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>(qValuePredictor)
+					,m_model(nullptr)
+				{
+				}
+
+				ndReal GetReward() const
+				{
+					return m_model->GetReward();
+				}
+
+				virtual void ApplyActions(ndReal* const actions) const
+				{
+					m_model->ApplyActions(actions);
+				}
+
+				void ApplyRandomAction() const
+				{
+					m_model->RandomePush();
+				}
+
+				void GetObservation(ndReal* const state) const
+				{
+					m_model->GetObservation(state);
+				}
+
+				bool IsTerminal() const
+				{
+					return m_model->IsTerminal();
+				}
+
+				void ResetModel() const
+				{
 					m_model->ResetModel();
 				}
-			}
 
-			ndCartpole* m_model;
-		};
+				void OptimizeStep()
+				{
+					ndInt32 stopTraining = GetFramesCount();
+					if (stopTraining <= 1000000)
+					{
+						ndBrainAgentDQN_Trainner::OptimizeStep();
+					}
+			
+					if (stopTraining == 1000000)
+					{
+						char fileName[1024];
+						dGetWorkingFileName("cartpoleDQN.nn", fileName);
+
+						SaveToFile(fileName);
+						ndExpandTraceMessage("\n");
+						ndExpandTraceMessage("training complete\n");
+						ndExpandTraceMessage("save to file: %s\n", fileName);
+						m_model->ResetModel();
+					}
+				}
+
+				ndCartpole* m_model;
+			};
+
+		#else
+
+			class ndCartpoleAgent : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
+			{
+				public:
+				ndCartpoleAgent(ndSharedPtr<ndBrain>& qValuePredictor)
+					:ndBrainAgentDQN<m_stateSize, m_actionsSize>(qValuePredictor)
+					,m_model(nullptr)
+				{
+					//ndAssert(0);
+				}
+
+				void GetObservation(ndReal* const state) const
+				{
+					//ndAssert(0);
+					m_model->GetObservation(state);
+				}
+
+				virtual void ApplyActions(ndReal* const actions) const
+				{
+					//ndAssert(0);
+					m_model->ApplyActions(actions);
+				}
+
+				ndCartpole* m_model;
+			};
+
+			class ndCartpoleAgent_trainer : public ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>
+			{
+				public:
+				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
+					:ndBrainAgentDQN_Trainner<m_stateSize, m_actionsSize>(qValuePredictor)
+					, m_model(nullptr)
+				{
+					ndAssert(0);
+				}
+
+				ndReal GetReward() const
+				{
+					ndAssert(0);
+					return m_model->GetReward();
+				}
+
+				virtual void ApplyActions(ndReal* const actions) const
+				{
+					ndAssert(0);
+					m_model->ApplyActions(actions);
+				}
+
+				void ApplyRandomAction() const
+				{
+					m_model->RandomePush();
+				}
+
+				void GetObservation(ndReal* const state) const
+				{
+					ndAssert(0);
+					m_model->GetObservation(state);
+				}
+
+				bool IsTerminal() const
+				{
+					ndAssert(0);
+					return m_model->IsTerminal();
+				}
+
+				void ResetModel() const
+				{
+					ndAssert(0);
+					m_model->ResetModel();
+				}
+
+				void OptimizeStep()
+				{
+					ndAssert(0);
+					ndInt32 stopTraining = GetFramesCount();
+					if (stopTraining <= 1000000)
+					{
+						ndBrainAgentDQN_Trainner::OptimizeStep();
+					}
+
+					if (stopTraining == 1000000)
+					{
+						char fileName[1024];
+						dGetWorkingFileName("cartpoleDQN.nn", fileName);
+
+						SaveToFile(fileName);
+						ndExpandTraceMessage("\n");
+						ndExpandTraceMessage("training complete\n");
+						ndExpandTraceMessage("save to file: %s\n", fileName);
+						m_model->ResetModel();
+					}
+				}
+
+				ndCartpole* m_model;
+			};
+
+		#endif
 
 		ndCartpole(const ndSharedPtr<ndBrainAgent>& agent)
 			:ndModelArticulation()
@@ -159,7 +261,6 @@ namespace ndController_0
 		{
 			const ndMatrix& matrix = m_pole->GetMatrix();
 			ndFloat32 angle = ndMin(ndAbs(matrix.m_front.m_x), D_REWARD_MIN_ANGLE);
-			//ndFloat32 angle = ndAbs(matrix.m_front.m_x);
 			ndFloat32 reward = ndFloat32(1.0f) - angle / D_REWARD_MIN_ANGLE;
 			return ndReal(reward);
 		}
@@ -167,6 +268,7 @@ namespace ndController_0
 		void ApplyActions(ndReal* const actions) const
 		{
 			ndVector force(m_cart->GetForce());
+			#ifdef D_USE_POLE_DQN
 			ndInt32 action = ndInt32(actions[0]);
 			if (action == m_pushLeft)
 			{
@@ -176,42 +278,19 @@ namespace ndController_0
 			{
 				force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
 			}
+			#else
+				ndAssert(0);
+			#endif
 			m_cart->SetForce(force);
 		}
 
 		void GetObservation(ndReal* const state)
 		{
-			#ifdef D_USE_POLE
-				ndVector omega(m_pole->GetOmega());
-				const ndMatrix& matrix = m_pole->GetMatrix();
-				ndFloat32 angle = ndClamp (matrix.m_front.m_x, -2.0f * D_REWARD_MIN_ANGLE, 2.0f * D_REWARD_MIN_ANGLE);
-				state[m_poleAngle] = ndReal(angle);
-				state[m_poleOmega] = ndReal(omega.m_z);
-				
-			#else	
-				ndSkeletonContainer* const skeleton = m_cart->GetSkeleton();
-				ndAssert(skeleton);
-
-				ndWorld* const world = m_cart->GetScene()->GetWorld();
-				ndFloat32 timestep = m_cart->GetScene()->GetTimestep();
-				m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
-				m_invDynamicsSolver.Solve();
-			
-				const ndVector poleTorque(m_invDynamicsSolver.GetBodyTorque(m_pole));
-				ndVector omega(m_pole->GetOmega());
-				ndVector alpha(m_pole->GetInvInertiaMatrix().RotateVector(poleTorque));
-
-				const ndVector cartForce(m_invDynamicsSolver.GetBodyForce(m_cart));
-				ndVector veloc(m_cart->GetVelocity());
-				ndVector accel(cartForce.Scale(m_cart->GetInvMass()));
-			
-				state[m_poleAlpha] = ndReal(alpha.m_z);
-				state[m_poleOmega] = ndReal(omega.m_z);
-				state[m_cartVelocity] = ndReal(veloc.m_x);
-				state[m_cartAcceleration] = ndReal(accel.m_x);
-
-				m_invDynamicsSolver.SolverEnd();
-			#endif
+			ndVector omega(m_pole->GetOmega());
+			const ndMatrix& matrix = m_pole->GetMatrix();
+			ndFloat32 angle = ndClamp (matrix.m_front.m_x, -2.0f * D_REWARD_MIN_ANGLE, 2.0f * D_REWARD_MIN_ANGLE);
+			state[m_poleAngle] = ndReal(angle);
+			state[m_poleOmega] = ndReal(omega.m_z);
 		}
 
 		virtual void ResetModel() const
@@ -228,33 +307,23 @@ namespace ndController_0
 			m_state = 0;
 		}
 
-		void RandomePush(ndFloat32 timestep)
+		void RandomePush()
 		{
 			ndVector impulsePush(ndVector::m_zero);
 			impulsePush.m_x = ndGaussianRandom(0.0f, 0.5f) * m_cart->GetMassMatrix().m_w;
-			m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, timestep);
+			m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, m_cart->GetScene()->GetTimestep());
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
-			if (m_state < 3)
-			{
-				RandomePush(timestep);
-			}
-			else
-			{
-				m_agent->Step();
-			}
+			m_agent->Step();
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
-			if (m_state >= 3)
-			{
-				m_agent->OptimizeStep();
-			}
+			m_agent->OptimizeStep();
 		
 			if (ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(40.0f))
 			{
@@ -342,9 +411,9 @@ namespace ndController_0
 		qValuePredictor->EndAddLayer(ndReal(0.25f));
 
 		// add a reinforcement learning controller 
-		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndDQNAgent_trainer(qValuePredictor));
+		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(qValuePredictor));
 		ndCartpole* const model = new ndCartpole(agent);
-		((ndCartpole::ndDQNAgent_trainer*)*agent)->m_model = model;
+		((ndCartpole::ndCartpoleAgent_trainer*)*agent)->m_model = model;
 
 		BuildModel(model, scene, location);
 
@@ -358,10 +427,10 @@ namespace ndController_0
 		dGetWorkingFileName("cartpoleDQN.nn", fileName);
 	
 		ndSharedPtr<ndBrain> qValuePredictor(ndBrainLoad::Load(fileName));
-		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndDQNAgent(qValuePredictor));
+		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(qValuePredictor));
 
 		ndCartpole* const model = new ndCartpole(agent);
-		((ndCartpole::ndDQNAgent*)*agent)->m_model = model;
+		((ndCartpole::ndCartpoleAgent*)*agent)->m_model = model;
 		model->m_state = 100;
 
 		BuildModel(model, scene, location);

@@ -29,7 +29,7 @@
 #include "ndBrainReplayBuffer.h"
 
 // this is an implementation of the vanilla 
-// Continuous control with deep re inforcement learning (ddpg agent)
+// Continuous control with deep re enforcement learning (ddpg agent)
 // trainer as described in: https://arxiv.org/pdf/1509.02971.pdf
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -45,7 +45,10 @@ class ndBrainAgentDDPG : public ndBrainAgent
 	void ResetModel() const;
 	bool IsTerminal() const;
 	ndReal GetReward() const;
+	void ApplyRandomAction() const;
 	virtual ndInt32 SelectBestAction();
+	ndInt32 GetOpmizationDelay() const;
+	void SetOpmizationDelay(ndInt32 delay);
 	void Save(ndBrainSave* const loadSave) const;
 
 	ndSharedPtr<ndBrain> m_onlineNetwork;
@@ -64,6 +67,7 @@ class ndBrainAgentDDPG_Trainner : public ndBrainAgentDDPG<statesDim, actionDim>
 	#define D_DDPG_MOVING_AVERAGE			64
 	#define D_DDPG_REPLAY_BASH_SIZE			32
 	#define D_DDPG_TARGET_UPDATE_PERIOD		1000
+	#define D_DDPG_OPTIMIZATION_DELAY		3
 	#define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
 	#define D_DDPG_MIN_EXPLORE_PROBABILITY	ndReal(1.0f/100.0f)
 	#define D_DDPG_STAR_OPTIMIZATION		(D_DDPG_REPLAY_BUFFERSIZE - 1000)
@@ -82,7 +86,10 @@ class ndBrainAgentDDPG_Trainner : public ndBrainAgentDDPG<statesDim, actionDim>
 	private:
 	void PrintDebug();
 	void BackPropagate();
+	void ApplyRandomAction() const;
 	void SetBufferSize(ndInt32 size);
+	ndInt32 GetOpmizationDelay() const;
+	void SetOpmizationDelay(ndInt32 delay);
 	virtual ndInt32 SelectBestAction();
 
 	class ndOptimizer : public ndBrainTrainer
@@ -192,6 +199,8 @@ class ndBrainAgentDDPG_Trainner : public ndBrainAgentDDPG<statesDim, actionDim>
 
 	ndInt32 m_framesAlive;
 	ndInt32 m_movingAverageIndex;
+	ndInt32 m_optimizationDelay;
+	ndInt32 m_optimizationDelayCount;
 	bool m_collectingSamples;
 };
 
@@ -224,6 +233,12 @@ ndInt32 ndBrainAgentDDPG<statesDim, actionDim>::SelectBestAction()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG<statesDim, actionDim>::ApplyRandomAction() const
+{
+	ndAssert(0);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG<statesDim, actionDim>::Step()
 {
 	GetObservation(&m_state[0]);
@@ -231,6 +246,17 @@ void ndBrainAgentDDPG<statesDim, actionDim>::Step()
 
 	ndReal bestAction = ndReal(SelectBestAction());
 	ApplyActions(&bestAction);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndInt32 ndBrainAgentDDPG<statesDim, actionDim>::GetOpmizationDelay() const
+{
+	return 0;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG<statesDim, actionDim>::SetOpmizationDelay(ndInt32)
+{
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -282,6 +308,8 @@ ndBrainAgentDDPG_Trainner<statesDim, actionDim>::ndBrainAgentDDPG_Trainner(const
 	,m_targetUpdatePeriod(D_DDPG_TARGET_UPDATE_PERIOD)
 	,m_framesAlive(0)
 	,m_movingAverageIndex(0)
+	,m_optimizationDelay(D_DDPG_OPTIMIZATION_DELAY)
+	,m_optimizationDelayCount(0)
 	,m_collectingSamples(true)
 {
 	m_trainer.m_agent = this;
@@ -368,6 +396,12 @@ ndInt32 ndBrainAgentDDPG_Trainner<statesDim, actionDim>::SelectBestAction()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::ApplyRandomAction() const
+{
+	ndAssert(0);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::PrintDebug()
 {
 	m_movingAverage[m_movingAverageIndex] = m_framesAlive;
@@ -387,14 +421,34 @@ void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::PrintDebug()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
+ndInt32 ndBrainAgentDDPG_Trainner<statesDim, actionDim>::GetOpmizationDelay() const
+{
+	return m_optimizationDelay;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::SetOpmizationDelay(ndInt32 delay)
+{
+	m_optimizationDelay = delay;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::OptimizeStep()
 {
+	m_optimizationDelayCount++;
+	if (m_optimizationDelayCount <= GetOpmizationDelay())
+	{
+		ApplyRandomAction();
+		return;
+	}
+
 	if (!m_frameCount)
 	{
 		ndBrainAgentDDPG_Trainner<statesDim, actionDim>::m_state.Set(ndReal(0.0f));
 		ndBrainAgentDDPG_Trainner<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
 		ResetModel();
 		m_currentTransition.Clear();
+		m_optimizationDelayCount = 0;
 	}
 
 	GetObservation(&m_currentTransition.m_nextState[0]);
@@ -422,6 +476,7 @@ void ndBrainAgentDDPG_Trainner<statesDim, actionDim>::OptimizeStep()
 			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_startOptimization, m_eposideCount);
 		}
 		m_eposideCount++;
+		m_optimizationDelayCount = 0;
 		ndBrainAgentDDPG_Trainner<statesDim, actionDim>::PrintDebug();
 	}
 
