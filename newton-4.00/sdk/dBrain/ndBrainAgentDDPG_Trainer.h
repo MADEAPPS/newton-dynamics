@@ -35,7 +35,8 @@
 // defualt hyper parameters defaults
 #define D_DDPG_LEARN_RATE				ndReal(2.0e-4f)
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
-#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
+//#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
+#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 1)
 #define D_DDPG_MOVING_AVERAGE			64
 #define D_DDPG_REPLAY_BASH_SIZE			32
 #define D_DDPG_TARGET_UPDATE_PERIOD		1000
@@ -75,65 +76,72 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 	void Optimize();
 	void PopulateReplayBuffer();
 
-	class ndOptimizer : public ndBrainTrainer
+	class ndCriticOptimizer: public ndBrainTrainer
 	{
 		public:
-		ndOptimizer(ndBrain* const brain)
+		ndCriticOptimizer(ndBrain* const brain)
 			:ndBrainTrainer(brain)
 			,m_truth()
 			,m_inputBatch()
 			,m_outputBatch()
+			,m_actorState()
+			,m_actorAction()
 			,m_agent(nullptr)
 		{
-			m_truth.SetCount(actionDim);
-			m_inputBatch.SetCount(statesDim);
-			m_outputBatch.SetCount(actionDim);
+			m_truth.SetCount(1);
+			m_outputBatch.SetCount(1);
+			m_actorState.SetCount(statesDim);
+			m_actorAction.SetCount(actionDim);
+			m_inputBatch.SetCount(statesDim + actionDim);
 		}
 
-		ndOptimizer(const ndOptimizer& src)
-			:ndBrainTrainer(src)
-			,m_truth()
-			,m_inputBatch()
-			,m_outputBatch()
-			,m_agent(nullptr)
-		{
-			m_truth.SetCount(actionDim);
-			m_inputBatch.SetCount(statesDim);
-			m_outputBatch.SetCount(actionDim);
-		}
+		//ndCriticOptimizer(const ndCriticOptimizer& src)
+		//	:ndCriticOptimizer(src)
+		//	,m_truth()
+		//	,m_inputBatch()
+		//	,m_outputBatch()
+		//	,m_agent(nullptr)
+		//{
+		//	m_truth.SetCount(actionDim);
+		//	m_inputBatch.SetCount(statesDim);
+		//	m_outputBatch.SetCount(actionDim);
+		//}
 
 		//virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
 		void EvaluateBellmanEquation(ndInt32 index)
 		{
 			ndAssert(m_truth.GetCount() == m_output.GetCount());
 			ndAssert(m_truth.GetCount() == m_outputBatch.GetCount());
-			const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_agent->m_replayBuffer[index];
+			const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_agent->m_replayBuffer[index];
 
 			for (ndInt32 i = 0; i < statesDim; ++i)
 			{
 				m_inputBatch[i] = transition.m_state[i];
 			}
-			MakePrediction(m_inputBatch);
-
 			for (ndInt32 i = 0; i < actionDim; ++i)
 			{
-				m_truth[i] = m_output[i];
-				ndAssert(ndAbs(m_output[i]) < ndReal(100.0f));
+				m_inputBatch[i + actionDim] = transition.m_action[i];
 			}
+			MakePrediction(m_inputBatch);
 
-			ndInt32 action = transition.m_action[0];
 			if (transition.m_terminalState)
 			{
-				m_truth[action] = transition.m_reward;
+				m_truth[0] = transition.m_reward;
 			}
 			else
 			{
 				for (ndInt32 i = 0; i < statesDim; ++i)
 				{
 					m_inputBatch[i] = transition.m_nextState[i];
+					m_actorState[i] = transition.m_nextState[i];
 				}
-				m_agent->m_targetActorInstance.MakePrediction(m_inputBatch, m_outputBatch);
-				m_truth[action] = transition.m_reward + m_agent->m_gamma * m_outputBatch[action];
+				m_agent->m_actorInstance.MakePrediction(m_actorState, m_actorAction);
+				for (ndInt32 i = 0; i < actionDim; ++i)
+				{
+					m_inputBatch[i + actionDim] = m_actorAction[i];
+				}
+				m_agent->m_targetCriticInstance.MakePrediction(m_inputBatch, m_outputBatch);
+				m_truth[0] = transition.m_reward + m_agent->m_gamma * m_outputBatch[0];
 			}
 		}
 
@@ -157,6 +165,84 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 		ndBrainVector m_truth;
 		ndBrainVector m_inputBatch;
 		ndBrainVector m_outputBatch;
+		ndBrainVector m_actorState;
+		ndBrainVector m_actorAction;
+		ndBrainAgentDDPG_Trainer<statesDim, actionDim>* m_agent;
+	};
+
+	class ndActorOptimizer : public ndBrainTrainer
+	{
+		public:
+		ndActorOptimizer(ndBrain* const brain)
+			:ndBrainTrainer(brain)
+			,m_truth()
+			,m_inputBatch()
+			,m_outputBatch()
+			,m_agent(nullptr)
+		{
+			m_truth.SetCount(actionDim);
+			m_inputBatch.SetCount(statesDim);
+			m_outputBatch.SetCount(actionDim);
+		}
+
+		//virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
+		//void EvaluateBellmanEquation(ndInt32 index)
+		void EvaluateBellmanEquation()
+		{
+			ndAssert(0);
+			//ndAssert(m_truth.GetCount() == m_output.GetCount());
+			//ndAssert(m_truth.GetCount() == m_outputBatch.GetCount());
+			//const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_agent->m_replayBuffer[index];
+			//
+			//for (ndInt32 i = 0; i < statesDim; ++i)
+			//{
+			//	m_inputBatch[i] = transition.m_state[i];
+			//}
+			//MakePrediction(m_inputBatch);
+			//
+			//for (ndInt32 i = 0; i < actionDim; ++i)
+			//{
+			//	m_truth[i] = m_output[i];
+			//	ndAssert(ndAbs(m_output[i]) < ndReal(100.0f));
+			//}
+			//
+			//ndInt32 action = transition.m_action[0];
+			//if (transition.m_terminalState)
+			//{
+			//	m_truth[action] = transition.m_reward;
+			//}
+			//else
+			//{
+			//	for (ndInt32 i = 0; i < statesDim; ++i)
+			//	{
+			//		m_inputBatch[i] = transition.m_nextState[i];
+			//	}
+			//	m_agent->m_targetActorInstance.MakePrediction(m_inputBatch, m_outputBatch);
+			//	m_truth[action] = transition.m_reward + m_agent->m_gamma * m_outputBatch[action];
+			//}
+		}
+
+		virtual void Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32)
+		{
+			ndAssert(0);
+			//ndArray<ndInt32>& shuffleBuffer = m_agent->m_replayBuffer.m_shuffleBuffer;
+			//
+			//ClearGradientsAcc();
+			//shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
+			//for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
+			//{
+			//	ndInt32 index = shuffleBuffer[i];
+			//	//GetGroundTruth(index, truth, m_output);
+			//	EvaluateBellmanEquation(index);
+			//	BackPropagate(m_truth);
+			//}
+			//UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
+			//ApplyWeightTranspose();
+		}
+
+		ndBrainVector m_truth;
+		ndBrainVector m_inputBatch;
+		ndBrainVector m_outputBatch;
 		ndBrainAgentDDPG_Trainer<statesDim, actionDim>* m_agent;
 	};
 
@@ -164,8 +250,8 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 	ndSharedPtr<ndBrain> m_critic;
 	ndBrain m_targetActor;
 	ndBrain m_targetCritic;
-	ndOptimizer m_actorOtimizer;
-	ndOptimizer m_criticOtimizer;
+	ndActorOptimizer m_actorOtimizer;
+	ndCriticOptimizer m_criticOtimizer;
 	ndBrainInstance m_actorInstance;
 	ndBrainInstance m_criticInstance;
 	ndBrainInstance m_targetActorInstance;
@@ -174,8 +260,8 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 	ndBrainVector m_state;
 	ndBrainVector m_actions;
 	ndArray<ndInt32> m_movingAverage;
-	ndBrainReplayBuffer<ndInt32, statesDim, 1> m_replayBuffer;
-	ndBrainReplayTransitionMemory<ndInt32, statesDim, 1> m_currentTransition;
+	ndBrainReplayBuffer<ndReal, statesDim, actionDim> m_replayBuffer;
+	ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim> m_currentTransition;
 
 	ndReal m_gamma;
 	ndReal m_learnRate;
@@ -238,11 +324,15 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	m_actions.Set(ndReal(0.0f));
 
 	m_actorOtimizer.m_agent = this;
+	m_criticOtimizer.m_agent = this;
 	m_actorOtimizer.SetRegularizer(D_DDPG_REGULARIZER);
+	m_criticOtimizer.SetRegularizer(D_DDPG_REGULARIZER);
+
 	m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / D_DDPG_STAR_OPTIMIZATION;
 
 	SetBufferSize(D_DDPG_REPLAY_BUFFERSIZE);
 	m_targetActor.CopyFrom(*(*m_actor));
+	m_targetCritic.CopyFrom(*(*m_critic));
 
 	for (ndInt32 i = 0; i < D_DDPG_MOVING_AVERAGE; ++i)
 	{
@@ -278,7 +368,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagate()
 {
 	class ndTestValidator : public ndBrainTrainer::ndValidation
 	{
-	public:
+		public:
 		ndTestValidator(ndBrainTrainer& trainer)
 			:ndBrainTrainer::ndValidation(trainer)
 		{
@@ -291,8 +381,12 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagate()
 	};
 
 	ndBrainMatrix inputBatch;
-	ndTestValidator validator(m_actorOtimizer);
-	m_actorOtimizer.Optimize(validator, inputBatch, m_learnRate, 1);
+	ndTestValidator criticValidator(m_criticOtimizer);
+	m_criticOtimizer.Optimize(criticValidator, inputBatch, m_learnRate, 1);
+
+	//ndBrainMatrix inputBatch;
+	ndTestValidator actorValidator(m_actorOtimizer);
+	//m_actorOtimizer.Optimize(actorValidator, inputBatch, m_learnRate, 1);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -447,8 +541,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PopulateReplayBuffer()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Optimize()
 {
-	ndAssert(0);
-	//BackPropagate();
+	BackPropagate();
 	//if (m_collectingSamples)
 	//{
 	//	ndExpandTraceMessage("%d star training: episode %d\n", m_frameCount, m_eposideCount);
