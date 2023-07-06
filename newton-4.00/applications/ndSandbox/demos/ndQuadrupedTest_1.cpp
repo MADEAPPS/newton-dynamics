@@ -281,7 +281,7 @@ namespace ndQuadruped_1
 			virtual void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 			{
 				// generate a procedural in place march gait
-				const ndFloat32 gaitFraction = 0.25f;
+				const ndFloat32 gaitFraction = 0.47f;
 				ndFloat32 amp = 0.27f;
 				ndFloat32 omega = ndPi / gaitFraction;
 
@@ -548,7 +548,7 @@ namespace ndQuadruped_1
 			m_invDynamicsSolver.SolverBegin(skeleton, joint, 4, world, timestep);
 			//m_invDynamicsSolver.Solve();
 			ndVector torque(CalculateTorque());
-			ndTrace(("%f %f %f\n", torque.m_x, torque.m_y, torque.m_z));
+			//ndTrace(("%f %f %f\n", torque.m_x, torque.m_y, torque.m_z));
 
 			m_invDynamicsSolver.SolverEnd();
 		}
@@ -647,7 +647,8 @@ namespace ndQuadruped_1
 		
 		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
 		ndFloat32 offset[] = { -0.3f, 0.3f, -0.3f, 0.3f };
-		ndFloat32 phase[] = { 0.0f, 0.5f, 0.25f, 0.75f };
+		//ndFloat32 phase[] = { 0.0f, 0.75f, 0.25f, 0.5f };
+		ndFloat32 phase[] = { 0.0f, 0.5f, 0.0f, 0.5f };
 
 		ndSharedPtr<ndAnimationSequence> sequence(new ndModelQuadruped::ndPoseGenerator());
 		model->m_poseGenerator = new ndAnimationSequencePlayer(sequence);

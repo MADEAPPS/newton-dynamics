@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#define D_USE_POLE_DQN
+//#define D_USE_POLE_DQN
 
 namespace ndController_0
 {
@@ -173,18 +173,15 @@ namespace ndController_0
 					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 					,m_model(nullptr)
 				{
-					ndAssert(0);
 				}
 
 				ndReal GetReward() const
 				{
-					ndAssert(0);
 					return m_model->GetReward();
 				}
 
 				virtual void ApplyActions(ndReal* const actions) const
 				{
-					ndAssert(0);
 					m_model->ApplyActions(actions);
 				}
 
@@ -195,25 +192,21 @@ namespace ndController_0
 
 				void GetObservation(ndReal* const state) const
 				{
-					ndAssert(0);
 					m_model->GetObservation(state);
 				}
 
 				bool IsTerminal() const
 				{
-					ndAssert(0);
 					return m_model->IsTerminal();
 				}
 
 				void ResetModel() const
 				{
-					ndAssert(0);
 					m_model->ResetModel();
 				}
 
 				void OptimizeStep()
 				{
-					ndAssert(0);
 					ndInt32 stopTraining = GetFramesCount();
 					if (stopTraining <= 1000000)
 					{
