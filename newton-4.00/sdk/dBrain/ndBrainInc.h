@@ -38,6 +38,7 @@
 #include <ndBrainReplayBuffer.h>
 #include <ndBrainParallelTrainer.h>
 #include <ndBrainAgentDQN_Trainer.h>
+#include <ndBrainAgentDDPG_Trainer.h>
 
 #endif 
 
