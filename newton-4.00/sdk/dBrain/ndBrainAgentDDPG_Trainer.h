@@ -228,6 +228,10 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	,m_optimizationDelayCount(0)
 	,m_collectingSamples(true)
 {
+	ndAssert(m_critic->GetOutputSize() == 1);
+	ndAssert(((*(*m_actor))[m_actor->GetCount() - 1])->GetActivationType() == m_tanh);
+	ndAssert(m_critic->GetInputSize() == (m_actor->GetInputSize() + m_actor->GetOutputSize()));
+
 	m_state.SetCount(statesDim);
 	m_actions.SetCount(actionDim);
 	m_state.Set(ndReal(0.0f));
@@ -299,10 +303,16 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SelectActions()
 	m_actorInstance.MakePrediction(m_state, m_actions);
 	if (explore <= m_explorationProbability)
 	{
+		//for (ndInt32 i = 0; i < 5000; ++i)
+		//{
+		//	ndReal noisyAction = ndGaussianRandom(ndFloat32(0.0f), ndFloat32(m_actionNoiseDeviation));
+		//	ndTrace(("%f\n", noisyAction));
+		//}
+
 		for (ndInt32 i = 0; i < actionDim; ++i)
 		{
-			ndReal noise = ndGaussianRandom(ndFloat32(0.0f), ndFloat32(m_actionNoiseDeviation));
-			m_actions[i] = ndClamp(m_actions[i] + noise, ndReal(-1.0f), ndReal(1.0f));
+			ndReal noisyAction = ndGaussianRandom(ndFloat32(m_actions[i]), ndFloat32(m_actionNoiseDeviation));
+			m_actions[i] = ndClamp(noisyAction, ndReal(-1.0f), ndReal(1.0f));
 		}
 	}
 }

@@ -51,6 +51,8 @@ class ndBrainLayer: public ndBrainMatrix
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
 	virtual void MakePrediction(ndThreadPool& threadPool, const ndBrainVector& input, ndBrainVector& output);
 
+	ndBrainActivationType GetActivationType() const;
+
 	virtual void CopyFrom(const ndBrainLayer& src);
 	virtual bool Compare(const ndBrainLayer& src) const;
 
@@ -79,6 +81,11 @@ class ndBrainLayer: public ndBrainMatrix
 	friend class ndBrain;
 	friend class ndBrainSave;
 };
+
+inline ndBrainActivationType ndBrainLayer::GetActivationType() const
+{
+	return m_activation;
+}
 
 inline ndInt32 ndBrainLayer::GetOuputSize() const
 {
