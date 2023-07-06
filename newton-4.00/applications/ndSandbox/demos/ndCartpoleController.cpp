@@ -417,6 +417,14 @@ namespace ndController_0
 			actor->AddLayer(ouputLayer);
 			actor->EndAddLayer(ndReal(0.25f));
 
+			// clear actors bias so that the actions start centered at zero
+			for (ndInt32 i = 0; i < actor->GetCount(); ++i)
+			{
+				ndBrainLayer* const actorLayer = (*(*actor))[i];
+				ndBrainVector& actorLayerBias = actorLayer->GetBias();
+				actorLayerBias.Set(ndReal(0.0f));
+			}
+
 			char fileName[1024];
 			dGetWorkingFileName("cartpoleDDPG.nn", fileName);
 			ndBrainSave::Save(*actor, fileName);

@@ -248,18 +248,6 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	{
 		m_movingAverage.PushBack(0);
 	}
-
-	// clear actors bias so that the actions start centered at zero
-	for (ndInt32 i = 0; i < m_actor->GetCount(); ++i)
-	{
-		ndBrainLayer* const actorLayer = (*(*m_actor))[i];
-		ndBrainVector& actorLayerBias = actorLayer->GetBias();
-		actorLayerBias.Set(ndReal(0.0f));
-
-		ndBrainLayer* const actorTargetLayer = m_targetActor[i];
-		ndBrainVector& actorTargetLayerBias = actorTargetLayer->GetBias();
-		actorTargetLayerBias.Set(ndReal(0.0f));
-	}
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
