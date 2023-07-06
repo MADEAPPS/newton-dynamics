@@ -42,7 +42,6 @@ class ndBrainAgentDDPG: public ndBrainAgent
 	bool IsTerminal() const;
 	ndReal GetReward() const;
 	void ApplyRandomAction() const;
-	ndInt32 SelectBestAction() const;
 	ndInt32 GetOpmizationDelay() const;
 	void SetOpmizationDelay(ndInt32 delay);
 	void Save(ndBrainSave* const loadSave) const;
@@ -116,31 +115,11 @@ void ndBrainAgentDDPG<statesDim, actionDim>::OptimizeStep()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDDPG<statesDim, actionDim>::SelectBestAction() const
-{
-	ndAssert(0);
-	ndInt32 bestAction = 0;
-	ndReal maxQValue = m_actions[0];
-	for (ndInt32 i = 1; i < actionDim; ++i)
-	{
-		if (m_actions[i] > maxQValue)
-		{
-			bestAction = i;
-			maxQValue = m_actions[i];
-		}
-	}
-	return bestAction;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG<statesDim, actionDim>::Step()
 {
-	ndAssert(0);
 	GetObservation(&m_state[0]);
 	m_actorInstance.MakePrediction(m_state, m_actions);
-
-	ndReal bestAction = ndReal(SelectBestAction());
-	ApplyActions(&bestAction);
+	ApplyActions(&m_actions[0]);
 }
 
 #endif 
