@@ -127,6 +127,8 @@ bool ndBrainLayer::Compare(const ndBrainLayer& src) const
 void ndBrainLayer::InitGaussianWeights(ndReal variance)
 {
 	m_bias.InitGaussianWeights(variance * ndReal (0.5f));
+	//m_bias.InitGaussianWeights(variance * ndReal (0.25f));
+	//m_bias.InitGaussianWeights(variance * ndReal(0.0f));
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		(*this)[i].InitGaussianWeights(variance);
