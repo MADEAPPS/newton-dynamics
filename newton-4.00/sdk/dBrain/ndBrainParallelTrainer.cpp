@@ -83,10 +83,10 @@ void ndBrainParallelTrainer::ThreadFunction()
 	End();
 }
 
-void ndBrainParallelTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
+void ndBrainParallelTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndInt32 steps)
 {
 	m_steps = steps;
-	m_learnRate = learnRate;
+	//m_learnRate = learnRate;
 	m_inputBatch = &inputBatch;
 	m_groundTruth = &groundTruth;
 	m_validator = &validator;
@@ -156,9 +156,9 @@ ndReal ndBrainParallelTrainer::Validate(const ndBrainMatrix& inputBatch, const n
 	return error;
 }
 
-
 void ndBrainParallelTrainer::Optimize()
 {
+	ndAssert(0);
 	ndFloatExceptions exception;
 
 	ndValidation& validator = *m_validator;

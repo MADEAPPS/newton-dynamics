@@ -75,7 +75,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndTestValidator testError(trainer);
 
 	trainer.SetMiniBatchSize(16);
-	trainer.Optimize(testError, inputBatch, groundTruth, 1.0e-2f, 2000);
+	trainer.Optimize(testError, inputBatch, groundTruth, 2000);
 
 	ndAssert(0);
 	//brain.Save("xxx.nn");
@@ -284,7 +284,7 @@ static void MnistTrainingSet()
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		//trainer.Optimize(validator, *trainingDigits, *trainingLabels, 5.0e-3f, 20);
-		trainer.Optimize(validator, *trainingDigits, *trainingLabels, 5.0e-3f, 2000);
+		trainer.Optimize(validator, *trainingDigits, *trainingLabels, 2000);
 		time = ndGetTimeInMicroseconds() - time;
 
 		char path[256];

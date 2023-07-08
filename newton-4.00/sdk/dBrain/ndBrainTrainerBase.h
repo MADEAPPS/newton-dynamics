@@ -68,7 +68,7 @@ class ndBrainTrainerBase: public ndClassAlloc
 	virtual ndReal Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndBrainVector& output);
 
 	virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const = 0;
-	virtual void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, ndReal learnRate, ndInt32 steps) = 0;
+	virtual void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, ndInt32 steps) = 0;
 
 	protected:
 	ndBrainInstance m_instance;

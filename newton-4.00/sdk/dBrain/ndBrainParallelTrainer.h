@@ -25,7 +25,6 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainTrainer.h"
 
-
 class ndBrainParallelTrainer: public ndBrainTrainer, public ndThreadPool
 {
 	public: 
@@ -33,10 +32,10 @@ class ndBrainParallelTrainer: public ndBrainTrainer, public ndThreadPool
 	ndBrainParallelTrainer(ndBrain* const brain, ndInt32 threads = 1);
 	~ndBrainParallelTrainer();
 
-	virtual void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
+	virtual void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndInt32 steps);
 
 	private:
-	void Optimize();
+	virtual void Optimize();
 	ndReal Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndBrainVector& output);
 	virtual void ThreadFunction();
 
@@ -50,7 +49,6 @@ class ndBrainParallelTrainer: public ndBrainTrainer, public ndThreadPool
 	ndReal m_learnRate;
 	ndInt32 m_steps;
 };
-
 
 #endif 
 

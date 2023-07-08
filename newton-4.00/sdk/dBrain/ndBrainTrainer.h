@@ -39,9 +39,9 @@ class ndBrainTrainer: public ndBrainTrainerBase
 	virtual void BackPropagate(const ndBrainVector& groundTruth);
 
 	virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const;
-	virtual void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, ndReal learnRate, ndInt32 steps);
+	virtual void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, ndInt32 steps);
 
-	void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
+	void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndInt32 steps);
 
 	protected:
 	void ClearGradientsAcc();
