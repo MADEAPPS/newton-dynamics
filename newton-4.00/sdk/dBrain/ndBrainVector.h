@@ -38,13 +38,13 @@ class ndBrainVector: public ndArray<ndReal>
 	ndInt32 GetMaxIndex() const;
 
 	ndReal Dot(const ndBrainVector& a) const;
-	void ScaleSet(const ndBrainVector& a, ndReal scale);
 	void Add(const ndBrainVector& a, const ndBrainVector& b);
 	void Sub(const ndBrainVector& a, const ndBrainVector& b);
 	void Mul(const ndBrainVector& a, const ndBrainVector& b);
 
 	void Clamp(ndReal min, ndReal max);
 	void ScaleAdd(const ndBrainVector& a, ndReal b);
+	void ScaleSet(const ndBrainVector& a, ndReal scale);
 	void MulAdd(const ndBrainVector& a, const ndBrainVector& b);
 	void MulSub(const ndBrainVector& a, const ndBrainVector& b);
 };

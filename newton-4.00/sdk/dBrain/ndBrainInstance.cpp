@@ -132,10 +132,13 @@ void ndBrainInstance::CalculateInpuGradients(const ndBrainVector& input, const n
 		layer->ActivationDerivative(z, g);
 		g.Mul(g, gradient);
 
-		outGradient.Set(ndReal(0.0f));
-		for (ndInt32 j = layer->GetInputSize() - 1; j >= 0; --j)
+		//outGradient.Set(ndReal(0.0f));
+		outGradient.ScaleSet((*layer)[g.GetCount() - 1], g[g.GetCount() - 1]);
+		for (ndInt32 j = g.GetCount() - 2; j >= 0; --j)
 		{
-			//layer->CalculateGradients(gradient, outGradient);
+			ndReal scale = g[j];
+			const ndBrainVector& row = (*layer)[j];
+			outGradient.ScaleAdd(row, scale);
 		}
 		
 		gradient.SetCount(outGradient.GetCount());

@@ -126,7 +126,7 @@ void ndBrainVector::Clamp(ndReal min, ndReal max)
 void ndBrainVector::ScaleAdd(const ndBrainVector& a, ndReal b)
 {
 	ndAssert(GetCount() == a.GetCount());
-	ndScaleAdd(GetCount(), &(*this)[0], &(*this)[0], &a[0], b);
+	ndScaleAdd(GetCount(), &(*this)[0], &a[0], b);
 }
 
 void ndBrainVector::Add(const ndBrainVector& a, const ndBrainVector& b)
