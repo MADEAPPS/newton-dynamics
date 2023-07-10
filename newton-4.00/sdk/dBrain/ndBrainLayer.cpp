@@ -339,16 +339,6 @@ void ndBrainLayer::MakePrediction(const ndBrainVector& input, ndBrainVector& out
 	ApplyActivation(output);
 }
 
-void ndBrainLayer::CalculateGradients(const ndBrainVector& input, const ndBrainVector& output) const
-{
-	ndAssert(GetRows() == input.GetCount());
-	ndAssert(GetColumns() == output.GetCount());
-
-	ndReal* const buffer = ndAlloca(ndReal, input.GetCount());
-	ndDeepBrainMemVector derivative(buffer, input.GetCount());
-	ActivationDerivative(input, derivative);
-}
-
 void ndBrainLayer::Save(const ndBrainSave* const loadSave) const
 {
 	char buffer[1024];

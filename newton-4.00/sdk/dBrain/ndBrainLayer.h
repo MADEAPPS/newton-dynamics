@@ -74,8 +74,6 @@ class ndBrainLayer: public ndBrainMatrix
 	void ReluActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const;
 	void LinealActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const;
 
-	void CalculateGradients(const ndBrainVector& input, const ndBrainVector& output) const;
-
 	ndDeepBrainMemVector m_bias;
 	ndBrainActivationType m_activation;
 	ndInt32 m_columns;
