@@ -394,6 +394,12 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SelectActions()
 {
 	ndFloat32 explore = ndRand();
 
+//m_actorInstance.MakePrediction(m_state, m_actions);
+//m_actions[0] += ndReal(0.1f);
+//ndBrainVector inputGradients;
+//inputGradients.SetCount(m_state.GetCount());
+//m_actorInstance.CalculateInpuGradients(m_state, m_actions, inputGradients);
+
 	m_actorInstance.MakePrediction(m_state, m_actions);
 	if (explore <= m_explorationProbability)
 	{
