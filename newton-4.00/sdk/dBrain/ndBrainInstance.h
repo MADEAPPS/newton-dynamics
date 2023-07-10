@@ -44,7 +44,7 @@ class ndBrainInstance: public ndClassAlloc
 	const ndBrainPrefixScan& GetPrefixScan() const;
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
-	void MakePrediction(ndThreadPool& threadPool, const ndBrainVector& input, ndBrainVector& output);
+	void CalculateInpuGradients(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients);
 
 	protected:
 	ndBrainVector m_z;

@@ -94,23 +94,25 @@ void ndBrainInstance::MakePrediction(const ndBrainVector& input, ndBrainVector& 
 	output.Set(out);
 }
 
-void ndBrainInstance::MakePrediction(ndThreadPool& threadPool, const ndBrainVector& input, ndBrainVector& output)
+void ndBrainInstance::CalculateInpuGradients(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients)
 {
 	const ndArray<ndBrainLayer*>& layers = (*m_brain);
-	ndAssert(layers.GetCount());
 	ndAssert(layers[0]->GetInputSize() == input.GetCount());
+	ndAssert(GetOutput().GetCount() == groundTruth.GetCount());
+	
+	ndReal* const buffer = ndAlloca(ndReal, GetOutput().GetCount());
+	ndDeepBrainMemVector output(buffer, GetOutput().GetCount());
+	MakePrediction(input, output);
 
-	ndDeepBrainMemVector layerInput(&m_z[m_zPrefixScan[0]], input.GetCount());
-	layerInput.Set(input);
-	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	{
-		ndBrainLayer* const layer = layers[i];
-		const ndDeepBrainMemVector in(&m_z[m_zPrefixScan[i + 0]], layer->GetInputSize());
-		ndDeepBrainMemVector out(&m_z[m_zPrefixScan[i + 1]], layer->GetOuputSize());
-		layer->MakePrediction(threadPool, in, out);
-	}
+	//ndDeepBrainMemVector in(&m_z[0], GetOutput().GetCount());
+	//ndDeepBrainMemVector out(&m_z[GetOutput().GetCount()], GetOutput().GetCount());
+	//in.Sub(output, groundTruth);
+	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	//{
+	//	const ndBrainLayer* const layer = layers[i];
+	//	out(&m_z[GetOutput().GetCount()], );
+	//
+	//	//out.SetCount()
+	//}
 
-	output.SetCount(layers[layers.GetCount() - 1]->GetOuputSize());
-	const ndDeepBrainMemVector out(&m_z[m_zPrefixScan[layers.GetCount()]], output.GetCount());
-	output.Set(out);
 }
