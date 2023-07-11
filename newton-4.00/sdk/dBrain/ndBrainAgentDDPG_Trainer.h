@@ -36,7 +36,7 @@
 #define D_DDPG_LEARN_RATE				ndReal(2.0e-4f)
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
 //#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
-#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 1)
+#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 4)
 #define D_DDPG_MOVING_AVERAGE			64
 #define D_DDPG_REPLAY_BASH_SIZE			32
 #define D_DDPG_TARGET_UPDATE_PERIOD		1000
@@ -185,40 +185,21 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 			}
 			MakePrediction(m_inputBatch, m_truth);
 
-			// calcuate gradient of theis action using the critic and target critic 
-			//ndAssert(0);
-			//m_actions[0] += ndReal(0.1f);
-			//ndBrainVector inputGradients;
-			//inputGradients.SetCount(m_state.GetCount());
-			//m_actorInstance.CalculateInpuGradients(m_state, m_actions, inputGradients);
-			//m_actor->MakePrediction(m_state, m_actions);
+			for (ndInt32 i = 0; i < statesDim; ++i)
+			{
+				m_agent->m_criticOtimizer.m_inputBatch[i] = transition.m_state[i];
+			}
+			for (ndInt32 i = 0; i < actionDim; ++i)
+			{
+				m_agent->m_criticOtimizer.m_inputBatch[i + actionDim] = m_truth[i];
+			}
+			m_agent->m_critic->MakePrediction(m_agent->m_criticOtimizer.m_inputBatch, m_agent->m_criticOtimizer.m_outputBatch);
+			m_agent->m_targetCritic.CalculateInpuGradients(m_agent->m_criticOtimizer.m_inputBatch, m_agent->m_criticOtimizer.m_outputBatch, m_agent->m_criticOtimizer.m_inputBatch);
 
-			//for (ndInt32 i = 0; i < statesDim; ++i)
-			//{
-			//	m_inputBatch[i] = transition.m_state[i];
-			//}
-			//MakePrediction(m_inputBatch);
-			//
-			//for (ndInt32 i = 0; i < actionDim; ++i)
-			//{
-			//	m_truth[i] = m_output[i];
-			//	ndAssert(ndAbs(m_output[i]) < ndReal(100.0f));
-			//}
-			//
-			//ndInt32 action = transition.m_action[0];
-			//if (transition.m_terminalState)
-			//{
-			//	m_truth[action] = transition.m_reward;
-			//}
-			//else
-			//{
-			//	for (ndInt32 i = 0; i < statesDim; ++i)
-			//	{
-			//		m_inputBatch[i] = transition.m_nextState[i];
-			//	}
-			//	m_agent->m_targetActorInstance.MakePrediction(m_inputBatch, m_outputBatch);
-			//	m_truth[action] = transition.m_reward + m_agent->m_gamma * m_outputBatch[action];
-			//}
+			for (ndInt32 i = 0; i < actionDim; ++i)
+			{
+				m_truth[i] += m_agent->m_criticOtimizer.m_inputBatch[statesDim + i];
+			}
 		}
 
 		virtual void Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32)
@@ -234,7 +215,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 				EvaluateBellmanEquation(index);
 				BackPropagate(m_truth);
 			}
-			UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
+			//UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
 		}
 
 		ndBrainVector m_truth;
