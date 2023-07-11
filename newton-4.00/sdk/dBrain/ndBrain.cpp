@@ -23,6 +23,252 @@
 #include "ndBrain.h"
 #include "ndBrainTypes.h"
 
+
+ndBrain* ndBrainLoad::Load(const char* const pathName)
+{
+	class Loader : public ndBrainLoad
+	{
+	public:
+		Loader(const char* const pathName)
+			:ndBrainLoad()
+		{
+			m_file = fopen(pathName, "rb");
+			ndAssert(m_file);
+		}
+
+		~Loader()
+		{
+			if (m_file)
+			{
+				fclose(m_file);
+			}
+		}
+
+		ndInt32 ReadInt() const
+		{
+			ndInt32 value;
+			fscanf(m_file, "%d", &value);
+			return value;
+		}
+
+		ndFloat32 ReadFloat() const
+		{
+			ndReal value;
+			fscanf(m_file, "%f", &value);
+			return value;
+		}
+
+		void ReadString(char* const buffer) const
+		{
+			fscanf(m_file, "%s", buffer);
+		}
+
+		FILE* m_file;
+	};
+
+	Loader loader(pathName);
+	return loader.Load();
+}
+
+ndBrain* ndBrainLoad::Load() const
+{
+	char buffer[1024];
+	ReadString(buffer);
+	ReadString(buffer);
+	ReadString(buffer);
+
+	ReadString(buffer);
+	ndInt32 layersCount = ReadInt();
+
+	ndBrain* const brain = new ndBrain;
+	brain->BeginAddLayer();
+	for (ndInt32 i = 0; i < layersCount; ++i)
+	{
+		char layerType[256];
+		ReadString(buffer);
+		ReadString(layerType);
+
+		ReadString(buffer);
+		ndBrainLayer* layer = nullptr;
+
+		ReadString(buffer);
+		ReadString(buffer);
+
+		ndBrainActivationType activation = m_sigmoid;
+		if (!strcmp(buffer, "relu"))
+		{
+			activation = m_relu;
+		}
+		else if (!strcmp(buffer, "lineal"))
+		{
+			activation = m_lineal;
+		}
+		else if (!strcmp(buffer, "tanh"))
+		{
+			activation = m_tanh;
+		}
+		else if (!strcmp(buffer, "softmax"))
+		{
+			activation = m_softmax;
+		}
+		else
+		{
+			activation = m_sigmoid;
+		}
+
+		ReadString(buffer);
+		ndInt32 inputs = ReadInt();
+		ReadString(buffer);
+		ndInt32 outputs = ReadInt();
+
+		if (!strcmp(layerType, "fullyConnected"))
+		{
+			//layer = new ndBrainLayer(this);
+			layer = new ndBrainLayer(inputs, outputs, activation);
+		}
+		else
+		{
+			ndAssert(0);
+		}
+		if (layer)
+		{
+			//layer->Load(this);
+			brain->AddLayer(layer);
+		}
+
+		ReadString(buffer);
+	}
+	brain->EndAddLayer(ndReal(0.0f));
+
+	for (ndInt32 i = 0; i < layersCount; ++i)
+	{
+		ndBrainLayer* const layer = (*brain)[i];
+		ReadString(buffer);
+		ReadString(buffer);
+		layer->Load(this);
+		ReadString(buffer);
+	}
+
+	brain->m_isReady = true;
+
+	return brain;
+}
+
+void ndBrainSave::Save(const ndBrain* const brain)
+{
+	char buffer[1024];
+	auto Save = [this, &buffer](const char* const fmt, ...)
+	{
+		va_list v_args;
+		buffer[0] = 0;
+		va_start(v_args, fmt);
+		vsprintf(buffer, fmt, v_args);
+		va_end(v_args);
+		WriteData(buffer);
+	};
+
+	Save("ndBrain version 1.0\n\n");
+	Save("layersCount %d\n\n", brain->GetCount());
+
+	for (ndInt32 i = 0; i < brain->GetCount(); ++i)
+	{
+		ndBrainLayer* const layer = (*brain)[i];
+		Save("layer fullyConnected\n");
+		Save("{\n");
+		switch (layer->m_activation)
+		{
+		case m_relu:
+			Save("\tactivation relu\n");
+			break;
+
+		case m_lineal:
+			Save("\tactivation lineal\n");
+			break;
+
+		case m_tanh:
+			Save("\tactivation tanh\n");
+			break;
+
+		case m_softmax:
+			Save("\tactivation softmax\n");
+			break;
+
+		case m_sigmoid:
+		default:
+			Save("\tactivation sigmoid\n");
+			break;
+		}
+
+		Save("\tinputs %d\n", layer->GetColumns());
+		Save("\toutputs %d\n", layer->GetRows());
+		Save("}\n\n");
+	}
+
+	for (ndInt32 i = 0; i < brain->GetCount(); ++i)
+	{
+		ndBrainLayer* const layer = (*brain)[i];
+		Save("layer\n");
+		Save("{\n");
+		layer->Save(this);
+		Save("}\n\n");
+	}
+}
+
+void ndBrainSave::Save(const ndBrain* const brain, const char* const pathName)
+{
+	class SaveAgent : public ndBrainSave
+	{
+	public:
+		SaveAgent(const char* const pathFilename)
+			:ndBrainSave()
+		{
+			m_file = fopen(pathFilename, "wb");
+			ndAssert(m_file);
+		}
+
+		~SaveAgent()
+		{
+			if (m_file)
+			{
+				fclose(m_file);
+			}
+		}
+
+		void WriteData(const char* const data) const
+		{
+			fprintf(m_file, data);
+		}
+
+		FILE* m_file;
+	};
+
+	SaveAgent saveAgent(pathName);
+	saveAgent.Save(brain);
+}
+
+ndBrain::ndHidenVariableOffsets::ndHidenVariableOffsets(ndBrain* const brain)
+	:ndFixSizeArray<ndInt32, 256>()
+{
+	const ndArray<ndBrainLayer*>& layers = (*brain);
+
+	SetCount(0);
+	PushBack((layers[0]->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT);
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		ndBrainLayer* const layer = layers[i];
+		PushBack((layer->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT);
+	}
+	
+	ndInt32 sum = 0;
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		ndInt32 size = (*this)[i];
+		(*this)[i] = sum;
+		sum += size;
+	}
+	PushBack(sum);
+}
+
 ndBrain::ndBrain()
 	:ndArray<ndBrainLayer*>()
 	,m_memory(nullptr)
@@ -177,224 +423,84 @@ void ndBrain::InitGaussianWeights(ndReal variance)
 	}
 }
 
-ndBrain* ndBrainLoad::Load(const char* const pathName)
+void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, const ndBrainVector& hiddenLayerOutputs)
 {
-	class Loader : public ndBrainLoad
-	{
-		public:
-		Loader(const char* const pathName)
-			:ndBrainLoad()
-		{
-			m_file = fopen(pathName, "rb");
-			ndAssert(m_file);
-		}
-
-		~Loader()
-		{
-			if (m_file)
-			{
-				fclose(m_file);
-			}
-		}
-
-		ndInt32 ReadInt() const
-		{
-			ndInt32 value;
-			fscanf(m_file, "%d", &value);
-			return value;
-		}
-
-		ndFloat32 ReadFloat() const
-		{
-			ndReal value;
-			fscanf(m_file, "%f", &value);
-			return value;
-		}
-
-		void ReadString(char* const buffer) const
-		{
-			fscanf(m_file, "%s", buffer);
-		}
-
-		FILE* m_file;
-	};
-
-	Loader loader(pathName);
-	return loader.Load();
-}
-
-ndBrain* ndBrainLoad::Load() const
-{
-	char buffer[1024];
-	ReadString(buffer);
-	ReadString(buffer);
-	ReadString(buffer);
+	ndBrain::ndHidenVariableOffsets offsets(this);
+	const ndArray<ndBrainLayer*>& layers = (*this);
+	ndAssert(layers.GetCount());
+	ndAssert(input.GetCount() == GetInputSize());
+	ndAssert(output.GetCount() == GetOutputSize());
+	ndAssert(hiddenLayerOutputs.GetCount() >= offsets[offsets.GetCount() - 1]);
 	
-	ReadString(buffer);
-	ndInt32 layersCount = ReadInt();
-
-	ndBrain* const brain = new ndBrain;
-	brain->BeginAddLayer();
-	for (ndInt32 i = 0; i < layersCount; ++i)
+	ndDeepBrainMemVector layerInput(&hiddenLayerOutputs[offsets[0]], input.GetCount());
+	layerInput.Set(input);
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
-		char layerType[256];
-		ReadString(buffer);
-		ReadString(layerType);
-
-		ReadString(buffer);
-		ndBrainLayer* layer = nullptr;
-
-		ReadString(buffer);
-		ReadString(buffer);
-
-		ndBrainActivationType activation = m_sigmoid;
-		if (!strcmp(buffer, "relu"))
-		{
-			activation = m_relu;
-		}
-		else if (!strcmp(buffer, "lineal"))
-		{
-			activation = m_lineal;
-		}
-		else if (!strcmp(buffer, "tanh"))
-		{
-			activation = m_tanh;
-		}
-		else if (!strcmp(buffer, "softmax"))
-		{
-			activation = m_softmax;
-		}
-		else
-		{
-			activation = m_sigmoid;
-		}
-
-		ReadString(buffer);
-		ndInt32 inputs = ReadInt();
-		ReadString(buffer);
-		ndInt32 outputs = ReadInt();
-
-		if (!strcmp(layerType, "fullyConnected"))
-		{
-			//layer = new ndBrainLayer(this);
-			layer = new ndBrainLayer(inputs, outputs, activation);
-		}
-		else
-		{
-			ndAssert(0);
-		}
-		if (layer)
-		{
-			//layer->Load(this);
-			brain->AddLayer(layer);
-		}
-
-		ReadString(buffer);
-	}
-	brain->EndAddLayer(ndReal (0.0f));
-
-	for (ndInt32 i = 0; i < layersCount; ++i)
-	{
-		ndBrainLayer* const layer = (*brain)[i];
-		ReadString(buffer);
-		ReadString(buffer);
-		layer->Load(this);
-		ReadString(buffer);
+		ndBrainLayer* const layer = layers[i];
+		const ndDeepBrainMemVector in(&hiddenLayerOutputs[offsets[i + 0]], layer->GetInputSize());
+		ndDeepBrainMemVector out(&hiddenLayerOutputs[offsets[i + 1]], layer->GetOuputSize());
+		layer->MakePrediction(in, out);
 	}
 	
-	brain->m_isReady = true;
-
-	return brain;
+	const ndDeepBrainMemVector out(&hiddenLayerOutputs[offsets[layers.GetCount()]], output.GetCount());
+	output.Set(out);
 }
 
-void ndBrainSave::Save(const ndBrain* const brain)
+void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
-	char buffer[1024];
-	auto Save = [this, &buffer](const char* const fmt, ...)
+	ndBrain::ndHidenVariableOffsets offsets(this);
+	ndReal* const inpuBuffer = ndAlloca(ndReal, offsets[offsets.GetCount()-1]);
+	ndDeepBrainMemVector z (inpuBuffer, offsets[offsets.GetCount() - 1]);
+	MakePrediction(input, output, z);
+}
+
+void ndBrain::CalculateInpuGradients(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients)
+{
+	ndBrain::ndHidenVariableOffsets offsets(this);
+	const ndArray<ndBrainLayer*>& layers = (*this);
+	ndAssert(layers.GetCount());
+	ndAssert(input.GetCount() == GetInputSize());
+	ndAssert(output.GetCount() == GetOutputSize());
+	ndAssert(hiddenLayerOutputs.GetCount() >= offsets[offsets.GetCount() - 1]);
+
+	ndInt32 capacity = 0;
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
-		va_list v_args;
-		buffer[0] = 0;
-		va_start(v_args, fmt);
-		vsprintf(buffer, fmt, v_args);
-		va_end(v_args);
-		WriteData(buffer);
-	};
+		const ndBrainLayer* const layer = layers[i];
+		capacity = ndMax(capacity, layer->GetRows());
+		capacity = ndMax(capacity, layer->GetColumns());
+	}
+
+	ndReal* const gradientBuffer = ndAlloca(ndReal, capacity);
+	ndReal* const inpuBuffer = ndAlloca(ndReal, groundTruth.GetCount());
+	ndReal* const hidden_zBuffer = ndAlloca(ndReal, offsets[offsets.GetCount() - 1]);
 	
-	Save("ndBrain version 1.0\n\n");
-	Save("layersCount %d\n\n", brain->GetCount());
+	ndDeepBrainMemVector output(inpuBuffer, groundTruth.GetCount());
+	ndDeepBrainMemVector gradient(gradientBuffer, capacity);
+	gradient.SetCount(groundTruth.GetCount());
+	ndDeepBrainMemVector hidden_z(hidden_zBuffer, offsets[offsets.GetCount() - 1]);
 
-	for (ndInt32 i = 0; i < brain->GetCount(); ++i)
+	MakePrediction(input, gradient, hidden_z);
+	gradient.Sub(groundTruth);
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
-		ndBrainLayer* const layer = (*brain)[i];
-		Save("layer fullyConnected\n");
-		Save("{\n");
-		switch (layer->m_activation)
-		{
-			case m_relu:
-				Save("\tactivation relu\n");
-				break;
-
-			case m_lineal:
-				Save("\tactivation lineal\n");
-				break;
-
-			case m_tanh:
-				Save("\tactivation tanh\n");
-				break;
-
-			case m_softmax:
-				Save("\tactivation softmax\n");
-				break;
-
-			case m_sigmoid:
-			default:
-				Save("\tactivation sigmoid\n");
-				break;
-		}
-
-		Save("\tinputs %d\n", layer->GetColumns());
-		Save("\toutputs %d\n", layer->GetRows());
-		Save("}\n\n");
+		const ndBrainLayer* const layer = layers[i];
+		ndAssert(layer->GetRows() == layer->GetOuputSize());
+		ndAssert(layer->GetColumns() == layer->GetInputSize());
+	
+		ndReal* const outBuff = ndAlloca(ndReal, layer->GetInputSize());
+		ndReal* const derBuff = ndAlloca(ndReal, layer->GetOuputSize());
+		ndDeepBrainMemVector outGradient(outBuff, layer->GetInputSize());
+		ndDeepBrainMemVector g(derBuff, layer->GetOuputSize());
+		ndDeepBrainMemVector z(&hidden_z[offsets[i]], layer->GetOuputSize());
+	
+		layer->ActivationDerivative(z, g);
+		g.Mul(gradient);
+		layer->TransposeMul(g, outGradient);
+		
+		gradient.SetCount(outGradient.GetCount());
+		gradient.Set(outGradient);
 	}
-
-	for (ndInt32 i = 0; i < brain->GetCount(); ++i)
-	{
-		ndBrainLayer* const layer = (*brain)[i];
-		Save("layer\n");
-		Save("{\n");
-		layer->Save(this);
-		Save("}\n\n");
-	}
-}
-
-void ndBrainSave::Save(const ndBrain* const brain, const char* const pathName)
-{
-	class SaveAgent : public ndBrainSave
-	{
-		public:
-		SaveAgent(const char* const pathFilename)
-			:ndBrainSave()
-		{
-			m_file = fopen(pathFilename, "wb");
-			ndAssert(m_file);
-		}
-
-		~SaveAgent()
-		{
-			if (m_file)
-			{
-				fclose(m_file);
-			}
-		}
-
-		void WriteData(const char* const data) const
-		{
-			fprintf(m_file, data);
-		}
-
-		FILE* m_file;
-	};
-
-	SaveAgent saveAgent(pathName);
-	saveAgent.Save(brain);
+	ndAssert(inputGradients.GetCount() == gradient.GetCount());
+	inputGradients.Set(gradient);
 }

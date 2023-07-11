@@ -133,7 +133,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 				{
 					m_inputBatch[i] = transition.m_nextState[i];
 				}
-				m_agent->m_targetInstance.MakePrediction(m_inputBatch, m_outputBatch);
+				m_agent->m_target.MakePrediction(m_inputBatch, m_outputBatch);
 				m_truth[action] = transition.m_reward + m_agent->m_gamma * m_outputBatch[action];
 			}
 		}
@@ -163,8 +163,6 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 	ndSharedPtr<ndBrain> m_actor;
 	ndBrain m_target;
 	ndOptimizer m_actorOtimizer;
-	ndBrainInstance m_actorInstance;
-	ndBrainInstance m_targetInstance;
 
 	ndBrainVector m_state;
 	ndBrainVector m_actions;
@@ -196,8 +194,6 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 	,m_actor(actor)
 	,m_target(*(*m_actor))
 	,m_actorOtimizer(*m_actor)
-	,m_actorInstance(*m_actor)
-	,m_targetInstance(&m_target)
 	,m_movingAverage()
 	,m_replayBuffer()
 	,m_gamma(D_DQN_DISCOUNT_FACTOR)
@@ -294,8 +290,6 @@ ndInt32 ndBrainAgentDQN_Trainer<statesDim, actionDim>::SelectBestAction()
 	else
 	{
 		// exploit environment
-		//ndInt32 action = ndBrainAgentDQN____<statesDim, actionDim>::SelectBestAction();
-		//m_currentTransition.m_action[0] = action;
 		ndInt32 bestAction = 0;
 		ndReal maxQValue = m_actions[0];
 		for (ndInt32 i = 1; i < actionDim; ++i)
@@ -372,85 +366,11 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 {
 	GetObservation(&m_state[0]);
-	m_actorInstance.MakePrediction(m_state, m_actions);
+	m_actor->MakePrediction(m_state, m_actions);
 
 	ndReal bestAction = ndReal(SelectBestAction());
 	ApplyActions(&bestAction);
 }
-
-#if 0
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN_Trainer<statesDim, actionDim>::OptimizeStep()
-{
-	m_optimizationDelayCount++;
-	if (m_optimizationDelayCount <= GetOpmizationDelay())
-	{
-		ApplyRandomAction();
-		return;
-	}
-
-	if (!m_frameCount)
-	{
-		ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_state.Set(ndReal (0.0f));
-		ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
-		ResetModel();
-		m_currentTransition.Clear();
-		m_optimizationDelayCount = 0;
-	}
-
-	GetObservation(&m_currentTransition.m_nextState[0]);
-	m_currentTransition.m_reward = GetReward();
-	m_currentTransition.m_terminalState = IsTerminal();
-	for (ndInt32 i = 0; i < statesDim; ++i)
-	{
-		m_currentTransition.m_state[i] = ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_state[i];
-	}
-
-	m_replayBuffer.AddTransition(m_currentTransition);
-	if (m_frameCount < m_shuffleBuffer.GetCapacity())
-	{
-		m_shuffleBuffer.PushBack(m_frameCount);
-	}
-
-	if (m_currentTransition.m_terminalState)
-	{
-		ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_state.Set(ndReal(0.0f));
-		ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
-		ResetModel();
-		m_currentTransition.Clear();
-		if ((m_frameCount < m_startOptimization) && (m_eposideCount % 32 == 0))
-		{
-			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_startOptimization, m_eposideCount);
-		}
-		m_eposideCount++;
-		m_optimizationDelayCount = 0;
-		ndBrainAgentDQN_Trainer<statesDim, actionDim>::PrintDebug();
-	}
-
-	// begin exploitation only after there are a replay buffer is full of random training samples
-	m_explorationProbability = ndMax(m_explorationProbability - m_explorationProbabilityAnnelining, m_minExplorationProbability);
-	if (m_frameCount > m_startOptimization)
-	//if (m_frameCount > 100)
-	{
-		BackPropagate();
-		if (m_collectingSamples)
-		{
-			ndExpandTraceMessage("%d star training: episode %d\n", m_frameCount, m_eposideCount);
-		}
-		m_collectingSamples = false;
-	}
-
-	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
-	{
-		// update on line network
-		m_target.CopyFrom(*(*m_actor));
-	}
-	
-	m_frameCount++;
-	m_framesAlive++;
-}
-
-#else
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::OptimizeStep()
@@ -528,6 +448,5 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Optimize()
 		m_target.CopyFrom(*(*m_actor));
 	}
 }
-#endif
 
 #endif 

@@ -25,7 +25,6 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
-#include "ndBrainInstance.h"
 
 template<class actionType, ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainReplayTransitionMemory

@@ -38,7 +38,7 @@ enum ndBrainActivationType
 
 class ndBrainPrefixScan : public ndFixSizeArray<ndInt32, 256>
 {
-	public:
+public:
 };
 
 

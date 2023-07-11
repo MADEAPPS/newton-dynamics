@@ -110,39 +110,40 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 		//virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
 		void EvaluateBellmanEquation(ndInt32 index)
 		{
-			ndAssert(m_truth.GetCount() == m_output.GetCount());
-			ndAssert(m_truth.GetCount() == m_outputBatch.GetCount());
-			const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_agent->m_replayBuffer[index];
-
-			for (ndInt32 i = 0; i < statesDim; ++i)
-			{
-				m_inputBatch[i] = transition.m_state[i];
-			}
-			for (ndInt32 i = 0; i < actionDim; ++i)
-			{
-				m_inputBatch[i + actionDim] = transition.m_action[i];
-			}
-			MakePrediction(m_inputBatch);
-
-			if (transition.m_terminalState)
-			{
-				m_truth[0] = transition.m_reward;
-			}
-			else
-			{
-				for (ndInt32 i = 0; i < statesDim; ++i)
-				{
-					m_inputBatch[i] = transition.m_nextState[i];
-					m_actorState[i] = transition.m_nextState[i];
-				}
-				m_agent->m_actorInstance.MakePrediction(m_actorState, m_actorAction);
-				for (ndInt32 i = 0; i < actionDim; ++i)
-				{
-					m_inputBatch[i + actionDim] = m_actorAction[i];
-				}
-				m_agent->m_targetCriticInstance.MakePrediction(m_inputBatch, m_outputBatch);
-				m_truth[0] = transition.m_reward + m_agent->m_gamma * m_outputBatch[0];
-			}
+			ndAssert(0);
+			//ndAssert(m_truth.GetCount() == m_output.GetCount());
+			//ndAssert(m_truth.GetCount() == m_outputBatch.GetCount());
+			//const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_agent->m_replayBuffer[index];
+			//
+			//for (ndInt32 i = 0; i < statesDim; ++i)
+			//{
+			//	m_inputBatch[i] = transition.m_state[i];
+			//}
+			//for (ndInt32 i = 0; i < actionDim; ++i)
+			//{
+			//	m_inputBatch[i + actionDim] = transition.m_action[i];
+			//}
+			//MakePrediction(m_inputBatch);
+			//
+			//if (transition.m_terminalState)
+			//{
+			//	m_truth[0] = transition.m_reward;
+			//}
+			//else
+			//{
+			//	for (ndInt32 i = 0; i < statesDim; ++i)
+			//	{
+			//		m_inputBatch[i] = transition.m_nextState[i];
+			//		m_actorState[i] = transition.m_nextState[i];
+			//	}
+			//	m_agent->m_actorInstance.MakePrediction(m_actorState, m_actorAction);
+			//	for (ndInt32 i = 0; i < actionDim; ++i)
+			//	{
+			//		m_inputBatch[i + actionDim] = m_actorAction[i];
+			//	}
+			//	m_agent->m_targetCriticInstance.MakePrediction(m_inputBatch, m_outputBatch);
+			//	m_truth[0] = transition.m_reward + m_agent->m_gamma * m_outputBatch[0];
+			//}
 		}
 
 		virtual void Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32)
@@ -250,10 +251,6 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 	ndBrain m_targetCritic;
 	ndActorOptimizer m_actorOtimizer;
 	ndCriticOptimizer m_criticOtimizer;
-	ndBrainInstance m_actorInstance;
-	ndBrainInstance m_criticInstance;
-	ndBrainInstance m_targetActorInstance;
-	ndBrainInstance m_targetCriticInstance;
 
 	ndBrainVector m_state;
 	ndBrainVector m_actions;
@@ -289,10 +286,6 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	,m_targetCritic(*(*m_critic))
 	,m_actorOtimizer(*m_actor)
 	,m_criticOtimizer(*m_critic)
-	,m_actorInstance(*m_actor)
-	,m_criticInstance(*m_critic)
-	,m_targetActorInstance(&m_targetActor)
-	,m_targetCriticInstance(&m_targetCritic)
 	,m_movingAverage()
 	,m_replayBuffer()
 	,m_gamma(D_DDPG_DISCOUNT_FACTOR)
@@ -392,13 +385,12 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SelectActions()
 {
 	ndFloat32 explore = ndRand();
 
-//m_actorInstance.MakePrediction(m_state, m_actions);
 //m_actions[0] += ndReal(0.1f);
 //ndBrainVector inputGradients;
 //inputGradients.SetCount(m_state.GetCount());
 //m_actorInstance.CalculateInpuGradients(m_state, m_actions, inputGradients);
+//m_actor->MakePrediction(m_state, m_actions);
 
-	m_actorInstance.MakePrediction(m_state, m_actions);
 	if (explore <= m_explorationProbability)
 	{
 		//for (ndInt32 i = 0; i < 5000; ++i)
@@ -476,7 +468,7 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 {
 	GetObservation(&m_state[0]);
-	m_actorInstance.MakePrediction(m_state, m_actions);
+	m_actor->MakePrediction(m_state, m_actions);
 
 	SelectActions();
 	ApplyActions(&m_actions[0]);

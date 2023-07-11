@@ -93,7 +93,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	
 	ndInt32 failCount = 0;
 	ndInt32 testCount = 200;
-	ndBrainInstance instance(&brain);
+	//ndBrainInstance instance(&brain);
 	for (ndInt32 i = 0; i < testCount; i++)
 	{
 		input[0] = ndReal(ndGaussianRandom(0.5f, 0.25f));
@@ -101,7 +101,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		truth[0] = ((input[0] >= 0.5f) && (input[1] >= 0.5f)) ? 1.0f : 0.0f;
 		truth[1] = ((input[0] >= 0.5f) || (input[1] >= 0.5f)) ? 1.0f : 0.0f;
 	
-		instance.MakePrediction(input, output);
+		brain.MakePrediction(input, output);
 
 		bool predicted = true;
 		for (ndInt32 j = 0; j < output.GetCount(); j++)
@@ -216,8 +216,6 @@ static ndBrainMatrix* LoadMnistSampleData(const char* const filename)
 
 static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 {
-	ndBrainInstance instance(&brain);
-
 	ndBrainVector output;
 	output.SetCount((*testLabels)[0].GetCount());
 
@@ -225,7 +223,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 	for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
 	{
 		const ndBrainVector& input = (*testDigits)[i];
-		instance.MakePrediction(input, output);
+		brain.MakePrediction(input, output);
 
 		const ndBrainVector& truth = (*testLabels)[i];
 

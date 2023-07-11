@@ -24,7 +24,6 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainMatrix.h"
-#include "ndBrainInstance.h"
 
 class ndBrainTrainerBase: public ndClassAlloc
 {
@@ -62,8 +61,6 @@ class ndBrainTrainerBase: public ndClassAlloc
 	void SetModel(ndSolveModel model);
 
 	ndBrain* GetBrain() const;
-	ndBrainInstance& GetInstance();
-	const ndBrainInstance& GetInstance() const;
 	void SetMiniBatchSize(ndInt32 miniBatchSize);
 	virtual ndReal Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndBrainVector& output);
 
@@ -71,7 +68,7 @@ class ndBrainTrainerBase: public ndClassAlloc
 	virtual void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, ndInt32 steps) = 0;
 
 	protected:
-	ndBrainInstance m_instance;
+	ndBrain* m_brain;
 	ndInt32 m_miniBatchSize;
 	ndSolveModel m_model;
 
@@ -88,19 +85,10 @@ inline void ndBrainTrainerBase::SetModel(ndSolveModel model)
 	m_model = model;
 }
 
-inline ndBrainInstance& ndBrainTrainerBase::GetInstance()
-{
-	return m_instance;
-}
-
-inline const ndBrainInstance& ndBrainTrainerBase::GetInstance() const
-{
-	return m_instance;
-}
 
 inline ndBrain* ndBrainTrainerBase::GetBrain() const
 {
-	return GetInstance().GetBrain();
+	return m_brain;
 }
 #endif 
 

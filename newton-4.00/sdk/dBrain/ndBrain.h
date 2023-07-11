@@ -28,7 +28,7 @@
 
 class ndBrain;
 
-class ndBrainLoad : public ndClassAlloc
+class ndBrainLoad: public ndClassAlloc
 {
 	public:
 	ndBrainLoad() {}
@@ -42,7 +42,7 @@ class ndBrainLoad : public ndClassAlloc
 	virtual void ReadString(char* const buffer) const = 0;
 };
 
-class ndBrainSave : public ndClassAlloc
+class ndBrainSave: public ndClassAlloc
 {
 	public:
 	ndBrainSave() {}
@@ -56,6 +56,12 @@ class ndBrainSave : public ndClassAlloc
 class ndBrain: public ndArray<ndBrainLayer*>
 {
 	public: 
+	class ndHidenVariableOffsets : public ndFixSizeArray<ndInt32, 256>
+	{
+		public:
+		ndHidenVariableOffsets(ndBrain* const brain);
+	};
+
 	ndBrain();
 	ndBrain(const ndBrain& src);
 	~ndBrain();
@@ -70,9 +76,20 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	void InitGaussianWeights(ndReal variance);
 	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
 
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
+	void CalculateInpuGradients(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients);
+
+	private:
+	void CalculateHiddenVariableOffeset();
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output, const ndBrainVector& hiddenLayerOutputs);
+
 	void* m_memory;
 	ndInt32 m_memorySize;
 	bool m_isReady;
+
+	friend class ndBrainLoad;
+	friend class ndBrainSave;
+	friend class ndBrainTrainer;
 };
 
 #endif 
