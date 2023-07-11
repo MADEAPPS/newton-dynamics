@@ -95,55 +95,42 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 			m_inputBatch.SetCount(statesDim + actionDim);
 		}
 
-		//ndCriticOptimizer(const ndCriticOptimizer& src)
-		//	:ndCriticOptimizer(src)
-		//	,m_truth()
-		//	,m_inputBatch()
-		//	,m_outputBatch()
-		//	,m_agent(nullptr)
-		//{
-		//	m_truth.SetCount(actionDim);
-		//	m_inputBatch.SetCount(statesDim);
-		//	m_outputBatch.SetCount(actionDim);
-		//}
-
 		//virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
 		void EvaluateBellmanEquation(ndInt32 index)
 		{
-			ndAssert(0);
-			//ndAssert(m_truth.GetCount() == m_output.GetCount());
-			//ndAssert(m_truth.GetCount() == m_outputBatch.GetCount());
-			//const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_agent->m_replayBuffer[index];
-			//
-			//for (ndInt32 i = 0; i < statesDim; ++i)
-			//{
-			//	m_inputBatch[i] = transition.m_state[i];
-			//}
-			//for (ndInt32 i = 0; i < actionDim; ++i)
-			//{
-			//	m_inputBatch[i + actionDim] = transition.m_action[i];
-			//}
-			//MakePrediction(m_inputBatch);
-			//
-			//if (transition.m_terminalState)
-			//{
-			//	m_truth[0] = transition.m_reward;
-			//}
-			//else
-			//{
-			//	for (ndInt32 i = 0; i < statesDim; ++i)
-			//	{
-			//		m_inputBatch[i] = transition.m_nextState[i];
-			//		m_actorState[i] = transition.m_nextState[i];
-			//	}
-			//	m_agent->m_actorInstance.MakePrediction(m_actorState, m_actorAction);
-			//	for (ndInt32 i = 0; i < actionDim; ++i)
-			//	{
-			//		m_inputBatch[i + actionDim] = m_actorAction[i];
-			//	}
-			//	m_agent->m_targetCriticInstance.MakePrediction(m_inputBatch, m_outputBatch);
-			//	m_truth[0] = transition.m_reward + m_agent->m_gamma * m_outputBatch[0];
-			//}
+			ndAssert(m_truth.GetCount() == m_output.GetCount());
+			ndAssert(m_truth.GetCount() == m_outputBatch.GetCount());
+			const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_agent->m_replayBuffer[index];
+			
+			for (ndInt32 i = 0; i < statesDim; ++i)
+			{
+				m_inputBatch[i] = transition.m_state[i];
+			}
+			for (ndInt32 i = 0; i < actionDim; ++i)
+			{
+				m_inputBatch[i + actionDim] = transition.m_action[i];
+			}
+			MakePrediction(m_inputBatch);
+			
+			if (transition.m_terminalState)
+			{
+				m_truth[0] = transition.m_reward;
+			}
+			else
+			{
+				for (ndInt32 i = 0; i < statesDim; ++i)
+				{
+					m_inputBatch[i] = transition.m_nextState[i];
+					m_actorState[i] = transition.m_nextState[i];
+				}
+				m_agent->m_actor->MakePrediction(m_actorState, m_actorAction);
+				for (ndInt32 i = 0; i < actionDim; ++i)
+				{
+					m_inputBatch[i + actionDim] = m_actorAction[i];
+				}
+				m_agent->m_targetCritic.MakePrediction(m_inputBatch, m_outputBatch);
+				m_truth[0] = transition.m_reward + m_agent->m_gamma * m_outputBatch[0];
+			}
 		}
 
 		virtual void Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32)
@@ -186,14 +173,26 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 		}
 
 		//virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
-		//void EvaluateBellmanEquation(ndInt32 index)
-		void EvaluateBellmanEquation()
+		void EvaluateBellmanEquation(ndInt32 index)
 		{
-			ndAssert(0);
-			//ndAssert(m_truth.GetCount() == m_output.GetCount());
-			//ndAssert(m_truth.GetCount() == m_outputBatch.GetCount());
-			//const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_agent->m_replayBuffer[index];
-			//
+			ndAssert(m_truth.GetCount() == m_output.GetCount());
+			ndAssert(m_truth.GetCount() == m_outputBatch.GetCount());
+			const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_agent->m_replayBuffer[index];
+
+			for (ndInt32 i = 0; i < statesDim; ++i)
+			{
+				m_inputBatch[i] = transition.m_state[i];
+			}
+			MakePrediction(m_inputBatch, m_truth);
+
+			// calcuate gradient of theis action using the critic and target critic 
+			//ndAssert(0);
+			//m_actions[0] += ndReal(0.1f);
+			//ndBrainVector inputGradients;
+			//inputGradients.SetCount(m_state.GetCount());
+			//m_actorInstance.CalculateInpuGradients(m_state, m_actions, inputGradients);
+			//m_actor->MakePrediction(m_state, m_actions);
+
 			//for (ndInt32 i = 0; i < statesDim; ++i)
 			//{
 			//	m_inputBatch[i] = transition.m_state[i];
@@ -224,19 +223,18 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 
 		virtual void Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32)
 		{
-			ndAssert(0);
-			//ndArray<ndInt32>& shuffleBuffer = m_agent->m_replayBuffer.m_shuffleBuffer;
-			//
-			//ClearGradientsAcc();
-			//shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
-			//for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
-			//{
-			//	ndInt32 index = shuffleBuffer[i];
-			//	//GetGroundTruth(index, truth, m_output);
-			//	EvaluateBellmanEquation(index);
-			//	BackPropagate(m_truth);
-			//}
-			//UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
+			ndArray<ndInt32>& shuffleBuffer = m_agent->m_replayBuffer.m_shuffleBuffer;
+			
+			ClearGradientsAcc();
+			shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
+			for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
+			{
+				ndInt32 index = shuffleBuffer[i];
+				//GetGroundTruth(index, truth, m_output);
+				EvaluateBellmanEquation(index);
+				BackPropagate(m_truth);
+			}
+			UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
 		}
 
 		ndBrainVector m_truth;
@@ -375,36 +373,8 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagate()
 	ndTestValidator criticValidator(m_criticOtimizer);
 	m_criticOtimizer.Optimize(criticValidator, inputBatch, m_learnRate, 1);
 
-	//ndBrainMatrix inputBatch;
 	ndTestValidator actorValidator(m_actorOtimizer);
-	//m_actorOtimizer.Optimize(actorValidator, inputBatch, m_learnRate, 1);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SelectActions()
-{
-	ndFloat32 explore = ndRand();
-
-//m_actions[0] += ndReal(0.1f);
-//ndBrainVector inputGradients;
-//inputGradients.SetCount(m_state.GetCount());
-//m_actorInstance.CalculateInpuGradients(m_state, m_actions, inputGradients);
-//m_actor->MakePrediction(m_state, m_actions);
-
-	if (explore <= m_explorationProbability)
-	{
-		//for (ndInt32 i = 0; i < 5000; ++i)
-		//{
-		//	ndReal noisyAction = ndGaussianRandom(ndFloat32(0.0f), ndFloat32(m_actionNoiseDeviation));
-		//	ndTrace(("%f\n", noisyAction));
-		//}
-
-		for (ndInt32 i = 0; i < actionDim; ++i)
-		{
-			ndReal noisyAction = ndGaussianRandom(ndFloat32(m_actions[i]), ndFloat32(m_actionNoiseDeviation));
-			m_actions[i] = ndClamp(noisyAction, ndReal(-1.0f), ndReal(1.0f));
-		}
-	}
+	m_actorOtimizer.Optimize(actorValidator, inputBatch, m_learnRate, 1);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -462,6 +432,26 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SetOpmizationDelay(ndInt32 delay)
 {
 	m_optimizationDelay = delay;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SelectActions()
+{
+	ndFloat32 explore = ndRand();
+	if (explore <= m_explorationProbability)
+	{
+		//for (ndInt32 i = 0; i < 5000; ++i)
+		//{
+		//	ndReal noisyAction = ndGaussianRandom(ndFloat32(0.0f), ndFloat32(m_actionNoiseDeviation));
+		//	ndTrace(("%f\n", noisyAction));
+		//}
+
+		for (ndInt32 i = 0; i < actionDim; ++i)
+		{
+			ndReal noisyAction = ndGaussianRandom(ndFloat32(m_actions[i]), ndFloat32(m_actionNoiseDeviation));
+			m_actions[i] = ndClamp(noisyAction, ndReal(-1.0f), ndReal(1.0f));
+		}
+	}
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

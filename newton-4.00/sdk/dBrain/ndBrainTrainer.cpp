@@ -134,6 +134,12 @@ void ndBrainTrainer::MakePrediction(const ndBrainVector& input)
 	}
 }
 
+void ndBrainTrainer::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
+{
+	MakePrediction(input);
+	output.Set(m_output);
+}
+
 void ndBrainTrainer::BackPropagateOutputLayer(const ndBrainVector& groundTruth)
 {
 	const ndArray<ndBrainLayer*>& layers = *m_brain;

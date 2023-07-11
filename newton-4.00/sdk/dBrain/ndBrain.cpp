@@ -460,8 +460,8 @@ void ndBrain::CalculateInpuGradients(const ndBrainVector& input, const ndBrainVe
 	const ndArray<ndBrainLayer*>& layers = (*this);
 	ndAssert(layers.GetCount());
 	ndAssert(input.GetCount() == GetInputSize());
-	ndAssert(output.GetCount() == GetOutputSize());
-	ndAssert(hiddenLayerOutputs.GetCount() >= offsets[offsets.GetCount() - 1]);
+	ndAssert(inputGradients.GetCount() == GetOutputSize());
+	//ndAssert(hiddenLayerOutputs.GetCount() >= offsets[offsets.GetCount() - 1]);
 
 	ndInt32 capacity = 0;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
