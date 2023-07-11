@@ -161,7 +161,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 	};
 
 	ndSharedPtr<ndBrain> m_actor;
-	ndBrain m_target;
+	//ndBrain m_target;
 	ndOptimizer m_actorOtimizer;
 
 	ndBrainVector m_state;

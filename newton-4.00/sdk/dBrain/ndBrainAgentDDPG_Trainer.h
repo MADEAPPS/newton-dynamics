@@ -35,8 +35,8 @@
 // defualt hyper parameters defaults
 #define D_DDPG_LEARN_RATE				ndReal(2.0e-4f)
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
-//#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
-#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 4)
+#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
+//#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 4)
 #define D_DDPG_MOVING_AVERAGE			64
 #define D_DDPG_REPLAY_BASH_SIZE			32
 #define D_DDPG_TARGET_UPDATE_PERIOD		1000
@@ -215,7 +215,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 				EvaluateBellmanEquation(index);
 				BackPropagate(m_truth);
 			}
-			//UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
+			UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
 		}
 
 		ndBrainVector m_truth;
@@ -509,17 +509,18 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Optimize()
 {
 	BackPropagate();
-	//if (m_collectingSamples)
-	//{
-	//	ndExpandTraceMessage("%d star training: episode %d\n", m_frameCount, m_eposideCount);
-	//}
-	//m_collectingSamples = false;
-	//
-	//if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
-	//{
-	//	// update on line network
-	//	m_target.CopyFrom(*(*m_actor));
-	//}
+	if (m_collectingSamples)
+	{
+		ndExpandTraceMessage("%d star training: episode %d\n", m_frameCount, m_eposideCount);
+	}
+	m_collectingSamples = false;
+	
+	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
+	{
+		// update on line network
+		//m_target.CopyFrom(*(*m_actor));
+		m_targetCritic.CopyFrom(*(*m_critic));
+	}
 }
 
 
