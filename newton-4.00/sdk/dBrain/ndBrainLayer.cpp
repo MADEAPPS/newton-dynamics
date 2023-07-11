@@ -335,7 +335,7 @@ void ndBrainLayer::ActivationDerivative(const ndBrainVector& input, ndBrainVecto
 void ndBrainLayer::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
 	Mul(input, output);
-	output.Add(output, m_bias);
+	output.Add(m_bias);
 	ApplyActivation(output);
 }
 

@@ -30,19 +30,10 @@ class ndBrainParallelTrainer::ndBrainTrainerChannel : public ndBrainTrainer
 	ndBrainTrainerChannel(const ndBrainParallelTrainer& src)
 		:ndBrainTrainer(src)
 	{
-		for (ndInt32 i = 0; i < m_weightsLayersTranspose.GetCount(); ++i)
-		{
-			delete m_weightsLayersTranspose[i];
-			m_weightsLayersTranspose[i] = src.m_weightsLayersTranspose[i];
-		}
 	}
 
 	~ndBrainTrainerChannel()
 	{
-		for (ndInt32 i = 0; i < m_weightsLayersTranspose.GetCount(); ++i)
-		{
-			m_weightsLayersTranspose[i] = nullptr;
-		}
 	}
 };
 
@@ -110,10 +101,12 @@ void ndBrainParallelTrainer::AverageWeights()
 		for (ndInt32 i = 0; i < threads; ++i)
 		{
 			const ndBrainLayer& srcLayer = *(*m_threadData[i]->GetBrain())[j];
-			bias.Add(bias, srcLayer.GetBias());
+			//bias.Add(bias, srcLayer.GetBias());
+			bias.Add(srcLayer.GetBias());
 			for (ndInt32 k = 0; k < layer.GetOuputSize(); k++)
 			{
-				layer[k].Add(layer[k], srcLayer[k]);
+				//layer[k].Add(layer[k], srcLayer[k]);
+				layer[k].Add(srcLayer[k]);
 			}
 		}
 		
@@ -139,7 +132,8 @@ ndReal ndBrainParallelTrainer::Validate(const ndBrainMatrix& inputBatch, const n
 			const ndBrainVector& input = inputBatch[i];
 			const ndBrainVector& truth = groundTruth[i];
 			optimizer.m_instance.MakePrediction(input, optimizer.m_output);
-			optimizer.m_output.Sub(optimizer.m_output, truth);
+			//optimizer.m_output.Sub(optimizer.m_output, truth);
+			optimizer.m_output.Sub(truth);
 			errorAcc += optimizer.m_output.Dot(optimizer.m_output);
 		}
 		subBatchError2[threadIndex] = errorAcc;
@@ -220,8 +214,10 @@ void ndBrainParallelTrainer::Optimize()
 					const ndBrainTrainer& optimizer = *m_threadData[i];
 					const ndDeepBrainMemVector biasSrc(&optimizer.m_biasGradientsAcc[biasStartEnd.m_start], biasStartEnd.m_end - biasStartEnd.m_start);
 					const ndDeepBrainMemVector weightSrc(&optimizer.m_weightGradients[weightStartEnd.m_start], weightStartEnd.m_end - weightStartEnd.m_start);
-					biasAcc.Add(biasAcc, biasSrc);
-					weightAcc.Add(weightAcc, weightSrc);
+					//biasAcc.Add(biasAcc, biasSrc);
+					biasAcc.Add(biasSrc);
+					//weightAcc.Add(weightAcc, weightSrc);
+					weightAcc.Add(weightSrc);
 				}
 				threadIndex *= 1;
 			});
@@ -229,7 +225,6 @@ void ndBrainParallelTrainer::Optimize()
 			UpdateWeights(m_learnRate, batchSize);
 		}
 
-		ApplyWeightTranspose();
 		randomizeVector.RandomShuffle(randomizeVector.GetCount());
 
 		//ndReal batchError = validator.Validate(inputBatch, groundTruth);

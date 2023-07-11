@@ -159,7 +159,6 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 				BackPropagate(m_truth);
 			}
 			UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
-			ApplyWeightTranspose();
 		}
 
 		ndBrainVector m_truth;
@@ -237,7 +236,6 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 			//	BackPropagate(m_truth);
 			//}
 			//UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
-			//ApplyWeightTranspose();
 		}
 
 		ndBrainVector m_truth;

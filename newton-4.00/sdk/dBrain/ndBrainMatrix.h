@@ -39,8 +39,9 @@ class ndBrainMatrix: public ndArray<ndBrainVector>
 	ndInt32 GetColumns() const;
 	void Set(ndReal value);
 	void Set(const ndBrainMatrix& src);
-	void SetTranspose(const ndBrainMatrix& src);
+
 	void Mul(const ndBrainVector& input, ndBrainVector& output) const;
+	void TransposeMul(const ndBrainVector& input, ndBrainVector& output) const;
 
 	protected:
 	ndUnsigned8* SetPointer(ndUnsigned8* const mem);

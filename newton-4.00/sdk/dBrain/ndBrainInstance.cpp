@@ -115,8 +115,10 @@ void ndBrainInstance::CalculateInpuGradients(const ndBrainVector& input, const n
 	ndDeepBrainMemVector gradient(gradientBuffer, capacity);
 	gradient.SetCount(groundTruth.GetCount());
 
-	MakePrediction(input, output);
-	gradient.Sub(output, groundTruth);
+	//MakePrediction(input, output);
+	//gradient.Set(output);
+	MakePrediction(input, gradient);
+	gradient.Sub(groundTruth);
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 		const ndBrainLayer* const layer = layers[i];
@@ -130,16 +132,8 @@ void ndBrainInstance::CalculateInpuGradients(const ndBrainVector& input, const n
 		ndDeepBrainMemVector z(&m_z[m_zPrefixScan[i]], layer->GetOuputSize());
 
 		layer->ActivationDerivative(z, g);
-		g.Mul(g, gradient);
-
-		//outGradient.Set(ndReal(0.0f));
-		outGradient.ScaleSet((*layer)[g.GetCount() - 1], g[g.GetCount() - 1]);
-		for (ndInt32 j = g.GetCount() - 2; j >= 0; --j)
-		{
-			ndReal scale = g[j];
-			const ndBrainVector& row = (*layer)[j];
-			outGradient.ScaleAdd(row, scale);
-		}
+		g.Mul(gradient);
+		layer->TransposeMul(g, outGradient);
 		
 		gradient.SetCount(outGradient.GetCount());
 		gradient.Set(outGradient);

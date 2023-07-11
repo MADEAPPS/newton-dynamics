@@ -129,39 +129,36 @@ void ndBrainVector::ScaleAdd(const ndBrainVector& a, ndReal b)
 	ndScaleAdd(GetCount(), &(*this)[0], &a[0], b);
 }
 
-void ndBrainVector::Add(const ndBrainVector& a, const ndBrainVector& b)
+void ndBrainVector::Add(const ndBrainVector& a)
 {
 	ndAssert(GetCount() == a.GetCount());
-	ndAssert(GetCount() == b.GetCount());
-	ndAdd(GetCount(), &(*this)[0], &a[0], &b[0]);
+	ndAdd(GetCount(), &(*this)[0], &a[0]);
 }
 
-void ndBrainVector::Sub(const ndBrainVector& a, const ndBrainVector& b)
+void ndBrainVector::Sub(const ndBrainVector& a)
 {
 	ndAssert(GetCount() == a.GetCount());
-	ndAssert(GetCount() == b.GetCount());
-	ndSub(GetCount(), &(*this)[0], &a[0], &b[0]);
+	ndSub(GetCount(), &(*this)[0], &a[0]);
 }
 
-void ndBrainVector::Mul(const ndBrainVector& a, const ndBrainVector& b)
+void ndBrainVector::Mul(const ndBrainVector& a)
 {
 	ndAssert(GetCount() == a.GetCount());
-	ndAssert(GetCount() == b.GetCount());
-	ndMul(GetCount(), &(*this)[0], &a[0], &b[0]);
+	ndMul(GetCount(), &(*this)[0], &a[0]);
 }
 
 void ndBrainVector::MulAdd(const ndBrainVector& a, const ndBrainVector& b)
 {
 	ndAssert(GetCount() == a.GetCount());
 	ndAssert(GetCount() == b.GetCount());
-	ndMulAdd(GetCount(), &(*this)[0], &(*this)[0], &a[0], &b[0]);
+	ndMulAdd(GetCount(), &(*this)[0], &a[0], &b[0]);
 }
 
 void ndBrainVector::MulSub(const ndBrainVector& a, const ndBrainVector& b)
 {
 	ndAssert(GetCount() == a.GetCount());
 	ndAssert(GetCount() == b.GetCount());
-	ndMulSub(GetCount(), &(*this)[0], &(*this)[0], &a[0], &b[0]);
+	ndMulSub(GetCount(), &(*this)[0], &a[0], &b[0]);
 }
 
 ndReal ndBrainVector::Dot(const ndBrainVector& a) const

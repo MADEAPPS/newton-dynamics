@@ -46,7 +46,6 @@ class ndBrainTrainer: public ndBrainTrainerBase
 	protected:
 	void ClearGradientsAcc();
 	virtual void PrefixScan();
-	virtual void ApplyWeightTranspose();
 	virtual void BackPropagateHiddenLayer(ndInt32 layerIndex);
 	virtual void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
 	virtual void BackPropagateOutputLayer(const ndBrainVector& groundTruth);
@@ -63,7 +62,6 @@ class ndBrainTrainer: public ndBrainTrainerBase
 	ndBrainVector m_weightGradient_u;
 	ndBrainVector m_weightGradient_v;
 	ndBrainPrefixScan m_weightGradientsPrefixScan;
-	ndArray <ndBrainMatrix*> m_weightsLayersTranspose;
 	ndReal m_regularizer;
 	ndReal m_bestCost;
 	ndReal m_alpha;

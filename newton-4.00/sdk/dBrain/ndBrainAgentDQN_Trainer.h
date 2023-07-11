@@ -36,6 +36,7 @@
 #define D_DQN_LEARN_RATE				ndReal(2.0e-4f)
 #define D_DQN_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DQN_REPLAY_BUFFERSIZE			(1024 * 512)
+//#define D_DQN_REPLAY_BUFFERSIZE		(1024)
 #define D_DQN_MOVING_AVERAGE			64
 #define D_DQN_REPLAY_BASH_SIZE			32
 #define D_DQN_TARGET_UPDATE_PERIOD		1000
@@ -151,7 +152,6 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 				BackPropagate(m_truth);
 			}
 			UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
-			ApplyWeightTranspose();
 		}
 
 		ndBrainVector m_truth;

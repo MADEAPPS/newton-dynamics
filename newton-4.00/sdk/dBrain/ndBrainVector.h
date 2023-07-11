@@ -38,9 +38,9 @@ class ndBrainVector: public ndArray<ndReal>
 	ndInt32 GetMaxIndex() const;
 
 	ndReal Dot(const ndBrainVector& a) const;
-	void Add(const ndBrainVector& a, const ndBrainVector& b);
-	void Sub(const ndBrainVector& a, const ndBrainVector& b);
-	void Mul(const ndBrainVector& a, const ndBrainVector& b);
+	void Add(const ndBrainVector& a);
+	void Sub(const ndBrainVector& a);
+	void Mul(const ndBrainVector& a);
 
 	void Clamp(ndReal min, ndReal max);
 	void ScaleAdd(const ndBrainVector& a, ndReal b);
