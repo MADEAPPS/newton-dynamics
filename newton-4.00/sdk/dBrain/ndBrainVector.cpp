@@ -75,19 +75,21 @@ void ndBrainVector::InitGaussianWeights(ndReal variance)
 
 void ndBrainVector::Set(ndReal value)
 {
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
-	{
-		(*this)[i] = value;
-	}
+	//for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	//{
+	//	(*this)[i] = value;
+	//}
+	ndMemSet(&(*this)[0], value, GetCount());
 }
 
 void ndBrainVector::Set(const ndBrainVector& data)
 {
 	ndAssert(GetCount() == data.GetCount());
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
-	{
-		(*this)[i] = data[i];
-	}
+	//for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	//{
+	//	(*this)[i] = data[i];
+	//}
+	ndMemCpy(&(*this)[0], &data[0], GetCount());
 }
 
 ndInt32 ndBrainVector::GetMaxIndex() const
