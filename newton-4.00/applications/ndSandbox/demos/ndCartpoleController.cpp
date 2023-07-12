@@ -150,18 +150,15 @@ namespace ndController_0
 					:ndBrainAgentDDPG<m_stateSize, m_actionsSize>(actor)
 					,m_model(nullptr)
 				{
-					//ndAssert(0);
 				}
 
 				void GetObservation(ndReal* const state) const
 				{
-					//ndAssert(0);
 					m_model->GetObservation(state);
 				}
 
 				virtual void ApplyActions(ndReal* const actions) const
 				{
-					//ndAssert(0);
 					m_model->ApplyActions(actions);
 				}
 
@@ -200,6 +197,11 @@ namespace ndController_0
 
 				bool IsTerminal() const
 				{
+					if (GetEpisodeFrames() > 1500)
+					{
+						// kill the model with a huge push if is alive for too long.
+						m_model->RandomePush();
+					}
 					return m_model->IsTerminal();
 				}
 
@@ -256,8 +258,10 @@ namespace ndController_0
 		virtual ndReal GetReward() const
 		{
 			const ndMatrix& matrix = m_pole->GetMatrix();
-			ndFloat32 angle = ndMin(ndAbs(matrix.m_front.m_x), D_REWARD_MIN_ANGLE);
-			ndFloat32 reward = ndFloat32(1.0f) - angle / D_REWARD_MIN_ANGLE;
+			ndFloat32 sinAngle = matrix.m_front.m_x;
+			//ndFloat32 angle = ndMin(ndAbs(sinAngle), D_REWARD_MIN_ANGLE);
+			//ndFloat32 reward = ndFloat32(1.0f) - angle / D_REWARD_MIN_ANGLE;
+			ndFloat32 reward = ndReal(ndPow(ndEXP, - ndFloat32 (100.0f) * sinAngle * sinAngle));
 			return ndReal(reward);
 		}
 

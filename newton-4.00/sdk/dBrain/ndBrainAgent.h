@@ -40,6 +40,7 @@ class ndBrainAgent: public ndClassAlloc
 	virtual void ResetModel() const = 0;
 	virtual bool IsTerminal() const = 0;
 	virtual ndReal GetReward() const = 0;
+	virtual ndInt32 GetEpisodeFrames() const = 0;
 	virtual ndInt32 GetOpmizationDelay() const = 0;
 	virtual void SetOpmizationDelay(ndInt32 delay) = 0;
 

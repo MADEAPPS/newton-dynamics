@@ -58,6 +58,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 
 	ndInt32 GetFramesCount() const;
 	ndInt32 GetEposideCount() const;
+	ndInt32 GetEpisodeFrames() const;
 
 	protected:
 	void Step();
@@ -328,6 +329,12 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 ndInt32 ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetEposideCount() const
 {
 	return m_eposideCount;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndInt32 ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetEpisodeFrames() const
+{
+	return m_framesAlive;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
