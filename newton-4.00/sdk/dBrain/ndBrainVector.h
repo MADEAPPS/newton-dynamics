@@ -36,17 +36,19 @@ class ndBrainVector: public ndArray<ndReal>
 	void Set(const ndBrainVector& data);
 
 	ndInt32 GetMaxIndex() const;
-
 	ndReal Dot(const ndBrainVector& a) const;
+
+	void Scale(ndReal b);
 	void Add(const ndBrainVector& a);
 	void Sub(const ndBrainVector& a);
 	void Mul(const ndBrainVector& a);
 
 	void Clamp(ndReal min, ndReal max);
 	void ScaleAdd(const ndBrainVector& a, ndReal b);
-	void ScaleSet(const ndBrainVector& a, ndReal scale);
 	void MulAdd(const ndBrainVector& a, const ndBrainVector& b);
 	void MulSub(const ndBrainVector& a, const ndBrainVector& b);
+
+	void Blend(const ndBrainVector& target, ndReal blend);
 };
 
 class ndDeepBrainMemVector : public ndBrainVector

@@ -53,6 +53,8 @@ class ndBrainLayer: public ndBrainMatrix
 	ndBrainActivationType GetActivationType() const;
 
 	virtual void CopyFrom(const ndBrainLayer& src);
+	virtual void Blend(const ndBrainLayer& src, ndReal blend);
+
 	virtual bool Compare(const ndBrainLayer& src) const;
 
 	virtual void Load(const ndBrainLoad* const loadSave);

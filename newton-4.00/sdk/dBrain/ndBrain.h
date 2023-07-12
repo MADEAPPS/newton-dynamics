@@ -69,6 +69,7 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	ndInt32 GetInputSize() const;
 	ndInt32 GetOutputSize() const;
 	void CopyFrom(const ndBrain& src);
+	void SoftCopy(const ndBrain& src, ndReal blend);
 
 	void BeginAddLayer();
 	void EndAddLayer(ndReal randomVariance);
@@ -80,10 +81,10 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	void CalculateInpuGradients(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients);
 
 	private:
-	void CalculateHiddenVariableOffeset();
+	void CalculateHiddenVariableOffset();
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output, const ndBrainVector& hiddenLayerOutputs);
 
-	void* m_memory;
+	ndReal* m_memory;
 	ndInt32 m_memorySize;
 	bool m_isReady;
 

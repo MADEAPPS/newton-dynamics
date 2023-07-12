@@ -82,6 +82,7 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
 					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(qValuePredictor)
 					,m_model(nullptr)
+					,m_stopTraining(1000000)
 				{
 				}
 
@@ -118,12 +119,12 @@ namespace ndController_0
 				void OptimizeStep()
 				{
 					ndInt32 stopTraining = GetFramesCount();
-					if (stopTraining <= 1000000)
+					if (stopTraining <= m_stopTraining)
 					{
 						ndBrainAgentDQN_Trainer::OptimizeStep();
 					}
 			
-					if (stopTraining == 1000000)
+					if (stopTraining == m_stopTraining)
 					{
 						char fileName[1024];
 						dGetWorkingFileName("cartpoleDQN.nn", fileName);
@@ -137,6 +138,7 @@ namespace ndController_0
 				}
 
 				ndCartpole* m_model;
+				ndInt32 m_stopTraining;
 			};
 
 		#else
@@ -172,6 +174,7 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 					,m_model(nullptr)
+					,m_stopTraining(2000000)
 				{
 				}
 
@@ -208,12 +211,12 @@ namespace ndController_0
 				void OptimizeStep()
 				{
 					ndInt32 stopTraining = GetFramesCount();
-					if (stopTraining <= 1000000)
+					if (stopTraining <= m_stopTraining)
 					{
 						ndBrainAgentDDPG_Trainer::OptimizeStep();
 					}
 
-					if (stopTraining == 1000000)
+					if (stopTraining == m_stopTraining)
 					{
 						char fileName[1024];
 						dGetWorkingFileName("cartpoleDQN.nn", fileName);
@@ -227,6 +230,7 @@ namespace ndController_0
 				}
 
 				ndCartpole* m_model;
+				ndInt32 m_stopTraining;
 			};
 
 		#endif
@@ -318,8 +322,9 @@ namespace ndController_0
 		
 			if (ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(40.0f))
 			{
-				//ResetModel();
-				// this will kill the model
+				// this probably will kill the model, or make really hard to keep balanced
+				m_cart->SetMatrix(m_cartMatrix);
+				m_pole->SetMatrix(m_poleMatrix);
 				ndVector impulsePush(ndVector::m_zero);
 				impulsePush.m_x = 5.0f * m_cart->GetMassMatrix().m_w;
 				m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, timestep);
@@ -403,8 +408,8 @@ namespace ndController_0
 			ndBrainSave::Save(*actor, fileName);
 
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(actor));
-		#else
 
+		#else
 			ndSharedPtr<ndBrain> actor(new ndBrain());
 			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
 			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
@@ -445,7 +450,8 @@ namespace ndController_0
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(actor, critic));
 		#endif
 		ndCartpole* const model = new ndCartpole(agent);
-		((ndCartpole::ndCartpoleAgent_trainer*)*agent)->m_model = model;
+		ndCartpole::ndCartpoleAgent_trainer* const trainer = (ndCartpole::ndCartpoleAgent_trainer*)*agent;
+		trainer->m_model = model;
 
 		BuildModel(model, scene, location);
 

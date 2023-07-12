@@ -76,6 +76,12 @@ void ndBrainLayer::CopyFrom(const ndBrainLayer& src)
 	m_bias.Set(src.m_bias);
 }
 
+void ndBrainLayer::Blend(const ndBrainLayer& src, ndReal blend)
+{
+	ndBrainMatrix::Blend(src, blend);
+	m_bias.Blend(src.m_bias, blend);
+}
+
 bool ndBrainLayer::Compare(const ndBrainLayer& src) const
 {
 	if (m_activation != src.m_activation)

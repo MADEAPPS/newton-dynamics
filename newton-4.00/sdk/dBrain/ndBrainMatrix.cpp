@@ -109,6 +109,17 @@ void ndBrainMatrix::Set(const ndBrainMatrix& src)
 	}
 }
 
+void ndBrainMatrix::Blend(const ndBrainMatrix& src, ndReal blend)
+{
+	ndAssert(src.GetRows() == GetRows());
+	ndAssert(src.GetColumns() == GetColumns());
+	ndBrainMatrix& matrix = *this;
+	for (ndInt32 i = 0; i < src.GetRows(); ++i)
+	{
+		matrix[i].Blend(src[i], blend);
+	}
+}
+
 void ndBrainMatrix::Mul(const ndBrainVector& input, ndBrainVector& output) const
 {
 	const ndBrainMatrix& me = *this;
@@ -129,7 +140,9 @@ void ndBrainMatrix::TransposeMul(const ndBrainVector& input, ndBrainVector& outp
 	ndAssert(input.GetCount() == GetCount());
 	ndAssert(output.GetCount() == GetColumns());
 
-	output.ScaleSet(me[input.GetCount() - 1], input[input.GetCount() - 1]);
+	//output.ScaleSet(me[input.GetCount() - 1], input[input.GetCount() - 1]);
+	output.Set(me[input.GetCount() - 1]);
+	output.Scale(input[input.GetCount() - 1]);
 	for (ndInt32 j = me.GetCount() - 2; j >= 0; --j)
 	{
 		ndReal scale = input[j];

@@ -28,7 +28,7 @@ ndBrain* ndBrainLoad::Load(const char* const pathName)
 {
 	class Loader : public ndBrainLoad
 	{
-	public:
+		public:
 		Loader(const char* const pathName)
 			:ndBrainLoad()
 		{
@@ -333,6 +333,16 @@ void ndBrain::CopyFrom(const ndBrain& src)
 	}
 }
 
+void ndBrain::SoftCopy(const ndBrain& src, ndReal blend)
+{
+	const ndArray<ndBrainLayer*>& layers = *this;
+	const ndArray<ndBrainLayer*>& srcLayers = src;
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		layers[i]->Blend(*srcLayers[i], blend);
+	}
+}
+
 ndBrainLayer* ndBrain::AddLayer(ndBrainLayer* const layer)
 {
 	ndAssert(!GetCount() || ((*this)[GetCount() - 1]->GetOuputSize() == layer->GetInputSize()));
@@ -360,8 +370,9 @@ void ndBrain::EndAddLayer(ndReal randomVariance)
 
 	ndInt32 memorySize = floatsCount * ndInt32(sizeof(ndReal)) + vectorSizeInBytes + 256;
 	m_memorySize = memorySize;
-	m_memory = ndMemory::Malloc(size_t(memorySize));
-	memset(m_memory, 0, size_t(memorySize));
+	m_memory = (ndReal*)ndMemory::Malloc(size_t(memorySize));
+	//memset(m_memory, 0, size_t(memorySize));
+	ndMemSet(m_memory, ndReal(0.0f), ndInt32 (m_memorySize / sizeof (ndReal)));
 
 	// assign vector pointers
 	ndUnsigned8* mem = (ndUnsigned8*)m_memory;
@@ -373,7 +384,6 @@ void ndBrain::EndAddLayer(ndReal randomVariance)
 
 	ndIntPtr metToVal;
 	metToVal.m_ptr = mem;
-	//ndReal* floatMemory = (ndReal*) ((ndUnsigned64 (mem) + 31) & -32);
 	ndReal* floatMemory = (ndReal*)((ndUnsigned64(metToVal.m_int) + 31) & -32);
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{

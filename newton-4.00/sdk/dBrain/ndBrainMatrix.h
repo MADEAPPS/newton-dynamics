@@ -39,6 +39,7 @@ class ndBrainMatrix: public ndArray<ndBrainVector>
 	ndInt32 GetColumns() const;
 	void Set(ndReal value);
 	void Set(const ndBrainMatrix& src);
+	void Blend(const ndBrainMatrix& src, ndReal blend);
 
 	void Mul(const ndBrainVector& input, ndBrainVector& output) const;
 	void TransposeMul(const ndBrainVector& input, ndBrainVector& output) const;

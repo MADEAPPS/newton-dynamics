@@ -106,10 +106,9 @@ ndInt32 ndBrainVector::GetMaxIndex() const
 	return index;
 }
 
-void ndBrainVector::ScaleSet(const ndBrainVector& a, ndReal scale)
+void ndBrainVector::Scale(ndReal scale)
 {
-	ndAssert(GetCount() == a.GetCount());
-	ndScaleSet(GetCount(), &(*this)[0], &a[0], scale);
+	ndScale(GetCount(), &(*this)[0], scale);
 }
 
 void ndBrainVector::Clamp(ndReal min, ndReal max)
@@ -165,4 +164,10 @@ ndReal ndBrainVector::Dot(const ndBrainVector& a) const
 {
 	ndAssert(GetCount() == a.GetCount());
 	return ndDotProduct(GetCount(), &(*this)[0], &a[0]);
+}
+
+void ndBrainVector::Blend(const ndBrainVector& target, ndReal blend)
+{
+	Scale(ndReal(1.0f) - blend);
+	ScaleAdd(target, blend);
 }

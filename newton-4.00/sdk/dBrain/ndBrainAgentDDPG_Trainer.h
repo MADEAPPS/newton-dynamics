@@ -32,8 +32,9 @@
 // Continuous control with deep re enforcement learning (ddpg agent)
 // trainer as described in: https://arxiv.org/pdf/1509.02971.pdf
 
-// defualt hyper parameters defaults
+// default hyper parameters defaults
 #define D_DDPG_LEARN_RATE				ndReal(2.0e-4f)
+#define D_DDPG_TARGET_LEARN_RATE		(D_DDPG_LEARN_RATE * ndReal(0.5f))
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
 //#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 4)
@@ -42,7 +43,8 @@
 #define D_DDPG_TARGET_UPDATE_PERIOD		1000
 #define D_DDPG_OPTIMIZATION_DELAY		3
 #define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
-#define D_DDPG_ACTION_NOISE_DEVIATION	ndReal (0.25f)
+#define D_DDPG_SOFT_TARGET_FACTOR		ndReal (1.0e-3f)
+#define D_DDPG_ACTION_NOISE_DEVIATION	ndReal (0.125f)
 #define D_DDPG_MIN_EXPLORE_PROBABILITY	ndReal(1.0f/100.0f)
 #define D_DDPG_STAR_OPTIMIZATION		(D_DDPG_REPLAY_BUFFERSIZE - 1000)
 #define D_DDPG_EXPLORE_ANNELININGING	(D_DDPG_MIN_EXPLORE_PROBABILITY / ndReal(2.0f))
@@ -123,7 +125,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 					m_inputBatch[i] = transition.m_nextState[i];
 					m_actorState[i] = transition.m_nextState[i];
 				}
-				m_agent->m_actor->MakePrediction(m_actorState, m_actorAction);
+				m_agent->m_targetActor.MakePrediction(m_actorState, m_actorAction);
 				for (ndInt32 i = 0; i < actionDim; ++i)
 				{
 					m_inputBatch[i + actionDim] = m_actorAction[i];
@@ -138,7 +140,6 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 			ndArray<ndInt32>& shuffleBuffer = m_agent->m_replayBuffer.m_shuffleBuffer;
 
 			ClearGradientsAcc();
-			shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 			for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
 			{
 				ndInt32 index = shuffleBuffer[i];
@@ -187,27 +188,24 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 
 			for (ndInt32 i = 0; i < statesDim; ++i)
 			{
-				m_agent->m_criticOtimizer.m_inputBatch[i] = transition.m_state[i];
+				m_agent->m_criticOptimizer.m_inputBatch[i] = transition.m_state[i];
 			}
 			for (ndInt32 i = 0; i < actionDim; ++i)
 			{
-				m_agent->m_criticOtimizer.m_inputBatch[i + actionDim] = m_truth[i];
+				m_agent->m_criticOptimizer.m_inputBatch[i + actionDim] = m_truth[i];
 			}
-			m_agent->m_critic->MakePrediction(m_agent->m_criticOtimizer.m_inputBatch, m_agent->m_criticOtimizer.m_outputBatch);
-			m_agent->m_targetCritic.CalculateInpuGradients(m_agent->m_criticOtimizer.m_inputBatch, m_agent->m_criticOtimizer.m_outputBatch, m_agent->m_criticOtimizer.m_inputBatch);
-
+			m_agent->m_targetCritic.MakePrediction(m_agent->m_criticOptimizer.m_inputBatch, m_agent->m_criticOptimizer.m_outputBatch);
+			m_agent->m_critic->CalculateInpuGradients(m_agent->m_criticOptimizer.m_inputBatch, m_agent->m_criticOptimizer.m_outputBatch, m_agent->m_criticOptimizer.m_inputBatch);
 			for (ndInt32 i = 0; i < actionDim; ++i)
 			{
-				m_truth[i] += m_agent->m_criticOtimizer.m_inputBatch[statesDim + i];
+				m_truth[i] -= m_agent->m_criticOptimizer.m_inputBatch[statesDim + i];
 			}
 		}
 
 		virtual void Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32)
 		{
 			ndArray<ndInt32>& shuffleBuffer = m_agent->m_replayBuffer.m_shuffleBuffer;
-			
 			ClearGradientsAcc();
-			shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 			for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
 			{
 				ndInt32 index = shuffleBuffer[i];
@@ -215,7 +213,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 				EvaluateBellmanEquation(index);
 				BackPropagate(m_truth);
 			}
-			UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
+			UpdateWeights(m_agent->m_targetLearnRate, m_agent->m_bashBufferSize);
 		}
 
 		ndBrainVector m_truth;
@@ -228,17 +226,20 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 	ndSharedPtr<ndBrain> m_critic;
 	ndBrain m_targetActor;
 	ndBrain m_targetCritic;
-	ndActorOptimizer m_actorOtimizer;
-	ndCriticOptimizer m_criticOtimizer;
+	ndActorOptimizer m_actorOptimizer;
+	ndCriticOptimizer m_criticOptimizer;
 
 	ndBrainVector m_state;
 	ndBrainVector m_actions;
+	ndArray<ndInt32> m_bashSamples;
 	ndArray<ndInt32> m_movingAverage;
 	ndBrainReplayBuffer<ndReal, statesDim, actionDim> m_replayBuffer;
 	ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim> m_currentTransition;
 
 	ndReal m_gamma;
 	ndReal m_learnRate;
+	ndReal m_targetLearnRate;
+	ndReal m_softTargetFactor;
 	ndReal m_actionNoiseDeviation;
 	ndReal m_explorationProbability;
 	ndReal m_minExplorationProbability;
@@ -263,12 +264,14 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	,m_critic(critic)
 	,m_targetActor(*(*m_actor))
 	,m_targetCritic(*(*m_critic))
-	,m_actorOtimizer(*m_actor)
-	,m_criticOtimizer(*m_critic)
+	,m_actorOptimizer(*m_actor)
+	,m_criticOptimizer(*m_critic)
 	,m_movingAverage()
 	,m_replayBuffer()
 	,m_gamma(D_DDPG_DISCOUNT_FACTOR)
 	,m_learnRate(D_DDPG_LEARN_RATE)
+	,m_targetLearnRate(D_DDPG_TARGET_LEARN_RATE)
+	,m_softTargetFactor(D_DDPG_SOFT_TARGET_FACTOR)
 	,m_actionNoiseDeviation(D_DDPG_ACTION_NOISE_DEVIATION)
 	,m_explorationProbability(ndReal(1.0f))
 	,m_minExplorationProbability(D_DDPG_MIN_EXPLORE_PROBABILITY)
@@ -293,10 +296,10 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	m_state.Set(ndReal(0.0f));
 	m_actions.Set(ndReal(0.0f));
 
-	m_actorOtimizer.m_agent = this;
-	m_criticOtimizer.m_agent = this;
-	m_actorOtimizer.SetRegularizer(D_DDPG_REGULARIZER);
-	m_criticOtimizer.SetRegularizer(D_DDPG_REGULARIZER);
+	m_actorOptimizer.m_agent = this;
+	m_criticOptimizer.m_agent = this;
+	m_actorOptimizer.SetRegularizer(D_DDPG_REGULARIZER);
+	m_criticOptimizer.SetRegularizer(D_DDPG_REGULARIZER);
 
 	m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / D_DDPG_STAR_OPTIMIZATION;
 
@@ -350,12 +353,17 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagate()
 		}
 	};
 
-	ndBrainMatrix inputBatch;
-	ndTestValidator criticValidator(m_criticOtimizer);
-	m_criticOtimizer.Optimize(criticValidator, inputBatch, m_learnRate, 1);
+	m_replayBuffer.m_shuffleBuffer.RandomShuffle(m_replayBuffer.m_shuffleBuffer.GetCount());
 
-	ndTestValidator actorValidator(m_actorOtimizer);
-	m_actorOtimizer.Optimize(actorValidator, inputBatch, m_learnRate, 1);
+	ndBrainMatrix inputBatch;
+	ndTestValidator criticValidator(m_criticOptimizer);
+	m_criticOptimizer.Optimize(criticValidator, inputBatch, m_learnRate, 1);
+
+	ndTestValidator actorValidator(m_actorOptimizer);
+	m_actorOptimizer.Optimize(actorValidator, inputBatch, m_learnRate, 1);
+
+	m_targetActor.SoftCopy(*(*m_actor), m_softTargetFactor);
+	m_targetCritic.SoftCopy(*(*m_critic), m_softTargetFactor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -421,12 +429,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SelectActions()
 	ndFloat32 explore = ndRand();
 	if (explore <= m_explorationProbability)
 	{
-		//for (ndInt32 i = 0; i < 5000; ++i)
-		//{
-		//	ndReal noisyAction = ndGaussianRandom(ndFloat32(0.0f), ndFloat32(m_actionNoiseDeviation));
-		//	ndTrace(("%f\n", noisyAction));
-		//}
-
 		for (ndInt32 i = 0; i < actionDim; ++i)
 		{
 			ndReal noisyAction = ndGaussianRandom(ndFloat32(m_actions[i]), ndFloat32(m_actionNoiseDeviation));
@@ -515,12 +517,12 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Optimize()
 	}
 	m_collectingSamples = false;
 	
-	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
-	{
-		// update on line network
-		//m_target.CopyFrom(*(*m_actor));
-		m_targetCritic.CopyFrom(*(*m_critic));
-	}
+	//if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
+	//{
+	//	// update on line network
+	//	m_targetActor.CopyFrom(*(*m_actor));
+	//	m_targetCritic.CopyFrom(*(*m_critic));
+	//}
 }
 
 
