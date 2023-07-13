@@ -109,6 +109,12 @@ namespace ndController_0
 
 				bool IsTerminal() const
 				{
+					if (GetFramesCount() > 1000)
+					{
+						// kill the model if is is too long alive. 
+						// this generate a contradicting entry byt for now let it be.
+						return true;
+					}
 					return m_model->IsTerminal();
 				}
 
@@ -218,6 +224,12 @@ namespace ndController_0
 
 				bool IsTerminal() const
 				{
+					if (GetFramesCount() > 1000)
+					{
+						// kill the model if is is too long alive. 
+						// this generate a contradicting entry byt for now let it be.
+						return true;
+					}
 					return m_model->IsTerminal();
 				}
 
