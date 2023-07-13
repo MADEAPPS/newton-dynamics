@@ -208,13 +208,13 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 			}
 			for (ndInt32 i = 0; i < actionDim; ++i)
 			{
-				m_agent->m_criticOptimizer.m_inputBatch[i + actionDim] = m_truth[i];
+				m_agent->m_criticOptimizer.m_inputBatch[i + statesDim] = m_truth[i];
 			}
 			m_agent->m_targetCritic.MakePrediction(m_agent->m_criticOptimizer.m_inputBatch, m_agent->m_criticOptimizer.m_outputBatch);
 			m_agent->m_critic->CalculateInpuGradients(m_agent->m_criticOptimizer.m_inputBatch, m_agent->m_criticOptimizer.m_outputBatch, m_agent->m_criticOptimizer.m_inputBatch);
 			for (ndInt32 i = 0; i < actionDim; ++i)
 			{
-				m_truth[i] -= m_agent->m_criticOptimizer.m_inputBatch[statesDim + i];
+				m_truth[i] -= m_agent->m_criticOptimizer.m_inputBatch[i + statesDim];
 			}
 		}
 
