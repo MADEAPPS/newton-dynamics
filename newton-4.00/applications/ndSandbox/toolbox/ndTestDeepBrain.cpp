@@ -128,7 +128,7 @@ static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 	ndBrainMatrix* labelData = nullptr;
 
 	char outPathName[1024];
-	dGetWorkingFileName(filename, outPathName);
+	ndGetWorkingFileName(filename, outPathName);
 	FILE* fp = fopen(outPathName, "rb");
 	if (fp)
 	{
@@ -168,7 +168,7 @@ static ndBrainMatrix* LoadMnistSampleData(const char* const filename)
 	ndBrainMatrix* trainingDigits = nullptr;
 
 	char outPathName[1024];
-	dGetWorkingFileName(filename, outPathName);
+	ndGetWorkingFileName(filename, outPathName);
 	FILE* const fp = fopen(outPathName, "rb");
 	if (fp)
 	{
@@ -286,7 +286,7 @@ static void MnistTrainingSet()
 		time = ndGetTimeInMicroseconds() - time;
 
 		char path[256];
-		dGetWorkingFileName("mnistDatabase/mnist.nn", path);
+		ndGetWorkingFileName("mnistDatabase/mnist.nn", path);
 		
 		ndAssert(0);
 		//brain.Save(path);
@@ -314,7 +314,7 @@ static void MnistTestSet()
 	{
 		char path[256];
 		ndBrain brain;
-		dGetWorkingFileName("mnistDatabase/mnist.nn", path);
+		ndGetWorkingFileName("mnistDatabase/mnist.nn", path);
 		
 		ndAssert(0);
 		//brain.Load(path);

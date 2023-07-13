@@ -305,7 +305,7 @@ ndSoundManager::~ndSoundManager()
 void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const fileName)
 {
 	char path[2048];
-	dGetWorkingFileName(fileName, path);
+	ndGetWorkingFileName(fileName, path);
 
 	FILE* const wave = fopen(path, "rb");
 	if (wave)

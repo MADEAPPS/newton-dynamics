@@ -81,7 +81,6 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	void CalculateInpuGradients(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients);
 
 	private:
-	void CalculateHiddenVariableOffset();
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output, const ndBrainVector& hiddenLayerOutputs);
 
 	ndReal* m_memory;

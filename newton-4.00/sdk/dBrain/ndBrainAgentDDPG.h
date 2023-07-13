@@ -41,6 +41,7 @@ class ndBrainAgentDDPG: public ndBrainAgent
 	void ResetModel() const;
 	bool IsTerminal() const;
 	ndReal GetReward() const;
+	ndReal GetCurrentValue() const;
 	void ApplyRandomAction() const;
 	ndInt32 GetEpisodeFrames() const;
 	ndInt32 GetOpmizationDelay() const;
@@ -93,6 +94,12 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 ndReal ndBrainAgentDDPG<statesDim, actionDim>::GetReward() const
 {
 	ndAssert(0);
+	return ndReal(0.0f);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndReal ndBrainAgentDDPG<statesDim, actionDim>::GetCurrentValue() const
+{
 	return ndReal(0.0f);
 }
 

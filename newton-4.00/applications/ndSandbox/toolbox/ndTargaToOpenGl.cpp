@@ -198,7 +198,7 @@ struct TGAHEADER
 GLuint LoadTexture(const char* const filename)
 {
 	char fullPathName[2048];
-	dGetWorkingFileName (filename, fullPathName);
+	ndGetWorkingFileName (filename, fullPathName);
 	ndTextureCache& cache = ndTextureCache::GetChache();
 	ndTextureEntry* texture = cache.Find(fullPathName);
 	if (texture)
@@ -330,7 +330,7 @@ GLuint LoadCubeMapTexture(
 	for (ndInt32 i = 0; i < 6; ++i)
 	{
 		char fullPathName[2048];
-		dGetWorkingFileName(namesArray[i], fullPathName);
+		ndGetWorkingFileName(namesArray[i], fullPathName);
 		ndAssert(!cache.Find(namesArray[i]));
 
 		FILE* const pFile = fopen(fullPathName, "rb");

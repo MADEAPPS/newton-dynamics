@@ -23,7 +23,6 @@
 #include "ndBrain.h"
 #include "ndBrainTypes.h"
 
-
 ndBrain* ndBrainLoad::Load(const char* const pathName)
 {
 	class Loader : public ndBrainLoad
@@ -371,7 +370,6 @@ void ndBrain::EndAddLayer(ndReal randomVariance)
 	ndInt32 memorySize = floatsCount * ndInt32(sizeof(ndReal)) + vectorSizeInBytes + 256;
 	m_memorySize = memorySize;
 	m_memory = (ndReal*)ndMemory::Malloc(size_t(memorySize));
-	//memset(m_memory, 0, size_t(memorySize));
 	ndMemSet(m_memory, ndReal(0.0f), ndInt32 (m_memorySize / sizeof (ndReal)));
 
 	// assign vector pointers

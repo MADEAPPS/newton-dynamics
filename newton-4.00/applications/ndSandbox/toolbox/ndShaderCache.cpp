@@ -56,7 +56,7 @@ void ndShaderCache::LoadShaderCode (const char* const filename, char* const buff
 	FILE* file;
 	char fullPathName[2048];
 
-	dGetWorkingFileName (filename, fullPathName);
+	ndGetWorkingFileName (filename, fullPathName);
 
 	file = fopen (fullPathName, "rb");
 	ndAssert (file);

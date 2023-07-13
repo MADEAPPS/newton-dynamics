@@ -41,7 +41,9 @@ class ndBrainAgentDQN: public ndBrainAgent
 	void ResetModel() const;
 	bool IsTerminal() const;
 	ndReal GetReward() const;
+	ndReal GetCurrentValue() const;
 	void ApplyRandomAction() const;
+	ndInt32 GetEpisodeFrames() const;
 	ndInt32 SelectBestAction() const;
 	ndInt32 GetOpmizationDelay() const;
 	void SetOpmizationDelay(ndInt32 delay);
@@ -98,9 +100,22 @@ ndReal ndBrainAgentDQN<statesDim, actionDim>::GetReward() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
+ndReal ndBrainAgentDQN<statesDim, actionDim>::GetCurrentValue() const
+{
+	return ndReal(0.0f);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN<statesDim, actionDim>::ResetModel() const
 {
 	ndAssert(0);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndInt32 ndBrainAgentDQN<statesDim, actionDim>::GetEpisodeFrames() const
+{
+	ndAssert(0);
+	return 0;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

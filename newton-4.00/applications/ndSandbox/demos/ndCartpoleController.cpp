@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-//#define D_USE_POLE_DQN
+#define D_USE_POLE_DQN
 
 namespace ndController_0
 {
@@ -118,6 +118,7 @@ namespace ndController_0
 
 				void OptimizeStep()
 				{
+					//m_model->CheckBounds();
 					ndInt32 stopTraining = GetFramesCount();
 					if (stopTraining <= m_stopTraining)
 					{
@@ -127,7 +128,7 @@ namespace ndController_0
 					if (stopTraining == m_stopTraining)
 					{
 						char fileName[1024];
-						dGetWorkingFileName("cartpoleDQN.nn", fileName);
+						ndGetWorkingFileName(GetName().GetStr(), fileName);
 
 						SaveToFile(fileName);
 						ndExpandTraceMessage("\n");
@@ -135,10 +136,24 @@ namespace ndController_0
 						ndExpandTraceMessage("save to file: %s\n", fileName);
 						m_model->ResetModel();
 					}
+
+					if (m_model->IsOutOfBounds())
+					{
+						ndAssert(0);
+						m_model->TelePort();
+					}
+
+					//if (GetEpisodeFrames() > 500)
+					//{
+					//	// try killing the model with a huge push if is alive for too long.
+					//	m_model->RandomePush();
+					//}
+
 				}
 
 				ndCartpole* m_model;
 				ndInt32 m_stopTraining;
+				//mutable bool m_makeRoughtRide;
 			};
 
 		#else
@@ -197,10 +212,11 @@ namespace ndController_0
 
 				bool IsTerminal() const
 				{
-					if (GetEpisodeFrames() > 1500)
+					if (GetEpisodeFrames() > 500)
 					{
 						// kill the model with a huge push if is alive for too long.
-						m_model->RandomePush();
+						//m_model->RandomePush();
+						return true;
 					}
 					return m_model->IsTerminal();
 				}
@@ -221,7 +237,7 @@ namespace ndController_0
 					if (stopTraining == m_stopTraining)
 					{
 						char fileName[1024];
-						dGetWorkingFileName("cartpoleDQN.nn", fileName);
+						ndGetWorkingFileName(GetName().GetStr(), fileName);
 
 						SaveToFile(fileName);
 						ndExpandTraceMessage("\n");
@@ -251,7 +267,7 @@ namespace ndController_0
 		{
 			const ndMatrix& matrix = m_pole->GetMatrix();
 			// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
-			bool fail = ndAbs(matrix.m_front.m_x) > (D_REWARD_MIN_ANGLE * ndFloat32 (2.0f));
+			bool fail = ndAbs(ndAsin (matrix.m_front.m_x)) > (D_REWARD_MIN_ANGLE * ndFloat32 (2.0f));
 			return fail;
 		}
 
@@ -289,21 +305,26 @@ namespace ndController_0
 		{
 			ndVector omega(m_pole->GetOmega());
 			const ndMatrix& matrix = m_pole->GetMatrix();
-			ndFloat32 angle = ndClamp (matrix.m_front.m_x, -2.0f * D_REWARD_MIN_ANGLE, 2.0f * D_REWARD_MIN_ANGLE);
+			//ndFloat32 angle = ndClamp (matrix.m_front.m_x, -2.0f * D_REWARD_MIN_ANGLE, 2.0f * D_REWARD_MIN_ANGLE);
+			ndFloat32 angle = ndAsin (matrix.m_front.m_x);
 			state[m_poleAngle] = ndReal(angle);
 			state[m_poleOmega] = ndReal(omega.m_z);
 		}
 
-		virtual void ResetModel() const
+		void TelePort() const
 		{
+			m_cart->SetMatrix(m_cartMatrix);
+			m_pole->SetMatrix(m_poleMatrix);
+		}
+
+		void ResetModel() const
+		{
+			TelePort();
 			m_pole->SetOmega(ndVector::m_zero);
 			m_pole->SetVelocity(ndVector::m_zero);
 
 			m_cart->SetOmega(ndVector::m_zero);
 			m_cart->SetVelocity(ndVector::m_zero);
-
-			m_cart->SetMatrix(m_cartMatrix);
-			m_pole->SetMatrix(m_poleMatrix);
 		}
 
 		void RandomePush()
@@ -311,6 +332,18 @@ namespace ndController_0
 			ndVector impulsePush(ndVector::m_zero);
 			impulsePush.m_x = ndGaussianRandom(0.0f, 0.5f) * m_cart->GetMassMatrix().m_w;
 			m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, m_cart->GetScene()->GetTimestep());
+		}
+
+		bool IsOutOfBounds() const
+		{
+			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(40.0f);
+			//if (ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(40.0f))
+			//{
+			//	// teleport the body and apply a push, to make it tumble.
+			//	m_cart->SetMatrix(m_cartMatrix);
+			//	m_pole->SetMatrix(m_poleMatrix);
+			//	RandomePush();
+			//}
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -323,16 +356,6 @@ namespace ndController_0
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
 			m_agent->OptimizeStep();
-		
-			if (ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(40.0f))
-			{
-				// this probably will kill the model, or make really hard to keep balanced
-				m_cart->SetMatrix(m_cartMatrix);
-				m_pole->SetMatrix(m_poleMatrix);
-				ndVector impulsePush(ndVector::m_zero);
-				impulsePush.m_x = 5.0f * m_cart->GetMassMatrix().m_w;
-				m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, timestep);
-			}
 		}
 
 		ndMatrix m_cartMatrix;
@@ -407,14 +430,12 @@ namespace ndController_0
 			actor->AddLayer(ouputLayer);
 			actor->EndAddLayer(ndReal(0.25f));
 
-			char fileName[1024];
-			dGetWorkingFileName("cartpoleDQN.nn", fileName);
-			ndBrainSave::Save(*actor, fileName);
-
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(actor));
+			agent->SetName("cartpoleDQN.nn");
 
 		#else
-			ndSharedPtr<ndBrain> actor(new ndBrain());
+
+			ndSharedPtr<ndBrain> actor(new ndBrain("cartpoleDDPG.nn"));
 			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
 			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
 			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
@@ -434,10 +455,6 @@ namespace ndController_0
 				actorLayerBias.Set(ndReal(0.0f));
 			}
 
-			char fileName[1024];
-			dGetWorkingFileName("cartpoleDDPG.nn", fileName);
-			ndBrainSave::Save(*actor, fileName);
-
 			ndSharedPtr<ndBrain> critic(new ndBrain());
 			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + actor->GetOutputSize(), layerSize, m_tanh);
 			ndBrainLayer* const criticLayer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
@@ -452,7 +469,13 @@ namespace ndController_0
 
 			// add a reinforcement learning controller 
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(actor, critic));
+			agent->SetName("cartpoleDDPG.nn");
 		#endif
+
+		char fileName[1024];
+		ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
+		agent->SaveToFile(fileName);
+
 		ndCartpole* const model = new ndCartpole(agent);
 		ndCartpole::ndCartpoleAgent_trainer* const trainer = (ndCartpole::ndCartpoleAgent_trainer*)*agent;
 		trainer->m_model = model;
@@ -467,9 +490,9 @@ namespace ndController_0
 	{
 		char fileName[1024];
 #ifdef D_USE_POLE_DQN
-		dGetWorkingFileName("cartpoleDQN.nn", fileName);
+		ndGetWorkingFileName("cartpoleDQN.nn", fileName);
 #else
-		dGetWorkingFileName("cartpoleDDPG.nn", fileName);
+		ndGetWorkingFileName("cartpoleDDPG.nn", fileName);
 #endif
 	
 		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));

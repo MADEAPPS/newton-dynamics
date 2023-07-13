@@ -25,7 +25,7 @@ ndMeshLoader::~ndMeshLoader()
 ndMesh* ndMeshLoader::LoadMesh(const char* const fbxMeshName, bool loadAnimation)
 {
 	char pathName[1024];
-	dGetWorkingFileName(fbxMeshName, pathName);
+	ndGetWorkingFileName(fbxMeshName, pathName);
 	ndMesh* const mesh = ndFbxMeshLoader::LoadMesh(pathName, loadAnimation);
 	return mesh;
 }

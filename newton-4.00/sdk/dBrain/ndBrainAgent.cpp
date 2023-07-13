@@ -25,6 +25,7 @@
 
 ndBrainAgent::ndBrainAgent()
 	:ndClassAlloc()
+	,m_name()
 {
 }
 

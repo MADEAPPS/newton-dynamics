@@ -53,8 +53,10 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 	ndBrainAgentDQN_Trainer(const ndSharedPtr<ndBrain>& actor);
 	virtual ~ndBrainAgentDQN_Trainer();
 
+	ndReal GetCurrentValue() const;
 	ndInt32 GetFramesCount() const;
 	ndInt32 GetEposideCount() const;
+	ndInt32 GetEpisodeFrames() const;
 
 	protected:
 	void Step();
@@ -172,6 +174,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 	
 	ndReal m_gamma;
 	ndReal m_learnRate;
+	ndReal m_lastValue;
 	ndReal m_explorationProbability;
 	ndReal m_minExplorationProbability;
 	ndReal m_explorationProbabilityAnnelining;
@@ -198,6 +201,7 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 	,m_replayBuffer()
 	,m_gamma(D_DQN_DISCOUNT_FACTOR)
 	,m_learnRate(D_DQN_LEARN_RATE)
+	,m_lastValue(0)
 	,m_explorationProbability(ndReal(1.0f))
 	,m_minExplorationProbability(D_DQN_MIN_EXPLORE_PROBABILITY)
 	,m_explorationProbabilityAnnelining(D_DQN_EXPLORE_ANNELININGING)
@@ -242,9 +246,21 @@ ndInt32 ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetFramesCount() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
+ndReal ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetCurrentValue() const
+{
+	return m_lastValue;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
 ndInt32 ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetEposideCount() const
 {
 	return m_eposideCount;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndInt32 ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetEpisodeFrames() const
+{
+	return m_framesAlive;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -300,6 +316,8 @@ ndInt32 ndBrainAgentDQN_Trainer<statesDim, actionDim>::SelectBestAction()
 				maxQValue = m_actions[i];
 			}
 		}
+
+		m_lastValue = maxQValue;
 		m_currentTransition.m_action[0] = bestAction;
 		return bestAction;
 	}
@@ -326,7 +344,8 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::PrintDebug()
 	sum = sum / m_movingAverage.GetCount();
 	if (!m_collectingSamples)
 	{
-		ndExpandTraceMessage("%d moving average alive frames:%d\n", m_frameCount - 1, sum);
+		ndExpandTraceMessage("%d moving average alive frames: %d   value: %f\n", m_frameCount - 1, sum, GetCurrentValue());
+		//ndExpandTraceMessage("%f\n", GetCurrentValue());
 	}
 }
 

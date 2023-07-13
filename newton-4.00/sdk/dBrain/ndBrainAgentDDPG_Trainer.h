@@ -56,6 +56,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 	ndBrainAgentDDPG_Trainer(const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic);
 	virtual ~ndBrainAgentDDPG_Trainer();
 
+	ndReal GetCurrentValue() const;
 	ndInt32 GetFramesCount() const;
 	ndInt32 GetEposideCount() const;
 	ndInt32 GetEpisodeFrames() const;
@@ -317,6 +318,13 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDDPG_Trainer<statesDim, actionDim>::~ndBrainAgentDDPG_Trainer()
 {
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCurrentValue() const
+{
+	ndAssert(0);
+	return 0;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

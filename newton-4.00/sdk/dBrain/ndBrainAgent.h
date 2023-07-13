@@ -25,6 +25,7 @@
 //#include "ndBrainStdafx.h"
 
 class ndBrainSave;
+
 class ndBrainAgent: public ndClassAlloc
 {
 	public: 
@@ -34,6 +35,8 @@ class ndBrainAgent: public ndClassAlloc
 	virtual void Step() = 0;
 	virtual void OptimizeStep() = 0;
 
+	const ndString& GetName() const;
+	void SetName(const ndString& name);
 	void SaveToFile(const char* const filename) const;
 
 	protected:
@@ -48,7 +51,21 @@ class ndBrainAgent: public ndClassAlloc
 	virtual void ApplyActions(ndReal* const actions) const = 0;
 	virtual void GetObservation(ndReal* const state) const = 0;
 	virtual void Save(ndBrainSave* const loadSave) const = 0;
+
+	virtual ndReal GetCurrentValue() const = 0;
+
+	ndString m_name;
 };
+
+inline const ndString& ndBrainAgent::GetName() const
+{
+	return m_name;
+}
+
+inline void ndBrainAgent::SetName(const ndString& name)
+{
+	m_name = name;
+}
 
 #endif 
 

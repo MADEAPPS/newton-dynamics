@@ -16,7 +16,7 @@
 #include "ndSandboxStdafx.h"
 
 // Windows user assets path
-void dGetWorkingFileName (const char* const name, char* const outPathName)
+void ndGetWorkingFileName (const char* const name, char* const outPathName)
 {
 	#if (defined(WIN32) || defined(_WIN32))
 		char appPath [256];
