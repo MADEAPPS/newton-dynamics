@@ -197,7 +197,7 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 					,m_model(nullptr)
-					,m_stopTraining(2000000)
+					,m_stopTraining(1000000)
 					,m_makeRoughtRide(false)
 				{
 				}
