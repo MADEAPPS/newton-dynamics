@@ -83,6 +83,7 @@ namespace ndController_0
 					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(qValuePredictor)
 					,m_model(nullptr)
 					,m_stopTraining(1000000)
+					,m_makeRoughtRide(false)
 				{
 				}
 
@@ -113,6 +114,7 @@ namespace ndController_0
 
 				void ResetModel() const
 				{
+					m_makeRoughtRide = false;
 					m_model->ResetModel();
 				}
 
@@ -139,21 +141,20 @@ namespace ndController_0
 
 					if (m_model->IsOutOfBounds())
 					{
-						ndAssert(0);
+						m_makeRoughtRide = true;
 						m_model->TelePort();
 					}
 
-					//if (GetEpisodeFrames() > 500)
-					//{
-					//	// try killing the model with a huge push if is alive for too long.
-					//	m_model->RandomePush();
-					//}
-
+					if (m_makeRoughtRide)
+					{
+						// try killing the model with a huge push if is alive for too long.
+						m_model->RandomePush();
+					}
 				}
 
 				ndCartpole* m_model;
 				ndInt32 m_stopTraining;
-				//mutable bool m_makeRoughtRide;
+				mutable bool m_makeRoughtRide;
 			};
 
 		#else
