@@ -112,7 +112,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 			}
 			for (ndInt32 i = 0; i < actionDim; ++i)
 			{
-				m_inputBatch[i + actionDim] = transition.m_action[i];
+				m_inputBatch[i + statesDim] = transition.m_action[i];
 			}
 			MakePrediction(m_inputBatch);
 			
@@ -130,7 +130,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 				m_agent->m_targetActor.MakePrediction(m_actorState, m_actorAction);
 				for (ndInt32 i = 0; i < actionDim; ++i)
 				{
-					m_inputBatch[i + actionDim] = m_actorAction[i];
+					m_inputBatch[i + statesDim] = m_actorAction[i];
 				}
 				m_agent->m_targetCritic.MakePrediction(m_inputBatch, m_outputBatch);
 				m_truth[0] = transition.m_reward + m_agent->m_gamma * m_outputBatch[0];
@@ -150,6 +150,20 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 				BackPropagate(m_truth);
 			}
 			UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
+		}
+
+		ndReal GetQValue() 
+		{
+			for (ndInt32 i = 0; i < statesDim; ++i)
+			{
+				m_inputBatch[i] = m_agent->m_state[i];
+			}
+			for (ndInt32 i = 0; i < actionDim; ++i)
+			{
+				m_inputBatch[i + statesDim] = m_agent->m_actions[i];
+			}
+			m_agent->m_critic->MakePrediction(m_actorState, m_actorAction);
+			return m_actorAction[0];
 		}
 
 		ndBrainVector m_truth;
@@ -256,6 +270,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 	ndInt32 m_movingAverageIndex;
 	ndInt32 m_optimizationDelay;
 	ndInt32 m_optimizationDelayCount;
+	ndMovingAverage<256> m_averageQValue;
 	bool m_collectingSamples;
 };
 
@@ -287,6 +302,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	,m_movingAverageIndex(0)
 	,m_optimizationDelay(D_DDPG_OPTIMIZATION_DELAY)
 	,m_optimizationDelayCount(0)
+	,m_averageQValue()
 	,m_collectingSamples(true)
 {
 	ndAssert(m_critic->GetOutputSize() == 1);
@@ -323,8 +339,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::~ndBrainAgentDDPG_Trainer()
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCurrentValue() const
 {
-	ndAssert(0);
-	return 0;
+	return m_averageQValue.GetAverage();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -402,7 +417,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PrintDebug()
 	sum = sum / m_movingAverage.GetCount();
 	if (!m_collectingSamples)
 	{
-		ndExpandTraceMessage("%d moving average alive frames:%d\n", m_frameCount - 1, sum);
+		ndExpandTraceMessage("%d moving average alive frames: %d   value: %f\n", m_frameCount - 1, sum, GetCurrentValue());
 	}
 }
 
@@ -450,6 +465,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SelectActions()
 			m_actions[i] = ndClamp(noisyAction, ndReal(-1.0f), ndReal(1.0f));
 		}
 	}
+	m_averageQValue.Update(m_criticOptimizer.GetQValue());
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

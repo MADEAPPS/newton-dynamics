@@ -26,6 +26,7 @@
 #include "ndTypes.h"
 #include "ndStack.h"
 #include "ndMemory.h"
+#include "ndFixSizeArray.h"
 
 // assume this function returns memory aligned to 16 bytes
 #define ndAlloca(type, count) (type*) alloca (sizeof (type) * (count))
@@ -254,6 +255,41 @@ ndInt32 ndVertexListToIndexList(T* const vertexList, ndInt32 strideInBytes, ndIn
 
 	return count;
 }
+
+/// Simple moving average class, useful for stuff like frame rate smoothing
+template <ndInt32 size>
+class ndMovingAverage: public ndFixSizeArray<ndReal, size>
+{
+	public:
+	ndMovingAverage()
+		:ndFixSizeArray<ndReal, size>()
+		,m_average(ndReal(0.0f))
+		,m_index(0)
+	{
+		for (ndInt32 i = 0; i < size; ++i)
+		{
+			PushBack(ndReal(0.0f));
+		}
+	}
+
+	ndReal GetAverage() const
+	{
+		return m_average;
+	}
+
+	ndReal Update(ndReal value)
+	{
+		(*this)[m_index] = value;
+		ndInt32 index = (m_index + 1) % size;
+		m_average += (value - (*this)[index]) / size;
+		m_index = index;
+		return GetAverage();
+	}
+
+	private:
+	ndReal m_average;
+	ndInt32 m_index;
+};
 
 /// Simple spin lock for synchronizing threads for very short period of time.
 class ndSpinLock

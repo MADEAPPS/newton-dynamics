@@ -36,7 +36,7 @@
 #define D_DQN_LEARN_RATE				ndReal(2.0e-4f)
 #define D_DQN_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DQN_REPLAY_BUFFERSIZE			(1024 * 512)
-//#define D_DQN_REPLAY_BUFFERSIZE		(1024)
+//#define D_DQN_REPLAY_BUFFERSIZE			(1024)
 #define D_DQN_MOVING_AVERAGE			64
 #define D_DQN_REPLAY_BASH_SIZE			32
 #define D_DQN_TARGET_UPDATE_PERIOD		1000
@@ -174,7 +174,6 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 	
 	ndReal m_gamma;
 	ndReal m_learnRate;
-	ndReal m_lastValue;
 	ndReal m_explorationProbability;
 	ndReal m_minExplorationProbability;
 	ndReal m_explorationProbabilityAnnelining;
@@ -188,6 +187,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 	ndInt32 m_movingAverageIndex;
 	ndInt32 m_optimizationDelay;
 	ndInt32 m_optimizationDelayCount;
+	ndMovingAverage<256> m_averageQValue;
 	bool m_collectingSamples;
 };
 
@@ -201,7 +201,6 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 	,m_replayBuffer()
 	,m_gamma(D_DQN_DISCOUNT_FACTOR)
 	,m_learnRate(D_DQN_LEARN_RATE)
-	,m_lastValue(0)
 	,m_explorationProbability(ndReal(1.0f))
 	,m_minExplorationProbability(D_DQN_MIN_EXPLORE_PROBABILITY)
 	,m_explorationProbabilityAnnelining(D_DQN_EXPLORE_ANNELININGING)
@@ -214,6 +213,7 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 	,m_movingAverageIndex(0)
 	,m_optimizationDelay(D_DQN_OPTIMIZATION_DELAY)
 	,m_optimizationDelayCount(0)
+	,m_averageQValue()
 	,m_collectingSamples(true)
 {
 	m_state.SetCount(statesDim);
@@ -248,7 +248,7 @@ ndInt32 ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetFramesCount() const
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndReal ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetCurrentValue() const
 {
-	return m_lastValue;
+	return m_averageQValue.GetAverage();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -317,7 +317,7 @@ ndInt32 ndBrainAgentDQN_Trainer<statesDim, actionDim>::SelectBestAction()
 			}
 		}
 
-		m_lastValue = maxQValue;
+		m_averageQValue.Update(maxQValue);
 		m_currentTransition.m_action[0] = bestAction;
 		return bestAction;
 	}
@@ -345,7 +345,6 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::PrintDebug()
 	if (!m_collectingSamples)
 	{
 		ndExpandTraceMessage("%d moving average alive frames: %d   value: %f\n", m_frameCount - 1, sum, GetCurrentValue());
-		//ndExpandTraceMessage("%f\n", GetCurrentValue());
 	}
 }
 

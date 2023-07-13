@@ -118,6 +118,16 @@ namespace ndController_0
 					m_model->ResetModel();
 				}
 
+				void Step()
+				{
+					if (m_makeRoughtRide)
+					{
+						// try killing the model with a huge push if is alive for too long.
+						m_model->RandomePush();
+					}
+					ndBrainAgentDQN_Trainer::Step();
+				}
+
 				void OptimizeStep()
 				{
 					//m_model->CheckBounds();
@@ -143,12 +153,6 @@ namespace ndController_0
 					{
 						m_makeRoughtRide = true;
 						m_model->TelePort();
-					}
-
-					if (m_makeRoughtRide)
-					{
-						// try killing the model with a huge push if is alive for too long.
-						m_model->RandomePush();
 					}
 				}
 
@@ -188,6 +192,7 @@ namespace ndController_0
 					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 					,m_model(nullptr)
 					,m_stopTraining(2000000)
+					,m_makeRoughtRide(false)
 				{
 				}
 
@@ -213,18 +218,23 @@ namespace ndController_0
 
 				bool IsTerminal() const
 				{
-					if (GetEpisodeFrames() > 500)
-					{
-						// kill the model with a huge push if is alive for too long.
-						//m_model->RandomePush();
-						return true;
-					}
 					return m_model->IsTerminal();
 				}
 
 				void ResetModel() const
 				{
+					m_makeRoughtRide = false;
 					m_model->ResetModel();
+				}
+
+				void Step()
+				{
+					if (m_makeRoughtRide)
+					{
+						// try killing the model with a huge push if is alive for too long.
+						m_model->RandomePush();
+					}
+					ndBrainAgentDDPG_Trainer::Step();
 				}
 
 				void OptimizeStep()
@@ -246,10 +256,17 @@ namespace ndController_0
 						ndExpandTraceMessage("save to file: %s\n", fileName);
 						m_model->ResetModel();
 					}
+
+					if (m_model->IsOutOfBounds())
+					{
+						m_makeRoughtRide = true;
+						m_model->TelePort();
+					}
 				}
 
 				ndCartpole* m_model;
 				ndInt32 m_stopTraining;
+				mutable bool m_makeRoughtRide;
 			};
 
 		#endif
@@ -276,8 +293,6 @@ namespace ndController_0
 		{
 			const ndMatrix& matrix = m_pole->GetMatrix();
 			ndFloat32 sinAngle = matrix.m_front.m_x;
-			//ndFloat32 angle = ndMin(ndAbs(sinAngle), D_REWARD_MIN_ANGLE);
-			//ndFloat32 reward = ndFloat32(1.0f) - angle / D_REWARD_MIN_ANGLE;
 			ndFloat32 reward = ndReal(ndPow(ndEXP, - ndFloat32 (100.0f) * sinAngle * sinAngle));
 			return ndReal(reward);
 		}
@@ -337,14 +352,7 @@ namespace ndController_0
 
 		bool IsOutOfBounds() const
 		{
-			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(40.0f);
-			//if (ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(40.0f))
-			//{
-			//	// teleport the body and apply a push, to make it tumble.
-			//	m_cart->SetMatrix(m_cartMatrix);
-			//	m_pole->SetMatrix(m_poleMatrix);
-			//	RandomePush();
-			//}
+			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -436,7 +444,7 @@ namespace ndController_0
 
 		#else
 
-			ndSharedPtr<ndBrain> actor(new ndBrain("cartpoleDDPG.nn"));
+			ndSharedPtr<ndBrain> actor(new ndBrain());
 			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
 			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
 			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
