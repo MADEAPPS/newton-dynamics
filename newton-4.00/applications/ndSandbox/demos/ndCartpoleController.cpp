@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#define D_USE_POLE_DQN
+//#define D_USE_POLE_DQN
 
 namespace ndController_0
 {
