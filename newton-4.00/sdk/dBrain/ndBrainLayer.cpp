@@ -22,6 +22,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainLayer.h"
+#include "ndBrainSaveLoad.h"
 
 ndBrainLayer::ndBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndBrainActivationType activation)
 	:ndBrainMatrix()

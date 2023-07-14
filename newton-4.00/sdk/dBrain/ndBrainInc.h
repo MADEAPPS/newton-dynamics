@@ -31,6 +31,7 @@
 #include <ndBrainVector.h>
 #include <ndBrainMatrix.h>
 #include <ndBrainTrainer.h>
+#include <ndBrainSaveLoad.h>
 #include <ndBrainAgentDQN.h>
 #include <ndBrainAgentDDPG.h>
 #include <ndBrainTrainerBase.h>

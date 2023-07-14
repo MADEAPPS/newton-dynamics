@@ -25,6 +25,8 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainMatrix.h"
 
+class ndBrain;
+
 class ndBrainTrainerBase: public ndClassAlloc
 {
 	public: 

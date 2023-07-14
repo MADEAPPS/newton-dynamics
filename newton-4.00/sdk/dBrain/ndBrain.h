@@ -26,32 +26,8 @@
 #include "ndBrainLayer.h"
 #include "ndBrainTrainerBase.h"
 
-class ndBrain;
-
-class ndBrainLoad: public ndClassAlloc
-{
-	public:
-	ndBrainLoad() {}
-	virtual ~ndBrainLoad() {}
-
-	ndBrain* Load() const;
-	static ndBrain* Load(const char* const pathName);
-
-	virtual ndInt32 ReadInt() const = 0;
-	virtual ndFloat32 ReadFloat() const = 0;
-	virtual void ReadString(char* const buffer) const = 0;
-};
-
-class ndBrainSave: public ndClassAlloc
-{
-	public:
-	ndBrainSave() {}
-	virtual ~ndBrainSave() {}
-	virtual void WriteData(const char* const data) const = 0;
-
-	void Save(const ndBrain* const brain);
-	static void Save(const ndBrain* const brain, const char* const pathName);
-};
+class ndBrainLoad;
+class ndBrainSave;
 
 class ndBrain: public ndArray<ndBrainLayer*>
 {

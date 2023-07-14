@@ -19,51 +19,39 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_BRAIN_SAVE_LOAD_H__
+#define _ND_BRAIN_SAVE_LOAD_H__
+
 #include "ndBrainStdafx.h"
-#include "ndBrain.h"
-#include "ndBrainAgent.h"
-#include "ndBrainSaveLoad.h"
+#include "ndBrainLayer.h"
+#include "ndBrainTrainerBase.h"
 
-ndBrainAgent::ndBrainAgent()
-	:ndClassAlloc()
-	,m_name()
+class ndBrain;
+
+class ndBrainLoad: public ndClassAlloc
 {
-}
+	public:
+	ndBrainLoad() {}
+	virtual ~ndBrainLoad() {}
 
-ndBrainAgent::~ndBrainAgent()
+	ndBrain* Load() const;
+	static ndBrain* Load(const char* const pathName);
+
+	virtual ndInt32 ReadInt() const = 0;
+	virtual ndFloat32 ReadFloat() const = 0;
+	virtual void ReadString(char* const buffer) const = 0;
+};
+
+class ndBrainSave: public ndClassAlloc
 {
-}
+	public:
+	ndBrainSave() {}
+	virtual ~ndBrainSave() {}
+	virtual void WriteData(const char* const data) const = 0;
 
-void ndBrainAgent::SaveToFile(const char* const pathFilename) const
-{
-	class SaveAgent: public ndBrainSave
-	{
-		public:
-		SaveAgent(const char* const pathFilename)
-			:ndBrainSave()
-		{
-			m_file = fopen(pathFilename, "wb");
-			ndAssert(m_file);
-		}
+	void Save(const ndBrain* const brain);
+	static void Save(const ndBrain* const brain, const char* const pathName);
+};
 
-		~SaveAgent()
-		{
-			if (m_file)
-			{
-				fclose(m_file);
-			}
-		}
-
-		void WriteData(const char* const data) const
-		{
-			fprintf(m_file, data);
-		}
-
-		FILE* m_file;
-	};
-
-	SaveAgent saveAgent(pathFilename);
-	Save(&saveAgent);
-}
-
+#endif 
 

@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-//#define D_USE_POLE_DQN
+#define D_USE_POLE_DQN
 
 namespace ndController_0
 {
@@ -84,6 +84,8 @@ namespace ndController_0
 					,m_model(nullptr)
 					,m_stopTraining(1000000)
 					,m_makeRoughtRide(false)
+					,m_averageQValue()
+					,m_averageFramesPerEpisodes()
 				{
 				}
 
@@ -112,7 +114,7 @@ namespace ndController_0
 					if (GetEpisodeFrames() > 1000)
 					{
 						// kill the model if is is too long alive. 
-						// this generate a contradicting entry byt for now let it be.
+						// this generate a contradicting entry but for now let it be.
 						return true;
 					}
 					return m_model->IsTerminal();
@@ -140,9 +142,19 @@ namespace ndController_0
 					ndInt32 stopTraining = GetFramesCount();
 					if (stopTraining <= m_stopTraining)
 					{
+						if (!IsSampling())
+						{
+							m_averageQValue.Update(GetCurrentValue());
+							if (m_model->IsTerminal())
+							{
+								m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
+								ndExpandTraceMessage("%d moving average frames alive: %f   value: %f\n", GetFramesCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+							}
+						}
+
 						ndBrainAgentDQN_Trainer::OptimizeStep();
 					}
-			
+
 					if (stopTraining == m_stopTraining)
 					{
 						char fileName[1024];
@@ -165,6 +177,8 @@ namespace ndController_0
 				ndCartpole* m_model;
 				ndInt32 m_stopTraining;
 				mutable bool m_makeRoughtRide;
+				ndMovingAverage<256> m_averageQValue;
+				ndMovingAverage<128> m_averageFramesPerEpisodes;
 			};
 
 		#else
