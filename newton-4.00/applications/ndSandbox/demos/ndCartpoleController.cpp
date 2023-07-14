@@ -111,13 +111,25 @@ namespace ndController_0
 
 				bool IsTerminal() const
 				{
+					bool state = m_model->IsTerminal();
 					if (GetEpisodeFrames() > 1000)
 					{
 						// kill the model if is is too long alive. 
 						// this generate a contradicting entry but for now let it be.
-						return true;
+						state = true;
 					}
-					return m_model->IsTerminal();
+
+					if (!IsSampling())
+					{
+						m_averageQValue.Update(GetCurrentValue());
+						if (state)
+						{
+							m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
+							ndExpandTraceMessage("%d moving average frames alive: %f   value: %f\n", GetFramesCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+						}
+					}
+
+					return state;
 				}
 
 				void ResetModel() const
@@ -142,16 +154,6 @@ namespace ndController_0
 					ndInt32 stopTraining = GetFramesCount();
 					if (stopTraining <= m_stopTraining)
 					{
-						if (!IsSampling())
-						{
-							m_averageQValue.Update(GetCurrentValue());
-							if (m_model->IsTerminal())
-							{
-								m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
-								ndExpandTraceMessage("%d moving average frames alive: %f   value: %f\n", GetFramesCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
-							}
-						}
-
 						ndBrainAgentDQN_Trainer::OptimizeStep();
 					}
 
@@ -177,8 +179,8 @@ namespace ndController_0
 				ndCartpole* m_model;
 				ndInt32 m_stopTraining;
 				mutable bool m_makeRoughtRide;
-				ndMovingAverage<256> m_averageQValue;
-				ndMovingAverage<128> m_averageFramesPerEpisodes;
+				mutable ndMovingAverage<256> m_averageQValue;
+				mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
 			};
 
 		#else
