@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-//#define D_USE_POLE_DQN
+#define D_USE_POLE_DQN
 
 namespace ndController_0
 {
@@ -82,7 +82,7 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
 					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(qValuePredictor)
 					,m_model(nullptr)
-					,m_stopTraining(1000000)
+					,m_stopTraining(2000000)
 					,m_makeRoughtRide(false)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
@@ -213,7 +213,7 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 					,m_model(nullptr)
-					,m_stopTraining(1000000)
+					,m_stopTraining(2000000)
 					,m_makeRoughtRide(false)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
@@ -526,7 +526,7 @@ namespace ndController_0
 
 		char fileName[1024];
 		ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
-		agent->SaveToFile(fileName);
+		//agent->SaveToFile(fileName);
 
 		ndCartpole* const model = new ndCartpole(agent);
 		ndCartpole::ndCartpoleAgent_trainer* const trainer = (ndCartpole::ndCartpoleAgent_trainer*)*agent;

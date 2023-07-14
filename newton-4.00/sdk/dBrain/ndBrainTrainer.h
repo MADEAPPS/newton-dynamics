@@ -23,6 +23,7 @@
 #define _ND_BRAIN_TRAINER_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrainTypes.h"
 #include "ndBrainTrainerBase.h"
 
 class ndBrainTrainer: public ndBrainTrainerBase

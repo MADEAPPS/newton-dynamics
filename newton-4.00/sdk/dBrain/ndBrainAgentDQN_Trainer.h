@@ -105,7 +105,6 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 			m_outputBatch.SetCount(actionDim);
 		}
 
-		//virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const
 		void EvaluateBellmanEquation(ndInt32 index)
 		{
 			ndAssert(m_truth.GetCount() == m_output.GetCount());
@@ -138,6 +137,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 				m_agent->m_target.MakePrediction(m_inputBatch, m_outputBatch);
 				m_truth[action] = transition.m_reward + m_agent->m_gamma * m_outputBatch[action];
 			}
+			BackPropagate(m_truth);
 		}
 
 		virtual void Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32)
@@ -149,9 +149,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 			for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
 			{
 				ndInt32 index = shuffleBuffer[i];
-				//GetGroundTruth(index, truth, m_output);
 				EvaluateBellmanEquation(index);
-				BackPropagate(m_truth);
 			}
 			UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
 		}
