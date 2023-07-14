@@ -38,14 +38,12 @@
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
 //#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 4)
-#define D_DDPG_MOVING_AVERAGE			64
 #define D_DDPG_REPLAY_BASH_SIZE			32
 #define D_DDPG_TARGET_UPDATE_PERIOD		1000
 #define D_DDPG_OPTIMIZATION_DELAY		3
 #define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
 #define D_DDPG_SOFT_TARGET_FACTOR		ndReal (1.0e-3f)
 #define D_DDPG_ACTION_NOISE_DEVIATION	ndReal (0.03125f)
-//#define D_DDPG_STAR_OPTIMIZATION		(D_DDPG_REPLAY_BUFFERSIZE - 1000)
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDDPG_Trainer : public ndBrainAgent
@@ -66,6 +64,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 
 	bool IsTerminal() const;
 	ndReal GetReward() const;
+	ndReal IsSampling() const;
 
 	private:
 	void PrintDebug();
@@ -246,26 +245,23 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 	ndBrainVector m_state;
 	ndBrainVector m_actions;
 	ndArray<ndInt32> m_bashSamples;
-	ndArray<ndInt32> m_movingAverage;
 	ndBrainReplayBuffer<ndReal, statesDim, actionDim> m_replayBuffer;
 	ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim> m_currentTransition;
 
 	ndReal m_gamma;
 	ndReal m_learnRate;
+	ndReal m_currentQValue;
 	ndReal m_targetLearnRate;
 	ndReal m_softTargetFactor;
 	ndReal m_actionNoiseDeviation;
 	ndInt32 m_frameCount;
 	ndInt32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
-	//ndInt32 m_startOptimization;
 	ndInt32 m_targetUpdatePeriod;
 
 	ndInt32 m_framesAlive;
-	ndInt32 m_movingAverageIndex;
 	ndInt32 m_optimizationDelay;
 	ndInt32 m_optimizationDelayCount;
-	ndMovingAverage<256> m_averageQValue;
 	bool m_collectingSamples;
 };
 
@@ -278,23 +274,20 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	,m_targetCritic(*(*m_critic))
 	,m_actorOptimizer(*m_actor)
 	,m_criticOptimizer(*m_critic)
-	,m_movingAverage()
 	,m_replayBuffer()
 	,m_gamma(D_DDPG_DISCOUNT_FACTOR)
 	,m_learnRate(D_DDPG_LEARN_RATE)
+	,m_currentQValue(ndReal(0.0f))
 	,m_targetLearnRate(D_DDPG_TARGET_LEARN_RATE)
 	,m_softTargetFactor(D_DDPG_SOFT_TARGET_FACTOR)
 	,m_actionNoiseDeviation(D_DDPG_ACTION_NOISE_DEVIATION)
 	,m_frameCount(0)
 	,m_eposideCount(0)
 	,m_bashBufferSize(D_DDPG_REPLAY_BASH_SIZE)
-	//,m_startOptimization(D_DDPG_STAR_OPTIMIZATION)
 	,m_targetUpdatePeriod(D_DDPG_TARGET_UPDATE_PERIOD)
 	,m_framesAlive(0)
-	,m_movingAverageIndex(0)
 	,m_optimizationDelay(D_DDPG_OPTIMIZATION_DELAY)
 	,m_optimizationDelayCount(0)
-	,m_averageQValue()
 	,m_collectingSamples(true)
 {
 	ndAssert(m_critic->GetOutputSize() == 1);
@@ -314,11 +307,6 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	SetBufferSize(D_DDPG_REPLAY_BUFFERSIZE);
 	m_targetActor.CopyFrom(*(*m_actor));
 	m_targetCritic.CopyFrom(*(*m_critic));
-
-	for (ndInt32 i = 0; i < D_DDPG_MOVING_AVERAGE; ++i)
-	{
-		m_movingAverage.PushBack(0);
-	}
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -329,7 +317,13 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::~ndBrainAgentDDPG_Trainer()
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCurrentValue() const
 {
-	return m_averageQValue.GetAverage();
+	return m_currentQValue;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::IsSampling() const
+{
+	return m_collectingSamples;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -451,7 +445,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SelectActions()
 		ndReal noisyAction = ndGaussianRandom(ndFloat32(m_actions[i]), ndFloat32(m_actionNoiseDeviation));
 		m_actions[i] = ndClamp(noisyAction, ndReal(-1.0f), ndReal(1.0f));
 	}
-	m_averageQValue.Update(m_criticOptimizer.GetQValue());
+	m_currentQValue = m_criticOptimizer.GetQValue();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -490,14 +484,14 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::OptimizeStep()
 			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
 			ResetModel();
 			m_currentTransition.Clear();
-			//if ((m_frameCount < m_startOptimization) && (m_eposideCount % 32 == 0))
-			if ((m_frameCount < m_replayBuffer.GetCapacity()) && (m_eposideCount % 32 == 0))
+			//if ((m_frameCount < m_replayBuffer.GetCapacity()) && (m_eposideCount % 32 == 0))
+			if (IsSampling() && (m_eposideCount % 100 == 0))
 			{
 				ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_replayBuffer.GetCapacity(), m_eposideCount);
 			}
 			m_eposideCount++;
+			m_framesAlive = 0;
 			m_optimizationDelayCount = 0;
-			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PrintDebug();
 		}
 	}
 	else
@@ -528,13 +522,11 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Optimize()
 {
 	BackPropagate();
-	if (m_collectingSamples)
+	if (IsSampling())
 	{
 		ndExpandTraceMessage("%d star training: episode %d\n", m_frameCount, m_eposideCount);
 	}
 	m_collectingSamples = false;
 }
 
-
 #endif 
-

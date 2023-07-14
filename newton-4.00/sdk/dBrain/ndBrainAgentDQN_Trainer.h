@@ -65,7 +65,6 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 
 	bool IsTerminal() const;
 	ndReal GetReward() const;
-
 	ndReal IsSampling() const;
 
 	private:
@@ -314,7 +313,6 @@ ndInt32 ndBrainAgentDQN_Trainer<statesDim, actionDim>::SelectBestAction()
 			}
 		}
 
-		//m_averageQValue.Update(maxQValue);
 		m_currentQValue = maxQValue;
 		m_currentTransition.m_action[0] = bestAction;
 		return bestAction;

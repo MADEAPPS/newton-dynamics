@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#define D_USE_POLE_DQN
+//#define D_USE_POLE_DQN
 
 namespace ndController_0
 {
@@ -215,6 +215,8 @@ namespace ndController_0
 					,m_model(nullptr)
 					,m_stopTraining(1000000)
 					,m_makeRoughtRide(false)
+					,m_averageQValue()
+					,m_averageFramesPerEpisodes()
 				{
 				}
 
@@ -240,13 +242,24 @@ namespace ndController_0
 
 				bool IsTerminal() const
 				{
+					bool state = m_model->IsTerminal();
 					if (GetEpisodeFrames() > 1000)
 					{
 						// kill the model if is is too long alive. 
-						// this generate a contradicting entry byt for now let it be.
-						return true;
+						// this generate a contradicting entry but for now let it be.
+						state = true;
 					}
-					return m_model->IsTerminal();
+
+					if (!IsSampling())
+					{
+						m_averageQValue.Update(GetCurrentValue());
+						if (state)
+						{
+							m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
+							ndExpandTraceMessage("%d moving average frames alive: %f   value: %f\n", GetFramesCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+						}
+					}
+					return state;
 				}
 
 				void ResetModel() const
@@ -295,6 +308,8 @@ namespace ndController_0
 				ndCartpole* m_model;
 				ndInt32 m_stopTraining;
 				mutable bool m_makeRoughtRide;
+				mutable ndMovingAverage<256> m_averageQValue;
+				mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
 			};
 
 		#endif
