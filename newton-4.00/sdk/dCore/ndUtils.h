@@ -268,7 +268,7 @@ class ndMovingAverage: public ndFixSizeArray<ndReal, size>
 	{
 		for (ndInt32 i = 0; i < size; ++i)
 		{
-			PushBack(ndReal(0.0f));
+			ndFixSizeArray<ndReal, size>::PushBack(ndReal(0.0f));
 		}
 	}
 
