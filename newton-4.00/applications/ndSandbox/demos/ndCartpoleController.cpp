@@ -444,7 +444,7 @@ namespace ndController_0
 
 		bool IsOutOfBounds() const
 		{
-			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
+			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(30.0f);
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
