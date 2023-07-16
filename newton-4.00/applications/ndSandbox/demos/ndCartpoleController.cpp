@@ -168,7 +168,6 @@ namespace ndController_0
 							{
 								ndBrainAgentDQN_Trainer::OptimizeStep();
 
-								//if ((m_averageFramesPerEpisodes.GetAverage() >= 1000) || (stopTraining == m_stopTraining))
 								if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
 								{
 									if (m_averageQValue.GetAverage() > m_maxGain)
@@ -177,15 +176,16 @@ namespace ndController_0
 										ndGetWorkingFileName(GetName().GetStr(), fileName);
 
 										SaveToFile(fileName);
-										ndExpandTraceMessage("episode: %d saving to file: %s\n  averageFrames: %f  averageValue %f", GetEposideCount(), fileName, m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
-										//m_averageFramesPerEpisodes.Clear();
+										ndExpandTraceMessage("saving to file: %s\n", fileName);
+										ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
 										m_maxGain = m_averageQValue.GetAverage();
 									}
-									if (stopTraining == m_stopTraining)
-									{
-										ndExpandTraceMessage("\n");
-										ndExpandTraceMessage("training complete\n");
-									}
+								}
+
+								if (stopTraining == m_stopTraining)
+								{
+									ndExpandTraceMessage("\n");
+									ndExpandTraceMessage("training complete\n");
 								}
 							}
 							
@@ -239,6 +239,8 @@ namespace ndController_0
 					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 					,m_model(nullptr)
 					,m_stopTraining(1000000)
+					,m_maxGain(-1.0e10f)
+					,m_maxFrames(500.0f)
 					,m_controllerState(0)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
@@ -276,7 +278,6 @@ namespace ndController_0
 						if (state)
 						{
 							m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
-							ndExpandTraceMessage("%d moving average frames alive: %f   value: %f\n", GetFramesCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
 						}
 					}
 					return state;
@@ -324,17 +325,24 @@ namespace ndController_0
 								ndBrainAgentDDPG_Trainer::OptimizeStep();
 							}
 
-							if ((m_averageFramesPerEpisodes.GetAverage() >= 500) || (stopTraining == m_stopTraining))
+							if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
 							{
-								ndAssert(0);
-								char fileName[1024];
-								ndGetWorkingFileName(GetName().GetStr(), fileName);
+								if (m_averageQValue.GetAverage() > m_maxGain)
+								{
+									char fileName[1024];
+									ndGetWorkingFileName(GetName().GetStr(), fileName);
 
-								SaveToFile(fileName);
-								ndExpandTraceMessage("\n");
-								ndExpandTraceMessage("training complete\n");
-								ndExpandTraceMessage("save to file: %s\n", fileName);
-								m_averageFramesPerEpisodes.Clear();
+									SaveToFile(fileName);
+									ndExpandTraceMessage("saving to file: %s\n", fileName);
+									ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+									m_maxGain = m_averageQValue.GetAverage();
+								}
+
+								if (stopTraining == m_stopTraining)
+								{
+									ndExpandTraceMessage("\n");
+									ndExpandTraceMessage("training complete\n");
+								}
 							}
 
 							if (m_model->IsOutOfBounds())
@@ -347,6 +355,8 @@ namespace ndController_0
 
 				ndCartpole* m_model;
 				ndInt32 m_stopTraining;
+				ndFloat32 m_maxGain;
+				ndFloat32 m_maxFrames;
 				mutable ndInt32 m_controllerState;
 				mutable ndMovingAverage<256> m_averageQValue;
 				mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
