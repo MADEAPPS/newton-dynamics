@@ -63,9 +63,9 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 	void OptimizeStep();
 	void Save(ndBrainSave* const loadSave) const;
 
+	bool IsSampling() const;
 	bool IsTerminal() const;
 	ndReal GetReward() const;
-	ndReal IsSampling() const;
 	ndReal PerturbeAction(ndReal action) const;
 
 	private:
@@ -322,7 +322,7 @@ ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCurrentValue() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::IsSampling() const
+bool ndBrainAgentDDPG_Trainer<statesDim, actionDim>::IsSampling() const
 {
 	return m_collectingSamples;
 }
