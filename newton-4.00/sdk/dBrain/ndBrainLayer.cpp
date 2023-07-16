@@ -161,10 +161,10 @@ void ndBrainLayer::SigmoidActivation(ndBrainVector& output) const
 	{
 		ndReal value = ndClamp (output[i], ndReal(-50.0f), ndReal(50.0f));
 		const ndReal exp = ndReal(ndPow(ndEXP, value));
-		output[i] = exp / (exp + 1.0f);
+		output[i] = exp / (exp + ndReal(1.0f));
 		ndAssert (ndCheckFloat(output[i]));
-		ndAssert(output[i] <= 1.0f);
-		ndAssert(output[i] >= 0.0f);
+		ndAssert(output[i] <= ndReal(1.0f));
+		ndAssert(output[i] >= ndReal(0.0f));
 	}
 }
 
@@ -173,11 +173,11 @@ void ndBrainLayer::HyperbolicTanActivation(ndBrainVector& output) const
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal value = ndClamp(output[i], ndReal(-25.0f), ndReal(25.0f));
-		const ndReal exp = ndReal(ndPow(ndEXP, 2.0f * value));
-		output[i] = (exp - 1.0f) / (exp + 1.0f);
+		const ndReal exp = ndReal(ndPow(ndEXP, ndReal(2.0f) * value));
+		output[i] = (exp - ndReal(1.0f)) / (exp + ndReal(1.0f));
 		ndAssert(ndCheckFloat(output[i]));
-		ndAssert(output[i] <= 1.0f);
-		ndAssert(output[i] >= -1.0f);
+		ndAssert(output[i] <= ndReal(1.0f));
+		ndAssert(output[i] >= ndReal(-1.0f));
 	}
 }
 
@@ -193,12 +193,12 @@ void ndBrainLayer::SoftmaxActivation(ndBrainVector& output) const
 	}
 	
 	ndAssert(acc > 0.0f);
-	ndReal invAcc = 1.0f / acc;
+	ndReal invAcc = ndReal(1.0f) / acc;
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
 		output[i] *= invAcc;
-		ndAssert(output[i] <= 1.0f);
-		ndAssert(output[i] >= 0.0f);
+		ndAssert(output[i] <= ndReal(1.0f));
+		ndAssert(output[i] >= ndReal(0.0f));
 	}
 }
 
@@ -237,7 +237,7 @@ void ndBrainLayer::LinealActivationDerivative(const ndBrainVector& input, ndBrai
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
-		derivativeOutput[i] = 1.0f;
+		derivativeOutput[i] = ndReal(1.0f);
 	}
 }
 
@@ -247,7 +247,7 @@ void ndBrainLayer::ReluActivationDerivative(const ndBrainVector& input, ndBrainV
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal val = input[i];
-		derivativeOutput[i] = (val > 0.0f) ? 1.0f : 0.0f;
+		derivativeOutput[i] = (val > ndReal(0.0f)) ? ndReal(1.0f) : ndReal(0.0f);
 	}
 }
 

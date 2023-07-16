@@ -29,10 +29,10 @@
 
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"
-#include "ndRand.h"
 #include "ndUtils.h"
 #include "ndVector.h"
 #include "ndClassAlloc.h"
+#include "ndProbability.h"
 
 /// Generic template vector.
 /// note: this template vector is similar to std::vector but has some significant differences.

@@ -23,9 +23,9 @@
 #define _ND_BRAIN_PARALLEL_TRAINER_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainTrainer.h"
+#include "ndBrainTrainer_old.h"
 
-class ndBrainParallelTrainer: public ndBrainTrainer, public ndThreadPool
+class ndBrainParallelTrainer: public ndBrainTrainer_old, public ndThreadPool
 {
 	public: 
 	class ndBrainTrainerChannel;

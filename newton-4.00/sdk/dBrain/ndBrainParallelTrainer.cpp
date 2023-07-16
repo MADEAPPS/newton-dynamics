@@ -24,11 +24,11 @@
 #include "ndBrainLayer.h"
 #include "ndBrainParallelTrainer.h"
 
-class ndBrainParallelTrainer::ndBrainTrainerChannel : public ndBrainTrainer
+class ndBrainParallelTrainer::ndBrainTrainerChannel : public ndBrainTrainer_old
 {	
 	public:
 	ndBrainTrainerChannel(const ndBrainParallelTrainer& src)
-		:ndBrainTrainer(src)
+		:ndBrainTrainer_old(src)
 	{
 	}
 
@@ -39,7 +39,7 @@ class ndBrainParallelTrainer::ndBrainTrainerChannel : public ndBrainTrainer
 
 //ndBrainParallelTrainer::ndBrainParallelTrainer(ndBrain* const brain, ndInt32 threads)
 ndBrainParallelTrainer::ndBrainParallelTrainer(ndBrain* const brain, ndInt32)
-	:ndBrainTrainer(brain)
+	:ndBrainTrainer_old(brain)
 	,ndThreadPool("neuralNet")
 	,m_inputBatch(nullptr)
 	,m_groundTruth(nullptr)

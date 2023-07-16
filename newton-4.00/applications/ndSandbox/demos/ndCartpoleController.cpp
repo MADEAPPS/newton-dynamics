@@ -82,8 +82,8 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
 					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(qValuePredictor)
 					,m_model(nullptr)
-					,m_stopTraining(2000000)
-					,m_makeRoughtRide(false)
+					,m_stopTraining(1000000)
+					,m_controllerState(0)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
 				{
@@ -96,12 +96,13 @@ namespace ndController_0
 
 				virtual void ApplyActions(ndReal* const actions) const
 				{
-					m_model->ApplyActions(actions);
-				}
+					if (GetEpisodeFrames() >= 1000)
+					{
+						ndUnsigned32 randomIndex = ndRandInt();
+						*actions = ndReal (ndInt32(randomIndex % 3));
+					}
 
-				void ApplyRandomAction() const
-				{
-					m_model->RandomePush();
+					m_model->ApplyActions(actions);
 				}
 
 				void GetObservation(ndReal* const state) const
@@ -112,13 +113,6 @@ namespace ndController_0
 				bool IsTerminal() const
 				{
 					bool state = m_model->IsTerminal();
-					if (GetEpisodeFrames() > 1000)
-					{
-						// kill the model if is is too long alive. 
-						// this generate a contradicting entry but for now let it be.
-						state = true;
-					}
-
 					if (!IsSampling())
 					{
 						m_averageQValue.Update(GetCurrentValue());
@@ -134,51 +128,71 @@ namespace ndController_0
 
 				void ResetModel() const
 				{
-					m_makeRoughtRide = false;
+					m_controllerState = -1;
 					m_model->ResetModel();
 				}
 
 				void Step()
 				{
-					if (m_makeRoughtRide)
+					switch (m_controllerState)
 					{
-						// try killing the model with a huge push if is alive for too long.
-						m_model->RandomePush();
+						case 0:
+						{
+							m_model->RandomePush();
+							break;
+						}
+						case 1:
+						{
+							break;
+						}
+						default:
+						{
+							ndBrainAgentDQN_Trainer::Step();
+						}
 					}
-					ndBrainAgentDQN_Trainer::Step();
 				}
 
 				void OptimizeStep()
 				{
-					//m_model->CheckBounds();
-					ndInt32 stopTraining = GetFramesCount();
-					if (stopTraining <= m_stopTraining)
+					switch (m_controllerState)
 					{
-						ndBrainAgentDQN_Trainer::OptimizeStep();
+						case 0:
+						case 1:
+							break;
+
+						default:
+						{
+							ndInt32 stopTraining = GetFramesCount();
+							if (stopTraining <= m_stopTraining)
+							{
+								ndBrainAgentDQN_Trainer::OptimizeStep();
+							}
+							
+							if ((m_averageFramesPerEpisodes.GetAverage() >= 1000) || (stopTraining == m_stopTraining))
+							{
+								char fileName[1024];
+								ndGetWorkingFileName(GetName().GetStr(), fileName);
+							
+								SaveToFile(fileName);
+								ndExpandTraceMessage("\n");
+								ndExpandTraceMessage("training complete\n");
+								ndExpandTraceMessage("save to file: %s\n", fileName);
+								m_averageFramesPerEpisodes.Clear();
+							}
+							
+							if (m_model->IsOutOfBounds())
+							{
+								m_model->TelePort();
+							}
+						}
 					}
 
-					if (stopTraining == m_stopTraining)
-					{
-						char fileName[1024];
-						ndGetWorkingFileName(GetName().GetStr(), fileName);
-
-						SaveToFile(fileName);
-						ndExpandTraceMessage("\n");
-						ndExpandTraceMessage("training complete\n");
-						ndExpandTraceMessage("save to file: %s\n", fileName);
-						m_model->ResetModel();
-					}
-
-					if (m_model->IsOutOfBounds())
-					{
-						m_makeRoughtRide = true;
-						m_model->TelePort();
-					}
+					m_controllerState++;
 				}
 
 				ndCartpole* m_model;
 				ndInt32 m_stopTraining;
-				mutable bool m_makeRoughtRide;
+				mutable ndInt32 m_controllerState;
 				mutable ndMovingAverage<256> m_averageQValue;
 				mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
 			};
@@ -213,7 +227,7 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 					,m_model(nullptr)
-					,m_stopTraining(2000000)
+					,m_stopTraining(1000000)
 					,m_makeRoughtRide(false)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
@@ -228,11 +242,6 @@ namespace ndController_0
 				virtual void ApplyActions(ndReal* const actions) const
 				{
 					m_model->ApplyActions(actions);
-				}
-
-				void ApplyRandomAction() const
-				{
-					m_model->RandomePush();
 				}
 
 				void GetObservation(ndReal* const state) const
@@ -286,8 +295,9 @@ namespace ndController_0
 						ndBrainAgentDDPG_Trainer::OptimizeStep();
 					}
 
-					if (stopTraining == m_stopTraining)
+					if ((m_averageFramesPerEpisodes.GetAverage() >= 1000) || (stopTraining == m_stopTraining))
 					{
+						ndAssert(0);
 						char fileName[1024];
 						ndGetWorkingFileName(GetName().GetStr(), fileName);
 
@@ -295,7 +305,7 @@ namespace ndController_0
 						ndExpandTraceMessage("\n");
 						ndExpandTraceMessage("training complete\n");
 						ndExpandTraceMessage("save to file: %s\n", fileName);
-						m_model->ResetModel();
+						m_averageFramesPerEpisodes.Clear();
 					}
 
 					if (m_model->IsOutOfBounds())
@@ -324,7 +334,7 @@ namespace ndController_0
 		{
 		}
 
-		virtual bool IsTerminal() const
+		bool IsTerminal() const
 		{
 			const ndMatrix& matrix = m_pole->GetMatrix();
 			// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
@@ -332,7 +342,7 @@ namespace ndController_0
 			return fail;
 		}
 
-		virtual ndReal GetReward() const
+		ndReal GetReward() const
 		{
 			const ndMatrix& matrix = m_pole->GetMatrix();
 			ndFloat32 sinAngle = matrix.m_front.m_x;
@@ -364,7 +374,6 @@ namespace ndController_0
 		{
 			ndVector omega(m_pole->GetOmega());
 			const ndMatrix& matrix = m_pole->GetMatrix();
-			//ndFloat32 angle = ndClamp (matrix.m_front.m_x, -2.0f * D_REWARD_MIN_ANGLE, 2.0f * D_REWARD_MIN_ANGLE);
 			ndFloat32 angle = ndAsin (matrix.m_front.m_x);
 			state[m_poleAngle] = ndReal(angle);
 			state[m_poleOmega] = ndReal(omega.m_z);
@@ -389,7 +398,7 @@ namespace ndController_0
 		void RandomePush()
 		{
 			ndVector impulsePush(ndVector::m_zero);
-			impulsePush.m_x = ndGaussianRandom(0.0f, 0.5f) * m_cart->GetMassMatrix().m_w;
+			impulsePush.m_x = 5.0f * m_cart->GetMassMatrix().m_w *  ndSquash (ndGaussianRandom(0.0f, 0.5f));
 			m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, m_cart->GetScene()->GetTimestep());
 		}
 

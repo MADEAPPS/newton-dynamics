@@ -24,7 +24,6 @@
 
 #include <ndCoreStdafx.h>
 #include <ndCRC.h>
-#include <ndRand.h>
 #include <ndList.h>
 #include <ndTree.h>
 #include <ndHeap.h>
@@ -52,6 +51,7 @@
 #include <ndThreadPool.h>
 #include <ndIsoSurface.h>
 #include <ndQuaternion.h>
+#include <ndProbability.h>
 #include <ndPerlinNoise.h>
 #include <ndFixSizeArray.h>
 #include <ndConvexHull2d.h>

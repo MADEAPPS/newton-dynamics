@@ -43,16 +43,11 @@ class ndBrainAgent: public ndClassAlloc
 	virtual void ResetModel() const = 0;
 	virtual bool IsTerminal() const = 0;
 	virtual ndReal GetReward() const = 0;
+	virtual ndReal GetCurrentValue() const = 0;
 	virtual ndInt32 GetEpisodeFrames() const = 0;
-	virtual ndInt32 GetOpmizationDelay() const = 0;
-	virtual void SetOpmizationDelay(ndInt32 delay) = 0;
-
-	virtual void ApplyRandomAction() const = 0;
+	virtual void Save(ndBrainSave* const loadSave) const = 0;
 	virtual void ApplyActions(ndReal* const actions) const = 0;
 	virtual void GetObservation(ndReal* const state) const = 0;
-	virtual void Save(ndBrainSave* const loadSave) const = 0;
-
-	virtual ndReal GetCurrentValue() const = 0;
 
 	ndString m_name;
 };

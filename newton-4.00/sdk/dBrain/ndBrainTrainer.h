@@ -24,69 +24,66 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainTypes.h"
-#include "ndBrainTrainerBase.h"
 
-class ndBrainTrainer: public ndBrainTrainerBase
+class ndBrainTrainer: public ndClassAlloc
 {
 	public: 
+	enum ndSolveModel
+	{
+		m_cgd,
+		m_adam
+	};
+
 	ndBrainTrainer(ndBrain* const brain);
 	ndBrainTrainer(const ndBrainTrainer& src);
 	virtual ~ndBrainTrainer();
 
-	ndReal GetRegularizer() const;
-	void SetRegularizer(ndReal regularizer);
-	virtual void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
-	virtual void MakePrediction(const ndBrainVector& input);
-	virtual void BackPropagate(const ndBrainVector& groundTruth);
-
-	virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const;
-	virtual void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, ndInt32 steps);
-
-	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
-	void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndInt32 steps);
+	//ndReal GetRegularizer() const;
+	//void SetRegularizer(ndReal regularizer);
+	//virtual void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
+	//virtual void MakePrediction(const ndBrainVector& input);
+	//virtual void BackPropagate(const ndBrainVector& groundTruth);
+	//
+	//virtual void GetGroundTruth(ndInt32 index, ndBrainVector& groundTruth, const ndBrainVector& output) const;
+	//virtual void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, ndInt32 steps);
+	//
+	//void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
+	//void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndInt32 steps);
 
 	protected:
-	void ClearGradientsAcc();
-	virtual void PrefixScan();
-	virtual void BackPropagateHiddenLayer(ndInt32 layerIndex);
-	virtual void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
-	virtual void BackPropagateOutputLayer(const ndBrainVector& groundTruth);
+	//void ClearGradientsAcc();
+	//void ApplyAdamCorrection();
+	//
+	//virtual void PrefixScan();
+	//virtual void BackPropagateHiddenLayer(ndInt32 layerIndex);
+	//virtual void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
+	//virtual void BackPropagateOutputLayer(const ndBrainVector& groundTruth);
+	//
+	//ndBrainVector m_output;
+	//ndBrainVector m_z;
+	//ndBrainVector m_zDerivative;
+	//ndBrainVector m_biasGradients;
+	//ndBrainVector m_weightGradients;
+	//ndBrainVector m_biasGradientsAcc;
+	//ndBrainVector m_biasGradient_u;
+	//ndBrainVector m_biasGradient_v;
+	//ndBrainVector m_weightGradient_u;
+	//ndBrainVector m_weightGradient_v;
+	//ndBrainPrefixScan m_weightGradientsPrefixScan;
 
-	void ApplyAdamCorrection();
-
-	ndBrainVector m_output;
-
-	ndBrainVector m_z;
-	ndBrainVector m_zDerivative;
-	ndBrainVector m_biasGradients;
-	ndBrainVector m_weightGradients;
-	ndBrainVector m_biasGradientsAcc;
-	ndBrainVector m_biasGradient_u;
-	ndBrainVector m_biasGradient_v;
-	ndBrainVector m_weightGradient_u;
-	ndBrainVector m_weightGradient_v;
-	ndBrainPrefixScan m_weightGradientsPrefixScan;
-	ndReal m_regularizer;
-	ndReal m_bestCost;
-	ndReal m_alpha;
-	ndReal m_beta;
-	ndReal m_epsilon;
-	ndReal m_alphaAcc;
-	ndReal m_betaAcc;
+	ndBrain* m_brain;
+	//ndReal m_regularizer;
+	//ndReal m_bestCost;
+	//ndReal m_alpha;
+	//ndReal m_beta;
+	//ndReal m_epsilon;
+	//ndReal m_alphaAcc;
+	//ndReal m_betaAcc;
+	ndSolveModel m_model;
 	
 	friend class ndBrainTrainerChannel;
 	friend class ndBrainParallelTrainer;
 };
-
-inline ndReal ndBrainTrainer::GetRegularizer() const
-{
-	return m_regularizer;
-}
-
-inline void ndBrainTrainer::SetRegularizer(ndReal regularizer)
-{
-	m_regularizer = ndClamp(regularizer, ndReal(0.0f), ndReal(0.01f));
-}
 
 #endif 
 

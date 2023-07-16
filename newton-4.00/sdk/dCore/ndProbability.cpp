@@ -22,7 +22,7 @@
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"
 #include "ndUtils.h"
-#include "ndRand.h"
+#include "ndProbability.h"
 
 std::mt19937& GetRandomGenerator()
 {
@@ -118,6 +118,18 @@ ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
 	ndFloat32 normal = NormalCumulativeDistibutionInverse(r);
 	return mean + normal * sigma;
 }
+
+ndFloat32 ndSquash(ndFloat32 x)
+{
+	ndFloat32 value = ndClamp(x, ndFloat32(-25.0f), ndFloat32(25.0f));
+	const ndFloat32 exp = ndFloat32(ndPow(ndEXP, ndFloat32(2.0f) * value));
+	x = (exp - ndFloat32(1.0f)) / (exp + ndFloat32(1.0f));
+	ndAssert(ndCheckFloat(x));
+	ndAssert(x <= ndFloat32 (1.0f));
+	ndAssert(x >= ndFloat32(-1.0f));
+	return x;
+}
+
 
 ndOUNoise::ndOUNoise(ndFloat32 value, ndFloat32 theta, ndFloat32 mean, ndFloat32 sigma)
 	:m_value(value)

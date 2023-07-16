@@ -12,11 +12,11 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-class ndTestValidator : public ndBrainTrainer::ndValidation
+class ndTestValidator : public ndBrainTrainer_old::ndValidation
 {
 	public:
-	ndTestValidator(ndBrainTrainer& trainer)
-		:ndBrainTrainer::ndValidation(trainer)
+	ndTestValidator(ndBrainTrainer_old& trainer)
+		:ndBrainTrainer_old::ndValidation(trainer)
 		,m_minError(1.0e10f)
 		,m_step(0)
 		,m_step0(0)
@@ -70,7 +70,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		groundTruth[i][1] = ((inputBatch[i][0] >= 0.5f) || (inputBatch[i][1] >= 0.5f)) ? 1.0f : 0.0f;
 	}
 	
-	ndBrainTrainer trainer(&brain);
+	ndBrainTrainer_old trainer(&brain);
 	//ndBrainParallelTrainer trainer(&brain, 4);
 	ndTestValidator testError(trainer);
 
@@ -273,7 +273,7 @@ static void MnistTrainingSet()
 		brain.AddLayer(ouputLayer);
 		brain.EndAddLayer(ndReal(0.125f));
 
-		ndBrainTrainer trainer(&brain);
+		ndBrainTrainer_old trainer(&brain);
 		//ndBrainParallelTrainer trainer(&brain, 4);
 		//ndDeepBrainTrainerParallelSDG_Experiment trainer(&brain, 4);
 

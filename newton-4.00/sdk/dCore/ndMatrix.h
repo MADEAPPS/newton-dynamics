@@ -94,7 +94,7 @@ class ndMatrix
 		ndFloat64* const dst, ndInt32 dstStrideInBytes,
 		const ndFloat32* const src, ndInt32 srcStrideInBytes, ndInt32 count) const;
 #endif
-
+	bool SanityCheck() const;
 	bool TestIdentity() const;
 	bool TestSymetric3x3() const;
 	bool TestOrthogonal(ndFloat32 tol = ndFloat32 (1.0e-4f)) const;
@@ -285,6 +285,33 @@ inline bool ndMatrix::TestSymetric3x3() const
 		   (me[3][1] == ndFloat32 (0.0f)) &&
 		   (me[3][2] == ndFloat32 (0.0f)) &&
 		   (me[3][3] == ndFloat32 (1.0f));
+}
+
+inline bool ndMatrix::SanityCheck() const
+{
+	if (ndAbs(m_right.m_w) > ndFloat32(0.0f))
+	{
+		return false;
+	}
+	if (ndAbs(m_up.m_w) > ndFloat32(0.0f))
+	{
+		return false;
+	}
+	if (ndAbs(m_right.m_w) > ndFloat32(0.0f))
+	{
+		return false;
+	}
+	if (ndAbs(m_posit.m_w) != ndFloat32(1.0f)) 
+	{
+		return false;
+	}
+
+	ndVector right(m_front.CrossProduct(m_up));
+	if (ndAbs(right.DotProduct(m_right).GetScalar()) < ndFloat32(0.9999f))
+	{
+		return false;
+	}
+	return true;
 }
 
 #endif

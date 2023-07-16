@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_RAND_H__
-#define __ND_RAND_H__
+#ifndef __ND_PROBABILITY_H__
+#define __ND_PROBABILITY_H__
 
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"
@@ -39,6 +39,9 @@ D_CORE_API void ndSetRandSeed(ndUnsigned32 seed);
 
 /// Returns a guardian distributed random value with center at mean and standard deviation sigma
 D_CORE_API ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma);
+
+/// map a random variable with zero mean to the interval [-1.0, 1.0] using atanh
+D_CORE_API ndFloat32 ndSquash(ndFloat32 x);
 
 /// generate a Gaussian process of centered at mean, deviation sigma and uncertainty range theta.
 /// this class is used to randomly explore the environment when using reinforcement learning training.

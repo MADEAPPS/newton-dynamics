@@ -25,7 +25,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
-#include "ndBrainTrainer.h"
+#include "ndBrainTrainer_old.h"
 #include "ndBrainReplayBuffer.h"
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -42,11 +42,8 @@ class ndBrainAgentDQN: public ndBrainAgent
 	bool IsTerminal() const;
 	ndReal GetReward() const;
 	ndReal GetCurrentValue() const;
-	void ApplyRandomAction() const;
 	ndInt32 GetEpisodeFrames() const;
 	ndInt32 SelectBestAction() const;
-	ndInt32 GetOpmizationDelay() const;
-	void SetOpmizationDelay(ndInt32 delay);
 	void Save(ndBrainSave* const loadSave) const;
 
 	ndSharedPtr<ndBrain> m_actor;
@@ -63,26 +60,6 @@ ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN(const ndSharedPtr<ndBrain
 	m_actions.SetCount(actionDim);
 	m_state.Set(ndReal(0.0f));
 	m_actions.Set(ndReal(0.0f));
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN<statesDim, actionDim>::ApplyRandomAction() const
-{
-	ndAssert(0);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDQN<statesDim, actionDim>::GetOpmizationDelay() const
-{
-	ndAssert(0);
-	return 0;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN<statesDim, actionDim>::SetOpmizationDelay(ndInt32)
-{
-	ndAssert(0);
-	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

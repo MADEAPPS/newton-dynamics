@@ -266,15 +266,23 @@ class ndMovingAverage: public ndFixSizeArray<ndReal, size>
 		,m_average(ndReal(0.0f))
 		,m_index(0)
 	{
-		for (ndInt32 i = 0; i < size; ++i)
-		{
-			ndFixSizeArray<ndReal, size>::PushBack(ndReal(0.0f));
-		}
+		Clear();
 	}
 
 	ndReal GetAverage() const
 	{
 		return m_average;
+	}
+
+	void Clear()
+	{
+		m_index = 0;
+		m_average = ndReal(0.0f);
+		ndFixSizeArray<ndReal, size>::SetCount(0);
+		for (ndInt32 i = 0; i < size; ++i)
+		{
+			ndFixSizeArray<ndReal, size>::PushBack(ndReal(0.0f));
+		}
 	}
 
 	ndReal Update(ndReal value)
