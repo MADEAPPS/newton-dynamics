@@ -42,7 +42,6 @@
 #define D_DQN_TARGET_UPDATE_PERIOD		1000
 #define D_DQN_REGULARIZER				ndReal (2.0e-6f)
 #define D_DQN_MIN_EXPLORE_PROBABILITY	ndReal(1.0f/100.0f)
-#define D_DQN_STAR_OPTIMIZATION			(D_DQN_REPLAY_BUFFERSIZE - 1000)
 #define D_DQN_EXPLORE_ANNELININGING		(D_DQN_MIN_EXPLORE_PROBABILITY / ndReal(2.0f))
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -173,7 +172,6 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 	ndInt32 m_framesAlive;
 	ndInt32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
-	ndInt32 m_startOptimization;
 	ndInt32 m_targetUpdatePeriod;
 	bool m_collectingSamples;
 };
@@ -195,7 +193,6 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 	,m_framesAlive(0)
 	,m_eposideCount(0)
 	,m_bashBufferSize(D_DQN_REPLAY_BASH_SIZE)
-	,m_startOptimization(D_DQN_STAR_OPTIMIZATION)
 	,m_targetUpdatePeriod(D_DQN_TARGET_UPDATE_PERIOD)
 	,m_collectingSamples(true)
 {
@@ -206,10 +203,10 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 
 	m_actorOtimizer.m_agent = this;
 	m_actorOtimizer.SetRegularizer(D_DQN_REGULARIZER);
-	m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / D_DQN_STAR_OPTIMIZATION;
-
 	SetBufferSize(D_DQN_REPLAY_BUFFERSIZE);
 	m_target.CopyFrom(*(*m_actor));
+
+	m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / ndReal (m_replayBuffer.GetCapacity());
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -275,38 +272,6 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 	m_actorOtimizer.Optimize(validator, inputBatch, m_learnRate, 1);
 }
 
-//template<ndInt32 statesDim, ndInt32 actionDim>
-//ndInt32 ndBrainAgentDQN_Trainer<statesDim, actionDim>::SelectBestAction()
-//{
-//	ndFloat32 explore = ndRand();
-//	if (explore <= m_explorationProbability)
-//	{
-//		// explore environment
-//		ndUnsigned32 randomIndex = ndRandInt();
-//		ndInt32 action = ndInt32(randomIndex % actionDim);
-//		m_currentTransition.m_action[0] = action;
-//		return action;
-//	}
-//	else
-//	{
-//		// exploit environment
-//		ndInt32 bestAction = 0;
-//		ndReal maxQValue = m_actions[0];
-//		for (ndInt32 i = 1; i < actionDim; ++i)
-//		{
-//			if (m_actions[i] > maxQValue)
-//			{
-//				bestAction = i;
-//				maxQValue = m_actions[i];
-//			}
-//		}
-//
-//		m_currentQValue = maxQValue;
-//		m_currentTransition.m_action[0] = bestAction;
-//		return bestAction;
-//	}
-//}
-
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Save(ndBrainSave* const loadSave) const
 {
@@ -333,16 +298,12 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 	GetObservation(&m_state[0]);
 	m_actor->MakePrediction(m_state, m_actions);
 
-	//ndReal bestAction = ndReal(SelectBestAction());
-
 	ndInt32 action = 0;
 	ndFloat32 explore = ndRand();
 	if (explore <= m_explorationProbability)
 	{
 		// explore environment
 		ndUnsigned32 randomIndex = ndRandInt();
-		//ndInt32 action = ndInt32(randomIndex % actionDim);
-		//m_currentTransition.m_action[0] = action;
 		action = ndInt32(randomIndex % actionDim);
 	}
 	else
@@ -360,8 +321,6 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 		}
 
 		m_currentQValue = maxQValue;
-		//m_currentTransition.m_action[0] = bestAction;
-		//return bestAction;
 	}
 
 	ndReal bestAction = ndReal(action);
@@ -399,7 +358,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::OptimizeStep()
 		m_currentTransition.Clear();
 		if (IsSampling() && (m_eposideCount % 500 == 0))
 		{
-			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_startOptimization, m_eposideCount);
+			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_replayBuffer.GetCapacity(), m_eposideCount);
 		}
 		m_eposideCount++;
 		m_framesAlive = 0;

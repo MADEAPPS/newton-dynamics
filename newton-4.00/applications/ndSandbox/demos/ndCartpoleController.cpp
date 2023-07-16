@@ -82,7 +82,9 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
 					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(qValuePredictor)
 					,m_model(nullptr)
-					,m_stopTraining(1000000)
+					,m_stopTraining(1500000)
+					,m_maxGain(-1.0e10f)
+					,m_maxFrames(600.0f)
 					,m_controllerState(0)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
@@ -119,7 +121,6 @@ namespace ndController_0
 						if (state)
 						{
 							m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
-							ndExpandTraceMessage("%d moving average frames alive: %f   value: %f\n", GetFramesCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
 						}
 					}
 
@@ -166,18 +167,26 @@ namespace ndController_0
 							if (stopTraining <= m_stopTraining)
 							{
 								ndBrainAgentDQN_Trainer::OptimizeStep();
-							}
-							
-							if ((m_averageFramesPerEpisodes.GetAverage() >= 1000) || (stopTraining == m_stopTraining))
-							{
-								char fileName[1024];
-								ndGetWorkingFileName(GetName().GetStr(), fileName);
-							
-								SaveToFile(fileName);
-								ndExpandTraceMessage("\n");
-								ndExpandTraceMessage("training complete\n");
-								ndExpandTraceMessage("save to file: %s\n", fileName);
-								m_averageFramesPerEpisodes.Clear();
+
+								//if ((m_averageFramesPerEpisodes.GetAverage() >= 1000) || (stopTraining == m_stopTraining))
+								if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
+								{
+									if (m_averageQValue.GetAverage() > m_maxGain)
+									{
+										char fileName[1024];
+										ndGetWorkingFileName(GetName().GetStr(), fileName);
+
+										SaveToFile(fileName);
+										ndExpandTraceMessage("episode: %d saving to file: %s\n  averageFrames: %f  averageValue %f", GetEposideCount(), fileName, m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+										//m_averageFramesPerEpisodes.Clear();
+										m_maxGain = m_averageQValue.GetAverage();
+									}
+									if (stopTraining == m_stopTraining)
+									{
+										ndExpandTraceMessage("\n");
+										ndExpandTraceMessage("training complete\n");
+									}
+								}
 							}
 							
 							if (m_model->IsOutOfBounds())
@@ -192,6 +201,8 @@ namespace ndController_0
 
 				ndCartpole* m_model;
 				ndInt32 m_stopTraining;
+				ndFloat32 m_maxGain;
+				ndFloat32 m_maxFrames;
 				mutable ndInt32 m_controllerState;
 				mutable ndMovingAverage<256> m_averageQValue;
 				mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
@@ -228,7 +239,7 @@ namespace ndController_0
 					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 					,m_model(nullptr)
 					,m_stopTraining(1000000)
-					,m_makeRoughtRide(false)
+					,m_controllerState(0)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
 				{
@@ -241,6 +252,13 @@ namespace ndController_0
 
 				virtual void ApplyActions(ndReal* const actions) const
 				{
+					if (GetEpisodeFrames() >= 1000)
+					{
+						for (ndInt32 i = 0; i < 1; ++i)
+						{
+							actions[i] = PerturbeAction(actions[i]);
+						}
+					}
 					m_model->ApplyActions(actions);
 				}
 
@@ -252,13 +270,6 @@ namespace ndController_0
 				bool IsTerminal() const
 				{
 					bool state = m_model->IsTerminal();
-					if (GetEpisodeFrames() > 1000)
-					{
-						// kill the model if is is too long alive. 
-						// this generate a contradicting entry but for now let it be.
-						state = true;
-					}
-
 					if (!IsSampling())
 					{
 						m_averageQValue.Update(GetCurrentValue());
@@ -273,51 +284,70 @@ namespace ndController_0
 
 				void ResetModel() const
 				{
-					m_makeRoughtRide = false;
+					m_controllerState = -1;
 					m_model->ResetModel();
 				}
 
 				void Step()
 				{
-					if (m_makeRoughtRide)
+					switch (m_controllerState)
 					{
-						// try killing the model with a huge push if is alive for too long.
-						m_model->RandomePush();
+						case 0:
+						{
+							m_model->RandomePush();
+							break;
+						}
+						case 1:
+						{
+							break;
+						}
+						default:
+						{
+							ndBrainAgentDDPG_Trainer::Step();
+						}
 					}
-					ndBrainAgentDDPG_Trainer::Step();
 				}
 
 				void OptimizeStep()
 				{
-					ndInt32 stopTraining = GetFramesCount();
-					if (stopTraining <= m_stopTraining)
+					switch (m_controllerState)
 					{
-						ndBrainAgentDDPG_Trainer::OptimizeStep();
-					}
+						case 0:
+						case 1:
+							break;
 
-					if ((m_averageFramesPerEpisodes.GetAverage() >= 1000) || (stopTraining == m_stopTraining))
-					{
-						ndAssert(0);
-						char fileName[1024];
-						ndGetWorkingFileName(GetName().GetStr(), fileName);
+						default:
+						{
+							ndInt32 stopTraining = GetFramesCount();
+							if (stopTraining <= m_stopTraining)
+							{
+								ndBrainAgentDDPG_Trainer::OptimizeStep();
+							}
 
-						SaveToFile(fileName);
-						ndExpandTraceMessage("\n");
-						ndExpandTraceMessage("training complete\n");
-						ndExpandTraceMessage("save to file: %s\n", fileName);
-						m_averageFramesPerEpisodes.Clear();
-					}
+							if ((m_averageFramesPerEpisodes.GetAverage() >= 500) || (stopTraining == m_stopTraining))
+							{
+								ndAssert(0);
+								char fileName[1024];
+								ndGetWorkingFileName(GetName().GetStr(), fileName);
 
-					if (m_model->IsOutOfBounds())
-					{
-						m_makeRoughtRide = true;
-						m_model->TelePort();
+								SaveToFile(fileName);
+								ndExpandTraceMessage("\n");
+								ndExpandTraceMessage("training complete\n");
+								ndExpandTraceMessage("save to file: %s\n", fileName);
+								m_averageFramesPerEpisodes.Clear();
+							}
+
+							if (m_model->IsOutOfBounds())
+							{
+								m_model->TelePort();
+							}
+						}
 					}
 				}
 
 				ndCartpole* m_model;
 				ndInt32 m_stopTraining;
-				mutable bool m_makeRoughtRide;
+				mutable ndInt32 m_controllerState;
 				mutable ndMovingAverage<256> m_averageQValue;
 				mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
 			};
