@@ -256,9 +256,9 @@ namespace ndController_0
 
 				virtual void ApplyActions(ndReal* const actions) const
 				{
-					if (GetEpisodeFrames() >= 1000)
+					if (GetEpisodeFrames() >= 2500)
 					{
-						for (ndInt32 i = 0; i < 1; ++i)
+						for (ndInt32 i = 0; i < m_actionsSize; ++i)
 						{
 							actions[i] = PerturbeAction(actions[i]);
 						}
@@ -355,6 +355,8 @@ namespace ndController_0
 							}
 						}
 					}
+
+					m_controllerState++;
 				}
 
 				ndCartpole* m_model;

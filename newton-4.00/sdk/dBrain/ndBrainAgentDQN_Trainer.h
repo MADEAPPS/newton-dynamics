@@ -325,6 +325,32 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 	}
 }
 
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN_Trainer<statesDim, actionDim>::PopulateReplayBuffer()
+{
+	GetObservation(&m_currentTransition.m_nextState[0]);
+	m_currentTransition.m_reward = GetReward();
+	m_currentTransition.m_terminalState = IsTerminal();
+	for (ndInt32 i = 0; i < statesDim; ++i)
+	{
+		m_currentTransition.m_state[i] = ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_state[i];
+	}
+
+	m_replayBuffer.AddTransition(m_currentTransition);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Optimize()
+{
+	BackPropagate();
+	if (IsSampling())
+	{
+		ndExpandTraceMessage("%d start training: episode %d\n", m_frameCount, m_eposideCount);
+	}
+	m_collectingSamples = false;
+}
+
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::OptimizeStep()
 {
@@ -360,34 +386,5 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::OptimizeStep()
 	m_framesAlive++;
 	m_explorationProbability = ndMax(m_explorationProbability - m_explorationProbabilityAnnelining, m_minExplorationProbability);
 }
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN_Trainer<statesDim, actionDim>::PopulateReplayBuffer()
-{
-	GetObservation(&m_currentTransition.m_nextState[0]);
-	m_currentTransition.m_reward = GetReward();
-	m_currentTransition.m_terminalState = IsTerminal();
-	for (ndInt32 i = 0; i < statesDim; ++i)
-	{
-		m_currentTransition.m_state[i] = ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_state[i];
-	}
-
-	m_replayBuffer.AddTransition(m_currentTransition);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Optimize()
-{
-	BackPropagate();
-	if (IsSampling())
-	{
-		ndExpandTraceMessage("%d start training: episode %d\n", m_frameCount, m_eposideCount);
-	}
-	m_collectingSamples = false;
-}
-
-#else
-
-
 
 #endif 
