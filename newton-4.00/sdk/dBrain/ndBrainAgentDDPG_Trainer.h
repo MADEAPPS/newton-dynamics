@@ -36,8 +36,8 @@
 #define D_DDPG_CRITIC_LEARN_RATE		ndReal(2.0e-4f)
 #define D_DDPG_ACTOR_LEARN_RATE			(D_DDPG_CRITIC_LEARN_RATE * ndReal(0.5f))
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
-//#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
-#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
+#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
+//#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
 #define D_DDPG_REPLAY_BASH_SIZE			32
 #define D_DDPG_TARGET_UPDATE_PERIOD		1000
 #define D_DDPG_MIN_EXPLORE_PROBABILITY	ndReal(1.0f/100.0f)
@@ -214,13 +214,14 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 				m_agent->m_criticOptimizer.m_inputBatch[i + statesDim] = m_truth[i];
 			}
 			m_agent->m_targetCritic.MakePrediction(m_agent->m_criticOptimizer.m_inputBatch, m_agent->m_criticOptimizer.m_outputBatch);
-			 
-			//m_agent->m_critic->CalculateInpuGradients(m_agent->m_criticOptimizer.m_inputBatch, m_agent->m_criticOptimizer.m_outputBatch, m_agent->m_criticOptimizer.m_inputBatch);
-			//for (ndInt32 i = 0; i < actionDim; ++i)
-			//{
-			//	m_truth[i] -= m_agent->m_criticOptimizer.m_inputBatch[i + statesDim];
-			//}
+			m_agent->m_critic->CalculateInpuGradients(m_agent->m_criticOptimizer.m_inputBatch, m_agent->m_criticOptimizer.m_outputBatch, m_agent->m_criticOptimizer.m_inputBatch);
+			for (ndInt32 i = 0; i < actionDim; ++i)
+			{
+				//m_truth[i] -= m_agent->m_criticOptimizer.m_inputBatch[i + statesDim];
+				m_truth[i] = ndReal (2.0f) * m_truth[i] - m_agent->m_criticOptimizer.m_inputBatch[i + statesDim];
+			}
 			//BackPropagate(m_truth);
+			BackPropagate(m_inputBatch, m_truth);
 		}
 
 		virtual void Optimize()

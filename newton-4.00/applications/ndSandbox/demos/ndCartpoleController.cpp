@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#define D_USE_POLE_DQN
+//#define D_USE_POLE_DQN
 
 namespace ndController_0
 {
@@ -247,6 +247,13 @@ namespace ndController_0
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
 				{
+					m_outFile = fopen("traingPerf.csv", "wb");
+					ndAssert(m_outFile);
+				}
+
+				~ndCartpoleAgent_trainer()
+				{
+					fclose(m_outFile);
 				}
 
 				ndReal GetReward() const
@@ -353,6 +360,12 @@ namespace ndController_0
 							{
 								m_model->TelePort();
 							}
+
+							if (!IsSampling())
+							{
+								fprintf(m_outFile, "%g, %g\n", m_averageQValue.GetAverage(), GetCurrentValue());
+								fflush(m_outFile);
+							}
 						}
 					}
 
@@ -360,6 +373,7 @@ namespace ndController_0
 				}
 
 				ndCartpole* m_model;
+				FILE* m_outFile;
 				ndInt32 m_stopTraining;
 				ndFloat32 m_maxGain;
 				ndFloat32 m_maxFrames;
@@ -586,7 +600,7 @@ namespace ndController_0
 			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + actor->GetOutputSize(), layerSize, m_tanh);
 			ndBrainLayer* const criticLayer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
 			ndBrainLayer* const criticLayer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
-			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(layer2->GetOuputSize(), 1, m_lineal);
+			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(layer2->GetOuputSize(), 1, m_relu);
 			critic->BeginAddLayer();
 			critic->AddLayer(criticLayer0);
 			critic->AddLayer(criticLayer1);
