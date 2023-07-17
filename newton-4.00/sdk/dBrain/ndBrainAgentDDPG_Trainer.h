@@ -25,7 +25,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
-#include "ndBrainTrainer_old.h"
+#include "ndBrainTrainer.h"
 #include "ndBrainReplayBuffer.h"
 
 // this is an implementation of the vanilla 
@@ -75,11 +75,11 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 	void SetBufferSize(ndInt32 size);
 	
 
-	class ndCriticOptimizer: public ndBrainTrainer_old
+	class ndCriticOptimizer: public ndBrainTrainer
 	{
 		public:
 		ndCriticOptimizer(ndBrain* const brain)
-			:ndBrainTrainer_old(brain)
+			:ndBrainTrainer(brain)
 			,m_truth()
 			,m_inputBatch()
 			,m_outputBatch()
@@ -87,6 +87,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 			,m_actorAction()
 			,m_agent(nullptr)
 		{
+			ndAssert(0);
 			m_truth.SetCount(1);
 			m_outputBatch.SetCount(1);
 			m_actorState.SetCount(statesDim);
@@ -133,18 +134,22 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 			BackPropagate(m_truth);
 		}
 
-		virtual void Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32)
+		//virtual void Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32)
+		//{
+		//	ndArray<ndInt32>& shuffleBuffer = m_agent->m_replayBuffer.m_shuffleBuffer;
+		//
+		//	ClearGradientsAcc();
+		//	for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
+		//	{
+		//		ndInt32 index = shuffleBuffer[i];
+		//		//GetGroundTruth(index, truth, m_output);
+		//		EvaluateBellmanEquation(index);
+		//	}
+		//	UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
+		//}
+		virtual void Optimize()
 		{
-			ndArray<ndInt32>& shuffleBuffer = m_agent->m_replayBuffer.m_shuffleBuffer;
-
-			ClearGradientsAcc();
-			for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
-			{
-				ndInt32 index = shuffleBuffer[i];
-				//GetGroundTruth(index, truth, m_output);
-				EvaluateBellmanEquation(index);
-			}
-			UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
+			ndAssert(0);
 		}
 
 		ndReal GetQValue() 
@@ -169,16 +174,17 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 		ndBrainAgentDDPG_Trainer<statesDim, actionDim>* m_agent;
 	};
 
-	class ndActorOptimizer : public ndBrainTrainer_old
+	class ndActorOptimizer : public ndBrainTrainer
 	{
 		public:
 		ndActorOptimizer(ndBrain* const brain)
-			:ndBrainTrainer_old(brain)
+			:ndBrainTrainer(brain)
 			,m_truth()
 			,m_inputBatch()
 			,m_outputBatch()
 			,m_agent(nullptr)
 		{
+			ndAssert(0);
 			m_truth.SetCount(actionDim);
 			m_inputBatch.SetCount(statesDim);
 			m_outputBatch.SetCount(actionDim);
@@ -214,17 +220,21 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 			BackPropagate(m_truth);
 		}
 
-		virtual void Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32)
+		//virtual void Optimize(ndValidation&, const ndBrainMatrix&, ndReal, ndInt32)
+		//{
+		//	ndArray<ndInt32>& shuffleBuffer = m_agent->m_replayBuffer.m_shuffleBuffer;
+		//	ClearGradientsAcc();
+		//	for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
+		//	{
+		//		ndInt32 index = shuffleBuffer[i];
+		//		//GetGroundTruth(index, truth, m_output);
+		//		EvaluateBellmanEquation(index);
+		//	}
+		//	UpdateWeights(m_agent->m_targetLearnRate, m_agent->m_bashBufferSize);
+		//}
+		virtual void Optimize()
 		{
-			ndArray<ndInt32>& shuffleBuffer = m_agent->m_replayBuffer.m_shuffleBuffer;
-			ClearGradientsAcc();
-			for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
-			{
-				ndInt32 index = shuffleBuffer[i];
-				//GetGroundTruth(index, truth, m_output);
-				EvaluateBellmanEquation(index);
-			}
-			UpdateWeights(m_agent->m_targetLearnRate, m_agent->m_bashBufferSize);
+			ndAssert(0);
 		}
 
 		ndBrainVector m_truth;

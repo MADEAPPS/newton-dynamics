@@ -31,13 +31,10 @@
 #include <ndBrainVector.h>
 #include <ndBrainMatrix.h>
 #include <ndBrainTrainer.h>
-#include <ndBrainTrainer_old.h>
 #include <ndBrainSaveLoad.h>
 #include <ndBrainAgentDQN.h>
 #include <ndBrainAgentDDPG.h>
-#include <ndBrainTrainerBase.h>
 #include <ndBrainReplayBuffer.h>
-#include <ndBrainParallelTrainer.h>
 #include <ndBrainAgentDQN_Trainer.h>
 #include <ndBrainAgentDDPG_Trainer.h>
 
