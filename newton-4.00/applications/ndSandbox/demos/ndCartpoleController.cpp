@@ -82,9 +82,9 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
 					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(qValuePredictor)
 					,m_model(nullptr)
-					,m_stopTraining(1500000)
+					,m_stopTraining(2000000)
 					,m_maxGain(-1.0e10f)
-					,m_maxFrames(600.0f)
+					,m_maxFrames(1200.0f)
 					,m_controllerState(0)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
@@ -98,7 +98,7 @@ namespace ndController_0
 
 				virtual void ApplyActions(ndReal* const actions) const
 				{
-					if (GetEpisodeFrames() >= 1000)
+					if (GetEpisodeFrames() >= 2500)
 					{
 						ndUnsigned32 randomIndex = ndRandInt();
 						*actions = ndReal (ndInt32(randomIndex % 3));
@@ -166,18 +166,20 @@ namespace ndController_0
 							ndInt32 stopTraining = GetFramesCount();
 							if (stopTraining <= m_stopTraining)
 							{
+								ndInt32 episodeCount = GetEposideCount();
 								ndBrainAgentDQN_Trainer::OptimizeStep();
 
 								if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
 								{
-									if (m_averageQValue.GetAverage() > m_maxGain)
+									episodeCount -= GetEposideCount();
+									if (episodeCount && (m_averageQValue.GetAverage() > m_maxGain))
 									{
 										char fileName[1024];
 										ndGetWorkingFileName(GetName().GetStr(), fileName);
 
 										SaveToFile(fileName);
 										ndExpandTraceMessage("saving to file: %s\n", fileName);
-										ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+										ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
 										m_maxGain = m_averageQValue.GetAverage();
 									}
 								}
@@ -322,26 +324,28 @@ namespace ndController_0
 							ndInt32 stopTraining = GetFramesCount();
 							if (stopTraining <= m_stopTraining)
 							{
+								ndInt32 episodeCount = GetEposideCount();
 								ndBrainAgentDDPG_Trainer::OptimizeStep();
-							}
 
-							if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
-							{
-								if (m_averageQValue.GetAverage() > m_maxGain)
+								if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
 								{
-									char fileName[1024];
-									ndGetWorkingFileName(GetName().GetStr(), fileName);
+									episodeCount -= GetEposideCount();
+									if (episodeCount && (m_averageQValue.GetAverage() > m_maxGain))
+									{
+										char fileName[1024];
+										ndGetWorkingFileName(GetName().GetStr(), fileName);
 
-									SaveToFile(fileName);
-									ndExpandTraceMessage("saving to file: %s\n", fileName);
-									ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
-									m_maxGain = m_averageQValue.GetAverage();
-								}
+										SaveToFile(fileName);
+										ndExpandTraceMessage("saving to file: %s\n", fileName);
+										ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+										m_maxGain = m_averageQValue.GetAverage();
+									}
 
-								if (stopTraining == m_stopTraining)
-								{
-									ndExpandTraceMessage("\n");
-									ndExpandTraceMessage("training complete\n");
+									if (stopTraining == m_stopTraining)
+									{
+										ndExpandTraceMessage("\n");
+										ndExpandTraceMessage("training complete\n");
+									}
 								}
 							}
 
@@ -421,13 +425,33 @@ namespace ndController_0
 
 		void TelePort() const
 		{
-			m_cart->SetMatrix(m_cartMatrix);
-			m_pole->SetMatrix(m_poleMatrix);
+			ndVector veloc(m_cart->GetVelocity());
+			ndVector posit(m_cart->GetMatrix().m_posit & ndVector::m_triplexMask);
+			posit.m_y = 0.0f;
+			posit.m_z = 0.0f;
+			veloc.m_y = 0.0f;
+			veloc.m_z = 0.0f;
+
+			ndMatrix cartMatrix(m_cart->GetMatrix());
+			ndVector cartVeloc(m_cart->GetVelocity());
+			cartVeloc -= veloc;
+			cartMatrix.m_posit -= posit;
+			m_cart->SetMatrix(cartMatrix);
+			m_cart->SetVelocity(cartVeloc);
+
+			ndMatrix poleMatrix(m_pole->GetMatrix());
+			ndVector poleVeloc(m_pole->GetVelocity());
+			poleVeloc -= veloc;
+			poleMatrix.m_posit -= posit;
+			m_pole->SetMatrix(poleMatrix);
+			m_pole->SetVelocity(poleVeloc);
 		}
 
 		void ResetModel() const
 		{
-			TelePort();
+			m_cart->SetMatrix(m_cartMatrix);
+			m_pole->SetMatrix(m_poleMatrix);
+
 			m_pole->SetOmega(ndVector::m_zero);
 			m_pole->SetVelocity(ndVector::m_zero);
 
@@ -444,7 +468,7 @@ namespace ndController_0
 
 		bool IsOutOfBounds() const
 		{
-			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(30.0f);
+			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
