@@ -119,6 +119,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 				{
 					m_actorState[i] = transition.m_nextState[i];
 				}
+				//m_agent->m_actor->MakePrediction(m_actorState, m_actorAction);
 				m_agent->m_targetActor.MakePrediction(m_actorState, m_actorAction);
 
 				for (ndInt32 i = 0; i < statesDim; ++i)
