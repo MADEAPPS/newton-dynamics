@@ -204,7 +204,6 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 				m_inputBatch[i] = transition.m_state[i];
 			}
 			m_agent->m_actor->MakePrediction(m_inputBatch, m_truth);
-			
 			for (ndInt32 i = 0; i < statesDim; ++i)
 			{
 				m_agent->m_criticOptimizer.m_inputBatch[i] = transition.m_state[i];
@@ -214,14 +213,16 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 				m_agent->m_criticOptimizer.m_inputBatch[i + statesDim] = m_truth[i];
 			}
 			m_agent->m_targetCritic.MakePrediction(m_agent->m_criticOptimizer.m_inputBatch, m_agent->m_criticOptimizer.m_outputBatch);
-			m_agent->m_critic->CalculateInpuGradients(m_agent->m_criticOptimizer.m_inputBatch, m_agent->m_criticOptimizer.m_outputBatch, m_agent->m_criticOptimizer.m_inputBatch);
-			for (ndInt32 i = 0; i < actionDim; ++i)
-			{
-				//m_truth[i] -= m_agent->m_criticOptimizer.m_inputBatch[i + statesDim];
-				m_truth[i] = ndReal (2.0f) * m_truth[i] - m_agent->m_criticOptimizer.m_inputBatch[i + statesDim];
-			}
-			//BackPropagate(m_truth);
-			BackPropagate(m_inputBatch, m_truth);
+			
+			ndTrace(("!!!this is wrong\n"));
+			//m_agent->m_critic->CalculateInpuGradients(m_agent->m_criticOptimizer.m_inputBatch, m_agent->m_criticOptimizer.m_outputBatch, m_agent->m_criticOptimizer.m_inputBatch);
+			//for (ndInt32 i = 0; i < actionDim; ++i)
+			//{
+			//	//m_truth[i] -= m_agent->m_criticOptimizer.m_inputBatch[i + statesDim];
+			//	m_truth[i] = ndReal (2.0f) * m_truth[i] - m_agent->m_criticOptimizer.m_inputBatch[i + statesDim];
+			//}
+			////BackPropagate(m_truth);
+			//BackPropagate(m_inputBatch, m_truth);
 		}
 
 		virtual void Optimize()
