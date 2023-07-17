@@ -34,12 +34,11 @@
 
 // default hyper parameters defaults
 #define D_DDPG_CRITIC_LEARN_RATE		ndReal(2.0e-4f)
-#define D_DDPG_ACTOR_LEARN_RATE			(D_DDPG_CRITIC_LEARN_RATE * ndReal(0.5f))
+#define D_DDPG_ACTOR_LEARN_RATE			(D_DDPG_CRITIC_LEARN_RATE * ndReal(0.25f))
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
 //#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
 #define D_DDPG_REPLAY_BASH_SIZE			32
-#define D_DDPG_TARGET_UPDATE_PERIOD		1000
 #define D_DDPG_MIN_EXPLORE_PROBABILITY	ndReal(1.0f/100.0f)
 #define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
 #define D_DDPG_SOFT_TARGET_FACTOR		ndReal (1.0e-3f)
@@ -269,7 +268,6 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 	ndInt32 m_framesAlive;
 	ndInt32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
-	ndInt32 m_targetUpdatePeriod;
 	bool m_collectingSamples;
 };
 
@@ -296,7 +294,6 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	,m_framesAlive(0)
 	,m_eposideCount(0)
 	,m_bashBufferSize(D_DDPG_REPLAY_BASH_SIZE)
-	,m_targetUpdatePeriod(D_DDPG_TARGET_UPDATE_PERIOD)
 	,m_collectingSamples(true)
 {
 	ndAssert(m_critic->GetOutputSize() == 1);
