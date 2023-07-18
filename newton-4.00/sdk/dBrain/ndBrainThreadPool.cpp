@@ -19,25 +19,15 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_INC_H__
-#define _ND_BRAIN_INC_H__
+#include "ndBrainStdafx.h"
+#include "ndBrainThreadPool.h"
 
-#include <ndBrainStdafx.h>
+ndBrainThreadPool::ndBrainThreadPool()
+	:ndThreadPool("ndBrain")
+{
+}
 
-#include <ndBrain.h>
-#include <ndBrainTypes.h>
-#include <ndBrainAgent.h>
-#include <ndBrainLayer.h>
-#include <ndBrainVector.h>
-#include <ndBrainMatrix.h>
-#include <ndBrainTrainer.h>
-#include <ndBrainSaveLoad.h>
-#include <ndBrainAgentDQN.h>
-#include <ndBrainAgentDDPG.h>
-#include <ndBrainThreadPool.h>
-#include <ndBrainReplayBuffer.h>
-#include <ndBrainAgentDQN_Trainer.h>
-#include <ndBrainAgentDDPG_Trainer.h>
-
-#endif 
-
+ndBrainThreadPool::~ndBrainThreadPool()
+{
+	Finish();
+}

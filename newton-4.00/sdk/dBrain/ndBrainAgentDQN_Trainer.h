@@ -45,7 +45,7 @@
 #define D_DQN_EXPLORE_ANNELININGING		(D_DQN_MIN_EXPLORE_PROBABILITY / ndReal(2.0f))
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-class ndBrainAgentDQN_Trainer: public ndBrainAgent
+class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 {
 	public: 
 	ndBrainAgentDQN_Trainer(const ndSharedPtr<ndBrain>& actor);
@@ -68,6 +68,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 	private:
 	void Optimize();
 	void BackPropagate();
+	void ThreadFunction();
 	void PopulateReplayBuffer();
 	void SetBufferSize(ndInt32 size);
 
@@ -136,7 +137,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 			BackPropagate(m_inputBatch, m_truth);
 		}
 
-		virtual void Optimize()
+		void Optimize()
 		{
 			ndArray<ndInt32>& shuffleBuffer = m_agent->m_replayBuffer.m_shuffleBuffer;
 			
@@ -182,6 +183,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndSharedPtr<ndBrain>& actor)
 	:ndBrainAgent()
+	,ndBrainThreadPool()
 	,m_actor(actor)
 	,m_target(*(*m_actor))
 	,m_actorOtimizer(*m_actor)
@@ -215,6 +217,12 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDQN_Trainer<statesDim, actionDim>::~ndBrainAgentDQN_Trainer()
 {
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN_Trainer<statesDim, actionDim>::ThreadFunction()
+{
+	m_actorOtimizer.Optimize();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -256,7 +264,9 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::SetBufferSize(ndInt32 size)
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 {
-	m_actorOtimizer.Optimize();
+	TickOne();
+	Sync();
+
 	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
 	{
 		// update on line network
@@ -282,6 +292,26 @@ ndReal ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetReward() const
 {
 	ndAssert(0);
 	return ndReal (0.0f);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN_Trainer<statesDim, actionDim>::PopulateReplayBuffer()
+{
+	GetObservation(&m_currentTransition.m_nextState[0]);
+	m_currentTransition.m_reward = GetReward();
+	m_currentTransition.m_terminalState = IsTerminal();
+	m_replayBuffer.AddTransition(m_currentTransition);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Optimize()
+{
+	BackPropagate();
+	if (IsSampling())
+	{
+		ndExpandTraceMessage("%d start training: episode %d\n", m_frameCount, m_eposideCount);
+	}
+	m_collectingSamples = false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -323,31 +353,10 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 	m_currentTransition.m_action[0] = action;
 
 	ApplyActions(&bestAction);
-	if (bestAction != ndReal (m_currentTransition.m_action[0]))
+	if (bestAction != ndReal(m_currentTransition.m_action[0]))
 	{
-		m_currentTransition.m_action[0] = ndInt32 (bestAction);
+		m_currentTransition.m_action[0] = ndInt32(bestAction);
 	}
-}
-
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN_Trainer<statesDim, actionDim>::PopulateReplayBuffer()
-{
-	GetObservation(&m_currentTransition.m_nextState[0]);
-	m_currentTransition.m_reward = GetReward();
-	m_currentTransition.m_terminalState = IsTerminal();
-	m_replayBuffer.AddTransition(m_currentTransition);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Optimize()
-{
-	BackPropagate();
-	if (IsSampling())
-	{
-		ndExpandTraceMessage("%d start training: episode %d\n", m_frameCount, m_eposideCount);
-	}
-	m_collectingSamples = false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
