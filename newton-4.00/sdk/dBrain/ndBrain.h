@@ -53,7 +53,8 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
-	void CalculateInpuGradients(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients);
+	void CalculateInputGradients(const ndBrainVector& input, ndBrainVector& inputGradients);
+	void CalculateInputGradientLoss(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients);
 
 	private:
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output, const ndBrainVector& hiddenLayerOutputs);

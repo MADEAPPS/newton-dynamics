@@ -241,7 +241,7 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 	MakePrediction(input, output, z);
 }
 
-void ndBrain::CalculateInpuGradients(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients)
+void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients)
 {
 	ndBrain::ndHidenVariableOffsets offsets(this);
 	const ndArray<ndBrainLayer*>& layers = (*this);
@@ -290,4 +290,15 @@ void ndBrain::CalculateInpuGradients(const ndBrainVector& input, const ndBrainVe
 	}
 	ndAssert(inputGradients.GetCount() == gradient.GetCount());
 	inputGradients.Set(gradient);
+}
+
+void ndBrain::CalculateInputGradients(const ndBrainVector& input, ndBrainVector& inputGradients)
+{
+	ndBrain::ndHidenVariableOffsets offsets(this);
+	const ndArray<ndBrainLayer*>& layers = (*this);
+
+	ndAssert(layers.GetCount());
+	ndAssert(input.GetCount() == GetInputSize());
+	ndAssert(inputGradients.GetCount() == GetOutputSize());
+
 }
