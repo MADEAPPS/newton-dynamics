@@ -299,6 +299,7 @@ void ndBrain::CalculateInputGradients(const ndBrainVector& input, ndBrainVector&
 
 	ndAssert(layers.GetCount());
 	ndAssert(input.GetCount() == GetInputSize());
-	ndAssert(inputGradients.GetCount() == GetOutputSize());
+	ndAssert(inputGradients.GetCount() == GetInputSize());
 
+	inputGradients.Set(0.0f);
 }
