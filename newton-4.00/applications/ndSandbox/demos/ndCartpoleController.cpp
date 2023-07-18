@@ -193,6 +193,7 @@ namespace ndController_0
 
 								if (episodeCount && !IsSampling())
 								{
+									ndExpandTraceMessage("%g\n", m_averageQValue.GetAverage());
 									fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
 									fflush(m_outFile);
 								}
@@ -578,7 +579,7 @@ namespace ndController_0
 			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
 			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
 			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
-			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_lineal);
+			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_relu);
 			actor->BeginAddLayer();
 			actor->AddLayer(layer0);
 			actor->AddLayer(layer1);
