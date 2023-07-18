@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-//#define D_USE_POLE_DQN
+#define D_USE_POLE_DQN
 
 namespace ndController_0
 {
@@ -89,6 +89,13 @@ namespace ndController_0
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
 				{
+					m_outFile = fopen("traingPerf.csv", "wb");
+					ndAssert(m_outFile);
+				}
+
+				~ndCartpoleAgent_trainer()
+				{
+					fclose(m_outFile);
 				}
 
 				ndReal GetReward() const
@@ -168,10 +175,10 @@ namespace ndController_0
 							{
 								ndInt32 episodeCount = GetEposideCount();
 								ndBrainAgentDQN_Trainer::OptimizeStep();
+								episodeCount -= GetEposideCount();
 
 								if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
 								{
-									episodeCount -= GetEposideCount();
 									if (episodeCount && (m_averageQValue.GetAverage() > m_maxGain))
 									{
 										char fileName[1024];
@@ -182,6 +189,12 @@ namespace ndController_0
 										ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
 										m_maxGain = m_averageQValue.GetAverage();
 									}
+								}
+
+								if (episodeCount && !IsSampling())
+								{
+									fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
+									fflush(m_outFile);
 								}
 
 								if (stopTraining == m_stopTraining)
@@ -201,6 +214,7 @@ namespace ndController_0
 					m_controllerState++;
 				}
 
+				FILE* m_outFile;
 				ndCartpole* m_model;
 				ndInt32 m_stopTraining;
 				ndFloat32 m_maxGain;
@@ -334,9 +348,9 @@ namespace ndController_0
 								ndInt32 episodeCount = GetEposideCount();
 								ndBrainAgentDDPG_Trainer::OptimizeStep();
 
+								episodeCount -= GetEposideCount();
 								if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
 								{
-									episodeCount -= GetEposideCount();
 									if (episodeCount && (m_averageQValue.GetAverage() > m_maxGain))
 									{
 										char fileName[1024];
@@ -347,12 +361,19 @@ namespace ndController_0
 										ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
 										m_maxGain = m_averageQValue.GetAverage();
 									}
+								}
 
-									if (stopTraining == m_stopTraining)
-									{
-										ndExpandTraceMessage("\n");
-										ndExpandTraceMessage("training complete\n");
-									}
+								if (episodeCount && !IsSampling())
+								{
+									ndExpandTraceMessage("%g\n", m_averageQValue.GetAverage());
+									fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
+									fflush(m_outFile);
+								}
+
+								if (stopTraining == m_stopTraining)
+								{
+									ndExpandTraceMessage("\n");
+									ndExpandTraceMessage("training complete\n");
 								}
 							}
 
@@ -360,20 +381,14 @@ namespace ndController_0
 							{
 								m_model->TelePort();
 							}
-
-							if (!IsSampling())
-							{
-								fprintf(m_outFile, "%g, %g\n", m_averageQValue.GetAverage(), GetCurrentValue());
-								fflush(m_outFile);
-							}
 						}
 					}
 
 					m_controllerState++;
 				}
 
-				ndCartpole* m_model;
 				FILE* m_outFile;
+				ndCartpole* m_model;
 				ndInt32 m_stopTraining;
 				ndFloat32 m_maxGain;
 				ndFloat32 m_maxFrames;

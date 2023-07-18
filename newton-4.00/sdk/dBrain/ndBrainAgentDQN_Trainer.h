@@ -289,6 +289,10 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 {
 	GetObservation(&m_state[0]);
 	m_actor->MakePrediction(m_state, m_actions);
+	for (ndInt32 i = 0; i < statesDim; ++i)
+	{
+		m_currentTransition.m_state[i] = ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_state[i];
+	}
 
 	ndInt32 action = 0;
 	ndFloat32 explore = ndRand();
@@ -332,11 +336,6 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::PopulateReplayBuffer()
 	GetObservation(&m_currentTransition.m_nextState[0]);
 	m_currentTransition.m_reward = GetReward();
 	m_currentTransition.m_terminalState = IsTerminal();
-	for (ndInt32 i = 0; i < statesDim; ++i)
-	{
-		m_currentTransition.m_state[i] = ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_state[i];
-	}
-
 	m_replayBuffer.AddTransition(m_currentTransition);
 }
 
@@ -356,10 +355,9 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::OptimizeStep()
 {
 	if (!m_frameCount)
 	{
-		ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_state.Set(ndReal(0.0f));
-		ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
+		//ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_state.Set(ndReal(0.0f));
+		//ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
 		ResetModel();
-		m_currentTransition.Clear();
 	}
 
 	PopulateReplayBuffer();

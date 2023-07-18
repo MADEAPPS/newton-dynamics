@@ -73,7 +73,6 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 	void PopulateReplayBuffer();
 	void SetBufferSize(ndInt32 size);
 	
-
 	class ndCriticOptimizer: public ndBrainTrainer
 	{
 		public:
@@ -118,7 +117,6 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 				{
 					m_actorState[i] = transition.m_nextState[i];
 				}
-				//m_agent->m_actor->MakePrediction(m_actorState, m_actorAction);
 				m_agent->m_targetActor.MakePrediction(m_actorState, m_actorAction);
 
 				for (ndInt32 i = 0; i < statesDim; ++i)
@@ -398,7 +396,11 @@ ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PerturbeAction(ndReal act
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 {
-	GetObservation(&m_state[0]);
+	GetObservation(&m_currentTransition.m_state[0]);
+	for (ndInt32 i = 0; i < statesDim; ++i)
+	{
+		ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_state[i] = m_currentTransition.m_state[i];
+	}
 	m_actor->MakePrediction(m_state, m_actions);
 
 	ndFloat32 explore = ndRand();
@@ -412,8 +414,12 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 	}
 	m_currentQValue = m_criticOptimizer.GetQValue();
 	ApplyActions(&m_actions[0]);
-}
 
+	for (ndInt32 i = 0; i < actionDim; ++i)
+	{
+		m_currentTransition.m_action[i] = m_actions[i];
+	}
+}
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PopulateReplayBuffer()
@@ -421,11 +427,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PopulateReplayBuffer()
 	GetObservation(&m_currentTransition.m_nextState[0]);
 	m_currentTransition.m_reward = GetReward();
 	m_currentTransition.m_terminalState = IsTerminal();
-	for (ndInt32 i = 0; i < statesDim; ++i)
-	{
-		m_currentTransition.m_state[i] = ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_state[i];
-	}
-
 	m_replayBuffer.AddTransition(m_currentTransition);
 }
 
@@ -445,10 +446,10 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::OptimizeStep()
 {
 	if (!m_frameCount)
 	{
-		ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_state.Set(ndReal(0.0f));
-		ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
+		//ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_state.Set(ndReal(0.0f));
+		//ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
 		ResetModel();
-		m_currentTransition.Clear();
+		//m_currentTransition.Clear();
 	}
 
 	PopulateReplayBuffer();
