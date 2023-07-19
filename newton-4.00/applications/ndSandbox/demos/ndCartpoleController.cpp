@@ -82,7 +82,7 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
 					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(qValuePredictor)
 					,m_model(nullptr)
-					,m_stopTraining(2000000)
+					,m_stopTraining(5000000)
 					,m_maxGain(-1.0e10f)
 					,m_maxFrames(1200.0f)
 					,m_controllerState(0)

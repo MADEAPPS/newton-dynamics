@@ -259,10 +259,8 @@ void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBra
 	}
 
 	ndReal* const gradientBuffer = ndAlloca(ndReal, capacity);
-	//ndReal* const inpuBuffer = ndAlloca(ndReal, groundTruth.GetCount());
 	ndReal* const hidden_zBuffer = ndAlloca(ndReal, offsets[offsets.GetCount() - 1]);
 	
-	//ndDeepBrainMemVector output(inpuBuffer, groundTruth.GetCount());
 	ndDeepBrainMemVector gradient(gradientBuffer, capacity);
 	ndDeepBrainMemVector hidden_z(hidden_zBuffer, offsets[offsets.GetCount() - 1]);
 
@@ -310,19 +308,14 @@ void ndBrain::CalculateInputGradients(const ndBrainVector& input, ndBrainVector&
 		capacity = ndMax(capacity, layer->GetColumns());
 	}
 
-	ndAssert(0);
-	//ndReal inpuBuffer[16];
 	ndReal* const gradientBuffer = ndAlloca(ndReal, capacity);
-	//ndReal* const inpuBuffer = ndAlloca(ndReal, groundTruth.GetCount());
 	ndReal* const hidden_zBuffer = ndAlloca(ndReal, offsets[offsets.GetCount() - 1]);
 	
-	//ndDeepBrainMemVector output(inpuBuffer, groundTruth.GetCount());
 	ndDeepBrainMemVector gradient(gradientBuffer, capacity);
 	ndDeepBrainMemVector hidden_z(hidden_zBuffer, offsets[offsets.GetCount() - 1]);
 
 	gradient.SetCount(1);
 	MakePrediction(input, gradient, hidden_z);
-	//gradient.Sub(groundTruth);
 	gradient[0] = ndReal(1.0f);
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
@@ -345,5 +338,4 @@ void ndBrain::CalculateInputGradients(const ndBrainVector& input, ndBrainVector&
 	}
 	ndAssert(inputGradients.GetCount() == gradient.GetCount());
 	inputGradients.Set(gradient);
-
 }
