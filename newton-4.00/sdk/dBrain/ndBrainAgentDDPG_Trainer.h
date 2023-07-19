@@ -215,7 +215,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 			m_agent->m_actor->MakePrediction(m_inputBatch, m_truth);
 			for (ndInt32 i = 0; i < actionDim; ++i)
 			{
-				ndReal x = m_truth[i] + m_agent->m_criticOptimizer.m_inputBatch[i + statesDim] * ndReal(0.01f);
+				ndReal x = m_truth[i] + m_agent->m_criticOptimizer.m_inputBatch[i + statesDim] * ndReal(0.1f);
 				m_truth[i] = ndClamp(x, ndReal(-1.0f), ndReal(1.0f));
 			}
 			BackPropagate(m_inputBatch, m_truth);

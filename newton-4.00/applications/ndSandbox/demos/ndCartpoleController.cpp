@@ -626,7 +626,7 @@ namespace ndController_0
 			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + actor->GetOutputSize(), layerSize, m_tanh);
 			ndBrainLayer* const criticLayer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
 			ndBrainLayer* const criticLayer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
-			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(layer2->GetOuputSize(), 1, m_relu);
+			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(layer2->GetOuputSize(), 1, m_lineal);
 			critic->BeginAddLayer();
 			critic->AddLayer(criticLayer0);
 			critic->AddLayer(criticLayer1);
