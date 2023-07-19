@@ -36,8 +36,8 @@
 #define D_DDPG_CRITIC_LEARN_RATE		ndReal(2.0e-4f)
 #define D_DDPG_ACTOR_LEARN_RATE			(D_DDPG_CRITIC_LEARN_RATE * ndReal(0.25f))
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
-//#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
-#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
+#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
+//#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
 #define D_DDPG_REPLAY_BASH_SIZE			32
 #define D_DDPG_MIN_EXPLORE_PROBABILITY	ndReal(1.0f/100.0f)
 #define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
@@ -216,8 +216,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 			for (ndInt32 i = 0; i < actionDim; ++i)
 			{
 				ndReal x = m_truth[i] + m_agent->m_criticOptimizer.m_inputBatch[i + statesDim] * ndReal(0.01f);
-				ndReal x1 = ndSquash(x);
-				m_truth[i] = ndSquash(x);
+				m_truth[i] = ndClamp(x, ndReal(-1.0f), ndReal(1.0f));
 			}
 			BackPropagate(m_inputBatch, m_truth);
 		}
@@ -389,7 +388,8 @@ ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetReward() const
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PerturbeAction(ndReal action) const
 {
-	return ndSquash(ndGaussianRandom(ndFloat32(action), ndFloat32(m_actionNoiseDeviation)));
+	//return ndSquash(ndGaussianRandom(ndFloat32(action), ndFloat32(m_actionNoiseDeviation)));
+	return ndClamp(ndGaussianRandom(ndFloat32(action), ndFloat32(m_actionNoiseDeviation)), ndFloat32(-1.0f), ndFloat32(1.0f));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

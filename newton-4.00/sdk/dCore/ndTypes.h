@@ -247,8 +247,8 @@ typedef double ndFloat64;
 #define ndRsqrt(x)		(ndFloat32 (1.0f) / ndSqrt(x))
 
 #if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
-	//#define ndCheckFloat(x) (_finite(x) && !_isnan(x))
-	#define ndCheckFloat(x) (1)
+	//#define ndCheckFloat(x) (1)
+	#define ndCheckFloat(x) (_finite(x) && !_isnan(x))
 #else
 	//#define ndCheckFloat(x) (isfinite(x) && !isnan(x))
 	#define ndCheckFloat(x) (1)
