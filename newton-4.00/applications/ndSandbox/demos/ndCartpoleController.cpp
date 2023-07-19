@@ -90,12 +90,14 @@ namespace ndController_0
 					,m_averageFramesPerEpisodes()
 				{
 					m_outFile = fopen("traingPerf.csv", "wb");
-					ndAssert(m_outFile);
 				}
 
 				~ndCartpoleAgent_trainer()
 				{
-					fclose(m_outFile);
+					if (m_outFile)
+					{
+						fclose(m_outFile);
+					}
 				}
 
 				ndReal GetReward() const
@@ -194,8 +196,11 @@ namespace ndController_0
 								if (episodeCount && !IsSampling())
 								{
 									ndExpandTraceMessage("%g\n", m_averageQValue.GetAverage());
-									fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
-									fflush(m_outFile);
+									if (m_outFile)
+									{
+										fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
+										fflush(m_outFile);
+									}
 								}
 
 								if (stopTraining == m_stopTraining)
@@ -263,12 +268,14 @@ namespace ndController_0
 					,m_averageFramesPerEpisodes()
 				{
 					m_outFile = fopen("traingPerf.csv", "wb");
-					ndAssert(m_outFile);
 				}
 
 				~ndCartpoleAgent_trainer()
 				{
-					fclose(m_outFile);
+					if (m_outFile)
+					{
+						fclose(m_outFile);
+					}
 				}
 
 				ndReal GetReward() const
@@ -367,8 +374,11 @@ namespace ndController_0
 								if (episodeCount && !IsSampling())
 								{
 									ndExpandTraceMessage("%g\n", m_averageQValue.GetAverage());
-									fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
-									fflush(m_outFile);
+									if (m_outFile)
+									{
+										fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
+										fflush(m_outFile);
+									}
 								}
 
 								if (stopTraining == m_stopTraining)
@@ -579,7 +589,7 @@ namespace ndController_0
 			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
 			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
 			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
-			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_relu);
+			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_lineal);
 			actor->BeginAddLayer();
 			actor->AddLayer(layer0);
 			actor->AddLayer(layer1);

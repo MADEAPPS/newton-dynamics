@@ -259,14 +259,14 @@ void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBra
 	}
 
 	ndReal* const gradientBuffer = ndAlloca(ndReal, capacity);
-	ndReal* const inpuBuffer = ndAlloca(ndReal, groundTruth.GetCount());
+	//ndReal* const inpuBuffer = ndAlloca(ndReal, groundTruth.GetCount());
 	ndReal* const hidden_zBuffer = ndAlloca(ndReal, offsets[offsets.GetCount() - 1]);
 	
-	ndDeepBrainMemVector output(inpuBuffer, groundTruth.GetCount());
+	//ndDeepBrainMemVector output(inpuBuffer, groundTruth.GetCount());
 	ndDeepBrainMemVector gradient(gradientBuffer, capacity);
-	gradient.SetCount(groundTruth.GetCount());
 	ndDeepBrainMemVector hidden_z(hidden_zBuffer, offsets[offsets.GetCount() - 1]);
 
+	gradient.SetCount(groundTruth.GetCount());
 	MakePrediction(input, gradient, hidden_z);
 	gradient.Sub(groundTruth);
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
@@ -298,8 +298,52 @@ void ndBrain::CalculateInputGradients(const ndBrainVector& input, ndBrainVector&
 	const ndArray<ndBrainLayer*>& layers = (*this);
 
 	ndAssert(layers.GetCount());
+	ndAssert(GetOutputSize() == 1);
 	ndAssert(input.GetCount() == GetInputSize());
 	ndAssert(inputGradients.GetCount() == GetInputSize());
 
-	inputGradients.Set(0.0f);
+	ndInt32 capacity = 0;
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+		const ndBrainLayer* const layer = layers[i];
+		capacity = ndMax(capacity, layer->GetRows());
+		capacity = ndMax(capacity, layer->GetColumns());
+	}
+
+	ndAssert(0);
+	//ndReal inpuBuffer[16];
+	ndReal* const gradientBuffer = ndAlloca(ndReal, capacity);
+	//ndReal* const inpuBuffer = ndAlloca(ndReal, groundTruth.GetCount());
+	ndReal* const hidden_zBuffer = ndAlloca(ndReal, offsets[offsets.GetCount() - 1]);
+	
+	//ndDeepBrainMemVector output(inpuBuffer, groundTruth.GetCount());
+	ndDeepBrainMemVector gradient(gradientBuffer, capacity);
+	ndDeepBrainMemVector hidden_z(hidden_zBuffer, offsets[offsets.GetCount() - 1]);
+
+	gradient.SetCount(1);
+	MakePrediction(input, gradient, hidden_z);
+	//gradient.Sub(groundTruth);
+	gradient[0] = ndReal(1.0f);
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+		const ndBrainLayer* const layer = layers[i];
+		ndAssert(layer->GetRows() == layer->GetOuputSize());
+		ndAssert(layer->GetColumns() == layer->GetInputSize());
+
+		ndReal* const outBuff = ndAlloca(ndReal, layer->GetInputSize());
+		ndReal* const derBuff = ndAlloca(ndReal, layer->GetOuputSize());
+		ndDeepBrainMemVector outGradient(outBuff, layer->GetInputSize());
+		ndDeepBrainMemVector g(derBuff, layer->GetOuputSize());
+		ndDeepBrainMemVector z(&hidden_z[offsets[i]], layer->GetOuputSize());
+
+		layer->ActivationDerivative(z, g);
+		g.Mul(gradient);
+		layer->TransposeMul(g, outGradient);
+
+		gradient.SetCount(outGradient.GetCount());
+		gradient.Set(outGradient);
+	}
+	ndAssert(inputGradients.GetCount() == gradient.GetCount());
+	inputGradients.Set(gradient);
+
 }
