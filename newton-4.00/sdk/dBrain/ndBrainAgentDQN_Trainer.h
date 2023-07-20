@@ -33,6 +33,7 @@
 // https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
 
 // default hyper parameters defaults
+#define D_DQN_THREADS					4
 #define D_DQN_LEARN_RATE				ndReal(2.0e-4f)
 #define D_DQN_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DQN_REPLAY_BUFFERSIZE			(1024 * 512)
@@ -68,11 +69,10 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	private:
 	void Optimize();
 	void BackPropagate();
-	//void ThreadFunction();
 	void PopulateReplayBuffer();
 	void SetBufferSize(ndInt32 size);
 
-	class ndOptimizer : public ndBrainTrainer
+	class ndOptimizer: public ndBrainTrainer
 	{
 		public:
 		ndOptimizer(ndBrain* const brain)
@@ -137,27 +137,19 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 			BackPropagate(m_inputBatch, m_truth);
 		}
 
-		void Optimize()
-		{
-
-			auto TestThread = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-			{
-				ndTrace(("%d %d\n", threadIndex, threadCount));
-				//m_actorOtimizer.Optimize();
-			});
-			m_agent->ParallelExecute(TestThread);
-
-			ndArray<ndInt32>& shuffleBuffer = m_agent->m_replayBuffer.m_shuffleBuffer;
-			
-			ClearGradientsAcc();
-			shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
-			for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
-			{
-				ndInt32 index = shuffleBuffer[i];
-				EvaluateBellmanEquation(index);
-			}
-			UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
-		}
+		//void Optimize()
+		//{
+		//	ndArray<ndInt32>& shuffleBuffer = m_agent->m_replayBuffer.m_shuffleBuffer;
+		//	
+		//	ClearGradientsAcc();
+		//	shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
+		//	for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
+		//	{
+		//		ndInt32 index = shuffleBuffer[i];
+		//		EvaluateBellmanEquation(index);
+		//	}
+		//	UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
+		//}
 
 		ndBrainVector m_truth;
 		ndBrainVector m_inputBatch;
@@ -209,6 +201,8 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 	,m_targetUpdatePeriod(D_DQN_TARGET_UPDATE_PERIOD)
 	,m_collectingSamples(true)
 {
+	SetThreadCount(ndBrainThreadPool::GetMaxThreads());
+
 	m_state.SetCount(statesDim);
 	m_actions.SetCount(actionDim);
 	m_state.Set(ndReal(0.0f));
@@ -226,12 +220,6 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDQN_Trainer<statesDim, actionDim>::~ndBrainAgentDQN_Trainer()
 {
 }
-
-//template<ndInt32 statesDim, ndInt32 actionDim>
-//void ndBrainAgentDQN_Trainer<statesDim, actionDim>::ThreadFunction()
-//{
-//	m_actorOtimizer.Optimize();
-//}
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndInt32 ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetFramesCount() const
@@ -272,7 +260,37 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::SetBufferSize(ndInt32 size)
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 {
-	m_actorOtimizer.Optimize();
+	ndArray<ndInt32>& shuffleBuffer = m_replayBuffer.m_shuffleBuffer;
+	shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
+
+	auto TestThread = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		ndArray<ndInt32>& shuffleBuffer = m_replayBuffer.m_shuffleBuffer;
+
+		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
+		if (threadIndex > 0)
+		{
+			return;
+		}
+
+		m_actorOtimizer.ClearGradientsAcc();
+		for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
+		{
+			ndInt32 index = shuffleBuffer[i];
+			m_actorOtimizer.EvaluateBellmanEquation(index);
+		}
+	});
+	ParallelExecute(TestThread);
+
+	//m_actorOtimizer.ClearGradientsAcc();
+	//for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
+	//{
+	//	ndInt32 index = shuffleBuffer[i];
+	//	m_actorOtimizer.EvaluateBellmanEquation(index);
+	//}
+	m_actorOtimizer.UpdateWeights(m_learnRate, m_bashBufferSize);
+
+	//m_actorOtimizer.Optimize();
 	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
 	{
 		// update on line network

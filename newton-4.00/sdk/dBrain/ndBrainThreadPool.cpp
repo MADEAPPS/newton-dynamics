@@ -66,7 +66,7 @@ ndBrainThreadPool::ndBrainThreadPool()
 	,ndSyncMutex()
 	,m_workers()
 {
-	SetThreadCount(4);
+	SetThreadCount(1);
 }
 
 ndBrainThreadPool::~ndBrainThreadPool()
