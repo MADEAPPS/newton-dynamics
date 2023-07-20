@@ -28,15 +28,28 @@
 class ndBrainLoad;
 class ndBrainSave;
 
+class ndHidenVariableOffsets: public ndFixSizeArray<ndInt32, 32>
+{
+	public:
+	ndHidenVariableOffsets()
+		:ndFixSizeArray<ndInt32, 32>()
+	{
+	}
+
+	ndHidenVariableOffsets(const ndHidenVariableOffsets& src)
+		:ndFixSizeArray<ndInt32, 32>()
+	{
+		ndFixSizeArray<ndInt32, 32>::SetCount(0);
+		for (ndInt32 i = 0; i < src.GetCount(); ++i)
+		{
+			ndFixSizeArray<ndInt32, 32>::PushBack(src[i]);
+		}
+	}
+};
+
 class ndBrain: public ndArray<ndBrainLayer*>
 {
 	public: 
-	class ndHidenVariableOffsets : public ndFixSizeArray<ndInt32, 256>
-	{
-		public:
-		ndHidenVariableOffsets(ndBrain* const brain);
-	};
-
 	ndBrain();
 	ndBrain(const ndBrain& src);
 	~ndBrain();
@@ -57,10 +70,12 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	void CalculateInputGradientLoss(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients);
 
 	private:
+	void CalculateOffsets();
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output, const ndBrainVector& hiddenLayerOutputs);
 
 	ndReal* m_memory;
 	ndInt32 m_memorySize;
+	ndHidenVariableOffsets m_offsets;
 	bool m_isReady;
 
 	friend class ndBrainLoad;

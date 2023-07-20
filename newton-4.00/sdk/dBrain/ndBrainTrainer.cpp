@@ -24,21 +24,6 @@
 #include "ndBrainLayer.h"
 #include "ndBrainTrainer.h"
 
-ndBrainTrainer::ndHidenVariableOffsets::ndHidenVariableOffsets()
-	:ndFixSizeArray<ndInt32, 256>()
-{
-}
-
-ndBrainTrainer::ndHidenVariableOffsets::ndHidenVariableOffsets(const ndHidenVariableOffsets& src)
-	:ndFixSizeArray<ndInt32, 256>()
-{
-	ndFixSizeArray<ndInt32, 256>::SetCount(0);
-	for (ndInt32 i = 0; i < src.GetCount(); ++i)
-	{
-		ndFixSizeArray<ndInt32, 256>::PushBack(src[i]);
-	}
-}
-
 ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
 	:ndClassAlloc()
 	,m_z()
@@ -105,7 +90,7 @@ void ndBrainTrainer::SetRegularizer(ndReal regularizer)
 void ndBrainTrainer::PrefixScan()
 {
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
-	const ndBrain::ndHidenVariableOffsets preFixScan(m_brain);
+	const ndHidenVariableOffsets& preFixScan = m_brain->m_offsets;
 
 	ndInt32 size = preFixScan[preFixScan.GetCount()-1];
 	m_z.SetCount(size);
@@ -121,14 +106,11 @@ void ndBrainTrainer::PrefixScan()
 	m_biasGradient_u.Set(0.0f);
 	m_biasGradient_v.Set(0.0f);
 
-	//m_weightGradientsPrefixScan.SetCount(layers.GetCount());
 	m_weightGradientsPrefixScan.SetCount(0);
-	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		ndBrainLayer* const layer = layers[i];
 		ndInt32 stride = (layer->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-		//m_weightGradientsPrefixScan[i] = stride * layer->GetOuputSize();
 		m_weightGradientsPrefixScan.PushBack (stride * layer->GetOuputSize());
 	}
 
@@ -164,7 +146,8 @@ void ndBrainTrainer::BackPropagateOutputLayer(const ndBrainVector& groundTruth)
 	ndBrainLayer* const ouputLayer = layers[layerIndex];
 	const ndInt32 inputCount = ouputLayer->GetInputSize();
 	const ndInt32 outputCount = ouputLayer->GetOuputSize();
-	const ndBrain::ndHidenVariableOffsets preFixScan(m_brain);
+	//const ndHidenVariableOffsets preFixScan(m_brain);
+	const ndHidenVariableOffsets& preFixScan = m_brain->m_offsets;
 	ndDeepBrainMemVector biasGradients(&m_biasGradients[preFixScan[layerIndex + 1]], outputCount);
 	ndDeepBrainMemVector biasGradientsAcc(&m_biasGradientsAcc[preFixScan[layerIndex + 1]], outputCount);
 	const ndDeepBrainMemVector z(&m_z[preFixScan[layerIndex + 1]], outputCount);
@@ -191,7 +174,8 @@ void ndBrainTrainer::BackPropagateCalculateBiasGradient(ndInt32 layerIndex)
 {
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
 	ndBrainLayer* const layer = layers[layerIndex + 1];
-	const ndBrain::ndHidenVariableOffsets preFixScan(m_brain);
+	//const ndHidenVariableOffsets preFixScan(m_brain);
+	const ndHidenVariableOffsets& preFixScan = m_brain->m_offsets;
 
 	const ndDeepBrainMemVector biasGradients1(&m_biasGradients[preFixScan[layerIndex + 2]], layer->GetOuputSize());
 	ndDeepBrainMemVector biasGradients(&m_biasGradients[preFixScan[layerIndex + 1]], layer->GetInputSize());
@@ -209,7 +193,7 @@ void ndBrainTrainer::BackPropagateHiddenLayer(ndInt32 layerIndex)
 	BackPropagateCalculateBiasGradient(layerIndex);
 
 	ndBrainLayer* const layer = layers[layerIndex];
-	const ndBrain::ndHidenVariableOffsets preFixScan(m_brain);
+	const ndHidenVariableOffsets& preFixScan = m_brain->m_offsets;
 
 	const ndDeepBrainMemVector biasGradients(&m_biasGradients[preFixScan[layerIndex + 1]], layer->GetOuputSize());
 
@@ -284,7 +268,8 @@ void ndBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 
 	const ndReal clampValue = ndReal(1.0e10f);
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
-	const ndBrain::ndHidenVariableOffsets preFixScan(m_brain);
+	//const ndHidenVariableOffsets preFixScan(m_brain);
+	const ndHidenVariableOffsets& preFixScan = m_brain->m_offsets;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 		ndBrainLayer* const layer = layers[i];
@@ -320,7 +305,8 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, const ndBrainVect
 	ndReal* const outputBuffer = ndAlloca(ndReal, layers[layers.GetCount() - 1]->GetOuputSize());
 	ndDeepBrainMemVector output(outputBuffer, layers[layers.GetCount() - 1]->GetOuputSize());
 	m_brain->MakePrediction(input, output, m_z);
-	const ndBrain::ndHidenVariableOffsets preFixScan(m_brain);
+	//const ndHidenVariableOffsets preFixScan(m_brain);
+	const ndHidenVariableOffsets& preFixScan = m_brain->m_offsets;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 		ndBrainLayer* const layer = layers[i];

@@ -24,33 +24,11 @@
 #include "ndBrainTypes.h"
 #include "ndBrainSaveLoad.h"
 
-ndBrain::ndHidenVariableOffsets::ndHidenVariableOffsets(ndBrain* const brain)
-	:ndFixSizeArray<ndInt32, 256>()
-{
-	const ndArray<ndBrainLayer*>& layers = (*brain);
-
-	SetCount(0);
-	PushBack((layers[0]->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT);
-	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	{
-		ndBrainLayer* const layer = layers[i];
-		PushBack((layer->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT);
-	}
-	
-	ndInt32 sum = 0;
-	for (ndInt32 i = 0; i < GetCount(); ++i)
-	{
-		ndInt32 size = (*this)[i];
-		(*this)[i] = sum;
-		sum += size;
-	}
-	PushBack(sum);
-}
-
 ndBrain::ndBrain()
 	:ndArray<ndBrainLayer*>()
 	,m_memory(nullptr)
 	,m_memorySize(0)
+	,m_offsets()
 	,m_isReady(false)
 {
 }
@@ -59,6 +37,7 @@ ndBrain::ndBrain(const ndBrain& src)
 	:ndArray<ndBrainLayer*>()
 	,m_memory(nullptr)
 	,m_memorySize(0)
+	,m_offsets(src.m_offsets)
 	,m_isReady(src.m_isReady)
 {
 	const ndArray<ndBrainLayer*>& srcLayers = src;
@@ -168,8 +147,32 @@ void ndBrain::EndAddLayer(ndReal randomVariance)
 		floatMemory = layer.SetFloatPointers(floatMemory);
 	}
 
+	CalculateOffsets();
+
 	InitGaussianWeights(randomVariance);
 	m_isReady = true;
+}
+
+void ndBrain::CalculateOffsets()
+{
+	m_offsets.SetCount(0);
+
+	const ndArray<ndBrainLayer*>& layers = (*this);
+	m_offsets.PushBack((layers[0]->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT);
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		ndBrainLayer* const layer = layers[i];
+		m_offsets.PushBack((layer->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT);
+	}
+	
+	ndInt32 sum = 0;
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		ndInt32 size = m_offsets[i];
+		m_offsets[i] = sum;
+		sum += size;
+	}
+	m_offsets.PushBack(sum);
 }
 
 bool ndBrain::Compare(const ndBrain& src) const
@@ -212,38 +215,38 @@ void ndBrain::InitGaussianWeights(ndReal variance)
 
 void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, const ndBrainVector& hiddenLayerOutputs)
 {
-	ndBrain::ndHidenVariableOffsets offsets(this);
+	//ndBrain::ndHidenVariableOffsets offsets(this);
 	const ndArray<ndBrainLayer*>& layers = (*this);
 	ndAssert(layers.GetCount());
 	ndAssert(input.GetCount() == GetInputSize());
 	ndAssert(output.GetCount() == GetOutputSize());
-	ndAssert(hiddenLayerOutputs.GetCount() >= offsets[offsets.GetCount() - 1]);
+	ndAssert(hiddenLayerOutputs.GetCount() >= m_offsets[m_offsets.GetCount() - 1]);
 	
-	ndDeepBrainMemVector layerInput(&hiddenLayerOutputs[offsets[0]], input.GetCount());
+	ndDeepBrainMemVector layerInput(&hiddenLayerOutputs[m_offsets[0]], input.GetCount());
 	layerInput.Set(input);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		ndBrainLayer* const layer = layers[i];
-		const ndDeepBrainMemVector in(&hiddenLayerOutputs[offsets[i + 0]], layer->GetInputSize());
-		ndDeepBrainMemVector out(&hiddenLayerOutputs[offsets[i + 1]], layer->GetOuputSize());
+		const ndDeepBrainMemVector in(&hiddenLayerOutputs[m_offsets[i + 0]], layer->GetInputSize());
+		ndDeepBrainMemVector out(&hiddenLayerOutputs[m_offsets[i + 1]], layer->GetOuputSize());
 		layer->MakePrediction(in, out);
 	}
 	
-	const ndDeepBrainMemVector out(&hiddenLayerOutputs[offsets[layers.GetCount()]], output.GetCount());
+	const ndDeepBrainMemVector out(&hiddenLayerOutputs[m_offsets[layers.GetCount()]], output.GetCount());
 	output.Set(out);
 }
 
 void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
-	ndBrain::ndHidenVariableOffsets offsets(this);
-	ndReal* const inpuBuffer = ndAlloca(ndReal, offsets[offsets.GetCount()-1]);
-	ndDeepBrainMemVector z (inpuBuffer, offsets[offsets.GetCount() - 1]);
+	//ndBrain::ndHidenVariableOffsets offsets(this);
+	ndReal* const inpuBuffer = ndAlloca(ndReal, m_offsets[m_offsets.GetCount()-1]);
+	ndDeepBrainMemVector z (inpuBuffer, m_offsets[m_offsets.GetCount() - 1]);
 	MakePrediction(input, output, z);
 }
 
 void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients)
 {
-	ndBrain::ndHidenVariableOffsets offsets(this);
+	//ndBrain::ndHidenVariableOffsets offsets(this);
 	const ndArray<ndBrainLayer*>& layers = (*this);
 	ndAssert(layers.GetCount());
 	ndAssert(input.GetCount() == GetInputSize());
@@ -259,10 +262,10 @@ void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBra
 	}
 
 	ndReal* const gradientBuffer = ndAlloca(ndReal, capacity);
-	ndReal* const hidden_zBuffer = ndAlloca(ndReal, offsets[offsets.GetCount() - 1]);
+	ndReal* const hidden_zBuffer = ndAlloca(ndReal, m_offsets[m_offsets.GetCount() - 1]);
 	
 	ndDeepBrainMemVector gradient(gradientBuffer, capacity);
-	ndDeepBrainMemVector hidden_z(hidden_zBuffer, offsets[offsets.GetCount() - 1]);
+	ndDeepBrainMemVector hidden_z(hidden_zBuffer, m_offsets[m_offsets.GetCount() - 1]);
 
 	gradient.SetCount(groundTruth.GetCount());
 	MakePrediction(input, gradient, hidden_z);
@@ -277,7 +280,7 @@ void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBra
 		ndReal* const derBuff = ndAlloca(ndReal, layer->GetOuputSize());
 		ndDeepBrainMemVector outGradient(outBuff, layer->GetInputSize());
 		ndDeepBrainMemVector g(derBuff, layer->GetOuputSize());
-		ndDeepBrainMemVector z(&hidden_z[offsets[i]], layer->GetOuputSize());
+		ndDeepBrainMemVector z(&hidden_z[m_offsets[i]], layer->GetOuputSize());
 	
 		layer->ActivationDerivative(z, g);
 		g.Mul(gradient);
@@ -292,7 +295,7 @@ void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBra
 
 void ndBrain::CalculateInputGradients(const ndBrainVector& input, ndBrainVector& inputGradients)
 {
-	ndBrain::ndHidenVariableOffsets offsets(this);
+	//ndBrain::ndHidenVariableOffsets offsets(this);
 	const ndArray<ndBrainLayer*>& layers = (*this);
 
 	ndAssert(layers.GetCount());
@@ -309,10 +312,10 @@ void ndBrain::CalculateInputGradients(const ndBrainVector& input, ndBrainVector&
 	}
 
 	ndReal* const gradientBuffer = ndAlloca(ndReal, capacity);
-	ndReal* const hidden_zBuffer = ndAlloca(ndReal, offsets[offsets.GetCount() - 1]);
+	ndReal* const hidden_zBuffer = ndAlloca(ndReal, m_offsets[m_offsets.GetCount() - 1]);
 	
 	ndDeepBrainMemVector gradient(gradientBuffer, capacity);
-	ndDeepBrainMemVector hidden_z(hidden_zBuffer, offsets[offsets.GetCount() - 1]);
+	ndDeepBrainMemVector hidden_z(hidden_zBuffer, m_offsets[m_offsets.GetCount() - 1]);
 
 	gradient.SetCount(1);
 	MakePrediction(input, gradient, hidden_z);
@@ -327,7 +330,7 @@ void ndBrain::CalculateInputGradients(const ndBrainVector& input, ndBrainVector&
 		ndReal* const derBuff = ndAlloca(ndReal, layer->GetOuputSize());
 		ndDeepBrainMemVector outGradient(outBuff, layer->GetInputSize());
 		ndDeepBrainMemVector g(derBuff, layer->GetOuputSize());
-		ndDeepBrainMemVector z(&hidden_z[offsets[i]], layer->GetOuputSize());
+		ndDeepBrainMemVector z(&hidden_z[m_offsets[i]], layer->GetOuputSize());
 
 		layer->ActivationDerivative(z, g);
 		g.Mul(gradient);

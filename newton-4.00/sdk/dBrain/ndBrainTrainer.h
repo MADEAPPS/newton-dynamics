@@ -23,6 +23,7 @@
 #define _ND_BRAIN_TRAINER_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrain.h"
 #include "ndBrainTypes.h"
 #include "ndBrainLayer.h"
 
@@ -33,13 +34,6 @@ class ndBrainTrainer: public ndClassAlloc
 	{
 		m_cgd,
 		m_adam
-	};
-
-	class ndHidenVariableOffsets : public ndFixSizeArray<ndInt32, 256>
-	{
-		public:
-		ndHidenVariableOffsets();
-		ndHidenVariableOffsets(const ndHidenVariableOffsets& src);
 	};
 
 	ndBrainTrainer(ndBrain* const brain);

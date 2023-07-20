@@ -36,11 +36,5 @@ enum ndBrainActivationType
 	m_softmax
 };
 
-class ndBrainPrefixScan : public ndFixSizeArray<ndInt32, 256>
-{
-public:
-};
-
-
 #endif 
 
