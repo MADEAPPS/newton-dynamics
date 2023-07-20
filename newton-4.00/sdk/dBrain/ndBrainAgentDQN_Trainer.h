@@ -35,8 +35,8 @@
 // default hyper parameters defaults
 #define D_DQN_LEARN_RATE				ndReal(2.0e-4f)
 #define D_DQN_DISCOUNT_FACTOR			ndReal (0.99f)
-#define D_DQN_REPLAY_BUFFERSIZE			(1024 * 512)
-//#define D_DQN_REPLAY_BUFFERSIZE			(1024)
+//#define D_DQN_REPLAY_BUFFERSIZE			(1024 * 512)
+#define D_DQN_REPLAY_BUFFERSIZE			(1024)
 #define D_DQN_MOVING_AVERAGE			64
 #define D_DQN_REPLAY_BASH_SIZE			32
 #define D_DQN_TARGET_UPDATE_PERIOD		1000
@@ -68,7 +68,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	private:
 	void Optimize();
 	void BackPropagate();
-	void ThreadFunction();
+	//void ThreadFunction();
 	void PopulateReplayBuffer();
 	void SetBufferSize(ndInt32 size);
 
@@ -219,11 +219,11 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::~ndBrainAgentDQN_Trainer()
 {
 }
 
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN_Trainer<statesDim, actionDim>::ThreadFunction()
-{
-	m_actorOtimizer.Optimize();
-}
+//template<ndInt32 statesDim, ndInt32 actionDim>
+//void ndBrainAgentDQN_Trainer<statesDim, actionDim>::ThreadFunction()
+//{
+//	m_actorOtimizer.Optimize();
+//}
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndInt32 ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetFramesCount() const
@@ -264,9 +264,13 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::SetBufferSize(ndInt32 size)
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 {
-	TickOne();
-	Sync();
-
+	//auto TestThread = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	auto TestThread = ndMakeObject::ndFunction([this](ndInt32, ndInt32)
+	{
+		m_actorOtimizer.Optimize();
+	});
+	ParallelExecute(TestThread);
+		
 	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
 	{
 		// update on line network

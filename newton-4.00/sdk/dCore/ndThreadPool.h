@@ -58,7 +58,6 @@ class ndTask
 	ndTask(){}
 	virtual ~ndTask(){}
 	virtual void Execute() const = 0;
-	friend class ndThreadPool;
 };
 
 class ndThreadPool: public ndSyncMutex, public ndThread

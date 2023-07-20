@@ -82,7 +82,7 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
 					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(qValuePredictor)
 					,m_model(nullptr)
-					,m_stopTraining(5000000)
+					,m_stopTraining(3000000)
 					,m_maxGain(-1.0e10f)
 					,m_maxFrames(1200.0f)
 					,m_controllerState(0)
@@ -260,9 +260,9 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 					,m_model(nullptr)
-					,m_stopTraining(2000000)
+					,m_stopTraining(1000000)
 					,m_maxGain(-1.0e10f)
-					,m_maxFrames(500.0f)
+					,m_maxFrames(200.0f)
 					,m_controllerState(0)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
@@ -285,13 +285,23 @@ namespace ndController_0
 
 				virtual void ApplyActions(ndReal* const actions) const
 				{
-					if (GetEpisodeFrames() >= 2500)
+					if (GetEpisodeFrames() >= 10000)
 					{
 						for (ndInt32 i = 0; i < m_actionsSize; ++i)
 						{
-							actions[i] = PerturbeAction(actions[i]);
+							ndReal veryNoisyAction = ndReal(ndClamp(100.0f * ndReal (-actions[i]), ndFloat32(-1.0f), ndFloat32(1.0f)));
+							actions[i] = veryNoisyAction;
 						}
 					}
+					else if (GetEpisodeFrames() >= 2500)
+					{
+						for (ndInt32 i = 0; i < m_actionsSize; ++i)
+						{
+							ndReal veryNoisyAction = ndReal(ndClamp(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(0.25f)), ndFloat32(-1.0f), ndFloat32(1.0f)));
+							actions[i] = veryNoisyAction;
+						}
+					}
+					ndAssert(((m_controllerState == 2) && (actions[0] >= 0.0f)) || (m_controllerState != 2));
 					m_model->ApplyActions(actions);
 				}
 
@@ -326,7 +336,7 @@ namespace ndController_0
 					{
 						case 0:
 						{
-							m_model->RandomePush();
+							//m_model->RandomePush();
 							break;
 						}
 						case 1:
@@ -345,6 +355,7 @@ namespace ndController_0
 					switch (m_controllerState)
 					{
 						case 0:
+							break;
 						case 1:
 							break;
 
@@ -373,7 +384,7 @@ namespace ndController_0
 
 								if (episodeCount && !IsSampling())
 								{
-									ndExpandTraceMessage("%g\n", m_averageQValue.GetAverage());
+									//ndExpandTraceMessage("%g\n", m_averageQValue.GetAverage());
 									if (m_outFile)
 									{
 										fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
@@ -615,18 +626,18 @@ namespace ndController_0
 			actor->EndAddLayer(ndReal(0.25f));
 
 			// clear actors bias so that the actions start centered at zero
-			for (ndInt32 i = 0; i < actor->GetCount(); ++i)
-			{
-				ndBrainLayer* const actorLayer = (*(*actor))[i];
-				ndBrainVector& actorLayerBias = actorLayer->GetBias();
-				actorLayerBias.Set(ndReal(0.0f));
-			}
+			//for (ndInt32 i = 0; i < actor->GetCount(); ++i)
+			//{
+			//	ndBrainLayer* const actorLayer = (*(*actor))[i];
+			//	ndBrainVector& actorLayerBias = actorLayer->GetBias();
+			//	actorLayerBias.Set(ndReal(0.0f));
+			//}
 
 			ndSharedPtr<ndBrain> critic(new ndBrain());
-			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + actor->GetOutputSize(), layerSize, m_tanh);
-			ndBrainLayer* const criticLayer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
-			ndBrainLayer* const criticLayer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
-			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(layer2->GetOuputSize(), 1, m_lineal);
+			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + m_actionsSize, layerSize * 2, m_tanh);
+			ndBrainLayer* const criticLayer1 = new ndBrainLayer(criticLayer0->GetOuputSize(), layerSize * 2, m_tanh);
+			ndBrainLayer* const criticLayer2 = new ndBrainLayer(criticLayer1->GetOuputSize(), layerSize * 2, m_tanh);
+			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(criticLayer2->GetOuputSize(), 1, m_lineal);
 			critic->BeginAddLayer();
 			critic->AddLayer(criticLayer0);
 			critic->AddLayer(criticLayer1);

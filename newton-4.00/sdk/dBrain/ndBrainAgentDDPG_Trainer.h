@@ -33,18 +33,16 @@
 // trainer as described in: https://arxiv.org/pdf/1509.02971.pdf
 
 // default hyper parameters defaults
-#define D_DDPG_CRITIC_LEARN_RATE		ndReal(2.0e-4f)
-#define D_DDPG_ACTOR_LEARN_RATE			(D_DDPG_CRITIC_LEARN_RATE * ndReal(0.25f))
+#define D_DDPG_CRITIC_LEARN_RATE		ndReal(5.0e-4f)
+#define D_DDPG_ACTOR_LEARN_RATE			(D_DDPG_CRITIC_LEARN_RATE * ndReal(0.15f))
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
 //#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
-#define D_DDPG_REPLAY_BASH_SIZE			32
-#define D_DDPG_MIN_EXPLORE_PROBABILITY	ndReal(1.0f/100.0f)
+#define D_DDPG_REPLAY_BASH_SIZE			64
 #define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
 #define D_DDPG_SOFT_TARGET_FACTOR		ndReal (1.0e-3f)
 #define D_DDPG_ACTION_NOISE_DEVIATION	ndReal (0.05f)
 #define D_DDPG_ACTION_GRADIENT_FRACTION ndReal (0.01f)
-#define D_DDPG_EXPLORE_ANNELININGING	(D_DDPG_MIN_EXPLORE_PROBABILITY / ndReal(2.0f))
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDDPG_Trainer : public ndBrainAgent
@@ -260,9 +258,6 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 	ndReal m_softTargetFactor;
 	ndReal m_actionNoiseDeviation;
 	ndReal m_actionGradientFraction;
-	ndReal m_explorationProbability;
-	ndReal m_minExplorationProbability;
-	ndReal m_explorationProbabilityAnnelining;
 	ndInt32 m_frameCount;
 	ndInt32 m_framesAlive;
 	ndInt32 m_eposideCount;
@@ -287,9 +282,6 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	,m_softTargetFactor(D_DDPG_SOFT_TARGET_FACTOR)
 	,m_actionNoiseDeviation(D_DDPG_ACTION_NOISE_DEVIATION)
 	,m_actionGradientFraction(D_DDPG_ACTION_GRADIENT_FRACTION)
-	,m_explorationProbability(ndReal(1.0f))
-	,m_minExplorationProbability(D_DDPG_MIN_EXPLORE_PROBABILITY)
-	,m_explorationProbabilityAnnelining(D_DDPG_EXPLORE_ANNELININGING)
 	,m_frameCount(0)
 	,m_framesAlive(0)
 	,m_eposideCount(0)
@@ -313,8 +305,6 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	SetBufferSize(D_DDPG_REPLAY_BUFFERSIZE);
 	m_targetActor.CopyFrom(*(*m_actor));
 	m_targetCritic.CopyFrom(*(*m_critic));
-
-	m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / ndReal (m_replayBuffer.GetCapacity());
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -405,17 +395,14 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 	}
 	m_actor->MakePrediction(m_state, m_actions);
 
-	ndFloat32 explore = ndRand();
-	if (explore <= m_explorationProbability)
+	// explore environment
+	for (ndInt32 i = 0; i < actionDim; ++i)
 	{
-		// explore environment
-		for (ndInt32 i = 0; i < actionDim; ++i)
-		{
-			m_actions[i] = PerturbeAction(m_actions[i]);
-		}
+		m_actions[i] = PerturbeAction(m_actions[i]);
 	}
-	m_currentQValue = m_criticOptimizer.GetQValue();
+	
 	ApplyActions(&m_actions[0]);
+	m_currentQValue = m_criticOptimizer.GetQValue();
 
 	for (ndInt32 i = 0; i < actionDim; ++i)
 	{
@@ -476,7 +463,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::OptimizeStep()
 
 	m_frameCount++;
 	m_framesAlive++;
-	m_explorationProbability = ndMax(m_explorationProbability - m_explorationProbabilityAnnelining, m_minExplorationProbability);
 }
 
 #endif 
