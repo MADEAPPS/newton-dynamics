@@ -25,34 +25,56 @@
 class ndBrainThreadPool::ndWorker : public ndThread
 {
 	public:
-	ndWorker();
-	virtual ~ndWorker();
+	ndWorker(const char* const name, ndBrainThreadPool* const owner, ndInt32 threadIndex)
+		:ndThread()
+		,m_task(nullptr)
+		,m_owner(owner)
+		,m_threadIndex(threadIndex)
+	{
+		SetName(name);
+	}
+
+	virtual ~ndWorker()
+	{
+		Finish();
+	}
+
+	void SubmmitTask(ndTask* const task)
+	{
+		ndAssert(!m_task);
+		m_task = task;
+		m_owner->Tick();
+		Signal();
+	}
 
 	private:
-	virtual void ThreadFunction();
+	void ThreadFunction()
+	{
+		m_task->Execute();
+		m_task = nullptr;
+		m_owner->Release();
+	}
 
+	ndTask* m_task;
 	ndBrainThreadPool* m_owner;
-	ndAtomic<bool> m_begin;
-	ndAtomic<bool> m_stillLooping;
-	ndAtomic<ndTask*> m_task;
 	ndInt32 m_threadIndex;
 	friend class ndBrainThreadPool;
 };
 
 ndBrainThreadPool::ndBrainThreadPool()
 	:ndClassAlloc()
+	,ndSyncMutex()
 	,m_workers()
 {
-	m_workers.SetCount(0);
+	SetThreadCount(4);
 }
 
 ndBrainThreadPool::~ndBrainThreadPool()
 {
 	for (ndInt32 i = 0; i < m_workers.GetCount(); ++i)
 	{
-		ndAssert(0);
+		delete m_workers[i];
 	}
-	//Finish();
 }
 
 ndInt32 ndBrainThreadPool::GetThreadCount() const
@@ -69,36 +91,36 @@ ndInt32 ndBrainThreadPool::GetMaxThreads()
 	#endif
 }
 
+void ndBrainThreadPool::SubmmitTask(ndTask* const task, ndInt32 index)
+{
+	m_workers[index]->SubmmitTask(task);
+}
+
 void ndBrainThreadPool::SetThreadCount(ndInt32 count)
 {
-#ifdef D_USE_THREAD_EMULATION
-	m_count = ndClamp(count, 1, D_MAX_THREADS_COUNT) - 1;
-#else
-	ndInt32 maxThread = GetMaxThreads();
-	count = ndClamp(count, 1, maxThread) - 1;
-	if (count != m_workers.GetCount())
-	{
-		ndAssert(0);
-		//if (m_workers)
-		//{
-		//	m_count = 0;
-		//	delete[] m_workers;
-		//	m_workers = nullptr;
-		//}
-		//if (count)
-		//{
-		//	m_count = count;
-		//	m_workers = new ndWorker[size_t(count)];
-		//	for (ndInt32 i = 0; i < count; ++i)
-		//	{
-		//		char name[256];
-		//		m_workers[i].m_owner = this;
-		//		m_workers[i].m_threadIndex = i;
-		//		sprintf(name, "%s_%d", m_baseName, i + 1);
-		//		m_workers[i].SetName(name);
-		//	}
-		//}
-	}
-#endif
-
+	#ifdef D_USE_THREAD_EMULATION
+		m_workers.SetCount (ndClamp(count, 1, D_MAX_THREADS_COUNT) - 1);
+	#else
+		ndInt32 maxThread = GetMaxThreads();
+		count = ndClamp(count, 1, maxThread) - 1;
+		if (count > m_workers.GetCount())
+		{
+			for (ndInt32 i = m_workers.GetCount(); i < count; ++i)
+			{
+				char name[256];
+				sprintf(name, "ndBrain_%d", i + 1);
+				ndWorker* const worker = new ndWorker(name, this, i + 1);
+				m_workers.PushBack(worker);
+			}
+		}
+		else if (count < m_workers.GetCount())
+		{
+			for (ndInt32 i = m_workers.GetCount() - 1; i >= count; --i)
+			{
+				delete m_workers[i];
+				m_workers[i] = nullptr;
+			}
+			m_workers.SetCount(count);
+		}
+	#endif
 }

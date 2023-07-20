@@ -24,7 +24,7 @@
 
 #include "ndBrainStdafx.h"
 
-class ndBrainThreadPool: public ndClassAlloc
+class ndBrainThreadPool: public ndClassAlloc, public ndSyncMutex
 {
 	public: 
 	class ndWorker;
@@ -40,11 +40,12 @@ class ndBrainThreadPool: public ndClassAlloc
 	void ParallelExecute(const Function& ndFunction);
 
 	private:
+	void SubmmitTask(ndTask* const task, ndInt32 index);
 	ndFixSizeArray<ndWorker*, D_MAX_THREADS_COUNT> m_workers;
 };
 
 template <typename Function>
-class ndBrainTaskImplement : public ndTask
+class ndBrainTaskImplement: public ndTask
 {
 	public:
 	ndBrainTaskImplement(ndInt32 threadIndex, ndBrainThreadPool* const threadPool, const Function& ndFunction)
@@ -73,7 +74,6 @@ class ndBrainTaskImplement : public ndTask
 	friend class ndBrainThreadPool;
 };
 
-
 template <typename Function>
 void ndBrainThreadPool::ParallelExecute(const Function& callback)
 {
@@ -88,34 +88,22 @@ void ndBrainThreadPool::ParallelExecute(const Function& callback)
 
 	if (m_workers.GetCount() > 0)
 	{
-		#ifdef	D_USE_THREAD_EMULATION
-		ndAssert(0);
+		//#ifdef D_USE_THREAD_EMULATION
+		#if	0
 		for (ndInt32 i = 0; i < threadCount; ++i)
 		{
-			ndTaskImplement<Function>* const job = &jobsArray[i];
+			ndBrainTaskImplement<Function>* const job = &jobsArray[i];
 			callback(job->m_threadIndex, job->m_threadCount);
 		}
 		#else
-		ndAssert(0);
-		//for (ndInt32 i = 0; i < m_count; ++i)
-		//{
-		//	ndBrainThreadPool<Function>* const job = &jobsArray[i];
-		//	m_workers[i].m_task.store(job);
-		//}
-		//ndTaskImplement<Function>* const job = &jobsArray[m_count];
-		//callback(job->m_threadIndex, job->m_threadCount);
-		//
-		//bool jobsInProgress = true;
-		//do
-		//{
-		//	ndThreadYield();
-		//	bool inProgess = false;
-		//	for (ndInt32 i = 0; i < m_count; ++i)
-		//	{
-		//		inProgess = inProgess | (m_workers[i].m_task.load() != nullptr);
-		//	}
-		//	jobsInProgress = jobsInProgress & inProgess;
-		//} while (jobsInProgress);
+		for (ndInt32 i = threadCount - 1; i > 0; --i)
+		{
+			ndBrainTaskImplement<Function>* const job = &jobsArray[i];
+			SubmmitTask(job, i - 1);
+		}
+		ndBrainTaskImplement<Function>* const job = &jobsArray[0];
+		callback(job->m_threadIndex, job->m_threadCount);
+		Sync();
 		#endif
 	}
 	else
