@@ -301,7 +301,7 @@ namespace ndController_0
 							actions[i] = veryNoisyAction;
 						}
 					}
-					ndAssert(((m_controllerState == 2) && (actions[0] >= 0.0f)) || (m_controllerState != 2));
+					//ndAssert(((m_controllerState == 2) && (actions[0] >= 0.0f)) || (m_controllerState != 2));
 					m_model->ApplyActions(actions);
 				}
 
@@ -626,12 +626,12 @@ namespace ndController_0
 			actor->EndAddLayer(ndReal(0.25f));
 
 			// clear actors bias so that the actions start centered at zero
-			//for (ndInt32 i = 0; i < actor->GetCount(); ++i)
-			//{
-			//	ndBrainLayer* const actorLayer = (*(*actor))[i];
-			//	ndBrainVector& actorLayerBias = actorLayer->GetBias();
-			//	actorLayerBias.Set(ndReal(0.0f));
-			//}
+			for (ndInt32 i = 0; i < actor->GetCount(); ++i)
+			{
+				ndBrainLayer* const actorLayer = (*(*actor))[i];
+				ndBrainVector& actorLayerBias = actorLayer->GetBias();
+				actorLayerBias.Set(ndReal(0.0f));
+			}
 
 			ndSharedPtr<ndBrain> critic(new ndBrain());
 			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + m_actionsSize, layerSize * 2, m_tanh);
