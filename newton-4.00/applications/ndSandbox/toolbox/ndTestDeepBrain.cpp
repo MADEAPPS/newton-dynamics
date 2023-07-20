@@ -39,7 +39,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	//	groundTruth[i][1] = ((inputBatch[i][0] >= 0.5f) || (inputBatch[i][1] >= 0.5f)) ? 1.0f : 0.0f;
 	//}
 	//
-	//ndBrainTrainer_old trainer(&brain);
+	//ndBrainTrainer trainer(&brain);
 	////ndBrainParallelTrainer trainer(&brain, 4);
 	//ndTestValidator testError(trainer);
 	//
@@ -243,7 +243,7 @@ static void MnistTrainingSet()
 	//	brain.AddLayer(ouputLayer);
 	//	brain.EndAddLayer(ndReal(0.125f));
 	//
-	//	ndBrainTrainer_old trainer(&brain);
+	//	ndBrainTrainer trainer(&brain);
 	//	//ndBrainParallelTrainer trainer(&brain, 4);
 	//	//ndDeepBrainTrainerParallelSDG_Experiment trainer(&brain, 4);
 	//

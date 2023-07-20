@@ -81,7 +81,6 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	friend class ndBrainLoad;
 	friend class ndBrainSave;
 	friend class ndBrainTrainer;
-	friend class ndBrainTrainer_old;
 };
 
 #endif 
