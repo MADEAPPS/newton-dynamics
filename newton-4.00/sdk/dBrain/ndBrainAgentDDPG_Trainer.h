@@ -42,7 +42,8 @@
 #define D_DDPG_MIN_EXPLORE_PROBABILITY	ndReal(1.0f/100.0f)
 #define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
 #define D_DDPG_SOFT_TARGET_FACTOR		ndReal (1.0e-3f)
-#define D_DDPG_ACTION_NOISE_DEVIATION	ndReal (0.03125f)
+#define D_DDPG_ACTION_NOISE_DEVIATION	ndReal (0.05f)
+#define D_DDPG_ACTION_GRADIENT_FRACTION ndReal (0.01f)
 #define D_DDPG_EXPLORE_ANNELININGING	(D_DDPG_MIN_EXPLORE_PROBABILITY / ndReal(2.0f))
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -215,7 +216,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 			m_agent->m_actor->MakePrediction(m_inputBatch, m_truth);
 			for (ndInt32 i = 0; i < actionDim; ++i)
 			{
-				ndReal x = m_truth[i] + m_agent->m_criticOptimizer.m_inputBatch[i + statesDim] * ndReal(0.01f);
+				ndReal x = m_truth[i] + m_agent->m_actionGradientFraction * m_agent->m_criticOptimizer.m_inputBatch[i + statesDim];
 				m_truth[i] = ndClamp(x, ndReal(-1.0f), ndReal(1.0f));
 			}
 			BackPropagate(m_inputBatch, m_truth);
@@ -258,6 +259,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 	ndReal m_actorLearnRate;
 	ndReal m_softTargetFactor;
 	ndReal m_actionNoiseDeviation;
+	ndReal m_actionGradientFraction;
 	ndReal m_explorationProbability;
 	ndReal m_minExplorationProbability;
 	ndReal m_explorationProbabilityAnnelining;
@@ -284,6 +286,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	,m_actorLearnRate(D_DDPG_ACTOR_LEARN_RATE)
 	,m_softTargetFactor(D_DDPG_SOFT_TARGET_FACTOR)
 	,m_actionNoiseDeviation(D_DDPG_ACTION_NOISE_DEVIATION)
+	,m_actionGradientFraction(D_DDPG_ACTION_GRADIENT_FRACTION)
 	,m_explorationProbability(ndReal(1.0f))
 	,m_minExplorationProbability(D_DDPG_MIN_EXPLORE_PROBABILITY)
 	,m_explorationProbabilityAnnelining(D_DDPG_EXPLORE_ANNELININGING)
