@@ -93,11 +93,11 @@ void ndBrain::CopyFrom(const ndBrain& src)
 void ndBrain::SoftCopy(const ndBrain& src, ndReal blend)
 {
 	const ndArray<ndBrainLayer*>& layers = *this;
-	const ndArray<ndBrainLayer*>& srcLayers = src;
-	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	{
-		layers[i]->Blend(*srcLayers[i], blend);
-	}
+const ndArray<ndBrainLayer*>& srcLayers = src;
+for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+{
+	layers[i]->Blend(*srcLayers[i], blend);
+}
 }
 
 ndBrainLayer* ndBrain::AddLayer(ndBrainLayer* const layer)
@@ -128,7 +128,7 @@ void ndBrain::EndAddLayer(ndReal randomVariance)
 	ndInt32 memorySize = floatsCount * ndInt32(sizeof(ndReal)) + vectorSizeInBytes + 256;
 	m_memorySize = memorySize;
 	m_memory = (ndReal*)ndMemory::Malloc(size_t(memorySize));
-	ndMemSet(m_memory, ndReal(0.0f), ndInt32 (m_memorySize / sizeof (ndReal)));
+	ndMemSet(m_memory, ndReal(0.0f), ndInt32(m_memorySize / sizeof(ndReal)));
 
 	// assign vector pointers
 	ndUnsigned8* mem = (ndUnsigned8*)m_memory;
@@ -164,9 +164,9 @@ void ndBrain::CalculateOffsets()
 		ndBrainLayer* const layer = layers[i];
 		m_offsets.PushBack((layer->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT);
 	}
-	
+
 	ndInt32 sum = 0;
-	for (ndInt32 i = 0; i < GetCount(); ++i)
+	for (ndInt32 i = 0; i < m_offsets.GetCount(); ++i)
 	{
 		ndInt32 size = m_offsets[i];
 		m_offsets[i] = sum;
@@ -187,6 +187,21 @@ bool ndBrain::Compare(const ndBrain& src) const
 	{
 		ndAssert(0);
 		return false;
+	}
+
+	if (m_offsets.GetCount() != src.m_offsets.GetCount())
+	{
+		ndAssert(0);
+		return false;
+	}
+
+	for (ndInt32 i = 0; i < m_offsets.GetCount(); ++i)
+	{
+		if (m_offsets[i] != src.m_offsets[i])
+		{
+			ndAssert(0);
+			return false;
+		}
 	}
 
 	const ndArray<ndBrainLayer*>& layers0 = *this;
@@ -215,7 +230,6 @@ void ndBrain::InitGaussianWeights(ndReal variance)
 
 void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, const ndBrainVector& hiddenLayerOutputs)
 {
-	//ndBrain::ndHidenVariableOffsets offsets(this);
 	const ndArray<ndBrainLayer*>& layers = (*this);
 	ndAssert(layers.GetCount());
 	ndAssert(input.GetCount() == GetInputSize());
