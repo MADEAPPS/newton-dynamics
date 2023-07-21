@@ -84,7 +84,7 @@ ndInt32 ndBrainThreadPool::GetThreadCount() const
 
 ndInt32 ndBrainThreadPool::GetMaxThreads()
 {
-	#ifdef D_USE_THREAD_EMULATION
+	#ifdef D_USE_BRAIN_THREAD_EMULATION
 		return D_MAX_THREADS_COUNT;
 	#else
 		return ndClamp(ndInt32(std::thread::hardware_concurrency() + 1) / 2, 1, D_MAX_THREADS_COUNT);
@@ -98,8 +98,12 @@ void ndBrainThreadPool::SubmmitTask(ndTask* const task, ndInt32 index)
 
 void ndBrainThreadPool::SetThreadCount(ndInt32 count)
 {
-	#ifdef D_USE_THREAD_EMULATION
+	#ifdef D_USE_BRAIN_THREAD_EMULATION
 		m_workers.SetCount (ndClamp(count, 1, D_MAX_THREADS_COUNT) - 1);
+		for (ndInt32 i = m_workers.GetCount(); i < count; ++i)
+		{
+			m_workers[i] = nullptr;
+		}
 	#else
 		ndInt32 maxThread = GetMaxThreads();
 		count = ndClamp(count, 1, maxThread) - 1;

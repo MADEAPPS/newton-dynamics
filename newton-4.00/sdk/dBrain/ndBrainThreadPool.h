@@ -24,6 +24,8 @@
 
 #include "ndBrainStdafx.h"
 
+#define D_USE_BRAIN_THREAD_EMULATION
+
 class ndBrainThreadPool: public ndClassAlloc, public ndSyncMutex
 {
 	public: 
@@ -88,8 +90,7 @@ void ndBrainThreadPool::ParallelExecute(const Function& callback)
 
 	if (m_workers.GetCount() > 0)
 	{
-		//#ifdef D_USE_THREAD_EMULATION
-		#if	0
+		#ifdef D_USE_BRAIN_THREAD_EMULATION
 		for (ndInt32 i = 0; i < threadCount; ++i)
 		{
 			ndBrainTaskImplement<Function>* const job = &jobsArray[i];
@@ -112,7 +113,6 @@ void ndBrainThreadPool::ParallelExecute(const Function& callback)
 		callback(job->m_threadIndex, job->m_threadCount);
 	}
 }
-
 
 #endif 
 
