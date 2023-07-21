@@ -27,6 +27,8 @@
 #include "ndBrainTypes.h"
 #include "ndBrainLayer.h"
 
+class ndBrainLoss;
+
 class ndBrainTrainer: public ndClassAlloc
 {
 	public: 
@@ -45,6 +47,8 @@ class ndBrainTrainer: public ndClassAlloc
 
 	void ClearGradientsAcc();
 	void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
+	void BackPropagate(const ndBrainVector& input, const ndBrainLoss& loss);
+
 	void BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth);
 
 	private:
@@ -52,7 +56,8 @@ class ndBrainTrainer: public ndClassAlloc
 	void ApplyAdamCorrection();
 	void BackPropagateHiddenLayer(ndInt32 layerIndex);
 	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
-	void BackPropagateOutputLayer(const ndBrainVector& groundTruth);
+	//void BackPropagateOutputLayer(const ndBrainVector& groundTruth);
+	void BackPropagateOutputLayer(const ndBrainLoss& loss);
 	
 	ndBrainVector m_z;
 	ndBrainVector m_zDerivative;

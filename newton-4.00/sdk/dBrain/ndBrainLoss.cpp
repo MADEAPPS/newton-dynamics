@@ -19,26 +19,24 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_INC_H__
-#define _ND_BRAIN_INC_H__
+#include "ndBrainStdafx.h"
+#include "ndBrainTypes.h"
+#include "ndBrainLoss.h"
 
-#include <ndBrainStdafx.h>
 
-#include <ndBrain.h>
-#include <ndBrainLoss.h>
-#include <ndBrainTypes.h>
-#include <ndBrainAgent.h>
-#include <ndBrainLayer.h>
-#include <ndBrainVector.h>
-#include <ndBrainMatrix.h>
-#include <ndBrainTrainer.h>
-#include <ndBrainSaveLoad.h>
-#include <ndBrainAgentDQN.h>
-#include <ndBrainAgentDDPG.h>
-#include <ndBrainThreadPool.h>
-#include <ndBrainReplayBuffer.h>
-#include <ndBrainAgentDQN_Trainer.h>
-#include <ndBrainAgentDDPG_Trainer.h>
+ndBrainLeastSquareErrorLoss::ndBrainLeastSquareErrorLoss(ndInt32 size)
+	:ndBrainLoss()
+{
+	m_truth.SetCount(size);
+}
 
-#endif 
+void ndBrainLeastSquareErrorLoss::SetTruth(const ndBrainVector& truth)
+{
+	m_truth.Set(truth);
+}
 
+void ndBrainLeastSquareErrorLoss::GetLoss(const ndBrainVector& output, ndBrainVector& loss) const
+{
+	loss.Set(output);
+	loss.Sub(m_truth);
+}

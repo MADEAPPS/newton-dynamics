@@ -19,26 +19,30 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_INC_H__
-#define _ND_BRAIN_INC_H__
+#ifndef _ND_BRAIN_LOSS_H__
+#define _ND_BRAIN_LOSS_H__
 
-#include <ndBrainStdafx.h>
+#include "ndBrainStdafx.h"
+#include "ndBrainVector.h"
 
-#include <ndBrain.h>
-#include <ndBrainLoss.h>
-#include <ndBrainTypes.h>
-#include <ndBrainAgent.h>
-#include <ndBrainLayer.h>
-#include <ndBrainVector.h>
-#include <ndBrainMatrix.h>
-#include <ndBrainTrainer.h>
-#include <ndBrainSaveLoad.h>
-#include <ndBrainAgentDQN.h>
-#include <ndBrainAgentDDPG.h>
-#include <ndBrainThreadPool.h>
-#include <ndBrainReplayBuffer.h>
-#include <ndBrainAgentDQN_Trainer.h>
-#include <ndBrainAgentDDPG_Trainer.h>
+class ndBrainLoss 
+{
+	public: 
+	ndBrainLoss() {}
+	virtual ~ndBrainLoss() {}
+
+	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss) const = 0;
+};
+
+class ndBrainLeastSquareErrorLoss: public ndBrainLoss
+{
+	public:
+	ndBrainLeastSquareErrorLoss(ndInt32 size);
+	void SetTruth(const ndBrainVector& truth);
+	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss) const;
+
+	ndBrainVector m_truth;
+};
 
 #endif 
 
