@@ -82,6 +82,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 			,m_outputBatch()
 			,m_agent(nullptr)
 		{
+			ndAssert(0);
 			m_truth.SetCount(actionDim);
 			m_inputBatch.SetCount(statesDim);
 			m_outputBatch.SetCount(actionDim);

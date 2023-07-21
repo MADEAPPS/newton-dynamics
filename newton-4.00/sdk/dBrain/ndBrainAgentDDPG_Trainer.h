@@ -84,6 +84,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 			,m_actorAction()
 			,m_agent(nullptr)
 		{
+			ndAssert(0);
 			m_truth.SetCount(1);
 			m_outputBatch.SetCount(1);
 			m_actorState.SetCount(statesDim);
@@ -186,6 +187,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainAgent
 			,m_outputBatch()
 			,m_agent(nullptr)
 		{
+			ndAssert(0);
 			m_truth.SetCount(actionDim);
 			m_inputBatch.SetCount(statesDim);
 			m_outputBatch.SetCount(actionDim);

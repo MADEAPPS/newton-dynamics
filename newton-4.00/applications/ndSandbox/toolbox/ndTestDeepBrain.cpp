@@ -44,8 +44,9 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	
 	const ndInt32 bashSize = 64;
 	ndBrainTrainer trainer(&brain);
+	ndAssert(brain.Compare(trainer.GetBrain()));
 
-	ndBrainLeastSquareErrorLoss loss(brain.GetOutputSize());
+	ndBrainLeastSquareErrorLoss loss(trainer.GetBrain().GetOutputSize());
 	for (ndInt32 i = 0; i < 20000; ++i)
 	{
 		trainer.ClearGradientsAcc();
@@ -61,6 +62,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		}
 		trainer.UpdateWeights(ndReal(1.0e-2f), bashSize);
 	}
+	brain.CopyFrom(trainer.GetBrain());
 	
 	ndBrainVector truth;
 	ndBrainVector input;
