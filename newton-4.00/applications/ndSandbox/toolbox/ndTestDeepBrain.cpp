@@ -46,20 +46,49 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndBrainTrainer trainer(&brain);
 	ndAssert(brain.Compare(trainer.GetBrain()));
 
-	ndBrainLeastSquareErrorLoss loss(trainer.GetBrain().GetOutputSize());
-	for (ndInt32 i = 0; i < 20000; ++i)
+	//ndBrainLeastSquareErrorLoss loss(trainer.GetBrain().GetOutputSize());
+	//for (ndInt32 i = 0; i < 20000; ++i)
+	//{
+	//	trainer.ClearGradientsAcc();
+	//	randomeSelection.RandomShuffle(randomeSelection.GetCount());
+	//	for (ndInt32 j = 0; j < bashSize; ++j)
+	//	{
+	//		ndInt32 index = randomeSelection[j];
+	//		const ndBrainVector& input = inputBatch[index];
+	//		//const ndBrainVector& truth = groundTruth[index];
+	//		//trainer.BackPropagate(input, truth);
+	//		loss.SetTruth(groundTruth[index]);
+	//		trainer.BackPropagate(input, loss);
+	//	}
+	//	trainer.UpdateWeights(ndReal(1.0e-2f), bashSize);
+	//}
+
+	ndBrainThreadPool threads;
+
+	auto UpdateTrainer = ndMakeObject::ndFunction([bashSize, &trainer, &randomeSelection, &inputBatch, &groundTruth](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		trainer.ClearGradientsAcc();
-		randomeSelection.RandomShuffle(randomeSelection.GetCount());
-		for (ndInt32 j = 0; j < bashSize; ++j)
+		if (threadIndex > 0)
 		{
-			ndInt32 index = randomeSelection[j];
+			return;
+		}
+
+		ndAssert(threadCount == 1);
+		trainer.ClearGradientsAcc();
+		ndBrainLeastSquareErrorLoss loss(trainer.GetBrain().GetOutputSize());
+		const ndStartEnd startEnd(bashSize, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndInt32 index = randomeSelection[i];
 			const ndBrainVector& input = inputBatch[index];
-			//const ndBrainVector& truth = groundTruth[index];
-			//trainer.BackPropagate(input, truth);
 			loss.SetTruth(groundTruth[index]);
 			trainer.BackPropagate(input, loss);
 		}
+	});
+
+	for (ndInt32 i = 0; i < 20000; ++i)
+	{
+		randomeSelection.RandomShuffle(randomeSelection.GetCount());
+		threads.ParallelExecute(UpdateTrainer);
 		trainer.UpdateWeights(ndReal(1.0e-2f), bashSize);
 	}
 	brain.CopyFrom(trainer.GetBrain());
