@@ -44,6 +44,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	
 	const ndInt32 bashSize = 64;
 	ndBrainTrainer trainer(&brain);
+
+	ndBrainLeastSquareErrorLoss loss(brain.GetOutputSize());
 	for (ndInt32 i = 0; i < 20000; ++i)
 	{
 		trainer.ClearGradientsAcc();
@@ -52,8 +54,10 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		{
 			ndInt32 index = randomeSelection[j];
 			const ndBrainVector& input = inputBatch[index];
-			const ndBrainVector& truth = groundTruth[index];
-			trainer.BackPropagate(input, truth);
+			//const ndBrainVector& truth = groundTruth[index];
+			//trainer.BackPropagate(input, truth);
+			loss.SetTruth(groundTruth[index]);
+			trainer.BackPropagate(input, loss);
 		}
 		trainer.UpdateWeights(ndReal(1.0e-2f), bashSize);
 	}
@@ -62,9 +66,9 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndBrainVector input;
 	ndBrainVector output;
 	
-	truth.SetCount(2);
-	input.SetCount(2);
-	output.SetCount(2);
+	input.SetCount(brain.GetInputSize());
+	truth.SetCount(brain.GetOutputSize());
+	output.SetCount(brain.GetOutputSize());
 	
 	ndInt32 failCount = 0;
 	ndInt32 testCount = 200;
