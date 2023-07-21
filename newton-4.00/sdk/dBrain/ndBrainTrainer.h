@@ -44,7 +44,7 @@ class ndBrainTrainer: public ndClassAlloc
 	void SetRegularizer(ndReal regularizer);
 
 	void ClearGradientsAcc();
-	virtual void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
+	void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
 	void BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth);
 
 	private:

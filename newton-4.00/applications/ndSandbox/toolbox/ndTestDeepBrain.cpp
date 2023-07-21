@@ -14,82 +14,87 @@
 
 static void ThreeLayersTwoInputsTwoOutputs()
 {
-	ndAssert(0);
-	//ndBrain brain;
-	//ndBrainLayer* const inputLayer = new ndBrainLayer(2, 16, m_relu);
-	////ndBrainLayer* const hiddenLayer = new ndBrainLayer(inputLayer->GetOuputSize(), 16, m_relu);
-	//ndBrainLayer* const hiddenLayer = new ndBrainLayer(inputLayer->GetOuputSize(), 6, m_relu);
-	//ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer->GetOuputSize(), 2, m_sigmoid);
-	//
-	//brain.BeginAddLayer();
-	//brain.AddLayer(inputLayer);
-	//brain.AddLayer(hiddenLayer);
-	//brain.AddLayer(ouputLayer);
-	//brain.EndAddLayer(ndReal(0.125f));
-	//
-	//ndInt32 samples = 2000;
-	//ndBrainMatrix inputBatch(samples, 2);
-	//ndBrainMatrix groundTruth(samples, 2);
-	//for (ndInt32 i = 0; i < samples; i++)
-	//{
-	//	inputBatch[i][0] = ndReal(ndGaussianRandom(0.5f, 0.25f));
-	//	inputBatch[i][1] = ndReal(ndGaussianRandom(0.5f, 0.25f));
-	//
-	//	groundTruth[i][0] = ((inputBatch[i][0] >= 0.5f) && (inputBatch[i][1] >= 0.5f)) ? 1.0f : 0.0f;
-	//	groundTruth[i][1] = ((inputBatch[i][0] >= 0.5f) || (inputBatch[i][1] >= 0.5f)) ? 1.0f : 0.0f;
-	//}
-	//
-	//ndBrainTrainer trainer(&brain);
-	////ndBrainParallelTrainer trainer(&brain, 4);
-	//ndTestValidator testError(trainer);
-	//
-	//trainer.SetMiniBatchSize(16);
-	//trainer.Optimize(testError, inputBatch, groundTruth, 2000);
-	//
-	//ndAssert(0);
-	////brain.Save("xxx.nn");
-	////ndBrain brain1;
-	////brain1.Load("xxx.nn");
-	////ndAssert(brain1.Compare(brain));
-	//
-	//ndBrainVector truth;
-	//ndBrainVector input;
-	//ndBrainVector output;
-	//
-	//truth.SetCount(2);
-	//input.SetCount(2);
-	//output.SetCount(2);
-	//
-	//ndInt32 failCount = 0;
-	//ndInt32 testCount = 200;
-	////ndBrainInstance instance(&brain);
-	//for (ndInt32 i = 0; i < testCount; i++)
-	//{
-	//	input[0] = ndReal(ndGaussianRandom(0.5f, 0.25f));
-	//	input[1] = ndReal(ndGaussianRandom(0.5f, 0.25f));
-	//	truth[0] = ((input[0] >= 0.5f) && (input[1] >= 0.5f)) ? 1.0f : 0.0f;
-	//	truth[1] = ((input[0] >= 0.5f) || (input[1] >= 0.5f)) ? 1.0f : 0.0f;
-	//
-	//	brain.MakePrediction(input, output);
-	//
-	//	bool predicted = true;
-	//	for (ndInt32 j = 0; j < output.GetCount(); j++)
-	//	{
-	//		bool trueBit = truth[j] >= 0.5f;
-	//		bool predictBit = output[j] >= 0.5f;
-	//		predicted = predicted & (predictBit == trueBit);
-	//	}
-	//
-	//	if (!predicted)
-	//	{
-	//		failCount++;
-	//	}
-	//}
-	//
-	//ndExpandTraceMessage("%s\n", "boolean logic");
-	//ndExpandTraceMessage("num_right: %d  out of %d\n", testCount - failCount, testCount);
-	//ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testCount);
-	//ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testCount - failCount) * 100.0f / (ndFloat32)testCount);
+	ndBrain brain;
+	ndInt32 neurons = 32;
+	ndBrainLayer* const inputLayer = new ndBrainLayer(2, neurons, m_relu);
+	ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), neurons, m_relu);
+	ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), neurons, m_relu);
+	ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer1->GetOuputSize(), 2, m_sigmoid);
+	
+	brain.BeginAddLayer();
+	brain.AddLayer(inputLayer);
+	brain.AddLayer(hiddenLayer0);
+	brain.AddLayer(hiddenLayer1);
+	brain.AddLayer(ouputLayer);
+	brain.EndAddLayer(ndReal(0.125f));
+	
+	ndInt32 samples = 2000;
+	ndBrainMatrix inputBatch(samples, 2);
+	ndBrainMatrix groundTruth(samples, 2);
+	ndArray<ndInt32> randomeSelection;
+	for (ndInt32 i = 0; i < samples; i++)
+	{
+		randomeSelection.PushBack(i);
+		inputBatch[i][0] = ndClamp (ndReal(ndGaussianRandom(0.5f, 0.25f)), ndReal(0.0f), ndReal(1.0f));
+		inputBatch[i][1] = ndClamp (ndReal(ndGaussianRandom(0.5f, 0.25f)), ndReal(0.0f), ndReal(1.0f));
+	
+		groundTruth[i][0] = ((inputBatch[i][0] >= ndReal(0.5f)) && (inputBatch[i][1] >= ndReal(0.5f))) ? ndReal(1.0f) : ndReal(0.0f);
+		groundTruth[i][1] = ((inputBatch[i][0] >= ndReal(0.5f)) || (inputBatch[i][1] >= ndReal(0.5f))) ? ndReal(1.0f) : ndReal(0.0f);
+	}
+	
+	const ndInt32 bashSize = 64;
+	ndBrainTrainer trainer(&brain);
+	for (ndInt32 i = 0; i < 20000; ++i)
+	{
+		trainer.ClearGradientsAcc();
+		randomeSelection.RandomShuffle(randomeSelection.GetCount());
+		for (ndInt32 j = 0; j < bashSize; ++j)
+		{
+			ndInt32 index = randomeSelection[j];
+			const ndBrainVector& input = inputBatch[index];
+			const ndBrainVector& truth = groundTruth[index];
+			trainer.BackPropagate(input, truth);
+		}
+		trainer.UpdateWeights(ndReal(1.0e-2f), bashSize);
+	}
+	
+	ndBrainVector truth;
+	ndBrainVector input;
+	ndBrainVector output;
+	
+	truth.SetCount(2);
+	input.SetCount(2);
+	output.SetCount(2);
+	
+	ndInt32 failCount = 0;
+	ndInt32 testCount = 200;
+	for (ndInt32 i = 0; i < testCount; ++i)
+	{
+		input[0] = ndReal(ndGaussianRandom(0.5f, 0.25f));
+		input[1] = ndReal(ndGaussianRandom(0.5f, 0.25f));
+		truth[0] = ((input[0] >= ndReal(0.5f)) && (input[1] >= ndReal(0.5f))) ? ndReal(1.0f) : ndReal(0.0f);
+		truth[1] = ((input[0] >= ndReal(0.5f)) || (input[1] >= ndReal(0.5f))) ? ndReal(1.0f) : ndReal(0.0f);
+	
+		brain.MakePrediction(input, output);
+	
+		bool predicted = true;
+		for (ndInt32 j = 0; j < output.GetCount(); ++j)
+		{
+			bool trueBit = truth[j] >= ndReal(0.5f);
+			bool predictBit = output[j] >= ndReal(0.5f);
+			predicted = predicted & (predictBit == trueBit);
+		}
+	
+		if (!predicted)
+		{
+			failCount++;
+		}
+	}
+	
+	ndExpandTraceMessage("%s\n", "boolean logic");
+	ndExpandTraceMessage("num_right: %d  out of %d\n", testCount - failCount, testCount);
+	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testCount);
+	ndExpandTraceMessage("success rate %g%%\n", (ndFloat32)(testCount - failCount) * 100.0f / (ndFloat32)testCount);
 }
 
 static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
@@ -305,7 +310,6 @@ static void MnistTestSet()
 	}
 }
 
-
 void ndTestDeedBrian()
 {
 	ndSetRandSeed(12345);
@@ -313,4 +317,3 @@ void ndTestDeedBrian()
 	//MnistTrainingSet();
 	//MnistTestSet();
 }
-

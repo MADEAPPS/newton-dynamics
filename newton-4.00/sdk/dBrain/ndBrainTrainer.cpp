@@ -268,7 +268,6 @@ void ndBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 
 	const ndReal clampValue = ndReal(1.0e10f);
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
-	//const ndHidenVariableOffsets preFixScan(m_brain);
 	const ndHidenVariableOffsets& preFixScan = m_brain->m_offsets;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
