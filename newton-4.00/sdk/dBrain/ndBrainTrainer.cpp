@@ -139,9 +139,22 @@ void ndBrainTrainer::PrefixScan()
 
 void ndBrainTrainer::ClearGradientsAcc()
 {
-	m_biasGradients.Set(0.0f);
+	//m_biasGradients.Set(0.0f);
 	m_biasGradientsAcc.Set(0.0f);
 	m_weightGradients.Set(0.0f);
+}
+
+void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 threadIndex, ndInt32 threadCount)
+{
+	ndStartEnd biasStartEnd(m_biasGradientsAcc.GetCount(), threadIndex, threadCount);
+	ndDeepBrainMemVector bias0(&m_biasGradientsAcc[biasStartEnd.m_start], biasStartEnd.m_end - biasStartEnd.m_start);
+	const ndDeepBrainMemVector bias1(&src.m_biasGradientsAcc[biasStartEnd.m_start], biasStartEnd.m_end - biasStartEnd.m_start);
+	bias0.Add(bias1);
+
+	ndStartEnd weightStartEnd(m_weightGradients.GetCount(), threadIndex, threadCount);
+	ndDeepBrainMemVector weigh0(&m_weightGradients[weightStartEnd.m_start], weightStartEnd.m_end - weightStartEnd.m_start);
+	const ndDeepBrainMemVector weigh1(&src.m_weightGradients[weightStartEnd.m_start], weightStartEnd.m_end - weightStartEnd.m_start);
+	weigh0.Add(weigh1);
 }
 
 //void ndBrainTrainer::BackPropagateOutputLayer(const ndBrainVector& groundTruth)

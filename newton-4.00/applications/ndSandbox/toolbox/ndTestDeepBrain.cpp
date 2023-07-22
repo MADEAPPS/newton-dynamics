@@ -70,15 +70,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		trainers.PushBack(new ndBrainTrainer(&brain));
 	}
 
-	auto UpdateTrainer = ndMakeObject::ndFunction([bashSize, &trainers, &randomeSelection, &inputBatch, &groundTruth](ndInt32 threadIndex, ndInt32 threadCount)
+	auto UpdateTrainer = ndMakeObject::ndFunction([&trainers, &randomeSelection, &inputBatch, &groundTruth, bashSize](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		if (threadIndex > 0)
-		{
-			return;
-		}
-
-		threadCount = 1;
-
 		ndBrainTrainer& trainer = *(*trainers[threadIndex]);
 		trainer.ClearGradientsAcc();
 		ndBrainLeastSquareErrorLoss loss(trainer.GetBrain()->GetOutputSize());
@@ -92,10 +85,21 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		}
 	});
 
+	auto AccumulateWeight = ndMakeObject::ndFunction([&trainers](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		ndBrainTrainer& trainer = *(*trainers[0]);
+		for (ndInt32 i = 1; i < threadCount; ++i)
+		{
+			ndBrainTrainer& srcTrainer = *(*trainers[i]);
+			trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
+		}
+	});
+
 	for (ndInt32 i = 0; i < 20000; ++i)
 	{
 		randomeSelection.RandomShuffle(randomeSelection.GetCount());
 		threads.ParallelExecute(UpdateTrainer);
+		threads.ParallelExecute(AccumulateWeight);
 		trainers[0]->UpdateWeights(ndReal(1.0e-2f), bashSize);
 	}
 	
@@ -354,7 +358,7 @@ static void MnistTestSet()
 void ndTestDeedBrian()
 {
 	ndSetRandSeed(12345);
-	ThreeLayersTwoInputsTwoOutputs();
+	//ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();
 	//MnistTestSet();
 }
