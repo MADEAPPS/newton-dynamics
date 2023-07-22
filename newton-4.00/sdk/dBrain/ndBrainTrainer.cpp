@@ -188,7 +188,7 @@ void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 thre
 //	}
 //}
 
-void ndBrainTrainer::BackPropagateOutputLayer(const ndBrainLoss& loss)
+void ndBrainTrainer::BackPropagateOutputLayer(ndBrainLoss& loss)
 {
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
 	const ndInt32 layerIndex = layers.GetCount() - 1;
@@ -391,7 +391,7 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, const ndBrainVect
 	BackPropagate(input, loss);
 }
 
-void ndBrainTrainer::BackPropagate(const ndBrainVector& input, const ndBrainLoss& loss)
+void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
 {
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
 

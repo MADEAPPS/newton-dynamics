@@ -34,7 +34,7 @@
 
 // default hyper parameters defaults
 #define D_DQN_THREADS					4
-#define D_DQN_LEARN_RATE				ndReal(2.0e-4f)
+#define D_DQN_LEARN_RATE				ndReal(5.0e-3f)
 #define D_DQN_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DQN_REPLAY_BUFFERSIZE			(1024 * 512)
 //#define D_DQN_REPLAY_BUFFERSIZE			(1024)
@@ -72,95 +72,9 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void PopulateReplayBuffer();
 	void SetBufferSize(ndInt32 size);
 
-	class ndOptimizer: public ndBrainTrainer
-	{
-		public:
-		ndOptimizer(ndBrain* const brain)
-			:ndBrainTrainer(brain)
-			,m_truth()
-			,m_inputBatch()
-			,m_outputBatch()
-			,m_agent(nullptr)
-		{
-			ndAssert(0);
-			m_truth.SetCount(actionDim);
-			m_inputBatch.SetCount(statesDim);
-			m_outputBatch.SetCount(actionDim);
-		}
-
-		ndOptimizer(const ndOptimizer& src)
-			:ndBrainTrainer(src)
-			,m_truth()
-			,m_inputBatch()
-			,m_outputBatch()
-			,m_agent(nullptr)
-		{
-			m_truth.SetCount(actionDim);
-			m_inputBatch.SetCount(statesDim);
-			m_outputBatch.SetCount(actionDim);
-		}
-
-		void EvaluateBellmanEquation(ndInt32 index)
-		{
-			ndAssert(m_truth.GetCount() == m_outputBatch.GetCount());
-			const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_agent->m_replayBuffer[index];
-
-			for (ndInt32 i = 0; i < statesDim; ++i)
-			{
-				m_inputBatch[i] = transition.m_state[i];
-			}
-			m_agent->m_actor->MakePrediction(m_inputBatch, m_outputBatch);
-
-			for (ndInt32 i = 0; i < actionDim; ++i)
-			{
-				m_truth[i] = m_outputBatch[i];
-				ndAssert(ndAbs(m_truth[i]) < ndReal(1000.0f));
-			}
-			
-			ndInt32 action = transition.m_action[0];
-			if (transition.m_terminalState)
-			{
-				m_truth[action] = transition.m_reward;
-			}
-			else
-			{
-				for (ndInt32 i = 0; i < statesDim; ++i)
-				{
-					m_inputBatch[i] = transition.m_nextState[i];
-				}
-				m_agent->m_target.MakePrediction(m_inputBatch, m_outputBatch);
-				m_truth[action] = transition.m_reward + m_agent->m_gamma * m_outputBatch[action];
-			}
-			for (ndInt32 i = 0; i < statesDim; ++i)
-			{
-				m_inputBatch[i] = transition.m_state[i];
-			}
-			BackPropagate(m_inputBatch, m_truth);
-		}
-
-		//void Optimize()
-		//{
-		//	ndArray<ndInt32>& shuffleBuffer = m_agent->m_replayBuffer.m_shuffleBuffer;
-		//	
-		//	ClearGradientsAcc();
-		//	shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
-		//	for (ndInt32 i = 0; i < m_agent->m_bashBufferSize; ++i)
-		//	{
-		//		ndInt32 index = shuffleBuffer[i];
-		//		EvaluateBellmanEquation(index);
-		//	}
-		//	UpdateWeights(m_agent->m_learnRate, m_agent->m_bashBufferSize);
-		//}
-
-		ndBrainVector m_truth;
-		ndBrainVector m_inputBatch;
-		ndBrainVector m_outputBatch;
-		ndBrainAgentDQN_Trainer<statesDim, actionDim>* m_agent;
-	};
-
 	ndSharedPtr<ndBrain> m_actor;
 	ndBrain m_target;
-	ndOptimizer m_actorOtimizer;
+	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> m_actorOtimizer;
 
 	ndBrainVector m_state;
 	ndBrainVector m_actions;
@@ -187,7 +101,6 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 	,ndBrainThreadPool()
 	,m_actor(actor)
 	,m_target(*(*m_actor))
-	,m_actorOtimizer(*m_actor)
 	,m_replayBuffer()
 	,m_gamma(D_DQN_DISCOUNT_FACTOR)
 	,m_learnRate(D_DQN_LEARN_RATE)
@@ -203,14 +116,17 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 	,m_collectingSamples(true)
 {
 	SetThreadCount(ndBrainThreadPool::GetMaxThreads());
+	for (ndInt32 i = 0; i < GetThreadCount(); ++i)
+	{
+		m_actorOtimizer.PushBack(new ndBrainTrainer(*m_actor));
+		m_actorOtimizer[m_actorOtimizer.GetCount() - 1]->SetRegularizer(D_DQN_REGULARIZER);
+	}
 
 	m_state.SetCount(statesDim);
 	m_actions.SetCount(actionDim);
 	m_state.Set(ndReal(0.0f));
 	m_actions.Set(ndReal(0.0f));
-
-	m_actorOtimizer.m_agent = this;
-	m_actorOtimizer.SetRegularizer(D_DQN_REGULARIZER);
+	
 	SetBufferSize(D_DQN_REPLAY_BUFFERSIZE);
 	m_target.CopyFrom(*(*m_actor));
 
@@ -264,34 +180,99 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 	ndArray<ndInt32>& shuffleBuffer = m_replayBuffer.m_shuffleBuffer;
 	shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 
-	auto TestThread = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	auto OptimizeActor = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
+		class Loss: public ndBrainLeastSquareErrorLoss
+		{
+			public:
+			Loss(ndBrainTrainer& trainer, ndBrainAgentDQN_Trainer<statesDim, actionDim>* const agent)
+				:ndBrainLeastSquareErrorLoss(trainer.GetBrain()->GetOutputSize())
+				,m_trainer(trainer)
+				,m_agent(agent)
+				,m_index(0)
+			{
+			}
+
+			virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+			{
+				ndAssert(output.GetCount() == actionDim);
+				ndAssert(m_truth.GetCount() == m_trainer.GetBrain()->GetOutputSize());
+
+				ndReal stateBuffer[statesDim * 2];
+				ndReal actionBuffer[actionDim * 2];
+				ndDeepBrainMemVector state(stateBuffer, statesDim);
+				ndDeepBrainMemVector action(actionBuffer, actionDim);
+
+				const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_agent->m_replayBuffer[m_index];
+				for (ndInt32 i = 0; i < actionDim; ++i)
+				{
+					action[i] = output[i];
+				}
+
+				ndInt32 actionIndex = transition.m_action[0];
+				if (transition.m_terminalState)
+				{
+					action[actionIndex] = transition.m_reward;
+				}
+				else
+				{
+					ndReal actionBuffer1[actionDim * 2];
+					ndDeepBrainMemVector action1(actionBuffer1, actionDim);
+
+					for (ndInt32 i = 0; i < statesDim; ++i)
+					{
+						state[i] = transition.m_nextState[i];
+					}
+					m_agent->m_target.MakePrediction(state, action1);
+					action[actionIndex] = transition.m_reward + m_agent->m_gamma * action1[actionIndex];
+				}
+
+				SetTruth(action);
+				ndBrainLeastSquareErrorLoss::GetLoss(output, loss);
+			}
+
+			ndBrainTrainer& m_trainer;
+			ndBrainAgentDQN_Trainer<statesDim, actionDim>* m_agent;
+			ndInt32 m_index;
+		};
+
 		ndArray<ndInt32>& shuffleBuffer = m_replayBuffer.m_shuffleBuffer;
+		ndBrainTrainer& trainer = *(*m_actorOtimizer[threadIndex]);
+		trainer.ClearGradientsAcc();
+
+		Loss loss(trainer, this);
+		ndReal stateBuffer[statesDim * 2];
+		ndDeepBrainMemVector state(stateBuffer, statesDim);
 
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
-		if (threadIndex > 0)
-		{
-			return;
-		}
-
-		m_actorOtimizer.ClearGradientsAcc();
-		for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndInt32 index = shuffleBuffer[i];
-			m_actorOtimizer.EvaluateBellmanEquation(index);
+			const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_replayBuffer[index];
+
+			for (ndInt32 j = 0; j < statesDim; ++j)
+			{
+				state[j] = transition.m_state[j];
+			}
+			loss.m_index = index;
+			trainer.BackPropagate(state, loss);
 		}
 	});
-	ParallelExecute(TestThread);
 
-	//m_actorOtimizer.ClearGradientsAcc();
-	//for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
-	//{
-	//	ndInt32 index = shuffleBuffer[i];
-	//	m_actorOtimizer.EvaluateBellmanEquation(index);
-	//}
-	m_actorOtimizer.UpdateWeights(m_learnRate, m_bashBufferSize);
+	auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		ndBrainTrainer& trainer = *(*m_actorOtimizer[0]);
+		for (ndInt32 i = 1; i < threadCount; ++i)
+		{
+			ndBrainTrainer& srcTrainer = *(*m_actorOtimizer[i]);
+			trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
+		}
+	});
 
-	//m_actorOtimizer.Optimize();
+	ParallelExecute(OptimizeActor);
+	ParallelExecute(AccumulateWeight);
+	m_actorOtimizer[0]->UpdateWeights(m_learnRate, m_bashBufferSize);
+
 	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
 	{
 		// update on line network
@@ -389,8 +370,6 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::OptimizeStep()
 {
 	if (!m_frameCount)
 	{
-		//ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_state.Set(ndReal(0.0f));
-		//ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
 		ResetModel();
 	}
 

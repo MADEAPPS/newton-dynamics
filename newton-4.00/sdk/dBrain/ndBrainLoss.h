@@ -31,7 +31,7 @@ class ndBrainLoss
 	ndBrainLoss() {}
 	virtual ~ndBrainLoss() {}
 
-	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss) const = 0;
+	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss) = 0;
 };
 
 class ndBrainLeastSquareErrorLoss: public ndBrainLoss
@@ -39,7 +39,7 @@ class ndBrainLeastSquareErrorLoss: public ndBrainLoss
 	public:
 	ndBrainLeastSquareErrorLoss(ndInt32 size);
 	void SetTruth(const ndBrainVector& truth);
-	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss) const;
+	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss);
 
 	ndBrainVector m_truth;
 };

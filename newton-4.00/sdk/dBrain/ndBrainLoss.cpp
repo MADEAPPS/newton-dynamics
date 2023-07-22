@@ -35,7 +35,7 @@ void ndBrainLeastSquareErrorLoss::SetTruth(const ndBrainVector& truth)
 	m_truth.Set(truth);
 }
 
-void ndBrainLeastSquareErrorLoss::GetLoss(const ndBrainVector& output, ndBrainVector& loss) const
+void ndBrainLeastSquareErrorLoss::GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 {
 	loss.Set(output);
 	loss.Sub(m_truth);

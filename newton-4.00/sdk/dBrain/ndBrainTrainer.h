@@ -49,7 +49,7 @@ class ndBrainTrainer: public ndClassAlloc
 
 	void ClearGradientsAcc();
 	void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
-	void BackPropagate(const ndBrainVector& input, const ndBrainLoss& loss);
+	void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
 	void AcculumateGradients(const ndBrainTrainer& src, ndInt32 thread, ndInt32 threadCount);
 
 	void BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth);
@@ -58,7 +58,7 @@ class ndBrainTrainer: public ndClassAlloc
 	void PrefixScan();
 	void ApplyAdamCorrection();
 	void BackPropagateHiddenLayer(ndInt32 layerIndex);
-	void BackPropagateOutputLayer(const ndBrainLoss& loss);
+	void BackPropagateOutputLayer(ndBrainLoss& loss);
 	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
 	
 	ndBrainVector m_z;

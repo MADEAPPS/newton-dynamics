@@ -44,7 +44,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	
 	const ndInt32 bashSize = 64;
 	//ndBrainTrainer trainer(&brain);
-	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, 32> trainers;
+	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> trainers;
 
 	//ndBrainLeastSquareErrorLoss loss(trainer.GetBrain().GetOutputSize());
 	//for (ndInt32 i = 0; i < 20000; ++i)
