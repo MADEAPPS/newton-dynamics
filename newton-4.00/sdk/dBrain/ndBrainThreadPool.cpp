@@ -66,15 +66,24 @@ ndBrainThreadPool::ndBrainThreadPool()
 	,ndSyncMutex()
 	,m_workers()
 {
+	for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; ++i)
+	{
+		m_workers.PushBack(nullptr);
+	}
+
+	m_workers.SetCount(0);
 	SetThreadCount(1);
 }
 
 ndBrainThreadPool::~ndBrainThreadPool()
 {
+	#ifndef D_USE_BRAIN_THREAD_EMULATION
 	for (ndInt32 i = 0; i < m_workers.GetCount(); ++i)
 	{
+		ndAssert(m_workers[i]);
 		delete m_workers[i];
 	}
+	#endif
 }
 
 ndInt32 ndBrainThreadPool::GetThreadCount() const
@@ -100,10 +109,6 @@ void ndBrainThreadPool::SetThreadCount(ndInt32 count)
 {
 	#ifdef D_USE_BRAIN_THREAD_EMULATION
 		m_workers.SetCount (ndClamp(count, 1, D_MAX_THREADS_COUNT) - 1);
-		for (ndInt32 i = m_workers.GetCount(); i < count; ++i)
-		{
-			m_workers[i] = nullptr;
-		}
 	#else
 		ndInt32 maxThread = GetMaxThreads();
 		count = ndClamp(count, 1, maxThread) - 1;

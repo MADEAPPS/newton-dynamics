@@ -43,8 +43,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	}
 	
 	const ndInt32 bashSize = 64;
-	ndBrainTrainer trainer(&brain);
-	ndAssert(brain.Compare(trainer.GetBrain()));
+	//ndBrainTrainer trainer(&brain);
+	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, 32> trainers;
 
 	//ndBrainLeastSquareErrorLoss loss(trainer.GetBrain().GetOutputSize());
 	//for (ndInt32 i = 0; i < 20000; ++i)
@@ -64,17 +64,24 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	//}
 
 	ndBrainThreadPool threads;
+	threads.SetThreadCount(4);
+	for (ndInt32 i = 0; i < threads.GetThreadCount(); ++i)
+	{
+		trainers.PushBack(new ndBrainTrainer(&brain));
+	}
 
-	auto UpdateTrainer = ndMakeObject::ndFunction([bashSize, &trainer, &randomeSelection, &inputBatch, &groundTruth](ndInt32 threadIndex, ndInt32 threadCount)
+	auto UpdateTrainer = ndMakeObject::ndFunction([bashSize, &trainers, &randomeSelection, &inputBatch, &groundTruth](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		if (threadIndex > 0)
 		{
 			return;
 		}
 
-		ndAssert(threadCount == 1);
+		threadCount = 1;
+
+		ndBrainTrainer& trainer = *(*trainers[threadIndex]);
 		trainer.ClearGradientsAcc();
-		ndBrainLeastSquareErrorLoss loss(trainer.GetBrain().GetOutputSize());
+		ndBrainLeastSquareErrorLoss loss(trainer.GetBrain()->GetOutputSize());
 		const ndStartEnd startEnd(bashSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -89,9 +96,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	{
 		randomeSelection.RandomShuffle(randomeSelection.GetCount());
 		threads.ParallelExecute(UpdateTrainer);
-		trainer.UpdateWeights(ndReal(1.0e-2f), bashSize);
+		trainers[0]->UpdateWeights(ndReal(1.0e-2f), bashSize);
 	}
-	brain.CopyFrom(trainer.GetBrain());
 	
 	ndBrainVector truth;
 	ndBrainVector input;
@@ -117,7 +123,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		{
 			bool trueBit = truth[j] >= ndReal(0.5f);
 			bool predictBit = output[j] >= ndReal(0.5f);
-			predicted = predicted & (predictBit == trueBit);
+			predicted = predicted && (predictBit == trueBit);
 		}
 	
 		if (!predicted)
@@ -348,7 +354,7 @@ static void MnistTestSet()
 void ndTestDeedBrian()
 {
 	ndSetRandSeed(12345);
-	//ThreeLayersTwoInputsTwoOutputs();
+	ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();
 	//MnistTestSet();
 }

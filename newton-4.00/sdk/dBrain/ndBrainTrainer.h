@@ -42,7 +42,7 @@ class ndBrainTrainer: public ndClassAlloc
 	ndBrainTrainer(const ndBrainTrainer& src);
 	virtual ~ndBrainTrainer();
 
-	ndBrain& GetBrain();
+	ndBrain* GetBrain() const;
 
 	ndReal GetRegularizer() const;
 	void SetRegularizer(ndReal regularizer);
@@ -60,7 +60,6 @@ class ndBrainTrainer: public ndClassAlloc
 	void BackPropagateOutputLayer(const ndBrainLoss& loss);
 	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
 	
-	ndBrain m_brain;
 	ndBrainVector m_z;
 	ndBrainVector m_zDerivative;
 	ndBrainVector m_biasGradients;
@@ -71,6 +70,7 @@ class ndBrainTrainer: public ndClassAlloc
 	ndBrainVector m_weightGradient_u;
 	ndBrainVector m_weightGradient_v;
 	ndHidenVariableOffsets m_weightGradientsPrefixScan;
+	ndBrain* m_brain;
 	
 	ndReal m_regularizer;
 	ndReal m_alpha;

@@ -148,8 +148,10 @@ void ndBrain::EndAddLayer(ndReal randomVariance)
 	}
 
 	CalculateOffsets();
-
-	InitGaussianWeights(randomVariance);
+	if (randomVariance > ndReal(0.0f))
+	{
+		InitGaussianWeights(randomVariance);
+	}
 	m_isReady = true;
 }
 
