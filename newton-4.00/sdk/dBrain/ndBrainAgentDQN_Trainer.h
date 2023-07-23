@@ -114,7 +114,7 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 	,m_collectingSamples(true)
 {
 	ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
-	//threadCount = 1;
+threadCount = 1;
 	SetThreadCount(threadCount);
 	for (ndInt32 i = 0; i < GetThreadCount(); ++i)
 	{

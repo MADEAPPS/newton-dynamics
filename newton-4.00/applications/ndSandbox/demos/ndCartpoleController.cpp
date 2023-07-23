@@ -601,9 +601,9 @@ namespace ndController_0
 		ndInt32 layerSize = 64;
 		#ifdef D_USE_POLE_DQN
 			ndSharedPtr<ndBrain> actor(new ndBrain());
-			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_relu);
-			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_relu);
-			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_relu);
+			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
+			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
 			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_lineal);
 			actor->BeginAddLayer();
 			actor->AddLayer(layer0);
