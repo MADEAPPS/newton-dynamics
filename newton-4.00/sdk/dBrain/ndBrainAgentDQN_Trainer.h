@@ -207,11 +207,11 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 				ndDeepBrainMemVector action(actionBuffer, actionDim);
 
 				const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_agent->m_replayBuffer[m_index];
+#if 0
 				for (ndInt32 i = 0; i < actionDim; ++i)
 				{
 					action[i] = output[i];
 				}
-
 				ndInt32 actionIndex = transition.m_action[0];
 				if (transition.m_terminalState)
 				{
@@ -221,7 +221,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 				{
 					ndReal actionBuffer1[actionDim * 2];
 					ndDeepBrainMemVector action1(actionBuffer1, actionDim);
-
+				
 					for (ndInt32 i = 0; i < statesDim; ++i)
 					{
 						state[i] = transition.m_nextState[i];
@@ -229,7 +229,22 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 					m_agent->m_target.MakePrediction(state, action1);
 					action[actionIndex] = transition.m_reward + m_agent->m_gamma * action1[actionIndex];
 				}
-
+#else
+				for (ndInt32 i = 0; i < statesDim; ++i)
+				{
+					state[i] = transition.m_nextState[i];
+				}
+				m_agent->m_target.MakePrediction(state, action);
+				for (ndInt32 i = 0; i < actionDim; ++i)
+				{
+					action[i] = transition.m_reward + m_agent->m_gamma * action[i];
+				}
+				if (transition.m_terminalState)
+				{
+					ndInt32 actionIndex = transition.m_action[0];
+					action[actionIndex] = transition.m_reward;
+				}
+#endif
 				SetTruth(action);
 				ndBrainLeastSquareErrorLoss::GetLoss(output, loss);
 			}

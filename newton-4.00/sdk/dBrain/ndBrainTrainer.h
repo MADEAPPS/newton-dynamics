@@ -52,8 +52,6 @@ class ndBrainTrainer: public ndClassAlloc
 	void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
 	void AcculumateGradients(const ndBrainTrainer& src, ndInt32 thread, ndInt32 threadCount);
 
-	void BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth);
-
 	private:
 	void PrefixScan();
 	void ApplyAdamCorrection();

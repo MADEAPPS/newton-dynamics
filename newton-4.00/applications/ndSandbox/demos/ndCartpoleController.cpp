@@ -82,7 +82,7 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
 					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(qValuePredictor)
 					,m_model(nullptr)
-					,m_stopTraining(1500000)
+					,m_stopTraining(2000000)
 					,m_maxGain(-1.0e10f)
 					,m_maxFrames(1200.0f)
 					,m_controllerState(0)
@@ -441,6 +441,10 @@ namespace ndController_0
 
 		ndReal GetReward() const
 		{
+			if (IsTerminal())
+			{
+				return ndReal(0.0f);
+			}
 			const ndMatrix& matrix = m_pole->GetMatrix();
 			ndFloat32 sinAngle = matrix.m_front.m_x;
 			ndFloat32 reward = ndReal(ndPow(ndEXP, - ndFloat32 (100.0f) * sinAngle * sinAngle));
@@ -600,7 +604,7 @@ namespace ndController_0
 			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_relu);
 			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_relu);
 			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_relu);
-			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_relu);
+			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_lineal);
 			actor->BeginAddLayer();
 			actor->AddLayer(layer0);
 			actor->AddLayer(layer1);
