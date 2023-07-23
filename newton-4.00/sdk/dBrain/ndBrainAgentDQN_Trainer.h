@@ -33,12 +33,10 @@
 // https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
 
 // default hyper parameters defaults
-#define D_DQN_THREADS					4
 #define D_DQN_LEARN_RATE				ndReal(5.0e-3f)
 #define D_DQN_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DQN_REPLAY_BUFFERSIZE			(1024 * 512)
 //#define D_DQN_REPLAY_BUFFERSIZE			(1024)
-#define D_DQN_MOVING_AVERAGE			64
 #define D_DQN_REPLAY_BASH_SIZE			32
 #define D_DQN_TARGET_UPDATE_PERIOD		1000
 #define D_DQN_REGULARIZER				ndReal (2.0e-6f)
@@ -115,7 +113,9 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 	,m_targetUpdatePeriod(D_DQN_TARGET_UPDATE_PERIOD)
 	,m_collectingSamples(true)
 {
-	SetThreadCount(ndBrainThreadPool::GetMaxThreads());
+	ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
+	//threadCount = 1;
+	SetThreadCount(threadCount);
 	for (ndInt32 i = 0; i < GetThreadCount(); ++i)
 	{
 		m_actorOtimizer.PushBack(new ndBrainTrainer(*m_actor));
@@ -177,10 +177,13 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::SetBufferSize(ndInt32 size)
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 {
-	ndArray<ndInt32>& shuffleBuffer = m_replayBuffer.m_shuffleBuffer;
-	shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
+	ndUnsigned32 shuffleBuffer[1024];
+	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
+	{
+		shuffleBuffer[i] = ndRandInt() % m_replayBuffer.GetCount();
+	}
 
-	auto OptimizeActor = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	auto OptimizeActor = ndMakeObject::ndFunction([this, &shuffleBuffer](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		class Loss: public ndBrainLeastSquareErrorLoss
 		{
@@ -236,7 +239,6 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 			ndInt32 m_index;
 		};
 
-		ndArray<ndInt32>& shuffleBuffer = m_replayBuffer.m_shuffleBuffer;
 		ndBrainTrainer& trainer = *(*m_actorOtimizer[threadIndex]);
 		trainer.ClearGradientsAcc();
 
@@ -247,7 +249,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			ndInt32 index = shuffleBuffer[i];
+			ndInt32 index = ndInt32 (shuffleBuffer[i]);
 			const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_replayBuffer[index];
 
 			for (ndInt32 j = 0; j < statesDim; ++j)

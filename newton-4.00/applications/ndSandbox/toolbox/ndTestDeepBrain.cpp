@@ -31,10 +31,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndInt32 samples = 2000;
 	ndBrainMatrix inputBatch(samples, 2);
 	ndBrainMatrix groundTruth(samples, 2);
-	ndArray<ndInt32> randomeSelection;
 	for (ndInt32 i = 0; i < samples; i++)
 	{
-		randomeSelection.PushBack(i);
 		inputBatch[i][0] = ndClamp (ndReal(ndGaussianRandom(0.5f, 0.25f)), ndReal(0.0f), ndReal(1.0f));
 		inputBatch[i][1] = ndClamp (ndReal(ndGaussianRandom(0.5f, 0.25f)), ndReal(0.0f), ndReal(1.0f));
 	
@@ -43,25 +41,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	}
 	
 	const ndInt32 bashSize = 64;
-	//ndBrainTrainer trainer(&brain);
-	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> trainers;
 
-	//ndBrainLeastSquareErrorLoss loss(trainer.GetBrain().GetOutputSize());
-	//for (ndInt32 i = 0; i < 20000; ++i)
-	//{
-	//	trainer.ClearGradientsAcc();
-	//	randomeSelection.RandomShuffle(randomeSelection.GetCount());
-	//	for (ndInt32 j = 0; j < bashSize; ++j)
-	//	{
-	//		ndInt32 index = randomeSelection[j];
-	//		const ndBrainVector& input = inputBatch[index];
-	//		//const ndBrainVector& truth = groundTruth[index];
-	//		//trainer.BackPropagate(input, truth);
-	//		loss.SetTruth(groundTruth[index]);
-	//		trainer.BackPropagate(input, loss);
-	//	}
-	//	trainer.UpdateWeights(ndReal(1.0e-2f), bashSize);
-	//}
+	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> trainers;
 
 	ndBrainThreadPool threads;
 	threads.SetThreadCount(4);
@@ -69,6 +50,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	{
 		trainers.PushBack(new ndBrainTrainer(&brain));
 	}
+
+	ndInt32 randomeSelection[bashSize];
 
 	auto UpdateTrainer = ndMakeObject::ndFunction([&trainers, &randomeSelection, &inputBatch, &groundTruth, bashSize](ndInt32 threadIndex, ndInt32 threadCount)
 	{
@@ -97,7 +80,10 @@ static void ThreeLayersTwoInputsTwoOutputs()
 
 	for (ndInt32 i = 0; i < 20000; ++i)
 	{
-		randomeSelection.RandomShuffle(randomeSelection.GetCount());
+		for (ndInt32 j = 0; j < bashSize; ++j)
+		{
+			randomeSelection[j] = ndInt32 (ndRandInt() % samples);
+		}
 		threads.ParallelExecute(UpdateTrainer);
 		threads.ParallelExecute(AccumulateWeight);
 		trainers[0]->UpdateWeights(ndReal(1.0e-2f), bashSize);

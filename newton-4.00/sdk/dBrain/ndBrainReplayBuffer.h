@@ -51,7 +51,6 @@ class ndBrainReplayBuffer : public ndArray<ndBrainReplayTransitionMemory<actionT
 	void SetSize(ndInt32 size);
 	void AddTransition(const ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>& transition);
 
-	ndArray<ndInt32> m_shuffleBuffer;
 	ndInt32 m_replayBufferIndex;
 };
 
@@ -90,7 +89,6 @@ void ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>::Clear()
 template<class actionType, ndInt32 statesDim, ndInt32 actionDim>
 ndBrainReplayBuffer<actionType, statesDim, actionDim>::ndBrainReplayBuffer()
 	:ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>()
-	,m_shuffleBuffer()
 	,m_replayBufferIndex(0)
 {
 }
@@ -104,14 +102,12 @@ template<class actionType, ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainReplayBuffer<actionType, statesDim, actionDim>::Clear()
 {
 	m_replayBufferIndex = 0;
-	m_shuffleBuffer.SetCount(0);
 	ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::SetCount(0);
 }
 
 template<class actionType, ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainReplayBuffer<actionType, statesDim, actionDim>::SetSize(ndInt32 size)
 {
-	m_shuffleBuffer.SetCount(size);
 	ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::SetCount(size);
 	Clear();
 }
@@ -122,7 +118,6 @@ void ndBrainReplayBuffer<actionType, statesDim, actionDim>::AddTransition(const 
 	ndInt32 count = ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::GetCount();
 	if (count < ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::GetCapacity())
 	{
-		m_shuffleBuffer.PushBack(ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::GetCount());
 		ndArray<ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>>::PushBack(transition);
 	}
 	else
