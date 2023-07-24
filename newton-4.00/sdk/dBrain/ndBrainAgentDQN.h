@@ -25,6 +25,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
+#include "ndBrainTrainer.h"
 #include "ndBrainReplayBuffer.h"
 
 template<ndInt32 statesDim, ndInt32 actionDim>

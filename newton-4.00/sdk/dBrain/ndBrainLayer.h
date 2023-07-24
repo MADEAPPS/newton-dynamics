@@ -81,7 +81,6 @@ class ndBrainLayer: public ndBrainMatrix
 	ndInt32 m_columns;
 	friend class ndBrain;
 	friend class ndBrainSave;
-	friend class ndBrainInstance;
 };
 
 inline ndBrainActivationType ndBrainLayer::GetActivationType() const

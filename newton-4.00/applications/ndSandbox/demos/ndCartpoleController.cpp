@@ -195,7 +195,7 @@ namespace ndController_0
 
 								if (episodeCount && !IsSampling())
 								{
-									//ndExpandTraceMessage("%g\n", m_averageQValue.GetAverage());
+									ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 									if (m_outFile)
 									{
 										fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
@@ -519,7 +519,8 @@ namespace ndController_0
 		void RandomePush()
 		{
 			ndVector impulsePush(ndVector::m_zero);
-			impulsePush.m_x = 5.0f * m_cart->GetMassMatrix().m_w *  ndSquash (ndGaussianRandom(0.0f, 0.5f));
+			ndFloat32 randValue(ndClamp(ndGaussianRandom(0.0f, 0.5f), -1.0f, 1.0f));
+			impulsePush.m_x = 5.0f * randValue * m_cart->GetMassMatrix().m_w;
 			m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, m_cart->GetScene()->GetTimestep());
 		}
 

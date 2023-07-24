@@ -83,6 +83,16 @@ ndBrain* ndBrainTrainer::GetBrain() const
 	return m_brain;
 }
 
+ndBrainTrainer::ndSolveModel ndBrainTrainer::GetModel() const
+{
+	return m_model;
+}
+
+void ndBrainTrainer::SetModel(ndSolveModel model)
+{
+	m_model = model;
+}
+
 ndReal ndBrainTrainer::GetRegularizer() const
 {
 	return m_regularizer;
@@ -102,15 +112,17 @@ void ndBrainTrainer::PrefixScan()
 	m_z.SetCount(size);
 	m_zDerivative.SetCount(size);
 	m_biasGradients.SetCount(size);
-	m_biasGradientsAcc.SetCount(size);
 	m_biasGradient_u.SetCount(size);
 	m_biasGradient_v.SetCount(size);
+	m_biasGradientsAcc.SetCount(size);
 
-	m_zDerivative.Set(0.0f);
-	m_biasGradients.Set(0.0f);
-	m_biasGradientsAcc.Set(0.0f);
-	m_biasGradient_u.Set(0.0f);
-	m_biasGradient_v.Set(0.0f);
+	m_z.Set(ndReal (0.0f));
+	m_zDerivative.Set(ndReal(0.0f));
+	m_biasGradients.Set(ndReal(0.0f));
+	m_biasGradient_u.Set(ndReal (0.0f));
+	m_biasGradient_v.Set(ndReal (0.0f));
+	m_biasGradientsAcc.Set(ndReal(0.0f));
+	//m_output.SetCount(layers[layers.GetCount() - 1]->GetOuputSize());
 
 	m_weightGradientsPrefixScan.SetCount(0);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)

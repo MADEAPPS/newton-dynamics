@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DQN_BRAIN_AGENT_DQN_TRAINER_H__
-#define _ND_DQN_BRAIN_AGENT_DQN_TRAINER_H__
+#ifndef _ND_BRAIN_AGENT_DQN_TRAINER_H__
+#define _ND_BRAIN_AGENT_DQN_TRAINER_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
@@ -33,6 +33,7 @@
 // https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
 
 // default hyper parameters defaults
+//#define D_DQN_LEARN_RATE				ndReal(2.0e-4f)
 #define D_DQN_LEARN_RATE				ndReal(5.0e-3f)
 #define D_DQN_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DQN_REPLAY_BUFFERSIZE			(1024 * 512)
@@ -114,7 +115,7 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 	,m_collectingSamples(true)
 {
 	ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
-threadCount = 1;
+//threadCount = 1;
 	SetThreadCount(threadCount);
 	for (ndInt32 i = 0; i < GetThreadCount(); ++i)
 	{
@@ -207,7 +208,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 				ndDeepBrainMemVector action(actionBuffer, actionDim);
 
 				const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_agent->m_replayBuffer[m_index];
-#if 0
+#if 1
 				for (ndInt32 i = 0; i < actionDim; ++i)
 				{
 					action[i] = output[i];
@@ -230,19 +231,21 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 					action[actionIndex] = transition.m_reward + m_agent->m_gamma * action1[actionIndex];
 				}
 #else
+				for (ndInt32 i = 0; i < actionDim; ++i)
+				{
+					action[i] = ndReal(0.0f);
+				}
 				for (ndInt32 i = 0; i < statesDim; ++i)
 				{
 					state[i] = transition.m_nextState[i];
 				}
-				m_agent->m_target.MakePrediction(state, action);
+				if (!transition.m_terminalState)
+				{
+					m_agent->m_target.MakePrediction(state, action);
+				}
 				for (ndInt32 i = 0; i < actionDim; ++i)
 				{
 					action[i] = transition.m_reward + m_agent->m_gamma * action[i];
-				}
-				if (transition.m_terminalState)
-				{
-					ndInt32 actionIndex = transition.m_action[0];
-					action[actionIndex] = transition.m_reward;
 				}
 #endif
 				SetTruth(action);

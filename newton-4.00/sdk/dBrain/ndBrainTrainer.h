@@ -23,11 +23,7 @@
 #define _ND_BRAIN_TRAINER_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrain.h"
-#include "ndBrainTypes.h"
-#include "ndBrainLayer.h"
-
-class ndBrainLoss;
+class ndBrain;
 
 class ndBrainTrainer: public ndClassAlloc
 {
@@ -47,6 +43,9 @@ class ndBrainTrainer: public ndClassAlloc
 	ndReal GetRegularizer() const;
 	void SetRegularizer(ndReal regularizer);
 
+	ndSolveModel GetModel() const;
+	void SetModel(ndSolveModel model);
+
 	void ClearGradientsAcc();
 	void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
 	void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
@@ -60,6 +59,7 @@ class ndBrainTrainer: public ndClassAlloc
 	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
 	
 	ndBrainVector m_z;
+	//ndBrainVector m_output;
 	ndBrainVector m_zDerivative;
 	ndBrainVector m_biasGradients;
 	ndBrainVector m_weightGradients;

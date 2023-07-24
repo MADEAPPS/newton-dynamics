@@ -93,11 +93,11 @@ void ndBrain::CopyFrom(const ndBrain& src)
 void ndBrain::SoftCopy(const ndBrain& src, ndReal blend)
 {
 	const ndArray<ndBrainLayer*>& layers = *this;
-const ndArray<ndBrainLayer*>& srcLayers = src;
-for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-{
-	layers[i]->Blend(*srcLayers[i], blend);
-}
+	const ndArray<ndBrainLayer*>& srcLayers = src;
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		layers[i]->Blend(*srcLayers[i], blend);
+	}
 }
 
 ndBrainLayer* ndBrain::AddLayer(ndBrainLayer* const layer)
@@ -232,7 +232,7 @@ void ndBrain::InitGaussianWeights(ndReal variance)
 
 void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, const ndBrainVector& hiddenLayerOutputs)
 {
-	const ndArray<ndBrainLayer*>& layers = (*this);
+	const ndArray<ndBrainLayer*>& layers = *this;
 	ndAssert(layers.GetCount());
 	ndAssert(input.GetCount() == GetInputSize());
 	ndAssert(output.GetCount() == GetOutputSize());
