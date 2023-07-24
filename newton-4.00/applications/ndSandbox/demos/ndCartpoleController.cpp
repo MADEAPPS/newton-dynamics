@@ -38,7 +38,7 @@ namespace ndController_0
 #else
 	enum ndActionSpace
 	{
-		m_doNoting,
+		m_softPush,
 		m_actionsSize
 	};
 #endif
