@@ -624,13 +624,14 @@ namespace ndController_0
 			actor->EndAddLayer(ndReal(0.25f));
 
 			// clear actors bias so that the actions start centered at zero
-			for (ndInt32 i = 0; i < actor->GetCount(); ++i)
-			{
-				ndBrainLayer* const actorLayer = (*(*actor))[i];
-				ndBrainVector& actorLayerBias = actorLayer->GetBias();
-				actorLayerBias.Set(ndReal(0.0f));
-			}
+			//for (ndInt32 i = 0; i < actor->GetCount(); ++i)
+			//{
+			//	ndBrainLayer* const actorLayer = (*(*actor))[i];
+			//	ndBrainVector& actorLayerBias = actorLayer->GetBias();
+			//	actorLayerBias.Set(ndReal(0.0f));
+			//}
 
+			// the critic is more complex since is deal with more complex inputs
 			ndSharedPtr<ndBrain> critic(new ndBrain());
 			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + m_actionsSize, layerSize * 2, m_tanh);
 			ndBrainLayer* const criticLayer1 = new ndBrainLayer(criticLayer0->GetOuputSize(), layerSize * 2, m_tanh);
