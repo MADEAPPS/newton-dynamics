@@ -290,8 +290,9 @@ namespace ndController_0
 					{
 						for (ndInt32 i = 0; i < m_actionsSize; ++i)
 						{
-							ndReal veryNoisyAction = ndReal(ndClamp(100.0f * ndReal (-actions[i]), ndFloat32(-1.0f), ndFloat32(1.0f)));
-							actions[i] = veryNoisyAction;
+							ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
+							ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
+							actions[i] = clippiedNoisyAction;
 						}
 					}
 					m_model->ApplyActions(actions);
@@ -512,7 +513,7 @@ namespace ndController_0
 		void RandomePush()
 		{
 			ndVector impulsePush(ndVector::m_zero);
-			ndFloat32 randValue(ndClamp(ndGaussianRandom(0.0f, 0.5f), -1.0f, 1.0f));
+			ndFloat32 randValue = ndClamp(ndGaussianRandom(0.0f, 0.5f), ndFloat32 (-1.0f), ndFloat32(1.0f));
 			impulsePush.m_x = 5.0f * randValue * m_cart->GetMassMatrix().m_w;
 			m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, m_cart->GetScene()->GetTimestep());
 		}
