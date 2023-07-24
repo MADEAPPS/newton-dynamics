@@ -84,7 +84,7 @@ namespace ndController_0
 					,m_model(nullptr)
 					,m_stopTraining(2000000)
 					,m_maxGain(-1.0e10f)
-					,m_maxFrames(1200.0f)
+					,m_maxFrames(4000.0f)
 					,m_controllerState(0)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
@@ -107,7 +107,7 @@ namespace ndController_0
 
 				virtual void ApplyActions(ndReal* const actions) const
 				{
-					if (GetEpisodeFrames() >= 2500)
+					if (GetEpisodeFrames() >= 10000)
 					{
 						ndUnsigned32 randomIndex = ndRandInt();
 						*actions = ndReal (ndInt32(randomIndex % 3));
@@ -181,7 +181,8 @@ namespace ndController_0
 
 								if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
 								{
-									if (episodeCount && (m_averageQValue.GetAverage() > m_maxGain))
+									//if (episodeCount && (m_averageQValue.GetAverage() > m_maxGain))
+									if (m_averageQValue.GetAverage() > m_maxGain)
 									{
 										char fileName[1024];
 										ndGetWorkingFileName(GetName().GetStr(), fileName);
@@ -285,7 +286,7 @@ namespace ndController_0
 
 				virtual void ApplyActions(ndReal* const actions) const
 				{
-					if (GetEpisodeFrames() >= 10000)
+					if (GetEpisodeFrames() >= 20000)
 					{
 						for (ndInt32 i = 0; i < m_actionsSize; ++i)
 						{
@@ -293,15 +294,6 @@ namespace ndController_0
 							actions[i] = veryNoisyAction;
 						}
 					}
-					else if (GetEpisodeFrames() >= 2500)
-					{
-						for (ndInt32 i = 0; i < m_actionsSize; ++i)
-						{
-							ndReal veryNoisyAction = ndReal(ndClamp(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(0.25f)), ndFloat32(-1.0f), ndFloat32(1.0f)));
-							actions[i] = veryNoisyAction;
-						}
-					}
-					//ndAssert(((m_controllerState == 2) && (actions[0] >= 0.0f)) || (m_controllerState != 2));
 					m_model->ApplyActions(actions);
 				}
 
@@ -370,7 +362,8 @@ namespace ndController_0
 								episodeCount -= GetEposideCount();
 								if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
 								{
-									if (episodeCount && (m_averageQValue.GetAverage() > m_maxGain))
+									//if (episodeCount && (m_averageQValue.GetAverage() > m_maxGain))
+									if (m_averageQValue.GetAverage() > m_maxGain)
 									{
 										char fileName[1024];
 										ndGetWorkingFileName(GetName().GetStr(), fileName);
