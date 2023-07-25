@@ -300,10 +300,9 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 		class ActorLoss: public ndBrainLoss
 		{
 			public:
-			ActorLoss(ndBrainTrainer& actorTrainer, ndBrainTrainer& criticTrainer, ndBrainAgentDDPG_Trainer<statesDim, actionDim>* const agent)
+			ActorLoss(ndBrainTrainer& actorTrainer, ndBrainAgentDDPG_Trainer<statesDim, actionDim>* const agent)
 				:ndBrainLoss()
 				,m_actorTrainer(actorTrainer)
-				//,m_criticTrainer(criticTrainer)
 				,m_agent(agent)
 				,m_index(0)
 			{
@@ -334,20 +333,17 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 			}
 
 			ndBrainTrainer& m_actorTrainer;
-			//ndBrainTrainer& m_criticTrainer;
 			ndBrainAgentDDPG_Trainer<statesDim, actionDim>* m_agent;
 			ndInt32 m_index;
 		};
 
 		ndBrainTrainer& actorTrainer = *(*m_actorOptimizer[threadIndex]);
-		ndBrainTrainer& criticTrainer = *(*m_criticOptimizer[threadIndex]);
 
-		ActorLoss loss(actorTrainer, criticTrainer, this);
+		ActorLoss loss(actorTrainer, this);
 		ndReal inputBuffer[statesDim * 2];
 		ndDeepBrainMemVector input(inputBuffer, statesDim);
 
 		actorTrainer.ClearGradientsAcc();
-		criticTrainer.ClearGradientsAcc();
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{

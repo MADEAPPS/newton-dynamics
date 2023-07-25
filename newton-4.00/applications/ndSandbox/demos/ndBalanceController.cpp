@@ -23,8 +23,8 @@
 namespace ndController_1
 {
 	//#define ND_ALPHA_TOL ndFloat32 (1.0e-3f)
-	#define ND_ACTIONS			12
-	#define ND_TOTAL_ACTIONS	(2 * ND_ACTIONS + 1)
+	//#define ND_ACTIONS			12
+	//#define ND_TOTAL_ACTIONS	(2 * ND_ACTIONS + 1)
 
 #if 0
 	class ndModelUnicycleTrainer : public ndModelUnicycle
@@ -531,32 +531,32 @@ namespace ndController_1
 			//,m_comVel(ndVector::m_zero)
 			//,m_gyroTorque(ndVector::m_zero)
 			//,m_comDist()
-			,m_bodies()
+			//,m_bodies()
 			,m_ballBody(nullptr)
 			,m_controlJoint(nullptr)
 			,m_invMass(ndFloat32(0.0f))
 		{
-			ndFloat32 angleStep = ndFloat32(0.25f) * ndDegreeToRad;
-			for (ndInt32 i = 0; i < ND_TOTAL_ACTIONS; ++i)
-			{
-				m_actionMap[i * 2 + 1] = ndReal(-angleStep);
-				m_actionMap[i * 2 + 2] = ndReal(angleStep);
-				angleStep *= ndFloat32(1.5f);
-			}
-			m_actionMap[0] = 0.0f;
+			//ndFloat32 angleStep = ndFloat32(0.25f) * ndDegreeToRad;
+			//for (ndInt32 i = 0; i < ND_TOTAL_ACTIONS; ++i)
+			//{
+			//	m_actionMap[i * 2 + 1] = ndReal(-angleStep);
+			//	m_actionMap[i * 2 + 2] = ndReal(angleStep);
+			//	angleStep *= ndFloat32(1.5f);
+			//}
+			//m_actionMap[0] = 0.0f;
 		}
 
 		void Init()
 		{
-			ndFloat32 mass = ndFloat32(0.0f);
-			for (ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
-			{
-				ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-				m_bodies.PushBack(body);
-				mass += body->GetMassMatrix().m_w;
-			}
-			m_invMass = ndFloat32(1.0f) / mass;
-			//m_comDist.SetCount(m_bodies.GetCount());
+			//ndFloat32 mass = ndFloat32(0.0f);
+			//for (ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+			//{
+			//	ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+			//	m_bodies.PushBack(body);
+			//	mass += body->GetMassMatrix().m_w;
+			//}
+			//m_invMass = ndFloat32(1.0f) / mass;
+			////m_comDist.SetCount(m_bodies.GetCount());
 		}
 
 		bool ValidateContact(ndWorld* const world)
@@ -791,12 +791,12 @@ namespace ndController_1
 		//ndVector m_comVel;
 		//ndVector m_gyroTorque;
 
-		ndFixSizeArray<ndVector, 8> m_comDist;
-		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
+		//ndFixSizeArray<ndVector, 8> m_comDist;
+		//ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
 		ndBodyDynamic* m_ballBody;
 		ndJointHinge* m_controlJoint;
 		ndFloat32 m_invMass;
-		ndReal m_actionMap[ND_TOTAL_ACTIONS];
+		//ndReal m_actionMap[ND_TOTAL_ACTIONS];
 		//bool m_hasSupport;
 		//ndVector m_crossValidation____;
 	};
@@ -881,14 +881,6 @@ namespace ndController_1
 		model->Init();
 	}
 
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
-	{
-		ndModelUnicycle* const model = new ndModelUnicycle();
-		BuildModel(model, scene, location);
-
-		return model;
-	}
-
 	ndModelArticulation* CreateTrainer(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		ndAssert(0);
@@ -906,6 +898,14 @@ namespace ndController_1
 		//scene->SetAcceleratedUpdate();
 		//return model;
 	}
+
+	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	{
+		ndModelUnicycle* const model = new ndModelUnicycle();
+		BuildModel(model, scene, location);
+
+		return model;
+	}
 }
 
 using namespace ndController_1;
@@ -918,8 +918,8 @@ void ndBalanceController(ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
-	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	ndSharedPtr<ndModel> model(CreateTrainer(scene, matrix));
+	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	//ndSharedPtr<ndModel> model(CreateTrainer(scene, matrix));
 	scene->GetWorld()->AddModel(model);
 
 	ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
