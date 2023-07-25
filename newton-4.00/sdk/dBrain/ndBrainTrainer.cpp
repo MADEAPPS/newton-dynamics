@@ -150,8 +150,8 @@ void ndBrainTrainer::PrefixScan()
 
 void ndBrainTrainer::ClearGradientsAcc()
 {
-	m_biasGradientsAcc.Set(0.0f);
 	m_weightGradients.Set(0.0f);
+	m_biasGradientsAcc.Set(0.0f);
 }
 
 void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 threadIndex, ndInt32 threadCount)
@@ -246,18 +246,6 @@ void ndBrainTrainer::ApplyAdamCorrection()
 
 	ndReal beta1 = 1.0f - m_beta;
 	ndReal alpha1 = 1.0f - m_alpha;
-
-	//for (ndInt32 i = 0; i < m_biasGradientsAcc.GetCount(); ++i)
-	//{
-	//	m_biasGradient_u[i] = m_biasGradient_u[i] * alpha0 + m_biasGradientsAcc[i] * alpha1;
-	//	m_biasGradient_v[i] = m_biasGradient_v[i] * beta0 + m_biasGradientsAcc[i] * m_biasGradientsAcc[i] * beta1;
-	//}
-	//for (ndInt32 i = 0; i < m_weightGradients.GetCount(); ++i)
-	//{
-	//	m_weightGradient_u[i] = m_weightGradient_u[i] * alpha0 + m_weightGradients[i] * alpha1;
-	//	m_weightGradient_v[i] = m_weightGradient_v[i] * beta0 + m_weightGradients[i] * m_weightGradients[i] * beta1;
-	//}
-
 	ndReal* const tempBuff = ndAlloca(ndReal, ndMax(m_biasGradientsAcc.GetCount(), m_weightGradients.GetCount()));
 	ndDeepBrainMemVector temp(tempBuff, m_biasGradientsAcc.GetCount());
 

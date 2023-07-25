@@ -249,12 +249,12 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 		};
 
 		ndBrainTrainer& trainer = *(*m_criticOptimizer[threadIndex]);
-		trainer.ClearGradientsAcc();
 
 		Loss loss(trainer, this);
 		ndReal inputBuffer[(statesDim + actionDim) * 2];
 		ndDeepBrainMemVector input(inputBuffer, statesDim + actionDim);
 
+		trainer.ClearGradientsAcc();
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -295,12 +295,13 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 {
 	auto PropagateBash = ndMakeObject::ndFunction([this, &shuffleBuffer](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		class Loss: public ndBrainLoss
+		class ActorLoss: public ndBrainLoss
 		{
 			public:
-			Loss(ndBrainTrainer& trainer, ndBrainAgentDDPG_Trainer<statesDim, actionDim>* const agent)
+			ActorLoss(ndBrainTrainer& actorTrainer, ndBrainTrainer& criticTrainer, ndBrainAgentDDPG_Trainer<statesDim, actionDim>* const agent)
 				:ndBrainLoss()
-				,m_actorTrainer(trainer)
+				,m_actorTrainer(actorTrainer)
+				,m_criticTrainer(criticTrainer)
 				,m_agent(agent)
 				,m_index(0)
 			{
@@ -331,17 +332,19 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 			}
 
 			ndBrainTrainer& m_actorTrainer;
+			ndBrainTrainer& m_criticTrainer;
 			ndBrainAgentDDPG_Trainer<statesDim, actionDim>* m_agent;
 			ndInt32 m_index;
 		};
 
-		ndBrainTrainer& trainer = *(*m_actorOptimizer[threadIndex]);
-		trainer.ClearGradientsAcc();
+		ndBrainTrainer& actorTrainer = *(*m_actorOptimizer[threadIndex]);
+		ndBrainTrainer& criticTrainer = *(*m_criticOptimizer[threadIndex]);
 
-		Loss loss(trainer, this);
+		ActorLoss loss(actorTrainer, criticTrainer, this);
 		ndReal inputBuffer[statesDim * 2];
 		ndDeepBrainMemVector input(inputBuffer, statesDim);
 
+		actorTrainer.ClearGradientsAcc();
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -353,7 +356,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 				input[j] = transition.m_state[j];
 			}
 			loss.m_index = index;
-			trainer.BackPropagate(input, loss);
+			actorTrainer.BackPropagate(input, loss);
 		}
 	});
 
