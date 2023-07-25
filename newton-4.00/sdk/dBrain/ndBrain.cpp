@@ -287,7 +287,7 @@ void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBra
 	
 		ndDeepBrainMemVector g(gBuff, layer->GetOuputSize());
 		ndDeepBrainMemVector outGradient(zBuff, layer->GetInputSize());
-		ndDeepBrainMemVector z(&hidden_z[m_offsets[i]], layer->GetOuputSize());
+		ndDeepBrainMemVector z(&hidden_z[m_offsets[i + 1]], layer->GetOuputSize());
 	
 		layer->ActivationDerivative(z, g);
 		g.Mul(gradient);
@@ -329,7 +329,7 @@ void ndBrain::CalculateInputGradients(const ndBrainVector& input, ndBrainVector&
 
 		ndDeepBrainMemVector g(gBuff, layer->GetOuputSize());
 		ndDeepBrainMemVector outGradient(zBuff, layer->GetInputSize());
-		ndDeepBrainMemVector z(&hidden_z[m_offsets[i]], layer->GetOuputSize());
+		ndDeepBrainMemVector z(&hidden_z[m_offsets[i + 1]], layer->GetOuputSize());
 
 		layer->ActivationDerivative(z, g);
 		g.Mul(gradient);

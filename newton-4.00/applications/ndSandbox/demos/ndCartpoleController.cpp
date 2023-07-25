@@ -286,7 +286,7 @@ namespace ndController_0
 
 				virtual void ApplyActions(ndReal* const actions) const
 				{
-					if (GetEpisodeFrames() >= 20000)
+					if (GetEpisodeFrames() >= 10000)
 					{
 						for (ndInt32 i = 0; i < m_actionsSize; ++i)
 						{
@@ -308,6 +308,10 @@ namespace ndController_0
 					bool state = m_model->IsTerminal();
 					if (!IsSampling())
 					{
+						if (GetEpisodeFrames() >= 15000)
+						{
+							state = true;
+						}
 						m_averageQValue.Update(GetCurrentValue());
 						if (state)
 						{

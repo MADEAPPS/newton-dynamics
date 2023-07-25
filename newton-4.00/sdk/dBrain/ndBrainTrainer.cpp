@@ -333,11 +333,12 @@ void ndBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
 {
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
+	const ndHidenVariableOffsets& preFixScan = m_brain->m_offsets;
 
-	ndReal* const outputBuffer = ndAlloca(ndReal, layers[layers.GetCount() - 1]->GetOuputSize());
+	ndReal* const outputBuffer = ndAlloca(ndReal, layers[layers.GetCount() - 1]->GetOuputSize() + 32);
 	ndDeepBrainMemVector output(outputBuffer, layers[layers.GetCount() - 1]->GetOuputSize());
 	m_brain->MakePrediction(input, output, m_z);
-	const ndHidenVariableOffsets& preFixScan = m_brain->m_offsets;
+	
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 		ndBrainLayer* const layer = layers[i];
@@ -351,4 +352,9 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	{
 		BackPropagateHiddenLayer(i);
 	}
+	
+	//ndBrainLayer* const layer = layers[0];
+	//const ndDeepBrainMemVector biasGradients1(&m_biasGradients[preFixScan[1]], layer->GetOuputSize());
+	//ndDeepBrainMemVector biasGradients(&m_biasGradients[preFixScan[0]], layer->GetInputSize());
+	//layer->TransposeMul(biasGradients1, biasGradients);
 }
