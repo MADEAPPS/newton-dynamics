@@ -413,7 +413,7 @@ namespace ndController_0
 				ndFloat32 m_maxGain;
 				ndFloat32 m_maxFrames;
 				mutable ndInt32 m_controllerState;
-				mutable ndMovingAverage<256> m_averageQValue;
+				mutable ndMovingAverage<128> m_averageQValue;
 				mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
 			};
 

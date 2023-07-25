@@ -26,287 +26,7 @@ namespace ndController_1
 	#define ND_ACTIONS			12
 	#define ND_TOTAL_ACTIONS	(2 * ND_ACTIONS + 1)
 
-	class ndModelUnicycle : public ndModelArticulation
-	{
-		public:
-		ndModelUnicycle()
-			:ndModelArticulation()
-			//,m_invInertia(ndGetZeroMatrix())
-			//,m_com(ndVector::m_zero)
-			//,m_comVel(ndVector::m_zero)
-			//,m_gyroTorque(ndVector::m_zero)
-			//,m_comDist()
-			,m_bodies()
-			,m_ballBody(nullptr)
-			,m_controlJoint(nullptr)
-			,m_invMass(ndFloat32 (0.0f))
-		{
-			ndFloat32 angleStep = ndFloat32(0.25f) * ndDegreeToRad;
-			for (ndInt32 i = 0; i < ND_TOTAL_ACTIONS; ++i)
-			{
-				m_actionMap[i * 2 + 1] = ndReal(-angleStep);
-				m_actionMap[i * 2 + 2] = ndReal(angleStep);
-				angleStep *= ndFloat32(1.5f);
-			}
-			m_actionMap[0] = 0.0f;
-		}
-
-		void Init()
-		{
-			ndFloat32 mass = ndFloat32(0.0f);
-			for (ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
-			{
-				ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-				m_bodies.PushBack(body);
-				mass += body->GetMassMatrix().m_w;
-			}
-			m_invMass = ndFloat32(1.0f) / mass;
-			//m_comDist.SetCount(m_bodies.GetCount());
-		}
-
-		bool ValidateContact(ndWorld* const world)
-		{
-			bool hasSupport = false;
-			ndBodyKinematic::ndContactMap::Iterator it(m_ballBody->GetContactMap());
-			for (it.Begin(); it; it++)
-			{
-				ndContact* const contact = it.GetNode()->GetInfo();
-				if (contact->IsActive())
-				{
-					world->CalculateJointContacts(contact);
-					hasSupport = true;
-				}
-			}
-			return hasSupport;
-		}
-
 #if 0
-		void InitState(ndWorld* const world)
-		{
-			//a) Mt = sum(m(i))
-			//b) cg = sum(p(i) * m(i)) / Mt
-			//c) Vcg = sum(v(i) * m(i)) / Mt
-			//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
-			//e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
-			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
-			//g) Bcg = (Icg ^ -1) * (T0 + T1)
-
-			//a) Mt = sum(m(i))
-			//b) cg = sum(p(i) * m(i)) / Mt
-			//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
-			//e) T0 = sum(w(i) x (I(i) * w(i))
-			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
-			//g) Bcg = (Icg ^ -1) * (T0 + T1)
-
-			ndVector com(ndVector::m_zero);
-			ndFixSizeArray<ndVector, 8> bodiesCom;
-			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-			{
-				const ndBodyDynamic* const body = m_bodies[i];
-				const ndMatrix matrix (body->GetMatrix());
-				ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
-				bodiesCom.PushBack(bodyCom);
-				com += bodyCom.Scale (body->GetMassMatrix().m_w);
-			}
-			m_com = com.Scale(m_invMass);
-
-			ndMatrix inertia(ndGetZeroMatrix());
-			ndVector gyroTorque(ndVector::m_zero);
-			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-			{
-				const ndBodyDynamic* const body = m_bodies[i];
-
-				const ndMatrix matrix(body->GetMatrix());
-				const ndVector omega(body->GetOmega());
-				const ndVector comDist((bodiesCom[i] - m_com) & ndVector::m_triplexMask);
-
-				m_comDist[i] = comDist;
-				ndMatrix covariance(ndCovarianceMatrix(comDist, comDist));
-				ndMatrix bodyInertia(body->CalculateInertiaMatrix());
-				
-				ndFloat32 mass = body->GetMassMatrix().m_w;
-				inertia.m_front += (bodyInertia.m_front - covariance.m_front.Scale (mass));
-				inertia.m_up += (bodyInertia.m_up - covariance.m_up.Scale(mass));
-				inertia.m_right += (bodyInertia.m_right - covariance.m_right.Scale(mass));
-
-				ndFloat32 massDist2 = comDist.DotProduct(comDist).GetScalar() * mass;
-				inertia.m_front.m_x += massDist2;
-				inertia.m_front.m_y += massDist2;
-				inertia.m_front.m_z += massDist2;
-
-				gyroTorque += omega.CrossProduct(bodyInertia.RotateVector(omega));
-			}
-
-			m_gyroTorque = gyroTorque;
-			inertia.m_posit = ndVector::m_wOne;
-			m_invInertia = inertia.Inverse4x4();
-
-			m_hasSupport = false;
-			ndBodyKinematic::ndContactMap::Iterator it(m_ballBody->GetContactMap());
-			for (it.Begin(); it; it++)
-			{
-				ndContact* const contact = it.GetNode()->GetInfo();
-				if (contact->IsActive())
-				{
-					world->CalculateJointContacts(contact);
-					m_hasSupport = true;
-				}
-			}
-		}
-
-		//e) T0 = sum(w(i) x (I(i) * w(i))
-		//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
-		//g) Bcg = (Icg ^ -1) * (T0 + T1)
-		ndVector CalculateAlpha()
-		{
-			ndVector torque(m_gyroTorque);
-
-			m_invDynamicsSolver.Solve();
-			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-			{
-				ndBodyDynamic* const body = m_bodies[i];
-				
-				ndVector r(m_comDist[i]);
-				ndVector f(m_invDynamicsSolver.GetBodyForce(body));
-				ndVector t(m_invDynamicsSolver.GetBodyTorque(body));
-				torque += (t + r.CrossProduct(f));
-			}
-			return m_invInertia.RotateVector(torque);
-		}
-
-		void Update(ndWorld* const world, ndFloat32 timestep)
-		{
-			ndModelArticulation::Update(world, timestep);
-			//ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
-			//ndAssert(skeleton);
-			//m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
-			//
-			//ndVector alpha(CalculateAlpha());
-			//if (ndAbs(alpha.m_z) > ND_ALPHA_TOL)
-			//{
-			//	//ndTrace(("%d alpha(%f) angle(%f)\n", xxx, alpha.m_z, m_controlJoint->GetOffsetAngle() * ndRadToDegree));
-			//}
-			//m_invDynamicsSolver.SolverEnd();
-		}
-
-		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
-		{
-			ndModelArticulation::PostUpdate(world, timestep);
-
-			InitState(world);
-			if (m_hasSupport)
-			//if (0)
-			{
-				ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
-				ndAssert(skeleton);
-			
-				m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
-				ndVector alpha(CalculateAlpha());
-				if (ndAbs(alpha.m_z) > ND_ALPHA_TOL)
-				{
-					//ndFloat32 angle = m_controlJoint->GetOffsetAngle();
-					ndFloat32 angle = m_controlJoint->GetAngle();
-					//ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, 0.0f));
-			
-					ndInt32 passes = 1;
-					ndFloat32 angleLimit = ndFloat32(45.0f * ndDegreeToRad);
-					do
-					{
-						passes--;
-						ndFloat32 deltaAngle = alpha.m_z * 0.002f;
-						angle += deltaAngle;
-						
-						angle = ndClamp(angle + deltaAngle, -angleLimit, angleLimit);
-						m_controlJoint->SetTargetAngle(angle);
-						m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
-						alpha = CalculateAlpha();
-						//ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, deltaAngle));
-					} while ((ndAbs(alpha.m_z) > ND_ALPHA_TOL) && passes);
-					//ndTrace(("\n"));
-				}
-				m_crossValidation____ = CalculateAlpha();
-			
-				ndFloat32 xxx0 = m_controlJoint->GetTargetAngle() - m_controlJoint->GetAngle();
-				ndTrace(("deltaAngle(%f)\n", xxx0 * ndRadToDegree));
-				m_invDynamicsSolver.SolverEnd();
-			}
-		}
-#else
-		void Update(ndWorld* const world, ndFloat32 timestep)
-		{
-			ndModelArticulation::Update(world, timestep);
-		}
-
-		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
-		{
-			ndModelArticulation::PostUpdate(world, timestep);
-			if (ValidateContact(world))
-			{
-				ndAssert(m_bodies[0]->GetSkeleton());
-				ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
-
-				m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
-
-				//a) Mt = sum(m(i))
-				//b) cg = sum(p(i) * m(i)) / Mt
-				//c) Vcg = sum(v(i) * m(i)) / Mt
-				//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
-				//e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
-				//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
-				//g) Bcg = (Icg ^ -1) * (T0 + T1)
-
-				//a) Mt = sum(m(i))
-				//b) cg = sum(p(i) * m(i)) / Mt
-				//f) T = sum[(p(i) - cg) x Fext(i) + Text(i) + w(i) x (I(i) * w(i)]
-
-				m_invDynamicsSolver.Solve();
-				ndVector com(ndVector::m_zero);
-				ndFixSizeArray<ndVector, 8> bodiesCom;
-				for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-				{
-					const ndBodyDynamic* const body = m_bodies[i];
-					const ndMatrix matrix(body->GetMatrix());
-					ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
-					bodiesCom.PushBack(bodyCom);
-					com += bodyCom.Scale(body->GetMassMatrix().m_w);
-				}
-				com = com.Scale(m_invMass);
-
-				ndVector torque(ndVector::m_zero);
-				for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-				{
-					const ndBodyDynamic* const body = m_bodies[i];
-					const ndVector omega(body->GetOmega());
-					const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
-					const ndVector force(m_invDynamicsSolver.GetBodyForce(body));
-					const ndVector comDist((bodiesCom[i] - com) & ndVector::m_triplexMask);
-
-					torque += m_invDynamicsSolver.GetBodyTorque(body);
-					torque += comDist.CrossProduct(force);
-					torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
-				}
-
-				m_invDynamicsSolver.SolverEnd();
-			}
-		}
-#endif
-
-		//ndMatrix m_invInertia;
-		//ndVector m_com;
-		//ndVector m_comVel;
-		//ndVector m_gyroTorque;
-
-		ndFixSizeArray<ndVector, 8> m_comDist;
-		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
-		ndBodyDynamic* m_ballBody;
-		ndJointHinge* m_controlJoint;
-		ndFloat32 m_invMass;
-		ndReal m_actionMap[ND_TOTAL_ACTIONS];
-		//bool m_hasSupport;
-		//ndVector m_crossValidation____;
-	};
-
-	// implements a DQN to keep the robot balanced
 	class ndModelUnicycleTrainer : public ndModelUnicycle
 	{
 		public:
@@ -586,6 +306,500 @@ namespace ndController_1
 		ndTrainingStage m_trainingState;
 		ndFloat32 m_epsilonGreedy;
 	};
+#endif
+
+	enum ndActionSpace
+	{
+		m_softPush,
+		m_actionsSize
+	};
+
+	enum ndStateSpace
+	{
+		m_poleAngle,
+		m_poleOmega,
+		m_stateSize
+	};
+
+	class ndModelUnicycle : public ndModelArticulation
+	{
+
+		// the table based aproach does is not really parctical
+		// try implement DDPN controller using neural networks, 
+		class ndControllerAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
+		{
+			public:
+			ndControllerAgent(ndSharedPtr<ndBrain>& actor)
+				:ndBrainAgentDDPG<m_stateSize, m_actionsSize>(actor)
+				,m_model(nullptr)
+			{
+			}
+
+			void GetObservation(ndReal* const state) const
+			{
+				ndAssert(0);
+				//m_model->GetObservation(state);
+			}
+
+			virtual void ApplyActions(ndReal* const actions) const
+			{
+				ndAssert(0);
+				//m_model->ApplyActions(actions);
+			}
+
+			ndModelUnicycle* m_model;
+		};
+
+		class ndControllerAgent_trainer : public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
+		{
+			public:
+			ndControllerAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
+				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
+				,m_model(nullptr)
+				,m_stopTraining(1000000)
+				,m_maxGain(-1.0e10f)
+				,m_maxFrames(3000.0f)
+				,m_controllerState(0)
+				,m_averageQValue()
+				,m_averageFramesPerEpisodes()
+			{
+				m_outFile = fopen("traingPerf.csv", "wb");
+			}
+
+			~ndControllerAgent_trainer()
+			{
+				if (m_outFile)
+				{
+					fclose(m_outFile);
+				}
+			}
+
+			ndReal GetReward() const
+			{
+				ndAssert(0);
+				//return m_model->GetReward();
+				return 0;
+			}
+
+			virtual void ApplyActions(ndReal* const actions) const
+			{
+				ndAssert(0);
+				//if (GetEpisodeFrames() >= 10000)
+				//{
+				//	for (ndInt32 i = 0; i < m_actionsSize; ++i)
+				//	{
+				//		ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
+				//		ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
+				//		actions[i] = clippiedNoisyAction;
+				//	}
+				//}
+				//m_model->ApplyActions(actions);
+			}
+
+			void GetObservation(ndReal* const state) const
+			{
+				ndAssert(0);
+				//m_model->GetObservation(state);
+			}
+
+			bool IsTerminal() const
+			{
+				ndAssert(0);
+				//bool state = m_model->IsTerminal();
+				//if (!IsSampling())
+				//{
+				//	if (GetEpisodeFrames() >= 15000)
+				//	{
+				//		state = true;
+				//	}
+				//	m_averageQValue.Update(GetCurrentValue());
+				//	if (state)
+				//	{
+				//		m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
+				//	}
+				//}
+				//return state;
+				return true;
+			}
+
+			void ResetModel() const
+			{
+				ndAssert(0);
+				//m_controllerState = -1;
+				//m_model->ResetModel();
+			}
+
+			void Step()
+			{
+				ndAssert(0);
+				switch (m_controllerState)
+				{
+					case 0:
+					{
+						//m_model->RandomePush();
+						break;
+					}
+					case 1:
+					{
+						break;
+					}
+					default:
+					{
+						ndBrainAgentDDPG_Trainer::Step();
+					}
+				}
+			}
+
+			void OptimizeStep()
+			{
+				ndAssert(0);
+				switch (m_controllerState)
+				{
+					case 0:
+						break;
+					case 1:
+						break;
+
+					default:
+					{
+						ndInt32 stopTraining = GetFramesCount();
+						if (stopTraining <= m_stopTraining)
+						{
+							ndInt32 episodeCount = GetEposideCount();
+							ndBrainAgentDDPG_Trainer::OptimizeStep();
+
+							episodeCount -= GetEposideCount();
+							if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
+							{
+								//if (episodeCount && (m_averageQValue.GetAverage() > m_maxGain))
+								if (m_averageQValue.GetAverage() > m_maxGain)
+								{
+									char fileName[1024];
+									ndGetWorkingFileName(GetName().GetStr(), fileName);
+
+									SaveToFile(fileName);
+									ndExpandTraceMessage("saving to file: %s\n", fileName);
+									ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+									m_maxGain = m_averageQValue.GetAverage();
+								}
+							}
+
+							if (episodeCount && !IsSampling())
+							{
+								ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+								if (m_outFile)
+								{
+									fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
+									fflush(m_outFile);
+								}
+							}
+
+							if (stopTraining == m_stopTraining)
+							{
+								ndExpandTraceMessage("\n");
+								ndExpandTraceMessage("training complete\n");
+							}
+						}
+
+						ndAssert(0);
+						//if (m_model->IsOutOfBounds())
+						//{
+						//	m_model->TelePort();
+						//}
+					}
+				}
+
+				m_controllerState++;
+			}
+
+			FILE* m_outFile;
+			ndModelUnicycle* m_model;
+			ndInt32 m_stopTraining;
+			ndFloat32 m_maxGain;
+			ndFloat32 m_maxFrames;
+			mutable ndInt32 m_controllerState;
+			mutable ndMovingAverage<128> m_averageQValue;
+			mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
+		};
+
+		public:
+
+		ndModelUnicycle()
+			:ndModelArticulation()
+			//,m_invInertia(ndGetZeroMatrix())
+			//,m_com(ndVector::m_zero)
+			//,m_comVel(ndVector::m_zero)
+			//,m_gyroTorque(ndVector::m_zero)
+			//,m_comDist()
+			,m_bodies()
+			,m_ballBody(nullptr)
+			,m_controlJoint(nullptr)
+			,m_invMass(ndFloat32(0.0f))
+		{
+			ndFloat32 angleStep = ndFloat32(0.25f) * ndDegreeToRad;
+			for (ndInt32 i = 0; i < ND_TOTAL_ACTIONS; ++i)
+			{
+				m_actionMap[i * 2 + 1] = ndReal(-angleStep);
+				m_actionMap[i * 2 + 2] = ndReal(angleStep);
+				angleStep *= ndFloat32(1.5f);
+			}
+			m_actionMap[0] = 0.0f;
+		}
+
+		void Init()
+		{
+			ndFloat32 mass = ndFloat32(0.0f);
+			for (ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+				m_bodies.PushBack(body);
+				mass += body->GetMassMatrix().m_w;
+			}
+			m_invMass = ndFloat32(1.0f) / mass;
+			//m_comDist.SetCount(m_bodies.GetCount());
+		}
+
+		bool ValidateContact(ndWorld* const world)
+		{
+			bool hasSupport = false;
+			ndBodyKinematic::ndContactMap::Iterator it(m_ballBody->GetContactMap());
+			for (it.Begin(); it; it++)
+			{
+				ndContact* const contact = it.GetNode()->GetInfo();
+				if (contact->IsActive())
+				{
+					world->CalculateJointContacts(contact);
+					hasSupport = true;
+				}
+			}
+			return hasSupport;
+		}
+
+#if 0
+		void InitState(ndWorld* const world)
+		{
+			//a) Mt = sum(m(i))
+			//b) cg = sum(p(i) * m(i)) / Mt
+			//c) Vcg = sum(v(i) * m(i)) / Mt
+			//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
+			//e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
+			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
+			//g) Bcg = (Icg ^ -1) * (T0 + T1)
+
+			//a) Mt = sum(m(i))
+			//b) cg = sum(p(i) * m(i)) / Mt
+			//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
+			//e) T0 = sum(w(i) x (I(i) * w(i))
+			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
+			//g) Bcg = (Icg ^ -1) * (T0 + T1)
+
+			ndVector com(ndVector::m_zero);
+			ndFixSizeArray<ndVector, 8> bodiesCom;
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				const ndBodyDynamic* const body = m_bodies[i];
+				const ndMatrix matrix(body->GetMatrix());
+				ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+				bodiesCom.PushBack(bodyCom);
+				com += bodyCom.Scale(body->GetMassMatrix().m_w);
+			}
+			m_com = com.Scale(m_invMass);
+
+			ndMatrix inertia(ndGetZeroMatrix());
+			ndVector gyroTorque(ndVector::m_zero);
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				const ndBodyDynamic* const body = m_bodies[i];
+
+				const ndMatrix matrix(body->GetMatrix());
+				const ndVector omega(body->GetOmega());
+				const ndVector comDist((bodiesCom[i] - m_com) & ndVector::m_triplexMask);
+
+				m_comDist[i] = comDist;
+				ndMatrix covariance(ndCovarianceMatrix(comDist, comDist));
+				ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+
+				ndFloat32 mass = body->GetMassMatrix().m_w;
+				inertia.m_front += (bodyInertia.m_front - covariance.m_front.Scale(mass));
+				inertia.m_up += (bodyInertia.m_up - covariance.m_up.Scale(mass));
+				inertia.m_right += (bodyInertia.m_right - covariance.m_right.Scale(mass));
+
+				ndFloat32 massDist2 = comDist.DotProduct(comDist).GetScalar() * mass;
+				inertia.m_front.m_x += massDist2;
+				inertia.m_front.m_y += massDist2;
+				inertia.m_front.m_z += massDist2;
+
+				gyroTorque += omega.CrossProduct(bodyInertia.RotateVector(omega));
+			}
+
+			m_gyroTorque = gyroTorque;
+			inertia.m_posit = ndVector::m_wOne;
+			m_invInertia = inertia.Inverse4x4();
+
+			m_hasSupport = false;
+			ndBodyKinematic::ndContactMap::Iterator it(m_ballBody->GetContactMap());
+			for (it.Begin(); it; it++)
+			{
+				ndContact* const contact = it.GetNode()->GetInfo();
+				if (contact->IsActive())
+				{
+					world->CalculateJointContacts(contact);
+					m_hasSupport = true;
+				}
+			}
+		}
+
+		//e) T0 = sum(w(i) x (I(i) * w(i))
+		//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
+		//g) Bcg = (Icg ^ -1) * (T0 + T1)
+		ndVector CalculateAlpha()
+		{
+			ndVector torque(m_gyroTorque);
+
+			m_invDynamicsSolver.Solve();
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				ndBodyDynamic* const body = m_bodies[i];
+
+				ndVector r(m_comDist[i]);
+				ndVector f(m_invDynamicsSolver.GetBodyForce(body));
+				ndVector t(m_invDynamicsSolver.GetBodyTorque(body));
+				torque += (t + r.CrossProduct(f));
+			}
+			return m_invInertia.RotateVector(torque);
+		}
+
+		void Update(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndModelArticulation::Update(world, timestep);
+			//ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
+			//ndAssert(skeleton);
+			//m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+			//
+			//ndVector alpha(CalculateAlpha());
+			//if (ndAbs(alpha.m_z) > ND_ALPHA_TOL)
+			//{
+			//	//ndTrace(("%d alpha(%f) angle(%f)\n", xxx, alpha.m_z, m_controlJoint->GetOffsetAngle() * ndRadToDegree));
+			//}
+			//m_invDynamicsSolver.SolverEnd();
+		}
+
+		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndModelArticulation::PostUpdate(world, timestep);
+
+			InitState(world);
+			if (m_hasSupport)
+				//if (0)
+			{
+				ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
+				ndAssert(skeleton);
+
+				m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+				ndVector alpha(CalculateAlpha());
+				if (ndAbs(alpha.m_z) > ND_ALPHA_TOL)
+				{
+					//ndFloat32 angle = m_controlJoint->GetOffsetAngle();
+					ndFloat32 angle = m_controlJoint->GetAngle();
+					//ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, 0.0f));
+
+					ndInt32 passes = 1;
+					ndFloat32 angleLimit = ndFloat32(45.0f * ndDegreeToRad);
+					do
+					{
+						passes--;
+						ndFloat32 deltaAngle = alpha.m_z * 0.002f;
+						angle += deltaAngle;
+
+						angle = ndClamp(angle + deltaAngle, -angleLimit, angleLimit);
+						m_controlJoint->SetTargetAngle(angle);
+						m_invDynamicsSolver.UpdateJointAcceleration(m_controlJoint);
+						alpha = CalculateAlpha();
+						//ndTrace(("%d alpha(%f) angle(%f)  deltaAngle(%f)\n", xxx, alpha.m_z, angle * ndRadToDegree, deltaAngle));
+					} while ((ndAbs(alpha.m_z) > ND_ALPHA_TOL) && passes);
+					//ndTrace(("\n"));
+				}
+				m_crossValidation____ = CalculateAlpha();
+
+				ndFloat32 xxx0 = m_controlJoint->GetTargetAngle() - m_controlJoint->GetAngle();
+				ndTrace(("deltaAngle(%f)\n", xxx0 * ndRadToDegree));
+				m_invDynamicsSolver.SolverEnd();
+			}
+		}
+#else
+		void Update(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndModelArticulation::Update(world, timestep);
+		}
+
+		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndModelArticulation::PostUpdate(world, timestep);
+			//if (ValidateContact(world))
+			//{
+			//	ndAssert(m_bodies[0]->GetSkeleton());
+			//	ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
+			//
+			//	m_invDynamicsSolver.SolverBegin(skeleton, nullptr, 0, world, timestep);
+			//
+			//	//a) Mt = sum(m(i))
+			//	//b) cg = sum(p(i) * m(i)) / Mt
+			//	//c) Vcg = sum(v(i) * m(i)) / Mt
+			//	//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
+			//	//e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
+			//	//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
+			//	//g) Bcg = (Icg ^ -1) * (T0 + T1)
+			//
+			//	//a) Mt = sum(m(i))
+			//	//b) cg = sum(p(i) * m(i)) / Mt
+			//	//f) T = sum[(p(i) - cg) x Fext(i) + Text(i) + w(i) x (I(i) * w(i)]
+			//
+			//	m_invDynamicsSolver.Solve();
+			//	ndVector com(ndVector::m_zero);
+			//	ndFixSizeArray<ndVector, 8> bodiesCom;
+			//	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			//	{
+			//		const ndBodyDynamic* const body = m_bodies[i];
+			//		const ndMatrix matrix(body->GetMatrix());
+			//		ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+			//		bodiesCom.PushBack(bodyCom);
+			//		com += bodyCom.Scale(body->GetMassMatrix().m_w);
+			//	}
+			//	com = com.Scale(m_invMass);
+			//
+			//	ndVector torque(ndVector::m_zero);
+			//	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			//	{
+			//		const ndBodyDynamic* const body = m_bodies[i];
+			//		const ndVector omega(body->GetOmega());
+			//		const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+			//		const ndVector force(m_invDynamicsSolver.GetBodyForce(body));
+			//		const ndVector comDist((bodiesCom[i] - com) & ndVector::m_triplexMask);
+			//
+			//		torque += m_invDynamicsSolver.GetBodyTorque(body);
+			//		torque += comDist.CrossProduct(force);
+			//		torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
+			//	}
+			//
+			//	m_invDynamicsSolver.SolverEnd();
+			//}
+		}
+#endif
+
+		//ndMatrix m_invInertia;
+		//ndVector m_com;
+		//ndVector m_comVel;
+		//ndVector m_gyroTorque;
+
+		ndFixSizeArray<ndVector, 8> m_comDist;
+		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
+		ndBodyDynamic* m_ballBody;
+		ndJointHinge* m_controlJoint;
+		ndFloat32 m_invMass;
+		ndReal m_actionMap[ND_TOTAL_ACTIONS];
+		//bool m_hasSupport;
+		//ndVector m_crossValidation____;
+	};
 
 	void BuildModel(ndModelUnicycle* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
@@ -677,18 +891,20 @@ namespace ndController_1
 
 	ndModelArticulation* CreateTrainer(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
-		ndModelUnicycleTrainer* const model = new ndModelUnicycleTrainer();
-		BuildModel(model, scene, location);
-
-		//for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-		for (ndInt32 i = 0; i < model->m_bodies.GetCount(); ++i)
-		{
-			model->m_basePose.PushBack(model->m_bodies[i]);
-		}
-		model->m_basePose.PushBack(model->m_ballBody);
-
-		scene->SetAcceleratedUpdate();
-		return model;
+		ndAssert(0);
+		return nullptr;
+		//ndModelUnicycleTrainer* const model = new ndModelUnicycleTrainer();
+		//BuildModel(model, scene, location);
+		//
+		////for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+		//for (ndInt32 i = 0; i < model->m_bodies.GetCount(); ++i)
+		//{
+		//	model->m_basePose.PushBack(model->m_bodies[i]);
+		//}
+		//model->m_basePose.PushBack(model->m_ballBody);
+		//
+		//scene->SetAcceleratedUpdate();
+		//return model;
 	}
 }
 
