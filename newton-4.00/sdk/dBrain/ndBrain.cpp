@@ -267,16 +267,11 @@ void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBra
 	ndAssert(groundTruth.GetCount() == GetOutputSize());
 	ndAssert(inputGradients.GetCount() == GetInputSize());
 
-	ndInt32 capacity = 0;
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
-	{
-		const ndBrainLayer* const layer = layers[i];
-		capacity = ndMax(capacity, layer->GetRows());
-		capacity = ndMax(capacity, layer->GetColumns());
-	}
-
+	ndInt32 capacity = m_offsets[m_offsets.GetCount() - 1];
+	ndReal* const zBuff = ndAlloca(ndReal, capacity);
+	ndReal* const gBuff = ndAlloca(ndReal, capacity);
 	ndReal* const gradientBuffer = ndAlloca(ndReal, capacity);
-	ndReal* const hidden_zBuffer = ndAlloca(ndReal, m_offsets[m_offsets.GetCount() - 1]);
+	ndReal* const hidden_zBuffer = ndAlloca(ndReal, capacity);
 	
 	ndDeepBrainMemVector gradient(gradientBuffer, capacity);
 	ndDeepBrainMemVector hidden_z(hidden_zBuffer, m_offsets[m_offsets.GetCount() - 1]);
@@ -290,10 +285,8 @@ void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBra
 		ndAssert(layer->GetRows() == layer->GetOuputSize());
 		ndAssert(layer->GetColumns() == layer->GetInputSize());
 	
-		ndReal* const outBuff = ndAlloca(ndReal, layer->GetInputSize());
-		ndReal* const derBuff = ndAlloca(ndReal, layer->GetOuputSize());
-		ndDeepBrainMemVector outGradient(outBuff, layer->GetInputSize());
-		ndDeepBrainMemVector g(derBuff, layer->GetOuputSize());
+		ndDeepBrainMemVector g(gBuff, layer->GetOuputSize());
+		ndDeepBrainMemVector outGradient(zBuff, layer->GetInputSize());
 		ndDeepBrainMemVector z(&hidden_z[m_offsets[i]], layer->GetOuputSize());
 	
 		layer->ActivationDerivative(z, g);
@@ -317,13 +310,6 @@ void ndBrain::CalculateInputGradients(const ndBrainVector& input, ndBrainVector&
 	ndAssert(inputGradients.GetCount() == GetInputSize());
 
 	ndInt32 capacity = m_offsets[m_offsets.GetCount() - 1];
-	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
-	//{
-	//	const ndBrainLayer* const layer = layers[i];
-	//	capacity = ndMax(capacity, layer->GetRows());
-	//	capacity = ndMax(capacity, layer->GetColumns());
-	//}
-
 	ndReal* const zBuff = ndAlloca(ndReal, capacity);
 	ndReal* const gBuff = ndAlloca(ndReal, capacity);
 	ndReal* const gradientBuffer = ndAlloca(ndReal, capacity);

@@ -441,7 +441,8 @@ namespace ndController_0
 			}
 			const ndMatrix& matrix = m_pole->GetMatrix();
 			ndFloat32 sinAngle = matrix.m_front.m_x;
-			ndFloat32 reward = ndReal(ndPow(ndEXP, - ndFloat32 (100.0f) * sinAngle * sinAngle));
+			//ndFloat32 reward = ndReal(ndPow(ndEXP, - ndFloat32 (100.0f) * sinAngle * sinAngle));
+			ndFloat32 reward = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * sinAngle * sinAngle));
 			return ndReal(reward);
 		}
 
