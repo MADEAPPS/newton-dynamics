@@ -140,7 +140,6 @@ void ndBrainMatrix::TransposeMul(const ndBrainVector& input, ndBrainVector& outp
 	ndAssert(input.GetCount() == GetCount());
 	ndAssert(output.GetCount() == GetColumns());
 
-	//output.ScaleSet(me[input.GetCount() - 1], input[input.GetCount() - 1]);
 	output.Set(me[input.GetCount() - 1]);
 	output.Scale(input[input.GetCount() - 1]);
 	for (ndInt32 j = me.GetCount() - 2; j >= 0; --j)

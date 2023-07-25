@@ -122,7 +122,6 @@ void ndBrainTrainer::PrefixScan()
 	m_biasGradient_u.Set(ndReal (0.0f));
 	m_biasGradient_v.Set(ndReal (0.0f));
 	m_biasGradientsAcc.Set(ndReal(0.0f));
-	//m_output.SetCount(layers[layers.GetCount() - 1]->GetOuputSize());
 
 	m_weightGradientsPrefixScan.SetCount(0);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
@@ -151,7 +150,6 @@ void ndBrainTrainer::PrefixScan()
 
 void ndBrainTrainer::ClearGradientsAcc()
 {
-	//m_biasGradients.Set(0.0f);
 	m_biasGradientsAcc.Set(0.0f);
 	m_weightGradients.Set(0.0f);
 }

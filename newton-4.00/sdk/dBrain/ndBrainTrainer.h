@@ -59,7 +59,6 @@ class ndBrainTrainer: public ndClassAlloc
 	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
 	
 	ndBrainVector m_z;
-	//ndBrainVector m_output;
 	ndBrainVector m_zDerivative;
 	ndBrainVector m_biasGradients;
 	ndBrainVector m_weightGradients;

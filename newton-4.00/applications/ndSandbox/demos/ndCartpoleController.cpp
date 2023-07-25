@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#define D_USE_POLE_DQN
+//#define D_USE_POLE_DQN
 
 namespace ndController_0
 {
@@ -261,9 +261,9 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 					,m_model(nullptr)
-					,m_stopTraining(1000000)
+					,m_stopTraining(2000000)
 					,m_maxGain(-1.0e10f)
-					,m_maxFrames(200.0f)
+					,m_maxFrames(500.0f)
 					,m_controllerState(0)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
@@ -378,7 +378,7 @@ namespace ndController_0
 
 								if (episodeCount && !IsSampling())
 								{
-									//ndExpandTraceMessage("%g\n", m_averageQValue.GetAverage());
+									ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 									if (m_outFile)
 									{
 										fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
