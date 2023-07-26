@@ -90,6 +90,7 @@
 
 	#include <unistd.h>
 	#include <assert.h>
+	#include <cstdint>
 	// it was __ARMCC_VERSION before, it should be __ARM__ or aarch64, otherwise cross compiling in gcc fails.
 	#if (!defined(__arm__) && !defined(__aarch64__)) 
 		extern "C" 
