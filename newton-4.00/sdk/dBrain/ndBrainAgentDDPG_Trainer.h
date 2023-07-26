@@ -36,7 +36,7 @@
 #define D_DDPG_CRITIC_LEARN_RATE		ndReal(5.0e-3f)
 #define D_DDPG_ACTOR_LEARN_RATE			(D_DDPG_CRITIC_LEARN_RATE * ndReal(0.125f))
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
-#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
+#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 128)
 //#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
 #define D_DDPG_REPLAY_BASH_SIZE			32
 #define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
@@ -272,8 +272,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 
 			loss.m_index = index;
 			trainer.BackPropagate(input, loss);
-			//trainer.GetBrain()->CalculateInputGradients(input, input);
-			//trainer.GetBrain()->CalculateInputGradients(input, input);
 		}
 	});
 

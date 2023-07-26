@@ -261,10 +261,9 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 					,m_model(nullptr)
-					,m_stopTraining(1000000)
 					,m_maxGain(-1.0e10f)
-					,m_maxFrames(3000.0f)
-					,m_controllerState(0)
+					,m_maxFrames(3000)
+					,m_stopTraining(1000000)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
 				{
@@ -323,96 +322,60 @@ namespace ndController_0
 
 				void ResetModel() const
 				{
-					m_controllerState = -1;
 					m_model->ResetModel();
-				}
-
-				void Step()
-				{
-					switch (m_controllerState)
-					{
-						case 0:
-						{
-							//m_model->RandomePush();
-							break;
-						}
-						case 1:
-						{
-							break;
-						}
-						default:
-						{
-							ndBrainAgentDDPG_Trainer::Step();
-						}
-					}
 				}
 
 				void OptimizeStep()
 				{
-					switch (m_controllerState)
+					ndInt32 stopTraining = GetFramesCount();
+					if (stopTraining <= m_stopTraining)
 					{
-						case 0:
-							break;
-						case 1:
-							break;
+						ndInt32 episodeCount = GetEposideCount();
+						ndBrainAgentDDPG_Trainer::OptimizeStep();
 
-						default:
+						episodeCount -= GetEposideCount();
+						if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32 (m_maxFrames))
 						{
-							ndInt32 stopTraining = GetFramesCount();
-							if (stopTraining <= m_stopTraining)
+							if (m_averageQValue.GetAverage() > m_maxGain)
 							{
-								ndInt32 episodeCount = GetEposideCount();
-								ndBrainAgentDDPG_Trainer::OptimizeStep();
+								char fileName[1024];
+								ndGetWorkingFileName(GetName().GetStr(), fileName);
 
-								episodeCount -= GetEposideCount();
-								if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
-								{
-									//if (episodeCount && (m_averageQValue.GetAverage() > m_maxGain))
-									if (m_averageQValue.GetAverage() > m_maxGain)
-									{
-										char fileName[1024];
-										ndGetWorkingFileName(GetName().GetStr(), fileName);
-
-										SaveToFile(fileName);
-										ndExpandTraceMessage("saving to file: %s\n", fileName);
-										ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
-										m_maxGain = m_averageQValue.GetAverage();
-									}
-								}
-
-								if (episodeCount && !IsSampling())
-								{
-									ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-									if (m_outFile)
-									{
-										fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
-										fflush(m_outFile);
-									}
-								}
-
-								if (stopTraining == m_stopTraining)
-								{
-									ndExpandTraceMessage("\n");
-									ndExpandTraceMessage("training complete\n");
-								}
+								SaveToFile(fileName);
+								ndExpandTraceMessage("saving to file: %s\n", fileName);
+								ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+								m_maxGain = m_averageQValue.GetAverage();
 							}
+						}
 
-							if (m_model->IsOutOfBounds())
+						if (episodeCount && !IsSampling())
+						{
+							ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+							if (m_outFile)
 							{
-								m_model->TelePort();
+								fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
+								fflush(m_outFile);
 							}
+						}
+
+						if (stopTraining == m_stopTraining)
+						{
+							ndExpandTraceMessage("\n");
+							ndExpandTraceMessage("training complete\n");
 						}
 					}
 
-					m_controllerState++;
+					if (m_model->IsOutOfBounds())
+					{
+						m_model->TelePort();
+					}
 				}
 
 				FILE* m_outFile;
 				ndCartpole* m_model;
-				ndInt32 m_stopTraining;
 				ndFloat32 m_maxGain;
-				ndFloat32 m_maxFrames;
-				mutable ndInt32 m_controllerState;
+				ndInt32 m_maxFrames;
+				ndInt32 m_stopTraining;
 				mutable ndMovingAverage<128> m_averageQValue;
 				mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
 			};
