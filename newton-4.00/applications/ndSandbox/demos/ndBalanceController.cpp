@@ -86,8 +86,7 @@ namespace ndController_1
 			ndBodyDynamic* m_body;
 		};
 
-		// the table based approach does is not really practical
-		// try implement DDPN controller using neural networks, 
+		// implement copntroler player
 		class ndControllerAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
 		{
 			public:
@@ -108,16 +107,17 @@ namespace ndController_1
 				m_model->GetObservation(state);
 			}
 
-			//virtual void ApplyActions(ndReal* const actions) const
-			virtual void ApplyActions(ndReal* const) const
+			virtual void ApplyActions(ndReal* const actions) const
 			{
 				ndAssert(0);
-				//m_model->ApplyActions(actions);
+				m_model->ApplyActions(actions);
 			}
 
 			ndModelUnicycle* m_model;
 		};
 
+		// the table based approach does is not really practical
+		// try implement DDPN controller using neural networks, 
 		class ndControllerAgent_trainer : public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
@@ -582,30 +582,20 @@ namespace ndController_1
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
-			//if (ValidateContact(world))
-			//{
-			//}
-
 			m_agent->OptimizeStep();
 		}
 #endif
 
 
 		ndSharedPtr<ndBrainAgent> m_agent;
-		//ndVector m_com;
-		//ndVector m_comVel;
-		//ndVector m_gyroTorque;
-
-		//ndFixSizeArray<ndVector, 8> m_comDist;
 		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
-		ndFixSizeArray<ndBasePose, 32> m_basePose;
+		ndFixSizeArray<ndBasePose, 8> m_basePose;
 		ndWorld* m_world;
 		ndBodyDynamic* m_ballBody;
 		ndJointHinge* m_controlJoint;
 		ndFloat32 m_invMass;
 		ndFloat32 m_timestep;
 		//bool m_hasSupport;
-		//ndVector m_crossValidation____;
 	};
 
 	void BuildModel(ndModelUnicycle* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -692,26 +682,6 @@ namespace ndController_1
 			model->m_basePose.PushBack(model->m_bodies[i]);
 		}
 		model->m_basePose.PushBack(model->m_ballBody);
-
-	}
-
-	//ndModelArticulation* CreateTrainer(ndDemoEntityManager* const scene, const ndMatrix& location)
-	ndModelArticulation* CreateTrainer(ndDemoEntityManager* const, const ndMatrix&)
-	{
-		ndAssert(0);
-		return nullptr;
-		//ndModelUnicycleTrainer* const model = new ndModelUnicycleTrainer();
-		//BuildModel(model, scene, location);
-		//
-		////for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-		//for (ndInt32 i = 0; i < model->m_bodies.GetCount(); ++i)
-		//{
-		//	model->m_basePose.PushBack(model->m_bodies[i]);
-		//}
-		//model->m_basePose.PushBack(model->m_ballBody);
-		//
-		//scene->SetAcceleratedUpdate();
-		//return model;
 	}
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -772,7 +742,6 @@ void ndBalanceController(ndDemoEntityManager* const scene)
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
 	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	//ndSharedPtr<ndModel> model(CreateTrainer(scene, matrix));
 	scene->GetWorld()->AddModel(model);
 
 	ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
