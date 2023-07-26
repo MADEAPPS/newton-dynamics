@@ -322,6 +322,36 @@ namespace ndController_1
 	class ndModelUnicycle : public ndModelArticulation
 	{
 		public:
+		class ndBasePose
+		{
+			public:
+			ndBasePose()
+				:m_body(nullptr)
+			{
+			}
+
+			ndBasePose(ndBodyDynamic* const body)
+				:m_veloc(body->GetVelocity())
+				,m_omega(body->GetOmega())
+				,m_posit(body->GetPosition())
+				,m_rotation(body->GetRotation())
+				,m_body(body)
+			{
+			}
+
+			void SetPose() const
+			{
+				m_body->SetMatrix(ndCalculateMatrix(m_rotation, m_posit));
+				m_body->SetOmega(m_omega);
+				m_body->SetVelocity(m_veloc);
+			}
+
+			ndVector m_veloc;
+			ndVector m_omega;
+			ndVector m_posit;
+			ndQuaternion m_rotation;
+			ndBodyDynamic* m_body;
+		};
 
 		// the table based approach does is not really practical
 		// try implement DDPN controller using neural networks, 
@@ -345,7 +375,8 @@ namespace ndController_1
 				m_model->GetObservation(state);
 			}
 
-			virtual void ApplyActions(ndReal* const actions) const
+			//virtual void ApplyActions(ndReal* const actions) const
+			virtual void ApplyActions(ndReal* const) const
 			{
 				ndAssert(0);
 				//m_model->ApplyActions(actions);
@@ -361,7 +392,7 @@ namespace ndController_1
 				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(3000.0f)
+				,m_maxFrames(3000)
 				,m_stopTraining(1000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
@@ -384,9 +415,7 @@ namespace ndController_1
 
 			ndReal GetReward() const
 			{
-				ndAssert(0);
-				//return m_model->GetReward();
-				return 0;
+				return m_model->GetReward();
 			}
 
 			virtual void ApplyActions(ndReal* const actions) const
@@ -410,34 +439,29 @@ namespace ndController_1
 
 			bool IsTerminal() const
 			{
-				ndAssert(0);
-				//bool state = m_model->IsTerminal();
-				//if (!IsSampling())
-				//{
-				//	if (GetEpisodeFrames() >= 15000)
-				//	{
-				//		state = true;
-				//	}
-				//	m_averageQValue.Update(GetCurrentValue());
-				//	if (state)
-				//	{
-				//		m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
-				//	}
-				//}
-				//return state;
-				return true;
+				bool state = m_model->IsTerminal();
+				if (!IsSampling())
+				{
+					if (GetEpisodeFrames() >= 15000)
+					{
+						state = true;
+					}
+					m_averageQValue.Update(GetCurrentValue());
+					if (state)
+					{
+						m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
+					}
+				}
+				return state;
 			}
 
 			void ResetModel() const
 			{
-				ndAssert(0);
-				//m_controllerState = -1;
-				//m_model->ResetModel();
+				m_model->ResetModel();
 			}
 
 			void OptimizeStep()
 			{
-				ndAssert(0);
 				ndInt32 stopTraining = GetFramesCount();
 				if (stopTraining <= m_stopTraining)
 				{
@@ -445,9 +469,8 @@ namespace ndController_1
 					ndBrainAgentDDPG_Trainer::OptimizeStep();
 
 					episodeCount -= GetEposideCount();
-					if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
+					if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32 (m_maxFrames))
 					{
-						//if (episodeCount && (m_averageQValue.GetAverage() > m_maxGain))
 						if (m_averageQValue.GetAverage() > m_maxGain)
 						{
 							char fileName[1024];
@@ -477,7 +500,7 @@ namespace ndController_1
 					}
 				}
 
-				ndAssert(0);
+				//ndAssert(0);
 				//if (m_model->IsOutOfBounds())
 				//{
 				//	m_model->TelePort();
@@ -749,10 +772,38 @@ namespace ndController_1
 
 		void ApplyActions(ndReal* const actions) const
 		{
-			//ndVector force(m_cart->GetForce());
-			//ndFloat32 action = actions[0];
-			//force.m_x = 2.0f * action * (m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL);
-			//m_cart->SetForce(force);
+			ndFloat32 angle = ndDegreeToRad * ndFloat32(45.0f) * ndFloat32(actions[0]);
+			m_controlJoint->SetTargetAngle(angle);
+		}
+
+		ndReal GetReward() const
+		{
+			//if (IsTerminal())
+			//{
+			//	return ndReal(0.0f);
+			//}
+			//const ndMatrix& matrix = m_pole->GetMatrix();
+			//ndFloat32 sinAngle = matrix.m_front.m_x;
+			////ndFloat32 reward = ndReal(ndPow(ndEXP, - ndFloat32 (100.0f) * sinAngle * sinAngle));
+			//ndFloat32 reward = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * sinAngle * sinAngle));
+			//return ndReal(reward);
+			return ndReal(0.0f);
+		}
+
+		void ResetModel() const
+		{
+			for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
+			{
+				m_basePose[i].SetPose();
+			}
+		}
+
+		bool IsTerminal() const
+		{
+			#define D_REWARD_MIN_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
+			const ndMatrix& matrix = GetRoot()->m_body->GetMatrix();
+			bool fail = ndAbs(ndAsin(matrix.m_up.m_x)) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
+			return fail;
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -812,6 +863,8 @@ namespace ndController_1
 			//
 			//	m_invDynamicsSolver.SolverEnd();
 			//}
+
+			m_agent->OptimizeStep();
 		}
 #endif
 
@@ -824,6 +877,7 @@ namespace ndController_1
 
 		ndFixSizeArray<ndVector, 8> m_comDist;
 		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
+		ndFixSizeArray<ndBasePose, 32> m_basePose;
 		ndBodyDynamic* m_ballBody;
 		ndJointHinge* m_controlJoint;
 		ndFloat32 m_invMass;
@@ -910,9 +964,17 @@ namespace ndController_1
 		model->m_ballBody = wheelBody->GetAsBodyDynamic();
 
 		model->Init();
+
+		for (ndInt32 i = 0; i < model->m_bodies.GetCount(); ++i)
+		{
+			model->m_basePose.PushBack(model->m_bodies[i]);
+		}
+		model->m_basePose.PushBack(model->m_ballBody);
+
 	}
 
-	ndModelArticulation* CreateTrainer(ndDemoEntityManager* const scene, const ndMatrix& location)
+	//ndModelArticulation* CreateTrainer(ndDemoEntityManager* const scene, const ndMatrix& location)
+	ndModelArticulation* CreateTrainer(ndDemoEntityManager* const, const ndMatrix&)
 	{
 		ndAssert(0);
 		return nullptr;

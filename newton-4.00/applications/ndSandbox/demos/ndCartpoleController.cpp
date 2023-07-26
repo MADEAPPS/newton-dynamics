@@ -181,7 +181,6 @@ namespace ndController_0
 
 								if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
 								{
-									//if (episodeCount && (m_averageQValue.GetAverage() > m_maxGain))
 									if (m_averageQValue.GetAverage() > m_maxGain)
 									{
 										char fileName[1024];
