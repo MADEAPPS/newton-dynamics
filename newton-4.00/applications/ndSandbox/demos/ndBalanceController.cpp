@@ -472,7 +472,7 @@ namespace ndController_1
 			ndVector omega(invInertia.RotateVector(angularMomentum));
 
 			const ndMatrix& matrix = GetRoot()->m_body->GetMatrix();
-			ndFloat32 angle = ndAsin(matrix.m_up.m_y);
+			ndFloat32 angle = ndAsin(matrix.m_up.m_x);
 
 			state[m_poleAngle] = ndReal(angle);
 			state[m_poleOmega] = ndReal(omega.m_z);
@@ -542,17 +542,18 @@ namespace ndController_1
 				torque += comDist.CrossProduct(force);
 				torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
 			}
+			invDynamicsSolver->SolverEnd();
+
 			inertia.m_posit = ndVector::m_wOne;
 			ndMatrix invInertia (inertia.Inverse4x4());
 			ndVector alpha(invInertia.RotateVector(torque));
 
 			const ndMatrix& matrix = GetRoot()->m_body->GetMatrix();
-			ndFloat32 sinAngle = matrix.m_front.m_x;
+			ndFloat32 sinAngle = matrix.m_up.m_x;
 			ndFloat32 reward0 = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * sinAngle * sinAngle));
-			//return ndReal(reward);
-
-			invDynamicsSolver->SolverEnd();
-			return ndReal(0.0f);
+			ndFloat32 reward1 = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * alpha.m_z * alpha.m_z));
+			ndFloat32 reward = (2.0f * reward1 + reward0) / 3.0f;
+			return ndReal (reward);
 		}
 
 		void ResetModel() const
@@ -620,7 +621,7 @@ namespace ndController_1
 		ndMatrix limbLocation(matrix);
 		limbLocation.m_posit.m_z += zSize * 0.0f;
 		limbLocation.m_posit.m_y -= ySize * 0.5f;
-		limbLocation.m_posit.m_x += xSize * 0.5f * -0.1f;
+		//limbLocation.m_posit.m_x += xSize * 0.5f;
 
 		// make single leg
 		ndFloat32 limbLength = 0.3f;
