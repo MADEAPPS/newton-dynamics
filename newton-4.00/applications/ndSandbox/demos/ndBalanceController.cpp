@@ -22,9 +22,7 @@
 
 namespace ndController_1
 {
-	//#define ND_ALPHA_TOL ndFloat32 (1.0e-3f)
-	//#define ND_ACTIONS			12
-	//#define ND_TOTAL_ACTIONS	(2 * ND_ACTIONS + 1)
+	#define ND_TRAIN_MODEL
 
 #if 0
 	class ndModelUnicycleTrainer : public ndModelUnicycle
@@ -323,8 +321,9 @@ namespace ndController_1
 
 	class ndModelUnicycle : public ndModelArticulation
 	{
+		public:
 
-		// the table based aproach does is not really parctical
+		// the table based approach does is not really practical
 		// try implement DDPN controller using neural networks, 
 		class ndControllerAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
 		{
@@ -335,10 +334,15 @@ namespace ndController_1
 			{
 			}
 
+			void SetModel(ndModelUnicycle* model)
+			{
+				m_model = model;
+			}
+
 			void GetObservation(ndReal* const state) const
 			{
 				ndAssert(0);
-				//m_model->GetObservation(state);
+				m_model->GetObservation(state);
 			}
 
 			virtual void ApplyActions(ndReal* const actions) const
@@ -356,10 +360,9 @@ namespace ndController_1
 			ndControllerAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
-				,m_stopTraining(1000000)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(3000.0f)
-				,m_controllerState(0)
+				,m_stopTraining(1000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
@@ -374,6 +377,11 @@ namespace ndController_1
 				}
 			}
 
+			void SetModel(ndModelUnicycle* model)
+			{
+				m_model = model;
+			}
+
 			ndReal GetReward() const
 			{
 				ndAssert(0);
@@ -383,23 +391,21 @@ namespace ndController_1
 
 			virtual void ApplyActions(ndReal* const actions) const
 			{
-				ndAssert(0);
-				//if (GetEpisodeFrames() >= 10000)
-				//{
-				//	for (ndInt32 i = 0; i < m_actionsSize; ++i)
-				//	{
-				//		ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
-				//		ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
-				//		actions[i] = clippiedNoisyAction;
-				//	}
-				//}
-				//m_model->ApplyActions(actions);
+				if (GetEpisodeFrames() >= 10000)
+				{
+					for (ndInt32 i = 0; i < m_actionsSize; ++i)
+					{
+						ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
+						ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
+						actions[i] = clippiedNoisyAction;
+					}
+				}
+				m_model->ApplyActions(actions);
 			}
 
 			void GetObservation(ndReal* const state) const
 			{
-				ndAssert(0);
-				//m_model->GetObservation(state);
+				m_model->GetObservation(state);
 			}
 
 			bool IsTerminal() const
@@ -429,133 +435,90 @@ namespace ndController_1
 				//m_model->ResetModel();
 			}
 
-			void Step()
-			{
-				ndAssert(0);
-				switch (m_controllerState)
-				{
-					case 0:
-					{
-						//m_model->RandomePush();
-						break;
-					}
-					case 1:
-					{
-						break;
-					}
-					default:
-					{
-						ndBrainAgentDDPG_Trainer::Step();
-					}
-				}
-			}
-
 			void OptimizeStep()
 			{
 				ndAssert(0);
-				switch (m_controllerState)
+				ndInt32 stopTraining = GetFramesCount();
+				if (stopTraining <= m_stopTraining)
 				{
-					case 0:
-						break;
-					case 1:
-						break;
+					ndInt32 episodeCount = GetEposideCount();
+					ndBrainAgentDDPG_Trainer::OptimizeStep();
 
-					default:
+					episodeCount -= GetEposideCount();
+					if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
 					{
-						ndInt32 stopTraining = GetFramesCount();
-						if (stopTraining <= m_stopTraining)
+						//if (episodeCount && (m_averageQValue.GetAverage() > m_maxGain))
+						if (m_averageQValue.GetAverage() > m_maxGain)
 						{
-							ndInt32 episodeCount = GetEposideCount();
-							ndBrainAgentDDPG_Trainer::OptimizeStep();
+							char fileName[1024];
+							ndGetWorkingFileName(GetName().GetStr(), fileName);
 
-							episodeCount -= GetEposideCount();
-							if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
-							{
-								//if (episodeCount && (m_averageQValue.GetAverage() > m_maxGain))
-								if (m_averageQValue.GetAverage() > m_maxGain)
-								{
-									char fileName[1024];
-									ndGetWorkingFileName(GetName().GetStr(), fileName);
-
-									SaveToFile(fileName);
-									ndExpandTraceMessage("saving to file: %s\n", fileName);
-									ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
-									m_maxGain = m_averageQValue.GetAverage();
-								}
-							}
-
-							if (episodeCount && !IsSampling())
-							{
-								ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-								if (m_outFile)
-								{
-									fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
-									fflush(m_outFile);
-								}
-							}
-
-							if (stopTraining == m_stopTraining)
-							{
-								ndExpandTraceMessage("\n");
-								ndExpandTraceMessage("training complete\n");
-							}
+							SaveToFile(fileName);
+							ndExpandTraceMessage("saving to file: %s\n", fileName);
+							ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+							m_maxGain = m_averageQValue.GetAverage();
 						}
+					}
 
-						ndAssert(0);
-						//if (m_model->IsOutOfBounds())
-						//{
-						//	m_model->TelePort();
-						//}
+					if (episodeCount && !IsSampling())
+					{
+						ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						if (m_outFile)
+						{
+							fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
+							fflush(m_outFile);
+						}
+					}
+
+					if (stopTraining == m_stopTraining)
+					{
+						ndExpandTraceMessage("\n");
+						ndExpandTraceMessage("training complete\n");
 					}
 				}
 
-				m_controllerState++;
+				ndAssert(0);
+				//if (m_model->IsOutOfBounds())
+				//{
+				//	m_model->TelePort();
+				//}
 			}
 
 			FILE* m_outFile;
 			ndModelUnicycle* m_model;
-			ndInt32 m_stopTraining;
 			ndFloat32 m_maxGain;
-			ndFloat32 m_maxFrames;
-			mutable ndInt32 m_controllerState;
+			ndInt32 m_maxFrames;
+			ndInt32 m_stopTraining;
 			mutable ndMovingAverage<128> m_averageQValue;
 			mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
 		};
 
-		public:
-
-		ndModelUnicycle()
+		ndModelUnicycle(ndSharedPtr<ndBrainAgent> agent)
 			:ndModelArticulation()
+			,m_agent(agent)
 			//,m_invInertia(ndGetZeroMatrix())
-			//,m_com(ndVector::m_zero)
+			,m_com(ndVector::m_zero)
 			//,m_comVel(ndVector::m_zero)
 			//,m_gyroTorque(ndVector::m_zero)
 			//,m_comDist()
-			//,m_bodies()
+			,m_bodies()
 			,m_ballBody(nullptr)
 			,m_controlJoint(nullptr)
 			,m_invMass(ndFloat32(0.0f))
 		{
-			//ndFloat32 angleStep = ndFloat32(0.25f) * ndDegreeToRad;
-			//for (ndInt32 i = 0; i < ND_TOTAL_ACTIONS; ++i)
-			//{
-			//	m_actionMap[i * 2 + 1] = ndReal(-angleStep);
-			//	m_actionMap[i * 2 + 2] = ndReal(angleStep);
-			//	angleStep *= ndFloat32(1.5f);
-			//}
-			//m_actionMap[0] = 0.0f;
 		}
 
 		void Init()
 		{
-			//ndFloat32 mass = ndFloat32(0.0f);
-			//for (ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
-			//{
-			//	ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-			//	m_bodies.PushBack(body);
-			//	mass += body->GetMassMatrix().m_w;
-			//}
-			//m_invMass = ndFloat32(1.0f) / mass;
+			m_bodies.SetCount(0);
+			ndFloat32 mass = ndFloat32(0.0f);
+			for (ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+				m_bodies.PushBack(body);
+				mass += body->GetMassMatrix().m_w;
+			}
+			m_invMass = ndFloat32(1.0f) / mass;
 			////m_comDist.SetCount(m_bodies.GetCount());
 		}
 
@@ -727,9 +690,75 @@ namespace ndController_1
 			}
 		}
 #else
+
+		void GetObservation(ndReal* const state)
+		{
+			ndVector com(ndVector::m_zero);
+			ndFixSizeArray<ndVector, 8> bodiesCom;
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				const ndBodyDynamic* const body = m_bodies[i];
+				const ndMatrix matrix(body->GetMatrix());
+				ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+				bodiesCom.PushBack(bodyCom);
+				com += bodyCom.Scale(body->GetMassMatrix().m_w);
+			}
+			m_com = com.Scale(m_invMass);
+
+			ndMatrix inertia(ndGetZeroMatrix());
+			//ndVector gyroTorque(ndVector::m_zero);
+			ndVector angularMomentum(ndVector::m_zero);
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				const ndBodyDynamic* const body = m_bodies[i];
+
+				const ndMatrix matrix(body->GetMatrix());
+				const ndVector omega(body->GetOmega());
+				const ndVector comDist((bodiesCom[i] - m_com) & ndVector::m_triplexMask);
+
+				m_comDist[i] = comDist;
+				ndMatrix covariance(ndCovarianceMatrix(comDist, comDist));
+				ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+
+				ndFloat32 mass = body->GetMassMatrix().m_w;
+				inertia.m_front += (bodyInertia.m_front - covariance.m_front.Scale(mass));
+				inertia.m_up += (bodyInertia.m_up - covariance.m_up.Scale(mass));
+				inertia.m_right += (bodyInertia.m_right - covariance.m_right.Scale(mass));
+
+				ndFloat32 massDist2 = comDist.DotProduct(comDist).GetScalar() * mass;
+				inertia.m_front.m_x += massDist2;
+				inertia.m_front.m_y += massDist2;
+				inertia.m_front.m_z += massDist2;
+
+				angularMomentum += comDist.CrossProduct(body->GetVelocity().Scale(mass));
+				angularMomentum += bodyInertia.RotateVector(omega);
+
+				//gyroTorque += omega.CrossProduct(bodyInertia.RotateVector(omega));
+			}
+
+			inertia.m_posit = ndVector::m_wOne;
+			m_invInertia = inertia.Inverse4x4();
+			ndVector omega(m_invInertia.RotateVector(angularMomentum));
+
+			const ndMatrix& matrix = GetRoot()->m_body->GetMatrix();
+			ndFloat32 angle = ndAsin(matrix.m_up.m_y);
+
+			state[m_poleAngle] = ndReal(angle);
+			state[m_poleOmega] = ndReal(omega.m_z);
+		}
+
+		void ApplyActions(ndReal* const actions) const
+		{
+			//ndVector force(m_cart->GetForce());
+			//ndFloat32 action = actions[0];
+			//force.m_x = 2.0f * action * (m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL);
+			//m_cart->SetForce(force);
+		}
+
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
+			m_agent->Step();
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -786,13 +815,15 @@ namespace ndController_1
 		}
 #endif
 
-		//ndMatrix m_invInertia;
-		//ndVector m_com;
+
+		ndSharedPtr<ndBrainAgent> m_agent;
+		ndMatrix m_invInertia;
+		ndVector m_com;
 		//ndVector m_comVel;
 		//ndVector m_gyroTorque;
 
-		//ndFixSizeArray<ndVector, 8> m_comDist;
-		//ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
+		ndFixSizeArray<ndVector, 8> m_comDist;
+		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
 		ndBodyDynamic* m_ballBody;
 		ndJointHinge* m_controlJoint;
 		ndFloat32 m_invMass;
@@ -901,8 +932,45 @@ namespace ndController_1
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
-		ndModelUnicycle* const model = new ndModelUnicycle();
+		// build neural net controller
+		ndInt32 layerSize = 64;
+		#ifdef ND_TRAIN_MODEL
+			ndSharedPtr<ndBrain> actor(new ndBrain());
+			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
+			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_tanh);
+			actor->BeginAddLayer();
+			actor->AddLayer(layer0);
+			actor->AddLayer(layer1);
+			actor->AddLayer(layer2);
+			actor->AddLayer(ouputLayer);
+			actor->EndAddLayer(ndReal(0.25f));
+
+			// the critic is more complex since is deal with more complex inputs
+			ndSharedPtr<ndBrain> critic(new ndBrain());
+			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + m_actionsSize, layerSize * 2, m_tanh);
+			ndBrainLayer* const criticLayer1 = new ndBrainLayer(criticLayer0->GetOuputSize(), layerSize * 2, m_tanh);
+			ndBrainLayer* const criticLayer2 = new ndBrainLayer(criticLayer1->GetOuputSize(), layerSize * 2, m_tanh);
+			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(criticLayer2->GetOuputSize(), 1, m_lineal);
+			critic->BeginAddLayer();
+			critic->AddLayer(criticLayer0);
+			critic->AddLayer(criticLayer1);
+			critic->AddLayer(criticLayer2);
+			critic->AddLayer(criticOuputLayer);
+			critic->EndAddLayer(ndReal(0.25f));
+
+			// add a reinforcement learning controller 
+			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(actor, critic));
+			agent->SetName("unicycleDDPG.nn");
+
+		#else
+			ndAssert(0);
+		#endif
+
+		ndModelUnicycle* const model = new ndModelUnicycle(agent);
 		BuildModel(model, scene, location);
+		((ndModelUnicycle::ndControllerAgent_trainer*)*agent)->SetModel(model);
 
 		return model;
 	}

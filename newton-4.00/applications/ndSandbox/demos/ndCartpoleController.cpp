@@ -560,7 +560,7 @@ namespace ndController_0
 
 	ndModelArticulation* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
-		// build neutral net controller
+		// build neural net controller
 		ndInt32 layerSize = 64;
 		#ifdef D_USE_POLE_DQN
 			ndSharedPtr<ndBrain> actor(new ndBrain());
@@ -591,14 +591,6 @@ namespace ndController_0
 			actor->AddLayer(layer2);
 			actor->AddLayer(ouputLayer);
 			actor->EndAddLayer(ndReal(0.25f));
-
-			// clear actors bias so that the actions start centered at zero
-			//for (ndInt32 i = 0; i < actor->GetCount(); ++i)
-			//{
-			//	ndBrainLayer* const actorLayer = (*(*actor))[i];
-			//	ndBrainVector& actorLayerBias = actorLayer->GetBias();
-			//	actorLayerBias.Set(ndReal(0.0f));
-			//}
 
 			// the critic is more complex since is deal with more complex inputs
 			ndSharedPtr<ndBrain> critic(new ndBrain());
