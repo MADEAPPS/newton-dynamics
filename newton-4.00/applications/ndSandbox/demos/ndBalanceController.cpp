@@ -773,6 +773,7 @@ namespace ndController_1
 		void ApplyActions(ndReal* const actions) const
 		{
 			ndFloat32 angle = ndDegreeToRad * ndFloat32(45.0f) * ndFloat32(actions[0]);
+			//angle = ndAbs(angle);
 			m_controlJoint->SetTargetAngle(angle);
 		}
 
@@ -1026,6 +1027,7 @@ namespace ndController_1
 			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(actor, critic));
 			agent->SetName("unicycleDDPG.nn");
 
+			scene->SetAcceleratedUpdate();
 		#else
 			ndAssert(0);
 		#endif
