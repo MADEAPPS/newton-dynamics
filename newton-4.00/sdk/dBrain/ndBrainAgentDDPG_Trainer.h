@@ -42,7 +42,6 @@
 #define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
 #define D_DDPG_SOFT_TARGET_FACTOR		ndReal (1.0e-3f)
 #define D_DDPG_ACTION_NOISE_DEVIATION	ndReal (0.05f)
-//#define D_DDPG_ACTION_NOISE_DEVIATION	ndReal (0.0f)
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
