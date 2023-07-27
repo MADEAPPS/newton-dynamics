@@ -253,7 +253,8 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 					{
 						actorInput[i] = transition.m_nextState[i];
 					}
-					m_agent->m_actor->MakePrediction(actorInput, actorOutput);
+					//m_agent->m_actor->MakePrediction(actorInput, actorOutput);
+					m_agent->m_targetActor.MakePrediction(actorInput, actorOutput);
 
 					ndReal criticInputBuffer[(statesDim + actionDim) * 2];
 					ndDeepBrainMemVector criticInput(criticInputBuffer, statesDim + actionDim);
