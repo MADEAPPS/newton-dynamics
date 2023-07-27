@@ -37,14 +37,17 @@
 
 namespace ndController_1
 {
-	//#define ND_TRAIN_MODEL
+//	#define ND_TRAIN_MODEL
 
+
+	#define ND_MAX_WHEEL_STEP		(ndFloat32 (4.0f) * ndDegreeToRad)
+	#define ND_MAX_ANGLE_STEP		(ndFloat32 (3.0f) * ndDegreeToRad)
 	#define ND_MAX_JOINT_ANGLE		(ndFloat32 (30.0f) * ndDegreeToRad)
-	#define ND_MAX_JOINT_ANGLE_STEP (ndFloat32 (3.0f) * ndDegreeToRad)
 
 	enum ndActionSpace
 	{
-		m_softPush,
+		m_softLegControl,
+		m_softWheelControl,
 		m_actionsSize
 	};
 
@@ -255,8 +258,9 @@ namespace ndController_1
 			:ndModelArticulation()
 			,m_agent(agent)
 			,m_bodies()
-			,m_ballBody(nullptr)
-			,m_controlJoint(nullptr)
+			//,m_ballBody(nullptr)
+			,m_legJoint(nullptr)
+			,m_wheelJoint(nullptr)
 			,m_invMass(ndFloat32(0.0f))
 		{
 		}
@@ -274,19 +278,19 @@ namespace ndController_1
 			m_invMass = ndFloat32(1.0f) / mass;
 		}
 
-		bool ValidateContact(ndWorld* const world)
+		bool ValidateContact(ndWorld* const)
 		{
 			bool hasSupport = false;
-			ndBodyKinematic::ndContactMap::Iterator it(m_ballBody->GetContactMap());
-			for (it.Begin(); it; it++)
-			{
-				ndContact* const contact = it.GetNode()->GetInfo();
-				if (contact->IsActive())
-				{
-					world->CalculateJointContacts(contact);
-					hasSupport = true;
-				}
-			}
+			//ndBodyKinematic::ndContactMap::Iterator it(m_ballBody->GetContactMap());
+			//for (it.Begin(); it; it++)
+			//{
+			//	ndContact* const contact = it.GetNode()->GetInfo();
+			//	if (contact->IsActive())
+			//	{
+			//		world->CalculateJointContacts(contact);
+			//		hasSupport = true;
+			//	}
+			//}
 			return hasSupport;
 		}
 
@@ -479,14 +483,16 @@ namespace ndController_1
 
 			state[m_topBoxAngle] = ndReal(angle);
 			state[m_modelOmega] = ndReal(omega.m_z);
-			state[m_jointAngle] = m_controlJoint->GetAngle() / ND_MAX_JOINT_ANGLE;
+			state[m_jointAngle] = m_legJoint->GetAngle() / ND_MAX_JOINT_ANGLE;
 		}
 
 		void ApplyActions(ndReal* const actions) const
 		{
-			ndFloat32 angle = ndClamp (actions[0] * ND_MAX_JOINT_ANGLE_STEP + m_controlJoint->GetAngle(), -ND_MAX_JOINT_ANGLE, ND_MAX_JOINT_ANGLE);
-			//angle = ndAbs(angle);
-			m_controlJoint->SetTargetAngle(angle);
+			ndFloat32 legAngle = ndClamp (actions[m_softLegControl] * ND_MAX_ANGLE_STEP + m_legJoint->GetAngle(), -ND_MAX_JOINT_ANGLE, ND_MAX_JOINT_ANGLE);
+			m_legJoint->SetTargetAngle(legAngle);
+
+			ndFloat32 wheelAngle = actions[m_softWheelControl] * ND_MAX_WHEEL_STEP;
+			m_wheelJoint->SetTargetAngle(m_wheelJoint->GetTargetAngle() + wheelAngle);
 		}
 
 		ndReal GetReward() const
@@ -569,6 +575,8 @@ namespace ndController_1
 			{
 				m_basePose[i].SetPose();
 			}
+			m_legJoint->SetTargetAngle(0.0f);
+			m_wheelJoint->SetTargetAngle(0.0f);
 		}
 
 		bool IsTerminal() const
@@ -600,8 +608,8 @@ namespace ndController_1
 		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
 		ndFixSizeArray<ndBasePose, 8> m_basePose;
 		ndWorld* m_world;
-		ndBodyDynamic* m_ballBody;
-		ndJointHinge* m_controlJoint;
+		ndJointHinge* m_legJoint;
+		ndJointHinge* m_wheelJoint;
 		ndFloat32 m_invMass;
 		ndFloat32 m_timestep;
 	};
@@ -628,7 +636,6 @@ namespace ndController_1
 		ndMatrix limbLocation(matrix);
 		limbLocation.m_posit.m_z += zSize * 0.0f;
 		limbLocation.m_posit.m_y -= ySize * 0.5f;
-		//limbLocation.m_posit.m_x += xSize * 0.5f;
 
 		// make single leg
 		ndFloat32 limbLength = 0.3f;
@@ -643,7 +650,7 @@ namespace ndController_1
 		ndSharedPtr<ndJointBilateralConstraint> legJoint(new ndJointHinge(legPivot, legBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
 		ndJointHinge* const hinge = (ndJointHinge*)*legJoint;
 		hinge->SetAsSpringDamper(0.001f, 1500, 40.0f);
-		model->m_controlJoint = hinge;
+		model->m_legJoint = hinge;
 
 		// make wheel
 		ndFloat32 wheelRadio = 4.0f * limbRadio;
@@ -651,8 +658,10 @@ namespace ndController_1
 		ndMatrix wheelMatrix(legPivot);
 		wheelMatrix.m_posit.m_y -= limbLength;
 		wheelBody->SetMatrix(wheelMatrix);
-		ndSharedPtr<ndJointBilateralConstraint> wheelJoint(new ndJointSpherical(wheelMatrix, wheelBody->GetAsBodyKinematic(), legBody->GetAsBodyKinematic()));
-		//((ndJointSpherical*)*wheelJoint)->SetAsSpringDamper(ndFloat32(0.001f), ndFloat32(0.0f), ndFloat32(10.f));
+		ndSharedPtr<ndJointBilateralConstraint> wheelJoint(new ndJointHinge(wheelMatrix, wheelBody->GetAsBodyKinematic(), legBody->GetAsBodyKinematic()));
+		ndJointHinge* const wheelMotor = (ndJointHinge*)*wheelJoint;
+		wheelMotor->SetAsSpringDamper(0.001f, 1500, 10.0f);
+		model->m_wheelJoint = wheelMotor;
 
 		// tele port the model so that is on the floor
 		ndMatrix probeMatrix(wheelMatrix);
@@ -674,22 +683,18 @@ namespace ndController_1
 		wheelBody->GetNotifyCallback()->OnTransform(0, wheelMatrix);
 		modelRoot->m_body->GetNotifyCallback()->OnTransform(0, rootMatrix);
 
-		// add the joints manually, because on this model the wheel is not actuated.
 		world->AddJoint(legJoint);
 		world->AddJoint(wheelJoint);
 
 		// add model limbs
-		model->AddLimb(modelRoot, legBody, legJoint);
-
-		model->m_ballBody = wheelBody->GetAsBodyDynamic();
+		ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
+		model->AddLimb(legLimb, wheelBody, wheelJoint);
 
 		model->Init();
-
 		for (ndInt32 i = 0; i < model->m_bodies.GetCount(); ++i)
 		{
 			model->m_basePose.PushBack(model->m_bodies[i]);
 		}
-		model->m_basePose.PushBack(model->m_ballBody);
 	}
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
