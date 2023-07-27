@@ -122,15 +122,17 @@ namespace ndController_1
 
 		// the table based approach does is not really practical
 		// try implement DDPN controller using neural networks, 
-		class ndControllerAgent_trainer : public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
+		//class ndControllerAgent_trainer: public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
+		class ndControllerAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
 			ndControllerAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
-				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
+				//:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
+				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(200)
-				,m_stopTraining(2000000)
+				,m_stopTraining(1000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
@@ -651,7 +653,7 @@ namespace ndController_1
 		wheelBody->SetMatrix(wheelMatrix);
 		ndSharedPtr<ndJointBilateralConstraint> wheelJoint(new ndJointHinge(wheelMatrix, wheelBody->GetAsBodyKinematic(), legBody->GetAsBodyKinematic()));
 		ndJointHinge* const wheelMotor = (ndJointHinge*)*wheelJoint;
-		wheelMotor->SetAsSpringDamper(0.001f, 1500, 10.0f);
+		wheelMotor->SetAsSpringDamper(0.001f, 1500, 1.0f);
 		model->m_wheelJoint = wheelMotor;
 
 		// tele port the model so that is on the floor

@@ -63,21 +63,19 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 
 	protected:
 	void Step();
+	void Optimize();
 	void OptimizeStep();
 	void Save(ndBrainSave* const loadSave) const;
-
 	bool IsSampling() const;
 	bool IsTerminal() const;
 	ndReal GetReward() const;
-	ndReal PerturbeAction(ndReal action) const;
-
-	private:
-	void Optimize();
-	void BackPropagate();
 	void PopulateReplayBuffer();
 	void SetBufferSize(ndInt32 size);
+	ndReal PerturbeAction(ndReal action) const;
 	void BackPropagateActor(const ndUnsigned32* const bashIndex);
 	void BackPropagateCritic(const ndUnsigned32* const bashIndex);
+
+	virtual void BackPropagate();
 
 	ndSharedPtr<ndBrain> m_actor;
 	ndSharedPtr<ndBrain> m_critic;
@@ -136,8 +134,8 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	{
 		m_actorOptimizer.PushBack(new ndBrainTrainer(*m_actor));
 		m_criticOptimizer.PushBack(new ndBrainTrainer(*m_critic));
-		m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(D_DQN_REGULARIZER);
-		m_criticOptimizer[m_criticOptimizer.GetCount() - 1]->SetRegularizer(D_DQN_REGULARIZER);
+		m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(D_DDPG_REGULARIZER);
+		m_criticOptimizer[m_criticOptimizer.GetCount() - 1]->SetRegularizer(D_DDPG_REGULARIZER);
 	}
 
 	m_state.SetCount(statesDim);
