@@ -481,7 +481,7 @@ namespace ndController_1
 
 		void ApplyActions(ndReal* const actions) const
 		{
-			ndFloat32 angle = ndDegreeToRad * ndFloat32(45.0f) * ndFloat32(actions[0]);
+			ndFloat32 angle = ndDegreeToRad * ndFloat32(30.0f) * ndFloat32(actions[0]);
 			//angle = ndAbs(angle);
 			m_controlJoint->SetTargetAngle(angle);
 		}
@@ -603,7 +603,7 @@ namespace ndController_1
 
 	void BuildModel(ndModelUnicycle* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
-		ndFloat32 mass = 10.0f;
+		ndFloat32 mass = 20.0f;
 		ndFloat32 limbMass = 1.0f;
 		ndFloat32 wheelMass = 1.0f;
 
