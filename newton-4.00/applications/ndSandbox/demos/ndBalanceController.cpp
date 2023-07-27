@@ -472,7 +472,8 @@ namespace ndController_1
 			ndVector omega(invInertia.RotateVector(angularMomentum));
 
 			const ndMatrix& matrix = GetRoot()->m_body->GetMatrix();
-			ndFloat32 angle = ndAsin(matrix.m_up.m_x);
+			ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
+			ndFloat32 angle = ndAsin(sinAngle);
 
 			state[m_poleAngle] = ndReal(angle);
 			state[m_poleOmega] = ndReal(omega.m_z);
@@ -568,7 +569,8 @@ namespace ndController_1
 		{
 			#define D_REWARD_MIN_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
 			const ndMatrix& matrix = GetRoot()->m_body->GetMatrix();
-			bool fail = ndAbs(ndAsin(matrix.m_up.m_x)) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
+			ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32 (-0.9f), ndFloat32(0.9f));
+			bool fail = ndAbs(ndAsin(sinAngle)) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
 			return fail;
 		}
 
