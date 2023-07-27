@@ -37,7 +37,10 @@
 
 namespace ndController_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
+
+	#define ND_MAX_JOINT_ANGLE		(ndFloat32 (30.0f) * ndDegreeToRad)
+	#define ND_MAX_JOINT_ANGLE_STEP (ndFloat32 (3.0f) * ndDegreeToRad)
 
 	enum ndActionSpace
 	{
@@ -47,8 +50,9 @@ namespace ndController_1
 
 	enum ndStateSpace
 	{
-		m_poleAngle,
-		m_poleOmega,
+		m_topBoxAngle,
+		m_modelOmega,
+		m_jointAngle,
 		m_stateSize
 	};
 
@@ -103,13 +107,11 @@ namespace ndController_1
 
 			void GetObservation(ndReal* const state) const
 			{
-				ndAssert(0);
 				m_model->GetObservation(state);
 			}
 
 			virtual void ApplyActions(ndReal* const actions) const
 			{
-				ndAssert(0);
 				m_model->ApplyActions(actions);
 			}
 
@@ -125,7 +127,7 @@ namespace ndController_1
 				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(3000)
+				,m_maxFrames(200)
 				,m_stopTraining(1000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
@@ -475,13 +477,14 @@ namespace ndController_1
 			ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
 			ndFloat32 angle = ndAsin(sinAngle);
 
-			state[m_poleAngle] = ndReal(angle);
-			state[m_poleOmega] = ndReal(omega.m_z);
+			state[m_topBoxAngle] = ndReal(angle);
+			state[m_modelOmega] = ndReal(omega.m_z);
+			state[m_jointAngle] = m_controlJoint->GetAngle() / ND_MAX_JOINT_ANGLE;
 		}
 
 		void ApplyActions(ndReal* const actions) const
 		{
-			ndFloat32 angle = ndDegreeToRad * ndFloat32(30.0f) * ndFloat32(actions[0]);
+			ndFloat32 angle = ndClamp (actions[0] * ND_MAX_JOINT_ANGLE_STEP + m_controlJoint->GetAngle(), -ND_MAX_JOINT_ANGLE, ND_MAX_JOINT_ANGLE);
 			//angle = ndAbs(angle);
 			m_controlJoint->SetTargetAngle(angle);
 		}
@@ -549,11 +552,14 @@ namespace ndController_1
 			ndMatrix invInertia (inertia.Inverse4x4());
 			ndVector alpha(invInertia.RotateVector(torque));
 
-			const ndMatrix& matrix = GetRoot()->m_body->GetMatrix();
-			ndFloat32 sinAngle = matrix.m_up.m_x;
-			ndFloat32 reward0 = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * sinAngle * sinAngle));
-			ndFloat32 reward1 = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * alpha.m_z * alpha.m_z));
-			ndFloat32 reward = (2.0f * reward1 + reward0) / 3.0f;
+			//const ndMatrix& matrix = GetRoot()->m_body->GetMatrix();
+			//ndFloat32 sinAngle = matrix.m_up.m_x;
+			//ndFloat32 reward0 = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * sinAngle * sinAngle));
+			//ndFloat32 reward1 = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * alpha.m_z * alpha.m_z));
+			//ndFloat32 reward = (2.0f * reward1 + reward0) / 3.0f;
+
+			ndFloat32 reward = ndReal(ndPow(ndEXP, -ndFloat32(1.0f) * alpha.m_z * alpha.m_z));
+			//ndTrace(("a=%g r=%g\n", alpha.m_z, reward));
 			return ndReal (reward);
 		}
 
@@ -598,7 +604,6 @@ namespace ndController_1
 		ndJointHinge* m_controlJoint;
 		ndFloat32 m_invMass;
 		ndFloat32 m_timestep;
-		//bool m_hasSupport;
 	};
 
 	void BuildModel(ndModelUnicycle* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -690,8 +695,8 @@ namespace ndController_1
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		// build neural net controller
-		ndInt32 layerSize = 64;
 		#ifdef ND_TRAIN_MODEL
+			ndInt32 layerSize = 64;
 			ndSharedPtr<ndBrain> actor(new ndBrain());
 			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
 			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
@@ -723,12 +728,19 @@ namespace ndController_1
 
 			scene->SetAcceleratedUpdate();
 		#else
-			ndAssert(0);
+			char fileName[1024];
+			ndGetWorkingFileName("unicycleDDPG.nn", fileName);
+			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+			ndSharedPtr<ndBrainAgent> agent(new  ndModelUnicycle::ndControllerAgent(actor));
 		#endif
 
 		ndModelUnicycle* const model = new ndModelUnicycle(agent);
 		BuildModel(model, scene, location);
-		((ndModelUnicycle::ndControllerAgent_trainer*)*agent)->SetModel(model);
+		#ifdef ND_TRAIN_MODEL
+			((ndModelUnicycle::ndControllerAgent_trainer*)*agent)->SetModel(model);
+		#else
+			((ndModelUnicycle::ndControllerAgent*)*agent)->SetModel(model);
+		#endif
 
 		return model;
 	}
