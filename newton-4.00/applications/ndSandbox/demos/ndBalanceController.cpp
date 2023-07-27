@@ -37,7 +37,7 @@
 
 namespace ndController_1
 {
-	#define ND_TRAIN_MODEL
+//	#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_STEP		(ndFloat32 (4.0f) * ndDegreeToRad)
 	#define ND_MAX_ANGLE_STEP		(ndFloat32 (3.0f) * ndDegreeToRad)
