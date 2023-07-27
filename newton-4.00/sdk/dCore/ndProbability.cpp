@@ -252,34 +252,3 @@ ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
 	ndScopeSpinLock lock(GetLock());
 	return generator.GetGaussianRandom(mean, sigma);
 }
-
-
-ndOUNoise::ndOUNoise(ndFloat32 value, ndFloat32 theta, ndFloat32 mean, ndFloat32 sigma)
-	:m_value(value)
-	,m_mean(mean)
-	,m_sigma(sigma)
-	,m_theta(theta)
-{
-}
-
-void ndOUNoise::Reset(ndFloat32 value)
-{
-	m_value = value;
-}
-
-ndFloat32 ndOUNoise::Evaluate(ndFloat32 step)
-{
-	// from the paper and wikipedia
-	//dx = theta * (mu - x) * dt + sigma * np.sqrt(dt) * np.random.normal(size = action_dim)
-	//x = x + dx
-	
-	// but after substitutions, 
-	//ndFloat32 dx = m_theta * (m_mean - m_value) * step + m_sigma * ndSqrt(step) * ndGaussianRandom(ndFloat32 (0.0f), ndFloat32(1.0f));
-	//ndFloat32 dx = m_theta * (m_mean - m_value) * step + ndGaussianRandom(ndFloat32(0.0f), m_sigma * ndSqrt(step));
-
-	// the function reduces to a Brownian Gaussian process.
-	ndFloat32 dx = ndGaussianRandom(m_theta * (m_mean - m_value) * step, m_sigma * ndSqrt(step));
-	m_value += dx;
-	return m_value;
-}
-

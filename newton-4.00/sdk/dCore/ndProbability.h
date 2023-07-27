@@ -59,21 +59,5 @@ class ndRandom
 	std::mt19937 m_generator;
 };
 
-/// generate a Gaussian process of centered at mean, deviation sigma and uncertainty range theta.
-/// this class is used to randomly explore the environment when using reinforcement learning training.
-class ndOUNoise
-{
-	public: 
-	D_CORE_API ndOUNoise(ndFloat32 value, ndFloat32 theta, ndFloat32 mean, ndFloat32 sigma);
-	D_CORE_API void Reset(ndFloat32 value);
-	D_CORE_API ndFloat32 Evaluate(ndFloat32 step);
-
-	private:
-	ndFloat32 m_value;
-	ndFloat32 m_mean;
-	ndFloat32 m_sigma;
-	ndFloat32 m_theta;
-};
-
 #endif
 
