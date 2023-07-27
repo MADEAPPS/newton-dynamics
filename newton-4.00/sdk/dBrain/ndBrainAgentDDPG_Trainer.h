@@ -41,8 +41,7 @@
 #define D_DDPG_REPLAY_BASH_SIZE			32
 #define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
 #define D_DDPG_SOFT_TARGET_FACTOR		ndReal (1.0e-3f)
-#define D_DDPG_ACTION_NOISE_DEVIATION	ndReal (0.05f)
-//#define D_DDPG_ACTION_NOISE_DEVIATION	ndReal (0.01f)
+#define D_DDPG_ACTION_NOISE_VARIANCE	ndReal (0.05f)
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
@@ -55,6 +54,12 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndInt32 GetFramesCount() const;
 	ndInt32 GetEposideCount() const;
 	ndInt32 GetEpisodeFrames() const;
+
+	ndReal GetLearnRate() const;
+	void SetLearnRate(ndReal learnRate);
+
+	ndReal GetActionNoise() const;
+	void SetActionNoise(ndReal learnRate);
 
 	protected:
 	void Step();
@@ -92,7 +97,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndReal m_actorLearnRate;
 	ndReal m_criticLearnRate;
 	ndReal m_softTargetFactor;
-	ndReal m_actionNoiseDeviation;
+	ndReal m_actionNoiseVariance;
 	ndInt32 m_frameCount;
 	ndInt32 m_framesAlive;
 	ndInt32 m_eposideCount;
@@ -113,7 +118,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	,m_actorLearnRate(D_DDPG_ACTOR_LEARN_RATE)
 	,m_criticLearnRate(D_DDPG_CRITIC_LEARN_RATE)
 	,m_softTargetFactor(D_DDPG_SOFT_TARGET_FACTOR)
-	,m_actionNoiseDeviation(D_DDPG_ACTION_NOISE_DEVIATION)
+	,m_actionNoiseVariance(D_DDPG_ACTION_NOISE_VARIANCE)
 	,m_frameCount(0)
 	,m_framesAlive(0)
 	,m_eposideCount(0)
@@ -148,6 +153,31 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDDPG_Trainer<statesDim, actionDim>::~ndBrainAgentDDPG_Trainer()
 {
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetLearnRate() const
+{
+	return m_criticLearnRate;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SetLearnRate(ndReal learnRate)
+{
+	m_criticLearnRate = learnRate;
+	m_actorLearnRate = learnRate * ndReal (0.125f);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetActionNoise() const
+{
+	return m_actionNoiseVariance;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SetActionNoise(ndReal noiseVariance)
+{
+	m_actionNoiseVariance = noiseVariance;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -410,7 +440,7 @@ ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetReward() const
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PerturbeAction(ndReal action) const
 {
-	ndReal actionNoise = ndReal(ndGaussianRandom(ndFloat32(action), ndFloat32(m_actionNoiseDeviation)));
+	ndReal actionNoise = ndReal(ndGaussianRandom(ndFloat32(action), ndFloat32(m_actionNoiseVariance)));
 	return ndClamp(actionNoise, ndReal(-1.0f), ndReal(1.0f));
 }
 

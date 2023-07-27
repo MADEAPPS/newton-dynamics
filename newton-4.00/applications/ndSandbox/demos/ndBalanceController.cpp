@@ -39,7 +39,6 @@ namespace ndController_1
 {
 //	#define ND_TRAIN_MODEL
 
-
 	#define ND_MAX_WHEEL_STEP		(ndFloat32 (4.0f) * ndDegreeToRad)
 	#define ND_MAX_ANGLE_STEP		(ndFloat32 (3.0f) * ndDegreeToRad)
 	#define ND_MAX_JOINT_ANGLE		(ndFloat32 (30.0f) * ndDegreeToRad)
@@ -93,7 +92,7 @@ namespace ndController_1
 			ndBodyDynamic* m_body;
 		};
 
-		// implement copntroler player
+		// implement controller player
 		class ndControllerAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
 		{
 			public:
@@ -131,10 +130,12 @@ namespace ndController_1
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(200)
-				,m_stopTraining(1000000)
+				,m_stopTraining(2000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
+				//SetLearnRate(GetLearnRate() * ndReal (0.25f));
+				//SetLearnRate(1.0e-3f);
 				m_outFile = fopen("traingPerf.csv", "wb");
 			}
 
@@ -223,7 +224,7 @@ namespace ndController_1
 
 					if (episodeCount && !IsSampling())
 					{
-						ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						//ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 						if (m_outFile)
 						{
 							fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
@@ -237,12 +238,6 @@ namespace ndController_1
 						ndExpandTraceMessage("training complete\n");
 					}
 				}
-
-				//ndAssert(0);
-				//if (m_model->IsOutOfBounds())
-				//{
-				//	m_model->TelePort();
-				//}
 			}
 
 			FILE* m_outFile;
