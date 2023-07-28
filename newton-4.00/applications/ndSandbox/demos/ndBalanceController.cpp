@@ -37,7 +37,7 @@
 
 namespace ndController_1
 {
-	//#define ND_TRAIN_MODEL
+//	#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_STEP		(ndFloat32 (4.0f) * ndDegreeToRad)
 	#define ND_MAX_ANGLE_STEP		(ndFloat32 (3.0f) * ndDegreeToRad)
@@ -131,7 +131,7 @@ namespace ndController_1
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(200)
+				,m_maxFrames(300)
 				,m_stopTraining(1000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
@@ -558,8 +558,10 @@ namespace ndController_1
 			//ndFloat32 reward0 = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * sinAngle * sinAngle));
 			//ndFloat32 reward1 = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * alpha.m_z * alpha.m_z));
 			//ndFloat32 reward = (2.0f * reward1 + reward0) / 3.0f;
-
-			ndFloat32 reward = ndReal(ndPow(ndEXP, -ndFloat32(1.0f) * alpha.m_z * alpha.m_z));
+			
+			ndFloat32 accelReward = ndReal(ndPow(ndEXP, -ndFloat32(1.0f) * alpha.m_z * alpha.m_z));
+			ndFloat32 angleReward = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * m_legJoint->GetAngle() * m_legJoint->GetAngle()));
+			ndFloat32 reward = (ndReal(2.0f) * accelReward + angleReward) / 3.0f;
 			//ndFloat32 reward = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * sinAngle * sinAngle));
 			//ndTrace(("a=%g r=%g\n", alpha.m_z, reward));
 			return ndReal (reward);
@@ -719,7 +721,7 @@ namespace ndController_1
 			critic->AddLayer(criticLayer1);
 			critic->AddLayer(criticLayer2);
 			critic->AddLayer(criticOuputLayer);
-			critic->EndAddLayer(ndReal(0.25f));
+			critic->EndAddLayer();
 
 			// add a reinforcement learning controller 
 			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(actor, critic));
