@@ -36,8 +36,8 @@
 #define D_DDPG_CRITIC_LEARN_RATE		ndReal(5.0e-3f)
 #define D_DDPG_ACTOR_LEARN_RATE			(D_DDPG_CRITIC_LEARN_RATE * ndReal(0.125f))
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
-//#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 256)
-#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
+#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 256)
+//#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
 #define D_DDPG_REPLAY_BASH_SIZE			32
 #define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
 #define D_DDPG_SOFT_TARGET_FACTOR		ndReal (1.0e-3f)
@@ -128,7 +128,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	ndAssert(m_critic->GetInputSize() == (m_actor->GetInputSize() + m_actor->GetOutputSize()));
 
 	ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
-threadCount = 1;
+//threadCount = 1;
 	SetThreadCount(threadCount);
 	for (ndInt32 i = 0; i < GetThreadCount(); ++i)
 	{

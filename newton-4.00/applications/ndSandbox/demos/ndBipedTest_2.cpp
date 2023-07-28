@@ -186,7 +186,8 @@ namespace biped2
 			AddLayer(hiddenLayer1);
 			//brain.AddLayer(hiddenLayer2);
 			AddLayer(ouputLayer);
-			EndAddLayer(ndReal(0.125f));
+			EndAddLayer();
+			InitGaussianWeights(ndReal(0.125f));
 		}
 	};
 

@@ -71,11 +71,12 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	void SoftCopy(const ndBrain& src, ndReal blend);
 
 	void BeginAddLayer();
+	void EndAddLayer();
 	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
-	void EndAddLayer(ndReal randomVariance = ndReal (0.25f));
 
 	bool Compare(const ndBrain& src) const;
-	void InitGaussianWeights(ndReal variance = ndReal(0.25f));
+	void InitGaussianBias(ndReal variance);
+	void InitGaussianWeights(ndReal variance);
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
 	void CalculateInputGradients(const ndBrainVector& input, ndBrainVector& inputGradients);

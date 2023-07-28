@@ -138,7 +138,7 @@ ndBrain* ndBrainLoad::Load() const
 
 		ReadString(buffer);
 	}
-	brain->EndAddLayer(ndReal(0.0f));
+	brain->EndAddLayer();
 
 	for (ndInt32 i = 0; i < layersCount; ++i)
 	{

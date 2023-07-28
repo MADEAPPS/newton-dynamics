@@ -286,6 +286,7 @@ namespace ndController_0
 				{
 					if (GetEpisodeFrames() >= 10000)
 					{
+						//const ndRandom& randomGenerator = GetRandomGenerator(0);
 						for (ndInt32 i = 0; i < m_actionsSize; ++i)
 						{
 							ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
@@ -572,7 +573,8 @@ namespace ndController_0
 			actor->AddLayer(layer1);
 			actor->AddLayer(layer2);
 			actor->AddLayer(ouputLayer);
-			actor->EndAddLayer(ndReal(0.25f));
+			actor->EndAddLayer();
+			actor->InitGaussianWeights(ndReal(0.25f));
 
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(actor));
 			agent->SetName("cartpoleDQN.nn");
@@ -589,8 +591,9 @@ namespace ndController_0
 			actor->AddLayer(layer1);
 			actor->AddLayer(layer2);
 			actor->AddLayer(ouputLayer);
-			actor->EndAddLayer(ndReal(0.25f));
-
+			actor->EndAddLayer();
+			actor->InitGaussianWeights(ndReal(0.25f));
+			
 			// the critic is more complex since is deal with more complex inputs
 			ndSharedPtr<ndBrain> critic(new ndBrain());
 			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + m_actionsSize, layerSize * 2, m_tanh);
@@ -602,7 +605,8 @@ namespace ndController_0
 			critic->AddLayer(criticLayer1);
 			critic->AddLayer(criticLayer2);
 			critic->AddLayer(criticOuputLayer);
-			critic->EndAddLayer(ndReal(0.25f));
+			critic->EndAddLayer();
+			critic->InitGaussianWeights(ndReal(0.25f));
 
 			// add a reinforcement learning controller 
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(actor, critic));
