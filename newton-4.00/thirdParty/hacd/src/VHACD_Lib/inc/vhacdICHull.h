@@ -18,6 +18,10 @@
 #include "vhacdManifoldMesh.h"
 #include "vhacdVector.h"
 
+#if (defined (__linux__ ) || defined (__MINGW32__) || defined (__MINGW64__))
+	#include <unistd.h>
+#endif
+
 namespace nd_
 {
 	namespace VHACD 

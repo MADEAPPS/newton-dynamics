@@ -20,6 +20,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include "vhacdRaycastMesh.h"
 #include <vector>
 
+#if (defined (__linux__ ) || defined (__MINGW32__) || defined (__MINGW64__))
+#include <unistd.h>
+#endif
+
 namespace nd_
 {
 	#define CH_APP_MIN_NUM_PRIMITIVES 64000

@@ -39,6 +39,10 @@
 // and begin a new one.  To cancel a currently running approximation just call 'Cancel'.
 #include <stdint.h>
 
+#if (defined (__linux__ ) || defined (__MINGW32__) || defined (__MINGW64__))
+#include <unistd.h>
+#endif
+
 namespace nd_
 {
 	namespace VHACD 
