@@ -119,6 +119,7 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 	SetThreadCount(threadCount);
 	for (ndInt32 i = 0; i < GetThreadCount(); ++i)
 	{
+		GetRandomGenerator(i).SetSeed(ndUnsigned32(i + 42));
 		m_actorOptimizer.PushBack(new ndBrainTrainer(*m_actor));
 		m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(D_DQN_REGULARIZER);
 	}

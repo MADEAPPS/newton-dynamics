@@ -112,6 +112,15 @@ ndRandom& ndBrainThreadPool::GetRandomGenerator(ndInt32 threadIndex)
 	return m_workers[threadIndex - 1]->m_random;
 }
 
+const ndRandom& ndBrainThreadPool::GetRandomGenerator(ndInt32 threadIndex) const
+{
+	if (threadIndex == 0)
+	{
+		return m_random;
+	}
+	return m_workers[threadIndex - 1]->m_random;
+}
+
 void ndBrainThreadPool::SubmmitTask(ndTask* const task, ndInt32 index)
 {
 	m_workers[index]->SubmmitTask(task);

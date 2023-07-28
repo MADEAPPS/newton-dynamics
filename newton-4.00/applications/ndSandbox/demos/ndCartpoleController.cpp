@@ -261,7 +261,7 @@ namespace ndController_0
 					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 					,m_model(nullptr)
 					,m_maxGain(-1.0e10f)
-					,m_maxFrames(3000)
+					,m_maxFrames(5000)
 					,m_stopTraining(1000000)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
@@ -286,10 +286,11 @@ namespace ndController_0
 				{
 					if (GetEpisodeFrames() >= 10000)
 					{
-						//const ndRandom& randomGenerator = GetRandomGenerator(0);
+						const ndRandom& random = GetRandomGenerator(0);
 						for (ndInt32 i = 0; i < m_actionsSize; ++i)
 						{
-							ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
+							//ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
+							ndReal gaussianNoise = ndReal(random.GetGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
 							ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
 							actions[i] = clippiedNoisyAction;
 						}

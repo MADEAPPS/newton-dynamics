@@ -132,6 +132,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	SetThreadCount(threadCount);
 	for (ndInt32 i = 0; i < GetThreadCount(); ++i)
 	{
+		GetRandomGenerator(i).SetSeed(ndUnsigned32(i + 42));
 		m_actorOptimizer.PushBack(new ndBrainTrainer(*m_actor));
 		m_criticOptimizer.PushBack(new ndBrainTrainer(*m_critic));
 		m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(D_DDPG_REGULARIZER);
@@ -439,7 +440,9 @@ ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetReward() const
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PerturbeAction(ndReal action) const
 {
-	ndReal actionNoise = ndReal(ndGaussianRandom(ndFloat32(action), ndFloat32(m_actionNoiseVariance)));
+	const ndRandom& random = GetRandomGenerator(0);
+	//ndReal actionNoise = ndReal(ndGaussianRandom(ndFloat32(action), ndFloat32(m_actionNoiseVariance)));
+	ndReal actionNoise = ndReal(random.GetGaussianRandom(ndFloat32(action), ndFloat32(m_actionNoiseVariance)));
 	return ndClamp(actionNoise, ndReal(-1.0f), ndReal(1.0f));
 }
 

@@ -39,6 +39,7 @@ class ndBrainThreadPool: public ndClassAlloc, public ndSyncMutex
 	void SetThreadCount(ndInt32 count);
 
 	ndRandom& GetRandomGenerator(ndInt32 threadIndex);
+	const ndRandom& GetRandomGenerator(ndInt32 threadIndex) const;
 
 	template <typename Function>
 	void ParallelExecute(const Function& ndFunction);

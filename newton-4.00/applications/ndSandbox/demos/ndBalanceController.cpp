@@ -164,9 +164,11 @@ namespace ndController_1
 			{
 				if (GetEpisodeFrames() >= 10000)
 				{
+					const ndRandom& random = GetRandomGenerator(0);
 					for (ndInt32 i = 0; i < m_actionsSize; ++i)
 					{
-						ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
+						//ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
+						ndReal gaussianNoise = ndReal(random.GetGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
 						ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
 						actions[i] = clippiedNoisyAction;
 					}

@@ -29,16 +29,21 @@ ndRandom::ndRandom(ndUnsigned32 seed)
 {
 	if (seed)
 	{
-		m_generator.seed(seed);
+		SetSeed(seed);
 	}
 }
 
-ndUnsigned32 ndRandom::GetRandInt()
+void ndRandom::SetSeed(ndUnsigned32 seed)
+{
+	m_generator.seed(seed);
+}
+
+ndUnsigned32 ndRandom::GetRandInt() const
 {
 	return m_generator();
 }
 
-ndFloat32 ndRandom::GetRand()
+ndFloat32 ndRandom::GetRand() const
 {
 	const ndUnsigned32 minValue = std::mt19937::min();
 	const ndUnsigned32 maxValue = std::mt19937::max();
@@ -47,7 +52,7 @@ ndFloat32 ndRandom::GetRand()
 	return r;
 }
 
-ndFloat32 ndRandom::GetGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
+ndFloat32 ndRandom::GetGaussianRandom(ndFloat32 mean, ndFloat32 sigma) const
 {
 	// from Abramowitz and Stegun formula 26.2.23.
 	// calculate a normal value with 0.0 mean and 1.0 deviation 
