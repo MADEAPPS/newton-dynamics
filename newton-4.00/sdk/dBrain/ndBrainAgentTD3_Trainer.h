@@ -69,10 +69,12 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 		{
 			public:
 				Loss(ndBrainTrainer& trainer, ndBrain* const targetActor, ndBrain* const targetCritic, 
-					const ndBrainReplayBuffer<ndReal, statesDim, actionDim>& replayBuffer, ndReal gamma)
+					const ndBrainReplayBuffer<ndReal, statesDim, actionDim>& replayBuffer, ndReal gamma, 
+					ndReal* const inputNoise)
 				:ndBrainLeastSquareErrorLoss(trainer.GetBrain()->GetOutputSize())
 				,m_targetActor(targetActor)
 				,m_targetCritic(targetCritic)
+				,m_inputNoise(inputNoise)
 				,m_criticTrainer(trainer)
 				,m_replayBuffer(replayBuffer)
 				,m_gamma(gamma)
@@ -85,9 +87,8 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 				ndAssert(loss.GetCount() == 1);
 				ndAssert(output.GetCount() == 1);
 				ndAssert(m_truth.GetCount() == m_criticTrainer.GetBrain()->GetOutputSize());
-				//const ndBrainReplayBuffer<ndReal, statesDim, actionDim>& replayBuffer = m_agent->GetReplayBuffer();
 				const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_replayBuffer[m_index];
-
+				
 				ndReal criticOutputBuffer[2];
 				ndDeepBrainMemVector criticOutput(criticOutputBuffer, 1);
 				criticOutput[0] = transition.m_reward;
@@ -97,13 +98,13 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 					ndReal actorOutputBuffer[actionDim * 2];
 					ndDeepBrainMemVector actorInput(actorInputBuffer, statesDim);
 					ndDeepBrainMemVector actorOutput(actorOutputBuffer, actionDim);
-
+				
 					for (ndInt32 i = 0; i < statesDim; ++i)
 					{
 						actorInput[i] = transition.m_nextState[i];
 					}
 					m_targetActor->MakePrediction(actorInput, actorOutput);
-
+				
 					ndReal criticInputBuffer[(statesDim + actionDim) * 2];
 					ndDeepBrainMemVector criticInput(criticInputBuffer, statesDim + actionDim);
 					for (ndInt32 i = 0; i < statesDim; ++i)
@@ -112,18 +113,27 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 					}
 					for (ndInt32 i = 0; i < actionDim; ++i)
 					{
-						criticInput[i + statesDim] = actorOutput[i];
+						criticInput[i + statesDim] = actorOutput[i] + m_inputNoise[i];
 					}
 					m_targetCritic->MakePrediction(criticInput, criticOutput);
-					criticOutput[0] = transition.m_reward + m_gamma * criticOutput[0];
+					ndReal reward0 = criticOutput[0];
+				
+					// todo: calculate reward form the second target
+					ndReal reward1 = criticOutput[0];
+				
+					// get minimum reward from the two target critics, and use that at the targte loss
+					ndReal targetReward = ndMin(reward0, reward1);
+				
+					criticOutput[0] = transition.m_reward + m_gamma * targetReward;
 				}
-
+				
 				SetTruth(criticOutput);
 				ndBrainLeastSquareErrorLoss::GetLoss(output, loss);
 			}
 
 			ndBrain* m_targetActor;
 			ndBrain* m_targetCritic;
+			ndReal* m_inputNoise;
 			ndBrainTrainer& m_criticTrainer;
 			const ndBrainReplayBuffer<ndReal, statesDim, actionDim>& m_replayBuffer;
 			ndFloat32 m_gamma;
@@ -135,11 +145,13 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 		trainer0.ClearGradientsAcc();
 		trainer1.ClearGradientsAcc();
 
+		ndReal noise[actionDim];
 		ndReal inputBuffer[(statesDim + actionDim) * 2];
 		ndDeepBrainMemVector input(inputBuffer, statesDim + actionDim);
-		Loss loss0(trainer0, &m_targetActor, &m_targetCritic, m_replayBuffer, m_gamma);
-		Loss loss1(trainer1, &m_targetActor, &m_target2Critic, m_replayBuffer, m_gamma);
+		Loss loss0(trainer0, &m_targetActor, &m_targetCritic, m_replayBuffer, m_gamma, noise);
+		Loss loss1(trainer1, &m_targetActor, &m_target2Critic, m_replayBuffer, m_gamma, noise);
 
+		ndRandom& randomGenerator = GetRandomGenerator(threadIndex);
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -153,6 +165,7 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 			for (ndInt32 j = 0; j < actionDim; ++j)
 			{
 				input[j + statesDim] = transition.m_action[j];
+				noise[j] = ndReal (randomGenerator.GetGaussianRandom(ndFloat32(0.0f), ndFloat32(m_actionNoiseVariance)));
 			}
 
 			loss0.m_index = index;
