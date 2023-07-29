@@ -37,10 +37,11 @@
 
 namespace ndController_1
 {
-	//#define ND_TRAIN_MODEL
+	//#define USE_TD3
+	#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_STEP		(ndFloat32 (4.0f) * ndDegreeToRad)
-	#define ND_MAX_ANGLE_STEP		(ndFloat32 (3.0f) * ndDegreeToRad)
+	#define ND_MAX_ANGLE_STEP		(ndFloat32 (4.0f) * ndDegreeToRad)
 	#define ND_MAX_JOINT_ANGLE		(ndFloat32 (30.0f) * ndDegreeToRad)
 
 	enum ndActionSpace
@@ -122,7 +123,7 @@ namespace ndController_1
 
 		// the table based approach does is not really practical
 		// try implement DDPN controller using neural networks, 
-#if 1
+#ifdef USE_TD3
 		class ndControllerAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
