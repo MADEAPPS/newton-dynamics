@@ -50,7 +50,7 @@ class ndMatrix
 	ndMatrix (const ndFloat32* const array);
 	ndMatrix (const ndVector &front, const ndVector &up, const ndVector &right, const ndVector &posit);
 
-	// please use function ndGetTransform()
+	// please use function ndCalculateMatrix()
 	//D_CORE_API ndMatrix (const ndQuaternion &rotation, const ndVector &position);
 
 	~ndMatrix();
