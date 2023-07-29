@@ -15,12 +15,8 @@
 #pragma once
 #ifndef _ND_VHACD_VECTOR_H_
 #define _ND_VHACD_VECTOR_H_
-#include <iostream>
-#include <math.h>
 
-#if (defined (__linux__ ) || defined (__MINGW32__) || defined (__MINGW64__))
-#include <unistd.h>
-#endif
+#include "vhacdDefines.h"
 
 namespace nd_ 
 {

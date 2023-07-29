@@ -22,7 +22,7 @@
 #ifndef __ND_CONVEXHULL_3D__
 #define __ND_CONVEXHULL_3D__
 
-#include "vector"
+#include "vhacdDefines.h"
 #include "vhacdConvexHullUtils.h"
 
 namespace nd_

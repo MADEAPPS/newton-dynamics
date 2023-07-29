@@ -1,10 +1,7 @@
 #ifndef ND_RAYCAST_MESH_H
 #define ND_RAYCAST_MESH_H
 
-#include <stdint.h>
-#if (defined (__linux__ ) || defined (__MINGW32__) || defined (__MINGW64__))
-	#include <unistd.h>
-#endif
+#include "vhacdDefines.h"
 
 namespace nd_
 {

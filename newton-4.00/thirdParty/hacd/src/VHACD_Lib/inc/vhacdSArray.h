@@ -15,9 +15,8 @@
 #pragma once
 #ifndef ND_VHACD_SARRAY_H
 #define ND_VHACD_SARRAY_H
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+
+#include "vhacdDefines.h"
 
 namespace nd_
 {

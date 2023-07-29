@@ -15,14 +15,9 @@
 #pragma once
 #ifndef ND_VHACD_VOLUME_H
 #define ND_VHACD_VOLUME_H
+#include "vhacdDefines.h"
 #include "vhacdMesh.h"
 #include "vhacdVector.h"
-#include <vector>
-#include <assert.h>
-
-#if (defined (__linux__ ) || defined (__MINGW32__) || defined (__MINGW64__))
-#include <unistd.h>
-#endif
 
 namespace nd_
 {

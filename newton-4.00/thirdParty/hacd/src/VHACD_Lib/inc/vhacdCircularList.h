@@ -15,7 +15,7 @@
 #pragma once
 #ifndef ND_VHACD_CIRCULAR_LIST_H
 #define ND_VHACD_CIRCULAR_LIST_H
-#include <stdlib.h>
+#include "vhacdDefines.h"
 
 namespace nd_
 {

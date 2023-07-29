@@ -1,12 +1,7 @@
 #ifndef ND_FLOAT_MATH_LIB_H
 #define ND_FLOAT_MATH_LIB_H
 
-#include <float.h>
-#include <stdint.h>
-
-#if (defined (__linux__ ) || defined (__MINGW32__) || defined (__MINGW64__))
-	#include <unistd.h>
-#endif
+#include "vhacdDefines.h"
 
 namespace nd_
 {

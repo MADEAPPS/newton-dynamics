@@ -37,11 +37,35 @@
 // the last approximation operation is complete and will dispatch any pending messages.
 // If you call 'Compute' while a previous operation was still running, it will automatically cancel the last request
 // and begin a new one.  To cancel a currently running approximation just call 'Cancel'.
-#include <stdint.h>
 
-#if (defined (__linux__ ) || defined (__MINGW32__) || defined (__MINGW64__))
-#include <unistd.h>
+#ifdef _WIN32
+	#ifndef WIN32_LEAN_AND_MEAN
+		#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+	#endif
+	#include <windows.h>
+#elif __MACH__
+	#include <mach/clock.h>
+	#include <mach/mach.h>
+#else
+	#include <sys/time.h>
+	#include <time.h>
+	#include <unistd.h>
 #endif
+
+#include <math.h>
+#include <cstdint>
+#include <float.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <string.h>
+#include <iostream>
+#include <vector>
+#include <atomic>
+#include <thread>
+#include <condition_variable>
+
 
 namespace nd_
 {

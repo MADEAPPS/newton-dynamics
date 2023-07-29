@@ -15,6 +15,8 @@
 #pragma once
 #ifndef ND_VHACD_ICHULL_H
 #define ND_VHACD_ICHULL_H
+
+#include "vhacdDefines.h"
 #include "vhacdManifoldMesh.h"
 #include "vhacdVector.h"
 

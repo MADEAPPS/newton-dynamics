@@ -22,11 +22,7 @@
 #ifndef __ND_CONVEXHULL_3D_UTILS__
 #define __ND_CONVEXHULL_3D_UTILS__
 
-
-#include <vector>
-#include <atomic>
-#include <thread>
-#include <condition_variable>
+#include "vhacdDefines.h"
 #include "vhacdVector.h"
 
 #ifndef _ASSERT
