@@ -36,7 +36,7 @@
 #define D_DDPG_CRITIC_LEARN_RATE		ndReal(5.0e-3f)
 #define D_DDPG_ACTOR_LEARN_RATE			(D_DDPG_CRITIC_LEARN_RATE * ndReal(0.125f))
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
-#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 256)
+#define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
 //#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
 #define D_DDPG_REPLAY_BASH_SIZE			32
 #define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
@@ -223,10 +223,12 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 		class Loss : public ndBrainLeastSquareErrorLoss
 		{
 			public:
-			Loss(ndBrainTrainer& trainer, ndBrainAgentDDPG_Trainer<statesDim, actionDim>* const agent)
+				Loss(ndBrainTrainer& trainer, ndBrainAgentDDPG_Trainer<statesDim, actionDim>* const agent, ndRandom& randomGenerator, ndFloat32 actionNoiseVariance)
 				:ndBrainLeastSquareErrorLoss(trainer.GetBrain()->GetOutputSize())
 				,m_criticTrainer(trainer)
 				,m_agent(agent)
+				,m_randomGenerator(randomGenerator)
+				,m_actionNoiseVariance(actionNoiseVariance)
 				,m_index(0)
 			{
 			}
@@ -252,8 +254,11 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 					{
 						actorInput[i] = transition.m_nextState[i];
 					}
-					//m_agent->m_actor->MakePrediction(actorInput, actorOutput);
 					m_agent->m_targetActor.MakePrediction(actorInput, actorOutput);
+					for (ndInt32 i = 0; i < actionDim; ++i)
+					{
+						actorOutput[i] += ndReal (m_randomGenerator.GetGaussianRandom(ndFloat32(0.0f), ndFloat32(m_actionNoiseVariance)));
+					}
 
 					ndReal criticInputBuffer[(statesDim + actionDim) * 2];
 					ndDeepBrainMemVector criticInput(criticInputBuffer, statesDim + actionDim);
@@ -275,12 +280,15 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 
 			ndBrainTrainer& m_criticTrainer;
 			ndBrainAgentDDPG_Trainer<statesDim, actionDim>* m_agent;
+			ndRandom& m_randomGenerator;
+			ndFloat32 m_actionNoiseVariance;
 			ndInt32 m_index;
+			
 		};
 
 		ndBrainTrainer& trainer = *(*m_criticOptimizer[threadIndex]);
 
-		Loss loss(trainer, this);
+		Loss loss(trainer, this, GetRandomGenerator(threadIndex), m_actionNoiseVariance);
 		ndReal inputBuffer[(statesDim + actionDim) * 2];
 		ndDeepBrainMemVector input(inputBuffer, statesDim + actionDim);
 

@@ -38,7 +38,7 @@
 namespace ndController_1
 {
 	//#define USE_TD3
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_STEP		(ndFloat32 (4.0f) * ndDegreeToRad)
 	#define ND_MAX_ANGLE_STEP		(ndFloat32 (4.0f) * ndDegreeToRad)
@@ -145,7 +145,7 @@ namespace ndController_1
 			{
 				//SetLearnRate(GetLearnRate() * ndReal (0.25f));
 				//SetLearnRate(1.0e-3f);
-				SetActionNoise(ndReal (0.2f));
+				SetActionNoise(ndReal (0.15f));
 				m_outFile = fopen("traingPerf.csv", "wb");
 			}
 
