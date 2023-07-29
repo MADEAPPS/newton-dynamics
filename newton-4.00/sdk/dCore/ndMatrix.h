@@ -56,7 +56,7 @@ class ndMatrix
 	~ndMatrix();
 
 	// create a orthonormal normal vector basis, front become m_front vector, and m_up and m_right are mutualiperpendicular to fron and to each other
-	// please use function ndGramSchmidt
+	// please use function ndGramSchmidtMatrix
 	//ndMatrix (const ndVector &front);
 
 	// create a covariance Matrix = transpose(p) * q 
