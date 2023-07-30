@@ -169,7 +169,16 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 
 		ndReal inputBuffer[(statesDim + actionDim) * 2];
 		ndDeepBrainMemVector input(inputBuffer, statesDim + actionDim);
-		Loss loss(trainer0, trainer1, &m_targetActor, &m_targetCritic, &m_target2Critic, m_replayBuffer, m_gamma, m_actionNoiseVariance, GetRandomGenerator(threadIndex));
+		//Loss loss(trainer0, trainer1, &m_targetActor, &m_targetCritic, &m_target2Critic, m_replayBuffer, m_gamma, m_actionNoiseVariance, GetRandomGenerator(threadIndex));
+
+		Loss loss(trainer0, trainer1,
+			&m_targetActor,
+			&m_targetCritic,
+			&m_target2Critic,
+			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_replayBuffer,
+			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_gamma,
+			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_actionNoiseVariance,
+			ndBrainThreadPool::GetRandomGenerator(threadIndex));
 		
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)

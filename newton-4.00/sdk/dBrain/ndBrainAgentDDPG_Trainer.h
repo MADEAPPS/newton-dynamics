@@ -101,6 +101,9 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndInt32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
 	bool m_collectingSamples;
+
+	template<ndInt32 statesDim, ndInt32 actionDim>
+	friend class ndBrainAgentTD3_Trainer;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>

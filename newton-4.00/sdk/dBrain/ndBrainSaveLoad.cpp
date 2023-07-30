@@ -240,7 +240,7 @@ void ndBrainSave::Save(const ndBrain* const brain, const char* const pathName)
 		void WriteData(const char* const data) const
 		{
 			ndInt32 error = 0;
-			error = fprintf(m_file, data);
+			error = fprintf(m_file, "%s", data);
 		}
 
 		FILE* m_file;
