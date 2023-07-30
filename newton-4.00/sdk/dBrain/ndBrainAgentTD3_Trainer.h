@@ -172,8 +172,8 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 		//Loss loss(trainer0, trainer1, &m_targetActor, &m_targetCritic, &m_target2Critic, m_replayBuffer, m_gamma, m_actionNoiseVariance, GetRandomGenerator(threadIndex));
 
 		Loss loss(trainer0, trainer1,
-			&m_targetActor,
-			&m_targetCritic,
+			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetTargetActor(),
+			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetTargetCritic(),
 			&m_target2Critic,
 			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_replayBuffer,
 			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_gamma,

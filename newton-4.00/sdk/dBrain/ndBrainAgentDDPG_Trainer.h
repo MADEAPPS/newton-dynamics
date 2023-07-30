@@ -77,6 +77,9 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 
 	virtual void BackPropagate();
 
+	ndBrain* GetTargetActor() { return &m_targetActor; }
+	ndBrain* GetTargetCritic() { return &m_targetCritic; }
+
 	ndSharedPtr<ndBrain> m_actor;
 	ndSharedPtr<ndBrain> m_critic;
 	ndBrain m_targetActor;
@@ -101,9 +104,6 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndInt32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
 	bool m_collectingSamples;
-
-	template<ndInt32 statesDim, ndInt32 actionDim>
-	friend class ndBrainAgentTD3_Trainer;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
