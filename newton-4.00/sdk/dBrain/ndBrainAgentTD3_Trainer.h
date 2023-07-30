@@ -218,10 +218,9 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 
 	ParallelExecute(PropagateBash);
 	ParallelExecute(AccumulateWeight);
-	m_criticOptimizer[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
-	m_critic2Optimizer[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
+	m_criticOptimizer[0]->UpdateWeights(ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_criticLearnRate, ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_bashBufferSize);
+	m_critic2Optimizer[0]->UpdateWeights(ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_criticLearnRate, ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_bashBufferSize);
 }
-
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagate()
@@ -236,9 +235,9 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagate()
 	if (m_frameCount & 1)
 	{
 		BackPropagateActor(shuffleBuffer);
-		m_targetActor.SoftCopy(*(*m_actor), m_softTargetFactor);
-		m_target2Critic.SoftCopy(m_critic2, m_softTargetFactor);
-		m_targetCritic.SoftCopy(*(*m_critic), m_softTargetFactor);
+		m_targetActor.SoftCopy(*ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetActor(), ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_softTargetFactor);
+		m_target2Critic.SoftCopy(m_critic2, ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_softTargetFactor);
+		m_targetCritic.SoftCopy(*ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCritic(), ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_softTargetFactor);
 	}
 }
 

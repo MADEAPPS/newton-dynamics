@@ -77,6 +77,8 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 
 	virtual void BackPropagate();
 
+	ndBrain* GetActor() { return *m_actor; }
+	ndBrain* GetCritic() { return *m_critic; }
 	ndBrain* GetTargetActor() { return &m_targetActor; }
 	ndBrain* GetTargetCritic() { return &m_targetCritic; }
 	ndBrainTrainer* GetCriticTrainer(ndInt32 index) { return *m_criticOptimizer[index]; }
