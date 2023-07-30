@@ -232,7 +232,7 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagate()
 	}
 
 	ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(shuffleBuffer);
-	if (m_frameCount & 1)
+	if (ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_frameCount & 1)
 	{
 		ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(shuffleBuffer);
 		ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetTargetActor()->SoftCopy(*ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetActor(), ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_softTargetFactor);
