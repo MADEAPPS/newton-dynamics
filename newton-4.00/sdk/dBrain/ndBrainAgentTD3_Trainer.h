@@ -180,11 +180,11 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_actionNoiseVariance,
 			ndBrainThreadPool::GetRandomGenerator(threadIndex));
 		
-		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
+		const ndStartEnd startEnd(ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndInt32 index = ndInt32(shuffleBuffer[i]);
-			const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_replayBuffer[index];
+			const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_replayBuffer[index];
 
 			for (ndInt32 j = 0; j < statesDim; ++j)
 			{
@@ -204,14 +204,15 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 
 	auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		ndBrainTrainer& trainer0 = *(*m_criticOptimizer[0]);
-		ndBrainTrainer& trainer1 = *(*m_critic2Optimizer[0]);
+		//ndBrainTrainer& trainer0 = *(*m_criticOptimizer[0]);
+		ndBrainTrainer* const trainer0 = ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCriticTrainer(0);
+		ndBrainTrainer* const trainer1 = *m_critic2Optimizer[0];
 		for (ndInt32 i = 1; i < threadCount; ++i)
 		{
-			ndBrainTrainer& srcTrainer0 = *(*m_criticOptimizer[i]);
-			ndBrainTrainer& srcTrainer1 = *(*m_critic2Optimizer[i]);
-			trainer0.AcculumateGradients(srcTrainer0, threadIndex, threadCount);
-			trainer1.AcculumateGradients(srcTrainer1, threadIndex, threadCount);
+			ndBrainTrainer* const srcTrainer0 = ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCriticTrainer(i);
+			ndBrainTrainer* const srcTrainer1 = *m_critic2Optimizer[i];
+			trainer0->AcculumateGradients(*srcTrainer0, threadIndex, threadCount);
+			trainer1->AcculumateGradients(*srcTrainer1, threadIndex, threadCount);
 		}
 	});
 

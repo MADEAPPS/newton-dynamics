@@ -79,6 +79,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 
 	ndBrain* GetTargetActor() { return &m_targetActor; }
 	ndBrain* GetTargetCritic() { return &m_targetCritic; }
+	ndBrainTrainer* GetCriticTrainer(ndInt32 index) { return *m_criticOptimizer[index]; }
 
 	ndSharedPtr<ndBrain> m_actor;
 	ndSharedPtr<ndBrain> m_critic;
@@ -320,11 +321,11 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 
 	auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		ndBrainTrainer& trainer = *(*m_criticOptimizer[0]);
+		ndBrainTrainer* const trainer = *m_criticOptimizer[0];
 		for (ndInt32 i = 1; i < threadCount; ++i)
 		{
-			ndBrainTrainer& srcTrainer = *(*m_criticOptimizer[i]);
-			trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
+			ndBrainTrainer* const srcTrainer = *m_criticOptimizer[i];
+			trainer->AcculumateGradients(*srcTrainer, threadIndex, threadCount);
 		}
 	});
 
