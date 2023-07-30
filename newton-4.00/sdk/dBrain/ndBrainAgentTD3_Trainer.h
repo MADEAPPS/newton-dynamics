@@ -216,8 +216,8 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 		}
 	});
 
-	ParallelExecute(PropagateBash);
-	ParallelExecute(AccumulateWeight);
+	ndBrainThreadPool::ParallelExecute(PropagateBash);
+	ndBrainThreadPool::ParallelExecute(AccumulateWeight);
 	ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCriticTrainer(0)->UpdateWeights(ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_criticLearnRate, ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_bashBufferSize);
 	m_critic2Optimizer[0]->UpdateWeights(ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_criticLearnRate, ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_bashBufferSize);
 }
