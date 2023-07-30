@@ -451,7 +451,6 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PerturbeAction(ndReal action) const
 {
 	const ndRandom& random = GetRandomGenerator(0);
-	//ndReal actionNoise = ndReal(ndGaussianRandom(ndFloat32(action), ndFloat32(m_actionNoiseVariance)));
 	ndReal actionNoise = ndReal(random.GetGaussianRandom(ndFloat32(action), ndFloat32(m_actionNoiseVariance)));
 	return ndClamp(actionNoise, ndReal(-1.0f), ndReal(1.0f));
 }
