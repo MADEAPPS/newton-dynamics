@@ -612,7 +612,8 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 		};
 
 		ndInt32 error = 0;
-		fgets(token, sizeof(token) - 1, file);
+		char* error1 = nullptr;
+		error1 = fgets(token, sizeof(token) - 1, file);
 		ReadToken();
 		ndTree<ndSharedPtr<ndMeshEffect>, ndInt32> meshEffects;
 		if (!strcmp(token, "geometries:"))

@@ -130,7 +130,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
 	//threadCount = 1;
 	SetThreadCount(threadCount);
-	for (ndInt32 i = 0; i < GetThreadCount(); ++i)
+	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
 	{
 		GetRandomGenerator(i).SetSeed(ndUnsigned32(i + 42));
 		m_actorOptimizer.PushBack(new ndBrainTrainer(*m_actor));

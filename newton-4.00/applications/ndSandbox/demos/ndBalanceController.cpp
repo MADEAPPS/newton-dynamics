@@ -37,7 +37,7 @@
 
 namespace ndController_1
 {
-	//#define USE_TD3
+	#define USE_TD3
 	//#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		ndFloat32 (10.0f)
@@ -349,7 +349,7 @@ namespace ndController_1
 		{
 			ndBodyKinematic* const body = GetRoot()->m_body->GetAsBodyKinematic();
 
-			//ndVector veloc(body->GetVelocity());
+			ndVector veloc(body->GetVelocity());
 			ndVector posit(body->GetMatrix().m_posit);
 			posit.m_y = 0.0f;
 			posit.m_z = 0.0f;
@@ -357,7 +357,7 @@ namespace ndController_1
 			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 			{
 				ndBodyKinematic* const modelBody = m_bodies[i];
-				//modelBody->SetVelocity(modelBody->GetVelocity() - veloc);
+				modelBody->SetVelocity(modelBody->GetVelocity() - veloc);
 				ndMatrix matrix(modelBody->GetMatrix());
 				matrix.m_posit -= posit;
 				modelBody->SetMatrix(matrix);

@@ -53,7 +53,7 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const ndS
 	m_critic2.InitGaussianWeights(ndReal (0.25f));
 	m_target2Critic.CopyFrom(m_critic2);
 
-	for (ndInt32 i = 0; i < GetThreadCount(); ++i)
+	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
 	{
 		m_critic2Optimizer.PushBack(new ndBrainTrainer(&m_critic2));
 		m_critic2Optimizer[m_critic2Optimizer.GetCount() - 1]->SetRegularizer(D_DDPG_REGULARIZER);
@@ -162,7 +162,7 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 			ndInt32 m_pass;
 		};
 
-		ndBrainTrainer& trainer0 = *(*m_criticOptimizer[threadIndex]);
+		ndBrainTrainer& trainer0 = *(*ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_criticOptimizer[threadIndex]);
 		ndBrainTrainer& trainer1 = *(*m_critic2Optimizer[threadIndex]);
 		trainer0.ClearGradientsAcc();
 		trainer1.ClearGradientsAcc();
