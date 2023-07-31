@@ -103,7 +103,7 @@ namespace ndController_1
 			{
 			}
 
-			void SetModel(ndModelUnicycle* model)
+			void SetModel(ndModelUnicycle* const model)
 			{
 				m_model = model;
 			}
@@ -169,7 +169,7 @@ namespace ndController_1
 				}
 			}
 
-			void SetModel(ndModelUnicycle* model)
+			void SetModel(ndModelUnicycle* const model)
 			{
 				m_model = model;
 			}
