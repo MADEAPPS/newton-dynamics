@@ -301,51 +301,58 @@ namespace ndQuadruped_1
 			return torque;
 		}
 
+		void Update(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndModelArticulation::Update(world, timestep);
+		}
+
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
-			ndVector veloc;
-			m_animBlendTree->Update(timestep * m_control->m_animSpeed);
-			m_animBlendTree->Evaluate(m_animPose, veloc);
+			//ndVector veloc;
+			//m_animBlendTree->Update(timestep * m_control->m_animSpeed);
+			//m_animBlendTree->Evaluate(m_animPose, veloc);
+			//
+			//ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
+			//ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
+			//ndAssert(skeleton);
+			//
+			//ndJointBilateralConstraint* joint[4];
+			//ndVector upVector(rootBody->GetMatrix().m_up);
+			//for (ndInt32 i = 0; i < 4; ++i)
+			//{
+			//	ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
+			//	ndAssert(info == &m_effectorsInfo[i]);
+			//	joint[i] = *info->m_effector;
+			//
+			//	ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+			//	ndVector posit (m_animPose[i].m_posit);
+			//	effector->SetLocalTargetPosition(posit);
+			//	effector->SetSwivelAngle(0.0f);
+			//
+			//	// calculate lookAt angle
+			//	ndMatrix lookAtMatrix0;
+			//	ndMatrix lookAtMatrix1;
+			//	info->m_footHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
+			//
+			//	ndMatrix upMatrix(ndGetIdentityMatrix());
+			//	upMatrix.m_front = lookAtMatrix1.m_front;
+			//	upMatrix.m_right = (upMatrix.m_front.CrossProduct(upVector) & ndVector::m_triplexMask).Normalize();
+			//	upMatrix.m_up = upMatrix.m_right.CrossProduct(upMatrix.m_front);
+			//	upMatrix = upMatrix * lookAtMatrix0.OrthoInverse();
+			//	const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
+			//	info->m_footHinge->SetTargetAngle(angle);
+			//}
+			//
+			//InitState();
+			//
+			//m_invDynamicsSolver.SolverBegin(skeleton, joint, 4, world, timestep);
+			////m_invDynamicsSolver.Solve();
+			//ndVector torque(CalculateTorque());
+			////ndTrace(("%f %f %f\n", torque.m_x, torque.m_y, torque.m_z));
+			//
+			//m_invDynamicsSolver.SolverEnd();
 
-			ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
-			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
-			ndAssert(skeleton);
-
-			ndJointBilateralConstraint* joint[4];
-			ndVector upVector(rootBody->GetMatrix().m_up);
-			for (ndInt32 i = 0; i < 4; ++i)
-			{
-				ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
-				ndAssert(info == &m_effectorsInfo[i]);
-				joint[i] = *info->m_effector;
-
-				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-				ndVector posit (m_animPose[i].m_posit);
-				effector->SetLocalTargetPosition(posit);
-				effector->SetSwivelAngle(0.0f);
-
-				// calculate lookAt angle
-				ndMatrix lookAtMatrix0;
-				ndMatrix lookAtMatrix1;
-				info->m_footHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-
-				ndMatrix upMatrix(ndGetIdentityMatrix());
-				upMatrix.m_front = lookAtMatrix1.m_front;
-				upMatrix.m_right = (upMatrix.m_front.CrossProduct(upVector) & ndVector::m_triplexMask).Normalize();
-				upMatrix.m_up = upMatrix.m_right.CrossProduct(upMatrix.m_front);
-				upMatrix = upMatrix * lookAtMatrix0.OrthoInverse();
-				const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
-				info->m_footHinge->SetTargetAngle(angle);
-			}
-
-			InitState();
-
-			m_invDynamicsSolver.SolverBegin(skeleton, joint, 4, world, timestep);
-			//m_invDynamicsSolver.Solve();
-			ndVector torque(CalculateTorque());
-			//ndTrace(("%f %f %f\n", torque.m_x, torque.m_y, torque.m_z));
-
-			m_invDynamicsSolver.SolverEnd();
+			ndModelArticulation::PostUpdate(world, timestep);
 		}
 
 		ndAnimationPose m_animPose;

@@ -389,9 +389,9 @@ namespace ndController_1
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
+			ndModelArticulation::Update(world, timestep);
 			m_world = world;
 			m_timestep = timestep;
-			ndModelArticulation::Update(world, timestep);
 			m_agent->Step();
 		}
 
