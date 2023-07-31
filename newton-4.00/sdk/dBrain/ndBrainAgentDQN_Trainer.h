@@ -272,8 +272,8 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 		}
 	});
 
-	ParallelExecute(PropagateBash);
-	ParallelExecute(AccumulateWeight);
+	ndBrainThreadPool::ParallelExecute(PropagateBash);
+	ndBrainThreadPool::ParallelExecute(AccumulateWeight);
 	m_actorOptimizer[0]->UpdateWeights(m_learnRate, m_bashBufferSize);
 
 	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))

@@ -41,8 +41,8 @@ namespace ndController_1
 	//#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		ndFloat32 (10.0f)
-	#define ND_MAX_ANGLE_STEP		(ndFloat32 (4.0f) * ndDegreeToRad)
-	#define ND_MAX_JOINT_ANGLE		(ndFloat32 (30.0f) * ndDegreeToRad)
+	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)
+	#define ND_MAX_LEG_JOINT_ANGLE	(ndFloat32 (30.0f) * ndDegreeToRad)
 
 	enum ndActionSpace
 	{
@@ -115,6 +115,14 @@ namespace ndController_1
 
 			virtual void ApplyActions(ndReal* const actions) const
 			{
+				if (!m_model->HasSupportContact())
+				{
+					for (ndInt32 i = 0; i < m_actionsSize; ++i)
+					{
+						actions[i] = ndReal(0.0f);
+					}
+				}
+
 				m_model->ApplyActions(actions);
 			}
 
@@ -286,13 +294,13 @@ namespace ndController_1
 
 			state[m_topBoxAngle] = ndReal(angle);
 			state[m_topBoxOmega] = ndReal(omega.m_z);
-			state[m_jointAngle] = m_legJoint->GetAngle() / ND_MAX_JOINT_ANGLE;
+			state[m_jointAngle] = m_legJoint->GetAngle() / ND_MAX_LEG_JOINT_ANGLE;
 		}
 
 		void ApplyActions(ndReal* const actions) const
 		{
-			ndFloat32 legAngle = actions[m_softLegControl] * ND_MAX_ANGLE_STEP + m_legJoint->GetAngle();
-			legAngle = ndClamp (legAngle, -ND_MAX_JOINT_ANGLE, ND_MAX_JOINT_ANGLE);
+			ndFloat32 legAngle = actions[m_softLegControl] * ND_MAX_LEG_ANGLE_STEP + m_legJoint->GetAngle();
+			legAngle = ndClamp (legAngle, -ND_MAX_LEG_JOINT_ANGLE, ND_MAX_LEG_JOINT_ANGLE);
 			m_legJoint->SetTargetAngle(legAngle);
 
 			ndBodyDynamic* const wheelBody = m_wheelJoint->GetBody0()->GetAsBodyDynamic();
@@ -362,6 +370,21 @@ namespace ndController_1
 				matrix.m_posit -= posit;
 				modelBody->SetMatrix(matrix);
 			}
+		}
+
+		bool HasSupportContact() const
+		{
+			ndBodyKinematic* const body = m_wheelJoint->GetBody0();
+			ndBodyKinematic::ndContactMap::Iterator it(body->GetContactMap());
+			for (it.Begin(); it; it++)
+			{
+				ndContact* const contact = it.GetNode()->GetInfo();
+				if (contact->IsActive())
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)

@@ -532,6 +532,7 @@ void APIENTRY ndDemoEntityManager::OpenMessageCallback(GLenum source,
 	{
 		switch(id)
 		{
+			case 131154:  // Pixel-path performance warning: Pixel transfer is synchronized with 3D rendering.
 			case 131185:  // nvidia driver report will use VIDEO memory as the source for buffer object operations
 				return;
 		}
