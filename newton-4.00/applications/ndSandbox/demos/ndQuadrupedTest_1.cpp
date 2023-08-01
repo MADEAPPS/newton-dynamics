@@ -242,7 +242,6 @@ namespace ndQuadruped_1
 
 			void ResetModel() const
 			{
-				//m_model->ResetModel();
 				for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
 				{
 					m_basePose[i].SetPose();
