@@ -519,7 +519,7 @@ namespace ndQuadruped_1
 			ndBodyState state;
 			const ndMatrix& rootMatrix = GetRoot()->m_body->GetMatrix();
 			state.m_com.m_up = ndVector::m_zero;
-			state.m_com.m_up.m_y = ndFloat32 (0.0f);
+			state.m_com.m_up.m_y = ndFloat32 (1.0f);
 			state.m_com.m_right = (state.m_com.m_up.CrossProduct(rootMatrix.m_front)).Normalize();
 			state.m_com.m_front = state.m_com.m_up.CrossProduct(state.m_com.m_right);
 
