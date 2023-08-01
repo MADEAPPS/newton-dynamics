@@ -23,6 +23,7 @@
 namespace ndQuadruped_1
 {
 	#define ND_TRAIN_MODEL
+	#define D_MIN_REWARD_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
 
 	enum ndActionSpace
 	{
@@ -132,6 +133,37 @@ namespace ndQuadruped_1
 		class ndControllerAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
+			class ndBasePose
+			{
+				public:
+				ndBasePose()
+					:m_body(nullptr)
+				{
+				}
+
+				ndBasePose(ndBodyDynamic* const body)
+					:m_veloc(body->GetVelocity())
+					,m_omega(body->GetOmega())
+					,m_posit(body->GetPosition())
+					,m_rotation(body->GetRotation())
+					,m_body(body)
+				{
+				}
+
+				void SetPose() const
+				{
+					m_body->SetMatrix(ndCalculateMatrix(m_rotation, m_posit));
+					m_body->SetOmega(m_omega);
+					m_body->SetVelocity(m_veloc);
+				}
+
+				ndVector m_veloc;
+				ndVector m_omega;
+				ndVector m_posit;
+				ndQuaternion m_rotation;
+				ndBodyDynamic* m_body;
+			};
+
 			ndControllerAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
@@ -157,26 +189,30 @@ namespace ndQuadruped_1
 			void SetModel(ndModelQuadruped* const model)
 			{
 				m_model = model;
+				for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+				{
+					ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+					m_bodies.PushBack(body);
+					m_basePose.PushBack(body);
+				}
 			}
 
 			ndReal GetReward() const
 			{
-				return 0;
-				//return m_model->GetReward();
+				return m_model->GetReward();
 			}
 
 			virtual void ApplyActions(ndReal* const actions) const
 			{
 				if (GetEpisodeFrames() >= 10000)
 				{
-					ndAssert(0);
-				//	const ndRandom& random = GetRandomGenerator(0);
-				//	for (ndInt32 i = 0; i < m_actionsSize; ++i)
-				//	{
-				//		ndReal gaussianNoise = ndReal(random.GetGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
-				//		ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
-				//		actions[i] = clippiedNoisyAction;
-				//	}
+					const ndRandom& random = GetRandomGenerator(0);
+					for (ndInt32 i = 0; i < m_actionsSize; ++i)
+					{
+						ndReal gaussianNoise = ndReal(random.GetGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
+						ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
+						actions[i] = clippiedNoisyAction;
+					}
 				}
 				m_model->ApplyActions(actions);
 			}
@@ -188,70 +224,72 @@ namespace ndQuadruped_1
 
 			bool IsTerminal() const
 			{
-				ndAssert(0);
-				return false;
-				//bool state = m_model->IsTerminal();
-				//if (!IsSampling())
-				//{
-				//	if (GetEpisodeFrames() >= 15000)
-				//	{
-				//		state = true;
-				//	}
-				//	m_averageQValue.Update(GetCurrentValue());
-				//	if (state)
-				//	{
-				//		m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
-				//	}
-				//}
-				//return state;
+				bool state = m_model->IsTerminal();
+				if (!IsSampling())
+				{
+					if (GetEpisodeFrames() >= 15000)
+					{
+						state = true;
+					}
+					m_averageQValue.Update(GetCurrentValue());
+					if (state)
+					{
+						m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
+					}
+				}
+				return state;
 			}
 
 			void ResetModel() const
 			{
-				ndAssert(0);
 				//m_model->ResetModel();
+				for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
+				{
+					m_basePose[i].SetPose();
+				}
+				//m_legJoint->SetTargetAngle(0.0f);
+				//m_wheelJoint->SetTargetAngle(0.0f);
 			}
 
 			void OptimizeStep()
 			{
-				ndAssert(0);
-				//ndInt32 stopTraining = GetFramesCount();
-				//if (stopTraining <= m_stopTraining)
-				//{
-				//	ndInt32 episodeCount = GetEposideCount();
-				//	ndBrainAgentDDPG_Trainer::OptimizeStep();
-				//
-				//	episodeCount -= GetEposideCount();
-				//	if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
-				//	{
-				//		if (m_averageQValue.GetAverage() > m_maxGain)
-				//		{
-				//			char fileName[1024];
-				//			ndGetWorkingFileName(GetName().GetStr(), fileName);
-				//
-				//			SaveToFile(fileName);
-				//			ndExpandTraceMessage("saving to file: %s\n", fileName);
-				//			ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
-				//			m_maxGain = m_averageQValue.GetAverage();
-				//		}
-				//	}
-				//
-				//	if (episodeCount && !IsSampling())
-				//	{
-				//		ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-				//		if (m_outFile)
-				//		{
-				//			fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
-				//			fflush(m_outFile);
-				//		}
-				//	}
-				//
-				//	if (stopTraining == m_stopTraining)
-				//	{
-				//		ndExpandTraceMessage("\n");
-				//		ndExpandTraceMessage("training complete\n");
-				//	}
-				//}
+				ndInt32 stopTraining = GetFramesCount();
+				if (stopTraining <= m_stopTraining)
+				{
+					ndInt32 episodeCount = GetEposideCount();
+					ndBrainAgentDDPG_Trainer::OptimizeStep();
+				
+					episodeCount -= GetEposideCount();
+					if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
+					{
+						if (m_averageQValue.GetAverage() > m_maxGain)
+						{
+							char fileName[1024];
+							ndGetWorkingFileName(GetName().GetStr(), fileName);
+				
+							SaveToFile(fileName);
+							ndExpandTraceMessage("saving to file: %s\n", fileName);
+							ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+							m_maxGain = m_averageQValue.GetAverage();
+						}
+					}
+				
+					if (episodeCount && !IsSampling())
+					{
+						ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						if (m_outFile)
+						{
+							fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
+							fflush(m_outFile);
+						}
+					}
+				
+					if (stopTraining == m_stopTraining)
+					{
+						ndExpandTraceMessage("\n");
+						ndExpandTraceMessage("training complete\n");
+					}
+				}
 				//if (m_model->IsOutOfBounds())
 				//{
 				//	m_model->TelePort();
@@ -263,6 +301,8 @@ namespace ndQuadruped_1
 			ndFloat32 m_maxGain;
 			ndInt32 m_maxFrames;
 			ndInt32 m_stopTraining;
+			ndFixSizeArray<ndBasePose, 32> m_basePose;
+			ndFixSizeArray<ndBodyDynamic*, 32> m_bodies;
 			mutable ndMovingAverage<128> m_averageQValue;
 			mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
 		};
@@ -487,12 +527,13 @@ namespace ndQuadruped_1
 
 		bool IsTerminal() const
 		{
-			//#define D_REWARD_MIN_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
-			//const ndMatrix& matrix = GetRoot()->m_body->GetMatrix();
-			//ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
-			//bool fail = ndAbs(ndAsin(sinAngle)) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
-			//return fail;
-			return false;
+			ndBodyKinematic* const body = GetRoot()->m_body->GetAsBodyKinematic();
+			const ndMatrix& matrix = body->GetMatrix();
+			ndFloat32 sinAngle = ndSqrt(matrix.m_up.m_x * matrix.m_up.m_x + matrix.m_up.m_z * matrix.m_up.m_z);
+			sinAngle = ndMin(sinAngle, ndFloat32(0.9f));
+			bool fail = ndAbs(ndAsin(sinAngle)) > D_MIN_REWARD_ANGLE;
+			//ndTrace(("%f\n", ndAsin(sinAngle) * ndRadToDegree));
+			return fail;
 		}
 
 		ndReal GetReward() const
@@ -585,6 +626,7 @@ namespace ndQuadruped_1
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
+			m_agent->OptimizeStep();
 		}
 
 		ndAnimationPose m_animPose;
@@ -852,7 +894,7 @@ namespace ndQuadruped_1
 
 		#ifdef ND_TRAIN_MODEL
 			((ndModelQuadruped::ndControllerAgent_trainer*)*agent)->SetModel(model);
-			//scene->SetAcceleratedUpdate();
+			scene->SetAcceleratedUpdate();
 		#else
 			ndAssert(0);
 			((ndModelUnicycle::ndControllerAgent*)*agent)->SetModel(model);
