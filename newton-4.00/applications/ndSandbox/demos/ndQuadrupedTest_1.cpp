@@ -26,17 +26,19 @@ namespace ndQuadruped_1
 
 	enum ndActionSpace
 	{
-		//m_softLegControl,
-		//m_softWheelControl,
-		m_actionsSize = 2
+		m_bodySwing,
+		m_actionsSize
 	};
 
 	enum ndStateSpace
 	{
-		//m_topBoxAngle,
-		//m_topBoxOmega,
-		//m_jointAngle,
-		m_stateSize = 2
+		m_leg0_y,
+		m_leg1_y,
+		m_leg2_y,
+		m_leg3_y,
+		m_body_omega_x,
+		m_body_omega_z,
+		m_stateSize
 	};
 
 	class ndModelQuadruped: public ndModelArticulation
@@ -80,7 +82,7 @@ namespace ndQuadruped_1
 			ndSharedPtr<ndJointBilateralConstraint> m_effector;
 		};
 
-		class ndPoseGenerator : public ndAnimationSequence
+		class ndPoseGenerator: public ndAnimationSequence
 		{
 			public:
 			ndPoseGenerator()
@@ -127,7 +129,7 @@ namespace ndQuadruped_1
 			ndFloat32 m_offset[4];
 		};
 
-		class ndControllerAgent_trainer : public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
+		class ndControllerAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
 			ndControllerAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
@@ -159,16 +161,15 @@ namespace ndQuadruped_1
 
 			ndReal GetReward() const
 			{
-				ndAssert(0);
 				return 0;
 				//return m_model->GetReward();
 			}
 
 			virtual void ApplyActions(ndReal* const actions) const
 			{
-				ndAssert(0);
-				//if (GetEpisodeFrames() >= 10000)
-				//{
+				if (GetEpisodeFrames() >= 10000)
+				{
+					ndAssert(0);
 				//	const ndRandom& random = GetRandomGenerator(0);
 				//	for (ndInt32 i = 0; i < m_actionsSize; ++i)
 				//	{
@@ -176,14 +177,13 @@ namespace ndQuadruped_1
 				//		ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
 				//		actions[i] = clippiedNoisyAction;
 				//	}
-				//}
-				//m_model->ApplyActions(actions);
+				}
+				m_model->ApplyActions(actions);
 			}
 
 			void GetObservation(ndReal* const state) const
 			{
-				ndAssert(0);
-				//m_model->GetObservation(state);
+				m_model->GetObservation(state);
 			}
 
 			bool IsTerminal() const
@@ -312,8 +312,9 @@ namespace ndQuadruped_1
 			ndReal m_animSpeed;
 		};
 		
-		ndModelQuadruped()
+		ndModelQuadruped(ndSharedPtr<ndBrainAgent>& agent)
 			:ndModelArticulation()
+			,m_agent(agent)
 		{
 		}
 
@@ -401,67 +402,6 @@ namespace ndQuadruped_1
 			}
 		}
 
-		//void InitState()
-		//{
-		//	//a) Mt = sum(M(i))
-		//	//b) cg = sum(p(i) * M(i)) / Mt
-		//	//c) Vcg = sum(v(i) * M(i)) / Mt
-		//	//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
-		//	//e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x(m(i) * V(i))]
-		//	//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
-		//	//g) Bcg = (Icg ^ -1) * (T0 + T1)
-		//
-		//	//a) Mt = sum(m(i))
-		//	//b) cg = sum(p(i) * m(i)) / Mt
-		//	//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
-		//	//e) T0 = sum(w(i) x (I(i) * w(i))
-		//	//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
-		//	//g) Bcg = (Icg ^ -1) * (T0 + T1)
-		//
-		//	ndVector com(ndVector::m_zero);
-		//	ndFixSizeArray<ndVector, 32> bodiesCom;
-		//	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-		//	{
-		//		const ndBodyKinematic* const body = m_bodies[i];
-		//		const ndMatrix matrix(body->GetMatrix());
-		//		ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
-		//		bodiesCom.PushBack(bodyCom);
-		//		com += bodyCom.Scale(body->GetMassMatrix().m_w);
-		//	}
-		//	com = com.Scale(m_invMass);
-		//
-		//	ndVector gyroTorque(ndVector::m_zero);
-		//	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-		//	{
-		//		const ndBodyKinematic* const body = m_bodies[i];
-		//
-		//		const ndMatrix matrix(body->GetMatrix());
-		//		const ndVector omega(body->GetOmega());
-		//		const ndVector comDist(matrix.TransformVector(body->GetCentreOfMass()) - com);
-		//		m_comDist[i] = comDist;
-		//		ndMatrix bodyInertia(body->CalculateInertiaMatrix());
-		//		gyroTorque += omega.CrossProduct(bodyInertia.RotateVector(omega));
-		//	}
-		//
-		//	m_gyroTorque = gyroTorque;
-		//}
-		//
-		//ndVector CalculateTorque()
-		//{
-		//	ndVector torque(m_gyroTorque);
-		//	m_invDynamicsSolver.Solve();
-		//	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-		//	{
-		//		const ndBodyKinematic* const body = m_bodies[i];
-		//
-		//		ndVector r(m_comDist[i]);
-		//		ndVector f(m_invDynamicsSolver.GetBodyForce(body));
-		//		ndVector t(m_invDynamicsSolver.GetBodyTorque(body));
-		//		torque += (t + r.CrossProduct(f));
-		//	}
-		//	return torque;
-		//}
-
 		void ApplyPoseGeneration()
 		{
 			ndVector veloc;
@@ -503,6 +443,77 @@ namespace ndQuadruped_1
 			m_invDynamicsSolver.SolverEnd();
 		}
 
+		void GetObservation(ndReal* const state)
+		{
+			//ndBodyKinematic* const body = GetRoot()->m_body->GetAsBodyKinematic();
+			//const ndVector omega(body->GetOmega());
+			//const ndMatrix& matrix = body->GetMatrix();
+			//ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
+			//ndFloat32 angle = ndAsin(sinAngle);
+
+			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			{
+				const ndAnimKeyframe& keyFrame = m_animPose[i];
+				ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
+				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+
+				ndVector posit(effector->GetLocalTargetPosition());
+				state[i] = posit.m_x;
+				//if (i == 0)	ndTrace(("%d: %f %f %f\n", posit.m_x, posit.m_y, posit.m_z));
+			}
+
+			ndBodyState bodyState(CalculateFullBodyState());
+			ndVector omega(bodyState.m_com.UnrotateVector(bodyState.m_omega));
+			state[m_body_omega_x] = omega.m_x;
+			state[m_body_omega_z] = omega.m_z;
+		}
+
+		void ApplyActions(ndReal* const actions)
+		{
+			//ndFloat32 legAngle = actions[m_softLegControl] * ND_MAX_LEG_ANGLE_STEP + m_legJoint->GetAngle();
+			//legAngle = ndClamp(legAngle, -ND_MAX_LEG_JOINT_ANGLE, ND_MAX_LEG_JOINT_ANGLE);
+			//m_legJoint->SetTargetAngle(legAngle);
+			//
+			//ndBodyDynamic* const wheelBody = m_wheelJoint->GetBody0()->GetAsBodyDynamic();
+			//const ndMatrix matrix(m_wheelJoint->GetLocalMatrix1() * m_wheelJoint->GetBody1()->GetMatrix());
+			//
+			//ndVector torque(matrix.m_front.Scale(actions[m_softWheelControl] * ND_MAX_WHEEL_TORQUE));
+			//wheelBody->SetTorque(torque);
+
+			m_control->m_animSpeed = 0.25f;
+			m_control->m_z = actions[m_bodySwing] * 0.15f;
+			ApplyPoseGeneration();
+		}
+
+		bool IsTerminal() const
+		{
+			//#define D_REWARD_MIN_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
+			//const ndMatrix& matrix = GetRoot()->m_body->GetMatrix();
+			//ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
+			//bool fail = ndAbs(ndAsin(sinAngle)) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
+			//return fail;
+			return false;
+		}
+
+		ndReal GetReward() const
+		{
+			if (IsTerminal())
+			{
+				return ndReal(0.0f);
+			}
+
+			//ndFloat32 legReward = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * m_legJoint->GetAngle() * m_legJoint->GetAngle()));
+			//
+			//ndBodyKinematic* const boxBody = GetRoot()->m_body->GetAsBodyKinematic();
+			//const ndMatrix& matrix = boxBody->GetMatrix();
+			//ndFloat32 sinAngle = matrix.m_up.m_x;
+			//ndFloat32 boxReward = ndReal(ndPow(ndEXP, -ndFloat32(1000.0f) * sinAngle * sinAngle));
+			//
+			//ndFloat32 reward = (boxReward + legReward) / 2.0f;
+			//return ndReal(reward);
+			return ndReal(0);
+		}
+
 		ndBodyState CalculateFullBodyState() const
 		{
 			ndBodyState state;
@@ -542,8 +553,11 @@ namespace ndQuadruped_1
 			
 				ndFloat32 massDist2 = comDist.DotProduct(comDist).GetScalar() * mass;
 				state.m_inertia.m_front.m_x += massDist2;
-				state.m_inertia.m_front.m_y += massDist2;
-				state.m_inertia.m_front.m_z += massDist2;
+				state.m_inertia.m_up.m_y    += massDist2;
+				state.m_inertia.m_right.m_z += massDist2;
+				ndAssert(state.m_inertia[0][0] > ndFloat32(0.0f));
+				ndAssert(state.m_inertia[1][1] > ndFloat32(0.0f));
+				ndAssert(state.m_inertia[2][2] > ndFloat32(0.0f));
 			}
 
 			state.m_inertia.m_posit = ndVector::m_wOne;
@@ -559,9 +573,7 @@ namespace ndQuadruped_1
 			m_world = world;
 			m_timestep = timestep;
 			ndModelArticulation::Update(world, timestep);
-
-			CalculateFullBodyState();
-			ApplyPoseGeneration();
+			m_agent->Step();
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -578,6 +590,7 @@ namespace ndQuadruped_1
 
 		ndWorld* m_world;
 		ndFloat32 m_timestep;
+		ndSharedPtr<ndBrainAgent> m_agent;
 	};
 
 	class ndModelUI: public ndUIEntity
@@ -633,6 +646,50 @@ namespace ndQuadruped_1
 		ndSharedPtr<ndModel> m_model;
 	};
 
+	ndSharedPtr<ndBrainAgent> BuildAgent()
+	{
+		#ifdef ND_TRAIN_MODEL
+			ndInt32 layerSize = 64;
+			ndSharedPtr<ndBrain> actor(new ndBrain());
+			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
+			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_tanh);
+			actor->BeginAddLayer();
+			actor->AddLayer(layer0);
+			actor->AddLayer(layer1);
+			actor->AddLayer(layer2);
+			actor->AddLayer(ouputLayer);
+			actor->EndAddLayer();
+			actor->InitGaussianWeights(ndReal(0.25f));
+
+			// the critic is more complex since is deal with more complex inputs
+			ndSharedPtr<ndBrain> critic(new ndBrain());
+			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + m_actionsSize, layerSize * 2, m_tanh);
+			ndBrainLayer* const criticLayer1 = new ndBrainLayer(criticLayer0->GetOuputSize(), layerSize * 2, m_tanh);
+			ndBrainLayer* const criticLayer2 = new ndBrainLayer(criticLayer1->GetOuputSize(), layerSize * 2, m_tanh);
+			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(criticLayer2->GetOuputSize(), 1, m_lineal);
+			critic->BeginAddLayer();
+			critic->AddLayer(criticLayer0);
+			critic->AddLayer(criticLayer1);
+			critic->AddLayer(criticLayer2);
+			critic->AddLayer(criticOuputLayer);
+			critic->EndAddLayer();
+			critic->InitGaussianWeights(ndReal(0.25f));
+
+			// add a reinforcement learning controller 
+			ndSharedPtr<ndBrainAgent> agent(new ndModelQuadruped::ndControllerAgent_trainer(actor, critic));
+			agent->SetName("quadruped_1.nn");
+		#else
+			ndAssert(0);
+			char fileName[1024];
+			ndGetWorkingFileName("quadruped_1.nn", fileName);
+			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+			ndSharedPtr<ndBrainAgent> agent(new  ndModelUnicycle::ndControllerAgent(actor));
+		#endif
+		return agent;
+	}
+
 	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation)
 	{
 		ndFloat32 mass = 10.0f;
@@ -641,7 +698,8 @@ namespace ndQuadruped_1
 		ndFloat32 limbLength = 0.3f;
 		ndFloat32 limbRadios = 0.06f;
 
-		ndModelQuadruped* const model = new ndModelQuadruped();
+		ndSharedPtr<ndBrainAgent> agent (BuildAgent());
+		ndModelQuadruped* const model = new ndModelQuadruped(agent);
 
 		ndPhysicsWorld* const world = scene->GetWorld();
 		ndVector floor(FindFloor(*world, matrixLocation.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
@@ -787,49 +845,12 @@ namespace ndQuadruped_1
 		}
 
 		#ifdef ND_TRAIN_MODEL
-			ndInt32 layerSize = 64;
-			ndSharedPtr<ndBrain> actor(new ndBrain());
-			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
-			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
-			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
-			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_tanh);
-			actor->BeginAddLayer();
-			actor->AddLayer(layer0);
-			actor->AddLayer(layer1);
-			actor->AddLayer(layer2);
-			actor->AddLayer(ouputLayer);
-			actor->EndAddLayer();
-			actor->InitGaussianWeights(ndReal(0.25f));
-
-			// the critic is more complex since is deal with more complex inputs
-			ndSharedPtr<ndBrain> critic(new ndBrain());
-			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + m_actionsSize, layerSize * 2, m_tanh);
-			ndBrainLayer* const criticLayer1 = new ndBrainLayer(criticLayer0->GetOuputSize(), layerSize * 2, m_tanh);
-			ndBrainLayer* const criticLayer2 = new ndBrainLayer(criticLayer1->GetOuputSize(), layerSize * 2, m_tanh);
-			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(criticLayer2->GetOuputSize(), 1, m_lineal);
-			critic->BeginAddLayer();
-			critic->AddLayer(criticLayer0);
-			critic->AddLayer(criticLayer1);
-			critic->AddLayer(criticLayer2);
-			critic->AddLayer(criticOuputLayer);
-			critic->EndAddLayer();
-			critic->InitGaussianWeights(ndReal(0.25f));
-
-			// add a reinforcement learning controller 
-			ndSharedPtr<ndBrainAgent> agent(new ndModelQuadruped::ndControllerAgent_trainer(actor, critic));
-			agent->SetName("quadruped_1.nn");
-
 			((ndModelQuadruped::ndControllerAgent_trainer*)*agent)->SetModel(model);
 			//scene->SetAcceleratedUpdate();
 		#else
-			char fileName[1024];
-			ndGetWorkingFileName("quadruped_1.nn", fileName);
-			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-			ndSharedPtr<ndBrainAgent> agent(new  ndModelUnicycle::ndControllerAgent(actor));
-
+			ndAssert(0);
 			((ndModelUnicycle::ndControllerAgent*)*agent)->SetModel(model);
 		#endif
-
 		return model;
 	}
 }
