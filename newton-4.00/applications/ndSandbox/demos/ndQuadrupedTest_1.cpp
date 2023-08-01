@@ -517,7 +517,12 @@ namespace ndQuadruped_1
 		ndBodyState CalculateFullBodyState() const
 		{
 			ndBodyState state;
-			state.m_com = GetRoot()->m_body->GetMatrix();
+			const ndMatrix& rootMatrix = GetRoot()->m_body->GetMatrix();
+			state.m_com.m_up = ndVector::m_zero;
+			state.m_com.m_up.m_y = ndFloat32 (0.0f);
+			state.m_com.m_right = (state.m_com.m_up.CrossProduct(rootMatrix.m_front)).Normalize();
+			state.m_com.m_front = state.m_com.m_up.CrossProduct(state.m_com.m_right);
+
 			state.m_com.m_posit = ndVector::m_zero;
 			for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
@@ -546,15 +551,16 @@ namespace ndQuadruped_1
 				state.m_veloc += linearMomentum;
 				state.m_omega += comDist.CrossProduct(linearMomentum);
 				state.m_omega += bodyInertia.RotateVector(body->GetOmega());
-				
-				state.m_inertia.m_front += (bodyInertia.m_front - covariance.m_front.Scale(mass));
-				state.m_inertia.m_up    += (bodyInertia.m_up - covariance.m_up.Scale(mass));
-				state.m_inertia.m_right += (bodyInertia.m_right - covariance.m_right.Scale(mass));
-			
+
 				ndFloat32 massDist2 = comDist.DotProduct(comDist).GetScalar() * mass;
-				state.m_inertia.m_front.m_x += massDist2;
-				state.m_inertia.m_up.m_y    += massDist2;
-				state.m_inertia.m_right.m_z += massDist2;
+				
+				state.m_inertia[0] += (bodyInertia[0] - covariance[0].Scale(mass));
+				state.m_inertia[1] += (bodyInertia[1] - covariance[1].Scale(mass));
+				state.m_inertia[2] += (bodyInertia[2] - covariance[2].Scale(mass));
+				
+				state.m_inertia[0][0] += massDist2;
+				state.m_inertia[1][1] += massDist2;
+				state.m_inertia[2][2] += massDist2;
 				ndAssert(state.m_inertia[0][0] > ndFloat32(0.0f));
 				ndAssert(state.m_inertia[1][1] > ndFloat32(0.0f));
 				ndAssert(state.m_inertia[2][2] > ndFloat32(0.0f));
