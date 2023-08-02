@@ -465,7 +465,6 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PopulateReplayBuffer()
 {
 	GetObservation(&m_currentTransition.m_nextState[0]);
-	//m_currentTransition.m_reward = GetReward();
 	m_currentTransition.m_terminalState = IsTerminal();
 	m_replayBuffer.AddTransition(m_currentTransition);
 }
