@@ -208,12 +208,12 @@ namespace ndQuadruped_1
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(300)
+				,m_maxFrames(250)
 				,m_stopTraining(1500000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
-				SetActionNoise(ndReal(0.15f));
+				SetActionNoise(ndReal(0.05f));
 				m_outFile = fopen("traingPerf-TD3.csv", "wb");
 				fprintf(m_outFile, "td3\n");
 			}
