@@ -22,8 +22,8 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
-	#define D_SWING_STEP		ndFloat32 (0.005f)
+	//#define ND_TRAIN_MODEL
+	#define D_SWING_STEP		ndFloat32 (0.01f)
 	#define D_MAX_SWING_DIST	ndFloat32 (0.15f)
 	#define D_MIN_REWARD_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
 
@@ -133,6 +133,41 @@ namespace ndQuadruped_1
 			ndFloat32 m_offset[4];
 		};
 
+		// implement controller player
+		class ndControllerAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
+		{
+			public:
+			ndControllerAgent(ndSharedPtr<ndBrain>& actor)
+				:ndBrainAgentDDPG<m_stateSize, m_actionsSize>(actor)
+				,m_model(nullptr)
+			{
+			}
+
+			void SetModel(ndModelQuadruped* const model)
+			{
+				m_model = model;
+			}
+
+			void GetObservation(ndReal* const state) const
+			{
+				m_model->GetObservation(state);
+			}
+
+			virtual void ApplyActions(ndReal* const actions) const
+			{
+				//if (!m_model->HasSupportContact())
+				//{
+				//	for (ndInt32 i = 0; i < m_actionsSize; ++i)
+				//	{
+				//		actions[i] = ndReal(0.0f);
+				//	}
+				//}
+				m_model->ApplyActions(actions);
+			}
+
+			ndModelQuadruped* m_model;
+		};
+
 		class ndControllerAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
@@ -171,8 +206,8 @@ namespace ndQuadruped_1
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(200)
-				,m_stopTraining(1000000)
+				,m_maxFrames(300)
+				,m_stopTraining(1500000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
@@ -515,8 +550,6 @@ namespace ndQuadruped_1
 		void ApplyActions(ndReal* const actions)
 		{
 			m_control->m_animSpeed = 0.25f;
-			//m_control->m_z = actions[m_bodySwing] * 0.15f;
-			//ndAssert(actions[m_bodySwing] <= 0);
 			m_control->m_z = ndClamp(m_control->m_z + actions[m_bodySwing] * D_SWING_STEP, -D_MAX_SWING_DIST, D_MAX_SWING_DIST);
 			ApplyPoseGeneration();
 		}
@@ -720,11 +753,10 @@ namespace ndQuadruped_1
 			ndSharedPtr<ndBrainAgent> agent(new ndModelQuadruped::ndControllerAgent_trainer(actor, critic));
 			agent->SetName("quadruped_1.nn");
 		#else
-			ndAssert(0);
 			char fileName[1024];
 			ndGetWorkingFileName("quadruped_1.nn", fileName);
 			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-			ndSharedPtr<ndBrainAgent> agent(new  ndModelUnicycle::ndControllerAgent(actor));
+			ndSharedPtr<ndBrainAgent> agent(new ndModelQuadruped::ndControllerAgent(actor));
 		#endif
 		return agent;
 	}
@@ -887,8 +919,7 @@ namespace ndQuadruped_1
 			((ndModelQuadruped::ndControllerAgent_trainer*)*agent)->SetModel(model);
 			scene->SetAcceleratedUpdate();
 		#else
-			ndAssert(0);
-			((ndModelUnicycle::ndControllerAgent*)*agent)->SetModel(model);
+			((ndModelQuadruped::ndControllerAgent*)*agent)->SetModel(model);
 		#endif
 		return model;
 	}
