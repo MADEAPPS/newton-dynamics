@@ -23,6 +23,8 @@
 namespace ndQuadruped_1
 {
 	#define ND_TRAIN_MODEL
+	#define D_SWING_STEP		ndFloat32 (0.005f)
+	#define D_MAX_SWING_DIST	ndFloat32 (0.15f)
 	#define D_MIN_REWARD_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
 
 	enum ndActionSpace
@@ -37,6 +39,7 @@ namespace ndQuadruped_1
 		m_leg1_y,
 		m_leg2_y,
 		m_leg3_y,
+		m_body_swing,
 		m_body_omega_x,
 		m_body_omega_z,
 		m_stateSize
@@ -168,8 +171,8 @@ namespace ndQuadruped_1
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(2500)
-				,m_stopTraining(1500000)
+				,m_maxFrames(200)
+				,m_stopTraining(1000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
@@ -246,6 +249,7 @@ namespace ndQuadruped_1
 				{
 					m_basePose[i].SetPose();
 				}
+				m_model->m_control->m_z = ndReal(0.0f);
 				//m_legJoint->SetTargetAngle(0.0f);
 				//m_wheelJoint->SetTargetAngle(0.0f);
 			}
@@ -505,22 +509,15 @@ namespace ndQuadruped_1
 			ndVector omega(bodyState.m_com.UnrotateVector(bodyState.m_omega));
 			state[m_body_omega_x] = omega.m_x;
 			state[m_body_omega_z] = omega.m_z;
+			state[m_body_omega_x] = m_control->m_z;
 		}
 
 		void ApplyActions(ndReal* const actions)
 		{
-			//ndFloat32 legAngle = actions[m_softLegControl] * ND_MAX_LEG_ANGLE_STEP + m_legJoint->GetAngle();
-			//legAngle = ndClamp(legAngle, -ND_MAX_LEG_JOINT_ANGLE, ND_MAX_LEG_JOINT_ANGLE);
-			//m_legJoint->SetTargetAngle(legAngle);
-			//
-			//ndBodyDynamic* const wheelBody = m_wheelJoint->GetBody0()->GetAsBodyDynamic();
-			//const ndMatrix matrix(m_wheelJoint->GetLocalMatrix1() * m_wheelJoint->GetBody1()->GetMatrix());
-			//
-			//ndVector torque(matrix.m_front.Scale(actions[m_softWheelControl] * ND_MAX_WHEEL_TORQUE));
-			//wheelBody->SetTorque(torque);
-
 			m_control->m_animSpeed = 0.25f;
-			m_control->m_z = actions[m_bodySwing] * 0.15f;
+			//m_control->m_z = actions[m_bodySwing] * 0.15f;
+			//ndAssert(actions[m_bodySwing] <= 0);
+			m_control->m_z = ndClamp(m_control->m_z + actions[m_bodySwing] * D_SWING_STEP, -D_MAX_SWING_DIST, D_MAX_SWING_DIST);
 			ApplyPoseGeneration();
 		}
 
@@ -542,16 +539,11 @@ namespace ndQuadruped_1
 				return ndReal(0.0f);
 			}
 
-			//ndFloat32 legReward = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * m_legJoint->GetAngle() * m_legJoint->GetAngle()));
-			//
-			//ndBodyKinematic* const boxBody = GetRoot()->m_body->GetAsBodyKinematic();
-			//const ndMatrix& matrix = boxBody->GetMatrix();
-			//ndFloat32 sinAngle = matrix.m_up.m_x;
-			//ndFloat32 boxReward = ndReal(ndPow(ndEXP, -ndFloat32(1000.0f) * sinAngle * sinAngle));
-			//
-			//ndFloat32 reward = (boxReward + legReward) / 2.0f;
-			//return ndReal(reward);
-			return ndReal(0);
+			ndBodyKinematic* const boxBody = GetRoot()->m_body->GetAsBodyKinematic();
+			const ndMatrix& matrix = boxBody->GetMatrix();
+			ndFloat32 sinAngle = ndSqrt(matrix.m_up.m_x * matrix.m_up.m_x + matrix.m_up.m_z * matrix.m_up.m_z);
+			ndFloat32 reward = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * sinAngle * sinAngle));
+			return ndReal(reward);
 		}
 
 		ndBodyState CalculateFullBodyState() const
@@ -667,21 +659,21 @@ namespace ndQuadruped_1
 			
 			bool change = false;
 			ImGui::Text("position x");
-			change = change | ImGui::SliderFloat("##x", &control->m_x, -0.1f, 0.1f);
+			change = change || ImGui::SliderFloat("##x", &control->m_x, -0.1f, 0.1f);
 			ImGui::Text("position y");
-			change = change | ImGui::SliderFloat("##y", &control->m_y, -0.2f, 0.1f);
+			change = change || ImGui::SliderFloat("##y", &control->m_y, -0.2f, 0.1f);
 			ImGui::Text("position z");
-			change = change | ImGui::SliderFloat("##z", &control->m_z, -0.15f, 0.15f);
+			change = change || ImGui::SliderFloat("##z", &control->m_z, -D_MAX_SWING_DIST, D_MAX_SWING_DIST);
 
 			ImGui::Text("pitch");
-			change = change | ImGui::SliderFloat("##pitch", &control->m_pitch, -15.0f, 15.0f);
+			change = change || ImGui::SliderFloat("##pitch", &control->m_pitch, -15.0f, 15.0f);
 			ImGui::Text("yaw");
-			change = change | ImGui::SliderFloat("##yaw", &control->m_yaw, -20.0f, 20.0f);
+			change = change || ImGui::SliderFloat("##yaw", &control->m_yaw, -20.0f, 20.0f);
 			ImGui::Text("roll");
-			change = change | ImGui::SliderFloat("##roll", &control->m_roll, -15.0f, 15.0f);
+			change = change || ImGui::SliderFloat("##roll", &control->m_roll, -15.0f, 15.0f);
 
 			ImGui::Text("animSpeed");
-			change = change | ImGui::SliderFloat("##animSpeed", &control->m_animSpeed, 0.0f, 1.0f);
+			change = change || ImGui::SliderFloat("##animSpeed", &control->m_animSpeed, 0.0f, 1.0f);
 
 			if (change)
 			{
