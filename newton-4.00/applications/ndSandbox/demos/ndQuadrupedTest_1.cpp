@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define D_SWING_STEP			ndFloat32 (0.01f)
 	#define D_MAX_SWING_DIST		ndFloat32 (0.15f)
 	#define D_MIN_REWARD_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
@@ -208,12 +208,12 @@ namespace ndQuadruped_1
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(250)
+				,m_maxFrames(300)
 				,m_stopTraining(1500000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
-				SetActionNoise(ndReal(0.05f));
+				SetActionNoise(ndReal(0.20f));
 				m_outFile = fopen("traingPerf-TD3.csv", "wb");
 				fprintf(m_outFile, "td3\n");
 			}
