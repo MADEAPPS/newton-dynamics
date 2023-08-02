@@ -22,10 +22,12 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
-	#define D_SWING_STEP		ndFloat32 (0.01f)
-	#define D_MAX_SWING_DIST	ndFloat32 (0.15f)
-	#define D_MIN_REWARD_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
+	#define ND_TRAIN_MODEL
+	#define D_SWING_STEP			ndFloat32 (0.01f)
+	#define D_MAX_SWING_DIST		ndFloat32 (0.15f)
+	#define D_MIN_REWARD_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
+
+	#define D_POSE_REST_POSITION	ndFloat32 (0.4f)
 
 	enum ndActionSpace
 	{
@@ -114,8 +116,8 @@ namespace ndQuadruped_1
 
 				ndFloat32 high = -0.3f;
 				ndVector base (ndVector::m_wOne);
-				base.m_x = 0.4f;
 				base.m_y = high;
+				base.m_x = D_POSE_REST_POSITION;
 				for (ndInt32 i = 0; i < 4; i++)
 				{
 					output[i].m_posit = base;
@@ -280,13 +282,11 @@ namespace ndQuadruped_1
 
 			void ResetModel() const
 			{
+				m_model->m_control->m_z = ndReal(0.0f);
 				for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
 				{
 					m_basePose[i].SetPose();
 				}
-				m_model->m_control->m_z = ndReal(0.0f);
-				//m_legJoint->SetTargetAngle(0.0f);
-				//m_wheelJoint->SetTargetAngle(0.0f);
 			}
 
 			void OptimizeStep()
@@ -523,12 +523,6 @@ namespace ndQuadruped_1
 
 		void GetObservation(ndReal* const state)
 		{
-			//ndBodyKinematic* const body = GetRoot()->m_body->GetAsBodyKinematic();
-			//const ndVector omega(body->GetOmega());
-			//const ndMatrix& matrix = body->GetMatrix();
-			//ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
-			//ndFloat32 angle = ndAsin(sinAngle);
-
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
@@ -536,8 +530,7 @@ namespace ndQuadruped_1
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 
 				ndVector posit(effector->GetLocalTargetPosition());
-				state[i] = posit.m_x;
-				//if (i == 0)	ndTrace(("%d: %f %f %f\n", posit.m_x, posit.m_y, posit.m_z));
+				state[i] = posit.m_x - D_POSE_REST_POSITION;
 			}
 
 			ndBodyState bodyState(CalculateFullBodyState());
