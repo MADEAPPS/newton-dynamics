@@ -22,12 +22,12 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define D_SWING_STEP			ndFloat32 (0.01f)
 	#define D_MAX_SWING_DIST		ndFloat32 (0.15f)
 	#define D_MIN_REWARD_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
 
-	#define D_POSE_REST_POSITION	ndFloat32 (0.4f)
+	#define D_POSE_REST_POSITION_Y	ndFloat32 (-0.3f)
 
 	enum ndActionSpace
 	{
@@ -114,10 +114,9 @@ namespace ndQuadruped_1
 				ndFloat32 amp = 0.27f;
 				ndFloat32 omega = ndPi / gaitFraction;
 
-				ndFloat32 high = -0.3f;
 				ndVector base (ndVector::m_wOne);
-				base.m_y = high;
-				base.m_x = D_POSE_REST_POSITION;
+				base.m_y = D_POSE_REST_POSITION_Y;
+				base.m_x = 0.4f;
 				for (ndInt32 i = 0; i < 4; i++)
 				{
 					output[i].m_posit = base;
@@ -209,11 +208,15 @@ namespace ndQuadruped_1
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(300)
-				,m_stopTraining(2000000)
+				,m_stopTraining(1500000)
+				//, m_stopTraining(2000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
-				SetActionNoise(ndReal(0.15f));
+				//SetActionNoise(ndReal(0.15f));
+				SetActionNoise(ndReal(0.20f));
+				SetLearnRate(ndReal(1.0e-3f));
+
 				m_outFile = fopen("traingPerf-TD3.csv", "wb");
 				fprintf(m_outFile, "td3\n");
 				m_timer = ndGetTimeInMicroseconds();
@@ -534,7 +537,8 @@ namespace ndQuadruped_1
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 
 				ndVector posit(effector->GetLocalTargetPosition());
-				state[i] = posit.m_x - D_POSE_REST_POSITION;
+				state[i] = posit.m_y - D_POSE_REST_POSITION_Y;
+				//if (i==0) ndTrace(("%d %f %f %f\n", i, posit.m_x, state[i], posit.m_z));
 			}
 
 			//ndBodyState bodyState(CalculateFullBodyState());
@@ -542,17 +546,18 @@ namespace ndQuadruped_1
 
 			ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
 			const ndMatrix& rootMatrix = rootBody->GetMatrix();
-			ndMatrix matrix(ndGetIdentityMatrix());
-			matrix.m_up = ndVector::m_zero;
-			matrix.m_up.m_y = ndFloat32(1.0f);
-			matrix.m_right = (rootMatrix.m_front.CrossProduct(matrix.m_up)).Normalize();
-			matrix.m_front = matrix.m_up.CrossProduct(matrix.m_right);
-			ndVector omega(matrix.UnrotateVector(rootBody->GetOmega()));
+			//ndMatrix matrix(ndGetIdentityMatrix());
+			//matrix.m_up = ndVector::m_zero;
+			//matrix.m_up.m_y = ndFloat32(1.0f);
+			//matrix.m_right = (rootMatrix.m_front.CrossProduct(matrix.m_up)).Normalize();
+			//matrix.m_front = matrix.m_up.CrossProduct(matrix.m_right);
+			//ndVector omega(matrix.UnrotateVector(rootBody->GetOmega()));
+			ndVector omega(rootMatrix.UnrotateVector(rootBody->GetOmega()));
 
 			state[m_body_omega_x] = omega.m_x;
 			state[m_body_omega_z] = omega.m_z;
 
-			state[m_body_omega_x] = m_control->m_z;
+			state[m_body_swing] = m_control->m_z;
 		}
 
 		void ApplyActions(ndReal* const actions)
@@ -590,12 +595,12 @@ namespace ndQuadruped_1
 		ndBodyState CalculateFullBodyState() const
 		{
 			ndBodyState state;
-			const ndMatrix& rootMatrix = GetRoot()->m_body->GetMatrix();
-			state.m_com.m_up = ndVector::m_zero;
-			state.m_com.m_up.m_y = ndFloat32 (1.0f);
-			state.m_com.m_right = (rootMatrix.m_front.CrossProduct(state.m_com.m_up)).Normalize();
-			state.m_com.m_front = state.m_com.m_up.CrossProduct(state.m_com.m_right);
-
+			//const ndMatrix& rootMatrix = GetRoot()->m_body->GetMatrix();
+			//state.m_com.m_up = ndVector::m_zero;
+			//state.m_com.m_up.m_y = ndFloat32 (1.0f);
+			//state.m_com.m_right = (rootMatrix.m_front.CrossProduct(state.m_com.m_up)).Normalize();
+			//state.m_com.m_front = state.m_com.m_up.CrossProduct(state.m_com.m_right);
+			state.m_com = GetRoot()->m_body->GetMatrix();
 			state.m_com.m_posit = ndVector::m_zero;
 			for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
