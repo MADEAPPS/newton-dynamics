@@ -107,9 +107,10 @@ namespace ndQuadruped_1
 				return ndVector::m_zero;
 			}
 
-			void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
+			void CalculatePose(ndAnimationPose& output, ndFloat32 time) const
 			{
 				// generate a procedural in place march gait
+				const ndFloat32 param = time / m_duration;
 				const ndFloat32 gaitFraction = 0.47f;
 				ndFloat32 amp = 0.27f;
 				ndFloat32 omega = ndPi / gaitFraction;
@@ -208,14 +209,14 @@ namespace ndQuadruped_1
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(300)
-				,m_stopTraining(3000000)
+				,m_stopTraining(2000000)
 				//, m_stopTraining(2000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
-				//SetActionNoise(ndReal(0.15f));
-				SetActionNoise(ndReal(0.20f));
-				SetLearnRate(ndReal(1.0e-3f));
+				SetActionNoise(ndReal(0.15f));
+				//SetActionNoise(ndReal(0.20f));
+				//SetLearnRate(ndReal(1.0e-3f));
 
 				m_outFile = fopen("traingPerf-TD3.csv", "wb");
 				fprintf(m_outFile, "td3\n");
@@ -291,7 +292,10 @@ namespace ndQuadruped_1
 				{
 					m_basePose[i].SetPose();
 				}
-				m_model->m_poseGenerator->SetTime(0.0f);
+
+				ndUnsigned32 index = (ndRandInt() >> 4) % 1;
+				ndFloat32 period = m_model->m_poseGenerator->GetSequence()->GetDuration();
+				m_model->m_poseGenerator->SetTime(period  * ndFloat32 (index) / 2.0f);
 			}
 
 			void OptimizeStep()
@@ -563,7 +567,7 @@ namespace ndQuadruped_1
 
 		void ApplyActions(ndReal* const actions)
 		{
-			m_control->m_animSpeed = 0.25f;
+			m_control->m_animSpeed = 2.0f;
 			m_control->m_z = ndClamp(m_control->m_z + actions[m_bodySwing] * D_SWING_STEP, -D_MAX_SWING_DIST, D_MAX_SWING_DIST);
 			ApplyPoseGeneration();
 		}
@@ -736,7 +740,7 @@ namespace ndQuadruped_1
 			change = change || ImGui::SliderFloat("##roll", &control->m_roll, -15.0f, 15.0f);
 
 			ImGui::Text("animSpeed");
-			change = change || ImGui::SliderFloat("##animSpeed", &control->m_animSpeed, 0.0f, 1.0f);
+			change = change || ImGui::SliderFloat("##animSpeed", &control->m_animSpeed, 0.0f, 4.0f);
 
 			if (change)
 			{
@@ -947,7 +951,7 @@ namespace ndQuadruped_1
 
 		#ifdef ND_TRAIN_MODEL
 			((ndModelQuadruped::ndControllerAgent_trainer*)*agent)->SetModel(model);
-			//scene->SetAcceleratedUpdate();
+			scene->SetAcceleratedUpdate();
 		#else
 			((ndModelQuadruped::ndControllerAgent*)*agent)->SetModel(model);
 		#endif
