@@ -209,7 +209,7 @@ namespace ndQuadruped_1
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(300)
-				,m_stopTraining(2000000)
+				,m_stopTraining(5000000)
 				//, m_stopTraining(2000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
