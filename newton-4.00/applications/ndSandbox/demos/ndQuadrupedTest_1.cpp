@@ -209,13 +209,14 @@ namespace ndQuadruped_1
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(300)
-				,m_stopTraining(1500000)
+				,m_stopTraining(2000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
-				SetActionNoise(ndReal(0.20f));
+				SetActionNoise(ndReal(0.15f));
 				m_outFile = fopen("traingPerf-TD3.csv", "wb");
 				fprintf(m_outFile, "td3\n");
+				m_timer = ndGetTimeInMicroseconds();
 			}
 
 			~ndControllerAgent_trainer()
@@ -304,8 +305,8 @@ namespace ndQuadruped_1
 						{
 							char fileName[1024];
 							ndGetWorkingFileName(GetName().GetStr(), fileName);
-				
 							SaveToFile(fileName);
+
 							ndExpandTraceMessage("saving to file: %s\n", fileName);
 							ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
 							m_maxGain = m_averageQValue.GetAverage();
@@ -326,6 +327,8 @@ namespace ndQuadruped_1
 					{
 						ndExpandTraceMessage("\n");
 						ndExpandTraceMessage("training complete\n");
+						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+						ndExpandTraceMessage("time training: %f\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 					}
 				}
 				//if (m_model->IsOutOfBounds())
@@ -339,6 +342,7 @@ namespace ndQuadruped_1
 			ndFloat32 m_maxGain;
 			ndInt32 m_maxFrames;
 			ndInt32 m_stopTraining;
+			ndUnsigned64 m_timer;
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
 			ndFixSizeArray<ndBodyDynamic*, 32> m_bodies;
 			mutable ndMovingAverage<128> m_averageQValue;
@@ -533,10 +537,21 @@ namespace ndQuadruped_1
 				state[i] = posit.m_x - D_POSE_REST_POSITION;
 			}
 
-			ndBodyState bodyState(CalculateFullBodyState());
-			ndVector omega(bodyState.m_com.UnrotateVector(bodyState.m_omega));
+			//ndBodyState bodyState(CalculateFullBodyState());
+			//ndVector omega(bodyState.m_com.UnrotateVector(bodyState.m_omega));
+
+			ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
+			const ndMatrix& rootMatrix = rootBody->GetMatrix();
+			ndMatrix matrix(ndGetIdentityMatrix());
+			matrix.m_up = ndVector::m_zero;
+			matrix.m_up.m_y = ndFloat32(1.0f);
+			matrix.m_right = (rootMatrix.m_front.CrossProduct(matrix.m_up)).Normalize();
+			matrix.m_front = matrix.m_up.CrossProduct(matrix.m_right);
+			ndVector omega(matrix.UnrotateVector(rootBody->GetOmega()));
+
 			state[m_body_omega_x] = omega.m_x;
 			state[m_body_omega_z] = omega.m_z;
+
 			state[m_body_omega_x] = m_control->m_z;
 		}
 
@@ -578,7 +593,7 @@ namespace ndQuadruped_1
 			const ndMatrix& rootMatrix = GetRoot()->m_body->GetMatrix();
 			state.m_com.m_up = ndVector::m_zero;
 			state.m_com.m_up.m_y = ndFloat32 (1.0f);
-			state.m_com.m_right = (state.m_com.m_up.CrossProduct(rootMatrix.m_front)).Normalize();
+			state.m_com.m_right = (rootMatrix.m_front.CrossProduct(state.m_com.m_up)).Normalize();
 			state.m_com.m_front = state.m_com.m_up.CrossProduct(state.m_com.m_right);
 
 			state.m_com.m_posit = ndVector::m_zero;
