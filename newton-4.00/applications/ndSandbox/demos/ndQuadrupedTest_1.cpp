@@ -291,6 +291,7 @@ namespace ndQuadruped_1
 				{
 					m_basePose[i].SetPose();
 				}
+				m_model->m_poseGenerator->SetTime(0.0f);
 			}
 
 			void OptimizeStep()
@@ -541,18 +542,18 @@ namespace ndQuadruped_1
 				//if (i==0) ndTrace(("%d %f %f %f\n", i, posit.m_x, state[i], posit.m_z));
 			}
 
-			//ndBodyState bodyState(CalculateFullBodyState());
-			//ndVector omega(bodyState.m_com.UnrotateVector(bodyState.m_omega));
+			ndBodyState bodyState(CalculateFullBodyState());
+			ndVector omega(bodyState.m_com.UnrotateVector(bodyState.m_omega));
 
-			ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
-			const ndMatrix& rootMatrix = rootBody->GetMatrix();
+			//ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
+			//const ndMatrix& rootMatrix = rootBody->GetMatrix();
 			//ndMatrix matrix(ndGetIdentityMatrix());
 			//matrix.m_up = ndVector::m_zero;
 			//matrix.m_up.m_y = ndFloat32(1.0f);
 			//matrix.m_right = (rootMatrix.m_front.CrossProduct(matrix.m_up)).Normalize();
 			//matrix.m_front = matrix.m_up.CrossProduct(matrix.m_right);
 			//ndVector omega(matrix.UnrotateVector(rootBody->GetOmega()));
-			ndVector omega(rootMatrix.UnrotateVector(rootBody->GetOmega()));
+			//ndVector omega(rootMatrix.UnrotateVector(rootBody->GetOmega()));
 
 			state[m_body_omega_x] = omega.m_x;
 			state[m_body_omega_z] = omega.m_z;
@@ -585,6 +586,22 @@ namespace ndQuadruped_1
 				return ndReal(0.0f);
 			}
 
+			//a) Mt = sum(m(i))
+			//b) cg = sum(p(i) * m(i)) / Mt
+			//c) Vcg = sum(v(i) * m(i)) / Mt
+			//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
+			//e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
+			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
+			//g) Bcg = (Icg ^ -1) * (T0 + T1)
+
+			//a) Mt = sum(m(i))
+			//b) cg = sum(p(i) * m(i)) / Mt
+			//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
+			//e) T0 = sum(w(i) x (I(i) * w(i))
+			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
+			//g) Bcg = (Icg ^ -1) * (T0 + T1)
+
+			// this seem to simple and very wrong 
 			ndBodyKinematic* const boxBody = GetRoot()->m_body->GetAsBodyKinematic();
 			const ndMatrix& matrix = boxBody->GetMatrix();
 			ndFloat32 sinAngle = ndSqrt(matrix.m_up.m_x * matrix.m_up.m_x + matrix.m_up.m_z * matrix.m_up.m_z);
@@ -595,12 +612,12 @@ namespace ndQuadruped_1
 		ndBodyState CalculateFullBodyState() const
 		{
 			ndBodyState state;
-			//const ndMatrix& rootMatrix = GetRoot()->m_body->GetMatrix();
-			//state.m_com.m_up = ndVector::m_zero;
-			//state.m_com.m_up.m_y = ndFloat32 (1.0f);
-			//state.m_com.m_right = (rootMatrix.m_front.CrossProduct(state.m_com.m_up)).Normalize();
-			//state.m_com.m_front = state.m_com.m_up.CrossProduct(state.m_com.m_right);
-			state.m_com = GetRoot()->m_body->GetMatrix();
+			const ndMatrix& rootMatrix = GetRoot()->m_body->GetMatrix();
+			state.m_com.m_up = ndVector::m_zero;
+			state.m_com.m_up.m_y = ndFloat32 (1.0f);
+			state.m_com.m_right = (rootMatrix.m_front.CrossProduct(state.m_com.m_up)).Normalize();
+			state.m_com.m_front = state.m_com.m_up.CrossProduct(state.m_com.m_right);
+			//state.m_com = GetRoot()->m_body->GetMatrix();
 			state.m_com.m_posit = ndVector::m_zero;
 			for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
@@ -930,7 +947,7 @@ namespace ndQuadruped_1
 
 		#ifdef ND_TRAIN_MODEL
 			((ndModelQuadruped::ndControllerAgent_trainer*)*agent)->SetModel(model);
-			scene->SetAcceleratedUpdate();
+			//scene->SetAcceleratedUpdate();
 		#else
 			((ndModelQuadruped::ndControllerAgent*)*agent)->SetModel(model);
 		#endif
