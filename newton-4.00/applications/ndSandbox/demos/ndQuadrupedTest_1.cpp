@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define D_SWING_STEP			ndFloat32 (0.01f)
 	#define D_MAX_SWING_DIST		ndFloat32 (0.15f)
 	#define D_MIN_REWARD_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
