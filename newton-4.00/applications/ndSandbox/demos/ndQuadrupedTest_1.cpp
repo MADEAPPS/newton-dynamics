@@ -572,7 +572,7 @@ namespace ndQuadruped_1
 		{
 			m_control->m_animSpeed = 2.0f;
 			//m_control->m_animSpeed = 0.0f;
-			//m_control->m_z = ndClamp(m_control->m_z + actions[m_bodySwing] * D_SWING_STEP, -D_MAX_SWING_DIST, D_MAX_SWING_DIST);
+			m_control->m_z = ndClamp(m_control->m_z + actions[m_bodySwing] * D_SWING_STEP, -D_MAX_SWING_DIST, D_MAX_SWING_DIST);
 			ApplyPoseGeneration();
 		}
 
@@ -683,8 +683,8 @@ namespace ndQuadruped_1
 			//return ndReal(reward);
 
 
-			ndMatrix xxxx(state.m_inertia.Inverse4x4());
-			ndVector alpha(xxxx.RotateVector(torque));
+			ndMatrix invInertia(state.m_inertia.Inverse4x4());
+			ndVector alpha(invInertia.RotateVector(torque));
 
 			const ndMatrix& rootMatrix = GetRoot()->m_body->GetMatrix();
 			ndMatrix matrix(ndGetIdentityMatrix());
@@ -694,12 +694,25 @@ namespace ndQuadruped_1
 			matrix.m_front = matrix.m_up.CrossProduct(matrix.m_right);
 			torque = matrix.UnrotateVector(torque);
 
-			ndTrace(("%d torque(%f %f %f) alpha(%f %f %f)\n", xxx, torque.m_x, torque.m_y, torque.m_z, alpha.m_x, alpha.m_y, alpha.m_z));
+			//ndTrace(("%d torque(%f %f %f) alpha(%f %f %f)\n", xxx, torque.m_x, torque.m_y, torque.m_z, alpha.m_x, alpha.m_y, alpha.m_z));
+
+			ndFloat32 xxx0 = torque.m_x * torque.m_x + torque.m_z * torque.m_z;
+			ndFloat32 xxx1 = alpha.m_x * alpha.m_x + alpha.m_z * alpha.m_z;
+			//ndTrace(("%d reward(torque)=%f reward(alpha)=%f\n", xxx, xxx0, xxx1));
+
+			ndFloat32 xxx2 = ndPow(ndEXP, -ndFloat32(0.05f) * xxx1);
+			ndTrace(("%d reward(alpha)=%f gain=%f\n", xxx, xxx0, xxx2));
+
+			if (xxx2 > 0.9f)
+			{
+				xxx2 *= 1;
+			}
+
 			//ndFloat32 sinAngle = ndSqrt(matrix.m_up.m_x * matrix.m_up.m_x + matrix.m_up.m_z * matrix.m_up.m_z);
 			//ndFloat32 reward = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * sinAngle * sinAngle));
 
 			xxx++;
-			return ndReal(0.0f);
+			return ndReal(xxx2);
 		}
 
 		ndBodyState CalculateFullBodyState() const
@@ -779,7 +792,7 @@ namespace ndQuadruped_1
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
-			//m_agent->OptimizeStep();
+			m_agent->OptimizeStep();
 		}
 
 		ndAnimationPose m_animPose;
