@@ -91,7 +91,12 @@ ndSharedPtr<ndAnimationSequence>& ndAnimationSequencePlayer::GetSequence()
 void ndAnimationSequencePlayer::Evaluate(ndAnimationPose& output, ndVector& veloc)
 {
 	veloc = m_veloc;
-	m_sequence->CalculatePose(output, m_time);
+
+	const ndFloat32 period = m_sequence->GetDuration();
+
+	ndAssert(m_time <= period);
+	ndAssert(m_time >= ndFloat32(0.0f));
+	m_sequence->CalculatePose(output, m_time / period);
 }
 
 

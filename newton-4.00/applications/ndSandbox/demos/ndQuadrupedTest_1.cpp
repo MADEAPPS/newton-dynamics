@@ -56,16 +56,17 @@ namespace ndQuadruped_1
 			ndBodyState()
 				:m_com(ndGetZeroMatrix())
 				,m_inertia(ndGetZeroMatrix())
-				,m_veloc(ndVector::m_zero)
-				,m_omega(ndVector::m_zero)
+				,m_linearMomentum(ndVector::m_zero)
+				,m_angularMomentum(ndVector::m_zero)
 				,m_mass(0.0f)
 			{
+				m_inertia[3][3] = ndFloat32(1.0f);
 			}
 
 			ndMatrix m_com;
 			ndMatrix m_inertia;
-			ndVector m_veloc;
-			ndVector m_omega;
+			ndVector m_linearMomentum;
+			ndVector m_angularMomentum;
 			ndFloat32 m_mass;
 		};
 
@@ -107,10 +108,13 @@ namespace ndQuadruped_1
 				return ndVector::m_zero;
 			}
 
-			void CalculatePose(ndAnimationPose& output, ndFloat32 time) const
+			void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 			{
 				// generate a procedural in place march gait
-				const ndFloat32 param = time / m_duration;
+				//const ndFloat32 param = time / m_duration;
+				ndAssert(param >= ndFloat32(0.0f));
+				ndAssert(param <= ndFloat32(1.0f));
+
 				const ndFloat32 gaitFraction = 0.47f;
 				ndFloat32 amp = 0.27f;
 				ndFloat32 omega = ndPi / gaitFraction;
@@ -209,7 +213,7 @@ namespace ndQuadruped_1
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(300)
-				,m_stopTraining(5000000)
+				,m_stopTraining(1500000)
 				//, m_stopTraining(2000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
@@ -294,8 +298,7 @@ namespace ndQuadruped_1
 				}
 
 				ndUnsigned32 index = (ndRandInt() >> 4) % 1;
-				ndFloat32 period = m_model->m_poseGenerator->GetSequence()->GetDuration();
-				m_model->m_poseGenerator->SetTime(period  * ndFloat32 (index) / 2.0f);
+				m_model->m_poseGenerator->SetTime(ndFloat32 (index) / 2.0f);
 			}
 
 			void OptimizeStep()
@@ -547,8 +550,8 @@ namespace ndQuadruped_1
 			}
 
 			ndBodyState bodyState(CalculateFullBodyState());
-			ndVector omega(bodyState.m_com.UnrotateVector(bodyState.m_omega));
-
+			ndVector angularMomentum(bodyState.m_com.UnrotateVector(bodyState.m_angularMomentum));
+			//ndVector omega(bodyState.m_com.UnrotateVector(bodyState.m_omega));
 			//ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
 			//const ndMatrix& rootMatrix = rootBody->GetMatrix();
 			//ndMatrix matrix(ndGetIdentityMatrix());
@@ -559,8 +562,8 @@ namespace ndQuadruped_1
 			//ndVector omega(matrix.UnrotateVector(rootBody->GetOmega()));
 			//ndVector omega(rootMatrix.UnrotateVector(rootBody->GetOmega()));
 
-			state[m_body_omega_x] = omega.m_x;
-			state[m_body_omega_z] = omega.m_z;
+			state[m_body_omega_x] = angularMomentum.m_x;
+			state[m_body_omega_z] = angularMomentum.m_z;
 
 			state[m_body_swing] = m_control->m_z;
 		}
@@ -568,7 +571,8 @@ namespace ndQuadruped_1
 		void ApplyActions(ndReal* const actions)
 		{
 			m_control->m_animSpeed = 2.0f;
-			m_control->m_z = ndClamp(m_control->m_z + actions[m_bodySwing] * D_SWING_STEP, -D_MAX_SWING_DIST, D_MAX_SWING_DIST);
+			//m_control->m_animSpeed = 0.0f;
+			//m_control->m_z = ndClamp(m_control->m_z + actions[m_bodySwing] * D_SWING_STEP, -D_MAX_SWING_DIST, D_MAX_SWING_DIST);
 			ApplyPoseGeneration();
 		}
 
@@ -583,34 +587,119 @@ namespace ndQuadruped_1
 			return fail;
 		}
 
-		ndReal GetReward() const
+		ndReal GetReward()
 		{
 			if (IsTerminal())
 			{
 				return ndReal(0.0f);
 			}
 
+			ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
+			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
+			ndAssert(skeleton);
+			ndJointBilateralConstraint* joint[4];
+			ndVector upVector(rootBody->GetMatrix().m_up);
+			for (ndInt32 i = 0; i < 4; ++i)
+			{
+				ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
+				ndAssert(info == &m_effectorsInfo[i]);
+				joint[i] = *info->m_effector;
+			}
+
+			m_invDynamicsSolver.SolverBegin(skeleton, joint, 4, m_world, m_timestep);
+			m_invDynamicsSolver.Solve();
+
 			//a) Mt = sum(m(i))
 			//b) cg = sum(p(i) * m(i)) / Mt
 			//c) Vcg = sum(v(i) * m(i)) / Mt
-			//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
+			//d) Icg = sum(I(i) +  m(i) * (Identity * ((p(i) - cg) * transpose (p(i) - cg)) - covarianMatrix(p(i) - cg))
 			//e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
 			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
 			//g) Bcg = (Icg ^ -1) * (T0 + T1)
 
-			//a) Mt = sum(m(i))
-			//b) cg = sum(p(i) * m(i)) / Mt
-			//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
-			//e) T0 = sum(w(i) x (I(i) * w(i))
-			//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
-			//g) Bcg = (Icg ^ -1) * (T0 + T1)
+			ndBodyState state;
+			ndFixSizeArray<ndVector, 32> bodyMomentum;
+			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
+			for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+				const ndMatrix matrix(body->GetMatrix());
+				ndFloat32 mass = body->GetMassMatrix().m_w;
+				state.m_mass += mass;
+				ndVector momentum(body->GetVelocity().Scale(mass));
+				state.m_linearMomentum += momentum;
+				state.m_com.m_posit += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
 
+				bodies.PushBack(body);
+				bodyMomentum.PushBack(momentum);
+			}
+			//ndFloat32 invMass = 1.0f / state.m_mass;
+			ndVector torque (ndVector::m_zero);
+			for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+			{
+				const ndBodyKinematic* const body = bodies[i];
+				const ndMatrix matrix(body->GetMatrix());
+				const ndVector comDist((matrix.TransformVector(body->GetCentreOfMass()) - state.m_com.m_posit) & ndVector::m_wOne);
+			
+				const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+				const ndVector omega(body->GetOmega());
+
+				torque += m_invDynamicsSolver.GetBodyTorque(body);
+				torque += comDist.CrossProduct(m_invDynamicsSolver.GetBodyForce(body));
+				torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
+
+				// note: the sum below should add to zero.
+				//ndVector angularMomentumSum(ndVector::m_zero);
+				//for (ndInt32 j = 0; j < bodies.GetCount(); ++j)
+				//{
+				//	if (j != i)
+				//	{
+				//		angularMomentumSum += bodyMomentum[j].CrossProduct(bodyMomentum[i]);
+				//	}
+				//}
+				//torque += angularMomentumSum.Scale(invMass);
+
+				ndFloat32 mass = body->GetMassMatrix().m_w;
+				ndFloat32 massDist2 = comDist.DotProduct(comDist).GetScalar() * mass;
+				const ndMatrix covariance(ndCovarianceMatrix(comDist, comDist));
+				state.m_inertia[0][0] += massDist2;
+				state.m_inertia[1][1] += massDist2;
+				state.m_inertia[2][2] += massDist2;
+				state.m_inertia[0] += (bodyInertia[0] - covariance[0].Scale(mass));
+				state.m_inertia[1] += (bodyInertia[1] - covariance[1].Scale(mass));
+				state.m_inertia[2] += (bodyInertia[2] - covariance[2].Scale(mass));
+				ndAssert(state.m_inertia[0][0] > ndFloat32(0.0f));
+				ndAssert(state.m_inertia[1][1] > ndFloat32(0.0f));
+				ndAssert(state.m_inertia[2][2] > ndFloat32(0.0f));
+			}
+			m_invDynamicsSolver.SolverEnd();
+
+			static int xxx;
 			// this seem to simple and very wrong 
-			ndBodyKinematic* const boxBody = GetRoot()->m_body->GetAsBodyKinematic();
-			const ndMatrix& matrix = boxBody->GetMatrix();
-			ndFloat32 sinAngle = ndSqrt(matrix.m_up.m_x * matrix.m_up.m_x + matrix.m_up.m_z * matrix.m_up.m_z);
-			ndFloat32 reward = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * sinAngle * sinAngle));
-			return ndReal(reward);
+			//ndBodyKinematic* const boxBody = GetRoot()->m_body->GetAsBodyKinematic();
+			//const ndMatrix& matrix = boxBody->GetMatrix();
+			//ndFloat32 sinAngle = ndSqrt(matrix.m_up.m_x * matrix.m_up.m_x + matrix.m_up.m_z * matrix.m_up.m_z);
+			//ndFloat32 reward = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * sinAngle * sinAngle));
+			//return ndReal(reward);
+
+
+			ndMatrix xxxx(state.m_inertia.Inverse4x4());
+			ndVector alpha(xxxx.RotateVector(torque));
+
+			const ndMatrix& rootMatrix = GetRoot()->m_body->GetMatrix();
+			ndMatrix matrix(ndGetIdentityMatrix());
+			matrix.m_up = ndVector::m_zero;
+			matrix.m_up.m_y = ndFloat32(1.0f);
+			matrix.m_right = (rootMatrix.m_front.CrossProduct(matrix.m_up)).Normalize();
+			matrix.m_front = matrix.m_up.CrossProduct(matrix.m_right);
+			torque = matrix.UnrotateVector(torque);
+
+			ndTrace(("%d torque(%f %f %f) alpha(%f %f %f)\n", xxx, torque.m_x, torque.m_y, torque.m_z, alpha.m_x, alpha.m_y, alpha.m_z));
+			//ndFloat32 sinAngle = ndSqrt(matrix.m_up.m_x * matrix.m_up.m_x + matrix.m_up.m_z * matrix.m_up.m_z);
+			//ndFloat32 reward = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * sinAngle * sinAngle));
+
+			xxx++;
+			return ndReal(0.0f);
 		}
 
 		ndBodyState CalculateFullBodyState() const
@@ -621,7 +710,6 @@ namespace ndQuadruped_1
 			state.m_com.m_up.m_y = ndFloat32 (1.0f);
 			state.m_com.m_right = (rootMatrix.m_front.CrossProduct(state.m_com.m_up)).Normalize();
 			state.m_com.m_front = state.m_com.m_up.CrossProduct(state.m_com.m_right);
-			//state.m_com = GetRoot()->m_body->GetMatrix();
 			state.m_com.m_posit = ndVector::m_zero;
 			for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
@@ -642,33 +730,40 @@ namespace ndQuadruped_1
 			 	ndVector comDist (matrix.TransformVector(body->GetCentreOfMass()) - state.m_com.m_posit);
 				comDist = comDist & ndVector::m_triplexMask;
 
-				ndMatrix bodyInertia(body->CalculateInertiaMatrix());
-				ndMatrix covariance(ndCovarianceMatrix(comDist, comDist));
-
 				ndFloat32 mass = body->GetMassMatrix().m_w;
-				ndVector linearMomentum(body->GetVelocity().Scale(mass));
-				state.m_veloc += linearMomentum;
-				state.m_omega += comDist.CrossProduct(linearMomentum);
-				state.m_omega += bodyInertia.RotateVector(body->GetOmega());
+				//ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+				//ndMatrix covariance(ndCovarianceMatrix(comDist, comDist));
+				
+				//ndVector linearMomentum(body->GetVelocity().Scale(mass));
+				//state.m_veloc += linearMomentum;
+				//state.m_omega += comDist.CrossProduct(linearMomentum);
+				//state.m_omega += bodyInertia.RotateVector(body->GetOmega());
+				//
+				//ndFloat32 massDist2 = comDist.DotProduct(comDist).GetScalar() * mass;
+				//
+				//state.m_inertia[0] += (bodyInertia[0] - covariance[0].Scale(mass));
+				//state.m_inertia[1] += (bodyInertia[1] - covariance[1].Scale(mass));
+				//state.m_inertia[2] += (bodyInertia[2] - covariance[2].Scale(mass));
+				//
+				//state.m_inertia[0][0] += massDist2;
+				//state.m_inertia[1][1] += massDist2;
+				//state.m_inertia[2][2] += massDist2;
+				//ndAssert(state.m_inertia[0][0] > ndFloat32(0.0f));
+				//ndAssert(state.m_inertia[1][1] > ndFloat32(0.0f));
+				//ndAssert(state.m_inertia[2][2] > ndFloat32(0.0f));
 
-				ndFloat32 massDist2 = comDist.DotProduct(comDist).GetScalar() * mass;
-				
-				state.m_inertia[0] += (bodyInertia[0] - covariance[0].Scale(mass));
-				state.m_inertia[1] += (bodyInertia[1] - covariance[1].Scale(mass));
-				state.m_inertia[2] += (bodyInertia[2] - covariance[2].Scale(mass));
-				
-				state.m_inertia[0][0] += massDist2;
-				state.m_inertia[1][1] += massDist2;
-				state.m_inertia[2][2] += massDist2;
-				ndAssert(state.m_inertia[0][0] > ndFloat32(0.0f));
-				ndAssert(state.m_inertia[1][1] > ndFloat32(0.0f));
-				ndAssert(state.m_inertia[2][2] > ndFloat32(0.0f));
+				ndVector linearMomentum(body->GetVelocity().Scale(mass));
+				state.m_linearMomentum += linearMomentum;
+
+				ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+				state.m_angularMomentum += bodyInertia.RotateVector(body->GetOmega());
+				state.m_angularMomentum += comDist.CrossProduct(linearMomentum);
 			}
 
-			state.m_inertia.m_posit = ndVector::m_wOne;
-			ndMatrix invInertia(state.m_inertia.Inverse4x4());
-			state.m_omega = invInertia.RotateVector(state.m_omega);
-			state.m_veloc = state.m_veloc.Scale(1.0f / state.m_mass);
+			//state.m_inertia.m_posit = ndVector::m_wOne;
+			//ndMatrix invInertia(state.m_inertia.Inverse4x4());
+			//state.m_omega = invInertia.RotateVector(state.m_omega);
+			//state.m_veloc = state.m_veloc.Scale(1.0f / state.m_mass);
 
 			return state;
 		}
@@ -684,7 +779,7 @@ namespace ndQuadruped_1
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
-			m_agent->OptimizeStep();
+			//m_agent->OptimizeStep();
 		}
 
 		ndAnimationPose m_animPose;
