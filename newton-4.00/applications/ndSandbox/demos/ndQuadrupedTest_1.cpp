@@ -212,7 +212,7 @@ namespace ndQuadruped_1
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(300)
+				,m_maxFrames(1000)
 				,m_stopTraining(1500000)
 				//, m_stopTraining(2000)
 				,m_averageQValue()
@@ -675,14 +675,6 @@ namespace ndQuadruped_1
 			m_invDynamicsSolver.SolverEnd();
 
 			static int xxx;
-			// this seem to simple and very wrong 
-			//ndBodyKinematic* const boxBody = GetRoot()->m_body->GetAsBodyKinematic();
-			//const ndMatrix& matrix = boxBody->GetMatrix();
-			//ndFloat32 sinAngle = ndSqrt(matrix.m_up.m_x * matrix.m_up.m_x + matrix.m_up.m_z * matrix.m_up.m_z);
-			//ndFloat32 reward = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * sinAngle * sinAngle));
-			//return ndReal(reward);
-
-
 			ndMatrix invInertia(state.m_inertia.Inverse4x4());
 			ndVector alpha(invInertia.RotateVector(torque));
 
@@ -696,17 +688,12 @@ namespace ndQuadruped_1
 
 			//ndTrace(("%d torque(%f %f %f) alpha(%f %f %f)\n", xxx, torque.m_x, torque.m_y, torque.m_z, alpha.m_x, alpha.m_y, alpha.m_z));
 
-			ndFloat32 xxx0 = torque.m_x * torque.m_x + torque.m_z * torque.m_z;
+			//ndFloat32 xxx0 = torque.m_x * torque.m_x + torque.m_z * torque.m_z;
 			ndFloat32 xxx1 = alpha.m_x * alpha.m_x + alpha.m_z * alpha.m_z;
 			//ndTrace(("%d reward(torque)=%f reward(alpha)=%f\n", xxx, xxx0, xxx1));
 
 			ndFloat32 xxx2 = ndPow(ndEXP, -ndFloat32(0.05f) * xxx1);
-			ndTrace(("%d reward(alpha)=%f gain=%f\n", xxx, xxx0, xxx2));
-
-			if (xxx2 > 0.9f)
-			{
-				xxx2 *= 1;
-			}
+			ndTrace(("%d alpha^2=%f reward=%f\n", xxx, xxx0, xxx2));
 
 			//ndFloat32 sinAngle = ndSqrt(matrix.m_up.m_x * matrix.m_up.m_x + matrix.m_up.m_z * matrix.m_up.m_z);
 			//ndFloat32 reward = ndReal(ndPow(ndEXP, -ndFloat32(10000.0f) * sinAngle * sinAngle));
