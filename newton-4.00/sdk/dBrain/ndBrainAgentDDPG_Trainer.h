@@ -484,7 +484,6 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 {
 	GetObservation(&m_currentTransition.m_state[0]);
-
 	for (ndInt32 i = 0; i < statesDim; ++i)
 	{
 		ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_state[i] = m_currentTransition.m_state[i];
@@ -507,7 +506,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 
 	// Get Q vale from Critic
 	ndReal buffer[256];
-	ndDeepBrainMemVector criticInput(buffer, statesDim + actionDim);;
+	ndDeepBrainMemVector criticInput(buffer, statesDim + actionDim);
 	for (ndInt32 i = 0; i < statesDim; ++i)
 	{
 		criticInput[i] = m_state[i];
