@@ -784,7 +784,7 @@ namespace ndQuadruped_1
 			}
 
 			ndFloat32 control_x_reward = ndPow(ndEXP, -ndFloat32(100.0f) * m_control->m_x * m_control->m_x);
-			ndFloat32 control_z_reward = ndPow(ndEXP, -ndFloat32(150.0f) * m_control->m_z * m_control->m_z);
+			ndFloat32 control_z_reward = ndPow(ndEXP, -ndFloat32(45.0f) * m_control->m_z * m_control->m_z);
 			reward += ndReal(0.25f * control_x_reward);
 			reward += ndReal(0.25f * control_z_reward);
 			return reward;
