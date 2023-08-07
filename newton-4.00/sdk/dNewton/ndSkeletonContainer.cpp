@@ -1439,7 +1439,8 @@ void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSid
 	}
 }
 
-void ndSkeletonContainer::CalculateJointAccelImmediate(const ndJacobian* const internalForces, ndForcePair* const accel) const
+//void ndSkeletonContainer::CalculateJointAccelImmediate(const ndJacobian* const internalForces, ndForcePair* const accel) const
+void ndSkeletonContainer::CalculateJointAccelImmediate(const ndJacobian* const, ndForcePair* const accel) const
 {
 	const ndSpatialVector zero(ndSpatialVector::m_zero);
 	const ndInt32 nodeCount = m_nodeList.GetCount();
@@ -1537,7 +1538,8 @@ inline void ndSkeletonContainer::UpdateForcesImmediate(ndArray<ndBodyKinematic*>
 	}
 }
 
-void ndSkeletonContainer::SolveAuxiliaryImmediate(ndArray<ndBodyKinematic*>& bodyArray, const ndJacobian* const internalForces, const ndForcePair* const, ndForcePair* const force) const
+//void ndSkeletonContainer::SolveAuxiliaryImmediate(ndArray<ndBodyKinematic*>& bodyArray, const ndJacobian* const internalForces, const ndForcePair* const, ndForcePair* const force) const
+void ndSkeletonContainer::SolveAuxiliaryImmediate(ndArray<ndBodyKinematic*>& bodyArray, const ndJacobian* const , const ndForcePair* const, ndForcePair* const force) const
 {
 	ndFloat32* const f = ndAlloca(ndFloat32, m_rowCount);
 	ndFloat32* const b = ndAlloca(ndFloat32, m_auxiliaryRowCount);

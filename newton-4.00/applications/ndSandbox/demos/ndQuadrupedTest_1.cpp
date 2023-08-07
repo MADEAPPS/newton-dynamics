@@ -152,7 +152,7 @@ namespace ndQuadruped_1
 					ndFloat32 t = ndMod (param - m_phase[i] + ndFloat32(1.0f), ndFloat32 (1.0f));
 					if (t <= m_gaitFraction)
 					{
-						if ((i == 2) || (i == 3))
+						//if ((i == 2) || (i == 3))
 						//if (i == 2)
 						{
 							m_code = m_code ^ (1 << i);
@@ -325,10 +325,11 @@ namespace ndQuadruped_1
 					m_basePose[i].SetPose();
 				}
 
-				ndUnsigned32 index = (ndRandInt() >> 4) % 4;
+				ndUnsigned32 index = (ndRandInt() >> 1) % 4;
 				ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
 				m_model->m_poseGenerator->SetTime(duration * ndFloat32 (index) / 4.0f);
 				m_model->m_poseGenerator->SetTime(duration * ndFloat32(index) / 4.0f);
+				m_model->ApplyPoseGeneration();
 			}
 
 			void OptimizeStep()
@@ -929,10 +930,12 @@ namespace ndQuadruped_1
 	{
 		#ifdef ND_TRAIN_MODEL
 			ndInt32 layerSize = 64;
+			//ndBrainActivationType hiddenActivation = m_tanh;
+			ndBrainActivationType hiddenActivation = m_relu;
 			ndSharedPtr<ndBrain> actor(new ndBrain());
-			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
-			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
-			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, hiddenActivation);
+			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, hiddenActivation);
+			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, hiddenActivation);
 			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_tanh);
 			actor->BeginAddLayer();
 			actor->AddLayer(layer0);
@@ -944,9 +947,9 @@ namespace ndQuadruped_1
 
 			// the critic is more complex since is deal with more complex inputs
 			ndSharedPtr<ndBrain> critic(new ndBrain());
-			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + m_actionsSize, layerSize * 2, m_tanh);
-			ndBrainLayer* const criticLayer1 = new ndBrainLayer(criticLayer0->GetOuputSize(), layerSize * 2, m_tanh);
-			ndBrainLayer* const criticLayer2 = new ndBrainLayer(criticLayer1->GetOuputSize(), layerSize * 2, m_tanh);
+			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + m_actionsSize, layerSize * 2, hiddenActivation);
+			ndBrainLayer* const criticLayer1 = new ndBrainLayer(criticLayer0->GetOuputSize(), layerSize * 2, hiddenActivation);
+			ndBrainLayer* const criticLayer2 = new ndBrainLayer(criticLayer1->GetOuputSize(), layerSize * 2, hiddenActivation);
 			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(criticLayer2->GetOuputSize(), 1, m_lineal);
 			critic->BeginAddLayer();
 			critic->AddLayer(criticLayer0);
