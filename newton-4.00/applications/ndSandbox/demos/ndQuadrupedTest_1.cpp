@@ -241,7 +241,7 @@ namespace ndQuadruped_1
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(600)
+				,m_maxFrames(500)
 				,m_stopTraining(10000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
