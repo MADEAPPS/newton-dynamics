@@ -241,7 +241,7 @@ namespace ndQuadruped_1
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(2000)
+				,m_maxFrames(600)
 				,m_stopTraining(10000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
@@ -357,7 +357,7 @@ namespace ndQuadruped_1
 				
 					if (episodeCount && !IsSampling())
 					{
-						ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						ndExpandTraceMessage("step:%d  reward:%g frame:%g\n", GetFramesCount(), m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 						if (m_outFile)
 						{
 							fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
@@ -930,8 +930,8 @@ namespace ndQuadruped_1
 	{
 		#ifdef ND_TRAIN_MODEL
 			ndInt32 layerSize = 64;
-			//ndBrainActivationType hiddenActivation = m_tanh;
-			ndBrainActivationType hiddenActivation = m_relu;
+			ndBrainActivationType hiddenActivation = m_tanh;
+			//ndBrainActivationType hiddenActivation = m_relu;
 			ndSharedPtr<ndBrain> actor(new ndBrain());
 			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, hiddenActivation);
 			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, hiddenActivation);
@@ -977,11 +977,11 @@ namespace ndQuadruped_1
 
 	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation)
 	{
-		ndFloat32 mass = 10.0f;
+		ndFloat32 mass = 20.0f;
 		ndFloat32 radius = 0.25f;
 		ndFloat32 limbMass = 0.5f;
 		ndFloat32 limbLength = 0.3f;
-		ndFloat32 limbRadios = 0.06f;
+		ndFloat32 limbRadios = 0.05f;
 
 		ndSharedPtr<ndBrainAgent> agent (BuildAgent());
 		ndModelQuadruped* const model = new ndModelQuadruped(agent);
