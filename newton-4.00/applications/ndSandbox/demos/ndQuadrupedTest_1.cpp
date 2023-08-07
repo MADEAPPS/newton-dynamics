@@ -152,8 +152,8 @@ namespace ndQuadruped_1
 					ndFloat32 t = ndMod (param - m_phase[i] + ndFloat32(1.0f), ndFloat32 (1.0f));
 					if (t <= m_gaitFraction)
 					{
-						//if ((i == 0) || (i == 3))
-						if (i == 2)
+						if ((i == 2) || (i == 3))
+						//if (i == 2)
 						{
 							m_code = m_code ^ (1 << i);
 							output[i].m_posit.m_y += m_amp * ndSin(omega * t);
@@ -900,31 +900,20 @@ namespace ndQuadruped_1
 		virtual void RenderHelp()
 		{
 			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			m_scene->Print(color, "Control panel");
+			//m_scene->Print(color, "Control panel");
 		
 			ndModelQuadruped* const model = (ndModelQuadruped*)*m_model;
 			ndModelQuadruped::ndUIControlNode* const control = model->m_control;
 			
 			bool change = false;
-			ImGui::Text("position x");
-			change = change || ImGui::SliderFloat("##x", &control->m_x, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
-			ImGui::Text("position y");
-			change = change || ImGui::SliderFloat("##y", &control->m_y, -0.2f, 0.1f);
-			ImGui::Text("position z");
-			change = change || ImGui::SliderFloat("##z", &control->m_z, -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
-
-			ImGui::Text("pitch");
-			change = change || ImGui::SliderFloat("##pitch", &control->m_pitch, -15.0f, 15.0f);
-			ImGui::Text("yaw");
-			change = change || ImGui::SliderFloat("##yaw", &control->m_yaw, -20.0f, 20.0f);
-			ImGui::Text("roll");
-			change = change || ImGui::SliderFloat("##roll", &control->m_roll, -15.0f, 15.0f);
-
-			ImGui::Text("animSpeed");
-			change = change || ImGui::SliderFloat("##animSpeed", &control->m_animSpeed, 0.0f, 4.0f);
-
-			ImGui::Text("enable controller");
-			change = change || ImGui::Checkbox("##enable controller", &control->m_enableController);
+			change = change || ImGui::SliderFloat("posit x", &control->m_x, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
+			change = change || ImGui::SliderFloat("posit y", &control->m_y, -0.2f, 0.1f);
+			change = change || ImGui::SliderFloat("posit z", &control->m_z, -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
+			change = change || ImGui::SliderFloat("pitch", &control->m_pitch, -15.0f, 15.0f);
+			change = change || ImGui::SliderFloat("yaw", &control->m_yaw, -20.0f, 20.0f);
+			change = change || ImGui::SliderFloat("roll", &control->m_roll, -15.0f, 15.0f);
+			change = change || ImGui::SliderFloat("animSpeed", &control->m_animSpeed, 0.0f, 4.0f);
+			change = change || ImGui::Checkbox("enable controller", &control->m_enableController);
 
 			if (change)
 			{
