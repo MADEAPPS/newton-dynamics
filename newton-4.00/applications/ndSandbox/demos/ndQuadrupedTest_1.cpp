@@ -241,8 +241,8 @@ namespace ndQuadruped_1
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(1000)
-				,m_stopTraining(1500000)
+				,m_maxFrames(3000)
+				,m_stopTraining(10000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
@@ -773,21 +773,19 @@ namespace ndQuadruped_1
 				contactMask = contactMask | (HasContact(i) << i);
 			}
 
-			ndReal reward = ndReal(0.0f);
+			ndFloat32 animReward = ndReal(0.0f);
 			if (contactMask == 0x0f)
 			{
-				reward = 0.1f;
+				animReward = ndFloat32(0.1f);
 			}
 			else if (keyFramerMask == contactMask)
 			{
-				reward = ndReal(1.0f);
+				animReward = ndFloat32(1.0f);
 			}
 
-			ndFloat32 control_x_reward = ndPow(ndEXP, -ndFloat32(100.0f) * m_control->m_x * m_control->m_x);
-			ndFloat32 control_z_reward = ndPow(ndEXP, -ndFloat32(45.0f) * m_control->m_z * m_control->m_z);
-			reward += ndReal(0.25f * control_x_reward);
-			reward += ndReal(0.25f * control_z_reward);
-			return reward;
+			ndFloat32 control_x_reward = ndPow(ndEXP, -ndFloat32(230.0f) * m_control->m_x * m_control->m_x);
+			ndFloat32 control_z_reward = ndPow(ndEXP, -ndFloat32(102.0f) * m_control->m_z * m_control->m_z);
+			return ndReal ((animReward * ndFloat32(4.0f) + control_x_reward + control_z_reward) / ndFloat32 (6.0f));
 		}
 
 		ndBodyState CalculateFullBodyState() const
