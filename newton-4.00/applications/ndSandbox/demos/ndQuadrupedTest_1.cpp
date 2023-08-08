@@ -152,7 +152,7 @@ namespace ndQuadruped_1
 					ndFloat32 t = ndMod (param - m_phase[i] + ndFloat32(1.0f), ndFloat32 (1.0f));
 					if (t <= m_gaitFraction)
 					{
-						//if ((i == 2) || (i == 3))
+						if ((i == 2) || (i == 3))
 						//if (i == 2)
 						{
 							m_code = m_code ^ (1 << i);
@@ -241,7 +241,7 @@ namespace ndQuadruped_1
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(500)
+				,m_maxFrames(1500)
 				,m_stopTraining(10000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
