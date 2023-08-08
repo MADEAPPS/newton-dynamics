@@ -39,7 +39,7 @@
 #define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
 //#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
 #define D_DDPG_REPLAY_BASH_SIZE			32
-//#define D_DDPG_REPLAY_BASH_SIZE			64
+//#define D_DDPG_REPLAY_BASH_SIZE		64
 #define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
 #define D_DDPG_SOFT_TARGET_FACTOR		ndReal (1.0e-3f)
 #define D_DDPG_ACTION_NOISE_VARIANCE	ndReal (0.05f)
@@ -77,6 +77,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void BackPropagateCritic(const ndUnsigned32* const bashIndex);
 
 	virtual void BackPropagate();
+	virtual void CalculateQvalue();
 
 	ndBrain* GetActor() { return *m_actor; }
 	ndBrain* GetCritic() { return *m_critic; }
@@ -135,7 +136,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	ndAssert(m_critic->GetInputSize() == (m_actor->GetInputSize() + m_actor->GetOutputSize()));
 
 	ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
-threadCount = 1;
+//threadCount = 1;
 	SetThreadCount(threadCount);
 	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
 	{
@@ -480,6 +481,23 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Optimize()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::CalculateQvalue()
+{
+	ndReal buffer[256];
+	ndDeepBrainMemVector criticInput(buffer, statesDim + actionDim);
+	for (ndInt32 i = 0; i < statesDim; ++i)
+	{
+		criticInput[i] = m_state[i];
+	}
+	for (ndInt32 i = 0; i < actionDim; ++i)
+	{
+		criticInput[i + statesDim] = m_actions[i];
+	}
+	ndDeepBrainMemVector criticOutput(&m_currentQValue, 1);
+	m_critic->MakePrediction(criticInput, criticOutput);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 {
 	GetObservation(&m_currentTransition.m_state[0]);
@@ -504,18 +522,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 	m_currentTransition.m_reward = GetReward();
 
 	// Get Q vale from Critic
-	ndReal buffer[256];
-	ndDeepBrainMemVector criticInput(buffer, statesDim + actionDim);
-	for (ndInt32 i = 0; i < statesDim; ++i)
-	{
-		criticInput[i] = m_state[i];
-	}
-	for (ndInt32 i = 0; i < actionDim; ++i)
-	{
-		criticInput[i + statesDim] = m_actions[i];
-	}
-	ndDeepBrainMemVector criticOutput(&m_currentQValue, 1);
-	m_critic->MakePrediction(criticInput, criticOutput);
+	CalculateQvalue();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

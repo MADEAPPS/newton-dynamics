@@ -152,7 +152,7 @@ namespace ndQuadruped_1
 					ndFloat32 t = ndMod (param - m_phase[i] + ndFloat32(1.0f), ndFloat32 (1.0f));
 					if (t <= m_gaitFraction)
 					{
-						if ((i == 2) || (i == 3))
+						if ((i == 1) || (i == 2))
 						//if (i == 2)
 						{
 							m_code = m_code ^ (1 << i);
@@ -357,7 +357,7 @@ namespace ndQuadruped_1
 				
 					if (episodeCount && !IsSampling())
 					{
-						ndExpandTraceMessage("step:%d\treward:%g\tframes:%g\n", GetFramesCount(), m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 						if (m_outFile)
 						{
 							fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());

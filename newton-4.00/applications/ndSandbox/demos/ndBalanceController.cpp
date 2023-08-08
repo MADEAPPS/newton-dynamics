@@ -38,7 +38,7 @@
 namespace ndController_1
 {
 	#define USE_TD3
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		ndFloat32 (10.0f)
 	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)
@@ -248,8 +248,7 @@ namespace ndController_1
 
 					if (episodeCount && !IsSampling())
 					{
-						//ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-						ndExpandTraceMessage("step:%d\treward:%g\tframes:%g\n", GetFramesCount(), m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 						if (m_outFile)
 						{
 							fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
