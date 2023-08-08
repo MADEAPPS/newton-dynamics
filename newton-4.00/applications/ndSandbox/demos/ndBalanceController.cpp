@@ -38,7 +38,7 @@
 namespace ndController_1
 {
 	#define USE_TD3
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		ndFloat32 (10.0f)
 	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)
@@ -159,6 +159,7 @@ namespace ndController_1
 					m_outFile = fopen("traingPerf-DDPG.csv", "wb");
 					fprintf(m_outFile, "ddpg\n");
 				#endif
+				m_timer = ndGetTimeInMicroseconds();
 			}
 
 			~ndControllerAgent_trainer()
@@ -247,7 +248,8 @@ namespace ndController_1
 
 					if (episodeCount && !IsSampling())
 					{
-						ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						//ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						ndExpandTraceMessage("step:%d\treward:%g\tframes:%g\n", GetFramesCount(), m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 						if (m_outFile)
 						{
 							fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
@@ -259,6 +261,8 @@ namespace ndController_1
 					{
 						ndExpandTraceMessage("\n");
 						ndExpandTraceMessage("training complete\n");
+						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+						ndExpandTraceMessage("time training: %f\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 					}
 				}
 				if (m_model->IsOutOfBounds())
@@ -272,6 +276,7 @@ namespace ndController_1
 			ndFloat32 m_maxGain;
 			ndInt32 m_maxFrames;
 			ndInt32 m_stopTraining;
+			ndUnsigned64 m_timer;
 			mutable ndMovingAverage<128> m_averageQValue;
 			mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
 		};

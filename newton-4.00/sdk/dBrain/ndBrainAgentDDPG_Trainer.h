@@ -38,8 +38,8 @@
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
 //#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
-//#define D_DDPG_REPLAY_BASH_SIZE		32
-#define D_DDPG_REPLAY_BASH_SIZE			64
+#define D_DDPG_REPLAY_BASH_SIZE			32
+//#define D_DDPG_REPLAY_BASH_SIZE			64
 #define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
 #define D_DDPG_SOFT_TARGET_FACTOR		ndReal (1.0e-3f)
 #define D_DDPG_ACTION_NOISE_VARIANCE	ndReal (0.05f)
@@ -135,7 +135,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	ndAssert(m_critic->GetInputSize() == (m_actor->GetInputSize() + m_actor->GetOutputSize()));
 
 	ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
-	//threadCount = 1;
+threadCount = 1;
 	SetThreadCount(threadCount);
 	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
 	{
@@ -264,7 +264,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 					m_agent->m_targetActor.MakePrediction(actorInput, actorOutput);
 					for (ndInt32 i = 0; i < actionDim; ++i)
 					{
-						//actorOutput[i] += ndReal (m_randomGenerator.GetGaussianRandom(ndFloat32(0.0f), ndFloat32(m_actionNoiseVariance)));
 						ndReal noiseAction = actorOutput[i] + ndReal(m_randomGenerator.GetGaussianRandom(ndFloat32(0.0f), ndFloat32(m_actionNoiseVariance)));
 						actorOutput[i] = ndClamp(noiseAction, ndReal(-1.0f), ndReal(1.0f));
 					}
@@ -292,7 +291,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 			ndRandom& m_randomGenerator;
 			ndFloat32 m_actionNoiseVariance;
 			ndInt32 m_index;
-			
 		};
 
 		ndBrainTrainer& trainer = *(*m_criticOptimizer[threadIndex]);

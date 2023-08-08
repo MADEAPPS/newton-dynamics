@@ -29,6 +29,8 @@
 // Continuous control with deep re enforcement learning (ddpg agent)
 // trainer as described in: https://arxiv.org/pdf/1802.09477.pdf
 
+//#define USED_NEWTON_VARIANCE
+
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentTD3_Trainer: public ndBrainAgentDDPG_Trainer<statesDim, actionDim>
 {
@@ -63,6 +65,117 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const ndS
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const ndUnsigned32* const shuffleBuffer)
 {
+	#ifdef USED_NEWTON_VARIANCE
+	auto PropagateBash = ndMakeObject::ndFunction([this, &shuffleBuffer](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		class Loss : public ndBrainLeastSquareErrorLoss
+		{
+			public:
+			Loss(ndBrainTrainer& trainer, ndBrain* const targetCritic
+				,const ndBrainReplayBuffer<ndReal, statesDim, actionDim>& replayBuffer, ndReal gamma)
+				:ndBrainLeastSquareErrorLoss(trainer.GetBrain()->GetOutputSize())
+				,m_criticTrainer(trainer)
+				,m_targetCritic(targetCritic)
+				,m_replayBuffer(replayBuffer)
+				,m_gamma(gamma)
+				,m_index(0)
+			{
+			}
+
+			void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+			{
+				ndAssert(loss.GetCount() == 1);
+				ndAssert(output.GetCount() == 1);
+				ndAssert(m_truth.GetCount() == m_criticTrainer.GetBrain()->GetOutputSize());
+
+				ndReal criticOutputBuffer[2];
+				ndDeepBrainMemVector criticOutput(criticOutputBuffer, 1);
+
+				const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_replayBuffer[m_index];
+				ndReal targetValue = transition.m_reward;
+				if (!transition.m_terminalState)
+				{
+					ndDeepBrainMemVector criticInput(m_targetInputBuffer, statesDim + actionDim);
+					m_targetCritic->MakePrediction(criticInput, criticOutput);
+					targetValue = transition.m_reward + m_gamma * criticOutput[0];
+				}
+				criticOutput[0] = targetValue;
+				
+				SetTruth(criticOutput);
+				ndBrainLeastSquareErrorLoss::GetLoss(output, loss);
+			}
+
+			ndBrainTrainer& m_criticTrainer;
+			ndBrain* m_targetCritic;
+			const ndBrainReplayBuffer<ndReal, statesDim, actionDim>& m_replayBuffer;
+			ndFloat32 m_gamma;
+			ndInt32 m_index;
+			ndReal m_targetInputBuffer[(statesDim + actionDim) * 2];
+		};
+
+		ndBrainTrainer& trainer1 = *(*m_critic2Optimizer[threadIndex]);
+		ndBrainTrainer& trainer0 = *(*ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_criticOptimizer[threadIndex]);
+		trainer0.ClearGradientsAcc();
+		trainer1.ClearGradientsAcc();
+
+		Loss loss0(trainer0,
+			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetTargetCritic(),
+			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_replayBuffer,
+			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_gamma);
+
+		Loss loss1(trainer1, &m_target2Critic,
+			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_replayBuffer,
+			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_gamma);
+
+		ndRandom& randomGenerator = ndBrainThreadPool::GetRandomGenerator(threadIndex);
+		ndBrain* const targetActor = ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetTargetActor();
+		ndFloat32 actionNoiseVariance = ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_actionNoiseVariance;
+		const ndStartEnd startEnd(ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_bashBufferSize, threadIndex, threadCount);
+
+		ndReal targetInputBuffer[statesDim * 2];
+		ndReal targetOutputBuffer[actionDim * 2];
+		ndReal criticInputBuffer[(statesDim + actionDim) * 2];
+		ndDeepBrainMemVector targetInput(targetInputBuffer, statesDim);
+		ndDeepBrainMemVector targetOutput(targetOutputBuffer, actionDim);
+		ndDeepBrainMemVector criticInput(criticInputBuffer, statesDim + actionDim);
+
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndInt32 index = ndInt32(shuffleBuffer[i]);
+			const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_replayBuffer[index];
+
+			for (ndInt32 j = 0; j < statesDim; ++j)
+			{
+				targetInput[j] = transition.m_nextState[j];
+				loss0.m_targetInputBuffer[j] = transition.m_nextState[j];
+				loss1.m_targetInputBuffer[j] = transition.m_nextState[j];
+			}
+			targetActor->MakePrediction(targetInput, targetOutput);
+			for (ndInt32 j = 0; j < actionDim; ++j)
+			{
+				ndReal noisyAction = targetOutput[j] + ndReal(randomGenerator.GetGaussianRandom(ndFloat32(0.0f), ndFloat32(actionNoiseVariance)));
+				ndReal action = ndClamp(noisyAction, ndReal(-1.0f), ndReal(1.0f));
+				loss0.m_targetInputBuffer[j + statesDim] = action;
+				loss1.m_targetInputBuffer[j + statesDim] = action;
+			}
+
+			for (ndInt32 j = 0; j < statesDim; ++j)
+			{
+				criticInput[j] = transition.m_state[j];
+			}
+			for (ndInt32 j = 0; j < actionDim; ++j)
+			{
+				criticInput[j + statesDim] = transition.m_action[j];
+			}
+			loss0.m_index = index;
+			loss1.m_index = index;
+			trainer0.BackPropagate(criticInput, loss0);
+			trainer1.BackPropagate(criticInput, loss1);
+		}
+	});
+
+	#else
+
 	auto PropagateBash = ndMakeObject::ndFunction([this, &shuffleBuffer](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		class Loss: public ndBrainLeastSquareErrorLoss
@@ -201,6 +314,7 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 			trainer1.BackPropagate(input, loss);
 		}
 	});
+	#endif
 
 	auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
@@ -230,8 +344,12 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagate()
 	{
 		shuffleBuffer[i] = ndRandInt() % ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_replayBuffer.GetCount();
 	}
-
+	
 	ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(shuffleBuffer);
+
+	#ifdef USED_NEWTON_VARIANCE
+		ndAssert(0);
+	#endif
 	if (ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_frameCount & 1)
 	{
 		ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(shuffleBuffer);
