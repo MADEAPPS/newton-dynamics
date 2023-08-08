@@ -357,7 +357,7 @@ namespace ndQuadruped_1
 				
 					if (episodeCount && !IsSampling())
 					{
-						ndExpandTraceMessage("step:%d/treward:%g/tframes:%g\n", GetFramesCount(), m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						ndExpandTraceMessage("step:%d\treward:%g\tframes:%g\n", GetFramesCount(), m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 						if (m_outFile)
 						{
 							fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
