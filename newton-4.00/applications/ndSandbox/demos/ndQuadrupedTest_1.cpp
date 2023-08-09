@@ -143,6 +143,8 @@ namespace ndQuadruped_1
 				// generate a procedural in place march gait
 				ndAssert(param >= ndFloat32(0.0f));
 				ndAssert(param <= ndFloat32(1.0f));
+
+				param = 0.125f;
 				
 				m_code = 0x0f;
 				ndFloat32 omega = ndPi / m_gaitFraction;
@@ -560,7 +562,7 @@ namespace ndQuadruped_1
 			comLineOfAction.m_y = comMatrix.m_posit.m_y - 0.38f;
 			context.DrawPoint(comLineOfAction, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 10);
 
-			ndVector torque(ndVector::m_zero);
+			ndVector netTorque(ndVector::m_zero);
 			for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
 			{
 				const ndBodyKinematic* const body = bodies[i];
@@ -570,17 +572,19 @@ namespace ndQuadruped_1
 				const ndVector omega(body->GetOmega());
 				const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
 
-				torque += invDynamicsSolver->GetBodyTorque(body);
+				ndVector force(invDynamicsSolver->GetBodyForce(body));
+				ndVector torque (invDynamicsSolver->GetBodyTorque(body));
+				torque += comDist.CrossProduct(force);
 				torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
-				torque += comDist.CrossProduct(invDynamicsSolver->GetBodyForce(body));
+				netTorque += torque;
 			}
 			invDynamicsSolver->SolverEnd();
 			ndVector weight(ndVector::m_zMask);
 			weight.m_y = -state.m_mass * DEMO_GRAVITY;
 
 			ndVector zmpLineOfAction(comLineOfAction);
-			zmpLineOfAction.m_x += -torque.m_z / weight.m_y;
-			zmpLineOfAction.m_z += torque.m_x / weight.m_y;
+			zmpLineOfAction.m_x += -netTorque.m_z / weight.m_y;
+			zmpLineOfAction.m_z += netTorque.m_x / weight.m_y;
 			context.DrawPoint(zmpLineOfAction, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 6);
 
 			ndFixSizeArray<ndVector, 4> contactPoints;
