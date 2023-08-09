@@ -38,6 +38,7 @@ class ndIkSolver: public ndClassAlloc
 	D_NEWTON_API bool IsSleeping(ndSkeletonContainer* const skeleton) const;
 
 	D_NEWTON_API void SolverBegin(ndSkeletonContainer* const skeleton, ndJointBilateralConstraint* const* joint, ndInt32 jointCount, ndWorld* const world, ndFloat32 timestep);
+	D_NEWTON_API void SolverBegin____(ndSkeletonContainer* const skeleton, ndJointBilateralConstraint* const* joint, ndInt32 jointCount, ndWorld* const world, ndFloat32 timestep);
 	D_NEWTON_API void Solve();
 	D_NEWTON_API void UpdateJointAcceleration(ndConstraint* const joint);
 	D_NEWTON_API void SolverEnd();

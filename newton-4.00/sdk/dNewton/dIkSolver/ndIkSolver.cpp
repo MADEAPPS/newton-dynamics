@@ -448,6 +448,29 @@ void ndIkSolver::SolverBegin(ndSkeletonContainer* const skeleton, ndJointBilater
 	BuildMassMatrix();
 }
 
+void ndIkSolver::SolverBegin____(ndSkeletonContainer* const skeleton, ndJointBilateralConstraint* const* joints, ndInt32 jointCount, ndWorld* const world, ndFloat32 timestep)
+{
+	m_world = world;
+	m_skeleton = skeleton;
+	m_timestep = timestep;
+	m_invTimestep = ndFloat32(1.0f) / timestep;
+
+	m_skeleton->ClearCloseLoopJoints();
+	//for (ndInt32 i = jointCount - 1; i >= 0; --i)
+	//{
+	//	m_skeleton->AddCloseLoopJoint((ndConstraint*)joints[i]);
+	//}
+	//
+	//for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
+	//{
+	//	ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
+	//	ndJointBilateralConstraint* const joint = node->m_joint;
+	//	joint->SetIkMode(true);
+	//}
+	BuildMassMatrix();
+}
+
+
 void ndIkSolver::SolverEnd()
 {
 	if (m_skeleton)
