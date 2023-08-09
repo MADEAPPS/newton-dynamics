@@ -501,6 +501,8 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 {
 	GetObservation(&m_currentTransition.m_state[0]);
+	m_currentTransition.m_reward = GetReward();
+
 	for (ndInt32 i = 0; i < statesDim; ++i)
 	{
 		ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_state[i] = m_currentTransition.m_state[i];
@@ -518,8 +520,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 	{
 		m_currentTransition.m_action[i] = m_actions[i];
 	}
-
-	m_currentTransition.m_reward = GetReward();
 
 	// Get Q vale from Critic
 	CalculateQvalue();

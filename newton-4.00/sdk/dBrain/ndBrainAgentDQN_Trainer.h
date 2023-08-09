@@ -326,6 +326,7 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 {
 	GetObservation(&m_state[0]);
+	m_currentTransition.m_reward = GetReward();
 
 	m_actor->MakePrediction(m_state, m_actions);
 	for (ndInt32 i = 0; i < statesDim; ++i)
@@ -366,8 +367,6 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 	{
 		m_currentTransition.m_action[0] = ndInt32(bestAction);
 	}
-
-	m_currentTransition.m_reward = GetReward();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
