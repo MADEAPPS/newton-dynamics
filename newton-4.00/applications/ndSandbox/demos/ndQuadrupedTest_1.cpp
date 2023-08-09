@@ -578,6 +578,11 @@ namespace ndQuadruped_1
 			ndVector weight(ndVector::m_zMask);
 			weight.m_y = -state.m_mass * DEMO_GRAVITY;
 
+			ndVector zmpLineOfAction(comLineOfAction);
+			zmpLineOfAction.m_x += -torque.m_z / weight.m_y;
+			zmpLineOfAction.m_z += torque.m_x / weight.m_y;
+			context.DrawPoint(zmpLineOfAction, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 6);
+
 			ndFixSizeArray<ndVector, 4> contactPoints;
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
@@ -722,7 +727,7 @@ namespace ndQuadruped_1
 
 		void ApplyActions(ndReal* const actions)
 		{
-			m_control->m_animSpeed = 0.1f;
+			m_control->m_animSpeed = 0.5f;
 			if (m_control->m_enableController)
 			{
 				m_control->m_x = ndClamp(m_control->m_x + actions[m_bodySwing_x] * D_SWING_STEP, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
