@@ -129,6 +129,7 @@ class TestIKSolver : public ndModelArticulation
 
         ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
         invDynamicsSolver->SolverBegin(skeleton, nullptr, 0, world, timestep);
+        invDynamicsSolver->SolveDebug();
         invDynamicsSolver->Solve();
 
         ndFloat32 totalMass = 0.0f;
@@ -182,6 +183,7 @@ class TestIKSolver : public ndModelArticulation
 
         ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
         invDynamicsSolver->SolverBegin____(skeleton, nullptr, 0, world, timestep);
+        invDynamicsSolver->SolveDebug();
         invDynamicsSolver->Solve();
 
         ndFloat32 totalMass = 0.0f;
