@@ -470,7 +470,6 @@ void ndIkSolver::SolverBegin____(ndSkeletonContainer* const skeleton, ndJointBil
 	BuildMassMatrix();
 }
 
-
 void ndIkSolver::SolverEnd()
 {
 	if (m_skeleton)
@@ -548,4 +547,9 @@ void ndIkSolver::Solve()
 			joint->SetIkMode(false);
 		}
 	}
+}
+
+void ndIkSolver::SolveDebug()
+{
+
 }
