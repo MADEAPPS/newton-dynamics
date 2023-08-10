@@ -41,19 +41,26 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 
 #else
 
-class ndCustomJointHinge : public ndJointHinge
+class ndCustomJointHinge : public ndIkJointHinge
 {
     public:
-    ndCustomJointHinge(const ndMatrix& mFrameChild, const ndMatrix& mFrameParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-        :ndJointHinge(ndGetIdentityMatrix(), child, parent)
+    ndCustomJointHinge(const ndMatrix& frame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+        :ndIkJointHinge(frame, child, parent)
     {
-        m_localMatrix0 = mFrameChild;
-        m_localMatrix1 = mFrameParent;
+        SetAsSpringDamper(1.0e-3, 1000.0f, 10.0f);
     }
 
     void JacobianDerivative(ndConstraintDescritor& desc)
     {
-        ndJointHinge::JacobianDerivative(desc);
+        ndIkJointHinge::JacobianDerivative(desc);
+
+        if (m_ikMode)
+        {
+            ndMatrix matrix0;
+            ndMatrix matrix1;
+            CalculateGlobalMatrix(matrix0, matrix1);
+            SubmitSpringDamper(desc, matrix0, matrix1);
+        }
     }
 };
 
@@ -62,7 +69,6 @@ class TestIKSolver : public ndModelArticulation
     public:
     TestIKSolver(ndDemoEntityManager* const scene, ndMatrix& location)
         :ndModelArticulation()
-        ,m_controlJoint(nullptr)
     {
         ndFloat32 xSize = 0.25f;
         ndFloat32 ySize = 0.125f;
@@ -94,66 +100,34 @@ class TestIKSolver : public ndModelArticulation
         poleBody->SetMatrix(poleLocation);
         poleBody->GetAsBodyDynamic()->SetSleepAccel(poleBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
 
-        // link cart and body with a hinge
         ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
         polePivot.m_posit -= poleLocation.m_front.Scale (poleLength * 0.5f);
-        ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
-
-        // make the car move alone the z axis only (2d problem)
-        ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointFix6dof(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
-        world->AddJoint(xDirSlider);
+        //ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
+        ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndCustomJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
 
         // add path to the model
         world->AddJoint(poleJoint);
         AddLimb(modelRoot, poleBody, poleJoint);
 
-        // save some useful data
-        //m_cart = cartBody->GetAsBodyDynamic();
-        //m_pole = poleBody->GetAsBodyDynamic();
-        //m_cartMatrix = cartBody->GetMatrix();
-        //m_poleMatrix = poleBody->GetMatrix();
+        // fix model to the world for first test.
+        ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
+        world->AddJoint(fixJoint);
     }
 
-    ndJointBilateralConstraint* CreateHinge(ndBodyKinematic* const pBodyA, ndBodyKinematic* pBodyB, const ndVector& vPivotA, const ndVector& vPivotB, const ndVector& vAxisA, const ndVector& vAxisB)
+    void Update(ndWorld* const world, ndFloat32 timestep)
     {
-        ndAssert(0);
-        return nullptr;
-        //ndMatrix mFrameA = ndGetIdentityMatrix();
-        //ndVector vAx = vAxisA, vAy, vAz;
-        //BuildOrthoNormalBasis(vAy, vAz, vAx);
-        //mFrameA.m_posit = vPivotA;
-        //mFrameA.m_front = ndVector(vAx.GetX(), vAx.GetY(), vAx.GetZ(), ndFloat32(0.0));
-        //mFrameA.m_up = ndVector(vAy.GetX(), vAy.GetY(), vAy.GetZ(), ndFloat32(0.0));
-        //mFrameA.m_right = ndVector(vAz.GetX(), vAz.GetY(), vAz.GetZ(), ndFloat32(0.0));
-        //
-        //ndMatrix mFrameB = ndGetIdentityMatrix();
-        //ndVector vBx = vAxisB, vBy, vBz;
-        //BuildOrthoNormalBasis(vBy, vBz, vBx);
-        //mFrameB.m_posit = vPivotB;
-        //mFrameB.m_front = ndVector(vBx.GetX(), vBx.GetY(), vBx.GetZ(), ndFloat32(0.0));
-        //mFrameB.m_up = ndVector(vBy.GetX(), vBy.GetY(), vBy.GetZ(), ndFloat32(0.0));
-        //mFrameB.m_right = ndVector(vBz.GetX(), vBz.GetY(), vBz.GetZ(), ndFloat32(0.0));
-        //
-        //ndMatrix mBodyB = ndGetIdentityMatrix();
-        ////mBodyB = OrthoInvert(mFrameB) * mFrameA * pBodyA->GetMatrix();
-        //mBodyB = mFrameB.OrthoInverse() * mFrameA * pBodyA->GetMatrix();
-        //pBodyB->SetMatrix(mBodyB);
-        //
-        //return new ndCustomJointHinge(mFrameB, mFrameA, pBodyB, pBodyA);
-    }
-
-    void Update(ndWorld* const, ndFloat32 timestep)
-    {
-        if (m_controlJoint)
+        ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
+        ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
+        if (!skeleton)
         {
-            m_angle += ndFmod(1.0f * timestep, 2.0f * ndPi);
-            ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
-            m_controlJoint->SetTargetAngle(dist);
+            return;
         }
-    }
 
-    ndFloat32 m_angle;
-    ndJointHinge* m_controlJoint;
+        ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
+        invDynamicsSolver->SolverBegin(skeleton, nullptr, 0, world, timestep);
+        invDynamicsSolver->Solve();
+        invDynamicsSolver->SolverEnd();
+    }
 };
 
 void ndBasicRigidBody(ndDemoEntityManager* const scene)
