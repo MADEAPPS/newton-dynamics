@@ -47,7 +47,7 @@ class ndCustomJointHinge : public ndIkJointHinge
     ndCustomJointHinge(const ndMatrix& frame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
         :ndIkJointHinge(frame, child, parent)
     {
-        SetAsSpringDamper(1.0e-3, 1000.0f, 10.0f);
+        SetAsSpringDamper(1.0e-3f, 1000.0f, 10.0f);
     }
 
     void JacobianDerivative(ndConstraintDescritor& desc)
@@ -114,6 +114,112 @@ class TestIKSolver : public ndModelArticulation
         world->AddJoint(fixJoint);
     }
 
+    ndVector CalculateIKtorque(ndWorld* const world, ndFloat32 timestep)
+    {
+        //a) Mt = sum(m(i))
+        //b) cg = sum(p(i) * m(i)) / Mt
+        //c) Vcg = sum(v(i) * m(i)) / Mt
+        //d) Icg = sum(I(i) +  m(i) * (Identity * ((p(i) - cg) * transpose (p(i) - cg)) - covarianMatrix(p(i) - cg))
+        //e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
+        //f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
+        //g) Bcg = (Icg ^ -1) * (T0 + T1)
+
+        ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
+        ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
+
+        ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
+        invDynamicsSolver->SolverBegin(skeleton, nullptr, 0, world, timestep);
+        invDynamicsSolver->Solve();
+
+        ndFloat32 totalMass = 0.0f;
+        ndVector com(ndVector::m_zero);
+        ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
+        for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+        {
+            const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+            const ndMatrix matrix(body->GetMatrix());
+            ndFloat32 mass = body->GetMassMatrix().m_w;
+            totalMass += mass;
+            com += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
+            bodies.PushBack(body);
+        }
+        ndFloat32 invMass = 1.0f / totalMass;
+        com = com.Scale(invMass);
+        com.m_w = ndFloat32(1.0f);
+
+        ndVector netTorque(ndVector::m_zero);
+        for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+        {
+            const ndBodyKinematic* const body = bodies[i];
+            const ndMatrix matrix(body->GetMatrix());
+            const ndVector comDist((matrix.TransformVector(body->GetCentreOfMass()) - com) & ndVector::m_triplexMask);
+
+            const ndVector omega(body->GetOmega());
+            const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+
+            ndVector force(invDynamicsSolver->GetBodyForce(body));
+            ndVector torque(invDynamicsSolver->GetBodyTorque(body));
+            torque += comDist.CrossProduct(force);
+            torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
+            netTorque += torque;
+        }
+        invDynamicsSolver->SolverEnd();
+        return netTorque;
+    }
+
+    ndVector CalculateFKtorque(ndWorld* const world, ndFloat32 timestep)
+    {
+        //a) Mt = sum(m(i))
+        //b) cg = sum(p(i) * m(i)) / Mt
+        //c) Vcg = sum(v(i) * m(i)) / Mt
+        //d) Icg = sum(I(i) +  m(i) * (Identity * ((p(i) - cg) * transpose (p(i) - cg)) - covarianMatrix(p(i) - cg))
+        //e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
+        //f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
+        //g) Bcg = (Icg ^ -1) * (T0 + T1)
+
+        ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
+        ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
+
+        ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
+        invDynamicsSolver->SolverBegin____(skeleton, nullptr, 0, world, timestep);
+        invDynamicsSolver->Solve();
+
+        ndFloat32 totalMass = 0.0f;
+        ndVector com(ndVector::m_zero);
+        ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
+        for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+        {
+            const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+            const ndMatrix matrix(body->GetMatrix());
+            ndFloat32 mass = body->GetMassMatrix().m_w;
+            totalMass += mass;
+            com += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
+            bodies.PushBack(body);
+        }
+        ndFloat32 invMass = 1.0f / totalMass;
+        com = com.Scale(invMass);
+        com.m_w = ndFloat32(1.0f);
+
+        ndVector netTorque(ndVector::m_zero);
+        for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+        {
+            const ndBodyKinematic* const body = bodies[i];
+            const ndMatrix matrix(body->GetMatrix());
+            const ndVector comDist((matrix.TransformVector(body->GetCentreOfMass()) - com) & ndVector::m_triplexMask);
+
+            const ndVector omega(body->GetOmega());
+            const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+
+            ndVector force(invDynamicsSolver->GetBodyForce(body));
+            ndVector torque(invDynamicsSolver->GetBodyTorque(body));
+            torque += comDist.CrossProduct(force);
+            torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
+            netTorque += torque;
+        }
+        invDynamicsSolver->SolverEnd();
+        return netTorque;
+    }
+
     void Update(ndWorld* const world, ndFloat32 timestep)
     {
         ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
@@ -122,6 +228,9 @@ class TestIKSolver : public ndModelArticulation
         {
             return;
         }
+
+        ndVector ikTorque(CalculateIKtorque(world, timestep));
+        ndVector fkTorque(CalculateFKtorque(world, timestep));
 
         ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
         invDynamicsSolver->SolverBegin(skeleton, nullptr, 0, world, timestep);

@@ -139,7 +139,7 @@ void ndJointHinge::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, nd
 {
 	m_springK = ndAbs(spring);
 	m_damperC = ndAbs(damper);
-	m_springDamperRegularizer = ndClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+	m_springDamperRegularizer = ndClamp(regularizer, ND_SPRING_DAMP_MIN_REG, ndFloat32(0.99f));
 }
 
 void ndJointHinge::GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const

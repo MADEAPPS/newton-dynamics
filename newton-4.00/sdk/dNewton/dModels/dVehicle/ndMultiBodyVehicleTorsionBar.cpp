@@ -61,7 +61,7 @@ void ndMultiBodyVehicleTorsionBar::SetTorsionTorque(ndFloat32 springK, ndFloat32
 {
 	m_springK = ndAbs(springK);
 	m_damperC = ndAbs(damperC);
-	m_springDamperRegularizer = ndClamp (springDamperRegularizer, ndFloat32 (0.001), ndFloat32(0.99f));
+	m_springDamperRegularizer = ndClamp (springDamperRegularizer, ND_SPRING_DAMP_MIN_REG, ndFloat32(0.99f));
 }
 
 void ndMultiBodyVehicleTorsionBar::GetTorsionTorque(ndFloat32& springK, ndFloat32& damperC, ndFloat32& springDamperRegularizer) const

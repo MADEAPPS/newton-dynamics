@@ -29,6 +29,7 @@
 
 
 #define ND_BILATERAL_CONTRAINT_DOF	12
+#define ND_SPRING_DAMP_MIN_REG		ndFloat32 (1.0e-4f)
 
 enum ndJointBilateralSolverModel
 {
