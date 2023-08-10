@@ -46,7 +46,7 @@
 //#define DEFAULT_SCENE	7		// particle fluid
 //#define DEFAULT_SCENE	8		// static mesh collision 
 //#define DEFAULT_SCENE	9		// static user mesh collision 
-//#define DEFAULT_SCENE	10		// basic joints
+#define DEFAULT_SCENE	10		// basic joints
 //#define DEFAULT_SCENE	11		// basic vehicle
 //#define DEFAULT_SCENE	12		// heavy vehicle
 //#define DEFAULT_SCENE	13		// background vehicle prop
@@ -57,7 +57,7 @@
 //#define DEFAULT_SCENE	18		// cart pole controller player
 //#define DEFAULT_SCENE	19		// cart pole controller trainer
 //#define DEFAULT_SCENE	20		// unit cycle controller
-#define DEFAULT_SCENE	21		// quadruped test 1
+//#define DEFAULT_SCENE	21		// quadruped test 1
 //#define DEFAULT_SCENE	22		// quadruped test 2
 //#define DEFAULT_SCENE	23		// quadruped test 3
 //#define DEFAULT_SCENE	24		// biped test 1
