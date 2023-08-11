@@ -1468,6 +1468,7 @@ void ndSkeletonContainer::CalculateJointAccelImmediate(const ndJacobian* const, 
 		const ndInt32 first = joint->m_rowStart;
 		const ndInt32 dof = joint->m_rowCount;
 
+		ndTrace(("this seems wrong %s\n", __FUNCTION__));
 		for (ndInt32 j = 0; j < dof; ++j)
 		{
 			const ndInt32 k = node->m_ordinal.m_sourceJacobianIndex[j];

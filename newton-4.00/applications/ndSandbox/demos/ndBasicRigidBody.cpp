@@ -93,25 +93,23 @@ class TestIKSolver : public ndModelArticulation
         ndMatrix poleLocation(ndRollMatrix(90.0f * ndDegreeToRad) * matrix);
         poleLocation.m_posit.m_y += poleLength * 0.5f;
 
-        ndMatrix T(ndGetIdentityMatrix());
-        T.m_posit.m_y = -poleLength * 0.5f;
-        poleLocation = poleLocation * T * ndRollMatrix(30.0f * ndDegreeToRad) * T.OrthoInverse();
+        ndMatrix translate(ndGetIdentityMatrix());
+        translate.m_posit.m_y = -poleLength * 0.5f;
+        poleLocation = poleLocation * translate * ndRollMatrix(45.0f * ndDegreeToRad) * translate.OrthoInverse();
 
         poleBody->SetMatrix(poleLocation);
         poleBody->GetAsBodyDynamic()->SetSleepAccel(poleBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
 
         ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
         polePivot.m_posit -= poleLocation.m_front.Scale (poleLength * 0.5f);
-        //ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
         ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndCustomJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
-
-        // add path to the model
         world->AddJoint(poleJoint);
         AddLimb(modelRoot, poleBody, poleJoint);
 
         // fix model to the world for first test.
-        ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
-        world->AddJoint(fixJoint);
+        //ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
+        //world->AddJoint(fixJoint);
+        cartBody->GetAsBodyKinematic()->SetMassMatrix(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
     ndVector CalculateIKtorque(ndWorld* const world, ndFloat32 timestep)
@@ -124,8 +122,12 @@ class TestIKSolver : public ndModelArticulation
         //f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
         //g) Bcg = (Icg ^ -1) * (T0 + T1)
 
-        ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
-        ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
+        ndSkeletonContainer* const skeleton = GetRoot()->GetFirstChild()->m_body->GetAsBodyKinematic()->GetSkeleton();
+
+static int xxxx;
+xxxx++;
+if (xxxx >= 1000)
+    xxxx *= 1;
 
         ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
         invDynamicsSolver->SolverBegin(skeleton, nullptr, 0, world, timestep);
@@ -178,8 +180,7 @@ class TestIKSolver : public ndModelArticulation
         //f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
         //g) Bcg = (Icg ^ -1) * (T0 + T1)
 
-        ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
-        ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
+        ndSkeletonContainer* const skeleton = GetRoot()->GetFirstChild()->m_body->GetAsBodyKinematic()->GetSkeleton();
 
         ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
         invDynamicsSolver->SolverBegin____(skeleton, nullptr, 0, world, timestep);
@@ -224,7 +225,7 @@ class TestIKSolver : public ndModelArticulation
 
     void Update(ndWorld* const world, ndFloat32 timestep)
     {
-        ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
+        ndBodyKinematic* const rootBody = GetRoot()->GetFirstChild()->m_body->GetAsBodyKinematic();
         ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
         if (!skeleton)
         {
