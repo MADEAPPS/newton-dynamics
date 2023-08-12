@@ -107,9 +107,9 @@ class TestIKSolver : public ndModelArticulation
         AddLimb(modelRoot, poleBody, poleJoint);
 
         // fix model to the world for first test.
-        //ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
-        //world->AddJoint(fixJoint);
-        cartBody->GetAsBodyKinematic()->SetMassMatrix(0.0f, 0.0f, 0.0f, 0.0f);
+        ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
+        world->AddJoint(fixJoint);
+        //cartBody->GetAsBodyKinematic()->SetMassMatrix(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
     ndVector CalculateIKtorque(ndWorld* const world, ndFloat32 timestep)
@@ -131,7 +131,6 @@ if (xxxx >= 1000)
 
         ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
         invDynamicsSolver->SolverBegin(skeleton, nullptr, 0, world, timestep);
-        invDynamicsSolver->SolveDebug();
         invDynamicsSolver->Solve();
 
         ndFloat32 totalMass = 0.0f;
@@ -160,8 +159,10 @@ if (xxxx >= 1000)
             const ndVector omega(body->GetOmega());
             const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
 
-            ndVector force(invDynamicsSolver->GetBodyForce(body));
-            ndVector torque(invDynamicsSolver->GetBodyTorque(body));
+            //ndVector force(invDynamicsSolver->GetBodyForce(body));
+            //ndVector torque(invDynamicsSolver->GetBodyTorque(body));
+            ndVector torque(bodyInertia.RotateVector(body->GetAlpha()));
+            ndVector force(body->GetAccel().Scale(body->GetMassMatrix().m_w));
             torque += comDist.CrossProduct(force);
             torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
             netTorque += torque;
@@ -184,7 +185,6 @@ if (xxxx >= 1000)
 
         ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
         invDynamicsSolver->SolverBegin____(skeleton, nullptr, 0, world, timestep);
-        invDynamicsSolver->SolveDebug();
         invDynamicsSolver->Solve();
 
         ndFloat32 totalMass = 0.0f;
@@ -213,8 +213,10 @@ if (xxxx >= 1000)
             const ndVector omega(body->GetOmega());
             const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
 
-            ndVector force(invDynamicsSolver->GetBodyForce(body));
-            ndVector torque(invDynamicsSolver->GetBodyTorque(body));
+            //ndVector force(invDynamicsSolver->GetBodyForce(body));
+            //ndVector torque(invDynamicsSolver->GetBodyTorque(body));
+            ndVector torque(bodyInertia.RotateVector(body->GetAlpha()));
+            ndVector force(body->GetAccel().Scale(body->GetMassMatrix().m_w));
             torque += comDist.CrossProduct(force);
             torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
             netTorque += torque;

@@ -40,7 +40,6 @@ class ndIkSolver: public ndClassAlloc
 	D_NEWTON_API void SolverBegin(ndSkeletonContainer* const skeleton, ndJointBilateralConstraint* const* joint, ndInt32 jointCount, ndWorld* const world, ndFloat32 timestep);
 	D_NEWTON_API void SolverBegin____(ndSkeletonContainer* const skeleton, ndJointBilateralConstraint* const* joint, ndInt32 jointCount, ndWorld* const world, ndFloat32 timestep);
 	D_NEWTON_API void Solve();
-	D_NEWTON_API void SolveDebug();
 	D_NEWTON_API void UpdateJointAcceleration(ndConstraint* const joint);
 	D_NEWTON_API void SolverEnd();
 
@@ -55,7 +54,7 @@ class ndIkSolver: public ndClassAlloc
 	ndBodyKinematic m_sentinelBody;
 	ndArray<ndInt32> m_savedBodiesIndex;
 	ndArray<ndBodyKinematic*> m_bodies;
-	ndArray<ndJacobian> m_internalForces;
+	//ndArray<ndJacobian> m_internalForces;
 	ndArray<ndLeftHandSide> m_leftHandSide;
 	ndArray<ndRightHandSide> m_rightHandSide;
 	ndWorld* m_world;

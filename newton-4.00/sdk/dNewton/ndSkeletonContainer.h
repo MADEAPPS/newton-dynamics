@@ -51,17 +51,17 @@ class ndSkeletonContainer
 	class ndNodePair
 	{
 		public:
+		const ndConstraint* m_joint;
 		ndInt32 m_m0;
 		ndInt32 m_m1;
-		const ndConstraint* m_joint;
 	};
 
 	D_MSV_NEWTON_ALIGN_32
 	class ndForcePair
 	{
 		public:
-		ndSpatialVector m_joint;
 		ndSpatialVector m_body;
+		ndSpatialVector m_joint;
 	} D_GCC_NEWTON_ALIGN_32;
 
 	D_MSV_NEWTON_ALIGN_32
@@ -153,8 +153,10 @@ class ndSkeletonContainer
 	inline void SolveForward(ndForcePair* const force, const ndForcePair* const accel, ndInt32 startNode) const;
 
 	void SolveImmediate(ndIkSolver& solverInfo);
-	void UpdateForcesImmediate(ndArray<ndBodyKinematic*>& bodyArray, const ndForcePair* const force) const;
-	void CalculateJointAccelImmediate(const ndJacobian* const internalForces, ndForcePair* const accel) const;
+	//void UpdateForcesImmediate(ndArray<ndBodyKinematic*>& bodyArray, const ndForcePair* const force) const;
+	//void CalculateJointAccelImmediate(const ndJacobian* const internalForces, ndForcePair* const accel) const;
+	void UpdateForcesImmediate(const ndForcePair* const force) const;
+	void CalculateJointAccelImmediate(ndForcePair* const accel) const;
 	void SolveAuxiliaryImmediate(ndArray<ndBodyKinematic*>& bodyArray, const ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
 	
 	ndNode* m_skeleton;
