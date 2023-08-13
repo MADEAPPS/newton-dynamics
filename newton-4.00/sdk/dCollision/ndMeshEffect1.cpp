@@ -2866,7 +2866,7 @@ void ndMeshEffect::BuildFromIndexList(const ndMeshVertexFormat* const format)
 	ndInt32 normalStride = ndInt32(format->m_normal.m_strideInBytes / sizeof(ndReal));
 	ndInt32 binormalStride = ndInt32(format->m_binormal.m_strideInBytes / sizeof(ndReal));
 	ndInt32 vertexColorStride = ndInt32(format->m_vertexColor.m_strideInBytes / sizeof(ndReal));
-	ndInt32 vertexWeightStride = ndInt32(format->m_vertexWeight.m_strideInBytes / sizeof(ndVertexWeight));
+	//ndInt32 vertexWeightStride = ndInt32(format->m_vertexWeight.m_strideInBytes / sizeof(ndVertexWeight));
 
 	ndStack<ndInt8> faceMark(format->m_faceCount);
 	ndMemSet(&faceMark[0], ndInt8(0), format->m_faceCount);
@@ -3758,7 +3758,7 @@ void ndMeshEffect::GetVertexChannel(ndInt32 strideInByte, ndFloat32* const buffe
 
 void ndMeshEffect::GetVertexWeightChannel(ndInt32 strideInByte, ndVertexWeight* const bufferOut) const
 {
-	ndInt32 offset = 0;
+	//ndInt32 offset = 0;
 	char* ptr = (char*)bufferOut;
 	for (ndInt32 i = 0; i < m_attrib.m_pointChannel.GetCount(); ++i)
 	{
