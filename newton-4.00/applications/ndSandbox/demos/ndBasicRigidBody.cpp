@@ -81,6 +81,7 @@ class TestIKSolver : public ndModelArticulation
 
         // make cart
         ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.tga")));
+        //ndSharedPtr<ndBody> cartBody(world->GetBody(AddSphere(scene, location, cartMass, xSize, "smilli.tga")));
         ndModelArticulation::ndNode* const modelRoot = AddRootBody(cartBody);
         ndMatrix matrix(cartBody->GetMatrix());
         matrix.m_posit.m_y += ySize / 2.0f;
@@ -95,7 +96,7 @@ class TestIKSolver : public ndModelArticulation
 
         ndMatrix translate(ndGetIdentityMatrix());
         translate.m_posit.m_y = -poleLength * 0.5f;
-        poleLocation = poleLocation * translate * ndRollMatrix(45.0f * ndDegreeToRad) * translate.OrthoInverse();
+        //poleLocation = poleLocation * translate * ndRollMatrix(45.0f * ndDegreeToRad) * translate.OrthoInverse();
 
         poleBody->SetMatrix(poleLocation);
         poleBody->GetAsBodyDynamic()->SetSleepAccel(poleBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
@@ -107,8 +108,8 @@ class TestIKSolver : public ndModelArticulation
         AddLimb(modelRoot, poleBody, poleJoint);
 
         // fix model to the world for first test.
-        ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
-        world->AddJoint(fixJoint);
+        //ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
+        //world->AddJoint(fixJoint);
         //cartBody->GetAsBodyKinematic()->SetMassMatrix(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
@@ -235,12 +236,12 @@ if (xxxx >= 1000)
         }
 
         ndVector ikTorque(CalculateIKtorque(world, timestep));
-        ndVector fkTorque(CalculateFKtorque(world, timestep));
+        //ndVector fkTorque(CalculateFKtorque(world, timestep));
 
         ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
-        invDynamicsSolver->SolverBegin(skeleton, nullptr, 0, world, timestep);
-        invDynamicsSolver->Solve();
-        invDynamicsSolver->SolverEnd();
+        //invDynamicsSolver->SolverBegin(skeleton, nullptr, 0, world, timestep);
+        //invDynamicsSolver->Solve();
+        //invDynamicsSolver->SolverEnd();
     }
 };
 

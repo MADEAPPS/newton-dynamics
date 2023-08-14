@@ -54,7 +54,6 @@ class ndIkSolver: public ndClassAlloc
 	ndBodyKinematic m_sentinelBody;
 	ndArray<ndInt32> m_savedBodiesIndex;
 	ndArray<ndBodyKinematic*> m_bodies;
-	//ndArray<ndJacobian> m_internalForces;
 	ndArray<ndLeftHandSide> m_leftHandSide;
 	ndArray<ndRightHandSide> m_rightHandSide;
 	ndWorld* m_world;

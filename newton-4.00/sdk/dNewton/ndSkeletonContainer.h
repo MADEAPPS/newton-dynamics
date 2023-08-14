@@ -143,8 +143,8 @@ class ndSkeletonContainer
 	void CalculateLoopMassMatrixCoefficients(ndFloat32* const diagDamp);
 	void FactorizeMatrix(ndInt32 size, ndInt32 stride, ndFloat32* const matrix, ndFloat32* const diagDamp) const;
 	void SolveAuxiliary(ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
-	void SolveBlockLcp(ndInt32 size, ndInt32 blockSize, const ndFloat32* const x0, ndFloat32* const x, ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex) const;
-	void SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32* const matrix, const ndFloat32* const x0, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex) const;
+	void SolveBlockLcp(ndInt32 size, ndInt32 blockSize, const ndFloat32* const x0, ndFloat32* const x, ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
+	void SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32* const matrix, const ndFloat32* const x0, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
 
 	inline void SolveBackward(ndForcePair* const force) const;
 	inline void CalculateForce(ndForcePair* const force, const ndForcePair* const accel) const;
@@ -153,11 +153,9 @@ class ndSkeletonContainer
 	inline void SolveForward(ndForcePair* const force, const ndForcePair* const accel, ndInt32 startNode) const;
 
 	void SolveImmediate(ndIkSolver& solverInfo);
-	//void UpdateForcesImmediate(ndArray<ndBodyKinematic*>& bodyArray, const ndForcePair* const force) const;
-	//void CalculateJointAccelImmediate(const ndJacobian* const internalForces, ndForcePair* const accel) const;
 	void UpdateForcesImmediate(const ndForcePair* const force) const;
 	void CalculateJointAccelImmediate(ndForcePair* const accel) const;
-	void SolveAuxiliaryImmediate(ndArray<ndBodyKinematic*>& bodyArray, const ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
+	void SolveAuxiliaryImmediate(ndArray<ndBodyKinematic*>& bodyArray, ndForcePair* const force) const;
 	
 	ndNode* m_skeleton;
 	ndNode** m_nodesOrder;
