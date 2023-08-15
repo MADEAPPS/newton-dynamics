@@ -144,7 +144,7 @@ namespace ndQuadruped_1
 				ndAssert(param >= ndFloat32(0.0f));
 				ndAssert(param <= ndFloat32(1.0f));
 
-				param = 0.125f;
+				//param = 0.125f;
 				
 				m_code = 0x0f;
 				ndFloat32 omega = ndPi / m_gaitFraction;
@@ -155,7 +155,7 @@ namespace ndQuadruped_1
 					if (t <= m_gaitFraction)
 					{
 						//if (i == 3)
-						if ((i == 0) || (i == 3))
+						//if ((i == 0) || (i == 3))
 						//if ((i == 1) || (i == 2))
 						{
 							m_code = m_code ^ (1 << i);
@@ -742,7 +742,12 @@ namespace ndQuadruped_1
 
 		void ApplyActions(ndReal* const actions)
 		{
-			m_control->m_animSpeed = 0.5f;
+			//m_control->m_animSpeed = 4.0f;
+			//m_control->m_animSpeed = 2.0f;
+			//m_control->m_animSpeed = 1.0f;
+			//m_control->m_animSpeed = 0.5f;
+			//m_control->m_animSpeed = 0.25f;
+			m_control->m_animSpeed = 0.1f;
 			if (m_control->m_enableController)
 			{
 				m_control->m_x = ndClamp(m_control->m_x + actions[m_bodySwing_x] * D_SWING_STEP, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
@@ -1276,7 +1281,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	world->AddModel(model);
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	//world->AddJoint(fixJoint);
+	world->AddJoint(fixJoint);
 
 	ndSharedPtr<ndUIEntity> quadrupedUI (new ndModelUI(scene, model));
 	scene->Set2DDisplayRenderFunction(quadrupedUI);
