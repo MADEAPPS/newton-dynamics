@@ -272,6 +272,7 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	ndUnsigned8 m_isInSkeletonLoop;
 
 	friend class ndIkSolver;
+	friend class ndBodyKinematic;
 	friend class ndDynamicsUpdate;
 	friend class ndSkeletonContainer;
 	friend class ndDynamicsUpdateSoa;

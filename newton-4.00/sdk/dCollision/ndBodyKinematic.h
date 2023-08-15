@@ -128,6 +128,7 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API void SetMatrixUpdateScene(const ndMatrix& matrix);
 	D_COLLISION_API virtual ndContact* FindContact(const ndBody* const otherBody) const;
 
+	D_COLLISION_API ndJacobian CalculateNetForce() const;
 	D_COLLISION_API ndMatrix CalculateInertiaMatrix() const;
 	D_COLLISION_API virtual ndMatrix CalculateInvInertiaMatrix() const;
 	D_COLLISION_API virtual void SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia);
@@ -237,6 +238,7 @@ class ndBodyKinematic : public ndBody
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateSycl;
 	friend class ndDynamicsUpdateCuda;
+
 	friend class ndJointBilateralConstraint;
 } D_GCC_NEWTON_ALIGN_32;
 

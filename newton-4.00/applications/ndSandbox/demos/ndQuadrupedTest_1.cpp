@@ -540,6 +540,7 @@ namespace ndQuadruped_1
 
 			ndBodyState state;
 			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
+
 			for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
 				const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
@@ -563,6 +564,7 @@ namespace ndQuadruped_1
 			context.DrawPoint(comLineOfAction, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 10);
 
 			ndVector netTorque(ndVector::m_zero);
+			ndVector netTorque1(ndVector::m_zero);
 			for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
 			{
 				const ndBodyKinematic* const body = bodies[i];
@@ -578,14 +580,22 @@ namespace ndQuadruped_1
 				ndVector force(body->GetAccel().Scale(body->GetMassMatrix().m_w));
 				torque += comDist.CrossProduct(force);
 				torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
+
+				ndJacobian force1(body->CalculateNetForce());
+				force1.m_angular += comDist.CrossProduct(force1.m_linear);
+				force1.m_angular += omega.CrossProduct(bodyInertia.RotateVector(omega));
+
 				netTorque += torque;
+				netTorque1 += force1.m_angular;
 			}
 			invDynamicsSolver->SolverEnd();
 			ndVector weight(ndVector::m_zMask);
 			weight.m_y = -state.m_mass * DEMO_GRAVITY;
 			ndVector zmpLineOfAction(comLineOfAction);
-			zmpLineOfAction.m_x += -netTorque.m_z / weight.m_y;
-			zmpLineOfAction.m_z += netTorque.m_x / weight.m_y;
+			//zmpLineOfAction.m_z += netTorque.m_x / weight.m_y;
+			//zmpLineOfAction.m_x += -netTorque.m_z / weight.m_y;
+			zmpLineOfAction.m_z += netTorque1.m_x / weight.m_y;
+			zmpLineOfAction.m_x += -netTorque1.m_z / weight.m_y;
 			context.DrawPoint(zmpLineOfAction, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 6);
 
 			ndFixSizeArray<ndVector, 4> contactPoints;

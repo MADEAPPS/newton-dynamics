@@ -549,6 +549,51 @@ ndVector ndBodyKinematic::CalculateAngularMomentum() const
 #endif
 }
 
+ndJacobian ndBodyKinematic::CalculateNetForce() const
+{
+	ndJacobian force;
+	force.m_linear = GetForce();
+	force.m_angular = GetTorque();
+
+	for (ndJointList::ndNode* node = GetJointList().GetFirst(); node; node = node->GetNext())
+	{
+		ndJointBilateralConstraint* const joint = node->GetInfo();
+		if (joint->GetBody0() == this)
+		{
+			force.m_linear += joint->m_forceBody0;
+			force.m_angular += joint->m_torqueBody0;
+		}
+		else
+		{
+			ndAssert(joint->GetBody1() == this);
+			force.m_linear += joint->m_forceBody1;
+			force.m_angular += joint->m_torqueBody1;
+		}
+	}
+
+	const ndBodyKinematic::ndContactMap& contactMap = GetContactMap();
+	ndBodyKinematic::ndContactMap::Iterator it(contactMap);
+	for (it.Begin(); it; it++)
+	{
+		ndContact* const fronterContact = it.GetNode()->GetInfo();
+		if (fronterContact->IsActive())
+		{
+			if (fronterContact->GetBody0() == this)
+			{
+				force.m_linear += fronterContact->m_forceBody0;
+				force.m_angular += fronterContact->m_torqueBody0;
+			}
+			else
+			{
+				ndAssert(fronterContact->GetBody1() == this);
+				force.m_linear += fronterContact->m_forceBody1;
+				force.m_angular += fronterContact->m_torqueBody1;
+			}
+		}
+	}
+	return force;
+}
+
 ndFloat32 ndBodyKinematic::TotalEnergy() const
 {
 	ndVector energy (m_veloc.DotProduct(CalculateLinearMomentum()) + m_veloc.DotProduct(CalculateAngularMomentum()));
