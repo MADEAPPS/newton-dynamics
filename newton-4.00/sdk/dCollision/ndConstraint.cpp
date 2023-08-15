@@ -29,6 +29,10 @@
 
 ndConstraint::ndConstraint()
 	:ndContainersFreeListAlloc<ndConstraint>()
+	,m_forceBody0(ndVector::m_zero)
+	,m_torqueBody0(ndVector::m_zero)
+	,m_forceBody1(ndVector::m_zero)
+	,m_torqueBody1(ndVector::m_zero)
 	,m_rowCount(0)
 	,m_rowStart(0)
 	,m_active(1)

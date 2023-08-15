@@ -125,11 +125,6 @@ class TestIKSolver : public ndModelArticulation
 
         ndSkeletonContainer* const skeleton = GetRoot()->GetFirstChild()->m_body->GetAsBodyKinematic()->GetSkeleton();
 
-static int xxxx;
-xxxx++;
-if (xxxx >= 1000)
-    xxxx *= 1;
-
         ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
         invDynamicsSolver->SolverBegin(skeleton, nullptr, 0, world, timestep);
         invDynamicsSolver->Solve();
@@ -172,7 +167,7 @@ if (xxxx >= 1000)
         return netTorque;
     }
 
-    ndVector CalculateFKtorque(ndWorld* const world, ndFloat32 timestep)
+    ndVector CalculateFKtorque(ndWorld* const, ndFloat32)
     {
         //a) Mt = sum(m(i))
         //b) cg = sum(p(i) * m(i)) / Mt
@@ -182,10 +177,9 @@ if (xxxx >= 1000)
         //f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
         //g) Bcg = (Icg ^ -1) * (T0 + T1)
 
-        ndSkeletonContainer* const skeleton = GetRoot()->GetFirstChild()->m_body->GetAsBodyKinematic()->GetSkeleton();
+        //ndSkeletonContainer* const skeleton = GetRoot()->GetFirstChild()->m_body->GetAsBodyKinematic()->GetSkeleton();
 
         ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
-        invDynamicsSolver->SolverBegin____(skeleton, nullptr, 0, world, timestep);
         invDynamicsSolver->Solve();
 
         ndFloat32 totalMass = 0.0f;
@@ -239,9 +233,9 @@ if (xxxx >= 1000)
         //ndVector fkTorque(CalculateFKtorque(world, timestep));
 
         ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
-        //invDynamicsSolver->SolverBegin(skeleton, nullptr, 0, world, timestep);
-        //invDynamicsSolver->Solve();
-        //invDynamicsSolver->SolverEnd();
+        invDynamicsSolver->SolverBegin(skeleton, nullptr, 0, world, timestep);
+        invDynamicsSolver->Solve();
+        invDynamicsSolver->SolverEnd();
     }
 };
 
@@ -252,6 +246,8 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
     ndSetRandSeed(42);
     ndWorld* const world = scene->GetWorld();
     ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
+
+    AddBox(scene, matrix, 10.0f, 1.0f, 0.125f, 1.0f, "smilli.tga");
 
     ndSharedPtr<ndModel> model(new TestIKSolver(scene, matrix));
     world->AddModel(model);

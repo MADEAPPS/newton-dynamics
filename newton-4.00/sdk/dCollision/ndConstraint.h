@@ -113,6 +113,11 @@ class ndJacobianPair
 class ndForceImpactPair
 {
 	public:
+	ndForceImpactPair()
+	{
+		Clear();
+	}
+
 	void Clear()
 	{
 		m_force = ndFloat32(ndFloat32(0.0f));
@@ -252,6 +257,11 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 
 	protected:
 	ndConstraint();
+
+	ndVector m_forceBody0;
+	ndVector m_torqueBody0;
+	ndVector m_forceBody1;
+	ndVector m_torqueBody1;
 
 	ndInt32 m_rowCount;
 	ndInt32 m_rowStart;

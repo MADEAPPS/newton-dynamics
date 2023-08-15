@@ -133,10 +133,6 @@ class ndJointBilateralConstraint : public ndConstraint
 
 	ndMatrix m_localMatrix0;
 	ndMatrix m_localMatrix1;
-	ndVector m_forceBody0;
-	ndVector m_torqueBody0;
-	ndVector m_forceBody1;
-	ndVector m_torqueBody1;
 
 	ndVector m_r0[ND_BILATERAL_CONTRAINT_DOF];
 	ndVector m_r1[ND_BILATERAL_CONTRAINT_DOF];

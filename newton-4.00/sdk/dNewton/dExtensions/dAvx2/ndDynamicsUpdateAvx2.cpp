@@ -1510,7 +1510,7 @@ void ndDynamicsUpdateAvx2::UpdateForceFeedback()
 				rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;
 			}
 
-			if (joint->GetAsBilateral())
+			//if (joint->GetAsBilateral())
 			{
 				ndAvxFloat force0(zero);
 				ndAvxFloat force1(zero);
@@ -1523,11 +1523,11 @@ void ndDynamicsUpdateAvx2::UpdateForceFeedback()
 					force0 = force0.MulAdd((ndAvxFloat&)lhs->m_Jt.m_jacobianM0, f);
 					force1 = force1.MulAdd((ndAvxFloat&)lhs->m_Jt.m_jacobianM1, f);
 				}
-				ndJointBilateralConstraint* const bilateral = (ndJointBilateralConstraint*)joint;
-				bilateral->m_forceBody0 = force0.GetLow();
-				bilateral->m_torqueBody0 = force0.GetHigh();
-				bilateral->m_forceBody1 = force1.GetLow();
-				bilateral->m_torqueBody1 = force1.GetHigh();
+				//ndJointBilateralConstraint* const bilateral = (ndJointBilateralConstraint*)joint;
+				joint->m_forceBody0 = force0.GetLow();
+				joint->m_torqueBody0 = force0.GetHigh();
+				joint->m_forceBody1 = force1.GetLow();
+				joint->m_torqueBody1 = force1.GetHigh();
 			}
 		}
 	});

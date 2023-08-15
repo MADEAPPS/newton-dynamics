@@ -29,10 +29,6 @@
 
 ndJointBilateralConstraint::ndJointBilateralConstraint()
 	:ndConstraint()
-	,m_forceBody0(ndVector::m_zero)
-	,m_torqueBody0(ndVector::m_zero)
-	,m_forceBody1(ndVector::m_zero)
-	,m_torqueBody1(ndVector::m_zero)
 	,m_body0(nullptr)
 	,m_body1(nullptr)
 	,m_worldNode(nullptr)
@@ -49,16 +45,14 @@ ndJointBilateralConstraint::ndJointBilateralConstraint()
 	m_solverModel = m_jointkinematicOpenLoop;
 	m_defualtDiagonalRegularizer = ndFloat32(0.0f);
 
-	memset(m_jointForce, 0, sizeof(m_jointForce));
-	memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
+	//memset(m_jointForce, 0, sizeof(m_jointForce));
+	//memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
+	ndMemSet(m_jointForce, ndForceImpactPair(), sizeof(m_jointForce) / sizeof(m_jointForce[0]));
+	ndMemSet(m_motorAcceleration, ndFloat32 (0.0f), sizeof(m_motorAcceleration) / sizeof (m_motorAcceleration[0]));
 }
 
 ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrix)
 	:ndConstraint()
-	,m_forceBody0(ndVector::m_zero)
-	,m_torqueBody0(ndVector::m_zero)
-	,m_forceBody1(ndVector::m_zero)
-	,m_torqueBody1(ndVector::m_zero)
 	,m_body0(body0)
 	,m_body1(body1)
 	,m_worldNode(nullptr)
@@ -86,17 +80,15 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 	m_solverModel = m_jointkinematicOpenLoop;
 	m_defualtDiagonalRegularizer = ndFloat32(0.0f);
 	
-	memset(m_jointForce, 0, sizeof(m_jointForce));
-	memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
+	//memset(m_jointForce, 0, sizeof(m_jointForce));
+	//memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
+	ndMemSet(m_jointForce, ndForceImpactPair(), sizeof(m_jointForce) / sizeof(m_jointForce[0]));
+	ndMemSet(m_motorAcceleration, ndFloat32(0.0f), sizeof(m_motorAcceleration) / sizeof(m_motorAcceleration[0]));
 }
 
 ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0,
 	ndBodyKinematic* const body1, const ndMatrix& globalMatrixBody0, const ndMatrix& globalMatrixBody1)
 	:ndConstraint()
-	,m_forceBody0(ndVector::m_zero)
-	,m_torqueBody0(ndVector::m_zero)
-	,m_forceBody1(ndVector::m_zero)
-	,m_torqueBody1(ndVector::m_zero)
 	,m_body0(body0)
 	,m_body1(body1)
 	,m_worldNode(nullptr)
@@ -126,8 +118,10 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 	m_solverModel = m_jointkinematicOpenLoop;
 	m_defualtDiagonalRegularizer = ndFloat32(0.0f);
 
-	memset(m_jointForce, 0, sizeof(m_jointForce));
-	memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
+	//memset(m_jointForce, 0, sizeof(m_jointForce));
+	//memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
+	ndMemSet(m_jointForce, ndForceImpactPair(), sizeof(m_jointForce) / sizeof(m_jointForce[0]));
+	ndMemSet(m_motorAcceleration, ndFloat32(0.0f), sizeof(m_motorAcceleration) / sizeof(m_motorAcceleration[0]));
 }
 
 ndJointBilateralConstraint::~ndJointBilateralConstraint()

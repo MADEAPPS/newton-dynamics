@@ -1054,7 +1054,7 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 				rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;
 			}
 
-			if (joint->GetAsBilateral())
+			//if (joint->GetAsBilateral())
 			{
 				ndVector force0(zero);
 				ndVector force1(zero);
@@ -1071,11 +1071,11 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 					force1 += lhs->m_Jt.m_jacobianM1.m_linear * f;
 					torque1 += lhs->m_Jt.m_jacobianM1.m_angular * f;
 				}
-				ndJointBilateralConstraint* const bilateral = (ndJointBilateralConstraint*)joint;
-				bilateral->m_forceBody0 = force0;
-				bilateral->m_torqueBody0 = torque0;
-				bilateral->m_forceBody1 = force1;
-				bilateral->m_torqueBody1 = torque1;
+				//ndJointBilateralConstraint* const bilateral = (ndJointBilateralConstraint*)joint;
+				joint->m_forceBody0 = force0;
+				joint->m_torqueBody0 = torque0;
+				joint->m_forceBody1 = force1;
+				joint->m_torqueBody1 = torque1;
 			}
 		}
 	});

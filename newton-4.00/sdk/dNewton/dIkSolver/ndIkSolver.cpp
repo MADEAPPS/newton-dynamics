@@ -31,9 +31,9 @@
 ndIkSolver::ndIkSolver()
 	:ndClassAlloc()
 	,m_sentinelBody()
-	,m_savedBodiesIndex(32)
+	,m_contacts(32)
 	,m_bodies(32)
-	//,m_internalForces(32)
+	,m_savedBodiesIndex(32)
 	,m_leftHandSide(128)
 	,m_rightHandSide(128)
 	,m_world(nullptr)
@@ -263,9 +263,10 @@ ndVector ndIkSolver::GetBodyTorque(const ndBodyKinematic* const body) const
 void ndIkSolver::BuildMassMatrix()
 {
 	m_bodies.SetCount(0);
+	m_contacts.SetCount(0);
 	m_leftHandSide.SetCount(0);
 	m_rightHandSide.SetCount(0);
-	ndFixSizeArray<ndContact*, 256> contacts;
+	//ndFixSizeArray<ndContact*, 256> contacts;
 	
 	const ndVector zero(ndVector::m_zero);
 	m_bodies.PushBack(&m_sentinelBody);
@@ -322,13 +323,13 @@ void ndIkSolver::BuildMassMatrix()
 			if (contact->IsActive())
 			{
 				bool duplicate = false;
-				for (ndInt32 j = contacts.GetCount() - 1; j >= 0; --j)
+				for (ndInt32 j = m_contacts.GetCount() - 1; j >= 0; --j)
 				{
-					duplicate = duplicate || (contacts[j] == contact);
+					duplicate = duplicate || (m_contacts[j] == contact);
 				}
 				if (!duplicate)
 				{
-					contacts.PushBack(contact);
+					m_contacts.PushBack(contact);
 					ndBodyKinematic* const body0 = contact->GetBody0();
 					ndBodyKinematic* const body1 = contact->GetBody1();
 					ndAssert(body0->GetInvMass() > ndFloat32(0.0f));
@@ -377,9 +378,9 @@ void ndIkSolver::BuildMassMatrix()
 		BuildJacobianMatrix(joint);
 	}
 	
-	for (ndInt32 i = 0; i < contacts.GetCount(); ++i)
+	for (ndInt32 i = 0; i < m_contacts.GetCount(); ++i)
 	{
-		ndContact* const contact = contacts[i];
+		ndContact* const contact = m_contacts[i];
 		GetJacobianDerivatives(contact);
 		BuildJacobianMatrix(contact);
 	}
@@ -434,6 +435,54 @@ void ndIkSolver::Solve()
 			body->m_accel = body->GetForce();
 			body->m_alpha = body->GetTorque() - body->GetGyroTorque();
 		}
+		for (ndInt32 i = m_contacts.GetCount() - 1; i >= 0; --i)
+		{
+			ndContact* const contact = m_contacts[i];
+			ndBodyKinematic* const body1 = contact->GetBody1();
+			if (body1->GetInvMass() > ndFloat32 (0.0f)) 
+			{
+				ndBodyKinematic* const body0 = contact->GetBody0();
+				ndAssert(((body0->GetSkeleton() == m_skeleton) && (body1->GetSkeleton() != m_skeleton)) ||
+						 ((body0->GetSkeleton() != m_skeleton) && (body1->GetSkeleton() == m_skeleton)));
+				ndBodyKinematic* const body = (body0->GetSkeleton() != m_skeleton) ? body0 : body1;
+
+				//auto AddContactForce = [contact](ndBodyKinematic* const body)
+				//{
+				//	ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
+				//	ndBodyKinematic::ndContactMap::Iterator it(contactMap);
+				//	for (it.Begin(); it; it++)
+				//	{
+				//		ndContact* const fronterContact = it.GetNode()->GetInfo();
+				//		if (fronterContact->IsActive() && (fronterContact != contact))
+				//		{
+				//
+				//		}
+				//	}
+				//};
+
+				ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
+				ndBodyKinematic::ndContactMap::Iterator it(contactMap);
+				for (it.Begin(); it; it++)
+				{
+					ndContact* const fronterContact = it.GetNode()->GetInfo();
+					if (fronterContact->IsActive() && (fronterContact != contact))
+					{
+						if (body == fronterContact->GetBody0())
+						{
+							body->m_accel += fronterContact->m_forceBody0;
+							body->m_alpha += fronterContact->m_torqueBody0;
+						}
+						else
+						{
+							ndAssert(body == fronterContact->GetBody1());
+							body->m_accel += fronterContact->m_forceBody1;
+							body->m_alpha += fronterContact->m_torqueBody1;
+						}
+					}
+				}
+			}
+		}
+
 		m_skeleton->SolveImmediate(*this);
 
 		for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
