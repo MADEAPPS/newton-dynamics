@@ -144,7 +144,7 @@ namespace ndQuadruped_1
 				ndAssert(param >= ndFloat32(0.0f));
 				ndAssert(param <= ndFloat32(1.0f));
 
-				//param = 0.125f;
+				param = 0.125f;
 				
 				m_code = 0x0f;
 				ndFloat32 omega = ndPi / m_gaitFraction;
@@ -154,7 +154,7 @@ namespace ndQuadruped_1
 					ndFloat32 t = ndMod (param - m_phase[i] + ndFloat32(1.0f), ndFloat32 (1.0f));
 					if (t <= m_gaitFraction)
 					{
-						//if (i == 3)
+						//if (i == 0)
 						//if ((i == 0) || (i == 3))
 						//if ((i == 1) || (i == 2))
 						{
@@ -562,6 +562,12 @@ namespace ndQuadruped_1
 			context.DrawLine(comMatrix.m_posit, comLineOfAction, ndVector::m_zero);
 			comLineOfAction.m_y = comMatrix.m_posit.m_y - 0.38f;
 			context.DrawPoint(comLineOfAction, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 10);
+
+
+static int xxxx;
+xxxx++;
+if (xxxx == 1000)
+xxxx *= 1;
 
 			ndVector netTorque(ndVector::m_zero);
 			ndVector netTorque1(ndVector::m_zero);
@@ -1281,7 +1287,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	world->AddModel(model);
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
+	//world->AddJoint(fixJoint);
 
 	ndSharedPtr<ndUIEntity> quadrupedUI (new ndModelUI(scene, model));
 	scene->Set2DDisplayRenderFunction(quadrupedUI);
