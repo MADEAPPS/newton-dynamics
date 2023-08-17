@@ -45,8 +45,6 @@ class ndBrainAgentDDPG: public ndBrainAgent
 	void Save(ndBrainSave* const loadSave) const;
 
 	ndSharedPtr<ndBrain> m_actor;
-	ndBrainVector m_state;
-	ndBrainVector m_actions;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -54,10 +52,6 @@ ndBrainAgentDDPG<statesDim, actionDim>::ndBrainAgentDDPG(const ndSharedPtr<ndBra
 	:ndBrainAgent()
 	,m_actor(actor)
 {
-	m_state.SetCount(statesDim);
-	m_actions.SetCount(actionDim);
-	m_state.Set(ndReal(0.0f));
-	m_actions.Set(ndReal(0.0f));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -107,9 +101,14 @@ void ndBrainAgentDDPG<statesDim, actionDim>::OptimizeStep()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG<statesDim, actionDim>::Step()
 {
-	GetObservation(&m_state[0]);
-	m_actor->MakePrediction(m_state, m_actions);
-	ApplyActions(&m_actions[0]);
+	ndReal stateBuffer[statesDim * 2];
+	ndReal actionBuffer[actionDim * 2];
+	ndDeepBrainMemVector state(stateBuffer, statesDim);
+	ndDeepBrainMemVector actions(actionBuffer, actionDim);
+
+	GetObservation(&state[0]);
+	m_actor->MakePrediction(state, actions);
+	ApplyActions(&actions[0]);
 }
 
 #endif 

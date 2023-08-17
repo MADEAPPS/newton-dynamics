@@ -39,7 +39,8 @@ class ndBrainAgentTD3_Trainer: public ndBrainAgentDDPG_Trainer<statesDim, action
 
 	protected:
 	virtual void BackPropagate();
-	virtual void CalculateQvalue();
+	virtual void CalculateQvalue(const ndBrainVector& state, const ndBrainVector& actions);
+
 	void BackPropagateActor(const ndUnsigned32* const bashIndex);
 	void BackPropagateCritic(const ndUnsigned32* const bashIndex);
 
@@ -466,22 +467,22 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagate()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentTD3_Trainer<statesDim, actionDim>::CalculateQvalue()
+void ndBrainAgentTD3_Trainer<statesDim, actionDim>::CalculateQvalue(const ndBrainVector& state, const ndBrainVector& actions)
 {
-	ndReal buffer[256];
+	ndReal buffer[(statesDim + actionDim) * 2];
 	ndDeepBrainMemVector criticInput(buffer, statesDim + actionDim);
 	for (ndInt32 i = 0; i < statesDim; ++i)
 	{
-		criticInput[i] = m_state[i];
+		criticInput[i] = state[i];
 	}
 	for (ndInt32 i = 0; i < actionDim; ++i)
 	{
-		criticInput[i + statesDim] = m_actions[i];
+		criticInput[i + statesDim] = actions[i];
 	}
-
+	
 	ndReal currentQValueBuffer[2];
 	ndDeepBrainMemVector currentQValue(currentQValueBuffer, 1);
-
+	
 	m_critic2.MakePrediction(criticInput, currentQValue);
 	ndReal reward0 = currentQValue[0];
 	ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCritic()->MakePrediction(criticInput, currentQValue);

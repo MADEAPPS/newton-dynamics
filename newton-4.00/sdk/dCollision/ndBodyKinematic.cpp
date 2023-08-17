@@ -552,22 +552,22 @@ ndVector ndBodyKinematic::CalculateAngularMomentum() const
 ndJacobian ndBodyKinematic::CalculateNetForce() const
 {
 	ndJacobian force;
+
 	force.m_linear = GetForce();
 	force.m_angular = GetTorque();
-
 	for (ndJointList::ndNode* node = GetJointList().GetFirst(); node; node = node->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = node->GetInfo();
 		if (joint->GetBody0() == this)
 		{
-			force.m_linear += joint->m_forceBody0;
-			force.m_angular += joint->m_torqueBody0;
+			force.m_linear += joint->GetForceBody0();
+			force.m_angular += joint->GetTorqueBody0();
 		}
 		else
 		{
 			ndAssert(joint->GetBody1() == this);
-			force.m_linear += joint->m_forceBody1;
-			force.m_angular += joint->m_torqueBody1;
+			force.m_linear += joint->GetForceBody1();
+			force.m_angular += joint->GetTorqueBody1();
 		}
 	}
 
@@ -580,14 +580,14 @@ ndJacobian ndBodyKinematic::CalculateNetForce() const
 		{
 			if (fronterContact->GetBody0() == this)
 			{
-				force.m_linear += fronterContact->m_forceBody0;
-				force.m_angular += fronterContact->m_torqueBody0;
+				force.m_linear += fronterContact->GetForceBody0();
+				force.m_angular += fronterContact->GetTorqueBody0();
 			}
 			else
 			{
 				ndAssert(fronterContact->GetBody1() == this);
-				force.m_linear += fronterContact->m_forceBody1;
-				force.m_angular += fronterContact->m_torqueBody1;
+				force.m_linear += fronterContact->GetForceBody1();
+				force.m_angular += fronterContact->GetTorqueBody1();
 			}
 		}
 	}

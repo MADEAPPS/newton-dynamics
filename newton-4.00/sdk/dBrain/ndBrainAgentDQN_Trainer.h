@@ -75,8 +75,6 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndBrain m_target;
 	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> m_actorOptimizer;
 
-	ndBrainVector m_state;
-	ndBrainVector m_actions;
 	ndBrainReplayBuffer<ndInt32, statesDim, 1> m_replayBuffer;
 	ndBrainReplayTransitionMemory<ndInt32, statesDim, 1> m_currentTransition;
 	
@@ -124,11 +122,6 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 		m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(D_DQN_REGULARIZER);
 	}
 
-	m_state.SetCount(statesDim);
-	m_actions.SetCount(actionDim);
-	m_state.Set(ndReal(0.0f));
-	m_actions.Set(ndReal(0.0f));
-	
 	SetBufferSize(D_DQN_REPLAY_BUFFERSIZE);
 	m_target.CopyFrom(*(*m_actor));
 
@@ -325,13 +318,18 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Optimize()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 {
-	GetObservation(&m_state[0]);
+	ndReal stateBuffer[statesDim * 2];
+	ndReal actionBuffer[actionDim * 2];
+	ndDeepBrainMemVector state(stateBuffer, statesDim);
+	ndDeepBrainMemVector actions(actionBuffer, actionDim);
+
+	GetObservation(&state[0]);
 	m_currentTransition.m_reward = GetReward();
 
-	m_actor->MakePrediction(m_state, m_actions);
+	m_actor->MakePrediction(state, actions);
 	for (ndInt32 i = 0; i < statesDim; ++i)
 	{
-		m_currentTransition.m_state[i] = ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_state[i];
+		m_currentTransition.m_state[i] = state[i];
 	}
 
 	ndInt32 action = 0;
@@ -346,13 +344,13 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 	{
 		// exploit environment
 		action = 0;
-		ndReal maxQValue = m_actions[0];
+		ndReal maxQValue = actions[0];
 		for (ndInt32 i = 1; i < actionDim; ++i)
 		{
-			if (m_actions[i] > maxQValue)
+			if (actions[i] > maxQValue)
 			{
 				action = i;
-				maxQValue = m_actions[i];
+				maxQValue = actions[i];
 			}
 		}
 
@@ -385,8 +383,6 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::OptimizeStep()
 
 	if (m_currentTransition.m_terminalState)
 	{
-		ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_state.Set(ndReal(0.0f));
-		ndBrainAgentDQN_Trainer<statesDim, actionDim>::m_actions.Set(ndReal(0.0f));
 		ResetModel();
 		m_currentTransition.Clear();
 		if (IsSampling() && (m_eposideCount % 500 == 0))

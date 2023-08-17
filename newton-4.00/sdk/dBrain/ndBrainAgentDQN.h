@@ -43,12 +43,10 @@ class ndBrainAgentDQN: public ndBrainAgent
 	ndReal GetReward() const;
 	ndReal GetCurrentValue() const;
 	ndInt32 GetEpisodeFrames() const;
-	ndInt32 SelectBestAction() const;
 	void Save(ndBrainSave* const loadSave) const;
+	ndInt32 SelectBestAction(const ndBrainVector& actions) const;
 
 	ndSharedPtr<ndBrain> m_actor;
-	ndBrainVector m_state;
-	ndBrainVector m_actions;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -56,10 +54,6 @@ ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN(const ndSharedPtr<ndBrain
 	:ndBrainAgent()
 	,m_actor(actor)
 {
-	m_state.SetCount(statesDim);
-	m_actions.SetCount(actionDim);
-	m_state.Set(ndReal(0.0f));
-	m_actions.Set(ndReal(0.0f));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -107,16 +101,16 @@ void ndBrainAgentDQN<statesDim, actionDim>::OptimizeStep()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDQN<statesDim, actionDim>::SelectBestAction() const
+ndInt32 ndBrainAgentDQN<statesDim, actionDim>::SelectBestAction(const ndBrainVector& actions) const
 {
 	ndInt32 bestAction = 0;
-	ndReal maxQValue = m_actions[0];
+	ndReal maxQValue = actions[0];
 	for (ndInt32 i = 1; i < actionDim; ++i)
 	{
-		if (m_actions[i] > maxQValue)
+		if (actions[i] > maxQValue)
 		{
 			bestAction = i;
-			maxQValue = m_actions[i];
+			maxQValue = actions[i];
 		}
 	}
 	return bestAction;
@@ -125,10 +119,15 @@ ndInt32 ndBrainAgentDQN<statesDim, actionDim>::SelectBestAction() const
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN<statesDim, actionDim>::Step()
 {
-	GetObservation(&m_state[0]);
-	m_actor->MakePrediction(m_state, m_actions);
+	ndReal stateBuffer[statesDim * 2];
+	ndReal actionBuffer[actionDim * 2];
+	ndDeepBrainMemVector state(stateBuffer, statesDim);
+	ndDeepBrainMemVector actions(actionBuffer, actionDim);
 
-	ndReal bestAction = ndReal(SelectBestAction());
+	GetObservation(&state[0]);
+	m_actor->MakePrediction(state, actions);
+
+	ndReal bestAction = ndReal(SelectBestAction(actions));
 	ApplyActions(&bestAction);
 }
 

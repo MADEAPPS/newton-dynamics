@@ -469,14 +469,14 @@ void ndIkSolver::Solve()
 					{
 						if (body == fronterContact->GetBody0())
 						{
-							body->m_accel += fronterContact->m_forceBody0;
-							body->m_alpha += fronterContact->m_torqueBody0;
+							body->m_accel += fronterContact->GetForceBody0();
+							body->m_alpha += fronterContact->GetTorqueBody0();
 						}
 						else
 						{
 							ndAssert(body == fronterContact->GetBody1());
-							body->m_accel += fronterContact->m_forceBody1;
-							body->m_alpha += fronterContact->m_torqueBody1;
+							body->m_accel += fronterContact->GetForceBody1();
+							body->m_alpha += fronterContact->GetTorqueBody1();
 						}
 					}
 				}
