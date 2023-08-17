@@ -39,12 +39,9 @@ ndContact::ndContact()
 	,m_rotationAcc()
 	,m_separatingVector(m_initialSeparatingVector)
 	,m_contacPointsList()
-	,m_body0(nullptr)
-	,m_body1(nullptr)
 	,m_material(nullptr)
 	,m_timeOfImpact(ndFloat32(1.0e10f))
 	,m_separationDistance(ndFloat32(0.0f))
-	,m_maxDOF(0)
 	,m_sceneLru(0)
 	,m_isDead(0)
 	,m_inTrigger(0)
@@ -90,7 +87,7 @@ void ndContact::DetachFromBodies()
 void ndContact::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndInt32 frictionIndex = 0;
-	if (m_maxDOF) 
+	if (m_maxDof) 
 	{
 		ndInt32 i = 0;
 		frictionIndex = m_contacPointsList.GetCount();

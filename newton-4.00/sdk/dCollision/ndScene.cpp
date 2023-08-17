@@ -346,7 +346,7 @@ bool ndScene::ValidateContactCache(ndContact* const contact, const ndVector& tim
 {
 	ndAssert(contact && (contact->GetAsContact()));
 
-	if (contact->m_maxDOF)
+	if (contact->m_maxDof)
 	{
 		ndBodyKinematic* const body0 = contact->GetBody0();
 		ndBodyKinematic* const body1 = contact->GetBody1();
@@ -423,7 +423,7 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 			{
 				ndAssert(count <= (D_CONSTRAINT_MAX_ROWS / 3));
 				ProcessContacts(threadIndex, count, &contactSolver);
-				ndAssert(contact->m_maxDOF);
+				ndAssert(contact->m_maxDof);
 				contact->m_isIntersetionTestOnly = 0;
 			}
 		}
@@ -447,7 +447,7 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 				}
 				contact->m_isIntersetionTestOnly = 1;
 			}
-			contact->m_maxDOF = 0;
+			contact->m_maxDof = 0;
 		}
 	}
 }
@@ -644,7 +644,8 @@ void ndScene::ProcessContacts(ndInt32, ndInt32 contactCount, ndContactSolver* co
 		contactPointList.Remove(nodes[i]);
 	}
 	
-	contact->m_maxDOF = ndUnsigned32(3 * contactPointList.GetCount());
+	//contact->m_maxDof = ndUnsigned32(3 * contactPointList.GetCount());
+	contact->m_maxDof = ndUnsigned8(3 * contactPointList.GetCount());
 	m_contactNotifyCallback->OnContactCallback(contact, m_timestep);
 }
 
@@ -858,7 +859,8 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 			if (distance < D_NARROW_PHASE_DIST)
 			{
 				CalculateJointContacts(threadIndex, contact);
-				if (contact->m_maxDOF || contact->m_isIntersetionTestOnly)
+				//if (contact->m_maxDOF || contact->m_isIntersetionTestOnly)
+				if (contact->m_maxDof || contact->m_isIntersetionTestOnly)
 				{
 					contact->SetActive(true);
 					contact->m_timeOfImpact = ndFloat32(1.0e10f);
@@ -1648,7 +1650,8 @@ void ndScene::DeleteDeadContacts()
 
 		ndInt32 GetKey(const ndContact* const contact) const
 		{
-			const ndUnsigned32 inactive = ndUnsigned32(!contact->IsActive() | (contact->m_maxDOF ? 0 : 1));
+			//const ndUnsigned32 inactive = ndUnsigned32(!contact->IsActive() | (contact->m_maxDOF ? 0 : 1));
+			const ndUnsigned32 inactive = ndUnsigned32(!contact->IsActive() | (contact->m_maxDof ? 0 : 1));
 			const ndUnsigned32 idDead = contact->m_isDead;
 			return m_code[idDead * 2 + inactive];
 		}

@@ -29,8 +29,6 @@
 
 ndJointBilateralConstraint::ndJointBilateralConstraint()
 	:ndConstraint()
-	,m_body0(nullptr)
-	,m_body1(nullptr)
 	,m_worldNode(nullptr)
 	,m_body0Node(nullptr)
 	,m_body1Node(nullptr)
@@ -53,13 +51,13 @@ ndJointBilateralConstraint::ndJointBilateralConstraint()
 
 ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrix)
 	:ndConstraint()
-	,m_body0(body0)
-	,m_body1(body1)
 	,m_worldNode(nullptr)
 	,m_body0Node(nullptr)
 	,m_body1Node(nullptr)
 	,m_deletedNode(nullptr)
 {
+	m_body0 = body0;
+	m_body1 = body1;
 	ndAssert(m_body0 && m_body1);
 	ndAssert(m_body0 != m_body1);
 
@@ -73,7 +71,8 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 
 	m_mark0 = 0;
 	m_mark1	= 0;
-	m_maxDof = ndUnsigned32(maxDof);
+	//m_maxDof = ndUnsigned32(maxDof);
+	m_maxDof = ndUnsigned8(maxDof);
 	m_rowIsMotor = 0;
 	m_isInSkeleton = 0;
 	m_enableCollision = 0;
@@ -89,13 +88,13 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0,
 	ndBodyKinematic* const body1, const ndMatrix& globalMatrixBody0, const ndMatrix& globalMatrixBody1)
 	:ndConstraint()
-	,m_body0(body0)
-	,m_body1(body1)
 	,m_worldNode(nullptr)
 	,m_body0Node(nullptr)
 	,m_body1Node(nullptr)
 	,m_deletedNode(nullptr)
 {
+	m_body0 = body0;
+	m_body1 = body1;
 	ndAssert(m_body0 && m_body1);
 	ndAssert(m_body0 != m_body1);
 
@@ -111,7 +110,8 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 
 	m_mark0 = 0;
 	m_mark1 = 0;
-	m_maxDof = ndUnsigned32(maxDof);
+	//m_maxDof = ndUnsigned32(maxDof);
+	m_maxDof = ndUnsigned8(maxDof);
 	m_rowIsMotor = 0;
 	m_isInSkeleton = 0;
 	m_enableCollision = 0;

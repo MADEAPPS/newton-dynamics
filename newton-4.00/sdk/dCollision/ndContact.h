@@ -99,16 +99,12 @@ class ndContact: public ndConstraint
 	D_COLLISION_API ndContact();
 	D_COLLISION_API virtual ~ndContact();
 
-	D_COLLISION_API virtual ndBodyKinematic* GetBody0() const;
-	D_COLLISION_API virtual ndBodyKinematic* GetBody1() const;
-
 	D_COLLISION_API void AttachToBodies();
 	D_COLLISION_API void DetachFromBodies();
-
-	ndContact* GetAsContact();
-	virtual ndUnsigned32 GetRowsCount() const;
-
+	
 	const ndMaterial* GetMaterial() const;
+
+	virtual ndContact* GetAsContact();
 	virtual void JacobianDerivative(ndConstraintDescritor& desc);
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
 	
@@ -129,12 +125,10 @@ class ndContact: public ndConstraint
 	ndQuaternion m_rotationAcc;
 	ndVector m_separatingVector;
 	ndContactPointList m_contacPointsList;
-	ndBodyKinematic* m_body0;
-	ndBodyKinematic* m_body1;
 	ndMaterial* m_material;
 	ndFloat32 m_timeOfImpact;
 	ndFloat32 m_separationDistance;
-	ndUnsigned32 m_maxDOF;
+	//ndUnsigned32 m_maxDOF;
 	ndUnsigned32 m_sceneLru;
 	ndUnsigned32 m_isDead : 1;
 	ndUnsigned32 m_inTrigger : 1;
@@ -164,20 +158,10 @@ inline const ndMaterial* ndContact::GetMaterial() const
 	return m_material;
 }
 
-inline ndUnsigned32 ndContact::GetRowsCount() const
-{
-	return m_maxDOF;
-}
-
-inline ndBodyKinematic* ndContact::GetBody0() const
-{
-	return m_body0;
-}
-
-inline ndBodyKinematic* ndContact::GetBody1() const
-{
-	return m_body1;
-}
+//inline ndUnsigned32 ndContact::GetRowsCount() const
+//{
+//	return m_maxDOF;
+//}
 
 inline ndContactPointList& ndContact::GetContactPoints()
 {

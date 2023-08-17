@@ -239,18 +239,23 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 
 	virtual ~ndConstraint();
 
+	virtual bool IsBilateral() const;
 	virtual ndContact* GetAsContact();
 	virtual ndJointBilateralConstraint* GetAsBilateral();
 
 	bool IsActive() const;
 	void SetActive(bool state);
-	virtual bool IsBilateral() const;
 
-	virtual ndUnsigned32 GetRowsCount() const = 0;
-	virtual ndBodyKinematic* GetBody0() const;
-	virtual ndBodyKinematic* GetBody1() const;
+	ndUnsigned32 GetRowsCount() const;
 	virtual void JacobianDerivative(ndConstraintDescritor& desc) = 0;
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc) = 0;
+
+	ndVector GetForceBody0() const;
+	ndVector GetTorqueBody0() const;
+	ndVector GetForceBody1() const;
+	ndVector GetTorqueBody1() const;
+	ndBodyKinematic* GetBody0() const;
+	ndBodyKinematic* GetBody1() const;
 	
 	virtual void DebugJoint(ndConstraintDebugCallback&) const;
 	void InitPointParam(ndPointParam& param, const ndVector& p0Global, const ndVector& p1Global) const;
@@ -262,9 +267,12 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	ndVector m_torqueBody0;
 	ndVector m_forceBody1;
 	ndVector m_torqueBody1;
+	ndBodyKinematic* m_body0;
+	ndBodyKinematic* m_body1;
 
 	ndInt32 m_rowCount;
 	ndInt32 m_rowStart;
+	ndUnsigned8 m_maxDof;
 	ndUnsigned8 m_active;
 	ndUnsigned8 m_fence0;
 	ndUnsigned8 m_fence1;
@@ -308,18 +316,43 @@ inline bool ndConstraint::IsBilateral() const
 	return false; 
 }
 
+inline ndUnsigned32 ndConstraint::GetRowsCount() const
+{
+	return m_maxDof;
+}
+
 inline ndBodyKinematic* ndConstraint::GetBody0() const
 { 
-	return nullptr; 
+	return m_body0;
 }
 
 inline ndBodyKinematic* ndConstraint::GetBody1() const
 { 
-	return nullptr; 
+	return m_body1;
 }
 
 inline void ndConstraint::DebugJoint(ndConstraintDebugCallback&) const
 {
+}
+
+inline ndVector ndConstraint::GetForceBody0() const
+{
+	return m_forceBody0;
+}
+
+inline ndVector ndConstraint::GetTorqueBody0() const
+{
+	return m_torqueBody0;
+}
+
+inline ndVector ndConstraint::GetForceBody1() const
+{
+	return m_forceBody1;
+}
+
+inline ndVector ndConstraint::GetTorqueBody1() const
+{
+	return m_torqueBody1;
 }
 
 #endif 
