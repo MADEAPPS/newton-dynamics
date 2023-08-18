@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define D_SWING_STEP			ndFloat32 (0.01f)
 	#define D_MAX_SWING_DIST_X		ndFloat32 (0.10f)
 	#define D_MAX_SWING_DIST_Z		ndFloat32 (0.15f)
@@ -43,14 +43,14 @@ namespace ndQuadruped_1
 		m_leg1_y0,
 		m_leg2_y0,
 		m_leg3_y0,
-		m_leg0_y1,
-		m_leg1_y1,
-		m_leg2_y1,
-		m_leg3_y1,
-		m_leg0_contact,
-		m_leg1_contact,
-		m_leg2_contact,
-		m_leg3_contact,
+		//m_leg0_y1,
+		//m_leg1_y1,
+		//m_leg2_y1,
+		//m_leg3_y1,
+		//m_leg0_contact,
+		//m_leg1_contact,
+		//m_leg2_contact,
+		//m_leg3_contact,
 		m_body_swing_x,
 		m_body_swing_z,
 		m_stateSize
@@ -105,16 +105,14 @@ namespace ndQuadruped_1
 				:ndAnimationSequence()
 				,m_amp(0.27f)
 				,m_gaitFraction(gaitFraction)
-				,m_code(0)
+				,m_stanceMask(0)
 			{
-				m_prevPose.SetCount(0);
 				m_currentPose.SetCount(0);
 				m_duration = ndFloat32 (4.0f);
 				for (ndInt32 i = 0; i < 4; i++)
 				{
 					m_phase[i] = phase[i];
 					m_offset[i] = ndFloat32(0.0f);
-					m_prevPose.PushBack(BasePose(i));
 					m_currentPose.PushBack(BasePose(i));
 				}
 			}
@@ -124,9 +122,9 @@ namespace ndQuadruped_1
 				return ndVector::m_zero;
 			}
 
-			ndInt32 GetStaceCode() const
+			ndInt32 GetStanceCode() const
 			{
-				return m_code;
+				return m_stanceMask;
 			}
 
 			ndVector BasePose(ndInt32 index) const 
@@ -146,7 +144,7 @@ namespace ndQuadruped_1
 
 				param = 0.125f;
 				
-				m_code = 0x0f;
+				m_stanceMask = 0x0f;
 				ndFloat32 omega = ndPi / m_gaitFraction;
 				for (ndInt32 i = 0; i < 4; i++)
 				{
@@ -158,12 +156,12 @@ namespace ndQuadruped_1
 						//if ((i == 0) || (i == 3))
 						//if ((i == 1) || (i == 2))
 						{
-							m_code = m_code ^ (1 << i);
+							m_stanceMask = m_stanceMask ^ (1 << i);
 							output[i].m_posit.m_y += m_amp * ndSin(omega * t);
 						}
 					}
-					output[i].m_rotation.m_w = ((t >= ndFloat32(0.0f)) && (t < m_gaitFraction)) ? ndFloat32(0.0f) : ndFloat32(1.0f);
-					m_prevPose[i] = m_currentPose[i];
+					//output[i].m_rotation.m_w = ((t >= ndFloat32(0.0f)) && (t < m_gaitFraction)) ? ndFloat32(0.0f) : ndFloat32(1.0f);
+					//m_prevPose[i] = m_currentPose[i];
 					m_currentPose[i] = output[i].m_posit;
 				}
 			}
@@ -172,8 +170,8 @@ namespace ndQuadruped_1
 			ndFloat32 m_offset[4];
 			ndFloat32 m_amp;
 			ndFloat32 m_gaitFraction;
-			mutable ndInt32 m_code;
-			mutable ndFixSizeArray<ndVector, 4> m_prevPose;
+			mutable ndInt32 m_stanceMask;
+			//mutable ndFixSizeArray<ndVector, 4> m_prevPose;
 			mutable ndFixSizeArray<ndVector, 4> m_currentPose;
 		};
 
@@ -193,9 +191,11 @@ namespace ndQuadruped_1
 				//ResetModel();
 			}
 
-			void GetObservation(ndReal* const state) const
+			//void GetObservation(ndReal* const state) const
+			void GetObservation(ndReal* const) const
 			{
-				m_model->GetObservation(state);
+				ndAssert(0);
+				//m_model->GetObservation(state);
 			}
 
 			virtual void ApplyActions(ndReal* const actions) const
@@ -247,7 +247,7 @@ namespace ndQuadruped_1
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(1500)
-				,m_stopTraining(10000000)
+				,m_stopTraining(1000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
@@ -281,7 +281,40 @@ namespace ndQuadruped_1
 
 			ndReal GetReward() const
 			{
-				return m_model->GetReward();
+				//return m_model->GetReward();
+				if (IsTerminal())
+				{
+					return ndReal(-1.0f);
+				}
+
+				ndInt32 contactMask = 0x0f;
+				const ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*m_model->m_poseGenerator->GetSequence();
+				for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
+				{
+					ndContact* const contact = m_model->FindContact(i);
+					if (contact)
+					{
+						contactMask = contactMask ^ (1 << i);
+					}
+				}
+				ndInt32 mask = contactMask & poseGenerator->GetStanceCode();
+
+				ndReal reward = ndReal(0.0f);
+				switch (mask)
+				{
+					case 0x07:
+					case 0x0b:
+					case 0x0d:
+					case 0x0f:
+					{
+						reward = ndReal(1.0f);
+					}
+				}
+
+				const ndUIControlNode* const control = m_model->m_control;
+				ndFloat32 control_x_reward = ndPow(ndEXP, -ndFloat32(230.0f) * control->m_x * control->m_x);
+				ndFloat32 control_z_reward = ndPow(ndEXP, -ndFloat32(102.0f) * control->m_z * control->m_z);
+				return ndReal((reward * ndFloat32(8.0f) + control_x_reward + control_z_reward) / ndFloat32(10.0f));
 			}
 
 			virtual void ApplyActions(ndReal* const actions) const
@@ -301,7 +334,21 @@ namespace ndQuadruped_1
 
 			void GetObservation(ndReal* const state) const
 			{
-				m_model->GetObservation(state);
+				ndInt32 contactMask = 0x0f;
+				const ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*m_model->m_poseGenerator->GetSequence();
+				ndInt32 stanceMask = poseGenerator->GetStanceCode();
+				for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
+				{
+					ndContact* const contact = m_model->FindContact(i);
+					if (contact)
+					{
+						contactMask = contactMask ^ (1 << i);
+					}
+					ndInt32 input = contactMask & stanceMask & (1 << i);
+					state[m_leg0_y0 + i] = input ? ndReal (1.0f) : ndReal(0.0f);
+				}
+				state[m_body_swing_x] = m_model->m_control->m_x;
+				state[m_body_swing_z] = m_model->m_control->m_z;
 			}
 
 			bool IsTerminal() const
@@ -460,6 +507,26 @@ namespace ndQuadruped_1
 		{
 		}
 
+		ndContact* FindContact (ndInt32 index) const 
+		{
+			const ndAnimKeyframe& keyFrame = m_animPose[index];
+			ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
+			ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+
+			ndBodyKinematic* const body = effector->GetBody0();
+			ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
+			ndBodyKinematic::ndContactMap::Iterator it(contacts);
+			for (it.Begin(); it; it++)
+			{
+				ndContact* const contact = *it;
+				if (contact->IsActive())
+				{
+					return contact;
+				}
+			}
+			return nullptr;
+		};
+
 		void Debug(ndConstraintDebugCallback& context) const
 		{
 			ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
@@ -492,25 +559,25 @@ namespace ndQuadruped_1
 			//	//context.DrawLine(lookAtMatrix1.m_posit, updir, ndVector(0.0f, 0.0f, 0.0f, 1.0f));
 			//}
 
-			auto FindContact = [this](ndInt32 index)
-			{
-				const ndAnimKeyframe& keyFrame = m_animPose[index];
-				ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-
-				ndBodyKinematic* const body = effector->GetBody0();
-				ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
-				ndBodyKinematic::ndContactMap::Iterator it(contacts);
-				for (it.Begin(); it; it++)
-				{
-					ndContact* const contact = *it;
-					if (contact->IsActive())
-					{
-						return contact;
-					}
-				}
-				return (ndContact*)nullptr;
-			};
+			//auto FindContact = [this](ndInt32 index)
+			//{
+			//	const ndAnimKeyframe& keyFrame = m_animPose[index];
+			//	ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
+			//	ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+			//
+			//	ndBodyKinematic* const body = effector->GetBody0();
+			//	ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
+			//	ndBodyKinematic::ndContactMap::Iterator it(contacts);
+			//	for (it.Begin(); it; it++)
+			//	{
+			//		ndContact* const contact = *it;
+			//		if (contact->IsActive())
+			//		{
+			//			return contact;
+			//		}
+			//	}
+			//	return (ndContact*)nullptr;
+			//};
 
 			ndJointBilateralConstraint* joint[4];
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
@@ -518,7 +585,7 @@ namespace ndQuadruped_1
 				ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
 				ndAssert(info == &m_effectorsInfo[i]);
 				joint[i] = *info->m_effector;
-
+			
 				ndContact* const contact = FindContact(i);
 				if (contact)
 				{
@@ -564,10 +631,10 @@ namespace ndQuadruped_1
 			context.DrawPoint(comLineOfAction, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 10);
 
 
-static int xxxx;
-xxxx++;
-if (xxxx == 1000)
-xxxx *= 1;
+//static int xxxx;
+//xxxx++;
+//if (xxxx == 1000)
+//xxxx *= 1;
 
 			ndVector netTorque(ndVector::m_zero);
 			ndVector netTorque1(ndVector::m_zero);
@@ -604,11 +671,16 @@ xxxx *= 1;
 			zmpLineOfAction.m_x += -netTorque1.m_z / weight.m_y;
 			context.DrawPoint(zmpLineOfAction, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 6);
 
+
+			const ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*m_poseGenerator->GetSequence();
+			ndInt32 stanceMask = poseGenerator->GetStanceCode();
+
 			ndFixSizeArray<ndVector, 4> contactPoints;
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
-				if (keyFrame.m_rotation.m_w > ndFloat32(0.0f))
+				//if (keyFrame.m_rotation.m_w > ndFloat32(0.0f))
+				if (stanceMask & (1<<i))
 				{
 					ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
 					ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
@@ -718,33 +790,33 @@ xxxx *= 1;
 			m_invDynamicsSolver.SolverEnd();
 		}
 
-		void GetObservation(ndReal* const state)
-		{
-			const ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*m_poseGenerator->GetSequence();
-			//ndInt32 keyFramerMask = ((ndPoseGenerator*)*m_poseGenerator->GetSequence())->GetStaceCode();
-			const ndFixSizeArray<ndVector, 4>& prevPose = poseGenerator->m_prevPose;
-			const ndFixSizeArray<ndVector, 4>& currentPose = poseGenerator->m_currentPose;
-			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
-			{
-				//const ndAnimKeyframe& keyFrame = m_animPose[i];
-				//ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-				//ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-				
-				ndInt32 hasContact = HasContact(i);
-				//ndVector posit(effector->GetLocalTargetPosition());
-				state[m_leg0_y0 + i] = prevPose[i].m_y - D_POSE_REST_POSITION_Y;
-				state[m_leg0_y1 + i] = currentPose[i].m_y - D_POSE_REST_POSITION_Y;
-				state[m_leg0_contact + i] = !hasContact ? ndReal(1.0f) : ndReal(0.0f);
-			}
-
-			//ndBodyState bodyState(CalculateFullBodyState());
-			//ndVector angularMomentum(bodyState.m_com.UnrotateVector(bodyState.m_angularMomentum));
-			//state[m_body_omega_x] = angularMomentum.m_x;
-			//state[m_body_omega_z] = angularMomentum.m_z;
-
-			state[m_body_swing_x] = m_control->m_x;
-			state[m_body_swing_z] = m_control->m_z;
-		}
+		//void GetObservation(ndReal* const state)
+		//{
+		//	const ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*m_poseGenerator->GetSequence();
+		//	//ndInt32 keyFramerMask = ((ndPoseGenerator*)*m_poseGenerator->GetSequence())->GetStanceCode();
+		//	//const ndFixSizeArray<ndVector, 4>& prevPose = poseGenerator->m_prevPose;
+		//	//const ndFixSizeArray<ndVector, 4>& currentPose = poseGenerator->m_currentPose;
+		//	//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+		//	//{
+		//	//	//const ndAnimKeyframe& keyFrame = m_animPose[i];
+		//	//	//ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
+		//	//	//ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+		//	//	
+		//	//	ndInt32 hasContact = HasContact(i);
+		//	//	//ndVector posit(effector->GetLocalTargetPosition());
+		//	//	state[m_leg0_y0 + i] = prevPose[i].m_y - D_POSE_REST_POSITION_Y;
+		//	//	state[m_leg0_y1 + i] = currentPose[i].m_y - D_POSE_REST_POSITION_Y;
+		//	//	state[m_leg0_contact + i] = !hasContact ? ndReal(1.0f) : ndReal(0.0f);
+		//	//}
+		//
+		//	////ndBodyState bodyState(CalculateFullBodyState());
+		//	////ndVector angularMomentum(bodyState.m_com.UnrotateVector(bodyState.m_angularMomentum));
+		//	////state[m_body_omega_x] = angularMomentum.m_x;
+		//	////state[m_body_omega_z] = angularMomentum.m_z;
+		//	//
+		//	//state[m_body_swing_x] = m_control->m_x;
+		//	//state[m_body_swing_z] = m_control->m_z;
+		//}
 
 		void ApplyActions(ndReal* const actions)
 		{
@@ -887,7 +959,7 @@ xxxx *= 1;
 #endif
 			
 			ndInt32 contactMask = 0;
-			ndInt32 keyFramerMask = ((ndPoseGenerator*) *m_poseGenerator->GetSequence())->GetStaceCode();
+			ndInt32 keyFramerMask = ((ndPoseGenerator*) *m_poseGenerator->GetSequence())->GetStanceCode();
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				contactMask = contactMask | (HasContact(i) << i);
@@ -976,7 +1048,6 @@ xxxx *= 1;
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
-			m_world = world;
 			m_timestep = timestep;
 			ndModelArticulation::Update(world, timestep);
 			m_agent->Step();
@@ -995,7 +1066,6 @@ xxxx *= 1;
 		ndUIControlNode* m_control;
 		ndAnimationSequencePlayer* m_poseGenerator;
 
-		ndWorld* m_world;
 		ndFloat32 m_timestep;
 		ndSharedPtr<ndBrainAgent> m_agent;
 	};
