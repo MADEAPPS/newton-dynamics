@@ -246,8 +246,8 @@ namespace ndQuadruped_1
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(1500)
-				,m_stopTraining(1000000)
+				,m_maxFrames(500)
+				,m_stopTraining(2000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
@@ -422,7 +422,7 @@ namespace ndQuadruped_1
 						ndExpandTraceMessage("\n");
 						ndExpandTraceMessage("training complete\n");
 						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-						ndExpandTraceMessage("time training: %f\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+						ndExpandTraceMessage("time training(secs): %f\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 					}
 				}
 				//if (m_model->IsOutOfBounds())
