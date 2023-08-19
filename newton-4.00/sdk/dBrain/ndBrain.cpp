@@ -235,6 +235,15 @@ void ndBrain::InitGaussianWeights(ndReal variance)
 	}
 }
 
+void ndBrain::InitWeightsXavierMethod()
+{
+	ndArray<ndBrainLayer*>& layers = *this;
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+		layers[i]->InitWeightsXavierMethod();
+	}
+}
+
 void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, const ndBrainVector& hiddenLayerOutputs)
 {
 	const ndArray<ndBrainLayer*>& layers = *this;

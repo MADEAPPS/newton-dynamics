@@ -368,9 +368,9 @@ static void MnistTrainingSet()
 		brain.AddLayer(hiddenLayer1);
 		brain.AddLayer(ouputLayer);
 		brain.EndAddLayer();
-	 	brain.InitGaussianBias(ndReal(0.125f));
-		//brain.InitGaussianBias(ndReal(0.0f));
-		brain.InitGaussianWeights(ndReal(0.125f));
+	 	//brain.InitGaussianBias(ndReal(0.125f));
+		//brain.InitGaussianWeights(ndReal(0.125f));
+		brain.InitWeightsXavierMethod();
 	
 		SupervisedTrainer optimizer(&brain);
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
@@ -407,6 +407,15 @@ static void MnistTestSet()
 void ndTestDeedBrian()
 {
 	ndSetRandSeed(12345);
+
+	//FILE* outFile = fopen("xxx.csv", "wb");
+	//for (ndInt32 i = 0; i < 40000; ++i)
+	//{
+	//	ndReal xxx = ndGaussianRandom(0.0f, 0.1f);
+	//	fprintf(outFile, "%g\n", xxx);
+	//}
+	//fclose(outFile);
+
 	//ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();
 	//MnistTestSet();

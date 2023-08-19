@@ -144,6 +144,21 @@ void ndBrainLayer::InitGaussianWeights(ndReal variance)
 	}
 }
 
+void ndBrainLayer::InitWeightsXavierMethod()
+{
+	InitGaussianBias(ndReal(0.0f));
+	//if (m_activation == m_tanh)
+	//{
+		ndFloat32 den = ndFloat32 (GetInputSize() + GetOuputSize());
+		ndFloat32 variance = ndSqrt (ndFloat32(2.0f) / den);
+		InitGaussianWeights(variance);
+	//}
+	//else
+	//{
+	//	InitGaussianWeights(0.125f);
+	//}
+}
+
 void ndBrainLayer::LinealActivation(ndBrainVector&) const
 {
 }
