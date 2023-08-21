@@ -225,9 +225,9 @@ typedef double ndFloat64;
 #else
 	typedef float ndFloat32;
 #endif
-
+	
 #define ndPi	 		ndFloat32 (3.141592f)
-#define ndEXP		 	ndFloat32 (2.71828f)
+#define ndEXP		 	ndFloat32 (2.7182818f)
 #define ndEpsilon	  	ndFloat32 (1.0e-5f)
 #define ndDegreeToRad	ndFloat32 (ndPi / 180.0f)
 #define ndRadToDegree  	ndFloat32 (180.0f / ndPi)
@@ -240,6 +240,7 @@ typedef double ndFloat64;
 #define ndLog(x)		ndFloat32 (log(x))
 #define ndCeil(x)		ndFloat32 (ceil(x))
 #define ndFloor(x)		ndFloat32 (floor(x))	
+#define ndExp(x)		ndFloat32 (expf(x))
 #define ndPow(x,y)		ndFloat32 (pow(x,y))
 #define ndFmod(x,y)		ndFloat32 (fmod(x,y))
 #define ndTan(x)		ndFloat32 (tan(x))

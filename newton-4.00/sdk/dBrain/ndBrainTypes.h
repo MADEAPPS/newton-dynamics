@@ -29,8 +29,8 @@
 
 enum ndBrainActivationType
 {
-	m_relu,
 	m_lineal,
+	m_relu,
 	m_tanh,
 	m_sigmoid,
 	m_softmax

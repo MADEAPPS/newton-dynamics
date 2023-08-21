@@ -118,41 +118,9 @@ class ndForceImpactPair
 		Clear();
 	}
 
-	void Clear()
-	{
-		m_force = ndFloat32(ndFloat32(0.0f));
-		m_impact = ndFloat32(ndFloat32(0.0f));
-		for (ndInt32 i = 0; i < ndInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); ++i)
-		{
-			m_initialGuess[i] = ndFloat32(ndFloat32(0.0f));
-		}
-	}
-
-	void Push(ndFloat32 val)
-	{
-		for (ndInt32 i = 1; i < ndInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); ++i)
-		{
-			m_initialGuess[i - 1] = m_initialGuess[i];
-		}
-		m_initialGuess[sizeof(m_initialGuess) / sizeof(m_initialGuess[0]) - 1] = val;
-	}
-
-	ndFloat32 GetInitialGuess() const
-	{
-		//return 100.0f;
-		ndFloat32 smallest = ndFloat32(1.0e15f);
-		ndFloat32 value = ndFloat32(ndFloat32(0.0f));
-		for (ndInt32 i = 0; i < ndInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); ++i)
-		{
-			ndFloat32 mag = ndAbs(m_initialGuess[i]);
-			if (mag < smallest) 
-			{
-				smallest = mag;
-				value = m_initialGuess[i];
-			}
-		}
-		return value;
-	}
+	void Clear();
+	void Push(ndFloat32 val);
+	ndFloat32 GetInitialGuess() const;
 
 	ndFloat32 m_force;
 	ndFloat32 m_impact;

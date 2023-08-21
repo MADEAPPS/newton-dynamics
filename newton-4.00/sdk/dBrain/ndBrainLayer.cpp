@@ -24,6 +24,8 @@
 #include "ndBrainLayer.h"
 #include "ndBrainSaveLoad.h"
 
+#define RELUE_GAIN ndReal(0.01f)
+
 ndBrainLayer::ndBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndBrainActivationType activation)
 	:ndBrainMatrix()
 	,m_bias()
@@ -100,7 +102,7 @@ bool ndBrainLayer::Compare(const ndBrainLayer& src) const
 	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
 	{
 		ndReal error = m_bias[i] - src.m_bias[i];
-		if (ndAbs(error) > 1.0e-6f)
+		if (ndAbs(error) > ndFloat32(1.0e-6f))
 		{
 			ndAssert(0);
 			return false;
@@ -120,7 +122,7 @@ bool ndBrainLayer::Compare(const ndBrainLayer& src) const
 		for (ndInt32 j = 0; j < row0.GetCount(); j++)
 		{
 			ndReal error = row0[j] - row1[j];
-			if (ndAbs(error) > 1.0e-6f)
+			if (ndAbs(error) > ndFloat32 (1.0e-6f))
 			{
 				ndAssert(0);
 				return false;
@@ -146,17 +148,10 @@ void ndBrainLayer::InitGaussianWeights(ndReal variance)
 
 void ndBrainLayer::InitWeightsXavierMethod()
 {
-	InitGaussianBias(ndReal(0.0f));
-	//if (m_activation == m_tanh)
-	//{
-		ndFloat32 den = ndFloat32 (GetInputSize() + GetOuputSize());
-		ndFloat32 variance = ndSqrt (ndFloat32(2.0f) / den);
-		InitGaussianWeights(variance);
-	//}
-	//else
-	//{
-	//	InitGaussianWeights(0.125f);
-	//}
+	ndFloat32 den = ndFloat32 (GetInputSize() + GetOuputSize());
+	ndFloat32 variance = ndSqrt (ndFloat32(2.0f) / den);
+	InitGaussianBias(variance);
+	InitGaussianWeights(variance);
 }
 
 void ndBrainLayer::LinealActivation(ndBrainVector&) const
@@ -167,7 +162,7 @@ void ndBrainLayer::ReluActivation(ndBrainVector& output) const
 {
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
-		output[i] = ndMax(ndReal(0.0f), output[i]);
+		output[i] = (output[i] >= ndReal (0.0f)) ? output[i] : ndReal(0.0f);
 		ndAssert(ndCheckFloat(output[i]));
 	}
 }
@@ -177,7 +172,8 @@ void ndBrainLayer::SigmoidActivation(ndBrainVector& output) const
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal value = ndClamp (output[i], ndReal(-50.0f), ndReal(50.0f));
-		const ndReal exp = ndReal(ndPow(ndEXP, value));
+		//const ndReal exp = ndReal(ndPow(ndEXP, value));
+		ndReal exp = ndReal(ndExp(value));
 		output[i] = exp / (exp + ndReal(1.0f));
 		ndAssert (ndCheckFloat(output[i]));
 		ndAssert(output[i] <= ndReal(1.0f));
@@ -190,7 +186,8 @@ void ndBrainLayer::HyperbolicTanActivation(ndBrainVector& output) const
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal value = ndClamp(output[i], ndReal(-25.0f), ndReal(25.0f));
-		const ndReal exp = ndReal(ndPow(ndEXP, ndReal(2.0f) * value));
+		//const ndReal exp = ndReal(ndPow(ndEXP, ndReal(2.0f) * value));
+		ndReal exp = ndReal(ndExp(ndReal(2.0f) * value));
 		output[i] = (exp - ndReal(1.0f)) / (exp + ndReal(1.0f));
 		ndAssert(ndCheckFloat(output[i]));
 		ndAssert(output[i] <= ndReal(1.0f));
@@ -203,7 +200,8 @@ void ndBrainLayer::SoftmaxActivation(ndBrainVector& output) const
 	ndReal acc = 0.0f;
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
-		const ndReal exp = ndReal(ndPow(ndEXP, output[i]));
+		//const ndReal exp = ndReal(ndPow(ndEXP, output[i]));
+		ndReal exp = ndReal(ndExp(output[i]));
 		output[i] = exp;
 		ndAssert(ndCheckFloat(output[i]));
 		acc += exp;
@@ -219,6 +217,25 @@ void ndBrainLayer::SoftmaxActivation(ndBrainVector& output) const
 	}
 }
 
+void ndBrainLayer::LinealActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
+{
+	ndAssert(input.GetCount() == derivativeOutput.GetCount());
+	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	{
+		derivativeOutput[i] = ndReal(1.0f);
+	}
+}
+
+void ndBrainLayer::ReluActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
+{
+	ndAssert(input.GetCount() == derivativeOutput.GetCount());
+	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	{
+		ndReal val = input[i];
+		derivativeOutput[i] = (val > ndReal(0.0f)) ? ndReal(1.0f) : ndReal(0.0f);
+	}
+}
+
 void ndBrainLayer::SigmoidDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
@@ -226,6 +243,16 @@ void ndBrainLayer::SigmoidDerivative(const ndBrainVector& input, ndBrainVector& 
 	{
 		ndReal val = input[i];
 		derivativeOutput[i] = val * (ndReal(1.0f) - val);
+	}
+}
+
+void ndBrainLayer::HyperbolicTanDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
+{
+	ndAssert(input.GetCount() == derivativeOutput.GetCount());
+	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	{
+		ndReal val = input[i];
+		derivativeOutput[i] = ndReal(1.0f) - val * val;
 	}
 }
 
@@ -249,48 +276,19 @@ void ndBrainLayer::SoftmaxDerivative(const ndBrainVector& input, ndBrainVector& 
 	//}
 }
 
-void ndBrainLayer::LinealActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
-{
-	ndAssert(input.GetCount() == derivativeOutput.GetCount());
-	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
-	{
-		derivativeOutput[i] = ndReal(1.0f);
-	}
-}
-
-void ndBrainLayer::ReluActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
-{
-	ndAssert(input.GetCount() == derivativeOutput.GetCount());
-	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
-	{
-		ndReal val = input[i];
-		derivativeOutput[i] = (val > ndReal(0.0f)) ? ndReal(1.0f) : ndReal(0.0f);
-	}
-}
-
-void ndBrainLayer::HyperbolicTanDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
-{
-	ndAssert(input.GetCount() == derivativeOutput.GetCount());
-	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
-	{
-		ndReal val = input[i];
-		derivativeOutput[i] = ndReal(1.0f) - val * val;
-	}
-}
-
 void ndBrainLayer::ApplyActivation(ndBrainVector& output) const
 {
 	switch (m_activation)
 	{
-		case m_relu:
-		{
-			ReluActivation(output);
-			break;
-		}
-
 		case m_lineal:
 		{
 			LinealActivation(output);
+			break;
+		}
+
+		case m_relu:
+		{
+			ReluActivation(output);
 			break;
 		}
 
@@ -321,15 +319,15 @@ void ndBrainLayer::ActivationDerivative(const ndBrainVector& input, ndBrainVecto
 {
 	switch (m_activation)
 	{
-		case m_relu:
-		{
-			ReluActivationDerivative(input, derivativeOutput);
-			break;
-		}
-
 		case m_lineal:
 		{
 			LinealActivationDerivative(input, derivativeOutput);
+			break;
+		}
+
+		case m_relu:
+		{
+			ReluActivationDerivative(input, derivativeOutput);
 			break;
 		}
 

@@ -23,12 +23,11 @@
 namespace ndQuadruped_1
 {
 	#define ND_TRAIN_MODEL
-	#define D_SWING_STEP			ndFloat32 (0.01f)
-	#define D_MAX_SWING_DIST_X		ndFloat32 (0.10f)
-	#define D_MAX_SWING_DIST_Z		ndFloat32 (0.15f)
-	#define D_MIN_REWARD_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
-
-	#define D_POSE_REST_POSITION_Y	ndFloat32 (-0.3f)
+	#define D_SWING_STEP			ndReal(0.01f)
+	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
+	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
+	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
+	#define D_MIN_REWARD_ANGLE		ndReal(ndFloat32 (20.0f) * ndDegreeToRad)
 
 	enum ndActionSpace
 	{
@@ -671,7 +670,6 @@ namespace ndQuadruped_1
 			zmpLineOfAction.m_x += -netTorque1.m_z / weight.m_y;
 			context.DrawPoint(zmpLineOfAction, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 6);
 
-
 			const ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*m_poseGenerator->GetSequence();
 			ndInt32 stanceMask = poseGenerator->GetStanceCode();
 
@@ -828,8 +826,8 @@ namespace ndQuadruped_1
 			m_control->m_animSpeed = 0.1f;
 			if (m_control->m_enableController)
 			{
-				m_control->m_x = ndClamp(m_control->m_x + actions[m_bodySwing_x] * D_SWING_STEP, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
-				m_control->m_z = ndClamp(m_control->m_z + actions[m_bodySwing_z] * D_SWING_STEP, -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
+				m_control->m_x = ndClamp(ndReal(m_control->m_x + actions[m_bodySwing_x] * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
+				m_control->m_z = ndClamp(ndReal(m_control->m_z + actions[m_bodySwing_z] * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
 			}
 			ApplyPoseGeneration();
 		}

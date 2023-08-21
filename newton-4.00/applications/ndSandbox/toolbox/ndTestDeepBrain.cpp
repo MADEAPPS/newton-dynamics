@@ -27,8 +27,9 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	brain.AddLayer(hiddenLayer1);
 	brain.AddLayer(ouputLayer);
 	brain.EndAddLayer();
-	brain.InitGaussianBias(ndReal(0.125f));
-	brain.InitGaussianWeights(ndReal(0.125f));
+	//brain.InitGaussianBias(ndReal(0.125f));
+	//brain.InitGaussianWeights(ndReal(0.125f));
+	brain.InitWeightsXavierMethod();
 	
 	ndInt32 samples = 2000;
 	ndBrainMatrix inputBatch(samples, 2);
@@ -268,9 +269,10 @@ static void MnistTrainingSet()
 			:ndBrainThreadPool()
 			,m_brain(*brain)
 			,m_learnRate(ndReal (0.1f))
-			,m_bashBufferSize(64)
+			,m_bashBufferSize(256)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize/4);
+			//threadCount = 1;
 			SetThreadCount(threadCount);
 			for (ndInt32 i = 0; i < GetThreadCount(); ++i)
 			{
@@ -283,49 +285,42 @@ static void MnistTrainingSet()
 		{
 			ndUnsigned32 shuffleBashBuffer[1024];
 
-			auto PropagateBash = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &shuffleBashBuffer](ndInt32 threadIndex, ndInt32 threadCount)
+			auto BackPropagateBash = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &shuffleBashBuffer](ndInt32 threadIndex, ndInt32 threadCount)
 			{
-				class Loss : public ndBrainLeastSquareErrorLoss
-				{
-					public:
-					Loss(ndBrainTrainer& trainer, ndBrainMatrix* const trainingLabels)
-						:ndBrainLeastSquareErrorLoss(trainer.GetBrain()->GetOutputSize())
-						,m_trainer(trainer)
-						,m_trainingLabels(trainingLabels)
-						,m_index(0)
-					{
-					}
-				
-					void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
-					{
-						ndAssert(output.GetCount() == m_trainingLabels->GetColumns());
-						ndAssert(m_truth.GetCount() == m_trainer.GetBrain()->GetOutputSize());
-						const ndBrainVector& truth = (*m_trainingLabels)[m_index];
-						SetTruth(truth);
-						ndBrainLeastSquareErrorLoss::GetLoss(output, loss);
-					}
-				
-					ndBrainTrainer& m_trainer;
-					const ndBrainMatrix* m_trainingLabels;
-					ndInt32 m_index;
-				};
+				//class Loss : public ndBrainLeastSquareErrorLoss
+				//{
+				//	public:
+				//	Loss(ndBrainTrainer& trainer)
+				//		:ndBrainLeastSquareErrorLoss(trainer.GetBrain()->GetOutputSize())
+				//		,m_trainer(trainer)
+				//	{
+				//	}
+				//
+				//	void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+				//	{
+				//		ndAssert(output.GetCount() == m_trainingLabels->GetColumns());
+				//		ndAssert(m_truth.GetCount() == m_trainer.GetBrain()->GetOutputSize());
+				//		ndBrainLeastSquareErrorLoss::GetLoss(output, loss);
+				//	}
+				//
+				//	ndBrainTrainer& m_trainer;
+				//	const ndBrainMatrix* m_trainingLabels;
+				//};
 
 				ndBrainTrainer& trainer = *(*m_optimizers[threadIndex]);
 				trainer.ClearGradientsAcc();
 
-				Loss loss(trainer, trainingLabels);
+				ndBrainLeastSquareErrorLoss loss(trainer.GetBrain()->GetOutputSize());
 				const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				{
 					ndInt32 index = ndInt32(shuffleBashBuffer[i]);
-					const ndBrainVector& input = (*trainingDigits)[index];
-
-					loss.m_index = index;
-					trainer.BackPropagate(input, loss);
+					loss.SetTruth((*trainingLabels)[index]);
+					trainer.BackPropagate((*trainingDigits)[index], loss);
 				}
 			});
 
-			auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+			auto AccumulateBashWeights = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 			{
 				ndBrainTrainer& trainer = *(*m_optimizers[0]);
 				for (ndInt32 i = 1; i < threadCount; ++i)
@@ -335,14 +330,14 @@ static void MnistTrainingSet()
 				}
 			});
 
-			for (ndInt32 i = 0; i < 1000000; ++i)
+			for (ndInt32 i = 0; i < 10000000; ++i)
 			{
 				for (ndInt32 j = 0; j < m_bashBufferSize; ++j)
 				{
 					shuffleBashBuffer[j] = ndRandInt() % trainingDigits->GetCount();
 				}
-				ndBrainThreadPool::ParallelExecute(PropagateBash);
-				ndBrainThreadPool::ParallelExecute(AccumulateWeight);
+				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
+				ndBrainThreadPool::ParallelExecute(AccumulateBashWeights);
 				m_optimizers[0]->UpdateWeights(m_learnRate, m_bashBufferSize);
 			}
 		}
@@ -357,9 +352,11 @@ static void MnistTrainingSet()
 	{
 		ndBrain brain;
 		ndInt32 neuronsPerLayers = 64;
-		ndBrainLayer* const inputLayer = new ndBrainLayer(trainingDigits->GetColumns(), neuronsPerLayers, m_tanh);
-		ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), neuronsPerLayers, m_tanh);
-		ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerLayers, m_tanh);
+		//ndBrainActivationType activation = m_tanh;
+		ndBrainActivationType activation = m_relu;
+		ndBrainLayer* const inputLayer = new ndBrainLayer(trainingDigits->GetColumns(), neuronsPerLayers, activation);
+		ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), neuronsPerLayers, activation);
+		ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerLayers, activation);
 		ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer1->GetOuputSize(), trainingLabels->GetColumns(), m_sigmoid);
 	
 		brain.BeginAddLayer();
@@ -382,6 +379,7 @@ static void MnistTrainingSet()
 		
 		ndBrainSave::Save(&brain, path);
 		ValidateData("training data", brain, *trainingLabels, *trainingDigits);
+		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 }

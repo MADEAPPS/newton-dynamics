@@ -180,26 +180,26 @@ void ndBrainSave::Save(const ndBrain* const brain)
 		Save("{\n");
 		switch (layer->m_activation)
 		{
-		case m_relu:
-			Save("\tactivation relu\n");
-			break;
+			case m_relu:
+				Save("\tactivation relu\n");
+				break;
 
-		case m_lineal:
-			Save("\tactivation lineal\n");
-			break;
+			case m_lineal:
+				Save("\tactivation lineal\n");
+				break;
 
-		case m_tanh:
-			Save("\tactivation tanh\n");
-			break;
+			case m_tanh:
+				Save("\tactivation tanh\n");
+				break;
 
-		case m_softmax:
-			Save("\tactivation softmax\n");
-			break;
+			case m_softmax:
+				Save("\tactivation softmax\n");
+				break;
 
-		case m_sigmoid:
-		default:
-			Save("\tactivation sigmoid\n");
-			break;
+			case m_sigmoid:
+			default:
+				Save("\tactivation sigmoid\n");
+				break;
 		}
 
 		Save("\tinputs %d\n", layer->GetColumns());

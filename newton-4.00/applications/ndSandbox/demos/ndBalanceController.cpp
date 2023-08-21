@@ -298,7 +298,7 @@ namespace ndController_1
 
 			state[m_topBoxAngle] = ndReal(angle);
 			state[m_topBoxOmega] = ndReal(omega.m_z);
-			state[m_jointAngle] = m_legJoint->GetAngle() / ND_MAX_LEG_JOINT_ANGLE;
+			state[m_jointAngle] = ndReal(m_legJoint->GetAngle() / ND_MAX_LEG_JOINT_ANGLE);
 		}
 
 		void ApplyActions(ndReal* const actions) const

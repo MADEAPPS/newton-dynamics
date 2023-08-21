@@ -228,6 +228,7 @@ void ndBrain::InitGaussianBias(ndReal variance)
 
 void ndBrain::InitGaussianWeights(ndReal variance)
 {
+	ndAssert(0);
 	ndArray<ndBrainLayer*>& layers = *this;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
