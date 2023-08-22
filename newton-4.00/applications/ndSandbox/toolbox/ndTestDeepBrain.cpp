@@ -268,8 +268,8 @@ static void MnistTrainingSet()
 		SupervisedTrainer(ndBrain* const brain)
 			:ndBrainThreadPool()
 			,m_brain(*brain)
-			,m_learnRate(ndReal (0.1f))
-			,m_bashBufferSize(256)
+			,m_learnRate(ndReal(0.1f))
+			,m_bashBufferSize(128)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize/4);
 			//threadCount = 1;
@@ -330,6 +330,42 @@ static void MnistTrainingSet()
 				}
 			});
 
+			ndInt32 partialScore[D_MAX_THREADS_COUNT];
+			auto CrossValidate = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &partialScore](ndInt32 threadIndex, ndInt32 threadCount)
+			{
+				ndReal outputBuffer[32];
+				ndDeepBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
+
+				ndInt32 fails = 0;
+				const ndStartEnd startEnd(trainingDigits->GetCount(), threadIndex, threadCount);
+				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+				{
+					const ndBrainVector& truth = (*trainingLabels)[i];
+					const ndBrainVector& input = (*trainingDigits)[i];
+					m_brain.MakePrediction(input, output);
+
+					ndInt32 index = 0;
+					ndFloat32 maxProbability = 0.0f;
+					for (ndInt32 j = 0; j < output.GetCount(); j++)
+					{
+						if (output[j] > maxProbability)
+						{
+							index = j;
+							maxProbability = output[j];
+						}
+					}
+
+					if (truth[index] < 0.5f)
+					{
+						fails++;
+					}
+				}
+
+				partialScore[threadIndex] = fails;
+			});
+
+			ndInt32 minFail = trainingDigits->GetCount();
+			ndBrain bestBrain(m_brain);
 			for (ndInt32 i = 0; i < 10000000; ++i)
 			{
 				for (ndInt32 j = 0; j < m_bashBufferSize; ++j)
@@ -339,7 +375,28 @@ static void MnistTrainingSet()
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 				ndBrainThreadPool::ParallelExecute(AccumulateBashWeights);
 				m_optimizers[0]->UpdateWeights(m_learnRate, m_bashBufferSize);
+
+				if (i % 10000 == 0)
+				{
+					ndBrainThreadPool::ParallelExecute(CrossValidate);
+					ndInt32 failCount = 0;
+					for (ndInt32 j = 0; j < GetThreadCount(); ++j)
+					{
+						failCount += partialScore[j];
+					}
+
+					//ndExpandTraceMessage("%f\n", (ndFloat32)(trainingDigits->GetCount() - failCount) * 100.0f / (ndFloat32)trainingDigits->GetCount());
+					if (failCount <= minFail)
+					{
+						minFail = failCount;
+						bestBrain.CopyFrom(m_brain);
+						ndExpandTraceMessage("%f", (ndFloat32)(trainingDigits->GetCount() - failCount) * 100.0f / (ndFloat32)trainingDigits->GetCount());
+						ndExpandTraceMessage("  failed count %d  steps %d", failCount, i);
+						ndExpandTraceMessage("\n");
+					}
+				}
 			}
+			m_brain.CopyFrom(bestBrain);
 		}
 
 		ndBrain& m_brain;

@@ -55,7 +55,8 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const ndS
 	,m_critic2(*(*critic))
 	,m_target2Critic(*(*critic))
 {
-	m_critic2.InitGaussianWeights(ndReal (0.25f));
+	//m_critic2.InitGaussianWeights(ndReal (0.25f));
+	m_critic2.InitWeightsXavierMethod();
 	m_target2Critic.CopyFrom(m_critic2);
 
 	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)

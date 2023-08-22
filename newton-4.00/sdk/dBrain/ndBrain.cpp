@@ -149,6 +149,7 @@ void ndBrain::EndAddLayer()
 
 	CalculateOffsets();
 	m_isReady = true;
+	InitWeightsXavierMethod();
 }
 
 void ndBrain::CalculateOffsets()
