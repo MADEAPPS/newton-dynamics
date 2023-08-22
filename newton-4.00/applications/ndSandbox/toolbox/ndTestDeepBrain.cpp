@@ -366,7 +366,7 @@ static void MnistTrainingSet()
 
 			ndInt32 minFail = trainingDigits->GetCount();
 			ndBrain bestBrain(m_brain);
-			for (ndInt32 i = 0; i < 10000000; ++i)
+			for (ndInt32 i = 0; i < 20000000; ++i)
 			{
 				for (ndInt32 j = 0; j < m_bashBufferSize; ++j)
 				{
