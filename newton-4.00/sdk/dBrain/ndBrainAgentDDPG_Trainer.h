@@ -77,6 +77,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void BackPropagateCritic(const ndUnsigned32* const bashIndex);
 
 	virtual void BackPropagate();
+	virtual void InitWeights(ndReal variance);
 	virtual void CalculateQvalue(const ndBrainVector& state, const ndBrainVector& actions);
 
 	ndBrain* GetActor() { return *m_actor; }
@@ -146,13 +147,24 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	}
 
 	SetBufferSize(D_DDPG_REPLAY_BUFFERSIZE);
-	m_targetActor.CopyFrom(*(*m_actor));
-	m_targetCritic.CopyFrom(*(*m_critic));
+	//m_targetActor.CopyFrom(*(*m_actor));
+	//m_targetCritic.CopyFrom(*(*m_critic));
+	InitWeights(ndReal(0.25f));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDDPG_Trainer<statesDim, actionDim>::~ndBrainAgentDDPG_Trainer()
 {
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::InitWeights(ndReal variance)
+{
+	m_actor->InitWeightsXavierMethod(variance);
+	m_critic->InitWeightsXavierMethod(variance);
+
+	m_targetActor.CopyFrom(*(*m_actor));
+	m_targetCritic.CopyFrom(*(*m_critic));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

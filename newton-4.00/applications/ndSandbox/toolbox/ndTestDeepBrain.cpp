@@ -29,7 +29,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	brain.EndAddLayer();
 	//brain.InitGaussianBias(ndReal(0.125f));
 	//brain.InitGaussianWeights(ndReal(0.125f));
-	brain.InitWeightsXavierMethod();
+	brain.InitWeightsXavierMethod(ndReal(0.25f));
 	
 	ndInt32 samples = 2000;
 	ndBrainMatrix inputBatch(samples, 2);
@@ -424,7 +424,7 @@ static void MnistTrainingSet()
 		brain.EndAddLayer();
 	 	//brain.InitGaussianBias(ndReal(0.125f));
 		//brain.InitGaussianWeights(ndReal(0.125f));
-		brain.InitWeightsXavierMethod();
+		brain.InitWeightsXavierMethod(ndReal(0.25f));
 	
 		SupervisedTrainer optimizer(&brain);
 		ndUnsigned64 time = ndGetTimeInMicroseconds();

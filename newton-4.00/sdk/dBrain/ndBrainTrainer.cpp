@@ -313,7 +313,7 @@ void ndBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 		bias.ScaleAdd(bias, -regularizer);
 		bias.ScaleAdd(biasGradients, -learnRate);
 		bias.Clamp(-clampValue, clampValue);
-		bias.DropOut();
+		//bias.DropOut();
 	
 		const ndInt32 weightGradientStride = (inputSize + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 		ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[i]];
@@ -326,7 +326,7 @@ void ndBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 			weightVector.ScaleAdd(weightVector, -regularizer);
 			weightVector.ScaleAdd(weightGradients, -learnRate);
 			weightVector.Clamp(-clampValue, clampValue);
-			weightVector.DropOut();
+			//weightVector.DropOut();
 			weightGradientPtr += weightGradientStride;
 		}
 	}

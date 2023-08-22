@@ -24,7 +24,7 @@
 #include "ndBrainLayer.h"
 #include "ndBrainSaveLoad.h"
 
-#define RELUE_GAIN ndReal(0.01f)
+#define RELUE_SATURATION ndReal(100.0f)
 
 ndBrainLayer::ndBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndBrainActivationType activation)
 	:ndBrainMatrix()
@@ -146,11 +146,12 @@ void ndBrainLayer::InitGaussianWeights(ndReal variance)
 	}
 }
 
-void ndBrainLayer::InitWeightsXavierMethod()
+void ndBrainLayer::InitWeightsXavierMethod(ndFloat32 variance)
 {
-	ndFloat32 den = ndFloat32 (GetInputSize() + GetOuputSize());
-	ndFloat32 variance = ndSqrt (ndFloat32(2.0f) / den);
-	InitGaussianBias(variance);
+	//variance = ndReal(ndSqrt (ndFloat32(2.0f) / ndFloat32(GetInputSize() + GetOuputSize())));
+	//InitGaussianBias(variance);
+
+	InitGaussianBias(ndReal(0.0f));
 	InitGaussianWeights(variance);
 }
 
@@ -172,7 +173,6 @@ void ndBrainLayer::SigmoidActivation(ndBrainVector& output) const
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal value = ndClamp (output[i], ndReal(-50.0f), ndReal(50.0f));
-		//const ndReal exp = ndReal(ndPow(ndEXP, value));
 		ndReal exp = ndReal(ndExp(value));
 		output[i] = exp / (exp + ndReal(1.0f));
 		ndAssert (ndCheckFloat(output[i]));
@@ -186,7 +186,6 @@ void ndBrainLayer::HyperbolicTanActivation(ndBrainVector& output) const
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal value = ndClamp(output[i], ndReal(-25.0f), ndReal(25.0f));
-		//const ndReal exp = ndReal(ndPow(ndEXP, ndReal(2.0f) * value));
 		ndReal exp = ndReal(ndExp(ndReal(2.0f) * value));
 		output[i] = (exp - ndReal(1.0f)) / (exp + ndReal(1.0f));
 		ndAssert(ndCheckFloat(output[i]));
@@ -200,7 +199,6 @@ void ndBrainLayer::SoftmaxActivation(ndBrainVector& output) const
 	ndReal acc = 0.0f;
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
-		//const ndReal exp = ndReal(ndPow(ndEXP, output[i]));
 		ndReal exp = ndReal(ndExp(output[i]));
 		output[i] = exp;
 		ndAssert(ndCheckFloat(output[i]));
@@ -232,7 +230,7 @@ void ndBrainLayer::ReluActivationDerivative(const ndBrainVector& input, ndBrainV
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal val = input[i];
-		derivativeOutput[i] = (val > ndReal(0.0f)) ? ndReal(1.0f) : ndReal(0.0f);
+		derivativeOutput[i] = (val >= ndReal(0.0f)) ? ndReal(1.0f) : ndReal(0.0f);
 	}
 }
 

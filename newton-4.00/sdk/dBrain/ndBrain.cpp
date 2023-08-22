@@ -149,7 +149,6 @@ void ndBrain::EndAddLayer()
 
 	CalculateOffsets();
 	m_isReady = true;
-	InitWeightsXavierMethod();
 }
 
 void ndBrain::CalculateOffsets()
@@ -237,12 +236,12 @@ void ndBrain::InitGaussianWeights(ndReal variance)
 	}
 }
 
-void ndBrain::InitWeightsXavierMethod()
+void ndBrain::InitWeightsXavierMethod(ndReal variance)
 {
 	ndArray<ndBrainLayer*>& layers = *this;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
-		layers[i]->InitWeightsXavierMethod();
+		layers[i]->InitWeightsXavierMethod(variance);
 	}
 }
 

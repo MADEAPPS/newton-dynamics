@@ -577,8 +577,6 @@ namespace ndController_0
 			actor->AddLayer(layer2);
 			actor->AddLayer(ouputLayer);
 			actor->EndAddLayer();
-			//actor->InitGaussianWeights(ndReal(0.25f));
-			actor->InitWeightsXavierMethod();
 			
 			// the critic is more complex since is deal with more complex inputs
 			ndSharedPtr<ndBrain> critic(new ndBrain());
@@ -592,11 +590,10 @@ namespace ndController_0
 			critic->AddLayer(criticLayer2);
 			critic->AddLayer(criticOuputLayer);
 			critic->EndAddLayer();
-			//critic->InitGaussianWeights(ndReal(0.25f));
-			actor->InitWeightsXavierMethod();
 
 			// add a reinforcement learning controller 
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(actor, critic));
+			agent->InitWeights(ndReal(0.25f));
 		#endif
 
 		char fileName[1024];

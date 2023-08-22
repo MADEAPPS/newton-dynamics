@@ -39,6 +39,8 @@ class ndBrainAgent: public ndClassAlloc
 	void SetName(const ndString& name);
 	void SaveToFile(const char* const filename) const;
 
+	virtual void InitWeights(ndReal variance) = 0;
+
 	protected:
 	virtual void ResetModel() const = 0;
 	virtual bool IsTerminal() const = 0;
