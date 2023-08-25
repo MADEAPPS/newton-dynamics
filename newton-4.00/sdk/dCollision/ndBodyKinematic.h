@@ -238,7 +238,6 @@ class ndBodyKinematic : public ndBody
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateSycl;
 	friend class ndDynamicsUpdateCuda;
-
 	friend class ndJointBilateralConstraint;
 } D_GCC_NEWTON_ALIGN_32;
 
