@@ -146,13 +146,13 @@ void ndBrainLayer::InitGaussianWeights(ndReal variance)
 	}
 }
 
-void ndBrainLayer::InitWeightsXavierMethod(ndFloat32 variance)
+void ndBrainLayer::InitWeightsXavierMethod(ndReal weighVariance, ndReal biasVariance)
 {
 	//variance = ndReal(ndSqrt (ndFloat32(2.0f) / ndFloat32(GetInputSize() + GetOuputSize())));
 	//InitGaussianBias(variance);
 
-	InitGaussianBias(ndReal(0.0f));
-	InitGaussianWeights(variance);
+	InitGaussianBias(biasVariance);
+	InitGaussianWeights(weighVariance);
 }
 
 void ndBrainLayer::LinealActivation(ndBrainVector&) const

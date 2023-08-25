@@ -450,11 +450,12 @@ void ndVehicleUI::RenderUI()
 		return;
 	}
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	ndFloat32 gageSize = 200.0f;
-	ndFloat32 y = (ndFloat32)m_scene->GetHeight() - (gageSize / 2.0f + 20.0f);
+	ndAssert(0);
+	//ndFloat32 gageSize = 200.0f;
+	//ndFloat32 y = (ndFloat32)m_scene->GetHeight() - (gageSize / 2.0f + 20.0f);
 	
 	// draw the tachometer
-	ndFloat32 x = gageSize / 2 + 20.0f;
+	//ndFloat32 x = gageSize / 2 + 20.0f;
 	ndFloat32 maxRpm = m_vehicle->m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm;
 	maxRpm += 500.0f;
 

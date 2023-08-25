@@ -473,7 +473,7 @@ void ndVehicleCommon::PostUpdate(ndWorld* const world, ndFloat32 timestep)
 #endif
 }
 
-void ndVehicleCommon::ApplyInputs(ndWorld* const world, ndFloat32)
+void ndVehicleCommon::ApplyInputs(ndWorld* const, ndFloat32)
 {
 	ndAssert(0);
 

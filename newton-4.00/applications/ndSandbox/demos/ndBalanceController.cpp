@@ -37,7 +37,7 @@
 
 namespace ndController_1
 {
-	#define USE_TD3
+	//#define USE_TD3
 	#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		ndFloat32 (10.0f)
@@ -147,7 +147,7 @@ namespace ndController_1
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(2500)
-				,m_stopTraining(1500000)
+				,m_stopTraining(2000000)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
@@ -160,6 +160,7 @@ namespace ndController_1
 					fprintf(m_outFile, "ddpg\n");
 				#endif
 				m_timer = ndGetTimeInMicroseconds();
+				InitWeights(ndReal(0.25f), ndReal(0.0f));
 			}
 
 			~ndControllerAgent_trainer()
@@ -449,7 +450,7 @@ namespace ndController_1
 		legPivot.m_posit.m_y += limbLength * 0.5f;
 		ndSharedPtr<ndJointBilateralConstraint> legJoint(new ndJointHinge(legPivot, legBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
 		ndJointHinge* const hinge = (ndJointHinge*)*legJoint;
-		hinge->SetAsSpringDamper(0.001f, 1500, 40.0f);
+		hinge->SetAsSpringDamper(0.02f, 1500, 40.0f);
 		model->m_legJoint = hinge;
 
 		// make wheel
@@ -460,7 +461,7 @@ namespace ndController_1
 		wheelBody->SetMatrix(wheelMatrix);
 		ndSharedPtr<ndJointBilateralConstraint> wheelJoint(new ndJointHinge(wheelMatrix, wheelBody->GetAsBodyKinematic(), legBody->GetAsBodyKinematic()));
 		ndJointHinge* const wheelMotor = (ndJointHinge*)*wheelJoint;
-		wheelMotor->SetAsSpringDamper(0.001f, 0.0f, 0.2f);
+		wheelMotor->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
 		model->m_wheelJoint = wheelMotor;
 
 		// tele port the model so that is on the floor
@@ -505,10 +506,12 @@ namespace ndController_1
 		// build neural net controller
 		#ifdef ND_TRAIN_MODEL
 			ndInt32 layerSize = 64;
+			ndBrainActivationType activation = m_tanh;
+
 			ndSharedPtr<ndBrain> actor(new ndBrain());
-			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
-			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
-			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, activation);
+			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, activation);
+			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, activation);
 			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_tanh);
 			actor->BeginAddLayer();
 			actor->AddLayer(layer0);
@@ -519,9 +522,9 @@ namespace ndController_1
 
 			// the critic is more complex since is deal with more complex inputs
 			ndSharedPtr<ndBrain> critic(new ndBrain());
-			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + m_actionsSize, layerSize * 2, m_tanh);
-			ndBrainLayer* const criticLayer1 = new ndBrainLayer(criticLayer0->GetOuputSize(), layerSize * 2, m_tanh);
-			ndBrainLayer* const criticLayer2 = new ndBrainLayer(criticLayer1->GetOuputSize(), layerSize * 2, m_tanh);
+			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + m_actionsSize, layerSize * 2, activation);
+			ndBrainLayer* const criticLayer1 = new ndBrainLayer(criticLayer0->GetOuputSize(), layerSize * 2, activation);
+			ndBrainLayer* const criticLayer2 = new ndBrainLayer(criticLayer1->GetOuputSize(), layerSize * 2, activation);
 			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(criticLayer2->GetOuputSize(), 1, m_lineal);
 			critic->BeginAddLayer();
 			critic->AddLayer(criticLayer0);
@@ -533,8 +536,6 @@ namespace ndController_1
 			// add a reinforcement learning controller 
 			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(actor, critic));
 			agent->SetName("unicycle.nn");
-			agent->InitWeights(ndReal (0.25f));
-
 			scene->SetAcceleratedUpdate();
 		#else
 			char fileName[1024];
@@ -575,7 +576,7 @@ void ndBalanceController(ndDemoEntityManager* const scene)
 	
 	matrix.m_posit.m_x -= 0.0f;
 	matrix.m_posit.m_y += 0.5f;
-	matrix.m_posit.m_z += 2.0f;
+	matrix.m_posit.m_z += 3.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }

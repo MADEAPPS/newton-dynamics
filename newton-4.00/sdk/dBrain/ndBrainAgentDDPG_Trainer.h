@@ -33,8 +33,11 @@
 // trainer as described in: https://arxiv.org/pdf/1509.02971.pdf
 
 // default hyper parameters defaults
-#define D_DDPG_CRITIC_LEARN_RATE		ndReal(5.0e-3f)
-#define D_DDPG_ACTOR_LEARN_RATE			(D_DDPG_CRITIC_LEARN_RATE * ndReal(0.125f))
+#define D_DDPG_CRITIC_LEARN_RATE	ndReal(5.0e-3f)
+#define D_DDPG_ACTOR_LEARN_RATE		(D_DDPG_CRITIC_LEARN_RATE * ndReal(0.125f))
+//#define D_DDPG_CRITIC_LEARN_RATE	ndReal(0.005f)
+//#define D_DDPG_ACTOR_LEARN_RATE	ndReal(0.0005f)
+
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
 //#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
@@ -77,7 +80,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void BackPropagateCritic(const ndUnsigned32* const bashIndex);
 
 	virtual void BackPropagate();
-	virtual void InitWeights(ndReal variance);
+	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
 	virtual void CalculateQvalue(const ndBrainVector& state, const ndBrainVector& actions);
 
 	ndBrain* GetActor() { return *m_actor; }
@@ -147,9 +150,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	}
 
 	SetBufferSize(D_DDPG_REPLAY_BUFFERSIZE);
-	//m_targetActor.CopyFrom(*(*m_actor));
-	//m_targetCritic.CopyFrom(*(*m_critic));
-	InitWeights(ndReal(0.25f));
+	InitWeights(ndReal(0.25f), ndReal(0.125f));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -158,10 +159,10 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::~ndBrainAgentDDPG_Trainer()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::InitWeights(ndReal variance)
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::InitWeights(ndReal weighVariance, ndReal biasVariance)
 {
-	m_actor->InitWeightsXavierMethod(variance);
-	m_critic->InitWeightsXavierMethod(variance);
+	m_actor->InitWeightsXavierMethod(weighVariance, biasVariance);
+	m_critic->InitWeightsXavierMethod(weighVariance, biasVariance);
 
 	m_targetActor.CopyFrom(*(*m_actor));
 	m_targetCritic.CopyFrom(*(*m_critic));
@@ -339,6 +340,8 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 	ndBrainThreadPool::ParallelExecute(PropagateBash);
 	ndBrainThreadPool::ParallelExecute(AccumulateWeight);
 	m_criticOptimizer[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
+	//m_criticOptimizer[0]->ClampWeights(ndReal(100.0f));
+	//m_criticOptimizer[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -421,6 +424,8 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 	ParallelExecute(PropagateBash);
 	ParallelExecute(AccumulateWeight);
 	m_actorOptimizer[0]->UpdateWeights(-m_actorLearnRate, m_bashBufferSize);
+	//m_actorOptimizer[0]->ClampWeights(ndReal(100.0f));
+	//m_actorOptimizer[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

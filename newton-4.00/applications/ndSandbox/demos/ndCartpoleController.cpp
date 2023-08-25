@@ -90,6 +90,8 @@ namespace ndController_0
 					,m_averageFramesPerEpisodes()
 				{
 					m_outFile = fopen("traingPerf.csv", "wb");
+					//InitWeights(ndReal(0.25f), ndReal(0.125f));
+					InitWeights(ndReal(0.25f), ndReal(0.0f));
 				}
 
 				~ndCartpoleAgent_trainer()
@@ -253,6 +255,8 @@ namespace ndController_0
 					m_outFile = fopen("traingPerf-DDPG.csv", "wb");
 					fprintf(m_outFile, "ddpg\n");
 					#endif
+
+					InitWeights(ndReal(0.25f), ndReal(0.0f));
 				}
 
 				~ndCartpoleAgent_trainer()
@@ -559,9 +563,6 @@ namespace ndController_0
 			actor->AddLayer(layer2);
 			actor->AddLayer(ouputLayer);
 			actor->EndAddLayer();
-			//actor->InitGaussianWeights(ndReal(0.25f));
-			actor->InitWeightsXavierMethod();
-
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(actor));
 
 		#else
@@ -593,7 +594,6 @@ namespace ndController_0
 
 			// add a reinforcement learning controller 
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(actor, critic));
-			agent->InitWeights(ndReal(0.25f));
 		#endif
 
 		char fileName[1024];

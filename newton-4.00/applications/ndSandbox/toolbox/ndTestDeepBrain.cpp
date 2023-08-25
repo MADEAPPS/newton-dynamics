@@ -29,7 +29,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	brain.EndAddLayer();
 	//brain.InitGaussianBias(ndReal(0.125f));
 	//brain.InitGaussianWeights(ndReal(0.125f));
-	brain.InitWeightsXavierMethod(ndReal(0.25f));
+	brain.InitWeightsXavierMethod(ndReal(0.25f), ndReal(0.125f));
 	
 	ndInt32 samples = 2000;
 	ndBrainMatrix inputBatch(samples, 2);
@@ -90,6 +90,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		threads.ParallelExecute(UpdateTrainer);
 		threads.ParallelExecute(AccumulateWeight);
 		trainers[0]->UpdateWeights(ndReal(1.0e-2f), bashSize);
+		trainers[0]->ClampWeights(ndReal(100.0f));
+		trainers[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
 	}
 	
 	ndBrainVector truth;
@@ -375,6 +377,9 @@ static void MnistTrainingSet()
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 				ndBrainThreadPool::ParallelExecute(AccumulateBashWeights);
 				m_optimizers[0]->UpdateWeights(m_learnRate, m_bashBufferSize);
+				ndAssert(0);
+				m_optimizers[0]->ClampWeights(ndReal(100.0f));
+				m_optimizers[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
 
 				if (i % 10000 == 0)
 				{
@@ -424,7 +429,7 @@ static void MnistTrainingSet()
 		brain.EndAddLayer();
 	 	//brain.InitGaussianBias(ndReal(0.125f));
 		//brain.InitGaussianWeights(ndReal(0.125f));
-		brain.InitWeightsXavierMethod(ndReal(0.25f));
+		brain.InitWeightsXavierMethod(ndReal(0.25f), ndReal(0.125f));
 	
 		SupervisedTrainer optimizer(&brain);
 		ndUnsigned64 time = ndGetTimeInMicroseconds();

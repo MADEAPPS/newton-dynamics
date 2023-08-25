@@ -44,6 +44,7 @@ class ndBrainAgentDQN: public ndBrainAgent
 	ndReal GetCurrentValue() const;
 	ndInt32 GetEpisodeFrames() const;
 	void Save(ndBrainSave* const loadSave) const;
+	void InitWeights(ndReal weighVariance, ndReal biasVariance);
 	ndInt32 SelectBestAction(const ndBrainVector& actions) const;
 
 	ndSharedPtr<ndBrain> m_actor;
@@ -54,6 +55,12 @@ ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN(const ndSharedPtr<ndBrain
 	:ndBrainAgent()
 	,m_actor(actor)
 {
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN<statesDim, actionDim>::InitWeights(ndReal, ndReal)
+{
+	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
