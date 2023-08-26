@@ -201,6 +201,7 @@ class ndList: public ndClassAlloc
 	// ***********************************************************
 	public:
 	ndList ();
+	ndList(const ndList& src);
 	~ndList ();
 
 	operator ndInt32() const;
@@ -252,6 +253,22 @@ ndList<T,allocator>::ndList ()
 	,m_last(nullptr)
 	,m_count(0)
 {
+}
+
+template<class T, class allocator>
+ndList<T, allocator>::ndList(const ndList& src)
+	:ndClassAlloc()
+	,m_first(src.m_first)
+	,m_last(src.m_last)
+	,m_count(src.m_count)
+{
+	//steal the members.
+	//yes I know this is wrong, I have to add the move semantic, 
+	//but since my code predate move semantic, I will do my own steal
+	//this will work as long as src is empty
+	ndAssert(src.m_count == 0);
+	ndAssert(src.m_first == nullptr);
+	ndAssert(src.m_last == nullptr);
 }
 
 template<class T, class allocator>

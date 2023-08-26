@@ -61,10 +61,6 @@ ndBrainVector::ndBrainVector()
 {
 }
 
-ndBrainVector::~ndBrainVector()
-{
-}
-
 void ndBrainVector::InitGaussianWeights(ndReal variance)
 {
 	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)

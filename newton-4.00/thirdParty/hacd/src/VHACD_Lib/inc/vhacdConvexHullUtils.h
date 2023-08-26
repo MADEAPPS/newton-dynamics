@@ -742,11 +742,26 @@ namespace nd_
 				Z() = rhs.Z();
 				return *this;
 			}
+
+			inline hullVector& operator= (const hullVector& rhs)
+			{
+				X() = rhs.X();
+				Y() = rhs.Y();
+				Z() = rhs.Z();
+				return *this;
+			}
+
 		};
 
 		class hullPlane : public hullVector
 		{
 			public:
+			hullPlane(const hullPlane& src)
+				:hullVector(src)
+				,m_w(src.m_w)
+			{
+			}
+
 			hullPlane(double x, double y, double z, double w)
 				:hullVector(x, y, z, 0.0)
 				, m_w(w)
@@ -945,6 +960,10 @@ namespace nd_
 		{
 			public:
 			Job()
+			{
+			}
+
+			Job(const Job&)
 			{
 			}
 

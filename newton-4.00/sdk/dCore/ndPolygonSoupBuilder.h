@@ -46,10 +46,10 @@ class ndAdjacentFace
 
 class ndPolygonSoupBuilder: public ndClassAlloc 
 {
-	class dgFaceMap;
-	class dgFaceInfo;
-	class dgFaceBucket;
-	class dgPolySoupFilterAllocator;
+	class ndFaceMap;
+	class ndFaceInfo;
+	class ndFaceBucket;
+	class ndPolySoupFilterAllocator;
 
 	public:
 	D_CORE_API ndPolygonSoupBuilder ();
@@ -65,7 +65,7 @@ class ndPolygonSoupBuilder: public ndClassAlloc
 	D_CORE_API void SavePLY(const char* const fileName) const;
 
 	private:
-	void Optimize(ndInt32 faceId, const dgFaceBucket& faceBucket, const ndPolygonSoupBuilder& source);
+	void Optimize(ndInt32 faceId, const ndFaceBucket& faceBucket, const ndPolygonSoupBuilder& source);
 
 	void Finalize();
 	void OptimizeByIndividualFaces();

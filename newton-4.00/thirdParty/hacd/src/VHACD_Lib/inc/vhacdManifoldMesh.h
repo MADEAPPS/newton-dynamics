@@ -36,7 +36,6 @@ namespace nd_
 			public:
 			void Initialize();
 			TMMVertex(void);
-			~TMMVertex(void);
 
 			private:
 			Vec3<double> m_pos;
@@ -45,7 +44,7 @@ namespace nd_
 			CircularListElement<TMMEdge>* m_duplicate; // pointer to incident cone edge (or NULL)
 			bool m_onHull;
 			bool m_tag;
-			TMMVertex(const TMMVertex& rhs);
+			
 			friend class ICHull;
 			friend class TMMesh;
 			friend class TMMTriangle;
@@ -57,14 +56,13 @@ namespace nd_
 			public:
 			void Initialize();
 			TMMEdge(void);
-			~TMMEdge(void);
 
 			private:
 			size_t m_id;
 			CircularListElement<TMMTriangle>* m_triangles[2];
 			CircularListElement<TMMVertex>* m_vertices[2];
 			CircularListElement<TMMTriangle>* m_newFace;
-			TMMEdge(const TMMEdge& rhs);
+
 			friend class ICHull;
 			friend class TMMTriangle;
 			friend class TMMVertex;
@@ -76,7 +74,6 @@ namespace nd_
 			public:
 			void Initialize();
 			TMMTriangle(void);
-			~TMMTriangle(void);
 
 			private:
 			size_t m_id;
@@ -84,7 +81,6 @@ namespace nd_
 			CircularListElement<TMMVertex>* m_vertices[3];
 			bool m_visible;
 
-			TMMTriangle(const TMMTriangle& rhs);
 			friend class ICHull;
 			friend class TMMesh;
 			friend class TMMVertex;

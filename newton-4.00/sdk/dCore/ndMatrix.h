@@ -53,8 +53,6 @@ class ndMatrix
 	// please use function ndCalculateMatrix()
 	//D_CORE_API ndMatrix (const ndQuaternion &rotation, const ndVector &position);
 
-	~ndMatrix();
-
 	// create a orthonormal normal vector basis, front become m_front vector, and m_up and m_right are mutualiperpendicular to fron and to each other
 	// please use function ndGramSchmidtMatrix
 	//ndMatrix (const ndVector &front);
@@ -127,10 +125,6 @@ inline ndMatrix::ndMatrix (const ndFloat32* const array)
 
 inline ndMatrix::ndMatrix (const ndVector &front, const ndVector &up, const ndVector &right, const ndVector &posit)
 	:m_front (front), m_up(up), m_right(right), m_posit(posit)
-{
-}
-
-inline ndMatrix::~ndMatrix() 
 {
 }
 

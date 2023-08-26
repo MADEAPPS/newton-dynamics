@@ -1222,6 +1222,17 @@ struct GeometryImpl : Geometry
 
 	struct NewVertex
 	{
+		NewVertex()
+			:index(-1)
+			,next(nullptr)
+		{
+		}
+
+		NewVertex(const NewVertex&)
+		{
+			assert(0);
+		}
+
 		~NewVertex() { delete next; }
 
 		int index = -1;

@@ -122,5 +122,6 @@ void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, ndFlo
 
 void ndArchimedesBuoyancyVolume::OnTriggerExit(ndBodyKinematic* const body, ndFloat32)
 {
-	ndTrace(("exit trigger body: %d\n", body->GetId()));
+	//ndTrace(("exit trigger body: %d\n", body->GetId()));
+	ndExpandTraceMessage("exit trigger body: %d\n", body->GetId());
 }

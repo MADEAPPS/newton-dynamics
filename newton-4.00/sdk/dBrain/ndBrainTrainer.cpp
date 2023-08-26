@@ -335,7 +335,7 @@ void ndBrainTrainer::ClampWeights(ndReal clampValue)
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 		ndBrainLayer* const layer = layers[i];
-		const ndInt32 inputSize = layer->GetInputSize();
+		//const ndInt32 inputSize = layer->GetInputSize();
 		const ndInt32 outputSize = layer->GetOuputSize();
 
 		ndBrainVector& bias = layer->GetBias();
@@ -356,7 +356,7 @@ void ndBrainTrainer::DropOutWeights(ndReal weighsDropOut, ndReal biasDropOut)
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 		ndBrainLayer* const layer = layers[i];
-		const ndInt32 inputSize = layer->GetInputSize();
+		//const ndInt32 inputSize = layer->GetInputSize();
 		const ndInt32 outputSize = layer->GetOuputSize();
 
 		ndBrainVector& bias = layer->GetBias();

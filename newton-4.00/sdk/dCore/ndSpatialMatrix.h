@@ -45,9 +45,9 @@ class ndSpatialMatrix
 		}
 	}
 
-	inline ~ndSpatialMatrix()
-	{
-	}
+	//inline ~ndSpatialMatrix()
+	//{
+	//}
 	
 	inline ndSpatialVector& operator[] (ndInt32 i)
 	{

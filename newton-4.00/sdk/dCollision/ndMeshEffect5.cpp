@@ -1113,7 +1113,7 @@ return 0;
 				m_attrib.m_pointChannel.PushBack(edge->m_incidentVertex);
 				if (m_attrib.m_normalChannel.GetCount())
 				{
-					m_attrib.m_normalChannel.PushBack(ndNormal(normal.m_x, normal.m_y, normal.m_z));
+					m_attrib.m_normalChannel.PushBack(ndNormal(ndReal(normal.m_x), ndReal(normal.m_y), ndReal(normal.m_z)));
 				}
 
 				if (m_attrib.m_binormalChannel.GetCount())

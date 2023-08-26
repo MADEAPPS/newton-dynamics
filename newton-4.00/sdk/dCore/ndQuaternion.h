@@ -33,7 +33,7 @@ class ndQuaternion: public ndVector
 	public:
 	ndQuaternion(); 
 	ndQuaternion(const ndVector& quat);
-	ndQuaternion(const ndQuaternion& quat);
+	//ndQuaternion(const ndQuaternion& quat);
 	D_CORE_API ndQuaternion (const ndMatrix& matrix);
 	ndQuaternion (ndFloat32 q0, ndFloat32 q1, ndFloat32 q2, ndFloat32 q3);
 	D_CORE_API ndQuaternion (const ndVector &unit_Axis, ndFloat32 angle);
@@ -63,10 +63,10 @@ inline ndQuaternion::ndQuaternion(const ndVector& quat)
 {
 }
 
-inline ndQuaternion::ndQuaternion(const ndQuaternion& quat)
-	:ndVector(quat)
-{
-}
+//inline ndQuaternion::ndQuaternion(const ndQuaternion& quat)
+//	:ndVector(quat)
+//{
+//}
 
 inline ndQuaternion::ndQuaternion(ndFloat32 q0, ndFloat32 q1, ndFloat32 q2, ndFloat32 q3)
 	:ndVector(q0, q1, q2, q3)

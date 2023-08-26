@@ -34,11 +34,6 @@ class ndClassAlloc
 	{
 	}
 
-	/// Empty
-	inline ~ndClassAlloc()
-	{
-	}
-
 	D_OPERATOR_NEW_AND_DELETE
 
 	/// Generic allocation for any function subclass from ndClassAlloc

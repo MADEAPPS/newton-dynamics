@@ -69,6 +69,13 @@ class ndSpatialVector
 		return ((ndFloat64*)&m_f)[i];
 	}
 
+	inline ndSpatialVector& operator= (const ndSpatialVector& A)
+	{
+		m_data.m_low = A.m_data.m_low;
+		m_data.m_high = A.m_data.m_high;
+		return *this;
+	}
+
 	inline ndSpatialVector operator+ (const ndSpatialVector& A) const
 	{
 		return ndSpatialVector(m_data.m_low + A.m_data.m_low, m_data.m_high + A.m_data.m_high);

@@ -198,6 +198,12 @@ class ndVector
 		return _mm_mul_ps (m_type, _mm_set_ps1(s));
 	}
 
+	inline ndVector& operator= (const ndVector& A)
+	{
+		m_type = A.m_type;
+		return *this;
+	}
+
 	inline ndFloat32& operator[] (ndInt32 i)
 	{
 		ndAssert (i < 4);
@@ -693,6 +699,13 @@ class ndBigVector
 		ndAssert(i < 4);
 		ndAssert(i >= 0);
 		return m_f[i];
+	}
+
+	inline ndBigVector& operator= (const ndBigVector& A)
+	{
+		m_typeLow = A.m_typeLow;
+		m_typeHigh = A.m_typeHigh;
+		return *this;
 	}
 
 	inline ndBigVector operator+ (const ndBigVector& A) const

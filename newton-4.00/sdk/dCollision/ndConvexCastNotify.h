@@ -34,7 +34,8 @@ class ndConvexCastNotify : public ndClassAlloc
 {
 	public: 
 	ndConvexCastNotify()
-		:m_normal(ndVector::m_zero)
+		:ndClassAlloc()
+		,m_normal(ndVector::m_zero)
 		,m_closestPoint0(ndVector::m_zero)
 		,m_closestPoint1(ndVector::m_zero)
 		,m_contacts()
@@ -42,6 +43,18 @@ class ndConvexCastNotify : public ndClassAlloc
 		,m_cachedScene(nullptr)
 	{
 	}
+
+	ndConvexCastNotify(const ndConvexCastNotify& src)
+		:ndClassAlloc(src)
+		,m_normal(src.m_normal)
+		,m_closestPoint0(src.m_closestPoint0)
+		,m_closestPoint1(src.m_closestPoint1)
+		,m_contacts(src.m_contacts)
+		,m_param(src.m_param)
+		,m_cachedScene(src.m_cachedScene)
+	{
+	}
+
 
 	virtual ~ndConvexCastNotify()
 	{

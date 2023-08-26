@@ -56,10 +56,6 @@ class ndFbxMeshLoader::ndFbxAnimationTrack
 	{
 	}
 
-	~ndFbxAnimationTrack()
-	{
-	}
-
 	void SetDuration(ndFloat32 duration)
 	{
 		m_scale.m_lenght = ndReal(duration);

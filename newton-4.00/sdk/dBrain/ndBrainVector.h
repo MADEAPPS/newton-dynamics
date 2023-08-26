@@ -28,7 +28,6 @@ class ndBrainVector: public ndArray<ndReal>
 {
 	public: 
 	ndBrainVector();
-	~ndBrainVector();
 	
 	void InitGaussianWeights(ndReal variance);
 

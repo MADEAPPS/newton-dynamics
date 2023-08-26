@@ -30,8 +30,6 @@
 #define D_MAX_BODY_RADIX_BIT		9
 #define D_DEFAULT_BUFFER_SIZE		1024
 
-static int xxxx;
-
 ndDynamicsUpdate::ndDynamicsUpdate(ndWorld* const world)
 	:m_velocTol(ndFloat32(1.0e-8f))
 	,m_islands(D_DEFAULT_BUFFER_SIZE)
@@ -1436,7 +1434,6 @@ void ndDynamicsUpdate::Update()
 	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
 
-xxxx++;
 	BuildIsland();
 	IntegrateUnconstrainedBodies();
 	InitWeights();

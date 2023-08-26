@@ -45,7 +45,7 @@ class ndEdge
 	public:
 	ndEdge ();
 	ndEdge (ndInt32 vertex, ndInt32 face, ndUnsigned64 userdata = 0);
-	~ndEdge ();
+	//~ndEdge ();
 
 	ndInt32 m_incidentVertex;
 	ndInt32 m_incidentFace;
@@ -216,9 +216,9 @@ inline ndEdge::ndEdge (ndInt32 vertex, ndInt32 face, ndUnsigned64 userdata)
 {
 }
 
-inline ndEdge::~ndEdge ()
-{
-}
+//inline ndEdge::~ndEdge ()
+//{
+//}
 
 inline void ndPolyhedra::BeginFace ()
 {

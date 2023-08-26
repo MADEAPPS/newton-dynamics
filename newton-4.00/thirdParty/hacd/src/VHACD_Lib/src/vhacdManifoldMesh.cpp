@@ -30,9 +30,6 @@ namespace nd_
 			m_tag = false;
 		}
 
-		TMMVertex::~TMMVertex(void)
-		{
-		}
 		TMMEdge::TMMEdge(void)
 		{
 			Initialize();
@@ -43,9 +40,7 @@ namespace nd_
 			m_triangles[0] = m_triangles[1] = m_newFace = 0;
 			m_vertices[0] = m_vertices[1] = 0;
 		}
-		TMMEdge::~TMMEdge(void)
-		{
-		}
+
 		void TMMTriangle::Initialize()
 		{
 			m_id = 0;
@@ -58,9 +53,6 @@ namespace nd_
 		TMMTriangle::TMMTriangle(void)
 		{
 			Initialize();
-		}
-		TMMTriangle::~TMMTriangle(void)
-		{
 		}
 		TMMesh::TMMesh()
 		{

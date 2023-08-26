@@ -315,6 +315,12 @@
 			return ptr[i];
 		}
 
+		inline ndAvxFloat& operator= (const ndAvxFloat& A)
+		{
+			m_type = A.m_type;
+			return *this;
+		}
+
 		inline ndAvxFloat operator+ (const ndAvxFloat& A) const
 		{
 			return _mm256_add_ps(m_type, A.m_type);

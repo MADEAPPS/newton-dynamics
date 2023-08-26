@@ -119,7 +119,8 @@ ndFloat32 ndMultiBodyVehicleMotor::CalculateAcceleration(ndConstraintDescritor& 
 	return accel;
 }
 
-void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
+//void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
+void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor&)
 {
 	ndAssert(0);
 	//ndMatrix matrix0;
