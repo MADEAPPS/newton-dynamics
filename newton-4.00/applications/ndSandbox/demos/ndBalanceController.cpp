@@ -37,7 +37,7 @@
 
 namespace ndController_1
 {
-	//#define USE_TD3
+	#define USE_TD3
 	#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		ndFloat32 (10.0f)
@@ -129,8 +129,8 @@ namespace ndController_1
 			ndModelUnicycle* m_model;
 		};
 
-		// the table based approach does is not really practical
-		// try implement DDPN controller using neural networks, 
+		// the table based approach is not really practical
+		// try implement DDPN controller using neural networks. 
 #ifdef USE_TD3
 		class ndControllerAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
 		{
@@ -146,8 +146,10 @@ namespace ndController_1
 #endif
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(2500)
+				,m_maxFrames(3000)
 				,m_stopTraining(2000000)
+				,m_timer(0)
+				,m_modelIsTrained(false)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
@@ -259,6 +261,7 @@ namespace ndController_1
 
 					if (stopTraining == m_stopTraining)
 					{
+						m_modelIsTrained = true;
 						ndExpandTraceMessage("\n");
 						ndExpandTraceMessage("training complete\n");
 						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
@@ -277,6 +280,7 @@ namespace ndController_1
 			ndInt32 m_maxFrames;
 			ndInt32 m_stopTraining;
 			ndUnsigned64 m_timer;
+			bool m_modelIsTrained;
 			mutable ndMovingAverage<128> m_averageQValue;
 			mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
 		};
@@ -392,10 +396,29 @@ namespace ndController_1
 			return false;
 		}
 
+		void CheckTrainingCompleted()
+		{
+			#ifdef ND_TRAIN_MODEL
+			if (m_agent->IsTrainer())
+			{
+				ndControllerAgent_trainer* const agent = (ndControllerAgent_trainer*)*m_agent;
+				if (agent->m_modelIsTrained)
+				{
+					char fileName[1024];
+					ndGetWorkingFileName("unicycle.nn", fileName);
+					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+					m_agent = ndSharedPtr<ndBrainAgent>(new ndModelUnicycle::ndControllerAgent(actor));
+					((ndModelUnicycle::ndControllerAgent*)*m_agent)->SetModel(this);
+					ResetModel();
+					((ndPhysicsWorld*)m_world)->NormalUpdates();
+				}
+			}
+			#endif
+		}
+
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
-			m_world = world;
 			m_timestep = timestep;
 			m_agent->Step();
 		}
@@ -404,12 +427,12 @@ namespace ndController_1
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
 			m_agent->OptimizeStep();
+			CheckTrainingCompleted();
 		}
 
 		ndSharedPtr<ndBrainAgent> m_agent;
 		ndFixSizeArray<ndBasePose, 8> m_basePose;
 		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
-		ndWorld* m_world;
 		ndJointHinge* m_legJoint;
 		ndJointHinge* m_wheelJoint;
 		ndFloat32 m_timestep;
@@ -551,7 +574,6 @@ namespace ndController_1
 		#else
 			((ndModelUnicycle::ndControllerAgent*)*agent)->SetModel(model);
 		#endif
-
 		return model;
 	}
 }

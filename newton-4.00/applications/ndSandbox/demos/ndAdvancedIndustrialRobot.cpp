@@ -365,7 +365,8 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	ndMeshLoader loader;
-	ndBodyKinematic* const floor = BuildFloorBox(scene, ndGetIdentityMatrix());
+	//ndBodyKinematic* const floor = BuildFloorBox(scene, ndGetIdentityMatrix());
+	BuildFloorBox(scene, ndGetIdentityMatrix());
 	ndSharedPtr<ndDemoEntity> robotEntity(loader.LoadEntity("robot.fbx", scene));
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);

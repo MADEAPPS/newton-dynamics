@@ -29,20 +29,19 @@
 #include "ndBrainReplayBuffer.h"
 
 // this is an implementation of the vanilla 
-// Continuous control with deep re enforcement learning (ddpg agent)
-// trainer as described in: https://arxiv.org/pdf/1509.02971.pdf
+// deep deterministic policy gradient (ddpg)
+// continuous control re enforcement learning algorithm 
+// as described in: https://arxiv.org/pdf/1509.02971.pdf
 
 // default hyper parameters defaults
-#define D_DDPG_CRITIC_LEARN_RATE	ndReal(5.0e-3f)
-#define D_DDPG_ACTOR_LEARN_RATE		(D_DDPG_CRITIC_LEARN_RATE * ndReal(0.125f))
-//#define D_DDPG_CRITIC_LEARN_RATE	ndReal(0.005f)
-//#define D_DDPG_ACTOR_LEARN_RATE	ndReal(0.0005f)
-
+#define D_DDPG_CRITIC_LEARN_RATE		ndReal(0.005f)
+#define D_DDPG_ACTOR_LEARN_RATE			ndReal(0.0005f)
+//#define D_DDPG_ACTOR_LEARN_RATE			ndReal(0.000625f)
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
 //#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
-//#define D_DDPG_REPLAY_BASH_SIZE		32
-#define D_DDPG_REPLAY_BASH_SIZE			64
+#define D_DDPG_REPLAY_BASH_SIZE			32
+//#define D_DDPG_REPLAY_BASH_SIZE		64
 #define D_DDPG_REGULARIZER				ndReal (2.0e-6f)
 #define D_DDPG_SOFT_TARGET_FACTOR		ndReal (1.0e-3f)
 #define D_DDPG_ACTION_NOISE_VARIANCE	ndReal (0.05f)
@@ -69,6 +68,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void Step();
 	void Optimize();
 	void OptimizeStep();
+	bool IsTrainer() const;
 	void Save(ndBrainSave* const loadSave) const;
 	bool IsSampling() const;
 	bool IsTerminal() const;
@@ -156,6 +156,12 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDDPG_Trainer<statesDim, actionDim>::~ndBrainAgentDDPG_Trainer()
 {
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+bool ndBrainAgentDDPG_Trainer<statesDim, actionDim>::IsTrainer() const
+{
+	return true;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -520,7 +526,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 
 	for (ndInt32 i = 0; i < statesDim; ++i)
 	{
-		//ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_state[i] = m_currentTransition.m_state[i];
 		state[i] = m_currentTransition.m_state[i];
 	}
 	m_actor->MakePrediction(state, actions);

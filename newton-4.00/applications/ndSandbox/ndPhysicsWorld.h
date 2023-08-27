@@ -93,6 +93,7 @@ class ndPhysicsWorld: public ndWorld
 	ndSoundManager* GetSoundManager() const;
 	void RemoveEntity(ndDemoEntity* const entity);
 
+	void NormalUpdates();
 	void AccelerateUpdates();
 
 	private:

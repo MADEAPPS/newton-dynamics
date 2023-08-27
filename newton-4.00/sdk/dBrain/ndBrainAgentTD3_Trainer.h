@@ -451,9 +451,6 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateActor(const ndU
 	m_actorOptimizer[0]->UpdateWeights(-m_actorLearnRate, m_bashBufferSize);
 	//m_actorOptimizer[0]->ClampWeights(ndReal(100.0f));
 	//m_actorOptimizer[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
-
-	ndAssert(0);
-	m_target2Critic.SoftCopy(m_critic2, m_softTargetFactor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -467,17 +464,21 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagate()
 	
 	ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(shuffleBuffer);
 
-	if ((ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_frameCount % 2) == 0)
+#ifdef USED_NEWTON_VARIANCE
+	ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateActor(shuffleBuffer);
+
+	m_target2Critic.SoftCopy(m_critic2, ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_softTargetFactor);
+	ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetTargetActor()->SoftCopy(*ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetActor(), ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_softTargetFactor);
+	ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetTargetCritic()->SoftCopy(*ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCritic(), ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_softTargetFactor);
+#else
+	if (ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_frameCount & 1)
 	{
-		#ifdef USED_NEWTON_VARIANCE
-			ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateActor(shuffleBuffer);
-		#else
-			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(shuffleBuffer);
-		#endif
-		ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetTargetActor()->SoftCopy(*ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetActor(), ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_softTargetFactor);
+		ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(shuffleBuffer);
 		m_target2Critic.SoftCopy(m_critic2, ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_softTargetFactor);
+		ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetTargetActor()->SoftCopy(*ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetActor(), ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_softTargetFactor);
 		ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetTargetCritic()->SoftCopy(*ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCritic(), ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_softTargetFactor);
 	}
+#endif
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

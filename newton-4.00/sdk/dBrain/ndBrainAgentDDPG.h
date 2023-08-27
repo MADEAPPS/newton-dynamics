@@ -37,6 +37,7 @@ class ndBrainAgentDDPG: public ndBrainAgent
 
 	protected:
 	void OptimizeStep();
+	bool IsTrainer() const;
 	void ResetModel() const;
 	bool IsTerminal() const;
 	ndReal GetReward() const;
@@ -53,6 +54,12 @@ ndBrainAgentDDPG<statesDim, actionDim>::ndBrainAgentDDPG(const ndSharedPtr<ndBra
 	:ndBrainAgent()
 	,m_actor(actor)
 {
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+bool ndBrainAgentDDPG<statesDim, actionDim>::IsTrainer() const
+{
+	return false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

@@ -38,11 +38,13 @@ class ndBrainAgentDQN: public ndBrainAgent
 
 	protected:
 	void OptimizeStep();
+	bool IsTrainer() const;
 	void ResetModel() const;
 	bool IsTerminal() const;
 	ndReal GetReward() const;
 	ndReal GetCurrentValue() const;
 	ndInt32 GetEpisodeFrames() const;
+	
 	void Save(ndBrainSave* const loadSave) const;
 	void InitWeights(ndReal weighVariance, ndReal biasVariance);
 	ndInt32 SelectBestAction(const ndBrainVector& actions) const;
@@ -55,6 +57,12 @@ ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN(const ndSharedPtr<ndBrain
 	:ndBrainAgent()
 	,m_actor(actor)
 {
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+bool ndBrainAgentDQN<statesDim, actionDim>::IsTrainer() const
+{
+	return false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

@@ -20,11 +20,11 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-//#define D_USE_POLE_DQN
-
 namespace ndController_0
 {
 	//#define USE_TD3
+	#define D_USE_POLE_DQN
+
 	#define D_PUSH_ACCEL			ndFloat32 (15.0f)
 	#define D_REWARD_MIN_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
 

@@ -59,7 +59,9 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	protected:
 	void Step();
 	void OptimizeStep();
+	bool IsTrainer() const;
 	void Save(ndBrainSave* const loadSave) const;
+	void InitWeights(ndReal weighVariance, ndReal biasVariance);
 
 	bool IsSampling() const;
 	bool IsTerminal() const;
@@ -70,7 +72,6 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void BackPropagate();
 	void PopulateReplayBuffer();
 	void SetBufferSize(ndInt32 size);
-	void InitWeights(ndReal weighVariance, ndReal biasVariance);
 
 	ndSharedPtr<ndBrain> m_actor;
 	ndBrain m_target;
@@ -132,6 +133,12 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDQN_Trainer<statesDim, actionDim>::~ndBrainAgentDQN_Trainer()
 {
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+bool ndBrainAgentDQN_Trainer<statesDim, actionDim>::IsTrainer() const
+{
+	return true;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

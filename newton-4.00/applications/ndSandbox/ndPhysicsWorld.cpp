@@ -144,6 +144,11 @@ void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 	}
 }
 
+void ndPhysicsWorld::NormalUpdates()
+{
+	m_acceleratedUpdate = false;
+}
+
 void ndPhysicsWorld::AccelerateUpdates()
 {
 	m_acceleratedUpdate = true;

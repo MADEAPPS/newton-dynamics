@@ -470,7 +470,7 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		camera->SetNextMatrix(camMatrix, camOrigin);
 	}
 
-	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
+	void ApplyInputs(ndWorld* const, ndFloat32)
 	{
 		ndAssert(0);
 		//ndVehicleCommon::ApplyInputs(world, timestep);

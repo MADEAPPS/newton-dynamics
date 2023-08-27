@@ -39,6 +39,7 @@ class ndBrainAgent: public ndClassAlloc
 	void SetName(const ndString& name);
 	void SaveToFile(const char* const filename) const;
 
+	virtual bool IsTrainer() const = 0;
 	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance) = 0;
 
 	protected:
