@@ -46,6 +46,8 @@ class ndBrainAgentDQN: public ndBrainAgent
 	ndInt32 GetEpisodeFrames() const;
 	
 	void Save(ndBrainSave* const loadSave) const;
+
+	void InitWeights();
 	void InitWeights(ndReal weighVariance, ndReal biasVariance);
 	ndInt32 SelectBestAction(const ndBrainVector& actions) const;
 
@@ -63,6 +65,12 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 bool ndBrainAgentDQN<statesDim, actionDim>::IsTrainer() const
 {
 	return false;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN<statesDim, actionDim>::InitWeights()
+{
+	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

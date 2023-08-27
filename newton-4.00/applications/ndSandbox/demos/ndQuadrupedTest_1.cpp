@@ -252,12 +252,11 @@ namespace ndQuadruped_1
 			{
 				//SetActionNoise(ndReal(0.15f));
 				SetActionNoise(ndReal(0.20f));
-				//SetLearnRate(ndReal(1.0e-3f));
-				InitWeights(ndReal(0.25f), ndReal(0.125f));
-
 				m_outFile = fopen("traingPerf-TD3.csv", "wb");
 				fprintf(m_outFile, "td3\n");
 				m_timer = ndGetTimeInMicroseconds();
+
+				InitWeights();
 			}
 
 			~ndControllerAgent_trainer()

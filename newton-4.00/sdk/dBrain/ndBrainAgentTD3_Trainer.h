@@ -25,11 +25,11 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainAgentDDPG_Trainer.h"
 
-// this is an implementation of more stable Policy gradoint
-// Continuous control with deep re enforcement learning (ddpg agent)
-// trainer as described in: https://arxiv.org/pdf/1802.09477.pdf
+// this is an implementation of more stable Policy gradient
+// continuous control with deep re enforcement learning (td3)
+// algorithm as described in: https://arxiv.org/pdf/1802.09477.pdf
 
-#define USED_NEWTON_VARIANCE
+#define USED_NEWTON_TD3_TWIST_VERSION
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentTD3_Trainer: public ndBrainAgentDDPG_Trainer<statesDim, actionDim>
@@ -38,8 +38,10 @@ class ndBrainAgentTD3_Trainer: public ndBrainAgentDDPG_Trainer<statesDim, action
 	ndBrainAgentTD3_Trainer(const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic);
 
 	protected:
-	virtual void BackPropagate();
-	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
+	void BackPropagate();
+	void InitWeights();
+	void InitWeights(ndReal weighVariance, ndReal biasVariance);
+
 	virtual void CalculateQvalue(const ndBrainVector& state, const ndBrainVector& actions);
 
 	void BackPropagateActor(const ndUnsigned32* const bashIndex);
@@ -61,13 +63,22 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const ndS
 		m_critic2Optimizer.PushBack(new ndBrainTrainer(&m_critic2));
 		m_critic2Optimizer[m_critic2Optimizer.GetCount() - 1]->SetRegularizer(D_DDPG_REGULARIZER);
 	}
-	InitWeights(ndReal(0.25f), ndReal(0.125f));
+
+	InitWeights();
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentTD3_Trainer<statesDim, actionDim>::InitWeights()
+{
+	m_critic2.InitWeightsXavierMethod();
+	m_target2Critic.CopyFrom(m_critic2);
+	ndBrainAgentDDPG_Trainer<statesDim, actionDim>::InitWeights();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentTD3_Trainer<statesDim, actionDim>::InitWeights(ndReal weighVariance, ndReal biasVariance)
 {
-	m_critic2.InitWeightsXavierMethod(weighVariance, biasVariance);
+	m_critic2.InitWeights(weighVariance, biasVariance);
 	m_target2Critic.CopyFrom(m_critic2);
 	ndBrainAgentDDPG_Trainer<statesDim, actionDim>::InitWeights(weighVariance, biasVariance);
 }
@@ -75,7 +86,7 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::InitWeights(ndReal weighVari
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const ndUnsigned32* const shuffleBuffer)
 {
-	#ifdef USED_NEWTON_VARIANCE
+	#ifdef USED_NEWTON_TD3_TWIST_VERSION
 	auto PropagateBash = ndMakeObject::ndFunction([this, &shuffleBuffer](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		class Loss : public ndBrainLeastSquareErrorLoss
@@ -345,10 +356,11 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 	m_critic2Optimizer[0]->UpdateWeights(ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_criticLearnRate, ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_bashBufferSize);
 	ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCriticTrainer(0)->UpdateWeights(ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_criticLearnRate, ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_bashBufferSize);
 
-	//m_critic2Optimizer[0]->ClampWeights(ndReal(100.0f));
-	//m_critic2Optimizer[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
-	//ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCriticTrainer(0)->ClampWeights(ndReal(100.0f));
-	//ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCriticTrainer(0)->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
+	m_critic2Optimizer[0]->ClampWeights(ndReal(100.0f));
+	ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCriticTrainer(0)->ClampWeights(ndReal(100.0f));
+
+	m_critic2Optimizer[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
+	ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCriticTrainer(0)->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -449,8 +461,9 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateActor(const ndU
 	ParallelExecute(PropagateBash);
 	ParallelExecute(AccumulateWeight);
 	m_actorOptimizer[0]->UpdateWeights(-m_actorLearnRate, m_bashBufferSize);
-	//m_actorOptimizer[0]->ClampWeights(ndReal(100.0f));
-	//m_actorOptimizer[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
+	m_actorOptimizer[0]->ClampWeights(ndReal(100.0f));
+
+	m_actorOptimizer[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -464,7 +477,7 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagate()
 	
 	ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(shuffleBuffer);
 
-#ifdef USED_NEWTON_VARIANCE
+#ifdef USED_NEWTON_TD3_TWIST_VERSION
 	ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateActor(shuffleBuffer);
 
 	m_target2Critic.SoftCopy(m_critic2, ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_softTargetFactor);

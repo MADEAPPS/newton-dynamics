@@ -44,6 +44,8 @@ class ndBrainAgentDDPG: public ndBrainAgent
 	ndReal GetCurrentValue() const;
 	ndInt32 GetEpisodeFrames() const;
 	void Save(ndBrainSave* const loadSave) const;
+
+	void InitWeights();
 	void InitWeights(ndReal weighVariance, ndReal biasVariance);
 
 	ndSharedPtr<ndBrain> m_actor;
@@ -84,6 +86,12 @@ ndReal ndBrainAgentDDPG<statesDim, actionDim>::GetCurrentValue() const
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG<statesDim, actionDim>::ResetModel() const
+{
+	ndAssert(0);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDDPG<statesDim, actionDim>::InitWeights()
 {
 	ndAssert(0);
 }

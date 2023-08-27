@@ -78,7 +78,9 @@ class ndBrain: public ndArray<ndBrainLayer*>
 
 	void InitGaussianBias(ndReal variance);
 	void InitGaussianWeights(ndReal variance);
-	void InitWeightsXavierMethod(ndReal weighVariance, ndReal biasVariance);
+
+	void InitWeightsXavierMethod();
+	void InitWeights(ndReal weighVariance, ndReal biasVariance);
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
 	void CalculateInputGradients(const ndBrainVector& input, ndBrainVector& inputGradients);

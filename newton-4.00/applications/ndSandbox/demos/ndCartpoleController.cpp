@@ -90,8 +90,7 @@ namespace ndController_0
 					,m_averageFramesPerEpisodes()
 				{
 					m_outFile = fopen("traingPerf.csv", "wb");
-					//InitWeights(ndReal(0.25f), ndReal(0.125f));
-					InitWeights(ndReal(0.25f), ndReal(0.0f));
+					InitWeights();
 				}
 
 				~ndCartpoleAgent_trainer()

@@ -61,6 +61,8 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void OptimizeStep();
 	bool IsTrainer() const;
 	void Save(ndBrainSave* const loadSave) const;
+
+	void InitWeights();
 	void InitWeights(ndReal weighVariance, ndReal biasVariance);
 
 	bool IsSampling() const;
@@ -125,9 +127,9 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 	}
 
 	SetBufferSize(D_DQN_REPLAY_BUFFERSIZE);
-	m_target.CopyFrom(*(*m_actor));
-
 	m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / ndReal (m_replayBuffer.GetCapacity());
+
+	InitWeights();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -142,9 +144,16 @@ bool ndBrainAgentDQN_Trainer<statesDim, actionDim>::IsTrainer() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN_Trainer<statesDim, actionDim>::InitWeights()
+{
+	m_actor->InitWeightsXavierMethod();
+	m_target.CopyFrom(*(*m_actor));
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::InitWeights(ndReal weighVariance, ndReal biasVariance)
 {
-	m_actor->InitWeightsXavierMethod(weighVariance, biasVariance);
+	m_actor->InitWeights(weighVariance, biasVariance);
 	m_target.CopyFrom(*(*m_actor));
 }
 
@@ -283,8 +292,8 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 	ndBrainThreadPool::ParallelExecute(PropagateBash);
 	ndBrainThreadPool::ParallelExecute(AccumulateWeight);
 	m_actorOptimizer[0]->UpdateWeights(m_learnRate, m_bashBufferSize);
-	//m_actorOptimizer[0]->ClampWeights(ndReal(100.0f));
-	//m_actorOptimizer[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
+	m_actorOptimizer[0]->ClampWeights(ndReal(100.0f));
+	m_actorOptimizer[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
 
 	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
 	{

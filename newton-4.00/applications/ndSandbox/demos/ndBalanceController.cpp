@@ -162,7 +162,7 @@ namespace ndController_1
 					fprintf(m_outFile, "ddpg\n");
 				#endif
 				m_timer = ndGetTimeInMicroseconds();
-				InitWeights(ndReal(0.25f), ndReal(0.0f));
+				InitWeights();
 			}
 
 			~ndControllerAgent_trainer()
@@ -530,6 +530,7 @@ namespace ndController_1
 		#ifdef ND_TRAIN_MODEL
 			ndInt32 layerSize = 64;
 			ndBrainActivationType activation = m_tanh;
+			//ndBrainActivationType activation = m_relu;
 
 			ndSharedPtr<ndBrain> actor(new ndBrain());
 			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, activation);

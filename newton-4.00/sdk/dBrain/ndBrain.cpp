@@ -236,12 +236,21 @@ void ndBrain::InitGaussianWeights(ndReal variance)
 	}
 }
 
-void ndBrain::InitWeightsXavierMethod(ndReal weighVariance, ndReal biasVariance)
+void ndBrain::InitWeights(ndReal weighVariance, ndReal biasVariance)
 {
 	ndArray<ndBrainLayer*>& layers = *this;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
-		layers[i]->InitWeightsXavierMethod(weighVariance, biasVariance);
+		layers[i]->InitWeights(weighVariance, biasVariance);
+	}
+}
+
+void ndBrain::InitWeightsXavierMethod()
+{
+	ndArray<ndBrainLayer*>& layers = *this;
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+		layers[i]->InitWeightsXavierMethod();
 	}
 }
 

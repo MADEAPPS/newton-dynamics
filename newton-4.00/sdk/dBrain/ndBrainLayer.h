@@ -50,7 +50,9 @@ class ndBrainLayer: public ndBrainMatrix
 	virtual void InitGaussianBias(ndReal variance);
 	virtual void InitGaussianWeights(ndReal variance);
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
-	virtual void InitWeightsXavierMethod(ndReal weighVariance, ndReal biasVariance);
+
+	virtual void InitWeightsXavierMethod();
+	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
 
 	ndBrainActivationType GetActivationType() const;
 

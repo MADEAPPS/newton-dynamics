@@ -146,11 +146,39 @@ void ndBrainLayer::InitGaussianWeights(ndReal variance)
 	}
 }
 
-void ndBrainLayer::InitWeightsXavierMethod(ndReal weighVariance, ndReal biasVariance)
+void ndBrainLayer::InitWeights(ndReal weighVariance, ndReal biasVariance)
 {
-	//variance = ndReal(ndSqrt (ndFloat32(2.0f) / ndFloat32(GetInputSize() + GetOuputSize())));
-	//InitGaussianBias(variance);
+	biasVariance = ndMin(biasVariance, ndReal(0.5f));
+	weighVariance = ndMin(weighVariance, ndReal(0.5f));
+	InitGaussianBias(biasVariance);
+	InitGaussianWeights(weighVariance);
+}
 
+void ndBrainLayer::InitWeightsXavierMethod()
+{
+	ndReal biasVariance = ndReal (0.0f);
+	ndReal weighVariance = ndReal(0.0f);
+	switch (m_activation)
+	{
+		case m_relu:
+		case m_lineal:
+		case m_sigmoid:
+		case m_softmax:
+		{
+			biasVariance = ndReal(ndSqrt(ndFloat32(2.0f) / ndFloat32(GetInputSize())));
+			weighVariance = biasVariance;
+			break;
+		}
+
+		case m_tanh:
+		{
+			weighVariance = ndReal(ndSqrt (ndFloat32(6.0f) / ndFloat32(GetInputSize() + GetOuputSize())));
+			break;
+		}
+	}
+
+	biasVariance = ndMin(biasVariance, ndReal(0.5f));
+	weighVariance = ndMin(weighVariance, ndReal(0.5f));
 	InitGaussianBias(biasVariance);
 	InitGaussianWeights(weighVariance);
 }
