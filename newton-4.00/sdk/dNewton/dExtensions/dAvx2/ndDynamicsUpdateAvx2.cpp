@@ -95,6 +95,13 @@
 			return ptr[i];
 		}
 
+		inline ndAvxFloat& operator= (const ndAvxFloat& A)
+		{
+			m_low = A.m_low;
+			m_high = A.m_high;
+			return *this;
+		}
+
 		inline ndAvxFloat operator+ (const ndAvxFloat& A) const
 		{
 			return ndAvxFloat(_mm256_add_pd(m_low, A.m_low), _mm256_add_pd(m_high, A.m_high));

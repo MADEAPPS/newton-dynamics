@@ -200,6 +200,15 @@ class ndVector
 		return (&m_x)[i];
 	}
 
+	inline ndVector& operator= (const ndVector& A)
+	{
+		m_x = A.m_x;
+		m_y = A.m_y;
+		m_z = A.m_z;
+		m_w = A.m_w;
+		return *this;
+	}
+
 	inline ndVector operator+ (const ndVector& A) const
 	{
 		return ndVector (m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w);
@@ -705,6 +714,15 @@ class ndBigVector
 		ndAssert (i < 4);
 		ndAssert (i >= 0);
 		return (&m_x)[i];
+	}
+
+	inline ndBigVector& operator= (const ndBigVector& A)
+	{
+		m_x = A.m_x;
+		m_y = A.m_y;
+		m_z = A.m_z;
+		m_w = A.m_w;
+		return *this;
 	}
 
 	inline ndBigVector operator+ (const ndBigVector& A) const
