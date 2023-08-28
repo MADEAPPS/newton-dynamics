@@ -378,9 +378,8 @@ static void MnistTrainingSet()
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 				ndBrainThreadPool::ParallelExecute(AccumulateBashWeights);
 				m_optimizers[0]->UpdateWeights(m_learnRate, m_bashBufferSize);
-				ndAssert(0);
-				m_optimizers[0]->ClampWeights(ndReal(100.0f));
 				m_optimizers[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
+				m_optimizers[0]->ClampWeights(ndReal(100.0f));
 
 				if (i % 10000 == 0)
 				{
@@ -396,8 +395,9 @@ static void MnistTrainingSet()
 					{
 						minFail = failCount;
 						bestBrain.CopyFrom(m_brain);
-						ndExpandTraceMessage("%f", (ndFloat32)(trainingDigits->GetCount() - failCount) * 100.0f / (ndFloat32)trainingDigits->GetCount());
-						ndExpandTraceMessage("  failed count %d  steps %d", failCount, i);
+						ndExpandTraceMessage("success rate:%f   ", (ndFloat32)(trainingDigits->GetCount() - failCount) * 100.0f / (ndFloat32)trainingDigits->GetCount());
+						ndExpandTraceMessage("failed count:%d   ", failCount);
+						ndExpandTraceMessage("steps:%d", i);
 						ndExpandTraceMessage("\n");
 					}
 				}

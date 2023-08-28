@@ -34,9 +34,8 @@
 // as described in: https://arxiv.org/pdf/1509.02971.pdf
 
 // default hyper parameters defaults
-#define D_DDPG_CRITIC_LEARN_RATE		ndReal(0.005f)
-#define D_DDPG_ACTOR_LEARN_RATE			ndReal(0.0005f)
-//#define D_DDPG_ACTOR_LEARN_RATE		ndReal(0.000625f)
+#define D_DDPG_CRITIC_LEARN_RATE		ndReal(0.001f)
+#define D_DDPG_ACTOR_LEARN_RATE			ndReal(0.0001f)
 #define D_DDPG_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DDPG_REPLAY_BUFFERSIZE		(1024 * 512)
 //#define D_DDPG_REPLAY_BUFFERSIZE		(1024)
@@ -140,7 +139,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	ndAssert(m_critic->GetInputSize() == (m_actor->GetInputSize() + m_actor->GetOutputSize()));
 
 	ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
-threadCount = 1;
+//threadCount = 1;
 	SetThreadCount(threadCount);
 	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
 	{

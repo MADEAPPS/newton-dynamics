@@ -33,12 +33,11 @@
 // https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
 
 // default hyper parameters defaults
-//#define D_DQN_LEARN_RATE				ndReal(2.0e-4f)
-#define D_DQN_LEARN_RATE				ndReal(5.0e-3f)
+#define D_DQN_LEARN_RATE				ndReal(0.001f)
 #define D_DQN_DISCOUNT_FACTOR			ndReal (0.99f)
 #define D_DQN_REPLAY_BUFFERSIZE			(1024 * 512)
-//#define D_DQN_REPLAY_BUFFERSIZE			(1024)
-#define D_DQN_REPLAY_BASH_SIZE			32
+//#define D_DQN_REPLAY_BUFFERSIZE		(1024)
+#define D_DQN_REPLAY_BASH_SIZE			64
 #define D_DQN_TARGET_UPDATE_PERIOD		1000
 #define D_DQN_REGULARIZER				ndReal (2.0e-6f)
 #define D_DQN_MIN_EXPLORE_PROBABILITY	ndReal(1.0f/100.0f)

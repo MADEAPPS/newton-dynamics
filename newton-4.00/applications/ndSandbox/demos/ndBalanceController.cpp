@@ -257,12 +257,12 @@ namespace ndController_1
 
 					if (episodeCount && !IsSampling())
 					{
-						//ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-						//if (m_outFile)
-						//{
-						//	fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
-						//	fflush(m_outFile);
-						//}
+						ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						if (m_outFile)
+						{
+							fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
+							fflush(m_outFile);
+						}
 					}
 
 					if (stopTraining == m_stopTraining)
@@ -535,8 +535,8 @@ namespace ndController_1
 		// build neural net controller
 		#ifdef ND_TRAIN_MODEL
 			ndInt32 layerSize = 64;
-			//ndBrainActivationType activation = m_tanh;
-			ndBrainActivationType activation = m_relu;
+			ndBrainActivationType activation = m_tanh;
+			//ndBrainActivationType activation = m_relu;
 
 			ndSharedPtr<ndBrain> actor(new ndBrain());
 			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, activation);
