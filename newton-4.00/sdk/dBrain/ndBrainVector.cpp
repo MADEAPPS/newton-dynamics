@@ -107,7 +107,9 @@ void ndBrainVector::DropOut(ndReal dropOut)
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		ndReal val = (*this)[i];
-		(*this)[i] = (ndAbs(val) >= dropOut) ? val : ndReal (0.0f);
+		ndAssert(val <= 100.0f);
+		ndAssert(val >= -100.0f);
+		(*this)[i] = (ndAbs(val) >= dropOut) ? val : ndReal(0.0f);
 	}
 }
 
@@ -116,8 +118,8 @@ void ndBrainVector::Clamp(ndReal min, ndReal max)
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		ndReal val = (*this)[i];
-		ndAssert(val >= ndReal(-1.0e6f));
-		ndAssert(val <= ndReal(1.0e6f));
+		ndAssert(val >= min);
+		ndAssert(val <= max);
 		(*this)[i] = ndClamp(val, min, max);
 	}
 }

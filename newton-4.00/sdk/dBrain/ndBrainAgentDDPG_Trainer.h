@@ -140,7 +140,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const n
 	ndAssert(m_critic->GetInputSize() == (m_actor->GetInputSize() + m_actor->GetOutputSize()));
 
 	ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
-//threadCount = 1;
+threadCount = 1;
 	SetThreadCount(threadCount);
 	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
 	{
