@@ -184,7 +184,6 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 			targetActor->MakePrediction(targetInput, targetOutput);
 			for (ndInt32 j = 0; j < actionDim; ++j)
 			{
-				//ndReal noisyAction = ndReal(ndGaussianRandom(targetOutput[j], actionNoiseVariance));
 				ndReal noisyAction = targetOutput[j] + bashRandomActionNoise[i][j];
 				ndReal action = ndClamp(noisyAction, ndReal(-1.0f), ndReal(1.0f));
 				loss0.m_targetInputBuffer[j + statesDim] = action;

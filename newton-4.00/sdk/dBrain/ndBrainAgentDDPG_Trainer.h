@@ -276,10 +276,10 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 
 			void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 			{
+				ndAssert(loss.GetCount() == 1);
+				ndAssert(output.GetCount() == 1);
+				ndAssert(m_truth.GetCount() == m_criticTrainer.GetBrain()->GetOutputSize());
 				ndAssert(0);
-				//ndAssert(loss.GetCount() == 1);
-				//ndAssert(output.GetCount() == 1);
-				//ndAssert(m_truth.GetCount() == m_criticTrainer.GetBrain()->GetOutputSize());
 				//const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_agent->m_replayBuffer[m_index];
 				//
 				//ndReal criticOutputBuffer[2];
