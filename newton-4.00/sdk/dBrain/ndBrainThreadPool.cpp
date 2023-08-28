@@ -30,7 +30,6 @@ class ndBrainThreadPool::ndWorker : public ndThread
 		,m_task(nullptr)
 		,m_owner(owner)
 		,m_threadIndex(threadIndex)
-		,m_random()
 	{
 		SetName(name);
 	}
@@ -59,7 +58,6 @@ class ndBrainThreadPool::ndWorker : public ndThread
 	ndTask* m_task;
 	ndBrainThreadPool* m_owner;
 	ndInt32 m_threadIndex;
-	ndRandom m_random;
 	friend class ndBrainThreadPool;
 };
 
@@ -67,7 +65,6 @@ ndBrainThreadPool::ndBrainThreadPool()
 	:ndClassAlloc()
 	,ndSyncMutex()
 	,m_workers()
-	,m_random()
 {
 	for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; ++i)
 	{
@@ -101,24 +98,6 @@ ndInt32 ndBrainThreadPool::GetMaxThreads()
 	#else
 		return ndClamp(ndInt32(std::thread::hardware_concurrency() + 1) / 2, 1, D_MAX_THREADS_COUNT);
 	#endif
-}
-
-ndRandom& ndBrainThreadPool::GetRandomGenerator(ndInt32 threadIndex)
-{
-	if (threadIndex == 0)
-	{
-		return m_random;
-	}
-	return m_workers[threadIndex - 1]->m_random;
-}
-
-const ndRandom& ndBrainThreadPool::GetRandomGenerator(ndInt32 threadIndex) const
-{
-	if (threadIndex == 0)
-	{
-		return m_random;
-	}
-	return m_workers[threadIndex - 1]->m_random;
 }
 
 void ndBrainThreadPool::SubmmitTask(ndTask* const task, ndInt32 index)

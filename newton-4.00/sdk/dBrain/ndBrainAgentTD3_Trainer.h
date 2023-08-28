@@ -87,7 +87,18 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const ndUnsigned32* const shuffleBuffer)
 {
 	#ifdef USED_NEWTON_TD3_TWIST_VERSION
-	auto PropagateBash = ndMakeObject::ndFunction([this, &shuffleBuffer](ndInt32 threadIndex, ndInt32 threadCount)
+
+	ndFixSizeArray<ndReal[actionDim], 256> bashRandomActionNoise;
+	bashRandomActionNoise.SetCount(m_bashBufferSize);
+	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
+	{
+		for (ndInt32 j = 0; j < actionDim; ++j)
+		{
+			bashRandomActionNoise[i][j] = ndGaussianRandom(ndFloat32(0.0f), ndFloat32(m_actionNoiseVariance));
+		}
+	}
+
+	auto PropagateBash = ndMakeObject::ndFunction([this, &shuffleBuffer, &bashRandomActionNoise](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		class Loss : public ndBrainLeastSquareErrorLoss
 		{
@@ -148,9 +159,8 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_replayBuffer,
 			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_gamma);
 
-		ndRandom& randomGenerator = ndBrainThreadPool::GetRandomGenerator(threadIndex);
 		ndBrain* const targetActor = ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetTargetActor();
-		ndFloat32 actionNoiseVariance = ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_actionNoiseVariance;
+		//ndFloat32 actionNoiseVariance = ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_actionNoiseVariance;
 		const ndStartEnd startEnd(ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_bashBufferSize, threadIndex, threadCount);
 
 		ndReal targetInputBuffer[statesDim * 2];
@@ -174,7 +184,8 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 			targetActor->MakePrediction(targetInput, targetOutput);
 			for (ndInt32 j = 0; j < actionDim; ++j)
 			{
-				ndReal noisyAction = targetOutput[j] + ndReal(randomGenerator.GetGaussianRandom(ndFloat32(0.0f), ndFloat32(actionNoiseVariance)));
+				//ndReal noisyAction = ndReal(ndGaussianRandom(targetOutput[j], actionNoiseVariance));
+				ndReal noisyAction = targetOutput[j] + bashRandomActionNoise[i][j];
 				ndReal action = ndClamp(noisyAction, ndReal(-1.0f), ndReal(1.0f));
 				loss0.m_targetInputBuffer[j + statesDim] = action;
 				loss1.m_targetInputBuffer[j + statesDim] = action;
@@ -470,11 +481,14 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagate()
 {
 	ndUnsigned32 shuffleBuffer[1024];
+	ndFixSizeArray<ndReal[actionDim], 256> bashRandomActionNoise0;
+	ndFixSizeArray<ndReal[actionDim], 256> bashRandomActionNoise1;
 	for (ndInt32 i = 0; i < ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_bashBufferSize; ++i)
 	{
 		shuffleBuffer[i] = ndRandInt() % ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_replayBuffer.GetCount();
 	}
 	
+	ndAssert(0);
 	ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(shuffleBuffer);
 
 #ifdef USED_NEWTON_TD3_TWIST_VERSION

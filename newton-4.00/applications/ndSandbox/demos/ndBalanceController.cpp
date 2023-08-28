@@ -146,8 +146,8 @@ namespace ndController_1
 #endif
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(3000)
-				,m_stopTraining(5000000)
+				,m_maxFrames(3500)
+				,m_stopTraining(2000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
 				,m_averageQValue()
@@ -187,10 +187,9 @@ namespace ndController_1
 			{
 				if (GetEpisodeFrames() >= 10000)
 				{
-					const ndRandom& random = GetRandomGenerator(0);
 					for (ndInt32 i = 0; i < m_actionsSize; ++i)
 					{
-						ndReal gaussianNoise = ndReal(random.GetGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
+						ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
 						ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
 						actions[i] = clippiedNoisyAction;
 					}

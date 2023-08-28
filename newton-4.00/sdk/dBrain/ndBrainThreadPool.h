@@ -38,17 +38,12 @@ class ndBrainThreadPool: public ndClassAlloc, public ndSyncMutex
 	static ndInt32 GetMaxThreads();
 	void SetThreadCount(ndInt32 count);
 
-	ndRandom& GetRandomGenerator(ndInt32 threadIndex);
-	const ndRandom& GetRandomGenerator(ndInt32 threadIndex) const;
-
 	template <typename Function>
 	void ParallelExecute(const Function& ndFunction);
 
 	private:
 	void SubmmitTask(ndTask* const task, ndInt32 index);
 	ndFixSizeArray<ndWorker*, D_MAX_THREADS_COUNT> m_workers;
-
-	ndRandom m_random;
 };
 
 template <typename Function>
