@@ -365,7 +365,7 @@ void ndBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 	m_weightGradients.Scale(weight);
 	if (m_model == m_adam)
 	{
-		// apply adam optimizer
+		// apply Adam optimizer
 		ApplyAdamCorrection();
 	}
 
