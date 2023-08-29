@@ -265,12 +265,13 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 		class Loss: public ndBrainLeastSquareErrorLoss
 		{
 			public:
-			Loss(ndBrainTrainer& trainer, ndBrainAgentDDPG_Trainer<statesDim, actionDim>* const agent, ndFloat32 actionNoiseVariance)
+			Loss(ndBrainTrainer& trainer, ndBrainAgentDDPG_Trainer<statesDim, actionDim>* const agent, ndReal gamma)
 				:ndBrainLeastSquareErrorLoss(trainer.GetBrain()->GetOutputSize())
 				,m_criticTrainer(trainer)
 				,m_agent(agent)
-				,m_actionNoiseVariance(actionNoiseVariance)
-				,m_index(0)
+				,m_gamma(gamma)
+				,m_reward(0.0f)
+				,m_isTerminal(false)
 			{
 			}
 
@@ -279,59 +280,39 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 				ndAssert(loss.GetCount() == 1);
 				ndAssert(output.GetCount() == 1);
 				ndAssert(m_truth.GetCount() == m_criticTrainer.GetBrain()->GetOutputSize());
-				ndAssert(0);
-				//const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_agent->m_replayBuffer[m_index];
-				//
-				//ndReal criticOutputBuffer[2];
-				//ndDeepBrainMemVector criticOutput(criticOutputBuffer, 1);
-				//criticOutput[0] = transition.m_reward;
-				//if (!transition.m_terminalState)
-				//{
-				//	ndReal actorInputBuffer[statesDim * 2];
-				//	ndReal actorOutputBuffer[actionDim * 2];
-				//	ndDeepBrainMemVector actorInput(actorInputBuffer, statesDim);
-				//	ndDeepBrainMemVector actorOutput(actorOutputBuffer, actionDim);
-				//
-				//	for (ndInt32 i = 0; i < statesDim; ++i)
-				//	{
-				//		actorInput[i] = transition.m_nextState[i];
-				//	}
-				//	m_agent->m_targetActor.MakePrediction(actorInput, actorOutput);
-				//	for (ndInt32 i = 0; i < actionDim; ++i)
-				//	{
-				//		//ndReal noiseAction = ndReal(ndGaussianRandom(actorOutput[i], m_actionNoiseVariance));
-				//		ndReal noisyAction = targetOutput[j] + bashRandomActionNoise[i][j];
-				//		actorOutput[i] = ndClamp(noiseAction, ndReal(-1.0f), ndReal(1.0f));
-				//	}
-				//
-				//	ndReal criticInputBuffer[(statesDim + actionDim) * 2];
-				//	ndDeepBrainMemVector criticInput(criticInputBuffer, statesDim + actionDim);
-				//	for (ndInt32 i = 0; i < statesDim; ++i)
-				//	{
-				//		criticInput[i] = actorInput[i];
-				//	}
-				//	for (ndInt32 i = 0; i < actionDim; ++i)
-				//	{
-				//		criticInput[i + statesDim] = actorOutput[i];
-				//	}
-				//	m_agent->m_targetCritic.MakePrediction(criticInput, criticOutput);
-				//	criticOutput[0] = transition.m_reward + m_agent->m_gamma * criticOutput[0];
-				//}
-				//
-				//SetTruth(criticOutput);
-				//ndBrainLeastSquareErrorLoss::GetLoss(output, loss);
+
+				ndReal criticOutputBuffer[2];
+				ndDeepBrainMemVector criticOutput(criticOutputBuffer, 1);
+
+				ndReal targetValue = m_reward;
+				if (!m_isTerminal)
+				{
+					ndDeepBrainMemVector criticInput(m_targetInputBuffer, statesDim + actionDim);
+					m_agent->m_targetCritic.MakePrediction(criticInput, criticOutput);
+					targetValue = m_reward + m_gamma * criticOutput[0];
+				}
+				criticOutput[0] = targetValue;
+				
+				SetTruth(criticOutput);
+				ndBrainLeastSquareErrorLoss::GetLoss(output, loss);
 			}
 
 			ndBrainTrainer& m_criticTrainer;
 			ndBrainAgentDDPG_Trainer<statesDim, actionDim>* m_agent;
-			ndFloat32 m_actionNoiseVariance;
-			ndInt32 m_index;
+			ndFloat32 m_gamma;
+			ndFloat32 m_reward;
+			bool m_isTerminal;
+			ndReal m_targetInputBuffer[(statesDim + actionDim) * 2];
 		};
 
 		ndBrainTrainer& trainer = *(*m_criticOptimizer[threadIndex]);
+		Loss loss(trainer, this, m_gamma);
 
-		Loss loss(trainer, this, m_actionNoiseVariance);
+		ndReal actorInputBuffer[statesDim * 2];
+		ndReal actorOutputBuffer[actionDim * 2];
 		ndReal inputBuffer[(statesDim + actionDim) * 2];
+		ndDeepBrainMemVector actorInput(actorInputBuffer, statesDim);
+		ndDeepBrainMemVector actorOutput(actorOutputBuffer, actionDim);
 		ndDeepBrainMemVector input(inputBuffer, statesDim + actionDim);
 
 		trainer.ClearGradientsAcc();
@@ -343,6 +324,17 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 
 			for (ndInt32 j = 0; j < statesDim; ++j)
 			{
+				actorInput[j] = transition.m_nextState[j];
+			}
+			m_targetActor.MakePrediction(actorInput, actorOutput);
+			for (ndInt32 j = 0; j < actionDim; ++j)
+			{
+				ndReal noisyAction = actorOutput[j] + bashRandomActionNoise[i][j];
+				loss.m_targetInputBuffer[i] = ndClamp(noisyAction, ndReal(-1.0f), ndReal(1.0f));
+			}
+
+			for (ndInt32 j = 0; j < statesDim; ++j)
+			{
 				input[j] = transition.m_state[j];
 			}
 			for (ndInt32 j = 0; j < actionDim; ++j)
@@ -350,7 +342,8 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 				input[j + statesDim] = transition.m_action[j];
 			}
 
-			loss.m_index = index;
+			loss.m_reward = transition.m_reward;
+			loss.m_isTerminal = transition.m_terminalState;
 			trainer.BackPropagate(input, loss);
 		}
 	});

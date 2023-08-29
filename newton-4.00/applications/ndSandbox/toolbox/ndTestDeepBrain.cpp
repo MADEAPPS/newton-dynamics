@@ -279,8 +279,6 @@ static void MnistTrainingSet()
 			SetThreadCount(threadCount);
 			for (ndInt32 i = 0; i < GetThreadCount(); ++i)
 			{
-				ndAssert(0);
-				//GetRandomGenerator(i).SetSeed(ndUnsigned32(i + 42));
 				m_optimizers.PushBack(new ndBrainTrainer(&m_brain));
 			}
 		}

@@ -255,7 +255,8 @@ namespace ndController_0
 					fprintf(m_outFile, "ddpg\n");
 					#endif
 
-					InitWeights(ndReal(0.25f), ndReal(0.0f));
+					//InitWeights(ndReal(0.25f), ndReal(0.0f));
+					InitWeights();
 				}
 
 				~ndCartpoleAgent_trainer()

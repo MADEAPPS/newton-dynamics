@@ -160,7 +160,6 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 			ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_gamma);
 
 		ndBrain* const targetActor = ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetTargetActor();
-		//ndFloat32 actionNoiseVariance = ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_actionNoiseVariance;
 		const ndStartEnd startEnd(ndBrainAgentDDPG_Trainer<statesDim, actionDim>::m_bashBufferSize, threadIndex, threadCount);
 
 		ndReal targetInputBuffer[statesDim * 2];
@@ -349,7 +348,6 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 
 	auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		//ndBrainTrainer& trainer0 = *(*m_criticOptimizer[0]);
 		ndBrainTrainer* const trainer0 = ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCriticTrainer(0);
 		ndBrainTrainer* const trainer1 = *m_critic2Optimizer[0];
 		for (ndInt32 i = 1; i < threadCount; ++i)
