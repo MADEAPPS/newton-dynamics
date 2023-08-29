@@ -37,7 +37,7 @@
 
 namespace ndController_1
 {
-	#define USE_TD3
+	//#define USE_TD3
 	#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		ndFloat32 (10.0f)
@@ -146,7 +146,7 @@ namespace ndController_1
 #endif
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(4000)
+				,m_maxFrames(3500)
 				,m_stopTraining(2000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
@@ -554,7 +554,8 @@ namespace ndController_1
 			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + m_actionsSize, layerSize * 2, activation);
 			ndBrainLayer* const criticLayer1 = new ndBrainLayer(criticLayer0->GetOuputSize(), layerSize * 2, activation);
 			ndBrainLayer* const criticLayer2 = new ndBrainLayer(criticLayer1->GetOuputSize(), layerSize * 2, activation);
-			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(criticLayer2->GetOuputSize(), 1, m_lineal);
+			//ndBrainLayer* const criticOuputLayer = new ndBrainLayer(criticLayer2->GetOuputSize(), 1, m_lineal);
+			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(criticLayer2->GetOuputSize(), 1, m_relu);
 			critic->BeginAddLayer();
 			critic->AddLayer(criticLayer0);
 			critic->AddLayer(criticLayer1);
