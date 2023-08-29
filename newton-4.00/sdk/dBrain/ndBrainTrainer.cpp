@@ -181,8 +181,6 @@ void ndBrainTrainer::BackPropagateOutputLayer(ndBrainLoss& loss)
 	const ndDeepBrainMemVector z(&m_z[preFixScan[layerIndex + 1]], outputCount);
 	const ndDeepBrainMemVector zDerivative(&m_zDerivative[preFixScan[layerIndex + 1]], outputCount);
 
-	//biasGradients.Set(z);
-	//biasGradients.Sub(groundTruth);
 	loss.GetLoss(z, biasGradients);
 	biasGradients.Mul(zDerivative);
 	biasGradientsAcc.Add(biasGradients);
@@ -393,7 +391,7 @@ for (ndInt32 xxxxxx = 0; xxxxxx < biasGradients.GetCount(); ++xxxxxx)
 {
 	if (ndAbs(biasGradients[xxxxxx]) > xxxx1)
 	{
-		xxxx1 = ndAbs(biasGradients[i]);
+		xxxx1 = ndAbs(biasGradients[xxxxxx]);
 		ndExpandTraceMessage("gradient:%f  index:%d\n", xxxx1, xxxx);
 	}
 }

@@ -165,8 +165,12 @@ void ndBrainLayer::InitWeightsXavierMethod()
 		case m_sigmoid:
 		case m_softmax:
 		{
-			biasVariance = ndReal(ndSqrt(ndFloat32(2.0f) / ndFloat32(GetInputSize())));
-			weighVariance = biasVariance;
+			// thsi seem to be some huge bull shit.
+			//biasVariance = ndReal(ndSqrt(ndFloat32(2.0f) / ndFloat32(GetInputSize())));
+			//weighVariance = biasVariance;
+
+			biasVariance = ndReal(0.1f);
+			weighVariance = ndReal(0.1f);
 			break;
 		}
 

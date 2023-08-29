@@ -325,12 +325,13 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 			for (ndInt32 j = 0; j < statesDim; ++j)
 			{
 				actorInput[j] = transition.m_nextState[j];
+				loss.m_targetInputBuffer[j] = transition.m_nextState[j];
 			}
 			m_targetActor.MakePrediction(actorInput, actorOutput);
 			for (ndInt32 j = 0; j < actionDim; ++j)
 			{
 				ndReal noisyAction = actorOutput[j] + bashRandomActionNoise[i][j];
-				loss.m_targetInputBuffer[i] = ndClamp(noisyAction, ndReal(-1.0f), ndReal(1.0f));
+				loss.m_targetInputBuffer[j + statesDim] = ndClamp(noisyAction, ndReal(-1.0f), ndReal(1.0f));
 			}
 
 			for (ndInt32 j = 0; j < statesDim; ++j)
@@ -456,10 +457,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagate()
 	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 	{
 		shuffleBuffer[i] = ndRandInt() % m_replayBuffer.GetCount();
-		//for (ndInt32 j = 0; j < actionDim; ++j)
-		//{
-		//	m_bashRandomActionNoise[i][j] = ndGaussianRandom(ndFloat32(0.0f), ndFloat32(m_actionNoiseVariance));
-		//}
 	}
 
 	BackPropagateCritic(shuffleBuffer);
