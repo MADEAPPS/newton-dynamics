@@ -20,21 +20,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-//a) Mt = sum(m(i))
-//b) cg = sum(p(i) * m(i)) / Mt
-//c) Vcg = sum(v(i) * m(i)) / Mt
-//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
-//e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
-//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
-//g) Bcg = (Icg ^ -1) * (T0 + T1)
-
-//a) Mt = sum(m(i))
-//b) cg = sum(p(i) * m(i)) / Mt
-//d) Icg = sum(I(i) + covarianMatrix(p(i) - cg) * m(i))
-//e) T0 = sum(w(i) x (I(i) * w(i))
-//f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
-//g) Bcg = (Icg ^ -1) * (T0 + T1)
-
 namespace ndController_1
 {
 	//#define USE_TD3
@@ -138,16 +123,16 @@ namespace ndController_1
 			ndControllerAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 #else
-		class ndControllerAgent_trainer: public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
+		class ndControllerAgent_trainer: public ndBrainAgentSAC_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
 			ndControllerAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
-				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
+				:ndBrainAgentSAC_Trainer<m_stateSize, m_actionsSize>(actor, critic)
 #endif
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(3500)
-				,m_stopTraining(2000000)
+				,m_maxFrames(4000)
+				,m_stopTraining(3000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
 				,m_averageQValue()
@@ -158,8 +143,8 @@ namespace ndController_1
 					m_outFile = fopen("traingPerf-TD3.csv", "wb");
 					fprintf(m_outFile, "td3\n");
 				#else
-					m_outFile = fopen("traingPerf-DDPG.csv", "wb");
-					fprintf(m_outFile, "ddpg\n");
+					m_outFile = fopen("traingPerf-SAC.csv", "wb");
+					fprintf(m_outFile, "sac\n");
 				#endif
 				m_timer = ndGetTimeInMicroseconds();
 				InitWeights();
