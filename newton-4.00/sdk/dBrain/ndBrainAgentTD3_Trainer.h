@@ -25,9 +25,10 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainAgentDDPG_Trainer.h"
 
-// this is an implementation of more stable Policy gradient
-// continuous control with deep re enforcement learning (td3)
-// algorithm as described in: https://arxiv.org/pdf/1802.09477.pdf
+// this is an implementation of more stable policy gradient for
+// continues action controller using deep re enforcement learning. 
+// td3 algorithm as described here: 
+// https://arxiv.org/pdf/1802.09477.pdf
 
 #define USED_NEWTON_TD3_TWIST_VERSION
 

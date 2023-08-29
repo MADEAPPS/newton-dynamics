@@ -28,10 +28,9 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainReplayBuffer.h"
 
-// this is an implementation of the vanilla 
-// deep deterministic policy gradient (ddpg)
-// continuous control re enforcement learning algorithm 
-// as described in: https://arxiv.org/pdf/1509.02971.pdf
+// this is an implementation of the vanilla deep deterministic 
+// policy gradient for continues control re enforcement learning.  
+// ddpg algorithm as described in: https://arxiv.org/pdf/1509.02971.pdf
 
 // default hyper parameters defaults
 #define D_DDPG_CRITIC_LEARN_RATE		ndReal(0.001f)

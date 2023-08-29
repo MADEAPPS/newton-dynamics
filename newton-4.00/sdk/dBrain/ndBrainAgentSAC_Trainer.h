@@ -25,9 +25,9 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainAgentDDPG_Trainer.h"
 
-// this is an implementation of more stable Policy gradient
-// continuous control with deep re enforcement learning (sac)
-// algorithm as described in: 
+// this is an implementation of more stable policy gradient for
+// continues action controller using deep re enforcement learning. 
+// sac algorithm as described here: 
 // https://spinningup.openai.com/en/latest/algorithms/sac.html
 
 #define USED_NEWTON_TD3_TWIST_VERSION
