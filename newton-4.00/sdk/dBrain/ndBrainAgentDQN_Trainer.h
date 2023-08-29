@@ -348,8 +348,6 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 	ndDeepBrainMemVector actions(actionBuffer, actionDim);
 
 	GetObservation(&state[0]);
-	m_currentTransition.m_reward = GetReward();
-
 	m_actor->MakePrediction(state, actions);
 	for (ndInt32 i = 0; i < statesDim; ++i)
 	{
@@ -389,6 +387,8 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 	{
 		m_currentTransition.m_action[0] = ndInt32(bestAction);
 	}
+
+	m_currentTransition.m_reward = GetReward();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

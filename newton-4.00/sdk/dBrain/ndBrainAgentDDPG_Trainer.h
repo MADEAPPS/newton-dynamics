@@ -488,8 +488,6 @@ ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetReward() const
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PerturbeAction(ndReal action) const
 {
-	//const ndRandom& random = GetRandomGenerator(0);
-	//ndReal actionNoise = ndReal(random.GetGaussianRandom(ndFloat32(action), ndFloat32(m_actionNoiseVariance)));
 	ndReal actionNoise = ndReal(ndGaussianRandom(action, m_actionNoiseVariance));
 	return ndClamp(actionNoise, ndReal(-1.0f), ndReal(1.0f));
 }
@@ -539,8 +537,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 	ndDeepBrainMemVector actions(actionBuffer, actionDim);
 
 	GetObservation(&m_currentTransition.m_state[0]);
-	m_currentTransition.m_reward = GetReward();
-
 	for (ndInt32 i = 0; i < statesDim; ++i)
 	{
 		state[i] = m_currentTransition.m_state[i];
@@ -553,6 +549,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 		actions[i] = PerturbeAction(actions[i]);
 	}
 	ApplyActions(&actions[0]);
+	m_currentTransition.m_reward = GetReward();
 
 	for (ndInt32 i = 0; i < actionDim; ++i)
 	{

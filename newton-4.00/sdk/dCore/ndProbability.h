@@ -40,27 +40,5 @@ D_CORE_API void ndSetRandSeed(ndUnsigned32 seed);
 /// Returns a guardian distributed random value with center at mean and standard deviation sigma
 D_CORE_API ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma);
 
-//class ndRandom
-//{
-//	public:
-//	/// Create a random generator object ans set the seed
-//	D_CORE_API ndRandom(ndUnsigned32 seed = 0);
-//
-//	/// Set random generator new seed
-//	D_CORE_API void SetSeed(ndUnsigned32 seed);
-//
-//	/// Returns a float random value between 0.0 top 1.0 
-//	D_CORE_API ndFloat32 GetRand() const;
-//
-//	/// Returns a unsigned integer random value between 0 top 0xffffffff 
-//	D_CORE_API ndUnsigned32 GetRandInt() const;
-//
-//	/// Returns a guardian distributed random value with center at mean and standard deviation sigma
-//	D_CORE_API ndFloat32 GetGaussianRandom(ndFloat32 mean, ndFloat32 sigma) const;
-//
-//	private:
-//	mutable std::mt19937 m_generator;
-//};
-
 #endif
 
