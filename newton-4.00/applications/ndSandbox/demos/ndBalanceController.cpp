@@ -146,7 +146,7 @@ namespace ndController_1
 #endif
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(3500)
+				,m_maxFrames(4000)
 				,m_stopTraining(2000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
