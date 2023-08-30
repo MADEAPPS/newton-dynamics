@@ -28,6 +28,8 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainReplayBuffer.h"
 
+//#define D_USE_FLAT_AGENTS
+
 // this is an implementation of the vanilla deep deterministic 
 // policy gradient for continues control re enforcement learning.  
 // ddpg algorithm as described in: https://arxiv.org/pdf/1509.02971.pdf
@@ -49,7 +51,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 {
 	public:
 	ndBrainAgentDDPG_Trainer(const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic);
-	virtual ~ndBrainAgentDDPG_Trainer();
+	~ndBrainAgentDDPG_Trainer();
 
 	ndReal GetCurrentValue() const;
 	ndInt32 GetFramesCount() const;
@@ -80,8 +82,13 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void InitWeights();
 	void InitWeights(ndReal weighVariance, ndReal biasVariance);
 
+#ifdef 	D_USE_FLAT_AGENTS
+	void BackPropagate();
+	void CalculateQvalue(const ndBrainVector& state, const ndBrainVector& actions);
+#else
 	virtual void BackPropagate();
 	virtual void CalculateQvalue(const ndBrainVector& state, const ndBrainVector& actions);
+#endif
 
 	ndBrain* GetActor() { return *m_actor; }
 	ndBrain* GetCritic() { return *m_critic; }
