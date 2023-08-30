@@ -22,7 +22,7 @@
 
 namespace ndController_1
 {
-	//#define USE_TD3
+	#define USE_TD3
 	#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
@@ -79,6 +79,7 @@ namespace ndController_1
 		};
 
 		// implement controller player
+#ifdef USE_TD3
 		class ndControllerAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
 		{
 			public:
@@ -87,6 +88,16 @@ namespace ndController_1
 				,m_model(nullptr)
 			{
 			}
+#else
+		class ndControllerAgent : public ndBrainAgentSAC<m_stateSize, m_actionsSize>
+		{
+			public:
+			ndControllerAgent(ndSharedPtr<ndBrain>& actor)
+				:ndBrainAgentSAC<m_stateSize, m_actionsSize>(actor)
+				, m_model(nullptr)
+			{
+			}
+#endif
 
 			void SetModel(ndModelUnicycle* const model)
 			{
@@ -222,7 +233,11 @@ namespace ndController_1
 				if (stopTraining <= m_stopTraining)
 				{
 					ndInt32 episodeCount = GetEposideCount();
-					ndBrainAgentDDPG_Trainer::OptimizeStep();
+					#ifdef USE_TD3
+						ndBrainAgentTD3_Trainer::OptimizeStep();
+					#else
+						ndBrainAgentSAC_Trainer::OptimizeStep();
+					#endif
 
 					episodeCount -= GetEposideCount();
 					if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32 (m_maxFrames))

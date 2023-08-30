@@ -34,12 +34,14 @@
 #include <ndBrainTrainer.h>
 #include <ndBrainSaveLoad.h>
 #include <ndBrainAgentDQN.h>
+#include <ndBrainAgentTD3.h>
+#include <ndBrainAgentSAC.h>
 #include <ndBrainAgentDDPG.h>
 #include <ndBrainThreadPool.h>
 #include <ndBrainReplayBuffer.h>
-#include <ndBrainAgentSAC_Trainer.h>
-#include <ndBrainAgentTD3_Trainer.h>
 #include <ndBrainAgentDQN_Trainer.h>
+#include <ndBrainAgentTD3_Trainer.h>
+#include <ndBrainAgentSAC_Trainer.h>
 #include <ndBrainAgentDDPG_Trainer.h>
 
 #endif 

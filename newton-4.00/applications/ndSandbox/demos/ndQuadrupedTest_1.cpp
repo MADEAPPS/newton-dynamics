@@ -390,7 +390,11 @@ namespace ndQuadruped_1
 				if (stopTraining <= m_stopTraining)
 				{
 					ndInt32 episodeCount = GetEposideCount();
-					ndBrainAgentDDPG_Trainer::OptimizeStep();
+					#ifdef USE_TD3
+						ndBrainAgentDDPG_Trainer::OptimizeStep();
+					#else
+						ndAssert(0);
+					#endif
 				
 					episodeCount -= GetEposideCount();
 					if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
