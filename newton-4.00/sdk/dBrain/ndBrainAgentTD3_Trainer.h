@@ -23,6 +23,7 @@
 #define _ND_BRAIN_AGENT_TD3_TRAINER_H__
 
 #ifdef 	D_USE_FLAT_AGENTS
+
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
@@ -48,7 +49,7 @@
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 {
-public:
+	public:
 	ndBrainAgentTD3_Trainer(const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic);
 	~ndBrainAgentTD3_Trainer();
 
@@ -63,7 +64,7 @@ public:
 	ndReal GetActionNoise() const;
 	void SetActionNoise(ndReal learnRate);
 
-protected:
+	protected:
 	void Step();
 	void Optimize();
 	void OptimizeStep();
@@ -116,27 +117,27 @@ protected:
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic)
 	:ndBrainAgent()
-	, ndBrainThreadPool()
-	, m_actor(actor)
-	, m_critic0(critic)
-	, m_critic1(critic)
-	, m_targetActor(*(*actor))
-	, m_targetCritic0(*(*critic))
-	, m_targetCritic1(*(*critic))
-	, m_bashSamples()
-	, m_replayBuffer()
-	, m_currentTransition()
-	, m_gamma(D_TD3_DISCOUNT_FACTOR)
-	, m_currentQValue(ndReal(0.0f))
-	, m_actorLearnRate(D_TD3_ACTOR_LEARN_RATE)
-	, m_criticLearnRate(D_TD3_CRITIC_LEARN_RATE)
-	, m_softTargetFactor(D_TD3_SOFT_TARGET_FACTOR)
-	, m_actionNoiseVariance(D_TD3_ACTION_NOISE_VARIANCE)
-	, m_frameCount(0)
-	, m_framesAlive(0)
-	, m_eposideCount(0)
-	, m_bashBufferSize(D_TD3_REPLAY_BASH_SIZE)
-	, m_collectingSamples(true)
+	,ndBrainThreadPool()
+	,m_actor(actor)
+	,m_critic0(critic)
+	,m_critic1(critic)
+	,m_targetActor(*(*actor))
+	,m_targetCritic0(*(*critic))
+	,m_targetCritic1(*(*critic))
+	,m_bashSamples()
+	,m_replayBuffer()
+	,m_currentTransition()
+	,m_gamma(D_TD3_DISCOUNT_FACTOR)
+	,m_currentQValue(ndReal(0.0f))
+	,m_actorLearnRate(D_TD3_ACTOR_LEARN_RATE)
+	,m_criticLearnRate(D_TD3_CRITIC_LEARN_RATE)
+	,m_softTargetFactor(D_TD3_SOFT_TARGET_FACTOR)
+	,m_actionNoiseVariance(D_TD3_ACTION_NOISE_VARIANCE)
+	,m_frameCount(0)
+	,m_framesAlive(0)
+	,m_eposideCount(0)
+	,m_bashBufferSize(D_TD3_REPLAY_BASH_SIZE)
+	,m_collectingSamples(true)
 {
 	ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
 	//threadCount = 1;
