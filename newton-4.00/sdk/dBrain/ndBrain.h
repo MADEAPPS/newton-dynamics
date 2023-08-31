@@ -25,6 +25,8 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
 
+//#define D_USE_FLAT_AGENTS
+
 class ndBrainLoad;
 class ndBrainSave;
 

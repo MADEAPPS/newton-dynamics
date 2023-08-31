@@ -208,11 +208,6 @@ namespace ndController_1
 						state = true;
 					}
 
-					if (GetCurrentValue() > 100)
-					{
-						ndExpandTraceMessage("step: %d\treward: %g\n", GetFramesCount(), GetCurrentValue());
-					}
-
 					m_averageQValue.Update(GetCurrentValue());
 					if (state)
 					{

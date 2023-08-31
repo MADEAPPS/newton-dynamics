@@ -28,7 +28,6 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainReplayBuffer.h"
 
-//#define D_USE_FLAT_AGENTS
 
 // this is an implementation of the vanilla deep deterministic 
 // policy gradient for continues control re enforcement learning.  
