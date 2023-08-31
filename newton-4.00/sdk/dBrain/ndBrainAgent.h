@@ -22,9 +22,9 @@
 #ifndef _ND_BRAIN_AGENT_H__
 #define _ND_BRAIN_AGENT_H__
 
-//#include "ndBrainStdafx.h"
 
 class ndBrainSave;
+
 
 class ndBrainAgent: public ndClassAlloc
 {
@@ -65,6 +65,7 @@ inline void ndBrainAgent::SetName(const ndString& name)
 {
 	m_name = name;
 }
+
 
 #endif 
 
