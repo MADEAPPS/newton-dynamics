@@ -186,8 +186,6 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const ndS
 
 	SetBufferSize(D_TD3_REPLAY_BUFFERSIZE);
 
-	//m_actor.InitWeightsXavierMethod();
-	//m_critic0.InitWeightsXavierMethod();
 	InitWeights();
 }
 
@@ -259,15 +257,9 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::SetActionNoise(ndReal noiseV
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentTD3_Trainer<statesDim, actionDim>::InitWeights()
 {
-#if 0
-	m_critic1.InitWeightsXavierMethod();
-	m_actor.InitWeightsXavierMethod();
-	m_critic0.InitWeightsXavierMethod();
-#else
 	m_actor.InitWeightsXavierMethod();
 	m_critic0.InitWeightsXavierMethod();
 	m_critic1.InitWeightsXavierMethod();
-#endif
 
 	m_targetActor.CopyFrom(m_actor);
 	m_targetCritic0.CopyFrom(m_critic0);
