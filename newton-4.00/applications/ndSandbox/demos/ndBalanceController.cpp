@@ -143,7 +143,7 @@ namespace ndController_1
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(4000)
-				,m_stopTraining(5000000)
+				,m_stopTraining(3000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
 				,m_averageQValue()
