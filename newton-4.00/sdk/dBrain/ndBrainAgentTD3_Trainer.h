@@ -33,50 +33,40 @@
 // td3 algorithm as described here: 
 // https://arxiv.org/pdf/1802.09477.pdf
 
-#define D_TD3_CRITIC_LEARN_RATE		ndReal(0.001f)
-#define D_TD3_ACTOR_LEARN_RATE		ndReal(0.0001f)
-#define D_TD3_DISCOUNT_FACTOR		ndReal (0.99f)
-#define D_TD3_REPLAY_BUFFERSIZE		(1024 * 512)
-//#define D_TD3_REPLAY_BUFFERSIZE	(1024)
-//#define D_TD3_REPLAY_BASH_SIZE	32
-#define D_TD3_REPLAY_BASH_SIZE		64
-#define D_TD3_REGULARIZER			ndReal (2.0e-6f)
-#define D_TD3_SOFT_TARGET_FACTOR	ndReal (1.0e-3f)
-#define D_TD3_ACTION_NOISE_VARIANCE	ndReal (0.05f)
-
-class ndBrainAgentTD3_HyperParameters
-{
-	public:
-	ndBrainAgentTD3_HyperParameters()
-	{
-		m_gamma = D_TD3_DISCOUNT_FACTOR;
-		m_regularizer = D_TD3_REGULARIZER;
-		m_actorLearnRate = D_TD3_ACTOR_LEARN_RATE;
-		m_criticLearnRate = D_TD3_CRITIC_LEARN_RATE;
-		m_bashBufferSize = D_TD3_REPLAY_BUFFERSIZE;
-		m_replayBufferSize = D_TD3_REPLAY_BUFFERSIZE;
-		m_softTargetFactor = D_TD3_SOFT_TARGET_FACTOR;
-		m_actionNoiseVariance = D_TD3_ACTION_NOISE_VARIANCE;
-		m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
-	}
-
-	ndReal m_gamma;
-	ndReal m_regularizer;
-	ndReal m_actorLearnRate;
-	ndReal m_criticLearnRate;
-	ndReal m_softTargetFactor;
-	ndReal m_actionNoiseVariance;
-
-	ndInt32 m_threadsCount;
-	ndInt32 m_bashBufferSize;
-	ndInt32 m_replayBufferSize;
-};
-
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 {
 	public:
-	ndBrainAgentTD3_Trainer(const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic);
+
+	class HyperParameters
+	{
+		public:
+		HyperParameters()
+		{
+			m_bashBufferSize = 64;
+			m_discountFactor = ndReal(0.99f);
+			m_regularizer = ndReal(2.0e-6f);
+			m_actorLearnRate = ndReal(0.0001f);
+			m_criticLearnRate = ndReal(0.001f);
+			m_replayBufferSize = 1024 * 512;
+			m_softTargetFactor = ndReal(1.0e-3f);
+			m_actionNoiseVariance = ndReal(0.05f);
+			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
+		}
+
+		ndReal m_discountFactor;
+		ndReal m_regularizer;
+		ndReal m_actorLearnRate;
+		ndReal m_criticLearnRate;
+		ndReal m_softTargetFactor;
+		ndReal m_actionNoiseVariance;
+
+		ndInt32 m_threadsCount;
+		ndInt32 m_bashBufferSize;
+		ndInt32 m_replayBufferSize;
+	};
+
+	ndBrainAgentTD3_Trainer(const HyperParameters& hyperParameters, const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic);
 	~ndBrainAgentTD3_Trainer();
 
 	ndReal GetCurrentValue() const;
@@ -127,7 +117,7 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 	ndBrainReplayBuffer<ndReal, statesDim, actionDim> m_replayBuffer;
 	ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim> m_currentTransition;
 
-	ndReal m_gamma;
+	ndReal m_discountFactor;
 	ndReal m_currentQValue;
 	ndReal m_actorLearnRate;
 	ndReal m_criticLearnRate;
@@ -141,7 +131,7 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic)
+ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const HyperParameters& hyperParameters, const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic)
 	:ndBrainAgent()
 	,ndBrainThreadPool()
 	,m_actor(*(*actor))
@@ -153,16 +143,16 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const ndS
 	,m_bashSamples()
 	,m_replayBuffer()
 	,m_currentTransition()
-	,m_gamma(D_TD3_DISCOUNT_FACTOR)
+	,m_discountFactor(hyperParameters.m_discountFactor)
 	,m_currentQValue(ndReal(0.0f))
-	,m_actorLearnRate(D_TD3_ACTOR_LEARN_RATE)
-	,m_criticLearnRate(D_TD3_CRITIC_LEARN_RATE)
-	,m_softTargetFactor(D_TD3_SOFT_TARGET_FACTOR)
-	,m_actionNoiseVariance(D_TD3_ACTION_NOISE_VARIANCE)
+	,m_actorLearnRate(hyperParameters.m_actorLearnRate)
+	,m_criticLearnRate(hyperParameters.m_criticLearnRate)
+	,m_softTargetFactor(hyperParameters.m_softTargetFactor)
+	,m_actionNoiseVariance(hyperParameters.m_actionNoiseVariance)
 	,m_frameCount(0)
 	,m_framesAlive(0)
 	,m_eposideCount(0)
-	,m_bashBufferSize(D_TD3_REPLAY_BASH_SIZE)
+	,m_bashBufferSize(hyperParameters.m_bashBufferSize)
 	,m_collectingSamples(true)
 {
 	ndAssert(m_critic0.GetOutputSize() == 1);
@@ -171,21 +161,18 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const ndS
 	ndAssert(m_critic0.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
 	ndAssert(m_critic1.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
 
-	ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
-//threadCount = 1;
-	SetThreadCount(threadCount);
+	SetThreadCount(hyperParameters.m_threadsCount);
 	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
 	{
 		m_actorOptimizer.PushBack(new ndBrainTrainer(&m_actor));
 		m_criticOptimizer0.PushBack(new ndBrainTrainer(&m_critic0));
 		m_criticOptimizer1.PushBack(new ndBrainTrainer(&m_critic1));
-		m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(D_TD3_REGULARIZER);
-		m_criticOptimizer0[m_criticOptimizer0.GetCount() - 1]->SetRegularizer(D_TD3_REGULARIZER);
-		m_criticOptimizer1[m_criticOptimizer1.GetCount() - 1]->SetRegularizer(D_TD3_REGULARIZER);
+		m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
+		m_criticOptimizer0[m_criticOptimizer0.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
+		m_criticOptimizer1[m_criticOptimizer1.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
 	}
 
-	SetBufferSize(D_TD3_REPLAY_BUFFERSIZE);
-
+	SetBufferSize(hyperParameters.m_replayBufferSize);
 	InitWeights();
 }
 
@@ -372,8 +359,8 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 		trainer0.ClearGradientsAcc();
 		trainer1.ClearGradientsAcc();
 
-		Loss loss0(trainer0, &m_targetCritic0, m_replayBuffer, m_gamma);
-		Loss loss1(trainer1, &m_targetCritic1, m_replayBuffer, m_gamma);
+		Loss loss0(trainer0, &m_targetCritic0, m_replayBuffer, m_discountFactor);
+		Loss loss1(trainer1, &m_targetCritic1, m_replayBuffer, m_discountFactor);
 
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 

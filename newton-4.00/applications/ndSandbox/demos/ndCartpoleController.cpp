@@ -23,7 +23,7 @@
 namespace ndController_0
 {
 	//#define USE_TD3
-	#define D_USE_POLE_DQN
+	//#define D_USE_POLE_DQN
 
 	#define D_PUSH_ACCEL			ndFloat32 (15.0f)
 	#define D_REWARD_MIN_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
@@ -237,8 +237,8 @@ namespace ndController_0
 			class ndCartpoleAgent_trainer: public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
 			{
 				public:
-				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
-					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(actor, critic)
+				ndCartpoleAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
+					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
 #endif
 					,m_model(nullptr)
 					,m_maxGain(-1.0e10f)
@@ -276,10 +276,9 @@ namespace ndController_0
 				{
 					if (GetEpisodeFrames() >= 10000)
 					{
-						const ndRandom& random = GetRandomGenerator(0);
 						for (ndInt32 i = 0; i < m_actionsSize; ++i)
 						{
-							ndReal gaussianNoise = ndReal(random.GetGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
+							ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
 							ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
 							actions[i] = clippiedNoisyAction;
 						}
@@ -593,7 +592,8 @@ namespace ndController_0
 			critic->EndAddLayer();
 
 			// add a reinforcement learning controller 
-			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(actor, critic));
+			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor, critic));
 		#endif
 
 		char fileName[1024];

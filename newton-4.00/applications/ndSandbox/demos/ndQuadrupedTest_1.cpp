@@ -241,8 +241,8 @@ namespace ndQuadruped_1
 				ndBodyDynamic* m_body;
 			};
 
-			ndControllerAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
-				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
+			ndControllerAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
+				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(3000)
@@ -320,14 +320,12 @@ namespace ndQuadruped_1
 			{
 				if (GetEpisodeFrames() >= 10000)
 				{
-					ndAssert(0);
-					//const ndRandom& random = GetRandomGenerator(0);
-					//for (ndInt32 i = 0; i < m_actionsSize; ++i)
-					//{
-					//	ndReal gaussianNoise = ndReal(random.GetGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
-					//	ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
-					//	actions[i] = clippiedNoisyAction;
-					//}
+					for (ndInt32 i = 0; i < m_actionsSize; ++i)
+					{
+						ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
+						ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
+						actions[i] = clippiedNoisyAction;
+					}
 				}
 				m_model->ApplyActions(actions);
 			}
@@ -1150,7 +1148,8 @@ namespace ndQuadruped_1
 			critic->EndAddLayer();
 
 			// add a reinforcement learning controller 
-			ndSharedPtr<ndBrainAgent> agent(new ndModelQuadruped::ndControllerAgent_trainer(actor, critic));
+			ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			ndSharedPtr<ndBrainAgent> agent(new ndModelQuadruped::ndControllerAgent_trainer(hyperParameters, actor, critic));
 			agent->SetName("quadruped_1.nn");
 
 			//char fileName[1024];

@@ -131,8 +131,8 @@ namespace ndController_1
 		class ndControllerAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
-			ndControllerAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
-				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
+			ndControllerAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
+				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
 #else
 		class ndControllerAgent_trainer: public ndBrainAgentSAC_Trainer<m_stateSize, m_actionsSize>
 		{
@@ -559,7 +559,8 @@ namespace ndController_1
 			critic->EndAddLayer();
 
 			// add a reinforcement learning controller 
-			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(actor, critic));
+			ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(hyperParameters, actor, critic));
 			agent->SetName("unicycle.nn");
 			scene->SetAcceleratedUpdate();
 		#else
