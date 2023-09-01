@@ -23,7 +23,7 @@
 namespace ndController_1
 {
 	#define USE_TD3
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
 	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)
