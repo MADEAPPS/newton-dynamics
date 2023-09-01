@@ -23,7 +23,7 @@
 namespace ndController_1
 {
 	#define USE_TD3
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
 	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)
@@ -89,11 +89,11 @@ namespace ndController_1
 			{
 			}
 #else
-		class ndControllerAgent : public ndBrainAgentSAC<m_stateSize, m_actionsSize>
+		class ndControllerAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
 		{
 			public:
 			ndControllerAgent(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentSAC<m_stateSize, m_actionsSize>(actor)
+				:ndBrainAgentDDPG<m_stateSize, m_actionsSize>(actor)
 				, m_model(nullptr)
 			{
 			}
@@ -134,11 +134,11 @@ namespace ndController_1
 			ndControllerAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
 #else
-		class ndControllerAgent_trainer: public ndBrainAgentSAC_Trainer<m_stateSize, m_actionsSize>
+		class ndControllerAgent_trainer: public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
-			ndControllerAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
-				:ndBrainAgentSAC_Trainer<m_stateSize, m_actionsSize>(actor, critic)
+			ndControllerAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
+				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
 #endif
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
@@ -231,7 +231,7 @@ namespace ndController_1
 					#ifdef USE_TD3
 						ndBrainAgentTD3_Trainer::OptimizeStep();
 					#else
-						ndBrainAgentSAC_Trainer::OptimizeStep();
+						ndBrainAgentDDPG_Trainer::OptimizeStep();
 					#endif
 
 					episodeCount -= GetEposideCount();
@@ -549,7 +549,6 @@ namespace ndController_1
 			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + m_actionsSize, layerSize * 2, activation);
 			ndBrainLayer* const criticLayer1 = new ndBrainLayer(criticLayer0->GetOuputSize(), layerSize * 2, activation);
 			ndBrainLayer* const criticLayer2 = new ndBrainLayer(criticLayer1->GetOuputSize(), layerSize * 2, activation);
-			//ndBrainLayer* const criticOuputLayer = new ndBrainLayer(criticLayer2->GetOuputSize(), 1, m_lineal);
 			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(criticLayer2->GetOuputSize(), 1, m_relu);
 			critic->BeginAddLayer();
 			critic->AddLayer(criticLayer0);
@@ -559,8 +558,14 @@ namespace ndController_1
 			critic->EndAddLayer();
 
 			// add a reinforcement learning controller 
+			#ifdef USE_TD3
 			ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			#else
+			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			#endif
 			//hyperParameters.m_discountFactor = ndReal (0.995f);
+			//hyperParameters.m_threadsCount = 1;
+
 			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(hyperParameters, actor, critic));
 			agent->SetName("unicycle.nn");
 			scene->SetAcceleratedUpdate();

@@ -52,21 +52,16 @@ ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
 
 ndBrainLayer::~ndBrainLayer()
 {
-	ndAssert(0);
-	//m_size = 0;
-	//m_capacity = 0;
 }
 
 ndUnsigned8* ndBrainLayer::SetPointers(ndUnsigned8* const memPtr)
 {
-	//return ndBrainMatrix::SetPointer(memPtr);
 	return m_weights.SetPointer(memPtr);
 }
 
 ndReal* ndBrainLayer::SetFloatPointers(ndReal* const memPtr)
 {
 	ndInt32 columns = memPtr ? m_columns : 0;
-	//ndReal* memory = ndBrainMatrix::SetFloatPointers(memPtr, columns);
 	ndReal* memory = m_weights.SetFloatPointers(memPtr, columns);
 	m_bias.SetPointer(memory);
 	ndInt32 count = (m_bias.GetCount() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
