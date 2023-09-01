@@ -306,8 +306,8 @@ void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBra
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 		const ndBrainLayer* const layer = layers[i];
-		ndAssert(layer->GetRows() == layer->GetOuputSize());
-		ndAssert(layer->GetColumns() == layer->GetInputSize());
+		ndAssert(layer->m_weights.GetRows() == layer->GetOuputSize());
+		ndAssert(layer->m_weights.GetColumns() == layer->GetInputSize());
 	
 		ndDeepBrainMemVector g(gBuff, layer->GetOuputSize());
 		ndDeepBrainMemVector outGradient(zBuff, layer->GetInputSize());
@@ -315,7 +315,7 @@ void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBra
 	
 		layer->ActivationDerivative(z, g);
 		g.Mul(gradient);
-		layer->TransposeMul(g, outGradient);
+		layer->m_weights.TransposeMul(g, outGradient);
 		
 		gradient.SetCount(outGradient.GetCount());
 		gradient.Set(outGradient);
@@ -348,8 +348,8 @@ void ndBrain::CalculateInputGradients(const ndBrainVector& input, ndBrainVector&
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 		const ndBrainLayer* const layer = layers[i];
-		ndAssert(layer->GetRows() == layer->GetOuputSize());
-		ndAssert(layer->GetColumns() == layer->GetInputSize());
+		ndAssert(layer->m_weights.GetRows() == layer->GetOuputSize());
+		ndAssert(layer->m_weights.GetColumns() == layer->GetInputSize());
 
 		ndDeepBrainMemVector g(gBuff, layer->GetOuputSize());
 		ndDeepBrainMemVector outGradient(zBuff, layer->GetInputSize());
@@ -357,7 +357,7 @@ void ndBrain::CalculateInputGradients(const ndBrainVector& input, ndBrainVector&
 
 		layer->ActivationDerivative(z, g);
 		g.Mul(gradient);
-		layer->TransposeMul(g, outGradient);
+		layer->m_weights.TransposeMul(g, outGradient);
 
 		gradient.SetCount(outGradient.GetCount());
 		gradient.Set(outGradient);

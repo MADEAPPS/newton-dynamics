@@ -202,8 +202,8 @@ void ndBrainSave::Save(const ndBrain* const brain)
 				break;
 		}
 
-		Save("\tinputs %d\n", layer->GetColumns());
-		Save("\toutputs %d\n", layer->GetRows());
+		Save("\tinputs %d\n", layer->m_weights.GetColumns());
+		Save("\toutputs %d\n", layer->m_weights.GetRows());
 		Save("}\n\n");
 	}
 

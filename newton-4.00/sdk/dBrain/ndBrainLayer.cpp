@@ -27,42 +27,47 @@
 #define RELUE_SATURATION ndReal(100.0f)
 
 ndBrainLayer::ndBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndBrainActivationType activation)
-	:ndBrainMatrix()
+	:ndClassAlloc()
+	,m_weights()
 	,m_bias()
 	,m_activation(activation)
 	,m_columns(inputCount)
 {
-	m_size = outputCount;
-	m_capacity = outputCount + 1;
+	m_weights.m_size = outputCount;
+	m_weights.m_capacity = outputCount + 1;
 	m_bias.SetSize(outputCount);
 }
 
 ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
-	:ndBrainMatrix()
+	:ndClassAlloc()
+	,m_weights()
 	,m_bias()
 	,m_activation(src.m_activation)
 	,m_columns(src.m_columns)
 {
-	m_size = src.GetOuputSize();
-	m_capacity = src.GetOuputSize() + 1;
+	m_weights.m_size = src.GetOuputSize();
+	m_weights.m_capacity = src.GetOuputSize() + 1;
 	m_bias.SetSize(src.GetOuputSize());
 }
 
 ndBrainLayer::~ndBrainLayer()
 {
-	m_size = 0;
-	m_capacity = 0;
+	ndAssert(0);
+	//m_size = 0;
+	//m_capacity = 0;
 }
 
 ndUnsigned8* ndBrainLayer::SetPointers(ndUnsigned8* const memPtr)
 {
-	return ndBrainMatrix::SetPointer(memPtr);
+	//return ndBrainMatrix::SetPointer(memPtr);
+	return m_weights.SetPointer(memPtr);
 }
 
 ndReal* ndBrainLayer::SetFloatPointers(ndReal* const memPtr)
 {
 	ndInt32 columns = memPtr ? m_columns : 0;
-	ndReal* memory = ndBrainMatrix::SetFloatPointers(memPtr, columns);
+	//ndReal* memory = ndBrainMatrix::SetFloatPointers(memPtr, columns);
+	ndReal* memory = m_weights.SetFloatPointers(memPtr, columns);
 	m_bias.SetPointer(memory);
 	ndInt32 count = (m_bias.GetCount() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 	return &memory[count];
@@ -75,13 +80,13 @@ ndBrainLayer* ndBrainLayer::Clone() const
 
 void ndBrainLayer::CopyFrom(const ndBrainLayer& src)
 {
-	Set(src);
+	m_weights.Set(src.m_weights);
 	m_bias.Set(src.m_bias);
 }
 
 void ndBrainLayer::Blend(const ndBrainLayer& src, ndReal blend)
 {
-	ndBrainMatrix::Blend(src, blend);
+	m_weights.Blend(src.m_weights, blend);
 	m_bias.Blend(src.m_bias, blend);
 }
 
@@ -109,11 +114,11 @@ bool ndBrainLayer::Compare(const ndBrainLayer& src) const
 		}
 	}
 	
-	const ndBrainMatrix& me = (*this);
+	const ndBrainMatrix& me = m_weights;
 	for (ndInt32 i = 0; i < me.GetCount(); ++i)
 	{
 		const ndBrainVector& row0 = me[i];
-		const ndBrainVector& row1 = src[i];
+		const ndBrainVector& row1 = src.m_weights[i];
 		if (row0.GetCount() != row1.GetCount())
 		{
 			ndAssert(0);
@@ -140,9 +145,9 @@ void ndBrainLayer::InitGaussianBias(ndReal variance)
 
 void ndBrainLayer::InitGaussianWeights(ndReal variance)
 {
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = m_weights.GetCount() - 1; i >= 0; --i)
 	{
-		(*this)[i].InitGaussianWeights(variance);
+		m_weights[i].InitGaussianWeights(variance);
 	}
 }
 
@@ -386,7 +391,7 @@ void ndBrainLayer::ActivationDerivative(const ndBrainVector& input, ndBrainVecto
 
 void ndBrainLayer::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
-	Mul(input, output);
+	m_weights.Mul(input, output);
 	output.Add(m_bias);
 	ApplyActivation(output);
 }
@@ -412,10 +417,10 @@ void ndBrainLayer::Save(const ndBrainSave* const loadSave) const
 	Save("\n");
 
 	Save("\tinputWeights\n");
-	for (ndInt32 i = 0; i < GetCount(); ++i)
+	for (ndInt32 i = 0; i < m_weights.GetCount(); ++i)
 	{
 		Save("\t\tweights_%d ", i);
-		const ndBrainVector& row = (*this)[i];
+		const ndBrainVector& row = m_weights[i];
 		for (ndInt32 j = 0; j < GetInputSize(); ++j)
 		{
 			Save("%g ", row[j]);
@@ -439,7 +444,7 @@ void ndBrainLayer::Load(const ndBrainLoad* const loader)
 	for (ndInt32 i = 0; i < GetOuputSize(); ++i)
 	{
 		loader->ReadString(buffer);
-		ndBrainVector& row = (*this)[i];
+		ndBrainVector& row = m_weights[i];
 		for (ndInt32 j = 0; j < GetInputSize(); ++j)
 		{
 			ndFloat32 weight = loader->ReadFloat();

@@ -30,7 +30,7 @@
 class ndBrainLoad;
 class ndBrainSave;
 
-class ndBrainLayer: public ndBrainMatrix
+class ndBrainLayer : public ndClassAlloc
 {
 	public: 
 	ndBrainLayer(const ndBrainLayer& src);
@@ -80,11 +80,13 @@ class ndBrainLayer: public ndBrainMatrix
 	void ReluActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const;
 	void LinealActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const;
 
+	ndBrainMatrix m_weights;
 	ndDeepBrainMemVector m_bias;
 	ndBrainActivationType m_activation;
 	ndInt32 m_columns;
 	friend class ndBrain;
 	friend class ndBrainSave;
+	friend class ndBrainTrainer;
 };
 
 inline ndBrainActivationType ndBrainLayer::GetActivationType() const

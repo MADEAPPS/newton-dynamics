@@ -208,7 +208,7 @@ void ndBrainTrainer::BackPropagateCalculateBiasGradient(ndInt32 layerIndex)
 	ndDeepBrainMemVector biasGradientsAcc(&m_biasGradientsAcc[preFixScan[layerIndex + 1]], layer->GetInputSize());
 	const ndDeepBrainMemVector zDerivative(&m_zDerivative[preFixScan[layerIndex + 1]], layer->GetInputSize());
 
-	layer->TransposeMul(biasGradients1, biasGradients);
+	layer->m_weights.TransposeMul(biasGradients1, biasGradients);
 	biasGradients.Mul(zDerivative);
 	biasGradientsAcc.Add(biasGradients);
 }
@@ -251,7 +251,7 @@ void ndBrainTrainer::ClampWeights(ndReal clampValue)
 		ndBrainVector& bias = layer->GetBias();
 		bias.Clamp(negativeValue, postiveValue);
 
-		ndBrainMatrix& weightMatrix = *layer;
+		ndBrainMatrix& weightMatrix = layer->m_weights;
 		for (ndInt32 j = 0; j < outputSize; ++j)
 		{
 			ndBrainVector& weightVector = weightMatrix[j];
@@ -271,7 +271,7 @@ void ndBrainTrainer::DropOutWeights(ndReal weighsDropOut, ndReal biasDropOut)
 		ndBrainVector& bias = layer->GetBias();
 		bias.DropOut(biasDropOut);
 
-		ndBrainMatrix& weightMatrix = *layer;
+		ndBrainMatrix& weightMatrix = layer->m_weights;
 		for (ndInt32 j = 0; j < outputSize; ++j)
 		{
 			ndBrainVector& weightVector = weightMatrix[j];
@@ -499,7 +499,7 @@ void ndBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 		const ndInt32 weightGradientStride = (inputSize + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 		const ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[i]];
 
-		ndBrainMatrix& weightMatrix = *layer;
+		ndBrainMatrix& weightMatrix = layer->m_weights;
 		for (ndInt32 j = 0; j < outputSize; ++j)
 		{
 			ndBrainVector& weightVector = weightMatrix[j];

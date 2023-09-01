@@ -32,7 +32,6 @@ class ndBrainMatrix: public ndArray<ndBrainVector>
 	ndBrainMatrix(ndInt32 rows, ndInt32 columns);
 	ndBrainMatrix(const ndBrainMatrix& src);
 	~ndBrainMatrix();
-
 	void Init(ndInt32 rows, ndInt32 columns);
 
 	ndInt32 GetRows() const;
@@ -47,6 +46,8 @@ class ndBrainMatrix: public ndArray<ndBrainVector>
 	protected:
 	ndUnsigned8* SetPointer(ndUnsigned8* const mem);
 	ndReal* SetFloatPointers(ndReal* const mem, ndInt32 columns);
+
+	friend class ndBrainLayer;
 };
 
 inline ndInt32 ndBrainMatrix::GetRows() const
