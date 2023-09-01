@@ -143,7 +143,7 @@ namespace ndController_1
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(4000)
-				,m_stopTraining(3000000)
+				,m_stopTraining(2000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
 				,m_averageQValue()
@@ -560,7 +560,7 @@ namespace ndController_1
 
 			// add a reinforcement learning controller 
 			ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
-			hyperParameters.m_discountFactor = ndReal (0.995f);
+			//hyperParameters.m_discountFactor = ndReal (0.995f);
 			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(hyperParameters, actor, critic));
 			agent->SetName("unicycle.nn");
 			scene->SetAcceleratedUpdate();
