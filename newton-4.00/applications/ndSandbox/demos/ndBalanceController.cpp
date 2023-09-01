@@ -560,6 +560,7 @@ namespace ndController_1
 
 			// add a reinforcement learning controller 
 			ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			hyperParameters.m_discountFactor = ndReal (0.995f);
 			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(hyperParameters, actor, critic));
 			agent->SetName("unicycle.nn");
 			scene->SetAcceleratedUpdate();
