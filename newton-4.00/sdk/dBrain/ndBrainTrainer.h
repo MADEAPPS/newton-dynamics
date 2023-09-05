@@ -74,12 +74,12 @@ class ndBrainTrainer: public ndClassAlloc
 	ndHidenVariableOffsets m_weightGradientsPrefixScan;
 	ndBrain* m_brain;
 	
-	ndReal m_regularizer;
 	ndReal m_beta;
 	ndReal m_alpha;
 	ndReal m_epsilon;
 	ndReal m_betaAcc;
 	ndReal m_alphaAcc;
+	ndReal m_weighDecayRegularizer;
 	ndSolveModel m_model;
 	
 	friend class ndBrainTrainerChannel;

@@ -39,15 +39,14 @@ ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
 	,m_inputOutputPrefixScan()
 	,m_weightGradientsPrefixScan()
 	,m_brain(brain)
-	,m_regularizer(1.0e-6f)
 	,m_beta(0.999f)
 	,m_alpha(0.9f)
 	,m_epsilon(1.0e-8f)
 	,m_betaAcc(m_beta)
 	,m_alphaAcc(m_alpha)
+	,m_weighDecayRegularizer(ndReal (1.0e-6f))
 	,m_model(m_adam)
 {
-	ndAssert(m_regularizer >= 0.0f);
 	PrefixScan();
 }
 
@@ -65,12 +64,12 @@ ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
 	,m_inputOutputPrefixScan(src.m_inputOutputPrefixScan)
 	,m_weightGradientsPrefixScan(src.m_weightGradientsPrefixScan)
 	,m_brain(src.m_brain)
-	,m_regularizer(src.m_regularizer)
 	,m_beta(src.m_beta)
 	,m_alpha(src.m_alpha)
 	,m_epsilon(src.m_epsilon)
 	,m_betaAcc(src.m_betaAcc)
 	,m_alphaAcc(src.m_alphaAcc)
+	,m_weighDecayRegularizer(src.m_weighDecayRegularizer)
 	,m_model(src.m_model)
 {
 	ndAssert(0);
@@ -97,12 +96,12 @@ void ndBrainTrainer::SetModel(ndSolveModel model)
 
 ndReal ndBrainTrainer::GetRegularizer() const
 {
-	return m_regularizer;
+	return m_weighDecayRegularizer;
 }
 
 void ndBrainTrainer::SetRegularizer(ndReal regularizer)
 {
-	m_regularizer = ndClamp(regularizer, ndReal(0.0f), ndReal(0.01f));
+	m_weighDecayRegularizer = ndClamp(regularizer, ndReal(0.0f), ndReal(0.01f));
 }
 
 void ndBrainTrainer::PrefixScan()
@@ -309,7 +308,7 @@ void ndBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 void ndBrainTrainer::StochasticUpdate(ndReal learnRate)
 {
 	learnRate *= ndReal(-1.0f);
-	ndReal regularizer = GetRegularizer();
+	ndReal regularizer = -GetRegularizer();
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
@@ -319,8 +318,6 @@ void ndBrainTrainer::StochasticUpdate(ndReal learnRate)
 
 		ndBrainVector& bias = layer->GetBias();
 		ndDeepBrainMemVector biasGradients(&m_biasGradientsAcc[m_inputOutputPrefixScan[i + 1]], outputSize);
-		//bias.ScaleAdd(bias, regularizer);
-		//bias.ScaleAdd(biasGradients, learnRate);
 		biasGradients.Scale(learnRate);
 		biasGradients.ScaleAdd(bias, regularizer);
 		bias.Add(biasGradients);
@@ -334,8 +331,6 @@ void ndBrainTrainer::StochasticUpdate(ndReal learnRate)
 		{
 			ndBrainVector& weightVector = weightMatrix[j];
 			ndDeepBrainMemVector weightGradients(weightGradientPtr, inputSize);
-			//weightVector.ScaleAdd(weightVector, regularizer);
-			//weightVector.ScaleAdd(weightGradients, learnRate);
 			weightGradients.Scale(learnRate);
 			weightGradients.ScaleAdd(weightVector, regularizer);
 			weightVector.Add(weightGradients);
