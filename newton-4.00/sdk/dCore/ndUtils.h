@@ -79,6 +79,12 @@ inline T ndClamp(T val, T min, T max)
 	return ndMax (min, ndMin (max, val));
 }
 
+template <class T>
+inline T ndFlushToZero(T val)
+{
+	return (val > T(1.0e-16f)) ? val : ((val < T(-1.0e-16f)) ? val : T(0.0f));
+}
+
 template <class T> 
 inline void ndSwap(T& A, T& B)
 {

@@ -24,12 +24,6 @@
 #include "ndUtils.h"
 #include "ndProbability.h"
 
-static ndSpinLock& GetLock()
-{
-	static ndSpinLock lock;
-	return lock;
-}
-
 static std::mt19937& GetRandomGenerator()
 {
 	static std::mt19937 generator;
@@ -43,7 +37,8 @@ void ndSetRandSeed(ndUnsigned32 seed)
 
 ndUnsigned32 ndRandInt()
 {
-	ndScopeSpinLock lock(GetLock());
+	static ndSpinLock __lock__;
+	ndScopeSpinLock lock(__lock__);
 	std::mt19937& generator = GetRandomGenerator();
 	return ndUnsigned32(generator());
 }

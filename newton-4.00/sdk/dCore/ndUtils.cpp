@@ -375,7 +375,6 @@ void ndThreadYield()
 
 ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 {
-	//#if (defined (WIN32) || defined(_WIN32))
 	#if defined (_MSC_VER)
 		_clearfp();
 		m_floatMask = _controlfp(0, 0);
