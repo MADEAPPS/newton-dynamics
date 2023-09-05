@@ -16,9 +16,9 @@ static void ThreeLayersTwoInputsTwoOutputs()
 {
 	ndBrain brain;
 	ndInt32 neurons = 32;
-	ndBrainLayer* const inputLayer = new ndBrainLayer(2, neurons, m_relu);
-	ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), neurons, m_relu);
-	ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), neurons, m_relu);
+	ndBrainLayer* const inputLayer = new ndBrainLayer(2, neurons, m_tanh);
+	ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), neurons, m_tanh);
+	ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), neurons, m_tanh);
 	ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer1->GetOuputSize(), 2, m_sigmoid);
 	
 	brain.BeginAddLayer();
@@ -27,10 +27,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	brain.AddLayer(hiddenLayer1);
 	brain.AddLayer(ouputLayer);
 	brain.EndAddLayer();
-	//brain.InitGaussianBias(ndReal(0.125f));
-	//brain.InitGaussianWeights(ndReal(0.125f));
-	//brain.InitWeightsXavierMethod();
-	brain.InitWeights(ndReal(0.25f), ndReal(0.125f));
+	brain.InitWeightsXavierMethod();
 	
 	ndInt32 samples = 2000;
 	ndBrainMatrix inputBatch(samples, 2);
@@ -432,8 +429,8 @@ static void MnistTrainingSet()
 		brain.AddLayer(hiddenLayer1);
 		brain.AddLayer(ouputLayer);
 		brain.EndAddLayer();
-		brain.InitWeights(ndReal(0.25f), ndReal(0.125f));
-		//brain.InitWeightsXavierMethod();
+		brain.InitWeightsXavierMethod();
+		//brain.InitWeights(ndReal(0.25f), ndReal(0.125f));
 	
 		SupervisedTrainer optimizer(&brain);
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
