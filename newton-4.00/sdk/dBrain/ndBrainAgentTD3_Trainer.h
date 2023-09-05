@@ -407,12 +407,6 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 	ndBrainThreadPool::ParallelExecute(AccumulateWeight);
 	m_criticOptimizer0[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
 	m_criticOptimizer1[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
-
-	m_criticOptimizer0[0]->ClampWeights(ndReal(100.0f));
-	m_criticOptimizer1[0]->ClampWeights(ndReal(100.0f));
-
-	m_criticOptimizer0[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
-	m_criticOptimizer1[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -495,9 +489,6 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateActor(const ndU
 	ParallelExecute(PropagateBash);
 	ParallelExecute(AccumulateWeight);
 	m_actorOptimizer[0]->UpdateWeights(-m_actorLearnRate, m_bashBufferSize);
-	m_actorOptimizer[0]->ClampWeights(ndReal(100.0f));
-
-	m_actorOptimizer[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

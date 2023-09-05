@@ -152,8 +152,6 @@ ndBrain* ndBrainLoad::Load() const
 		ReadString(buffer);
 	}
 
-	brain->m_isReady = true;
-
 	return brain;
 }
 

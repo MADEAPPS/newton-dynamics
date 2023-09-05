@@ -24,48 +24,45 @@
 #include "ndBrainLayer.h"
 #include "ndBrainSaveLoad.h"
 
-#define RELUE_SATURATION ndReal(100.0f)
-
 ndBrainLayer::ndBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndBrainActivationType activation)
 	:ndClassAlloc()
-	,m_weights()
+	,m_weights(outputCount, inputCount)
 	,m_bias()
 	,m_activation(activation)
 	,m_columns(inputCount)
 {
-	m_weights.m_size = outputCount;
-	m_weights.m_capacity = outputCount + 1;
-	m_bias.SetSize(outputCount);
+	m_bias.SetCount(outputCount);
 }
 
 ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
 	:ndClassAlloc()
-	,m_weights()
-	,m_bias()
+	,m_weights(src.m_weights)
+	,m_bias(src.m_bias)
 	,m_activation(src.m_activation)
 	,m_columns(src.m_columns)
 {
-	m_weights.m_size = src.GetOuputSize();
-	m_weights.m_capacity = src.GetOuputSize() + 1;
-	m_bias.SetSize(src.GetOuputSize());
 }
 
 ndBrainLayer::~ndBrainLayer()
 {
 }
 
-ndUnsigned8* ndBrainLayer::SetPointers(ndUnsigned8* const memPtr)
+ndUnsigned8* ndBrainLayer::SetPointers(ndUnsigned8* const)
 {
-	return m_weights.SetPointer(memPtr);
+	ndAssert(0);
+	//return m_weights.SetPointer(memPtr);
+	return nullptr;
 }
 
-ndReal* ndBrainLayer::SetFloatPointers(ndReal* const memPtr)
+ndReal* ndBrainLayer::SetFloatPointers(ndReal* const)
 {
-	ndInt32 columns = memPtr ? m_columns : 0;
-	ndReal* memory = m_weights.SetFloatPointers(memPtr, columns);
-	m_bias.SetPointer(memory);
-	ndInt32 count = (m_bias.GetCount() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	return &memory[count];
+	ndAssert(0);
+	//ndInt32 columns = memPtr ? m_columns : 0;
+	//ndReal* memory = m_weights.SetFloatPointers(memPtr, columns);
+	//m_bias.SetPointer(memory);
+	//ndInt32 count = (m_bias.GetCount() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+	//return &memory[count];
+	return nullptr;
 }
 
 ndBrainLayer* ndBrainLayer::Clone() const
@@ -165,7 +162,7 @@ void ndBrainLayer::InitWeightsXavierMethod()
 		case m_sigmoid:
 		case m_softmax:
 		{
-			// thsi seem to be some huge bull shit.
+			// this seems to be some huge bull shit.
 			//biasVariance = ndReal(ndSqrt(ndFloat32(2.0f) / ndFloat32(GetInputSize())));
 			//weighVariance = biasVariance;
 
@@ -195,7 +192,7 @@ void ndBrainLayer::ReluActivation(ndBrainVector& output) const
 {
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
-		output[i] = (output[i] >= ndReal (0.0f)) ? output[i] : ndReal(0.0f);
+		output[i] = (output[i] > ndReal (0.0f)) ? output[i] : ndReal(0.0f);
 		ndAssert(ndCheckFloat(output[i]));
 	}
 }
@@ -204,12 +201,13 @@ void ndBrainLayer::SigmoidActivation(ndBrainVector& output) const
 {
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
-		ndReal value = ndClamp (output[i], ndReal(-50.0f), ndReal(50.0f));
-		ndReal exp = ndReal(ndExp(value));
-		output[i] = exp / (exp + ndReal(1.0f));
-		ndAssert (ndCheckFloat(output[i]));
-		ndAssert(output[i] <= ndReal(1.0f));
-		ndAssert(output[i] >= ndReal(0.0f));
+		ndReal val = ndClamp (output[i], ndReal(-50.0f), ndReal(50.0f));
+		ndReal exp = ndReal(ndExp(val));
+		ndReal out = ndFlushToZero(exp / (exp + ndReal(1.0f)));
+		ndAssert(ndCheckFloat(out));
+		ndAssert(out <= ndReal(1.0f));
+		ndAssert(out >= ndReal(0.0f));
+		output[i] = out;
 	}
 }
 
@@ -219,7 +217,7 @@ void ndBrainLayer::HyperbolicTanActivation(ndBrainVector& output) const
 	{
 		ndReal value = ndClamp(output[i], ndReal(-25.0f), ndReal(25.0f));
 		ndReal exp = ndReal(ndExp(ndReal(2.0f) * value));
-		output[i] = (exp - ndReal(1.0f)) / (exp + ndReal(1.0f));
+		output[i] = ndFlushToZero(exp - ndReal(1.0f)) / (exp + ndReal(1.0f));
 		ndAssert(ndCheckFloat(output[i]));
 		ndAssert(output[i] <= ndReal(1.0f));
 		ndAssert(output[i] >= ndReal(-1.0f));
@@ -228,6 +226,7 @@ void ndBrainLayer::HyperbolicTanActivation(ndBrainVector& output) const
 
 void ndBrainLayer::SoftmaxActivation(ndBrainVector& output) const
 {
+	ndAssert(0);
 	ndReal acc = 0.0f;
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
@@ -262,7 +261,7 @@ void ndBrainLayer::ReluActivationDerivative(const ndBrainVector& input, ndBrainV
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal val = input[i];
-		derivativeOutput[i] = (val >= ndReal(0.0f)) ? ndReal(1.0f) : ndReal(0.0f);
+		derivativeOutput[i] = (val > ndReal(0.0f)) ? ndReal(1.0f) : ndReal(0.0f);
 	}
 }
 
@@ -272,7 +271,8 @@ void ndBrainLayer::SigmoidDerivative(const ndBrainVector& input, ndBrainVector& 
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal val = input[i];
-		derivativeOutput[i] = val * (ndReal(1.0f) - val);
+		ndReal out = val * (ndReal(1.0f) - val);
+		derivativeOutput[i] = ndFlushToZero (out);
 	}
 }
 
@@ -282,12 +282,13 @@ void ndBrainLayer::HyperbolicTanDerivative(const ndBrainVector& input, ndBrainVe
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal val = input[i];
-		derivativeOutput[i] = ndReal(1.0f) - val * val;
+		derivativeOutput[i] = ndFlushToZero (ndReal(1.0f) - val * val);
 	}
 }
 
 void ndBrainLayer::SoftmaxDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
+	ndAssert(0);
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	
 	// this is not correct, for now use SigmoidDerivative, 

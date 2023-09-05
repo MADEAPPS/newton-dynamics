@@ -42,13 +42,12 @@ class ndBrainVector: public ndArray<ndReal>
 	void Sub(const ndBrainVector& a);
 	void Mul(const ndBrainVector& a);
 
+	void FlushToZero();
 	void Clamp(ndReal min, ndReal max);
-	void DropOut(ndReal dropOut = ndReal(1.0e-6f));
 	void ScaleAdd(const ndBrainVector& a, ndReal b);
+	void Blend(const ndBrainVector& target, ndReal blend);
 	void MulAdd(const ndBrainVector& a, const ndBrainVector& b);
 	void MulSub(const ndBrainVector& a, const ndBrainVector& b);
-
-	void Blend(const ndBrainVector& target, ndReal blend);
 };
 
 class ndDeepBrainMemVector : public ndBrainVector

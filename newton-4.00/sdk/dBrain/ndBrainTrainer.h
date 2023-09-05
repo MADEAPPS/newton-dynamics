@@ -30,7 +30,7 @@ class ndBrainTrainer: public ndClassAlloc
 	public: 
 	enum ndSolveModel
 	{
-		m_cgd,
+		m_sgd,
 		m_adam
 	};
 
@@ -47,18 +47,19 @@ class ndBrainTrainer: public ndClassAlloc
 	void SetModel(ndSolveModel model);
 
 	void ClearGradientsAcc();
-	void ClampWeights(ndReal clampValue);
 	void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
-	void DropOutWeights(ndReal weighsDropOut, ndReal biasDropOut);
 	void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
 	void AcculumateGradients(const ndBrainTrainer& src, ndInt32 thread, ndInt32 threadCount);
 
 	private:
 	void PrefixScan();
-	void ApplyAdamCorrection();
 	void BackPropagateHiddenLayer(ndInt32 layerIndex);
 	void BackPropagateOutputLayer(ndBrainLoss& loss);
 	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
+	void BackPropagateCalculateWeightsGradient(ndInt32 layerIndex);
+
+	void AdamUpdate(ndReal learnRate);
+	void StochasticUpdate(ndReal learnRate);
 	
 	ndBrainVector m_z;
 	ndBrainVector m_zDerivative;
@@ -69,15 +70,16 @@ class ndBrainTrainer: public ndClassAlloc
 	ndBrainVector m_biasGradient_v;
 	ndBrainVector m_weightGradient_u;
 	ndBrainVector m_weightGradient_v;
+	ndHidenVariableOffsets m_inputOutputPrefixScan;
 	ndHidenVariableOffsets m_weightGradientsPrefixScan;
 	ndBrain* m_brain;
 	
 	ndReal m_regularizer;
-	ndReal m_alpha;
 	ndReal m_beta;
+	ndReal m_alpha;
 	ndReal m_epsilon;
-	ndReal m_alphaAcc;
 	ndReal m_betaAcc;
+	ndReal m_alphaAcc;
 	ndSolveModel m_model;
 	
 	friend class ndBrainTrainerChannel;

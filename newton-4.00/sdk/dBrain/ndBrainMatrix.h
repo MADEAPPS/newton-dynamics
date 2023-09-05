@@ -25,12 +25,12 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
 
-class ndBrainMatrix: public ndArray<ndBrainVector>
+class ndBrainMatrix: public ndArray<ndDeepBrainMemVector>
 {
 	public: 
 	ndBrainMatrix();
-	ndBrainMatrix(ndInt32 rows, ndInt32 columns);
 	ndBrainMatrix(const ndBrainMatrix& src);
+	ndBrainMatrix(ndInt32 rows, ndInt32 columns);
 	~ndBrainMatrix();
 	void Init(ndInt32 rows, ndInt32 columns);
 
@@ -44,9 +44,7 @@ class ndBrainMatrix: public ndArray<ndBrainVector>
 	void TransposeMul(const ndBrainVector& input, ndBrainVector& output) const;
 
 	protected:
-	ndUnsigned8* SetPointer(ndUnsigned8* const mem);
-	ndReal* SetFloatPointers(ndReal* const mem, ndInt32 columns);
-
+	void* m_memory;
 	friend class ndBrainLayer;
 };
 

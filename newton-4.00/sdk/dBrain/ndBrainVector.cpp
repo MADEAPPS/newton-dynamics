@@ -101,26 +101,20 @@ void ndBrainVector::Scale(ndReal scale)
 	ndScale(GetCount(), &(*this)[0], scale);
 }
 
-void ndBrainVector::DropOut(ndReal dropOut)
-{
-	ndAssert(dropOut >= ndReal(0.0f));
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
-	{
-		ndReal val = (*this)[i];
-		ndAssert(val <= 100.0f);
-		ndAssert(val >= -100.0f);
-		(*this)[i] = (ndAbs(val) >= dropOut) ? val : ndReal(0.0f);
-	}
-}
-
 void ndBrainVector::Clamp(ndReal min, ndReal max)
 {
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		ndReal val = (*this)[i];
-		ndAssert(val >= min);
-		ndAssert(val <= max);
 		(*this)[i] = ndClamp(val, min, max);
+	}
+}
+
+void ndBrainVector::FlushToZero()
+{
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		(*this)[i] = ndFlushToZero((*this)[i]);
 	}
 }
 

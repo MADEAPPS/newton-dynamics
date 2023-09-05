@@ -81,7 +81,7 @@ class ndBrainLayer : public ndClassAlloc
 	void LinealActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const;
 
 	ndBrainMatrix m_weights;
-	ndDeepBrainMemVector m_bias;
+	ndBrainVector m_bias;
 	ndBrainActivationType m_activation;
 	ndInt32 m_columns;
 	friend class ndBrain;

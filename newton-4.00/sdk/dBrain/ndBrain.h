@@ -87,13 +87,7 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	void CalculateInputGradientLoss(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients);
 
 	private:
-	void CalculateOffsets();
-	void MakePrediction(const ndBrainVector& input, ndBrainVector& output, const ndBrainVector& hiddenLayerOutputs);
-
-	ndReal* m_memory;
-	ndInt32 m_memorySize;
-	ndHidenVariableOffsets m_offsets;
-	bool m_isReady;
+	//void MakePrediction(const ndBrainVector& input, ndBrainVector& output, const ndBrainVector& hiddenLayerOutputs);
 
 	friend class ndBrainLoad;
 	friend class ndBrainSave;

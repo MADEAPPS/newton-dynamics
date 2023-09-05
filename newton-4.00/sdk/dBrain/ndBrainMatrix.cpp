@@ -24,69 +24,65 @@
 #include "ndBrainMatrix.h"
 
 ndBrainMatrix::ndBrainMatrix()
-	:ndArray<ndBrainVector>()
+	:ndArray<ndDeepBrainMemVector>()
+	,m_memory(nullptr)
 {
+	ndAssert(0);
 }
 
 ndBrainMatrix::ndBrainMatrix(ndInt32 rows, ndInt32 columns)
-	:ndArray<ndBrainVector>()
+	:ndArray<ndDeepBrainMemVector>()
+	,m_memory(nullptr)
 {
 	Init(rows, columns);
 }
 
 ndBrainMatrix::ndBrainMatrix(const ndBrainMatrix& src)
-	:ndArray<ndBrainVector>(src)
+	:ndArray<ndDeepBrainMemVector>()
+	,m_memory(nullptr)
 {
-	ndBrainMatrix& me = *this;
-	for (ndInt32 i = 0; i < src.GetRows(); ++i)
-	{
-		ndBrainVector& row = me[i];
-		row.ResetMembers();
-		row.SetCount(src.GetColumns());
-		row.Set(src[i]);
-	}
+	Init(src.GetRows(), src.GetColumns());
+	Set(src);
 }
 
 ndBrainMatrix::~ndBrainMatrix()
 {
-	if (m_array)
+	ndAssert(0);
+	ndBrainMatrix& me = *this;
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
-		ndBrainMatrix& me = *this;
-		for (ndInt32 i = GetCount() - 1; i >= 0; --i)
-		{
-			ndBrainVector& row = me[i];
-			row.~ndBrainVector();
-		}
+		ndDeepBrainMemVector& row = me[i];
+		row.~ndDeepBrainMemVector();
 	}
+	m_array = nullptr;
+	ndAssert(m_memory);
+	ndMemory::Free(m_memory);
 }
 
 void ndBrainMatrix::Init(ndInt32 rows, ndInt32 columns)
 {
-	SetCount(rows);
+	m_size = rows;
+	m_capacity = rows + 1;
+
+	ndInt32 padding = D_DEEP_BRAIN_DATA_ALIGMENT * 4;
+	ndInt32 columSizeInBytes = (ndInt32(columns * sizeof(ndReal)) + padding - 1) & -padding;
+	ndInt32 size = ndInt32 (rows * sizeof(ndDeepBrainMemVector) + 256);
+	size += columSizeInBytes * rows;
+	m_memory = (ndReal*)ndMemory::Malloc(size_t(size));
+	m_array = (ndDeepBrainMemVector*)m_memory;
+
+	ndInt32 bytes = ndInt32((rows * sizeof(ndDeepBrainMemVector) + padding - 1) & -padding);
+	ndInt8* ptr = (ndInt8*)m_memory + bytes;
+
 	ndBrainMatrix& me = *this;
 	for (ndInt32 i = 0; i < rows; ++i)
 	{
-		ndBrainVector& row = me[i];
-		row.ResetMembers();
-		row.SetCount(columns);
+		ndDeepBrainMemVector& row = me[i];
+		row.SetSize(columns);
+		row.SetPointer((ndReal*) ptr);
+		ptr += columSizeInBytes;
+		ndAssert((bytes + columSizeInBytes * i) < size);
 	}
-}
-
-ndUnsigned8* ndBrainMatrix::SetPointer(ndUnsigned8* const mem)
-{
-	m_array = (ndDeepBrainMemVector*)mem;
-	return mem + GetCount() * sizeof (ndDeepBrainMemVector);
-}
-
-ndReal* ndBrainMatrix::SetFloatPointers(ndReal* const mem, ndInt32 columns)
-{
-	ndInt32 count = 0;
-	for (ndInt32 i = 0; i < GetCount(); ++i)
-	{
-		m_array[i].SetMembers(columns, &mem[count]);
-		count += (m_array[i].GetCount() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	}
-	return &mem[count];
 }
 
 void ndBrainMatrix::Set(ndReal value)
