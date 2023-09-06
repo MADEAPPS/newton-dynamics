@@ -333,14 +333,12 @@ static void MnistTrainingSet()
 			ndInt32 minFail = trainingDigits->GetCount();
 			for (ndInt32 i = 0; i < 2000000; ++i)
 			{
-				ndInt32 start = 0;
-				if (priorityIndexArray.GetCount())
+				ndInt32 priorityStart = ndMin(priorityIndexArray.GetCount(), 2);
+				for (ndInt32 j = 0; j < priorityStart; ++j)
 				{
-					ndUnsigned32 index = ndRandInt() % ndUnsigned32(priorityIndexArray.GetCount());
-					shuffleBashBuffer[0] = priorityIndexArray[ndInt32 (index)];
-					start = 1;
+					shuffleBashBuffer[j] = priorityIndexArray[ndInt32 (ndRandInt() % ndUnsigned32(priorityIndexArray.GetCount()))];
 				}
-				for (ndInt32 j = start; j < m_bashBufferSize; ++j)
+				for (ndInt32 j = priorityStart; j < m_bashBufferSize; ++j)
 				{
 					shuffleBashBuffer[j] = ndRandInt() % trainingDigits->GetCount();
 				}
@@ -483,6 +481,6 @@ void ndTestDeedBrian()
 	//fclose(outFile);
 
 	//ThreeLayersTwoInputsTwoOutputs();
-	MnistTrainingSet();
-	//MnistTestSet();
+	//MnistTrainingSet();
+	MnistTestSet();
 }
