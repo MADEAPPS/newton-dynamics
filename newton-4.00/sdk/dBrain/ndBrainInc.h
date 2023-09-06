@@ -28,7 +28,7 @@
 #include <ndBrainLoss.h>
 #include <ndBrainTypes.h>
 #include <ndBrainAgent.h>
-//#include <ndBrainLayer.h>
+#include <ndBrainLayer.h>
 #include <ndBrainVector.h>
 #include <ndBrainMatrix.h>
 #include <ndBrainTrainer.h>

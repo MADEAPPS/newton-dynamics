@@ -47,24 +47,6 @@ ndBrainLayerLinearActivated::~ndBrainLayerLinearActivated()
 {
 }
 
-ndUnsigned8* ndBrainLayerLinearActivated::SetPointers(ndUnsigned8* const)
-{
-	ndAssert(0);
-	//return m_weights.SetPointer(memPtr);
-	return nullptr;
-}
-
-ndReal* ndBrainLayerLinearActivated::SetFloatPointers(ndReal* const)
-{
-	ndAssert(0);
-	//ndInt32 columns = memPtr ? m_columns : 0;
-	//ndReal* memory = m_weights.SetFloatPointers(memPtr, columns);
-	//m_bias.SetPointer(memory);
-	//ndInt32 count = (m_bias.GetCount() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	//return &memory[count];
-	return nullptr;
-}
-
 ndBrainLayerLinearActivated* ndBrainLayerLinearActivated::Clone() const
 {
 	return new ndBrainLayerLinearActivated(*this);
@@ -161,6 +143,7 @@ void ndBrainLayerLinearActivated::InitWeightsXavierMethod()
 		case m_lineal:
 		case m_sigmoid:
 		case m_softmax:
+		case m_noActivation:
 		{
 			// this seems to be some huge bull shit.
 			//biasVariance = ndReal(ndSqrt(ndFloat32(2.0f) / ndFloat32(GetInputSize())));

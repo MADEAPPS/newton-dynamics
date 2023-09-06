@@ -36,10 +36,6 @@ class ndBrainLayerLinearActivated : public ndClassAlloc
 	ndBrainLayerLinearActivated(const ndBrainLayerLinearActivated& src);
 	ndBrainLayerLinearActivated(ndInt32 inputs, ndInt32 outputs, ndBrainActivationType type);
 	virtual ~ndBrainLayerLinearActivated();
-
-	ndReal* SetFloatPointers(ndReal* const mem);
-	ndUnsigned8* SetPointers(ndUnsigned8* const mem);
-
 	virtual ndBrainLayerLinearActivated* Clone() const;
 	
 	ndBrainVector& GetBias();

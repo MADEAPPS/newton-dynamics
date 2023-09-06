@@ -33,7 +33,8 @@ enum ndBrainActivationType
 	m_relu,
 	m_tanh,
 	m_sigmoid,
-	m_softmax
+	m_softmax,
+	m_noActivation
 };
 
 #endif 
