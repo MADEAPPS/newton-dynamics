@@ -47,6 +47,7 @@ ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
 	,m_weighDecayRegularizer(ndReal (1.0e-6f))
 	,m_model(m_adam)
 {
+	m_weighDecayRegularizer = ndReal(1.0e-4f);
 	PrefixScan();
 }
 

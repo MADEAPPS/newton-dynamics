@@ -331,7 +331,7 @@ static void MnistTrainingSet()
 
 			ndBrain bestBrain(m_brain);
 			ndInt32 minFail = trainingDigits->GetCount();
-			for (ndInt32 i = 0; i < 2000000; ++i)
+			for (ndInt32 i = 0; i < 5000000; ++i)
 			{
 				for (ndInt32 j = 0; j < m_bashBufferSize; ++j)
 				{
@@ -478,6 +478,6 @@ void ndTestDeedBrian()
 	//fclose(outFile);
 
 	//ThreeLayersTwoInputsTwoOutputs();
-	MnistTrainingSet();
-	//MnistTestSet();
+	//MnistTrainingSet();
+	MnistTestSet();
 }
