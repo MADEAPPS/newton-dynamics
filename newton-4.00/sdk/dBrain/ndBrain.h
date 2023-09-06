@@ -23,7 +23,7 @@
 #define _ND_BRAIN_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainLayer.h"
+#include "ndBrainLayerLinearActivated.h"
 
 class ndBrainLoad;
 class ndBrainSave;
@@ -58,7 +58,7 @@ class ndHidenVariableOffsets: public ndFixSizeArray<ndInt32, 32>
 	}
 };
 
-class ndBrain: public ndArray<ndBrainLayer*>
+class ndBrain: public ndArray<ndBrainLayerLinearActivated*>
 {
 	public: 
 	ndBrain();
@@ -72,7 +72,7 @@ class ndBrain: public ndArray<ndBrainLayer*>
 
 	void BeginAddLayer();
 	void EndAddLayer();
-	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
+	ndBrainLayerLinearActivated* AddLayer(ndBrainLayerLinearActivated* const layer);
 
 	bool Compare(const ndBrain& src) const;
 

@@ -45,7 +45,7 @@ class ndBrainMatrix: public ndArray<ndDeepBrainMemVector>
 
 	protected:
 	void* m_memory;
-	friend class ndBrainLayer;
+	friend class ndBrainLayerLinearActivated;
 };
 
 inline ndInt32 ndBrainMatrix::GetRows() const

@@ -552,10 +552,10 @@ namespace ndController_0
 		ndInt32 layerSize = 64;
 		#ifdef D_USE_POLE_DQN
 			ndSharedPtr<ndBrain> actor(new ndBrain());
-			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
-			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
-			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
-			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_lineal);
+			ndBrainLayerLinearActivated* const layer0 = new ndBrainLayerLinearActivated(m_stateSize, layerSize, m_tanh);
+			ndBrainLayerLinearActivated* const layer1 = new ndBrainLayerLinearActivated(layer0->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayerLinearActivated* const layer2 = new ndBrainLayerLinearActivated(layer1->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(layer2->GetOuputSize(), m_actionsSize, m_lineal);
 			actor->BeginAddLayer();
 			actor->AddLayer(layer0);
 			actor->AddLayer(layer1);
@@ -567,10 +567,10 @@ namespace ndController_0
 		#else
 
 			ndSharedPtr<ndBrain> actor(new ndBrain());
-			ndBrainLayer* const layer0 = new ndBrainLayer(m_stateSize, layerSize, m_tanh);
-			ndBrainLayer* const layer1 = new ndBrainLayer(layer0->GetOuputSize(), layerSize, m_tanh);
-			ndBrainLayer* const layer2 = new ndBrainLayer(layer1->GetOuputSize(), layerSize, m_tanh);
-			ndBrainLayer* const ouputLayer = new ndBrainLayer(layer2->GetOuputSize(), m_actionsSize, m_tanh);
+			ndBrainLayerLinearActivated* const layer0 = new ndBrainLayerLinearActivated(m_stateSize, layerSize, m_tanh);
+			ndBrainLayerLinearActivated* const layer1 = new ndBrainLayerLinearActivated(layer0->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayerLinearActivated* const layer2 = new ndBrainLayerLinearActivated(layer1->GetOuputSize(), layerSize, m_tanh);
+			ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(layer2->GetOuputSize(), m_actionsSize, m_tanh);
 			actor->BeginAddLayer();
 			actor->AddLayer(layer0);
 			actor->AddLayer(layer1);
@@ -580,10 +580,10 @@ namespace ndController_0
 			
 			// the critic is more complex since is deal with more complex inputs
 			ndSharedPtr<ndBrain> critic(new ndBrain());
-			ndBrainLayer* const criticLayer0 = new ndBrainLayer(m_stateSize + m_actionsSize, layerSize * 2, m_tanh);
-			ndBrainLayer* const criticLayer1 = new ndBrainLayer(criticLayer0->GetOuputSize(), layerSize * 2, m_tanh);
-			ndBrainLayer* const criticLayer2 = new ndBrainLayer(criticLayer1->GetOuputSize(), layerSize * 2, m_tanh);
-			ndBrainLayer* const criticOuputLayer = new ndBrainLayer(criticLayer2->GetOuputSize(), 1, m_lineal);
+			ndBrainLayerLinearActivated* const criticLayer0 = new ndBrainLayerLinearActivated(m_stateSize + m_actionsSize, layerSize * 2, m_tanh);
+			ndBrainLayerLinearActivated* const criticLayer1 = new ndBrainLayerLinearActivated(criticLayer0->GetOuputSize(), layerSize * 2, m_tanh);
+			ndBrainLayerLinearActivated* const criticLayer2 = new ndBrainLayerLinearActivated(criticLayer1->GetOuputSize(), layerSize * 2, m_tanh);
+			ndBrainLayerLinearActivated* const criticOuputLayer = new ndBrainLayerLinearActivated(criticLayer2->GetOuputSize(), 1, m_lineal);
 			critic->BeginAddLayer();
 			critic->AddLayer(criticLayer0);
 			critic->AddLayer(criticLayer1);

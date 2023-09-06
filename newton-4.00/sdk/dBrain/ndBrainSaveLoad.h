@@ -23,7 +23,7 @@
 #define _ND_BRAIN_SAVE_LOAD_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainLayer.h"
+#include "ndBrainLayerLinearActivated.h"
 
 class ndBrain;
 

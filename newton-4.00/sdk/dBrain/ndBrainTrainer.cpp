@@ -22,7 +22,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainLoss.h"
-#include "ndBrainLayer.h"
+#include "ndBrainLayerLinearActivated.h"
 #include "ndBrainTrainer.h"
 
 ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
@@ -44,10 +44,10 @@ ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
 	,m_epsilon(1.0e-8f)
 	,m_betaAcc(m_beta)
 	,m_alphaAcc(m_alpha)
-	,m_weighDecayRegularizer(ndReal (1.0e-6f))
+	,m_weighDecayRegularizer(ndReal (1.0e-5f))
 	,m_model(m_adam)
 {
-	m_weighDecayRegularizer = ndReal(1.0e-4f);
+	//m_weighDecayRegularizer = ndReal(1.0e-4f);
 	PrefixScan();
 }
 
@@ -107,12 +107,12 @@ void ndBrainTrainer::SetRegularizer(ndReal regularizer)
 
 void ndBrainTrainer::PrefixScan()
 {
-	const ndArray<ndBrainLayer*>& layers = *m_brain;
+	const ndArray<ndBrainLayerLinearActivated*>& layers = *m_brain;
 	m_inputOutputPrefixScan.SetCount(0);
 	m_inputOutputPrefixScan.PushBack((layers[0]->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
-		ndBrainLayer* const layer = layers[i];
+		ndBrainLayerLinearActivated* const layer = layers[i];
 		ndInt32 size = (layer->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 		m_inputOutputPrefixScan.PushBack(size);
 	}
@@ -142,7 +142,7 @@ void ndBrainTrainer::PrefixScan()
 	m_weightGradientsPrefixScan.SetCount(0);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
-		ndBrainLayer* const layer = layers[i];
+		ndBrainLayerLinearActivated* const layer = layers[i];
 		ndInt32 stride = (layer->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 		m_weightGradientsPrefixScan.PushBack (stride * layer->GetOuputSize());
 	}
@@ -185,10 +185,10 @@ void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 thre
 
 void ndBrainTrainer::BackPropagateOutputLayer(ndBrainLoss& loss)
 {
-	const ndArray<ndBrainLayer*>& layers = *m_brain;
+	const ndArray<ndBrainLayerLinearActivated*>& layers = *m_brain;
 	const ndInt32 layerIndex = layers.GetCount() - 1;
 	
-	ndBrainLayer* const ouputLayer = layers[layerIndex];
+	ndBrainLayerLinearActivated* const ouputLayer = layers[layerIndex];
 	const ndInt32 inputCount = ouputLayer->GetInputSize();
 	const ndInt32 outputCount = ouputLayer->GetOuputSize();
 
@@ -217,8 +217,8 @@ void ndBrainTrainer::BackPropagateOutputLayer(ndBrainLoss& loss)
 
 void ndBrainTrainer::BackPropagateCalculateBiasGradient(ndInt32 layerIndex)
 {
-	const ndArray<ndBrainLayer*>& layers = *m_brain;
-	ndBrainLayer* const layer = layers[layerIndex + 1];
+	const ndArray<ndBrainLayerLinearActivated*>& layers = *m_brain;
+	ndBrainLayerLinearActivated* const layer = layers[layerIndex + 1];
 	
 	const ndDeepBrainMemVector biasGradients1(&m_biasGradients[m_inputOutputPrefixScan[layerIndex + 2]], layer->GetOuputSize());
 	ndDeepBrainMemVector biasGradients(&m_biasGradients[m_inputOutputPrefixScan[layerIndex + 1]], layer->GetInputSize());
@@ -233,8 +233,8 @@ void ndBrainTrainer::BackPropagateCalculateBiasGradient(ndInt32 layerIndex)
 
 void ndBrainTrainer::BackPropagateCalculateWeightsGradient(ndInt32 layerIndex)
 {
-	const ndArray<ndBrainLayer*>& layers = *m_brain;
-	ndBrainLayer* const layer = layers[layerIndex];
+	const ndArray<ndBrainLayerLinearActivated*>& layers = *m_brain;
+	ndBrainLayerLinearActivated* const layer = layers[layerIndex];
 
 	const ndDeepBrainMemVector biasGradients(&m_biasGradients[m_inputOutputPrefixScan[layerIndex + 1]], layer->GetOuputSize());
 
@@ -261,13 +261,13 @@ void ndBrainTrainer::BackPropagateHiddenLayer(ndInt32 layerIndex)
 
 void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
 {
-	const ndArray<ndBrainLayer*>& layers = *m_brain;
+	const ndArray<ndBrainLayerLinearActivated*>& layers = *m_brain;
 
 	ndDeepBrainMemVector layerInput(&m_z[m_inputOutputPrefixScan[0]], input.GetCount());
 	layerInput.Set(input);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
-		ndBrainLayer* const layer = layers[i];
+		ndBrainLayerLinearActivated* const layer = layers[i];
 		const ndDeepBrainMemVector in(&m_z[m_inputOutputPrefixScan[i + 0]], layer->GetInputSize());
 		ndDeepBrainMemVector out(&m_z[m_inputOutputPrefixScan[i + 1]], layer->GetOuputSize());
 		layer->MakePrediction(in, out);
@@ -275,7 +275,7 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
-		ndBrainLayer* const layer = layers[i];
+		ndBrainLayerLinearActivated* const layer = layers[i];
 		const ndDeepBrainMemVector z(&m_z[m_inputOutputPrefixScan[i + 1]], layer->GetOuputSize());
 		ndDeepBrainMemVector zDerivative(&m_zDerivative[m_inputOutputPrefixScan[i + 1]], layer->GetOuputSize());
 		layer->ActivationDerivative(z, zDerivative);
@@ -310,10 +310,10 @@ void ndBrainTrainer::StochasticUpdate(ndReal learnRate)
 {
 	learnRate *= ndReal(-1.0f);
 	ndReal regularizer = -GetRegularizer();
-	const ndArray<ndBrainLayer*>& layers = *m_brain;
+	const ndArray<ndBrainLayerLinearActivated*>& layers = *m_brain;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
-		ndBrainLayer* const layer = layers[i];
+		ndBrainLayerLinearActivated* const layer = layers[i];
 		const ndInt32 inputSize = layer->GetInputSize();
 		const ndInt32 outputSize = layer->GetOuputSize();
 

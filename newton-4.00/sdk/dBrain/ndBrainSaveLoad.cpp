@@ -92,7 +92,7 @@ ndBrain* ndBrainLoad::Load() const
 		ReadString(layerType);
 
 		ReadString(buffer);
-		ndBrainLayer* layer = nullptr;
+		ndBrainLayerLinearActivated* layer = nullptr;
 
 		ReadString(buffer);
 		ReadString(buffer);
@@ -127,7 +127,7 @@ ndBrain* ndBrainLoad::Load() const
 		if (!strcmp(layerType, "fullyConnected"))
 		{
 			//layer = new ndBrainLayer(this);
-			layer = new ndBrainLayer(inputs, outputs, activation);
+			layer = new ndBrainLayerLinearActivated(inputs, outputs, activation);
 		}
 		else
 		{
@@ -145,7 +145,7 @@ ndBrain* ndBrainLoad::Load() const
 
 	for (ndInt32 i = 0; i < layersCount; ++i)
 	{
-		ndBrainLayer* const layer = (*brain)[i];
+		ndBrainLayerLinearActivated* const layer = (*brain)[i];
 		ReadString(buffer);
 		ReadString(buffer);
 		layer->Load(this);
@@ -173,7 +173,7 @@ void ndBrainSave::Save(const ndBrain* const brain)
 
 	for (ndInt32 i = 0; i < brain->GetCount(); ++i)
 	{
-		ndBrainLayer* const layer = (*brain)[i];
+		ndBrainLayerLinearActivated* const layer = (*brain)[i];
 		Save("layer fullyConnected\n");
 		Save("{\n");
 		switch (layer->m_activation)
@@ -207,7 +207,7 @@ void ndBrainSave::Save(const ndBrain* const brain)
 
 	for (ndInt32 i = 0; i < brain->GetCount(); ++i)
 	{
-		ndBrainLayer* const layer = (*brain)[i];
+		ndBrainLayerLinearActivated* const layer = (*brain)[i];
 		Save("layer\n");
 		Save("{\n");
 		layer->Save(this);

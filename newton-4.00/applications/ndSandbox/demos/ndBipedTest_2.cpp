@@ -174,11 +174,11 @@ namespace biped2
 			:ndBrain()
 		{
 			const ndInt32 neuronsPerHiddenLayers = 16;
-			ndBrainLayer* const inputLayer = new ndBrainLayer(numberOfImputs, neuronsPerHiddenLayers, m_relu);
-			ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
-			ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
+			ndBrainLayerLinearActivated* const inputLayer = new ndBrainLayerLinearActivated(numberOfImputs, neuronsPerHiddenLayers, m_relu);
+			ndBrainLayerLinearActivated* const hiddenLayer0 = new ndBrainLayerLinearActivated(inputLayer->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
+			ndBrainLayerLinearActivated* const hiddenLayer1 = new ndBrainLayerLinearActivated(hiddenLayer0->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
 			//ndBrainLayer* const hiddenLayer2 = new ndBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
-			ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer1->GetOuputSize(), numberOfOutputs, m_relu);
+			ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(hiddenLayer1->GetOuputSize(), numberOfOutputs, m_relu);
 
 			BeginAddLayer();
 			AddLayer(inputLayer);

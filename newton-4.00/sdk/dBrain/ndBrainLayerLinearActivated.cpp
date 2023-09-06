@@ -21,10 +21,10 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
-#include "ndBrainLayer.h"
+#include "ndBrainLayerLinearActivated.h"
 #include "ndBrainSaveLoad.h"
 
-ndBrainLayer::ndBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndBrainActivationType activation)
+ndBrainLayerLinearActivated::ndBrainLayerLinearActivated(ndInt32 inputCount, ndInt32 outputCount, ndBrainActivationType activation)
 	:ndClassAlloc()
 	,m_weights(outputCount, inputCount)
 	,m_bias()
@@ -34,7 +34,7 @@ ndBrainLayer::ndBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndBrainActiv
 	m_bias.SetCount(outputCount);
 }
 
-ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
+ndBrainLayerLinearActivated::ndBrainLayerLinearActivated(const ndBrainLayerLinearActivated& src)
 	:ndClassAlloc()
 	,m_weights(src.m_weights)
 	,m_bias(src.m_bias)
@@ -43,18 +43,18 @@ ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
 {
 }
 
-ndBrainLayer::~ndBrainLayer()
+ndBrainLayerLinearActivated::~ndBrainLayerLinearActivated()
 {
 }
 
-ndUnsigned8* ndBrainLayer::SetPointers(ndUnsigned8* const)
+ndUnsigned8* ndBrainLayerLinearActivated::SetPointers(ndUnsigned8* const)
 {
 	ndAssert(0);
 	//return m_weights.SetPointer(memPtr);
 	return nullptr;
 }
 
-ndReal* ndBrainLayer::SetFloatPointers(ndReal* const)
+ndReal* ndBrainLayerLinearActivated::SetFloatPointers(ndReal* const)
 {
 	ndAssert(0);
 	//ndInt32 columns = memPtr ? m_columns : 0;
@@ -65,24 +65,24 @@ ndReal* ndBrainLayer::SetFloatPointers(ndReal* const)
 	return nullptr;
 }
 
-ndBrainLayer* ndBrainLayer::Clone() const
+ndBrainLayerLinearActivated* ndBrainLayerLinearActivated::Clone() const
 {
-	return new ndBrainLayer(*this);
+	return new ndBrainLayerLinearActivated(*this);
 }
 
-void ndBrainLayer::CopyFrom(const ndBrainLayer& src)
+void ndBrainLayerLinearActivated::CopyFrom(const ndBrainLayerLinearActivated& src)
 {
 	m_weights.Set(src.m_weights);
 	m_bias.Set(src.m_bias);
 }
 
-void ndBrainLayer::Blend(const ndBrainLayer& src, ndReal blend)
+void ndBrainLayerLinearActivated::Blend(const ndBrainLayerLinearActivated& src, ndReal blend)
 {
 	m_weights.Blend(src.m_weights, blend);
 	m_bias.Blend(src.m_bias, blend);
 }
 
-bool ndBrainLayer::Compare(const ndBrainLayer& src) const
+bool ndBrainLayerLinearActivated::Compare(const ndBrainLayerLinearActivated& src) const
 {
 	if (m_activation != src.m_activation)
 	{
@@ -130,12 +130,12 @@ bool ndBrainLayer::Compare(const ndBrainLayer& src) const
 	return true;
 }
 
-void ndBrainLayer::InitGaussianBias(ndReal variance)
+void ndBrainLayerLinearActivated::InitGaussianBias(ndReal variance)
 {
 	m_bias.InitGaussianWeights(variance);
 }
 
-void ndBrainLayer::InitGaussianWeights(ndReal variance)
+void ndBrainLayerLinearActivated::InitGaussianWeights(ndReal variance)
 {
 	for (ndInt32 i = m_weights.GetCount() - 1; i >= 0; --i)
 	{
@@ -143,7 +143,7 @@ void ndBrainLayer::InitGaussianWeights(ndReal variance)
 	}
 }
 
-void ndBrainLayer::InitWeights(ndReal weighVariance, ndReal biasVariance)
+void ndBrainLayerLinearActivated::InitWeights(ndReal weighVariance, ndReal biasVariance)
 {
 	biasVariance = ndMin(biasVariance, ndReal(0.5f));
 	weighVariance = ndMin(weighVariance, ndReal(0.5f));
@@ -151,7 +151,7 @@ void ndBrainLayer::InitWeights(ndReal weighVariance, ndReal biasVariance)
 	InitGaussianWeights(weighVariance);
 }
 
-void ndBrainLayer::InitWeightsXavierMethod()
+void ndBrainLayerLinearActivated::InitWeightsXavierMethod()
 {
 	ndReal biasVariance = ndReal (0.0f);
 	ndReal weighVariance = ndReal(0.0f);
@@ -184,11 +184,11 @@ void ndBrainLayer::InitWeightsXavierMethod()
 	InitGaussianWeights(weighVariance);
 }
 
-void ndBrainLayer::LinealActivation(ndBrainVector&) const
+void ndBrainLayerLinearActivated::LinealActivation(ndBrainVector&) const
 {
 }
 
-void ndBrainLayer::ReluActivation(ndBrainVector& output) const
+void ndBrainLayerLinearActivated::ReluActivation(ndBrainVector& output) const
 {
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
@@ -197,7 +197,7 @@ void ndBrainLayer::ReluActivation(ndBrainVector& output) const
 	}
 }
 
-void ndBrainLayer::SigmoidActivation(ndBrainVector& output) const
+void ndBrainLayerLinearActivated::SigmoidActivation(ndBrainVector& output) const
 {
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
@@ -211,7 +211,7 @@ void ndBrainLayer::SigmoidActivation(ndBrainVector& output) const
 	}
 }
 
-void ndBrainLayer::HyperbolicTanActivation(ndBrainVector& output) const
+void ndBrainLayerLinearActivated::HyperbolicTanActivation(ndBrainVector& output) const
 {
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
@@ -224,7 +224,7 @@ void ndBrainLayer::HyperbolicTanActivation(ndBrainVector& output) const
 	}
 }
 
-void ndBrainLayer::SoftmaxActivation(ndBrainVector& output) const
+void ndBrainLayerLinearActivated::SoftmaxActivation(ndBrainVector& output) const
 {
 	ndAssert(0);
 	ndReal acc = 0.0f;
@@ -246,7 +246,7 @@ void ndBrainLayer::SoftmaxActivation(ndBrainVector& output) const
 	}
 }
 
-void ndBrainLayer::LinealActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
+void ndBrainLayerLinearActivated::LinealActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
@@ -255,7 +255,7 @@ void ndBrainLayer::LinealActivationDerivative(const ndBrainVector& input, ndBrai
 	}
 }
 
-void ndBrainLayer::ReluActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
+void ndBrainLayerLinearActivated::ReluActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
@@ -265,7 +265,7 @@ void ndBrainLayer::ReluActivationDerivative(const ndBrainVector& input, ndBrainV
 	}
 }
 
-void ndBrainLayer::SigmoidDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
+void ndBrainLayerLinearActivated::SigmoidDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
@@ -276,7 +276,7 @@ void ndBrainLayer::SigmoidDerivative(const ndBrainVector& input, ndBrainVector& 
 	}
 }
 
-void ndBrainLayer::HyperbolicTanDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
+void ndBrainLayerLinearActivated::HyperbolicTanDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
@@ -286,7 +286,7 @@ void ndBrainLayer::HyperbolicTanDerivative(const ndBrainVector& input, ndBrainVe
 	}
 }
 
-void ndBrainLayer::SoftmaxDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
+void ndBrainLayerLinearActivated::SoftmaxDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	ndAssert(0);
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
@@ -307,7 +307,7 @@ void ndBrainLayer::SoftmaxDerivative(const ndBrainVector& input, ndBrainVector& 
 	//}
 }
 
-void ndBrainLayer::ApplyActivation(ndBrainVector& output) const
+void ndBrainLayerLinearActivated::ApplyActivation(ndBrainVector& output) const
 {
 	switch (m_activation)
 	{
@@ -346,7 +346,7 @@ void ndBrainLayer::ApplyActivation(ndBrainVector& output) const
 	}
 }
 
-void ndBrainLayer::ActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
+void ndBrainLayerLinearActivated::ActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	switch (m_activation)
 	{
@@ -385,14 +385,14 @@ void ndBrainLayer::ActivationDerivative(const ndBrainVector& input, ndBrainVecto
 	}
 }
 
-void ndBrainLayer::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
+void ndBrainLayerLinearActivated::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
 	m_weights.Mul(input, output);
 	output.Add(m_bias);
 	ApplyActivation(output);
 }
 
-void ndBrainLayer::Save(const ndBrainSave* const loadSave) const
+void ndBrainLayerLinearActivated::Save(const ndBrainSave* const loadSave) const
 {
 	char buffer[1024];
 	auto Save = [this, &buffer, &loadSave](const char* const fmt, ...)
@@ -425,7 +425,7 @@ void ndBrainLayer::Save(const ndBrainSave* const loadSave) const
 	}
 }
 
-void ndBrainLayer::Load(const ndBrainLoad* const loader)
+void ndBrainLayerLinearActivated::Load(const ndBrainLoad* const loader)
 {
 	char buffer[1024];
 	loader->ReadString(buffer);

@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_H__
-#define _ND_BRAIN_LAYER_H__
+#ifndef _ND_BRAIN_LAYER_LINEAL_ACTIVATED_H__
+#define _ND_BRAIN_LAYER_LINEAL_ACTIVATED_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainTypes.h"
@@ -30,17 +30,17 @@
 class ndBrainLoad;
 class ndBrainSave;
 
-class ndBrainLayer : public ndClassAlloc
+class ndBrainLayerLinearActivated : public ndClassAlloc
 {
 	public: 
-	ndBrainLayer(const ndBrainLayer& src);
-	ndBrainLayer(ndInt32 inputs, ndInt32 outputs, ndBrainActivationType type);
-	virtual ~ndBrainLayer();
+	ndBrainLayerLinearActivated(const ndBrainLayerLinearActivated& src);
+	ndBrainLayerLinearActivated(ndInt32 inputs, ndInt32 outputs, ndBrainActivationType type);
+	virtual ~ndBrainLayerLinearActivated();
 
 	ndReal* SetFloatPointers(ndReal* const mem);
 	ndUnsigned8* SetPointers(ndUnsigned8* const mem);
 
-	virtual ndBrainLayer* Clone() const;
+	virtual ndBrainLayerLinearActivated* Clone() const;
 	
 	ndBrainVector& GetBias();
 	const ndBrainVector& GetBias() const;
@@ -56,10 +56,10 @@ class ndBrainLayer : public ndClassAlloc
 
 	ndBrainActivationType GetActivationType() const;
 
-	virtual void CopyFrom(const ndBrainLayer& src);
-	virtual void Blend(const ndBrainLayer& src, ndReal blend);
+	virtual void CopyFrom(const ndBrainLayerLinearActivated& src);
+	virtual void Blend(const ndBrainLayerLinearActivated& src, ndReal blend);
 
-	virtual bool Compare(const ndBrainLayer& src) const;
+	virtual bool Compare(const ndBrainLayerLinearActivated& src) const;
 
 	virtual void Load(const ndBrainLoad* const loadSave);
 	virtual void Save(const ndBrainSave* const loadSave) const;
@@ -89,27 +89,27 @@ class ndBrainLayer : public ndClassAlloc
 	friend class ndBrainTrainer;
 };
 
-inline ndBrainActivationType ndBrainLayer::GetActivationType() const
+inline ndBrainActivationType ndBrainLayerLinearActivated::GetActivationType() const
 {
 	return m_activation;
 }
 
-inline ndInt32 ndBrainLayer::GetOuputSize() const
+inline ndInt32 ndBrainLayerLinearActivated::GetOuputSize() const
 {
 	return m_bias.GetCount();
 }
 
-inline ndInt32 ndBrainLayer::GetInputSize() const
+inline ndInt32 ndBrainLayerLinearActivated::GetInputSize() const
 {
 	return m_columns;
 }
 
-inline ndBrainVector& ndBrainLayer::GetBias()
+inline ndBrainVector& ndBrainLayerLinearActivated::GetBias()
 {
 	return m_bias;
 }
 
-inline const ndBrainVector& ndBrainLayer::GetBias() const
+inline const ndBrainVector& ndBrainLayerLinearActivated::GetBias() const
 {
 	return m_bias;
 }
