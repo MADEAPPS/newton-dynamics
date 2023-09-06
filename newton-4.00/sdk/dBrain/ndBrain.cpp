@@ -45,22 +45,10 @@ ndBrain::ndBrain(const ndBrain& src)
 
 ndBrain::~ndBrain()
 {
-	ndAssert(0);
-	//if (m_memory)
-	//{
-	//	for (ndInt32 i = 0; i < GetCount(); ++i)
-	//	{
-	//		ndBrainLayer& layer = *(*this)[i];
-	//		layer.SetFloatPointers(nullptr);
-	//		layer.SetPointers(nullptr);
-	//	}
-	//	ndMemory::Free(m_memory);
-	//}
-	//
-	//for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
-	//{
-	//	delete (*this)[i];
-	//}
+	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
+	{
+		delete (*this)[i];
+	}
 }
 
 ndInt32 ndBrain::GetInputSize() const

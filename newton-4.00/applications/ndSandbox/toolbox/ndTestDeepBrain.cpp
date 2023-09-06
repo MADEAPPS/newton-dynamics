@@ -433,7 +433,6 @@ static void MnistTrainingSet()
 		brain.AddLayer(ouputLayer);
 		brain.EndAddLayer();
 		brain.InitWeightsXavierMethod();
-		//brain.InitWeights(ndReal(0.25f), ndReal(0.125f));
 	
 		SupervisedTrainer optimizer(&brain);
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
@@ -459,10 +458,10 @@ static void MnistTestSet()
 	{
 		char path[256];
 		ndGetWorkingFileName("mnistDatabase/mnist.nn", path);
-	
-		ndBrain* const brain = ndBrainLoad::Load(path);
+		
+		ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
-		ValidateData("test data", *brain, *testLabels, *testDigits);
+		ValidateData("test data", *(*brain), *testLabels, *testDigits);
 		time = ndGetTimeInMicroseconds() - time;
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}

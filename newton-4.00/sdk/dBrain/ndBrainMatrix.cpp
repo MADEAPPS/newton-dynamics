@@ -47,7 +47,6 @@ ndBrainMatrix::ndBrainMatrix(const ndBrainMatrix& src)
 
 ndBrainMatrix::~ndBrainMatrix()
 {
-	ndAssert(0);
 	ndBrainMatrix& me = *this;
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
