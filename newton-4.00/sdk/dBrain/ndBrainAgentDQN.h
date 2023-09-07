@@ -144,8 +144,8 @@ void ndBrainAgentDQN<statesDim, actionDim>::Step()
 {
 	ndReal stateBuffer[statesDim * 2];
 	ndReal actionBuffer[actionDim * 2];
-	ndDeepBrainMemVector state(stateBuffer, statesDim);
-	ndDeepBrainMemVector actions(actionBuffer, actionDim);
+	ndBrainMemVector state(stateBuffer, statesDim);
+	ndBrainMemVector actions(actionBuffer, actionDim);
 
 	GetObservation(&state[0]);
 	m_actor->MakePrediction(state, actions);

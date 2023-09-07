@@ -284,12 +284,12 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 				ndAssert(m_truth.GetCount() == m_criticTrainer.GetBrain()->GetOutputSize());
 
 				ndReal criticOutputBuffer[2];
-				ndDeepBrainMemVector criticOutput(criticOutputBuffer, 1);
+				ndBrainMemVector criticOutput(criticOutputBuffer, 1);
 
 				ndReal targetValue = m_reward;
 				if (!m_isTerminal)
 				{
-					ndDeepBrainMemVector criticInput(m_targetInputBuffer, statesDim + actionDim);
+					ndBrainMemVector criticInput(m_targetInputBuffer, statesDim + actionDim);
 					m_agent->m_targetCritic.MakePrediction(criticInput, criticOutput);
 					targetValue = m_reward + m_discountFactor * criticOutput[0];
 				}
@@ -313,9 +313,9 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 		ndReal actorInputBuffer[statesDim * 2];
 		ndReal actorOutputBuffer[actionDim * 2];
 		ndReal inputBuffer[(statesDim + actionDim) * 2];
-		ndDeepBrainMemVector actorInput(actorInputBuffer, statesDim);
-		ndDeepBrainMemVector actorOutput(actorOutputBuffer, actionDim);
-		ndDeepBrainMemVector input(inputBuffer, statesDim + actionDim);
+		ndBrainMemVector actorInput(actorInputBuffer, statesDim);
+		ndBrainMemVector actorOutput(actorOutputBuffer, actionDim);
+		ndBrainMemVector input(inputBuffer, statesDim + actionDim);
 
 		trainer.ClearGradientsAcc();
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
@@ -388,7 +388,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 				const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_agent->m_replayBuffer[m_index];
 
 				ndReal criticInputBuffer[(statesDim + actionDim) * 2];
-				ndDeepBrainMemVector input(criticInputBuffer, statesDim + actionDim);
+				ndBrainMemVector input(criticInputBuffer, statesDim + actionDim);
 				for (ndInt32 i = 0; i < statesDim; ++i)
 				{
 					input[i] = transition.m_state[i];
@@ -414,7 +414,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 		ActorLoss loss(actorTrainer, this);
 
 		ndReal inputBuffer[statesDim * 2];
-		ndDeepBrainMemVector input(inputBuffer, statesDim);
+		ndBrainMemVector input(inputBuffer, statesDim);
 
 		actorTrainer.ClearGradientsAcc();
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
@@ -504,7 +504,7 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::CalculateQvalue(const ndBrainVector& state, const ndBrainVector& actions)
 {
 	ndReal buffer[(statesDim + actionDim) * 2];
-	ndDeepBrainMemVector criticInput(buffer, statesDim + actionDim);
+	ndBrainMemVector criticInput(buffer, statesDim + actionDim);
 	for (ndInt32 i = 0; i < statesDim; ++i)
 	{
 		criticInput[i] = state[i];
@@ -513,7 +513,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::CalculateQvalue(const ndBra
 	{
 		criticInput[i + statesDim] = actions[i];
 	}
-	ndDeepBrainMemVector criticOutput(&m_currentQValue, 1);
+	ndBrainMemVector criticOutput(&m_currentQValue, 1);
 	m_critic.MakePrediction(criticInput, criticOutput);
 }
 
@@ -522,8 +522,8 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 {
 	ndReal stateBuffer[statesDim * 2];
 	ndReal actionBuffer[actionDim * 2];
-	ndDeepBrainMemVector state(stateBuffer, statesDim);
-	ndDeepBrainMemVector actions(actionBuffer, actionDim);
+	ndBrainMemVector state(stateBuffer, statesDim);
+	ndBrainMemVector actions(actionBuffer, actionDim);
 
 	GetObservation(&m_currentTransition.m_state[0]);
 	for (ndInt32 i = 0; i < statesDim; ++i)

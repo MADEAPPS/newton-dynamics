@@ -271,7 +271,7 @@ static void MnistTrainingSet()
 			,m_bashBufferSize(64)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize/4);
-//threadCount = 1;
+threadCount = 1;
 
 			SetThreadCount(threadCount);
 			for (ndInt32 i = 0; i < GetThreadCount(); ++i)
@@ -331,7 +331,8 @@ static void MnistTrainingSet()
 
 			ndBrain bestBrain(m_brain);
 			ndInt32 minFail = trainingDigits->GetCount();
-			for (ndInt32 i = 0; i < 2000000; ++i)
+			//for (ndInt32 i = 0; i < 2000000; ++i)
+			for (ndInt32 i = 0; i < 10000; ++i)
 			{
 				ndInt32 priorityStart = ndMin(priorityIndexArray.GetCount(), 2);
 				for (ndInt32 j = 0; j < priorityStart; ++j)
@@ -352,7 +353,7 @@ static void MnistTrainingSet()
 					auto CrossValidate = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &failPriorities](ndInt32 threadIndex, ndInt32 threadCount)
 					{
 						ndReal outputBuffer[32];
-						ndDeepBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
+						ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
 
 						ndFixSizeArray<ndUnsigned32, 1024>& priorityArray = failPriorities[threadIndex];
 						priorityArray.SetCount(0);
@@ -480,6 +481,6 @@ void ndTestDeedBrian()
 	//fclose(outFile);
 
 	//ThreeLayersTwoInputsTwoOutputs();
-	//MnistTrainingSet();
-	MnistTestSet();
+	MnistTrainingSet();
+	//MnistTestSet();
 }

@@ -24,21 +24,21 @@
 #include "ndBrainMatrix.h"
 
 ndBrainMatrix::ndBrainMatrix()
-	:ndArray<ndDeepBrainMemVector>()
+	:ndArray<ndBrainMemVector>()
 	,m_memory(nullptr)
 {
 	ndAssert(0);
 }
 
 ndBrainMatrix::ndBrainMatrix(ndInt32 rows, ndInt32 columns)
-	:ndArray<ndDeepBrainMemVector>()
+	:ndArray<ndBrainMemVector>()
 	,m_memory(nullptr)
 {
 	Init(rows, columns);
 }
 
 ndBrainMatrix::ndBrainMatrix(const ndBrainMatrix& src)
-	:ndArray<ndDeepBrainMemVector>()
+	:ndArray<ndBrainMemVector>()
 	,m_memory(nullptr)
 {
 	Init(src.GetRows(), src.GetColumns());
@@ -50,8 +50,8 @@ ndBrainMatrix::~ndBrainMatrix()
 	ndBrainMatrix& me = *this;
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
-		ndDeepBrainMemVector& row = me[i];
-		row.~ndDeepBrainMemVector();
+		ndBrainMemVector& row = me[i];
+		row.~ndBrainMemVector();
 	}
 	m_array = nullptr;
 	ndAssert(m_memory);
@@ -65,18 +65,18 @@ void ndBrainMatrix::Init(ndInt32 rows, ndInt32 columns)
 
 	ndInt32 padding = D_DEEP_BRAIN_DATA_ALIGMENT * 4;
 	ndInt32 columSizeInBytes = (ndInt32(columns * sizeof(ndReal)) + padding - 1) & -padding;
-	ndInt32 size = ndInt32 (rows * sizeof(ndDeepBrainMemVector) + 256);
+	ndInt32 size = ndInt32 (rows * sizeof(ndBrainMemVector) + 256);
 	size += columSizeInBytes * rows;
 	m_memory = (ndReal*)ndMemory::Malloc(size_t(size));
-	m_array = (ndDeepBrainMemVector*)m_memory;
+	m_array = (ndBrainMemVector*)m_memory;
 
-	ndInt32 bytes = ndInt32((rows * sizeof(ndDeepBrainMemVector) + padding - 1) & -padding);
+	ndInt32 bytes = ndInt32((rows * sizeof(ndBrainMemVector) + padding - 1) & -padding);
 	ndInt8* ptr = (ndInt8*)m_memory + bytes;
 
 	ndBrainMatrix& me = *this;
 	for (ndInt32 i = 0; i < rows; ++i)
 	{
-		ndDeepBrainMemVector& row = me[i];
+		ndBrainMemVector& row = me[i];
 		row.SetSize(columns);
 		row.SetPointer((ndReal*) ptr);
 		ptr += columSizeInBytes;

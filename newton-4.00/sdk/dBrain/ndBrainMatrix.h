@@ -25,7 +25,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
 
-class ndBrainMatrix: public ndArray<ndDeepBrainMemVector>
+class ndBrainMatrix: public ndArray<ndBrainMemVector>
 {
 	public: 
 	ndBrainMatrix();

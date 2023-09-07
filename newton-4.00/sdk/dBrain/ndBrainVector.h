@@ -50,12 +50,12 @@ class ndBrainVector: public ndArray<ndReal>
 	void MulSub(const ndBrainVector& a, const ndBrainVector& b);
 };
 
-class ndDeepBrainMemVector : public ndBrainVector
+class ndBrainMemVector : public ndBrainVector
 {
 	public:
-	ndDeepBrainMemVector();
-	ndDeepBrainMemVector(const ndReal* const mem, ndInt32 size);
-	~ndDeepBrainMemVector();
+	ndBrainMemVector();
+	ndBrainMemVector(const ndReal* const mem, ndInt32 size);
+	~ndBrainMemVector();
 
 	void SetSize(ndInt32 size);
 	void SetPointer(ndReal* const memmory);

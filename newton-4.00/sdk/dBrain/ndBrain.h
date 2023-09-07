@@ -24,7 +24,6 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
-//#include "ndBrainLayerLinearActivated.h"
 
 class ndBrainLoad;
 class ndBrainSave;

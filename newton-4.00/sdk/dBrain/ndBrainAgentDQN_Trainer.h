@@ -220,8 +220,8 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 
 				ndReal stateBuffer[statesDim * 2];
 				ndReal actionBuffer[actionDim * 2];
-				ndDeepBrainMemVector state(stateBuffer, statesDim);
-				ndDeepBrainMemVector action(actionBuffer, actionDim);
+				ndBrainMemVector state(stateBuffer, statesDim);
+				ndBrainMemVector action(actionBuffer, actionDim);
 
 				const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_agent->m_replayBuffer[m_index];
 				for (ndInt32 i = 0; i < actionDim; ++i)
@@ -236,7 +236,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 				else
 				{
 					ndReal actionBuffer1[actionDim * 2];
-					ndDeepBrainMemVector action1(actionBuffer1, actionDim);
+					ndBrainMemVector action1(actionBuffer1, actionDim);
 				
 					for (ndInt32 i = 0; i < statesDim; ++i)
 					{
@@ -260,7 +260,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 
 		Loss loss(trainer, this);
 		ndReal stateBuffer[statesDim * 2];
-		ndDeepBrainMemVector state(stateBuffer, statesDim);
+		ndBrainMemVector state(stateBuffer, statesDim);
 
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -344,8 +344,8 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 {
 	ndReal stateBuffer[statesDim * 2];
 	ndReal actionBuffer[actionDim * 2];
-	ndDeepBrainMemVector state(stateBuffer, statesDim);
-	ndDeepBrainMemVector actions(actionBuffer, actionDim);
+	ndBrainMemVector state(stateBuffer, statesDim);
+	ndBrainMemVector actions(actionBuffer, actionDim);
 
 	GetObservation(&state[0]);
 	m_actor->MakePrediction(state, actions);
