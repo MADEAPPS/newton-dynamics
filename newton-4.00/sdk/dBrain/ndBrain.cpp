@@ -72,12 +72,13 @@ void ndBrain::CopyFrom(const ndBrain& src)
 
 void ndBrain::SoftCopy(const ndBrain& src, ndReal blend)
 {
-	const ndArray<ndBrainLayer*>& layers = *this;
-	const ndArray<ndBrainLayer*>& srcLayers = src;
-	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	{
-		layers[i]->Blend(*srcLayers[i], blend);
-	}
+	ndAssert(0);
+	//const ndArray<ndBrainLayer*>& layers = *this;
+	//const ndArray<ndBrainLayer*>& srcLayers = src;
+	//for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	//{
+	//	layers[i]->Blend(*srcLayers[i], blend);
+	//}
 }
 
 ndBrainLayer* ndBrain::AddLayer(ndBrainLayer* const layer)
@@ -87,57 +88,34 @@ ndBrainLayer* ndBrain::AddLayer(ndBrainLayer* const layer)
 	return layer;
 }
 
-bool ndBrain::Compare(const ndBrain& src) const
-{
-	if (GetCount() != src.GetCount())
-	{
-		ndAssert(0);
-		return false;
-	}
-
-	ndAssert(0);
-
-	const ndArray<ndBrainLayer*>& layers0 = *this;
-	const ndArray<ndBrainLayer*>& layers1 = src;
-	for (ndInt32 i = 0; i < layers0.GetCount(); ++i)
-	{
-		bool test = layers0[i]->Compare(*layers1[i]);
-		if (!test)
-		{
-			ndAssert(0);
-			return false;
-		}
-	}
-
-	return true;
-}
-
 void ndBrain::InitGaussianBias(ndReal variance)
 {
-	ndArray<ndBrainLayer*>& layers = *this;
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
-	{
-		layers[i]->InitGaussianBias(variance);
-	}
+	ndAssert(0);
+	//ndArray<ndBrainLayer*>& layers = *this;
+	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	//{
+	//	layers[i]->InitGaussianBias(variance);
+	//}
 }
 
 void ndBrain::InitGaussianWeights(ndReal variance)
 {
 	ndAssert(0);
-	ndArray<ndBrainLayer*>& layers = *this;
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
-	{
-		layers[i]->InitGaussianWeights(variance);
-	}
+	//ndArray<ndBrainLayer*>& layers = *this;
+	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	//{
+	//	layers[i]->InitGaussianWeights(variance);
+	//}
 }
 
 void ndBrain::InitWeights(ndReal weighVariance, ndReal biasVariance)
 {
-	ndArray<ndBrainLayer*>& layers = *this;
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
-	{
-		layers[i]->InitWeights(weighVariance, biasVariance);
-	}
+	ndAssert(0);
+	//ndArray<ndBrainLayer*>& layers = *this;
+	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	//{
+	//	layers[i]->InitWeights(weighVariance, biasVariance);
+	//}
 }
 
 void ndBrain::InitWeightsXavierMethod()
@@ -145,7 +123,19 @@ void ndBrain::InitWeightsXavierMethod()
 	ndArray<ndBrainLayer*>& layers = *this;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
-		layers[i]->InitWeightsXavierMethod();
+		ndBrainLayer* const layer = layers[i];
+		if (layer->HasParameters())
+		{
+			if (i < (layers.GetCount() - 1))
+			{
+				ndAssert(0);
+				//layer->InitWeightsXavierMethod();
+			}
+			else
+			{
+				layer->InitWeights(ndReal(0.1f), ndReal(0.1f));
+			}
+		}
 	}
 }
 
@@ -174,38 +164,39 @@ void ndBrain::InitWeightsXavierMethod()
 
 void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
-	const ndArray<ndBrainLayer*>& layers = *this;
-	ndFixSizeArray<ndInt32, 256 > offsets;
-
-	ndInt32 size = 0;
-	offsets.PushBack(size);
-	size += (layers[0]->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	{
-		ndBrainLayer* const layer = layers[i];
-		offsets.PushBack(size);
-		size += (layer->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	}
-	offsets.PushBack(size);
-
-	ndReal* const memBuffer = ndAlloca(ndReal, size);
-
-	ndAssert(layers.GetCount());
-	ndAssert(input.GetCount() == GetInputSize());
-	ndAssert(output.GetCount() == GetOutputSize());
-		
-	ndBrainMemVector layerInput(&memBuffer[offsets[0]], input.GetCount());
-	layerInput.Set(input);
-	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	{
-		ndBrainLayer* const layer = layers[i];
-		const ndBrainMemVector in(&memBuffer[offsets[i + 0]], layer->GetInputSize());
-		ndBrainMemVector out(&memBuffer[offsets[i + 1]], layer->GetOuputSize());
-		layer->MakePrediction(in, out);
-	}
-	
-	const ndBrainMemVector out(&memBuffer[offsets[layers.GetCount()]], output.GetCount());
-	output.Set(out);
+	ndAssert(0);
+	//const ndArray<ndBrainLayer*>& layers = *this;
+	//ndFixSizeArray<ndInt32, 256 > offsets;
+	//
+	//ndInt32 size = 0;
+	//offsets.PushBack(size);
+	//size += (layers[0]->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+	//for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	//{
+	//	ndBrainLayer* const layer = layers[i];
+	//	offsets.PushBack(size);
+	//	size += (layer->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+	//}
+	//offsets.PushBack(size);
+	//
+	//ndReal* const memBuffer = ndAlloca(ndReal, size);
+	//
+	//ndAssert(layers.GetCount());
+	//ndAssert(input.GetCount() == GetInputSize());
+	//ndAssert(output.GetCount() == GetOutputSize());
+	//	
+	//ndBrainMemVector layerInput(&memBuffer[offsets[0]], input.GetCount());
+	//layerInput.Set(input);
+	//for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	//{
+	//	ndBrainLayer* const layer = layers[i];
+	//	const ndBrainMemVector in(&memBuffer[offsets[i + 0]], layer->GetInputSize());
+	//	ndBrainMemVector out(&memBuffer[offsets[i + 1]], layer->GetOuputSize());
+	//	layer->MakePrediction(in, out);
+	//}
+	//
+	//const ndBrainMemVector out(&memBuffer[offsets[layers.GetCount()]], output.GetCount());
+	//output.Set(out);
 }
 
 void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients)

@@ -59,6 +59,9 @@ class ndBrainTrainer: public ndClassAlloc
 		}
 	};
 
+
+	class ndLayersVariables;
+
 	enum ndSolveModel
 	{
 		m_sgd,
@@ -91,6 +94,8 @@ class ndBrainTrainer: public ndClassAlloc
 
 	void AdamUpdate(ndReal learnRate);
 	void StochasticUpdate(ndReal learnRate);
+
+	ndArray<ndLayersVariables*> m_layers;
 	
 	ndBrainVector m_z;
 	ndBrainVector m_zDerivative;
@@ -112,6 +117,8 @@ class ndBrainTrainer: public ndClassAlloc
 	ndReal m_alphaAcc;
 	ndReal m_weighDecayRegularizer;
 	ndSolveModel m_model;
+
+	
 	
 	friend class ndBrainTrainerChannel;
 	friend class ndBrainParallelTrainer;

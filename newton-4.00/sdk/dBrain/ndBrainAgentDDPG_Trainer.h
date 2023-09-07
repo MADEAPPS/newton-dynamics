@@ -150,21 +150,22 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 	,m_replayBufferPrefill(hyperParameters.m_replayBufferPrefill)
 	,m_collectingSamples(true)
 {
-	ndAssert(m_critic.GetOutputSize() == 1);
-	ndAssert((m_actor[m_actor.GetCount() - 1])->GetActivationType() == m_tanh);
-	ndAssert(m_critic.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
-
-	SetThreadCount(hyperParameters.m_threadsCount);
-	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
-	{
-		m_actorOptimizer.PushBack(new ndBrainTrainer(&m_actor));
-		m_criticOptimizer.PushBack(new ndBrainTrainer(&m_critic));
-		m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
-		m_criticOptimizer[m_criticOptimizer.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
-	}
-
-	SetBufferSize(hyperParameters.m_replayBufferSize);
-	InitWeights();
+	ndAssert(0);
+	//ndAssert(m_critic.GetOutputSize() == 1);
+	//ndAssert((m_actor[m_actor.GetCount() - 1])->GetActivationType() == m_tanh);
+	//ndAssert(m_critic.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
+	//
+	//SetThreadCount(hyperParameters.m_threadsCount);
+	//for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
+	//{
+	//	m_actorOptimizer.PushBack(new ndBrainTrainer(&m_actor));
+	//	m_criticOptimizer.PushBack(new ndBrainTrainer(&m_critic));
+	//	m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
+	//	m_criticOptimizer[m_criticOptimizer.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
+	//}
+	//
+	//SetBufferSize(hyperParameters.m_replayBufferSize);
+	//InitWeights();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

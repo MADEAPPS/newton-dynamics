@@ -35,12 +35,11 @@ class ndBrainLayerActivation : public ndBrainLayer
 	ndBrainLayerActivation(const ndBrainLayerActivation& src);
 	virtual ~ndBrainLayerActivation();
 	virtual ndBrainLayer* Clone() const;
+	virtual bool HasParameters() const;
 
 	virtual const char* GetLabelId() const;
 	virtual ndInt32 GetOuputSize() const;
 	virtual ndInt32 GetInputSize() const;
-	virtual void InitGaussianBias(ndReal variance);
-	virtual void InitGaussianWeights(ndReal variance);
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
 
 	virtual void InitWeightsXavierMethod();
@@ -60,112 +59,5 @@ class ndBrainLayerActivation : public ndBrainLayer
 	virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& outputDerivative) const;
 };
 
-inline ndBrainLayerActivation::ndBrainLayerActivation()
-	:ndBrainLayer()
-{
-	ndAssert(0);
-}
-
-inline ndBrainLayerActivation::ndBrainLayerActivation(const ndBrainLayerActivation& src)
-	:ndBrainLayer(src)
-{
-	ndAssert(0);
-}
-
-inline ndBrainLayerActivation::~ndBrainLayerActivation()
-{
-	ndAssert(0);
-}
-
-inline const char* ndBrainLayerActivation::GetLabelId() const
-{
-	ndAssert(0);
-	return "ndBrainLayerActivation";
-}
-
-inline ndBrainLayer* ndBrainLayerActivation::Clone() const
-{
-	ndAssert(0);
-	return nullptr;
-}
-
-inline ndInt32 ndBrainLayerActivation::GetOuputSize() const
-{
-	ndAssert(0);
-	return 0;
-}
-
-inline ndInt32 ndBrainLayerActivation::GetInputSize() const
-{
-	ndAssert(0);
-	return 0;
-}
-
-inline void ndBrainLayerActivation::InitGaussianBias(ndReal)
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerActivation::InitGaussianWeights(ndReal)
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerActivation::MakePrediction(const ndBrainVector&, ndBrainVector&)
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerActivation::InitWeightsXavierMethod()
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerActivation::InitWeights(ndReal, ndReal)
-{
-	ndAssert(0);
-}
-
-inline ndBrainActivationType ndBrainLayerActivation::GetActivationType() const
-{
-	ndAssert(0);
-	return m_noActivation;
-}
-
-inline void ndBrainLayerActivation::CopyFrom(const ndBrainLayer&)
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerActivation::Blend(const ndBrainLayer&, ndReal)
-{
-	ndAssert(0);
-}
-
-inline bool ndBrainLayerActivation::Compare(const ndBrainLayer&) const
-{
-	ndAssert(0);
-	return false;
-}
-
-inline void ndBrainLayerActivation::Load(const ndBrainLoad* const)
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerActivation::Save(const ndBrainSave* const) const
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerActivation::ApplyActivation(ndBrainVector&) const
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerActivation::ActivationDerivative(const ndBrainVector&, ndBrainVector&) const
-{
-	ndAssert(0);
-}
 #endif 
 

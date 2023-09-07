@@ -158,25 +158,26 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const Hyp
 	,m_replayBufferPrefill(hyperParameters.m_replayBufferPrefill)
 	,m_collectingSamples(true)
 {
-	ndAssert(m_critic0.GetOutputSize() == 1);
-	ndAssert(m_critic1.GetOutputSize() == 1);
-	ndAssert((m_actor[m_actor.GetCount() - 1])->GetActivationType() == m_tanh);
-	ndAssert(m_critic0.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
-	ndAssert(m_critic1.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
-
-	SetThreadCount(hyperParameters.m_threadsCount);
-	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
-	{
-		m_actorOptimizer.PushBack(new ndBrainTrainer(&m_actor));
-		m_criticOptimizer0.PushBack(new ndBrainTrainer(&m_critic0));
-		m_criticOptimizer1.PushBack(new ndBrainTrainer(&m_critic1));
-		m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
-		m_criticOptimizer0[m_criticOptimizer0.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
-		m_criticOptimizer1[m_criticOptimizer1.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
-	}
-
-	SetBufferSize(hyperParameters.m_replayBufferSize);
-	InitWeights();
+	ndAssert(0);
+	//ndAssert(m_critic0.GetOutputSize() == 1);
+	//ndAssert(m_critic1.GetOutputSize() == 1);
+	//ndAssert((m_actor[m_actor.GetCount() - 1])->GetActivationType() == m_tanh);
+	//ndAssert(m_critic0.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
+	//ndAssert(m_critic1.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
+	//
+	//SetThreadCount(hyperParameters.m_threadsCount);
+	//for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
+	//{
+	//	m_actorOptimizer.PushBack(new ndBrainTrainer(&m_actor));
+	//	m_criticOptimizer0.PushBack(new ndBrainTrainer(&m_critic0));
+	//	m_criticOptimizer1.PushBack(new ndBrainTrainer(&m_critic1));
+	//	m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
+	//	m_criticOptimizer0[m_criticOptimizer0.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
+	//	m_criticOptimizer1[m_criticOptimizer1.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
+	//}
+	//
+	//SetBufferSize(hyperParameters.m_replayBufferSize);
+	//InitWeights();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

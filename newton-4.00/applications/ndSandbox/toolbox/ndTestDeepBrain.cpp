@@ -16,15 +16,22 @@ static void ThreeLayersTwoInputsTwoOutputs()
 {
 	ndBrain brain;
 	ndInt32 neurons = 32;
-	ndBrainLayerLinearActivated* const inputLayer = new ndBrainLayerLinearActivated(2, neurons, m_tanh);
-	ndBrainLayerLinearActivated* const hiddenLayer0 = new ndBrainLayerLinearActivated(inputLayer->GetOuputSize(), neurons, m_tanh);
-	ndBrainLayerLinearActivated* const hiddenLayer1 = new ndBrainLayerLinearActivated(hiddenLayer0->GetOuputSize(), neurons, m_tanh);
-	ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(hiddenLayer1->GetOuputSize(), 2, m_sigmoid);
-	
+#if 0
+	//ndBrainLayerLinearActivated* const inputLayer = new ndBrainLayerLinearActivated(2, neurons, m_tanh);
+	//ndBrainLayerLinearActivated* const hiddenLayer0 = new ndBrainLayerLinearActivated(inputLayer->GetOuputSize(), neurons, m_tanh);
+	//ndBrainLayerLinearActivated* const hiddenLayer1 = new ndBrainLayerLinearActivated(hiddenLayer0->GetOuputSize(), neurons, m_tanh);
+	//ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(hiddenLayer1->GetOuputSize(), 2, m_sigmoid);
+	//
+	//brain.AddLayer(inputLayer);
+	//brain.AddLayer(hiddenLayer0);
+	//brain.AddLayer(hiddenLayer1);
+	//brain.AddLayer(ouputLayer);
+	//brain.InitWeightsXavierMethod();
+#else
+	neurons = 2;
+	ndBrainLayer* const inputLayer = new ndBrainLayerLineal(2, neurons);
 	brain.AddLayer(inputLayer);
-	brain.AddLayer(hiddenLayer0);
-	brain.AddLayer(hiddenLayer1);
-	brain.AddLayer(ouputLayer);
+#endif
 	brain.InitWeightsXavierMethod();
 	
 	ndInt32 samples = 2000;
@@ -44,7 +51,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> trainers;
 
 	ndBrainThreadPool threads;
-	threads.SetThreadCount(4);
+	//threads.SetThreadCount(4);
+	threads.SetThreadCount(1);
 	for (ndInt32 i = 0; i < threads.GetThreadCount(); ++i)
 	{
 		trainers.PushBack(new ndBrainTrainer(&brain));
@@ -483,7 +491,8 @@ void ndTestDeedBrian()
 	//}
 	//fclose(outFile);
 
-	//ThreeLayersTwoInputsTwoOutputs();
-	MnistTrainingSet();
+	ThreeLayersTwoInputsTwoOutputs();
+	//MnistTrainingSet();
 	//MnistTestSet();
+	exit(0);
 }

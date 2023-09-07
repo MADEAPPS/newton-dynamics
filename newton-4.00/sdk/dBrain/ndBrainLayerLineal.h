@@ -34,139 +34,39 @@ class ndBrainLayerLineal : public ndBrainLayer
 	ndBrainLayerLineal(ndInt32 inputs, ndInt32 outputs);
 	ndBrainLayerLineal(const ndBrainLayerLineal& src);
 	virtual ~ndBrainLayerLineal();
-	virtual ndBrainLayer* Clone() const;
+	//virtual ndBrainLayer* Clone() const;
 
-	virtual const char* GetLabelId() const;
+	virtual bool HasParameters() const;
 	virtual ndInt32 GetOuputSize() const;
 	virtual ndInt32 GetInputSize() const;
-	virtual void InitGaussianBias(ndReal variance);
-	virtual void InitGaussianWeights(ndReal variance);
-	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
-
+	//virtual const char* GetLabelId() const;
+	
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
+	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
+	
+	//virtual ndBrainActivationType GetActivationType() const;
+	//
+	//virtual void CopyFrom(const ndBrainLayer& src);
+	//virtual void Blend(const ndBrainLayer& src, ndReal blend);
+	//
+	//virtual bool Compare(const ndBrainLayer& src) const;
+	//
+	//virtual void Load(const ndBrainLoad* const loadSave);
+	//virtual void Save(const ndBrainSave* const loadSave) const;
+	//
+	//virtual void ApplyActivation(ndBrainVector& output) const;
+	//virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& outputDerivative) const;
 
-	virtual ndBrainActivationType GetActivationType() const;
+	private:
+	void InitGaussianBias(ndReal variance);
+	void InitGaussianWeights(ndReal variance);
 
-	virtual void CopyFrom(const ndBrainLayer& src);
-	virtual void Blend(const ndBrainLayer& src, ndReal blend);
-
-	virtual bool Compare(const ndBrainLayer& src) const;
-
-	virtual void Load(const ndBrainLoad* const loadSave);
-	virtual void Save(const ndBrainSave* const loadSave) const;
-
-	virtual void ApplyActivation(ndBrainVector& output) const;
-	virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& outputDerivative) const;
+	ndBrainVector m_bias;
+	ndBrainMatrix m_weights;
 };
 
 
-inline ndBrainLayerLineal::ndBrainLayerLineal(ndInt32 inputs, ndInt32 outputs)
-	:ndBrainLayer()
-{
-	ndAssert(0);
-}
 
-inline ndBrainLayerLineal::ndBrainLayerLineal(const ndBrainLayerLineal& src)
-	:ndBrainLayer(src)
-{
-	ndAssert(0);
-}
-
-inline ndBrainLayerLineal::~ndBrainLayerLineal()
-{
-	ndAssert(0);
-}
-
-inline const char* ndBrainLayerLineal::GetLabelId() const
-{
-	ndAssert(0);
-	return "ndBrainLayerLineal";
-}
-
-inline ndBrainLayer* ndBrainLayerLineal::Clone() const
-{
-	ndAssert(0);
-	return nullptr;
-}
-
-inline ndInt32 ndBrainLayerLineal::GetOuputSize() const
-{
-	ndAssert(0);
-	return 0;
-}
-
-inline ndInt32 ndBrainLayerLineal::GetInputSize() const
-{
-	ndAssert(0);
-	return 0;
-}
-
-inline void ndBrainLayerLineal::InitGaussianBias(ndReal)
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerLineal::InitGaussianWeights(ndReal)
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerLineal::MakePrediction(const ndBrainVector&, ndBrainVector&)
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerLineal::InitWeightsXavierMethod()
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerLineal::InitWeights(ndReal, ndReal)
-{
-	ndAssert(0);
-}
-
-inline ndBrainActivationType ndBrainLayerLineal::GetActivationType() const
-{
-	ndAssert(0);
-	return m_noActivation;
-}
-
-inline void ndBrainLayerLineal::CopyFrom(const ndBrainLayer&)
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerLineal::Blend(const ndBrainLayer&, ndReal)
-{
-	ndAssert(0);
-}
-
-inline bool ndBrainLayerLineal::Compare(const ndBrainLayer&) const
-{
-	ndAssert(0);
-	return false;
-}
-
-inline void ndBrainLayerLineal::Load(const ndBrainLoad* const)
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerLineal::Save(const ndBrainSave* const) const
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerLineal::ApplyActivation(ndBrainVector&) const
-{
-	ndAssert(0);
-}
-
-inline void ndBrainLayerLineal::ActivationDerivative(const ndBrainVector&, ndBrainVector&) const
-{
-	ndAssert(0);
-}
 #endif 
 

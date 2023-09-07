@@ -31,6 +31,7 @@ ndBrainLayerLinearActivated::ndBrainLayerLinearActivated(ndInt32 inputCount, ndI
 	,m_activation(activation)
 	,m_columns(inputCount)
 {
+	ndAssert(0);
 	m_bias.SetCount(outputCount);
 }
 
@@ -41,6 +42,7 @@ ndBrainLayerLinearActivated::ndBrainLayerLinearActivated(const ndBrainLayerLinea
 	,m_activation(src.m_activation)
 	,m_columns(src.m_columns)
 {
+	ndAssert(0);
 }
 
 ndBrainLayerLinearActivated::~ndBrainLayerLinearActivated()
