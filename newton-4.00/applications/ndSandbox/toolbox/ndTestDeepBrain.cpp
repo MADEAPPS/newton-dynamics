@@ -21,12 +21,10 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndBrainLayerLinearActivated* const hiddenLayer1 = new ndBrainLayerLinearActivated(hiddenLayer0->GetOuputSize(), neurons, m_tanh);
 	ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(hiddenLayer1->GetOuputSize(), 2, m_sigmoid);
 	
-	brain.BeginAddLayer();
 	brain.AddLayer(inputLayer);
 	brain.AddLayer(hiddenLayer0);
 	brain.AddLayer(hiddenLayer1);
 	brain.AddLayer(ouputLayer);
-	brain.EndAddLayer();
 	brain.InitWeightsXavierMethod();
 	
 	ndInt32 samples = 2000;
@@ -422,6 +420,7 @@ threadCount = 1;
 	{
 		ndBrain brain;
 		ndInt32 neuronsPerLayers = 64;
+#if 0
 		ndBrainLayerLinearActivated* const inputLayer = new ndBrainLayerLinearActivated(trainingDigits->GetColumns(), neuronsPerLayers, m_tanh);
 		ndBrainLayerLinearActivated* const hiddenLayer0 = new ndBrainLayerLinearActivated(inputLayer->GetOuputSize(), neuronsPerLayers, m_tanh);
 		ndBrainLayerLinearActivated* const hiddenLayer1 = new ndBrainLayerLinearActivated(hiddenLayer0->GetOuputSize(), neuronsPerLayers, m_tanh);
@@ -433,6 +432,10 @@ threadCount = 1;
 		brain.AddLayer(hiddenLayer1);
 		brain.AddLayer(ouputLayer);
 		brain.EndAddLayer();
+#else
+		ndBrainLayer* const inputLayer = new ndBrainLayerLineal(trainingDigits->GetColumns(), neuronsPerLayers);
+		brain.AddLayer(inputLayer);
+#endif
 		brain.InitWeightsXavierMethod();
 	
 		SupervisedTrainer optimizer(&brain);

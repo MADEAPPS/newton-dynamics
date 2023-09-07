@@ -40,8 +40,6 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	void CopyFrom(const ndBrain& src);
 	void SoftCopy(const ndBrain& src, ndReal blend);
 
-	void BeginAddLayer();
-	void EndAddLayer();
 	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
 
 	bool Compare(const ndBrain& src) const;

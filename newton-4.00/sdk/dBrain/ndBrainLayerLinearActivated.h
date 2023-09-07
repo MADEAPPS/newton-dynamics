@@ -28,7 +28,6 @@
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 
-
 class ndBrainLayerLinearActivated : public ndBrainLayer
 {
 	public: 
@@ -36,6 +35,8 @@ class ndBrainLayerLinearActivated : public ndBrainLayer
 	ndBrainLayerLinearActivated(ndInt32 inputs, ndInt32 outputs, ndBrainActivationType type);
 	virtual ~ndBrainLayerLinearActivated();
 	virtual ndBrainLayer* Clone() const;
+
+	virtual const char* GetLabelId() const;
 	
 	ndBrainVector& GetBias();
 	const ndBrainVector& GetBias() const;
@@ -87,6 +88,11 @@ class ndBrainLayerLinearActivated : public ndBrainLayer
 inline ndBrainActivationType ndBrainLayerLinearActivated::GetActivationType() const
 {
 	return m_activation;
+}
+
+inline const char* ndBrainLayerLinearActivated::GetLabelId() const
+{
+	return "ndBrainLayerLinearActivated";
 }
 
 inline ndInt32 ndBrainLayerLinearActivated::GetOuputSize() const

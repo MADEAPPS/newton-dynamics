@@ -33,15 +33,12 @@ ndBrain::ndBrain()
 ndBrain::ndBrain(const ndBrain& src)
 	:ndArray<ndBrainLayer*>()
 {
-	//const ndArray<ndBrainLayerLinearActivated*>& srcLayers = src;
 	const ndArray<ndBrainLayer*>& srcLayers = src;
-	BeginAddLayer();
 	for (ndInt32 i = 0; i < srcLayers.GetCount(); ++i)
 	{
 		ndBrainLayer* const layer = srcLayers[i]->Clone();
 		AddLayer(layer);
 	}
-	EndAddLayer();
 	CopyFrom(src);
 }
 
@@ -88,14 +85,6 @@ ndBrainLayer* ndBrain::AddLayer(ndBrainLayer* const layer)
 	ndAssert(!GetCount() || ((*this)[GetCount() - 1]->GetOuputSize() == layer->GetInputSize()));
 	PushBack(layer);
 	return layer;
-}
-
-void ndBrain::BeginAddLayer()
-{
-}
-
-void ndBrain::EndAddLayer()
-{
 }
 
 bool ndBrain::Compare(const ndBrain& src) const

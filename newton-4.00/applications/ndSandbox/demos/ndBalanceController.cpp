@@ -537,12 +537,11 @@ namespace ndController_1
 			ndBrainLayerLinearActivated* const layer1 = new ndBrainLayerLinearActivated(layer0->GetOuputSize(), layerSize, activation);
 			ndBrainLayerLinearActivated* const layer2 = new ndBrainLayerLinearActivated(layer1->GetOuputSize(), layerSize, activation);
 			ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(layer2->GetOuputSize(), m_actionsSize, m_tanh);
-			actor->BeginAddLayer();
+
 			actor->AddLayer(layer0);
 			actor->AddLayer(layer1);
 			actor->AddLayer(layer2);
 			actor->AddLayer(ouputLayer);
-			actor->EndAddLayer();
 
 			// the critic is more complex since is deal with more complex inputs
 			ndSharedPtr<ndBrain> critic(new ndBrain());
@@ -550,12 +549,11 @@ namespace ndController_1
 			ndBrainLayerLinearActivated* const criticLayer1 = new ndBrainLayerLinearActivated(criticLayer0->GetOuputSize(), layerSize * 2, activation);
 			ndBrainLayerLinearActivated* const criticLayer2 = new ndBrainLayerLinearActivated(criticLayer1->GetOuputSize(), layerSize * 2, activation);
 			ndBrainLayerLinearActivated* const criticOuputLayer = new ndBrainLayerLinearActivated(criticLayer2->GetOuputSize(), 1, m_relu);
-			critic->BeginAddLayer();
+
 			critic->AddLayer(criticLayer0);
 			critic->AddLayer(criticLayer1);
 			critic->AddLayer(criticLayer2);
 			critic->AddLayer(criticOuputLayer);
-			critic->EndAddLayer();
 
 			// add a reinforcement learning controller 
 			#ifdef USE_TD3

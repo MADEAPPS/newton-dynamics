@@ -180,13 +180,11 @@ namespace biped2
 			//ndBrainLayer* const hiddenLayer2 = new ndBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
 			ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(hiddenLayer1->GetOuputSize(), numberOfOutputs, m_relu);
 
-			BeginAddLayer();
 			AddLayer(inputLayer);
 			AddLayer(hiddenLayer0);
 			AddLayer(hiddenLayer1);
 			//brain.AddLayer(hiddenLayer2);
 			AddLayer(ouputLayer);
-			EndAddLayer();
 			InitGaussianWeights(ndReal(0.125f));
 		}
 	};
