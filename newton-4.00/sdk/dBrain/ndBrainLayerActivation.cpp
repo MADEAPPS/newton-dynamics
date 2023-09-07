@@ -22,10 +22,10 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
-ndBrainLayerActivation::ndBrainLayerActivation()
+ndBrainLayerActivation::ndBrainLayerActivation(ndInt32 neurons)
 	:ndBrainLayer()
+	,m_neurons(neurons)
 {
-	ndAssert(0);
 }
 
 ndBrainLayerActivation::ndBrainLayerActivation(const ndBrainLayerActivation& src)
@@ -41,7 +41,6 @@ ndBrainLayerActivation::~ndBrainLayerActivation()
 
 bool ndBrainLayerActivation::HasParameters() const
 {
-	ndAssert(0);
 	return false;
 }
 
@@ -59,62 +58,12 @@ ndBrainLayer* ndBrainLayerActivation::Clone() const
 
 ndInt32 ndBrainLayerActivation::GetOuputSize() const
 {
-	ndAssert(0);
-	return 0;
+	return m_neurons;
 }
 
 ndInt32 ndBrainLayerActivation::GetInputSize() const
 {
-	ndAssert(0);
-	return 0;
-}
-
-void ndBrainLayerActivation::MakePrediction(const ndBrainVector&, ndBrainVector&)
-{
-	ndAssert(0);
-}
-
-
-ndBrainActivationType ndBrainLayerActivation::GetActivationType() const
-{
-	ndAssert(0);
-	return m_noActivation;
-}
-
-void ndBrainLayerActivation::CopyFrom(const ndBrainLayer&)
-{
-	ndAssert(0);
-}
-
-void ndBrainLayerActivation::Blend(const ndBrainLayer&, ndReal)
-{
-	ndAssert(0);
-}
-
-bool ndBrainLayerActivation::Compare(const ndBrainLayer&) const
-{
-	ndAssert(0);
-	return false;
-}
-
-void ndBrainLayerActivation::Load(const ndBrainLoad* const)
-{
-	ndAssert(0);
-}
-
-void ndBrainLayerActivation::Save(const ndBrainSave* const) const
-{
-	ndAssert(0);
-}
-
-void ndBrainLayerActivation::ApplyActivation(ndBrainVector&) const
-{
-	ndAssert(0);
-}
-
-void ndBrainLayerActivation::ActivationDerivative(const ndBrainVector&, ndBrainVector&) const
-{
-	ndAssert(0);
+	return m_neurons;
 }
 
 void ndBrainLayerActivation::InitWeightsXavierMethod()
@@ -124,4 +73,12 @@ void ndBrainLayerActivation::InitWeightsXavierMethod()
 void ndBrainLayerActivation::InitWeights(ndReal, ndReal)
 {
 }
+
+void ndBrainLayerActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
+{
+	ndAssert(input.GetCount() == m_neurons);
+	ndAssert(output.GetCount() == m_neurons);
+	output.Set(input);
+}
+
 

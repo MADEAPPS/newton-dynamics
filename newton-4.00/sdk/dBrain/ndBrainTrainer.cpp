@@ -297,16 +297,14 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	m_layers[0]->m_layer->MakePrediction(input, m_layers[0]->m_z);
 	for (ndInt32 i = 1; i < m_layers.GetCount(); ++i)
 	{
-		ndAssert(0);
 	//	ndLayersVariables* const variable = m_layers[i];
 	//	ndBrainLayer* const layer = layers[i];
 	//	const ndBrainMemVector in(&m_z[m_inputOutputPrefixScan[i + 0]], layer->GetInputSize());
 	//	ndBrainMemVector out(&m_z[m_inputOutputPrefixScan[i + 1]], layer->GetOuputSize());
 	//	layer->MakePrediction(in, out);
+		m_layers[i]->m_layer->MakePrediction(m_layers[i-1]->m_z, m_layers[i]->m_z);
 	}
 	
-	ndAssert(0);
-
 	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	//{
 	//	ndBrainLayer* const layer = layers[i];
@@ -314,8 +312,9 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	//	ndBrainMemVector zDerivative(&m_zDerivative[m_inputOutputPrefixScan[i + 1]], layer->GetOuputSize());
 	//	layer->ActivationDerivative(z, zDerivative);
 	//}
-	//
-	//BackPropagateOutputLayer(loss);
+	
+	BackPropagateOutputLayer(loss);
+
 	//for (ndInt32 i = layers.GetCount() - 2; i >= 0; --i)
 	//{
 	//	BackPropagateHiddenLayer(i);

@@ -30,7 +30,11 @@ static void ThreeLayersTwoInputsTwoOutputs()
 #else
 	neurons = 2;
 	ndBrainLayer* const inputLayer = new ndBrainLayerLineal(2, neurons);
+	ndBrainLayer* const activation0 = new ndBrainLayerActivation(neurons);
+
 	brain.AddLayer(inputLayer);
+	brain.AddLayer(activation0);
+
 #endif
 	brain.InitWeightsXavierMethod();
 	

@@ -45,19 +45,6 @@ class ndBrainLayerLineal : public ndBrainLayer
 	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
 	
-	//virtual ndBrainActivationType GetActivationType() const;
-	//
-	//virtual void CopyFrom(const ndBrainLayer& src);
-	//virtual void Blend(const ndBrainLayer& src, ndReal blend);
-	//
-	//virtual bool Compare(const ndBrainLayer& src) const;
-	//
-	//virtual void Load(const ndBrainLoad* const loadSave);
-	//virtual void Save(const ndBrainSave* const loadSave) const;
-	//
-	//virtual void ApplyActivation(ndBrainVector& output) const;
-	//virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& outputDerivative) const;
-
 	private:
 	void InitGaussianBias(ndReal variance);
 	void InitGaussianWeights(ndReal variance);

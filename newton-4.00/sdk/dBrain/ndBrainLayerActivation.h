@@ -31,7 +31,7 @@
 class ndBrainLayerActivation : public ndBrainLayer
 {
 	public: 
-	ndBrainLayerActivation();
+	ndBrainLayerActivation(ndInt32 neurons);
 	ndBrainLayerActivation(const ndBrainLayerActivation& src);
 	virtual ~ndBrainLayerActivation();
 	virtual ndBrainLayer* Clone() const;
@@ -40,23 +40,24 @@ class ndBrainLayerActivation : public ndBrainLayer
 	virtual const char* GetLabelId() const;
 	virtual ndInt32 GetOuputSize() const;
 	virtual ndInt32 GetInputSize() const;
-	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
 
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
+	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
+	
+	//virtual void CopyFrom(const ndBrainLayer& src);
+	//virtual void Blend(const ndBrainLayer& src, ndReal blend);
+	//
+	//virtual bool Compare(const ndBrainLayer& src) const;
+	//
+	//virtual void Load(const ndBrainLoad* const loadSave);
+	//virtual void Save(const ndBrainSave* const loadSave) const;
+	//
+	//virtual void ApplyActivation(ndBrainVector& output) const;
+	//virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& outputDerivative) const;
 
-	virtual ndBrainActivationType GetActivationType() const;
-
-	virtual void CopyFrom(const ndBrainLayer& src);
-	virtual void Blend(const ndBrainLayer& src, ndReal blend);
-
-	virtual bool Compare(const ndBrainLayer& src) const;
-
-	virtual void Load(const ndBrainLoad* const loadSave);
-	virtual void Save(const ndBrainSave* const loadSave) const;
-
-	virtual void ApplyActivation(ndBrainVector& output) const;
-	virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& outputDerivative) const;
+	protected:
+	ndInt32 m_neurons;
 };
 
 #endif 

@@ -128,8 +128,9 @@ void ndBrain::InitWeightsXavierMethod()
 		{
 			if (i < (layers.GetCount() - 1))
 			{
-				ndAssert(0);
+				ndTrace(("fix this\n"));
 				//layer->InitWeightsXavierMethod();
+				layer->InitWeights(ndReal(0.1f), ndReal(0.1f));
 			}
 			else
 			{
