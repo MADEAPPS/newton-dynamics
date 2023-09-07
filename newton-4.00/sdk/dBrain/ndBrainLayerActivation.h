@@ -35,8 +35,8 @@ class ndBrainLayerActivation : public ndBrainLayer
 	ndBrainLayerActivation(const ndBrainLayerActivation& src);
 	virtual ~ndBrainLayerActivation();
 	virtual ndBrainLayer* Clone() const;
-	virtual bool HasParameters() const;
 
+	virtual bool HasParameters() const;
 	virtual const char* GetLabelId() const;
 	virtual ndInt32 GetOuputSize() const;
 	virtual ndInt32 GetInputSize() const;
@@ -44,20 +44,31 @@ class ndBrainLayerActivation : public ndBrainLayer
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
-	
-	//virtual void CopyFrom(const ndBrainLayer& src);
-	//virtual void Blend(const ndBrainLayer& src, ndReal blend);
-	//
-	//virtual bool Compare(const ndBrainLayer& src) const;
-	//
-	//virtual void Load(const ndBrainLoad* const loadSave);
-	//virtual void Save(const ndBrainSave* const loadSave) const;
-	//
-	//virtual void ApplyActivation(ndBrainVector& output) const;
-	//virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& outputDerivative) const;
 
 	protected:
 	ndInt32 m_neurons;
+};
+
+class ndBrainLayerSigmoidActivation : public ndBrainLayerActivation
+{
+	public:
+	ndBrainLayerSigmoidActivation(ndInt32 neurons)
+		:ndBrainLayerActivation(neurons)
+	{
+	}
+
+	ndBrainLayerSigmoidActivation(const ndBrainLayerActivation& src)
+		:ndBrainLayerActivation(src)
+	{
+	}
+
+	virtual ndBrainLayer* Clone() const
+	{
+		ndAssert(0);
+		return nullptr;
+	}
+
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
 };
 
 #endif 

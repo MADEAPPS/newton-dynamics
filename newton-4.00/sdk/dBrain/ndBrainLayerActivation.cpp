@@ -81,4 +81,14 @@ void ndBrainLayerActivation::MakePrediction(const ndBrainVector& input, ndBrainV
 	output.Set(input);
 }
 
+void ndBrainLayerSigmoidActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
+{
+	ndAssert(input.GetCount() == output.GetCount());
+	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	{
+		ndReal val = input[i];
+		ndReal out = val * (ndReal(1.0f) - val);
+		output[i] = ndFlushToZero(out);
+	}
+}
 
