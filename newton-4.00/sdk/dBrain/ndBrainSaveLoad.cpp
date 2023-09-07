@@ -145,7 +145,7 @@ ndBrain* ndBrainLoad::Load() const
 
 	for (ndInt32 i = 0; i < layersCount; ++i)
 	{
-		ndBrainLayerLinearActivated* const layer = (*brain)[i];
+		ndBrainLayer* const layer = (*brain)[i];
 		ReadString(buffer);
 		ReadString(buffer);
 		layer->Load(this);
@@ -173,10 +173,11 @@ void ndBrainSave::Save(const ndBrain* const brain)
 
 	for (ndInt32 i = 0; i < brain->GetCount(); ++i)
 	{
-		ndBrainLayerLinearActivated* const layer = (*brain)[i];
+		ndBrainLayer* const layer = (*brain)[i];
 		Save("layer fullyConnected\n");
 		Save("{\n");
-		switch (layer->m_activation)
+		//switch (layer->m_activation)
+		switch (layer->GetActivationType())
 		{
 			case m_relu:
 				Save("\tactivation relu\n");
@@ -200,14 +201,15 @@ void ndBrainSave::Save(const ndBrain* const brain)
 				break;
 		}
 
-		Save("\tinputs %d\n", layer->m_weights.GetColumns());
-		Save("\toutputs %d\n", layer->m_weights.GetRows());
+		ndAssert(0);
+		//Save("\tinputs %d\n", layer->m_weights.GetColumns());
+		//Save("\toutputs %d\n", layer->m_weights.GetRows());
 		Save("}\n\n");
 	}
 
 	for (ndInt32 i = 0; i < brain->GetCount(); ++i)
 	{
-		ndBrainLayerLinearActivated* const layer = (*brain)[i];
+		ndBrainLayer* const layer = (*brain)[i];
 		Save("layer\n");
 		Save("{\n");
 		layer->Save(this);

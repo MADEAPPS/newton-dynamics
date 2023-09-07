@@ -21,13 +21,13 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
-#include "ndBrainLayerLinearActivated.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainLayerLinearActivated.h"
 
 ndBrainLayerLinearActivated::ndBrainLayerLinearActivated(ndInt32 inputCount, ndInt32 outputCount, ndBrainActivationType activation)
-	:ndClassAlloc()
-	,m_weights(outputCount, inputCount)
+	:ndBrainLayer()
 	,m_bias()
+	,m_weights(outputCount, inputCount)
 	,m_activation(activation)
 	,m_columns(inputCount)
 {
@@ -35,9 +35,9 @@ ndBrainLayerLinearActivated::ndBrainLayerLinearActivated(ndInt32 inputCount, ndI
 }
 
 ndBrainLayerLinearActivated::ndBrainLayerLinearActivated(const ndBrainLayerLinearActivated& src)
-	:ndClassAlloc()
-	,m_weights(src.m_weights)
+	:ndBrainLayer(src)
 	,m_bias(src.m_bias)
+	,m_weights(src.m_weights)
 	,m_activation(src.m_activation)
 	,m_columns(src.m_columns)
 {
@@ -47,25 +47,28 @@ ndBrainLayerLinearActivated::~ndBrainLayerLinearActivated()
 {
 }
 
-ndBrainLayerLinearActivated* ndBrainLayerLinearActivated::Clone() const
+ndBrainLayer* ndBrainLayerLinearActivated::Clone() const
 {
 	return new ndBrainLayerLinearActivated(*this);
 }
 
-void ndBrainLayerLinearActivated::CopyFrom(const ndBrainLayerLinearActivated& src)
+void ndBrainLayerLinearActivated::CopyFrom(const ndBrainLayer& src__)
 {
-	m_weights.Set(src.m_weights);
+	const ndBrainLayerLinearActivated& src = (const ndBrainLayerLinearActivated&)src__;
 	m_bias.Set(src.m_bias);
+	m_weights.Set(src.m_weights);
 }
 
-void ndBrainLayerLinearActivated::Blend(const ndBrainLayerLinearActivated& src, ndReal blend)
+void ndBrainLayerLinearActivated::Blend(const ndBrainLayer& src__, ndReal blend)
 {
-	m_weights.Blend(src.m_weights, blend);
+	const ndBrainLayerLinearActivated& src = (const ndBrainLayerLinearActivated&)src__;
 	m_bias.Blend(src.m_bias, blend);
+	m_weights.Blend(src.m_weights, blend);
 }
 
-bool ndBrainLayerLinearActivated::Compare(const ndBrainLayerLinearActivated& src) const
+bool ndBrainLayerLinearActivated::Compare(const ndBrainLayer& src__) const
 {
+	const ndBrainLayerLinearActivated& src = (const ndBrainLayerLinearActivated&)src__;
 	if (m_activation != src.m_activation)
 	{
 		ndAssert(0);

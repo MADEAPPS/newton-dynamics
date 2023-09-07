@@ -25,7 +25,6 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainTypes.h"
 
-
 class ndBrainLoad;
 class ndBrainSave;
 class ndBrainVector;
@@ -63,101 +62,101 @@ class ndBrainLayer : public ndClassAlloc
 };
 
 
-ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
+inline ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
 	:ndClassAlloc(src)
 {
 }
 
-ndBrainLayer::ndBrainLayer()
+inline ndBrainLayer::ndBrainLayer()
 	:ndClassAlloc()
 {
 }
 
-ndBrainLayer::~ndBrainLayer()
+inline ndBrainLayer::~ndBrainLayer()
 {
 }
 
-ndBrainLayer* ndBrainLayer::Clone() const
+inline ndBrainLayer* ndBrainLayer::Clone() const
 {
 	ndAssert(0);
 	return nullptr;
 }
 
-ndInt32 ndBrainLayer::GetOuputSize() const
+inline ndInt32 ndBrainLayer::GetOuputSize() const
 {
 	ndAssert(0);
 	return 0;
 }
 
-ndInt32 ndBrainLayer::GetInputSize() const
+inline ndInt32 ndBrainLayer::GetInputSize() const
 {
 	ndAssert(0);
 	return 0;
 }
 
-void ndBrainLayer::InitGaussianBias(ndReal)
+inline void ndBrainLayer::InitGaussianBias(ndReal)
 {
 	ndAssert(0);
 }
 
-void ndBrainLayer::InitGaussianWeights(ndReal)
+inline void ndBrainLayer::InitGaussianWeights(ndReal)
 {
 	ndAssert(0);
 }
 
-void ndBrainLayer::MakePrediction(const ndBrainVector&, ndBrainVector&)
+inline void ndBrainLayer::MakePrediction(const ndBrainVector&, ndBrainVector&)
 {
 	ndAssert(0);
 }
 
-void ndBrainLayer::InitWeightsXavierMethod()
+inline void ndBrainLayer::InitWeightsXavierMethod()
 {
 	ndAssert(0);
 }
 
-void ndBrainLayer::InitWeights(ndReal, ndReal)
+inline void ndBrainLayer::InitWeights(ndReal, ndReal)
 {
 	ndAssert(0);
 }
 
-ndBrainActivationType ndBrainLayer::GetActivationType() const
+inline ndBrainActivationType ndBrainLayer::GetActivationType() const
 {
 	ndAssert(0);
 	return m_noActivation;
 }
 
-void ndBrainLayer::CopyFrom(const ndBrainLayer&)
+inline void ndBrainLayer::CopyFrom(const ndBrainLayer&)
 {
 	ndAssert(0);
 }
 
-void ndBrainLayer::Blend(const ndBrainLayer&, ndReal)
+inline void ndBrainLayer::Blend(const ndBrainLayer&, ndReal)
 {
 	ndAssert(0);
 }
 
-bool ndBrainLayer::Compare(const ndBrainLayer&) const
+inline bool ndBrainLayer::Compare(const ndBrainLayer&) const
 {
 	ndAssert(0);
 	return false;
 }
 
-void ndBrainLayer::Load(const ndBrainLoad* const)
+inline void ndBrainLayer::Load(const ndBrainLoad* const)
 {
 	ndAssert(0);
 }
 
-void ndBrainLayer::Save(const ndBrainSave* const) const
+inline void ndBrainLayer::Save(const ndBrainSave* const) const
 {
 	ndAssert(0);
 }
 
-void ndBrainLayer::ApplyActivation(ndBrainVector&) const
+inline void ndBrainLayer::ApplyActivation(ndBrainVector&) const
 {
 	ndAssert(0);
 }
 
-void ndBrainLayer::ActivationDerivative(const ndBrainVector&, ndBrainVector&) const
+inline void ndBrainLayer::ActivationDerivative(const ndBrainVector&, ndBrainVector&) const
 {
 	ndAssert(0);
 }

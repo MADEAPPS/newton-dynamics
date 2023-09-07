@@ -24,19 +24,18 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainTypes.h"
+#include "ndBrainLayer.h"
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 
-class ndBrainLoad;
-class ndBrainSave;
 
-class ndBrainLayerLinearActivated : public ndClassAlloc
+class ndBrainLayerLinearActivated : public ndBrainLayer
 {
 	public: 
 	ndBrainLayerLinearActivated(const ndBrainLayerLinearActivated& src);
 	ndBrainLayerLinearActivated(ndInt32 inputs, ndInt32 outputs, ndBrainActivationType type);
 	virtual ~ndBrainLayerLinearActivated();
-	virtual ndBrainLayerLinearActivated* Clone() const;
+	virtual ndBrainLayer* Clone() const;
 	
 	ndBrainVector& GetBias();
 	const ndBrainVector& GetBias() const;
@@ -50,12 +49,12 @@ class ndBrainLayerLinearActivated : public ndClassAlloc
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
 
-	ndBrainActivationType GetActivationType() const;
+	virtual ndBrainActivationType GetActivationType() const;
 
-	virtual void CopyFrom(const ndBrainLayerLinearActivated& src);
-	virtual void Blend(const ndBrainLayerLinearActivated& src, ndReal blend);
+	virtual void CopyFrom(const ndBrainLayer& src);
+	virtual void Blend(const ndBrainLayer& src, ndReal blend);
 
-	virtual bool Compare(const ndBrainLayerLinearActivated& src) const;
+	virtual bool Compare(const ndBrainLayer& src) const;
 
 	virtual void Load(const ndBrainLoad* const loadSave);
 	virtual void Save(const ndBrainSave* const loadSave) const;
@@ -76,8 +75,8 @@ class ndBrainLayerLinearActivated : public ndClassAlloc
 	void ReluActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const;
 	void LinealActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const;
 
-	ndBrainMatrix m_weights;
 	ndBrainVector m_bias;
+	ndBrainMatrix m_weights;
 	ndBrainActivationType m_activation;
 	ndInt32 m_columns;
 	friend class ndBrain;

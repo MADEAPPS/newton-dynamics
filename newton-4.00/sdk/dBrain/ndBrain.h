@@ -23,42 +23,13 @@
 #define _ND_BRAIN_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainLayerLinearActivated.h"
+#include "ndBrainLayer.h"
+//#include "ndBrainLayerLinearActivated.h"
 
 class ndBrainLoad;
 class ndBrainSave;
 
-class ndHidenVariableOffsets: public ndFixSizeArray<ndInt32, 32>
-{
-	public:
-	ndHidenVariableOffsets()
-		:ndFixSizeArray<ndInt32, 32>()
-	{
-		Clear();
-	}
-
-	ndHidenVariableOffsets(const ndHidenVariableOffsets& src)
-		:ndFixSizeArray<ndInt32, 32>()
-	{
-		Clear();
-		for (ndInt32 i = 0; i < src.GetCount(); ++i)
-		{
-			ndFixSizeArray<ndInt32, 32>::PushBack(src[i]);
-		}
-	}
-
-	void Clear()
-	{
-		ndFixSizeArray<ndInt32, 32>::SetCount(0);
-		for (ndInt32 i = 0; i < 32; ++i)
-		{
-			ndFixSizeArray<ndInt32, 32>::PushBack(0);
-		}
-		ndFixSizeArray<ndInt32, 32>::SetCount(0);
-	}
-};
-
-class ndBrain: public ndArray<ndBrainLayerLinearActivated*>
+class ndBrain: public ndArray<ndBrainLayer*>
 {
 	public: 
 	ndBrain();
@@ -72,7 +43,7 @@ class ndBrain: public ndArray<ndBrainLayerLinearActivated*>
 
 	void BeginAddLayer();
 	void EndAddLayer();
-	ndBrainLayerLinearActivated* AddLayer(ndBrainLayerLinearActivated* const layer);
+	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
 
 	bool Compare(const ndBrain& src) const;
 

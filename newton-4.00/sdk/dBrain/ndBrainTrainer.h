@@ -28,6 +28,37 @@ class ndBrain;
 class ndBrainTrainer: public ndClassAlloc
 {
 	public: 
+
+	class ndHidenVariableOffsets: public ndFixSizeArray<ndInt32, 32>
+	{
+		public:
+		ndHidenVariableOffsets()
+			:ndFixSizeArray<ndInt32, 32>()
+		{
+			Clear();
+		}
+		
+		ndHidenVariableOffsets(const ndHidenVariableOffsets& src)
+			:ndFixSizeArray<ndInt32, 32>()
+		{
+			Clear();
+			for (ndInt32 i = 0; i < src.GetCount(); ++i)
+			{
+				ndFixSizeArray<ndInt32, 32>::PushBack(src[i]);
+			}
+		}
+		
+		void Clear()
+		{
+			ndFixSizeArray<ndInt32, 32>::SetCount(0);
+			for (ndInt32 i = 0; i < 32; ++i)
+			{
+				ndFixSizeArray<ndInt32, 32>::PushBack(0);
+			}
+			ndFixSizeArray<ndInt32, 32>::SetCount(0);
+		}
+	};
+
 	enum ndSolveModel
 	{
 		m_sgd,
