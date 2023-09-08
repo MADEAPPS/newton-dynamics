@@ -44,6 +44,7 @@ class ndBrainLayerLineal : public ndBrainLayer
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
+	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc);
 	
 	private:
 	void InitGaussianBias(ndReal variance);

@@ -23,6 +23,8 @@
 #include "ndBrain.h"
 #include "ndBrainLoss.h"
 #include "ndBrainLayer.h"
+#include "ndBrainVector.h"
+#include "ndBrainMatrix.h"
 #include "ndBrainTrainer.h"
 
 class ndBrainTrainer::ndLayersVariables : public ndClassAlloc
@@ -33,10 +35,16 @@ class ndBrainTrainer::ndLayersVariables : public ndClassAlloc
 		,m_z()
 		,m_layer(layer)
 	{
-		m_z.SetCount(layer->GetOuputSize());
+	}
+
+	void ClearGradAcc()
+	{
+		m_layer->ClearGradAcc(m_gradBiasAcc, m_gradWeightAcc);
 	}
 
 	ndBrainVector m_z;
+	ndBrainVector m_gradBiasAcc;
+	ndBrainMatrix m_gradWeightAcc;
 	ndBrainLayer* m_layer;
 };
 
@@ -193,8 +201,10 @@ void ndBrainTrainer::PrefixScan()
 
 void ndBrainTrainer::ClearGradientsAcc()
 {
-	//m_weightGradients.Set(0.0f);
-	//m_biasGradientsAcc.Set(0.0f);
+	for (ndInt32 i = m_layers.GetCount() - 1; i >= 0; --i)
+	{
+		m_layers[i]->ClearGradAcc();
+	}
 }
 
 void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 threadIndex, ndInt32 threadCount)

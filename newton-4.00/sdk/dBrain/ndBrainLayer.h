@@ -28,6 +28,7 @@
 class ndBrainLoad;
 class ndBrainSave;
 class ndBrainVector;
+class ndBrainMatrix;
 
 class ndBrainLayer : public ndClassAlloc
 {
@@ -49,6 +50,7 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
+	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc);
 
 	//virtual ndBrainActivationType GetActivationType() const;
 	//

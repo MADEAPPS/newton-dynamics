@@ -44,13 +44,13 @@ ndBrainLayerLineal::~ndBrainLayerLineal()
 
 ndInt32 ndBrainLayerLineal::GetOuputSize() const
 {
-	ndAssert(m_bias.GetCount() == m_weights.GetColumns());
+	ndAssert(m_bias.GetCount() == m_weights.GetRows());
 	return m_bias.GetCount();
 }
 
 ndInt32 ndBrainLayerLineal::GetInputSize() const
 {
-	return m_weights.GetRows();
+	return m_weights.GetColumns();
 }
 
 //const char* ndBrainLayerLineal::GetLabelId() const
@@ -148,4 +148,16 @@ void ndBrainLayerLineal::MakePrediction(const ndBrainVector& input, ndBrainVecto
 {
 	m_weights.Mul(input, output);
 	output.Add(m_bias);
+}
+
+void ndBrainLayerLineal::ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc)
+{
+	if (!gradWeightAcc.GetRows())
+	{
+		gradBiasAcc.SetCount(GetOuputSize());
+		gradWeightAcc.Init(GetOuputSize(), GetInputSize());
+	}
+
+	gradBiasAcc.Set(ndReal (0.0f));
+	gradWeightAcc.Set(ndReal(0.0f));
 }

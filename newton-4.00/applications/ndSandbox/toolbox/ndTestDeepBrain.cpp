@@ -15,11 +15,11 @@
 static void ThreeLayersTwoInputsTwoOutputs()
 {
 	ndBrain brain;
-	ndInt32 neurons = 32;
+	ndInt32 hiddenNeurons = 32;
 #if 0
-	//ndBrainLayerLinearActivated* const inputLayer = new ndBrainLayerLinearActivated(2, neurons, m_tanh);
-	//ndBrainLayerLinearActivated* const hiddenLayer0 = new ndBrainLayerLinearActivated(inputLayer->GetOuputSize(), neurons, m_tanh);
-	//ndBrainLayerLinearActivated* const hiddenLayer1 = new ndBrainLayerLinearActivated(hiddenLayer0->GetOuputSize(), neurons, m_tanh);
+	//ndBrainLayerLinearActivated* const inputLayer = new ndBrainLayerLinearActivated(2, hiddenNeurons, m_tanh);
+	//ndBrainLayerLinearActivated* const hiddenLayer0 = new ndBrainLayerLinearActivated(inputLayer->GetOuputSize(), hiddenNeurons, m_tanh);
+	//ndBrainLayerLinearActivated* const hiddenLayer1 = new ndBrainLayerLinearActivated(hiddenLayer0->GetOuputSize(), hiddenNeurons, m_tanh);
 	//ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(hiddenLayer1->GetOuputSize(), 2, m_sigmoid);
 	//
 	//brain.AddLayer(inputLayer);
@@ -28,9 +28,9 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	//brain.AddLayer(ouputLayer);
 	//brain.InitWeightsXavierMethod();
 #else
-	neurons = 2;
-	ndBrainLayer* const inputLayer = new ndBrainLayerLineal(2, neurons);
-	ndBrainLayer* const activation0 = new ndBrainLayerSigmoidActivation(neurons);
+	hiddenNeurons = 2;
+	ndBrainLayer* const inputLayer = new ndBrainLayerLineal(2, hiddenNeurons);
+	ndBrainLayer* const activation0 = new ndBrainLayerSigmoidActivation(hiddenNeurons);
 
 	brain.AddLayer(inputLayer);
 	brain.AddLayer(activation0);
@@ -74,8 +74,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		{
 			ndInt32 index = randomeSelection[i];
 			const ndBrainVector& input = inputBatch[index];
-			loss.SetTruth(groundTruth[index]);
-			trainer.BackPropagate(input, loss);
+			//loss.SetTruth(groundTruth[index]);
+			//trainer.BackPropagate(input, loss);
 		}
 	});
 
@@ -96,8 +96,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 			randomeSelection[j] = ndInt32 (ndRandInt() % samples);
 		}
 		threads.ParallelExecute(UpdateTrainer);
-		threads.ParallelExecute(AccumulateWeight);
-		trainers[0]->UpdateWeights(ndReal(1.0e-2f), bashSize);
+		//threads.ParallelExecute(AccumulateWeight);
+		//trainers[0]->UpdateWeights(ndReal(1.0e-2f), bashSize);
 	}
 	
 	ndBrainVector truth;

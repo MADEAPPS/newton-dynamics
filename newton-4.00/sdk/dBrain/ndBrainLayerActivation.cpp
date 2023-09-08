@@ -74,6 +74,10 @@ void ndBrainLayerActivation::InitWeights(ndReal, ndReal)
 {
 }
 
+void ndBrainLayerActivation::ClearGradAcc(ndBrainVector&, ndBrainMatrix&)
+{
+}
+
 void ndBrainLayerActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
 	ndAssert(input.GetCount() == m_neurons);

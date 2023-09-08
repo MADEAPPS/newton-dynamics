@@ -27,7 +27,6 @@ ndBrainMatrix::ndBrainMatrix()
 	:ndArray<ndBrainMemVector>()
 	,m_memory(nullptr)
 {
-	ndAssert(0);
 }
 
 ndBrainMatrix::ndBrainMatrix(ndInt32 rows, ndInt32 columns)

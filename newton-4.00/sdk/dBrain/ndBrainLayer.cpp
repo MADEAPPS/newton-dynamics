@@ -122,6 +122,11 @@ void ndBrainLayer::InitWeightsXavierMethod()
 //}
 
 
+void ndBrainLayer::ClearGradAcc(ndBrainVector&, ndBrainMatrix&)
+{
+	ndAssert(0);
+}
+
 void ndBrainLayer::MakePrediction(const ndBrainVector&, ndBrainVector&)
 {
 	ndAssert(0);

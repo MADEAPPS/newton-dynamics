@@ -36,6 +36,7 @@ class ndBrainMatrix: public ndArray<ndBrainMemVector>
 
 	ndInt32 GetRows() const;
 	ndInt32 GetColumns() const;
+
 	void Set(ndReal value);
 	void Set(const ndBrainMatrix& src);
 	void Blend(const ndBrainMatrix& src, ndReal blend);
@@ -45,7 +46,6 @@ class ndBrainMatrix: public ndArray<ndBrainMemVector>
 
 	protected:
 	void* m_memory;
-	friend class ndBrainLayerLinearActivated;
 };
 
 inline ndInt32 ndBrainMatrix::GetRows() const
