@@ -90,9 +90,28 @@ void ndBrainLayerSigmoidActivation::MakePrediction(const ndBrainVector& input, n
 	ndAssert(input.GetCount() == output.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
-		ndReal val = input[i];
-		ndReal out = val * (ndReal(1.0f) - val);
-		output[i] = ndFlushToZero(out);
+		ndAssert(0);
+		ndReal val = ndClamp(output[i], ndReal(-50.0f), ndReal(50.0f));
+		ndReal exp = ndReal(ndExp(val));
+		ndReal out = ndFlushToZero(exp / (exp + ndReal(1.0f)));
+		ndAssert(ndCheckFloat(out));
+		ndAssert(out <= ndReal(1.0f));
+		ndAssert(out >= ndReal(0.0f));
+		output[i] = out;
 	}
 }
 
+void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
+{
+	ndAssert(input.GetCount() == output.GetCount());
+	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	{
+		ndAssert(0);
+		ndReal value = ndClamp(output[i], ndReal(-25.0f), ndReal(25.0f));
+		ndReal exp = ndReal(ndExp(ndReal(2.0f) * value));
+		output[i] = ndFlushToZero(exp - ndReal(1.0f)) / (exp + ndReal(1.0f));
+		ndAssert(ndCheckFloat(output[i]));
+		ndAssert(output[i] <= ndReal(1.0f));
+		ndAssert(output[i] >= ndReal(-1.0f));
+	}
+}

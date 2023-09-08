@@ -66,11 +66,34 @@ class ndBrainLayerSigmoidActivation : public ndBrainLayerActivation
 	virtual ndBrainLayer* Clone() const
 	{
 		ndAssert(0);
-		return nullptr;
+		return new ndBrainLayerSigmoidActivation(*this);
 	}
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
 };
+
+class ndBrainLayerTanhActivation : public ndBrainLayerActivation
+{
+	public:
+	ndBrainLayerTanhActivation(ndInt32 neurons)
+		:ndBrainLayerActivation(neurons)
+	{
+	}
+
+	ndBrainLayerTanhActivation(const ndBrainLayerTanhActivation& src)
+		:ndBrainLayerActivation(src)
+	{
+	}
+
+	virtual ndBrainLayer* Clone() const
+	{
+		ndAssert(0);
+		return new ndBrainLayerTanhActivation(*this);
+	}
+
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
+};
+
 
 #endif 
 

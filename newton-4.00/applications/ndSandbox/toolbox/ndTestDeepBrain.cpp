@@ -16,17 +16,24 @@ static void ThreeLayersTwoInputsTwoOutputs()
 {
 	ndBrain brain;
 	ndInt32 hiddenNeurons = 32;
-#if 0
-	//ndBrainLayerLinearActivated* const inputLayer = new ndBrainLayerLinearActivated(2, hiddenNeurons, m_tanh);
-	//ndBrainLayerLinearActivated* const hiddenLayer0 = new ndBrainLayerLinearActivated(inputLayer->GetOuputSize(), hiddenNeurons, m_tanh);
-	//ndBrainLayerLinearActivated* const hiddenLayer1 = new ndBrainLayerLinearActivated(hiddenLayer0->GetOuputSize(), hiddenNeurons, m_tanh);
-	//ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(hiddenLayer1->GetOuputSize(), 2, m_sigmoid);
-	//
-	//brain.AddLayer(inputLayer);
-	//brain.AddLayer(hiddenLayer0);
-	//brain.AddLayer(hiddenLayer1);
-	//brain.AddLayer(ouputLayer);
-	//brain.InitWeightsXavierMethod();
+#if 1
+	ndFixSizeArray<ndBrainLayer*, 16> layers;
+	layers.PushBack(new ndBrainLayerLineal(2, hiddenNeurons));
+	layers.PushBack(new ndBrainLayerTanhActivation(hiddenNeurons));
+
+	layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOuputSize(), hiddenNeurons));
+	layers.PushBack(new ndBrainLayerTanhActivation(hiddenNeurons));
+
+	layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOuputSize(), hiddenNeurons));
+	layers.PushBack(new ndBrainLayerTanhActivation(hiddenNeurons));
+
+	layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOuputSize(), 2));
+	layers.PushBack(new ndBrainLayerSigmoidActivation(2));
+	
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		brain.AddLayer(layers[i]);
+	}
 #else
 	hiddenNeurons = 2;
 	ndBrainLayer* const inputLayer = new ndBrainLayerLineal(2, hiddenNeurons);
