@@ -35,6 +35,7 @@ class ndBrainTrainer::ndLayersVariables : public ndClassAlloc
 		,m_z()
 		,m_layer(layer)
 	{
+		m_z.SetCount(m_layer->GetOuputSize());
 	}
 
 	void ClearGradAcc()

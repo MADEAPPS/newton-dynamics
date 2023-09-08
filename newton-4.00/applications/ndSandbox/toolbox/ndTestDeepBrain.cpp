@@ -81,8 +81,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		{
 			ndInt32 index = randomeSelection[i];
 			const ndBrainVector& input = inputBatch[index];
-			//loss.SetTruth(groundTruth[index]);
-			//trainer.BackPropagate(input, loss);
+			loss.SetTruth(groundTruth[index]);
+			trainer.BackPropagate(input, loss);
 		}
 	});
 
@@ -103,6 +103,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 			randomeSelection[j] = ndInt32 (ndRandInt() % samples);
 		}
 		threads.ParallelExecute(UpdateTrainer);
+		ndAssert(0);
 		//threads.ParallelExecute(AccumulateWeight);
 		//trainers[0]->UpdateWeights(ndReal(1.0e-2f), bashSize);
 	}

@@ -106,10 +106,24 @@ void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBr
 	ndAssert(input.GetCount() == output.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
-		ndAssert(0);
-		ndReal value = ndClamp(output[i], ndReal(-25.0f), ndReal(25.0f));
-		ndReal exp = ndReal(ndExp(ndReal(2.0f) * value));
-		output[i] = ndFlushToZero(exp - ndReal(1.0f)) / (exp + ndReal(1.0f));
+		//ndReal value1 = ndClamp(input[i], ndReal(-25.0f), ndReal(25.0f));
+		//ndReal exp = ndReal(ndExp(ndReal(2.0f) * value1));
+		//ndReal out0 = ndFlushToZero((exp - ndReal(1.0f)) / (exp + ndReal(1.0f)));
+
+		ndReal out = ndReal(0.0f);
+		ndReal value = input[i];
+		if (value > ndReal(0.0f))
+		{
+			ndReal exp = ndReal(ndExp(-ndReal(2.0f) * value));
+			out = ndFlushToZero((ndReal(1.0f) - exp) / (exp + ndReal(1.0f)));
+		}
+		else
+		{
+			ndReal exp = ndReal(ndExp(ndReal(2.0f) * value));
+			out = ndFlushToZero((exp - ndReal(1.0f)) / (exp + ndReal(1.0f)));
+		}
+
+		output[i] = out;
 		ndAssert(ndCheckFloat(output[i]));
 		ndAssert(output[i] <= ndReal(1.0f));
 		ndAssert(output[i] >= ndReal(-1.0f));
