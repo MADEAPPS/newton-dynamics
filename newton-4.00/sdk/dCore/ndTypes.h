@@ -240,7 +240,7 @@ typedef double ndFloat64;
 #define ndLog(x)		ndFloat32 (log(x))
 #define ndCeil(x)		ndFloat32 (ceil(x))
 #define ndFloor(x)		ndFloat32 (floor(x))	
-#define ndExp(x)		ndFloat32 (expf(x))
+#define ndExp(x)		ndFloat32 (exp(x))
 #define ndPow(x,y)		ndFloat32 (pow(x,y))
 #define ndFmod(x,y)		ndFloat32 (fmod(x,y))
 #define ndTan(x)		ndFloat32 (tan(x))

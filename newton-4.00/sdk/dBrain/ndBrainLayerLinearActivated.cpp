@@ -190,8 +190,8 @@ void ndBrainLayerLinearActivated::SigmoidActivation(ndBrainVector& output) const
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal val = ndClamp (output[i], ndReal(-50.0f), ndReal(50.0f));
-		ndReal exp = ndReal(ndExp(val));
-		ndReal out = ndFlushToZero(exp / (exp + ndReal(1.0f)));
+		ndReal ep = ndReal(ndExp(val));
+		ndReal out = ndFlushToZero(ep / (ep + ndReal(1.0f)));
 		ndAssert(ndCheckFloat(out));
 		ndAssert(out <= ndReal(1.0f));
 		ndAssert(out >= ndReal(0.0f));
@@ -204,8 +204,8 @@ void ndBrainLayerLinearActivated::HyperbolicTanActivation(ndBrainVector& output)
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal value = ndClamp(output[i], ndReal(-25.0f), ndReal(25.0f));
-		ndReal exp = ndReal(ndExp(ndReal(2.0f) * value));
-		output[i] = ndFlushToZero(exp - ndReal(1.0f)) / (exp + ndReal(1.0f));
+		ndReal ep = ndReal(ndExp(ndReal(2.0f) * value));
+		output[i] = ndFlushToZero(ep - ndReal(1.0f)) / (ep + ndReal(1.0f));
 		ndAssert(ndCheckFloat(output[i]));
 		ndAssert(output[i] <= ndReal(1.0f));
 		ndAssert(output[i] >= ndReal(-1.0f));
@@ -218,10 +218,10 @@ void ndBrainLayerLinearActivated::SoftmaxActivation(ndBrainVector& output) const
 	ndReal acc = 0.0f;
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
-		ndReal exp = ndReal(ndExp(output[i]));
-		output[i] = exp;
+		ndReal ep = ndReal(ndExp(output[i]));
+		output[i] = ep;
 		ndAssert(ndCheckFloat(output[i]));
-		acc += exp;
+		acc += ep;
 	}
 	
 	ndAssert(acc > 0.0f);
