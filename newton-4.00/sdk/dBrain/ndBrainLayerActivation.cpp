@@ -46,7 +46,6 @@ bool ndBrainLayerActivation::HasParameters() const
 
 const char* ndBrainLayerActivation::GetLabelId() const
 {
-	ndAssert(0);
 	return "ndBrainLayerActivation";
 }
 
@@ -85,6 +84,12 @@ void ndBrainLayerActivation::MakePrediction(const ndBrainVector& input, ndBrainV
 	output.Set(input);
 }
 
+
+const char* ndBrainLayerSigmoidActivation::GetLabelId() const
+{
+	return "ndBrainLayerSigmoidActivation";
+}
+
 void ndBrainLayerSigmoidActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
 	ndAssert(input.GetCount() == output.GetCount());
@@ -112,6 +117,11 @@ void ndBrainLayerSigmoidActivation::MakePrediction(const ndBrainVector& input, n
 		ndAssert(out >= ndReal(0.0f));
 		output[i] = out;
 	}
+}
+
+const char* ndBrainLayerTanhActivation::GetLabelId() const
+{
+	return "ndBrainLayerTanhActivation";
 }
 
 void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output)

@@ -173,6 +173,7 @@ namespace biped2
 		ndHumanoidBrain(ndInt32 numberOfImputs, ndInt32 numberOfOutputs)
 			:ndBrain()
 		{
+			ndAssert(0);
 			const ndInt32 neuronsPerHiddenLayers = 16;
 			ndBrainLayerLinearActivated* const inputLayer = new ndBrainLayerLinearActivated(numberOfImputs, neuronsPerHiddenLayers, m_relu);
 			ndBrainLayerLinearActivated* const hiddenLayer0 = new ndBrainLayerLinearActivated(inputLayer->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
@@ -185,7 +186,8 @@ namespace biped2
 			AddLayer(hiddenLayer1);
 			//brain.AddLayer(hiddenLayer2);
 			AddLayer(ouputLayer);
-			InitGaussianWeights(ndReal(0.125f));
+			ndAssert(0);
+			//InitGaussianWeights(ndReal(0.125f));
 		}
 	};
 

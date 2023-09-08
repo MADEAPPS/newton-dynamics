@@ -119,9 +119,9 @@ bool ndBrainLayerLineal::HasParameters() const
 
 void ndBrainLayerLineal::InitWeightsXavierMethod()
 {
-	ndAssert(0);
+	ndReal weighVariance = ndReal(ndSqrt(ndFloat32(6.0f) / ndFloat32(GetInputSize() + GetOuputSize())));
+	InitWeights(weighVariance, ndReal(0.0f));
 }
-
 
 void ndBrainLayerLineal::InitGaussianBias(ndReal variance)
 {

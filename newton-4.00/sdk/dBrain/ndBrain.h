@@ -42,9 +42,6 @@ class ndBrain: public ndArray<ndBrainLayer*>
 
 	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
 
-	void InitGaussianBias(ndReal variance);
-	void InitGaussianWeights(ndReal variance);
-
 	void InitWeightsXavierMethod();
 	void InitWeights(ndReal weighVariance, ndReal biasVariance);
 

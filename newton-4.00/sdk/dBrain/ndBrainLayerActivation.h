@@ -69,6 +69,7 @@ class ndBrainLayerSigmoidActivation : public ndBrainLayerActivation
 		return new ndBrainLayerSigmoidActivation(*this);
 	}
 
+	const char* GetLabelId() const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
 };
 
@@ -91,6 +92,7 @@ class ndBrainLayerTanhActivation : public ndBrainLayerActivation
 		return new ndBrainLayerTanhActivation(*this);
 	}
 
+	const char* GetLabelId() const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
 };
 
