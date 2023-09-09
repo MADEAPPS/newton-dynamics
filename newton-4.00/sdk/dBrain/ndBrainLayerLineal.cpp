@@ -144,13 +144,18 @@ void ndBrainLayerLineal::InitWeights(ndReal weighVariance, ndReal biasVariance)
 	InitGaussianWeights(weighVariance);
 }
 
-void ndBrainLayerLineal::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
+void ndBrainLayerLineal::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	m_weights.Mul(input, output);
 	output.Add(m_bias);
 }
 
-void ndBrainLayerLineal::ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc)
+void ndBrainLayerLineal::ActivationDerivative(const ndBrainVector&, ndBrainVector&) const
+{
+	ndAssert(0);
+}
+
+void ndBrainLayerLineal::ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const
 {
 	if (!gradWeightAcc.GetRows())
 	{
@@ -160,4 +165,20 @@ void ndBrainLayerLineal::ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix&
 
 	gradBiasAcc.Set(ndReal (0.0f));
 	gradWeightAcc.Set(ndReal(0.0f));
+}
+
+void ndBrainLayerLineal::CalculateOutputParamGradients(const ndBrainVector& outputDerivative, const ndBrainVector& input, ndBrainVector& biasGrad, ndBrainMatrix& weightGrad) const
+{
+	if (!weightGrad.GetRows())
+	{
+		biasGrad.SetCount(GetOuputSize());
+		weightGrad.Init(GetOuputSize(), GetInputSize());
+	}
+
+	biasGrad.Set(outputDerivative);
+	for (ndInt32 i = GetOuputSize() - 1; i >= 0 ; --i)
+	{
+		weightGrad[i].Set(biasGrad[i]);
+		weightGrad[i].Mul(input);
+	}
 }

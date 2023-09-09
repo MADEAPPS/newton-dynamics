@@ -122,12 +122,22 @@ void ndBrainLayer::InitWeightsXavierMethod()
 //}
 
 
-void ndBrainLayer::ClearGradAcc(ndBrainVector&, ndBrainMatrix&)
+void ndBrainLayer::ClearGradAcc(ndBrainVector&, ndBrainMatrix&) const
 {
 	ndAssert(0);
 }
 
-void ndBrainLayer::MakePrediction(const ndBrainVector&, ndBrainVector&)
+void ndBrainLayer::MakePrediction(const ndBrainVector&, ndBrainVector&) const
+{
+	ndAssert(0);
+}
+
+void ndBrainLayer::ActivationDerivative(const ndBrainVector&, ndBrainVector&) const
+{
+	ndAssert(0);
+}
+
+void ndBrainLayer::CalculateOutputParamGradients(const ndBrainVector&, const ndBrainVector&, ndBrainVector&, ndBrainMatrix&) const
 {
 	ndAssert(0);
 }

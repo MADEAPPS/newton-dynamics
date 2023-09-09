@@ -15,8 +15,9 @@
 static void ThreeLayersTwoInputsTwoOutputs()
 {
 	ndBrain brain;
-	ndInt32 hiddenNeurons = 32;
-#if 1
+	//ndInt32 hiddenNeurons = 32;
+	ndInt32 hiddenNeurons = 8;
+
 	ndFixSizeArray<ndBrainLayer*, 16> layers;
 	layers.PushBack(new ndBrainLayerLineal(2, hiddenNeurons));
 	layers.PushBack(new ndBrainLayerTanhActivation(hiddenNeurons));
@@ -34,15 +35,6 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	{
 		brain.AddLayer(layers[i]);
 	}
-#else
-	hiddenNeurons = 2;
-	ndBrainLayer* const inputLayer = new ndBrainLayerLineal(2, hiddenNeurons);
-	ndBrainLayer* const activation0 = new ndBrainLayerSigmoidActivation(hiddenNeurons);
-
-	brain.AddLayer(inputLayer);
-	brain.AddLayer(activation0);
-
-#endif
 	brain.InitWeightsXavierMethod();
 	
 	ndInt32 samples = 2000;

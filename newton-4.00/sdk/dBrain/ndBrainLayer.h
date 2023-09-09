@@ -49,8 +49,10 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
 
-	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
-	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc);
+	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
+	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const;
+	virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& output) const;
+	virtual void CalculateOutputParamGradients(const ndBrainVector& outputDerivative, const ndBrainVector& input, ndBrainVector& biasGrad, ndBrainMatrix& weightGrad) const;
 
 	//virtual ndBrainActivationType GetActivationType() const;
 	//

@@ -40,12 +40,15 @@ class ndBrainTrainer::ndLayersVariables : public ndClassAlloc
 
 	void ClearGradAcc()
 	{
-		m_layer->ClearGradAcc(m_gradBiasAcc, m_gradWeightAcc);
+		ndTrace(("this is wrong)"));
+		//m_layer->ClearGradAcc(m_gradBiasAcc, m_gradWeightAcc);
 	}
 
 	ndBrainVector m_z;
-	ndBrainVector m_gradBiasAcc;
-	ndBrainMatrix m_gradWeightAcc;
+	//ndBrainVector m_gradBiasAcc;
+	//ndBrainMatrix m_gradWeightAcc;
+	ndBrainVector m_gradBias;
+	ndBrainMatrix m_gradWeight;
 	ndBrainLayer* m_layer;
 };
 
@@ -62,8 +65,6 @@ ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
 	,m_biasGradient_v()
 	,m_weightGradient_u()
 	,m_weightGradient_v()
-	//,m_inputOutputPrefixScan()
-	//,m_weightGradientsPrefixScan()
 	,m_brain(brain)
 	,m_beta(0.999f)
 	,m_alpha(0.9f)
@@ -91,8 +92,6 @@ ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
 	,m_biasGradient_v(src.m_biasGradient_v)
 	,m_weightGradient_u(src.m_weightGradient_u)
 	,m_weightGradient_v(src.m_weightGradient_v)
-	//,m_inputOutputPrefixScan(src.m_inputOutputPrefixScan)
-	//,m_weightGradientsPrefixScan(src.m_weightGradientsPrefixScan)
 	,m_brain(src.m_brain)
 	,m_beta(src.m_beta)
 	,m_alpha(src.m_alpha)
@@ -214,39 +213,6 @@ void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 thre
 	ndBrainMemVector weigh0(&m_weightGradients[weightStartEnd.m_start], weightStartEnd.m_end - weightStartEnd.m_start);
 	const ndBrainMemVector weigh1(&src.m_weightGradients[weightStartEnd.m_start], weightStartEnd.m_end - weightStartEnd.m_start);
 	weigh0.Add(weigh1);
-}
-
-void ndBrainTrainer::BackPropagateOutputLayer(ndBrainLoss& loss)
-{
-	ndAssert(0);
-	//const ndArray<ndBrainLayer*>& layers = *m_brain;
-	//const ndInt32 layerIndex = layers.GetCount() - 1;
-	//
-	//ndBrainLayer* const ouputLayer = layers[layerIndex];
-	//const ndInt32 inputCount = ouputLayer->GetInputSize();
-	//const ndInt32 outputCount = ouputLayer->GetOuputSize();
-	//
-	//ndBrainMemVector biasGradients(&m_biasGradients[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
-	//ndBrainMemVector biasGradientsAcc(&m_biasGradientsAcc[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
-	//const ndBrainMemVector z(&m_z[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
-	//const ndBrainMemVector zDerivative(&m_zDerivative[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
-	//
-	//loss.GetLoss(z, biasGradients);
-	//biasGradients.Mul(zDerivative);
-	//biasGradientsAcc.Add(biasGradients);
-	//biasGradientsAcc.FlushToZero();
-	//
-	//const ndInt32 stride = (inputCount + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	//ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[layerIndex]];
-	//const ndBrainMemVector z0(&m_z[m_inputOutputPrefixScan[layerIndex]], inputCount);
-	//for (ndInt32 i = 0; i < outputCount; ++i)
-	//{
-	//	ndBrainMemVector weightGradient(weightGradientPtr, inputCount);
-	//	ndReal gValue = biasGradients[i];
-	//	weightGradient.ScaleAdd(z0, gValue);
-	//	weightGradient.FlushToZero();
-	//	weightGradientPtr += stride;
-	//}
 }
 
 void ndBrainTrainer::BackPropagateCalculateBiasGradient(ndInt32 layerIndex)
@@ -450,7 +416,9 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 
 	ndReal* const lossBuffer = ndAlloca (ndReal, m_brain->GetOutputSize() * 2);
 	ndBrainMemVector outputLost(lossBuffer, m_brain->GetOutputSize());
-	loss.GetLoss(m_layers[m_layers.GetCount() - 1]->m_z, outputLost);
+
+	const ndBrainVector& output = m_layers[m_layers.GetCount() - 1]->m_z;
+	loss.GetLoss(output, outputLost);
 
 	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	//{
@@ -460,10 +428,55 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	//	layer->ActivationDerivative(z, zDerivative);
 	//}
 
-	BackPropagateOutputLayer(loss);
-
+	BackPropagateOutputLayer(outputLost);
+	ndAssert(0);
 	//for (ndInt32 i = layers.GetCount() - 2; i >= 0; --i)
 	//{
 	//	BackPropagateHiddenLayer(i);
 	//}
+}
+
+
+void ndBrainTrainer::BackPropagateOutputLayer(const ndBrainVector& loss)
+{
+	//const ndArray<ndBrainLayer*>& layers = *m_brain;
+	//const ndInt32 layerIndex = layers.GetCount() - 1;
+	
+	//ndBrainLayer* const ouputLayer = layers[layerIndex];
+	//const ndInt32 inputCount = ouputLayer->GetInputSize();
+	//const ndInt32 outputCount = ouputLayer->GetOuputSize();
+	
+	//ndBrainMemVector biasGradients(&m_biasGradients[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
+	//ndBrainMemVector biasGradientsAcc(&m_biasGradientsAcc[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
+	//const ndBrainMemVector z(&m_z[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
+	//const ndBrainMemVector zDerivative(&m_zDerivative[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
+	//
+	//loss.GetLoss(z, biasGradients);
+	ndLayersVariables& outputLayer = *m_layers[m_layers.GetCount() - 1];
+
+	ndReal* const activationDerivativeBuffer = ndAlloca(ndReal, outputLayer.m_z.GetCount() * 2);
+	ndBrainMemVector activationDerivative(activationDerivativeBuffer, outputLayer.m_z.GetCount());
+	outputLayer.m_layer->ActivationDerivative(outputLayer.m_z, activationDerivative);
+	activationDerivative.Mul(loss);
+
+	//biasGradients.Mul(zDerivative);
+	//biasGradientsAcc.Add(biasGradients);
+	//biasGradientsAcc.FlushToZero();
+	//
+	//const ndInt32 stride = (inputCount + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+	//ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[layerIndex]];
+	//const ndBrainMemVector z0(&m_z[m_inputOutputPrefixScan[layerIndex]], inputCount);
+	//for (ndInt32 i = 0; i < outputCount; ++i)
+	//{
+	//	ndBrainMemVector weightGradient(weightGradientPtr, inputCount);
+	//	ndReal gValue = biasGradients[i];
+	//	weightGradient.ScaleAdd(z0, gValue);
+	//	weightGradient.FlushToZero();
+	//	weightGradientPtr += stride;
+	//}
+
+	ndAssert(m_layers.GetCount() > 2);
+	ndLayersVariables& linealLayer = *m_layers[m_layers.GetCount() - 2];
+	const ndBrainVector& input = m_layers[m_layers.GetCount() - 3]->m_z;
+	linealLayer.m_layer->CalculateOutputParamGradients(activationDerivative, input, linealLayer.m_gradBias, linealLayer.m_gradWeight);
 }

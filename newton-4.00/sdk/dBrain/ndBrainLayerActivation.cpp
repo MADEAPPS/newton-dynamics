@@ -73,24 +73,50 @@ void ndBrainLayerActivation::InitWeights(ndReal, ndReal)
 {
 }
 
-void ndBrainLayerActivation::ClearGradAcc(ndBrainVector&, ndBrainMatrix&)
+void ndBrainLayerActivation::ClearGradAcc(ndBrainVector&, ndBrainMatrix&) const
 {
 }
 
-void ndBrainLayerActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
+void ndBrainLayerActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == m_neurons);
 	ndAssert(output.GetCount() == m_neurons);
 	output.Set(input);
 }
 
+void ndBrainLayerActivation::ActivationDerivative(const ndBrainVector&, ndBrainVector&) const
+{
+	ndAssert(0);
+}
+
+void ndBrainLayerActivation::CalculateOutputParamGradients(const ndBrainVector&, const ndBrainVector&, ndBrainVector&, ndBrainMatrix&) const
+{
+	ndAssert(0);
+}
 
 const char* ndBrainLayerSigmoidActivation::GetLabelId() const
 {
 	return "ndBrainLayerSigmoidActivation";
 }
 
-void ndBrainLayerSigmoidActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
+void ndBrainLayerSigmoidActivation::ActivationDerivative(const ndBrainVector& input, ndBrainVector& output) const
+{
+	//ndAssert(input.GetCount() == derivativeOutput.GetCount());
+	//for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	//{
+	//	ndReal val = input[i];
+	//	ndReal out = val * (ndReal(1.0f) - val);
+	//	derivativeOutput[i] = ndFlushToZero(out);
+	//}
+
+	ndAssert(input.GetCount() == output.GetCount());
+	output.Set(ndReal(1.0f));
+	output.Sub(input);
+	output.Mul(input);
+	output.FlushToZero();
+}
+
+void ndBrainLayerSigmoidActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
@@ -124,7 +150,7 @@ const char* ndBrainLayerTanhActivation::GetLabelId() const
 	return "ndBrainLayerTanhActivation";
 }
 
-void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
+void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)

@@ -85,9 +85,8 @@ class ndBrainTrainer: public ndClassAlloc
 	void AcculumateGradients(const ndBrainTrainer& src, ndInt32 thread, ndInt32 threadCount);
 
 	private:
-	//void PrefixScan();
 	void BackPropagateHiddenLayer(ndInt32 layerIndex);
-	void BackPropagateOutputLayer(ndBrainLoss& loss);
+	void BackPropagateOutputLayer(const ndBrainVector& loss);
 	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
 	void BackPropagateCalculateWeightsGradient(ndInt32 layerIndex);
 
