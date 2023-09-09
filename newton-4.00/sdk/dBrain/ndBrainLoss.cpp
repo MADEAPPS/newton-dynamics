@@ -32,11 +32,14 @@ ndBrainLeastSquareErrorLoss::ndBrainLeastSquareErrorLoss(ndInt32 size)
 
 void ndBrainLeastSquareErrorLoss::SetTruth(const ndBrainVector& truth)
 {
+	ndAssert(m_truth.GetCount() == truth.GetCount());
 	m_truth.Set(truth);
 }
 
 void ndBrainLeastSquareErrorLoss::GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 {
+	ndAssert(output.GetCount() == loss.GetCount());
+	ndAssert(m_truth.GetCount() == loss.GetCount());
 	loss.Set(output);
 	loss.Sub(m_truth);
 }

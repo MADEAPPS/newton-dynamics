@@ -62,8 +62,8 @@ ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
 	,m_biasGradient_v()
 	,m_weightGradient_u()
 	,m_weightGradient_v()
-	,m_inputOutputPrefixScan()
-	,m_weightGradientsPrefixScan()
+	//,m_inputOutputPrefixScan()
+	//,m_weightGradientsPrefixScan()
 	,m_brain(brain)
 	,m_beta(0.999f)
 	,m_alpha(0.9f)
@@ -73,8 +73,7 @@ ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
 	,m_weighDecayRegularizer(ndReal (1.0e-5f))
 	,m_model(m_adam)
 {
-	PrefixScan();
-
+	//PrefixScan();
 	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
 	{
 		m_layers.PushBack(new ndLayersVariables((*m_brain)[i]));
@@ -92,8 +91,8 @@ ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
 	,m_biasGradient_v(src.m_biasGradient_v)
 	,m_weightGradient_u(src.m_weightGradient_u)
 	,m_weightGradient_v(src.m_weightGradient_v)
-	,m_inputOutputPrefixScan(src.m_inputOutputPrefixScan)
-	,m_weightGradientsPrefixScan(src.m_weightGradientsPrefixScan)
+	//,m_inputOutputPrefixScan(src.m_inputOutputPrefixScan)
+	//,m_weightGradientsPrefixScan(src.m_weightGradientsPrefixScan)
 	,m_brain(src.m_brain)
 	,m_beta(src.m_beta)
 	,m_alpha(src.m_alpha)
@@ -104,6 +103,10 @@ ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
 	,m_model(src.m_model)
 {
 	ndAssert(0);
+	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
+	{
+		m_layers.PushBack(new ndLayersVariables((*m_brain)[i]));
+	}
 }
 
 ndBrainTrainer::~ndBrainTrainer()
@@ -141,72 +144,64 @@ void ndBrainTrainer::SetRegularizer(ndReal regularizer)
 	m_weighDecayRegularizer = ndClamp(regularizer, ndReal(0.0f), ndReal(0.01f));
 }
 
-void ndBrainTrainer::PrefixScan()
-{
-	//const ndArray<ndBrainLayer*>& layers = *m_brain;
-	//m_inputOutputPrefixScan.SetCount(0);
-	//m_inputOutputPrefixScan.PushBack((layers[0]->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT);
-	//for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	//{
-	//	ndBrainLayer* const layer = layers[i];
-	//	ndInt32 size = (layer->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	//	m_inputOutputPrefixScan.PushBack(size);
-	//}
-	//ndInt32 size = 0;
-	//for (ndInt32 i = 0; i < m_inputOutputPrefixScan.GetCount(); ++i)
-	//{
-	//	ndInt32 count = m_inputOutputPrefixScan[i];
-	//	m_inputOutputPrefixScan[i] = size;
-	//	size += count;
-	//}
-	//m_inputOutputPrefixScan.PushBack(size);
-	//
-	//m_z.SetCount(size);
-	//m_zDerivative.SetCount(size);
-	//m_biasGradients.SetCount(size);
-	//m_biasGradient_u.SetCount(size);
-	//m_biasGradient_v.SetCount(size);
-	//m_biasGradientsAcc.SetCount(size);
-	//
-	//m_z.Set(ndReal (0.0f));
-	//m_zDerivative.Set(ndReal(0.0f));
-	//m_biasGradients.Set(ndReal(0.0f));
-	//m_biasGradient_u.Set(ndReal (0.0f));
-	//m_biasGradient_v.Set(ndReal (0.0f));
-	//m_biasGradientsAcc.Set(ndReal(0.0f));
-	//
-	//m_weightGradientsPrefixScan.SetCount(0);
-	//for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	//{
-	//	ndBrainLayer* const layer = layers[i];
-	//	ndInt32 stride = (layer->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	//	m_weightGradientsPrefixScan.PushBack (stride * layer->GetOuputSize());
-	//}
-	//
-	//ndInt32 sum = 0;
-	//for (ndInt32 i = 0; i < m_weightGradientsPrefixScan.GetCount(); ++i)
-	//{
-	//	ndInt32 count = m_weightGradientsPrefixScan[i];
-	//	m_weightGradientsPrefixScan[i] = sum;
-	//	sum += count;
-	//}
-	//m_weightGradientsPrefixScan.PushBack(sum);
-	//m_weightGradients.SetCount(sum);
-	//m_weightGradient_u.SetCount(sum);
-	//m_weightGradient_v.SetCount(sum);
-	//
-	//m_weightGradients.Set(0.0f);
-	//m_weightGradient_u.Set(0.0f);
-	//m_weightGradient_v.Set(0.0f);
-}
-
-void ndBrainTrainer::ClearGradientsAcc()
-{
-	for (ndInt32 i = m_layers.GetCount() - 1; i >= 0; --i)
-	{
-		m_layers[i]->ClearGradAcc();
-	}
-}
+//void ndBrainTrainer::PrefixScan()
+//{
+//	const ndArray<ndBrainLayer*>& layers = *m_brain;
+//	m_inputOutputPrefixScan.SetCount(0);
+//	m_inputOutputPrefixScan.PushBack((layers[0]->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT);
+//	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+//	{
+//		ndBrainLayer* const layer = layers[i];
+//		ndInt32 size = (layer->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+//		m_inputOutputPrefixScan.PushBack(size);
+//	}
+//	ndInt32 size = 0;
+//	for (ndInt32 i = 0; i < m_inputOutputPrefixScan.GetCount(); ++i)
+//	{
+//		ndInt32 count = m_inputOutputPrefixScan[i];
+//		m_inputOutputPrefixScan[i] = size;
+//		size += count;
+//	}
+//	m_inputOutputPrefixScan.PushBack(size);
+//	
+//	m_z.SetCount(size);
+//	m_zDerivative.SetCount(size);
+//	m_biasGradients.SetCount(size);
+//	m_biasGradient_u.SetCount(size);
+//	m_biasGradient_v.SetCount(size);
+//	m_biasGradientsAcc.SetCount(size);
+//	
+//	m_z.Set(ndReal (0.0f));
+//	m_zDerivative.Set(ndReal(0.0f));
+//	m_biasGradients.Set(ndReal(0.0f));
+//	m_biasGradient_u.Set(ndReal (0.0f));
+//	m_biasGradient_v.Set(ndReal (0.0f));
+//	m_biasGradientsAcc.Set(ndReal(0.0f));
+//	
+//	m_weightGradientsPrefixScan.SetCount(0);
+//	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+//	{
+//		ndBrainLayer* const layer = layers[i];
+//		ndInt32 stride = (layer->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+//		m_weightGradientsPrefixScan.PushBack (stride * layer->GetOuputSize());
+//	}
+//	
+//	ndInt32 sum = 0;
+//	for (ndInt32 i = 0; i < m_weightGradientsPrefixScan.GetCount(); ++i)
+//	{
+//		ndInt32 count = m_weightGradientsPrefixScan[i];
+//		m_weightGradientsPrefixScan[i] = sum;
+//		sum += count;
+//	}
+//	m_weightGradientsPrefixScan.PushBack(sum);
+//	m_weightGradients.SetCount(sum);
+//	m_weightGradient_u.SetCount(sum);
+//	m_weightGradient_v.SetCount(sum);
+//	
+//	m_weightGradients.Set(0.0f);
+//	m_weightGradient_u.Set(0.0f);
+//	m_weightGradient_v.Set(0.0f);
+//}
 
 void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 threadIndex, ndInt32 threadCount)
 {
@@ -223,47 +218,48 @@ void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 thre
 
 void ndBrainTrainer::BackPropagateOutputLayer(ndBrainLoss& loss)
 {
-	const ndArray<ndBrainLayer*>& layers = *m_brain;
-	const ndInt32 layerIndex = layers.GetCount() - 1;
-	
-	ndBrainLayer* const ouputLayer = layers[layerIndex];
-	const ndInt32 inputCount = ouputLayer->GetInputSize();
-	const ndInt32 outputCount = ouputLayer->GetOuputSize();
-
-	ndBrainMemVector biasGradients(&m_biasGradients[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
-	ndBrainMemVector biasGradientsAcc(&m_biasGradientsAcc[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
-	const ndBrainMemVector z(&m_z[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
-	const ndBrainMemVector zDerivative(&m_zDerivative[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
-	
-	loss.GetLoss(z, biasGradients);
-	biasGradients.Mul(zDerivative);
-	biasGradientsAcc.Add(biasGradients);
-	biasGradientsAcc.FlushToZero();
-	
-	const ndInt32 stride = (inputCount + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[layerIndex]];
-	const ndBrainMemVector z0(&m_z[m_inputOutputPrefixScan[layerIndex]], inputCount);
-	for (ndInt32 i = 0; i < outputCount; ++i)
-	{
-		ndBrainMemVector weightGradient(weightGradientPtr, inputCount);
-		ndReal gValue = biasGradients[i];
-		weightGradient.ScaleAdd(z0, gValue);
-		weightGradient.FlushToZero();
-		weightGradientPtr += stride;
-	}
+	ndAssert(0);
+	//const ndArray<ndBrainLayer*>& layers = *m_brain;
+	//const ndInt32 layerIndex = layers.GetCount() - 1;
+	//
+	//ndBrainLayer* const ouputLayer = layers[layerIndex];
+	//const ndInt32 inputCount = ouputLayer->GetInputSize();
+	//const ndInt32 outputCount = ouputLayer->GetOuputSize();
+	//
+	//ndBrainMemVector biasGradients(&m_biasGradients[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
+	//ndBrainMemVector biasGradientsAcc(&m_biasGradientsAcc[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
+	//const ndBrainMemVector z(&m_z[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
+	//const ndBrainMemVector zDerivative(&m_zDerivative[m_inputOutputPrefixScan[layerIndex + 1]], outputCount);
+	//
+	//loss.GetLoss(z, biasGradients);
+	//biasGradients.Mul(zDerivative);
+	//biasGradientsAcc.Add(biasGradients);
+	//biasGradientsAcc.FlushToZero();
+	//
+	//const ndInt32 stride = (inputCount + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+	//ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[layerIndex]];
+	//const ndBrainMemVector z0(&m_z[m_inputOutputPrefixScan[layerIndex]], inputCount);
+	//for (ndInt32 i = 0; i < outputCount; ++i)
+	//{
+	//	ndBrainMemVector weightGradient(weightGradientPtr, inputCount);
+	//	ndReal gValue = biasGradients[i];
+	//	weightGradient.ScaleAdd(z0, gValue);
+	//	weightGradient.FlushToZero();
+	//	weightGradientPtr += stride;
+	//}
 }
 
 void ndBrainTrainer::BackPropagateCalculateBiasGradient(ndInt32 layerIndex)
 {
-	const ndArray<ndBrainLayer*>& layers = *m_brain;
-	ndBrainLayer* const layer = layers[layerIndex + 1];
-	
-	const ndBrainMemVector biasGradients1(&m_biasGradients[m_inputOutputPrefixScan[layerIndex + 2]], layer->GetOuputSize());
-	ndBrainMemVector biasGradients(&m_biasGradients[m_inputOutputPrefixScan[layerIndex + 1]], layer->GetInputSize());
-	ndBrainMemVector biasGradientsAcc(&m_biasGradientsAcc[m_inputOutputPrefixScan[layerIndex + 1]], layer->GetInputSize());
-	const ndBrainMemVector zDerivative(&m_zDerivative[m_inputOutputPrefixScan[layerIndex + 1]], layer->GetInputSize());
-	
 	ndAssert(0);
+	//const ndArray<ndBrainLayer*>& layers = *m_brain;
+	//ndBrainLayer* const layer = layers[layerIndex + 1];
+	//
+	//const ndBrainMemVector biasGradients1(&m_biasGradients[m_inputOutputPrefixScan[layerIndex + 2]], layer->GetOuputSize());
+	//ndBrainMemVector biasGradients(&m_biasGradients[m_inputOutputPrefixScan[layerIndex + 1]], layer->GetInputSize());
+	//ndBrainMemVector biasGradientsAcc(&m_biasGradientsAcc[m_inputOutputPrefixScan[layerIndex + 1]], layer->GetInputSize());
+	//const ndBrainMemVector zDerivative(&m_zDerivative[m_inputOutputPrefixScan[layerIndex + 1]], layer->GetInputSize());
+
 	//layer->m_weights.TransposeMul(biasGradients1, biasGradients);
 	//biasGradients.Mul(zDerivative);
 	//biasGradientsAcc.Add(biasGradients);
@@ -272,64 +268,31 @@ void ndBrainTrainer::BackPropagateCalculateBiasGradient(ndInt32 layerIndex)
 
 void ndBrainTrainer::BackPropagateCalculateWeightsGradient(ndInt32 layerIndex)
 {
-	const ndArray<ndBrainLayer*>& layers = *m_brain;
-	ndBrainLayer* const layer = layers[layerIndex];
-
-	const ndBrainMemVector biasGradients(&m_biasGradients[m_inputOutputPrefixScan[layerIndex + 1]], layer->GetOuputSize());
-
-	const ndInt32 inputCount = layer->GetInputSize();
-	const ndInt32 stride = (inputCount + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[layerIndex]];
-
-	const ndBrainMemVector z0(&m_z[m_inputOutputPrefixScan[layerIndex]], inputCount);
-	for (ndInt32 i = 0; i < layer->GetOuputSize(); ++i)
-	{
-		ndBrainMemVector weightGradient(weightGradientPtr, inputCount);
-		ndReal gValue = biasGradients[i];
-		weightGradient.ScaleAdd(z0, gValue);
-		weightGradient.FlushToZero();
-		weightGradientPtr += stride;
-	}
+	ndAssert(0);
+	//const ndArray<ndBrainLayer*>& layers = *m_brain;
+	//ndBrainLayer* const layer = layers[layerIndex];
+	//
+	//const ndBrainMemVector biasGradients(&m_biasGradients[m_inputOutputPrefixScan[layerIndex + 1]], layer->GetOuputSize());
+	//
+	//const ndInt32 inputCount = layer->GetInputSize();
+	//const ndInt32 stride = (inputCount + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+	//ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[layerIndex]];
+	//
+	//const ndBrainMemVector z0(&m_z[m_inputOutputPrefixScan[layerIndex]], inputCount);
+	//for (ndInt32 i = 0; i < layer->GetOuputSize(); ++i)
+	//{
+	//	ndBrainMemVector weightGradient(weightGradientPtr, inputCount);
+	//	ndReal gValue = biasGradients[i];
+	//	weightGradient.ScaleAdd(z0, gValue);
+	//	weightGradient.FlushToZero();
+	//	weightGradientPtr += stride;
+	//}
 }
 
 void ndBrainTrainer::BackPropagateHiddenLayer(ndInt32 layerIndex)
 {
 	BackPropagateCalculateBiasGradient(layerIndex);
 	BackPropagateCalculateWeightsGradient(layerIndex);
-}
-
-void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
-{
-	//const ndArray<ndBrainLayer*>& layers = *m_brain;
-	
-	//ndBrainMemVector layerInput(&m_z[m_inputOutputPrefixScan[0]], input.GetCount());
-	//layerInput.Set(input);
-
-	m_layers[0]->m_layer->MakePrediction(input, m_layers[0]->m_z);
-	for (ndInt32 i = 1; i < m_layers.GetCount(); ++i)
-	{
-	//	ndLayersVariables* const variable = m_layers[i];
-	//	ndBrainLayer* const layer = layers[i];
-	//	const ndBrainMemVector in(&m_z[m_inputOutputPrefixScan[i + 0]], layer->GetInputSize());
-	//	ndBrainMemVector out(&m_z[m_inputOutputPrefixScan[i + 1]], layer->GetOuputSize());
-	//	layer->MakePrediction(in, out);
-		m_layers[i]->m_layer->MakePrediction(m_layers[i-1]->m_z, m_layers[i]->m_z);
-	}
-	
-	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
-	//{
-	//	ndBrainLayer* const layer = layers[i];
-	//	const ndBrainMemVector z(&m_z[m_inputOutputPrefixScan[i + 1]], layer->GetOuputSize());
-	//	ndBrainMemVector zDerivative(&m_zDerivative[m_inputOutputPrefixScan[i + 1]], layer->GetOuputSize());
-	//	layer->ActivationDerivative(z, zDerivative);
-	//}
-	
-	BackPropagateOutputLayer(loss);
-
-	//for (ndInt32 i = layers.GetCount() - 2; i >= 0; --i)
-	//{
-	//	BackPropagateHiddenLayer(i);
-	//}
 }
 
 void ndBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
@@ -467,4 +430,40 @@ void ndBrainTrainer::AdamUpdate(ndReal learnRate)
 		m_betaAcc = ndReal(0.0f);
 	}
 	StochasticUpdate(learnRate);
+}
+
+void ndBrainTrainer::ClearGradientsAcc()
+{
+	for (ndInt32 i = m_layers.GetCount() - 1; i >= 0; --i)
+	{
+		m_layers[i]->ClearGradAcc();
+	}
+}
+
+void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
+{
+	m_layers[0]->m_layer->MakePrediction(input, m_layers[0]->m_z);
+	for (ndInt32 i = 1; i < m_layers.GetCount(); ++i)
+	{
+		m_layers[i]->m_layer->MakePrediction(m_layers[i - 1]->m_z, m_layers[i]->m_z);
+	}
+
+	ndReal* const lossBuffer = ndAlloca (ndReal, m_brain->GetOutputSize() * 2);
+	ndBrainMemVector outputLost(lossBuffer, m_brain->GetOutputSize());
+	loss.GetLoss(m_layers[m_layers.GetCount() - 1]->m_z, outputLost);
+
+	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	//{
+	//	ndBrainLayer* const layer = layers[i];
+	//	const ndBrainMemVector z(&m_z[m_inputOutputPrefixScan[i + 1]], layer->GetOuputSize());
+	//	ndBrainMemVector zDerivative(&m_zDerivative[m_inputOutputPrefixScan[i + 1]], layer->GetOuputSize());
+	//	layer->ActivationDerivative(z, zDerivative);
+	//}
+
+	BackPropagateOutputLayer(loss);
+
+	//for (ndInt32 i = layers.GetCount() - 2; i >= 0; --i)
+	//{
+	//	BackPropagateHiddenLayer(i);
+	//}
 }

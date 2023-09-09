@@ -29,36 +29,35 @@ class ndBrainTrainer: public ndClassAlloc
 {
 	public: 
 
-	class ndHidenVariableOffsets: public ndFixSizeArray<ndInt32, 32>
-	{
-		public:
-		ndHidenVariableOffsets()
-			:ndFixSizeArray<ndInt32, 32>()
-		{
-			Clear();
-		}
-		
-		ndHidenVariableOffsets(const ndHidenVariableOffsets& src)
-			:ndFixSizeArray<ndInt32, 32>()
-		{
-			Clear();
-			for (ndInt32 i = 0; i < src.GetCount(); ++i)
-			{
-				ndFixSizeArray<ndInt32, 32>::PushBack(src[i]);
-			}
-		}
-		
-		void Clear()
-		{
-			ndFixSizeArray<ndInt32, 32>::SetCount(0);
-			for (ndInt32 i = 0; i < 32; ++i)
-			{
-				ndFixSizeArray<ndInt32, 32>::PushBack(0);
-			}
-			ndFixSizeArray<ndInt32, 32>::SetCount(0);
-		}
-	};
-
+	//class ndHidenVariableOffsets: public ndFixSizeArray<ndInt32, 32>
+	//{
+	//	public:
+	//	ndHidenVariableOffsets()
+	//		:ndFixSizeArray<ndInt32, 32>()
+	//	{
+	//		Clear();
+	//	}
+	//	
+	//	ndHidenVariableOffsets(const ndHidenVariableOffsets& src)
+	//		:ndFixSizeArray<ndInt32, 32>()
+	//	{
+	//		Clear();
+	//		for (ndInt32 i = 0; i < src.GetCount(); ++i)
+	//		{
+	//			ndFixSizeArray<ndInt32, 32>::PushBack(src[i]);
+	//		}
+	//	}
+	//	
+	//	void Clear()
+	//	{
+	//		ndFixSizeArray<ndInt32, 32>::SetCount(0);
+	//		for (ndInt32 i = 0; i < 32; ++i)
+	//		{
+	//			ndFixSizeArray<ndInt32, 32>::PushBack(0);
+	//		}
+	//		ndFixSizeArray<ndInt32, 32>::SetCount(0);
+	//	}
+	//};
 
 	class ndLayersVariables;
 
@@ -86,7 +85,7 @@ class ndBrainTrainer: public ndClassAlloc
 	void AcculumateGradients(const ndBrainTrainer& src, ndInt32 thread, ndInt32 threadCount);
 
 	private:
-	void PrefixScan();
+	//void PrefixScan();
 	void BackPropagateHiddenLayer(ndInt32 layerIndex);
 	void BackPropagateOutputLayer(ndBrainLoss& loss);
 	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
@@ -106,8 +105,8 @@ class ndBrainTrainer: public ndClassAlloc
 	ndBrainVector m_biasGradient_v;
 	ndBrainVector m_weightGradient_u;
 	ndBrainVector m_weightGradient_v;
-	ndHidenVariableOffsets m_inputOutputPrefixScan;
-	ndHidenVariableOffsets m_weightGradientsPrefixScan;
+	//ndHidenVariableOffsets m_inputOutputPrefixScan;
+	//ndHidenVariableOffsets m_weightGradientsPrefixScan;
 	ndBrain* m_brain;
 	
 	ndReal m_beta;
