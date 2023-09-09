@@ -478,5 +478,5 @@ void ndBrainTrainer::BackPropagateOutputLayer(const ndBrainVector& loss)
 	ndAssert(m_layers.GetCount() > 2);
 	ndLayersVariables& linealLayer = *m_layers[m_layers.GetCount() - 2];
 	const ndBrainVector& input = m_layers[m_layers.GetCount() - 3]->m_z;
-	linealLayer.m_layer->CalculateOutputParamGradients(activationDerivative, input, linealLayer.m_gradBias, linealLayer.m_gradWeight);
+	linealLayer.m_layer->CalculateOutputLayersParamGradients(activationDerivative, input, linealLayer.m_gradBias, linealLayer.m_gradWeight);
 }

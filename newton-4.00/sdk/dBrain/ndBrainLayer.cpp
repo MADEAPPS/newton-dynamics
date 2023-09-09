@@ -137,7 +137,7 @@ void ndBrainLayer::ActivationDerivative(const ndBrainVector&, ndBrainVector&) co
 	ndAssert(0);
 }
 
-void ndBrainLayer::CalculateOutputParamGradients(const ndBrainVector&, const ndBrainVector&, ndBrainVector&, ndBrainMatrix&) const
+void ndBrainLayer::CalculateOutputLayersParamGradients(const ndBrainVector&, const ndBrainVector&, ndBrainVector&, ndBrainMatrix&) const
 {
 	ndAssert(0);
 }

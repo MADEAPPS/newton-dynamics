@@ -167,7 +167,7 @@ void ndBrainLayerLineal::ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix&
 	gradWeightAcc.Set(ndReal(0.0f));
 }
 
-void ndBrainLayerLineal::CalculateOutputParamGradients(const ndBrainVector& outputDerivative, const ndBrainVector& input, ndBrainVector& biasGrad, ndBrainMatrix& weightGrad) const
+void ndBrainLayerLineal::CalculateOutputLayersParamGradients(const ndBrainVector& outputDerivative, const ndBrainVector& input, ndBrainVector& biasGrad, ndBrainMatrix& weightGrad) const
 {
 	if (!weightGrad.GetRows())
 	{

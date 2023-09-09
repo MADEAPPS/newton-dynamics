@@ -52,7 +52,7 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const;
 	virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& output) const;
-	virtual void CalculateOutputParamGradients(const ndBrainVector& outputDerivative, const ndBrainVector& input, ndBrainVector& biasGrad, ndBrainMatrix& weightGrad) const;
+	virtual void CalculateOutputLayersParamGradients(const ndBrainVector& outputDerivative, const ndBrainVector& input, ndBrainVector& biasGrad, ndBrainMatrix& weightGrad) const;
 
 	//virtual ndBrainActivationType GetActivationType() const;
 	//
