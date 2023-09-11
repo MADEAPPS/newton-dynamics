@@ -178,3 +178,18 @@ void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBr
 		ndAssert(output[i] >= ndReal(-1.0f));
 	}
 }
+
+void ndBrainLayerTanhActivation::ActivationDerivative(const ndBrainVector& input, ndBrainVector& output) const
+{
+	//ndAssert(input.GetCount() == output.GetCount());
+	//for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	//{
+	//	ndReal val = input[i];
+	//	output[i] = ndFlushToZero(ndReal(1.0f) - val * val);
+	//}
+
+	ndAssert(input.GetCount() == output.GetCount());
+	output.Set(ndReal(1.0f));
+	output.MulSub(input, input);
+	output.FlushToZero();
+}

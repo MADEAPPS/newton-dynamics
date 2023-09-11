@@ -253,7 +253,7 @@ void ndBrainLayerLinearActivated::ReluActivationDerivative(const ndBrainVector& 
 	}
 }
 
-void ndBrainLayerLinearActivated::SigmoidDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
+void ndBrainLayerLinearActivated::SigmoidActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
@@ -264,7 +264,7 @@ void ndBrainLayerLinearActivated::SigmoidDerivative(const ndBrainVector& input, 
 	}
 }
 
-void ndBrainLayerLinearActivated::HyperbolicTanDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
+void ndBrainLayerLinearActivated::TanhActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
@@ -279,9 +279,9 @@ void ndBrainLayerLinearActivated::SoftmaxDerivative(const ndBrainVector& input, 
 	ndAssert(0);
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	
-	// this is not correct, for now use SigmoidDerivative, 
+	// this is not correct, for now use SigmoidActivationDerivative, 
 	// Categorical Cross-Entropy Loss
-	SigmoidDerivative(input, derivativeOutput);
+	SigmoidActivationDerivative(input, derivativeOutput);
 
 	//for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	//{
@@ -352,13 +352,13 @@ void ndBrainLayerLinearActivated::ActivationDerivative(const ndBrainVector& inpu
 
 		case m_tanh:
 		{
-			HyperbolicTanDerivative(input, derivativeOutput);
+			TanhActivationDerivative(input, derivativeOutput);
 			break;
 		}
 
 		case m_sigmoid:
 		{
-			SigmoidDerivative(input, derivativeOutput);
+			SigmoidActivationDerivative(input, derivativeOutput);
 			break;
 		}
 
