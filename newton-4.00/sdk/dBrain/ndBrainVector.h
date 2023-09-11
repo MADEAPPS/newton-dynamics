@@ -28,7 +28,10 @@ class ndBrainVector: public ndArray<ndReal>
 {
 	public: 
 	ndBrainVector();
-	
+	~ndBrainVector();
+
+	void Swap(ndBrainVector& src);
+
 	void InitGaussianWeights(ndReal variance);
 
 	void Set(ndReal value);

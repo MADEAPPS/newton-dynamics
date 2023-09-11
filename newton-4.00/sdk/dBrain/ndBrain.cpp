@@ -148,43 +148,6 @@ void ndBrain::InitWeightsXavierMethod()
 //	//output.Set(out);
 //}
 
-void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
-{
-	ndAssert(0);
-	//const ndArray<ndBrainLayer*>& layers = *this;
-	//ndFixSizeArray<ndInt32, 256 > offsets;
-	//
-	//ndInt32 size = 0;
-	//offsets.PushBack(size);
-	//size += (layers[0]->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	//for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	//{
-	//	ndBrainLayer* const layer = layers[i];
-	//	offsets.PushBack(size);
-	//	size += (layer->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	//}
-	//offsets.PushBack(size);
-	//
-	//ndReal* const memBuffer = ndAlloca(ndReal, size);
-	//
-	//ndAssert(layers.GetCount());
-	//ndAssert(input.GetCount() == GetInputSize());
-	//ndAssert(output.GetCount() == GetOutputSize());
-	//	
-	//ndBrainMemVector layerInput(&memBuffer[offsets[0]], input.GetCount());
-	//layerInput.Set(input);
-	//for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	//{
-	//	ndBrainLayer* const layer = layers[i];
-	//	const ndBrainMemVector in(&memBuffer[offsets[i + 0]], layer->GetInputSize());
-	//	ndBrainMemVector out(&memBuffer[offsets[i + 1]], layer->GetOuputSize());
-	//	layer->MakePrediction(in, out);
-	//}
-	//
-	//const ndBrainMemVector out(&memBuffer[offsets[layers.GetCount()]], output.GetCount());
-	//output.Set(out);
-}
-
 void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients)
 {
 	ndAssert(0);
@@ -268,4 +231,30 @@ void ndBrain::CalculateInputGradients(const ndBrainVector& input, ndBrainVector&
 	//}
 	//ndAssert(inputGradients.GetCount() == gradient.GetCount());
 	//inputGradients.Set(gradient);
+}
+
+
+void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
+{
+	const ndArray<ndBrainLayer*>& layers = *this;
+	ndInt32 maxSize = layers[0]->GetInputSize();
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		maxSize = ndMax (maxSize, layers[i]->GetOuputSize());
+	}
+
+	ndReal* const memBuffer = ndAlloca(ndReal, maxSize * 2 + 256);
+	ndBrainMemVector in(memBuffer, input.GetCount());
+	ndBrainMemVector out(memBuffer + maxSize + 128, input.GetCount());
+
+	in.Set(input);
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		out.SetSize(layers[i]->GetOuputSize());
+		layers[i]->MakePrediction(in, out);
+		in.Swap(out);
+	}
+
+	ndAssert(in.GetCount() == output.GetCount());
+	output.Set(in);
 }

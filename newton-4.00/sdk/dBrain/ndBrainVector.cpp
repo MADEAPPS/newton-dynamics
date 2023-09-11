@@ -61,6 +61,17 @@ ndBrainVector::ndBrainVector()
 {
 }
 
+ndBrainVector::~ndBrainVector()
+{
+}
+
+void ndBrainVector::Swap(ndBrainVector& src)
+{
+	ndSwap(m_size, src.m_size);
+	ndSwap(m_array, src.m_array);
+	ndSwap(m_capacity, src.m_capacity);
+}
+
 void ndBrainVector::InitGaussianWeights(ndReal variance)
 {
 	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)

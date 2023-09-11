@@ -450,7 +450,6 @@ void ndBrainTrainer::BackPropagateCalculateBiasGradient(ndInt32 layerIndex)
 void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
 {
 	m_layers[0]->m_layer->MakePrediction(input, m_layers[0]->m_z);
-
 	ndInt32 maxOutpuSize = m_layers[0]->m_layer->GetOuputSize();
 	for (ndInt32 i = 1; i < m_layers.GetCount(); ++i)
 	{
@@ -459,8 +458,9 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 		maxOutpuSize = ndMax(maxOutpuSize, layer.m_layer->GetOuputSize());
 	}
 
+m_brain->MakePrediction(input, m_layers[m_layers.GetCount() - 1]->m_z);
 ndAssert(0);
-	ndReal* const lossBuffer = ndAlloca(ndReal, m_brain->GetOutputSize() * 2);
+	ndReal* const lossBuffer = ndAlloca(ndReal, m_brain->GetOutputSize() + 256);
 	ndBrainMemVector outputLost(lossBuffer, m_brain->GetOutputSize());
 
 	const ndBrainVector& output = m_layers[m_layers.GetCount() - 1]->m_z;
