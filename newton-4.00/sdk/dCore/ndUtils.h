@@ -29,7 +29,7 @@
 #include "ndFixSizeArray.h"
 
 // assume this function returns memory aligned to 16 bytes
-#define ndAlloca(type, count) (type*) alloca (sizeof (type) * (count))
+#define ndAlloca(type, count) (type*) alloca (sizeof (type) * size_t(count))
 
 inline ndInt32 ndExp2 (ndInt32 x)
 {

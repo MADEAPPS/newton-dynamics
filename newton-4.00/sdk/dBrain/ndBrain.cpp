@@ -125,29 +125,6 @@ void ndBrain::InitWeightsXavierMethod()
 	}
 }
 
-//void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, const ndBrainVector& hiddenLayerOutputs)
-//{
-//	ndAssert(0);
-//	//const ndArray<ndBrainLayer*>& layers = *this;
-//	//ndAssert(layers.GetCount());
-//	//ndAssert(input.GetCount() == GetInputSize());
-//	//ndAssert(output.GetCount() == GetOutputSize());
-//	//ndAssert(hiddenLayerOutputs.GetCount() >= m_offsets[m_offsets.GetCount() - 1]);
-//	//
-//	//ndBrainMemVector layerInput(&hiddenLayerOutputs[m_offsets[0]], input.GetCount());
-//	//layerInput.Set(input);
-//	//for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-//	//{
-//	//	ndBrainLayer* const layer = layers[i];
-//	//	const ndBrainMemVector in(&hiddenLayerOutputs[m_offsets[i + 0]], layer->GetInputSize());
-//	//	ndBrainMemVector out(&hiddenLayerOutputs[m_offsets[i + 1]], layer->GetOuputSize());
-//	//	layer->MakePrediction(in, out);
-//	//}
-//	//
-//	//const ndBrainMemVector out(&hiddenLayerOutputs[m_offsets[layers.GetCount()]], output.GetCount());
-//	//output.Set(out);
-//}
-
 void ndBrain::CalculateInputGradientLoss(const ndBrainVector& input, const ndBrainVector& groundTruth, ndBrainVector& inputGradients)
 {
 	ndAssert(0);
