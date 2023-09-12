@@ -96,7 +96,6 @@ else()
 
 	if(MSVC)
 		file(GLOB CPP_SOURCE ${CPP_SOURCE} dCore/ndTypes.natvis)
-		message (${CPP_SOURCE})
 	endif()
 
 	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
