@@ -50,6 +50,9 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
+	virtual void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+
+
 	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const;
 	virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void CalculateOutputLayersParamGradients(const ndBrainVector& input, const ndBrainVector& outputDerivative, ndBrainVector& biasGrad, ndBrainMatrix& weightGrad) const;

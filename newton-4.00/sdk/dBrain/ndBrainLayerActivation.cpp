@@ -94,6 +94,11 @@ void ndBrainLayerActivation::CalculateOutputLayersParamGradients(const ndBrainVe
 	ndAssert(0);
 }
 
+void ndBrainLayerActivation::InputDerivative(const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
+{
+	ndAssert(0);
+}
+
 const char* ndBrainLayerSigmoidActivation::GetLabelId() const
 {
 	return "ndBrainLayerSigmoidActivation";
@@ -109,11 +114,24 @@ void ndBrainLayerSigmoidActivation::ActivationDerivative(const ndBrainVector& in
 	//	derivativeOutput[i] = ndFlushToZero(out);
 	//}
 
+	ndAssert(0);
 	ndAssert(input.GetCount() == output.GetCount());
 	output.Set(ndReal(1.0f));
 	output.Sub(input);
 	output.Mul(input);
 	output.FlushToZero();
+}
+
+void ndBrainLayerSigmoidActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+{
+	ndAssert(output.GetCount() == outputDerivative.GetCount());
+	ndAssert(output.GetCount() == inputDerivative.GetCount());
+
+	inputDerivative.Set(ndReal(1.0f));
+	inputDerivative.Sub(output);
+	inputDerivative.Mul(output);
+	inputDerivative.Mul(outputDerivative);
+	inputDerivative.FlushToZero();
 }
 
 void ndBrainLayerSigmoidActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
