@@ -458,6 +458,13 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 		maxOutpuSize = ndMax(maxOutpuSize, layer.m_layer->GetOuputSize());
 	}
 
+ndBrainVector xxxx0;
+ndBrainVector xxxx1;
+xxxx0.SetCount(input.GetCount());
+xxxx1.SetCount(m_brain->GetOutputSize());
+xxxx1.Set(ndReal(1.0f));
+//m_brain->CalculateInputGradient(input, xxxx1, xxxx0);
+m_brain->CalculateInputGradient(input, xxxx0);
 ndAssert(0);
 	ndReal* const lossBuffer = ndAlloca(ndReal, m_brain->GetOutputSize() + 256);
 	ndBrainMemVector outputLost(lossBuffer, m_brain->GetOutputSize());
