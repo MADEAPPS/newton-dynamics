@@ -22,40 +22,6 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
 
-ndBrainMemVector::ndBrainMemVector()
-	:ndBrainVector()
-{
-	m_size = 0;
-	m_capacity = 0;
-	m_array = nullptr;
-}
-
-ndBrainMemVector::ndBrainMemVector(const ndReal* const mem, ndInt32 size)
-	:ndBrainVector()
-{
-	m_size = size;
-	m_capacity = size + 1;
-	m_array = (ndReal*)mem;
-}
-
-ndBrainMemVector::~ndBrainMemVector()
-{
-	m_size = 0;
-	m_capacity = 0;
-	m_array = nullptr;
-}
-
-void ndBrainMemVector::SetSize(ndInt32 size)
-{
-	m_size = size;
-	m_capacity = size + 1;
-}
-
-void ndBrainMemVector::SetPointer(ndReal* const memmory)
-{
-	m_array = memmory;
-}
-
 ndBrainVector::ndBrainVector()
 	:ndArray<ndReal>()
 {
@@ -68,13 +34,6 @@ ndBrainVector::ndBrainVector(const ndBrainVector& src)
 
 ndBrainVector::~ndBrainVector()
 {
-}
-
-void ndBrainVector::Swap(ndBrainVector& src)
-{
-	ndSwap(m_size, src.m_size);
-	ndSwap(m_array, src.m_array);
-	ndSwap(m_capacity, src.m_capacity);
 }
 
 void ndBrainVector::InitGaussianWeights(ndReal variance)
@@ -182,4 +141,46 @@ void ndBrainVector::Blend(const ndBrainVector& target, ndReal blend)
 {
 	Scale(ndReal(1.0f) - blend);
 	ScaleAdd(target, blend);
+}
+
+
+ndBrainMemVector::ndBrainMemVector()
+	:ndBrainVector()
+{
+	m_size = 0;
+	m_capacity = 0;
+	m_array = nullptr;
+}
+
+ndBrainMemVector::ndBrainMemVector(const ndReal* const mem, ndInt32 size)
+	:ndBrainVector()
+{
+	m_size = size;
+	m_capacity = size + 1;
+	m_array = (ndReal*)mem;
+}
+
+ndBrainMemVector::~ndBrainMemVector()
+{
+	m_size = 0;
+	m_capacity = 0;
+	m_array = nullptr;
+}
+
+void ndBrainMemVector::SetSize(ndInt32 size)
+{
+	m_size = size;
+	m_capacity = size + 1;
+}
+
+void ndBrainMemVector::SetPointer(ndReal* const memmory)
+{
+	m_array = memmory;
+}
+
+void ndBrainMemVector::Swap(ndBrainMemVector& src)
+{
+	ndSwap(m_size, src.m_size);
+	ndSwap(m_array, src.m_array);
+	ndSwap(m_capacity, src.m_capacity);
 }

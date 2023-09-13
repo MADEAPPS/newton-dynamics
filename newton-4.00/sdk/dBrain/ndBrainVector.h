@@ -31,8 +31,6 @@ class ndBrainVector: public ndArray<ndReal>
 	ndBrainVector(const ndBrainVector& src);
 	~ndBrainVector();
 
-	void Swap(ndBrainVector& src);
-
 	void InitGaussianWeights(ndReal variance);
 
 	void Set(ndReal value);
@@ -62,6 +60,7 @@ class ndBrainMemVector : public ndBrainVector
 	~ndBrainMemVector();
 
 	void SetSize(ndInt32 size);
+	void Swap(ndBrainMemVector& src);
 	void SetPointer(ndReal* const memmory);
 };
 
