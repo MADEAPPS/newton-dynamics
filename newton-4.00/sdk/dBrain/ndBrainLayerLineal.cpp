@@ -42,6 +42,18 @@ ndBrainLayerLineal::~ndBrainLayerLineal()
 	ndAssert(0);
 }
 
+const char* ndBrainLayerLineal::GetLabelId() const
+{
+	ndAssert(0);
+	return "ndBrainLayerLineal";
+}
+
+ndBrainLayer* ndBrainLayerLineal::Clone() const
+{
+	ndAssert(0);
+	return new ndBrainLayerLineal(*this);
+}
+
 ndInt32 ndBrainLayerLineal::GetOuputSize() const
 {
 	ndAssert(m_bias.GetCount() == m_weights.GetRows());
@@ -52,18 +64,6 @@ ndInt32 ndBrainLayerLineal::GetInputSize() const
 {
 	return m_weights.GetColumns();
 }
-
-//const char* ndBrainLayerLineal::GetLabelId() const
-//{
-//	ndAssert(0);
-//	return "ndBrainLayerLineal";
-//}
-
-//ndBrainLayer* ndBrainLayerLineal::Clone() const
-//{
-//	ndAssert(0);
-//	return nullptr;
-//}
 
 //void ndBrainLayerLineal::InitWeights(ndReal, ndReal)
 //{
@@ -181,4 +181,9 @@ void ndBrainLayerLineal::CalculateOutputLayersParamGradients(const ndBrainVector
 		weightGrad[i].Set(biasGrad[i]);
 		weightGrad[i].Mul(input);
 	}
+}
+
+void ndBrainLayerLineal::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+{
+	m_weights.TransposeMul(outputDerivative, inputDerivative);
 }

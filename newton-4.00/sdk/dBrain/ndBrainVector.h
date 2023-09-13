@@ -28,6 +28,7 @@ class ndBrainVector: public ndArray<ndReal>
 {
 	public: 
 	ndBrainVector();
+	ndBrainVector(const ndBrainVector& src);
 	~ndBrainVector();
 
 	void Swap(ndBrainVector& src);

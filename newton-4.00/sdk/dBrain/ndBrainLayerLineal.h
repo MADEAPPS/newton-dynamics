@@ -34,17 +34,20 @@ class ndBrainLayerLineal : public ndBrainLayer
 	ndBrainLayerLineal(ndInt32 inputs, ndInt32 outputs);
 	ndBrainLayerLineal(const ndBrainLayerLineal& src);
 	virtual ~ndBrainLayerLineal();
-	//virtual ndBrainLayer* Clone() const;
+	virtual ndBrainLayer* Clone() const;
 
 	virtual bool HasParameters() const;
 	virtual ndInt32 GetOuputSize() const;
 	virtual ndInt32 GetInputSize() const;
-	//virtual const char* GetLabelId() const;
+	virtual const char* GetLabelId() const;
 	
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
+	virtual void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+
+
 	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const;
 	virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void CalculateOutputLayersParamGradients(const ndBrainVector& input, const ndBrainVector& outputDerivative, ndBrainVector& biasGrad, ndBrainMatrix& weightGrad) const;

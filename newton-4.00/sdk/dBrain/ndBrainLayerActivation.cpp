@@ -211,3 +211,14 @@ void ndBrainLayerTanhActivation::ActivationDerivative(const ndBrainVector& input
 	output.MulSub(input, input);
 	output.FlushToZero();
 }
+
+void ndBrainLayerTanhActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+{
+	ndAssert(output.GetCount() == outputDerivative.GetCount());
+	ndAssert(output.GetCount() == inputDerivative.GetCount());
+
+	inputDerivative.Set(ndReal(1.0f));
+	inputDerivative.MulSub(output, output);
+	inputDerivative.Mul(outputDerivative);
+	inputDerivative.FlushToZero();
+}

@@ -61,6 +61,11 @@ ndBrainVector::ndBrainVector()
 {
 }
 
+ndBrainVector::ndBrainVector(const ndBrainVector& src)
+	:ndArray<ndReal>(src)
+{
+}
+
 ndBrainVector::~ndBrainVector()
 {
 }
