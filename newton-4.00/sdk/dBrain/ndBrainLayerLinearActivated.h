@@ -41,7 +41,7 @@ class ndBrainLayerLinearActivated : public ndBrainLayer
 	ndBrainVector& GetBias();
 	const ndBrainVector& GetBias() const;
 
-	virtual ndInt32 GetOuputSize() const;
+	virtual ndInt32 GetOutputSize() const;
 	virtual ndInt32 GetInputSize() const;
 	virtual void InitGaussianBias(ndReal variance);
 	virtual void InitGaussianWeights(ndReal variance);
@@ -95,7 +95,7 @@ inline const char* ndBrainLayerLinearActivated::GetLabelId() const
 	return "ndBrainLayerLinearActivated";
 }
 
-inline ndInt32 ndBrainLayerLinearActivated::GetOuputSize() const
+inline ndInt32 ndBrainLayerLinearActivated::GetOutputSize() const
 {
 	return m_bias.GetCount();
 }

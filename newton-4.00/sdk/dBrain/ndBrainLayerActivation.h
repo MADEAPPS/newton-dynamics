@@ -38,7 +38,7 @@ class ndBrainLayerActivation : public ndBrainLayer
 
 	virtual bool HasParameters() const;
 	virtual const char* GetLabelId() const;
-	virtual ndInt32 GetOuputSize() const;
+	virtual ndInt32 GetOutputSize() const;
 	virtual ndInt32 GetInputSize() const;
 
 	virtual void InitWeightsXavierMethod();

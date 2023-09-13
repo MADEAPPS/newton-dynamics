@@ -22,7 +22,6 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerSigmoidActivation.h"
 
-
 ndBrainLayerSigmoidActivation::ndBrainLayerSigmoidActivation(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)
 {
@@ -104,62 +103,3 @@ void ndBrainLayerSigmoidActivation::MakePrediction(const ndBrainVector& input, n
 	}
 }
 
-const char* ndBrainLayerTanhActivation::GetLabelId() const
-{
-	return "ndBrainLayerTanhActivation";
-}
-
-void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
-{
-	ndAssert(input.GetCount() == output.GetCount());
-	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
-	{
-		//ndReal value1 = ndClamp(input[i], ndReal(-25.0f), ndReal(25.0f));
-		//ndReal exp = ndReal(ndExp(ndReal(2.0f) * value1));
-		//ndReal out0 = ndFlushToZero((exp - ndReal(1.0f)) / (exp + ndReal(1.0f)));
-
-		ndReal out = ndReal(0.0f);
-		ndReal value = input[i];
-		if (value > ndReal(0.0f))
-		{
-			ndReal p = ndReal(ndExp(-ndReal(2.0f) * value));
-			out = ndFlushToZero((ndReal(1.0f) - p) / (p + ndReal(1.0f)));
-		}
-		else
-		{
-			ndReal p = ndReal(ndExp(ndReal(2.0f) * value));
-			out = ndFlushToZero((p - ndReal(1.0f)) / (p + ndReal(1.0f)));
-		}
-
-		output[i] = out;
-		ndAssert(ndCheckFloat(output[i]));
-		ndAssert(output[i] <= ndReal(1.0f));
-		ndAssert(output[i] >= ndReal(-1.0f));
-	}
-}
-
-void ndBrainLayerTanhActivation::ActivationDerivative(const ndBrainVector& input, ndBrainVector& output) const
-{
-	//ndAssert(input.GetCount() == output.GetCount());
-	//for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
-	//{
-	//	ndReal val = input[i];
-	//	output[i] = ndFlushToZero(ndReal(1.0f) - val * val);
-	//}
-
-	ndAssert(input.GetCount() == output.GetCount());
-	output.Set(ndReal(1.0f));
-	output.MulSub(input, input);
-	output.FlushToZero();
-}
-
-void ndBrainLayerTanhActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
-{
-	ndAssert(output.GetCount() == outputDerivative.GetCount());
-	ndAssert(output.GetCount() == inputDerivative.GetCount());
-
-	inputDerivative.Set(ndReal(1.0f));
-	inputDerivative.MulSub(output, output);
-	inputDerivative.Mul(outputDerivative);
-	inputDerivative.FlushToZero();
-}

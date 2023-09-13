@@ -534,9 +534,9 @@ namespace ndController_1
 
 			ndSharedPtr<ndBrain> actor(new ndBrain());
 			ndBrainLayerLinearActivated* const layer0 = new ndBrainLayerLinearActivated(m_stateSize, layerSize, activation);
-			ndBrainLayerLinearActivated* const layer1 = new ndBrainLayerLinearActivated(layer0->GetOuputSize(), layerSize, activation);
-			ndBrainLayerLinearActivated* const layer2 = new ndBrainLayerLinearActivated(layer1->GetOuputSize(), layerSize, activation);
-			ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(layer2->GetOuputSize(), m_actionsSize, m_tanh);
+			ndBrainLayerLinearActivated* const layer1 = new ndBrainLayerLinearActivated(layer0->GetOutputSize(), layerSize, activation);
+			ndBrainLayerLinearActivated* const layer2 = new ndBrainLayerLinearActivated(layer1->GetOutputSize(), layerSize, activation);
+			ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(layer2->GetOutputSize(), m_actionsSize, m_tanh);
 
 			actor->AddLayer(layer0);
 			actor->AddLayer(layer1);
@@ -546,9 +546,9 @@ namespace ndController_1
 			// the critic is more complex since is deal with more complex inputs
 			ndSharedPtr<ndBrain> critic(new ndBrain());
 			ndBrainLayerLinearActivated* const criticLayer0 = new ndBrainLayerLinearActivated(m_stateSize + m_actionsSize, layerSize * 2, activation);
-			ndBrainLayerLinearActivated* const criticLayer1 = new ndBrainLayerLinearActivated(criticLayer0->GetOuputSize(), layerSize * 2, activation);
-			ndBrainLayerLinearActivated* const criticLayer2 = new ndBrainLayerLinearActivated(criticLayer1->GetOuputSize(), layerSize * 2, activation);
-			ndBrainLayerLinearActivated* const criticOuputLayer = new ndBrainLayerLinearActivated(criticLayer2->GetOuputSize(), 1, m_relu);
+			ndBrainLayerLinearActivated* const criticLayer1 = new ndBrainLayerLinearActivated(criticLayer0->GetOutputSize(), layerSize * 2, activation);
+			ndBrainLayerLinearActivated* const criticLayer2 = new ndBrainLayerLinearActivated(criticLayer1->GetOutputSize(), layerSize * 2, activation);
+			ndBrainLayerLinearActivated* const criticOuputLayer = new ndBrainLayerLinearActivated(criticLayer2->GetOutputSize(), 1, m_relu);
 
 			critic->AddLayer(criticLayer0);
 			critic->AddLayer(criticLayer1);

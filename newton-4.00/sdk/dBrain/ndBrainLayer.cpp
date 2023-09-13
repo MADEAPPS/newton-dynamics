@@ -57,7 +57,7 @@ ndInt32 ndBrainLayer::GetInputSize() const
 	return 0;
 }
  
-ndInt32 ndBrainLayer::GetOuputSize() const
+ndInt32 ndBrainLayer::GetOutputSize() const
 {
 	ndAssert(0);
 	return 0;

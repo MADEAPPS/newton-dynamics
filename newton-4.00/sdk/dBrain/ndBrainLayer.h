@@ -43,7 +43,7 @@ class ndBrainLayer : public ndClassAlloc
 	virtual const char* GetLabelId() const;
 
 	virtual ndInt32 GetInputSize() const;
-	virtual ndInt32 GetOuputSize() const;
+	virtual ndInt32 GetOutputSize() const;
 	virtual void CopyFrom(const ndBrainLayer& src);
 	
 	virtual void InitWeightsXavierMethod();

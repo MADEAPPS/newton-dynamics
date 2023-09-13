@@ -161,7 +161,7 @@ void ndBrainLayerLinearActivated::InitWeightsXavierMethod()
 
 		case m_tanh:
 		{
-			weighVariance = ndReal(ndSqrt (ndFloat32(6.0f) / ndFloat32(GetInputSize() + GetOuputSize())));
+			weighVariance = ndReal(ndSqrt (ndFloat32(6.0f) / ndFloat32(GetInputSize() + GetOutputSize())));
 			break;
 		}
 	}
@@ -425,7 +425,7 @@ void ndBrainLayerLinearActivated::Load(const ndBrainLoad* const loader)
 	}
 
 	loader->ReadString(buffer);
-	for (ndInt32 i = 0; i < GetOuputSize(); ++i)
+	for (ndInt32 i = 0; i < GetOutputSize(); ++i)
 	{
 		loader->ReadString(buffer);
 		ndBrainVector& row = m_weights[i];

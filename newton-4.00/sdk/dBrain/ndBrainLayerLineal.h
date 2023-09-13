@@ -37,7 +37,7 @@ class ndBrainLayerLineal : public ndBrainLayer
 	virtual ndBrainLayer* Clone() const;
 
 	virtual bool HasParameters() const;
-	virtual ndInt32 GetOuputSize() const;
+	virtual ndInt32 GetOutputSize() const;
 	virtual ndInt32 GetInputSize() const;
 	virtual const char* GetLabelId() const;
 	

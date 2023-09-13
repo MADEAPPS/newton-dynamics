@@ -57,7 +57,7 @@ ndInt32 ndBrain::GetInputSize() const
 
 ndInt32 ndBrain::GetOutputSize() const
 {
-	return GetCount() ? (*this)[GetCount()-1]->GetOuputSize() : 0;
+	return GetCount() ? (*this)[GetCount()-1]->GetOutputSize() : 0;
 }
 
 void ndBrain::CopyFrom(const ndBrain& src)
@@ -83,7 +83,7 @@ void ndBrain::SoftCopy(const ndBrain& src, ndReal blend)
 
 ndBrainLayer* ndBrain::AddLayer(ndBrainLayer* const layer)
 {
-	ndAssert(!GetCount() || ((*this)[GetCount() - 1]->GetOuputSize() == layer->GetInputSize()));
+	ndAssert(!GetCount() || ((*this)[GetCount() - 1]->GetOutputSize() == layer->GetInputSize()));
 	PushBack(layer);
 	return layer;
 }
@@ -131,7 +131,7 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 	ndInt32 maxSize = layers[0]->GetInputSize();
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
-		maxSize = ndMax(maxSize, layers[i]->GetOuputSize());
+		maxSize = ndMax(maxSize, layers[i]->GetOutputSize());
 	}
 
 	ndReal* const memBuffer = ndAlloca(ndReal, maxSize * 2 + 256);
@@ -141,7 +141,7 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 	in.Set(input);
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
-		out.SetSize(layers[i]->GetOuputSize());
+		out.SetSize(layers[i]->GetOutputSize());
 		layers[i]->MakePrediction(in, out);
 		in.Swap(out);
 	}
@@ -173,12 +173,12 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 //	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 //	{
 //		const ndBrainLayer* const layer = layers[i];
-//		ndAssert(layer->m_weights.GetRows() == layer->GetOuputSize());
+//		ndAssert(layer->m_weights.GetRows() == layer->GetOutputSize());
 //		ndAssert(layer->m_weights.GetColumns() == layer->GetInputSize());
 //	
-//		ndBrainMemVector g(gBuff, layer->GetOuputSize());
+//		ndBrainMemVector g(gBuff, layer->GetOutputSize());
 //		ndBrainMemVector outGradient(zBuff, layer->GetInputSize());
-//		ndBrainMemVector z(&hidden_z[m_offsets[i + 1]], layer->GetOuputSize());
+//		ndBrainMemVector z(&hidden_z[m_offsets[i + 1]], layer->GetOutputSize());
 //	
 //		layer->ActivationDerivative(z, g);
 //		g.Mul(gradient);
@@ -203,7 +203,7 @@ void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& 
 	{
 		prefixScan.PushBack(sizeAcc);
 		sizeAcc += (layers[i]->GetInputSize() + 7) & -8;
-		maxSize = ndMax(maxSize, layers[i]->GetOuputSize());
+		maxSize = ndMax(maxSize, layers[i]->GetOutputSize());
 	}
 	prefixScan.PushBack(sizeAcc);
 
@@ -213,7 +213,7 @@ void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& 
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
 		ndBrainMemVector in(memBuffer + prefixScan[i + 0], layers[i]->GetInputSize());
-		ndBrainMemVector out(memBuffer + prefixScan[i + 1], layers[i]->GetOuputSize());
+		ndBrainMemVector out(memBuffer + prefixScan[i + 1], layers[i]->GetOutputSize());
 		layers[i]->MakePrediction(in, out);
 	}
 
@@ -225,7 +225,7 @@ void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& 
 	{
 		const ndBrainLayer* const layer = layers[i];
 		gradientIn.SetSize(layer->GetInputSize());
-		const ndBrainMemVector out(memBuffer + prefixScan[i + 1], layer->GetOuputSize());
+		const ndBrainMemVector out(memBuffer + prefixScan[i + 1], layer->GetOutputSize());
 		layer->InputDerivative(out, gradientOut, gradientIn);
 		gradientIn.Swap(gradientOut);
 	}

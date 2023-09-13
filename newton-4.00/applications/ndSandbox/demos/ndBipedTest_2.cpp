@@ -176,10 +176,10 @@ namespace biped2
 			ndAssert(0);
 			const ndInt32 neuronsPerHiddenLayers = 16;
 			ndBrainLayerLinearActivated* const inputLayer = new ndBrainLayerLinearActivated(numberOfImputs, neuronsPerHiddenLayers, m_relu);
-			ndBrainLayerLinearActivated* const hiddenLayer0 = new ndBrainLayerLinearActivated(inputLayer->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
-			ndBrainLayerLinearActivated* const hiddenLayer1 = new ndBrainLayerLinearActivated(hiddenLayer0->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
-			//ndBrainLayer* const hiddenLayer2 = new ndBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
-			ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(hiddenLayer1->GetOuputSize(), numberOfOutputs, m_relu);
+			ndBrainLayerLinearActivated* const hiddenLayer0 = new ndBrainLayerLinearActivated(inputLayer->GetOutputSize(), neuronsPerHiddenLayers, m_relu);
+			ndBrainLayerLinearActivated* const hiddenLayer1 = new ndBrainLayerLinearActivated(hiddenLayer0->GetOutputSize(), neuronsPerHiddenLayers, m_relu);
+			//ndBrainLayer* const hiddenLayer2 = new ndBrainLayer(hiddenLayer1->GetOutputSize(), neuronsPerHiddenLayers, m_relu);
+			ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(hiddenLayer1->GetOutputSize(), numberOfOutputs, m_relu);
 
 			AddLayer(inputLayer);
 			AddLayer(hiddenLayer0);

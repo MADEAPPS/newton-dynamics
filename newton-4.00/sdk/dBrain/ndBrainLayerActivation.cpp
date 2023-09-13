@@ -56,7 +56,7 @@ ndBrainLayer* ndBrainLayerActivation::Clone() const
 	return nullptr;
 }
 
-ndInt32 ndBrainLayerActivation::GetOuputSize() const
+ndInt32 ndBrainLayerActivation::GetOutputSize() const
 {
 	return m_neurons;
 }

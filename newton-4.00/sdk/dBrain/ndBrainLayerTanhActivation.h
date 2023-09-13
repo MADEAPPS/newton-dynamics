@@ -19,17 +19,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_SIGMOID_ACTIVATION_H__
-#define _ND_BRAIN_LAYER_SIGMOID_ACTIVATION_H__
+#ifndef _ND_BRAIN_LAYER_TANH_ACTIVATION_H__
+#define _ND_BRAIN_LAYER_TANH_ACTIVATION_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
-class ndBrainLayerSigmoidActivation : public ndBrainLayerActivation
+class ndBrainLayerTanhActivation : public ndBrainLayerActivation
 {
 	public:
-	ndBrainLayerSigmoidActivation(ndInt32 neurons);
-	ndBrainLayerSigmoidActivation(const ndBrainLayerActivation& src);
+	ndBrainLayerTanhActivation(ndInt32 neurons);
+	ndBrainLayerTanhActivation(const ndBrainLayerTanhActivation& src);
 	ndBrainLayer* Clone() const;
 
 	const char* GetLabelId() const;

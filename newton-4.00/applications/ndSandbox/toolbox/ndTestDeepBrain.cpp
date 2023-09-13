@@ -22,13 +22,13 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	layers.PushBack(new ndBrainLayerLineal(2, hiddenNeurons));
 	layers.PushBack(new ndBrainLayerTanhActivation(hiddenNeurons));
 
-	layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOuputSize(), hiddenNeurons));
+	layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenNeurons));
 	layers.PushBack(new ndBrainLayerTanhActivation(hiddenNeurons));
 
-	layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOuputSize(), hiddenNeurons));
+	layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenNeurons));
 	layers.PushBack(new ndBrainLayerTanhActivation(hiddenNeurons));
 
-	layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOuputSize(), 2));
+	layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOutputSize(), 2));
 	layers.PushBack(new ndBrainLayerSigmoidActivation(2));
 	
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
@@ -434,9 +434,9 @@ threadCount = 1;
 		ndInt32 neuronsPerLayers = 64;
 #if 0
 		ndBrainLayerLinearActivated* const inputLayer = new ndBrainLayerLinearActivated(trainingDigits->GetColumns(), neuronsPerLayers, m_tanh);
-		ndBrainLayerLinearActivated* const hiddenLayer0 = new ndBrainLayerLinearActivated(inputLayer->GetOuputSize(), neuronsPerLayers, m_tanh);
-		ndBrainLayerLinearActivated* const hiddenLayer1 = new ndBrainLayerLinearActivated(hiddenLayer0->GetOuputSize(), neuronsPerLayers, m_tanh);
-		ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(hiddenLayer1->GetOuputSize(), trainingLabels->GetColumns(), m_sigmoid);
+		ndBrainLayerLinearActivated* const hiddenLayer0 = new ndBrainLayerLinearActivated(inputLayer->GetOutputSize(), neuronsPerLayers, m_tanh);
+		ndBrainLayerLinearActivated* const hiddenLayer1 = new ndBrainLayerLinearActivated(hiddenLayer0->GetOutputSize(), neuronsPerLayers, m_tanh);
+		ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(hiddenLayer1->GetOutputSize(), trainingLabels->GetColumns(), m_sigmoid);
 	
 		brain.BeginAddLayer();
 		brain.AddLayer(inputLayer);
