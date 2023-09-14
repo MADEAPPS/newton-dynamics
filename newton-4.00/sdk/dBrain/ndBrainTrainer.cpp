@@ -530,7 +530,9 @@ ndAssert(0);
 	}
 	prefixScan.PushBack(sizeAcc);
 
-	ndReal* const memBuffer = ndAlloca(ndReal, sizeAcc + 8);
+	const ndReal* const memBuffer = ndAlloca(ndReal, sizeAcc + 8);
+	const ndReal* const gradientBuffer = ndAlloca(ndReal, maxSize * 2 + 256);
+
 	ndBrainMemVector in0(memBuffer, input.GetCount());
 	in0.Set(input);
 	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
@@ -539,18 +541,17 @@ ndAssert(0);
 		ndBrainMemVector out(memBuffer + prefixScan[i + 1], layers[i]->GetOutputSize());
 		layers[i]->MakePrediction(in, out);
 	}
+	const ndBrainMemVector output(memBuffer + prefixScan[layers.GetCount()], m_brain->GetOutputSize());
 
-ndBrainMemVector xxxx1(memBuffer + prefixScan[layers.GetCount()], m_brain->GetOutputSize());
 ndBrainVector xxxx0;
 xxxx0.SetCount(input.GetCount());
 m_brain->CalculateInputGradient(input, xxxx0);
-ndAssert(0);
 
-
-	ndReal* const gradientBuffer = ndAlloca(ndReal, maxSize * 2 + 256);
 	ndBrainMemVector gradientIn(gradientBuffer, m_brain->GetOutputSize());
 	ndBrainMemVector gradientOut(gradientBuffer + maxSize + 128, m_brain->GetOutputSize());
-	gradientOut.Set(ndReal(1.0f));
+	loss.GetLoss(output, gradientOut);
+
+ndAssert(0);
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 		const ndBrainLayer* const layer = layers[i];
