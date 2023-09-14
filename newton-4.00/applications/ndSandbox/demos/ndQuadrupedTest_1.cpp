@@ -1121,28 +1121,29 @@ namespace ndQuadruped_1
 		#ifdef ND_TRAIN_MODEL
 			ndInt32 layerSize = 64;
 			ndBrainActivationType hiddenActivation = m_tanh;
-			//ndBrainActivationType hiddenActivation = m_relu;
 			ndSharedPtr<ndBrain> actor(new ndBrain());
-			ndBrainLayerLinearActivated* const layer0 = new ndBrainLayerLinearActivated(m_stateSize, layerSize, hiddenActivation);
-			ndBrainLayerLinearActivated* const layer1 = new ndBrainLayerLinearActivated(layer0->GetOutputSize(), layerSize, hiddenActivation);
-			ndBrainLayerLinearActivated* const layer2 = new ndBrainLayerLinearActivated(layer1->GetOutputSize(), layerSize, hiddenActivation);
-			ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(layer2->GetOutputSize(), m_actionsSize, m_tanh);
-			actor->AddLayer(layer0);
-			actor->AddLayer(layer1);
-			actor->AddLayer(layer2);
-			actor->AddLayer(ouputLayer);
+			ndAssert(0);
+			//ndBrainLayerLinearActivated* const layer0 = new ndBrainLayerLinearActivated(m_stateSize, layerSize, hiddenActivation);
+			//ndBrainLayerLinearActivated* const layer1 = new ndBrainLayerLinearActivated(layer0->GetOutputSize(), layerSize, hiddenActivation);
+			//ndBrainLayerLinearActivated* const layer2 = new ndBrainLayerLinearActivated(layer1->GetOutputSize(), layerSize, hiddenActivation);
+			//ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(layer2->GetOutputSize(), m_actionsSize, m_tanh);
+			//actor->AddLayer(layer0);
+			//actor->AddLayer(layer1);
+			//actor->AddLayer(layer2);
+			//actor->AddLayer(ouputLayer);
 
 			// the critic is more complex since is deal with more complex inputs
 			ndSharedPtr<ndBrain> critic(new ndBrain());
-			ndBrainLayerLinearActivated* const criticLayer0 = new ndBrainLayerLinearActivated(m_stateSize + m_actionsSize, layerSize * 2, hiddenActivation);
-			ndBrainLayerLinearActivated* const criticLayer1 = new ndBrainLayerLinearActivated(criticLayer0->GetOutputSize(), layerSize * 2, hiddenActivation);
-			ndBrainLayerLinearActivated* const criticLayer2 = new ndBrainLayerLinearActivated(criticLayer1->GetOutputSize(), layerSize * 2, hiddenActivation);
-			ndBrainLayerLinearActivated* const criticOuputLayer = new ndBrainLayerLinearActivated(criticLayer2->GetOutputSize(), 1, m_lineal);
-
-			critic->AddLayer(criticLayer0);
-			critic->AddLayer(criticLayer1);
-			critic->AddLayer(criticLayer2);
-			critic->AddLayer(criticOuputLayer);
+			ndAssert(0);
+			//ndBrainLayerLinearActivated* const criticLayer0 = new ndBrainLayerLinearActivated(m_stateSize + m_actionsSize, layerSize * 2, hiddenActivation);
+			//ndBrainLayerLinearActivated* const criticLayer1 = new ndBrainLayerLinearActivated(criticLayer0->GetOutputSize(), layerSize * 2, hiddenActivation);
+			//ndBrainLayerLinearActivated* const criticLayer2 = new ndBrainLayerLinearActivated(criticLayer1->GetOutputSize(), layerSize * 2, hiddenActivation);
+			//ndBrainLayerLinearActivated* const criticOuputLayer = new ndBrainLayerLinearActivated(criticLayer2->GetOutputSize(), 1, m_lineal);
+			//
+			//critic->AddLayer(criticLayer0);
+			//critic->AddLayer(criticLayer1);
+			//critic->AddLayer(criticLayer2);
+			//critic->AddLayer(criticOuputLayer);
 
 			// add a reinforcement learning controller 
 			ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;

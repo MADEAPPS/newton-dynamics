@@ -50,10 +50,7 @@ class ndBrainLayerActivation : public ndBrainLayer
 		ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient);
 
 
-
 	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const;
-	virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& output) const;
-	virtual void CalculateOutputLayersParamGradients(const ndBrainVector& input, const ndBrainVector& outputDerivative, ndBrainVector& biasGrad, ndBrainMatrix& weightGrad) const;
 
 	protected:
 	ndInt32 m_neurons;

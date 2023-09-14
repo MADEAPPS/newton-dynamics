@@ -46,7 +46,6 @@
 #include <ndBrainAgentSAC_Trainer.h>
 #include <ndBrainAgentDDPG_Trainer.h>
 #include <ndBrainLayerTanhActivation.h>
-#include <ndBrainLayerLinearActivated.h>
 #include <ndBrainLayerSigmoidActivation.h>
 
 #endif 

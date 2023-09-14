@@ -85,16 +85,6 @@ void ndBrainLayerActivation::MakePrediction(const ndBrainVector& input, ndBrainV
 	output.Set(input);
 }
 
-void ndBrainLayerActivation::ActivationDerivative(const ndBrainVector&, ndBrainVector&) const
-{
-	ndAssert(0);
-}
-
-void ndBrainLayerActivation::CalculateOutputLayersParamGradients(const ndBrainVector&, const ndBrainVector&, ndBrainVector&, ndBrainMatrix&) const
-{
-	ndAssert(0);
-}
-
 void ndBrainLayerActivation::InputDerivative(const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
 {
 	ndAssert(0);

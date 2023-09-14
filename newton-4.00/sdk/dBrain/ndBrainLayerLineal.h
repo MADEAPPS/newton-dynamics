@@ -49,11 +49,7 @@ class ndBrainLayerLineal : public ndBrainLayer
 	virtual void CalculateParamGradients(const ndBrainVector& output, const ndBrainVector& outputDerivative,
 		ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient);
 
-
-
 	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const;
-	virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& output) const;
-	virtual void CalculateOutputLayersParamGradients(const ndBrainVector& input, const ndBrainVector& outputDerivative, ndBrainVector& biasGrad, ndBrainMatrix& weightGrad) const;
 	
 	private:
 	void InitGaussianBias(ndReal variance);

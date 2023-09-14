@@ -55,22 +55,11 @@ class ndBrainLayer : public ndClassAlloc
 										  ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient);
 
 
+	virtual void Blend(const ndBrainLayer& src, ndReal blend);
 	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const;
-	virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& output) const;
-	virtual void CalculateOutputLayersParamGradients(const ndBrainVector& input, const ndBrainVector& outputDerivative, ndBrainVector& biasGrad, ndBrainMatrix& weightGrad) const;
-
-	//virtual ndBrainActivationType GetActivationType() const;
-	//
-
-	//virtual void Blend(const ndBrainLayer& src, ndReal blend);
-	//
-	//virtual bool Compare(const ndBrainLayer& src) const;
-	//
-	//virtual void Load(const ndBrainLoad* const loadSave);
-	//virtual void Save(const ndBrainSave* const loadSave) const;
-	//
-	//virtual void ApplyActivation(ndBrainVector& output) const;
-	//virtual void ActivationDerivative(const ndBrainVector& input, ndBrainVector& outputDerivative) const;
+	
+	virtual void Load(const ndBrainLoad* const loadSave);
+	virtual void Save(const ndBrainSave* const loadSave) const;
 };
 
 #endif 

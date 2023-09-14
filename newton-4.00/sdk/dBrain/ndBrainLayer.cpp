@@ -84,43 +84,20 @@ void ndBrainLayer::InitWeightsXavierMethod()
 	ndAssert(0);
 }
 
-//ndBrainActivationType ndBrainLayer::GetActivationType() const
-//{
-//	ndAssert(0);
-//	return m_noActivation;
-//}
-//
-//void ndBrainLayer::Blend(const ndBrainLayer&, ndReal)
-//{
-//	ndAssert(0);
-//}
-//
-//bool ndBrainLayer::Compare(const ndBrainLayer&) const
-//{
-//	ndAssert(0);
-//	return false;
-//}
-//
-//void ndBrainLayer::Load(const ndBrainLoad* const)
-//{
-//	ndAssert(0);
-//}
-//
-//void ndBrainLayer::Save(const ndBrainSave* const) const
-//{
-//	ndAssert(0);
-//}
-//
-//void ndBrainLayer::ApplyActivation(ndBrainVector&) const
-//{
-//	ndAssert(0);
-//}
-//
-//void ndBrainLayer::ActivationDerivative(const ndBrainVector&, ndBrainVector&) const
-//{
-//	ndAssert(0);
-//}
+void ndBrainLayer::Blend(const ndBrainLayer&, ndReal)
+{
+	ndAssert(0);
+}
 
+void ndBrainLayer::Load(const ndBrainLoad* const)
+{
+	ndAssert(0);
+}
+
+void ndBrainLayer::Save(const ndBrainSave* const) const
+{
+	ndAssert(0);
+}
 
 void ndBrainLayer::ClearGradAcc(ndBrainVector&, ndBrainMatrix&) const
 {
@@ -128,16 +105,6 @@ void ndBrainLayer::ClearGradAcc(ndBrainVector&, ndBrainMatrix&) const
 }
 
 void ndBrainLayer::MakePrediction(const ndBrainVector&, ndBrainVector&) const
-{
-	ndAssert(0);
-}
-
-void ndBrainLayer::ActivationDerivative(const ndBrainVector&, ndBrainVector&) const
-{
-	ndAssert(0);
-}
-
-void ndBrainLayer::CalculateOutputLayersParamGradients(const ndBrainVector&, const ndBrainVector&, ndBrainVector&, ndBrainMatrix&) const
 {
 	ndAssert(0);
 }
