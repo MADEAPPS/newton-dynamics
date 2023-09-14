@@ -19,52 +19,21 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_TRAINER_H__
-#define _ND_BRAIN_TRAINER_H__
+#ifndef _ND_BRAIN_OPTIMIZER_SGD_H__
+#define _ND_BRAIN_OPTIMIZER_SGD_H__
 
 #include "ndBrainStdafx.h"
-class ndBrain;
-class ndBrainLoss;
-class ndBrainVector;
+#include "ndBrainOptimizer.h"
 
-class ndBrainTrainer: public ndClassAlloc
+class ndBrainOptimizerSgd : public ndBrainOptimizer
 {
 	public: 
-	class ndLayerData;
+	ndBrainOptimizerSgd(ndBrainTrainer* const trainer);
+	virtual ~ndBrainOptimizerSgd();
 
-	enum ndSolveModel
-	{
-		m_sgd,
-		m_adam
-	};
-
-	ndBrainTrainer(ndBrain* const brain);
-	ndBrainTrainer(const ndBrainTrainer& src);
-	virtual ~ndBrainTrainer();
-
-	ndBrain* GetBrain() const;
-
-	ndSolveModel GetModel() const;
-	void SetModel(ndSolveModel model);
-
-	void ClearGradientsAcc();
-	void AcculumateGradients(const ndBrainTrainer& src);
-	void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
-	void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
-
-	private:
-	void AdamUpdate(ndReal learnRate);
-	//void StochasticUpdate(ndReal learnRate);
-
-	ndArray<ndLayerData*> m_layerData;
-	ndBrain* m_brain;
-	ndReal m_beta;
-	ndReal m_alpha;
-	ndReal m_epsilon;
-	ndReal m_betaAcc;
-	ndReal m_alphaAcc;
-	ndSolveModel m_model;
+	virtual void Update(ndReal learnRate, ndInt32 bashSize);
 };
+
 
 #endif 
 

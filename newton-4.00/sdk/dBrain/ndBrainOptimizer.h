@@ -32,9 +32,13 @@ class ndBrainOptimizer : public ndClassAlloc
 	ndBrainOptimizer(ndBrainTrainer* const trainer);
 	virtual ~ndBrainOptimizer();
 
+	ndReal GetRegularizer() const;
+	void SetRegularizer(ndReal regularizer);
+
 	virtual void Update(ndReal learnRate, ndInt32 bashSize);
 
 	ndBrainTrainer* m_trainer;
+	ndReal m_weighDecayRegularizer;
 };
 
 

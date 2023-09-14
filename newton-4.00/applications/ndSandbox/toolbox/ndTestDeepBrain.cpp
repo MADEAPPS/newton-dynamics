@@ -61,7 +61,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		trainers.PushBack(new ndBrainTrainer(&brain));
 	}
 
-	ndBrainOptimizer optimizer(*trainers[0]);
+	//ndBrainOptimizer optimizer(*trainers[0]);
+	ndBrainOptimizerSgd optimizer(*trainers[0]);
 
 	ndInt32 randomeSelection[bashSize];
 
@@ -287,7 +288,8 @@ threadCount = 1;
 			{
 				ndBrainTrainer* const trainer = new ndBrainTrainer(&m_brain);
 				trainer->SetModel(ndBrainTrainer::m_adam);
-				trainer->SetRegularizer(ndReal(1.0e-4f));
+				ndAssert(0);
+				//trainer->SetRegularizer(ndReal(1.0e-4f));
 				m_optimizers.PushBack(trainer);
 			}
 		}

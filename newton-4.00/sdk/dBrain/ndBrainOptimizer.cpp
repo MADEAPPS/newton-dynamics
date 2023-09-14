@@ -26,12 +26,24 @@
 ndBrainOptimizer::ndBrainOptimizer(ndBrainTrainer* const trainer)
 	:ndClassAlloc()
 	,m_trainer(trainer)
+	,m_weighDecayRegularizer(ndReal(1.0e-5f))
 {
 }
 
 ndBrainOptimizer::~ndBrainOptimizer()
 {
 }
+
+ndReal ndBrainOptimizer::GetRegularizer() const
+{
+	return m_weighDecayRegularizer;
+}
+
+void ndBrainOptimizer::SetRegularizer(ndReal regularizer)
+{
+	m_weighDecayRegularizer = ndClamp(regularizer, ndReal(0.0f), ndReal(0.01f));
+}
+
 
 void ndBrainOptimizer::Update(ndReal, ndInt32)
 {
