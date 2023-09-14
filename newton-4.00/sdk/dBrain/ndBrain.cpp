@@ -196,9 +196,10 @@ void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& 
 	ndFixSizeArray<ndInt32, 256> prefixScan;
 	const ndArray<ndBrainLayer*>& layers = *this;
 
-	prefixScan.PushBack(0);
 	ndInt32 maxSize = 0;
 	ndInt32 sizeAcc = (layers[0]->GetInputSize() + 7) & -8;
+
+	prefixScan.PushBack(0);
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
 		prefixScan.PushBack(sizeAcc);

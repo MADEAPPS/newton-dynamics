@@ -391,21 +391,22 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 		}
 	});
 
-	auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		ndBrainTrainer* const trainer0 = *m_criticOptimizer0[0];;
-		ndBrainTrainer* const trainer1 = *m_criticOptimizer1[0];
-		for (ndInt32 i = 1; i < threadCount; ++i)
-		{
-			ndBrainTrainer* const srcTrainer0 = *m_criticOptimizer0[i];
-			ndBrainTrainer* const srcTrainer1 = *m_criticOptimizer1[i];
-			trainer0->AcculumateGradients(*srcTrainer0, threadIndex, threadCount);
-			trainer1->AcculumateGradients(*srcTrainer1, threadIndex, threadCount);
-		}
-	});
+	//auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	ndBrainTrainer* const trainer0 = *m_criticOptimizer0[0];;
+	//	ndBrainTrainer* const trainer1 = *m_criticOptimizer1[0];
+	//	for (ndInt32 i = 1; i < threadCount; ++i)
+	//	{
+	//		ndBrainTrainer* const srcTrainer0 = *m_criticOptimizer0[i];
+	//		ndBrainTrainer* const srcTrainer1 = *m_criticOptimizer1[i];
+	//		trainer0->AcculumateGradients(*srcTrainer0, threadIndex, threadCount);
+	//		trainer1->AcculumateGradients(*srcTrainer1, threadIndex, threadCount);
+	//	}
+	//});
 
 	ndBrainThreadPool::ParallelExecute(PropagateBash);
-	ndBrainThreadPool::ParallelExecute(AccumulateWeight);
+	ndAssert(0);
+	//ndBrainThreadPool::ParallelExecute(AccumulateWeight);
 	m_criticOptimizer0[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
 	m_criticOptimizer1[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
 }
@@ -478,18 +479,19 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateActor(const ndU
 		}
 	});
 
-	auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		ndBrainTrainer& trainer = *(*m_actorOptimizer[0]);
-		for (ndInt32 i = 1; i < threadCount; ++i)
-		{
-			ndBrainTrainer& srcTrainer = *(*m_actorOptimizer[i]);
-			trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
-		}
-	});
+	//auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	ndBrainTrainer& trainer = *(*m_actorOptimizer[0]);
+	//	for (ndInt32 i = 1; i < threadCount; ++i)
+	//	{
+	//		ndBrainTrainer& srcTrainer = *(*m_actorOptimizer[i]);
+	//		trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
+	//	}
+	//});
 
 	ParallelExecute(PropagateBash);
-	ParallelExecute(AccumulateWeight);
+	ndAssert(0);
+	//ParallelExecute(AccumulateWeight);
 	m_actorOptimizer[0]->UpdateWeights(-m_actorLearnRate, m_bashBufferSize);
 }
 

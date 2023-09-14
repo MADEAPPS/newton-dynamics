@@ -136,20 +136,6 @@ void ndBrainTrainer::SetRegularizer(ndReal regularizer)
 	m_weighDecayRegularizer = ndClamp(regularizer, ndReal(0.0f), ndReal(0.01f));
 }
 
-void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 threadIndex, ndInt32 threadCount)
-{
-	ndAssert(0);
-	//ndStartEnd biasStartEnd(m_biasGradientsAcc.GetCount(), threadIndex, threadCount);
-	//ndBrainMemVector bias0(&m_biasGradientsAcc[biasStartEnd.m_start], biasStartEnd.m_end - biasStartEnd.m_start);
-	//const ndBrainMemVector bias1(&src.m_biasGradientsAcc[biasStartEnd.m_start], biasStartEnd.m_end - biasStartEnd.m_start);
-	//bias0.Add(bias1);
-	//
-	//ndStartEnd weightStartEnd(m_weightGradients.GetCount(), threadIndex, threadCount);
-	//ndBrainMemVector weigh0(&m_weightGradients[weightStartEnd.m_start], weightStartEnd.m_end - weightStartEnd.m_start);
-	//const ndBrainMemVector weigh1(&src.m_weightGradients[weightStartEnd.m_start], weightStartEnd.m_end - weightStartEnd.m_start);
-	//weigh0.Add(weigh1);
-}
-
 void ndBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 {
 	ndAssert(0);
@@ -296,14 +282,29 @@ void ndBrainTrainer::ClearGradientsAcc()
 	}
 }
 
+void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& srcTrainer)
+{
+	for (ndInt32 i = m_layerData.GetCount() - 1; i >= 0; --i)
+	{
+		ndLayerData* const dst = m_layerData[i];
+		if (dst->m_layer->HasParameters())
+		{
+			const ndLayerData* const src = srcTrainer.m_layerData[i];
+			dst->m_gradBias.Add(src->m_gradBias);
+			dst->m_gradWeight.Add(src->m_gradWeight);
+		}
+	}
+}
+
 void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
 {
 	ndFixSizeArray<ndInt32, 256> prefixScan;
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
 
-	prefixScan.PushBack(0);
 	ndInt32 maxSize = 0;
 	ndInt32 sizeAcc = (layers[0]->GetInputSize() + 7) & -8;
+
+	prefixScan.PushBack(0);
 	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
 	{
 		prefixScan.PushBack(sizeAcc);

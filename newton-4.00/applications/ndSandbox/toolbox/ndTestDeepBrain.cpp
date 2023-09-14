@@ -78,17 +78,6 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		}
 	});
 
-	auto AccumulateWeight = ndMakeObject::ndFunction([&trainers](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		ndAssert(0);
-		ndBrainTrainer& trainer = *(*trainers[0]);
-		for (ndInt32 i = 1; i < threadCount; ++i)
-		{
-			ndBrainTrainer& srcTrainer = *(*trainers[i]);
-			trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
-		}
-	});
-
 	for (ndInt32 i = 0; i < 20000; ++i)
 	{
 		for (ndInt32 j = 0; j < bashSize; ++j)
@@ -96,8 +85,15 @@ static void ThreeLayersTwoInputsTwoOutputs()
 			randomeSelection[j] = ndInt32 (ndRandInt() % samples);
 		}
 		threads.ParallelExecute(UpdateTrainer);
-		threads.ParallelExecute(AccumulateWeight);
-		//trainers[0]->UpdateWeights(ndReal(1.0e-2f), bashSize);
+
+		ndBrainTrainer& trainer = *(*trainers[0]);
+		for (ndInt32 j = 1; j < threads.GetThreadCount(); ++j)
+		{
+			ndBrainTrainer& srcTrainer = *(*trainers[j]);
+			trainer.AcculumateGradients(srcTrainer);
+		}
+
+		//trainer.UpdateWeights(ndReal(1.0e-2f), bashSize);
 	}
 	
 	ndBrainVector truth;
@@ -329,15 +325,15 @@ threadCount = 1;
 				}
 			});
 
-			auto AccumulateBashWeights = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-			{
-				ndBrainTrainer& trainer = *(*m_optimizers[0]);
-				for (ndInt32 i = 1; i < threadCount; ++i)
-				{
-					ndBrainTrainer& srcTrainer = *(*m_optimizers[i]);
-					trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
-				}
-			});
+			//auto AccumulateBashWeights = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+			//{
+			//	ndBrainTrainer& trainer = *(*m_optimizers[0]);
+			//	for (ndInt32 i = 1; i < threadCount; ++i)
+			//	{
+			//		ndBrainTrainer& srcTrainer = *(*m_optimizers[i]);
+			//		trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
+			//	}
+			//});
 
 			ndBrain bestBrain(m_brain);
 			ndInt32 minFail = trainingDigits->GetCount();
@@ -354,7 +350,8 @@ threadCount = 1;
 					shuffleBashBuffer[j] = ndRandInt() % trainingDigits->GetCount();
 				}
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
-				ndBrainThreadPool::ParallelExecute(AccumulateBashWeights);
+				ndAssert(0);
+				//ndBrainThreadPool::ParallelExecute(AccumulateBashWeights);
 				m_optimizers[0]->UpdateWeights(m_learnRate, m_bashBufferSize);
 
 				if (i % 2000 == 0)

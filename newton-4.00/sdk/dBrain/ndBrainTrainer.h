@@ -49,9 +49,9 @@ class ndBrainTrainer: public ndClassAlloc
 	void SetModel(ndSolveModel model);
 
 	void ClearGradientsAcc();
+	void AcculumateGradients(const ndBrainTrainer& src);
 	void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
 	void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
-	void AcculumateGradients(const ndBrainTrainer& src, ndInt32 thread, ndInt32 threadCount);
 
 	private:
 	//void BackPropagateOutputLayer(const ndBrainVector& loss);

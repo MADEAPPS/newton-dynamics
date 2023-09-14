@@ -103,6 +103,17 @@ void ndBrainMatrix::Set(const ndBrainMatrix& src)
 	}
 }
 
+void ndBrainMatrix::Add(const ndBrainMatrix& src)
+{
+	ndAssert(src.GetRows() == GetRows());
+	ndAssert(src.GetColumns() == GetColumns());
+	ndBrainMatrix& matrix = *this;
+	for (ndInt32 i = 0; i < src.GetRows(); ++i)
+	{
+		matrix[i].Add(src[i]);
+	}
+}
+
 void ndBrainMatrix::Blend(const ndBrainMatrix& src, ndReal blend)
 {
 	ndAssert(src.GetRows() == GetRows());

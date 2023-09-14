@@ -351,18 +351,19 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 		}
 	});
 
-	auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		ndBrainTrainer* const trainer = *m_criticOptimizer[0];
-		for (ndInt32 i = 1; i < threadCount; ++i)
-		{
-			ndBrainTrainer* const srcTrainer = *m_criticOptimizer[i];
-			trainer->AcculumateGradients(*srcTrainer, threadIndex, threadCount);
-		}
-	});
+	//auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	ndBrainTrainer* const trainer = *m_criticOptimizer[0];
+	//	for (ndInt32 i = 1; i < threadCount; ++i)
+	//	{
+	//		ndBrainTrainer* const srcTrainer = *m_criticOptimizer[i];
+	//		trainer->AcculumateGradients(*srcTrainer, threadIndex, threadCount);
+	//	}
+	//});
 
 	ndBrainThreadPool::ParallelExecute(PropagateBash);
-	ndBrainThreadPool::ParallelExecute(AccumulateWeight);
+	ndAssert(0);
+	//ndBrainThreadPool::ParallelExecute(AccumulateWeight);
 	m_criticOptimizer[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
 }
 
@@ -434,18 +435,19 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 		}
 	});
 
-	auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		ndBrainTrainer& trainer = *(*m_actorOptimizer[0]);
-		for (ndInt32 i = 1; i < threadCount; ++i)
-		{
-			ndBrainTrainer& srcTrainer = *(*m_actorOptimizer[i]);
-			trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
-		}
-	});
+	//auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	ndBrainTrainer& trainer = *(*m_actorOptimizer[0]);
+	//	for (ndInt32 i = 1; i < threadCount; ++i)
+	//	{
+	//		ndBrainTrainer& srcTrainer = *(*m_actorOptimizer[i]);
+	//		trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
+	//	}
+	//});
 
 	ParallelExecute(PropagateBash);
-	ParallelExecute(AccumulateWeight);
+	ndAssert(0);
+	//ParallelExecute(AccumulateWeight);
 	m_actorOptimizer[0]->UpdateWeights(-m_actorLearnRate, m_bashBufferSize);
 }
 
