@@ -187,3 +187,11 @@ void ndBrainLayerLineal::InputDerivative(const ndBrainVector&, const ndBrainVect
 {
 	m_weights.TransposeMul(outputDerivative, inputDerivative);
 }
+
+void ndBrainLayerLineal::CalculateParamGradients(const ndBrainVector& output, const ndBrainVector& outputDerivative,
+	ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient)
+{
+	ndAssert(biasGradient.GetCount() == outputDerivative.GetCount());
+	biasGradient.Set(outputDerivative);
+	InputDerivative(output, outputDerivative, inputGradient);
+}

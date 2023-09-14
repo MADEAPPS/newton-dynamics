@@ -28,38 +28,7 @@ class ndBrain;
 class ndBrainTrainer: public ndClassAlloc
 {
 	public: 
-
-	//class ndHidenVariableOffsets: public ndFixSizeArray<ndInt32, 32>
-	//{
-	//	public:
-	//	ndHidenVariableOffsets()
-	//		:ndFixSizeArray<ndInt32, 32>()
-	//	{
-	//		Clear();
-	//	}
-	//	
-	//	ndHidenVariableOffsets(const ndHidenVariableOffsets& src)
-	//		:ndFixSizeArray<ndInt32, 32>()
-	//	{
-	//		Clear();
-	//		for (ndInt32 i = 0; i < src.GetCount(); ++i)
-	//		{
-	//			ndFixSizeArray<ndInt32, 32>::PushBack(src[i]);
-	//		}
-	//	}
-	//	
-	//	void Clear()
-	//	{
-	//		ndFixSizeArray<ndInt32, 32>::SetCount(0);
-	//		for (ndInt32 i = 0; i < 32; ++i)
-	//		{
-	//			ndFixSizeArray<ndInt32, 32>::PushBack(0);
-	//		}
-	//		ndFixSizeArray<ndInt32, 32>::SetCount(0);
-	//	}
-	//};
-
-	class ndLayersVariables;
+	class ndLayerData;
 
 	enum ndSolveModel
 	{
@@ -92,19 +61,17 @@ class ndBrainTrainer: public ndClassAlloc
 	void AdamUpdate(ndReal learnRate);
 	void StochasticUpdate(ndReal learnRate);
 
-	ndArray<ndLayersVariables*> m_layers;
+	ndArray<ndLayerData*> m_layerData;
 	
-	ndBrainVector m_z;
-	ndBrainVector m_zDerivative;
-	ndBrainVector m_biasGradients;
-	ndBrainVector m_weightGradients;
-	ndBrainVector m_biasGradientsAcc;
-	ndBrainVector m_biasGradient_u;
-	ndBrainVector m_biasGradient_v;
-	ndBrainVector m_weightGradient_u;
-	ndBrainVector m_weightGradient_v;
-	//ndHidenVariableOffsets m_inputOutputPrefixScan;
-	//ndHidenVariableOffsets m_weightGradientsPrefixScan;
+	//ndBrainVector m_z;
+	//ndBrainVector m_zDerivative;
+	//ndBrainVector m_biasGradients;
+	//ndBrainVector m_weightGradients;
+	//ndBrainVector m_biasGradientsAcc;
+	//ndBrainVector m_biasGradient_u;
+	//ndBrainVector m_biasGradient_v;
+	//ndBrainVector m_weightGradient_u;
+	//ndBrainVector m_weightGradient_v;
 	ndBrain* m_brain;
 	
 	ndReal m_beta;
@@ -114,11 +81,9 @@ class ndBrainTrainer: public ndClassAlloc
 	ndReal m_alphaAcc;
 	ndReal m_weighDecayRegularizer;
 	ndSolveModel m_model;
-
 	
-	
-	friend class ndBrainTrainerChannel;
-	friend class ndBrainParallelTrainer;
+	//friend class ndBrainTrainerChannel;
+	//friend class ndBrainParallelTrainer;
 };
 
 #endif 

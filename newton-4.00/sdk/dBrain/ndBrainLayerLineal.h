@@ -46,6 +46,9 @@ class ndBrainLayerLineal : public ndBrainLayer
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+	virtual void CalculateParamGradients(const ndBrainVector& output, const ndBrainVector& outputDerivative,
+		ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient);
+
 
 
 	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const;
