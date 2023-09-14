@@ -80,6 +80,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 
 	auto AccumulateWeight = ndMakeObject::ndFunction([&trainers](ndInt32 threadIndex, ndInt32 threadCount)
 	{
+		ndAssert(0);
 		ndBrainTrainer& trainer = *(*trainers[0]);
 		for (ndInt32 i = 1; i < threadCount; ++i)
 		{
@@ -95,8 +96,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 			randomeSelection[j] = ndInt32 (ndRandInt() % samples);
 		}
 		threads.ParallelExecute(UpdateTrainer);
-		ndAssert(0);
-		//threads.ParallelExecute(AccumulateWeight);
+		threads.ParallelExecute(AccumulateWeight);
 		//trainers[0]->UpdateWeights(ndReal(1.0e-2f), bashSize);
 	}
 	

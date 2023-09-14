@@ -166,6 +166,10 @@ void ndBrainLayerLineal::CalculateParamGradients(const ndBrainVector& input, con
 {
 	ndAssert(biasGradient.GetCount() == outputDerivative.GetCount());
 	biasGradient.Add(outputDerivative);
+	for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0 ; --i)
+	{
+		ndReal value = outputDerivative[i];
+		weightGradient[i].ScaleAdd(input, value);
+	}
 	InputDerivative(output, outputDerivative, inputGradient);
-	ndTrace(("xxxx CalculateParamGradients\n"));
 }
