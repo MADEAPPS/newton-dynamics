@@ -114,7 +114,7 @@ void ndBrainLayer::InputDerivative(const ndBrainVector&, const ndBrainVector&, n
 	ndAssert(0);
 }
 
-void ndBrainLayer::CalculateParamGradients(const ndBrainVector&, const ndBrainVector&, ndBrainVector&, ndBrainVector&, ndBrainMatrix&)
+void ndBrainLayer::CalculateParamGradients(const ndBrainVector&, const ndBrainVector&, const ndBrainVector&, ndBrainVector&, ndBrainVector&, ndBrainMatrix&)
 {
 	ndAssert(0);
 }

@@ -54,26 +54,15 @@ class ndBrainTrainer: public ndClassAlloc
 	void AcculumateGradients(const ndBrainTrainer& src, ndInt32 thread, ndInt32 threadCount);
 
 	private:
-	void BackPropagateOutputLayer(const ndBrainVector& loss);
-	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
-	void BackPropagateCalculateWeightsGradient(ndInt32 layerIndex);
+	//void BackPropagateOutputLayer(const ndBrainVector& loss);
+	//void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
+	//void BackPropagateCalculateWeightsGradient(ndInt32 layerIndex);
 
 	void AdamUpdate(ndReal learnRate);
 	void StochasticUpdate(ndReal learnRate);
 
 	ndArray<ndLayerData*> m_layerData;
-	
-	//ndBrainVector m_z;
-	//ndBrainVector m_zDerivative;
-	//ndBrainVector m_biasGradients;
-	//ndBrainVector m_weightGradients;
-	//ndBrainVector m_biasGradientsAcc;
-	//ndBrainVector m_biasGradient_u;
-	//ndBrainVector m_biasGradient_v;
-	//ndBrainVector m_weightGradient_u;
-	//ndBrainVector m_weightGradient_v;
 	ndBrain* m_brain;
-	
 	ndReal m_beta;
 	ndReal m_alpha;
 	ndReal m_epsilon;
@@ -81,9 +70,6 @@ class ndBrainTrainer: public ndClassAlloc
 	ndReal m_alphaAcc;
 	ndReal m_weighDecayRegularizer;
 	ndSolveModel m_model;
-	
-	//friend class ndBrainTrainerChannel;
-	//friend class ndBrainParallelTrainer;
 };
 
 #endif 

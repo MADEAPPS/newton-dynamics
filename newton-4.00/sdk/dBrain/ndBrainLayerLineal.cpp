@@ -152,12 +152,6 @@ void ndBrainLayerLineal::MakePrediction(const ndBrainVector& input, ndBrainVecto
 
 void ndBrainLayerLineal::ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const
 {
-	if (!gradWeightAcc.GetRows())
-	{
-		gradBiasAcc.SetCount(GetOutputSize());
-		gradWeightAcc.Init(GetOutputSize(), GetInputSize());
-	}
-
 	gradBiasAcc.Set(ndReal (0.0f));
 	gradWeightAcc.Set(ndReal(0.0f));
 }
@@ -167,10 +161,11 @@ void ndBrainLayerLineal::InputDerivative(const ndBrainVector&, const ndBrainVect
 	m_weights.TransposeMul(outputDerivative, inputDerivative);
 }
 
-void ndBrainLayerLineal::CalculateParamGradients(const ndBrainVector& output, const ndBrainVector& outputDerivative,
+void ndBrainLayerLineal::CalculateParamGradients(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative,
 	ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient)
 {
 	ndAssert(biasGradient.GetCount() == outputDerivative.GetCount());
-	biasGradient.Set(outputDerivative);
+	biasGradient.Add(outputDerivative);
 	InputDerivative(output, outputDerivative, inputGradient);
+	ndTrace(("xxxx CalculateParamGradients\n"));
 }
