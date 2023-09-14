@@ -24,6 +24,8 @@
 
 #include "ndBrainStdafx.h"
 class ndBrain;
+class ndBrainLoss;
+class ndBrainVector;
 
 class ndBrainTrainer: public ndClassAlloc
 {

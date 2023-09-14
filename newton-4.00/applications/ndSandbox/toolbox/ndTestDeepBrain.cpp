@@ -61,6 +61,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		trainers.PushBack(new ndBrainTrainer(&brain));
 	}
 
+	ndBrainOptimizer optimizer(*trainers[0]);
+
 	ndInt32 randomeSelection[bashSize];
 
 	auto UpdateTrainer = ndMakeObject::ndFunction([&trainers, &randomeSelection, &inputBatch, &groundTruth, bashSize](ndInt32 threadIndex, ndInt32 threadCount)
@@ -94,6 +96,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		}
 
 		//trainer.UpdateWeights(ndReal(1.0e-2f), bashSize);
+		optimizer.Update(ndReal(1.0e-3f), bashSize);
 	}
 	
 	ndBrainVector truth;

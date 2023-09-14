@@ -37,6 +37,7 @@
 #include <ndBrainAgentTD3.h>
 #include <ndBrainAgentSAC.h>
 #include <ndBrainAgentDDPG.h>
+#include <ndBrainOptimizer.h>
 #include <ndBrainThreadPool.h>
 #include <ndBrainLayerLineal.h>
 #include <ndBrainReplayBuffer.h>

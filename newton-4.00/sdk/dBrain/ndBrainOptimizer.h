@@ -19,30 +19,24 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LOSS_H__
-#define _ND_BRAIN_LOSS_H__
+#ifndef _ND_BRAIN_OPTIMIZER_H__
+#define _ND_BRAIN_OPTIMIZER_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainVector.h"
 
-class ndBrainLoss : public ndClassAlloc
+class ndBrainTrainer;
+
+class ndBrainOptimizer : public ndClassAlloc
 {
 	public: 
-	ndBrainLoss() {}
-	virtual ~ndBrainLoss() {}
+	ndBrainOptimizer(ndBrainTrainer* const trainer);
+	virtual ~ndBrainOptimizer();
 
-	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss) = 0;
+	virtual void Update(ndReal learnRate, ndInt32 bashSize);
+
+	ndBrainTrainer* m_trainer;
 };
 
-class ndBrainLeastSquareErrorLoss: public ndBrainLoss
-{
-	public:
-	ndBrainLeastSquareErrorLoss(ndInt32 size);
-	void SetTruth(const ndBrainVector& truth);
-	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss);
-
-	ndBrainVector m_truth;
-};
 
 #endif 
 
