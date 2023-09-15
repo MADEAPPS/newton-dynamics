@@ -19,14 +19,23 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_BRAIN_LAYER_SOFTMAX_ACTIVATION_H__
+#define _ND_BRAIN_LAYER_SOFTMAX_ACTIVATION_H__
+
 #include "ndBrainStdafx.h"
-#include "ndBrainLoss.h"
+#include "ndBrainLayerActivation.h"
 
-ndBrainLoss::ndBrainLoss() 
-	:ndClassAlloc()
+class ndBrainLayerSoftmaxActivation : public ndBrainLayerActivation
 {
-}
+	public:
+	ndBrainLayerSoftmaxActivation(ndInt32 neurons);
+	ndBrainLayerSoftmaxActivation(const ndBrainLayerActivation& src);
+	ndBrainLayer* Clone() const;
 
-ndBrainLoss::~ndBrainLoss() 
-{
-}
+	const char* GetLabelId() const;
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
+	void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+};
+
+#endif 
+

@@ -23,26 +23,17 @@
 #define _ND_BRAIN_LOSS_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainVector.h"
+
+class ndBrainVector;
 
 class ndBrainLoss : public ndClassAlloc
 {
 	public: 
-	ndBrainLoss() {}
-	virtual ~ndBrainLoss() {}
-
+	ndBrainLoss();
+	virtual ~ndBrainLoss();
 	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss) = 0;
 };
 
-class ndBrainLeastSquareErrorLoss: public ndBrainLoss
-{
-	public:
-	ndBrainLeastSquareErrorLoss(ndInt32 size);
-	void SetTruth(const ndBrainVector& truth);
-	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss);
-
-	ndBrainVector m_truth;
-};
 
 #endif 
 

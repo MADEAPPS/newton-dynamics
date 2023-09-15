@@ -20,13 +20,24 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainLoss.h"
+#include "ndBrainLossLeastSquaredError.h"
 
-ndBrainLoss::ndBrainLoss() 
-	:ndClassAlloc()
+ndBrainLeastSquareErrorLoss::ndBrainLeastSquareErrorLoss(ndInt32 size)
+	:ndBrainLoss()
 {
+	m_truth.SetCount(size);
 }
 
-ndBrainLoss::~ndBrainLoss() 
+void ndBrainLeastSquareErrorLoss::SetTruth(const ndBrainVector& truth)
 {
+	ndAssert(m_truth.GetCount() == truth.GetCount());
+	m_truth.Set(truth);
+}
+
+void ndBrainLeastSquareErrorLoss::GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+{
+	ndAssert(output.GetCount() == loss.GetCount());
+	ndAssert(m_truth.GetCount() == loss.GetCount());
+	loss.Set(output);
+	loss.Sub(m_truth);
 }

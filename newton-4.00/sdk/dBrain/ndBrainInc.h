@@ -49,7 +49,9 @@
 #include <ndBrainAgentDDPG_Trainer.h>
 #include <ndBrainLayerReluActivation.h>
 #include <ndBrainLayerTanhActivation.h>
+#include <ndBrainLossLeastSquaredError.h>
 #include <ndBrainLayerSigmoidActivation.h>
+#include <ndBrainLayerSoftmaxActivation.h>
 
 #endif 
 

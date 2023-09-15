@@ -19,14 +19,22 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_BRAIN_LOSS_LEAST_SQUARED_ERROR_H__
+#define _ND_BRAIN_LOSS_LEAST_SQUARED_ERROR_H__
+
 #include "ndBrainStdafx.h"
+#include "ndBrainVector.h"
 #include "ndBrainLoss.h"
 
-ndBrainLoss::ndBrainLoss() 
-	:ndClassAlloc()
+class ndBrainLeastSquareErrorLoss: public ndBrainLoss
 {
-}
+	public:
+	ndBrainLeastSquareErrorLoss(ndInt32 size);
+	void SetTruth(const ndBrainVector& truth);
+	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss);
 
-ndBrainLoss::~ndBrainLoss() 
-{
-}
+	ndBrainVector m_truth;
+};
+
+#endif 
+
