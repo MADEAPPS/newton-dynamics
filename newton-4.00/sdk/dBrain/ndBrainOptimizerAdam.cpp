@@ -130,7 +130,7 @@ void ndBrainOptimizerAdam::Update(ndReal learnRate, ndInt32 bashSize)
 			}
 			else
 			{
-				for (ndInt32 j = biasGradients.GetCount() - 1; i >= 0; --j)
+				for (ndInt32 j = biasGradients.GetCount() - 1; j >= 0; --j)
 				{
 					ndReal bias_den = ndReal(1.0f) / (ndReal(ndSqrt(data.m_biasGradient_v[j])) + m_epsilon);
 					biasGradients[j] = data.m_biasGradient_u[j] * bias_den;

@@ -15,8 +15,8 @@
 static void ThreeLayersTwoInputsTwoOutputs()
 {
 	ndBrain brain;
-	//ndInt32 hiddenNeurons = 32;
-	ndInt32 hiddenNeurons = 8;
+	ndInt32 hiddenNeurons = 32;
+	//ndInt32 hiddenNeurons = 8;
 
 	ndFixSizeArray<ndBrainLayer*, 16> layers;
 	layers.PushBack(new ndBrainLayerLineal(2, hiddenNeurons));
@@ -54,8 +54,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> trainers;
 
 	ndBrainThreadPool threads;
-	//threads.SetThreadCount(4);
-	threads.SetThreadCount(1);
+	threads.SetThreadCount(4);
+	//threads.SetThreadCount(1);
 	for (ndInt32 i = 0; i < threads.GetThreadCount(); ++i)
 	{
 		trainers.PushBack(new ndBrainTrainer(&brain));
@@ -82,7 +82,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		}
 	});
 
-	for (ndInt32 i = 0; i < 20000; ++i)
+	for (ndInt32 i = 0; i < 5000; ++i)
 	{
 		for (ndInt32 j = 0; j < bashSize; ++j)
 		{
@@ -96,8 +96,6 @@ static void ThreeLayersTwoInputsTwoOutputs()
 			ndBrainTrainer& srcTrainer = *(*trainers[j]);
 			trainer.AcculumateGradients(srcTrainer);
 		}
-
-		//trainer.UpdateWeights(ndReal(1.0e-2f), bashSize);
 		optimizer.Update(ndReal(1.0e-3f), bashSize);
 	}
 	
