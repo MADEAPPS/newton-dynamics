@@ -50,15 +50,6 @@ class ndBrainTrainer::ndLayerData : public ndClassAlloc
 ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
 	:ndClassAlloc()
 	,m_layerData()
-	//,m_z()
-	//,m_zDerivative()
-	//,m_biasGradients()
-	//,m_weightGradients()
-	//,m_biasGradientsAcc()
-	//,m_biasGradient_u()
-	//,m_biasGradient_v()
-	//,m_weightGradient_u()
-	//,m_weightGradient_v()
 {
 	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
 	{
