@@ -26,7 +26,6 @@
 ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
 	:ndClassAlloc(src)
 {
-	ndAssert(0);
 }
 
 ndBrainLayer::ndBrainLayer()
@@ -36,7 +35,6 @@ ndBrainLayer::ndBrainLayer()
 
 ndBrainLayer::~ndBrainLayer()
 {
-	ndAssert(0);
 }
 
 ndBrainLayer* ndBrainLayer::Clone() const

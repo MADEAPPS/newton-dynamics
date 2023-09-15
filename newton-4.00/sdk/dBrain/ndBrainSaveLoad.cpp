@@ -158,26 +158,25 @@ ndBrain* ndBrainLoad::Load() const
 
 void ndBrainSave::Save(const ndBrain* const brain)
 {
-	ndAssert(0);
-	//char buffer[1024];
-	//auto Save = [this, &buffer](const char* const fmt, ...)
-	//{
-	//	va_list v_args;
-	//	buffer[0] = 0;
-	//	va_start(v_args, fmt);
-	//	vsprintf(buffer, fmt, v_args);
-	//	va_end(v_args);
-	//	WriteData(buffer);
-	//};
-	//
-	//Save("ndBrain version 1.0\n\n");
-	//Save("layersCount %d\n\n", brain->GetCount());
-	//
-	//for (ndInt32 i = 0; i < brain->GetCount(); ++i)
-	//{
-	//	ndBrainLayer* const layer = (*brain)[i];
-	//	Save("layer fullyConnected\n");
-	//	Save("{\n");
+	char buffer[1024];
+	auto Save = [this, &buffer](const char* const fmt, ...)
+	{
+		va_list v_args;
+		buffer[0] = 0;
+		va_start(v_args, fmt);
+		vsprintf(buffer, fmt, v_args);
+		va_end(v_args);
+		WriteData(buffer);
+	};
+	
+	Save("ndBrain version 1.0\n\n");
+	Save("layersCount %d\n\n", brain->GetCount());
+	
+	for (ndInt32 i = 0; i < brain->GetCount(); ++i)
+	{
+		ndBrainLayer* const layer = (*brain)[i];
+		Save("layer %s\n", layer->GetLabelId());
+		Save("{\n");
 	//	//switch (layer->m_activation)
 	//	switch (layer->GetActivationType())
 	//	{
@@ -202,13 +201,9 @@ void ndBrainSave::Save(const ndBrain* const brain)
 	//			Save("\tactivation sigmoid\n");
 	//			break;
 	//	}
-	//
-	//	ndAssert(0);
-	//	//Save("\tinputs %d\n", layer->m_weights.GetColumns());
-	//	//Save("\toutputs %d\n", layer->m_weights.GetRows());
-	//	Save("}\n\n");
-	//}
-	//
+		Save("}\n\n");
+	}
+	
 	//for (ndInt32 i = 0; i < brain->GetCount(); ++i)
 	//{
 	//	ndBrainLayer* const layer = (*brain)[i];
@@ -221,9 +216,9 @@ void ndBrainSave::Save(const ndBrain* const brain)
 
 void ndBrainSave::Save(const ndBrain* const brain, const char* const pathName)
 {
-	class SaveAgent : public ndBrainSave
+	class SaveAgent: public ndBrainSave
 	{
-	public:
+		public:
 		SaveAgent(const char* const pathFilename)
 			:ndBrainSave()
 		{

@@ -52,8 +52,10 @@ ndBrainMatrix::~ndBrainMatrix()
 		row.~ndBrainMemVector();
 	}
 	m_array = nullptr;
-	ndAssert(m_memory);
-	ndMemory::Free(m_memory);
+	if (m_memory)
+	{
+		ndMemory::Free(m_memory);
+	}
 }
 
 void ndBrainMatrix::Init(ndInt32 rows, ndInt32 columns)
@@ -61,7 +63,6 @@ void ndBrainMatrix::Init(ndInt32 rows, ndInt32 columns)
 	m_size = rows;
 	m_capacity = rows + 1;
 
-	//ndInt32 padding = D_DEEP_BRAIN_DATA_ALIGMENT * 4;
 	ndInt32 padding = 32;
 	ndInt32 columSizeInBytes = (ndInt32(columns * sizeof(ndReal)) + padding - 1) & -padding;
 	ndInt32 size = ndInt32 (rows * sizeof(ndBrainMemVector) + 256);

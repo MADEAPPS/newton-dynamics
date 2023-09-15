@@ -280,15 +280,11 @@ static void MnistTrainingSet()
 			,m_bashBufferSize(64)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize/4);
-threadCount = 1;
 
 			SetThreadCount(threadCount);
 			for (ndInt32 i = 0; i < GetThreadCount(); ++i)
 			{
 				ndBrainTrainer* const trainer = new ndBrainTrainer(&m_brain);
-				ndAssert(0);
-				//trainer->SetModel(ndBrainTrainer::m_adam);
-				//trainer->SetRegularizer(ndReal(1.0e-4f));
 				m_optimizers.PushBack(trainer);
 			}
 		}
@@ -335,7 +331,8 @@ threadCount = 1;
 			ndBrainOptimizerAdam optimizer(&trainer);
 
 			//for (ndInt32 i = 0; i < 2000000; ++i)
-			for (ndInt32 i = 0; i < 10000; ++i)
+			//for (ndInt32 i = 0; i < 10000; ++i)
+			for (ndInt32 i = 0; i < 100; ++i)
 			{
 				ndInt32 priorityStart = ndMin(priorityIndexArray.GetCount(), 2);
 				for (ndInt32 j = 0; j < priorityStart; ++j)
@@ -347,15 +344,11 @@ threadCount = 1;
 					shuffleBashBuffer[j] = ndRandInt() % trainingDigits->GetCount();
 				}
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
-				ndAssert(0);
-				//ndBrainThreadPool::ParallelExecute(AccumulateBashWeights);
-				//m_optimizers[0]->UpdateWeights(m_learnRate, m_bashBufferSize);
 				for (ndInt32 j = 1; j < GetThreadCount(); ++j)
 				{
 					ndBrainTrainer& srcTrainer = *(*m_optimizers[j]);
 					trainer.AcculumateGradients(srcTrainer);
 				}
-				//trainer.UpdateWeights(ndReal(1.0e-2f), bashSize);
 				optimizer.Update(ndReal(1.0e-3f), m_bashBufferSize);
 
 				if (i % 2000 == 0)
@@ -497,8 +490,8 @@ void ndTestDeedBrian()
 	//}
 	//fclose(outFile);
 
-	ThreeLayersTwoInputsTwoOutputs();
-	//MnistTrainingSet();
+	//ThreeLayersTwoInputsTwoOutputs();
+	MnistTrainingSet();
 	//MnistTestSet();
 	exit(0);
 }

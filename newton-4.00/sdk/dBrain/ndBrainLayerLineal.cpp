@@ -33,24 +33,22 @@ ndBrainLayerLineal::ndBrainLayerLineal(ndInt32 inputs, ndInt32 outputs)
 
 ndBrainLayerLineal::ndBrainLayerLineal(const ndBrainLayerLineal& src)
 	:ndBrainLayer(src)
+	,m_bias(src.m_bias)
+	,m_weights(src.m_weights)
 {
-	ndAssert(0);
 }
 
 ndBrainLayerLineal::~ndBrainLayerLineal()
 {
-	ndAssert(0);
 }
 
 const char* ndBrainLayerLineal::GetLabelId() const
 {
-	ndAssert(0);
 	return "ndBrainLayerLineal";
 }
 
 ndBrainLayer* ndBrainLayerLineal::Clone() const
 {
-	ndAssert(0);
 	return new ndBrainLayerLineal(*this);
 }
 
@@ -105,6 +103,13 @@ void ndBrainLayerLineal::InitWeights(ndReal weighVariance, ndReal biasVariance)
 	weighVariance = ndMin(weighVariance, ndReal(0.5f));
 	InitGaussianBias(biasVariance);
 	InitGaussianWeights(weighVariance);
+}
+
+void ndBrainLayerLineal::CopyFrom(const ndBrainLayer& src)
+{
+	const ndBrainLayerLineal& linealSrc = (ndBrainLayerLineal&)src;
+	m_bias.Set(linealSrc.m_bias);
+	m_weights.Set(linealSrc.m_weights);
 }
 
 void ndBrainLayerLineal::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const

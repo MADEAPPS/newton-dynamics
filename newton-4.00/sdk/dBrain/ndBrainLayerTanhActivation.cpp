@@ -34,7 +34,6 @@ ndBrainLayerTanhActivation::ndBrainLayerTanhActivation(const ndBrainLayerTanhAct
 
 ndBrainLayer* ndBrainLayerTanhActivation::Clone() const
 {
-	ndAssert(0);
 	return new ndBrainLayerTanhActivation(*this);
 }
 

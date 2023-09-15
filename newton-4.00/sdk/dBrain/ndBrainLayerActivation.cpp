@@ -32,12 +32,10 @@ ndBrainLayerActivation::ndBrainLayerActivation(const ndBrainLayerActivation& src
 	:ndBrainLayer(src)
 	,m_neurons(src.m_neurons)
 {
-	ndAssert(0);
 }
 
 ndBrainLayerActivation::~ndBrainLayerActivation()
 {
-	ndAssert(0);
 }
 
 bool ndBrainLayerActivation::HasParameters() const
@@ -71,6 +69,10 @@ void ndBrainLayerActivation::InitWeightsXavierMethod()
 }
 
 void ndBrainLayerActivation::InitWeights(ndReal, ndReal)
+{
+}
+
+void ndBrainLayerActivation::CopyFrom(const ndBrainLayer&)
 {
 }
 

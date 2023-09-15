@@ -36,9 +36,10 @@ class ndBrainLayerActivation : public ndBrainLayer
 	virtual ndBrainLayer* Clone() const;
 
 	virtual bool HasParameters() const;
-	virtual const char* GetLabelId() const;
 	virtual ndInt32 GetOutputSize() const;
 	virtual ndInt32 GetInputSize() const;
+	virtual const char* GetLabelId() const;
+	virtual void CopyFrom(const ndBrainLayer& src);
 
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);

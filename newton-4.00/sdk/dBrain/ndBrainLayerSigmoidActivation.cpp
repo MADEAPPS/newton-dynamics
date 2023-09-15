@@ -34,10 +34,8 @@ ndBrainLayerSigmoidActivation::ndBrainLayerSigmoidActivation(const ndBrainLayerA
 
 ndBrainLayer* ndBrainLayerSigmoidActivation::Clone() const
 {
-	ndAssert(0);
 	return new ndBrainLayerSigmoidActivation(*this);
 }
-
 
 const char* ndBrainLayerSigmoidActivation::GetLabelId() const
 {
