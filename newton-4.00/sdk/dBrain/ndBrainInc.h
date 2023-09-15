@@ -42,6 +42,7 @@
 #include <ndBrainLayerLineal.h>
 #include <ndBrainReplayBuffer.h>
 #include <ndBrainOptimizerSgd.h>
+#include <ndBrainOptimizerAdam.h>
 #include <ndBrainLayerActivation.h>
 #include <ndBrainAgentDQN_Trainer.h>
 #include <ndBrainAgentTD3_Trainer.h>

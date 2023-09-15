@@ -19,38 +19,29 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_TRAINER_H__
-#define _ND_BRAIN_TRAINER_H__
+#ifndef _ND_BRAIN_OPTIMIZER_ADAM_H__
+#define _ND_BRAIN_OPTIMIZER_ADAM_H__
 
 #include "ndBrainStdafx.h"
-class ndBrain;
-class ndBrainLoss;
-class ndBrainVector;
-class ndBrainMatrix;
+#include "ndBrainOptimizer.h"
 
-class ndBrainTrainer: public ndClassAlloc
+class ndBrainOptimizerAdam : public ndBrainOptimizer
 {
 	public: 
-	class ndLayerData;
+	class ndAdabData;
+	ndBrainOptimizerAdam(ndBrainTrainer* const trainer);
+	virtual ~ndBrainOptimizerAdam();
 
-	ndBrainTrainer(ndBrain* const brain);
-	ndBrainTrainer(const ndBrainTrainer& src);
-	virtual ~ndBrainTrainer();
+	virtual void Update(ndReal learnRate, ndInt32 bashSize);
 
-	ndBrain* GetBrain() const;
-	void ClearGradientsAcc();
-	void AcculumateGradients(const ndBrainTrainer& src);
-	void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
-
-	ndBrainVector* GetBias(ndInt32 index) const;
-	ndBrainMatrix* GetWeight(ndInt32 index) const;
-	ndBrainVector* GetBiasGradients(ndInt32 index) const;
-	ndBrainMatrix* GetWeightGradients(ndInt32 index) const;
-
-	private:
-	ndArray<ndLayerData*> m_layerData;
-	ndBrain* m_brain;
+	ndArray<ndAdabData*> m_data;
+	ndReal m_beta;
+	ndReal m_alpha;
+	ndReal m_epsilon;
+	ndReal m_betaAcc;
+	ndReal m_alphaAcc;
 };
+
 
 #endif 
 

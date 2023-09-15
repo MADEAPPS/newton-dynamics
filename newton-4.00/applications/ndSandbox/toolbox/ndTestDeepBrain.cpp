@@ -62,7 +62,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	}
 
 	//ndBrainOptimizer optimizer(*trainers[0]);
-	ndBrainOptimizerSgd optimizer(*trainers[0]);
+	//ndBrainOptimizerSgd optimizer(*trainers[0]);
+	ndBrainOptimizerAdam optimizer(*trainers[0]);
 
 	ndInt32 randomeSelection[bashSize];
 
@@ -287,8 +288,8 @@ threadCount = 1;
 			for (ndInt32 i = 0; i < GetThreadCount(); ++i)
 			{
 				ndBrainTrainer* const trainer = new ndBrainTrainer(&m_brain);
-				trainer->SetModel(ndBrainTrainer::m_adam);
 				ndAssert(0);
+				//trainer->SetModel(ndBrainTrainer::m_adam);
 				//trainer->SetRegularizer(ndReal(1.0e-4f));
 				m_optimizers.PushBack(trainer);
 			}
@@ -357,7 +358,7 @@ threadCount = 1;
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 				ndAssert(0);
 				//ndBrainThreadPool::ParallelExecute(AccumulateBashWeights);
-				m_optimizers[0]->UpdateWeights(m_learnRate, m_bashBufferSize);
+				//m_optimizers[0]->UpdateWeights(m_learnRate, m_bashBufferSize);
 
 				if (i % 2000 == 0)
 				{
