@@ -85,19 +85,20 @@ void ndBrainOptimizerAdam::Update(ndReal learnRate, ndInt32 bashSize)
 	ndBrain* const brian = m_trainer->GetBrain();
 
 	ndInt32 maxSize = brian->GetInputSize();
-	for (ndInt32 i = 0; i < brian->GetCount(); ++i)
+	//for (ndInt32 i = 0; i < brian->GetCount(); ++i)
+	for (ndInt32 i = brian->GetCount() - 1; i >= 0; --i)
 	{
 		ndBrainLayer* const layer = (*brian)[i];
 		maxSize = ndMax(maxSize, layer->GetOutputSize());
 	}
 	ndReal* const tempBuff = ndAlloca(ndReal, maxSize * 2 + 64);
 	
-	for (ndInt32 i = 0; i < brian->GetCount(); ++i)
+	for (ndInt32 i = brian->GetCount() - 1; i >= 0 ; --i)
 	{
-		ndAdamData& data = *m_data[i];
 		ndBrainLayer* const layer = (*brian)[i];
 		if (layer->HasParameters())
 		{
+			ndAdamData& data = *m_data[i];
 			ndBrainVector& bias = *m_trainer->GetBias(i);
 			ndBrainMatrix& weight = *m_trainer->GetWeight(i);
 			ndBrainVector& biasGradients = *m_trainer->GetBiasGradients(i);
@@ -135,7 +136,6 @@ void ndBrainOptimizerAdam::Update(ndReal learnRate, ndInt32 bashSize)
 					biasGradients[j] = data.m_biasGradient_u[j] * bias_den;
 				}
 			}
-
 			biasGradients.Scale(learnRate);
 			biasGradients.ScaleAdd(bias, regularizer);
 			bias.Add(biasGradients);
@@ -147,7 +147,7 @@ void ndBrainOptimizerAdam::Update(ndReal learnRate, ndInt32 bashSize)
 				data.m_weightGradient_v[j].Scale(m_beta);
 				data.m_weightGradient_u[j].Scale(m_alpha);
 				
-				ndBrainMemVector weightGradients2(tempBuff, biasGradients.GetCount());
+				ndBrainMemVector weightGradients2(tempBuff, weightGradients.GetColumns());
 				weightGradients2.Set(weightGradients[j]);
 				weightGradients2.Mul(weightGradients[j]);
 				data.m_weightGradient_v[j].ScaleAdd(weightGradients2, ndReal(1.0f) - m_beta);
@@ -176,7 +176,6 @@ void ndBrainOptimizerAdam::Update(ndReal learnRate, ndInt32 bashSize)
 						weightGradients[j][k] = data.m_weightGradient_u[j][k] * bias_den;
 					}
 				}
-
 				weightGradients[j].Scale(learnRate);
 				weightGradients[j].ScaleAdd(weight[j], regularizer);
 				weight[j].Add(weightGradients[j]);
