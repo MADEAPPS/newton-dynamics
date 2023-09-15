@@ -48,7 +48,7 @@ class ndBrainTrainer: public ndClassAlloc
 	ndBrainMatrix* GetWeightGradients(ndInt32 index) const;
 
 	private:
-	ndArray<ndLayerData*> m_layerData;
+	ndArray<ndLayerData*> m_data;
 	ndBrain* m_brain;
 };
 

@@ -36,12 +36,13 @@ ndBrainOptimizerSgd::~ndBrainOptimizerSgd()
 
 void ndBrainOptimizerSgd::Update(ndReal learnRate, ndInt32 bashSize)
 {
-	learnRate *= ndReal(-1.0f);
+	//learnRate *= ndReal(-1.0f);
 	ndReal regularizer = -GetRegularizer();
-	ndReal den = ndReal(1.0f) / ndReal(bashSize);
+	//ndReal den = ndReal(1.0f) / ndReal(bashSize);
+	ndReal denScale = -learnRate / ndReal(bashSize);
 
 	ndBrain* const brian = m_trainer->GetBrain();
-	for (ndInt32 i = 0; brian->GetCount(); ++i)
+	for (ndInt32 i = 0; i < brian->GetCount(); ++i)
 	{
 		ndBrainLayer* const layer = (*brian)[i];
 		if (layer->HasParameters())
@@ -51,14 +52,16 @@ void ndBrainOptimizerSgd::Update(ndReal learnRate, ndInt32 bashSize)
 			ndBrainVector& biasGradients = *m_trainer->GetBiasGradients(i);
 			ndBrainMatrix& weightGradients = *m_trainer->GetWeightGradients(i);
 
-			biasGradients.Scale(den);
-			biasGradients.Scale(learnRate);
+			//biasGradients.Scale(den);
+			//biasGradients.Scale(learnRate);
+			biasGradients.Scale(denScale);
 			biasGradients.ScaleAdd(bias, regularizer);
 			bias.Add(biasGradients);
 			bias.FlushToZero();
 
-			weightGradients.Scale(den);
-			weightGradients.Scale(learnRate);
+			//weightGradients.Scale(den);
+			//weightGradients.Scale(learnRate);
+			weightGradients.Scale(denScale);
 			weightGradients.ScaleAdd(weight, regularizer);
 			weight.Add(weightGradients);
 			weight.FlushToZero();

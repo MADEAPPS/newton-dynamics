@@ -28,13 +28,13 @@
 class ndBrainOptimizerAdam : public ndBrainOptimizer
 {
 	public: 
-	class ndAdabData;
+	class ndAdamData;
 	ndBrainOptimizerAdam(ndBrainTrainer* const trainer);
 	virtual ~ndBrainOptimizerAdam();
 
 	virtual void Update(ndReal learnRate, ndInt32 bashSize);
 
-	ndArray<ndAdabData*> m_data;
+	ndArray<ndAdamData*> m_data;
 	ndReal m_beta;
 	ndReal m_alpha;
 	ndReal m_epsilon;
