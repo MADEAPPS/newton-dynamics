@@ -331,18 +331,11 @@ threadCount = 1;
 				}
 			});
 
-			//auto AccumulateBashWeights = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-			//{
-			//	ndBrainTrainer& trainer = *(*m_optimizers[0]);
-			//	for (ndInt32 i = 1; i < threadCount; ++i)
-			//	{
-			//		ndBrainTrainer& srcTrainer = *(*m_optimizers[i]);
-			//		trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
-			//	}
-			//});
-
 			ndBrain bestBrain(m_brain);
 			ndInt32 minFail = trainingDigits->GetCount();
+			ndBrainTrainer& trainer = *(*m_optimizers[0]);
+			ndBrainOptimizerAdam optimizer(&trainer);
+
 			//for (ndInt32 i = 0; i < 2000000; ++i)
 			for (ndInt32 i = 0; i < 10000; ++i)
 			{
@@ -359,6 +352,13 @@ threadCount = 1;
 				ndAssert(0);
 				//ndBrainThreadPool::ParallelExecute(AccumulateBashWeights);
 				//m_optimizers[0]->UpdateWeights(m_learnRate, m_bashBufferSize);
+				for (ndInt32 j = 1; j < GetThreadCount(); ++j)
+				{
+					ndBrainTrainer& srcTrainer = *(*m_optimizers[j]);
+					trainer.AcculumateGradients(srcTrainer);
+				}
+				//trainer.UpdateWeights(ndReal(1.0e-2f), bashSize);
+				optimizer.Update(ndReal(1.0e-3f), m_bashBufferSize);
 
 				if (i % 2000 == 0)
 				{
@@ -398,7 +398,6 @@ threadCount = 1;
 						}
 					});
 
-
 					priorityIndexArray.SetCount(0);
 					ndBrainThreadPool::ParallelExecute(CrossValidate);
 					for (ndInt32 j = 0; j < GetThreadCount(); ++j)
@@ -435,22 +434,24 @@ threadCount = 1;
 	{
 		ndBrain brain;
 		ndInt32 neuronsPerLayers = 64;
-#if 0
-		ndBrainLayerLinearActivated* const inputLayer = new ndBrainLayerLinearActivated(trainingDigits->GetColumns(), neuronsPerLayers, m_tanh);
-		ndBrainLayerLinearActivated* const hiddenLayer0 = new ndBrainLayerLinearActivated(inputLayer->GetOutputSize(), neuronsPerLayers, m_tanh);
-		ndBrainLayerLinearActivated* const hiddenLayer1 = new ndBrainLayerLinearActivated(hiddenLayer0->GetOutputSize(), neuronsPerLayers, m_tanh);
-		ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(hiddenLayer1->GetOutputSize(), trainingLabels->GetColumns(), m_sigmoid);
+		ndFixSizeArray<ndBrainLayer*, 16> layers;
+
+		layers.PushBack(new ndBrainLayerLineal(trainingDigits->GetColumns(), neuronsPerLayers));
+		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+		layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+		layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+		layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
+		layers.PushBack(new ndBrainLayerSigmoidActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 	
-		brain.BeginAddLayer();
-		brain.AddLayer(inputLayer);
-		brain.AddLayer(hiddenLayer0);
-		brain.AddLayer(hiddenLayer1);
-		brain.AddLayer(ouputLayer);
-		brain.EndAddLayer();
-#else
-		ndBrainLayer* const inputLayer = new ndBrainLayerLineal(trainingDigits->GetColumns(), neuronsPerLayers);
-		brain.AddLayer(inputLayer);
-#endif
+		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+		{
+			brain.AddLayer(layers[i]);
+		}
 		brain.InitWeightsXavierMethod();
 	
 		SupervisedTrainer optimizer(&brain);
