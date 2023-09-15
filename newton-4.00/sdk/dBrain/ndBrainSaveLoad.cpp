@@ -177,41 +177,9 @@ void ndBrainSave::Save(const ndBrain* const brain)
 		ndBrainLayer* const layer = (*brain)[i];
 		Save("layer %s\n", layer->GetLabelId());
 		Save("{\n");
-	//	//switch (layer->m_activation)
-	//	switch (layer->GetActivationType())
-	//	{
-	//		case m_relu:
-	//			Save("\tactivation relu\n");
-	//			break;
-	//
-	//		case m_lineal:
-	//			Save("\tactivation lineal\n");
-	//			break;
-	//
-	//		case m_tanh:
-	//			Save("\tactivation tanh\n");
-	//			break;
-	//
-	//		case m_softmax:
-	//			Save("\tactivation softmax\n");
-	//			break;
-	//
-	//		case m_sigmoid:
-	//		default:
-	//			Save("\tactivation sigmoid\n");
-	//			break;
-	//	}
+		layer->Save(this);
 		Save("}\n\n");
 	}
-	
-	//for (ndInt32 i = 0; i < brain->GetCount(); ++i)
-	//{
-	//	ndBrainLayer* const layer = (*brain)[i];
-	//	Save("layer\n");
-	//	Save("{\n");
-	//	layer->Save(this);
-	//	Save("}\n\n");
-	//}
 }
 
 void ndBrainSave::Save(const ndBrain* const brain, const char* const pathName)

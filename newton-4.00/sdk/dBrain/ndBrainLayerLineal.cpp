@@ -21,6 +21,7 @@
 
 
 #include "ndBrainStdafx.h"
+#include "ndBrainSaveLoad.h"
 #include "ndBrainLayerLineal.h"
 
 ndBrainLayerLineal::ndBrainLayerLineal(ndInt32 inputs, ndInt32 outputs)
@@ -140,4 +141,39 @@ void ndBrainLayerLineal::CalculateParamGradients(const ndBrainVector& input, con
 		weightGradient[i].ScaleAdd(input, value);
 	}
 	InputDerivative(output, outputDerivative, inputGradient);
+}
+
+void ndBrainLayerLineal::Save(const ndBrainSave* const loadSave) const
+{
+	char buffer[1024];
+	auto Save = [this, &buffer, &loadSave](const char* const fmt, ...)
+	{
+		va_list v_args;
+		buffer[0] = 0;
+		va_start(v_args, fmt);
+		vsprintf(buffer, fmt, v_args);
+		va_end(v_args);
+		loadSave->WriteData(buffer);
+	};
+
+	Save("\tbiasWeights %d\n", m_bias.GetCount());
+
+	Save("\t\tweights ");
+	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
+	{
+		Save("%g ", m_bias[i]);
+	}
+	Save("\n");
+
+	Save("\tinputWeights %d %d\n", m_weights.GetColumns(), m_weights.GetCount());
+	for (ndInt32 i = 0; i < m_weights.GetCount(); ++i)
+	{
+		Save("\t\tweights_%d ", i);
+		const ndBrainVector& row = m_weights[i];
+		for (ndInt32 j = 0; j < GetInputSize(); ++j)
+		{
+			Save("%g ", row[j]);
+		}
+		Save("\n");
+	}
 }

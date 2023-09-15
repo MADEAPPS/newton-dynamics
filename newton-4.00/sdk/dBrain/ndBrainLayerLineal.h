@@ -54,6 +54,8 @@ class ndBrainLayerLineal : public ndBrainLayer
 		ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient);
 
 	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const;
+
+	virtual void Save(const ndBrainSave* const loadSave) const;
 	
 	private:
 	void InitGaussianBias(ndReal variance);

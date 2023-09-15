@@ -51,6 +51,7 @@ class ndBrainLayerActivation : public ndBrainLayer
 		ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient);
 
 	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const;
+	virtual void Save(const ndBrainSave* const loadSave) const;
 
 	protected:
 	ndInt32 m_neurons;

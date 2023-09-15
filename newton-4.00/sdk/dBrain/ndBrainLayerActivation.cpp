@@ -20,6 +20,7 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainSaveLoad.h"
 #include "ndBrainLayerActivation.h"
 
 ndBrainLayerActivation::ndBrainLayerActivation(ndInt32 neurons)
@@ -52,6 +53,13 @@ ndBrainLayer* ndBrainLayerActivation::Clone() const
 {
 	ndAssert(0);
 	return nullptr;
+}
+
+void ndBrainLayerActivation::Save(const ndBrainSave* const loadSave) const
+{
+	char buffer[1024];
+	sprintf(buffer, "\tnewrons %d\n", m_neurons);
+	loadSave->WriteData(buffer);
 }
 
 ndInt32 ndBrainLayerActivation::GetOutputSize() const
