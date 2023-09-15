@@ -20,9 +20,7 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainTypes.h"
 #include "ndBrainLoss.h"
-
 
 ndBrainLeastSquareErrorLoss::ndBrainLeastSquareErrorLoss(ndInt32 size)
 	:ndBrainLoss()

@@ -20,61 +20,55 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainLayerTanhActivation.h"
+#include "ndBrainLayerReluActivation.h"
 
-ndBrainLayerTanhActivation::ndBrainLayerTanhActivation(ndInt32 neurons)
+ndBrainLayerReluActivation::ndBrainLayerReluActivation(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)
 {
 }
 
-ndBrainLayerTanhActivation::ndBrainLayerTanhActivation(const ndBrainLayerTanhActivation& src)
+ndBrainLayerReluActivation::ndBrainLayerReluActivation(const ndBrainLayerReluActivation& src)
 	:ndBrainLayerActivation(src)
 {
 }
 
-ndBrainLayer* ndBrainLayerTanhActivation::Clone() const
+ndBrainLayer* ndBrainLayerReluActivation::Clone() const
 {
 	ndAssert(0);
-	return new ndBrainLayerTanhActivation(*this);
+	return new ndBrainLayerReluActivation(*this);
 }
 
-const char* ndBrainLayerTanhActivation::GetLabelId() const
+const char* ndBrainLayerReluActivation::GetLabelId() const
 {
-	return "ndBrainLayerTanhActivation";
+	return "ndBrainLayerReluActivation";
 }
 
-void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+void ndBrainLayerReluActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
-		ndReal out = ndReal(0.0f);
-		ndReal value = input[i];
-		if (value > ndReal(0.0f))
-		{
-			ndReal p = ndReal(ndExp(-ndReal(2.0f) * value));
-			out = ndFlushToZero((ndReal(1.0f) - p) / (p + ndReal(1.0f)));
-		}
-		else
-		{
-			ndReal p = ndReal(ndExp(ndReal(2.0f) * value));
-			out = ndFlushToZero((p - ndReal(1.0f)) / (p + ndReal(1.0f)));
-		}
-
-		output[i] = out;
+		output[i] = (output[i] > ndReal(0.0f)) ? output[i] : ndReal(0.0f);
 		ndAssert(ndCheckFloat(output[i]));
 		ndAssert(output[i] <= ndReal(1.0f));
 		ndAssert(output[i] >= ndReal(-1.0f));
 	}
 }
 
-void ndBrainLayerTanhActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerReluActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
 	ndAssert(output.GetCount() == inputDerivative.GetCount());
 
-	inputDerivative.Set(ndReal(1.0f));
-	inputDerivative.MulSub(output, output);
-	inputDerivative.Mul(outputDerivative);
-	inputDerivative.FlushToZero();
+	ndAssert(0);
+	//inputDerivative.Set(ndReal(1.0f));
+	//inputDerivative.MulSub(output, output);
+	//inputDerivative.Mul(outputDerivative);
+	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
+	{
+		inputDerivative[i] = (output[i] > ndReal(0.0f)) ? ndReal(1.0f) : ndReal(0.0f);
+		ndAssert(ndCheckFloat(output[i]));
+		ndAssert(output[i] <= ndReal(1.0f));
+		ndAssert(output[i] >= ndReal(-1.0f));
+	}
 }

@@ -21,7 +21,6 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
-#include "ndBrainTypes.h"
 #include "ndBrainVector.h"
 #include "ndBrainSaveLoad.h"
 

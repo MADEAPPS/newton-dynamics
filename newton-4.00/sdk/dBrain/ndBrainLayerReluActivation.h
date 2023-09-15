@@ -19,22 +19,22 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
-#ifndef _ND_BRAIN_TYPES_H__
-#define _ND_BRAIN_TYPES_H__
+#ifndef _ND_BRAIN_LAYER_RELU_ACTIVATION_H__
+#define _ND_BRAIN_LAYER_RELU_ACTIVATION_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrainLayerActivation.h"
 
-#define D_DEEP_BRAIN_DATA_ALIGMENT 8
-
-enum ndBrainActivationType
+class ndBrainLayerReluActivation : public ndBrainLayerActivation
 {
-	m_lineal,
-	m_relu,
-	m_tanh,
-	m_sigmoid,
-	m_softmax,
-	m_noActivation
+	public:
+	ndBrainLayerReluActivation(ndInt32 neurons);
+	ndBrainLayerReluActivation(const ndBrainLayerReluActivation& src);
+	ndBrainLayer* Clone() const;
+
+	const char* GetLabelId() const;
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
+	void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 };
 
 #endif 

@@ -21,7 +21,6 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
-#include "ndBrainTypes.h"
 #include "ndBrainSaveLoad.h"
 
 ndBrain* ndBrainLoad::Load(const char* const pathName)

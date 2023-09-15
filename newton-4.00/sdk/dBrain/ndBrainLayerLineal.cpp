@@ -75,54 +75,6 @@ ndBrainMatrix* ndBrainLayerLineal::GetWeights()
 	return &m_weights;
 }
 
-
-//void ndBrainLayerLineal::InitWeights(ndReal, ndReal)
-//{
-//	ndAssert(0);
-//}
-//
-//ndBrainActivationType ndBrainLayerLineal::GetActivationType() const
-//{
-//	ndAssert(0);
-//	return m_noActivation;
-//}
-//
-//void ndBrainLayerLineal::CopyFrom(const ndBrainLayer&)
-//{
-//	ndAssert(0);
-//}
-//
-//void ndBrainLayerLineal::Blend(const ndBrainLayer&, ndReal)
-//{
-//	ndAssert(0);
-//}
-//
-//bool ndBrainLayerLineal::Compare(const ndBrainLayer&) const
-//{
-//	ndAssert(0);
-//	return false;
-//}
-//
-//void ndBrainLayerLineal::Load(const ndBrainLoad* const)
-//{
-//	ndAssert(0);
-//}
-//
-//void ndBrainLayerLineal::Save(const ndBrainSave* const) const
-//{
-//	ndAssert(0);
-//}
-//
-//void ndBrainLayerLineal::ApplyActivation(ndBrainVector&) const
-//{
-//	ndAssert(0);
-//}
-//
-//void ndBrainLayerLineal::ActivationDerivative(const ndBrainVector&, ndBrainVector&) const
-//{
-//	ndAssert(0);
-//}
-
 bool ndBrainLayerLineal::HasParameters() const
 {
 	return true;

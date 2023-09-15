@@ -35,9 +35,6 @@ class ndBrainLayerTanhActivation : public ndBrainLayerActivation
 	const char* GetLabelId() const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
-
-
-	void ActivationDerivative(const ndBrainVector& input, ndBrainVector& output) const;
 };
 
 #endif 

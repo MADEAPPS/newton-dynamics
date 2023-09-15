@@ -529,7 +529,7 @@ namespace ndController_1
 		// build neural net controller
 		#ifdef ND_TRAIN_MODEL
 			ndInt32 layerSize = 64;
-			ndBrainActivationType activation = m_tanh;
+			//ndBrainActivationType activation = m_tanh;
 			//ndBrainActivationType activation = m_relu;
 
 			ndSharedPtr<ndBrain> actor(new ndBrain());

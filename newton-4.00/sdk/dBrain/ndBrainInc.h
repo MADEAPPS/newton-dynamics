@@ -26,7 +26,6 @@
 
 #include <ndBrain.h>
 #include <ndBrainLoss.h>
-#include <ndBrainTypes.h>
 #include <ndBrainAgent.h>
 #include <ndBrainLayer.h>
 #include <ndBrainVector.h>
@@ -48,6 +47,7 @@
 #include <ndBrainAgentTD3_Trainer.h>
 #include <ndBrainAgentSAC_Trainer.h>
 #include <ndBrainAgentDDPG_Trainer.h>
+#include <ndBrainLayerReluActivation.h>
 #include <ndBrainLayerTanhActivation.h>
 #include <ndBrainLayerSigmoidActivation.h>
 

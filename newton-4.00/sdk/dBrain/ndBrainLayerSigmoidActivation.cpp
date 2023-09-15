@@ -44,24 +44,6 @@ const char* ndBrainLayerSigmoidActivation::GetLabelId() const
 	return "ndBrainLayerSigmoidActivation";
 }
 
-void ndBrainLayerSigmoidActivation::ActivationDerivative(const ndBrainVector& input, ndBrainVector& output) const
-{
-	//ndAssert(input.GetCount() == derivativeOutput.GetCount());
-	//for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
-	//{
-	//	ndReal val = input[i];
-	//	ndReal out = val * (ndReal(1.0f) - val);
-	//	derivativeOutput[i] = ndFlushToZero(out);
-	//}
-
-	ndAssert(0);
-	ndAssert(input.GetCount() == output.GetCount());
-	output.Set(ndReal(1.0f));
-	output.Sub(input);
-	output.Mul(input);
-	output.FlushToZero();
-}
-
 void ndBrainLayerSigmoidActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
@@ -79,10 +61,6 @@ void ndBrainLayerSigmoidActivation::MakePrediction(const ndBrainVector& input, n
 	ndAssert(input.GetCount() == output.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
-		//ndReal val = ndClamp(input[i], ndReal(-50.0f), ndReal(50.0f));
-		//ndReal exp1 = ndReal(ndExp(val));
-		//ndReal out1 = ndFlushToZero(exp1 / (exp1 + ndReal(1.0f)));
-
 		ndReal out = ndReal(0.0f);
 		ndReal value = input[i];
 		if (value > ndReal(0.0f))

@@ -1120,7 +1120,7 @@ namespace ndQuadruped_1
 	{
 		#ifdef ND_TRAIN_MODEL
 			ndInt32 layerSize = 64;
-			ndBrainActivationType hiddenActivation = m_tanh;
+			//ndBrainActivationType hiddenActivation = m_tanh;
 			ndSharedPtr<ndBrain> actor(new ndBrain());
 			ndAssert(0);
 			//ndBrainLayerLinearActivated* const layer0 = new ndBrainLayerLinearActivated(m_stateSize, layerSize, hiddenActivation);

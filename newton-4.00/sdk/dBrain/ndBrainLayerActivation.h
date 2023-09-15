@@ -23,7 +23,6 @@
 #define _ND_BRAIN_LAYER_ACTIVATION_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainTypes.h"
 #include "ndBrainLayer.h"
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
