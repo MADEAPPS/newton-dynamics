@@ -26,6 +26,7 @@
 class ndBrain;
 class ndBrainLoss;
 class ndBrainVector;
+class ndBrainMatrix;
 
 class ndBrainTrainer: public ndClassAlloc
 {
@@ -51,6 +52,11 @@ class ndBrainTrainer: public ndClassAlloc
 	void AcculumateGradients(const ndBrainTrainer& src);
 	void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
 	void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
+
+	ndBrainVector* GetBias(ndInt32 index) const;
+	ndBrainMatrix* GetWeight(ndInt32 index) const;
+	ndBrainVector* GetBiasGradients(ndInt32 index) const;
+	ndBrainMatrix* GetWeightGradients(ndInt32 index) const;
 
 	private:
 	void AdamUpdate(ndReal learnRate);

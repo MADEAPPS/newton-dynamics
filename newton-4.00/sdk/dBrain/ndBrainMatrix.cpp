@@ -97,9 +97,30 @@ void ndBrainMatrix::Set(const ndBrainMatrix& src)
 	ndAssert(src.GetRows() == GetRows());
 	ndAssert(src.GetColumns() == GetColumns());
 	ndBrainMatrix& matrix = *this;
-	for (ndInt32 i = 0; i < src.GetRows(); ++i)
+	//for (ndInt32 i = 0; i < src.GetRows(); ++i)
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		matrix[i].Set(src[i]);
+	}
+}
+
+void ndBrainMatrix::Scale(ndReal scale)
+{
+	ndBrainMatrix& matrix = *this;
+	//for (ndInt32 i = 0; i < GetRows(); ++i)
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		matrix[i].Scale(scale);
+	}
+}
+
+void ndBrainMatrix::ScaleAdd(const ndBrainMatrix& src, ndReal scale)
+{
+	ndBrainMatrix& matrix = *this;
+	//for (ndInt32 i = 0; i < GetRows(); ++i)
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		matrix[i].ScaleAdd(src[i], scale);
 	}
 }
 
@@ -108,7 +129,8 @@ void ndBrainMatrix::Add(const ndBrainMatrix& src)
 	ndAssert(src.GetRows() == GetRows());
 	ndAssert(src.GetColumns() == GetColumns());
 	ndBrainMatrix& matrix = *this;
-	for (ndInt32 i = 0; i < src.GetRows(); ++i)
+	//for (ndInt32 i = 0; i < src.GetRows(); ++i)
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		matrix[i].Add(src[i]);
 	}
@@ -119,9 +141,20 @@ void ndBrainMatrix::Blend(const ndBrainMatrix& src, ndReal blend)
 	ndAssert(src.GetRows() == GetRows());
 	ndAssert(src.GetColumns() == GetColumns());
 	ndBrainMatrix& matrix = *this;
-	for (ndInt32 i = 0; i < src.GetRows(); ++i)
+	//for (ndInt32 i = 0; i < src.GetRows(); ++i)
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		matrix[i].Blend(src[i], blend);
+	}
+}
+
+void ndBrainMatrix::FlushToZero()
+{
+	ndBrainMatrix& matrix = *this;
+	//for (ndInt32 i = 0; i < GetRows(); ++i)
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		matrix[i].FlushToZero();
 	}
 }
 

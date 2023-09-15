@@ -65,6 +65,17 @@ ndInt32 ndBrainLayerLineal::GetInputSize() const
 	return m_weights.GetColumns();
 }
 
+ndBrainVector* ndBrainLayerLineal::GetBias()
+{
+	return &m_bias;
+}
+
+ndBrainMatrix* ndBrainLayerLineal::GetWeights()
+{
+	return &m_weights;
+}
+
+
 //void ndBrainLayerLineal::InitWeights(ndReal, ndReal)
 //{
 //	ndAssert(0);

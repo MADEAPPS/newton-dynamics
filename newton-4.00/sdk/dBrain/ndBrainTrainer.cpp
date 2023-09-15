@@ -262,6 +262,26 @@ void ndBrainTrainer::AdamUpdate(ndReal learnRate)
 	//StochasticUpdate(learnRate);
 }
 
+ndBrainVector* ndBrainTrainer::GetBias(ndInt32 index) const
+{
+	return m_layerData[index]->m_layer->GetBias();
+}
+
+ndBrainMatrix* ndBrainTrainer::GetWeight(ndInt32 index) const
+{
+	return m_layerData[index]->m_layer->GetWeights();
+}
+
+ndBrainVector* ndBrainTrainer::GetBiasGradients(ndInt32 index) const
+{
+	return &m_layerData[index]->m_gradBias;
+}
+
+ndBrainMatrix* ndBrainTrainer::GetWeightGradients(ndInt32 index) const
+{
+	return &m_layerData[index]->m_gradWeight;
+}
+
 void ndBrainTrainer::ClearGradientsAcc()
 {
 	for (ndInt32 i = m_layerData.GetCount() - 1; i >= 0; --i)

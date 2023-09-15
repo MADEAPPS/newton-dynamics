@@ -45,6 +45,9 @@ class ndBrainLayer : public ndClassAlloc
 	virtual ndInt32 GetInputSize() const;
 	virtual ndInt32 GetOutputSize() const;
 	virtual void CopyFrom(const ndBrainLayer& src);
+
+	virtual ndBrainVector* GetBias();
+	virtual ndBrainMatrix* GetWeights();
 	
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);

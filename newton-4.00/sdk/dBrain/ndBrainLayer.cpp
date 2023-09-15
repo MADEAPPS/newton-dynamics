@@ -84,6 +84,18 @@ void ndBrainLayer::InitWeightsXavierMethod()
 	ndAssert(0);
 }
 
+ndBrainVector* ndBrainLayer::GetBias()
+{
+	ndAssert(0);
+	return nullptr;
+}
+
+ndBrainMatrix* ndBrainLayer::GetWeights()
+{
+	ndAssert(0);
+	return nullptr;
+}
+
 void ndBrainLayer::Blend(const ndBrainLayer&, ndReal)
 {
 	ndAssert(0);

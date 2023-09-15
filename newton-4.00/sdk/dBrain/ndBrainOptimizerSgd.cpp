@@ -20,6 +20,8 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrain.h"
+#include "ndBrainMatrix.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainOptimizerSgd.h"
 
@@ -34,38 +36,32 @@ ndBrainOptimizerSgd::~ndBrainOptimizerSgd()
 
 void ndBrainOptimizerSgd::Update(ndReal learnRate, ndInt32 bashSize)
 {
-	ndAssert(0);
+	learnRate *= ndReal(-1.0f);
+	ndReal regularizer = -GetRegularizer();
+	ndReal den = ndReal(1.0f) / ndReal(bashSize);
 
-	//learnRate *= ndReal(-1.0f);
-	//ndReal regularizer = -GetRegularizer();
-	//const ndArray<ndBrainLayer*>& layers = *m_brain;
-	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
-	//{
-	//	ndAssert(0);
-	//	//ndBrainLayer* const layer = layers[i];
-	//	//const ndInt32 inputSize = layer->GetInputSize();
-	//	//const ndInt32 outputSize = layer->GetOutputSize();
-	//	//
-	//	//ndBrainVector& bias = layer->GetBias();
-	//	//ndBrainMemVector biasGradients(&m_biasGradientsAcc[m_inputOutputPrefixScan[i + 1]], outputSize);
-	//	//biasGradients.Scale(learnRate);
-	//	//biasGradients.ScaleAdd(bias, regularizer);
-	//	//bias.Add(biasGradients);
-	//	//bias.FlushToZero();
-	//	//
-	//	//const ndInt32 weightGradientStride = (inputSize + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	//	//const ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[i]];
-	//	//
-	//	//ndBrainMatrix& weightMatrix = layer->m_weights;
-	//	//for (ndInt32 j = 0; j < outputSize; ++j)
-	//	//{
-	//	//	ndBrainVector& weightVector = weightMatrix[j];
-	//	//	ndBrainMemVector weightGradients(weightGradientPtr, inputSize);
-	//	//	weightGradients.Scale(learnRate);
-	//	//	weightGradients.ScaleAdd(weightVector, regularizer);
-	//	//	weightVector.Add(weightGradients);
-	//	//	weightVector.FlushToZero();
-	//	//	weightGradientPtr += weightGradientStride;
-	//	//}
-	//}
+	ndBrain* const brian = m_trainer->GetBrain();
+	for (ndInt32 i = 0; brian->GetCount(); ++i)
+	{
+		ndBrainLayer* const layer = (*brian)[i];
+		if (layer->HasParameters())
+		{
+			ndBrainVector& bias = *m_trainer->GetBias(i);
+			ndBrainMatrix& weight = *m_trainer->GetWeight(i);
+			ndBrainVector& biasGradients = *m_trainer->GetBiasGradients(i);
+			ndBrainMatrix& weightGradients = *m_trainer->GetWeightGradients(i);
+
+			biasGradients.Scale(den);
+			biasGradients.Scale(learnRate);
+			biasGradients.ScaleAdd(bias, regularizer);
+			bias.Add(biasGradients);
+			bias.FlushToZero();
+
+			weightGradients.Scale(den);
+			weightGradients.Scale(learnRate);
+			weightGradients.ScaleAdd(weight, regularizer);
+			weight.Add(weightGradients);
+			weight.FlushToZero();
+		}
+	}
 }

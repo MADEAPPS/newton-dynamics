@@ -40,6 +40,9 @@ class ndBrainLayerLineal : public ndBrainLayer
 	virtual ndInt32 GetOutputSize() const;
 	virtual ndInt32 GetInputSize() const;
 	virtual const char* GetLabelId() const;
+
+	virtual ndBrainVector* GetBias();
+	virtual ndBrainMatrix* GetWeights();
 	
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
