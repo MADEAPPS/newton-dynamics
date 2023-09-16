@@ -20,6 +20,7 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainSaveLoad.h"
 #include "ndBrainLayerReluActivation.h"
 
 ndBrainLayerReluActivation::ndBrainLayerReluActivation(ndInt32 neurons)
@@ -71,4 +72,16 @@ void ndBrainLayerReluActivation::InputDerivative(const ndBrainVector& output, co
 		ndAssert(output[i] <= ndReal(1.0f));
 		ndAssert(output[i] >= ndReal(-1.0f));
 	}
+}
+
+ndBrainLayerReluActivation* ndBrainLayerReluActivation::Load(const ndBrainLoad* const loadSave)
+{
+	char buffer[1024];
+	loadSave->ReadString(buffer);
+
+	loadSave->ReadString(buffer);
+	ndInt32 inputs = loadSave->ReadInt();
+	ndBrainLayerReluActivation* const layer = new ndBrainLayerReluActivation(inputs);
+	loadSave->ReadString(buffer);
+	return layer;
 }

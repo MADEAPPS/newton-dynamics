@@ -72,7 +72,6 @@ ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
 
 ndBrainTrainer::~ndBrainTrainer()
 {
-	ndAssert(0);
 	for (ndInt32 i = 0; i < m_data.GetCount(); ++i)
 	{
 		delete (m_data[i]);

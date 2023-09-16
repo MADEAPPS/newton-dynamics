@@ -79,3 +79,14 @@ void ndBrainLayerSigmoidActivation::MakePrediction(const ndBrainVector& input, n
 	}
 }
 
+ndBrainLayerSigmoidActivation* ndBrainLayerSigmoidActivation::Load(const ndBrainLoad* const loadSave)
+{
+	char buffer[1024];
+	loadSave->ReadString(buffer);
+
+	loadSave->ReadString(buffer);
+	ndInt32 inputs = loadSave->ReadInt();
+	ndBrainLayerSigmoidActivation* const layer = new ndBrainLayerSigmoidActivation(inputs);
+	loadSave->ReadString(buffer);
+	return layer;
+}

@@ -156,19 +156,20 @@ void ndBrainLayerLineal::Save(const ndBrainSave* const loadSave) const
 		loadSave->WriteData(buffer);
 	};
 
-	Save("\tbiasWeights %d\n", m_bias.GetCount());
+	Save("\tinputs %d\n", m_weights.GetColumns());
+	Save("\touputs %d\n", m_weights.GetCount());
 
-	Save("\t\tweights ");
+	Save("\tbias ");
 	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
 	{
 		Save("%g ", m_bias[i]);
 	}
 	Save("\n");
 
-	Save("\tinputWeights %d %d\n", m_weights.GetColumns(), m_weights.GetCount());
+	Save("\tweights\n");
 	for (ndInt32 i = 0; i < m_weights.GetCount(); ++i)
 	{
-		Save("\t\tweights_%d ", i);
+		Save("\t\trow_%d ", i);
 		const ndBrainVector& row = m_weights[i];
 		for (ndInt32 j = 0; j < GetInputSize(); ++j)
 		{
@@ -176,4 +177,37 @@ void ndBrainLayerLineal::Save(const ndBrainSave* const loadSave) const
 		}
 		Save("\n");
 	}
+}
+
+ndBrainLayerLineal* ndBrainLayerLineal::Load(const ndBrainLoad* const loadSave)
+{
+	char buffer[1024];
+	loadSave->ReadString(buffer);
+
+	loadSave->ReadString(buffer);
+	ndInt32 inputs = loadSave->ReadInt();
+	loadSave->ReadString(buffer);
+	ndInt32 outputs = loadSave->ReadInt();
+	ndBrainLayerLineal* const layer = new ndBrainLayerLineal(inputs, outputs);
+
+	loadSave->ReadString(buffer);
+	for (ndInt32 i = 0; i < outputs; ++i)
+	{
+		ndReal val = ndReal(loadSave->ReadFloat());
+		layer->m_bias[i] = val;
+	}
+
+	loadSave->ReadString(buffer);
+	for (ndInt32 i = 0; i < outputs; ++i)
+	{
+		loadSave->ReadString(buffer);
+		for (ndInt32 j = 0; j < inputs; ++j)
+		{
+			ndReal val = ndReal(loadSave->ReadFloat());
+			layer->m_weights[i][j] = val;
+		}
+	}
+
+	loadSave->ReadString(buffer);
+	return layer;
 }

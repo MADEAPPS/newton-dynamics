@@ -22,6 +22,11 @@
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainLayerLineal.h"
+#include "ndBrainLayerReluActivation.h"
+#include "ndBrainLayerTanhActivation.h"
+#include "ndBrainLayerSoftmaxActivation.h"
+#include "ndBrainLayerSigmoidActivation.h"
 
 ndBrain* ndBrainLoad::Load(const char* const pathName)
 {
@@ -74,86 +79,51 @@ ndBrain* ndBrainLoad::Load(const char* const pathName)
 
 ndBrain* ndBrainLoad::Load() const
 {
-	ndAssert(0);
-	return nullptr;
-	//char buffer[1024];
-	//ReadString(buffer);
-	//ReadString(buffer);
-	//ReadString(buffer);
-	//
-	//ReadString(buffer);
-	//ndInt32 layersCount = ReadInt();
-	//
-	//ndBrain* const brain = new ndBrain;
-	//brain->BeginAddLayer();
-	//for (ndInt32 i = 0; i < layersCount; ++i)
-	//{
-	//	char layerType[256];
-	//	ReadString(buffer);
-	//	ReadString(layerType);
-	//
-	//	ReadString(buffer);
-	//	ndBrainLayer* layer = nullptr;
-	//
-	//	ReadString(buffer);
-	//	ReadString(buffer);
-	//
-	//	ndBrainActivationType activation = m_sigmoid;
-	//	if (!strcmp(buffer, "relu"))
-	//	{
-	//		activation = m_relu;
-	//	}
-	//	else if (!strcmp(buffer, "lineal"))
-	//	{
-	//		activation = m_lineal;
-	//	}
-	//	else if (!strcmp(buffer, "tanh"))
-	//	{
-	//		activation = m_tanh;
-	//	}
-	//	else if (!strcmp(buffer, "softmax"))
-	//	{
-	//		activation = m_softmax;
-	//	}
-	//	else
-	//	{
-	//		activation = m_sigmoid;
-	//	}
-	//
-	//	ReadString(buffer);
-	//	ndInt32 inputs = ReadInt();
-	//	ReadString(buffer);
-	//	ndInt32 outputs = ReadInt();
-	//
-	//	if (!strcmp(layerType, "fullyConnected"))
-	//	{
-	//		//layer = new ndBrainLayer(this);
-	//		layer = new ndBrainLayerLinearActivated(inputs, outputs, activation);
-	//	}
-	//	else
-	//	{
-	//		ndAssert(0);
-	//	}
-	//	if (layer)
-	//	{
-	//		//layer->Load(this);
-	//		brain->AddLayer(layer);
-	//	}
-	//
-	//	ReadString(buffer);
-	//}
-	//brain->EndAddLayer();
-	//
-	//for (ndInt32 i = 0; i < layersCount; ++i)
-	//{
-	//	ndBrainLayer* const layer = (*brain)[i];
-	//	ReadString(buffer);
-	//	ReadString(buffer);
-	//	layer->Load(this);
-	//	ReadString(buffer);
-	//}
-	//
-	//return brain;
+	char buffer[1024];
+	ReadString(buffer);
+	ReadString(buffer);
+	ReadString(buffer);
+	
+	ReadString(buffer);
+	ndInt32 layersCount = ReadInt();
+	
+	ndBrain* const brain = new ndBrain;
+	for (ndInt32 i = 0; i < layersCount; ++i)
+	{
+		char layerType[256];
+		ReadString(buffer);
+		ReadString(layerType);
+	
+		ndBrainLayer* layer = nullptr;
+		if (!strcmp(layerType, "ndBrainLayerLineal"))
+		{
+			layer = ndBrainLayerLineal::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerReluActivation"))
+		{
+			layer = ndBrainLayerReluActivation::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerTanhActivation"))
+		{
+			layer = ndBrainLayerTanhActivation::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerSigmoidActivation"))
+		{
+			layer = ndBrainLayerSigmoidActivation::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerSoftmaxActivation"))
+		{
+			layer = ndBrainLayerSoftmaxActivation::Load(this);
+		}
+		else
+		{
+			ndAssert(0);
+		}
+		ndAssert(layer);
+		brain->AddLayer(layer);
+	}
+	
+	return brain;
 }
 
 void ndBrainSave::Save(const ndBrain* const brain)

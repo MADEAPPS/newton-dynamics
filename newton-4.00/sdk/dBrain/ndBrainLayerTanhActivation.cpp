@@ -20,6 +20,7 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainSaveLoad.h"
 #include "ndBrainLayerTanhActivation.h"
 
 ndBrainLayerTanhActivation::ndBrainLayerTanhActivation(ndInt32 neurons)
@@ -76,4 +77,16 @@ void ndBrainLayerTanhActivation::InputDerivative(const ndBrainVector& output, co
 	inputDerivative.MulSub(output, output);
 	inputDerivative.Mul(outputDerivative);
 	inputDerivative.FlushToZero();
+}
+
+ndBrainLayerTanhActivation* ndBrainLayerTanhActivation::Load(const ndBrainLoad* const loadSave)
+{
+	char buffer[1024];
+	loadSave->ReadString(buffer);
+
+	loadSave->ReadString(buffer);
+	ndInt32 inputs = loadSave->ReadInt();
+	ndBrainLayerTanhActivation* const layer = new ndBrainLayerTanhActivation(inputs);
+	loadSave->ReadString(buffer);
+	return layer;
 }

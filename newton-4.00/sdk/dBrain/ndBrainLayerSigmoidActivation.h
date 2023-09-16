@@ -23,6 +23,7 @@
 #define _ND_BRAIN_LAYER_SIGMOID_ACTIVATION_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrainSaveLoad.h"
 #include "ndBrainLayerActivation.h"
 
 class ndBrainLayerSigmoidActivation : public ndBrainLayerActivation
@@ -31,6 +32,7 @@ class ndBrainLayerSigmoidActivation : public ndBrainLayerActivation
 	ndBrainLayerSigmoidActivation(ndInt32 neurons);
 	ndBrainLayerSigmoidActivation(const ndBrainLayerActivation& src);
 	ndBrainLayer* Clone() const;
+	static ndBrainLayerSigmoidActivation* Load(const ndBrainLoad* const loadSave);
 
 	const char* GetLabelId() const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;

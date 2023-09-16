@@ -20,6 +20,7 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainSaveLoad.h"
 #include "ndBrainLayerSoftmaxActivation.h"
 
 ndBrainLayerSoftmaxActivation::ndBrainLayerSoftmaxActivation(ndInt32 neurons)
@@ -79,3 +80,14 @@ void ndBrainLayerSoftmaxActivation::MakePrediction(const ndBrainVector& input, n
 	output.FlushToZero();
 }
 
+ndBrainLayerSoftmaxActivation* ndBrainLayerSoftmaxActivation::Load(const ndBrainLoad* const loadSave)
+{
+	char buffer[1024];
+	loadSave->ReadString(buffer);
+
+	loadSave->ReadString(buffer);
+	ndInt32 inputs = loadSave->ReadInt();
+	ndBrainLayerSoftmaxActivation* const layer = new ndBrainLayerSoftmaxActivation(inputs);
+	loadSave->ReadString(buffer);
+	return layer;
+}

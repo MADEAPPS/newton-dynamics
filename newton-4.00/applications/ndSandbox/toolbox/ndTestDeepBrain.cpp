@@ -330,9 +330,7 @@ static void MnistTrainingSet()
 			ndBrainTrainer& trainer = *(*m_optimizers[0]);
 			ndBrainOptimizerAdam optimizer(&trainer);
 
-			//for (ndInt32 i = 0; i < 2000000; ++i)
-			//for (ndInt32 i = 0; i < 10000; ++i)
-			for (ndInt32 i = 0; i < 100; ++i)
+			for (ndInt32 i = 0; i < 200000; ++i)
 			{
 				ndInt32 priorityStart = ndMin(priorityIndexArray.GetCount(), 2);
 				for (ndInt32 j = 0; j < priorityStart; ++j)
@@ -482,16 +480,7 @@ void ndTestDeedBrian()
 {
 	ndSetRandSeed(12345);
 
-	//FILE* outFile = fopen("xxx.csv", "wb");
-	//for (ndInt32 i = 0; i < 40000; ++i)
-	//{
-	//	ndReal xxx = ndGaussianRandom(0.0f, 0.1f);
-	//	fprintf(outFile, "%g\n", xxx);
-	//}
-	//fclose(outFile);
-
 	//ThreeLayersTwoInputsTwoOutputs();
 	MnistTrainingSet();
 	//MnistTestSet();
-	exit(0);
 }

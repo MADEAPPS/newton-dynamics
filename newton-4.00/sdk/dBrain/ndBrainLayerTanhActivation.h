@@ -31,6 +31,7 @@ class ndBrainLayerTanhActivation : public ndBrainLayerActivation
 	ndBrainLayerTanhActivation(ndInt32 neurons);
 	ndBrainLayerTanhActivation(const ndBrainLayerTanhActivation& src);
 	ndBrainLayer* Clone() const;
+	static ndBrainLayerTanhActivation* Load(const ndBrainLoad* const loadSave);
 
 	const char* GetLabelId() const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
