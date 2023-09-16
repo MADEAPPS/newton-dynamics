@@ -161,16 +161,17 @@ ndBrainAgentSAC_Trainer<statesDim, actionDim>::ndBrainAgentSAC_Trainer(const Hyp
 	ndAssert(m_critic0.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
 	ndAssert(m_critic1.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
 
-	SetThreadCount(hyperParameters.m_threadsCount);
-	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
-	{
-		m_actorOptimizer.PushBack(new ndBrainTrainer(&m_actor));
-		m_criticOptimizer0.PushBack(new ndBrainTrainer(&m_critic0));
-		m_criticOptimizer1.PushBack(new ndBrainTrainer(&m_critic1));
-		m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
-		m_criticOptimizer0[m_criticOptimizer0.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
-		m_criticOptimizer1[m_criticOptimizer1.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
-	}
+	ndAssert(0);
+	//SetThreadCount(hyperParameters.m_threadsCount);
+	//for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
+	//{
+	//	m_actorOptimizer.PushBack(new ndBrainTrainer(&m_actor));
+	//	m_criticOptimizer0.PushBack(new ndBrainTrainer(&m_critic0));
+	//	m_criticOptimizer1.PushBack(new ndBrainTrainer(&m_critic1));
+	//	m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
+	//	m_criticOptimizer0[m_criticOptimizer0.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
+	//	m_criticOptimizer1[m_criticOptimizer1.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
+	//}
 
 	SetBufferSize(hyperParameters.m_replayBufferSize);
 	InitWeights();
@@ -387,23 +388,24 @@ void ndBrainAgentSAC_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 		}
 	});
 
-	auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		ndBrainTrainer* const trainer0 = *m_criticOptimizer0[0];;
-		ndBrainTrainer* const trainer1 = *m_criticOptimizer1[0];
-		for (ndInt32 i = 1; i < threadCount; ++i)
-		{
-			ndBrainTrainer* const srcTrainer0 = *m_criticOptimizer0[i];
-			ndBrainTrainer* const srcTrainer1 = *m_criticOptimizer1[i];
-			trainer0->AcculumateGradients(*srcTrainer0, threadIndex, threadCount);
-			trainer1->AcculumateGradients(*srcTrainer1, threadIndex, threadCount);
-		}
-	});
+	ndAssert(0);
+	//auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	ndBrainTrainer* const trainer0 = *m_criticOptimizer0[0];;
+	//	ndBrainTrainer* const trainer1 = *m_criticOptimizer1[0];
+	//	for (ndInt32 i = 1; i < threadCount; ++i)
+	//	{
+	//		ndBrainTrainer* const srcTrainer0 = *m_criticOptimizer0[i];
+	//		ndBrainTrainer* const srcTrainer1 = *m_criticOptimizer1[i];
+	//		trainer0->AcculumateGradients(*srcTrainer0, threadIndex, threadCount);
+	//		trainer1->AcculumateGradients(*srcTrainer1, threadIndex, threadCount);
+	//	}
+	//});
 
 	ndBrainThreadPool::ParallelExecute(PropagateBash);
-	ndBrainThreadPool::ParallelExecute(AccumulateWeight);
-	m_criticOptimizer0[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
-	m_criticOptimizer1[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
+	//ndBrainThreadPool::ParallelExecute(AccumulateWeight);
+	//m_criticOptimizer0[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
+	//m_criticOptimizer1[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
 
 	m_criticOptimizer0[0]->ClampWeights(ndReal(100.0f));
 	m_criticOptimizer1[0]->ClampWeights(ndReal(100.0f));
