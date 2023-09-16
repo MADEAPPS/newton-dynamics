@@ -406,12 +406,12 @@ void ndBrainAgentSAC_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 	//ndBrainThreadPool::ParallelExecute(AccumulateWeight);
 	//m_criticOptimizer0[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
 	//m_criticOptimizer1[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
-
-	m_criticOptimizer0[0]->ClampWeights(ndReal(100.0f));
-	m_criticOptimizer1[0]->ClampWeights(ndReal(100.0f));
-
-	m_criticOptimizer0[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
-	m_criticOptimizer1[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
+	//
+	//m_criticOptimizer0[0]->ClampWeights(ndReal(100.0f));
+	//m_criticOptimizer1[0]->ClampWeights(ndReal(100.0f));
+	//
+	//m_criticOptimizer0[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
+	//m_criticOptimizer1[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -432,26 +432,27 @@ void ndBrainAgentSAC_Trainer<statesDim, actionDim>::BackPropagateActor(const ndU
 
 			void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 			{
-				ndAssert(loss.GetCount() == actionDim);
-				ndAssert(output.GetCount() == actionDim);
-				const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_agent->m_replayBuffer[m_index];
-
-				ndReal criticInputBuffer[(statesDim + actionDim) * 2];
-				ndBrainMemVector input(criticInputBuffer, statesDim + actionDim);
-				for (ndInt32 i = 0; i < statesDim; ++i)
-				{
-					input[i] = transition.m_state[i];
-				}
-				for (ndInt32 i = 0; i < actionDim; ++i)
-				{
-					input[i + statesDim] = output[i];
-				}
-				m_agent->m_critic0.CalculateInputGradients(input, input);
-
-				for (ndInt32 i = 0; i < actionDim; ++i)
-				{
-					loss[i] = input[statesDim + i];
-				}
+				ndAssert(0);
+				//ndAssert(loss.GetCount() == actionDim);
+				//ndAssert(output.GetCount() == actionDim);
+				//const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_agent->m_replayBuffer[m_index];
+				//
+				//ndReal criticInputBuffer[(statesDim + actionDim) * 2];
+				//ndBrainMemVector input(criticInputBuffer, statesDim + actionDim);
+				//for (ndInt32 i = 0; i < statesDim; ++i)
+				//{
+				//	input[i] = transition.m_state[i];
+				//}
+				//for (ndInt32 i = 0; i < actionDim; ++i)
+				//{
+				//	input[i + statesDim] = output[i];
+				//}
+				//m_agent->m_critic0.CalculateInputGradients(input, input);
+				//
+				//for (ndInt32 i = 0; i < actionDim; ++i)
+				//{
+				//	loss[i] = input[statesDim + i];
+				//}
 			}
 
 			ndBrainTrainer& m_actorTrainer;
