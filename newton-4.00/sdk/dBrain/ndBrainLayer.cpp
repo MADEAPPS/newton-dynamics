@@ -99,11 +99,6 @@ void ndBrainLayer::Blend(const ndBrainLayer&, ndReal)
 	ndAssert(0);
 }
 
-void ndBrainLayer::Load(const ndBrainLoad* const)
-{
-	ndAssert(0);
-}
-
 void ndBrainLayer::Save(const ndBrainSave* const) const
 {
 	ndAssert(0);

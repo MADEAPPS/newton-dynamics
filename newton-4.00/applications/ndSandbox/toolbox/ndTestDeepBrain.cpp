@@ -330,7 +330,7 @@ static void MnistTrainingSet()
 			ndBrainTrainer& trainer = *(*m_optimizers[0]);
 			ndBrainOptimizerAdam optimizer(&trainer);
 
-			for (ndInt32 i = 0; i < 200000; ++i)
+			for (ndInt32 i = 0; i < 500000; ++i)
 			{
 				ndInt32 priorityStart = ndMin(priorityIndexArray.GetCount(), 2);
 				for (ndInt32 j = 0; j < priorityStart; ++j)
@@ -368,6 +368,7 @@ static void MnistTrainingSet()
 								const ndBrainVector& input = (*trainingDigits)[i];
 								m_brain.MakePrediction(input, output);
 
+								//output.Sub(truth);
 								ndInt32 index = 0;
 								ndFloat32 maxProbability = 0.0f;
 								for (ndInt32 j = 0; j < output.GetCount(); j++)
@@ -378,7 +379,7 @@ static void MnistTrainingSet()
 										maxProbability = output[j];
 									}
 								}
-
+								
 								if (truth[index] < 0.5f)
 								{
 									priorityArray.PushBack(ndUnsigned32(i));
@@ -392,7 +393,7 @@ static void MnistTrainingSet()
 					for (ndInt32 j = 0; j < GetThreadCount(); ++j)
 					{
 						ndFixSizeArray<ndUnsigned32, 1024>& priorityArray = failPriorities[j];
-						for (ndInt32 k = priorityArray.GetCount() - 1; k; --k)
+						for (ndInt32 k = priorityArray.GetCount() - 1; k >= 0; --k)
 						{
 							priorityIndexArray.PushBack(priorityArray[k]);
 						}
@@ -482,5 +483,5 @@ void ndTestDeedBrian()
 
 	//ThreeLayersTwoInputsTwoOutputs();
 	MnistTrainingSet();
-	//MnistTestSet();
+	MnistTestSet();
 }
