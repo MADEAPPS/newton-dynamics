@@ -26,10 +26,10 @@
 #include "ndBrainVector.h"
 #include "ndBrainLoss.h"
 
-class ndBrainLeastSquareErrorLoss: public ndBrainLoss
+class ndBrainLossLeastSquaredError: public ndBrainLoss
 {
 	public:
-	ndBrainLeastSquareErrorLoss(ndInt32 size);
+	ndBrainLossLeastSquaredError(ndInt32 size);
 	void SetTruth(const ndBrainVector& truth);
 	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss);
 

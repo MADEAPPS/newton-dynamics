@@ -34,7 +34,6 @@
 
 //#define ND_HEAP_DEBUG_CHECK
 
-
 template <class dItem, class dKey>
 class ndHeap : public ndClassAlloc
 {
@@ -59,9 +58,9 @@ class ndHeap : public ndClassAlloc
 	bool SanityCheck();
 
 	protected:
-	struct dRecord
+	struct ndRecord
 	{
-		dRecord(dKey key, const dItem& obj)
+		ndRecord(dKey key, const dItem& obj)
 			:m_key(key)
 			,m_obj(obj)
 		{
@@ -71,13 +70,11 @@ class ndHeap : public ndClassAlloc
 		dItem m_obj;
 	};
 
-	dRecord* m_pool;
+	ndRecord* m_pool;
 	ndInt32 m_curCount;
 	ndInt32 m_maxCount;
 	bool m_bufferIsOwnned;
 };
-
-
 
 // *************************
 //
@@ -88,7 +85,7 @@ class ndHeap : public ndClassAlloc
 template <class dItem, class dKey>
 ndHeap<dItem, dKey>::ndHeap(ndInt32 maxElements)
 	:ndClassAlloc()
-	,m_pool((dRecord *)ndMemory::Malloc(maxElements * sizeof(dRecord)))
+	,m_pool((ndRecord *)ndMemory::Malloc(maxElements * sizeof(ndRecord)))
 	,m_curCount(0)
 	,m_maxCount(maxElements)
 	,m_bufferIsOwnned(true)
@@ -99,9 +96,9 @@ ndHeap<dItem, dKey>::ndHeap(ndInt32 maxElements)
 template <class dItem, class dKey>
 ndHeap<dItem, dKey>::ndHeap(const void * const buffer, ndInt32 sizeInBytes)
 	:ndClassAlloc()
-	,m_pool((dRecord *)buffer)
+	,m_pool((ndRecord *)buffer)
 	,m_curCount(0)
-	,m_maxCount(ndInt32(sizeInBytes / sizeof(dRecord)))
+	,m_maxCount(ndInt32(sizeInBytes / sizeof(ndRecord)))
 	,m_bufferIsOwnned(false)
 {
 	Flush();

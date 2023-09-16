@@ -265,11 +265,11 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 {
 	auto PropagateBash = ndMakeObject::ndFunction([this, &shuffleBuffer](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		class Loss: public ndBrainLeastSquareErrorLoss
+		class Loss: public ndBrainLossLeastSquaredError
 		{
 			public:
 			Loss(ndBrainTrainer& trainer, ndBrainAgentDDPG_Trainer<statesDim, actionDim>* const agent, ndReal discountFactor)
-				:ndBrainLeastSquareErrorLoss(trainer.GetBrain()->GetOutputSize())
+				:ndBrainLossLeastSquaredError(trainer.GetBrain()->GetOutputSize())
 				,m_criticTrainer(trainer)
 				,m_agent(agent)
 				,m_reward(0.0f)
@@ -297,7 +297,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 				criticOutput[0] = targetValue;
 				
 				SetTruth(criticOutput);
-				ndBrainLeastSquareErrorLoss::GetLoss(output, loss);
+				ndBrainLossLeastSquaredError::GetLoss(output, loss);
 			}
 
 			ndBrainTrainer& m_criticTrainer;

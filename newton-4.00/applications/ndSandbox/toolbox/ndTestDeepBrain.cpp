@@ -71,7 +71,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	{
 		ndBrainTrainer& trainer = *(*trainers[threadIndex]);
 		trainer.ClearGradientsAcc();
-		ndBrainLeastSquareErrorLoss loss(trainer.GetBrain()->GetOutputSize());
+		ndBrainLossLeastSquaredError loss(trainer.GetBrain()->GetOutputSize());
 		const ndStartEnd startEnd(bashSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -296,17 +296,17 @@ static void MnistTrainingSet()
 			
 			auto BackPropagateBash = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &shuffleBashBuffer](ndInt32 threadIndex, ndInt32 threadCount)
 			{
-				class Loss : public ndBrainLeastSquareErrorLoss
+				class Loss : public ndBrainLossLeastSquaredError
 				{
 					public:
 					Loss(ndInt32 size)
-						:ndBrainLeastSquareErrorLoss(size)
+						:ndBrainLossLeastSquaredError(size)
 					{
 					}
 				
 					void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 					{
-						ndBrainLeastSquareErrorLoss::GetLoss(output, loss);
+						ndBrainLossLeastSquaredError::GetLoss(output, loss);
 					}
 				
 					const ndBrainMatrix* m_trainingLabels;
@@ -352,6 +352,9 @@ static void MnistTrainingSet()
 				if (i % 2000 == 0)
 				{
 					ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 1024>, D_MAX_THREADS_COUNT> failPriorities;
+
+					
+					
 					auto CrossValidate = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &failPriorities](ndInt32 threadIndex, ndInt32 threadCount)
 					{
 						ndReal outputBuffer[32];

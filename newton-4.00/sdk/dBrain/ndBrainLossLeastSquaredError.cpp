@@ -22,19 +22,19 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLossLeastSquaredError.h"
 
-ndBrainLeastSquareErrorLoss::ndBrainLeastSquareErrorLoss(ndInt32 size)
+ndBrainLossLeastSquaredError::ndBrainLossLeastSquaredError(ndInt32 size)
 	:ndBrainLoss()
 {
 	m_truth.SetCount(size);
 }
 
-void ndBrainLeastSquareErrorLoss::SetTruth(const ndBrainVector& truth)
+void ndBrainLossLeastSquaredError::SetTruth(const ndBrainVector& truth)
 {
 	ndAssert(m_truth.GetCount() == truth.GetCount());
 	m_truth.Set(truth);
 }
 
-void ndBrainLeastSquareErrorLoss::GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+void ndBrainLossLeastSquaredError::GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 {
 	ndAssert(output.GetCount() == loss.GetCount());
 	ndAssert(m_truth.GetCount() == loss.GetCount());

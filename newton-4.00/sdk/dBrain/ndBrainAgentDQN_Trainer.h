@@ -120,8 +120,9 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const ndS
 	SetThreadCount(threadCount);
 	for (ndInt32 i = 0; i < GetThreadCount(); ++i)
 	{
+		ndAssert(0);
 		m_actorOptimizer.PushBack(new ndBrainTrainer(*m_actor));
-		m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(D_DQN_REGULARIZER);
+		//m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(D_DQN_REGULARIZER);
 	}
 
 	SetBufferSize(D_DQN_REPLAY_BUFFERSIZE);
@@ -202,11 +203,11 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 
 	auto PropagateBash = ndMakeObject::ndFunction([this, &shuffleBuffer](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		class Loss: public ndBrainLeastSquareErrorLoss
+		class Loss: public ndBrainLossLeastSquaredError
 		{
 			public:
 			Loss(ndBrainTrainer& trainer, ndBrainAgentDQN_Trainer<statesDim, actionDim>* const agent)
-				:ndBrainLeastSquareErrorLoss(trainer.GetBrain()->GetOutputSize())
+				:ndBrainLossLeastSquaredError(trainer.GetBrain()->GetOutputSize())
 				,m_trainer(trainer)
 				,m_agent(agent)
 				,m_index(0)
@@ -247,7 +248,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 				}
 
 				SetTruth(action);
-				ndBrainLeastSquareErrorLoss::GetLoss(output, loss);
+				ndBrainLossLeastSquaredError::GetLoss(output, loss);
 			}
 
 			ndBrainTrainer& m_trainer;
@@ -277,21 +278,22 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 		}
 	});
 
-	auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		ndBrainTrainer& trainer = *(*m_actorOptimizer[0]);
-		for (ndInt32 i = 1; i < threadCount; ++i)
-		{
-			ndBrainTrainer& srcTrainer = *(*m_actorOptimizer[i]);
-			trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
-		}
-	});
+	ndAssert(0);
+	//auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	ndBrainTrainer& trainer = *(*m_actorOptimizer[0]);
+	//	for (ndInt32 i = 1; i < threadCount; ++i)
+	//	{
+	//		ndBrainTrainer& srcTrainer = *(*m_actorOptimizer[i]);
+	//		trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
+	//	}
+	//});
 
 	ndBrainThreadPool::ParallelExecute(PropagateBash);
-	ndBrainThreadPool::ParallelExecute(AccumulateWeight);
-	m_actorOptimizer[0]->UpdateWeights(m_learnRate, m_bashBufferSize);
-	m_actorOptimizer[0]->ClampWeights(ndReal(100.0f));
-	m_actorOptimizer[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
+	//ndBrainThreadPool::ParallelExecute(AccumulateWeight);
+	//m_actorOptimizer[0]->UpdateWeights(m_learnRate, m_bashBufferSize);
+	//m_actorOptimizer[0]->ClampWeights(ndReal(100.0f));
+	//m_actorOptimizer[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
 
 	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
 	{
