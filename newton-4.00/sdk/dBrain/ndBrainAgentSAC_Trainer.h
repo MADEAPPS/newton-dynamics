@@ -481,20 +481,21 @@ void ndBrainAgentSAC_Trainer<statesDim, actionDim>::BackPropagateActor(const ndU
 		}
 	});
 
-	auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		ndBrainTrainer& trainer = *(*m_actorOptimizer[0]);
-		for (ndInt32 i = 1; i < threadCount; ++i)
-		{
-			ndBrainTrainer& srcTrainer = *(*m_actorOptimizer[i]);
-			trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
-		}
-	});
+	ndAssert(0);
+	//auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	ndBrainTrainer& trainer = *(*m_actorOptimizer[0]);
+	//	for (ndInt32 i = 1; i < threadCount; ++i)
+	//	{
+	//		ndBrainTrainer& srcTrainer = *(*m_actorOptimizer[i]);
+	//		trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
+	//	}
+	//});
 
 	ParallelExecute(PropagateBash);
-	ParallelExecute(AccumulateWeight);
-	m_actorOptimizer[0]->UpdateWeights(-m_actorLearnRate, m_bashBufferSize);
-	m_actorOptimizer[0]->ClampWeights(ndReal(100.0f));
+	//ParallelExecute(AccumulateWeight);
+	//m_actorOptimizer[0]->UpdateWeights(-m_actorLearnRate, m_bashBufferSize);
+	//m_actorOptimizer[0]->ClampWeights(ndReal(100.0f));
 
 	m_actorOptimizer[0]->DropOutWeights(ndReal(1.0e-6f), ndReal(1.0e-6f));
 }
