@@ -27,7 +27,7 @@
 #include "ndBrainAgent.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainReplayBuffer.h"
-
+#include "ndBrainLossLeastSquaredError.h"
 
 // this is an implementation of the vanilla deep deterministic 
 // policy gradient for continues control re enforcement learning.  

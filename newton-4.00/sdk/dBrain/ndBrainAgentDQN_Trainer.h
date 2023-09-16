@@ -27,6 +27,7 @@
 #include "ndBrainAgent.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainReplayBuffer.h"
+#include "ndBrainLossLeastSquaredError.h"
 
 // this is an implementation of the vanilla dqn agent trainer as described 
 // on the nature paper below. 

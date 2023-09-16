@@ -27,6 +27,7 @@
 #include "ndBrainAgent.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainReplayBuffer.h"
+#include "ndBrainLossLeastSquaredError.h"
 
 // this is an implementation of more stable policy gradient for
 // continues action controller using deep re enforcement learning. 
