@@ -58,7 +58,7 @@ void ndBrainAgent::SaveToFile(const char* const pathFilename) const
 		{
 			if (m_file)
 			{
-				fprintf(m_file, data);
+				fprintf(m_file, "%s", data);
 			}
 		}
 
