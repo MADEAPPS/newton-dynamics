@@ -19,16 +19,16 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	//ndInt32 hiddenNeurons = 8;
 
 	ndFixSizeArray<ndBrainLayer*, 16> layers;
-	layers.PushBack(new ndBrainLayerLineal(2, hiddenNeurons));
+	layers.PushBack(new ndBrainLayerLinear(2, hiddenNeurons));
 	layers.PushBack(new ndBrainLayerTanhActivation(hiddenNeurons));
 
-	layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenNeurons));
+	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenNeurons));
 	layers.PushBack(new ndBrainLayerTanhActivation(hiddenNeurons));
 
-	layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenNeurons));
+	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenNeurons));
 	layers.PushBack(new ndBrainLayerTanhActivation(hiddenNeurons));
 
-	layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOutputSize(), 2));
+	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 2));
 	layers.PushBack(new ndBrainLayerSigmoidActivation(2));
 	
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
@@ -523,16 +523,16 @@ static void MnistTrainingSet()
 		ndInt32 neuronsPerLayers = 64;
 		ndFixSizeArray<ndBrainLayer*, 16> layers;
 
-		layers.PushBack(new ndBrainLayerLineal(trainingDigits->GetColumns(), neuronsPerLayers));
+		layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), neuronsPerLayers));
 		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-		layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-		layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-		layers.PushBack(new ndBrainLayerLineal(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
+		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerSigmoidActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 	
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)

@@ -22,9 +22,9 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainLayerLineal.h"
+#include "ndBrainLayerLinear.h"
 
-ndBrainLayerLineal::ndBrainLayerLineal(ndInt32 inputs, ndInt32 outputs)
+ndBrainLayerLinear::ndBrainLayerLinear(ndInt32 inputs, ndInt32 outputs)
 	:ndBrainLayer()
 	,m_bias()
 	,m_weights(outputs, inputs)
@@ -32,65 +32,65 @@ ndBrainLayerLineal::ndBrainLayerLineal(ndInt32 inputs, ndInt32 outputs)
 	m_bias.SetCount(outputs);
 }
 
-ndBrainLayerLineal::ndBrainLayerLineal(const ndBrainLayerLineal& src)
+ndBrainLayerLinear::ndBrainLayerLinear(const ndBrainLayerLinear& src)
 	:ndBrainLayer(src)
 	,m_bias(src.m_bias)
 	,m_weights(src.m_weights)
 {
 }
 
-ndBrainLayerLineal::~ndBrainLayerLineal()
+ndBrainLayerLinear::~ndBrainLayerLinear()
 {
 }
 
-const char* ndBrainLayerLineal::GetLabelId() const
+const char* ndBrainLayerLinear::GetLabelId() const
 {
-	return "ndBrainLayerLineal";
+	return "ndBrainLayerLinear";
 }
 
-ndBrainLayer* ndBrainLayerLineal::Clone() const
+ndBrainLayer* ndBrainLayerLinear::Clone() const
 {
-	return new ndBrainLayerLineal(*this);
+	return new ndBrainLayerLinear(*this);
 }
 
-ndInt32 ndBrainLayerLineal::GetOutputSize() const
+ndInt32 ndBrainLayerLinear::GetOutputSize() const
 {
 	ndAssert(m_bias.GetCount() == m_weights.GetRows());
 	return m_bias.GetCount();
 }
 
-ndInt32 ndBrainLayerLineal::GetInputSize() const
+ndInt32 ndBrainLayerLinear::GetInputSize() const
 {
 	return m_weights.GetColumns();
 }
 
-ndBrainVector* ndBrainLayerLineal::GetBias()
+ndBrainVector* ndBrainLayerLinear::GetBias()
 {
 	return &m_bias;
 }
 
-ndBrainMatrix* ndBrainLayerLineal::GetWeights()
+ndBrainMatrix* ndBrainLayerLinear::GetWeights()
 {
 	return &m_weights;
 }
 
-bool ndBrainLayerLineal::HasParameters() const
+bool ndBrainLayerLinear::HasParameters() const
 {
 	return true;
 }
 
-void ndBrainLayerLineal::InitWeightsXavierMethod()
+void ndBrainLayerLinear::InitWeightsXavierMethod()
 {
 	ndReal weighVariance = ndReal(ndSqrt(ndFloat32(6.0f) / ndFloat32(GetInputSize() + GetOutputSize())));
 	InitWeights(weighVariance, ndReal(0.0f));
 }
 
-void ndBrainLayerLineal::InitGaussianBias(ndReal variance)
+void ndBrainLayerLinear::InitGaussianBias(ndReal variance)
 {
 	m_bias.InitGaussianWeights(variance);
 }
 
-void ndBrainLayerLineal::InitGaussianWeights(ndReal variance)
+void ndBrainLayerLinear::InitGaussianWeights(ndReal variance)
 {
 	for (ndInt32 i = m_weights.GetCount() - 1; i >= 0; --i)
 	{
@@ -98,7 +98,7 @@ void ndBrainLayerLineal::InitGaussianWeights(ndReal variance)
 	}
 }
 
-void ndBrainLayerLineal::InitWeights(ndReal weighVariance, ndReal biasVariance)
+void ndBrainLayerLinear::InitWeights(ndReal weighVariance, ndReal biasVariance)
 {
 	biasVariance = ndMin(biasVariance, ndReal(0.5f));
 	weighVariance = ndMin(weighVariance, ndReal(0.5f));
@@ -106,31 +106,31 @@ void ndBrainLayerLineal::InitWeights(ndReal weighVariance, ndReal biasVariance)
 	InitGaussianWeights(weighVariance);
 }
 
-void ndBrainLayerLineal::CopyFrom(const ndBrainLayer& src)
+void ndBrainLayerLinear::CopyFrom(const ndBrainLayer& src)
 {
-	const ndBrainLayerLineal& linealSrc = (ndBrainLayerLineal&)src;
-	m_bias.Set(linealSrc.m_bias);
-	m_weights.Set(linealSrc.m_weights);
+	const ndBrainLayerLinear& linearSrc = (ndBrainLayerLinear&)src;
+	m_bias.Set(linearSrc.m_bias);
+	m_weights.Set(linearSrc.m_weights);
 }
 
-void ndBrainLayerLineal::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+void ndBrainLayerLinear::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	m_weights.Mul(input, output);
 	output.Add(m_bias);
 }
 
-void ndBrainLayerLineal::ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const
+void ndBrainLayerLinear::ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const
 {
 	gradBiasAcc.Set(ndReal (0.0f));
 	gradWeightAcc.Set(ndReal(0.0f));
 }
 
-void ndBrainLayerLineal::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerLinear::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	m_weights.TransposeMul(outputDerivative, inputDerivative);
 }
 
-void ndBrainLayerLineal::CalculateParamGradients(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative,
+void ndBrainLayerLinear::CalculateParamGradients(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative,
 	ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient)
 {
 	ndAssert(biasGradient.GetCount() == outputDerivative.GetCount());
@@ -143,7 +143,7 @@ void ndBrainLayerLineal::CalculateParamGradients(const ndBrainVector& input, con
 	InputDerivative(output, outputDerivative, inputGradient);
 }
 
-void ndBrainLayerLineal::Save(const ndBrainSave* const loadSave) const
+void ndBrainLayerLinear::Save(const ndBrainSave* const loadSave) const
 {
 	char buffer[1024];
 	auto Save = [this, &buffer, &loadSave](const char* const fmt, ...)
@@ -179,7 +179,7 @@ void ndBrainLayerLineal::Save(const ndBrainSave* const loadSave) const
 	}
 }
 
-ndBrainLayerLineal* ndBrainLayerLineal::Load(const ndBrainLoad* const loadSave)
+ndBrainLayerLinear* ndBrainLayerLinear::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
 	loadSave->ReadString(buffer);
@@ -188,7 +188,7 @@ ndBrainLayerLineal* ndBrainLayerLineal::Load(const ndBrainLoad* const loadSave)
 	ndInt32 inputs = loadSave->ReadInt();
 	loadSave->ReadString(buffer);
 	ndInt32 outputs = loadSave->ReadInt();
-	ndBrainLayerLineal* const layer = new ndBrainLayerLineal(inputs, outputs);
+	ndBrainLayerLinear* const layer = new ndBrainLayerLinear(inputs, outputs);
 
 	loadSave->ReadString(buffer);
 	for (ndInt32 i = 0; i < outputs; ++i)

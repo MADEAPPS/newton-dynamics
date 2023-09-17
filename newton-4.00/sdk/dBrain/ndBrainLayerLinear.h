@@ -19,20 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_LINEAL_H__
-#define _ND_BRAIN_LAYER_LINEAL_H__
+#ifndef _ND_BRAIN_LAYER_LINEAR_H__
+#define _ND_BRAIN_LAYER_LINEAR_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 
-class ndBrainLayerLineal : public ndBrainLayer
+class ndBrainLayerLinear : public ndBrainLayer
 {
 	public: 
-	ndBrainLayerLineal(ndInt32 inputs, ndInt32 outputs);
-	ndBrainLayerLineal(const ndBrainLayerLineal& src);
-	virtual ~ndBrainLayerLineal();
+	ndBrainLayerLinear(ndInt32 inputs, ndInt32 outputs);
+	ndBrainLayerLinear(const ndBrainLayerLinear& src);
+	virtual ~ndBrainLayerLinear();
 	virtual ndBrainLayer* Clone() const;
 
 	virtual bool HasParameters() const;
@@ -56,7 +56,7 @@ class ndBrainLayerLineal : public ndBrainLayer
 	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const;
 
 	virtual void Save(const ndBrainSave* const loadSave) const;
-	static ndBrainLayerLineal* Load(const ndBrainLoad* const loadSave);
+	static ndBrainLayerLinear* Load(const ndBrainLoad* const loadSave);
 	
 	private:
 	void InitGaussianBias(ndReal variance);

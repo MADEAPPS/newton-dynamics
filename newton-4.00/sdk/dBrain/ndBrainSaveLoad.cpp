@@ -22,7 +22,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainLayerLineal.h"
+#include "ndBrainLayerLinear.h"
 #include "ndBrainLayerReluActivation.h"
 #include "ndBrainLayerTanhActivation.h"
 #include "ndBrainLayerSoftmaxActivation.h"
@@ -95,9 +95,9 @@ ndBrain* ndBrainLoad::Load() const
 		ReadString(layerType);
 	
 		ndBrainLayer* layer = nullptr;
-		if (!strcmp(layerType, "ndBrainLayerLineal"))
+		if (!strcmp(layerType, "ndBrainLayerLinear"))
 		{
-			layer = ndBrainLayerLineal::Load(this);
+			layer = ndBrainLayerLinear::Load(this);
 		}
 		else if (!strcmp(layerType, "ndBrainLayerReluActivation"))
 		{
