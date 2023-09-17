@@ -28,6 +28,12 @@ ndBrainOptimizer::ndBrainOptimizer(ndBrainTrainer* const trainer)
 	,m_trainer(trainer)
 	,m_weighDecayRegularizer(ndReal(1.0e-5f))
 {
+	//m_weighDecayRegularizer = ndReal(1.0e-4f);
+	//m_weighDecayRegularizer = ndReal(5.0e-5f);
+	//m_weighDecayRegularizer = ndReal(2.5e-5f);
+	// so far best training result on the mnist data set
+	//m_weighDecayRegularizer = ndReal(2.0e-5f); 
+	//m_weighDecayRegularizer = ndReal(3.0e-5f); 
 }
 
 ndBrainOptimizer::~ndBrainOptimizer()
@@ -43,7 +49,6 @@ void ndBrainOptimizer::SetRegularizer(ndReal regularizer)
 {
 	m_weighDecayRegularizer = ndClamp(regularizer, ndReal(0.0f), ndReal(0.01f));
 }
-
 
 void ndBrainOptimizer::Update(ndReal, ndInt32)
 {

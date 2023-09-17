@@ -265,7 +265,6 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 	ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
 }
 
-//#define USE_FAIL_DIGIT_ONLY
 static void MnistTrainingSet()
 {
 	ndSharedPtr<ndBrainMatrix> trainingLabels (LoadMnistLabelData("mnistDatabase/train-labels.idx1-ubyte"));
@@ -332,13 +331,9 @@ static void MnistTrainingSet()
 			ndBrainTrainer& trainer = *(*m_optimizers[0]);
 			ndBrainOptimizerAdam optimizer(&trainer);
 
-			#ifndef USE_FAIL_DIGIT_ONLY
-			ndFixSizeArray<ndUpHeap<ndInt32, ndReal>*, D_MAX_THREADS_COUNT> failPriorities;
-			for (ndInt32 i = 0; i < GetThreadCount(); ++i)
-			{
-				failPriorities.PushBack(new ndUpHeap<ndInt32, ndReal>(1024));
-			}
-			#endif
+			// so far best training result on the mnist data set
+			//optimizer.SetRegularizer(ndReal(2.0e-5f));
+			optimizer.SetRegularizer(ndReal(2.0e-5f));
 
 			for (ndInt32 i = 0; i < 1000000; ++i)
 			{
@@ -359,10 +354,9 @@ static void MnistTrainingSet()
 				}
 				optimizer.Update(ndReal(1.0e-3f), m_bashBufferSize);
 
-				if (i % 2000 == 0)
+				if ((i % 1024) == 0)
 				{
 					ndInt32 failCount[D_MAX_THREADS_COUNT];
-				#ifdef USE_FAIL_DIGIT_ONLY
 					ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 1024>, D_MAX_THREADS_COUNT> failPriorities;
 					auto CrossValidate = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &failPriorities, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
 					{
@@ -412,78 +406,6 @@ static void MnistTrainingSet()
 						}
 					}
 
-				#else
-
-					auto BuildPriorityBash = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &failPriorities, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
-					{
-						ndReal outputBuffer[32];
-						ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
-						ndUpHeap<ndInt32, ndReal>& priorityArray = *failPriorities[threadIndex];
-						priorityArray.Flush();
-
-						failCount[threadIndex] = 0;
-						const ndStartEnd startEnd(trainingDigits->GetCount(), threadIndex, threadCount);
-						for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-						{
-							const ndBrainVector& truth = (*trainingLabels)[i];
-							const ndBrainVector& input = (*trainingDigits)[i];
-							m_brain.MakePrediction(input, output);
-
-							ndInt32 index = 0;
-							ndFloat32 maxProbability = 0.0f;
-							for (ndInt32 j = 0; j < output.GetCount(); j++)
-							{
-								if (output[j] > maxProbability)
-								{
-									index = j;
-									maxProbability = output[j];
-								}
-							}
-
-							ndReal penalty = ndReal(0.0f);
-							if (truth[index] < 0.5f)
-							{
-								penalty = ndReal(100.0f);
-								failCount[threadIndex]++;
-							}
-
-							output.Sub(truth);
-							ndReal error2 = output.Dot(output) + penalty;
-							if (!priorityArray.GetCount() || (error2 > priorityArray.Value()))
-							{
-								if (priorityArray.GetCount() >= priorityArray.GetMaxCount())
-								{
-									priorityArray.Pop();
-								}
-								priorityArray.Push(i, error2);
-							}
-						}
-						priorityArray.Sort();
-					});
-
-					ndBrainThreadPool::ParallelExecute(BuildPriorityBash);
-					priorityIndexArray.SetCount(0);
-					for (ndInt32 j = 0; j < 1024; ++j)
-					{
-						ndInt32 index = -1;
-						ndReal error = ndReal(-1.0f);
-						for (ndInt32 k = failPriorities.GetCount() - 1; k >= 0; --k)
-						{
-							ndUpHeap<ndInt32, ndReal>& priorityArray = *failPriorities[k];
-							ndInt32 posit = priorityArray.GetCount() - 1;
-							if (priorityArray.Value(posit) > error)
-							{
-								index = k;
-								error = priorityArray.Value(posit);
-							}
-						}
-						ndUpHeap<ndInt32, ndReal>& priorityArray = *failPriorities[index];
-						ndInt32 posit = priorityArray.GetCount() - 1;
-						priorityIndexArray.PushBack(ndUnsigned32(priorityArray[posit]));
-						priorityArray.Remove(posit);
-					}
-				#endif
-
 					ndInt32 fails = 0;
 					for (ndInt32 j = 0; j < GetThreadCount(); ++j)
 					{
@@ -502,13 +424,6 @@ static void MnistTrainingSet()
 				}
 			}
 			m_brain.CopyFrom(bestBrain);
-
-			#ifndef USE_FAIL_DIGIT_ONLY
-			for (ndInt32 i = 0; i < GetThreadCount(); ++i)
-			{
-				delete failPriorities[i];
-			}
-			#endif
 		}
 
 		ndBrain& m_brain;
@@ -551,7 +466,6 @@ static void MnistTrainingSet()
 		
 		ndBrainSave::Save(&brain, path);
 		ValidateData("training data", brain, *trainingLabels, *trainingDigits);
-		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 }
