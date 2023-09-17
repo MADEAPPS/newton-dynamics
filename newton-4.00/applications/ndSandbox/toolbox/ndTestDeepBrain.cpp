@@ -262,7 +262,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 	ndExpandTraceMessage("%s\n", title);
 	ndExpandTraceMessage("num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());
 	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testDigits->GetCount());
-	ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
+	ndExpandTraceMessage("success rate %g%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
 }
 
 static void MnistTrainingSet()
@@ -333,9 +333,10 @@ static void MnistTrainingSet()
 
 			// so far best training result on the mnist data set
 			//optimizer.SetRegularizer(ndReal(2.0e-5f));
-			optimizer.SetRegularizer(ndReal(2.0e-5f));
+			optimizer.SetRegularizer(ndReal(2.5e-5f));
 
-			for (ndInt32 i = 0; i < 1000000; ++i)
+			bool firstPass = true;
+			for (ndInt32 i = 0; i < 2000000; ++i)
 			{
 				ndInt32 priorityStart = ndMin(priorityIndexArray.GetCount(), 2);
 				for (ndInt32 j = 0; j < priorityStart; ++j)
@@ -358,7 +359,7 @@ static void MnistTrainingSet()
 				{
 					ndInt32 failCount[D_MAX_THREADS_COUNT];
 					ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 1024>, D_MAX_THREADS_COUNT> failPriorities;
-					auto CrossValidate = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &failPriorities, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
+					auto CrossValidate = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &failPriorities, &failCount, firstPass](ndInt32 threadIndex, ndInt32 threadCount)
 					{
 						ndReal outputBuffer[32];
 						ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
@@ -369,14 +370,14 @@ static void MnistTrainingSet()
 						const ndStartEnd startEnd(trainingDigits->GetCount(), threadIndex, threadCount);
 						for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 						{
-							if (priorityArray.GetCount() < priorityArray.GetCapacity())
+							if (firstPass || (priorityArray.GetCount() < priorityArray.GetCapacity()))
 							{
 								const ndBrainVector& truth = (*trainingLabels)[i];
 								const ndBrainVector& input = (*trainingDigits)[i];
 								m_brain.MakePrediction(input, output);
 
 								ndInt32 index = 0;
-								ndFloat32 maxProbability = 0.0f;
+								ndReal maxProbability = ndReal (0.0f);
 								for (ndInt32 j = 0; j < output.GetCount(); j++)
 								{
 									if (output[j] > maxProbability)
@@ -386,17 +387,21 @@ static void MnistTrainingSet()
 									}
 								}
 								
-								if (truth[index] < 0.5f)
+								if (truth[index] < ndReal (0.5f))
 								{
 									failCount[threadIndex]++;
-									priorityArray.PushBack(ndUnsigned32(i));
+									if (priorityArray.GetCount() < priorityArray.GetCapacity())
+									{
+										priorityArray.PushBack(ndUnsigned32(i));
+									}
 								}
 							}
 						}
 					});
-
-					priorityIndexArray.SetCount(0);
 					ndBrainThreadPool::ParallelExecute(CrossValidate);
+
+					firstPass = false;
+					priorityIndexArray.SetCount(0);
 					for (ndInt32 j = 0; j < GetThreadCount(); ++j)
 					{
 						ndFixSizeArray<ndUnsigned32, 1024>& priorityArray = failPriorities[j];
@@ -416,7 +421,7 @@ static void MnistTrainingSet()
 					{
 						bestBrain.CopyFrom(m_brain);
 						minFail = fails;
-						ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(trainingDigits->GetCount() - minFail) * 100.0f / (ndFloat32)trainingDigits->GetCount());
+						ndExpandTraceMessage("success rate: %g%%   ", (ndFloat32)(trainingDigits->GetCount() - minFail) * 100.0f / (ndFloat32)trainingDigits->GetCount());
 						ndExpandTraceMessage("failed count: %d   ", minFail);
 						ndExpandTraceMessage("steps: %d", i);
 						ndExpandTraceMessage("\n");
@@ -466,7 +471,7 @@ static void MnistTrainingSet()
 		
 		ndBrainSave::Save(&brain, path);
 		ValidateData("training data", brain, *trainingLabels, *trainingDigits);
-		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
+		ndExpandTraceMessage("time %g (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 }
 
@@ -484,7 +489,7 @@ static void MnistTestSet()
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		ValidateData("test data", *(*brain), *testLabels, *testDigits);
 		time = ndGetTimeInMicroseconds() - time;
-		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
+		ndExpandTraceMessage("time %g (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 }
 
