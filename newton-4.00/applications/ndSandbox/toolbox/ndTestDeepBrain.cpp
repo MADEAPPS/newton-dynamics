@@ -498,6 +498,6 @@ void ndTestDeedBrian()
 	ndSetRandSeed(12345);
 
 	//ThreeLayersTwoInputsTwoOutputs();
-	MnistTrainingSet();
+	//MnistTrainingSet();
 	MnistTestSet();
 }
