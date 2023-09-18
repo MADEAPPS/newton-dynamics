@@ -89,7 +89,7 @@ namespace ndController_0
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
 				{
-					m_outFile = fopen("traingPerf.csv", "wb");
+					m_outFile = fopen("cartpole-DQN.csv", "wb");
 					InitWeights();
 				}
 
@@ -248,10 +248,10 @@ namespace ndController_0
 					,m_averageFramesPerEpisodes()
 				{
 					#ifdef D_USE_TD3
-					m_outFile = fopen("traingPerf-TD3.csv", "wb");
+					m_outFile = fopen("cartpole-TD3.csv", "wb");
 					fprintf(m_outFile, "td3\n");
 					#else
-					m_outFile = fopen("traingPerf-DDPG.csv", "wb");
+					m_outFile = fopen("cartpole-DDPG.csv", "wb");
 					fprintf(m_outFile, "ddpg\n");
 					#endif
 

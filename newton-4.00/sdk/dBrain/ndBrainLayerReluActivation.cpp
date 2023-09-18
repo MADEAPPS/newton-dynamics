@@ -50,8 +50,6 @@ void ndBrainLayerReluActivation::MakePrediction(const ndBrainVector& input, ndBr
 	{
 		output[i] = (input[i] > ndReal(0.0f)) ? input[i] : ndReal(0.0f);
 		ndAssert(ndCheckFloat(output[i]));
-		ndAssert(output[i] <= ndReal(1.0f));
-		ndAssert(output[i] >= ndReal(-1.0f));
 	}
 }
 

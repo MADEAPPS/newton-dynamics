@@ -43,7 +43,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 		HyperParameters()
 		{
 			m_discountFactor = ndReal(0.99f);
-			m_regularizer = ndReal(1.0e-6f);
+			m_regularizer = ndReal(1.0e-5f);
 			m_learnRate = ndReal(0.001f);
 			m_bashBufferSize = 64;
 			m_replayBufferSize = 1024 * 512;

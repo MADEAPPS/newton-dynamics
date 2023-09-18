@@ -22,6 +22,8 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainMatrix.h"
 
+#define D_BRAIN_MATRIX_ALIGNMENT 16
+
 ndBrainMatrix::ndBrainMatrix()
 	:ndArray<ndBrainMemVector>()
 	,m_memory(nullptr)
@@ -63,14 +65,13 @@ void ndBrainMatrix::Init(ndInt32 rows, ndInt32 columns)
 	m_size = rows;
 	m_capacity = rows + 1;
 
-	ndInt32 padding = 32;
-	ndInt32 columSizeInBytes = (ndInt32(columns * sizeof(ndReal)) + padding - 1) & -padding;
+	ndInt32 strideInBytes = (ndInt32(columns * sizeof(ndReal)) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT;
 	ndInt32 size = ndInt32 (rows * sizeof(ndBrainMemVector) + 256);
-	size += columSizeInBytes * rows;
+	size += strideInBytes * rows;
 	m_memory = (ndReal*)ndMemory::Malloc(size_t(size));
 	m_array = (ndBrainMemVector*)m_memory;
 
-	ndInt32 bytes = ndInt32((rows * sizeof(ndBrainMemVector) + padding - 1) & -padding);
+	ndInt32 bytes = ndInt32((rows * sizeof(ndBrainMemVector) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT);
 	ndInt8* ptr = (ndInt8*)m_memory + bytes;
 
 	ndBrainMatrix& me = *this;
@@ -79,18 +80,23 @@ void ndBrainMatrix::Init(ndInt32 rows, ndInt32 columns)
 		ndBrainMemVector& row = me[i];
 		row.SetSize(columns);
 		row.SetPointer((ndReal*) ptr);
-		ptr += columSizeInBytes;
-		ndAssert((bytes + columSizeInBytes * i) < size);
+		ptr += strideInBytes;
+		ndAssert((bytes + strideInBytes * i) < size);
 	}
 }
 
 void ndBrainMatrix::Set(ndReal value)
 {
-	ndBrainMatrix& me = *this;
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
-	{
-		me[i].Set(value);
-	}
+	ndBrainMatrix& matrix = *this;
+
+	ndInt32 strideInBytes = (ndInt32(GetColumns() * sizeof(ndReal)) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT;
+	ndInt32 size = GetCount() * strideInBytes / ndInt32(sizeof(ndReal));
+	ndReal* const ptr = &matrix[0][0];
+	ndMemSet(ptr, value, size);
+	//for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	//{
+	//	matrix[i].Set(value);
+	//}
 }
 
 void ndBrainMatrix::Set(const ndBrainMatrix& src)
@@ -98,17 +104,22 @@ void ndBrainMatrix::Set(const ndBrainMatrix& src)
 	ndAssert(src.GetRows() == GetRows());
 	ndAssert(src.GetColumns() == GetColumns());
 	ndBrainMatrix& matrix = *this;
-	//for (ndInt32 i = 0; i < src.GetRows(); ++i)
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
-	{
-		matrix[i].Set(src[i]);
-	}
+
+	ndInt32 strideInBytes = (ndInt32(GetColumns() * sizeof(ndReal)) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT;
+	ndInt32 size = GetCount() * strideInBytes / ndInt32(sizeof(ndReal));
+	ndReal* const dstData = &matrix[0][0];
+	const ndReal* const srcData = &src[0][0];
+	ndMemCpy(dstData, srcData, size);
+
+	//for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	//{
+	//	matrix[i].Set(src[i]);
+	//}
 }
 
 void ndBrainMatrix::Scale(ndReal scale)
 {
 	ndBrainMatrix& matrix = *this;
-	//for (ndInt32 i = 0; i < GetRows(); ++i)
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		matrix[i].Scale(scale);
@@ -118,7 +129,6 @@ void ndBrainMatrix::Scale(ndReal scale)
 void ndBrainMatrix::ScaleAdd(const ndBrainMatrix& src, ndReal scale)
 {
 	ndBrainMatrix& matrix = *this;
-	//for (ndInt32 i = 0; i < GetRows(); ++i)
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		matrix[i].ScaleAdd(src[i], scale);
@@ -130,7 +140,6 @@ void ndBrainMatrix::Add(const ndBrainMatrix& src)
 	ndAssert(src.GetRows() == GetRows());
 	ndAssert(src.GetColumns() == GetColumns());
 	ndBrainMatrix& matrix = *this;
-	//for (ndInt32 i = 0; i < src.GetRows(); ++i)
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		matrix[i].Add(src[i]);
@@ -142,7 +151,6 @@ void ndBrainMatrix::Blend(const ndBrainMatrix& src, ndReal blend)
 	ndAssert(src.GetRows() == GetRows());
 	ndAssert(src.GetColumns() == GetColumns());
 	ndBrainMatrix& matrix = *this;
-	//for (ndInt32 i = 0; i < src.GetRows(); ++i)
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		matrix[i].Blend(src[i], blend);
@@ -152,7 +160,6 @@ void ndBrainMatrix::Blend(const ndBrainMatrix& src, ndReal blend)
 void ndBrainMatrix::FlushToZero()
 {
 	ndBrainMatrix& matrix = *this;
-	//for (ndInt32 i = 0; i < GetRows(); ++i)
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		matrix[i].FlushToZero();
