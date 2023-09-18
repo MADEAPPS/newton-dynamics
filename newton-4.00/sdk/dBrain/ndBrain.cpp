@@ -161,7 +161,7 @@ void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& 
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
 		prefixScan.PushBack(sizeAcc);
-		sizeAcc += (layers[i]->GetInputSize() + 7) & -8;
+		sizeAcc += (layers[i]->GetOutputSize() + 7) & -8;
 		maxSize = ndMax(maxSize, layers[i]->GetOutputSize());
 	}
 	prefixScan.PushBack(sizeAcc);
