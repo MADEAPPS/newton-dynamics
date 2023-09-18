@@ -405,7 +405,7 @@ namespace ndController_1
 				if (agent->m_modelIsTrained)
 				{
 					char fileName[1024];
-					ndGetWorkingFileName("unicycle.nn", fileName);
+					ndGetWorkingFileName("unicycle.dnn", fileName);
 					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
 					m_agent = ndSharedPtr<ndBrainAgent>(new ndModelUnicycle::ndControllerAgent(actor));
 					((ndModelUnicycle::ndControllerAgent*)*m_agent)->SetModel(this);
@@ -567,11 +567,11 @@ namespace ndController_1
 			//hyperParameters.m_threadsCount = 1;
 
 			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(hyperParameters, actor, critic));
-			agent->SetName("unicycle.nn");
+			agent->SetName("unicycle.dnn");
 			scene->SetAcceleratedUpdate();
 		#else
 			char fileName[1024];
-			ndGetWorkingFileName("unicycle.nn", fileName);
+			ndGetWorkingFileName("unicycle.dnn", fileName);
 			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
 			ndSharedPtr<ndBrainAgent> agent(new  ndModelUnicycle::ndControllerAgent(actor));
 		#endif

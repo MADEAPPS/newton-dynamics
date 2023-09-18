@@ -467,7 +467,7 @@ static void MnistTrainingSet()
 		time = ndGetTimeInMicroseconds() - time;
 	
 		char path[256];
-		ndGetWorkingFileName("mnistDatabase/mnist.nn", path);
+		ndGetWorkingFileName("mnistDatabase/mnist.dnn", path);
 		
 		ndBrainSave::Save(&brain, path);
 		ValidateData("training data", brain, *trainingLabels, *trainingDigits);
@@ -483,7 +483,7 @@ static void MnistTestSet()
 	if (testLabels && testDigits)
 	{
 		char path[256];
-		ndGetWorkingFileName("mnistDatabase/mnist.nn", path);
+		ndGetWorkingFileName("mnistDatabase/mnist.dnn", path);
 		
 		ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
 		ndUnsigned64 time = ndGetTimeInMicroseconds();

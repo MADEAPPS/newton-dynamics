@@ -1148,14 +1148,14 @@ namespace ndQuadruped_1
 			// add a reinforcement learning controller 
 			ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			ndSharedPtr<ndBrainAgent> agent(new ndModelQuadruped::ndControllerAgent_trainer(hyperParameters, actor, critic));
-			agent->SetName("quadruped_1.nn");
+			agent->SetName("quadruped_1.dnn");
 
 			//char fileName[1024];
-			//ndGetWorkingFileName("quadruped_1.nn", fileName);
+			//ndGetWorkingFileName("quadruped_1.dnn", fileName);
 			//agent->SaveToFile(fileName);
 		#else
 			char fileName[1024];
-			ndGetWorkingFileName("quadruped_1.nn", fileName);
+			ndGetWorkingFileName("quadruped_1.dnn", fileName);
 			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
 			ndSharedPtr<ndBrainAgent> agent(new ndModelQuadruped::ndControllerAgent(actor));
 		#endif

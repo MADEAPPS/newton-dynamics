@@ -255,7 +255,6 @@ namespace ndController_0
 					fprintf(m_outFile, "ddpg\n");
 					#endif
 
-					//InitWeights(ndReal(0.25f), ndReal(0.0f));
 					InitWeights();
 				}
 
@@ -549,15 +548,15 @@ namespace ndController_0
 	ndModelArticulation* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		// build neural net controller
-		ndInt32 layerSize = 64;
+		ndInt32 hiddenLayersNewrons = 64;
+		ndFixSizeArray<ndBrainLayer*, 16> layers;
 		#ifdef D_USE_POLE_DQN
-			ndFixSizeArray<ndBrainLayer*, 16> layers;
 			ndSharedPtr<ndBrain> actor(new ndBrain());
 
-			layers.PushBack(new ndBrainLayerLinear(m_stateSize, layerSize));
+			layers.PushBack(new ndBrainLayerLinear(m_stateSize, hiddenLayersNewrons));
 			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), layerSize));
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
 			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
@@ -573,43 +572,58 @@ namespace ndController_0
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor));
 
 			char fileName[1024];
-			agent->SetName("cartpoleDQN.nn");
+			agent->SetName("cartpoleDQN.dnn");
 			ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
 
 		#else
 
+			layers.SetCount(0);
 			ndSharedPtr<ndBrain> actor(new ndBrain());
-			ndAssert(0);
-			//ndBrainLayerLinearActivated* const layer0 = new ndBrainLayerLinearActivated(m_stateSize, layerSize, m_tanh);
-			//ndBrainLayerLinearActivated* const layer1 = new ndBrainLayerLinearActivated(layer0->GetOutputSize(), layerSize, m_tanh);
-			//ndBrainLayerLinearActivated* const layer2 = new ndBrainLayerLinearActivated(layer1->GetOutputSize(), layerSize, m_tanh);
-			//ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(layer2->GetOutputSize(), m_actionsSize, m_tanh);
-			//actor->AddLayer(layer0);
-			//actor->AddLayer(layer1);
-			//actor->AddLayer(layer2);
-			//actor->AddLayer(ouputLayer);
 
+			layers.PushBack(new ndBrainLayerLinear(m_stateSize, hiddenLayersNewrons));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+			{
+				actor->AddLayer(layers[i]);
+			}
+			actor->InitWeightsXavierMethod();
 			
 			// the critic is more complex since is deal with more complex inputs
+			layers.SetCount(0);
 			ndSharedPtr<ndBrain> critic(new ndBrain());
-			ndAssert(0);
-			//ndBrainLayerLinearActivated* const criticLayer0 = new ndBrainLayerLinearActivated(m_stateSize + m_actionsSize, layerSize * 2, m_tanh);
-			//ndBrainLayerLinearActivated* const criticLayer1 = new ndBrainLayerLinearActivated(criticLayer0->GetOutputSize(), layerSize * 2, m_tanh);
-			//ndBrainLayerLinearActivated* const criticLayer2 = new ndBrainLayerLinearActivated(criticLayer1->GetOutputSize(), layerSize * 2, m_tanh);
-			//ndBrainLayerLinearActivated* const criticOuputLayer = new ndBrainLayerLinearActivated(criticLayer2->GetOutputSize(), 1, m_lineal);
-			//
-			//critic->AddLayer(criticLayer0);
-			//critic->AddLayer(criticLayer1);
-			//critic->AddLayer(criticLayer2);
-			//critic->AddLayer(criticOuputLayer);
 
+			layers.PushBack(new ndBrainLayerLinear(m_stateSize + m_actionsSize, hiddenLayersNewrons * 2));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons * 2));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons * 2));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
+			layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+			{
+				critic->AddLayer(layers[i]);
+			}
+			critic->InitWeightsXavierMethod();
 
 			// add a reinforcement learning controller 
 			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor, critic));
 
 			char fileName[1024];
-			agent->SetName("cartpoleDDPG.nn");
+			agent->SetName("cartpoleDDPG.dnn");
 			ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
 		#endif
 
@@ -627,9 +641,9 @@ namespace ndController_0
 	{
 		char fileName[1024];
 #ifdef D_USE_POLE_DQN
-		ndGetWorkingFileName("cartpoleDQN.nn", fileName);
+		ndGetWorkingFileName("cartpoleDQN.dnn", fileName);
 #else
-		ndGetWorkingFileName("cartpoleDDPG.nn", fileName);
+		ndGetWorkingFileName("cartpoleDDPG.dnn", fileName);
 #endif
 	
 		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
