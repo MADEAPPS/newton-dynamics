@@ -572,6 +572,10 @@ namespace ndController_0
 			ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor));
 
+			char fileName[1024];
+			agent->SetName("cartpoleDQN.nn");
+			ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
+
 		#else
 
 			ndSharedPtr<ndBrain> actor(new ndBrain());
@@ -603,11 +607,11 @@ namespace ndController_0
 			// add a reinforcement learning controller 
 			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor, critic));
-		#endif
 
-		char fileName[1024];
-		agent->SetName("cartpoleDQN");
-		ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
+			char fileName[1024];
+			agent->SetName("cartpoleDDPG.nn");
+			ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
+		#endif
 
 		ndCartpole* const model = new ndCartpole(agent);
 		ndCartpole::ndCartpoleAgent_trainer* const trainer = (ndCartpole::ndCartpoleAgent_trainer*)*agent;
@@ -622,7 +626,11 @@ namespace ndController_0
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		char fileName[1024];
-		ndGetWorkingFileName("cartpole.nn", fileName);
+#ifdef D_USE_POLE_DQN
+		ndGetWorkingFileName("cartpoleDQN.nn", fileName);
+#else
+		ndGetWorkingFileName("cartpoleDDPG.nn", fileName);
+#endif
 	
 		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
 		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(actor));
