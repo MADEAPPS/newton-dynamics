@@ -22,8 +22,8 @@
 
 namespace ndController_0
 {
-	//#define USE_TD3
-	//#define D_USE_POLE_DQN
+	//#define D_USE_TD3
+	#define D_USE_POLE_DQN
 
 	#define D_PUSH_ACCEL			ndFloat32 (15.0f)
 	#define D_REWARD_MIN_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
@@ -80,8 +80,8 @@ namespace ndController_0
 			class ndCartpoleAgent_trainer : public ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>
 			{
 				public:
-				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& qValuePredictor)
-					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(qValuePredictor)
+				ndCartpoleAgent_trainer(ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters, ndSharedPtr<ndBrain>& qValuePredictor)
+					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(hyperParameters, qValuePredictor)
 					,m_model(nullptr)
 					,m_stopTraining(2000000)
 					,m_maxGain(-1.0e10f)
@@ -227,7 +227,7 @@ namespace ndController_0
 			};
 
 
-#ifdef USE_TD3
+#ifdef D_USE_TD3
 			class ndCartpoleAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
 			{
 				public:
@@ -247,7 +247,7 @@ namespace ndController_0
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
 				{
-					#ifdef USE_TD3
+					#ifdef D_USE_TD3
 					m_outFile = fopen("traingPerf-TD3.csv", "wb");
 					fprintf(m_outFile, "td3\n");
 					#else
@@ -551,18 +551,26 @@ namespace ndController_0
 		// build neural net controller
 		ndInt32 layerSize = 64;
 		#ifdef D_USE_POLE_DQN
+			ndFixSizeArray<ndBrainLayer*, 16> layers;
 			ndSharedPtr<ndBrain> actor(new ndBrain());
-			ndBrainLayerLinearActivated* const layer0 = new ndBrainLayerLinearActivated(m_stateSize, layerSize, m_tanh);
-			ndBrainLayerLinearActivated* const layer1 = new ndBrainLayerLinearActivated(layer0->GetOutputSize(), layerSize, m_tanh);
-			ndBrainLayerLinearActivated* const layer2 = new ndBrainLayerLinearActivated(layer1->GetOutputSize(), layerSize, m_tanh);
-			ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(layer2->GetOutputSize(), m_actionsSize, m_lineal);
-			actor->BeginAddLayer();
-			actor->AddLayer(layer0);
-			actor->AddLayer(layer1);
-			actor->AddLayer(layer2);
-			actor->AddLayer(ouputLayer);
-			actor->EndAddLayer();
-			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(actor));
+
+			layers.PushBack(new ndBrainLayerLinear(m_stateSize, layerSize));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), layerSize));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
+			layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+			{
+				actor->AddLayer(layers[i]);
+			}
+			actor->InitWeightsXavierMethod();
+
+			ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor));
 
 		#else
 

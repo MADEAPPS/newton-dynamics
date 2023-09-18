@@ -55,8 +55,8 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
 		}
 
-		ndReal m_discountFactor;
 		ndReal m_regularizer;
+		ndReal m_discountFactor;
 		ndReal m_actorLearnRate;
 		ndReal m_criticLearnRate;
 		ndReal m_softTargetFactor;
