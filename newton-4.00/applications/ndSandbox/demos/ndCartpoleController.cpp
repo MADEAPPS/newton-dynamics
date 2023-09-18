@@ -198,8 +198,8 @@ namespace ndController_0
 				ndInt32 m_stopTraining;
 				ndFloat32 m_maxGain;
 				ndFloat32 m_maxFrames;
-				mutable ndMovingAverage<256> m_averageQValue;
-				mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
+				mutable ndMovingAverage<64> m_averageQValue;
+				mutable ndMovingAverage<64> m_averageFramesPerEpisodes;
 			};
 
 		#else
@@ -365,8 +365,8 @@ namespace ndController_0
 				ndFloat32 m_maxGain;
 				ndInt32 m_maxFrames;
 				ndInt32 m_stopTraining;
-				mutable ndMovingAverage<128> m_averageQValue;
-				mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
+				mutable ndMovingAverage<64> m_averageQValue;
+				mutable ndMovingAverage<64> m_averageFramesPerEpisodes;
 			};
 
 		#endif
