@@ -35,7 +35,6 @@ ndBrainLayerReluActivation::ndBrainLayerReluActivation(const ndBrainLayerReluAct
 
 ndBrainLayer* ndBrainLayerReluActivation::Clone() const
 {
-	ndAssert(0);
 	return new ndBrainLayerReluActivation(*this);
 }
 
@@ -49,7 +48,7 @@ void ndBrainLayerReluActivation::MakePrediction(const ndBrainVector& input, ndBr
 	ndAssert(input.GetCount() == output.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
-		output[i] = (output[i] > ndReal(0.0f)) ? output[i] : ndReal(0.0f);
+		output[i] = (input[i] > ndReal(0.0f)) ? input[i] : ndReal(0.0f);
 		ndAssert(ndCheckFloat(output[i]));
 		ndAssert(output[i] <= ndReal(1.0f));
 		ndAssert(output[i] >= ndReal(-1.0f));
@@ -61,10 +60,6 @@ void ndBrainLayerReluActivation::InputDerivative(const ndBrainVector& output, co
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
 	ndAssert(output.GetCount() == inputDerivative.GetCount());
 
-	ndAssert(0);
-	//inputDerivative.Set(ndReal(1.0f));
-	//inputDerivative.MulSub(output, output);
-	//inputDerivative.Mul(outputDerivative);
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
 		inputDerivative[i] = (output[i] > ndReal(0.0f)) ? ndReal(1.0f) : ndReal(0.0f);
