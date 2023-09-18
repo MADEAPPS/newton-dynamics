@@ -41,6 +41,7 @@ class ndBrainMatrix: public ndArray<ndBrainMemVector>
 	void Scale(ndReal scale);
 	void Set(const ndBrainMatrix& src);
 	void Add(const ndBrainMatrix& src);
+	void Mul(const ndBrainMatrix& src);
 	void Blend(const ndBrainMatrix& src, ndReal blend);
 	void ScaleAdd(const ndBrainMatrix& src, ndReal scale);
 
