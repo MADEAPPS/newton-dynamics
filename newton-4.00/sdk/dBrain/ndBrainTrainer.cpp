@@ -137,7 +137,7 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
 	{
 		prefixScan.PushBack(sizeAcc);
-		sizeAcc += (layers[i]->GetInputSize() + 7) & -8;
+		sizeAcc += (layers[i]->GetOutputSize() + 7) & -8;
 		maxSize = ndMax(maxSize, layers[i]->GetOutputSize());
 	}
 	prefixScan.PushBack(sizeAcc);

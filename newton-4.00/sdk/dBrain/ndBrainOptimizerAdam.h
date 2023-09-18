@@ -42,6 +42,5 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 	ndReal m_alphaAcc;
 };
 
-
 #endif 
 
