@@ -63,10 +63,9 @@ void ndBrainLayerReluActivation::InputDerivative(const ndBrainVector& output, co
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
 		inputDerivative[i] = (output[i] > ndReal(0.0f)) ? ndReal(1.0f) : ndReal(0.0f);
-		ndAssert(ndCheckFloat(output[i]));
-		ndAssert(output[i] <= ndReal(1.0f));
-		ndAssert(output[i] >= ndReal(-1.0f));
+		ndAssert(ndCheckFloat(inputDerivative[i]));
 	}
+	inputDerivative.Mul(outputDerivative);
 }
 
 ndBrainLayerReluActivation* ndBrainLayerReluActivation::Load(const ndBrainLoad* const loadSave)
