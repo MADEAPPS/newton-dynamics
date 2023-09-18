@@ -119,6 +119,7 @@ void ndBrainMatrix::Set(const ndBrainMatrix& src)
 
 void ndBrainMatrix::Scale(ndReal scale)
 {
+	ndAssert(0);
 	ndBrainMatrix& matrix = *this;
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
@@ -128,6 +129,7 @@ void ndBrainMatrix::Scale(ndReal scale)
 
 void ndBrainMatrix::ScaleAdd(const ndBrainMatrix& src, ndReal scale)
 {
+	ndAssert(0);
 	ndBrainMatrix& matrix = *this;
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
@@ -140,14 +142,22 @@ void ndBrainMatrix::Add(const ndBrainMatrix& src)
 	ndAssert(src.GetRows() == GetRows());
 	ndAssert(src.GetColumns() == GetColumns());
 	ndBrainMatrix& matrix = *this;
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
-	{
-		matrix[i].Add(src[i]);
-	}
+
+	ndInt32 strideInBytes = (ndInt32(GetColumns() * sizeof(ndReal)) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT;
+	ndInt32 size = GetCount() * strideInBytes / ndInt32(sizeof(ndReal));
+	ndReal* const dstData = &matrix[0][0];
+	const ndReal* const srcData = &src[0][0];
+	ndAdd(size, dstData, srcData);
+
+	//for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	//{
+	//	matrix[i].Add(src[i]);
+	//}
 }
 
 void ndBrainMatrix::Blend(const ndBrainMatrix& src, ndReal blend)
 {
+	ndAssert(0);
 	ndAssert(src.GetRows() == GetRows());
 	ndAssert(src.GetColumns() == GetColumns());
 	ndBrainMatrix& matrix = *this;
@@ -159,6 +169,7 @@ void ndBrainMatrix::Blend(const ndBrainMatrix& src, ndReal blend)
 
 void ndBrainMatrix::FlushToZero()
 {
+	ndAssert(0);
 	ndBrainMatrix& matrix = *this;
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
