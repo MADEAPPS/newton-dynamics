@@ -240,10 +240,11 @@ namespace ndController_0
 				ndCartpoleAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
 #endif
+					,m_bestActor(*(*actor))
 					,m_model(nullptr)
 					,m_maxGain(-1.0e10f)
 					,m_maxFrames(5000)
-					,m_stopTraining(1500000)
+					,m_stopTraining(1000000)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
 				{
@@ -256,6 +257,7 @@ namespace ndController_0
 					#endif
 
 					InitWeights();
+					m_bestActor.CopyFrom(m_actor);
 				}
 
 				~ndCartpoleAgent_trainer()
@@ -339,12 +341,8 @@ namespace ndController_0
 						{
 							if (m_averageQValue.GetAverage() > m_maxGain)
 							{
-								char fileName[1024];
-								ndGetWorkingFileName(GetName().GetStr(), fileName);
-
-								SaveToFile(fileName);
-								ndExpandTraceMessage("saving to file: %s\n", fileName);
-								ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+								m_bestActor.CopyFrom(m_actor);
+								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
 								m_maxGain = m_averageQValue.GetAverage();
 							}
 						}
@@ -361,8 +359,12 @@ namespace ndController_0
 
 						if (stopTraining == m_stopTraining)
 						{
-							ndExpandTraceMessage("\n");
-							ndExpandTraceMessage("training complete\n");
+							char fileName[1024];
+							m_actor.CopyFrom(m_bestActor);
+							ndGetWorkingFileName(GetName().GetStr(), fileName);
+							SaveToFile(fileName);
+							ndExpandTraceMessage("saving to file: %s\n", fileName);
+							ndExpandTraceMessage("training complete\n\n");
 						}
 					}
 
@@ -373,12 +375,13 @@ namespace ndController_0
 				}
 
 				FILE* m_outFile;
+				ndBrain m_bestActor;
 				ndCartpole* m_model;
 				ndFloat32 m_maxGain;
 				ndInt32 m_maxFrames;
 				ndInt32 m_stopTraining;
-				mutable ndMovingAverage<64> m_averageQValue;
-				mutable ndMovingAverage<64> m_averageFramesPerEpisodes;
+				mutable ndMovingAverage<16> m_averageQValue;
+				mutable ndMovingAverage<16> m_averageFramesPerEpisodes;
 			};
 
 		#endif
