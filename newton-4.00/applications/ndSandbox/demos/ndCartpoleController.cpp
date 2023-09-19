@@ -244,7 +244,7 @@ namespace ndController_0
 					,m_model(nullptr)
 					,m_maxGain(-1.0e10f)
 					,m_maxFrames(5000)
-					,m_stopTraining(1000000)
+					,m_stopTraining(500000)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
 				{
