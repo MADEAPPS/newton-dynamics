@@ -115,8 +115,8 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndBrainReplayBuffer<ndReal, statesDim, actionDim> m_replayBuffer;
 	ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim> m_currentTransition;
 
+	ndReal m_currentQvalue;
 	ndReal m_discountFactor;
-	ndReal m_currentQValue;
 	ndReal m_actorLearnRate;
 	ndReal m_criticLearnRate;
 	ndReal m_softTargetFactor;
@@ -141,8 +141,8 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 	,m_bashSamples()
 	,m_replayBuffer()
 	,m_currentTransition()
+	,m_currentQvalue(ndReal(0.0f))
 	,m_discountFactor(hyperParameters.m_discountFactor)
-	,m_currentQValue(ndReal(0.0f))
 	,m_actorLearnRate(hyperParameters.m_actorLearnRate)
 	,m_criticLearnRate(hyperParameters.m_criticLearnRate)
 	,m_softTargetFactor(hyperParameters.m_softTargetFactor)
@@ -236,7 +236,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SetActionNoise(ndReal noise
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndReal ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCurrentValue() const
 {
-	return m_currentQValue;
+	return m_currentQvalue;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -515,7 +515,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::CalculateQvalue(const ndBra
 	{
 		criticInput[i + statesDim] = actions[i];
 	}
-	ndBrainMemVector criticOutput(&m_currentQValue, 1);
+	ndBrainMemVector criticOutput(&m_currentQvalue, 1);
 	m_critic.MakePrediction(criticInput, criticOutput);
 }
 
