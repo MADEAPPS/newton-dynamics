@@ -291,12 +291,12 @@ class ndMovingAverage: public ndFixSizeArray<ndReal, size>
 		}
 	}
 
-	ndReal Update(ndReal value)
+	ndReal Update(ndReal value1)
 	{
-		(*this)[m_index] = value;
-		ndInt32 index = (m_index + 1) % size;
-		m_average += (value - (*this)[index]) / size;
-		m_index = index;
+		ndReal value0 = (*this)[m_index];
+		m_average += (value1 - value0) / size;
+		(*this)[m_index] = value1;
+		m_index = (m_index + 1) % size;
 		return GetAverage();
 	}
 
