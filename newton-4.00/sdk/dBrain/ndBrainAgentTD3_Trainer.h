@@ -46,14 +46,15 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 		{
 			m_bashBufferSize = 64;
 			m_discountFactor = ndReal(0.99f);
-			m_regularizer = ndReal(2.0e-6f);
-			m_actorLearnRate = ndReal(0.0001f);
+			m_regularizer = ndReal(1.0e-6f);
+			m_actorLearnRate = ndReal(0.0005f);
 			m_criticLearnRate = ndReal(0.001f);
 			m_replayBufferSize = 1024 * 512;
 			m_replayBufferPrefill = 1024 * 4;
 			m_softTargetFactor = ndReal(1.0e-3f);
 			m_actionNoiseVariance = ndReal(0.05f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
+			m_threadsCount = 1;
 		}
 
 		ndReal m_discountFactor;
@@ -111,6 +112,10 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 	ndBrain m_targetCritic0;
 	ndBrain m_targetCritic1;
 
+	ndBrainOptimizerAdam* m____actorOptimizer;
+	ndBrainOptimizerAdam* m____criticOptimizer0;
+	ndBrainOptimizerAdam* m____criticOptimizer1;
+
 	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> m_actorOptimizer;
 	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> m_criticOptimizer0;
 	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> m_criticOptimizer1;
@@ -143,6 +148,9 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const Hyp
 	,m_targetActor(m_actor)
 	,m_targetCritic0(m_critic0)
 	,m_targetCritic1(m_critic1)
+	,m____actorOptimizer(nullptr)
+	,m____criticOptimizer0(nullptr)
+	,m____criticOptimizer1(nullptr)
 	,m_bashSamples()
 	,m_replayBuffer()
 	,m_currentTransition()
@@ -159,31 +167,40 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const Hyp
 	,m_replayBufferPrefill(hyperParameters.m_replayBufferPrefill)
 	,m_collectingSamples(true)
 {
-	ndAssert(0);
-	//ndAssert(m_critic0.GetOutputSize() == 1);
-	//ndAssert(m_critic1.GetOutputSize() == 1);
-	//ndAssert((m_actor[m_actor.GetCount() - 1])->GetActivationType() == m_tanh);
-	//ndAssert(m_critic0.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
-	//ndAssert(m_critic1.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
-	//
-	//SetThreadCount(hyperParameters.m_threadsCount);
-	//for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
-	//{
-	//	m_actorOptimizer.PushBack(new ndBrainTrainer(&m_actor));
-	//	m_criticOptimizer0.PushBack(new ndBrainTrainer(&m_critic0));
-	//	m_criticOptimizer1.PushBack(new ndBrainTrainer(&m_critic1));
-	//	m_actorOptimizer[m_actorOptimizer.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
-	//	m_criticOptimizer0[m_criticOptimizer0.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
-	//	m_criticOptimizer1[m_criticOptimizer1.GetCount() - 1]->SetRegularizer(hyperParameters.m_regularizer);
-	//}
-	//
-	//SetBufferSize(hyperParameters.m_replayBufferSize);
-	//InitWeights();
+	ndAssert(m_critic0.GetOutputSize() == 1);
+	ndAssert(m_critic1.GetOutputSize() == 1);
+	ndAssert(m_critic0.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
+	ndAssert(m_critic1.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
+	ndAssert(!strcmp((m_actor[m_actor.GetCount() - 1])->GetLabelId(), "ndBrainLayerTanhActivation"));
+	ndAssert(!strcmp((m_critic0[m_critic0.GetCount() - 1])->GetLabelId(), "ndBrainLayerReluActivation"));
+	ndAssert(!strcmp((m_critic1[m_critic1.GetCount() - 1])->GetLabelId(), "ndBrainLayerReluActivation"));
+
+	SetThreadCount(hyperParameters.m_threadsCount);
+	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
+	{
+		m_actorOptimizer.PushBack(new ndBrainTrainer(&m_actor));
+		m_criticOptimizer0.PushBack(new ndBrainTrainer(&m_critic0));
+		m_criticOptimizer1.PushBack(new ndBrainTrainer(&m_critic1));
+	}
+	
+	SetBufferSize(hyperParameters.m_replayBufferSize);
+	InitWeights();
+
+	m____actorOptimizer = new ndBrainOptimizerAdam(*m_actorOptimizer[0]);
+	m____criticOptimizer0 = new ndBrainOptimizerAdam(*m_criticOptimizer0[0]);
+	m____criticOptimizer1 = new ndBrainOptimizerAdam(*m_criticOptimizer1[0]);
+
+	m____actorOptimizer->SetRegularizer(hyperParameters.m_regularizer);
+	m____criticOptimizer0->SetRegularizer(hyperParameters.m_regularizer);
+	m____criticOptimizer1->SetRegularizer(hyperParameters.m_regularizer);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentTD3_Trainer<statesDim, actionDim>::~ndBrainAgentTD3_Trainer()
 {
+	delete m____actorOptimizer;
+	delete m____criticOptimizer0;
+	delete m____criticOptimizer1;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

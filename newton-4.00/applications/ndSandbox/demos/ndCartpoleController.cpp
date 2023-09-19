@@ -231,8 +231,8 @@ namespace ndController_0
 			class ndCartpoleAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
 			{
 				public:
-				ndCartpoleAgent_trainer(ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
-					:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(actor, critic)
+				ndCartpoleAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
+					:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
 #else
 			class ndCartpoleAgent_trainer: public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
 			{
@@ -319,7 +319,11 @@ namespace ndController_0
 					if (stopTraining <= m_stopTraining)
 					{
 						ndInt32 episodeCount = GetEposideCount();
-						ndBrainAgentDDPG_Trainer::OptimizeStep();
+						#ifdef D_USE_TD3
+							ndBrainAgentTD3_Trainer::OptimizeStep();
+						#else
+							ndBrainAgentDDPG_Trainer::OptimizeStep();
+						#endif
 
 						episodeCount -= GetEposideCount();
 						if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32 (m_maxFrames))
@@ -620,7 +624,11 @@ namespace ndController_0
 			critic->InitWeightsXavierMethod();
 
 			// add a reinforcement learning controller 
-			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			#ifdef D_USE_TD3
+				ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			#else
+				ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			#endif
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor, critic));
 
 			char fileName[1024];
