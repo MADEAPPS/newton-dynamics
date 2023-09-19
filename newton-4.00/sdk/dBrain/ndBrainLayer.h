@@ -44,6 +44,7 @@ class ndBrainLayer : public ndClassAlloc
 	virtual ndInt32 GetInputSize() const;
 	virtual ndInt32 GetOutputSize() const;
 	virtual void CopyFrom(const ndBrainLayer& src);
+	virtual void Blend(const ndBrainLayer& src, ndReal blend);
 
 	virtual ndBrainVector* GetBias();
 	virtual ndBrainMatrix* GetWeights();
@@ -57,7 +58,6 @@ class ndBrainLayer : public ndClassAlloc
 		const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative,
 		ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient);
 
-	virtual void Blend(const ndBrainLayer& src, ndReal blend);
 	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const;
 	virtual void Save(const ndBrainSave* const loadSave) const;
 };

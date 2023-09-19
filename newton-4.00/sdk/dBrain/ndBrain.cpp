@@ -71,13 +71,12 @@ void ndBrain::CopyFrom(const ndBrain& src)
 
 void ndBrain::SoftCopy(const ndBrain& src, ndReal blend)
 {
-	ndAssert(0);
-	//const ndArray<ndBrainLayer*>& layers = *this;
-	//const ndArray<ndBrainLayer*>& srcLayers = src;
-	//for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	//{
-	//	layers[i]->Blend(*srcLayers[i], blend);
-	//}
+	const ndArray<ndBrainLayer*>& layers = *this;
+	const ndArray<ndBrainLayer*>& srcLayers = src;
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		layers[i]->Blend(*srcLayers[i], blend);
+	}
 }
 
 ndBrainLayer* ndBrain::AddLayer(ndBrainLayer* const layer)

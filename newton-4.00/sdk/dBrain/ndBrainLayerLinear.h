@@ -40,6 +40,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual ndInt32 GetInputSize() const;
 	virtual const char* GetLabelId() const;
 	virtual void CopyFrom(const ndBrainLayer& src);
+	virtual void Blend(const ndBrainLayer& src, ndReal blend);
 
 	virtual ndBrainVector* GetBias();
 	virtual ndBrainMatrix* GetWeights();

@@ -113,6 +113,13 @@ void ndBrainLayerLinear::CopyFrom(const ndBrainLayer& src)
 	m_weights.Set(linearSrc.m_weights);
 }
 
+void ndBrainLayerLinear::Blend(const ndBrainLayer& src, ndReal blend)
+{
+	const ndBrainLayerLinear& linearSrc = (ndBrainLayerLinear&)src;
+	m_bias.Blend(linearSrc.m_bias, blend);
+	m_weights.Blend(linearSrc.m_weights, blend);
+}
+
 void ndBrainLayerLinear::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	m_weights.Mul(input, output);

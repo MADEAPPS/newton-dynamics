@@ -23,7 +23,7 @@
 namespace ndController_0
 {
 	//#define D_USE_TD3
-	#define D_USE_POLE_DQN
+	//#define D_USE_POLE_DQN
 
 	#define D_PUSH_ACCEL			ndFloat32 (15.0f)
 	#define D_REWARD_MIN_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
@@ -612,6 +612,7 @@ namespace ndController_0
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
 			layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
 			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 			{
 				critic->AddLayer(layers[i]);

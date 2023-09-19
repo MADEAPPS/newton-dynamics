@@ -33,7 +33,6 @@
 // policy gradient for continues control re enforcement learning.  
 // ddpg algorithm as described in: https://arxiv.org/pdf/1509.02971.pdf
 
-
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 {
@@ -45,7 +44,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 		{
 			m_discountFactor = ndReal(0.99f);
 			m_regularizer = ndReal(1.0e-6f);
-			m_actorLearnRate = ndReal(0.0001f);
+			m_actorLearnRate = ndReal(0.0005f);
 			m_criticLearnRate = ndReal(0.001f);
 			m_bashBufferSize = 64;
 			m_replayBufferSize = 1024 * 512;
@@ -53,7 +52,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 			m_softTargetFactor = ndReal(1.0e-3f);
 			m_actionNoiseVariance = ndReal(0.05f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
-			m_threadsCount = 1;
+			//m_threadsCount = 1;
 		}
 
 		ndReal m_regularizer;
@@ -107,9 +106,10 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndBrain m_critic;
 	ndBrain m_targetActor;
 	ndBrain m_targetCritic;
-	ndBrainOptimizerAdam* m_optimizer;
-	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> m_actorOptimizer;
-	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> m_criticOptimizer;
+	ndBrainOptimizerAdam* m_actorOptimizer;
+	ndBrainOptimizerAdam* m_criticOptimizer;
+	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> m_actorTrainer;
+	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> m_criticTrainer;
 
 	ndArray<ndInt32> m_bashSamples;
 	ndBrainReplayBuffer<ndReal, statesDim, actionDim> m_replayBuffer;
@@ -136,6 +136,8 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 	,m_critic(*(*critic))
 	,m_targetActor(m_actor)
 	,m_targetCritic(m_critic)
+	,m_actorOptimizer(nullptr)
+	,m_criticOptimizer(nullptr)
 	,m_bashSamples()
 	,m_replayBuffer()
 	,m_currentTransition()
@@ -155,26 +157,29 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 	ndAssert(m_critic.GetOutputSize() == 1);
 	ndAssert(m_critic.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
 	ndAssert(!strcmp((m_actor[m_actor.GetCount() - 1])->GetLabelId(), "ndBrainLayerTanhActivation"));
-	ndAssert(!strcmp((m_critic[m_critic.GetCount() - 1])->GetLabelId(), "ndBrainLayerReluActivation"));
+	//ndAssert(!strcmp((m_critic[m_critic.GetCount() - 1])->GetLabelId(), "ndBrainLayerReluActivation"));
 	
 	SetThreadCount(hyperParameters.m_threadsCount);
 	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
 	{
-		m_actorOptimizer.PushBack(new ndBrainTrainer(&m_actor));
-		m_criticOptimizer.PushBack(new ndBrainTrainer(&m_critic));
+		m_actorTrainer.PushBack(new ndBrainTrainer(&m_actor));
+		m_criticTrainer.PushBack(new ndBrainTrainer(&m_critic));
 	}
 	
 	SetBufferSize(hyperParameters.m_replayBufferSize);
 	InitWeights();
 
-	m_optimizer = new ndBrainOptimizerAdam(*m_actorOptimizer[0]);
-	m_optimizer->SetRegularizer(hyperParameters.m_regularizer);
+	m_actorOptimizer = new ndBrainOptimizerAdam(*m_actorTrainer[0]);
+	m_criticOptimizer = new ndBrainOptimizerAdam(*m_criticTrainer[0]);
+	m_actorOptimizer->SetRegularizer(hyperParameters.m_regularizer);
+	m_criticOptimizer->SetRegularizer(hyperParameters.m_regularizer);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDDPG_Trainer<statesDim, actionDim>::~ndBrainAgentDDPG_Trainer()
 {
-	delete m_optimizer;
+	delete m_actorOptimizer;
+	delete m_criticOptimizer;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -312,7 +317,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 			ndReal m_targetInputBuffer[(statesDim + actionDim) * 2];
 		};
 
-		ndBrainTrainer& trainer = *(*m_criticOptimizer[threadIndex]);
+		ndBrainTrainer& trainer = *(*m_criticTrainer[threadIndex]);
 		Loss loss(trainer, this, m_discountFactor);
 
 		ndReal actorInputBuffer[statesDim * 2];
@@ -355,20 +360,15 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 		}
 	});
 
-	//auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	//{
-	//	ndBrainTrainer* const trainer = *m_criticOptimizer[0];
-	//	for (ndInt32 i = 1; i < threadCount; ++i)
-	//	{
-	//		ndBrainTrainer* const srcTrainer = *m_criticOptimizer[i];
-	//		trainer->AcculumateGradients(*srcTrainer, threadIndex, threadCount);
-	//	}
-	//});
-
 	ndBrainThreadPool::ParallelExecute(PropagateBash);
-	ndAssert(0);
-	//ndBrainThreadPool::ParallelExecute(AccumulateWeight);
-	//m_criticOptimizer[0]->UpdateWeights(m_criticLearnRate, m_bashBufferSize);
+
+	ndBrainTrainer& criticTrainer = *(*m_criticTrainer[0]);
+	for (ndInt32 i = 1; i < GetThreadCount(); ++i)
+	{
+		ndBrainTrainer& srcTrainer = *(*m_criticTrainer[i]);
+		criticTrainer.AcculumateGradients(srcTrainer);
+	}
+	m_criticOptimizer->Update(m_criticLearnRate, m_bashBufferSize);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -389,27 +389,26 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 
 			void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 			{
-				ndAssert(0);
-				//ndAssert(loss.GetCount() == actionDim);
-				//ndAssert(output.GetCount() == actionDim);
-				//const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_agent->m_replayBuffer[m_index];
-				//
-				//ndReal criticInputBuffer[(statesDim + actionDim) * 2];
-				//ndBrainMemVector input(criticInputBuffer, statesDim + actionDim);
-				//for (ndInt32 i = 0; i < statesDim; ++i)
-				//{
-				//	input[i] = transition.m_state[i];
-				//}
-				//for (ndInt32 i = 0; i < actionDim; ++i)
-				//{
-				//	input[i + statesDim] = output[i];
-				//}
-				//m_agent->m_critic.CalculateInputGradients(input, input);
-				//
-				//for (ndInt32 i = 0; i < actionDim; ++i)
-				//{
-				//	loss[i] = input[statesDim + i];
-				//}
+				ndAssert(loss.GetCount() == actionDim);
+				ndAssert(output.GetCount() == actionDim);
+				const ndBrainReplayTransitionMemory<ndReal, statesDim, actionDim>& transition = m_agent->m_replayBuffer[m_index];
+				
+				ndReal criticInputBuffer[(statesDim + actionDim) * 2];
+				ndBrainMemVector input(criticInputBuffer, statesDim + actionDim);
+				for (ndInt32 i = 0; i < statesDim; ++i)
+				{
+					input[i] = transition.m_state[i];
+				}
+				for (ndInt32 i = 0; i < actionDim; ++i)
+				{
+					input[i + statesDim] = output[i];
+				}
+				m_agent->m_critic.CalculateInputGradient(input, input);
+				
+				for (ndInt32 i = 0; i < actionDim; ++i)
+				{
+					loss[i] = input[statesDim + i];
+				}
 			}
 
 			ndBrainTrainer& m_actorTrainer;
@@ -417,7 +416,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 			ndInt32 m_index;
 		};
 
-		ndBrainTrainer& actorTrainer = *(*m_actorOptimizer[threadIndex]);
+		ndBrainTrainer& actorTrainer = *(*m_actorTrainer[threadIndex]);
 		ActorLoss loss(actorTrainer, this);
 
 		ndReal inputBuffer[statesDim * 2];
@@ -439,20 +438,15 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 		}
 	});
 
-	//auto AccumulateWeight = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	//{
-	//	ndBrainTrainer& trainer = *(*m_actorOptimizer[0]);
-	//	for (ndInt32 i = 1; i < threadCount; ++i)
-	//	{
-	//		ndBrainTrainer& srcTrainer = *(*m_actorOptimizer[i]);
-	//		trainer.AcculumateGradients(srcTrainer, threadIndex, threadCount);
-	//	}
-	//});
-
 	ParallelExecute(PropagateBash);
-	ndAssert(0);
-	//ParallelExecute(AccumulateWeight);
-	//m_actorOptimizer[0]->UpdateWeights(-m_actorLearnRate, m_bashBufferSize);
+
+	ndBrainTrainer& actorTrainer = *(*m_actorTrainer[0]);
+	for (ndInt32 i = 1; i < GetThreadCount(); ++i)
+	{
+		ndBrainTrainer& srcTrainer = *(*m_actorTrainer[i]);
+		actorTrainer.AcculumateGradients(srcTrainer);
+	}
+	m_actorOptimizer->Update(-m_actorLearnRate, m_bashBufferSize);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

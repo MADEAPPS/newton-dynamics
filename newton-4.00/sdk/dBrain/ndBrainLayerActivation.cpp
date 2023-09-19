@@ -84,6 +84,10 @@ void ndBrainLayerActivation::CopyFrom(const ndBrainLayer&)
 {
 }
 
+void ndBrainLayerActivation::Blend(const ndBrainLayer&, ndReal)
+{
+}
+
 void ndBrainLayerActivation::ClearGradAcc(ndBrainVector&, ndBrainMatrix&) const
 {
 }

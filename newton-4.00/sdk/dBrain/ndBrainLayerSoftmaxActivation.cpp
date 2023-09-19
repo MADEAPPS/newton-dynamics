@@ -45,7 +45,8 @@ const char* ndBrainLayerSoftmaxActivation::GetLabelId() const
 	return "ndBrainLayerSoftmaxActivation";
 }
 
-void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+//void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
 {
 	ndAssert(0);
 	//inputDerivative.Set(ndReal(1.0f));
@@ -55,18 +56,16 @@ void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector& output,
 	//inputDerivative.FlushToZero();
 }
 
-void ndBrainLayerSoftmaxActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+void ndBrainLayerSoftmaxActivation::MakePrediction(const ndBrainVector&, ndBrainVector& output) const
 {
 	ndAssert(0);
-	ndAssert(input.GetCount() == output.GetCount());
-
 	ndReal max = ndReal(1.0e-16f);
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
 		max = output[i];
 	}
 
-	ndReal acc = 0.0f;
+	ndReal acc = ndReal(0.0f);
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
 		ndAssert(ndCheckFloat(output[i]));
@@ -75,7 +74,7 @@ void ndBrainLayerSoftmaxActivation::MakePrediction(const ndBrainVector& input, n
 		acc += prob;
 	}
 
-	ndAssert(acc > 0.0f);
+	ndAssert(acc > ndReal (0.0f));
 	output.Scale(ndReal(1.0f) / acc);
 	output.FlushToZero();
 }

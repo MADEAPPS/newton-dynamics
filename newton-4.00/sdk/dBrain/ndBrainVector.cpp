@@ -143,7 +143,6 @@ void ndBrainVector::Blend(const ndBrainVector& target, ndReal blend)
 	ScaleAdd(target, blend);
 }
 
-
 ndBrainMemVector::ndBrainMemVector()
 	:ndBrainVector()
 {
