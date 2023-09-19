@@ -54,7 +54,7 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 			m_softTargetFactor = ndReal(1.0e-3f);
 			m_actionNoiseVariance = ndReal(0.05f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
-			m_threadsCount = 1;
+			//m_threadsCount = 1;
 		}
 
 		ndReal m_discountFactor;
