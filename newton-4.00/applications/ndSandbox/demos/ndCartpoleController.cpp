@@ -273,7 +273,16 @@ namespace ndController_0
 
 				virtual void ApplyActions(ndReal* const actions) const
 				{
-					if (GetEpisodeFrames() >= 10000)
+					if (GetEpisodeFrames() >= 15000)
+					{
+						for (ndInt32 i = 0; i < m_actionsSize; ++i)
+						{
+							ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(2.0f)));
+							ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
+							actions[i] = clippiedNoisyAction;
+						}
+					}
+					else if (GetEpisodeFrames() >= 10000)
 					{
 						for (ndInt32 i = 0; i < m_actionsSize; ++i)
 						{
@@ -295,7 +304,7 @@ namespace ndController_0
 					bool state = m_model->IsTerminal();
 					if (!IsSampling())
 					{
-						if (GetEpisodeFrames() >= 15000)
+						if (GetEpisodeFrames() >= 30000)
 						{
 							state = true;
 						}
