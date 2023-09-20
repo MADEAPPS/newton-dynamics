@@ -644,7 +644,11 @@ namespace ndController_0
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor, critic));
 
 			char fileName[1024];
-			agent->SetName("cartpoleDDPG.dnn");
+			#ifdef D_USE_TD3
+				agent->SetName("cartpoleTD3.dnn");
+			#else
+				agent->SetName("cartpoleDDPG.dnn");
+			#endif	
 			ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
 		#endif
 
@@ -661,11 +665,13 @@ namespace ndController_0
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		char fileName[1024];
-#ifdef D_USE_POLE_DQN
-		ndGetWorkingFileName("cartpoleDQN.dnn", fileName);
-#else
-		ndGetWorkingFileName("cartpoleDDPG.dnn", fileName);
-#endif
+		#ifdef D_USE_POLE_DQN
+			ndGetWorkingFileName("cartpoleDQN.dnn", fileName);
+		#elif defined (D_USE_TD3)
+			ndGetWorkingFileName("cartpoleTD3.dnn", fileName);
+		#else	
+			ndGetWorkingFileName("cartpoleDDPG.dnn", fileName);
+		#endif
 	
 		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
 		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(actor));
