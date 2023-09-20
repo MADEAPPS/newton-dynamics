@@ -198,8 +198,8 @@ namespace ndController_0
 				ndInt32 m_stopTraining;
 				ndFloat32 m_maxGain;
 				ndFloat32 m_maxFrames;
-				mutable ndMovingAverage<64> m_averageQValue;
-				mutable ndMovingAverage<64> m_averageFramesPerEpisodes;
+				mutable ndMovingAverage<32> m_averageQValue;
+				mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 			};
 
 		#else
@@ -245,6 +245,7 @@ namespace ndController_0
 					,m_maxGain(-1.0e10f)
 					,m_maxFrames(5000)
 					,m_stopTraining(500000)
+					,m_timer(0)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
 				{
@@ -258,6 +259,7 @@ namespace ndController_0
 
 					InitWeights();
 					m_bestActor.CopyFrom(m_actor);
+					m_timer = ndGetTimeInMicroseconds();
 				}
 
 				~ndCartpoleAgent_trainer()
@@ -342,8 +344,8 @@ namespace ndController_0
 							if (m_averageQValue.GetAverage() > m_maxGain)
 							{
 								m_bestActor.CopyFrom(m_actor);
-								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
 								m_maxGain = m_averageQValue.GetAverage();
+								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
 							}
 						}
 
@@ -365,6 +367,8 @@ namespace ndController_0
 							SaveToFile(fileName);
 							ndExpandTraceMessage("saving to file: %s\n", fileName);
 							ndExpandTraceMessage("training complete\n\n");
+							ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+							ndExpandTraceMessage("training time: %g\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 						}
 					}
 
@@ -380,8 +384,9 @@ namespace ndController_0
 				ndFloat32 m_maxGain;
 				ndInt32 m_maxFrames;
 				ndInt32 m_stopTraining;
-				mutable ndMovingAverage<16> m_averageQValue;
-				mutable ndMovingAverage<16> m_averageFramesPerEpisodes;
+				ndUnsigned64 m_timer;
+				mutable ndMovingAverage<32> m_averageQValue;
+				mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 			};
 
 		#endif
@@ -626,7 +631,7 @@ namespace ndController_0
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons * 2));
 			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 			layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			for (ndInt32 i = 0; i < layers.GetCount(); ++i)

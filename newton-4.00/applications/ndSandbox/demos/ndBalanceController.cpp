@@ -22,7 +22,7 @@
 
 namespace ndController_1
 {
-	#define USE_TD3
+	//#define ND_USE_TD3
 	#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
@@ -79,7 +79,7 @@ namespace ndController_1
 		};
 
 		// implement controller player
-#ifdef USE_TD3
+#ifdef ND_USE_TD3
 		class ndControllerAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
 		{
 			public:
@@ -127,7 +127,7 @@ namespace ndController_1
 
 		// the table based approach is not really practical
 		// try implement DDPN controller using neural networks. 
-#ifdef USE_TD3
+#ifdef ND_USE_TD3
 		class ndControllerAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
@@ -140,25 +140,27 @@ namespace ndController_1
 			ndControllerAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
 #endif
+				,m_bestActor(*(*actor))
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(4000)
-				,m_stopTraining(2000000)
+				,m_maxFrames(5000)
+				,m_stopTraining(1000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
 				,m_averageQValue()
 				,m_averageFramesPerEpisodes()
 			{
 				SetActionNoise(ndReal (0.15f));
-				#ifdef USE_TD3
+				#ifdef ND_USE_TD3
 					m_outFile = fopen("traingPerf-TD3.csv", "wb");
 					fprintf(m_outFile, "td3\n");
 				#else
 					m_outFile = fopen("traingPerf-SAC.csv", "wb");
 					fprintf(m_outFile, "sac\n");
 				#endif
-				m_timer = ndGetTimeInMicroseconds();
 				InitWeights();
+				m_bestActor.CopyFrom(m_actor);
+				m_timer = ndGetTimeInMicroseconds();
 			}
 
 			~ndControllerAgent_trainer()
@@ -181,7 +183,16 @@ namespace ndController_1
 
 			virtual void ApplyActions(ndReal* const actions) const
 			{
-				if (GetEpisodeFrames() >= 10000)
+				if (GetEpisodeFrames() >= 15000)
+				{
+					for (ndInt32 i = 0; i < m_actionsSize; ++i)
+					{
+						ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(2.0f)));
+						ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
+						actions[i] = clippiedNoisyAction;
+					}
+				}
+				else if (GetEpisodeFrames() >= 10000)
 				{
 					for (ndInt32 i = 0; i < m_actionsSize; ++i)
 					{
@@ -203,7 +214,7 @@ namespace ndController_1
 				bool state = m_model->IsTerminal();
 				if (!IsSampling())
 				{
-					if (GetEpisodeFrames() >= 15000)
+					if (GetEpisodeFrames() >= 30000)
 					{
 						state = true;
 					}
@@ -228,7 +239,7 @@ namespace ndController_1
 				if (stopTraining <= m_stopTraining)
 				{
 					ndInt32 episodeCount = GetEposideCount();
-					#ifdef USE_TD3
+					#ifdef ND_USE_TD3
 						ndBrainAgentTD3_Trainer::OptimizeStep();
 					#else
 						ndBrainAgentDDPG_Trainer::OptimizeStep();
@@ -239,13 +250,9 @@ namespace ndController_1
 					{
 						if (m_averageQValue.GetAverage() > m_maxGain)
 						{
-							char fileName[1024];
-							ndGetWorkingFileName(GetName().GetStr(), fileName);
-
-							SaveToFile(fileName);
-							ndExpandTraceMessage("saving to file: %s\n", fileName);
-							ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+							m_bestActor.CopyFrom(m_actor);
 							m_maxGain = m_averageQValue.GetAverage();
+							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %g\taverageValue %g\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
 						}
 					}
 
@@ -261,11 +268,16 @@ namespace ndController_1
 
 					if (stopTraining == m_stopTraining)
 					{
+						char fileName[1024];
 						m_modelIsTrained = true;
-						ndExpandTraceMessage("\n");
+						m_actor.CopyFrom(m_bestActor);
+						ndGetWorkingFileName(GetName().GetStr(), fileName);
+						SaveToFile(fileName);
+						ndExpandTraceMessage("saving to file: %s\n", fileName);
 						ndExpandTraceMessage("training complete\n");
+						ndExpandTraceMessage("episode: %d\taverageFrames: %g\taverageValue %g\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
 						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-						ndExpandTraceMessage("time training: %f\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+						ndExpandTraceMessage("training time: %g\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 					}
 				}
 				if (m_model->IsOutOfBounds())
@@ -275,14 +287,15 @@ namespace ndController_1
 			}
 
 			FILE* m_outFile;
+			ndBrain m_bestActor;
 			ndModelUnicycle* m_model;
 			ndFloat32 m_maxGain;
 			ndInt32 m_maxFrames;
 			ndInt32 m_stopTraining;
 			ndUnsigned64 m_timer;
 			bool m_modelIsTrained;
-			mutable ndMovingAverage<128> m_averageQValue;
-			mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
+			mutable ndMovingAverage<32> m_averageQValue;
+			mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 		};
 
 		ndModelUnicycle(ndSharedPtr<ndBrainAgent> agent)
@@ -528,43 +541,57 @@ namespace ndController_1
 	{
 		// build neural net controller
 		#ifdef ND_TRAIN_MODEL
-			ndInt32 layerSize = 64;
-			//ndBrainActivationType activation = m_tanh;
-			//ndBrainActivationType activation = m_relu;
-
+			ndInt32 hiddenLayersNewrons = 64;
+			ndFixSizeArray<ndBrainLayer*, 16> layers;
 			ndSharedPtr<ndBrain> actor(new ndBrain());
-			ndAssert(0);
-			//ndBrainLayerLinearActivated* const layer0 = new ndBrainLayerLinearActivated(m_stateSize, layerSize, activation);
-			//ndBrainLayerLinearActivated* const layer1 = new ndBrainLayerLinearActivated(layer0->GetOutputSize(), layerSize, activation);
-			//ndBrainLayerLinearActivated* const layer2 = new ndBrainLayerLinearActivated(layer1->GetOutputSize(), layerSize, activation);
-			//ndBrainLayerLinearActivated* const ouputLayer = new ndBrainLayerLinearActivated(layer2->GetOutputSize(), m_actionsSize, m_tanh);
-			//
-			//actor->AddLayer(layer0);
-			//actor->AddLayer(layer1);
-			//actor->AddLayer(layer2);
-			//actor->AddLayer(ouputLayer);
+
+			layers.SetCount(0);
+			layers.PushBack(new ndBrainLayerLinear(m_stateSize, hiddenLayersNewrons));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+			{
+				actor->AddLayer(layers[i]);
+			}
+			actor->InitWeightsXavierMethod();
+
 
 			// the critic is more complex since is deal with more complex inputs
 			ndSharedPtr<ndBrain> critic(new ndBrain());
-			ndAssert(0);
-			//ndBrainLayerLinearActivated* const criticLayer0 = new ndBrainLayerLinearActivated(m_stateSize + m_actionsSize, layerSize * 2, activation);
-			//ndBrainLayerLinearActivated* const criticLayer1 = new ndBrainLayerLinearActivated(criticLayer0->GetOutputSize(), layerSize * 2, activation);
-			//ndBrainLayerLinearActivated* const criticLayer2 = new ndBrainLayerLinearActivated(criticLayer1->GetOutputSize(), layerSize * 2, activation);
-			//ndBrainLayerLinearActivated* const criticOuputLayer = new ndBrainLayerLinearActivated(criticLayer2->GetOutputSize(), 1, m_relu);
-			//
-			//critic->AddLayer(criticLayer0);
-			//critic->AddLayer(criticLayer1);
-			//critic->AddLayer(criticLayer2);
-			//critic->AddLayer(criticOuputLayer);
+			layers.SetCount(0);
+			layers.PushBack(new ndBrainLayerLinear(m_stateSize + m_actionsSize, hiddenLayersNewrons * 2));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons * 2));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons * 2));
+			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
+			layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+			{
+				critic->AddLayer(layers[i]);
+			}
+			critic->InitWeightsXavierMethod();
 
 			// add a reinforcement learning controller 
-			#ifdef USE_TD3
+			#ifdef ND_USE_TD3
 			ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			#else
 			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			#endif
 			//hyperParameters.m_discountFactor = ndReal (0.995f);
-			//hyperParameters.m_threadsCount = 1;
+			hyperParameters.m_threadsCount = 1;
 
 			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(hyperParameters, actor, critic));
 			agent->SetName("unicycle.dnn");

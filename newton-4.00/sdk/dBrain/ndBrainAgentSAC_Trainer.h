@@ -523,7 +523,7 @@ void ndBrainAgentSAC_Trainer<statesDim, actionDim>::Optimize()
 	BackPropagate();
 	if (IsSampling())
 	{
-		ndExpandTraceMessage("%d star training: episode %d\n", m_frameCount, m_eposideCount);
+		ndExpandTraceMessage("%d start training: episode %d\n", m_frameCount, m_eposideCount);
 	}
 	m_collectingSamples = false;
 }
