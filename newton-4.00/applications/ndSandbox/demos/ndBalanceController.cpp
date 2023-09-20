@@ -418,7 +418,11 @@ namespace ndController_1
 				if (agent->m_modelIsTrained)
 				{
 					char fileName[1024];
-					ndGetWorkingFileName("unicycle.dnn", fileName);
+					#ifdef ND_USE_TD3					
+						ndGetWorkingFileName("unicycleTD3.dnn", fileName);
+					#else	
+						ndGetWorkingFileName("unicycleDDPG.dnn", fileName);
+					#endif		
 					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
 					m_agent = ndSharedPtr<ndBrainAgent>(new ndModelUnicycle::ndControllerAgent(actor));
 					((ndModelUnicycle::ndControllerAgent*)*m_agent)->SetModel(this);
@@ -593,14 +597,22 @@ namespace ndController_1
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_discountFactor = ndReal (0.995f);
 			hyperParameters.m_criticLearnRate = ndReal(0.0005f);
-			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * ndReal(0.5f);
+			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * ndReal(0.25f);
 
 			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(hyperParameters, actor, critic));
-			agent->SetName("unicycle.dnn");
+			#ifdef ND_USE_TD3
+				agent->SetName("unicycleTD3.dnn");
+			#else
+				agent->SetName("unicycleDDPG.dnn");
+			#endif
 			scene->SetAcceleratedUpdate();
 		#else
 			char fileName[1024];
-			ndGetWorkingFileName("unicycle.dnn", fileName);
+			#ifdef ND_USE_TD3
+				ndGetWorkingFileName("unicycleTD3.dnn", fileName);
+			#else
+				ndGetWorkingFileName("unicycleDDPG.dnn", fileName);
+			#endif
 			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
 			ndSharedPtr<ndBrainAgent> agent(new  ndModelUnicycle::ndControllerAgent(actor));
 		#endif
