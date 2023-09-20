@@ -89,6 +89,7 @@ namespace ndController_0
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
 				{
+					SetName("cartpoleDQN.dnn");
 					m_outFile = fopen("cartpole-DQN.csv", "wb");
 					InitWeights();
 				}
@@ -172,10 +173,10 @@ namespace ndController_0
 
 						if (episodeCount && !IsSampling())
 						{
-							ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+							ndExpandTraceMessage("%f %f\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 							if (m_outFile)
 							{
-								fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
+								fprintf(m_outFile, "%f\n", m_averageQValue.GetAverage());
 								fflush(m_outFile);
 							}
 						}
@@ -250,11 +251,13 @@ namespace ndController_0
 					,m_averageFramesPerEpisodes()
 				{
 					#ifdef D_USE_TD3
-					m_outFile = fopen("cartpole-TD3.csv", "wb");
-					fprintf(m_outFile, "td3\n");
+						SetName("cartpoleTD3.dnn");
+						m_outFile = fopen("cartpole-TD3.csv", "wb");
+						fprintf(m_outFile, "td3\n");
 					#else
-					m_outFile = fopen("cartpole-DDPG.csv", "wb");
-					fprintf(m_outFile, "ddpg\n");
+						agent->SetName("cartpoleDDPG.dnn");
+						m_outFile = fopen("cartpole-DDPG.csv", "wb");
+						fprintf(m_outFile, "ddpg\n");
 					#endif
 
 					InitWeights();
@@ -351,10 +354,10 @@ namespace ndController_0
 
 						if (episodeCount && !IsSampling())
 						{
-							ndExpandTraceMessage("%g %g\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+							ndExpandTraceMessage("%f %f\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 							if (m_outFile)
 							{
-								fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
+								fprintf(m_outFile, "%f\n", m_averageQValue.GetAverage());
 								fflush(m_outFile);
 							}
 						}
@@ -368,7 +371,7 @@ namespace ndController_0
 							ndExpandTraceMessage("saving to file: %s\n", fileName);
 							ndExpandTraceMessage("training complete\n\n");
 							ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-							ndExpandTraceMessage("training time: %g\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+							ndExpandTraceMessage("training time: %f\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 						}
 					}
 
@@ -582,7 +585,6 @@ namespace ndController_0
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
 			layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
 			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 			{
 				actor->AddLayer(layers[i]);
@@ -592,9 +594,6 @@ namespace ndController_0
 			ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor));
 
-			char fileName[1024];
-			agent->SetName("cartpoleDQN.dnn");
-			ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
 
 		#else
 
@@ -632,8 +631,7 @@ namespace ndController_0
 			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
-			layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
+			//layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 			{
 				critic->AddLayer(layers[i]);
@@ -647,14 +645,6 @@ namespace ndController_0
 				ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			#endif
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor, critic));
-
-			char fileName[1024];
-			#ifdef D_USE_TD3
-				agent->SetName("cartpoleTD3.dnn");
-			#else
-				agent->SetName("cartpoleDDPG.dnn");
-			#endif	
-			ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
 		#endif
 
 		ndCartpole* const model = new ndCartpole(agent);

@@ -23,7 +23,7 @@
 namespace ndController_1
 {
 	#define ND_USE_TD3
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
 	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)
@@ -152,12 +152,15 @@ namespace ndController_1
 			{
 				SetActionNoise(ndReal (0.15f));
 				#ifdef ND_USE_TD3
+					SetName("unicycleTD3.dnn");
 					m_outFile = fopen("traingPerf-TD3.csv", "wb");
 					fprintf(m_outFile, "td3\n");
 				#else
+					SetName("unicycleDDPG.dnn");
 					m_outFile = fopen("traingPerf-SAC.csv", "wb");
 					fprintf(m_outFile, "sac\n");
 				#endif
+
 				InitWeights();
 				m_bestActor.CopyFrom(m_actor);
 				m_timer = ndGetTimeInMicroseconds();
@@ -252,13 +255,13 @@ namespace ndController_1
 						{
 							m_bestActor.CopyFrom(m_actor);
 							m_maxGain = m_averageQvalue.GetAverage();
-							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %g\taverageValue %g\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
+							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
 						}
 					}
 
 					if (episodeCount && !IsSampling())
 					{
-						ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						ndExpandTraceMessage("step: %d\treward: %f\tframes: %f\n", GetFramesCount(), m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 						if (m_outFile)
 						{
 							fprintf(m_outFile, "%g\n", m_averageQvalue.GetAverage());
@@ -417,13 +420,7 @@ namespace ndController_1
 				ndControllerAgent_trainer* const agent = (ndControllerAgent_trainer*)*m_agent;
 				if (agent->m_modelIsTrained)
 				{
-					char fileName[1024];
-					#ifdef ND_USE_TD3					
-						ndGetWorkingFileName("unicycleTD3.dnn", fileName);
-					#else	
-						ndGetWorkingFileName("unicycleDDPG.dnn", fileName);
-					#endif		
-					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(agent->GetName().GetStr()));
 					m_agent = ndSharedPtr<ndBrainAgent>(new ndModelUnicycle::ndControllerAgent(actor));
 					((ndModelUnicycle::ndControllerAgent*)*m_agent)->SetModel(this);
 					ResetModel();
@@ -600,11 +597,6 @@ namespace ndController_1
 			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * ndReal(0.25f);
 
 			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(hyperParameters, actor, critic));
-			#ifdef ND_USE_TD3
-				agent->SetName("unicycleTD3.dnn");
-			#else
-				agent->SetName("unicycleDDPG.dnn");
-			#endif
 			scene->SetAcceleratedUpdate();
 		#else
 			char fileName[1024];
