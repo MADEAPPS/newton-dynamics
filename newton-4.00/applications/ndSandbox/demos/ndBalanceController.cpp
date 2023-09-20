@@ -590,9 +590,10 @@ namespace ndController_1
 			#else
 			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			#endif
-			//hyperParameters.m_discountFactor = ndReal (0.995f);
 			//hyperParameters.m_threadsCount = 1;
-			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * 0.1f;
+			hyperParameters.m_discountFactor = ndReal (0.995f);
+			hyperParameters.m_criticLearnRate = ndReal(0.0005f);
+			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * ndReal(0.5f);
 
 			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(hyperParameters, actor, critic));
 			agent->SetName("unicycle.dnn");

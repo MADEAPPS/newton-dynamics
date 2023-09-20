@@ -46,10 +46,12 @@ const char* ndBrainLayerTanhActivation::GetLabelId() const
 void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
+#if 0
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal out = ndReal(0.0f);
 		ndReal value = input[i];
+		ndReal out1 = ndTanh(value);
 		if (value > ndReal(0.0f))
 		{
 			ndReal p = ndReal(ndExp(-ndReal(2.0f) * value));
@@ -66,6 +68,13 @@ void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBr
 		ndAssert(output[i] <= ndReal(1.0f));
 		ndAssert(output[i] >= ndReal(-1.0f));
 	}
+#else
+	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	{
+		output[i] = ndTanh(input[i]);
+	}
+	output.FlushToZero();
+#endif
 }
 
 void ndBrainLayerTanhActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
