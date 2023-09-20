@@ -47,7 +47,7 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 			m_bashBufferSize = 64;
 			m_discountFactor = ndReal(0.99f);
 			m_regularizer = ndReal(1.0e-6f);
-			m_actorLearnRate = ndReal(0.0005f);
+			m_actorLearnRate = ndReal(0.0002f);
 			m_criticLearnRate = ndReal(0.001f);
 			m_replayBufferSize = 1024 * 512;
 			m_replayBufferPrefill = 1024 * 4;
@@ -172,8 +172,8 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const Hyp
 	ndAssert(m_critic0.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
 	ndAssert(m_critic1.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
 	ndAssert(!strcmp((m_actor[m_actor.GetCount() - 1])->GetLabelId(), "ndBrainLayerTanhActivation"));
-	ndAssert(!strcmp((m_critic0[m_critic0.GetCount() - 1])->GetLabelId(), "ndBrainLayerReluActivation"));
-	ndAssert(!strcmp((m_critic1[m_critic1.GetCount() - 1])->GetLabelId(), "ndBrainLayerReluActivation"));
+	//ndAssert(!strcmp((m_critic0[m_critic0.GetCount() - 1])->GetLabelId(), "ndBrainLayerReluActivation"));
+	//ndAssert(!strcmp((m_critic1[m_critic1.GetCount() - 1])->GetLabelId(), "ndBrainLayerReluActivation"));
 
 	SetThreadCount(hyperParameters.m_threadsCount);
 	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)

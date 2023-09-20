@@ -22,7 +22,7 @@
 
 namespace ndController_1
 {
-	//#define ND_USE_TD3
+	#define ND_USE_TD3
 	#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
@@ -147,7 +147,7 @@ namespace ndController_1
 				,m_stopTraining(1000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
-				,m_averageQValue()
+				,m_averageQvalue()
 				,m_averageFramesPerEpisodes()
 			{
 				SetActionNoise(ndReal (0.15f));
@@ -219,7 +219,7 @@ namespace ndController_1
 						state = true;
 					}
 
-					m_averageQValue.Update(GetCurrentValue());
+					m_averageQvalue.Update(GetCurrentValue());
 					if (state)
 					{
 						m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
@@ -248,20 +248,20 @@ namespace ndController_1
 					episodeCount -= GetEposideCount();
 					if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32 (m_maxFrames))
 					{
-						if (m_averageQValue.GetAverage() > m_maxGain)
+						if (m_averageQvalue.GetAverage() > m_maxGain)
 						{
 							m_bestActor.CopyFrom(m_actor);
-							m_maxGain = m_averageQValue.GetAverage();
-							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %g\taverageValue %g\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+							m_maxGain = m_averageQvalue.GetAverage();
+							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %g\taverageValue %g\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
 						}
 					}
 
 					if (episodeCount && !IsSampling())
 					{
-						ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 						if (m_outFile)
 						{
-							fprintf(m_outFile, "%g\n", m_averageQValue.GetAverage());
+							fprintf(m_outFile, "%g\n", m_averageQvalue.GetAverage());
 							fflush(m_outFile);
 						}
 					}
@@ -275,7 +275,7 @@ namespace ndController_1
 						SaveToFile(fileName);
 						ndExpandTraceMessage("saving to file: %s\n", fileName);
 						ndExpandTraceMessage("training complete\n");
-						ndExpandTraceMessage("episode: %d\taverageFrames: %g\taverageValue %g\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+						ndExpandTraceMessage("episode: %d\taverageFrames: %g\taverageValue %g\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
 						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
 						ndExpandTraceMessage("training time: %g\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 					}
@@ -294,7 +294,7 @@ namespace ndController_1
 			ndInt32 m_stopTraining;
 			ndUnsigned64 m_timer;
 			bool m_modelIsTrained;
-			mutable ndMovingAverage<32> m_averageQValue;
+			mutable ndMovingAverage<32> m_averageQvalue;
 			mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 		};
 
@@ -577,7 +577,7 @@ namespace ndController_1
 			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
-			layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			//layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 			{
 				critic->AddLayer(layers[i]);
@@ -591,7 +591,8 @@ namespace ndController_1
 			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			#endif
 			//hyperParameters.m_discountFactor = ndReal (0.995f);
-			hyperParameters.m_threadsCount = 1;
+			//hyperParameters.m_threadsCount = 1;
+			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * 0.1f;
 
 			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(hyperParameters, actor, critic));
 			agent->SetName("unicycle.dnn");
