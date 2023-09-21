@@ -565,8 +565,8 @@ namespace ndController_1
 
 
 			// the critic is more complex since is deal with more complex inputs
-			ndSharedPtr<ndBrain> critic(new ndBrain());
 			layers.SetCount(0);
+			ndSharedPtr<ndBrain> critic(new ndBrain());
 			layers.PushBack(new ndBrainLayerLinear(m_stateSize + m_actionsSize, hiddenLayersNewrons * 2));
 			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
@@ -577,7 +577,6 @@ namespace ndController_1
 			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
-			//layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 			{
 				critic->AddLayer(layers[i]);
