@@ -278,7 +278,6 @@ namespace ndController_1
 						SaveToFile(fileName);
 						ndExpandTraceMessage("saving to file: %s\n", fileName);
 						ndExpandTraceMessage("training complete\n");
-						ndExpandTraceMessage("episode: %d\taverageFrames: %g\taverageValue %g\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
 						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
 						ndExpandTraceMessage("training time: %g\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 					}

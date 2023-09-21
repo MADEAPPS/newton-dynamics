@@ -82,16 +82,21 @@ namespace ndController_0
 				public:
 				ndCartpoleAgent_trainer(ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters, ndSharedPtr<ndBrain>& qValuePredictor)
 					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(hyperParameters, qValuePredictor)
+					,m_bestActor(*(*qValuePredictor))
 					,m_model(nullptr)
 					,m_stopTraining(2000000)
 					,m_maxGain(-1.0e10f)
 					,m_maxFrames(4000.0f)
+					,m_timer(0)
 					,m_averageQValue()
 					,m_averageFramesPerEpisodes()
 				{
 					SetName("cartpoleDQN.dnn");
 					m_outFile = fopen("cartpole-DQN.csv", "wb");
 					InitWeights();
+
+					m_bestActor.CopyFrom(*(*m_actor));
+					m_timer = ndGetTimeInMicroseconds();
 				}
 
 				~ndCartpoleAgent_trainer()
@@ -161,13 +166,9 @@ namespace ndController_0
 						{
 							if (m_averageQValue.GetAverage() > m_maxGain)
 							{
-								char fileName[1024];
-								ndGetWorkingFileName(GetName().GetStr(), fileName);
-
-								SaveToFile(fileName);
-								ndExpandTraceMessage("saving to file: %s\n", fileName);
-								ndExpandTraceMessage("episode: %d\taverageFrames: %f\taverageValue %f\n\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+								m_bestActor.CopyFrom(*(*m_actor));
 								m_maxGain = m_averageQValue.GetAverage();
+								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
 							}
 						}
 
@@ -183,8 +184,14 @@ namespace ndController_0
 
 						if (stopTraining == m_stopTraining)
 						{
-							ndExpandTraceMessage("\n");
-							ndExpandTraceMessage("training complete\n");
+							char fileName[1024];
+							m_actor->CopyFrom(m_bestActor);
+							ndGetWorkingFileName(GetName().GetStr(), fileName);
+							SaveToFile(fileName);
+							ndExpandTraceMessage("saving to file: %s\n", fileName);
+							ndExpandTraceMessage("training complete\n\n");
+							ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+							ndExpandTraceMessage("training time: %f\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 						}
 					}
 							
@@ -195,10 +202,12 @@ namespace ndController_0
 				}
 
 				FILE* m_outFile;
+				ndBrain m_bestActor;
 				ndCartpole* m_model;
 				ndInt32 m_stopTraining;
 				ndFloat32 m_maxGain;
 				ndFloat32 m_maxFrames;
+				ndUnsigned64 m_timer;
 				mutable ndMovingAverage<32> m_averageQValue;
 				mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 			};
@@ -593,7 +602,6 @@ namespace ndController_0
 
 			ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor));
-
 
 		#else
 
