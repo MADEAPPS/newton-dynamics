@@ -141,7 +141,7 @@ namespace ndQuadruped_1
 				ndAssert(param >= ndFloat32(0.0f));
 				ndAssert(param <= ndFloat32(1.0f));
 
-				param = 0.125f;
+				//param = 0.125f;
 				
 				m_stanceMask = 0x0f;
 				ndFloat32 omega = ndPi / m_gaitFraction;
@@ -151,7 +151,7 @@ namespace ndQuadruped_1
 					ndFloat32 t = ndMod (param - m_phase[i] + ndFloat32(1.0f), ndFloat32 (1.0f));
 					if (t <= m_gaitFraction)
 					{
-						//if (i == 0)
+						if (i == 0)
 						//if ((i == 0) || (i == 3))
 						//if ((i == 1) || (i == 2))
 						{
@@ -634,12 +634,6 @@ namespace ndQuadruped_1
 			comLineOfAction.m_y = comMatrix.m_posit.m_y - 0.38f;
 			context.DrawPoint(comLineOfAction, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 10);
 
-
-//static int xxxx;
-//xxxx++;
-//if (xxxx == 1000)
-//xxxx *= 1;
-
 			ndVector netTorque(ndVector::m_zero);
 			ndVector netTorque1(ndVector::m_zero);
 			for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
@@ -692,7 +686,7 @@ namespace ndQuadruped_1
 				}
 			}
 
-			ndVector supportColor(1.0f, 1.0f, 0.0f, 1.0f);
+			ndVector supportColor(0.0f, 1.0f, 1.0f, 1.0f);
 			if (contactPoints.GetCount() >= 3)
 			{
 				ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
@@ -831,8 +825,8 @@ namespace ndQuadruped_1
 			m_control->m_animSpeed = 0.1f;
 			if (m_control->m_enableController)
 			{
-				m_control->m_x = ndClamp(ndReal(m_control->m_x + actions[m_bodySwing_x] * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
-				m_control->m_z = ndClamp(ndReal(m_control->m_z + actions[m_bodySwing_z] * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
+				//m_control->m_x = ndClamp(ndReal(m_control->m_x + actions[m_bodySwing_x] * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
+				//m_control->m_z = ndClamp(ndReal(m_control->m_z + actions[m_bodySwing_z] * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
 			}
 			ApplyPoseGeneration();
 		}
@@ -1077,7 +1071,7 @@ namespace ndQuadruped_1
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
-			m_agent->OptimizeStep();
+			//m_agent->OptimizeStep();
 			CheckTrainingCompleted();
 		}
 

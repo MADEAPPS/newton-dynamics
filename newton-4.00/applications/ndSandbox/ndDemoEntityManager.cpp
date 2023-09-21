@@ -445,7 +445,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_solverSubSteps = 2;
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
-	//m_showNormalForces = true;
+	m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
 	m_showModelsDebugInfo = true;
