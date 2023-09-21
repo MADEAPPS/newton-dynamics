@@ -139,7 +139,6 @@ namespace ndController_1
 				,m_averageQvalue()
 				,m_averageFramesPerEpisodes()
 			{
-				SetActionNoise(ndReal (0.15f));
 				#ifdef ND_USE_TD3
 					SetName("unicycleTD3.dnn");
 					m_outFile = fopen("traingPerf-TD3.csv", "wb");
@@ -581,6 +580,7 @@ namespace ndController_1
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_discountFactor = ndReal (0.995f);
 			hyperParameters.m_criticLearnRate = ndReal(0.0005f);
+			hyperParameters.m_actionNoiseVariance = ndReal(0.125f);
 			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * ndReal(0.25f);
 
 			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(hyperParameters, actor, critic));
