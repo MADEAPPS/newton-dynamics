@@ -22,6 +22,7 @@
 
 namespace ndQuadruped_1
 {
+	//#define ND_USE_TD3
 	#define ND_TRAIN_MODEL
 	#define D_SWING_STEP			ndReal(0.01f)
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
@@ -141,7 +142,7 @@ namespace ndQuadruped_1
 				ndAssert(param >= ndFloat32(0.0f));
 				ndAssert(param <= ndFloat32(1.0f));
 
-				//param = 0.125f;
+				param = 0.125f;
 				
 				m_stanceMask = 0x0f;
 				ndFloat32 omega = ndPi / m_gaitFraction;
@@ -151,7 +152,7 @@ namespace ndQuadruped_1
 					ndFloat32 t = ndMod (param - m_phase[i] + ndFloat32(1.0f), ndFloat32 (1.0f));
 					if (t <= m_gaitFraction)
 					{
-						if (i == 0)
+						//if (i == 0)
 						//if ((i == 0) || (i == 3))
 						//if ((i == 1) || (i == 2))
 						{
@@ -207,7 +208,11 @@ namespace ndQuadruped_1
 			ndModelQuadruped* m_model;
 		};
 
+		#ifdef ND_USE_TD3
 		class ndControllerAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
+		#else
+		class ndControllerAgent_trainer : public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
+		#endif	
 		{
 			public:
 			class ndBasePose
@@ -241,8 +246,13 @@ namespace ndQuadruped_1
 				ndBodyDynamic* m_body;
 			};
 
+			#ifdef ND_USE_TD3
 			ndControllerAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
+			#else
+			ndControllerAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
+				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
+			#endif
 				,m_bestActor(*(*actor))
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
@@ -254,8 +264,13 @@ namespace ndQuadruped_1
 				,m_averageFramesPerEpisodes()
 			{
 				SetName("quadruped_1.dnn");
+				#ifdef ND_USE_TD3
 				m_outFile = fopen("traingPerf-TD3.csv", "wb");
 				fprintf(m_outFile, "td3\n");
+				#else	
+				m_outFile = fopen("traingPerf-DDPG.csv", "wb");
+				fprintf(m_outFile, "ddpg\n");
+				#endif	
 				m_timer = ndGetTimeInMicroseconds();
 
 				InitWeights();
@@ -391,7 +406,11 @@ namespace ndQuadruped_1
 				if (stopTraining <= m_stopTraining)
 				{
 					ndInt32 episodeCount = GetEposideCount();
-					ndBrainAgentTD3_Trainer::OptimizeStep();
+					#ifdef ND_USE_TD3
+						ndBrainAgentTD3_Trainer::OptimizeStep();
+					#else
+						ndBrainAgentDDPG_Trainer::OptimizeStep();
+					#endif
 				
 					episodeCount -= GetEposideCount();
 					if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
@@ -1178,7 +1197,12 @@ namespace ndQuadruped_1
 
 
 			// add a reinforcement learning controller 
-			ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			#ifdef ND_USE_TD3
+				ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			#else
+				ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			#endif
+
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_discountFactor = ndReal(0.995f);
 			hyperParameters.m_criticLearnRate = ndReal(0.0005f);

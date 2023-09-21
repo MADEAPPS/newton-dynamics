@@ -22,8 +22,8 @@
 
 namespace ndController_0
 {
-	#define D_USE_TD3
-	//#define D_USE_POLE_DQN
+	//#define D_USE_TD3
+	#define D_USE_POLE_DQN
 
 	#define D_PUSH_ACCEL			ndFloat32 (15.0f)
 	#define D_REWARD_MIN_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
@@ -95,7 +95,7 @@ namespace ndController_0
 					m_outFile = fopen("cartpole-DQN.csv", "wb");
 					InitWeights();
 
-					m_bestActor.CopyFrom(*(*m_actor));
+					m_bestActor.CopyFrom(m_actor);
 					m_timer = ndGetTimeInMicroseconds();
 				}
 
@@ -166,7 +166,7 @@ namespace ndController_0
 						{
 							if (m_averageQValue.GetAverage() > m_maxGain)
 							{
-								m_bestActor.CopyFrom(*(*m_actor));
+								m_bestActor.CopyFrom(m_actor);
 								m_maxGain = m_averageQValue.GetAverage();
 								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
 							}
@@ -185,7 +185,7 @@ namespace ndController_0
 						if (stopTraining == m_stopTraining)
 						{
 							char fileName[1024];
-							m_actor->CopyFrom(m_bestActor);
+							m_actor.CopyFrom(m_bestActor);
 							ndGetWorkingFileName(GetName().GetStr(), fileName);
 							SaveToFile(fileName);
 							ndExpandTraceMessage("saving to file: %s\n", fileName);

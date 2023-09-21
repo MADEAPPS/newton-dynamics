@@ -170,7 +170,8 @@ namespace biped2
 			m_actionSize,
 		};
 
-		ndHumanoidBrain(ndInt32 numberOfImputs, ndInt32 numberOfOutputs)
+		//ndHumanoidBrain(ndInt32 numberOfImputs, ndInt32 numberOfOutputs)
+		ndHumanoidBrain(ndInt32, ndInt32)
 			:ndBrain()
 		{
 			ndAssert(0);

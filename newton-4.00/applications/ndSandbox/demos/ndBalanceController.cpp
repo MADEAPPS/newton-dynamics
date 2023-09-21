@@ -79,7 +79,6 @@ namespace ndController_1
 		};
 
 		// implement controller player
-#ifdef ND_USE_TD3
 		class ndControllerAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
 		{
 			public:
@@ -88,16 +87,6 @@ namespace ndController_1
 				,m_model(nullptr)
 			{
 			}
-#else
-		class ndControllerAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
-		{
-			public:
-			ndControllerAgent(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentDDPG<m_stateSize, m_actionsSize>(actor)
-				, m_model(nullptr)
-			{
-			}
-#endif
 
 			void SetModel(ndModelUnicycle* const model)
 			{
@@ -127,19 +116,19 @@ namespace ndController_1
 
 		// the table based approach is not really practical
 		// try implement DDPN controller using neural networks. 
-#ifdef ND_USE_TD3
+		#ifdef ND_USE_TD3
 		class ndControllerAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
 			ndControllerAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
-#else
+		#else
 		class ndControllerAgent_trainer: public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
 			ndControllerAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
 				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
-#endif
+		#endif
 				,m_bestActor(*(*actor))
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
@@ -157,8 +146,8 @@ namespace ndController_1
 					fprintf(m_outFile, "td3\n");
 				#else
 					SetName("unicycleDDPG.dnn");
-					m_outFile = fopen("traingPerf-SAC.csv", "wb");
-					fprintf(m_outFile, "sac\n");
+					m_outFile = fopen("traingPerf-DDPG.csv", "wb");
+					fprintf(m_outFile, "DDPG\n");
 				#endif
 
 				InitWeights();

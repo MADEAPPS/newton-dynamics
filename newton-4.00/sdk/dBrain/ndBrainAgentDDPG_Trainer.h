@@ -156,7 +156,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 	ndAssert(m_critic.GetOutputSize() == 1);
 	ndAssert(m_critic.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
 	ndAssert(!strcmp((m_actor[m_actor.GetCount() - 1])->GetLabelId(), "ndBrainLayerTanhActivation"));
-	ndAssert(!strcmp((m_critic[m_critic.GetCount() - 1])->GetLabelId(), "ndBrainLayerReluActivation"));
+	//ndAssert(!strcmp((m_critic[m_critic.GetCount() - 1])->GetLabelId(), "ndBrainLayerReluActivation"));
 	
 	SetThreadCount(hyperParameters.m_threadsCount);
 	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)

@@ -97,7 +97,8 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void SetBufferSize(ndInt32 size);
 
 	protected:
-	ndSharedPtr<ndBrain> m_actor;
+	//ndSharedPtr<ndBrain> m_actor;
+	ndBrain m_actor;
 	ndBrain m_target;
 	ndBrainOptimizerAdam* m_optimizer;
 	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> m_trainers;
@@ -123,8 +124,8 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const HyperParameters& hyperParameters, const ndSharedPtr<ndBrain>& actor)
 	:ndBrainAgent()
 	,ndBrainThreadPool()
-	,m_actor(actor)
-	,m_target(*(*m_actor))
+	,m_actor(*(*actor))
+	,m_target(*(*actor))
 	,m_optimizer(nullptr)
 	,m_replayBuffer()
 	,m_gamma(hyperParameters.m_discountFactor)
@@ -143,7 +144,7 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 	SetThreadCount(hyperParameters.m_threadsCount);
 	for (ndInt32 i = 0; i < GetThreadCount(); ++i)
 	{
-		ndBrainTrainer* const trainer = new ndBrainTrainer(*m_actor);
+		ndBrainTrainer* const trainer = new ndBrainTrainer(&m_actor);
 		m_trainers.PushBack(trainer);
 	}
 
@@ -170,15 +171,15 @@ bool ndBrainAgentDQN_Trainer<statesDim, actionDim>::IsTrainer() const
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::InitWeights()
 {
-	m_actor->InitWeightsXavierMethod();
-	m_target.CopyFrom(*(*m_actor));
+	m_actor.InitWeightsXavierMethod();
+	m_target.CopyFrom(m_actor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::InitWeights(ndReal weighVariance, ndReal biasVariance)
 {
-	m_actor->InitWeights(weighVariance, biasVariance);
-	m_target.CopyFrom(*(*m_actor));
+	m_actor.InitWeights(weighVariance, biasVariance);
+	m_target.CopyFrom(m_actor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -315,14 +316,14 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
 	{
 		// update on line network
-		m_target.CopyFrom(*(*m_actor));
+		m_target.CopyFrom(m_actor);
 	}
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Save(ndBrainSave* const loadSave) const
 {
-	loadSave->Save(*m_actor);
+	loadSave->Save(&m_actor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -367,7 +368,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 	ndBrainMemVector actions(actionBuffer, actionDim);
 
 	GetObservation(&state[0]);
-	m_actor->MakePrediction(state, actions);
+	m_actor.MakePrediction(state, actions);
 	for (ndInt32 i = 0; i < statesDim; ++i)
 	{
 		m_currentTransition.m_state[i] = state[i];

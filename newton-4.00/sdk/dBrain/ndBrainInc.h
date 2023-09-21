@@ -34,7 +34,6 @@
 #include <ndBrainSaveLoad.h>
 #include <ndBrainAgentDQN.h>
 #include <ndBrainAgentTD3.h>
-#include <ndBrainAgentSAC.h>
 #include <ndBrainAgentDDPG.h>
 #include <ndBrainOptimizer.h>
 #include <ndBrainThreadPool.h>
@@ -45,7 +44,6 @@
 #include <ndBrainLayerActivation.h>
 #include <ndBrainAgentDQN_Trainer.h>
 #include <ndBrainAgentTD3_Trainer.h>
-#include <ndBrainAgentSAC_Trainer.h>
 #include <ndBrainAgentDDPG_Trainer.h>
 #include <ndBrainLayerReluActivation.h>
 #include <ndBrainLayerTanhActivation.h>
