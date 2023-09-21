@@ -58,10 +58,11 @@ ndBrain* ndBrainLoad::Load(const char* const pathName)
 
 		ndFloat32 ReadFloat() const
 		{
+			//ndBrainFloat value;
 			ndReal value;
 			ndInt32 error = 0;
 			error = fscanf(m_file, "%f", &value);
-			return value;
+			return ndFloat32 (value);
 		}
 
 		void ReadString(char* const buffer) const

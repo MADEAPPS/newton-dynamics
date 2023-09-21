@@ -64,12 +64,12 @@ namespace ndController_0
 				{
 				}
 
-				void GetObservation(ndReal* const state) const
+				void GetObservation(ndBrainFloat* const state) const
 				{
 					m_model->GetObservation(state);
 				}
 
-				virtual void ApplyActions(ndReal* const actions) const
+				virtual void ApplyActions(ndBrainFloat* const actions) const
 				{
 					m_model->ApplyActions(actions);
 				}
@@ -88,7 +88,7 @@ namespace ndController_0
 					,m_maxGain(-1.0e10f)
 					,m_maxFrames(4000.0f)
 					,m_timer(0)
-					,m_averageQValue()
+					,m_averageQvalue()
 					,m_averageFramesPerEpisodes()
 				{
 					SetName("cartpoleDQN.dnn");
@@ -107,12 +107,12 @@ namespace ndController_0
 					}
 				}
 
-				ndReal GetReward() const
+				ndBrainFloat GetReward() const
 				{
 					return m_model->GetReward();
 				}
 
-				virtual void ApplyActions(ndReal* const actions) const
+				virtual void ApplyActions(ndBrainFloat* const actions) const
 				{
 					if (GetEpisodeFrames() >= 10000)
 					{
@@ -123,7 +123,7 @@ namespace ndController_0
 					m_model->ApplyActions(actions);
 				}
 
-				void GetObservation(ndReal* const state) const
+				void GetObservation(ndBrainFloat* const state) const
 				{
 					m_model->GetObservation(state);
 				}
@@ -133,7 +133,7 @@ namespace ndController_0
 					bool state = m_model->IsTerminal();
 					if (!IsSampling())
 					{
-						m_averageQValue.Update(GetCurrentValue());
+						m_averageQvalue.Update(ndReal (GetCurrentValue()));
 						if (state)
 						{
 							m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
@@ -164,20 +164,20 @@ namespace ndController_0
 
 						if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
 						{
-							if (m_averageQValue.GetAverage() > m_maxGain)
+							if (m_averageQvalue.GetAverage() > m_maxGain)
 							{
 								m_bestActor.CopyFrom(m_actor);
-								m_maxGain = m_averageQValue.GetAverage();
-								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+								m_maxGain = m_averageQvalue.GetAverage();
+								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
 							}
 						}
 
 						if (episodeCount && !IsSampling())
 						{
-							ndExpandTraceMessage("%f %f\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+							ndExpandTraceMessage("%f %f\n", m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 							if (m_outFile)
 							{
-								fprintf(m_outFile, "%f\n", m_averageQValue.GetAverage());
+								fprintf(m_outFile, "%f\n", m_averageQvalue.GetAverage());
 								fflush(m_outFile);
 							}
 						}
@@ -208,7 +208,7 @@ namespace ndController_0
 				ndFloat32 m_maxGain;
 				ndFloat32 m_maxFrames;
 				ndUnsigned64 m_timer;
-				mutable ndMovingAverage<32> m_averageQValue;
+				mutable ndMovingAverage<32> m_averageQvalue;
 				mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 			};
 
@@ -223,12 +223,12 @@ namespace ndController_0
 				{
 				}
 
-				void GetObservation(ndReal* const state) const
+				void GetObservation(ndBrainFloat* const state) const
 				{
 					m_model->GetObservation(state);
 				}
 
-				virtual void ApplyActions(ndReal* const actions) const
+				virtual void ApplyActions(ndBrainFloat* const actions) const
 				{
 					m_model->ApplyActions(actions);
 				}
@@ -256,7 +256,7 @@ namespace ndController_0
 					,m_maxFrames(5000)
 					,m_stopTraining(500000)
 					,m_timer(0)
-					,m_averageQValue()
+					,m_averageQvalue()
 					,m_averageFramesPerEpisodes()
 				{
 					#ifdef D_USE_TD3
@@ -287,7 +287,7 @@ namespace ndController_0
 					return m_model->GetReward();
 				}
 
-				virtual void ApplyActions(ndReal* const actions) const
+				virtual void ApplyActions(ndBrainFloat* const actions) const
 				{
 					if (GetEpisodeFrames() >= 15000)
 					{
@@ -310,7 +310,7 @@ namespace ndController_0
 					m_model->ApplyActions(actions);
 				}
 
-				void GetObservation(ndReal* const state) const
+				void GetObservation(ndBrainFloat* const state) const
 				{
 					m_model->GetObservation(state);
 				}
@@ -324,7 +324,7 @@ namespace ndController_0
 						{
 							state = true;
 						}
-						m_averageQValue.Update(GetCurrentValue());
+						m_averageQvalue.Update(GetCurrentValue());
 						if (state)
 						{
 							m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
@@ -353,20 +353,20 @@ namespace ndController_0
 						episodeCount -= GetEposideCount();
 						if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32 (m_maxFrames))
 						{
-							if (m_averageQValue.GetAverage() > m_maxGain)
+							if (m_averageQvalue.GetAverage() > m_maxGain)
 							{
 								m_bestActor.CopyFrom(m_actor);
-								m_maxGain = m_averageQValue.GetAverage();
-								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQValue.GetAverage());
+								m_maxGain = m_averageQvalue.GetAverage();
+								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
 							}
 						}
 
 						if (episodeCount && !IsSampling())
 						{
-							ndExpandTraceMessage("%f %f\n", m_averageQValue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+							ndExpandTraceMessage("%f %f\n", m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 							if (m_outFile)
 							{
-								fprintf(m_outFile, "%f\n", m_averageQValue.GetAverage());
+								fprintf(m_outFile, "%f\n", m_averageQvalue.GetAverage());
 								fflush(m_outFile);
 							}
 						}
@@ -397,7 +397,7 @@ namespace ndController_0
 				ndInt32 m_maxFrames;
 				ndInt32 m_stopTraining;
 				ndUnsigned64 m_timer;
-				mutable ndMovingAverage<32> m_averageQValue;
+				mutable ndMovingAverage<32> m_averageQvalue;
 				mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 			};
 
@@ -433,7 +433,7 @@ namespace ndController_0
 			return ndReal(reward);
 		}
 
-		void ApplyActions(ndReal* const actions) const
+		void ApplyActions(ndBrainFloat* const actions) const
 		{
 			ndVector force(m_cart->GetForce());
 			#ifdef D_USE_POLE_DQN
@@ -453,7 +453,7 @@ namespace ndController_0
 			m_cart->SetForce(force);
 		}
 
-		void GetObservation(ndReal* const state)
+		void GetObservation(ndBrainFloat* const state)
 		{
 			ndVector omega(m_pole->GetOmega());
 			const ndMatrix& matrix = m_pole->GetMatrix();

@@ -26,31 +26,31 @@
 ndBrainOptimizer::ndBrainOptimizer(ndBrainTrainer* const trainer)
 	:ndClassAlloc()
 	,m_trainer(trainer)
-	,m_weighDecayRegularizer(ndReal(1.0e-5f))
+	,m_weighDecayRegularizer(ndBrainFloat(1.0e-5f))
 {
-	//m_weighDecayRegularizer = ndReal(1.0e-4f);
-	//m_weighDecayRegularizer = ndReal(5.0e-5f);
-	//m_weighDecayRegularizer = ndReal(2.5e-5f);
+	//m_weighDecayRegularizer = ndBrainFloat(1.0e-4f);
+	//m_weighDecayRegularizer = ndBrainFloat(5.0e-5f);
+	//m_weighDecayRegularizer = ndBrainFloat(2.5e-5f);
 	// so far best training result on the mnist data set
-	//m_weighDecayRegularizer = ndReal(2.0e-5f); 
-	//m_weighDecayRegularizer = ndReal(3.0e-5f); 
+	//m_weighDecayRegularizer = ndBrainFloat(2.0e-5f); 
+	//m_weighDecayRegularizer = ndBrainFloat(3.0e-5f); 
 }
 
 ndBrainOptimizer::~ndBrainOptimizer()
 {
 }
 
-ndReal ndBrainOptimizer::GetRegularizer() const
+ndBrainFloat ndBrainOptimizer::GetRegularizer() const
 {
 	return m_weighDecayRegularizer;
 }
 
-void ndBrainOptimizer::SetRegularizer(ndReal regularizer)
+void ndBrainOptimizer::SetRegularizer(ndBrainFloat regularizer)
 {
-	m_weighDecayRegularizer = ndClamp(regularizer, ndReal(0.0f), ndReal(0.01f));
+	m_weighDecayRegularizer = ndClamp(regularizer, ndBrainFloat(0.0f), ndBrainFloat(0.01f));
 }
 
-void ndBrainOptimizer::Update(ndReal, ndInt32)
+void ndBrainOptimizer::Update(ndBrainFloat, ndInt32)
 {
 	ndAssert(0);
 }

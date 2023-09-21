@@ -76,7 +76,7 @@ void ndBrainLayerActivation::InitWeightsXavierMethod()
 {
 }
 
-void ndBrainLayerActivation::InitWeights(ndReal, ndReal)
+void ndBrainLayerActivation::InitWeights(ndBrainFloat, ndBrainFloat)
 {
 }
 
@@ -84,7 +84,7 @@ void ndBrainLayerActivation::CopyFrom(const ndBrainLayer&)
 {
 }
 
-void ndBrainLayerActivation::Blend(const ndBrainLayer&, ndReal)
+void ndBrainLayerActivation::Blend(const ndBrainLayer&, ndBrainFloat)
 {
 }
 

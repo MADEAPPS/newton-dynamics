@@ -32,14 +32,14 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 	ndBrainOptimizerAdam(ndBrainTrainer* const trainer);
 	virtual ~ndBrainOptimizerAdam();
 
-	virtual void Update(ndReal learnRate, ndInt32 bashSize);
+	virtual void Update(ndBrainFloat learnRate, ndInt32 bashSize);
 
 	ndArray<ndAdamData*> m_data;
-	ndReal m_beta;
-	ndReal m_alpha;
-	ndReal m_epsilon;
-	ndReal m_betaAcc;
-	ndReal m_alphaAcc;
+	ndBrainFloat m_beta;
+	ndBrainFloat m_alpha;
+	ndBrainFloat m_epsilon;
+	ndBrainFloat m_betaAcc;
+	ndBrainFloat m_alphaAcc;
 };
 
 #endif 

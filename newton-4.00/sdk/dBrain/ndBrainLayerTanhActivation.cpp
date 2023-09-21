@@ -49,24 +49,24 @@ void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBr
 #if 0
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
-		ndReal out = ndReal(0.0f);
-		ndReal value = input[i];
-		ndReal out1 = ndTanh(value);
-		if (value > ndReal(0.0f))
+		ndBrainFloat out = ndBrainFloat(0.0f);
+		ndBrainFloat value = input[i];
+		ndBrainFloat out1 = ndTanh(value);
+		if (value > ndBrainFloat(0.0f))
 		{
-			ndReal p = ndReal(ndExp(-ndReal(2.0f) * value));
-			out = ndFlushToZero((ndReal(1.0f) - p) / (p + ndReal(1.0f)));
+			ndBrainFloat p = ndBrainFloat(ndExp(-ndBrainFloat(2.0f) * value));
+			out = ndFlushToZero((ndBrainFloat(1.0f) - p) / (p + ndBrainFloat(1.0f)));
 		}
 		else
 		{
-			ndReal p = ndReal(ndExp(ndReal(2.0f) * value));
-			out = ndFlushToZero((p - ndReal(1.0f)) / (p + ndReal(1.0f)));
+			ndBrainFloat p = ndBrainFloat(ndExp(ndBrainFloat(2.0f) * value));
+			out = ndFlushToZero((p - ndBrainFloat(1.0f)) / (p + ndBrainFloat(1.0f)));
 		}
 
 		output[i] = out;
 		ndAssert(ndCheckFloat(output[i]));
-		ndAssert(output[i] <= ndReal(1.0f));
-		ndAssert(output[i] >= ndReal(-1.0f));
+		ndAssert(output[i] <= ndBrainFloat(1.0f));
+		ndAssert(output[i] >= ndBrainFloat(-1.0f));
 	}
 #else
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
@@ -82,7 +82,7 @@ void ndBrainLayerTanhActivation::InputDerivative(const ndBrainVector& output, co
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
 	ndAssert(output.GetCount() == inputDerivative.GetCount());
 
-	inputDerivative.Set(ndReal(1.0f));
+	inputDerivative.Set(ndBrainFloat(1.0f));
 	inputDerivative.MulSub(output, output);
 	inputDerivative.Mul(outputDerivative);
 	inputDerivative.FlushToZero();

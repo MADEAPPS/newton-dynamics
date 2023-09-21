@@ -93,12 +93,12 @@ namespace ndController_1
 				m_model = model;
 			}
 
-			void GetObservation(ndReal* const state) const
+			void GetObservation(ndBrainFloat* const state) const
 			{
 				m_model->GetObservation(state);
 			}
 
-			virtual void ApplyActions(ndReal* const actions) const
+			virtual void ApplyActions(ndBrainFloat* const actions) const
 			{
 				if (!m_model->HasSupportContact())
 				{
@@ -168,12 +168,12 @@ namespace ndController_1
 				m_model = model;
 			}
 
-			ndReal GetReward() const
+			ndBrainFloat GetReward() const
 			{
 				return m_model->GetReward();
 			}
 
-			virtual void ApplyActions(ndReal* const actions) const
+			virtual void ApplyActions(ndBrainFloat* const actions) const
 			{
 				if (GetEpisodeFrames() >= 15000)
 				{
@@ -196,7 +196,7 @@ namespace ndController_1
 				m_model->ApplyActions(actions);
 			}
 
-			void GetObservation(ndReal* const state) const
+			void GetObservation(ndBrainFloat* const state) const
 			{
 				m_model->GetObservation(state);
 			}
@@ -211,7 +211,7 @@ namespace ndController_1
 						state = true;
 					}
 
-					m_averageQvalue.Update(GetCurrentValue());
+					m_averageQvalue.Update(ndReal (GetCurrentValue()));
 					if (state)
 					{
 						m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
@@ -297,7 +297,7 @@ namespace ndController_1
 		{
 		}
 
-		void GetObservation(ndReal* const state)
+		void GetObservation(ndBrainFloat* const state)
 		{
 			ndBodyKinematic* const body = GetRoot()->m_body->GetAsBodyKinematic();
 			const ndVector omega (body->GetOmega());
@@ -310,16 +310,16 @@ namespace ndController_1
 			state[m_jointAngle] = ndReal(m_legJoint->GetAngle() / ND_MAX_LEG_JOINT_ANGLE);
 		}
 
-		void ApplyActions(ndReal* const actions) const
+		void ApplyActions(ndBrainFloat* const actions) const
 		{
-			ndFloat32 legAngle = actions[m_softLegControl] * ND_MAX_LEG_ANGLE_STEP + m_legJoint->GetAngle();
+			ndFloat32 legAngle = ndFloat32(actions[m_softLegControl]) * ND_MAX_LEG_ANGLE_STEP + m_legJoint->GetAngle();
 			legAngle = ndClamp (legAngle, -ND_MAX_LEG_JOINT_ANGLE, ND_MAX_LEG_JOINT_ANGLE);
 			m_legJoint->SetTargetAngle(legAngle);
 
 			ndBodyDynamic* const wheelBody = m_wheelJoint->GetBody0()->GetAsBodyDynamic();
 			const ndMatrix matrix(m_wheelJoint->GetLocalMatrix1() * m_wheelJoint->GetBody1()->GetMatrix());
 
-			ndVector torque(matrix.m_front.Scale(actions[m_softWheelControl] * ND_MAX_WHEEL_TORQUE));
+			ndVector torque(matrix.m_front.Scale(ndFloat32 (actions[m_softWheelControl]) * ND_MAX_WHEEL_TORQUE));
 			wheelBody->SetTorque(torque);
 		}
 

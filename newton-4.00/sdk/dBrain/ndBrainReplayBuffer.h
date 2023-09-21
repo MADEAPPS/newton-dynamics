@@ -33,10 +33,10 @@ class ndBrainReplayTransitionMemory
 	ndBrainReplayTransitionMemory();
 
 	void Clear();
-	ndFixSizeArray<ndReal, statesDim> m_state;
-	ndFixSizeArray<ndReal, statesDim> m_nextState;
+	ndFixSizeArray<ndBrainFloat, statesDim> m_state;
+	ndFixSizeArray<ndBrainFloat, statesDim> m_nextState;
 	ndFixSizeArray<actionType, actionDim> m_action;
-	ndReal m_reward;
+	ndBrainFloat m_reward;
 	bool m_terminalState;
 };
 
@@ -73,8 +73,8 @@ void ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>::Clear()
 	m_nextState.SetCount(0);
 	for (ndInt32 i = 0; i < statesDim; ++i)
 	{
-		m_state.PushBack(ndReal(0.0f));
-		m_nextState.PushBack(ndReal(0.0f));
+		m_state.PushBack(ndBrainFloat(0.0f));
+		m_nextState.PushBack(ndBrainFloat(0.0f));
 	}
 
 	for (ndInt32 i = 0; i < actionDim; ++i)
@@ -82,7 +82,7 @@ void ndBrainReplayTransitionMemory<actionType, statesDim, actionDim>::Clear()
 		m_action.PushBack(actionType(0));
 	}
 
-	m_reward = ndReal(0.0f);
+	m_reward = ndBrainFloat(0.0f);
 	m_terminalState = false;
 }
 

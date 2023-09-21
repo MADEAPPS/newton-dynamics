@@ -192,13 +192,13 @@ namespace ndQuadruped_1
 			}
 
 			//void GetObservation(ndReal* const state) const
-			void GetObservation(ndReal* const) const
+			void GetObservation(ndBrainFloat* const) const
 			{
 				ndAssert(0);
 				//m_model->GetObservation(state);
 			}
 
-			virtual void ApplyActions(ndReal* const actions) const
+			virtual void ApplyActions(ndBrainFloat* const actions) const
 			{
 				actions[m_bodySwing_x] = 0;
 				actions[m_bodySwing_z] = 0;
@@ -260,7 +260,7 @@ namespace ndQuadruped_1
 				,m_stopTraining(4000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
-				,m_currentQvalue()
+				,m_averageQvalue()
 				,m_averageFramesPerEpisodes()
 			{
 				SetName("quadruped_1.dnn");
@@ -296,7 +296,7 @@ namespace ndQuadruped_1
 				}
 			}
 
-			ndReal GetReward() const
+			ndBrainFloat GetReward() const
 			{
 				//return m_model->GetReward();
 				if (IsTerminal())
@@ -334,7 +334,7 @@ namespace ndQuadruped_1
 				return ndReal((reward * ndFloat32(8.0f) + control_x_reward + control_z_reward) / ndFloat32(10.0f));
 			}
 
-			virtual void ApplyActions(ndReal* const actions) const
+			virtual void ApplyActions(ndBrainFloat* const actions) const
 			{
 				if (GetEpisodeFrames() >= 10000)
 				{
@@ -348,7 +348,7 @@ namespace ndQuadruped_1
 				m_model->ApplyActions(actions);
 			}
 
-			void GetObservation(ndReal* const state) const
+			void GetObservation(ndBrainFloat* const state) const
 			{
 				ndInt32 contactMask = 0x0f;
 				const ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*m_model->m_poseGenerator->GetSequence();
@@ -376,7 +376,7 @@ namespace ndQuadruped_1
 					{
 						state = true;
 					}
-					m_currentQvalue.Update(GetCurrentValue());
+					m_averageQvalue.Update(ndReal (GetCurrentValue()));
 					if (state)
 					{
 						m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
@@ -415,20 +415,20 @@ namespace ndQuadruped_1
 					episodeCount -= GetEposideCount();
 					if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
 					{
-						if (m_currentQvalue.GetAverage() > m_maxGain)
+						if (m_averageQvalue.GetAverage() > m_maxGain)
 						{
 							m_bestActor.CopyFrom(m_actor);
-							m_maxGain = m_currentQvalue.GetAverage();
-							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_currentQvalue.GetAverage());
+							m_maxGain = m_averageQvalue.GetAverage();
+							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
 						}
 					}
 				
 					if (episodeCount && !IsSampling())
 					{
-						ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_currentQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 						if (m_outFile)
 						{
-							fprintf(m_outFile, "%g\n", m_currentQvalue.GetAverage());
+							fprintf(m_outFile, "%g\n", m_averageQvalue.GetAverage());
 							fflush(m_outFile);
 						}
 					}
@@ -462,7 +462,7 @@ namespace ndQuadruped_1
 			bool m_modelIsTrained;
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
 			ndFixSizeArray<ndBodyDynamic*, 32> m_bodies;
-			mutable ndMovingAverage<128> m_currentQvalue;
+			mutable ndMovingAverage<128> m_averageQvalue;
 			mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
 		};
 
@@ -834,7 +834,7 @@ namespace ndQuadruped_1
 		//	//state[m_body_swing_z] = m_control->m_z;
 		//}
 
-		void ApplyActions(ndReal* const actions)
+		void ApplyActions(ndBrainFloat* const actions)
 		{
 			//m_control->m_animSpeed = 4.0f;
 			//m_control->m_animSpeed = 2.0f;

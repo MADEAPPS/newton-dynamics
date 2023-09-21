@@ -40,13 +40,13 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual ndInt32 GetInputSize() const;
 	virtual const char* GetLabelId() const;
 	virtual void CopyFrom(const ndBrainLayer& src);
-	virtual void Blend(const ndBrainLayer& src, ndReal blend);
+	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
 
 	virtual ndBrainVector* GetBias();
 	virtual ndBrainMatrix* GetWeights();
 	
 	virtual void InitWeightsXavierMethod();
-	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
+	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
@@ -60,8 +60,8 @@ class ndBrainLayerLinear : public ndBrainLayer
 	static ndBrainLayerLinear* Load(const ndBrainLoad* const loadSave);
 	
 	private:
-	void InitGaussianBias(ndReal variance);
-	void InitGaussianWeights(ndReal variance);
+	void InitGaussianBias(ndBrainFloat variance);
+	void InitGaussianWeights(ndBrainFloat variance);
 
 	ndBrainVector m_bias;
 	ndBrainMatrix m_weights;

@@ -40,12 +40,12 @@ class ndBrainOptimizerAdam::ndBrainOptimizerAdam::ndAdamData : public ndClassAll
 			m_weightGradient_v.Init(layer->GetOutputSize(), layer->GetInputSize());
 			m_weightGradient_v2.Init(layer->GetOutputSize(), layer->GetInputSize());
 
-			m_biasGradient_u.Set(ndReal(0.0f));
-			m_biasGradient_v.Set(ndReal(0.0f));
-			m_biasGradient_v2.Set(ndReal(0.0f));
-			m_weightGradient_u.Set(ndReal(0.0f));
-			m_weightGradient_v.Set(ndReal(0.0f));
-			m_weightGradient_v2.Set(ndReal(0.0f));
+			m_biasGradient_u.Set(ndBrainFloat(0.0f));
+			m_biasGradient_v.Set(ndBrainFloat(0.0f));
+			m_biasGradient_v2.Set(ndBrainFloat(0.0f));
+			m_weightGradient_u.Set(ndBrainFloat(0.0f));
+			m_weightGradient_v.Set(ndBrainFloat(0.0f));
+			m_weightGradient_v2.Set(ndBrainFloat(0.0f));
 		}
 	}
 
@@ -80,14 +80,14 @@ ndBrainOptimizerAdam::~ndBrainOptimizerAdam()
 	}
 }
 
-void ndBrainOptimizerAdam::Update(ndReal learnRate, ndInt32 bashSize)
+void ndBrainOptimizerAdam::Update(ndBrainFloat learnRate, ndInt32 bashSize)
 {
-	learnRate *= ndReal(-1.0f);
-	ndReal regularizer = -GetRegularizer();
-	ndReal den = ndReal(1.0f) / ndReal(bashSize);
+	learnRate *= ndBrainFloat(-1.0f);
+	ndBrainFloat regularizer = -GetRegularizer();
+	ndBrainFloat den = ndBrainFloat(1.0f) / ndBrainFloat(bashSize);
 
-	ndReal betaWeight = ndReal(1.0f) / (ndReal(1.0f) - m_betaAcc);
-	ndReal alphaWeight = ndReal(1.0f) / (ndReal(1.0f) - m_alphaAcc);
+	ndBrainFloat betaWeight = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_betaAcc);
+	ndBrainFloat alphaWeight = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_alphaAcc);
 	ndBrain* const brian = m_trainer->GetBrain();
 
 	for (ndInt32 i = brian->GetCount() - 1; i >= 0 ; --i)
@@ -107,10 +107,10 @@ void ndBrainOptimizerAdam::Update(ndReal learnRate, ndInt32 bashSize)
 			
 			data.m_biasGradient_v2.Set(biasGradients);
 			data.m_biasGradient_v2.Mul(biasGradients);
-			data.m_biasGradient_u.ScaleAdd(biasGradients, ndReal(1.0f) - m_alpha);
-			data.m_biasGradient_v.ScaleAdd(data.m_biasGradient_v2, ndReal (1.0f) - m_beta);
+			data.m_biasGradient_u.ScaleAdd(biasGradients, ndBrainFloat(1.0f) - m_alpha);
+			data.m_biasGradient_v.ScaleAdd(data.m_biasGradient_v2, ndBrainFloat (1.0f) - m_beta);
 			
-			if (m_betaAcc > ndReal(0.0f))
+			if (m_betaAcc > ndBrainFloat(0.0f))
 			{
 				ndBrainVector& vHat = biasGradients;
 				ndBrainVector& uHat = data.m_biasGradient_v2;
@@ -121,7 +121,7 @@ void ndBrainOptimizerAdam::Update(ndReal learnRate, ndInt32 bashSize)
 				uHat.Scale(alphaWeight);
 				for (ndInt32 j = biasGradients.GetCount() - 1; j >= 0; --j)
 				{
-					ndReal bias_den = ndReal(1.0f) / (ndReal(ndSqrt(vHat[j])) + m_epsilon);
+					ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(vHat[j])) + m_epsilon);
 					biasGradients[j] = uHat[j] * bias_den;
 				}
 			}
@@ -129,7 +129,7 @@ void ndBrainOptimizerAdam::Update(ndReal learnRate, ndInt32 bashSize)
 			{
 				for (ndInt32 j = biasGradients.GetCount() - 1; j >= 0; --j)
 				{
-					ndReal bias_den = ndReal(1.0f) / (ndReal(ndSqrt(data.m_biasGradient_v[j])) + m_epsilon);
+					ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(data.m_biasGradient_v[j])) + m_epsilon);
 					biasGradients[j] = data.m_biasGradient_u[j] * bias_den;
 				}
 			}
@@ -144,10 +144,10 @@ void ndBrainOptimizerAdam::Update(ndReal learnRate, ndInt32 bashSize)
 			data.m_weightGradient_u.Scale(m_alpha);
 			data.m_weightGradient_v2.Set(weightGradients);
 			data.m_weightGradient_v2.Mul(weightGradients);
-			data.m_weightGradient_v.ScaleAdd(data.m_weightGradient_v2, ndReal(1.0f) - m_beta);
-			data.m_weightGradient_u.ScaleAdd(weightGradients, ndReal(1.0f) - m_alpha);
+			data.m_weightGradient_v.ScaleAdd(data.m_weightGradient_v2, ndBrainFloat(1.0f) - m_beta);
+			data.m_weightGradient_u.ScaleAdd(weightGradients, ndBrainFloat(1.0f) - m_alpha);
 
-			if (m_betaAcc > ndReal(0.0f))
+			if (m_betaAcc > ndBrainFloat(0.0f))
 			{
 				ndBrainMatrix& vHat = weightGradients;
 				ndBrainMatrix& uHat = data.m_weightGradient_v2;
@@ -161,7 +161,7 @@ void ndBrainOptimizerAdam::Update(ndReal learnRate, ndInt32 bashSize)
 				{
 					for (ndInt32 k = weightGradients[j].GetCount() - 1; k >= 0; --k)
 					{
-						ndReal bias_den = ndReal(1.0f) / (ndReal(ndSqrt(vHat[j][k])) + m_epsilon);
+						ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(vHat[j][k])) + m_epsilon);
 						weightGradients[j][k] = uHat[j][k] * bias_den;
 					}
 				}
@@ -172,7 +172,7 @@ void ndBrainOptimizerAdam::Update(ndReal learnRate, ndInt32 bashSize)
 				{
 					for (ndInt32 k = weightGradients[j].GetCount() - 1; k >= 0; --k)
 					{
-						ndReal bias_den = ndReal(1.0f) / (ndReal(ndSqrt(data.m_weightGradient_v[j][k])) + m_epsilon);
+						ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(data.m_weightGradient_v[j][k])) + m_epsilon);
 						weightGradients[j][k] = data.m_weightGradient_u[j][k] * bias_den;
 					}
 				}
@@ -186,8 +186,8 @@ void ndBrainOptimizerAdam::Update(ndReal learnRate, ndInt32 bashSize)
 
 	m_betaAcc = ndFlushToZero(m_betaAcc * m_beta);
 	m_alphaAcc = ndFlushToZero(m_alphaAcc * m_alpha);
-	if (m_betaAcc < ndReal(1.0e-6f))
+	if (m_betaAcc < ndBrainFloat(1.0e-6f))
 	{
-		m_betaAcc = ndReal(0.0f);
+		m_betaAcc = ndBrainFloat(0.0f);
 	}
 }

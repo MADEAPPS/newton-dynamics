@@ -40,10 +40,10 @@ class ndBrainLayerActivation : public ndBrainLayer
 	virtual ndInt32 GetInputSize() const;
 	virtual const char* GetLabelId() const;
 	virtual void CopyFrom(const ndBrainLayer& src);
-	virtual void Blend(const ndBrainLayer& src, ndReal blend);
+	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
 
 	virtual void InitWeightsXavierMethod();
-	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance);
+	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;

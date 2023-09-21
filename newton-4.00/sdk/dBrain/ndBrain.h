@@ -38,12 +38,12 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	ndInt32 GetInputSize() const;
 	ndInt32 GetOutputSize() const;
 	void CopyFrom(const ndBrain& src);
-	void SoftCopy(const ndBrain& src, ndReal blend);
+	void SoftCopy(const ndBrain& src, ndBrainFloat blend);
 
 	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
 
 	void InitWeightsXavierMethod();
-	void InitWeights(ndReal weighVariance, ndReal biasVariance);
+	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
 	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients);

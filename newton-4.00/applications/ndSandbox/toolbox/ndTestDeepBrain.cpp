@@ -244,7 +244,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 		const ndBrainVector& truth = (*testLabels)[i];
 
 		ndInt32 index = 0;
-		ndFloat32 maxProbability = 0.0f;
+		ndBrainFloat maxProbability = 0.0f;
 		for (ndInt32 j = 0; j < output.GetCount(); j++)
 		{
 			if (output[j] > maxProbability)
@@ -367,7 +367,7 @@ static void MnistTrainingSet()
 					ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 1024>, D_MAX_THREADS_COUNT> failPriorities;
 					auto CrossValidate = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &failPriorities, &failCount, firstPass](ndInt32 threadIndex, ndInt32 threadCount)
 					{
-						ndReal outputBuffer[32];
+						ndBrainFloat outputBuffer[32];
 						ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
 
 						ndFixSizeArray<ndUnsigned32, 1024>& priorityArray = failPriorities[threadIndex];
@@ -383,7 +383,7 @@ static void MnistTrainingSet()
 								m_brain.MakePrediction(input, output);
 
 								ndInt32 index = 0;
-								ndReal maxProbability = ndReal (0.0f);
+								ndBrainFloat maxProbability = ndBrainFloat(0.0f);
 								for (ndInt32 j = 0; j < output.GetCount(); j++)
 								{
 									if (output[j] > maxProbability)

@@ -48,7 +48,7 @@ void ndBrainLayerReluActivation::MakePrediction(const ndBrainVector& input, ndBr
 	ndAssert(input.GetCount() == output.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
-		output[i] = (input[i] > ndReal(0.0f)) ? input[i] : ndReal(0.0f);
+		output[i] = (input[i] > ndBrainFloat(0.0f)) ? input[i] : ndBrainFloat(0.0f);
 		ndAssert(ndCheckFloat(output[i]));
 	}
 }
@@ -60,7 +60,7 @@ void ndBrainLayerReluActivation::InputDerivative(const ndBrainVector& output, co
 
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
-		inputDerivative[i] = (output[i] > ndReal(0.0f)) ? ndReal(1.0f) : ndReal(0.0f);
+		inputDerivative[i] = (output[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
 		ndAssert(ndCheckFloat(inputDerivative[i]));
 	}
 	inputDerivative.Mul(outputDerivative);

@@ -24,30 +24,30 @@
 
 #include "ndBrainStdafx.h"
 
-class ndBrainVector: public ndArray<ndReal> 
+class ndBrainVector: public ndArray<ndBrainFloat> 
 {
 	public: 
 	ndBrainVector();
 	ndBrainVector(const ndBrainVector& src);
 	~ndBrainVector();
 
-	void InitGaussianWeights(ndReal variance);
+	void InitGaussianWeights(ndBrainFloat variance);
 
-	void Set(ndReal value);
+	void Set(ndBrainFloat value);
 	void Set(const ndBrainVector& data);
 
 	ndInt32 GetMaxIndex() const;
-	ndReal Dot(const ndBrainVector& a) const;
+	ndBrainFloat Dot(const ndBrainVector& a) const;
 
-	void Scale(ndReal b);
+	void Scale(ndBrainFloat b);
 	void Add(const ndBrainVector& a);
 	void Sub(const ndBrainVector& a);
 	void Mul(const ndBrainVector& a);
 
 	void FlushToZero();
-	void Clamp(ndReal min, ndReal max);
-	void ScaleAdd(const ndBrainVector& a, ndReal b);
-	void Blend(const ndBrainVector& target, ndReal blend);
+	void Clamp(ndBrainFloat min, ndBrainFloat max);
+	void ScaleAdd(const ndBrainVector& a, ndBrainFloat b);
+	void Blend(const ndBrainVector& target, ndBrainFloat blend);
 	void MulAdd(const ndBrainVector& a, const ndBrainVector& b);
 	void MulSub(const ndBrainVector& a, const ndBrainVector& b);
 };
@@ -56,12 +56,12 @@ class ndBrainMemVector : public ndBrainVector
 {
 	public:
 	ndBrainMemVector();
-	ndBrainMemVector(const ndReal* const mem, ndInt32 size);
+	ndBrainMemVector(const ndBrainFloat* const mem, ndInt32 size);
 	~ndBrainMemVector();
 
 	void SetSize(ndInt32 size);
 	void Swap(ndBrainMemVector& src);
-	void SetPointer(ndReal* const memmory);
+	void SetPointer(ndBrainFloat* const memmory);
 };
 
 #endif 

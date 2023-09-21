@@ -34,12 +34,12 @@ ndBrainOptimizerSgd::~ndBrainOptimizerSgd()
 {
 }
 
-void ndBrainOptimizerSgd::Update(ndReal learnRate, ndInt32 bashSize)
+void ndBrainOptimizerSgd::Update(ndBrainFloat learnRate, ndInt32 bashSize)
 {
-	//learnRate *= ndReal(-1.0f);
-	ndReal regularizer = -GetRegularizer();
-	//ndReal den = ndReal(1.0f) / ndReal(bashSize);
-	ndReal denScale = -learnRate / ndReal(bashSize);
+	//learnRate *= ndBrainFloat(-1.0f);
+	ndBrainFloat regularizer = -GetRegularizer();
+	//ndBrainFloat den = ndBrainFloat(1.0f) / ndBrainFloat(bashSize);
+	ndBrainFloat denScale = -learnRate / ndBrainFloat(bashSize);
 
 	ndBrain* const brian = m_trainer->GetBrain();
 	for (ndInt32 i = 0; i < brian->GetCount(); ++i)

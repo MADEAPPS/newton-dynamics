@@ -31,7 +31,7 @@ class ndBrainOptimizerSgd : public ndBrainOptimizer
 	ndBrainOptimizerSgd(ndBrainTrainer* const trainer);
 	virtual ~ndBrainOptimizerSgd();
 
-	virtual void Update(ndReal learnRate, ndInt32 bashSize);
+	virtual void Update(ndBrainFloat learnRate, ndInt32 bashSize);
 };
 
 

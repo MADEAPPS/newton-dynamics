@@ -72,7 +72,7 @@ bool ndBrainLayer::HasParameters() const
 	return false;
 }
 
-void ndBrainLayer::InitWeights(ndReal, ndReal)
+void ndBrainLayer::InitWeights(ndBrainFloat, ndBrainFloat)
 {
 	ndAssert(0);
 }
@@ -94,7 +94,7 @@ ndBrainMatrix* ndBrainLayer::GetWeights()
 	return nullptr;
 }
 
-void ndBrainLayer::Blend(const ndBrainLayer&, ndReal)
+void ndBrainLayer::Blend(const ndBrainLayer&, ndBrainFloat)
 {
 	ndAssert(0);
 }

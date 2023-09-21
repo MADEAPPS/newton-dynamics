@@ -41,14 +41,14 @@ class ndBrainAgentDQN: public ndBrainAgent
 	bool IsTrainer() const;
 	void ResetModel() const;
 	bool IsTerminal() const;
-	ndReal GetReward() const;
-	ndReal GetCurrentValue() const;
+	ndBrainFloat GetReward() const;
+	ndBrainFloat GetCurrentValue() const;
 	ndInt32 GetEpisodeFrames() const;
 	
 	void Save(ndBrainSave* const loadSave) const;
 
 	void InitWeights();
-	void InitWeights(ndReal weighVariance, ndReal biasVariance);
+	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 	ndInt32 SelectBestAction(const ndBrainVector& actions) const;
 
 	ndSharedPtr<ndBrain> m_actor;
@@ -74,7 +74,7 @@ void ndBrainAgentDQN<statesDim, actionDim>::InitWeights()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN<statesDim, actionDim>::InitWeights(ndReal, ndReal)
+void ndBrainAgentDQN<statesDim, actionDim>::InitWeights(ndBrainFloat, ndBrainFloat)
 {
 	ndAssert(0);
 }
@@ -87,16 +87,16 @@ bool ndBrainAgentDQN<statesDim, actionDim>::IsTerminal() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndReal ndBrainAgentDQN<statesDim, actionDim>::GetReward() const
+ndBrainFloat ndBrainAgentDQN<statesDim, actionDim>::GetReward() const
 {
 	ndAssert(0);
-	return ndReal(0.0f);
+	return ndBrainFloat(0.0f);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndReal ndBrainAgentDQN<statesDim, actionDim>::GetCurrentValue() const
+ndBrainFloat ndBrainAgentDQN<statesDim, actionDim>::GetCurrentValue() const
 {
-	return ndReal(0.0f);
+	return ndBrainFloat(0.0f);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -127,7 +127,7 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 ndInt32 ndBrainAgentDQN<statesDim, actionDim>::SelectBestAction(const ndBrainVector& actions) const
 {
 	ndInt32 bestAction = 0;
-	ndReal maxQValue = actions[0];
+	ndBrainFloat maxQValue = actions[0];
 	for (ndInt32 i = 1; i < actionDim; ++i)
 	{
 		if (actions[i] > maxQValue)
@@ -142,15 +142,15 @@ ndInt32 ndBrainAgentDQN<statesDim, actionDim>::SelectBestAction(const ndBrainVec
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN<statesDim, actionDim>::Step()
 {
-	ndReal stateBuffer[statesDim * 2];
-	ndReal actionBuffer[actionDim * 2];
+	ndBrainFloat stateBuffer[statesDim * 2];
+	ndBrainFloat actionBuffer[actionDim * 2];
 	ndBrainMemVector state(stateBuffer, statesDim);
 	ndBrainMemVector actions(actionBuffer, actionDim);
 
 	GetObservation(&state[0]);
 	m_actor->MakePrediction(state, actions);
 
-	ndReal bestAction = ndReal(SelectBestAction(actions));
+	ndBrainFloat bestAction = ndBrainFloat(SelectBestAction(actions));
 	ApplyActions(&bestAction);
 }
 

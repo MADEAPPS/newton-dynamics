@@ -31,9 +31,9 @@
 //	ndAssert(m_action.GetCount() == src.m_action.GetCount());
 //	ndAssert(m_nextState.GetCount() == src.m_nextState.GetCount());
 //	
-//	memcpy(&m_state[0], &src.m_state[0], src.m_state.GetCount() * sizeof(ndReal));
-//	memcpy(&m_action[0], &src.m_action[0], src.m_action.GetCount() * sizeof(ndReal));
-//	memcpy(&m_nextState[0], &src.m_nextState[0], src.m_nextState.GetCount() * sizeof(ndReal));
+//	memcpy(&m_state[0], &src.m_state[0], src.m_state.GetCount() * sizeof(ndBrainFloat));
+//	memcpy(&m_action[0], &src.m_action[0], src.m_action.GetCount() * sizeof(ndBrainFloat));
+//	memcpy(&m_nextState[0], &src.m_nextState[0], src.m_nextState.GetCount() * sizeof(ndBrainFloat));
 //}
 
 //ndBrainReplayBuffer::ndBrainReplayBuffer()
@@ -79,7 +79,7 @@
 //		transition.m_state = ndBrainVector();
 //		transition.m_nextState = ndBrainVector();
 //		transition.m_action = ndBrainVector();
-//		transition.m_reward = ndReal (1.0f);
+//		transition.m_reward = ndBrainFloat (1.0f);
 //		transition.m_terminalState = false;
 //	
 //		transition.m_state.SetCount(stateSize);

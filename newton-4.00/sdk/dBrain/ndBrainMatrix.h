@@ -37,13 +37,13 @@ class ndBrainMatrix: public ndArray<ndBrainMemVector>
 	ndInt32 GetRows() const;
 	ndInt32 GetColumns() const;
 
-	void Set(ndReal value);
-	void Scale(ndReal scale);
+	void Set(ndBrainFloat value);
+	void Scale(ndBrainFloat scale);
 	void Set(const ndBrainMatrix& src);
 	void Add(const ndBrainMatrix& src);
 	void Mul(const ndBrainMatrix& src);
-	void Blend(const ndBrainMatrix& src, ndReal blend);
-	void ScaleAdd(const ndBrainMatrix& src, ndReal scale);
+	void Blend(const ndBrainMatrix& src, ndBrainFloat blend);
+	void ScaleAdd(const ndBrainMatrix& src, ndBrainFloat scale);
 
 	void FlushToZero();
 	void Mul(const ndBrainVector& input, ndBrainVector& output) const;

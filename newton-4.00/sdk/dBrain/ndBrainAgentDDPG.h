@@ -40,13 +40,13 @@ class ndBrainAgentDDPG: public ndBrainAgent
 	bool IsTrainer() const;
 	void ResetModel() const;
 	bool IsTerminal() const;
-	ndReal GetReward() const;
-	ndReal GetCurrentValue() const;
+	ndBrainFloat GetReward() const;
+	ndBrainFloat GetCurrentValue() const;
 	ndInt32 GetEpisodeFrames() const;
 	void Save(ndBrainSave* const loadSave) const;
 
 	void InitWeights();
-	void InitWeights(ndReal weighVariance, ndReal biasVariance);
+	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 
 	ndSharedPtr<ndBrain> m_actor;
 };
@@ -72,16 +72,16 @@ bool ndBrainAgentDDPG<statesDim, actionDim>::IsTerminal() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndReal ndBrainAgentDDPG<statesDim, actionDim>::GetReward() const
+ndBrainFloat ndBrainAgentDDPG<statesDim, actionDim>::GetReward() const
 {
 	ndAssert(0);
-	return ndReal(0.0f);
+	return ndBrainFloat(0.0f);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndReal ndBrainAgentDDPG<statesDim, actionDim>::GetCurrentValue() const
+ndBrainFloat ndBrainAgentDDPG<statesDim, actionDim>::GetCurrentValue() const
 {
-	return ndReal(0.0f);
+	return ndBrainFloat(0.0f);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -97,7 +97,7 @@ void ndBrainAgentDDPG<statesDim, actionDim>::InitWeights()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG<statesDim, actionDim>::InitWeights(ndReal, ndReal)
+void ndBrainAgentDDPG<statesDim, actionDim>::InitWeights(ndBrainFloat, ndBrainFloat)
 {
 	ndAssert(0);
 }
@@ -123,8 +123,8 @@ void ndBrainAgentDDPG<statesDim, actionDim>::OptimizeStep()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG<statesDim, actionDim>::Step()
 {
-	ndReal stateBuffer[statesDim * 2];
-	ndReal actionBuffer[actionDim * 2];
+	ndBrainFloat stateBuffer[statesDim * 2];
+	ndBrainFloat actionBuffer[actionDim * 2];
 	ndBrainMemVector state(stateBuffer, statesDim);
 	ndBrainMemVector actions(actionBuffer, actionDim);
 

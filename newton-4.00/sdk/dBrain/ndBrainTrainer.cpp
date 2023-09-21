@@ -142,8 +142,8 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	}
 	prefixScan.PushBack(sizeAcc);
 
-	const ndReal* const memBuffer = ndAlloca(ndReal, sizeAcc + 8);
-	const ndReal* const gradientBuffer = ndAlloca(ndReal, maxSize * 2 + 256);
+	const ndBrainFloat* const memBuffer = ndAlloca(ndBrainFloat, sizeAcc + 8);
+	const ndBrainFloat* const gradientBuffer = ndAlloca(ndBrainFloat, maxSize * 2 + 256);
 
 	ndBrainMemVector in0(memBuffer, input.GetCount());
 	in0.Set(input);

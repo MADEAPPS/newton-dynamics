@@ -41,17 +41,17 @@ class ndBrainAgent: public ndClassAlloc
 
 	virtual bool IsTrainer() const = 0;
 	virtual void InitWeights() = 0;
-	virtual void InitWeights(ndReal weighVariance, ndReal biasVariance) = 0;
+	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance) = 0;
 
 	protected:
 	virtual void ResetModel() const = 0;
 	virtual bool IsTerminal() const = 0;
-	virtual ndReal GetReward() const = 0;
-	virtual ndReal GetCurrentValue() const = 0;
+	virtual ndBrainFloat GetReward() const = 0;
+	virtual ndBrainFloat GetCurrentValue() const = 0;
 	virtual ndInt32 GetEpisodeFrames() const = 0;
 	virtual void Save(ndBrainSave* const loadSave) const = 0;
-	virtual void ApplyActions(ndReal* const actions) const = 0;
-	virtual void GetObservation(ndReal* const state) const = 0;
+	virtual void ApplyActions(ndBrainFloat* const actions) const = 0;
+	virtual void GetObservation(ndBrainFloat* const state) const = 0;
 
 	ndString m_name;
 };
