@@ -841,7 +841,6 @@ class ndBigVector
 
 	inline ndBigVector Floor() const
 	{
-#ifdef D_USE_64_BIT_SIMD_INT
 		ndInt64 x = _mm_cvtsd_si64(m_typeLow);
 		ndInt64 y = _mm_cvtsd_si64(_mm_unpackhi_pd(m_typeLow, m_typeLow));
 		ndInt64 z = _mm_cvtsd_si64(m_typeHigh);
@@ -854,14 +853,10 @@ class ndBigVector
 		__m128d xy_round(_mm_and_pd(one, _mm_cmplt_pd(m_typeLow, xy)));
 		__m128d zw_round(_mm_and_pd(one, _mm_cmplt_pd(m_typeHigh, zw)));
 		return ndBigVector(_mm_sub_pd(xy, xy_round), _mm_sub_pd(zw, zw_round));
-#else
-		return ndBigVector(floor(m_x), floor(m_y), floor(m_z), floor(m_w));
-#endif
 	}
 
 	inline ndBigVector GetInt() const
 	{
-#ifdef D_USE_64_BIT_SIMD_INT
 		ndInt64 x = _mm_cvtsd_si64(m_typeLow);
 		ndInt64 y = _mm_cvtsd_si64(_mm_unpackhi_pd(m_typeLow, m_typeLow));
 		ndInt64 z = _mm_cvtsd_si64(m_typeHigh);
@@ -876,14 +871,6 @@ class ndBigVector
 		__m128i xy_round(_mm_castpd_si128(_mm_cmplt_pd(m_typeLow, xy_float)));
 		__m128i zw_round(_mm_castpd_si128(_mm_cmplt_pd(m_typeHigh, zw_float)));
 		return ndBigVector(_mm_add_epi64(xy_int, xy_round), _mm_add_epi64(zw_int, zw_round));
-#else
-		ndBigVector temp(Floor());
-		ndInt64 x = _mm_cvtsd_si32(temp.m_typeLow);
-		ndInt64 y = _mm_cvtsd_si32(_mm_unpackhi_pd(temp.m_typeLow, temp.m_typeLow));
-		ndInt64 z = _mm_cvtsd_si32(temp.m_typeHigh);
-		ndInt64 w = _mm_cvtsd_si32(_mm_unpackhi_pd(temp.m_typeHigh, temp.m_typeHigh));
-		return ndBigVector(_mm_set_pd(*(ndFloat32*)&y, *(ndFloat32*)&x), _mm_set_pd(*(ndFloat32*)&w, *(ndFloat32*)&z));
-#endif
 	}
 
 	// relational operators
