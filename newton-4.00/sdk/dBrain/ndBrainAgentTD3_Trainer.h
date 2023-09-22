@@ -54,7 +54,6 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 			m_softTargetFactor = ndBrainFloat(1.0e-3f);
 			m_actionNoiseVariance = ndBrainFloat(0.05f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
-			//m_threadsCount = 1;
 		}
 
 		ndBrainFloat m_discountFactor;
@@ -73,16 +72,16 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 	ndBrainAgentTD3_Trainer(const HyperParameters& hyperParameters, const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic);
 	~ndBrainAgentTD3_Trainer();
 
-	ndBrainFloat GetCurrentValue() const;
 	ndInt32 GetFramesCount() const;
 	ndInt32 GetEposideCount() const;
 	ndInt32 GetEpisodeFrames() const;
+	ndBrainFloat GetCurrentValue() const;
 
 	ndBrainFloat GetLearnRate() const;
 	void SetLearnRate(ndBrainFloat learnRate);
 
 	ndBrainFloat GetActionNoise() const;
-	void SetActionNoise(ndBrainFloat learnRate);
+	void SetActionNoise(ndBrainFloat  noiseVaraince);
 
 	protected:
 	void Step();
@@ -172,8 +171,6 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const Hyp
 	ndAssert(m_critic0.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
 	ndAssert(m_critic1.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
 	ndAssert(!strcmp((m_actor[m_actor.GetCount() - 1])->GetLabelId(), "ndBrainLayerTanhActivation"));
-	//ndAssert(!strcmp((m_critic0[m_critic0.GetCount() - 1])->GetLabelId(), "ndBrainLayerReluActivation"));
-	//ndAssert(!strcmp((m_critic1[m_critic1.GetCount() - 1])->GetLabelId(), "ndBrainLayerReluActivation"));
 
 	SetThreadCount(hyperParameters.m_threadsCount);
 	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)

@@ -70,16 +70,16 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndBrainAgentDDPG_Trainer(const HyperParameters& hyperParameters, const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic);
 	~ndBrainAgentDDPG_Trainer();
 
-	ndBrainFloat GetCurrentValue() const;
 	ndInt32 GetFramesCount() const;
 	ndInt32 GetEposideCount() const;
 	ndInt32 GetEpisodeFrames() const;
+	ndBrainFloat GetCurrentValue() const;
 
 	ndBrainFloat GetLearnRate() const;
 	void SetLearnRate(ndBrainFloat learnRate);
 
 	ndBrainFloat GetActionNoise() const;
-	void SetActionNoise(ndBrainFloat learnRate);
+	void SetActionNoise(ndBrainFloat noiseVaraince);
 
 	protected:
 	void Step();
