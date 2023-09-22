@@ -618,10 +618,8 @@ class ndBigVector
 
 #ifdef D_NEWTON_USE_DOUBLE
 	inline ndBigVector (const ndFloat32* const ptr)
-		:m_typeLow(_mm_loadu_pd(ptr))
-		,m_typeHigh(_mm_loadu_pd(&ptr[2]))
+		:m_type(_mm256_loadu_pd(ptr))
 	{
-		ndAssert(0);
 	}
 #else
 
@@ -632,7 +630,7 @@ class ndBigVector
 	}
 
 	inline ndBigVector(const ndFloat64* const ptr)
-		:m_type(_mm256_load_pd(ptr))
+		:m_type(_mm256_loadu_pd(ptr))
 	{
 	}
 #endif
@@ -795,8 +793,7 @@ class ndBigVector
 
 	inline ndBigVector Abs() const
 	{
-		ndAssert(0);
-		return ndBigVector(_mm_and_pd(m_typeLow, m_signMask.m_typeLow), _mm_and_pd(m_typeHigh, m_signMask.m_typeLow));
+		return ndBigVector(_mm256_and_pd(m_type, m_signMask.m_type));
 	}
 
 	inline ndBigVector Reciproc() const
@@ -883,34 +880,34 @@ class ndBigVector
 	}
 
 	// relational operators
-	inline ndBigVector operator> (const ndBigVector& data) const
-	{
-		ndAssert(0);
-		return ndBigVector(_mm_cmpgt_pd(m_typeLow, data.m_typeLow), _mm_cmpgt_pd(m_typeHigh, data.m_typeHigh));
-	}
-
 	inline ndBigVector operator== (const ndBigVector& data) const
 	{
-		ndAssert(0);
-		return ndBigVector(_mm_cmpeq_pd(m_typeLow, data.m_typeLow), _mm_cmpeq_pd(m_typeHigh, data.m_typeHigh));
+		//return ndBigVector(_mm_cmpeq_pd(m_typeLow, data.m_typeLow), _mm_cmpeq_pd(m_typeHigh, data.m_typeHigh));
+		return ndBigVector(_mm256_cmp_pd(m_type, data.m_type, _CMP_EQ_OQ));
+	}
+
+	inline ndBigVector operator> (const ndBigVector& data) const
+	{
+		//return ndBigVector(_mm_cmpgt_pd(m_typeLow, data.m_typeLow), _mm_cmpgt_pd(m_typeHigh, data.m_typeHigh));
+		return ndBigVector(_mm256_cmp_pd(m_type, data.m_type, _CMP_GT_OS));
 	}
 
 	inline ndBigVector operator< (const ndBigVector& data) const
 	{
-		ndAssert(0);
-		return ndBigVector(_mm_cmplt_pd(m_typeLow, data.m_typeLow), _mm_cmplt_pd(m_typeHigh, data.m_typeHigh));
+		//return ndBigVector(_mm256_cmplt_pd(m_type, data.m_type));
+		return ndBigVector(_mm256_cmp_pd(m_type, data.m_type, _CMP_LT_OQ));
 	}
 
 	inline ndBigVector operator>= (const ndBigVector& data) const
 	{
-		ndAssert(0);
-		return ndBigVector(_mm_cmpge_pd(m_typeLow, data.m_typeLow), _mm_cmpge_pd(m_typeHigh, data.m_typeHigh));
+		//return ndBigVector(_mm_cmpge_pd(m_typeLow, data.m_typeLow), _mm_cmpge_pd(m_typeHigh, data.m_typeHigh));
+		return ndBigVector(_mm256_cmp_pd(m_type, data.m_type, _CMP_GE_OS));
 	}
 
 	inline ndBigVector operator<= (const ndBigVector& data) const
 	{
-		ndAssert(0);
-		return ndBigVector(_mm_cmple_pd(m_typeLow, data.m_typeLow), _mm_cmple_pd(m_typeHigh, data.m_typeHigh));
+		//return ndBigVector(_mm_cmple_pd(m_typeLow, data.m_typeLow), _mm_cmple_pd(m_typeHigh, data.m_typeHigh));
+		return ndBigVector(_mm256_cmp_pd(m_type, data.m_type, _CMP_LE_OQ));
 	}
 
 	// logical operations
@@ -952,8 +949,8 @@ class ndBigVector
 
 	inline ndBigVector ShiftTripleRight() const
 	{
-		ndAssert(0);
-		return ndBigVector(_mm_shuffle_pd(m_typeHigh, m_typeLow, PERMUT_MASK_DOUBLE(0, 0)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
+		//return ndBigVector(_mm_shuffle_pd(m_typeHigh, m_typeLow, PERMUT_MASK_DOUBLE(0, 0)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
+		return ndBigVector(_mm256_shuffle_pd(_mm256_permute2f128_pd(m_type, m_type, 1), m_type, 0x0c));
 	}
 
 	inline ndBigVector ShiftTripleLeft() const
@@ -989,29 +986,49 @@ class ndBigVector
 			m_x * right.m_x + m_y * right.m_y + m_z * right.m_z,
 			ndFloat64(0.0f));
 #else
-		__m128d tmp0(_mm_add_pd(_mm_mul_pd(m_typeLow, front.m_typeLow), _mm_mul_pd(m_typeHigh, front.m_typeHigh)));
-		__m128d tmp1(_mm_add_pd(_mm_mul_pd(m_typeLow, up.m_typeLow), _mm_mul_pd(m_typeHigh, up.m_typeHigh)));
-		__m128d tmp2(_mm_add_pd(_mm_mul_pd(m_typeLow, right.m_typeLow), _mm_mul_pd(m_typeHigh, right.m_typeHigh)));
+		__m128d tmp0__(_mm_add_pd(_mm_mul_pd(m_typeLow, front.m_typeLow), _mm_mul_pd(m_typeHigh, front.m_typeHigh)));
+		__m128d tmp1__(_mm_add_pd(_mm_mul_pd(m_typeLow, up.m_typeLow), _mm_mul_pd(m_typeHigh, up.m_typeHigh)));
+		__m128d tmp2__(_mm_add_pd(_mm_mul_pd(m_typeLow, right.m_typeLow), _mm_mul_pd(m_typeHigh, right.m_typeHigh)));
 
-		__m128d tmp3(_mm_add_pd(_mm_unpacklo_pd(tmp0, tmp1), _mm_unpackhi_pd(tmp0, tmp1)));
-		__m128d tmp4(_mm_unpackhi_pd(_mm_add_pd(tmp2, _mm_unpacklo_pd(tmp2, tmp2)), right.m_typeHigh));
-		return ndBigVector(tmp3, tmp4);
+		__m128d tmp3(_mm_add_pd(_mm_unpacklo_pd(tmp0__, tmp1__), _mm_unpackhi_pd(tmp0__, tmp1__)));
+		__m128d tmp4(_mm_unpackhi_pd(_mm_add_pd(tmp2__, _mm_unpacklo_pd(tmp2__, tmp2__)), right.m_typeHigh));
+		//return ndBigVector(tmp3, tmp4);
+		ndBigVector xxxx (tmp3, tmp4);
+
+
+		__m256d tmp0(_mm256_mul_pd(m_type, front.m_type));
+		__m256d tmp1(_mm256_mul_pd(m_type, up.m_type));
+		__m256d tmp2(_mm256_mul_pd(m_type, right.m_type));
+		//__m128 tmp2(_mm_unpacklo_ps(tmp0, tmp1));
+		//__m128 tmp3(_mm_unpackhi_ps(tmp0, tmp1));
+		//__m128 tmp4(_mm_add_ps(tmp2, tmp3));
+		//
+		//__m128 tmp5(_mm_mul_ps(m_type, right.m_type));
+		//__m128 tmp6(_mm_shuffle_ps(tmp5, tmp5, PERMUTE_MASK(3, 2, 3, 0)));
+		//__m128 tmp7(_mm_shuffle_ps(tmp5, tmp5, PERMUTE_MASK(3, 3, 3, 1)));
+		//__m128 tmp8(_mm_add_ps(tmp6, tmp7));
+		//
+		//__m128 tmp9(_mm_movelh_ps(tmp4, tmp8));
+		//__m128 tmp10(_mm_movehl_ps(tmp8, tmp4));
+		//return ndVector(_mm_add_ps(tmp9, tmp10));
+		return xxxx;
+
 #endif
 	}
 
 	inline static void Transpose4x4(ndBigVector& dst0, ndBigVector& dst1, ndBigVector& dst2, ndBigVector& dst3,
 		const ndBigVector& src0, const ndBigVector& src1, const ndBigVector& src2, const ndBigVector& src3)
 	{
-		ndAssert(0);
-		ndBigVector tmp0(src0);
-		ndBigVector tmp1(src1);
-		ndBigVector tmp2(src2);
-		ndBigVector tmp3(src3);
+		__m256d tmp[4];
+		tmp[0] = _mm256_permute2f128_pd(src0.m_type, src2.m_type, 0x20);
+		tmp[1] = _mm256_permute2f128_pd(src1.m_type, src3.m_type, 0x20);
+		tmp[2] = _mm256_permute2f128_pd(src0.m_type, src2.m_type, 0x31);
+		tmp[3] = _mm256_permute2f128_pd(src1.m_type, src3.m_type, 0x31);
 
-		dst0 = ndBigVector(tmp0.m_x, tmp1.m_x, tmp2.m_x, tmp3.m_x);
-		dst1 = ndBigVector(tmp0.m_y, tmp1.m_y, tmp2.m_y, tmp3.m_y);
-		dst2 = ndBigVector(tmp0.m_z, tmp1.m_z, tmp2.m_z, tmp3.m_z);
-		dst3 = ndBigVector(tmp0.m_w, tmp1.m_w, tmp2.m_w, tmp3.m_w);
+		dst0 = _mm256_unpacklo_pd(tmp[0], tmp[1]);
+		dst1 = _mm256_unpackhi_pd(tmp[0], tmp[1]);
+		dst2 = _mm256_unpacklo_pd(tmp[2], tmp[3]);
+		dst3 = _mm256_unpackhi_pd(tmp[2], tmp[3]);
 	}
 
 	// return dot 4d dot product
