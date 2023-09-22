@@ -110,6 +110,13 @@ if(UNIX)
 		add_compile_options(-fPIC)
 	endif()
 
+	if (NEWTON_ENABLE_AVX2)
+		add_definitions(-D_NEWTON_USE_AVX2_OPTION)
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -march=haswell ")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
+		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
+	endif()
+
 	add_compile_options(-msse3)
 
 	include("GNUInstallDirs")
