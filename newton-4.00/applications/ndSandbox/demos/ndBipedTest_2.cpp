@@ -175,7 +175,7 @@ namespace biped2
 			:ndBrain()
 		{
 			ndAssert(0);
-			const ndInt32 neuronsPerHiddenLayers = 16;
+			//const ndInt32 neuronsPerHiddenLayers = 16;
 			//ndBrainLayerLinearActivated* const inputLayer = new ndBrainLayerLinearActivated(numberOfImputs, neuronsPerHiddenLayers, m_relu);
 			//ndBrainLayerLinearActivated* const hiddenLayer0 = new ndBrainLayerLinearActivated(inputLayer->GetOutputSize(), neuronsPerHiddenLayers, m_relu);
 			//ndBrainLayerLinearActivated* const hiddenLayer1 = new ndBrainLayerLinearActivated(hiddenLayer0->GetOutputSize(), neuronsPerHiddenLayers, m_relu);
