@@ -24,7 +24,7 @@
 
 #include "ndBrainStdafx.h"
 
-#define D_USE_BRAIN_THREAD_EMULATION
+//#define D_USE_BRAIN_THREAD_EMULATION
 
 class ndBrainThreadPool: public ndClassAlloc, public ndSyncMutex
 {

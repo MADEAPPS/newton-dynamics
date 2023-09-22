@@ -579,7 +579,7 @@ namespace ndController_1
 			#else
 			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			#endif
-			hyperParameters.m_threadsCount = 2;
+			hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_discountFactor = ndReal (0.995f);
 			hyperParameters.m_criticLearnRate = ndReal(0.0005f);
 			hyperParameters.m_actionNoiseVariance = ndReal(0.125f);
