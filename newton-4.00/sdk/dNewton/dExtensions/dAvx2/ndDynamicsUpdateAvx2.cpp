@@ -65,12 +65,16 @@
 				m_vector8.m_linear = low;
 				m_vector8.m_angular = high;
 			}
-		#else
+		#elif defined (D_NEWTON_USE_AVX2_OPTION)
 			inline ndAvxFloat(const ndVector& low, const ndVector& high)
-				//:m_low(_mm256_set_m128d(low.m_typeHigh, low.m_typeLow))
-				//,m_high(_mm256_set_m128d(high.m_typeHigh, high.m_typeLow))
 				:m_low(low.m_type)
 				,m_high(high.m_type)
+			{
+			}
+		#else
+			inline ndAvxFloat(const ndVector& low, const ndVector& high)
+				:m_low(_mm256_set_m128d(low.m_typeHigh, low.m_typeLow))
+				,m_high(_mm256_set_m128d(high.m_typeHigh, high.m_typeLow))
 			{
 			}
 		#endif

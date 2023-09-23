@@ -25,19 +25,20 @@
 #include "ndBrainStdafx.h"
 
 class ndBrainTrainer;
+class ndBrainThreadPool;
 
 class ndBrainOptimizer : public ndClassAlloc
 {
 	public: 
-	ndBrainOptimizer(ndBrainTrainer* const trainer);
+	ndBrainOptimizer();
 	virtual ~ndBrainOptimizer();
 
 	ndBrainFloat GetRegularizer() const;
 	void SetRegularizer(ndBrainFloat regularizer);
+	virtual void Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate);
 
-	virtual void Update(ndBrainFloat learnRate, ndInt32 bashSize);
-
-	ndBrainTrainer* m_trainer;
+	protected:
+	void AccumulateGradients(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients) const;
 	ndBrainFloat m_weighDecayRegularizer;
 };
 

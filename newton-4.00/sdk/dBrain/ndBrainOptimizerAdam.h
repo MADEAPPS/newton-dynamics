@@ -29,10 +29,10 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 {
 	public: 
 	class ndAdamData;
-	ndBrainOptimizerAdam(ndBrainTrainer* const trainer);
+	ndBrainOptimizerAdam();
 	virtual ~ndBrainOptimizerAdam();
 
-	virtual void Update(ndBrainFloat learnRate, ndInt32 bashSize);
+	virtual void Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate);
 
 	ndArray<ndAdamData*> m_data;
 	ndBrainFloat m_beta;
@@ -40,6 +40,7 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 	ndBrainFloat m_epsilon;
 	ndBrainFloat m_betaAcc;
 	ndBrainFloat m_alphaAcc;
+	bool m_initalized;
 };
 
 #endif 

@@ -223,11 +223,11 @@ void ndArray<T>::CopyData(T* const dstPtr, const T* const srcPtr, ndInt32 elemen
 template<class T>
 void ndArray<T>::Resize(ndInt32 newSize)
 {
-	// note: I know some tolls will detect a warning here
-	// because it is copy object from one array
-	// to another with out calling the copy constructor
+	// note: I know some tools will detect a warning here
+	// because it is copying object from one array
+	// to another without calling the copy constructor
 	// and destructor, but the ndArray is designed for 
-	// high performance memory resizing of struct,
+	// high performance memory resizing of structures,
 	// if an application needs to use an array with
 	// for general purpose classes, 
 	// please use standart lib std::vector

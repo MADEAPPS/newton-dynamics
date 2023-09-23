@@ -57,19 +57,20 @@ class ndBrainOptimizerAdam::ndBrainOptimizerAdam::ndAdamData : public ndClassAll
 	ndBrainMatrix m_weightGradient_v2;
 };
 
-ndBrainOptimizerAdam::ndBrainOptimizerAdam(ndBrainTrainer* const trainer)
-	:ndBrainOptimizer(trainer)
+ndBrainOptimizerAdam::ndBrainOptimizerAdam()
+	:ndBrainOptimizer()
 	,m_beta(0.999f)
 	,m_alpha(0.9f)
 	,m_epsilon(1.0e-8f)
 	,m_betaAcc(m_beta)
 	,m_alphaAcc(m_alpha)
+	,m_initalized(false)
 {
-	ndBrain* const brain = trainer->GetBrain();
-	for (ndInt32 i = 0; i < brain->GetCount(); ++i)
-	{
-		m_data.PushBack(new ndAdamData((*brain)[i]));
-	}
+	//ndBrain* const brain = trainer->GetBrain();
+	//for (ndInt32 i = 0; i < brain->GetCount(); ++i)
+	//{
+	//	m_data.PushBack(new ndAdamData((*brain)[i]));
+	//}
 }
 
 ndBrainOptimizerAdam::~ndBrainOptimizerAdam()
@@ -80,27 +81,40 @@ ndBrainOptimizerAdam::~ndBrainOptimizerAdam()
 	}
 }
 
-void ndBrainOptimizerAdam::Update(ndBrainFloat learnRate, ndInt32 bashSize)
+void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
 {
+	AccumulateGradients(threadPool, partialGradients);
+
 	learnRate *= ndBrainFloat(-1.0f);
 	ndBrainFloat regularizer = -GetRegularizer();
-	ndBrainFloat den = ndBrainFloat(1.0f) / ndBrainFloat(bashSize);
+	ndBrainFloat den = ndBrainFloat(1.0f) / ndBrainFloat(partialGradients.GetCount());
 
 	ndBrainFloat betaWeight = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_betaAcc);
 	ndBrainFloat alphaWeight = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_alphaAcc);
-	ndBrain* const brian = m_trainer->GetBrain();
 
-	for (ndInt32 i = brian->GetCount() - 1; i >= 0 ; --i)
+	ndBrainTrainer* const trainer = partialGradients[0];
+	ndBrain* const brain = trainer->GetBrain();
+
+	if (!m_initalized)
 	{
-		ndBrainLayer* const layer = (*brian)[i];
+		m_initalized = true;
+		for (ndInt32 i = 0; i < brain->GetCount(); ++i)
+		{
+			m_data.PushBack(new ndAdamData((*brain)[i]));
+		}
+	}
+	
+	for (ndInt32 i = brain->GetCount() - 1; i >= 0 ; --i)
+	{
+		ndBrainLayer* const layer = (*brain)[i];
 		if (layer->HasParameters())
 		{
 			ndAdamData& data = *m_data[i];
-			ndBrainVector& bias = *m_trainer->GetBias(i);
-			ndBrainMatrix& weight = *m_trainer->GetWeight(i);
-			ndBrainVector& biasGradients = *m_trainer->GetBiasGradients(i);
-			ndBrainMatrix& weightGradients = *m_trainer->GetWeightGradients(i);
-
+			ndBrainVector& bias = *trainer->GetBias(i);
+			ndBrainMatrix& weight = *trainer->GetWeight(i);
+			ndBrainVector& biasGradients = *trainer->GetBiasGradients(i);
+			ndBrainMatrix& weightGradients = *trainer->GetWeightGradients(i);
+	
 			biasGradients.Scale(den);
 			data.m_biasGradient_v.Scale(m_beta);
 			data.m_biasGradient_u.Scale(m_alpha);
@@ -114,7 +128,7 @@ void ndBrainOptimizerAdam::Update(ndBrainFloat learnRate, ndInt32 bashSize)
 			{
 				ndBrainVector& vHat = biasGradients;
 				ndBrainVector& uHat = data.m_biasGradient_v2;
-
+	
 				uHat.Set(data.m_biasGradient_u);
 				vHat.Set(data.m_biasGradient_v);
 				vHat.Scale(betaWeight);
@@ -137,8 +151,8 @@ void ndBrainOptimizerAdam::Update(ndBrainFloat learnRate, ndInt32 bashSize)
 			biasGradients.ScaleAdd(bias, regularizer);
 			bias.Add(biasGradients);
 			bias.FlushToZero();
-
-
+	
+	
 			weightGradients.Scale(den);
 			data.m_weightGradient_v.Scale(m_beta);
 			data.m_weightGradient_u.Scale(m_alpha);
@@ -146,7 +160,7 @@ void ndBrainOptimizerAdam::Update(ndBrainFloat learnRate, ndInt32 bashSize)
 			data.m_weightGradient_v2.Mul(weightGradients);
 			data.m_weightGradient_v.ScaleAdd(data.m_weightGradient_v2, ndBrainFloat(1.0f) - m_beta);
 			data.m_weightGradient_u.ScaleAdd(weightGradients, ndBrainFloat(1.0f) - m_alpha);
-
+	
 			if (m_betaAcc > ndBrainFloat(0.0f))
 			{
 				ndBrainMatrix& vHat = weightGradients;
@@ -156,7 +170,7 @@ void ndBrainOptimizerAdam::Update(ndBrainFloat learnRate, ndInt32 bashSize)
 				vHat.Set(data.m_weightGradient_v);
 				vHat.Scale(betaWeight);
 				uHat.Scale(alphaWeight);
-
+	
 				for (ndInt32 j = weightGradients.GetRows() - 1; j >= 0; --j)
 				{
 					for (ndInt32 k = weightGradients[j].GetCount() - 1; k >= 0; --k)
@@ -183,7 +197,7 @@ void ndBrainOptimizerAdam::Update(ndBrainFloat learnRate, ndInt32 bashSize)
 			weight.FlushToZero();
 		}
 	}
-
+	
 	m_betaAcc = ndFlushToZero(m_betaAcc * m_beta);
 	m_alphaAcc = ndFlushToZero(m_alphaAcc * m_alpha);
 	if (m_betaAcc < ndBrainFloat(1.0e-6f))

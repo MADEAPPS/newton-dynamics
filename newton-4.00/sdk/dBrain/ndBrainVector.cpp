@@ -93,6 +93,12 @@ void ndBrainVector::FlushToZero()
 	}
 }
 
+void ndBrainVector::ScaleSet(const ndBrainVector& a, ndBrainFloat b)
+{
+	ndAssert(GetCount() == a.GetCount());
+	ndScaleSet(GetCount(), &(*this)[0], &a[0], b);
+}
+
 void ndBrainVector::ScaleAdd(const ndBrainVector& a, ndBrainFloat b)
 {
 	ndAssert(GetCount() == a.GetCount());

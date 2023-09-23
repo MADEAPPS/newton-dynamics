@@ -601,6 +601,7 @@ namespace ndController_0
 			actor->InitWeightsXavierMethod();
 
 			ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			//hyperParameters.m_threadsCount = 1;
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor));
 
 		#else
@@ -652,6 +653,8 @@ namespace ndController_0
 			#else
 				ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			#endif
+			hyperParameters.m_threadsCount = 1;
+
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor, critic));
 		#endif
 

@@ -51,7 +51,7 @@ class ndVector
 	}
 
 	inline ndVector(const __m128 type)
-		: m_type(type)
+		:m_type(type)
 	{
 	}
 
@@ -251,7 +251,11 @@ class ndVector
 	// return 4d dot product
 	inline ndVector DotProduct(const ndVector& A) const
 	{
-		return (*this * A).AddHorizontal();
+		#ifdef D_NEWTON_USE_AVX2_OPTION
+			return _mm_dp_ps(m_type, A.m_type, 0xff);
+		#else
+			return (*this * A).AddHorizontal();
+		#endif
 	}
 
 	// return 3d cross product
@@ -362,13 +366,17 @@ class ndVector
 
 	inline ndVector Floor () const
 	{
-		ndVector truncated (_mm_cvtepi32_ps (_mm_cvttps_epi32 (m_type)));
-		ndVector ret (truncated - (ndVector::m_one & (*this < truncated)));
-		ndAssert (ret.m_f[0] == ndFloor(m_f[0]));
-		ndAssert (ret.m_f[1] == ndFloor(m_f[1]));
-		ndAssert (ret.m_f[2] == ndFloor(m_f[2]));
-		ndAssert (ret.m_f[3] == ndFloor(m_f[3]));
-		return ret;
+		#ifdef D_NEWTON_USE_AVX2_OPTION
+			return _mm_floor_ps(m_type);
+		#else
+			ndVector truncated(_mm_cvtepi32_ps(_mm_cvttps_epi32(m_type)));
+			ndVector ret(truncated - (ndVector::m_one & (*this < truncated)));
+			ndAssert(ret.m_f[0] == ndFloor(m_f[0]));
+			ndAssert(ret.m_f[1] == ndFloor(m_f[1]));
+			ndAssert(ret.m_f[2] == ndFloor(m_f[2]));
+			ndAssert(ret.m_f[3] == ndFloor(m_f[3]));
+			return ret;
+		#endif
 	}
 
 	inline ndVector GetInt() const
@@ -498,7 +506,7 @@ class ndVector
 
 		__m128 tmp9(_mm_movelh_ps(tmp4, tmp8));
 		__m128 tmp10(_mm_movehl_ps(tmp8, tmp4));
-		return ndVector(_mm_add_ps(tmp9, tmp10));
+		return _mm_add_ps(tmp9, tmp10);
 #endif
 	}
 
@@ -577,20 +585,6 @@ class ndBigVector
 		:m_type(copy.m_type)
 	{
 	}
-
-	//inline ndBigVector(const __m128d typeLow, const __m128d typeHigh)
-	//	:m_typeLow(typeLow)
-	//	,m_typeHigh(typeHigh)
-	//{
-	//	ndAssert(0);
-	//}
-	//
-	//inline ndBigVector(const __m128i typeLow, const __m128i typeHigh)
-	//	:m_typeIntLow(typeLow)
-	//	,m_typeIntHigh(typeHigh)
-	//{
-	//	ndAssert(0);
-	//}
 
 	inline ndBigVector(const __m256d type)
 		:m_type(type)
@@ -1085,16 +1079,6 @@ class ndBigVector
 
 		__m256d m_type;
 		__m256i m_typeInt;
-		//struct
-		//{
-		//	__m128d m_typeLow;
-		//	__m128d m_typeHigh;
-		//};
-		//struct
-		//{
-		//	__m128i m_typeIntLow;
-		//	__m128i m_typeIntHigh;
-		//};
 		struct
 		{
 			ndFloat64 m_x;

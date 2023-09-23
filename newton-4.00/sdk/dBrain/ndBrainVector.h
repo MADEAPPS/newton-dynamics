@@ -46,6 +46,7 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 
 	void FlushToZero();
 	void Clamp(ndBrainFloat min, ndBrainFloat max);
+	void ScaleSet(const ndBrainVector& a, ndBrainFloat b);
 	void ScaleAdd(const ndBrainVector& a, ndBrainFloat b);
 	void Blend(const ndBrainVector& target, ndBrainFloat blend);
 	void MulAdd(const ndBrainVector& a, const ndBrainVector& b);

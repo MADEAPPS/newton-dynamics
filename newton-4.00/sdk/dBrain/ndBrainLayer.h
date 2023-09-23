@@ -58,7 +58,7 @@ class ndBrainLayer : public ndClassAlloc
 		const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative,
 		ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient);
 
-	virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const;
+	//virtual void ClearGradAcc(ndBrainVector& gradBiasAcc, ndBrainMatrix& gradWeightAcc) const;
 	virtual void Save(const ndBrainSave* const loadSave) const;
 };
 

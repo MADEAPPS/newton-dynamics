@@ -80,6 +80,26 @@ void ndScaleSet(ndInt32 size, T* const X, const T* const A, T scale)
 }
 
 template<class T>
+void ndScaleAdd(ndInt32 size, T* const X, const T* const B, T C)
+{
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		X[i] += B[i] * C;
+		ndAssert(ndCheckFloat(X[i]));
+	}
+}
+
+template<class T>
+void ndScaleAdd(ndInt32 size, T* const X, const T* const A, const T* const B, T C)
+{
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		X[i] = A[i] + B[i] * C;
+		ndAssert(ndCheckFloat(X[i]));
+	}
+}
+
+template<class T>
 void ndAdd(ndInt32 size, T* const X, const T* const A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
@@ -135,26 +155,6 @@ void ndMul(ndInt32 size, T* const X, const T* const A, const T* const B)
 	for (ndInt32 i = 0; i < size; ++i)
 	{
 		X[i] = A[i] * B[i];
-		ndAssert(ndCheckFloat(X[i]));
-	}
-}
-
-template<class T>
-void ndScaleAdd(ndInt32 size, T* const X, const T* const B, T C)
-{
-	for (ndInt32 i = 0; i < size; ++i)
-	{
-		X[i] += B[i] * C;
-		ndAssert(ndCheckFloat(X[i]));
-	}
-}
-
-template<class T>
-void ndScaleAdd(ndInt32 size, T* const X, const T* const A, const T* const B, T C)
-{
-	for (ndInt32 i = 0; i < size; ++i) 
-	{
-		X[i] = A[i] + B[i] * C;
 		ndAssert(ndCheckFloat(X[i]));
 	}
 }

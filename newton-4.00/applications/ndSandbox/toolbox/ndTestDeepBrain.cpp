@@ -61,16 +61,18 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		trainers.PushBack(new ndBrainTrainer(&brain));
 	}
 
+	ndAssert(0);
 	//ndBrainOptimizer optimizer(*trainers[0]);
 	//ndBrainOptimizerSgd optimizer(*trainers[0]);
-	ndBrainOptimizerAdam optimizer(*trainers[0]);
+	ndBrainOptimizerAdam optimizer;
 
 	ndInt32 randomeSelection[bashSize];
 
 	auto UpdateTrainer = ndMakeObject::ndFunction([&trainers, &randomeSelection, &inputBatch, &groundTruth, bashSize](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		ndBrainTrainer& trainer = *(*trainers[threadIndex]);
-		trainer.ClearGradientsAcc();
+		ndAssert(0);
+		//trainer.ClearGradientsAcc();
 		ndBrainLossLeastSquaredError loss(trainer.GetBrain()->GetOutputSize());
 		const ndStartEnd startEnd(bashSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -90,13 +92,14 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		}
 		threads.ParallelExecute(UpdateTrainer);
 
-		ndBrainTrainer& trainer = *(*trainers[0]);
-		for (ndInt32 j = 1; j < threads.GetThreadCount(); ++j)
-		{
-			ndBrainTrainer& srcTrainer = *(*trainers[j]);
-			trainer.AcculumateGradients(srcTrainer);
-		}
-		optimizer.Update(ndReal(1.0e-3f), bashSize);
+		ndAssert(0);
+		//ndBrainTrainer& trainer = *(*trainers[0]);
+		//for (ndInt32 j = 1; j < threads.GetThreadCount(); ++j)
+		//{
+		//	ndBrainTrainer& srcTrainer = *(*trainers[j]);
+		//	trainer.AcculumateGradients(srcTrainer);
+		//}
+		//optimizer.Update(ndReal(1.0e-3f), bashSize);
 	}
 	
 	ndBrainVector truth;
@@ -314,7 +317,8 @@ static void MnistTrainingSet()
 				};
 
 				ndBrainTrainer& trainer = *(*m_optimizers[threadIndex]);
-				trainer.ClearGradientsAcc();
+				ndAssert(0);
+				//trainer.ClearGradientsAcc();
 
 				Loss loss(m_brain.GetOutputSize());
 				const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
@@ -328,8 +332,10 @@ static void MnistTrainingSet()
 
 			ndBrain bestBrain(m_brain);
 			ndInt32 minFail = trainingDigits->GetCount();
+
+			ndAssert(0);
 			ndBrainTrainer& trainer = *(*m_optimizers[0]);
-			ndBrainOptimizerAdam optimizer(&trainer);
+			ndBrainOptimizerAdam optimizer;
 
 			// so far best training result on the mnist data set
 			//optimizer.SetRegularizer(ndReal(2.0e-5f));
@@ -354,12 +360,14 @@ static void MnistTrainingSet()
 					shuffleBashBuffer[j] = ndRandInt() % trainingDigits->GetCount();
 				}
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
-				for (ndInt32 j = 1; j < GetThreadCount(); ++j)
-				{
-					ndBrainTrainer& srcTrainer = *(*m_optimizers[j]);
-					trainer.AcculumateGradients(srcTrainer);
-				}
-				optimizer.Update(ndReal(1.0e-3f), m_bashBufferSize);
+
+				ndAssert(0);
+				//for (ndInt32 j = 1; j < GetThreadCount(); ++j)
+				//{
+				//	ndBrainTrainer& srcTrainer = *(*m_optimizers[j]);
+				//	trainer.AcculumateGradients(srcTrainer);
+				//}
+				//optimizer.Update(ndReal(1.0e-3f), m_bashBufferSize);
 
 				if ((i % 1024) == 0)
 				{

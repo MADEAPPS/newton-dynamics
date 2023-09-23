@@ -97,11 +97,10 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void SetBufferSize(ndInt32 size);
 
 	protected:
-	//ndSharedPtr<ndBrain> m_actor;
 	ndBrain m_actor;
 	ndBrain m_target;
 	ndBrainOptimizerAdam* m_optimizer;
-	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> m_trainers;
+	ndArray<ndBrainTrainer*> m_trainers;
 
 	ndBrainReplayBuffer<ndInt32, statesDim, 1> m_replayBuffer;
 	ndBrainReplayTransitionMemory<ndInt32, statesDim, 1> m_currentTransition;
@@ -141,8 +140,9 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 	,m_targetUpdatePeriod(hyperParameters.m_targetUpdatePeriod)
 	,m_collectingSamples(true)
 {
+	m_trainers.SetCount(0);
 	SetThreadCount(hyperParameters.m_threadsCount);
-	for (ndInt32 i = 0; i < GetThreadCount(); ++i)
+	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 	{
 		ndBrainTrainer* const trainer = new ndBrainTrainer(&m_actor);
 		m_trainers.PushBack(trainer);
@@ -152,13 +152,17 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 	m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / ndBrainFloat (m_replayBuffer.GetCapacity());
 
 	InitWeights();
-	m_optimizer = new ndBrainOptimizerAdam(*m_trainers[0]);
+	m_optimizer = new ndBrainOptimizerAdam();
 	m_optimizer->SetRegularizer(hyperParameters.m_regularizer);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDQN_Trainer<statesDim, actionDim>::~ndBrainAgentDQN_Trainer()
 {
+	for (ndInt32 i = 0; i < m_trainers.GetCount(); ++i)
+	{
+		delete m_trainers[i];
+	}
 	delete m_optimizer;
 }
 
@@ -282,19 +286,16 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 			ndInt32 m_index;
 		};
 
-		ndBrainTrainer& trainer = *(*m_trainers[threadIndex]);
-		trainer.ClearGradientsAcc();
-
-		Loss loss(trainer, this);
 		ndBrainFloat stateBuffer[statesDim * 2];
 		ndBrainMemVector state(stateBuffer, statesDim);
-
+		ndAssert(m_bashBufferSize == m_trainers.GetCount());
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
+			ndBrainTrainer& trainer = *m_trainers[i];
+			Loss loss(trainer, this);
 			ndInt32 index = ndInt32 (shuffleBuffer[i]);
 			const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_replayBuffer[index];
-
 			for (ndInt32 j = 0; j < statesDim; ++j)
 			{
 				state[j] = transition.m_state[j];
@@ -304,15 +305,9 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 		}
 	});
 
-	ndBrainTrainer& trainer = *(*m_trainers[0]);
 	ndBrainThreadPool::ParallelExecute(PropagateBash);
-	for (ndInt32 i = 1; i < GetThreadCount(); ++i)
-	{
-		ndBrainTrainer& srcTrainer = *(*m_trainers[i]);
-		trainer.AcculumateGradients(srcTrainer);
-	}
-	m_optimizer->Update(m_learnRate, m_bashBufferSize);
-
+	m_optimizer->Update(this, m_trainers, m_learnRate);
+	
 	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
 	{
 		// update on line network
@@ -389,7 +384,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 		ndBrainFloat maxQValue = actions[0];
 		for (ndInt32 i = 1; i < actionDim; ++i)
 		{
-			// assume dqn will alway use a relu as the last layer, 
+			// assume dqn will always uses a relu as the last layer, 
 			// wish can only product positive q values.
 			ndAssert(actions[i] >= ndBrainFloat(0.0f));
 			if (actions[i] > maxQValue)

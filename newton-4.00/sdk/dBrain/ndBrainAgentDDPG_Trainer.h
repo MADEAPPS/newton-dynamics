@@ -168,10 +168,11 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 	SetBufferSize(hyperParameters.m_replayBufferSize);
 	InitWeights();
 
-	m_actorOptimizer = new ndBrainOptimizerAdam(*m_actorTrainer[0]);
-	m_criticOptimizer = new ndBrainOptimizerAdam(*m_criticTrainer[0]);
-	m_actorOptimizer->SetRegularizer(hyperParameters.m_regularizer);
-	m_criticOptimizer->SetRegularizer(hyperParameters.m_regularizer);
+	ndAssert(0);
+	//m_actorOptimizer = new ndBrainOptimizerAdam(*m_actorTrainer[0]);
+	//m_criticOptimizer = new ndBrainOptimizerAdam(*m_criticTrainer[0]);
+	//m_actorOptimizer->SetRegularizer(hyperParameters.m_regularizer);
+	//m_criticOptimizer->SetRegularizer(hyperParameters.m_regularizer);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -326,7 +327,8 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 		ndBrainMemVector actorOutput(actorOutputBuffer, actionDim);
 		ndBrainMemVector input(inputBuffer, statesDim + actionDim);
 
-		trainer.ClearGradientsAcc();
+		ndAssert(0);
+		//trainer.ClearGradientsAcc();
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -361,13 +363,14 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 
 	ndBrainThreadPool::ParallelExecute(PropagateBash);
 
-	ndBrainTrainer& criticTrainer = *(*m_criticTrainer[0]);
-	for (ndInt32 i = 1; i < GetThreadCount(); ++i)
-	{
-		ndBrainTrainer& srcTrainer = *(*m_criticTrainer[i]);
-		criticTrainer.AcculumateGradients(srcTrainer);
-	}
-	m_criticOptimizer->Update(m_criticLearnRate, m_bashBufferSize);
+	ndAssert(0);
+	//ndBrainTrainer& criticTrainer = *(*m_criticTrainer[0]);
+	//for (ndInt32 i = 1; i < GetThreadCount(); ++i)
+	//{
+	//	ndBrainTrainer& srcTrainer = *(*m_criticTrainer[i]);
+	//	criticTrainer.AcculumateGradients(srcTrainer);
+	//}
+	//m_criticOptimizer->Update(m_criticLearnRate, m_bashBufferSize);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -421,7 +424,8 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 		ndBrainFloat inputBuffer[statesDim * 2];
 		ndBrainMemVector input(inputBuffer, statesDim);
 
-		actorTrainer.ClearGradientsAcc();
+		ndAssert(0);
+		//actorTrainer.ClearGradientsAcc();
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -439,13 +443,14 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 
 	ParallelExecute(PropagateBash);
 
-	ndBrainTrainer& actorTrainer = *(*m_actorTrainer[0]);
-	for (ndInt32 i = 1; i < GetThreadCount(); ++i)
-	{
-		ndBrainTrainer& srcTrainer = *(*m_actorTrainer[i]);
-		actorTrainer.AcculumateGradients(srcTrainer);
-	}
-	m_actorOptimizer->Update(-m_actorLearnRate, m_bashBufferSize);
+	ndAssert(0);
+	//ndBrainTrainer& actorTrainer = *(*m_actorTrainer[0]);
+	//for (ndInt32 i = 1; i < GetThreadCount(); ++i)
+	//{
+	//	ndBrainTrainer& srcTrainer = *(*m_actorTrainer[i]);
+	//	actorTrainer.AcculumateGradients(srcTrainer);
+	//}
+	//m_actorOptimizer->Update(-m_actorLearnRate, m_bashBufferSize);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

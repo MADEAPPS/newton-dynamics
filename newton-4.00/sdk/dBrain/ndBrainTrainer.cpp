@@ -46,7 +46,6 @@ class ndBrainTrainer::ndLayerData : public ndClassAlloc
 	ndBrainLayer* m_layer;
 };
 
-
 ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
 	:ndClassAlloc()
 	,m_data()
@@ -103,26 +102,36 @@ ndBrainMatrix* ndBrainTrainer::GetWeightGradients(ndInt32 index) const
 	return &m_data[index]->m_gradWeight;
 }
 
-void ndBrainTrainer::ClearGradientsAcc()
-{
-	for (ndInt32 i = m_data.GetCount() - 1; i >= 0; --i)
-	{
-		m_data[i]->m_layer->ClearGradAcc(m_data[i]->m_gradBias, m_data[i]->m_gradWeight);
-	}
-}
+//void ndBrainTrainer::ClearGradientsAcc()
+//{
+//	for (ndInt32 i = m_data.GetCount() - 1; i >= 0; --i)
+//	{
+//		m_data[i]->m_layer->ClearGradAcc(m_data[i]->m_gradBias, m_data[i]->m_gradWeight);
+//	}
+//}
 
-void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& srcTrainer)
+//void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& srcTrainer)
+//{
+//	for (ndInt32 i = m_data.GetCount() - 1; i >= 0; --i)
+//	{
+//		ndLayerData* const dst = m_data[i];
+//		if (dst->m_layer->HasParameters())
+//		{
+//			const ndLayerData* const src = srcTrainer.m_data[i];
+//			dst->m_gradBias.Add(src->m_gradBias);
+//			dst->m_gradWeight.Add(src->m_gradWeight);
+//		}
+//	}
+//}
+
+void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 index)
 {
-	for (ndInt32 i = m_data.GetCount() - 1; i >= 0; --i)
-	{
-		ndLayerData* const dst = m_data[i];
-		if (dst->m_layer->HasParameters())
-		{
-			const ndLayerData* const src = srcTrainer.m_data[i];
-			dst->m_gradBias.Add(src->m_gradBias);
-			dst->m_gradWeight.Add(src->m_gradWeight);
-		}
-	}
+	ndLayerData* const dstData = m_data[index];
+	ndAssert(dstData->m_layer->HasParameters());
+
+	const ndLayerData* const srcData = src.m_data[index];
+	dstData->m_gradBias.Add(srcData->m_gradBias);
+	dstData->m_gradWeight.Add(srcData->m_gradWeight);
 }
 
 void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
@@ -143,7 +152,6 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	prefixScan.PushBack(sizeAcc);
 
 	const ndBrainFloat* const memBuffer = ndAlloca(ndBrainFloat, sizeAcc + 8);
-	const ndBrainFloat* const gradientBuffer = ndAlloca(ndBrainFloat, maxSize * 2 + 256);
 
 	ndBrainMemVector in0(memBuffer, input.GetCount());
 	in0.Set(input);
@@ -155,6 +163,7 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	}
 	const ndBrainMemVector output(memBuffer + prefixScan[layers.GetCount()], m_brain->GetOutputSize());
 
+	const ndBrainFloat* const gradientBuffer = ndAlloca(ndBrainFloat, maxSize * 2 + 256);
 	ndBrainMemVector gradientIn(gradientBuffer, m_brain->GetOutputSize());
 	ndBrainMemVector gradientOut(gradientBuffer + maxSize + 128, m_brain->GetOutputSize());
 	loss.GetLoss(output, gradientOut);

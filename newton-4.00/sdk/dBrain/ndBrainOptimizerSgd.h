@@ -28,10 +28,10 @@
 class ndBrainOptimizerSgd : public ndBrainOptimizer
 {
 	public: 
-	ndBrainOptimizerSgd(ndBrainTrainer* const trainer);
+	ndBrainOptimizerSgd();
 	virtual ~ndBrainOptimizerSgd();
 
-	virtual void Update(ndBrainFloat learnRate, ndInt32 bashSize);
+	virtual void Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate);
 };
 
 

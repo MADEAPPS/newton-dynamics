@@ -25,7 +25,7 @@
 
 #include <ndCore.h>
 
-//typedef ndReal ndBrainFloat;
-typedef ndFloat64 ndBrainFloat;
+typedef ndReal ndBrainFloat;
+//typedef ndFloat64 ndBrainFloat;
 #endif 
 
