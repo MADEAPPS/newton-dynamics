@@ -102,28 +102,6 @@ ndBrainMatrix* ndBrainTrainer::GetWeightGradients(ndInt32 index) const
 	return &m_data[index]->m_gradWeight;
 }
 
-//void ndBrainTrainer::ClearGradientsAcc()
-//{
-//	for (ndInt32 i = m_data.GetCount() - 1; i >= 0; --i)
-//	{
-//		m_data[i]->m_layer->ClearGradAcc(m_data[i]->m_gradBias, m_data[i]->m_gradWeight);
-//	}
-//}
-
-//void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& srcTrainer)
-//{
-//	for (ndInt32 i = m_data.GetCount() - 1; i >= 0; --i)
-//	{
-//		ndLayerData* const dst = m_data[i];
-//		if (dst->m_layer->HasParameters())
-//		{
-//			const ndLayerData* const src = srcTrainer.m_data[i];
-//			dst->m_gradBias.Add(src->m_gradBias);
-//			dst->m_gradWeight.Add(src->m_gradWeight);
-//		}
-//	}
-//}
-
 void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 index)
 {
 	ndLayerData* const dstData = m_data[index];

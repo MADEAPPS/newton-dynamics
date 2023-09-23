@@ -88,10 +88,6 @@ void ndBrainLayerActivation::Blend(const ndBrainLayer&, ndBrainFloat)
 {
 }
 
-void ndBrainLayerActivation::ClearGradAcc(ndBrainVector&, ndBrainMatrix&) const
-{
-}
-
 void ndBrainLayerActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == m_neurons);

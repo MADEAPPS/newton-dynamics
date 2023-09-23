@@ -23,7 +23,7 @@
 namespace ndController_0
 {
 	//#define D_USE_TD3
-	#define D_USE_POLE_DQN
+	//#define D_USE_POLE_DQN
 
 	#define D_PUSH_ACCEL			ndFloat32 (15.0f)
 	#define D_REWARD_MIN_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
@@ -264,7 +264,7 @@ namespace ndController_0
 						m_outFile = fopen("cartpole-TD3.csv", "wb");
 						fprintf(m_outFile, "td3\n");
 					#else
-						agent->SetName("cartpoleDDPG.dnn");
+						SetName("cartpoleDDPG.dnn");
 						m_outFile = fopen("cartpole-DDPG.csv", "wb");
 						fprintf(m_outFile, "ddpg\n");
 					#endif
@@ -653,7 +653,7 @@ namespace ndController_0
 			#else
 				ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			#endif
-			hyperParameters.m_threadsCount = 1;
+			//hyperParameters.m_threadsCount = 1;
 
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor, critic));
 		#endif

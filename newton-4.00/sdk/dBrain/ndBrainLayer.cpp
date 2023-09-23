@@ -104,11 +104,6 @@ void ndBrainLayer::Save(const ndBrainSave* const) const
 	ndAssert(0);
 }
 
-//void ndBrainLayer::ClearGradAcc(ndBrainVector&, ndBrainMatrix&) const
-//{
-//	ndAssert(0);
-//}
-
 void ndBrainLayer::MakePrediction(const ndBrainVector&, ndBrainVector&) const
 {
 	ndAssert(0);

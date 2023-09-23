@@ -38,10 +38,7 @@ class ndBrainTrainer: public ndClassAlloc
 	virtual ~ndBrainTrainer();
 
 	ndBrain* GetBrain() const;
-	//void ClearGradientsAcc();
-	//void AcculumateGradients(const ndBrainTrainer& src);
 	void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
-
 	void AcculumateGradients(const ndBrainTrainer& src, ndInt32 index);
 
 	ndBrainVector* GetBias(ndInt32 index) const;
