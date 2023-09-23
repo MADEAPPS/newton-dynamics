@@ -66,11 +66,6 @@ ndBrainOptimizerAdam::ndBrainOptimizerAdam()
 	,m_alphaAcc(m_alpha)
 	,m_initalized(false)
 {
-	//ndBrain* const brain = trainer->GetBrain();
-	//for (ndInt32 i = 0; i < brain->GetCount(); ++i)
-	//{
-	//	m_data.PushBack(new ndAdamData((*brain)[i]));
-	//}
 }
 
 ndBrainOptimizerAdam::~ndBrainOptimizerAdam()

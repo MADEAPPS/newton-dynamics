@@ -102,16 +102,6 @@ ndBrainMatrix* ndBrainTrainer::GetWeightGradients(ndInt32 index) const
 	return &m_data[index]->m_gradWeight;
 }
 
-void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 index)
-{
-	ndLayerData* const dstData = m_data[index];
-	ndAssert(dstData->m_layer->HasParameters());
-
-	const ndLayerData* const srcData = src.m_data[index];
-	dstData->m_gradBias.Add(srcData->m_gradBias);
-	dstData->m_gradWeight.Add(srcData->m_gradWeight);
-}
-
 void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
 {
 	ndFixSizeArray<ndInt32, 256> prefixScan;
@@ -155,4 +145,13 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 		layer->CalculateParamGradients(in, out, gradientOut, gradientIn, m_data[i]->m_gradBias, m_data[i]->m_gradWeight);
 		gradientIn.Swap(gradientOut);
 	}
+}
+
+void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 index)
+{
+	ndLayerData* const dstData = m_data[index];
+	ndAssert(dstData->m_layer->HasParameters());
+	const ndLayerData* const srcData = src.m_data[index];
+	dstData->m_gradBias.Add(srcData->m_gradBias);
+	dstData->m_gradWeight.Add(srcData->m_gradWeight);
 }

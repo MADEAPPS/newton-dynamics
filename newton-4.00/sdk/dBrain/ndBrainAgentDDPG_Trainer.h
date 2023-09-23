@@ -160,8 +160,9 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 	
 	m_actorTrainers.SetCount(0);
 	m_criticTrainers.SetCount(0);
-	//SetThreadCount(hyperParameters.m_threadsCount);
-SetThreadCount(16);
+	SetThreadCount(hyperParameters.m_threadsCount);
+	//SetThreadCount(1);
+
 	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 	{
 		m_actorTrainers.PushBack(new ndBrainTrainer(&m_actor));
@@ -325,9 +326,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 			ndBrainFloat m_targetInputBuffer[(statesDim + actionDim) * 2];
 		};
 
-		ndBrainTrainer& trainer = *m_criticTrainers[threadIndex];
-		Loss loss(trainer, this, m_discountFactor);
-
 		ndBrainFloat actorInputBuffer[statesDim * 2];
 		ndBrainFloat actorOutputBuffer[actionDim * 2];
 		ndBrainFloat inputBuffer[(statesDim + actionDim) * 2];
@@ -338,6 +336,9 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
+			ndBrainTrainer& trainer = *m_criticTrainers[i];
+			Loss loss(trainer, this, m_discountFactor);
+
 			ndInt32 index = ndInt32(shuffleBuffer[i]);
 			const ndBrainReplayTransitionMemory<ndBrainFloat, statesDim, actionDim>& transition = m_replayBuffer[index];
 
@@ -416,15 +417,15 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 			ndInt32 m_index;
 		};
 
-		ndBrainTrainer& actorTrainer = *m_actorTrainers[threadIndex];
-		ActorLoss loss(actorTrainer, this);
-
 		ndBrainFloat inputBuffer[statesDim * 2];
 		ndBrainMemVector input(inputBuffer, statesDim);
 
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
+			ndBrainTrainer& actorTrainer = *m_actorTrainers[i];
+			ActorLoss loss(actorTrainer, this);
+
 			ndInt32 index = ndInt32(shuffleBuffer[i]);
 			const ndBrainReplayTransitionMemory<ndBrainFloat, statesDim, actionDim>& transition = m_replayBuffer[index];
 
