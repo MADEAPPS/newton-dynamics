@@ -15,8 +15,7 @@
 static void ThreeLayersTwoInputsTwoOutputs()
 {
 	ndBrain brain;
-	ndInt32 hiddenNeurons = 32;
-	//ndInt32 hiddenNeurons = 8;
+	ndInt32 hiddenNeurons = 16;
 
 	ndFixSizeArray<ndBrainLayer*, 16> layers;
 	layers.PushBack(new ndBrainLayerLinear(2, hiddenNeurons));
@@ -50,33 +49,27 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	}
 	
 	const ndInt32 bashSize = 64;
-
-	ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> trainers;
+	ndArray<ndBrainTrainer*> trainers;
 
 	ndBrainThreadPool threads;
 	threads.SetThreadCount(4);
-	//threads.SetThreadCount(1);
-	for (ndInt32 i = 0; i < threads.GetThreadCount(); ++i)
+	for (ndInt32 i = 0; i < bashSize; ++i)
 	{
 		trainers.PushBack(new ndBrainTrainer(&brain));
 	}
 
-	ndAssert(0);
-	//ndBrainOptimizer optimizer(*trainers[0]);
-	//ndBrainOptimizerSgd optimizer(*trainers[0]);
+	//ndBrainOptimizerSgd optimizer;
 	ndBrainOptimizerAdam optimizer;
 
 	ndInt32 randomeSelection[bashSize];
-
 	auto UpdateTrainer = ndMakeObject::ndFunction([&trainers, &randomeSelection, &inputBatch, &groundTruth, bashSize](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		ndBrainTrainer& trainer = *(*trainers[threadIndex]);
-		ndAssert(0);
-		//trainer.ClearGradientsAcc();
-		ndBrainLossLeastSquaredError loss(trainer.GetBrain()->GetOutputSize());
 		const ndStartEnd startEnd(bashSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
+			ndBrainTrainer& trainer = *trainers[i];
+			ndBrainLossLeastSquaredError loss(trainer.GetBrain()->GetOutputSize());
+
 			ndInt32 index = randomeSelection[i];
 			const ndBrainVector& input = inputBatch[index];
 			loss.SetTruth(groundTruth[index]);
@@ -91,15 +84,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 			randomeSelection[j] = ndInt32 (ndRandInt() % samples);
 		}
 		threads.ParallelExecute(UpdateTrainer);
-
-		ndAssert(0);
-		//ndBrainTrainer& trainer = *(*trainers[0]);
-		//for (ndInt32 j = 1; j < threads.GetThreadCount(); ++j)
-		//{
-		//	ndBrainTrainer& srcTrainer = *(*trainers[j]);
-		//	trainer.AcculumateGradients(srcTrainer);
-		//}
-		//optimizer.Update(ndReal(1.0e-3f), bashSize);
+		optimizer.Update(&threads, trainers, ndReal(1.0e-3f));
 	}
 	
 	ndBrainVector truth;
@@ -134,7 +119,12 @@ static void ThreeLayersTwoInputsTwoOutputs()
 			failCount++;
 		}
 	}
-	
+
+	for (ndInt32 i = 0; i < trainers.GetCount(); ++i)
+	{
+		delete trainers[i];
+	}
+
 	ndExpandTraceMessage("%s\n", "boolean logic");
 	ndExpandTraceMessage("num_right: %d  out of %d\n", testCount - failCount, testCount);
 	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testCount);
@@ -511,7 +501,7 @@ void ndTestDeedBrian()
 {
 	ndSetRandSeed(12345);
 
-	//ThreeLayersTwoInputsTwoOutputs();
+	ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();
 	//MnistTestSet();
 }

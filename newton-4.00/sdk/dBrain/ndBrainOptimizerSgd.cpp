@@ -23,6 +23,7 @@
 #include "ndBrain.h"
 #include "ndBrainMatrix.h"
 #include "ndBrainTrainer.h"
+#include "ndBrainThreadPool.h"
 #include "ndBrainOptimizerSgd.h"
 
 ndBrainOptimizerSgd::ndBrainOptimizerSgd()
@@ -36,34 +37,51 @@ ndBrainOptimizerSgd::~ndBrainOptimizerSgd()
 
 void ndBrainOptimizerSgd::Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
 {
-	ndAssert(0);
-	//ndBrainFloat regularizer = -GetRegularizer();
-	//ndBrainFloat denScale = -learnRate / ndBrainFloat(bashSize);
-	//
-	//ndBrain* const brian = m_trainer->GetBrain();
-	//for (ndInt32 i = 0; i < brian->GetCount(); ++i)
-	//{
-	//	ndBrainLayer* const layer = (*brian)[i];
-	//	if (layer->HasParameters())
-	//	{
-	//		ndBrainVector& bias = *m_trainer->GetBias(i);
-	//		ndBrainMatrix& weight = *m_trainer->GetWeight(i);
-	//		ndBrainVector& biasGradients = *m_trainer->GetBiasGradients(i);
-	//		ndBrainMatrix& weightGradients = *m_trainer->GetWeightGradients(i);
-	//
-	//		//biasGradients.Scale(den);
-	//		//biasGradients.Scale(learnRate);
-	//		biasGradients.Scale(denScale);
-	//		biasGradients.ScaleAdd(bias, regularizer);
-	//		bias.Add(biasGradients);
-	//		bias.FlushToZero();
-	//
-	//		//weightGradients.Scale(den);
-	//		//weightGradients.Scale(learnRate);
-	//		weightGradients.Scale(denScale);
-	//		weightGradients.ScaleAdd(weight, regularizer);
-	//		weight.Add(weightGradients);
-	//		weight.FlushToZero();
-	//	}
-	//}
+	ndBrainTrainer* const trainer = partialGradients[0];
+	ndBrain& brain = *trainer->GetBrain();
+
+	ndFixSizeArray<ndInt32, 256> paramLayer;
+	for (ndInt32 i = 0; i < brain.GetCount(); ++i)
+	{
+		if (brain[i]->HasParameters())
+		{
+			paramLayer.PushBack(i);
+		}
+	}
+
+	auto UpdateGradients = ndMakeObject::ndFunction([this, learnRate, &paramLayer, &partialGradients](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		ndBrainTrainer* const trainer = partialGradients[0];
+		ndBrainFloat regularizer = -GetRegularizer();
+		ndBrainFloat denScale = -learnRate / ndBrainFloat(partialGradients.GetCount());
+
+		const ndStartEnd startEnd(paramLayer.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndInt32 index = paramLayer[i];
+			ndAssert((*trainer->GetBrain())[index]->HasParameters());
+			ndBrainVector& bias = *trainer->GetBias(index);
+			ndBrainMatrix& weight = *trainer->GetWeight(index);
+			ndBrainVector& biasGradients = *trainer->GetBiasGradients(index);
+			ndBrainMatrix& weightGradients = *trainer->GetWeightGradients(index);
+		
+			for (ndInt32 j = 1; j < partialGradients.GetCount(); ++j)
+			{
+				ndBrainTrainer* const src = partialGradients[j];
+				trainer->AcculumateGradients(*src, index);
+			}
+		
+			biasGradients.Scale(denScale);
+			biasGradients.ScaleAdd(bias, regularizer);
+			bias.Add(biasGradients);
+			bias.FlushToZero();
+		
+			weightGradients.Scale(denScale);
+			weightGradients.ScaleAdd(weight, regularizer);
+			weight.Add(weightGradients);
+			weight.FlushToZero();
+		}
+	});
+
+	threadPool->ndBrainThreadPool::ParallelExecute(UpdateGradients);
 }
