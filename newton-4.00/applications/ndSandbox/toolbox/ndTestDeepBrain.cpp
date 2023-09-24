@@ -341,7 +341,7 @@ static void MnistTrainingSet()
 			//optimizer.SetRegularizer(ndReal(5.0e-5f));
 
 			bool firstPass = true;
-			for (ndInt32 i = 0; i < 10000000; ++i)
+			for (ndInt32 i = 0; i < 2000000; ++i)
 			{
 				ndInt32 priorityStart = ndMin(priorityIndexArray.GetCount(), 2);
 				for (ndInt32 j = 0; j < priorityStart; ++j)
