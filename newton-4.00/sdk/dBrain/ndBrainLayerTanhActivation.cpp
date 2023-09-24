@@ -137,17 +137,21 @@ void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& 
 		const ndBrainFloat log2f = ndReal(1.442695022f);
 
 		ndBrainFloat v = log2f * ndClamp(in, ndBrainFloat(-10.0f), ndBrainFloat(10.0f));
-		ndInt32 intPart = (ndInt32)ndFloor(v);
-		ndBrainFloat x = v - ndReal(intPart);
+		//ndInt32 intPart = (ndInt32)ndFloor(v);
+		//ndBrainFloat x = v - ndReal(intPart);
+		ndBrainFloat floatIntPart = ndBrainFloat(ndFloor(v));
+		ndBrainFloat x = v - floatIntPart;
 		ndBrainFloat xx = x * x;
 		ndBrainFloat v1 = log2f + c2 * xx;
 		ndBrainFloat v2 = x + xx * c1 * x;
 		ndBrainFloat v3 = v2 + v1;
 		ndBrainFloat v4 = v2 - v1;
 		#ifdef D_BRAIN_USES_REAL
-			*((ndInt32*)&v3) += intPart << 24;
+			//*((ndInt32*)&v3) += intPart << 24;
+			* ((ndInt32*)&v3) += ndInt32(floatIntPart) << 24;
 		#else
-			*((ndInt64*)&v3) += ndInt64(intPart) << 53;
+			//*((ndInt64*)&v3) += ndInt64(intPart) << 53;
+			* ((ndInt64*)&v3) += ndInt64(floatIntPart) << 53;
 		#endif
 		return (v3 + v4) / (v3 - v4);
 	};
