@@ -1121,12 +1121,14 @@ class ndBigVector
 	D_CORE_API static ndBigVector m_signMask;
 	D_CORE_API static ndBigVector m_triplexMask;
 } D_GCC_NEWTON_ALIGN_32;
+
 #else
+
 class ndBigVector
 {
-#define PERMUT_MASK_DOUBLE(y, x) _MM_SHUFFLE2 (y, x)
+	#define PERMUT_MASK_DOUBLE(y, x) _MM_SHUFFLE2 (y, x)
 
-public:
+	public:
 	D_OPERATOR_NEW_AND_DELETE
 
 		inline ndBigVector()
@@ -1359,7 +1361,7 @@ public:
 	
 	inline ndBigVector Divide(const ndBigVector& denominator) const
 	{
-		return ndBigVector(_mm_div_pd(m_typeLow, denominator.mTypeLow), _mm_div_pd(m_typeHigh, denominator.m_typeHigh));
+		return ndBigVector(_mm_div_pd(m_typeLow, denominator.m_typeLow), _mm_div_pd(m_typeHigh, denominator.m_typeHigh));
 	}
 
 	inline ndBigVector Reciproc() const
