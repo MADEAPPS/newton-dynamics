@@ -499,5 +499,5 @@ void ndTestDeedBrian()
 
 	//ThreeLayersTwoInputsTwoOutputs();
 	MnistTrainingSet();
-	//MnistTestSet();
+	MnistTestSet();
 }
