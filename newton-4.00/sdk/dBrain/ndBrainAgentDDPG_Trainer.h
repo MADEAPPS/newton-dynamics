@@ -161,7 +161,6 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 	m_actorTrainers.SetCount(0);
 	m_criticTrainers.SetCount(0);
 	SetThreadCount(hyperParameters.m_threadsCount);
-	//SetThreadCount(1);
 
 	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 	{

@@ -22,7 +22,7 @@
 
 namespace ndController_0
 {
-	//#define D_USE_TD3
+	#define D_USE_TD3
 	//#define D_USE_POLE_DQN
 
 	#define D_PUSH_ACCEL			ndFloat32 (15.0f)
