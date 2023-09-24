@@ -354,8 +354,6 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 			ndBrainFloat m_reward;
 		};
 
-		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
-
 		ndBrainFloat criticOutputBuffer[2];
 		ndBrainFloat targetInputBuffer[statesDim * 2];
 		ndBrainFloat targetOutputBuffer[actionDim * 2];
@@ -366,10 +364,11 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 		ndBrainMemVector targetOutput(targetOutputBuffer, actionDim);
 		ndBrainMemVector criticInput(criticInputBuffer, statesDim + actionDim);
 
+		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			ndBrainTrainer& trainer0 = *m_criticTrainers0[threadIndex];
-			ndBrainTrainer& trainer1 = *m_criticTrainers1[threadIndex];
+			ndBrainTrainer& trainer0 = *m_criticTrainers0[i];
+			ndBrainTrainer& trainer1 = *m_criticTrainers1[i];
 			Loss loss0(trainer0, &m_targetCritic0, m_replayBuffer);
 			Loss loss1(trainer1, &m_targetCritic1, m_replayBuffer);
 
@@ -471,7 +470,7 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateActor(const ndU
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			ndBrainTrainer& actorTrainer = *m_actorTrainers[threadIndex];
+			ndBrainTrainer& actorTrainer = *m_actorTrainers[i];
 			ActorLoss loss(actorTrainer, this);
 
 			ndInt32 index = ndInt32(shuffleBuffer[i]);
