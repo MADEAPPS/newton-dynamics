@@ -175,9 +175,10 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const Hyp
 	m_actorTrainers.SetCount(0);
 	m_criticTrainers0.SetCount(0);
 	m_criticTrainers1.SetCount(0);
-
 	SetThreadCount(hyperParameters.m_threadsCount);
-	for (ndInt32 i = 0; i < ndBrainThreadPool::GetThreadCount(); ++i)
+	//SetThreadCount(1);
+
+	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 	{
 		m_actorTrainers.PushBack(new ndBrainTrainer(&m_actor));
 		m_criticTrainers0.PushBack(new ndBrainTrainer(&m_critic0));
