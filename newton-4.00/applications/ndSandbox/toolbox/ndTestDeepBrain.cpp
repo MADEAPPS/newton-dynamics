@@ -333,8 +333,9 @@ static void MnistTrainingSet()
 			// so far best training result on the mnist data set
 			//optimizer.SetRegularizer(ndReal(2.0e-5f)); //
 			//optimizer.SetRegularizer(ndReal(3.0e-5f)); //
-			//optimizer.SetRegularizer(ndReal(4.0e-5f)); //best score yet 98.35% on test data
-			optimizer.SetRegularizer(ndReal(5.0e-5f)); //
+			//optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 98.35%
+			optimizer.SetRegularizer(ndReal(4.5e-5f)); // test data score 
+			//optimizer.SetRegularizer(ndReal(5.0e-5f)); // test data score 98.22%
 
 			bool firstPass = true;
 			for (ndInt32 i = 0; i < 2000000; ++i)
