@@ -273,13 +273,20 @@ static void MnistTrainingSet()
 			,m_bashBufferSize(64)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize/4);
-//threadCount = 1;
 
 			SetThreadCount(threadCount);
-			for (ndInt32 i = 0; i < GetThreadCount(); ++i)
+			for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 			{
 				ndBrainTrainer* const trainer = new ndBrainTrainer(&m_brain);
-				m_optimizers.PushBack(trainer);
+				m_trainers.PushBack(trainer);
+			}
+		}
+
+		~SupervisedTrainer()
+		{
+			for (ndInt32 i = 0; i < m_trainers.GetCount(); ++i)
+			{
+				delete m_trainers[i];
 			}
 		}
 
@@ -306,14 +313,12 @@ static void MnistTrainingSet()
 					const ndBrainMatrix* m_trainingLabels;
 				};
 
-				ndBrainTrainer& trainer = *(*m_optimizers[threadIndex]);
-				ndAssert(0);
-				//trainer.ClearGradientsAcc();
-
-				Loss loss(m_brain.GetOutputSize());
 				const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				{
+					ndBrainTrainer& trainer = *m_trainers[i];
+					Loss loss(m_brain.GetOutputSize());
+
 					ndInt32 index = ndInt32(shuffleBashBuffer[i]);
 					loss.SetTruth((*trainingLabels)[index]);
 					trainer.BackPropagate((*trainingDigits)[index], loss);
@@ -323,17 +328,15 @@ static void MnistTrainingSet()
 			ndBrain bestBrain(m_brain);
 			ndInt32 minFail = trainingDigits->GetCount();
 
-			ndAssert(0);
-			ndBrainTrainer& trainer = *(*m_optimizers[0]);
 			ndBrainOptimizerAdam optimizer;
 
 			// so far best training result on the mnist data set
-			//optimizer.SetRegularizer(ndReal(2.0e-5f));
+			optimizer.SetRegularizer(ndReal(2.0e-5f));
 			//optimizer.SetRegularizer(ndReal(2.5e-5f));
 			//optimizer.SetRegularizer(ndReal(3.0e-5f));
 			//optimizer.SetRegularizer(ndReal(3.5e-5f));
 			//optimizer.SetRegularizer(ndReal(4.0e-5f));
-			optimizer.SetRegularizer(ndReal(4.5e-5f)); //best score yet 98.35% on test data
+			//optimizer.SetRegularizer(ndReal(4.5e-5f)); //best score yet 98.35% on test data
 			//optimizer.SetRegularizer(ndReal(4.6e-5f));
 			//optimizer.SetRegularizer(ndReal(5.0e-5f));
 
@@ -350,14 +353,7 @@ static void MnistTrainingSet()
 					shuffleBashBuffer[j] = ndRandInt() % trainingDigits->GetCount();
 				}
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
-
-				ndAssert(0);
-				//for (ndInt32 j = 1; j < GetThreadCount(); ++j)
-				//{
-				//	ndBrainTrainer& srcTrainer = *(*m_optimizers[j]);
-				//	trainer.AcculumateGradients(srcTrainer);
-				//}
-				//optimizer.Update(ndReal(1.0e-3f), m_bashBufferSize);
+				optimizer.Update(this, m_trainers, ndReal(1.0e-3f));
 
 				if ((i % 1024) == 0)
 				{
@@ -436,7 +432,7 @@ static void MnistTrainingSet()
 		}
 
 		ndBrain& m_brain;
-		ndFixSizeArray<ndSharedPtr<ndBrainTrainer>, D_MAX_THREADS_COUNT> m_optimizers;
+		ndArray<ndBrainTrainer*> m_trainers;
 		ndReal m_learnRate;
 		ndInt32 m_bashBufferSize;
 	};
@@ -448,13 +444,13 @@ static void MnistTrainingSet()
 		ndFixSizeArray<ndBrainLayer*, 16> layers;
 
 		layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), neuronsPerLayers));
-		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerSigmoidActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -501,7 +497,7 @@ void ndTestDeedBrian()
 {
 	ndSetRandSeed(12345);
 
-	ThreeLayersTwoInputsTwoOutputs();
-	//MnistTrainingSet();
+	//ThreeLayersTwoInputsTwoOutputs();
+	MnistTrainingSet();
 	//MnistTestSet();
 }
