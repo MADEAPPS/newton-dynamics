@@ -331,14 +331,10 @@ static void MnistTrainingSet()
 			ndBrainOptimizerAdam optimizer;
 
 			// so far best training result on the mnist data set
-			optimizer.SetRegularizer(ndReal(2.0e-5f));
-			//optimizer.SetRegularizer(ndReal(2.5e-5f));
-			//optimizer.SetRegularizer(ndReal(3.0e-5f));
-			//optimizer.SetRegularizer(ndReal(3.5e-5f));
-			//optimizer.SetRegularizer(ndReal(4.0e-5f));
-			//optimizer.SetRegularizer(ndReal(4.5e-5f)); //best score yet 98.35% on test data
-			//optimizer.SetRegularizer(ndReal(4.6e-5f));
-			//optimizer.SetRegularizer(ndReal(5.0e-5f));
+			//optimizer.SetRegularizer(ndReal(2.0e-5f)); //
+			//optimizer.SetRegularizer(ndReal(3.0e-5f)); //
+			//optimizer.SetRegularizer(ndReal(4.0e-5f)); //best score yet 98.35% on test data
+			optimizer.SetRegularizer(ndReal(5.0e-5f)); //
 
 			bool firstPass = true;
 			for (ndInt32 i = 0; i < 2000000; ++i)
