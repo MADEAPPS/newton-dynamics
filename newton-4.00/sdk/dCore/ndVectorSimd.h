@@ -1361,7 +1361,7 @@ class ndBigVector
 	
 	inline ndBigVector Divide(const ndBigVector& denominator) const
 	{
-		return ndBigVector(_mm_div_pd(m_typeLow, denominator.m_TypeLow), _mm_div_pd(m_typeHigh, denominator.m_typeHigh));
+		return ndBigVector(_mm_div_pd(m_typeLow, denominator.m_typeLow), _mm_div_pd(m_typeHigh, denominator.m_typeHigh));
 	}
 
 	inline ndBigVector Reciproc() const
