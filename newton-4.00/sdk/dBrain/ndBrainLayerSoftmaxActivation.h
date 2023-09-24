@@ -31,7 +31,7 @@ class ndBrainLayerSoftmaxActivation : public ndBrainLayerActivation
 	ndBrainLayerSoftmaxActivation(ndInt32 neurons);
 	ndBrainLayerSoftmaxActivation(const ndBrainLayerActivation& src);
 	ndBrainLayer* Clone() const;
-	static ndBrainLayerSoftmaxActivation* Load(const ndBrainLoad* const loadSave);
+	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
 	const char* GetLabelId() const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;

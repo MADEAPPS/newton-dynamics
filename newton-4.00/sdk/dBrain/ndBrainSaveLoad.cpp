@@ -116,6 +116,10 @@ ndBrain* ndBrainLoad::Load() const
 		{
 			layer = ndBrainLayerSoftmaxActivation::Load(this);
 		}
+		else if (!strcmp(layerType, "ndBrainLayerApproximateTanhActivation"))
+		{
+			layer = ndBrainLayerApproximateTanhActivation::Load(this);
+		}
 		else
 		{
 			ndAssert(0);

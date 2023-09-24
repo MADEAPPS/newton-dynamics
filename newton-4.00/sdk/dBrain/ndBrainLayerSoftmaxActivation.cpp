@@ -79,7 +79,7 @@ void ndBrainLayerSoftmaxActivation::MakePrediction(const ndBrainVector&, ndBrain
 	output.FlushToZero();
 }
 
-ndBrainLayerSoftmaxActivation* ndBrainLayerSoftmaxActivation::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerSoftmaxActivation::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
 	loadSave->ReadString(buffer);

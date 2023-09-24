@@ -31,11 +31,29 @@ class ndBrainLayerTanhActivation : public ndBrainLayerActivation
 	ndBrainLayerTanhActivation(ndInt32 neurons);
 	ndBrainLayerTanhActivation(const ndBrainLayerTanhActivation& src);
 	ndBrainLayer* Clone() const;
-	static ndBrainLayerTanhActivation* Load(const ndBrainLoad* const loadSave);
+	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
 	const char* GetLabelId() const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+};
+
+class ndBrainLayerApproximateTanhActivation : public ndBrainLayerTanhActivation
+{
+	public:
+	ndBrainLayerApproximateTanhActivation(ndInt32 neurons);
+	ndBrainLayerApproximateTanhActivation(const ndBrainLayerTanhActivation& src);
+	ndBrainLayer* Clone() const;
+	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
+
+	const char* GetLabelId() const;
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
+
+	static ndBrainVector4 m_c1;
+	static ndBrainVector4 m_c2;
+	static ndBrainVector4 m_log2f;
+	static ndBrainVector4 m_upMax;
+	static ndBrainVector4 m_upMin;
 };
 
 #endif 

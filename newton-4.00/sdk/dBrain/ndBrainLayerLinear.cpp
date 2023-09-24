@@ -180,7 +180,7 @@ void ndBrainLayerLinear::Save(const ndBrainSave* const loadSave) const
 	}
 }
 
-ndBrainLayerLinear* ndBrainLayerLinear::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerLinear::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
 	loadSave->ReadString(buffer);

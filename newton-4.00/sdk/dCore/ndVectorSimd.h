@@ -312,6 +312,11 @@ class ndVector
 		return normal;
 	}
 
+	inline ndVector Devide(const ndVector& denominator) const
+	{
+		return _mm_div_ps(m_type, denominator.m_type);
+	}
+
 	inline ndVector Reciproc () const
 	{
 		return _mm_div_ps (m_one.m_type, m_type);
@@ -786,6 +791,11 @@ class ndBigVector
 	inline ndBigVector Abs() const
 	{
 		return ndBigVector(_mm256_and_pd(m_type, m_signMask.m_type));
+	}
+
+	inline ndBigVector Devide(const ndBigVector& denominator) const
+	{
+		return ndBigVector(_mm256_div_pd(m_type, denominator.m_type));
 	}
 
 	inline ndBigVector Reciproc() const
@@ -1345,6 +1355,11 @@ public:
 	inline ndBigVector Abs() const
 	{
 		return ndBigVector(_mm_and_pd(m_typeLow, m_signMask.m_typeLow), _mm_and_pd(m_typeHigh, m_signMask.m_typeLow));
+	}
+	
+	inline ndBigVector Divide(const ndBigVector& denominator) const
+	{
+		return ndBigVector(_mm_div_pd(m_typeLow, denominator.mTypeLow), _mm_div_pd(m_typeHigh, denominator.m_typeHigh));
 	}
 
 	inline ndBigVector Reciproc() const

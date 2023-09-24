@@ -327,6 +327,11 @@ class ndVector
 		return (*this * A).AddHorizontal();
 	}
 
+	inline ndVector Devide(const ndVector& denominator) const
+	{
+		return ndVector(m_x / denominator.m_x, m_y / denominator.m_y, m_z / denominator.m_z, m_w / denominator.m_w);
+	}
+
 	inline ndVector Reciproc() const
 	{
 		return ndVector(ndFloat32(1.0f) / m_x, ndFloat32(1.0f) / m_y, ndFloat32(1.0f) / m_z, ndFloat32(1.0f) / m_w);
@@ -778,6 +783,11 @@ class ndBigVector
 	{
 		//return ndBigVector(m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
 		return (*this * A).AddHorizontal();
+	}
+
+	inline ndBigVector Devide(const ndBigVector& denominator) const
+	{
+		return ndVector(m_x / denominator.m_x, m_y / denominator.m_y, m_z / denominator.m_z, m_w / denominator.m_w);
 	}
 
 	inline ndBigVector Reciproc() const

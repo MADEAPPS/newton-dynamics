@@ -25,8 +25,8 @@ namespace ndController_0
 	#define D_USE_TD3
 	//#define D_USE_POLE_DQN
 
-	#define D_PUSH_ACCEL			ndFloat32 (15.0f)
-	#define D_REWARD_MIN_ANGLE		(ndFloat32 (20.0f) * ndDegreeToRad)
+	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
+	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
 
 #ifdef D_USE_POLE_DQN
 	enum ndActionSpace
@@ -282,7 +282,7 @@ namespace ndController_0
 					}
 				}
 
-				ndReal GetReward() const
+				ndBrainFloat GetReward() const
 				{
 					return m_model->GetReward();
 				}
@@ -324,7 +324,7 @@ namespace ndController_0
 						{
 							state = true;
 						}
-						m_averageQvalue.Update(GetCurrentValue());
+						m_averageQvalue.Update(ndReal (GetCurrentValue()));
 						if (state)
 						{
 							m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
@@ -447,8 +447,8 @@ namespace ndController_0
 					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
 				}
 			#else
-				ndFloat32 action = actions[0];
-				force.m_x = 2.0f * action * (m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL);
+				ndBrainFloat action = actions[0];
+				force.m_x = ndFloat32 (ndBrainFloat(2.0f) * action * (m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL));
 			#endif
 			m_cart->SetForce(force);
 		}
@@ -610,13 +610,16 @@ namespace ndController_0
 			ndSharedPtr<ndBrain> actor(new ndBrain());
 
 			layers.PushBack(new ndBrainLayerLinear(m_stateSize, hiddenLayersNewrons));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			//layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			//layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			//layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
 			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -631,16 +634,18 @@ namespace ndController_0
 			ndSharedPtr<ndBrain> critic(new ndBrain());
 
 			layers.PushBack(new ndBrainLayerLinear(m_stateSize + m_actionsSize, hiddenLayersNewrons * 2));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			//layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons * 2));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			//layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons * 2));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			//layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
-			//layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 			{
 				critic->AddLayer(layers[i]);

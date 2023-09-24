@@ -32,7 +32,7 @@ class ndBrainLayerSigmoidActivation : public ndBrainLayerActivation
 	ndBrainLayerSigmoidActivation(ndInt32 neurons);
 	ndBrainLayerSigmoidActivation(const ndBrainLayerActivation& src);
 	ndBrainLayer* Clone() const;
-	static ndBrainLayerSigmoidActivation* Load(const ndBrainLoad* const loadSave);
+	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
 	const char* GetLabelId() const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;

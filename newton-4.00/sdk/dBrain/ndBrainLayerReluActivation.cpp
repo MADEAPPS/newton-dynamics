@@ -66,7 +66,7 @@ void ndBrainLayerReluActivation::InputDerivative(const ndBrainVector& output, co
 	inputDerivative.Mul(outputDerivative);
 }
 
-ndBrainLayerReluActivation* ndBrainLayerReluActivation::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerReluActivation::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
 	loadSave->ReadString(buffer);

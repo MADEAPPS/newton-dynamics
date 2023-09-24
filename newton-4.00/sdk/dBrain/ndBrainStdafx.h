@@ -25,7 +25,15 @@
 
 #include <ndCore.h>
 
-typedef ndReal ndBrainFloat;
-//typedef ndFloat64 ndBrainFloat;
+#define D_BRAIN_USES_REAL
+
+#ifdef D_BRAIN_USES_REAL
+	typedef ndReal ndBrainFloat;
+	typedef ndVector ndBrainVector4;
+#else
+	typedef ndFloat64 ndBrainFloat;
+	typedef ndBigVector ndBrainVector4;
+#endif
+
 #endif 
 

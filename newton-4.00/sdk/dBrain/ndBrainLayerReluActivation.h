@@ -31,7 +31,7 @@ class ndBrainLayerReluActivation : public ndBrainLayerActivation
 	ndBrainLayerReluActivation(ndInt32 neurons);
 	ndBrainLayerReluActivation(const ndBrainLayerReluActivation& src);
 	ndBrainLayer* Clone() const;
-	static ndBrainLayerReluActivation* Load(const ndBrainLoad* const loadSave);
+	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
 	const char* GetLabelId() const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
