@@ -133,7 +133,7 @@ namespace ndController_1
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(5000)
-				,m_stopTraining(1000000)
+				,m_stopTraining(2000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
 				,m_averageQvalue()
@@ -267,7 +267,7 @@ namespace ndController_1
 						ndExpandTraceMessage("saving to file: %s\n", fileName);
 						ndExpandTraceMessage("training complete\n");
 						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-						ndExpandTraceMessage("training time: %g\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+						ndExpandTraceMessage("training time: %g\n seconds", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 					}
 				}
 				if (m_model->IsOutOfBounds())
@@ -284,7 +284,7 @@ namespace ndController_1
 			ndInt32 m_stopTraining;
 			ndUnsigned64 m_timer;
 			bool m_modelIsTrained;
-			mutable ndMovingAverage<512> m_averageQvalue;
+			mutable ndMovingAverage<1024> m_averageQvalue;
 			mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 		};
 
