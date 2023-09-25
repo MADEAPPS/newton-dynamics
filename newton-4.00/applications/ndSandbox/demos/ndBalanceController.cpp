@@ -284,7 +284,7 @@ namespace ndController_1
 			ndInt32 m_stopTraining;
 			ndUnsigned64 m_timer;
 			bool m_modelIsTrained;
-			mutable ndMovingAverage<32> m_averageQvalue;
+			mutable ndMovingAverage<512> m_averageQvalue;
 			mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 		};
 

@@ -208,7 +208,7 @@ namespace ndController_0
 				ndFloat32 m_maxGain;
 				ndFloat32 m_maxFrames;
 				ndUnsigned64 m_timer;
-				mutable ndMovingAverage<32> m_averageQvalue;
+				mutable ndMovingAverage<512> m_averageQvalue;
 				mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 			};
 
@@ -397,7 +397,7 @@ namespace ndController_0
 				ndInt32 m_maxFrames;
 				ndInt32 m_stopTraining;
 				ndUnsigned64 m_timer;
-				mutable ndMovingAverage<32> m_averageQvalue;
+				mutable ndMovingAverage<512> m_averageQvalue;
 				mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 			};
 
