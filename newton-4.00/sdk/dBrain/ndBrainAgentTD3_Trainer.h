@@ -44,16 +44,16 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 		public:
 		HyperParameters()
 		{
-			m_bashBufferSize = 64;
+			m_bashBufferSize = 32;
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_actorLearnRate = ndBrainFloat(0.0002f);
 			m_criticLearnRate = ndBrainFloat(0.001f);
 			m_replayBufferSize = 1024 * 512;
-			m_replayBufferPrefill = 1024 * 4;
+			m_replayBufferPrefill = 1024 * 16;
 			m_softTargetFactor = ndBrainFloat(1.0e-3f);
 			m_actionNoiseVariance = ndBrainFloat(0.05f);
-			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
+			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 2);
 		}
 
 		ndBrainFloat m_discountFactor;

@@ -48,7 +48,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 			m_actorLearnRate = ndBrainFloat(0.0005f);
 			m_criticLearnRate = ndBrainFloat(0.001f);
 			m_replayBufferSize = 1024 * 512;
-			m_replayBufferPrefill = 1024 * 4;
+			m_replayBufferPrefill = 1024 * 16;
 			m_softTargetFactor = ndBrainFloat(1.0e-3f);
 			m_actionNoiseVariance = ndBrainFloat(0.05f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
