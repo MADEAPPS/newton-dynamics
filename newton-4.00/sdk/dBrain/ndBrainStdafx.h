@@ -25,7 +25,7 @@
 
 #include <ndCore.h>
 
-//#define D_BRAIN_USES_REAL
+#define D_BRAIN_USES_REAL
 
 #ifdef D_BRAIN_USES_REAL
 	typedef ndReal ndBrainFloat;

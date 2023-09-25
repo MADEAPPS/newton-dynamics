@@ -22,7 +22,7 @@
 
 namespace ndController_1
 {
-	#define ND_USE_TD3
+	//#define ND_USE_TD3
 	#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
