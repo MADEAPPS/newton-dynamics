@@ -329,8 +329,8 @@ namespace ndQuadruped_1
 				}
 
 				const ndUIControlNode* const control = m_model->m_control;
-				ndFloat32 control_x_reward = ndPow(ndEXP, -ndFloat32(230.0f) * control->m_x * control->m_x);
-				ndFloat32 control_z_reward = ndPow(ndEXP, -ndFloat32(102.0f) * control->m_z * control->m_z);
+				ndFloat32 control_x_reward = ndExp(-ndFloat32(230.0f) * control->m_x * control->m_x);
+				ndFloat32 control_z_reward = ndExp(-ndFloat32(102.0f) * control->m_z * control->m_z);
 				return ndReal((reward * ndFloat32(8.0f) + control_x_reward + control_z_reward) / ndFloat32(10.0f));
 			}
 
@@ -991,8 +991,8 @@ namespace ndQuadruped_1
 				animReward = ndFloat32(1.0f);
 			}
 
-			ndFloat32 control_x_reward = ndPow(ndEXP, -ndFloat32(230.0f) * m_control->m_x * m_control->m_x);
-			ndFloat32 control_z_reward = ndPow(ndEXP, -ndFloat32(102.0f) * m_control->m_z * m_control->m_z);
+			ndFloat32 control_x_reward = ndExp(-ndFloat32(230.0f) * m_control->m_x * m_control->m_x);
+			ndFloat32 control_z_reward = ndExp(-ndFloat32(102.0f) * m_control->m_z * m_control->m_z);
 			return ndReal ((animReward * ndFloat32(4.0f) + control_x_reward + control_z_reward) / ndFloat32 (6.0f));
 		}
 

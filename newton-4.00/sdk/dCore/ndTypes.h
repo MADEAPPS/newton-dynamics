@@ -222,7 +222,7 @@ typedef double ndFloat64;
 #endif
 	
 #define ndPi	 		ndFloat32 (3.141592f)
-#define ndEXP		 	ndFloat32 (2.7182818f)
+//#define ndEXP		 	ndFloat32 (2.7182818f)
 #define ndEpsilon	  	ndFloat32 (1.0e-5f)
 #define ndDegreeToRad	ndFloat32 (ndPi / 180.0f)
 #define ndRadToDegree  	ndFloat32 (180.0f / ndPi)
