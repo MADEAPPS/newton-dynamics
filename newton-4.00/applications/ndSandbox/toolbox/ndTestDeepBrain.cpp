@@ -332,9 +332,10 @@ static void MnistTrainingSet()
 
 			// so far best training result on the mnist data set
 			//optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score 
-			optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score 98.1%
-			//optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 98.35%
-			//optimizer.SetRegularizer(ndReal(4.5e-5f)); // test data score 
+			//optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score 98.1%
+			//optimizer.SetRegularizer(ndReal(3.5e-5f)); // test data score 98.18%
+			optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 98.35%
+			//optimizer.SetRegularizer(ndReal(4.5e-5f)); // test data score 98.1%
 			//optimizer.SetRegularizer(ndReal(5.0e-5f)); // test data score 98.22%
 
 			bool firstPass = true;
@@ -495,6 +496,6 @@ void ndTestDeedBrian()
 	ndSetRandSeed(12345);
 
 	//ThreeLayersTwoInputsTwoOutputs();
-	MnistTrainingSet();
+	//MnistTrainingSet();
 	MnistTestSet();
 }
