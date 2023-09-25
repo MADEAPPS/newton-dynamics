@@ -278,23 +278,26 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 	m_rowIsMotor &= ~(1 << index);
 	m_motorAcceleration[index] = ndFloat32(0.0f);
 	ndAssert(desc.m_timestep > ndFloat32(0.0f));
+	ndForceImpactPair* const jointForce = &m_jointForce[index];
 
 	const ndVector& omega0 = m_body0->m_omega;
 	const ndVector& omega1 = m_body1->m_omega;
+	const ndVector& veloc0 = m_body0->m_veloc;
+	const ndVector& veloc1 = m_body1->m_veloc;
+
 	const ndVector gyroAlpha0(m_body0->GetGyroAlpha());
 	const ndVector gyroAlpha1(m_body1->GetGyroAlpha());
 	const ndVector centripetal0(omega0.CrossProduct(omega0.CrossProduct(m_r0[index])));
 	const ndVector centripetal1(omega1.CrossProduct(omega1.CrossProduct(m_r1[index])));
-
-	ndForceImpactPair* const jointForce = &m_jointForce[index];
-
-	const ndVector& veloc0 = m_body0->m_veloc;
-	const ndVector& veloc1 = m_body1->m_veloc;
-	const ndVector positError(param.m_posit1 - param.m_posit0);
-	ndFloat32 relPosit = positError.DotProduct(dir).GetScalar();
+	
+	//const ndVector positError(param.m_posit1 - param.m_posit0);
+	//ndFloat32 relPosit = positError.DotProduct(dir).GetScalar();
+	//ndFloat32 relPosit___ = -(jacobian0.m_linear * param.m_posit0 + jacobian1.m_linear * param.m_posit1).AddHorizontal().GetScalar();
+	//ndAssert(ndAbs (relPosit___ - relPosit) < ndFloat32(1.0e-7f));
 
 	const ndFloat32 relGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 	const ndFloat32 relCentr = -(jacobian0.m_linear * centripetal0 + jacobian1.m_linear * centripetal1).AddHorizontal().GetScalar();
+	const ndFloat32 relPosit = -(jacobian0.m_linear * param.m_posit0 + jacobian1.m_linear * param.m_posit1).AddHorizontal().GetScalar();
 	const ndFloat32 relVeloc = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 
 	//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
