@@ -128,7 +128,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndExpandTraceMessage("%s\n", "boolean logic");
 	ndExpandTraceMessage("num_right: %d  out of %d\n", testCount - failCount, testCount);
 	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testCount);
-	ndExpandTraceMessage("success rate %g%%\n", (ndFloat32)(testCount - failCount) * 100.0f / (ndFloat32)testCount);
+	ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testCount - failCount) * 100.0f / (ndFloat32)testCount);
 }
 
 static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
@@ -255,7 +255,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 	ndExpandTraceMessage("%s\n", title);
 	ndExpandTraceMessage("num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());
 	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testDigits->GetCount());
-	ndExpandTraceMessage("success rate %g%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
+	ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
 }
 
 static void MnistTrainingSet()
@@ -331,10 +331,10 @@ static void MnistTrainingSet()
 			ndBrainOptimizerAdam optimizer;
 
 			// so far best training result on the mnist data set
-			//optimizer.SetRegularizer(ndReal(2.0e-5f)); //
-			//optimizer.SetRegularizer(ndReal(3.0e-5f)); //
+			//optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score 
+			optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score 98.1%
 			//optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 98.35%
-			optimizer.SetRegularizer(ndReal(4.5e-5f)); // test data score 
+			//optimizer.SetRegularizer(ndReal(4.5e-5f)); // test data score 
 			//optimizer.SetRegularizer(ndReal(5.0e-5f)); // test data score 98.22%
 
 			bool firstPass = true;
@@ -418,7 +418,7 @@ static void MnistTrainingSet()
 					{
 						bestBrain.CopyFrom(m_brain);
 						minFail = fails;
-						ndExpandTraceMessage("success rate: %g%%   ", (ndFloat32)(trainingDigits->GetCount() - minFail) * 100.0f / (ndFloat32)trainingDigits->GetCount());
+						ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(trainingDigits->GetCount() - minFail) * 100.0f / (ndFloat32)trainingDigits->GetCount());
 						ndExpandTraceMessage("failed count: %d   ", minFail);
 						ndExpandTraceMessage("steps: %d", i);
 						ndExpandTraceMessage("\n");
@@ -468,7 +468,7 @@ static void MnistTrainingSet()
 		
 		ndBrainSave::Save(&brain, path);
 		ValidateData("training data", brain, *trainingLabels, *trainingDigits);
-		ndExpandTraceMessage("time %g (sec)\n\n", ndFloat64(time) / 1000000.0f);
+		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 }
 
@@ -486,7 +486,7 @@ static void MnistTestSet()
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		ValidateData("test data", *(*brain), *testLabels, *testDigits);
 		time = ndGetTimeInMicroseconds() - time;
-		ndExpandTraceMessage("time %g (sec)\n\n", ndFloat64(time) / 1000000.0f);
+		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 }
 
