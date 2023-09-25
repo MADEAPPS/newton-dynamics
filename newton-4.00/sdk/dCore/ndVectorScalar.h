@@ -334,7 +334,7 @@ class ndVector
 		return ndVector (m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
 	}
 
-	inline ndVector Devide(const ndVector& denominator) const
+	inline ndVector Divide(const ndVector& denominator) const
 	{
 		return ndVector(m_x / denominator.m_x, m_y / denominator.m_y, m_z / denominator.m_z, m_w / denominator.m_w);
 	}
@@ -854,7 +854,7 @@ class ndBigVector
 		return ndBigVector (m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
 	}
 
-	inline ndBigVector Devide(const ndBigVector& denominator) const
+	inline ndBigVector Divide(const ndBigVector& denominator) const
 	{
 		return ndVector(m_x / denominator.m_x, m_y / denominator.m_y, m_z / denominator.m_z, m_w / denominator.m_w);
 	}

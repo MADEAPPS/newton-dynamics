@@ -327,7 +327,7 @@ class ndVector
 		return (*this * A).AddHorizontal();
 	}
 
-	inline ndVector Devide(const ndVector& denominator) const
+	inline ndVector Divide(const ndVector& denominator) const
 	{
 		return ndVector(m_x / denominator.m_x, m_y / denominator.m_y, m_z / denominator.m_z, m_w / denominator.m_w);
 	}
@@ -785,7 +785,7 @@ class ndBigVector
 		return (*this * A).AddHorizontal();
 	}
 
-	inline ndBigVector Devide(const ndBigVector& denominator) const
+	inline ndBigVector Divide(const ndBigVector& denominator) const
 	{
 		return ndVector(m_x / denominator.m_x, m_y / denominator.m_y, m_z / denominator.m_z, m_w / denominator.m_w);
 	}

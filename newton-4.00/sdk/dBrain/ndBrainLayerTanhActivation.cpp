@@ -176,7 +176,7 @@ void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& 
 		ndBrainVector4 v4(v2 - v1);
 		ndBrainVector4 num(v3 + v4);
 		ndBrainVector4 den(v3 - v4);
-		return num.Devide(den);
+		return num.Divide(den);
 	};
 
 	// check accuracy, expected error less that 1e-6 of all cases.

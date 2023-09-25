@@ -312,7 +312,7 @@ class ndVector
 		return normal;
 	}
 
-	inline ndVector Devide(const ndVector& denominator) const
+	inline ndVector Divide(const ndVector& denominator) const
 	{
 		return _mm_div_ps(m_type, denominator.m_type);
 	}
@@ -793,7 +793,7 @@ class ndBigVector
 		return ndBigVector(_mm256_and_pd(m_type, m_signMask.m_type));
 	}
 
-	inline ndBigVector Devide(const ndBigVector& denominator) const
+	inline ndBigVector Divide(const ndBigVector& denominator) const
 	{
 		return ndBigVector(_mm256_div_pd(m_type, denominator.m_type));
 	}
