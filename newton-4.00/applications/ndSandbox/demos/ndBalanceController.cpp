@@ -23,7 +23,7 @@
 namespace ndController_1
 {
 	#define ND_USE_TD3
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
 	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)
@@ -133,7 +133,7 @@ namespace ndController_1
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(5000)
-				,m_stopTraining(2000000)
+				,m_stopTraining(1500000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
 				,m_averageQvalue()

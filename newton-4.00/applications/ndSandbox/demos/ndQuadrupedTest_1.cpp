@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_USE_TD3
+	#define ND_USE_TD3
 	#define ND_TRAIN_MODEL
 	#define D_SWING_STEP			ndReal(0.01f)
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
