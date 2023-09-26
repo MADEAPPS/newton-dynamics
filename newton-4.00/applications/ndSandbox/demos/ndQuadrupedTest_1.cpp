@@ -783,6 +783,11 @@ namespace ndQuadruped_1
 				joint[i] = *info->m_effector;
 
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+
+				//ndVector posit___;
+				//ndVector veloc___;
+				//effector->GetDynamicState(posit___, veloc___);
+
 				ndVector posit(m_animPose[i].m_posit);
 				effector->SetLocalTargetPosition(posit);
 				effector->SetSwivelAngle(0.0f);

@@ -237,42 +237,21 @@ void ndIkSwivelPositionEffector::GetDynamicState(ndVector& posit, ndVector& velo
 	const ndVector veloc0(m_body0->GetVelocity());
 	const ndVector veloc1(m_body1->GetVelocity());
 
-	ndConstraintDescritor desc____;
+	posit = matrix1.UntransformVector(matrix0.m_posit);
+
+	ndPointParam param;
+	InitPointParam(param, matrix0.m_posit, matrix0.m_posit);
 	for (ndInt32 i = 0; i < 3; ++i)
 	{
-		ndPointParam param;
-		ndJacobian jacobian0;
-		ndJacobian jacobian1;
 		const ndVector& pin = axisDir[i];
-
-		((ndIkSwivelPositionEffector*)this)->AddLinearRowJacobian(desc____, matrix0.m_posit, matrix0.m_posit, pin);
-
-
-		InitPointParam(param, matrix0.m_posit, matrix0.m_posit);
-
-		ndVector r0CrossDir(param.m_r0.CrossProduct(pin));
-		ndVector r1CrossDir(pin.CrossProduct(param.m_r1));
-		jacobian0.m_linear = pin;
-		jacobian0.m_angular = r0CrossDir;
-		jacobian1.m_linear = pin * ndVector::m_negOne;
-		jacobian1.m_angular = r1CrossDir;
-
-		const ndFloat32 relPosit = (jacobian0.m_linear * param.m_posit0 + jacobian1.m_linear * param.m_posit1).AddHorizontal().GetScalar();
-		const ndFloat32 relVeloc = (jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
-
-		posit[i] = relPosit;
-		veloc[i] = relVeloc;
+		const ndVector r0CrossDir(param.m_r0.CrossProduct(pin));
+		const ndVector r1CrossDir(pin.CrossProduct(param.m_r1));
+		veloc[i] = (pin * veloc0 + r0CrossDir * omega0 - pin * veloc1 + r1CrossDir * omega1).AddHorizontal().GetScalar();
 	}
 
-	ndAssert(0);
-	const ndMatrix swivelMatrix1(ndPitchMatrix(m_swivelAngle) * CalculateSwivelFrame(matrix1));
-	const ndVector& pin = swivelMatrix1.m_front;
-	const ndFloat32 angle = CalculateAngle(matrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
-	posit.m_w = angle;
-
-	((ndIkSwivelPositionEffector*)this)->AddAngularRowJacobian(desc____, pin, angle);
-	ndAssert(0);
-	
+	const ndMatrix swivelMatrix(ndPitchMatrix(m_swivelAngle) * CalculateSwivelFrame(matrix1));
+	posit.m_w = CalculateAngle(matrix0[1], swivelMatrix[1], swivelMatrix[0]);
+	veloc.m_w = (omega0 * swivelMatrix.m_front - omega1 * swivelMatrix.m_front).AddHorizontal().GetScalar();
 }
 
 void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
