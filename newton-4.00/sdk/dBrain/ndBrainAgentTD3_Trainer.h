@@ -552,10 +552,11 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::Step()
 	ndBrainMemVector actions(actionBuffer, actionDim);
 
 	GetObservation(&m_currentTransition.m_state[0]);
-	for (ndInt32 i = 0; i < statesDim; ++i)
-	{
-		state[i] = m_currentTransition.m_state[i];
-	}
+	//for (ndInt32 i = 0; i < statesDim; ++i)
+	//{
+	//	state[i] = m_currentTransition.m_state[i];
+	//}
+	ndMemCpy(&state[0], &m_currentTransition.m_state[0], statesDim);
 	m_actor.MakePrediction(state, actions);
 
 	// explore environment
