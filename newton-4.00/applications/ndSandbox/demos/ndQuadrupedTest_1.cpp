@@ -1435,6 +1435,7 @@ namespace ndQuadruped_1
 		
 		ndMatrix location(matrixLocation);
 		location.m_posit.m_y = floor.m_y + 0.5f;
+location.m_posit.m_y += 0.5f;
 		torso->SetMatrix(location);
 		
 		ndDemoEntity* const entity = (ndDemoEntity*)torso->GetNotifyCallback()->GetUserData();
@@ -1575,7 +1576,7 @@ namespace ndQuadruped_1
 
 		#ifdef ND_TRAIN_MODEL
 			((ndModelQuadruped::ndControllerAgent_trainer*)*agent)->SetModel(model);
-			scene->SetAcceleratedUpdate();
+			//scene->SetAcceleratedUpdate();
 		#else
 			((ndModelQuadruped::ndControllerAgent*)*agent)->SetModel(model);
 		#endif
@@ -1610,7 +1611,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	world->AddModel(model);
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	//world->AddJoint(fixJoint);
+	world->AddJoint(fixJoint);
 
 	ndSharedPtr<ndUIEntity> quadrupedUI (new ndModelUI(scene, model));
 	scene->Set2DDisplayRenderFunction(quadrupedUI);
