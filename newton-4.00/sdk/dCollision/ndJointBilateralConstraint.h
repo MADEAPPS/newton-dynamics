@@ -136,7 +136,6 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndSpecialList<ndJointBilateralConstraint>::ndNode* m_deletedNode;
 
 	ndFloat32 m_defualtDiagonalRegularizer;
-//	ndUnsigned32 m_maxDof			: 6;
 	ndUnsigned32 m_mark0			: 1;
 	ndUnsigned32 m_mark1			: 1;
 	ndUnsigned32 m_isInSkeleton		: 1;

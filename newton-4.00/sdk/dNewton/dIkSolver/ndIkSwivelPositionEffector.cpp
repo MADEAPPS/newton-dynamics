@@ -225,6 +225,56 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 	debugCallback.DrawPoint(swivelMatrix0.m_posit, ndVector(1.0f, 1.0f, 0.0f, 0.0f), 8.0f);
 }
 
+void ndIkSwivelPositionEffector::GetDynamicState(ndVector& posit, ndVector& veloc) const
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	const ndMatrix& axisDir = matrix1;
+	const ndVector omega0(m_body0->GetOmega());
+	const ndVector omega1(m_body1->GetOmega());
+	const ndVector veloc0(m_body0->GetVelocity());
+	const ndVector veloc1(m_body1->GetVelocity());
+
+	ndConstraintDescritor desc____;
+	for (ndInt32 i = 0; i < 3; ++i)
+	{
+		ndPointParam param;
+		ndJacobian jacobian0;
+		ndJacobian jacobian1;
+		const ndVector& pin = axisDir[i];
+
+		((ndIkSwivelPositionEffector*)this)->AddLinearRowJacobian(desc____, matrix0.m_posit, matrix0.m_posit, pin);
+
+
+		InitPointParam(param, matrix0.m_posit, matrix0.m_posit);
+
+		ndVector r0CrossDir(param.m_r0.CrossProduct(pin));
+		ndVector r1CrossDir(pin.CrossProduct(param.m_r1));
+		jacobian0.m_linear = pin;
+		jacobian0.m_angular = r0CrossDir;
+		jacobian1.m_linear = pin * ndVector::m_negOne;
+		jacobian1.m_angular = r1CrossDir;
+
+		const ndFloat32 relPosit = (jacobian0.m_linear * param.m_posit0 + jacobian1.m_linear * param.m_posit1).AddHorizontal().GetScalar();
+		const ndFloat32 relVeloc = (jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
+
+		posit[i] = relPosit;
+		veloc[i] = relVeloc;
+	}
+
+	ndAssert(0);
+	const ndMatrix swivelMatrix1(ndPitchMatrix(m_swivelAngle) * CalculateSwivelFrame(matrix1));
+	const ndVector& pin = swivelMatrix1.m_front;
+	const ndFloat32 angle = CalculateAngle(matrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
+	posit.m_w = angle;
+
+	((ndIkSwivelPositionEffector*)this)->AddAngularRowJacobian(desc____, pin, angle);
+	ndAssert(0);
+	
+}
+
 void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	const ndMatrix swivelMatrix1(ndPitchMatrix(m_swivelAngle) * CalculateSwivelFrame(matrix1));

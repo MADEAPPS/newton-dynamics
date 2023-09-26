@@ -32,7 +32,7 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 
 	D_NEWTON_API ndVector GetLocalTargetPosition() const;
 	D_NEWTON_API void SetLocalTargetPosition(const ndVector& posit);
-
+	
 	D_NEWTON_API ndVector GetGlobalPosition() const;
 	D_NEWTON_API ndMatrix GetReferenceFrame() const;
 
@@ -60,6 +60,8 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API ndRotationOrder GetRotationOrder() const;
 	D_NEWTON_API void SetRotationOrder(ndRotationOrder order);
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
+
+	D_NEWTON_API void GetDynamicState(ndVector& posit, ndVector& veloc) const;
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
