@@ -393,32 +393,25 @@ namespace ndQuadruped_1
 				//ndFloat32 control_z_reward = ndExp(-ndFloat32(102.0f) * control->m_z * control->m_z);
 				//return ndReal((reward * ndFloat32(8.0f) + control_x_reward + control_z_reward) / ndFloat32(10.0f));
 
-				ndInt32 actionIndex = 0;
+				ndInt32 stateIndex = 0;
 				ndBrainFloat reward = ndBrainFloat(0.0f);
-				//const ndBrainFloat* const actions = &m_currentTransition.m_action[0];
 				const ndBrainFloat* const state = &m_currentTransition.m_state[0];
-				//for (ndInt32 i = 0; i < m_actionsSize; ++i)
 				for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
 				{
-					//ndBrainFloat d = ndBrainFloat (4.0f) * actions[i] * D_EFFECTOR_STEP;
-					//ndBrainFloat d2 = ndMin (ndBrainFloat(100.0f) * d * d, ndBrainFloat(30.0f));
-					//reward = ndMin (ndBrainFloat(ndExp(-d2)), reward);
+					ndBrainFloat error0 = state[stateIndex + m_leg0_anim_posit_x] - state[stateIndex + m_leg0_posit_x];
+					ndBrainFloat error1 = state[stateIndex + m_leg0_anim_posit_y] - state[stateIndex + m_leg0_posit_y];
+					ndBrainFloat error2 = state[stateIndex + m_leg0_anim_posit_z] - state[stateIndex + m_leg0_posit_z];
 
-					ndBrainFloat error0 = state[actionIndex + m_leg0_anim_posit_x] - state[actionIndex + m_leg0_posit_x];
-					ndBrainFloat error1 = state[actionIndex + m_leg0_anim_posit_y] - state[actionIndex + m_leg0_posit_y];
-					ndBrainFloat error2 = state[actionIndex + m_leg0_anim_posit_z] - state[actionIndex + m_leg0_posit_z];
+					ndBrainFloat d20 = ndMin(ndBrainFloat(100.0f) * error0 * error0, ndBrainFloat(30.0f));
+					reward += ndBrainFloat(ndExp(-d20));
 
-					//reward = ndMin(ndBrainFloat(ndExp(-d2)), reward);
-					ndBrainFloat d2 = ndMin(ndBrainFloat(50.0f) * error0 * error0, ndBrainFloat(30.0f));
-					reward += ndBrainFloat(ndExp(-d2));
+					ndBrainFloat d21 = ndMin(ndBrainFloat(100.0f) * error1 * error1, ndBrainFloat(30.0f));
+					reward += ndBrainFloat(ndExp(-d21));
 
-					d2 = ndMin(ndBrainFloat(50.0f) * error1 * error1, ndBrainFloat(30.0f));
-					reward += ndBrainFloat(ndExp(-d2));
+					ndBrainFloat d22 = ndMin(ndBrainFloat(100.0f) * error2 * error2, ndBrainFloat(30.0f));
+					reward += ndBrainFloat(ndExp(-d22));
 
-					d2 = ndMin(ndBrainFloat(50.0f) * error2 * error2, ndBrainFloat(30.0f));
-					reward += ndBrainFloat(ndExp(-d2));
-
-					//startIndex += (m_leg1_posit_x - m_leg0_posit_x);
+					stateIndex += (m_leg1_posit_x - m_leg0_posit_x);
 				}
 				reward /= m_actionsSize;
 				return reward;
@@ -445,31 +438,24 @@ namespace ndQuadruped_1
 
 			bool IsTerminal() const
 			{
-				//bool state = m_model->IsTerminal();
-				ndBrainFloat maxVal = ndBrainFloat(0.0f);
-				//const ndBrainFloat* const actions = &m_currentTransition.m_action[0];
-				const ndBrainFloat* const stateActions = &m_currentTransition.m_state[0];
-				ndInt32 actionIndex = 0;
-				for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
-				{
-					//ndBrainFloat d = ndBrainFloat (4.0f) * actions[i] * D_EFFECTOR_STEP;
-					//ndBrainFloat d2 = ndMin (ndBrainFloat(100.0f) * d * d, ndBrainFloat(30.0f));
-					//reward = ndMin (ndBrainFloat(ndExp(-d2)), reward);
+				//ndBrainFloat maxVal = ndBrainFloat(0.0f);
+				//const ndBrainFloat* const stateActions = &m_currentTransition.m_state[0];
+				//ndInt32 actionIndex = 0;
+				//for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
+				//{
+				//	ndBrainFloat error0 = stateActions[actionIndex + m_leg0_anim_posit_x] - stateActions[actionIndex + m_leg0_posit_x];
+				//	ndBrainFloat error1 = stateActions[actionIndex + m_leg0_anim_posit_y] - stateActions[actionIndex + m_leg0_posit_y];
+				//	ndBrainFloat error2 = stateActions[actionIndex + m_leg0_anim_posit_z] - stateActions[actionIndex + m_leg0_posit_z];
+				//	maxVal = ndMax(maxVal, ndAbs(error0));
+				//	maxVal = ndMax(maxVal, ndAbs(error1));
+				//	maxVal = ndMax(maxVal, ndAbs(error2));
+				//	actionIndex += (m_leg1_posit_x - m_leg0_posit_x);
+				//}
+				//ndFloat32 dev = ndBrainFloat(0.5f) * D_EFFECTOR_STEP;
+				//bool state = (maxVal > dev) ? true : false;
+				//state = state && (m_startTraning >= 64);
 
-					ndBrainFloat error0 = stateActions[actionIndex + m_leg0_anim_posit_x] - stateActions[actionIndex + m_leg0_posit_x];
-					ndBrainFloat error1 = stateActions[actionIndex + m_leg0_anim_posit_y] - stateActions[actionIndex + m_leg0_posit_y];
-					ndBrainFloat error2 = stateActions[actionIndex + m_leg0_anim_posit_z] - stateActions[actionIndex + m_leg0_posit_z];
-					maxVal = ndMax(maxVal, ndAbs(error0));
-					maxVal = ndMax(maxVal, ndAbs(error1));
-					maxVal = ndMax(maxVal, ndAbs(error2));
-					actionIndex += (m_leg1_posit_x - m_leg0_posit_x);
-				}
-				//ndFloat32 dev = ndBrainFloat(4.0f) * D_EFFECTOR_STEP;
-				ndFloat32 dev = ndBrainFloat(0.01f);
-				bool state = (maxVal > dev) ? true : false;
-				state = state && (m_startTraning >= 64);
-//if (m_startTraning >= 64)
-//dev = 0;
+				bool state = (m_startTraning >= 1024 * 2);
 
 				if (!IsSampling())
 				{
