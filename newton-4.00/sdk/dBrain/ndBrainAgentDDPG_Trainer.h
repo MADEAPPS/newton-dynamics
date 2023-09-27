@@ -42,7 +42,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 		public:
 		HyperParameters()
 		{
-			m_bashBufferSize = 64;
+			m_bashBufferSize = 32;
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_actorLearnRate = ndBrainFloat(0.0005f);
@@ -520,10 +520,11 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 	ndBrainMemVector actions(actionBuffer, actionDim);
 
 	GetObservation(&m_currentTransition.m_state[0]);
-	for (ndInt32 i = 0; i < statesDim; ++i)
-	{
-		state[i] = m_currentTransition.m_state[i];
-	}
+	//for (ndInt32 i = 0; i < statesDim; ++i)
+	//{
+	//	state[i] = m_currentTransition.m_state[i];
+	//}
+	ndMemCpy(&state[0], &m_currentTransition.m_state[0], statesDim);
 	m_actor.MakePrediction(state, actions);
 
 	// explore environment
@@ -532,13 +533,13 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 		actions[i] = PerturbeAction(actions[i]);
 	}
 	ApplyActions(&actions[0]);
+	//for (ndInt32 i = 0; i < actionDim; ++i)
+	//{
+	//	m_currentTransition.m_action[i] = actions[i];
+	//}
+	ndMemCpy(&m_currentTransition.m_action[0], &actions[0], actionDim);
+
 	m_currentTransition.m_reward = GetReward();
-
-	for (ndInt32 i = 0; i < actionDim; ++i)
-	{
-		m_currentTransition.m_action[i] = actions[i];
-	}
-
 	if (!IsSampling())
 	{
 		// Get Q vale from Critic

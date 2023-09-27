@@ -552,10 +552,6 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::Step()
 	ndBrainMemVector actions(actionBuffer, actionDim);
 
 	GetObservation(&m_currentTransition.m_state[0]);
-	//for (ndInt32 i = 0; i < statesDim; ++i)
-	//{
-	//	state[i] = m_currentTransition.m_state[i];
-	//}
 	ndMemCpy(&state[0], &m_currentTransition.m_state[0], statesDim);
 	m_actor.MakePrediction(state, actions);
 
@@ -565,12 +561,8 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::Step()
 		actions[i] = PerturbeAction(actions[i]);
 	}
 	ApplyActions(&actions[0]);
+	ndMemCpy(&m_currentTransition.m_action[0], &actions[0], actionDim);
 	m_currentTransition.m_reward = GetReward();
-
-	for (ndInt32 i = 0; i < actionDim; ++i)
-	{
-		m_currentTransition.m_action[i] = actions[i];
-	}
 
 	if (!IsSampling())
 	{
