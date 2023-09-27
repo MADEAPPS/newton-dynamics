@@ -865,7 +865,7 @@ namespace ndQuadruped_1
 			m_animBlendTree->Evaluate(m_animPose, veloc);
 
 			ndInt32 actionIndex = 0;
-			ndBrainFloat actions[m_actionsSize];
+			ndBrainFloat actions[m_actionsSize * 2];
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				ndVector posit(m_animPose[i].m_posit);
@@ -1212,7 +1212,7 @@ namespace ndQuadruped_1
 
 			ndInt32 stateIndex = 0;
 			ndInt32 actionIndex = 0;
-			ndBrainFloat combinedActions[m_actionsSize];
+			ndBrainFloat combinedActions[m_actionsSize * 2];
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				combinedActions[actionIndex + m_leg0_action_posit_x] = currentState[stateIndex + m_leg0_anim_posit_x] + actions[actionIndex + m_leg0_action_posit_x] * D_EFFECTOR_STEP;
@@ -1409,7 +1409,7 @@ namespace ndQuadruped_1
 			hyperParameters.m_discountFactor = ndReal(0.99f);
 			hyperParameters.m_criticLearnRate = ndReal(0.0005f);
 			//hyperParameters.m_actionNoiseVariance = ndReal(0.125f);
-			hyperParameters.m_actionNoiseVariance = ndReal(0.0f);
+			hyperParameters.m_actionNoiseVariance = ndReal(0.05f);
 			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * ndReal(0.25f);
 			ndSharedPtr<ndBrainAgent> agent(new ndModelQuadruped::ndControllerAgent_trainer(hyperParameters, actor, critic));
 		#else
