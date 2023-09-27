@@ -23,7 +23,8 @@
 namespace ndQuadruped_1
 {
 	#define ND_USE_TD3
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
+
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
 	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
 	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
@@ -399,18 +400,20 @@ namespace ndQuadruped_1
 					ndBrainFloat error1 = state[stateIndex + m_leg0_anim_posit_y] - state[stateIndex + m_leg0_posit_y];
 					ndBrainFloat error2 = state[stateIndex + m_leg0_anim_posit_z] - state[stateIndex + m_leg0_posit_z];
 
-					ndBrainFloat d20 = ndMin(ndBrainFloat(100.0f) * error0 * error0, ndBrainFloat(30.0f));
+					ndBrainFloat d20 = ndMin(ndBrainFloat(100000.0f) * error0 * error0, ndBrainFloat(30.0f));
 					reward += ndBrainFloat(ndExp(-d20));
 
-					ndBrainFloat d21 = ndMin(ndBrainFloat(100.0f) * error1 * error1, ndBrainFloat(30.0f));
+					ndBrainFloat d21 = ndMin(ndBrainFloat(100000.0f) * error1 * error1, ndBrainFloat(30.0f));
 					reward += ndBrainFloat(ndExp(-d21));
 
-					ndBrainFloat d22 = ndMin(ndBrainFloat(100.0f) * error2 * error2, ndBrainFloat(30.0f));
+					ndBrainFloat d22 = ndMin(ndBrainFloat(100000.0f) * error2 * error2, ndBrainFloat(30.0f));
 					reward += ndBrainFloat(ndExp(-d22));
 
-					//stateIndex += (m_leg1_posit_x - m_leg0_posit_x);
+					//stateIndex += (m_leg1_anim_posit_x - m_leg0_anim_posit_x);
+					stateIndex += 9;
 				}
 				reward /= m_actionsSize;
+				//ndTrace(("%d %f\n", GetFramesCount(), reward));
 				return reward;
 			}
 
@@ -446,7 +449,8 @@ namespace ndQuadruped_1
 				//	maxVal = ndMax(maxVal, ndAbs(error0));
 				//	maxVal = ndMax(maxVal, ndAbs(error1));
 				//	maxVal = ndMax(maxVal, ndAbs(error2));
-				//	actionIndex += (m_leg1_posit_x - m_leg0_posit_x);
+				//	actionIndex += (m_leg1_anim_posit_x - m_leg0_anim_posit_x);
+				//  actionIndex += 9;
 				//}
 				//ndFloat32 dev = ndBrainFloat(0.5f) * D_EFFECTOR_STEP;
 				//bool state = (maxVal > dev) ? true : false;
@@ -872,6 +876,7 @@ namespace ndQuadruped_1
 				//actions[actionIndex + m_leg0_action_posit_swivel] = posit.m_w;
 
 				//actionIndex += (m_leg1_action_posit_x - m_leg0_action_posit_x);
+				actionIndex += 3;
 			}
 
 			ApplyPoseGeneration(actions);
@@ -918,6 +923,7 @@ namespace ndQuadruped_1
 
 				effectorsCount++;
 				//actionIndex += (m_leg1_action_posit_x - m_leg0_action_posit_x);
+				actionIndex += 3;
 			}
 
 			m_invDynamicsSolver.SolverBegin(skeleton, effectors, effectorsCount, m_world, m_timestep);
@@ -1214,8 +1220,10 @@ namespace ndQuadruped_1
 				combinedActions[actionIndex + m_leg0_action_posit_z] = currentState[stateIndex + m_leg0_anim_posit_z] + actions[actionIndex + m_leg0_action_posit_z] * D_EFFECTOR_STEP;
 				//actions[actionIndex + m_leg0_action_posit_swivel] = m_currentTransition.m_state[stateIndex + m_leg0_anim_posit_swivel] + actions[actionIndex + m_leg0_action_posit_swivel] * D_SWING_STEP;
 
-				//stateIndex += (m_leg1_posit_x - m_leg0_posit_x);
+				//stateIndex += (m_leg1_anim_posit_x - m_leg0_anim_posit_x);
 				//actionIndex += (m_leg1_action_posit_x - m_leg0_action_posit_x);
+				actionIndex += 3;
+				stateIndex += 9;
 			}
 
 			ApplyPoseGeneration(combinedActions);
@@ -1268,7 +1276,8 @@ namespace ndQuadruped_1
 				state[startIndex + m_leg0_veloc_z] = ndBrainFloat(effectVelocState.m_z);
 				//state[startIndex + m_leg0_veloc_swivel] = ndBrainFloat(effectVelocState.m_w);
 
-				//startIndex += (m_leg1_posit_x - m_leg0_posit_x);
+				//startIndex += (m_leg1_anim_posit_x - m_leg0_anim_posit_x);
+				startIndex += 9;
 			}
 		}
 
