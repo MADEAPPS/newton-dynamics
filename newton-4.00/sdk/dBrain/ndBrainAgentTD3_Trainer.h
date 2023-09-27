@@ -579,8 +579,8 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::OptimizeStep()
 		ResetModel();
 	}
 
-	GetObservation(&m_currentTransition.m_nextState[0]);
 	m_currentTransition.m_terminalState = IsTerminal();
+	GetObservation(&m_currentTransition.m_nextState[0]);
 	m_replayBuffer.AddTransition(m_currentTransition);
 
 	if (m_frameCount > m_replayBufferPrefill)
@@ -591,7 +591,7 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::OptimizeStep()
 	if (m_currentTransition.m_terminalState)
 	{
 		ResetModel();
-		m_currentTransition.Clear();
+		//m_currentTransition.Clear();
 		if (IsSampling() && (m_eposideCount % 100 == 0))
 		{
 			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_replayBuffer.GetCapacity(), m_eposideCount);

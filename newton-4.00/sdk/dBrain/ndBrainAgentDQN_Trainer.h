@@ -364,10 +364,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 
 	GetObservation(&state[0]);
 	m_actor.MakePrediction(state, actions);
-	for (ndInt32 i = 0; i < statesDim; ++i)
-	{
-		m_currentTransition.m_state[i] = state[i];
-	}
+	ndMemCpy(&m_currentTransition.m_action[0], &actions[0], actionDim);
 
 	ndInt32 action = 0;
 	ndFloat32 explore = ndRand();
@@ -426,7 +423,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::OptimizeStep()
 	if (m_currentTransition.m_terminalState)
 	{
 		ResetModel();
-		m_currentTransition.Clear();
+		//m_currentTransition.Clear();
 		if (IsSampling() && (m_eposideCount % 500 == 0))
 		{
 			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_replayBuffer.GetCapacity(), m_eposideCount);

@@ -520,10 +520,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 	ndBrainMemVector actions(actionBuffer, actionDim);
 
 	GetObservation(&m_currentTransition.m_state[0]);
-	//for (ndInt32 i = 0; i < statesDim; ++i)
-	//{
-	//	state[i] = m_currentTransition.m_state[i];
-	//}
 	ndMemCpy(&state[0], &m_currentTransition.m_state[0], statesDim);
 	m_actor.MakePrediction(state, actions);
 
@@ -533,10 +529,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 		actions[i] = PerturbeAction(actions[i]);
 	}
 	ApplyActions(&actions[0]);
-	//for (ndInt32 i = 0; i < actionDim; ++i)
-	//{
-	//	m_currentTransition.m_action[i] = actions[i];
-	//}
 	ndMemCpy(&m_currentTransition.m_action[0], &actions[0], actionDim);
 
 	m_currentTransition.m_reward = GetReward();
@@ -555,8 +547,8 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::OptimizeStep()
 		ResetModel();
 	}
 
-	GetObservation(&m_currentTransition.m_nextState[0]);
 	m_currentTransition.m_terminalState = IsTerminal();
+	GetObservation(&m_currentTransition.m_nextState[0]);
 	m_replayBuffer.AddTransition(m_currentTransition);
 
 	if (m_frameCount > m_replayBufferPrefill)
@@ -567,7 +559,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::OptimizeStep()
 	if (m_currentTransition.m_terminalState)
 	{
 		ResetModel();
-		m_currentTransition.Clear();
+		//m_currentTransition.Clear();
 		if (IsSampling() && (m_eposideCount % 100 == 0))
 		{
 			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_replayBuffer.GetCapacity(), m_eposideCount);

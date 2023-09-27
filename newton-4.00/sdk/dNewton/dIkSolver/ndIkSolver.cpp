@@ -442,8 +442,8 @@ void ndIkSolver::Solve()
 			if (body1->GetInvMass() > ndFloat32 (0.0f)) 
 			{
 				ndBodyKinematic* const body0 = contact->GetBody0();
-				ndAssert(((body0->GetSkeleton() == m_skeleton) && (body1->GetSkeleton() != m_skeleton)) ||
-						 ((body0->GetSkeleton() != m_skeleton) && (body1->GetSkeleton() == m_skeleton)));
+				//ndAssert(((body0->GetSkeleton() == m_skeleton) && (body1->GetSkeleton() != m_skeleton)) ||
+				//		 ((body0->GetSkeleton() != m_skeleton) && (body1->GetSkeleton() == m_skeleton)));
 				ndBodyKinematic* const body = (body0->GetSkeleton() != m_skeleton) ? body0 : body1;
 
 				//auto AddContactForce = [contact](ndBodyKinematic* const body)
