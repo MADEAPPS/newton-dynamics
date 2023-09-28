@@ -555,8 +555,8 @@ namespace ndQuadruped_1
 			bool m_modelIsTrained;
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
 			ndFixSizeArray<ndBodyDynamic*, 32> m_bodies;
-			mutable ndMovingAverage<128> m_averageQvalue;
-			mutable ndMovingAverage<128> m_averageFramesPerEpisodes;
+			mutable ndMovingAverage<1024> m_averageQvalue;
+			mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 		};
 
 		class ndUIControlNode: public ndAnimationBlendTreeNode
