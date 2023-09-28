@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_USE_TD3
+	#define ND_USE_TD3
 	#define ND_TRAIN_MODEL
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
@@ -1417,7 +1417,7 @@ namespace ndQuadruped_1
 			hyperParameters.m_discountFactor = ndReal(0.99f);
 			hyperParameters.m_criticLearnRate = ndReal(0.0005f);
 			//hyperParameters.m_actionNoiseVariance = ndReal(0.125f);
-			hyperParameters.m_actionNoiseVariance = ndReal(0.05f);
+			hyperParameters.m_actionNoiseVariance = ndReal(0.00f);
 			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * ndReal(0.25f);
 			ndSharedPtr<ndBrainAgent> agent(new ndModelQuadruped::ndControllerAgent_trainer(hyperParameters, actor, critic));
 		#else
