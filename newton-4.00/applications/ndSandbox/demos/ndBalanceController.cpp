@@ -178,20 +178,6 @@ namespace ndController_1
 
 			void AddExploration(ndBrainFloat* const actions) const
 			{
-				//ndFloat32 explore = ndRand();
-				//if (explore <= m_explorationProbability)
-				{
-					for (ndInt32 i = 0; i < m_actionsSize; ++i)
-					{
-						ndBrainFloat actionNoise = ndBrainFloat(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(m_actionNoiseVariance)));
-						actions[i] = actionNoise;
-					}
-				}
-				m_explorationProbability = ndMax(m_explorationProbability - m_explorationAnneliningRate, m_minExplorationProbability);
-			}
-
-			virtual void ApplyActions(ndBrainFloat* const actions) const
-			{
 				if (GetEpisodeFrames() >= 15000)
 				{
 					for (ndInt32 i = 0; i < m_actionsSize; ++i)
@@ -210,6 +196,21 @@ namespace ndController_1
 						actions[i] = clippiedNoisyAction;
 					}
 				}
+
+				//ndFloat32 explore = ndRand();
+				//if (explore <= m_explorationProbability)
+				{
+					for (ndInt32 i = 0; i < m_actionsSize; ++i)
+					{
+						ndBrainFloat actionNoise = ndBrainFloat(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(m_actionNoiseVariance)));
+						actions[i] = actionNoise;
+					}
+				}
+				m_explorationProbability = ndMax(m_explorationProbability - m_explorationAnneliningRate, m_minExplorationProbability);
+			}
+
+			virtual void ApplyActions(ndBrainFloat* const actions) const
+			{
 				m_model->ApplyActions(actions);
 			}
 
