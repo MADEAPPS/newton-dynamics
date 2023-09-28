@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_USE_TD3
+	//#define ND_USE_TD3
 	#define ND_TRAIN_MODEL
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
@@ -317,7 +317,7 @@ namespace ndQuadruped_1
 				//,m_maxFrames(3000)
 				, m_maxFrames(2000)
 				,m_startTraning(0)
-				,m_stopTraining(1000000)
+				,m_stopTraining(20000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
 				,m_averageQvalue()
@@ -533,7 +533,7 @@ namespace ndQuadruped_1
 						ndExpandTraceMessage("saving to file: %s\n", fileName);
 						ndExpandTraceMessage("training complete\n");
 						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-						ndExpandTraceMessage("training time: %g\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+						ndExpandTraceMessage("training time: %g\n seconds", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 					}
 				}
 
@@ -1363,7 +1363,7 @@ namespace ndQuadruped_1
 	ndSharedPtr<ndBrainAgent> BuildAgent()
 	{
 		#ifdef ND_TRAIN_MODEL
-			ndInt32 hiddenLayersNewrons = 128;
+			ndInt32 hiddenLayersNewrons = 64;
 			ndFixSizeArray<ndBrainLayer*, 16> layers;
 			ndSharedPtr<ndBrain> actor(new ndBrain());
 
