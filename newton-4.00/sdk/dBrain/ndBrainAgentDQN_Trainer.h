@@ -47,8 +47,6 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 			m_learnRate = ndBrainFloat(0.001f);
 			m_bashBufferSize = 64;
 			m_replayBufferSize = 1024 * 512;
-			//m_replayBufferSize = 1024;
-			//m_replayBufferPrefill = 1024 * 4;
 			m_targetUpdatePeriod = 1000;
 
 			m_exploreMinProbability = ndBrainFloat(1.0f / 100.0f);

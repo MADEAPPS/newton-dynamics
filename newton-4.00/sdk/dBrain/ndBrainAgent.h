@@ -52,6 +52,7 @@ class ndBrainAgent: public ndClassAlloc
 	virtual void Save(ndBrainSave* const loadSave) const = 0;
 	virtual void ApplyActions(ndBrainFloat* const actions) const = 0;
 	virtual void GetObservation(ndBrainFloat* const state) const = 0;
+	virtual void AddExploration(ndBrainFloat* const actions) const = 0;
 
 	ndString m_name;
 };

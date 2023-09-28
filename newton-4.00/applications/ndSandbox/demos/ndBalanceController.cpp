@@ -22,7 +22,7 @@
 
 namespace ndController_1
 {
-	//#define ND_USE_TD3
+	#define ND_USE_TD3
 	#define ND_TRAIN_MODEL
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
@@ -138,6 +138,9 @@ namespace ndController_1
 				,m_modelIsTrained(false)
 				,m_averageQvalue()
 				,m_averageFramesPerEpisodes()
+				,m_explorationProbability(ndBrainFloat(1.0f))
+				,m_minExplorationProbability(ndBrainFloat(0.01f))
+				,m_explorationAnneliningRate(ndBrainFloat(0.0f))
 			{
 				#ifdef ND_USE_TD3
 					SetName("unicycleTD3.dnn");
@@ -152,6 +155,7 @@ namespace ndController_1
 				InitWeights();
 				m_bestActor.CopyFrom(m_actor);
 				m_timer = ndGetTimeInMicroseconds();
+				m_explorationAnneliningRate = (m_explorationProbability - m_minExplorationProbability) / (ndBrainFloat(m_stopTraining * 2 / 3));
 			}
 
 			~ndControllerAgent_trainer()
@@ -170,6 +174,20 @@ namespace ndController_1
 			ndBrainFloat GetReward() const
 			{
 				return m_model->GetReward();
+			}
+
+			void AddExploration(ndBrainFloat* const actions) const
+			{
+				//ndFloat32 explore = ndRand();
+				//if (explore <= m_explorationProbability)
+				{
+					for (ndInt32 i = 0; i < m_actionsSize; ++i)
+					{
+						ndBrainFloat actionNoise = ndBrainFloat(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(m_actionNoiseVariance)));
+						actions[i] = actionNoise;
+					}
+				}
+				m_explorationProbability = ndMax(m_explorationProbability - m_explorationAnneliningRate, m_minExplorationProbability);
 			}
 
 			virtual void ApplyActions(ndBrainFloat* const actions) const
@@ -286,6 +304,9 @@ namespace ndController_1
 			bool m_modelIsTrained;
 			mutable ndMovingAverage<1024> m_averageQvalue;
 			mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
+			mutable ndFloat32 m_explorationProbability;
+			mutable ndFloat32 m_minExplorationProbability;
+			mutable ndFloat32 m_explorationAnneliningRate;
 		};
 
 		ndModelUnicycle(ndSharedPtr<ndBrainAgent> agent)

@@ -322,6 +322,9 @@ namespace ndQuadruped_1
 				,m_modelIsTrained(false)
 				,m_averageQvalue()
 				,m_averageFramesPerEpisodes()
+				,m_explorationProbability(ndBrainFloat(1.0f))
+				,m_minExplorationProbability(ndBrainFloat(0.01f))
+				,m_explorationAnneliningRate(ndBrainFloat(0.0f))
 			{
 				SetName("quadruped_1.dnn");
 				#ifdef ND_USE_TD3
@@ -335,6 +338,8 @@ namespace ndQuadruped_1
 
 				InitWeights();
 				m_bestActor.CopyFrom(m_actor);
+
+				m_explorationAnneliningRate = (m_explorationProbability - m_minExplorationProbability) / (ndBrainFloat(m_stopTraining * 2 / 3));
 			}
 
 			~ndControllerAgent_trainer()
@@ -353,6 +358,20 @@ namespace ndQuadruped_1
 					ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
 					m_bodies.PushBack(body);
 					m_basePose.PushBack(body);
+				}
+			}
+
+			void AddExploration(ndBrainFloat* const actions) const
+			{
+				m_explorationProbability = ndMax(m_explorationProbability - m_explorationAnneliningRate, m_minExplorationProbability);
+				ndFloat32 explore = ndRand();
+				if (explore <= m_explorationProbability)
+				{
+					for (ndInt32 i = 0; i < m_actionsSize; ++i)
+					{
+						ndBrainFloat actionNoise = ndBrainFloat(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(m_actionNoiseVariance)));
+						actions[i] = actionNoise;
+					}
 				}
 			}
 
@@ -557,6 +576,9 @@ namespace ndQuadruped_1
 			ndFixSizeArray<ndBodyDynamic*, 32> m_bodies;
 			mutable ndMovingAverage<1024> m_averageQvalue;
 			mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
+			mutable ndFloat32 m_explorationProbability;
+			mutable ndFloat32 m_minExplorationProbability;
+			mutable ndFloat32 m_explorationAnneliningRate;
 		};
 
 		class ndUIControlNode: public ndAnimationBlendTreeNode

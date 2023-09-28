@@ -92,7 +92,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	bool IsTerminal() const;
 	ndBrainFloat GetReward() const;
 	void SetBufferSize(ndInt32 size);
-	ndBrainFloat PerturbeAction(ndBrainFloat action) const;
+	void AddExploration(ndBrainFloat* const actions) const;
 	void BackPropagateActor(const ndUnsigned32* const bashIndex);
 	void BackPropagateCritic(const ndUnsigned32* const bashIndex);
 
@@ -100,6 +100,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 
 	void BackPropagate();
+	
 	void CalculateQvalue(const ndBrainVector& state, const ndBrainVector& actions);
 
 	ndBrain m_actor;
@@ -454,10 +455,13 @@ ndBrainFloat ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetReward() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDDPG_Trainer<statesDim, actionDim>::PerturbeAction(ndBrainFloat action) const
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat* const actions) const
 {
-	ndBrainFloat actionNoise = ndBrainFloat(ndGaussianRandom(ndFloat32 (action), ndFloat32 (m_actionNoiseVariance)));
-	return ndClamp(actionNoise, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
+	for (ndInt32 i = 0; i < actionDim; ++i)
+	{
+		ndBrainFloat actionNoise = ndBrainFloat(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(m_actionNoiseVariance)));
+		actions[i] = actionNoise;
+	}
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -496,10 +500,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 	m_actor.MakePrediction(state, actions);
 
 	// explore environment
-	for (ndInt32 i = 0; i < actionDim; ++i)
-	{
-		actions[i] = PerturbeAction(actions[i]);
-	}
+	AddExploration(&actions[0]);
 	ApplyActions(&actions[0]);
 	ndMemCpy(&m_currentTransition.m_action[0], &actions[0], actionDim);
 
