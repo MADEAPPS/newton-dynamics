@@ -45,15 +45,15 @@ namespace ndQuadruped_1
 		m_leg1_action_posit_z,
 		//m_leg1_action_posit_swivel,
 		
-		//m_leg2_action_posit_x,
-		//m_leg2_action_posit_y,
-		//m_leg2_action_posit_z,
-		////m_leg2_action_posit_swivel,
-		//
-		//m_leg3_action_posit_x,
-		//m_leg3_action_posit_y,
-		//m_leg3_action_posit_z,
-		////m_leg3_action_posit_swivel,
+		m_leg2_action_posit_x,
+		m_leg2_action_posit_y,
+		m_leg2_action_posit_z,
+		//m_leg2_action_posit_swivel,
+		
+		m_leg3_action_posit_x,
+		m_leg3_action_posit_y,
+		m_leg3_action_posit_z,
+		//m_leg3_action_posit_swivel,
 
 		m_actionsSize
 	};
@@ -86,31 +86,31 @@ namespace ndQuadruped_1
 		m_leg1_veloc_z,
 		//m_leg1_veloc_swivel,
 		
-		//m_leg2_anim_posit_x,
-		//m_leg2_anim_posit_y,
-		//m_leg2_anim_posit_z,
-		////m_leg2_anim_posit_swivel,
-		//m_leg2_posit_x,
-		//m_leg2_posit_y,
-		//m_leg2_posit_z,
-		////m_leg2_posit_swivel,
-		//m_leg2_veloc_x,
-		//m_leg2_veloc_y,
-		//m_leg2_veloc_z,
-		////m_leg2_veloc_swivel,
-		//
-		//m_leg3_anim_posit_x,
-		//m_leg3_anim_posit_y,
-		//m_leg3_anim_posit_z,
-		////m_leg3_anim_posit_swivel,
-		//m_leg3_posit_x,
-		//m_leg3_posit_y,
-		//m_leg3_posit_z,
-		////m_leg3_posit_swivel,
-		//m_leg3_veloc_x,
-		//m_leg3_veloc_y,
-		//m_leg3_veloc_z,
-		////m_leg3_veloc_swivel,
+		m_leg2_anim_posit_x,
+		m_leg2_anim_posit_y,
+		m_leg2_anim_posit_z,
+		//m_leg2_anim_posit_swivel,
+		m_leg2_posit_x,
+		m_leg2_posit_y,
+		m_leg2_posit_z,
+		//m_leg2_posit_swivel,
+		m_leg2_veloc_x,
+		m_leg2_veloc_y,
+		m_leg2_veloc_z,
+		//m_leg2_veloc_swivel,
+		
+		m_leg3_anim_posit_x,
+		m_leg3_anim_posit_y,
+		m_leg3_anim_posit_z,
+		//m_leg3_anim_posit_swivel,
+		m_leg3_posit_x,
+		m_leg3_posit_y,
+		m_leg3_posit_z,
+		//m_leg3_posit_swivel,
+		m_leg3_veloc_x,
+		m_leg3_veloc_y,
+		m_leg3_veloc_z,
+		//m_leg3_veloc_swivel,
 
 		m_stateSize
 	};
@@ -1471,8 +1471,7 @@ location.m_posit.m_y += 0.5f;
 
 		ndModelQuadruped::ndPoseGenerator* const poseGenerator = (ndModelQuadruped::ndPoseGenerator*)*sequence;
 		const ndVector upDir(location.m_up);
-		//for (ndInt32 i = 0; i < 4; ++i)
-		for (ndInt32 i = 0; i < 2; ++i)
+		for (ndInt32 i = 0; i < 4; ++i)
 		{
 			ndMatrix limbPivotLocation(matrix * ndYawMatrix(angles[i] * ndDegreeToRad));
 			limbPivotLocation.m_posit += torso->GetMatrix().m_posit;
