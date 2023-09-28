@@ -22,8 +22,8 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_USE_TD3
-	//#define ND_TRAIN_MODEL
+	//#define ND_USE_TD3
+	#define ND_TRAIN_MODEL
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
 	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
@@ -40,11 +40,11 @@ namespace ndQuadruped_1
 		m_leg0_action_posit_z,
 		//m_leg0_action_posit_swivel,
 
-		//m_leg1_action_posit_x,
-		//m_leg1_action_posit_y,
-		//m_leg1_action_posit_z,
-		////m_leg1_action_posit_swivel,
-		//
+		m_leg1_action_posit_x,
+		m_leg1_action_posit_y,
+		m_leg1_action_posit_z,
+		//m_leg1_action_posit_swivel,
+		
 		//m_leg2_action_posit_x,
 		//m_leg2_action_posit_y,
 		//m_leg2_action_posit_z,
@@ -73,19 +73,19 @@ namespace ndQuadruped_1
 		m_leg0_veloc_z,
 		//m_leg0_veloc_swivel,
 		
-		//m_leg1_anim_posit_x,
-		//m_leg1_anim_posit_y,
-		//m_leg1_anim_posit_z,
-		////m_leg1_anim_posit_swivel,
-		//m_leg1_posit_x,
-		//m_leg1_posit_y,
-		//m_leg1_posit_z,
-		////m_leg1_posit_swivel,
-		//m_leg1_veloc_x,
-		//m_leg1_veloc_y,
-		//m_leg1_veloc_z,
-		////m_leg1_veloc_swivel,
-		//
+		m_leg1_anim_posit_x,
+		m_leg1_anim_posit_y,
+		m_leg1_anim_posit_z,
+		//m_leg1_anim_posit_swivel,
+		m_leg1_posit_x,
+		m_leg1_posit_y,
+		m_leg1_posit_z,
+		//m_leg1_posit_swivel,
+		m_leg1_veloc_x,
+		m_leg1_veloc_y,
+		m_leg1_veloc_z,
+		//m_leg1_veloc_swivel,
+		
 		//m_leg2_anim_posit_x,
 		//m_leg2_anim_posit_y,
 		//m_leg2_anim_posit_z,
@@ -697,7 +697,8 @@ namespace ndQuadruped_1
 
 			
 			ndFixSizeArray<ndJointBilateralConstraint*, 32> effectors;
-			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
 				ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
 				ndAssert(info == &m_effectorsInfo[i]);
@@ -786,7 +787,8 @@ namespace ndQuadruped_1
 			ndInt32 stanceMask = poseGenerator->GetStanceCode();
 
 			ndFixSizeArray<ndVector, 4> contactPoints;
-			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
 				//if (keyFrame.m_rotation.m_w > ndFloat32(0.0f))
@@ -866,7 +868,8 @@ namespace ndQuadruped_1
 
 			ndInt32 actionIndex = 0;
 			ndBrainFloat actions[m_actionsSize * 2];
-			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
 				ndVector posit(m_animPose[i].m_posit);
 
@@ -892,7 +895,8 @@ namespace ndQuadruped_1
 
 			ndInt32 actionIndex = 0;
 			ndInt32 effectorsCount = 0;
-			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
 				ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
 				ndAssert(info == &m_effectorsInfo[i]);
@@ -938,6 +942,7 @@ namespace ndQuadruped_1
 		//	//const ndFixSizeArray<ndVector, 4>& prevPose = poseGenerator->m_prevPose;
 		//	//const ndFixSizeArray<ndVector, 4>& currentPose = poseGenerator->m_currentPose;
 		//	//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+		//	//for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 		//	//{
 		//	//	//const ndAnimKeyframe& keyFrame = m_animPose[i];
 		//	//	//ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
@@ -1085,7 +1090,8 @@ namespace ndQuadruped_1
 			
 			ndInt32 contactMask = 0;
 			ndInt32 keyFramerMask = ((ndPoseGenerator*) *m_poseGenerator->GetSequence())->GetStanceCode();
-			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
 				contactMask = contactMask | (HasContact(i) << i);
 			}
@@ -1213,7 +1219,8 @@ namespace ndQuadruped_1
 			ndInt32 stateIndex = 0;
 			ndInt32 actionIndex = 0;
 			ndBrainFloat combinedActions[m_actionsSize * 2];
-			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
 				combinedActions[actionIndex + m_leg0_action_posit_x] = currentState[stateIndex + m_leg0_anim_posit_x] + actions[actionIndex + m_leg0_action_posit_x] * D_EFFECTOR_STEP;
 				combinedActions[actionIndex + m_leg0_action_posit_y] = currentState[stateIndex + m_leg0_anim_posit_y] + actions[actionIndex + m_leg0_action_posit_y] * D_EFFECTOR_STEP;
@@ -1249,7 +1256,8 @@ namespace ndQuadruped_1
 			m_animBlendTree->Evaluate(m_animPose, veloc);
 
 			ndInt32 startIndex = 0;
-			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
 				ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
 				ndAssert(info == &m_effectorsInfo[i]);
@@ -1355,7 +1363,7 @@ namespace ndQuadruped_1
 	ndSharedPtr<ndBrainAgent> BuildAgent()
 	{
 		#ifdef ND_TRAIN_MODEL
-			ndInt32 hiddenLayersNewrons = 64;
+			ndInt32 hiddenLayersNewrons = 128;
 			ndFixSizeArray<ndBrainLayer*, 16> layers;
 			ndSharedPtr<ndBrain> actor(new ndBrain());
 
@@ -1464,7 +1472,7 @@ location.m_posit.m_y += 0.5f;
 		ndModelQuadruped::ndPoseGenerator* const poseGenerator = (ndModelQuadruped::ndPoseGenerator*)*sequence;
 		const ndVector upDir(location.m_up);
 		//for (ndInt32 i = 0; i < 4; ++i)
-		for (ndInt32 i = 0; i < 1; ++i)
+		for (ndInt32 i = 0; i < 2; ++i)
 		{
 			ndMatrix limbPivotLocation(matrix * ndYawMatrix(angles[i] * ndDegreeToRad));
 			limbPivotLocation.m_posit += torso->GetMatrix().m_posit;
