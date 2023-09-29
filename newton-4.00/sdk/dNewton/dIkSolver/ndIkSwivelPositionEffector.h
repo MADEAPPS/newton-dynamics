@@ -61,6 +61,7 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void SetRotationOrder(ndRotationOrder order);
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
+	D_NEWTON_API ndVector GetEffectorPosit() const;
 	D_NEWTON_API void GetDynamicState(ndVector& posit, ndVector& veloc) const;
 
 	protected:

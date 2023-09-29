@@ -255,6 +255,18 @@ void ndIkSwivelPositionEffector::SubmitLinearAxis(ndConstraintDescritor& desc, c
 	}
 }
 
+ndVector ndIkSwivelPositionEffector::GetEffectorPosit() const
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	ndVector posit(matrix1.UntransformVector(matrix0.m_posit));
+
+	const ndMatrix swivelMatrix(ndPitchMatrix(m_swivelAngle) * CalculateSwivelFrame(matrix1));
+	posit.m_w = CalculateAngle(matrix0[1], swivelMatrix[1], swivelMatrix[0]);
+	return posit;
+}
+
 void ndIkSwivelPositionEffector::GetDynamicState(ndVector& posit, ndVector& veloc) const
 {
 	ndMatrix matrix0;

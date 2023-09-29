@@ -375,7 +375,7 @@ namespace ndQuadruped_1
 				}
 			}
 
-			//#pragma optimize( "", off ) //for debugging purpose
+			#pragma optimize( "", off ) //for debugging purpose
 			ndBrainFloat GetReward() const
 			{
 				if (IsTerminal())
@@ -418,7 +418,9 @@ namespace ndQuadruped_1
 				{
 					ndEffectorInfo* const info = &m_model->m_effectorsInfo[i];
 					ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-					ndVector targetPosit(effector->GetLocalTargetPosition());
+
+					//ndVector targetPosit(effector->GetLocalTargetPosition());
+					ndVector targetPosit(effector->GetEffectorPosit());
 
 					ndBrainFloat error0 = state[stateIndex + m_leg0_anim_posit_x] - ndBrainFloat(targetPosit.m_x);
 					ndBrainFloat error1 = state[stateIndex + m_leg0_anim_posit_y] - ndBrainFloat(targetPosit.m_y);
