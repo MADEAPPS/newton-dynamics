@@ -314,10 +314,9 @@ namespace ndQuadruped_1
 				,m_bestActor(*(*actor))
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				//,m_maxFrames(3000)
-				, m_maxFrames(2000)
+				,m_maxFrames(3000)
 				,m_startTraning(0)
-				,m_stopTraining(20000000)
+				,m_stopTraining(1000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
 				,m_averageQvalue()
@@ -361,6 +360,7 @@ namespace ndQuadruped_1
 				}
 			}
 
+			//#pragma optimize( "", off ) //for debugging purpose
 			void AddExploration(ndBrainFloat* const actions) const
 			{
 				m_explorationProbability = ndMax(m_explorationProbability - m_explorationAnneliningRate, m_minExplorationProbability);
@@ -375,6 +375,7 @@ namespace ndQuadruped_1
 				}
 			}
 
+			//#pragma optimize( "", off ) //for debugging purpose
 			ndBrainFloat GetReward() const
 			{
 				if (IsTerminal())
@@ -413,12 +414,15 @@ namespace ndQuadruped_1
 				ndInt32 stateIndex = 0;
 				ndBrainFloat reward = ndBrainFloat(0.0f);
 				const ndBrainFloat* const state = &m_currentTransition.m_state[0];
-				//for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
 				for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 				{
-					ndBrainFloat error0 = state[stateIndex + m_leg0_anim_posit_x] - state[stateIndex + m_leg0_posit_x];
-					ndBrainFloat error1 = state[stateIndex + m_leg0_anim_posit_y] - state[stateIndex + m_leg0_posit_y];
-					ndBrainFloat error2 = state[stateIndex + m_leg0_anim_posit_z] - state[stateIndex + m_leg0_posit_z];
+					ndEffectorInfo* const info = &m_model->m_effectorsInfo[i];
+					ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+					ndVector targetPosit(effector->GetLocalTargetPosition());
+
+					ndBrainFloat error0 = state[stateIndex + m_leg0_anim_posit_x] - ndBrainFloat(targetPosit.m_x);
+					ndBrainFloat error1 = state[stateIndex + m_leg0_anim_posit_y] - ndBrainFloat(targetPosit.m_y);
+					ndBrainFloat error2 = state[stateIndex + m_leg0_anim_posit_z] - ndBrainFloat(targetPosit.m_z);
 
 					ndBrainFloat d20 = ndMin(ndBrainFloat(100000.0f) * error0 * error0, ndBrainFloat(30.0f));
 					reward += ndBrainFloat(ndExp(-d20));
@@ -429,11 +433,14 @@ namespace ndQuadruped_1
 					ndBrainFloat d22 = ndMin(ndBrainFloat(100000.0f) * error2 * error2, ndBrainFloat(30.0f));
 					reward += ndBrainFloat(ndExp(-d22));
 
-					//stateIndex += (m_leg1_anim_posit_x - m_leg0_anim_posit_x);
 					stateIndex += 9;
 				}
 				reward /= m_actionsSize;
 				//ndTrace(("%d %f\n", GetFramesCount(), reward));
+				if (reward > 0.3f) 
+				{
+					ndExpandTraceMessage("%d %f\n", GetFramesCount(), reward);
+				}
 				return reward;
 			}
 
@@ -476,7 +483,7 @@ namespace ndQuadruped_1
 				//bool state = (maxVal > dev) ? true : false;
 				//state = state && (m_startTraning >= 64);
 
-				bool state = (m_startTraning >= 1024 * 2);
+				bool state = (m_startTraning >= 1024 * 3);
 
 				if (!IsSampling())
 				{
@@ -893,9 +900,9 @@ namespace ndQuadruped_1
 			{
 				ndVector posit(m_animPose[i].m_posit);
 
-				actions[actionIndex + m_leg0_action_posit_x] = posit.m_x;
-				actions[actionIndex + m_leg0_action_posit_y] = posit.m_y;
-				actions[actionIndex + m_leg0_action_posit_z] = posit.m_z;
+				actions[actionIndex + m_leg0_action_posit_x] = ndBrainFloat(posit.m_x);
+				actions[actionIndex + m_leg0_action_posit_y] = ndBrainFloat(posit.m_y);
+				actions[actionIndex + m_leg0_action_posit_z] = ndBrainFloat(posit.m_z);
 				//actions[actionIndex + m_leg0_action_posit_swivel] = posit.m_w;
 
 				//actionIndex += (m_leg1_action_posit_x - m_leg0_action_posit_x);
@@ -917,8 +924,9 @@ namespace ndQuadruped_1
 			ndInt32 effectorsCount = 0;
 			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
-				ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
-				ndAssert(info == &m_effectorsInfo[i]);
+				//ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
+				//ndAssert(info == &m_effectorsInfo[i]);
+				ndEffectorInfo* const info = &m_effectorsInfo[i];
 				effectors[i] = *info->m_effector;
 
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
@@ -1274,8 +1282,9 @@ namespace ndQuadruped_1
 			ndInt32 startIndex = 0;
 			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
-				ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
-				ndAssert(info == &m_effectorsInfo[i]);
+				//ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
+				//ndAssert(info == &m_effectorsInfo[i]);
+				ndEffectorInfo* const info = &m_effectorsInfo[i];
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 
 				ndVector effectPositState;
@@ -1461,7 +1470,7 @@ namespace ndQuadruped_1
 		
 		ndMatrix location(matrixLocation);
 		location.m_posit.m_y = floor.m_y + 0.5f;
-//location.m_posit.m_y += 0.5f;
+location.m_posit.m_y += 0.5f;
 		torso->SetMatrix(location);
 		
 		ndDemoEntity* const entity = (ndDemoEntity*)torso->GetNotifyCallback()->GetUserData();
@@ -1637,7 +1646,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	world->AddModel(model);
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	//world->AddJoint(fixJoint);
+	world->AddJoint(fixJoint);
 
 	ndSharedPtr<ndUIEntity> quadrupedUI (new ndModelUI(scene, model));
 	scene->Set2DDisplayRenderFunction(quadrupedUI);
