@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_USE_TD3
+	#define ND_USE_TD3
 	#define ND_TRAIN_MODEL
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
@@ -317,7 +317,7 @@ namespace ndQuadruped_1
 				//,m_maxFrames(3000)
 				, m_maxFrames(2000)
 				,m_startTraning(0)
-				,m_stopTraining(10000000)
+				,m_stopTraining(20000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
 				,m_averageQvalue()
@@ -413,7 +413,8 @@ namespace ndQuadruped_1
 				ndInt32 stateIndex = 0;
 				ndBrainFloat reward = ndBrainFloat(0.0f);
 				const ndBrainFloat* const state = &m_currentTransition.m_state[0];
-				for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
+				//for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
+				for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 				{
 					ndBrainFloat error0 = state[stateIndex + m_leg0_anim_posit_x] - state[stateIndex + m_leg0_posit_x];
 					ndBrainFloat error1 = state[stateIndex + m_leg0_anim_posit_y] - state[stateIndex + m_leg0_posit_y];
@@ -719,7 +720,6 @@ namespace ndQuadruped_1
 
 			
 			ndFixSizeArray<ndJointBilateralConstraint*, 32> effectors;
-			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
 				ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
@@ -809,7 +809,6 @@ namespace ndQuadruped_1
 			ndInt32 stanceMask = poseGenerator->GetStanceCode();
 
 			ndFixSizeArray<ndVector, 4> contactPoints;
-			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
@@ -890,7 +889,6 @@ namespace ndQuadruped_1
 
 			ndInt32 actionIndex = 0;
 			ndBrainFloat actions[m_actionsSize * 2];
-			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
 				ndVector posit(m_animPose[i].m_posit);
@@ -917,7 +915,6 @@ namespace ndQuadruped_1
 
 			ndInt32 actionIndex = 0;
 			ndInt32 effectorsCount = 0;
-			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
 				ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
@@ -1236,11 +1233,9 @@ namespace ndQuadruped_1
 			//	//m_control->m_z = ndClamp(ndReal(m_control->m_z + actions[m_bodySwing_z] * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
 			//}
 
-
 			ndInt32 stateIndex = 0;
 			ndInt32 actionIndex = 0;
 			ndBrainFloat combinedActions[m_actionsSize * 2];
-			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
 				combinedActions[actionIndex + m_leg0_action_posit_x] = currentState[stateIndex + m_leg0_anim_posit_x] + actions[actionIndex + m_leg0_action_posit_x] * D_EFFECTOR_STEP;
@@ -1277,7 +1272,6 @@ namespace ndQuadruped_1
 			m_animBlendTree->Evaluate(m_animPose, veloc);
 
 			ndInt32 startIndex = 0;
-			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
 				ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
@@ -1437,8 +1431,7 @@ namespace ndQuadruped_1
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_discountFactor = ndReal(0.99f);
 			hyperParameters.m_criticLearnRate = ndReal(0.0005f);
-			//hyperParameters.m_actionNoiseVariance = ndReal(0.125f);
-			hyperParameters.m_actionNoiseVariance = ndReal(0.00f);
+			hyperParameters.m_actionNoiseVariance = ndReal(0.125f);
 			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * ndReal(0.25f);
 			ndSharedPtr<ndBrainAgent> agent(new ndModelQuadruped::ndControllerAgent_trainer(hyperParameters, actor, critic));
 		#else
