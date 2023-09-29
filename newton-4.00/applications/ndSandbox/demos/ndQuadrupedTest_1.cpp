@@ -339,7 +339,7 @@ namespace ndQuadruped_1
 				InitWeights();
 				m_bestActor.CopyFrom(m_actor);
 
-				m_explorationAnneliningRate = (m_explorationProbability - m_minExplorationProbability) / (ndBrainFloat(m_stopTraining * 2 / 3));
+				m_explorationAnneliningRate = (m_explorationProbability - m_minExplorationProbability) / (ndBrainFloat(m_stopTraining / 3));
 			}
 
 			~ndControllerAgent_trainer()
