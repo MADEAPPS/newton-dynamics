@@ -225,35 +225,6 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 	debugCallback.DrawPoint(swivelMatrix0.m_posit, ndVector(1.0f, 1.0f, 0.0f, 0.0f), 8.0f);
 }
 
-void ndIkSwivelPositionEffector::GetDynamicState(ndVector& posit, ndVector& veloc) const
-{
-	ndMatrix matrix0;
-	ndMatrix matrix1;
-	CalculateGlobalMatrix(matrix0, matrix1);
-
-	const ndMatrix& axisDir = matrix1;
-	const ndVector omega0(m_body0->GetOmega());
-	const ndVector omega1(m_body1->GetOmega());
-	const ndVector veloc0(m_body0->GetVelocity());
-	const ndVector veloc1(m_body1->GetVelocity());
-
-	posit = matrix1.UntransformVector(matrix0.m_posit);
-
-	ndPointParam param;
-	InitPointParam(param, matrix0.m_posit, matrix0.m_posit);
-	for (ndInt32 i = 0; i < 3; ++i)
-	{
-		const ndVector& pin = axisDir[i];
-		const ndVector r0CrossDir(param.m_r0.CrossProduct(pin));
-		const ndVector r1CrossDir(pin.CrossProduct(param.m_r1));
-		veloc[i] = (pin * veloc0 + r0CrossDir * omega0 - pin * veloc1 + r1CrossDir * omega1).AddHorizontal().GetScalar();
-	}
-
-	const ndMatrix swivelMatrix(ndPitchMatrix(m_swivelAngle) * CalculateSwivelFrame(matrix1));
-	posit.m_w = CalculateAngle(matrix0[1], swivelMatrix[1], swivelMatrix[0]);
-	veloc.m_w = (omega0 * swivelMatrix.m_front - omega1 * swivelMatrix.m_front).AddHorizontal().GetScalar();
-}
-
 void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	const ndMatrix swivelMatrix1(ndPitchMatrix(m_swivelAngle) * CalculateSwivelFrame(matrix1));
@@ -264,8 +235,13 @@ void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc, 
 	SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 }
 
+//#pragma optimize( "", off ) //for debugging purpose
 void ndIkSwivelPositionEffector::SubmitLinearAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
+//static ndVector xxx0;
+//static ndVector xxx1;
+//GetDynamicState(xxx0, xxx1);
+
 	const ndVector posit0(matrix0.m_posit);
 	const ndVector posit1(matrix1.TransformVector(m_localTargetPosit));
 	const ndMatrix& axisDir = matrix1;
@@ -274,9 +250,38 @@ void ndIkSwivelPositionEffector::SubmitLinearAxis(ndConstraintDescritor& desc, c
 		const ndVector pin = axisDir[i];
 		AddLinearRowJacobian(desc, posit0, posit1, pin);
 		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-		SetLowerFriction(desc, -m_linearMaxForce);
 		SetHighFriction(desc, m_linearMaxForce);
+		SetLowerFriction(desc, -m_linearMaxForce);
 	}
+}
+
+void ndIkSwivelPositionEffector::GetDynamicState(ndVector& posit, ndVector& veloc) const
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	matrix1.m_posit = matrix1.TransformVector(m_localTargetPosit);
+
+	const ndMatrix& axisDir = matrix1;
+	const ndVector omega0(m_body0->GetOmega());
+	const ndVector omega1(m_body1->GetOmega());
+	const ndVector veloc0(m_body0->GetVelocity());
+	const ndVector veloc1(m_body1->GetVelocity());
+
+	ndPointParam param;
+	InitPointParam(param, matrix0.m_posit, matrix1.m_posit);
+	for (ndInt32 i = 0; i < 3; ++i)
+	{
+		const ndVector& pin = axisDir[i];
+		const ndVector r0CrossDir(param.m_r0.CrossProduct(pin));
+		const ndVector r1CrossDir(param.m_r1.CrossProduct(pin));
+		posit[i] = (pin * param.m_posit0 - pin * param.m_posit1).AddHorizontal().GetScalar();
+		veloc[i] = (pin * veloc0 + r0CrossDir * omega0 - pin * veloc1 - r1CrossDir * omega1).AddHorizontal().GetScalar();
+	}
+
+	const ndMatrix swivelMatrix(ndPitchMatrix(m_swivelAngle) * CalculateSwivelFrame(matrix1));
+	posit.m_w = CalculateAngle(matrix0[1], swivelMatrix[1], swivelMatrix[0]);
+	veloc.m_w = (omega0 * swivelMatrix.m_front - omega1 * swivelMatrix.m_front).AddHorizontal().GetScalar();
 }
 
 void ndIkSwivelPositionEffector::JacobianDerivative(ndConstraintDescritor& desc)
