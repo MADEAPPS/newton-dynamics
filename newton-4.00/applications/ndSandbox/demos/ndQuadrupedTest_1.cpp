@@ -437,7 +437,7 @@ namespace ndQuadruped_1
 				}
 				reward /= m_actionsSize;
 				//ndTrace(("%d %f\n", GetFramesCount(), reward));
-				if (reward > 0.3f) 
+				if (reward > 0.6f) 
 				{
 					ndExpandTraceMessage("%d %f\n", GetFramesCount(), reward);
 				}
