@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_USE_TD3
+	//#define ND_USE_TD3
 	#define ND_TRAIN_MODEL
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
@@ -317,7 +317,7 @@ namespace ndQuadruped_1
 				//,m_maxFrames(3000)
 				, m_maxFrames(2000)
 				,m_startTraning(0)
-				,m_stopTraining(20000000)
+				,m_stopTraining(10000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
 				,m_averageQvalue()
@@ -1112,7 +1112,6 @@ namespace ndQuadruped_1
 			
 			ndInt32 contactMask = 0;
 			ndInt32 keyFramerMask = ((ndPoseGenerator*) *m_poseGenerator->GetSequence())->GetStanceCode();
-			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
 				contactMask = contactMask | (HasContact(i) << i);
