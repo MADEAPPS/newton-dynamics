@@ -412,34 +412,62 @@ namespace ndQuadruped_1
 				//return ndReal((reward * ndFloat32(8.0f) + control_x_reward + control_z_reward) / ndFloat32(10.0f));
 
 				ndInt32 stateIndex = 0;
-				ndBrainFloat reward = ndBrainFloat(0.0f);
+				ndBrainFloat positReward = ndBrainFloat(0.0f);
+				ndBrainFloat velocReward = ndBrainFloat(0.0f);
 				const ndBrainFloat* const state = &m_currentTransition.m_state[0];
+
+				//ndBrainFloat xxx = 0;
 				for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 				{
 					ndEffectorInfo* const info = &m_model->m_effectorsInfo[i];
 					ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 
-					//ndVector targetPosit(effector->GetLocalTargetPosition());
 					ndVector targetPosit(effector->GetEffectorPosit());
+					//ndVector targetPosit(effector->GetLocalTargetPosition()); very wrong option
+					
+					ndBrainFloat positError0 = state[stateIndex + m_leg0_anim_posit_x] - ndBrainFloat(targetPosit.m_x);
+					ndBrainFloat positError1 = state[stateIndex + m_leg0_anim_posit_y] - ndBrainFloat(targetPosit.m_y);
+					ndBrainFloat positError2 = state[stateIndex + m_leg0_anim_posit_z] - ndBrainFloat(targetPosit.m_z);
 
-					ndBrainFloat error0 = state[stateIndex + m_leg0_anim_posit_x] - ndBrainFloat(targetPosit.m_x);
-					ndBrainFloat error1 = state[stateIndex + m_leg0_anim_posit_y] - ndBrainFloat(targetPosit.m_y);
-					ndBrainFloat error2 = state[stateIndex + m_leg0_anim_posit_z] - ndBrainFloat(targetPosit.m_z);
+					ndBrainFloat d20 = ndMin(ndBrainFloat(100000.0f) * positError0 * positError0, ndBrainFloat(30.0f));
+					positReward += ndBrainFloat(ndExp(-d20));
 
-					ndBrainFloat d20 = ndMin(ndBrainFloat(100000.0f) * error0 * error0, ndBrainFloat(30.0f));
-					reward += ndBrainFloat(ndExp(-d20));
+					ndBrainFloat d21 = ndMin(ndBrainFloat(100000.0f) * positError1 * positError1, ndBrainFloat(30.0f));
+					positReward += ndBrainFloat(ndExp(-d21));
 
-					ndBrainFloat d21 = ndMin(ndBrainFloat(100000.0f) * error1 * error1, ndBrainFloat(30.0f));
-					reward += ndBrainFloat(ndExp(-d21));
+					ndBrainFloat d22 = ndMin(ndBrainFloat(100000.0f) * positError2 * positError2, ndBrainFloat(30.0f));
+					positReward += ndBrainFloat(ndExp(-d22));
 
-					ndBrainFloat d22 = ndMin(ndBrainFloat(100000.0f) * error2 * error2, ndBrainFloat(30.0f));
-					reward += ndBrainFloat(ndExp(-d22));
+					ndVector posit;
+					ndVector veloc;
+					effector->GetDynamicState(posit, veloc);
+					ndBrainFloat velocError0 = ndBrainFloat(veloc.m_x);
+					ndBrainFloat velocError1 = ndBrainFloat(veloc.m_y);
+					ndBrainFloat velocError2 = ndBrainFloat(veloc.m_z);
+
+					//xxx = ndMax(xxx, ndAbs(velocError0));
+					//xxx = ndMax(xxx, ndAbs(velocError1));
+					//xxx = ndMax(xxx, ndAbs(velocError2));
+
+					ndBrainFloat d23 = ndMin(ndBrainFloat(200.0f) * velocError0 * velocError0, ndBrainFloat(30.0f));
+					velocReward += ndBrainFloat(ndExp(-d23));
+					
+					ndBrainFloat d24 = ndMin(ndBrainFloat(200.0f) * velocError1 * velocError1, ndBrainFloat(30.0f));
+					velocReward += ndBrainFloat(ndExp(-d24));
+					
+					ndBrainFloat d25 = ndMin(ndBrainFloat(200.0f) * velocError2 * velocError2, ndBrainFloat(30.0f));
+					velocReward += ndBrainFloat(ndExp(-d25));
 
 					stateIndex += 9;
 				}
-				reward /= m_actionsSize;
+
+				//ndExpandTraceMessage("%d %f\n", GetFramesCount(), xxx);
+
+				ndBrainFloat den = 4 * m_actionsSize + m_actionsSize;
+				ndBrainFloat num = ndBrainFloat (4.0f) * positReward + velocReward;
+				ndBrainFloat reward = num / den;
 				//ndTrace(("%d %f\n", GetFramesCount(), reward));
-				if (reward > 0.7f) 
+				if (reward > 0.5f) 
 				{
 					ndExpandTraceMessage("%d %f\n", GetFramesCount(), reward);
 				}
@@ -1458,7 +1486,7 @@ namespace ndQuadruped_1
 	{
 		ndFloat32 mass = 20.0f;
 		ndFloat32 radius = 0.25f;
-		ndFloat32 limbMass = 0.5f;
+		ndFloat32 limbMass = 0.25f;
 		ndFloat32 limbLength = 0.3f;
 		ndFloat32 limbRadios = 0.05f;
 
