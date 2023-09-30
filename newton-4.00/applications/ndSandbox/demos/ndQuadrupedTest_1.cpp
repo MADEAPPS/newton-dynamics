@@ -201,11 +201,10 @@ namespace ndQuadruped_1
 				ndAssert(param >= ndFloat32(0.0f));
 				ndAssert(param <= ndFloat32(1.0f));
 
-				param = 0.125f;
+				//param = 0.125f;
 				
 				m_stanceMask = 0x0f;
 				ndFloat32 omega = ndPi / m_gaitFraction;
-				//for (ndInt32 i = 0; i < 4; i++)
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
 				{
 					output[i].m_posit = BasePose(i);
@@ -220,18 +219,15 @@ namespace ndQuadruped_1
 							output[i].m_posit.m_y += m_amp * ndSin(omega * t);
 						}
 					}
-					//output[i].m_rotation.m_w = ((t >= ndFloat32(0.0f)) && (t < m_gaitFraction)) ? ndFloat32(0.0f) : ndFloat32(1.0f);
-					//m_prevPose[i] = m_currentPose[i];
 					m_currentPose[i] = output[i].m_posit;
 				}
 			}
 
-			ndFloat32 m_phase[4];
-			ndFloat32 m_offset[4];
 			ndFloat32 m_amp;
 			ndFloat32 m_gaitFraction;
+			ndFloat32 m_phase[4];
+			ndFloat32 m_offset[4];
 			mutable ndInt32 m_stanceMask;
-			//mutable ndFixSizeArray<ndVector, 4> m_prevPose;
 			mutable ndFixSizeArray<ndVector, 4> m_currentPose;
 		};
 
@@ -248,7 +244,6 @@ namespace ndQuadruped_1
 			void SetModel(ndModelQuadruped* const model)
 			{
 				m_model = model;
-				//ResetModel();
 			}
 
 			void GetObservation(ndReal* const state) const
@@ -375,7 +370,7 @@ namespace ndQuadruped_1
 				}
 			}
 
-			#pragma optimize( "", off ) //for debugging purpose
+			//#pragma optimize( "", off ) //for debugging purpose
 			ndBrainFloat GetReward() const
 			{
 				if (IsTerminal())
@@ -416,7 +411,6 @@ namespace ndQuadruped_1
 				ndBrainFloat velocReward = ndBrainFloat(0.0f);
 				const ndBrainFloat* const state = &m_currentTransition.m_state[0];
 
-				//ndBrainFloat xxx = 0;
 				for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 				{
 					ndEffectorInfo* const info = &m_model->m_effectorsInfo[i];
@@ -445,10 +439,6 @@ namespace ndQuadruped_1
 					ndBrainFloat velocError1 = ndBrainFloat(veloc.m_y);
 					ndBrainFloat velocError2 = ndBrainFloat(veloc.m_z);
 
-					//xxx = ndMax(xxx, ndAbs(velocError0));
-					//xxx = ndMax(xxx, ndAbs(velocError1));
-					//xxx = ndMax(xxx, ndAbs(velocError2));
-
 					ndBrainFloat d23 = ndMin(ndBrainFloat(200.0f) * velocError0 * velocError0, ndBrainFloat(30.0f));
 					velocReward += ndBrainFloat(ndExp(-d23));
 					
@@ -461,12 +451,9 @@ namespace ndQuadruped_1
 					stateIndex += 9;
 				}
 
-				//ndExpandTraceMessage("%d %f\n", GetFramesCount(), xxx);
-
 				ndBrainFloat den = 4 * m_actionsSize + m_actionsSize;
 				ndBrainFloat num = ndBrainFloat (4.0f) * positReward + velocReward;
 				ndBrainFloat reward = num / den;
-				//ndTrace(("%d %f\n", GetFramesCount(), reward));
 				if (reward > 0.5f) 
 				{
 					ndExpandTraceMessage("%d %f\n", GetFramesCount(), reward);
@@ -954,8 +941,6 @@ namespace ndQuadruped_1
 			ndInt32 effectorsCount = 0;
 			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
-				//ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
-				//ndAssert(info == &m_effectorsInfo[i]);
 				ndEffectorInfo* const info = &m_effectorsInfo[i];
 				effectors[i] = *info->m_effector;
 
@@ -983,7 +968,6 @@ namespace ndQuadruped_1
 				info->m_footHinge->SetTargetAngle(angle);
 
 				effectorsCount++;
-				//actionIndex += (m_leg1_action_posit_x - m_leg0_action_posit_x);
 				actionIndex += 3;
 			}
 
@@ -991,35 +975,6 @@ namespace ndQuadruped_1
 			m_invDynamicsSolver.Solve();
 			m_invDynamicsSolver.SolverEnd();
 		}
-
-		//void GetObservation(ndReal* const state)
-		//{
-		//	const ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*m_poseGenerator->GetSequence();
-		//	//ndInt32 keyFramerMask = ((ndPoseGenerator*)*m_poseGenerator->GetSequence())->GetStanceCode();
-		//	//const ndFixSizeArray<ndVector, 4>& prevPose = poseGenerator->m_prevPose;
-		//	//const ndFixSizeArray<ndVector, 4>& currentPose = poseGenerator->m_currentPose;
-		//	//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
-		//	//for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
-		//	//{
-		//	//	//const ndAnimKeyframe& keyFrame = m_animPose[i];
-		//	//	//ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-		//	//	//ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-		//	//	
-		//	//	ndInt32 hasContact = HasContact(i);
-		//	//	//ndVector posit(effector->GetLocalTargetPosition());
-		//	//	state[m_leg0_y0 + i] = prevPose[i].m_y - D_POSE_REST_POSITION_Y;
-		//	//	state[m_leg0_y1 + i] = currentPose[i].m_y - D_POSE_REST_POSITION_Y;
-		//	//	state[m_leg0_contact + i] = !hasContact ? ndReal(1.0f) : ndReal(0.0f);
-		//	//}
-		//
-		//	////ndBodyState bodyState(CalculateFullBodyState());
-		//	////ndVector angularMomentum(bodyState.m_com.UnrotateVector(bodyState.m_angularMomentum));
-		//	////state[m_body_omega_x] = angularMomentum.m_x;
-		//	////state[m_body_omega_z] = angularMomentum.m_z;
-		//	//
-		//	//state[m_body_swing_x] = m_control->m_x;
-		//	//state[m_body_swing_z] = m_control->m_z;
-		//}
 
 		bool IsTerminal() const
 		{
@@ -1281,8 +1236,6 @@ namespace ndQuadruped_1
 				combinedActions[actionIndex + m_leg0_action_posit_z] = currentState[stateIndex + m_leg0_anim_posit_z] + actions[actionIndex + m_leg0_action_posit_z] * D_EFFECTOR_STEP;
 				//actions[actionIndex + m_leg0_action_posit_swivel] = m_currentTransition.m_state[stateIndex + m_leg0_anim_posit_swivel] + actions[actionIndex + m_leg0_action_posit_swivel] * D_SWING_STEP;
 
-				//stateIndex += (m_leg1_anim_posit_x - m_leg0_anim_posit_x);
-				//actionIndex += (m_leg1_action_posit_x - m_leg0_action_posit_x);
 				actionIndex += 3;
 				stateIndex += 9;
 			}
@@ -1312,8 +1265,6 @@ namespace ndQuadruped_1
 			ndInt32 startIndex = 0;
 			for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			{
-				//ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
-				//ndAssert(info == &m_effectorsInfo[i]);
 				ndEffectorInfo* const info = &m_effectorsInfo[i];
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 
@@ -1338,7 +1289,6 @@ namespace ndQuadruped_1
 				state[startIndex + m_leg0_veloc_z] = ndBrainFloat(effectVelocState.m_z);
 				//state[startIndex + m_leg0_veloc_swivel] = ndBrainFloat(effectVelocState.m_w);
 
-				//startIndex += (m_leg1_anim_posit_x - m_leg0_anim_posit_x);
 				startIndex += 9;
 			}
 		}
