@@ -19,31 +19,28 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_SOFTMAX_ACTIVATION_H__
-#define _ND_BRAIN_LAYER_SOFTMAX_ACTIVATION_H__
+#ifndef _ND_BRAIN_LOSS_CATEGORICAL_CROSS_ENTROPY_H__
+#define _ND_BRAIN_LOSS_CATEGORICAL_CROSS_ENTROPY_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainLayerActivation.h"
+#include "ndBrainVector.h"
+#include "ndBrainLoss.h"
 
-
-// note: SoftMax activation layer is designed you work with the Categorical entropy loss
+// note: Categorical entropy loss is designed you work with the SoftMax activation layer
 // the rules for using it are
 // 1- can only be use as when the last layer of the neural net is SoftMax layer
 // 2- the function does not calculate the derivative since this is done by the SoftMax layer 
 // which make use that the combine the truth value can only be 1 or 0, 
 // and this fact cancel out many term from the derivative equation. 
 // in that regard, the loss is just the truth value.
-class ndBrainLayerSoftmaxActivation : public ndBrainLayerActivation
+class ndBrainLossCategoricalCrossEntropy: public ndBrainLoss
 {
 	public:
-	ndBrainLayerSoftmaxActivation(ndInt32 neurons);
-	ndBrainLayerSoftmaxActivation(const ndBrainLayerActivation& src);
-	ndBrainLayer* Clone() const;
-	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
+	ndBrainLossCategoricalCrossEntropy(ndInt32 size);
+	void SetTruth(const ndBrainVector& truth);
+	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss);
 
-	const char* GetLabelId() const;
-	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+	ndBrainVector m_truth;
 };
 
 #endif 

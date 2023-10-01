@@ -35,7 +35,6 @@ ndBrainLayerSoftmaxActivation::ndBrainLayerSoftmaxActivation(const ndBrainLayerA
 
 ndBrainLayer* ndBrainLayerSoftmaxActivation::Clone() const
 {
-	ndAssert(0);
 	return new ndBrainLayerSoftmaxActivation(*this);
 }
 
@@ -45,31 +44,41 @@ const char* ndBrainLayerSoftmaxActivation::GetLabelId() const
 	return "ndBrainLayerSoftmaxActivation";
 }
 
-//void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
-void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
+void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-	ndAssert(0);
-	//inputDerivative.Set(ndBrainFloat(1.0f));
-	//inputDerivative.Sub(output);
-	//inputDerivative.Mul(output);
-	//inputDerivative.Mul(outputDerivative);
-	//inputDerivative.FlushToZero();
+#ifdef _DEBUG
+	ndAssert(output.GetCount() == inputDerivative.GetCount());
+	ndAssert(output.GetCount() == outputDerivative.GetCount());
+	ndInt32 index = 0;
+	for (ndInt32 i = 0; i < outputDerivative.GetCount(); ++i)
+	{
+		ndAssert((outputDerivative[i] == ndBrainFloat(0.0f)) || (outputDerivative[i] == ndBrainFloat(1.0f)));
+		index += (outputDerivative[i] == ndBrainFloat(1.0f)) ? 1 : 0;
+	}
+	ndAssert(index == 1);
+#endif
+
+	// basically it acts as a loss function
+	inputDerivative.Set(output);
+	inputDerivative.Sub(outputDerivative);
+	inputDerivative.FlushToZero();
 }
 
-void ndBrainLayerSoftmaxActivation::MakePrediction(const ndBrainVector&, ndBrainVector& output) const
+void ndBrainLayerSoftmaxActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-	ndAssert(0);
+	ndAssert(input.GetCount() == output.GetCount());
 	ndBrainFloat max = ndBrainFloat(1.0e-16f);
-	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
-		max = output[i];
+		max = ndMax (input[i], max);
 	}
 
 	ndBrainFloat acc = ndBrainFloat(0.0f);
-	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
-		ndAssert(ndCheckFloat(output[i]));
-		ndBrainFloat prob = ndBrainFloat(ndExp(output[i] - max));
+		ndBrainFloat in = ndMax((input[i] - max), ndBrainFloat(-30.0f));
+		ndAssert(in <= ndBrainFloat(0.0f));
+		ndBrainFloat prob = ndBrainFloat(ndExp(in));
 		output[i] = prob;
 		acc += prob;
 	}

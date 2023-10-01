@@ -311,7 +311,7 @@ namespace ndQuadruped_1
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(3000)
 				,m_startTraning(0)
-				,m_stopTraining(1000000)
+				,m_stopTraining(2000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
 				,m_averageQvalue()
@@ -1218,8 +1218,8 @@ namespace ndQuadruped_1
 			//m_control->m_animSpeed = 2.0f;
 			//m_control->m_animSpeed = 1.0f;
 			//m_control->m_animSpeed = 0.5f;
-			//m_control->m_animSpeed = 0.25f;
-			m_control->m_animSpeed = 0.1f;
+			m_control->m_animSpeed = 0.25f;
+			//m_control->m_animSpeed = 0.1f;
 			//if (m_control->m_enableController)
 			//{
 			//	//m_control->m_x = ndClamp(ndReal(m_control->m_x + actions[m_bodySwing_x] * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);

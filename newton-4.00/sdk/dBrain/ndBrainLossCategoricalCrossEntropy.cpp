@@ -19,32 +19,41 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_SOFTMAX_ACTIVATION_H__
-#define _ND_BRAIN_LAYER_SOFTMAX_ACTIVATION_H__
-
 #include "ndBrainStdafx.h"
-#include "ndBrainLayerActivation.h"
+#include "ndBrainLossCategoricalCrossEntropy.h"
 
+ndBrainLossCategoricalCrossEntropy::ndBrainLossCategoricalCrossEntropy(ndInt32 size)
+	:ndBrainLoss()
+{
+	m_truth.SetCount(size);
+}
 
-// note: SoftMax activation layer is designed you work with the Categorical entropy loss
+void ndBrainLossCategoricalCrossEntropy::SetTruth(const ndBrainVector& truth)
+{
+#ifdef _DEBUG
+	ndAssert(m_truth.GetCount() == truth.GetCount());
+	ndInt32 index = 0;
+	for (ndInt32 i = 0; i < truth.GetCount(); ++i)
+	{
+		ndAssert((truth[i] == ndBrainFloat(0.0f)) || (truth[i] == ndBrainFloat(1.0f)));
+		index += (truth[i] == ndBrainFloat(1.0f)) ? 1 : 0;
+	}
+	ndAssert(index == 1);
+#endif
+	
+	m_truth.Set(truth);
+}
+
+// note: Categorical entropy loss is designed you work with the SoftMax activation layer
 // the rules for using it are
 // 1- can only be use as when the last layer of the neural net is SoftMax layer
 // 2- the function does not calculate the derivative since this is done by the SoftMax layer 
 // which make use that the combine the truth value can only be 1 or 0, 
 // and this fact cancel out many term from the derivative equation. 
-// in that regard, the loss is just the truth value.
-class ndBrainLayerSoftmaxActivation : public ndBrainLayerActivation
+// in that regard the loss is just the truth value.
+void ndBrainLossCategoricalCrossEntropy::GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 {
-	public:
-	ndBrainLayerSoftmaxActivation(ndInt32 neurons);
-	ndBrainLayerSoftmaxActivation(const ndBrainLayerActivation& src);
-	ndBrainLayer* Clone() const;
-	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
-
-	const char* GetLabelId() const;
-	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
-};
-
-#endif 
-
+	ndAssert(output.GetCount() == loss.GetCount());
+	ndAssert(m_truth.GetCount() == loss.GetCount());
+	loss.Set(m_truth);
+}

@@ -63,11 +63,13 @@ void ndBrainLayerSigmoidActivation::MakePrediction(const ndBrainVector& input, n
 		ndBrainFloat value = input[i];
 		if (value > ndBrainFloat(0.0f))
 		{
+			value = ndMin(value, ndBrainFloat(30.0f));
 			ndBrainFloat p = ndBrainFloat(ndExp(-value));
 			out = ndFlushToZero(ndBrainFloat(1.0f) / (p + ndBrainFloat(1.0f)));
 		}
 		else
 		{
+			value = ndMax(value, ndBrainFloat(-30.0f));
 			ndBrainFloat p = ndBrainFloat(ndExp(value));
 			out = ndFlushToZero(p / (p + ndBrainFloat(1.0f)));
 		}

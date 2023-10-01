@@ -297,17 +297,18 @@ static void MnistTrainingSet()
 			
 			auto BackPropagateBash = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &shuffleBashBuffer](ndInt32 threadIndex, ndInt32 threadCount)
 			{
-				class Loss : public ndBrainLossLeastSquaredError
+				//class Loss : public ndBrainLossLeastSquaredError
+				class Loss : public ndBrainLossCategoricalCrossEntropy
 				{
 					public:
 					Loss(ndInt32 size)
-						:ndBrainLossLeastSquaredError(size)
+						:ndBrainLossCategoricalCrossEntropy(size)
 					{
 					}
 				
 					void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 					{
-						ndBrainLossLeastSquaredError::GetLoss(output, loss);
+						ndBrainLossCategoricalCrossEntropy::GetLoss(output, loss);
 					}
 				
 					const ndBrainMatrix* m_trainingLabels;
@@ -451,7 +452,8 @@ static void MnistTrainingSet()
 		layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
-		layers.PushBack(new ndBrainLayerSigmoidActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerSigmoidActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 	
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{
@@ -496,6 +498,6 @@ void ndTestDeedBrian()
 	ndSetRandSeed(12345);
 
 	//ThreeLayersTwoInputsTwoOutputs();
-	//MnistTrainingSet();
+	MnistTrainingSet();
 	//MnistTestSet();
 }
