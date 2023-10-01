@@ -309,9 +309,9 @@ namespace ndQuadruped_1
 				,m_bestActor(*(*actor))
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(3000)
+				,m_maxFrames(5000)
 				,m_startTraning(0)
-				,m_stopTraining(1000000)
+				,m_stopTraining(3000000)
 				,m_timer(0)
 				,m_modelIsTrained(false)
 				,m_averageQvalue()
@@ -333,7 +333,7 @@ namespace ndQuadruped_1
 				InitWeights();
 				m_bestActor.CopyFrom(m_actor);
 
-				m_explorationAnneliningRate = (m_explorationProbability - m_minExplorationProbability) / (ndBrainFloat(m_stopTraining / 3));
+				m_explorationAnneliningRate = (m_explorationProbability - m_minExplorationProbability) / (ndBrainFloat(m_stopTraining * 3 / 4));
 			}
 
 			~ndControllerAgent_trainer()
@@ -500,7 +500,7 @@ namespace ndQuadruped_1
 				//bool state = (maxVal > dev) ? true : false;
 				//state = state && (m_startTraning >= 64);
 
-				bool state = (m_startTraning >= 1024 * 3);
+				bool state = (m_startTraning > m_maxFrames);
 
 				if (!IsSampling())
 				{
@@ -1421,7 +1421,7 @@ namespace ndQuadruped_1
 			hyperParameters.m_discountFactor = ndReal(0.99f);
 			hyperParameters.m_criticLearnRate = ndReal(0.0005f);
 			hyperParameters.m_actionNoiseVariance = ndReal(0.125f);
-			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * ndReal(0.25f);
+			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * ndReal(0.5f);
 			ndSharedPtr<ndBrainAgent> agent(new ndModelQuadruped::ndControllerAgent_trainer(hyperParameters, actor, critic));
 		#else
 			char fileName[1024];
@@ -1450,7 +1450,7 @@ namespace ndQuadruped_1
 		
 		ndMatrix location(matrixLocation);
 		location.m_posit.m_y = floor.m_y + 0.5f;
-location.m_posit.m_y += 0.5f;
+//location.m_posit.m_y += 0.5f;
 		torso->SetMatrix(location);
 		
 		ndDemoEntity* const entity = (ndDemoEntity*)torso->GetNotifyCallback()->GetUserData();
@@ -1626,7 +1626,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	world->AddModel(model);
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
+	//world->AddJoint(fixJoint);
 
 	ndSharedPtr<ndUIEntity> quadrupedUI (new ndModelUI(scene, model));
 	scene->Set2DDisplayRenderFunction(quadrupedUI);
