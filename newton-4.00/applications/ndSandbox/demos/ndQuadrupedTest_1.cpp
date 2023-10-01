@@ -418,18 +418,19 @@ namespace ndQuadruped_1
 
 					ndVector targetPosit(effector->GetEffectorPosit());
 					//ndVector targetPosit(effector->GetLocalTargetPosition()); very wrong option
-					
+
 					ndBrainFloat positError0 = state[stateIndex + m_leg0_anim_posit_x] - ndBrainFloat(targetPosit.m_x);
 					ndBrainFloat positError1 = state[stateIndex + m_leg0_anim_posit_y] - ndBrainFloat(targetPosit.m_y);
 					ndBrainFloat positError2 = state[stateIndex + m_leg0_anim_posit_z] - ndBrainFloat(targetPosit.m_z);
 
-					ndBrainFloat d20 = ndMin(ndBrainFloat(100000.0f) * positError0 * positError0, ndBrainFloat(30.0f));
+					ndBrainFloat positDev2 = ndBrainFloat(100000.0f);
+					ndBrainFloat d20 = ndMin(positDev2 * positError0 * positError0, ndBrainFloat(30.0f));
 					positReward += ndBrainFloat(ndExp(-d20));
 
-					ndBrainFloat d21 = ndMin(ndBrainFloat(100000.0f) * positError1 * positError1, ndBrainFloat(30.0f));
+					ndBrainFloat d21 = ndMin(positDev2 * positError1 * positError1, ndBrainFloat(30.0f));
 					positReward += ndBrainFloat(ndExp(-d21));
 
-					ndBrainFloat d22 = ndMin(ndBrainFloat(100000.0f) * positError2 * positError2, ndBrainFloat(30.0f));
+					ndBrainFloat d22 = ndMin(positDev2 * positError2 * positError2, ndBrainFloat(30.0f));
 					positReward += ndBrainFloat(ndExp(-d22));
 
 					ndVector posit;
@@ -439,13 +440,14 @@ namespace ndQuadruped_1
 					ndBrainFloat velocError1 = ndBrainFloat(veloc.m_y);
 					ndBrainFloat velocError2 = ndBrainFloat(veloc.m_z);
 
-					ndBrainFloat d23 = ndMin(ndBrainFloat(200.0f) * velocError0 * velocError0, ndBrainFloat(30.0f));
+					ndBrainFloat velocDev2 = ndBrainFloat(200.0f);
+					ndBrainFloat d23 = ndMin(velocDev2 * velocError0 * velocError0, ndBrainFloat(30.0f));
 					velocReward += ndBrainFloat(ndExp(-d23));
-					
-					ndBrainFloat d24 = ndMin(ndBrainFloat(200.0f) * velocError1 * velocError1, ndBrainFloat(30.0f));
+
+					ndBrainFloat d24 = ndMin(velocDev2 * velocError1 * velocError1, ndBrainFloat(30.0f));
 					velocReward += ndBrainFloat(ndExp(-d24));
-					
-					ndBrainFloat d25 = ndMin(ndBrainFloat(200.0f) * velocError2 * velocError2, ndBrainFloat(30.0f));
+
+					ndBrainFloat d25 = ndMin(velocDev2 * velocError2 * velocError2, ndBrainFloat(30.0f));
 					velocReward += ndBrainFloat(ndExp(-d25));
 
 					stateIndex += 9;
