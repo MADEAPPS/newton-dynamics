@@ -332,15 +332,16 @@ static void MnistTrainingSet()
 			ndBrainOptimizerAdam optimizer;
 
 			// so far best training result on the mnist data set
+			optimizer.SetRegularizer(ndReal(1.0e-5f)); // test data score 
 			//optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score 
 			//optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score 98.1%
 			//optimizer.SetRegularizer(ndReal(3.5e-5f)); // test data score 98.18%
-			optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 98.35%
+			//optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 98.35%
 			//optimizer.SetRegularizer(ndReal(4.5e-5f)); // test data score 98.1%
 			//optimizer.SetRegularizer(ndReal(5.0e-5f)); // test data score 98.22%
 
 			bool firstPass = true;
-			for (ndInt32 i = 0; i < 2000000; ++i)
+			for (ndInt32 i = 0; i < 1000000; ++i)
 			{
 				ndInt32 priorityStart = ndMin(priorityIndexArray.GetCount(), 2);
 				for (ndInt32 j = 0; j < priorityStart; ++j)
@@ -448,8 +449,8 @@ static void MnistTrainingSet()
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 		layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		//layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		//layers.PushBack(new ndBrainLayerSigmoidActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -499,5 +500,5 @@ void ndTestDeedBrian()
 
 	//ThreeLayersTwoInputsTwoOutputs();
 	MnistTrainingSet();
-	//MnistTestSet();
+	MnistTestSet();
 }

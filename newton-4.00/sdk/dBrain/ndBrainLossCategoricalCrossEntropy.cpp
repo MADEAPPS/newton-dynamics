@@ -51,9 +51,9 @@ void ndBrainLossCategoricalCrossEntropy::SetTruth(const ndBrainVector& truth)
 // which make use that the combine the truth value can only be 1 or 0, 
 // and this fact cancel out many term from the derivative equation. 
 // in that regard the loss is just the truth value.
-void ndBrainLossCategoricalCrossEntropy::GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+void ndBrainLossCategoricalCrossEntropy::GetLoss(const ndBrainVector&, ndBrainVector& loss)
 {
-	ndAssert(output.GetCount() == loss.GetCount());
+	//ndAssert(output.GetCount() == loss.GetCount());
 	ndAssert(m_truth.GetCount() == loss.GetCount());
 	loss.Set(m_truth);
 }
