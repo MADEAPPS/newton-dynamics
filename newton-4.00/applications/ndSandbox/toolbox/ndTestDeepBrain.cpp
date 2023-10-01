@@ -263,6 +263,9 @@ static void MnistTrainingSet()
 	ndSharedPtr<ndBrainMatrix> trainingLabels (LoadMnistLabelData("mnistDatabase/train-labels.idx1-ubyte"));
 	ndSharedPtr<ndBrainMatrix> trainingDigits (LoadMnistSampleData("mnistDatabase/train-images.idx3-ubyte"));
 
+	ndSharedPtr<ndBrainMatrix> testLabels(LoadMnistLabelData("mnistDatabase/t10k-labels.idx1-ubyte"));
+	ndSharedPtr<ndBrainMatrix> testDigits(LoadMnistSampleData("mnistDatabase/t10k-images.idx3-ubyte"));
+
 	class SupervisedTrainer : public ndBrainThreadPool
 	{
 		public:
@@ -290,7 +293,8 @@ static void MnistTrainingSet()
 			}
 		}
 
-		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits)
+		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits,
+					  ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 		{
 			ndUnsigned32 shuffleBashBuffer[1024];
 			ndArray<ndUnsigned32> priorityIndexArray;
@@ -327,7 +331,8 @@ static void MnistTrainingSet()
 			});
 
 			ndBrain bestBrain(m_brain);
-			ndInt32 minFail = trainingDigits->GetCount();
+			ndInt32 minTestFail = testDigits->GetCount();
+			ndInt32 minTrainingFail = trainingDigits->GetCount();
 
 			ndBrainOptimizerAdam optimizer;
 
@@ -359,7 +364,7 @@ static void MnistTrainingSet()
 				{
 					ndInt32 failCount[D_MAX_THREADS_COUNT];
 					ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 1024>, D_MAX_THREADS_COUNT> failPriorities;
-					auto CrossValidate = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &failPriorities, &failCount, firstPass](ndInt32 threadIndex, ndInt32 threadCount)
+					auto CrossValidateTraining = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &failPriorities, &failCount, firstPass](ndInt32 threadIndex, ndInt32 threadCount)
 					{
 						ndBrainFloat outputBuffer[32];
 						ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
@@ -398,7 +403,7 @@ static void MnistTrainingSet()
 							}
 						}
 					});
-					ndBrainThreadPool::ParallelExecute(CrossValidate);
+					ndBrainThreadPool::ParallelExecute(CrossValidateTraining);
 
 					firstPass = false;
 					priorityIndexArray.SetCount(0);
@@ -417,14 +422,77 @@ static void MnistTrainingSet()
 						fails += failCount[j];
 					}
 
-					if (fails <= minFail)
+					if (fails <= minTrainingFail)
 					{
-						bestBrain.CopyFrom(m_brain);
-						minFail = fails;
-						ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(trainingDigits->GetCount() - minFail) * 100.0f / (ndFloat32)trainingDigits->GetCount());
-						ndExpandTraceMessage("failed count: %d   ", minFail);
-						ndExpandTraceMessage("steps: %d", i);
-						ndExpandTraceMessage("\n");
+						auto CrossValidateTest = ndMakeObject::ndFunction([this, testDigits, testLabels, &failPriorities, &failCount, firstPass](ndInt32 threadIndex, ndInt32 threadCount)
+						{
+							ndBrainFloat outputBuffer[32];
+							ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
+
+							failCount[threadIndex] = 0;
+							const ndStartEnd startEnd(testDigits->GetCount(), threadIndex, threadCount);
+							for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+							{
+								const ndBrainVector& truth = (*testLabels)[i];
+								const ndBrainVector& input = (*testDigits)[i];
+								m_brain.MakePrediction(input, output);
+
+								ndInt32 index = 0;
+								ndBrainFloat maxProbability = ndBrainFloat(0.0f);
+								for (ndInt32 j = 0; j < output.GetCount(); j++)
+								{
+									if (output[j] > maxProbability)
+									{
+										index = j;
+										maxProbability = output[j];
+									}
+								}
+
+								if (truth[index] < ndReal(0.5f))
+								{
+									failCount[threadIndex]++;
+								}
+							}
+						});
+
+						bool traningTest = fails < minTrainingFail;
+
+						minTrainingFail = fails;
+						ndBrainThreadPool::ParallelExecute(CrossValidateTest);
+						fails = 0;
+						for (ndInt32 j = 0; j < GetThreadCount(); ++j)
+						{
+							fails += failCount[j];
+						}
+
+						if (traningTest)
+						{
+							minTestFail = fails;
+							bestBrain.CopyFrom(m_brain);
+							ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(trainingDigits->GetCount() - minTrainingFail) * 100.0f / (ndFloat32)trainingDigits->GetCount());
+							ndExpandTraceMessage("failed count: %d   ", minTrainingFail);
+							ndExpandTraceMessage("steps: %d", i);
+							ndExpandTraceMessage("\n");
+						}
+						else
+						{
+							if (fails <= minTestFail)
+							{
+								minTestFail = fails;
+								bestBrain.CopyFrom(m_brain);
+								ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(trainingDigits->GetCount() - minTrainingFail) * 100.0f / (ndFloat32)trainingDigits->GetCount());
+								ndExpandTraceMessage("failed count: %d   ", minTrainingFail);
+								ndExpandTraceMessage("steps: %d", i);
+								ndExpandTraceMessage("\n");
+							}
+						}
+
+						//bestBrain.CopyFrom(m_brain);
+						//minFail = fails;
+						//ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(trainingDigits->GetCount() - minFail) * 100.0f / (ndFloat32)trainingDigits->GetCount());
+						//ndExpandTraceMessage("failed count: %d   ", minFail);
+						//ndExpandTraceMessage("steps: %d", i);
+						//ndExpandTraceMessage("\n");
 					}
 				}
 			}
@@ -464,7 +532,7 @@ static void MnistTrainingSet()
 	
 		SupervisedTrainer optimizer(&brain);
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
-		optimizer.Optimize(*trainingLabels, *trainingDigits);
+		optimizer.Optimize(*trainingLabels, *trainingDigits, *testLabels, *testDigits);
 		time = ndGetTimeInMicroseconds() - time;
 	
 		char path[256];
