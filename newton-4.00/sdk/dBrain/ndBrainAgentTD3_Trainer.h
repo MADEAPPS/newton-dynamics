@@ -478,12 +478,24 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagate()
 		shuffleBuffer.PushBack(ndRandInt() % m_replayBuffer.GetCount());
 	}
 
+#if 0
 	BackPropagateCritic(&shuffleBuffer[0]);
 	BackPropagateActor(&shuffleBuffer[0]);
 
 	m_targetActor.SoftCopy(m_actor, m_softTargetFactor);
 	m_targetCritic0.SoftCopy(m_critic0, m_softTargetFactor);
 	m_targetCritic1.SoftCopy(m_critic1, m_softTargetFactor);
+#else
+
+	BackPropagateCritic(&shuffleBuffer[0]);
+	if (m_frameCount & 1)
+	{
+		BackPropagateActor(&shuffleBuffer[0]);
+		m_targetActor.SoftCopy(m_actor, m_softTargetFactor);
+	}
+	m_targetCritic0.SoftCopy(m_critic0, m_softTargetFactor);
+	m_targetCritic1.SoftCopy(m_critic1, m_softTargetFactor);
+#endif
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
