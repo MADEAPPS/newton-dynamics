@@ -338,11 +338,9 @@ static void MnistTrainingSet()
 
 			// so far best training result on the mnist data set
 			//optimizer.SetRegularizer(ndReal(1.0e-5f)); // test data score 
-			//optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score 98.47%
-			//optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score 98.18%
-			//optimizer.SetRegularizer(ndReal(3.5e-5f)); // test data score 98.18%
-			optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 98.35%
-			//optimizer.SetRegularizer(ndReal(4.5e-5f)); // test data score 98.1%
+			//optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score 98.50%
+			optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score 98.18%
+			//optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 98.35%
 			//optimizer.SetRegularizer(ndReal(5.0e-5f)); // test data score 98.22%
 
 			bool firstPass = true;
@@ -457,7 +455,9 @@ static void MnistTrainingSet()
 
 						bool traningTest = fails < minTrainingFail;
 
-						minTrainingFail = fails;
+						//minTrainingFail = fails;
+						minTrainingFail = ndMax(fails, 5);
+						ndInt32 actualTraining = fails;
 						ndBrainThreadPool::ParallelExecute(CrossValidateTest);
 						fails = 0;
 						for (ndInt32 j = 0; j < GetThreadCount(); ++j)
@@ -465,12 +465,12 @@ static void MnistTrainingSet()
 							fails += failCount[j];
 						}
 
-						if (traningTest)
+						if (traningTest && (minTrainingFail > 5))
 						{
 							minTestFail = fails;
 							bestBrain.CopyFrom(m_brain);
-							ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(trainingDigits->GetCount() - minTrainingFail) * 100.0f / (ndFloat32)trainingDigits->GetCount());
-							ndExpandTraceMessage("failed count: %d   ", minTrainingFail);
+							ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(trainingDigits->GetCount() - actualTraining) * 100.0f / (ndFloat32)trainingDigits->GetCount());
+							ndExpandTraceMessage("failed count: %d   ", actualTraining);
 							ndExpandTraceMessage("steps: %d", i);
 							ndExpandTraceMessage("\n");
 						}
@@ -478,8 +478,8 @@ static void MnistTrainingSet()
 						{
 							minTestFail = fails;
 							bestBrain.CopyFrom(m_brain);
-							ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(trainingDigits->GetCount() - minTrainingFail) * 100.0f / (ndFloat32)trainingDigits->GetCount());
-							ndExpandTraceMessage("failed count: %d   ", minTrainingFail);
+							ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(trainingDigits->GetCount() - actualTraining) * 100.0f / (ndFloat32)trainingDigits->GetCount());
+							ndExpandTraceMessage("failed count: %d   ", actualTraining);
 							ndExpandTraceMessage("steps: %d", i);
 							ndExpandTraceMessage(" %d\n", minTestFail);
 						}
