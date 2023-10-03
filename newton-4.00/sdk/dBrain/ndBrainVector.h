@@ -52,6 +52,8 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void Blend(const ndBrainVector& target, ndBrainFloat blend);
 	void MulAdd(const ndBrainVector& a, const ndBrainVector& b);
 	void MulSub(const ndBrainVector& a, const ndBrainVector& b);
+
+	ndInt32 CategoricalSample() const;
 };
 
 class ndBrainMemVector : public ndBrainVector

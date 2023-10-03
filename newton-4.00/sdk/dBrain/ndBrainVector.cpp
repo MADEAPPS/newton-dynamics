@@ -60,7 +60,6 @@ ndInt32 ndBrainVector::ArgMax() const
 {
 	ndInt32 index = 0;
 	ndBrainFloat maxValue = (*this)[0];
-	//for (ndInt32 i = GetCount() - 1; i > 0; --i)
 	for (ndInt32 i = 1; i < GetCount(); ++i)
 	{
 		ndBrainFloat val = (*this)[i];
@@ -68,6 +67,37 @@ ndInt32 ndBrainVector::ArgMax() const
 		{
 			index = i;
 			maxValue = val;
+		}
+	}
+	return index;
+}
+
+ndInt32 ndBrainVector::CategoricalSample() const
+{
+	#ifdef _DEBUG
+		ndBrainFloat acc = ndBrainFloat(0.0f);
+		for (ndInt32 i = 0; i < GetCount(); ++i)
+		{
+			acc += (*this)[i];
+		}
+		ndAssert(ndAbs(acc - ndFloat32(1.0f)) < ndBrainFloat(1.0e-5f));
+	#endif	
+
+	ndInt32 index = -1;
+	ndBrainFloat max = ndBrainFloat(-1.0e30f);
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		ndBrainFloat num = ndClamp((*this)[i], ndBrainFloat(0.0000001f), ndBrainFloat(0.9999999f));;
+		ndBrainFloat den = ndBrainFloat(1.0f) - num;
+		ndBrainFloat logits = ndLog(num / den);
+		//ndBrainFloat entropy = -ndLog(-ndLog(ndRand()));
+		ndBrainFloat r = ndRand();
+		ndBrainFloat entropy = ndBrainFloat(0.5f) * ndLog(r / (ndBrainFloat(1.0f) - r));
+		ndBrainFloat val = logits + entropy;
+		if (val > max)
+		{
+			max = val;
+			index = i;
 		}
 	}
 	return index;
