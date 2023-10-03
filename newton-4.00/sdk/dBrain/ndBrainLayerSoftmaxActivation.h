@@ -37,13 +37,15 @@ class ndBrainLayerSoftmaxActivation : public ndBrainLayerActivation
 {
 	public:
 	ndBrainLayerSoftmaxActivation(ndInt32 neurons);
-	ndBrainLayerSoftmaxActivation(const ndBrainLayerActivation& src);
+	ndBrainLayerSoftmaxActivation(const ndBrainLayerSoftmaxActivation& src);
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
 	const char* GetLabelId() const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+
+	bool m_isCathegorical;
 };
 
 #endif 

@@ -28,6 +28,11 @@ ndBrainLossCategoricalCrossEntropy::ndBrainLossCategoricalCrossEntropy(ndInt32 s
 	m_truth.SetCount(size);
 }
 
+bool ndBrainLossCategoricalCrossEntropy::IsCategorical() const
+{
+	return true;
+}
+
 void ndBrainLossCategoricalCrossEntropy::SetTruth(const ndBrainVector& truth)
 {
 #ifdef _DEBUG

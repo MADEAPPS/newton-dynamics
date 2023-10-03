@@ -32,8 +32,14 @@ class ndBrainLoss : public ndClassAlloc
 	ndBrainLoss();
 	virtual ~ndBrainLoss();
 	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss) = 0;
+
+	virtual bool IsCategorical() const;
 };
 
+inline bool ndBrainLoss::IsCategorical() const
+{
+	return false;
+}
 
 #endif 
 

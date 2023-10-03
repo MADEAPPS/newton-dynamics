@@ -29,12 +29,6 @@ ndBrainOptimizer::ndBrainOptimizer()
 	:ndClassAlloc()
 	,m_weighDecayRegularizer(ndBrainFloat(1.0e-5f))
 {
-	//m_weighDecayRegularizer = ndBrainFloat(1.0e-4f);
-	//m_weighDecayRegularizer = ndBrainFloat(5.0e-5f);
-	//m_weighDecayRegularizer = ndBrainFloat(2.5e-5f);
-	// so far best training result on the mnist data set
-	//m_weighDecayRegularizer = ndBrainFloat(2.0e-5f); 
-	//m_weighDecayRegularizer = ndBrainFloat(3.0e-5f); 
 }
 
 ndBrainOptimizer::~ndBrainOptimizer()

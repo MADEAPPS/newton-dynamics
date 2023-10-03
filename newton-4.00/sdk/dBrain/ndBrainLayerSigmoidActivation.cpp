@@ -27,7 +27,7 @@ ndBrainLayerSigmoidActivation::ndBrainLayerSigmoidActivation(ndInt32 neurons)
 {
 }
 
-ndBrainLayerSigmoidActivation::ndBrainLayerSigmoidActivation(const ndBrainLayerActivation& src)
+ndBrainLayerSigmoidActivation::ndBrainLayerSigmoidActivation(const ndBrainLayerSigmoidActivation& src)
 	:ndBrainLayerActivation(src)
 {
 }
@@ -50,6 +50,7 @@ void ndBrainLayerSigmoidActivation::InputDerivative(const ndBrainVector& output,
 	inputDerivative.Set(ndBrainFloat(1.0f));
 	inputDerivative.Sub(output);
 	inputDerivative.Mul(output);
+
 	inputDerivative.Mul(outputDerivative);
 	inputDerivative.FlushToZero();
 }

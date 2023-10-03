@@ -30,7 +30,7 @@ class ndBrainLayerSigmoidActivation : public ndBrainLayerActivation
 {
 	public:
 	ndBrainLayerSigmoidActivation(ndInt32 neurons);
-	ndBrainLayerSigmoidActivation(const ndBrainLayerActivation& src);
+	ndBrainLayerSigmoidActivation(const ndBrainLayerSigmoidActivation& src);
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
