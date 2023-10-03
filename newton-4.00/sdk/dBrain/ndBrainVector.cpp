@@ -55,11 +55,13 @@ void ndBrainVector::Set(const ndBrainVector& data)
 	ndMemCpy(&(*this)[0], &data[0], GetCount());
 }
 
-ndInt32 ndBrainVector::GetMaxIndex() const
+//ndInt32 ndBrainVector::GetMaxIndex() const
+ndInt32 ndBrainVector::ArgMax() const
 {
 	ndInt32 index = 0;
 	ndBrainFloat maxValue = (*this)[0];
-	for (ndInt32 i = GetCount() - 1; i > 0; --i)
+	//for (ndInt32 i = GetCount() - 1; i > 0; --i)
+	for (ndInt32 i = 1; i < GetCount(); ++i)
 	{
 		ndBrainFloat val = (*this)[i];
 		if (val > maxValue)
