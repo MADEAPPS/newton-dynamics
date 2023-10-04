@@ -19,14 +19,14 @@
 int main(int, char**)
 {
 
-	//ndBrainVector xxx;
-	//xxx.PushBack(0.1f);
-	//xxx.PushBack(0.7f);
-	//xxx.PushBack(0.2f);
-	//
-	//ndInt32 a = xxx.CategoricalSample();
-	//ndInt32 b = xxx.CategoricalSample();
-	//ndInt32 c = xxx.CategoricalSample();
+	ndBrainVector xxx;
+	xxx.PushBack(0.1f);
+	xxx.PushBack(0.7f);
+	xxx.PushBack(0.2f);
+	
+	ndInt32 a = xxx.CategoricalSample();
+	ndInt32 b = xxx.CategoricalSample();
+	ndInt32 c = xxx.CategoricalSample();
 	//ndInt32 ndBrainVector::CategoricalSample() const
 	//ndFloat32 xxx0[] = { 0.31, 0.29, 0.3 };
 	//ndFloat32 xxx1[3];

@@ -83,6 +83,13 @@ ndInt32 ndBrainVector::CategoricalSample() const
 		ndAssert(ndAbs(acc - ndFloat32(1.0f)) < ndBrainFloat(1.0e-5f));
 	#endif	
 
+	ndBrainFloat xxx = 0.0f;
+	for (ndInt32 i = 0; i < 20; ++i)
+	{
+		ndBrainFloat xxx1 = -ndLog (-ndLog(xxx));
+		xxx += 1.0f / 20.0f;
+	}
+
 	ndInt32 index = -1;
 	ndBrainFloat max = ndBrainFloat(-1.0e30f);
 	for (ndInt32 i = 0; i < GetCount(); ++i)
