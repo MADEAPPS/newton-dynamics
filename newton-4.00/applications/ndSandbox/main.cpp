@@ -20,13 +20,16 @@ int main(int, char**)
 {
 
 	ndBrainVector xxx;
+	ndBrainVector xxx1;
 	xxx.PushBack(0.1f);
 	xxx.PushBack(0.7f);
 	xxx.PushBack(0.2f);
 	
-	ndInt32 a = xxx.CategoricalSample();
-	ndInt32 b = xxx.CategoricalSample();
-	ndInt32 c = xxx.CategoricalSample();
+	xxx1.SetCount(3);
+	for (ndInt32 i = 0; i < 20; i++)
+	{
+		xxx1.CategoricalSample(xxx, 0.5f);
+	}
 	//ndInt32 ndBrainVector::CategoricalSample() const
 	//ndFloat32 xxx0[] = { 0.31, 0.29, 0.3 };
 	//ndFloat32 xxx1[3];

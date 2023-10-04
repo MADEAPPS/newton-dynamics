@@ -36,8 +36,7 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void Set(ndBrainFloat value);
 	void Set(const ndBrainVector& data);
 
-	ndInt32 ArgMax() const;
-	//ndInt32 GetMaxIndex() const;
+	
 	ndBrainFloat Dot(const ndBrainVector& a) const;
 
 	void Scale(ndBrainFloat b);
@@ -53,7 +52,8 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void MulAdd(const ndBrainVector& a, const ndBrainVector& b);
 	void MulSub(const ndBrainVector& a, const ndBrainVector& b);
 
-	ndInt32 CategoricalSample() const;
+	ndInt32 ArgMax() const;
+	void CategoricalSample(const ndBrainVector& probability, ndBrainFloat beta);
 };
 
 class ndBrainMemVector : public ndBrainVector

@@ -72,42 +72,41 @@ ndInt32 ndBrainVector::ArgMax() const
 	return index;
 }
 
-ndInt32 ndBrainVector::CategoricalSample() const
+
+// using Random variate generation from https://en.wikipedia.org/wiki/Gumbel_distribution 
+void ndBrainVector::CategoricalSample(const ndBrainVector& probability, ndBrainFloat beta)
 {
 	#ifdef _DEBUG
 		ndBrainFloat acc = ndBrainFloat(0.0f);
 		for (ndInt32 i = 0; i < GetCount(); ++i)
 		{
-			acc += (*this)[i];
+			acc += probability[i];
 		}
 		ndAssert(ndAbs(acc - ndFloat32(1.0f)) < ndBrainFloat(1.0e-5f));
 	#endif	
 
-	ndBrainFloat xxx = 0.0f;
-	for (ndInt32 i = 0; i < 20; ++i)
-	{
-		ndBrainFloat xxx1 = -ndLog (-ndLog(xxx));
-		xxx += 1.0f / 20.0f;
-	}
+	//ndBrainFloat xxx = 0.0f;
+	//for (ndInt32 i = 0; i < 20; ++i)
+	//{
+	//	ndBrainFloat map = ndBrainFloat(0.930159f) * xxx + ndBrainFloat(1.0e-6f);
+	//	ndBrainFloat xxx1 = -ndLog (-ndLog(map));
+	//	xxx += 1.0f / 20.0f;
+	//}
 
-	ndInt32 index = -1;
-	ndBrainFloat max = ndBrainFloat(-1.0e30f);
+	ndBrainFloat sum = ndBrainFloat(0.0f);
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
-		ndBrainFloat num = ndClamp((*this)[i], ndBrainFloat(0.0000001f), ndBrainFloat(0.9999999f));;
+		ndBrainFloat num = ndClamp(probability[i], ndBrainFloat(0.0000001f), ndBrainFloat(0.9999999f));;
 		ndBrainFloat den = ndBrainFloat(1.0f) - num;
 		ndBrainFloat logits = ndLog(num / den);
-		//ndBrainFloat entropy = -ndLog(-ndLog(ndRand()));
-		ndBrainFloat r = ndRand();
-		ndBrainFloat entropy = ndBrainFloat(0.5f) * ndLog(r / (ndBrainFloat(1.0f) - r));
+		ndBrainFloat r = ndBrainFloat(0.930159f) * ndRand() + ndBrainFloat(1.0e-6f);
+		ndBrainFloat entropy = ndBrainFloat  (-ndLog(-ndLog(r)));
 		ndBrainFloat val = logits + entropy;
-		if (val > max)
-		{
-			max = val;
-			index = i;
-		}
+
+		(*this)[i] = ndExp(val);
+		sum += (*this)[i];
 	}
-	return index;
+	Scale(ndBrainFloat(1.0f) / sum);
 }
 
 void ndBrainVector::Scale(ndBrainFloat scale)
