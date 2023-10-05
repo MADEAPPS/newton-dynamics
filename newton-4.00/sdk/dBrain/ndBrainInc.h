@@ -50,6 +50,7 @@
 #include <ndBrainLossLeastSquaredError.h>
 #include <ndBrainLayerSigmoidActivation.h>
 #include <ndBrainLayerSoftmaxActivation.h>
+#include <ndBrainAgentDescretePolicyGrad.h>
 #include <ndBrainLossCategoricalCrossEntropy.h>
 
 #endif 
