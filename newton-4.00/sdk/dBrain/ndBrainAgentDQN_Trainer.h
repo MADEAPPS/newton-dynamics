@@ -45,7 +45,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_learnRate = ndBrainFloat(0.001f);
-			m_bashBufferSize = 64;
+			m_bashBufferSize = 32;
 			m_replayBufferSize = 1024 * 512;
 			m_targetUpdatePeriod = 1000;
 
@@ -67,7 +67,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 		ndInt32 m_replayBufferPrefill;
 	};
 
-	ndBrainAgentDQN_Trainer(const HyperParameters& hyperParameters, const ndSharedPtr<ndBrain>& actor);
+	ndBrainAgentDQN_Trainer(const HyperParameters& hyperParameters, const ndBrain& actor);
 	virtual ~ndBrainAgentDQN_Trainer();
 
 	ndBrainFloat GetCurrentValue() const;
@@ -119,11 +119,11 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const HyperParameters& hyperParameters, const ndSharedPtr<ndBrain>& actor)
+ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const HyperParameters& hyperParameters, const ndBrain& actor)
 	:ndBrainAgent()
 	,ndBrainThreadPool()
-	,m_actor(*(*actor))
-	,m_target(*(*actor))
+	,m_actor(actor)
+	,m_target(actor)
 	,m_optimizer(nullptr)
 	,m_replayBuffer()
 	,m_gamma(hyperParameters.m_discountFactor)
@@ -385,38 +385,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 
 	GetObservation(&state[0]);
 	m_actor.MakePrediction(state, actions);
-	//ndMemCpy(&m_currentTransition.m_action[0], &actions[0], actionDim);
 
-	//ndInt32 action = 0;
-	//ndFloat32 explore = ndRand();
-	//if (explore <= m_explorationProbability)
-	//{
-	//	// explore environment
-	//	ndUnsigned32 randomIndex = ndRandInt();
-	//	action = ndInt32(randomIndex % actionDim);
-	//}
-	//else
-	//{
-	//	// exploit environment
-	//	action = 0;
-	//	ndBrainFloat maxQValue = actions[0];
-	//	for (ndInt32 i = 1; i < actionDim; ++i)
-	//	{
-	//		// assume dqn will always uses a relu as the last layer, 
-	//		// wish can only product positive q values.
-	//		ndAssert(actions[i] >= ndBrainFloat(0.0f));
-	//		if (actions[i] > maxQValue)
-	//		{
-	//			action = i;
-	//			maxQValue = actions[i];
-	//		}
-	//	}
-	//
-	//	m_currentQValue = maxQValue;
-	//}
-	//
-	//ndBrainFloat bestAction = ndBrainFloat(action);
-	//m_currentTransition.m_action[0] = action;
 	AddExploration(&actions[0]);
 	ndBrainFloat bestAction = ndBrainFloat(m_currentTransition.m_action[0]);
 	

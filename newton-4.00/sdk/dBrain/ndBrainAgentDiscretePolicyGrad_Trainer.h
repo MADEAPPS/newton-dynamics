@@ -45,7 +45,7 @@ class ndBrainAgentDiscretePolicyGrad_Trainer : public ndBrainAgent, public ndBra
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_learnRate = ndBrainFloat(0.001f);
-			m_bashBufferSize = 64;
+			m_bashBufferSize = 32;
 			m_replayBufferSize = 1024 * 512;
 			m_targetUpdatePeriod = 1000;
 

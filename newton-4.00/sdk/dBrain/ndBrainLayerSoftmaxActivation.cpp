@@ -69,20 +69,26 @@ void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector& output,
 	else
 	{
 		ndAssert(0);
-		// calculate the output derivatiove whis is a teh jacovian matrix time the input
-		for (ndInt32 i = 0; i < output.GetCount(); ++i)
-		{
-			ndFloat32 s = output[i];
-			ndFloat32 acc = (s * (ndFloat32(1.0f) - s)) * outputDerivative[i];
-			for (ndInt32 j = 0; j < output.GetCount(); ++j)
-			{
-				if (i != j)
-				{
-					acc -= s * output[j] * outputDerivative[j];
-				}
-			}
-			inputDerivative[i] = ndBrainFloat(acc);
-		}
+		// calculate the output derivative whis is a the jacovian matrix time the input
+		//for (ndInt32 i = 0; i < output.GetCount(); ++i)
+		//{
+		//	ndFloat32 s = output[i];
+		//	ndFloat32 acc = (s * (ndFloat32(1.0f) - s)) * outputDerivative[i];
+		//	for (ndInt32 j = 0; j < output.GetCount(); ++j)
+		//	{
+		//		if (i != j)
+		//		{
+		//			acc -= s * output[j] * outputDerivative[j];
+		//		}
+		//	}
+		//	inputDerivative[i] = ndBrainFloat(acc);
+		//}
+
+		// y = (O * I - O * transp(O)) * x
+		ndBrainFloat s = -outputDerivative.Dot(output);
+		inputDerivative.Set(output);
+		inputDerivative.Scale(s);
+		inputDerivative.MulAdd(output, outputDerivative);
 	}
 
 	inputDerivative.FlushToZero();
