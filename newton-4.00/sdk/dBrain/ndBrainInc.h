@@ -52,6 +52,7 @@
 #include <ndBrainLayerSoftmaxActivation.h>
 #include <ndBrainAgentDiscretePolicyGrad.h>
 #include <ndBrainLossCategoricalCrossEntropy.h>
+#include <ndBrainAgentDiscretePolicyGrad_Trainer.h>
 
 #endif 
 
