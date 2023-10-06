@@ -92,7 +92,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	bool IsTerminal() const;
 	ndBrainFloat GetReward() const;
 	void SetBufferSize(ndInt32 size);
-	void AddExploration(ndBrainFloat* const actions) const;
+	void AddExploration(ndBrainFloat* const actions);
 	void BackPropagateActor(const ndUnsigned32* const bashIndex);
 	void BackPropagateCritic(const ndUnsigned32* const bashIndex);
 
@@ -455,7 +455,7 @@ ndBrainFloat ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetReward() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat* const actions) const
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat* const actions)
 {
 	for (ndInt32 i = 0; i < actionDim; ++i)
 	{

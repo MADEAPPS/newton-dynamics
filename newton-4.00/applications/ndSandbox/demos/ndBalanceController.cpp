@@ -176,7 +176,7 @@ namespace ndController_1
 				return m_model->GetReward();
 			}
 
-			void AddExploration(ndBrainFloat* const actions) const
+			void AddExploration(ndBrainFloat* const actions)
 			{
 				if (GetEpisodeFrames() >= 15000)
 				{

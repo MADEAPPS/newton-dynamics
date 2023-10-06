@@ -87,6 +87,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	bool IsSampling() const;
 	bool IsTerminal() const;
 	ndBrainFloat GetReward() const;
+	void AddExploration(ndBrainFloat* const actions);
 
 	private:
 	void Optimize();
@@ -353,6 +354,28 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Optimize()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat* const actions)
+{
+	ndInt32 action = 0;
+	ndFloat32 explore = ndRand();
+
+	const ndBrainMemVector qActionValues(actions, actionDim);
+	if (explore <= m_explorationProbability)
+	{
+		// explore environment
+		ndUnsigned32 randomIndex = ndRandInt();
+		action = ndInt32(randomIndex % actionDim);
+	}
+	else
+	{
+		action = qActionValues.ArgMax();
+	}
+
+	m_currentQValue = qActionValues[action];
+	m_currentTransition.m_action[0] = action;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 {
 	ndBrainFloat stateBuffer[statesDim * 2];
@@ -362,39 +385,41 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 
 	GetObservation(&state[0]);
 	m_actor.MakePrediction(state, actions);
-	ndMemCpy(&m_currentTransition.m_action[0], &actions[0], actionDim);
+	//ndMemCpy(&m_currentTransition.m_action[0], &actions[0], actionDim);
 
-	ndInt32 action = 0;
-	ndFloat32 explore = ndRand();
-	if (explore <= m_explorationProbability)
-	{
-		// explore environment
-		ndUnsigned32 randomIndex = ndRandInt();
-		action = ndInt32(randomIndex % actionDim);
-	}
-	else
-	{
-		// exploit environment
-		action = 0;
-		ndBrainFloat maxQValue = actions[0];
-		for (ndInt32 i = 1; i < actionDim; ++i)
-		{
-			// assume dqn will always uses a relu as the last layer, 
-			// wish can only product positive q values.
-			ndAssert(actions[i] >= ndBrainFloat(0.0f));
-			if (actions[i] > maxQValue)
-			{
-				action = i;
-				maxQValue = actions[i];
-			}
-		}
-
-		m_currentQValue = maxQValue;
-	}
-
-	ndBrainFloat bestAction = ndBrainFloat(action);
-	m_currentTransition.m_action[0] = action;
-
+	//ndInt32 action = 0;
+	//ndFloat32 explore = ndRand();
+	//if (explore <= m_explorationProbability)
+	//{
+	//	// explore environment
+	//	ndUnsigned32 randomIndex = ndRandInt();
+	//	action = ndInt32(randomIndex % actionDim);
+	//}
+	//else
+	//{
+	//	// exploit environment
+	//	action = 0;
+	//	ndBrainFloat maxQValue = actions[0];
+	//	for (ndInt32 i = 1; i < actionDim; ++i)
+	//	{
+	//		// assume dqn will always uses a relu as the last layer, 
+	//		// wish can only product positive q values.
+	//		ndAssert(actions[i] >= ndBrainFloat(0.0f));
+	//		if (actions[i] > maxQValue)
+	//		{
+	//			action = i;
+	//			maxQValue = actions[i];
+	//		}
+	//	}
+	//
+	//	m_currentQValue = maxQValue;
+	//}
+	//
+	//ndBrainFloat bestAction = ndBrainFloat(action);
+	//m_currentTransition.m_action[0] = action;
+	AddExploration(&actions[0]);
+	ndBrainFloat bestAction = ndBrainFloat(m_currentTransition.m_action[0]);
+	
 	ApplyActions(&bestAction);
 	if (bestAction != ndBrainFloat(m_currentTransition.m_action[0]))
 	{
@@ -421,7 +446,6 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::OptimizeStep()
 	if (m_currentTransition.m_terminalState)
 	{
 		ResetModel();
-		//m_currentTransition.Clear();
 		if (IsSampling() && (m_eposideCount % 500 == 0))
 		{
 			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_replayBuffer.GetCapacity(), m_eposideCount);

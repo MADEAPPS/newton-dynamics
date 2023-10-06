@@ -356,7 +356,7 @@ namespace ndQuadruped_1
 			}
 
 			//#pragma optimize( "", off ) //for debugging purpose
-			void AddExploration(ndBrainFloat* const actions) const
+			void AddExploration(ndBrainFloat* const actions)
 			{
 				m_explorationProbability = ndMax(m_explorationProbability - m_explorationAnneliningRate, m_minExplorationProbability);
 				ndFloat32 explore = ndRand();

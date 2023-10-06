@@ -22,13 +22,12 @@
 
 namespace ndController_0
 {
-	#define D_USE_TD3
-	//#define D_USE_POLE_DQN
+	//#define D_USE_POLE_TRAIN_AGENT
+	//#define D_USE_POLE_POLICY_GRAD
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
 
-#ifdef D_USE_POLE_DQN
 	enum ndActionSpace
 	{
 		m_doNoting,
@@ -36,13 +35,6 @@ namespace ndController_0
 		m_pushRight,
 		m_actionsSize
 	};
-#else
-	enum ndActionSpace
-	{
-		m_softPush,
-		m_actionsSize
-	};
-#endif
 
 	enum ndStateSpace
 	{
@@ -54,7 +46,7 @@ namespace ndController_0
 	class ndCartpole: public ndModelArticulation
 	{
 		public:
-		#ifdef D_USE_POLE_DQN
+		#ifndef D_USE_POLE_TRAIN_AGENT
 			class ndCartpoleAgent : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
 			{
 				public:
@@ -76,6 +68,8 @@ namespace ndController_0
 
 				ndCartpole* m_model;
 			};
+
+		#else
 
 			class ndCartpoleAgent_trainer : public ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>
 			{
@@ -211,196 +205,6 @@ namespace ndController_0
 				mutable ndMovingAverage<512> m_averageQvalue;
 				mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 			};
-
-		#else
-
-			class ndCartpoleAgent: public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
-			{
-				public:
-				ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
-					:ndBrainAgentDDPG<m_stateSize, m_actionsSize>(actor)
-					,m_model(nullptr)
-				{
-				}
-
-				void GetObservation(ndBrainFloat* const state) const
-				{
-					m_model->GetObservation(state);
-				}
-
-				virtual void ApplyActions(ndBrainFloat* const actions) const
-				{
-					m_model->ApplyActions(actions);
-				}
-
-				ndCartpole* m_model;
-			};
-
-
-#ifdef D_USE_TD3
-			class ndCartpoleAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
-			{
-				public:
-				ndCartpoleAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
-					:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
-#else
-			class ndCartpoleAgent_trainer: public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
-			{
-				public:
-				ndCartpoleAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
-					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
-#endif
-					,m_bestActor(*(*actor))
-					,m_model(nullptr)
-					,m_maxGain(-1.0e10f)
-					,m_maxFrames(5000)
-					,m_stopTraining(500000)
-					,m_timer(0)
-					,m_averageQvalue()
-					,m_averageFramesPerEpisodes()
-				{
-					#ifdef D_USE_TD3
-						SetName("cartpoleTD3.dnn");
-						m_outFile = fopen("cartpole-TD3.csv", "wb");
-						fprintf(m_outFile, "td3\n");
-					#else
-						SetName("cartpoleDDPG.dnn");
-						m_outFile = fopen("cartpole-DDPG.csv", "wb");
-						fprintf(m_outFile, "ddpg\n");
-					#endif
-
-					InitWeights();
-					m_bestActor.CopyFrom(m_actor);
-					m_timer = ndGetTimeInMicroseconds();
-				}
-
-				~ndCartpoleAgent_trainer()
-				{
-					if (m_outFile)
-					{
-						fclose(m_outFile);
-					}
-				}
-
-				ndBrainFloat GetReward() const
-				{
-					return m_model->GetReward();
-				}
-
-				virtual void ApplyActions(ndBrainFloat* const actions) const
-				{
-					if (GetEpisodeFrames() >= 15000)
-					{
-						for (ndInt32 i = 0; i < m_actionsSize; ++i)
-						{
-							ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(2.0f)));
-							ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
-							actions[i] = clippiedNoisyAction;
-						}
-					}
-					else if (GetEpisodeFrames() >= 10000)
-					{
-						for (ndInt32 i = 0; i < m_actionsSize; ++i)
-						{
-							ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
-							ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
-							actions[i] = clippiedNoisyAction;
-						}
-					}
-					m_model->ApplyActions(actions);
-				}
-
-				void GetObservation(ndBrainFloat* const state) const
-				{
-					m_model->GetObservation(state);
-				}
-
-				bool IsTerminal() const
-				{
-					bool state = m_model->IsTerminal();
-					if (!IsSampling())
-					{
-						if (GetEpisodeFrames() >= 30000)
-						{
-							state = true;
-						}
-						m_averageQvalue.Update(ndReal (GetCurrentValue()));
-						if (state)
-						{
-							m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
-						}
-					}
-					return state;
-				}
-
-				void ResetModel() const
-				{
-					m_model->ResetModel();
-				}
-
-				void OptimizeStep()
-				{
-					ndInt32 stopTraining = GetFramesCount();
-					if (stopTraining <= m_stopTraining)
-					{
-						ndInt32 episodeCount = GetEposideCount();
-						#ifdef D_USE_TD3
-							ndBrainAgentTD3_Trainer::OptimizeStep();
-						#else
-							ndBrainAgentDDPG_Trainer::OptimizeStep();
-						#endif
-
-						episodeCount -= GetEposideCount();
-						if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32 (m_maxFrames))
-						{
-							if (m_averageQvalue.GetAverage() > m_maxGain)
-							{
-								m_bestActor.CopyFrom(m_actor);
-								m_maxGain = m_averageQvalue.GetAverage();
-								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
-							}
-						}
-
-						if (episodeCount && !IsSampling())
-						{
-							ndExpandTraceMessage("%f %f\n", m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-							if (m_outFile)
-							{
-								fprintf(m_outFile, "%f\n", m_averageQvalue.GetAverage());
-								fflush(m_outFile);
-							}
-						}
-
-						if (stopTraining == m_stopTraining)
-						{
-							char fileName[1024];
-							m_actor.CopyFrom(m_bestActor);
-							ndGetWorkingFileName(GetName().GetStr(), fileName);
-							ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-							ndExpandTraceMessage("training time: %f\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-							SaveToFile(fileName);
-							ndExpandTraceMessage("saving to file: %s\n", fileName);
-							ndExpandTraceMessage("training complete\n\n");
-						}
-					}
-
-					if (m_model->IsOutOfBounds())
-					{
-						m_model->TelePort();
-					}
-				}
-
-				FILE* m_outFile;
-				ndBrain m_bestActor;
-				ndCartpole* m_model;
-				ndFloat32 m_maxGain;
-				ndInt32 m_maxFrames;
-				ndInt32 m_stopTraining;
-				ndUnsigned64 m_timer;
-				mutable ndMovingAverage<512> m_averageQvalue;
-				mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
-			};
-
 		#endif
 
 		ndCartpole(const ndSharedPtr<ndBrainAgent>& agent)
@@ -436,20 +240,15 @@ namespace ndController_0
 		void ApplyActions(ndBrainFloat* const actions) const
 		{
 			ndVector force(m_cart->GetForce());
-			#ifdef D_USE_POLE_DQN
-				ndInt32 action = ndInt32(actions[0]);
-				if (action == m_pushLeft)
-				{
-					force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
-				}
-				else if (action == m_pushRight)
-				{
-					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
-				}
-			#else
-				ndBrainFloat action = actions[0];
-				force.m_x = ndFloat32 (ndBrainFloat(2.0f) * action * (m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL));
-			#endif
+			ndInt32 action = ndInt32(actions[0]);
+			if (action == m_pushLeft)
+			{
+				force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
+			}
+			else if (action == m_pushRight)
+			{
+				force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
+			}
 			m_cart->SetForce(force);
 		}
 
@@ -578,12 +377,12 @@ namespace ndController_0
 		model->m_poleMatrix = poleBody->GetMatrix();
 	}
 
+	#ifdef D_USE_POLE_TRAIN_AGENT
 	ndModelArticulation* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		// build neural net controller
 		ndInt32 hiddenLayersNewrons = 64;
 		ndFixSizeArray<ndBrainLayer*, 16> layers;
-		#ifdef D_USE_POLE_DQN
 			ndSharedPtr<ndBrain> actor(new ndBrain());
 
 			layers.PushBack(new ndBrainLayerLinear(m_stateSize, hiddenLayersNewrons));
@@ -593,7 +392,10 @@ namespace ndController_0
 			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
-			layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			#ifdef D_USE_POLE_POLICY_GRAD
+				ndAssert(0);
+				layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			#endif
 			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 			{
 				actor->AddLayer(layers[i]);
@@ -604,28 +406,62 @@ namespace ndController_0
 			//hyperParameters.m_threadsCount = 1;
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor));
 
-		#else
 
-			layers.SetCount(0);
-			ndSharedPtr<ndBrain> actor(new ndBrain());
+		ndCartpole* const model = new ndCartpole(agent);
+		ndCartpole::ndCartpoleAgent_trainer* const trainer = (ndCartpole::ndCartpoleAgent_trainer*)*agent;
+		trainer->m_model = model;
 
-			layers.PushBack(new ndBrainLayerLinear(m_stateSize, hiddenLayersNewrons));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		BuildModel(model, scene, location);
 
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		scene->SetAcceleratedUpdate();
+		return model;
+	}
+	#endif
 
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	{
+		#ifndef D_USE_POLE_TRAIN_AGENT
+			char fileName[1024];
+			ndGetWorkingFileName("cartpoleDQN.dnn", fileName);
+	
+			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(actor));
 
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-			{
-				actor->AddLayer(layers[i]);
-			}
-			actor->InitWeightsXavierMethod();
-			
+			ndCartpole* const model = new ndCartpole(agent);
+			((ndCartpole::ndCartpoleAgent*)*agent)->m_model = model;
+		
+			BuildModel(model, scene, location);
+		#else	
+
+		// build neural net controller
+		ndInt32 hiddenLayersNewrons = 64;
+		ndFixSizeArray<ndBrainLayer*, 16> layers;
+
+		layers.SetCount(0);
+		ndSharedPtr<ndBrain> actor(new ndBrain());
+
+		layers.PushBack(new ndBrainLayerLinear(m_stateSize, hiddenLayersNewrons));
+		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
+		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
+		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
+		#ifdef D_USE_POLE_POLICY_GRAD
+		ndAssert(0);
+		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		#endif
+		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+		{
+			actor->AddLayer(layers[i]);
+		}
+		actor->InitWeightsXavierMethod();
+
+		#ifdef D_USE_POLE_POLICY_GRAD
+			ndAssert(0);
 			// the critic is more complex since is deal with more complex inputs
 			layers.SetCount(0);
 			ndSharedPtr<ndBrain> critic(new ndBrain());
@@ -646,16 +482,16 @@ namespace ndController_0
 			}
 			critic->InitWeightsXavierMethod();
 
-			// add a reinforcement learning controller 
-			#ifdef D_USE_TD3
-				ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
-			#else
-				ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
-			#endif
+			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			//hyperParameters.m_threadsCount = 1;
-
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor, critic));
-		#endif
+
+		#else
+
+			ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			//hyperParameters.m_threadsCount = 1;
+			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor));
+		#endif	
 
 		ndCartpole* const model = new ndCartpole(agent);
 		ndCartpole::ndCartpoleAgent_trainer* const trainer = (ndCartpole::ndCartpoleAgent_trainer*)*agent;
@@ -664,34 +500,17 @@ namespace ndController_0
 		BuildModel(model, scene, location);
 
 		scene->SetAcceleratedUpdate();
-		return model;
-	}
 
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
-	{
-		char fileName[1024];
-		#ifdef D_USE_POLE_DQN
-			ndGetWorkingFileName("cartpoleDQN.dnn", fileName);
-		#elif defined (D_USE_TD3)
-			ndGetWorkingFileName("cartpoleTD3.dnn", fileName);
-		#else	
-			ndGetWorkingFileName("cartpoleDDPG.dnn", fileName);
-		#endif
-	
-		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(actor));
 
-		ndCartpole* const model = new ndCartpole(agent);
-		((ndCartpole::ndCartpoleAgent*)*agent)->m_model = model;
-		
-		BuildModel(model, scene, location);
+		#endif	
 		return model;
 	}
 }
 
 using namespace ndController_0;
 
-void ndCartpoleControllerPlayer(ndDemoEntityManager* const scene)
+
+void ndCartpoleDiscretePlayer(ndDemoEntityManager* const scene)
 {
 	BuildFlatPlane(scene, true);
 
@@ -702,26 +521,6 @@ void ndCartpoleControllerPlayer(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
 	world->AddModel(model);
 
-	matrix.m_posit.m_x -= 0.0f;
-	matrix.m_posit.m_y += 0.5f;
-	matrix.m_posit.m_z += 2.0f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
-	scene->SetCameraMatrix(rotation, matrix.m_posit);
-}
-
-void ndCartpoleControllerTrainer(ndDemoEntityManager* const scene)
-{
-	// build a floor
-	//BuildFloorBox(scene, ndGetIdentityMatrix());
-	BuildFlatPlane(scene, true);
-
-	ndSetRandSeed(42);
-	ndWorld* const world = scene->GetWorld();
-	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-
-	ndSharedPtr<ndModel> model(CreateTrainModel(scene, matrix));
-	world->AddModel(model);
-	
 	matrix.m_posit.m_x -= 0.0f;
 	matrix.m_posit.m_y += 0.5f;
 	matrix.m_posit.m_z += 2.0f;

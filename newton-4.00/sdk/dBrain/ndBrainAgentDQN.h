@@ -44,6 +44,7 @@ class ndBrainAgentDQN: public ndBrainAgent
 	ndBrainFloat GetReward() const;
 	ndBrainFloat GetCurrentValue() const;
 	ndInt32 GetEpisodeFrames() const;
+	void AddExploration(ndBrainFloat* const actions);
 	
 	void Save(ndBrainSave* const loadSave) const;
 
@@ -114,6 +115,12 @@ ndInt32 ndBrainAgentDQN<statesDim, actionDim>::GetEpisodeFrames() const
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN<statesDim, actionDim>::Save(ndBrainSave* const) const
+{
+	ndAssert(0);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentDQN<statesDim, actionDim>::AddExploration(ndBrainFloat* const)
 {
 	ndAssert(0);
 }

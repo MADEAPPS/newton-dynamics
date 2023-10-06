@@ -44,7 +44,7 @@ class ndBrainAgentDDPG: public ndBrainAgent
 	ndBrainFloat GetCurrentValue() const;
 	ndInt32 GetEpisodeFrames() const;
 	void Save(ndBrainSave* const loadSave) const;
-	void AddExploration(ndBrainFloat* const actions) const;
+	void AddExploration(ndBrainFloat* const actions);
 
 	void InitWeights();
 	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
@@ -86,7 +86,7 @@ ndBrainFloat ndBrainAgentDDPG<statesDim, actionDim>::GetCurrentValue() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG<statesDim, actionDim>::AddExploration(ndBrainFloat* const) const
+void ndBrainAgentDDPG<statesDim, actionDim>::AddExploration(ndBrainFloat* const)
 {
 	ndAssert(0);
 }

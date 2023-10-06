@@ -39,10 +39,11 @@ class ndBrainAgent: public ndClassAlloc
 	void SetName(const ndString& name);
 	void SaveToFile(const char* const filename) const;
 
-	virtual bool IsTrainer() const = 0;
 	virtual void InitWeights() = 0;
+	virtual bool IsTrainer() const = 0;
+	virtual void AddExploration(ndBrainFloat* const actions) = 0;
 	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance) = 0;
-
+	
 	protected:
 	virtual void ResetModel() const = 0;
 	virtual bool IsTerminal() const = 0;
@@ -52,7 +53,6 @@ class ndBrainAgent: public ndClassAlloc
 	virtual void Save(ndBrainSave* const loadSave) const = 0;
 	virtual void ApplyActions(ndBrainFloat* const actions) const = 0;
 	virtual void GetObservation(ndBrainFloat* const state) const = 0;
-	virtual void AddExploration(ndBrainFloat* const actions) const = 0;
 
 	ndString m_name;
 };
