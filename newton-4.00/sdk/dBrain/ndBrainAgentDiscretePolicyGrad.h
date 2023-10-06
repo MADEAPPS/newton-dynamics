@@ -29,11 +29,11 @@
 #include "ndBrainReplayBuffer.h"
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-class ndBrainAgentDescretePolicyGrad: public ndBrainAgent
+class ndBrainAgentDiscretePolicyGrad: public ndBrainAgent
 {
 	public:
-	ndBrainAgentDescretePolicyGrad(const ndSharedPtr<ndBrain>& actor);
-	~ndBrainAgentDescretePolicyGrad();
+	ndBrainAgentDiscretePolicyGrad(const ndSharedPtr<ndBrain>& actor);
+	~ndBrainAgentDiscretePolicyGrad();
 
 	void Step();
 
@@ -50,13 +50,12 @@ class ndBrainAgentDescretePolicyGrad: public ndBrainAgent
 
 	void InitWeights();
 	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
-	ndInt32 SelectBestAction(const ndBrainVector& actions) const;
 
 	ndSharedPtr<ndBrain> m_actor;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::ndBrainAgentDescretePolicyGrad(const ndSharedPtr<ndBrain>& actor)
+ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::ndBrainAgentDiscretePolicyGrad(const ndSharedPtr<ndBrain>& actor)
 	:ndBrainAgent()
 	,m_actor(actor)
 {
@@ -64,91 +63,75 @@ ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::ndBrainAgentDescretePolicy
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::~ndBrainAgentDescretePolicyGrad()
+ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::~ndBrainAgentDiscretePolicyGrad()
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::IsTrainer() const
+bool ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::IsTrainer() const
 {
 	return false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::InitWeights()
+void ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::InitWeights()
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::InitWeights(ndBrainFloat, ndBrainFloat)
+void ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::InitWeights(ndBrainFloat, ndBrainFloat)
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::IsTerminal() const
+bool ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::IsTerminal() const
 {
 	ndAssert(0);
 	return false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::GetReward() const
+ndBrainFloat ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::GetReward() const
 {
 	ndAssert(0);
 	return ndBrainFloat(0.0f);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::GetCurrentValue() const
+ndBrainFloat ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::GetCurrentValue() const
 {
 	return ndBrainFloat(0.0f);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::ResetModel() const
+void ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::ResetModel() const
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::GetEpisodeFrames() const
+ndInt32 ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::GetEpisodeFrames() const
 {
 	ndAssert(0);
 	return 0;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::Save(ndBrainSave* const) const
+void ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::Save(ndBrainSave* const) const
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::OptimizeStep()
+void ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::OptimizeStep()
 {
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::SelectBestAction(const ndBrainVector& actions) const
-{
-	ndInt32 bestAction = 0;
-	ndBrainFloat maxQValue = actions[0];
-	for (ndInt32 i = 1; i < actionDim; ++i)
-	{
-		if (actions[i] > maxQValue)
-		{
-			bestAction = i;
-			maxQValue = actions[i];
-		}
-	}
-	return bestAction;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::Step()
+void ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::Step()
 {
 	ndBrainFloat stateBuffer[statesDim * 2];
 	ndBrainFloat actionBuffer[actionDim * 2];
@@ -158,7 +141,7 @@ void ndBrainAgentDescretePolicyGrad<statesDim, actionDim>::Step()
 	GetObservation(&state[0]);
 	m_actor->MakePrediction(state, actions);
 
-	ndBrainFloat bestAction = ndBrainFloat(SelectBestAction(actions));
+	ndBrainFloat bestAction = ndBrainFloat(actions.ArgMax());
 	ApplyActions(&bestAction);
 }
 

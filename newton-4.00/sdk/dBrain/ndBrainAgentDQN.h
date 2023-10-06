@@ -124,22 +124,6 @@ void ndBrainAgentDQN<statesDim, actionDim>::OptimizeStep()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDQN<statesDim, actionDim>::SelectBestAction(const ndBrainVector& actions) const
-{
-	ndInt32 bestAction = 0;
-	ndBrainFloat maxQValue = actions[0];
-	for (ndInt32 i = 1; i < actionDim; ++i)
-	{
-		if (actions[i] > maxQValue)
-		{
-			bestAction = i;
-			maxQValue = actions[i];
-		}
-	}
-	return bestAction;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN<statesDim, actionDim>::Step()
 {
 	ndBrainFloat stateBuffer[statesDim * 2];
@@ -150,7 +134,7 @@ void ndBrainAgentDQN<statesDim, actionDim>::Step()
 	GetObservation(&state[0]);
 	m_actor->MakePrediction(state, actions);
 
-	ndBrainFloat bestAction = ndBrainFloat(SelectBestAction(actions));
+	ndBrainFloat bestAction = ndBrainFloat(actions.ArgMax());
 	ApplyActions(&bestAction);
 }
 
