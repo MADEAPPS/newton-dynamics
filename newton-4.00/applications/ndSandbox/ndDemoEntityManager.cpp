@@ -226,6 +226,18 @@ void Test1__()
 	//	xxxxx.Remove (index);
 	//	xxxxx.Push (xxx, key);
 	//}
+
+	//ndBrainVector xxx;
+	//ndBrainVector xxx1;
+	//xxx.PushBack(0.1f);
+	//xxx.PushBack(0.7f);
+	//xxx.PushBack(0.2f);
+	//
+	//xxx1.SetCount(3);
+	//for (ndInt32 i = 0; i < 20; i++)
+	//{
+	//	xxx1.CategoricalSample(xxx, 0.5f);
+	//}
 }
 
 class ndDemoEntityManager::ndDemoEntityManager::ndDebuMesh

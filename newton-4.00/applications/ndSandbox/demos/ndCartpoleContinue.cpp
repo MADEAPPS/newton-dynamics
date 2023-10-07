@@ -716,7 +716,8 @@ using namespace ndController_0;
 //}
 
 
-void ndCartpoleContinuePlayer(ndDemoEntityManager* const scene)
+//void ndCartpoleContinuePlayer(ndDemoEntityManager* const scene)
+void ndCartpoleContinuePlayer(ndDemoEntityManager* const)
 {
 	ndAssert(0);
 	//BuildFlatPlane(scene, true);

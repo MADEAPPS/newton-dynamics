@@ -25,7 +25,7 @@ namespace ndCarpole_0
 	#define D_USE_POLE_TRAIN_AGENT
 	//#define D_USE_POLE_POLICY_GRAD
 
-	#define D_PUSH_ACCEL			ndBrainFloat (10.0f)
+	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
 
 	enum ndActionSpace
@@ -398,9 +398,6 @@ namespace ndCarpole_0
 		#ifdef D_USE_POLE_POLICY_GRAD
 			ndAssert(0);
 			layers.PushBack(new ndBrainLayerSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-		#else
-			//ndAssert(0);
-			//layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		#endif
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{
@@ -429,7 +426,6 @@ namespace ndCarpole_0
 		#ifdef D_USE_POLE_TRAIN_AGENT
 			ndCartpole* const model = CreateTrainModel(scene, location);
 		#else
-			ndAssert(0);
 			char fileName[1024];
 			ndGetWorkingFileName("cartpoleDQN.dnn", fileName);
 	
