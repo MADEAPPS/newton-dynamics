@@ -101,8 +101,8 @@ protected:
 	ndBrainOptimizerAdam* m_optimizer;
 	ndArray<ndBrainTrainer*> m_trainers;
 
-	ndBrainReplayBuffer<ndInt32, statesDim, 1> m_replayBuffer;
-	ndBrainReplayTransitionMemory<ndInt32, statesDim, 1> m_currentTransition;
+	ndBrainReplayBuffer<statesDim, 1> m_replayBuffer;
+	ndBrainReplayTransitionMemory<statesDim, 1> m_currentTransition;
 
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_learnRate;

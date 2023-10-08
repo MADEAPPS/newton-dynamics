@@ -45,7 +45,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_learnRate = ndBrainFloat(0.001f);
-			m_bashBufferSize = 32;
+			m_bashBufferSize = 64;
 			m_replayBufferSize = 1024 * 512;
 			m_targetUpdatePeriod = 1000;
 
@@ -101,8 +101,8 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndBrainOptimizerAdam* m_optimizer;
 	ndArray<ndBrainTrainer*> m_trainers;
 
-	ndBrainReplayBuffer<ndInt32, statesDim, 1> m_replayBuffer;
-	ndBrainReplayTransitionMemory<ndInt32, statesDim, 1> m_currentTransition;
+	ndBrainReplayBuffer<statesDim, 1> m_replayBuffer;
+	ndBrainReplayTransitionMemory<statesDim, 1> m_currentTransition;
 	
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_learnRate;
@@ -248,34 +248,24 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 				ndAssert(output.GetCount() == actionDim);
 				ndAssert(m_truth.GetCount() == m_trainer.GetBrain()->GetOutputSize());
 
-				ndBrainFloat stateBuffer[statesDim * 2];
 				ndBrainFloat actionBuffer[actionDim * 2];
-				ndBrainMemVector state(stateBuffer, statesDim);
 				ndBrainMemVector action(actionBuffer, actionDim);
-
-				const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_agent->m_replayBuffer[m_index];
-				for (ndInt32 i = 0; i < actionDim; ++i)
-				{
-					action[i] = output[i];
-				}
-				ndInt32 actionIndex = transition.m_action[0];
+				
+				const ndBrainReplayTransitionMemory<statesDim, 1>& transition = m_agent->m_replayBuffer[m_index];
+				action.Set(output);
+				ndInt32 actionIndex = ndInt32(transition.m_action[0]);
 				if (transition.m_terminalState)
 				{
 					action[actionIndex] = transition.m_reward;
 				}
 				else
 				{
-					ndBrainFloat actionBuffer1[actionDim * 2];
-					ndBrainMemVector action1(actionBuffer1, actionDim);
-				
-					for (ndInt32 i = 0; i < statesDim; ++i)
-					{
-						state[i] = transition.m_nextState[i];
-					}
-					m_agent->m_target.MakePrediction(state, action1);
-					action[actionIndex] = transition.m_reward + m_agent->m_gamma * action1[actionIndex];
+					ndBrainFloat nextActionBuffer[actionDim * 2];
+					ndBrainMemVector nextAction(nextActionBuffer, actionDim);
+					m_agent->m_target.MakePrediction(transition.m_nextState, nextAction);
+					action[actionIndex] = transition.m_reward + m_agent->m_gamma * nextAction[actionIndex];
 				}
-
+				
 				SetTruth(action);
 				ndBrainLossLeastSquaredError::GetLoss(output, loss);
 			}
@@ -285,8 +275,6 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 			ndInt32 m_index;
 		};
 
-		ndBrainFloat stateBuffer[statesDim * 2];
-		ndBrainMemVector state(stateBuffer, statesDim);
 		ndAssert(m_bashBufferSize == m_trainers.GetCount());
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -294,13 +282,9 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 			ndBrainTrainer& trainer = *m_trainers[i];
 			Loss loss(trainer, this);
 			ndInt32 index = ndInt32 (shuffleBuffer[i]);
-			const ndBrainReplayTransitionMemory<ndInt32, statesDim, 1>& transition = m_replayBuffer[index];
-			for (ndInt32 j = 0; j < statesDim; ++j)
-			{
-				state[j] = transition.m_state[j];
-			}
+			const ndBrainReplayTransitionMemory<statesDim, 1>& transition = m_replayBuffer[index];
 			loss.m_index = index;
-			trainer.BackPropagate(state, loss);
+			trainer.BackPropagate(transition.m_state, loss);
 		}
 	});
 
@@ -358,7 +342,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat*
 {
 	ndInt32 action = 0;
 	ndFloat32 explore = ndRand();
-
+	
 	const ndBrainMemVector qActionValues(actions, actionDim);
 	if (explore <= m_explorationProbability)
 	{
@@ -370,21 +354,19 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat*
 	{
 		action = qActionValues.ArgMax();
 	}
-
+	
 	m_currentQValue = qActionValues[action];
-	m_currentTransition.m_action[0] = action;
+	m_currentTransition.m_action[0] = ndBrainFloat(action);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 {
-	ndBrainFloat stateBuffer[statesDim * 2];
 	ndBrainFloat actionBuffer[actionDim * 2];
-	ndBrainMemVector state(stateBuffer, statesDim);
 	ndBrainMemVector actions(actionBuffer, actionDim);
 
-	GetObservation(&state[0]);
-	m_actor.MakePrediction(state, actions);
+	GetObservation(&m_currentTransition.m_state[0]);
+	m_actor.MakePrediction(m_currentTransition.m_state, actions);
 
 	AddExploration(&actions[0]);
 	ndBrainFloat bestAction = ndBrainFloat(m_currentTransition.m_action[0]);
@@ -392,9 +374,9 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 	ApplyActions(&bestAction);
 	if (bestAction != ndBrainFloat(m_currentTransition.m_action[0]))
 	{
-		m_currentTransition.m_action[0] = ndInt32(bestAction);
+		m_currentTransition.m_action[0] = bestAction;
 	}
-
+	
 	m_currentTransition.m_reward = GetReward();
 }
 

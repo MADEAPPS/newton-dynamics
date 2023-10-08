@@ -113,8 +113,8 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndArray<ndBrainTrainer*> m_criticTrainers;
 
 	ndArray<ndInt32> m_bashSamples;
-	ndBrainReplayBuffer<ndBrainFloat, statesDim, actionDim> m_replayBuffer;
-	ndBrainReplayTransitionMemory<ndBrainFloat, statesDim, actionDim> m_currentTransition;
+	ndBrainReplayBuffer<statesDim, actionDim> m_replayBuffer;
+	ndBrainReplayTransitionMemory<statesDim, actionDim> m_currentTransition;
 
 	ndBrainFloat m_currentQvalue;
 	ndBrainFloat m_discountFactor;
@@ -327,11 +327,9 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 			ndBrainFloat m_targetInputBuffer[(statesDim + actionDim) * 2];
 		};
 
-		ndBrainFloat actorInputBuffer[statesDim * 2];
-		ndBrainFloat actorOutputBuffer[actionDim * 2];
+		ndBrainFloat nextStateOutputBuffer[actionDim * 2];
 		ndBrainFloat inputBuffer[(statesDim + actionDim) * 2];
-		ndBrainMemVector actorInput(actorInputBuffer, statesDim);
-		ndBrainMemVector actorOutput(actorOutputBuffer, actionDim);
+		ndBrainMemVector nextStateOutput(nextStateOutputBuffer, actionDim);
 		ndBrainMemVector input(inputBuffer, statesDim + actionDim);
 
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
@@ -341,16 +339,14 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 			Loss loss(trainer, this, m_discountFactor);
 
 			ndInt32 index = ndInt32(shuffleBuffer[i]);
-			const ndBrainReplayTransitionMemory<ndBrainFloat, statesDim, actionDim>& transition = m_replayBuffer[index];
+			const ndBrainReplayTransitionMemory<statesDim, actionDim>& transition = m_replayBuffer[index];
 
-			ndMemCpy(&actorInput[0], &transition.m_nextState[0], statesDim);
-			m_targetActor.MakePrediction(actorInput, actorOutput);
+			m_targetActor.MakePrediction(transition.m_nextState, nextStateOutput);
+			ndMemCpy(&loss.m_targetInputBuffer[0], &transition.m_nextState[0], statesDim);
+			ndMemCpy(&loss.m_targetInputBuffer[statesDim], &nextStateOutput[0], actionDim);
 
 			ndMemCpy(&input[0], &transition.m_state[0], statesDim);
 			ndMemCpy(&input[statesDim], &transition.m_action[0], actionDim);
-
-			ndMemCpy(&loss.m_targetInputBuffer[0], &transition.m_nextState[0], statesDim);
-			ndMemCpy(&loss.m_targetInputBuffer[statesDim], &actorOutput[0], actionDim);
 
 			loss.m_reward = transition.m_reward;
 			loss.m_isTerminal = transition.m_terminalState;
@@ -360,6 +356,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateCritic(const n
 
 	ndBrainThreadPool::ParallelExecute(PropagateBash);
 	m_criticOptimizer->Update(this, m_criticTrainers, m_criticLearnRate);
+	m_targetCritic.SoftCopy(m_critic, m_softTargetFactor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -382,23 +379,20 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 			{
 				ndAssert(loss.GetCount() == actionDim);
 				ndAssert(output.GetCount() == actionDim);
-				const ndBrainReplayTransitionMemory<ndBrainFloat, statesDim, actionDim>& transition = m_agent->m_replayBuffer[m_index];
+				const ndBrainReplayTransitionMemory<statesDim, actionDim>& transition = m_agent->m_replayBuffer[m_index];
 				
-				ndBrainFloat criticInputBuffer[(statesDim + actionDim) * 2];
-				ndBrainMemVector input(criticInputBuffer, statesDim + actionDim);
-				ndMemCpy(&input[0], &transition.m_state[0], statesDim);
-				ndMemCpy(&input[statesDim], &output[0], actionDim);
-				m_agent->m_critic.CalculateInputGradient(input, input);
-				ndMemCpy(&loss[0], &input[statesDim], actionDim);
+				ndBrainFloat inputGradientBuffer[(statesDim + actionDim) * 2];
+				ndBrainMemVector inputGradient(inputGradientBuffer, statesDim + actionDim);
+				ndMemCpy(&inputGradient[0], &transition.m_state[0], statesDim);
+				ndMemCpy(&inputGradient[statesDim], &output[0], actionDim);
+				m_agent->m_critic.CalculateInputGradient(inputGradient, inputGradient);
+				ndMemCpy(&loss[0], &inputGradient[statesDim], actionDim);
 			}
 
 			ndBrainTrainer& m_actorTrainer;
 			ndBrainAgentDDPG_Trainer<statesDim, actionDim>* m_agent;
 			ndInt32 m_index;
 		};
-
-		ndBrainFloat inputBuffer[statesDim * 2];
-		ndBrainMemVector input(inputBuffer, statesDim);
 
 		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -407,16 +401,16 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 			ActorLoss loss(actorTrainer, this);
 
 			ndInt32 index = ndInt32(shuffleBuffer[i]);
-			const ndBrainReplayTransitionMemory<ndBrainFloat, statesDim, actionDim>& transition = m_replayBuffer[index];
+			const ndBrainReplayTransitionMemory<statesDim, actionDim>& transition = m_replayBuffer[index];
 
 			loss.m_index = index;
-			ndMemCpy(&input[0], &transition.m_state[0], statesDim);
-			actorTrainer.BackPropagate(input, loss);
+			actorTrainer.BackPropagate(transition.m_state, loss);
 		}
 	});
 
 	ParallelExecute(PropagateBash);
 	m_actorOptimizer->Update(this, m_actorTrainers, -m_actorLearnRate);
+	m_targetActor.SoftCopy(m_actor, m_softTargetFactor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -430,8 +424,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagate()
 
 	BackPropagateCritic(&shuffleBuffer[0]);
 	BackPropagateActor(&shuffleBuffer[0]);
-	m_targetActor.SoftCopy(m_actor, m_softTargetFactor);
-	m_targetCritic.SoftCopy(m_critic, m_softTargetFactor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -490,25 +482,18 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::CalculateQvalue(const ndBra
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 {
-	ndBrainFloat stateBuffer[statesDim * 2];
-	ndBrainFloat actionBuffer[actionDim * 2];
-	ndBrainMemVector state(stateBuffer, statesDim);
-	ndBrainMemVector actions(actionBuffer, actionDim);
-
 	GetObservation(&m_currentTransition.m_state[0]);
-	ndMemCpy(&state[0], &m_currentTransition.m_state[0], statesDim);
-	m_actor.MakePrediction(state, actions);
+	m_actor.MakePrediction(m_currentTransition.m_state, m_currentTransition.m_action);
 
 	// explore environment
-	AddExploration(&actions[0]);
-	ApplyActions(&actions[0]);
-	ndMemCpy(&m_currentTransition.m_action[0], &actions[0], actionDim);
+	AddExploration(&m_currentTransition.m_action[0]);
+	ApplyActions(&m_currentTransition.m_action[0]);
 
 	m_currentTransition.m_reward = GetReward();
 	if (!IsSampling())
 	{
 		// Get Q vale from Critic
-		CalculateQvalue(state, actions);
+		CalculateQvalue(m_currentTransition.m_state, m_currentTransition.m_action);
 	}
 }
 
@@ -532,7 +517,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::OptimizeStep()
 	if (m_currentTransition.m_terminalState)
 	{
 		ResetModel();
-		//m_currentTransition.Clear();
 		if (IsSampling() && (m_eposideCount % 100 == 0))
 		{
 			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_replayBuffer.GetCapacity(), m_eposideCount);

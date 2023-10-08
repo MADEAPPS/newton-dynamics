@@ -22,7 +22,7 @@
 
 namespace ndCarpole_0
 {
-	#define D_USE_POLE_TRAIN_AGENT
+	//#define D_USE_POLE_TRAIN_AGENT
 	//#define D_USE_POLE_POLICY_GRAD
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
@@ -71,17 +71,17 @@ namespace ndCarpole_0
 
 		#else
 
-			class ndCartpoleAgent_trainer : public ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>
+			class ndCartpoleAgent : public ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>
 			{
 				public:
-				ndCartpoleAgent_trainer(ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters, const ndBrain& qValuePredictor)
+				ndCartpoleAgent(ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters, const ndBrain& qValuePredictor)
 					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(hyperParameters, qValuePredictor)
 					,m_bestActor(qValuePredictor)
 					,m_model(nullptr)
-					,m_stopTraining(2000000)
-					,m_maxGain(-1.0e10f)
-					,m_maxFrames(4000.0f)
 					,m_timer(0)
+					,m_maxGain(ndFloat32(- 1.0e10f))
+					,m_maxFrames(5000)
+					,m_stopTraining(2000000)
 					,m_averageQvalue()
 					,m_averageFramesPerEpisodes()
 				{
@@ -93,7 +93,7 @@ namespace ndCarpole_0
 					m_timer = ndGetTimeInMicroseconds();
 				}
 
-				~ndCartpoleAgent_trainer()
+				~ndCartpoleAgent()
 				{
 					if (m_outFile)
 					{
@@ -156,13 +156,13 @@ namespace ndCarpole_0
 						ndBrainAgentDQN_Trainer::OptimizeStep();
 						episodeCount -= GetEposideCount();
 
-						if (m_averageFramesPerEpisodes.GetAverage() >= m_maxFrames)
+						if (m_averageFramesPerEpisodes.GetAverage() >= ndReal(m_maxFrames))
 						{
 							if (m_averageQvalue.GetAverage() > m_maxGain)
 							{
 								m_bestActor.CopyFrom(m_actor);
 								m_maxGain = m_averageQvalue.GetAverage();
-								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
+								ndExpandTraceMessage("%d: best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetFramesCount(), GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
 							}
 						}
 
@@ -198,11 +198,11 @@ namespace ndCarpole_0
 				FILE* m_outFile;
 				ndBrain m_bestActor;
 				ndCartpole* m_model;
-				ndInt32 m_stopTraining;
-				ndFloat32 m_maxGain;
-				ndFloat32 m_maxFrames;
 				ndUnsigned64 m_timer;
-				mutable ndMovingAverage<512> m_averageQvalue;
+				ndFloat32 m_maxGain;
+				ndInt32 m_maxFrames;
+				ndInt32 m_stopTraining;
+				mutable ndMovingAverage<1024> m_averageQvalue;
 				mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 			};
 		#endif
@@ -408,10 +408,11 @@ namespace ndCarpole_0
 		ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 		//hyperParameters.m_threadsCount = 1;
 		//hyperParameters.m_learnRate = ndBrainFloat(1.0e-4f);
-		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent_trainer(hyperParameters, actor));
+		hyperParameters.m_discountFactor = ndBrainFloat(0.995f);
+		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(hyperParameters, actor));
 
 		ndCartpole* const model = new ndCartpole(agent);
-		ndCartpole::ndCartpoleAgent_trainer* const trainer = (ndCartpole::ndCartpoleAgent_trainer*)*agent;
+		ndCartpole::ndCartpoleAgent* const trainer = (ndCartpole::ndCartpoleAgent*)*agent;
 		trainer->m_model = model;
 
 		BuildModel(model, scene, location);
@@ -442,7 +443,6 @@ namespace ndCarpole_0
 }
 
 using namespace ndCarpole_0;
-
 
 void ndCartpoleDiscretePlayer(ndDemoEntityManager* const scene)
 {
