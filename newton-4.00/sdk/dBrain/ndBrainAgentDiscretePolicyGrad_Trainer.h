@@ -32,7 +32,6 @@
 // this is an implementation of the vanilla policy Gradinet as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 
-
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDiscretePolicyGrad_Trainer : public ndBrainAgent, public ndBrainThreadPool
 {
@@ -42,32 +41,98 @@ class ndBrainAgentDiscretePolicyGrad_Trainer : public ndBrainAgent, public ndBra
 		public:
 		HyperParameters()
 		{
-			m_discountFactor = ndBrainFloat(0.99f);
-			m_regularizer = ndBrainFloat(1.0e-6f);
-			m_learnRate = ndBrainFloat(0.001f);
-			m_bashBufferSize = 32;
-			m_replayBufferSize = 1024 * 512;
-			m_targetUpdatePeriod = 1000;
+			m_numberOfHiddenLayers = 3;
+			m_hiddenLayersNumberOfNeuron = 64;
 
-			m_exploreMinProbability = ndBrainFloat(1.0f / 100.0f);
-			m_exploreAnnelining = (m_exploreMinProbability / ndBrainFloat(2.0f));
+			m_bashBufferSize = 32;
+			m_replayBufferSize = 32 * 8;
+			m_learnRate = ndBrainFloat(0.001f);
+			m_regularizer = ndBrainFloat(1.0e-6f);
+			m_discountFactor = ndBrainFloat(0.99f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
 		}
 
 		ndBrainFloat m_learnRate;
 		ndBrainFloat m_regularizer;
 		ndBrainFloat m_discountFactor;
-		ndBrainFloat m_exploreAnnelining;
-		ndBrainFloat m_exploreMinProbability;
 
 		ndInt32 m_threadsCount;
 		ndInt32 m_bashBufferSize;
 		ndInt32 m_replayBufferSize;
-		ndInt32 m_targetUpdatePeriod;
-		ndInt32 m_replayBufferPrefill;
+		ndInt32 m_numberOfHiddenLayers;
+		ndInt32 m_hiddenLayersNumberOfNeuron;
 	};
 
-	ndBrainAgentDiscretePolicyGrad_Trainer(const HyperParameters& hyperParameters, const ndSharedPtr<ndBrain>& actor);
+	template<ndInt32 statesDim, ndInt32 actionDim>
+	class ndTransitionMemory
+	{
+		public:
+		ndTransitionMemory()
+			:m_action(m_actionMem, actionDim)
+			,m_observation(m_observationMem, statesDim)
+			,m_qValue(ndBrainFloat(0.0f))
+			,m_reward(ndBrainFloat(0.0f))
+			,m_advantage(ndBrainFloat(0.0f))
+			,m_logProbability(ndBrainFloat(0.0f))
+			,m_terminalState(false)
+		{
+			Clear();
+		}
+
+		ndTransitionMemory(const ndTransitionMemory& src)
+			:m_action(m_actionMem, actionDim)
+			,m_observation(m_observationMem, statesDim)
+			,m_qValue(src.m_qValue)
+			,m_reward(src.m_reward)
+			,m_advantage(src.m_advantage)
+			,m_logProbability(src.m_logProbability)
+			,m_terminalState(src.m_terminalState)
+		{
+			m_action.Set(src.m_action);
+			m_observation.Set(src.m_observation);
+		}
+
+		void Clear()
+		{
+			m_action.SetCount(0);
+			m_observation.SetCount(0);
+			for (ndInt32 i = 0; i < statesDim; ++i)
+			{
+				m_observation.PushBack(ndBrainFloat(0.0f));
+			}
+
+			for (ndInt32 i = 0; i < actionDim; ++i)
+			{
+				m_action.PushBack(ndBrainFloat(0.0f));
+			}
+
+			m_terminalState = false;
+			m_reward = ndBrainFloat(0.0f);
+			m_qValue = ndBrainFloat(0.0f);
+			m_advantage = ndBrainFloat(0.0f);
+			m_logProbability = ndBrainFloat(0.0f);
+		}
+
+		ndTransitionMemory& operator=(const ndTransitionMemory& src)
+		{
+			new (this) ndTransitionMemory(src);
+			return*this;
+		}
+
+		ndBrainMemVector m_action;
+		ndBrainMemVector m_observation;
+		ndBrainFloat m_qValue;
+		ndBrainFloat m_reward;
+		ndBrainFloat m_advantage;
+		ndBrainFloat m_logProbability;
+		bool m_terminalState;
+
+		private:
+		ndBrainFloat m_actionMem[actionDim];
+		ndBrainFloat m_observationMem[statesDim];
+	};
+
+	ndBrainAgentDiscretePolicyGrad_Trainer(const HyperParameters& hyperParameters);
 	virtual ~ndBrainAgentDiscretePolicyGrad_Trainer();
 
 	ndBrainFloat GetCurrentValue() const;
@@ -75,7 +140,7 @@ class ndBrainAgentDiscretePolicyGrad_Trainer : public ndBrainAgent, public ndBra
 	ndInt32 GetEposideCount() const;
 	ndInt32 GetEpisodeFrames() const;
 
-protected:
+	protected:
 	void Step();
 	void OptimizeStep();
 	bool IsTrainer() const;
@@ -101,15 +166,12 @@ protected:
 	ndBrainOptimizerAdam* m_optimizer;
 	ndArray<ndBrainTrainer*> m_trainers;
 
-	ndBrainReplayBuffer<statesDim, 1> m_replayBuffer;
-	ndBrainReplayTransitionMemory<statesDim, 1> m_currentTransition;
+	ndBrainReplayTransitionMemory<statesDim, actionDim> m_currentTransition____;
+	ndArray<ndBrainReplayTransitionMemory<statesDim, actionDim>> m_replayBuffer____;
 
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_learnRate;
 	ndBrainFloat m_currentQValue;
-	ndBrainFloat m_explorationProbability;
-	ndBrainFloat m_minExplorationProbability;
-	ndBrainFloat m_explorationProbabilityAnnelining;
 	ndInt32 m_frameCount;
 	ndInt32 m_framesAlive;
 	ndInt32 m_eposideCount;
@@ -119,26 +181,42 @@ protected:
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::ndBrainAgentDiscretePolicyGrad_Trainer(const HyperParameters& hyperParameters, const ndSharedPtr<ndBrain>& actor)
+ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::ndBrainAgentDiscretePolicyGrad_Trainer(const HyperParameters& hyperParameters)
 	:ndBrainAgent()
 	,ndBrainThreadPool()
-	,m_actor(*(*actor))
-	,m_target(*(*actor))
+	,m_actor()
+	,m_target()
 	,m_optimizer(nullptr)
-	,m_replayBuffer()
+	,m_currentTransition____()
+	,m_replayBuffer____()
 	,m_gamma(hyperParameters.m_discountFactor)
 	,m_learnRate(hyperParameters.m_learnRate)
 	,m_currentQValue(ndBrainFloat(0.0f))
-	,m_explorationProbability(ndBrainFloat(1.0f))
-	,m_minExplorationProbability(hyperParameters.m_exploreMinProbability)
-	,m_explorationProbabilityAnnelining(hyperParameters.m_exploreAnnelining)
 	,m_frameCount(0)
 	,m_framesAlive(0)
 	,m_eposideCount(0)
 	,m_bashBufferSize(hyperParameters.m_bashBufferSize)
-	,m_targetUpdatePeriod(hyperParameters.m_targetUpdatePeriod)
 	,m_collectingSamples(true)
 {
+	// build neural net
+	ndFixSizeArray<ndBrainLayer*, 32> layers;
+	layers.PushBack(new ndBrainLayerLinear(m_stateSize, hyperParameters.m_hiddenLayersNumberOfNeuron));
+	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
+	{
+		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeuron);
+		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeuron, hyperParameters.m_hiddenLayersNumberOfNeuron));
+		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeuron));
+	}
+	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeuron, m_actionsSize));
+	layers.PushBack(new ndBrainLayerSoftmaxActivation(m_actionsSize));
+
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		m_actor.AddLayer(layers[i]);
+		m_target.AddLayer(layers[i]->Clone());
+	}
+
 	m_trainers.SetCount(0);
 	SetThreadCount(hyperParameters.m_threadsCount);
 	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
@@ -146,13 +224,13 @@ ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::ndBrainAgentDiscre
 		ndBrainTrainer* const trainer = new ndBrainTrainer(&m_actor);
 		m_trainers.PushBack(trainer);
 	}
-
+	
 	SetBufferSize(hyperParameters.m_replayBufferSize);
-	m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / ndBrainFloat(m_replayBuffer.GetCapacity());
+	//m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / ndBrainFloat(m_replayBuffer.GetCapacity());
 
-	InitWeights();
-	m_optimizer = new ndBrainOptimizerAdam();
-	m_optimizer->SetRegularizer(hyperParameters.m_regularizer);
+	//InitWeights();
+	//m_optimizer = new ndBrainOptimizerAdam();
+	//m_optimizer->SetRegularizer(hyperParameters.m_regularizer);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -218,7 +296,7 @@ ndInt32 ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::GetEpisode
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::SetBufferSize(ndInt32 size)
 {
-	m_replayBuffer.SetSize(size);
+	m_replayBuffer____.SetCount(size);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -243,8 +321,10 @@ void ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::BackPropagate
 			{
 			}
 
-			void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+			//void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+			void GetLoss(const ndBrainVector& output, ndBrainVector&)
 			{
+				ndAssert(0);
 				ndAssert(output.GetCount() == actionDim);
 				ndAssert(m_truth.GetCount() == m_trainer.GetBrain()->GetOutputSize());
 
@@ -270,7 +350,7 @@ void ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::BackPropagate
 				//
 				//	for (ndInt32 i = 0; i < statesDim; ++i)
 				//	{
-				//		state[i] = transition.m_nextState[i];
+				//		state[i] = transition.m_nextObservation[i];
 				//	}
 				//	m_agent->m_target.MakePrediction(state, action1);
 				//	action[actionIndex] = transition.m_reward + m_agent->m_gamma * action1[actionIndex];
@@ -285,12 +365,13 @@ void ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::BackPropagate
 			ndInt32 m_index;
 		};
 
+		ndAssert(0);
 		//ndBrainFloat stateBuffer[statesDim * 2];
 		//ndBrainMemVector state(stateBuffer, statesDim);
 		//ndAssert(m_bashBufferSize == m_trainers.GetCount());
-		//const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
-		//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		//{
+		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
 		//	ndBrainTrainer& trainer = *m_trainers[i];
 		//	Loss loss(trainer, this);
 		//	ndInt32 index = ndInt32(shuffleBuffer[i]);
@@ -301,7 +382,7 @@ void ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::BackPropagate
 		//	}
 		//	loss.m_index = index;
 		//	trainer.BackPropagate(state, loss);
-		//}
+		}
 	});
 
 	ndBrainThreadPool::ParallelExecute(PropagateBash);
@@ -337,9 +418,10 @@ ndBrainFloat ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::GetRe
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::PopulateReplayBuffer()
 {
-	GetObservation(&m_currentTransition.m_nextState[0]);
-	m_currentTransition.m_terminalState = IsTerminal();
-	m_replayBuffer.AddTransition(m_currentTransition);
+	ndAssert(0);
+	//GetObservation(&m_currentTransition.m_nextObservation[0]);
+	//m_currentTransition.m_terminalState = IsTerminal();
+	//m_replayBuffer.AddTransition(m_currentTransition);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -354,77 +436,81 @@ void ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::Optimize()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat* const actions)
+//void ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat* const actions)
+void ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat* const)
 {
-	ndInt32 action = 0;
-	ndFloat32 explore = ndRand();
-
-	const ndBrainMemVector qActionValues(actions, actionDim);
-	if (explore <= m_explorationProbability)
-	{
-		// explore environment
-		ndUnsigned32 randomIndex = ndRandInt();
-		action = ndInt32(randomIndex % actionDim);
-	}
-	else
-	{
-		action = qActionValues.ArgMax();
-	}
-
-	m_currentQValue = qActionValues[action];
-	m_currentTransition.m_action[0] = action;
+	ndAssert(0);
+	//ndInt32 action = 0;
+	//ndFloat32 explore = ndRand();
+	//
+	//const ndBrainMemVector qActionValues(actions, actionDim);
+	//if (explore <= m_explorationProbability)
+	//{
+	//	// explore environment
+	//	ndUnsigned32 randomIndex = ndRandInt();
+	//	action = ndInt32(randomIndex % actionDim);
+	//}
+	//else
+	//{
+	//	action = qActionValues.ArgMax();
+	//}
+	//
+	//m_currentQValue = qActionValues[action];
+	//m_currentTransition.m_action[0] = action;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::Step()
 {
-	ndBrainFloat stateBuffer[statesDim * 2];
-	ndBrainFloat actionBuffer[actionDim * 2];
-	ndBrainMemVector state(stateBuffer, statesDim);
-	ndBrainMemVector actions(actionBuffer, actionDim);
-
-	GetObservation(&state[0]);
-	m_actor.MakePrediction(state, actions);
-	AddExploration(&actions[0]);
-
-	ndBrainFloat bestAction = ndBrainFloat(m_currentTransition.m_action[0]);
-	ApplyActions(&bestAction);
-	if (bestAction != ndBrainFloat(m_currentTransition.m_action[0]))
-	{
-		m_currentTransition.m_action[0] = ndInt32(bestAction);
-	}
-
-	m_currentTransition.m_reward = GetReward();
+	ndAssert(0);
+	//ndBrainFloat stateBuffer[statesDim * 2];
+	//ndBrainFloat actionBuffer[actionDim * 2];
+	//ndBrainMemVector state(stateBuffer, statesDim);
+	//ndBrainMemVector actions(actionBuffer, actionDim);
+	//
+	//GetObservation(&state[0]);
+	//m_actor.MakePrediction(state, actions);
+	//AddExploration(&actions[0]);
+	//
+	//ndBrainFloat bestAction = ndBrainFloat(m_currentTransition.m_action[0]);
+	//ApplyActions(&bestAction);
+	//if (bestAction != ndBrainFloat(m_currentTransition.m_action[0]))
+	//{
+	//	m_currentTransition.m_action[0] = ndInt32(bestAction);
+	//}
+	//
+	//m_currentTransition.m_reward = GetReward();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDiscretePolicyGrad_Trainer<statesDim, actionDim>::OptimizeStep()
 {
-	if (!m_frameCount)
-	{
-		ResetModel();
-	}
-
-	PopulateReplayBuffer();
-	if (m_replayBuffer.GetCount() == m_replayBuffer.GetCapacity())
-	{
-		Optimize();
-	}
-
-	if (m_currentTransition.m_terminalState)
-	{
-		ResetModel();
-		if (IsSampling() && (m_eposideCount % 500 == 0))
-		{
-			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_replayBuffer.GetCapacity(), m_eposideCount);
-		}
-		m_eposideCount++;
-		m_framesAlive = 0;
-	}
-
-	m_frameCount++;
-	m_framesAlive++;
-	m_explorationProbability = ndMax(m_explorationProbability - m_explorationProbabilityAnnelining, m_minExplorationProbability);
+	ndAssert(0);
+	//if (!m_frameCount)
+	//{
+	//	ResetModel();
+	//}
+	//
+	//PopulateReplayBuffer();
+	//if (m_replayBuffer.GetCount() == m_replayBuffer.GetCapacity())
+	//{
+	//	Optimize();
+	//}
+	//
+	//if (m_currentTransition.m_terminalState)
+	//{
+	//	ResetModel();
+	//	if (IsSampling() && (m_eposideCount % 500 == 0))
+	//	{
+	//		ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_replayBuffer.GetCapacity(), m_eposideCount);
+	//	}
+	//	m_eposideCount++;
+	//	m_framesAlive = 0;
+	//}
+	//
+	//m_frameCount++;
+	//m_framesAlive++;
+	//m_explorationProbability = ndMax(m_explorationProbability - m_explorationProbabilityAnnelining, m_minExplorationProbability);
 }
 
 #endif 

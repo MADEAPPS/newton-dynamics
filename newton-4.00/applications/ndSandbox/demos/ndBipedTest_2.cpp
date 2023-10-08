@@ -908,7 +908,7 @@ namespace biped2
 
 		void GetStateAndAction(ndFloat32 timestep)
 		{
-			GetState(m_dqnAgent.m_transition.m_state);
+			GetState(m_dqnAgent.m_transition.m_observation);
 			ndFloat32 exploit = ndRand();
 			if (m_dqnAgent.m_exploration > exploit)
 			{
@@ -923,7 +923,7 @@ namespace biped2
 			m_dqnAgent.m_transition.m_reward = 1.0f;
 			m_dqnAgent.m_transition.m_terminalState = false;
 
-			ndFloat32 dist = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::ndModelStateParam::m_comSagittalPosit];
+			ndFloat32 dist = m_dqnAgent.m_transition.m_observation[ndHumanoidBrain::ndModelStateParam::m_comSagittalPosit];
 			if (ndAbs(dist) > 0.4f)
 			{
 				m_dqnAgent.m_transition.m_terminalState = true;

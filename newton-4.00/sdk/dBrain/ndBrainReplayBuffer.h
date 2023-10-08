@@ -36,16 +36,17 @@ class ndBrainReplayTransitionMemory
 	void Clear();
 	ndBrainReplayTransitionMemory& operator=(const ndBrainReplayTransitionMemory& src);
 
-	ndBrainMemVector m_state;
 	ndBrainMemVector m_action;
-	ndBrainMemVector m_nextState;
+	ndBrainMemVector m_observation;
+	ndBrainMemVector m_nextObservation;
 	ndBrainFloat m_reward;
+
 	bool m_terminalState;
 
 	private:
-	ndBrainFloat m_stateMem[statesDim];
 	ndBrainFloat m_actionMem[actionDim];
-	ndBrainFloat m_nextStateMem[statesDim];
+	ndBrainFloat m_observationMem[statesDim];
+	ndBrainFloat m_nextObservationMem[statesDim];
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -64,10 +65,10 @@ class ndBrainReplayBuffer : public ndArray<ndBrainReplayTransitionMemory<statesD
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainReplayTransitionMemory<statesDim, actionDim>::ndBrainReplayTransitionMemory()
-	:m_state(m_stateMem, statesDim)
-	,m_action(m_actionMem, actionDim)
-	,m_nextState(m_nextStateMem, statesDim)
-	,m_reward(0.0f)
+	:m_action(m_actionMem, actionDim)
+	,m_observation(m_observationMem, statesDim)
+	,m_nextObservation(m_nextObservationMem, statesDim)
+	,m_reward(ndBrainFloat (0.0f))
 	,m_terminalState(false)
 {
 	Clear();
@@ -75,21 +76,20 @@ ndBrainReplayTransitionMemory<statesDim, actionDim>::ndBrainReplayTransitionMemo
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainReplayTransitionMemory<statesDim, actionDim>::ndBrainReplayTransitionMemory(const ndBrainReplayTransitionMemory& src)
-	:m_state(m_stateMem, statesDim)
-	,m_action(m_actionMem, actionDim)
-	,m_nextState(m_nextStateMem, statesDim)
+	:m_action(m_actionMem, actionDim)
+	,m_observation(m_observationMem, statesDim)
+	,m_nextObservation(m_nextObservationMem, statesDim)
 	,m_reward(src.m_reward)
 	,m_terminalState(src.m_terminalState)
 {
-	m_state.Set(src.m_state);
 	m_action.Set(src.m_action);
-	m_nextState.Set(src.m_nextState);
+	m_observation.Set(src.m_observation);
+	m_nextObservation.Set(src.m_nextObservation);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainReplayTransitionMemory<statesDim, actionDim>& ndBrainReplayTransitionMemory<statesDim, actionDim>::operator=(const ndBrainReplayTransitionMemory& src)
 {
-	//this->ndBrainReplayTransitionMemory<statesDim, actionDim>::ndBrainReplayTransitionMemory(src);
 	new (this) ndBrainReplayTransitionMemory(src);
 	return* this;
 }
@@ -97,13 +97,13 @@ ndBrainReplayTransitionMemory<statesDim, actionDim>& ndBrainReplayTransitionMemo
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainReplayTransitionMemory<statesDim, actionDim>::Clear()
 {
-	m_state.SetCount(0);
 	m_action.SetCount(0);
-	m_nextState.SetCount(0);
+	m_observation.SetCount(0);
+	m_nextObservation.SetCount(0);
 	for (ndInt32 i = 0; i < statesDim; ++i)
 	{
-		m_state.PushBack(ndBrainFloat(0.0f));
-		m_nextState.PushBack(ndBrainFloat(0.0f));
+		m_observation.PushBack(ndBrainFloat(0.0f));
+		m_nextObservation.PushBack(ndBrainFloat(0.0f));
 	}
 	
 	for (ndInt32 i = 0; i < actionDim; ++i)

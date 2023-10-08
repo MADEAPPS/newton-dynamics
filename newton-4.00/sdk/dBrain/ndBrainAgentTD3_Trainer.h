@@ -44,13 +44,17 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 		public:
 		HyperParameters()
 		{
+			m_numberOfHiddenLayers = 3;
+			m_hiddenLayersNumberOfNeuron = 64;
+
 			m_bashBufferSize = 32;
+			m_replayBufferSize = 1024 * 512;
+			m_replayBufferPrefill = 1024 * 16;
+
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_actorLearnRate = ndBrainFloat(0.0002f);
 			m_criticLearnRate = ndBrainFloat(0.001f);
-			m_replayBufferSize = 1024 * 512;
-			m_replayBufferPrefill = 1024 * 16;
 			m_softTargetFactor = ndBrainFloat(1.0e-3f);
 			m_actionNoiseVariance = ndBrainFloat(0.05f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 2);
@@ -67,9 +71,11 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 		ndInt32 m_bashBufferSize;
 		ndInt32 m_replayBufferSize;
 		ndInt32 m_replayBufferPrefill;
+		ndInt32 m_numberOfHiddenLayers;
+		ndInt32 m_hiddenLayersNumberOfNeuron;
 	};
 
-	ndBrainAgentTD3_Trainer(const HyperParameters& hyperParameters, const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic);
+	ndBrainAgentTD3_Trainer(const HyperParameters& hyperParameters);
 	~ndBrainAgentTD3_Trainer();
 
 	ndInt32 GetFramesCount() const;
@@ -138,15 +144,15 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const HyperParameters& hyperParameters, const ndSharedPtr<ndBrain>& actor, const ndSharedPtr<ndBrain>& critic)
+ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const HyperParameters& hyperParameters)
 	:ndBrainAgent()
 	,ndBrainThreadPool()
-	,m_actor(*(*actor))
-	,m_critic0(*(*critic))
-	,m_critic1(*(*critic))
-	,m_targetActor(m_actor)
-	,m_targetCritic0(m_critic0)
-	,m_targetCritic1(m_critic1)
+	,m_actor()
+	,m_critic0()
+	,m_critic1()
+	,m_targetActor()
+	,m_targetCritic0()
+	,m_targetCritic1()
 	,m_actorOptimizer(nullptr)
 	,m_criticOptimizer0(nullptr)
 	,m_criticOptimizer1(nullptr)
@@ -166,6 +172,44 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const Hyp
 	,m_replayBufferPrefill(hyperParameters.m_replayBufferPrefill)
 	,m_collectingSamples(true)
 {
+
+	ndFixSizeArray<ndBrainLayer*, 32> layers;
+	layers.SetCount(0);
+	layers.PushBack(new ndBrainLayerLinear(m_stateSize, hyperParameters.m_hiddenLayersNumberOfNeuron));
+	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
+	{
+		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeuron);
+		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeuron, hyperParameters.m_hiddenLayersNumberOfNeuron));
+		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeuron));
+	}
+	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeuron, m_actionsSize));
+	layers.PushBack(new ndBrainLayerTanhActivation(m_actionsSize));
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		m_actor.AddLayer(layers[i]);
+		m_targetActor.AddLayer(layers[i]->Clone());
+	}
+
+	// the critic is more complex since is deal with more complex inputs
+	layers.SetCount(0);
+	layers.PushBack(new ndBrainLayerLinear(m_stateSize + m_actionsSize, hyperParameters.m_hiddenLayersNumberOfNeuron * 2));
+	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
+	{
+		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeuron);
+		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeuron * 2, hyperParameters.m_hiddenLayersNumberOfNeuron * 2));
+		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeuron * 2));
+	}
+	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeuron * 2, 1));
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		m_critic0.AddLayer(layers[i]);
+		m_critic1.AddLayer(layers[i]->Clone());
+		m_targetCritic0.AddLayer(layers[i]->Clone());
+		m_targetCritic1.AddLayer(layers[i]->Clone());
+	}
+
 	ndAssert(m_critic0.GetOutputSize() == 1);
 	ndAssert(m_critic1.GetOutputSize() == 1);
 	ndAssert(m_critic0.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
@@ -378,8 +422,8 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 			ndInt32 index = ndInt32(shuffleBuffer[i]);
 			const ndBrainReplayTransitionMemory<statesDim, actionDim>& transition = m_replayBuffer[index];
 		
-			m_targetActor.MakePrediction(transition.m_nextState, nextStateOutput);
-			ndMemCpy(&criticInput[0], &transition.m_nextState[0], statesDim);
+			m_targetActor.MakePrediction(transition.m_nextObservation, nextStateOutput);
+			ndMemCpy(&criticInput[0], &transition.m_nextObservation[0], statesDim);
 			ndMemCpy(&criticInput[statesDim], &nextStateOutput[0], actionDim);
 		
 			ndBrainFloat targetValue = transition.m_reward;
@@ -396,7 +440,7 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateCritic(const nd
 			loss0.m_reward = targetValue;
 			loss1.m_reward = targetValue;
 		
-			ndMemCpy(&criticInput[0], &transition.m_state[0], statesDim);
+			ndMemCpy(&criticInput[0], &transition.m_observation[0], statesDim);
 			ndMemCpy(&criticInput[statesDim], &transition.m_action[0], actionDim);
 		
 			trainer0.BackPropagate(criticInput, loss0);
@@ -436,7 +480,7 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateActor(const ndU
 				
 				ndBrainFloat inputGradientBuffer[(statesDim + actionDim) * 2];
 				ndBrainMemVector inputGradient(inputGradientBuffer, statesDim + actionDim);
-				ndMemCpy(&inputGradient[0], &transition.m_state[0], statesDim);
+				ndMemCpy(&inputGradient[0], &transition.m_observation[0], statesDim);
 				ndMemCpy(&inputGradient[statesDim], &output[0], actionDim);
 				m_agent->m_critic0.CalculateInputGradient(inputGradient, inputGradient);
 				ndMemCpy(&loss[0], &inputGradient[statesDim], actionDim);
@@ -457,7 +501,7 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::BackPropagateActor(const ndU
 			const ndBrainReplayTransitionMemory<statesDim, actionDim>& transition = m_replayBuffer[index];
 		
 			loss.m_index = index;
-			actorTrainer.BackPropagate(transition.m_state, loss);
+			actorTrainer.BackPropagate(transition.m_observation, loss);
 		}
 	});
 
@@ -522,8 +566,8 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::CalculateQvalue(const ndBrai
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentTD3_Trainer<statesDim, actionDim>::Step()
 {
-	GetObservation(&m_currentTransition.m_state[0]);
-	m_actor.MakePrediction(m_currentTransition.m_state, m_currentTransition.m_action);
+	GetObservation(&m_currentTransition.m_observation[0]);
+	m_actor.MakePrediction(m_currentTransition.m_observation, m_currentTransition.m_action);
 
 	// explore environment
 	AddExploration(&m_currentTransition.m_action[0]);
@@ -533,7 +577,7 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::Step()
 	if (!IsSampling())
 	{
 		// Get Q vale from Critic
-		CalculateQvalue(m_currentTransition.m_state, m_currentTransition.m_action);
+		CalculateQvalue(m_currentTransition.m_observation, m_currentTransition.m_action);
 	}
 }
 
@@ -546,7 +590,7 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::OptimizeStep()
 	}
 
 	m_currentTransition.m_terminalState = IsTerminal();
-	GetObservation(&m_currentTransition.m_nextState[0]);
+	GetObservation(&m_currentTransition.m_nextObservation[0]);
 	m_replayBuffer.AddTransition(m_currentTransition);
 
 	if (m_frameCount > m_replayBufferPrefill)

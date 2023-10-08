@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_USE_TD3
+	//#define ND_USE_TD3
 	#define ND_TRAIN_MODEL
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
@@ -300,19 +300,19 @@ namespace ndQuadruped_1
 			};
 
 			#ifdef ND_USE_TD3
-			ndControllerAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
-				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
+			ndControllerAgent_trainer(const HyperParameters& hyperParameters)
+				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
 			#else
-			ndControllerAgent_trainer(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
-				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
+			ndControllerAgent_trainer(const HyperParameters& hyperParameters)
+				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
 			#endif
-				,m_bestActor(*(*actor))
+				,m_bestActor(m_actor)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(3000)
 				,m_startTraning(0)
 				,m_stopTraining(2000000)
-				,m_timer(0)
+				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
 				,m_averageQvalue()
 				,m_averageFramesPerEpisodes()
@@ -328,10 +328,6 @@ namespace ndQuadruped_1
 				m_outFile = fopen("traingPerf-DDPG.csv", "wb");
 				fprintf(m_outFile, "ddpg\n");
 				#endif	
-				m_timer = ndGetTimeInMicroseconds();
-
-				InitWeights();
-				m_bestActor.CopyFrom(m_actor);
 
 				m_explorationAnneliningRate = (m_explorationProbability - m_minExplorationProbability) / (ndBrainFloat(m_stopTraining / 3));
 			}
@@ -409,7 +405,7 @@ namespace ndQuadruped_1
 				ndInt32 stateIndex = 0;
 				ndBrainFloat positReward = ndBrainFloat(0.0f);
 				ndBrainFloat velocReward = ndBrainFloat(0.0f);
-				const ndBrainFloat* const state = &m_currentTransition.m_state[0];
+				const ndBrainFloat* const state = &m_currentTransition.m_observation[0];
 
 				for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 				{
@@ -472,7 +468,7 @@ namespace ndQuadruped_1
 						actions[i] = clippiedNoisyAction;
 					}
 				}
-				m_model->ApplyActions(actions, &m_currentTransition.m_state[0]);
+				m_model->ApplyActions(actions, &m_currentTransition.m_observation[0]);
 			}
 
 			void GetObservation(ndBrainFloat* const state) const
@@ -483,7 +479,7 @@ namespace ndQuadruped_1
 			bool IsTerminal() const
 			{
 				//ndBrainFloat maxVal = ndBrainFloat(0.0f);
-				//const ndBrainFloat* const stateActions = &m_currentTransition.m_state[0];
+				//const ndBrainFloat* const stateActions = &m_currentTransition.m_observation[0];
 				//ndInt32 actionIndex = 0;
 				//for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
 				//{
@@ -1234,7 +1230,7 @@ namespace ndQuadruped_1
 				combinedActions[actionIndex + m_leg0_action_posit_x] = currentState[stateIndex + m_leg0_anim_posit_x] + actions[actionIndex + m_leg0_action_posit_x] * D_EFFECTOR_STEP;
 				combinedActions[actionIndex + m_leg0_action_posit_y] = currentState[stateIndex + m_leg0_anim_posit_y] + actions[actionIndex + m_leg0_action_posit_y] * D_EFFECTOR_STEP;
 				combinedActions[actionIndex + m_leg0_action_posit_z] = currentState[stateIndex + m_leg0_anim_posit_z] + actions[actionIndex + m_leg0_action_posit_z] * D_EFFECTOR_STEP;
-				//actions[actionIndex + m_leg0_action_posit_swivel] = m_currentTransition.m_state[stateIndex + m_leg0_anim_posit_swivel] + actions[actionIndex + m_leg0_action_posit_swivel] * D_SWING_STEP;
+				//actions[actionIndex + m_leg0_action_posit_swivel] = m_currentTransition.m_observation[stateIndex + m_leg0_anim_posit_swivel] + actions[actionIndex + m_leg0_action_posit_swivel] * D_SWING_STEP;
 
 				actionIndex += 3;
 				stateIndex += 9;
@@ -1367,49 +1363,6 @@ namespace ndQuadruped_1
 	ndSharedPtr<ndBrainAgent> BuildAgent()
 	{
 		#ifdef ND_TRAIN_MODEL
-			ndInt32 hiddenLayersNewrons = 64;
-			ndFixSizeArray<ndBrainLayer*, 16> layers;
-			ndSharedPtr<ndBrain> actor(new ndBrain());
-
-			layers.SetCount(0);
-			layers.PushBack(new ndBrainLayerLinear(m_stateSize, hiddenLayersNewrons));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-			{
-				actor->AddLayer(layers[i]);
-			}
-			actor->InitWeightsXavierMethod();
-
-
-			// the critic is more complex since is deal with more complex inputs
-			layers.SetCount(0);
-			ndSharedPtr<ndBrain> critic(new ndBrain());
-			layers.PushBack(new ndBrainLayerLinear(m_stateSize + m_actionsSize, hiddenLayersNewrons * 2));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons * 2));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons * 2));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
-			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-			{
-				critic->AddLayer(layers[i]);
-			}
-			critic->InitWeightsXavierMethod();
-
-
 			// add a reinforcement learning controller 
 			#ifdef ND_USE_TD3
 				ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
@@ -1422,7 +1375,7 @@ namespace ndQuadruped_1
 			hyperParameters.m_criticLearnRate = ndReal(0.0005f);
 			hyperParameters.m_actionNoiseVariance = ndReal(0.125f);
 			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * ndReal(0.25f);
-			ndSharedPtr<ndBrainAgent> agent(new ndModelQuadruped::ndControllerAgent_trainer(hyperParameters, actor, critic));
+			ndSharedPtr<ndBrainAgent> agent(new ndModelQuadruped::ndControllerAgent_trainer(hyperParameters));
 		#else
 			char fileName[1024];
 			ndGetWorkingFileName("quadruped_1.dnn", fileName);

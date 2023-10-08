@@ -61,6 +61,7 @@ ndInt32 ndBrain::GetOutputSize() const
 
 void ndBrain::CopyFrom(const ndBrain& src)
 {
+	ndAssert(src.GetCount() == GetCount());
 	const ndArray<ndBrainLayer*>& layers = *this;
 	const ndArray<ndBrainLayer*>& srcLayers = src;
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)

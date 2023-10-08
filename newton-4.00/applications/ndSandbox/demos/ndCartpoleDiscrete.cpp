@@ -22,7 +22,7 @@
 
 namespace ndCarpole_0
 {
-	//#define D_USE_POLE_TRAIN_AGENT
+	#define D_USE_POLE_TRAIN_AGENT
 	//#define D_USE_POLE_POLICY_GRAD
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
@@ -47,14 +47,26 @@ namespace ndCarpole_0
 	{
 		public:
 		#ifndef D_USE_POLE_TRAIN_AGENT
+			#ifdef D_USE_POLE_POLICY_GRAD
+			class ndCartpoleAgent : public ndBrainAgentDiscretePolicyGrad<m_stateSize, m_actionsSize>
+			#else
 			class ndCartpoleAgent : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
+			#endif
 			{
 				public:
+				#ifdef D_USE_POLE_POLICY_GRAD
+				ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
+					:ndBrainAgentDiscretePolicyGrad<m_stateSize, m_actionsSize>(actor)
+					,m_model(nullptr)
+				{
+				}
+				#else
 				ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
 					:ndBrainAgentDQN<m_stateSize, m_actionsSize>(actor)
 					,m_model(nullptr)
 				{
 				}
+				#endif
 
 				void GetObservation(ndBrainFloat* const state) const
 				{
@@ -71,15 +83,36 @@ namespace ndCarpole_0
 
 		#else
 
+			#ifdef D_USE_POLE_POLICY_GRAD
+			class ndCartpoleAgent : public ndBrainAgentDiscretePolicyGrad_Trainer<m_stateSize, m_actionsSize>
+			#else
 			class ndCartpoleAgent : public ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>
+			#endif
 			{
 				public:
-				ndCartpoleAgent(ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters, const ndBrain& qValuePredictor)
-					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(hyperParameters, qValuePredictor)
-					,m_bestActor(qValuePredictor)
+				#ifdef D_USE_POLE_POLICY_GRAD
+				ndCartpoleAgent(ndBrainAgentDiscretePolicyGrad_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
+					:ndBrainAgentDiscretePolicyGrad_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
+					,m_bestActor(m_bestActor)
 					,m_model(nullptr)
-					,m_timer(0)
+					,m_timer(ndGetTimeInMicroseconds())
 					,m_maxGain(ndFloat32(- 1.0e10f))
+					,m_maxFrames(5000)
+					,m_stopTraining(2000000)
+					,m_averageQvalue()
+					,m_averageFramesPerEpisodes()
+				{
+					ndAssert(0);
+					SetName("cartpoleVPG.dnn");
+					m_outFile = fopen("cartpole-VPG.csv", "wb");
+				}
+				#else
+				ndCartpoleAgent(ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
+					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
+					,m_bestActor(m_actor)
+					,m_model(nullptr)
+					,m_timer(ndGetTimeInMicroseconds())
+					,m_maxGain(ndFloat32(-1.0e10f))
 					,m_maxFrames(5000)
 					,m_stopTraining(2000000)
 					,m_averageQvalue()
@@ -87,11 +120,8 @@ namespace ndCarpole_0
 				{
 					SetName("cartpoleDQN.dnn");
 					m_outFile = fopen("cartpole-DQN.csv", "wb");
-					InitWeights();
-
-					m_bestActor.CopyFrom(m_actor);
-					m_timer = ndGetTimeInMicroseconds();
 				}
+				#endif
 
 				~ndCartpoleAgent()
 				{
@@ -142,18 +172,20 @@ namespace ndCarpole_0
 					m_model->ResetModel();
 				}
 
-				void Step()
-				{
-					ndBrainAgentDQN_Trainer::Step();
-				}
-
 				void OptimizeStep()
 				{
 					ndInt32 stopTraining = GetFramesCount();
 					if (stopTraining <= m_stopTraining)
 					{
 						ndInt32 episodeCount = GetEposideCount();
+
+						#ifdef D_USE_POLE_POLICY_GRAD
+						ndAssert(0);
+						ndBrainAgentDiscretePolicyGrad_Trainer::OptimizeStep();
+						#else
 						ndBrainAgentDQN_Trainer::OptimizeStep();
+						#endif
+
 						episodeCount -= GetEposideCount();
 
 						if (m_averageFramesPerEpisodes.GetAverage() >= ndReal(m_maxFrames))
@@ -380,36 +412,14 @@ namespace ndCarpole_0
 	#ifdef D_USE_POLE_TRAIN_AGENT
 	ndCartpole* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
-		// build neural net controller
-		ndInt32 hiddenLayersNewrons = 64;
-		ndFixSizeArray<ndBrainLayer*, 16> layers;
-		ndBrain actor;
-
-		layers.PushBack(new ndBrainLayerLinear(m_stateSize, hiddenLayersNewrons));
-		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
-		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
-		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
 		#ifdef D_USE_POLE_POLICY_GRAD
-			ndAssert(0);
-			layers.PushBack(new ndBrainLayerSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			ndBrainAgentDiscretePolicyGrad_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+		#else
+			ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 		#endif
-		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-		{
-			actor.AddLayer(layers[i]);
-		}
-		actor.InitWeightsXavierMethod();
-
-		ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 		//hyperParameters.m_threadsCount = 1;
-		//hyperParameters.m_learnRate = ndBrainFloat(1.0e-4f);
 		hyperParameters.m_discountFactor = ndBrainFloat(0.995f);
-		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(hyperParameters, actor));
+		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(hyperParameters));
 
 		ndCartpole* const model = new ndCartpole(agent);
 		ndCartpole::ndCartpoleAgent* const trainer = (ndCartpole::ndCartpoleAgent*)*agent;
@@ -428,7 +438,12 @@ namespace ndCarpole_0
 			ndCartpole* const model = CreateTrainModel(scene, location);
 		#else
 			char fileName[1024];
-			ndGetWorkingFileName("cartpoleDQN.dnn", fileName);
+			#ifdef D_USE_POLE_POLICY_GRAD
+				ndAssert(0);
+				ndGetWorkingFileName("cartpoleVPG.dnn", fileName);
+			#else
+				ndGetWorkingFileName("cartpoleDQN.dnn", fileName);
+			#endif
 	
 			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(actor));

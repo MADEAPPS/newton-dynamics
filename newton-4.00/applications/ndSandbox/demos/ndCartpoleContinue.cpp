@@ -22,7 +22,7 @@
 
 namespace ndCarpole_1
 {
-	//#define D_USE_POLE_TRAIN_AGENT
+	#define D_USE_POLE_TRAIN_AGENT
 	//#define D_USE_POLE_POLICY_GRAD
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
@@ -72,11 +72,11 @@ namespace ndCarpole_1
 			class ndCartpoleAgent: public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
 			{
 				public:
-				ndCartpoleAgent(const HyperParameters& hyperParameters, ndSharedPtr<ndBrain>& actor, ndSharedPtr<ndBrain>& critic)
-					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters, actor, critic)
-					,m_bestActor(*(*actor))
+				ndCartpoleAgent(const HyperParameters& hyperParameters)
+					:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
+					,m_bestActor(m_actor)
 					,m_model(nullptr)
-					,m_timer(0)
+					,m_timer(ndGetTimeInMicroseconds())
 					,m_maxGain(ndFloat32(-1.0e10f))
 					,m_maxFrames(5000)
 					,m_stopTraining(500000)
@@ -86,10 +86,6 @@ namespace ndCarpole_1
 					SetName("cartpoleDDPG.dnn");
 					m_outFile = fopen("cartpole-DDPG.csv", "wb");
 					fprintf(m_outFile, "ddpg\n");
-
-					InitWeights();
-					m_bestActor.CopyFrom(m_actor);
-					m_timer = ndGetTimeInMicroseconds();
 				}
 
 				~ndCartpoleAgent()
@@ -382,57 +378,11 @@ namespace ndCarpole_1
 	#ifdef D_USE_POLE_TRAIN_AGENT
 		ndCartpole* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 		{
-			// build neural net controller
-			ndInt32 hiddenLayersNewrons = 64;
-			ndFixSizeArray<ndBrainLayer*, 16> layers;
-
-			layers.SetCount(0);
-			ndSharedPtr<ndBrain> actor(new ndBrain());
-
-			layers.PushBack(new ndBrainLayerLinear(m_stateSize, hiddenLayersNewrons));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_actionsSize));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-			{
-				actor->AddLayer(layers[i]);
-			}
-			actor->InitWeightsXavierMethod();
-			
-			// the critic is more complex since is deal with more complex inputs
-			layers.SetCount(0);
-			ndSharedPtr<ndBrain> critic(new ndBrain());
-
-			layers.PushBack(new ndBrainLayerLinear(m_stateSize + m_actionsSize, hiddenLayersNewrons * 2));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons * 2));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenLayersNewrons * 2));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
-
-			for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-			{
-				critic->AddLayer(layers[i]);
-			}
-			critic->InitWeightsXavierMethod();
-
 			// add a reinforcement learning controller 
 			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_discountFactor = ndBrainFloat(0.995f);
-			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(hyperParameters, actor, critic));
+			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(hyperParameters));
 
 			ndCartpole* const model = new ndCartpole(agent);
 			ndCartpole::ndCartpoleAgent* const trainer = (ndCartpole::ndCartpoleAgent*)*agent;
