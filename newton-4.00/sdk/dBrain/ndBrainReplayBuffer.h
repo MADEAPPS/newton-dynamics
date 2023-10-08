@@ -89,7 +89,8 @@ ndBrainReplayTransitionMemory<statesDim, actionDim>::ndBrainReplayTransitionMemo
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainReplayTransitionMemory<statesDim, actionDim>& ndBrainReplayTransitionMemory<statesDim, actionDim>::operator=(const ndBrainReplayTransitionMemory& src)
 {
-	this->ndBrainReplayTransitionMemory<statesDim, actionDim>::ndBrainReplayTransitionMemory(src);
+	//this->ndBrainReplayTransitionMemory<statesDim, actionDim>::ndBrainReplayTransitionMemory(src);
+	new (this) ndBrainReplayTransitionMemory(src);
 	return* this;
 }
 
