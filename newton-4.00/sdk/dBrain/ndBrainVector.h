@@ -53,10 +53,11 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void MulSub(const ndBrainVector& a, const ndBrainVector& b);
 
 	ndInt32 ArgMax() const;
-	void CategoricalSample(const ndBrainVector& probability, ndBrainFloat beta);
+	void GaussianNormalize();
+	void CategoricalSample(const ndBrainVector& probability, ndBrainFloat beta = ndBrainFloat(0.5f));
 };
 
-class ndBrainMemVector : public ndBrainVector
+class ndBrainMemVector: public ndBrainVector
 {
 	public:
 	ndBrainMemVector();
@@ -67,5 +68,37 @@ class ndBrainMemVector : public ndBrainVector
 	void Swap(ndBrainMemVector& src);
 	void SetPointer(ndBrainFloat* const memmory);
 };
+
+template<ndInt32 size>
+class ndBrainFixSizeVector: public ndBrainMemVector
+{
+	public:
+	ndBrainFixSizeVector();
+	ndBrainFixSizeVector(const ndBrainFixSizeVector& src);
+	ndBrainFixSizeVector& operator=(const ndBrainFixSizeVector& src);
+
+	private:
+	ndBrainFloat m_buffer[size];
+};
+
+template<ndInt32 size>
+ndBrainFixSizeVector<size>::ndBrainFixSizeVector()
+	:ndBrainMemVector(m_buffer, size)
+{
+}
+
+template<ndInt32 size>
+ndBrainFixSizeVector<size>::ndBrainFixSizeVector(const ndBrainFixSizeVector& src)
+	:ndBrainMemVector(m_buffer, size)
+{
+	Set(src);
+}
+
+template<ndInt32 size>
+ndBrainFixSizeVector<size>& ndBrainFixSizeVector<size>::operator=(const ndBrainFixSizeVector& src)
+{
+	new (this) ndBrainFixSizeVector(src);
+	return*this;
+}
 
 #endif 

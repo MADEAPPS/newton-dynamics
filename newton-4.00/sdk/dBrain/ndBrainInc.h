@@ -51,8 +51,9 @@
 #include <ndBrainLayerSigmoidActivation.h>
 #include <ndBrainLayerSoftmaxActivation.h>
 #include <ndBrainAgentDiscretePolicyGrad.h>
+#include <ndBrainAgentDiscreteVPG_Trainer.h>
 #include <ndBrainLossCategoricalCrossEntropy.h>
-#include <ndBrainAgentDiscretePolicyGrad_Trainer.h>
+
 
 #endif 
 

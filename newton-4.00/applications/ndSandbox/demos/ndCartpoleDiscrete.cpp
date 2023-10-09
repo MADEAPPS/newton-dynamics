@@ -84,16 +84,16 @@ namespace ndCarpole_0
 		#else
 
 			#ifdef D_USE_POLE_POLICY_GRAD
-			class ndCartpoleAgent : public ndBrainAgentDiscretePolicyGrad_Trainer<m_stateSize, m_actionsSize>
+			class ndCartpoleAgent : public ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>
 			#else
 			class ndCartpoleAgent : public ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>
 			#endif
 			{
 				public:
 				#ifdef D_USE_POLE_POLICY_GRAD
-				ndCartpoleAgent(ndBrainAgentDiscretePolicyGrad_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
-					:ndBrainAgentDiscretePolicyGrad_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
-					,m_bestActor(m_bestActor)
+				ndCartpoleAgent(ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
+					:ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
+					,m_bestActor(m_actor)
 					,m_model(nullptr)
 					,m_timer(ndGetTimeInMicroseconds())
 					,m_maxGain(ndFloat32(- 1.0e10f))
@@ -102,7 +102,6 @@ namespace ndCarpole_0
 					,m_averageQvalue()
 					,m_averageFramesPerEpisodes()
 				{
-					ndAssert(0);
 					SetName("cartpoleVPG.dnn");
 					m_outFile = fopen("cartpole-VPG.csv", "wb");
 				}
@@ -180,8 +179,7 @@ namespace ndCarpole_0
 						ndInt32 episodeCount = GetEposideCount();
 
 						#ifdef D_USE_POLE_POLICY_GRAD
-						ndAssert(0);
-						ndBrainAgentDiscretePolicyGrad_Trainer::OptimizeStep();
+						ndBrainAgentDiscreteVPG_Trainer::OptimizeStep();
 						#else
 						ndBrainAgentDQN_Trainer::OptimizeStep();
 						#endif
@@ -413,7 +411,7 @@ namespace ndCarpole_0
 	ndCartpole* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		#ifdef D_USE_POLE_POLICY_GRAD
-			ndBrainAgentDiscretePolicyGrad_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 		#else
 			ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 		#endif

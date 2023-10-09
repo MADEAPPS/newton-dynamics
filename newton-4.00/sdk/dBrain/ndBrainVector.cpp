@@ -108,6 +108,28 @@ void ndBrainVector::CategoricalSample(const ndBrainVector& probability, ndBrainF
 	Scale(ndBrainFloat(1.0f) / sum);
 }
 
+void ndBrainVector::GaussianNormalize()
+{
+	ndFloat64 sum = ndFloat64(0.0f);
+	ndFloat64 sum2= ndFloat64(0.0f);
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		ndFloat64 x = (*this)[i];
+		sum += x;
+		sum2 += x * x;
+	}
+
+	ndBrainFloat mean = ndBrainFloat(sum / GetCount());
+	ndBrainFloat deviation = ndBrainFloat (ndSqrt (ndMax (sum2 / GetCount() - mean, ndFloat64 (1.0e-12f))));
+
+	ndBrainFloat invDeviation = ndBrainFloat(1.0f) / deviation;
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		ndBrainFloat x = (*this)[i];
+		(*this)[i] = (x - mean) * invDeviation;
+	}
+}
+
 void ndBrainVector::Scale(ndBrainFloat scale)
 {
 	ndScale(GetCount(), &(*this)[0], scale);

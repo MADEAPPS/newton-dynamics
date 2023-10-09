@@ -42,15 +42,16 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 		public:
 		HyperParameters()
 		{
-			m_discountFactor = ndBrainFloat(0.99f);
-			m_regularizer = ndBrainFloat(1.0e-6f);
-			m_learnRate = ndBrainFloat(0.001f);
+			m_numberOfHiddenLayers = 3;
+			m_hiddenLayersNumberOfNeurons = 64;
+
 			m_bashBufferSize = 64;
 			m_replayBufferSize = 1024 * 512;
 			m_targetUpdatePeriod = 1000;
-
-			m_numberOfHiddenLayers = 3;
-			m_hiddenLayersNumberOfNeuron = 64;
+			
+			m_learnRate = ndBrainFloat(0.001f);
+			m_regularizer = ndBrainFloat(1.0e-6f);
+			m_discountFactor = ndBrainFloat(0.99f);
 			m_exploreMinProbability = ndBrainFloat(1.0f / 100.0f);
 			m_exploreAnnelining = (m_exploreMinProbability / ndBrainFloat(2.0f));
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize / 4);
@@ -68,7 +69,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 		ndInt32 m_targetUpdatePeriod;
 		ndInt32 m_replayBufferPrefill;
 		ndInt32 m_numberOfHiddenLayers;
-		ndInt32 m_hiddenLayersNumberOfNeuron;
+		ndInt32 m_hiddenLayersNumberOfNeurons;
 	};
 
 	//ndBrainAgentDQN_Trainer(const HyperParameters& hyperParameters, const ndBrain& actor);
@@ -146,15 +147,15 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 {
 	// build neural net
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
-	layers.PushBack(new ndBrainLayerLinear(m_stateSize, hyperParameters.m_hiddenLayersNumberOfNeuron));
+	layers.PushBack(new ndBrainLayerLinear(m_stateSize, hyperParameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
 	{
-		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeuron);
-		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeuron, hyperParameters.m_hiddenLayersNumberOfNeuron));
-		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeuron));
+		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeurons);
+		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, hyperParameters.m_hiddenLayersNumberOfNeurons));
+		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons));
 	}
-	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeuron, m_actionsSize));
+	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, m_actionsSize));
 
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
@@ -271,8 +272,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 				ndAssert(output.GetCount() == actionDim);
 				ndAssert(m_truth.GetCount() == m_trainer.GetBrain()->GetOutputSize());
 
-				ndBrainFloat actionBuffer[actionDim * 2];
-				ndBrainMemVector action(actionBuffer, actionDim);
+				ndBrainFixSizeVector<actionDim> action;
 				
 				const ndBrainReplayTransitionMemory<statesDim, 1>& transition = m_agent->m_replayBuffer[m_index];
 				action.Set(output);
@@ -283,8 +283,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 				}
 				else
 				{
-					ndBrainFloat nextActionBuffer[actionDim * 2];
-					ndBrainMemVector nextAction(nextActionBuffer, actionDim);
+					ndBrainFixSizeVector<actionDim> nextAction;
 					m_agent->m_target.MakePrediction(transition.m_nextObservation, nextAction);
 					action[actionIndex] = transition.m_reward + m_agent->m_gamma * nextAction[actionIndex];
 				}
@@ -385,8 +384,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat*
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 {
-	ndBrainFloat actionBuffer[actionDim * 2];
-	ndBrainMemVector actions(actionBuffer, actionDim);
+	ndBrainFixSizeVector<actionDim> actions;
 
 	GetObservation(&m_currentTransition.m_observation[0]);
 	m_actor.MakePrediction(m_currentTransition.m_observation, actions);
