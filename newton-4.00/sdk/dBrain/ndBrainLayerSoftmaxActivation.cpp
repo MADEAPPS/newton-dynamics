@@ -25,13 +25,11 @@
 
 ndBrainLayerSoftmaxActivation::ndBrainLayerSoftmaxActivation(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)
-	,m_isCathegorical(false)
 {
 }
 
 ndBrainLayerSoftmaxActivation::ndBrainLayerSoftmaxActivation(const ndBrainLayerSoftmaxActivation& src)
 	:ndBrainLayerActivation(src)
-	,m_isCathegorical(src.m_isCathegorical)
 {
 }
 
@@ -40,7 +38,6 @@ ndBrainLayer* ndBrainLayerSoftmaxActivation::Clone() const
 	return new ndBrainLayerSoftmaxActivation(*this);
 }
 
-
 const char* ndBrainLayerSoftmaxActivation::GetLabelId() const
 {
 	return "ndBrainLayerSoftmaxActivation";
@@ -48,48 +45,26 @@ const char* ndBrainLayerSoftmaxActivation::GetLabelId() const
 
 void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-	if (m_isCathegorical)
-	{
-#ifdef _DEBUG
-		ndAssert(output.GetCount() == inputDerivative.GetCount());
-		ndAssert(output.GetCount() == outputDerivative.GetCount());
-		ndInt32 index = 0;
-		for (ndInt32 i = 0; i < outputDerivative.GetCount(); ++i)
-		{
-			ndAssert((outputDerivative[i] == ndBrainFloat(0.0f)) || (outputDerivative[i] == ndBrainFloat(1.0f)));
-			index += (outputDerivative[i] == ndBrainFloat(1.0f)) ? 1 : 0;
-		}
-		ndAssert(index == 1);
-#endif
+	// calculate the output derivative whis is a the jacovian matrix time the input
+	//for (ndInt32 i = 0; i < output.GetCount(); ++i)
+	//{
+	//	ndFloat32 s = output[i];
+	//	ndFloat32 acc = (s * (ndFloat32(1.0f) - s)) * outputDerivative[i];
+	//	for (ndInt32 j = 0; j < output.GetCount(); ++j)
+	//	{
+	//		if (i != j)
+	//		{
+	//			acc -= s * output[j] * outputDerivative[j];
+	//		}
+	//	}
+	//	inputDerivative[i] = ndBrainFloat(acc);
+	//}
 
-		// basically it acts as a loss function
-		inputDerivative.Set(output);
-		inputDerivative.Sub(outputDerivative);
-	}
-	else
-	{
-		ndAssert(0);
-		// calculate the output derivative whis is a the jacovian matrix time the input
-		//for (ndInt32 i = 0; i < output.GetCount(); ++i)
-		//{
-		//	ndFloat32 s = output[i];
-		//	ndFloat32 acc = (s * (ndFloat32(1.0f) - s)) * outputDerivative[i];
-		//	for (ndInt32 j = 0; j < output.GetCount(); ++j)
-		//	{
-		//		if (i != j)
-		//		{
-		//			acc -= s * output[j] * outputDerivative[j];
-		//		}
-		//	}
-		//	inputDerivative[i] = ndBrainFloat(acc);
-		//}
-
-		// y = (O * I - O * transp(O)) * x
-		ndBrainFloat s = -outputDerivative.Dot(output);
-		inputDerivative.Set(output);
-		inputDerivative.Scale(s);
-		inputDerivative.MulAdd(output, outputDerivative);
-	}
+	// y = (O * I - O * transp(O)) * x
+	ndBrainFloat s = -outputDerivative.Dot(output);
+	inputDerivative.Set(output);
+	inputDerivative.Scale(s);
+	inputDerivative.MulAdd(output, outputDerivative);
 
 	inputDerivative.FlushToZero();
 }

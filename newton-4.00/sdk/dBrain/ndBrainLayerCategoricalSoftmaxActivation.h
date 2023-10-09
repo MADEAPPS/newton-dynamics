@@ -19,11 +19,11 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_SOFTMAX_ACTIVATION_H__
-#define _ND_BRAIN_LAYER_SOFTMAX_ACTIVATION_H__
+#ifndef _ND_BRAIN_LAYER_CATEGORICAL_SOFTMAX_ACTIVATION_H__
+#define _ND_BRAIN_LAYER_CATEGORICAL_SOFTMAX_ACTIVATION_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainLayerActivation.h"
+#include "ndBrainLayerSoftmaxActivation.h"
 
 
 // note: SoftMax activation layer is designed you work with the Categorical entropy loss
@@ -33,16 +33,15 @@
 // which make use that the combine the truth value can only be 1 or 0, 
 // and this fact cancel out many term from the derivative equation. 
 // in that regard, the loss is just the truth value.
-class ndBrainLayerSoftmaxActivation : public ndBrainLayerActivation
+class ndBrainLayerCategoricalSoftmaxActivation : public ndBrainLayerSoftmaxActivation
 {
 	public:
-	ndBrainLayerSoftmaxActivation(ndInt32 neurons);
-	ndBrainLayerSoftmaxActivation(const ndBrainLayerSoftmaxActivation& src);
+	ndBrainLayerCategoricalSoftmaxActivation(ndInt32 neurons);
+	ndBrainLayerCategoricalSoftmaxActivation(const ndBrainLayerCategoricalSoftmaxActivation& src);
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
 	const char* GetLabelId() const;
-	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 };
 

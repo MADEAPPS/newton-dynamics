@@ -117,14 +117,6 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	ndFixSizeArray<ndInt32, 256> prefixScan;
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
 
-	bool isSoftMax = strcmp(layers[layers.GetCount() - 1]->GetLabelId(), "ndBrainLayerSoftmaxActivation") ? false : true;
-	ndAssert(!loss.IsCategorical() || isSoftMax);
-	if (isSoftMax && loss.IsCategorical())
-	{
-		ndBrainLayerSoftmaxActivation* const categoricalSoftMax = (ndBrainLayerSoftmaxActivation*)(layers[layers.GetCount() - 1]);
-		categoricalSoftMax->m_isCathegorical = true;
-	}
-
 	ndInt32 maxSize = 0;
 	ndInt32 sizeAcc = (layers[0]->GetInputSize() + 7) & -8;
 
