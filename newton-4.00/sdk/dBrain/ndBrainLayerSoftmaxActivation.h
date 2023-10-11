@@ -25,14 +25,6 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
-
-// note: SoftMax activation layer is designed you work with the Categorical entropy loss
-// the rules for using it are
-// 1- can only be use as when the last layer of the neural net is SoftMax layer
-// 2- the function does not calculate the derivative since this is done by the SoftMax layer 
-// which make use that the combine the truth value can only be 1 or 0, 
-// and this fact cancel out many term from the derivative equation. 
-// in that regard, the loss is just the truth value.
 class ndBrainLayerSoftmaxActivation : public ndBrainLayerActivation
 {
 	public:

@@ -47,6 +47,7 @@ const char* ndBrainLayerCategoricalSoftmaxActivation::GetLabelId() const
 void ndBrainLayerCategoricalSoftmaxActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	#ifdef _DEBUG
+	// check that the ouputDerivative is a one hat encoding 
 	ndAssert(output.GetCount() == inputDerivative.GetCount());
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
 	ndInt32 index = 0;
