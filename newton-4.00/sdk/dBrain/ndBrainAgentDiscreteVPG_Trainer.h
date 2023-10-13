@@ -200,6 +200,13 @@ ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::ndBrainAgentDiscreteVPG_T
 	m_rewads.SetCount(hyperParameters.m_maxTrajectorySteps);
 	m_trajectory.SetCount(hyperParameters.m_maxTrajectorySteps);
 	m_trajectory.SetCount(0);
+
+	//ndBrainVector xxx;
+	//for (ndInt32 i = 0; i < 100000; ++i)
+	//{
+	//	xxx.PushBack(ndGaussianRandom(0.0f, 0.1f));
+	//}
+	//xxx.GaussianNormalize();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

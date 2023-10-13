@@ -108,25 +108,34 @@ void ndBrainVector::CategoricalSample(const ndBrainVector& probability, ndBrainF
 	Scale(ndBrainFloat(1.0f) / sum);
 }
 
-void ndBrainVector::GaussianNormalize()
+void ndBrainVector::CalculateMeanAndDeviation(ndBrainFloat& mean, ndBrainFloat& deviation) const
 {
 	ndFloat64 sum = ndFloat64(0.0f);
-	ndFloat64 sum2= ndFloat64(0.0f);
+	ndFloat64 sum2 = ndFloat64(0.0f);
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		ndFloat64 x = (*this)[i];
 		sum += x;
 		sum2 += x * x;
 	}
+	ndFloat64 den = ndFloat64(1.0f) / ndBrainFloat(GetCount());
+	ndFloat64 average = sum * den;
+	ndFloat64 variance2 = ndMax((sum2 * den - average * average), ndFloat64(1.0e-12f));
 
-	ndBrainFloat mean = ndBrainFloat(sum / GetCount());
-	ndBrainFloat deviation = ndBrainFloat (ndSqrt (ndMax (sum2 / GetCount() - mean, ndFloat64 (1.0e-12f))));
+	mean = ndBrainFloat(average);
+	deviation = ndBrainFloat(ndSqrt (variance2));
+}
 
-	ndBrainFloat invDeviation = ndBrainFloat(1.0f) / deviation;
+void ndBrainVector::GaussianNormalize()
+{
+	ndBrainFloat mean;
+	ndBrainFloat variance;
+	CalculateMeanAndDeviation(mean, variance);
+	ndBrainFloat invVariance = ndBrainFloat(1.0f) / variance;
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		ndBrainFloat x = (*this)[i];
-		(*this)[i] = (x - mean) * invDeviation;
+		(*this)[i] = (x - mean) * invVariance;
 	}
 }
 

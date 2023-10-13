@@ -53,6 +53,8 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void MulSub(const ndBrainVector& a, const ndBrainVector& b);
 
 	ndInt32 ArgMax() const;
+	void CalculateMeanAndDeviation(ndBrainFloat& mean, ndBrainFloat& deviation) const;
+
 	void GaussianNormalize();
 	void CategoricalSample(const ndBrainVector& probability, ndBrainFloat beta = ndBrainFloat(0.5f));
 };
