@@ -45,7 +45,7 @@ const char* ndBrainLayerSoftmaxActivation::GetLabelId() const
 
 void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-	// calculate the output derivative whis is a the jacovian matrix time the input
+	// calculate the output derivative which is a the Jacobian matrix time the input
 	//for (ndInt32 i = 0; i < output.GetCount(); ++i)
 	//{
 	//	ndFloat32 s = output[i];
@@ -60,6 +60,7 @@ void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector& output,
 	//	inputDerivative[i] = ndBrainFloat(acc);
 	//}
 
+	// better way to calculate the output derivative which is a the Jacobian matrix time the input
 	// y = (O * I - O * transp(O)) * x
 	ndBrainFloat s = -outputDerivative.Dot(output);
 	inputDerivative.Set(output);

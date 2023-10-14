@@ -55,6 +55,5 @@
 #include <ndBrainLossCategoricalCrossEntropy.h>
 #include <ndBrainLayerCategoricalSoftmaxActivation.h>
 
-
 #endif 
 

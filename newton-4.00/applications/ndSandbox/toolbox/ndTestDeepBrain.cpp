@@ -276,7 +276,7 @@ static void MnistTrainingSet()
 			,m_bashBufferSize(64)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize/4);
-
+			//threadCount = 1;
 			SetThreadCount(threadCount);
 			for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 			{
@@ -301,30 +301,44 @@ static void MnistTrainingSet()
 			
 			auto BackPropagateBash = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &shuffleBashBuffer](ndInt32 threadIndex, ndInt32 threadCount)
 			{
-				//class Loss : public ndBrainLossLeastSquaredError
-				class Loss : public ndBrainLossCategoricalCrossEntropy
+				class CategoricalLoss : public ndBrainLossCategoricalCrossEntropy
 				{
 					public:
-					Loss(ndInt32 size)
+					CategoricalLoss(ndInt32 size)
 						:ndBrainLossCategoricalCrossEntropy(size)
-						//:ndBrainLossLeastSquaredError(size)
 					{
 					}
 				
 					void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 					{
 						ndBrainLossCategoricalCrossEntropy::GetLoss(output, loss);
-						//ndBrainLossLeastSquaredError::GetLoss(output, loss);
 					}
 				
 					const ndBrainMatrix* m_trainingLabels;
 				};
 
+				class LeastSquaredErrorLoss : public ndBrainLossLeastSquaredError
+				{
+					public:
+					LeastSquaredErrorLoss(ndInt32 size)
+						:ndBrainLossLeastSquaredError(size)
+					{
+					}
+
+					void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+					{
+						ndBrainLossLeastSquaredError::GetLoss(output, loss);
+					}
+
+					const ndBrainMatrix* m_trainingLabels;
+				};
+
+
 				const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				{
 					ndBrainTrainer& trainer = *m_trainers[i];
-					Loss loss(m_brain.GetOutputSize());
+					CategoricalLoss loss(m_brain.GetOutputSize());
 
 					ndInt32 index = ndInt32(shuffleBashBuffer[i]);
 					loss.SetTruth((*trainingLabels)[index]);
