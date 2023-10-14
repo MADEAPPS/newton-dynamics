@@ -26,7 +26,12 @@
 
 static std::mt19937& GetRandomGenerator()
 {
+	// for debugging this is better than an hardware generator
 	static std::mt19937 generator;
+
+	// thy to select a hardware non deterministic random generator
+	//static std::mt19937 generator(std::random_device{}());
+
 	return generator;
 }
 
@@ -37,24 +42,47 @@ void ndSetRandSeed(ndUnsigned32 seed)
 
 ndUnsigned32 ndRandInt()
 {
+	//static ndSpinLock __lock__;
+	//ndScopeSpinLock lock(__lock__);
+	//std::mt19937& generator = GetRandomGenerator();
+	//return ndUnsigned32(generator());
+
+	std::uniform_int_distribution<ndUnsigned32> uniform;
 	static ndSpinLock __lock__;
 	ndScopeSpinLock lock(__lock__);
-	std::mt19937& generator = GetRandomGenerator();
-	return ndUnsigned32(generator());
+	return uniform(GetRandomGenerator());
 }
 
 ndFloat32 ndRand()
 {
-	ndUnsigned32 minValue = std::mt19937::min();
-	ndUnsigned32 maxValue = std::mt19937::max();
-	ndUnsigned32 spand = maxValue - minValue;
+	//ndUnsigned32 minValue = std::mt19937::min();
+	//ndUnsigned32 maxValue = std::mt19937::max();
+	//ndUnsigned32 spand = maxValue - minValue;
+	//ndFloat32 r = ndFloat32 (ndFloat64(ndRandInt()) / (ndFloat64)spand);
+	//return r;
 
-	ndFloat32 r = ndFloat32 (ndFloat64(ndRandInt()) / (ndFloat64)spand);
-	return r;
+	std::uniform_real_distribution<ndFloat32> uniform(ndFloat32 (0.0f), ndFloat32(1.0f));
+	static ndSpinLock __lock__;
+	ndScopeSpinLock lock(__lock__);
+	return uniform(GetRandomGenerator());
 }
 
 ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
 {
+	// It seems the standard library normal random is based of the Box–Muller transform
+	// https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
+	// this is probably more accurate than Abramowitz and Stegun which is based on the 
+	// inverse cumulative, however Box–Muller is quite problematic, since it uses memory, 
+	// and more calls to rand and transcendental functions, 
+	// therefore, I am sticking with inverse cumulative method.
+	// beside, all my test show that inverse cumulative seems in fact more accurate.
+	// 
+	//std::normal_distribution<ndReal> gaussian(mean, sigma);
+	//static ndSpinLock __lock__;
+	//ndScopeSpinLock lock(__lock__);
+	//return gaussian(GetRandomGenerator());
+
+
 	// from Abramowitz and Stegun formula 26.2.23.
 	// calculate a normal value with 0.0 mean and 1.0 deviation 
 	// the absolute value of the error should be less than 4.5e-4.
@@ -109,8 +137,8 @@ ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
 		}
 
 		// Taylor expansion does not produces good approximation for value far from the center. 
-		// not sure how the Abramowitz and Stegun formula is derived but is far better than taylor
-		// in bot accuracy and performance 
+		// not sure how the Abramowitz and Stegun formula is derived but is far better than Taylor
+		// in both accuracy and performance 
 		// ndFloat32 value1 = (r >= ndFloat32(0.5f)) ? TailorExpansion(r - ndFloat32(0.5f)) : -TailorExpansion(ndFloat32(0.5f) - r);
 		return value;
 	};
