@@ -46,6 +46,10 @@ class ndBrainTrainer: public ndClassAlloc
 	ndBrainVector* GetBiasGradients(ndInt32 index) const;
 	ndBrainMatrix* GetWeightGradients(ndInt32 index) const;
 
+	void ClearGradients();
+	void ScaleWeights(const ndBrainFloat s);
+	void AddGradients(const ndBrainTrainer* const src);
+
 	private:
 	ndArray<ndLayerData*> m_data;
 	ndBrain* m_brain;

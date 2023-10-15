@@ -81,3 +81,4 @@ void ndBrainOptimizer::AccumulateGradients(ndBrainThreadPool* const threadPool, 
 
 	threadPool->ndBrainThreadPool::ParallelExecute(AddGradients);
 }
+

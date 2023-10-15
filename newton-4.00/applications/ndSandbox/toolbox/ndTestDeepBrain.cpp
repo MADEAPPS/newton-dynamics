@@ -275,7 +275,7 @@ static void MnistTrainingSet()
 			,m_learnRate(ndReal(0.001f))
 			,m_bashBufferSize(64)
 		{
-			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize/4);
+			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
 			//threadCount = 1;
 			SetThreadCount(threadCount);
 			for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
@@ -571,6 +571,16 @@ static void MnistTestSet()
 void ndTestDeedBrian()
 {
 	ndSetRandSeed(12345);
+
+	//int xxxxxxx = ndRandInt();
+	//ndFloat32 xxxxxxx0 = ndRand();
+	//ndBrainVector xxx;
+	//for (ndInt32 i = 0; i < 100000; ++i)
+	//{
+	//	//xxx.PushBack(ndGaussianRandom(0.0f, 0.1f));
+	//	xxx.PushBack(1.0f);
+	//}
+	//xxx.GaussianNormalize();
 
 	//ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();

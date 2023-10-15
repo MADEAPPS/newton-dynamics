@@ -23,7 +23,7 @@
 namespace ndCarpole_0
 {
 	#define D_USE_POLE_TRAIN_AGENT
-	//#define D_USE_POLE_POLICY_GRAD
+	#define D_USE_POLE_POLICY_GRAD
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)

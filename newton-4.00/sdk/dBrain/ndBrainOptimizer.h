@@ -37,8 +37,8 @@ class ndBrainOptimizer : public ndClassAlloc
 	void SetRegularizer(ndBrainFloat regularizer);
 	virtual void Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate);
 
-	protected:
 	void AccumulateGradients(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients) const;
+	protected:
 	ndBrainFloat m_weighDecayRegularizer;
 };
 
