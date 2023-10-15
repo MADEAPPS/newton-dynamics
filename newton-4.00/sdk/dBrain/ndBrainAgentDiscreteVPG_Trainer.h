@@ -138,7 +138,7 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	ndInt32 m_framesAlive;
 	ndInt32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
-	ndInt32 m_targetUpdatePeriod;
+	ndInt32 m_maxTrajectorySteps;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -155,6 +155,7 @@ ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::ndBrainAgentDiscreteVPG_T
 	,m_framesAlive(0)
 	,m_eposideCount(0)
 	,m_bashBufferSize(hyperParameters.m_bashBufferSize)
+	,m_maxTrajectorySteps(hyperParameters.m_maxTrajectorySteps)
 {
 	// build neural net
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
@@ -191,8 +192,9 @@ ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::ndBrainAgentDiscreteVPG_T
 	m_optimizer = new ndBrainOptimizerAdam();
 	m_optimizer->SetRegularizer(hyperParameters.m_regularizer);
 
-	m_rewards.SetCount(hyperParameters.m_maxTrajectorySteps);
-	m_trajectory.SetCount(hyperParameters.m_maxTrajectorySteps);
+	ndInt32 trajectoryPadd = 1024;
+	m_rewards.SetCount(m_maxTrajectorySteps + trajectoryPadd);
+	m_trajectory.SetCount(m_maxTrajectorySteps + trajectoryPadd);
 	m_trajectory.SetCount(0);
 }
 
@@ -270,7 +272,9 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::BackPropagate()
 	});
 	ndBrainThreadPool::ParallelExecute(ClearGradients);
 
-	for (ndInt32 base = 0; base < m_trajectory.GetCount(); base += m_bashBufferSize)
+	const ndInt32 steps = ndMin(m_maxTrajectorySteps, m_trajectory.GetCount());
+
+	for (ndInt32 base = 0; base < steps; base += m_bashBufferSize)
 	{
 		auto CalculateGradients = ndMakeObject::ndFunction([this, base](ndInt32 threadIndex, ndInt32 threadCount)
 		{
@@ -415,7 +419,7 @@ ndBrainFloat ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::SelectAction
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
 		index = i;
-		if (pdf[i] <= r)
+		if (pdf[i] < r)
 		{
 			break;
 		}
