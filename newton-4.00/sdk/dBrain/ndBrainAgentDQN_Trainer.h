@@ -45,11 +45,11 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 			m_numberOfHiddenLayers = 3;
 			m_hiddenLayersNumberOfNeurons = 64;
 
-			m_bashBufferSize = 64;
+			m_bashBufferSize = 32;
 			m_replayBufferSize = 1024 * 512;
 			m_targetUpdatePeriod = 1000;
 			
-			m_learnRate = ndBrainFloat(0.001f);
+			m_learnRate = ndBrainFloat(0.0005f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_exploreMinProbability = ndBrainFloat(1.0f / 100.0f);
@@ -364,39 +364,40 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat*
 	if (explore <= m_explorationProbability)
 	{
 		// explore environment
-		//ndUnsigned32 randomIndex = ndRandInt();
-		//action = ndInt32(randomIndex % actionDim);
+		ndUnsigned32 randomIndex = ndRandInt();
+		action = ndInt32(randomIndex % actionDim);
 
 		// using soft max and cumulative distribution instead
-		ndBrainFloat max = ndBrainFloat(1.0e-16f);
-		for (ndInt32 i = actionDim - 1; i >= 0; --i)
-		{
-			max = ndMax(actions[i], max);
-		}
-		ndBrainFixSizeVector<actionDim + 1> pdf;
-		pdf.SetCount(0);
-		ndBrainFloat acc = ndBrainFloat(0.0f);
-		for (ndInt32 i = 0; i < actionDim; ++i)
-		{
-			ndBrainFloat in = ndMax((actions[i] - max), ndBrainFloat(-30.0f));
-			ndAssert(in <= ndBrainFloat(0.0f));
-			ndBrainFloat prob = ndBrainFloat(ndExp(in));
-			pdf.PushBack(acc);
-			acc += prob;
-		}
-		pdf.PushBack(acc);
-		pdf.Scale(ndBrainFloat(1.0f) / acc);
-
-		ndFloat32 r = ndRand();
-		action = actionDim - 1;
-		for (ndInt32 i = actionDim - 1; i >= 0; --i)
-		{
-			action = i;
-			if (pdf[i] < r)
-			{
-				break;
-			}
-		}
+		// seem like a good idead but in fact si really bad. 
+		//ndBrainFloat max = ndBrainFloat(1.0e-16f);
+		//for (ndInt32 i = actionDim - 1; i >= 0; --i)
+		//{
+		//	max = ndMax(actions[i], max);
+		//}
+		//ndBrainFixSizeVector<actionDim + 1> pdf;
+		//pdf.SetCount(0);
+		//ndBrainFloat acc = ndBrainFloat(0.0f);
+		//for (ndInt32 i = 0; i < actionDim; ++i)
+		//{
+		//	ndBrainFloat in = ndMax((actions[i] - max), ndBrainFloat(-30.0f));
+		//	ndAssert(in <= ndBrainFloat(0.0f));
+		//	ndBrainFloat prob = ndBrainFloat(ndExp(in));
+		//	pdf.PushBack(acc);
+		//	acc += prob;
+		//}
+		//pdf.PushBack(acc);
+		//pdf.Scale(ndBrainFloat(1.0f) / acc);
+		//
+		//ndFloat32 r = ndRand();
+		//action = actionDim - 1;
+		//for (ndInt32 i = actionDim - 1; i >= 0; --i)
+		//{
+		//	action = i;
+		//	if (pdf[i] < r)
+		//	{
+		//		break;
+		//	}
+		//}
 	}
 	else
 	{

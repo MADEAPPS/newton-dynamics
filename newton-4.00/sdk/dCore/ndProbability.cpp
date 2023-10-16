@@ -42,11 +42,6 @@ void ndSetRandSeed(ndUnsigned32 seed)
 
 ndUnsigned32 ndRandInt()
 {
-	//static ndSpinLock __lock__;
-	//ndScopeSpinLock lock(__lock__);
-	//std::mt19937& generator = GetRandomGenerator();
-	//return ndUnsigned32(generator());
-
 	std::uniform_int_distribution<ndUnsigned32> uniform;
 	static ndSpinLock __lock__;
 	ndScopeSpinLock lock(__lock__);
@@ -55,12 +50,6 @@ ndUnsigned32 ndRandInt()
 
 ndFloat32 ndRand()
 {
-	//ndUnsigned32 minValue = std::mt19937::min();
-	//ndUnsigned32 maxValue = std::mt19937::max();
-	//ndUnsigned32 spand = maxValue - minValue;
-	//ndFloat32 r = ndFloat32 (ndFloat64(ndRandInt()) / (ndFloat64)spand);
-	//return r;
-
 	std::uniform_real_distribution<ndFloat32> uniform(ndFloat32 (0.0f), ndFloat32(1.0f));
 	static ndSpinLock __lock__;
 	ndScopeSpinLock lock(__lock__);
