@@ -46,196 +46,191 @@ namespace ndCarpole_0
 	class ndCartpole: public ndModelArticulation
 	{
 		public:
-		#ifndef D_USE_POLE_TRAIN_AGENT
-			#ifdef D_USE_POLE_POLICY_GRAD
-			class ndCartpoleAgent : public ndBrainAgentDiscretePolicyGrad<m_stateSize, m_actionsSize>
-			#else
-			class ndCartpoleAgent : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
-			#endif
-			{
-				public:
-				#ifdef D_USE_POLE_POLICY_GRAD
-				ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
-					:ndBrainAgentDiscretePolicyGrad<m_stateSize, m_actionsSize>(actor)
-					,m_model(nullptr)
-				{
-				}
-				#else
-				ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
-					:ndBrainAgentDQN<m_stateSize, m_actionsSize>(actor)
-					,m_model(nullptr)
-				{
-				}
-				#endif
 
-				void GetObservation(ndBrainFloat* const state) const
-				{
-					m_model->GetObservation(state);
-				}
-
-				virtual void ApplyActions(ndBrainFloat* const actions) const
-				{
-					m_model->ApplyActions(actions);
-				}
-
-				ndCartpole* m_model;
-			};
-
+		#ifdef D_USE_POLE_POLICY_GRAD
+		class ndCartpoleAgent : public ndBrainAgentDiscretePolicyGrad<m_stateSize, m_actionsSize>
 		#else
-
-			#ifdef D_USE_POLE_POLICY_GRAD
-			class ndCartpoleAgent : public ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>
-			#else
-			class ndCartpoleAgent : public ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>
-			#endif
-			{
-				public:
-				#ifdef D_USE_POLE_POLICY_GRAD
-				ndCartpoleAgent(ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
-					:ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
-					,m_bestActor(m_actor)
-					,m_model(nullptr)
-					,m_timer(ndGetTimeInMicroseconds())
-					,m_maxGain(ndFloat32(- 1.0e10f))
-					,m_maxFrames(5000)
-					,m_stopTraining(2000000)
-					,m_averageQvalue()
-					,m_averageFramesPerEpisodes()
-				{
-					SetName("cartpoleVPG.dnn");
-					m_outFile = fopen("cartpole-VPG.csv", "wb");
-				}
-				#else
-				ndCartpoleAgent(ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
-					:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
-					,m_bestActor(m_actor)
-					,m_model(nullptr)
-					,m_timer(ndGetTimeInMicroseconds())
-					,m_maxGain(ndFloat32(-1.0e10f))
-					,m_maxFrames(5000)
-					,m_stopTraining(2000000)
-					,m_averageQvalue()
-					,m_averageFramesPerEpisodes()
-				{
-					SetName("cartpoleDQN.dnn");
-					m_outFile = fopen("cartpole-DQN.csv", "wb");
-				}
-				#endif
-
-				~ndCartpoleAgent()
-				{
-					if (m_outFile)
-					{
-						fclose(m_outFile);
-					}
-				}
-
-				ndBrainFloat GetReward() const
-				{
-					return m_model->GetReward();
-				}
-
-				virtual void ApplyActions(ndBrainFloat* const actions) const
-				{
-					if (GetEpisodeFrames() >= 10000)
-					{
-						ndUnsigned32 randomIndex = ndRandInt();
-						*actions = ndReal (ndInt32(randomIndex % 3));
-					}
-
-					m_model->ApplyActions(actions);
-				}
-
-				void GetObservation(ndBrainFloat* const state) const
-				{
-					m_model->GetObservation(state);
-				}
-
-				bool IsTerminal() const
-				{
-					bool state = m_model->IsTerminal();
-					if (!IsSampling())
-					{
-						m_averageQvalue.Update(ndReal (GetCurrentValue()));
-						if (state)
-						{
-							m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
-						}
-					}
-
-					return state;
-				}
-
-				void ResetModel() const
-				{
-					m_model->ResetModel();
-				}
-
-				void OptimizeStep()
-				{
-					ndInt32 stopTraining = GetFramesCount();
-					if (stopTraining <= m_stopTraining)
-					{
-						ndInt32 episodeCount = GetEposideCount();
-
-						#ifdef D_USE_POLE_POLICY_GRAD
-						ndBrainAgentDiscreteVPG_Trainer::OptimizeStep();
-						#else
-						ndBrainAgentDQN_Trainer::OptimizeStep();
-						#endif
-
-						episodeCount -= GetEposideCount();
-
-						if (m_averageFramesPerEpisodes.GetAverage() >= ndReal(m_maxFrames))
-						{
-							if (m_averageQvalue.GetAverage() > m_maxGain)
-							{
-								m_bestActor.CopyFrom(m_actor);
-								m_maxGain = m_averageQvalue.GetAverage();
-								ndExpandTraceMessage("%d: best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetFramesCount(), GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
-							}
-						}
-
-						if (episodeCount && !IsSampling())
-						{
-							ndExpandTraceMessage("%f %f\n", m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-							if (m_outFile)
-							{
-								fprintf(m_outFile, "%f\n", m_averageQvalue.GetAverage());
-								fflush(m_outFile);
-							}
-						}
-
-						if (stopTraining == m_stopTraining)
-						{
-							char fileName[1024];
-							m_actor.CopyFrom(m_bestActor);
-							ndGetWorkingFileName(GetName().GetStr(), fileName);
-							SaveToFile(fileName);
-							ndExpandTraceMessage("saving to file: %s\n", fileName);
-							ndExpandTraceMessage("training complete\n\n");
-							ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-							ndExpandTraceMessage("training time: %f\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-						}
-					}
-							
-					if (m_model->IsOutOfBounds())
-					{
-						m_model->TelePort();
-					}
-				}
-
-				FILE* m_outFile;
-				ndBrain m_bestActor;
-				ndCartpole* m_model;
-				ndUnsigned64 m_timer;
-				ndFloat32 m_maxGain;
-				ndInt32 m_maxFrames;
-				ndInt32 m_stopTraining;
-				mutable ndMovingAverage<1024> m_averageQvalue;
-				mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
-			};
+		class ndCartpoleAgent : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
 		#endif
+		{
+			public:
+			#ifdef D_USE_POLE_POLICY_GRAD
+			ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
+				:ndBrainAgentDiscretePolicyGrad<m_stateSize, m_actionsSize>(actor)
+				,m_model(nullptr)
+			{
+			}
+			#else
+			ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
+				:ndBrainAgentDQN<m_stateSize, m_actionsSize>(actor)
+				,m_model(nullptr)
+			{
+			}
+			#endif
+
+			void GetObservation(ndBrainFloat* const state) const
+			{
+				m_model->GetObservation(state);
+			}
+
+			virtual void ApplyActions(ndBrainFloat* const actions) const
+			{
+				m_model->ApplyActions(actions);
+			}
+
+			void SetModel(ndCartpole* const model)
+			{
+				m_model = model;
+			}
+
+			ndCartpole* m_model;
+		};
+
+		#ifdef D_USE_POLE_POLICY_GRAD
+		class ndCartpoleAgentTrainer : public ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>
+		#else
+		class ndCartpoleAgentTrainer : public ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>
+		#endif
+		{
+			public:
+			#ifdef D_USE_POLE_POLICY_GRAD
+			ndCartpoleAgentTrainer(ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
+				:ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
+				,m_bestActor(m_actor)
+				,m_model(nullptr)
+				,m_timer(ndGetTimeInMicroseconds())
+				,m_maxGain(ndFloat32(- 1.0e10f))
+				,m_maxFrames(5000)
+				,m_stopTraining(2000000)
+				,m_modelIsTrained(false)
+			{
+				SetName("cartpoleVPG.dnn");
+				m_outFile = fopen("cartpole-VPG.csv", "wb");
+			}
+			#else
+			ndCartpoleAgentTrainer(ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
+				:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
+				,m_bestActor(m_actor)
+				,m_model(nullptr)
+				,m_timer(ndGetTimeInMicroseconds())
+				,m_maxGain(ndFloat32(-1.0e10f))
+				,m_maxFrames(5000)
+				,m_stopTraining(2000000)
+				,m_averageQvalue()
+				,m_averageFramesPerEpisodes()
+			{
+				SetName("cartpoleDQN.dnn");
+				m_outFile = fopen("cartpole-DQN.csv", "wb");
+			}
+			#endif
+
+			~ndCartpoleAgentTrainer()
+			{
+				if (m_outFile)
+				{
+					fclose(m_outFile);
+				}
+			}
+
+			ndBrainFloat GetReward() const
+			{
+				return m_model->GetReward();
+			}
+
+			virtual void ApplyActions(ndBrainFloat* const actions) const
+			{
+				if (GetEpisodeFrames() >= 10000)
+				{
+					ndUnsigned32 randomIndex = ndRandInt();
+					*actions = ndReal (ndInt32(randomIndex % 3));
+				}
+
+				m_model->ApplyActions(actions);
+			}
+
+			void GetObservation(ndBrainFloat* const state) const
+			{
+				m_model->GetObservation(state);
+			}
+
+			bool IsTerminal() const
+			{
+				return m_model->IsTerminal();
+			}
+
+			void ResetModel() const
+			{
+				m_model->ResetModel();
+			}
+
+			void OptimizeStep()
+			{
+				ndInt32 stopTraining = GetFramesCount();
+				if (stopTraining <= m_stopTraining)
+				{
+					ndInt32 episodeCount = GetEposideCount();
+
+					#ifdef D_USE_POLE_POLICY_GRAD
+					ndBrainAgentDiscreteVPG_Trainer::OptimizeStep();
+					#else
+					ndBrainAgentDQN_Trainer::OptimizeStep();
+					#endif
+
+					episodeCount -= GetEposideCount();
+
+					if (m_averageFramesPerEpisodes.GetAverage() >= ndReal(m_maxFrames))
+					{
+						if (m_averageQvalue.GetAverage() > m_maxGain)
+						{
+							m_bestActor.CopyFrom(m_actor);
+							m_maxGain = m_averageQvalue.GetAverage();
+							ndExpandTraceMessage("%d: best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetFramesCount(), GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
+						}
+					}
+
+					if (episodeCount && !IsSampling())
+					{
+						ndExpandTraceMessage("%f %f\n", m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						if (m_outFile)
+						{
+							fprintf(m_outFile, "%f\n", m_averageQvalue.GetAverage());
+							fflush(m_outFile);
+						}
+					}
+
+					if (stopTraining == m_stopTraining)
+					{
+						char fileName[1024];
+						m_actor.CopyFrom(m_bestActor);
+						ndGetWorkingFileName(GetName().GetStr(), fileName);
+						SaveToFile(fileName);
+						ndExpandTraceMessage("saving to file: %s\n", fileName);
+						ndExpandTraceMessage("training complete\n\n");
+						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+						ndExpandTraceMessage("training time: %f\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+						if (m_outFile)
+						{
+							fclose(m_outFile);
+							m_outFile = nullptr;
+						}
+					}
+				}
+							
+				if (m_model->IsOutOfBounds())
+				{
+					m_model->TelePort();
+				}
+			}
+
+			FILE* m_outFile;
+			ndBrain m_bestActor;
+			ndCartpole* m_model;
+			ndUnsigned64 m_timer;
+			ndFloat32 m_maxGain;
+			ndInt32 m_maxFrames;
+			ndInt32 m_stopTraining;
+			bool m_modelIsTrained;
+		};
 
 		ndCartpole(const ndSharedPtr<ndBrainAgent>& agent)
 			:ndModelArticulation()
@@ -340,6 +335,27 @@ namespace ndCarpole_0
 			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
 		}
 
+		void CheckTrainingCompleted()
+		{
+			#ifdef D_USE_POLE_TRAIN_AGENT
+			if (m_agent->IsTrainer())
+			{
+				ndCartpoleAgentTrainer* const agent = (ndCartpoleAgentTrainer*)(*m_agent);
+				if (agent->m_modelIsTrained)
+				{
+					char fileName[1024];
+					ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
+					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+					m_agent = ndSharedPtr<ndBrainAgent>(new ndCartpole::ndCartpoleAgent(actor));
+					((ndCartpole::ndCartpoleAgent*)*m_agent)->SetModel(this);
+					//ResetModel();
+					((ndPhysicsWorld*)m_world)->NormalUpdates();
+				}
+			}
+			#endif
+		}
+
+
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
@@ -412,20 +428,22 @@ namespace ndCarpole_0
 	{
 		#ifdef D_USE_POLE_POLICY_GRAD
 			ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			hyperParameters.m_maxTrajectorySteps = 6000;
 		#else
 			ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 		#endif
 		//hyperParameters.m_threadsCount = 1;
 		hyperParameters.m_discountFactor = ndBrainFloat(0.995f);
-		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(hyperParameters));
+		
+		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgentTrainer(hyperParameters));
 
 		ndCartpole* const model = new ndCartpole(agent);
-		ndCartpole::ndCartpoleAgent* const trainer = (ndCartpole::ndCartpoleAgent*)*agent;
+		ndCartpole::ndCartpoleAgentTrainer* const trainer = (ndCartpole::ndCartpoleAgentTrainer*)*agent;
 		trainer->m_model = model;
 
 		BuildModel(model, scene, location);
 
-		scene->SetAcceleratedUpdate();
+		//scene->SetAcceleratedUpdate();
 		return model;
 	}
 	#endif

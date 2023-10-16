@@ -44,6 +44,8 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 			m_bashBufferSize = 32;
 			m_numberOfHiddenLayers = 3;
 			m_maxTrajectorySteps = 1024 * 2;
+			m_extraTrajectorySteps = 1024 * 2;
+			
 			m_hiddenLayersNumberOfNeurons = 64;
 
 			m_learnRate = ndBrainFloat(0.0001f);
@@ -60,6 +62,7 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 		ndInt32 m_threadsCount;
 		ndInt32 m_bashBufferSize;
 		ndInt32 m_maxTrajectorySteps;
+		ndInt32 m_extraTrajectorySteps;
 		ndInt32 m_numberOfHiddenLayers;
 		ndInt32 m_hiddenLayersNumberOfNeurons;
 	};
@@ -100,10 +103,12 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	ndInt32 GetEpisodeFrames() const;
 	ndBrainFloat GetCurrentValue() const;
 
+	bool IsTrainer() const;
+
 	protected:
 	void Step();
 	void OptimizeStep();
-	bool IsTrainer() const;
+
 	void Save(ndBrainSave* const loadSave) const;
 
 	void InitWeights();
@@ -133,12 +138,14 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_learnRate;
-	ndBrainFloat m_currentQValue;
 	ndInt32 m_frameCount;
 	ndInt32 m_framesAlive;
 	ndInt32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
 	ndInt32 m_maxTrajectorySteps;
+	ndInt32 m_extraTrajectorySteps;
+	ndMovingAverage<256> m_averageQvalue;
+	ndMovingAverage<256> m_averageFramesPerEpisodes;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -150,12 +157,14 @@ ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::ndBrainAgentDiscreteVPG_T
 	,m_rewards()
 	,m_gamma(hyperParameters.m_discountFactor)
 	,m_learnRate(hyperParameters.m_learnRate)
-	,m_currentQValue(ndBrainFloat(0.0f))
 	,m_frameCount(0)
 	,m_framesAlive(0)
 	,m_eposideCount(0)
 	,m_bashBufferSize(hyperParameters.m_bashBufferSize)
 	,m_maxTrajectorySteps(hyperParameters.m_maxTrajectorySteps)
+	,m_extraTrajectorySteps(hyperParameters.m_extraTrajectorySteps)
+	,m_averageQvalue()
+	,m_averageFramesPerEpisodes()
 {
 	// build neural net
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
@@ -192,9 +201,8 @@ ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::ndBrainAgentDiscreteVPG_T
 	m_optimizer = new ndBrainOptimizerAdam();
 	m_optimizer->SetRegularizer(hyperParameters.m_regularizer);
 
-	ndInt32 trajectoryPadd = 1024;
-	m_rewards.SetCount(m_maxTrajectorySteps + trajectoryPadd);
-	m_trajectory.SetCount(m_maxTrajectorySteps + trajectoryPadd);
+	m_rewards.SetCount(m_maxTrajectorySteps + m_extraTrajectorySteps);
+	m_trajectory.SetCount(m_maxTrajectorySteps + m_extraTrajectorySteps);
 	m_trajectory.SetCount(0);
 }
 
@@ -237,7 +245,9 @@ ndInt32 ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::GetFramesCount() 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainFloat ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::GetCurrentValue() const
 {
-	return m_currentQValue;
+	ndAssert(0);
+	//return m_currentQValue;
+	return 0;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -384,6 +394,9 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::CalcucateRewards()
 	{
 		m_rewards[i] = m_trajectory[i].m_reward + m_gamma * m_rewards[i + 1];
 	}
+	//m_currentQValue = m_rewards[0];
+	m_averageQvalue.Update(m_rewards[0]);
+	m_averageFramesPerEpisodes.Update(ndBrainFloat(steps));
 	m_rewards.GaussianNormalize();
 }
 
@@ -451,7 +464,7 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::OptimizeStep()
 		ResetModel();
 	}
 
-	bool isTeminal = IsTerminal() || (m_trajectory.GetCount() == m_trajectory.GetCapacity());
+	bool isTeminal = IsTerminal() || (m_trajectory.GetCount() == (m_extraTrajectorySteps + m_maxTrajectorySteps));
 	if (isTeminal)
 	{
 		Optimize();
