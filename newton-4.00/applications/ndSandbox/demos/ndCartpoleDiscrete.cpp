@@ -22,8 +22,9 @@
 
 namespace ndCarpole_0
 {
-	#define D_USE_POLE_TRAIN_AGENT
-	#define D_USE_POLE_POLICY_GRAD
+	#define D_TRAIN_AGENT
+	#define D_USE_VANILLA_POLICY_GRAD
+	//#define D_USE_PROXIMA_POLICY_GRAD
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
@@ -47,14 +48,14 @@ namespace ndCarpole_0
 	{
 		public:
 
-		#ifdef D_USE_POLE_POLICY_GRAD
+		#ifdef D_USE_VANILLA_POLICY_GRAD
 		class ndCartpoleAgent : public ndBrainAgentDiscretePolicyGrad<m_stateSize, m_actionsSize>
 		#else
 		class ndCartpoleAgent : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
 		#endif
 		{
 			public:
-			#ifdef D_USE_POLE_POLICY_GRAD
+			#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
 				:ndBrainAgentDiscretePolicyGrad<m_stateSize, m_actionsSize>(actor)
 				,m_model(nullptr)
@@ -86,14 +87,14 @@ namespace ndCarpole_0
 			ndCartpole* m_model;
 		};
 
-		#ifdef D_USE_POLE_POLICY_GRAD
+		#ifdef D_USE_VANILLA_POLICY_GRAD
 		class ndCartpoleAgentTrainer : public ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>
 		#else
 		class ndCartpoleAgentTrainer : public ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>
 		#endif
 		{
 			public:
-			#ifdef D_USE_POLE_POLICY_GRAD
+			#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndCartpoleAgentTrainer(ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
 				:ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
 				,m_bestActor(m_actor)
@@ -170,7 +171,7 @@ namespace ndCarpole_0
 				{
 					ndInt32 episodeCount = GetEposideCount();
 
-					#ifdef D_USE_POLE_POLICY_GRAD
+					#ifdef D_USE_VANILLA_POLICY_GRAD
 					ndBrainAgentDiscreteVPG_Trainer::OptimizeStep();
 					#else
 					ndBrainAgentDQN_Trainer::OptimizeStep();
@@ -338,7 +339,7 @@ namespace ndCarpole_0
 
 		void CheckTrainingCompleted()
 		{
-			#ifdef D_USE_POLE_TRAIN_AGENT
+			#ifdef D_TRAIN_AGENT
 			if (m_agent->IsTrainer())
 			{
 				ndCartpoleAgentTrainer* const agent = (ndCartpoleAgentTrainer*)(*m_agent);
@@ -424,10 +425,10 @@ namespace ndCarpole_0
 		model->m_poleMatrix = poleBody->GetMatrix();
 	}
 
-	#ifdef D_USE_POLE_TRAIN_AGENT
+	#ifdef D_TRAIN_AGENT
 	ndCartpole* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
-		#ifdef D_USE_POLE_POLICY_GRAD
+		#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			hyperParameters.m_maxTrajectorySteps = 6000;
 		#else
@@ -451,11 +452,11 @@ namespace ndCarpole_0
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
-		#ifdef D_USE_POLE_TRAIN_AGENT
+		#ifdef D_TRAIN_AGENT
 			ndCartpole* const model = CreateTrainModel(scene, location);
 		#else
 			char fileName[1024];
-			#ifdef D_USE_POLE_POLICY_GRAD
+			#ifdef D_USE_VANILLA_POLICY_GRAD
 				ndAssert(0);
 				ndGetWorkingFileName("cartpoleVPG.dnn", fileName);
 			#else
