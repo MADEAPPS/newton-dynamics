@@ -73,7 +73,6 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 		ndInt32 m_hiddenLayersNumberOfNeurons;
 	};
 
-	//ndBrainAgentDQN_Trainer(const HyperParameters& hyperParameters, const ndBrain& actor);
 	ndBrainAgentDQN_Trainer(const HyperParameters& hyperParameters);
 	virtual ~ndBrainAgentDQN_Trainer();
 
@@ -113,7 +112,6 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_learnRate;
-	ndBrainFloat m_currentQValue;
 	ndBrainFloat m_explorationProbability;
 	ndBrainFloat m_minExplorationProbability;
 	ndBrainFloat m_explorationProbabilityAnnelining;
@@ -122,6 +120,8 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndInt32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
 	ndInt32 m_targetUpdatePeriod;
+	ndMovingAverage<1024> m_averageQvalue;
+	ndMovingAverage<64> m_averageFramesPerEpisodes;
 	bool m_collectingSamples;
 };
 
@@ -135,7 +135,6 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 	,m_replayBuffer()
 	,m_gamma(hyperParameters.m_discountFactor)
 	,m_learnRate(hyperParameters.m_learnRate)
-	,m_currentQValue(ndBrainFloat(0.0f))
 	,m_explorationProbability(ndBrainFloat(1.0f))
 	,m_minExplorationProbability(hyperParameters.m_exploreMinProbability)
 	,m_explorationProbabilityAnnelining(hyperParameters.m_exploreAnnelining)
@@ -144,6 +143,8 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 	,m_eposideCount(0)
 	,m_bashBufferSize(hyperParameters.m_bashBufferSize)
 	,m_targetUpdatePeriod(hyperParameters.m_targetUpdatePeriod)
+	,m_averageQvalue()
+	,m_averageFramesPerEpisodes()
 	,m_collectingSamples(true)
 {
 	// build neural net
@@ -219,7 +220,9 @@ ndInt32 ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetFramesCount() const
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainFloat ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetCurrentValue() const
 {
-	return m_currentQValue;
+	ndAssert(0);
+	//return m_currentQValue;
+	return 0;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -409,7 +412,10 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat*
 		action = qActionValues.ArgMax();
 	}
 	
-	m_currentQValue = qActionValues[action];
+	if (!IsSampling())
+	{
+		m_averageQvalue.Update(qActionValues[action]);
+	}
 	m_currentTransition.m_action[0] = ndBrainFloat(action);
 }
 
@@ -453,6 +459,11 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::OptimizeStep()
 		if (IsSampling() && (m_eposideCount % 500 == 0))
 		{
 			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_replayBuffer.GetCapacity(), m_eposideCount);
+		}
+
+		if (!IsSampling())
+		{
+			m_averageFramesPerEpisodes.Update(ndBrainFloat(m_framesAlive));
 		}
 		m_eposideCount++;
 		m_framesAlive = 0;

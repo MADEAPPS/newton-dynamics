@@ -101,11 +101,12 @@ namespace ndCarpole_0
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_maxGain(ndFloat32(- 1.0e10f))
 				,m_maxFrames(5000)
-				,m_stopTraining(2000000)
+				,m_stopTraining(4000000)
 				,m_modelIsTrained(false)
 			{
 				SetName("cartpoleVPG.dnn");
 				m_outFile = fopen("cartpole-VPG.csv", "wb");
+				fprintf(m_outFile, "VPG\n");
 			}
 			#else
 			ndCartpoleAgentTrainer(ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
@@ -116,11 +117,10 @@ namespace ndCarpole_0
 				,m_maxGain(ndFloat32(-1.0e10f))
 				,m_maxFrames(5000)
 				,m_stopTraining(2000000)
-				,m_averageQvalue()
-				,m_averageFramesPerEpisodes()
 			{
 				SetName("cartpoleDQN.dnn");
 				m_outFile = fopen("cartpole-DQN.csv", "wb");
+				fprintf(m_outFile, "DQN\n");
 			}
 			#endif
 
@@ -208,6 +208,7 @@ namespace ndCarpole_0
 						ndExpandTraceMessage("training complete\n\n");
 						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
 						ndExpandTraceMessage("training time: %f\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+						m_modelIsTrained = true;
 						if (m_outFile)
 						{
 							fclose(m_outFile);
@@ -443,7 +444,7 @@ namespace ndCarpole_0
 
 		BuildModel(model, scene, location);
 
-		//scene->SetAcceleratedUpdate();
+		scene->SetAcceleratedUpdate();
 		return model;
 	}
 	#endif
