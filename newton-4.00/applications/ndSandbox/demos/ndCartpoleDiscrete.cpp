@@ -105,7 +105,7 @@ namespace ndCarpole_0
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_maxGain(ndFloat32(-1.0e10f))
 				,m_maxFrames(5000)
-				,m_stopTraining(5000000)
+				,m_stopTraining(8000000)
 				,m_modelIsTrained(false)
 			{
 				SetName("cartpoleVPG.dnn");
