@@ -80,8 +80,6 @@ namespace ndCarpole_1
 					,m_maxGain(ndFloat32(-1.0e10f))
 					,m_maxFrames(5000)
 					,m_stopTraining(500000)
-					,m_averageQvalue()
-					,m_averageFramesPerEpisodes()
 				{
 					SetName("cartpoleDDPG.dnn");
 					m_outFile = fopen("cartpole-DDPG.csv", "wb");
@@ -131,20 +129,7 @@ namespace ndCarpole_1
 
 				bool IsTerminal() const
 				{
-					bool state = m_model->IsTerminal();
-					if (!IsSampling())
-					{
-						if (GetEpisodeFrames() >= 30000)
-						{
-							state = true;
-						}
-						m_averageQvalue.Update(ndReal (GetCurrentValue()));
-						if (state)
-						{
-							m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
-						}
-					}
-					return state;
+					return m_model->IsTerminal();
 				}
 
 				void ResetModel() const
@@ -207,8 +192,6 @@ namespace ndCarpole_1
 				ndFloat32 m_maxGain;
 				ndInt32 m_maxFrames;
 				ndInt32 m_stopTraining;
-				mutable ndMovingAverage<1024> m_averageQvalue;
-				mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 			};
 		#endif
 

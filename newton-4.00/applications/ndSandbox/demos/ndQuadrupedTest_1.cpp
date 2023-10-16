@@ -314,8 +314,6 @@ namespace ndQuadruped_1
 				,m_stopTraining(2000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
-				,m_averageQvalue()
-				,m_averageFramesPerEpisodes()
 				,m_explorationProbability(ndBrainFloat(1.0f))
 				,m_minExplorationProbability(ndBrainFloat(0.01f))
 				,m_explorationAnneliningRate(ndBrainFloat(0.0f))
@@ -496,21 +494,7 @@ namespace ndQuadruped_1
 				//bool state = (maxVal > dev) ? true : false;
 				//state = state && (m_startTraning >= 64);
 
-				bool state = (m_startTraning >= 1024 * 3);
-
-				if (!IsSampling())
-				{
-					if (GetEpisodeFrames() >= 15000)
-					{
-						state = true;
-					}
-					m_averageQvalue.Update(ndReal (GetCurrentValue()));
-					if (state)
-					{
-						m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
-					}
-				}
-				return state;
+				return m_model->IsTerminal();
 			}
 
 			void ResetModel() const
@@ -595,8 +579,6 @@ namespace ndQuadruped_1
 			bool m_modelIsTrained;
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
 			ndFixSizeArray<ndBodyDynamic*, 32> m_bodies;
-			mutable ndMovingAverage<1024> m_averageQvalue;
-			mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 			mutable ndFloat32 m_explorationProbability;
 			mutable ndFloat32 m_minExplorationProbability;
 			mutable ndFloat32 m_explorationAnneliningRate;

@@ -136,8 +136,6 @@ namespace ndController_1
 				,m_stopTraining(1000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
-				,m_averageQvalue()
-				,m_averageFramesPerEpisodes()
 				,m_explorationProbability(ndBrainFloat(1.0f))
 				,m_minExplorationProbability(ndBrainFloat(0.01f))
 				,m_explorationAnneliningRate(ndBrainFloat(0.0f))
@@ -218,21 +216,7 @@ namespace ndController_1
 
 			bool IsTerminal() const
 			{
-				bool state = m_model->IsTerminal();
-				if (!IsSampling())
-				{
-					if (GetEpisodeFrames() >= 30000)
-					{
-						state = true;
-					}
-
-					m_averageQvalue.Update(ndReal (GetCurrentValue()));
-					if (state)
-					{
-						m_averageFramesPerEpisodes.Update(ndReal(GetEpisodeFrames()));
-					}
-				}
-				return state;
+				return m_model->IsTerminal();
 			}
 
 			void ResetModel() const
@@ -300,8 +284,6 @@ namespace ndController_1
 			ndInt32 m_stopTraining;
 			ndUnsigned64 m_timer;
 			bool m_modelIsTrained;
-			mutable ndMovingAverage<1024> m_averageQvalue;
-			mutable ndMovingAverage<32> m_averageFramesPerEpisodes;
 			mutable ndFloat32 m_explorationProbability;
 			mutable ndFloat32 m_minExplorationProbability;
 			mutable ndFloat32 m_explorationAnneliningRate;

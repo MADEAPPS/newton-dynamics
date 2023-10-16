@@ -41,7 +41,6 @@ class ndBrainAgentTD3: public ndBrainAgent
 	void ResetModel() const;
 	bool IsTerminal() const;
 	ndBrainFloat GetReward() const;
-	ndBrainFloat GetCurrentValue() const;
 	ndInt32 GetEpisodeFrames() const;
 	void Save(ndBrainSave* const loadSave) const;
 
@@ -75,12 +74,6 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainFloat ndBrainAgentTD3<statesDim, actionDim>::GetReward() const
 {
 	ndAssert(0);
-	return ndBrainFloat(0.0f);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentTD3<statesDim, actionDim>::GetCurrentValue() const
-{
 	return ndBrainFloat(0.0f);
 }
 

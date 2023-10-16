@@ -80,7 +80,6 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndInt32 GetFramesCount() const;
 	ndInt32 GetEposideCount() const;
 	ndInt32 GetEpisodeFrames() const;
-	ndBrainFloat GetCurrentValue() const;
 
 	ndBrainFloat GetLearnRate() const;
 	void SetLearnRate(ndBrainFloat learnRate);
@@ -122,7 +121,6 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndBrainReplayBuffer<statesDim, actionDim> m_replayBuffer;
 	ndBrainReplayTransitionMemory<statesDim, actionDim> m_currentTransition;
 
-	ndBrainFloat m_currentQvalue;
 	ndBrainFloat m_discountFactor;
 	ndBrainFloat m_actorLearnRate;
 	ndBrainFloat m_criticLearnRate;
@@ -133,6 +131,8 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndInt32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
 	ndInt32 m_replayBufferPrefill;
+	ndMovingAverage<1024> m_averageQvalue;
+	ndMovingAverage<64> m_averageFramesPerEpisodes;
 	bool m_collectingSamples;
 };
 
@@ -148,7 +148,6 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 	,m_bashSamples()
 	,m_replayBuffer()
 	,m_currentTransition()
-	,m_currentQvalue(ndBrainFloat(0.0f))
 	,m_discountFactor(hyperParameters.m_discountFactor)
 	,m_actorLearnRate(hyperParameters.m_actorLearnRate)
 	,m_criticLearnRate(hyperParameters.m_criticLearnRate)
@@ -159,6 +158,8 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 	,m_eposideCount(0)
 	,m_bashBufferSize(hyperParameters.m_bashBufferSize)
 	,m_replayBufferPrefill(hyperParameters.m_replayBufferPrefill)
+	,m_averageQvalue()
+	,m_averageFramesPerEpisodes()
 	,m_collectingSamples(true)
 {
 	// build actor network
@@ -282,12 +283,6 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SetActionNoise(ndBrainFloat noiseVariance)
 {
 	m_actionNoiseVariance = noiseVariance;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetCurrentValue() const
-{
-	return m_currentQvalue;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -507,12 +502,13 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Optimize()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::CalculateQvalue(const ndBrainVector& state, const ndBrainVector& actions)
 {
+	ndBrainFixSizeVector<1> qValue;
 	ndBrainFixSizeVector<statesDim + actionDim> criticInput;
-
+	
 	ndMemCpy(&criticInput[0], &state[0], statesDim);
 	ndMemCpy(&criticInput[statesDim], &actions[0], actionDim);
-	ndBrainMemVector criticOutput(&m_currentQvalue, 1);
-	m_critic.MakePrediction(criticInput, criticOutput);
+	m_critic.MakePrediction(criticInput, qValue);
+	m_averageQvalue.Update(qValue[0]);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -557,6 +553,12 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::OptimizeStep()
 		{
 			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_replayBuffer.GetCapacity(), m_eposideCount);
 		}
+
+		if (!IsSampling())
+		{
+			m_averageFramesPerEpisodes.Update(ndBrainFloat(m_framesAlive));
+		}
+
 		m_eposideCount++;
 		m_framesAlive = 0;
 	}

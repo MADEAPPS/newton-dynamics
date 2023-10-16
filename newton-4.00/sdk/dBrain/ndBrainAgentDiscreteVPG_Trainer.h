@@ -48,7 +48,7 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 			
 			m_hiddenLayersNumberOfNeurons = 64;
 
-			m_learnRate = ndBrainFloat(0.0001f);
+			m_learnRate = ndBrainFloat(0.0005f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
@@ -101,7 +101,6 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	ndInt32 GetFramesCount() const;
 	ndInt32 GetEposideCount() const;
 	ndInt32 GetEpisodeFrames() const;
-	ndBrainFloat GetCurrentValue() const;
 
 	bool IsTrainer() const;
 
@@ -240,14 +239,6 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 ndInt32 ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::GetFramesCount() const
 {
 	return m_frameCount;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::GetCurrentValue() const
-{
-	ndAssert(0);
-	//return m_currentQValue;
-	return 0;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

@@ -42,7 +42,6 @@ class ndBrainAgentDQN: public ndBrainAgent
 	void ResetModel() const;
 	bool IsTerminal() const;
 	ndBrainFloat GetReward() const;
-	ndBrainFloat GetCurrentValue() const;
 	ndInt32 GetEpisodeFrames() const;
 	void AddExploration(ndBrainFloat* const actions);
 	
@@ -91,12 +90,6 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainFloat ndBrainAgentDQN<statesDim, actionDim>::GetReward() const
 {
 	ndAssert(0);
-	return ndBrainFloat(0.0f);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDQN<statesDim, actionDim>::GetCurrentValue() const
-{
 	return ndBrainFloat(0.0f);
 }
 

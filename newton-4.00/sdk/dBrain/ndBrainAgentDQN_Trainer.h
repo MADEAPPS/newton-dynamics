@@ -76,7 +76,6 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndBrainAgentDQN_Trainer(const HyperParameters& hyperParameters);
 	virtual ~ndBrainAgentDQN_Trainer();
 
-	ndBrainFloat GetCurrentValue() const;
 	ndInt32 GetFramesCount() const;
 	ndInt32 GetEposideCount() const;
 	ndInt32 GetEpisodeFrames() const;
@@ -215,14 +214,6 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 ndInt32 ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetFramesCount() const
 {
 	return m_frameCount;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetCurrentValue() const
-{
-	ndAssert(0);
-	//return m_currentQValue;
-	return 0;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
