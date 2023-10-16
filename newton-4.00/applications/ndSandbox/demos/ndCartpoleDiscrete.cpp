@@ -23,8 +23,11 @@
 namespace ndCarpole_0
 {
 	#define D_TRAIN_AGENT
-	#define D_USE_VANILLA_POLICY_GRAD
-	//#define D_USE_PROXIMA_POLICY_GRAD
+
+	#ifdef D_TRAIN_AGENT
+		#define D_USE_VANILLA_POLICY_GRAD
+		//#define D_USE_PROXIMA_POLICY_GRAD
+	#endif
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
@@ -102,7 +105,7 @@ namespace ndCarpole_0
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_maxGain(ndFloat32(-1.0e10f))
 				,m_maxFrames(5000)
-				,m_stopTraining(4000000)
+				,m_stopTraining(5000000)
 				,m_modelIsTrained(false)
 			{
 				SetName("cartpoleVPG.dnn");
