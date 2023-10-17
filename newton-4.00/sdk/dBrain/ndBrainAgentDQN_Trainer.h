@@ -45,11 +45,11 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 			m_numberOfHiddenLayers = 3;
 			m_hiddenLayersNumberOfNeurons = 64;
 
-			m_bashBufferSize = 32;
+			m_bashBufferSize = 64;
 			m_replayBufferSize = 1024 * 512;
 			m_targetUpdatePeriod = 1000;
 			
-			m_learnRate = ndBrainFloat(0.0005f);
+			m_learnRate = ndBrainFloat(0.0001f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_exploreMinProbability = ndBrainFloat(1.0f / 100.0f);

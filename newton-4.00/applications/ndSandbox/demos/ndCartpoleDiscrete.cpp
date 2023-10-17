@@ -27,6 +27,12 @@ namespace ndCarpole_0
 	#define D_USE_VANILLA_POLICY_GRAD
 	//#define D_USE_PROXIMA_POLICY_GRAD
 
+	#ifdef D_USE_VANILLA_POLICY_GRAD
+		#define CONTROLLER_NAME "cartpoleDiscreteVPG.dnn"
+	#else
+		#define CONTROLLER_NAME "cartpoleDQN.dnn"
+	#endif
+
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
 
@@ -106,7 +112,6 @@ namespace ndCarpole_0
 				,m_stopTraining(10000000)
 				,m_modelIsTrained(false)
 			{
-				SetName("cartpoleVPG.dnn");
 				m_outFile = fopen("cartpole-VPG.csv", "wb");
 				fprintf(m_outFile, "VPG\n");
 			}
@@ -120,7 +125,6 @@ namespace ndCarpole_0
 				,m_maxFrames(5000)
 				,m_stopTraining(2000000)
 			{
-				SetName("cartpoleDQN.dnn");
 				m_outFile = fopen("cartpole-DQN.csv", "wb");
 				fprintf(m_outFile, "DQN\n");
 			}
@@ -432,17 +436,18 @@ namespace ndCarpole_0
 		#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			hyperParameters.m_maxTrajectorySteps = 6000;
+			hyperParameters.m_discountFactor = ndBrainFloat(0.995f);
 		#else
 			ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 		#endif
 		//hyperParameters.m_threadsCount = 1;
-		hyperParameters.m_discountFactor = ndBrainFloat(0.995f);
 		
 		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgentTrainer(hyperParameters));
 
 		ndCartpole* const model = new ndCartpole(agent);
 		ndCartpole::ndCartpoleAgentTrainer* const trainer = (ndCartpole::ndCartpoleAgentTrainer*)*agent;
 		trainer->m_model = model;
+		trainer->SetName(CONTROLLER_NAME);
 
 		BuildModel(model, scene, location);
 
@@ -457,12 +462,7 @@ namespace ndCarpole_0
 			ndCartpole* const model = CreateTrainModel(scene, location);
 		#else
 			char fileName[1024];
-			#ifdef D_USE_VANILLA_POLICY_GRAD
-				ndAssert(0);
-				ndGetWorkingFileName("cartpoleVPG.dnn", fileName);
-			#else
-				ndGetWorkingFileName("cartpoleDQN.dnn", fileName);
-			#endif
+			ndGetWorkingFileName(CONTROLLER_NAME, fileName);
 	
 			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(actor));
