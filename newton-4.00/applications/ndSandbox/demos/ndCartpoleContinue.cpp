@@ -52,14 +52,26 @@ namespace ndCarpole_1
 	{
 		public:
 
-		class ndCartpoleAgent: public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
+		#ifdef D_USE_VANILLA_POLICY_GRAD
+		class ndCartpoleAgent : public ndBrainAgentPolicyGrad<m_stateSize, m_actionsSize>
+		#else
+		class ndCartpoleAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
+		#endif
 		{
 			public:
+			#ifdef D_USE_VANILLA_POLICY_GRAD
+			ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
+				: ndBrainAgentPolicyGrad<m_stateSize, m_actionsSize>(actor)
+				, m_model(nullptr)
+			{
+			}
+			#else
 			ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
 				:ndBrainAgentDDPG<m_stateSize, m_actionsSize>(actor)
 				,m_model(nullptr)
 			{
 			}
+			#endif
 
 			void GetObservation(ndBrainFloat* const state) const
 			{
@@ -74,9 +86,28 @@ namespace ndCarpole_1
 			ndCartpole* m_model;
 		};
 
-		class ndCartpoleAgentTrainer: public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
+
+		#ifdef D_USE_VANILLA_POLICY_GRAD
+		class ndCartpoleAgentTrainer : public ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>
+		#else
+		class ndCartpoleAgentTrainer : public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
+		#endif
 		{
 			public:
+			#ifdef D_USE_VANILLA_POLICY_GRAD
+			ndCartpoleAgentTrainer(const HyperParameters& hyperParameters)
+				:ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
+				,m_bestActor(m_actor)
+				,m_model(nullptr)
+				,m_timer(ndGetTimeInMicroseconds())
+				,m_maxGain(ndFloat32(-1.0e10f))
+				,m_maxFrames(5000)
+				,m_stopTraining(500000)
+			{
+				m_outFile = fopen("cartpole-DDPG.csv", "wb");
+				fprintf(m_outFile, "ddpg\n");
+			}
+			#else
 			ndCartpoleAgentTrainer(const HyperParameters& hyperParameters)
 				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
 				,m_bestActor(m_actor)
@@ -89,6 +120,7 @@ namespace ndCarpole_1
 				m_outFile = fopen("cartpole-DDPG.csv", "wb");
 				fprintf(m_outFile, "ddpg\n");
 			}
+			#endif
 
 			~ndCartpoleAgentTrainer()
 			{
@@ -147,7 +179,12 @@ namespace ndCarpole_1
 				if (stopTraining <= m_stopTraining)
 				{
 					ndInt32 episodeCount = GetEposideCount();
+					
+					#ifdef D_USE_VANILLA_POLICY_GRAD
+					ndBrainAgentContinueVPG_Trainer::OptimizeStep();
+					#else
 					ndBrainAgentDDPG_Trainer::OptimizeStep();
+					#endif
 
 					episodeCount -= GetEposideCount();
 					if (m_averageFramesPerEpisodes.GetAverage() >= ndReal (m_maxFrames))
@@ -365,7 +402,14 @@ namespace ndCarpole_1
 		ndCartpole* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 		{
 			// add a reinforcement learning controller 
+			#ifdef D_USE_VANILLA_POLICY_GRAD
+			ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			hyperParameters.m_maxTrajectorySteps = 6000;
+			hyperParameters.m_discountFactor = ndBrainFloat(0.995f);
+			#else
 			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			#endif
+			
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_discountFactor = ndBrainFloat(0.995f);
 			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgentTrainer(hyperParameters));
