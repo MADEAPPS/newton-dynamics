@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DQN_BRAIN_AGENT_DESCRETE_POLICY_GRAD_H__
-#define _ND_DQN_BRAIN_AGENT_DESCRETE_POLICY_GRAD_H__
+#ifndef _ND_DQN_BRAIN_AGENT_POLICY_GRAD_H__
+#define _ND_DQN_BRAIN_AGENT_POLICY_GRAD_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
@@ -29,11 +29,11 @@
 #include "ndBrainReplayBuffer.h"
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-class ndBrainAgentDiscretePolicyGrad: public ndBrainAgent
+class ndBrainAgentPolicyGrad: public ndBrainAgent
 {
 	public:
-	ndBrainAgentDiscretePolicyGrad(const ndSharedPtr<ndBrain>& actor);
-	~ndBrainAgentDiscretePolicyGrad();
+	ndBrainAgentPolicyGrad(const ndSharedPtr<ndBrain>& actor);
+	~ndBrainAgentPolicyGrad();
 
 	void Step();
 
@@ -55,7 +55,7 @@ class ndBrainAgentDiscretePolicyGrad: public ndBrainAgent
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::ndBrainAgentDiscretePolicyGrad(const ndSharedPtr<ndBrain>& actor)
+ndBrainAgentPolicyGrad<statesDim, actionDim>::ndBrainAgentPolicyGrad(const ndSharedPtr<ndBrain>& actor)
 	:ndBrainAgent()
 	,m_actor(actor)
 {
@@ -63,75 +63,75 @@ ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::ndBrainAgentDiscretePolicy
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::~ndBrainAgentDiscretePolicyGrad()
+ndBrainAgentPolicyGrad<statesDim, actionDim>::~ndBrainAgentPolicyGrad()
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::IsTrainer() const
+bool ndBrainAgentPolicyGrad<statesDim, actionDim>::IsTrainer() const
 {
 	return false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::InitWeights()
+void ndBrainAgentPolicyGrad<statesDim, actionDim>::InitWeights()
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::InitWeights(ndBrainFloat, ndBrainFloat)
+void ndBrainAgentPolicyGrad<statesDim, actionDim>::InitWeights(ndBrainFloat, ndBrainFloat)
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::IsTerminal() const
+bool ndBrainAgentPolicyGrad<statesDim, actionDim>::IsTerminal() const
 {
 	ndAssert(0);
 	return false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::AddExploration(ndBrainFloat* const)
+void ndBrainAgentPolicyGrad<statesDim, actionDim>::AddExploration(ndBrainFloat* const)
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::GetReward() const
+ndBrainFloat ndBrainAgentPolicyGrad<statesDim, actionDim>::GetReward() const
 {
 	ndAssert(0);
 	return ndBrainFloat(0.0f);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::ResetModel() const
+void ndBrainAgentPolicyGrad<statesDim, actionDim>::ResetModel() const
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::GetEpisodeFrames() const
+ndInt32 ndBrainAgentPolicyGrad<statesDim, actionDim>::GetEpisodeFrames() const
 {
 	ndAssert(0);
 	return 0;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::Save(ndBrainSave* const) const
+void ndBrainAgentPolicyGrad<statesDim, actionDim>::Save(ndBrainSave* const) const
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::OptimizeStep()
+void ndBrainAgentPolicyGrad<statesDim, actionDim>::OptimizeStep()
 {
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscretePolicyGrad<statesDim, actionDim>::Step()
+void ndBrainAgentPolicyGrad<statesDim, actionDim>::Step()
 {
 	ndBrainFloat stateBuffer[statesDim * 2];
 	ndBrainFloat actionBuffer[actionDim * 2];

@@ -22,7 +22,7 @@
 
 namespace ndCarpole_0
 {
-	//#define D_TRAIN_AGENT
+	#define D_TRAIN_AGENT
 
 	#define D_USE_VANILLA_POLICY_GRAD
 	//#define D_USE_PROXIMA_POLICY_GRAD
@@ -50,7 +50,7 @@ namespace ndCarpole_0
 		public:
 
 		#ifdef D_USE_VANILLA_POLICY_GRAD
-		class ndCartpoleAgent : public ndBrainAgentDiscretePolicyGrad<m_stateSize, m_actionsSize>
+		class ndCartpoleAgent : public ndBrainAgentPolicyGrad<m_stateSize, m_actionsSize>
 		#else
 		class ndCartpoleAgent : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
 		#endif
@@ -58,7 +58,7 @@ namespace ndCarpole_0
 			public:
 			#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentDiscretePolicyGrad<m_stateSize, m_actionsSize>(actor)
+				:ndBrainAgentPolicyGrad<m_stateSize, m_actionsSize>(actor)
 				,m_model(nullptr)
 			{
 			}

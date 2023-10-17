@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DQN_BRAIN_AGENT_DESCRETE_VPG_H__
-#define _ND_DQN_BRAIN_AGENT_DESCRETE_VPG_H__
+#ifndef _ND_DQN_BRAIN_AGENT_CONTINUE_VPG_TRAINER_H__
+#define _ND_DQN_BRAIN_AGENT_CONTINUE_VPG_TRAINER_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
@@ -33,7 +33,7 @@
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThreadPool
+class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThreadPool
 {
 	public:
 	class HyperParameters
@@ -95,8 +95,8 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 		ndBrainFloat m_action;
 	};
 
-	ndBrainAgentDiscreteVPG_Trainer(const HyperParameters& hyperParameters);
-	virtual ~ndBrainAgentDiscreteVPG_Trainer();
+	ndBrainAgentContinueVPG_Trainer(const HyperParameters& hyperParameters);
+	virtual ~ndBrainAgentContinueVPG_Trainer();
 
 	ndInt32 GetFramesCount() const;
 	ndInt32 GetEposideCount() const;
@@ -148,7 +148,7 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::ndBrainAgentDiscreteVPG_Trainer(const HyperParameters& hyperParameters)
+ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_Trainer(const HyperParameters& hyperParameters)
 	:ndBrainAgent()
 	,ndBrainThreadPool()
 	,m_actor()
@@ -206,7 +206,7 @@ ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::ndBrainAgentDiscreteVPG_T
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::~ndBrainAgentDiscreteVPG_Trainer()
+ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::~ndBrainAgentContinueVPG_Trainer()
 {
 	for (ndInt32 i = 0; i < m_trainers.GetCount(); ++i)
 	{
@@ -217,50 +217,50 @@ ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::~ndBrainAgentDiscreteVPG_
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::IsTrainer() const
+bool ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::IsTrainer() const
 {
 	return true;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::InitWeights()
+void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::InitWeights()
 {
 	m_actor.InitWeightsXavierMethod();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
+void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
 {
 	ndAssert(0);
 	m_actor.InitWeights(weighVariance, biasVariance);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::GetFramesCount() const
+ndInt32 ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::GetFramesCount() const
 {
 	return m_frameCount;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::IsSampling() const
+bool ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::IsSampling() const
 {
 	return false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::GetEposideCount() const
+ndInt32 ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::GetEposideCount() const
 {
 	return m_eposideCount;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::GetEpisodeFrames() const
+ndInt32 ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::GetEpisodeFrames() const
 {
 	return m_framesAlive;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::BackPropagate()
+void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::BackPropagate()
 {
 	auto ClearGradients = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
@@ -282,7 +282,7 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::BackPropagate()
 			class Loss : public ndBrainLossLeastSquaredError
 			{
 				public:
-				Loss(ndBrainTrainer& trainer, ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>* const agent, ndInt32 index)
+				Loss(ndBrainTrainer& trainer, ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>* const agent, ndInt32 index)
 					:ndBrainLossLeastSquaredError(trainer.GetBrain()->GetOutputSize())
 					,m_trainer(trainer)
 					,m_agent(agent)
@@ -300,7 +300,7 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::BackPropagate()
 				}
 	
 				ndBrainTrainer& m_trainer;
-				ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>* m_agent;
+				ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>* m_agent;
 				ndInt32 m_index;
 			};
 
@@ -341,27 +341,27 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::BackPropagate()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Save(ndBrainSave* const loadSave) const
+void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Save(ndBrainSave* const loadSave) const
 {
 	loadSave->Save(&m_actor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::IsTerminal() const
+bool ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::IsTerminal() const
 {
 	ndAssert(0);
 	return false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::GetReward() const
+ndBrainFloat ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::GetReward() const
 {
 	ndAssert(0);
 	return ndBrainFloat(0.0f);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::CalcucateRewards()
+void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::CalcucateRewards()
 {
 	const ndInt32 steps = m_trajectory.GetCount();
 	#if 0
@@ -392,20 +392,20 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::CalcucateRewards()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Optimize()
+void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Optimize()
 {
 	CalcucateRewards();
 	BackPropagate();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat* const)
+void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat* const)
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::SelectAction(const ndBrainVector& probabilities) const
+ndBrainFloat ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(const ndBrainVector& probabilities) const
 {
 	ndBrainFixSizeVector<actionDim + 1> pdf;
 
@@ -432,7 +432,7 @@ ndBrainFloat ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::SelectAction
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Step()
+void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Step()
 {
 	ndTrajectoryStep trajectoryStep;
 	ndBrainFixSizeVector<actionDim> probability;
@@ -448,7 +448,7 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Step()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::OptimizeStep()
+void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::OptimizeStep()
 {
 	if (!m_frameCount)
 	{
