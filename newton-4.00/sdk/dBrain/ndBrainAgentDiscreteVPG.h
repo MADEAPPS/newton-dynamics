@@ -133,13 +133,11 @@ void ndBrainAgentDiscreteVPG<statesDim, actionDim>::OptimizeStep()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDiscreteVPG<statesDim, actionDim>::Step()
 {
-	ndBrainFloat stateBuffer[statesDim * 2];
-	ndBrainFloat actionBuffer[actionDim * 2];
-	ndBrainMemVector state(stateBuffer, statesDim);
-	ndBrainMemVector actions(actionBuffer, actionDim);
+	ndBrainFixSizeVector<actionDim> actions;
+	ndBrainFixSizeVector<statesDim> observations;
 
-	GetObservation(&state[0]);
-	m_actor->MakePrediction(state, actions);
+	GetObservation(&observations[0]);
+	m_actor->MakePrediction(observations, actions);
 
 	ndBrainFloat bestAction = ndBrainFloat(actions.ArgMax());
 	ApplyActions(&bestAction);

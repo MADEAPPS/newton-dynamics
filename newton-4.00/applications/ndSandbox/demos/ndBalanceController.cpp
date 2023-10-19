@@ -150,7 +150,7 @@ namespace ndController_1
 					fprintf(m_outFile, "DDPG\n");
 				#endif
 				
-				m_explorationAnneliningRate = (m_explorationProbability - m_minExplorationProbability) / (ndBrainFloat(m_stopTraining * 2 / 3));
+				m_explorationAnneliningRate = (m_explorationProbability - m_minExplorationProbability) / ndFloat32(m_stopTraining * 2 / 3);
 			}
 
 			~ndControllerAgent_trainer()

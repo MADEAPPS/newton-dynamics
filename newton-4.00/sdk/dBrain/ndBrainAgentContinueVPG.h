@@ -134,16 +134,12 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG<statesDim, actionDim>::Step()
 {
 	ndAssert(0);
-	ndBrainFloat stateBuffer[statesDim * 2];
-	ndBrainFloat actionBuffer[actionDim * 2];
-	ndBrainMemVector state(stateBuffer, statesDim);
-	ndBrainMemVector actions(actionBuffer, actionDim);
+	ndBrainFixSizeVector<actionDim> actions;
+	ndBrainFixSizeVector<statesDim> observations;
 
-	GetObservation(&state[0]);
-	m_actor->MakePrediction(state, actions);
-
-	ndBrainFloat bestAction = ndBrainFloat(actions.ArgMax());
-	ApplyActions(&bestAction);
+	GetObservation(&observations[0]);
+	m_actor->MakePrediction(observations, actions);
+	ApplyActions(&actions[0]);
 }
 
 #endif 

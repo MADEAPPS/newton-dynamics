@@ -246,7 +246,7 @@ namespace ndQuadruped_1
 				m_model = model;
 			}
 
-			void GetObservation(ndReal* const state) const
+			void GetObservation(ndBrainFloat* const state) const
 			{
 				m_model->GetObservation(state);
 				ndMemCpy(m_currentTransition, state, m_stateSize);
@@ -327,7 +327,7 @@ namespace ndQuadruped_1
 				fprintf(m_outFile, "ddpg\n");
 				#endif	
 
-				m_explorationAnneliningRate = (m_explorationProbability - m_minExplorationProbability) / (ndBrainFloat(m_stopTraining / 3));
+				m_explorationAnneliningRate = (m_explorationProbability - m_minExplorationProbability) / ndFloat32(m_stopTraining / 3);
 			}
 
 			~ndControllerAgent_trainer()

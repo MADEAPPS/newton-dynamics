@@ -508,7 +508,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::CalculateQvalue(const ndBra
 	ndMemCpy(&criticInput[0], &state[0], statesDim);
 	ndMemCpy(&criticInput[statesDim], &actions[0], actionDim);
 	m_critic.MakePrediction(criticInput, qValue);
-	m_averageQvalue.Update(qValue[0]);
+	m_averageQvalue.Update(ndReal (qValue[0]));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -556,7 +556,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::OptimizeStep()
 
 		if (!IsSampling())
 		{
-			m_averageFramesPerEpisodes.Update(ndBrainFloat(m_framesAlive));
+			m_averageFramesPerEpisodes.Update(ndReal(m_framesAlive));
 		}
 
 		m_eposideCount++;

@@ -22,7 +22,7 @@
 
 namespace ndCarpole_0
 {
-	//#define D_TRAIN_AGENT
+	#define D_TRAIN_AGENT
 
 	#define D_USE_VANILLA_POLICY_GRAD
 	//#define D_USE_PROXIMA_POLICY_GRAD
@@ -33,8 +33,8 @@ namespace ndCarpole_0
 		#define CONTROLLER_NAME "cartpoleDQN.dnn"
 	#endif
 
-	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
-	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
+	#define D_PUSH_ACCEL			ndFloat32 (15.0f)
+	#define D_REWARD_MIN_ANGLE		ndFloat32 (20.0f * ndDegreeToRad)
 
 	enum ndActionSpace
 	{

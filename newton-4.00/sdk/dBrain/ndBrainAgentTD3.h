@@ -116,10 +116,6 @@ void ndBrainAgentTD3<statesDim, actionDim>::OptimizeStep()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentTD3<statesDim, actionDim>::Step()
 {
-	//ndBrainFloat stateBuffer[statesDim * 2];
-	//ndBrainFloat actionBuffer[actionDim * 2];
-	//ndBrainMemVector observations(stateBuffer, statesDim);
-	//ndBrainMemVector actions(actionBuffer, actionDim);
 	ndBrainFixSizeVector<actionDim> actions;
 	ndBrainFixSizeVector<statesDim> observations;
 

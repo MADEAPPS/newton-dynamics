@@ -22,8 +22,8 @@
 
 namespace ndCarpole_1
 {
-	//#define D_TRAIN_AGENT
-	//#define D_USE_VANILLA_POLICY_GRAD
+	#define D_TRAIN_AGENT
+	#define D_USE_VANILLA_POLICY_GRAD
 	//#define D_USE_PROXIMA_POLICY_GRAD
 
 	#ifdef D_USE_VANILLA_POLICY_GRAD

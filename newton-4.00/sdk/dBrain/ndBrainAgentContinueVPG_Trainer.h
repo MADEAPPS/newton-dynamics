@@ -176,11 +176,11 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons));
 	}
 	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, m_actionsSize));
-	layers.PushBack(new ndBrainLayerSoftmaxActivation(m_actionsSize));
+	//layers.PushBack(new ndBrainLayerSoftmaxActivation(m_actionsSize));
+	layers.PushBack(new ndBrainLayerTanhActivation(m_actionsSize));
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		m_actor.AddLayer(layers[i]);
-		//m_target.AddLayer(layers[i]->Clone());
 	}
 	InitWeights();
 
@@ -386,8 +386,8 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::CalcucateRewards()
 		m_rewards[i] = m_trajectory[i].m_reward + m_gamma * m_rewards[i + 1];
 	}
 
-	m_averageQvalue.Update(m_rewards[0]);
-	m_averageFramesPerEpisodes.Update(ndBrainFloat(steps));
+	m_averageQvalue.Update(ndReal(m_rewards[0]));
+	m_averageFramesPerEpisodes.Update(ndReal(steps));
 	m_rewards.GaussianNormalize();
 }
 
