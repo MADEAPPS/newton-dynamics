@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DQN_BRAIN_AGENT_CONTINUE_VPG_TRAINER_H__
-#define _ND_DQN_BRAIN_AGENT_CONTINUE_VPG_TRAINER_H__
+#ifndef _ND_AGENT_CONTINUE_VPG_H_TRAINER_H__
+#define _ND_AGENT_CONTINUE_VPG_H_TRAINER_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"

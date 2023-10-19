@@ -53,7 +53,7 @@ namespace ndCarpole_1
 		public:
 
 		#ifdef D_USE_VANILLA_POLICY_GRAD
-		class ndCartpoleAgent : public ndBrainAgentPolicyGrad<m_stateSize, m_actionsSize>
+		class ndCartpoleAgent : public ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>
 		#else
 		class ndCartpoleAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
 		#endif
@@ -61,7 +61,7 @@ namespace ndCarpole_1
 			public:
 			#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
-				: ndBrainAgentPolicyGrad<m_stateSize, m_actionsSize>(actor)
+				: ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>(actor)
 				, m_model(nullptr)
 			{
 			}

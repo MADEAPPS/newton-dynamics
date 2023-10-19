@@ -42,7 +42,8 @@
 #include <ndBrainOptimizerSgd.h>
 #include <ndBrainOptimizerAdam.h>
 #include <ndBrainLayerActivation.h>
-#include <ndBrainAgentPolicyGrad.h>
+#include <ndBrainAgentDiscreteVPG.h>
+#include <ndBrainAgentContinueVPG.h>
 #include <ndBrainAgentDQN_Trainer.h>
 #include <ndBrainAgentTD3_Trainer.h>
 #include <ndBrainAgentDDPG_Trainer.h>
