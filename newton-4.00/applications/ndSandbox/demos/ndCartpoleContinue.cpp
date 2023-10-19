@@ -23,6 +23,7 @@
 namespace ndCarpole_1
 {
 	#define D_TRAIN_AGENT
+
 	#define D_USE_VANILLA_POLICY_GRAD
 	//#define D_USE_PROXIMA_POLICY_GRAD
 
@@ -61,8 +62,8 @@ namespace ndCarpole_1
 			public:
 			#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
-				: ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>(actor)
-				, m_model(nullptr)
+				:ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>(actor)
+				,m_model(nullptr)
 			{
 			}
 			#else
@@ -102,7 +103,7 @@ namespace ndCarpole_1
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_maxGain(ndFloat32(-1.0e10f))
 				,m_maxFrames(5000)
-				,m_stopTraining(500000)
+				,m_stopTraining(5000000)
 			{
 				m_outFile = fopen("cartpole-DDPG.csv", "wb");
 				fprintf(m_outFile, "ddpg\n");

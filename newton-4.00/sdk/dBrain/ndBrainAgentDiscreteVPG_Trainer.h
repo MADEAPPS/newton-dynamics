@@ -143,8 +143,8 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	ndInt32 m_bashBufferSize;
 	ndInt32 m_maxTrajectorySteps;
 	ndInt32 m_extraTrajectorySteps;
-	ndMovingAverage<256> m_averageQvalue;
-	ndMovingAverage<256> m_averageFramesPerEpisodes;
+	ndMovingAverage<128> m_averageQvalue;
+	ndMovingAverage<128> m_averageFramesPerEpisodes;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>

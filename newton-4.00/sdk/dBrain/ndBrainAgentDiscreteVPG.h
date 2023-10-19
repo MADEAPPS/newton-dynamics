@@ -59,13 +59,11 @@ ndBrainAgentDiscreteVPG<statesDim, actionDim>::ndBrainAgentDiscreteVPG(const ndS
 	:ndBrainAgent()
 	,m_actor(actor)
 {
-	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDiscreteVPG<statesDim, actionDim>::~ndBrainAgentDiscreteVPG()
 {
-	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

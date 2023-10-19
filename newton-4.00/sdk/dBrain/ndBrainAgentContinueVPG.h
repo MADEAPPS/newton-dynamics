@@ -133,7 +133,6 @@ void ndBrainAgentContinueVPG<statesDim, actionDim>::OptimizeStep()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG<statesDim, actionDim>::Step()
 {
-	ndAssert(0);
 	ndBrainFixSizeVector<actionDim> actions;
 	ndBrainFixSizeVector<statesDim> observations;
 

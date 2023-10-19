@@ -36,7 +36,7 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThreadPool
 {
 	public:
-	#define SIGMA ndBrainFloat(0.25f)
+	#define SIGMA ndBrainFloat(0.5f)
 	
 	class HyperParameters
 	{
@@ -145,8 +145,8 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	ndInt32 m_bashBufferSize;
 	ndInt32 m_maxTrajectorySteps;
 	ndInt32 m_extraTrajectorySteps;
-	ndMovingAverage<256> m_averageQvalue;
-	ndMovingAverage<256> m_averageFramesPerEpisodes;
+	ndMovingAverage<128> m_averageQvalue;
+	ndMovingAverage<128> m_averageFramesPerEpisodes;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -295,14 +295,10 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::BackPropagate()
 				{
 					const ndBrainVector& rewards = m_agent->m_rewards;
 					const ndBrainVector& actions = m_agent->m_trajectory[m_index].m_actions;
-					//ndInt32 actionIndex = ndInt32 (m_agent->m_trajectory[m_index].m_action);
-					//loss.Set(ndBrainFloat(0.0f));
-					//ndBrainFloat negLogProb = -ndLog(output[actionIndex]);
-					//loss[actionIndex] = negLogProb * rewards[m_index];
-					ndBrainFloat avantage = -rewards[m_index] / (SIGMA * SIGMA);
+					ndBrainFloat negLogProbAdvantage = -rewards[m_index] / (SIGMA * SIGMA);
 					for (ndInt32 i = actionDim - 1; i >= 0; --i)
 					{
-						loss[i] = avantage * (output[i] - actions[i]);
+						loss[i] = negLogProbAdvantage * (output[i] - actions[i]);
 					}
 				}
 	
@@ -405,7 +401,8 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrain
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
 		ndBrainFloat sample = ndGaussianRandom(probabilities[i], SIGMA);
-		ndBrainFloat squashSample(ndTanh(sample));
+		//ndBrainFloat squashSample(ndTanh(sample));
+		ndBrainFloat squashSample = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		probabilities[i] = squashSample;
 	}
 }
