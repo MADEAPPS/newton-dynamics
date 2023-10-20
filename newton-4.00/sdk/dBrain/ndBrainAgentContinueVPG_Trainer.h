@@ -295,10 +295,10 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::BackPropagate()
 				{
 					const ndBrainVector& rewards = m_agent->m_rewards;
 					const ndBrainVector& actions = m_agent->m_trajectory[m_index].m_actions;
-					ndBrainFloat negLogProbAdvantage = -rewards[m_index] / (SIGMA * SIGMA);
+					ndBrainFloat logProbAdvantage = rewards[m_index] / (SIGMA * SIGMA);
 					for (ndInt32 i = actionDim - 1; i >= 0; --i)
 					{
-						loss[i] = negLogProbAdvantage * (output[i] - actions[i]);
+						loss[i] = logProbAdvantage * (actions[i] - output[i]);
 					}
 				}
 	
