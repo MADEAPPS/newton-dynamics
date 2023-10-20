@@ -24,12 +24,12 @@ namespace ndUnicycle
 {
 	#define ND_TRAIN_MODEL
 
-	#define ND_USE_TD3
+	//#define D_USE_VANILLA_POLICY_GRAD
 
-	#ifdef ND_USE_TD3
-		#define CONTROLLER_NAME "unicycleTD3.dnn"
-	#else
+	#ifdef D_USE_VANILLA_POLICY_GRAD
 		#define CONTROLLER_NAME "unicycleVPG.dnn"
+	#else
+		#define CONTROLLER_NAME "unicycleDDPG.dnn"
 	#endif 
 
 
@@ -87,14 +87,23 @@ namespace ndUnicycle
 		};
 
 		// implement controller player
+		#ifdef D_USE_VANILLA_POLICY_GRAD
+		class ndController : public ndBrainAgentContinueVPG<m_stateSize, m_actionsSize>
+		#else
 		class ndController : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
+		#endif
 		{
 			public:
 			ndController(ndSharedPtr<ndBrain>& actor)
+				#ifdef D_USE_VANILLA_POLICY_GRAD
+				:ndBrainAgentContinueVPG<m_stateSize, m_actionsSize>(actor)
+				#else
 				:ndBrainAgentDDPG<m_stateSize, m_actionsSize>(actor)
+				#endif
 				,m_model(nullptr)
 			{
 			}
+
 
 			void SetModel(ndRobot* const model)
 			{
@@ -122,20 +131,21 @@ namespace ndUnicycle
 			ndRobot* m_model;
 		};
 
-		#ifdef ND_USE_TD3
-		class ndControllerTrainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
+		#ifdef D_USE_VANILLA_POLICY_GRAD
+		class ndControllerTrainer: public ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>
 		#else
+		class ndControllerTrainer : public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
 		#endif
 		{
 			public:
-			#ifdef ND_USE_TD3
+			#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndControllerTrainer(const HyperParameters& hyperParameters)
-				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
+				:ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
 				,m_bestActor(m_actor)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(5000)
-				,m_stopTraining(1000000)
+				,m_stopTraining(10000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
 			#else
@@ -145,19 +155,17 @@ namespace ndUnicycle
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(5000)
-				,m_stopTraining(1000000)
+				,m_stopTraining(4000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
 			#endif
 			{
-				#ifdef ND_USE_TD3
-					m_outFile = fopen("traingPerf-TD3.csv", "wb");
-					fprintf(m_outFile, "td3\n");
+				#ifdef D_USE_VANILLA_POLICY_GRAD
+					m_outFile = fopen("unicycle-VPG.csv", "wb");
+					fprintf(m_outFile, "vgp\n");
 				#else
-					ndAssert(0);
-					SetName("unicycleDDPG.dnn");
-					m_outFile = fopen("traingPerf-DDPG.csv", "wb");
-					fprintf(m_outFile, "DDPG\n");
+					m_outFile = fopen("unicycle-DDPG.csv", "wb");
+					fprintf(m_outFile, "ddpg\n");
 				#endif
 			}
 
@@ -179,6 +187,7 @@ namespace ndUnicycle
 				return m_model->GetReward();
 			}
 
+			#ifndef D_USE_VANILLA_POLICY_GRAD
 			void AddExploration(ndBrainFloat* const actions)
 			{
 				if (GetEpisodeFrames() >= 15000)
@@ -206,6 +215,7 @@ namespace ndUnicycle
 					actions[i] = actionNoise;
 				}
 			}
+			#endif
 
 			virtual void ApplyActions(ndBrainFloat* const actions) const
 			{
@@ -233,10 +243,9 @@ namespace ndUnicycle
 				if (stopTraining <= m_stopTraining)
 				{
 					ndInt32 episodeCount = GetEposideCount();
-					#ifdef ND_USE_TD3
-						ndBrainAgentTD3_Trainer::OptimizeStep();
+					#ifdef D_USE_VANILLA_POLICY_GRAD
+						ndBrainAgentContinueVPG_Trainer::OptimizeStep();
 					#else
-						ndAssert(0);
 						ndBrainAgentDDPG_Trainer::OptimizeStep();
 					#endif
 
@@ -539,17 +548,15 @@ namespace ndUnicycle
 		// build neural net controller
 		#ifdef ND_TRAIN_MODEL
 			// add a reinforcement learning controller 
-			#ifdef ND_USE_TD3
-			ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			#ifdef D_USE_VANILLA_POLICY_GRAD
+			ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			hyperParameters.m_maxTrajectorySteps = 6000;
 			#else
-			ndAssert(0);
 			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			hyperParameters.m_actionNoiseVariance = ndReal(0.125f);
 			#endif
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_discountFactor = ndReal (0.995f);
-			hyperParameters.m_criticLearnRate = ndReal(0.0005f);
-			hyperParameters.m_actionNoiseVariance = ndReal(0.125f);
-			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * ndReal(0.25f);
 
 			ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerTrainer(hyperParameters));
 			agent->SetName(CONTROLLER_NAME);
