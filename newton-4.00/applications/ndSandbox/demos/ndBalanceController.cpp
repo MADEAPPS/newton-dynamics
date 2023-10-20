@@ -22,8 +22,16 @@
 
 namespace ndController_1
 {
-	//#define ND_USE_TD3
 	#define ND_TRAIN_MODEL
+
+	#define ND_USE_TD3
+
+	#ifdef ND_USE_TD3
+		#define CONTROLLER_NAME "unicycleTD3.dnn"
+	#else
+		#define CONTROLLER_NAME "unicycleVPG.dnn"
+	#endif 
+
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
 	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)
@@ -114,8 +122,6 @@ namespace ndController_1
 			ndModelUnicycle* m_model;
 		};
 
-		// the table based approach is not really practical
-		// try implement DDPN controller using neural networks. 
 		#ifdef ND_USE_TD3
 		class ndControllerAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
 		{
@@ -136,12 +142,8 @@ namespace ndController_1
 				,m_stopTraining(1000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
-				,m_explorationProbability(ndBrainFloat(1.0f))
-				,m_minExplorationProbability(ndBrainFloat(0.01f))
-				,m_explorationAnneliningRate(ndBrainFloat(0.0f))
 			{
 				#ifdef ND_USE_TD3
-					SetName("unicycleTD3.dnn");
 					m_outFile = fopen("traingPerf-TD3.csv", "wb");
 					fprintf(m_outFile, "td3\n");
 				#else
@@ -149,8 +151,6 @@ namespace ndController_1
 					m_outFile = fopen("traingPerf-DDPG.csv", "wb");
 					fprintf(m_outFile, "DDPG\n");
 				#endif
-				
-				m_explorationAnneliningRate = (m_explorationProbability - m_minExplorationProbability) / ndFloat32(m_stopTraining * 2 / 3);
 			}
 
 			~ndControllerAgent_trainer()
@@ -192,16 +192,11 @@ namespace ndController_1
 					}
 				}
 
-				//ndFloat32 explore = ndRand();
-				//if (explore <= m_explorationProbability)
+				for (ndInt32 i = 0; i < m_actionsSize; ++i)
 				{
-					for (ndInt32 i = 0; i < m_actionsSize; ++i)
-					{
-						ndBrainFloat actionNoise = ndBrainFloat(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(m_actionNoiseVariance)));
-						actions[i] = actionNoise;
-					}
+					ndBrainFloat actionNoise = ndBrainFloat(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(m_actionNoiseVariance)));
+					actions[i] = actionNoise;
 				}
-				m_explorationProbability = ndMax(m_explorationProbability - m_explorationAnneliningRate, m_minExplorationProbability);
 			}
 
 			virtual void ApplyActions(ndBrainFloat* const actions) const
@@ -233,6 +228,7 @@ namespace ndController_1
 					#ifdef ND_USE_TD3
 						ndBrainAgentTD3_Trainer::OptimizeStep();
 					#else
+						ndAssert(0);
 						ndBrainAgentDDPG_Trainer::OptimizeStep();
 					#endif
 
@@ -268,6 +264,11 @@ namespace ndController_1
 						ndExpandTraceMessage("training complete\n");
 						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
 						ndExpandTraceMessage("training time: %g\n seconds", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+						if (m_outFile)
+						{
+							fclose(m_outFile);
+							m_outFile = nullptr;
+						}
 					}
 				}
 				if (m_model->IsOutOfBounds())
@@ -284,9 +285,6 @@ namespace ndController_1
 			ndInt32 m_stopTraining;
 			ndUnsigned64 m_timer;
 			bool m_modelIsTrained;
-			mutable ndFloat32 m_explorationProbability;
-			mutable ndFloat32 m_minExplorationProbability;
-			mutable ndFloat32 m_explorationAnneliningRate;
 		};
 
 		ndModelUnicycle(ndSharedPtr<ndBrainAgent> agent)
@@ -536,6 +534,7 @@ namespace ndController_1
 			#ifdef ND_USE_TD3
 			ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			#else
+			ndAssert(0);
 			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			#endif
 			//hyperParameters.m_threadsCount = 1;
@@ -545,14 +544,11 @@ namespace ndController_1
 			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * ndReal(0.25f);
 
 			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(hyperParameters));
+			agent->SetName(CONTROLLER_NAME);
 			scene->SetAcceleratedUpdate();
 		#else
 			char fileName[1024];
-			#ifdef ND_USE_TD3
-				ndGetWorkingFileName("unicycleTD3.dnn", fileName);
-			#else
-				ndGetWorkingFileName("unicycleDDPG.dnn", fileName);
-			#endif
+			ndGetWorkingFileName(CONTROLLER_NAME, fileName);
 			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
 			ndSharedPtr<ndBrainAgent> agent(new  ndModelUnicycle::ndControllerAgent(actor));
 		#endif
