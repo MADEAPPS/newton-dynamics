@@ -59,13 +59,11 @@ ndBrainAgentContinueVPG<statesDim, actionDim>::ndBrainAgentContinueVPG(const ndS
 	:ndBrainAgent()
 	,m_actor(actor)
 {
-	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentContinueVPG<statesDim, actionDim>::~ndBrainAgentContinueVPG()
 {
-	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

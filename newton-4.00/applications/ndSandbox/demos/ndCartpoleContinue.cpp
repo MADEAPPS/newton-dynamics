@@ -22,7 +22,7 @@
 
 namespace ndCarpole_1
 {
-	#define D_TRAIN_AGENT
+	//#define D_TRAIN_AGENT
 
 	#define D_USE_VANILLA_POLICY_GRAD
 	//#define D_USE_PROXIMA_POLICY_GRAD
@@ -54,7 +54,7 @@ namespace ndCarpole_1
 		public:
 
 		#ifdef D_USE_VANILLA_POLICY_GRAD
-		class ndCartpoleAgent : public ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>
+		class ndCartpoleAgent : public ndBrainAgentContinueVPG<m_stateSize, m_actionsSize>
 		#else
 		class ndCartpoleAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
 		#endif
@@ -62,7 +62,7 @@ namespace ndCarpole_1
 			public:
 			#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>(actor)
+				:ndBrainAgentContinueVPG<m_stateSize, m_actionsSize>(actor)
 				,m_model(nullptr)
 			{
 			}
@@ -104,9 +104,10 @@ namespace ndCarpole_1
 				,m_maxGain(ndFloat32(-1.0e10f))
 				,m_maxFrames(5000)
 				,m_stopTraining(5000000)
+				,m_modelIsTrained(false)
 			{
-				m_outFile = fopen("cartpole-DDPG.csv", "wb");
-				fprintf(m_outFile, "ddpg\n");
+				m_outFile = fopen("cartpoleContinue-VPG.csv", "wb");
+				fprintf(m_outFile, "vpg\n");
 			}
 			#else
 			ndCartpoleAgentTrainer(const HyperParameters& hyperParameters)
@@ -117,6 +118,7 @@ namespace ndCarpole_1
 				,m_maxGain(ndFloat32(-1.0e10f))
 				,m_maxFrames(5000)
 				,m_stopTraining(500000)
+				,m_modelIsTrained(false)
 			{
 				m_outFile = fopen("cartpole-DDPG.csv", "wb");
 				fprintf(m_outFile, "ddpg\n");
@@ -218,6 +220,12 @@ namespace ndCarpole_1
 						SaveToFile(fileName);
 						ndExpandTraceMessage("saving to file: %s\n", fileName);
 						ndExpandTraceMessage("training complete\n\n");
+						m_modelIsTrained = true;
+						if (m_outFile)
+						{
+							fclose(m_outFile);
+							m_outFile = nullptr;
+						}
 					}
 				}
 
@@ -234,6 +242,7 @@ namespace ndCarpole_1
 			ndFloat32 m_maxGain;
 			ndInt32 m_maxFrames;
 			ndInt32 m_stopTraining;
+			bool m_modelIsTrained;
 		};
 
 		ndCartpole(const ndSharedPtr<ndBrainAgent>& agent)
@@ -330,6 +339,26 @@ namespace ndCarpole_1
 		bool IsOutOfBounds() const
 		{
 			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
+		}
+
+		void CheckTrainingCompleted()
+		{
+			#ifdef D_TRAIN_AGENT
+			if (m_agent->IsTrainer())
+			{
+				ndCartpoleAgentTrainer* const agent = (ndCartpoleAgentTrainer*)(*m_agent);
+				if (agent->m_modelIsTrained)
+				{
+					char fileName[1024];
+					ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
+					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+					m_agent = ndSharedPtr<ndBrainAgent>(new ndCartpole::ndCartpoleAgent(actor));
+					((ndCartpole::ndCartpoleAgent*)*m_agent)->m_model = this;
+					//ResetModel();
+					((ndPhysicsWorld*)m_world)->NormalUpdates();
+				}
+			}
+			#endif
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
