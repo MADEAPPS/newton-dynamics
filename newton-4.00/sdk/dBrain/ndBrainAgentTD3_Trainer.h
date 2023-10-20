@@ -100,7 +100,7 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 	void Save(ndBrainSave* const loadSave) const;
 
 	void BackPropagate();
-	void AddExploration(ndBrainFloat* const actions);
+	void SelectAction(ndBrainFloat* const actions) const;
 	void BackPropagateActor(const ndUnsigned32* const bashIndex);
 	void BackPropagateCritic(const ndUnsigned32* const bashIndex);
 	void CalculateQvalue(const ndBrainVector& state, const ndBrainVector& actions);
@@ -349,12 +349,14 @@ ndBrainFloat ndBrainAgentTD3_Trainer<statesDim, actionDim>::GetReward() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentTD3_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat* const actions)
+void ndBrainAgentTD3_Trainer<statesDim, actionDim>::SelectAction(ndBrainFloat* const actions) const
 {
-	for (ndInt32 i = 0; i < actionDim; ++i)
+	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
-		ndBrainFloat actionNoise = ndBrainFloat(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(m_actionNoiseVariance)));
-		actions[i] = actionNoise;
+		ndBrainFloat sample = ndGaussianRandom(actions[i], m_actionNoiseVariance);
+		//ndBrainFloat squashSample(ndTanh(sample));
+		ndBrainFloat squashSample = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
+		actions[i] = squashSample;
 	}
 }
 
@@ -555,7 +557,7 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::Step()
 	m_actor.MakePrediction(m_currentTransition.m_observation, m_currentTransition.m_action);
 
 	// explore environment
-	AddExploration(&m_currentTransition.m_action[0]);
+	SelectAction(&m_currentTransition.m_action[0]);
 	ApplyActions(&m_currentTransition.m_action[0]);
 
 	m_currentTransition.m_reward = GetReward();

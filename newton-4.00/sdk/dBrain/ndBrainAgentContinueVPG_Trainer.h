@@ -118,7 +118,6 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	bool IsSampling() const;
 	bool IsTerminal() const;
 	ndBrainFloat GetReward() const;
-	void AddExploration(ndBrainFloat* const actions);
 
 	private:
 	void Optimize();
@@ -389,15 +388,9 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Optimize()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat* const)
-{
-	ndAssert(0);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrainVector& probabilities) const
 {
-	// for now use a constant deviations until teh algorism is stable 
+	// for now use a constant deviations until the algorism is stable 
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
 		ndBrainFloat sample = ndGaussianRandom(probabilities[i], SIGMA);

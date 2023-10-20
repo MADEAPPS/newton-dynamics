@@ -188,7 +188,42 @@ namespace ndUnicycle
 			}
 
 			#ifndef D_USE_VANILLA_POLICY_GRAD
-			void AddExploration(ndBrainFloat* const actions)
+			//void AddExploration(ndBrainFloat* const actions)
+			//{
+			//	if (GetEpisodeFrames() >= 15000)
+			//	{
+			//		for (ndInt32 i = 0; i < m_actionsSize; ++i)
+			//		{
+			//			ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(2.0f)));
+			//			ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
+			//			actions[i] = clippiedNoisyAction;
+			//		}
+			//	}
+			//	else if (GetEpisodeFrames() >= 10000)
+			//	{
+			//		for (ndInt32 i = 0; i < m_actionsSize; ++i)
+			//		{
+			//			ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
+			//			ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
+			//			actions[i] = clippiedNoisyAction;
+			//		}
+			//	}
+			//
+			//	for (ndInt32 i = 0; i < m_actionsSize; ++i)
+			//	{
+			//		ndBrainFloat actionNoise = ndBrainFloat(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(m_actionNoiseVariance)));
+			//		actions[i] = actionNoise;
+			//	}
+			//}
+			#endif
+
+			#ifdef D_USE_VANILLA_POLICY_GRAD
+			virtual void ApplyActions(ndBrainFloat* const actions) const
+			{
+				m_model->ApplyActions(actions);
+			}
+			#else		
+			virtual void ApplyActions(ndBrainFloat* const actions) const
 			{
 				if (GetEpisodeFrames() >= 15000)
 				{
@@ -209,18 +244,9 @@ namespace ndUnicycle
 					}
 				}
 
-				for (ndInt32 i = 0; i < m_actionsSize; ++i)
-				{
-					ndBrainFloat actionNoise = ndBrainFloat(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(m_actionNoiseVariance)));
-					actions[i] = actionNoise;
-				}
-			}
-			#endif
-
-			virtual void ApplyActions(ndBrainFloat* const actions) const
-			{
 				m_model->ApplyActions(actions);
 			}
+			#endif
 
 			void GetObservation(ndBrainFloat* const state) const
 			{

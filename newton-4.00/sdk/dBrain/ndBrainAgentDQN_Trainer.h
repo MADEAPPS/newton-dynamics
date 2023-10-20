@@ -92,13 +92,13 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	bool IsSampling() const;
 	bool IsTerminal() const;
 	ndBrainFloat GetReward() const;
-	void AddExploration(ndBrainFloat* const actions);
 
 	private:
 	void Optimize();
 	void BackPropagate();
 	void PopulateReplayBuffer();
 	void SetBufferSize(ndInt32 size);
+	void AddExploration(ndBrainFloat* const actions);
 
 	protected:
 	ndBrain m_actor;

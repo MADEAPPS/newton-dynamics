@@ -116,7 +116,6 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	bool IsSampling() const;
 	bool IsTerminal() const;
 	ndBrainFloat GetReward() const;
-	void AddExploration(ndBrainFloat* const actions);
 
 	private:
 	void Optimize();
@@ -394,12 +393,6 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Optimize()
 {
 	CalcucateRewards();
 	BackPropagate();
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat* const)
-{
-	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

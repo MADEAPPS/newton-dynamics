@@ -43,7 +43,6 @@ class ndBrainAgentDDPG: public ndBrainAgent
 	ndBrainFloat GetReward() const;
 	ndInt32 GetEpisodeFrames() const;
 	void Save(ndBrainSave* const loadSave) const;
-	void AddExploration(ndBrainFloat* const actions);
 
 	void InitWeights();
 	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
@@ -76,12 +75,6 @@ ndBrainFloat ndBrainAgentDDPG<statesDim, actionDim>::GetReward() const
 {
 	ndAssert(0);
 	return ndBrainFloat(0.0f);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG<statesDim, actionDim>::AddExploration(ndBrainFloat* const)
-{
-	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

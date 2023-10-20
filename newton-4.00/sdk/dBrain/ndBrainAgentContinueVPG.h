@@ -44,8 +44,6 @@ class ndBrainAgentContinueVPG: public ndBrainAgent
 	bool IsTerminal() const;
 	ndBrainFloat GetReward() const;
 	ndInt32 GetEpisodeFrames() const;
-	void AddExploration(ndBrainFloat* const actions);
-
 	void Save(ndBrainSave* const loadSave) const;
 
 	void InitWeights();
@@ -89,12 +87,6 @@ bool ndBrainAgentContinueVPG<statesDim, actionDim>::IsTerminal() const
 {
 	ndAssert(0);
 	return false;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentContinueVPG<statesDim, actionDim>::AddExploration(ndBrainFloat* const)
-{
-	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

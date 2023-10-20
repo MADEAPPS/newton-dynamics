@@ -350,19 +350,19 @@ namespace ndQuadruped_1
 			}
 
 			//#pragma optimize( "", off ) //for debugging purpose
-			void AddExploration(ndBrainFloat* const actions)
-			{
-				m_explorationProbability = ndMax(m_explorationProbability - m_explorationAnneliningRate, m_minExplorationProbability);
-				ndFloat32 explore = ndRand();
-				if (explore <= m_explorationProbability)
-				{
-					for (ndInt32 i = 0; i < m_actionsSize; ++i)
-					{
-						ndBrainFloat actionNoise = ndBrainFloat(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(m_actionNoiseVariance)));
-						actions[i] = actionNoise;
-					}
-				}
-			}
+			//void AddExploration(ndBrainFloat* const actions)
+			//{
+			//	m_explorationProbability = ndMax(m_explorationProbability - m_explorationAnneliningRate, m_minExplorationProbability);
+			//	ndFloat32 explore = ndRand();
+			//	if (explore <= m_explorationProbability)
+			//	{
+			//		for (ndInt32 i = 0; i < m_actionsSize; ++i)
+			//		{
+			//			ndBrainFloat actionNoise = ndBrainFloat(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(m_actionNoiseVariance)));
+			//			actions[i] = actionNoise;
+			//		}
+			//	}
+			//}
 
 			//#pragma optimize( "", off ) //for debugging purpose
 			ndBrainFloat GetReward() const
