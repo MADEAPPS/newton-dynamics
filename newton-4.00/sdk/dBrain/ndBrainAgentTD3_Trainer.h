@@ -57,6 +57,7 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 			m_criticLearnRate = ndBrainFloat(0.0005f);
 			m_softTargetFactor = ndBrainFloat(1.0e-3f);
 			m_actionNoiseVariance = ndBrainFloat(0.05f);
+			m_criticRegularizer = ndBrainFloat(1.0e-5f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
 		}
 
@@ -65,6 +66,7 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 		ndBrainFloat m_actorLearnRate;
 		ndBrainFloat m_criticLearnRate;
 		ndBrainFloat m_softTargetFactor;
+		ndBrainFloat m_criticRegularizer;
 		ndBrainFloat m_actionNoiseVariance;
 
 		ndInt32 m_threadsCount;
@@ -138,8 +140,8 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 	ndInt32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
 	ndInt32 m_replayBufferPrefill;
-	ndMovingAverage<1024> m_averageQvalue;
-	ndMovingAverage<64> m_averageFramesPerEpisodes;
+	ndMovingAverage<128> m_averageQvalue;
+	ndMovingAverage<128> m_averageFramesPerEpisodes;
 	bool m_collectingSamples;
 };
 
@@ -237,8 +239,8 @@ ndBrainAgentTD3_Trainer<statesDim, actionDim>::ndBrainAgentTD3_Trainer(const Hyp
 	m_criticOptimizer1 = new ndBrainOptimizerAdam();
 	
 	m_actorOptimizer->SetRegularizer(hyperParameters.m_regularizer);
-	m_criticOptimizer0->SetRegularizer(hyperParameters.m_regularizer);
-	m_criticOptimizer1->SetRegularizer(hyperParameters.m_regularizer);
+	m_criticOptimizer0->SetRegularizer(hyperParameters.m_criticRegularizer);
+	m_criticOptimizer1->SetRegularizer(hyperParameters.m_criticRegularizer);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

@@ -154,8 +154,8 @@ namespace ndUnicycle
 				,m_bestActor(m_actor)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(5000)
-				,m_stopTraining(4000000)
+				,m_maxFrames(3000)
+				,m_stopTraining(2000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
 			#endif
@@ -186,36 +186,6 @@ namespace ndUnicycle
 			{
 				return m_model->GetReward();
 			}
-
-			#ifndef D_USE_VANILLA_POLICY_GRAD
-			//void AddExploration(ndBrainFloat* const actions)
-			//{
-			//	if (GetEpisodeFrames() >= 15000)
-			//	{
-			//		for (ndInt32 i = 0; i < m_actionsSize; ++i)
-			//		{
-			//			ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(2.0f)));
-			//			ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
-			//			actions[i] = clippiedNoisyAction;
-			//		}
-			//	}
-			//	else if (GetEpisodeFrames() >= 10000)
-			//	{
-			//		for (ndInt32 i = 0; i < m_actionsSize; ++i)
-			//		{
-			//			ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
-			//			ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
-			//			actions[i] = clippiedNoisyAction;
-			//		}
-			//	}
-			//
-			//	for (ndInt32 i = 0; i < m_actionsSize; ++i)
-			//	{
-			//		ndBrainFloat actionNoise = ndBrainFloat(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(m_actionNoiseVariance)));
-			//		actions[i] = actionNoise;
-			//	}
-			//}
-			#endif
 
 			#ifdef D_USE_VANILLA_POLICY_GRAD
 			virtual void ApplyActions(ndBrainFloat* const actions) const
@@ -579,7 +549,7 @@ namespace ndUnicycle
 			hyperParameters.m_maxTrajectorySteps = 6000;
 			#else
 			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
-			hyperParameters.m_actionNoiseVariance = ndReal(0.125f);
+			hyperParameters.m_actionNoiseVariance = ndReal(0.25f);
 			#endif
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_discountFactor = ndReal (0.995f);
