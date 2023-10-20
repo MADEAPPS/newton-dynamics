@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-namespace ndController_1
+namespace ndUnicycle
 {
 	#define ND_TRAIN_MODEL
 
@@ -52,7 +52,7 @@ namespace ndController_1
 		m_stateSize
 	};
 
-	class ndModelUnicycle : public ndModelArticulation
+	class ndRobot : public ndModelArticulation
 	{
 		public:
 		class ndBasePose
@@ -87,16 +87,16 @@ namespace ndController_1
 		};
 
 		// implement controller player
-		class ndControllerAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
+		class ndController : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
 		{
 			public:
-			ndControllerAgent(ndSharedPtr<ndBrain>& actor)
+			ndController(ndSharedPtr<ndBrain>& actor)
 				:ndBrainAgentDDPG<m_stateSize, m_actionsSize>(actor)
 				,m_model(nullptr)
 			{
 			}
 
-			void SetModel(ndModelUnicycle* const model)
+			void SetModel(ndRobot* const model)
 			{
 				m_model = model;
 			}
@@ -119,22 +119,18 @@ namespace ndController_1
 				m_model->ApplyActions(actions);
 			}
 
-			ndModelUnicycle* m_model;
+			ndRobot* m_model;
 		};
 
 		#ifdef ND_USE_TD3
-		class ndControllerAgent_trainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
-		{
-			public:
-			ndControllerAgent_trainer(const HyperParameters& hyperParameters)
-				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
+		class ndControllerTrainer: public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
 		#else
-		class ndControllerAgent_trainer: public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
+		#endif
 		{
 			public:
-			ndControllerAgent_trainer(const HyperParameters& hyperParameters)
-				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
-		#endif
+			#ifdef ND_USE_TD3
+			ndControllerTrainer(const HyperParameters& hyperParameters)
+				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
 				,m_bestActor(m_actor)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
@@ -142,18 +138,30 @@ namespace ndController_1
 				,m_stopTraining(1000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
+			#else
+			ndControllerTrainer(const HyperParameters& hyperParameters)
+				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
+				,m_bestActor(m_actor)
+				,m_model(nullptr)
+				,m_maxGain(-1.0e10f)
+				,m_maxFrames(5000)
+				,m_stopTraining(1000000)
+				,m_timer(ndGetTimeInMicroseconds())
+				,m_modelIsTrained(false)
+			#endif
 			{
 				#ifdef ND_USE_TD3
 					m_outFile = fopen("traingPerf-TD3.csv", "wb");
 					fprintf(m_outFile, "td3\n");
 				#else
+					ndAssert(0);
 					SetName("unicycleDDPG.dnn");
 					m_outFile = fopen("traingPerf-DDPG.csv", "wb");
 					fprintf(m_outFile, "DDPG\n");
 				#endif
 			}
 
-			~ndControllerAgent_trainer()
+			~ndControllerTrainer()
 			{
 				if (m_outFile)
 				{
@@ -161,7 +169,7 @@ namespace ndController_1
 				}
 			}
 
-			void SetModel(ndModelUnicycle* const model)
+			void SetModel(ndRobot* const model)
 			{
 				m_model = model;
 			}
@@ -279,7 +287,7 @@ namespace ndController_1
 
 			FILE* m_outFile;
 			ndBrain m_bestActor;
-			ndModelUnicycle* m_model;
+			ndRobot* m_model;
 			ndFloat32 m_maxGain;
 			ndInt32 m_maxFrames;
 			ndInt32 m_stopTraining;
@@ -287,7 +295,7 @@ namespace ndController_1
 			bool m_modelIsTrained;
 		};
 
-		ndModelUnicycle(ndSharedPtr<ndBrainAgent> agent)
+		ndRobot(ndSharedPtr<ndBrainAgent> agent)
 			:ndModelArticulation()
 			,m_agent(agent)
 			,m_legJoint(nullptr)
@@ -403,14 +411,14 @@ namespace ndController_1
 			#ifdef ND_TRAIN_MODEL
 			if (m_agent->IsTrainer())
 			{
-				ndControllerAgent_trainer* const agent = (ndControllerAgent_trainer*)*m_agent;
+				ndControllerTrainer* const agent = (ndControllerTrainer*)*m_agent;
 				if (agent->m_modelIsTrained)
 				{
 					char fileName[1024];
 					ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
 					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-					m_agent = ndSharedPtr<ndBrainAgent>(new ndModelUnicycle::ndControllerAgent(actor));
-					((ndModelUnicycle::ndControllerAgent*)*m_agent)->SetModel(this);
+					m_agent = ndSharedPtr<ndBrainAgent>(new ndRobot::ndController(actor));
+					((ndRobot::ndController*)*m_agent)->SetModel(this);
 					ResetModel();
 					((ndPhysicsWorld*)m_world)->NormalUpdates();
 				}
@@ -440,7 +448,7 @@ namespace ndController_1
 		ndFloat32 m_timestep;
 	};
 
-	void BuildModel(ndModelUnicycle* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
+	void BuildModel(ndRobot* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		ndFloat32 mass = 20.0f;
 		ndFloat32 limbMass = 1.0f;
@@ -543,29 +551,29 @@ namespace ndController_1
 			hyperParameters.m_actionNoiseVariance = ndReal(0.125f);
 			hyperParameters.m_actorLearnRate = hyperParameters.m_criticLearnRate * ndReal(0.25f);
 
-			ndSharedPtr<ndBrainAgent> agent(new ndModelUnicycle::ndControllerAgent_trainer(hyperParameters));
+			ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerTrainer(hyperParameters));
 			agent->SetName(CONTROLLER_NAME);
 			scene->SetAcceleratedUpdate();
 		#else
 			char fileName[1024];
 			ndGetWorkingFileName(CONTROLLER_NAME, fileName);
 			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-			ndSharedPtr<ndBrainAgent> agent(new  ndModelUnicycle::ndControllerAgent(actor));
+			ndSharedPtr<ndBrainAgent> agent(new  ndRobot::ndController(actor));
 		#endif
 
-		ndModelUnicycle* const model = new ndModelUnicycle(agent);
+		ndRobot* const model = new ndRobot(agent);
 		BuildModel(model, scene, location);
 		#ifdef ND_TRAIN_MODEL
-			((ndModelUnicycle::ndControllerAgent_trainer*)*agent)->SetModel(model);
+			((ndRobot::ndControllerTrainer*)*agent)->SetModel(model);
 		#else
-			((ndModelUnicycle::ndControllerAgent*)*agent)->SetModel(model);
+			((ndRobot::ndController*)*agent)->SetModel(model);
 		#endif
 		return model;
 	}
 }
 
-using namespace ndController_1;
-void ndBalanceController(ndDemoEntityManager* const scene)
+using namespace ndUnicycle;
+void ndUnicycleController(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFloorBox(scene, ndGetIdentityMatrix());

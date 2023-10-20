@@ -51,25 +51,25 @@ namespace ndCarpole_0
 		m_stateSize
 	};
 
-	class ndCartpole: public ndModelArticulation
+	class ndRobot: public ndModelArticulation
 	{
 		public:
 
 		#ifdef D_USE_VANILLA_POLICY_GRAD
-		class ndCartpoleAgent : public ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>
+		class ndController : public ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>
 		#else
-		class ndCartpoleAgent : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
+		class ndController : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
 		#endif
 		{
 			public:
 			#ifdef D_USE_VANILLA_POLICY_GRAD
-			ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
+			ndController(ndSharedPtr<ndBrain>& actor)
 				:ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>(actor)
 				,m_model(nullptr)
 			{
 			}
 			#else
-			ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
+			ndController(ndSharedPtr<ndBrain>& actor)
 				:ndBrainAgentDQN<m_stateSize, m_actionsSize>(actor)
 				,m_model(nullptr)
 			{
@@ -86,23 +86,23 @@ namespace ndCarpole_0
 				m_model->ApplyActions(actions);
 			}
 
-			void SetModel(ndCartpole* const model)
+			void SetModel(ndRobot* const model)
 			{
 				m_model = model;
 			}
 
-			ndCartpole* m_model;
+			ndRobot* m_model;
 		};
 
 		#ifdef D_USE_VANILLA_POLICY_GRAD
-		class ndCartpoleAgentTrainer : public ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>
+		class ndControllerTrainer : public ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>
 		#else
-		class ndCartpoleAgentTrainer : public ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>
+		class ndControllerTrainer : public ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>
 		#endif
 		{
 			public:
 			#ifdef D_USE_VANILLA_POLICY_GRAD
-			ndCartpoleAgentTrainer(ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
+			ndControllerTrainer(ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
 				:ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
 				,m_bestActor(m_actor)
 				,m_model(nullptr)
@@ -116,7 +116,7 @@ namespace ndCarpole_0
 				fprintf(m_outFile, "VPG\n");
 			}
 			#else
-			ndCartpoleAgentTrainer(ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
+			ndControllerTrainer(ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
 				:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
 				,m_bestActor(m_actor)
 				,m_model(nullptr)
@@ -130,7 +130,7 @@ namespace ndCarpole_0
 			}
 			#endif
 
-			~ndCartpoleAgentTrainer()
+			~ndControllerTrainer()
 			{
 				if (m_outFile)
 				{
@@ -231,7 +231,7 @@ namespace ndCarpole_0
 
 			FILE* m_outFile;
 			ndBrain m_bestActor;
-			ndCartpole* m_model;
+			ndRobot* m_model;
 			ndUnsigned64 m_timer;
 			ndFloat32 m_maxGain;
 			ndInt32 m_maxFrames;
@@ -239,7 +239,7 @@ namespace ndCarpole_0
 			bool m_modelIsTrained;
 		};
 
-		ndCartpole(const ndSharedPtr<ndBrainAgent>& agent)
+		ndRobot(const ndSharedPtr<ndBrainAgent>& agent)
 			:ndModelArticulation()
 			,m_cartMatrix(ndGetIdentityMatrix())
 			,m_poleMatrix(ndGetIdentityMatrix())
@@ -347,14 +347,14 @@ namespace ndCarpole_0
 			#ifdef D_TRAIN_AGENT
 			if (m_agent->IsTrainer())
 			{
-				ndCartpoleAgentTrainer* const agent = (ndCartpoleAgentTrainer*)(*m_agent);
+				ndControllerTrainer* const agent = (ndControllerTrainer*)(*m_agent);
 				if (agent->m_modelIsTrained)
 				{
 					char fileName[1024];
 					ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
 					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-					m_agent = ndSharedPtr<ndBrainAgent>(new ndCartpole::ndCartpoleAgent(actor));
-					((ndCartpole::ndCartpoleAgent*)*m_agent)->SetModel(this);
+					m_agent = ndSharedPtr<ndBrainAgent>(new ndRobot::ndController(actor));
+					((ndRobot::ndController*)*m_agent)->SetModel(this);
 					//ResetModel();
 					((ndPhysicsWorld*)m_world)->NormalUpdates();
 				}
@@ -382,7 +382,7 @@ namespace ndCarpole_0
 		ndSharedPtr<ndBrainAgent> m_agent;
 	};
 
-	void BuildModel(ndCartpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
+	void BuildModel(ndRobot* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		ndFloat32 xSize = 0.25f;
 		ndFloat32 ySize = 0.125f;
@@ -431,7 +431,7 @@ namespace ndCarpole_0
 	}
 
 	#ifdef D_TRAIN_AGENT
-	ndCartpole* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	ndRobot* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
@@ -442,10 +442,10 @@ namespace ndCarpole_0
 		#endif
 		//hyperParameters.m_threadsCount = 1;
 		
-		ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgentTrainer(hyperParameters));
+		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerTrainer(hyperParameters));
 
-		ndCartpole* const model = new ndCartpole(agent);
-		ndCartpole::ndCartpoleAgentTrainer* const trainer = (ndCartpole::ndCartpoleAgentTrainer*)*agent;
+		ndRobot* const model = new ndRobot(agent);
+		ndRobot::ndControllerTrainer* const trainer = (ndRobot::ndControllerTrainer*)*agent;
 		trainer->m_model = model;
 		trainer->SetName(CONTROLLER_NAME);
 
@@ -459,16 +459,16 @@ namespace ndCarpole_0
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		#ifdef D_TRAIN_AGENT
-			ndCartpole* const model = CreateTrainModel(scene, location);
+			ndRobot* const model = CreateTrainModel(scene, location);
 		#else
 			char fileName[1024];
 			ndGetWorkingFileName(CONTROLLER_NAME, fileName);
 	
 			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(actor));
+			ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndController(actor));
 
-			ndCartpole* const model = new ndCartpole(agent);
-			((ndCartpole::ndCartpoleAgent*)*agent)->m_model = model;
+			ndRobot* const model = new ndRobot(agent);
+			((ndRobot::ndController*)*agent)->m_model = model;
 		
 			BuildModel(model, scene, location);
 		#endif	
@@ -478,7 +478,7 @@ namespace ndCarpole_0
 
 using namespace ndCarpole_0;
 
-void ndCartpoleDiscretePlayer(ndDemoEntityManager* const scene)
+void ndCartpoleDiscrete(ndDemoEntityManager* const scene)
 {
 	BuildFlatPlane(scene, true);
 

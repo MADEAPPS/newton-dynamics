@@ -55,8 +55,8 @@
 //#define DEFAULT_SCENE	16		// basic player
 //#define DEFAULT_SCENE	17		// rag doll
 //#define DEFAULT_SCENE	18		// cart pole discrete controller
-#define DEFAULT_SCENE	19		// cart pole continue controller
-//#define DEFAULT_SCENE	20		// unit cycle controller
+//#define DEFAULT_SCENE	19		// cart pole continue controller
+#define DEFAULT_SCENE	20		// unit cycle controller
 //#define DEFAULT_SCENE	21		// quadruped test 1
 //#define DEFAULT_SCENE	22		// quadruped test 2
 //#define DEFAULT_SCENE	23		// quadruped test 3
@@ -82,20 +82,20 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_2(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
-void ndBalanceController(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
 void ndBipedTest_2Trainer(ndDemoEntityManager* const scene);
 void ndBasicParticleFluid(ndDemoEntityManager* const scene);
+void ndUnicycleController(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene);
 void ndSimpleIndustrialRobot(ndDemoEntityManager* const scene);
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene);
 void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene);
 void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene);
-void ndCartpoleDiscretePlayer(ndDemoEntityManager* const scene);
-void ndCartpoleContinuePlayer(ndDemoEntityManager* const scene);
+void ndCartpoleDiscrete(ndDemoEntityManager* const scene);
+void ndCartpoleContinue(ndDemoEntityManager* const scene);
 
 //void ndBasicFracture_0(ndDemoEntityManager* const scene);
 //void ndBasicFracture_2(ndDemoEntityManager* const scene);
@@ -123,9 +123,9 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
 	{ "basic player", ndPlayerCapsuleDemo },
 	{ "rag doll", ndRagdollTest },
-	{ "carpole discrete controller", ndCartpoleDiscretePlayer },
-	{ "carpole continue controller", ndCartpoleContinuePlayer },
-	{ "balance controller", ndBalanceController },
+	{ "cartpole discrete controller", ndCartpoleDiscrete },
+	{ "cartpole continue controller", ndCartpoleContinue },
+	{ "unicycle controller", ndUnicycleController },
 	{ "quadruped test one", ndQuadrupedTest_1 },
 	{ "quadruped test two", ndQuadrupedTest_2 },
 	{ "quadruped test three", ndQuadrupedTest_3},

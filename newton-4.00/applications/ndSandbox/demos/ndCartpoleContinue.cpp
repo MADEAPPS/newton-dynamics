@@ -49,25 +49,25 @@ namespace ndCarpole_1
 		m_stateSize
 	};
 
-	class ndCartpole: public ndModelArticulation
+	class ndRobot: public ndModelArticulation
 	{
 		public:
 
 		#ifdef D_USE_VANILLA_POLICY_GRAD
-		class ndCartpoleAgent : public ndBrainAgentContinueVPG<m_stateSize, m_actionsSize>
+		class ndController : public ndBrainAgentContinueVPG<m_stateSize, m_actionsSize>
 		#else
-		class ndCartpoleAgent : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
+		class ndController : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
 		#endif
 		{
 			public:
 			#ifdef D_USE_VANILLA_POLICY_GRAD
-			ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
+			ndController(ndSharedPtr<ndBrain>& actor)
 				:ndBrainAgentContinueVPG<m_stateSize, m_actionsSize>(actor)
 				,m_model(nullptr)
 			{
 			}
 			#else
-			ndCartpoleAgent(ndSharedPtr<ndBrain>& actor)
+			ndController(ndSharedPtr<ndBrain>& actor)
 				:ndBrainAgentDDPG<m_stateSize, m_actionsSize>(actor)
 				,m_model(nullptr)
 			{
@@ -84,19 +84,19 @@ namespace ndCarpole_1
 				m_model->ApplyActions(actions);
 			}
 
-			ndCartpole* m_model;
+			ndRobot* m_model;
 		};
 
 
 		#ifdef D_USE_VANILLA_POLICY_GRAD
-		class ndCartpoleAgentTrainer : public ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>
+		class ndControllerTrainer : public ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>
 		#else
-		class ndCartpoleAgentTrainer : public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
+		class ndControllerTrainer : public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
 		#endif
 		{
 			public:
 			#ifdef D_USE_VANILLA_POLICY_GRAD
-			ndCartpoleAgentTrainer(const HyperParameters& hyperParameters)
+			ndControllerTrainer(const HyperParameters& hyperParameters)
 				:ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
 				,m_bestActor(m_actor)
 				,m_model(nullptr)
@@ -110,7 +110,7 @@ namespace ndCarpole_1
 				fprintf(m_outFile, "vpg\n");
 			}
 			#else
-			ndCartpoleAgentTrainer(const HyperParameters& hyperParameters)
+			ndControllerTrainer(const HyperParameters& hyperParameters)
 				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
 				,m_bestActor(m_actor)
 				,m_model(nullptr)
@@ -125,7 +125,7 @@ namespace ndCarpole_1
 			}
 			#endif
 
-			~ndCartpoleAgentTrainer()
+			~ndControllerTrainer()
 			{
 				if (m_outFile)
 				{
@@ -237,7 +237,7 @@ namespace ndCarpole_1
 
 			FILE* m_outFile;
 			ndBrain m_bestActor;
-			ndCartpole* m_model;
+			ndRobot* m_model;
 			ndUnsigned64 m_timer;
 			ndFloat32 m_maxGain;
 			ndInt32 m_maxFrames;
@@ -245,7 +245,7 @@ namespace ndCarpole_1
 			bool m_modelIsTrained;
 		};
 
-		ndCartpole(const ndSharedPtr<ndBrainAgent>& agent)
+		ndRobot(const ndSharedPtr<ndBrainAgent>& agent)
 			:ndModelArticulation()
 			,m_cartMatrix(ndGetIdentityMatrix())
 			,m_poleMatrix(ndGetIdentityMatrix())
@@ -346,14 +346,14 @@ namespace ndCarpole_1
 			#ifdef D_TRAIN_AGENT
 			if (m_agent->IsTrainer())
 			{
-				ndCartpoleAgentTrainer* const agent = (ndCartpoleAgentTrainer*)(*m_agent);
+				ndControllerTrainer* const agent = (ndControllerTrainer*)(*m_agent);
 				if (agent->m_modelIsTrained)
 				{
 					char fileName[1024];
 					ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
 					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-					m_agent = ndSharedPtr<ndBrainAgent>(new ndCartpole::ndCartpoleAgent(actor));
-					((ndCartpole::ndCartpoleAgent*)*m_agent)->m_model = this;
+					m_agent = ndSharedPtr<ndBrainAgent>(new ndRobot::ndController(actor));
+					((ndRobot::ndController*)*m_agent)->m_model = this;
 					//ResetModel();
 					((ndPhysicsWorld*)m_world)->NormalUpdates();
 				}
@@ -380,7 +380,7 @@ namespace ndCarpole_1
 		ndSharedPtr<ndBrainAgent> m_agent;
 	};
 
-	void BuildModel(ndCartpole* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
+	void BuildModel(ndRobot* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		ndFloat32 xSize = 0.25f;
 		ndFloat32 ySize = 0.125f;
@@ -429,7 +429,7 @@ namespace ndCarpole_1
 	}
 
 	#ifdef D_TRAIN_AGENT
-		ndCartpole* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+		ndRobot* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 		{
 			// add a reinforcement learning controller 
 			#ifdef D_USE_VANILLA_POLICY_GRAD
@@ -442,10 +442,10 @@ namespace ndCarpole_1
 			
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_discountFactor = ndBrainFloat(0.995f);
-			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgentTrainer(hyperParameters));
+			ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerTrainer(hyperParameters));
 
-			ndCartpole* const model = new ndCartpole(agent);
-			ndCartpole::ndCartpoleAgentTrainer* const trainer = (ndCartpole::ndCartpoleAgentTrainer*)*agent;
+			ndRobot* const model = new ndRobot(agent);
+			ndRobot::ndControllerTrainer* const trainer = (ndRobot::ndControllerTrainer*)*agent;
 			trainer->m_model = model;
 			trainer->SetName(CONTROLLER_NAME);
 
@@ -459,16 +459,16 @@ namespace ndCarpole_1
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		#ifdef D_TRAIN_AGENT
-			ndCartpole* const model = CreateTrainModel(scene, location);
+			ndRobot* const model = CreateTrainModel(scene, location);
 		#else
 			char fileName[1024];
 			ndGetWorkingFileName(CONTROLLER_NAME, fileName);
 	
 			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-			ndSharedPtr<ndBrainAgent> agent(new ndCartpole::ndCartpoleAgent(actor));
+			ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndController(actor));
 
-			ndCartpole* const model = new ndCartpole(agent);
-			((ndCartpole::ndCartpoleAgent*)*agent)->m_model = model;
+			ndRobot* const model = new ndRobot(agent);
+			((ndRobot::ndController*)*agent)->m_model = model;
 		
 			BuildModel(model, scene, location);
 		#endif
@@ -478,7 +478,7 @@ namespace ndCarpole_1
 
 using namespace ndCarpole_1;
 
-void ndCartpoleContinuePlayer(ndDemoEntityManager* const scene)
+void ndCartpoleContinue(ndDemoEntityManager* const scene)
 {
 	BuildFlatPlane(scene, true);
 	
