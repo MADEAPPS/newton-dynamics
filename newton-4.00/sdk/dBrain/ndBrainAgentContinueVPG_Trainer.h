@@ -50,6 +50,7 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 			
 			m_hiddenLayersNumberOfNeurons = 64;
 
+			m_sigma = ndBrainFloat(0.5f);
 			m_learnRate = ndBrainFloat(0.0005f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
@@ -57,6 +58,7 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 			//m_threadsCount = 1;
 		}
 
+		ndBrainFloat m_sigma;
 		ndBrainFloat m_learnRate;
 		ndBrainFloat m_regularizer;
 		ndBrainFloat m_discountFactor;
@@ -136,6 +138,7 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	ndArray<ndTrajectoryStep> m_trajectory;
 	ndBrainVector m_rewards;
 
+	ndBrainFloat m_sigma;
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_learnRate;
 	ndInt32 m_frameCount;
@@ -155,6 +158,7 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 	,m_actor()
 	,m_trajectory()
 	,m_rewards()
+	,m_sigma(hyperParameters.m_sigma)
 	,m_gamma(hyperParameters.m_discountFactor)
 	,m_learnRate(hyperParameters.m_learnRate)
 	,m_frameCount(0)
@@ -275,18 +279,21 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::BackPropagate()
 	ndBrainThreadPool::ParallelExecute(ClearGradients);
 
 	const ndInt32 steps = ndMin(m_maxTrajectorySteps, m_trajectory.GetCount());
+	const ndBrainFloat invSigmaSquare = ndBrainFloat(1.0f) / (m_sigma * m_sigma);
+
 	for (ndInt32 base = 0; base < steps; base += m_bashBufferSize)
 	{
-		auto CalculateGradients = ndMakeObject::ndFunction([this, base](ndInt32 threadIndex, ndInt32 threadCount)
+		auto CalculateGradients = ndMakeObject::ndFunction([this, base, invSigmaSquare](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			class Loss : public ndBrainLossLeastSquaredError
 			{
 				public:
-				Loss(ndBrainTrainer& trainer, ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>* const agent, ndInt32 index)
+				Loss(ndBrainTrainer& trainer, ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>* const agent, ndInt32 index, ndBrainFloat invSigmaSquare)
 					:ndBrainLossLeastSquaredError(trainer.GetBrain()->GetOutputSize())
-					, m_trainer(trainer)
-					, m_agent(agent)
-					, m_index(index)
+					,m_trainer(trainer)
+					,m_agent(agent)
+					,m_invSigmaSquare(invSigmaSquare)
+					,m_index(index)
 				{
 				}
 
@@ -294,7 +301,8 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::BackPropagate()
 				{
 					const ndBrainVector& rewards = m_agent->m_rewards;
 					const ndBrainVector& actions = m_agent->m_trajectory[m_index].m_actions;
-					ndBrainFloat logProbAdvantage = rewards[m_index] / (SIGMA * SIGMA);
+					//ndBrainFloat logProbAdvantage = rewards[m_index] / (SIGMA * SIGMA);
+					ndBrainFloat logProbAdvantage = rewards[m_index] * m_invSigmaSquare;
 					for (ndInt32 i = actionDim - 1; i >= 0; --i)
 					{
 						loss[i] = logProbAdvantage * (actions[i] - output[i]);
@@ -303,6 +311,7 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::BackPropagate()
 	
 				ndBrainTrainer& m_trainer;
 				ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>* m_agent;
+				const ndBrainFloat m_invSigmaSquare;
 				ndInt32 m_index;
 			};
 
@@ -311,7 +320,7 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::BackPropagate()
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBrainTrainer& trainer = *m_auxiliaryTrainers[i];
-				Loss loss(trainer, this, base + i);
+				Loss loss(trainer, this, base + i, invSigmaSquare);
 				if ((base + i) < m_trajectory.GetCount())
 				{
 					trainer.BackPropagate(m_trajectory[base + i].m_observation, loss);
@@ -393,8 +402,7 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrain
 	// for now use a constant deviations until the algorism is stable 
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
-		ndBrainFloat sample = ndGaussianRandom(probabilities[i], SIGMA);
-		//ndBrainFloat squashSample(ndTanh(sample));
+		ndBrainFloat sample = ndGaussianRandom(probabilities[i], m_sigma);
 		ndBrainFloat squashSample = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		probabilities[i] = squashSample;
 	}

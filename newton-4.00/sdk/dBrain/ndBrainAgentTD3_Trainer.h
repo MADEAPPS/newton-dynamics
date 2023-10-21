@@ -47,18 +47,20 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 			m_numberOfHiddenLayers = 3;
 			m_hiddenLayersNumberOfNeurons = 64;
 
-			m_bashBufferSize = 32;
+			m_bashBufferSize = 64;
 			m_replayBufferSize = 1024 * 512;
 			m_replayBufferPrefill = 1024 * 16;
 
-			m_discountFactor = ndBrainFloat(0.99f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
-			m_actorLearnRate = ndBrainFloat(0.0001f);
-			m_criticLearnRate = ndBrainFloat(0.0005f);
-			m_softTargetFactor = ndBrainFloat(1.0e-3f);
-			m_actionNoiseVariance = ndBrainFloat(0.05f);
 			m_criticRegularizer = ndBrainFloat(1.0e-5f);
+
+			m_discountFactor = ndBrainFloat(0.99f);
+			m_actorLearnRate = ndBrainFloat(1.0e-4f);
+			m_criticLearnRate = ndBrainFloat(1.0e-4f);
+			m_softTargetFactor = ndBrainFloat(1.0e-3f);
+			m_actionNoiseVariance = ndBrainFloat(0.125f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
+			//m_threadsCount = 1;
 		}
 
 		ndBrainFloat m_discountFactor;

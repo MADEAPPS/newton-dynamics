@@ -155,7 +155,7 @@ namespace ndUnicycle
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(3000)
-				,m_stopTraining(2000000)
+				,m_stopTraining(3000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
 			#endif
@@ -547,12 +547,11 @@ namespace ndUnicycle
 			#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			hyperParameters.m_maxTrajectorySteps = 6000;
+			hyperParameters.m_discountFactor = ndReal(0.995f);
 			#else
 			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			hyperParameters.m_actionNoiseVariance = ndReal(0.25f);
 			#endif
-			//hyperParameters.m_threadsCount = 1;
-			hyperParameters.m_discountFactor = ndReal (0.995f);
 
 			ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerTrainer(hyperParameters));
 			agent->SetName(CONTROLLER_NAME);
