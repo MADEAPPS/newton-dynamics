@@ -52,8 +52,8 @@ class ndBrainLayerApproximateTanhActivation : public ndBrainLayerTanhActivation
 	static ndBrainVector4 m_c1;
 	static ndBrainVector4 m_c2;
 	static ndBrainVector4 m_log2f;
-	static ndBrainVector4 m_upMax;
-	static ndBrainVector4 m_upMin;
+	static ndBrainVector4 m_max;
+	static ndBrainVector4 m_min;
 };
 
 #endif 

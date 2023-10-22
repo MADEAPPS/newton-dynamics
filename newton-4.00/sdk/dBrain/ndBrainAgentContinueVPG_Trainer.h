@@ -36,7 +36,6 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThreadPool
 {
 	public:
-	#define SIGMA ndBrainFloat(0.5f)
 	
 	class HyperParameters
 	{

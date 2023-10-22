@@ -23,8 +23,8 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerTanhActivation.h"
 
-ndBrainVector4 ndBrainLayerApproximateTanhActivation::m_upMax(ndBrainFloat(10.f));
-ndBrainVector4 ndBrainLayerApproximateTanhActivation::m_upMin(ndBrainFloat(-10.f));
+ndBrainVector4 ndBrainLayerApproximateTanhActivation::m_max(ndBrainFloat(10.f));
+ndBrainVector4 ndBrainLayerApproximateTanhActivation::m_min(ndBrainFloat(-10.f));
 ndBrainVector4 ndBrainLayerApproximateTanhActivation::m_c1(ndBrainFloat(0.03138777f));
 ndBrainVector4 ndBrainLayerApproximateTanhActivation::m_c2(ndBrainFloat(0.276281267f));
 ndBrainVector4 ndBrainLayerApproximateTanhActivation::m_log2f(ndBrainFloat(1.442695022f));
@@ -130,41 +130,44 @@ void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& 
 	// only problem is that is not exact zero for input zero, 
 	// however this can be very good for dense hidden layers, 
 	// in fact it seems to produce better or equal result than the standard tanh  
-	auto ScalarTanhApproximation = [](ndBrainFloat in)
-	{
-		const ndBrainFloat c1 = ndReal(0.03138777f);
-		const ndBrainFloat c2 = ndReal(0.276281267f);
-		const ndBrainFloat log2f = ndReal(1.442695022f);
 
-		ndBrainFloat v = log2f * ndClamp(in, ndBrainFloat(-10.0f), ndBrainFloat(10.0f));
-		//ndInt32 intPart = (ndInt32)ndFloor(v);
-		//ndBrainFloat x = v - ndReal(intPart);
+	const ndBrainVector4 c1(m_c1);
+	const ndBrainVector4 c2(m_c2);
+	const ndBrainVector4 min(m_min);
+	const ndBrainVector4 max(m_max);
+	const ndBrainVector4 log2f(m_log2f);
+
+	auto ScalarTanhApproximation = [c1, c2, min, max, log2f](ndBrainFloat in)
+	{
+		//const ndBrainFloat c1 = ndReal(0.03138777f);
+		//const ndBrainFloat c2 = ndReal(0.276281267f);
+		//const ndBrainFloat log2f = ndReal(1.442695022f);
+
+		ndBrainFloat v = log2f[0] * ndClamp(in, min[0], max[0]);
 		ndBrainFloat floatIntPart = ndBrainFloat(ndFloor(v));
 		ndBrainFloat x = v - floatIntPart;
 		ndBrainFloat xx = x * x;
-		ndBrainFloat v1 = log2f + c2 * xx;
-		ndBrainFloat v2 = x + xx * c1 * x;
+		ndBrainFloat v1 = log2f[0] + c2[0] * xx;
+		ndBrainFloat v2 = x + xx * c1[0] * x;
 		ndBrainFloat v3 = v2 + v1;
 		ndBrainFloat v4 = v2 - v1;
 		#ifdef D_BRAIN_USES_REAL
-			//*((ndInt32*)&v3) += intPart << 24;
 			* ((ndInt32*)&v3) += ndInt32(floatIntPart) << 24;
 		#else
-			//*((ndInt64*)&v3) += ndInt64(intPart) << 53;
 			* ((ndInt64*)&v3) += ndInt64(floatIntPart) << 53;
 		#endif
 		return (v3 + v4) / (v3 - v4);
 	};
-
-	auto VectorTanhApproximation = [](const ndBrainVector4& in)
+	
+	auto VectorTanhApproximation = [c1, c2, min, max, log2f](const ndBrainVector4& in)
 	{
-		ndBrainVector4 v(m_log2f * in.GetMin(m_upMax).GetMax(m_upMin));
+		ndBrainVector4 v(log2f * in.GetMin(max).GetMax(min));
 		ndBrainVector4 intPart(v.GetInt());
 		ndBrainVector4 x(v - v.Floor());
 		ndBrainVector4 xx(x * x);
-		ndBrainVector4 v1(m_log2f + m_c2 * xx);
-		ndBrainVector4 v2(x + xx * m_c1 * x);
-		ndBrainVector4 v3((v2 + v1));
+		ndBrainVector4 v1(log2f + c2 * xx);
+		ndBrainVector4 v2(x + xx * c1 * x);
+		ndBrainVector4 v3(v2 + v1);
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
 			#ifdef D_BRAIN_USES_REAL
