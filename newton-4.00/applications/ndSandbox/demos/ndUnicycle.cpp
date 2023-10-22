@@ -24,14 +24,13 @@ namespace ndUnicycle
 {
 	#define ND_TRAIN_MODEL
 
-	//#define D_USE_VANILLA_POLICY_GRAD
+	#define D_USE_VANILLA_POLICY_GRAD
 
 	#ifdef D_USE_VANILLA_POLICY_GRAD
 		#define CONTROLLER_NAME "unicycleVPG.dnn"
 	#else
-		#define CONTROLLER_NAME "unicycleDDPG.dnn"
+		#define CONTROLLER_NAME "unicycleTD3.dnn"
 	#endif 
-
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
 	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)
@@ -90,7 +89,7 @@ namespace ndUnicycle
 		#ifdef D_USE_VANILLA_POLICY_GRAD
 		class ndController : public ndBrainAgentContinueVPG<m_stateSize, m_actionsSize>
 		#else
-		class ndController : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
+		class ndController : public ndBrainAgentTD3<m_stateSize, m_actionsSize>
 		#endif
 		{
 			public:
@@ -98,12 +97,11 @@ namespace ndUnicycle
 				#ifdef D_USE_VANILLA_POLICY_GRAD
 				:ndBrainAgentContinueVPG<m_stateSize, m_actionsSize>(actor)
 				#else
-				:ndBrainAgentDDPG<m_stateSize, m_actionsSize>(actor)
+				:ndBrainAgentTD3<m_stateSize, m_actionsSize>(actor)
 				#endif
 				,m_model(nullptr)
 			{
 			}
-
 
 			void SetModel(ndRobot* const model)
 			{
@@ -134,7 +132,7 @@ namespace ndUnicycle
 		#ifdef D_USE_VANILLA_POLICY_GRAD
 		class ndControllerTrainer: public ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>
 		#else
-		class ndControllerTrainer : public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
+		class ndControllerTrainer : public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
 		#endif
 		{
 			public:
@@ -145,12 +143,12 @@ namespace ndUnicycle
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(5000)
-				,m_stopTraining(10000000)
+				,m_stopTraining(20000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
 			#else
 			ndControllerTrainer(const HyperParameters& hyperParameters)
-				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
+				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
 				,m_bestActor(m_actor)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
@@ -164,8 +162,8 @@ namespace ndUnicycle
 					m_outFile = fopen("unicycle-VPG.csv", "wb");
 					fprintf(m_outFile, "vgp\n");
 				#else
-					m_outFile = fopen("unicycle-DDPG.csv", "wb");
-					fprintf(m_outFile, "ddpg\n");
+					m_outFile = fopen("unicycle-TD3.csv", "wb");
+					fprintf(m_outFile, "td3\n");
 				#endif
 			}
 
@@ -242,7 +240,7 @@ namespace ndUnicycle
 					#ifdef D_USE_VANILLA_POLICY_GRAD
 						ndBrainAgentContinueVPG_Trainer::OptimizeStep();
 					#else
-						ndBrainAgentDDPG_Trainer::OptimizeStep();
+						ndBrainAgentTD3_Trainer::OptimizeStep();
 					#endif
 
 					episodeCount -= GetEposideCount();
@@ -547,9 +545,9 @@ namespace ndUnicycle
 			#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			hyperParameters.m_maxTrajectorySteps = 6000;
-			hyperParameters.m_discountFactor = ndReal(0.995f);
+			hyperParameters.m_discountFactor = ndReal(0.99f);
 			#else
-			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			hyperParameters.m_actionNoiseVariance = ndReal(0.25f);
 			#endif
 

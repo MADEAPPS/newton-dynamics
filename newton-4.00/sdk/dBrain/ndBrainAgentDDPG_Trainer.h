@@ -487,7 +487,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::SelectAction(ndBrainFloat* 
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
 		ndBrainFloat sample = ndGaussianRandom(actions[i], m_actionNoiseVariance);
-		//ndBrainFloat squashSample(ndTanh(sample));
 		ndBrainFloat squashSample = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = squashSample;
 	}

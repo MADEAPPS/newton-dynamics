@@ -399,9 +399,10 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Optimize()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrainVector& probabilities) const
 {
-	// for now use a constant deviations until the algorism is stable 
+	// for now use a constant deviations until the algorithm is stable 
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
+		//ndBrainFloat sample = ndGaussianRandom(probabilities[i], SIGMA);
 		ndBrainFloat sample = ndGaussianRandom(probabilities[i], m_sigma);
 		ndBrainFloat squashSample = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		probabilities[i] = squashSample;

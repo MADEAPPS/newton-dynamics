@@ -60,7 +60,6 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 			m_softTargetFactor = ndBrainFloat(1.0e-3f);
 			m_actionNoiseVariance = ndBrainFloat(0.125f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
-			//m_threadsCount = 1;
 		}
 
 		ndBrainFloat m_discountFactor;
@@ -142,8 +141,8 @@ class ndBrainAgentTD3_Trainer : public ndBrainAgent, public ndBrainThreadPool
 	ndInt32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
 	ndInt32 m_replayBufferPrefill;
-	ndMovingAverage<128> m_averageQvalue;
-	ndMovingAverage<128> m_averageFramesPerEpisodes;
+	ndMovingAverage<256> m_averageQvalue;
+	ndMovingAverage<256> m_averageFramesPerEpisodes;
 	bool m_collectingSamples;
 };
 
@@ -358,7 +357,6 @@ void ndBrainAgentTD3_Trainer<statesDim, actionDim>::SelectAction(ndBrainFloat* c
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
 		ndBrainFloat sample = ndGaussianRandom(actions[i], m_actionNoiseVariance);
-		//ndBrainFloat squashSample(ndTanh(sample));
 		ndBrainFloat squashSample = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = squashSample;
 	}

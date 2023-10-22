@@ -26,13 +26,19 @@
 
 static std::mt19937& GetRandomGenerator()
 {
-	// for debugging this is better than an hardware generator
-	static std::mt19937 generator;
+	// for debugging this is better than a hardware generator.
+	//static std::mt19937 generator;
 
-	// thy to select a hardware non deterministic random generator
-	//static std::mt19937 generator(std::random_device{}());
+	// using hardware non deterministic random generator if found
+	static std::mt19937 generator(std::random_device{}());
 
 	return generator;
+}
+
+static ndSpinLock& GetLock()
+{
+	static ndSpinLock lock;
+	return lock;
 }
 
 void ndSetRandSeed(ndUnsigned32 seed)
@@ -40,21 +46,40 @@ void ndSetRandSeed(ndUnsigned32 seed)
 	GetRandomGenerator().seed(seed);
 }
 
+#if 1
 ndUnsigned32 ndRandInt()
 {
-	std::uniform_int_distribution<ndUnsigned32> uniform;
-	static ndSpinLock __lock__;
-	ndScopeSpinLock lock(__lock__);
+	ndScopeSpinLock lock(GetLock());
+	static std::uniform_int_distribution<ndUnsigned32> uniform;
 	return uniform(GetRandomGenerator());
 }
 
 ndFloat32 ndRand()
 {
-	std::uniform_real_distribution<ndFloat32> uniform(ndFloat32 (0.0f), ndFloat32(1.0f));
-	static ndSpinLock __lock__;
-	ndScopeSpinLock lock(__lock__);
+	ndScopeSpinLock lock(GetLock());
+	static std::uniform_real_distribution<ndFloat32> uniform(ndFloat32 (0.0f), ndFloat32(1.0f));
 	return uniform(GetRandomGenerator());
 }
+
+#else
+
+ndUnsigned32 ndRandInt()
+{
+	ndScopeSpinLock lock(GetLock());
+	std::mt19937& generator = GetRandomGenerator();
+	return ndUnsigned32(generator());
+}
+
+ndFloat32 ndRand()
+{
+	ndUnsigned64 minValue = std::mt19937::min();
+	ndUnsigned64 maxValue = std::mt19937::max();
+	ndUnsigned64 spand = maxValue - minValue;
+	ndFloat32 r = ndFloat32(ndFloat64(ndRandInt()) / (ndFloat64)spand);
+	return r;
+}
+
+#endif
 
 ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
 {
