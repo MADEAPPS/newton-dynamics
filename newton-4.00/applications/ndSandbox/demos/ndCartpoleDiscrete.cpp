@@ -76,9 +76,9 @@ namespace ndCarpole_0
 			}
 			#endif
 
-			void GetObservation(ndBrainFloat* const state) const
+			void GetObservation(ndBrainFloat* const observation)
 			{
-				m_model->GetObservation(state);
+				m_model->GetObservation(observation);
 			}
 
 			virtual void ApplyActions(ndBrainFloat* const actions) const
@@ -154,9 +154,9 @@ namespace ndCarpole_0
 				m_model->ApplyActions(actions);
 			}
 
-			void GetObservation(ndBrainFloat* const state) const
+			void GetObservation(ndBrainFloat* const observation)
 			{
-				m_model->GetObservation(state);
+				m_model->GetObservation(observation);
 			}
 
 			bool IsTerminal() const

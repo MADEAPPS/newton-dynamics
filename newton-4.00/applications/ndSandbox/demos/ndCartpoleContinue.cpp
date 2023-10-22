@@ -74,9 +74,9 @@ namespace ndCarpole_1
 			}
 			#endif
 
-			void GetObservation(ndBrainFloat* const state) const
+			void GetObservation(ndBrainFloat* const observation)
 			{
-				m_model->GetObservation(state);
+				m_model->GetObservation(observation);
 			}
 
 			virtual void ApplyActions(ndBrainFloat* const actions) const
@@ -161,9 +161,9 @@ namespace ndCarpole_1
 				m_model->ApplyActions(actions);
 			}
 
-			void GetObservation(ndBrainFloat* const state) const
+			void GetObservation(ndBrainFloat* const observation)
 			{
-				m_model->GetObservation(state);
+				m_model->GetObservation(observation);
 			}
 
 			bool IsTerminal() const
@@ -283,13 +283,13 @@ namespace ndCarpole_1
 			m_cart->SetForce(force);
 		}
 
-		void GetObservation(ndBrainFloat* const state)
+		void GetObservation(ndBrainFloat* const observation)
 		{
 			ndVector omega(m_pole->GetOmega());
 			const ndMatrix& matrix = m_pole->GetMatrix();
 			ndFloat32 angle = ndAsin (matrix.m_front.m_x);
-			state[m_poleAngle] = ndReal(angle);
-			state[m_poleOmega] = ndReal(omega.m_z);
+			observation[m_poleAngle] = ndReal(angle);
+			observation[m_poleOmega] = ndReal(omega.m_z);
 		}
 
 		void TelePort() const

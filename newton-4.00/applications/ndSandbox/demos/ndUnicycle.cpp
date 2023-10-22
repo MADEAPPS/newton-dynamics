@@ -108,9 +108,9 @@ namespace ndUnicycle
 				m_model = model;
 			}
 
-			void GetObservation(ndBrainFloat* const state) const
+			void GetObservation(ndBrainFloat* const observation)
 			{
-				m_model->GetObservation(state);
+				m_model->GetObservation(observation);
 			}
 
 			virtual void ApplyActions(ndBrainFloat* const actions) const
@@ -216,9 +216,9 @@ namespace ndUnicycle
 			}
 			#endif
 
-			void GetObservation(ndBrainFloat* const state) const
+			void GetObservation(ndBrainFloat* const observation)
 			{
-				m_model->GetObservation(state);
+				m_model->GetObservation(observation);
 			}
 
 			bool IsTerminal() const
