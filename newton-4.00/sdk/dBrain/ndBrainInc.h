@@ -47,6 +47,7 @@
 #include <ndBrainAgentDQN_Trainer.h>
 #include <ndBrainAgentTD3_Trainer.h>
 #include <ndBrainAgentDDPG_Trainer.h>
+#include <ndBrainLayerConvolutional.h>
 #include <ndBrainLayerReluActivation.h>
 #include <ndBrainLayerTanhActivation.h>
 #include <ndBrainLossLeastSquaredError.h>
