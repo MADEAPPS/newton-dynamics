@@ -48,6 +48,7 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 			m_extraTrajectorySteps = 1024 * 2;
 			
 			m_hiddenLayersNumberOfNeurons = 64;
+			//m_hiddenLayersNumberOfNeurons = 64 + 3;
 
 			m_sigma = ndBrainFloat(0.5f);
 			m_learnRate = ndBrainFloat(0.0005f);
@@ -171,13 +172,15 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 {
 	// build neural net
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
+
 	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeurons);
 		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, hyperParameters.m_hiddenLayersNumberOfNeurons));
-		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons));
+		//layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons));
+		layers.PushBack(new ndBrainLayerApproximateTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons));
 	}
 	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, m_actionsSize));
 	//layers.PushBack(new ndBrainLayerSoftmaxActivation(m_actionsSize));

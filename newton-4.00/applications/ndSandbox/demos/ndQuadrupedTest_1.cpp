@@ -22,9 +22,9 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 
-	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
+	#define CONTROLLER_NAME "ndQuadruped_1VPG.dnn"
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
 	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)

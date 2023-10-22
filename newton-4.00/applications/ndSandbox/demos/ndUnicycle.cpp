@@ -185,36 +185,31 @@ namespace ndUnicycle
 				return m_model->GetReward();
 			}
 
-			#ifdef D_USE_VANILLA_POLICY_GRAD
 			virtual void ApplyActions(ndBrainFloat* const actions) const
 			{
-				m_model->ApplyActions(actions);
-			}
-			#else		
-			virtual void ApplyActions(ndBrainFloat* const actions) const
-			{
-				if (GetEpisodeFrames() >= 15000)
-				{
-					for (ndInt32 i = 0; i < m_actionsSize; ++i)
+				#ifndef D_USE_VANILLA_POLICY_GRAD
+					if (GetEpisodeFrames() >= 15000)
 					{
-						ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(2.0f)));
-						ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
-						actions[i] = clippiedNoisyAction;
+						for (ndInt32 i = 0; i < m_actionsSize; ++i)
+						{
+							ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(2.0f)));
+							ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
+							actions[i] = clippiedNoisyAction;
+						}
 					}
-				}
-				else if (GetEpisodeFrames() >= 10000)
-				{
-					for (ndInt32 i = 0; i < m_actionsSize; ++i)
+					else if (GetEpisodeFrames() >= 10000)
 					{
-						ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
-						ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
-						actions[i] = clippiedNoisyAction;
+						for (ndInt32 i = 0; i < m_actionsSize; ++i)
+						{
+							ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
+							ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
+							actions[i] = clippiedNoisyAction;
+						}
 					}
-				}
+				#endif
 
 				m_model->ApplyActions(actions);
 			}
-			#endif
 
 			void GetObservation(ndBrainFloat* const observation)
 			{
