@@ -143,7 +143,7 @@ namespace ndUnicycle
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(5000)
-				,m_stopTraining(20000000)
+				,m_stopTraining(50000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
 			#else
@@ -274,7 +274,7 @@ namespace ndUnicycle
 						ndExpandTraceMessage("saving to file: %s\n", fileName);
 						ndExpandTraceMessage("training complete\n");
 						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-						ndExpandTraceMessage("training time: %g\n seconds", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+						ndExpandTraceMessage("training time: %g seconds", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 						if (m_outFile)
 						{
 							fclose(m_outFile);
@@ -545,7 +545,7 @@ namespace ndUnicycle
 			#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			hyperParameters.m_maxTrajectorySteps = 6000;
-			hyperParameters.m_discountFactor = ndReal(0.99f);
+			hyperParameters.m_discountFactor = ndReal(0.995f);
 			#else
 			ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			hyperParameters.m_actionNoiseVariance = ndReal(0.25f);
