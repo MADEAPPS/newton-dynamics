@@ -38,8 +38,6 @@ class ndBrainTrainer::ndLayerData : public ndClassAlloc
 	{
 		if (layer->HasParameters())
 		{
-			//m_gradBias.SetCount(layer->GetOutputSize());
-			//m_gradWeight.Init(layer->GetOutputSize(), layer->GetInputSize());
 			m_gradient = layer->Clone();
 		}
 	}
@@ -52,23 +50,18 @@ class ndBrainTrainer::ndLayerData : public ndClassAlloc
 		}
 	}
 
-	void ClearGradients()
+	void Clear()
 	{
 		if (m_layer->HasParameters())
 		{
-			ndAssert(0);
-			//m_gradBias.Set(ndBrainFloat(0.0f));
-			//m_gradWeight.Set(ndBrainFloat(0.0f));
+			m_gradient->Clear();
 		}
 	}
 
-	//void AddGradients(const ndLayerData& src)
 	void Add(const ndLayerData& src)
 	{
 		if (m_layer->HasParameters())
 		{
-			//m_gradBias.Add(src.m_gradBias);
-			//m_gradWeight.Add(src.m_gradWeight);
 			m_gradient->Add(*src.m_gradient);
 		}
 	}
@@ -77,14 +70,10 @@ class ndBrainTrainer::ndLayerData : public ndClassAlloc
 	{
 		if (m_layer->HasParameters())
 		{
-			//m_gradBias.Scale(s);
-			//m_gradWeight.Scale(s);
 			m_gradient->Scale(s);
 		}
 	}
 
-	//ndBrainVector m_gradBias;
-	//ndBrainMatrix m_gradWeight;
 	ndBrainLayer* m_layer;
 	ndBrainLayer* m_gradient;
 };
@@ -140,8 +129,6 @@ void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 inde
 	ndLayerData* const dstData = m_data[index];
 	ndAssert(dstData->m_layer->HasParameters());
 	const ndLayerData* const srcData = src.m_data[index];
-	//dstData->m_gradBias.Add(srcData->m_gradBias);
-	//dstData->m_gradWeight.Add(srcData->m_gradWeight);
 	dstData->Add(*srcData);
 }
 
@@ -149,7 +136,7 @@ void ndBrainTrainer::ClearGradients()
 {
 	for (ndInt32 i = m_data.GetCount() - 1; i >= 0; --i)
 	{
-		m_data[i]->ClearGradients();
+		m_data[i]->Clear();
 	}
 }
 

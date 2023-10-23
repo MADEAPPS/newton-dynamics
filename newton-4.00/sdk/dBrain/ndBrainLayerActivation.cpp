@@ -133,11 +133,6 @@ void ndBrainLayerActivation::InputDerivative(const ndBrainVector&, const ndBrain
 	ndAssert(0);
 }
 
-void ndBrainLayerActivation::CalculateParamGradients(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainVector&, ndBrainMatrix&)
-{
-	InputDerivative(output, outputDerivative, inputGradient);
-}
-
 void ndBrainLayerActivation::CalculateParamGradients(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const) const
 {
 	InputDerivative(output, outputDerivative, inputGradient);

@@ -210,17 +210,24 @@ void ndBrainLayerConvolutional::InputDerivative(const ndBrainVector&, const ndBr
 	ndAssert(0);
 }
 
-void ndBrainLayerConvolutional::CalculateParamGradients(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative,
-	ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient)
+//void ndBrainLayerConvolutional::CalculateParamGradients(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative,
+//	ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient)
+//{
+//	//ndAssert(biasGradient.GetCount() == outputDerivative.GetCount());
+//	//biasGradient.Set(outputDerivative);
+//	//for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0 ; --i)
+//	//{
+//	//	ndBrainFloat value = outputDerivative[i];
+//	//	weightGradient[i].ScaleSet(input, value);
+//	//}
+//	//InputDerivative(output, outputDerivative, inputGradient);
+//	ndAssert(0);
+//}
+
+void ndBrainLayerConvolutional::CalculateParamGradients(
+	const ndBrainVector& input, const ndBrainVector& output,
+	const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const
 {
-	//ndAssert(biasGradient.GetCount() == outputDerivative.GetCount());
-	//biasGradient.Set(outputDerivative);
-	//for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0 ; --i)
-	//{
-	//	ndBrainFloat value = outputDerivative[i];
-	//	weightGradient[i].ScaleSet(input, value);
-	//}
-	//InputDerivative(output, outputDerivative, inputGradient);
 	ndAssert(0);
 }
 

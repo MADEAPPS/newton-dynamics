@@ -198,18 +198,18 @@ void ndBrainLayerLinear::InputDerivative(const ndBrainVector&, const ndBrainVect
 	m_weights.TransposeMul(outputDerivative, inputDerivative);
 }
 
-void ndBrainLayerLinear::CalculateParamGradients(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative,
-	ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient)
-{
-	ndAssert(biasGradient.GetCount() == outputDerivative.GetCount());
-	biasGradient.Set(outputDerivative);
-	for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0 ; --i)
-	{
-		ndBrainFloat value = outputDerivative[i];
-		weightGradient[i].ScaleSet(input, value);
-	}
-	InputDerivative(output, outputDerivative, inputGradient);
-}
+//void ndBrainLayerLinear::CalculateParamGradients(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative,
+//	ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient)
+//{
+//	ndAssert(biasGradient.GetCount() == outputDerivative.GetCount());
+//	biasGradient.Set(outputDerivative);
+//	for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0 ; --i)
+//	{
+//		ndBrainFloat value = outputDerivative[i];
+//		weightGradient[i].ScaleSet(input, value);
+//	}
+//	InputDerivative(output, outputDerivative, inputGradient);
+//}
 
 void ndBrainLayerLinear::CalculateParamGradients(
 	const ndBrainVector& input, const ndBrainVector& output,

@@ -29,7 +29,7 @@ namespace ndQuadruped_1
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
 	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
 	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
-	#define D_MIN_REWARD_ANGLE		ndReal(ndFloat32 (20.0f) * ndDegreeToRad)
+	#define D_MIN_REWARD_ANGLE		ndReal(ndFloat32 (30.0f) * ndDegreeToRad)
 
 	#define D_SWING_STEP			ndReal(0.00f)
 	#define D_EFFECTOR_STEP			ndReal(0.1f)
@@ -59,7 +59,7 @@ namespace ndQuadruped_1
 		m_actionsSize
 	};
 
-	enum ndObeservationSpace
+	enum ndObservationSpace
 	{
 		m_leg0_anim_posit_x,
 		m_leg0_anim_posit_y,
@@ -414,9 +414,16 @@ namespace ndQuadruped_1
 				
 					stateIndex += 9;
 				}
+
+				ndBodyKinematic* const body = m_model->GetRoot()->m_body->GetAsBodyKinematic();
+				const ndMatrix& matrix = body->GetMatrix();
+				ndFloat32 sinAngle2 = matrix.m_up.m_x * matrix.m_up.m_x + matrix.m_up.m_z * matrix.m_up.m_z;
+				//sinAngle = ndMin(sinAngle, ndFloat32(0.9f));
+
+				ndBrainFloat orientationReward = ndExp(-100 * sinAngle2);
 				
-				ndBrainFloat den = 4 * m_actionsSize + m_actionsSize;
-				ndBrainFloat num = ndBrainFloat (4.0f) * positReward + velocReward;
+				ndBrainFloat den = 2 * m_actionsSize + m_actionsSize + ndBrainFloat(3.0f);
+				ndBrainFloat num = ndBrainFloat(3.0f) * orientationReward + ndBrainFloat (2.0f) * positReward + velocReward;
 				ndBrainFloat reward = num / den;
 				if (reward > 0.5f) 
 				{
@@ -1332,7 +1339,7 @@ namespace ndQuadruped_1
 		
 		ndMatrix location(matrixLocation);
 		location.m_posit.m_y = floor.m_y + 0.5f;
-location.m_posit.m_y += 0.5f;
+//location.m_posit.m_y += 0.5f;
 		torso->SetMatrix(location);
 		
 		ndDemoEntity* const entity = (ndDemoEntity*)torso->GetNotifyCallback()->GetUserData();
@@ -1508,7 +1515,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	world->AddModel(model);
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
+	//world->AddJoint(fixJoint);
 
 	ndSharedPtr<ndUIEntity> quadrupedUI (new ndModelUI(scene, model));
 	scene->Set2DDisplayRenderFunction(quadrupedUI);

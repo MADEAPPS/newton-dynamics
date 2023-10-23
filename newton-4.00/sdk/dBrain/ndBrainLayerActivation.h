@@ -48,10 +48,6 @@ class ndBrainLayerActivation : public ndBrainLayer
 	virtual void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 
 	virtual void CalculateParamGradients(
-		const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative,
-		ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient);
-
-	virtual void CalculateParamGradients(
 		const ndBrainVector& input, const ndBrainVector& output,
 		const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const;
 
