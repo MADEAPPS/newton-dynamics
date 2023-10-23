@@ -49,7 +49,6 @@ class ndBrainOptimizerAdam::ndBrainOptimizerAdam::ndAdamData : public ndClassAll
 
 	~ndAdamData()
 	{
-		ndAssert(0);
 		if (m_u)
 		{
 			delete m_u;

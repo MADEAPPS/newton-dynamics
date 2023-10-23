@@ -210,9 +210,10 @@ namespace ndQuadruped_1
 				{
 					output[i].m_posit = BasePose(i);
 					ndFloat32 t = ndMod (param - m_phase[i] + ndFloat32(1.0f), ndFloat32 (1.0f));
+					t = m_gaitFraction / 2;
 					if (t <= m_gaitFraction)
 					{
-						//if (i == 0)
+						if (i == 0)
 						//if ((i == 0) || (i == 3))
 						//if ((i == 1) || (i == 2))
 						{
@@ -420,12 +421,12 @@ namespace ndQuadruped_1
 				ndFloat32 sinAngle2 = matrix.m_up.m_x * matrix.m_up.m_x + matrix.m_up.m_z * matrix.m_up.m_z;
 				//sinAngle = ndMin(sinAngle, ndFloat32(0.9f));
 
-				ndBrainFloat orientationReward = ndExp(-100 * sinAngle2);
+				ndBrainFloat orientationReward = (20 * m_actionsSize) * ndExp(-100.0f * sinAngle2);
 				
-				ndBrainFloat den = 2 * m_actionsSize + m_actionsSize + ndBrainFloat(3.0f);
-				ndBrainFloat num = ndBrainFloat(3.0f) * orientationReward + ndBrainFloat (2.0f) * positReward + velocReward;
+				ndBrainFloat den = 2 * m_actionsSize + m_actionsSize + 20 * m_actionsSize;
+				ndBrainFloat num = orientationReward + ndBrainFloat (2.0f) * positReward + velocReward;
 				ndBrainFloat reward = num / den;
-				if (reward > 0.5f) 
+				if (reward > 0.75f) 
 				{
 					ndExpandTraceMessage("%d %f\n", GetFramesCount(), reward);
 				}
