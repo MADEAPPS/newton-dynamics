@@ -426,7 +426,7 @@ namespace ndQuadruped_1
 				ndBrainFloat den = 2 * m_actionsSize + m_actionsSize + 20 * m_actionsSize;
 				ndBrainFloat num = orientationReward + ndBrainFloat (2.0f) * positReward + velocReward;
 				ndBrainFloat reward = num / den;
-				if (reward > 0.75f) 
+				if (reward > 0.85f) 
 				{
 					ndExpandTraceMessage("%d %f\n", GetFramesCount(), reward);
 				}
@@ -1310,7 +1310,8 @@ namespace ndQuadruped_1
 		#ifdef ND_TRAIN_MODEL
 			// add a reinforcement learning controller 
 			ndBrainAgentContinueVPG_Trainer<m_observationsSize, m_actionsSize>::HyperParameters hyperParameters;
-			hyperParameters.m_discountFactor = ndReal(0.995f);
+			//hyperParameters.m_sigma = ndReal(0.25f);
+			hyperParameters.m_discountFactor = ndReal(0.99f);
 			hyperParameters.m_extraTrajectorySteps = 6000;
 			ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(hyperParameters));
 		#else
