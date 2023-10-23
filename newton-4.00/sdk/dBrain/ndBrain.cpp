@@ -66,7 +66,7 @@ void ndBrain::CopyFrom(const ndBrain& src)
 	const ndArray<ndBrainLayer*>& srcLayers = src;
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
-		layers[i]->CopyFrom(*srcLayers[i]);
+		layers[i]->Set(*srcLayers[i]);
 	}
 }
 

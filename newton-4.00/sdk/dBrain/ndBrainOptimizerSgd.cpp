@@ -60,26 +60,20 @@ void ndBrainOptimizerSgd::Update(ndBrainThreadPool* const threadPool, ndArray<nd
 		{
 			ndInt32 index = paramLayer[i];
 			ndAssert((*trainer->GetBrain())[index]->HasParameters());
-			ndBrainVector& bias = *trainer->GetBias(index);
-			ndBrainMatrix& weight = *trainer->GetWeight(index);
-			ndBrainVector& biasGradients = *trainer->GetBiasGradients(index);
-			ndBrainMatrix& weightGradients = *trainer->GetWeightGradients(index);
-		
+			
+			ndBrainLayer& weights = *trainer->GetWeightsLayer(index);
+			ndBrainLayer& gradients = *trainer->GetGradientLayer(index);
+
 			for (ndInt32 j = 1; j < partialGradients.GetCount(); ++j)
 			{
 				ndBrainTrainer* const src = partialGradients[j];
 				trainer->AcculumateGradients(*src, index);
 			}
-		
-			biasGradients.Scale(denScale);
-			biasGradients.ScaleAdd(bias, regularizer);
-			bias.Add(biasGradients);
-			bias.FlushToZero();
-		
-			weightGradients.Scale(denScale);
-			weightGradients.ScaleAdd(weight, regularizer);
-			weight.Add(weightGradients);
-			weight.FlushToZero();
+			
+			gradients.Scale(denScale);
+			gradients.ScaleAdd(weights, regularizer);
+			weights.Add(gradients);
+			weights.FlushToZero();
 		}
 	});
 

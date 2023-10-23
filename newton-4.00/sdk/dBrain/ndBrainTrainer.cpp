@@ -34,11 +34,21 @@ class ndBrainTrainer::ndLayerData : public ndClassAlloc
 	ndLayerData(ndBrainLayer* const layer)
 		:ndClassAlloc()
 		,m_layer(layer)
+		,m_gradient(nullptr)
 	{
 		if (layer->HasParameters())
 		{
-			m_gradBias.SetCount(layer->GetOutputSize());
-			m_gradWeight.Init(layer->GetOutputSize(), layer->GetInputSize());
+			//m_gradBias.SetCount(layer->GetOutputSize());
+			//m_gradWeight.Init(layer->GetOutputSize(), layer->GetInputSize());
+			m_gradient = layer->Clone();
+		}
+	}
+
+	~ndLayerData()
+	{
+		if (m_gradient)
+		{
+			delete m_gradient;
 		}
 	}
 
@@ -46,32 +56,37 @@ class ndBrainTrainer::ndLayerData : public ndClassAlloc
 	{
 		if (m_layer->HasParameters())
 		{
-			m_gradBias.Set(ndBrainFloat(0.0f));
-			m_gradWeight.Set(ndBrainFloat(0.0f));
+			ndAssert(0);
+			//m_gradBias.Set(ndBrainFloat(0.0f));
+			//m_gradWeight.Set(ndBrainFloat(0.0f));
 		}
 	}
 
-	void ScaleGradients(ndBrainFloat s)
+	//void AddGradients(const ndLayerData& src)
+	void Add(const ndLayerData& src)
 	{
 		if (m_layer->HasParameters())
 		{
-			m_gradBias.Scale(s);
-			m_gradWeight.Scale(s);
+			//m_gradBias.Add(src.m_gradBias);
+			//m_gradWeight.Add(src.m_gradWeight);
+			m_gradient->Add(*src.m_gradient);
 		}
 	}
 
-	void AddGradients(const ndLayerData& src)
+	void Scale(ndBrainFloat s)
 	{
 		if (m_layer->HasParameters())
 		{
-			m_gradBias.Add(src.m_gradBias);
-			m_gradWeight.Add(src.m_gradWeight);
+			//m_gradBias.Scale(s);
+			//m_gradWeight.Scale(s);
+			m_gradient->Scale(s);
 		}
 	}
 
-	ndBrainVector m_gradBias;
-	ndBrainMatrix m_gradWeight;
+	//ndBrainVector m_gradBias;
+	//ndBrainMatrix m_gradWeight;
 	ndBrainLayer* m_layer;
+	ndBrainLayer* m_gradient;
 };
 
 ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
@@ -110,24 +125,14 @@ ndBrain* ndBrainTrainer::GetBrain() const
 	return m_brain;
 }
 
-ndBrainVector* ndBrainTrainer::GetBias(ndInt32 index) const
+ndBrainLayer* ndBrainTrainer::GetWeightsLayer(ndInt32 index) const
 {
-	return m_data[index]->m_layer->GetBias();
+	return m_data[index]->m_layer;
 }
 
-ndBrainMatrix* ndBrainTrainer::GetWeight(ndInt32 index) const
+ndBrainLayer* ndBrainTrainer::GetGradientLayer(ndInt32 index) const
 {
-	return m_data[index]->m_layer->GetWeights();
-}
-
-ndBrainVector* ndBrainTrainer::GetBiasGradients(ndInt32 index) const
-{
-	return &m_data[index]->m_gradBias;
-}
-
-ndBrainMatrix* ndBrainTrainer::GetWeightGradients(ndInt32 index) const
-{
-	return &m_data[index]->m_gradWeight;
+	return m_data[index]->m_gradient;
 }
 
 void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 index)
@@ -135,8 +140,9 @@ void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 inde
 	ndLayerData* const dstData = m_data[index];
 	ndAssert(dstData->m_layer->HasParameters());
 	const ndLayerData* const srcData = src.m_data[index];
-	dstData->m_gradBias.Add(srcData->m_gradBias);
-	dstData->m_gradWeight.Add(srcData->m_gradWeight);
+	//dstData->m_gradBias.Add(srcData->m_gradBias);
+	//dstData->m_gradWeight.Add(srcData->m_gradWeight);
+	dstData->Add(*srcData);
 }
 
 void ndBrainTrainer::ClearGradients()
@@ -151,7 +157,7 @@ void ndBrainTrainer::AddGradients(const ndBrainTrainer* const src)
 {
 	for (ndInt32 i = m_data.GetCount() - 1; i >= 0; --i)
 	{
-		m_data[i]->AddGradients(*src->m_data[i]);
+		m_data[i]->Add(*src->m_data[i]);
 	}
 }
 
@@ -159,7 +165,7 @@ void ndBrainTrainer::ScaleWeights(const ndBrainFloat s)
 {
 	for (ndInt32 i = m_data.GetCount() - 1; i >= 0; --i)
 	{
-		m_data[i]->ScaleGradients(s);
+		m_data[i]->Scale(s);
 	}
 }
 
@@ -202,11 +208,12 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 
 	for (ndInt32 i = m_data.GetCount() - 1; i >= 0; --i)
 	{
-		ndBrainLayer* const layer = m_data[i]->m_layer;
+		const ndBrainLayer* const layer = m_data[i]->m_layer;
 		gradientIn.SetSize(layer->GetInputSize());
 		const ndBrainMemVector in(memBuffer + prefixScan[i + 0], layer->GetInputSize());
 		const ndBrainMemVector out(memBuffer + prefixScan[i + 1], layer->GetOutputSize());
-		layer->CalculateParamGradients(in, out, gradientOut, gradientIn, m_data[i]->m_gradBias, m_data[i]->m_gradWeight);
+		//layer->CalculateParamGradients(in, out, gradientOut, gradientIn, m_data[i]->m_gradBias, m_data[i]->m_gradWeight);
+		layer->CalculateParamGradients(in, out, gradientOut, gradientIn, m_data[i]->m_gradient);
 		gradientIn.Swap(gradientOut);
 	}
 }

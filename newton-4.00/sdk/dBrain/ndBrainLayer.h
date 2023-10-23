@@ -43,20 +43,35 @@ class ndBrainLayer : public ndClassAlloc
 
 	virtual ndInt32 GetInputSize() const;
 	virtual ndInt32 GetOutputSize() const;
-	virtual void CopyFrom(const ndBrainLayer& src);
+	
 	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
 
-	virtual ndBrainVector* GetBias();
-	virtual ndBrainMatrix* GetWeights();
+	//virtual ndBrainVector* GetBias();
+	//virtual ndBrainMatrix* GetWeights();
 	
+	virtual void Clear();
+	virtual void FlushToZero();
+	virtual void Scale(ndBrainFloat scale);
+	virtual void Set(const ndBrainLayer& src);
+	virtual void Add(const ndBrainLayer& src);
+	virtual void Mul(const ndBrainLayer& src);
+	virtual void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
+
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+
 	virtual void CalculateParamGradients (
 		const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative,
 		ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient);
+
+	virtual void CalculateParamGradients(
+		const ndBrainVector& input, const ndBrainVector& output, 
+		const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const;
+
+	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
 	virtual void Save(const ndBrainSave* const loadSave) const;
 };

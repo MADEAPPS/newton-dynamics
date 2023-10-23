@@ -106,11 +106,51 @@ void ndBrainLayerLinear::InitWeights(ndBrainFloat weighVariance, ndBrainFloat bi
 	InitGaussianWeights(weighVariance);
 }
 
-void ndBrainLayerLinear::CopyFrom(const ndBrainLayer& src)
+void ndBrainLayerLinear::Clear()
+{
+	m_bias.Set(ndBrainFloat(0.0f));
+	m_weights.Set(ndBrainFloat(0.0f));
+}
+
+void ndBrainLayerLinear::FlushToZero()
+{
+	m_bias.FlushToZero();
+	m_weights.FlushToZero();
+}
+
+void ndBrainLayerLinear::Scale(ndBrainFloat scale)
+{
+	//const ndBrainLayerLinear& linearSrc = (ndBrainLayerLinear&)src;
+	m_bias.Scale(scale);
+	m_weights.Scale(scale);
+}
+
+void ndBrainLayerLinear::Set(const ndBrainLayer& src)
 {
 	const ndBrainLayerLinear& linearSrc = (ndBrainLayerLinear&)src;
 	m_bias.Set(linearSrc.m_bias);
 	m_weights.Set(linearSrc.m_weights);
+}
+
+void ndBrainLayerLinear::Add(const ndBrainLayer& src)
+{
+	const ndBrainLayerLinear& linearSrc = (ndBrainLayerLinear&)src;
+	m_bias.Add(linearSrc.m_bias);
+	m_weights.Add(linearSrc.m_weights);
+}
+
+void ndBrainLayerLinear::Mul(const ndBrainLayer& src)
+{
+	const ndBrainLayerLinear& linearSrc = (ndBrainLayerLinear&)src;
+	m_bias.Mul(linearSrc.m_bias);
+	m_weights.Mul(linearSrc.m_weights);
+}
+
+void ndBrainLayerLinear::ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale)
+{
+	const ndBrainLayerLinear& linearSrc = (ndBrainLayerLinear&)src;
+	m_bias.ScaleAdd(linearSrc.m_bias, scale);
+	m_weights.ScaleAdd(linearSrc.m_weights, scale);
 }
 
 void ndBrainLayerLinear::Blend(const ndBrainLayer& src, ndBrainFloat blend)
@@ -118,6 +158,33 @@ void ndBrainLayerLinear::Blend(const ndBrainLayer& src, ndBrainFloat blend)
 	const ndBrainLayerLinear& linearSrc = (ndBrainLayerLinear&)src;
 	m_bias.Blend(linearSrc.m_bias, blend);
 	m_weights.Blend(linearSrc.m_weights, blend);
+}
+
+void ndBrainLayerLinear::AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon)
+{
+	const ndBrainLayerLinear& linear_U = (ndBrainLayerLinear&)u;
+	const ndBrainLayerLinear& linear_V = (ndBrainLayerLinear&)v;
+
+	const ndBrainVector& bias_U = linear_U.m_bias;
+	const ndBrainVector& bias_V = linear_V.m_bias;
+	for (ndInt32 i = m_bias.GetCount() - 1; i >= 0; --i)
+	{
+		ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(bias_V[i])) + epsilon);
+		//biasGradients[j] = uHat[j] * bias_den;
+		m_bias[i] = bias_U[i] * bias_den;
+	}
+
+	const ndBrainMatrix& weight_U = linear_U.m_weights;
+	const ndBrainMatrix& weight_V = linear_V.m_weights;
+	for (ndInt32 i = m_weights.GetRows() - 1; i >= 0; --i)
+	{
+		for (ndInt32 j = m_weights[i].GetCount() - 1; j >= 0; --j)
+		{
+			ndBrainFloat weight_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(weight_V[i][j])) + epsilon);
+			//weightGradients[j][k] = uHat[j][k] * bias_den;
+			m_weights[i][j] = weight_U[i][j] * weight_den;
+		}
+	}
 }
 
 void ndBrainLayerLinear::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
@@ -140,6 +207,22 @@ void ndBrainLayerLinear::CalculateParamGradients(const ndBrainVector& input, con
 	{
 		ndBrainFloat value = outputDerivative[i];
 		weightGradient[i].ScaleSet(input, value);
+	}
+	InputDerivative(output, outputDerivative, inputGradient);
+}
+
+void ndBrainLayerLinear::CalculateParamGradients(
+	const ndBrainVector& input, const ndBrainVector& output,
+	const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const
+{
+	ndAssert(!strcmp(GetLabelId(), gradientOut->GetLabelId()));
+	ndBrainLayerLinear* const gradients = (ndBrainLayerLinear*)gradientOut;
+	ndAssert(gradients->m_bias.GetCount() == outputDerivative.GetCount());
+	gradients->m_bias.Set(outputDerivative);
+	for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0; --i)
+	{
+		ndBrainFloat value = outputDerivative[i];
+		gradients->m_weights[i].ScaleSet(input, value);
 	}
 	InputDerivative(output, outputDerivative, inputGradient);
 }

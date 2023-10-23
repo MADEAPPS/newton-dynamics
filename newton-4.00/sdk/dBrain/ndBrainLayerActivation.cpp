@@ -72,15 +72,48 @@ ndInt32 ndBrainLayerActivation::GetInputSize() const
 	return m_neurons;
 }
 
+void ndBrainLayerActivation::Clear()
+{
+	ndAssert(0);
+}
+
+void ndBrainLayerActivation::FlushToZero()
+{
+}
+
+void ndBrainLayerActivation::Set(const ndBrainLayer&)
+{
+}
+
+void ndBrainLayerActivation::Scale(ndBrainFloat)
+{
+}
+
+void ndBrainLayerActivation::Add(const ndBrainLayer&)
+{
+	ndAssert(0);
+}
+
+void ndBrainLayerActivation::Mul(const ndBrainLayer&)
+{
+	ndAssert(0);
+}
+
+void ndBrainLayerActivation::ScaleAdd(const ndBrainLayer&, ndBrainFloat)
+{
+	ndAssert(0);
+}
+
+void ndBrainLayerActivation::AdamUpdate(const ndBrainLayer&, const ndBrainLayer&, ndBrainFloat)
+{
+	ndAssert(0);
+}
+
 void ndBrainLayerActivation::InitWeightsXavierMethod()
 {
 }
 
 void ndBrainLayerActivation::InitWeights(ndBrainFloat, ndBrainFloat)
-{
-}
-
-void ndBrainLayerActivation::CopyFrom(const ndBrainLayer&)
 {
 }
 
@@ -101,6 +134,11 @@ void ndBrainLayerActivation::InputDerivative(const ndBrainVector&, const ndBrain
 }
 
 void ndBrainLayerActivation::CalculateParamGradients(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainVector&, ndBrainMatrix&)
+{
+	InputDerivative(output, outputDerivative, inputGradient);
+}
+
+void ndBrainLayerActivation::CalculateParamGradients(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const) const
 {
 	InputDerivative(output, outputDerivative, inputGradient);
 }

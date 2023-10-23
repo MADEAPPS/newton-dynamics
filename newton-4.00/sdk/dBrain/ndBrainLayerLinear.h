@@ -39,7 +39,6 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual ndInt32 GetOutputSize() const;
 	virtual ndInt32 GetInputSize() const;
 	virtual const char* GetLabelId() const;
-	virtual void CopyFrom(const ndBrainLayer& src);
 	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
 
 	virtual ndBrainVector* GetBias();
@@ -50,16 +49,30 @@ class ndBrainLayerLinear : public ndBrainLayer
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+
 	virtual void CalculateParamGradients(
 		const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative,
 		ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient);
 
+	virtual void CalculateParamGradients(
+		const ndBrainVector& input, const ndBrainVector& output,
+		const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const;
+
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 	
+	void Clear();
+	void FlushToZero();
+	void Scale(ndBrainFloat scale);
+	void Set(const ndBrainLayer& src);
+	void Add(const ndBrainLayer& src);
+	void Mul(const ndBrainLayer& src);
+	void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
+
 	private:
 	void InitGaussianBias(ndBrainFloat variance);
 	void InitGaussianWeights(ndBrainFloat variance);
+	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
 	ndBrainVector m_bias;
 	ndBrainMatrix m_weights;

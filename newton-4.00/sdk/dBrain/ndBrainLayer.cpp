@@ -61,11 +61,6 @@ ndInt32 ndBrainLayer::GetOutputSize() const
 	return 0;
 }
 
-void ndBrainLayer::CopyFrom(const ndBrainLayer&)
-{
-	ndAssert(0);
-}
-
 bool ndBrainLayer::HasParameters() const
 {
 	ndAssert(0);
@@ -82,19 +77,59 @@ void ndBrainLayer::InitWeightsXavierMethod()
 	ndAssert(0);
 }
 
-ndBrainVector* ndBrainLayer::GetBias()
+//ndBrainVector* ndBrainLayer::GetBias()
+//{
+//	ndAssert(0);
+//	return nullptr;
+//}
+//
+//ndBrainMatrix* ndBrainLayer::GetWeights()
+//{
+//	ndAssert(0);
+//	return nullptr;
+//}
+
+void ndBrainLayer::Clear()
 {
 	ndAssert(0);
-	return nullptr;
 }
 
-ndBrainMatrix* ndBrainLayer::GetWeights()
+void ndBrainLayer::FlushToZero()
 {
 	ndAssert(0);
-	return nullptr;
+}
+
+void ndBrainLayer::Scale(ndBrainFloat)
+{
+	ndAssert(0);
+}
+
+void ndBrainLayer::Set(const ndBrainLayer&)
+{
+	ndAssert(0);
+}
+
+void ndBrainLayer::Add(const ndBrainLayer&)
+{
+	ndAssert(0);
+}
+
+void ndBrainLayer::Mul(const ndBrainLayer&)
+{
+	ndAssert(0);
+}
+
+void ndBrainLayer::ScaleAdd(const ndBrainLayer&, ndBrainFloat)
+{
+	ndAssert(0);
 }
 
 void ndBrainLayer::Blend(const ndBrainLayer&, ndBrainFloat)
+{
+	ndAssert(0);
+}
+
+void ndBrainLayer::AdamUpdate(const ndBrainLayer&, const ndBrainLayer&, ndBrainFloat)
 {
 	ndAssert(0);
 }
@@ -118,3 +153,9 @@ void ndBrainLayer::CalculateParamGradients(const ndBrainVector&, const ndBrainVe
 {
 	ndAssert(0);
 }
+
+void ndBrainLayer::CalculateParamGradients(const ndBrainVector&, const ndBrainVector&, const ndBrainVector&, ndBrainVector&, ndBrainLayer* const) const
+{
+	ndAssert(0);
+}
+

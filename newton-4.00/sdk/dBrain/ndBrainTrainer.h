@@ -41,10 +41,8 @@ class ndBrainTrainer: public ndClassAlloc
 	void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
 	void AcculumateGradients(const ndBrainTrainer& src, ndInt32 index);
 
-	ndBrainVector* GetBias(ndInt32 index) const;
-	ndBrainMatrix* GetWeight(ndInt32 index) const;
-	ndBrainVector* GetBiasGradients(ndInt32 index) const;
-	ndBrainMatrix* GetWeightGradients(ndInt32 index) const;
+	ndBrainLayer* GetWeightsLayer(ndInt32 index) const;
+	ndBrainLayer* GetGradientLayer(ndInt32 index) const;
 
 	void ClearGradients();
 	void ScaleWeights(const ndBrainFloat s);

@@ -30,7 +30,7 @@
 class ndBrainLayerConvolutional : public ndBrainLayer
 {
 	public: 
-	ndBrainLayerConvolutional(ndInt32 inputs, ndInt32 outputs);
+	ndBrainLayerConvolutional(ndInt32 inputStride, ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels);
 	ndBrainLayerConvolutional(const ndBrainLayerConvolutional& src);
 	virtual ~ndBrainLayerConvolutional();
 	virtual ndBrainLayer* Clone() const;
@@ -39,11 +39,7 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 	virtual ndInt32 GetOutputSize() const;
 	virtual ndInt32 GetInputSize() const;
 	virtual const char* GetLabelId() const;
-	virtual void CopyFrom(const ndBrainLayer& src);
 	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
-
-	virtual ndBrainVector* GetBias();
-	virtual ndBrainMatrix* GetWeights();
 	
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
@@ -56,13 +52,26 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
+
+
+	void Set(const ndBrainLayer& src);
 	
 	private:
 	void InitGaussianBias(ndBrainFloat variance);
 	void InitGaussianWeights(ndBrainFloat variance);
 
-	ndBrainVector m_bias;
-	ndBrainMatrix m_weights;
+	ndArray<ndBrainMatrix*> m_bias;
+	ndArray<ndBrainMatrix*> m_weights;
+
+	ndInt32 m_inputWidth;
+	ndInt32 m_inputStride;
+	ndInt32 m_inputHeight;
+	ndInt32 m_inputDepth;
+	ndInt32 m_kernelSize;
+	ndInt32 m_numberOfKernels;
+
+	ndInt32 m_outputWidth;
+	ndInt32 m_outputHeight;
 };
 
 

@@ -31,31 +31,36 @@ class ndBrainOptimizerAdam::ndBrainOptimizerAdam::ndAdamData : public ndClassAll
 	public:
 	ndAdamData(ndBrainLayer* const layer)
 		:ndClassAlloc()
+		,m_u(nullptr)
+		,m_v(nullptr)
+		,m_v2(nullptr)
 	{
 		if (layer->HasParameters())
 		{
-			m_biasGradient_u.SetCount(layer->GetOutputSize());
-			m_biasGradient_v.SetCount(layer->GetOutputSize());
-			m_biasGradient_v2.SetCount(layer->GetOutputSize());
-			m_weightGradient_u.Init(layer->GetOutputSize(), layer->GetInputSize());
-			m_weightGradient_v.Init(layer->GetOutputSize(), layer->GetInputSize());
-			m_weightGradient_v2.Init(layer->GetOutputSize(), layer->GetInputSize());
+			m_u = layer->Clone();
+			m_v = layer->Clone();
+			m_v2 = layer->Clone();
 
-			m_biasGradient_u.Set(ndBrainFloat(0.0f));
-			m_biasGradient_v.Set(ndBrainFloat(0.0f));
-			m_biasGradient_v2.Set(ndBrainFloat(0.0f));
-			m_weightGradient_u.Set(ndBrainFloat(0.0f));
-			m_weightGradient_v.Set(ndBrainFloat(0.0f));
-			m_weightGradient_v2.Set(ndBrainFloat(0.0f));
+			m_u->Clear();
+			m_v->Clear();
+			m_v2->Clear();
 		}
 	}
 
-	ndBrainVector m_biasGradient_u;
-	ndBrainVector m_biasGradient_v;
-	ndBrainVector m_biasGradient_v2;
-	ndBrainMatrix m_weightGradient_u;
-	ndBrainMatrix m_weightGradient_v;
-	ndBrainMatrix m_weightGradient_v2;
+	~ndAdamData()
+	{
+		ndAssert(0);
+		if (m_u)
+		{
+			delete m_u;
+			delete m_v;
+			delete m_v2;
+		}
+	}
+
+	ndBrainLayer* m_u;
+	ndBrainLayer* m_v;
+	ndBrainLayer* m_v2;
 };
 
 ndBrainOptimizerAdam::ndBrainOptimizerAdam()
@@ -116,98 +121,45 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 		{
 			ndInt32 index = paramLayer[i];
 			ndAssert((*trainer->GetBrain())[index]->HasParameters());
-			ndBrainVector& bias = *trainer->GetBias(index);
-			ndBrainMatrix& weight = *trainer->GetWeight(index);
-			ndBrainVector& biasGradients = *trainer->GetBiasGradients(index);
-			ndBrainMatrix& weightGradients = *trainer->GetWeightGradients(index);
-
+			ndBrainLayer& weights = *trainer->GetWeightsLayer(index);
+			ndBrainLayer& gradients = *trainer->GetGradientLayer(index);
+			
 			for (ndInt32 j = 1; j < partialGradients.GetCount(); ++j)
 			{
 				ndBrainTrainer* const src = partialGradients[j];
 				trainer->AcculumateGradients(*src, index);
 			}
-
+			
 			ndAdamData& data = *m_data[index];
-			biasGradients.Scale(den);
-			data.m_biasGradient_v.Scale(m_beta);
-			data.m_biasGradient_u.Scale(m_alpha);
-			
-			data.m_biasGradient_v2.Set(biasGradients);
-			data.m_biasGradient_v2.Mul(biasGradients);
-			data.m_biasGradient_u.ScaleAdd(biasGradients, ndBrainFloat(1.0f) - m_alpha);
-			data.m_biasGradient_v.ScaleAdd(data.m_biasGradient_v2, ndBrainFloat (1.0f) - m_beta);
+			gradients.Scale(den);
+			data.m_v->Scale(m_beta);
+			data.m_u->Scale(m_alpha);
+			data.m_v2->Set(gradients);
+			data.m_v2->Mul(gradients);
+
+			data.m_u->ScaleAdd(gradients, ndBrainFloat(1.0f) - m_alpha);
+			data.m_v->ScaleAdd(*data.m_v2, ndBrainFloat(1.0f) - m_beta);
 
 			if (m_betaAcc > ndBrainFloat(0.0f))
 			{
-				ndBrainVector& vHat = biasGradients;
-				ndBrainVector& uHat = data.m_biasGradient_v2;
-			
-				uHat.Set(data.m_biasGradient_u);
-				vHat.Set(data.m_biasGradient_v);
+ 				ndBrainLayer& vHat = gradients;
+				ndBrainLayer& uHat = *data.m_v2;
+	
+				uHat.Set(*data.m_u);
+				vHat.Set(*data.m_v);
 				vHat.Scale(betaWeight);
 				uHat.Scale(alphaWeight);
-				for (ndInt32 j = biasGradients.GetCount() - 1; j >= 0; --j)
-				{
-					ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(vHat[j])) + m_epsilon);
-					biasGradients[j] = uHat[j] * bias_den;
-				}
+				gradients.AdamUpdate(uHat, vHat, m_epsilon);
 			}
 			else
 			{
-				for (ndInt32 j = biasGradients.GetCount() - 1; j >= 0; --j)
-				{
-					ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(data.m_biasGradient_v[j])) + m_epsilon);
-					biasGradients[j] = data.m_biasGradient_u[j] * bias_den;
-				}
+				gradients.AdamUpdate(*data.m_u, *data.m_v, m_epsilon);
 			}
-			biasGradients.Scale(descendRate);
-			biasGradients.ScaleAdd(bias, regularizer);
-			bias.Add(biasGradients);
-			bias.FlushToZero();
 
-
-			weightGradients.Scale(den);
-			data.m_weightGradient_v.Scale(m_beta);
-			data.m_weightGradient_u.Scale(m_alpha);
-			data.m_weightGradient_v2.Set(weightGradients);
-			data.m_weightGradient_v2.Mul(weightGradients);
-			data.m_weightGradient_v.ScaleAdd(data.m_weightGradient_v2, ndBrainFloat(1.0f) - m_beta);
-			data.m_weightGradient_u.ScaleAdd(weightGradients, ndBrainFloat(1.0f) - m_alpha);
-			
-			if (m_betaAcc > ndBrainFloat(0.0f))
-			{
-				ndBrainMatrix& vHat = weightGradients;
-				ndBrainMatrix& uHat = data.m_weightGradient_v2;
-				
-				uHat.Set(data.m_weightGradient_u);
-				vHat.Set(data.m_weightGradient_v);
-				vHat.Scale(betaWeight);
-				uHat.Scale(alphaWeight);
-			
-				for (ndInt32 j = weightGradients.GetRows() - 1; j >= 0; --j)
-				{
-					for (ndInt32 k = weightGradients[j].GetCount() - 1; k >= 0; --k)
-					{
-						ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(vHat[j][k])) + m_epsilon);
-						weightGradients[j][k] = uHat[j][k] * bias_den;
-					}
-				}
-			}
-			else
-			{
-				for (ndInt32 j = weightGradients.GetRows() - 1; j >= 0; --j)
-				{
-					for (ndInt32 k = weightGradients[j].GetCount() - 1; k >= 0; --k)
-					{
-						ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(data.m_weightGradient_v[j][k])) + m_epsilon);
-						weightGradients[j][k] = data.m_weightGradient_u[j][k] * bias_den;
-					}
-				}
-			}
-			weightGradients.Scale(descendRate);
-			weightGradients.ScaleAdd(weight, regularizer);
-			weight.Add(weightGradients);
-			weight.FlushToZero();
+			gradients.Scale(descendRate);
+			gradients.ScaleAdd(weights, regularizer);
+			weights.Add(gradients);
+			weights.FlushToZero();
 		}
 	});
 
