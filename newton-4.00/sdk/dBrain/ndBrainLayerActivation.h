@@ -39,8 +39,17 @@ class ndBrainLayerActivation : public ndBrainLayer
 	virtual ndInt32 GetOutputSize() const;
 	virtual ndInt32 GetInputSize() const;
 	virtual const char* GetLabelId() const;
-	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
 
+	protected:
+	void Clear();
+	void FlushToZero();
+	void Scale(ndBrainFloat scale);
+	void Set(const ndBrainLayer& src);
+	void Add(const ndBrainLayer& src);
+	void Mul(const ndBrainLayer& src);
+	void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
+	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
+	
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 
@@ -51,18 +60,10 @@ class ndBrainLayerActivation : public ndBrainLayer
 		const ndBrainVector& input, const ndBrainVector& output,
 		const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const;
 
+	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
+
 	virtual void Save(const ndBrainSave* const loadSave) const;
 
-	void Clear();
-	void FlushToZero();
-	void Scale(ndBrainFloat scale);
-	void Set(const ndBrainLayer& src);
-	void Add(const ndBrainLayer& src);
-	void Mul(const ndBrainLayer& src);
-	void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
-
-	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
-	protected:
 	ndInt32 m_neurons;
 };
 

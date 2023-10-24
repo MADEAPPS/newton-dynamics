@@ -61,7 +61,8 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 	void InitGaussianBias(ndBrainFloat variance);
 	void InitGaussianWeights(ndBrainFloat variance);
 
-	ndArray<ndBrainMatrix*> m_bias;
+	//ndArray<ndBrainMatrix*> m_bias;
+	ndBrainVector m_bias;
 	ndArray<ndBrainMatrix*> m_weights;
 
 	ndInt32 m_inputWidth;
@@ -74,8 +75,6 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 	ndInt32 m_outputWidth;
 	ndInt32 m_outputHeight;
 };
-
-
 
 #endif 
 

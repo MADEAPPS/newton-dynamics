@@ -44,17 +44,13 @@ class ndBrainLayer : public ndClassAlloc
 	virtual ndInt32 GetInputSize() const;
 	virtual ndInt32 GetOutputSize() const;
 	
-	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
-
-	//virtual ndBrainVector* GetBias();
-	//virtual ndBrainMatrix* GetWeights();
-	
 	virtual void Clear();
 	virtual void FlushToZero();
 	virtual void Scale(ndBrainFloat scale);
 	virtual void Set(const ndBrainLayer& src);
 	virtual void Add(const ndBrainLayer& src);
 	virtual void Mul(const ndBrainLayer& src);
+	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
 	virtual void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
 
 	virtual void InitWeightsXavierMethod();
