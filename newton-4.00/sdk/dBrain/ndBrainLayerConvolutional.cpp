@@ -23,12 +23,11 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerConvolutional.h"
 
-ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputStride, ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)
+ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)
 	:ndBrainLayer()
 	,m_bias()
 	,m_weights()
 	,m_inputWidth(inputWidth)
-	,m_inputStride(inputStride)
 	,m_inputHeight(inputHeight)
 	,m_inputDepth(inputDepth)
 	,m_kernelSize(kernelSize)
@@ -55,7 +54,6 @@ ndBrainLayerConvolutional::ndBrainLayerConvolutional(const ndBrainLayerConvoluti
 	,m_bias()
 	,m_weights()
 	,m_inputWidth(src.m_inputWidth)
-	,m_inputStride(src.m_inputStride)
 	,m_inputHeight(src.m_inputHeight)
 	,m_inputDepth(src.m_inputDepth)
 	,m_kernelSize(src.m_kernelSize)
@@ -118,18 +116,20 @@ ndInt32 ndBrainLayerConvolutional::GetInputSize() const
 	return m_inputDepth * m_inputWidth * m_inputHeight;
 }
 
-//ndBrainVector* ndBrainLayerConvolutional::GetBias()
-//{
-//	ndAssert(0);
-//	return nullptr;
-//}
-//
-//ndBrainMatrix* ndBrainLayerConvolutional::GetWeights()
-//{
-//	//return &m_weights;
-//	ndAssert(0);
-//	return nullptr;
-//}
+ndInt32 ndBrainLayerConvolutional::GetOutputWidth() const
+{
+	return m_outputWidth;
+}
+
+ndInt32 ndBrainLayerConvolutional::GetOutputHeighh() const
+{
+	return m_outputHeight;
+}
+
+ndInt32 ndBrainLayerConvolutional::GetOutputChannels() const
+{
+	return m_numberOfKernels;
+}
 
 bool ndBrainLayerConvolutional::HasParameters() const
 {

@@ -30,10 +30,14 @@
 class ndBrainLayerConvolutional : public ndBrainLayer
 {
 	public: 
-	ndBrainLayerConvolutional(ndInt32 inputStride, ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels);
+	ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels);
 	ndBrainLayerConvolutional(const ndBrainLayerConvolutional& src);
 	virtual ~ndBrainLayerConvolutional();
 	virtual ndBrainLayer* Clone() const;
+
+	ndInt32 GetOutputWidth() const;
+	ndInt32 GetOutputHeighh() const;
+	ndInt32 GetOutputChannels() const;
 
 	virtual bool HasParameters() const;
 	virtual ndInt32 GetOutputSize() const;
@@ -66,7 +70,6 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 	ndArray<ndBrainMatrix*> m_weights;
 
 	ndInt32 m_inputWidth;
-	ndInt32 m_inputStride;
 	ndInt32 m_inputHeight;
 	ndInt32 m_inputDepth;
 	ndInt32 m_kernelSize;

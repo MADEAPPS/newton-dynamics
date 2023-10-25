@@ -56,6 +56,7 @@
 #include <ndBrainAgentDiscreteVPG_Trainer.h>
 #include <ndBrainAgentContinueVPG_Trainer.h>
 #include <ndBrainLossCategoricalCrossEntropy.h>
+#include <ndBrainLayerConvolutionalMaxPooling.h>
 #include <ndBrainLayerCategoricalSoftmaxActivation.h>
 
 #endif 
