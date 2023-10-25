@@ -33,9 +33,16 @@ class ndBrainLayerConvolutionalMaxPooling : public ndBrainLayerActivation
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
+	virtual ndInt32 GetInputSize() const;
+
 	const char* GetLabelId() const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+
+	mutable ndArray<ndInt32> m_index;
+	ndInt32 m_width;
+	ndInt32 m_height;
+	ndInt32 m_channels;
 };
 
 #endif 

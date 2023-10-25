@@ -304,11 +304,10 @@ void ndBrainLayerConvolutional::MakePrediction(const ndBrainVector& input, ndBra
 {
 	//m_weights.Mul(input, output);
 	//output.Add(m_bias);
+	ndAssert(input.GetCount() == GetInputSize());
 
-	//output.Set(ndBrainFloat(ndFloat32(0.0f)));
 	//ndInt32 inputStart = 0;
 	//ndInt32 outputStart = 0;
-	ndAssert(0);
 	output.InitGaussianWeights(0.1f);
 //float xxxxx = 0;
 //	for (ndInt32 i = 0; i < m_numberOfKernels; ++i)

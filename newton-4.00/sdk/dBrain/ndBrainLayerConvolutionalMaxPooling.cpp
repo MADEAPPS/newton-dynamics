@@ -24,15 +24,28 @@
 #include "ndBrainLayerConvolutionalMaxPooling.h"
 
 ndBrainLayerConvolutionalMaxPooling::ndBrainLayerConvolutionalMaxPooling(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth)
-	:ndBrainLayerActivation(0)
+	:ndBrainLayerActivation(((inputWidth + 1) / 2) * ((inputHeight + 1) / 2) * inputDepth)
+	,m_index()
+	,m_width(inputWidth)
+	,m_height(inputHeight)
+	,m_channels(inputDepth)
 {
-	ndAssert(0);
+	m_index.SetCount(m_neurons);
 }
 
 ndBrainLayerConvolutionalMaxPooling::ndBrainLayerConvolutionalMaxPooling(const ndBrainLayerConvolutionalMaxPooling& src)
 	:ndBrainLayerActivation(src)
+	,m_index()
+	,m_width(src.m_width)
+	,m_height(src.m_height)
+	,m_channels(src.m_channels)
 {
-	ndAssert(0);
+	m_index.SetCount(src.m_index.GetCount());
+}
+
+ndInt32 ndBrainLayerConvolutionalMaxPooling::GetInputSize() const
+{
+	return m_width * m_height * m_channels;
 }
 
 ndBrainLayer* ndBrainLayerConvolutionalMaxPooling::Clone() const
@@ -47,10 +60,22 @@ const char* ndBrainLayerConvolutionalMaxPooling::GetLabelId() const
 
 void ndBrainLayerConvolutionalMaxPooling::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-	ndAssert(0);
+	ndAssert(input.GetCount() == GetInputSize());
+	ndAssert(output.GetCount() == GetOutputSize());
 	//ndAssert(input.GetCount() == output.GetCount());
-	//for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
-	//{
+	ndInt32 base = 0;
+	for (ndInt32 k = 0; k < m_channels; ++k)
+	{
+		for (ndInt32 i = 0; i < (m_height & -1); i += 2)
+		{
+			for (ndInt32 j = 0; j < (m_width & -1); j += 2)
+			{
+				
+			}
+
+			base += m_width * 2;
+		}
+	}
 	//	output[i] = (input[i] > ndBrainFloat(0.0f)) ? input[i] : ndBrainFloat(0.0f);
 	//	ndAssert(ndCheckFloat(output[i]));
 	//}
