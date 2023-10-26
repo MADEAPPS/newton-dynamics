@@ -58,27 +58,68 @@ const char* ndBrainLayerConvolutionalMaxPooling::GetLabelId() const
 	return "ndBrainLayerConvolutionalMaxPooling";
 }
 
+ndBrainLayer* ndBrainLayerConvolutionalMaxPooling::Load(const ndBrainLoad* const loadSave)
+{
+	ndAssert(0);
+	return nullptr;
+	//char buffer[1024];
+	//loadSave->ReadString(buffer);
+	//
+	//loadSave->ReadString(buffer);
+	//ndInt32 inputs = loadSave->ReadInt();
+	//ndBrainLayerConvolutionalMaxPooling* const layer = new ndBrainLayerConvolutionalMaxPooling(inputs);
+	//loadSave->ReadString(buffer);
+	//return layer;
+}
+
 void ndBrainLayerConvolutionalMaxPooling::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == GetInputSize());
 	ndAssert(output.GetCount() == GetOutputSize());
-	//ndAssert(input.GetCount() == output.GetCount());
-	ndInt32 base = 0;
+
+	ndInt32 baseIn = 0;
+	ndInt32 baseOut = 0;
 	for (ndInt32 k = 0; k < m_channels; ++k)
 	{
 		for (ndInt32 i = 0; i < (m_height & -1); i += 2)
 		{
 			for (ndInt32 j = 0; j < (m_width & -1); j += 2)
 			{
-				
+				ndInt32 index = j;
+				ndBrainFloat maxValue = input[baseIn + j];
+				if (input[baseIn + j + 1] > maxValue)
+				{
+					index = j + 1;
+					maxValue = input[baseIn + j + 1];
+				}
+				if (input[baseIn + m_width + j] > maxValue)
+				{
+					index = m_width + j;
+					maxValue = input[baseIn + m_width + j];
+				}
+				if (input[baseIn + m_width + j + 1] > maxValue)
+				{
+					index = m_width + j + 1;
+					maxValue = input[baseIn + m_width + j + 1];
+				}
+				output[baseOut + (j >> 1)] = maxValue;
+				m_index[baseOut + (j >> 1)] = baseIn + index;
 			}
 
-			base += m_width * 2;
+			if (m_width & 1)
+			{
+				ndAssert(0);
+			}
+
+			baseIn += m_width * 2;
+			baseOut += m_width >> 1;
+		}
+
+		if (m_height & 1)
+		{
+			ndAssert(0);
 		}
 	}
-	//	output[i] = (input[i] > ndBrainFloat(0.0f)) ? input[i] : ndBrainFloat(0.0f);
-	//	ndAssert(ndCheckFloat(output[i]));
-	//}
 }
 
 void ndBrainLayerConvolutionalMaxPooling::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
@@ -93,18 +134,4 @@ void ndBrainLayerConvolutionalMaxPooling::InputDerivative(const ndBrainVector& o
 	//	ndAssert(ndCheckFloat(inputDerivative[i]));
 	//}
 	//inputDerivative.Mul(outputDerivative);
-}
-
-ndBrainLayer* ndBrainLayerConvolutionalMaxPooling::Load(const ndBrainLoad* const loadSave)
-{
-	ndAssert(0);
-	return nullptr;
-	//char buffer[1024];
-	//loadSave->ReadString(buffer);
-	//
-	//loadSave->ReadString(buffer);
-	//ndInt32 inputs = loadSave->ReadInt();
-	//ndBrainLayerConvolutionalMaxPooling* const layer = new ndBrainLayerConvolutionalMaxPooling(inputs);
-	//loadSave->ReadString(buffer);
-	//return layer;
 }
