@@ -67,6 +67,43 @@ class ndBrainMemVector: public ndBrainVector
 	void SetPointer(ndBrainFloat* const memmory);
 };
 
+inline ndBrainVector::ndBrainVector()
+	:ndArray<ndBrainFloat>()
+{
+}
+
+inline ndBrainVector::ndBrainVector(const ndBrainVector& src)
+	: ndArray<ndBrainFloat>(src)
+{
+}
+
+inline ndBrainVector::~ndBrainVector()
+{
+}
+
+inline ndBrainMemVector::ndBrainMemVector()
+	:ndBrainVector()
+{
+	m_size = 0;
+	m_capacity = 0;
+	m_array = nullptr;
+}
+
+inline ndBrainMemVector::ndBrainMemVector(const ndBrainFloat* const mem, ndInt32 size)
+	:ndBrainVector()
+{
+	m_size = size;
+	m_capacity = size + 1;
+	m_array = (ndBrainFloat*)mem;
+}
+
+inline ndBrainMemVector::~ndBrainMemVector()
+{
+	m_size = 0;
+	m_capacity = 0;
+	m_array = nullptr;
+}
+
 template<ndInt32 size>
 class ndBrainFixSizeVector: public ndBrainMemVector
 {

@@ -524,7 +524,7 @@ static void MnistTrainingSet()
 		ndInt32 height = 28;
 		ndInt32 width = trainingDigits->GetColumns() / height;
 		ndAssert((height * width) == trainingDigits->GetColumns());
-		layers.PushBack(new ndBrainLayerConvolutional(width, height, 1, 5, 1));
+		layers.PushBack(new ndBrainLayerConvolutional(width, height, 1, 5, 10));
 		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		const ndBrainLayerConvolutional* const conv0 = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv0->GetOutputWidth(), conv0->GetOutputHeighh(), conv0->GetOutputChannels()));
