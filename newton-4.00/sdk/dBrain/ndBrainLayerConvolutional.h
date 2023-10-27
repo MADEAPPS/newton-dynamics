@@ -65,11 +65,12 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 	void InitGaussianBias(ndBrainFloat variance);
 	void InitGaussianWeights(ndBrainFloat variance);
 
-	ndBrainFloat CrossCorrelation(const ndBrainVector& input, const ndBrainVector& kernels, ndBrainVector& inputCache) const;
+	ndBrainFloat CrossCorrelation(const ndBrainVector& input, const ndBrainVector& kernels) const;
 	void PredictionOutputChannel(const ndBrainVector& input, const ndBrainVector& bias, const ndBrainVector& kernels, ndBrainVector& output) const;
 
 	ndBrainVector m_bias;
 	ndBrainVector m_kernels;
+	ndFixSizeArray<ndInt32, 128> m_inputOffsets;
 
 	ndInt32 m_inputWidth;
 	ndInt32 m_inputHeight;
