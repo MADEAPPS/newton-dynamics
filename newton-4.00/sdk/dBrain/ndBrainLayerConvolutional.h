@@ -36,7 +36,7 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 	virtual ndBrainLayer* Clone() const;
 
 	ndInt32 GetOutputWidth() const;
-	ndInt32 GetOutputHeighh() const;
+	ndInt32 GetOutputHeight() const;
 	ndInt32 GetOutputChannels() const;
 
 	virtual bool HasParameters() const;

@@ -33,6 +33,14 @@ class ndBrainLayerConvolutionalMaxPooling : public ndBrainLayerActivation
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
+	ndInt32 GetInputWidth() const;
+	ndInt32 GetInputHeight() const;
+	ndInt32 GetInputChannels() const;
+
+	ndInt32 GetOutputWidth() const;
+	ndInt32 GetOutputHeight() const;
+	ndInt32 GetOutputChannels() const;
+
 	virtual ndInt32 GetInputSize() const;
 
 	const char* GetLabelId() const;

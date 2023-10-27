@@ -518,22 +518,37 @@ static void MnistTrainingSet()
 	{
 		ndBrain brain;
 
+		ndInt32 neuronsPerLayers = 64;
 		ndFixSizeArray<ndBrainLayer*, 16> layers;
 
 #ifdef D_USE_CONVOLUTIONAL_LAYERS
 		ndInt32 height = 28;
 		ndInt32 width = trainingDigits->GetColumns() / height;
 		ndAssert((height * width) == trainingDigits->GetColumns());
+
 		layers.PushBack(new ndBrainLayerConvolutional(width, height, 1, 5, 10));
 		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		const ndBrainLayerConvolutional* const conv0 = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
-		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv0->GetOutputWidth(), conv0->GetOutputHeighh(), conv0->GetOutputChannels()));
+		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv0->GetOutputWidth(), conv0->GetOutputHeight(), conv0->GetOutputChannels()));
+		const ndBrainLayerConvolutionalMaxPooling* const pooling0 = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
+
+		layers.PushBack(new ndBrainLayerConvolutional(pooling0->GetOutputWidth(), pooling0->GetOutputHeight(), pooling0->GetOutputChannels(), 3, 16));
+		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		const ndBrainLayerConvolutional* const conv1 = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
+		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv1->GetOutputWidth(), conv1->GetOutputHeight(), conv1->GetOutputChannels()));
+		const ndBrainLayerConvolutionalMaxPooling* const pooling1 = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
+
+		layers.PushBack(new ndBrainLayerConvolutional(pooling1->GetOutputWidth(), pooling1->GetOutputHeight(), pooling1->GetOutputChannels(), 3, 32));
+		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		const ndBrainLayerConvolutional* const conv2 = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
+		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv2->GetOutputWidth(), conv2->GetOutputHeight(), conv2->GetOutputChannels()));
+
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 #else
-		ndInt32 neuronsPerLayers = 64;
+		
 
 		layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), neuronsPerLayers));
 		layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -548,7 +563,6 @@ static void MnistTrainingSet()
 		layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 #endif
 
-	
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{
 			brain.AddLayer(layers[i]);

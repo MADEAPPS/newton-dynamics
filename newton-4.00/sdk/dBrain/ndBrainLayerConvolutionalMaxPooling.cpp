@@ -43,6 +43,36 @@ ndBrainLayerConvolutionalMaxPooling::ndBrainLayerConvolutionalMaxPooling(const n
 	m_index.SetCount(src.m_index.GetCount());
 }
 
+ndInt32 ndBrainLayerConvolutionalMaxPooling::GetInputWidth() const
+{
+	return m_width;
+}
+
+ndInt32 ndBrainLayerConvolutionalMaxPooling::GetInputHeight() const
+{
+	return m_height;
+}
+
+ndInt32 ndBrainLayerConvolutionalMaxPooling::GetInputChannels() const
+{
+	return m_channels;
+}
+
+ndInt32 ndBrainLayerConvolutionalMaxPooling::GetOutputWidth() const
+{
+	return (m_width + 1) / 2;
+}
+
+ndInt32 ndBrainLayerConvolutionalMaxPooling::GetOutputHeight() const
+{
+	return (m_height + 1) / 2;
+}
+
+ndInt32 ndBrainLayerConvolutionalMaxPooling::GetOutputChannels() const
+{
+	return m_channels;
+}
+
 ndInt32 ndBrainLayerConvolutionalMaxPooling::GetInputSize() const
 {
 	return m_width * m_height * m_channels;
@@ -124,14 +154,13 @@ void ndBrainLayerConvolutionalMaxPooling::MakePrediction(const ndBrainVector& in
 
 void ndBrainLayerConvolutionalMaxPooling::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-	ndAssert(0);
-	//ndAssert(output.GetCount() == outputDerivative.GetCount());
-	//ndAssert(output.GetCount() == inputDerivative.GetCount());
-	//
-	//for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
-	//{
-	//	inputDerivative[i] = (output[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-	//	ndAssert(ndCheckFloat(inputDerivative[i]));
-	//}
-	//inputDerivative.Mul(outputDerivative);
+	ndAssert(output.GetCount() == outputDerivative.GetCount());
+	ndAssert(m_index.GetCount() == outputDerivative.GetCount());
+
+	inputDerivative.Set(ndBrainFloat(0.0f));
+	for (ndInt32 i = m_index.GetCount() - 1; i >= 0; --i)
+	{
+		ndInt32 index = m_index[i];
+		inputDerivative[index] = outputDerivative[i];
+	}
 }

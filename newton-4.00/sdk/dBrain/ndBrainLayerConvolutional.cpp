@@ -94,7 +94,7 @@ ndInt32 ndBrainLayerConvolutional::GetOutputWidth() const
 	return m_outputWidth;
 }
 
-ndInt32 ndBrainLayerConvolutional::GetOutputHeighh() const
+ndInt32 ndBrainLayerConvolutional::GetOutputHeight() const
 {
 	return m_outputHeight;
 }
@@ -235,23 +235,6 @@ ndBrainLayer* ndBrainLayerConvolutional::Load(const ndBrainLoad* const loadSave)
 	return nullptr;
 }
 
-void ndBrainLayerConvolutional::CalculateParamGradients(
-	const ndBrainVector& input, const ndBrainVector& output,
-	const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const
-{
-	ndAssert(0);
-	//ndAssert(!strcmp(GetLabelId(), gradientOut->GetLabelId()));
-	//ndBrainLayerLinear* const gradients = (ndBrainLayerLinear*)gradientOut;
-	//ndAssert(gradients->m_bias.GetCount() == outputDerivative.GetCount());
-	//gradients->m_bias.Set(outputDerivative);
-	//for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0; --i)
-	//{
-	//	ndBrainFloat value = outputDerivative[i];
-	//	gradients->m_weights[i].ScaleSet(input, value);
-	//}
-	//InputDerivative(output, outputDerivative, inputGradient);
-}
-
 void ndBrainLayerConvolutional::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	//m_weights.Mul(input, output);
@@ -316,4 +299,21 @@ ndBrainFloat ndBrainLayerConvolutional::CrossCorrelation(const ndBrainVector& in
 		cacheStart += m_kernelSize;
 	}
 	return kernels.Dot(inputCache);
+}
+
+void ndBrainLayerConvolutional::CalculateParamGradients(
+	const ndBrainVector& input, const ndBrainVector& output,
+	const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const
+{
+	ndAssert(0);
+	//ndAssert(!strcmp(GetLabelId(), gradientOut->GetLabelId()));
+	//ndBrainLayerLinear* const gradients = (ndBrainLayerLinear*)gradientOut;
+	//ndAssert(gradients->m_bias.GetCount() == outputDerivative.GetCount());
+	//gradients->m_bias.Set(outputDerivative);
+	//for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0; --i)
+	//{
+	//	ndBrainFloat value = outputDerivative[i];
+	//	gradients->m_weights[i].ScaleSet(input, value);
+	//}
+	//InputDerivative(output, outputDerivative, inputGradient);
 }

@@ -199,7 +199,6 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 		gradientIn.SetSize(layer->GetInputSize());
 		const ndBrainMemVector in(memBuffer + prefixScan[i + 0], layer->GetInputSize());
 		const ndBrainMemVector out(memBuffer + prefixScan[i + 1], layer->GetOutputSize());
-		//layer->CalculateParamGradients(in, out, gradientOut, gradientIn, m_data[i]->m_gradBias, m_data[i]->m_gradWeight);
 		layer->CalculateParamGradients(in, out, gradientOut, gradientIn, m_data[i]->m_gradient);
 		gradientIn.Swap(gradientOut);
 	}
