@@ -66,7 +66,7 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 	void InitGaussianWeights(ndBrainFloat variance);
 
 	ndBrainFloat CrossCorrelation(const ndBrainVector& input, const ndBrainVector& kernels) const;
-	void PredictionOutputChannel(const ndBrainVector& input, const ndBrainVector& bias, const ndBrainVector& kernels, ndBrainVector& output) const;
+	void PredictionOutputChannel(const ndBrainVector& input, const ndBrainVector& kernels, ndBrainFloat bias, ndBrainVector& output) const;
 
 	ndBrainVector m_bias;
 	ndBrainVector m_kernels;

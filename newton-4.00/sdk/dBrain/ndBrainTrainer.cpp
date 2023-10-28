@@ -177,12 +177,13 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	prefixScan.PushBack(sizeAcc);
 
 	const ndBrainFloat* const memBuffer = ndAlloca(ndBrainFloat, sizeAcc + 8);
-	ndBrainMemVector in0(memBuffer, input.GetCount());
 
+	ndBrainMemVector in0(memBuffer, input.GetCount());
 	in0.Set(input);
+
 	for (ndInt32 i = 0; i < layersCount; ++i)
 	{
-		ndBrainMemVector in(memBuffer + prefixScan[i + 0], layers[i]->GetInputSize());
+		const ndBrainMemVector in(memBuffer + prefixScan[i + 0], layers[i]->GetInputSize());
 		ndBrainMemVector out(memBuffer + prefixScan[i + 1], layers[i]->GetOutputSize());
 		layers[i]->MakePrediction(in, out);
 	}

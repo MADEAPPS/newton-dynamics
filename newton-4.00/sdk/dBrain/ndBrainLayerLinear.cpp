@@ -170,7 +170,6 @@ void ndBrainLayerLinear::AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v
 	for (ndInt32 i = m_bias.GetCount() - 1; i >= 0; --i)
 	{
 		ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(bias_V[i])) + epsilon);
-		//biasGradients[j] = uHat[j] * bias_den;
 		m_bias[i] = bias_U[i] * bias_den;
 	}
 
@@ -181,21 +180,9 @@ void ndBrainLayerLinear::AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v
 		for (ndInt32 j = m_weights[i].GetCount() - 1; j >= 0; --j)
 		{
 			ndBrainFloat weight_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(weight_V[i][j])) + epsilon);
-			//weightGradients[j][k] = uHat[j][k] * bias_den;
 			m_weights[i][j] = weight_U[i][j] * weight_den;
 		}
 	}
-}
-
-void ndBrainLayerLinear::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
-{
-	m_weights.Mul(input, output);
-	output.Add(m_bias);
-}
-
-void ndBrainLayerLinear::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
-{
-	m_weights.TransposeMul(outputDerivative, inputDerivative);
 }
 
 void ndBrainLayerLinear::Save(const ndBrainSave* const loadSave) const
@@ -268,18 +255,16 @@ ndBrainLayer* ndBrainLayerLinear::Load(const ndBrainLoad* const loadSave)
 }
 
 
-//void ndBrainLayerLinear::CalculateParamGradients(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative,
-//	ndBrainVector& inputGradient, ndBrainVector& biasGradient, ndBrainMatrix& weightGradient)
-//{
-//	ndAssert(biasGradient.GetCount() == outputDerivative.GetCount());
-//	biasGradient.Set(outputDerivative);
-//	for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0 ; --i)
-//	{
-//		ndBrainFloat value = outputDerivative[i];
-//		weightGradient[i].ScaleSet(input, value);
-//	}
-//	InputDerivative(output, outputDerivative, inputGradient);
-//}
+void ndBrainLayerLinear::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+{
+	m_weights.Mul(input, output);
+	output.Add(m_bias);
+}
+
+void ndBrainLayerLinear::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+{
+	m_weights.TransposeMul(outputDerivative, inputDerivative);
+}
 
 void ndBrainLayerLinear::CalculateParamGradients(
 	const ndBrainVector& input, const ndBrainVector& output,
