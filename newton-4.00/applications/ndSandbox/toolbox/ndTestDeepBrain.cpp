@@ -538,7 +538,7 @@ static void MnistTrainingSet()
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv1->GetOutputWidth(), conv1->GetOutputHeight(), conv1->GetOutputChannels()));
 		const ndBrainLayerConvolutionalMaxPooling* const pooling1 = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
 
-		layers.PushBack(new ndBrainLayerConvolutional(pooling1->GetOutputWidth(), pooling1->GetOutputHeight(), pooling1->GetOutputChannels(), 3, 2));
+		layers.PushBack(new ndBrainLayerConvolutional(pooling1->GetOutputWidth(), pooling1->GetOutputHeight(), pooling1->GetOutputChannels(), 3, 3));
 		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		const ndBrainLayerConvolutional* const conv2 = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv2->GetOutputWidth(), conv2->GetOutputHeight(), conv2->GetOutputChannels()));
@@ -613,7 +613,7 @@ void ndTestDeedBrian()
 	//	//xxx.PushBack(ndGaussianRandom(0.0f, 0.1f));
 	//	xxx.PushBack(1.0f);
 	//}
-	//xxx.GaussianNormalize();
+	//xxx.GaussianNormalize();/
 
 	//ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();

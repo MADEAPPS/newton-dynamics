@@ -68,7 +68,6 @@ ndBrainLayerConvolutional::ndBrainLayerConvolutional(const ndBrainLayerConvoluti
 	,m_numberOfKernels(src.m_numberOfKernels)
 	,m_outputWidth(src.m_outputWidth)
 	,m_outputHeight(src.m_outputHeight)
-	
 {
 }
 

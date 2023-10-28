@@ -107,59 +107,80 @@ void ndBrainLayerConvolutionalMaxPooling::MakePrediction(const ndBrainVector& in
 	ndAssert(input.GetCount() == GetInputSize());
 	ndAssert(output.GetCount() == GetOutputSize());
 
-	ndAssert(m_height != 3);
-	ndInt32 baseIn = 0;
 	ndInt32 baseOut = 0;
 	for (ndInt32 k = 0; k < m_channels; ++k)
 	{
+		const ndInt32 base = k * m_height * m_width;
+		const ndBrainMemVector in(&input[base], m_height * m_width);
+
+		ndInt32 baseIn = 0;
 		for (ndInt32 i = 0; i < (m_height & -2); i += 2)
 		{
 			for (ndInt32 j = 0; j < (m_width & -2); j += 2)
 			{
-				ndInt32 index = j;
-				ndBrainFloat maxValue = input[baseIn + j];
-				if (input[baseIn + j + 1] > maxValue)
+				ndInt32 index = baseIn + j;
+				ndBrainFloat maxValue = in[index];
+				if (in[baseIn + j + 1] > maxValue)
 				{
-					index = j + 1;
-					maxValue = input[baseIn + index];
+					index = baseIn + j + 1;
+					maxValue = in[index];
 				}
-				if (input[baseIn + m_width + j] > maxValue)
+				if (in[baseIn + m_width + j] > maxValue)
 				{
-					index = m_width + j;
-					maxValue = input[baseIn + index];
+					index = baseIn + m_width + j;
+					maxValue = in[index];
 				}
-				if (input[baseIn + m_width + j + 1] > maxValue)
+				if (in[baseIn + m_width + j + 1] > maxValue)
 				{
-					index = m_width + j + 1;
-					maxValue = input[baseIn + index];
+					index = baseIn + m_width + j + 1;
+					maxValue = in[index];
 				}
 				output[baseOut + (j >> 1)] = maxValue;
-				m_index[baseOut + (j >> 1)] = baseIn + index;
+				m_index[baseOut + (j >> 1)] = base + index;
 			}
 
 			if (m_width & 1)
 			{
-				ndInt32 index = m_width - 1;
-				ndBrainFloat maxValue = input[baseIn + index];
-				if (input[baseIn + m_width + index] > maxValue)
+				ndInt32 index = baseIn + m_width - 1;
+				ndBrainFloat maxValue = in[index];
+				if (in[baseIn + m_width + m_width - 1] > maxValue)
 				{
-					index = m_width + index;
-					maxValue = input[baseIn + index];
+					index = baseIn + m_width + m_width - 1;
+					maxValue = in[index];
 				}
 				output[baseOut + (m_width >> 1)] = maxValue;
-				m_index[baseOut + (m_width >> 1)] = baseIn + index;
+				m_index[baseOut + (m_width >> 1)] = base + index;
 			}
 
 			baseIn += m_width * 2;
-			baseOut += m_width >> 1;
+			baseOut += (m_width + 1) >> 1;
 		}
 
 		if (m_height & 1)
 		{
-			//ndInt32 index = m_width - 1;
-			//ndBrainFloat maxValue = input[baseIn + index];
-			//output[output->GetCount()] = maxValue;
-			//m_index[baseOut + (m_width >> 1)] = baseIn + index;
+			for (ndInt32 j = 0; j < (m_width & -2); j += 2)
+			{
+				ndInt32 index = baseIn + j;
+				ndBrainFloat maxValue = in[index];
+				if (in[baseIn + j + 1] > maxValue)
+				{
+					index = baseIn + j + 1;
+					maxValue = in[index];
+				}
+				output[baseOut + (j >> 1)] = maxValue;
+				m_index[baseOut + (j >> 1)] = base + index;
+			}
+
+			if (m_width & 1)
+			{
+				ndInt32 index = baseIn + m_width - 1;
+				ndBrainFloat maxValue = in[index];
+				output[baseOut + (m_width >> 1)] = maxValue;
+				m_index[baseOut + (m_width >> 1)] = base + index;
+			}
+
+			baseIn += m_width * 2;
+			baseOut += (m_width + 1) >> 1;
 		}
 	}
 }
