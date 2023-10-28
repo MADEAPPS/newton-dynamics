@@ -107,30 +107,31 @@ void ndBrainLayerConvolutionalMaxPooling::MakePrediction(const ndBrainVector& in
 	ndAssert(input.GetCount() == GetInputSize());
 	ndAssert(output.GetCount() == GetOutputSize());
 
+	ndAssert(m_height != 3);
 	ndInt32 baseIn = 0;
 	ndInt32 baseOut = 0;
 	for (ndInt32 k = 0; k < m_channels; ++k)
 	{
-		for (ndInt32 i = 0; i < (m_height & -1); i += 2)
+		for (ndInt32 i = 0; i < (m_height & -2); i += 2)
 		{
-			for (ndInt32 j = 0; j < (m_width & -1); j += 2)
+			for (ndInt32 j = 0; j < (m_width & -2); j += 2)
 			{
 				ndInt32 index = j;
 				ndBrainFloat maxValue = input[baseIn + j];
 				if (input[baseIn + j + 1] > maxValue)
 				{
 					index = j + 1;
-					maxValue = input[baseIn + j + 1];
+					maxValue = input[baseIn + index];
 				}
 				if (input[baseIn + m_width + j] > maxValue)
 				{
 					index = m_width + j;
-					maxValue = input[baseIn + m_width + j];
+					maxValue = input[baseIn + index];
 				}
 				if (input[baseIn + m_width + j + 1] > maxValue)
 				{
 					index = m_width + j + 1;
-					maxValue = input[baseIn + m_width + j + 1];
+					maxValue = input[baseIn + index];
 				}
 				output[baseOut + (j >> 1)] = maxValue;
 				m_index[baseOut + (j >> 1)] = baseIn + index;
@@ -138,7 +139,15 @@ void ndBrainLayerConvolutionalMaxPooling::MakePrediction(const ndBrainVector& in
 
 			if (m_width & 1)
 			{
-				ndAssert(0);
+				ndInt32 index = m_width - 1;
+				ndBrainFloat maxValue = input[baseIn + index];
+				if (input[baseIn + m_width + index] > maxValue)
+				{
+					index = m_width + index;
+					maxValue = input[baseIn + index];
+				}
+				output[baseOut + (m_width >> 1)] = maxValue;
+				m_index[baseOut + (m_width >> 1)] = baseIn + index;
 			}
 
 			baseIn += m_width * 2;
@@ -147,7 +156,10 @@ void ndBrainLayerConvolutionalMaxPooling::MakePrediction(const ndBrainVector& in
 
 		if (m_height & 1)
 		{
-			ndAssert(0);
+			//ndInt32 index = m_width - 1;
+			//ndBrainFloat maxValue = input[baseIn + index];
+			//output[output->GetCount()] = maxValue;
+			//m_index[baseOut + (m_width >> 1)] = baseIn + index;
 		}
 	}
 }
