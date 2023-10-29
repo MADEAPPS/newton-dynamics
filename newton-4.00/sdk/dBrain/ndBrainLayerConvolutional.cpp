@@ -240,21 +240,25 @@ ndBrainLayer* ndBrainLayerConvolutional::Load(const ndBrainLoad* const loadSave)
 	return nullptr;
 }
 
-void ndBrainLayerConvolutional::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+ndBrainFloat ndBrainLayerConvolutional::CrossCorrelation(const ndBrainVector& input, const ndBrainVector& kernels) const
 {
-	//m_weights.Mul(input, output);
-	//output.Add(m_bias);
-	ndAssert(input.GetCount() == GetInputSize());
+	//ndInt32 cacheStart = 0;
+	//ndInt32 inputStart = 0;
+	//for (ndInt32 i = 0; i < m_kernelSize; ++i)
+	//{
+	//	ndMemCpy(&inputCache[cacheStart], &input[inputStart], m_kernelSize);
+	//	inputStart += m_inputWidth;
+	//	cacheStart += m_kernelSize;
+	//}
+	//return kernels.Dot(inputCache);
 
-	for (ndInt32 i = 0; i < m_numberOfKernels; ++i)
+	ndBrainFloat value = ndBrainFloat(0.0f);
+	for (ndInt32 i = 0; i < m_inputOffsets.GetCount(); ++i)
 	{
-		ndInt32 outStart = i * m_outputWidth * m_outputHeight;
-		ndInt32 kernelStart = i * m_inputDepth * m_kernelSize * m_kernelSize;
-		
-		ndBrainMemVector out(&output[outStart], m_outputWidth * m_outputHeight);
-		const ndBrainMemVector kernels(&m_kernels[kernelStart], m_inputDepth * m_kernelSize * m_kernelSize);
-		PredictionOutputChannel(input, kernels, m_bias[i], out);
+		ndInt32 index = m_inputOffsets[i];
+		value += input[index] * kernels[i];
 	}
+	return value;
 }
 
 void ndBrainLayerConvolutional::PredictionOutputChannel(const ndBrainVector& input, const ndBrainVector& kernels, ndBrainFloat bias, ndBrainVector& output) const
@@ -284,36 +288,46 @@ void ndBrainLayerConvolutional::PredictionOutputChannel(const ndBrainVector& inp
 	}
 }
 
-ndBrainFloat ndBrainLayerConvolutional::CrossCorrelation(const ndBrainVector& input, const ndBrainVector& kernels) const
+void ndBrainLayerConvolutional::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-	//ndInt32 cacheStart = 0;
-	//ndInt32 inputStart = 0;
-	//for (ndInt32 i = 0; i < m_kernelSize; ++i)
-	//{
-	//	ndMemCpy(&inputCache[cacheStart], &input[inputStart], m_kernelSize);
-	//	inputStart += m_inputWidth;
-	//	cacheStart += m_kernelSize;
-	//}
-	//return kernels.Dot(inputCache);
+	//m_weights.Mul(input, output);
+	//output.Add(m_bias);
+	ndAssert(input.GetCount() == GetInputSize());
 
-	ndBrainFloat value = ndBrainFloat(0.0f);
-	for (ndInt32 i = 0; i < m_inputOffsets.GetCount(); ++i)
+	for (ndInt32 i = 0; i < m_numberOfKernels; ++i)
 	{
-		ndInt32 index = m_inputOffsets[i];
-		value += input[index] * kernels[i];
+		ndInt32 outStart = i * m_outputWidth * m_outputHeight;
+		ndInt32 kernelStart = i * m_inputDepth * m_kernelSize * m_kernelSize;
+		
+		ndBrainMemVector out(&output[outStart], m_outputWidth * m_outputHeight);
+		const ndBrainMemVector kernels(&m_kernels[kernelStart], m_inputDepth * m_kernelSize * m_kernelSize);
+		PredictionOutputChannel(input, kernels, m_bias[i], out);
 	}
-	return value;
 }
 
 void ndBrainLayerConvolutional::CalculateParamGradients(
 	const ndBrainVector& input, const ndBrainVector& output,
 	const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const
 {
-	ndAssert(0);
-	//ndAssert(!strcmp(GetLabelId(), gradientOut->GetLabelId()));
-	//ndBrainLayerLinear* const gradients = (ndBrainLayerLinear*)gradientOut;
-	//ndAssert(gradients->m_bias.GetCount() == outputDerivative.GetCount());
+	ndAssert(!strcmp(GetLabelId(), gradientOut->GetLabelId()));
+	ndBrainLayerConvolutional* const gradients = (ndBrainLayerConvolutional*)gradientOut;
+
+	ndAssert(gradients->m_bias.GetCount() == m_numberOfKernels);
+
 	//gradients->m_bias.Set(outputDerivative);
+	const ndInt32 size = m_outputWidth * m_outputHeight;
+	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
+	{
+		ndBrainFloat value = ndBrainFloat(0.0f);
+		const ndBrainMemVector biasGrad(&outputDerivative[i * size], size);
+		for (ndInt32 j = 0; j < size; ++j)
+		{
+			value += biasGrad[j];
+		}
+		gradients->m_bias[i] = value;
+	}
+	
+	ndAssert(0);
 	//for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0; --i)
 	//{
 	//	ndBrainFloat value = outputDerivative[i];

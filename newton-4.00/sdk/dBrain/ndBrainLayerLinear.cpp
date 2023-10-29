@@ -254,7 +254,6 @@ ndBrainLayer* ndBrainLayerLinear::Load(const ndBrainLoad* const loadSave)
 	return layer;
 }
 
-
 void ndBrainLayerLinear::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	m_weights.Mul(input, output);
@@ -273,6 +272,7 @@ void ndBrainLayerLinear::CalculateParamGradients(
 	ndAssert(!strcmp(GetLabelId(), gradientOut->GetLabelId()));
 	ndBrainLayerLinear* const gradients = (ndBrainLayerLinear*)gradientOut;
 	ndAssert(gradients->m_bias.GetCount() == outputDerivative.GetCount());
+
 	gradients->m_bias.Set(outputDerivative);
 	for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0; --i)
 	{
