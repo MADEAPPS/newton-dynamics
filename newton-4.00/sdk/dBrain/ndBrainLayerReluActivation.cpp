@@ -43,6 +43,18 @@ const char* ndBrainLayerReluActivation::GetLabelId() const
 	return "ndBrainLayerReluActivation";
 }
 
+ndBrainLayer* ndBrainLayerReluActivation::Load(const ndBrainLoad* const loadSave)
+{
+	char buffer[1024];
+	loadSave->ReadString(buffer);
+
+	loadSave->ReadString(buffer);
+	ndInt32 inputs = loadSave->ReadInt();
+	ndBrainLayerReluActivation* const layer = new ndBrainLayerReluActivation(inputs);
+	loadSave->ReadString(buffer);
+	return layer;
+}
+
 void ndBrainLayerReluActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
@@ -64,16 +76,4 @@ void ndBrainLayerReluActivation::InputDerivative(const ndBrainVector& output, co
 		ndAssert(ndCheckFloat(inputDerivative[i]));
 	}
 	inputDerivative.Mul(outputDerivative);
-}
-
-ndBrainLayer* ndBrainLayerReluActivation::Load(const ndBrainLoad* const loadSave)
-{
-	char buffer[1024];
-	loadSave->ReadString(buffer);
-
-	loadSave->ReadString(buffer);
-	ndInt32 inputs = loadSave->ReadInt();
-	ndBrainLayerReluActivation* const layer = new ndBrainLayerReluActivation(inputs);
-	loadSave->ReadString(buffer);
-	return layer;
 }

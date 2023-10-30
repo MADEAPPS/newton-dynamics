@@ -42,17 +42,16 @@ const char* ndBrainLayerSigmoidActivation::GetLabelId() const
 	return "ndBrainLayerSigmoidActivation";
 }
 
-void ndBrainLayerSigmoidActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+ndBrainLayer* ndBrainLayerSigmoidActivation::Load(const ndBrainLoad* const loadSave)
 {
-	ndAssert(output.GetCount() == outputDerivative.GetCount());
-	ndAssert(output.GetCount() == inputDerivative.GetCount());
+	char buffer[1024];
+	loadSave->ReadString(buffer);
 
-	inputDerivative.Set(ndBrainFloat(1.0f));
-	inputDerivative.Sub(output);
-	inputDerivative.Mul(output);
-
-	inputDerivative.Mul(outputDerivative);
-	inputDerivative.FlushToZero();
+	loadSave->ReadString(buffer);
+	ndInt32 inputs = loadSave->ReadInt();
+	ndBrainLayerSigmoidActivation* const layer = new ndBrainLayerSigmoidActivation(inputs);
+	loadSave->ReadString(buffer);
+	return layer;
 }
 
 void ndBrainLayerSigmoidActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
@@ -82,14 +81,15 @@ void ndBrainLayerSigmoidActivation::MakePrediction(const ndBrainVector& input, n
 	}
 }
 
-ndBrainLayer* ndBrainLayerSigmoidActivation::Load(const ndBrainLoad* const loadSave)
+void ndBrainLayerSigmoidActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-	char buffer[1024];
-	loadSave->ReadString(buffer);
+	ndAssert(output.GetCount() == outputDerivative.GetCount());
+	ndAssert(output.GetCount() == inputDerivative.GetCount());
 
-	loadSave->ReadString(buffer);
-	ndInt32 inputs = loadSave->ReadInt();
-	ndBrainLayerSigmoidActivation* const layer = new ndBrainLayerSigmoidActivation(inputs);
-	loadSave->ReadString(buffer);
-	return layer;
+	inputDerivative.Set(ndBrainFloat(1.0f));
+	inputDerivative.Sub(output);
+	inputDerivative.Mul(output);
+
+	inputDerivative.Mul(outputDerivative);
+	inputDerivative.FlushToZero();
 }

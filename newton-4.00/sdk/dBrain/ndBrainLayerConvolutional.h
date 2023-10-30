@@ -58,15 +58,23 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
+	//virtual void Clear();
+	//virtual void FlushToZero();
+	//virtual void Scale(ndBrainFloat scale);
+	virtual void Set(const ndBrainLayer& src);
+	//virtual void Add(const ndBrainLayer& src);
+	//virtual void Mul(const ndBrainLayer& src);
+	//virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
+	//virtual void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
 
-	void Set(const ndBrainLayer& src);
-	
 	private:
 	void InitGaussianBias(ndBrainFloat variance);
 	void InitGaussianWeights(ndBrainFloat variance);
 
 	ndBrainFloat CrossCorrelation(const ndBrainVector& input, const ndBrainVector& kernels) const;
 	void PredictionOutputChannel(const ndBrainVector& input, const ndBrainVector& kernels, ndBrainFloat bias, ndBrainVector& output) const;
+
+	void Debug(ndInt32 width, ndInt32 height, ndInt32 channels, ndInt32 filterSize, ndInt32 filterCount);
 
 	ndBrainVector m_bias;
 	ndBrainVector m_kernels;

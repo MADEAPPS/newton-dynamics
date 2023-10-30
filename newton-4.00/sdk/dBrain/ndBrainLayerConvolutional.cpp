@@ -52,6 +52,10 @@ ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32
 		}
 		offset += m_inputWidth;
 	}
+
+	//if (inputWidth == 5)
+	if (inputWidth == 12)
+		Debug(inputWidth, m_inputHeight, inputDepth, kernelSize, numberOfKernels);
 }
 
 ndBrainLayerConvolutional::ndBrainLayerConvolutional(const ndBrainLayerConvolutional& src)
@@ -144,7 +148,6 @@ void ndBrainLayerConvolutional::InitWeights(ndBrainFloat weighVariance, ndBrainF
 	InitGaussianWeights(weighVariance);
 }
 
-//void ndBrainLayerConvolutional::CopyFrom(const ndBrainLayer& src)
 void ndBrainLayerConvolutional::Set(const ndBrainLayer& src)
 {
 	const ndBrainLayerConvolutional& convSrc = (ndBrainLayerConvolutional&)src;
@@ -288,6 +291,106 @@ void ndBrainLayerConvolutional::PredictionOutputChannel(const ndBrainVector& inp
 	}
 }
 
+void ndBrainLayerConvolutional::Debug(ndInt32 width, ndInt32 height, ndInt32 channels, ndInt32 filterSize, ndInt32 filterCount)
+{
+	// print inputs
+	for (ndInt32 channel = 0; channel < channels; ++channel)
+	{
+		for (ndInt32 y = 0; y < height; ++y)
+		{
+			for (ndInt32 x = 0; x < width; ++x)
+			{
+				ndTrace(("x(%d,%d,%d) ", channel, y, x));
+			}
+			ndTrace(("\n"));
+		}
+		ndTrace(("\n"));
+	}
+
+	// print kilters
+	ndTrace(("\n"));
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 channel = 0; channel < channels; ++channel)
+		{
+			for (ndInt32 y = 0; y < filterSize; ++y)
+			{
+				for (ndInt32 x = 0; x < filterSize; ++x)
+				{
+					ndTrace(("w(%d,%d,%d,%d) ", filter, channel, y, x));
+				}
+				ndTrace(("\n"));
+			}
+			ndTrace(("\n"));
+		}
+		ndTrace(("b(%d)\n", filter));
+		ndTrace(("\n"));
+	}
+
+	// print outputs
+	ndTrace(("\n"));
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 y = 0; y < (height - filterSize + 1); ++y)
+		{
+			for (ndInt32 x = 0; x < (width - filterSize + 1); ++x)
+			{
+				ndTrace(("y(%d,%d,%d) ", filter, y, x));
+			}
+			ndTrace(("\n"));
+		}
+		ndTrace(("\n"));
+		//ndTrace(("b(%d)\n\n", filter));
+	}
+
+
+	// print convolutions
+	ndTrace(("\n"));
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 y0 = 0; y0 < (height - filterSize + 1); ++y0)
+		{
+			for (ndInt32 x0 = 0; x0 < (width - filterSize + 1); ++x0)
+			{
+				ndTrace(("y(%d,%d,%d)=\n", filter, y0, x0));
+				for (ndInt32 channel = 0; channel < channels; ++channel)
+				{
+					for (ndInt32 y = 0; y < filterSize; ++y)
+					{
+						ndTrace(("   "));
+						for (ndInt32 x = 0; x < filterSize; ++x)
+						{
+							ndTrace(("x(%d,%d,%d)*w(%d,%d,%d,%d) + ", channel, y0 + y, x0 + x, filter, channel, y, x));
+						}
+						ndTrace(("\n"));
+					}
+				}
+				ndTrace(("   b(%d)\n", filter));
+				ndTrace(("\n"));
+			}
+		}
+		ndTrace(("\n"));
+	}
+
+	// print weight gradients
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 channel = 0; channel < channels; ++channel)
+		{
+			for (ndInt32 y0 = 0; y0 < filterSize; ++y0)
+			{
+				for (ndInt32 x0 = 0; x0 < filterSize; ++x0)
+				{
+					ndTrace(("dL/dw(%d,%d,%d,%d)=\n", filter, channel, y0, x0));
+
+
+					ndTrace(("\n"));
+				}
+			}
+		}
+	}
+}
+
 void ndBrainLayerConvolutional::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	//m_weights.Mul(input, output);
@@ -313,6 +416,7 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 	ndBrainLayerConvolutional* const gradients = (ndBrainLayerConvolutional*)gradientOut;
 
 	ndAssert(gradients->m_bias.GetCount() == m_numberOfKernels);
+	ndAssert(output.GetCount() == outputDerivative.GetCount());
 
 	//gradients->m_bias.Set(outputDerivative);
 	const ndInt32 size = m_outputWidth * m_outputHeight;

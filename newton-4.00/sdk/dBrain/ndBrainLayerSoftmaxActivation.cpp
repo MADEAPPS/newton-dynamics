@@ -43,8 +43,47 @@ const char* ndBrainLayerSoftmaxActivation::GetLabelId() const
 	return "ndBrainLayerSoftmaxActivation";
 }
 
+ndBrainLayer* ndBrainLayerSoftmaxActivation::Load(const ndBrainLoad* const loadSave)
+{
+	char buffer[1024];
+	loadSave->ReadString(buffer);
+
+	loadSave->ReadString(buffer);
+	ndInt32 inputs = loadSave->ReadInt();
+	ndBrainLayerSoftmaxActivation* const layer = new ndBrainLayerSoftmaxActivation(inputs);
+	loadSave->ReadString(buffer);
+	return layer;
+}
+
+void ndBrainLayerSoftmaxActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+{
+	ndAssert(input.GetCount() == output.GetCount());
+	ndBrainFloat max = ndBrainFloat(1.0e-16f);
+	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	{
+		max = ndMax(input[i], max);
+	}
+
+	ndBrainFloat acc = ndBrainFloat(0.0f);
+	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	{
+		ndBrainFloat in = ndMax((input[i] - max), ndBrainFloat(-30.0f));
+		ndAssert(in <= ndBrainFloat(0.0f));
+		ndBrainFloat prob = ndBrainFloat(ndExp(in));
+		output[i] = prob;
+		acc += prob;
+	}
+
+	ndAssert(acc > ndBrainFloat(0.0f));
+	output.Scale(ndBrainFloat(1.0f) / acc);
+	output.FlushToZero();
+}
+
 void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
+	ndAssert(output.GetCount() == outputDerivative.GetCount());
+	ndAssert(output.GetCount() == inputDerivative.GetCount());
+
 	// calculate the output derivative which is a the Jacobian matrix time the input
 	//for (ndInt32 i = 0; i < output.GetCount(); ++i)
 	//{
@@ -68,40 +107,4 @@ void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector& output,
 	inputDerivative.MulAdd(output, outputDerivative);
 
 	inputDerivative.FlushToZero();
-}
-
-void ndBrainLayerSoftmaxActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
-{
-	ndAssert(input.GetCount() == output.GetCount());
-	ndBrainFloat max = ndBrainFloat(1.0e-16f);
-	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
-	{
-		max = ndMax (input[i], max);
-	}
-
-	ndBrainFloat acc = ndBrainFloat(0.0f);
-	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
-	{
-		ndBrainFloat in = ndMax((input[i] - max), ndBrainFloat(-30.0f));
-		ndAssert(in <= ndBrainFloat(0.0f));
-		ndBrainFloat prob = ndBrainFloat(ndExp(in));
-		output[i] = prob;
-		acc += prob;
-	}
-
-	ndAssert(acc > ndBrainFloat (0.0f));
-	output.Scale(ndBrainFloat(1.0f) / acc);
-	output.FlushToZero();
-}
-
-ndBrainLayer* ndBrainLayerSoftmaxActivation::Load(const ndBrainLoad* const loadSave)
-{
-	char buffer[1024];
-	loadSave->ReadString(buffer);
-
-	loadSave->ReadString(buffer);
-	ndInt32 inputs = loadSave->ReadInt();
-	ndBrainLayerSoftmaxActivation* const layer = new ndBrainLayerSoftmaxActivation(inputs);
-	loadSave->ReadString(buffer);
-	return layer;
 }

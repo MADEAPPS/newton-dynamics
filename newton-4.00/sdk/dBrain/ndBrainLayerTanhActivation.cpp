@@ -49,6 +49,18 @@ const char* ndBrainLayerTanhActivation::GetLabelId() const
 	return "ndBrainLayerTanhActivation";
 }
 
+ndBrainLayer* ndBrainLayerTanhActivation::Load(const ndBrainLoad* const loadSave)
+{
+	char buffer[1024];
+	loadSave->ReadString(buffer);
+
+	loadSave->ReadString(buffer);
+	ndInt32 inputs = loadSave->ReadInt();
+	ndBrainLayerTanhActivation* const layer = new ndBrainLayerTanhActivation(inputs);
+	loadSave->ReadString(buffer);
+	return layer;
+}
+
 void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
@@ -69,19 +81,6 @@ void ndBrainLayerTanhActivation::InputDerivative(const ndBrainVector& output, co
 	inputDerivative.Mul(outputDerivative);
 	inputDerivative.FlushToZero();
 }
-
-ndBrainLayer* ndBrainLayerTanhActivation::Load(const ndBrainLoad* const loadSave)
-{
-	char buffer[1024];
-	loadSave->ReadString(buffer);
-
-	loadSave->ReadString(buffer);
-	ndInt32 inputs = loadSave->ReadInt();
-	ndBrainLayerTanhActivation* const layer = new ndBrainLayerTanhActivation(inputs);
-	loadSave->ReadString(buffer);
-	return layer;
-}
-
 
 ndBrainLayerApproximateTanhActivation::ndBrainLayerApproximateTanhActivation(ndInt32 neurons)
 	:ndBrainLayerTanhActivation(neurons)
@@ -115,12 +114,12 @@ const char* ndBrainLayerApproximateTanhActivation::GetLabelId() const
 	return "ndBrainLayerApproximateTanhActivation";
 }
 
-#if defined (D_SCALAR_VECTOR_CLASS) || (defined (D_NEWTON_USE_DOUBLE) && defined (D_BRAIN_USES_REAL))
+//#if defined (D_SCALAR_VECTOR_CLASS) || (defined (D_NEWTON_USE_DOUBLE) && defined (D_BRAIN_USES_REAL))
+#if defined (D_NEWTON_USE_DOUBLE)
 void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndBrainLayerTanhActivation::MakePrediction(input, output);
 }
-
 #else
 
 void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const

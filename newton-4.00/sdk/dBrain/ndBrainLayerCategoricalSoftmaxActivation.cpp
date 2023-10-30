@@ -50,6 +50,7 @@ void ndBrainLayerCategoricalSoftmaxActivation::InputDerivative(const ndBrainVect
 	// check that the ouputDerivative is a one hat encoding 
 	ndAssert(output.GetCount() == inputDerivative.GetCount());
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
+
 	ndInt32 index = 0;
 	for (ndInt32 i = 0; i < outputDerivative.GetCount(); ++i)
 	{
