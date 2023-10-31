@@ -55,7 +55,10 @@ ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32
 
 	//if (inputWidth == 5)
 	if (inputWidth == 12)
-		Debug(inputWidth, m_inputHeight, inputDepth, kernelSize, numberOfKernels);
+	{
+		//Debug(inputWidth, m_inputHeight, inputDepth, kernelSize, numberOfKernels);
+		Debug(7, 7, 2, 3, 3);
+	}
 }
 
 ndBrainLayerConvolutional::ndBrainLayerConvolutional(const ndBrainLayerConvolutional& src)
@@ -360,7 +363,7 @@ void ndBrainLayerConvolutional::Debug(ndInt32 width, ndInt32 height, ndInt32 cha
 						ndTrace(("   "));
 						for (ndInt32 x = 0; x < filterSize; ++x)
 						{
-							ndTrace(("x(%d,%d,%d)*w(%d,%d,%d,%d) + ", channel, y0 + y, x0 + x, filter, channel, y, x));
+							ndTrace(("x(%d,%d,%d) * w(%d,%d,%d,%d) + ", channel, y0 + y, x0 + x, filter, channel, y, x));
 						}
 						ndTrace(("\n"));
 					}
@@ -381,10 +384,8 @@ void ndBrainLayerConvolutional::Debug(ndInt32 width, ndInt32 height, ndInt32 cha
 			{
 				for (ndInt32 x0 = 0; x0 < filterSize; ++x0)
 				{
-					ndTrace(("dL/dw(%d,%d,%d,%d)=\n", filter, channel, y0, x0));
-
-
-					ndTrace(("\n"));
+					//ndTrace(("dL/dw(%d,%d,%d,%d)=\n", filter, channel, y0, x0));
+					//ndTrace(("\n"));
 				}
 			}
 		}
