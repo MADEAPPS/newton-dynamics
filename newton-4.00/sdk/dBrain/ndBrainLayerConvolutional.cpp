@@ -57,7 +57,8 @@ ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32
 	if (inputWidth == 12)
 	{
 		//Debug(inputWidth, m_inputHeight, inputDepth, kernelSize, numberOfKernels);
-		Debug(7, 7, 2, 3, 3);
+		//Debug(7, 7, 2, 3, 3);
+		Debug(4, 4, 2, 2, 3);
 	}
 }
 
@@ -368,7 +369,7 @@ void ndBrainLayerConvolutional::Debug(ndInt32 width, ndInt32 height, ndInt32 cha
 						ndTrace(("\n"));
 					}
 				}
-				ndTrace(("   b(%d)\n", filter));
+				//ndTrace(("   b(%d)\n", filter));
 				ndTrace(("\n"));
 			}
 		}
