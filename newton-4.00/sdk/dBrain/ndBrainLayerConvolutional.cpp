@@ -59,6 +59,7 @@ ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32
 		//Debug(inputWidth, m_inputHeight, inputDepth, kernelSize, numberOfKernels);
 		//Debug(7, 7, 2, 3, 3);
 		Debug(4, 4, 2, 2, 3);
+		//Debug(4, 4, 2, 2, 2);
 	}
 }
 
@@ -350,6 +351,37 @@ void ndBrainLayerConvolutional::Debug(ndInt32 width, ndInt32 height, ndInt32 cha
 		//ndTrace(("b(%d)\n\n", filter));
 	}
 
+	ndTrace(("\n"));
+	ndInt32 index = 0;
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 y = 0; y < outputWidth; ++y)
+		{
+			for (ndInt32 x = 0; x < outputHeight; ++x)
+			{
+				ndTrace(("z(%d) = g(y(%d,%d,%d))\n", index, filter, y, x));
+				index++;
+			}
+		}
+	}
+
+	ndTrace(("\n"));
+	ndTrace(("L2 =\n"));
+	index = 0;
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 y = 0; y < outputWidth; ++y)
+		{
+			ndTrace(("    "));
+			for (ndInt32 x = 0; x < outputHeight; ++x)
+			{
+				ndTrace(("1/2 * (z(%d) - k(%d))^2 + ", index, index));
+				index++;
+			}
+			ndTrace(("\n"));
+		}
+	}
+	ndTrace(("\n"));
 
 	// print convolutions
 	ndTrace(("\n"));
