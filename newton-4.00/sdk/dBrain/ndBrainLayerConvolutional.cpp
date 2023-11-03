@@ -552,19 +552,19 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
 
 	//gradients->m_bias.Set(outputDerivative);
-	const ndInt32 size = m_outputWidth * m_outputHeight;
-	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
-	{
-		ndBrainFloat value = ndBrainFloat(0.0f);
-		const ndBrainMemVector biasGrad(&outputDerivative[i * size], size);
-		for (ndInt32 j = 0; j < size; ++j)
-		{
-			value += biasGrad[j];
-		}
-		gradients->m_bias[i] = value;
-	}
-	
 	ndAssert(0);
+	//const ndInt32 size = m_outputWidth * m_outputHeight;
+	//for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
+	//{
+	//	ndBrainFloat value = ndBrainFloat(0.0f);
+	//	const ndBrainMemVector biasGrad(&outputDerivative[i * size], size);
+	//	for (ndInt32 j = 0; j < size; ++j)
+	//	{
+	//		value += biasGrad[j];
+	//	}
+	//	gradients->m_bias[i] = value;
+	//}
+	
 	//for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0; --i)
 	//{
 	//	ndBrainFloat value = outputDerivative[i];
