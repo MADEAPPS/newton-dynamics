@@ -326,7 +326,6 @@ void ndBrainLayerConvolutional::Debug(ndInt32 width, ndInt32 height, ndInt32 cha
 				}
 				ndTrace(("\n"));
 			}
-			ndTrace(("\n"));
 		}
 		ndTrace(("b(%d)\n", filter));
 		ndTrace(("\n"));
@@ -336,60 +335,28 @@ void ndBrainLayerConvolutional::Debug(ndInt32 width, ndInt32 height, ndInt32 cha
 	int outputHeight = height - filterSize + 1;
 
 	// print outputs
-	ndTrace(("\n"));
-	for (ndInt32 filter = 0; filter < filterCount; ++filter)
-	{
-		for (ndInt32 y = 0; y < outputWidth; ++y)
-		{
-			for (ndInt32 x = 0; x < outputHeight; ++x)
-			{
-				ndTrace(("y(%d,%d,%d) ", filter, y, x));
-			}
-			ndTrace(("\n"));
-		}
-		ndTrace(("\n"));
-		//ndTrace(("b(%d)\n\n", filter));
-	}
+	//ndTrace(("\n"));
+	//for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	//{
+	//	for (ndInt32 y = 0; y < outputWidth; ++y)
+	//	{
+	//		for (ndInt32 x = 0; x < outputHeight; ++x)
+	//		{
+	//			ndTrace(("y(%d,%d,%d) ", filter, y, x));
+	//		}
+	//		ndTrace(("\n"));
+	//	}
+	//	ndTrace(("\n"));
+	//	//ndTrace(("b(%d)\n\n", filter));
+	//}
 
-	ndTrace(("\n"));
-	ndInt32 index = 0;
-	for (ndInt32 filter = 0; filter < filterCount; ++filter)
-	{
-		for (ndInt32 y = 0; y < outputWidth; ++y)
-		{
-			for (ndInt32 x = 0; x < outputHeight; ++x)
-			{
-				ndTrace(("z(%d) = g(y(%d,%d,%d))\n", index, filter, y, x));
-				index++;
-			}
-		}
-	}
-
-	ndTrace(("\n"));
-	ndTrace(("L2 =\n"));
-	index = 0;
-	for (ndInt32 filter = 0; filter < filterCount; ++filter)
-	{
-		for (ndInt32 y = 0; y < outputWidth; ++y)
-		{
-			ndTrace(("    "));
-			for (ndInt32 x = 0; x < outputHeight; ++x)
-			{
-				ndTrace(("1/2 * (z(%d) - k(%d))^2 + ", index, index));
-				index++;
-			}
-			ndTrace(("\n"));
-		}
-	}
-	ndTrace(("\n"));
-
-	// print convolutions
+	// print convolutions outputs
 	ndTrace(("\n"));
 	for (ndInt32 filter = 0; filter < filterCount; ++filter)
 	{
-		for (ndInt32 y0 = 0; y0 < outputWidth; ++y0)
+		for (ndInt32 y0 = 0; y0 < outputHeight; ++y0)
 		{
-			for (ndInt32 x0 = 0; x0 < outputHeight; ++x0)
+			for (ndInt32 x0 = 0; x0 < outputWidth; ++x0)
 			{
 				ndTrace(("y(%d,%d,%d)=\n", filter, y0, x0));
 				for (ndInt32 channel = 0; channel < channels; ++channel)
@@ -404,14 +371,131 @@ void ndBrainLayerConvolutional::Debug(ndInt32 width, ndInt32 height, ndInt32 cha
 						ndTrace(("\n"));
 					}
 				}
-				//ndTrace(("   b(%d)\n", filter));
+				ndTrace(("   b(%d)\n", filter));
 				ndTrace(("\n"));
 			}
 		}
-		ndTrace(("\n"));
+		//ndTrace(("\n"));
 	}
 
+	ndTrace(("\n"));
+	ndInt32 index = 0;
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 y = 0; y < outputHeight; ++y)
+		{
+			for (ndInt32 x = 0; x < outputWidth; ++x)
+			{
+				ndTrace(("z(%d) = g(y(%d,%d,%d))\n", index, filter, y, x));
+				index++;
+			}
+		}
+	}
+
+	ndTrace(("\n"));
+	ndTrace(("L2 =\n"));
+	index = 0;
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 y = 0; y < outputHeight; ++y)
+		{
+			ndTrace(("    "));
+			for (ndInt32 x = 0; x < outputWidth; ++x)
+			{
+				ndTrace(("1/2 * (z(%d) - k(%d))^2 + ", index, index));
+				index++;
+			}
+			ndTrace(("\n"));
+		}
+	}
+	ndTrace(("\n"));
+
+
+	ndTrace(("\n"));
+	ndTrace(("d(L2)/d(w) =\n"));
+	index = 0;
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 y = 0; y < outputHeight; ++y)
+		{
+			ndTrace(("    "));
+			for (ndInt32 x = 0; x < outputWidth; ++x)
+			{
+				ndTrace(("(z(%d) - k(%d) * d(z(%d))/d(w) + ", index, index));
+				index++;
+			}
+			ndTrace(("\n"));
+		}
+	}
+	ndTrace(("\n"));
+
+
+	ndTrace(("\n"));
+	ndTrace(("d(L2)/d(w) =\n"));
+	index = 0;
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 y = 0; y < outputHeight; ++y)
+		{
+			ndTrace(("    "));
+			for (ndInt32 x = 0; x < outputWidth; ++x)
+			{
+				ndTrace(("l(%d) * d(z(%d))/d(w) + ", index, index));ndTrace(("l(%d) * d(z(%d))/d(w) + ", index, index));
+				index++;
+			}
+			ndTrace(("\n"));
+		}
+	}
+	ndTrace(("\n"));
+
+
+
+	ndTrace(("\n"));
+	ndTrace(("d(L2)/d(w) =\n"));
+	index = 0;
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 y = 0; y < outputHeight; ++y)
+		{
+			ndTrace(("    "));
+			for (ndInt32 x = 0; x < outputWidth; ++x)
+			{
+				//ndTrace(("z(%d) = g(y(%d,%d,%d))\n", index, filter, y, x));
+				//ndTrace(("l(%d) * d(z(%d))/d(w) + ", index, index));
+				ndTrace(("l(%d) * d(g(y(%d,%d,%d)))/d(w) + ", index, filter, y, x));
+				index++;
+			}
+			ndTrace(("\n"));
+		}
+	}
+	ndTrace(("\n"));
+
+
+	ndTrace(("\n"));
+	ndTrace(("d(L2)/d(w) =\n"));
+	index = 0;
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 y = 0; y < outputHeight; ++y)
+		{
+			ndTrace(("    "));
+			for (ndInt32 x = 0; x < outputWidth; ++x)
+			{
+				//ndTrace(("l(%d) * d(z(%d))/d(w) + ", index, index));
+				//ndTrace(("z(%d) = g(y(%d,%d,%d))\n", index, filter, y, x));
+				//ndTrace(("l(%d) * d(g(y(%d,%d,%d)))/d(w) + ", index, filter, y, x));
+				ndTrace(("l(%d) * d(g(y(%d,%d,%d)))/d(y(%d,%d,%d)) * d(y(%d,%d,%d))/d(w) +\n", index, filter, y, x, filter, y, x, filter, y, x));
+				ndTrace(("    "));
+				index++;
+			}
+			ndTrace(("\n"));
+		}
+	}
+	ndTrace(("\n"));
+
+
 	// print weight gradients
+	ndTrace(("\n"));
 	for (ndInt32 filter = 0; filter < filterCount; ++filter)
 	{
 		for (ndInt32 channel = 0; channel < channels; ++channel)
