@@ -27,7 +27,9 @@ ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32
 	:ndBrainLayer()
 	,m_bias()
 	,m_kernels()
+	,m_paddedGradientOut()
 	,m_inputOffsets()
+	,m_inputGradOffsets()
 	,m_inputWidth(inputWidth)
 	,m_inputHeight(inputHeight)
 	,m_inputDepth(inputDepth)
@@ -43,14 +45,17 @@ ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32
 	m_bias.Set(ndBrainFloat(0.0f));
 	m_kernels.Set(ndBrainFloat(0.0f));
 
-	ndInt32 offset = 0;
+	ndInt32 inputOffset = 0;
+	ndInt32 inputGradOffset = 0;
 	for (ndInt32 j = 0; j < m_kernelSize; ++j)
 	{
 		for (ndInt32 i = 0; i < m_kernelSize; ++i)
 		{
-			m_inputOffsets.PushBack(offset + i);
+			m_inputOffsets.PushBack(inputOffset + i);
+			m_inputGradOffsets.PushBack(inputGradOffset + i);
 		}
-		offset += m_inputWidth;
+		inputOffset += m_inputWidth;
+		inputGradOffset += m_inputWidth + m_kernelSize - 1;
 	}
 	
 	if (inputWidth == 5)
@@ -770,5 +775,101 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 		}
 	}
 
+
 	//InputDerivative(output, outputDerivative, inputGradient);
+	if (!m_paddedGradientOut.GetCount())
+	{
+		ndInt32 paddSizeWidth = m_inputWidth + m_kernelSize - 1;
+		ndInt32 paddSizeHeight = m_inputHeight + m_kernelSize - 1;
+		m_paddedGradientOut.SetCount(paddSizeWidth * paddSizeHeight);
+		m_paddedGradientOut.Set(ndBrainFloat(0.0f));
+	}
+
+
+	ndInt32 inputOffset = 0;
+	ndBrainFloat convKernelBuffer[256];
+	ndBrainMemVector convKernel(convKernelBuffer, kernelSize);
+
+	auto CopyOutput = [this, &outputDerivative](ndInt32 filter)
+	{
+		ndInt32 srcOffset = 0;
+		ndInt32 dstWidth = m_inputWidth + m_kernelSize - 1;
+		ndInt32 outputSize = m_outputWidth * m_outputHeight;
+		ndInt32 dstOffset = dstWidth * (m_kernelSize - 1) + m_kernelSize - 1;
+		const ndBrainMemVector srcGrad(&outputDerivative[filter * outputSize], outputSize);
+		for (ndInt32 y = 0; y < m_outputHeight; ++y)
+		{
+			const ndBrainMemVector src(&srcGrad[srcOffset], m_outputWidth);
+			ndBrainMemVector dst(&m_paddedGradientOut[dstOffset], m_outputWidth);
+			dst.Set(src);
+			dstOffset += dstWidth;
+			srcOffset += m_outputWidth;
+		}
+	};
+
+	auto RotateKernel = [&convKernel](const ndBrainMemVector& kernel)
+	{
+		ndAssert(convKernel.GetCount() == kernel.GetCount());
+		for (ndInt32 i = kernel.GetCount() - 1; i >= 0; --i)
+		{
+			convKernel[kernel.GetCount() - 1 - i] = kernel[i];
+		}
+	};
+
+	auto CalculateInpuGradient = [this](const ndBrainVector& filter, ndBrainVector& output)
+	{
+		//auto CrossCorrelation = [this](const ndBrainVector& input, const ndBrainVector& kernels)
+		//{
+		//	ndBrainFloat value = ndBrainFloat(0.0f);
+		//	for (ndInt32 i = 0; i < m_inputOffsets.GetCount(); ++i)
+		//	{
+		//		ndInt32 index = m_inputOffsets[i];
+		//		value += input[index] * kernels[i];
+		//	}
+		//	return value;
+		//};
+		
+		ndInt32 outputOffset = 0;
+		ndInt32 gradInputOffset = 0;
+		const ndInt32 gradInputWidth = m_inputWidth + m_kernelSize - 1;
+		//const ndInt32 inputSize = m_inputWidth * m_kernelSize;
+		//const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
+		for (ndInt32 y = 0; y < m_inputHeight; ++y)
+		{
+			for (ndInt32 x = 0; x < m_inputWidth; ++x)
+			{
+				ndBrainFloat value = ndBrainFloat(0.0f);
+		//		const ndBrainMemVector in(&input[inputOffset + i], inputSize);
+		//
+		//		ndInt32 kernelOffset = 0;
+		//		for (ndInt32 k = 0; k < m_inputDepth; ++k)
+		//		{
+		//			const ndBrainMemVector filter(&kernels[kernelOffset], kernelSize);
+		//			value += CrossCorrelation(in, filter);
+		//		}
+		//		kernelOffset += kernelSize;
+		//		//ndAssert(value == output[outputOffset + i]);
+				output[outputOffset + x] = value;
+			}
+			outputOffset += m_inputWidth;
+			gradInputOffset += gradInputWidth;
+		}
+	};
+
+	kernelOffset = 0;
+	inputGradient.Set(ndBrainFloat(0.0f));
+	for (ndInt32 filter = 0; filter < m_numberOfKernels; ++filter)
+	{
+		inputOffset = 0;
+		CopyOutput(filter);
+		for (ndInt32 channel = 0; channel < m_inputDepth; ++channel)
+		{
+			ndBrainMemVector inputGrad(&inputGradient[inputOffset], inputSize);
+			const ndBrainMemVector kernelGradients(&m_kernels[kernelOffset], kernelSize);
+			RotateKernel(kernelGradients);
+			CalculateInpuGradient(kernelGradients, inputGrad);
+			inputOffset += inputSize;
+			kernelOffset += kernelSize;
+		}
+	}
 }
