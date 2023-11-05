@@ -53,10 +53,10 @@ ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32
 		offset += m_inputWidth;
 	}
 	
-	//if (inputWidth == 5)
-	if (m_inputWidth == 12)
+	if (inputWidth == 5)
+	//if (m_inputWidth == 12)
 	{
-		//Debug(m_inputWidth, m_inputHeight, inputDepth, kernelSize, numberOfKernels);
+		Debug(m_inputWidth, m_inputHeight, m_inputDepth, m_kernelSize, m_numberOfKernels);
 		//Debug(7, 7, 2, 3, 3);
 		//Debug(4, 4, 2, 2, 3);
 	}
@@ -345,7 +345,7 @@ void ndBrainLayerConvolutional::Debug(ndInt32 width, ndInt32 height, ndInt32 cha
 	}
 	ndTrace(("\n"));
 
-
+#if 0
 	ndTrace(("\n"));
 	ndTrace(("d(L2)/d(w) =\n"));
 	index = 0;
@@ -364,7 +364,6 @@ void ndBrainLayerConvolutional::Debug(ndInt32 width, ndInt32 height, ndInt32 cha
 		}
 	}
 	ndTrace(("\n"));
-
 
 	ndTrace(("\n"));
 	ndTrace(("d(L2)/d(w) =\n"));
@@ -455,8 +454,139 @@ void ndBrainLayerConvolutional::Debug(ndInt32 width, ndInt32 height, ndInt32 cha
 		}
 	}
 	ndTrace(("\n"));
-}
+#endif
 
+
+#if 1
+	ndTrace(("\n"));
+	ndTrace(("d(L2)/d(x) =\n"));
+	index = 0;
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 y = 0; y < outputHeight; ++y)
+		{
+			ndTrace(("    "));
+			for (ndInt32 x = 0; x < outputWidth; ++x)
+			{
+				ndTrace(("(z(%d) - k(%d)) * d(z(%d))/d(x) +\n", index, index, index));
+				ndTrace(("    "));
+				index++;
+			}
+			ndTrace(("\n"));
+		}
+	}
+	ndTrace(("\n"));
+
+
+	ndTrace(("\n"));
+	ndTrace(("d(L2)/d(x) =\n"));
+	index = 0;
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 y = 0; y < outputHeight; ++y)
+		{
+			ndTrace(("    "));
+			for (ndInt32 x = 0; x < outputWidth; ++x)
+			{
+				ndTrace(("l(%d) * d(z(%d))/d(x) + ", index, index));
+				index++;
+			}
+			ndTrace(("\n"));
+		}
+	}
+	ndTrace(("\n"));
+
+
+	ndTrace(("\n"));
+	ndTrace(("d(L2)/d(x) =\n"));
+	index = 0;
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 y = 0; y < outputHeight; ++y)
+		{
+			ndTrace(("    "));
+			for (ndInt32 x = 0; x < outputWidth; ++x)
+			{
+				//ndTrace(("z(%d) = g(y(%d,%d,%d))\n", index, filter, y, x));
+				//ndTrace(("l(%d) * d(z(%d))/d(x) + ", index, index));
+				ndTrace(("l(%d) * d(g(y(%d,%d,%d)))/d(x) +\n", index, filter, y, x));
+				ndTrace(("    "));
+				index++;
+			}
+			ndTrace(("\n"));
+		}
+	}
+	ndTrace(("\n"));
+
+
+	ndTrace(("\n"));
+	ndTrace(("d(L2)/d(x) =\n"));
+	index = 0;
+	for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	{
+		for (ndInt32 y = 0; y < outputHeight; ++y)
+		{
+			ndTrace(("    "));
+			for (ndInt32 x = 0; x < outputWidth; ++x)
+			{
+				//ndTrace(("l(%d) * d(z(%d))/d(x) + ", index, index));
+				//ndTrace(("z(%d) = g(y(%d,%d,%d))\n", index, filter, y, x));
+				//ndTrace(("l(%d) * d(g(y(%d,%d,%d)))/d(w) + ", index, filter, y, x));
+				ndTrace(("l(%d) * d(g(y(%d,%d,%d)))/d(y(%d,%d,%d)) * d(y(%d,%d,%d))/d(x) +\n", index, filter, y, x, filter, y, x, filter, y, x));
+				ndTrace(("    "));
+				index++;
+			}
+			ndTrace(("\n"));
+		}
+	}
+	ndTrace(("\n"));
+	
+	
+	ndTrace(("\n"));
+	//for (ndInt32 filter = 0; filter < filterCount; ++filter)
+	//{
+	//	for (ndInt32 channel = 0; channel < channels; ++channel)
+	//	{
+	//		for (ndInt32 y = 0; y < filterSize; ++y)
+	//		{
+	//			for (ndInt32 x = 0; x < filterSize; ++x)
+	//			{
+	//				ndTrace(("d(L2)/d(w(%d,%d,%d,%d)) =\n", filter, channel, y, x));
+	//				ndTrace(("    "));
+	//				for (ndInt32 y0 = 0; y0 < outputHeight; ++y0)
+	//				{
+	//					for (ndInt32 x0 = 0; x0 < outputWidth; ++x0)
+	//					{
+	//						ndTrace(("Dg(%d,%d,%d) * x(%d,%d,%d) + ", filter, y0, x0, channel, y + y0, x + x0));
+	//					}
+	//					ndTrace(("\n"));
+	//					ndTrace(("    "));
+	//				}
+	//				ndTrace(("\n"));
+	//			}
+	//		}
+	//	}
+	//}
+	//ndTrace(("\n"));
+
+
+	ndTrace(("\n"));
+	for (ndInt32 channel = 0; channel < channels; ++channel)
+	{
+		for (ndInt32 y = 0; y < m_inputHeight; ++y)
+		{
+			for (ndInt32 x = 0; x < m_inputWidth; ++x)
+			{
+				ndTrace(("d(L2)/d(x(%d,%d,%d)) =\n", channel, y, x));
+
+				ndTrace(("\n"));
+			}
+		}
+		ndTrace(("\n"));
+	}
+	ndTrace(("\n"));
+#endif
+}
 
 //ndBrainFloat ndBrainLayerConvolutional::CrossCorrelation(const ndBrainVector& input, const ndBrainVector& kernels) const
 //{
@@ -576,16 +706,20 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 
 	//gradients->m_bias.Set(outputDerivative);
 	//const ndInt32 size = m_outputWidth * m_outputHeight;
-	//for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
-	//{
-	//	ndBrainFloat value = ndBrainFloat(0.0f);
-	//	const ndBrainMemVector biasGrad(&outputDerivative[i * size], size);
-	//	for (ndInt32 j = 0; j < size; ++j)
-	//	{
-	//		value += biasGrad[j];
-	//	}
-	//	gradients->m_bias[i] = value;
-	//}
+	const ndInt32 inputSize = m_inputWidth * m_inputHeight;
+	const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
+	const ndInt32 outputSize = m_outputWidth * m_outputHeight;
+
+	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
+	{
+		ndBrainFloat value = ndBrainFloat(0.0f);
+		const ndBrainMemVector biasGrad(&outputDerivative[i * outputSize], outputSize);
+		for (ndInt32 j = 0; j < outputSize; ++j)
+		{
+			value += biasGrad[j];
+		}
+		gradients->m_bias[i] = value;
+	}
 	
 	//for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0; --i)
 	//{
@@ -612,10 +746,6 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 		}
 		return value;
 	};
-
-	const ndInt32 inputSize = m_inputWidth * m_inputHeight;
-	const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
-	const ndInt32 outputSize = m_outputWidth * m_outputHeight;
 	
 	ndInt32 kernelOffset = 0;
 	for (ndInt32 filter = 0; filter < m_numberOfKernels; ++filter)
@@ -639,8 +769,6 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 			kernelOffset += kernelSize;
 		}
 	}
-
-	
 
 	//InputDerivative(output, outputDerivative, inputGradient);
 }
