@@ -198,7 +198,7 @@ void ndBrainLayerConvolutionalMaxPooling::MakePrediction(const ndBrainVector& in
 	//	}
 	//}
 
-	ndBrainFloat block[4];
+	
 	const ndBrainFloat minValue = ndBrainFloat(-1.0e20f);
 	const ndInt32 inputSize = m_height * m_width;
 
@@ -213,35 +213,59 @@ void ndBrainLayerConvolutionalMaxPooling::MakePrediction(const ndBrainVector& in
 			ndInt32 yMask = (y + 1) < m_width;
 			for (ndInt32 x = 0; x < m_width; x += 2)
 			{
-				ndInt32 xMask = (x + 1) < m_width;
+				const ndInt32 xMask = (x + 1) < m_width;
 
-				ndInt32 x0 = inputStride + x;
-				ndInt32 x1 = x0 + 1;
-				ndInt32 x2 = x0 + m_width;
-				ndInt32 x3 = x2 + 1;
-				block[0] = in[x0];
-				block[1] = xMask ? in[x1] : minValue;
-				block[2] = yMask ? in[x2] : minValue;
-				block[3] = (xMask & yMask) ? in[x3] : minValue;
-				ndInt32 index = x0;
-				ndBrainFloat maxValue = block[0];
-				if (block[1] > maxValue)
-				{
-					index = x1;
-					maxValue = block[1];
-				}
-				if (block[2] > maxValue)
-				{
-					index = x2;
-					maxValue = block[2];
-				}
-				if (block[3] > maxValue)
-				{
-					index = x3;
-					maxValue = block[3];
-				}
-				output[offsetOut + (x >> 1)] = maxValue;
-				m_index[offsetOut + (x >> 1)] = inputOffset + index;
+				const ndInt32 x0 = inputStride + x;
+				const ndInt32 x1 = x0 + 1;
+				const ndInt32 x2 = x0 + m_width;
+				const ndInt32 x3 = x2 + 1;
+
+				//ndBrainFloat block[4];
+				//block[0] = in[x0];
+				//block[1] = xMask ? in[x1] : minValue;
+				//block[2] = yMask ? in[x2] : minValue;
+				//block[3] = (xMask & yMask) ? in[x3] : minValue;
+				//ndInt32 index = x0;
+				//ndBrainFloat maxValue = block[0];
+				//if (block[1] > maxValue)
+				//{
+				//	index = x1;
+				//	maxValue = block[1];
+				//}
+				//if (block[2] > maxValue)
+				//{
+				//	index = x2;
+				//	maxValue = block[2];
+				//}
+				//if (block[3] > maxValue)
+				//{
+				//	index = x3;
+				//	maxValue = block[3];
+				//}
+				//output[offsetOut + (x >> 1)] = maxValue;
+				//m_index[offsetOut + (x >> 1)] = inputOffset + index;
+
+				const ndBrainFloat val0 = in[x0];
+				const ndBrainFloat val1 = xMask ? in[x1] : minValue;
+				const ndBrainFloat val2 = yMask ? in[x2] : minValue;
+				const ndBrainFloat val3 = (xMask & yMask) ? in[x3] : minValue;
+
+				const bool test01 = val0 >= val1;
+				const ndInt32 index01 = test01 ? x0 : x1;
+				const ndBrainFloat val01 = test01 ? val0 : val1;
+
+				const bool test23 = val2 >= val3;
+				const ndInt32 index23 = test23 ? x2 : x3;
+				const ndBrainFloat val23 = test23 ? val2 : val3;
+
+				const bool test0123 = val01 >= val23;
+				const ndInt32 index0123 = test0123 ? index01 : index23;
+				const ndBrainFloat val0123 = test0123 ? val01 : val23;
+				
+				//ndAssert(index0123 == index);
+
+				output[offsetOut + (x >> 1)] = val0123;
+				m_index[offsetOut + (x >> 1)] = inputOffset + index0123;
 			}
 
 			inputStride += m_width * 2;
