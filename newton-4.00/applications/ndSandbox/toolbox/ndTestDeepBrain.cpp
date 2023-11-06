@@ -529,21 +529,21 @@ static void MnistTrainingSet()
 
 		//layers.PushBack(new ndBrainLayerConvolutional(width, height, 1, 5, 16));
 		layers.PushBack(new ndBrainLayerConvolutional(width, height, 1, 5, 3));
-		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
 
 		//layers.PushBack(new ndBrainLayerConvolutional(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 16));
 		layers.PushBack(new ndBrainLayerConvolutional(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 3));
-		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
 
 		//layers.PushBack(new ndBrainLayerConvolutional(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
 		layers.PushBack(new ndBrainLayerConvolutional(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 2));
-		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
