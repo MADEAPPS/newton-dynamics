@@ -665,13 +665,13 @@ void ndBrainLayerConvolutional::MakePrediction(const ndBrainVector& input, ndBra
 
 	auto PredictOutputChannel = [this](const ndBrainVector& input, const ndBrainVector& kernels, ndBrainFloat bias, ndBrainVector& output)
 	{
-		auto CrossCorrelation = [this](const ndBrainVector& input, const ndBrainVector& kernels)
+		auto CrossCorrelation = [this](const ndBrainVector& input, const ndBrainVector& kernel)
 		{
 			ndBrainFloat value = ndBrainFloat(0.0f);
-			for (ndInt32 i = 0; i < m_inputOffsets.GetCount(); ++i)
+			for (ndInt32 i = m_inputOffsets.GetCount() - 1; i >= 0; --i)
 			{
 				ndInt32 index = m_inputOffsets[i];
-				value += input[index] * kernels[i];
+				value += input[index] * kernel[i];
 			}
 			return value;
 		};
@@ -801,7 +801,6 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 		m_paddedGradientOut.Set(ndBrainFloat(0.0f));
 	}
 
-
 	ndInt32 inputOffset = 0;
 	ndBrainFloat convKernelBuffer[256];
 	ndBrainMemVector convKernel(convKernelBuffer, kernelSize);
@@ -834,38 +833,39 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 
 	auto CalculateInpuGradient = [this](const ndBrainVector& filter, ndBrainVector& output)
 	{
-		//auto CrossCorrelation = [this](const ndBrainVector& input, const ndBrainVector& kernels)
-		//{
-		//	ndBrainFloat value = ndBrainFloat(0.0f);
-		//	for (ndInt32 i = 0; i < m_inputOffsets.GetCount(); ++i)
-		//	{
-		//		ndInt32 index = m_inputOffsets[i];
-		//		value += input[index] * kernels[i];
-		//	}
-		//	return value;
-		//};
+		auto CrossCorrelation = [this, &filter](const ndBrainVector& input)
+		{
+			ndBrainFloat value = ndBrainFloat(0.0f);
+			for (ndInt32 i = m_inputGradOffsets.GetCount() - 1; i >= 0 ; --i)
+			{
+				ndInt32 index = m_inputGradOffsets[i];
+				value += input[index] * filter[i];
+			}
+			return value;
+		};
 		
 		ndInt32 outputOffset = 0;
 		ndInt32 gradInputOffset = 0;
 		const ndInt32 gradInputWidth = m_inputWidth + m_kernelSize - 1;
+		const ndInt32 gradInputSize = gradInputWidth * m_kernelSize;
 		//const ndInt32 inputSize = m_inputWidth * m_kernelSize;
-		//const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
+		const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
 		for (ndInt32 y = 0; y < m_inputHeight; ++y)
 		{
 			for (ndInt32 x = 0; x < m_inputWidth; ++x)
 			{
-				ndBrainFloat value = ndBrainFloat(0.0f);
-		//		const ndBrainMemVector in(&input[inputOffset + i], inputSize);
-		//
-		//		ndInt32 kernelOffset = 0;
-		//		for (ndInt32 k = 0; k < m_inputDepth; ++k)
-		//		{
-		//			const ndBrainMemVector filter(&kernels[kernelOffset], kernelSize);
-		//			value += CrossCorrelation(in, filter);
-		//		}
-		//		kernelOffset += kernelSize;
-		//		//ndAssert(value == output[outputOffset + i]);
-				output[outputOffset + x] = value;
+				//ndBrainFloat value = ndBrainFloat(0.0f);
+				//const ndBrainMemVector in(&input[inputOffset + i], inputSize);
+				const ndBrainMemVector in(&m_paddedGradientOut[gradInputOffset + x], gradInputSize);
+		
+				//ndInt32 kernelOffset = 0;
+				//for (ndInt32 k = 0; k < m_inputDepth; ++k)
+				//{
+				//	const ndBrainMemVector filter(&kernels[kernelOffset], kernelSize);
+				//	value += CrossCorrelation(in, filter);
+				//}
+				//kernelOffset += kernelSize;
+				output[outputOffset + x] += CrossCorrelation(in);
 			}
 			outputOffset += m_inputWidth;
 			gradInputOffset += gradInputWidth;
