@@ -47,9 +47,10 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 	
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
+	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	virtual void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+	//virtual void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 
 	virtual void CalculateParamGradients(
 		const ndBrainVector& input, const ndBrainVector& output,
@@ -58,14 +59,14 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
-	//virtual void Clear();
-	//virtual void FlushToZero();
-	//virtual void Scale(ndBrainFloat scale);
+	virtual void Clear();
+	virtual void FlushToZero();
+	virtual void Scale(ndBrainFloat scale);
 	virtual void Set(const ndBrainLayer& src);
-	//virtual void Add(const ndBrainLayer& src);
-	//virtual void Mul(const ndBrainLayer& src);
+	virtual void Add(const ndBrainLayer& src);
+	virtual void Mul(const ndBrainLayer& src);
 	//virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
-	//virtual void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
+	virtual void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
 
 	private:
 	void InitGaussianBias(ndBrainFloat variance);

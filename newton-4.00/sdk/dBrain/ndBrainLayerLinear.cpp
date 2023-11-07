@@ -120,7 +120,6 @@ void ndBrainLayerLinear::FlushToZero()
 
 void ndBrainLayerLinear::Scale(ndBrainFloat scale)
 {
-	//const ndBrainLayerLinear& linearSrc = (ndBrainLayerLinear&)src;
 	m_bias.Scale(scale);
 	m_weights.Scale(scale);
 }
