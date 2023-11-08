@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-//#define D_USE_CONVOLUTIONAL_LAYERS
+#define D_USE_CONVOLUTIONAL_LAYERS
 
 static void ThreeLayersTwoInputsTwoOutputs()
 {
@@ -287,10 +287,21 @@ static void MnistTrainingSet()
 				ndBrainTrainer* const trainer = new ndBrainTrainer(&m_brain);
 				m_trainers.PushBack(trainer);
 			}
+
+			for (ndInt32 i = 0; i < threadCount; ++i)
+			{
+				ndArray<ndUnsigned32>* const tails = new ndArray<ndUnsigned32>;
+				m_failPriorities.PushBack(tails);
+			}
 		}
 
 		~SupervisedTrainer()
 		{
+			for (ndInt32 i = 0; i < GetThreadCount(); ++i)
+			{
+				delete (m_failPriorities[i]);
+			}
+
 			for (ndInt32 i = 0; i < m_trainers.GetCount(); ++i)
 			{
 				delete m_trainers[i];
@@ -363,7 +374,6 @@ static void MnistTrainingSet()
 			//optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 98.49%
 			//optimizer.SetRegularizer(ndReal(5.0e-5f)); // test data score 98.22%
 
-			bool firstPass = true;
 			for (ndInt32 passes = 0; passes < 4000000; ++passes)
 			{
 				ndInt32 priorityStart = ndMin(priorityIndexArray.GetCount(), 2);
@@ -381,53 +391,45 @@ static void MnistTrainingSet()
 				if ((passes % 1024) == 0)
 				{
 					ndInt32 failCount[D_MAX_THREADS_COUNT];
-					ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 1024>, D_MAX_THREADS_COUNT> failPriorities;
-					auto CrossValidateTraining = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &failPriorities, &failCount, firstPass](ndInt32 threadIndex, ndInt32 threadCount)
+					auto CrossValidateTraining = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
 					{
 						ndBrainFloat outputBuffer[32];
 						ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
 
-						ndFixSizeArray<ndUnsigned32, 1024>& priorityArray = failPriorities[threadIndex];
+						ndArray<ndUnsigned32>& priorityArray = *m_failPriorities[threadIndex];
 						priorityArray.SetCount(0);
 						failCount[threadIndex] = 0;
 						const ndStartEnd startEnd(trainingDigits->GetCount(), threadIndex, threadCount);
 						for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 						{
-							if (firstPass || (priorityArray.GetCount() < priorityArray.GetCapacity()))
-							{
-								const ndBrainVector& truth = (*trainingLabels)[i];
-								const ndBrainVector& input = (*trainingDigits)[i];
-								m_brain.MakePrediction(input, output);
+							const ndBrainVector& truth = (*trainingLabels)[i];
+							const ndBrainVector& input = (*trainingDigits)[i];
+							m_brain.MakePrediction(input, output);
 
-								ndInt32 index = 0;
-								ndBrainFloat maxProbability = ndBrainFloat(0.0f);
-								for (ndInt32 j = 0; j < output.GetCount(); j++)
+							ndInt32 index = 0;
+							ndBrainFloat maxProbability = ndBrainFloat(0.0f);
+							for (ndInt32 j = 0; j < output.GetCount(); j++)
+							{
+								if (output[j] > maxProbability)
 								{
-									if (output[j] > maxProbability)
-									{
-										index = j;
-										maxProbability = output[j];
-									}
+									index = j;
+									maxProbability = output[j];
 								}
+							}
 								
-								if (truth[index] < ndReal (0.5f))
-								{
-									failCount[threadIndex]++;
-									if (priorityArray.GetCount() < priorityArray.GetCapacity())
-									{
-										priorityArray.PushBack(ndUnsigned32(i));
-									}
-								}
+							if (truth[index] < ndReal (0.5f))
+							{
+								failCount[threadIndex]++;
+								priorityArray.PushBack(ndUnsigned32(i));
 							}
 						}
 					});
 					ndBrainThreadPool::ParallelExecute(CrossValidateTraining);
 
-					firstPass = false;
 					priorityIndexArray.SetCount(0);
 					for (ndInt32 j = 0; j < GetThreadCount(); ++j)
 					{
-						ndFixSizeArray<ndUnsigned32, 1024>& priorityArray = failPriorities[j];
+						ndArray<ndUnsigned32>& priorityArray = *m_failPriorities[j];
 						for (ndInt32 k = priorityArray.GetCount() - 1; k >= 0; --k)
 						{
 							priorityIndexArray.PushBack(priorityArray[k]);
@@ -442,7 +444,7 @@ static void MnistTrainingSet()
 
 					if (fails <= minTrainingFail)
 					{
-						auto CrossValidateTest = ndMakeObject::ndFunction([this, testDigits, testLabels, &failPriorities, &failCount, firstPass](ndInt32 threadIndex, ndInt32 threadCount)
+						auto CrossValidateTest = ndMakeObject::ndFunction([this, testDigits, testLabels, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
 						{
 							ndBrainFloat outputBuffer[32];
 							ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
@@ -510,6 +512,7 @@ static void MnistTrainingSet()
 
 		ndBrain& m_brain;
 		ndArray<ndBrainTrainer*> m_trainers;
+		ndFixSizeArray<ndArray<ndUnsigned32>*, D_MAX_THREADS_COUNT> m_failPriorities;
 		ndReal m_learnRate;
 		ndInt32 m_bashBufferSize;
 	};
@@ -528,22 +531,22 @@ static void MnistTrainingSet()
 		const ndBrainLayerConvolutionalMaxPooling* pooling;
 
 		layers.PushBack(new ndBrainLayerConvolutional(width, height, 1, 5, 16));
-		//layers.PushBack(new ndBrainLayerConvolutional(width, height, 1, 5, 3));
-		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
 
 		layers.PushBack(new ndBrainLayerConvolutional(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
-		//layers.PushBack(new ndBrainLayerConvolutional(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 3));
-		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
 
 		layers.PushBack(new ndBrainLayerConvolutional(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
-		//layers.PushBack(new ndBrainLayerConvolutional(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 2));
-		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
@@ -555,13 +558,13 @@ static void MnistTrainingSet()
 		
 		ndInt32 neuronsPerLayers = 64;
 		layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), neuronsPerLayers));
-		layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		layers.PushBack(new ndBrainLayerApproximateTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -620,6 +623,6 @@ void ndTestDeedBrian()
 	//xxx.GaussianNormalize();
 
 	//ThreeLayersTwoInputsTwoOutputs();
-	//MnistTrainingSet();
+	MnistTrainingSet();
 	//MnistTestSet();
 }
