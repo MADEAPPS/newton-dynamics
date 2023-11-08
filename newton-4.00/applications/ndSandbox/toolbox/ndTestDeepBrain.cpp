@@ -532,6 +532,7 @@ static void MnistTrainingSet()
 		const ndBrainLayerConvolutionalMaxPooling* pooling;
 
 		layers.PushBack(new ndBrainLayerConvolutional(width, height, 1, 3, 32));
+		//layers.PushBack(new ndBrainLayerConvolutional(width, height, 1, 3, 16));
 		//layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
@@ -552,8 +553,8 @@ static void MnistTrainingSet()
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
 
-		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		//layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
