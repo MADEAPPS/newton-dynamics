@@ -23,6 +23,8 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerConvolutional.h"
 
+ndSpinLock ndBrainLayerConvolutional::m_lock;
+
 ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)
 	:ndBrainLayer()
 	,m_bias()
@@ -35,9 +37,13 @@ ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32
 	,m_inputDepth(inputDepth)
 	,m_kernelSize(kernelSize)
 	,m_numberOfKernels(numberOfKernels)
+	,m_outputWidth(m_inputWidth - m_kernelSize + 1)
+	,m_outputHeight(m_inputHeight - m_kernelSize + 1)
 {
-	m_outputWidth = m_inputWidth - m_kernelSize + 1;
-	m_outputHeight = m_inputHeight - m_kernelSize + 1;
+	ndAssert(m_inputWidth > 0);
+	ndAssert(m_inputHeight > 0);
+	ndAssert(m_outputWidth > 0);
+	ndAssert(m_outputHeight > 0);
 
 	m_bias.SetCount(m_numberOfKernels);
 	m_kernels.SetCount(m_numberOfKernels * m_inputDepth * m_kernelSize * m_kernelSize);
@@ -804,6 +810,7 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 	//InputDerivative(output, outputDerivative, inputGradient);
 	if (!m_paddedGradientOut.GetCount())
 	{
+		ndScopeSpinLock lock(ndBrainLayerConvolutional::m_lock);
 		ndInt32 paddSizeWidth = m_inputWidth + m_kernelSize - 1;
 		ndInt32 paddSizeHeight = m_inputHeight + m_kernelSize - 1;
 		m_paddedGradientOut.SetCount(paddSizeWidth * paddSizeHeight);
