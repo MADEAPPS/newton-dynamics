@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-#define D_USE_CONVOLUTIONAL_LAYERS
+//#define D_USE_CONVOLUTIONAL_LAYERS
 
 static void ThreeLayersTwoInputsTwoOutputs()
 {
@@ -276,7 +276,7 @@ static void MnistTrainingSet()
 		SupervisedTrainer(ndBrain* const brain)
 			:ndBrainThreadPool()
 			,m_brain(*brain)
-			,m_learnRate(ndReal(0.001f))
+			,m_learnRate(ndReal(1.0e-3f))
 			,m_bashBufferSize(64)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
@@ -287,21 +287,10 @@ static void MnistTrainingSet()
 				ndBrainTrainer* const trainer = new ndBrainTrainer(&m_brain);
 				m_trainers.PushBack(trainer);
 			}
-
-			for (ndInt32 i = 0; i < threadCount; ++i)
-			{
-				ndArray<ndUnsigned32>* const tails = new ndArray<ndUnsigned32>;
-				m_failPriorities.PushBack(tails);
-			}
 		}
 
 		~SupervisedTrainer()
 		{
-			for (ndInt32 i = 0; i < GetThreadCount(); ++i)
-			{
-				delete (m_failPriorities[i]);
-			}
-
 			for (ndInt32 i = 0; i < m_trainers.GetCount(); ++i)
 			{
 				delete m_trainers[i];
@@ -314,6 +303,13 @@ static void MnistTrainingSet()
 #if 0
 			ndUnsigned32 shuffleBashBuffer[1024];
 			ndArray<ndUnsigned32> priorityIndexArray;
+			ndFixSizeArray<ndArray<ndUnsigned32>*, D_MAX_THREADS_COUNT> failPriorities;
+
+			for (ndInt32 i = 0; i < GetThreadCount(); ++i)
+			{
+				ndArray<ndUnsigned32>* const tails = new ndArray<ndUnsigned32>;
+				failPriorities.PushBack(tails);
+			}
 			
 			auto BackPropagateBash = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &shuffleBashBuffer](ndInt32 threadIndex, ndInt32 threadCount)
 			{
@@ -383,17 +379,17 @@ static void MnistTrainingSet()
 					shuffleBashBuffer[j] = ndRandInt() % trainingDigits->GetCount();
 				}
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
-				optimizer.Update(this, m_trainers, ndReal(1.0e-3f));
+				optimizer.Update(this, m_trainers, m_learnRate);
 
 				if ((passes % 1024) == 0)
 				{
 					ndInt32 failCount[D_MAX_THREADS_COUNT];
-					auto CrossValidateTraining = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
+					auto CrossValidateTraining = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &failCount, &failPriorities](ndInt32 threadIndex, ndInt32 threadCount)
 					{
 						ndBrainFloat outputBuffer[32];
 						ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
 
-						ndArray<ndUnsigned32>& priorityArray = *m_failPriorities[threadIndex];
+						ndArray<ndUnsigned32>& priorityArray = *failPriorities[threadIndex];
 						priorityArray.SetCount(0);
 						failCount[threadIndex] = 0;
 						const ndStartEnd startEnd(trainingDigits->GetCount(), threadIndex, threadCount);
@@ -426,7 +422,7 @@ static void MnistTrainingSet()
 					priorityIndexArray.SetCount(0);
 					for (ndInt32 j = 0; j < GetThreadCount(); ++j)
 					{
-						ndArray<ndUnsigned32>& priorityArray = *m_failPriorities[j];
+						ndArray<ndUnsigned32>& priorityArray = *failPriorities[j];
 						for (ndInt32 k = priorityArray.GetCount() - 1; k >= 0; --k)
 						{
 							priorityIndexArray.PushBack(priorityArray[k]);
@@ -504,20 +500,24 @@ static void MnistTrainingSet()
 					}
 				}
 			}
+
+			for (ndInt32 i = 0; i < GetThreadCount(); ++i)
+			{
+				delete (failPriorities[i]);
+			}
+
 #else
 
 			ndUnsigned32 miniBashArray[64];
 			ndArray<ndUnsigned32> shuffleBuffer;
+			ndUnsigned32 failCount[D_MAX_THREADS_COUNT];
+			ndBrainOptimizerAdam optimizer;
+
+			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
 			for (ndInt32 i = 0; i < trainingDigits->GetCount(); ++i)
 			{
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
-
-			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
-
-			ndUnsigned32 failCount[D_MAX_THREADS_COUNT];
-
-			ndBrainOptimizerAdam optimizer;
 
 			auto BackPropagateBash = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &miniBashArray, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
 			{
@@ -579,7 +579,7 @@ static void MnistTrainingSet()
 					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_bashBufferSize);
 
 					ndBrainThreadPool::ParallelExecute(BackPropagateBash);
-					optimizer.Update(this, m_trainers, ndReal(1.0e-3f));
+					optimizer.Update(this, m_trainers, m_learnRate);
 
 					start += m_bashBufferSize;
 				}
@@ -668,7 +668,6 @@ static void MnistTrainingSet()
 
 		ndBrain& m_brain;
 		ndArray<ndBrainTrainer*> m_trainers;
-		ndFixSizeArray<ndArray<ndUnsigned32>*, D_MAX_THREADS_COUNT> m_failPriorities;
 		ndReal m_learnRate;
 		ndInt32 m_bashBufferSize;
 	};
