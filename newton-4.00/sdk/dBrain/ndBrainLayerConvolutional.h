@@ -87,7 +87,6 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 
 	ndInt32 m_outputWidth;
 	ndInt32 m_outputHeight;
-	static ndSpinLock m_lock;
 };
 
 #endif 

@@ -23,8 +23,6 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerConvolutional.h"
 
-ndSpinLock ndBrainLayerConvolutional::m_lock;
-
 ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)
 	:ndBrainLayer()
 	,m_bias()
@@ -63,7 +61,12 @@ ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32
 		inputOffset += m_inputWidth;
 		inputGradOffset += m_inputWidth + m_kernelSize - 1;
 	}
-	
+
+	ndInt32 paddSizeWidth = m_inputWidth + m_kernelSize - 1;
+	ndInt32 paddSizeHeight = m_inputHeight + m_kernelSize - 1;
+	m_paddedGradientOut.SetCount(paddSizeWidth * paddSizeHeight);
+	m_paddedGradientOut.Set(ndBrainFloat(0.0f));
+
 	if (inputWidth == 5)
 	//if (m_inputWidth == 12)
 	{
@@ -78,7 +81,7 @@ ndBrainLayerConvolutional::ndBrainLayerConvolutional(const ndBrainLayerConvoluti
 	:ndBrainLayer(src)
 	,m_bias(src.m_bias)
 	,m_kernels(src.m_kernels)
-	,m_paddedGradientOut()
+	,m_paddedGradientOut(src.m_paddedGradientOut)
 	,m_inputOffsets(src.m_inputOffsets)
 	,m_inputGradOffsets(src.m_inputGradOffsets)
 	,m_inputWidth(src.m_inputWidth)
@@ -808,15 +811,6 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 	}
 
 	//InputDerivative(output, outputDerivative, inputGradient);
-	if (!m_paddedGradientOut.GetCount())
-	{
-		ndScopeSpinLock lock(ndBrainLayerConvolutional::m_lock);
-		ndInt32 paddSizeWidth = m_inputWidth + m_kernelSize - 1;
-		ndInt32 paddSizeHeight = m_inputHeight + m_kernelSize - 1;
-		m_paddedGradientOut.SetCount(paddSizeWidth * paddSizeHeight);
-		m_paddedGradientOut.Set(ndBrainFloat(0.0f));
-	}
-
 	ndInt32 inputOffset = 0;
 	ndBrainFloat convKernelBuffer[256];
 	ndBrainMemVector convKernel(convKernelBuffer, kernelSize);
