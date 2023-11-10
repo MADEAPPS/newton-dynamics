@@ -733,17 +733,13 @@ void ndBrainLayerConvolutional::MakePrediction(const ndBrainVector& input, ndBra
 
 void ndBrainLayerConvolutional::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-	//m_weights.Mul(input, output);
-	//output.Add(m_bias);
 	ndAssert(input.GetCount() == GetInputSize());
-
-	const ndInt32 inputSize = m_inputWidth * m_inputHeight;
-	const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
-	const ndInt32 outputSize = m_outputWidth * m_outputHeight;
 
 	ndInt32 outputOffset = 0;
 	ndInt32 kernelOffset = 0;
-
+	const ndInt32 inputSize = m_inputWidth * m_inputHeight;
+	const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
+	const ndInt32 outputSize = m_outputWidth * m_outputHeight;
 	auto CrossCorrelation = [this](const ndBrainVector& input, const ndBrainVector& kernel)
 	{
 		ndBrainFloat value = ndBrainFloat(0.0f);
