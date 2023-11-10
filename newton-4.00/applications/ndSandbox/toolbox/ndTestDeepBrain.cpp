@@ -280,7 +280,7 @@ static void MnistTrainingSet()
 			,m_bashBufferSize(64)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
-	//threadCount = 1;
+	threadCount = 1;
 			SetThreadCount(threadCount);
 			for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 			{
@@ -509,15 +509,7 @@ static void MnistTrainingSet()
 #else
 
 			ndUnsigned32 miniBashArray[64];
-			ndArray<ndUnsigned32> shuffleBuffer;
 			ndUnsigned32 failCount[D_MAX_THREADS_COUNT];
-			ndBrainOptimizerAdam optimizer;
-
-			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
-			for (ndInt32 i = 0; i < trainingDigits->GetCount(); ++i)
-			{
-				shuffleBuffer.PushBack(ndUnsigned32(i));
-			}
 
 			auto BackPropagateBash = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &miniBashArray, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
 			{
@@ -565,11 +557,23 @@ static void MnistTrainingSet()
 				}
 			});
 
+			ndBrain bestBrain(m_brain);
+			ndBrainOptimizerAdam optimizer;
+
 			ndInt32 minTestFail = testDigits->GetCount();
 			ndInt32 minTrainingFail = trainingDigits->GetCount();
+			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
 
-			ndBrain bestBrain(m_brain);
-			for (ndInt32 epoch = 0; epoch < 100; ++epoch)
+			batches = 1;
+
+			ndArray<ndUnsigned32> shuffleBuffer;
+			for (ndInt32 i = 0; i < trainingDigits->GetCount(); ++i)
+			{
+				//shuffleBuffer.PushBack(ndUnsigned32(i));
+				shuffleBuffer.PushBack(ndUnsigned32(0));
+			}
+			
+			for (ndInt32 epoch = 0; epoch < 500; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -620,8 +624,6 @@ static void MnistTrainingSet()
 									maxProbability = output[j];
 								}
 							}
-
-							//if (truth[index] < ndReal(0.5f))
 							if (truth[index] == ndReal(0.0f))
 							{
 								failCount[threadIndex]++;
@@ -629,7 +631,7 @@ static void MnistTrainingSet()
 						}
 					});
 
-					ndBrainThreadPool::ParallelExecute(CrossValidateTest);
+					//ndBrainThreadPool::ParallelExecute(CrossValidateTest);
 
 					fails = 0;
 					for (ndInt32 j = 0; j < GetThreadCount(); ++j)
