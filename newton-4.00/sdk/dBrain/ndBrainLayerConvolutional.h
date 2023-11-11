@@ -50,7 +50,6 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	//virtual void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 
 	virtual void CalculateParamGradients(
 		const ndBrainVector& input, const ndBrainVector& output,
@@ -71,7 +70,6 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 	private:
 	void InitGaussianBias(ndBrainFloat variance);
 	void InitGaussianWeights(ndBrainFloat variance);
-	void Debug(ndInt32 width, ndInt32 height, ndInt32 channels, ndInt32 filterSize, ndInt32 filterCount);
 
 	ndBrainVector m_bias;
 	ndBrainVector m_kernels;

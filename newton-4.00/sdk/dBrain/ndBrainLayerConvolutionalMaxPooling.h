@@ -44,13 +44,14 @@ class ndBrainLayerConvolutionalMaxPooling : public ndBrainLayerActivation
 	virtual ndInt32 GetInputSize() const;
 
 	const char* GetLabelId() const;
+	void Save(const ndBrainSave* const loadSave) const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
-
-	mutable ndArray<ndInt32> m_index;
+		
 	ndInt32 m_width;
 	ndInt32 m_height;
 	ndInt32 m_channels;
+	mutable ndArray<ndInt32> m_index;
 };
 
 #endif 

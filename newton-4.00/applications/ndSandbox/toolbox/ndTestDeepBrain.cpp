@@ -55,8 +55,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndArray<ndBrainTrainer*> trainers;
 
 	ndBrainThreadPool threads;
-	//threads.SetThreadCount(4);
-	threads.SetThreadCount(1);
+	threads.SetThreadCount(4);
 	for (ndInt32 i = 0; i < bashSize; ++i)
 	{
 		trainers.PushBack(new ndBrainTrainer(&brain));
@@ -276,7 +275,7 @@ static void MnistTrainingSet()
 		SupervisedTrainer(ndBrain* const brain)
 			:ndBrainThreadPool()
 			,m_brain(*brain)
-			,m_learnRate(ndReal(2.0e-4f))
+			,m_learnRate(ndReal(1.0e-4f))
 			,m_bashBufferSize(64)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
@@ -364,14 +363,13 @@ static void MnistTrainingSet()
 			//optimizer.SetRegularizer(ndReal(5.0e-5f)); // test data score 98.22%
 
 			//batches = 1;
-
 			ndArray<ndUnsigned32> shuffleBuffer;
 			for (ndInt32 i = 0; i < trainingDigits->GetCount(); ++i)
 			{
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
 			
-			for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 500; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -487,10 +485,6 @@ static void MnistTrainingSet()
 		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 
-		//layers.PushBack(new ndBrainLayerConvolutional(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels(), 3, 16));
-		////layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-		//layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-		//conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
 
@@ -499,10 +493,6 @@ static void MnistTrainingSet()
 		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 
-		//layers.PushBack(new ndBrainLayerConvolutional(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels(), 3, 32));
-		////layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-		//layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-		//conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
 
@@ -510,8 +500,6 @@ static void MnistTrainingSet()
 		//layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		layers.PushBack(new ndBrainLayerReluActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
-		//layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
-		//pooling = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
 
 		ndInt32 neuronsPerLayers = 64;
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
@@ -549,7 +537,11 @@ static void MnistTrainingSet()
 		time = ndGetTimeInMicroseconds() - time;
 	
 		char path[256];
+		#ifdef D_USE_CONVOLUTIONAL_LAYERS
+		ndGetWorkingFileName("mnistDatabase/mnist-cnn.dnn", path);
+		#else
 		ndGetWorkingFileName("mnistDatabase/mnist.dnn", path);
+		#endif
 		
 		ndBrainSave::Save(&brain, path);
 		ValidateData("training data", brain, *trainingLabels, *trainingDigits);
@@ -565,8 +557,12 @@ static void MnistTestSet()
 	if (testLabels && testDigits)
 	{
 		char path[256];
+		#ifdef D_USE_CONVOLUTIONAL_LAYERS
+		ndGetWorkingFileName("mnistDatabase/mnist-cnn.dnn", path);
+		#else
 		ndGetWorkingFileName("mnistDatabase/mnist.dnn", path);
-		
+		#endif
+
 		ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		ValidateData("test data", *(*brain), *testLabels, *testDigits);

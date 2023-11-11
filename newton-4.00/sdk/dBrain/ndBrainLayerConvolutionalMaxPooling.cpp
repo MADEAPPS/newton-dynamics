@@ -25,22 +25,22 @@
 
 ndBrainLayerConvolutionalMaxPooling::ndBrainLayerConvolutionalMaxPooling(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth)
 	:ndBrainLayerActivation(((inputWidth + 1) / 2) * ((inputHeight + 1) / 2) * inputDepth)
-	,m_index()
 	,m_width(inputWidth)
 	,m_height(inputHeight)
 	,m_channels(inputDepth)
+	,m_index()
 {
 	m_index.SetCount(m_neurons);
 }
 
 ndBrainLayerConvolutionalMaxPooling::ndBrainLayerConvolutionalMaxPooling(const ndBrainLayerConvolutionalMaxPooling& src)
 	:ndBrainLayerActivation(src)
-	,m_index()
 	,m_width(src.m_width)
 	,m_height(src.m_height)
 	,m_channels(src.m_channels)
+	,m_index(src.m_index)
 {
-	m_index.SetCount(src.m_index.GetCount());
+	//m_index.SetCount(src.m_index.GetCount());
 }
 
 ndInt32 ndBrainLayerConvolutionalMaxPooling::GetInputWidth() const
@@ -207,4 +207,18 @@ void ndBrainLayerConvolutionalMaxPooling::MakePrediction(const ndBrainVector& in
 		}
 		inputOffset += inputSize;
 	}
+}
+
+void ndBrainLayerConvolutionalMaxPooling::Save(const ndBrainSave* const loadSave) const
+{
+	char buffer[1024];
+
+	sprintf(buffer, "\tinput_width %d\n", m_width);
+	loadSave->WriteData(buffer);
+
+	sprintf(buffer, "\tinput_heigh %d\n", m_height);
+	loadSave->WriteData(buffer);
+
+	sprintf(buffer, "\tinput_layers %d\n", m_channels);
+	loadSave->WriteData(buffer);
 }
