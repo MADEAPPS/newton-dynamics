@@ -356,6 +356,7 @@ static void MnistTrainingSet()
 			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
 
 			// so far best training result on the mnist data set
+			optimizer.SetRegularizer(ndReal(0.0f)); // test data score 98.50%
 			//optimizer.SetRegularizer(ndReal(1.0e-5f)); // test data score 98.32%
 			//optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score 98.50%
 			//optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score 98.53%
@@ -369,7 +370,7 @@ static void MnistTrainingSet()
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
 			
-			for (ndInt32 epoch = 0; epoch < 500; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -392,10 +393,9 @@ static void MnistTrainingSet()
 
 				if (fails <= minTrainingFail)
 				{
-					bool traningTest = fails < minTrainingFail;
-
-					minTrainingFail = ndMax(fails, ndInt32(5));
 					ndInt32 actualTraining = fails;
+					bool traningTest = fails < minTrainingFail;
+					minTrainingFail = ndMax(fails, ndInt32(200));
 
 					auto CrossValidateTest = ndMakeObject::ndFunction([this, testDigits, testLabels, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
 					{
@@ -435,7 +435,7 @@ static void MnistTrainingSet()
 						fails += failCount[j];
 					}
 
-					if (traningTest && (minTrainingFail > 5))
+					if (traningTest && (minTrainingFail > 200))
 					{
 						minTestFail = fails;
 						bestBrain.CopyFrom(m_brain);

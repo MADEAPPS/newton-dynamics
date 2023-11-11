@@ -77,14 +77,15 @@ class ndBrainLayerConvolutional : public ndBrainLayer
 	ndFixSizeArray<ndInt32, 128> m_inputOffsets;
 	ndFixSizeArray<ndInt32, 128> m_inputGradOffsets;
 
+	ndInt32 m_kernelSize;
+
 	ndInt32 m_inputWidth;
 	ndInt32 m_inputHeight;
-	ndInt32 m_inputDepth;
-	ndInt32 m_kernelSize;
-	ndInt32 m_numberOfKernels;
+	ndInt32 m_inputLayers;
 
 	ndInt32 m_outputWidth;
 	ndInt32 m_outputHeight;
+	ndInt32 m_outputLayers;
 };
 
 #endif 
