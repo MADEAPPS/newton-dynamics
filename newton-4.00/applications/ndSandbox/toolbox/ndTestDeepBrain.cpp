@@ -276,7 +276,7 @@ static void MnistTrainingSet()
 		SupervisedTrainer(ndBrain* const brain)
 			:ndBrainThreadPool()
 			,m_brain(*brain)
-			,m_learnRate(ndReal(1.0e-3f))
+			,m_learnRate(ndReal(1.0e-4f))
 			,m_bashBufferSize(64)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));

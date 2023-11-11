@@ -147,7 +147,8 @@ void ndBrainLayerConvolutional::InitWeightsXavierMethod()
 
 void ndBrainLayerConvolutional::InitGaussianBias(ndBrainFloat variance)
 {
-	m_bias.InitGaussianWeights(variance);
+	//m_bias.InitGaussianWeights(variance);
+	m_bias.Set(ndBrainFloat(0.0f));
 }
 
 void ndBrainLayerConvolutional::InitGaussianWeights(ndBrainFloat variance)
@@ -157,8 +158,9 @@ void ndBrainLayerConvolutional::InitGaussianWeights(ndBrainFloat variance)
 
 void ndBrainLayerConvolutional::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
 {
-	biasVariance = ndMin(biasVariance, ndBrainFloat(0.5f));
-	weighVariance = ndMin(weighVariance, ndBrainFloat(0.5f));
+	//biasVariance = ndMin(biasVariance, ndBrainFloat(0.5f));
+	biasVariance = ndBrainFloat(0.0f);
+	weighVariance = ndMin(weighVariance, ndBrainFloat(0.05f));
 	InitGaussianBias(biasVariance);
 	InitGaussianWeights(weighVariance);
 }
