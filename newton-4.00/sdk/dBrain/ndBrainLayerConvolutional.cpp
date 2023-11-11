@@ -723,8 +723,6 @@ void ndBrainLayerConvolutional::MakePrediction(const ndBrainVector& input, ndBra
 		
 		ndBrainMemVector out(&output[outStart], m_outputWidth * m_outputHeight);
 		const ndBrainMemVector kernels(&m_kernels[kernelStart], m_inputDepth * m_kernelSize * m_kernelSize);
-		
-		//PredictionOutputChannel(input, kernels, m_bias[i], out);
 		PredictOutputChannel(input, kernels, m_bias[i], out);
 	}
 }
