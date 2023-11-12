@@ -359,9 +359,9 @@ static void MnistTrainingSet()
 			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
 
 			// so far best training result on the mnist data set
-			optimizer.SetRegularizer(ndReal(0.0f)); // test data score 98.50%
+			//optimizer.SetRegularizer(ndReal(0.0f)); // test data score 98.50%
 			//optimizer.SetRegularizer(ndReal(1.0e-5f)); // test data score 98.32%
-			//optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score 98.50%
+			optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score 98.50%
 			//optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score 98.53%
 			//optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 98.49%
 			//optimizer.SetRegularizer(ndReal(5.0e-5f)); // test data score 98.22%
@@ -589,6 +589,6 @@ void ndTestDeedBrian()
 	//xxx.GaussianNormalize();
 
 	//ThreeLayersTwoInputsTwoOutputs();
-	//MnistTrainingSet();
-	MnistTestSet();
+	MnistTrainingSet();
+	//MnistTestSet();
 }
