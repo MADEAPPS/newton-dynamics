@@ -363,8 +363,8 @@ static void MnistTrainingSet()
 			// so far best training result on the mnist data set
 			//optimizer.SetRegularizer(ndReal(0.0f)); // test data score 98.50%
 			//optimizer.SetRegularizer(ndReal(1.0e-5f)); // test data score 98.32%
-			optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score 98.50%
-			//optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score 98.53%
+			//optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score fully(98.50%)  conv(97.760002%)
+			optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score 98.53%
 			//optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 98.49%
 			//optimizer.SetRegularizer(ndReal(5.0e-5f)); // test data score 98.22%
 
@@ -491,7 +491,7 @@ static void MnistTrainingSet()
 			#define DIGIT_ACTIVATION_TYPE ndBrainLayerTanhActivation
 		#endif
 
-		layers.PushBack(new ndBrainLayerConvolutional(width, height, 1, 3, 32));
+		layers.PushBack(new ndBrainLayerConvolutional(width, height, 1, 3, 16));
 		layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
