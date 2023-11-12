@@ -182,7 +182,7 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, 
 	output.Set(in);
 }
 
-void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients)
+void ndBrain::CalculateInputGradient___(const ndBrainVector& input, ndBrainVector& inputGradients)
 {
 	ndAssert(0);
 	ndFixSizeArray<ndInt32, 256> prefixScan;

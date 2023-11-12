@@ -23,6 +23,8 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerConvolutional.h"
 
+//#define ND_BRAIN_CONV_LAYER_USE_BIAS
+
 ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)
 	:ndBrainLayer()
 	,m_bias()
@@ -251,11 +253,17 @@ void ndBrainLayerConvolutional::MakePrediction(const ndBrainVector& input, ndBra
 		return value;
 	};
 
+	#ifdef ND_BRAIN_CONV_LAYER_USE_BIAS
+		ndBrainFloat biasScale = ndBrainFloat(1.0f) / ndBrainFloat(m_inputLayers * outputSize);
+	#else
+		ndBrainFloat biasScale = ndBrainFloat(0.0f);
+	#endif
+
 	for (ndInt32 i = 0; i < m_outputLayers; ++i)
 	{
 		ndBrainMemVector out(&output[outputOffset], outputSize);
 
-		out.Set(m_bias[i]/ndBrainFloat(m_inputLayers * outputSize));
+		out.Set(m_bias[i] * biasScale);
 		const ndBrainMemVector filter(&m_kernels[kernelOffset], kernelSize);
 
 		ndInt32 inputOffset = 0;
@@ -294,6 +302,12 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 	const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
 	const ndInt32 outputSize = m_outputWidth * m_outputHeight;
 
+	#ifdef ND_BRAIN_CONV_LAYER_USE_BIAS
+		ndBrainFloat biasScale = ndBrainFloat(1.0f) / ndBrainFloat(m_inputLayers * outputSize);
+	#else
+		ndBrainFloat biasScale = ndBrainFloat(0.0f);
+	#endif
+
 	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
 	{
 		ndBrainFloat value = ndBrainFloat(0.0f);
@@ -302,7 +316,7 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 		{
 			value += biasGrad[j];
 		}
-		gradients->m_bias[i] = value / ndBrainFloat(m_inputLayers * outputSize);
+		gradients->m_bias[i] = value * biasScale;
 	}
 	
 	auto CrossCorrelationGradient = [this](const ndBrainVector& input, ndInt32 y0, ndInt32 x0, const ndBrainVector& outputDerivative)

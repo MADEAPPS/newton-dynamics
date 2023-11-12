@@ -46,7 +46,7 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
-	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients);
+	void CalculateInputGradient___(const ndBrainVector& input, ndBrainVector& inputGradients);
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer);
 	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients, ndBrainVector& workingBuffer);
