@@ -23,7 +23,7 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerConvolutional.h"
 
-//#define ND_BRAIN_CONV_LAYER_USE_BIAS
+#define ND_BRAIN_CONV_LAYER_USE_BIAS
 
 ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)
 	:ndBrainLayer()

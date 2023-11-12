@@ -46,7 +46,6 @@ void ndSetRandSeed(ndUnsigned32 seed)
 	GetRandomGenerator().seed(seed);
 }
 
-#if 1
 ndUnsigned32 ndRandInt()
 {
 	ndScopeSpinLock lock(GetLock());
@@ -60,26 +59,6 @@ ndFloat32 ndRand()
 	static std::uniform_real_distribution<ndFloat32> uniform(ndFloat32 (0.0f), ndFloat32(1.0f));
 	return uniform(GetRandomGenerator());
 }
-
-#else
-
-ndUnsigned32 ndRandInt()
-{
-	ndScopeSpinLock lock(GetLock());
-	std::mt19937& generator = GetRandomGenerator();
-	return ndUnsigned32(generator());
-}
-
-ndFloat32 ndRand()
-{
-	ndUnsigned64 minValue = std::mt19937::min();
-	ndUnsigned64 maxValue = std::mt19937::max();
-	ndUnsigned64 spand = maxValue - minValue;
-	ndFloat32 r = ndFloat32(ndFloat64(ndRandInt()) / (ndFloat64)spand);
-	return r;
-}
-
-#endif
 
 ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
 {
