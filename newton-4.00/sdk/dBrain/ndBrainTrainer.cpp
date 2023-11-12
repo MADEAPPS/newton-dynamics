@@ -190,29 +190,10 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
 	ndAssert(!(loss.IsCategorical() ^ (!strcmp(layers[layersCount - 1]->GetLabelId(), "ndBrainLayerCategoricalSoftmaxActivation"))));
 
-#if 1
 	const ndInt32 gradientOffset = m_prefixScan[m_prefixScan.GetCount() - 1];
 	const ndBrainFloat* const memBuffer = &m_workingBuffer[0];
 	const ndBrainFloat* const gradientBuffer = &m_workingBuffer[gradientOffset];
 	const ndInt32 maxSize = m_maxLayerBufferSize;
-
-#else
-	ndFixSizeArray<ndInt32, 256> prefixScan;
-
-	ndInt32 maxSize = 0;
-	ndInt32 sizeAcc = (layers[0]->GetInputSize() + 7) & -8;
-	prefixScan.PushBack(0);
-	for (ndInt32 i = 0; i < layersCount; ++i)
-	{
-		prefixScan.PushBack(sizeAcc);
-		sizeAcc += (layers[i]->GetOutputSize() + 7) & -8;
-		maxSize = ndMax(maxSize, layers[i]->GetOutputSize());
-	}
-	prefixScan.PushBack(sizeAcc);
-
-	const ndBrainFloat* const memBuffer = ndAlloca(ndBrainFloat, sizeAcc + 8);
-	const ndBrainFloat* const gradientBuffer = ndAlloca(ndBrainFloat, maxSize * 2 + 256);
-#endif
 
 	ndBrainMemVector in0(memBuffer, input.GetCount());
 	in0.Set(input);

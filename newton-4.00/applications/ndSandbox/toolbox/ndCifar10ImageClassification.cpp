@@ -12,96 +12,44 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
+static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndSharedPtr<ndBrainMatrix>& trainingLabels)
 {
-	ndBrainMatrix* labelData = nullptr;
+	ndInt32 batches = 1;
+	trainingLabels = new ndBrainMatrix(ndInt32(batches * 10000), ndInt32(10));
+	trainingImages = new ndBrainMatrix(ndInt32(batches * 10000), ndInt32(32 * 32 * 3));
 
-	char outPathName[1024];
-	ndGetWorkingFileName(filename, outPathName);
-	FILE* fp = fopen(outPathName, "rb");
-	if (fp)
+	ndBrainMatrix& labelMatrix = *(*trainingLabels);
+	ndBrainMatrix& imageMatrix = *(*trainingImages);
+
+	ndUnsigned8 data[32 * 32 * 3];
+
+	labelMatrix.Set(ndBrainFloat(0.0f));
+	for (ndInt32 i = 0; i < 1; ++i)
 	{
-		// read training labels
-		//[offset] [type]          [value]          [description]
-		//0000     32 bit integer  0x00000801(2049) magic number(MSB first)
-		//0004     32 bit integer  60000            number of items
-		//0008     unsigned byte ? ? label
-		//0009     unsigned byte ? ? label
-		//........
-		//xxxx     unsigned byte ? ? label
-		//The labels values are 0 to 9.
-
-		ndUnsigned32 magicNumber;
-		ndUnsigned32 numberOfItems;
-		size_t ret = 0;
-		ret = fread(&magicNumber, 4, 1, fp);
-		ret = fread(&numberOfItems, 4, 1, fp);
-		magicNumber = ndIndian32(magicNumber);
-		numberOfItems = ndIndian32(numberOfItems);
-
-		labelData = new ndBrainMatrix(ndInt32 (numberOfItems), 10);
-		labelData->Set(0.0f);
-		for (ndUnsigned32 i = 0; i < numberOfItems; ++i)
+		char filename[1024];
+		char outPathName[1024];
+		sprintf(filename, "cifar-10-batches-bin/data_batch_%d.bin", i + 1);
+		ndGetWorkingFileName(filename, outPathName);
+		FILE* const fp = fopen(outPathName, "rb");
+		if (fp)
 		{
-			ndUnsigned8 label;
-			ret = fread(&label, 1, 1, fp);
-			(*labelData)[ndInt32(i)][ndInt32(label)] = 1.0f;
-		}
-		fclose(fp);
-	}
-	return labelData;
-}
-
-static ndBrainMatrix* LoadMnistSampleData(const char* const filename)
-{
-	ndBrainMatrix* trainingDigits = nullptr;
-
-	char outPathName[1024];
-	ndGetWorkingFileName(filename, outPathName);
-	FILE* const fp = fopen(outPathName, "rb");
-	if (fp)
-	{
-		//[offset] [type]          [value]          [description]
-		//0000     32 bit integer  0x00000803(2051) magic number
-		//0004     32 bit integer  60000            number of images
-		//0008     32 bit integer  28               number of rows
-		//0012     32 bit integer  28               number of columns
-		//0016     unsigned byte ? ? pixel
-		//0017     unsigned byte ? ? pixel
-		//........
-		//xxxx     unsigned byte ? ? pixel/
-
-		size_t ret = 0;
-		ndUnsigned32 magicNumber;
-		ndUnsigned32 numberOfItems;
-		ndUnsigned32 digitWith;
-		ndUnsigned32 digitHeight;
-
-		ret = fread(&magicNumber, 4, 1, fp);
-		ret = fread(&numberOfItems, 4, 1, fp);
-		ret = fread(&digitWith, 4, 1, fp);
-		ret = fread(&digitHeight, 4, 1, fp);
-		magicNumber = ndIndian32(magicNumber);
-		numberOfItems = ndIndian32(numberOfItems);
-
-		digitWith = ndIndian32(digitWith);
-		digitHeight = ndIndian32(digitHeight);
-		trainingDigits = new ndBrainMatrix(ndInt32(numberOfItems), ndInt32(digitWith * digitHeight));
-		trainingDigits->Set(0.0f);
-
-		ndUnsigned8 data[32 * 32];
-		for (ndUnsigned32 i = 0; i < numberOfItems; ++i)
-		{
-			ndBrainVector& image = (*trainingDigits)[ndInt32(i)];
-			ret = fread(data, digitWith, digitHeight, fp);
-			for (ndUnsigned32 j = 0; j < digitWith * digitHeight; j++)
+			for (ndInt32 j = 0; j < 10000; ++j)
 			{
-				image[ndInt32(j)] = ndReal(data[ndInt32(j)]) / 255.0f;
+				size_t ret = 0;
+				ndInt32 label = 0;
+				ret = fread(&label, 1, 1, fp);
+
+				labelMatrix[j][label] = ndBrainFloat(1.0f);
+				ndBrainVector& image = imageMatrix[ndInt32(j)];
+				ret = fread(data, 1, 32 * 32 * 3, fp);
+				for (ndInt32 k = 0; k < 32 * 32 * 3; ++k)
+				{
+					image[k] = ndBrainFloat(data[k]) / ndBrainFloat(255.0f);
+				}
 			}
+			fclose(fp);
 		}
-		fclose(fp);
 	}
-	return trainingDigits;
 }
 
 static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
@@ -144,11 +92,15 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void Cifar10TrainingSet()
 {
-	ndSharedPtr<ndBrainMatrix> trainingLabels (LoadMnistLabelData("mnistDatabase/train-labels.idx1-ubyte"));
-	ndSharedPtr<ndBrainMatrix> trainingDigits (LoadMnistSampleData("mnistDatabase/train-images.idx3-ubyte"));
+	//ndSharedPtr<ndBrainMatrix> trainingLabels (LoadMnistLabelData("cifar-10-batches-bin/train-labels.idx1-ubyte"));
+	//ndSharedPtr<ndBrainMatrix> trainingImages (LoadMnistSampleData("cifar-10-batches-bin/train-images.idx3-ubyte"));
+	//
+	//ndSharedPtr<ndBrainMatrix> testLabels(LoadMnistLabelData("cifar-10-batches-bin/t10k-labels.idx1-ubyte"));
+	//ndSharedPtr<ndBrainMatrix> testDigits(LoadMnistSampleData("cifar-10-batches-bin/t10k-images.idx3-ubyte"));
 
-	ndSharedPtr<ndBrainMatrix> testLabels(LoadMnistLabelData("mnistDatabase/t10k-labels.idx1-ubyte"));
-	ndSharedPtr<ndBrainMatrix> testDigits(LoadMnistSampleData("mnistDatabase/t10k-images.idx3-ubyte"));
+	ndSharedPtr<ndBrainMatrix> trainingLabels;
+	ndSharedPtr<ndBrainMatrix> trainingImages;
+	LoadTrainingData(trainingImages, trainingLabels);
 
 	class SupervisedTrainer : public ndBrainThreadPool
 	{
@@ -177,13 +129,13 @@ static void Cifar10TrainingSet()
 			}
 		}
 
-		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits,
+		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingImages,
 					  ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 		{
 			ndUnsigned32 miniBashArray[64];
 			ndUnsigned32 failCount[D_MAX_THREADS_COUNT];
 
-			auto BackPropagateBash = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &miniBashArray, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
+			auto BackPropagateBash = ndMakeObject::ndFunction([this, trainingImages, trainingLabels, &miniBashArray, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
 			{
 				class CategoricalLoss : public ndBrainLossCategoricalCrossEntropy
 				{
@@ -226,28 +178,28 @@ static void Cifar10TrainingSet()
 
 					ndInt32 index = ndInt32(miniBashArray[i]);
 					loss.SetTruth((*trainingLabels)[index]);
-					trainer.BackPropagate((*trainingDigits)[index], loss);
+					trainer.BackPropagate((*trainingImages)[index], loss);
 				}
 			});
 
 			ndBrain bestBrain(m_brain);
 			ndBrainOptimizerAdam optimizer;
 
-			ndInt32 minTestFail = testDigits->GetCount();
-			ndInt32 minTrainingFail = trainingDigits->GetCount();
-			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
+			ndInt32 minTestFail = testLabels->GetCount();
+			ndInt32 minTrainingFail = trainingLabels->GetCount();
+			ndInt32 batches = trainingLabels->GetCount() / m_bashBufferSize;
 
-			// so far best training result on the mnist data set
-			//optimizer.SetRegularizer(ndReal(0.0f)); // test data score 98.50%
-			//optimizer.SetRegularizer(ndReal(1.0e-5f)); // test data score 98.32%
-			optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score 98.50%
-			//optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score 98.53%
-			//optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 98.49%
-			//optimizer.SetRegularizer(ndReal(5.0e-5f)); // test data score 98.22%
+			// so far best training result on the cifar-10 data set
+			//optimizer.SetRegularizer(ndReal(0.0f)); // test data score 
+			optimizer.SetRegularizer(ndReal(1.0e-5f)); // test data score 
+			//optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score 
+			//optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score 
+			//optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 
+			//optimizer.SetRegularizer(ndReal(5.0e-5f)); // test data score 
 
 			//batches = 1;
 			ndArray<ndUnsigned32> shuffleBuffer;
-			for (ndInt32 i = 0; i < trainingDigits->GetCount(); ++i)
+			for (ndInt32 i = 0; i < trainingLabels->GetCount(); ++i)
 			{
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
@@ -285,7 +237,8 @@ static void Cifar10TrainingSet()
 						ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
 
 						failCount[threadIndex] = 0;
-						const ndStartEnd startEnd(testDigits->GetCount(), threadIndex, threadCount);
+						//const ndStartEnd startEnd(testDigits->GetCount(), threadIndex, threadCount);
+						const ndStartEnd startEnd(testLabels->GetCount(), threadIndex, threadCount);
 						for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 						{
 							const ndBrainVector& truth = (*testLabels)[i];
@@ -349,47 +302,51 @@ static void Cifar10TrainingSet()
 		ndInt32 m_bashBufferSize;
 	};
 	
-	if (trainingLabels && trainingDigits)
+	if (trainingLabels && trainingImages)
 	{
 		ndBrain brain;
 		ndFixSizeArray<ndBrainLayer*, 32> layers;
 		
-		ndInt32 height = 28;
-		ndInt32 width = trainingDigits->GetColumns() / height;
-		ndAssert((height * width) == trainingDigits->GetColumns());
-
+		ndInt32 height = 32;
+		ndInt32 width = trainingImages->GetColumns() / (height * 3);
+		ndAssert((3 * height * width) == trainingImages->GetColumns());
+	
 		const ndBrainLayerConvolutional* conv;
 		const ndBrainLayerConvolutionalMaxPooling* pooling;
-
+	
 		#if 1
 			#define ACTIVATION_TYPE	ndBrainLayerReluActivation
 		#else
 			#define ACTIVATION_TYPE	ndBrainLayerTanhActivation
 		#endif
-
-		layers.PushBack(new ndBrainLayerConvolutional(width, height, 1, 3, 32));
+	
+		layers.PushBack(new ndBrainLayerConvolutional(width, height, 3, 3, 32));
 		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
-
-		layers.PushBack(new ndBrainLayerConvolutional(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
+	
+		layers.PushBack(new ndBrainLayerConvolutional(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 64));
 		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
+	
+		layers.PushBack(new ndBrainLayerConvolutional(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 64));
+		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 
-		layers.PushBack(new ndBrainLayerConvolutional(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
+		layers.PushBack(new ndBrainLayerConvolutional(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels(), 3, 64));
 		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 
 		ndInt32 neuronsPerLayers = 64;
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-
+	
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
+	
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{
 			brain.AddLayer(layers[i]);
@@ -398,34 +355,36 @@ static void Cifar10TrainingSet()
 	
 		SupervisedTrainer optimizer(&brain);
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
-		optimizer.Optimize(*trainingLabels, *trainingDigits, *testLabels, *testDigits);
+		//optimizer.Optimize(*trainingLabels, *trainingImages, *testLabels, *testDigits);
+		optimizer.Optimize(*trainingLabels, *trainingImages, *trainingLabels, *trainingImages);
 		time = ndGetTimeInMicroseconds() - time;
 	
 		char path[256];
-		ndGetWorkingFileName("mnistDatabase/mnist-cnn.dnn", path);
+		ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
 		
 		ndBrainSave::Save(&brain, path);
-		ValidateData("training data", brain, *trainingLabels, *trainingDigits);
+		ValidateData("training data", brain, *trainingLabels, *trainingImages);
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 }
 
 static void Cifar10TestSet()
 {
-	ndSharedPtr<ndBrainMatrix> testLabels (LoadMnistLabelData("mnistDatabase/t10k-labels.idx1-ubyte"));
-	ndSharedPtr<ndBrainMatrix> testDigits (LoadMnistSampleData("mnistDatabase/t10k-images.idx3-ubyte"));
-
-	if (testLabels && testDigits)
-	{
-		char path[256];
-		ndGetWorkingFileName("mnistDatabase/mnist-cnn.dnn", path);
-
-		ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
-		ndUnsigned64 time = ndGetTimeInMicroseconds();
-		ValidateData("test data", *(*brain), *testLabels, *testDigits);
-		time = ndGetTimeInMicroseconds() - time;
-		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
-	}
+	ndAssert(0);
+	//ndSharedPtr<ndBrainMatrix> testLabels (LoadMnistLabelData("cifar-10-batches-bin/t10k-labels.idx1-ubyte"));
+	//ndSharedPtr<ndBrainMatrix> testDigits (LoadMnistSampleData("cifar-10-batches-bin/t10k-images.idx3-ubyte"));
+	//
+	//if (testLabels && testDigits)
+	//{
+	//	char path[256];
+	//	ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
+	//
+	//	ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
+	//	ndUnsigned64 time = ndGetTimeInMicroseconds();
+	//	ValidateData("test data", *(*brain), *testLabels, *testDigits);
+	//	time = ndGetTimeInMicroseconds() - time;
+	//	ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
+	//}
 }
 
 void ndCifar10ImageClassification()
@@ -433,5 +392,5 @@ void ndCifar10ImageClassification()
 	ndSetRandSeed(12345);
 
 	Cifar10TrainingSet();
-	Cifar10TestSet();
+	//Cifar10TestSet();
 }

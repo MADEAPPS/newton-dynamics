@@ -48,7 +48,7 @@ bld/
 *.ilk
 *.map
 *.idb
-*.bin
+#*.bin
 *.ncb
 *.htm
 *.dep
