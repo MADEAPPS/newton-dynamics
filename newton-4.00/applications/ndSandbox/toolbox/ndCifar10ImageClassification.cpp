@@ -237,7 +237,6 @@ static void Cifar10TrainingSet()
 						ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
 
 						failCount[threadIndex] = 0;
-						//const ndStartEnd startEnd(testDigits->GetCount(), threadIndex, threadCount);
 						const ndStartEnd startEnd(testLabels->GetCount(), threadIndex, threadCount);
 						for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 						{
@@ -340,10 +339,13 @@ static void Cifar10TrainingSet()
 		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
 
-		ndInt32 neuronsPerLayers = 64;
+		ndInt32 neuronsPerLayers = 128;
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-	
+
+		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 	
