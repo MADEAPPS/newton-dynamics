@@ -239,8 +239,8 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 		const ndBrainVector& truth = (*testLabels)[i];
 
-		ndInt32 index = 0;
-		ndBrainFloat maxProbability = 0.0f;
+		ndInt32 index = -1;
+		ndBrainFloat maxProbability = -1.0f;
 		for (ndInt32 j = 0; j < output.GetCount(); j++)
 		{
 			if (output[j] > maxProbability)
@@ -250,7 +250,9 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 			}
 		}
 
-		if (truth[index] < 0.5f)
+		ndAssert(index >= 0);
+		//if (truth[index] < 0.5f)
+		if (truth[index] == ndReal(0.0f))
 		{
 			failCount++;
 		}
@@ -326,6 +328,7 @@ static void MnistTrainingSet()
 							}
 						}
 
+						ndAssert(index >= 0);
 						if (m_truth[index] == ndReal(0.0f))
 						{
 							(*m_failCount)++;
@@ -410,8 +413,8 @@ static void MnistTrainingSet()
 							const ndBrainVector& input = (*testDigits)[i];
 							m_brain.MakePrediction(input, output);
 
-							ndInt32 index = 0;
-							ndBrainFloat maxProbability = ndBrainFloat(0.0f);
+							ndInt32 index = -1;
+							ndBrainFloat maxProbability = ndBrainFloat(-1.0f);
 							for (ndInt32 j = 0; j < output.GetCount(); j++)
 							{
 								if (output[j] > maxProbability)
@@ -586,6 +589,6 @@ void ndTestDeedBrian()
 	//xxx.GaussianNormalize();
 
 	//ThreeLayersTwoInputsTwoOutputs();
-	MnistTrainingSet();
-	//MnistTestSet();
+	//MnistTrainingSet();
+	MnistTestSet();
 }

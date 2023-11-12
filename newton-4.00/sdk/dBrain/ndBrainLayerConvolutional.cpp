@@ -229,42 +229,6 @@ void ndBrainLayerConvolutional::AdamUpdate(const ndBrainLayer& u, const ndBrainL
 	}
 }
 
-ndBrainLayer* ndBrainLayerConvolutional::Load(const ndBrainLoad* const loadSave)
-{
-	//char buffer[1024];
-	//loadSave->ReadString(buffer);
-	//
-	//loadSave->ReadString(buffer);
-	//ndInt32 inputs = loadSave->ReadInt();
-	//loadSave->ReadString(buffer);
-	//ndInt32 outputs = loadSave->ReadInt();
-	//ndBrainLayerConvolutional* const layer = new ndBrainLayerConvolutional(inputs, outputs);
-	//
-	//loadSave->ReadString(buffer);
-	//for (ndInt32 i = 0; i < outputs; ++i)
-	//{
-	//	ndBrainFloat val = ndBrainFloat(loadSave->ReadFloat());
-	//	layer->m_bias[i] = val;
-	//}
-	//
-	//loadSave->ReadString(buffer);
-	//for (ndInt32 i = 0; i < outputs; ++i)
-	//{
-	//	loadSave->ReadString(buffer);
-	//	for (ndInt32 j = 0; j < inputs; ++j)
-	//	{
-	//		ndBrainFloat val = ndBrainFloat(loadSave->ReadFloat());
-	//		layer->m_weights[i][j] = val;
-	//	}
-	//}
-	//
-	//loadSave->ReadString(buffer);
-	//return layer;
-
-	ndAssert(0);
-	return nullptr;
-}
-
 void ndBrainLayerConvolutional::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == GetInputSize());
@@ -324,7 +288,7 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 	ndBrainLayerConvolutional* const gradients = (ndBrainLayerConvolutional*)gradientOut;
 
 	ndAssert(gradients->m_bias.GetCount() == m_outputLayers);
-	ndAssert(output.GetCount() == outputDerivative.GetCount());
+	//ndAssert(output.GetCount() == outputDerivative.GetCount());
 
 	const ndInt32 inputSize = m_inputWidth * m_inputHeight;
 	const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
@@ -507,4 +471,52 @@ void ndBrainLayerConvolutional::Save(const ndBrainSave* const loadSave) const
 		kernelOffset += kernelSize;
 		Save("\n");
 	}
+}
+
+ndBrainLayer* ndBrainLayerConvolutional::Load(const ndBrainLoad* const loadSave)
+{
+	char buffer[1024];
+	loadSave->ReadString(buffer);
+	
+	loadSave->ReadString(buffer);
+	ndInt32 inputWidth = loadSave->ReadInt();
+
+	loadSave->ReadString(buffer);
+	ndInt32 inputHeight = loadSave->ReadInt();
+
+	loadSave->ReadString(buffer);
+	ndInt32 inputLayers = loadSave->ReadInt();
+
+	loadSave->ReadString(buffer);
+	ndInt32 kernelSize = loadSave->ReadInt();
+
+	loadSave->ReadString(buffer);
+	ndInt32 ouputLayers = loadSave->ReadInt();
+
+	ndBrainLayerConvolutional* const layer = new ndBrainLayerConvolutional(inputWidth, inputHeight, inputLayers, kernelSize, ouputLayers);
+	
+	loadSave->ReadString(buffer);
+	for (ndInt32 i = 0; i < ouputLayers; ++i)
+	{
+		ndBrainFloat val = ndBrainFloat(loadSave->ReadFloat());
+		layer->m_bias[i] = val;
+	}
+	
+	loadSave->ReadString(buffer);
+	ndInt32 kernelWeights = kernelSize * kernelSize;
+
+	ndInt32 index = 0;
+	for (ndInt32 i = 0; i < ouputLayers * inputLayers; ++i)
+	{
+		loadSave->ReadString(buffer);
+		for (ndInt32 j = 0; j < kernelWeights; ++j)
+		{
+			ndBrainFloat val = ndBrainFloat(loadSave->ReadFloat());
+			layer->m_kernels[index] = val;
+			index++;
+		}
+	}
+	
+	loadSave->ReadString(buffer);
+	return layer;
 }

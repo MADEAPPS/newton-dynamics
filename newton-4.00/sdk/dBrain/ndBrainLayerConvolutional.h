@@ -30,7 +30,7 @@
 class ndBrainLayerConvolutional : public ndBrainLayer
 {
 	public: 
-	ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels);
+	ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputLayers, ndInt32 kernelSize, ndInt32 ouputLayers);
 	ndBrainLayerConvolutional(const ndBrainLayerConvolutional& src);
 	virtual ~ndBrainLayerConvolutional();
 	virtual ndBrainLayer* Clone() const;

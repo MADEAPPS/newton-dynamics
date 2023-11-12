@@ -23,11 +23,11 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerConvolutionalMaxPooling.h"
 
-ndBrainLayerConvolutionalMaxPooling::ndBrainLayerConvolutionalMaxPooling(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth)
-	:ndBrainLayerActivation(((inputWidth + 1) / 2) * ((inputHeight + 1) / 2) * inputDepth)
+ndBrainLayerConvolutionalMaxPooling::ndBrainLayerConvolutionalMaxPooling(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputLayers)
+	:ndBrainLayerActivation(((inputWidth + 1) / 2) * ((inputHeight + 1) / 2) * inputLayers)
 	,m_width(inputWidth)
 	,m_height(inputHeight)
-	,m_channels(inputDepth)
+	,m_channels(inputLayers)
 	,m_index()
 {
 	m_index.SetCount(m_neurons);
@@ -86,20 +86,6 @@ ndBrainLayer* ndBrainLayerConvolutionalMaxPooling::Clone() const
 const char* ndBrainLayerConvolutionalMaxPooling::GetLabelId() const
 {
 	return "ndBrainLayerConvolutionalMaxPooling";
-}
-
-ndBrainLayer* ndBrainLayerConvolutionalMaxPooling::Load(const ndBrainLoad* const loadSave)
-{
-	ndAssert(0);
-	return nullptr;
-	//char buffer[1024];
-	//loadSave->ReadString(buffer);
-	//
-	//loadSave->ReadString(buffer);
-	//ndInt32 inputs = loadSave->ReadInt();
-	//ndBrainLayerConvolutionalMaxPooling* const layer = new ndBrainLayerConvolutionalMaxPooling(inputs);
-	//loadSave->ReadString(buffer);
-	//return layer;
 }
 
 void ndBrainLayerConvolutionalMaxPooling::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
@@ -221,4 +207,23 @@ void ndBrainLayerConvolutionalMaxPooling::Save(const ndBrainSave* const loadSave
 
 	sprintf(buffer, "\tinput_layers %d\n", m_channels);
 	loadSave->WriteData(buffer);
+}
+
+ndBrainLayer* ndBrainLayerConvolutionalMaxPooling::Load(const ndBrainLoad* const loadSave)
+{
+	char buffer[1024];
+	loadSave->ReadString(buffer);
+	
+	loadSave->ReadString(buffer);
+	ndInt32 inputWidth = loadSave->ReadInt();
+	 
+	loadSave->ReadString(buffer);
+	ndInt32 inputHeight = loadSave->ReadInt();
+
+	loadSave->ReadString(buffer);
+	ndInt32 inputLayers = loadSave->ReadInt();
+
+	ndBrainLayerConvolutionalMaxPooling* const layer = new ndBrainLayerConvolutionalMaxPooling(inputWidth, inputHeight, inputLayers);
+	loadSave->ReadString(buffer);
+	return layer;
 }
