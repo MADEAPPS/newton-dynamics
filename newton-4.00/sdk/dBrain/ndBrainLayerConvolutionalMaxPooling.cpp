@@ -88,9 +88,9 @@ const char* ndBrainLayerConvolutionalMaxPooling::GetLabelId() const
 	return "ndBrainLayerConvolutionalMaxPooling";
 }
 
-void ndBrainLayerConvolutionalMaxPooling::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerConvolutionalMaxPooling::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-	ndAssert(output.GetCount() == outputDerivative.GetCount());
+	//ndAssert(output.GetCount() == outputDerivative.GetCount());
 	ndAssert(m_index.GetCount() == outputDerivative.GetCount());
 
 	inputDerivative.Set(ndBrainFloat(0.0f));
