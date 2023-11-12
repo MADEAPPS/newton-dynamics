@@ -93,6 +93,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndBrainVector truth;
 	ndBrainVector input;
 	ndBrainVector output;
+	ndBrainVector workBuffer;
 	
 	input.SetCount(brain.GetInputSize());
 	truth.SetCount(brain.GetOutputSize());
@@ -107,7 +108,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		truth[0] = ((input[0] >= ndReal(0.5f)) && (input[1] >= ndReal(0.5f))) ? ndReal(1.0f) : ndReal(0.0f);
 		truth[1] = ((input[0] >= ndReal(0.5f)) || (input[1] >= ndReal(0.5f))) ? ndReal(1.0f) : ndReal(0.0f);
 	
-		brain.MakePrediction(input, output);
+		brain.MakePrediction(input, output, workBuffer);
 	
 		bool predicted = true;
 		for (ndInt32 j = 0; j < output.GetCount(); ++j)
@@ -236,7 +237,6 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 	for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
 	{
 		const ndBrainVector& input = (*testDigits)[i];
-		//brain.MakePrediction(input, output);
 		brain.MakePrediction(input, output, workingBuffer);
 
 		const ndBrainVector& truth = (*testLabels)[i];
