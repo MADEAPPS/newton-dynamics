@@ -23,10 +23,9 @@
 #define _ND_BRAIN_TRAINER_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrainVector.h"
 class ndBrain;
 class ndBrainLoss;
-class ndBrainVector;
-class ndBrainMatrix;
 
 class ndBrainTrainer: public ndClassAlloc
 {
@@ -50,6 +49,8 @@ class ndBrainTrainer: public ndClassAlloc
 
 	private:
 	ndArray<ndLayerData*> m_data;
+	ndBrainVector m_workingBuffer;
+	ndFixSizeArray<ndInt32, 256> m_prefixScan;
 	ndBrain* m_brain;
 };
 

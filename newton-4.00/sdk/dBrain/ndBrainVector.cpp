@@ -22,20 +22,6 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
 
-//ndBrainVector::ndBrainVector()
-//	:ndArray<ndBrainFloat>()
-//{
-//}
-//
-//ndBrainVector::ndBrainVector(const ndBrainVector& src)
-//	:ndArray<ndBrainFloat>(src)
-//{
-//}
-//
-//ndBrainVector::~ndBrainVector()
-//{
-//}
-
 void ndBrainVector::InitGaussianWeights(ndBrainFloat variance)
 {
 	Set(ndFloat32(0.0f));

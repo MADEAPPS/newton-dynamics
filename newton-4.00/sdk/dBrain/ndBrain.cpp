@@ -24,6 +24,8 @@
 #include "ndBrainVector.h"
 #include "ndBrainSaveLoad.h"
 
+ndSpinLock ndBrain::m_lock;
+
 ndBrain::ndBrain()
 	:ndArray<ndBrainLayer*>()
 {
@@ -126,6 +128,7 @@ void ndBrain::InitWeightsXavierMethod()
 
 void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
+	ndAssert(0);
 	const ndArray<ndBrainLayer*>& layers = *this;
 	ndInt32 maxSize = layers[0]->GetInputSize();
 	for (ndInt32 i = 0; i < GetCount(); ++i)
@@ -149,8 +152,39 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 	output.Set(in);
 }
 
+void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer)
+{
+	const ndArray<ndBrainLayer*>& layers = *this;
+	ndInt32 maxSize = layers[0]->GetInputSize();
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		maxSize = ndMax(maxSize, layers[i]->GetOutputSize());
+	}
+
+	if (workingBuffer.GetCapacity() < (maxSize * 2 + 256))
+	{
+		ndScopeSpinLock lock(m_lock);
+		workingBuffer.SetCount(maxSize * 2 + 256);
+	}
+
+	ndBrainMemVector in(&workingBuffer[0], input.GetCount());
+	ndBrainMemVector out(&workingBuffer[maxSize + 128], input.GetCount());
+
+	in.Set(input);
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		out.SetSize(layers[i]->GetOutputSize());
+		layers[i]->MakePrediction(in, out);
+		in.Swap(out);
+	}
+
+	ndAssert(in.GetCount() == output.GetCount());
+	output.Set(in);
+}
+
 void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients)
 {
+	ndAssert(0);
 	ndFixSizeArray<ndInt32, 256> prefixScan;
 	const ndArray<ndBrainLayer*>& layers = *this;
 
@@ -177,7 +211,7 @@ void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& 
 		ndBrainMemVector out(memBuffer + prefixScan[i + 1], layers[i]->GetOutputSize());
 		layers[i]->MakePrediction(in, out);
 	}
-	
+
 	ndBrainMemVector gradientIn(gradientBuffer, GetOutputSize());
 	ndBrainMemVector gradientOut(gradientBuffer + maxSize + 128, GetOutputSize());
 	gradientOut.Set(ndBrainFloat(1.0f));
@@ -190,4 +224,9 @@ void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& 
 		gradientIn.Swap(gradientOut);
 	}
 	inputGradients.Set(gradientOut);
+}
+
+void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients, ndBrainVector& workingBuffer)
+{
+
 }

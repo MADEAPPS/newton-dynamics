@@ -232,10 +232,12 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 	output.SetCount((*testLabels)[0].GetCount());
 
 	ndInt32 failCount = 0;
+	ndBrainVector workingBuffer;
 	for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
 	{
 		const ndBrainVector& input = (*testDigits)[i];
-		brain.MakePrediction(input, output);
+		//brain.MakePrediction(input, output);
+		brain.MakePrediction(input, output, workingBuffer);
 
 		const ndBrainVector& truth = (*testLabels)[i];
 
@@ -590,5 +592,5 @@ void ndTestDeedBrian()
 
 	//ThreeLayersTwoInputsTwoOutputs();
 	MnistTrainingSet();
-	//MnistTestSet();
+	MnistTestSet();
 }

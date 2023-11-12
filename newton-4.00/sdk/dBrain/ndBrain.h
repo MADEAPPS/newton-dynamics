@@ -48,9 +48,14 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
 	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients);
 
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer);
+	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients, ndBrainVector& workingBuffer);
+
 	friend class ndBrainLoad;
 	friend class ndBrainSave;
 	friend class ndBrainTrainer;
+
+	static ndSpinLock m_lock;
 };
 
 #endif 
