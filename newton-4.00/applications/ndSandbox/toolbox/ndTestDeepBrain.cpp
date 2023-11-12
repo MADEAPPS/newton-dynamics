@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-#define D_USE_CONVOLUTIONAL_LAYERS
+//#define D_USE_CONVOLUTIONAL_LAYERS
 
 static void ThreeLayersTwoInputsTwoOutputs()
 {
@@ -283,7 +283,7 @@ static void MnistTrainingSet()
 			,m_bashBufferSize(64)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
-	//threadCount = 1;
+	threadCount = 1;
 			SetThreadCount(threadCount);
 			for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 			{
@@ -413,7 +413,7 @@ static void MnistTrainingSet()
 						{
 							const ndBrainVector& truth = (*testLabels)[i];
 							const ndBrainVector& input = (*testDigits)[i];
-							m_brain.MakePrediction(input, output);
+							m_brain.MakePrediction(input, output, m_trainers[threadIndex]->GetWorkingBuffer());
 
 							ndInt32 index = -1;
 							ndBrainFloat maxProbability = ndBrainFloat(-1.0f);

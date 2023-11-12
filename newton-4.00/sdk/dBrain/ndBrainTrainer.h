@@ -47,11 +47,14 @@ class ndBrainTrainer: public ndClassAlloc
 	void ScaleWeights(const ndBrainFloat s);
 	void AddGradients(const ndBrainTrainer* const src);
 
+	ndBrainVector& GetWorkingBuffer();
+
 	private:
 	ndArray<ndLayerData*> m_data;
 	ndBrainVector m_workingBuffer;
 	ndFixSizeArray<ndInt32, 256> m_prefixScan;
 	ndBrain* m_brain;
+	ndInt32 m_maxLayerBufferSize;
 };
 
 #endif 
