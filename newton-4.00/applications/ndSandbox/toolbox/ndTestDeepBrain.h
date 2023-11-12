@@ -14,7 +14,8 @@
 #define _D_TEST_DEEP_BRAIN_H_
 
 
-void ndTestDeedBrian();
+void ndHandWrittenDigits();
+void ndCifar10ImageClassification();
 
 
 #endif 
