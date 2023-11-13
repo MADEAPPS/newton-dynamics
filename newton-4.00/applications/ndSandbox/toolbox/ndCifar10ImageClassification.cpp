@@ -14,7 +14,7 @@
 
 static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndSharedPtr<ndBrainMatrix>& trainingLabels)
 {
-	ndInt32 batches = 1;
+	ndInt32 batches = 5;
 	trainingLabels = new ndBrainMatrix(ndInt32(batches * 10000), ndInt32(10));
 	trainingImages = new ndBrainMatrix(ndInt32(batches * 10000), ndInt32(32 * 32 * 3));
 
@@ -46,9 +46,55 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 				{
 					image[k] = ndBrainFloat(data[k]) / ndBrainFloat(255.0f);
 				}
+
+				for (ndInt32 k = 0; k < 3; ++k)
+				{
+					ndBrainMemVector imageChannel (&image[k * 32 * 32], 32 * 32);
+					imageChannel.GaussianNormalize();
+				}
 			}
 			fclose(fp);
 		}
+	}
+}
+
+static void LoadTestData(ndSharedPtr<ndBrainMatrix>& images, ndSharedPtr<ndBrainMatrix>& labels)
+{
+	labels = new ndBrainMatrix(ndInt32(10000), ndInt32(10));
+	images = new ndBrainMatrix(ndInt32(10000), ndInt32(32 * 32 * 3));
+
+	ndBrainMatrix& labelMatrix = *(*labels);
+	ndBrainMatrix& imageMatrix = *(*images);
+
+	char outPathName[1024];
+	ndUnsigned8 data[32 * 32 * 3];
+
+	labelMatrix.Set(ndBrainFloat(0.0f));
+	ndGetWorkingFileName("cifar-10-batches-bin/test_batch.bin", outPathName);
+	FILE* const fp = fopen(outPathName, "rb");
+	if (fp)
+	{
+		for (ndInt32 j = 0; j < 10000; ++j)
+		{
+			size_t ret = 0;
+			ndInt32 label = 0;
+			ret = fread(&label, 1, 1, fp);
+
+			labelMatrix[j][label] = ndBrainFloat(1.0f);
+			ndBrainVector& image = imageMatrix[ndInt32(j)];
+			ret = fread(data, 1, 32 * 32 * 3, fp);
+			for (ndInt32 k = 0; k < 32 * 32 * 3; ++k)
+			{
+				image[k] = ndBrainFloat(data[k]) / ndBrainFloat(255.0f);
+			}
+
+			for (ndInt32 k = 0; k < 3; ++k)
+			{
+				ndBrainMemVector imageChannel(&image[k * 32 * 32], 32 * 32);
+				imageChannel.GaussianNormalize();
+			}
+		}
+		fclose(fp);
 	}
 }
 
@@ -92,14 +138,12 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void Cifar10TrainingSet()
 {
-	//ndSharedPtr<ndBrainMatrix> trainingLabels (LoadMnistLabelData("cifar-10-batches-bin/train-labels.idx1-ubyte"));
-	//ndSharedPtr<ndBrainMatrix> trainingImages (LoadMnistSampleData("cifar-10-batches-bin/train-images.idx3-ubyte"));
-	//
-	//ndSharedPtr<ndBrainMatrix> testLabels(LoadMnistLabelData("cifar-10-batches-bin/t10k-labels.idx1-ubyte"));
-	//ndSharedPtr<ndBrainMatrix> testDigits(LoadMnistSampleData("cifar-10-batches-bin/t10k-images.idx3-ubyte"));
-
+	ndSharedPtr<ndBrainMatrix> testLabels;
+	ndSharedPtr<ndBrainMatrix> testImages;
 	ndSharedPtr<ndBrainMatrix> trainingLabels;
 	ndSharedPtr<ndBrainMatrix> trainingImages;
+
+	LoadTestData(testImages, testLabels);
 	LoadTrainingData(trainingImages, trainingLabels);
 
 	class SupervisedTrainer : public ndBrainThreadPool
@@ -190,12 +234,10 @@ static void Cifar10TrainingSet()
 			ndInt32 batches = trainingLabels->GetCount() / m_bashBufferSize;
 
 			// so far best training result on the cifar-10 data set
-			//optimizer.SetRegularizer(ndReal(0.0f)); // test data score 
-			optimizer.SetRegularizer(ndReal(1.0e-5f)); // test data score 
-			//optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score 
-			//optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score 
-			//optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 
-			//optimizer.SetRegularizer(ndReal(5.0e-5f)); // test data score 
+			//optimizer.SetRegularizer(ndBrainFloat(0.0e-5f)); // test data score 
+			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f)); // test data score 
+			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f)); // test data score 
+			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f)); // test data score 
 
 			//batches = 1;
 			ndArray<ndUnsigned32> shuffleBuffer;
@@ -313,7 +355,7 @@ static void Cifar10TrainingSet()
 		const ndBrainLayerConvolutional* conv;
 		const ndBrainLayerConvolutionalMaxPooling* pooling;
 	
-		#if 1
+		#if 0
 			#define ACTIVATION_TYPE	ndBrainLayerReluActivation
 		#else
 			#define ACTIVATION_TYPE	ndBrainLayerTanhActivation
@@ -357,8 +399,7 @@ static void Cifar10TrainingSet()
 	
 		SupervisedTrainer optimizer(&brain);
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
-		//optimizer.Optimize(*trainingLabels, *trainingImages, *testLabels, *testDigits);
-		optimizer.Optimize(*trainingLabels, *trainingImages, *trainingLabels, *trainingImages);
+		optimizer.Optimize(*trainingLabels, *trainingImages, *testLabels, *testImages);
 		time = ndGetTimeInMicroseconds() - time;
 	
 		char path[256];
