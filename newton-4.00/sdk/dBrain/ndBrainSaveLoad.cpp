@@ -28,6 +28,7 @@
 #include "ndBrainLayerTanhActivation.h"
 #include "ndBrainLayerSoftmaxActivation.h"
 #include "ndBrainLayerSigmoidActivation.h"
+#include "ndBrainLayerLeakyReluActivation.h"
 #include "ndBrainLayerConvolutionalMaxPooling.h"
 #include "ndBrainLayerCategoricalSoftmaxActivation.h"
 
@@ -106,6 +107,10 @@ ndBrain* ndBrainLoad::Load() const
 		else if (!strcmp(layerType, "ndBrainLayerReluActivation"))
 		{
 			layer = ndBrainLayerReluActivation::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerLeakyReluActivation"))
+		{
+			layer = ndBrainLayerLeakyReluActivation::Load(this);
 		}
 		else if (!strcmp(layerType, "ndBrainLayerTanhActivation"))
 		{

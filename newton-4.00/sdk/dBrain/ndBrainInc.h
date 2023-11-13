@@ -53,6 +53,7 @@
 #include <ndBrainLossLeastSquaredError.h>
 #include <ndBrainLayerSigmoidActivation.h>
 #include <ndBrainLayerSoftmaxActivation.h>
+#include <ndBrainLayerLeakyReluActivation.h>
 #include <ndBrainAgentDiscreteVPG_Trainer.h>
 #include <ndBrainAgentContinueVPG_Trainer.h>
 #include <ndBrainLossCategoricalCrossEntropy.h>
