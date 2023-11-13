@@ -12,128 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-//#define D_USE_CONVOLUTIONAL_LAYERS
-
-static void ThreeLayersTwoInputsTwoOutputs()
-{
-	ndBrain brain;
-	ndInt32 hiddenNeurons = 16;
-
-	ndFixSizeArray<ndBrainLayer*, 16> layers;
-
-	layers.PushBack(new ndBrainLayerLinear(2, hiddenNeurons));
-	layers.PushBack(new ndBrainLayerTanhActivation(hiddenNeurons));
-
-	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenNeurons));
-	layers.PushBack(new ndBrainLayerTanhActivation(hiddenNeurons));
-
-	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hiddenNeurons));
-	layers.PushBack(new ndBrainLayerTanhActivation(hiddenNeurons));
-
-	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 2));
-	layers.PushBack(new ndBrainLayerSigmoidActivation(2));
-	
-	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	{
-		brain.AddLayer(layers[i]);
-	}
-	brain.InitWeightsXavierMethod();
-	
-	ndInt32 samples = 2000;
-	ndBrainMatrix inputBatch(samples, 2);
-	ndBrainMatrix groundTruth(samples, 2);
-	for (ndInt32 i = 0; i < samples; i++)
-	{
-		inputBatch[i][0] = ndClamp (ndReal(ndGaussianRandom(0.5f, 0.25f)), ndReal(0.0f), ndReal(1.0f));
-		inputBatch[i][1] = ndClamp (ndReal(ndGaussianRandom(0.5f, 0.25f)), ndReal(0.0f), ndReal(1.0f));
-	
-		groundTruth[i][0] = ((inputBatch[i][0] >= ndReal(0.5f)) && (inputBatch[i][1] >= ndReal(0.5f))) ? ndReal(1.0f) : ndReal(0.0f);
-		groundTruth[i][1] = ((inputBatch[i][0] >= ndReal(0.5f)) || (inputBatch[i][1] >= ndReal(0.5f))) ? ndReal(1.0f) : ndReal(0.0f);
-	}
-	
-	const ndInt32 bashSize = 64;
-	ndArray<ndBrainTrainer*> trainers;
-
-	ndBrainThreadPool threads;
-	threads.SetThreadCount(4);
-	for (ndInt32 i = 0; i < bashSize; ++i)
-	{
-		trainers.PushBack(new ndBrainTrainer(&brain));
-	}
-
-	ndBrainOptimizerAdam optimizer;
-	//ndBrainOptimizerSgd optimizer;
-
-	ndInt32 randomeSelection[bashSize];
-	auto UpdateTrainer = ndMakeObject::ndFunction([&trainers, &randomeSelection, &inputBatch, &groundTruth, bashSize](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		const ndStartEnd startEnd(bashSize, threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndBrainTrainer& trainer = *trainers[i];
-			ndBrainLossLeastSquaredError loss(trainer.GetBrain()->GetOutputSize());
-
-			ndInt32 index = randomeSelection[i];
-			const ndBrainVector& input = inputBatch[index];
-			loss.SetTruth(groundTruth[index]);
-			trainer.BackPropagate(input, loss);
-		}
-	});
-
-	for (ndInt32 i = 0; i < 5000; ++i)
-	{
-		for (ndInt32 j = 0; j < bashSize; ++j)
-		{
-			randomeSelection[j] = ndInt32 (ndRandInt() % samples);
-		}
-		threads.ParallelExecute(UpdateTrainer);
-		optimizer.Update(&threads, trainers, ndBrainFloat(1.0e-3f));
-	}
-	
-	ndBrainVector truth;
-	ndBrainVector input;
-	ndBrainVector output;
-	ndBrainVector workBuffer;
-	
-	input.SetCount(brain.GetInputSize());
-	truth.SetCount(brain.GetOutputSize());
-	output.SetCount(brain.GetOutputSize());
-	
-	ndInt32 failCount = 0;
-	ndInt32 testCount = 200;
-	for (ndInt32 i = 0; i < testCount; ++i)
-	{
-		input[0] = ndReal(ndGaussianRandom(0.5f, 0.25f));
-		input[1] = ndReal(ndGaussianRandom(0.5f, 0.25f));
-		truth[0] = ((input[0] >= ndReal(0.5f)) && (input[1] >= ndReal(0.5f))) ? ndReal(1.0f) : ndReal(0.0f);
-		truth[1] = ((input[0] >= ndReal(0.5f)) || (input[1] >= ndReal(0.5f))) ? ndReal(1.0f) : ndReal(0.0f);
-	
-		brain.MakePrediction(input, output, workBuffer);
-	
-		bool predicted = true;
-		for (ndInt32 j = 0; j < output.GetCount(); ++j)
-		{
-			bool trueBit = truth[j] >= ndReal(0.5f);
-			bool predictBit = output[j] >= ndReal(0.5f);
-			predicted = predicted && (predictBit == trueBit);
-		}
-	
-		if (!predicted)
-		{
-			failCount++;
-		}
-	}
-
-	for (ndInt32 i = 0; i < trainers.GetCount(); ++i)
-	{
-		delete trainers[i];
-	}
-
-	ndExpandTraceMessage("%s\n", "boolean logic");
-	ndExpandTraceMessage("num_right: %d  out of %d\n", testCount - failCount, testCount);
-	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testCount);
-	ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testCount - failCount) * 100.0f / (ndFloat32)testCount);
-}
+#define D_USE_CONVOLUTIONAL_LAYERS
 
 static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 {
@@ -154,9 +33,9 @@ static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 		//xxxx     unsigned byte ? ? label
 		//The labels values are 0 to 9.
 
+		size_t ret = 0;
 		ndUnsigned32 magicNumber;
 		ndUnsigned32 numberOfItems;
-		size_t ret = 0;
 		ret = fread(&magicNumber, 4, 1, fp);
 		ret = fread(&numberOfItems, 4, 1, fp);
 		magicNumber = ndIndian32(magicNumber);
@@ -254,7 +133,6 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 		}
 
 		ndAssert(index >= 0);
-		//if (truth[index] < 0.5f)
 		if (truth[index] == ndReal(0.0f))
 		{
 			failCount++;
@@ -374,11 +252,11 @@ static void MnistTrainingSet()
 			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
 
 			// so far best training result on the mnist data set
-			//optimizer.SetRegularizer(ndBrainFloat(0.0e-5f)); // test data score fully(96.76%) conv(96.449997%)
+			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f)); // test data score fully(96.76%) conv(96.449997%)
 			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f)); // test data score fully(98.02%)  conv(97.529999%)
 			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f)); // test data score fully(98.08%)  conv(97.760002%)
 			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f)); // test data score fully(98.18%)  conv(97.339996%)
-			optimizer.SetRegularizer(ndBrainFloat(4.0e-5f)); // test data score fully(97.90%)  conv(97.339996%)
+			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f)); // test data score fully(98.06%)  conv(97.339996%)
 
 			//batches = 1;
 			ndArray<ndUnsigned32> shuffleBuffer;
@@ -521,7 +399,8 @@ static void MnistTrainingSet()
 		const ndBrainLayerConvolutionalMaxPooling* pooling;
 
 		#if 1
-			#define DIGIT_ACTIVATION_TYPE ndBrainLayerReluActivation
+			//#define DIGIT_ACTIVATION_TYPE ndBrainLayerReluActivation
+			#define DIGIT_ACTIVATION_TYPE ndBrainLayerLeakyReluActivation
 		#else
 			#define DIGIT_ACTIVATION_TYPE ndBrainLayerTanhActivation
 		#endif
@@ -615,17 +494,6 @@ void ndHandWrittenDigits()
 {
 	ndSetRandSeed(12345);
 
-	//int xxxxxxx = ndRandInt();
-	//ndFloat32 xxxxxxx0 = ndRand();
-	//ndBrainVector xxx;
-	//for (ndInt32 i = 0; i < 100000; ++i)
-	//{
-	//	//xxx.PushBack(ndGaussianRandom(0.0f, 0.1f));
-	//	xxx.PushBack(1.0f);
-	//}
-	//xxx.GaussianNormalize();
-
-	//ThreeLayersTwoInputsTwoOutputs();
 	MnistTrainingSet();
 	MnistTestSet();
 }
