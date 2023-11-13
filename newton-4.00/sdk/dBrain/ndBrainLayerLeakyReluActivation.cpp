@@ -28,7 +28,7 @@ ndBrainLayerLeakyReluActivation::ndBrainLayerLeakyReluActivation(ndInt32 neurons
 	,m_leakDerivative(leakDerivative)
 {
 	ndAssert(m_leakDerivative >= ndBrainFloat(0.0f));
-	ndAssert(m_leakDerivative >= ndBrainFloat(0.5f));
+	ndAssert(m_leakDerivative <= ndBrainFloat(0.5f));
 }
 
 ndBrainLayerLeakyReluActivation::ndBrainLayerLeakyReluActivation(const ndBrainLayerLeakyReluActivation& src)
@@ -97,4 +97,5 @@ void ndBrainLayerLeakyReluActivation::InputDerivative(const ndBrainVector& outpu
 		ndAssert(ndCheckFloat(inputDerivative[i]));
 	}
 	inputDerivative.Mul(outputDerivative);
+	inputDerivative.FlushToZero();
 }

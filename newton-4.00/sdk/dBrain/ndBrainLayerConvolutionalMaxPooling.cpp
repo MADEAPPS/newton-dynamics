@@ -40,7 +40,6 @@ ndBrainLayerConvolutionalMaxPooling::ndBrainLayerConvolutionalMaxPooling(const n
 	,m_channels(src.m_channels)
 	,m_index(src.m_index)
 {
-	//m_index.SetCount(src.m_index.GetCount());
 }
 
 ndInt32 ndBrainLayerConvolutionalMaxPooling::GetInputWidth() const
@@ -90,7 +89,6 @@ const char* ndBrainLayerConvolutionalMaxPooling::GetLabelId() const
 
 void ndBrainLayerConvolutionalMaxPooling::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-	//ndAssert(output.GetCount() == outputDerivative.GetCount());
 	ndAssert(m_index.GetCount() == outputDerivative.GetCount());
 
 	inputDerivative.Set(ndBrainFloat(0.0f));
