@@ -296,7 +296,6 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 	ndBrainLayerConvolutional* const gradients = (ndBrainLayerConvolutional*)gradientOut;
 
 	ndAssert(gradients->m_bias.GetCount() == m_outputLayers);
-	//ndAssert(output.GetCount() == outputDerivative.GetCount());
 
 	const ndInt32 inputSize = m_inputWidth * m_inputHeight;
 	const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
@@ -410,7 +409,7 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 		ndInt32 gradInputOffset = 0;
 		const ndInt32 gradInputWidth = m_inputWidth + m_kernelSize - 1;
 		const ndInt32 gradInputSize = gradInputWidth * m_kernelSize;
-		//const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
+
 		for (ndInt32 y = 0; y < m_inputHeight; ++y)
 		{
 			for (ndInt32 x = 0; x < m_inputWidth; ++x)

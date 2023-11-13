@@ -89,10 +89,11 @@ void ndBrainLayerLeakyReluActivation::InputDerivative(const ndBrainVector& outpu
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
 	ndAssert(output.GetCount() == inputDerivative.GetCount());
 
+	ndBrainFloat derivatine0 = ndBrainFloat(1.0f);
+	ndBrainFloat derivatine1 = m_leakDerivative;
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
-		//inputDerivative[i] = (output[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-		inputDerivative[i] = (output[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : m_leakDerivative;
+		inputDerivative[i] = (output[i] > ndBrainFloat(0.0f)) ? derivatine0 : derivatine1;
 		ndAssert(ndCheckFloat(inputDerivative[i]));
 	}
 	inputDerivative.Mul(outputDerivative);
