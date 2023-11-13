@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-#define D_USE_CONVOLUTIONAL_LAYERS
+//#define D_USE_CONVOLUTIONAL_LAYERS
 
 static void ThreeLayersTwoInputsTwoOutputs()
 {
@@ -361,12 +361,11 @@ static void MnistTrainingSet()
 			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
 
 			// so far best training result on the mnist data set
-			//optimizer.SetRegularizer(ndReal(0.0f)); // test data score 98.50%
-			//optimizer.SetRegularizer(ndReal(1.0e-5f)); // test data score 98.32%
-			//optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score fully(98.50%)  conv(97.760002%)
-			optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score 98.53%
-			//optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score 98.49%
-			//optimizer.SetRegularizer(ndReal(5.0e-5f)); // test data score 98.22%
+			//optimizer.SetRegularizer(ndReal(0.0e-5f)); // test data score fully(97.29%) conv(96.449997%)
+			//optimizer.SetRegularizer(ndReal(1.0e-5f)); // test data score fully(97.919%)  conv(97.529999%)
+			//optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score fully(98.01%)  conv(97.760002%)
+			//optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score fully(97.980003%)  conv(97.339996%)
+			optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score fully(97.980003%)  conv(97.339996%)
 
 			//batches = 1;
 			ndArray<ndUnsigned32> shuffleBuffer;
@@ -492,20 +491,20 @@ static void MnistTrainingSet()
 		#endif
 
 		layers.PushBack(new ndBrainLayerConvolutional(width, height, 1, 3, 16));
-		layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
+		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
 
 		layers.PushBack(new ndBrainLayerConvolutional(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
-		layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
+		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerConvolutionalMaxPooling*)(layers[layers.GetCount() - 1]);
 
 		layers.PushBack(new ndBrainLayerConvolutional(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
-		layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 2]);
+		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
 
 		ndInt32 neuronsPerLayers = 64;
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
