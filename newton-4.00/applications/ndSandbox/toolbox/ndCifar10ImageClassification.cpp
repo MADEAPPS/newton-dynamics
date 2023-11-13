@@ -21,13 +21,13 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 	ndBrainMatrix& labelMatrix = *(*trainingLabels);
 	ndBrainMatrix& imageMatrix = *(*trainingImages);
 
+	char filename[1024];
+	char outPathName[1024];
 	ndUnsigned8 data[32 * 32 * 3];
 
 	labelMatrix.Set(ndBrainFloat(0.0f));
-	for (ndInt32 i = 0; i < 1; ++i)
+	for (ndInt32 i = 0; i < batches; ++i)
 	{
-		char filename[1024];
-		char outPathName[1024];
 		sprintf(filename, "cifar-10-batches-bin/data_batch_%d.bin", i + 1);
 		ndGetWorkingFileName(filename, outPathName);
 		FILE* const fp = fopen(outPathName, "rb");
@@ -361,7 +361,7 @@ static void Cifar10TrainingSet()
 			#define ACTIVATION_TYPE	ndBrainLayerTanhActivation
 		#endif
 	
-		layers.PushBack(new ndBrainLayerConvolutional(width, height, 3, 3, 32));
+		layers.PushBack(new ndBrainLayerConvolutional(width, height, 3, 5, 32));
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 1]);
 		layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 		layers.PushBack(new ndBrainLayerConvolutionalMaxPooling(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
@@ -377,9 +377,9 @@ static void Cifar10TrainingSet()
 		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 1]);
 		layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 
-		layers.PushBack(new ndBrainLayerConvolutional(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels(), 3, 64));
-		conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 1]);
-		layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerConvolutional(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels(), 3, 64));
+		//conv = (ndBrainLayerConvolutional*)(layers[layers.GetCount() - 1]);
+		//layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 
 		ndInt32 neuronsPerLayers = 128;
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
