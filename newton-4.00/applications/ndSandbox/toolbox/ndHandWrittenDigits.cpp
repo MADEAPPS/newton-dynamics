@@ -221,6 +221,7 @@ static ndBrainMatrix* LoadMnistSampleData(const char* const filename)
 			{
 				image[ndInt32(j)] = ndReal(data[ndInt32(j)]) / 255.0f;
 			}
+			image.GaussianNormalize();
 		}
 		fclose(fp);
 	}
@@ -267,12 +268,14 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void MnistTrainingSet()
 {
+	#define BASH_BUFFER_SIZE	64
+
 	ndSharedPtr<ndBrainMatrix> trainingLabels (LoadMnistLabelData("mnistDatabase/train-labels.idx1-ubyte"));
 	ndSharedPtr<ndBrainMatrix> trainingDigits (LoadMnistSampleData("mnistDatabase/train-images.idx3-ubyte"));
 
 	ndSharedPtr<ndBrainMatrix> testLabels(LoadMnistLabelData("mnistDatabase/t10k-labels.idx1-ubyte"));
 	ndSharedPtr<ndBrainMatrix> testDigits(LoadMnistSampleData("mnistDatabase/t10k-images.idx3-ubyte"));
-
+	
 	class SupervisedTrainer : public ndBrainThreadPool
 	{
 		public:
@@ -280,7 +283,7 @@ static void MnistTrainingSet()
 			:ndBrainThreadPool()
 			,m_brain(*brain)
 			,m_learnRate(ndReal(1.0e-4f))
-			,m_bashBufferSize(64)
+			,m_bashBufferSize(BASH_BUFFER_SIZE)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
 	//threadCount = 1;
@@ -290,6 +293,7 @@ static void MnistTrainingSet()
 				ndBrainTrainer* const trainer = new ndBrainTrainer(&m_brain);
 				m_trainers.PushBack(trainer);
 			}
+			m_prioritySamples.SetCount(m_bashBufferSize);
 		}
 
 		~SupervisedTrainer()
@@ -311,9 +315,11 @@ static void MnistTrainingSet()
 				class CategoricalLoss : public ndBrainLossCategoricalCrossEntropy
 				{
 					public:
-					CategoricalLoss(ndInt32 size, ndUnsigned32* const failCount)
+					CategoricalLoss(ndInt32 size, ndUnsigned32* const failCount, ndFixSizeArray<ndUnsigned32, 16>& priority, ndUnsigned32 entry)
 						:ndBrainLossCategoricalCrossEntropy(size)
+						,m_entry(entry)
 						,m_failCount(failCount)
+						,m_priority(priority)
 					{
 					}
 
@@ -334,22 +340,29 @@ static void MnistTrainingSet()
 						if (m_truth[index] == ndReal(0.0f))
 						{
 							(*m_failCount)++;
+							if (m_priority.GetCount() < m_priority.GetCapacity())
+							{
+								m_priority.PushBack(m_entry);
+							}
 						}
 
 						ndBrainLossCategoricalCrossEntropy::GetLoss(output, loss);
 					}
+
+					ndUnsigned32 m_entry;
 					ndUnsigned32* m_failCount;
+					ndFixSizeArray<ndUnsigned32, 16>& m_priority;
 				};
 
 				const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				{
 					ndBrainTrainer& trainer = *m_trainers[i];
-					CategoricalLoss loss(m_brain.GetOutputSize(), &failCount[threadIndex]);
-
-					ndInt32 index = ndInt32(miniBashArray[i]);
-					loss.SetTruth((*trainingLabels)[index]);
-					trainer.BackPropagate((*trainingDigits)[index], loss);
+					ndUnsigned32 index = miniBashArray[i];
+					CategoricalLoss loss(m_brain.GetOutputSize(), &failCount[threadIndex], m_prioritySamples[i], index);
+				
+					loss.SetTruth((*trainingLabels)[ndInt32(index)]);
+					trainer.BackPropagate((*trainingDigits)[ndInt32(index)], loss);
 				}
 			});
 
@@ -361,11 +374,11 @@ static void MnistTrainingSet()
 			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
 
 			// so far best training result on the mnist data set
-			//optimizer.SetRegularizer(ndReal(0.0e-5f)); // test data score fully(97.29%) conv(96.449997%)
-			//optimizer.SetRegularizer(ndReal(1.0e-5f)); // test data score fully(97.919%)  conv(97.529999%)
-			//optimizer.SetRegularizer(ndReal(2.0e-5f)); // test data score fully(98.01%)  conv(97.760002%)
-			//optimizer.SetRegularizer(ndReal(3.0e-5f)); // test data score fully(97.980003%)  conv(97.339996%)
-			optimizer.SetRegularizer(ndReal(4.0e-5f)); // test data score fully(97.980003%)  conv(97.339996%)
+			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f)); // test data score fully(97.29%) conv(96.449997%)
+			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f)); // test data score fully(98.02%)  conv(97.529999%)
+			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f)); // test data score fully(97.90%)  conv(97.760002%)
+			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f)); // test data score fully(97.99%)  conv(97.339996%)
+			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f)); // test data score fully(97.90%)  conv(97.339996%)
 
 			//batches = 1;
 			ndArray<ndUnsigned32> shuffleBuffer;
@@ -373,7 +386,12 @@ static void MnistTrainingSet()
 			{
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
-			
+			ndFixSizeArray<ndUnsigned32, 1024 * 2> priorityList;
+			for (ndInt32 i = 0; i < priorityList.GetCapacity(); ++i)
+			{
+				priorityList.PushBack(ndRandInt() % trainingDigits->GetCount());
+			}
+
 			for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
 			{
 				ndInt32 start = 0;
@@ -382,6 +400,12 @@ static void MnistTrainingSet()
 				for (ndInt32 bash = 0; bash < batches; ++bash)
 				{
 					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_bashBufferSize);
+
+					const ndInt32 priorityCount = ndMin(4, priorityList.GetCount());
+					for (ndInt32 i = 0; i < priorityCount; ++i)
+					{
+						miniBashArray[i] = priorityList[ndInt32 (ndRandInt() % priorityList.GetCount())];
+					}
 
 					ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 					optimizer.Update(this, m_trainers, m_learnRate);
@@ -399,7 +423,7 @@ static void MnistTrainingSet()
 				{
 					ndInt32 actualTraining = fails;
 					bool traningTest = fails < minTrainingFail;
-					minTrainingFail = ndMax(fails, ndInt32(200));
+					minTrainingFail = ndMax(fails, ndInt32(500));
 
 					auto CrossValidateTest = ndMakeObject::ndFunction([this, testDigits, testLabels, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
 					{
@@ -439,7 +463,7 @@ static void MnistTrainingSet()
 						fails += failCount[j];
 					}
 
-					if (traningTest && (minTrainingFail > 200))
+					if (traningTest && (minTrainingFail > 500))
 					{
 						minTestFail = fails;
 						bestBrain.CopyFrom(m_brain);
@@ -460,6 +484,17 @@ static void MnistTrainingSet()
 						ndExpandTraceMessage(" %d\n", minTestFail);
 					}
 				}
+
+				priorityList.SetCount(0);
+				for (ndInt32 i = 0; i < m_prioritySamples.GetCount(); ++i)
+				{
+					ndFixSizeArray<ndUnsigned32, 16>& priority = m_prioritySamples[i];
+					for (ndInt32 j = 0; j < priority.GetCount(); ++j)
+					{
+						priorityList.PushBack(priority[j]);
+					}
+					priority.SetCount(0);
+				}
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 			}
 			m_brain.CopyFrom(bestBrain);
@@ -467,6 +502,7 @@ static void MnistTrainingSet()
 
 		ndBrain& m_brain;
 		ndArray<ndBrainTrainer*> m_trainers;
+		ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 16>, BASH_BUFFER_SIZE> m_prioritySamples;
 		ndReal m_learnRate;
 		ndInt32 m_bashBufferSize;
 	};
