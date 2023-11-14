@@ -188,9 +188,11 @@ static void Cifar10TrainingSet()
 				class CategoricalLoss : public ndBrainLossCategoricalCrossEntropy
 				{
 					public:
-					CategoricalLoss(ndInt32 size, ndUnsigned32* const failCount)
+					CategoricalLoss(ndInt32 size, ndUnsigned32* const failCount, ndFixSizeArray<ndUnsigned32, 16>& priority, ndUnsigned32 entry)
 						:ndBrainLossCategoricalCrossEntropy(size)
+						,m_entry(entry)
 						,m_failCount(failCount)
+						,m_priority(priority)
 					{
 					}
 
@@ -211,22 +213,29 @@ static void Cifar10TrainingSet()
 						if (m_truth[index] == ndReal(0.0f))
 						{
 							(*m_failCount)++;
+							if (m_priority.GetCount() < m_priority.GetCapacity())
+							{
+								m_priority.PushBack(m_entry);
+							}
 						}
 
 						ndBrainLossCategoricalCrossEntropy::GetLoss(output, loss);
 					}
+
+					ndUnsigned32 m_entry;
 					ndUnsigned32* m_failCount;
+					ndFixSizeArray<ndUnsigned32, 16>& m_priority;
 				};
 
 				const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				{
 					ndBrainTrainer& trainer = *m_trainers[i];
-					CategoricalLoss loss(m_brain.GetOutputSize(), &failCount[threadIndex]);
+					ndUnsigned32 index = miniBashArray[i];
+					CategoricalLoss loss(m_brain.GetOutputSize(), &failCount[threadIndex], m_prioritySamples[i], index);
 
-					ndInt32 index = ndInt32(miniBashArray[i]);
-					loss.SetTruth((*trainingLabels)[index]);
-					trainer.BackPropagate((*trainingImages)[index], loss);
+					loss.SetTruth((*trainingLabels)[ndInt32(index)]);
+					trainer.BackPropagate((*trainingImages)[ndInt32(index)], loss);
 				}
 			});
 
@@ -251,7 +260,6 @@ static void Cifar10TrainingSet()
 			{
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
-
 			for (ndInt32 i = 0; i < priorityList.GetCapacity(); ++i)
 			{
 				priorityList.PushBack(ndRandInt() % trainingLabels->GetCount());

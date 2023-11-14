@@ -19,17 +19,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_CONVOLUTIONAL_MAX_POOLING_2D_H__
-#define _ND_BRAIN_LAYER_CONVOLUTIONAL_MAX_POOLING_2D_H__
+#ifndef _ND_BRAIN_LAYER_CONVOLUTIONAL_PADDING_2D_H__
+#define _ND_BRAIN_LAYER_CONVOLUTIONAL_PADDING_2D_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
-class ndBrainLayerConvolutionalMaxPooling_2d : public ndBrainLayerActivation
+class ndBrainLayerConvolutionalPadding_2d : public ndBrainLayerActivation
 {
 	public:
-	ndBrainLayerConvolutionalMaxPooling_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth);
-	ndBrainLayerConvolutionalMaxPooling_2d(const ndBrainLayerConvolutionalMaxPooling_2d& src);
+	ndBrainLayerConvolutionalPadding_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 filterSize);
+	ndBrainLayerConvolutionalPadding_2d(const ndBrainLayerConvolutionalPadding_2d& src);
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
@@ -51,7 +51,6 @@ class ndBrainLayerConvolutionalMaxPooling_2d : public ndBrainLayerActivation
 	ndInt32 m_width;
 	ndInt32 m_height;
 	ndInt32 m_channels;
-	mutable ndArray<ndInt32> m_index;
 };
 
 #endif 

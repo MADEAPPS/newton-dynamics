@@ -267,7 +267,6 @@ static void MnistTrainingSet()
 			{
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
-	
 			for (ndInt32 i = 0; i < priorityList.GetCapacity(); ++i)
 			{
 				priorityList.PushBack(ndRandInt() % trainingDigits->GetCount());
