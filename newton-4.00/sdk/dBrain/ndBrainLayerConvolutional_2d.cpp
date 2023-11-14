@@ -21,11 +21,11 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainLayerConvolutional.h"
+#include "ndBrainLayerConvolutional_2d.h"
 
 #define ND_BRAIN_CONV_LAYER_USE_BIAS
 
-ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)
+ndBrainLayerConvolutional_2d::ndBrainLayerConvolutional_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)
 	:ndBrainLayer()
 	,m_bias()
 	,m_kernels()
@@ -70,7 +70,7 @@ ndBrainLayerConvolutional::ndBrainLayerConvolutional(ndInt32 inputWidth, ndInt32
 	m_paddedGradientOut.Set(ndBrainFloat(0.0f));
 }
 
-ndBrainLayerConvolutional::ndBrainLayerConvolutional(const ndBrainLayerConvolutional& src)
+ndBrainLayerConvolutional_2d::ndBrainLayerConvolutional_2d(const ndBrainLayerConvolutional_2d& src)
 	:ndBrainLayer(src)
 	,m_bias(src.m_bias)
 	,m_kernels(src.m_kernels)
@@ -87,67 +87,67 @@ ndBrainLayerConvolutional::ndBrainLayerConvolutional(const ndBrainLayerConvoluti
 {
 }
 
-ndBrainLayerConvolutional::~ndBrainLayerConvolutional()
+ndBrainLayerConvolutional_2d::~ndBrainLayerConvolutional_2d()
 {
 }
 
-const char* ndBrainLayerConvolutional::GetLabelId() const
+const char* ndBrainLayerConvolutional_2d::GetLabelId() const
 {
-	return "ndBrainLayerConvolutional";
+	return "ndBrainLayerConvolutional_2d";
 }
 
-ndBrainLayer* ndBrainLayerConvolutional::Clone() const
+ndBrainLayer* ndBrainLayerConvolutional_2d::Clone() const
 {
-	return new ndBrainLayerConvolutional(*this);
+	return new ndBrainLayerConvolutional_2d(*this);
 }
 
-ndInt32 ndBrainLayerConvolutional::GetOutputSize() const
+ndInt32 ndBrainLayerConvolutional_2d::GetOutputSize() const
 {
 	return m_outputLayers * m_outputWidth * m_outputHeight;
 }
 
-ndInt32 ndBrainLayerConvolutional::GetInputSize() const
+ndInt32 ndBrainLayerConvolutional_2d::GetInputSize() const
 {
 	return m_inputLayers * m_inputWidth * m_inputHeight;
 }
 
-ndInt32 ndBrainLayerConvolutional::GetOutputWidth() const
+ndInt32 ndBrainLayerConvolutional_2d::GetOutputWidth() const
 {
 	return m_outputWidth;
 }
 
-ndInt32 ndBrainLayerConvolutional::GetOutputHeight() const
+ndInt32 ndBrainLayerConvolutional_2d::GetOutputHeight() const
 {
 	return m_outputHeight;
 }
 
-ndInt32 ndBrainLayerConvolutional::GetOutputChannels() const
+ndInt32 ndBrainLayerConvolutional_2d::GetOutputChannels() const
 {
 	return m_outputLayers;
 }
 
-bool ndBrainLayerConvolutional::HasParameters() const
+bool ndBrainLayerConvolutional_2d::HasParameters() const
 {
 	return true;
 }
 
-void ndBrainLayerConvolutional::InitWeightsXavierMethod()
+void ndBrainLayerConvolutional_2d::InitWeightsXavierMethod()
 {
 	ndBrainFloat weighVariance = ndBrainFloat(ndSqrt(ndFloat32(6.0f) / ndFloat32(GetInputSize() + GetOutputSize())));
 	InitWeights(weighVariance, ndBrainFloat(0.0f));
 }
 
-void ndBrainLayerConvolutional::InitGaussianBias(ndBrainFloat)
+void ndBrainLayerConvolutional_2d::InitGaussianBias(ndBrainFloat)
 {
 	m_bias.Set(ndBrainFloat(0.0f));
 }
 
-void ndBrainLayerConvolutional::InitGaussianWeights(ndBrainFloat variance)
+void ndBrainLayerConvolutional_2d::InitGaussianWeights(ndBrainFloat variance)
 {
 	m_kernels.InitGaussianWeights(variance);
 }
 
-void ndBrainLayerConvolutional::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
+void ndBrainLayerConvolutional_2d::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
 {
 	biasVariance = ndBrainFloat(0.0f);
 	weighVariance = ndMin(weighVariance, ndBrainFloat(0.05f));
@@ -155,64 +155,64 @@ void ndBrainLayerConvolutional::InitWeights(ndBrainFloat weighVariance, ndBrainF
 	InitGaussianWeights(weighVariance);
 }
 
-void ndBrainLayerConvolutional::Set(const ndBrainLayer& src)
+void ndBrainLayerConvolutional_2d::Set(const ndBrainLayer& src)
 {
-	const ndBrainLayerConvolutional& convSrc = (ndBrainLayerConvolutional&)src;
+	const ndBrainLayerConvolutional_2d& convSrc = (ndBrainLayerConvolutional_2d&)src;
 	m_bias.Set(convSrc.m_bias);
 	m_kernels.Set(convSrc.m_kernels);
 }
 
-void ndBrainLayerConvolutional::Clear()
+void ndBrainLayerConvolutional_2d::Clear()
 {
 	m_bias.Set(ndBrainFloat(0.0f));
 	m_kernels.Set(ndBrainFloat(0.0f));
 }
 
-void ndBrainLayerConvolutional::FlushToZero()
+void ndBrainLayerConvolutional_2d::FlushToZero()
 {
 	m_bias.FlushToZero();
 	m_kernels.FlushToZero();
 }
 
-void ndBrainLayerConvolutional::Scale(ndBrainFloat scale)
+void ndBrainLayerConvolutional_2d::Scale(ndBrainFloat scale)
 {
 	m_bias.Scale(scale);
 	m_kernels.Scale(scale);
 }
 
-void ndBrainLayerConvolutional::Add(const ndBrainLayer& src)
+void ndBrainLayerConvolutional_2d::Add(const ndBrainLayer& src)
 {
-	const ndBrainLayerConvolutional& linearSrc = (ndBrainLayerConvolutional&)src;
+	const ndBrainLayerConvolutional_2d& linearSrc = (ndBrainLayerConvolutional_2d&)src;
 	m_bias.Add(linearSrc.m_bias);
 	m_kernels.Add(linearSrc.m_kernels);
 }
 
-void ndBrainLayerConvolutional::Mul(const ndBrainLayer& src)
+void ndBrainLayerConvolutional_2d::Mul(const ndBrainLayer& src)
 {
-	const ndBrainLayerConvolutional& linearSrc = (ndBrainLayerConvolutional&)src;
+	const ndBrainLayerConvolutional_2d& linearSrc = (ndBrainLayerConvolutional_2d&)src;
 	m_bias.Mul(linearSrc.m_bias);
 	m_kernels.Mul(linearSrc.m_kernels);
 }
 
-void ndBrainLayerConvolutional::ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale)
+void ndBrainLayerConvolutional_2d::ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale)
 {
-	const ndBrainLayerConvolutional& linearSrc = (ndBrainLayerConvolutional&)src;
+	const ndBrainLayerConvolutional_2d& linearSrc = (ndBrainLayerConvolutional_2d&)src;
 	m_bias.ScaleAdd(linearSrc.m_bias, scale);
 	m_kernels.ScaleAdd(linearSrc.m_kernels, scale);
 }
 
-void ndBrainLayerConvolutional::Blend(const ndBrainLayer& src, ndBrainFloat blend)
+void ndBrainLayerConvolutional_2d::Blend(const ndBrainLayer& src, ndBrainFloat blend)
 {
-	//const ndBrainLayerConvolutional& linearSrc = (ndBrainLayerConvolutional&)src;
+	//const ndBrainLayerConvolutional_2d& linearSrc = (ndBrainLayerConvolutional_2d&)src;
 	//m_bias.Blend(linearSrc.m_bias, blend);
 	//m_weights.Blend(linearSrc.m_weights, blend);
 	ndAssert(0);
 }
 
-void ndBrainLayerConvolutional::AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon)
+void ndBrainLayerConvolutional_2d::AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon)
 {
-	const ndBrainLayerConvolutional& linear_U = (ndBrainLayerConvolutional&)u;
-	const ndBrainLayerConvolutional& linear_V = (ndBrainLayerConvolutional&)v;
+	const ndBrainLayerConvolutional_2d& linear_U = (ndBrainLayerConvolutional_2d&)u;
+	const ndBrainLayerConvolutional_2d& linear_V = (ndBrainLayerConvolutional_2d&)v;
 
 	const ndBrainVector& bias_U = linear_U.m_bias;
 	const ndBrainVector& bias_V = linear_V.m_bias;
@@ -231,7 +231,7 @@ void ndBrainLayerConvolutional::AdamUpdate(const ndBrainLayer& u, const ndBrainL
 	}
 }
 
-void ndBrainLayerConvolutional::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == GetInputSize());
 
@@ -288,12 +288,12 @@ void ndBrainLayerConvolutional::MakePrediction(const ndBrainVector& input, ndBra
 	}
 }
 
-void ndBrainLayerConvolutional::CalculateParamGradients(
+void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 	const ndBrainVector& input, const ndBrainVector&,
 	const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const
 {
 	ndAssert(!strcmp(GetLabelId(), gradientOut->GetLabelId()));
-	ndBrainLayerConvolutional* const gradients = (ndBrainLayerConvolutional*)gradientOut;
+	ndBrainLayerConvolutional_2d* const gradients = (ndBrainLayerConvolutional_2d*)gradientOut;
 
 	ndAssert(gradients->m_bias.GetCount() == m_outputLayers);
 
@@ -440,7 +440,7 @@ void ndBrainLayerConvolutional::CalculateParamGradients(
 	}
 }
 
-void ndBrainLayerConvolutional::Save(const ndBrainSave* const loadSave) const
+void ndBrainLayerConvolutional_2d::Save(const ndBrainSave* const loadSave) const
 {
 	char buffer[1024];
 	auto Save = [this, &buffer, &loadSave](const char* const fmt, ...)
@@ -486,7 +486,7 @@ void ndBrainLayerConvolutional::Save(const ndBrainSave* const loadSave) const
 	}
 }
 
-ndBrainLayer* ndBrainLayerConvolutional::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerConvolutional_2d::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
 	loadSave->ReadString(buffer);
@@ -506,7 +506,7 @@ ndBrainLayer* ndBrainLayerConvolutional::Load(const ndBrainLoad* const loadSave)
 	loadSave->ReadString(buffer);
 	ndInt32 ouputLayers = loadSave->ReadInt();
 
-	ndBrainLayerConvolutional* const layer = new ndBrainLayerConvolutional(inputWidth, inputHeight, inputLayers, kernelSize, ouputLayers);
+	ndBrainLayerConvolutional_2d* const layer = new ndBrainLayerConvolutional_2d(inputWidth, inputHeight, inputLayers, kernelSize, ouputLayers);
 	
 	loadSave->ReadString(buffer);
 	for (ndInt32 i = 0; i < ouputLayers; ++i)

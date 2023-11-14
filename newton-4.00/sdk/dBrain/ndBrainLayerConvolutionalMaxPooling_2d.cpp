@@ -21,9 +21,9 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainLayerConvolutionalMaxPooling.h"
+#include "ndBrainLayerConvolutionalMaxPooling_2d.h"
 
-ndBrainLayerConvolutionalMaxPooling::ndBrainLayerConvolutionalMaxPooling(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputLayers)
+ndBrainLayerConvolutionalMaxPooling_2d::ndBrainLayerConvolutionalMaxPooling_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputLayers)
 	:ndBrainLayerActivation(((inputWidth + 1) / 2) * ((inputHeight + 1) / 2) * inputLayers)
 	,m_width(inputWidth)
 	,m_height(inputHeight)
@@ -33,7 +33,7 @@ ndBrainLayerConvolutionalMaxPooling::ndBrainLayerConvolutionalMaxPooling(ndInt32
 	m_index.SetCount(m_neurons);
 }
 
-ndBrainLayerConvolutionalMaxPooling::ndBrainLayerConvolutionalMaxPooling(const ndBrainLayerConvolutionalMaxPooling& src)
+ndBrainLayerConvolutionalMaxPooling_2d::ndBrainLayerConvolutionalMaxPooling_2d(const ndBrainLayerConvolutionalMaxPooling_2d& src)
 	:ndBrainLayerActivation(src)
 	,m_width(src.m_width)
 	,m_height(src.m_height)
@@ -42,52 +42,52 @@ ndBrainLayerConvolutionalMaxPooling::ndBrainLayerConvolutionalMaxPooling(const n
 {
 }
 
-ndInt32 ndBrainLayerConvolutionalMaxPooling::GetInputWidth() const
+ndInt32 ndBrainLayerConvolutionalMaxPooling_2d::GetInputWidth() const
 {
 	return m_width;
 }
 
-ndInt32 ndBrainLayerConvolutionalMaxPooling::GetInputHeight() const
+ndInt32 ndBrainLayerConvolutionalMaxPooling_2d::GetInputHeight() const
 {
 	return m_height;
 }
 
-ndInt32 ndBrainLayerConvolutionalMaxPooling::GetInputChannels() const
+ndInt32 ndBrainLayerConvolutionalMaxPooling_2d::GetInputChannels() const
 {
 	return m_channels;
 }
 
-ndInt32 ndBrainLayerConvolutionalMaxPooling::GetOutputWidth() const
+ndInt32 ndBrainLayerConvolutionalMaxPooling_2d::GetOutputWidth() const
 {
 	return (m_width + 1) / 2;
 }
 
-ndInt32 ndBrainLayerConvolutionalMaxPooling::GetOutputHeight() const
+ndInt32 ndBrainLayerConvolutionalMaxPooling_2d::GetOutputHeight() const
 {
 	return (m_height + 1) / 2;
 }
 
-ndInt32 ndBrainLayerConvolutionalMaxPooling::GetOutputChannels() const
+ndInt32 ndBrainLayerConvolutionalMaxPooling_2d::GetOutputChannels() const
 {
 	return m_channels;
 }
 
-ndInt32 ndBrainLayerConvolutionalMaxPooling::GetInputSize() const
+ndInt32 ndBrainLayerConvolutionalMaxPooling_2d::GetInputSize() const
 {
 	return m_width * m_height * m_channels;
 }
 
-ndBrainLayer* ndBrainLayerConvolutionalMaxPooling::Clone() const
+ndBrainLayer* ndBrainLayerConvolutionalMaxPooling_2d::Clone() const
 {
-	return new ndBrainLayerConvolutionalMaxPooling(*this);
+	return new ndBrainLayerConvolutionalMaxPooling_2d(*this);
 }
 
-const char* ndBrainLayerConvolutionalMaxPooling::GetLabelId() const
+const char* ndBrainLayerConvolutionalMaxPooling_2d::GetLabelId() const
 {
-	return "ndBrainLayerConvolutionalMaxPooling";
+	return "ndBrainLayerConvolutionalMaxPooling_2d";
 }
 
-void ndBrainLayerConvolutionalMaxPooling::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerConvolutionalMaxPooling_2d::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndAssert(m_index.GetCount() == outputDerivative.GetCount());
 
@@ -99,7 +99,7 @@ void ndBrainLayerConvolutionalMaxPooling::InputDerivative(const ndBrainVector&, 
 	}
 }
 
-void ndBrainLayerConvolutionalMaxPooling::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+void ndBrainLayerConvolutionalMaxPooling_2d::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == GetInputSize());
 	ndAssert(output.GetCount() == GetOutputSize());
@@ -193,7 +193,7 @@ void ndBrainLayerConvolutionalMaxPooling::MakePrediction(const ndBrainVector& in
 	}
 }
 
-void ndBrainLayerConvolutionalMaxPooling::Save(const ndBrainSave* const loadSave) const
+void ndBrainLayerConvolutionalMaxPooling_2d::Save(const ndBrainSave* const loadSave) const
 {
 	char buffer[1024];
 
@@ -207,7 +207,7 @@ void ndBrainLayerConvolutionalMaxPooling::Save(const ndBrainSave* const loadSave
 	loadSave->WriteData(buffer);
 }
 
-ndBrainLayer* ndBrainLayerConvolutionalMaxPooling::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerConvolutionalMaxPooling_2d::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
 	loadSave->ReadString(buffer);
@@ -221,7 +221,7 @@ ndBrainLayer* ndBrainLayerConvolutionalMaxPooling::Load(const ndBrainLoad* const
 	loadSave->ReadString(buffer);
 	ndInt32 inputLayers = loadSave->ReadInt();
 
-	ndBrainLayerConvolutionalMaxPooling* const layer = new ndBrainLayerConvolutionalMaxPooling(inputWidth, inputHeight, inputLayers);
+	ndBrainLayerConvolutionalMaxPooling_2d* const layer = new ndBrainLayerConvolutionalMaxPooling_2d(inputWidth, inputHeight, inputLayers);
 	loadSave->ReadString(buffer);
 	return layer;
 }

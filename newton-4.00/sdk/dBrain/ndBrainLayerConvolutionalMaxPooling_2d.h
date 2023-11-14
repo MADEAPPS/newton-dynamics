@@ -19,17 +19,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_CONVULUTIONAL_MAX_POOLING_H__
-#define _ND_BRAIN_LAYER_CONVULUTIONAL_MAX_POOLING_H__
+#ifndef _ND_BRAIN_LAYER_CONVULUTIONAL_MAX_POOLING_2D_H__
+#define _ND_BRAIN_LAYER_CONVULUTIONAL_MAX_POOLING_2D_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
-class ndBrainLayerConvolutionalMaxPooling : public ndBrainLayerActivation
+class ndBrainLayerConvolutionalMaxPooling_2d : public ndBrainLayerActivation
 {
 	public:
-	ndBrainLayerConvolutionalMaxPooling(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth);
-	ndBrainLayerConvolutionalMaxPooling(const ndBrainLayerConvolutionalMaxPooling& src);
+	ndBrainLayerConvolutionalMaxPooling_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth);
+	ndBrainLayerConvolutionalMaxPooling_2d(const ndBrainLayerConvolutionalMaxPooling_2d& src);
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
