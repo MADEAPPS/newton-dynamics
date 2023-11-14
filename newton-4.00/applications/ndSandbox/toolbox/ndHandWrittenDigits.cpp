@@ -252,11 +252,11 @@ static void MnistTrainingSet()
 			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
 
 			// so far best training result on the mnist data set
-			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f)); // test data score fully(96.76%) conv(96.449997%)
-			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f)); // test data score fully(98.02%)  conv(97.529999%)
-			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f)); // test data score fully(98.08%)  conv(97.760002%)
-			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f)); // test data score fully(98.18%)  conv(97.339996%)
-			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f)); // test data score fully(98.06%)  conv(97.339996%)
+			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f)); // test data score fully(96.76%) conv(97.45%)
+			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f)); // test data score fully(98.02%)  conv(97.53%)
+			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f)); // test data score fully(98.08%)  conv(97.76%)
+			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f)); // test data score fully(98.18%)  conv(97.34%)
+			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f)); // test data score fully(98.06%)  conv(97.34%)
 
 			//batches = 1;
 			ndArray<ndUnsigned32> shuffleBuffer;
