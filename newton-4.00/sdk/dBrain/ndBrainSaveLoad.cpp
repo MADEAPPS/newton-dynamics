@@ -23,6 +23,7 @@
 #include "ndBrain.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerLinear.h"
+#include "ndBrainLayerDropOut.h"
 #include "ndBrainLayerReluActivation.h"
 #include "ndBrainLayerTanhActivation.h"
 #include "ndBrainLayerConvolutional_2d.h"
@@ -103,6 +104,10 @@ ndBrain* ndBrainLoad::Load() const
 		if (!strcmp(layerType, "ndBrainLayerLinear"))
 		{
 			layer = ndBrainLayerLinear::Load(this);
+		}
+		if (!strcmp(layerType, "ndBrainLayerDropOut"))
+		{
+			layer = ndBrainLayerDropOut::Load(this);
 		}
 		else if (!strcmp(layerType, "ndBrainLayerReluActivation"))
 		{

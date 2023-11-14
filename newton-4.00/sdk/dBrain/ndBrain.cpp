@@ -226,7 +226,8 @@ void ndBrain::CalculateInputGradient___(const ndBrainVector& input, ndBrainVecto
 	inputGradients.Set(gradientOut);
 }
 
-void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients, ndBrainVector& workingBuffer)
+//void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients, ndBrainVector& workingBuffer)
+void ndBrain::CalculateInputGradient(const ndBrainVector&, ndBrainVector&, ndBrainVector&)
 {
-
+	ndAssert(0);
 }
