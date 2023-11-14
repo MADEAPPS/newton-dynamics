@@ -160,6 +160,7 @@ static void MnistTrainingSet()
 		SupervisedTrainer(ndBrain* const brain)
 			:ndBrainThreadPool()
 			,m_brain(*brain)
+			,m_prioritySamples()
 			,m_learnRate(ndReal(1.0e-4f))
 			,m_bashBufferSize(BASH_BUFFER_SIZE)
 		{
@@ -252,19 +253,21 @@ static void MnistTrainingSet()
 			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
 
 			// so far best training result on the mnist data set
-			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f)); // test data score fully(96.76%) conv(97.45%)
-			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f)); // test data score fully(98.02%)  conv(97.53%)
-			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f)); // test data score fully(98.08%)  conv(97.76%)
-			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f)); // test data score fully(98.18%)  conv(97.34%)
-			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f)); // test data score fully(98.06%)  conv(97.34%)
+			//optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(96.76%)  conv(97.45%)
+			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score fully(98.02%)  conv(97.53%)
+			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score fully(98.08%)  conv(97.76%)
+			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score fully(98.18%)  conv(97.34%)
+			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// test data score fully(98.06%)  conv(97.34%)
 
 			//batches = 1;
 			ndArray<ndUnsigned32> shuffleBuffer;
+			ndFixSizeArray<ndUnsigned32, 1024 * 2> priorityList;
+
 			for (ndInt32 i = 0; i < trainingDigits->GetCount(); ++i)
 			{
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
-			ndFixSizeArray<ndUnsigned32, 1024 * 2> priorityList;
+	
 			for (ndInt32 i = 0; i < priorityList.GetCapacity(); ++i)
 			{
 				priorityList.PushBack(ndRandInt() % trainingDigits->GetCount());
