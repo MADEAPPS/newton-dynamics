@@ -67,6 +67,10 @@ bool ndBrainLayer::HasParameters() const
 	return false;
 }
 
+void ndBrainLayer::UpdateDropOut()
+{
+}
+
 void ndBrainLayer::InitWeights(ndBrainFloat, ndBrainFloat)
 {
 	ndAssert(0);
@@ -76,18 +80,6 @@ void ndBrainLayer::InitWeightsXavierMethod()
 {
 	ndAssert(0);
 }
-
-//ndBrainVector* ndBrainLayer::GetBias()
-//{
-//	ndAssert(0);
-//	return nullptr;
-//}
-//
-//ndBrainMatrix* ndBrainLayer::GetWeights()
-//{
-//	ndAssert(0);
-//	return nullptr;
-//}
 
 void ndBrainLayer::Clear()
 {

@@ -89,6 +89,16 @@ ndBrainLayer* ndBrain::AddLayer(ndBrainLayer* const layer)
 	return layer;
 }
 
+void ndBrain::UpdateDropOut()
+{
+	ndAssert(0);
+	ndArray<ndBrainLayer*>& layers = *this;
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+		layers[i]->UpdateDropOut();
+	}
+}
+
 void ndBrain::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
 {
 	ndArray<ndBrainLayer*>& layers = *this;

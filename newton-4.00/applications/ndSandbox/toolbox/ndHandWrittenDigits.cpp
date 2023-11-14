@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-#define D_USE_CONVOLUTIONAL_LAYERS
+//#define D_USE_CONVOLUTIONAL_LAYERS
 
 static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 {
@@ -434,6 +434,7 @@ static void MnistTrainingSet()
 		
 		ndInt32 neuronsPerLayers = 64;
 		layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), neuronsPerLayers));
+		layers.PushBack(new ndBrainLayerDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
 		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));

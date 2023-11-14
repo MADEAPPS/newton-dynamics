@@ -33,6 +33,7 @@ class ndBrainLayerDropOut : public ndBrainLayerActivation
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
+	void UpdateDropOut();
 	const char* GetLabelId() const;
 	void Save(const ndBrainSave* const loadSave) const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;

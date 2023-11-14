@@ -53,6 +53,7 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
 	virtual void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
 
+	virtual void UpdateDropOut();
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 

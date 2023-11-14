@@ -42,6 +42,7 @@ class ndBrain: public ndArray<ndBrainLayer*>
 
 	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
 
+	void UpdateDropOut();
 	void InitWeightsXavierMethod();
 	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 

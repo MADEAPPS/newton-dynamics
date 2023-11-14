@@ -37,7 +37,6 @@ ndBrainLayerDropOut::ndBrainLayerDropOut(const ndBrainLayerDropOut& src)
 	,m_droppedNeuron(src.m_droppedNeuron)
 	,m_dropFraction(src.m_dropFraction)
 {
-	ndAssert(0);
 }
 
 ndBrainLayer* ndBrainLayerDropOut::Clone() const
@@ -50,18 +49,20 @@ const char* ndBrainLayerDropOut::GetLabelId() const
 	return "ndBrainLayerDropOut";
 }
 
-void ndBrainLayerDropOut::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerDropOut::UpdateDropOut()
 {
 	ndAssert(0);
-	ndAssert(outputDerivative.GetCount() == outputDerivative.GetCount());
+}
 
+void ndBrainLayerDropOut::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+{
+	ndAssert(outputDerivative.GetCount() == outputDerivative.GetCount());
 	inputDerivative.Set(m_droppedNeuron);
 	inputDerivative.Mul(outputDerivative);
 }
 
 void ndBrainLayerDropOut::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-	ndAssert(0);
 	ndAssert(input.GetCount() == output.GetCount());
 	output.Set(input);
 	output.Mul(m_droppedNeuron);
