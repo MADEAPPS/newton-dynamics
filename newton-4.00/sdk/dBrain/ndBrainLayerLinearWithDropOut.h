@@ -28,7 +28,7 @@
 class ndBrainLayerLinearWithDropOut : public ndBrainLayerLinear
 {
 	public: 
-	ndBrainLayerLinearWithDropOut(ndInt32 inputs, ndInt32 outputs, ndBrainFloat dropOutFactor);
+	ndBrainLayerLinearWithDropOut(ndInt32 inputs, ndInt32 outputs, ndBrainFloat dropOutFactor = ndBrainFloat(0.9f));
 	ndBrainLayerLinearWithDropOut(const ndBrainLayerLinearWithDropOut& src);
 	virtual ~ndBrainLayerLinearWithDropOut();
 	virtual ndBrainLayer* Clone() const;
@@ -44,6 +44,9 @@ class ndBrainLayerLinearWithDropOut : public ndBrainLayerLinear
 
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
+
+	ndBrainVector m_dropout;
+	ndBrainFloat m_dropoutFactor;
 };
 
 #endif 

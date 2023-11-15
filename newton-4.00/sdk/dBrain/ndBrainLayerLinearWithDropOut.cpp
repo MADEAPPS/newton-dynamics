@@ -26,12 +26,19 @@
 
 ndBrainLayerLinearWithDropOut::ndBrainLayerLinearWithDropOut(ndInt32 inputs, ndInt32 outputs, ndBrainFloat dropOutFactor)
 	:ndBrainLayerLinear(inputs, outputs)
+	,m_dropout()
+	,m_dropoutFactor(dropOutFactor)
 {
-	ndAssert(0);
+	ndAssert(dropOutFactor >= ndBrainFloat(0.5f));
+	ndAssert(dropOutFactor <= ndBrainFloat(1.0f));
+	m_dropout.SetCount(outputs);
+	UpdateDropOut();
 }
 
 ndBrainLayerLinearWithDropOut::ndBrainLayerLinearWithDropOut(const ndBrainLayerLinearWithDropOut& src)
 	:ndBrainLayerLinear(src)
+	,m_dropout(src.m_dropout)
+	,m_dropoutFactor(src.m_dropoutFactor)
 {
 }
 
@@ -124,6 +131,17 @@ ndBrainLayer* ndBrainLayerLinearWithDropOut::Load(const ndBrainLoad* const loadS
 void ndBrainLayerLinearWithDropOut::UpdateDropOut()
 {
 	ndAssert(0);
+	ndInt32 activeCount = 0;
+	for (ndInt32 i = m_dropout.GetCount(); i >= 0; --i)
+	{
+		ndInt32 active = (ndRand() > m_dropoutFactor);
+		m_dropout[i] = active ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		activeCount += active;
+	}
+
+	ndAssert((m_dropout.GetCount() - activeCount) > 0);
+	ndBrainFloat scale = ndBrainFloat (m_dropout.GetCount()) / ndBrainFloat (m_dropout.GetCount() - activeCount);
+	m_dropout.Scale(scale);
 }
 
 void ndBrainLayerLinearWithDropOut::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
