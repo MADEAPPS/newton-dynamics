@@ -51,6 +51,7 @@
 #include <ndBrainLayerTanhActivation.h>
 #include <ndBrainLayerConvolutional_2d.h>
 #include <ndBrainLossLeastSquaredError.h>
+#include <ndBrainLayerLinearWithDropOut.h>
 #include <ndBrainLayerSigmoidActivation.h>
 #include <ndBrainLayerSoftmaxActivation.h>
 #include <ndBrainLayerLeakyReluActivation.h>

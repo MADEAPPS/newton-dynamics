@@ -42,11 +42,11 @@ class ndBrain: public ndArray<ndBrainLayer*>
 
 	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
 
-	void UpdateDropOut();
+	//void UpdateDropOut();
 	void InitWeightsXavierMethod();
 	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 
-	void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
+	//void MakePrediction(const ndBrainVector& input, ndBrainVector& output);
 	void CalculateInputGradient___(const ndBrainVector& input, ndBrainVector& inputGradients);
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer);

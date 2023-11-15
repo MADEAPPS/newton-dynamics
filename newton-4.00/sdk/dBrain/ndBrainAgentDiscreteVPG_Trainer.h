@@ -425,17 +425,18 @@ ndBrainFloat ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::SelectAction
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Step()
 {
-	ndTrajectoryStep trajectoryStep;
-	ndBrainFixSizeVector<actionDim> probability;
-
-	GetObservation(&trajectoryStep.m_observation[0]);
-	m_actor.MakePrediction(trajectoryStep.m_observation, probability);
-	trajectoryStep.m_action = SelectAction(probability);
-	ApplyActions(&trajectoryStep.m_action);
-	trajectoryStep.m_reward = GetReward();
-
-	ndAssert(m_trajectory.GetCount() < m_trajectory.GetCapacity());
-	m_trajectory.PushBack(trajectoryStep);
+	ndAssert(0);
+	//ndTrajectoryStep trajectoryStep;
+	//ndBrainFixSizeVector<actionDim> probability;
+	//
+	//GetObservation(&trajectoryStep.m_observation[0]);
+	//m_actor.MakePrediction(trajectoryStep.m_observation, probability);
+	//trajectoryStep.m_action = SelectAction(probability);
+	//ApplyActions(&trajectoryStep.m_action);
+	//trajectoryStep.m_reward = GetReward();
+	//
+	//ndAssert(m_trajectory.GetCount() < m_trajectory.GetCapacity());
+	//m_trajectory.PushBack(trajectoryStep);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

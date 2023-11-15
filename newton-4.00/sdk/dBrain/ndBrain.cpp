@@ -89,16 +89,6 @@ ndBrainLayer* ndBrain::AddLayer(ndBrainLayer* const layer)
 	return layer;
 }
 
-void ndBrain::UpdateDropOut()
-{
-	ndAssert(0);
-	ndArray<ndBrainLayer*>& layers = *this;
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
-	{
-		layers[i]->UpdateDropOut();
-	}
-}
-
 void ndBrain::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
 {
 	ndArray<ndBrainLayer*>& layers = *this;
@@ -136,31 +126,31 @@ void ndBrain::InitWeightsXavierMethod()
 	}
 }
 
-void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
-{
-	ndAssert(0);
-	const ndArray<ndBrainLayer*>& layers = *this;
-	ndInt32 maxSize = layers[0]->GetInputSize();
-	for (ndInt32 i = 0; i < GetCount(); ++i)
-	{
-		maxSize = ndMax(maxSize, layers[i]->GetOutputSize());
-	}
-
-	ndBrainFloat* const memBuffer = ndAlloca(ndBrainFloat, maxSize * 2 + 256);
-	ndBrainMemVector in(memBuffer, input.GetCount());
-	ndBrainMemVector out(memBuffer + maxSize + 128, input.GetCount());
-
-	in.Set(input);
-	for (ndInt32 i = 0; i < GetCount(); ++i)
-	{
-		out.SetSize(layers[i]->GetOutputSize());
-		layers[i]->MakePrediction(in, out);
-		in.Swap(out);
-	}
-
-	ndAssert(in.GetCount() == output.GetCount());
-	output.Set(in);
-}
+//void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
+//{
+//	ndAssert(0);
+//	const ndArray<ndBrainLayer*>& layers = *this;
+//	ndInt32 maxSize = layers[0]->GetInputSize();
+//	for (ndInt32 i = 0; i < GetCount(); ++i)
+//	{
+//		maxSize = ndMax(maxSize, layers[i]->GetOutputSize());
+//	}
+//
+//	ndBrainFloat* const memBuffer = ndAlloca(ndBrainFloat, maxSize * 2 + 256);
+//	ndBrainMemVector in(memBuffer, input.GetCount());
+//	ndBrainMemVector out(memBuffer + maxSize + 128, input.GetCount());
+//
+//	in.Set(input);
+//	for (ndInt32 i = 0; i < GetCount(); ++i)
+//	{
+//		out.SetSize(layers[i]->GetOutputSize());
+//		layers[i]->MakePrediction(in, out);
+//		in.Swap(out);
+//	}
+//
+//	ndAssert(in.GetCount() == output.GetCount());
+//	output.Set(in);
+//}
 
 void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer)
 {

@@ -414,16 +414,17 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrain
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Step()
 {
-	ndTrajectoryStep trajectoryStep;
-
-	GetObservation(&trajectoryStep.m_observation[0]);
-	m_actor.MakePrediction(trajectoryStep.m_observation, trajectoryStep.m_actions);
-	SelectAction(trajectoryStep.m_actions);
-	ApplyActions(&trajectoryStep.m_actions[0]);
-	trajectoryStep.m_reward = GetReward();
-
-	ndAssert(m_trajectory.GetCount() < m_trajectory.GetCapacity());
-	m_trajectory.PushBack(trajectoryStep);
+	ndAssert(0);
+	//ndTrajectoryStep trajectoryStep;
+	//
+	//GetObservation(&trajectoryStep.m_observation[0]);
+	//m_actor.MakePrediction(trajectoryStep.m_observation, trajectoryStep.m_actions);
+	//SelectAction(trajectoryStep.m_actions);
+	//ApplyActions(&trajectoryStep.m_actions[0]);
+	//trajectoryStep.m_reward = GetReward();
+	//
+	//ndAssert(m_trajectory.GetCount() < m_trajectory.GetCapacity());
+	//m_trajectory.PushBack(trajectoryStep);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

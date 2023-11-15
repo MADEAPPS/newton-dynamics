@@ -19,34 +19,22 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_LINEAR_H__
-#define _ND_BRAIN_LAYER_LINEAR_H__
+#ifndef _ND_BRAIN_LAYER_LINEAR_WITH_DROP_OUT_H__
+#define _ND_BRAIN_LAYER_LINEAR_WITH_DROP_OUT_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainLayer.h"
-#include "ndBrainVector.h"
-#include "ndBrainMatrix.h"
+#include "ndBrainLayerLinear.h"
 
-class ndBrainLayerLinear : public ndBrainLayer
+class ndBrainLayerLinearWithDropOut : public ndBrainLayerLinear
 {
 	public: 
-	ndBrainLayerLinear(ndInt32 inputs, ndInt32 outputs);
-	ndBrainLayerLinear(const ndBrainLayerLinear& src);
-	virtual ~ndBrainLayerLinear();
+	ndBrainLayerLinearWithDropOut(ndInt32 inputs, ndInt32 outputs, ndBrainFloat dropOutFactor);
+	ndBrainLayerLinearWithDropOut(const ndBrainLayerLinearWithDropOut& src);
+	virtual ~ndBrainLayerLinearWithDropOut();
 	virtual ndBrainLayer* Clone() const;
 
-	virtual bool HasParameters() const;
-	virtual ndInt32 GetOutputSize() const;
-	virtual ndInt32 GetInputSize() const;
+	virtual void UpdateDropOut();
 	virtual const char* GetLabelId() const;
-	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
-
-	virtual ndBrainVector* GetBias();
-	virtual ndBrainMatrix* GetWeights();
-	
-	virtual void InitWeightsXavierMethod();
-	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
-
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 
@@ -56,25 +44,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
-	
-	void Clear();
-	void FlushToZero();
-	void Scale(ndBrainFloat scale);
-	void Set(const ndBrainLayer& src);
-	void Add(const ndBrainLayer& src);
-	void Mul(const ndBrainLayer& src);
-	void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
-
-	protected:
-	void InitGaussianBias(ndBrainFloat variance);
-	void InitGaussianWeights(ndBrainFloat variance);
-	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
-
-	ndBrainVector m_bias;
-	ndBrainMatrix m_weights;
 };
-
-
 
 #endif 
 

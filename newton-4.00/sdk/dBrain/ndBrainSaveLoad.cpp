@@ -28,6 +28,7 @@
 #include "ndBrainLayerConvolutional_2d.h"
 #include "ndBrainLayerSoftmaxActivation.h"
 #include "ndBrainLayerSigmoidActivation.h"
+#include "ndBrainLayerLinearWithDropOut.h"
 #include "ndBrainLayerLeakyReluActivation.h"
 #include "ndBrainLayerConvolutionalMaxPooling_2d.h"
 #include "ndBrainLayerCategoricalSoftmaxActivation.h"
