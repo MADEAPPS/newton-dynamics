@@ -231,6 +231,11 @@ void ndBrainLayerConvolutional_2d::AdamUpdate(const ndBrainLayer& u, const ndBra
 	}
 }
 
+void ndBrainLayerConvolutional_2d::UpdateDropOut()
+{
+	ndAssert(0);
+}
+
 void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == GetInputSize());

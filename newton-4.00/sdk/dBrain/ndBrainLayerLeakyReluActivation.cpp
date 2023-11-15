@@ -52,7 +52,6 @@ ndBrainLayer* ndBrainLayerLeakyReluActivation::Load(const ndBrainLoad* const loa
 	char buffer[1024];
 	loadSave->ReadString(buffer);
 
-	ndAssert(0);
 	loadSave->ReadString(buffer);
 	ndInt32 inputs = loadSave->ReadInt();
 

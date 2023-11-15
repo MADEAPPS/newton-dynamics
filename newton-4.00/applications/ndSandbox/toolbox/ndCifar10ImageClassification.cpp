@@ -387,7 +387,8 @@ static void Cifar10TrainingSet()
 		const ndBrainLayerConvolutionalMaxPooling_2d* pooling;
 	
 		#if 0
-			#define ACTIVATION_TYPE	ndBrainLayerReluActivation
+			//#define ACTIVATION_TYPE	ndBrainLayerReluActivation
+			#define DIGIT_ACTIVATION_TYPE ndBrainLayerLeakyReluActivation
 		#else
 			#define ACTIVATION_TYPE	ndBrainLayerTanhActivation
 		#endif

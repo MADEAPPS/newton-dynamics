@@ -45,6 +45,7 @@ class ndBrainLayerConvolutional_2d : public ndBrainLayer
 	virtual const char* GetLabelId() const;
 	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
 	
+	virtual void UpdateDropOut();
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);

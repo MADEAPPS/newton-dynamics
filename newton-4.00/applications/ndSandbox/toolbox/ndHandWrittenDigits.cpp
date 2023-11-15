@@ -273,6 +273,7 @@ static void MnistTrainingSet()
 			}
 
 			for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
+			//for (ndInt32 epoch = 0; epoch < 1; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -410,37 +411,31 @@ static void MnistTrainingSet()
 
 			layers.PushBack(new ndBrainLayerConvolutional_2d(width, height, 1, 3, 16));
 			conv = (ndBrainLayerConvolutional_2d*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ndBrainLayerDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
 			layers.PushBack(new ndBrainLayerConvolutionalMaxPooling_2d(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerConvolutionalMaxPooling_2d*)(layers[layers.GetCount() - 1]);
 
 			layers.PushBack(new ndBrainLayerConvolutional_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
 			conv = (ndBrainLayerConvolutional_2d*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ndBrainLayerDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
 			layers.PushBack(new ndBrainLayerConvolutionalMaxPooling_2d(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerConvolutionalMaxPooling_2d*)(layers[layers.GetCount() - 1]);
 
 			layers.PushBack(new ndBrainLayerConvolutional_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
-			layers.PushBack(new ndBrainLayerDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
 			conv = (ndBrainLayerConvolutional_2d*)(layers[layers.GetCount() - 1]);
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
 
 		#else
 
 			layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), neuronsPerLayers));
-			layers.PushBack(new ndBrainLayerDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
-			layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		#endif
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		layers.PushBack(new ndBrainLayerDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
 		layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		layers.PushBack(new ndBrainLayerDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
 		layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
