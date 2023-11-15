@@ -44,7 +44,6 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual ndBrainVector* GetBias();
 	virtual ndBrainMatrix* GetWeights();
 	
-	virtual void UpdateDropOut();
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 
@@ -73,8 +72,6 @@ class ndBrainLayerLinear : public ndBrainLayer
 
 	ndBrainVector m_bias;
 	ndBrainMatrix m_weights;
-	ndBrainVector m_dropOut;
-	ndBrainFloat m_dropOutProbability;
 };
 
 

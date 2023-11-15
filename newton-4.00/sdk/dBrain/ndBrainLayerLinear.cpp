@@ -28,20 +28,14 @@ ndBrainLayerLinear::ndBrainLayerLinear(ndInt32 inputs, ndInt32 outputs)
 	:ndBrainLayer()
 	,m_bias()
 	,m_weights(outputs, inputs)
-	,m_dropOut()
-	,m_dropOutProbability(ndBrainFloat(1.0f))
 {
-	m_dropOut.SetCount(outputs);
 	m_bias.SetCount(outputs);
-	m_dropOut.Set(ndBrainFloat(1.0f));
 }
 
 ndBrainLayerLinear::ndBrainLayerLinear(const ndBrainLayerLinear& src)
 	:ndBrainLayer(src)
 	,m_bias(src.m_bias)
 	,m_weights(src.m_weights)
-	,m_dropOut(src.m_dropOut)
-	,m_dropOutProbability(src.m_dropOutProbability)
 {
 }
 
@@ -257,11 +251,6 @@ ndBrainLayer* ndBrainLayerLinear::Load(const ndBrainLoad* const loadSave)
 
 	loadSave->ReadString(buffer);
 	return layer;
-}
-
-void ndBrainLayerLinear::UpdateDropOut()
-{
-	ndAssert(0);
 }
 
 void ndBrainLayerLinear::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
