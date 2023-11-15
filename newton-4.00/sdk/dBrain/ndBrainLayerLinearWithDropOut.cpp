@@ -28,17 +28,23 @@ ndBrainLayerLinearWithDropOut::ndBrainLayerLinearWithDropOut(ndInt32 inputs, ndI
 	:ndBrainLayerLinear(inputs, outputs)
 	,m_dropout()
 	,m_dropoutFactor(dropOutFactor)
+	,m_dropoutScale(ndBrainFloat(1.0f))
+	,m_droutOutEnable(true)
 {
 	ndAssert(dropOutFactor >= ndBrainFloat(0.5f));
 	ndAssert(dropOutFactor <= ndBrainFloat(1.0f));
 	m_dropout.SetCount(outputs);
 	UpdateDropOut();
+
+m_droutOutEnable = false;
 }
 
 ndBrainLayerLinearWithDropOut::ndBrainLayerLinearWithDropOut(const ndBrainLayerLinearWithDropOut& src)
 	:ndBrainLayerLinear(src)
 	,m_dropout(src.m_dropout)
 	,m_dropoutFactor(src.m_dropoutFactor)
+	,m_dropoutScale(src.m_dropoutScale)
+	,m_droutOutEnable(src.m_droutOutEnable)
 {
 }
 
@@ -130,25 +136,27 @@ ndBrainLayer* ndBrainLayerLinearWithDropOut::Load(const ndBrainLoad* const loadS
 
 void ndBrainLayerLinearWithDropOut::UpdateDropOut()
 {
-	ndAssert(0);
 	ndInt32 activeCount = 0;
-	for (ndInt32 i = m_dropout.GetCount(); i >= 0; --i)
+	for (ndInt32 i = m_dropout.GetCount()-1; i >= 0; --i)
 	{
-		ndInt32 active = (ndRand() > m_dropoutFactor);
+		ndInt32 active = (ndRand() <= m_dropoutFactor);
 		m_dropout[i] = active ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
 		activeCount += active;
 	}
 
-	ndAssert((m_dropout.GetCount() - activeCount) > 0);
-	ndBrainFloat scale = ndBrainFloat (m_dropout.GetCount()) / ndBrainFloat (m_dropout.GetCount() - activeCount);
-	m_dropout.Scale(scale);
+	ndAssert(activeCount > 0);
+	m_dropoutScale = ndBrainFloat (m_dropout.GetCount()) / ndBrainFloat (activeCount);
+	m_dropout.Scale(m_dropoutScale);
 }
 
 void ndBrainLayerLinearWithDropOut::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-	ndAssert(0);
-	m_weights.Mul(input, output);
-	output.Add(m_bias);
+	ndAssert(output.GetCount() == m_dropout.GetCount());
+	ndBrainLayerLinear::MakePrediction(input, output);
+	if (m_droutOutEnable)
+	{
+		output.Mul(m_dropout);
+	}
 }
 
 void ndBrainLayerLinearWithDropOut::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
@@ -161,17 +169,14 @@ void ndBrainLayerLinearWithDropOut::CalculateParamGradients(
 	const ndBrainVector& input, const ndBrainVector& output,
 	const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const
 {
-	ndAssert(0);
-	//ndAssert(!strcmp(GetLabelId(), gradientOut->GetLabelId()));
-	//ndBrainLayerLinearWithDropOut* const gradients = (ndBrainLayerLinearWithDropOut*)gradientOut;
-	//ndAssert(gradients->m_bias.GetCount() == outputDerivative.GetCount());
-	//ndAssert(output.GetCount() == outputDerivative.GetCount());
-	//
-	//gradients->m_bias.Set(outputDerivative);
-	//for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0; --i)
-	//{
-	//	ndBrainFloat value = outputDerivative[i];
-	//	gradients->m_weights[i].ScaleSet(input, value);
-	//}
-	//InputDerivative(output, outputDerivative, inputGradient);
+	if (m_droutOutEnable)
+	{
+		ndAssert(0);
+		//inputGradient.Mul(m_dropout);
+		//ndBrainLayerLinear::CalculateParamGradients(input, output, outputDerivative, inputGradient, gradientOut);
+	}
+	else
+	{
+		ndBrainLayerLinear::CalculateParamGradients(input, output, outputDerivative, inputGradient, gradientOut);
+	}
 }

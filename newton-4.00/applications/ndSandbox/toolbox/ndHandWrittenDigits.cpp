@@ -427,7 +427,8 @@ static void MnistTrainingSet()
 
 		#else
 
-			layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), neuronsPerLayers));
+			//layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), neuronsPerLayers));
+			layers.PushBack(new ndBrainLayerLinearWithDropOut(trainingDigits->GetColumns(), neuronsPerLayers));
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		#endif

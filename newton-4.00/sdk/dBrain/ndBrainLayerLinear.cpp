@@ -279,5 +279,5 @@ void ndBrainLayerLinear::CalculateParamGradients(
 		ndBrainFloat value = outputDerivative[i];
 		gradients->m_weights[i].ScaleSet(input, value);
 	}
-	InputDerivative(output, outputDerivative, inputGradient);
+	ndBrainLayerLinear::InputDerivative(output, outputDerivative, inputGradient);
 }

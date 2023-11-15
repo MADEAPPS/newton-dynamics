@@ -47,6 +47,8 @@ class ndBrainLayerLinearWithDropOut : public ndBrainLayerLinear
 
 	ndBrainVector m_dropout;
 	ndBrainFloat m_dropoutFactor;
+	ndBrainFloat m_dropoutScale;
+	bool m_droutOutEnable;
 };
 
 #endif 
