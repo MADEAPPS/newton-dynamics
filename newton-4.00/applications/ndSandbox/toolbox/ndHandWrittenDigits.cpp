@@ -255,8 +255,8 @@ static void MnistTrainingSet()
 			// so far best training result on the mnist data set
 			//optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(96.76%)  conv(97.07%)
 			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score fully(98.02%)  conv(97.83%)
-			optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score fully(98.08%)  conv(97.76%)
-			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score fully(98.18%)  conv(97.34%)
+			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score fully(98.08%)  conv(97.66%)
+			optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score fully(98.18%)  conv(97.34%)
 			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// test data score fully(98.06%)  conv(97.34%)
 
 			//batches = 1;
