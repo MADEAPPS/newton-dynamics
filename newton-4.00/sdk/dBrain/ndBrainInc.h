@@ -54,6 +54,7 @@
 #include <ndBrainLayerLinearWithDropOut.h>
 #include <ndBrainLayerSigmoidActivation.h>
 #include <ndBrainLayerSoftmaxActivation.h>
+#include <ndBrainLayerCrossCorrelation_2d.h>
 #include <ndBrainLayerLeakyReluActivation.h>
 #include <ndBrainAgentDiscreteVPG_Trainer.h>
 #include <ndBrainAgentContinueVPG_Trainer.h>

@@ -114,6 +114,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 	ndInt32 failCount = 0;
 	ndBrainVector workingBuffer;
+	brain.DisableDropOut();
 	for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
 	{
 		const ndBrainVector& input = (*testDigits)[i];
@@ -251,15 +252,15 @@ static void MnistTrainingSet()
 			ndInt32 minTestFail = testDigits->GetCount();
 			ndInt32 minTrainingFail = trainingDigits->GetCount();
 			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
+			//batches = 1;
 
 			// so far best training result on the mnist data set
-			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(%)  conv(%)
-			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score fully(%)  conv(%)
+			//optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(%)  conv(%)
+			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score fully(98.059%)  conv(%)
 			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score fully(%)  conv(%)
 			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score fully(%)  conv(%)
 			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// test data score fully(%)  conv(%)
 
-			//batches = 1;
 			ndArray<ndUnsigned32> shuffleBuffer;
 			ndFixSizeArray<ndUnsigned32, 1024 * 2> priorityList;
 
@@ -273,7 +274,6 @@ static void MnistTrainingSet()
 			}
 
 			for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
-			//for (ndInt32 epoch = 0; epoch < 1; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -336,7 +336,9 @@ static void MnistTrainingSet()
 						}
 					});
 
+					m_brain.DisableDropOut();
 					ndBrainThreadPool::ParallelExecute(CrossValidateTest);
+					m_brain.EnableDropOut();
 
 					fails = 0;
 					for (ndInt32 j = 0; j < GetThreadCount(); ++j)
@@ -376,6 +378,8 @@ static void MnistTrainingSet()
 					}
 					priority.SetCount(0);
 				}
+
+				m_brain.UpdateDropOut();
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 			}
 			m_brain.CopyFrom(bestBrain);
@@ -433,15 +437,14 @@ static void MnistTrainingSet()
 
 		#endif
 
-		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 		layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 		layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
 
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{

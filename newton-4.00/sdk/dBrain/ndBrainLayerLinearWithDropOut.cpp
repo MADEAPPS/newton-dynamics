@@ -54,7 +54,8 @@ ndBrainLayerLinearWithDropOut::~ndBrainLayerLinearWithDropOut()
 
 const char* ndBrainLayerLinearWithDropOut::GetLabelId() const
 {
-	return "ndBrainLayerLinearWithDropOut";
+	//return "ndBrainLayerLinearWithDropOut";
+	return "ndBrainLayerLinear";
 }
 
 ndBrainLayer* ndBrainLayerLinearWithDropOut::Clone() const
@@ -64,7 +65,7 @@ ndBrainLayer* ndBrainLayerLinearWithDropOut::Clone() const
 
 void ndBrainLayerLinearWithDropOut::Save(const ndBrainSave* const loadSave) const
 {
-	ndAssert(0);
+	ndBrainLayerLinear::Save(loadSave);
 	//char buffer[1024];
 	//auto Save = [this, &buffer, &loadSave](const char* const fmt, ...)
 	//{
@@ -99,7 +100,8 @@ void ndBrainLayerLinearWithDropOut::Save(const ndBrainSave* const loadSave) cons
 	//}
 }
 
-ndBrainLayer* ndBrainLayerLinearWithDropOut::Load(const ndBrainLoad* const loadSave)
+//ndBrainLayer* ndBrainLayerLinearWithDropOut::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerLinearWithDropOut::Load(const ndBrainLoad* const)
 {
 	ndAssert(0);
 	return nullptr;
@@ -132,6 +134,11 @@ ndBrainLayer* ndBrainLayerLinearWithDropOut::Load(const ndBrainLoad* const loadS
 	//
 	//loadSave->ReadString(buffer);
 	//return layer;
+}
+
+void ndBrainLayerLinearWithDropOut::EnableDropOut(bool state)
+{
+	m_droutOutEnable = state;
 }
 
 void ndBrainLayerLinearWithDropOut::UpdateDropOut()

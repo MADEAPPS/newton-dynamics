@@ -28,12 +28,13 @@
 class ndBrainLayerLinearWithDropOut : public ndBrainLayerLinear
 {
 	public: 
-	ndBrainLayerLinearWithDropOut(ndInt32 inputs, ndInt32 outputs, ndBrainFloat dropOutFactor = ndBrainFloat(0.9f));
+	ndBrainLayerLinearWithDropOut(ndInt32 inputs, ndInt32 outputs, ndBrainFloat dropOutFactor = ndBrainFloat(0.8f));
 	ndBrainLayerLinearWithDropOut(const ndBrainLayerLinearWithDropOut& src);
 	virtual ~ndBrainLayerLinearWithDropOut();
 	virtual ndBrainLayer* Clone() const;
 
 	virtual void UpdateDropOut();
+	virtual void EnableDropOut(bool state);
 	virtual const char* GetLabelId() const;
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;

@@ -71,6 +71,10 @@ void ndBrainLayer::UpdateDropOut()
 {
 }
 
+void ndBrainLayer::EnableDropOut(bool)
+{
+}
+
 void ndBrainLayer::InitWeights(ndBrainFloat, ndBrainFloat)
 {
 	ndAssert(0);

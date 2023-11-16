@@ -126,6 +126,33 @@ void ndBrain::InitWeightsXavierMethod()
 	}
 }
 
+void ndBrain::EnableDropOut()
+{
+	ndArray<ndBrainLayer*>& layers = *this;
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+		layers[i]->EnableDropOut(true);
+	}
+}
+
+void ndBrain::DisableDropOut()
+{
+	ndArray<ndBrainLayer*>& layers = *this;
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+		layers[i]->EnableDropOut(false);
+	}
+}
+
+void ndBrain::UpdateDropOut()
+{
+	ndArray<ndBrainLayer*>& layers = *this;
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+		layers[i]->UpdateDropOut();
+	}
+}
+
 //void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 //{
 //	ndAssert(0);

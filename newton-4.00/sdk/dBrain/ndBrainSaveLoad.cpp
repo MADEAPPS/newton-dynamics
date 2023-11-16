@@ -29,6 +29,7 @@
 #include "ndBrainLayerSoftmaxActivation.h"
 #include "ndBrainLayerSigmoidActivation.h"
 #include "ndBrainLayerLinearWithDropOut.h"
+#include "ndBrainLayerCrossCorrelation_2d.h"
 #include "ndBrainLayerLeakyReluActivation.h"
 #include "ndBrainLayerConvolutionalMaxPooling_2d.h"
 #include "ndBrainLayerCategoricalSoftmaxActivation.h"
@@ -135,6 +136,10 @@ ndBrain* ndBrainLoad::Load() const
 		else if (!strcmp(layerType, "ndBrainLayerConvolutional_2d"))
 		{
 			layer = ndBrainLayerConvolutional_2d::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerCrossCorrelation_2d"))
+		{
+			layer = ndBrainLayerCrossCorrelation_2d::Load(this);
 		}
 		else if (!strcmp(layerType, "ndBrainLayerConvolutionalMaxPooling_2d"))
 		{

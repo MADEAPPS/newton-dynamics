@@ -19,20 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_CONVOLUTIONAL_2D_H__
-#define _ND_BRAIN_LAYER_CONVOLUTIONAL_2D_H__
+#ifndef _ND_BRAIN_LAYER_CROSS_CORRELATION_2D_H__
+#define _ND_BRAIN_LAYER_CROSS_CORRELATION_2D_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 
-class ndBrainLayerConvolutional_2d : public ndBrainLayer
+class ndBrainLayerCrossCorrelation_2d : public ndBrainLayer
 {
 	public: 
-	ndBrainLayerConvolutional_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputLayers, ndInt32 kernelSize, ndInt32 ouputLayers);
-	ndBrainLayerConvolutional_2d(const ndBrainLayerConvolutional_2d& src);
-	virtual ~ndBrainLayerConvolutional_2d();
+	ndBrainLayerCrossCorrelation_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputLayers, ndInt32 kernelSize, ndInt32 ouputLayers);
+	ndBrainLayerCrossCorrelation_2d(const ndBrainLayerCrossCorrelation_2d& src);
+	virtual ~ndBrainLayerCrossCorrelation_2d();
 	virtual ndBrainLayer* Clone() const;
 
 	ndInt32 GetOutputWidth() const;

@@ -21,11 +21,11 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainLayerConvolutional_2d.h"
+#include "ndBrainLayerCrossCorrelation_2d.h"
 
 #define ND_BRAIN_CONV_LAYER_USE_BIAS
 
-ndBrainLayerConvolutional_2d::ndBrainLayerConvolutional_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)
+ndBrainLayerCrossCorrelation_2d::ndBrainLayerCrossCorrelation_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)
 	:ndBrainLayer()
 	,m_bias()
 	,m_kernels()
@@ -40,7 +40,6 @@ ndBrainLayerConvolutional_2d::ndBrainLayerConvolutional_2d(ndInt32 inputWidth, n
 	,m_outputHeight(m_inputHeight - m_kernelSize + 1)
 	,m_outputLayers(numberOfKernels)
 {
-	ndAssert(0);
 	ndAssert(m_inputWidth > 0);
 	ndAssert(m_inputHeight > 0);
 	ndAssert(m_outputWidth > 0);
@@ -71,7 +70,7 @@ ndBrainLayerConvolutional_2d::ndBrainLayerConvolutional_2d(ndInt32 inputWidth, n
 	m_paddedGradientOut.Set(ndBrainFloat(0.0f));
 }
 
-ndBrainLayerConvolutional_2d::ndBrainLayerConvolutional_2d(const ndBrainLayerConvolutional_2d& src)
+ndBrainLayerCrossCorrelation_2d::ndBrainLayerCrossCorrelation_2d(const ndBrainLayerCrossCorrelation_2d& src)
 	:ndBrainLayer(src)
 	,m_bias(src.m_bias)
 	,m_kernels(src.m_kernels)
@@ -86,70 +85,69 @@ ndBrainLayerConvolutional_2d::ndBrainLayerConvolutional_2d(const ndBrainLayerCon
 	,m_outputHeight(src.m_outputHeight)
 	,m_outputLayers(src.m_outputLayers)
 {
-	ndAssert(0);
 }
 
-ndBrainLayerConvolutional_2d::~ndBrainLayerConvolutional_2d()
+ndBrainLayerCrossCorrelation_2d::~ndBrainLayerCrossCorrelation_2d()
 {
 }
 
-const char* ndBrainLayerConvolutional_2d::GetLabelId() const
+const char* ndBrainLayerCrossCorrelation_2d::GetLabelId() const
 {
-	return "ndBrainLayerConvolutional_2d";
+	return "ndBrainLayerCrossCorrelation_2d";
 }
 
-ndBrainLayer* ndBrainLayerConvolutional_2d::Clone() const
+ndBrainLayer* ndBrainLayerCrossCorrelation_2d::Clone() const
 {
-	return new ndBrainLayerConvolutional_2d(*this);
+	return new ndBrainLayerCrossCorrelation_2d(*this);
 }
 
-ndInt32 ndBrainLayerConvolutional_2d::GetOutputSize() const
+ndInt32 ndBrainLayerCrossCorrelation_2d::GetOutputSize() const
 {
 	return m_outputLayers * m_outputWidth * m_outputHeight;
 }
 
-ndInt32 ndBrainLayerConvolutional_2d::GetInputSize() const
+ndInt32 ndBrainLayerCrossCorrelation_2d::GetInputSize() const
 {
 	return m_inputLayers * m_inputWidth * m_inputHeight;
 }
 
-ndInt32 ndBrainLayerConvolutional_2d::GetOutputWidth() const
+ndInt32 ndBrainLayerCrossCorrelation_2d::GetOutputWidth() const
 {
 	return m_outputWidth;
 }
 
-ndInt32 ndBrainLayerConvolutional_2d::GetOutputHeight() const
+ndInt32 ndBrainLayerCrossCorrelation_2d::GetOutputHeight() const
 {
 	return m_outputHeight;
 }
 
-ndInt32 ndBrainLayerConvolutional_2d::GetOutputChannels() const
+ndInt32 ndBrainLayerCrossCorrelation_2d::GetOutputChannels() const
 {
 	return m_outputLayers;
 }
 
-bool ndBrainLayerConvolutional_2d::HasParameters() const
+bool ndBrainLayerCrossCorrelation_2d::HasParameters() const
 {
 	return true;
 }
 
-void ndBrainLayerConvolutional_2d::InitWeightsXavierMethod()
+void ndBrainLayerCrossCorrelation_2d::InitWeightsXavierMethod()
 {
 	ndBrainFloat weighVariance = ndBrainFloat(ndSqrt(ndFloat32(6.0f) / ndFloat32(GetInputSize() + GetOutputSize())));
 	InitWeights(weighVariance, ndBrainFloat(0.0f));
 }
 
-void ndBrainLayerConvolutional_2d::InitGaussianBias(ndBrainFloat)
+void ndBrainLayerCrossCorrelation_2d::InitGaussianBias(ndBrainFloat)
 {
 	m_bias.Set(ndBrainFloat(0.0f));
 }
 
-void ndBrainLayerConvolutional_2d::InitGaussianWeights(ndBrainFloat variance)
+void ndBrainLayerCrossCorrelation_2d::InitGaussianWeights(ndBrainFloat variance)
 {
 	m_kernels.InitGaussianWeights(variance);
 }
 
-void ndBrainLayerConvolutional_2d::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
+void ndBrainLayerCrossCorrelation_2d::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
 {
 	biasVariance = ndBrainFloat(0.0f);
 	weighVariance = ndMin(weighVariance, ndBrainFloat(0.05f));
@@ -157,64 +155,64 @@ void ndBrainLayerConvolutional_2d::InitWeights(ndBrainFloat weighVariance, ndBra
 	InitGaussianWeights(weighVariance);
 }
 
-void ndBrainLayerConvolutional_2d::Set(const ndBrainLayer& src)
+void ndBrainLayerCrossCorrelation_2d::Set(const ndBrainLayer& src)
 {
-	const ndBrainLayerConvolutional_2d& convSrc = (ndBrainLayerConvolutional_2d&)src;
+	const ndBrainLayerCrossCorrelation_2d& convSrc = (ndBrainLayerCrossCorrelation_2d&)src;
 	m_bias.Set(convSrc.m_bias);
 	m_kernels.Set(convSrc.m_kernels);
 }
 
-void ndBrainLayerConvolutional_2d::Clear()
+void ndBrainLayerCrossCorrelation_2d::Clear()
 {
 	m_bias.Set(ndBrainFloat(0.0f));
 	m_kernels.Set(ndBrainFloat(0.0f));
 }
 
-void ndBrainLayerConvolutional_2d::FlushToZero()
+void ndBrainLayerCrossCorrelation_2d::FlushToZero()
 {
 	m_bias.FlushToZero();
 	m_kernels.FlushToZero();
 }
 
-void ndBrainLayerConvolutional_2d::Scale(ndBrainFloat scale)
+void ndBrainLayerCrossCorrelation_2d::Scale(ndBrainFloat scale)
 {
 	m_bias.Scale(scale);
 	m_kernels.Scale(scale);
 }
 
-void ndBrainLayerConvolutional_2d::Add(const ndBrainLayer& src)
+void ndBrainLayerCrossCorrelation_2d::Add(const ndBrainLayer& src)
 {
-	const ndBrainLayerConvolutional_2d& linearSrc = (ndBrainLayerConvolutional_2d&)src;
+	const ndBrainLayerCrossCorrelation_2d& linearSrc = (ndBrainLayerCrossCorrelation_2d&)src;
 	m_bias.Add(linearSrc.m_bias);
 	m_kernels.Add(linearSrc.m_kernels);
 }
 
-void ndBrainLayerConvolutional_2d::Mul(const ndBrainLayer& src)
+void ndBrainLayerCrossCorrelation_2d::Mul(const ndBrainLayer& src)
 {
-	const ndBrainLayerConvolutional_2d& linearSrc = (ndBrainLayerConvolutional_2d&)src;
+	const ndBrainLayerCrossCorrelation_2d& linearSrc = (ndBrainLayerCrossCorrelation_2d&)src;
 	m_bias.Mul(linearSrc.m_bias);
 	m_kernels.Mul(linearSrc.m_kernels);
 }
 
-void ndBrainLayerConvolutional_2d::ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale)
+void ndBrainLayerCrossCorrelation_2d::ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale)
 {
-	const ndBrainLayerConvolutional_2d& linearSrc = (ndBrainLayerConvolutional_2d&)src;
+	const ndBrainLayerCrossCorrelation_2d& linearSrc = (ndBrainLayerCrossCorrelation_2d&)src;
 	m_bias.ScaleAdd(linearSrc.m_bias, scale);
 	m_kernels.ScaleAdd(linearSrc.m_kernels, scale);
 }
 
-void ndBrainLayerConvolutional_2d::Blend(const ndBrainLayer& src, ndBrainFloat blend)
+void ndBrainLayerCrossCorrelation_2d::Blend(const ndBrainLayer& src, ndBrainFloat blend)
 {
-	//const ndBrainLayerConvolutional_2d& linearSrc = (ndBrainLayerConvolutional_2d&)src;
+	//const ndBrainLayerCrossCorrelation_2d& linearSrc = (ndBrainLayerCrossCorrelation_2d&)src;
 	//m_bias.Blend(linearSrc.m_bias, blend);
 	//m_weights.Blend(linearSrc.m_weights, blend);
 	ndAssert(0);
 }
 
-void ndBrainLayerConvolutional_2d::AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon)
+void ndBrainLayerCrossCorrelation_2d::AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon)
 {
-	const ndBrainLayerConvolutional_2d& linear_U = (ndBrainLayerConvolutional_2d&)u;
-	const ndBrainLayerConvolutional_2d& linear_V = (ndBrainLayerConvolutional_2d&)v;
+	const ndBrainLayerCrossCorrelation_2d& linear_U = (ndBrainLayerCrossCorrelation_2d&)u;
+	const ndBrainLayerCrossCorrelation_2d& linear_V = (ndBrainLayerCrossCorrelation_2d&)v;
 
 	const ndBrainVector& bias_U = linear_U.m_bias;
 	const ndBrainVector& bias_V = linear_V.m_bias;
@@ -233,14 +231,13 @@ void ndBrainLayerConvolutional_2d::AdamUpdate(const ndBrainLayer& u, const ndBra
 	}
 }
 
-void ndBrainLayerConvolutional_2d::UpdateDropOut()
+void ndBrainLayerCrossCorrelation_2d::UpdateDropOut()
 {
 	ndAssert(0);
 }
 
-void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+void ndBrainLayerCrossCorrelation_2d::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-	ndAssert(0);
 	ndAssert(input.GetCount() == GetInputSize());
 
 	ndInt32 outputOffset = 0;
@@ -296,18 +293,17 @@ void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, nd
 	}
 }
 
-void ndBrainLayerConvolutional_2d::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerCrossCorrelation_2d::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndAssert(0);
 }
 
-void ndBrainLayerConvolutional_2d::CalculateParamGradients(
+void ndBrainLayerCrossCorrelation_2d::CalculateParamGradients(
 	const ndBrainVector& input, const ndBrainVector&,
 	const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const
 {
-	ndAssert(0);
 	ndAssert(!strcmp(GetLabelId(), gradientOut->GetLabelId()));
-	ndBrainLayerConvolutional_2d* const gradients = (ndBrainLayerConvolutional_2d*)gradientOut;
+	ndBrainLayerCrossCorrelation_2d* const gradients = (ndBrainLayerCrossCorrelation_2d*)gradientOut;
 
 	ndAssert(gradients->m_bias.GetCount() == m_outputLayers);
 
@@ -454,7 +450,7 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 	}
 }
 
-void ndBrainLayerConvolutional_2d::Save(const ndBrainSave* const loadSave) const
+void ndBrainLayerCrossCorrelation_2d::Save(const ndBrainSave* const loadSave) const
 {
 	char buffer[1024];
 	auto Save = [this, &buffer, &loadSave](const char* const fmt, ...)
@@ -500,7 +496,7 @@ void ndBrainLayerConvolutional_2d::Save(const ndBrainSave* const loadSave) const
 	}
 }
 
-ndBrainLayer* ndBrainLayerConvolutional_2d::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerCrossCorrelation_2d::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
 	loadSave->ReadString(buffer);
@@ -520,7 +516,7 @@ ndBrainLayer* ndBrainLayerConvolutional_2d::Load(const ndBrainLoad* const loadSa
 	loadSave->ReadString(buffer);
 	ndInt32 ouputLayers = loadSave->ReadInt();
 
-	ndBrainLayerConvolutional_2d* const layer = new ndBrainLayerConvolutional_2d(inputWidth, inputHeight, inputLayers, kernelSize, ouputLayers);
+	ndBrainLayerCrossCorrelation_2d* const layer = new ndBrainLayerCrossCorrelation_2d(inputWidth, inputHeight, inputLayers, kernelSize, ouputLayers);
 	
 	loadSave->ReadString(buffer);
 	for (ndInt32 i = 0; i < ouputLayers; ++i)

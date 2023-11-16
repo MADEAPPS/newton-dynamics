@@ -42,7 +42,10 @@ class ndBrain: public ndArray<ndBrainLayer*>
 
 	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
 
-	//void UpdateDropOut();
+	void UpdateDropOut();
+	void EnableDropOut();
+	void DisableDropOut();
+
 	void InitWeightsXavierMethod();
 	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 
