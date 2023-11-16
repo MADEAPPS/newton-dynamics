@@ -269,13 +269,14 @@ void ndBrainLayerCrossCorrelation_2d::MakePrediction(const ndBrainVector& input,
 		ndBrainMemVector out(&output[outputOffset], outputSize);
 
 		out.Set(m_bias[i] * biasScale);
-		const ndBrainMemVector filter(&m_kernels[kernelOffset], kernelSize);
 
 		ndInt32 inputOffset = 0;
 		for (ndInt32 channel = 0; channel < m_inputLayers; ++channel)
 		{
 			ndInt32 outIndex = 0;
 			ndInt32 inputBase = inputOffset;
+			const ndBrainMemVector filter(&m_kernels[kernelOffset], kernelSize);
+
 			for (ndInt32 y = 0; y < m_outputHeight; ++y)
 			{
 				for (ndInt32 x = 0; x < m_outputWidth; ++x)
@@ -293,7 +294,8 @@ void ndBrainLayerCrossCorrelation_2d::MakePrediction(const ndBrainVector& input,
 	}
 }
 
-void ndBrainLayerCrossCorrelation_2d::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+//void ndBrainLayerCrossCorrelation_2d::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerCrossCorrelation_2d::InputDerivative(const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
 {
 	ndAssert(0);
 }

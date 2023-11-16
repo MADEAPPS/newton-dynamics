@@ -255,9 +255,9 @@ static void MnistTrainingSet()
 			//batches = 1;
 
 			// so far best training result on the mnist data set
-			//optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(%)  conv(%)
-			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score fully(98.059%)  conv(%)
-			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score fully(%)  conv(%)
+			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(98.070%)  conv(%)
+			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score fully(98.200%)  conv(%)
+			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score fully(97.980%)  conv(%)
 			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score fully(%)  conv(%)
 			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// test data score fully(%)  conv(%)
 
@@ -291,6 +291,7 @@ static void MnistTrainingSet()
 					ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 					optimizer.Update(this, m_trainers, m_learnRate);
 
+					m_brain.UpdateDropOut();
 					start += m_bashBufferSize;
 				}
 
@@ -378,8 +379,7 @@ static void MnistTrainingSet()
 					}
 					priority.SetCount(0);
 				}
-
-				m_brain.UpdateDropOut();
+				
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 			}
 			m_brain.CopyFrom(bestBrain);
