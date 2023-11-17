@@ -233,7 +233,6 @@ void ndBrainLayerConvolutional_2d::AdamUpdate(const ndBrainLayer& u, const ndBra
 
 void ndBrainLayerConvolutional_2d::UpdateDropOut()
 {
-	ndAssert(0);
 }
 
 void ndBrainLayerConvolutional_2d::Save(const ndBrainSave* const loadSave) const
@@ -461,7 +460,6 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 		return value;
 	};
 
-	ndAssert(0);
 	ndInt32 outputOffset = 0;
 	ndInt32 kernelOffset = 0;
 	for (ndInt32 filter = 0; filter < m_outputLayers; ++filter)
@@ -488,7 +486,6 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 		outputOffset += outputSize;
 	}
 
-	ndAssert(0);
 	// calculate input gradients
 	auto CopyOutput = [this, &outputDerivative](ndInt32 filter)
 	{
@@ -506,17 +503,6 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 			srcOffset += m_outputWidth;
 		}
 	};
-
-	//ndBrainFloat convKernelBuffer[256];
-	//ndBrainMemVector convKernel(convKernelBuffer, kernelSize);
-	//auto RotateKernel = [&convKernel](const ndBrainMemVector& kernel)
-	//{
-	//	ndAssert(convKernel.GetCount() == kernel.GetCount());
-	//	for (ndInt32 i = kernel.GetCount() - 1; i >= 0; --i)
-	//	{
-	//		convKernel[kernel.GetCount() - 1 - i] = kernel[i];
-	//	}
-	//};
 
 	auto CalculateInpuGradient = [this](const ndBrainVector& filter, ndBrainVector& output)
 	{
@@ -559,7 +545,6 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 		{
 			ndBrainMemVector inputGrad(&inputGradient[inputOffset], inputSize);
 			const ndBrainMemVector kernelGradients(&m_kernels[kernelOffset], kernelSize);
-			//RotateKernel(kernelGradients);
 			CalculateInpuGradient(kernelGradients, inputGrad);
 			inputOffset += inputSize;
 			kernelOffset += kernelSize;

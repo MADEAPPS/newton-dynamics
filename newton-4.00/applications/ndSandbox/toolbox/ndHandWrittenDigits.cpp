@@ -406,9 +406,9 @@ static void MnistTrainingSet()
 		#endif
 
 		#if 1
-			#define DIGIT_FILER_LAYER ndBrainLayerCrossCorrelation_2d
-		#else
 			#define DIGIT_FILER_LAYER ndBrainLayerConvolutional_2d
+		#else
+			#define DIGIT_FILER_LAYER ndBrainLayerCrossCorrelation_2d			
 		#endif
 
 		#ifdef D_USE_CONVOLUTIONAL_LAYERS

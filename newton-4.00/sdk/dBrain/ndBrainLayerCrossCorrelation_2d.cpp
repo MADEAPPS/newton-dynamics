@@ -491,20 +491,9 @@ void ndBrainLayerCrossCorrelation_2d::CalculateParamGradients(
 	};
 
 	ndBrainFloat convKernelBuffer[256];
-	ndBrainMemVector convKernel(convKernelBuffer, kernelSize);
-	auto RotateKernel = [&convKernel](const ndBrainMemVector& kernel)
+	auto CalculateInpuGradient = [this, &convKernelBuffer](const ndBrainVector& filter, ndBrainVector& output)
 	{
-		ndAssert(convKernel.GetCount() == kernel.GetCount());
-		for (ndInt32 i = kernel.GetCount() - 1; i >= 0; --i)
-		{
-			convKernel[kernel.GetCount() - 1 - i] = kernel[i];
-		}
-	};
-
-	//auto CalculateInpuGradient = [this](const ndBrainVector& filter, ndBrainVector& output)
-	auto CalculateInpuGradient = [this, &convKernel](ndBrainVector& output)
-	{
-		auto CrossCorrelation = [this, &convKernel](const ndBrainVector& input)
+		auto CrossCorrelation = [this](const ndBrainVector& input, const ndBrainVector& convKernel)
 		{
 			ndBrainFloat value = ndBrainFloat(0.0f);
 			for (ndInt32 i = m_inputGradOffsets.GetCount() - 1; i >= 0 ; --i)
@@ -520,12 +509,18 @@ void ndBrainLayerCrossCorrelation_2d::CalculateParamGradients(
 		const ndInt32 gradInputWidth = m_inputWidth + m_kernelSize - 1;
 		const ndInt32 gradInputSize = gradInputWidth * m_kernelSize;
 
+		ndBrainMemVector convKernel(convKernelBuffer, m_kernelSize * m_kernelSize);
+		for (ndInt32 i = filter.GetCount() - 1; i >= 0; --i)
+		{
+			convKernel[filter.GetCount() - 1 - i] = filter[i];
+		}
+
 		for (ndInt32 y = 0; y < m_inputHeight; ++y)
 		{
 			for (ndInt32 x = 0; x < m_inputWidth; ++x)
 			{
 				const ndBrainMemVector in(&m_paddedGradientOut[gradInputOffset + x], gradInputSize);
-				output[outputOffset + x] += CrossCorrelation(in);
+				output[outputOffset + x] += CrossCorrelation(in, convKernel);
 			}
 			outputOffset += m_inputWidth;
 			gradInputOffset += gradInputWidth;
@@ -543,8 +538,7 @@ void ndBrainLayerCrossCorrelation_2d::CalculateParamGradients(
 		{
 			ndBrainMemVector inputGrad(&inputGradient[inputOffset], inputSize);
 			const ndBrainMemVector kernelGradients(&m_kernels[kernelOffset], kernelSize);
-			RotateKernel(kernelGradients);
-			CalculateInpuGradient(inputGrad);
+			CalculateInpuGradient(kernelGradients, inputGrad);
 			inputOffset += inputSize;
 			kernelOffset += kernelSize;
 		}
