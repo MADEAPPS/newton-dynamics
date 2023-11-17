@@ -21,9 +21,9 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainLayerConvolutionalPadding_2d.h"
+#include "ndBrainLayerImagePadding.h"
 
-ndBrainLayerConvolutionalPadding_2d::ndBrainLayerConvolutionalPadding_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputLayers, ndInt32 filterSize)
+ndBrainLayerImagePadding::ndBrainLayerImagePadding(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputLayers, ndInt32 filterSize)
 	:ndBrainLayerActivation(((inputWidth + 1) / 2) * ((inputHeight + 1) / 2) * inputLayers)
 	,m_width(inputWidth)
 	,m_height(inputHeight)
@@ -32,7 +32,7 @@ ndBrainLayerConvolutionalPadding_2d::ndBrainLayerConvolutionalPadding_2d(ndInt32
 	ndAssert(0);
 }
 
-ndBrainLayerConvolutionalPadding_2d::ndBrainLayerConvolutionalPadding_2d(const ndBrainLayerConvolutionalPadding_2d& src)
+ndBrainLayerImagePadding::ndBrainLayerImagePadding(const ndBrainLayerImagePadding& src)
 	:ndBrainLayerActivation(src)
 	,m_width(src.m_width)
 	,m_height(src.m_height)
@@ -41,52 +41,52 @@ ndBrainLayerConvolutionalPadding_2d::ndBrainLayerConvolutionalPadding_2d(const n
 	ndAssert(0);
 }
 
-ndInt32 ndBrainLayerConvolutionalPadding_2d::GetInputWidth() const
+ndInt32 ndBrainLayerImagePadding::GetInputWidth() const
 {
 	return m_width;
 }
 
-ndInt32 ndBrainLayerConvolutionalPadding_2d::GetInputHeight() const
+ndInt32 ndBrainLayerImagePadding::GetInputHeight() const
 {
 	return m_height;
 }
 
-ndInt32 ndBrainLayerConvolutionalPadding_2d::GetInputChannels() const
+ndInt32 ndBrainLayerImagePadding::GetInputChannels() const
 {
 	return m_channels;
 }
 
-ndInt32 ndBrainLayerConvolutionalPadding_2d::GetOutputWidth() const
+ndInt32 ndBrainLayerImagePadding::GetOutputWidth() const
 {
 	return (m_width + 1) / 2;
 }
 
-ndInt32 ndBrainLayerConvolutionalPadding_2d::GetOutputHeight() const
+ndInt32 ndBrainLayerImagePadding::GetOutputHeight() const
 {
 	return (m_height + 1) / 2;
 }
 
-ndInt32 ndBrainLayerConvolutionalPadding_2d::GetOutputChannels() const
+ndInt32 ndBrainLayerImagePadding::GetOutputChannels() const
 {
 	return m_channels;
 }
 
-ndInt32 ndBrainLayerConvolutionalPadding_2d::GetInputSize() const
+ndInt32 ndBrainLayerImagePadding::GetInputSize() const
 {
 	return m_width * m_height * m_channels;
 }
 
-ndBrainLayer* ndBrainLayerConvolutionalPadding_2d::Clone() const
+ndBrainLayer* ndBrainLayerImagePadding::Clone() const
 {
-	return new ndBrainLayerConvolutionalPadding_2d(*this);
+	return new ndBrainLayerImagePadding(*this);
 }
 
-const char* ndBrainLayerConvolutionalPadding_2d::GetLabelId() const
+const char* ndBrainLayerImagePadding::GetLabelId() const
 {
-	return "ndBrainLayerConvolutionalPadding_2d";
+	return "ndBrainLayerImagePadding";
 }
 
-void ndBrainLayerConvolutionalPadding_2d::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerImagePadding::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndAssert(0);
 	//ndAssert(m_index.GetCount() == outputDerivative.GetCount());
@@ -99,7 +99,7 @@ void ndBrainLayerConvolutionalPadding_2d::InputDerivative(const ndBrainVector&, 
 	//}
 }
 
-void ndBrainLayerConvolutionalPadding_2d::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+void ndBrainLayerImagePadding::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(0);
 	//ndAssert(input.GetCount() == GetInputSize());
@@ -194,7 +194,7 @@ void ndBrainLayerConvolutionalPadding_2d::MakePrediction(const ndBrainVector& in
 	//}
 }
 
-void ndBrainLayerConvolutionalPadding_2d::Save(const ndBrainSave* const loadSave) const
+void ndBrainLayerImagePadding::Save(const ndBrainSave* const loadSave) const
 {
 	ndAssert(0);
 	//char buffer[1024];
@@ -209,7 +209,7 @@ void ndBrainLayerConvolutionalPadding_2d::Save(const ndBrainSave* const loadSave
 	//loadSave->WriteData(buffer);
 }
 
-ndBrainLayer* ndBrainLayerConvolutionalPadding_2d::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerImagePadding::Load(const ndBrainLoad* const loadSave)
 {
 	ndAssert(0);
 	//char buffer[1024];
@@ -224,7 +224,7 @@ ndBrainLayer* ndBrainLayerConvolutionalPadding_2d::Load(const ndBrainLoad* const
 	//loadSave->ReadString(buffer);
 	//ndInt32 inputLayers = loadSave->ReadInt();
 	//
-	//ndBrainLayerConvolutionalPadding_2d* const layer = new ndBrainLayerConvolutionalPadding_2d(inputWidth, inputHeight, inputLayers);
+	//ndBrainLayerImagePadding* const layer = new ndBrainLayerImagePadding(inputWidth, inputHeight, inputLayers);
 	//loadSave->ReadString(buffer);
 	//return layer;
 	return nullptr;

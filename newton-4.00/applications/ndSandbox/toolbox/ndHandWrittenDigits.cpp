@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-//#define D_USE_CONVOLUTIONAL_LAYERS
+#define D_USE_CONVOLUTIONAL_LAYERS
 
 static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 {
@@ -405,28 +405,34 @@ static void MnistTrainingSet()
 			#define DIGIT_ACTIVATION_TYPE ndBrainLayerTanhActivation
 		#endif
 
+		#if 1
+			#define DIGIT_FILER_LAYER ndBrainLayerCrossCorrelation_2d
+		#else
+			#define DIGIT_FILER_LAYER ndBrainLayerConvolutional_2d
+		#endif
+
 		#ifdef D_USE_CONVOLUTIONAL_LAYERS
 			ndInt32 height = 28;
 			ndInt32 width = trainingDigits->GetColumns() / height;
 			ndAssert((height * width) == trainingDigits->GetColumns());
 
-			const ndBrainLayerConvolutional_2d* conv;
-			const ndBrainLayerConvolutionalMaxPooling_2d* pooling;
+			const DIGIT_FILER_LAYER* conv;
+			const ndBrainLayerImagePolling_2x2* pooling;
 
-			layers.PushBack(new ndBrainLayerConvolutional_2d(width, height, 1, 3, 16));
-			conv = (ndBrainLayerConvolutional_2d*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new DIGIT_FILER_LAYER(width, height, 1, 3, 16));
+			conv = (DIGIT_FILER_LAYER*)(layers[layers.GetCount() - 1]);
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
-			layers.PushBack(new ndBrainLayerConvolutionalMaxPooling_2d(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
-			pooling = (ndBrainLayerConvolutionalMaxPooling_2d*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
+			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
-			layers.PushBack(new ndBrainLayerConvolutional_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
-			conv = (ndBrainLayerConvolutional_2d*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new DIGIT_FILER_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
+			conv = (DIGIT_FILER_LAYER*)(layers[layers.GetCount() - 1]);
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
-			layers.PushBack(new ndBrainLayerConvolutionalMaxPooling_2d(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
-			pooling = (ndBrainLayerConvolutionalMaxPooling_2d*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
+			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
-			layers.PushBack(new ndBrainLayerConvolutional_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
-			conv = (ndBrainLayerConvolutional_2d*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new DIGIT_FILER_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
+			conv = (DIGIT_FILER_LAYER*)(layers[layers.GetCount() - 1]);
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
 
 		#else

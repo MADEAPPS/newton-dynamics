@@ -47,8 +47,10 @@
 #include <ndBrainAgentDQN_Trainer.h>
 #include <ndBrainAgentTD3_Trainer.h>
 #include <ndBrainAgentDDPG_Trainer.h>
+#include <ndBrainLayerImagePadding.h>
 #include <ndBrainLayerReluActivation.h>
 #include <ndBrainLayerTanhActivation.h>
+#include <ndBrainLayerImagePolling_2x2.h>
 #include <ndBrainLayerConvolutional_2d.h>
 #include <ndBrainLossLeastSquaredError.h>
 #include <ndBrainLayerLinearWithDropOut.h>
@@ -59,8 +61,6 @@
 #include <ndBrainAgentDiscreteVPG_Trainer.h>
 #include <ndBrainAgentContinueVPG_Trainer.h>
 #include <ndBrainLossCategoricalCrossEntropy.h>
-#include <ndBrainLayerConvolutionalPadding_2d.h>
-#include <ndBrainLayerConvolutionalMaxPooling_2d.h>
 #include <ndBrainLayerCategoricalSoftmaxActivation.h>
 
 #endif 

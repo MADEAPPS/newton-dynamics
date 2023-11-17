@@ -25,11 +25,11 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
-class ndBrainLayerConvolutionalPadding_2d : public ndBrainLayerActivation
+class ndBrainLayerImagePadding : public ndBrainLayerActivation
 {
 	public:
-	ndBrainLayerConvolutionalPadding_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 filterSize);
-	ndBrainLayerConvolutionalPadding_2d(const ndBrainLayerConvolutionalPadding_2d& src);
+	ndBrainLayerImagePadding(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 filterSize);
+	ndBrainLayerImagePadding(const ndBrainLayerImagePadding& src);
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 

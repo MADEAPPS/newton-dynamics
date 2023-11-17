@@ -25,13 +25,13 @@
 #include "ndBrainLayerLinear.h"
 #include "ndBrainLayerReluActivation.h"
 #include "ndBrainLayerTanhActivation.h"
+#include "ndBrainLayerImagePolling_2x2.h"
 #include "ndBrainLayerConvolutional_2d.h"
 #include "ndBrainLayerSoftmaxActivation.h"
 #include "ndBrainLayerSigmoidActivation.h"
 #include "ndBrainLayerLinearWithDropOut.h"
 #include "ndBrainLayerCrossCorrelation_2d.h"
 #include "ndBrainLayerLeakyReluActivation.h"
-#include "ndBrainLayerConvolutionalMaxPooling_2d.h"
 #include "ndBrainLayerCategoricalSoftmaxActivation.h"
 
 ndBrain* ndBrainLoad::Load(const char* const pathName)
@@ -141,9 +141,9 @@ ndBrain* ndBrainLoad::Load() const
 		{
 			layer = ndBrainLayerCrossCorrelation_2d::Load(this);
 		}
-		else if (!strcmp(layerType, "ndBrainLayerConvolutionalMaxPooling_2d"))
+		else if (!strcmp(layerType, "ndBrainLayerImagePolling_2x2"))
 		{
-			layer = ndBrainLayerConvolutionalMaxPooling_2d::Load(this);
+			layer = ndBrainLayerImagePolling_2x2::Load(this);
 		}
 		else
 		{

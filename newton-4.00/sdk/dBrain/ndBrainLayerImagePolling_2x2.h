@@ -25,11 +25,11 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
-class ndBrainLayerConvolutionalMaxPooling_2d : public ndBrainLayerActivation
+class ndBrainLayerImagePolling_2x2 : public ndBrainLayerActivation
 {
 	public:
-	ndBrainLayerConvolutionalMaxPooling_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth);
-	ndBrainLayerConvolutionalMaxPooling_2d(const ndBrainLayerConvolutionalMaxPooling_2d& src);
+	ndBrainLayerImagePolling_2x2(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth);
+	ndBrainLayerImagePolling_2x2(const ndBrainLayerImagePolling_2x2& src);
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
