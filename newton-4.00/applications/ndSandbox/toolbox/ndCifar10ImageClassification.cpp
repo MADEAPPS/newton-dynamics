@@ -25,6 +25,7 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 	char outPathName[1024];
 	ndUnsigned8 data[32 * 32 * 3];
 
+	ndInt32 base = 0;
 	labelMatrix.Set(ndBrainFloat(0.0f));
 	for (ndInt32 i = 0; i < batches; ++i)
 	{
@@ -39,8 +40,8 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 				ndInt32 label = 0;
 				ret = fread(&label, 1, 1, fp);
 
-				labelMatrix[j][label] = ndBrainFloat(1.0f);
-				ndBrainVector& image = imageMatrix[ndInt32(j)];
+				labelMatrix[j + base][label] = ndBrainFloat(1.0f);
+				ndBrainVector& image = imageMatrix[j + base];
 				ret = fread(data, 1, 32 * 32 * 3, fp);
 				for (ndInt32 k = 0; k < 32 * 32 * 3; ++k)
 				{
@@ -53,6 +54,7 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 					imageChannel.GaussianNormalize();
 				}
 			}
+			base += 10000;
 			fclose(fp);
 		}
 	}
