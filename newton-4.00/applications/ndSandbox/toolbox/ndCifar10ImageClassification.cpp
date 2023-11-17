@@ -391,9 +391,9 @@ static void Cifar10TrainingSet()
 		const ndBrainLayerConvolutional_2d* conv;
 		const ndBrainLayerImagePolling_2x2* pooling;
 	
-		#if 0
+		#if 1
 			//#define ACTIVATION_TYPE	ndBrainLayerReluActivation
-			#define DIGIT_ACTIVATION_TYPE ndBrainLayerLeakyReluActivation
+			#define ACTIVATION_TYPE ndBrainLayerLeakyReluActivation
 		#else
 			#define ACTIVATION_TYPE	ndBrainLayerTanhActivation
 		#endif
