@@ -103,6 +103,8 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 	ndBrainVector output;
 	output.SetCount((*testLabels)[0].GetCount());
 
+	brain.DisableDropOut();
+
 	ndInt32 failCount = 0;
 	ndBrainVector workingBuffer;
 	for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
@@ -247,8 +249,8 @@ static void Cifar10TrainingSet()
 			ndInt32 batches = trainingLabels->GetCount() / m_bashBufferSize;
 
 			// so far best training result on the cifar-10 data set
-			//optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score 
-			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score 
+			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score 
+			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score 
 			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score 
 			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score 
 
@@ -265,7 +267,7 @@ static void Cifar10TrainingSet()
 				priorityList.PushBack(ndRandInt() % trainingLabels->GetCount());
 			}
 
-			for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 100; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -277,6 +279,7 @@ static void Cifar10TrainingSet()
 					ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 					optimizer.Update(this, m_trainers, m_learnRate);
 
+					m_brain.UpdateDropOut();
 					start += m_bashBufferSize;
 				}
 
@@ -322,7 +325,9 @@ static void Cifar10TrainingSet()
 						}
 					});
 
+					m_brain.DisableDropOut();
 					ndBrainThreadPool::ParallelExecute(CrossValidateTest);
+					m_brain.EnableDropOut();
 
 					fails = 0;
 					for (ndInt32 j = 0; j < GetThreadCount(); ++j)
