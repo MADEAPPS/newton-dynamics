@@ -128,7 +128,6 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 		}
 
 		ndAssert(index >= 0);
-		//if (truth[index] < 0.5f)
 		if (truth[index] == ndReal(0.0f))
 		{
 			failCount++;
@@ -249,17 +248,16 @@ static void Cifar10TrainingSet()
 			ndInt32 minTestFail = testLabels->GetCount();
 			ndInt32 minTrainingFail = trainingLabels->GetCount();
 			ndInt32 batches = trainingLabels->GetCount() / m_bashBufferSize;
+			//batches = 1;
 
 			// so far best training result on the cifar-10 data set
 			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score (%)
 			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score (%)
 			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score (%)
 			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score (%)
-
-			//batches = 1;
+			
 			ndArray<ndUnsigned32> shuffleBuffer;
 			ndFixSizeArray<ndUnsigned32, 1024 * 2> priorityList;
-
 			for (ndInt32 i = 0; i < trainingLabels->GetCount(); ++i)
 			{
 				shuffleBuffer.PushBack(ndUnsigned32(i));
@@ -274,9 +272,16 @@ static void Cifar10TrainingSet()
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
 
+				m_brain.EnableDropOut();
 				for (ndInt32 bash = 0; bash < batches; ++bash)
 				{
 					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_bashBufferSize);
+
+					const ndInt32 priorityCount = ndMin(4, priorityList.GetCount());
+					for (ndInt32 i = 0; i < priorityCount; ++i)
+					{
+						miniBashArray[i] = priorityList[ndInt32(ndRandInt() % priorityList.GetCount())];
+					}
 
 					ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 					optimizer.Update(this, m_trainers, m_learnRate);
@@ -293,7 +298,7 @@ static void Cifar10TrainingSet()
 
 				if (fails <= minTrainingFail)
 				{
-					const ndInt32 minTestCheck = 500;
+					const ndInt32 minTestCheck = 1000;
 					ndInt32 actualTraining = fails;
 					bool traningTest = fails < minTrainingFail;
 					minTrainingFail = ndMax(fails, minTestCheck);
@@ -330,7 +335,6 @@ static void Cifar10TrainingSet()
 
 					m_brain.DisableDropOut();
 					ndBrainThreadPool::ParallelExecute(CrossValidateTest);
-					m_brain.EnableDropOut();
 
 					fails = 0;
 					for (ndInt32 j = 0; j < GetThreadCount(); ++j)
@@ -360,6 +364,7 @@ static void Cifar10TrainingSet()
 					}
 				}
 
+				priorityList.SetCount(0);
 				for (ndInt32 i = 0; i < m_prioritySamples.GetCount(); ++i)
 				{
 					ndFixSizeArray<ndUnsigned32, 16>& priority = m_prioritySamples[i];
@@ -453,21 +458,21 @@ static void Cifar10TrainingSet()
 
 static void Cifar10TestSet()
 {
-	ndAssert(0);
-	//ndSharedPtr<ndBrainMatrix> testLabels (LoadMnistLabelData("cifar-10-batches-bin/t10k-labels.idx1-ubyte"));
-	//ndSharedPtr<ndBrainMatrix> testDigits (LoadMnistSampleData("cifar-10-batches-bin/t10k-images.idx3-ubyte"));
-	//
-	//if (testLabels && testDigits)
-	//{
-	//	char path[256];
-	//	ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
-	//
-	//	ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
-	//	ndUnsigned64 time = ndGetTimeInMicroseconds();
-	//	ValidateData("test data", *(*brain), *testLabels, *testDigits);
-	//	time = ndGetTimeInMicroseconds() - time;
-	//	ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
-	//}
+	ndSharedPtr<ndBrainMatrix> testLabels;
+	ndSharedPtr<ndBrainMatrix> testImages;
+	LoadTestData(testImages, testLabels);
+	
+	if (testLabels && testImages)
+	{
+		char path[256];
+		ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
+	
+		ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
+		ndUnsigned64 time = ndGetTimeInMicroseconds();
+		ValidateData("test data", *(*brain), *testLabels, *testImages);
+		time = ndGetTimeInMicroseconds() - time;
+		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
+	}
 }
 
 void ndCifar10ImageClassification()
@@ -475,5 +480,5 @@ void ndCifar10ImageClassification()
 	ndSetRandSeed(12345);
 
 	Cifar10TrainingSet();
-	//Cifar10TestSet();
+	Cifar10TestSet();
 }

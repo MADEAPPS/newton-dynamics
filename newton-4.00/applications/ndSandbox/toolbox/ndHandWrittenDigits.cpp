@@ -279,6 +279,7 @@ static void MnistTrainingSet()
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
 
+				m_brain.EnableDropOut();
 				for (ndInt32 bash = 0; bash < batches; ++bash)
 				{
 					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_bashBufferSize);
@@ -341,7 +342,6 @@ static void MnistTrainingSet()
 
 					m_brain.DisableDropOut();
 					ndBrainThreadPool::ParallelExecute(CrossValidateTest);
-					m_brain.EnableDropOut();
 
 					fails = 0;
 					for (ndInt32 j = 0; j < GetThreadCount(); ++j)

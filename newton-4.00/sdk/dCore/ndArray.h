@@ -286,7 +286,7 @@ template<class T>
 void ndArray<T>::RandomShuffle(ndInt32 count)
 {
 	const ndInt32 size = ndMin (count, GetCount());
-	for (ndInt32 i = size - 1; i != 0; --i)
+	for (ndInt32 i = size - 1; i >= 0; --i)
 	{
 		ndUnsigned32 randomIndex = ndRandInt();
 		ndUnsigned32 j = randomIndex % ndUnsigned32(size);
