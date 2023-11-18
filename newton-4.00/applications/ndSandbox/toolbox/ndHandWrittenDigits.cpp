@@ -255,7 +255,7 @@ static void MnistTrainingSet()
 			//batches = 1;
 
 			// so far best training result on the mnist data set
-			//optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(98.070%)  conv(99.170%)
+			//optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(98.070%)  conv(99.380%)
 			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score fully(98.200%)  conv(99.240%)
 			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score fully(97.980%)  conv(99.210%)
 			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score fully(%)  conv(%)
@@ -274,7 +274,7 @@ static void MnistTrainingSet()
 			}
 
 			//for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
-			for (ndInt32 epoch = 0; epoch < 100; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 500; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -304,9 +304,10 @@ static void MnistTrainingSet()
 
 				if (fails <= minTrainingFail)
 				{
+					const ndInt32 minTestCheck = 500;
 					ndInt32 actualTraining = fails;
 					bool traningTest = fails < minTrainingFail;
-					minTrainingFail = ndMax(fails, ndInt32(500));
+					minTrainingFail = ndMax(fails, minTestCheck);
 
 					auto CrossValidateTest = ndMakeObject::ndFunction([this, testDigits, testLabels, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
 					{
@@ -348,7 +349,7 @@ static void MnistTrainingSet()
 						fails += failCount[j];
 					}
 
-					if (traningTest && (minTrainingFail > 500))
+					if (traningTest && (minTrainingFail > minTestCheck))
 					{
 						minTestFail = fails;
 						bestBrain.CopyFrom(m_brain);

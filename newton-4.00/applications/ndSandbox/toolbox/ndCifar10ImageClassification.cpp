@@ -251,10 +251,10 @@ static void Cifar10TrainingSet()
 			ndInt32 batches = trainingLabels->GetCount() / m_bashBufferSize;
 
 			// so far best training result on the cifar-10 data set
-			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score 
-			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score 
-			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score 
-			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score 
+			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score (%)
+			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score (%)
+			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score (%)
+			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score (%)
 
 			//batches = 1;
 			ndArray<ndUnsigned32> shuffleBuffer;
@@ -269,7 +269,7 @@ static void Cifar10TrainingSet()
 				priorityList.PushBack(ndRandInt() % trainingLabels->GetCount());
 			}
 
-			for (ndInt32 epoch = 0; epoch < 100; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 500; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -293,9 +293,10 @@ static void Cifar10TrainingSet()
 
 				if (fails <= minTrainingFail)
 				{
+					const ndInt32 minTestCheck = 500;
 					ndInt32 actualTraining = fails;
 					bool traningTest = fails < minTrainingFail;
-					minTrainingFail = ndMax(fails, ndInt32(200));
+					minTrainingFail = ndMax(fails, minTestCheck);
 
 					auto CrossValidateTest = ndMakeObject::ndFunction([this, testDigits, testLabels, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
 					{
@@ -337,7 +338,7 @@ static void Cifar10TrainingSet()
 						fails += failCount[j];
 					}
 
-					if (traningTest && (minTrainingFail > 200))
+					if (traningTest && (minTrainingFail > minTestCheck))
 					{
 						minTestFail = fails;
 						bestBrain.CopyFrom(m_brain);
