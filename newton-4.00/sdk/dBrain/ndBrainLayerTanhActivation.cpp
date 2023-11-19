@@ -248,9 +248,9 @@ void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& 
 		output[i] = ndBrainFloat(ScalarTanhApproximation(input[i]));
 		#if _DEBUG
 			// check accuracy, expected error less that 2.0e-6 of all cases.
-			ndFloat32 xxx0 = output[i];
-			ndFloat32 xxx1 = ndTanh(input[i]);
-			ndAssert(ndAbs(xxx1 - xxx0) < ndFloat32(2.0e-6f));
+			ndBrainFloat xxx0 = output[i];
+			ndBrainFloat xxx1 = ndTanh(input[i]);
+			ndAssert(ndAbs(xxx1 - xxx0) < ndBrainFloat(2.0e-6f));
 		#endif
 	}
 

@@ -396,7 +396,7 @@ static void Cifar10TrainingSet()
 		ndInt32 width = trainingImages->GetColumns() / (height * 3);
 		ndAssert((3 * height * width) == trainingImages->GetColumns());
 	
-		const ndBrainLayerConvolutional_2d* conv;
+		const ndBrainLayerConvolutionalWithDropOut_2d* conv;
 		const ndBrainLayerImagePolling_2x2* pooling;
 	
 		#if 1
@@ -406,27 +406,27 @@ static void Cifar10TrainingSet()
 			#define ACTIVATION_TYPE	ndBrainLayerTanhActivation
 		#endif
 	
-		layers.PushBack(new ndBrainLayerConvolutional_2d(width, height, 3, 5, 32));
-		conv = (ndBrainLayerConvolutional_2d*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(width, height, 3, 5, 16));
+		conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
 		layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 		layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 	
-		layers.PushBack(new ndBrainLayerConvolutional_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 64));
-		conv = (ndBrainLayerConvolutional_2d*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
+		conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
 		layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 		layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 	
-		layers.PushBack(new ndBrainLayerConvolutional_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 64));
-		conv = (ndBrainLayerConvolutional_2d*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
+		conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
 		layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 
-		//layers.PushBack(new ndBrainLayerConvolutional_2d(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels(), 3, 64));
-		//conv = (ndBrainLayerConvolutional_2d*)(layers[layers.GetCount() - 1]);
+		//layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels(), 3, 64));
+		//conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
 		//layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 
-		ndInt32 neuronsPerLayers = 128;
+		ndInt32 neuronsPerLayers = 64;
 		layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 

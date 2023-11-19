@@ -52,6 +52,7 @@
 #include <ndBrainLayerTanhActivation.h>
 #include <ndBrainLayerImagePolling_2x2.h>
 #include <ndBrainLayerConvolutional_2d.h>
+#include <ndBrainLayerConvolutionalWithDropOut_2d.h>
 #include <ndBrainLossLeastSquaredError.h>
 #include <ndBrainLayerLinearWithDropOut.h>
 #include <ndBrainLayerSigmoidActivation.h>

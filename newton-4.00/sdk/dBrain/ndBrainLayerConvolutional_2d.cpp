@@ -208,10 +208,9 @@ void ndBrainLayerConvolutional_2d::ScaleAdd(const ndBrainLayer& src, ndBrainFloa
 
 void ndBrainLayerConvolutional_2d::Blend(const ndBrainLayer& src, ndBrainFloat blend)
 {
-	//const ndBrainLayerConvolutional_2d& linearSrc = (ndBrainLayerConvolutional_2d&)src;
-	//m_bias.Blend(linearSrc.m_bias, blend);
-	//m_weights.Blend(linearSrc.m_weights, blend);
-	ndAssert(0);
+	const ndBrainLayerConvolutional_2d& linearSrc = (ndBrainLayerConvolutional_2d&)src;
+	m_bias.Blend(linearSrc.m_bias, blend);
+	m_kernels.Blend(linearSrc.m_kernels, blend);
 }
 
 void ndBrainLayerConvolutional_2d::AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon)
@@ -347,7 +346,6 @@ void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, nd
 	ndBrainFloat convKernelBuffer[512];
 	ndBrainMemVector convKernel(convKernelBuffer, kernelSize);
 
-	//auto CrossCorrelation = [this](const ndBrainVector& input, const ndBrainVector& kernel)
 	auto CrossCorrelation = [this, &convKernel](const ndBrainVector& input)
 	{
 		ndBrainFloat value = ndBrainFloat(0.0f);

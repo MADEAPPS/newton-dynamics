@@ -203,10 +203,9 @@ void ndBrainLayerCrossCorrelation_2d::ScaleAdd(const ndBrainLayer& src, ndBrainF
 
 void ndBrainLayerCrossCorrelation_2d::Blend(const ndBrainLayer& src, ndBrainFloat blend)
 {
-	//const ndBrainLayerCrossCorrelation_2d& linearSrc = (ndBrainLayerCrossCorrelation_2d&)src;
-	//m_bias.Blend(linearSrc.m_bias, blend);
-	//m_weights.Blend(linearSrc.m_weights, blend);
-	ndAssert(0);
+	const ndBrainLayerCrossCorrelation_2d& linearSrc = (ndBrainLayerCrossCorrelation_2d&)src;
+	m_bias.Blend(linearSrc.m_bias, blend);
+	m_kernels.Blend(linearSrc.m_kernels, blend);
 }
 
 void ndBrainLayerCrossCorrelation_2d::AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon)

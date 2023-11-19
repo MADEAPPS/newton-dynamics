@@ -29,9 +29,10 @@
 #include "ndBrainLayerConvolutional_2d.h"
 #include "ndBrainLayerSoftmaxActivation.h"
 #include "ndBrainLayerSigmoidActivation.h"
-#include "ndBrainLayerLinearWithDropOut.h"
+//#include "ndBrainLayerLinearWithDropOut.h"
 #include "ndBrainLayerCrossCorrelation_2d.h"
 #include "ndBrainLayerLeakyReluActivation.h"
+//#include "ndBrainLayerConvolutionalWithDropOut_2d.h"
 #include "ndBrainLayerCategoricalSoftmaxActivation.h"
 
 ndBrain* ndBrainLoad::Load(const char* const pathName)

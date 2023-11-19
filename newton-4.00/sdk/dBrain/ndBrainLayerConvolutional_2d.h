@@ -69,7 +69,7 @@ class ndBrainLayerConvolutional_2d : public ndBrainLayer
 	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
 	virtual void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
 
-	private:
+	protected:
 	void InitGaussianBias(ndBrainFloat variance);
 	void InitGaussianWeights(ndBrainFloat variance);
 

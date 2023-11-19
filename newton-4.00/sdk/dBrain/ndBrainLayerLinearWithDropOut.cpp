@@ -35,8 +35,6 @@ ndBrainLayerLinearWithDropOut::ndBrainLayerLinearWithDropOut(ndInt32 inputs, ndI
 	ndAssert(dropOutFactor <= ndBrainFloat(1.0f));
 	m_dropout.SetCount(outputs);
 	UpdateDropOut();
-
-//m_droutOutEnable = false;
 }
 
 ndBrainLayerLinearWithDropOut::ndBrainLayerLinearWithDropOut(const ndBrainLayerLinearWithDropOut& src)
@@ -66,74 +64,12 @@ ndBrainLayer* ndBrainLayerLinearWithDropOut::Clone() const
 void ndBrainLayerLinearWithDropOut::Save(const ndBrainSave* const loadSave) const
 {
 	ndBrainLayerLinear::Save(loadSave);
-	//char buffer[1024];
-	//auto Save = [this, &buffer, &loadSave](const char* const fmt, ...)
-	//{
-	//	va_list v_args;
-	//	buffer[0] = 0;
-	//	va_start(v_args, fmt);
-	//	vsprintf(buffer, fmt, v_args);
-	//	va_end(v_args);
-	//	loadSave->WriteData(buffer);
-	//};
-	//
-	//Save("\tinputs %d\n", m_weights.GetColumns());
-	//Save("\touputs %d\n", m_weights.GetCount());
-	//
-	//Save("\tbias ");
-	//for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
-	//{
-	//	Save("%g ", m_bias[i]);
-	//}
-	//Save("\n");
-	//
-	//Save("\tweights\n");
-	//for (ndInt32 i = 0; i < m_weights.GetCount(); ++i)
-	//{
-	//	Save("\t\trow_%d ", i);
-	//	const ndBrainVector& row = m_weights[i];
-	//	for (ndInt32 j = 0; j < GetInputSize(); ++j)
-	//	{
-	//		Save("%g ", row[j]);
-	//	}
-	//	Save("\n");
-	//}
 }
 
-//ndBrainLayer* ndBrainLayerLinearWithDropOut::Load(const ndBrainLoad* const loadSave)
 ndBrainLayer* ndBrainLayerLinearWithDropOut::Load(const ndBrainLoad* const)
 {
 	ndAssert(0);
 	return nullptr;
-	//char buffer[1024];
-	//loadSave->ReadString(buffer);
-	//
-	//loadSave->ReadString(buffer);
-	//ndInt32 inputs = loadSave->ReadInt();
-	//loadSave->ReadString(buffer);
-	//ndInt32 outputs = loadSave->ReadInt();
-	//ndBrainLayerLinearWithDropOut* const layer = new ndBrainLayerLinearWithDropOut(inputs, outputs);
-	//
-	//loadSave->ReadString(buffer);
-	//for (ndInt32 i = 0; i < outputs; ++i)
-	//{
-	//	ndBrainFloat val = ndBrainFloat(loadSave->ReadFloat());
-	//	layer->m_bias[i] = val;
-	//}
-	//
-	//loadSave->ReadString(buffer);
-	//for (ndInt32 i = 0; i < outputs; ++i)
-	//{
-	//	loadSave->ReadString(buffer);
-	//	for (ndInt32 j = 0; j < inputs; ++j)
-	//	{
-	//		ndBrainFloat val = ndBrainFloat(loadSave->ReadFloat());
-	//		layer->m_weights[i][j] = val;
-	//	}
-	//}
-	//
-	//loadSave->ReadString(buffer);
-	//return layer;
 }
 
 void ndBrainLayerLinearWithDropOut::EnableDropOut(bool state)

@@ -408,7 +408,7 @@ static void MnistTrainingSet()
 		#endif
 
 		#if 1
-			#define DIGIT_FILTER_LAYER_TYPE ndBrainLayerConvolutional_2d
+			#define DIGIT_FILTER_LAYER_TYPE ndBrainLayerConvolutionalWithDropOut_2d
 		#else
 			#define DIGIT_FILTER_LAYER_TYPE ndBrainLayerCrossCorrelation_2d			
 		#endif
