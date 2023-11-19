@@ -268,7 +268,7 @@ ndSoundManager::ndSoundManager(ndDemoEntityManager* const scene)
 	,m_upDir(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f))
 	,m_frontDir(ndFloat32 (0.0f), ndFloat32(0.0f), ndFloat32(-1.0f), ndFloat32(0.0f))
 {
-	ndAssert(m_device);
+	//ndAssert(m_device);
 	if (m_device)
 	{
 		m_context = alcCreateContext(m_device, nullptr);
