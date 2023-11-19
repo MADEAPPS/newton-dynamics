@@ -39,10 +39,11 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual ndInt32 GetOutputSize() const;
 	virtual ndInt32 GetInputSize() const;
 	virtual const char* GetLabelId() const;
-	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
-
+	virtual ndInt32 GetNumberOfParameters() const;
+	
 	virtual ndBrainVector* GetBias();
 	virtual ndBrainMatrix* GetWeights();
+	
 	
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
@@ -63,6 +64,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 	void Set(const ndBrainLayer& src);
 	void Add(const ndBrainLayer& src);
 	void Mul(const ndBrainLayer& src);
+	void Blend(const ndBrainLayer& src, ndBrainFloat blend);
 	void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
 
 	protected:

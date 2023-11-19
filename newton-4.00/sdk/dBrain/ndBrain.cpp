@@ -89,6 +89,18 @@ ndBrainLayer* ndBrain::AddLayer(ndBrainLayer* const layer)
 	return layer;
 }
 
+ndInt32 ndBrain::GetNumberOfParameters() const
+{
+	const ndArray<ndBrainLayer*>& layers = *this;
+
+	ndInt32 parameters = 0;
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+		parameters += layers[i]->GetNumberOfParameters();
+	}
+	return parameters;
+}
+
 void ndBrain::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
 {
 	ndArray<ndBrainLayer*>& layers = *this;

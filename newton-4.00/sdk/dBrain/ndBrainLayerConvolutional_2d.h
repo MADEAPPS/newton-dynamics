@@ -43,8 +43,8 @@ class ndBrainLayerConvolutional_2d : public ndBrainLayer
 	virtual ndInt32 GetOutputSize() const;
 	virtual ndInt32 GetInputSize() const;
 	virtual const char* GetLabelId() const;
-	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
-	
+	virtual ndInt32 GetNumberOfParameters() const;
+		
 	virtual void UpdateDropOut();
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
@@ -66,7 +66,7 @@ class ndBrainLayerConvolutional_2d : public ndBrainLayer
 	virtual void Set(const ndBrainLayer& src);
 	virtual void Add(const ndBrainLayer& src);
 	virtual void Mul(const ndBrainLayer& src);
-	//virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
+	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
 	virtual void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
 
 	private:

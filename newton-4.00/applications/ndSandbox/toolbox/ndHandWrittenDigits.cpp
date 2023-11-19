@@ -256,7 +256,7 @@ static void MnistTrainingSet()
 
 			// so far best training result on the mnist data set
 			//optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(98.070%)  conv(99.380%)
-			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score fully(98.200%)  conv(99.240%)
+			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score fully(98.200%)  conv(99.280%)
 			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score fully(97.980%)  conv(99.210%)
 			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score fully(%)  conv(%)
 			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// test data score fully(%)  conv(%)
@@ -408,9 +408,9 @@ static void MnistTrainingSet()
 		#endif
 
 		#if 1
-			#define DIGIT_FILER_LAYER ndBrainLayerConvolutional_2d
+			#define DIGIT_FILTER_LAYER_TYPE ndBrainLayerConvolutional_2d
 		#else
-			#define DIGIT_FILER_LAYER ndBrainLayerCrossCorrelation_2d			
+			#define DIGIT_FILTER_LAYER_TYPE ndBrainLayerCrossCorrelation_2d			
 		#endif
 
 		#ifdef D_USE_CONVOLUTIONAL_LAYERS
@@ -418,23 +418,23 @@ static void MnistTrainingSet()
 			ndInt32 width = trainingDigits->GetColumns() / height;
 			ndAssert((height * width) == trainingDigits->GetColumns());
 
-			const DIGIT_FILER_LAYER* conv;
+			const DIGIT_FILTER_LAYER_TYPE* conv;
 			const ndBrainLayerImagePolling_2x2* pooling;
 
-			layers.PushBack(new DIGIT_FILER_LAYER(width, height, 1, 3, 16));
-			conv = (DIGIT_FILER_LAYER*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new DIGIT_FILTER_LAYER_TYPE(width, height, 1, 3, 16));
+			conv = (DIGIT_FILTER_LAYER_TYPE*)(layers[layers.GetCount() - 1]);
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
 			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
-			layers.PushBack(new DIGIT_FILER_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
-			conv = (DIGIT_FILER_LAYER*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new DIGIT_FILTER_LAYER_TYPE(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
+			conv = (DIGIT_FILTER_LAYER_TYPE*)(layers[layers.GetCount() - 1]);
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
 			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
-			layers.PushBack(new DIGIT_FILER_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
-			conv = (DIGIT_FILER_LAYER*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new DIGIT_FILTER_LAYER_TYPE(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
+			conv = (DIGIT_FILTER_LAYER_TYPE*)(layers[layers.GetCount() - 1]);
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
 
 		#else
@@ -493,7 +493,10 @@ static void MnistTestSet()
 		#endif
 
 		ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
+
+		ndInt32 numbeOfParam = brain->GetNumberOfParameters();
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
+		ndExpandTraceMessage("number of Parameters %d\n", numbeOfParam);
 		ValidateData("test data", *(*brain), *testLabels, *testDigits);
 		time = ndGetTimeInMicroseconds() - time;
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
@@ -504,6 +507,6 @@ void ndHandWrittenDigits()
 {
 	ndSetRandSeed(12345);
 
-	MnistTrainingSet();
+	//MnistTrainingSet();
 	MnistTestSet();
 }

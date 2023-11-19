@@ -126,6 +126,11 @@ ndInt32 ndBrainLayerConvolutional_2d::GetOutputChannels() const
 	return m_outputLayers;
 }
 
+ndInt32 ndBrainLayerConvolutional_2d::GetNumberOfParameters() const
+{
+	return m_bias.GetCount() + m_kernelSize * m_kernelSize * m_inputLayers * m_outputLayers;
+}
+
 bool ndBrainLayerConvolutional_2d::HasParameters() const
 {
 	return true;

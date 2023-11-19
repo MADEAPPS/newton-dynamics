@@ -40,6 +40,7 @@ class ndBrainLayer : public ndClassAlloc
 
 	virtual bool HasParameters() const;
 	virtual const char* GetLabelId() const;
+	virtual ndInt32 GetNumberOfParameters() const;
 
 	virtual ndInt32 GetInputSize() const;
 	virtual ndInt32 GetOutputSize() const;

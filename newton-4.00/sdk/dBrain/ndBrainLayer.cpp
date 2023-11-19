@@ -43,6 +43,11 @@ ndBrainLayer* ndBrainLayer::Clone() const
 	return nullptr;
 }
 
+ndInt32 ndBrainLayer::GetNumberOfParameters() const
+{
+	return 0;
+}
+
 const char* ndBrainLayer::GetLabelId() const
 {
 	ndAssert(0);

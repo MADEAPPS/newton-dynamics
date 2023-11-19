@@ -74,6 +74,11 @@ ndBrainMatrix* ndBrainLayerLinear::GetWeights()
 	return &m_weights;
 }
 
+ndInt32 ndBrainLayerLinear::GetNumberOfParameters() const
+{
+	return m_bias.GetCount() + m_weights.GetColumns() * m_weights.GetRows();
+}
+
 bool ndBrainLayerLinear::HasParameters() const
 {
 	return true;

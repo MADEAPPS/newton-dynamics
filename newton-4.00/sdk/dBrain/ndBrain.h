@@ -42,6 +42,8 @@ class ndBrain: public ndArray<ndBrainLayer*>
 
 	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
 
+	ndInt32 GetNumberOfParameters() const;
+
 	void UpdateDropOut();
 	void EnableDropOut();
 	void DisableDropOut();
