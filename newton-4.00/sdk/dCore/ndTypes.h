@@ -415,25 +415,8 @@ inline void operator delete[](void* ptr)	\
 	class ndAtomic : public std::atomic<T>
 	{
 		public:
-		ndAtomic<T>()
-			: std::atomic<T>(T(0))
-		{
-		}
-
-		ndAtomic<T>(T val)
-			: std::atomic<T>(val)
-		{
-		}
-
-		ndAtomic<T>(const ndAtomic<T>& copy)
-			: std::atomic<T>(copy.load())
-		{
-		}
-
-		T operator=(T value)
-		{
-			return std::atomic<T>::operator=(value);
-		}
+		using std::atomic<T>::atomic;
+		using std::atomic<T>::operator=;
 	};
 #endif
 
