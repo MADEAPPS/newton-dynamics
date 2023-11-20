@@ -76,7 +76,6 @@ class ndBrainLayerConvolutional_2d : public ndBrainLayer
 
 	ndBrainVector m_bias;
 	ndBrainVector m_kernels;
-	//mutable ndBrainVector m_paddedGradientOut____;
 	ndFixSizeArray<ndInt32, 128> m_inputOffsets;
 	ndFixSizeArray<ndInt32, 128> m_inputGradOffsets;
 

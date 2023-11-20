@@ -43,7 +43,8 @@ class ndBrainLayerCrossCorrelation_2d : public ndBrainLayer
 	virtual ndInt32 GetOutputSize() const;
 	virtual ndInt32 GetInputSize() const;
 	virtual const char* GetLabelId() const;
-	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
+	virtual ndInt32 GetOutputBufferSize() const;
+	virtual ndInt32 GetNumberOfParameters() const;
 	
 	virtual void UpdateDropOut();
 	virtual void InitWeightsXavierMethod();
@@ -66,7 +67,7 @@ class ndBrainLayerCrossCorrelation_2d : public ndBrainLayer
 	virtual void Set(const ndBrainLayer& src);
 	virtual void Add(const ndBrainLayer& src);
 	virtual void Mul(const ndBrainLayer& src);
-	//virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
+	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
 	virtual void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
 
 	private:
@@ -75,7 +76,6 @@ class ndBrainLayerCrossCorrelation_2d : public ndBrainLayer
 
 	ndBrainVector m_bias;
 	ndBrainVector m_kernels;
-	mutable ndBrainVector m_paddedGradientOut;
 	ndFixSizeArray<ndInt32, 128> m_inputOffsets;
 	ndFixSizeArray<ndInt32, 128> m_inputGradOffsets;
 
