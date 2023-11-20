@@ -316,6 +316,13 @@ class ndSpinLock
 	{
 	}
 
+	ndSpinLock(ndSpinLock const& other)
+	#ifndef D_USE_THREAD_EMULATION
+		:m_lock(other.m_lock.load())
+	#endif
+	{
+	}
+
 	void Lock()
 	{
 		#ifndef D_USE_THREAD_EMULATION	
