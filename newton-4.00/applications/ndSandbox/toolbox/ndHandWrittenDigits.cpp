@@ -382,7 +382,7 @@ static void MnistTrainingSet()
 					}
 					priority.SetCount(0);
 				}
-				//shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
+				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 			}
 			m_brain.CopyFrom(bestBrain);
 		}
