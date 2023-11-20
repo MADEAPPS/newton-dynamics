@@ -471,6 +471,8 @@ static void Cifar10TestSet()
 	
 		ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
+		ndInt32 numbeOfParam = brain->GetNumberOfParameters();
+		ndExpandTraceMessage("number of Parameters %d\n", numbeOfParam);
 		ValidateData("test data", *(*brain), *testLabels, *testImages);
 		time = ndGetTimeInMicroseconds() - time;
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);

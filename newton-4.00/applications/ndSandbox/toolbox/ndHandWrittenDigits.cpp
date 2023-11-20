@@ -166,7 +166,7 @@ static void MnistTrainingSet()
 			,m_bashBufferSize(BASH_BUFFER_SIZE)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
-	threadCount = 4;
+	//threadCount = 4;
 			SetThreadCount(threadCount);
 			for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 			{
@@ -252,7 +252,7 @@ static void MnistTrainingSet()
 			ndInt32 minTestFail = testDigits->GetCount();
 			ndInt32 minTrainingFail = trainingDigits->GetCount();
 			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
-			batches = 1;
+			//batches = 1;
 
 			// so far best training result on the mnist data set
 			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(98.070%)  conv(99.380%)
@@ -273,9 +273,9 @@ static void MnistTrainingSet()
 				priorityList.PushBack(ndRandInt() % trainingDigits->GetCount());
 			}
 
-			//for (ndInt32 epoch = 0; epoch < 500; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 500; ++epoch)
 			//for (ndInt32 epoch = 0; epoch < 15; ++epoch)
-			for (ndInt32 epoch = 0; epoch < 21; ++epoch)
+			//for (ndInt32 epoch = 0; epoch < 21; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -342,7 +342,7 @@ static void MnistTrainingSet()
 					});
 
 					m_brain.DisableDropOut();
-					//ndBrainThreadPool::ParallelExecute(CrossValidateTest);
+					ndBrainThreadPool::ParallelExecute(CrossValidateTest);
 
 					fails = 0;
 					for (ndInt32 j = 0; j < GetThreadCount(); ++j)
@@ -428,11 +428,11 @@ static void MnistTrainingSet()
 			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
-			//layers.PushBack(new DIGIT_FILTER_LAYER_TYPE(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
-			//conv = (DIGIT_FILTER_LAYER_TYPE*)(layers[layers.GetCount() - 1]);
-			//layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
-			//layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
-			//pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new DIGIT_FILTER_LAYER_TYPE(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
+			conv = (DIGIT_FILTER_LAYER_TYPE*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
+			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
+			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
 			layers.PushBack(new DIGIT_FILTER_LAYER_TYPE(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
 			conv = (DIGIT_FILTER_LAYER_TYPE*)(layers[layers.GetCount() - 1]);
@@ -444,11 +444,11 @@ static void MnistTrainingSet()
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 		#endif
 
-		//layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		//layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-		//
-		//layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		//layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+		
+		layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -472,7 +472,7 @@ static void MnistTrainingSet()
 		#endif
 		
 		ndBrainSave::Save(&brain, path);
-		//ValidateData("training data", brain, *trainingLabels, *trainingDigits);
+		ValidateData("training data", brain, *trainingLabels, *trainingDigits);
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 }
