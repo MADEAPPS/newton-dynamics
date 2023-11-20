@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-#define D_USE_CONVOLUTIONAL_LAYERS
+//#define D_USE_CONVOLUTIONAL_LAYERS
 
 static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 {
@@ -252,7 +252,7 @@ static void MnistTrainingSet()
 			ndInt32 minTestFail = testDigits->GetCount();
 			ndInt32 minTrainingFail = trainingDigits->GetCount();
 			ndInt32 batches = trainingDigits->GetCount() / m_bashBufferSize;
-			batches = 1;
+			batches = 2;
 
 			// so far best training result on the mnist data set
 			//optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(98.070%)  conv(99.380%)
@@ -273,7 +273,8 @@ static void MnistTrainingSet()
 				priorityList.PushBack(ndRandInt() % trainingDigits->GetCount());
 			}
 
-			for (ndInt32 epoch = 0; epoch < 500; ++epoch)
+			//for (ndInt32 epoch = 0; epoch < 500; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 51; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -437,18 +438,16 @@ static void MnistTrainingSet()
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
 
 		#else
-
-			//layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), neuronsPerLayers));
+		
 			layers.PushBack(new ndBrainLayerLinearWithDropOut(trainingDigits->GetColumns(), neuronsPerLayers));
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-
 		#endif
 
-		//layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		//layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-		//
-		//layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		//layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+		
+		layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
