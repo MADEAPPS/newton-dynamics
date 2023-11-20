@@ -42,6 +42,7 @@ class ndBrainLayerImagePolling_2x2 : public ndBrainLayerActivation
 	ndInt32 GetOutputChannels() const;
 
 	virtual ndInt32 GetInputSize() const;
+	virtual ndInt32 GetOutputBufferSize() const;
 
 	const char* GetLabelId() const;
 	void Save(const ndBrainSave* const loadSave) const;
@@ -51,7 +52,6 @@ class ndBrainLayerImagePolling_2x2 : public ndBrainLayerActivation
 	ndInt32 m_width;
 	ndInt32 m_height;
 	ndInt32 m_channels;
-	mutable ndArray<ndInt32> m_index;
 };
 
 #endif 

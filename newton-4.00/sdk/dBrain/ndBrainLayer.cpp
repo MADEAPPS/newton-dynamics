@@ -66,6 +66,11 @@ ndInt32 ndBrainLayer::GetOutputSize() const
 	return 0;
 }
 
+ndInt32 ndBrainLayer::GetOutputBufferSize() const
+{
+	return GetOutputSize();
+}
+
 bool ndBrainLayer::HasParameters() const
 {
 	ndAssert(0);

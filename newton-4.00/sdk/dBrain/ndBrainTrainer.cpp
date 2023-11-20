@@ -99,8 +99,9 @@ ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
 	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
 	{
 		m_prefixScan.PushBack(sizeAcc);
-		sizeAcc += (layers[i]->GetOutputSize() + 7) & -8;
-		maxSize = ndMax(maxSize, layers[i]->GetOutputSize());
+		ndInt32 outputSize = layers[i]->GetOutputBufferSize();
+		sizeAcc += (outputSize + 7) & -8;
+		maxSize = ndMax(maxSize, outputSize);
 	}
 	m_prefixScan.PushBack(sizeAcc + 32);
 

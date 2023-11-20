@@ -29,7 +29,7 @@ ndBrainLayerConvolutional_2d::ndBrainLayerConvolutional_2d(ndInt32 inputWidth, n
 	:ndBrainLayer()
 	,m_bias()
 	,m_kernels()
-	,m_paddedGradientOut()
+	//,m_paddedGradientOut____()
 	,m_inputOffsets()
 	,m_inputGradOffsets()
 	,m_kernelSize(kernelSize)
@@ -64,17 +64,17 @@ ndBrainLayerConvolutional_2d::ndBrainLayerConvolutional_2d(ndInt32 inputWidth, n
 		inputGradOffset += m_inputWidth + m_kernelSize - 1;
 	}
 
-	ndInt32 paddSizeWidth = m_inputWidth + m_kernelSize - 1;
-	ndInt32 paddSizeHeight = m_inputHeight + m_kernelSize - 1;
-	m_paddedGradientOut.SetCount(paddSizeWidth * paddSizeHeight);
-	m_paddedGradientOut.Set(ndBrainFloat(0.0f));
+	//ndInt32 paddSizeWidth = m_inputWidth + m_kernelSize - 1;
+	//ndInt32 paddSizeHeight = m_inputHeight + m_kernelSize - 1;
+	//m_paddedGradientOut____.SetCount(paddSizeWidth * paddSizeHeight);
+	//m_paddedGradientOut____.Set(ndBrainFloat(0.0f));
 }
 
 ndBrainLayerConvolutional_2d::ndBrainLayerConvolutional_2d(const ndBrainLayerConvolutional_2d& src)
 	:ndBrainLayer(src)
 	,m_bias(src.m_bias)
 	,m_kernels(src.m_kernels)
-	,m_paddedGradientOut(src.m_paddedGradientOut)
+	//,m_paddedGradientOut____(src.m_paddedGradientOut____)
 	,m_inputOffsets(src.m_inputOffsets)
 	,m_inputGradOffsets(src.m_inputGradOffsets)
 	,m_kernelSize(src.m_kernelSize)
@@ -104,6 +104,14 @@ ndBrainLayer* ndBrainLayerConvolutional_2d::Clone() const
 ndInt32 ndBrainLayerConvolutional_2d::GetOutputSize() const
 {
 	return m_outputLayers * m_outputWidth * m_outputHeight;
+}
+
+ndInt32 ndBrainLayerConvolutional_2d::GetOutputBufferSize() const
+{
+	ndInt32 size = GetOutputSize();
+	ndInt32 paddSizeWidth = m_inputWidth + m_kernelSize - 1;
+	ndInt32 paddSizeHeight = m_inputHeight + m_kernelSize - 1;
+	return size + paddSizeWidth * paddSizeHeight;
 }
 
 ndInt32 ndBrainLayerConvolutional_2d::GetInputSize() const
@@ -412,7 +420,7 @@ void ndBrainLayerConvolutional_2d::InputDerivative(const ndBrainVector&, const n
 }
 
 void ndBrainLayerConvolutional_2d::CalculateParamGradients(
-	const ndBrainVector& input, const ndBrainVector&,
+	const ndBrainVector& input, const ndBrainVector& output,
 	const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const
 {
 	ndAssert(!strcmp(GetLabelId(), gradientOut->GetLabelId()));
@@ -465,6 +473,7 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 
 	ndInt32 outputOffset = 0;
 	ndInt32 kernelOffset = 0;
+
 	for (ndInt32 filter = 0; filter < m_outputLayers; ++filter)
 	{
 		ndInt32 inputOffset = 0;
@@ -490,7 +499,12 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 	}
 
 	// calculate input gradients
-	auto CopyOutput = [this, &outputDerivative](ndInt32 filter)
+	const ndInt32 paddSizeWidth = m_inputWidth + m_kernelSize - 1;
+	const ndInt32 paddSizeHeight = m_inputHeight + m_kernelSize - 1;
+	ndBrainMemVector paddedGradientOut(&output[0] + GetOutputSize(), paddSizeWidth * paddSizeHeight);
+	paddedGradientOut.Set(ndBrainFloat(0.0f));
+
+	auto CopyOutput = [this, &outputDerivative, &paddedGradientOut](ndInt32 filter)
 	{
 		ndInt32 srcOffset = 0;
 		ndInt32 dstWidth = m_inputWidth + m_kernelSize - 1;
@@ -500,14 +514,15 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 		for (ndInt32 y = 0; y < m_outputHeight; ++y)
 		{
 			const ndBrainMemVector src(&srcGrad[srcOffset], m_outputWidth);
-			ndBrainMemVector dst(&m_paddedGradientOut[dstOffset], m_outputWidth);
+			//ndBrainMemVector dst(&m_paddedGradientOut____[dstOffset], m_outputWidth);
+			ndBrainMemVector dst(&paddedGradientOut[dstOffset], m_outputWidth);
 			dst.Set(src);
 			dstOffset += dstWidth;
 			srcOffset += m_outputWidth;
 		}
 	};
 
-	auto CalculateInpuGradient = [this](const ndBrainVector& filter, ndBrainVector& output)
+	auto CalculateInpuGradient = [this, &paddedGradientOut](const ndBrainVector& filter, ndBrainVector& output)
 	{
 		auto CrossCorrelation = [this, &filter](const ndBrainVector& input)
 		{
@@ -529,7 +544,8 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 		{
 			for (ndInt32 x = 0; x < m_inputWidth; ++x)
 			{
-				const ndBrainMemVector in(&m_paddedGradientOut[gradInputOffset + x], gradInputSize);
+				//const ndBrainMemVector in(&m_paddedGradientOut____[gradInputOffset + x], gradInputSize);
+				const ndBrainMemVector in(&paddedGradientOut[gradInputOffset + x], gradInputSize);
 				output[outputOffset + x] += CrossCorrelation(in);
 			}
 			outputOffset += m_inputWidth;

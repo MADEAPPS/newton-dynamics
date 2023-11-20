@@ -197,7 +197,8 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, 
 	ndInt32 maxSize = layers[0]->GetInputSize();
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
-		maxSize = ndMax(maxSize, layers[i]->GetOutputSize());
+		//maxSize = ndMax(maxSize, layers[i]->GetOutputSize());
+		maxSize = ndMax(maxSize, layers[i]->GetOutputBufferSize());
 	}
 
 	if (workingBuffer.GetCapacity() < (maxSize * 2 + 256))

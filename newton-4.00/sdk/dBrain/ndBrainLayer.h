@@ -44,6 +44,7 @@ class ndBrainLayer : public ndClassAlloc
 
 	virtual ndInt32 GetInputSize() const;
 	virtual ndInt32 GetOutputSize() const;
+	virtual ndInt32 GetOutputBufferSize() const;
 	
 	virtual void Clear();
 	virtual void FlushToZero();

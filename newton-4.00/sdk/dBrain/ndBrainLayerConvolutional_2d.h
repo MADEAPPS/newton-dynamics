@@ -38,11 +38,12 @@ class ndBrainLayerConvolutional_2d : public ndBrainLayer
 	ndInt32 GetOutputWidth() const;
 	ndInt32 GetOutputHeight() const;
 	ndInt32 GetOutputChannels() const;
-
+	
 	virtual bool HasParameters() const;
 	virtual ndInt32 GetOutputSize() const;
 	virtual ndInt32 GetInputSize() const;
 	virtual const char* GetLabelId() const;
+	virtual ndInt32 GetOutputBufferSize() const;
 	virtual ndInt32 GetNumberOfParameters() const;
 		
 	virtual void UpdateDropOut();
@@ -75,7 +76,7 @@ class ndBrainLayerConvolutional_2d : public ndBrainLayer
 
 	ndBrainVector m_bias;
 	ndBrainVector m_kernels;
-	mutable ndBrainVector m_paddedGradientOut;
+	//mutable ndBrainVector m_paddedGradientOut____;
 	ndFixSizeArray<ndInt32, 128> m_inputOffsets;
 	ndFixSizeArray<ndInt32, 128> m_inputGradOffsets;
 
