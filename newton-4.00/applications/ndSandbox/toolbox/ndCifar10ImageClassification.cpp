@@ -164,7 +164,6 @@ static void Cifar10TrainingSet()
 			,m_bashBufferSize(BASH_BUFFER_SIZE)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
-	//threadCount = 1;
 			SetThreadCount(threadCount);
 			for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 			{

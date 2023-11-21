@@ -34,7 +34,8 @@ ndBrainLayerConvolutionalWithDropOut_2d::ndBrainLayerConvolutionalWithDropOut_2d
 {
 	ndAssert(dropOutFactor >= ndBrainFloat(0.5f));
 	ndAssert(dropOutFactor <= ndBrainFloat(1.0f));
-	m_dropout.SetCount(m_outputLayers * m_outputWidth * m_outputHeight);
+	//m_dropout.SetCount(m_outputLayers * m_outputWidth * m_outputHeight);
+	m_dropout.SetCount(m_outputLayers);
 	UpdateDropOut();
 }
 
@@ -76,32 +77,39 @@ ndBrainLayer* ndBrainLayerConvolutionalWithDropOut_2d::Load(const ndBrainLoad* c
 void ndBrainLayerConvolutionalWithDropOut_2d::EnableDropOut(bool state)
 {
 	m_droutOutEnable = state;
-m_droutOutEnable = false;
 }
 
 void ndBrainLayerConvolutionalWithDropOut_2d::UpdateDropOut()
 {
-	//ndInt32 activeCount = 0;
-	//for (ndInt32 i = m_dropout.GetCount() - 1; i >= 0; --i)
-	//{
-	//	ndInt32 active = (ndRand() <= m_dropoutFactor);
-	//	m_dropout[i] = active ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-	//	activeCount += active;
-	//}
-	//
-	//ndAssert(activeCount > 0);
-	//m_dropoutScale = ndBrainFloat(m_dropout.GetCount()) / ndBrainFloat(activeCount);
-	//m_dropout.Scale(m_dropoutScale);
+	ndInt32 activeCount = 0;
+	for (ndInt32 i = m_dropout.GetCount() - 1; i >= 0; --i)
+	{
+		ndInt32 active = (ndRand() <= m_dropoutFactor);
+		m_dropout[i] = active ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		activeCount += active;
+	}
+	
+	ndAssert(activeCount > 0);
+	m_dropoutScale = ndBrainFloat(m_dropout.GetCount()) / ndBrainFloat(activeCount);
+	m_dropout.Scale(m_dropoutScale);
 }
 
 void ndBrainLayerConvolutionalWithDropOut_2d::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-	ndAssert(output.GetCount() == m_dropout.GetCount());
+	//ndAssert(output.GetCount() == m_dropout.GetCount());
+	ndAssert(output.GetCount() == GetOutputSize());
 	ndBrainLayerConvolutional_2d::MakePrediction(input, output);
 	if (m_droutOutEnable)
 	{
-		ndAssert(0);
-		output.Mul(m_dropout);
+		ndInt32 layerOffset = 0;
+		const ndInt32 layerSize = m_outputWidth * m_outputHeight;
+		for (ndInt32 i = 0; i < m_outputLayers; ++i)
+		{
+			ndBrainMemVector out(&output[layerOffset], layerSize);
+			//output.Mul(m_dropout);
+			out.Scale(m_dropout[i]);
+			layerOffset += layerSize;
+		}
 	}
 }
 
@@ -116,10 +124,17 @@ void ndBrainLayerConvolutionalWithDropOut_2d::CalculateParamGradients(
 {
 	if (m_droutOutEnable)
 	{
-		ndAssert(0);
 		const ndBrainFloat* const outMemory = &outputDerivative[0];
-		ndBrainMemVector outDerivative(outMemory, outputDerivative.GetCount());
-		outDerivative.Mul(m_dropout);
+		//ndBrainMemVector outDerivative(outMemory, outputDerivative.GetCount());
+		//outDerivative.Mul(m_dropout);
+		ndInt32 layerOffset = 0;
+		const ndInt32 layerSize = m_outputWidth * m_outputHeight;
+		for (ndInt32 i = 0; i < m_outputLayers; ++i)
+		{
+			ndBrainMemVector outDerivative(&outMemory[layerOffset], layerSize);
+			outDerivative.Scale(m_dropout[i]);
+			layerOffset += layerSize;
+		}
 	}
 	ndBrainLayerConvolutional_2d::CalculateParamGradients(input, output, outputDerivative, inputGradient, gradientOut);
 }
