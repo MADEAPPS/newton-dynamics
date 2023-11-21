@@ -507,7 +507,6 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 		for (ndInt32 y = 0; y < m_outputHeight; ++y)
 		{
 			const ndBrainMemVector src(&srcGrad[srcOffset], m_outputWidth);
-			//ndBrainMemVector dst(&m_paddedGradientOut[dstOffset], m_outputWidth);
 			ndBrainMemVector dst(&paddedGradientOut[dstOffset], m_outputWidth);
 			dst.Set(src);
 			dstOffset += dstWidth;
@@ -537,7 +536,6 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 		{
 			for (ndInt32 x = 0; x < m_inputWidth; ++x)
 			{
-				//const ndBrainMemVector in(&m_paddedGradientOut[gradInputOffset + x], gradInputSize);
 				const ndBrainMemVector in(&paddedGradientOut[gradInputOffset + x], gradInputSize);
 				output[outputOffset + x] += CrossCorrelation(in);
 			}
