@@ -23,8 +23,6 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerConvolutionalWithDropOut_2d.h"
 
-#define ND_BRAIN_CONV_LAYER_USE_BIAS
-
 ndBrainLayerConvolutionalWithDropOut_2d::ndBrainLayerConvolutionalWithDropOut_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels, ndBrainFloat dropOutFactor)
 	:ndBrainLayerConvolutional_2d(inputWidth, inputHeight, inputDepth, kernelSize, numberOfKernels)
 	,m_dropout()

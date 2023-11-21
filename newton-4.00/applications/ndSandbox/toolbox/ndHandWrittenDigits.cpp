@@ -162,11 +162,11 @@ static void MnistTrainingSet()
 			:ndBrainThreadPool()
 			,m_brain(*brain)
 			,m_prioritySamples()
-			,m_learnRate(ndReal(1.0e-3f))
+			,m_learnRate(ndReal(5.0e-4f))
 			,m_bashBufferSize(BASH_BUFFER_SIZE)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
-	//threadCount = 4;
+	threadCount = 1;
 			SetThreadCount(threadCount);
 			for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 			{

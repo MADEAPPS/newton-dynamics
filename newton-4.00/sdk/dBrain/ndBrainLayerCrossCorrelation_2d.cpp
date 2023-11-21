@@ -23,8 +23,6 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerCrossCorrelation_2d.h"
 
-#define ND_BRAIN_CONV_LAYER_USE_BIAS
-
 ndBrainLayerCrossCorrelation_2d::ndBrainLayerCrossCorrelation_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)
 	:ndBrainLayer()
 	,m_bias()
@@ -357,11 +355,7 @@ void ndBrainLayerCrossCorrelation_2d::MakePrediction(const ndBrainVector& input,
 		return value;
 	};
 
-	#ifdef ND_BRAIN_CONV_LAYER_USE_BIAS
-		ndBrainFloat biasScale = ndBrainFloat(1.0f) / ndBrainFloat(m_inputLayers * outputSize);
-	#else
-		ndBrainFloat biasScale = ndBrainFloat(0.0f);
-	#endif
+	const ndBrainFloat biasScale = ndBrainFloat(1.0f) / ndBrainFloat(m_inputLayers * outputSize);
 
 	for (ndInt32 i = 0; i < m_outputLayers; ++i)
 	{
@@ -411,12 +405,7 @@ void ndBrainLayerCrossCorrelation_2d::CalculateParamGradients(
 	const ndInt32 inputSize = m_inputWidth * m_inputHeight;
 	const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
 	const ndInt32 outputSize = m_outputWidth * m_outputHeight;
-
-	#ifdef ND_BRAIN_CONV_LAYER_USE_BIAS
-		ndBrainFloat biasScale = ndBrainFloat(1.0f) / ndBrainFloat(m_inputLayers * outputSize);
-	#else
-		ndBrainFloat biasScale = ndBrainFloat(0.0f);
-	#endif
+	const ndBrainFloat biasScale = ndBrainFloat(1.0f) / ndBrainFloat(m_inputLayers * outputSize);
 
 	// calculate bias gradients
 	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)

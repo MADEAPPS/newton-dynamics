@@ -98,33 +98,33 @@ inline ndBrainFloat4::~ndBrainFloat4()
 {
 }
 
-inline ndBrainFloat4::ndBrainFloat4& operator= (const ndBrainFloat4& A)
+inline ndBrainFloat4& ndBrainFloat4::operator= (const ndBrainFloat4& A)
 {
 	m_type = A.m_type;
 	return *this;
 }
 
-inline ndBrainFloat4::ndBrainFloat4 operator+ (const ndBrainFloat4& A) const
+inline ndBrainFloat4 ndBrainFloat4::operator+ (const ndBrainFloat4& A) const
 {
 	return _mm_add_ps(m_type, A.m_type);
 }
 
-inline ndBrainFloat4::ndBrainFloat4 operator- (const ndBrainFloat4& A) const
+inline ndBrainFloat4 ndBrainFloat4::operator- (const ndBrainFloat4& A) const
 {
 	return _mm_sub_ps(m_type, A.m_type);
 }
 
-inline ndBrainFloat4::ndBrainFloat4 operator* (const ndBrainFloat4& A) const
+inline ndBrainFloat4 ndBrainFloat4::operator* (const ndBrainFloat4& A) const
 {
 	return _mm_mul_ps(m_type, A.m_type);
 }
 
-inline ndBrainFloat4::ndBrainFloat4 MulAdd(const ndBrainFloat4& A, const ndBrainFloat4& B) const
+inline ndBrainFloat4 ndBrainFloat4::MulAdd(const ndBrainFloat4& A, const ndBrainFloat4& B) const
 {
 	return _mm_add_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
 }
 
-inline ndBrainFloat4::ndBrainFloat4 MulSub(const ndBrainFloat4& A, const ndBrainFloat4& B) const
+inline ndBrainFloat4 ndBrainFloat4::MulSub(const ndBrainFloat4& A, const ndBrainFloat4& B) const
 {
 	return _mm_sub_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
 }

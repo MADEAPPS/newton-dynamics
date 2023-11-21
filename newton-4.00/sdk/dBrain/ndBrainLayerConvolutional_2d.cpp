@@ -20,10 +20,9 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainFloat4.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerConvolutional_2d.h"
-
-#define ND_BRAIN_CONV_LAYER_USE_BIAS
 
 ndBrainLayerConvolutional_2d::ndBrainLayerConvolutional_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)
 	:ndBrainLayer()
@@ -334,77 +333,6 @@ ndBrainLayer* ndBrainLayerConvolutional_2d::Load(const ndBrainLoad* const loadSa
 	return layer;
 }
 
-void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
-{
-	ndAssert(input.GetCount() == GetInputSize());
-
-	ndInt32 outputOffset = 0;
-	ndInt32 kernelOffset = 0;
-	const ndInt32 inputSize = m_inputWidth * m_inputHeight;
-	const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
-	const ndInt32 outputSize = m_outputWidth * m_outputHeight;
-
-	ndBrainFloat convKernelBuffer[512];
-	ndBrainMemVector convKernel(convKernelBuffer, kernelSize);
-
-	auto CrossCorrelation = [this, &convKernel](const ndBrainVector& input)
-	{
-		ndBrainFloat value = ndBrainFloat(0.0f);
-		for (ndInt32 i = m_inputOffsets.GetCount() - 1; i >= 0; --i)
-		{
-			ndInt32 index = m_inputOffsets[i];
-			ndAssert(convKernel[i] < ndBrainFloat(100.0f));
-			ndAssert(convKernel[i] > ndBrainFloat(-100.0f));
-			value += input[index] * convKernel[i];
-		}
-		return value;
-	};
-
-	#ifdef ND_BRAIN_CONV_LAYER_USE_BIAS
-		ndBrainFloat biasScale = ndBrainFloat(1.0f) / ndBrainFloat(m_inputLayers * outputSize);
-	#else
-		ndBrainFloat biasScale = ndBrainFloat(0.0f);
-	#endif
-
-	auto RotateKernel = [&convKernel](const ndBrainMemVector& kernel)
-	{
-		ndAssert(convKernel.GetCount() == kernel.GetCount());
-		for (ndInt32 i = kernel.GetCount() - 1; i >= 0; --i)
-		{
-			convKernel[kernel.GetCount() - 1 - i] = kernel[i];
-		}
-	};
-
-	for (ndInt32 i = 0; i < m_outputLayers; ++i)
-	{
-		ndBrainMemVector out(&output[outputOffset], outputSize);
-
-		ndInt32 inputOffset = 0;
-		out.Set(m_bias[i] * biasScale);
-		for (ndInt32 channel = 0; channel < m_inputLayers; ++channel)
-		{
-			ndInt32 outIndex = 0;
-			ndInt32 inputBase = inputOffset;
-
-			const ndBrainMemVector filter(&m_kernels[kernelOffset], kernelSize);
-			RotateKernel(filter);
-
-			for (ndInt32 y = 0; y < m_outputHeight; ++y)
-			{
-				for (ndInt32 x = 0; x < m_outputWidth; ++x)
-				{
-					const ndBrainMemVector in(&input[inputBase + x], inputSize);
-					out[outIndex] += CrossCorrelation(in);
-					outIndex++;
-				}
-				inputBase += m_inputWidth;
-			}
-			inputOffset += inputSize;
-			kernelOffset += kernelSize;
-		}
-		outputOffset += outputSize;
-	}
-}
 
 //void ndBrainLayerConvolutional_2d::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 void ndBrainLayerConvolutional_2d::InputDerivative(const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
@@ -424,12 +352,7 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 	const ndInt32 inputSize = m_inputWidth * m_inputHeight;
 	const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
 	const ndInt32 outputSize = m_outputWidth * m_outputHeight;
-
-	#ifdef ND_BRAIN_CONV_LAYER_USE_BIAS
-		ndBrainFloat biasScale = ndBrainFloat(1.0f) / ndBrainFloat(m_inputLayers * outputSize);
-	#else
-		ndBrainFloat biasScale = ndBrainFloat(0.0f);
-	#endif
+	const ndBrainFloat biasScale = ndBrainFloat(1.0f) / ndBrainFloat(m_inputLayers * outputSize);
 
 	// calculate bias gradients
 	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
@@ -560,4 +483,140 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 			kernelOffset += kernelSize;
 		}
 	}
+}
+
+
+void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+{
+	ndAssert(input.GetCount() == GetInputSize());
+
+	const ndInt32 inputSize = m_inputWidth * m_inputHeight;
+	const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
+	const ndInt32 outputSize = m_outputWidth * m_outputHeight;
+	const ndBrainFloat biasScale = ndBrainFloat(1.0f) / ndBrainFloat(m_inputLayers * outputSize);
+
+	ndBrainFloat convKernelBuffer[512];
+	ndBrainMemVector convKernel(convKernelBuffer, kernelSize);
+
+	auto CrossCorrelation = [this, &convKernel](const ndBrainVector& input)
+	{
+		ndBrainFloat value = ndBrainFloat(0.0f);
+		for (ndInt32 i = m_inputOffsets.GetCount() - 1; i >= 0; --i)
+		{
+			ndInt32 index = m_inputOffsets[i];
+			ndAssert(convKernel[i] < ndBrainFloat(100.0f));
+			ndAssert(convKernel[i] > ndBrainFloat(-100.0f));
+			value += input[index] * convKernel[i];
+		}
+		return value;
+	};
+
+	auto RotateKernel = [&convKernel](const ndBrainMemVector& kernel)
+	{
+		ndAssert(convKernel.GetCount() == kernel.GetCount());
+		for (ndInt32 i = kernel.GetCount() - 1; i >= 0; --i)
+		{
+			convKernel[kernel.GetCount() - 1 - i] = kernel[i];
+		}
+	};
+
+static int xxxx;
+xxxx++;
+if (xxxx >= 100)
+xxxx *= 1;
+
+	ndInt32 outputOffset = 0;
+	ndInt32 kernelOffset = 0;
+	for (ndInt32 i = 0; i < m_outputLayers; ++i)
+	{
+		ndBrainMemVector out(&output[outputOffset], outputSize);
+
+		ndInt32 inputOffset = 0;
+		out.Set(m_bias[i] * biasScale);
+		for (ndInt32 channel = 0; channel < m_inputLayers; ++channel)
+		{
+			ndInt32 outIndex = 0;
+			ndInt32 inputBase = inputOffset;
+
+			const ndBrainMemVector filter(&m_kernels[kernelOffset], kernelSize);
+			RotateKernel(filter);
+
+			for (ndInt32 y = 0; y < m_outputHeight; ++y)
+			{
+				for (ndInt32 x = 0; x < m_outputWidth; ++x)
+				{
+					const ndBrainMemVector in(&input[inputBase + x], inputSize);
+					out[outIndex] += CrossCorrelation(in);
+					outIndex++;
+				}
+				inputBase += m_inputWidth;
+			}
+			inputOffset += inputSize;
+			kernelOffset += kernelSize;
+		}
+		outputOffset += outputSize;
+	}
+
+#if 0
+
+	auto CrossCorrelationSimd = [this, &convKernel](const ndBrainVector& input)
+	{
+		//ndBrainFloat value = ndBrainFloat(0.0f);
+		//for (ndInt32 i = m_inputOffsets.GetCount() - 1; i >= 0; --i)
+		//{
+		//	ndInt32 index = m_inputOffsets[i];
+		//	ndAssert(convKernel[i] < ndBrainFloat(100.0f));
+		//	ndAssert(convKernel[i] > ndBrainFloat(-100.0f));
+		//	value += input[index] * convKernel[i];
+		//}
+		//return value;
+		ndBrainFloat4 value(0.0f);
+		//const ndBrainFloat4* const src = (ndBrainFloat4*)&input[0];
+		for (ndInt32 i = m_inputOffsets.GetCount() - 1; i >= 0; --i)
+		{
+			ndInt32 index = m_inputOffsets[i];
+			const ndBrainFloat4* const src = (ndBrainFloat4*)&input[index];
+			value = value + src[0] * ndBrainFloat4(convKernel[i]);
+		}
+		return value;
+	};
+
+if (xxxx < 100)
+return;
+
+	outputOffset = 0;
+	kernelOffset = 0;
+	for (ndInt32 i = 0; i < m_outputLayers; ++i)
+	{
+		//ndBrainMemVector out(&output[outputOffset], outputSize);
+		ndBrainFloat4* const out = (ndBrainFloat4*)&output[outputOffset];
+		ndBrainMemVector outV(&output[outputOffset], outputSize);
+
+		ndInt32 inputOffset = 0;
+		outV.Set(m_bias[i] * biasScale);
+		for (ndInt32 channel = 0; channel < m_inputLayers; ++channel)
+		{
+			ndInt32 outIndex = 0;
+			ndInt32 inputBase = inputOffset;
+
+			const ndBrainMemVector filter(&m_kernels[kernelOffset], kernelSize);
+			RotateKernel(filter);
+
+			for (ndInt32 y = 0; y < m_outputHeight - 1; ++y)
+			{
+				for (ndInt32 x = 0; x < m_outputWidth; x += 4)
+				{
+					const ndBrainMemVector in(&input[inputBase + x], inputSize);
+					//out[outIndex] += CrossCorrelationSimd(in);
+					out[outIndex] = out[outIndex] + CrossCorrelationSimd(in);
+					outIndex++;
+				}
+				inputBase += m_inputWidth;
+			}
+			inputOffset += inputSize;
+			kernelOffset += kernelSize;
+		}
+		outputOffset += outputSize;
+	}
+#endif
 }
