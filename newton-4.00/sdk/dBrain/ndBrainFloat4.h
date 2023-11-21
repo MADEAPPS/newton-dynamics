@@ -28,9 +28,20 @@ class ndBrainFloat4
 {
 	public: 
 	ndBrainFloat4();
+	ndBrainFloat4(const __m128 type);
+	ndBrainFloat4(const ndBrainFloat a);
 	ndBrainFloat4(const ndBrainFloat4& src);
+	ndBrainFloat4(const ndBrainFloat* const ptr);
 	~ndBrainFloat4();
 
+	ndBrainFloat4& operator= (const ndBrainFloat4& A);
+
+	ndBrainFloat4 operator+ (const ndBrainFloat4& A) const;
+	ndBrainFloat4 operator- (const ndBrainFloat4& A) const;
+	ndBrainFloat4 operator* (const ndBrainFloat4& A) const;
+
+	ndBrainFloat4 MulAdd(const ndBrainFloat4& A, const ndBrainFloat4& B) const;
+	ndBrainFloat4 MulSub(const ndBrainFloat4& A, const ndBrainFloat4& B) const;
 
 	union
 	{
@@ -54,6 +65,69 @@ class ndBrainFloat4
 		};
 	};
 };
+
+inline ndBrainFloat4::ndBrainFloat4()
+{
+}
+
+inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat4& src)
+	:m_type(src.m_type)
+{
+}
+
+inline ndBrainFloat4::ndBrainFloat4(const __m128 type)
+	:m_type(type)
+{
+}
+
+inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat a)
+	:m_type(_mm_set1_ps(a))
+	//:m_x(a)
+	//,m_y(a)
+	//,m_z(a)
+	//,m_w(a)
+{
+}
+
+inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat* const ptr)
+	:m_type(_mm_loadu_ps(ptr))
+{
+}
+
+inline ndBrainFloat4::~ndBrainFloat4()
+{
+}
+
+inline ndBrainFloat4::ndBrainFloat4& operator= (const ndBrainFloat4& A)
+{
+	m_type = A.m_type;
+	return *this;
+}
+
+inline ndBrainFloat4::ndBrainFloat4 operator+ (const ndBrainFloat4& A) const
+{
+	return _mm_add_ps(m_type, A.m_type);
+}
+
+inline ndBrainFloat4::ndBrainFloat4 operator- (const ndBrainFloat4& A) const
+{
+	return _mm_sub_ps(m_type, A.m_type);
+}
+
+inline ndBrainFloat4::ndBrainFloat4 operator* (const ndBrainFloat4& A) const
+{
+	return _mm_mul_ps(m_type, A.m_type);
+}
+
+inline ndBrainFloat4::ndBrainFloat4 MulAdd(const ndBrainFloat4& A, const ndBrainFloat4& B) const
+{
+	return _mm_add_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
+}
+
+inline ndBrainFloat4::ndBrainFloat4 MulSub(const ndBrainFloat4& A, const ndBrainFloat4& B) const
+{
+	return _mm_sub_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
+}
 
 
 #endif 

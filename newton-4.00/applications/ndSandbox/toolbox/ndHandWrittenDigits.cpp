@@ -255,8 +255,8 @@ static void MnistTrainingSet()
 			//batches = 1;
 
 			// so far best training result on the mnist data set
-			//optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(98.070%)  conv(99.550%)
-			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score fully(98.200%)  conv(99.280%)
+			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(98.070%)  conv(99.550%)
+			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score fully(98.200%)  conv(99.420%)
 			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score fully(97.980%)  conv(99.210%)
 			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score fully(%)  conv(%)
 			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// test data score fully(%)  conv(%)
@@ -273,7 +273,7 @@ static void MnistTrainingSet()
 				priorityList.PushBack(ndRandInt() % trainingDigits->GetCount());
 			}
 
-			for (ndInt32 epoch = 0; epoch < 500; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 100; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);

@@ -56,10 +56,11 @@ class ndVector
 	}
 
 	inline ndVector (const ndFloat32 a)
-		:m_x(a)
-		,m_y(a)
-		,m_z(a)
-		,m_w(a)
+		:m_type(_mm_set1_ps( a))
+		//:m_x(a)
+		//,m_y(a)
+		//,m_z(a)
+		//,m_w(a)
 	{
 	}
 
