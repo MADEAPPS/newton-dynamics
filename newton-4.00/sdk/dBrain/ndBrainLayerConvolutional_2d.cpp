@@ -511,7 +511,7 @@ void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, nd
 		return value;
 	};
 
-	auto RotateKernel = [&convKernel](const ndBrainMemVector& kernel)
+	auto RotateKernel = [&convKernel](const ndBrainVector& kernel)
 	{
 		ndAssert(convKernel.GetCount() == kernel.GetCount());
 		for (ndInt32 i = kernel.GetCount() - 1; i >= 0; --i)
@@ -559,27 +559,44 @@ xxxx *= 1;
 
 #if 0
 
-	auto CrossCorrelationSimd = [this, &convKernel](const ndBrainVector& input)
+	ndBrainFloat4 convKernelSimd[256];
+
+	auto CrossCorrelationSimd = [this, &convKernelSimd](const ndBrainVector& input)
 	{
-		//ndBrainFloat value = ndBrainFloat(0.0f);
-		//for (ndInt32 i = m_inputOffsets.GetCount() - 1; i >= 0; --i)
-		//{
-		//	ndInt32 index = m_inputOffsets[i];
-		//	ndAssert(convKernel[i] < ndBrainFloat(100.0f));
-		//	ndAssert(convKernel[i] > ndBrainFloat(-100.0f));
-		//	value += input[index] * convKernel[i];
-		//}
-		//return value;
 		ndBrainFloat4 value(0.0f);
-		//const ndBrainFloat4* const src = (ndBrainFloat4*)&input[0];
-		for (ndInt32 i = m_inputOffsets.GetCount() - 1; i >= 0; --i)
+		//for (ndInt32 i = m_inputOffsets.GetCount() - 1; i >= 0; --i)
+		for (ndInt32 i = 0; i < (m_inputOffsets.GetCount() & - 4); i += 4)
+		{
+			ndInt32 index = m_inputOffsets[i + 0];
+			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 0];
+
+			index = m_inputOffsets[i + 1];
+			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 1];
+
+			index = m_inputOffsets[i + 2];
+			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 2];
+
+			index = m_inputOffsets[i + 3];
+			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 3];
+		}
+		for (ndInt32 i = m_inputOffsets.GetCount() & -4; i < m_inputOffsets.GetCount(); ++i)
 		{
 			ndInt32 index = m_inputOffsets[i];
 			const ndBrainFloat4* const src = (ndBrainFloat4*)&input[index];
-			value = value + src[0] * ndBrainFloat4(convKernel[i]);
+			value = value + src[0] * convKernelSimd[i];
 		}
 		return value;
 	};
+
+	auto RotateKernelSimd = [&convKernelSimd](const ndBrainVector& kernel)
+	{
+		ndAssert(convKernel.GetCount() == kernel.GetCount());
+		for (ndInt32 i = kernel.GetCount() - 1; i >= 0; --i)
+		{
+			convKernelSimd[kernel.GetCount() - 1 - i] = ndBrainFloat4(kernel[i]);
+		}
+	};
+
 
 if (xxxx < 100)
 return;
@@ -589,18 +606,19 @@ return;
 	for (ndInt32 i = 0; i < m_outputLayers; ++i)
 	{
 		//ndBrainMemVector out(&output[outputOffset], outputSize);
-		ndBrainFloat4* const out = (ndBrainFloat4*)&output[outputOffset];
-		ndBrainMemVector outV(&output[outputOffset], outputSize);
+		ndBrainMemVector out(&output[outputOffset], outputSize);
+		ndBrainFloat4* const out4 = (ndBrainFloat4*)&output[0];
 
 		ndInt32 inputOffset = 0;
-		outV.Set(m_bias[i] * biasScale);
+		out.Set(m_bias[i] * biasScale);
 		for (ndInt32 channel = 0; channel < m_inputLayers; ++channel)
 		{
 			ndInt32 outIndex = 0;
 			ndInt32 inputBase = inputOffset;
 
 			const ndBrainMemVector filter(&m_kernels[kernelOffset], kernelSize);
-			RotateKernel(filter);
+			//RotateKernel(filter);
+			RotateKernelSimd(filter);
 
 			for (ndInt32 y = 0; y < m_outputHeight - 1; ++y)
 			{
@@ -608,7 +626,7 @@ return;
 				{
 					const ndBrainMemVector in(&input[inputBase + x], inputSize);
 					//out[outIndex] += CrossCorrelationSimd(in);
-					out[outIndex] = out[outIndex] + CrossCorrelationSimd(in);
+					out4[outIndex] = out4[outIndex] + CrossCorrelationSimd(in);
 					outIndex++;
 				}
 				inputBase += m_inputWidth;
