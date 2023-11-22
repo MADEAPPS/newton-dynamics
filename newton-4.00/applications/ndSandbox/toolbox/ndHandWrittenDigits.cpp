@@ -273,7 +273,7 @@ static void MnistTrainingSet()
 				priorityList.PushBack(ndRandInt() % trainingDigits->GetCount());
 			}
 
-			for (ndInt32 epoch = 0; epoch < 100; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 200; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
