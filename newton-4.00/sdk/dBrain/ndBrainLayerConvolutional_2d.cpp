@@ -805,13 +805,39 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 		}
 	};
 
-	auto CrossCorrelation = [this](const ndBrainVector& input, const ndBrainVector& filter)
+	auto CrossCorrelationScalar = [this](const ndBrainVector& input, const ndBrainVector& filter)
 	{
 		ndBrainFloat value = ndBrainFloat(0.0f);
-		for (ndInt32 i = m_inputGradOffsets.GetCount() - 1; i >= 0; --i)
+		for (ndInt32 i = 0; i < m_inputGradOffsets.GetCount(); ++i)
 		{
 			ndInt32 index = m_inputGradOffsets[i];
 			value += input[index] * filter[i];
+		}
+		return value;
+	};
+
+	auto CrossCorrelationSimd = [this, &convKernelSimd](const ndBrainVector& input)
+	{
+		ndBrainFloat4 value(0.0f);
+		for (ndInt32 i = 0; i < (m_inputGradOffsets.GetCount() & -4); i += 4)
+		{
+			ndInt32 index = m_inputGradOffsets[i + 0];
+			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 0];
+
+			index = m_inputGradOffsets[i + 1];
+			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 1];
+
+			index = m_inputGradOffsets[i + 2];
+			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 2];
+
+			index = m_inputGradOffsets[i + 3];
+			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 3];
+		}
+		for (ndInt32 i = m_inputGradOffsets.GetCount() & -4; i < m_inputGradOffsets.GetCount(); ++i)
+		{
+			ndInt32 index = m_inputGradOffsets[i];
+			const ndBrainFloat4* const src = (ndBrainFloat4*)&input[index];
+			value = value + src[0] * convKernelSimd[i];
 		}
 		return value;
 	};
@@ -832,17 +858,43 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 			const ndBrainMemVector kernelGradients(&m_kernels[kernelOffset], kernelSize);
 
 			//CalculateInpuGradient(kernelGradients, inputGrad);
-
-			RotateKernelSimd(kernelGradients);
+			if (0)
+			{
+				ndInt32 outOffset = 0;
+				ndInt32 gradInputOffset = 0;
+				for (ndInt32 y = 0; y < m_inputHeight; ++y)
+				{
+					for (ndInt32 x = 0; x < m_inputWidth; ++x)
+					{
+						const ndBrainMemVector in(&paddedGradientOut[gradInputOffset + x], gradInputSize);
+						inputGrad[outOffset + x] += CrossCorrelationScalar(in, kernelGradients);
+					}
+					outOffset += m_inputWidth;
+					gradInputOffset += gradInputWidth;
+				}
+			}
 
 			ndInt32 outOffset = 0;
 			ndInt32 gradInputOffset = 0;
+			const ndInt32 roundedInputWith = m_inputWidth & -4;
+
+			RotateKernelSimd(kernelGradients);
 			for (ndInt32 y = 0; y < m_inputHeight; ++y)
 			{
-				for (ndInt32 x = 0; x < m_inputWidth; ++x)
+				ndInt32 outIndex = 0;
+				ndBrainFloat4* const out4 = (ndBrainFloat4*)&inputGrad[outOffset];
+				for (ndInt32 x = 0; x < roundedInputWith; x += 4)
 				{
 					const ndBrainMemVector in(&paddedGradientOut[gradInputOffset + x], gradInputSize);
-					inputGrad[outOffset + x] += CrossCorrelation(in, kernelGradients);
+					out4[outIndex] = out4[outIndex] + CrossCorrelationSimd(in);
+					outIndex++;
+				}
+				outIndex *= 4;
+				for (ndInt32 x = roundedInputWith; x < m_inputWidth; ++x)
+				{
+					const ndBrainMemVector in(&paddedGradientOut[gradInputOffset + x], gradInputSize);
+					inputGrad[outOffset + outIndex] += CrossCorrelationScalar(in, kernelGradients);
+					outIndex++;
 				}
 				outOffset += m_inputWidth;
 				gradInputOffset += gradInputWidth;
