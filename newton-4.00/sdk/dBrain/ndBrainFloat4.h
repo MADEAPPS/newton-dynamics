@@ -82,10 +82,6 @@ inline ndBrainFloat4::ndBrainFloat4(const __m128 type)
 
 inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat a)
 	:m_type(_mm_set1_ps(a))
-	//:m_x(a)
-	//,m_y(a)
-	//,m_z(a)
-	//,m_w(a)
 {
 }
 
