@@ -32,7 +32,6 @@ ndBrainLayerConvolutionalWithDropOut_2d::ndBrainLayerConvolutionalWithDropOut_2d
 {
 	ndAssert(dropOutFactor >= ndBrainFloat(0.5f));
 	ndAssert(dropOutFactor <= ndBrainFloat(1.0f));
-	//m_dropout.SetCount(m_outputLayers * m_outputWidth * m_outputHeight);
 	m_dropout.SetCount(m_outputLayers);
 	UpdateDropOut();
 }
@@ -123,8 +122,6 @@ void ndBrainLayerConvolutionalWithDropOut_2d::CalculateParamGradients(
 	if (m_droutOutEnable)
 	{
 		const ndBrainFloat* const outMemory = &outputDerivative[0];
-		//ndBrainMemVector outDerivative(outMemory, outputDerivative.GetCount());
-		//outDerivative.Mul(m_dropout);
 		ndInt32 layerOffset = 0;
 		const ndInt32 layerSize = m_outputWidth * m_outputHeight;
 		for (ndInt32 i = 0; i < m_outputLayers; ++i)
