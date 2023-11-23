@@ -34,6 +34,7 @@ class ndBrainFloat4
 	ndBrainFloat4(const ndBrainFloat a);
 	ndBrainFloat4(const ndBrainFloat4& src);
 	ndBrainFloat4(const ndBrainFloat* const ptr);
+	ndBrainFloat4(ndInt32 x, ndInt32 y, ndInt32 z, ndInt32 w);
 	ndBrainFloat4(ndBrainFloat x, ndBrainFloat y, ndBrainFloat z, ndBrainFloat w);
 	~ndBrainFloat4();
 
@@ -45,6 +46,12 @@ class ndBrainFloat4
 
 	ndBrainFloat4 MulAdd(const ndBrainFloat4& A, const ndBrainFloat4& B) const;
 	ndBrainFloat4 MulSub(const ndBrainFloat4& A, const ndBrainFloat4& B) const;
+
+	// logical operations;
+	ndBrainFloat4 operator& (const ndBrainFloat4& data) const;
+	ndBrainFloat4 operator| (const ndBrainFloat4& data) const;
+	ndBrainFloat4 operator> (const ndBrainFloat4& data) const;
+	ndBrainFloat4 operator< (const ndBrainFloat4& data) const;
 
 	union
 	{
@@ -95,6 +102,12 @@ inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat a)
 {
 }
 
+inline ndBrainFloat4::ndBrainFloat4(ndInt32 x, ndInt32 y, ndInt32 z, ndInt32 w)
+	:m_type(_mm_set_ps(x, y, z, w))
+{
+	ndAssert(0);
+}
+
 inline ndBrainFloat4::ndBrainFloat4(ndBrainFloat x, ndBrainFloat y, ndBrainFloat z, ndBrainFloat w)
 	:m_type(_mm_set_ps(x, y, z, w))
 {
@@ -141,6 +154,26 @@ inline ndBrainFloat4 ndBrainFloat4::MulSub(const ndBrainFloat4& A, const ndBrain
 	return _mm_sub_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
 }
 
+inline ndBrainFloat4 ndBrainFloat4::operator& (const ndBrainFloat4& data) const
+{
+	return _mm_and_ps(m_type, data.m_type);
+}
+
+inline ndBrainFloat4 ndBrainFloat4::operator| (const ndBrainFloat4& data) const
+{
+	return _mm_or_ps(m_type, data.m_type);
+}
+
+inline ndBrainFloat4 ndBrainFloat4::operator> (const ndBrainFloat4& data) const
+{
+	return _mm_cmpgt_ps(m_type, data.m_type);
+}
+
+inline ndBrainFloat4 ndBrainFloat4::operator< (const ndBrainFloat4& data) const
+{
+	return _mm_cmplt_ps(m_type, data.m_type);
+}
+
 #else
 
 inline ndBrainFloat4::ndBrainFloat4()
@@ -155,6 +188,12 @@ inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat4& src)
 inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat a)
 	:m_x(a), m_y(a), m_z(a), m_w(a)
 {
+}
+
+inline ndBrainFloat4::ndBrainFloat4(ndInt32 x, ndInt32 y, ndInt32 z, ndInt32 w)
+	:m_ix(x), m_iy(y), m_iz(z), m_iw(w)
+{
+
 }
 
 inline ndBrainFloat4::ndBrainFloat4(ndBrainFloat x, ndBrainFloat y, ndBrainFloat z, ndBrainFloat w)
@@ -203,6 +242,26 @@ inline ndBrainFloat4 ndBrainFloat4::MulAdd(const ndBrainFloat4& A, const ndBrain
 inline ndBrainFloat4 ndBrainFloat4::MulSub(const ndBrainFloat4& A, const ndBrainFloat4& B) const
 {
 	return *this - A * B;
+}
+
+inline ndBrainFloat4 ndBrainFloat4::operator& (const ndBrainFloat4& data) const
+{
+	return ndBrainFloat4 (m_ix & data.m_ix, m_iy & data.m_iy, m_iz & data.m_iz, m_iw & data.m_iw);
+}
+
+inline ndBrainFloat4 ndBrainFloat4::operator| (const ndBrainFloat4& data) const
+{
+	return ndBrainFloat4(m_ix | data.m_ix, m_iy | data.m_iy, m_iz | data.m_iz, m_iw | data.m_iw);
+}
+
+inline ndBrainFloat4 ndBrainFloat4::operator> (const ndBrainFloat4& data) const
+{
+	return ndBrainFloat4((m_x <= data.m_x) - 1, (m_y <= data.m_y) - 1, (m_z <= data.m_z) - 1, (m_w <= data.m_w) - 1);
+}
+
+inline ndBrainFloat4 ndBrainFloat4::operator< (const ndBrainFloat4& data) const
+{
+	return ndBrainFloat4((m_x >= data.m_x) - 1, (m_y >= data.m_y) - 1, (m_z >= data.m_z) - 1, (m_w >= data.m_w) - 1);
 }
 
 #endif
