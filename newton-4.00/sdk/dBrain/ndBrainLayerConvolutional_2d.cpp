@@ -726,27 +726,55 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 	// calculate filter weight gradients
 	auto CrossCorrelationGradient = [this](const ndBrainVector& input, ndInt32 y0, ndInt32 x0, const ndBrainVector& outputDerivative)
 	{
-		ndBrainFloat value = ndBrainFloat(0.0f);
+		//ndBrainFloat value__ = ndBrainFloat(0.0f);
+		//{
+		//	ndInt32 inputDerivativeBase = 0;
+		//	ndInt32 inputBase = y0 * m_inputWidth + x0;
+		//	for (ndInt32 y = 0; y < m_outputHeight; ++y)
+		//	{
+		//		const ndBrainMemVector in(&input[inputBase], m_outputWidth);
+		//		const ndBrainMemVector outputGrad(&outputDerivative[inputDerivativeBase], m_outputWidth);
+		//		for (ndInt32 x = 0; x < m_outputWidth; ++x)
+		//		{
+		//			value__ += in[x] * outputGrad[x];
+		//		}
+		//		inputBase += m_inputWidth;
+		//		inputDerivativeBase += m_outputWidth;
+		//	}
+		//}
 
+		ndBrainFloat value = ndBrainFloat(0.0f);
+		ndBrainFloat4 valueSim (ndBrainFloat(0.0f));
 		ndInt32 inputDerivativeBase = 0;
 		ndInt32 inputBase = y0 * m_inputWidth + x0;
+
+		const ndInt32 outputWidthSimd = m_outputWidth & -4;
 		for (ndInt32 y = 0; y < m_outputHeight; ++y)
 		{
 			const ndBrainMemVector in(&input[inputBase], m_outputWidth);
 			const ndBrainMemVector outputGrad(&outputDerivative[inputDerivativeBase], m_outputWidth);
-			for (ndInt32 x = 0; x < m_outputWidth; ++x)
+			const ndBrainFloat4* const inSimd = (ndBrainFloat4*)&in[0];
+			const ndBrainFloat4* const outputGradSimd = (ndBrainFloat4*)&outputGrad[0];
+			ndInt32 indxSimd = 0;
+			for (ndInt32 x = 0; x < outputWidthSimd; x += 4)
+			{
+				valueSim = valueSim + inSimd[indxSimd] * outputGradSimd[indxSimd];
+				indxSimd++;
+			}
+			for (ndInt32 x = outputWidthSimd; x < m_outputWidth; ++x)
 			{
 				value += in[x] * outputGrad[x];
 			}
+
 			inputBase += m_inputWidth;
 			inputDerivativeBase += m_outputWidth;
 		}
+		value += valueSim.m_x + valueSim.m_y + valueSim.m_z + valueSim.m_w;
 		return value;
 	};
 
 	ndInt32 outputOffset = 0;
 	ndInt32 kernelOffset = 0;
-
 	for (ndInt32 filter = 0; filter < m_outputLayers; ++filter)
 	{
 		ndInt32 inputOffset = 0;
@@ -765,6 +793,7 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 					index--;
 				}
 			}
+			
 			inputOffset += inputSize;
 			kernelOffset += kernelSize;
 		}
@@ -857,23 +886,6 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 		{
 			ndBrainMemVector inputGrad(&inputGradient[inputOffset], inputSize);
 			const ndBrainMemVector kernelGradients(&m_kernels[kernelOffset], kernelSize);
-
-			//CalculateInpuGradient(kernelGradients, inputGrad);
-			if (0)
-			{
-				ndInt32 outOffset = 0;
-				ndInt32 gradInputOffset = 0;
-				for (ndInt32 y = 0; y < m_inputHeight; ++y)
-				{
-					for (ndInt32 x = 0; x < m_inputWidth; ++x)
-					{
-						const ndBrainMemVector in(&paddedGradientOut[gradInputOffset + x], gradInputSize);
-						inputGrad[outOffset + x] += CrossCorrelationScalar(in, kernelGradients);
-					}
-					outOffset += m_inputWidth;
-					gradInputOffset += gradInputWidth;
-				}
-			}
 
 			ndInt32 outOffset = 0;
 			ndInt32 gradInputOffset = 0;
