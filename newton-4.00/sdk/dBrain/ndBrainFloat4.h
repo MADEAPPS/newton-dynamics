@@ -28,10 +28,13 @@ class ndBrainFloat4
 {
 	public: 
 	ndBrainFloat4();
+#ifdef D_NEWTON_USE_AVX2_OPTION
 	ndBrainFloat4(const __m128 type);
+#endif
 	ndBrainFloat4(const ndBrainFloat a);
 	ndBrainFloat4(const ndBrainFloat4& src);
 	ndBrainFloat4(const ndBrainFloat* const ptr);
+	ndBrainFloat4(ndBrainFloat x, ndBrainFloat y, ndBrainFloat z, ndBrainFloat w);
 	~ndBrainFloat4();
 
 	ndBrainFloat4& operator= (const ndBrainFloat4& A);
@@ -62,7 +65,7 @@ class ndBrainFloat4
 			ndInt32 m_iw;
 		};
 
-		#ifndef D_NEWTON_USE_AVX2_OPTION
+		#ifdef D_NEWTON_USE_AVX2_OPTION
 		__m128 m_type;
 		__m128i m_typeInt;
 		#endif
@@ -70,8 +73,8 @@ class ndBrainFloat4
 };
 
 // this class is only defined for avx instructions 
-// this is because the newral net code make use of misallined read and writes, 
-// which cause segmnet fault when using SS, but not when useng AVX.
+// this is because the neural net code make use of misaligned read and writes, 
+// which cause segment fault when using SS, but not when using AVX.
 #ifdef D_NEWTON_USE_AVX2_OPTION
 inline ndBrainFloat4::ndBrainFloat4()
 {
@@ -90,6 +93,12 @@ inline ndBrainFloat4::ndBrainFloat4(const __m128 type)
 inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat a)
 	:m_type(_mm_set1_ps(a))
 {
+}
+
+inline ndBrainFloat4::ndBrainFloat4(ndBrainFloat x, ndBrainFloat y, ndBrainFloat z, ndBrainFloat w)
+	:m_type(_mm_set_ps(x, y, z, w))
+{
+	ndAssert(0);
 }
 
 inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat* const ptr)
@@ -136,68 +145,64 @@ inline ndBrainFloat4 ndBrainFloat4::MulSub(const ndBrainFloat4& A, const ndBrain
 
 inline ndBrainFloat4::ndBrainFloat4()
 {
-	ndAssert(0);
 }
 
 inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat4& src)
-	:m_type(src.m_type)
-{
-	ndAssert(0);
-}
-
-inline ndBrainFloat4::ndBrainFloat4(const __m128 type)
-	: m_type(type)
+	:m_x(src.m_x), m_y(src.m_y), m_z(src.m_z), m_w(src.m_w)
 {
 }
 
 inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat a)
-	: m_type(_mm_set1_ps(a))
+	:m_x(a), m_y(a), m_z(a), m_w(a)
+{
+}
+
+inline ndBrainFloat4::ndBrainFloat4(ndBrainFloat x, ndBrainFloat y, ndBrainFloat z, ndBrainFloat w)
+	:m_x(x), m_y(y), m_z(z), m_w(w)
 {
 }
 
 inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat* const ptr)
-	: m_type(_mm_loadu_ps(ptr))
+	: m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(ptr[3])
 {
-	ndAssert(0);
 }
 
 inline ndBrainFloat4::~ndBrainFloat4()
 {
 }
 
-inline ndBrainFloat4& ndBrainFloat4::operator= (const ndBrainFloat4& A)
+inline ndBrainFloat4& ndBrainFloat4::operator= (const ndBrainFloat4& src)
 {
-	m_type = A.m_type;
+	m_x = src.m_x;
+	m_y = src.m_y;
+	m_z = src.m_z;
+	m_w = src.m_w;
 	return *this;
 }
 
 inline ndBrainFloat4 ndBrainFloat4::operator+ (const ndBrainFloat4& A) const
 {
-	ndAssert(0);
-	return _mm_add_ps(m_type, A.m_type);
+	return ndBrainFloat4(m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w);
 }
 
 inline ndBrainFloat4 ndBrainFloat4::operator- (const ndBrainFloat4& A) const
 {
-	ndAssert(0);
-	return _mm_sub_ps(m_type, A.m_type);
+	return ndBrainFloat4(m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
 }
 
 inline ndBrainFloat4 ndBrainFloat4::operator* (const ndBrainFloat4& A) const
 {
-	return _mm_mul_ps(m_type, A.m_type);
+	return ndBrainFloat4(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
 }
 
 inline ndBrainFloat4 ndBrainFloat4::MulAdd(const ndBrainFloat4& A, const ndBrainFloat4& B) const
 {
-	ndAssert(0);
-	return _mm_add_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
+	return *this + A * B;
 }
 
 inline ndBrainFloat4 ndBrainFloat4::MulSub(const ndBrainFloat4& A, const ndBrainFloat4& B) const
 {
-	ndAssert(0);
-	return _mm_sub_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
+	return *this - A * B;
 }
 
 #endif

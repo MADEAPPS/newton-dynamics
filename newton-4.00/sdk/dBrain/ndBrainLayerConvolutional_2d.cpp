@@ -24,7 +24,7 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerConvolutional_2d.h"
 
-#define ND_CONV_USE_SCALAR
+//#define ND_CONV_USE_SCALAR
 
 ndBrainLayerConvolutional_2d::ndBrainLayerConvolutional_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)
 	:ndBrainLayer()
