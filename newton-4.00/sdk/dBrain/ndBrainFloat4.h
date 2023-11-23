@@ -47,8 +47,6 @@ class ndBrainFloat4
 	{
 		ndBrainFloat m_f[4];
 		ndInt32 m_i[4];
-		__m128 m_type;
-		__m128i m_typeInt;
 		struct
 		{
 			ndBrainFloat m_x;
@@ -63,9 +61,18 @@ class ndBrainFloat4
 			ndInt32 m_iz;
 			ndInt32 m_iw;
 		};
+
+		#ifndef D_NEWTON_USE_AVX2_OPTION
+		__m128 m_type;
+		__m128i m_typeInt;
+		#endif
 	};
 };
 
+// this class is only defined for avx instructions 
+// this is because the newral net code make use of misallined read and writes, 
+// which cause segmnet fault when using SS, but not when useng AVX.
+#ifdef D_NEWTON_USE_AVX2_OPTION
 inline ndBrainFloat4::ndBrainFloat4()
 {
 }
@@ -124,6 +131,76 @@ inline ndBrainFloat4 ndBrainFloat4::MulSub(const ndBrainFloat4& A, const ndBrain
 {
 	return _mm_sub_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
 }
+
+#else
+
+inline ndBrainFloat4::ndBrainFloat4()
+{
+	ndAssert(0);
+}
+
+inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat4& src)
+	:m_type(src.m_type)
+{
+	ndAssert(0);
+}
+
+inline ndBrainFloat4::ndBrainFloat4(const __m128 type)
+	: m_type(type)
+{
+}
+
+inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat a)
+	: m_type(_mm_set1_ps(a))
+{
+}
+
+inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat* const ptr)
+	: m_type(_mm_loadu_ps(ptr))
+{
+	ndAssert(0);
+}
+
+inline ndBrainFloat4::~ndBrainFloat4()
+{
+}
+
+inline ndBrainFloat4& ndBrainFloat4::operator= (const ndBrainFloat4& A)
+{
+	m_type = A.m_type;
+	return *this;
+}
+
+inline ndBrainFloat4 ndBrainFloat4::operator+ (const ndBrainFloat4& A) const
+{
+	ndAssert(0);
+	return _mm_add_ps(m_type, A.m_type);
+}
+
+inline ndBrainFloat4 ndBrainFloat4::operator- (const ndBrainFloat4& A) const
+{
+	ndAssert(0);
+	return _mm_sub_ps(m_type, A.m_type);
+}
+
+inline ndBrainFloat4 ndBrainFloat4::operator* (const ndBrainFloat4& A) const
+{
+	return _mm_mul_ps(m_type, A.m_type);
+}
+
+inline ndBrainFloat4 ndBrainFloat4::MulAdd(const ndBrainFloat4& A, const ndBrainFloat4& B) const
+{
+	ndAssert(0);
+	return _mm_add_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
+}
+
+inline ndBrainFloat4 ndBrainFloat4::MulSub(const ndBrainFloat4& A, const ndBrainFloat4& B) const
+{
+	ndAssert(0);
+	return _mm_sub_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
+}
+
+#endif
 
 
 #endif 

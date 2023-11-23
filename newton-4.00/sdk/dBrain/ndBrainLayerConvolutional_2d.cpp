@@ -24,7 +24,7 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerConvolutional_2d.h"
 
-//#define ND_CONV_USE_SCALAR
+#define ND_CONV_USE_SCALAR
 
 ndBrainLayerConvolutional_2d::ndBrainLayerConvolutional_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)
 	:ndBrainLayer()
@@ -648,6 +648,7 @@ void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, nd
 
 	ndInt32 outputOffset = 0;
 	ndInt32 kernelOffset = 0;
+	const ndInt32 roundedOuputWith = m_outputWidth & -4;
 
 	for (ndInt32 i = 0; i < m_outputLayers; ++i)
 	{
@@ -662,7 +663,6 @@ void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, nd
 
 			ndInt32 outOffset = 0;
 			ndInt32 inputBase = inputOffset;
-			const ndInt32 roundedOuputWith = m_outputWidth & -4;
 			for (ndInt32 y = 0; y < m_outputHeight; ++y)
 			{
 				ndInt32 outIndex = 0;
@@ -846,6 +846,7 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 	ndInt32 inputOffset = 0;
 	const ndInt32 gradInputWidth = m_inputWidth + m_kernelSize - 1;
 	const ndInt32 gradInputSize = gradInputWidth * m_kernelSize;
+	const ndInt32 roundedInputWith = m_inputWidth & -4;
 
 	inputGradient.Set(ndBrainFloat(0.0f));
 	for (ndInt32 filter = 0; filter < m_outputLayers; ++filter)
@@ -876,8 +877,6 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 
 			ndInt32 outOffset = 0;
 			ndInt32 gradInputOffset = 0;
-			const ndInt32 roundedInputWith = m_inputWidth & -4;
-
 			RotateKernelSimd(kernelGradients);
 			for (ndInt32 y = 0; y < m_inputHeight; ++y)
 			{
