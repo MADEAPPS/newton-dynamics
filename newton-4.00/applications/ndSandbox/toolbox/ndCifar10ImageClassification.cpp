@@ -269,7 +269,7 @@ static void Cifar10TrainingSet()
 				priorityList.PushBack(ndRandInt() % trainingLabels->GetCount());
 			}
 
-			for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 2000; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -401,7 +401,7 @@ static void Cifar10TrainingSet()
 		const ndBrainLayerConvolutionalWithDropOut_2d* conv;
 		const ndBrainLayerImagePolling_2x2* pooling;
 	
-		#if 0
+		#if 1
 			//#define ACTIVATION_TYPE	ndBrainLayerReluActivation
 			#define ACTIVATION_TYPE ndBrainLayerLeakyReluActivation
 		#else
@@ -412,9 +412,9 @@ static void Cifar10TrainingSet()
 		conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
 		layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 
-		//layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels(), 3, 32));
-		//conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
-		//layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels(), 3, 32));
+		conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 		layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 		pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 	
@@ -436,8 +436,8 @@ static void Cifar10TrainingSet()
 		layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-		layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		//layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
