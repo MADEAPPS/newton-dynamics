@@ -103,13 +103,13 @@ inline ndBrainFloat4::ndBrainFloat4(const ndBrainFloat a)
 }
 
 inline ndBrainFloat4::ndBrainFloat4(ndInt32 x, ndInt32 y, ndInt32 z, ndInt32 w)
-	:m_typeInt(_mm_set_epi32(x, y, z, w))
+	:m_typeInt(_mm_set_epi32(w, z, y, x))
 {
 	ndAssert(0);
 }
 
 inline ndBrainFloat4::ndBrainFloat4(ndBrainFloat x, ndBrainFloat y, ndBrainFloat z, ndBrainFloat w)
-	:m_type(_mm_set_ps(x, y, z, w))
+	:m_type(_mm_set_ps(w, z, y, x))
 {
 	ndAssert(0);
 }

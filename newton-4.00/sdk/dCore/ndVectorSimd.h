@@ -88,10 +88,11 @@ class ndVector
 	}
 
 	inline ndVector(ndFloat64 x, ndFloat64 y, ndFloat64 z, ndFloat64 w)
-		:m_x(ndFloat32(x))
-		,m_y(ndFloat32(y))
-		,m_z(ndFloat32(z))
-		,m_w(ndFloat32(w))
+		//:m_x(ndFloat32(x))
+		//,m_y(ndFloat32(y))
+		//,m_z(ndFloat32(z))
+		//,m_w(ndFloat32(w))
+		:m_type(_mm_set_ps(ndFloat32(w), ndFloat32(z), ndFloat32(y), ndFloat32(x)))
 	{
 	}
 #endif
@@ -108,18 +109,20 @@ class ndVector
 	}
 
 	inline ndVector (ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w)
-		:m_x(x)
-		,m_y(y)
-		,m_z(z)
-		,m_w(w)
+		//:m_x(x)
+		//,m_y(y)
+		//,m_z(z)
+		//,m_w(w)
+		:m_type(_mm_set_ps(w, z, y, x))
 	{
 	}
 
-	inline ndVector (ndInt32 ix, ndInt32 iy, ndInt32 iz, ndInt32 iw)
-		:m_ix(ix)
-		,m_iy(iy)
-		,m_iz(iz)
-		,m_iw(iw)
+	inline ndVector (ndInt32 x, ndInt32 y, ndInt32 z, ndInt32 w)
+		:m_typeInt(_mm_set_epi32(w, z, y, x))
+		//:m_ix(x)
+		//,m_iy(y)
+		//,m_iz(z)
+		//,m_iw(w)
 	{
 	}
 
@@ -636,17 +639,20 @@ class ndBigVector
 #endif
 
 	inline ndBigVector(ndFloat64 x, ndFloat64 y, ndFloat64 z, ndFloat64 w)
-		:m_x(x), m_y(y), m_z(z), m_w(w)
+		//:m_x(x), m_y(y), m_z(z), m_w(w)
+		:m_type(_mm256_set_pd(w, z, y, x))
 	{
 	}
 
-	inline ndBigVector(ndInt32 ix, ndInt32 iy, ndInt32 iz, ndInt32 iw)
-		:m_ix(ndInt64(ix)), m_iy(ndInt64(iy)), m_iz(ndInt64(iz)), m_iw(ndInt64(iw))
+	inline ndBigVector(ndInt32 x, ndInt32 y, ndInt32 z, ndInt32 w)
+		//:m_ix(ndInt64(x)), m_iy(ndInt64(y)), m_iz(ndInt64(z)), m_iw(ndInt64(w))
+		:m_typeInt(_mm256_set_epi64x(ndInt64(w), ndInt64(z), ndInt64(y), ndInt64(x)))
 	{
 	}
 
-	inline ndBigVector(ndInt64 ix, ndInt64 iy, ndInt64 iz, ndInt64 iw)
-		:m_ix(ix), m_iy(iy), m_iz(iz), m_iw(iw)
+	inline ndBigVector(ndInt64 x, ndInt64 y, ndInt64 z, ndInt64 w)
+		//:m_ix(x), m_iy(y), m_iz(z), m_iw(w)
+		:m_typeInt(_mm256_set_epi64x(w, z, y, x))
 	{
 	}
 
@@ -1132,77 +1138,81 @@ class ndBigVector
 	public:
 	D_OPERATOR_NEW_AND_DELETE
 
-		inline ndBigVector()
+	inline ndBigVector()
 	{
 	}
 
 	inline ndBigVector(const ndBigVector& copy)
 		:m_typeLow(copy.m_typeLow)
-		, m_typeHigh(copy.m_typeHigh)
+		,m_typeHigh(copy.m_typeHigh)
 	{
 	}
 
 	inline ndBigVector(const __m128d typeLow, const __m128d typeHigh)
-		: m_typeLow(typeLow)
-		, m_typeHigh(typeHigh)
+		:m_typeLow(typeLow)
+		,m_typeHigh(typeHigh)
 	{
 	}
 
 	inline ndBigVector(const __m128i typeLow, const __m128i typeHigh)
-		: m_typeIntLow(typeLow)
-		, m_typeIntHigh(typeHigh)
+		:m_typeIntLow(typeLow)
+		,m_typeIntHigh(typeHigh)
 	{
 	}
 
 	inline ndBigVector(const ndFloat64 a)
-		: m_typeLow(_mm_set1_pd(a))
-		, m_typeHigh(_mm_set1_pd(a))
+		:m_typeLow(_mm_set1_pd(a))
+		,m_typeHigh(_mm_set1_pd(a))
 	{
 	}
 
 	inline ndBigVector(const ndFloat64* const baseAddr, const ndInt64* const index)
-		: m_x(baseAddr[index[0]])
-		, m_y(baseAddr[index[1]])
-		, m_z(baseAddr[index[2]])
-		, m_w(baseAddr[index[3]])
+		:m_x(baseAddr[index[0]])
+		,m_y(baseAddr[index[1]])
+		,m_z(baseAddr[index[2]])
+		,m_w(baseAddr[index[3]])
 	{
 	}
 
 #ifdef D_NEWTON_USE_DOUBLE
 	inline ndBigVector(const ndFloat32* const ptr)
 		:m_typeLow(_mm_loadu_pd(ptr))
-		, m_typeHigh(_mm_loadu_pd(&ptr[2]))
+		,m_typeHigh(_mm_loadu_pd(&ptr[2]))
 	{
 	}
 #else
 
 	inline ndBigVector(const ndVector& v)
 		:m_typeLow(_mm_cvtps_pd(v.m_type))
-		, m_typeHigh(_mm_cvtps_pd(_mm_shuffle_ps(v.m_type, v.m_type, PERMUTE_MASK(3, 2, 3, 2))))
+		,m_typeHigh(_mm_cvtps_pd(_mm_shuffle_ps(v.m_type, v.m_type, PERMUTE_MASK(3, 2, 3, 2))))
 	{
 		ndAssert(ndCheckVector((*this)));
 	}
 
 	inline ndBigVector(const ndFloat64* const ptr)
 		:m_typeLow(_mm_loadu_pd(ptr))
-		, m_typeHigh(_mm_loadu_pd(&ptr[2]))
+		,m_typeHigh(_mm_loadu_pd(&ptr[2]))
 	{
 	}
 #endif
 
 	inline ndBigVector(ndFloat64 x, ndFloat64 y, ndFloat64 z, ndFloat64 w)
 		:m_typeLow(_mm_set_pd(y, x))
-		, m_typeHigh(_mm_set_pd(w, z))
+		,m_typeHigh(_mm_set_pd(w, z))
 	{
 	}
 
-	inline ndBigVector(ndInt32 ix, ndInt32 iy, ndInt32 iz, ndInt32 iw)
-		: m_ix(ndInt64(ix)), m_iy(ndInt64(iy)), m_iz(ndInt64(iz)), m_iw(ndInt64(iw))
+	inline ndBigVector(ndInt32 x, ndInt32 y, ndInt32 z, ndInt32 w)
+		//:m_ix(ndInt64(x)), m_iy(ndInt64(y)), m_iz(ndInt64(z)), m_iw(ndInt64(w))
+		:m_typeIntLow(_mm_set_epi64x(ndInt64(y), ndInt64(x)))
+		,m_typeIntHigh(_mm_set_epi64x(ndInt64(w), ndInt64(z)))
 	{
 	}
 
-	inline ndBigVector(ndInt64 ix, ndInt64 iy, ndInt64 iz, ndInt64 iw)
-		: m_ix(ix), m_iy(iy), m_iz(iz), m_iw(iw)
+	inline ndBigVector(ndInt64 x, ndInt64 y, ndInt64 z, ndInt64 w)
+		//:m_ix(x), m_iy(y), m_iz(z), m_iw(w)
+		:m_typeIntLow(_mm_set_epi64x(y, x))
+		,m_typeIntHigh(_mm_set_epi64x(w, z))
 	{
 	}
 
