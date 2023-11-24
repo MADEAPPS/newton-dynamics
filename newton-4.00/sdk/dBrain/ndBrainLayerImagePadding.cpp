@@ -24,12 +24,12 @@
 #include "ndBrainLayerImagePadding.h"
 
 ndBrainLayerImagePadding::ndBrainLayerImagePadding(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputLayers, ndInt32 filterSize)
-	:ndBrainLayerActivation(((inputWidth + 1) / 2) * ((inputHeight + 1) / 2) * inputLayers)
-	,m_width(inputWidth)
-	,m_height(inputHeight)
+	:ndBrainLayerActivation((inputWidth + filterSize - 1) * (inputHeight + filterSize - 1) * inputLayers)
+	,m_width(inputWidth + filterSize - 1)
+	,m_height(inputHeight + filterSize - 1)
 	,m_channels(inputLayers)
+	,m_filterSize(filterSize)
 {
-	ndAssert(0);
 }
 
 ndBrainLayerImagePadding::ndBrainLayerImagePadding(const ndBrainLayerImagePadding& src)
@@ -37,18 +37,18 @@ ndBrainLayerImagePadding::ndBrainLayerImagePadding(const ndBrainLayerImagePaddin
 	,m_width(src.m_width)
 	,m_height(src.m_height)
 	,m_channels(src.m_channels)
+	,m_filterSize(src.m_filterSize)
 {
-	ndAssert(0);
 }
 
 ndInt32 ndBrainLayerImagePadding::GetInputWidth() const
 {
-	return m_width;
+	return m_width - m_filterSize + 1;
 }
 
 ndInt32 ndBrainLayerImagePadding::GetInputHeight() const
 {
-	return m_height;
+	return m_height - m_filterSize + 1;
 }
 
 ndInt32 ndBrainLayerImagePadding::GetInputChannels() const
@@ -58,12 +58,12 @@ ndInt32 ndBrainLayerImagePadding::GetInputChannels() const
 
 ndInt32 ndBrainLayerImagePadding::GetOutputWidth() const
 {
-	return (m_width + 1) / 2;
+	return m_width;
 }
 
 ndInt32 ndBrainLayerImagePadding::GetOutputHeight() const
 {
-	return (m_height + 1) / 2;
+	return m_height;
 }
 
 ndInt32 ndBrainLayerImagePadding::GetOutputChannels() const
@@ -71,9 +71,20 @@ ndInt32 ndBrainLayerImagePadding::GetOutputChannels() const
 	return m_channels;
 }
 
+ndInt32 ndBrainLayerImagePadding::GetFilterSize() const
+{
+	return m_filterSize;
+}
+
 ndInt32 ndBrainLayerImagePadding::GetInputSize() const
 {
-	return m_width * m_height * m_channels;
+	//return m_width * m_height * m_channels;
+	return GetInputWidth() * GetInputHeight() * m_channels;
+}
+
+ndInt32 ndBrainLayerImagePadding::GetOutputBufferSize() const
+{
+	return GetOutputWidth() * GetOutputHeight() * m_channels;
 }
 
 ndBrainLayer* ndBrainLayerImagePadding::Clone() const
@@ -84,114 +95,6 @@ ndBrainLayer* ndBrainLayerImagePadding::Clone() const
 const char* ndBrainLayerImagePadding::GetLabelId() const
 {
 	return "ndBrainLayerImagePadding";
-}
-
-void ndBrainLayerImagePadding::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
-{
-	ndAssert(0);
-	//ndAssert(m_index.GetCount() == outputDerivative.GetCount());
-	//
-	//inputDerivative.Set(ndBrainFloat(0.0f));
-	//for (ndInt32 i = m_index.GetCount() - 1; i >= 0; --i)
-	//{
-	//	ndInt32 index = m_index[i];
-	//	inputDerivative[index] = outputDerivative[i];
-	//}
-}
-
-void ndBrainLayerImagePadding::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
-{
-	ndAssert(0);
-	//ndAssert(input.GetCount() == GetInputSize());
-	//ndAssert(output.GetCount() == GetOutputSize());
-	//
-	//const ndBrainFloat minValue = ndBrainFloat(-1.0e20f);
-	//const ndInt32 inputSize = m_height * m_width;
-	//
-	//ndInt32 offsetOut = 0;
-	//ndInt32 inputOffset = 0;
-	//for (ndInt32 k = 0; k < m_channels; ++k)
-	//{
-	//	ndInt32 inputStride = 0;
-	//	const ndBrainMemVector in(&input[inputOffset], inputSize);
-	//
-	//	if (((m_height & 1) == 0) && ((m_width & 1) == 0))
-	//	{
-	//		for (ndInt32 y = 0; y < m_height; y += 2)
-	//		{
-	//			for (ndInt32 x = 0; x < m_width; x += 2)
-	//			{
-	//				const ndInt32 x0 = inputStride + x;
-	//				const ndInt32 x1 = x0 + 1;
-	//				const ndInt32 x2 = x0 + m_width;
-	//				const ndInt32 x3 = x2 + 1;
-	//
-	//				const ndBrainFloat val0 = in[x0];
-	//				const ndBrainFloat val1 = in[x1];
-	//				const ndBrainFloat val2 = in[x2];
-	//				const ndBrainFloat val3 = in[x3];
-	//
-	//				const bool test01 = val0 >= val1;
-	//				const ndInt32 index01 = test01 ? x0 : x1;
-	//				const ndBrainFloat val01 = test01 ? val0 : val1;
-	//
-	//				const bool test23 = val2 >= val3;
-	//				const ndInt32 index23 = test23 ? x2 : x3;
-	//				const ndBrainFloat val23 = test23 ? val2 : val3;
-	//
-	//				const bool test0123 = val01 >= val23;
-	//				const ndInt32 index0123 = test0123 ? index01 : index23;
-	//				const ndBrainFloat val0123 = test0123 ? val01 : val23;
-	//
-	//				output[offsetOut + (x >> 1)] = val0123;
-	//				m_index[offsetOut + (x >> 1)] = inputOffset + index0123;
-	//			}
-	//
-	//			inputStride += m_width * 2;
-	//			offsetOut += m_width >> 1;
-	//		}
-	//	}
-	//	else
-	//	{
-	//		for (ndInt32 y = 0; y < m_height; y += 2)
-	//		{
-	//			ndInt32 yMask = (y + 1) < m_width;
-	//			for (ndInt32 x = 0; x < m_width; x += 2)
-	//			{
-	//				const ndInt32 xMask = (x + 1) < m_width;
-	//
-	//				const ndInt32 x0 = inputStride + x;
-	//				const ndInt32 x1 = x0 + 1;
-	//				const ndInt32 x2 = x0 + m_width;
-	//				const ndInt32 x3 = x2 + 1;
-	//
-	//				const ndBrainFloat val0 = in[x0];
-	//				const ndBrainFloat val1 = xMask ? in[x1] : minValue;
-	//				const ndBrainFloat val2 = yMask ? in[x2] : minValue;
-	//				const ndBrainFloat val3 = (xMask & yMask) ? in[x3] : minValue;
-	//
-	//				const bool test01 = val0 >= val1;
-	//				const ndInt32 index01 = test01 ? x0 : x1;
-	//				const ndBrainFloat val01 = test01 ? val0 : val1;
-	//
-	//				const bool test23 = val2 >= val3;
-	//				const ndInt32 index23 = test23 ? x2 : x3;
-	//				const ndBrainFloat val23 = test23 ? val2 : val3;
-	//
-	//				const bool test0123 = val01 >= val23;
-	//				const ndInt32 index0123 = test0123 ? index01 : index23;
-	//				const ndBrainFloat val0123 = test0123 ? val01 : val23;
-	//
-	//				output[offsetOut + (x >> 1)] = val0123;
-	//				m_index[offsetOut + (x >> 1)] = inputOffset + index0123;
-	//			}
-	//
-	//			inputStride += m_width * 2;
-	//			offsetOut += (m_width + 1) >> 1;
-	//		}
-	//	}
-	//	inputOffset += inputSize;
-	//}
 }
 
 void ndBrainLayerImagePadding::Save(const ndBrainSave* const loadSave) const
@@ -228,4 +131,77 @@ ndBrainLayer* ndBrainLayerImagePadding::Load(const ndBrainLoad* const loadSave)
 	//loadSave->ReadString(buffer);
 	//return layer;
 	return nullptr;
+}
+
+void ndBrainLayerImagePadding::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+{
+	const ndInt32 outputWidth = GetOutputWidth();
+	const ndInt32 outputHeight = GetOutputHeight();
+	const ndInt32 inputWidth = GetInputWidth();
+	const ndInt32 inputHeight = GetInputHeight();
+
+	const ndInt32 inputSize = inputWidth * inputHeight;
+	const ndInt32 outputSize = outputWidth * outputHeight;
+
+	const ndInt32 paddStart = m_filterSize >> 1;
+	const ndInt32 outputRowStart = outputWidth * paddStart + paddStart;
+
+	ndInt32 inputOffset = 0;
+	ndInt32 outputOffset = 0;
+	output.Set(ndBrainFloat(0.0f));
+	for (ndInt32 k = 0; k < m_channels; ++k)
+	{
+		ndBrainMemVector out(&output[outputOffset], outputSize);
+		const ndBrainMemVector in(&input[inputOffset], inputSize);
+
+		ndInt32 inRowOffset = 0;
+		ndInt32 outRowOffset = outputRowStart;
+		for (ndInt32 y = 0; y < inputHeight; ++y)
+		{
+			ndBrainMemVector outRow(&out[outRowOffset], inputWidth);
+			const ndBrainMemVector inRow(&in[inRowOffset], inputWidth);
+
+			outRow.Set(inRow);
+			inRowOffset += inputWidth;
+			outRowOffset += outputWidth;
+		}
+		inputOffset += inputSize;
+		outputOffset += outputSize;
+	}
+}
+
+void ndBrainLayerImagePadding::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+{
+	const ndInt32 outputWidth = GetOutputWidth();
+	const ndInt32 outputHeight = GetOutputHeight();
+	const ndInt32 inputWidth = GetInputWidth();
+	const ndInt32 inputHeight = GetInputHeight();
+
+	const ndInt32 inputSize = inputWidth * inputHeight;
+	const ndInt32 outputSize = outputWidth * outputHeight;
+
+	const ndInt32 paddStart = m_filterSize >> 1;
+	const ndInt32 outputRowStart = outputWidth * paddStart + paddStart;
+
+	ndInt32 inputOffset = 0;
+	ndInt32 outputOffset = 0;
+	for (ndInt32 k = 0; k < m_channels; ++k)
+	{
+		ndBrainMemVector in(&inputDerivative[inputOffset], inputSize);
+		const ndBrainMemVector out(&outputDerivative[outputOffset], outputSize);
+	
+		ndInt32 inRowOffset = 0;
+		ndInt32 outRowOffset = outputRowStart;
+		for (ndInt32 y = 0; y < inputHeight; ++y)
+		{
+			const ndBrainMemVector outRow(&out[outRowOffset], inputWidth);
+			ndBrainMemVector inRow(&in[inRowOffset], inputWidth);
+
+			inRow.Set(outRow);
+			inRowOffset += inputWidth;
+			outRowOffset += outputWidth;
+		}
+		inputOffset += inputSize;
+		outputOffset += outputSize;
+	}
 }

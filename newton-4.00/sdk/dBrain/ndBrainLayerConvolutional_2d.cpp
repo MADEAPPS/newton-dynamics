@@ -95,6 +95,11 @@ ndBrainLayer* ndBrainLayerConvolutional_2d::Clone() const
 	return new ndBrainLayerConvolutional_2d(*this);
 }
 
+ndInt32 ndBrainLayerConvolutional_2d::GetFilterSize() const
+{
+	return m_kernelSize;
+}
+
 ndInt32 ndBrainLayerConvolutional_2d::GetOutputSize() const
 {
 	return m_outputLayers * m_outputWidth * m_outputHeight;

@@ -41,7 +41,9 @@ class ndBrainLayerImagePadding : public ndBrainLayerActivation
 	ndInt32 GetOutputHeight() const;
 	ndInt32 GetOutputChannels() const;
 
+	ndInt32 GetFilterSize() const;
 	virtual ndInt32 GetInputSize() const;
+	virtual ndInt32 GetOutputBufferSize() const;
 
 	const char* GetLabelId() const;
 	void Save(const ndBrainSave* const loadSave) const;
@@ -51,6 +53,7 @@ class ndBrainLayerImagePadding : public ndBrainLayerActivation
 	ndInt32 m_width;
 	ndInt32 m_height;
 	ndInt32 m_channels;
+	ndInt32 m_filterSize;
 };
 
 #endif 

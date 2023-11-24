@@ -35,6 +35,7 @@ class ndBrainLayerConvolutional_2d : public ndBrainLayer
 	virtual ~ndBrainLayerConvolutional_2d();
 	virtual ndBrainLayer* Clone() const;
 
+	ndInt32 GetFilterSize() const;
 	ndInt32 GetOutputWidth() const;
 	ndInt32 GetOutputHeight() const;
 	ndInt32 GetOutputChannels() const;
