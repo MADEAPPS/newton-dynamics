@@ -160,7 +160,7 @@ static void Cifar10TrainingSet()
 			:ndBrainThreadPool()
 			,m_brain(*brain)
 			,m_prioritySamples()
-			,m_learnRate(ndReal(1.0e-4f))
+			,m_learnRate(ndReal(1.0e-3f))
 			,m_bashBufferSize(BASH_BUFFER_SIZE)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
@@ -408,7 +408,7 @@ static void Cifar10TrainingSet()
 			#define ACTIVATION_TYPE	ndBrainLayerTanhActivation
 		#endif
 	
-		#if 0
+		#if 1
 			// so far the simplest configuration seems to yield better results
 			layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(width, height, 3, 5, 16));
 			conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
