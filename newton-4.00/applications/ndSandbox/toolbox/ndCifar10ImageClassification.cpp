@@ -278,12 +278,11 @@ static void Cifar10TrainingSet()
 				for (ndInt32 bash = 0; bash < batches; ++bash)
 				{
 					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_bashBufferSize);
-
-					const ndInt32 priorityCount = ndMin(4, priorityList.GetCount());
-					for (ndInt32 i = 0; i < priorityCount; ++i)
-					{
-						miniBashArray[i] = priorityList[ndInt32(ndRandInt() % priorityList.GetCount())];
-					}
+					//const ndInt32 priorityCount = ndMin(4, priorityList.GetCount());
+					//for (ndInt32 i = 0; i < priorityCount; ++i)
+					//{
+					//	miniBashArray[i] = priorityList[ndInt32(ndRandInt() % priorityList.GetCount())];
+					//}
 
 					ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 					optimizer.Update(this, m_trainers, m_learnRate);
