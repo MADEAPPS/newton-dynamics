@@ -25,10 +25,12 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerConvolutional_2d.h"
 
+#define ND_CNN_DROPOUT_FACTOR ndBrainFloat(0.8f)
+
 class ndBrainLayerConvolutionalWithDropOut_2d : public ndBrainLayerConvolutional_2d
 {
 	public: 
-	ndBrainLayerConvolutionalWithDropOut_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputLayers, ndInt32 kernelSize, ndInt32 ouputLayers, ndBrainFloat dropOutFactor = ndBrainFloat(0.9f));
+	ndBrainLayerConvolutionalWithDropOut_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputLayers, ndInt32 kernelSize, ndInt32 ouputLayers, ndBrainFloat dropOutFactor = ND_CNN_DROPOUT_FACTOR);
 	ndBrainLayerConvolutionalWithDropOut_2d(const ndBrainLayerConvolutionalWithDropOut_2d& src);
 	virtual ~ndBrainLayerConvolutionalWithDropOut_2d();
 	virtual ndBrainLayer* Clone() const;

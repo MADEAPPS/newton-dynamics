@@ -25,10 +25,12 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerLinear.h"
 
+#define ND_LINEAL_DROPOUT_FACTOR ndBrainFloat(0.8f)
+
 class ndBrainLayerLinearWithDropOut : public ndBrainLayerLinear
 {
 	public: 
-	ndBrainLayerLinearWithDropOut(ndInt32 inputs, ndInt32 outputs, ndBrainFloat dropOutFactor = ndBrainFloat(0.9f));
+	ndBrainLayerLinearWithDropOut(ndInt32 inputs, ndInt32 outputs, ndBrainFloat dropOutFactor = ND_LINEAL_DROPOUT_FACTOR);
 	ndBrainLayerLinearWithDropOut(const ndBrainLayerLinearWithDropOut& src);
 	virtual ~ndBrainLayerLinearWithDropOut();
 	virtual ndBrainLayer* Clone() const;

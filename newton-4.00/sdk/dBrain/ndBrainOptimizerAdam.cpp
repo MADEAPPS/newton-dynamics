@@ -214,13 +214,6 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 					gradients.AdamUpdate(*data.m_u, *data.m_v, m_epsilon);
 				}
 			#else
-				//ndBrainLayer& vHat = gradients;
-				//ndBrainLayer& uHat = *data.m_v2;
-				//uHat.Set(*data.m_u);
-				//vHat.Set(*data.m_v);
-				//vHat.Scale(betaWeight);
-				//uHat.Scale(alphaWeight);
-				//gradients.AdamUpdate(uHat, vHat, m_epsilon);
 				gradients.AdamUpdate(*data.m_u, *data.m_v, m_epsilon);
 			#endif
 
