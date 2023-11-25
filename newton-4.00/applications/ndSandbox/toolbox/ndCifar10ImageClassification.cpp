@@ -160,7 +160,7 @@ static void Cifar10TrainingSet()
 			:ndBrainThreadPool()
 			,m_brain(*brain)
 			,m_prioritySamples()
-			,m_learnRate(ndReal(1.0e-3f))
+			,m_learnRate(ndReal(5.0e-4f))
 			,m_bashBufferSize(BASH_BUFFER_SIZE)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
@@ -269,7 +269,7 @@ static void Cifar10TrainingSet()
 				priorityList.PushBack(ndRandInt() % trainingLabels->GetCount());
 			}
 
-			for (ndInt32 epoch = 0; epoch < 2000; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 5000; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
