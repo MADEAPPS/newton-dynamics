@@ -253,7 +253,7 @@ static void Cifar10TrainingSet()
 			//batches = 1;
 
 			// so far best training result on the cifar-10 data set
-			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score (%)
+			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score (72.510%)
 			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score (%)
 			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score (%)
 			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score (%)
