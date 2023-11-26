@@ -65,13 +65,13 @@ void ndBrainMatrix::Init(ndInt32 rows, ndInt32 columns)
 	m_size = rows;
 	m_capacity = rows + 1;
 
-	ndInt32 strideInBytes = (ndInt32(columns * sizeof(ndBrainFloat)) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT;
-	ndInt32 size = ndInt32 (rows * sizeof(ndBrainMemVector) + 256);
+	size_t strideInBytes = size_t((ndInt64(columns * sizeof(ndBrainFloat)) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT);
+	size_t size = size_t(rows * sizeof(ndBrainMemVector) + 256);
 	size += strideInBytes * rows;
 	m_memory = (ndBrainFloat*)ndMemory::Malloc(size_t(size));
 	m_array = (ndBrainMemVector*)m_memory;
 
-	ndInt32 bytes = ndInt32((rows * sizeof(ndBrainMemVector) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT);
+	size_t bytes = size_t((rows * sizeof(ndBrainMemVector) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT);
 	ndInt8* ptr = (ndInt8*)m_memory + bytes;
 
 	ndBrainMatrix& me = *this;

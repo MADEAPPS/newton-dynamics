@@ -40,10 +40,10 @@ class ndMemory
 	D_CORE_API static void Free(void* const ptr);
 
 	/// Get memory buffer size previously allocated by Malloc.
-	D_CORE_API static ndInt32 GetSize(void* const ptr);
+	D_CORE_API static size_t GetSize(void* const ptr);
 
 	/// Calculate buffer size.
-	D_CORE_API static ndInt32 CalculateBufferSize(size_t size);
+	D_CORE_API static size_t CalculateBufferSize(size_t size);
 
 	/// Return the total memory allocated by the newton engine and tools.
 	D_CORE_API static ndUnsigned64 GetMemoryUsed();

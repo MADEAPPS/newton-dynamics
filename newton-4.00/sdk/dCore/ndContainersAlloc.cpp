@@ -78,7 +78,7 @@ class ndFreeListDictionary: public ndFixSizeArray<ndFreeListHeader, D_FREELIST_D
 	{
 		{
 			ndScopeSpinLock lock(m_lock);
-			ndFreeListHeader* const header = FindEntry(ndMemory::CalculateBufferSize(size_t(size)));
+			ndFreeListHeader* const header = FindEntry(ndInt32(ndMemory::CalculateBufferSize(size_t(size))));
 			ndAssert(header->m_count >= 0);
 			if (header->m_count)
 			{
@@ -96,7 +96,7 @@ class ndFreeListDictionary: public ndFixSizeArray<ndFreeListHeader, D_FREELIST_D
 	void Free(void* ptr)
 	{
 		ndScopeSpinLock lock(m_lock);
-		ndFreeListHeader* const header = FindEntry(ndMemory::GetSize(ptr));
+		ndFreeListHeader* const header = FindEntry(ndInt32(ndMemory::GetSize(ptr)));
 		ndAssert(header);
 		ndFreeListEntry* const self = (ndFreeListEntry*)ptr;
 
@@ -120,7 +120,7 @@ class ndFreeListDictionary: public ndFixSizeArray<ndFreeListHeader, D_FREELIST_D
 	void Flush(ndInt32 size)
 	{
 		ndScopeSpinLock lock(m_lock);
-		ndFreeListHeader* const header = FindEntry(ndMemory::CalculateBufferSize(size_t(size)));
+		ndFreeListHeader* const header = FindEntry(ndInt32(ndMemory::CalculateBufferSize(size_t(size))));
 		Flush(header);
 	}
 

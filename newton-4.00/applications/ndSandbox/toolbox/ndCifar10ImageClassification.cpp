@@ -20,7 +20,7 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 	char outPathName[1024];
 	ndUnsigned8 data[pixelSize * 3];
 
-	ndInt32 dataAugmentation = 2;
+	ndInt32 dataAugmentation = 4;
 	trainingLabels = new ndBrainMatrix(ndInt32(batches * dataAugmentation * 10000), ndInt32(10));
 	trainingImages = new ndBrainMatrix(ndInt32(batches * dataAugmentation * 10000), ndInt32(pixelSize * 3));
 
@@ -62,15 +62,15 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 	}
 
 	dataAugmentation--;
-	base = batches * 10000;
 	if (dataAugmentation)
 	{
 		// flip images
-		for (ndInt32 i = 0; i < batches * 10000; ++i)
+		const ndInt32 size = batches * 10000;
+		for (ndInt32 i = 0; i < size; ++i)
 		{
-			labelMatrix[base + i].Set(labelMatrix[i]);
+			labelMatrix[size + i].Set(labelMatrix[i]);
 
-			ndBrainVector& dstImage = imageMatrix[i + base];
+			ndBrainVector& dstImage = imageMatrix[i + size];
 			const ndBrainVector& srcImage = imageMatrix[i];
 			for (ndInt32 k = 0; k < 3; ++k)
 			{
@@ -84,6 +84,48 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 					{
 						dstRow[x] = srcRow[31 - x];
 					}
+				}
+			}
+		}
+	}
+
+	dataAugmentation-= 2;
+	if (dataAugmentation)
+	{
+		// rotate image by a random angle form 1 to 5 degrees
+		const ndInt32 size = batches * 10000 * 2;
+		for (ndInt32 i = 0; i < size; ++i)
+		{
+			labelMatrix[size + i].Set(labelMatrix[i]);
+
+			const ndBrainFloat angle = ndDegreeToRad * (ndRand() * ndBrainFloat(4.0f) + ndBrainFloat(1.0f));
+			const ndBrainFloat sinAngle = ndBrainFloat(ndSin(angle));
+			const ndBrainFloat cosAngle = ndBrainFloat(ndCos(angle));
+
+			ndBrainVector& dstImage = imageMatrix[i + size];
+			const ndBrainVector& srcImage = imageMatrix[i];
+			dstImage.Set(srcImage);
+			for (ndInt32 k = 0; k < 3; ++k)
+			{
+				ndBrainMemVector dstChannel(&dstImage[k * pixelSize], pixelSize);
+				const ndBrainMemVector srcChannel(&srcImage[k * pixelSize], pixelSize);
+
+				ndBrainFloat inY = ndBrainFloat(-15.5f);
+				for (ndInt32 y = 0; y < 32; ++y)
+				{
+					ndBrainFloat inX = ndBrainFloat(-15.5f);
+					ndBrainMemVector dstRow(&dstChannel[y * 32], 32);
+					for (ndInt32 x = 0; x < 32; ++x)
+					{
+						ndInt32 rotX = ndInt32(cosAngle * inX - sinAngle * inY + ndBrainFloat(16.0f));
+						ndInt32 rotY = ndInt32(sinAngle * inX + cosAngle * inY + ndBrainFloat(16.0f));
+						if ((rotX >= 0) && (rotX < 32) && (rotY >= 0) && (rotY < 32))
+						{
+							dstRow[x] = srcChannel[rotY * 32 + rotX];
+						}
+						inX += ndBrainFloat(1.0f);
+					}
+					inY += ndBrainFloat(1.0f);
 				}
 			}
 		}
