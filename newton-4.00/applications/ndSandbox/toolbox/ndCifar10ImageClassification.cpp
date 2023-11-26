@@ -20,8 +20,9 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 	char outPathName[1024];
 	ndUnsigned8 data[pixelSize * 3];
 
-	trainingLabels = new ndBrainMatrix(ndInt32(batches * 10000), ndInt32(10));
-	trainingImages = new ndBrainMatrix(ndInt32(batches * 10000), ndInt32(pixelSize * 3));
+	ndInt32 dataAugmentation = 2;
+	trainingLabels = new ndBrainMatrix(ndInt32(batches * dataAugmentation * 10000), ndInt32(10));
+	trainingImages = new ndBrainMatrix(ndInt32(batches * dataAugmentation * 10000), ndInt32(pixelSize * 3));
 
 	ndBrainMatrix& labelMatrix = *(*trainingLabels);
 	ndBrainMatrix& imageMatrix = *(*trainingImages);
@@ -57,6 +58,34 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 			}
 			base += 10000;
 			fclose(fp);
+		}
+	}
+
+	dataAugmentation--;
+	base = batches * 10000;
+	if (dataAugmentation)
+	{
+		// flip images
+		for (ndInt32 i = 0; i < batches * 10000; ++i)
+		{
+			labelMatrix[base + i].Set(labelMatrix[i]);
+
+			ndBrainVector& dstImage = imageMatrix[i + base];
+			const ndBrainVector& srcImage = imageMatrix[i];
+			for (ndInt32 k = 0; k < 3; ++k)
+			{
+				ndBrainMemVector dstChannel(&dstImage[k * pixelSize], pixelSize);
+				const ndBrainMemVector srcChannel(&srcImage[k * pixelSize], pixelSize);
+				for (ndInt32 y = 0; y < 32; ++y)
+				{
+					ndBrainMemVector dstRow(&dstChannel[y * 32], 32);
+					const ndBrainMemVector srcRow(&srcChannel[y * 32], 32);
+					for (ndInt32 x = 0; x < 32; ++x)
+					{
+						dstRow[x] = srcRow[31 - x];
+					}
+				}
+			}
 		}
 	}
 }
