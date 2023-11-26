@@ -370,8 +370,8 @@ static void Cifar10TrainingSet()
 
 				if (fails <= minTrainingFail)
 				{
-					const ndInt32 minTestCheck = 1000;
 					ndInt32 actualTraining = fails;
+					const ndInt32 minTestCheck = ndInt32 (trainingLabels->GetCount() * 0.05f);
 					bool traningTest = fails < minTrainingFail;
 					minTrainingFail = ndMax(fails, minTestCheck);
 
