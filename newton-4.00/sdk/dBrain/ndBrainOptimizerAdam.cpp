@@ -197,31 +197,31 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 			data.m_u->ScaleAdd(gradients, ndBrainFloat(1.0f) - m_alpha);
 			data.m_v->ScaleAdd(*data.m_v2, ndBrainFloat(1.0f) - m_beta);
 
-			#if 0
-				if (m_betaAcc > ndBrainFloat(0.0f))
-				{
-					ndBrainLayer& vHat = gradients;
-					ndBrainLayer& uHat = *data.m_v2;
+			if (m_betaAcc > ndBrainFloat(0.0f))
+			{
+				ndBrainLayer& vHat = gradients;
+				ndBrainLayer& uHat = *data.m_v2;
 
-					uHat.Set(*data.m_u);
-					vHat.Set(*data.m_v);
-					vHat.Scale(betaWeight);
-					uHat.Scale(alphaWeight);
-					gradients.AdamUpdate(uHat, vHat, m_epsilon);
-				}
-				else
-				{
-					gradients.AdamUpdate(*data.m_u, *data.m_v, m_epsilon);
-				}
-			#else
+				uHat.Set(*data.m_u);
+				vHat.Set(*data.m_v);
+				vHat.Scale(betaWeight);
+				uHat.Scale(alphaWeight);
+				gradients.AdamUpdate(uHat, vHat, m_epsilon);
+			}
+			else
+			{
 				gradients.AdamUpdate(*data.m_u, *data.m_v, m_epsilon);
-			#endif
+			}
 
-			gradients.Scale(descendRate);
+			//gradients.Scale(descendRate);
+			//ndBrainLayer& weights = *trainer->GetWeightsLayer(i);
+			//gradients.ScaleAdd(weights, regularizer);
+			//weights.Add(gradients);
+			//weights.FlushToZero();
 
 			ndBrainLayer& weights = *trainer->GetWeightsLayer(i);
 			gradients.ScaleAdd(weights, regularizer);
-			weights.Add(gradients);
+			weights.ScaleAdd(gradients, descendRate);
 			weights.FlushToZero();
 		}
 	}
