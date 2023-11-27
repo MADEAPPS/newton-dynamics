@@ -20,9 +20,9 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 	char outPathName[1024];
 	ndUnsigned8 data[pixelSize * 3];
 
-	ndInt32 dataAugmentation = 4;
-	trainingLabels = new ndBrainMatrix(ndInt32(batches * dataAugmentation * 10000), ndInt32(10));
-	trainingImages = new ndBrainMatrix(ndInt32(batches * dataAugmentation * 10000), ndInt32(pixelSize * 3));
+	//ndInt32 dataAugmentation = 4;
+	trainingLabels = new ndBrainMatrix(ndInt32(batches * 10000), ndInt32(10));
+	trainingImages = new ndBrainMatrix(ndInt32(batches * 10000), ndInt32(pixelSize * 3));
 
 	ndBrainMatrix& labelMatrix = *(*trainingLabels);
 	ndBrainMatrix& imageMatrix = *(*trainingImages);
@@ -61,6 +61,7 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 		}
 	}
 
+#if 0
 	dataAugmentation--;
 	if (dataAugmentation)
 	{
@@ -130,6 +131,7 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 			}
 		}
 	}
+#endif
 }
 
 static void LoadTestData(ndSharedPtr<ndBrainMatrix>& images, ndSharedPtr<ndBrainMatrix>& labels)
@@ -230,7 +232,6 @@ static void Cifar10TrainingSet()
 		SupervisedTrainer(ndBrain* const brain)
 			:ndBrainThreadPool()
 			,m_brain(*brain)
-			,m_prioritySamples()
 			,m_learnRate(ndReal(5.0e-4f))
 			,m_bashBufferSize(BASH_BUFFER_SIZE)
 		{
@@ -242,7 +243,6 @@ static void Cifar10TrainingSet()
 				ndBrainTrainer* const trainer = new ndBrainTrainer(&m_brain);
 				m_trainers.PushBack(trainer);
 			}
-			m_prioritySamples.SetCount(m_bashBufferSize);
 		}
 
 		~SupervisedTrainer()
@@ -253,22 +253,89 @@ static void Cifar10TrainingSet()
 			}
 		}
 
-		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingImages,
+		void GenerateAugmentedImageBash(const ndBrainMatrix& src, ndBrainMatrix& dst) const
+		{
+			const ndInt32 pixelSize = 32 * 32;
+			ndBrainFixSizeVector<pixelSize * 3> tmpImage;
+			ndBrainFixSizeVector<pixelSize * 3> rotImage;
+			for (ndInt32 i = 0; i < src.GetCount(); ++i)
+			{
+				if (ndRandInt() & 1)
+				{
+					tmpImage.Set(src[i]);
+				}
+				else
+				{
+					const ndBrainVector& srcImage = src[i];
+					for (ndInt32 k = 0; k < 3; ++k)
+					{
+						ndBrainMemVector dstChannel(&tmpImage[k * pixelSize], pixelSize);
+						const ndBrainMemVector srcChannel(&srcImage[k * pixelSize], pixelSize);
+						for (ndInt32 y = 0; y < 32; ++y)
+						{
+							ndBrainMemVector dstRow(&dstChannel[y * 32], 32);
+							const ndBrainMemVector srcRow(&srcChannel[y * 32], 32);
+							for (ndInt32 x = 0; x < 32; ++x)
+							{
+								dstRow[x] = srcRow[31 - x];
+							}
+						}
+					}
+				}
+
+				rotImage.Set(tmpImage);
+				
+				const ndBrainFloat angle = ndDegreeToRad * (ndRand() * ndBrainFloat(4.0f) + ndBrainFloat(1.0f));
+				const ndBrainFloat sinAngle = ndBrainFloat(ndSin(angle));
+				const ndBrainFloat cosAngle = ndBrainFloat(ndCos(angle));
+
+				//ndBrainVector& dstImage = imageMatrix[i + size];
+				//const ndBrainVector& srcImage = imageMatrix[i];
+				//dstImage.Set(srcImage);
+				for (ndInt32 k = 0; k < 3; ++k)
+				{
+					ndBrainMemVector dstChannel(&rotImage[k * pixelSize], pixelSize);
+					const ndBrainMemVector srcChannel(&tmpImage[k * pixelSize], pixelSize);
+
+					ndBrainFloat inY = ndBrainFloat(-15.5f);
+					for (ndInt32 y = 0; y < 32; ++y)
+					{
+						ndBrainFloat inX = ndBrainFloat(-15.5f);
+						ndBrainMemVector dstRow(&dstChannel[y * 32], 32);
+						for (ndInt32 x = 0; x < 32; ++x)
+						{
+							ndInt32 rotX = ndInt32(cosAngle * inX - sinAngle * inY + ndBrainFloat(16.0f));
+							ndInt32 rotY = ndInt32(sinAngle * inX + cosAngle * inY + ndBrainFloat(16.0f));
+							if ((rotX >= 0) && (rotX < 32) && (rotY >= 0) && (rotY < 32))
+							{
+								dstRow[x] = srcChannel[rotY * 32 + rotX];
+							}
+							inX += ndBrainFloat(1.0f);
+						}
+						inY += ndBrainFloat(1.0f);
+					}
+				}
+
+				dst[i].Set(rotImage);
+			}
+		}
+
+		void Optimize(ndBrainMatrix* const trainingLabels, const ndBrainMatrix* const sourceTrainingImages,
 					  ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 		{
 			ndUnsigned32 miniBashArray[64];
 			ndUnsigned32 failCount[D_MAX_THREADS_COUNT];
 
-			auto BackPropagateBash = ndMakeObject::ndFunction([this, trainingImages, trainingLabels, &miniBashArray, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
+			ndBrainMatrix trainingImages(sourceTrainingImages->GetRows(), sourceTrainingImages->GetColumns());
+			auto BackPropagateBash = ndMakeObject::ndFunction([this, &trainingImages, trainingLabels, &miniBashArray, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
 			{
 				class CategoricalLoss : public ndBrainLossCategoricalCrossEntropy
 				{
 					public:
-					CategoricalLoss(ndInt32 size, ndUnsigned32* const failCount, ndFixSizeArray<ndUnsigned32, 16>& priority, ndUnsigned32 entry)
+					CategoricalLoss(ndInt32 size, ndUnsigned32* const failCount, ndUnsigned32 entry)
 						:ndBrainLossCategoricalCrossEntropy(size)
 						,m_entry(entry)
 						,m_failCount(failCount)
-						,m_priority(priority)
 					{
 					}
 
@@ -289,10 +356,6 @@ static void Cifar10TrainingSet()
 						if (m_truth[index] == ndReal(0.0f))
 						{
 							(*m_failCount)++;
-							if (m_priority.GetCount() < m_priority.GetCapacity())
-							{
-								m_priority.PushBack(m_entry);
-							}
 						}
 
 						ndBrainLossCategoricalCrossEntropy::GetLoss(output, loss);
@@ -300,7 +363,6 @@ static void Cifar10TrainingSet()
 
 					ndUnsigned32 m_entry;
 					ndUnsigned32* m_failCount;
-					ndFixSizeArray<ndUnsigned32, 16>& m_priority;
 				};
 
 				const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
@@ -308,10 +370,11 @@ static void Cifar10TrainingSet()
 				{
 					ndBrainTrainer& trainer = *m_trainers[i];
 					ndUnsigned32 index = miniBashArray[i];
-					CategoricalLoss loss(m_brain.GetOutputSize(), &failCount[threadIndex], m_prioritySamples[i], index);
+					CategoricalLoss loss(m_brain.GetOutputSize(), &failCount[threadIndex], index);
 
 					loss.SetTruth((*trainingLabels)[ndInt32(index)]);
-					trainer.BackPropagate((*trainingImages)[ndInt32(index)], loss);
+					//trainer.BackPropagate((*trainingImages)[ndInt32(index)], loss);
+					trainer.BackPropagate(trainingImages[ndInt32(index)], loss);
 				}
 			});
 
@@ -330,14 +393,9 @@ static void Cifar10TrainingSet()
 			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score (%)
 			
 			ndArray<ndUnsigned32> shuffleBuffer;
-			ndFixSizeArray<ndUnsigned32, 1024 * 2> priorityList;
 			for (ndInt32 i = 0; i < trainingLabels->GetCount(); ++i)
 			{
 				shuffleBuffer.PushBack(ndUnsigned32(i));
-			}
-			for (ndInt32 i = 0; i < priorityList.GetCapacity(); ++i)
-			{
-				priorityList.PushBack(ndRandInt() % trainingLabels->GetCount());
 			}
 
 			for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
@@ -345,15 +403,12 @@ static void Cifar10TrainingSet()
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
 
+				GenerateAugmentedImageBash(*sourceTrainingImages, trainingImages);
+
 				m_brain.EnableDropOut();
 				for (ndInt32 bash = 0; bash < batches; ++bash)
 				{
 					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_bashBufferSize);
-					//const ndInt32 priorityCount = ndMin(4, priorityList.GetCount());
-					//for (ndInt32 i = 0; i < priorityCount; ++i)
-					//{
-					//	miniBashArray[i] = priorityList[ndInt32(ndRandInt() % priorityList.GetCount())];
-					//}
 
 					ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 					optimizer.Update(this, m_trainers, m_learnRate);
@@ -371,7 +426,7 @@ static void Cifar10TrainingSet()
 				if (fails <= minTrainingFail)
 				{
 					ndInt32 actualTraining = fails;
-					const ndInt32 minTestCheck = ndInt32 (trainingLabels->GetCount() * 0.05f);
+					const ndInt32 minTestCheck = ndInt32 (ndBrainFloat(trainingLabels->GetCount()) * ndBrainFloat(0.05f));
 					bool traningTest = fails < minTrainingFail;
 					minTrainingFail = ndMax(fails, minTestCheck);
 
@@ -436,17 +491,6 @@ static void Cifar10TrainingSet()
 					}
 				}
 
-				priorityList.SetCount(0);
-				for (ndInt32 i = 0; i < m_prioritySamples.GetCount(); ++i)
-				{
-					ndFixSizeArray<ndUnsigned32, 16>& priority = m_prioritySamples[i];
-					for (ndInt32 j = 0; j < priority.GetCount(); ++j)
-					{
-						priorityList.PushBack(priority[j]);
-					}
-					priority.SetCount(0);
-				}
-
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 			}
 			m_brain.CopyFrom(bestBrain);
@@ -454,7 +498,6 @@ static void Cifar10TrainingSet()
 
 		ndBrain& m_brain;
 		ndArray<ndBrainTrainer*> m_trainers;
-		ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 16>, BASH_BUFFER_SIZE> m_prioritySamples;
 		ndReal m_learnRate;
 		ndInt32 m_bashBufferSize;
 	};
