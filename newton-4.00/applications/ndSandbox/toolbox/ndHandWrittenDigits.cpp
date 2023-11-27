@@ -493,7 +493,7 @@ static void MnistTestSet()
 
 		ndInt32 numbeOfParam = brain->GetNumberOfParameters();
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
-		ndExpandTraceMessage("number of Parameters %d\n", numbeOfParam);
+		ndExpandTraceMessage("mnist database, number of Parameters %d\n", numbeOfParam);
 		ValidateData("test data", *(*brain), *testLabels, *testDigits);
 		time = ndGetTimeInMicroseconds() - time;
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
@@ -504,6 +504,6 @@ void ndHandWrittenDigits()
 {
 	ndSetRandSeed(12345);
 
-	MnistTrainingSet();
-	MnistTestSet();
+	//MnistTrainingSet();
+	//MnistTestSet();
 }

@@ -99,38 +99,41 @@ const char* ndBrainLayerImagePadding::GetLabelId() const
 
 void ndBrainLayerImagePadding::Save(const ndBrainSave* const loadSave) const
 {
-	ndAssert(0);
-	//char buffer[1024];
-	//
-	//sprintf(buffer, "\tinput_width %d\n", m_width);
-	//loadSave->WriteData(buffer);
-	//
-	//sprintf(buffer, "\tinput_heigh %d\n", m_height);
-	//loadSave->WriteData(buffer);
-	//
-	//sprintf(buffer, "\tinput_layers %d\n", m_channels);
-	//loadSave->WriteData(buffer);
+	char buffer[1024];
+
+	sprintf(buffer, "\twidth %d\n", m_width);
+	loadSave->WriteData(buffer);
+	
+	sprintf(buffer, "\theigh %d\n", m_height);
+	loadSave->WriteData(buffer);
+	
+	sprintf(buffer, "\tchannels %d\n", m_channels);
+	loadSave->WriteData(buffer);
+
+	sprintf(buffer, "\tfilterSize %d\n", m_filterSize);
+	loadSave->WriteData(buffer);
 }
 
 ndBrainLayer* ndBrainLayerImagePadding::Load(const ndBrainLoad* const loadSave)
 {
-	ndAssert(0);
-	//char buffer[1024];
-	//loadSave->ReadString(buffer);
-	//
-	//loadSave->ReadString(buffer);
-	//ndInt32 inputWidth = loadSave->ReadInt();
-	// 
-	//loadSave->ReadString(buffer);
-	//ndInt32 inputHeight = loadSave->ReadInt();
-	//
-	//loadSave->ReadString(buffer);
-	//ndInt32 inputLayers = loadSave->ReadInt();
-	//
-	//ndBrainLayerImagePadding* const layer = new ndBrainLayerImagePadding(inputWidth, inputHeight, inputLayers);
-	//loadSave->ReadString(buffer);
-	//return layer;
-	return nullptr;
+	char buffer[1024];
+	loadSave->ReadString(buffer);
+	
+	loadSave->ReadString(buffer);
+	ndInt32 inputWidth = loadSave->ReadInt();
+	 
+	loadSave->ReadString(buffer);
+	ndInt32 inputHeight = loadSave->ReadInt();
+	
+	loadSave->ReadString(buffer);
+	ndInt32 inputLayers = loadSave->ReadInt();
+
+	loadSave->ReadString(buffer);
+	ndInt32 filterSize = loadSave->ReadInt();
+
+	ndBrainLayerImagePadding* const layer = new ndBrainLayerImagePadding(inputWidth, inputHeight, inputLayers, filterSize);
+	loadSave->ReadString(buffer);
+	return layer;
 }
 
 void ndBrainLayerImagePadding::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const

@@ -481,7 +481,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	//ndHandWrittenDigits();
+	ndHandWrittenDigits();
 	ndCifar10ImageClassification();
 
 	//ndSharedPtr<ndDemoEntityManager> xxx(this);
