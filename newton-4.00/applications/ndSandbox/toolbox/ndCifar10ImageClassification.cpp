@@ -398,7 +398,7 @@ static void Cifar10TrainingSet()
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
 
-			for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 2000; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
