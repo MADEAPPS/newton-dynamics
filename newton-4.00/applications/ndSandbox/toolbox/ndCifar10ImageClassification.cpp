@@ -285,7 +285,7 @@ static void Cifar10TrainingSet()
 
 				rotImage.Set(tmpImage);
 				
-				const ndBrainFloat angle = ndDegreeToRad * (ndRand() * ndBrainFloat(4.0f) + ndBrainFloat(1.0f));
+				const ndBrainFloat angle = ndDegreeToRad * (ndRand() * ndBrainFloat(10.0f) - ndBrainFloat(5.0f));
 				const ndBrainFloat sinAngle = ndBrainFloat(ndSin(angle));
 				const ndBrainFloat cosAngle = ndBrainFloat(ndCos(angle));
 
