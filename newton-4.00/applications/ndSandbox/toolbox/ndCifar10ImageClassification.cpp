@@ -289,9 +289,6 @@ static void Cifar10TrainingSet()
 				const ndBrainFloat sinAngle = ndBrainFloat(ndSin(angle));
 				const ndBrainFloat cosAngle = ndBrainFloat(ndCos(angle));
 
-				//ndBrainVector& dstImage = imageMatrix[i + size];
-				//const ndBrainVector& srcImage = imageMatrix[i];
-				//dstImage.Set(srcImage);
 				for (ndInt32 k = 0; k < 3; ++k)
 				{
 					ndBrainMemVector dstChannel(&rotImage[k * pixelSize], pixelSize);
@@ -387,7 +384,7 @@ static void Cifar10TrainingSet()
 			//batches = 1;
 
 			// so far best training result on the cifar-10 data set
-			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score (79.76%)
+			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score (82.48%)
 			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score (%)
 			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score (%)
 			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score (%)
