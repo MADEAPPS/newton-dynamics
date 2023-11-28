@@ -191,21 +191,33 @@ void ndBrain::UpdateDropOut()
 //	output.Set(in);
 //}
 
+ndInt32 ndBrain::CalculateWorkingtBufferSize() const
+{
+	const ndArray<ndBrainLayer*>& layers = *this;
+	ndInt32 maxSize = layers[0]->GetInputSize();
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		maxSize = ndMax(maxSize, layers[i]->GetOutputBufferSize());
+	}
+	return maxSize * 2 + 256;
+}
+
 void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer)
 {
 	const ndArray<ndBrainLayer*>& layers = *this;
 	ndInt32 maxSize = layers[0]->GetInputSize();
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
-		//maxSize = ndMax(maxSize, layers[i]->GetOutputSize());
 		maxSize = ndMax(maxSize, layers[i]->GetOutputBufferSize());
 	}
 
-	if (workingBuffer.GetCapacity() < (maxSize * 2 + 256))
+	const ndInt32 maxMemory = CalculateWorkingtBufferSize();
+	if (maxMemory > workingBuffer.GetCapacity())
 	{
 		ndScopeSpinLock lock(m_lock);
-		workingBuffer.SetCount(maxSize * 2 + 256);
+		workingBuffer.SetCount(maxMemory);
 	}
+	workingBuffer.SetCount(maxMemory);
 
 	ndBrainMemVector in(&workingBuffer[0], input.GetCount());
 	ndBrainMemVector out(&workingBuffer[maxSize + 128], input.GetCount());

@@ -142,6 +142,7 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	ndInt32 m_bashBufferSize;
 	ndInt32 m_maxTrajectorySteps;
 	ndInt32 m_extraTrajectorySteps;
+	ndBrainVector m_workingBuffer;
 	ndMovingAverage<128> m_averageQvalue;
 	ndMovingAverage<128> m_averageFramesPerEpisodes;
 };
@@ -161,6 +162,7 @@ ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::ndBrainAgentDiscreteVPG_T
 	,m_bashBufferSize(hyperParameters.m_bashBufferSize)
 	,m_maxTrajectorySteps(hyperParameters.m_maxTrajectorySteps)
 	,m_extraTrajectorySteps(hyperParameters.m_extraTrajectorySteps)
+	,m_workingBuffer()
 	,m_averageQvalue()
 	,m_averageFramesPerEpisodes()
 {
@@ -425,18 +427,17 @@ ndBrainFloat ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::SelectAction
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Step()
 {
-	ndAssert(0);
-	//ndTrajectoryStep trajectoryStep;
-	//ndBrainFixSizeVector<actionDim> probability;
-	//
-	//GetObservation(&trajectoryStep.m_observation[0]);
-	//m_actor.MakePrediction(trajectoryStep.m_observation, probability);
-	//trajectoryStep.m_action = SelectAction(probability);
-	//ApplyActions(&trajectoryStep.m_action);
-	//trajectoryStep.m_reward = GetReward();
-	//
-	//ndAssert(m_trajectory.GetCount() < m_trajectory.GetCapacity());
-	//m_trajectory.PushBack(trajectoryStep);
+	ndTrajectoryStep trajectoryStep;
+	ndBrainFixSizeVector<actionDim> probability;
+	
+	GetObservation(&trajectoryStep.m_observation[0]);
+	m_actor.MakePrediction(trajectoryStep.m_observation, probability, m_workingBuffer);
+	trajectoryStep.m_action = SelectAction(probability);
+	ApplyActions(&trajectoryStep.m_action);
+	trajectoryStep.m_reward = GetReward();
+	
+	ndAssert(m_trajectory.GetCount() < m_trajectory.GetCapacity());
+	m_trajectory.PushBack(trajectoryStep);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
