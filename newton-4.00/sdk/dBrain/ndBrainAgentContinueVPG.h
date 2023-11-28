@@ -123,13 +123,16 @@ void ndBrainAgentContinueVPG<statesDim, actionDim>::OptimizeStep()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG<statesDim, actionDim>::Step()
 {
-	ndAssert(0);
-	//ndBrainFixSizeVector<actionDim> actions;
-	//ndBrainFixSizeVector<statesDim> observations;
-	//
-	//GetObservation(&observations[0]);
-	//m_actor->MakePrediction(observations, actions);
-	//ApplyActions(&actions[0]);
+	ndInt32 bufferSize = m_actor->CalculateWorkingtBufferSize();
+	ndBrainFloat* const bufferMem = ndAlloca(ndBrainFloat, bufferSize);
+
+	ndBrainFixSizeVector<actionDim> actions;
+	ndBrainFixSizeVector<statesDim> observations;
+	ndBrainMemVector workingBuffer(bufferMem, bufferSize);
+	
+	GetObservation(&observations[0]);
+	m_actor->MakePrediction(observations, actions, workingBuffer);
+	ApplyActions(&actions[0]);
 }
 
 #endif 

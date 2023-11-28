@@ -147,6 +147,7 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	ndInt32 m_bashBufferSize;
 	ndInt32 m_maxTrajectorySteps;
 	ndInt32 m_extraTrajectorySteps;
+	ndBrainVector m_workingBuffer;
 	ndMovingAverage<128> m_averageQvalue;
 	ndMovingAverage<128> m_averageFramesPerEpisodes;
 };
@@ -167,6 +168,7 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 	,m_bashBufferSize(hyperParameters.m_bashBufferSize)
 	,m_maxTrajectorySteps(hyperParameters.m_maxTrajectorySteps)
 	,m_extraTrajectorySteps(hyperParameters.m_extraTrajectorySteps)
+	,m_workingBuffer()
 	,m_averageQvalue()
 	,m_averageFramesPerEpisodes()
 {
@@ -404,7 +406,6 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrain
 	// for now use a constant deviations until the algorithm is stable 
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
-		//ndBrainFloat sample = ndGaussianRandom(probabilities[i], SIGMA);
 		ndBrainFloat sample = ndGaussianRandom(probabilities[i], m_sigma);
 		ndBrainFloat squashSample = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		probabilities[i] = squashSample;
@@ -414,17 +415,17 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrain
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Step()
 {
-	ndAssert(0);
-	//ndTrajectoryStep trajectoryStep;
-	//
-	//GetObservation(&trajectoryStep.m_observation[0]);
-	//m_actor.MakePrediction(trajectoryStep.m_observation, trajectoryStep.m_actions);
-	//SelectAction(trajectoryStep.m_actions);
-	//ApplyActions(&trajectoryStep.m_actions[0]);
-	//trajectoryStep.m_reward = GetReward();
-	//
-	//ndAssert(m_trajectory.GetCount() < m_trajectory.GetCapacity());
-	//m_trajectory.PushBack(trajectoryStep);
+	ndTrajectoryStep trajectoryStep;
+	
+	GetObservation(&trajectoryStep.m_observation[0]);
+	m_actor.MakePrediction(trajectoryStep.m_observation, trajectoryStep.m_actions, m_workingBuffer);
+
+	SelectAction(trajectoryStep.m_actions);
+	ApplyActions(&trajectoryStep.m_actions[0]);
+	trajectoryStep.m_reward = GetReward();
+	
+	ndAssert(m_trajectory.GetCount() < m_trajectory.GetCapacity());
+	m_trajectory.PushBack(trajectoryStep);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
