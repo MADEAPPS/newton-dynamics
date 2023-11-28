@@ -1494,8 +1494,27 @@ namespace ndQuadruped_1
 
 	class ndRobot : public ndModelArticulation
 	{
-
 		public:
+		class ndEffectorInfo
+		{
+			public:
+			ndEffectorInfo()
+				:m_footHinge(nullptr)
+				,m_effector(nullptr)
+			{
+			}
+
+			ndEffectorInfo(const ndSharedPtr<ndJointBilateralConstraint>& effector, ndJointHinge* const footHinge)
+				:m_footHinge(footHinge)
+				,m_effector(effector)
+			{
+			}
+
+			ndJointHinge* m_footHinge;
+			ndSharedPtr<ndJointBilateralConstraint> m_effector;
+		};
+
+		
 		//ndRobot(ndSharedPtr<ndBrainAgent>& agent)
 		ndRobot()
 			:ndModelArticulation()
@@ -1503,7 +1522,23 @@ namespace ndQuadruped_1
 		{
 		}
 
+		void Update(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndModelArticulation::Update(world, timestep);
+			//m_timestep = timestep;
+			//m_agent->Step();
+		}
 
+		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+		{
+			//m_animBlendTree->Update(timestep * m_control->m_animSpeed);
+			ndModelArticulation::PostUpdate(world, timestep);
+			//m_agent->OptimizeStep();
+			//CheckTrainingCompleted();
+		}
+
+
+		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
 	};
 
 	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation)
@@ -1636,32 +1671,32 @@ namespace ndQuadruped_1
 				workSpace += lenght;
 			}
 		
-		//	// add leg effector
-		//	{
-		//		ndBodyKinematic* const targetBody = footNode->m_body->GetAsBodyKinematic();
-		//
-		//		ndFloat32 angle(i < 2 ? -90.0f : 90.0f);
-		//		ndMatrix effectorToeFrame(ndGetIdentityMatrix());
-		//		ndMatrix effectorRefFrame(ndYawMatrix(angle * ndDegreeToRad));
-		//		effectorRefFrame.m_posit = thighPivot;
-		//		effectorToeFrame.m_posit = limbPivotLocation.m_posit;
-		//
-		//		ndFloat32 regularizer = 0.001f;
-		//		ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame.m_posit, effectorRefFrame, targetBody, torso->GetAsBodyKinematic());
-		//		effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
-		//		effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
-		//		effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
-		//
-		//		ndRobot::ndEffectorInfo info(ndSharedPtr<ndJointBilateralConstraint>(effector), footHinge);
-		//		model->m_effectorsInfo.PushBack(info);
-		//
+			// add leg effector
+			{
+				ndBodyKinematic* const targetBody = footNode->m_body->GetAsBodyKinematic();
+		
+				ndFloat32 angle(i < 2 ? -90.0f : 90.0f);
+				ndMatrix effectorToeFrame(ndGetIdentityMatrix());
+				ndMatrix effectorRefFrame(ndYawMatrix(angle * ndDegreeToRad));
+				effectorRefFrame.m_posit = thighPivot;
+				effectorToeFrame.m_posit = limbPivotLocation.m_posit;
+		
+				ndFloat32 regularizer = 0.001f;
+				ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame.m_posit, effectorRefFrame, targetBody, torso->GetAsBodyKinematic());
+				effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+				effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+				effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
+		
+				ndRobot::ndEffectorInfo info(ndSharedPtr<ndJointBilateralConstraint>(effector), footHinge);
+				model->m_effectorsInfo.PushBack(info);
+		
 		//		ndAnimKeyframe keyFrame;
 		//		keyFrame.m_userData = &model->m_effectorsInfo[model->m_effectorsInfo.GetCount() - 1];
 		//		model->m_animPose.PushBack(keyFrame);
 		//		poseGenerator->AddTrack();
 		//		poseGenerator->m_phase[i] = phase[i];
 		//		poseGenerator->m_offset[i] = offset[i];
-		//	}
+			}
 		}
 		
 		//#ifdef ND_TRAIN_MODEL
