@@ -55,8 +55,8 @@
 //#define DEFAULT_SCENE	16		// basic player
 //#define DEFAULT_SCENE	17		// rag doll
 //#define DEFAULT_SCENE	18		// cart pole discrete controller
-#define DEFAULT_SCENE	19		// cart pole continue controller
-//#define DEFAULT_SCENE	20		// unit cycle controller
+//#define DEFAULT_SCENE	19		// cart pole continue controller
+#define DEFAULT_SCENE	20		// unit cycle controller
 //#define DEFAULT_SCENE	21		// quadruped test 1
 //#define DEFAULT_SCENE	22		// quadruped test 2
 //#define DEFAULT_SCENE	23		// quadruped test 3
