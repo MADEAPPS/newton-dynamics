@@ -1686,29 +1686,33 @@ namespace ndQuadruped_1
 			//
 			//ndBodyState state;
 			//ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
-			//
-			//for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			//{
-			//	const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-			//	const ndMatrix matrix(body->GetMatrix());
-			//	ndFloat32 mass = body->GetMassMatrix().m_w;
-			//	state.m_mass += mass;
-			//	state.m_com.m_posit += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
+			
+			ndFloat32 totalMass = ndFloat32(0.0f);
+			ndVector centerOfMass(ndVector::m_zero);
+			for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+				const ndMatrix matrix(body->GetMatrix());
+				ndFloat32 mass = body->GetMassMatrix().m_w;
+				totalMass += mass;
+				centerOfMass += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
 			//	bodies.PushBack(body);
-			//}
-			//ndFloat32 invMass = 1.0f / state.m_mass;
+			}
+			ndFloat32 invMass = 1.0f / totalMass;
+			centerOfMass = centerOfMass.Scale(invMass);
+
 			//state.m_com.m_posit = state.m_com.m_posit.Scale(invMass);
 			//state.m_com.m_posit.m_w = ndFloat32(1.0f);
-			//
 			//ndMatrix comMatrix(m_rootNode->m_body->GetAsBodyKinematic()->GetMatrix());
 			//comMatrix.m_posit = state.m_com.m_posit;
 			//context.DrawFrame(comMatrix);
-			//ndVector comLineOfAction(comMatrix.m_posit);
-			//comLineOfAction.m_y -= 0.5f;
-			//context.DrawLine(comMatrix.m_posit, comLineOfAction, ndVector::m_zero);
+
+			ndVector comLineOfAction(centerOfMass);
+			comLineOfAction.m_y -= ndFloat32(0.5f);
+			context.DrawLine(centerOfMass, comLineOfAction, ndVector::m_zero);
 			//comLineOfAction.m_y = comMatrix.m_posit.m_y - 0.38f;
 			//context.DrawPoint(comLineOfAction, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 10);
-			//
+			
 			//ndVector netTorque(ndVector::m_zero);
 			//ndVector netTorque1(ndVector::m_zero);
 			//for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
