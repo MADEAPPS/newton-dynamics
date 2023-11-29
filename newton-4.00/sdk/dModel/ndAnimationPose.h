@@ -20,6 +20,7 @@ class ndAnimKeyframe
 		,m_rotation()
 		,m_userData(nullptr)
 	{
+		m_userParamInt = 0;
 	}
 
 	ndAnimKeyframe(const ndVector& posit, const ndQuaternion& rotation)
@@ -27,10 +28,16 @@ class ndAnimKeyframe
 		,m_rotation(rotation)
 		,m_userData(nullptr)
 	{
+		m_userParamInt = 0;
 	}
 
 	ndVector m_posit;
 	ndQuaternion m_rotation;
+	union
+	{
+		ndInt64 m_userParamInt;
+		ndFloat32 m_userParamFloat;
+	};
 	void* m_userData;
 };
 
