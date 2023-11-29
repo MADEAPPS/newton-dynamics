@@ -157,9 +157,12 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 				gradients.AdamUpdate(*data.m_u, *data.m_v, m_epsilon);
 			}
 
-			gradients.Scale(descendRate);
+			//gradients.Scale(descendRate);
+			//gradients.ScaleAdd(weights, regularizer);
+			//weights.Add(gradients);
+			
 			gradients.ScaleAdd(weights, regularizer);
-			weights.Add(gradients);
+			weights.ScaleAdd(gradients, descendRate);
 			weights.FlushToZero();
 		}
 	});
