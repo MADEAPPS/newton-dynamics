@@ -1514,7 +1514,139 @@ namespace ndQuadruped_1
 			ndSharedPtr<ndJointBilateralConstraint> m_effector;
 		};
 
-		
+		class ndPoseGenerator : public ndAnimationSequence
+		{
+			public:
+			ndPoseGenerator(ndFloat32 gaitFraction, const ndFloat32* const phase)
+				:ndAnimationSequence()
+				,m_amp(0.27f)
+				,m_gaitFraction(gaitFraction)
+				,m_stanceMask(0)
+			{
+				m_currentPose.SetCount(0);
+				m_duration = ndFloat32(4.0f);
+				for (ndInt32 i = 0; i < 4; i++)
+				{
+					m_phase[i] = phase[i];
+					m_offset[i] = ndFloat32(0.0f);
+					m_currentPose.PushBack(BasePose(i));
+				}
+			}
+
+			ndVector GetTranslation(ndFloat32) const
+			{
+				return ndVector::m_zero;
+			}
+
+			ndInt32 GetStanceCode() const
+			{
+				return m_stanceMask;
+			}
+
+			ndVector BasePose(ndInt32 index) const
+			{
+				ndVector base(ndVector::m_wOne);
+				base.m_x = 0.4f;
+				base.m_z = m_offset[index];
+				base.m_y = D_POSE_REST_POSITION_Y;
+				return base;
+			}
+
+			void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
+			{
+				// generate a procedural in place march gait
+				ndAssert(param >= ndFloat32(0.0f));
+				ndAssert(param <= ndFloat32(1.0f));
+
+				//param = 0.125f;
+
+				m_stanceMask = 0x0f;
+				ndFloat32 omega = ndPi / m_gaitFraction;
+				for (ndInt32 i = 0; i < output.GetCount(); i++)
+				{
+					output[i].m_posit = BasePose(i);
+					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
+					t = m_gaitFraction / 2;
+					if (t <= m_gaitFraction)
+					{
+						if (i == 0)
+							//if ((i == 0) || (i == 3))
+							//if ((i == 1) || (i == 2))
+						{
+							m_stanceMask = m_stanceMask ^ (1 << i);
+							output[i].m_posit.m_y += m_amp * ndSin(omega * t);
+						}
+					}
+					m_currentPose[i] = output[i].m_posit;
+				}
+			}
+
+			ndFloat32 m_amp;
+			ndFloat32 m_gaitFraction;
+			ndFloat32 m_phase[4];
+			ndFloat32 m_offset[4];
+			mutable ndInt32 m_stanceMask;
+			mutable ndFixSizeArray<ndVector, 4> m_currentPose;
+		};
+
+		class ndUIControlNode : public ndAnimationBlendTreeNode
+		{
+			public:
+			ndUIControlNode(ndAnimationBlendTreeNode* const input)
+				:ndAnimationBlendTreeNode(input)
+				,m_x(ndReal(0.0f))
+				,m_y(ndReal(0.0f))
+				,m_z(ndReal(0.0f))
+				,m_pitch(ndReal(0.0f))
+				,m_yaw(ndReal(0.0f))
+				,m_roll(ndReal(0.0f))
+				,m_animSpeed(ndReal(0.0f))
+				,m_enableController(true)
+			{
+				Reset();
+			}
+
+			void Reset()
+			{
+				m_x = ndReal(0.0f);
+				m_y = ndReal(0.0f);
+				m_z = ndReal(0.0f);
+				m_yaw = ndReal(0.0f);
+				m_roll = ndReal(0.0f);
+				m_pitch = ndReal(0.0f);
+			}
+
+			void Evaluate(ndAnimationPose& output, ndVector& veloc)
+			{
+				ndAnimationBlendTreeNode::Evaluate(output, veloc);
+
+				ndMatrix matrix(ndPitchMatrix(m_pitch * ndDegreeToRad) * ndYawMatrix(m_yaw * ndDegreeToRad) * ndRollMatrix(m_roll * ndDegreeToRad));
+				matrix.m_posit.m_x = -m_x;
+				matrix.m_posit.m_y = -m_y;
+				matrix.m_posit.m_z = -m_z;
+				for (ndInt32 i = 0; i < output.GetCount(); ++i)
+				{
+					ndAnimKeyframe& keyFrame = output[i];
+					ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
+					ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+					const ndMatrix& localMatrix = effector->GetLocalMatrix1();
+					ndVector p0(localMatrix.TransformVector(keyFrame.m_posit));
+					ndVector p1(matrix.TransformVector(p0));
+					ndVector p2(localMatrix.UntransformVector(p1));
+					keyFrame.m_posit = p2;
+				}
+			}
+
+			ndReal m_x;
+			ndReal m_y;
+			ndReal m_z;
+			ndReal m_pitch;
+			ndReal m_yaw;
+			ndReal m_roll;
+			ndReal m_animSpeed;
+			bool m_enableController;
+		};
+
 		//ndRobot(ndSharedPtr<ndBrainAgent>& agent)
 		ndRobot()
 			:ndModelArticulation()
@@ -1527,6 +1659,43 @@ namespace ndQuadruped_1
 			ndModelArticulation::Update(world, timestep);
 			//m_timestep = timestep;
 			//m_agent->Step();
+
+			ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
+			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
+			ndAssert(skeleton);
+			ndFixSizeArray<ndJointBilateralConstraint*, 32> effectors;
+
+			ndVector veloc;
+			ndVector upVector(rootBody->GetMatrix().m_up);
+			m_animBlendTree->Evaluate(m_animPose, veloc);
+			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			{
+				ndEffectorInfo* const info = &m_effectorsInfo[i];
+				effectors.PushBack(*info->m_effector);
+
+				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+
+				ndVector posit(m_animPose[i].m_posit);
+				effector->SetLocalTargetPosition(posit);
+				//effector->SetSwivelAngle(actions[actionIndex + m_leg0_action_posit_swivel]);
+				effector->SetSwivelAngle(0.0f);
+
+				// calculate lookAt angle
+				ndMatrix lookAtMatrix0;
+				ndMatrix lookAtMatrix1;
+				info->m_footHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
+
+				ndMatrix upMatrix(ndGetIdentityMatrix());
+				upMatrix.m_front = lookAtMatrix1.m_front;
+				upMatrix.m_right = (upMatrix.m_front.CrossProduct(upVector) & ndVector::m_triplexMask).Normalize();
+				upMatrix.m_up = upMatrix.m_right.CrossProduct(upMatrix.m_front);
+				upMatrix = upMatrix * lookAtMatrix0.OrthoInverse();
+				const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
+				info->m_footHinge->SetTargetAngle(angle);
+			}
+			m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), m_world, timestep);
+			m_invDynamicsSolver.Solve();
+			m_invDynamicsSolver.SolverEnd();
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -1537,8 +1706,11 @@ namespace ndQuadruped_1
 			//CheckTrainingCompleted();
 		}
 
-
+		ndAnimationPose m_animPose;
+		ndUIControlNode* m_control;
+		ndAnimationSequencePlayer* m_poseGenerator;
 		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
+		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 	};
 
 	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation)
@@ -1571,18 +1743,18 @@ namespace ndQuadruped_1
 		matrix.m_posit.m_y = -radius * 0.5f;
 		
 		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
-		//ndFloat32 offset[] = { -0.3f, 0.3f, -0.3f, 0.3f };
+		ndFloat32 offset[] = { -0.3f, 0.3f, -0.3f, 0.3f };
 		////ndFloat32 phase[] = { 0.0f, 0.5f, 0.0f, 0.5f};
 		////ndSharedPtr<ndAnimationSequence> sequence(new ndRobot::ndPoseGenerator(0.47f, phase));
-		//
-		//ndFloat32 phase[] = { 0.0f, 0.5f, 0.25f, 0.75f };
-		//ndSharedPtr<ndAnimationSequence> sequence(new ndRobot::ndPoseGenerator(0.24f, phase));
-		//
-		//model->m_poseGenerator = new ndAnimationSequencePlayer(sequence);
-		//model->m_control = new ndRobot::ndUIControlNode(model->m_poseGenerator);
-		//model->m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(model->m_control);
-		//
-		//ndRobot::ndPoseGenerator* const poseGenerator = (ndRobot::ndPoseGenerator*)*sequence;
+		
+		ndFloat32 phase[] = { 0.0f, 0.5f, 0.25f, 0.75f };
+		ndSharedPtr<ndAnimationSequence> sequence(new ndRobot::ndPoseGenerator(0.24f, phase));
+		
+		model->m_poseGenerator = new ndAnimationSequencePlayer(sequence);
+		model->m_control = new ndRobot::ndUIControlNode(model->m_poseGenerator);
+		model->m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(model->m_control);
+		
+		ndRobot::ndPoseGenerator* const poseGenerator = (ndRobot::ndPoseGenerator*)*sequence;
 		//const ndVector upDir(location.m_up);
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
@@ -1690,12 +1862,12 @@ namespace ndQuadruped_1
 				ndRobot::ndEffectorInfo info(ndSharedPtr<ndJointBilateralConstraint>(effector), footHinge);
 				model->m_effectorsInfo.PushBack(info);
 		
-		//		ndAnimKeyframe keyFrame;
-		//		keyFrame.m_userData = &model->m_effectorsInfo[model->m_effectorsInfo.GetCount() - 1];
-		//		model->m_animPose.PushBack(keyFrame);
-		//		poseGenerator->AddTrack();
-		//		poseGenerator->m_phase[i] = phase[i];
-		//		poseGenerator->m_offset[i] = offset[i];
+				ndAnimKeyframe keyFrame;
+				keyFrame.m_userData = &model->m_effectorsInfo[model->m_effectorsInfo.GetCount() - 1];
+				model->m_animPose.PushBack(keyFrame);
+				poseGenerator->AddTrack();
+				poseGenerator->m_phase[i] = phase[i];
+				poseGenerator->m_offset[i] = offset[i];
 			}
 		}
 		
