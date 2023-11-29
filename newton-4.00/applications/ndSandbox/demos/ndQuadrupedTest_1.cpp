@@ -1747,12 +1747,9 @@ namespace ndQuadruped_1
 			//zmpLineOfAction.m_z += netTorque1.m_x / weight.m_y;
 			//zmpLineOfAction.m_x += -netTorque1.m_z / weight.m_y;
 			//context.DrawPoint(zmpLineOfAction, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 6);
-			
 			//const ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*m_poseGenerator->GetSequence();
-			//ndInt32 stanceMask = poseGenerator->GetStanceCode();
 			
 			ndFixSizeArray<ndVector, 4> desiredSupportPoint;
-			//for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
