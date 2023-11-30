@@ -1778,17 +1778,18 @@ namespace ndQuadruped_1
 					p0 = desiredSupportPoint[i];
 				}
 			
-				//ndBigVector p0Out;
-				//ndBigVector p1Out;
-				//ndBigVector ray_p0(comMatrix.m_posit);
-				//ndBigVector ray_p1(comMatrix.m_posit);
+				ndBigVector p0Out;
+				ndBigVector p1Out;
+				ndBigVector ray_p0(centerOfMass);
+				ndBigVector ray_p1(comLineOfAction);
 				//ray_p1.m_y -= 1.0f;
-				//ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-				//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
-				//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
+				ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
+				context.DrawPoint(ndVector(p0Out), ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
+				//context.DrawPoint(ndVector(p1Out), ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
 			}
 			else if (desiredSupportPoint.GetCount() == 2)
 			{
+				ndAssert(0);
 				context.DrawLine(desiredSupportPoint[0], desiredSupportPoint[1], supportColor);
 				//ndBigVector p0Out;
 				//ndBigVector p1Out;
