@@ -1685,7 +1685,7 @@ namespace ndQuadruped_1
 			////g) Bcg = (Icg ^ -1) * (T0 + T1)
 			//
 			//ndBodyState state;
-			//ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
+			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
 			
 			ndFloat32 totalMass = ndFloat32(0.0f);
 			ndVector centerOfMass(ndVector::m_zero);
@@ -1696,7 +1696,7 @@ namespace ndQuadruped_1
 				ndFloat32 mass = body->GetMassMatrix().m_w;
 				totalMass += mass;
 				centerOfMass += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
-			//	bodies.PushBack(body);
+				bodies.PushBack(body);
 			}
 			ndFloat32 invMass = 1.0f / totalMass;
 			centerOfMass = centerOfMass.Scale(invMass);
@@ -1715,15 +1715,21 @@ namespace ndQuadruped_1
 			
 			//ndVector netTorque(ndVector::m_zero);
 			//ndVector netTorque1(ndVector::m_zero);
-			//for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
-			//{
-			//	const ndBodyKinematic* const body = bodies[i];
-			//	const ndMatrix matrix(body->GetMatrix());
-			//	const ndVector comDist((matrix.TransformVector(body->GetCentreOfMass()) - state.m_com.m_posit) & ndVector::m_triplexMask);
-			//
-			//	const ndVector omega(body->GetOmega());
-			//	const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
-			//
+			const ndVector gravity(ndFloat32(0.0f), DEMO_GRAVITY, ndFloat32(0.0f), ndFloat32(0.0f));
+			for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+			{
+				const ndBodyKinematic* const body = bodies[i];
+				const ndMatrix matrix(body->GetMatrix());
+				const ndVector comDist((matrix.TransformVector(body->GetCentreOfMass()) - centerOfMass) & ndVector::m_triplexMask);
+			
+				const ndVector omega(body->GetOmega());
+				const ndVector accel(body->GetAccel());
+				const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+
+				const ndVector angleTorque (bodyInertia.RotateVector(body->GetAlpha()));
+				const ndVector gyroTorque(omega.CrossProduct(bodyInertia.RotateVector(omega)));
+				
+			
 			//	//ndVector force(invDynamicsSolver->GetBodyForce(body));
 			//	//ndVector torque (invDynamicsSolver->GetBodyTorque(body));
 			//	ndVector torque(bodyInertia.RotateVector(body->GetAlpha()));
@@ -1737,7 +1743,8 @@ namespace ndQuadruped_1
 			//
 			//	netTorque += torque;
 			//	netTorque1 += force1.m_angular;
-			//}
+			}
+
 			//invDynamicsSolver->SolverEnd();
 			//ndVector weight(ndVector::m_zMask);
 			//weight.m_y = -state.m_mass * DEMO_GRAVITY;
