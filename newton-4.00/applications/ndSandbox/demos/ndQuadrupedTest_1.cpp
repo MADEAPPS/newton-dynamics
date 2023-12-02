@@ -2037,6 +2037,51 @@ namespace ndQuadruped_1
 		return model;
 	}
 
+	class ndModelUI : public ndUIEntity
+	{
+		public:
+		ndModelUI(ndDemoEntityManager* const scene, const ndSharedPtr<ndModel>& quadruped)
+			:ndUIEntity(scene)
+			,m_model(quadruped)
+		{
+		}
+
+		~ndModelUI()
+		{
+		}
+
+		virtual void RenderUI()
+		{
+		}
+
+		virtual void RenderHelp()
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			//m_scene->Print(color, "Control panel");
+
+			ndRobot* const model = (ndRobot*)*m_model;
+			ndRobot::ndUIControlNode* const control = model->m_control;
+
+			bool change = false;
+			change = change || ImGui::SliderFloat("posit x", &control->m_x, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
+			change = change || ImGui::SliderFloat("posit y", &control->m_y, -0.2f, 0.1f);
+			change = change || ImGui::SliderFloat("posit z", &control->m_z, -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
+			change = change || ImGui::SliderFloat("pitch", &control->m_pitch, -15.0f, 15.0f);
+			change = change || ImGui::SliderFloat("yaw", &control->m_yaw, -20.0f, 20.0f);
+			change = change || ImGui::SliderFloat("roll", &control->m_roll, -15.0f, 15.0f);
+			change = change || ImGui::SliderFloat("animSpeed", &control->m_animSpeed, 0.0f, 4.0f);
+			change = change || ImGui::Checkbox("enable controller", &control->m_enableController);
+
+			if (change)
+			{
+				ndBodyKinematic* const body = m_model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
+				body->SetSleepState(false);
+			}
+		}
+
+		ndSharedPtr<ndModel> m_model;
+	};
+
 #endif
 }
 
@@ -2068,8 +2113,8 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
 	//world->AddJoint(fixJoint);
 
-	//ndSharedPtr<ndUIEntity> quadrupedUI (new ndModelUI(scene, model));
-	//scene->Set2DDisplayRenderFunction(quadrupedUI);
+	ndSharedPtr<ndUIEntity> quadrupedUI (new ndModelUI(scene, model));
+	scene->Set2DDisplayRenderFunction(quadrupedUI);
 	
 	matrix.m_posit.m_x -= 4.0f;
 	matrix.m_posit.m_y += 1.5f;
