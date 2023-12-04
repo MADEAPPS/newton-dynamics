@@ -57,10 +57,6 @@ class ndVector
 
 	inline ndVector (const ndFloat32 a)
 		:m_type(_mm_set1_ps( a))
-		//:m_x(a)
-		//,m_y(a)
-		//,m_z(a)
-		//,m_w(a)
 	{
 	}
 
@@ -88,10 +84,6 @@ class ndVector
 	}
 
 	inline ndVector(ndFloat64 x, ndFloat64 y, ndFloat64 z, ndFloat64 w)
-		//:m_x(ndFloat32(x))
-		//,m_y(ndFloat32(y))
-		//,m_z(ndFloat32(z))
-		//,m_w(ndFloat32(w))
 		:m_type(_mm_set_ps(ndFloat32(w), ndFloat32(z), ndFloat32(y), ndFloat32(x)))
 	{
 	}
@@ -109,20 +101,12 @@ class ndVector
 	}
 
 	inline ndVector (ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w)
-		//:m_x(x)
-		//,m_y(y)
-		//,m_z(z)
-		//,m_w(w)
 		:m_type(_mm_set_ps(w, z, y, x))
 	{
 	}
 
 	inline ndVector (ndInt32 x, ndInt32 y, ndInt32 z, ndInt32 w)
 		:m_typeInt(_mm_set_epi32(w, z, y, x))
-		//:m_ix(x)
-		//,m_iy(y)
-		//,m_iz(z)
-		//,m_iw(w)
 	{
 	}
 
@@ -639,19 +623,16 @@ class ndBigVector
 #endif
 
 	inline ndBigVector(ndFloat64 x, ndFloat64 y, ndFloat64 z, ndFloat64 w)
-		//:m_x(x), m_y(y), m_z(z), m_w(w)
 		:m_type(_mm256_set_pd(w, z, y, x))
 	{
 	}
 
 	inline ndBigVector(ndInt32 x, ndInt32 y, ndInt32 z, ndInt32 w)
-		//:m_ix(ndInt64(x)), m_iy(ndInt64(y)), m_iz(ndInt64(z)), m_iw(ndInt64(w))
 		:m_typeInt(_mm256_set_epi64x(ndInt64(w), ndInt64(z), ndInt64(y), ndInt64(x)))
 	{
 	}
 
 	inline ndBigVector(ndInt64 x, ndInt64 y, ndInt64 z, ndInt64 w)
-		//:m_ix(x), m_iy(y), m_iz(z), m_iw(w)
 		:m_typeInt(_mm256_set_epi64x(w, z, y, x))
 	{
 	}

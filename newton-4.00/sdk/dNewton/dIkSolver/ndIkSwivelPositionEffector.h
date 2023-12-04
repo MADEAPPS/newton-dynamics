@@ -27,7 +27,7 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_CLASS_REFLECTION(ndIkSwivelPositionEffector, ndJointBilateralConstraint)
 
 	D_NEWTON_API ndIkSwivelPositionEffector();
-	D_NEWTON_API ndIkSwivelPositionEffector(const ndVector& childPivot, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndIkSwivelPositionEffector(const ndVector& childPivotInGlobalSpace, const ndMatrix& pinAndPivotParentInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIkSwivelPositionEffector();
 
 	D_NEWTON_API ndVector GetLocalTargetPosition() const;
@@ -38,6 +38,8 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 
 	D_NEWTON_API ndFloat32 GetSwivelAngle() const;
 	D_NEWTON_API void SetSwivelAngle(const ndFloat32 angle);
+	D_NEWTON_API ndMatrix CalculateAlignSwivelMatrix() const;
+	D_NEWTON_API ndFloat32 CalculateAlignSwivelAngle(const ndVector& upDir) const;
 	
 	D_NEWTON_API void SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst);
 	D_NEWTON_API void GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const;
@@ -65,11 +67,13 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void GetDynamicState(ndVector& posit, ndVector& veloc) const;
 
 	protected:
-	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	ndMatrix CalculateSwivelFrame(const ndMatrix& matrix1) const;
+	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+
 	void SubmitLinearAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	void SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	
+	ndVector m_localSwivelPin;
 	ndVector m_localTargetPosit;
 	ndFloat32 m_swivelAngle;
 

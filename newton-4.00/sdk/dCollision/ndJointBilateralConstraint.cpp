@@ -251,7 +251,6 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 	}
 }
 
-//#pragma optimize( "", off ) //for debugging purpose
 void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& desc, const ndVector& pivot0, const ndVector& pivot1, const ndVector& dir)
 {
 	ndPointParam param;

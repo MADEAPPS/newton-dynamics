@@ -333,7 +333,6 @@ namespace ndQuadruped_1
 				}
 			}
 
-			//#pragma optimize( "", off ) //for debugging purpose
 			ndBrainFloat GetReward() const
 			{
 				if (IsTerminal())
@@ -1651,7 +1650,7 @@ namespace ndQuadruped_1
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			//ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
+			ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
 			//ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
 			//if (!skeleton)
 			//{
@@ -1756,14 +1755,33 @@ namespace ndQuadruped_1
 			//context.DrawPoint(zmpLineOfAction, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 6);
 			//const ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*m_poseGenerator->GetSequence();
 			
+			const ndVector upVector(rootBody->GetMatrix().m_up);
 			ndFixSizeArray<ndVector, 4> desiredSupportPoint;
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
+				ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
+				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+
+				if (i == 0)
+				{
+					//ndMatrix m0;
+					//ndMatrix m1;
+					//effector->CalculateGlobalMatrix(m0, m1);
+					//ndMatrix baseSwivelFrame(effector->CalculateAlignSwivelMatrix());
+					//baseSwivelFrame.m_posit = (m0.m_posit + m1.m_posit)* ndVector::m_half;
+					//
+					//ndFloat32 swivelAngle = effector->CalculateAlignSwivelAngle(upVector);
+					//ndMatrix upVectorSwivelFrame(ndPitchMatrix(swivelAngle) * baseSwivelFrame);
+					//
+					//context.DrawFrame(baseSwivelFrame);
+					//context.DrawFrame(upVectorSwivelFrame);
+
+					effector->DebugJoint(context);
+				}
+
 				if (keyFrame.m_userParamInt)
 				{
-					ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-					ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 					ndBodyKinematic* const body = effector->GetBody0();
 					desiredSupportPoint.PushBack(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit));
 				}
@@ -1822,8 +1840,10 @@ namespace ndQuadruped_1
 			ndFixSizeArray<ndJointBilateralConstraint*, 32> effectors;
 
 			ndVector veloc;
-			ndVector upVector(rootBody->GetMatrix().m_up);
 			m_animBlendTree->Evaluate(m_animPose, veloc);
+			//const ndVector upVector(rootBody->GetMatrix().m_up);
+
+			const ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				ndEffectorInfo* const info = &m_effectorsInfo[i];
@@ -1833,8 +1853,11 @@ namespace ndQuadruped_1
 
 				ndVector posit(m_animPose[i].m_posit);
 				effector->SetLocalTargetPosition(posit);
+
+				//effector->SetSwivelAngle(0.0f);
 				//effector->SetSwivelAngle(actions[actionIndex + m_leg0_action_posit_swivel]);
-				effector->SetSwivelAngle(0.0f);
+				ndFloat32 swivelAngle = effector->CalculateAlignSwivelAngle(upVector);
+				effector->SetSwivelAngle(swivelAngle);
 
 				// calculate lookAt angle
 				ndMatrix lookAtMatrix0;
@@ -1846,6 +1869,7 @@ namespace ndQuadruped_1
 				upMatrix.m_right = (upMatrix.m_front.CrossProduct(upVector) & ndVector::m_triplexMask).Normalize();
 				upMatrix.m_up = upMatrix.m_right.CrossProduct(upMatrix.m_front);
 				upMatrix = upMatrix * lookAtMatrix0.OrthoInverse();
+
 				const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
 				info->m_footHinge->SetTargetAngle(angle);
 			}
@@ -1888,9 +1912,12 @@ namespace ndQuadruped_1
 		
 		ndMatrix location(matrixLocation);
 		location.m_posit.m_y = floor.m_y + 0.5f;
-		//location.m_posit.m_y += 0.5f;
+		//location.m_posit.m_y += 1.5f;
 		torso->SetMatrix(location);
 		
+		ndAssert(0);
+		//remembr normalize inertia
+
 		ndDemoEntity* const entity = (ndDemoEntity*)torso->GetNotifyCallback()->GetUserData();
 		entity->SetMeshMatrix(ndYawMatrix(90.0f * ndDegreeToRad) * ndPitchMatrix(90.0f * ndDegreeToRad));
 		
@@ -1912,7 +1939,8 @@ namespace ndQuadruped_1
 		
 		ndRobot::ndPoseGenerator* const poseGenerator = (ndRobot::ndPoseGenerator*)*sequence;
 		//const ndVector upDir(location.m_up);
-		for (ndInt32 i = 0; i < 4; ++i)
+		//for (ndInt32 i = 0; i < 4; ++i)
+		for (ndInt32 i = 0; i < 1; ++i)
 		{
 			ndMatrix limbPivotLocation(matrix * ndYawMatrix(angles[i] * ndDegreeToRad));
 			limbPivotLocation.m_posit += torso->GetMatrix().m_posit;
@@ -1943,7 +1971,7 @@ namespace ndQuadruped_1
 		
 				ndMatrix bodyMatrix(limbPivotLocation);
 				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
-				ndSharedPtr<ndBody> calf0(world->GetBody(AddCapsule(scene, bodyMatrix, limbMass, limbRadios, limbRadios, limbLength)));
+				ndSharedPtr<ndBody> calf0(world->GetBody(AddCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, limbLength)));
 				calf0->SetMatrix(bodyMatrix);
 		
 				ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
@@ -1973,7 +2001,7 @@ namespace ndQuadruped_1
 				ndMatrix bodyMatrix(limbPivotLocation);
 				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(lenght * 0.5f);
 		
-				ndSharedPtr<ndBody> foot(world->GetBody(AddCapsule(scene, bodyMatrix, limbMass * 0.5f, limbRadios, limbRadios, lenght)));
+				ndSharedPtr<ndBody> foot(world->GetBody(AddCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, lenght)));
 				foot->SetMatrix(bodyMatrix);
 		
 				// set a Material with zero restitution for the feet
