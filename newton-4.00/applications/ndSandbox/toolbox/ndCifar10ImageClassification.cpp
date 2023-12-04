@@ -370,7 +370,6 @@ static void Cifar10TrainingSet()
 					CategoricalLoss loss(m_brain.GetOutputSize(), &failCount[threadIndex], index);
 
 					loss.SetTruth((*trainingLabels)[ndInt32(index)]);
-					//trainer.BackPropagate((*trainingImages)[ndInt32(index)], loss);
 					trainer.BackPropagate(trainingImages[ndInt32(index)], loss);
 				}
 			});
@@ -422,7 +421,7 @@ static void Cifar10TrainingSet()
 
 				if (fails <= minTrainingFail)
 				{
-					ndInt32 actualTraining = fails;
+					ndInt32 trainFailed = fails;
 					const ndInt32 minTestCheck = ndInt32 (ndBrainFloat(trainingLabels->GetCount()) * ndBrainFloat(0.05f));
 					bool traningTest = fails < minTrainingFail;
 					minTrainingFail = ndMax(fails, minTestCheck);
@@ -466,25 +465,36 @@ static void Cifar10TrainingSet()
 						fails += failCount[j];
 					}
 
-					if (traningTest && (minTrainingFail > minTestCheck))
+					//if (traningTest && (minTrainingFail > minTestCheck))
+					//{
+					//	minTestFail = fails;
+					//	bestBrain.CopyFrom(m_brain);
+					//	ndInt32 size = batches * m_bashBufferSize;
+					//	ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(size - trainFailed) * 100.0f / (ndFloat32)size);
+					//	ndExpandTraceMessage("failed count: %d   ", trainFailed);
+					//	ndExpandTraceMessage("epoch: %d", epoch);
+					//	ndExpandTraceMessage("\n");
+					//}
+					//else if (fails <= minTestFail)
+					//{
+					//	minTestFail = fails;
+					//	bestBrain.CopyFrom(m_brain);
+					//	ndInt32 size = batches * m_bashBufferSize;
+					//	ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(size - trainFailed) * 100.0f / (ndFloat32)size);
+					//	ndExpandTraceMessage("failed count: %d   ", trainFailed);
+					//	ndExpandTraceMessage("epoch: %d", epoch);
+					//	ndExpandTraceMessage(" %d\n", minTestFail);
+					//}
+
+					if (fails <= minTestFail)
 					{
 						minTestFail = fails;
 						bestBrain.CopyFrom(m_brain);
 						ndInt32 size = batches * m_bashBufferSize;
-						ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(size - actualTraining) * 100.0f / (ndFloat32)size);
-						ndExpandTraceMessage("failed count: %d   ", actualTraining);
-						ndExpandTraceMessage("epoch: %d", epoch);
-						ndExpandTraceMessage("\n");
-					}
-					else if (fails <= minTestFail)
-					{
-						minTestFail = fails;
-						bestBrain.CopyFrom(m_brain);
-						ndInt32 size = batches * m_bashBufferSize;
-						ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(size - actualTraining) * 100.0f / (ndFloat32)size);
-						ndExpandTraceMessage("failed count: %d   ", actualTraining);
-						ndExpandTraceMessage("epoch: %d", epoch);
-						ndExpandTraceMessage(" %d\n", minTestFail);
+						ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(size - trainFailed) * 100.0f / (ndFloat32)size);
+						ndExpandTraceMessage("epoch: %d  ", epoch);
+						ndExpandTraceMessage("train failed: %d   ", trainFailed);
+						ndExpandTraceMessage("test failed: %d\n", minTestFail);
 					}
 				}
 
@@ -677,6 +687,6 @@ void ndCifar10ImageClassification()
 {
 	ndSetRandSeed(12345);
 
-	//Cifar10TrainingSet();
+	Cifar10TrainingSet();
 	//Cifar10TestSet();
 }
