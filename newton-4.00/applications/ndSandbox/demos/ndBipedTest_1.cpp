@@ -75,16 +75,16 @@ namespace biped_1
 		//{ "rclavicle", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
 		//{ "rhumerus", ndDefinition::m_fix, 1, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 		//{ "rradius", ndDefinition::m_fix, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-		//
-		//{ "rhipjoint", ndDefinition::m_ikSpherical, 0,{ -60.0f, 60.0f, 80.0f },{ 0.0f, -60.0f, 0.0f } },
-		//{ "rfemur", ndDefinition::m_ikHinge, 1, { 0.5f, 120.0f, 0.0f },{ 0.0f, 90.0f, 0.0f } },
-		//{ "rfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+		
+		{ "rhipjoint", ndDefinition::m_ikSpherical, 0,{ -60.0f, 60.0f, 80.0f },{ 0.0f, -60.0f, 0.0f } },
+		{ "rfemur", ndDefinition::m_ikHinge, 1, { 0.5f, 120.0f, 0.0f },{ 0.0f, 90.0f, 0.0f } },
+		{ "rfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
 		//{ "rtibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 		//
-		////{ "lhipjoint", ndDefinition::m_ikSpherical, 0, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		////{ "lfemur", ndDefinition::m_ikHinge, 1, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		////{ "lfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
-		////{ "ltibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//{ "lhipjoint", ndDefinition::m_ikSpherical, 0, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		//{ "lfemur", ndDefinition::m_ikHinge, 1, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "lfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+		//{ "ltibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 		{ "", ndDefinition::m_root, 0,{},{} },
 	};
@@ -564,8 +564,6 @@ namespace biped_1
 			info1.m_z = info.m_z;
 			info1.m_swivel = info.m_swivel;
 
-			static ndOUNoise xxxxxxx0(0.0f, 0.5f, 0.0f, 0.1f);
-			static ndOUNoise xxxxxxx1(0.0f, 0.5f, 0.0f, 0.3f);
 			//info.m_z = xxxxxxx0.Evaluate(1.0f / 500.0f);
 			//info1.m_z = xxxxxxx1.Evaluate(1.0f / 500.0f);
 
@@ -578,6 +576,58 @@ namespace biped_1
 		ndHumanoidModel* m_biped;
 	};
 #endif
+
+	ndJointBilateralConstraint* ConnectBodyParts(ndBodyDynamic* const childBody, ndBodyDynamic* const parentBone, const ndDefinition& definition)
+	{
+		ndMatrix matrix(childBody->GetMatrix());
+		ndDefinition::ndFrameMatrix frameAngle(definition.m_frameBasics);
+		ndMatrix pinAndPivotInGlobalSpace(ndPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * ndYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * ndRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
+
+		switch (definition.m_type)
+		{
+			case ndDefinition::m_fix:
+			{
+				ndJointFix6dof* const joint = new ndJointFix6dof(pinAndPivotInGlobalSpace, childBody, parentBone);
+				return joint;
+			}
+
+			case ndDefinition::m_ikSpherical:
+			{
+				ndIkJointSpherical* const joint = new ndIkJointSpherical(pinAndPivotInGlobalSpace, childBody, parentBone);
+				//ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
+				//joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
+				//joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+				return joint;
+			}
+
+			case ndDefinition::m_ikHinge:
+			{
+				ndIkJointHinge* const joint = new ndIkJointHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
+
+				ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
+				joint->SetLimitState(true);
+				joint->SetLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+				return joint;
+			}
+
+			case ndDefinition::m_doubleHinge:
+			{
+				ndJointDoubleHinge* const joint = new ndJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
+
+				ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
+				joint->SetLimits0(-30.0f * ndDegreeToRad, 30.0f * ndDegreeToRad);
+				joint->SetLimits1(-45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
+
+				joint->SetAsSpringDamper0(0.01f, 0.0f, 10.0f);
+				joint->SetAsSpringDamper1(0.01f, 0.0f, 10.0f);
+				return joint;
+			}
+
+			default:
+				ndAssert(0);
+		}
+		return nullptr;
+	}
 
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndModel* const model, const ndDefinition& definition, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
 	{
@@ -662,7 +712,9 @@ namespace biped_1
 		while (stack)
 		{
 			stack--;
-		//	ndBodyDynamic* parentBody = parentBones[stack];
+			//ndBodyDynamic* parentBody = parentBones[stack];
+			//ndModelPassiveRagdoll::ndNode* const parentBody = parentBones[stack];
+			//ndModelPassiveRagdoll::ndNode* const parentBone = parentBones[stack];
 		//	ndDemoEntity* const childEntity = childEntities[stack];
 		//	const char* const name = childEntity->GetName().GetStr();
 		 
@@ -672,53 +724,55 @@ namespace biped_1
 
 			for (ndInt32 i = 0; ragdollDefinition[i].m_boneName[0]; ++i)
 			{
+				const ndDefinition& definition = ragdollDefinition[i];
 				if (!strcmp(ragdollDefinition[i].m_boneName, name))
 				{
-					if (ragdollDefinition[i].m_type != ndDefinition::m_effector)
+					if (definition.m_type != ndDefinition::m_effector)
 					{
-						ndAssert(0);
-						//ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBody, definition[i]);
-						//
-						//// connect this body part to its parentBody with a robot joint
-						//ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBody, definition[i]);
-						//
-						//ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-						//world->AddJoint(jointPtr);
-						//parentBody = childBody;
+						ndSharedPtr<ndBody> childBody (CreateBodyPart(scene, model, definition, childEntity, parentBone->m_body->GetAsBodyDynamic()));
+
+						// connect this body part to its parentBody with a robot joint
+						ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody->GetAsBodyDynamic(), parentBone->m_body->GetAsBodyDynamic(), definition);
+						
+						ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+						parentBone = model->AddLimb(parentBone, childBody, jointPtr);
+
+						world->AddBody(childBody);
+						world->AddJoint(jointPtr);
 					}
 					else
 					{
-						ndAssert(0);
-						//ndDemoEntityNotify* const childNotify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
-						//ndAssert(childNotify);
-						//ndDemoEntityNotify* const midNotify = (ndDemoEntityNotify*)childNotify->m_parentBody->GetNotifyCallback();
-						//ndAssert(midNotify);
-						//ndDemoEntityNotify* const pivotNotify = (ndDemoEntityNotify*)midNotify->m_parentBody->GetNotifyCallback();
-						//ndAssert(pivotNotify);
-						//
-						//ndBodyDynamic* const childBody = childNotify->GetBody()->GetAsBodyDynamic();
-						//ndBodyDynamic* const pivotBody = pivotNotify->GetBody()->GetAsBodyDynamic();
-						//
-						//ndDemoEntity* const pivotFrameNode = midNotify->m_entity->FindBySubString("reference");
-						//ndDemoEntity* const childFrameNode = childNotify->m_entity->FindBySubString("effector");
-						//ndAssert(pivotFrameNode);
-						//ndAssert(childFrameNode);
-						//ndAssert(childFrameNode == childEntity);
-						//
-						//ndMatrix pivotFrame(pivotFrameNode->CalculateGlobalMatrix());
-						//ndMatrix effectorFrame(childFrameNode->CalculateGlobalMatrix());
-						//
-						//ndFloat32 regularizer = 0.001f;
-						//ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, childBody, pivotBody);
-						//effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
-						//effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
-						//
-						//const ndVector kneePoint(childFrameNode->GetParent()->CalculateGlobalMatrix().m_posit);
-						//const ndVector dist0(effectorFrame.m_posit - kneePoint);
-						//const ndVector dist1(kneePoint - pivotFrame.m_posit);
-						//const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
-						//effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.999f);
-						//
+#if 0
+						ndDemoEntityNotify* const childNotify = (ndDemoEntityNotify*)parentBone->m_body->GetAsBodyDynamic()->GetNotifyCallback();
+						ndAssert(childNotify);
+						ndDemoEntityNotify* const midNotify = (ndDemoEntityNotify*)childNotify->m_parentBody->GetNotifyCallback();
+						ndAssert(midNotify);
+						ndDemoEntityNotify* const pivotNotify = (ndDemoEntityNotify*)midNotify->m_parentBody->GetNotifyCallback();
+						ndAssert(pivotNotify);
+						
+						ndBodyDynamic* const childBody = childNotify->GetBody()->GetAsBodyDynamic();
+						ndBodyDynamic* const pivotBody = pivotNotify->GetBody()->GetAsBodyDynamic();
+						
+						ndDemoEntity* const pivotFrameNode = midNotify->m_entity->FindBySubString("reference");
+						ndDemoEntity* const childFrameNode = childNotify->m_entity->FindBySubString("effector");
+						ndAssert(pivotFrameNode);
+						ndAssert(childFrameNode);
+						ndAssert(childFrameNode == childEntity);
+						
+						ndMatrix pivotFrame(pivotFrameNode->CalculateGlobalMatrix());
+						ndMatrix effectorFrame(childFrameNode->CalculateGlobalMatrix());
+						
+						ndFloat32 regularizer = 0.001f;
+						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, childBody, pivotBody);
+						effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+						effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+						
+						const ndVector kneePoint(childFrameNode->GetParent()->CalculateGlobalMatrix().m_posit);
+						const ndVector dist0(effectorFrame.m_posit - kneePoint);
+						const ndVector dist1(kneePoint - pivotFrame.m_posit);
+						const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
+						effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.999f);
+						
 						//ndEffectorInfo info(effector);
 						//info.m_x_mapper = ndParamMapper(0.0f, workSpace * 0.995f);
 						//info.m_y_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
@@ -742,9 +796,10 @@ namespace biped_1
 						////posit = roll.RotateVector(posit);
 						////posit = yaw.RotateVector(posit);
 						////info.m_effector->SetPosition(posit);
-						//
+						
 						//m_effectors.PushBack(info);
 						//m_effectorsJoints.PushBack(info.m_effector);
+#endif
 					}
 					break;
 				}
