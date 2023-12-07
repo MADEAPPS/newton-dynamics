@@ -1916,7 +1916,7 @@ namespace ndQuadruped_1
 		torso->SetMatrix(location);
 		
 		ndAssert(0);
-		//remembr normalize inertia
+		//remember normalize inertia
 
 		ndDemoEntity* const entity = (ndDemoEntity*)torso->GetNotifyCallback()->GetUserData();
 		entity->SetMeshMatrix(ndYawMatrix(90.0f * ndDegreeToRad) * ndPitchMatrix(90.0f * ndDegreeToRad));

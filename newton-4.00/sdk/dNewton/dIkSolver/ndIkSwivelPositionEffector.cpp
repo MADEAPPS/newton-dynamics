@@ -291,6 +291,12 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 
 	const ndMatrix swivelMatrix0(ndPitchMatrix(m_swivelAngle) * swivelMatrix1);
 	debugCallback.DrawFrame(swivelMatrix0);
+
+	const ndVector swivelPin0(matrix0.RotateVector(m_localSwivelPin));
+	//const ndMatrix swivelMatrix1(ndPitchMatrix(m_swivelAngle) * CalculateSwivelFrame(matrix1));
+	const ndVector& pin = swivelMatrix1.m_front;
+	//debugCallback.DrawLine(origin, origin + pin, ndVector (0.7f, 0.9f, 0.3f, 1.0f));
+	debugCallback.DrawLine(origin, origin + swivelPin0, ndVector(0.7f, 0.9f, 0.3f, 1.0f));
 }
 
 void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
