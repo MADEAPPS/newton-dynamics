@@ -1765,18 +1765,6 @@ namespace ndQuadruped_1
 
 				if (i == 0)
 				{
-					//ndMatrix m0;
-					//ndMatrix m1;
-					//effector->CalculateGlobalMatrix(m0, m1);
-					//ndMatrix baseSwivelFrame(effector->CalculateAlignSwivelMatrix());
-					//baseSwivelFrame.m_posit = (m0.m_posit + m1.m_posit)* ndVector::m_half;
-					//
-					//ndFloat32 swivelAngle = effector->CalculateAlignSwivelAngle(upVector);
-					//ndMatrix upVectorSwivelFrame(ndPitchMatrix(swivelAngle) * baseSwivelFrame);
-					//
-					//context.DrawFrame(baseSwivelFrame);
-					//context.DrawFrame(upVectorSwivelFrame);
-
 					effector->DebugJoint(context);
 				}
 
