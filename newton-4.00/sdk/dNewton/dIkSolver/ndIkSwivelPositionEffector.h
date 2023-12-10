@@ -18,12 +18,6 @@
 class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 {
 	public:
-	enum ndRotationOrder
-	{
-		m_pitchRollYaw,
-		m_pitchYawRoll,
-	};
-
 	D_CLASS_REFLECTION(ndIkSwivelPositionEffector, ndJointBilateralConstraint)
 
 	D_NEWTON_API ndIkSwivelPositionEffector();
@@ -37,9 +31,9 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API ndMatrix GetReferenceFrame() const;
 
 	D_NEWTON_API ndFloat32 GetSwivelAngle() const;
-	D_NEWTON_API void SetSwivelAngle(const ndFloat32 angle);
-	D_NEWTON_API ndMatrix CalculateAlignSwivelMatrix() const;
-	D_NEWTON_API ndFloat32 CalculateAlignSwivelAngle(const ndVector& upDir) const;
+	D_NEWTON_API void SetSwivelAngle(ndFloat32 angle);
+	D_NEWTON_API ndMatrix CalculateSwivelMatrix() const;
+	D_NEWTON_API ndFloat32 CalculateSwivelAngle(const ndVector& upDir) const;
 	
 	D_NEWTON_API void SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst);
 	D_NEWTON_API void GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const;
@@ -59,8 +53,6 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API ndFloat32 GetMaxTorque() const;
 	D_NEWTON_API void SetMaxTorque(ndFloat32 torque);
 
-	D_NEWTON_API ndRotationOrder GetRotationOrder() const;
-	D_NEWTON_API void SetRotationOrder(ndRotationOrder order);
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	D_NEWTON_API ndVector GetEffectorPosit() const;
@@ -73,7 +65,6 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	void SubmitLinearAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	void SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	
-	ndVector m_localSwivelPin;
 	ndVector m_localTargetPosit;
 	ndFloat32 m_swivelAngle;
 
@@ -89,7 +80,6 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 
 	ndFloat32 m_minWorkSpaceRadio;
 	ndFloat32 m_maxWorkSpaceRadio;
-	ndRotationOrder m_rotationOrder;
 	bool m_enableSwivelControl;
 };
 

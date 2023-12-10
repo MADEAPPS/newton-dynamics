@@ -1841,9 +1841,10 @@ namespace ndQuadruped_1
 
 			ndVector veloc;
 			m_animBlendTree->Evaluate(m_animPose, veloc);
-			//const ndVector upVector(rootBody->GetMatrix().m_up);
 
-			const ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
+			//const ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
+			const ndVector upVector(rootBody->GetMatrix().m_up);
+			
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				ndEffectorInfo* const info = &m_effectorsInfo[i];
@@ -1854,10 +1855,10 @@ namespace ndQuadruped_1
 				ndVector posit(m_animPose[i].m_posit);
 				effector->SetLocalTargetPosition(posit);
 
-				//effector->SetSwivelAngle(0.0f);
 				//effector->SetSwivelAngle(actions[actionIndex + m_leg0_action_posit_swivel]);
-				ndFloat32 swivelAngle = effector->CalculateAlignSwivelAngle(upVector);
+				ndFloat32 swivelAngle = effector->CalculateSwivelAngle(upVector);
 				effector->SetSwivelAngle(swivelAngle);
+				//effector->SetSwivelAngle(0.0f);
 
 				// calculate lookAt angle
 				ndMatrix lookAtMatrix0;
@@ -1915,9 +1916,6 @@ namespace ndQuadruped_1
 		//location.m_posit.m_y += 1.5f;
 		torso->SetMatrix(location);
 		
-		ndAssert(0);
-		//remember normalize inertia
-
 		ndDemoEntity* const entity = (ndDemoEntity*)torso->GetNotifyCallback()->GetUserData();
 		entity->SetMeshMatrix(ndYawMatrix(90.0f * ndDegreeToRad) * ndPitchMatrix(90.0f * ndDegreeToRad));
 		
@@ -1939,8 +1937,7 @@ namespace ndQuadruped_1
 		
 		ndRobot::ndPoseGenerator* const poseGenerator = (ndRobot::ndPoseGenerator*)*sequence;
 		//const ndVector upDir(location.m_up);
-		//for (ndInt32 i = 0; i < 4; ++i)
-		for (ndInt32 i = 0; i < 1; ++i)
+		for (ndInt32 i = 0; i < 4; ++i)
 		{
 			ndMatrix limbPivotLocation(matrix * ndYawMatrix(angles[i] * ndDegreeToRad));
 			limbPivotLocation.m_posit += torso->GetMatrix().m_posit;

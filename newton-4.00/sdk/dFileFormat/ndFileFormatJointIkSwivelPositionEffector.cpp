@@ -63,7 +63,6 @@ void ndFileFormatJointIkSwivelPositionEffector::SaveJoint(ndFileFormatSave* cons
 	exportJoint->GetWorkSpaceConstraints(minRadio, maxRadio);
 	xmlSaveParam(classNode, "minWorkSpaceRadio", minRadio);
 	xmlSaveParam(classNode, "maxWorkSpaceRadio", maxRadio);
-	xmlSaveParam(classNode, "rotationOrder", ndInt32 (exportJoint->GetRotationOrder()));
 	xmlSaveParam(classNode, "enableSwivelControl", exportJoint->GetSwivelMode() ? 1 : 0);
 }
 
@@ -91,15 +90,13 @@ void ndFileFormatJointIkSwivelPositionEffector::LoadJoint(const nd::TiXmlElement
 
 	ndFloat32 minWorkSpaceRadio = xmlGetFloat(node, "minWorkSpaceRadio");
 	ndFloat32 maxWorkSpaceRadio = xmlGetFloat(node, "maxWorkSpaceRadio");
-
-	ndInt32 rotationOrder = xmlGetInt(node, "rotationOrder");
 	ndInt32 enableSwivelControlr = xmlGetInt(node, "enableSwivelControl");
 
 	inportJoint->SetMaxForce(maxForce);
 	inportJoint->SetMaxTorque(maxTorque);
 	inportJoint->SetSwivelMode(enableSwivelControlr ? true : false);
 	inportJoint->SetWorkSpaceConstraints(minWorkSpaceRadio, maxWorkSpaceRadio);
-	inportJoint->SetRotationOrder(ndIkSwivelPositionEffector::ndRotationOrder(rotationOrder));
+	
 	inportJoint->GetLinearSpringDamper(linearSpringRegularizer, linearSpringConstant, linearDamperConstant);
 	inportJoint->GetLinearSpringDamper(angularSpringRegularizer, angularSpringConstant, angularDamperConstant);
 }
