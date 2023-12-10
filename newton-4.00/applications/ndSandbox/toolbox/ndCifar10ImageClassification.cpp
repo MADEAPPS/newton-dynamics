@@ -615,6 +615,13 @@ static void Cifar10TrainingSet()
 			brain.AddLayer(layers[i]);
 		}
 		brain.InitWeightsXavierMethod();
+
+		char path[256];
+		ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
+		{
+			ndSharedPtr<ndBrain> brain1(ndBrainLoad::Load(path));
+			brain.CopyFrom(**brain1);
+		}
 	
 		ndExpandTraceMessage("training cifar-10 database, number of parameters %d\n", brain.GetNumberOfParameters());
 
@@ -623,8 +630,8 @@ static void Cifar10TrainingSet()
 		optimizer.Optimize(*trainingLabels, *trainingImages, *testLabels, *testImages);
 		time = ndGetTimeInMicroseconds() - time;
 	
-		char path[256];
-		ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
+		//char path[256];
+		//ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
 		
 		ndBrainSave::Save(&brain, path);
 		ValidateData("training data", brain, *trainingLabels, *trainingImages);
@@ -657,6 +664,6 @@ void ndCifar10ImageClassification()
 {
 	ndSetRandSeed(12345);
 
-	//Cifar10TrainingSet();
+	Cifar10TrainingSet();
 	//Cifar10TestSet();
 }
