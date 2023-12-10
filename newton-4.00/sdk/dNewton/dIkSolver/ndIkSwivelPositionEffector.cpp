@@ -190,12 +190,6 @@ ndMatrix ndIkSwivelPositionEffector::CalculateSwivelFrame(const ndMatrix& matrix
 	return swivelMatrix;
 }
 
-ndMatrix ndIkSwivelPositionEffector::CalculateSwivelMatrix() const
-{
-	ndAssert(0);
-	return CalculateSwivelFrame(m_localMatrix1 * m_body1->GetMatrix());
-}
-
 ndVector ndIkSwivelPositionEffector::GetEffectorPosit() const
 {
 	ndMatrix matrix0;
@@ -239,7 +233,7 @@ void ndIkSwivelPositionEffector::GetDynamicState(ndVector& posit, ndVector& velo
 	veloc.m_w = (omega0 * swivelMatrix.m_front - omega1 * swivelMatrix.m_front).AddHorizontal().GetScalar();
 }
 
-ndFloat32 ndIkSwivelPositionEffector::CalculateSwivelAngle(const ndVector& upDir) const
+ndFloat32 ndIkSwivelPositionEffector::CalculateLookAtSwivelAngle(const ndVector& upDir) const
 {
 	ndFloat32 swivelAngle = GetSwivelAngle();
 	const ndMatrix swivelMatrix(CalculateSwivelFrame(m_localMatrix1 * m_body1->GetMatrix()));

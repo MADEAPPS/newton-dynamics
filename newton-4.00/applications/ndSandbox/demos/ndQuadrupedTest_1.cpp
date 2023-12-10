@@ -1856,7 +1856,7 @@ namespace ndQuadruped_1
 				effector->SetLocalTargetPosition(posit);
 
 				//effector->SetSwivelAngle(actions[actionIndex + m_leg0_action_posit_swivel]);
-				ndFloat32 swivelAngle = effector->CalculateSwivelAngle(upVector);
+				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
 				effector->SetSwivelAngle(swivelAngle);
 				//effector->SetSwivelAngle(0.0f);
 

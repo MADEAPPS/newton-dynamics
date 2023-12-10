@@ -32,8 +32,7 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 
 	D_NEWTON_API ndFloat32 GetSwivelAngle() const;
 	D_NEWTON_API void SetSwivelAngle(ndFloat32 angle);
-	D_NEWTON_API ndMatrix CalculateSwivelMatrix() const;
-	D_NEWTON_API ndFloat32 CalculateSwivelAngle(const ndVector& upDir) const;
+	D_NEWTON_API ndFloat32 CalculateLookAtSwivelAngle(const ndVector& lookAtDir) const;
 	
 	D_NEWTON_API void SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst);
 	D_NEWTON_API void GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const;
