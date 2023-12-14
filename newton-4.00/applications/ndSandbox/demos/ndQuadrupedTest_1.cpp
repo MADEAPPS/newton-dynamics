@@ -1649,15 +1649,27 @@ namespace ndQuadruped_1
 		}
 
 
-		ndVector CalculateZeroMomnetPoint(const ndVector& com, const ndVector& centerOfPresure) const
+		ndVector CalculateZeroMomentPoint(const ndVector& centerOfPresure) const
 		{
+			ndFixSizeArray<ndVector, 32> r;
 			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
 
+			ndVector com(ndVector::m_zero);
+			ndFloat32 totalMass = ndFloat32(0.0f);
 			for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
 				const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+				
+				const ndMatrix matrix(body->GetMatrix());
+				const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+				ndFloat32 mass = body->GetMassMatrix().m_w;
+				totalMass += mass;
+				com += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
+
+				r.PushBack(bodyCom);
 				bodies.PushBack(body);
 			}
+			com = com.Scale(ndFloat32 (1.0f) / totalMass);
 
 			ndVector force(ndVector::m_zero);
 			ndVector torque(ndVector::m_zero);
@@ -1666,17 +1678,18 @@ namespace ndQuadruped_1
 			{
 				const ndBodyKinematic* const body = bodies[i];
 
-				const ndMatrix matrix(body->GetMatrix());
-				const ndVector centerOfMass (matrix.TransformVector(body->GetCentreOfMass()));
-				const ndVector bodyForce((body->GetAccel() - gravity).Scale (body->GetMassMatrix().m_w));
+				//const ndMatrix matrix(body->GetMatrix());
+				//const ndVector centerOfMass (matrix.TransformVector(body->GetCentreOfMass()));
+
+				//const ndVector& centerOfMass = r[i];
+				const ndVector& centerOfMass = r[i] - com;
 				const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+				const ndVector bodyForce((body->GetAccel() - gravity).Scale (body->GetMassMatrix().m_w));
 
 				force += bodyForce;
 				torque += centerOfMass.CrossProduct(bodyForce);
 				torque += bodyInertia.RotateVector(body->GetAlpha());
-
 			}
-
 
 			return centerOfPresure;
 		}
@@ -1835,7 +1848,7 @@ namespace ndQuadruped_1
 				context.DrawPoint(centerOfPresure, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 5);
 				//context.DrawPoint(ndVector(p1Out), ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
 
-				ndVector zmp(CalculateZeroMomnetPoint(centerOfMass, centerOfPresure));
+				ndVector zmp(CalculateZeroMomentPoint(centerOfPresure));
 				context.DrawPoint(zmp, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
 			}
 			else if (desiredSupportPoint.GetCount() == 2)
