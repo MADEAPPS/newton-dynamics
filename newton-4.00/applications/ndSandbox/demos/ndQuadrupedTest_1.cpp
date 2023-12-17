@@ -22,17 +22,6 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
-
-	#define CONTROLLER_NAME "ndQuadruped_1VPG.dnn"
-
-	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
-	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
-	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
-	#define D_MIN_REWARD_ANGLE		ndReal(ndFloat32 (30.0f) * ndDegreeToRad)
-
-	#define D_SWING_STEP			ndReal(0.005f)
-	#define D_EFFECTOR_STEP			ndReal(0.1f)
 
 #if 0
 	enum ndActionSpace
@@ -116,6 +105,19 @@ namespace ndQuadruped_1
 
 		m_observationsSize
 	};
+
+	#define ND_TRAIN_MODEL
+
+	#define CONTROLLER_NAME "ndQuadruped_1VPG.dnn"
+
+	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
+	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
+	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
+	#define D_MIN_REWARD_ANGLE		ndReal(ndFloat32 (30.0f) * ndDegreeToRad)
+
+	#define D_SWING_STEP			ndReal(0.0025f)
+	#define D_EFFECTOR_STEP			ndReal(0.1f)
+	#define ND_AGENT_INPUTSIZE		(4 * m_legObservationsSize + m_actionsSize)
 
 	class ndRobot: public ndModelArticulation
 	{
@@ -1508,8 +1510,21 @@ namespace ndQuadruped_1
 		veloc_z,
 		support,
 		desired_support,
-		m_observationsSize
+		m_legObservationsSize
 	};
+
+	#define ND_TRAIN_MODEL
+
+	#define CONTROLLER_NAME "ndQuadruped_1VPG.dnn"
+
+	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
+	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
+	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
+	#define D_MIN_REWARD_ANGLE		ndReal(ndFloat32 (30.0f) * ndDegreeToRad)
+
+	#define D_SWING_STEP			ndReal(0.0025f)
+	#define D_EFFECTOR_STEP			ndReal(0.1f)
+	#define ND_AGENT_INPUTSIZE		(4 * m_legObservationsSize + m_actionsSize)
 
 	class ndRobot : public ndModelArticulation
 	{
@@ -1661,49 +1676,76 @@ namespace ndQuadruped_1
 			bool m_enableController;
 		};
 
-		class ndControllerAgent_trainer : public ndBrainAgentContinueVPG_Trainer<m_observationsSize * 4, m_actionsSize>
+		// implement controller player
+		class ndController : public ndBrainAgentContinueVPG<ND_AGENT_INPUTSIZE, m_actionsSize>
 		{
 			public:
-			//class ndBasePose
-			//{
-			//	public:
-			//	ndBasePose()
-			//		:m_body(nullptr)
-			//	{
-			//	}
-			//
-			//	ndBasePose(ndBodyDynamic* const body)
-			//		:m_veloc(body->GetVelocity())
-			//		,m_omega(body->GetOmega())
-			//		,m_posit(body->GetPosition())
-			//		,m_rotation(body->GetRotation())
-			//		,m_body(body)
-			//	{
-			//	}
-			//
-			//	void SetPose() const
-			//	{
-			//		ndAssert(0);
-			//		//m_body->SetMatrix(ndCalculateMatrix(m_rotation, m_posit));
-			//		//m_body->SetOmega(m_omega);
-			//		//m_body->SetVelocity(m_veloc);
-			//	}
-			//
-			//	ndVector m_veloc;
-			//	ndVector m_omega;
-			//	ndVector m_posit;
-			//	ndQuaternion m_rotation;
-			//	ndBodyDynamic* m_body;
-			//};
+			ndController(ndSharedPtr<ndBrain>& actor)
+				:ndBrainAgentContinueVPG<ND_AGENT_INPUTSIZE, m_actionsSize>(actor)
+				,m_model(nullptr)
+			{
+			}
+
+			void SetModel(ndRobot* const model)
+			{
+				m_model = model;
+			}
+
+			void GetObservation(ndBrainFloat* const observation)
+			{
+				m_model->GetObservation(observation);
+			}
+
+			virtual void ApplyActions(ndBrainFloat* const actions) const
+			{
+				m_model->ApplyActions(actions);
+			}
+
+			ndRobot* m_model;
+		};
+
+		class ndControllerAgent_trainer : public ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUTSIZE, m_actionsSize>
+		{
+			public:
+			class ndBasePose
+			{
+				public:
+				ndBasePose()
+					:m_body(nullptr)
+				{
+				}
+
+				ndBasePose(ndBodyDynamic* const body)
+					:m_veloc(body->GetVelocity())
+					,m_omega(body->GetOmega())
+					,m_posit(body->GetPosition())
+					,m_rotation(body->GetRotation())
+					,m_body(body)
+				{
+				}
+
+				void SetPose() const
+				{
+					m_body->SetMatrix(ndCalculateMatrix(m_rotation, m_posit));
+					m_body->SetOmega(m_omega);
+					m_body->SetVelocity(m_veloc);
+				}
+
+				ndVector m_veloc;
+				ndVector m_omega;
+				ndVector m_posit;
+				ndQuaternion m_rotation;
+				ndBodyDynamic* m_body;
+			};
 
 			ndControllerAgent_trainer(const HyperParameters& hyperParameters)
-				:ndBrainAgentContinueVPG_Trainer<m_observationsSize * 4, m_actionsSize>(hyperParameters)
+				:ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUTSIZE, m_actionsSize>(hyperParameters)
 				,m_bestActor(m_actor)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(3000)
-				,m_startTraning(0)
-				,m_stopTraining(5000000)
+				//,m_stopTraining(5000000)
+				,m_stopTraining(8000 * 10)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
 			{
@@ -1727,126 +1769,33 @@ namespace ndQuadruped_1
 				{
 					ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
 					m_bodies.PushBack(body);
-					//m_basePose.PushBack(body);
+					m_basePose.PushBack(body);
 				}
 			}
 
 			ndBrainFloat GetReward() const
 			{
-				//if (IsTerminal())
-				//{
-				//	return ndBrainFloat(-1.0f);
-				//}
-				//
-				////ndInt32 contactMask = 0x0f;
-				////const ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*m_model->m_poseGenerator->GetSequence();
-				////for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
-				////{
-				////	ndContact* const contact = m_model->FindContact(i);
-				////	if (contact)
-				////	{
-				////		contactMask = contactMask ^ (1 << i);
-				////	}
-				////}
-				////ndInt32 mask = contactMask & poseGenerator->GetStanceCode();
-				////
-				////ndReal reward = ndReal(0.0f);
-				////switch (mask)
-				////{
-				////	case 0x07:
-				////	case 0x0b:
-				////	case 0x0d:
-				////	case 0x0f:
-				////	{
-				////		reward = ndReal(1.0f);
-				////	}
-				////}
-				////const ndUIControlNode* const control = m_model->m_control;
-				////ndFloat32 control_x_reward = ndExp(-ndFloat32(230.0f) * control->m_x * control->m_x);
-				////ndFloat32 control_z_reward = ndExp(-ndFloat32(102.0f) * control->m_z * control->m_z);
-				////return ndReal((reward * ndFloat32(8.0f) + control_x_reward + control_z_reward) / ndFloat32(10.0f));
-				//
-				//
-				//
-				//
-				//ndInt32 stateIndex = 0;
-				//ndBrainFloat positReward = ndBrainFloat(0.0f);
-				//ndBrainFloat velocReward = ndBrainFloat(0.0f);
-				//const ndBrainFloat* const state = &m_currentTransition[0];
-				//
-				//for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
-				//{
-				//	ndEffectorInfo* const info = &m_model->m_effectorsInfo[i];
-				//	ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-				//
-				//	ndVector targetPosit(effector->GetEffectorPosit());
-				//	//ndVector targetPosit(effector->GetLocalTargetPosition()); very wrong option
-				//
-				//	ndBrainFloat positError0 = state[stateIndex + m_leg0_anim_posit_x] - ndBrainFloat(targetPosit.m_x);
-				//	ndBrainFloat positError1 = state[stateIndex + m_leg0_anim_posit_y] - ndBrainFloat(targetPosit.m_y);
-				//	ndBrainFloat positError2 = state[stateIndex + m_leg0_anim_posit_z] - ndBrainFloat(targetPosit.m_z);
-				//
-				//	ndBrainFloat d20 = ndMin(ndBrainFloat(100000.0f) * positError0 * positError0, ndBrainFloat(30.0f));
-				//	positReward += ndBrainFloat(ndExp(-d20));
-				//
-				//	ndBrainFloat d21 = ndMin(ndBrainFloat(100000.0f) * positError1 * positError1, ndBrainFloat(30.0f));
-				//	positReward += ndBrainFloat(ndExp(-d21));
-				//
-				//	ndBrainFloat d22 = ndMin(ndBrainFloat(100000.0f) * positError2 * positError2, ndBrainFloat(30.0f));
-				//	positReward += ndBrainFloat(ndExp(-d22));
-				//
-				//	ndVector posit;
-				//	ndVector veloc;
-				//	effector->GetDynamicState(posit, veloc);
-				//	ndBrainFloat velocError0 = ndBrainFloat(veloc.m_x);
-				//	ndBrainFloat velocError1 = ndBrainFloat(veloc.m_y);
-				//	ndBrainFloat velocError2 = ndBrainFloat(veloc.m_z);
-				//
-				//	ndBrainFloat d23 = ndMin(ndBrainFloat(200.0f) * velocError0 * velocError0, ndBrainFloat(30.0f));
-				//	velocReward += ndBrainFloat(ndExp(-d23));
-				//
-				//	ndBrainFloat d24 = ndMin(ndBrainFloat(200.0f) * velocError1 * velocError1, ndBrainFloat(30.0f));
-				//	velocReward += ndBrainFloat(ndExp(-d24));
-				//
-				//	ndBrainFloat d25 = ndMin(ndBrainFloat(200.0f) * velocError2 * velocError2, ndBrainFloat(30.0f));
-				//	velocReward += ndBrainFloat(ndExp(-d25));
-				//
-				//	stateIndex += 9;
-				//}
-				//
-				//ndBodyKinematic* const body = m_model->GetRoot()->m_body->GetAsBodyKinematic();
-				//const ndMatrix& matrix = body->GetMatrix();
-				//ndFloat32 sinAngle2 = matrix.m_up.m_x * matrix.m_up.m_x + matrix.m_up.m_z * matrix.m_up.m_z;
-				////sinAngle = ndMin(sinAngle, ndFloat32(0.9f));
-				//
-				//ndBrainFloat orientationReward = (20 * m_actionsSize) * ndExp(-100.0f * sinAngle2);
-				//
-				//ndBrainFloat den = 2 * m_actionsSize + m_actionsSize + 20 * m_actionsSize;
-				//ndBrainFloat num = orientationReward + ndBrainFloat(2.0f) * positReward + velocReward;
-				//ndBrainFloat reward = num / den;
-				//if (reward > 0.85f)
-				//{
-				//	ndExpandTraceMessage("%d %f\n", GetFramesCount(), reward);
-				//}
-				//return reward;
-				return 0;
+				if (IsTerminal())
+				{
+					return ndBrainFloat(-1.0f);
+				}
+
+				return m_model->CalculateReward();
 			}
 
 			virtual void ApplyActions(ndBrainFloat* const actions) const
 			{
-				//m_model->ApplyActions(actions, &m_currentTransition[0]);
 				m_model->ApplyActions(actions);
 			}
 
 			void GetObservation(ndBrainFloat* const observation)
 			{
 				m_model->GetObservation(observation);
-				//ndMemCpy(&m_currentTransition[0], observation, m_observationsSize);
 			}
 
 			bool IsTerminal() const
 			{
-				ndAssert(0);
+				//ndAssert(0);
 				////ndBrainFloat maxVal = ndBrainFloat(0.0f);
 				////const ndBrainFloat* const stateActions = &m_currentTransition.m_observation[0];
 				////ndInt32 actionIndex = 0;
@@ -1871,70 +1820,60 @@ namespace ndQuadruped_1
 
 			void ResetModel() const
 			{
-				ndAssert(0);
-				//m_model->m_control->Reset();
-				//for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
-				//{
-				//	m_basePose[i].SetPose();
-				//}
-				//
-				//ndUnsigned32 index = (ndRandInt() >> 1) % 4;
-				//ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
-				//m_model->m_poseGenerator->SetTime(duration * ndFloat32(index) / 4.0f);
-				//m_model->m_poseGenerator->SetTime(duration * ndFloat32(index) / 4.0f);
-				//m_model->ApplyPoseGeneration();
-				//
-				//m_startTraning = 0;
+				m_model->m_control->Reset();
+				for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
+				{
+					m_basePose[i].SetPose();
+				}
 			}
 
 			void OptimizeStep()
 			{
-				ndAssert(0);
-				//ndInt32 stopTraining = GetFramesCount();
-				//if (stopTraining <= m_stopTraining)
+				ndInt32 stopTraining = GetFramesCount();
+				if (stopTraining <= m_stopTraining)
+				{
+					ndInt32 episodeCount = GetEposideCount();
+					ndBrainAgentContinueVPG_Trainer::OptimizeStep();
+				
+					episodeCount -= GetEposideCount();
+					if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
+					{
+						if (m_averageQvalue.GetAverage() > m_maxGain)
+						{
+							m_bestActor.CopyFrom(m_actor);
+							m_maxGain = m_averageQvalue.GetAverage();
+							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
+						}
+					}
+				
+					if (episodeCount && !IsSampling())
+					{
+						ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						if (m_outFile)
+						{
+							fprintf(m_outFile, "%g\n", m_averageQvalue.GetAverage());
+							fflush(m_outFile);
+						}
+					}
+				
+					if (stopTraining == m_stopTraining)
+					{
+						char fileName[1024];
+						m_modelIsTrained = true;
+						m_actor.CopyFrom(m_bestActor);
+						ndGetWorkingFileName(GetName().GetStr(), fileName);
+						SaveToFile(fileName);
+						ndExpandTraceMessage("saving to file: %s\n", fileName);
+						ndExpandTraceMessage("training complete\n");
+						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+						ndExpandTraceMessage("training time: %g\n seconds", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+					}
+				}
+				
+				//if (m_model->IsOutOfBounds())
 				//{
-				//	ndInt32 episodeCount = GetEposideCount();
-				//	ndBrainAgentContinueVPG_Trainer::OptimizeStep();
-				//
-				//	episodeCount -= GetEposideCount();
-				//	if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
-				//	{
-				//		if (m_averageQvalue.GetAverage() > m_maxGain)
-				//		{
-				//			m_bestActor.CopyFrom(m_actor);
-				//			m_maxGain = m_averageQvalue.GetAverage();
-				//			ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
-				//		}
-				//	}
-				//
-				//	if (episodeCount && !IsSampling())
-				//	{
-				//		ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-				//		if (m_outFile)
-				//		{
-				//			fprintf(m_outFile, "%g\n", m_averageQvalue.GetAverage());
-				//			fflush(m_outFile);
-				//		}
-				//	}
-				//
-				//	if (stopTraining == m_stopTraining)
-				//	{
-				//		char fileName[1024];
-				//		m_modelIsTrained = true;
-				//		m_actor.CopyFrom(m_bestActor);
-				//		ndGetWorkingFileName(GetName().GetStr(), fileName);
-				//		SaveToFile(fileName);
-				//		ndExpandTraceMessage("saving to file: %s\n", fileName);
-				//		ndExpandTraceMessage("training complete\n");
-				//		ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-				//		ndExpandTraceMessage("training time: %g\n seconds", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-				//	}
+				//	m_model->TelePort();
 				//}
-				//
-				////if (m_model->IsOutOfBounds())
-				////{
-				////	m_model->TelePort();
-				////}
 				//m_startTraning++;
 			}
 
@@ -1943,13 +1882,11 @@ namespace ndQuadruped_1
 			ndRobot* m_model;
 			ndFloat32 m_maxGain;
 			ndInt32 m_maxFrames;
-			mutable ndInt32 m_startTraning;
 			ndInt32 m_stopTraining;
 			ndUnsigned64 m_timer;
 			bool m_modelIsTrained;
-			//ndFixSizeArray<ndBasePose, 32> m_basePose;
+			ndFixSizeArray<ndBasePose, 32> m_basePose;
 			ndFixSizeArray<ndBodyDynamic*, 32> m_bodies;
-			//ndBrainFixSizeVector<m_observationsSize> m_currentTransition;
 		};
 
 		ndRobot(ndSharedPtr<ndBrainAgent>& agent)
@@ -1967,8 +1904,6 @@ namespace ndQuadruped_1
 		{
 			ndFixSizeArray<ndVector, 32> r;
 			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
-
-			//ndVector centerOfPresure;
 
 			ndVector com(ndVector::m_zero);
 			ndFloat32 totalMass = ndFloat32(0.0f);
@@ -2002,7 +1937,7 @@ namespace ndQuadruped_1
 				torque += bodyInertia.RotateVector(body->GetAlpha());
 			}
 			// remember to clamp the values values before calculating xZmp and zZmp
-			if (ndAbs(force.m_y) > ndFloat32(0.0f))
+			if (ndAbs(force.m_y) > ndFloat32(1.0e-4f))
 			{
 				ndAssert(ndAbs(force.m_y) > ndFloat32(0.0f));
 				ndFloat32 zZmp = torque.m_z / force.m_y;
@@ -2018,39 +1953,6 @@ namespace ndQuadruped_1
 		void Debug(ndConstraintDebugCallback& context) const
 		{
 			ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
-			//ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
-			//if (!skeleton)
-			//{
-			//	return;
-			//}
-
-			//ndFixSizeArray<ndJointBilateralConstraint*, 32> effectors;
-			//for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
-			//{
-			//	ndEffectorInfo* const info = (ndEffectorInfo*)m_animPose[i].m_userData;
-			//	ndAssert(info == &m_effectorsInfo[i]);
-			//	effectors.PushBack(*info->m_effector);
-			//
-			//	ndContact* const contact = FindContact(i);
-			//	if (contact)
-			//	{
-			//		m_world->CalculateJointContacts(contact);
-			//	}
-			//}
-			//
-			//ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
-			//invDynamicsSolver->SolverBegin(skeleton, &effectors[0], effectors.GetCount(), m_world, m_timestep);
-			//invDynamicsSolver->Solve();
-			//
-			////a) Mt = sum(m(i))
-			////b) cg = sum(p(i) * m(i)) / Mt
-			////c) Vcg = sum(v(i) * m(i)) / Mt
-			////d) Icg = sum(I(i) +  m(i) * (Identity * ((p(i) - cg) * transpose (p(i) - cg)) - covarianMatrix(p(i) - cg))
-			////e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
-			////f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
-			////g) Bcg = (Icg ^ -1) * (T0 + T1)
-			//
-			//ndBodyState state;
 			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
 			
 			ndFloat32 totalMass = ndFloat32(0.0f);
@@ -2067,60 +1969,9 @@ namespace ndQuadruped_1
 			ndFloat32 invMass = 1.0f / totalMass;
 			centerOfMass = centerOfMass.Scale(invMass);
 
-			//state.m_com.m_posit = state.m_com.m_posit.Scale(invMass);
-			//state.m_com.m_posit.m_w = ndFloat32(1.0f);
-			//ndMatrix comMatrix(m_rootNode->m_body->GetAsBodyKinematic()->GetMatrix());
-			//comMatrix.m_posit = state.m_com.m_posit;
-			//context.DrawFrame(comMatrix);
-
 			ndVector comLineOfAction(centerOfMass);
 			comLineOfAction.m_y -= ndFloat32(0.5f);
 			context.DrawLine(centerOfMass, comLineOfAction, ndVector::m_zero);
-			//comLineOfAction.m_y = comMatrix.m_posit.m_y - 0.38f;
-			//context.DrawPoint(comLineOfAction, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 10);
-			
-			//ndVector netTorque(ndVector::m_zero);
-			//ndVector netTorque1(ndVector::m_zero);
-			//const ndVector gravity(ndFloat32(0.0f), DEMO_GRAVITY, ndFloat32(0.0f), ndFloat32(0.0f));
-			//for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
-			//{
-			//	const ndBodyKinematic* const body = bodies[i];
-			//	const ndMatrix matrix(body->GetMatrix());
-			//	const ndVector comDist((matrix.TransformVector(body->GetCentreOfMass()) - centerOfMass) & ndVector::m_triplexMask);
-			//
-			//	const ndVector omega(body->GetOmega());
-			//	const ndVector accel(body->GetAccel());
-			//	const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
-			//
-			//	const ndVector angleTorque (bodyInertia.RotateVector(body->GetAlpha()));
-			//	const ndVector gyroTorque(omega.CrossProduct(bodyInertia.RotateVector(omega)));
-			//	
-			//
-			////	//ndVector force(invDynamicsSolver->GetBodyForce(body));
-			////	//ndVector torque (invDynamicsSolver->GetBodyTorque(body));
-			////	ndVector torque(bodyInertia.RotateVector(body->GetAlpha()));
-			////	ndVector force(body->GetAccel().Scale(body->GetMassMatrix().m_w));
-			////	torque += comDist.CrossProduct(force);
-			////	torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
-			////
-			////	ndJacobian force1(body->CalculateNetForce());
-			////	force1.m_angular += comDist.CrossProduct(force1.m_linear);
-			////	force1.m_angular += omega.CrossProduct(bodyInertia.RotateVector(omega));
-			////
-			////	netTorque += torque;
-			////	netTorque1 += force1.m_angular;
-			//}
-
-			//invDynamicsSolver->SolverEnd();
-			//ndVector weight(ndVector::m_zMask);
-			//weight.m_y = -state.m_mass * DEMO_GRAVITY;
-			//ndVector zmpLineOfAction(comLineOfAction);
-			////zmpLineOfAction.m_z += netTorque.m_x / weight.m_y;
-			////zmpLineOfAction.m_x += -netTorque.m_z / weight.m_y;
-			//zmpLineOfAction.m_z += netTorque1.m_x / weight.m_y;
-			//zmpLineOfAction.m_x += -netTorque1.m_z / weight.m_y;
-			//context.DrawPoint(zmpLineOfAction, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 6);
-			//const ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*m_poseGenerator->GetSequence();
 			
 			const ndVector upVector(rootBody->GetMatrix().m_up);
 			ndFixSizeArray<ndVector, 4> desiredSupportPoint;
@@ -2201,9 +2052,7 @@ namespace ndQuadruped_1
 			ndVector veloc;
 			m_animBlendTree->Evaluate(m_animPose, veloc);
 
-			//const ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
 			const ndVector upVector(rootBody->GetMatrix().m_up);
-
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				ndEffectorInfo* const info = &m_effectorsInfo[i];
@@ -2214,10 +2063,8 @@ namespace ndQuadruped_1
 				ndVector posit(m_animPose[i].m_posit);
 				effector->SetLocalTargetPosition(posit);
 
-				//effector->SetSwivelAngle(actions[actionIndex + m_leg0_action_posit_swivel]);
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
 				effector->SetSwivelAngle(swivelAngle);
-				//effector->SetSwivelAngle(0.0f);
 
 				// calculate lookAt angle
 				ndMatrix lookAtMatrix0;
@@ -2258,7 +2105,6 @@ namespace ndQuadruped_1
 			return nullptr;
 		};
 
-		//void ApplyActions(ndBrainFloat* const actions, const ndBrainFloat* const currentState)
 		void ApplyActions(ndBrainFloat* const actions)
 		{
 			////m_control->m_animSpeed = 4.0f;
@@ -2266,27 +2112,6 @@ namespace ndQuadruped_1
 			////m_control->m_animSpeed = 1.0f;
 			////m_control->m_animSpeed = 0.5f;
 			//m_control->m_animSpeed = 0.25f;
-			////m_control->m_animSpeed = 0.1f;
-			////if (m_control->m_enableController)
-			////{
-			////	//m_control->m_x = ndClamp(ndReal(m_control->m_x + actions[m_bodySwing_x] * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
-			////	//m_control->m_z = ndClamp(ndReal(m_control->m_z + actions[m_bodySwing_z] * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
-			////}
-			//
-			//ndInt32 stateIndex = 0;
-			//ndInt32 actionIndex = 0;
-			//ndBrainFloat combinedActions[m_actionsSize * 2];
-			//for (ndInt32 i = 0; i < m_actionsSize / 3; ++i)
-			//{
-			//	combinedActions[actionIndex + m_leg0_action_posit_x] = currentState[stateIndex + m_leg0_anim_posit_x] + actions[actionIndex + m_leg0_action_posit_x] * D_EFFECTOR_STEP;
-			//	combinedActions[actionIndex + m_leg0_action_posit_y] = currentState[stateIndex + m_leg0_anim_posit_y] + actions[actionIndex + m_leg0_action_posit_y] * D_EFFECTOR_STEP;
-			//	combinedActions[actionIndex + m_leg0_action_posit_z] = currentState[stateIndex + m_leg0_anim_posit_z] + actions[actionIndex + m_leg0_action_posit_z] * D_EFFECTOR_STEP;
-			//	//actions[actionIndex + m_leg0_action_posit_swivel] = m_currentTransition.m_observation[stateIndex + m_leg0_anim_posit_swivel] + actions[actionIndex + m_leg0_action_posit_swivel] * D_SWING_STEP;
-			//
-			//	actionIndex += 3;
-			//	stateIndex += 9;
-			//}
-			//
 			//ApplyPoseGeneration(combinedActions);
 
 			m_control->m_x = ndClamp(ndReal(m_control->m_x + actions[m_move_x] * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
@@ -2307,7 +2132,7 @@ namespace ndQuadruped_1
 				ndVector effectVelocState;
 				effector->GetDynamicState(effectPositState, effectVelocState);
 
-				ndBrainFloat* const input = &observation[i * m_observationsSize];
+				ndBrainFloat* const input = &observation[i * m_legObservationsSize];
 				input[posit_x] = ndBrainFloat(effectPositState.m_x);
 				input[posit_y] = ndBrainFloat(effectPositState.m_y);
 				input[posit_z] = ndBrainFloat(effectPositState.m_z);
@@ -2317,7 +2142,163 @@ namespace ndQuadruped_1
 				input[support] = FindContact(i) ? ndFloat32(1.0f) : ndFloat32(0.0f);
 				input[desired_support] = keyFrame.m_userParamInt ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
 			}
+
+			ndBrainFloat* const input = &observation[m_legObservationsSize * 4];
+			input[m_move_x] = m_control->m_x;
+			input[m_move_z] = m_control->m_z;
 		}
+
+		ndBrainFloat CalculateReward() const
+		{
+			//ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
+			//ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
+			//ndFloat32 totalMass = ndFloat32(0.0f);
+			//ndVector centerOfMass(ndVector::m_zero);
+			//for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			//{
+			//	const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+			//	const ndMatrix matrix(body->GetMatrix());
+			//	ndFloat32 mass = body->GetMassMatrix().m_w;
+			//	totalMass += mass;
+			//	centerOfMass += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
+			//	bodies.PushBack(body);
+			//}
+			//ndFloat32 invMass = 1.0f / totalMass;
+			//centerOfMass = centerOfMass.Scale(invMass);
+			//
+			//ndVector comLineOfAction(centerOfMass);
+			//comLineOfAction.m_y -= ndFloat32(0.5f);
+			//context.DrawLine(centerOfMass, comLineOfAction, ndVector::m_zero);
+			//
+			//const ndVector upVector(rootBody->GetMatrix().m_up);
+			//ndFixSizeArray<ndVector, 4> desiredSupportPoint;
+			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			//{
+			//	const ndAnimKeyframe& keyFrame = m_animPose[i];
+			//	ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
+			//	ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+			//
+			//	if (i == 0)
+			//	{
+			//		effector->DebugJoint(context);
+			//	}
+			//
+			//	if (keyFrame.m_userParamInt)
+			//	{
+			//		ndBodyKinematic* const body = effector->GetBody0();
+			//		desiredSupportPoint.PushBack(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit));
+			//	}
+			//}
+			//
+			//ndVector supportColor(0.0f, 1.0f, 1.0f, 1.0f);
+			//if (desiredSupportPoint.GetCount() >= 3)
+			//{
+			//	ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
+			//	rotation.TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
+			//	ndInt32 supportCount = ndConvexHull2d(&desiredSupportPoint[0], desiredSupportPoint.GetCount());
+			//	rotation.OrthoInverse().TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
+			//	ndVector p0(desiredSupportPoint[supportCount - 1]);
+			//	ndBigVector bigPolygon[16];
+			//	for (ndInt32 i = 0; i < supportCount; ++i)
+			//	{
+			//		bigPolygon[i] = desiredSupportPoint[i];
+			//		context.DrawLine(desiredSupportPoint[i], p0, supportColor);
+			//		p0 = desiredSupportPoint[i];
+			//	}
+			//
+			//	ndBigVector p0Out;
+			//	ndBigVector p1Out;
+			//	ndBigVector ray_p0(centerOfMass);
+			//	ndBigVector ray_p1(comLineOfAction);
+			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
+			//
+			//	const ndVector centerOfPresure(p0Out);
+			//	context.DrawPoint(centerOfPresure, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 5);
+			//
+			//	ndVector zmp(CalculateZeroMomentPoint());
+			//	ray_p0 = zmp;
+			//	ray_p1 = zmp;
+			//	ray_p1.m_y -= ndFloat32(0.5f);
+			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
+			//	const ndVector zmpSupport(p0Out);
+			//	context.DrawPoint(zmpSupport, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
+			//}
+			//else if (desiredSupportPoint.GetCount() == 2)
+			//{
+			//	ndAssert(0);
+			//	context.DrawLine(desiredSupportPoint[0], desiredSupportPoint[1], supportColor);
+			//	//ndBigVector p0Out;
+			//	//ndBigVector p1Out;
+			//	//ndBigVector ray_p0(comMatrix.m_posit);
+			//	//ndBigVector ray_p1(comMatrix.m_posit);
+			//	//ray_p1.m_y -= 1.0f;
+			//	//
+			//	//ndRayToRayDistance(ray_p0, ray_p1, contactPoints[0], contactPoints[1], p0Out, p1Out);
+			//	//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
+			//	//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
+			//}
+
+			ndFixSizeArray<ndBigVector, 4> desiredSupportPoint;
+			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			{
+				const ndAnimKeyframe& keyFrame = m_animPose[i];
+				ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
+				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+
+				if (keyFrame.m_userParamInt)
+				{
+					ndBodyKinematic* const body = effector->GetBody0();
+					desiredSupportPoint.PushBack(ndBigVector(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit)));
+				}
+			}
+
+			ndBrainFloat reward = ndBrainFloat(0.0f);
+			if (desiredSupportPoint.GetCount() >= 3)
+			{
+				const ndVector zmp(CalculateZeroMomentPoint());
+
+				ndBigVector p0Out;
+				ndBigVector p1Out;
+				ndBigVector ray_p0(zmp);
+				ndBigVector ray_p1(zmp);
+				ray_p1.m_y -= ndFloat32(0.5f);
+				ndRayToPolygonDistance(ray_p0, ray_p1, &desiredSupportPoint[0], desiredSupportPoint.GetCount(), p0Out, p1Out);
+				ndBigVector error((p0Out - p1Out) & ndBigVector::m_triplexMask);
+				ndFloat32 dist = ndFloat32(1.0f) - ndFloat32 (ndSqrt (error.DotProduct(error).GetScalar()));
+				//ndFloat32 dist = ndFloat32(1.0f) - ndFloat32 (error.DotProduct(error).GetScalar());
+				//reward = (dist2 < ndBrainFloat(1.0e-5f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+				reward = dist;
+				ndTrace(("%f %f\n", dist, reward));
+			}
+			else
+			{
+				ndAssert(0);
+			}
+
+
+			return reward;
+		}
+
+		void CheckTrainingCompleted()
+		{
+			#ifdef ND_TRAIN_MODEL
+			if (m_agent->IsTrainer())
+			{
+				ndControllerAgent_trainer* const agent = (ndControllerAgent_trainer*)*m_agent;
+				if (agent->m_modelIsTrained)
+				{
+					char fileName[1024];
+					ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
+					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+					m_agent = ndSharedPtr<ndBrainAgent>(new ndRobot::ndController(actor));
+					((ndRobot::ndController*)*m_agent)->SetModel(this);
+					//ResetModel();
+					((ndPhysicsWorld*)m_world)->NormalUpdates();
+				}
+			}
+			#endif
+		}
+
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
@@ -2331,8 +2312,8 @@ namespace ndQuadruped_1
 		{
 			//m_animBlendTree->Update(timestep * m_control->m_animSpeed);
 			ndModelArticulation::PostUpdate(world, timestep);
-			//m_agent->OptimizeStep();
-			//CheckTrainingCompleted();
+			m_agent->OptimizeStep();
+			CheckTrainingCompleted();
 		}
 
 		ndAnimationPose m_animPose;
@@ -2393,7 +2374,7 @@ namespace ndQuadruped_1
 	{
 		#ifdef ND_TRAIN_MODEL
 		// add a reinforcement learning controller 
-		ndBrainAgentContinueVPG_Trainer<m_observationsSize * 4, m_actionsSize>::HyperParameters hyperParameters;
+		ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUTSIZE, m_actionsSize>::HyperParameters hyperParameters;
 		//hyperParameters.m_sigma = ndReal(0.25f);
 		hyperParameters.m_discountFactor = ndReal(0.99f);
 		hyperParameters.m_extraTrajectorySteps = 6000;
