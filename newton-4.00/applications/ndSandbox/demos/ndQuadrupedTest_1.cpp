@@ -1748,7 +1748,7 @@ namespace ndQuadruped_1
 				,m_killCounter(0)
 				,m_startTraining(0)
 				//,m_stopTraining(5000000)
-				,m_stopTraining(500000)
+				,m_stopTraining(1000000)
 				,m_modelIsTrained(false)
 			{
 				SetName(CONTROLLER_NAME);
