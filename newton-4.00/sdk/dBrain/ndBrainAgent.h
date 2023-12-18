@@ -44,7 +44,7 @@ class ndBrainAgent: public ndClassAlloc
 	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance) = 0;
 	
 	protected:
-	virtual void ResetModel() const = 0;
+	virtual void ResetModel() = 0;
 	virtual bool IsTerminal() const = 0;
 	virtual ndBrainFloat GetReward() const = 0;
 	virtual ndInt32 GetEpisodeFrames() const = 0;

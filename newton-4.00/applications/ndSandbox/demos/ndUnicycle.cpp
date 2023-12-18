@@ -221,7 +221,7 @@ namespace ndUnicycle
 				return m_model->IsTerminal();
 			}
 
-			void ResetModel() const
+			void ResetModel()
 			{
 				m_model->ResetModel();
 			}
@@ -345,7 +345,7 @@ namespace ndUnicycle
 			return ndReal(reward);
 		}
 
-		void ResetModel() const
+		void ResetModel()
 		{
 			for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
 			{

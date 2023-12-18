@@ -466,7 +466,7 @@ namespace ndQuadruped_1
 				return m_model->IsTerminal();
 			}
 
-			void ResetModel() const
+			void ResetModel()
 			{
 				m_model->m_control->Reset();
 				for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
@@ -1738,12 +1738,17 @@ namespace ndQuadruped_1
 			ndControllerAgent_trainer(const HyperParameters& hyperParameters)
 				:ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUTSIZE, m_actionsSize>(hyperParameters)
 				,m_bestActor(m_actor)
+				,m_basePose()
+				,m_bodies()
+				,m_outFile(nullptr)
 				,m_model(nullptr)
+				,m_timer(ndGetTimeInMicroseconds())
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(3000)
+				,m_killCounter(0)
+				,m_startTraining(0)
 				//,m_stopTraining(5000000)
 				,m_stopTraining(500000)
-				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
 			{
 				SetName(CONTROLLER_NAME);
@@ -1772,12 +1777,18 @@ namespace ndQuadruped_1
 
 			ndBrainFloat GetReward() const
 			{
+				ndBrainFloat reward = m_model->CalculateReward();
+				if (reward > ndBrainFloat(0.4f))
+				{
+					m_killCounter = 0;
+				}
+
 				if (IsTerminal())
 				{
 					return ndBrainFloat(-1.0f);
 				}
 
-				return m_model->CalculateReward();
+				return reward;
 			}
 
 			virtual void ApplyActions(ndBrainFloat* const actions) const
@@ -1812,11 +1823,17 @@ namespace ndQuadruped_1
 				////state = state && (m_startTraning >= 64);
 				//
 				//return m_model->IsTerminal();
+				if (m_killCounter > 256)
+				{
+					return true;
+				}
 				return false;
 			}
 
-			void ResetModel() const
+			void ResetModel()
 			{
+				m_killCounter = 0;
+				m_startTraining = 0;
 				m_model->m_control->Reset();
 				for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
 				{
@@ -1824,66 +1841,88 @@ namespace ndQuadruped_1
 				}
 			}
 
-			void OptimizeStep()
+			void Step()
 			{
-				ndInt32 stopTraining = GetFramesCount();
-				if (stopTraining <= m_stopTraining)
+				if (m_startTraining > 100)
 				{
-					ndInt32 episodeCount = GetEposideCount();
-					ndBrainAgentContinueVPG_Trainer::OptimizeStep();
-				
-					episodeCount -= GetEposideCount();
-					if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
-					{
-						if (m_averageQvalue.GetAverage() > m_maxGain)
-						{
-							m_bestActor.CopyFrom(m_actor);
-							m_maxGain = m_averageQvalue.GetAverage();
-							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
-						}
-					}
-				
-					if (episodeCount && !IsSampling())
-					{
-						ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-						if (m_outFile)
-						{
-							fprintf(m_outFile, "%g\n", m_averageQvalue.GetAverage());
-							fflush(m_outFile);
-						}
-					}
-				
-					if (stopTraining == m_stopTraining)
-					{
-						char fileName[1024];
-						m_modelIsTrained = true;
-						m_actor.CopyFrom(m_bestActor);
-						ndGetWorkingFileName(GetName().GetStr(), fileName);
-						SaveToFile(fileName);
-						ndExpandTraceMessage("saving to file: %s\n", fileName);
-						ndExpandTraceMessage("training complete\n");
-						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-						ndExpandTraceMessage("training time: %g\n seconds", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-					}
+					ndBrainAgentContinueVPG_Trainer::Step();
 				}
-				
-				//if (m_model->IsOutOfBounds())
-				//{
-				//	m_model->TelePort();
-				//}
-				//m_startTraning++;
+				else
+				{
+					ndBrainFixSizeVector<m_actionsSize> actions;
+					actions.Set(ndBrainFloat(0.0f));
+					m_model->ApplyActions(&actions[0]);
+				}
 			}
 
-			FILE* m_outFile;
+			void OptimizeStep()
+			{
+				if (m_startTraining > 100)
+				{
+					ndInt32 stopTraining = GetFramesCount();
+					if (stopTraining <= m_stopTraining)
+					{
+						ndInt32 episodeCount = GetEposideCount();
+						ndBrainAgentContinueVPG_Trainer::OptimizeStep();
+
+						episodeCount -= GetEposideCount();
+						if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
+						{
+							if (m_averageQvalue.GetAverage() > m_maxGain)
+							{
+								m_bestActor.CopyFrom(m_actor);
+								m_maxGain = m_averageQvalue.GetAverage();
+								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
+							}
+						}
+
+						if (episodeCount && !IsSampling())
+						{
+							ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+							if (m_outFile)
+							{
+								fprintf(m_outFile, "%g\n", m_averageQvalue.GetAverage());
+								fflush(m_outFile);
+							}
+						}
+
+						if (stopTraining == m_stopTraining)
+						{
+							char fileName[1024];
+							m_modelIsTrained = true;
+							m_actor.CopyFrom(m_bestActor);
+							ndGetWorkingFileName(GetName().GetStr(), fileName);
+							SaveToFile(fileName);
+							ndExpandTraceMessage("saving to file: %s\n", fileName);
+							ndExpandTraceMessage("training complete\n");
+							ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+							ndExpandTraceMessage("training time: %g\n seconds", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+						}
+					}
+
+					//if (m_model->IsOutOfBounds())
+					//{
+					//	m_model->TelePort();
+					//}
+
+					m_killCounter++;
+				}
+			
+				m_startTraining++;
+			}
+
 			ndBrain m_bestActor;
-			ndRobot* m_model;
-			ndFloat32 m_maxGain;
-			ndInt32 m_maxFrames;
-			ndInt32 m_stopTraining;
-			ndUnsigned64 m_timer;
-			bool m_modelIsTrained;
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
 			ndFixSizeArray<ndBodyDynamic*, 32> m_bodies;
+			FILE* m_outFile;
+			ndRobot* m_model;
+			ndUnsigned64 m_timer;
+			ndFloat32 m_maxGain;
+			ndInt32 m_maxFrames;
+			mutable ndInt32 m_killCounter;
+			ndInt32 m_startTraining;
+			ndInt32 m_stopTraining;
+			bool m_modelIsTrained;
 		};
 
 		ndRobot(ndSharedPtr<ndBrainAgent>& agent)

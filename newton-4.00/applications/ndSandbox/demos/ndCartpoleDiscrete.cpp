@@ -164,7 +164,7 @@ namespace ndCarpole_0
 				return m_model->IsTerminal();
 			}
 
-			void ResetModel() const
+			void ResetModel()
 			{
 				m_model->ResetModel();
 			}
@@ -317,7 +317,7 @@ namespace ndCarpole_0
 			m_pole->SetVelocity(poleVeloc);
 		}
 
-		void ResetModel() const
+		void ResetModel()
 		{
 			m_cart->SetMatrix(m_cartMatrix);
 			m_pole->SetMatrix(m_poleMatrix);

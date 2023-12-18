@@ -37,9 +37,9 @@ class ndBrainAgentDQN: public ndBrainAgent
 	void Step();
 
 	protected:
+	void ResetModel();
 	void OptimizeStep();
 	bool IsTrainer() const;
-	void ResetModel() const;
 	bool IsTerminal() const;
 	ndBrainFloat GetReward() const;
 	ndInt32 GetEpisodeFrames() const;
@@ -93,7 +93,7 @@ ndBrainFloat ndBrainAgentDQN<statesDim, actionDim>::GetReward() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN<statesDim, actionDim>::ResetModel() const
+void ndBrainAgentDQN<statesDim, actionDim>::ResetModel()
 {
 	ndAssert(0);
 }

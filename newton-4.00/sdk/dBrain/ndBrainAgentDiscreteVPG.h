@@ -38,9 +38,10 @@ class ndBrainAgentDiscreteVPG: public ndBrainAgent
 	void Step();
 
 	protected:
+	void ResetModel();
 	void OptimizeStep();
 	bool IsTrainer() const;
-	void ResetModel() const;
+
 	bool IsTerminal() const;
 	ndBrainFloat GetReward() const;
 	ndInt32 GetEpisodeFrames() const;
@@ -98,7 +99,7 @@ ndBrainFloat ndBrainAgentDiscreteVPG<statesDim, actionDim>::GetReward() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG<statesDim, actionDim>::ResetModel() const
+void ndBrainAgentDiscreteVPG<statesDim, actionDim>::ResetModel()
 {
 	ndAssert(0);
 }
