@@ -370,9 +370,6 @@ namespace ndQuadruped_1
 				//ndFloat32 control_z_reward = ndExp(-ndFloat32(102.0f) * control->m_z * control->m_z);
 				//return ndReal((reward * ndFloat32(8.0f) + control_x_reward + control_z_reward) / ndFloat32(10.0f));
 
-
-
-
 				ndInt32 stateIndex = 0;
 				ndBrainFloat positReward = ndBrainFloat(0.0f);
 				ndBrainFloat velocReward = ndBrainFloat(0.0f);
@@ -1522,7 +1519,7 @@ namespace ndQuadruped_1
 	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
 	#define D_MIN_REWARD_ANGLE		ndReal(ndFloat32 (30.0f) * ndDegreeToRad)
 
-	#define D_SWING_STEP			ndReal(0.0025f)
+	#define D_SWING_STEP			ndReal(0.005f)
 	#define D_EFFECTOR_STEP			ndReal(0.1f)
 	#define ND_AGENT_INPUTSIZE		(4 * m_legObservationsSize + m_actionsSize)
 
@@ -1745,7 +1742,7 @@ namespace ndQuadruped_1
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(3000)
 				//,m_stopTraining(5000000)
-				,m_stopTraining(8000 * 10)
+				,m_stopTraining(500000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
 			{
@@ -2150,94 +2147,6 @@ namespace ndQuadruped_1
 
 		ndBrainFloat CalculateReward() const
 		{
-			//ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
-			//ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
-			//ndFloat32 totalMass = ndFloat32(0.0f);
-			//ndVector centerOfMass(ndVector::m_zero);
-			//for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			//{
-			//	const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-			//	const ndMatrix matrix(body->GetMatrix());
-			//	ndFloat32 mass = body->GetMassMatrix().m_w;
-			//	totalMass += mass;
-			//	centerOfMass += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
-			//	bodies.PushBack(body);
-			//}
-			//ndFloat32 invMass = 1.0f / totalMass;
-			//centerOfMass = centerOfMass.Scale(invMass);
-			//
-			//ndVector comLineOfAction(centerOfMass);
-			//comLineOfAction.m_y -= ndFloat32(0.5f);
-			//context.DrawLine(centerOfMass, comLineOfAction, ndVector::m_zero);
-			//
-			//const ndVector upVector(rootBody->GetMatrix().m_up);
-			//ndFixSizeArray<ndVector, 4> desiredSupportPoint;
-			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
-			//{
-			//	const ndAnimKeyframe& keyFrame = m_animPose[i];
-			//	ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-			//	ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-			//
-			//	if (i == 0)
-			//	{
-			//		effector->DebugJoint(context);
-			//	}
-			//
-			//	if (keyFrame.m_userParamInt)
-			//	{
-			//		ndBodyKinematic* const body = effector->GetBody0();
-			//		desiredSupportPoint.PushBack(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit));
-			//	}
-			//}
-			//
-			//ndVector supportColor(0.0f, 1.0f, 1.0f, 1.0f);
-			//if (desiredSupportPoint.GetCount() >= 3)
-			//{
-			//	ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
-			//	rotation.TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
-			//	ndInt32 supportCount = ndConvexHull2d(&desiredSupportPoint[0], desiredSupportPoint.GetCount());
-			//	rotation.OrthoInverse().TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
-			//	ndVector p0(desiredSupportPoint[supportCount - 1]);
-			//	ndBigVector bigPolygon[16];
-			//	for (ndInt32 i = 0; i < supportCount; ++i)
-			//	{
-			//		bigPolygon[i] = desiredSupportPoint[i];
-			//		context.DrawLine(desiredSupportPoint[i], p0, supportColor);
-			//		p0 = desiredSupportPoint[i];
-			//	}
-			//
-			//	ndBigVector p0Out;
-			//	ndBigVector p1Out;
-			//	ndBigVector ray_p0(centerOfMass);
-			//	ndBigVector ray_p1(comLineOfAction);
-			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-			//
-			//	const ndVector centerOfPresure(p0Out);
-			//	context.DrawPoint(centerOfPresure, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 5);
-			//
-			//	ndVector zmp(CalculateZeroMomentPoint());
-			//	ray_p0 = zmp;
-			//	ray_p1 = zmp;
-			//	ray_p1.m_y -= ndFloat32(0.5f);
-			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-			//	const ndVector zmpSupport(p0Out);
-			//	context.DrawPoint(zmpSupport, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
-			//}
-			//else if (desiredSupportPoint.GetCount() == 2)
-			//{
-			//	ndAssert(0);
-			//	context.DrawLine(desiredSupportPoint[0], desiredSupportPoint[1], supportColor);
-			//	//ndBigVector p0Out;
-			//	//ndBigVector p1Out;
-			//	//ndBigVector ray_p0(comMatrix.m_posit);
-			//	//ndBigVector ray_p1(comMatrix.m_posit);
-			//	//ray_p1.m_y -= 1.0f;
-			//	//
-			//	//ndRayToRayDistance(ray_p0, ray_p1, contactPoints[0], contactPoints[1], p0Out, p1Out);
-			//	//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
-			//	//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
-			//}
-
 			ndFixSizeArray<ndBigVector, 4> desiredSupportPoint;
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
@@ -2264,17 +2173,19 @@ namespace ndQuadruped_1
 				ray_p1.m_y -= ndFloat32(0.5f);
 				ndRayToPolygonDistance(ray_p0, ray_p1, &desiredSupportPoint[0], desiredSupportPoint.GetCount(), p0Out, p1Out);
 				ndBigVector error((p0Out - p1Out) & ndBigVector::m_triplexMask);
-				ndFloat32 dist = ndFloat32(1.0f) - ndFloat32 (ndSqrt (error.DotProduct(error).GetScalar()));
+
+				ndFloat32 dist2 = ndFloat32(error.DotProduct(error).GetScalar());
+				
+				//ndFloat32 dist = ndFloat32(1.0f) - ndFloat32 (ndSqrt (error.DotProduct(error).GetScalar()));
 				//ndFloat32 dist = ndFloat32(1.0f) - ndFloat32 (error.DotProduct(error).GetScalar());
 				//reward = (dist2 < ndBrainFloat(1.0e-5f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-				reward = dist;
-				ndTrace(("%f %f\n", dist, reward));
+				reward = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * dist2));
+				ndTrace(("d2(% f) r(% f)\n", dist2, reward));
 			}
 			else
 			{
 				ndAssert(0);
 			}
-
 
 			return reward;
 		}
