@@ -1846,6 +1846,8 @@ namespace ndQuadruped_1
 				if (m_startTraining > 100)
 				{
 					ndBrainAgentContinueVPG_Trainer::Step();
+					OptimizeStep();
+					m_killCounter++;
 				}
 				else
 				{
@@ -1853,62 +1855,52 @@ namespace ndQuadruped_1
 					actions.Set(ndBrainFloat(0.0f));
 					m_model->ApplyActions(&actions[0]);
 				}
+
+				m_startTraining++;
 			}
 
 			void OptimizeStep()
 			{
-				if (m_startTraining > 100)
+				ndInt32 stopTraining = GetFramesCount();
+				if (stopTraining <= m_stopTraining)
 				{
-					ndInt32 stopTraining = GetFramesCount();
-					if (stopTraining <= m_stopTraining)
+					ndInt32 episodeCount = GetEposideCount();
+					ndBrainAgentContinueVPG_Trainer::OptimizeStep();
+
+					episodeCount -= GetEposideCount();
+					if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
 					{
-						ndInt32 episodeCount = GetEposideCount();
-						ndBrainAgentContinueVPG_Trainer::OptimizeStep();
-
-						episodeCount -= GetEposideCount();
-						if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
+						if (m_averageQvalue.GetAverage() > m_maxGain)
 						{
-							if (m_averageQvalue.GetAverage() > m_maxGain)
-							{
-								m_bestActor.CopyFrom(m_actor);
-								m_maxGain = m_averageQvalue.GetAverage();
-								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
-							}
-						}
-
-						if (episodeCount && !IsSampling())
-						{
-							ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-							if (m_outFile)
-							{
-								fprintf(m_outFile, "%g\n", m_averageQvalue.GetAverage());
-								fflush(m_outFile);
-							}
-						}
-
-						if (stopTraining == m_stopTraining)
-						{
-							char fileName[1024];
-							m_modelIsTrained = true;
-							m_actor.CopyFrom(m_bestActor);
-							ndGetWorkingFileName(GetName().GetStr(), fileName);
-							SaveToFile(fileName);
-							ndExpandTraceMessage("saving to file: %s\n", fileName);
-							ndExpandTraceMessage("training complete\n");
-							ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-							ndExpandTraceMessage("training time: %g\n seconds", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+							m_bestActor.CopyFrom(m_actor);
+							m_maxGain = m_averageQvalue.GetAverage();
+							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
 						}
 					}
 
-					//if (m_model->IsOutOfBounds())
-					//{
-					//	m_model->TelePort();
-					//}
+					if (episodeCount && !IsSampling())
+					{
+						ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						if (m_outFile)
+						{
+							fprintf(m_outFile, "%g\n", m_averageQvalue.GetAverage());
+							fflush(m_outFile);
+						}
+					}
 
-					m_killCounter++;
+					if (stopTraining == m_stopTraining)
+					{
+						char fileName[1024];
+						m_modelIsTrained = true;
+						m_actor.CopyFrom(m_bestActor);
+						ndGetWorkingFileName(GetName().GetStr(), fileName);
+						SaveToFile(fileName);
+						ndExpandTraceMessage("saving to file: %s\n", fileName);
+						ndExpandTraceMessage("training complete\n");
+						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+						ndExpandTraceMessage("training time: %g\n seconds", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+					}
 				}
-			
-				m_startTraining++;
 			}
 
 			ndBrain m_bestActor;
@@ -2262,7 +2254,7 @@ namespace ndQuadruped_1
 		{
 			//m_animBlendTree->Update(timestep * m_control->m_animSpeed);
 			ndModelArticulation::PostUpdate(world, timestep);
-			m_agent->OptimizeStep();
+			//m_agent->OptimizeStep();
 			CheckTrainingCompleted();
 		}
 
