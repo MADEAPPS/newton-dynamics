@@ -487,14 +487,16 @@ void ndIkSolver::Solve()
 
 		for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
 		{
-			ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
-			ndJointBilateralConstraint* const joint = node->m_joint;
 			ndJacobian accel0;
 			ndJacobian accel1;
-			accel0.m_linear = joint->GetBody0()->m_accel;
-			accel0.m_angular = joint->GetBody0()->m_alpha;
-			accel1.m_linear = joint->GetBody1()->m_accel;
-			accel1.m_angular = joint->GetBody1()->m_alpha;
+			const ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
+			ndJointBilateralConstraint* const joint = node->m_joint;
+			const ndBodyKinematic* const body0 = joint->GetBody0();
+			const ndBodyKinematic* const body1 = joint->GetBody1();
+			accel0.m_linear = body0->m_accel;
+			accel0.m_angular = body0->m_alpha;
+			accel1.m_linear = body1->m_accel;
+			accel1.m_angular = body1->m_alpha;
 			joint->SetIkSetAccel(accel0, accel1);
 			joint->SetIkMode(false);
 		}
