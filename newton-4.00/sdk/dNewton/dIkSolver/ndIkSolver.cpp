@@ -248,17 +248,17 @@ bool ndIkSolver::IsSleeping(ndSkeletonContainer* const skeleton) const
 	return skeleton->m_isResting ? true : false;
 }
 
-ndVector ndIkSolver::GetBodyForce(const ndBodyKinematic* const body) const
-{
-	ndAssert(0);
-	return body->m_accel;
-}
-
-ndVector ndIkSolver::GetBodyTorque(const ndBodyKinematic* const body) const
-{
-	ndAssert(0);
-	return body->m_alpha;
-}
+//ndVector ndIkSolver::GetBodyForce(const ndBodyKinematic* const body) const
+//{
+//	ndAssert(0);
+//	return body->m_accel;
+//}
+//
+//ndVector ndIkSolver::GetBodyTorque(const ndBodyKinematic* const body) const
+//{
+//	ndAssert(0);
+//	return body->m_alpha;
+//}
 
 void ndIkSolver::BuildMassMatrix()
 {
