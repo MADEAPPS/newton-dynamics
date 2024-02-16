@@ -8,8 +8,8 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __PHYSICS_WORLD_H__
-#define __PHYSICS_WORLD_H__
+#ifndef __ND_PHYSICS_WORLD_H__
+#define __ND_PHYSICS_WORLD_H__
 
 #include "ndSandboxStdafx.h"
 

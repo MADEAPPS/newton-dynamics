@@ -32,29 +32,31 @@ class ndMemoryHeader
 {
 	public:
 	void* m_ptr;
-	size_t m_size;
+	ndUnsigned32 m_bufferSize;
+	ndUnsigned32 m_requestedSize;
 };
 
-#define D_MEMORY_ALIGMNET 32
-#define ndGetBufferSize ndInt32(D_MEMORY_ALIGMNET - 1 + sizeof (ndMemoryHeader))
+#define ndGetBufferPaddingSize size_t(D_MEMORY_ALIGMNET - 1 + sizeof (ndMemoryHeader))
 
 size_t ndMemory::CalculateBufferSize(size_t size)
 {
-	return size + ndGetBufferSize;
+	return size + ndGetBufferPaddingSize;
 }
 
-void* ndMemory::Malloc(size_t size)
+void* ndMemory::Malloc(size_t requestSize)
 {
 	ndIntPtr metToVal;
-	size += ndGetBufferSize;
+	size_t size = requestSize + ndGetBufferPaddingSize;
 	metToVal.m_ptr = m_allocMemory(size);
-	ndUnsigned64 val = ndUnsigned64(metToVal.m_int) + ndGetBufferSize;
+	ndUnsigned64 val = ndUnsigned64(metToVal.m_int) + ndGetBufferPaddingSize;
 	ndInt64 mask = -ndInt64(D_MEMORY_ALIGMNET);
 	val = val & mask;
 	ndMemoryHeader* const ret = (ndMemoryHeader*)val;
 	ndMemoryHeader* const info = ret - 1;
+	ndAssert((char*)info >= (char*)metToVal.m_ptr);
 	info->m_ptr = metToVal.m_ptr;
-	info->m_size = size;
+	info->m_bufferSize = ndUnsigned32 (size);
+	info->m_requestedSize = ndUnsigned32(requestSize);
 	m_memoryUsed.fetch_add(size);
 	return ret;
 }
@@ -64,7 +66,7 @@ void ndMemory::Free(void* const ptr)
 	if (ptr)
 	{
 		ndMemoryHeader* const ret = ((ndMemoryHeader*)ptr) - 1;
-		m_memoryUsed.fetch_sub(ndUnsigned64(ret->m_size));
+		m_memoryUsed.fetch_sub(ndUnsigned64(ret->m_bufferSize));
 		m_freeMemory(ret->m_ptr);
 	}
 }
@@ -72,7 +74,13 @@ void ndMemory::Free(void* const ptr)
 size_t ndMemory::GetSize(void* const ptr)
 {
 	ndMemoryHeader* const ret = ((ndMemoryHeader*)ptr) - 1;
-	return ret->m_size;
+	return ret->m_bufferSize;
+}
+
+size_t ndMemory::GetOriginalSize(void* const ptr)
+{
+	ndMemoryHeader* const ret = ((ndMemoryHeader*)ptr) - 1;
+	return ret->m_requestedSize;
 }
 
 ndUnsigned64 ndMemory::GetMemoryUsed()

@@ -25,6 +25,7 @@
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"
 
+#define D_MEMORY_ALIGMNET	32
 typedef void* (*ndMemAllocCallback) (size_t size);
 typedef void (*ndMemFreeCallback) (void* const ptr);
 
@@ -39,8 +40,11 @@ class ndMemory
 	/// Destroy a memory buffer previously allocated by Malloc.
 	D_CORE_API static void Free(void* const ptr);
 
-	/// Get memory buffer size previously allocated by Malloc.
+	/// Get memory buffer size previously allocated by Malloc. include extra align padding.
 	D_CORE_API static size_t GetSize(void* const ptr);
+
+	/// Get memory buffer size previously allocated by Malloc.
+	D_CORE_API static size_t GetOriginalSize(void* const ptr);
 
 	/// Calculate buffer size.
 	D_CORE_API static size_t CalculateBufferSize(size_t size);

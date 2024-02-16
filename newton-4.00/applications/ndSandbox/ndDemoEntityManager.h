@@ -53,7 +53,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 
 		bool Update(bool value)
 		{
-			bool ret = !m_memory & value;
+			bool ret = bool (!m_memory & value);
 			m_memory = value;
 			return ret;
 		}
