@@ -22,7 +22,7 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	#define D_USE_VANILLA_POLICY_GRAD
 
@@ -143,7 +143,7 @@ namespace ndUnicycle
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(5000)
-				,m_stopTraining(35000000)
+				,m_stopTraining(5000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
 			#else
