@@ -48,6 +48,7 @@ namespace ndUnicycle
 		m_topBoxAngle,
 		m_topBoxOmega,
 		m_jointAngle,
+		m_hasWheelContact,
 		m_stateSize
 	};
 
@@ -115,14 +116,6 @@ namespace ndUnicycle
 
 			virtual void ApplyActions(ndBrainFloat* const actions) const
 			{
-				if (!m_model->HasSupportContact())
-				{
-					for (ndInt32 i = 0; i < m_actionsSize; ++i)
-					{
-						actions[i] = ndReal(0.0f);
-					}
-				}
-
 				m_model->ApplyActions(actions);
 			}
 
@@ -301,6 +294,21 @@ namespace ndUnicycle
 		{
 		}
 
+		bool HasSupportContact() const
+		{
+			const ndBodyKinematic::ndContactMap& contacts = m_wheel->GetContactMap();
+			ndBodyKinematic::ndContactMap::Iterator it(contacts);
+			for (it.Begin(); it; it++)
+			{
+				const ndContact* const contact = *it;
+				if (contact->IsActive())
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
 		void GetObservation(ndBrainFloat* const state)
 		{
 			ndBodyKinematic* const body = GetRoot()->m_body->GetAsBodyKinematic();
@@ -312,6 +320,7 @@ namespace ndUnicycle
 			state[m_topBoxAngle] = ndReal(angle);
 			state[m_topBoxOmega] = ndReal(omega.m_z);
 			state[m_jointAngle] = ndReal(m_legJoint->GetAngle() / ND_MAX_LEG_JOINT_ANGLE);
+			state[m_hasWheelContact] = HasSupportContact() ? ndReal(1.0f) : ndReal(0.0f);
 		}
 
 		void ApplyActions(ndBrainFloat* const actions) const
@@ -389,21 +398,6 @@ namespace ndUnicycle
 			}
 		}
 
-		bool HasSupportContact() const
-		{
-			ndBodyKinematic* const body = m_wheelJoint->GetBody0();
-			ndBodyKinematic::ndContactMap::Iterator it(body->GetContactMap());
-			for (it.Begin(); it; it++)
-			{
-				ndContact* const contact = it.GetNode()->GetInfo();
-				if (contact->IsActive())
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-
 		void CheckTrainingCompleted()
 		{
 			#ifdef ND_TRAIN_MODEL
@@ -443,6 +437,7 @@ namespace ndUnicycle
 		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
 		ndJointHinge* m_legJoint;
 		ndJointHinge* m_wheelJoint;
+		ndBodyKinematic* m_wheel;
 		ndFloat32 m_timestep;
 	};
 
@@ -494,6 +489,7 @@ namespace ndUnicycle
 		ndJointHinge* const wheelMotor = (ndJointHinge*)*wheelJoint;
 		wheelMotor->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
 		model->m_wheelJoint = wheelMotor;
+		model->m_wheel = wheelBody->GetAsBodyKinematic();
 
 		// tele port the model so that is on the floor
 		ndMatrix probeMatrix(wheelMatrix);

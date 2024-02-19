@@ -55,7 +55,7 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
-			m_threadsCount = 1;
+			//m_threadsCount = 1;
 		}
 
 		ndBrainFloat m_sigma;
