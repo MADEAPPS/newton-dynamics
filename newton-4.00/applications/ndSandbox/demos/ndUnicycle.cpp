@@ -48,7 +48,7 @@ namespace ndUnicycle
 		m_topBoxAngle,
 		m_topBoxOmega,
 		m_jointAngle,
-		m_hasWheelContact,
+		m_isOnAir,
 		m_stateSize
 	};
 
@@ -320,7 +320,7 @@ namespace ndUnicycle
 			state[m_topBoxAngle] = ndReal(angle);
 			state[m_topBoxOmega] = ndReal(omega.m_z);
 			state[m_jointAngle] = ndReal(m_legJoint->GetAngle() / ND_MAX_LEG_JOINT_ANGLE);
-			state[m_hasWheelContact] = HasSupportContact() ? ndReal(1.0f) : ndReal(0.0f);
+			state[m_isOnAir] = HasSupportContact() ? ndReal(0.0f) : ndReal(1.0f);
 		}
 
 		void ApplyActions(ndBrainFloat* const actions) const
