@@ -48,7 +48,7 @@ namespace ndUnicycle
 		m_topBoxAngle,
 		m_topBoxOmega,
 		m_jointAngle,
-		m_isOnAir,
+		m_wheelOmega,
 		m_stateSize
 	};
 
@@ -320,7 +320,17 @@ namespace ndUnicycle
 			state[m_topBoxAngle] = ndReal(angle);
 			state[m_topBoxOmega] = ndReal(omega.m_z);
 			state[m_jointAngle] = ndReal(m_legJoint->GetAngle() / ND_MAX_LEG_JOINT_ANGLE);
-			state[m_isOnAir] = HasSupportContact() ? ndReal(0.0f) : ndReal(1.0f);
+			if (HasSupportContact())
+			{
+				//ignore wheel omega when robot is landed
+				state[m_wheelOmega] = ndReal(0.0f);
+			}
+			else
+			{
+				ndAssert(0);
+				ndVector wheelOmega (m_wheel->GetOmega());
+				state[m_wheelOmega] = wheelOmega.m_z;
+			}
 		}
 
 		void ApplyActions(ndBrainFloat* const actions) const
@@ -343,15 +353,23 @@ namespace ndUnicycle
 				return ndReal(0.0f);
 			}
 
-			ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_legJoint->GetAngle() * m_legJoint->GetAngle()));
+			if (HasSupportContact())
+			{
+				ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_legJoint->GetAngle() * m_legJoint->GetAngle()));
 
-			ndBodyKinematic* const boxBody = GetRoot()->m_body->GetAsBodyKinematic();
-			const ndMatrix& matrix = boxBody->GetMatrix();
-			ndFloat32 sinAngle = matrix.m_up.m_x;
-			ndFloat32 boxReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
+				ndBodyKinematic* const boxBody = GetRoot()->m_body->GetAsBodyKinematic();
+				const ndMatrix& matrix = boxBody->GetMatrix();
+				ndFloat32 sinAngle = matrix.m_up.m_x;
+				ndFloat32 boxReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
 
-			ndFloat32 reward = (boxReward + legReward) / 2.0f;
-			return ndReal(reward);
+				ndFloat32 reward = (boxReward + legReward) / 2.0f;
+				return ndReal(reward);
+			}
+			else
+			{
+				ndAssert(0);
+				return 0.0f;
+			}
 		}
 
 		void ResetModel()
