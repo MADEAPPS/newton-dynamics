@@ -43,7 +43,7 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 		HyperParameters()
 		{
 			m_bashBufferSize = 32;
-			m_bashTrajectoryCount = 8;
+			m_bashTrajectoryCount = 32;
 			m_numberOfHiddenLayers = 3;
 			m_maxTrajectorySteps = 1024 * 2;
 			m_extraTrajectorySteps = 1024 * 2;
