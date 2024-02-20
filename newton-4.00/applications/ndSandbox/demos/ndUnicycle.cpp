@@ -49,6 +49,7 @@ namespace ndUnicycle
 		m_topBoxOmega,
 		m_jointAngle,
 		m_wheelOmega,
+		m_isOnAir,
 		m_stateSize
 	};
 
@@ -202,6 +203,12 @@ namespace ndUnicycle
 				#endif
 
 				m_model->ApplyActions(actions);
+
+				ndFloat32 applyJumpImpule = ndRand();
+				if (applyJumpImpule > 0.999f)
+				{
+					//m_model->ApplyRandomJump();
+				}
 			}
 
 			void GetObservation(ndBrainFloat* const observation)
@@ -323,13 +330,27 @@ namespace ndUnicycle
 			if (HasSupportContact())
 			{
 				//ignore wheel omega when robot is landed
+				state[m_isOnAir] = ndReal(0.0f);
 				state[m_wheelOmega] = ndReal(0.0f);
+				
 			}
 			else
 			{
-				ndAssert(0);
 				ndVector wheelOmega (m_wheel->GetOmega());
+				state[m_isOnAir] = ndReal(1.0f);
 				state[m_wheelOmega] = wheelOmega.m_z;
+			}
+		}
+
+		void ApplyRandomJump() const
+		{
+			if (HasSupportContact())
+			{
+				ndBodyDynamic* const boxBody = GetRoot()->m_body->GetAsBodyDynamic();
+
+				ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
+				ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * 2.0f));
+				boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_timestep);
 			}
 		}
 
@@ -367,7 +388,7 @@ namespace ndUnicycle
 			}
 			else
 			{
-				ndAssert(0);
+				//ndTrace((" calculate jump rweard \n"));
 				return 0.0f;
 			}
 		}

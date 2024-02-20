@@ -477,7 +477,7 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::OptimizeStep()
 		m_trajectory.SetCount(0);
 	}
 
-	bool isTeminal = IsTerminal() || (m_trajectory.GetCount() == (m_extraTrajectorySteps + m_maxTrajectorySteps));
+	bool isTeminal = IsTerminal() || (m_trajectory.GetCount() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
 	if (isTeminal)
 	{
 		SaveTrajectory();
