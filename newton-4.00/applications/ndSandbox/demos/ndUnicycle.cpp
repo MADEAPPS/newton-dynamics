@@ -136,8 +136,9 @@ namespace ndUnicycle
 				,m_bestActor(m_actor)
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(5000)
-				,m_stopTraining(10000000)
+				//,m_maxFrames(5000)
+				,m_maxFrames(1200)
+				,m_stopTraining(20000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
 			#else
