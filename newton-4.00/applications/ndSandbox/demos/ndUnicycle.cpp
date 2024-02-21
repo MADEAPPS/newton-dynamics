@@ -137,7 +137,7 @@ namespace ndUnicycle
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(5000)
-				,m_stopTraining(5000000)
+				,m_stopTraining(10000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
 			#else
@@ -207,7 +207,7 @@ namespace ndUnicycle
 				ndFloat32 applyJumpImpule = ndRand();
 				if (applyJumpImpule > 0.999f)
 				{
-					//m_model->ApplyRandomJump();
+					m_model->ApplyRandomJump();
 				}
 			}
 
