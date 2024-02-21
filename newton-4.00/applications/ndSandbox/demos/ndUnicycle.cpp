@@ -316,6 +316,19 @@ namespace ndUnicycle
 			return false;
 		}
 
+		void ApplyRandomJump() const
+		{
+			if (HasSupportContact())
+			{
+				ndBodyDynamic* const boxBody = GetRoot()->m_body->GetAsBodyDynamic();
+
+				ndFloat32 speed = 4.0f + 2.0f * ndRand();
+				ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
+				ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
+				boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_timestep);
+			}
+		}
+
 		void GetObservation(ndBrainFloat* const state)
 		{
 			ndBodyKinematic* const body = GetRoot()->m_body->GetAsBodyKinematic();
@@ -342,18 +355,6 @@ namespace ndUnicycle
 			}
 		}
 
-		void ApplyRandomJump() const
-		{
-			if (HasSupportContact())
-			{
-				ndBodyDynamic* const boxBody = GetRoot()->m_body->GetAsBodyDynamic();
-
-				ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
-				ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * 2.0f));
-				boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_timestep);
-			}
-		}
-
 		void ApplyActions(ndBrainFloat* const actions) const
 		{
 			ndFloat32 legAngle = ndFloat32(actions[m_softLegControl]) * ND_MAX_LEG_ANGLE_STEP + m_legJoint->GetAngle();
@@ -374,10 +375,10 @@ namespace ndUnicycle
 				return ndReal(0.0f);
 			}
 
+
+			ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_legJoint->GetAngle() * m_legJoint->GetAngle()));
 			if (HasSupportContact())
 			{
-				ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_legJoint->GetAngle() * m_legJoint->GetAngle()));
-
 				ndBodyKinematic* const boxBody = GetRoot()->m_body->GetAsBodyKinematic();
 				const ndMatrix& matrix = boxBody->GetMatrix();
 				ndFloat32 sinAngle = matrix.m_up.m_x;
@@ -388,8 +389,10 @@ namespace ndUnicycle
 			}
 			else
 			{
-				//ndTrace((" calculate jump rweard \n"));
-				return 0.0f;
+				ndVector wheelOmega(m_wheel->GetOmega());
+				ndFloat32 wheelReward = ndReal(ndExp(-ndFloat32(10000.0f) * wheelOmega.m_z * wheelOmega.m_z));
+				ndFloat32 reward = (wheelReward + legReward) / 2.0f;
+				return ndReal(reward);
 			}
 		}
 
