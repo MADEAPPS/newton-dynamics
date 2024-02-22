@@ -22,7 +22,7 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	#define D_USE_VANILLA_POLICY_GRAD
 
@@ -137,7 +137,7 @@ namespace ndUnicycle
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				//,m_maxFrames(5000)
-				,m_maxFrames(1200)
+				,m_maxFrames(1300)
 				,m_stopTraining(20000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
@@ -175,9 +175,40 @@ namespace ndUnicycle
 				m_model = model;
 			}
 
+			bool IsTerminal() const
+			{
+				#define D_REWARD_MIN_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
+				const ndMatrix& matrix = m_model->GetRoot()->m_body->GetMatrix();
+				ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
+				bool fail = ndAbs(ndAsin(sinAngle)) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
+				return fail;
+			}
+
 			ndBrainFloat GetReward() const
 			{
-				return m_model->GetReward();
+				if (IsTerminal())
+				{
+					return ndReal(0.0f);
+				}
+
+				ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_model->m_legJoint->GetAngle() * m_model->m_legJoint->GetAngle()));
+				if (m_model->HasSupportContact())
+				{
+					ndBodyKinematic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyKinematic();
+					const ndMatrix& matrix = boxBody->GetMatrix();
+					ndFloat32 sinAngle = matrix.m_up.m_x;
+					ndFloat32 boxReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
+
+					ndFloat32 reward = (boxReward + legReward) / 2.0f;
+					return ndReal(reward);
+				}
+				else
+				{
+					ndVector wheelOmega(m_model->m_wheel->GetOmega());
+					ndFloat32 wheelReward = ndReal(ndExp(-ndFloat32(10000.0f) * wheelOmega.m_z * wheelOmega.m_z));
+					ndFloat32 reward = (wheelReward + legReward) / 2.0f;
+					return ndReal(reward);
+				}
 			}
 
 			virtual void ApplyActions(ndBrainFloat* const actions) const
@@ -208,18 +239,21 @@ namespace ndUnicycle
 				ndFloat32 applyJumpImpule = ndRand();
 				if (applyJumpImpule > 0.999f)
 				{
-					m_model->ApplyRandomJump();
+					if (m_model->HasSupportContact())
+					{
+						ndBodyDynamic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyDynamic();
+
+						ndFloat32 speed = 4.0f + 2.0f * ndRand();
+						ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
+						ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
+						boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_model->m_timestep);
+					}
 				}
 			}
 
 			void GetObservation(ndBrainFloat* const observation)
 			{
 				m_model->GetObservation(observation);
-			}
-
-			bool IsTerminal() const
-			{
-				return m_model->IsTerminal();
 			}
 
 			void ResetModel()
@@ -317,19 +351,6 @@ namespace ndUnicycle
 			return false;
 		}
 
-		void ApplyRandomJump() const
-		{
-			if (HasSupportContact())
-			{
-				ndBodyDynamic* const boxBody = GetRoot()->m_body->GetAsBodyDynamic();
-
-				ndFloat32 speed = 4.0f + 2.0f * ndRand();
-				ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
-				ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
-				boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_timestep);
-			}
-		}
-
 		void GetObservation(ndBrainFloat* const state)
 		{
 			ndBodyKinematic* const body = GetRoot()->m_body->GetAsBodyKinematic();
@@ -369,34 +390,6 @@ namespace ndUnicycle
 			wheelBody->SetTorque(torque);
 		}
 
-		ndReal GetReward() const
-		{
-			if (IsTerminal())
-			{
-				return ndReal(0.0f);
-			}
-
-
-			ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_legJoint->GetAngle() * m_legJoint->GetAngle()));
-			if (HasSupportContact())
-			{
-				ndBodyKinematic* const boxBody = GetRoot()->m_body->GetAsBodyKinematic();
-				const ndMatrix& matrix = boxBody->GetMatrix();
-				ndFloat32 sinAngle = matrix.m_up.m_x;
-				ndFloat32 boxReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
-
-				ndFloat32 reward = (boxReward + legReward) / 2.0f;
-				return ndReal(reward);
-			}
-			else
-			{
-				ndVector wheelOmega(m_wheel->GetOmega());
-				ndFloat32 wheelReward = ndReal(ndExp(-ndFloat32(10000.0f) * wheelOmega.m_z * wheelOmega.m_z));
-				ndFloat32 reward = (wheelReward + legReward) / 2.0f;
-				return ndReal(reward);
-			}
-		}
-
 		void ResetModel()
 		{
 			for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
@@ -405,15 +398,6 @@ namespace ndUnicycle
 			}
 			m_legJoint->SetTargetAngle(0.0f);
 			m_wheelJoint->SetTargetAngle(0.0f);
-		}
-
-		bool IsTerminal() const
-		{
-			#define D_REWARD_MIN_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
-			const ndMatrix& matrix = GetRoot()->m_body->GetMatrix();
-			ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32 (-0.9f), ndFloat32(0.9f));
-			bool fail = ndAbs(ndAsin(sinAngle)) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
-			return fail;
 		}
 
 		bool IsOutOfBounds() const
