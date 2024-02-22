@@ -22,7 +22,7 @@
 
 namespace ndUnicycle
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 
 	#define D_USE_VANILLA_POLICY_GRAD
 
