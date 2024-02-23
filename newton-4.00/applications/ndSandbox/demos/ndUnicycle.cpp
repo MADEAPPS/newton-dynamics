@@ -236,8 +236,9 @@ namespace ndUnicycle
 
 				m_model->ApplyActions(actions);
 
+				const ndFloat32 probability = 1.0f / 1000.0f;
 				ndFloat32 applyJumpImpule = ndRand();
-				if (applyJumpImpule > 0.999f)
+				if (applyJumpImpule < probability)
 				{
 					if (m_model->HasSupportContact())
 					{
