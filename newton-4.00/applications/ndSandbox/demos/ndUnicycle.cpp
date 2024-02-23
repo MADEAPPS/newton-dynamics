@@ -22,7 +22,7 @@
 
 namespace ndUnicycle
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 
 	#define D_USE_VANILLA_POLICY_GRAD
 
@@ -137,7 +137,7 @@ namespace ndUnicycle
 				,m_model(nullptr)
 				,m_maxGain(-1.0e10f)
 				//,m_maxFrames(5000)
-				,m_maxFrames(1300)
+				,m_maxFrames(2300)
 				,m_stopTraining(20000000)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_modelIsTrained(false)
@@ -236,7 +236,7 @@ namespace ndUnicycle
 
 				m_model->ApplyActions(actions);
 
-				const ndFloat32 probability = 1.0f / 1000.0f;
+				const ndFloat32 probability = 1.0f / 2000.0f;
 				ndFloat32 applyJumpImpule = ndRand();
 				if (applyJumpImpule < probability)
 				{
