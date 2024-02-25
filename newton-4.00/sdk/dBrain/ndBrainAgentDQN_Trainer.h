@@ -84,14 +84,14 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void Step();
 	void OptimizeStep();
 	bool IsTrainer() const;
-	void Save(ndBrainSave* const loadSave) const;
+	void Save(ndBrainSave* const loadSave);
 
 	void InitWeights();
 	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 
 	bool IsSampling() const;
 	bool IsTerminal() const;
-	ndBrainFloat GetReward() const;
+	ndBrainFloat CalculateReward();
 
 	private:
 	void Optimize();
@@ -316,7 +316,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Save(ndBrainSave* const loadSave) const
+void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Save(ndBrainSave* const loadSave)
 {
 	loadSave->Save(&m_actor);
 }
@@ -329,7 +329,7 @@ bool ndBrainAgentDQN_Trainer<statesDim, actionDim>::IsTerminal() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetReward() const
+ndBrainFloat ndBrainAgentDQN_Trainer<statesDim, actionDim>::CalculateReward()
 {
 	ndAssert(0);
 	return ndBrainFloat (0.0f);
@@ -428,7 +428,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 		m_currentTransition.m_action[0] = bestAction;
 	}
 	
-	m_currentTransition.m_reward = GetReward();
+	m_currentTransition.m_reward = CalculateReward();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

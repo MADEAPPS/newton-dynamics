@@ -257,7 +257,7 @@ namespace ndQuadruped_1
 				ndMemCpy(&m_currentTransition[0], observation, m_observationsSize);
 			}
 
-			virtual void ApplyActions(ndBrainFloat* const actions) const
+			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
 				m_model->ApplyActions(actions, &m_currentTransition[0]);
 			}
@@ -432,7 +432,7 @@ namespace ndQuadruped_1
 				return reward;
 			}
 
-			virtual void ApplyActions(ndBrainFloat* const actions) const
+			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
 				m_model->ApplyActions(actions, &m_currentTransition[0]);
 			}
@@ -1490,6 +1490,20 @@ namespace ndQuadruped_1
 	}
 #else
 
+	#define ND_TRAIN_MODEL
+
+	#define CONTROLLER_NAME "ndQuadruped_1VPG.dnn"
+
+	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
+	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
+	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
+	#define D_MIN_REWARD_ANGLE		ndReal(ndFloat32 (30.0f) * ndDegreeToRad)
+
+	#define D_SWING_STEP			ndReal(0.005f)
+	#define D_EFFECTOR_STEP			ndReal(0.1f)
+	#define ND_AGENT_INPUTSIZE		(4 * m_legObservationsSize + m_actionsSize)
+
+
 	enum ndActionSpace
 	{
 		m_move_x,
@@ -1509,19 +1523,6 @@ namespace ndQuadruped_1
 		desired_support,
 		m_legObservationsSize
 	};
-
-	#define ND_TRAIN_MODEL
-
-	#define CONTROLLER_NAME "ndQuadruped_1VPG.dnn"
-
-	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
-	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
-	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
-	#define D_MIN_REWARD_ANGLE		ndReal(ndFloat32 (30.0f) * ndDegreeToRad)
-
-	#define D_SWING_STEP			ndReal(0.005f)
-	#define D_EFFECTOR_STEP			ndReal(0.1f)
-	#define ND_AGENT_INPUTSIZE		(4 * m_legObservationsSize + m_actionsSize)
 
 	class ndRobot : public ndModelArticulation
 	{
@@ -1693,7 +1694,7 @@ namespace ndQuadruped_1
 				m_model->GetObservation(observation);
 			}
 
-			virtual void ApplyActions(ndBrainFloat* const actions) const
+			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
 				m_model->ApplyActions(actions);
 			}
@@ -1744,11 +1745,10 @@ namespace ndQuadruped_1
 				,m_model(nullptr)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(3000)
+				,m_maxFrames(5000)
 				,m_killCounter(0)
 				,m_startTraining(0)
-				//,m_stopTraining(5000000)
-				,m_stopTraining(1000000)
+				,m_stopTraining(50000000)
 				,m_modelIsTrained(false)
 			{
 				SetName(CONTROLLER_NAME);
@@ -1775,7 +1775,7 @@ namespace ndQuadruped_1
 				}
 			}
 
-			ndBrainFloat GetReward() const
+			ndBrainFloat CalculateReward()
 			{
 				ndBrainFloat reward = m_model->CalculateReward();
 				if (reward > ndBrainFloat(0.4f))
@@ -1791,7 +1791,7 @@ namespace ndQuadruped_1
 				return reward;
 			}
 
-			virtual void ApplyActions(ndBrainFloat* const actions) const
+			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
 				m_model->ApplyActions(actions);
 			}
@@ -1888,12 +1888,13 @@ namespace ndQuadruped_1
 						}
 					}
 
-					if (stopTraining == m_stopTraining)
+					if (stopTraining >= m_stopTraining)
 					{
 						char fileName[1024];
 						m_modelIsTrained = true;
 						m_actor.CopyFrom(m_bestActor);
-						ndGetWorkingFileName(GetName().GetStr(), fileName);
+						//ndGetWorkingFileName(GetName().GetStr(), fileName);
+						ndGetWorkingFileName("ndQuadruped_1VPG_.dnn", fileName);
 						SaveToFile(fileName);
 						ndExpandTraceMessage("saving to file: %s\n", fileName);
 						ndExpandTraceMessage("training complete\n");
@@ -1911,7 +1912,7 @@ namespace ndQuadruped_1
 			ndUnsigned64 m_timer;
 			ndFloat32 m_maxGain;
 			ndInt32 m_maxFrames;
-			mutable ndInt32 m_killCounter;
+			ndInt32 m_killCounter;
 			ndInt32 m_startTraining;
 			ndInt32 m_stopTraining;
 			bool m_modelIsTrained;
@@ -2176,7 +2177,7 @@ namespace ndQuadruped_1
 			input[m_move_z] = m_control->m_z;
 		}
 
-		ndBrainFloat CalculateReward() const
+		ndBrainFloat CalculateReward()
 		{
 			ndFixSizeArray<ndBigVector, 4> desiredSupportPoint;
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
@@ -2210,8 +2211,8 @@ namespace ndQuadruped_1
 				//ndFloat32 dist = ndFloat32(1.0f) - ndFloat32 (ndSqrt (error.DotProduct(error).GetScalar()));
 				//ndFloat32 dist = ndFloat32(1.0f) - ndFloat32 (error.DotProduct(error).GetScalar());
 				//reward = (dist2 < ndBrainFloat(1.0e-5f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-				reward = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * dist2));
-				ndTrace(("d2(% f) r(% f)\n", dist2, reward));
+				reward = ndBrainFloat(ndExp(-ndBrainFloat(10000.0f) * dist2));
+				//ndTrace(("d2(% f) r(% f)\n", dist2, reward));
 			}
 			else
 			{
@@ -2319,7 +2320,7 @@ namespace ndQuadruped_1
 		ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUTSIZE, m_actionsSize>::HyperParameters hyperParameters;
 		//hyperParameters.m_sigma = ndReal(0.25f);
 		hyperParameters.m_discountFactor = ndReal(0.99f);
-		hyperParameters.m_extraTrajectorySteps = 6000;
+		hyperParameters.m_maxTrajectorySteps = 6000;
 		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(hyperParameters));
 		#else
 		char fileName[1024];

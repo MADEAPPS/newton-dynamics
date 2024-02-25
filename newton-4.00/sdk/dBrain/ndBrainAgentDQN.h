@@ -41,10 +41,10 @@ class ndBrainAgentDQN: public ndBrainAgent
 	void OptimizeStep();
 	bool IsTrainer() const;
 	bool IsTerminal() const;
-	ndBrainFloat GetReward() const;
+	ndBrainFloat CalculateReward();
 	ndInt32 GetEpisodeFrames() const;
 	
-	void Save(ndBrainSave* const loadSave) const;
+	void Save(ndBrainSave* const loadSave);
 
 	void InitWeights();
 	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
@@ -86,7 +86,7 @@ bool ndBrainAgentDQN<statesDim, actionDim>::IsTerminal() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDQN<statesDim, actionDim>::GetReward() const
+ndBrainFloat ndBrainAgentDQN<statesDim, actionDim>::CalculateReward()
 {
 	ndAssert(0);
 	return ndBrainFloat(0.0f);
@@ -106,7 +106,7 @@ ndInt32 ndBrainAgentDQN<statesDim, actionDim>::GetEpisodeFrames() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN<statesDim, actionDim>::Save(ndBrainSave* const) const
+void ndBrainAgentDQN<statesDim, actionDim>::Save(ndBrainSave* const)
 {
 	ndAssert(0);
 }

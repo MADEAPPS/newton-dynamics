@@ -115,7 +115,7 @@ namespace ndUnicycle
 				m_model->GetObservation(observation);
 			}
 
-			virtual void ApplyActions(ndBrainFloat* const actions) const
+			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
 				m_model->ApplyActions(actions);
 			}
@@ -184,7 +184,7 @@ namespace ndUnicycle
 				return fail;
 			}
 
-			ndBrainFloat GetReward() const
+			ndBrainFloat CalculateReward()
 			{
 				if (IsTerminal())
 				{
@@ -211,7 +211,7 @@ namespace ndUnicycle
 				}
 			}
 
-			virtual void ApplyActions(ndBrainFloat* const actions) const
+			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
 				#ifndef D_USE_VANILLA_POLICY_GRAD
 					if (GetEpisodeFrames() >= 15000)
@@ -378,7 +378,7 @@ namespace ndUnicycle
 			}
 		}
 
-		void ApplyActions(ndBrainFloat* const actions) const
+		void ApplyActions(ndBrainFloat* const actions)
 		{
 			ndFloat32 legAngle = ndFloat32(actions[m_softLegControl]) * ND_MAX_LEG_ANGLE_STEP + m_legJoint->GetAngle();
 			legAngle = ndClamp (legAngle, -ND_MAX_LEG_JOINT_ANGLE, ND_MAX_LEG_JOINT_ANGLE);

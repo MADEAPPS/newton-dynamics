@@ -81,7 +81,7 @@ namespace ndCarpole_0
 				m_model->GetObservation(observation);
 			}
 
-			virtual void ApplyActions(ndBrainFloat* const actions) const
+			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
 				m_model->ApplyActions(actions);
 			}
@@ -138,12 +138,12 @@ namespace ndCarpole_0
 				}
 			}
 
-			ndBrainFloat GetReward() const
+			ndBrainFloat CalculateReward()
 			{
 				return m_model->GetReward();
 			}
 
-			virtual void ApplyActions(ndBrainFloat* const actions) const
+			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
 				if (GetEpisodeFrames() >= 10000)
 				{
@@ -269,7 +269,7 @@ namespace ndCarpole_0
 			return ndReal(reward);
 		}
 
-		void ApplyActions(ndBrainFloat* const actions) const
+		void ApplyActions(ndBrainFloat* const actions)
 		{
 			ndVector force(m_cart->GetForce());
 			ndInt32 action = ndInt32(actions[0]);

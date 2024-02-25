@@ -34,7 +34,7 @@ ndBrainAgent::~ndBrainAgent()
 {
 }
 
-void ndBrainAgent::SaveToFile(const char* const pathFilename) const
+void ndBrainAgent::SaveToFile(const char* const pathFilename)
 {
 	class SaveAgent: public ndBrainSave
 	{

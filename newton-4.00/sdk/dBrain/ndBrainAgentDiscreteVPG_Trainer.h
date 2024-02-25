@@ -110,21 +110,19 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	void Step();
 	void OptimizeStep();
 
-	void Save(ndBrainSave* const loadSave) const;
+	void Save(ndBrainSave* const loadSave);
 
 	void InitWeights();
 	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 
 	bool IsSampling() const;
 	bool IsTerminal() const;
-	ndBrainFloat GetReward() const;
+	ndBrainFloat CalculateReward();
 
 	private:
 	void Optimize();
 	void BackPropagate();
 	void SaveTrajectory();
-
-	void CalcucateRewards();
 	ndBrainFloat SelectAction(const ndBrainVector& probabilities) const;
 
 	protected:
@@ -355,7 +353,7 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::BackPropagate()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Save(ndBrainSave* const loadSave) const
+void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Save(ndBrainSave* const loadSave)
 {
 	loadSave->Save(&m_actor);
 }
@@ -368,24 +366,10 @@ bool ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::IsTerminal() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::GetReward() const
+ndBrainFloat ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::CalculateReward()
 {
 	ndAssert(0);
 	return ndBrainFloat(0.0f);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::CalcucateRewards()
-{
-	const ndInt32 steps = m_trajectory.GetCount();
-
-	// using the Bellman equation.
-	for (ndInt32 i = steps - 2; i >= 0; --i)
-	{
-		m_trajectory[i].m_reward += m_gamma * m_trajectory[i + 1].m_reward;
-	}
-	m_averageQvalue.Update(ndReal(m_trajectory[0].m_reward));
-	m_averageFramesPerEpisodes.Update(ndReal(steps));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -417,9 +401,19 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Optimize()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 {
-	CalcucateRewards();
-	const ndInt32 steps = ndMin(m_maxTrajectorySteps, m_trajectory.GetCount());
-	for (ndInt32 i = 0; i < steps; ++i)
+	// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
+	ndReal averageGain = m_trajectory[m_trajectory.GetCount() - 1].m_reward;
+	for (ndInt32 i = m_trajectory.GetCount() - 2; i >= 0; --i)
+	{
+		m_trajectory[i].m_reward += m_gamma * m_trajectory[i + 1].m_reward;
+		averageGain += m_trajectory[i].m_reward;
+	}
+	//m_averageQvalue.Update(ndReal(m_trajectory[0].m_reward));
+	m_averageQvalue.Update(averageGain / ndReal(m_trajectory.GetCount()));
+	m_averageFramesPerEpisodes.Update(ndReal(m_trajectory.GetCount()));
+
+	const ndInt32 clippedTrajectorySteps = ndMin(m_maxTrajectorySteps, m_trajectory.GetCount());
+	for (ndInt32 i = 0; i < clippedTrajectorySteps; ++i)
 	{
 		m_trajectoryAccumulator.PushBack(m_trajectory[i]);
 	}
@@ -462,7 +456,7 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Step()
 	m_actor.MakePrediction(trajectoryStep.m_observation, probability, m_workingBuffer);
 	trajectoryStep.m_action = SelectAction(probability);
 	ApplyActions(&trajectoryStep.m_action);
-	trajectoryStep.m_reward = GetReward();
+	trajectoryStep.m_reward = CalculateReward();
 	
 	ndAssert(m_trajectory.GetCount() < m_trajectory.GetCapacity());
 	m_trajectory.PushBack(trajectoryStep);

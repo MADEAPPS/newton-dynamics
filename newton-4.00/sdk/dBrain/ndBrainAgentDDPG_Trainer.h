@@ -95,10 +95,10 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void Optimize();
 	void OptimizeStep();
 	bool IsTrainer() const;
-	void Save(ndBrainSave* const loadSave) const;
+	void Save(ndBrainSave* const loadSave);
 	bool IsSampling() const;
 	bool IsTerminal() const;
-	ndBrainFloat GetReward() const;
+	ndBrainFloat CalculateReward();
 	void SetBufferSize(ndInt32 size);
 	void BackPropagateActor(const ndUnsigned32* const bashIndex);
 	void BackPropagateCritic(const ndUnsigned32* const bashIndex);
@@ -462,7 +462,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagate()
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Save(ndBrainSave* const loadSave) const
+void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Save(ndBrainSave* const loadSave)
 {
 	loadSave->Save(&m_actor);
 }
@@ -475,7 +475,7 @@ bool ndBrainAgentDDPG_Trainer<statesDim, actionDim>::IsTerminal() const
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDDPG_Trainer<statesDim, actionDim>::GetReward() const
+ndBrainFloat ndBrainAgentDDPG_Trainer<statesDim, actionDim>::CalculateReward()
 {
 	ndAssert(0);
 	return ndBrainFloat(0.0f);
@@ -525,7 +525,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 	SelectAction(&m_currentTransition.m_action[0]);
 	ApplyActions(&m_currentTransition.m_action[0]);
 
-	m_currentTransition.m_reward = GetReward();
+	m_currentTransition.m_reward = CalculateReward();
 	if (!IsSampling())
 	{
 		// Get Q vale from Critic
