@@ -504,7 +504,7 @@ namespace ndQuadruped_1
 
 					if (episodeCount && !IsSampling())
 					{
-						ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						ndExpandTraceMessage("steps: %d\treward: %g\t trajectoryFrames: %g\n", GetFramesCount(), m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 						if (m_outFile)
 						{
 							fprintf(m_outFile, "%g\n", m_averageQvalue.GetAverage());
@@ -1794,6 +1794,7 @@ namespace ndQuadruped_1
 			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
 				m_model->ApplyActions(actions);
+				m_model->ApplyActions(actions);
 			}
 
 			void GetObservation(ndBrainFloat* const observation)
@@ -1880,7 +1881,7 @@ namespace ndQuadruped_1
 
 					if (episodeCount && !IsSampling())
 					{
-						ndExpandTraceMessage("step: %d\treward: %g\tframes: %g\n", GetFramesCount(), m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", GetFramesCount(), m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 						if (m_outFile)
 						{
 							fprintf(m_outFile, "%g\n", m_averageQvalue.GetAverage());
@@ -1894,7 +1895,7 @@ namespace ndQuadruped_1
 						m_modelIsTrained = true;
 						m_actor.CopyFrom(m_bestActor);
 						//ndGetWorkingFileName(GetName().GetStr(), fileName);
-						ndGetWorkingFileName("ndQuadruped_1VPG_.dnn", fileName);
+						ndGetWorkingFileName("ndQuadruped_1VPG_final.dnn", fileName);
 						SaveToFile(fileName);
 						ndExpandTraceMessage("saving to file: %s\n", fileName);
 						ndExpandTraceMessage("training complete\n");
