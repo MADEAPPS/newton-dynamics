@@ -43,6 +43,18 @@ ndContactArray::~ndContactArray()
 {
 }
 
+ndInt32 ndContactArray::GetActiveContacts() const
+{
+	ndInt32 count = 0;
+	ndScopeSpinLock lock(m_lock);
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		ndContact* const contact = m_array[i];
+		count += contact->IsActive() ? 1 : 0;
+	}
+	return count;
+}
+
 ndContact* ndContactArray::CreateContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 {
 	ndContact* const contact = new ndContact;

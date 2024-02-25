@@ -36,8 +36,10 @@ class ndContactArray : public ndArray<ndContact*>
 	void DetachContact(ndContact* const contact);
 	ndContact* CreateContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 
-	ndSpinLock m_lock;
-};
+	D_COLLISION_API ndInt32 GetActiveContacts() const;
 
+	private:
+	mutable ndSpinLock m_lock;
+};
 
 #endif
