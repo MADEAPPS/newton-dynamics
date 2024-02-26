@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	#define CONTROLLER_NAME "ndQuadruped_1VPG.dnn"
 
@@ -31,10 +31,9 @@ namespace ndQuadruped_1
 	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
 	#define D_MIN_REWARD_ANGLE		ndReal(ndFloat32 (30.0f) * ndDegreeToRad)
 
-	#define D_SWING_STEP			ndReal(0.005f)
-	#define D_EFFECTOR_STEP			ndReal(0.1f)
+	#define D_SWING_STEP			ndReal(0.02f)
+	//#define D_EFFECTOR_STEP		ndReal(0.1f)
 	#define ND_AGENT_INPUTSIZE		(4 * m_legObservationsSize + m_actionsSize)
-
 
 	enum ndActionSpace
 	{
