@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 
 	#define CONTROLLER_NAME "ndQuadruped_1VPG.dnn"
 
@@ -426,8 +426,7 @@ namespace ndQuadruped_1
 						char fileName[1024];
 						m_modelIsTrained = true;
 						m_actor.CopyFrom(m_bestActor);
-						//ndGetWorkingFileName(GetName().GetStr(), fileName);
-						ndGetWorkingFileName("ndQuadruped_1VPG_final.dnn", fileName);
+						ndGetWorkingFileName(GetName().GetStr(), fileName);
 						SaveToFile(fileName);
 						ndExpandTraceMessage("saving to file: %s\n", fileName);
 						ndExpandTraceMessage("training complete\n");
