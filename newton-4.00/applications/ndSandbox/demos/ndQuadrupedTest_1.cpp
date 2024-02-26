@@ -325,7 +325,6 @@ namespace ndQuadruped_1
 			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
 				m_model->ApplyActions(actions);
-				m_model->ApplyActions(actions);
 			}
 
 			void GetObservation(ndBrainFloat* const observation)
