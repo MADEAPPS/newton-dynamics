@@ -31,8 +31,9 @@ namespace ndQuadruped_1
 	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
 	#define D_MIN_REWARD_ANGLE		ndReal(ndFloat32 (30.0f) * ndDegreeToRad)
 
-	#define D_SWING_STEP			ndReal(0.02f)
-	//#define D_EFFECTOR_STEP		ndReal(0.1f)
+	//#define D_SWING_STEP			ndReal(0.01f)
+	#define D_SWING_STEP			ndReal(0.005f)
+
 	#define ND_AGENT_INPUTSIZE		(4 * m_legObservationsSize + m_actionsSize)
 
 	enum ndActionSpace
@@ -639,6 +640,7 @@ namespace ndQuadruped_1
 				const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
 				info->m_footHinge->SetTargetAngle(angle);
 			}
+
 			m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), m_world, timestep);
 			m_invDynamicsSolver.Solve();
 			m_invDynamicsSolver.SolverEnd();
@@ -741,7 +743,7 @@ namespace ndQuadruped_1
 				//ndFloat32 dist = ndFloat32(1.0f) - ndFloat32 (ndSqrt (error.DotProduct(error).GetScalar()));
 				//ndFloat32 dist = ndFloat32(1.0f) - ndFloat32 (error.DotProduct(error).GetScalar());
 				//reward = (dist2 < ndBrainFloat(1.0e-5f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-				reward = ndBrainFloat(ndExp(-ndBrainFloat(10000.0f) * dist2));
+				reward = ndBrainFloat(ndExp(-ndBrainFloat(200.0f) * dist2));
 				//ndTrace(("d2(% f) r(% f)\n", dist2, reward));
 			}
 			else
@@ -1034,6 +1036,8 @@ using namespace ndQuadruped_1;
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 {
 	// build a floor
+	ndSetRandSeed(94157);
+
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildFlatPlane(scene, true);
 
