@@ -281,6 +281,7 @@ namespace ndQuadruped_1
 				,m_killCounter(0)
 				,m_startTraining(0)
 				,m_stopTraining(50000000)
+				,m_lastEpisode(-1)
 				,m_modelIsTrained(false)
 			{
 				SetName(CONTROLLER_NAME);
@@ -404,9 +405,13 @@ namespace ndQuadruped_1
 					{
 						if (m_averageQvalue.GetAverage() > m_maxGain)
 						{
-							m_bestActor.CopyFrom(m_actor);
-							m_maxGain = m_averageQvalue.GetAverage();
-							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
+							if (m_lastEpisode != GetEposideCount())
+							{
+								m_bestActor.CopyFrom(m_actor);
+								m_maxGain = m_averageQvalue.GetAverage();
+								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
+								m_lastEpisode = GetEposideCount();
+							}
 						}
 					}
 
@@ -446,6 +451,7 @@ namespace ndQuadruped_1
 			ndInt32 m_killCounter;
 			ndInt32 m_startTraining;
 			ndInt32 m_stopTraining;
+			ndInt32 m_lastEpisode;
 			bool m_modelIsTrained;
 		};
 
