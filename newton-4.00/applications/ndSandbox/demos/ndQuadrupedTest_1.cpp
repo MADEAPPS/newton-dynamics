@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 
 	#define CONTROLLER_NAME "ndQuadruped_1VPG.dnn"
 
