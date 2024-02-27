@@ -650,9 +650,11 @@ namespace ndQuadruped_1
 			//m_control->m_animSpeed = 0.25f;
 			//ApplyPoseGeneration(combinedActions);
 
-			m_control->m_x = ndClamp(ndReal(m_control->m_x + actions[m_move_x] * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
-			m_control->m_z = ndClamp(ndReal(m_control->m_z + actions[m_move_z] * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
-
+			if (m_control->m_enableController)
+			{
+				m_control->m_x = ndClamp(ndReal(m_control->m_x + actions[m_move_x] * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
+				m_control->m_z = ndClamp(ndReal(m_control->m_z + actions[m_move_z] * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
+			}
 			UpdatePose(m_timestep);
 		}
 
@@ -760,9 +762,8 @@ namespace ndQuadruped_1
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
-			//m_animBlendTree->Update(timestep * m_control->m_animSpeed);
+			m_animBlendTree->Update(timestep * m_control->m_animSpeed);
 			ndModelArticulation::PostUpdate(world, timestep);
-			//m_agent->OptimizeStep();
 			CheckTrainingCompleted();
 		}
 
