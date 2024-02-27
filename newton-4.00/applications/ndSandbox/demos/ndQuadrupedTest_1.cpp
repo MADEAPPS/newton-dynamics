@@ -277,10 +277,8 @@ namespace ndQuadruped_1
 				,m_model(nullptr)
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_maxGain(-1.0e10f)
-				,m_maxFrames(5000)
-				,m_killCounter(0)
-				,m_startTraining(0)
-				,m_stopTraining(50000000)
+				,m_maxFrames(3500)
+				,m_stopTraining(5000000)
 				,m_lastEpisode(-1)
 				,m_modelIsTrained(false)
 			{
@@ -310,17 +308,12 @@ namespace ndQuadruped_1
 
 			ndBrainFloat CalculateReward()
 			{
-				ndBrainFloat reward = m_model->CalculateReward();
-				if (reward > ndBrainFloat(0.4f))
-				{
-					m_killCounter = 0;
-				}
-
 				if (IsTerminal())
 				{
 					return ndBrainFloat(-1.0f);
 				}
 
+				ndBrainFloat reward = m_model->CalculateReward();
 				return reward;
 			}
 
@@ -336,37 +329,27 @@ namespace ndQuadruped_1
 
 			bool IsTerminal() const
 			{
-				//ndAssert(0);
-				////ndBrainFloat maxVal = ndBrainFloat(0.0f);
-				////const ndBrainFloat* const stateActions = &m_currentTransition.m_observation[0];
-				////ndInt32 actionIndex = 0;
-				////for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
-				////{
-				////	ndBrainFloat error0 = stateActions[actionIndex + m_leg0_anim_posit_x] - stateActions[actionIndex + m_leg0_posit_x];
-				////	ndBrainFloat error1 = stateActions[actionIndex + m_leg0_anim_posit_y] - stateActions[actionIndex + m_leg0_posit_y];
-				////	ndBrainFloat error2 = stateActions[actionIndex + m_leg0_anim_posit_z] - stateActions[actionIndex + m_leg0_posit_z];
-				////	maxVal = ndMax(maxVal, ndAbs(error0));
-				////	maxVal = ndMax(maxVal, ndAbs(error1));
-				////	maxVal = ndMax(maxVal, ndAbs(error2));
-				////	actionIndex += (m_leg1_anim_posit_x - m_leg0_anim_posit_x);
-				////  actionIndex += 9;
-				////}
-				////ndFloat32 dev = ndBrainFloat(0.5f) * D_EFFECTOR_STEP;
-				////bool state = (maxVal > dev) ? true : false;
-				////state = state && (m_startTraning >= 64);
-				//
-				//return m_model->IsTerminal();
-				if (m_killCounter > 256)
+				for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
 				{
-					return true;
+					const ndAnimKeyframe& keyFrame = m_model->m_animPose[i];
+					//ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
+					//ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+
+					if (!keyFrame.m_userParamInt)
+					{
+						ndContact* const contact = m_model->FindContact(i);
+						if (contact && contact->IsActive())
+						{
+							return true;
+						}
+					}
 				}
+
 				return false;
 			}
 
 			void ResetModel()
 			{
-				m_killCounter = 0;
-				m_startTraining = 0;
 				m_model->m_control->Reset();
 				for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
 				{
@@ -376,20 +359,8 @@ namespace ndQuadruped_1
 
 			void Step()
 			{
-				if (m_startTraining > 100)
-				{
-					ndBrainAgentContinueVPG_Trainer::Step();
-					OptimizeStep();
-					m_killCounter++;
-				}
-				else
-				{
-					ndBrainFixSizeVector<m_actionsSize> actions;
-					actions.Set(ndBrainFloat(0.0f));
-					m_model->ApplyActions(&actions[0]);
-				}
-
-				m_startTraining++;
+				ndBrainAgentContinueVPG_Trainer::Step();
+				OptimizeStep();
 			}
 
 			void OptimizeStep()
@@ -448,8 +419,6 @@ namespace ndQuadruped_1
 			ndUnsigned64 m_timer;
 			ndFloat32 m_maxGain;
 			ndInt32 m_maxFrames;
-			ndInt32 m_killCounter;
-			ndInt32 m_startTraining;
 			ndInt32 m_stopTraining;
 			ndInt32 m_lastEpisode;
 			bool m_modelIsTrained;
@@ -858,7 +827,7 @@ namespace ndQuadruped_1
 		ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUTSIZE, m_actionsSize>::HyperParameters hyperParameters;
 		//hyperParameters.m_sigma = ndReal(0.25f);
 		hyperParameters.m_discountFactor = ndReal(0.99f);
-		hyperParameters.m_maxTrajectorySteps = 6000;
+		hyperParameters.m_maxTrajectorySteps = 4000;
 		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(hyperParameters));
 		#else
 		char fileName[1024];
