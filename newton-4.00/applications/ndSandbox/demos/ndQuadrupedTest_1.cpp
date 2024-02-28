@@ -643,13 +643,11 @@ namespace ndQuadruped_1
 
 		void ApplyActions(ndBrainFloat* const actions)
 		{
-			////m_control->m_animSpeed = 4.0f;
-			////m_control->m_animSpeed = 2.0f;
-			////m_control->m_animSpeed = 1.0f;
-			////m_control->m_animSpeed = 0.5f;
+			//m_control->m_animSpeed = 4.0f;
+			//m_control->m_animSpeed = 2.0f;
+			//m_control->m_animSpeed = 1.0f;
+			//m_control->m_animSpeed = 0.5f;
 			//m_control->m_animSpeed = 0.25f;
-			//ApplyPoseGeneration(combinedActions);
-
 			if (m_control->m_enableController)
 			{
 				m_control->m_x = ndClamp(ndReal(m_control->m_x + actions[m_move_x] * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
