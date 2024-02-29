@@ -125,9 +125,9 @@ namespace ndQuadruped_1
 					//t = m_gaitFraction / 2;
 					if (t <= m_gaitFraction)
 					{
-						if (i == 0)
-							//if ((i == 0) || (i == 3))
-							//if ((i == 1) || (i == 2))
+						//if (i == 0)
+						//if ((i == 0) || (i == 3))
+						//if ((i == 1) || (i == 2))
 						{
 							//m_stanceMask = m_stanceMask ^ (1 << i);
 							output[i].m_userParamInt = 0;
@@ -642,9 +642,10 @@ namespace ndQuadruped_1
 		{
 			//m_control->m_animSpeed = 4.0f;
 			//m_control->m_animSpeed = 2.0f;
-			m_control->m_animSpeed = 1.0f;
+			//m_control->m_animSpeed = 1.0f;
 			//m_control->m_animSpeed = 0.5f;
 			//m_control->m_animSpeed = 0.25f;
+			m_control->m_animSpeed = 0.1f;
 			m_control->m_enableController = 0;
 
 			if (m_control->m_enableController)
