@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	#define CONTROLLER_NAME "ndQuadruped_1VPG.dnn"
 
@@ -38,7 +38,7 @@ namespace ndQuadruped_1
 
 	enum ndActionSpace
 	{
-		m_move_x,
+		//m_move_x,
 		m_move_z,
 		m_actionsSize
 	};
@@ -329,9 +329,6 @@ namespace ndQuadruped_1
 				for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
 				{
 					const ndAnimKeyframe& keyFrame = m_model->m_animPose[i];
-					//ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-					//ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-
 					if (!keyFrame.m_userParamInt)
 					{
 						ndContact* const contact = m_model->FindContact(i);
@@ -560,7 +557,7 @@ namespace ndQuadruped_1
 			}
 			else if (desiredSupportPoint.GetCount() == 2)
 			{
-				ndAssert(0);
+				ndTrace(("xxxxxxxxxx\n"));
 				context.DrawLine(desiredSupportPoint[0], desiredSupportPoint[1], supportColor);
 				//ndBigVector p0Out;
 				//ndBigVector p1Out;
@@ -644,13 +641,13 @@ namespace ndQuadruped_1
 			//m_control->m_animSpeed = 2.0f;
 			//m_control->m_animSpeed = 1.0f;
 			//m_control->m_animSpeed = 0.5f;
-			//m_control->m_animSpeed = 0.25f;
-			m_control->m_animSpeed = 0.1f;
-			m_control->m_enableController = 0;
+			m_control->m_animSpeed = 0.25f;
+			//m_control->m_animSpeed = 0.1f;
 
+			//m_control->m_enableController = 0;
 			if (m_control->m_enableController)
 			{
-				m_control->m_x = ndClamp(ndReal(m_control->m_x + actions[m_move_x] * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
+				//m_control->m_x = ndClamp(ndReal(m_control->m_x + actions[m_move_x] * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
 				m_control->m_z = ndClamp(ndReal(m_control->m_z + actions[m_move_z] * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
 			}
 			UpdatePose(m_timestep);
@@ -680,7 +677,7 @@ namespace ndQuadruped_1
 			}
 
 			ndBrainFloat* const input = &observation[m_legObservationsSize * 4];
-			input[m_move_x] = m_control->m_x;
+			//input[m_move_x] = m_control->m_x;
 			input[m_move_z] = m_control->m_z;
 		}
 
@@ -867,10 +864,9 @@ namespace ndQuadruped_1
 		
 		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
 		ndFloat32 offset[] = { -0.3f, 0.3f, -0.3f, 0.3f };
-		////ndFloat32 phase[] = { 0.0f, 0.5f, 0.0f, 0.5f};
-		////ndSharedPtr<ndAnimationSequence> sequence(new ndRobot::ndPoseGenerator(0.47f, phase));
 		
-		ndFloat32 phase[] = { 0.0f, 0.5f, 0.25f, 0.75f };
+		//ndFloat32 phase[] = { 0.0f, 0.75f, 0.25f, 0.5f };
+		ndFloat32 phase[] = { 0.0f, 0.25f, 0.5f, 0.75f };
 		ndSharedPtr<ndAnimationSequence> sequence(new ndRobot::ndPoseGenerator(0.24f, phase));
 		
 		model->m_poseGenerator = new ndAnimationSequencePlayer(sequence);
@@ -1033,7 +1029,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	world->AddModel(model);
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
+	//world->AddJoint(fixJoint);
 
 	ndSharedPtr<ndUIEntity> quadrupedUI (new ndModelUI(scene, model));
 	scene->Set2DDisplayRenderFunction(quadrupedUI);

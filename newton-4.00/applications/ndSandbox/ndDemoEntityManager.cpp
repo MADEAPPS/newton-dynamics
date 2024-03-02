@@ -441,7 +441,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	// initialized the physics world for the new scene
 	//m_showUI = false;
 	//m_showAABB = true;
-	//m_hideVisualMeshes = true;
+	m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
 	//m_showMeshSkeleton = true;
@@ -457,12 +457,12 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
 	m_showNormalForces = true;
-	//m_showContactPoints = true;
+	m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
 	m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
-	//m_collisionDisplayMode = 3;		// solid wire frame
+	m_collisionDisplayMode = 3;		// solid wire frame
 	m_synchronousPhysicsUpdate = true;
 	m_synchronousParticlesUpdate = true;
 
