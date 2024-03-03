@@ -27,6 +27,14 @@ ndAnimationBlendTreeNode::~ndAnimationBlendTreeNode()
 	}
 }
 
+void ndAnimationBlendTreeNode::SetTime(ndFloat32 dt)
+{
+	if (m_input)
+	{
+		m_input->SetTime(dt);
+	}
+}
+
 void ndAnimationBlendTreeNode::Update(ndFloat32 dt)
 {
 	if (m_input)

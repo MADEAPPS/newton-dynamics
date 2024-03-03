@@ -192,8 +192,8 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, hyperParameters.m_hiddenLayersNumberOfNeurons));
 		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons));
 	}
-	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, m_actionsSize));
-	layers.PushBack(new ndBrainLayerTanhActivation(m_actionsSize));
+	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, actionDim));
+	layers.PushBack(new ndBrainLayerTanhActivation(actionDim));
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		m_actor.AddLayer(layers[i]);

@@ -24,6 +24,36 @@ namespace ndQuadruped_1
 {
 	#define ND_TRAIN_MODEL
 
+	#ifndef ND_TRAIN_MODEL
+		#define ND_XXXXXXXXXX
+	#endif
+
+	class ndLegObsevation
+	{
+		public:
+		ndBrainFloat m_posit_x;
+		ndBrainFloat m_posit_y;
+		ndBrainFloat m_posit_z;
+		ndBrainFloat m_veloc_x;
+		ndBrainFloat m_veloc_y;
+		ndBrainFloat m_veloc_z;
+		ndBrainFloat m_isLegLifted;
+	};
+
+	class ndActionVector
+	{
+		public:
+		ndBrainFloat m_x;
+		ndBrainFloat m_z;
+	};
+
+	class ndObsevationVector
+	{
+		public:
+		ndLegObsevation n_legs[4];
+		ndActionVector m_torso;
+	};
+
 	#define CONTROLLER_NAME "ndQuadruped_1VPG.dnn"
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
@@ -34,27 +64,8 @@ namespace ndQuadruped_1
 	//#define D_SWING_STEP			ndReal(0.01f)
 	#define D_SWING_STEP			ndReal(0.005f)
 
-	#define ND_AGENT_INPUTSIZE		(4 * m_legObservationsSize + m_actionsSize)
-
-	enum ndActionSpace
-	{
-		//m_move_x,
-		m_move_z,
-		m_actionsSize
-	};
-
-	enum ndObsevationSpace
-	{
-		posit_x,
-		posit_y,
-		posit_z,
-		veloc_x,
-		veloc_y,
-		veloc_z,
-		support,
-		desired_support,
-		m_legObservationsSize
-	};
+	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObsevationVector) / sizeof (ndBrainFloat))
+	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
 
 	class ndRobot : public ndModelArticulation
 	{
@@ -117,23 +128,25 @@ namespace ndQuadruped_1
 				ndAssert(param <= ndFloat32(1.0f));
 
 				ndFloat32 omega = ndPi / m_gaitFraction;
+				
+				ndFloat32 ycontact = D_POSE_REST_POSITION_Y + m_amp / 2.0f;
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
 				{
-					output[i].m_userParamInt = 1;
+					output[i].m_userParamInt = 0;
 					output[i].m_posit = BasePose(i);
 					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
 					//t = m_gaitFraction / 2;
 					if (t <= m_gaitFraction)
 					{
-						//if (i == 0)
-						//if ((i == 0) || (i == 3))
+						if (i == 0)
+						//if ((i == 0) || (i == 1))
 						//if ((i == 1) || (i == 2))
 						{
-							//m_stanceMask = m_stanceMask ^ (1 << i);
-							output[i].m_userParamInt = 0;
 							output[i].m_posit.m_y += m_amp * ndSin(omega * t);
+							output[i].m_userParamInt = output[i].m_posit.m_y < ycontact ? -1 : 1;
 						}
 					}
+
 					m_currentPose[i] = output[i].m_posit;
 				}
 			}
@@ -204,11 +217,11 @@ namespace ndQuadruped_1
 		};
 
 		// implement controller player
-		class ndController : public ndBrainAgentContinueVPG<ND_AGENT_INPUTSIZE, m_actionsSize>
+		class ndController : public ndBrainAgentContinueVPG<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>
 		{
 			public:
 			ndController(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentContinueVPG<ND_AGENT_INPUTSIZE, m_actionsSize>(actor)
+				:ndBrainAgentContinueVPG<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(actor)
 				,m_model(nullptr)
 			{
 			}
@@ -231,7 +244,7 @@ namespace ndQuadruped_1
 			ndRobot* m_model;
 		};
 
-		class ndControllerAgent_trainer : public ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUTSIZE, m_actionsSize>
+		class ndControllerAgent_trainer : public ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>
 		{
 			public:
 			class ndBasePose
@@ -253,7 +266,8 @@ namespace ndQuadruped_1
 
 				void SetPose() const
 				{
-					m_body->SetMatrix(ndCalculateMatrix(m_rotation, m_posit));
+					const ndMatrix matrix(ndCalculateMatrix(m_rotation, m_posit));
+					m_body->SetMatrix(matrix);
 					m_body->SetOmega(m_omega);
 					m_body->SetVelocity(m_veloc);
 				}
@@ -266,10 +280,9 @@ namespace ndQuadruped_1
 			};
 
 			ndControllerAgent_trainer(const HyperParameters& hyperParameters)
-				:ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUTSIZE, m_actionsSize>(hyperParameters)
+				:ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters)
 				,m_bestActor(m_actor)
 				,m_basePose()
-				,m_bodies()
 				,m_outFile(nullptr)
 				,m_model(nullptr)
 				,m_timer(ndGetTimeInMicroseconds())
@@ -297,9 +310,7 @@ namespace ndQuadruped_1
 				m_model = model;
 				for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 				{
-					ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-					m_bodies.PushBack(body);
-					m_basePose.PushBack(body);
+					m_basePose.PushBack(node->m_body->GetAsBodyDynamic());
 				}
 			}
 
@@ -326,20 +337,48 @@ namespace ndQuadruped_1
 
 			bool IsTerminal() const
 			{
+				bool airborneLeg[4];
+				ndContact* contacts[4];
+
+				int isGround = 4;
+				for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
+				{
+					ndContact* const contact = m_model->FindContact(i);
+					bool isAirborne = !(contact && contact->IsActive());
+					contacts[i] = contact;
+					airborneLeg[i] = isAirborne;
+					isGround -= ndInt32 (isAirborne);
+				}
+				if (isGround < 3)
+				{
+					return false;
+				}
+				
+				bool isTerminal = false;
+
+				bool xxxx[4];
 				for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
 				{
 					const ndAnimKeyframe& keyFrame = m_model->m_animPose[i];
-					if (!keyFrame.m_userParamInt)
+					bool animAirborneLeg = airborneLeg[i];
+					if (keyFrame.m_userParamInt == 0)
 					{
-						ndContact* const contact = m_model->FindContact(i);
-						if (contact && contact->IsActive())
-						{
-							return true;
-						}
+						animAirborneLeg = false;
 					}
+					else if (keyFrame.m_userParamInt == 1)
+					{
+						animAirborneLeg = true;
+					}
+					xxxx[i] = animAirborneLeg;
+					isTerminal = isTerminal || (animAirborneLeg != airborneLeg[i]);
 				}
 
-				return false;
+				if (isTerminal)
+				{
+					isTerminal = true;
+				}
+				
+				return isTerminal;
 			}
 
 			void ResetModel()
@@ -349,6 +388,10 @@ namespace ndQuadruped_1
 				{
 					m_basePose[i].SetPose();
 				}
+				m_model->m_animBlendTree->SetTime(0.0f);
+
+				//ndObsevationVector observation;
+				//m_model->GetObservation((ndBrainFloat*) &observation);
 			}
 
 			void Step()
@@ -359,6 +402,11 @@ namespace ndQuadruped_1
 
 			void OptimizeStep()
 			{
+				if (GetEposideCount() >= 440)
+				{
+					GetEposideCount();
+				}
+
 				ndInt32 stopTraining = GetFramesCount();
 				if (stopTraining <= m_stopTraining)
 				{
@@ -407,7 +455,6 @@ namespace ndQuadruped_1
 
 			ndBrain m_bestActor;
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
-			ndFixSizeArray<ndBodyDynamic*, 32> m_bodies;
 			FILE* m_outFile;
 			ndRobot* m_model;
 			ndUnsigned64 m_timer;
@@ -515,7 +562,7 @@ namespace ndQuadruped_1
 					effector->DebugJoint(context);
 				}
 
-				if (keyFrame.m_userParamInt)
+				if (keyFrame.m_userParamInt == 0)
 				{
 					ndBodyKinematic* const body = effector->GetBody0();
 					desiredSupportPoint.PushBack(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit));
@@ -644,41 +691,45 @@ namespace ndQuadruped_1
 			m_control->m_animSpeed = 0.25f;
 			//m_control->m_animSpeed = 0.1f;
 
-			//m_control->m_enableController = 0;
+			#ifdef ND_XXXXXXXXXX
+				m_control->m_enableController = 0;
+			#endif
 			if (m_control->m_enableController)
 			{
-				//m_control->m_x = ndClamp(ndReal(m_control->m_x + actions[m_move_x] * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
-				m_control->m_z = ndClamp(ndReal(m_control->m_z + actions[m_move_z] * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
+				const ndActionVector& actionVector = *((ndActionVector*)actions);
+				m_control->m_x = ndClamp(ndReal(m_control->m_x + actionVector.m_x * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
+				m_control->m_z = ndClamp(ndReal(m_control->m_z + actionVector.m_z * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
 			}
+			
 			UpdatePose(m_timestep);
 		}
 
-		void GetObservation(ndBrainFloat* const observation)
+		void GetObservation(ndBrainFloat* const observationInput)
 		{
+			ndObsevationVector& observation = *((ndObsevationVector*)observationInput);
+static int xxxx;
+xxxx++;
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
 				const ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
 				const ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-
+			
 				ndVector effectPositState;
 				ndVector effectVelocState;
 				effector->GetDynamicState(effectPositState, effectVelocState);
-
-				ndBrainFloat* const input = &observation[i * m_legObservationsSize];
-				input[posit_x] = ndBrainFloat(effectPositState.m_x);
-				input[posit_y] = ndBrainFloat(effectPositState.m_y);
-				input[posit_z] = ndBrainFloat(effectPositState.m_z);
-				input[veloc_x] = ndBrainFloat(effectVelocState.m_x);
-				input[veloc_y] = ndBrainFloat(effectVelocState.m_y);
-				input[veloc_z] = ndBrainFloat(effectVelocState.m_z);
-				input[support] = FindContact(i) ? ndFloat32(1.0f) : ndFloat32(0.0f);
-				input[desired_support] = keyFrame.m_userParamInt ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+			
+				observation.n_legs[i].m_posit_x = ndBrainFloat(effectPositState.m_x);
+				observation.n_legs[i].m_posit_y = ndBrainFloat(effectPositState.m_y);
+				observation.n_legs[i].m_posit_z = ndBrainFloat(effectPositState.m_z);
+				observation.n_legs[i].m_veloc_x = ndBrainFloat(effectVelocState.m_x);
+				observation.n_legs[i].m_veloc_y = ndBrainFloat(effectVelocState.m_y);
+				observation.n_legs[i].m_veloc_z = ndBrainFloat(effectVelocState.m_z);
+				observation.n_legs[i].m_isLegLifted = FindContact(i) ? ndFloat32(0.0f) : ndFloat32(1.0f);;
 			}
 
-			ndBrainFloat* const input = &observation[m_legObservationsSize * 4];
-			//input[m_move_x] = m_control->m_x;
-			input[m_move_z] = m_control->m_z;
+			observation.m_torso.m_x = m_control->m_x;
+			observation.m_torso.m_z = m_control->m_z;
 		}
 
 		ndBrainFloat CalculateReward()
@@ -690,7 +741,7 @@ namespace ndQuadruped_1
 				ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 
-				if (keyFrame.m_userParamInt)
+				if (keyFrame.m_userParamInt == 0)
 				{
 					ndBodyKinematic* const body = effector->GetBody0();
 					desiredSupportPoint.PushBack(ndBigVector(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit)));
@@ -745,7 +796,6 @@ namespace ndQuadruped_1
 			}
 			#endif
 		}
-
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
@@ -820,7 +870,7 @@ namespace ndQuadruped_1
 	{
 		#ifdef ND_TRAIN_MODEL
 		// add a reinforcement learning controller 
-		ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUTSIZE, m_actionsSize>::HyperParameters hyperParameters;
+		ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 		//hyperParameters.m_sigma = ndReal(0.25f);
 		hyperParameters.m_discountFactor = ndReal(0.99f);
 		hyperParameters.m_maxTrajectorySteps = 4000;
@@ -992,6 +1042,7 @@ namespace ndQuadruped_1
 		
 		#ifdef ND_TRAIN_MODEL
 			((ndRobot::ndControllerAgent_trainer*)*agent)->SetModel(model);
+			((ndRobot::ndControllerAgent_trainer*)*agent)->ResetModel();
 			scene->SetAcceleratedUpdate();
 		#else
 			((ndRobot::ndController*)*agent)->SetModel(model);
@@ -1029,7 +1080,9 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	world->AddModel(model);
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	//world->AddJoint(fixJoint);
+#ifdef ND_XXXXXXXXXX
+//	world->AddJoint(fixJoint);
+#endif
 
 	ndSharedPtr<ndUIEntity> quadrupedUI (new ndModelUI(scene, model));
 	scene->Set2DDisplayRenderFunction(quadrupedUI);
