@@ -138,7 +138,7 @@ namespace ndQuadruped_1
 					//t = m_gaitFraction / 2;
 					if (t <= m_gaitFraction)
 					{
-						if (i == 0)
+						if (i == 1)
 						//if ((i == 0) || (i == 1))
 						//if ((i == 1) || (i == 2))
 						{
@@ -288,7 +288,7 @@ namespace ndQuadruped_1
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(3500)
-				,m_stopTraining(5000000)
+				,m_stopTraining(10000000)
 				,m_lastEpisode(-1)
 				,m_modelIsTrained(false)
 			{
@@ -316,10 +316,10 @@ namespace ndQuadruped_1
 
 			ndBrainFloat CalculateReward()
 			{
-				if (IsTerminal())
-				{
-					return ndBrainFloat(-5.0f);
-				}
+				//if (IsTerminal())
+				//{
+				//	return ndBrainFloat(-50.0f);
+				//}
 
 				ndBrainFloat reward = m_model->CalculateReward();
 				return reward;

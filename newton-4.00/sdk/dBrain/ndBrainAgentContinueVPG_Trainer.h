@@ -410,6 +410,7 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Optimize()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 {
+	m_trajectory.SetCount(m_trajectory.GetCount() - 1);
 	// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 	ndReal averageGain = m_trajectory[m_trajectory.GetCount() - 1].m_reward;
 	for (ndInt32 i = m_trajectory.GetCount() - 2; i >= 0; --i)
@@ -417,9 +418,10 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 		m_trajectory[i].m_reward += m_gamma * m_trajectory[i + 1].m_reward;
 		averageGain += m_trajectory[i].m_reward;
 	}
-	
-	m_averageQvalue.Update(averageGain / ndReal(m_trajectory.GetCount()));
+
 	m_averageFramesPerEpisodes.Update(ndReal(m_trajectory.GetCount()));
+	m_averageQvalue.Update(averageGain / ndReal(m_trajectory.GetCount()));
+
 
 	const ndInt32 clippedTrajectorySteps = ndMin(m_maxTrajectorySteps, m_trajectory.GetCount());
 	for (ndInt32 i = 0; i < clippedTrajectorySteps; ++i)
