@@ -318,7 +318,7 @@ namespace ndQuadruped_1
 			{
 				if (IsTerminal())
 				{
-					return ndBrainFloat(-1.0f);
+					return ndBrainFloat(-5.0f);
 				}
 
 				ndBrainFloat reward = m_model->CalculateReward();
@@ -337,48 +337,49 @@ namespace ndQuadruped_1
 
 			bool IsTerminal() const
 			{
-				bool airborneLeg[4];
-				ndContact* contacts[4];
+				ndInt32 count = 0;
+				ndInt32 isGround = 4;
 
-				int isGround = 4;
+				bool airborneLeg[4];
+				bool sequenceAirborne[4];
+				
 				for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
 				{
 					ndContact* const contact = m_model->FindContact(i);
 					bool isAirborne = !(contact && contact->IsActive());
-					contacts[i] = contact;
-					airborneLeg[i] = isAirborne;
-					isGround -= ndInt32 (isAirborne);
+					isGround -= ndInt32(isAirborne);
+
+					const ndAnimKeyframe& keyFrame = m_model->m_animPose[i];
+					if (keyFrame.m_userParamInt != 0)
+					{
+						airborneLeg[count] = isAirborne;
+						if (keyFrame.m_userParamInt == 0)
+						{
+							isAirborne = false;
+						}
+						else if (keyFrame.m_userParamInt == 1)
+						{
+							isAirborne = true;
+						}
+						sequenceAirborne[count] = isAirborne;
+
+						count++;
+					}
 				}
-				if (isGround < 3)
+				if (isGround < 2)
 				{
 					return false;
 				}
-				
-				bool isTerminal = false;
 
-				bool xxxx[4];
-				for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
+				for (ndInt32 i = 0; i < count; ++i)
 				{
-					const ndAnimKeyframe& keyFrame = m_model->m_animPose[i];
-					bool animAirborneLeg = airborneLeg[i];
-					if (keyFrame.m_userParamInt == 0)
+					if (airborneLeg[i] != sequenceAirborne[i])
 					{
-						animAirborneLeg = false;
+						return true;
 					}
-					else if (keyFrame.m_userParamInt == 1)
-					{
-						animAirborneLeg = true;
-					}
-					xxxx[i] = animAirborneLeg;
-					isTerminal = isTerminal || (animAirborneLeg != airborneLeg[i]);
 				}
 
-				if (isTerminal)
-				{
-					isTerminal = true;
-				}
-				
-				return isTerminal;
+				return false;
 			}
 
 			void ResetModel()

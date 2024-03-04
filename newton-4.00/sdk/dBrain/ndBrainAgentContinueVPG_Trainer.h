@@ -417,7 +417,7 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 		m_trajectory[i].m_reward += m_gamma * m_trajectory[i + 1].m_reward;
 		averageGain += m_trajectory[i].m_reward;
 	}
-	//m_averageQvalue.Update(ndReal(m_trajectory[0].m_reward));
+	
 	m_averageQvalue.Update(averageGain / ndReal(m_trajectory.GetCount()));
 	m_averageFramesPerEpisodes.Update(ndReal(m_trajectory.GetCount()));
 
