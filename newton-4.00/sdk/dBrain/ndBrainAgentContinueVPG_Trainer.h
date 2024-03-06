@@ -32,6 +32,8 @@
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 
+#define ND_USE_BASE_LINE_VALUE
+
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThreadPool
 {
@@ -130,10 +132,17 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 
 	protected:
 	ndBrain m_actor;
+#ifdef ND_USE_BASE_LINE_VALUE
+	ndBrain m_baseLineValue;
+#endif
 	ndBrainOptimizerAdam* m_optimizer;
 	ndArray<ndBrainTrainer*> m_trainers;
 	ndArray<ndBrainTrainer*> m_weightedTrainer;
 	ndArray<ndBrainTrainer*> m_auxiliaryTrainers;
+#ifdef ND_USE_BASE_LINE_VALUE
+	ndBrainOptimizerAdam* m_baseLineValueOptimizer;
+	ndArray<ndBrainTrainer*> m_baseLineValueTrainers;
+#endif
 
 	ndArray<ndTrajectoryStep> m_trajectory;
 	ndArray<ndTrajectoryStep> m_trajectoryAccumulator;
@@ -160,10 +169,17 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 	:ndBrainAgent()
 	,ndBrainThreadPool()
 	,m_actor()
+#ifdef ND_USE_BASE_LINE_VALUE
+	,m_baseLineValue()
+#endif
 	,m_optimizer(nullptr)
 	,m_trainers()
 	,m_weightedTrainer()
 	,m_auxiliaryTrainers()
+#ifdef ND_USE_BASE_LINE_VALUE
+	,m_baseLineValueOptimizer(nullptr)
+	,m_baseLineValueTrainers()
+#endif
 	,m_trajectory()
 	,m_trajectoryAccumulator()
 	,m_sigma(hyperParameters.m_sigma)
@@ -182,8 +198,10 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 	,m_averageFramesPerEpisodes()
 {
 	// build neural net
+	SetThreadCount(hyperParameters.m_threadsCount);
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
+	layers.SetCount(0);
 	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
@@ -198,11 +216,11 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 	{
 		m_actor.AddLayer(layers[i]);
 	}
-	InitWeights();
+	m_actor.InitWeightsXavierMethod();
+	ndAssert(!strcmp((m_actor[m_actor.GetCount() - 1])->GetLabelId(), "ndBrainLayerTanhActivation"));
 
 	m_trainers.SetCount(0);
 	m_auxiliaryTrainers.SetCount(0);
-	SetThreadCount(hyperParameters.m_threadsCount);
 	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 	{
 		ndBrainTrainer* const trainer = new ndBrainTrainer(&m_actor);
@@ -215,6 +233,40 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 	m_weightedTrainer.PushBack(m_trainers[0]);
 	m_optimizer = new ndBrainOptimizerAdam();
 	m_optimizer->SetRegularizer(hyperParameters.m_regularizer);
+
+#ifdef ND_USE_BASE_LINE_VALUE
+	layers.SetCount(0);
+	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_hiddenLayersNumberOfNeurons));
+	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
+	{
+		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeurons);
+		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, hyperParameters.m_hiddenLayersNumberOfNeurons));
+		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons));
+	}
+	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, 1));
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		m_baseLineValue.AddLayer(layers[i]);
+	}
+	m_baseLineValue.InitWeightsXavierMethod();
+
+	ndAssert(m_baseLineValue.GetOutputSize() == 1);
+	ndAssert(m_baseLineValue.GetInputSize() == m_actor.GetInputSize());
+	ndAssert(!strcmp((m_baseLineValue[m_baseLineValue.GetCount() - 1])->GetLabelId(), "ndBrainLayerLinear"));
+
+	m_baseLineValueTrainers.SetCount(0);
+	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
+	{
+		ndBrainTrainer* const trainer = new ndBrainTrainer(&m_baseLineValue);
+		m_baseLineValueTrainers.PushBack(trainer);
+	}
+
+	m_baseLineValueOptimizer = new ndBrainOptimizerAdam();
+	//m_baseLineValueOptimizer->SetRegularizer(hyperParameters.m_regularizer);
+	m_baseLineValueOptimizer->SetRegularizer(ndBrainFloat(1.0e-5f));
+
+#endif
 
 	m_trajectory.SetCount(m_maxTrajectorySteps + m_extraTrajectorySteps);
 	m_trajectoryAccumulator.SetCount(m_bashTrajectoryCount * m_maxTrajectorySteps + 1024);
@@ -231,6 +283,14 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::~ndBrainAgentContinueVPG_
 		delete m_auxiliaryTrainers[i];
 	}
 	delete m_optimizer;
+
+#ifdef ND_USE_BASE_LINE_VALUE
+	for (ndInt32 i = 0; i < m_baseLineValueTrainers.GetCount(); ++i)
+	{
+		delete m_baseLineValueTrainers[i];
+	}
+	delete m_baseLineValueOptimizer;
+#endif
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -243,6 +303,10 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::InitWeights()
 {
 	m_actor.InitWeightsXavierMethod();
+
+	#ifdef ND_USE_BASE_LINE_VALUE
+	m_baseLineValue.InitWeightsXavierMethod();
+	#endif
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -421,7 +485,6 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 
 	m_averageFramesPerEpisodes.Update(ndReal(m_trajectory.GetCount()));
 	m_averageQvalue.Update(averageGain / ndReal(m_trajectory.GetCount()));
-
 
 	const ndInt32 clippedTrajectorySteps = ndMin(m_maxTrajectorySteps, m_trajectory.GetCount());
 	for (ndInt32 i = 0; i < clippedTrajectorySteps; ++i)
