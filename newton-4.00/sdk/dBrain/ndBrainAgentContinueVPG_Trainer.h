@@ -452,10 +452,10 @@ ndBrainFloat ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::CalculateRew
 	return ndBrainFloat(0.0f);
 }
 
+#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Optimize()
 {
-
 #ifdef ND_USE_BASE_LINE_VALUE
 	auto CalculateAdavantage = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
@@ -515,6 +515,7 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Optimize()
 	BackPropagate();
 }
 
+#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 {

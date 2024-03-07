@@ -403,11 +403,6 @@ namespace ndQuadruped_1
 
 			void OptimizeStep()
 			{
-				if (GetEposideCount() >= 440)
-				{
-					GetEposideCount();
-				}
-
 				ndInt32 stopTraining = GetFramesCount();
 				if (stopTraining <= m_stopTraining)
 				{
@@ -873,7 +868,7 @@ xxxx++;
 		// add a reinforcement learning controller 
 		ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 
-		//hyperParameters.m_threadsCount = 1;
+		hyperParameters.m_threadsCount = 1;
 		//hyperParameters.m_sigma = ndReal(0.25f);
 		hyperParameters.m_discountFactor = ndReal(0.99f);
 		hyperParameters.m_maxTrajectorySteps = 4000;
