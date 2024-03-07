@@ -872,9 +872,12 @@ xxxx++;
 		#ifdef ND_TRAIN_MODEL
 		// add a reinforcement learning controller 
 		ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
+
+		//hyperParameters.m_threadsCount = 1;
 		//hyperParameters.m_sigma = ndReal(0.25f);
 		hyperParameters.m_discountFactor = ndReal(0.99f);
 		hyperParameters.m_maxTrajectorySteps = 4000;
+		
 		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(hyperParameters));
 		#else
 		char fileName[1024];
