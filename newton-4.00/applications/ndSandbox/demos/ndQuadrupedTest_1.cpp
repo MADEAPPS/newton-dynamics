@@ -135,10 +135,10 @@ namespace ndQuadruped_1
 					output[i].m_userParamInt = 0;
 					output[i].m_posit = BasePose(i);
 					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
-					//t = m_gaitFraction / 2;
+					t = m_gaitFraction / 2;
 					if (t <= m_gaitFraction)
 					{
-						if (i == 1)
+						if (i == 0)
 						//if ((i == 0) || (i == 1))
 						//if ((i == 1) || (i == 2))
 						{
@@ -684,7 +684,7 @@ namespace ndQuadruped_1
 			//m_control->m_animSpeed = 2.0f;
 			//m_control->m_animSpeed = 1.0f;
 			//m_control->m_animSpeed = 0.5f;
-			m_control->m_animSpeed = 0.25f;
+			//m_control->m_animSpeed = 0.25f;
 			//m_control->m_animSpeed = 0.1f;
 
 			#ifdef ND_XXXXXXXXXX

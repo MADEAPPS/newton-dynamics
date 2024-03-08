@@ -32,7 +32,8 @@
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 
-#define ND_USE_BASE_LINE_VALUE
+//#define ND_USE_STATE_Q_VALUE_BASE_LINE
+//#define ND_USE_CONSTANT_AVERAGE_BASELINE
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThreadPool
@@ -132,14 +133,14 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 
 	protected:
 	ndBrain m_actor;
-#ifdef ND_USE_BASE_LINE_VALUE
+#ifdef ND_USE_STATE_Q_VALUE_BASE_LINE
 	ndBrain m_baseLineValue;
 #endif
 	ndBrainOptimizerAdam* m_optimizer;
 	ndArray<ndBrainTrainer*> m_trainers;
 	ndArray<ndBrainTrainer*> m_weightedTrainer;
 	ndArray<ndBrainTrainer*> m_auxiliaryTrainers;
-#ifdef ND_USE_BASE_LINE_VALUE
+#ifdef ND_USE_STATE_Q_VALUE_BASE_LINE
 	ndBrainOptimizerAdam* m_baseLineValueOptimizer;
 	ndArray<ndBrainTrainer*> m_baseLineValueTrainers;
 #endif
@@ -158,7 +159,7 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	ndInt32 m_extraTrajectorySteps;
 	ndInt32 m_bashTrajectoryIndex;
 	ndInt32 m_bashTrajectoryCount;
-#ifdef ND_USE_BASE_LINE_VALUE
+#ifdef ND_USE_STATE_Q_VALUE_BASE_LINE
 	ndInt32 m_baseValueWorkingBufferSize;
 #endif
 	ndBrainVector m_workingBuffer;
@@ -171,14 +172,14 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 	:ndBrainAgent()
 	,ndBrainThreadPool()
 	,m_actor()
-#ifdef ND_USE_BASE_LINE_VALUE
+#ifdef ND_USE_STATE_Q_VALUE_BASE_LINE
 	,m_baseLineValue()
 #endif
 	,m_optimizer(nullptr)
 	,m_trainers()
 	,m_weightedTrainer()
 	,m_auxiliaryTrainers()
-#ifdef ND_USE_BASE_LINE_VALUE
+#ifdef ND_USE_STATE_Q_VALUE_BASE_LINE
 	,m_baseLineValueOptimizer(nullptr)
 	,m_baseLineValueTrainers()
 #endif
@@ -195,7 +196,7 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 	,m_extraTrajectorySteps(hyperParameters.m_extraTrajectorySteps)
 	,m_bashTrajectoryIndex(0)
 	,m_bashTrajectoryCount(hyperParameters.m_bashTrajectoryCount)
-#ifdef ND_USE_BASE_LINE_VALUE
+#ifdef ND_USE_STATE_Q_VALUE_BASE_LINE
 	,m_baseValueWorkingBufferSize(0)
 #endif
 	,m_workingBuffer()
@@ -239,7 +240,7 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 	m_optimizer = new ndBrainOptimizerAdam();
 	m_optimizer->SetRegularizer(hyperParameters.m_regularizer);
 
-#ifdef ND_USE_BASE_LINE_VALUE
+#ifdef ND_USE_STATE_Q_VALUE_BASE_LINE
 	layers.SetCount(0);
 	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -291,7 +292,7 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::~ndBrainAgentContinueVPG_
 	}
 	delete m_optimizer;
 
-#ifdef ND_USE_BASE_LINE_VALUE
+#ifdef ND_USE_STATE_Q_VALUE_BASE_LINE
 	for (ndInt32 i = 0; i < m_baseLineValueTrainers.GetCount(); ++i)
 	{
 		delete m_baseLineValueTrainers[i];
@@ -311,7 +312,7 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::InitWeights()
 {
 	m_actor.InitWeightsXavierMethod();
 
-	#ifdef ND_USE_BASE_LINE_VALUE
+	#ifdef ND_USE_STATE_Q_VALUE_BASE_LINE
 	m_baseLineValue.InitWeightsXavierMethod();
 	#endif
 }
@@ -456,7 +457,7 @@ ndBrainFloat ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::CalculateRew
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Optimize()
 {
-#ifdef ND_USE_BASE_LINE_VALUE
+#ifdef ND_USE_STATE_Q_VALUE_BASE_LINE
 	auto CalculateAdavantage = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		ndBrainFixSizeVector<1> stateValue;
@@ -471,45 +472,42 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Optimize()
 	});
 	ndBrainThreadPool::ParallelExecute(CalculateAdavantage);
 
+#elif defined (ND_USE_CONSTANT_AVERAGE_BASELINE)
+	// using constant base line subtractions
+	ndFloat64 sum = ndFloat64(0.0f);
+	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
+	{
+		sum += m_trajectoryAccumulator[i].m_reward;
+	}
+
+	ndBrainFloat trajectoryBaseLine = ndBrainFloat(sum / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
+	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
+	{
+		m_trajectoryAccumulator[i].m_reward -= trajectoryBaseLine;
+	}
+
 #else
+	// using normalize rewards, no sure where this come from but many people since to like it, 
+	// basically it is just the scaling of the rewards, to make more or less equal
+	ndFloat64 sum = ndFloat64(0.0f);
+	ndFloat64 sum2 = ndFloat64(0.0f);
+	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
+	{
+		ndFloat64 x = m_trajectoryAccumulator[i].m_reward;
+		sum += x;
+		sum2 += x * x;
+	}
+	ndFloat64 den = ndFloat64(1.0f) / ndBrainFloat(m_trajectoryAccumulator.GetCount());
+	ndFloat64 average = sum * den;
+	ndFloat64 variance2 = ndMax((sum2 * den - average * average), ndFloat64(1.0e-12f));
 
-	#if 1
-		// using constant base line subtractions
-		ndFloat64 sum = ndFloat64(0.0f);
-		for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
-		{
-			sum += m_trajectoryAccumulator[i].m_reward;
-		}
-
-		ndBrainFloat trajectoryBaseLine = ndBrainFloat(sum / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
-		for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
-		{
-			m_trajectoryAccumulator[i].m_reward -= trajectoryBaseLine;
-		}
-
-	#else
-		// using normalize rewards, no sure where this come from but many people since to like it, 
-		// basically it is just the scaling of the rewards, to make more or less equal
-		ndFloat64 sum = ndFloat64(0.0f);
-		ndFloat64 sum2 = ndFloat64(0.0f);
-		for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
-		{
-			ndFloat64 x = m_trajectoryAccumulator[i].m_reward;
-			sum += x;
-			sum2 += x * x;
-		}
-		ndFloat64 den = ndFloat64(1.0f) / ndBrainFloat(m_trajectoryAccumulator.GetCount());
-		ndFloat64 average = sum * den;
-		ndFloat64 variance2 = ndMax((sum2 * den - average * average), ndFloat64(1.0e-12f));
-
-		ndBrainFloat mean = ndBrainFloat(average);
-		ndBrainFloat invVariance = ndBrainFloat (1.0f) / ndBrainFloat(ndSqrt(variance2));
-		for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
-		{
-			ndBrainFloat x = m_trajectoryAccumulator[i].m_reward;
-			m_trajectoryAccumulator[i].m_reward = (x - mean) * invVariance;
-		}
-	#endif
+	ndBrainFloat mean = ndBrainFloat(average);
+	ndBrainFloat invVariance = ndBrainFloat (1.0f) / ndBrainFloat(ndSqrt(variance2));
+	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
+	{
+		ndBrainFloat x = m_trajectoryAccumulator[i].m_reward;
+		m_trajectoryAccumulator[i].m_reward = (x - mean) * invVariance;
+	}
 #endif
 
 	BackPropagate();
@@ -521,7 +519,7 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 {
 	m_trajectory.SetCount(m_trajectory.GetCount() - 1);
 
-#ifdef ND_USE_BASE_LINE_VALUE
+#ifdef ND_USE_STATE_Q_VALUE_BASE_LINE
 	ndInt32 stepsCount = m_trajectory.GetCount() & -m_bashBufferSize;
 	if ((stepsCount + 3) > m_trajectory.GetCount())
 	{
@@ -558,6 +556,7 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 		ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 		m_baseLineValueOptimizer->Update(this, m_baseLineValueTrainers, m_learnRate);
 	}
+#endif
 
 	// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 	ndReal averageGain = m_trajectory[m_trajectory.GetCount() - 1].m_reward;
@@ -569,7 +568,6 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 
 	m_averageFramesPerEpisodes.Update(ndReal(m_trajectory.GetCount()));
 	m_averageQvalue.Update(averageGain / ndReal(m_trajectory.GetCount()));
-#endif
 
 	const ndInt32 clippedTrajectorySteps = ndMin(m_maxTrajectorySteps, m_trajectory.GetCount());
 	for (ndInt32 i = 0; i < clippedTrajectorySteps; ++i)
