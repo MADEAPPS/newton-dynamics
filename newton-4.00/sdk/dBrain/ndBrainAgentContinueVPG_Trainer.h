@@ -53,7 +53,8 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 			
 			m_hiddenLayersNumberOfNeurons = 64;
 
-			m_sigma = ndBrainFloat(0.25f);
+			//m_sigma = ndBrainFloat(0.25f);
+			m_sigma = ndBrainFloat(1.0f);
 			m_learnRate = ndBrainFloat(0.0005f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
@@ -348,6 +349,7 @@ ndInt32 ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::GetEpisodeFrames(
 	return m_framesAlive;
 }
 
+#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::BackPropagate()
 {
