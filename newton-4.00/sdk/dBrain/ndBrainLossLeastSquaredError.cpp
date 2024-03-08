@@ -41,3 +41,30 @@ void ndBrainLossLeastSquaredError::GetLoss(const ndBrainVector& output, ndBrainV
 	loss.Set(output);
 	loss.Sub(m_truth);
 }
+
+ndBrainLossHuber::ndBrainLossHuber(ndInt32 size, ndBrainFloat lambda)
+	:ndBrainLossLeastSquaredError(size)
+	,m_lambda(lambda)
+{
+}
+
+
+void ndBrainLossHuber::GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+{
+	ndAssert(output.GetCount() == loss.GetCount());
+	ndAssert(m_truth.GetCount() == loss.GetCount());
+
+	ndBrainLossLeastSquaredError::GetLoss(output, loss);
+	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
+	{
+		ndBrainFloat x = loss[i];
+		if (x > m_lambda)
+		{
+			loss[i] = m_lambda;
+		}
+		else if (x < -m_lambda)
+		{
+			loss[i] = -m_lambda;
+		}
+	}
+}

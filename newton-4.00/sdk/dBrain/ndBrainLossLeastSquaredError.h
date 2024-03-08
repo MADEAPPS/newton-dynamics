@@ -36,5 +36,15 @@ class ndBrainLossLeastSquaredError: public ndBrainLoss
 	ndBrainVector m_truth;
 };
 
+
+class ndBrainLossHuber : public ndBrainLossLeastSquaredError
+{
+	public:
+	ndBrainLossHuber(ndInt32 size, ndBrainFloat lambda = ndBrainFloat(1.0f));
+	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss);
+
+	ndBrainFloat m_lambda;
+};
+
 #endif 
 
