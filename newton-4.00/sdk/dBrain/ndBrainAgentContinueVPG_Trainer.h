@@ -537,14 +537,19 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 			ndBrainMemVector workingBuffer(&m_workingBuffer[threadCount * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
 
 			const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
+			ndBrainFloat gamma1 = m_gamma;
+			ndBrainFloat gamma2 = gamma1 * m_gamma;
+			ndBrainFloat gamma3 = gamma2 * m_gamma;
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
 				ndInt32 index = base + i;
 				m_baseLineValue.MakePrediction(m_trajectory[ndInt32(index + 3)].m_observation, stateValue, workingBuffer);
-				stateValue[0] += m_trajectory[ndInt32(index + 0)].m_reward;
-				stateValue[0] += m_trajectory[ndInt32(index + 1)].m_reward * m_gamma;
-				stateValue[0] += m_trajectory[ndInt32(index + 2)].m_reward * m_gamma * m_gamma;
+				ndBrainFloat q0 = m_trajectory[ndInt32(index + 0)].m_reward;
+				ndBrainFloat q1 = m_trajectory[ndInt32(index + 1)].m_reward;
+				ndBrainFloat q2 = m_trajectory[ndInt32(index + 2)].m_reward;
+				ndBrainFloat q3 = stateValue[0];
+				stateValue[0] = q0 + q1 * gamma1 + q2 * gamma2 + q3 * gamma3;
 				loss.SetTruth(stateValue);
 				trainer.BackPropagate(m_trajectory[ndInt32(index)].m_observation, loss);
 			}
