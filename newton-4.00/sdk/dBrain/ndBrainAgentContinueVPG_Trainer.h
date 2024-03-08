@@ -32,7 +32,7 @@
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 
-//#define ND_USE_STATE_Q_VALUE_BASE_LINE
+#define ND_USE_STATE_Q_VALUE_BASE_LINE
 //#define ND_USE_CONSTANT_AVERAGE_BASELINE
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -461,7 +461,7 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Optimize()
 	auto CalculateAdavantage = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		ndBrainFixSizeVector<1> stateValue;
-		ndBrainMemVector workingBuffer(&m_workingBuffer[threadCount * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
+		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
 
 		const ndStartEnd startEnd(m_trajectoryAccumulator.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -531,8 +531,8 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 		auto BackPropagateBash = ndMakeObject::ndFunction([this, base](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			ndBrainFixSizeVector<1> stateValue;
-			ndBrainLossLeastSquaredError loss(1);
-			ndBrainMemVector workingBuffer(&m_workingBuffer[threadCount * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
+			ndBrainLossHuber loss(1);
+			ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
 
 			const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
 			ndBrainFloat gamma1 = m_gamma;
