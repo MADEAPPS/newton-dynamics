@@ -21,6 +21,11 @@ int main(int, char**)
 	ndSetAllocators setAllocators;
 	//std::string xxxx2("local0");
 	//std::string xxxx3("local1");
+	//for (int i = 0; i < 2000; i++)
+	//{
+	//	ndFloat32 x = ndGaussianRandom(1.0f, 0.4472f);
+	//	ndTrace(("%g\n", x));
+	//}
 
 	ndDemoEntityManager demos;
 	demos.Run();

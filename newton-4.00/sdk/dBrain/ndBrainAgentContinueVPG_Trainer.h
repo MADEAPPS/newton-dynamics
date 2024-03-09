@@ -54,7 +54,8 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 			m_hiddenLayersNumberOfNeurons = 64;
 
 			//m_sigma = ndBrainFloat(0.25f);
-			m_sigma = ndBrainFloat(1.0f);
+			//m_sigma = ndBrainFloat(ndSqrt(0.25f));
+			m_sigma = ndBrainFloat(ndSqrt (0.2f));
 			m_learnRate = ndBrainFloat(0.0005f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
@@ -460,19 +461,36 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Optimize()
 {
 #ifdef ND_USE_STATE_Q_VALUE_BASE_LINE
-	auto CalculateAdavantage = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	ndBrainFixSizeVector<128> variance2;
+	variance2.SetCount(GetThreadCount());
+	auto CalculateAdavantage = ndMakeObject::ndFunction([this, &variance2](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		ndBrainFixSizeVector<1> stateValue;
 		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
 
+		variance2[threadIndex] = ndBrainFloat(0.0f);
 		const ndStartEnd startEnd(m_trajectoryAccumulator.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			m_baseLineValue.MakePrediction(m_trajectoryAccumulator[i].m_observation, stateValue, workingBuffer);
-			m_trajectoryAccumulator[i].m_reward -= stateValue[0];
+			ndBrainFloat advantage = m_trajectoryAccumulator[i].m_reward - stateValue[0];
+			m_trajectoryAccumulator[i].m_reward = advantage;
+			variance2[threadIndex] += advantage * advantage;
 		}
 	});
 	ndBrainThreadPool::ParallelExecute(CalculateAdavantage);
+
+	ndBrainFloat varianceSum2 = ndBrainFloat(0.0f);
+	for (ndInt32 i = GetThreadCount() - 1; i >= 0; --i)
+	{
+		varianceSum2 += variance2[i];
+	}
+	varianceSum2 /= ndBrainFloat(m_trajectoryAccumulator.GetCount());
+	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndSqrt(varianceSum2);
+	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
+	{
+		m_trajectoryAccumulator[i].m_reward *= invVariance;
+	}
 
 #elif defined (ND_USE_CONSTANT_AVERAGE_BASELINE)
 	// using constant base line subtractions
@@ -536,20 +554,34 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 			ndBrainLossHuber loss(1);
 			ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
 
+			ndBrainFixSizeVector<actionDim> actions;
+
 			const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
-			ndBrainFloat gamma1 = m_gamma;
-			ndBrainFloat gamma2 = gamma1 * m_gamma;
-			ndBrainFloat gamma3 = gamma2 * m_gamma;
+			const ndBrainFloat gamma1 = m_gamma;
+			const ndBrainFloat gamma2 = gamma1 * m_gamma;
+			const ndBrainFloat gamma3 = gamma2 * m_gamma;
+			const ndBrainFloat invSigma2 = ndBrainFloat(1.0f) / (ndBrainFloat(2.0f) * m_sigma * m_sigma);
+			const ndBrainFloat gaussian = ndBrainFloat(1.0f) / (m_sigma * ndBrainFloat(ndSqrt(ndBrainFloat(2.0f) * ndPi)));
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
 				ndInt32 index = base + i;
+				m_actor.MakePrediction(m_trajectory[ndInt32(index)].m_observation, actions, workingBuffer);
+
+				ndBrainFloat exponent = ndBrainFloat(0.0f);
+				for (ndInt32 j = actions.GetCount() - 1; j >= 0; --j)
+				{
+					ndBrainFloat error = (actions[j] - m_trajectory[ndInt32(index)].m_actions[j]);
+					exponent += error * error * invSigma2;
+				}
+				ndBrainFloat stateProb = gaussian * ndExp(-exponent);
+
 				m_baseLineValue.MakePrediction(m_trajectory[ndInt32(index + 3)].m_observation, stateValue, workingBuffer);
 				ndBrainFloat q0 = m_trajectory[ndInt32(index + 0)].m_reward;
 				ndBrainFloat q1 = m_trajectory[ndInt32(index + 1)].m_reward;
 				ndBrainFloat q2 = m_trajectory[ndInt32(index + 2)].m_reward;
 				ndBrainFloat q3 = stateValue[0];
-				stateValue[0] = q0 + q1 * gamma1 + q2 * gamma2 + q3 * gamma3;
+				stateValue[0] = stateProb * (q0 + q1 * gamma1 + q2 * gamma2 + q3 * gamma3);
 				loss.SetTruth(stateValue);
 				trainer.BackPropagate(m_trajectory[ndInt32(index)].m_observation, loss);
 			}
