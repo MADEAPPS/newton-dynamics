@@ -270,9 +270,6 @@ void ndBrainLayerLinear::InputDerivative(const ndBrainVector&, const ndBrainVect
 	m_weights.TransposeMul(outputDerivative, inputDerivative);
 }
 
-//void ndBrainLayerLinear::CalculateParamGradients(
-//	const ndBrainVector& input, const ndBrainVector& output___,
-//	const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const
 void ndBrainLayerLinear::CalculateParamGradients(
 	const ndBrainVector& input, const ndBrainVector& ,
 	const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const
@@ -280,7 +277,6 @@ void ndBrainLayerLinear::CalculateParamGradients(
 	ndAssert(!strcmp(GetLabelId(), gradientOut->GetLabelId()));
 	ndBrainLayerLinear* const gradients = (ndBrainLayerLinear*)gradientOut;
 	ndAssert(gradients->m_bias.GetCount() == outputDerivative.GetCount());
-	//ndAssert(output___.GetCount() == outputDerivative.GetCount());
 
 	gradients->m_bias.Set(outputDerivative);
 	for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0; --i)
@@ -289,6 +285,5 @@ void ndBrainLayerLinear::CalculateParamGradients(
 		gradients->m_weights[i].ScaleSet(input, value);
 	}
 
-	//ndBrainLayerLinear::InputDerivative(output, outputDerivative, inputGradient);
 	m_weights.TransposeMul(outputDerivative, inputGradient);
 }
