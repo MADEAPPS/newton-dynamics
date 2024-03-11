@@ -32,9 +32,7 @@
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 
-
 #define ND_USE_STATE_Q_VALUE_BASELINE_DISCRETE
-//#define ND_USE_CONSTANT_AVERAGE_BASELINE_DISCRETE
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThreadPool
@@ -480,20 +478,6 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Optimize()
 		m_trajectoryAccumulator[i].m_reward *= invVariance;
 	}
 
-#elif defined (ND_USE_CONSTANT_AVERAGE_BASELINE_DISCRETE)
-	// using constant base line subtractions
-	ndFloat64 sum = ndFloat64(0.0f);
-	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
-	{
-		sum += m_trajectoryAccumulator[i].m_reward;
-	}
-
-	ndBrainFloat trajectoryBaseLine = ndBrainFloat(sum / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
-	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
-	{
-		m_trajectoryAccumulator[i].m_reward -= trajectoryBaseLine;
-	}
-
 #else
 	// using normalize rewards, no sure where this come from but many people since to like it, 
 	// basically it is just the scaling of the rewards, to make more or less equal
@@ -507,14 +491,15 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Optimize()
 	}
 	ndFloat64 den = ndFloat64(1.0f) / ndBrainFloat(m_trajectoryAccumulator.GetCount());
 	ndFloat64 average = sum * den;
-	ndFloat64 variance2 = ndMax((sum2 * den - average * average), ndFloat64(1.0e-12f));
+	//ndFloat64 variance2 = ndMax((sum2 * den - average * average), ndFloat64(1.0e-12f));
+	ndFloat64 sigma2 = ndMax((sum2 * den - average * average), ndFloat64(1.0e-4f));
 
 	ndBrainFloat mean = ndBrainFloat(average);
-	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(variance2));
+	ndBrainFloat invSigma = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(sigma2));
 	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
 	{
 		ndBrainFloat x = m_trajectoryAccumulator[i].m_reward;
-		m_trajectoryAccumulator[i].m_reward = (x - mean) * invVariance;
+		m_trajectoryAccumulator[i].m_reward = (x - mean) * invSigma;
 	}
 #endif
 
