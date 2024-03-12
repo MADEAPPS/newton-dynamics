@@ -25,7 +25,7 @@ namespace ndQuadruped_1
 	#define ND_TRAIN_MODEL
 
 	#ifndef ND_TRAIN_MODEL
-		#define ND_XXXXXXXXXX
+		//#define ND_XXXXXXXXXX
 	#endif
 
 	class ndLegObsevation
@@ -316,11 +316,6 @@ namespace ndQuadruped_1
 
 			ndBrainFloat CalculateReward()
 			{
-				//if (IsTerminal())
-				//{
-				//	return ndBrainFloat(-50.0f);
-				//}
-
 				ndBrainFloat reward = m_model->CalculateReward();
 				return reward;
 			}
@@ -375,7 +370,7 @@ namespace ndQuadruped_1
 				{
 					if (airborneLeg[i] != sequenceAirborne[i])
 					{
-						return true;
+						//return true;
 					}
 				}
 
@@ -866,7 +861,7 @@ namespace ndQuadruped_1
 		// add a reinforcement learning controller 
 		ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 
-		hyperParameters.m_threadsCount = 1;
+		//hyperParameters.m_threadsCount = 1;
 		//hyperParameters.m_sigma = ndReal(0.25f);
 		hyperParameters.m_discountFactor = ndReal(0.99f);
 		hyperParameters.m_maxTrajectorySteps = 4000;
