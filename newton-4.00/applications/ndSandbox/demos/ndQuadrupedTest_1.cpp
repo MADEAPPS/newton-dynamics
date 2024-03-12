@@ -22,11 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
-
-	#ifndef ND_TRAIN_MODEL
-		//#define ND_XXXXXXXXXX
-	#endif
+	//#define ND_TRAIN_MODEL
 
 	class ndLegObsevation
 	{
@@ -54,7 +50,7 @@ namespace ndQuadruped_1
 		ndActionVector m_torso;
 	};
 
-	#define CONTROLLER_NAME "ndQuadruped_1VPG.dnn"
+	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
 	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
@@ -288,7 +284,7 @@ namespace ndQuadruped_1
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(3500)
-				,m_stopTraining(10000000)
+				,m_stopTraining(30000000)
 				,m_lastEpisode(-1)
 				,m_modelIsTrained(false)
 			{
@@ -682,9 +678,8 @@ namespace ndQuadruped_1
 			m_control->m_animSpeed = 0.25f;
 			//m_control->m_animSpeed = 0.1f;
 
-			#ifdef ND_XXXXXXXXXX
-				m_control->m_enableController = 0;
-			#endif
+			//m_control->m_enableController = 0;
+
 			if (m_control->m_enableController)
 			{
 				const ndActionVector& actionVector = *((ndActionVector*)actions);
@@ -1072,9 +1067,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	world->AddModel(model);
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-#ifdef ND_XXXXXXXXXX
 //	world->AddJoint(fixJoint);
-#endif
 
 	ndSharedPtr<ndUIEntity> quadrupedUI (new ndModelUI(scene, model));
 	scene->Set2DDisplayRenderFunction(quadrupedUI);
