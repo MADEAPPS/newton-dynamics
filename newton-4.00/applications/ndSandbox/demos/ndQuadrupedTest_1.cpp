@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	class ndLegObsevation
 	{
@@ -134,8 +134,8 @@ namespace ndQuadruped_1
 					//t = m_gaitFraction / 2;
 					if (t <= m_gaitFraction)
 					{
-						if (i == 1)
-						//if ((i == 0) || (i == 1))
+						//if (i == 1)
+						if ((i == 0) || (i == 1))
 						//if ((i == 1) || (i == 2))
 						{
 							output[i].m_posit.m_y += m_amp * ndSin(omega * t);
