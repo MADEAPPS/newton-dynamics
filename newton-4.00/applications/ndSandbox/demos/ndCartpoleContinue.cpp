@@ -215,7 +215,7 @@ namespace ndCarpole_1
 						m_actor.CopyFrom(m_bestActor);
 						ndGetWorkingFileName(GetName().GetStr(), fileName);
 						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-						ndExpandTraceMessage("training time: %f\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+						ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 						SaveToFile(fileName);
 						ndExpandTraceMessage("saving to file: %s\n", fileName);
 						ndExpandTraceMessage("training complete\n\n");
