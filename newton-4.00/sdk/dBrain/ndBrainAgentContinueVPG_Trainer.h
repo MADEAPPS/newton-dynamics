@@ -168,6 +168,10 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	ndBrainVector m_workingBuffer;
 	ndMovingAverage<128> m_averageQvalue;
 	ndMovingAverage<128> m_averageFramesPerEpisodes;
+
+	mutable std::random_device m_rd;
+	mutable std::mt19937 m_gen;
+	mutable std::normal_distribution<ndFloat32> m_d;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -205,6 +209,10 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 	,m_workingBuffer()
 	,m_averageQvalue()
 	,m_averageFramesPerEpisodes()
+
+	,m_rd()
+	,m_gen(m_rd())
+	,m_d(ndFloat32 (0.0f), ndFloat32(1.0f))
 {
 	// build neural net
 	SetThreadCount(hyperParameters.m_threadsCount);
@@ -629,10 +637,17 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 	m_averageQvalue.Update(averageGain / ndReal(m_trajectory.GetCount()));
 }
 
+
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrainVector& actions) const
 {
-	// for now use a constant deviations until the algorithm is stable 
+	//for (ndInt32 i = 0; i < 2000; ++i)
+	//{
+	//	ndBrainFloat xxx0 = ndGaussianRandom(5.0f, 2.0f);
+	//	ndBrainFloat xxx1 = 5.0f + ndBrainFloat(m_d(m_gen) * 2.0f);
+	//	ndTrace (("%f, %f\n", xxx0, xxx1))
+	//}
+
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
 		ndBrainFloat sample = ndGaussianRandom(actions[i], m_sigma);
