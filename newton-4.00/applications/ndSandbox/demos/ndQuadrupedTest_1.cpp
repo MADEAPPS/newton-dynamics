@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 
 	class ndLegObsevation
 	{
@@ -435,7 +435,7 @@ namespace ndQuadruped_1
 						ndExpandTraceMessage("saving to file: %s\n", fileName);
 						ndExpandTraceMessage("training complete\n");
 						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-						ndExpandTraceMessage("training time: %g seconds", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+						ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 					}
 				}
 			}
