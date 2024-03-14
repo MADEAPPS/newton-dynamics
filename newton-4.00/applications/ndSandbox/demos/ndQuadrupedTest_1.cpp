@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	class ndLegObsevation
 	{
@@ -284,7 +284,7 @@ namespace ndQuadruped_1
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(3500)
-				,m_stopTraining(100 * 1000000)
+				,m_stopTraining(200 * 1000000)
 				,m_lastEpisode(-1)
 				,m_modelIsTrained(false)
 			{
@@ -859,7 +859,8 @@ namespace ndQuadruped_1
 		//hyperParameters.m_threadsCount = 1;
 		//hyperParameters.m_sigma = ndReal(0.25f);
 		hyperParameters.m_discountFactor = ndReal(0.99f);
-		hyperParameters.m_maxTrajectorySteps = 1024 * 6;
+		//hyperParameters.m_maxTrajectorySteps = 1024 * 6;
+		hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 		
 		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(hyperParameters));
 		#else
