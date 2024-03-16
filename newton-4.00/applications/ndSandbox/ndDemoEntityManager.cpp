@@ -350,7 +350,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 	// Create window with graphics context
 	char version[256];
 	sprintf(version, "Newton Dynamics %d.%.2i sandbox demos", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION);
-	//GLFWwindow* window = glfwCreateWindow(1280, 720, version, NULL, NULL);
 	m_mainFrame = glfwCreateWindow(1280, 720, version, NULL, NULL);
 	glfwMakeContextCurrent(m_mainFrame);
 	glfwSwapInterval(0); // Enable vsync
