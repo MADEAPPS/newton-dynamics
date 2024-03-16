@@ -288,8 +288,7 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 #endif
 
 	m_trajectory.SetCount(m_maxTrajectorySteps + m_extraTrajectorySteps);
-	//m_trajectoryAccumulator.SetCount(m_bashTrajectoryCount * m_maxTrajectorySteps + 1024);
-	m_trajectoryAccumulator.SetCount(m_maxTrajectorySteps + m_extraTrajectorySteps);
+	m_trajectoryAccumulator.SetCount(m_bashTrajectoryCount * m_maxTrajectorySteps + 1024);
 	m_trajectory.SetCount(0);
 	m_trajectoryAccumulator.SetCount(0);
 }
