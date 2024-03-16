@@ -46,7 +46,7 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 		{
 			m_bashBufferSize = 32;
 			m_bashTrajectoryCount = 100;
-			m_numberOfHiddenLayers = 3;
+			m_numberOfHiddenLayers = 4;
 			m_maxTrajectorySteps = 1024 * 2;
 			m_extraTrajectorySteps = 1024 * 2;
 			m_hiddenLayersNumberOfNeurons = 64;
@@ -288,7 +288,8 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 #endif
 
 	m_trajectory.SetCount(m_maxTrajectorySteps + m_extraTrajectorySteps);
-	m_trajectoryAccumulator.SetCount(m_bashTrajectoryCount * m_maxTrajectorySteps + 1024);
+	//m_trajectoryAccumulator.SetCount(m_bashTrajectoryCount * m_maxTrajectorySteps + 1024);
+	m_trajectoryAccumulator.SetCount(m_maxTrajectorySteps + m_extraTrajectorySteps);
 	m_trajectory.SetCount(0);
 	m_trajectoryAccumulator.SetCount(0);
 }
