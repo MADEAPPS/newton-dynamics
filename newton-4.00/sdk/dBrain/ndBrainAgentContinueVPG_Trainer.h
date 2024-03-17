@@ -467,7 +467,7 @@ ndBrainFloat ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::CalculateRew
 	return ndBrainFloat(0.0f);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Optimize()
 {
@@ -613,8 +613,8 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 					//ndBrainFloat stateProb = gaussian * ndExp(-exponent);
 					ndBrainFloat stateProb = ndExp(-exponent);
 
-					ndBrainMemVector observation1(&m_trajectory[ndInt32(index + 3)].m_observation[0], statesDim);
-					m_baseLineValue.MakePrediction(observation1, stateValue, workingBuffer);
+					const ndBrainMemVector baseObservation(&m_trajectory[ndInt32(index + 3)].m_observation[0], statesDim);
+					m_baseLineValue.MakePrediction(baseObservation, stateValue, workingBuffer);
 					ndBrainFloat q0 = m_trajectory[ndInt32(index + 0)].m_reward;
 					ndBrainFloat q1 = m_trajectory[ndInt32(index + 1)].m_reward;
 					ndBrainFloat q2 = m_trajectory[ndInt32(index + 2)].m_reward;
@@ -641,17 +641,12 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 	{
 		m_trajectory[i].m_reward += m_gamma * m_trajectory[i + 1].m_reward;
 	}
-	//m_averageFramesPerEpisodes.Update(ndReal(m_trajectory.GetCount()));
 
-	//ndReal averageGain = ndBrainFloat(0.0f);
 	for (ndInt32 i = 0; i < maxSteps; ++i)
 	{
-		//averageGain += m_trajectory[i].m_reward;
 		m_trajectoryAccumulator.PushBack(m_trajectory[i]);
 	}
-	//m_averageScore.Update(averageGain / ndReal(m_trajectory.GetCount()));
 }
-
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrainVector& actions) const
