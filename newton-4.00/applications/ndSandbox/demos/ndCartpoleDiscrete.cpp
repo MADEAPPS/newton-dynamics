@@ -185,20 +185,20 @@ namespace ndCarpole_0
 
 					if (m_averageFramesPerEpisodes.GetAverage() >= ndReal(m_maxFrames))
 					{
-						if (m_averageQvalue.GetAverage() > m_maxGain)
+						if (m_averageScore.GetAverage() > m_maxGain)
 						{
 							m_bestActor.CopyFrom(m_actor);
-							m_maxGain = m_averageQvalue.GetAverage();
-							ndExpandTraceMessage("%d: best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetFramesCount(), GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageQvalue.GetAverage());
+							m_maxGain = m_averageScore.GetAverage();
+							ndExpandTraceMessage("%d: best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetFramesCount(), GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageScore.GetAverage());
 						}
 					}
 
 					if (episodeCount && !IsSampling())
 					{
-						ndExpandTraceMessage("%f %f\n", m_averageQvalue.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+						ndExpandTraceMessage("%f %f\n", m_averageScore.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
 						if (m_outFile)
 						{
-							fprintf(m_outFile, "%f\n", m_averageQvalue.GetAverage());
+							fprintf(m_outFile, "%f\n", m_averageScore.GetAverage());
 							fflush(m_outFile);
 						}
 					}

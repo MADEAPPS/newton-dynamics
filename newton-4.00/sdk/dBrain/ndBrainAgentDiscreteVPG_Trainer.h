@@ -157,7 +157,7 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	ndInt32 m_baseValueWorkingBufferSize;
 #endif
 	ndBrainVector m_workingBuffer;
-	ndMovingAverage<128> m_averageQvalue;
+	ndMovingAverage<128> m_averageScore;
 	ndMovingAverage<128> m_averageFramesPerEpisodes;
 };
 
@@ -193,7 +193,7 @@ ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::ndBrainAgentDiscreteVPG_T
 	,m_baseValueWorkingBufferSize(0)
 #endif
 	,m_workingBuffer()
-	,m_averageQvalue()
+	,m_averageScore()
 	,m_averageFramesPerEpisodes()
 {
 	// build neural net
@@ -600,7 +600,7 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 		averageGain += m_trajectory[i].m_reward;
 		m_trajectoryAccumulator.PushBack(m_trajectory[i]);
 	}
-	m_averageQvalue.Update(averageGain / ndReal(m_trajectory.GetCount()));
+	m_averageScore.Update(averageGain / ndReal(m_trajectory.GetCount()));
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
