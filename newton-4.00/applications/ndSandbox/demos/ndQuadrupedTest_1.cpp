@@ -284,7 +284,7 @@ namespace ndQuadruped_1
 				,m_timer(ndGetTimeInMicroseconds())
 				,m_maxGain(-1.0e10f)
 				,m_maxFrames(3500)
-				,m_stopTraining(200 * 1000000)
+				,m_stopTraining(300 * 1000000)
 				,m_lastEpisode(-1)
 				,m_modelIsTrained(false)
 			{

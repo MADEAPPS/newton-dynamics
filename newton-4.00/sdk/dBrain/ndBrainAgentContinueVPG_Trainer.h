@@ -90,9 +90,9 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 
 		ndTrajectoryStep(const ndTrajectoryStep& src)
 			:m_reward(src.m_reward)
-			,m_action(src.m_action)
-			,m_observation(src.m_observation)
 		{
+			ndMemCpy(m_action, src.m_action, actionDim);
+			ndMemCpy(m_observation, src.m_observation, statesDim);
 		}
 
 		ndTrajectoryStep& operator=(const ndTrajectoryStep& src)
@@ -102,8 +102,8 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 		}
 
 		ndBrainFloat m_reward;
-		ndBrainFixSizeVector<actionDim> m_action;
-		ndBrainFixSizeVector<statesDim> m_observation;
+		ndBrainFloat m_action[actionDim];
+		ndBrainFloat m_observation[statesDim];
 	};
 
 	ndBrainAgentContinueVPG_Trainer(const HyperParameters& hyperParameters);
@@ -288,7 +288,8 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 #endif
 
 	m_trajectory.SetCount(m_maxTrajectorySteps + m_extraTrajectorySteps);
-	m_trajectoryAccumulator.SetCount(m_bashTrajectoryCount * m_maxTrajectorySteps + 1024);
+	//m_trajectoryAccumulator.SetCount(m_bashTrajectoryCount * m_maxTrajectorySteps + 1024);
+	m_trajectoryAccumulator.SetCount(m_maxTrajectorySteps + m_extraTrajectorySteps);
 	m_trajectory.SetCount(0);
 	m_trajectoryAccumulator.SetCount(0);
 }
@@ -417,7 +418,8 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::BackPropagate()
 				Loss loss(trainer, this, base + i, invSigmaSquare);
 				if ((base + i) < m_trajectoryAccumulator.GetCount())
 				{
-					trainer.BackPropagate(m_trajectoryAccumulator[base + i].m_observation, loss);
+					const ndBrainMemVector observation(&m_trajectoryAccumulator[base + i].m_observation[0], statesDim);
+					trainer.BackPropagate(observation, loss);
 				}
 				else
 				{
@@ -481,7 +483,8 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Optimize()
 		const ndStartEnd startEnd(m_trajectoryAccumulator.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			m_baseLineValue.MakePrediction(m_trajectoryAccumulator[i].m_observation, stateValue, workingBuffer);
+			ndBrainMemVector observation(&m_trajectoryAccumulator[i].m_observation[0], statesDim);
+			m_baseLineValue.MakePrediction(observation, stateValue, workingBuffer);
 			ndBrainFloat advantage = m_trajectoryAccumulator[i].m_reward - stateValue[0];
 			m_trajectoryAccumulator[i].m_reward = advantage;
 			variance2[threadIndex] += advantage * advantage;
@@ -588,7 +591,8 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 				ndInt32 index = base + i;
 				if ((index + 3) < maxSteps)
 				{
-					m_actor.MakePrediction(m_trajectory[ndInt32(index)].m_observation, actions, workingBuffer);
+					const ndBrainMemVector observation(&m_trajectory[ndInt32(index)].m_observation[0], statesDim);
+					m_actor.MakePrediction(observation, actions, workingBuffer);
 
 					ndBrainFloat exponent = ndBrainFloat(0.0f);
 					for (ndInt32 j = actions.GetCount() - 1; j >= 0; --j)
@@ -599,14 +603,15 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 					//ndBrainFloat stateProb = gaussian * ndExp(-exponent);
 					ndBrainFloat stateProb = ndExp(-exponent);
 
-					m_baseLineValue.MakePrediction(m_trajectory[ndInt32(index + 3)].m_observation, stateValue, workingBuffer);
+					ndBrainMemVector observation1(&m_trajectory[ndInt32(index + 3)].m_observation[0], statesDim);
+					m_baseLineValue.MakePrediction(observation1, stateValue, workingBuffer);
 					ndBrainFloat q0 = m_trajectory[ndInt32(index + 0)].m_reward;
 					ndBrainFloat q1 = m_trajectory[ndInt32(index + 1)].m_reward;
 					ndBrainFloat q2 = m_trajectory[ndInt32(index + 2)].m_reward;
 					ndBrainFloat q3 = stateValue[0];
 					stateValue[0] = stateProb * (q0 + q1 * gamma1 + q2 * gamma2 + q3 * gamma3);
 					loss.SetTruth(stateValue);
-					trainer.BackPropagate(m_trajectory[ndInt32(index)].m_observation, loss);
+					trainer.BackPropagate(observation, loss);
 				}
 				else
 				{
@@ -661,10 +666,13 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Step()
 {
 	ndTrajectoryStep trajectoryStep;
 
-	GetObservation(&trajectoryStep.m_observation[0]);
-	m_actor.MakePrediction(trajectoryStep.m_observation, trajectoryStep.m_action, m_workingBuffer);
+	ndBrainMemVector actions(&trajectoryStep.m_action[0], actionDim);
+	ndBrainMemVector observation(&trajectoryStep.m_observation[0], statesDim);
 
-	SelectAction(trajectoryStep.m_action);
+	GetObservation(&observation[0]);
+	m_actor.MakePrediction(observation, actions, m_workingBuffer);
+
+	SelectAction(actions);
 	ApplyActions(&trajectoryStep.m_action[0]);
 	trajectoryStep.m_reward = CalculateReward();
 	
