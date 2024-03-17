@@ -467,7 +467,7 @@ ndBrainFloat ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::CalculateRew
 	return ndBrainFloat(0.0f);
 }
 
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Optimize()
 {
