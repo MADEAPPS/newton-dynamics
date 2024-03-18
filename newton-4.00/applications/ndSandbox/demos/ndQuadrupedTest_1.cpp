@@ -1078,10 +1078,15 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	material.m_dynamicFriction1 = 0.8f;
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_frictionTest, ndDemoContactCallback::m_default);
-	
+
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
+
+	#ifdef ND_TRAIN_MODEL
+		TrainingUpdata* const trainer = new TrainingUpdata();
+		scene->RegisterPostUpdate(trainer);
+	#endif
 	
 	ndSharedPtr<ndModel> model(BuildModel(scene, matrix));
 	world->AddModel(model);
@@ -1097,8 +1102,6 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z += 0.25f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
-
-	scene->RegisterPostUpdate(new TrainingUpdata());
 
 	//ndFileFormatSave xxxx;
 	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
