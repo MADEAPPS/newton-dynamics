@@ -1038,6 +1038,25 @@ namespace ndQuadruped_1
 
 		return model;
 	}
+
+
+	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
+	{
+		public:
+		TrainingUpdata()
+			:OnPostUpdate()
+		{
+		}
+
+		~TrainingUpdata()
+		{
+		}
+
+		virtual void Update(ndDemoEntityManager* const scene, ndFloat32 timestep)
+		{
+			ndTrace(("xxxxxxxxxxx\n"));
+		}
+	};
 }
 
 using namespace ndQuadruped_1;
@@ -1078,6 +1097,8 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z += 0.25f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
+
+	scene->RegisterPostUpdate(new TrainingUpdata());
 
 	//ndFileFormatSave xxxx;
 	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");

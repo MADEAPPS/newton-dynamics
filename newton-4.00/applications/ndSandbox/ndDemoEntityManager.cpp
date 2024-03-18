@@ -284,6 +284,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
 	,m_selectedModel(nullptr)
+	,m_onPostUpdate(nullptr)
 	,m_fps(0.0f)
 	,m_timestepAcc(0.0f)
 	,m_currentListenerTimestep(0.0f)
@@ -745,6 +746,8 @@ void ndDemoEntityManager::Cleanup ()
 	//{
 	//	delete *iter;
 	//}
+
+	RegisterPostUpdate(nullptr);
 	m_animationCache.RemoveAll();
 	
 	while (m_debugShapeCache->GetRoot())
@@ -1060,6 +1063,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			if (m_currentScene != -1) 
 			{
 				m_selectedModel = nullptr;
+				RegisterPostUpdate(nullptr);
 				LoadDemo(m_currentScene);
 				m_lastCurrentScene = m_currentScene;
 				m_currentScene = -1;
@@ -1575,6 +1579,15 @@ void ndDemoEntityManager::DrawDebugShapes()
 void ndDemoEntityManager::SetAcceleratedUpdate()
 {
 	m_world->AccelerateUpdates();
+}
+
+void ndDemoEntityManager::RegisterPostUpdate(OnPostUpdate* const postUpdate)
+{
+	if (m_onPostUpdate)
+	{
+		delete m_onPostUpdate;
+	}
+	m_onPostUpdate = postUpdate;
 }
 
 void ndDemoEntityManager::RenderScene()

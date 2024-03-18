@@ -34,6 +34,21 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	typedef void (*LaunchSDKDemoCallback) (ndDemoEntityManager* const scene);
 	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, ndFloat32 timestep);
 
+	class OnPostUpdate: public ndClassAlloc
+	{
+		public:
+		OnPostUpdate()
+			:ndClassAlloc()
+		{
+		}
+
+		virtual ~OnPostUpdate()
+		{
+		}
+		
+		virtual void Update(ndDemoEntityManager* const scene, ndFloat32 timestep) = 0;
+	};
+
 	enum ndMenuSelection
 	{
 		m_new,
@@ -168,6 +183,8 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	void SetAcceleratedUpdate(); 
 	const ndShaderCache& GetShaderCache() const;  
 	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(ndMeshLoader& loader, const char* const meshName);
+
+	void RegisterPostUpdate(OnPostUpdate* const postUpdate);
 	
 	private:
 	void BeginFrame();
@@ -233,6 +250,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	ndInt32 m_debugDisplayMode;
 	ndInt32 m_collisionDisplayMode;
 	ndModel* m_selectedModel;
+	OnPostUpdate* m_onPostUpdate;
 
 	ndFloat32 m_fps;
 	ndFloat32 m_timestepAcc;

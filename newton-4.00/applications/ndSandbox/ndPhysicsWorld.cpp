@@ -142,6 +142,11 @@ void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 	{
 		m_soundManager->Update(this, timestep);
 	}
+
+	if (m_manager->m_onPostUpdate)
+	{
+		m_manager->m_onPostUpdate->Update(m_manager, timestep);
+	}
 }
 
 void ndPhysicsWorld::NormalUpdates()
