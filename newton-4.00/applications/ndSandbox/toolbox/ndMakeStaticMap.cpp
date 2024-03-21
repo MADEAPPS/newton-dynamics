@@ -25,9 +25,9 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix&
 
 	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
 	ndMatrix uvMatrix(ndGetIdentityMatrix());
-	uvMatrix[0][0] *= 0.025f;
-	uvMatrix[1][1] *= 0.025f;
-	uvMatrix[2][2] *= 0.025f;
+	uvMatrix[0][0] *= 0.125f;
+	uvMatrix[1][1] *= 0.125f;
+	uvMatrix[2][2] *= 0.125f;
 
 	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix, false));
 
