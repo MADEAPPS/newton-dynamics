@@ -23,10 +23,10 @@ ndDemoCamera::ndDemoCamera()
 	,m_projectionMatrix(ndGetIdentityMatrix())
 	,m_invProjectionMatrix(ndGetIdentityMatrix())
 	,m_fov(D_CAMERA_ANGLE * ndDegreeToRad)
-	,m_backPlane(2000.0f)
-	,m_frontPlane (0.01f)
-	,m_cameraYaw(0.0f)
-	,m_cameraPitch(0.0f)
+	,m_backPlane(ndFloat32(2000.0f))
+	,m_frontPlane (ndFloat32(0.1f))
+	,m_cameraYaw(ndFloat32(0.0f))
+	,m_cameraPitch(ndFloat32(0.0f))
 {
 }
 	
@@ -62,25 +62,25 @@ ndMatrix ndDemoCamera::CreateMatrixFromFrustum(ndFloat32 left, ndFloat32 right, 
 {
 	ndMatrix projectionMatrix(ndGetIdentityMatrix());
 
-	projectionMatrix[0][0] = 2.0f * front / (right - left);
-	projectionMatrix[0][1] = 0.0f;
-	projectionMatrix[0][2] = 0.0f;
-	projectionMatrix[0][3] = 0.0f;
+	projectionMatrix[0][0] = ndFloat32(2.0f) * front / (right - left);
+	projectionMatrix[0][1] = ndFloat32(0.0f);
+	projectionMatrix[0][2] = ndFloat32(0.0f);
+	projectionMatrix[0][3] = ndFloat32(0.0f);
 
-	projectionMatrix[1][0] = 0.0f;
-	projectionMatrix[1][1] = 2.0f * front / (top - bottom);
-	projectionMatrix[1][2] = 0.0f;
-	projectionMatrix[1][3] = 0.0f;
+	projectionMatrix[1][0] = ndFloat32(0.0f);
+	projectionMatrix[1][1] = ndFloat32(2.0f) * front / (top - bottom);
+	projectionMatrix[1][2] = ndFloat32(0.0f);
+	projectionMatrix[1][3] = ndFloat32(0.0f);
 
 	projectionMatrix[2][0] = (right + left) / (right - left);
 	projectionMatrix[2][1] = (top + bottom) / (top - bottom);
 	projectionMatrix[2][2] = -(back + front) / (back - front);
-	projectionMatrix[2][3] = -1.0f;
+	projectionMatrix[2][3] = ndFloat32(-1.0f);
 
-	projectionMatrix[3][0] = 0.0f;
-	projectionMatrix[3][1] = 0.0f;
-	projectionMatrix[3][2] = -2.0f * back * front / (back - front);
-	projectionMatrix[3][3] = 0.0f;
+	projectionMatrix[3][0] = ndFloat32(0.0f);
+	projectionMatrix[3][1] = ndFloat32(0.0f);
+	projectionMatrix[3][2] = ndFloat32(-2.0f) * back * front / (back - front);
+	projectionMatrix[3][3] = ndFloat32(0.0f);
 
 	return projectionMatrix;
 }
@@ -104,8 +104,8 @@ ndMatrix ndDemoCamera::CreateLookAtMatrix(const ndVector& eyepoint, const ndVect
 	result = result.Transpose3x3();
 
 	ndVector negEye (eyepoint);
-	negEye = negEye.Scale(-1.0f);
-	negEye[3] = 1.0f;
+	negEye = negEye.Scale(ndFloat32 (-1.0f));
+	negEye[3] = ndFloat32 (1.0f);
 	result[3] = result.TransformVector(negEye);
 	return result;
 }
@@ -113,7 +113,7 @@ ndMatrix ndDemoCamera::CreateLookAtMatrix(const ndVector& eyepoint, const ndVect
 ndMatrix ndDemoCamera::CreatePerspectiveMatrix(ndFloat32 fov, ndFloat32 aspect, ndFloat32 front, ndFloat32 back)
 {
 	fov = ndClamp (fov, ndFloat32 (0.0f), ndPi);
-	ndFloat32 y = front * ndTan(fov * 0.5f);
+	ndFloat32 y = front * ndTan(fov * ndFloat32(0.5f));
 	ndFloat32 x = y * aspect;
 	ndMatrix projectionMatrix (CreateMatrixFromFrustum(-x, x, -y, y, front, back));
 	return projectionMatrix;
@@ -122,8 +122,10 @@ ndMatrix ndDemoCamera::CreatePerspectiveMatrix(ndFloat32 fov, ndFloat32 aspect, 
 void ndDemoCamera::SetViewMatrix(ndInt32 width, ndInt32 height)
 {
 	// set the view port for this render section
-	glViewport(0, 0, (GLint)width, (GLint)height);
-	glGetIntegerv(GL_VIEWPORT, m_viewport);
+	m_viewport[0] = 0;
+	m_viewport[1] = 0;
+	m_viewport[2] = width;
+	m_viewport[3] = height;
 
 	// calculate projection matrix
 	m_projectionMatrix = CreatePerspectiveMatrix(m_fov, GLfloat(width) / GLfloat(height), m_frontPlane, m_backPlane);
@@ -132,46 +134,61 @@ void ndDemoCamera::SetViewMatrix(ndInt32 width, ndInt32 height)
 	// set the model view matrix 
 	const ndVector pointOfInterest(m_matrix.m_posit + m_matrix.m_front);
 	m_viewMatrix = CreateLookAtMatrix(m_matrix.m_posit, pointOfInterest, m_matrix.m_up);
+
+
+	auto TestXXXX = [this](ndVector xxxx)
+	{
+		ndVector xxxx1(m_viewMatrix.TransformVector(xxxx));
+		ndVector xxxx2(m_projectionMatrix.TransformVector(xxxx1));
+		ndVector xxxx3(xxxx2.m_x / xxxx2.m_w, xxxx2.m_y / xxxx2.m_w, xxxx2.m_z / xxxx2.m_w, xxxx2.m_w);
+		return xxxx3;
+	};
+
+	auto TestXXXX1 = [this](ndVector xxxx)
+	{
+		ndVector xxxx1(xxxx.m_x * xxxx.m_w, xxxx.m_y * xxxx.m_w, xxxx.m_z * xxxx.m_w, 1.0f);
+		ndVector xxxx2(m_invProjectionMatrix.TransformVector1x4(xxxx1));
+		ndVector xxxx3(m_viewMatrix.OrthoInverse().TransformVector1x4(xxxx2));
+		return xxxx3;
+	};
+
+ndVector xxxx0(TestXXXX1(ndVector(1.0f, 1.0f, -1.0f, m_frontPlane)));
+ndVector xxxx1(TestXXXX1(ndVector(1.0f, 1.0f, 1.0f, m_backPlane)));
+
+ndVector xxxx2(TestXXXX(ndVector(m_frontPlane, 0.0f, 0.0f, 1.0f)));
+ndVector xxxx3(TestXXXX(ndVector(0.0f, m_frontPlane, 0.0f, 1.0f)));
+ndVector xxxx4(TestXXXX(ndVector(0.0f, 0.0f, m_frontPlane, 1.0f)));
+
+//ndVector xxxx4(TestXXXX(xxxx0));
+
+	for (ndInt32 k = 0; k < 2; ++k)
+	{
+		for (ndInt32 j = 0; j < 2; ++j)
+		{
+			for (ndInt32 i = 0; i < 2; ++i)
+			{
+				//sp = viewPoint * projeMatrix;
+				const ndVector sp(ndFloat32(i * 2 - 1), ndFloat32(j * 2 - 1), ndFloat32(k * 2 - 1), ndFloat32(1.0f));
+				const ndVector viewPoint(m_invProjectionMatrix.TransformVector1x4(sp));
+				m_frutrum[4 * k + 2 * j + i] = viewPoint.Scale(1.0f / viewPoint.m_w);
+
+				const ndVector xxx(m_viewMatrix.TransformVector(m_frutrum[4 * k + 2 * j + i]));
+				const ndVector xxx1(m_viewMatrix.TransformVector(m_frutrum[4 * k + 2 * j + i]));
+			}
+		}
+	}
 }
 
 ndVector ndDemoCamera::ScreenToWorld (const ndVector& screenPoint) const
 {
-#if 0
-	GLdouble winX = screenPoint.m_x; //Store the x cord;
-	GLdouble winY = screenPoint.m_y; //Store the y cord
-	GLdouble winZ = screenPoint.m_z; //Store the Z cord
-
-	//Now windows coordinates start with (0,0) being at the top left 
-	//whereas OpenGL cords start lower left so we have to do this to convert it: 
-	//Remember we got viewport value before 
-	winY = (ndFloat32)m_viewport[3] - winY; 
-
-	GLdouble objx;
-	GLdouble objy;
-	GLdouble objz;
-	GLdouble modelViewMatrix[16];
-	GLdouble projectionViewMatrix[16];
-	for (ndInt32 i = 0; i < 4; ++i) 
-	{
-		for (ndInt32 j = 0; j < 4; ++j)
-		{
-			modelViewMatrix[i * 4 + j] = m_viewMatrix[i][j];
-			projectionViewMatrix[i * 4 + j] = m_projectionMatrix[i][j];
-		}
-	}
-
-	gluUnProject (winX, winY, winZ, modelViewMatrix, projectionViewMatrix, (GLint*)&m_viewport, &objx, &objy, &objz);
-	return ndVector (ndFloat32(objx), ndFloat32(objy), ndFloat32(objz), ndFloat32 (1.0f));
-
-#else
 	ndVector sp(screenPoint);
 	sp.m_y = (ndFloat32)m_viewport[3] - sp.m_y;
 
 	sp.m_x = ndFloat32(2.0f) * (sp.m_x - (ndFloat32)m_viewport[0]) / (ndFloat32)m_viewport[2] - ndFloat32(1.0f);
-	sp.m_y = ndFloat32(2.0f) * (sp.m_y - (ndFloat32)m_viewport[1]) / (ndFloat32)m_viewport[3] - ndFloat32(1.0f),
+	sp.m_y = ndFloat32(2.0f) * (sp.m_y - (ndFloat32)m_viewport[1]) / (ndFloat32)m_viewport[3] - ndFloat32(1.0f);
 	sp.m_z = ndFloat32(2.0f) * sp.m_z  - ndFloat32(1.0f);
 	sp.m_w = ndFloat32(1.0f);
-
+	
 	//sp = viewPoint * ViewMatrx * projeMatrix;
 	ndVector viewPoint(m_viewMatrix.OrthoInverse().TransformVector1x4(m_invProjectionMatrix.TransformVector1x4(sp)));
 	if (viewPoint.m_w != 0.0)
@@ -179,7 +196,6 @@ ndVector ndDemoCamera::ScreenToWorld (const ndVector& screenPoint) const
 		viewPoint = viewPoint.Scale(1.0f / viewPoint.m_w);
 	}
 	return viewPoint;
-#endif
 }
 
 //ndVector ndDemoCamera::WorldToScreen (const ndVector& worldPoint) const
