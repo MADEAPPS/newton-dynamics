@@ -181,7 +181,7 @@ void ndDemoCamera::SetViewMatrix(ndInt32 width, ndInt32 height)
 		ndVector point(pointInClickSpace.Scale (zdist));
 		point.m_w = zdist;
 		point = m_invProjectionMatrix.TransformVector1x4(point);
-		point = m_viewMatrix____.TransformVector1x4(point);
+		//point = m_viewMatrix____.TransformVector1x4(point);
 		return point;
 	};
 
