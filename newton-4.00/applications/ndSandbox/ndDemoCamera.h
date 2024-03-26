@@ -46,15 +46,20 @@ class ndDemoCamera: public ndDemoEntity
 	ndMatrix CreatePerspectiveMatrix(ndFloat32 FOV, ndFloat32 Aspect, ndFloat32 ZNear, ndFloat32 ZFar);
 
 	ndMatrix m_viewMatrix;
+	ndMatrix m_viewMatrix____;
+	ndMatrix m_invViewMatrix;
 	ndMatrix m_projectionMatrix;
 	ndMatrix m_invProjectionMatrix;
 	ndVector m_frutrum[8];
+	ndVector m_frustum[8];
 
 	ndFloat32 m_fov;
 	ndFloat32 m_backPlane;
 	ndFloat32 m_frontPlane;
 	ndFloat32 m_cameraYaw;
 	ndFloat32 m_cameraPitch;
+
+	static ndMatrix m_worldToOpenGl;
 
 	ndInt32 m_viewport[4]; 
 	friend class ndDemoEntity;

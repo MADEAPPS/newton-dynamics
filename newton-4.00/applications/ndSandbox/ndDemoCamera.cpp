@@ -17,6 +17,13 @@
 
 #define D_CAMERA_ANGLE			60.0f
 
+ndMatrix ndDemoCamera::m_worldToOpenGl(
+	ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(-1.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32( 0.0f), ndFloat32(1.0f)));
+
+
 ndDemoCamera::ndDemoCamera()
 	:ndDemoEntity (ndGetIdentityMatrix(), nullptr) 
 	,m_viewMatrix(ndGetIdentityMatrix())
@@ -87,27 +94,32 @@ ndMatrix ndDemoCamera::CreateMatrixFromFrustum(ndFloat32 left, ndFloat32 right, 
 
 ndMatrix ndDemoCamera::CreateLookAtMatrix(const ndVector& eyepoint, const ndVector& eyepointTarget, const ndVector& normUp)
 {
-	ndMatrix result(ndGetIdentityMatrix());
-	
-	ndVector zAxis(eyepoint - eyepointTarget);
-	zAxis = zAxis & ndVector::m_triplexMask;
-	zAxis = zAxis.Normalize();
+	//ndMatrix result(ndGetIdentityMatrix());
+	//ndVector zAxis(eyepoint - eyepointTarget);
+	//zAxis = zAxis & ndVector::m_triplexMask;
+	//zAxis = zAxis.Normalize();
+	//
+	//ndVector xAxis(normUp.CrossProduct(zAxis) & ndVector::m_triplexMask);
+	//xAxis = xAxis.Normalize();
+	//ndVector YAxis (zAxis.CrossProduct(xAxis) & ndVector::m_triplexMask);
+	//
+	//result[0] = xAxis;
+	//result[1] = YAxis;
+	//result[2] = zAxis;
+	//result[3] = ndVector::m_wOne;
+	//result = result.Transpose3x3();
+	//
+	//ndVector negEye (eyepoint);
+	//negEye = negEye.Scale(ndFloat32 (-1.0f));
+	//negEye[3] = ndFloat32 (1.0f);
+	//result[3] = result.TransformVector(negEye);
 
-	ndVector xAxis(normUp.CrossProduct(zAxis) & ndVector::m_triplexMask);
-	xAxis = xAxis.Normalize();
-	ndVector YAxis (zAxis.CrossProduct(xAxis) & ndVector::m_triplexMask);
-
-	result[0] = xAxis;
-	result[1] = YAxis;
-	result[2] = zAxis;
-	result[3] = ndVector::m_wOne;
-	result = result.Transpose3x3();
-
-	ndVector negEye (eyepoint);
-	negEye = negEye.Scale(ndFloat32 (-1.0f));
-	negEye[3] = ndFloat32 (1.0f);
-	result[3] = result.TransformVector(negEye);
-	return result;
+	ndMatrix matrix(ndGetIdentityMatrix());
+	matrix.m_front = ((eyepoint - eyepointTarget) & ndVector::m_triplexMask).Normalize();
+	matrix.m_right = (matrix.m_front.CrossProduct(normUp) & ndVector::m_triplexMask).Normalize();
+	matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front);
+	matrix.m_posit = (eyepoint & ndVector::m_triplexMask) | ndVector::m_wOne;
+	return m_worldToOpenGl * matrix;
 }
 
 ndMatrix ndDemoCamera::CreatePerspectiveMatrix(ndFloat32 fov, ndFloat32 aspect, ndFloat32 front, ndFloat32 back)
@@ -133,48 +145,67 @@ void ndDemoCamera::SetViewMatrix(ndInt32 width, ndInt32 height)
 
 	// set the model view matrix 
 	const ndVector pointOfInterest(m_matrix.m_posit + m_matrix.m_front);
-	m_viewMatrix = CreateLookAtMatrix(m_matrix.m_posit, pointOfInterest, m_matrix.m_up);
+	//m_viewMatrix = CreateLookAtMatrix(m_matrix.m_posit, pointOfInterest, m_matrix.m_up);
+	m_viewMatrix____ = CreateLookAtMatrix(m_matrix.m_posit, pointOfInterest, m_matrix.m_up);
+	m_invViewMatrix = m_viewMatrix____.OrthoInverse();
 
+	m_viewMatrix = m_invViewMatrix;
 
-	auto TestXXXX = [this](ndVector xxxx)
+	//auto Test_XXXX1 = [this](ndVector xxxx)
+	//{
+	//	ndVector xxxx1(m_invViewMatrix.TransformVector1x4(xxxx));
+	//	xxxx1 = m_projectionMatrix.TransformVector1x4(xxxx1);
+	//	xxxx1.m_x /= xxxx1.m_w;
+	//	xxxx1.m_y /= xxxx1.m_w;
+	//	xxxx1.m_z /= xxxx1.m_w;
+	//	return xxxx1;
+	//};
+	//auto Test_XXXX0 = [this](ndVector xxxx)
+	//{
+	//	ndVector xxxx1(xxxx.Scale (xxxx.m_w));
+	//	xxxx1.m_w = xxxx.m_w;
+	//	xxxx1 = m_invProjectionMatrix.TransformVector1x4(xxxx1);
+	//	xxxx1 = m_viewMatrix____.TransformVector1x4(xxxx1);
+	//	return xxxx1;
+	//};
+	//
+	//ndVector xxxx1(Test_XXXX1(ndVector(m_frontPlane, m_frontPlane * 0.577f, m_frontPlane * 1.026f, 1.0f)));
+	//ndVector xxxx2(Test_XXXX1(ndVector(m_backPlane, m_backPlane * 0.577f, m_backPlane * 1.026f, 1.0f)));
+	//
+	//ndVector xxxx3(Test_XXXX0(xxxx1));
+	//ndVector xxxx4(Test_XXXX0(xxxx2));
+	//ndVector xxxx5(Test_XXXX0(xxxx1));
+
+	auto CalcuateFrustumPoint = [this](const ndVector& pointInClickSpace, ndFloat32 zdist)
 	{
-		ndVector xxxx1(m_viewMatrix.TransformVector(xxxx));
-		ndVector xxxx2(m_projectionMatrix.TransformVector(xxxx1));
-		ndVector xxxx3(xxxx2.m_x / xxxx2.m_w, xxxx2.m_y / xxxx2.m_w, xxxx2.m_z / xxxx2.m_w, xxxx2.m_w);
-		return xxxx3;
+		ndVector point(pointInClickSpace.Scale (zdist));
+		point.m_w = zdist;
+		point = m_invProjectionMatrix.TransformVector1x4(point);
+		point = m_viewMatrix____.TransformVector1x4(point);
+		return point;
 	};
 
-	auto TestXXXX1 = [this](ndVector xxxx)
+	for (ndInt32 j = 0; j < 2; ++j)
 	{
-		ndVector xxxx1(xxxx.m_x * xxxx.m_w, xxxx.m_y * xxxx.m_w, xxxx.m_z * xxxx.m_w, 1.0f);
-		ndVector xxxx2(m_invProjectionMatrix.TransformVector1x4(xxxx1));
-		ndVector xxxx3(m_viewMatrix.OrthoInverse().TransformVector1x4(xxxx2));
-		return xxxx3;
-	};
-
-ndVector xxxx0(TestXXXX1(ndVector(1.0f, 1.0f, -1.0f, m_frontPlane)));
-ndVector xxxx1(TestXXXX1(ndVector(1.0f, 1.0f, 1.0f, m_backPlane)));
-
-ndVector xxxx2(TestXXXX(ndVector(m_frontPlane, 0.0f, 0.0f, 1.0f)));
-ndVector xxxx3(TestXXXX(ndVector(0.0f, m_frontPlane, 0.0f, 1.0f)));
-ndVector xxxx4(TestXXXX(ndVector(0.0f, 0.0f, m_frontPlane, 1.0f)));
-
-//ndVector xxxx4(TestXXXX(xxxx0));
-
-	for (ndInt32 k = 0; k < 2; ++k)
-	{
-		for (ndInt32 j = 0; j < 2; ++j)
+		for (ndInt32 i = 0; i < 2; ++i)
 		{
-			for (ndInt32 i = 0; i < 2; ++i)
-			{
-				//sp = viewPoint * projeMatrix;
-				const ndVector sp(ndFloat32(i * 2 - 1), ndFloat32(j * 2 - 1), ndFloat32(k * 2 - 1), ndFloat32(1.0f));
-				const ndVector viewPoint(m_invProjectionMatrix.TransformVector1x4(sp));
-				m_frutrum[4 * k + 2 * j + i] = viewPoint.Scale(1.0f / viewPoint.m_w);
+			const ndVector sp(ndFloat32(i * 2 - 1), ndFloat32(j * 2 - 1), ndFloat32(-1.0f), ndFloat32(1.0f));
+			const ndVector viewPoint(m_invProjectionMatrix.TransformVector1x4(sp));
+			m_frutrum[4 * 0 + 2 * j + i] = viewPoint.Scale(1.0f / viewPoint.m_w);
 
-				const ndVector xxx(m_viewMatrix.TransformVector(m_frutrum[4 * k + 2 * j + i]));
-				const ndVector xxx1(m_viewMatrix.TransformVector(m_frutrum[4 * k + 2 * j + i]));
-			}
+			m_frustum[2 * j + i] = CalcuateFrustumPoint(sp, m_frontPlane);
+		}
+	}
+
+	for (ndInt32 j = 0; j < 2; ++j)
+	{
+		for (ndInt32 i = 0; i < 2; ++i)
+		{
+			const ndVector sp(ndFloat32(i * 2 - 1), ndFloat32(j * 2 - 1), ndFloat32(1.0f), ndFloat32(1.0f));
+			const ndVector viewPoint(m_invProjectionMatrix.TransformVector1x4(sp));
+			m_frutrum[4 * 1 + 2 * j + i] = viewPoint.Scale(1.0f / viewPoint.m_w);
+
+			m_frustum[4 + 2 * j + i] = CalcuateFrustumPoint(sp, m_backPlane);
 		}
 	}
 }
