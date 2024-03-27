@@ -46,7 +46,7 @@ void ndShadowMapRenderPass::Init(ndDemoEntityManager* const manager, ndInt32 arg
 {
 	ndRenderPass::Init(manager, 0);
 
-	std::va_list args;
+	va_list args;
 	va_start(args, arguments);
 	m_shaderProgram = va_arg(args, GLuint);
 	va_end(args);
@@ -240,11 +240,11 @@ void ndShadowMapRenderPass::RenderScene(ndFloat32)
 		for (ndList<ndDemoEntity*>::ndNode* node = m_manager->GetFirst(); node; node = node->GetNext())
 		{
 			ndDemoEntity* const entity = node->GetInfo();
-			if (entity->CastShadow())
-			{
-				if (i == 1)
-				entity->RenderShadowMap(this, camProjection);
-			}
+			//if (entity->CastShadow())
+			//{
+			//	if (i == 1)
+			//	entity->RenderShadowMap(this, camProjection);
+			//}
 		}
 	
 		ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);

@@ -29,7 +29,7 @@ void ndColorRenderPass::Init(ndDemoEntityManager* const manager, ndInt32 argumen
 {
 	ndRenderPass::Init(manager, 0);
 
-	std::va_list args;
+	va_list args;
 	va_start(args, arguments);
 	////m_shaderProgram = va_arg(args, GLuint);
 	va_end(args);
@@ -37,6 +37,7 @@ void ndColorRenderPass::Init(ndDemoEntityManager* const manager, ndInt32 argumen
 
 void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 {
+#if 0
 	ImGuiIO& io = ImGui::GetIO();
 	ndInt32 display_w = (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
 	ndInt32 display_h = (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
@@ -182,4 +183,5 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 	glEnable(GL_SCISSOR_TEST);
 
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#endif
 }

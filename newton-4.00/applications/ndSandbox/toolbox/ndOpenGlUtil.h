@@ -145,6 +145,10 @@ class glVector4
 class glMatrix
 {
 	public:
+	glMatrix()
+	{
+	}
+
 	glMatrix(const ndMatrix& matrix)
 	{
 		for (ndInt32 i = 0; i < 4; ++i)
