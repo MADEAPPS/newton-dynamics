@@ -8,11 +8,10 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */  
-#version 330 core
+#version 450 core
 
 in vec3 texCoord;
-
-out vec4 color;
+layout(location = 0) out vec4 color;
 
 uniform samplerCube cubemap;
 

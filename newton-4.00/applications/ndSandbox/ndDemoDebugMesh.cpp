@@ -146,9 +146,9 @@ void ndFlatShadedDebugMesh::Render(ndDemoEntityManager* const scene, const ndMat
 
 		ndDemoCamera* const camera = scene->GetCamera();
 
-		const ndMatrix& viewMatrix = camera->GetInvViewMatrix();
+		const ndMatrix& invViewMatrix = camera->GetInvViewMatrix();
 		const ndMatrix& projectionMatrix = camera->GetProjectionMatrix();
-		const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
+		const glMatrix viewModelMatrix(modelMatrix * invViewMatrix);
 
 		const glMatrix projMatrix(projectionMatrix);
 		const glVector4 color(m_color);
@@ -305,7 +305,7 @@ void ndWireFrameDebugMesh::Render(ndDemoEntityManager* const scene, const ndMatr
 	if (m_shader)
 	{
 		ndDemoCamera* const camera = scene->GetCamera();
-		const glMatrix projectionViewModelMatrix(modelMatrix * camera->GetInvViewMatrix() * camera->GetProjectionMatrix());
+		const glMatrix projectionViewModelMatrix(modelMatrix * camera->GetInvViewProjectionMatrix());
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		//glDepthFunc(GL_LESS);

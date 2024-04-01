@@ -32,6 +32,8 @@ class ndDemoCamera: public ndDemoEntity
 	const ndMatrix& GetViewMatrix() const;
 	const ndMatrix& GetInvViewMatrix() const;
 	const ndMatrix& GetProjectionMatrix() const;
+	const ndMatrix& GetInvProjectionMatrix() const;
+	const ndMatrix& GetInvViewProjectionMatrix() const;
 
 	const ndMatrix& GetWorlToGlMatrix() const;
 
@@ -52,6 +54,7 @@ class ndDemoCamera: public ndDemoEntity
 	ndMatrix m_invViewMatrix;
 	ndMatrix m_projectionMatrix;
 	ndMatrix m_invProjectionMatrix;
+	ndMatrix m_invViewRrojectionMatrix;
 	ndVector m_frustum[8];
 
 	ndFloat32 m_fov;
@@ -82,6 +85,11 @@ inline const ndMatrix& ndDemoCamera::GetProjectionMatrix() const
 	return m_projectionMatrix;
 }
 
+inline const ndMatrix& ndDemoCamera::GetInvProjectionMatrix() const
+{
+	return m_invProjectionMatrix;
+}
+
 inline const ndMatrix& ndDemoCamera::GetViewMatrix() const
 {
 	return m_viewMatrix;
@@ -90,6 +98,11 @@ inline const ndMatrix& ndDemoCamera::GetViewMatrix() const
 inline const ndMatrix& ndDemoCamera::GetInvViewMatrix() const
 {
 	return m_invViewMatrix;
+}
+
+inline const ndMatrix& ndDemoCamera::GetInvViewProjectionMatrix() const
+{
+	return m_invViewRrojectionMatrix;
 }
 
 inline const ndMatrix& ndDemoCamera::GetWorlToGlMatrix() const

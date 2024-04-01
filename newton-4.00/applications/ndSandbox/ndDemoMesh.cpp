@@ -544,14 +544,6 @@ void ndDemoMesh::RenderDifusseShadow(ndDemoEntityManager* const scene, const ndM
 			const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
 			const glVector4 directionaLight(viewMatrix.RotateVector(scene->GetDirectionsLight()));
 
-ndMatrix xxxxxxx(camera->GetProjectionMatrix());
-ndVector xxx0(modelMatrix.TransformVector(ndVector::m_wOne));
-ndVector xxx1(viewMatrix.TransformVector(xxx0));
-ndVector xxx2(xxxxxxx.TransformVector1x4(xxx1));
-//xxx2.m_x /= xxx2.m_w;
-//xxx2.m_y /= xxx2.m_w;
-//xxx2.m_z /= xxx2.m_w;
-
 			glUniform1i(m_textureLocationShadow, 0);
 			glUniform1f(m_transparencyLocationShadow, 1.0f);
 			glUniform4fv(m_directionalLightDirLocationShadow, 1, &directionaLight[0]);

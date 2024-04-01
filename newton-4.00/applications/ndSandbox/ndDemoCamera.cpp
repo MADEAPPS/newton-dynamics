@@ -107,6 +107,7 @@ void ndDemoCamera::SetViewMatrix(ndInt32 width, ndInt32 height)
 	// calculate projection matrix
 	m_projectionMatrix = CreatePerspectiveMatrix(m_fov, GLfloat(width) / GLfloat(height), m_frontPlane, m_backPlane);
 	m_invProjectionMatrix = m_projectionMatrix.Inverse4x4();
+	m_invViewRrojectionMatrix = m_invViewMatrix * m_projectionMatrix;
 
 	auto CalculateFrustumPoint = [this](const ndVector& pointInClickSpace, ndFloat32 zdist)
 	{

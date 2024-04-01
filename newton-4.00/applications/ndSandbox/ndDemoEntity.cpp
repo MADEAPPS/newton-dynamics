@@ -303,7 +303,7 @@ void ndDemoEntity::RenderBone(ndDemoEntityManager* const scene, const ndMatrix& 
 		ndSkelDebug(ndDemoEntityManager* const scene)
 		{
 			ndDemoCamera* const camera = scene->GetCamera();
-			const glMatrix viewProjectionMatrix(camera->GetInvViewMatrix() * camera->GetProjectionMatrix());
+			const glMatrix viewProjectionMatrix(camera->GetInvViewProjectionMatrix());
 			m_shader = scene->GetShaderCache().m_wireFrame;
 
 			glUseProgram(m_shader);
