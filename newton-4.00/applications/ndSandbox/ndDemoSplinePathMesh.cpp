@@ -96,7 +96,7 @@ void ndDemoSplinePathMesh::Render(ndDemoEntityManager* const scene, const ndMatr
 	if (m_isVisible)
 	{
 		ndDemoCamera* const camera = scene->GetCamera();
-		const glMatrix viewProjectionMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
+		const glMatrix viewProjectionMatrix(modelMatrix * camera->GetInvViewMatrix() * camera->GetProjectionMatrix());
 
 		const glVector4 color(m_color);
 

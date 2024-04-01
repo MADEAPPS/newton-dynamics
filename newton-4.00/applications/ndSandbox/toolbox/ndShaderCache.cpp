@@ -39,13 +39,16 @@ bool ndShaderCache::CreateAllEffects()
 	m_wireFrame = CreateShaderEffect("WireFrame", "FlatShaded");
 	m_flatShaded = CreateShaderEffect("FlatShaded", "FlatShaded");
 	m_texturedDecal = CreateShaderEffect ("TextureDecal", "TextureDecal");
-
 	m_diffuseEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuse");
 	m_diffuseDebrisEffect = CreateShaderEffect("DirectionalDebriDiffuse", "DirectionalDebriDiffuse");
 	m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse", "DirectionalDiffuse");
 	m_diffuseIntanceEffect = CreateShaderEffect ("DirectionalDiffuseInstance", "DirectionalDiffuse");
 	m_thickPoints = CreateShaderEffect("ThickPoint", "ThickPoint", "ThickPoint");
 	m_spriteSpheres = CreateShaderEffect("DirectionalDiffuseSprite", "DirectionalDiffuseSprite", "DirectionalDiffuseSprite");
+
+	// shadow programs
+	m_shadowMaps = CreateShaderEffect("ShadowMap", "ShadowMap");
+	m_diffuseShadowEffect = CreateShaderEffect("DirectionalDiffuseShadow", "DirectionalDiffuseShadow");
 
 	return true;
 }
@@ -128,7 +131,7 @@ GLuint ndShaderCache::CreateShaderEffect (const char* const vertexShaderName, co
 	if (state != GL_TRUE ) 
 	{
 		GLsizei length;  
-		glGetShaderInfoLog(vertexShader, sizeof (buffer), &length, errorLog);
+		glGetShaderInfoLog(pixelShader, sizeof (buffer), &length, errorLog);
 		ndTrace((errorLog));
 	}
 	glAttachShader(program, pixelShader);

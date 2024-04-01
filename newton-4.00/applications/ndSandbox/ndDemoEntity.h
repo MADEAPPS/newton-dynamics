@@ -19,6 +19,7 @@ class ndDemoEntity;
 class ndAnimKeyframe;
 class ndShaderCache;
 class ndDemoMeshInterface;
+class ndShadowMapRenderPass;
 
 class ndDemoEntity: public ndNodeHierarchy<ndDemoEntity>
 {
@@ -62,6 +63,11 @@ class ndDemoEntity: public ndNodeHierarchy<ndDemoEntity>
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
 
+	bool CastShadow() const;
+	void SetShadowMode(bool mode);
+
+	virtual void RenderShadowMap(ndShadowMapRenderPass* const shadowMap, const ndMatrix& matrix);
+
 	protected:
 	mutable ndMatrix m_matrix;			// interpolated matrix
 	ndVector m_curPosition;				// position one physics simulation step in the future
@@ -76,6 +82,7 @@ class ndDemoEntity: public ndNodeHierarchy<ndDemoEntity>
 	ndSpinLock m_lock;
 	bool m_isDead;
 	bool m_isVisible;
+	bool m_castShadow;
 
 	friend class ndPhysicsWorld;
 	friend class ndDemoEntityNotify;

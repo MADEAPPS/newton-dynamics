@@ -26,6 +26,7 @@
 #include <math.h>
 #include <float.h>
 #include <ctype.h>
+#include <cstdarg>
 
 #if (defined(WIN32) || defined(_WIN32))
 	#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers

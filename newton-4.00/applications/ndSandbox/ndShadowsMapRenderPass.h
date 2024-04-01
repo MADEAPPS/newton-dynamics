@@ -33,14 +33,12 @@ class ndShadowMapRenderPass: public ndRenderPass
 	glVector4 GetCameraSpaceSplits() const;
 	const glMatrix* GetLightProjMatrix() const;
 
-	private:
-	//class ndViewPortStart
-	//{
-	//	public:
-	//	//ndFloat32 m_origin_x____;
-	//	//ndInt32 m_origin_y;
-	//};
 
+	ndMatrix CreateLightMatrix(const ndVector& origin) const;
+	ndMatrix CalculateLightSpaceMatrix(ndInt32 indexSlice) const;
+	void CalculateWorldSpaceSubFrustum(ndVector* const frustum, ndInt32 indexSlice) const;
+
+	private:
 	void UpdateCascadeSplits();
 	ndMatrix CreateLightMatrix() const;
 	ndMatrix CalculateOrthoMatrix(const ndMatrix& camInvLight, ndInt32 sliceIndex) const;
@@ -53,7 +51,7 @@ class ndShadowMapRenderPass: public ndRenderPass
 	glMatrix m_lighProjectionMatrix[4];
 	glVector4 m_cameraSpaceSplits;
 
-	
+	ndDemoCamera* m_camera;
 	ndInt32 m_width;
 	ndInt32 m_height;
 

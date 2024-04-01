@@ -15,22 +15,37 @@
 #include "ndDemoEntity.h"
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
+#include "ndShadowsMapRenderPass.h"
 
 ndDemoMesh::ndDemoMesh(const char* const name)
 	:ndDemoMeshInterface()
 	,ndList<ndDemoSubMesh>()
 	,m_indexCount(0)
 	,m_vertexCount(0)
+	,m_shader(0)
 	,m_textureLocation(0)
 	,m_transparencyLocation(0)
 	,m_normalMatrixLocation(0)
 	,m_projectMatrixLocation(0)
 	,m_viewModelMatrixLocation(0)
-	,m_directionalLightDirLocation(0)
 	,m_materialAmbientLocation(0)
 	,m_materialDiffuseLocation(0)
 	,m_materialSpecularLocation(0)
-	,m_shader(0)
+	,m_directionalLightDirLocation(0)
+
+	,m_shaderShadow(0)
+	,m_textureLocationShadow(0)
+	,m_transparencyLocationShadow(0)
+	,m_projectMatrixLocationShadow(0)
+	,m_viewModelMatrixLocationShadow(0)
+	,m_materialAmbientLocationShadow(0)
+	,m_materialDiffuseLocationShadow(0)
+	,m_materialSpecularLocationShadow(0)
+	,m_directionalLightDirLocationShadow(0)
+	,m_worldMatrix(0)
+	,m_shadowSlices(0)
+	,m_depthMapTexture(0)
+	,m_directionLightViewProjectionMatrixShadow(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
@@ -45,6 +60,7 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh&, const ndShaderCache&)
 	,m_indexCount(0)
 	,m_vertexCount(0)
 	,m_shader(0)
+	,m_shaderShadow(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
@@ -85,6 +101,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 	,m_indexCount(0)
 	,m_vertexCount(0)
 	,m_shader(0)
+	,m_shaderShadow(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
@@ -94,6 +111,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 	ndMeshEffect mesh(*collision);
 	ndMatrix aligmentUV(uvMatrix);
 	m_shader = shaderCache.m_diffuseEffect;
+	m_shaderShadow = shaderCache.m_diffuseShadowEffect;
 
 	// apply uv projections
 	ndInt32 tex0 = ndInt32(LoadTexture(texture0));
@@ -208,6 +226,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 	,m_indexCount(0)
 	,m_vertexCount(0)
 	,m_shader(0)
+	,m_shaderShadow(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
@@ -215,6 +234,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 {
 	m_name = name;
 	m_shader = shaderCache.m_diffuseEffect;
+	m_shaderShadow = shaderCache.m_diffuseShadowEffect;
 
 	// extract the materials index array for mesh
 	ndIndexArray* const geometryHandle = meshNode->MaterialGeometryBegin();
@@ -374,18 +394,36 @@ void ndDemoMesh::OptimizeForRender(
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glUseProgram(m_shader);
-	m_textureLocation = glGetUniformLocation(m_shader, "texture");
+	m_textureLocation = glGetUniformLocation(m_shader, "texture0");
 	m_transparencyLocation = glGetUniformLocation(m_shader, "transparency");
 	m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
 	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
 	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
-	m_directionalLightDirLocation = glGetUniformLocation(m_shader, "directionalLightDir");
-
 	m_materialAmbientLocation = glGetUniformLocation(m_shader, "material_ambient");
 	m_materialDiffuseLocation = glGetUniformLocation(m_shader, "material_diffuse");
 	m_materialSpecularLocation = glGetUniformLocation(m_shader, "material_specular");
+	m_directionalLightDirLocation = glGetUniformLocation(m_shader, "directionalLightDir");
+	glUseProgram(0);
+
+
+	glUseProgram(m_shaderShadow);
+	m_textureLocationShadow = glGetUniformLocation(m_shaderShadow, "texture0");
+	m_transparencyLocationShadow = glGetUniformLocation(m_shaderShadow, "transparency");
+	m_projectMatrixLocationShadow = glGetUniformLocation(m_shaderShadow, "projectionMatrix");
+	m_viewModelMatrixLocationShadow = glGetUniformLocation(m_shaderShadow, "viewModelMatrix");
+	m_materialAmbientLocationShadow = glGetUniformLocation(m_shaderShadow, "material_ambient");
+	m_materialDiffuseLocationShadow = glGetUniformLocation(m_shaderShadow, "material_diffuse");
+	m_materialSpecularLocationShadow = glGetUniformLocation(m_shaderShadow, "material_specular");
+	m_directionalLightDirLocationShadow = glGetUniformLocation(m_shaderShadow, "directionalLightDir");
+
+	m_shadowSlices = glGetUniformLocation(m_shaderShadow, "shadowSlices");
+	m_worldMatrix = glGetUniformLocation(m_shaderShadow, "modelWorldMatrix");
+	m_depthMapTexture = glGetUniformLocation(m_shaderShadow, "depthMapTexture");
+	m_directionLightViewProjectionMatrixShadow = glGetUniformLocation(m_shaderShadow, "directionaLightViewProjectionMatrix");
 
 	glUseProgram(0);
+
+
 	m_vertexCount = pointCount;
 	m_indexCount = indexCount;
 }
@@ -400,7 +438,7 @@ void  ndDemoMesh::ResetOptimization()
 	}
 }
 
-void ndDemoMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
+void ndDemoMesh::RenderDifusse(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
 {
 	if (m_isVisible)
 	{
@@ -426,10 +464,10 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelM
 
 			ndDemoCamera* const camera = scene->GetCamera();
 
-			const ndMatrix& viewMatrix = camera->GetViewMatrix();
+			const ndMatrix& viewMatrix = camera->GetInvViewMatrix();
 			const glMatrix& projectionMatrix (camera->GetProjectionMatrix());
 			const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
-			const glVector4 directionaLight(viewMatrix.RotateVector(ndVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+			const glVector4 directionaLight(viewMatrix.RotateVector(scene->GetDirectionsLight()));
 
 			glUniform1i(m_textureLocation, 0);
 			glUniform1f(m_transparencyLocation, 1.0f);
@@ -459,7 +497,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelM
 					glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse[0]);
 					glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
 
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+					//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 					glBindTexture(GL_TEXTURE_2D, GLuint(segment.m_material.GetTexture()));
 					glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
 				}
@@ -474,16 +512,130 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelM
 	}
 }
 
+void ndDemoMesh::RenderDifusseShadow(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
+{
+	if (m_isVisible)
+	{
+		bool hasTransparency = m_hasTransparency;
+		if (hasTransparency)
+		{
+			scene->PushTransparentMesh(this, modelMatrix);
+		}
+
+		if (hasTransparency)
+		{
+			for (ndNode* node = GetFirst(); node; node = node->GetNext())
+			{
+				ndDemoSubMesh& segment = node->GetInfo();
+				hasTransparency = hasTransparency & segment.m_hasTranparency;
+			}
+		}
+
+		if (!hasTransparency)
+		{
+			glUseProgram(m_shaderShadow);
+
+			ndDemoCamera* const camera = scene->GetCamera();
+			const ndShadowMapRenderPass* const shadowPass = scene->GetShadowMapRenderPass();
+
+			const ndMatrix& viewMatrix = camera->GetInvViewMatrix();
+			const glMatrix& worldModelMatrix(modelMatrix);
+			const glMatrix& projectionMatrix(camera->GetProjectionMatrix());
+			const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
+			const glVector4 directionaLight(viewMatrix.RotateVector(scene->GetDirectionsLight()));
+
+ndMatrix xxxxxxx(camera->GetProjectionMatrix());
+ndVector xxx0(modelMatrix.TransformVector(ndVector::m_wOne));
+ndVector xxx1(viewMatrix.TransformVector(xxx0));
+ndVector xxx2(xxxxxxx.TransformVector1x4(xxx1));
+//xxx2.m_x /= xxx2.m_w;
+//xxx2.m_y /= xxx2.m_w;
+//xxx2.m_z /= xxx2.m_w;
+
+			glUniform1i(m_textureLocationShadow, 0);
+			glUniform1f(m_transparencyLocationShadow, 1.0f);
+			glUniform4fv(m_directionalLightDirLocationShadow, 1, &directionaLight[0]);
+			glUniformMatrix4fv(m_projectMatrixLocationShadow, 1, false, &projectionMatrix[0][0]);
+			glUniformMatrix4fv(m_viewModelMatrixLocationShadow, 1, false, &viewModelMatrix[0][0]);
+
+			glUniform1i(m_depthMapTexture, 1);
+			const glMatrix* const lightViewProjectMatrix = shadowPass->GetLightProjMatrix();
+			glUniformMatrix4fv(m_worldMatrix, 1, GL_FALSE, &worldModelMatrix[0][0]);
+			glUniformMatrix4fv(m_directionLightViewProjectionMatrixShadow, 4, GL_FALSE, &lightViewProjectMatrix[0][0][0]);
+
+			glVector4 cameraSpaceSplits(shadowPass->GetCameraSpaceSplits());
+			glUniform4fv(m_shadowSlices, 1, &cameraSpaceSplits[0]);
+
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, shadowPass->GetShadowMapTexture());
+
+			//float k1 = 7.0 / 120.0;
+			//float k2 = 1.0 / 240.0;
+			//float d2 = viewModelMatrix.m_posit.DotProduct(viewModelMatrix.m_posit & ndVector::m_triplexMask).GetScalar();
+			//float d1 = sqrt(d2);
+			//float attenuation = 1.0 / (1.0 + k1 * d1 + k2 * d2);
+			//ndAssert(attenuation > 0.0f);
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+			glBindVertexArray(m_vertextArrayBuffer);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+
+			glActiveTexture(GL_TEXTURE0);
+			for (ndNode* node = GetFirst(); node; node = node->GetNext())
+			{
+				ndDemoSubMesh& segment = node->GetInfo();
+				if (!segment.m_hasTranparency)
+				{
+					glUniform3fv(m_materialAmbientLocationShadow, 1, &segment.m_material.m_ambient[0]);
+					glUniform3fv(m_materialDiffuseLocationShadow, 1, &segment.m_material.m_diffuse[0]);
+					glUniform3fv(m_materialSpecularLocationShadow, 1, &segment.m_material.m_specular[0]);
+					glBindTexture(GL_TEXTURE_2D, GLuint(segment.m_material.GetTexture()));
+					glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+				}
+			}
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			glBindVertexArray(0);
+			glUseProgram(0);
+		}
+	}
+}
+
+void ndDemoMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
+{
+	//RenderDifusse(scene, modelMatrix);
+	RenderDifusseShadow(scene, modelMatrix);
+}
+
+void ndDemoMesh::RenderShadowMap(ndShadowMapRenderPass* const shadowMap, const ndMatrix& modelMatrixProjection)
+{
+	glUniformMatrix4fv(GLint(shadowMap->GetShaderModelProjMatrix()), 1, false, &modelMatrixProjection[0][0]);
+	
+	glBindVertexArray(m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	
+	for (ndNode* node = GetFirst(); node; node = node->GetNext())
+	{
+		ndDemoSubMesh& segment = node->GetInfo();
+		if (!segment.m_hasTranparency)
+		{
+			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+		}
+	}
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
 void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
 {
 	glUseProgram(m_shader);
 
 	ndDemoCamera* const camera = scene->GetCamera();
 
-	const ndMatrix& viewMatrix = camera->GetViewMatrix();
+	const ndMatrix& viewMatrix = camera->GetInvViewMatrix();
 	const glMatrix& projectionMatrix (camera->GetProjectionMatrix());
 	const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
-	const glVector4 directionaLight(viewMatrix.RotateVector(ndVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+	const glVector4 directionaLight(viewMatrix.RotateVector(scene->GetDirectionsLight()));
 
 	glUniform1i(m_textureLocation, 0);
 	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight[0]);
@@ -510,8 +662,7 @@ void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const ndMatrix
 			glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient[0]);
 			glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_ambient[0]);
 
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
+			//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			glBindTexture(GL_TEXTURE_2D, GLuint (segment.m_material.GetTexture()));
 			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
 		}

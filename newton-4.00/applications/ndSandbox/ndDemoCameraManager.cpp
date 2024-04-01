@@ -165,8 +165,8 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, ndFloat32
 	m_camera->SetMatrix (rot, targetMatrix.m_posit);
 
 	// get the mouse pick parameter so that we can do replay for debugging
-	ndVector p0(m_camera->ScreenToWorld(ndVector(mouseX, mouseY, 0.0f, 0.0f)));
-	ndVector p1(m_camera->ScreenToWorld(ndVector(mouseX, mouseY, 1.0f, 0.0f)));
+	ndVector p0(m_camera->ScreenToWorld(ndVector(mouseX, mouseY, ndFloat32(0.0f), ndFloat32(0.0f))));
+	ndVector p1(m_camera->ScreenToWorld(ndVector(mouseX, mouseY, ndFloat32(1.0f), ndFloat32(0.0f))));
 
 #ifdef D_ENABLE_CAMERA_REPLAY
 	struct ndReplay

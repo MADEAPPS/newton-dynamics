@@ -14,6 +14,8 @@
 #include "ndVehicleUI.h"
 #include "ndDemoCamera.h"
 #include "ndDemoEntity.h"
+#include "ndPhysicsWorld.h"
+#include "ndDebugDisplay.h"
 #include "ndColorRenderPass.h"
 
 ndColorRenderPass::ndColorRenderPass()
@@ -37,7 +39,6 @@ void ndColorRenderPass::Init(ndDemoEntityManager* const manager, ndInt32 argumen
 
 void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 {
-#if 0
 	ImGuiIO& io = ImGui::GetIO();
 	ndInt32 display_w = (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
 	ndInt32 display_h = (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
@@ -163,18 +164,18 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 	//	RenderCenterOfMass(this);
 	//}
 	//
-	//if (m_showNormalForces) 
-	//{
-	//	m_world->Sync();
-	//	RenderContactPoints(this);
-	//	RenderNormalForces (this);
-	//}
-	//
 	//if (m_collisionDisplayMode)
 	//{
 	//	m_world->Sync();
 	//	DrawDebugShapes();
 	//}
+
+	if (m_manager->m_showNormalForces) 
+	{
+		//m_manager->m_world->Sync();
+		//RenderContactPoints(m_manager);
+		//RenderNormalForces (m_manager);
+	}
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -183,5 +184,4 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 	glEnable(GL_SCISSOR_TEST);
 
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-#endif
 }

@@ -25,11 +25,13 @@
 #include "ndTestDeepBrain.h"
 #include "ndDemoDebugMesh.h"
 #include "ndTargaToOpenGl.h"
+#include "ndColorRenderPass.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"
 #include "ndDemoCameraManager.h"
 #include "ndHighResolutionTimer.h"
+#include "ndShadowsMapRenderPass.h"
 
 //#define ENABLE_REPLAY
 #ifdef ENABLE_REPLAY
@@ -312,6 +314,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_profilerMode(false)
 	,m_solverMode(ndWorld::ndSimdSoaSolver)
 	,m_debugShapeCache(new ndDebugMeshCache())
+	,m_colorRenderPass(new ndColorRenderPass())
+	,m_shadowRenderPass(new ndShadowMapRenderPass())
 	,m_replayLogFile(nullptr)
 {
 	// Setup window
@@ -336,8 +340,9 @@ ndDemoEntityManager::ndDemoEntityManager()
 	// GL 3.0 + GLSL 130
 	const char* glsl_version = "#version 130";
 	glfwWindowHint(GLFW_SAMPLES, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+
 	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 	#endif
@@ -351,7 +356,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	// Create window with graphics context
 	char version[256];
 	sprintf(version, "Newton Dynamics %d.%.2i sandbox demos", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION);
-	m_mainFrame = glfwCreateWindow(1280, 720, version, NULL, NULL);
+	m_mainFrame = glfwCreateWindow(1280, 768, version, nullptr, nullptr);
 	glfwMakeContextCurrent(m_mainFrame);
 	glfwSwapInterval(0); // Enable vsync
 
@@ -471,6 +476,11 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	m_shaderCache.CreateAllEffects();
 
+	m_diretionalLightDir = ndVector(-1.0f, 1.0f, 1.0f, 0.0f).Normalize();
+
+	m_colorRenderPass->Init(this, 0);
+	m_shadowRenderPass->Init(this, 1, m_shaderCache.m_shadowMaps);
+
 	#ifdef ENABLE_REPLAY
 		#ifdef REPLAY_RECORD
 			m_replayLogFile = fopen("replayLog.bin", "wb");
@@ -514,6 +524,9 @@ ndDemoEntityManager::~ndDemoEntityManager ()
 		delete m_world;
 	}
 
+	delete m_colorRenderPass;
+	delete m_shadowRenderPass;
+
 	// Cleanup
 	GLuint font_texture = GLuint(m_defaultFont);
 	glDeleteTextures(1, &font_texture);
@@ -547,6 +560,11 @@ void APIENTRY ndDemoEntityManager::OpenMessageCallback(GLenum source,
 			case 131154:  // Pixel-path performance warning: Pixel transfer is synchronized with 3D rendering.
 			case 131185:  // nvidia driver report will use VIDEO memory as the source for buffer object operations
 				return;
+
+			//	for some reason when using different target I get this on nvidia gpus.
+			//	no one seem to know what cause this
+			case 131139: // Rasterization quality warning : A non - fullscreen clear caused a fallback from CSAA to MSAA.
+				return;
 		}
 		ndTrace(("GL CALLBACK: %s source = 0x%x, type = 0x%x, id = %d, severity = 0x%x, message = %s, length = %d \n",
 			(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), source, type, id, severity, message, length));
@@ -576,6 +594,11 @@ ndInt32 ndDemoEntityManager::GetHeight() const
 ndDemoCamera* ndDemoEntityManager::GetCamera() const
 {
 	return m_cameraManager->GetCamera();
+}
+
+const ndShadowMapRenderPass* ndDemoEntityManager::GetShadowMapRenderPass() const
+{
+	return (ndShadowMapRenderPass*)m_shadowRenderPass;
 }
 
 bool ndDemoEntityManager::GetKeyState(ndInt32 key) const
@@ -1209,14 +1232,6 @@ void ndDemoEntityManager::BeginFrame()
 	io.DisplaySize = ImVec2((ndReal)w, (ndReal)h);
 	io.DisplayFramebufferScale = ImVec2(w > 0 ? ((ndReal)display_w / (ndReal)w) : 0, h > 0 ? ((ndReal)display_h / (ndReal)h) : 0);
 
-	//int display_w, display_h;
-	//glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
-	glViewport(0, 0, display_w, display_h);
-
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-	glClear(GL_COLOR_BUFFER_BIT);
-
 	// Start the Dear ImGui frame
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
@@ -1345,7 +1360,7 @@ void ndDemoEntityManager::CreateSkyBox()
 
 void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const mesh, const ndMatrix& modelMatrix)
 {
-	ndVector dist (m_cameraManager->GetCamera()->GetViewMatrix().TransformVector(modelMatrix.m_posit));
+	ndVector dist (m_cameraManager->GetCamera()->GetInvViewMatrix().TransformVector(modelMatrix.m_posit));
 	TransparentMesh entry (modelMatrix, (ndDemoMesh*) mesh);
 	m_transparentHeap.Push (entry, dist.m_z);
 }
@@ -1397,7 +1412,7 @@ ndFloat32 ndDemoEntityManager::CalculateInteplationParam () const
 	return param;
 }
 
-void ndDemoEntityManager::RenderScene(ImDrawData* const draw_data)
+void ndDemoEntityManager::RenderScene(ImDrawData* const)
 {
 	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
 	ImGuiIO& io = ImGui::GetIO();
@@ -1410,81 +1425,12 @@ void ndDemoEntityManager::RenderScene(ImDrawData* const draw_data)
 	}
 
 	ndDemoEntityManager* const window = (ndDemoEntityManager*)io.UserData;
-
-	ImVec4 clearColor = ImColor(114, 144, 154);
-	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
-
 	window->RenderScene();
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_SCISSOR_TEST);
-	glEnable(GL_TEXTURE_2D);
-	//glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context
-
-	// Setup viewport, orthographic projection matrix
-	glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
 
 	if (*window->m_renderDemoGUI) 
 	{
 		window->m_renderDemoGUI->RenderUI();
 	}
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-
-	// Render command lists
-	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
-	//#define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
-	for (ndInt32 n = 0; n < draw_data->CmdListsCount; n++)
-	{
-		const ImDrawList* cmd_list = draw_data->CmdLists[n];
-		const ImDrawVert* vtx_buffer = cmd_list->VtxBuffer.Data;
-		const ImDrawIdx* idx_buffer = cmd_list->IdxBuffer.Data;
-		glVertexPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, pos)));
-		glTexCoordPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, uv)));
-		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, col)));
-
-		for (ndInt32 cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
-		{
-			const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
-			if (pcmd->UserCallback)
-			{
-				pcmd->UserCallback(cmd_list, pcmd);
-			}
-			else
-			{
-				glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
-				glScissor((ndInt32)pcmd->ClipRect.x, (ndInt32)((ndFloat32)fb_height - pcmd->ClipRect.w), (ndInt32)(pcmd->ClipRect.z - pcmd->ClipRect.x), (ndInt32)(pcmd->ClipRect.w - pcmd->ClipRect.y));
-				glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer);
-			}
-			idx_buffer += pcmd->ElemCount;
-		}
-	}
-	#undef OFFSETOF
-
-	// Restore modified state
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glPopAttrib();
 }
 
 void ndDemoEntityManager::DrawDebugShapes()
@@ -1597,122 +1543,20 @@ void ndDemoEntityManager::RenderScene()
 	CalculateFPS(timestep);
 	UpdatePhysics(timestep);
 	
+	ImGuiIO& io = ImGui::GetIO();
+	ndInt32 display_w = (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+	ndInt32 display_h = (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+
+	ndDemoCamera* const camera = GetCamera();
+	camera->SetViewMatrix(display_w, display_h);
+
 	// Get the interpolated location of each body in the scene
 	ndFloat32 interpolateParam = CalculateInteplationParam();
 	m_cameraManager->InterpolateMatrices (this, interpolateParam);
 
-	ImGuiIO& io = ImGui::GetIO();
-	ndInt32 display_w = (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-	ndInt32 display_h = (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
-	glViewport(0, 0, display_w, display_h);
-	glScissor(0, 0, display_w, display_h);
-	glEnable(GL_SCISSOR_TEST);	
-
-	// Culling. 
-	glCullFace (GL_BACK);
-	glFrontFace (GL_CCW);
-	glEnable (GL_CULL_FACE);
-
-	//	glEnable(GL_DITHER);
-	// z buffer test
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc (GL_LEQUAL);
-
-	// Setup camera matrix
-	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
-
-	// render all entities
-	const ndMatrix globalMatrix (ndGetIdentityMatrix());
-	if (m_hideVisualMeshes) 
-	{
-		if (m_sky) 
-		{
-			m_sky->Render(timestep, this, globalMatrix);
-		}
-	} 
-	else 
-	{
-		for (ndNode* node = ndList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext()) 
-		{
-			ndDemoEntity* const entity = node->GetInfo();
-			entity->Render(timestep, this, globalMatrix);
-		}
-
-		while (m_transparentHeap.GetCount()) 
-		{
-			const TransparentMesh& transparentMesh = m_transparentHeap[0];
-			transparentMesh.m_mesh->RenderTransparency(this, transparentMesh.m_matrix);
-			m_transparentHeap.Pop();
-		}
-	}
-
-	if (m_showMeshSkeleton)
-	{
-		for (ndNode* node = ndList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext())
-		{
-			ndDemoEntity* const entity = node->GetInfo();
-			entity->RenderSkeleton(this, globalMatrix);
-		}
-	}
-
-	if (m_showContactPoints)
-	{
-		m_world->Sync();
-		RenderContactPoints(this);
-	}
-	
-	if (m_showAABB) 
-	{
-		m_world->Sync();
-		RenderBodiesAABB(this);
-	}
-
-	if (m_showScene)
-	{
-		m_world->Sync();
-		RenderWorldScene(this);
-	}
-
-	//if (m_showRaycastHit) {
-	//	RenderRayCastHit(m_world);
-	//}
-
-	if (m_showJointDebugInfo) 
-	{
-		m_world->Sync();
-		RenderJointsDebugInfo(this);
-	}
-
-	if (m_showModelsDebugInfo)
-	{
-		m_world->Sync();
-		RenderModelsDebugInfo(this);
-	}
-
-	if (m_showBodyFrame)
-	{
-		m_world->Sync();
-		RenderBodyFrame(this);
-	}
-
-	if (m_showCenterOfMass) 
-	{
-		m_world->Sync();
-		RenderCenterOfMass(this);
-	}
-
-	if (m_showNormalForces) 
-	{
-		m_world->Sync();
-		RenderContactPoints(this);
-		RenderNormalForces (this);
-	}
-
-	if (m_collisionDisplayMode)
-	{
-		m_world->Sync();
-		DrawDebugShapes();
-	}
+	// apply pre-render passes
+	m_shadowRenderPass->RenderScene(timestep);
+	m_colorRenderPass->RenderScene(timestep);
 }
 
 void ndDemoEntityManager::TestImGui()
@@ -1779,15 +1623,9 @@ void ndDemoEntityManager::Run()
 		D_TRACKTIME();
 
 		BeginFrame();
-		RenderStats();
-
 		//TestImGui();
-
-		// Rendering
-		ImGui::Render();
 		RenderScene(ImGui::GetDrawData());
 
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(m_mainFrame);
 	}
 }

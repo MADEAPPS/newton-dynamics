@@ -256,7 +256,7 @@ void ndDemoSkinMesh::CreateRenderMesh(
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	
 	glUseProgram(m_shader);
-	mesh->m_textureLocation = glGetUniformLocation(m_shader, "texture");
+	mesh->m_textureLocation = glGetUniformLocation(m_shader, "texture0");
 	mesh->m_transparencyLocation = glGetUniformLocation(m_shader, "transparency");
 	mesh->m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
 	mesh->m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
@@ -323,10 +323,10 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& mo
 
 	ndDemoCamera* const camera = scene->GetCamera();
 
-	const ndMatrix& viewMatrix = camera->GetViewMatrix();
+	const ndMatrix& viewMatrix = camera->GetInvViewMatrix();
 	const glMatrix& projectionMatrix(camera->GetProjectionMatrix());
 	const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
-	const glVector4 directionaLight(viewMatrix.RotateVector(ndVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+	const glVector4 directionaLight(viewMatrix.RotateVector(scene->GetDirectionsLight()));
 
 	ndDemoMesh* const mesh = (ndDemoMesh*)*m_shareMesh;
 	glUniform1i(mesh->m_textureLocation, 0);
@@ -350,7 +350,7 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& mo
 			glUniform3fv(mesh->m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse[0]);
 			glUniform3fv(mesh->m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
 
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			glBindTexture(GL_TEXTURE_2D, GLuint(segment.m_material.GetTexture()));
 			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
 		}

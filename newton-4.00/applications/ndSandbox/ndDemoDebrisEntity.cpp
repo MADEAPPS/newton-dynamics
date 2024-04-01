@@ -144,7 +144,7 @@ void ndDemoDebrisMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& 
 {
 	ndDemoCamera* const camera = scene->GetCamera();
 
-	const ndMatrix& viewMatrix = camera->GetViewMatrix();
+	const ndMatrix& viewMatrix = camera->GetInvViewMatrix();
 	const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
 
 	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
@@ -245,9 +245,9 @@ void ndDemoDebrisRootEntity::Render(ndFloat32 timestep, ndDemoEntityManager* con
 	glBindVertexArray(shaderMesh->m_vertextArrayBuffer);
 	
 	ndDemoCamera* const camera = scene->GetCamera();
-	const ndMatrix& viewMatrix = camera->GetViewMatrix();
+	const ndMatrix& viewMatrix = camera->GetInvViewMatrix();
 	const glMatrix projectionMatrix (camera->GetProjectionMatrix());
-	const glVector4 directionaLight(viewMatrix.RotateVector(ndVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+	const glVector4 directionaLight(viewMatrix.RotateVector(scene->GetDirectionsLight()));
 	
 	glUniform1i(shaderMesh->m_textureLocation, 0);
 	glUniform1i(shaderMesh->m_textureLocation1, 1);
@@ -261,11 +261,11 @@ void ndDemoDebrisRootEntity::Render(ndFloat32 timestep, ndDemoEntityManager* con
 	
 	// these call make the font display wrong
 	glActiveTexture(GL_TEXTURE1);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBindTexture(GL_TEXTURE_2D, GLuint(shaderMesh->m_material[1].GetTexture()));
 	
 	glActiveTexture(GL_TEXTURE0);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBindTexture(GL_TEXTURE_2D, GLuint(shaderMesh->m_material[0].GetTexture()));
 	
 	const ndMatrix nodeMatrix(m_matrix * matrix);

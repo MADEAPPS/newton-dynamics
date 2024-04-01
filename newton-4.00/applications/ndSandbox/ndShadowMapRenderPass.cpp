@@ -15,8 +15,8 @@
 #include "ndDemoEntity.h"
 #include "ndShadowsMapRenderPass.h"
 
-#define ND_MAX_FAR_PLANE	ndFloat32 (100.0f)
-#define ND_MIN_NEAR_PLANE	ndFloat32 (0.25f)
+#define ND_MAX_FAR_PLANE	ndFloat32 (50.0f)
+#define ND_MIN_NEAR_PLANE	ndFloat32 (0.1f)
 
 ndShadowMapRenderPass::ndShadowMapRenderPass()
 	:ndRenderPass()
@@ -85,22 +85,10 @@ void ndShadowMapRenderPass::Init(ndDemoEntityManager* const manager, ndInt32 arg
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
-	//m_viewPorts[0].m_origin_x = 0;
-	//m_viewPorts[0].m_origin_y = m_height;
-	//
-	//m_viewPorts[1].m_origin_x = m_width;
-	//m_viewPorts[1].m_origin_y = m_height;
-	//
-	//m_viewPorts[2].m_origin_x = 0;
-	//m_viewPorts[2].m_origin_y = 0;
-	//
-	//m_viewPorts[3].m_origin_x = m_width;
-	//m_viewPorts[3].m_origin_y = 0;
-
-	m_viewPortTiles[0] = ndVector(ndFloat32(0.0f), ndFloat32(0.5f), ndFloat32(0.5f), ndFloat32(0.5f));
-	m_viewPortTiles[1] = ndVector(ndFloat32(0.5f), ndFloat32(0.5f), ndFloat32(0.5f), ndFloat32(0.5f));
-	m_viewPortTiles[2] = ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.5f), ndFloat32(0.5f));
-	m_viewPortTiles[3] = ndVector(ndFloat32(0.5f), ndFloat32(0.0f), ndFloat32(0.5f), ndFloat32(0.5f));
+	m_viewPortTiles[0] = ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.5f), ndFloat32(0.5f));
+	m_viewPortTiles[1] = ndVector(ndFloat32(0.5f), ndFloat32(0.0f), ndFloat32(0.5f), ndFloat32(0.5f));
+	m_viewPortTiles[2] = ndVector(ndFloat32(0.0f), ndFloat32(0.5f), ndFloat32(0.5f), ndFloat32(0.5f));
+	m_viewPortTiles[3] = ndVector(ndFloat32(0.5f), ndFloat32(0.5f), ndFloat32(0.5f), ndFloat32(0.5f));
 
 	m_lightProjectToTextureSpace = ndGetIdentityMatrix();
 	m_lightProjectToTextureSpace[0][0] = ndFloat32(0.5f);
@@ -112,23 +100,25 @@ void ndShadowMapRenderPass::Init(ndDemoEntityManager* const manager, ndInt32 arg
 ndMatrix ndShadowMapRenderPass::CreateLightMatrix() const
 {
 	ndMatrix lighMatrix(ndGetIdentityMatrix());
-	//const ndVector normUp(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f));
-	//ndVector zAxis(m_manager->GetDirectionsLight());
-	//lighMatrix.m_right = zAxis;
-	//lighMatrix.m_front = normUp.CrossProduct(lighMatrix.m_right).Normalize();
-	//lighMatrix.m_up = lighMatrix.m_right.CrossProduct(lighMatrix.m_front);
-	//return lighMatrix.Transpose4X4();
-
-lighMatrix = ndPitchMatrix(-90.0f * ndDegreeToRad);
-	
+#if 0
+	const ndVector normUp(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+	//ndVector xAxis(m_manager->GetDirectionsLight() * ndVector::m_negOne);
+	const ndVector xDir(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+	lighMatrix.m_front = xDir;
+	lighMatrix.m_right = lighMatrix.m_front.CrossProduct(normUp).Normalize();
+	lighMatrix.m_up = lighMatrix.m_right.CrossProduct(lighMatrix.m_front);
+#else
+	lighMatrix.m_front = ndVector(ndFloat32(0.0f), ndFloat32(-1.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+	lighMatrix.m_up = ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+	lighMatrix.m_right = lighMatrix.m_front.CrossProduct(lighMatrix.m_up);
+#endif
 	return lighMatrix;
 }
 
 void ndShadowMapRenderPass::UpdateCascadeSplits()
 {
-	const ndDemoCamera* const camera = m_manager->GetCamera();
-	const ndFloat32 farPlane = ndMin(camera->m_backPlane, ND_MAX_FAR_PLANE);
-	const ndFloat32 nearPlane = ndMax(camera->m_frontPlane, ND_MIN_NEAR_PLANE);
+	const ndFloat32 farPlane = ndMin(m_camera->m_backPlane, ND_MAX_FAR_PLANE);
+	const ndFloat32 nearPlane = ndMax(m_camera->m_frontPlane, ND_MIN_NEAR_PLANE);
 	const ndFloat32 ratio = farPlane / nearPlane;
 	
 	ndFloat32 splitePlanes[5];
@@ -147,41 +137,54 @@ void ndShadowMapRenderPass::UpdateCascadeSplits()
 
 ndMatrix ndShadowMapRenderPass::CalculateOrthoMatrix(const ndMatrix& camInvLight, ndInt32 sliceIndex) const
 {
-	const ndDemoCamera* const camera = m_manager->GetCamera();
-	
+	const ndVector p0(ndVector::m_zero);
 	ndVector pMin(ndFloat32(1.0e10f));
 	ndVector pMax(ndFloat32(-1.0e10f));
 
-	const ndVector p0(ndVector::m_zero);
+	auto CalculateFrustumPoint = [this, &camInvLight, &p0](const ndVector& p1, ndFloat32 xdist)
+	{
+		const ndVector p10(p1 - p0);
+		ndFloat32 step = (xdist - p0.m_x) / p10.m_x;
+		const ndVector lighFrutum(xdist, p0.m_y + p10.m_y * step, p0.m_z + p10.m_z * step, ndFloat32(1.0f));
+
+		const ndMatrix camViewMatrix(m_camera->GetViewMatrix());
+		const ndMatrix invLighMatrix(CreateLightMatrix().OrthoInverse());
+		//const ndVector xxx0(m_camera->GetViewMatrix().TransformVector(p0));
+		//const ndVector xxx1(invLighMatrix.TransformVector(xxx0));
+		//const ndVector xxx2(m_camera->GetWorlToGlMatrix().TransformVector(xxx1));
+		//
+		//const ndVector yyy0(m_camera->GetViewMatrix().TransformVector(p1));
+		//const ndVector yyy1(invLighMatrix.TransformVector(yyy0));
+		//const ndVector yyy2(m_camera->GetWorlToGlMatrix().TransformVector(yyy1));
+		
+		const ndVector zzz0(camViewMatrix.TransformVector(lighFrutum));
+		const ndVector zzz1(invLighMatrix.TransformVector(zzz0));
+		const ndVector zzz2(m_camera->GetWorlToGlMatrix().TransformVector(zzz1));
+
+		return camInvLight.TransformVector(lighFrutum);
+	};
+	
 	for (ndInt32 i = 0; i < 4; ++i)
 	{
-		//const ndVector p0(camera->m_frutrum[i + 0]);
-		const ndVector p1(camera->m_frutrum[i + 4]);
-		const ndVector p10(p1 - p0);
-	
-		ndFloat32 z0 = -m_nearFrustumPlanes[sliceIndex];
-		ndFloat32 step0 = (z0 - p0.m_z) / p10.m_z;
-		const ndVector lighFrutum0(p0.m_x + p10.m_x * step0, p0.m_y + p10.m_y * step0, z0, ndFloat32(1.0f));
-		const ndVector q0(camInvLight.TransformVector(lighFrutum0));
-	
-		ndFloat32 z1 = -m_farFrustumPlanes[sliceIndex];
-		ndFloat32 step1 = (z1 - p0.m_z) / p10.m_z;
-		const ndVector lighFrutum1(p0.m_x + p10.m_x * step1, p0.m_y + p10.m_y * step1, z1, ndFloat32(1.0f));
-		const ndVector q1(camInvLight.TransformVector(lighFrutum1));
-		
-		pMin = pMin.GetMin(q0.GetMin(q1));
-		pMax = pMax.GetMax(q0.GetMax(q1));
+		const ndVector p1(m_camera->m_frustum[i + 4]);
+
+		const ndVector f0(CalculateFrustumPoint(p1, m_nearFrustumPlanes[sliceIndex]));
+		pMin = pMin.GetMin(f0);
+		pMax = pMax.GetMax(f0);
+
+		const ndVector f1(CalculateFrustumPoint(p1, m_farFrustumPlanes[sliceIndex]));
+		pMin = pMin.GetMin(f1);
+		pMax = pMax.GetMax(f1);
 	}
 	
 	// Initialize orthographic matrix
-	ndFloat32 left    = pMin.m_x;
-	ndFloat32 right   = pMax.m_x;
-	ndFloat32 bottom  = pMin.m_y;
-	ndFloat32 top	  = pMax.m_y;
-	ndFloat32 nearVal = pMin.m_z;
-	ndFloat32 farVal  = pMax.m_z;
-	
-	//m_orthoProjectionMatrix = ndGetIdentityMatrix();
+	ndFloat32 left    = -pMin.m_x;
+	ndFloat32 right   = -pMax.m_x;
+	ndFloat32 top	  = -pMin.m_y;
+	ndFloat32 bottom  = -pMax.m_y;
+	ndFloat32 nearVal = -pMin.m_z;
+	ndFloat32 farVal  = -pMax.m_z;
+
 	ndMatrix orthoMatrix(ndGetIdentityMatrix());
 	orthoMatrix[0][0] = ndFloat32(2.0f) / (right - left);
 	orthoMatrix[1][1] = ndFloat32(2.0f) / (top - bottom);
@@ -189,69 +192,159 @@ ndMatrix ndShadowMapRenderPass::CalculateOrthoMatrix(const ndMatrix& camInvLight
 	orthoMatrix[3][0] = -(right + left) / (right - left);
 	orthoMatrix[3][1] = -(top + bottom) / (top - bottom);
 	orthoMatrix[3][2] = -(farVal + nearVal) / (farVal - nearVal);
+
+	const ndMatrix invLighMatrix(CreateLightMatrix().OrthoInverse());
+	 
+	ndVector xxx0(invLighMatrix.TransformVector(ndVector(m_nearFrustumPlanes[sliceIndex], 0.0f, 0.0f, 1.0f)));
+	const ndVector xxx1(m_camera->GetWorlToGlMatrix().TransformVector(xxx0));
+	const ndVector xxx2(orthoMatrix.TransformVector(xxx1));
 	
-	return orthoMatrix;
+	ndVector yyy0(invLighMatrix.TransformVector(ndVector(m_farFrustumPlanes[sliceIndex], 0.0f, 0.0f, 1.0f)));
+	const ndVector yyy1(m_camera->GetWorlToGlMatrix().TransformVector(yyy0));
+	const ndVector yyy2(orthoMatrix.TransformVector(yyy1));
+	
+	return m_camera->GetWorlToGlMatrix() * orthoMatrix;
+}
+
+void ndShadowMapRenderPass::CalculateWorldSpaceSubFrustum(ndVector* const frustum, ndInt32 sliceIndex) const
+{
+	const ndVector p0(ndVector::m_zero);
+
+	const ndMatrix& viewMatrix = m_camera->GetViewMatrix();
+	auto CalculateFrustumPoint = [this, &viewMatrix, &p0](const ndVector& p1, ndFloat32 xdist)
+	{
+		const ndVector p10(p1 - p0);
+		ndFloat32 step = (xdist - p0.m_x) / p10.m_x;
+		const ndVector point(xdist, p0.m_y + p10.m_y * step, p0.m_z + p10.m_z * step, ndFloat32(1.0f));
+		return viewMatrix.TransformVector(point);
+	};
+
+	for (ndInt32 i = 0; i < 4; ++i)
+	{
+		const ndVector p1(m_camera->m_frustum[i + 4]);
+		frustum[0 * 4 + i] = CalculateFrustumPoint(p1, m_nearFrustumPlanes[sliceIndex]);
+		frustum[1 * 4 + i] = CalculateFrustumPoint(p1, m_farFrustumPlanes[sliceIndex]);
+	}
+}
+
+ndMatrix ndShadowMapRenderPass::CreateLightMatrix(const ndVector& origin) const
+{
+	ndMatrix lighMatrix(ndGetIdentityMatrix());
+#if 1
+	const ndVector normUp(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+	//const ndVector xDir(m_manager->GetDirectionsLight() * ndVector::m_negOne);
+	lighMatrix.m_front = m_manager->GetDirectionsLight() * ndVector::m_negOne;
+	lighMatrix.m_right = lighMatrix.m_front.CrossProduct(normUp).Normalize();
+	lighMatrix.m_up = lighMatrix.m_right.CrossProduct(lighMatrix.m_front);
+#else
+	lighMatrix.m_front = ndVector(ndFloat32(0.0f), ndFloat32(-1.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+	lighMatrix.m_up = ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+	lighMatrix.m_right = lighMatrix.m_front.CrossProduct(lighMatrix.m_up);
+#endif
+
+	lighMatrix.m_posit = (origin & ndVector::m_triplexMask) | ndVector::m_wOne;
+	return lighMatrix;
+}
+
+ndMatrix ndShadowMapRenderPass::CalculateLightSpaceMatrix(ndInt32 sliceIndex) const
+{
+	ndVector frustum[8];
+	CalculateWorldSpaceSubFrustum(frustum, sliceIndex);
+
+	ndVector origin (ndVector::m_zero);
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		origin += frustum[i];
+	}
+	origin = origin.Scale(ndFloat32(1.0f / 8.0f));
+
+	const ndMatrix& worldToGl = m_camera->GetWorlToGlMatrix();
+	const ndMatrix invLightSpaceMatrix(CreateLightMatrix(origin).OrthoInverse() * worldToGl);
+
+	ndVector pMin(ndFloat32(1.0e10f));
+	ndVector pMax(ndFloat32(-1.0e10f));
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		ndVector point(invLightSpaceMatrix.TransformVector(frustum[i]));
+		pMin = pMin.GetMin(point);
+		pMax = pMax.GetMax(point);
+	}
+
+	// pad the volume to capture rounding errors.
+	pMin -= ndVector(4.0f);
+	pMax += ndVector(4.0f);
+
+	ndFloat32 left = pMin.m_x;
+	ndFloat32 right = pMax.m_x;
+	ndFloat32 top = pMin.m_y;
+	ndFloat32 bottom = pMax.m_y;
+	ndFloat32 nearVal = pMin.m_z;
+	ndFloat32 farVal = pMax.m_z;
+
+	ndMatrix orthoMatrix(ndGetIdentityMatrix());
+	orthoMatrix[0][0] = ndFloat32(2.0f) / (right - left);
+	orthoMatrix[1][1] = ndFloat32(2.0f) / (top - bottom);
+	orthoMatrix[2][2] = -ndFloat32(2.0f) / (farVal - nearVal);
+	orthoMatrix[3][0] = -(right + left) / (right - left);
+	orthoMatrix[3][1] = -(top + bottom) / (top - bottom);
+	orthoMatrix[3][2] = -(farVal + nearVal) / (farVal - nearVal);
+
+	return invLightSpaceMatrix * orthoMatrix;
 }
 
 void ndShadowMapRenderPass::RenderScene(ndFloat32)
 {
-	const ndMatrix lighMatrix (CreateLightMatrix());
-	UpdateCascadeSplits();
 
-	const ndDemoCamera* const camera = m_manager->GetCamera();
-
-	const ndMatrix invLighMatrix(lighMatrix.OrthoInverse());
-	const ndMatrix camInvLight(camera->GetViewMatrix().OrthoInverse() * invLighMatrix);
-	
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_frameBufferObject);
 	glDisable(GL_SCISSOR_TEST);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
-
-	//glClearDepth(0.0f);
+	
 	glClear(GL_DEPTH_BUFFER_BIT);
+	glUseProgram(m_shaderProgram);
+	
+	glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
+	glEnable(GL_POLYGON_OFFSET_FILL);
 
-	ndVector cameraTestPoint(ndVector::m_wOne);
-	const ndMatrix& cameraProjection = camera->GetProjectionMatrix();
+	m_camera = m_manager->GetCamera();
+	UpdateCascadeSplits();
+
 	ndMatrix tileMatrix(ndGetIdentityMatrix());
-
 	tileMatrix[0][0] = ndFloat32(0.5f);
 	tileMatrix[1][1] = ndFloat32(0.5f);
+
+	ndVector cameraTestPoint(ndVector::m_wOne);
+	const ndMatrix& cameraProjection = m_camera->GetProjectionMatrix();
 	for (ndInt32 i = 0; i < 4; i++)
 	{
+		ndMatrix lightSpaceMatrix(CalculateLightSpaceMatrix(i));
+
 		const ndVector viewPortTile(m_viewPortTiles[i]);
 		ndInt32 vp_x = ndInt32(viewPortTile.m_x * ndFloat32(2 * m_width));
 		ndInt32 vp_y = ndInt32(viewPortTile.m_y * ndFloat32(2 * m_height));
-		glViewport(vp_x, vp_y, m_width, m_height);
-		glUseProgram(m_shaderProgram);
-	
-		cameraTestPoint.m_z = -m_farFrustumPlanes[i];
-		const ndVector cameraPoint(cameraProjection.TransformVector1x4(cameraTestPoint));
-		ndFloat32 perpectiveZ = cameraPoint.m_z / cameraPoint.m_w;
-		m_cameraSpaceSplits[i] = perpectiveZ;
 
-		const ndMatrix projectionMatrix(CalculateOrthoMatrix(camInvLight, i));
-		const ndMatrix camProjection(invLighMatrix * projectionMatrix);
+		cameraTestPoint.m_x = m_farFrustumPlanes[i];
+		const ndVector cameraPoint(cameraProjection.TransformVector1x4(cameraTestPoint));
+		m_cameraSpaceSplits[i] = ndFloat32 (0.5f) * cameraPoint.m_z / cameraPoint.m_w + ndFloat32(0.5f);
 
 		tileMatrix[3][0] = viewPortTile.m_x;
 		tileMatrix[3][1] = viewPortTile.m_y;
-		m_lighProjectionMatrix[i] = (camProjection * m_lightProjectToTextureSpace * tileMatrix);
+		m_lighProjectionMatrix[i] = glMatrix(lightSpaceMatrix * m_lightProjectToTextureSpace * tileMatrix);
 
+		glViewport(vp_x, vp_y, m_width, m_height);
 		for (ndList<ndDemoEntity*>::ndNode* node = m_manager->GetFirst(); node; node = node->GetNext())
 		{
 			ndDemoEntity* const entity = node->GetInfo();
-			//if (entity->CastShadow())
-			//{
-			//	if (i == 1)
-			//	entity->RenderShadowMap(this, camProjection);
-			//}
+			if (entity->CastShadow())
+			{
+				//if (i==3)
+				entity->RenderShadowMap(this, lightSpaceMatrix);
+			}
 		}
-	
-		ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-		glUseProgram(0);
 	}
-	
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
-	glClearDepth(1.0f);
+	glDisable(GL_POLYGON_OFFSET_FILL);
+	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	glUseProgram(0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }

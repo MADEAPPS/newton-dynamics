@@ -18,6 +18,7 @@ struct ImDrawData;
 
 class ndDemoMesh;
 class ndUIEntity;
+class ndRenderPass;
 class ndDemoEntity;
 class ndMeshLoader;
 class ndDemoCamera;
@@ -27,6 +28,7 @@ class ndDemoMeshInterface;
 class ndDemoCameraManager;
 class ndWireFrameDebugMesh;
 class ndFlatShadedDebugMesh;
+class ndShadowMapRenderPass;
 
 class ndDemoEntityManager: public ndList <ndDemoEntity*>
 {
@@ -157,6 +159,8 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 
 	ndDemoCamera* GetCamera() const;
 	ndDemoCameraManager* GetCameraManager() const;
+	const ndShadowMapRenderPass* GetShadowMapRenderPass() const;
+
 	bool GetMouseSpeed(ndFloat32& posX, ndFloat32& posY) const;
 	bool GetMousePosition (ndFloat32& posX, ndFloat32& posY) const;
 	void SetCameraMatrix (const ndQuaternion& rotation, const ndVector& position);
@@ -181,9 +185,9 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	void SetDebugDisplay(ndInt32 mode) const;
 
 	void SetAcceleratedUpdate(); 
+	ndVector GetDirectionsLight() const;
 	const ndShaderCache& GetShaderCache() const;  
 	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(ndMeshLoader& loader, const char* const meshName);
-
 	void RegisterPostUpdate(OnPostUpdate* const postUpdate);
 	
 	private:
@@ -281,12 +285,17 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 
 	ndWorld::ndSolverModes m_solverMode;
 
-	ndLightSource m_directionalLight;
+	ndVector m_diretionalLightDir;
 	ndDebugMeshCache* m_debugShapeCache;
+	ndRenderPass* m_colorRenderPass;
+	ndRenderPass* m_shadowRenderPass;
 
 	FILE* m_replayLogFile;
 	static SDKDemos m_demosSelection[];
+
 	friend class ndPhysicsWorld;
+	friend class ndColorRenderPass;
+	friend class ndShadowMapRenderPass;
 };
 
 inline ndPhysicsWorld* ndDemoEntityManager::GetWorld() const
@@ -319,4 +328,10 @@ inline void ndDemoEntityManager::SetSelectedModel(ndModel* const model)
 {
 	m_selectedModel = model;
 }
+
+inline ndVector ndDemoEntityManager::GetDirectionsLight() const
+{
+	return m_diretionalLightDir;
+}
+
 #endif

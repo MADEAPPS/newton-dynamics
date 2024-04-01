@@ -87,6 +87,8 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	m_textureMatrixLocation = glGetUniformLocation(m_shader, "textureMatrix");
 	m_matrixUniformLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
 	glUseProgram(0);
+
+	SetShadowMode(false);
 }
 
 ndSkyBox::~ndSkyBox()
@@ -120,7 +122,7 @@ void ndSkyBox::Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatri
 	ndDemoCamera* const camera = scene->GetCamera();
 	
 	ndMatrix skyMatrix(ndGetIdentityMatrix());
-	ndMatrix viewMatrix(camera->GetViewMatrix());
+	ndMatrix viewMatrix(camera->GetInvViewMatrix());
 	skyMatrix.m_posit = viewMatrix.UntransformVector(ndVector(0.0f, 0.25f, 0.0f, 1.0f));
 	const glMatrix projectionViewModelMatrix(skyMatrix * viewMatrix * camera->GetProjectionMatrix());
 	

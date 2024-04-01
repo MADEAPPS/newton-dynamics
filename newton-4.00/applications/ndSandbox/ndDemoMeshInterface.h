@@ -19,6 +19,7 @@ class ndDemoMesh;
 class ndDemoEntity;
 class ndDemoSkinMesh;
 class ndDemoEntityManager;
+class ndShadowMapRenderPass;
 
 class ndDemoSubMeshMaterial
 {
@@ -69,8 +70,9 @@ class ndDemoMeshInterface : public ndClassAlloc
 	virtual ndDemoSkinMesh* GetAsDemoSkinMesh();
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const entityOwner);
 
-	virtual void Render (ndDemoEntityManager* const scene, const ndMatrix& modelMatrix) = 0;
+	virtual void RenderShadowMap(ndShadowMapRenderPass* const, const ndMatrix&) {}
 	virtual void RenderTransparency(ndDemoEntityManager* const, const ndMatrix&) {}
+	virtual void Render (ndDemoEntityManager* const scene, const ndMatrix& modelMatrix) = 0;
 
 	ndString m_name;
 	bool m_isVisible;

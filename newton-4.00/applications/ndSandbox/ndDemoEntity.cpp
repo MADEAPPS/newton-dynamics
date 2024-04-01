@@ -30,6 +30,7 @@ ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 	,m_lock()
 	,m_isDead(false)
 	,m_isVisible(true)
+	,m_castShadow(true)
 {
 	if (parent) 
 	{
@@ -149,6 +150,11 @@ ndDemoEntity::~ndDemoEntity(void)
 {
 }
 
+ndDemoEntity* ndDemoEntity::CreateClone () const
+{
+	return new ndDemoEntity(*this);
+}
+
 const ndString& ndDemoEntity::GetName() const
 {
 	return m_name;
@@ -159,9 +165,14 @@ void ndDemoEntity::SetName(const ndString& name)
 	m_name = name;
 }
 
-ndDemoEntity* ndDemoEntity::CreateClone () const
+void ndDemoEntity::SetShadowMode(bool mode)
 {
-	return new ndDemoEntity(*this);
+	m_castShadow = mode;
+}
+
+bool ndDemoEntity::CastShadow() const
+{
+	return m_castShadow;
 }
 
 ndSharedPtr<ndDemoMeshInterface> ndDemoEntity::GetMesh()
@@ -292,7 +303,7 @@ void ndDemoEntity::RenderBone(ndDemoEntityManager* const scene, const ndMatrix& 
 		ndSkelDebug(ndDemoEntityManager* const scene)
 		{
 			ndDemoCamera* const camera = scene->GetCamera();
-			const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+			const glMatrix viewProjectionMatrix(camera->GetInvViewMatrix() * camera->GetProjectionMatrix());
 			m_shader = scene->GetShaderCache().m_wireFrame;
 
 			glUseProgram(m_shader);
@@ -372,23 +383,6 @@ void ndDemoEntity::RenderSkeleton(ndDemoEntityManager* const scene, const ndMatr
 	}
 }
 
-void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const
-{
-	ndMatrix nodeMatrix (m_matrix * matrix);
-	ndDemoMeshInterface* const mesh = (ndDemoMeshInterface*)*m_mesh;
-	if (m_isVisible && mesh) 
-	{
-		// Render mesh if there is one 
-		ndMatrix modelMatrix (m_meshMatrix * nodeMatrix);
-		mesh->Render(scene, modelMatrix);
-	}
-
-	//RenderBone(scene, nodeMatrix);
-	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext()) 
-	{
-		child->Render(timestep, scene, nodeMatrix);
-	}
-}
 
 ndDemoEntity* ndDemoEntity::Find(const char* const name) const
 {
@@ -667,3 +661,38 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 	return shapeArray[0];
 }
 
+void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const
+{
+	ndMatrix nodeMatrix(m_matrix * matrix);
+	ndDemoMeshInterface* const mesh = (ndDemoMeshInterface*)*m_mesh;
+	if (m_isVisible && mesh)
+	{
+		// Render mesh if there is one 
+		const ndMatrix modelMatrix(m_meshMatrix * nodeMatrix);
+		mesh->Render(scene, modelMatrix);
+	}
+
+	//RenderBone(scene, nodeMatrix);
+	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	{
+		child->Render(timestep, scene, nodeMatrix);
+	}
+}
+
+void ndDemoEntity::RenderShadowMap(ndShadowMapRenderPass* const shadowMap, const ndMatrix& matrix)
+{
+	ndMatrix nodeMatrix(m_matrix * matrix);
+
+	ndDemoMeshInterface* const mesh = (ndDemoMeshInterface*)*m_mesh;
+	if (m_isVisible && mesh && m_castShadow)
+	{
+		// Render mesh if there is one 
+		const ndMatrix modelMatrix(m_meshMatrix * nodeMatrix);
+		mesh->RenderShadowMap(shadowMap, modelMatrix);
+	}
+
+	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	{
+		child->RenderShadowMap(shadowMap, nodeMatrix);
+	}
+}

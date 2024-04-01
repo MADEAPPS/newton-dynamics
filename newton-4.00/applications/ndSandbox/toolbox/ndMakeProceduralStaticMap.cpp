@@ -262,6 +262,7 @@ ndDemoEntity* BuildVisualEntity(ndDemoEntityManager* const scene, ndInt32 grids,
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry);
+	entity->SetShadowMode(false);
 
 	scene->AddEntity(entity);
 	return entity;

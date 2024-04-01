@@ -150,8 +150,7 @@ static GLuint LoadTargaImage(const char* const buffer, ndInt32 width, ndInt32 hi
 		glBindTexture(GL_TEXTURE_2D, texture);
 
 		// select modulate to mix texture with color for shading
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
+		//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 

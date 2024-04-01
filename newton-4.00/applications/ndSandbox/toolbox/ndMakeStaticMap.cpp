@@ -35,6 +35,7 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix&
 	location.m_posit.m_y -= 0.5f;
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
 	entity->SetMesh(geometry);
+	entity->SetShadowMode(false);
 
 	ndBodyKinematic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -140,6 +141,7 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry);
+	entity->SetShadowMode(false);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndBodyKinematic* const body = new ndBodyDynamic();
@@ -183,6 +185,7 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry);
+	entity->SetShadowMode(false);
 
 	ndBodyKinematic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -203,6 +206,7 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 	ndAssert(meshEffectNode);
 
 	ndDemoEntity* const visualEntity = new ndDemoEntity(scene, meshEffectNode);
+	visualEntity->SetShadowMode(false);
 	scene->AddEntity(visualEntity);
 	
 	ndPolygonSoupBuilder meshBuilder;
@@ -282,6 +286,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	ndMeshLoader loader;
 	ndMesh* const meshEffectNode = loader.LoadMesh ("playerarena.fbx");
 	ndDemoEntity* const entity = new ndDemoEntity(scene, meshEffectNode);
+	entity->SetShadowMode(false);
 	scene->AddEntity(entity);
 
 	ndPolygonSoupBuilder meshBuilder;
@@ -549,6 +554,7 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		ndSharedPtr<ndDemoMeshInterface> splineMesh (new ndDemoSplinePathMesh(spline, scene->GetShaderCache(), 500));
 		((ndDemoSplinePathMesh*)*splineMesh)->SetColor(ndVector(0.0f, 1.0f, 0.0f, 1.0f));
 		ndDemoEntity* const splineEntity = new ndDemoEntity(matrix, nullptr);
+		splineEntity->SetShadowMode(false);
 		scene->AddEntity(splineEntity);
 		splineEntity->SetMesh(splineMesh);
 		splineMesh->SetVisible(true);

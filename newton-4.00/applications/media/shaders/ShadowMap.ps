@@ -7,21 +7,17 @@
 * Permission is granted to anyone to use this software for any purpose,
 * including commercial applications, and to alter it and redistribute it
 * freely
-*/
-//#version 120
-#version 450 core
+*/  
 
-uniform sampler2D texture0;
+#version 330 core
 
-in vec2 uv;
-out vec4 pixelColor;
-
+//in vec2 uv;
+//uniform sampler2D depthMap;
+//out vec4 pixelColor;
+                                                                                    
 void main()
 {
-	// check if the shader is been called
-	//vec4 color = vec4 (1.0, 0.0, 0.0, 1.0);
-
-	vec4 color = texture(texture0, uv);
-	pixelColor = color;
+    //float depth = texture(depthMap, uv).x;
+    //depth = 1.0 - (1.0 - depth) * 25.0;
+    //pixelColor = vec4(depth);
 }
-

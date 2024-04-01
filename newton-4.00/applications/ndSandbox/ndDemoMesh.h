@@ -36,6 +36,8 @@ class ndDemoMesh: public ndDemoMeshInterface, public ndList<ndDemoSubMesh>
 	virtual void RenderNormals();
 	virtual void Render (ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 	virtual void RenderTransparency(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
+	virtual void RenderShadowMap(ndShadowMapRenderPass* const shadowMap, const ndMatrix& modelMatrixProjection);
+
 	void OptimizeForRender(const glPositionNormalUV* const points, ndInt32 pointCount,
 						   const ndInt32* const indices, ndInt32 indexCount);
 	void GetVertexArray(ndArray<ndVector>& points) const;
@@ -45,20 +47,38 @@ class ndDemoMesh: public ndDemoMeshInterface, public ndList<ndDemoSubMesh>
 	void ResetOptimization();
 	void RenderGeometry(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 
-	ndInt32 m_indexCount;
-	ndInt32 m_vertexCount;
-	ndInt32 m_textureLocation;
-	ndInt32 m_transparencyLocation;
-	ndInt32 m_normalMatrixLocation;
-	ndInt32 m_projectMatrixLocation;
-	ndInt32 m_viewModelMatrixLocation;
-	ndInt32 m_directionalLightDirLocation;
+	void RenderDifusse(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
+	void RenderDifusseShadow(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 
-	ndInt32 m_materialAmbientLocation;
-	ndInt32 m_materialDiffuseLocation;
-	ndInt32 m_materialSpecularLocation;
+	GLint m_indexCount;
+	GLint m_vertexCount;
 
 	GLuint m_shader;
+	GLint m_textureLocation;
+	GLint m_transparencyLocation;
+	GLint m_normalMatrixLocation;
+	GLint m_projectMatrixLocation;
+	GLint m_viewModelMatrixLocation;
+	GLint m_materialAmbientLocation;
+	GLint m_materialDiffuseLocation;
+	GLint m_materialSpecularLocation;
+	GLint m_directionalLightDirLocation;
+	
+	GLuint m_shaderShadow;
+	GLint m_textureLocationShadow;
+	GLint m_transparencyLocationShadow;
+	GLint m_projectMatrixLocationShadow;
+	GLint m_viewModelMatrixLocationShadow;
+	GLint m_materialAmbientLocationShadow;
+	GLint m_materialDiffuseLocationShadow;
+	GLint m_materialSpecularLocationShadow;
+	GLint m_directionalLightDirLocationShadow;
+
+	GLint m_worldMatrix;
+	GLint m_shadowSlices;
+	GLint m_depthMapTexture;
+	GLint m_directionLightViewProjectionMatrixShadow;
+
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;

@@ -7,21 +7,17 @@
 * Permission is granted to anyone to use this software for any purpose,
 * including commercial applications, and to alter it and redistribute it
 * freely
-*/
-//#version 120
-#version 450 core
+*/  
 
-uniform sampler2D texture0;
+#version 330 core
 
-in vec2 uv;
-out vec4 pixelColor;
+// usin the same vertex buffer
+layout (location = 0) in vec3 in_position;
+layout (location = 1) in vec3 in_normal;
+layout (location = 2) in vec2 in_uv;
 
-void main()
+uniform mat4 viewModelProjectionMatrix;
+void main()                                                                         
 {
-	// check if the shader is been called
-	//vec4 color = vec4 (1.0, 0.0, 0.0, 1.0);
-
-	vec4 color = texture(texture0, uv);
-	pixelColor = color;
+    gl_Position = viewModelProjectionMatrix * vec4(in_position, 1.0);
 }
-

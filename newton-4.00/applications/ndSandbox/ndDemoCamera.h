@@ -30,7 +30,10 @@ class ndDemoCamera: public ndDemoEntity
 	ndFloat32 GetPichAngle() const;
 
 	const ndMatrix& GetViewMatrix() const;
+	const ndMatrix& GetInvViewMatrix() const;
 	const ndMatrix& GetProjectionMatrix() const;
+
+	const ndMatrix& GetWorlToGlMatrix() const;
 
 	void SetMatrix (const ndQuaternion& rotation, const ndVector& position);
 	void SetViewMatrix (ndInt32 width, ndInt32 height);
@@ -46,11 +49,9 @@ class ndDemoCamera: public ndDemoEntity
 	ndMatrix CreatePerspectiveMatrix(ndFloat32 FOV, ndFloat32 Aspect, ndFloat32 ZNear, ndFloat32 ZFar);
 
 	ndMatrix m_viewMatrix;
-	ndMatrix m_viewMatrix____;
 	ndMatrix m_invViewMatrix;
 	ndMatrix m_projectionMatrix;
 	ndMatrix m_invProjectionMatrix;
-	ndVector m_frutrum[8];
 	ndVector m_frustum[8];
 
 	ndFloat32 m_fov;
@@ -66,6 +67,34 @@ class ndDemoCamera: public ndDemoEntity
 	friend class ndShadowMapRenderPass;
 };
 
+inline ndFloat32 ndDemoCamera::GetYawAngle() const
+{
+	return m_cameraYaw;
+}
 
+inline ndFloat32 ndDemoCamera::GetPichAngle() const
+{
+	return m_cameraPitch;
+}
+
+inline const ndMatrix& ndDemoCamera::GetProjectionMatrix() const
+{
+	return m_projectionMatrix;
+}
+
+inline const ndMatrix& ndDemoCamera::GetViewMatrix() const
+{
+	return m_viewMatrix;
+}
+
+inline const ndMatrix& ndDemoCamera::GetInvViewMatrix() const
+{
+	return m_invViewMatrix;
+}
+
+inline const ndMatrix& ndDemoCamera::GetWorlToGlMatrix() const
+{
+	return m_worldToOpenGl;
+}
 
 #endif 

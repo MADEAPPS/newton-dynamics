@@ -78,7 +78,7 @@ void RenderBodiesAABB(ndDemoEntityManager* const scene)
 	GLuint shader = scene->GetShaderCache().m_wireFrame;
 	
 	ndDemoCamera* const camera = scene->GetCamera();
-	const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+	const glMatrix viewProjectionMatrix(camera->GetInvViewMatrix() * camera->GetProjectionMatrix());
 	
 	glVector4 color;
 	color.m_x = 0.0f;
@@ -117,7 +117,7 @@ void RenderWorldScene(ndDemoEntityManager* const scene)
 	GLuint shader = scene->GetShaderCache().m_wireFrame;
 
 	ndDemoCamera* const camera = scene->GetCamera();
-	const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+	const glMatrix viewProjectionMatrix(camera->GetInvViewMatrix() * camera->GetProjectionMatrix());
 
 	glVector4 color(ndVector(1.0f, 1.0f, 0.0f, 1.0f));
 
@@ -164,7 +164,7 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	GLuint shader = scene->GetShaderCache().m_thickPoints;
 
 	ndDemoCamera* const camera = scene->GetCamera();
-	const ndMatrix viewMatrix(camera->GetViewMatrix());
+	const ndMatrix viewMatrix(camera->GetInvViewMatrix());
 	const ndMatrix projectionMatrix(camera->GetProjectionMatrix());
 
 	glVector4 color;
@@ -309,7 +309,7 @@ void RenderPolygon(ndDemoEntityManager* const scene, const ndVector* const point
 	GLuint shader = scene->GetShaderCache().m_wireFrame;
 
 	ndDemoCamera* const camera = scene->GetCamera();
-	const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+	const glMatrix viewProjectionMatrix(camera->GetInvViewMatrix() * camera->GetProjectionMatrix());
 
 	glUseProgram(shader);
 
@@ -348,7 +348,7 @@ void RenderBodyFrame(ndDemoEntityManager* const scene)
 	GLuint shader = scene->GetShaderCache().m_wireFrame;
 	
 	ndDemoCamera* const camera = scene->GetCamera();
-	const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+	const glMatrix viewProjectionMatrix(camera->GetInvViewMatrix() * camera->GetProjectionMatrix());
 	
 	glUseProgram(shader);
 	
@@ -406,7 +406,7 @@ void RenderCenterOfMass(ndDemoEntityManager* const scene)
 	GLuint shader = scene->GetShaderCache().m_wireFrame;
 	
 	ndDemoCamera* const camera = scene->GetCamera();
-	const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+	const glMatrix viewProjectionMatrix(camera->GetInvViewMatrix() * camera->GetProjectionMatrix());
 	
 	glUseProgram(shader);
 	
@@ -467,7 +467,7 @@ void RenderParticles(ndDemoEntityManager* const scene)
 	GLuint shader = scene->GetShaderCache().m_spriteSpheres;
 
 	ndDemoCamera* const camera = scene->GetCamera();
-	const ndMatrix viewMatrix(camera->GetViewMatrix());
+	const ndMatrix viewMatrix(camera->GetInvViewMatrix());
 	const ndMatrix projectionMatrix(camera->GetProjectionMatrix());
 
 	glVector4 color;
@@ -622,7 +622,7 @@ class ndJoindDebug : public ndConstraintDebugCallback
 	ndJoindDebug(ndDemoEntityManager* const scene)
 	{
 		ndDemoCamera* const camera = scene->GetCamera();
-		const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+		const glMatrix viewProjectionMatrix(camera->GetInvViewMatrix() * camera->GetProjectionMatrix());
 		m_shader = scene->GetShaderCache().m_wireFrame;
 
 		glUseProgram(m_shader);

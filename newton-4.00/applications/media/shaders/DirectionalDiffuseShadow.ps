@@ -9,40 +9,94 @@
 * freely
 */  
    
-#version 330 core
+#version 450 core
 
 uniform sampler2D texture0;
+uniform sampler2D depthMapTexture;
+
 uniform float transparency;
+uniform vec4 directionalLightDir;
+
+
+uniform mat4 directionaLightViewProjectionMatrix[4];
+uniform vec4 shadowSlices; 
+
 uniform vec3 material_ambient;
 uniform vec3 material_diffuse; 
 uniform vec3 material_specular; 
 
 in vec2 uv;
-in vec3 posit;
 in vec3 normal;
-in vec3 lightDir;
+in vec3 posit;
+in vec4 worldPosit;
 
 out vec4 pixelColor;
 
-vec3 FlashLightShading(vec3 normalDir)
+float CalculateShadowFactor()
 {
-	vec3 lightDir = -normalize (posit);
+	int index = 4;
+	if (gl_FragCoord.z < shadowSlices.x)
+	{
+		index = 0;
+	}
+	else if (gl_FragCoord.z < shadowSlices.y)
+	{
+		index = 1;
+	}
+	else if (gl_FragCoord.z < shadowSlices.z)
+	{
+		index = 2;
+	}
+	else if (gl_FragCoord.z < shadowSlices.w)
+	{
+		index = 3;
+	}
 
-	vec3 diffuseCoeff = vec3(0.7f, 0.7f, 0.7f);  
+	float darkness = 1.0f;
+	if (index < 4)
+	{
+		vec4 pointInDepthMapSpace = directionaLightViewProjectionMatrix[index] * worldPosit;
 
-	float k1 = 7.0/120.0; 
-	float k2 = 1.0/240.0; 
-	float d2 = dot(posit, posit);
-	float d1 = sqrt(d2);
-	float attenuation = 1.0 / (1.0 + k1 * d1 + k2 * d2);
-	
-	return diffuseCoeff * max (dot(normalDir, lightDir), 0.0) * attenuation;
+		pointInDepthMapSpace.z = clamp (pointInDepthMapSpace.z, 0.0f, 1.0f);
+		float textDepth = texture(depthMapTexture, vec2(pointInDepthMapSpace)).x;
+
+		if (textDepth < pointInDepthMapSpace.z)
+		{
+			darkness = 0.0f;
+		}
+	}
+
+	return darkness;
+}
+
+vec3 DebugTiles()
+{
+	vec3 tile = vec3 (1.0f, 1.0f, 1.0f);
+	if (gl_FragCoord.z < shadowSlices.x)
+	{
+		tile = vec3(1.0f, 0.0f, 0.0f);
+	}
+	else if (gl_FragCoord.z < shadowSlices.y)
+	{
+		tile = vec3(0.0f, 1.0f, 0.0f);
+	}
+	else if (gl_FragCoord.z < shadowSlices.z)
+	{
+		tile = vec3(0.0f, 0.0f, 1.0f);
+	}
+	else if (gl_FragCoord.z < shadowSlices.w)
+	{
+		tile = vec3(1.0f, 1.0f, 0.0f);
+	}
+
+	return tile;
 }
 
 vec3 PhongDirectionalShading(vec3 normalDir)
 {
 	vec3 specularDir = normalize (-posit);
 	
+	vec3 lightDir = vec3 (directionalLightDir);
 	vec3 reflectionDir = -reflect (lightDir, normalDir);
 	
 	//vec3 ambientCoeff = vec3(gl_LightSource[0].ambient * gl_FrontMaterial.ambient);
@@ -61,14 +115,15 @@ vec3 PhongDirectionalShading(vec3 normalDir)
 	vec3 diffuseColor = diffuseCoeff * max (dot(normalDir, lightDir), 0.0f);
 	vec3 specularColor = specularCoeff * pow (max (dot (reflectionDir, specularDir), 0.1), shininess);
 	
-	return ambientColor + diffuseColor + specularColor;
+	float shadowCoef = CalculateShadowFactor();
+	vec3 lightColor = diffuseColor + specularColor;
+	//lightColor = lightColor * DebugTiles();
+	return ambientColor + lightColor * shadowCoef;
 }
 
 void main()
 {
 	vec3 normalDir = normalize (normal);
-
-	//vec3 lightIntensity = PhongDirectionalShading(normalDir) + FlashLightShading(normalDir);
 	vec3 lightIntensity = PhongDirectionalShading(normalDir);
 
 	vec3 texColor = lightIntensity * vec3 (texture(texture0, uv));
