@@ -194,3 +194,17 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+
+void ndColorRenderPass::UpdateDebugDisplay(ndFloat32)
+{
+	// this is called on physics timestep.
+	// update all graphics buffers to display physics debug info until teh next physics substep
+	if (m_manager->m_showNormalForces)
+	{
+		ndTrace(("xxxxxxxxxxxxxxxxxxxxx\n"));
+		//m_manager->m_world->Sync();
+		//RenderContactPoints(m_manager);
+		//RenderNormalForces (m_manager);
+	}
+
+}

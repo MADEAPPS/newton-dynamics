@@ -133,6 +133,9 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API virtual void PreUpdate(ndFloat32 timestep);
 	D_NEWTON_API virtual void PostUpdate(ndFloat32 timestep);
 
+	D_NEWTON_API virtual void OnSubStepPreUpdate(ndFloat32 timestep);
+	D_NEWTON_API virtual void OnSubStepPostUpdate(ndFloat32 timestep);
+
 	private:
 	//void RemoveModel(ndSharedPtr<ndModel>& model);
 	void RemoveBody(ndSharedPtr<ndBody>& body);

@@ -471,13 +471,12 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_synchronousPhysicsUpdate = true;
 	m_synchronousParticlesUpdate = true;
 
+	m_shaderCache.CreateAllEffects();
 	m_colorRenderPass->Init(this, 0);
 	m_shadowRenderPass->Init(this, 1, m_shaderCache.m_shadowMaps);
 
 	Cleanup();
 	ResetTimer();
-
-	m_shaderCache.CreateAllEffects();
 
 	m_diretionalLightDir = ndVector(-1.0f, 1.0f, 1.0f, 0.0f).Normalize();
 
@@ -1540,6 +1539,14 @@ void ndDemoEntityManager::RegisterPostUpdate(OnPostUpdate* const postUpdate)
 		delete m_onPostUpdate;
 	}
 	m_onPostUpdate = postUpdate;
+}
+
+void ndDemoEntityManager::OnSubStepPostUpdate(ndFloat32 timestep)
+{
+	if (m_colorRenderPass)
+	{
+		((ndColorRenderPass*)m_colorRenderPass)->UpdateDebugDisplay(timestep);
+	}
 }
 
 void ndDemoEntityManager::RenderScene()

@@ -100,6 +100,8 @@ class ndPhysicsWorld: public ndWorld
 	void PreUpdate(ndFloat32 timestep);
 	void PostUpdate(ndFloat32 timestep);
 
+	void OnSubStepPostUpdate(ndFloat32 timestep);
+
 	ndDemoEntityManager* m_manager;
 	ndSoundManager* m_soundManager;
 	ndFloat32 m_timeAccumulator;

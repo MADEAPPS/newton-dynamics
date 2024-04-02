@@ -224,6 +224,8 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 
 	void DrawDebugShapes();
 
+	void OnSubStepPostUpdate(ndFloat32 timestep);
+
 	void TestImGui();
 	
 	GLFWwindow* m_mainFrame;

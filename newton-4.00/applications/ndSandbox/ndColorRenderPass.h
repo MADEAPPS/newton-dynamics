@@ -28,6 +28,8 @@ class ndColorRenderPass: public ndRenderPass
 
 	void RenderScene(ndFloat32 timestep);
 
+	void UpdateDebugDisplay(ndFloat32 timestep);
+
 	private:
 	ndDebugDisplay m_debugDisplay;
 };

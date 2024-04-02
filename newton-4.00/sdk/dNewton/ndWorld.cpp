@@ -360,6 +360,14 @@ void ndWorld::PostUpdate(ndFloat32)
 {
 }
 
+void ndWorld::OnSubStepPreUpdate(ndFloat32)
+{
+}
+
+void ndWorld::OnSubStepPostUpdate(ndFloat32)
+{
+}
+
 bool ndWorld::AddBody(const ndSharedPtr<ndBody>& body)
 {
 	ndAssert(GetSentinelBody() != body->GetAsBodyKinematic());
@@ -522,11 +530,15 @@ void ndWorld::CalculateAverageUpdateTime()
 	}
 }
 
+
+
 void ndWorld::SubStepUpdate(ndFloat32 timestep)
 {
 	D_TRACKTIME();
 
 	// do physics step
+	OnSubStepPreUpdate(timestep);
+
 	m_scene->m_lru = m_scene->m_lru + 1;
 	m_scene->SetTimestep(timestep);
 
@@ -558,6 +570,9 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 
 	// second pass on models
 	ModelPostUpdate();
+
+
+	OnSubStepPostUpdate(timestep);
 
 	m_scene->m_subStepNumber++;
 }

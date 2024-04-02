@@ -149,6 +149,12 @@ void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 	}
 }
 
+void ndPhysicsWorld::OnSubStepPostUpdate(ndFloat32 timestep)
+{
+	ndWorld::OnSubStepPostUpdate(timestep);
+	m_manager->OnSubStepPostUpdate(timestep);
+}
+
 void ndPhysicsWorld::NormalUpdates()
 {
 	m_acceleratedUpdate = false;
