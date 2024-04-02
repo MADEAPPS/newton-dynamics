@@ -210,7 +210,12 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 
 	glGenBuffers(1, &vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+
+	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glVector3), (void*)0);
+
+	glBindVertexArray(0);
+	glDisableVertexAttribArray(0);
 
 	glUniform4fv(pixelSizeLocation, 4, &quad[0][0]);
 
