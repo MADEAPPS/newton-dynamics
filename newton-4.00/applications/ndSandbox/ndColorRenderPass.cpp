@@ -172,8 +172,8 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 
 	if (m_manager->m_showNormalForces) 
 	{
-		//m_manager->m_world->Sync();
-		//RenderContactPoints(m_manager);
+		m_manager->m_world->Sync();
+		RenderContactPoints(m_manager);
 		//RenderNormalForces (m_manager);
 	}
 

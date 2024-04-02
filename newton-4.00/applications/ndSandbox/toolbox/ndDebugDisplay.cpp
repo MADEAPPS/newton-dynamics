@@ -202,8 +202,15 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	};
 
 	ndFixSizeArray<glVector3, 1024> pointBuffer;
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(4, GL_FLOAT, sizeof(glVector3), &pointBuffer[0]);
+
+	GLuint vertexBuffer;
+	GLuint vertextArrayBuffer;
+	glGenVertexArrays(1, &vertextArrayBuffer);
+	glBindVertexArray(vertextArrayBuffer);
+
+	glGenBuffers(1, &vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glVector3), (void*)0);
 
 	glUniform4fv(pixelSizeLocation, 4, &quad[0][0]);
 
@@ -220,6 +227,7 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 				pointBuffer.PushBack(contactPoint.m_point);
 				if (pointBuffer.GetCount() == pointBuffer.GetCapacity())
 				{
+					glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(pointBuffer.GetCount() * sizeof(glVector3)), &pointBuffer[0], GL_STATIC_DRAW);
 					glDrawArrays(GL_POINTS, 0, pointBuffer.GetCount());
 					pointBuffer.SetCount(0);
 				}
@@ -242,10 +250,15 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 			#endif
 		}
 	}
-	glDrawArrays(GL_POINTS, 0, pointBuffer.GetCount());
+	if (pointBuffer.GetCount())
+	{
+		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(pointBuffer.GetCount() * sizeof(glVector3)), & pointBuffer[0], GL_STATIC_DRAW);
+		glDrawArrays(GL_POINTS, 0, pointBuffer.GetCount());
+	}
 
 	glUseProgram(0);
-	glDisableClientState(GL_VERTEX_ARRAY);
+	glDeleteBuffers(1, &vertexBuffer);
+	glDeleteVertexArrays(1, &vertextArrayBuffer);
 }
 
 #else
