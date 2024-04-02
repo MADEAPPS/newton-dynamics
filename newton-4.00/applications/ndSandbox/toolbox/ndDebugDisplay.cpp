@@ -12,6 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
+#include "ndOpenGlUtil.h"
 #include "ndDebugDisplay.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
@@ -19,6 +20,165 @@
 
 #define D_USE_GEOMETRY_SHADERS 
 //#define D_TEST_CALCULATE_CONTACTS
+
+
+ndDebugDisplay::ndContactPoints::ndContactPoints()
+	:ndDebudPass()
+	,m_count(0)
+	,m_vertexBuffer(0)
+	,m_vertextArrayBuffer(0)
+{
+}
+
+ndDebugDisplay::ndContactPoints::~ndContactPoints()
+{
+}
+
+void ndDebugDisplay::ndContactPoints::Init(ndDemoEntityManager* const scene)
+{
+	//glGenBuffers(1, &m_vertexBuffer);
+	//glGenVertexArrays(1, &m_vertextArrayBuffer);
+	//
+	//glBindVertexArray(m_vertextArrayBuffer);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	//
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glVector3), (void*)0);
+	//
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
+	//glDisableVertexAttribArray(0);
+	//
+	//GLuint shader = scene->GetShaderCache().m_thickPoints;
+	//
+	//glUseProgram(shader);
+	//m_pixelSizeLocation = glGetUniformLocation(shader, "pixelSize");
+	//m_pixelColorLocation = glGetUniformLocation(shader, "inputPixelColor");
+	//
+	//m_viewModelMatrixLocation = glGetUniformLocation(shader, "viewModelMatrix");
+	//m_projectionMatrixLocation = glGetUniformLocation(shader, "projectionMatrix");
+	//glUseProgram(0);
+}
+
+void ndDebugDisplay::ndContactPoints::CleanUp()
+{
+	//if (m_vertexBuffer)
+	//{
+	//	glDeleteBuffers(1, &m_vertexBuffer);
+	//}
+	//if (m_vertextArrayBuffer)
+	//{
+	//	glDeleteVertexArrays(1, &m_vertextArrayBuffer);
+	//}
+	//m_vertexBuffer = 0;
+	//m_vertextArrayBuffer = 0;
+}
+
+void ndDebugDisplay::ndContactPoints::UpdateBuffers(ndPhysicsWorld* const world, ndArray<ndUnsigned8>& scratchBuffer)
+{
+	m_count = 0;
+	ndInt32 pointCount = 0;
+	const ndContactArray& contactList = world->GetContactList();
+	for (ndInt32 i = 0; i < contactList.GetCount(); ++i)
+	{
+		const ndContact* const contact = contactList[i];
+		if (contact->IsActive())
+		{
+			pointCount += contact->GetContactPoints().GetCount();
+		}
+	}
+
+	if (pointCount)
+	{
+		m_count = pointCount;
+		scratchBuffer.SetCount(ndInt32(pointCount * sizeof(glVector3)));
+		glVector3* const buffer = (glVector3*)&scratchBuffer[0];
+
+		ndInt32 index = 0;
+		for (ndInt32 i = 0; i < contactList.GetCount(); ++i)
+		{
+			const ndContact* const contact = contactList[i];
+			if (contact->IsActive())
+			{
+				pointCount += contact->GetContactPoints().GetCount();
+				const ndContactPointList& contactPoints = contact->GetContactPoints();
+				for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
+				{
+					const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
+					buffer[index] = glVector3(contactPoint.m_point);
+					index++;
+				}
+			}
+		}
+
+		//glBindVertexArray(m_vertextArrayBuffer);
+		//glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+		////glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(pointCount * sizeof(glVector3)), &buffer[0], GL_STATIC_DRAW);
+		//glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(pointCount * sizeof(glVector3)), &buffer[0], GL_DYNAMIC_DRAW);
+		//
+		//glBindBuffer(GL_ARRAY_BUFFER, 0);
+		//glBindVertexArray(0);
+	}
+}
+
+void ndDebugDisplay::ndContactPoints::Render(ndDemoEntityManager* const scene)
+{
+	if (!m_count)
+	{
+		return;
+	}
+return;
+
+//CleanUp();
+//Init(scene);
+
+	GLuint shader = scene->GetShaderCache().m_thickPoints;
+
+	ndDemoCamera* const camera = scene->GetCamera();
+	const ndMatrix invViewMatrix(camera->GetInvViewMatrix());
+	const ndMatrix projectionMatrix(camera->GetProjectionMatrix());
+
+	glVector4 color;
+	color.m_x = 255.0f / 255.0f;
+	color.m_y = 0.0f;
+	color.m_z = 0.0f;
+	color.m_w = 1.0f;
+
+	glUseProgram(shader);
+	
+	const glMatrix glViewMatrix(invViewMatrix);
+	const glMatrix glProjectionMatrix(projectionMatrix);
+
+	GLint viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	ndFloat32 radius = 4.0f / (ndFloat32)viewport[3];
+	
+	glVector4 quad[] =
+	{
+		ndVector(-radius, -radius, ndFloat32(0.0f), ndFloat32(0.0f)),
+		ndVector(radius, -radius, ndFloat32(0.0f), ndFloat32(0.0f)),
+		ndVector(-radius,  radius, ndFloat32(0.0f), ndFloat32(0.0f)),
+		ndVector(radius,  radius, ndFloat32(0.0f), ndFloat32(0.0f)),
+	};
+
+	glUniform4fv(m_pixelSizeLocation, 4, &quad[0][0]);
+	glUniform4fv(m_pixelColorLocation, 1, &color.m_x);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &glViewMatrix[0][0]);
+	glUniformMatrix4fv(m_projectionMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
+
+	glBindVertexArray(m_vertextArrayBuffer);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+	// I do not know why this fucking crashes really bad.
+	//glDrawArrays(GL_POINTS, 0, m_count);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDisableVertexAttribArray(0);
+	glBindVertexArray(0);
+
+	glUseProgram(0);
+}
 
 #if 0
 #ifndef D_USE_GEOMETRY_SHADERS 
@@ -750,6 +910,8 @@ void RenderNormalForces(ndDemoEntityManager* const scene, ndFloat32 scale)
 #endif
 
 ndDebugDisplay::ndDebugDisplay()
+	:m_scratchBuffer()
+	,m_contactsPonts()
 {
 };
 
@@ -757,10 +919,22 @@ ndDebugDisplay::~ndDebugDisplay()
 {
 }
 
-void ndDebugDisplay::Init()
+void ndDebugDisplay::Init(ndDemoEntityManager* const scene)
 {
+	m_contactsPonts.Init(scene);
 }
 
 void ndDebugDisplay::Cleanup()
 {
+	m_contactsPonts.CleanUp();
+}
+
+void ndDebugDisplay::UpdateContactPoints(ndPhysicsWorld* const world)
+{
+	m_contactsPonts.UpdateBuffers(world, m_scratchBuffer);
+}
+
+void ndDebugDisplay::RenderContactPoints(ndDemoEntityManager* const scene)
+{
+	m_contactsPonts.Render(scene);
 }

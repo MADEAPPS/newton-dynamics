@@ -43,7 +43,7 @@ void ndColorRenderPass::Init(ndDemoEntityManager* const manager, ndInt32 argumen
 	////m_shaderProgram = va_arg(args, GLuint);
 	va_end(args);
 
-	m_debugDisplay.Init();
+	m_debugDisplay.Init(manager);
 }
 
 void ndColorRenderPass::RenderScene(ndFloat32 timestep)
@@ -181,8 +181,7 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 
 	if (m_manager->m_showNormalForces) 
 	{
-		//m_manager->m_world->Sync();
-		//RenderContactPoints(m_manager);
+		m_debugDisplay.RenderContactPoints(m_manager);
 		//RenderNormalForces (m_manager);
 	}
 
@@ -201,7 +200,7 @@ void ndColorRenderPass::UpdateDebugDisplay(ndFloat32)
 	// update all graphics buffers to display physics debug info until teh next physics substep
 	if (m_manager->m_showNormalForces)
 	{
-		ndTrace(("xxxxxxxxxxxxxxxxxxxxx\n"));
+		m_debugDisplay.UpdateContactPoints(m_manager->GetWorld());
 		//m_manager->m_world->Sync();
 		//RenderContactPoints(m_manager);
 		//RenderNormalForces (m_manager);
