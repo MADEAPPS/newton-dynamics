@@ -20,6 +20,7 @@
 #define D_USE_GEOMETRY_SHADERS 
 //#define D_TEST_CALCULATE_CONTACTS
 
+#if 0
 #ifndef D_USE_GEOMETRY_SHADERS 
 static glVector3 CalculatePoint(const ndMatrix& matrix, const ndVector& center, ndFloat32 x, ndFloat32 y, ndFloat32 w)
 {
@@ -745,4 +746,21 @@ void RenderNormalForces(ndDemoEntityManager* const scene, ndFloat32 scale)
 			}
 		}
 	}
+}
+#endif
+
+ndDebugDisplay::ndDebugDisplay()
+{
+};
+
+ndDebugDisplay::~ndDebugDisplay()
+{
+}
+
+void ndDebugDisplay::Init()
+{
+}
+
+void ndDebugDisplay::Cleanup()
+{
 }

@@ -33,37 +33,34 @@ class ndDebugNotify : public ndShapeDebugNotify
 
 	ndBodyKinematic* m_body;
 	ndDemoEntityManager* m_manager;
-	
 };
 
-#if 0
-void RenderBodyFrame (NewtonWorld* const world);
-void RenderRayCastHit(NewtonWorld* const world);
-void RenderNormalForces (NewtonWorld* const world);
+inline void RenderParticles(ndDemoEntityManager* const )
+{
+	ndAssert(0);
+}
 
-void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug);
+class ndDebugDisplay
+{
+	public:
+	ndDebugDisplay();
+	~ndDebugDisplay();
 
-void DebugShowSoftBodySpecialCollision (void* userData, dInt32 vertexCount, const dFloat32* const faceVertec, dInt32 faceId);
+	void Init();
+	void Cleanup();
 
+	//void RenderParticles(ndDemoEntityManager* const scene);
+	//void RenderWorldScene(ndDemoEntityManager* const scene);
+	//void RenderBodiesAABB(ndDemoEntityManager* const scene);
+	//void RenderBodyFrame(ndDemoEntityManager* const scene);
+	//void RenderCenterOfMass(ndDemoEntityManager* const scene);
+	//void RenderContactPoints(ndDemoEntityManager* const scene);
+	//void RenderJointsDebugInfo(ndDemoEntityManager* const scene);
+	//void RenderModelsDebugInfo(ndDemoEntityManager* const scene);
+	//void RenderNormalForces(ndDemoEntityManager* const scene, ndFloat32 scale = 0.005f);
+	//void RenderPolygon(ndDemoEntityManager* const scene, const ndVector* const points, ndInt32 count, const ndVector& color);
+};
 
-void DebugDrawPoint (const dVector& p0, dFloat32 size);
-void DebugDrawLine (const dVector& p0, const dVector& p1);
-void DebugDrawCollision (const NewtonCollision* const collision, const dMatrix& matrix, dDebugDisplayMode mode);
-
-void ClearDebugDisplay(NewtonWorld* const world);
-void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, dInt32 faceID, dInt32 vertexCount, const dFloat32* const vertex, dInt32 vertexstrideInBytes);
-#endif
-
-void RenderParticles(ndDemoEntityManager* const scene);
-void RenderWorldScene(ndDemoEntityManager* const scene);
-void RenderBodiesAABB(ndDemoEntityManager* const scene);
-void RenderBodyFrame(ndDemoEntityManager* const scene);
-void RenderCenterOfMass(ndDemoEntityManager* const scene);
-void RenderContactPoints(ndDemoEntityManager* const scene);
-void RenderJointsDebugInfo(ndDemoEntityManager* const scene);
-void RenderModelsDebugInfo(ndDemoEntityManager* const scene);
-void RenderNormalForces(ndDemoEntityManager* const scene, ndFloat32 scale = 0.005f);
-void RenderPolygon(ndDemoEntityManager* const scene, const ndVector* const points, ndInt32 count, const ndVector& color);
 
 #endif
 

@@ -28,3 +28,7 @@ void ndRenderPass::Init(ndDemoEntityManager* const manager, ndInt32, ...)
 	m_manager = manager;
 }
 
+void ndRenderPass::Cleanup()
+{
+}
+

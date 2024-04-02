@@ -20,11 +20,18 @@
 
 ndColorRenderPass::ndColorRenderPass()
 	:ndRenderPass()
+	,m_debugDisplay()
 {
 }
 
 ndColorRenderPass::~ndColorRenderPass()
 {
+}
+
+void ndColorRenderPass::Cleanup()
+{
+	m_debugDisplay.Cleanup();
+	ndRenderPass::Cleanup();
 }
 
 void ndColorRenderPass::Init(ndDemoEntityManager* const manager, ndInt32 arguments, ...)
@@ -35,6 +42,8 @@ void ndColorRenderPass::Init(ndDemoEntityManager* const manager, ndInt32 argumen
 	va_start(args, arguments);
 	////m_shaderProgram = va_arg(args, GLuint);
 	va_end(args);
+
+	m_debugDisplay.Init();
 }
 
 void ndColorRenderPass::RenderScene(ndFloat32 timestep)
@@ -172,8 +181,8 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 
 	if (m_manager->m_showNormalForces) 
 	{
-		m_manager->m_world->Sync();
-		RenderContactPoints(m_manager);
+		//m_manager->m_world->Sync();
+		//RenderContactPoints(m_manager);
 		//RenderNormalForces (m_manager);
 	}
 

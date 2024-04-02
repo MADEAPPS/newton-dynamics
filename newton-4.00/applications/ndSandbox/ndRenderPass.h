@@ -21,6 +21,8 @@ class ndRenderPass: public ndClassAlloc
 	virtual ~ndRenderPass();
 
 	virtual void RenderScene(ndFloat32 timestep) = 0;
+
+	virtual void Cleanup();
 	virtual void Init(ndDemoEntityManager* const manager, ndInt32 arguments, ...);
 
 	protected:

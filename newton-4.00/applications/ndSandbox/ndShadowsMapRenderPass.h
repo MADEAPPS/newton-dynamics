@@ -24,6 +24,7 @@ class ndShadowMapRenderPass: public ndRenderPass
 	ndShadowMapRenderPass();
 	~ndShadowMapRenderPass();
 
+	virtual void Cleanup();
 	virtual void Init(ndDemoEntityManager* const manager, ndInt32 arguments, ...);
 
 	void RenderScene(ndFloat32 timestep);

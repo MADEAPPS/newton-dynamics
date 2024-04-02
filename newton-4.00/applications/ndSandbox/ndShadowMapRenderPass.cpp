@@ -31,15 +31,7 @@ ndShadowMapRenderPass::ndShadowMapRenderPass()
 
 ndShadowMapRenderPass::~ndShadowMapRenderPass()
 {
-	if (m_shadowMapTexture != 0)
-	{
-		glDeleteTextures(1, &m_shadowMapTexture);
-	}
-
-	if (m_frameBufferObject != 0) 
-	{
-		glDeleteFramebuffers(1, &m_frameBufferObject);
-	}
+	Cleanup();
 }
 
 void ndShadowMapRenderPass::Init(ndDemoEntityManager* const manager, ndInt32 arguments, ...)
@@ -95,6 +87,21 @@ void ndShadowMapRenderPass::Init(ndDemoEntityManager* const manager, ndInt32 arg
 	m_lightProjectToTextureSpace[1][1] = ndFloat32(0.5f);
 	m_lightProjectToTextureSpace[2][2] = ndFloat32(0.5f);
 	m_lightProjectToTextureSpace.m_posit = ndVector(ndFloat32(0.5f), ndFloat32(0.5f), ndFloat32(0.5f), ndFloat32(1.0f));
+}
+
+void ndShadowMapRenderPass::Cleanup()
+{
+	if (m_shadowMapTexture != 0)
+	{
+		glDeleteTextures(1, &m_shadowMapTexture);
+	}
+
+	if (m_frameBufferObject != 0)
+	{
+		glDeleteFramebuffers(1, &m_frameBufferObject);
+	}
+	m_shadowMapTexture = 0;
+	m_frameBufferObject = 0;
 }
 
 ndMatrix ndShadowMapRenderPass::CreateLightMatrix() const

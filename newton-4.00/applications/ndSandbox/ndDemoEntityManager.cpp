@@ -471,15 +471,15 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_synchronousPhysicsUpdate = true;
 	m_synchronousParticlesUpdate = true;
 
+	m_colorRenderPass->Init(this, 0);
+	m_shadowRenderPass->Init(this, 1, m_shaderCache.m_shadowMaps);
+
 	Cleanup();
 	ResetTimer();
 
 	m_shaderCache.CreateAllEffects();
 
 	m_diretionalLightDir = ndVector(-1.0f, 1.0f, 1.0f, 0.0f).Normalize();
-
-	m_colorRenderPass->Init(this, 0);
-	m_shadowRenderPass->Init(this, 1, m_shaderCache.m_shadowMaps);
 
 	#ifdef ENABLE_REPLAY
 		#ifdef REPLAY_RECORD
@@ -773,6 +773,9 @@ void ndDemoEntityManager::Cleanup ()
 	RegisterPostUpdate(nullptr);
 	m_animationCache.RemoveAll();
 	
+	m_colorRenderPass->Cleanup();
+	m_shadowRenderPass->Cleanup();
+
 	while (m_debugShapeCache->GetRoot())
 	{
 		m_debugShapeCache->Remove(m_debugShapeCache->GetRoot());
@@ -824,6 +827,9 @@ void ndDemoEntityManager::Cleanup ()
 	
 	// we start without 2d render
 	m_renderDemoGUI = ndSharedPtr<ndUIEntity>();
+
+	m_colorRenderPass->Init(this, 0);
+	m_shadowRenderPass->Init(this, 1, m_shaderCache.m_shadowMaps);
 }
 
 void ndDemoEntityManager::LoadFont()

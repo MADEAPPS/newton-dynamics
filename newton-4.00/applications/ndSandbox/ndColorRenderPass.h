@@ -23,11 +23,13 @@ class ndColorRenderPass: public ndRenderPass
 	ndColorRenderPass();
 	~ndColorRenderPass();
 
+	virtual void Cleanup();
 	virtual void Init(ndDemoEntityManager* const manager, ndInt32 arguments, ...);
 
 	void RenderScene(ndFloat32 timestep);
 
 	private:
+	ndDebugDisplay m_debugDisplay;
 };
 
 #endif
