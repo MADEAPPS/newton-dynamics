@@ -50,7 +50,7 @@ class ndDebugDisplay
 		virtual void Init(ndDemoEntityManager* const scene) = 0;
 		virtual void CleanUp() = 0;
 		virtual void Render(ndDemoEntityManager* const scene) = 0;
-		virtual void UpdateBuffers(ndPhysicsWorld* const world, ndArray<ndUnsigned8>& scratchBuffer) = 0;
+		virtual void UpdateBuffers(ndPhysicsWorld* const world) = 0;
 	};
 
 	class ndContactPoints: public ndDebudPass
@@ -63,9 +63,10 @@ class ndDebugDisplay
 		virtual void CleanUp();
 
 		virtual void Render(ndDemoEntityManager* const scene);
-		virtual void UpdateBuffers(ndPhysicsWorld* const world, ndArray<ndUnsigned8>& scratchBuffer);
-			
-		ndInt32 m_count;
+		virtual void UpdateBuffers(ndPhysicsWorld* const world);
+		
+		ndArray<glVector3> m_points;
+
 		GLuint m_vertexBuffer;
 		GLuint m_vertextArrayBuffer;
 
@@ -75,7 +76,8 @@ class ndDebugDisplay
 		GLint m_viewModelMatrixLocation;
 		GLint m_projectionMatrixLocation;
 
-
+		
+		ndSpinLock m_lock;
 	};
 
 	ndDebugDisplay();
@@ -98,8 +100,6 @@ class ndDebugDisplay
 	//void RenderModelsDebugInfo(ndDemoEntityManager* const scene);
 	//void RenderNormalForces(ndDemoEntityManager* const scene, ndFloat32 scale = 0.005f);
 	//void RenderPolygon(ndDemoEntityManager* const scene, const ndVector* const points, ndInt32 count, const ndVector& color);
-
-	ndArray<ndUnsigned8> m_scratchBuffer;
 
 	ndContactPoints m_contactsPonts;
 };
