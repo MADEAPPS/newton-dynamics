@@ -785,6 +785,11 @@ void ndDemoEntityManager::Cleanup ()
 		delete m_cameraManager;
 		m_cameraManager = nullptr;
 	}
+
+	if (m_sky)
+	{
+		delete m_sky;
+	}
 	
 	m_sky = nullptr;
 	m_updateCamera = nullptr;
@@ -1356,10 +1361,9 @@ void ndDemoEntityManager::CreateSkyBox()
 	if (!m_sky)
 	{
 		m_sky = new ndSkyBox(m_shaderCache.m_skyBox);
-		
-		ndScopeSpinLock lock(m_addDeleteLock);
-		ndAssert(!m_sky->m_rootNode);
-		m_sky->m_rootNode = Addtop(m_sky);
+		//ndScopeSpinLock lock(m_addDeleteLock);
+		//ndAssert(!m_sky->m_rootNode);
+		//m_sky->m_rootNode = Addtop(m_sky);
 	}
 }
 

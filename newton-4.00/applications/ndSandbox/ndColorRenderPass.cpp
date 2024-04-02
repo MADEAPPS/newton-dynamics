@@ -83,20 +83,10 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc (GL_LEQUAL);
 	
-	// Setup camera matrix
-	//ndDemoCamera* const camera = m_manager->GetCamera();
-	//camera->SetViewMatrix(display_w, display_h);
-	
 	// render all entities
 	const ndMatrix globalMatrix (ndGetIdentityMatrix());
-	if (m_manager->m_hideVisualMeshes) 
-	{
-		if (m_manager->m_sky)
-		{
-			m_manager->m_sky->Render(timestep, m_manager, globalMatrix);
-		}
-	} 
-	else 
+
+	if (!m_manager->m_hideVisualMeshes) 
 	{
 		for (ndDemoEntityManager::ndNode* node = m_manager->GetFirst(); node; node = node->GetNext())
 		{
@@ -110,6 +100,12 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 			transparentMesh.m_mesh->RenderTransparency(m_manager, transparentMesh.m_matrix);
 			m_manager->m_transparentHeap.Pop();
 		}
+	}
+
+	// render sky lost reduce overdraw and render state change
+	if (m_manager->m_sky)
+	{
+		m_manager->m_sky->Render(timestep, m_manager, globalMatrix);
 	}
 
 	//ndDemoEntityManager* const window = (ndDemoEntityManager*)io.UserData;
