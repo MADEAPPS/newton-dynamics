@@ -611,26 +611,12 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 		joint->DebugJoint(debugJoint);
 	}
 }
-
-void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
-{
-	ndJoindDebug debugJoint(scene);
-	debugJoint.SetScale(0.2f);
-	ndWorld* const workd = scene->GetWorld();
-	const ndModelList& modelList = workd->GetModelList();
-	for (ndModelList::ndNode* modelNode = modelList.GetFirst(); modelNode; modelNode = modelNode->GetNext())
-	{
-		ndModel* const model = *modelNode->GetInfo();
-		model->Debug(debugJoint);
-	}
-}
-
-
 #endif
 
 ndDebugDisplay::ndDebugDisplay()
 	:m_normalForces()
 	,m_contactsPonts()
+	,m_modelsDebugInfo()
 {
 }
 
@@ -660,15 +646,25 @@ void ndDebugDisplay::UpdateNormalForces(ndDemoEntityManager* const scene)
 	m_normalForces.UpdateBuffers(scene);
 }
 
+void ndDebugDisplay::UpdateModelsDebugInfo(ndDemoEntityManager* const scene)
+{
+	m_modelsDebugInfo.UpdateBuffers(scene);
+}
 
 void ndDebugDisplay::RenderContactPoints(ndDemoEntityManager* const scene)
 {
 	m_contactsPonts.Render(scene);
 }
 
-void ndDebugDisplay::RenderNormalForces(ndDemoEntityManager* const scene, ndFloat32)
+void ndDebugDisplay::RenderNormalForces(ndDemoEntityManager* const scene, ndFloat32 scale)
 {
+	m_normalForces.m_scale = scale;
 	m_normalForces.Render(scene);
+}
+
+void ndDebugDisplay::RenderModelsDebugInfo(ndDemoEntityManager* const scene)
+{
+	m_modelsDebugInfo.Render(scene);
 }
 
 // ***************************************************************************
@@ -847,6 +843,7 @@ void ndDebugDisplay::ndContactPoints::Render(ndDemoEntityManager* const scene)
 ndDebugDisplay::ndNormalForces::ndNormalForces()
 	:ndDebudPass()
 	,m_lines()
+	,m_scale(ndFloat32 (0.1f))
 	,m_vertexSize(0)
 	,m_frameTick0(0)
 	,m_frameTick1(0)
@@ -865,6 +862,7 @@ void ndDebugDisplay::ndNormalForces::Init(ndDemoEntityManager* const scene)
 	m_vertexSize = 0;
 	m_frameTick0 = 0;
 	m_frameTick1 = 0;
+	m_scale = ndFloat32(0.1f);
 
 	glGenBuffers(1, &m_vertexBuffer);
 	glGenVertexArrays(1, &m_vertextArrayBuffer);
@@ -906,6 +904,7 @@ void ndDebugDisplay::ndNormalForces::CleanUp()
 	m_vertexSize = 0;
 	m_frameTick0 = 0;
 	m_frameTick1 = 0;
+	m_scale = ndFloat32(0.1f);
 
 	m_vertexBuffer = 0;
 	m_vertextArrayBuffer = 0;
@@ -917,7 +916,6 @@ void ndDebugDisplay::ndNormalForces::UpdateBuffers(ndDemoEntityManager* const sc
 
 	m_lines.SetCount(0);
 
-	ndFloat32 scale = 0.01f;
 	ndWorld* const world = scene->GetWorld();
 	const ndContactArray& contactList = world->GetContactList();
 	for (ndInt32 i = 0; i < contactList.GetCount(); ++i)
@@ -931,7 +929,7 @@ void ndDebugDisplay::ndNormalForces::UpdateBuffers(ndDemoEntityManager* const sc
 				const ndContactMaterial& contactPoint = contactPointsNode->GetInfo();
 				const ndVector origin(contactPoint.m_point);
 				const ndVector normal(contactPoint.m_normal);
-				const ndVector dest(origin + normal.Scale(contactPoint.m_normal_Force.m_force * scale));
+				const ndVector dest(origin + normal.Scale(contactPoint.m_normal_Force.m_force * m_scale));
 				//debugJoint.DrawLine(origin, dest, color, 1.0f);
 				m_lines.PushBack(origin);
 				m_lines.PushBack(dest);
@@ -997,4 +995,179 @@ void ndDebugDisplay::ndNormalForces::Render(ndDemoEntityManager* const scene)
 	glBindVertexArray(0);
 
 	glUseProgram(0);
+}
+
+
+// ***************************************************************************
+//
+// ***************************************************************************
+ndDebugDisplay::ndModelsDebugInfo::ndModelsDebugInfo()
+	:ndDebudPass()
+	, m_lines____()
+	, m_scale(ndFloat32(0.1f))
+	, m_vertexSize(0)
+	, m_frameTick0(0)
+	, m_frameTick1(0)
+	, m_vertexBuffer(0)
+	, m_vertextArrayBuffer(0)
+{
+	m_lines____.SetCount(0);
+}
+
+ndDebugDisplay::ndModelsDebugInfo::~ndModelsDebugInfo()
+{
+}
+
+void ndDebugDisplay::ndModelsDebugInfo::Init(ndDemoEntityManager* const scene)
+{
+	m_vertexSize = 0;
+	m_frameTick0 = 0;
+	m_frameTick1 = 0;
+	m_scale = ndFloat32(0.1f);
+
+	glGenBuffers(1, &m_vertexBuffer);
+	glGenVertexArrays(1, &m_vertextArrayBuffer);
+
+	glBindVertexArray(m_vertextArrayBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 1 * sizeof(glVector3), (void*)0);
+
+	//glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glVector3), (void*)sizeof(glVector3));
+
+	glDisableVertexAttribArray(0);
+	//glDisableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	GLuint shader = scene->GetShaderCache().m_wireFrame;
+
+	glUseProgram(shader);
+	m_shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	m_projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+
+	glUseProgram(0);
+}
+
+void ndDebugDisplay::ndModelsDebugInfo::CleanUp()
+{
+	if (m_vertexBuffer)
+	{
+		glDeleteBuffers(1, &m_vertexBuffer);
+	}
+	if (m_vertextArrayBuffer)
+	{
+		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
+	}
+
+	m_vertexSize = 0;
+	m_frameTick0 = 0;
+	m_frameTick1 = 0;
+	m_scale = ndFloat32(0.1f);
+
+	m_vertexBuffer = 0;
+	m_vertextArrayBuffer = 0;
+}
+
+
+//void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
+//{
+//	ndJoindDebug debugJoint(scene);
+//	debugJoint.SetScale(0.2f);
+//	ndWorld* const workd = scene->GetWorld();
+//	const ndModelList& modelList = workd->GetModelList();
+//	for (ndModelList::ndNode* modelNode = modelList.GetFirst(); modelNode; modelNode = modelNode->GetNext())
+//	{
+//		ndModel* const model = *modelNode->GetInfo();
+//		model->Debug(debugJoint);
+//	}
+//}
+
+void ndDebugDisplay::ndModelsDebugInfo::UpdateBuffers(ndDemoEntityManager* const scene)
+{
+	ndScopeSpinLock lock(m_lock);
+
+	//m_lines.SetCount(0);
+	//
+	//ndWorld* const world = scene->GetWorld();
+	//const ndContactArray& contactList = world->GetContactList();
+	//for (ndInt32 i = 0; i < contactList.GetCount(); ++i)
+	//{
+	//	const ndContact* const contact = contactList[i];
+	//	if (contact->IsActive())
+	//	{
+	//		const ndContactPointList& contactPoints = contact->GetContactPoints();
+	//		for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
+	//		{
+	//			const ndContactMaterial& contactPoint = contactPointsNode->GetInfo();
+	//			const ndVector origin(contactPoint.m_point);
+	//			const ndVector normal(contactPoint.m_normal);
+	//			const ndVector dest(origin + normal.Scale(contactPoint.m_normal_Force.m_force * m_scale));
+	//			//debugJoint.DrawLine(origin, dest, color, 1.0f);
+	//			m_lines.PushBack(origin);
+	//			m_lines.PushBack(dest);
+	//		}
+	//	}
+	//}
+	//m_frameTick1++;
+	//m_vertexSize = m_lines.GetCount();
+}
+
+void ndDebugDisplay::ndModelsDebugInfo::Render(ndDemoEntityManager* const scene)
+{
+	{
+		ndScopeSpinLock lock(m_lock);
+
+		//if (m_frameTick1 != m_frameTick0)
+		//{
+		//	if (m_lines.GetCount())
+		//	{
+		//		m_vertexSize = m_lines.GetCount();
+		//		glBindVertexArray(m_vertextArrayBuffer);
+		//		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+		//		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_lines.GetCount() * sizeof(glVector3)), &m_lines[0][0], GL_DYNAMIC_DRAW);
+		//
+		//		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		//		glBindVertexArray(0);
+		//	}
+		//}
+		//m_frameTick0 = m_frameTick1;
+	}
+
+	if (!m_vertexSize)
+	{
+		return;
+	}
+
+	//GLuint shader = scene->GetShaderCache().m_wireFrame;
+	//
+	//ndDemoCamera* const camera = scene->GetCamera();
+	//const glMatrix invViewProjectionMatrix(camera->GetInvViewProjectionMatrix());
+	//
+	//
+	//glUseProgram(shader);
+	//
+	//ndFloat32 thickness = 1.0f;
+	//const ndVector color(1.0f, 1.0f, 0.0f, 1.0f);
+	//glVector4 c(color);
+	//glPointSize(GLfloat(thickness));
+	//
+	//glUniform4fv(m_shadeColorLocation, 1, &c[0]);
+	//glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &invViewProjectionMatrix[0][0]);
+	//
+	//glBindVertexArray(m_vertextArrayBuffer);
+	//glEnableVertexAttribArray(0);
+	////glEnableVertexAttribArray(1);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	//
+	//glDrawArrays(GL_LINES, 0, m_vertexSize);
+	//
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glDisableVertexAttribArray(0);
+	////glDisableVertexAttribArray(1);
+	//glBindVertexArray(0);
+	//
+	//glUseProgram(0);
 }
