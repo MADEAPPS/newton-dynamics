@@ -10,9 +10,6 @@
 */  
 #version 450 core
 
-//uniform mat4 textureMatrix;
-//uniform mat4 projectionViewModelMatrix;
-
 uniform mat4 invViewModelProjectionTextureMatrix;
 
 in vec3 vertex;
@@ -21,9 +18,6 @@ out vec3 texCoord;
  
 void main() 
 {	
-	//texCoord = vec3 (textureMatrix * vec4(vertex, 1.0));
-	//gl_Position = projectionViewModelMatrix * vec4(vertex, 1.0);
-
 	texCoord = vec3 (invViewModelProjectionTextureMatrix * vec4(vertex, 1.0));
 	gl_Position = vec4(vertex, 1.0);
 }

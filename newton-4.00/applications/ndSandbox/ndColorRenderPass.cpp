@@ -123,12 +123,6 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 	//	}
 	//}
 	//
-	//if (m_showContactPoints)
-	//{
-	//	m_world->Sync();
-	//	RenderContactPoints(this);
-	//}
-	//
 	//if (m_showAABB) 
 	//{
 	//	m_world->Sync();
@@ -175,10 +169,15 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 	//	DrawDebugShapes();
 	//}
 
-	if (m_manager->m_showNormalForces) 
+	if (m_manager->m_showContactPoints)
 	{
 		m_debugDisplay.RenderContactPoints(m_manager);
-		//RenderNormalForces (m_manager);
+	}
+
+	if (m_manager->m_showNormalForces) 
+	{
+		//m_debugDisplay.RenderContactPoints(m_manager);
+		m_debugDisplay.RenderNormalForces (m_manager);
 	}
 
 	glEnable(GL_BLEND);
@@ -193,13 +192,10 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 void ndColorRenderPass::UpdateDebugDisplay(ndFloat32)
 {
 	// this is called on physics timestep.
-	// update all graphics buffers to display physics debug info until teh next physics substep
+	// update all graphics buffers to display physics debug info until the next physics sub step
 	if (m_manager->m_showNormalForces)
 	{
-		m_debugDisplay.UpdateContactPoints(m_manager->GetWorld());
-		//m_manager->m_world->Sync();
-		//RenderContactPoints(m_manager);
-		//RenderNormalForces (m_manager);
+		m_debugDisplay.UpdateNormalForces(m_manager);
+		m_debugDisplay.UpdateContactPoints(m_manager);
 	}
-
 }

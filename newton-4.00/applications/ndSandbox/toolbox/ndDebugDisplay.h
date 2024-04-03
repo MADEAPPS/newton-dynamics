@@ -50,7 +50,7 @@ class ndDebugDisplay
 		virtual void Init(ndDemoEntityManager* const scene) = 0;
 		virtual void CleanUp() = 0;
 		virtual void Render(ndDemoEntityManager* const scene) = 0;
-		virtual void UpdateBuffers(ndPhysicsWorld* const world) = 0;
+		virtual void UpdateBuffers(ndDemoEntityManager* const scene) = 0;
 	};
 
 	class ndContactPoints: public ndDebudPass
@@ -63,9 +63,13 @@ class ndDebugDisplay
 		virtual void CleanUp();
 
 		virtual void Render(ndDemoEntityManager* const scene);
-		virtual void UpdateBuffers(ndPhysicsWorld* const world);
+		virtual void UpdateBuffers(ndDemoEntityManager* const scene);
 		
 		ndArray<glVector3> m_points;
+
+		ndInt32 m_vertexSize;
+		ndInt32 m_frameTick0;
+		ndInt32 m_frameTick1;
 
 		GLuint m_vertexBuffer;
 		GLuint m_vertextArrayBuffer;
@@ -75,8 +79,35 @@ class ndDebugDisplay
 
 		GLint m_viewModelMatrixLocation;
 		GLint m_projectionMatrixLocation;
-
 		
+		ndSpinLock m_lock;
+	};
+
+
+	class ndNormalForces : public ndDebudPass
+	{
+		public:
+		ndNormalForces();
+		~ndNormalForces();
+
+		virtual void Init(ndDemoEntityManager* const scene);
+		virtual void CleanUp();
+
+		virtual void Render(ndDemoEntityManager* const scene);
+		virtual void UpdateBuffers(ndDemoEntityManager* const scene);
+
+		ndArray<glVector3> m_lines;
+
+		ndInt32 m_vertexSize;
+		ndInt32 m_frameTick0;
+		ndInt32 m_frameTick1;
+
+		GLuint m_vertexBuffer;
+		GLuint m_vertextArrayBuffer;
+
+		GLint m_shadeColorLocation;
+		GLint m_projectionViewModelMatrixLocation;
+
 		ndSpinLock m_lock;
 	};
 
@@ -86,10 +117,11 @@ class ndDebugDisplay
 	void Init(ndDemoEntityManager* const scene);
 	void Cleanup();
 
-	void UpdateContactPoints(ndPhysicsWorld* const world);
-
+	void UpdateNormalForces(ndDemoEntityManager* const scene);
+	void UpdateContactPoints(ndDemoEntityManager* const scene);
 
 	void RenderContactPoints(ndDemoEntityManager* const scene);
+	void RenderNormalForces(ndDemoEntityManager* const scene, ndFloat32 scale = 0.005f);
 	//void RenderParticles(ndDemoEntityManager* const scene);
 	//void RenderWorldScene(ndDemoEntityManager* const scene);
 	//void RenderBodiesAABB(ndDemoEntityManager* const scene);
@@ -98,10 +130,12 @@ class ndDebugDisplay
 	//
 	//void RenderJointsDebugInfo(ndDemoEntityManager* const scene);
 	//void RenderModelsDebugInfo(ndDemoEntityManager* const scene);
-	//void RenderNormalForces(ndDemoEntityManager* const scene, ndFloat32 scale = 0.005f);
+	//
 	//void RenderPolygon(ndDemoEntityManager* const scene, const ndVector* const points, ndInt32 count, const ndVector& color);
 
+	ndNormalForces m_normalForces;
 	ndContactPoints m_contactsPonts;
+	
 };
 
 
