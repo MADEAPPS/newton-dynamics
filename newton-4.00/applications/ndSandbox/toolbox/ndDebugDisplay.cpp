@@ -667,6 +667,42 @@ void ndDebugDisplay::RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 	m_modelsDebugInfo.Render(scene);
 }
 
+
+// ***************************************************************************
+//
+// ***************************************************************************
+
+ndDebugDisplay::ndDebudPass::ndDebudPass()
+	:m_vertexBuffer(0)
+	,m_vertextArrayBuffer(0)
+{
+}
+
+ndDebugDisplay::ndDebudPass::~ndDebudPass()
+{
+}
+
+void ndDebugDisplay::ndDebudPass::Init(ndDemoEntityManager* const)
+{
+	glGenBuffers(1, &m_vertexBuffer);
+	glGenVertexArrays(1, &m_vertextArrayBuffer);
+}
+
+void ndDebugDisplay::ndDebudPass::CleanUp()
+{
+	if (m_vertexBuffer)
+	{
+		glDeleteBuffers(1, &m_vertexBuffer);
+	}
+	if (m_vertextArrayBuffer)
+	{
+		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
+	}
+
+	m_vertexBuffer = 0;
+	m_vertextArrayBuffer = 0;
+}
+
 // ***************************************************************************
 //
 // ***************************************************************************
@@ -676,8 +712,6 @@ ndDebugDisplay::ndContactPoints::ndContactPoints()
 	,m_vertexSize(0)
 	,m_frameTick0(0)
 	,m_frameTick1(0)
-	,m_vertexBuffer(0)
-	,m_vertextArrayBuffer(0)
 {
 	m_points.SetCount(0);
 }
@@ -692,8 +726,7 @@ void ndDebugDisplay::ndContactPoints::Init(ndDemoEntityManager* const scene)
 	m_frameTick0 = 0;
 	m_frameTick1 = 0;
 
-	glGenBuffers(1, &m_vertexBuffer);
-	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	ndDebudPass::Init(scene);
 
 	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -718,21 +751,11 @@ void ndDebugDisplay::ndContactPoints::Init(ndDemoEntityManager* const scene)
 
 void ndDebugDisplay::ndContactPoints::CleanUp()
 {
-	if (m_vertexBuffer)
-	{
-		glDeleteBuffers(1, &m_vertexBuffer);
-	}
-	if (m_vertextArrayBuffer)
-	{
-		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
-	}
+	ndDebudPass::CleanUp();
 
 	m_vertexSize = 0;
 	m_frameTick0 = 0;
 	m_frameTick1 = 0;
-
-	m_vertexBuffer = 0;
-	m_vertextArrayBuffer = 0;
 }
 
 void ndDebugDisplay::ndContactPoints::UpdateBuffers(ndDemoEntityManager* const scene)
@@ -847,8 +870,6 @@ ndDebugDisplay::ndNormalForces::ndNormalForces()
 	,m_vertexSize(0)
 	,m_frameTick0(0)
 	,m_frameTick1(0)
-	,m_vertexBuffer(0)
-	,m_vertextArrayBuffer(0)
 {
 	m_lines.SetCount(0);
 }
@@ -864,8 +885,7 @@ void ndDebugDisplay::ndNormalForces::Init(ndDemoEntityManager* const scene)
 	m_frameTick1 = 0;
 	m_scale = ndFloat32(0.1f);
 
-	glGenBuffers(1, &m_vertexBuffer);
-	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	ndDebudPass::Init(scene);
 
 	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -892,22 +912,12 @@ void ndDebugDisplay::ndNormalForces::Init(ndDemoEntityManager* const scene)
 
 void ndDebugDisplay::ndNormalForces::CleanUp()
 {
-	if (m_vertexBuffer)
-	{
-		glDeleteBuffers(1, &m_vertexBuffer);
-	}
-	if (m_vertextArrayBuffer)
-	{
-		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
-	}
+	ndDebudPass::CleanUp();
 
 	m_vertexSize = 0;
 	m_frameTick0 = 0;
 	m_frameTick1 = 0;
 	m_scale = ndFloat32(0.1f);
-
-	m_vertexBuffer = 0;
-	m_vertextArrayBuffer = 0;
 }
 
 void ndDebugDisplay::ndNormalForces::UpdateBuffers(ndDemoEntityManager* const scene)
@@ -1003,13 +1013,11 @@ void ndDebugDisplay::ndNormalForces::Render(ndDemoEntityManager* const scene)
 // ***************************************************************************
 ndDebugDisplay::ndModelsDebugInfo::ndModelsDebugInfo()
 	:ndDebudPass()
-	, m_lines____()
-	, m_scale(ndFloat32(0.1f))
-	, m_vertexSize(0)
-	, m_frameTick0(0)
-	, m_frameTick1(0)
-	, m_vertexBuffer(0)
-	, m_vertextArrayBuffer(0)
+	,m_lines____()
+	,m_scale(ndFloat32(0.1f))
+	,m_vertexSize(0)
+	,m_frameTick0(0)
+	,m_frameTick1(0)
 {
 	m_lines____.SetCount(0);
 }
@@ -1025,8 +1033,7 @@ void ndDebugDisplay::ndModelsDebugInfo::Init(ndDemoEntityManager* const scene)
 	m_frameTick1 = 0;
 	m_scale = ndFloat32(0.1f);
 
-	glGenBuffers(1, &m_vertexBuffer);
-	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	ndDebudPass::Init(scene);
 
 	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -1053,24 +1060,12 @@ void ndDebugDisplay::ndModelsDebugInfo::Init(ndDemoEntityManager* const scene)
 
 void ndDebugDisplay::ndModelsDebugInfo::CleanUp()
 {
-	if (m_vertexBuffer)
-	{
-		glDeleteBuffers(1, &m_vertexBuffer);
-	}
-	if (m_vertextArrayBuffer)
-	{
-		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
-	}
-
+	ndDebudPass::CleanUp();
 	m_vertexSize = 0;
 	m_frameTick0 = 0;
 	m_frameTick1 = 0;
 	m_scale = ndFloat32(0.1f);
-
-	m_vertexBuffer = 0;
-	m_vertextArrayBuffer = 0;
 }
-
 
 //void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 //{

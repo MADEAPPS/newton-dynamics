@@ -46,11 +46,17 @@ class ndDebugDisplay
 	class ndDebudPass
 	{
 		public:
-		virtual ~ndDebudPass() {}
-		virtual void Init(ndDemoEntityManager* const scene) = 0;
-		virtual void CleanUp() = 0;
+		ndDebudPass();
+		virtual ~ndDebudPass();
+		
 		virtual void Render(ndDemoEntityManager* const scene) = 0;
 		virtual void UpdateBuffers(ndDemoEntityManager* const scene) = 0;
+
+		virtual void Init(ndDemoEntityManager* const scene);
+		virtual void CleanUp();
+
+		GLuint m_vertexBuffer;
+		GLuint m_vertextArrayBuffer;
 	};
 
 	class ndContactPoints: public ndDebudPass
@@ -70,9 +76,6 @@ class ndDebugDisplay
 		ndInt32 m_vertexSize;
 		ndInt32 m_frameTick0;
 		ndInt32 m_frameTick1;
-
-		GLuint m_vertexBuffer;
-		GLuint m_vertextArrayBuffer;
 
 		GLint m_pixelSizeLocation;
 		GLint m_pixelColorLocation;
@@ -102,9 +105,6 @@ class ndDebugDisplay
 		ndInt32 m_frameTick0;
 		ndInt32 m_frameTick1;
 
-		GLuint m_vertexBuffer;
-		GLuint m_vertextArrayBuffer;
-
 		GLint m_shadeColorLocation;
 		GLint m_projectionViewModelMatrixLocation;
 
@@ -119,7 +119,6 @@ class ndDebugDisplay
 			public:
 			glVector3 m_point;
 			glVector3 m_color;
-
 		};
 
 		ndModelsDebugInfo();
@@ -137,9 +136,6 @@ class ndDebugDisplay
 		ndInt32 m_vertexSize;
 		ndInt32 m_frameTick0;
 		ndInt32 m_frameTick1;
-
-		GLuint m_vertexBuffer;
-		GLuint m_vertextArrayBuffer;
 
 		GLint m_shadeColorLocation;
 		GLint m_projectionViewModelMatrixLocation;
