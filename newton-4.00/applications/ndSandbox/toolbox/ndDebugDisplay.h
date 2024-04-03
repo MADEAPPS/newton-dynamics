@@ -43,6 +43,13 @@ inline void RenderParticles(ndDemoEntityManager* const )
 class ndDebugDisplay
 {
 	public:
+	class ndColorPoint
+	{
+		public:
+		glVector3 m_point;
+		glVector3 m_color;
+	};
+
 	class ndDebudPass
 	{
 		public:
@@ -114,13 +121,6 @@ class ndDebugDisplay
 	class ndModelsDebugInfo : public ndDebudPass
 	{
 		public:
-		class ndDebugLine
-		{
-			public:
-			glVector3 m_point;
-			glVector3 m_color;
-		};
-
 		ndModelsDebugInfo();
 		~ndModelsDebugInfo();
 
@@ -130,14 +130,14 @@ class ndDebugDisplay
 		virtual void Render(ndDemoEntityManager* const scene);
 		virtual void UpdateBuffers(ndDemoEntityManager* const scene);
 
-		ndArray<ndDebugLine> m_lines____;
+		ndArray<ndColorPoint> m_points;
+		ndArray<ndColorPoint> m_lines;
 
 		ndFloat32 m_scale;
+		ndInt32 m_pointsSize;
 		ndInt32 m_vertexSize;
 		ndInt32 m_frameTick0;
 		ndInt32 m_frameTick1;
-
-		GLint m_shadeColorLocation;
 		GLint m_projectionViewModelMatrixLocation;
 
 		ndSpinLock m_lock;

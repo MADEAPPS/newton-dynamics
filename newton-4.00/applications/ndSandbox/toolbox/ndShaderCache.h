@@ -39,6 +39,7 @@ class ndShaderCache
 			GLuint m_texturedDecal;
 			GLuint m_diffuseEffect;
 			GLuint m_spriteSpheres;
+			GLuint m_colorWireFrame;
 			GLuint m_diffuseDebrisEffect;
 			GLuint m_diffuseIntanceEffect;
 			GLuint m_skinningDiffuseEffect;
