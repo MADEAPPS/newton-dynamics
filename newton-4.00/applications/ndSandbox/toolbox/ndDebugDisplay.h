@@ -65,6 +65,10 @@ class ndDebugDisplay
 		GLuint m_shader;
 		GLuint m_vertexBuffer;
 		GLuint m_vertextArrayBuffer;
+
+		//ndInt32 m_frameTick0;
+		//ndInt32 m_frameTick1;
+		//GLint m_projectionViewModelMatrixLocation;
 	};
 
 	class ndContactPoints: public ndDebudPass
@@ -79,18 +83,18 @@ class ndDebugDisplay
 		virtual void Render(ndDemoEntityManager* const scene);
 		virtual void UpdateBuffers(ndDemoEntityManager* const scene);
 		
-		ndArray<glVector3> m_points;
+		ndArray<ndColorPoint> m_points;
 
 		ndInt32 m_vertexSize;
 		ndInt32 m_frameTick0;
 		ndInt32 m_frameTick1;
 
+		GLint m_projectionViewModelMatrixLocation;
 		GLint m_pixelSizeLocation;
 		GLint m_pixelColorLocation;
 
 		GLint m_viewModelMatrixLocation;
 		GLint m_projectionMatrixLocation;
-		
 		ndSpinLock m_lock;
 	};
 
@@ -106,16 +110,13 @@ class ndDebugDisplay
 		virtual void Render(ndDemoEntityManager* const scene);
 		virtual void UpdateBuffers(ndDemoEntityManager* const scene);
 
-		ndArray<glVector3> m_lines;
+		ndArray<ndColorPoint> m_lines;
 
 		ndFloat32 m_scale;
 		ndInt32 m_vertexSize;
 		ndInt32 m_frameTick0;
 		ndInt32 m_frameTick1;
-
-		GLint m_shadeColorLocation;
 		GLint m_projectionViewModelMatrixLocation;
-
 		ndSpinLock m_lock;
 	};
 
@@ -146,8 +147,6 @@ class ndDebugDisplay
 
 		ndFloat32 m_lineThickness;
 		ndFloat32 m_pointThickness;
-
-
 		ndSpinLock m_lock;
 	};
 
