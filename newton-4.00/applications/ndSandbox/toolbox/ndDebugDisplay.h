@@ -62,13 +62,19 @@ class ndDebugDisplay
 		virtual void Init(ndDemoEntityManager* const scene);
 		virtual void CleanUp();
 
+		virtual void LoadBufferData();
+
+		ndSpinLock m_lock;
+		ndArray<ndColorPoint> m_points____;
+		ndInt32 m_vertexSize____;
+
 		GLuint m_shader;
 		GLuint m_vertexBuffer;
 		GLuint m_vertextArrayBuffer;
 
-		//ndInt32 m_frameTick0;
-		//ndInt32 m_frameTick1;
-		//GLint m_projectionViewModelMatrixLocation;
+		ndInt32 m_frameTick0;
+		ndInt32 m_frameTick1;
+		GLint m_projectionViewModelMatrixLocation;
 	};
 
 	class ndContactPoints: public ndDebudPass
@@ -82,20 +88,6 @@ class ndDebugDisplay
 
 		virtual void Render(ndDemoEntityManager* const scene);
 		virtual void UpdateBuffers(ndDemoEntityManager* const scene);
-		
-		ndArray<ndColorPoint> m_points;
-
-		ndInt32 m_vertexSize;
-		ndInt32 m_frameTick0;
-		ndInt32 m_frameTick1;
-
-		GLint m_projectionViewModelMatrixLocation;
-		GLint m_pixelSizeLocation;
-		GLint m_pixelColorLocation;
-
-		GLint m_viewModelMatrixLocation;
-		GLint m_projectionMatrixLocation;
-		ndSpinLock m_lock;
 	};
 
 	class ndNormalForces : public ndDebudPass
@@ -110,14 +102,7 @@ class ndDebugDisplay
 		virtual void Render(ndDemoEntityManager* const scene);
 		virtual void UpdateBuffers(ndDemoEntityManager* const scene);
 
-		ndArray<ndColorPoint> m_lines;
-
 		ndFloat32 m_scale;
-		ndInt32 m_vertexSize;
-		ndInt32 m_frameTick0;
-		ndInt32 m_frameTick1;
-		GLint m_projectionViewModelMatrixLocation;
-		ndSpinLock m_lock;
 	};
 
 	class ndModelsDebugInfo : public ndDebudPass
@@ -132,22 +117,16 @@ class ndDebugDisplay
 		virtual void Render(ndDemoEntityManager* const scene);
 		virtual void UpdateBuffers(ndDemoEntityManager* const scene);
 
-		ndArray<ndColorPoint> m_points;
-		ndArray<ndColorPoint> m_lines;
+		virtual void LoadBufferData();
 
+		//ndArray<ndColorPoint> m_lines;
+		//ndInt32 m_lineSize____;
 		ndFloat32 m_scale;
-		ndInt32 m_pointsSize;
-		ndInt32 m_vertexSize;
-		ndInt32 m_frameTick0;
-		ndInt32 m_frameTick1;
 
-		GLuint m_pointBuffer;
-		GLuint m_pointArrayBuffer;
-		GLint m_projectionViewModelMatrixLocation;
-
+		//GLuint m_pointBuffer;
+		//GLuint m_pointArrayBuffer;
 		ndFloat32 m_lineThickness;
 		ndFloat32 m_pointThickness;
-		ndSpinLock m_lock;
 	};
 
 	ndDebugDisplay();
@@ -177,7 +156,6 @@ class ndDebugDisplay
 	ndNormalForces m_normalForces;
 	ndContactPoints m_contactsPonts;
 	ndModelsDebugInfo m_modelsDebugInfo;
-	
 };
 
 
