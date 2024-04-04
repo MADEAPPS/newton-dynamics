@@ -175,7 +175,7 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 
 	if (m_manager->m_showNormalForces) 
 	{
-		//m_debugDisplay.RenderContactPoints(m_manager);
+		m_debugDisplay.RenderContactPoints(m_manager);
 		m_debugDisplay.RenderNormalForces (m_manager);
 	}
 
