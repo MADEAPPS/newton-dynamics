@@ -18,7 +18,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 
-#define D_USE_GEOMETRY_SHADERS 
+//#define D_USE_GEOMETRY_SHADERS 
 //#define D_TEST_CALCULATE_CONTACTS
 
 
@@ -675,7 +675,8 @@ void ndDebugDisplay::RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 // ***************************************************************************
 
 ndDebugDisplay::ndDebudPass::ndDebudPass()
-	:m_vertexBuffer(0)
+	:m_shader(0)
+	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
 {
 }
@@ -740,14 +741,14 @@ void ndDebugDisplay::ndContactPoints::Init(ndDemoEntityManager* const scene)
 	glBindVertexArray(0);
 	glDisableVertexAttribArray(0);
 
-	GLuint shader = scene->GetShaderCache().m_thickPoints;
+	m_shader = scene->GetShaderCache().m_thickPoints;
 
-	glUseProgram(shader);
-	m_pixelSizeLocation = glGetUniformLocation(shader, "pixelSize");
-	m_pixelColorLocation = glGetUniformLocation(shader, "inputPixelColor");
+	glUseProgram(m_shader);
+	m_pixelSizeLocation = glGetUniformLocation(m_shader, "pixelSize");
+	m_pixelColorLocation = glGetUniformLocation(m_shader, "inputPixelColor");
 
-	m_viewModelMatrixLocation = glGetUniformLocation(shader, "viewModelMatrix");
-	m_projectionMatrixLocation = glGetUniformLocation(shader, "projectionMatrix");
+	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+	m_projectionMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
 	glUseProgram(0);
 }
 
@@ -814,8 +815,6 @@ void ndDebugDisplay::ndContactPoints::Render(ndDemoEntityManager* const scene)
 		return;
 	}
 
-	GLuint shader = scene->GetShaderCache().m_thickPoints;
-
 	ndDemoCamera* const camera = scene->GetCamera();
 	const ndMatrix invViewMatrix(camera->GetInvViewMatrix());
 	const ndMatrix projectionMatrix(camera->GetProjectionMatrix());
@@ -842,7 +841,7 @@ void ndDebugDisplay::ndContactPoints::Render(ndDemoEntityManager* const scene)
 		ndVector(radius,  radius, ndFloat32(0.0f), ndFloat32(0.0f)),
 	};
 
-	glUseProgram(shader);
+	glUseProgram(m_shader);
 	glUniform4fv(m_pixelSizeLocation, 4, &quad[0][0]);
 	glUniform4fv(m_pixelColorLocation, 1, &color.m_x);
 	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &glInvViewMatrix[0][0]);
@@ -903,11 +902,11 @@ void ndDebugDisplay::ndNormalForces::Init(ndDemoEntityManager* const scene)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	GLuint shader = scene->GetShaderCache().m_wireFrame;
+	m_shader = scene->GetShaderCache().m_wireFrame;
 
-	glUseProgram(shader);
-	m_shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
-	m_projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+	glUseProgram(m_shader);
+	m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
+	m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
 
 	glUseProgram(0);
 }
@@ -978,13 +977,10 @@ void ndDebugDisplay::ndNormalForces::Render(ndDemoEntityManager* const scene)
 		return;
 	}
 	
-	GLuint shader = scene->GetShaderCache().m_wireFrame;
-
 	ndDemoCamera* const camera = scene->GetCamera();
 	const glMatrix invViewProjectionMatrix(camera->GetInvViewProjectionMatrix());
 
-
-	glUseProgram(shader);
+	glUseProgram(m_shader);
 
 	ndFloat32 thickness = 1.0f;
 	const ndVector color(1.0f, 1.0f, 0.0f, 1.0f);
@@ -1015,9 +1011,12 @@ ndDebugDisplay::ndModelsDebugInfo::ndModelsDebugInfo()
 	:ndDebudPass()
 	,m_lines()
 	,m_scale(ndFloat32(0.1f))
+	,m_pointsSize(0)
 	,m_vertexSize(0)
 	,m_frameTick0(0)
 	,m_frameTick1(0)
+	,m_pointBuffer(0)
+	,m_pointArrayBuffer(0)
 {
 	m_lines.SetCount(0);
 }
@@ -1029,30 +1028,52 @@ ndDebugDisplay::ndModelsDebugInfo::~ndModelsDebugInfo()
 void ndDebugDisplay::ndModelsDebugInfo::Init(ndDemoEntityManager* const scene)
 {
 	m_vertexSize = 0;
+	m_pointsSize = 0;
 	m_frameTick0 = 0;
 	m_frameTick1 = 0;
 	m_scale = ndFloat32(0.1f);
 
 	ndDebudPass::Init(scene);
 
-	glBindVertexArray(m_vertextArrayBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	{
+		glBindVertexArray(m_vertextArrayBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndColorPoint), (void*)OFFSETOF(ndColorPoint, m_point));
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndColorPoint), (void*)OFFSETOF(ndColorPoint, m_point));
 
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndColorPoint), (void*)OFFSETOF(ndColorPoint, m_color));
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndColorPoint), (void*)OFFSETOF(ndColorPoint, m_color));
 
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
 
-	GLuint shader = scene->GetShaderCache().m_colorWireFrame;
+	{
+		glGenBuffers(1, &m_pointBuffer);
+		glGenVertexArrays(1, &m_pointArrayBuffer);
 
-	glUseProgram(shader);
-	m_projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+		glBindVertexArray(m_pointArrayBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_pointBuffer);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndColorPoint), (void*)OFFSETOF(ndColorPoint, m_point));
+
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndColorPoint), (void*)OFFSETOF(ndColorPoint, m_color));
+
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		glBindVertexArray(1);
+	}
+
+	m_shader = scene->GetShaderCache().m_colorPoint;
+	glUseProgram(m_shader);
+	m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
 	glUseProgram(0);
 }
 
@@ -1063,6 +1084,17 @@ void ndDebugDisplay::ndModelsDebugInfo::CleanUp()
 	m_frameTick0 = 0;
 	m_frameTick1 = 0;
 	m_scale = ndFloat32(0.1f);
+
+	if (m_pointBuffer)
+	{
+		glDeleteBuffers(1, &m_pointBuffer);
+	}
+	if (m_pointArrayBuffer)
+	{
+		glDeleteVertexArrays(1, &m_pointArrayBuffer);
+	}
+	m_pointBuffer = 0;
+	m_pointArrayBuffer = 0;
 }
 
 void ndDebugDisplay::ndModelsDebugInfo::UpdateBuffers(ndDemoEntityManager* const scene)
@@ -1075,6 +1107,8 @@ void ndDebugDisplay::ndModelsDebugInfo::UpdateBuffers(ndDemoEntityManager* const
 		ndJoindDebug(ndModelsDebugInfo* const me)
 			:ndConstraintDebugCallback()
 			,m_me(me)
+			,m_lineThikness(ndFloat32(0.0f))
+			,m_pointThikness(ndFloat32(0.0f))
 		{
 			m_me->m_points.SetCount(0);
 			m_me->m_lines.SetCount(0);
@@ -1082,6 +1116,8 @@ void ndDebugDisplay::ndModelsDebugInfo::UpdateBuffers(ndDemoEntityManager* const
 	
 		~ndJoindDebug()
 		{
+			m_me->m_lineThickness = m_lineThikness;
+			m_me->m_pointThickness = m_pointThikness;
 		}
 	
 		void DrawPoint(const ndVector& point, const ndVector& color, ndFloat32 thickness)
@@ -1090,6 +1126,7 @@ void ndDebugDisplay::ndModelsDebugInfo::UpdateBuffers(ndDemoEntityManager* const
 			colorPoint.m_point = point;
 			colorPoint.m_color = color;
 			m_me->m_points.PushBack(colorPoint);
+			m_pointThikness = ndMax(thickness, m_pointThikness);
 		}
 	
 		void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32 thickness)
@@ -1102,9 +1139,13 @@ void ndDebugDisplay::ndModelsDebugInfo::UpdateBuffers(ndDemoEntityManager* const
 			colorPoint.m_point = p1;
 			colorPoint.m_color = color;
 			m_me->m_lines.PushBack(colorPoint);
+
+			m_lineThikness = ndMax(thickness, m_lineThikness);
 		}
 
 		ndModelsDebugInfo* m_me;
+		ndFloat32 m_lineThikness;
+		ndFloat32 m_pointThikness;
 	};
 	
 	ndJoindDebug debugJoint(this);
@@ -1138,52 +1179,66 @@ void ndDebugDisplay::ndModelsDebugInfo::Render(ndDemoEntityManager* const scene)
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 				glBindVertexArray(0);
 			}
+
+			if (m_points.GetCount())
+			{
+				m_pointsSize = m_points.GetCount();
+				glBindVertexArray(m_pointArrayBuffer);
+				glBindBuffer(GL_ARRAY_BUFFER, m_pointBuffer);
+				glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_points.GetCount() * sizeof(ndColorPoint)), &m_points[0].m_point.m_x, GL_DYNAMIC_DRAW);
+
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
+				glBindVertexArray(0);
+			}
 		}
 		m_frameTick0 = m_frameTick1;
 	}
 
-	if (!m_vertexSize)
+	if (m_vertexSize)
 	{
-		return;
+		ndDemoCamera* const camera = scene->GetCamera();
+		const glMatrix invViewProjectionMatrix(camera->GetInvViewProjectionMatrix());
+		
+		glUseProgram(m_shader);
+		glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &invViewProjectionMatrix[0][0]);
+		
+		glBindVertexArray(m_vertextArrayBuffer);
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+		
+		glLineWidth(GLfloat(m_lineThickness));
+		glDrawArrays(GL_LINES, 0, m_vertexSize);
+		glLineWidth(GLfloat(1.0f));
+		
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glBindVertexArray(0);
+		glUseProgram(0);
 	}
 
-	//glLineWidth(GLfloat(thickness));
-	//glUniform4fv(m_shadeColorLocation, 1, &c[0]);
-	//glDrawArrays(GL_LINES, 0, 2);
-	//glLineWidth(1);
+	if (m_pointsSize)
+	{
+		ndDemoCamera* const camera = scene->GetCamera();
+		const glMatrix invViewProjectionMatrix(camera->GetInvViewProjectionMatrix());
 
-	GLuint shader = scene->GetShaderCache().m_colorWireFrame;
-	
-	ndDemoCamera* const camera = scene->GetCamera();
-	const glMatrix invViewProjectionMatrix(camera->GetInvViewProjectionMatrix());
-	
-	
-	glUseProgram(shader);
+		glUseProgram(m_shader);
+		glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &invViewProjectionMatrix[0][0]);
 
-	//glPointSize(GLfloat(thickness));
-	//glUniform4fv(m_shadeColorLocation, 1, &c[0]);
-	//glDrawArrays(GL_POINTS, 0, 1);
-	//glPointSize(1);
+		glBindVertexArray(m_pointArrayBuffer);
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, m_pointBuffer);
 
-	//ndFloat32 thickness = 1.0f;
-	//const ndVector color(1.0f, 1.0f, 0.0f, 1.0f);
-	//glVector4 c(color);
-	//glPointSize(GLfloat(thickness));
-	
-	
-	glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &invViewProjectionMatrix[0][0]);
-	
-	glBindVertexArray(m_vertextArrayBuffer);
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	
-	glDrawArrays(GL_LINES, 0, m_vertexSize);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glBindVertexArray(0);
-	
-	glUseProgram(0);
+		glPointSize(GLfloat(m_pointThickness));
+		glDrawArrays(GL_POINTS, 0, m_pointsSize);
+		glPointSize(GLfloat(1.0f));
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glBindVertexArray(0);
+		glUseProgram(0);
+	}
 }

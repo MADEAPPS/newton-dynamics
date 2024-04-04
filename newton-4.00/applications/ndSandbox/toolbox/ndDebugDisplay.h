@@ -62,6 +62,7 @@ class ndDebugDisplay
 		virtual void Init(ndDemoEntityManager* const scene);
 		virtual void CleanUp();
 
+		GLuint m_shader;
 		GLuint m_vertexBuffer;
 		GLuint m_vertextArrayBuffer;
 	};
@@ -138,7 +139,14 @@ class ndDebugDisplay
 		ndInt32 m_vertexSize;
 		ndInt32 m_frameTick0;
 		ndInt32 m_frameTick1;
+
+		GLuint m_pointBuffer;
+		GLuint m_pointArrayBuffer;
 		GLint m_projectionViewModelMatrixLocation;
+
+		ndFloat32 m_lineThickness;
+		ndFloat32 m_pointThickness;
+
 
 		ndSpinLock m_lock;
 	};
