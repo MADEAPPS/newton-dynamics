@@ -508,7 +508,7 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Optimize()
 	m_averageFramesPerEpisodes.Update(ndBrainFloat(m_trajectoryAccumulator.GetCount()) / ndBrainFloat(m_bashTrajectoryCount));
 
 	varianceSum2 /= ndBrainFloat(m_trajectoryAccumulator.GetCount());
-	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndSqrt(varianceSum2);
+	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(varianceSum2));
 	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
 	{
 		m_trajectoryAccumulator[i].m_reward *= invVariance;
@@ -610,8 +610,8 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 						ndBrainFloat error = (actions[j] - m_trajectory[ndInt32(index)].m_action[j]);
 						exponent += error * error * invSigma2;
 					}
-					//ndBrainFloat stateProb = gaussian * ndExp(-exponent);
-					ndBrainFloat stateProb = ndExp(-exponent);
+					//ndBrainFloat stateProb = ndBrainFloat (gaussian * ndExp(-exponent));
+					ndBrainFloat stateProb = ndBrainFloat (ndExp(-exponent));
 
 					const ndBrainMemVector baseObservation(&m_trajectory[ndInt32(index + 3)].m_observation[0], statesDim);
 					m_baseLineValue.MakePrediction(baseObservation, stateValue, workingBuffer);
@@ -660,7 +660,7 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrain
 
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
-		ndBrainFloat sample = ndGaussianRandom(actions[i], m_sigma);
+		ndBrainFloat sample = ndBrainFloat (ndGaussianRandom(actions[i], m_sigma));
 		ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = squashedAction;
 	}

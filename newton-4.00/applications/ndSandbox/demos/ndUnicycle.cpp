@@ -373,8 +373,8 @@ namespace ndUnicycle
 			else
 			{
 				ndVector wheelOmega (m_wheel->GetOmega());
-				state[m_isOnAir] = ndReal(1.0f);
-				state[m_wheelOmega] = wheelOmega.m_z;
+				state[m_isOnAir] = ndBrainFloat(1.0f);
+				state[m_wheelOmega] = ndBrainFloat(wheelOmega.m_z);
 			}
 		}
 

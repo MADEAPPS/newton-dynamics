@@ -377,7 +377,7 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::BackPropagate()
 					ndInt32 actionIndex = ndInt32(trajectoryStep.m_action);
 
 					loss.Set(ndBrainFloat(0.0f));
-					ndBrainFloat negLogProb = -ndLog(output[actionIndex]);
+					ndBrainFloat negLogProb = ndBrainFloat (-ndLog(output[actionIndex]));
 
 					loss[actionIndex] = negLogProb * trajectoryStep.m_reward;
 				}
@@ -482,7 +482,7 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Optimize()
 	m_averageFramesPerEpisodes.Update(ndBrainFloat(m_trajectoryAccumulator.GetCount()) / ndBrainFloat(m_bashTrajectoryCount));
 
 	varianceSum2 /= ndBrainFloat(m_trajectoryAccumulator.GetCount());
-	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndSqrt(varianceSum2);
+	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(varianceSum2));
 	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
 	{
 		m_trajectoryAccumulator[i].m_reward *= invVariance;

@@ -601,7 +601,8 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelM
 
 void ndDemoMesh::RenderShadowMap(ndShadowMapRenderPass* const shadowMap, const ndMatrix& modelMatrixProjection)
 {
-	glUniformMatrix4fv(GLint(shadowMap->GetShaderModelProjMatrix()), 1, false, &modelMatrixProjection[0][0]);
+	glMatrix matrix(modelMatrixProjection);
+	glUniformMatrix4fv(GLint(shadowMap->GetShaderModelProjMatrix()), 1, false, &matrix[0][0]);
 	
 	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);

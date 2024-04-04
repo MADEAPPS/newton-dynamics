@@ -709,7 +709,7 @@ namespace ndQuadruped_1
 				observation.n_legs[i].m_veloc_x = ndBrainFloat(effectVelocState.m_x);
 				observation.n_legs[i].m_veloc_y = ndBrainFloat(effectVelocState.m_y);
 				observation.n_legs[i].m_veloc_z = ndBrainFloat(effectVelocState.m_z);
-				observation.n_legs[i].m_isLegLifted = FindContact(i) ? ndFloat32(0.0f) : ndFloat32(1.0f);;
+				observation.n_legs[i].m_isLegLifted = FindContact(i) ? ndBrainFloat(0.0f) : ndBrainFloat(1.0f);;
 			}
 
 			observation.m_torso.m_x = m_control->m_x;
@@ -750,7 +750,8 @@ namespace ndQuadruped_1
 				//ndFloat32 dist = ndFloat32(1.0f) - ndFloat32 (ndSqrt (error.DotProduct(error).GetScalar()));
 				//ndFloat32 dist = ndFloat32(1.0f) - ndFloat32 (error.DotProduct(error).GetScalar());
 				//reward = (dist2 < ndBrainFloat(1.0e-5f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-				reward = ndBrainFloat(ndExp(-ndBrainFloat(200.0f) * dist2));
+				//reward = ndBrainFloat(ndExp(-ndBrainFloat(200.0f) * dist2));
+				reward = ndBrainFloat(ndExp(-ndBrainFloat(1000.0f) * dist2));
 				//ndTrace(("d2(% f) r(% f)\n", dist2, reward));
 			}
 			else
@@ -1043,9 +1044,18 @@ namespace ndQuadruped_1
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
 	{
 		public:
-		TrainingUpdata()
+		TrainingUpdata(ndDemoEntityManager* const scene, const ndMatrix& matrix)
 			:OnPostUpdate()
 		{
+			ndWorld* const world = scene->GetWorld();
+			ndSharedPtr<ndModel> model(BuildModel(scene, matrix));
+			world->AddModel(model);
+
+			ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
+			//	world->AddJoint(fixJoint);
+
+			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model));
+			scene->Set2DDisplayRenderFunction(quadrupedUI);
 		}
 
 		~TrainingUpdata()
@@ -1084,18 +1094,18 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
 	#ifdef ND_TRAIN_MODEL
-		TrainingUpdata* const trainer = new TrainingUpdata();
+		TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix);
 		scene->RegisterPostUpdate(trainer);
+	#else
+		ndSharedPtr<ndModel> model(BuildModel(scene, matrix));
+		world->AddModel(model);
+
+		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
+		//	world->AddJoint(fixJoint);
+
+		ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model));
+		scene->Set2DDisplayRenderFunction(quadrupedUI);
 	#endif
-	
-	ndSharedPtr<ndModel> model(BuildModel(scene, matrix));
-	world->AddModel(model);
-
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-//	world->AddJoint(fixJoint);
-
-	ndSharedPtr<ndUIEntity> quadrupedUI (new ndModelUI(scene, model));
-	scene->Set2DDisplayRenderFunction(quadrupedUI);
 	
 	matrix.m_posit.m_x -= 4.0f;
 	matrix.m_posit.m_y += 1.5f;
