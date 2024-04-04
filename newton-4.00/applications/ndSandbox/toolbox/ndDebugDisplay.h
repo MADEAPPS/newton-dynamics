@@ -65,8 +65,8 @@ class ndDebugDisplay
 		virtual void LoadBufferData();
 
 		ndSpinLock m_lock;
-		ndArray<ndColorPoint> m_points____;
-		ndInt32 m_vertexSize____;
+		ndArray<ndColorPoint> m_points;
+		ndInt32 m_pointsCount;
 
 		GLuint m_shader;
 		GLuint m_vertexBuffer;

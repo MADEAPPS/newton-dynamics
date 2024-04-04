@@ -676,8 +676,8 @@ void ndDebugDisplay::RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 
 ndDebugDisplay::ndDebudPass::ndDebudPass()
 	:m_lock()
-	,m_points____()
-	,m_vertexSize____(0)
+	,m_points()
+	,m_pointsCount(0)
 	,m_shader(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
@@ -685,7 +685,7 @@ ndDebugDisplay::ndDebudPass::ndDebudPass()
 	,m_frameTick1(0)
 	,m_projectionViewModelMatrixLocation(0)
 {
-	m_points____.SetCount(0);
+	m_points.SetCount(0);
 }
 
 ndDebugDisplay::ndDebudPass::~ndDebudPass()
@@ -696,7 +696,7 @@ void ndDebugDisplay::ndDebudPass::Init(ndDemoEntityManager* const)
 {
 	m_frameTick0 = 0;
 	m_frameTick1 = 0;
-	m_vertexSize____ = 0;
+	m_pointsCount = 0;
 	glGenBuffers(1, &m_vertexBuffer);
 	glGenVertexArrays(1, &m_vertextArrayBuffer);
 }
@@ -712,7 +712,7 @@ void ndDebugDisplay::ndDebudPass::CleanUp()
 		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
 	}
 
-	m_vertexSize____ = 0;
+	m_pointsCount = 0;
 	m_frameTick0 = 0;
 	m_frameTick1 = 0;
 
@@ -726,12 +726,12 @@ void ndDebugDisplay::ndDebudPass::LoadBufferData()
 
 	if (m_frameTick1 != m_frameTick0)
 	{
-		if (m_points____.GetCount())
+		if (m_points.GetCount())
 		{
-			m_vertexSize____ = m_points____.GetCount();
+			m_pointsCount = m_points.GetCount();
 			glBindVertexArray(m_vertextArrayBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_points____.GetCount() * sizeof(ndColorPoint)), &m_points____[0].m_point.m_x, GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_points.GetCount() * sizeof(ndColorPoint)), &m_points[0].m_point.m_x, GL_DYNAMIC_DRAW);
 
 			//const glVector3* const xxxx = (glVector3*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
 			//glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -788,7 +788,7 @@ void ndDebugDisplay::ndContactPoints::UpdateBuffers(ndDemoEntityManager* const s
 {
 	ndScopeSpinLock lock(m_lock);
 
-	m_points____.SetCount(0);
+	m_points.SetCount(0);
 	ndWorld* const world = scene->GetWorld();
 	const ndContactArray& contactList = world->GetContactList();
 
@@ -807,18 +807,18 @@ void ndDebugDisplay::ndContactPoints::UpdateBuffers(ndDemoEntityManager* const s
 				colorPoint.m_point = contactPoint.m_point;
 				//colorPoint.m_point.m_y += 1.0f;
 				colorPoint.m_color = color;
-				m_points____.PushBack(colorPoint);
+				m_points.PushBack(colorPoint);
 			}
 		}
 	}
 	m_frameTick1++;
-	m_vertexSize____ = m_points____.GetCount();
+	m_pointsCount = m_points.GetCount();
 }
 
 void ndDebugDisplay::ndContactPoints::Render(ndDemoEntityManager* const scene)
 {
 	LoadBufferData();
-	if (!m_vertexSize____)
+	if (!m_pointsCount)
 	{
 		return;
 	}
@@ -835,7 +835,7 @@ void ndDebugDisplay::ndContactPoints::Render(ndDemoEntityManager* const scene)
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
 	glPointSize(GLfloat(4.0f));
-	glDrawArrays(GL_POINTS, 0, m_vertexSize____);
+	glDrawArrays(GL_POINTS, 0, m_pointsCount);
 	glPointSize(GLfloat(1.0f));
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -896,7 +896,7 @@ void ndDebugDisplay::ndNormalForces::UpdateBuffers(ndDemoEntityManager* const sc
 {
 	ndScopeSpinLock lock(m_lock);
 
-	m_points____.SetCount(0);
+	m_points.SetCount(0);
 
 	ndWorld* const world = scene->GetWorld();
 	const ndContactArray& contactList = world->GetContactList();
@@ -917,22 +917,22 @@ void ndDebugDisplay::ndNormalForces::UpdateBuffers(ndDemoEntityManager* const sc
 				ndColorPoint colorPoint;
 				colorPoint.m_point = origin;
 				colorPoint.m_color = color;
-				m_points____.PushBack(colorPoint);
+				m_points.PushBack(colorPoint);
 
 				colorPoint.m_point = dest;
 				colorPoint.m_color = color;
-				m_points____.PushBack(colorPoint);
+				m_points.PushBack(colorPoint);
 			}
 		}
 	}
 	m_frameTick1++;
-	m_vertexSize____ = m_points____.GetCount();
+	m_pointsCount = m_points.GetCount();
 }
 
 void ndDebugDisplay::ndNormalForces::Render(ndDemoEntityManager* const scene)
 {
 	LoadBufferData();
-	if (!m_vertexSize____)
+	if (!m_pointsCount)
 	{
 		return;
 	}
@@ -952,7 +952,7 @@ void ndDebugDisplay::ndNormalForces::Render(ndDemoEntityManager* const scene)
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	
-	glDrawArrays(GL_LINES, 0, m_vertexSize____);
+	glDrawArrays(GL_LINES, 0, m_pointsCount);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDisableVertexAttribArray(0);
@@ -1073,7 +1073,7 @@ void ndDebugDisplay::ndModelsDebugInfo::UpdateBuffers(ndDemoEntityManager* const
 			ndColorPoint colorPoint;
 			colorPoint.m_point = point;
 			colorPoint.m_color = color;
-			m_me->m_points____.PushBack(colorPoint);
+			m_me->m_points.PushBack(colorPoint);
 			m_pointThikness = ndMax(thickness, m_pointThikness);
 		}
 	
@@ -1107,7 +1107,7 @@ void ndDebugDisplay::ndModelsDebugInfo::UpdateBuffers(ndDemoEntityManager* const
 	}
 	m_frameTick1++;
 	//m_pointsSize = m_points.GetCount();
-	m_vertexSize____ = m_points____.GetCount();
+	m_pointsCount = m_points.GetCount();
 }
 
 void ndDebugDisplay::ndModelsDebugInfo::LoadBufferData()
@@ -1127,12 +1127,12 @@ void ndDebugDisplay::ndModelsDebugInfo::LoadBufferData()
 		//	glBindVertexArray(0);
 		//}
 
-		if (m_points____.GetCount())
+		if (m_points.GetCount())
 		{
-			m_vertexSize____ = m_points____.GetCount();
+			m_pointsCount = m_points.GetCount();
 			glBindVertexArray(m_vertextArrayBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_points____.GetCount() * sizeof(ndColorPoint)), &m_points____[0].m_point.m_x, GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_points.GetCount() * sizeof(ndColorPoint)), &m_points[0].m_point.m_x, GL_DYNAMIC_DRAW);
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindVertexArray(0);
@@ -1145,7 +1145,7 @@ void ndDebugDisplay::ndModelsDebugInfo::LoadBufferData()
 void ndDebugDisplay::ndModelsDebugInfo::Render(ndDemoEntityManager* const scene)
 {
 	LoadBufferData();
-	//if (m_vertexSize____)
+	//if (m_pointsCount)
 	//{
 	//	ndDemoCamera* const camera = scene->GetCamera();
 	//	const glMatrix invViewProjectionMatrix(camera->GetInvViewProjectionMatrix());
@@ -1169,7 +1169,7 @@ void ndDebugDisplay::ndModelsDebugInfo::Render(ndDemoEntityManager* const scene)
 	//	glUseProgram(0);
 	//}
 
-	if (m_vertexSize____)
+	if (m_pointsCount)
 	{
 		ndDemoCamera* const camera = scene->GetCamera();
 		const glMatrix invViewProjectionMatrix(camera->GetInvViewProjectionMatrix());
@@ -1183,7 +1183,7 @@ void ndDebugDisplay::ndModelsDebugInfo::Render(ndDemoEntityManager* const scene)
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
 		glPointSize(GLfloat(m_pointThickness));
-		glDrawArrays(GL_POINTS, 0, m_vertexSize____);
+		glDrawArrays(GL_POINTS, 0, m_pointsCount);
 		glPointSize(GLfloat(1.0f));
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
