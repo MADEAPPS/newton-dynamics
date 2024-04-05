@@ -584,14 +584,15 @@ void ndWorld::ParticleUpdate(ndFloat32 timestep)
 void ndWorld::ModelUpdate()
 {
 	D_TRACKTIME();
-	ndAtomic<ndInt32> iterator(0);
-	auto ModelUpdate = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
+	auto ModelUpdate = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(ModelUpdate);
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		const ndArray<ndModel*>& modelList = m_modelList.GetUpdateList();
+
 		const ndInt32 modelCount = modelList.GetCount();
-		for (ndInt32 i = iterator.fetch_add(1); i < modelCount; i = iterator.fetch_add(1))
+		const ndStartEnd startEnd(modelCount, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndModel* const model = modelList[i];
 			model->Update(this, timestep);
@@ -606,14 +607,15 @@ void ndWorld::ModelPostUpdate()
 {
 	D_TRACKTIME();
 	ndAtomic<ndInt32> counter(0);
-	auto ModelPostUpdate = ndMakeObject::ndFunction([this, &counter](ndInt32, ndInt32)
+	auto ModelPostUpdate = ndMakeObject::ndFunction([this, &counter](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(ModelPostUpdate);
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		const ndArray<ndModel*>& modelList = m_modelList.GetUpdateList();
 
 		const ndInt32 modelCount = modelList.GetCount();
-		for (ndInt32 i = counter.fetch_add(1); i < modelCount; i = counter.fetch_add(1))
+		const ndStartEnd startEnd(modelCount, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndModel* const model = modelList[i];
 			model->PostUpdate(this, timestep);
@@ -626,13 +628,15 @@ void ndWorld::PostModelTransform()
 {
 	D_TRACKTIME();
 	ndAtomic<ndInt32> counter(0);
-	auto PostModelTransform = ndMakeObject::ndFunction([this, &counter](ndInt32, ndInt32)
+	auto PostModelTransform = ndMakeObject::ndFunction([this, &counter](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(PostModelTransform);
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		const ndArray<ndModel*>& modelList = m_modelList.GetUpdateList();
+
 		const ndInt32 modelCount = modelList.GetCount();
-		for (ndInt32 i = counter.fetch_add(1); i < modelCount; i = counter.fetch_add(1))
+		const ndStartEnd startEnd(modelCount, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndModel* const model = modelList[i];
 			model->PostTransformUpdate(this, timestep);
