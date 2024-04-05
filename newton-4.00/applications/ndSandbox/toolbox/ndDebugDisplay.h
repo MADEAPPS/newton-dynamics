@@ -84,6 +84,14 @@ class ndDebugDisplay
 		virtual void UpdateBuffers(ndDemoEntityManager* const scene);
 	};
 
+	class ndCenterOfMass : public ndDebudPass
+	{
+		public:
+		virtual void Render(ndDemoEntityManager* const scene);
+		virtual void UpdateBuffers(ndDemoEntityManager* const scene);
+		//ndFloat32 m_scale;
+	};
+
 	class ndNormalForces : public ndDebudPass
 	{
 		public:
@@ -125,11 +133,13 @@ class ndDebugDisplay
 	void Init(ndDemoEntityManager* const scene);
 	void Cleanup();
 
+	void UpdateCenterOfMass(ndDemoEntityManager* const scene);
 	void UpdateNormalForces(ndDemoEntityManager* const scene);
 	void UpdateContactPoints(ndDemoEntityManager* const scene);
 	void UpdateJointsDebugInfo(ndDemoEntityManager* const scene);
 	void UpdateModelsDebugInfo(ndDemoEntityManager* const scene);
 
+	void RenderCenterOfMass(ndDemoEntityManager* const scene);
 	void RenderContactPoints(ndDemoEntityManager* const scene);
 	void RenderModelsDebugInfo(ndDemoEntityManager* const scene);
 	void RenderJointsDebugInfo(ndDemoEntityManager* const scene);
@@ -139,9 +149,10 @@ class ndDebugDisplay
 	//void RenderWorldScene(ndDemoEntityManager* const scene);
 	//void RenderBodiesAABB(ndDemoEntityManager* const scene);
 	//void RenderBodyFrame(ndDemoEntityManager* const scene);
-	//void RenderCenterOfMass(ndDemoEntityManager* const scene);
+	//
 	//void RenderPolygon(ndDemoEntityManager* const scene, const ndVector* const points, ndInt32 count, const ndVector& color);
 
+	ndCenterOfMass m_centerOfMass;
 	ndNormalForces m_normalForces;
 	ndContactPoints m_contactsPonts;
 	ndJointDebugInfo m_jointDebugInfo;
