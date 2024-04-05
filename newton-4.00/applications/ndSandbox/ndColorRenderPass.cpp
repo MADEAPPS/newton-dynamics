@@ -139,12 +139,6 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 	////	RenderRayCastHit(m_world);
 	////}
 	//
-	//if (m_showJointDebugInfo) 
-	//{
-	//	m_world->Sync();
-	//	RenderJointsDebugInfo(this);
-	//}
-	//
 	//if (m_showBodyFrame)
 	//{
 	//	m_world->Sync();
@@ -162,6 +156,11 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 	//	m_world->Sync();
 	//	DrawDebugShapes();
 	//}
+
+	if (m_manager->m_showJointDebugInfo)
+	{
+		m_debugDisplay.RenderJointsDebugInfo(m_manager);
+	}
 
 	if (m_manager->m_showModelsDebugInfo)
 	{
@@ -201,6 +200,11 @@ void ndColorRenderPass::UpdateDebugDisplay(ndFloat32)
 	if (m_manager->m_showContactPoints)
 	{
 		m_debugDisplay.UpdateContactPoints(m_manager);
+	}
+
+	if (m_manager->m_showJointDebugInfo)
+	{
+		m_debugDisplay.UpdateJointsDebugInfo(m_manager);
 	}
 
 	if (m_manager->m_showModelsDebugInfo)

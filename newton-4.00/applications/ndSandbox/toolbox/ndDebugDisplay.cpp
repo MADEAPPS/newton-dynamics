@@ -598,24 +598,12 @@ class ndJoindDebug : public ndConstraintDebugCallback
 
 	glVector3 m_line[2];
 };
-
-void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
-{
-	ndJoindDebug debugJoint(scene);
-	debugJoint.SetScale(0.2f);
-	ndWorld* const workd = scene->GetWorld();
-	const ndJointList& jointList = workd->GetJointList();
-	for (ndJointList::ndNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
-	{
-		ndJointBilateralConstraint* const joint = *jointNode->GetInfo();
-		joint->DebugJoint(debugJoint);
-	}
-}
 #endif
 
 ndDebugDisplay::ndDebugDisplay()
 	:m_normalForces()
 	,m_contactsPonts()
+	,m_jointDebugInfo()
 	,m_modelsDebugInfo()
 {
 }
@@ -628,6 +616,7 @@ void ndDebugDisplay::Init(ndDemoEntityManager* const scene)
 {
 	m_normalForces.Init(scene);
 	m_contactsPonts.Init(scene);
+	m_jointDebugInfo.Init(scene);
 	m_modelsDebugInfo.Init(scene);
 }
 
@@ -635,6 +624,7 @@ void ndDebugDisplay::Cleanup()
 {
 	m_normalForces.CleanUp();
 	m_contactsPonts.CleanUp();
+	m_jointDebugInfo.CleanUp();
 	m_modelsDebugInfo.CleanUp();
 }
 
@@ -646,6 +636,11 @@ void ndDebugDisplay::UpdateContactPoints(ndDemoEntityManager* const scene)
 void ndDebugDisplay::UpdateNormalForces(ndDemoEntityManager* const scene)
 {
 	m_normalForces.UpdateBuffers(scene);
+}
+
+void ndDebugDisplay::UpdateJointsDebugInfo(ndDemoEntityManager* const scene)
+{
+	m_jointDebugInfo.UpdateBuffers(scene);
 }
 
 void ndDebugDisplay::UpdateModelsDebugInfo(ndDemoEntityManager* const scene)
@@ -662,6 +657,11 @@ void ndDebugDisplay::RenderNormalForces(ndDemoEntityManager* const scene, ndFloa
 {
 	m_normalForces.m_scale = scale;
 	m_normalForces.Render(scene);
+}
+
+void ndDebugDisplay::RenderJointsDebugInfo(ndDemoEntityManager* const scene)
+{
+	m_jointDebugInfo.Render(scene);
 }
 
 void ndDebugDisplay::RenderModelsDebugInfo(ndDemoEntityManager* const scene)
@@ -871,9 +871,9 @@ void ndDebugDisplay::ndNormalForces::Render(ndDemoEntityManager* const scene)
 	}
 }
 
-// ***************************************************************************
+//***************************************************************************
 //
-// ***************************************************************************
+//***************************************************************************
 void ndDebugDisplay::ndModelsDebugInfo::Init(ndDemoEntityManager* const scene)
 {
 	ndDebudPass::Init(scene);
@@ -1025,4 +1025,73 @@ void ndDebugDisplay::ndModelsDebugInfo::Render(ndDemoEntityManager* const scene)
 		RenderBuffer(scene, GL_LINES, m_lines.GetCount(), m_lineArrayBuffer, m_lineBuffer);
 		glLineWidth(GLfloat(1.0f));
 	}
+}
+
+
+//***************************************************************************
+//
+//***************************************************************************
+void ndDebugDisplay::ndJointDebugInfo::UpdateBuffers(ndDemoEntityManager* const scene)
+{
+	ndScopeSpinLock lock(m_lock);
+
+	class ndJoindDebug : public ndConstraintDebugCallback
+	{
+		public:
+		ndJoindDebug(ndModelsDebugInfo* const me)
+			:ndConstraintDebugCallback()
+			,m_me(me)
+			,m_lineThikness(ndFloat32(0.0f))
+			,m_pointThikness(ndFloat32(0.0f))
+		{
+			m_me->m_points.SetCount(0);
+			m_me->m_lines.SetCount(0);
+			SetScale(m_me->m_scale);
+		}
+
+		~ndJoindDebug()
+		{
+			m_me->m_lineThickness = m_lineThikness;
+			m_me->m_pointThickness = m_pointThikness;
+		}
+
+		void DrawPoint(const ndVector& point, const ndVector& color, ndFloat32 thickness)
+		{
+			ndColorPoint colorPoint;
+			colorPoint.m_point = point;
+			colorPoint.m_color = color;
+			m_me->m_points.PushBack(colorPoint);
+			m_pointThikness = ndMax(thickness, m_pointThikness);
+		}
+
+		void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32 thickness)
+		{
+			ndColorPoint colorPoint;
+			colorPoint.m_point = p0;
+			colorPoint.m_color = color;
+			m_me->m_lines.PushBack(colorPoint);
+
+			colorPoint.m_point = p1;
+			colorPoint.m_color = color;
+			m_me->m_lines.PushBack(colorPoint);
+
+			m_lineThikness = ndMax(thickness, m_lineThikness);
+		}
+
+		ndModelsDebugInfo* m_me;
+		ndFloat32 m_lineThikness;
+		ndFloat32 m_pointThikness;
+	};
+
+	ndJoindDebug debugJoint(this);
+	debugJoint.SetScale(ndFloat32 (0.2f));
+
+	ndWorld* const world = scene->GetWorld();
+	const ndJointList& jointList = world->GetJointList();
+	for (ndJointList::ndNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+	{
+		ndJointBilateralConstraint* const joint = *jointNode->GetInfo();
+		joint->DebugJoint(debugJoint);
+	}
+	m_frameTick1++;
 }

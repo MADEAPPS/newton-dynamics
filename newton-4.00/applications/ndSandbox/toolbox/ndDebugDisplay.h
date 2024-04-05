@@ -113,6 +113,12 @@ class ndDebugDisplay
 		GLuint m_lineArrayBuffer;
 	};
 
+	class ndJointDebugInfo : public ndModelsDebugInfo
+	{
+		public:
+		virtual void UpdateBuffers(ndDemoEntityManager* const scene);
+	};
+
 	ndDebugDisplay();
 	~ndDebugDisplay();
 
@@ -121,10 +127,12 @@ class ndDebugDisplay
 
 	void UpdateNormalForces(ndDemoEntityManager* const scene);
 	void UpdateContactPoints(ndDemoEntityManager* const scene);
+	void UpdateJointsDebugInfo(ndDemoEntityManager* const scene);
 	void UpdateModelsDebugInfo(ndDemoEntityManager* const scene);
 
 	void RenderContactPoints(ndDemoEntityManager* const scene);
 	void RenderModelsDebugInfo(ndDemoEntityManager* const scene);
+	void RenderJointsDebugInfo(ndDemoEntityManager* const scene);
 	void RenderNormalForces(ndDemoEntityManager* const scene, ndFloat32 scale = 0.005f);
 
 	//void RenderParticles(ndDemoEntityManager* const scene);
@@ -132,11 +140,11 @@ class ndDebugDisplay
 	//void RenderBodiesAABB(ndDemoEntityManager* const scene);
 	//void RenderBodyFrame(ndDemoEntityManager* const scene);
 	//void RenderCenterOfMass(ndDemoEntityManager* const scene);
-	//void RenderJointsDebugInfo(ndDemoEntityManager* const scene);
 	//void RenderPolygon(ndDemoEntityManager* const scene, const ndVector* const points, ndInt32 count, const ndVector& color);
 
 	ndNormalForces m_normalForces;
 	ndContactPoints m_contactsPonts;
+	ndJointDebugInfo m_jointDebugInfo;
 	ndModelsDebugInfo m_modelsDebugInfo;
 };
 
