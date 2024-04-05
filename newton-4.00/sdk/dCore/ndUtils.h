@@ -227,6 +227,10 @@ D_CORE_API ndFloat64 ndRoundToFloat(ndFloat64 val);
 /// the OS is free to swith to another task if it needs to.
 D_CORE_API void ndThreadYield();
 
+/// in ssome systems, thread yeild coudl be too expensive 
+/// since ity could taskswicth to anothre thread. 
+D_CORE_API void ndThreadPause();
+
 /// removed all duplicate points from an array and place the location in the index array
 D_CORE_API ndInt32 ndVertexListToIndexList(ndFloat64* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance = ndEpsilon);
 

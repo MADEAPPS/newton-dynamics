@@ -72,10 +72,12 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 		virtual void ThreadFunction();
 
 		ndThreadPool* m_owner;
-		ndAtomic<bool> m_begin;
-		ndAtomic<bool> m_stillLooping;
+		//ndAtomic<bool> m_begin;
+		//ndAtomic<bool> m_stillLooping;
 		ndAtomic<ndTask*> m_task;
 		ndInt32 m_threadIndex;
+		ndUnsigned8 m_begin____;
+		ndUnsigned8 m_stillLooping____;
 		friend class ndThreadPool;
 	};
 
@@ -175,7 +177,7 @@ void ndThreadPool::ParallelExecute(const Function& callback)
 {
 	const ndInt32 threadCount = GetThreadCount();
 	ndTaskImplement<Function>* const jobsArray = ndAlloca(ndTaskImplement<Function>, threadCount);
-	
+
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
 		ndTaskImplement<Function>* const job = &jobsArray[i];
@@ -193,11 +195,11 @@ void ndThreadPool::ParallelExecute(const Function& callback)
 		#else
 		for (ndInt32 i = 0; i < m_count; ++i)
 		{
-			ndTaskImplement<Function>* const job = &jobsArray[i];
+			ndTaskImplement<Function>* const job = &jobsArray[i + 1];
 			m_workers[i].m_task.store(job);
 		}
 	
-		ndTaskImplement<Function>* const job = &jobsArray[m_count];
+		ndTaskImplement<Function>* const job = &jobsArray[0];
 		callback(job->m_threadIndex, job->m_threadCount);
 		WaitForWorkers();
 		#endif

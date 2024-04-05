@@ -28,10 +28,11 @@
 ndThreadPool::ndWorker::ndWorker()
 	:ndThread()
 	,m_owner(nullptr)
-	,m_begin(false)
-	,m_stillLooping(true)
+	//,m_begin(false)
 	,m_task(nullptr)
 	,m_threadIndex(0)
+	,m_begin____(0)
+	,m_stillLooping____(0)
 {
 }
 
@@ -43,9 +44,14 @@ ndThreadPool::ndWorker::~ndWorker()
 void ndThreadPool::ndWorker::ThreadFunction()
 {
 #ifndef	D_USE_THREAD_EMULATION
-	m_begin.store(true);
-	m_stillLooping.store(true);
-	while (m_begin.load())
+	//m_begin.store(true);
+	m_begin____ = 1;
+	ndInt32 iterations = 0;
+	//m_stillLooping.store(true);
+	m_stillLooping____ = 1;
+	//while (m_begin.load())
+
+	while (m_begin____)
 	{
 		ndTask* const task = m_task.load();
 		if (task)
@@ -53,13 +59,23 @@ void ndThreadPool::ndWorker::ThreadFunction()
 			//D_TRACKTIME();
 			task->Execute();
 			m_task.store(nullptr);
+			iterations = 0;
 		}
 		else
 		{
-			ndThreadYield();
+			if (iterations == 32)
+			{
+				ndThreadYield();
+			}
+			else
+			{
+				ndThreadPause();
+			}
+			iterations++;
 		}
 	}
-	m_stillLooping.store(false);
+	//m_stillLooping.store(false);
+	m_stillLooping____ = 0;
 #endif
 }
 
@@ -141,18 +157,26 @@ void ndThreadPool::End()
 	#ifndef	D_USE_THREAD_EMULATION
 	for (ndInt32 i = 0; i < m_count; ++i)
 	{
-		m_workers[i].m_begin.store(false);
+		//m_workers[i].m_begin.store(false);
+		m_workers[i].m_begin____ = 0;
 	}
 
-	bool stillLooping = true;
+	//bool stillLooping = true;
+	ndUnsigned8 stillLooping = 1;
 	do 
 	{
-		bool looping = false;
+		//bool looping = false;
+		ndUnsigned8 looping = 0;
 		for (ndInt32 i = 0; i < m_count; ++i)
 		{
-			looping = looping | m_workers[i].m_stillLooping.load();
+			//looping = looping | m_workers[i].m_stillLooping.load();
+			looping = ndUnsigned8(looping | m_workers[i].m_stillLooping____);
 		}
-		stillLooping = stillLooping & looping;
+		stillLooping = ndUnsigned8(stillLooping & looping);
+		if (m_count)
+		{
+			ndThreadYield();
+		}
 	} while (stillLooping);
 	#endif
 }
@@ -173,7 +197,7 @@ void ndThreadPool::TickOne()
 
 void ndThreadPool::WaitForWorkers()
 {
-	int xxxx = 0;
+	ndInt32 iterations = 0;
 	bool jobsInProgress = true;
 	do
 	{
@@ -185,12 +209,21 @@ void ndThreadPool::WaitForWorkers()
 		jobsInProgress = jobsInProgress & inProgess;
 		if (jobsInProgress)
 		{
-			xxxx++;
-			ndThreadYield();
+			if ((iterations & -32) == -32)
+			{
+				ndThreadYield();
+			}
+			else
+			{
+				ndThreadPause();
+			}
+			iterations++;
 		}
+		
 	} while (jobsInProgress);
-	if (xxxx > 2000)
-		xxxx += 1;
-	ndTrace(("xxx %d\n", xxxx));
+	//if (iterations > 3000)
+	//{
+	//	ndExpandTraceMessage("xxx %d\n", iterations);
+	//}
 }
 

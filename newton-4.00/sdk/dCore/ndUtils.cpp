@@ -73,8 +73,6 @@ void ndSpinLock::Delay(ndInt32& exp)
 }
 #endif
 
-
-
 class ndSortCluster
 {
 	public:
@@ -371,6 +369,22 @@ ndInt32 ndVertexListToIndexList(ndFloat64* const vertList, ndInt32 strideInBytes
 void ndThreadYield()
 {
 	std::this_thread::yield();
+}
+
+void ndThreadPause()
+{
+	//#if 0
+	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+	for (ndInt32 i = 0; i < 4; ++i)
+	{
+		_mm_pause();
+		_mm_pause();
+		_mm_pause();
+		_mm_pause();
+	}
+	#else
+	std::this_thread::yield();
+	#endif
 }
 
 ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)

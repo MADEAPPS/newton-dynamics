@@ -584,14 +584,14 @@ void ndWorld::ParticleUpdate(ndFloat32 timestep)
 void ndWorld::ModelUpdate()
 {
 	D_TRACKTIME();
-	ndAtomic<ndInt32> counter(0);
-	auto ModelUpdate = ndMakeObject::ndFunction([this, &counter](ndInt32, ndInt32)
+	ndAtomic<ndInt32> iterator(0);
+	auto ModelUpdate = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
 	{
 		D_TRACKTIME_NAMED(ModelUpdate);
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		const ndArray<ndModel*>& modelList = m_modelList.GetUpdateList();
 		const ndInt32 modelCount = modelList.GetCount();
-		for (ndInt32 i = counter.fetch_add(1); i < modelCount; i = counter.fetch_add(1))
+		for (ndInt32 i = iterator.fetch_add(1); i < modelCount; i = iterator.fetch_add(1))
 		{
 			ndModel* const model = modelList[i];
 			model->Update(this, timestep);
