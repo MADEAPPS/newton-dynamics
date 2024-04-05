@@ -81,7 +81,8 @@ ndBrainOptimizerAdam::~ndBrainOptimizerAdam()
 	}
 }
 
-void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
+//void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
+void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
 {
 	ndBrainTrainer* const trainer = partialGradients[0];
 	ndBrain& brain = *trainer->GetBrain();
