@@ -438,9 +438,13 @@ void ndWorld::ThreadFunction()
 	D_TRACKTIME();
 	ndUnsigned64 timeAcc = ndGetTimeInMicroseconds();
 
+	m_inUpdate = true;
+	m_scene->Begin();
+
 	// clean up all batched deletd objects, before update
 	while (m_deletedModels.GetCount())
 	{
+		D_TRACKTIME();
 		ndAssert(0);
 		ndModel* const model = m_deletedModels.GetFirst()->GetInfo();
 		m_deletedModels.Remove(m_deletedModels.GetFirst());
@@ -453,6 +457,7 @@ void ndWorld::ThreadFunction()
 	// remove joints bodies dependencies first
 	for (ndSpecialList<ndBody>::ndNode* node = m_deletedBodies.GetFirst(); node; node = node->GetNext())
 	{
+		D_TRACKTIME();
 		ndBodyKinematic* const kinematicBody = node->GetInfo()->GetAsBodyKinematic();
 		//ndTrace(("body: %s %d\n", kinematicBody->ClassName(), kinematicBody->m_uniqueId));
 		ndAssert(kinematicBody != GetSentinelBody());
@@ -465,6 +470,7 @@ void ndWorld::ThreadFunction()
 
 	while (m_deletedJoints.GetCount())
 	{
+		D_TRACKTIME();
 		ndJointBilateralConstraint* const joint = m_deletedJoints.GetFirst()->GetInfo();
 		m_deletedJoints.Remove(m_deletedJoints.GetFirst());
 
@@ -477,6 +483,7 @@ void ndWorld::ThreadFunction()
 
 	while (m_deletedBodies.GetCount())
 	{
+		D_TRACKTIME();
 		ndBody* const body = m_deletedBodies.GetFirst()->GetInfo();
 		m_deletedBodies.Remove(m_deletedBodies.GetFirst());
 
@@ -485,8 +492,8 @@ void ndWorld::ThreadFunction()
 		RemoveBody(sharedBody);
 	}
 
-	m_inUpdate = true;
-	m_scene->Begin();
+	//m_inUpdate = true;
+	//m_scene->Begin();
 
 	m_scene->SetTimestep(m_timestep);
 
