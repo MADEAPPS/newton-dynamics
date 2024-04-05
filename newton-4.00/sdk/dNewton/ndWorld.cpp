@@ -530,8 +530,6 @@ void ndWorld::CalculateAverageUpdateTime()
 	}
 }
 
-
-
 void ndWorld::SubStepUpdate(ndFloat32 timestep)
 {
 	D_TRACKTIME();
@@ -591,7 +589,7 @@ void ndWorld::ModelUpdate()
 	{
 		D_TRACKTIME_NAMED(ModelUpdate);
 		const ndFloat32 timestep = m_scene->GetTimestep();
-		ndArray<ndModel*> modelList = m_modelList.GetUpdateList();
+		const ndArray<ndModel*>& modelList = m_modelList.GetUpdateList();
 		const ndInt32 modelCount = modelList.GetCount();
 		for (ndInt32 i = counter.fetch_add(1); i < modelCount; i = counter.fetch_add(1))
 		{
@@ -612,7 +610,7 @@ void ndWorld::ModelPostUpdate()
 	{
 		D_TRACKTIME_NAMED(ModelPostUpdate);
 		const ndFloat32 timestep = m_scene->GetTimestep();
-		ndArray<ndModel*> modelList = m_modelList.GetUpdateList();
+		const ndArray<ndModel*>& modelList = m_modelList.GetUpdateList();
 
 		const ndInt32 modelCount = modelList.GetCount();
 		for (ndInt32 i = counter.fetch_add(1); i < modelCount; i = counter.fetch_add(1))
@@ -632,7 +630,7 @@ void ndWorld::PostModelTransform()
 	{
 		D_TRACKTIME_NAMED(PostModelTransform);
 		const ndFloat32 timestep = m_scene->GetTimestep();
-		ndArray<ndModel*> modelList = m_modelList.GetUpdateList();
+		const ndArray<ndModel*>& modelList = m_modelList.GetUpdateList();
 		const ndInt32 modelCount = modelList.GetCount();
 		for (ndInt32 i = counter.fetch_add(1); i < modelCount; i = counter.fetch_add(1))
 		{

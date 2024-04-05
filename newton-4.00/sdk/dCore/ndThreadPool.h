@@ -96,6 +96,7 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 
 	private:
 	D_CORE_API virtual void Release();
+	D_CORE_API virtual void WaitForWorkers();
 
 	ndWorker* m_workers;
 	ndInt32 m_count;
@@ -198,18 +199,7 @@ void ndThreadPool::ParallelExecute(const Function& callback)
 	
 		ndTaskImplement<Function>* const job = &jobsArray[m_count];
 		callback(job->m_threadIndex, job->m_threadCount);
-
-		bool jobsInProgress = true;
-		do
-		{
-			ndThreadYield();
-			bool inProgess = false;
-			for (ndInt32 i = 0; i < m_count; ++i)
-			{
-				inProgess = inProgess | (m_workers[i].m_task.load() != nullptr);
-			}
-			jobsInProgress = jobsInProgress & inProgess;
-		} while (jobsInProgress);
+		WaitForWorkers();
 		#endif
 	}
 	else

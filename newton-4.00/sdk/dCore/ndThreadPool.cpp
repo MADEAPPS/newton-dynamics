@@ -54,7 +54,10 @@ void ndThreadPool::ndWorker::ThreadFunction()
 			task->Execute();
 			m_task.store(nullptr);
 		}
-		ndThreadYield();
+		else
+		{
+			ndThreadYield();
+		}
 	}
 	m_stillLooping.store(false);
 #endif
@@ -167,3 +170,27 @@ void ndThreadPool::TickOne()
 	ThreadFunction();
 #endif
 }
+
+void ndThreadPool::WaitForWorkers()
+{
+	int xxxx = 0;
+	bool jobsInProgress = true;
+	do
+	{
+		bool inProgess = false;
+		for (ndInt32 i = 0; i < m_count; ++i)
+		{
+			inProgess = inProgess | (m_workers[i].m_task.load() != nullptr);
+		}
+		jobsInProgress = jobsInProgress & inProgess;
+		if (jobsInProgress)
+		{
+			xxxx++;
+			ndThreadYield();
+		}
+	} while (jobsInProgress);
+	if (xxxx > 2000)
+		xxxx += 1;
+	ndTrace(("xxx %d\n", xxxx));
+}
+
