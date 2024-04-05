@@ -29,9 +29,10 @@ ndThreadPool::ndWorker::ndWorker()
 	:ndThread()
 	,m_owner(nullptr)
 	//,m_begin(false)
-	,m_task(nullptr)
+	,m_task____(nullptr)
 	,m_threadIndex(0)
 	,m_begin____(0)
+	,m_taskReady____(0)
 	,m_stillLooping____(0)
 {
 }
@@ -53,12 +54,14 @@ void ndThreadPool::ndWorker::ThreadFunction()
 
 	while (m_begin____)
 	{
-		ndTask* const task = m_task.load();
-		if (task)
+		//ndTask* const task = m_task.load();
+		//if (task)
+		if (m_taskReady____)
 		{
 			//D_TRACKTIME();
-			task->Execute();
-			m_task.store(nullptr);
+			m_task____->Execute();
+			//m_task.store(nullptr);
+			m_taskReady____ = 0;
 			iterations = 0;
 		}
 		else
@@ -198,15 +201,18 @@ void ndThreadPool::TickOne()
 void ndThreadPool::WaitForWorkers()
 {
 	ndInt32 iterations = 0;
-	bool jobsInProgress = true;
+	//bool jobsInProgress = true;
+	ndUnsigned8 jobsInProgress = 1;
 	do
 	{
-		bool inProgess = false;
+		//bool inProgess = false;
+		ndUnsigned8 inProgess = false;
 		for (ndInt32 i = 0; i < m_count; ++i)
 		{
-			inProgess = inProgess | (m_workers[i].m_task.load() != nullptr);
+			//inProgess = inProgess | (m_workers[i].m_task.load() != nullptr);
+			inProgess = ndUnsigned8 (inProgess | m_workers[i].m_taskReady____);
 		}
-		jobsInProgress = jobsInProgress & inProgess;
+		jobsInProgress = ndUnsigned8 (jobsInProgress & inProgess);
 		if (jobsInProgress)
 		{
 			if ((iterations & -32) == -32)
