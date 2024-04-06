@@ -166,10 +166,6 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-	//glDisableVertexAttribArray(3);
-	//glDisableVertexAttribArray(2);
-	//glDisableVertexAttribArray(1);
-	//glDisableVertexAttribArray(0);
 
 	glUseProgram(m_shader);
 	m_textureLocation = glGetUniformLocation(m_shader, "texture0");

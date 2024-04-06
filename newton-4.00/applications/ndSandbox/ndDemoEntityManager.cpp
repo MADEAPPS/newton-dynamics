@@ -567,7 +567,7 @@ void APIENTRY ndDemoEntityManager::OpenMessageCallback(GLenum source,
 		}
 		ndTrace(("GL CALLBACK: %s source = 0x%x, type = 0x%x, id = %d, severity = 0x%x, message = %s, length = %d \n",
 			(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), source, type, id, severity, message, length));
-		//ndAssert(0);
+		ndAssert(0);
 	}
 }
 #endif

@@ -529,8 +529,6 @@ void ndDebugDisplay::ndDebudPass::Init(ndDemoEntityManager* const scene)
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndColorPoint), (void*)OFFSETOF(ndColorPoint, m_color));
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glDisableVertexAttribArray(0);
-	//glDisableVertexAttribArray(1);
 	glBindVertexArray(0);
 
 	m_shader = scene->GetShaderCache().m_colorPoint;
@@ -592,8 +590,6 @@ void ndDebugDisplay::ndDebudPass::RenderBuffer(ndDemoEntityManager* const scene,
 	glDrawArrays(mode, 0, pointCount);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glDisableVertexAttribArray(0);
-	//glDisableVertexAttribArray(1);
 	glBindVertexArray(0);
 	glUseProgram(0);
 }
@@ -774,8 +770,6 @@ void ndDebugDisplay::ndModelsDebugInfo::Init(ndDemoEntityManager* const scene)
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndColorPoint), (void*)OFFSETOF(ndColorPoint, m_color));
 	
-	//glDisableVertexAttribArray(0);
-	//glDisableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }

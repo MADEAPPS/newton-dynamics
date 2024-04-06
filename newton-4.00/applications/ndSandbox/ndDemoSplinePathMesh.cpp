@@ -80,7 +80,6 @@ void ndDemoSplinePathMesh::SetRenderResolution(ndInt32 breaks)
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glVector3), (void*)0);
 
 		glBindVertexArray(0);
-		//glDisableVertexAttribArray(0);
 
 		glUseProgram(m_shader);
 

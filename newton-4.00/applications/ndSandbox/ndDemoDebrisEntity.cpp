@@ -54,9 +54,6 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMesh, const ndArra
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 	glBindVertexArray(0);
-	//glDisableVertexAttribArray(2);
-	//glDisableVertexAttribArray(1);
-	//glDisableVertexAttribArray(0);
 }
 
 ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache, ndInt32 offsetBase, ndArray<glDebrisPoint>& vertexArray)

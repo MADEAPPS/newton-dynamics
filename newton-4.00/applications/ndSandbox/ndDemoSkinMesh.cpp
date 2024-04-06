@@ -244,12 +244,6 @@ void ndDemoSkinMesh::CreateRenderMesh(
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	//glDisableVertexAttribArray(4);
-	//glDisableVertexAttribArray(3);
-	//glDisableVertexAttribArray(2);
-	//glDisableVertexAttribArray(1);
-	//glDisableVertexAttribArray(0);
-	
 	glGenBuffers(1, &mesh->m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->m_indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(indexCount * sizeof(GLuint)), &indices[0], GL_STATIC_DRAW);

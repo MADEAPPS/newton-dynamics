@@ -28,7 +28,6 @@
 ndThreadPool::ndWorker::ndWorker()
 	:ndThread()
 	,m_owner(nullptr)
-	//,m_begin(false)
 	,m_task(nullptr)
 	,m_threadIndex(0)
 	,m_begin(0)
