@@ -1326,6 +1326,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 
 		auto JointForce = [this, &jointPartialForces](ndConstraint* const joint, ndInt32 jointIndex)
 		{
+			D_TRACKTIME_NAMED(JointForce);
 			const ndVector zero(ndVector::m_zero);
 			ndVector accNorm(zero);
 			ndBodyKinematic* const body0 = joint->GetBody0();

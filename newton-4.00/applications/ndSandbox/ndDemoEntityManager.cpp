@@ -556,13 +556,14 @@ void APIENTRY ndDemoEntityManager::OpenMessageCallback(GLenum source,
 	{
 		switch(id)
 		{
-			case 131154:  // Pixel-path performance warning: Pixel transfer is synchronized with 3D rendering.
-			case 131185:  // nvidia driver report will use VIDEO memory as the source for buffer object operations
-				return;
-
-			//	for some reason when using different target I get this on nvidia gpus.
-			//	no one seem to know what cause this
-			case 131139: // Rasterization quality warning : A non - fullscreen clear caused a fallback from CSAA to MSAA.
+			case 2:		 // no sure why on Intel embedded systems I get this warding, 
+				         // ID_RECOMPILE_FRAGMENT_SHADER performance warning has been generated.
+						 // Fragment shader recompiled due to state change., length = 120
+			case 131154: // Pixel-path performance warning: Pixel transfer is synchronized with 3D rendering.
+			case 131185: // nvidia driver report will use VIDEO memory as the source for buffer object operations
+			case 131139: //	for some reason when using different target I get this on nvidia gpus.
+						 //	no one seems to know what cause this
+					     // Rasterization quality warning : A non - fullscreen clear caused a fallback from CSAA to MSAA.
 				return;
 		}
 		ndTrace(("GL CALLBACK: %s source = 0x%x, type = 0x%x, id = %d, severity = 0x%x, message = %s, length = %d \n",
