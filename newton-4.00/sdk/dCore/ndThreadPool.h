@@ -72,14 +72,11 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 		virtual void ThreadFunction();
 
 		ndThreadPool* m_owner;
-		//ndAtomic<bool> m_begin;
-		//ndAtomic<bool> m_stillLooping;
-		//ndAtomic<ndTask*> m_task;
-		ndTask* m_task____;
+		ndTask* m_task;
 		ndInt32 m_threadIndex;
-		ndUnsigned8 m_begin____;
-		ndUnsigned8 m_taskReady____;
-		ndUnsigned8 m_stillLooping____;
+		ndUnsigned8 m_begin;
+		ndUnsigned8 m_taskReady;
+		ndUnsigned8 m_stillLooping;
 		friend class ndThreadPool;
 	};
 
@@ -198,9 +195,8 @@ void ndThreadPool::ParallelExecute(const Function& callback)
 		for (ndInt32 i = 0; i < m_count; ++i)
 		{
 			ndTaskImplement<Function>* const job = &jobsArray[i + 1];
-			//m_workers[i].m_task.store(job);
-			m_workers[i].m_task____ = job;
-			m_workers[i].m_taskReady____ = 1;
+			m_workers[i].m_task = job;
+			m_workers[i].m_taskReady = 1;
 		}
 	
 		ndTaskImplement<Function>* const job = &jobsArray[0];

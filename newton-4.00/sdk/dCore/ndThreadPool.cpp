@@ -29,11 +29,11 @@ ndThreadPool::ndWorker::ndWorker()
 	:ndThread()
 	,m_owner(nullptr)
 	//,m_begin(false)
-	,m_task____(nullptr)
+	,m_task(nullptr)
 	,m_threadIndex(0)
-	,m_begin____(0)
-	,m_taskReady____(0)
-	,m_stillLooping____(0)
+	,m_begin(0)
+	,m_taskReady(0)
+	,m_stillLooping(0)
 {
 }
 
@@ -45,23 +45,17 @@ ndThreadPool::ndWorker::~ndWorker()
 void ndThreadPool::ndWorker::ThreadFunction()
 {
 #ifndef	D_USE_THREAD_EMULATION
-	//m_begin.store(true);
-	m_begin____ = 1;
+	m_begin = 1;
 	ndInt32 iterations = 0;
-	//m_stillLooping.store(true);
-	m_stillLooping____ = 1;
-	//while (m_begin.load())
+	m_stillLooping = 1;
 
-	while (m_begin____)
+	while (m_begin)
 	{
-		//ndTask* const task = m_task.load();
-		//if (task)
-		if (m_taskReady____)
+		if (m_taskReady)
 		{
 			//D_TRACKTIME();
-			m_task____->Execute();
-			//m_task.store(nullptr);
-			m_taskReady____ = 0;
+			m_task->Execute();
+			m_taskReady = 0;
 			iterations = 0;
 		}
 		else
@@ -77,8 +71,7 @@ void ndThreadPool::ndWorker::ThreadFunction()
 			iterations++;
 		}
 	}
-	//m_stillLooping.store(false);
-	m_stillLooping____ = 0;
+	m_stillLooping = 0;
 #endif
 }
 
@@ -160,20 +153,16 @@ void ndThreadPool::End()
 	#ifndef	D_USE_THREAD_EMULATION
 	for (ndInt32 i = 0; i < m_count; ++i)
 	{
-		//m_workers[i].m_begin.store(false);
-		m_workers[i].m_begin____ = 0;
+		m_workers[i].m_begin = 0;
 	}
 
-	//bool stillLooping = true;
 	ndUnsigned8 stillLooping = 1;
 	do 
 	{
-		//bool looping = false;
 		ndUnsigned8 looping = 0;
 		for (ndInt32 i = 0; i < m_count; ++i)
 		{
-			//looping = looping | m_workers[i].m_stillLooping.load();
-			looping = ndUnsigned8(looping | m_workers[i].m_stillLooping____);
+			looping = ndUnsigned8(looping | m_workers[i].m_stillLooping);
 		}
 		stillLooping = ndUnsigned8(stillLooping & looping);
 		if (m_count)
@@ -201,16 +190,13 @@ void ndThreadPool::TickOne()
 void ndThreadPool::WaitForWorkers()
 {
 	ndInt32 iterations = 0;
-	//bool jobsInProgress = true;
 	ndUnsigned8 jobsInProgress = 1;
 	do
 	{
-		//bool inProgess = false;
-		ndUnsigned8 inProgess = false;
+		ndUnsigned8 inProgess = 0;
 		for (ndInt32 i = 0; i < m_count; ++i)
 		{
-			//inProgess = inProgess | (m_workers[i].m_task.load() != nullptr);
-			inProgess = ndUnsigned8 (inProgess | m_workers[i].m_taskReady____);
+			inProgess = ndUnsigned8 (inProgess | m_workers[i].m_taskReady);
 		}
 		jobsInProgress = ndUnsigned8 (jobsInProgress & inProgess);
 		if (jobsInProgress)
