@@ -243,8 +243,8 @@ void ndVehicleUI::CreateBufferUI()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboDyn);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indxDyn), &m_indxDyn[0], GL_STATIC_DRAW);
 
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(0);
+		//glDisableVertexAttribArray(1);
+		//glDisableVertexAttribArray(0);
 
 		// Don't unbind this buffer, Let's it in opengl memory.
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -266,19 +266,19 @@ void ndVehicleUI::CreateBufferUI()
 		glGenBuffers(1, &m_vboSta);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vboSta);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertSta), &m_vertSta[0], GL_STATIC_DRAW);
-		//
+		
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)0);
-		//
+		
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)(offsetof(glPositionUV, m_uv)));
 
 		glGenBuffers(1, &m_iboSta);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboSta);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indxSta), &m_indxSta[0], GL_STATIC_DRAW);
-		//
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(0);
+		
+		//glDisableVertexAttribArray(1);
+		//glDisableVertexAttribArray(0);
 		glBindVertexArray(0);
 
 		glUseProgram(m_shaderHandle);
@@ -335,8 +335,8 @@ void ndVehicleUI::RenderGageUI(const GLuint tex1, const ndFloat32 origin_x, cons
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(0);
+		//glDisableVertexAttribArray(1);
+		//glDisableVertexAttribArray(0);
 
 		// Don't unbind this buffers from the opengl memory.
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -410,8 +410,8 @@ void ndVehicleUI::RenderGearUI(const ndInt32 gearid, GLuint tex1, ndFloat32 orig
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(0);
+		//glDisableVertexAttribArray(1);
+		//glDisableVertexAttribArray(0);
 
 		// Don't unbind this buffer to let's it in opengl memory.
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

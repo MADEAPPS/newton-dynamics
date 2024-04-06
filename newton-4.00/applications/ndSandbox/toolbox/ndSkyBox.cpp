@@ -68,8 +68,8 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	glBindVertexArray(0);
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
+	//glDisableVertexAttribArray(0);
+	//glDisableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glUseProgram(m_shader);
@@ -125,7 +125,7 @@ void ndSkyBox::Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatri
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(0);
+	//glDisableVertexAttribArray(0);
 	glBindVertexArray(0);
 
 	glUseProgram(0);
