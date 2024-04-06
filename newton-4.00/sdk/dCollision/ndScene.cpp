@@ -1429,14 +1429,17 @@ void ndScene::ApplyExtForce()
 void ndScene::InitBodyArray()
 {
 	D_TRACKTIME();
-	auto BuildBodyArray = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	ndAtomic<ndInt32> iterator(0);
+	auto BuildBodyArray = ndMakeObject::ndFunction([this, &iterator](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(BuildBodyArray);
 		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
 
+		const ndInt32 count = view.GetCount() - 1;
 		ndBvhNodeArray& array = m_bvhSceneManager.GetNodeArray();
-		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		//const ndStartEnd startEnd(count, threadIndex, threadCount);
+		//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		for (ndInt32 i = iterator++; i < count; i = iterator++)
 		{
 			ndBodyKinematic* const body = view[i];
 			body->PrepareStep(i);

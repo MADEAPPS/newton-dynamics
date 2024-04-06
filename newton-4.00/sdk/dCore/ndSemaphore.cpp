@@ -58,7 +58,7 @@ bool ndSemaphore::Wait()
 	}
 
 	m_count--;
-	return m_terminate.load();
+	return m_terminate;
 #endif
 }
 
@@ -76,7 +76,7 @@ void ndSemaphore::Terminate()
 #ifndef D_USE_THREAD_EMULATION
 	std::unique_lock<std::mutex> lock(m_mutex);
 	m_count++;
-	m_terminate.store(true);
+	m_terminate = true;
 	m_condition.notify_one();
 #endif
 }

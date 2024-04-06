@@ -30,8 +30,12 @@ ndThreadPool::ndWorker::ndWorker()
 	,m_owner(nullptr)
 	,m_task(nullptr)
 	,m_threadIndex(0)
-	,m_begin(0)
+#ifdef D_USE_SYNC_SEMAPHORE
+	,m_taskReady()
+#else
 	,m_taskReady(0)
+#endif
+	,m_begin(0)
 	,m_stillLooping(0)
 {
 }
@@ -41,21 +45,51 @@ ndThreadPool::ndWorker::~ndWorker()
 	Finish();
 }
 
+ndUnsigned8 ndThreadPool::ndWorker::IsTaskInProgress() const
+{
+	#ifdef D_USE_SYNC_SEMAPHORE
+	return ndUnsigned8 (m_task ? 1 : 0);
+	#else
+	return m_taskReady;
+	#endif
+}
+
+void ndThreadPool::ndWorker::ExecuteTask(ndTask* const task)
+{
+	m_task = task;
+#ifdef D_USE_SYNC_SEMAPHORE
+	m_taskReady.Signal();
+#else
+	m_taskReady = 1;
+#endif
+}
+
 void ndThreadPool::ndWorker::ThreadFunction()
 {
 #ifndef	D_USE_THREAD_EMULATION
-	m_begin = 1;
-	ndInt32 iterations = 0;
 	m_stillLooping = 1;
 
+#ifdef D_USE_SYNC_SEMAPHORE
+	while (!m_taskReady.Wait() && m_task)
+	{
+		//D_TRACKTIME();
+		m_task->Execute();
+		m_task = nullptr;
+	}
+#else
+	m_begin = 1;
+	ndInt32 iterations = 0;
 	while (m_begin)
 	{
 		if (m_taskReady)
 		{
 			//D_TRACKTIME();
-			m_task->Execute();
-			m_taskReady = 0;
+			if (m_task)
+			{
+				m_task->Execute();
+			}
 			iterations = 0;
+			m_taskReady = 0;
 		}
 		else
 		{
@@ -70,6 +104,7 @@ void ndThreadPool::ndWorker::ThreadFunction()
 			iterations++;
 		}
 	}
+#endif
 	m_stillLooping = 0;
 #endif
 }
@@ -152,7 +187,10 @@ void ndThreadPool::End()
 	#ifndef	D_USE_THREAD_EMULATION
 	for (ndInt32 i = 0; i < m_count; ++i)
 	{
+		m_workers[i].ExecuteTask(nullptr);
+		#if !defined(D_USE_SYNC_SEMAPHORE)
 		m_workers[i].m_begin = 0;
+		#endif
 	}
 
 	ndUnsigned8 stillLooping = 1;
@@ -195,7 +233,7 @@ void ndThreadPool::WaitForWorkers()
 		ndUnsigned8 inProgess = 0;
 		for (ndInt32 i = 0; i < m_count; ++i)
 		{
-			inProgess = ndUnsigned8 (inProgess | m_workers[i].m_taskReady);
+			inProgess = ndUnsigned8(inProgess | (m_workers[i].IsTaskInProgress()));
 		}
 		jobsInProgress = ndUnsigned8 (jobsInProgress & inProgess);
 		if (jobsInProgress)

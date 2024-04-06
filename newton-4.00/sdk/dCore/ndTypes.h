@@ -58,6 +58,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <locale.h>
+//#include <semaphore> only in cpp 20 or later
 #include <condition_variable>
 
 // weird workaround but i am not sure how a global compiler flag would affect the rest of the code

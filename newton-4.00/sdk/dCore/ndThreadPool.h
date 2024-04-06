@@ -30,6 +30,8 @@
 #include "ndSemaphore.h"
 #include "ndClassAlloc.h"
 
+//#define	D_USE_SYNC_SEMAPHORE
+
 //#define	D_MAX_THREADS_COUNT	16
 #define	D_MAX_THREADS_COUNT	32
 
@@ -68,14 +70,22 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 		D_CORE_API ndWorker();
 		D_CORE_API virtual ~ndWorker();
 
+		D_CORE_API ndUnsigned8 IsTaskInProgress() const;
+		D_CORE_API void ExecuteTask(ndTask* const task);
+	
 		private:
 		virtual void ThreadFunction();
 
 		ndThreadPool* m_owner;
 		ndTask* m_task;
 		ndInt32 m_threadIndex;
-		ndUnsigned8 m_begin;
+		#ifdef D_USE_SYNC_SEMAPHORE
+		ndSemaphore m_taskReady;
+		//std::binary_semaphore m_taskReady;
+		#else
 		ndUnsigned8 m_taskReady;
+		#endif
+		ndUnsigned8 m_begin;
 		ndUnsigned8 m_stillLooping;
 		friend class ndThreadPool;
 	};
@@ -195,8 +205,7 @@ void ndThreadPool::ParallelExecute(const Function& callback)
 		for (ndInt32 i = 0; i < m_count; ++i)
 		{
 			ndTaskImplement<Function>* const job = &jobsArray[i + 1];
-			m_workers[i].m_task = job;
-			m_workers[i].m_taskReady = 1;
+			m_workers[i].ExecuteTask(job);
 		}
 	
 		ndTaskImplement<Function>* const job = &jobsArray[0];

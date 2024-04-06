@@ -58,7 +58,7 @@ class ndSemaphore
 	mutable std::mutex m_mutex;
 	std::condition_variable m_condition;
 	ndInt32 m_count;
-	ndAtomic<bool> m_terminate;
+	bool m_terminate;
 #endif
 };
 
