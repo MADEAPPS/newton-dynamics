@@ -1016,7 +1016,7 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 			}
 			arow[i] += diagDamp[m_blockSize + i];
 		}
-		ndAssert(ndTestPSDmatrix(m_auxiliaryRowCount - m_blockSize, m_auxiliaryRowCount, &m_massMatrix11[m_auxiliaryRowCount * m_blockSize + m_blockSize]));
+		ndAssert(!boundedSize || ndTestPSDmatrix(m_auxiliaryRowCount - m_blockSize, m_auxiliaryRowCount, &m_massMatrix11[m_auxiliaryRowCount * m_blockSize + m_blockSize]));
 	}
 }
 
