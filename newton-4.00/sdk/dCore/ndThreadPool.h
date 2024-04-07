@@ -34,6 +34,7 @@
 
 //#define	D_MAX_THREADS_COUNT	16
 #define	D_MAX_THREADS_COUNT	32
+#define D_WORKER_BATCH_SIZE	32
 
 class ndThreadPool;
 
