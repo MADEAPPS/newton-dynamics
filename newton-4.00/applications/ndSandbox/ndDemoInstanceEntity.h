@@ -22,10 +22,12 @@ class ndDemoMeshIntance : public ndDemoMesh
 	~ndDemoMeshIntance();
 
 	virtual void Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
+	virtual void RenderShadowMap(ndShadowMapRenderPass* const shadowMap, const ndMatrix& modelMatrixProjection);
 	void SetTransforms(ndInt32 count, const ndMatrix* const matrixArray);
 
 	private:
 	void RenderBatch(ndInt32 start, ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
+	void RenderShadowMapBatch(ndInt32 start, ndShadowMapRenderPass* const shadowMap, const ndMatrix& modelMatrixProjection);
 
 	const ndMatrix* m_offsets;
 	ndInt32 m_instanceCount;
@@ -40,8 +42,9 @@ class ndDemoInstanceEntity: public ndDemoEntity
 	ndDemoInstanceEntity(const ndDemoInstanceEntity& copyFrom);
 	virtual ~ndDemoInstanceEntity(void);
 
+	virtual void RenderShadowMap(ndShadowMapRenderPass* const shadowMap, const ndMatrix& matrix);
 	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
-
+	
 	static ndArray<ndMatrix>& GetMatrixStack();
 
 	ndSharedPtr<ndDemoMeshIntance> m_instanceMesh;

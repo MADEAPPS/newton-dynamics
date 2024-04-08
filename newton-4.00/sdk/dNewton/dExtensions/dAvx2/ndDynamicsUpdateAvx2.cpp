@@ -725,7 +725,8 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		{
 			SetRowsCount();
 		}
-		else if (threadIndex == (threadCount - 1))
+		//else if (threadIndex == (threadCount - 1))
+		else if (threadIndex == 1)
 		{
 			SetSoaRowsCount();
 		}

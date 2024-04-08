@@ -261,6 +261,27 @@ void ndDemoMeshIntance::RenderBatch(ndInt32 start, ndDemoEntityManager* const sc
 	glUseProgram(0);
 }
 
+void ndDemoMeshIntance::RenderShadowMapBatch(ndInt32 start, ndShadowMapRenderPass* const shadowMap, const ndMatrix& modelMatrixProjection)
+{
+	//glMatrix matrix(modelMatrixProjection);
+	//glUniformMatrix4fv(GLint(shadowMap->GetShaderModelProjMatrix()), 1, false, &matrix[0][0]);
+	//
+	//glBindVertexArray(m_vertextArrayBuffer);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	//
+	//for (ndNode* node = GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndDemoSubMesh& segment = node->GetInfo();
+	//	if (!segment.m_hasTranparency)
+	//	{
+	//		glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+	//	}
+	//}
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
+
+}
+
 void ndDemoMeshIntance::Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
 {
 	ndInt32 segments = (m_instanceCount - 1) / m_maxInstanceCount;
@@ -269,6 +290,16 @@ void ndDemoMeshIntance::Render(ndDemoEntityManager* const scene, const ndMatrix&
 		RenderBatch(i, scene, modelMatrix);
 	}
 	RenderBatch(segments, scene, modelMatrix);
+}
+
+void ndDemoMeshIntance::RenderShadowMap(ndShadowMapRenderPass* const shadowMap, const ndMatrix& modelMatrixProjection)
+{
+	ndInt32 segments = (m_instanceCount - 1) / m_maxInstanceCount;
+	for (ndInt32 i = 0; i < segments; ++i)
+	{
+		RenderShadowMapBatch(i, shadowMap, modelMatrixProjection);
+	}
+	RenderShadowMapBatch(segments, shadowMap, modelMatrixProjection);
 }
 
 ndDemoInstanceEntity::ndDemoInstanceEntity(const ndDemoInstanceEntity& copyFrom)
@@ -321,5 +352,34 @@ void ndDemoInstanceEntity::Render(ndFloat32, ndDemoEntityManager* const scene, c
 
 		ndMatrix nodeMatrix(m_matrix * matrix);
 		instanceMesh->Render(scene, nodeMatrix);
+	}
+}
+
+void ndDemoInstanceEntity::RenderShadowMap(ndShadowMapRenderPass* const shadowMap, const ndMatrix& matrix)
+{
+	ndInt32 count = 0;
+	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	{
+		count++;
+	}
+
+	if (count)
+	{
+		// prepare the transforms buffer form all the children matrices
+		ndInt32 index = 0;
+		ndArray<ndMatrix>& matrixStack = GetMatrixStack();
+		matrixStack.SetCount(count);
+
+		for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+		{
+			matrixStack[index] = child->GetCurrentMatrix();
+			index++;
+		}
+
+		ndDemoMeshIntance* const instanceMesh = (ndDemoMeshIntance*)*m_instanceMesh;
+		instanceMesh->SetTransforms(count, &matrixStack[0]);
+
+		ndMatrix nodeMatrix(m_matrix * matrix);
+		instanceMesh->RenderShadowMap(shadowMap, nodeMatrix);
 	}
 }
