@@ -1197,12 +1197,13 @@ void ndDynamicsUpdate::DetermineSleepStates()
 			const ndInt32 maxSpan = ((bodyCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : bodyCount - i;
 			for (ndInt32 j = 0; j < maxSpan; ++j)
 			{
-				const ndInt32 index = bodyIndex[i + j];
+				const ndInt32 m = i + j;
+				const ndInt32 index = bodyIndex[m];
 				ndBodyKinematic* const body = bodyArray[jointBodyPairIndexBuffer[index].m_body];
 				ndAssert(body->m_isStatic <= 1);
 				ndAssert(body->m_index == jointBodyPairIndexBuffer[index].m_body);
 				const ndInt32 mask = ndInt32(body->m_isStatic) - 1;
-				const ndInt32 count = mask & (bodyIndex[i + j + 1] - index);
+				const ndInt32 count = mask & (bodyIndex[m + 1] - index);
 				if (count)
 				{
 					ndUnsigned8 equilibrium = body->m_isJointFence0;
@@ -1468,19 +1469,20 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			{
 				ndVector force(zero);
 				ndVector torque(zero);
-				const ndBodyKinematic* const body = bodyArray[i + j];
+				const ndInt32 m = i + j;
+				const ndBodyKinematic* const body = bodyArray[m];
 
-				const ndInt32 startIndex = bodyIndex[i + j];
+				const ndInt32 startIndex = bodyIndex[m];
 				const ndInt32 mask = body->m_isStatic - 1;
-				const ndInt32 count = mask & (bodyIndex[i + j + 1] - startIndex);
+				const ndInt32 count = mask & (bodyIndex[m + 1] - startIndex);
 				for (ndInt32 k = 0; k < count; ++k)
 				{
 					const ndInt32 index = jointBodyPairIndexBuffer[startIndex + k].m_joint;
 					force += jointInternalForces[index].m_linear;
 					torque += jointInternalForces[index].m_angular;
 				}
-				internalForces[i + j].m_linear = force;
-				internalForces[i + j].m_angular = torque;
+				internalForces[m].m_linear = force;
+				internalForces[m].m_angular = torque;
 			}
 		}
 	});
