@@ -171,7 +171,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 	// build actor network
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 	layers.SetCount(0);
-	layers.PushBack(new ndBrainLayerLinear(m_stateSize, hyperParameters.m_hiddenLayersNumberOfNeurons));
+	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
 	{
@@ -189,7 +189,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 
 	// the critic is more complex since is deal with more complex inputs
 	layers.SetCount(0);
-	layers.PushBack(new ndBrainLayerLinear(m_stateSize + m_actionsSize, hyperParameters.m_hiddenLayersNumberOfNeurons * 2));
+	layers.PushBack(new ndBrainLayerLinear(statesDim + actionDim, hyperParameters.m_hiddenLayersNumberOfNeurons * 2));
 	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
 	{
