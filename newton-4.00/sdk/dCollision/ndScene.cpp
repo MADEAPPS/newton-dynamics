@@ -823,7 +823,6 @@ void ndScene::UpdateTransform()
 		}
 	});
 	ParallelExecute(TransformUpdate);
-
 }
 
 void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)

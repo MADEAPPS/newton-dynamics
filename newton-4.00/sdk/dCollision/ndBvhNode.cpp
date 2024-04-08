@@ -184,18 +184,12 @@ void ndBvhNodeArray::Swap(ndBvhNodeArray& src)
 
 ndBvhSceneManager::ndBvhSceneManager()
 	:m_workingArray()
-#ifdef D_NEW_SCENE
-	,m_buildArray()
-#endif
 	,m_bvhBuildState()
 {
 }
 
 ndBvhSceneManager::ndBvhSceneManager(const ndBvhSceneManager& src)
 	:m_workingArray(src.m_workingArray)
-#ifdef D_NEW_SCENE
-	,m_buildArray(src.m_buildArray)
-#endif
 	,m_bvhBuildState(src.m_bvhBuildState)
 {
 }
@@ -218,14 +212,6 @@ ndBvhNode* ndBvhSceneManager::AddBody(ndBodyKinematic* const body, ndBvhNode* ro
 	bodyNode->m_isDead = 0;
 	m_workingArray.PushBack(bodyNode);
 	body->m_bodyNodeIndex = m_workingArray.GetCount() - 1;
-
-	#ifdef D_NEW_SCENE
-	m_buildArray.m_isDirty = 1;
-	m_buildArray.PushBack(sceneNode->Clone());
-	body->m_buildSceneNodeIndex = m_buildArray.GetCount() - 1;
-	m_buildArray.PushBack(bodyNode->Clone());
-	body->m_buildBodyNodeIndex = m_buildArray.GetCount() - 1;
-	#endif
 
 	if (m_workingArray.GetCount() > 2)
 	{
@@ -308,10 +294,6 @@ ndBvhNode* ndBvhSceneManager::AddBody(ndBodyKinematic* const body, ndBvhNode* ro
 
 void ndBvhSceneManager::RemoveBody(ndBodyKinematic* const body)
 {
-	#ifdef D_NEW_SCENE
-	m_buildArray.m_isDirty = 1;
-	#endif
-
 	m_workingArray.m_isDirty = 1;
 	ndBvhLeafNode* const bodyNode = (ndBvhLeafNode*)m_workingArray[body->m_bodyNodeIndex];
 	ndBvhInternalNode* const sceneNode = (ndBvhInternalNode*)m_workingArray[body->m_sceneNodeIndex];
@@ -331,18 +313,11 @@ ndBvhLeafNode* ndBvhSceneManager::GetLeafNode(ndBodyKinematic* const body) const
 void ndBvhSceneManager::CleanUp()
 {
 	m_workingArray.CleanUp();
-#ifdef D_NEW_SCENE	
-	m_buildArray.CleanUp();
-#endif
 }
 
 void ndBvhSceneManager::Update(ndThreadPool& threadPool)
 {
-#ifdef D_NEW_SCENE
-	ndBvhNodeArray& nodeArray = m_buildArray;
-#else
 	ndBvhNodeArray& nodeArray = m_workingArray;
-#endif
 
 	if (nodeArray.m_isDirty && nodeArray.GetCount())
 	{
@@ -380,9 +355,6 @@ void ndBvhSceneManager::Update(ndThreadPool& threadPool)
 		for (ndInt32 i = 0; i < deadCount; ++i)
 		{
 			ndBvhNode* const node = nodeArray[alivedStart + i];
-			#ifdef D_NEW_SCENE
-				ndAssert(0);
-			#endif
 			delete node;
 		}
 		nodeArray.SetCount(alivedStart);
@@ -405,13 +377,8 @@ void ndBvhSceneManager::Update(ndThreadPool& threadPool)
 						ndAssert(nodes[baseCount + i + j]->GetAsSceneBodyNode());
 
 						ndBodyKinematic* const body = bodyNode->m_body;
-						#ifdef D_NEW_SCENE
-							body->m_buildSceneNodeIndex = i;
-							body->m_buildBodyNodeIndex = baseCount + i;
-						#else
-							body->m_sceneNodeIndex = i + j;
-							body->m_bodyNodeIndex = baseCount + i + j;
-						#endif
+						body->m_sceneNodeIndex = i + j;
+						body->m_bodyNodeIndex = baseCount + i + j;
 					}
 				}
 			});
@@ -499,12 +466,7 @@ bool ndBvhSceneManager::BuildBvhTreeInitNodes(ndThreadPool& threadPool)
 	{
 		D_TRACKTIME_NAMED(CopyBodyNodes);
 
-		#ifdef D_NEW_SCENE
-		ndBvhNodeArray& nodeArray = m_buildArray;
-		#else
 		ndBvhNodeArray& nodeArray = m_workingArray;
-		#endif
-
 		const ndInt32 baseCount = nodeArray.GetCount() / 2;
 		ndBvhNode** const srcArray = m_bvhBuildState.m_srcArray;
 		ndBvhLeafNode** const bodySceneNodes = (ndBvhLeafNode**)&nodeArray[baseCount];
@@ -531,11 +493,7 @@ bool ndBvhSceneManager::BuildBvhTreeInitNodes(ndThreadPool& threadPool)
 	auto CopySceneNode = ndMakeObject::ndFunction([this, &iterator1](ndInt32, ndInt32)
 	{
 		D_TRACKTIME_NAMED(CopySceneNode);
-		#ifdef D_NEW_SCENE
-		ndBvhNodeArray& nodeArray = m_buildArray;
-		#else
 		ndBvhNodeArray& nodeArray = m_workingArray;
-		#endif
 		
 		ndBvhInternalNode** const sceneNodes = (ndBvhInternalNode**)&nodeArray[0];
 		ndBvhNode** const parentsArray = m_bvhBuildState.m_parentsArray;
@@ -560,12 +518,7 @@ bool ndBvhSceneManager::BuildBvhTreeInitNodes(ndThreadPool& threadPool)
 	Update(threadPool);
 
 	bool ret = false;
-
-	#ifdef D_NEW_SCENE
-	ndBvhNodeArray& nodeArray = m_buildArray;
-	#else
 	ndBvhNodeArray& nodeArray = m_workingArray;
-	#endif
 
 	if (nodeArray.GetCount())
 	{
@@ -843,7 +796,7 @@ ndInt32 ndBvhSceneManager::BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode
 
 							class ndCompareKey
 							{
-							public:
+								public:
 								ndCompareKey(const void* const context)
 								{
 									const ndCompareContext* const info = (ndCompareContext*)context;
@@ -1046,11 +999,7 @@ void ndBvhSceneManager::BuildBvhTreeSetNodesDepth(ndThreadPool& threadPool)
 		}
 	};
 
-	#ifdef D_NEW_SCENE
-	ndBvhNodeArray& nodeArray = m_buildArray;
-	#else
 	ndBvhNodeArray& nodeArray = m_workingArray;
-	#endif
 
 	ndInt32 sceneNodeCount = nodeArray.GetCount() / 2 - 1;
 	ndBvhInternalNode** const view = (ndBvhInternalNode**)&nodeArray[0];
@@ -1127,8 +1076,6 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 		ndInt32 m_code[5];
 	};
 
-#define USE_FULL_32_BIT_SPACE
-#ifdef USE_FULL_32_BIT_SPACE
 	class ndSortCell_x
 	{
 		public:
@@ -1179,125 +1126,6 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 
 		ndInt32 m_shift;
 	};
-
-#else
-	class ndSortCell_xlow
-	{
-		public:
-		ndSortCell_xlow(const void* const)
-		{
-		}
-
-		ndInt32 GetKey(const ndBottomUpCell& cell) const
-		{
-			return cell.m_x & 0xff;
-		}
-	};
-
-	class ndSortCell_ylow
-	{
-		public:
-		ndSortCell_ylow(const void* const)
-		{
-		}
-
-		ndInt32 GetKey(const ndBottomUpCell& cell) const
-		{
-			return cell.m_y & 0xff;
-		}
-	};
-
-	class ndSortCell_zlow
-	{
-		public:
-		ndSortCell_zlow(const void* const)
-		{
-		}
-
-		ndInt32 GetKey(const ndBottomUpCell& cell) const
-		{
-			return cell.m_z & 0xff;
-		}
-	};
-
-	class ndSortCell_xMid
-	{
-		public:
-		ndSortCell_xMid(const void* const)
-		{
-		}
-
-		ndInt32 GetKey(const ndBottomUpCell& cell) const
-		{
-			return (cell.m_x >> 8) & 0xff;
-		}
-	};
-
-	class ndSortCell_yMid
-	{
-		public:
-		ndSortCell_yMid(const void* const)
-		{
-		}
-
-		ndInt32 GetKey(const ndBottomUpCell& cell) const
-		{
-			return (cell.m_y >> 8) & 0xff;
-		}
-	};
-
-	class ndSortCell_zMid
-	{
-		public:
-		ndSortCell_zMid(const void* const)
-		{
-		}
-
-		ndInt32 GetKey(const ndBottomUpCell& cell) const
-		{
-			return (cell.m_z >> 8) & 0xff;
-		}
-	};
-
-	class ndSortCell_xHigh
-	{
-		public:
-		ndSortCell_xHigh(const void* const)
-		{
-		}
-
-		ndInt32 GetKey(const ndBottomUpCell& cell) const
-		{
-			return (cell.m_x >> 16) & 0xff;
-		}
-	};
-
-	class ndSortCell_yHigh
-	{
-		public:
-		ndSortCell_yHigh(const void* const)
-		{
-		}
-
-		ndInt32 GetKey(const ndBottomUpCell& cell) const
-		{
-			return (cell.m_y >> 16) & 0xff;
-		}
-	};
-
-	class ndSortCell_zHigh
-	{
-		public:
-		ndSortCell_zHigh(const void* const)
-		{
-		}
-
-		ndInt32 GetKey(const ndBottomUpCell& cell) const
-		{
-			return (cell.m_z >> 16) & 0xff;
-		}
-	};
-#endif
 
 	class ndSortCellCount
 	{
@@ -1374,7 +1202,6 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 			maxGrids[0][2] = ndMax(maxGrids[i][2], maxGrids[0][2]);
 		}
 
-#ifdef USE_FULL_32_BIT_SPACE
 		ndAssert(maxGrids[0][0] < 0x7fffffff);
 		ndAssert(maxGrids[0][1] < 0x7fffffff);
 		ndAssert(maxGrids[0][2] < 0x7fffffff);
@@ -1395,40 +1222,6 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 			ndCountingSort<ndBottomUpCell, ndSortCell_z, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, &shift);
 			shift += 8;
 		} while (ndInt64(maxGrids[0][2]) > ndInt64(1) << shift);
-#else
-		ndCountingSort<ndBottomUpCell, ndSortCell_xlow, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
-		if (maxGrids[0][0] > 256)
-		{
-			ndCountingSort<ndBottomUpCell, ndSortCell_xMid, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
-			if (maxGrids[0][0] > 256 * 256)
-			{
-				ndCountingSort<ndBottomUpCell, ndSortCell_xHigh, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
-				ndAssert(maxGrids[0][0] < 256 * 256 * 256);
-			}
-		}
-
-		ndCountingSort<ndBottomUpCell, ndSortCell_ylow, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
-		if (maxGrids[0][1] > 256)
-		{
-			ndCountingSort<ndBottomUpCell, ndSortCell_yMid, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
-			if (maxGrids[0][1] > 256 * 256)
-			{
-				ndCountingSort<ndBottomUpCell, ndSortCell_yHigh, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
-				ndAssert(maxGrids[0][1] < 256 * 256 * 256);
-			}
-		}
-
-		ndCountingSort<ndBottomUpCell, ndSortCell_zlow, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
-		if (maxGrids[0][2] > 256)
-		{
-			ndCountingSort<ndBottomUpCell, ndSortCell_zMid, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
-			if (maxGrids[0][2] > 256 * 256)
-			{
-				ndCountingSort<ndBottomUpCell, ndSortCell_zHigh, 8>(threadPool, m_bvhBuildState.m_cellBuffer0, m_bvhBuildState.m_cellBuffer1, nullptr, nullptr);
-				ndAssert(maxGrids[0][2] < 256 * 256 * 256);
-			}
-		}
-#endif
 
 		ndBottomUpCell sentinelCell;
 		sentinelCell.m_x = ndUnsigned32(-1);
@@ -1600,7 +1393,6 @@ ndBvhNode* ndBvhSceneManager::BuildIncrementalBvhTree(ndThreadPool& threadPool)
 		case ndBuildBvhTreeBuildState::m_endBuild:
 		{
 			root = m_bvhBuildState.m_root;
-			BuildBvhTreeSwapBuffers(threadPool);
 			ndAssert(m_bvhBuildState.m_root->SanityCheck(0));
 			m_bvhBuildState.m_state = m_bvhBuildState.m_beginBuild;
 			break;
@@ -1610,38 +1402,6 @@ ndBvhNode* ndBvhSceneManager::BuildIncrementalBvhTree(ndThreadPool& threadPool)
 			ndAssert(0);
 	}
 	return root;
-}
-
-//void ndBvhSceneManager::BuildBvhTreeSwapBuffers(ndThreadPool& threadPool)
-void ndBvhSceneManager::BuildBvhTreeSwapBuffers(ndThreadPool& )
-{
-#ifdef D_NEW_SCENE
-
-	D_TRACKTIME();
-	ndAtomic<ndInt32> iterator(0);
-	auto SwapBodyIndices = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME_NAMED(MarkCellBounds);
-		ndBvhNodeArray& array = m_buildArray;
-		ndInt32 baseIndex = array.GetCount() / 2;
-		const ndStartEnd startEnd(baseIndex, threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndBvhLeafNode* const bodyNode = (ndBvhLeafNode*)array[baseIndex + i];
-			ndAssert(bodyNode->GetAsSceneBodyNode());
-
-			ndBodyKinematic* const body = bodyNode->m_body;
-			ndSwap(body->m_bodyNodeIndex, body->m_buildBodyNodeIndex);
-			ndSwap(body->m_sceneNodeIndex, body->m_buildSceneNodeIndex);
-		}
-	});
-	threadPool.ParallelExecute(SwapBodyIndices);
-
-	// for now just swap buffers
-	m_buildArray.Swap(m_workingArray);
-
-	UpdateScene(threadPool);
-#endif
 }
 
 ndBvhNode* ndBvhSceneManager::BuildBvhTree(ndThreadPool& threadPool)
@@ -1666,7 +1426,6 @@ ndBvhNode* ndBvhSceneManager::BuildBvhTree(ndThreadPool& threadPool)
 
 	BuildBvhTreeSetNodesDepth(threadPool);
 	ndAssert(m_bvhBuildState.m_root->SanityCheck(0));
-
-	BuildBvhTreeSwapBuffers(threadPool);
+	
 	return m_bvhBuildState.m_root;
 }

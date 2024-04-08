@@ -24,8 +24,6 @@
 
 #include "ndCollisionStdafx.h"
 
-//#define D_NEW_SCENE
-
 class ndBodyKinematic;
 class ndBvhLeafNode;
 class ndBvhInternalNode;
@@ -56,9 +54,6 @@ class ndBvhNode : public ndContainersFreeListAlloc<ndBvhNode>
 	ndVector m_minBox;
 	ndVector m_maxBox;
 	ndBvhNode* m_parent;
-#ifdef D_NEW_SCENE
-	ndBvhNode* m_buildNode;
-#endif
 	ndSpinLock m_lock;
 	ndInt32 m_depthLevel;
 	ndUnsigned8 m_isDead;
@@ -195,13 +190,7 @@ class ndBvhSceneManager
 	ndBvhNode* BuildIncrementalBvhTree(ndThreadPool& threadPool);
 	ndInt32 BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode** const parentsArray, ndInt32 bashCount);
 
-	void BuildBvhTreeSwapBuffers(ndThreadPool& threadPool);
-
 	ndBvhNodeArray m_workingArray;
-#ifdef D_NEW_SCENE
-	ndBvhNodeArray m_buildArray;
-#endif
-
 	ndBuildBvhTreeBuildState m_bvhBuildState;
 };
 
@@ -216,9 +205,6 @@ inline ndBvhNode::ndBvhNode(ndBvhNode* const parent)
 	,m_minBox(ndFloat32(-1.0e15f))
 	,m_maxBox(ndFloat32(1.0e15f))
 	,m_parent(parent)
-#ifdef D_NEW_SCENE
-	,m_buildNode(nullptr)
-#endif
 	,m_lock()
 	,m_depthLevel(0)
 	,m_isDead(0)
@@ -234,18 +220,11 @@ inline ndBvhNode::ndBvhNode(const ndBvhNode& src)
 	,m_minBox(src.m_minBox)
 	,m_maxBox(src.m_maxBox)
 	,m_parent(nullptr)
-#ifdef D_NEW_SCENE
-	,m_buildNode((ndBvhNode*)&src)
-#endif
 	,m_lock()
 	,m_depthLevel(0)
 	,m_isDead(0)
 	,m_bhvLinked(0)
 {
-#ifdef D_NEW_SCENE
-	m_buildNode->m_buildNode = this;
-#endif
-
 #ifdef _DEBUG
 	m_nodeId = 0;
 #endif
@@ -288,9 +267,6 @@ inline ndBvhNode* ndBvhNode::GetRight() const
 inline void ndBvhNode::Kill()
 {
 	m_isDead = 1;
-#ifdef D_NEW_SCENE
-	m_buildNode->m_isDead = 1;
-#endif
 }
 
 inline void ndBvhNode::GetAabb(ndVector& minBox, ndVector& maxBox) const
