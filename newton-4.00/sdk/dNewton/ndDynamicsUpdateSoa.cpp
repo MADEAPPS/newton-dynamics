@@ -743,9 +743,8 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 		}
 	});
 	
-	ndTrace(("xxxxxxxxxx\n"));
-
-	auto TransposeMassMatrix = ndMakeObject::ndFunction([this, &jointArray](ndInt32 threadIndex, ndInt32 threadCount)
+	ndAtomic<ndInt32> iterator2(0);
+	auto TransposeMassMatrix = ndMakeObject::ndFunction([this, &iterator2, &jointArray](ndInt32, ndInt32)
 	{
 		D_TRACKTIME_NAMED(TransposeMassMatrix);
 		const ndInt32 jointCount = jointArray.GetCount();
@@ -764,242 +763,248 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 		const ndInt32* const soaJointRows = &m_soaJointRows[0];
 
 		ndConstraint** const jointsPtr = &jointArray[0];
-		for (ndInt32 i = threadIndex; i < soaJointCount; i += threadCount)
+
+		for (ndInt32 i = iterator2.fetch_add(D_WORKER_BATCH_SIZE); i < soaJointCount; i = iterator2.fetch_add(D_WORKER_BATCH_SIZE))
 		{
-			const ndInt32 index = i * D_SSE_WORK_GROUP;
-			ndInt32 maxRow = 0;
-			ndInt32 minRow = 255;
-			ndVector selectMask(ndVector::m_xyzwMask);
-			for (ndInt32 j = 0; j < D_SSE_WORK_GROUP; ++j)
+			const ndInt32 maxSpan = ((soaJointCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : soaJointCount - i;
+			for (ndInt32 j = 0; j < maxSpan; ++j)
 			{
-				ndConstraint* const joint = jointsPtr[index + j];
-				if (joint)
+				const ndInt32 m = i + j;
+				const ndInt32 index = m * D_SSE_WORK_GROUP;
+				ndInt32 maxRow = 0;
+				ndInt32 minRow = 255;
+				ndVector selectMask(ndVector::m_xyzwMask);
+				for (ndInt32 k = 0; k < D_SSE_WORK_GROUP; ++k)
 				{
-					const ndInt32 maxMask = (maxRow - joint->m_rowCount) >> 8;
-					const ndInt32 minMask = (minRow - joint->m_rowCount) >> 8;
-					maxRow = ( maxMask & joint->m_rowCount) | (~maxMask & maxRow);
-					minRow = (~minMask & joint->m_rowCount) | ( minMask & minRow);
-					if (!joint->m_rowCount)
+					ndConstraint* const joint = jointsPtr[index + k];
+					if (joint)
 					{
-						selectMask[j] = ndFloat32(0.0f);
+						const ndInt32 maxMask = (maxRow - joint->m_rowCount) >> 8;
+						const ndInt32 minMask = (minRow - joint->m_rowCount) >> 8;
+						maxRow = ( maxMask & joint->m_rowCount) | (~maxMask & maxRow);
+						minRow = (~minMask & joint->m_rowCount) | ( minMask & minRow);
+						if (!joint->m_rowCount)
+						{
+							selectMask[k] = ndFloat32(0.0f);
+						}
+					}
+					else
+					{
+						minRow = 0;
+						selectMask[k] = ndFloat32(0.0f);
+					}
+				}
+				ndAssert(maxRow >= 0);
+				ndAssert(minRow < 255);
+				jointMask[m] = selectMask;
+
+				const ndInt8 isUniformGroup = (maxRow == minRow) & (maxRow > 0);
+				groupType[m] = isUniformGroup;
+
+				const ndInt32 soaRowBase = soaJointRows[m];
+				if (isUniformGroup)
+				{
+					const ndConstraint* const joint0 = jointsPtr[index + 0];
+					const ndConstraint* const joint1 = jointsPtr[index + 1];
+					const ndConstraint* const joint2 = jointsPtr[index + 2];
+					const ndConstraint* const joint3 = jointsPtr[index + 3];
+
+					const ndInt32 rowCount = joint0->m_rowCount;
+					for (ndInt32 k = 0; k < rowCount; ++k)
+					{
+						ndVector tmp;
+						const ndLeftHandSide* const row0 = &leftHandSide[joint0->m_rowStart + k];
+						const ndLeftHandSide* const row1 = &leftHandSide[joint1->m_rowStart + k];
+						const ndLeftHandSide* const row2 = &leftHandSide[joint2->m_rowStart + k];
+						const ndLeftHandSide* const row3 = &leftHandSide[joint3->m_rowStart + k];
+
+						ndSoa::ndSoaMatrixElement& row = massMatrix[soaRowBase + k];
+						ndVector::Transpose4x4(
+							row.m_Jt.m_jacobianM0.m_linear.m_x,
+							row.m_Jt.m_jacobianM0.m_linear.m_y,
+							row.m_Jt.m_jacobianM0.m_linear.m_z,
+							tmp,
+							row0->m_Jt.m_jacobianM0.m_linear,
+							row1->m_Jt.m_jacobianM0.m_linear,
+							row2->m_Jt.m_jacobianM0.m_linear,
+							row3->m_Jt.m_jacobianM0.m_linear);
+						ndVector::Transpose4x4(
+							row.m_Jt.m_jacobianM0.m_angular.m_x,
+							row.m_Jt.m_jacobianM0.m_angular.m_y,
+							row.m_Jt.m_jacobianM0.m_angular.m_z,
+							tmp,
+							row0->m_Jt.m_jacobianM0.m_angular,
+							row1->m_Jt.m_jacobianM0.m_angular,
+							row2->m_Jt.m_jacobianM0.m_angular,
+							row3->m_Jt.m_jacobianM0.m_angular);
+
+						ndVector::Transpose4x4(
+							row.m_Jt.m_jacobianM1.m_linear.m_x,
+							row.m_Jt.m_jacobianM1.m_linear.m_y,
+							row.m_Jt.m_jacobianM1.m_linear.m_z,
+							tmp,
+							row0->m_Jt.m_jacobianM1.m_linear,
+							row1->m_Jt.m_jacobianM1.m_linear,
+							row2->m_Jt.m_jacobianM1.m_linear,
+							row3->m_Jt.m_jacobianM1.m_linear);
+						ndVector::Transpose4x4(
+							row.m_Jt.m_jacobianM1.m_angular.m_x,
+							row.m_Jt.m_jacobianM1.m_angular.m_y,
+							row.m_Jt.m_jacobianM1.m_angular.m_z,
+							tmp,
+							row0->m_Jt.m_jacobianM1.m_angular,
+							row1->m_Jt.m_jacobianM1.m_angular,
+							row2->m_Jt.m_jacobianM1.m_angular,
+							row3->m_Jt.m_jacobianM1.m_angular);
+
+						ndVector::Transpose4x4(
+							row.m_JMinv.m_jacobianM0.m_linear.m_x,
+							row.m_JMinv.m_jacobianM0.m_linear.m_y,
+							row.m_JMinv.m_jacobianM0.m_linear.m_z,
+							tmp,
+							row0->m_JMinv.m_jacobianM0.m_linear,
+							row1->m_JMinv.m_jacobianM0.m_linear,
+							row2->m_JMinv.m_jacobianM0.m_linear,
+							row3->m_JMinv.m_jacobianM0.m_linear);
+						ndVector::Transpose4x4(
+							row.m_JMinv.m_jacobianM0.m_angular.m_x,
+							row.m_JMinv.m_jacobianM0.m_angular.m_y,
+							row.m_JMinv.m_jacobianM0.m_angular.m_z,
+							tmp,
+							row0->m_JMinv.m_jacobianM0.m_angular,
+							row1->m_JMinv.m_jacobianM0.m_angular,
+							row2->m_JMinv.m_jacobianM0.m_angular,
+							row3->m_JMinv.m_jacobianM0.m_angular);
+
+						ndVector::Transpose4x4(
+							row.m_JMinv.m_jacobianM1.m_linear.m_x,
+							row.m_JMinv.m_jacobianM1.m_linear.m_y,
+							row.m_JMinv.m_jacobianM1.m_linear.m_z,
+							tmp,
+							row0->m_JMinv.m_jacobianM1.m_linear,
+							row1->m_JMinv.m_jacobianM1.m_linear,
+							row2->m_JMinv.m_jacobianM1.m_linear,
+							row3->m_JMinv.m_jacobianM1.m_linear);
+						ndVector::Transpose4x4(
+							row.m_JMinv.m_jacobianM1.m_angular.m_x,
+							row.m_JMinv.m_jacobianM1.m_angular.m_y,
+							row.m_JMinv.m_jacobianM1.m_angular.m_z,
+							tmp,
+							row0->m_JMinv.m_jacobianM1.m_angular,
+							row1->m_JMinv.m_jacobianM1.m_angular,
+							row2->m_JMinv.m_jacobianM1.m_angular,
+							row3->m_JMinv.m_jacobianM1.m_angular);
+
+						#ifdef D_NEWTON_USE_DOUBLE
+						ndInt64* const normalIndex = (ndInt64*)&row.m_normalForceIndex[0];
+						#else
+						ndInt32* const normalIndex = (ndInt32*)&row.m_normalForceIndex[0];
+						#endif
+						for (ndInt32 n = 0; n < D_SSE_WORK_GROUP; ++n)
+						{
+							const ndConstraint* const soaJoint = jointsPtr[index + n];
+							const ndRightHandSide* const rhs = &rightHandSide[soaJoint->m_rowStart + k];
+							row.m_force[n] = rhs->m_force;
+							row.m_diagDamp[n] = rhs->m_diagDamp;
+							row.m_invJinvMJt[n] = rhs->m_invJinvMJt;
+							row.m_coordenateAccel[n] = rhs->m_coordenateAccel;
+							normalIndex[n] = (rhs->m_normalForceIndex + 1) * D_SSE_WORK_GROUP + n;
+							row.m_lowerBoundFrictionCoefficent[n] = rhs->m_lowerBoundFrictionCoefficent;
+							row.m_upperBoundFrictionCoefficent[n] = rhs->m_upperBoundFrictionCoefficent;
+						}
 					}
 				}
 				else
 				{
-					minRow = 0;
-					selectMask[j] = ndFloat32(0.0f);
-				}
-			}
-			ndAssert(maxRow >= 0);
-			ndAssert(minRow < 255);
-			jointMask[i] = selectMask;
+					for (ndInt32 k = 0; k < maxRow; ++k)
+					{
+						ndSoa::ndSoaMatrixElement& row = massMatrix[soaRowBase + k];
+						row.m_Jt.m_jacobianM0.m_linear.m_x = zero;
+						row.m_Jt.m_jacobianM0.m_linear.m_y = zero;
+						row.m_Jt.m_jacobianM0.m_linear.m_z = zero;
+						row.m_Jt.m_jacobianM0.m_angular.m_x = zero;
+						row.m_Jt.m_jacobianM0.m_angular.m_y = zero;
+						row.m_Jt.m_jacobianM0.m_angular.m_z = zero;
+						row.m_Jt.m_jacobianM1.m_linear.m_x = zero;
+						row.m_Jt.m_jacobianM1.m_linear.m_y = zero;
+						row.m_Jt.m_jacobianM1.m_linear.m_z = zero;
+						row.m_Jt.m_jacobianM1.m_angular.m_x = zero;
+						row.m_Jt.m_jacobianM1.m_angular.m_y = zero;
+						row.m_Jt.m_jacobianM1.m_angular.m_z = zero;
 
-			const ndInt8 isUniformGroup = (maxRow == minRow) & (maxRow > 0);
-			groupType[i] = isUniformGroup;
+						row.m_JMinv.m_jacobianM0.m_linear.m_x = zero;
+						row.m_JMinv.m_jacobianM0.m_linear.m_y = zero;
+						row.m_JMinv.m_jacobianM0.m_linear.m_z = zero;
+						row.m_JMinv.m_jacobianM0.m_angular.m_x = zero;
+						row.m_JMinv.m_jacobianM0.m_angular.m_y = zero;
+						row.m_JMinv.m_jacobianM0.m_angular.m_z = zero;
+						row.m_JMinv.m_jacobianM1.m_linear.m_x = zero;
+						row.m_JMinv.m_jacobianM1.m_linear.m_y = zero;
+						row.m_JMinv.m_jacobianM1.m_linear.m_z = zero;
+						row.m_JMinv.m_jacobianM1.m_angular.m_x = zero;
+						row.m_JMinv.m_jacobianM1.m_angular.m_y = zero;
+						row.m_JMinv.m_jacobianM1.m_angular.m_z = zero;
 
-			const ndInt32 soaRowBase = soaJointRows[i];
-			if (isUniformGroup)
-			{
-				const ndConstraint* const joint0 = jointsPtr[index + 0];
-				const ndConstraint* const joint1 = jointsPtr[index + 1];
-				const ndConstraint* const joint2 = jointsPtr[index + 2];
-				const ndConstraint* const joint3 = jointsPtr[index + 3];
+						row.m_force = zero;
+						row.m_diagDamp = zero;
+						row.m_invJinvMJt = zero;
+						row.m_coordenateAccel = zero;
+						row.m_normalForceIndex = ordinals;
+						row.m_lowerBoundFrictionCoefficent = zero;
+						row.m_upperBoundFrictionCoefficent = zero;
+					}
 
-				const ndInt32 rowCount = joint0->m_rowCount;
-				for (ndInt32 j = 0; j < rowCount; ++j)
-				{
-					ndVector tmp;
-					const ndLeftHandSide* const row0 = &leftHandSide[joint0->m_rowStart + j];
-					const ndLeftHandSide* const row1 = &leftHandSide[joint1->m_rowStart + j];
-					const ndLeftHandSide* const row2 = &leftHandSide[joint2->m_rowStart + j];
-					const ndLeftHandSide* const row3 = &leftHandSide[joint3->m_rowStart + j];
-
-					ndSoa::ndSoaMatrixElement& row = massMatrix[soaRowBase + j];
-					ndVector::Transpose4x4(
-						row.m_Jt.m_jacobianM0.m_linear.m_x,
-						row.m_Jt.m_jacobianM0.m_linear.m_y,
-						row.m_Jt.m_jacobianM0.m_linear.m_z,
-						tmp,
-						row0->m_Jt.m_jacobianM0.m_linear,
-						row1->m_Jt.m_jacobianM0.m_linear,
-						row2->m_Jt.m_jacobianM0.m_linear,
-						row3->m_Jt.m_jacobianM0.m_linear);
-					ndVector::Transpose4x4(
-						row.m_Jt.m_jacobianM0.m_angular.m_x,
-						row.m_Jt.m_jacobianM0.m_angular.m_y,
-						row.m_Jt.m_jacobianM0.m_angular.m_z,
-						tmp,
-						row0->m_Jt.m_jacobianM0.m_angular,
-						row1->m_Jt.m_jacobianM0.m_angular,
-						row2->m_Jt.m_jacobianM0.m_angular,
-						row3->m_Jt.m_jacobianM0.m_angular);
-
-					ndVector::Transpose4x4(
-						row.m_Jt.m_jacobianM1.m_linear.m_x,
-						row.m_Jt.m_jacobianM1.m_linear.m_y,
-						row.m_Jt.m_jacobianM1.m_linear.m_z,
-						tmp,
-						row0->m_Jt.m_jacobianM1.m_linear,
-						row1->m_Jt.m_jacobianM1.m_linear,
-						row2->m_Jt.m_jacobianM1.m_linear,
-						row3->m_Jt.m_jacobianM1.m_linear);
-					ndVector::Transpose4x4(
-						row.m_Jt.m_jacobianM1.m_angular.m_x,
-						row.m_Jt.m_jacobianM1.m_angular.m_y,
-						row.m_Jt.m_jacobianM1.m_angular.m_z,
-						tmp,
-						row0->m_Jt.m_jacobianM1.m_angular,
-						row1->m_Jt.m_jacobianM1.m_angular,
-						row2->m_Jt.m_jacobianM1.m_angular,
-						row3->m_Jt.m_jacobianM1.m_angular);
-
-					ndVector::Transpose4x4(
-						row.m_JMinv.m_jacobianM0.m_linear.m_x,
-						row.m_JMinv.m_jacobianM0.m_linear.m_y,
-						row.m_JMinv.m_jacobianM0.m_linear.m_z,
-						tmp,
-						row0->m_JMinv.m_jacobianM0.m_linear,
-						row1->m_JMinv.m_jacobianM0.m_linear,
-						row2->m_JMinv.m_jacobianM0.m_linear,
-						row3->m_JMinv.m_jacobianM0.m_linear);
-					ndVector::Transpose4x4(
-						row.m_JMinv.m_jacobianM0.m_angular.m_x,
-						row.m_JMinv.m_jacobianM0.m_angular.m_y,
-						row.m_JMinv.m_jacobianM0.m_angular.m_z,
-						tmp,
-						row0->m_JMinv.m_jacobianM0.m_angular,
-						row1->m_JMinv.m_jacobianM0.m_angular,
-						row2->m_JMinv.m_jacobianM0.m_angular,
-						row3->m_JMinv.m_jacobianM0.m_angular);
-
-					ndVector::Transpose4x4(
-						row.m_JMinv.m_jacobianM1.m_linear.m_x,
-						row.m_JMinv.m_jacobianM1.m_linear.m_y,
-						row.m_JMinv.m_jacobianM1.m_linear.m_z,
-						tmp,
-						row0->m_JMinv.m_jacobianM1.m_linear,
-						row1->m_JMinv.m_jacobianM1.m_linear,
-						row2->m_JMinv.m_jacobianM1.m_linear,
-						row3->m_JMinv.m_jacobianM1.m_linear);
-					ndVector::Transpose4x4(
-						row.m_JMinv.m_jacobianM1.m_angular.m_x,
-						row.m_JMinv.m_jacobianM1.m_angular.m_y,
-						row.m_JMinv.m_jacobianM1.m_angular.m_z,
-						tmp,
-						row0->m_JMinv.m_jacobianM1.m_angular,
-						row1->m_JMinv.m_jacobianM1.m_angular,
-						row2->m_JMinv.m_jacobianM1.m_angular,
-						row3->m_JMinv.m_jacobianM1.m_angular);
-
-					#ifdef D_NEWTON_USE_DOUBLE
-					ndInt64* const normalIndex = (ndInt64*)&row.m_normalForceIndex[0];
-					#else
-					ndInt32* const normalIndex = (ndInt32*)&row.m_normalForceIndex[0];
-					#endif
 					for (ndInt32 k = 0; k < D_SSE_WORK_GROUP; ++k)
 					{
-						const ndConstraint* const soaJoint = jointsPtr[index + k];
-						const ndRightHandSide* const rhs = &rightHandSide[soaJoint->m_rowStart + j];
-						row.m_force[k] = rhs->m_force;
-						row.m_diagDamp[k] = rhs->m_diagDamp;
-						row.m_invJinvMJt[k] = rhs->m_invJinvMJt;
-						row.m_coordenateAccel[k] = rhs->m_coordenateAccel;
-						normalIndex[k] = (rhs->m_normalForceIndex + 1) * D_SSE_WORK_GROUP + k;
-						row.m_lowerBoundFrictionCoefficent[k] = rhs->m_lowerBoundFrictionCoefficent;
-						row.m_upperBoundFrictionCoefficent[k] = rhs->m_upperBoundFrictionCoefficent;
-					}
-				}
-			}
-			else
-			{
-				for (ndInt32 j = 0; j < maxRow; ++j)
-				{
-					ndSoa::ndSoaMatrixElement& row = massMatrix[soaRowBase + j];
-					row.m_Jt.m_jacobianM0.m_linear.m_x = zero;
-					row.m_Jt.m_jacobianM0.m_linear.m_y = zero;
-					row.m_Jt.m_jacobianM0.m_linear.m_z = zero;
-					row.m_Jt.m_jacobianM0.m_angular.m_x = zero;
-					row.m_Jt.m_jacobianM0.m_angular.m_y = zero;
-					row.m_Jt.m_jacobianM0.m_angular.m_z = zero;
-					row.m_Jt.m_jacobianM1.m_linear.m_x = zero;
-					row.m_Jt.m_jacobianM1.m_linear.m_y = zero;
-					row.m_Jt.m_jacobianM1.m_linear.m_z = zero;
-					row.m_Jt.m_jacobianM1.m_angular.m_x = zero;
-					row.m_Jt.m_jacobianM1.m_angular.m_y = zero;
-					row.m_Jt.m_jacobianM1.m_angular.m_z = zero;
-
-					row.m_JMinv.m_jacobianM0.m_linear.m_x = zero;
-					row.m_JMinv.m_jacobianM0.m_linear.m_y = zero;
-					row.m_JMinv.m_jacobianM0.m_linear.m_z = zero;
-					row.m_JMinv.m_jacobianM0.m_angular.m_x = zero;
-					row.m_JMinv.m_jacobianM0.m_angular.m_y = zero;
-					row.m_JMinv.m_jacobianM0.m_angular.m_z = zero;
-					row.m_JMinv.m_jacobianM1.m_linear.m_x = zero;
-					row.m_JMinv.m_jacobianM1.m_linear.m_y = zero;
-					row.m_JMinv.m_jacobianM1.m_linear.m_z = zero;
-					row.m_JMinv.m_jacobianM1.m_angular.m_x = zero;
-					row.m_JMinv.m_jacobianM1.m_angular.m_y = zero;
-					row.m_JMinv.m_jacobianM1.m_angular.m_z = zero;
-
-					row.m_force = zero;
-					row.m_diagDamp = zero;
-					row.m_invJinvMJt = zero;
-					row.m_coordenateAccel = zero;
-					row.m_normalForceIndex = ordinals;
-					row.m_lowerBoundFrictionCoefficent = zero;
-					row.m_upperBoundFrictionCoefficent = zero;
-				}
-
-				for (ndInt32 j = 0; j < D_SSE_WORK_GROUP; ++j)
-				{
-					const ndConstraint* const joint = jointsPtr[index + j];
-					if (joint)
-					{
-						for (ndInt32 k = 0; k < joint->m_rowCount; ++k)
+						const ndConstraint* const joint = jointsPtr[index + k];
+						if (joint)
 						{
-							ndSoa::ndSoaMatrixElement& row = massMatrix[soaRowBase + k];
-							const ndLeftHandSide* const lhs = &leftHandSide[joint->m_rowStart + k];
+							for (ndInt32 n = 0; n < joint->m_rowCount; ++n)
+							{
+								ndSoa::ndSoaMatrixElement& row = massMatrix[soaRowBase + n];
+								const ndLeftHandSide* const lhs = &leftHandSide[joint->m_rowStart + n];
 
-							row.m_Jt.m_jacobianM0.m_linear.m_x[j] = lhs->m_Jt.m_jacobianM0.m_linear.m_x;
-							row.m_Jt.m_jacobianM0.m_linear.m_y[j] = lhs->m_Jt.m_jacobianM0.m_linear.m_y;
-							row.m_Jt.m_jacobianM0.m_linear.m_z[j] = lhs->m_Jt.m_jacobianM0.m_linear.m_z;
-							row.m_Jt.m_jacobianM0.m_angular.m_x[j] = lhs->m_Jt.m_jacobianM0.m_angular.m_x;
-							row.m_Jt.m_jacobianM0.m_angular.m_y[j] = lhs->m_Jt.m_jacobianM0.m_angular.m_y;
-							row.m_Jt.m_jacobianM0.m_angular.m_z[j] = lhs->m_Jt.m_jacobianM0.m_angular.m_z;
-							row.m_Jt.m_jacobianM1.m_linear.m_x[j] = lhs->m_Jt.m_jacobianM1.m_linear.m_x;
-							row.m_Jt.m_jacobianM1.m_linear.m_y[j] = lhs->m_Jt.m_jacobianM1.m_linear.m_y;
-							row.m_Jt.m_jacobianM1.m_linear.m_z[j] = lhs->m_Jt.m_jacobianM1.m_linear.m_z;
-							row.m_Jt.m_jacobianM1.m_angular.m_x[j] = lhs->m_Jt.m_jacobianM1.m_angular.m_x;
-							row.m_Jt.m_jacobianM1.m_angular.m_y[j] = lhs->m_Jt.m_jacobianM1.m_angular.m_y;
-							row.m_Jt.m_jacobianM1.m_angular.m_z[j] = lhs->m_Jt.m_jacobianM1.m_angular.m_z;
+								row.m_Jt.m_jacobianM0.m_linear.m_x[k] = lhs->m_Jt.m_jacobianM0.m_linear.m_x;
+								row.m_Jt.m_jacobianM0.m_linear.m_y[k] = lhs->m_Jt.m_jacobianM0.m_linear.m_y;
+								row.m_Jt.m_jacobianM0.m_linear.m_z[k] = lhs->m_Jt.m_jacobianM0.m_linear.m_z;
+								row.m_Jt.m_jacobianM0.m_angular.m_x[k] = lhs->m_Jt.m_jacobianM0.m_angular.m_x;
+								row.m_Jt.m_jacobianM0.m_angular.m_y[k] = lhs->m_Jt.m_jacobianM0.m_angular.m_y;
+								row.m_Jt.m_jacobianM0.m_angular.m_z[k] = lhs->m_Jt.m_jacobianM0.m_angular.m_z;
+								row.m_Jt.m_jacobianM1.m_linear.m_x[k] = lhs->m_Jt.m_jacobianM1.m_linear.m_x;
+								row.m_Jt.m_jacobianM1.m_linear.m_y[k] = lhs->m_Jt.m_jacobianM1.m_linear.m_y;
+								row.m_Jt.m_jacobianM1.m_linear.m_z[k] = lhs->m_Jt.m_jacobianM1.m_linear.m_z;
+								row.m_Jt.m_jacobianM1.m_angular.m_x[k] = lhs->m_Jt.m_jacobianM1.m_angular.m_x;
+								row.m_Jt.m_jacobianM1.m_angular.m_y[k] = lhs->m_Jt.m_jacobianM1.m_angular.m_y;
+								row.m_Jt.m_jacobianM1.m_angular.m_z[k] = lhs->m_Jt.m_jacobianM1.m_angular.m_z;
 
-							row.m_JMinv.m_jacobianM0.m_linear.m_x[j] = lhs->m_JMinv.m_jacobianM0.m_linear.m_x;
-							row.m_JMinv.m_jacobianM0.m_linear.m_y[j] = lhs->m_JMinv.m_jacobianM0.m_linear.m_y;
-							row.m_JMinv.m_jacobianM0.m_linear.m_z[j] = lhs->m_JMinv.m_jacobianM0.m_linear.m_z;
-							row.m_JMinv.m_jacobianM0.m_angular.m_x[j] = lhs->m_JMinv.m_jacobianM0.m_angular.m_x;
-							row.m_JMinv.m_jacobianM0.m_angular.m_y[j] = lhs->m_JMinv.m_jacobianM0.m_angular.m_y;
-							row.m_JMinv.m_jacobianM0.m_angular.m_z[j] = lhs->m_JMinv.m_jacobianM0.m_angular.m_z;
-							row.m_JMinv.m_jacobianM1.m_linear.m_x[j] = lhs->m_JMinv.m_jacobianM1.m_linear.m_x;
-							row.m_JMinv.m_jacobianM1.m_linear.m_y[j] = lhs->m_JMinv.m_jacobianM1.m_linear.m_y;
-							row.m_JMinv.m_jacobianM1.m_linear.m_z[j] = lhs->m_JMinv.m_jacobianM1.m_linear.m_z;
-							row.m_JMinv.m_jacobianM1.m_angular.m_x[j] = lhs->m_JMinv.m_jacobianM1.m_angular.m_x;
-							row.m_JMinv.m_jacobianM1.m_angular.m_y[j] = lhs->m_JMinv.m_jacobianM1.m_angular.m_y;
-							row.m_JMinv.m_jacobianM1.m_angular.m_z[j] = lhs->m_JMinv.m_jacobianM1.m_angular.m_z;
+								row.m_JMinv.m_jacobianM0.m_linear.m_x[k] = lhs->m_JMinv.m_jacobianM0.m_linear.m_x;
+								row.m_JMinv.m_jacobianM0.m_linear.m_y[k] = lhs->m_JMinv.m_jacobianM0.m_linear.m_y;
+								row.m_JMinv.m_jacobianM0.m_linear.m_z[k] = lhs->m_JMinv.m_jacobianM0.m_linear.m_z;
+								row.m_JMinv.m_jacobianM0.m_angular.m_x[k] = lhs->m_JMinv.m_jacobianM0.m_angular.m_x;
+								row.m_JMinv.m_jacobianM0.m_angular.m_y[k] = lhs->m_JMinv.m_jacobianM0.m_angular.m_y;
+								row.m_JMinv.m_jacobianM0.m_angular.m_z[k] = lhs->m_JMinv.m_jacobianM0.m_angular.m_z;
+								row.m_JMinv.m_jacobianM1.m_linear.m_x[k] = lhs->m_JMinv.m_jacobianM1.m_linear.m_x;
+								row.m_JMinv.m_jacobianM1.m_linear.m_y[k] = lhs->m_JMinv.m_jacobianM1.m_linear.m_y;
+								row.m_JMinv.m_jacobianM1.m_linear.m_z[k] = lhs->m_JMinv.m_jacobianM1.m_linear.m_z;
+								row.m_JMinv.m_jacobianM1.m_angular.m_x[k] = lhs->m_JMinv.m_jacobianM1.m_angular.m_x;
+								row.m_JMinv.m_jacobianM1.m_angular.m_y[k] = lhs->m_JMinv.m_jacobianM1.m_angular.m_y;
+								row.m_JMinv.m_jacobianM1.m_angular.m_z[k] = lhs->m_JMinv.m_jacobianM1.m_angular.m_z;
 
-							const ndRightHandSide* const rhs = &rightHandSide[joint->m_rowStart + k];
-							row.m_force[j] = rhs->m_force;
-							row.m_diagDamp[j] = rhs->m_diagDamp;
-							row.m_invJinvMJt[j] = rhs->m_invJinvMJt;
-							row.m_coordenateAccel[j] = rhs->m_coordenateAccel;
+								const ndRightHandSide* const rhs = &rightHandSide[joint->m_rowStart + n];
+								row.m_force[k] = rhs->m_force;
+								row.m_diagDamp[k] = rhs->m_diagDamp;
+								row.m_invJinvMJt[k] = rhs->m_invJinvMJt;
+								row.m_coordenateAccel[k] = rhs->m_coordenateAccel;
 
-							#ifdef D_NEWTON_USE_DOUBLE
-							ndInt64* const normalIndex = (ndInt64*)&row.m_normalForceIndex[0];
-							#else
-							ndInt32* const normalIndex = (ndInt32*)&row.m_normalForceIndex[0];
-							#endif
-							normalIndex[j] = (rhs->m_normalForceIndex + 1) * D_SSE_WORK_GROUP + j;
-							row.m_lowerBoundFrictionCoefficent[j] = rhs->m_lowerBoundFrictionCoefficent;
-							row.m_upperBoundFrictionCoefficent[j] = rhs->m_upperBoundFrictionCoefficent;
+								#ifdef D_NEWTON_USE_DOUBLE
+								ndInt64* const normalIndex = (ndInt64*)&row.m_normalForceIndex[0];
+								#else
+								ndInt32* const normalIndex = (ndInt32*)&row.m_normalForceIndex[0];
+								#endif
+								normalIndex[k] = (rhs->m_normalForceIndex + 1) * D_SSE_WORK_GROUP + k;
+								row.m_lowerBoundFrictionCoefficent[k] = rhs->m_lowerBoundFrictionCoefficent;
+								row.m_upperBoundFrictionCoefficent[k] = rhs->m_upperBoundFrictionCoefficent;
+							}
 						}
 					}
 				}
