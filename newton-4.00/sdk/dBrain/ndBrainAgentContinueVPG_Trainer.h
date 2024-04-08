@@ -27,6 +27,8 @@
 #include "ndBrainAgent.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainReplayBuffer.h"
+#include "ndBrainLayerLinear.h"
+#include "ndBrainLayerTanhActivation.h"
 #include "ndBrainLossLeastSquaredError.h"
 
 // this is an implementation of the vanilla policy Gradient as described in:
