@@ -1138,6 +1138,7 @@ void ndDynamicsUpdateSoa::UpdateSkeletons()
 	{
 		D_TRACKTIME_NAMED(UpdateSkeletons);
 		ndJacobian* const internalForces = &GetInternalForces()[0];
+
 		const ndInt32 count = activeSkeletons.GetCount();
 		for (ndInt32 i = iterator++; i < count; i = iterator++)
 		{
