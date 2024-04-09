@@ -277,13 +277,14 @@ void ndDynamicsUpdateSoa::SortIslands()
 	{
 		D_TRACKTIME_NAMED(Sort0);
 		ndInt32* const hist = &histogram[threadIndex][0];
-		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
 
 		ndInt32 map[4];
 		map[0] = 0;
 		map[1] = 1;
 		map[2] = 2;
 		map[3] = 2;
+
+		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
