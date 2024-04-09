@@ -173,9 +173,7 @@ void ndFlatShadedDebugMesh::Render(ndDemoEntityManager* const scene, const ndMat
 ndZbufferDebugMesh::ndZbufferDebugMesh(const ndShaderCache& shaderCache, const ndShapeInstance* const collision)
 	:ndDemoMeshInterface()
 	,m_indexCount(0)
-	,m_normalMatrixLocation(0)
-	,m_projectMatrixLocation(0)
-	,m_viewModelMatrixLocation(0)
+	,m_viewModelProjectMatrixLocation(0)
 	,m_shader(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
@@ -186,7 +184,7 @@ ndZbufferDebugMesh::ndZbufferDebugMesh(const ndShaderCache& shaderCache, const n
 		public:
 		ndDrawShape()
 			:ndDebugNotify()
-			, m_triangles(1024)
+			,m_triangles(1024)
 		{
 		}
 
@@ -196,38 +194,27 @@ ndZbufferDebugMesh::ndZbufferDebugMesh(const ndShaderCache& shaderCache, const n
 			ndVector p1(faceVertex[1]);
 			ndVector p2(faceVertex[2]);
 
-			ndVector normal((p1 - p0).CrossProduct(p2 - p0));
-			normal = normal.Normalize();
 			for (ndInt32 i = 2; i < vertexCount; ++i)
 			{
-				glPositionNormal point;
-				point.m_posit.m_x = GLfloat(faceVertex[0].m_x);
-				point.m_posit.m_y = GLfloat(faceVertex[0].m_y);
-				point.m_posit.m_z = GLfloat(faceVertex[0].m_z);
-				point.m_normal.m_x = GLfloat(normal.m_x);
-				point.m_normal.m_y = GLfloat(normal.m_y);
-				point.m_normal.m_z = GLfloat(normal.m_z);
+				glVector3 point;
+				point.m_x = GLfloat(faceVertex[0].m_x);
+				point.m_y = GLfloat(faceVertex[0].m_y);
+				point.m_z = GLfloat(faceVertex[0].m_z);
 				m_triangles.PushBack(point);
 
-				point.m_posit.m_x = GLfloat(faceVertex[i - 1].m_x);
-				point.m_posit.m_y = GLfloat(faceVertex[i - 1].m_y);
-				point.m_posit.m_z = GLfloat(faceVertex[i - 1].m_z);
-				point.m_normal.m_x = GLfloat(normal.m_x);
-				point.m_normal.m_y = GLfloat(normal.m_y);
-				point.m_normal.m_z = GLfloat(normal.m_z);
+				point.m_x = GLfloat(faceVertex[i - 1].m_x);
+				point.m_y = GLfloat(faceVertex[i - 1].m_y);
+				point.m_z = GLfloat(faceVertex[i - 1].m_z);
 				m_triangles.PushBack(point);
 
-				point.m_posit.m_x = GLfloat(faceVertex[i].m_x);
-				point.m_posit.m_y = GLfloat(faceVertex[i].m_y);
-				point.m_posit.m_z = GLfloat(faceVertex[i].m_z);
-				point.m_normal.m_x = GLfloat(normal.m_x);
-				point.m_normal.m_y = GLfloat(normal.m_y);
-				point.m_normal.m_z = GLfloat(normal.m_z);
+				point.m_x = GLfloat(faceVertex[i].m_x);
+				point.m_y = GLfloat(faceVertex[i].m_y);
+				point.m_z = GLfloat(faceVertex[i].m_z);
 				m_triangles.PushBack(point);
 			}
 		}
 
-		ndArray<glPositionNormal> m_triangles;
+		ndArray<glVector3> m_triangles;
 	};
 
 	ndDrawShape drawShapes;
@@ -236,9 +223,9 @@ ndZbufferDebugMesh::ndZbufferDebugMesh(const ndShaderCache& shaderCache, const n
 	{
 		ndArray<ndInt32> m_triangles(drawShapes.m_triangles.GetCount());
 		m_triangles.SetCount(drawShapes.m_triangles.GetCount());
-		ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(glPositionNormal), 6, drawShapes.m_triangles.GetCount(), &m_triangles[0], GLfloat(1.0e-6f));
+		ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_triangles[0].m_x, sizeof(glVector3), 3, drawShapes.m_triangles.GetCount(), &m_triangles[0], GLfloat(1.0e-6f));
 
-		m_shader = shaderCache.m_flatShaded;
+		m_shader = shaderCache.m_zBufferDebug;
 		m_indexCount = m_triangles.GetCount();
 
 		glGenVertexArrays(1, &m_vertextArrayBuffer);
@@ -247,13 +234,10 @@ ndZbufferDebugMesh::ndZbufferDebugMesh(const ndShaderCache& shaderCache, const n
 		glGenBuffers(1, &m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
-		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(vertexCount * sizeof(glPositionNormal)), &drawShapes.m_triangles[0].m_posit.m_x, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(vertexCount * sizeof(glVector3)), &drawShapes.m_triangles[0].m_x, GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_posit));
-
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_normal));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glVector3), 0);
 
 		glGenBuffers(1, &m_triangleIndexBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
@@ -265,9 +249,7 @@ ndZbufferDebugMesh::ndZbufferDebugMesh(const ndShaderCache& shaderCache, const n
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glUseProgram(m_shader);
-		m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
-		m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
-		m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+		m_viewModelProjectMatrixLocation = glGetUniformLocation(m_shader, "viewModelProjectionMatrix");
 
 		glUseProgram(0);
 	}
@@ -291,15 +273,16 @@ void ndZbufferDebugMesh::Render(ndDemoEntityManager* const scene, const ndMatrix
 
 		ndDemoCamera* const camera = scene->GetCamera();
 
-		const ndMatrix& invViewMatrix = camera->GetInvViewMatrix();
-		const ndMatrix& projectionMatrix = camera->GetProjectionMatrix();
-		const glMatrix viewModelMatrix(modelMatrix * invViewMatrix);
+		//const ndMatrix& invViewMatrix = camera->GetInvViewMatrix();
+		//const ndMatrix& projectionMatrix = camera->GetProjectionMatrix();
+		//const glMatrix viewModelMatrix(modelMatrix * invViewMatrix);
+		//const glMatrix projMatrix(projectionMatrix);
+		const glMatrix viewModelProjectMatrixLocation(modelMatrix * camera->GetInvViewProjectionMatrix());
 
-		const glMatrix projMatrix(projectionMatrix);
-
-		glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-		glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projMatrix[0][0]);
-		glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+		//glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+		//glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projMatrix[0][0]);
+		//glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+		glUniformMatrix4fv(m_viewModelProjectMatrixLocation, 1, false, &viewModelProjectMatrixLocation[0][0]);
 
 		glBindVertexArray(m_vertextArrayBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);

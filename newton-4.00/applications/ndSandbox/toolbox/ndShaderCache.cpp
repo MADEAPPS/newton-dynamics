@@ -39,6 +39,7 @@ bool ndShaderCache::CreateAllEffects()
 	m_wireFrame = CreateShaderEffect("WireFrame", "FlatShaded");
 	m_flatShaded = CreateShaderEffect("FlatShaded", "FlatShaded");
 	m_colorPoint = CreateShaderEffect("ColorPoint", "FlatShaded");
+	m_zBufferDebug = CreateShaderEffect("zBufferDebug", "zBufferDebug");
 	m_texturedDecal = CreateShaderEffect ("TextureDecal", "TextureDecal");
 	m_diffuseEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuse");
 	m_diffuseDebrisEffect = CreateShaderEffect("DirectionalDebriDiffuse", "DirectionalDebriDiffuse");

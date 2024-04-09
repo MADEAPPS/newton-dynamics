@@ -1031,9 +1031,8 @@ void ndDebugDisplay::ndShapesDebugInfo::LoadBufferData(ndDemoEntityManager* cons
 					debugMesh.m_wireFrameShareEdge = new ndWireFrameDebugMesh(scene->GetShaderCache(), &shape);
 					if (shape.GetShape()->GetAsShapeStaticBVH())
 					{
-						ndAssert(0);
-						//debugMesh.m_wireFrameOpenEdge = new ndWireFrameDebugMesh(m_shaderCache, &shape, ndShapeDebugNotify::ndEdgeType::m_open);
-						//debugMesh.m_wireFrameOpenEdge->SetColor(ndVector(1.0f, 0.0f, 1.0f, 1.0f));
+						debugMesh.m_wireFrameOpenEdge = new ndWireFrameDebugMesh(scene->GetShaderCache(), &shape, ndShapeDebugNotify::ndEdgeType::m_open);
+						debugMesh.m_wireFrameOpenEdge->SetColor(ndVector(1.0f, 0.0f, 1.0f, 1.0f));
 					}
 					shapeNode = m_meshCache.Insert(debugMesh, key);
 				}
@@ -1067,9 +1066,9 @@ void ndDebugDisplay::ndShapesDebugInfo::Render(ndDemoEntityManager* const scene)
 
 			const ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
 			
-			ndDebugMeshCache::ndNode* shapeNode = m_meshCache.Find(key);
-			ndWireFrameDebugMesh* const sharedEdgeMesh = *shapeNode->GetInfo().m_wireFrameShareEdge;
-			sharedEdgeMesh->Render(scene, matrix);
+			ndDebugMeshCache::ndNode* const shapeNode = m_meshCache.Find(key);
+			ndZbufferDebugMesh* const zbufferMesh = *shapeNode->GetInfo().m_zBufferShaded;
+			zbufferMesh->Render(scene, matrix);
 		}
 	}
 
@@ -1084,7 +1083,7 @@ void ndDebugDisplay::ndShapesDebugInfo::Render(ndDemoEntityManager* const scene)
 
 		if (m_debugMode >= 2)
 		{
-			ndDebugMeshCache::ndNode* shapeNode = m_meshCache.Find(key);
+			ndDebugMeshCache::ndNode* const shapeNode = m_meshCache.Find(key);
 			ndWireFrameDebugMesh* const sharedEdgeMesh = *shapeNode->GetInfo().m_wireFrameShareEdge;
 			sharedEdgeMesh->SetColor(color);
 			sharedEdgeMesh->Render(scene, matrix);

@@ -54,9 +54,7 @@ class ndZbufferDebugMesh : public ndDemoMeshInterface
 	void Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 
 	ndInt32 m_indexCount;
-	ndInt32 m_normalMatrixLocation;
-	ndInt32 m_projectMatrixLocation;
-	ndInt32 m_viewModelMatrixLocation;
+	ndInt32 m_viewModelProjectMatrixLocation;
 
 	GLuint m_shader;
 	GLuint m_vertexBuffer;

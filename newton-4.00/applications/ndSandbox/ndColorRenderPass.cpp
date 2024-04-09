@@ -125,13 +125,11 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 	//
 	//if (m_showAABB) 
 	//{
-	//	m_world->Sync();
 	//	RenderBodiesAABB(this);
 	//}
 	//
 	//if (m_showScene)
 	//{
-	//	m_world->Sync();
 	//	RenderWorldScene(this);
 	//}
 	//
@@ -141,7 +139,6 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 	//
 	//if (m_showBodyFrame)
 	//{
-	//	m_world->Sync();
 	//	RenderBodyFrame(this);
 	//}
 	

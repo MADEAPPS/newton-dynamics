@@ -37,6 +37,7 @@ class ndShaderCache
 			GLuint m_colorPoint;
 			GLuint m_flatShaded;
 			GLuint m_thickPoints;
+			GLuint m_zBufferDebug;
 			GLuint m_texturedDecal;
 			GLuint m_diffuseEffect;
 			GLuint m_spriteSpheres;
