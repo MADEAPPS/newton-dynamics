@@ -415,6 +415,7 @@ ndDebugDisplay::ndDebugDisplay()
 	,m_contactsPonts()
 	,m_jointDebugInfo()
 	,m_modelsDebugInfo()
+	,m_shapesDebugInfo()
 {
 }
 
@@ -429,6 +430,7 @@ void ndDebugDisplay::Init(ndDemoEntityManager* const scene)
 	m_contactsPonts.Init(scene);
 	m_jointDebugInfo.Init(scene);
 	m_modelsDebugInfo.Init(scene);
+	m_shapesDebugInfo.Init(scene);
 }
 
 void ndDebugDisplay::Cleanup()
@@ -438,6 +440,7 @@ void ndDebugDisplay::Cleanup()
 	m_contactsPonts.CleanUp();
 	m_jointDebugInfo.CleanUp();
 	m_modelsDebugInfo.CleanUp();
+	m_shapesDebugInfo.CleanUp();
 }
 
 void ndDebugDisplay::UpdateCenterOfMass(ndDemoEntityManager* const scene)
@@ -463,6 +466,12 @@ void ndDebugDisplay::UpdateJointsDebugInfo(ndDemoEntityManager* const scene)
 void ndDebugDisplay::UpdateModelsDebugInfo(ndDemoEntityManager* const scene)
 {
 	m_modelsDebugInfo.UpdateBuffers(scene);
+}
+
+void ndDebugDisplay::UpdateDebugShapes(ndDemoEntityManager* const scene, ndInt32 collisionDisplayMode)
+{
+	m_shapesDebugInfo.m_debugMode = collisionDisplayMode;
+	m_shapesDebugInfo.UpdateBuffers(scene);
 }
 
 void ndDebugDisplay::RenderCenterOfMass(ndDemoEntityManager* const scene)
@@ -491,10 +500,16 @@ void ndDebugDisplay::RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 	m_modelsDebugInfo.Render(scene);
 }
 
+void ndDebugDisplay::RenderDebugShapes(ndDemoEntityManager* const scene, ndInt32 collisionDisplayMode)
+{
+	m_shapesDebugInfo.m_debugMode = collisionDisplayMode;
+	m_shapesDebugInfo.Render(scene);
+}
+
 // ***************************************************************************
 //
 // ***************************************************************************
-ndDebugDisplay::ndDebudPass::ndDebudPass()
+ndDebugDisplay::ndDebugPass::ndDebugPass()
 	:m_lock()
 	,m_points()
 	,m_shader(0)
@@ -507,11 +522,11 @@ ndDebugDisplay::ndDebudPass::ndDebudPass()
 	m_points.SetCount(0);
 }
 
-ndDebugDisplay::ndDebudPass::~ndDebudPass()
+ndDebugDisplay::ndDebugPass::~ndDebugPass()
 {
 }
 
-void ndDebugDisplay::ndDebudPass::Init(ndDemoEntityManager* const scene)
+void ndDebugDisplay::ndDebugPass::Init(ndDemoEntityManager* const scene)
 {
 	m_frameTick0 = 0;
 	m_frameTick1 = 1;
@@ -537,7 +552,7 @@ void ndDebugDisplay::ndDebudPass::Init(ndDemoEntityManager* const scene)
 	glUseProgram(0);
 }
 
-void ndDebugDisplay::ndDebudPass::CleanUp()
+void ndDebugDisplay::ndDebugPass::CleanUp()
 {
 	if (m_vertextArrayBuffer)
 	{
@@ -552,7 +567,7 @@ void ndDebugDisplay::ndDebudPass::CleanUp()
 	m_vertextArrayBuffer = 0;
 }
 
-void ndDebugDisplay::ndDebudPass::LoadBufferData(ndArray<ndColorPoint>& data)
+void ndDebugDisplay::ndDebugPass::LoadBufferData(ndArray<ndColorPoint>& data)
 {
 	ndScopeSpinLock lock(m_lock);
 
@@ -574,7 +589,7 @@ void ndDebugDisplay::ndDebudPass::LoadBufferData(ndArray<ndColorPoint>& data)
 	m_frameTick0 = m_frameTick1;
 }
 
-void ndDebugDisplay::ndDebudPass::RenderBuffer(ndDemoEntityManager* const scene, GLenum mode, GLint pointCount, GLuint vertexArrayBuffer, GLuint vertexBuffer)
+void ndDebugDisplay::ndDebugPass::RenderBuffer(ndDemoEntityManager* const scene, GLenum mode, GLint pointCount, GLuint vertexArrayBuffer, GLuint vertexBuffer)
 {
 	ndDemoCamera* const camera = scene->GetCamera();
 	const glMatrix invViewProjectionMatrix(camera->GetInvViewProjectionMatrix());
@@ -752,7 +767,7 @@ void ndDebugDisplay::ndNormalForces::Render(ndDemoEntityManager* const scene)
 //***************************************************************************
 void ndDebugDisplay::ndModelsDebugInfo::Init(ndDemoEntityManager* const scene)
 {
-	ndDebudPass::Init(scene);
+	ndDebugPass::Init(scene);
 	
 	m_scale = ndFloat32(0.5f);
 	m_lineThickness = ndFloat32(1.0f);
@@ -776,7 +791,7 @@ void ndDebugDisplay::ndModelsDebugInfo::Init(ndDemoEntityManager* const scene)
 
 void ndDebugDisplay::ndModelsDebugInfo::CleanUp()
 {
-	ndDebudPass::CleanUp();
+	ndDebugPass::CleanUp();
 	
 	if (m_lineBuffer)
 	{
@@ -967,4 +982,118 @@ void ndDebugDisplay::ndJointDebugInfo::UpdateBuffers(ndDemoEntityManager* const 
 		joint->DebugJoint(debugJoint);
 	}
 	m_frameTick1++;
+}
+
+//***************************************************************************
+//
+//***************************************************************************
+void ndDebugDisplay::ndShapesDebugInfo::Init(ndDemoEntityManager* const)
+{
+}
+
+void ndDebugDisplay::ndShapesDebugInfo::CleanUp()
+{
+	m_meshCache.RemoveAll();
+}
+
+void ndDebugDisplay::ndShapesDebugInfo::UpdateBuffers(ndDemoEntityManager* const)
+{
+	ndScopeSpinLock lock(m_lock);
+	m_frameTick1++;
+}
+
+void ndDebugDisplay::ndShapesDebugInfo::LoadBufferData(ndDemoEntityManager* const scene)
+{
+	ndScopeSpinLock lock(m_lock);
+
+	if (m_frameTick1 != m_frameTick0)
+	{
+		ndWorld* const world = scene->GetWorld();
+		const ndBodyListView& bodyList = world->GetBodyList();
+
+		for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+		{
+			ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
+			const ndShapeInstance& shapeInstance = body->GetCollisionShape();
+			ndShape* const key = (ndShape*)shapeInstance.GetShape();
+			if (!(key->GetAsShapeNull() || key->GetAsShapeStaticProceduralMesh()))
+			{
+				ndDebugMeshCache::ndNode* shapeNode = m_meshCache.Find(key);
+				if (!shapeNode)
+				{
+					ndShapeInstance shape(body->GetCollisionShape());
+					shape.SetScale(ndVector(1.0f));
+					shape.SetLocalMatrix(ndGetIdentityMatrix());
+
+					ndDebugMesh debugMesh;
+					debugMesh.m_flatShaded = new ndFlatShadedDebugMesh(scene->GetShaderCache(), &shape);
+					debugMesh.m_zBufferShaded = new ndZbufferDebugMesh(scene->GetShaderCache(), &shape);
+					debugMesh.m_wireFrameShareEdge = new ndWireFrameDebugMesh(scene->GetShaderCache(), &shape);
+					if (shape.GetShape()->GetAsShapeStaticBVH())
+					{
+						ndAssert(0);
+						//debugMesh.m_wireFrameOpenEdge = new ndWireFrameDebugMesh(m_shaderCache, &shape, ndShapeDebugNotify::ndEdgeType::m_open);
+						//debugMesh.m_wireFrameOpenEdge->SetColor(ndVector(1.0f, 0.0f, 1.0f, 1.0f));
+					}
+					shapeNode = m_meshCache.Insert(debugMesh, key);
+				}
+			}
+		}
+	}
+	m_frameTick0 = m_frameTick1;
+}
+
+void ndDebugDisplay::ndShapesDebugInfo::Render(ndDemoEntityManager* const scene)
+{
+	LoadBufferData(scene);
+	if (!m_meshCache.GetCount())
+	{
+		return;
+	}
+
+	ndWorld* const world = scene->GetWorld();
+	const ndBodyListView& bodyList = world->GetBodyList();
+
+	const ndVector awakeColor(1.0f, 1.0f, 1.0f, 1.0f);
+	const ndVector sleepColor(0.42f, 0.73f, 0.98f, 1.0f);
+
+	if (m_debugMode == 3)
+	{
+		for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+		{
+			ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
+			const ndShapeInstance& shapeInstance = body->GetCollisionShape();
+			ndShape* const key = (ndShape*)shapeInstance.GetShape();
+
+			const ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
+			
+			ndDebugMeshCache::ndNode* shapeNode = m_meshCache.Find(key);
+			ndWireFrameDebugMesh* const sharedEdgeMesh = *shapeNode->GetInfo().m_wireFrameShareEdge;
+			sharedEdgeMesh->Render(scene, matrix);
+		}
+	}
+
+	for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	{
+		ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
+		const ndShapeInstance& shapeInstance = body->GetCollisionShape();
+		ndShape* const key = (ndShape*)shapeInstance.GetShape();
+
+		const ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
+		const ndVector color((body->GetSleepState() == 1) ? sleepColor : awakeColor);
+
+		if (m_debugMode >= 2)
+		{
+			ndDebugMeshCache::ndNode* shapeNode = m_meshCache.Find(key);
+			ndWireFrameDebugMesh* const sharedEdgeMesh = *shapeNode->GetInfo().m_wireFrameShareEdge;
+			sharedEdgeMesh->SetColor(color);
+			sharedEdgeMesh->Render(scene, matrix);
+		}
+		else
+		{
+			ndAssert(0);
+		}
+	}
+
+	//RenderParticles(this);
 }

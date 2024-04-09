@@ -26,8 +26,6 @@ class ndPhysicsWorld;
 class ndAnimationSequence;
 class ndDemoMeshInterface;
 class ndDemoCameraManager;
-class ndWireFrameDebugMesh;
-class ndFlatShadedDebugMesh;
 class ndShadowMapRenderPass;
 
 class ndDemoEntityManager: public ndList <ndDemoEntity*>
@@ -115,9 +113,6 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 		{
 		}
 	};
-
-	class ndDebuMesh;
-	class ndDebugMeshCache;
 
 	class SDKDemos
 	{
@@ -221,9 +216,6 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 
 	void ApplyMenuOptions();
 	void LoadDemo(ndInt32 menu);
-
-	void DrawDebugShapes();
-
 	void OnSubStepPostUpdate(ndFloat32 timestep);
 
 	void TestImGui();
@@ -288,7 +280,6 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	ndWorld::ndSolverModes m_solverMode;
 
 	ndVector m_diretionalLightDir;
-	ndDebugMeshCache* m_debugShapeCache;
 	ndRenderPass* m_colorRenderPass;
 	ndRenderPass* m_shadowRenderPass;
 

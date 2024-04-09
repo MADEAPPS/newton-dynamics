@@ -159,7 +159,6 @@ void ndRedBackNode::RotateRight(ndRedBackNode ** const head)
 	}
 }
 
-
 // maintain Red-Black tree balance after inserting node ptr   
 void ndRedBackNode::InsertFixup(ndRedBackNode ** const head) 
 {
@@ -291,7 +290,6 @@ void ndRedBackNode::RemoveFixup (ndRedBackNode* const thisNode, ndRedBackNode **
 				ptr->RotateLeft (head);
 			}
 			node = *head;
-
 		} 
 		else 
 		{
@@ -402,7 +400,8 @@ void ndRedBackNode::Unlink (ndRedBackNode ** const head)
 	{
 		// find tree successor with a nullptr node as a child 
 		ndRedBackNode* endNode = node->m_right;
-		while (endNode->m_left != nullptr) {
+		while (endNode->m_left != nullptr) 
+		{
 			endNode = endNode->m_left;
 		}
 
@@ -468,7 +467,8 @@ void ndRedBackNode::RemoveAllLow ()
 	{
 		m_left->RemoveAllLow();
 	}
-	if (m_right) {
+	if (m_right) 
+	{
 		m_right->RemoveAllLow ();
 	}
 	SetInTreeFlag(false);

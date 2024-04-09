@@ -23,7 +23,6 @@
 #include "ndPhysicsUtils.h"
 #include "ndDebugDisplay.h"
 #include "ndTestDeepBrain.h"
-#include "ndDemoDebugMesh.h"
 #include "ndTargaToOpenGl.h"
 #include "ndColorRenderPass.h"
 #include "ndDemoEntityNotify.h"
@@ -43,7 +42,7 @@
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
-//#define DEFAULT_SCENE	5		// basic Stacks
+#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
 //#define DEFAULT_SCENE	7		// particle fluid
 //#define DEFAULT_SCENE	8		// static mesh collision 
@@ -59,7 +58,7 @@
 //#define DEFAULT_SCENE	18		// cart pole discrete controller
 //#define DEFAULT_SCENE	19		// cart pole continue controller
 //#define DEFAULT_SCENE	20		// unit cycle controller
-#define DEFAULT_SCENE	21		// quadruped test 1
+//#define DEFAULT_SCENE	21		// quadruped test 1
 //#define DEFAULT_SCENE	22		// quadruped test 2
 //#define DEFAULT_SCENE	23		// quadruped test 3
 //#define DEFAULT_SCENE	24		// biped test 1
@@ -242,25 +241,6 @@ void Test1__()
 	//}
 }
 
-class ndDemoEntityManager::ndDemoEntityManager::ndDebuMesh
-{
-	public:
-	ndDebuMesh()
-		:m_flatShaded()
-		,m_wireFrameOpenEdge()
-		,m_wireFrameShareEdge()
-	{
-	}
-
-	ndSharedPtr<ndFlatShadedDebugMesh> m_flatShaded;
-	ndSharedPtr<ndWireFrameDebugMesh> m_wireFrameOpenEdge;
-	ndSharedPtr<ndWireFrameDebugMesh> m_wireFrameShareEdge;
-};
-
-class ndDemoEntityManager::ndDemoEntityManager::ndDebugMeshCache : public ndTree<ndDebuMesh, const ndShape*>
-{
-};
-
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 ndDemoEntityManager::ndDemoEntityManager()
@@ -313,7 +293,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_showRaycastHit(false)
 	,m_profilerMode(false)
 	,m_solverMode(ndWorld::ndSimdSoaSolver)
-	,m_debugShapeCache(new ndDebugMeshCache())
 	,m_colorRenderPass(new ndColorRenderPass())
 	,m_shadowRenderPass(new ndShadowMapRenderPass())
 	,m_replayLogFile(nullptr)
@@ -450,7 +429,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
 	//m_showMeshSkeleton = true;
-	m_autoSleepMode = false;
+	//m_autoSleepMode = false;
 	//m_solverMode = ndWorld::ndCudaSolver;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
 	//m_solverMode = ndWorld::ndSyclSolverCpu;
@@ -461,12 +440,12 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_solverSubSteps = 2;
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
-	m_showNormalForces = true;
-	m_showContactPoints = true;
+	//m_showNormalForces = true;
+	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	m_showModelsDebugInfo = true;
+	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
-	//m_collisionDisplayMode = 2;	
+	m_collisionDisplayMode = 2;	
 	//m_collisionDisplayMode = 3;		// solid wire frame
 	m_synchronousPhysicsUpdate = true;
 	m_synchronousParticlesUpdate = true;
@@ -506,11 +485,6 @@ ndDemoEntityManager::~ndDemoEntityManager ()
 	}
 
 	Cleanup ();
-
-	if (m_debugShapeCache)
-	{
-		delete m_debugShapeCache;
-	}
 
 	if (m_cameraManager)
 	{
@@ -559,8 +533,8 @@ void APIENTRY ndDemoEntityManager::OpenMessageCallback(GLenum source,
 			case 2:		 // no sure why on Intel embedded systems I get this warding, 
 				         // ID_RECOMPILE_FRAGMENT_SHADER performance warning has been generated.
 						 // Fragment shader recompiled due to state change., length = 120
-			case 131154: // Pixel-path performance warning: Pixel transfer is synchronized with 3D rendering.
-			case 131185: // nvidia driver report will use VIDEO memory as the source for buffer object operations
+			case 131154:  // Pixel-path performance warning: Pixel transfer is synchronized with 3D rendering.
+			case 131185:  // nvidia driver report will use VIDEO memory as the source for buffer object operations
 			case 131139: //	for some reason when using different target I get this on nvidia gpus.
 						 //	no one seems to know what cause this
 					     // Rasterization quality warning : A non - fullscreen clear caused a fallback from CSAA to MSAA.
@@ -775,11 +749,6 @@ void ndDemoEntityManager::Cleanup ()
 	
 	m_colorRenderPass->Cleanup();
 	m_shadowRenderPass->Cleanup();
-
-	while (m_debugShapeCache->GetRoot())
-	{
-		m_debugShapeCache->Remove(m_debugShapeCache->GetRoot());
-	}
 	
 	if (m_cameraManager) 
 	{
@@ -1441,95 +1410,6 @@ void ndDemoEntityManager::RenderScene(ImDrawData* const)
 	{
 		window->m_renderDemoGUI->RenderUI();
 	}
-}
-
-void ndDemoEntityManager::DrawDebugShapes()
-{
-	const ndVector awakeColor(1.0f, 1.0f, 1.0f, 1.0f);
-	const ndVector sleepColor(0.42f, 0.73f, 0.98f, 1.0f);
-	
-	const ndBodyListView& bodyList = m_world->GetBodyList();
-	
-	if (m_collisionDisplayMode == 3)
-	{
-		// do a z buffer pre pass for hidden line 
-		glColorMask(0, 0, 0, 0);
-		for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
-		{
-			ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
-			const ndShapeInstance& shapeInstance = body->GetCollisionShape();
-			ndShape* const key = (ndShape*)shapeInstance.GetShape();
-			if (key->GetAsShapeStaticProceduralMesh())
-			{
-				ndDebugNotify drawShapes(this, body);
-				key->DebugShape(ndGetIdentityMatrix(), drawShapes);
-			}
-			else if (!body->GetAsBodyTriggerVolume())
-			{
-				ndDebugMeshCache::ndNode* const shapeNode = m_debugShapeCache->Find(key);
-				if (shapeNode)
-				{
-					ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
-					shapeNode->GetInfo().m_flatShaded->Render(this, matrix);
-				}
-			}
-		}
-		glColorMask(1, 1, 1, 1);
-	}
-	
-	for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
-	{
-		ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
-		const ndShapeInstance& shapeInstance = body->GetCollisionShape();
-		ndShape* const key = (ndShape*)shapeInstance.GetShape();
-		if (!(key->GetAsShapeNull() || key->GetAsShapeStaticProceduralMesh()))
-		{
-			ndDebugMeshCache::ndNode* shapeNode = m_debugShapeCache->Find(key);
-			if (!shapeNode)
-			{
-				ndShapeInstance shape(body->GetCollisionShape());
-				shape.SetScale(ndVector(1.0f));
-				shape.SetLocalMatrix(ndGetIdentityMatrix());
-	
-				ndDebuMesh debugMesh;
-				debugMesh.m_flatShaded = new ndFlatShadedDebugMesh(m_shaderCache, &shape);
-				debugMesh.m_wireFrameShareEdge = new ndWireFrameDebugMesh(m_shaderCache, &shape);
-				if (shape.GetShape()->GetAsShapeStaticBVH())
-				{
-					debugMesh.m_wireFrameOpenEdge = new ndWireFrameDebugMesh(m_shaderCache, &shape, ndShapeDebugNotify::ndEdgeType::m_open);
-					debugMesh.m_wireFrameOpenEdge->SetColor(ndVector(1.0f, 0.0f, 1.0f, 1.0f));
-				}
-				shapeNode = m_debugShapeCache->Insert(debugMesh, key);
-			}
-	
-			ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
-			ndInt32 sleepState = body->GetSleepState();
-			ndVector color((sleepState == 1) ? sleepColor : awakeColor);
-	
-			if (m_collisionDisplayMode >= 2)
-			{
-				ndWireFrameDebugMesh* const sharedEdgeMesh = *shapeNode->GetInfo().m_wireFrameShareEdge;
-				sharedEdgeMesh->SetColor(color);
-				sharedEdgeMesh->Render(this, matrix);
-	
-				if (*shapeNode->GetInfo().m_wireFrameOpenEdge)
-				{
-					ndWireFrameDebugMesh* const openEdgeMesh = *shapeNode->GetInfo().m_wireFrameOpenEdge;
-					ndVector color1(m_showConcaveEdge ? ndVector(1.0f, 0.0f, 1.0f, 1.0f) : color);
-					openEdgeMesh->SetColor(color1);
-					openEdgeMesh->Render(this, matrix);
-				}
-			}
-			else
-			{
-				ndFlatShadedDebugMesh* const mesh = *shapeNode->GetInfo().m_flatShaded;
-				mesh->SetColor(color);
-				mesh->Render(this, matrix);
-			}
-		}
-	}
-	
-	RenderParticles(this);
 }
 
 void ndDemoEntityManager::SetAcceleratedUpdate()

@@ -144,12 +144,11 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 	//	m_world->Sync();
 	//	RenderBodyFrame(this);
 	//}
-	//
-	//if (m_collisionDisplayMode)
-	//{
-	//	m_world->Sync();
-	//	DrawDebugShapes();
-	//}
+	
+	if (m_manager->m_collisionDisplayMode)
+	{
+		m_debugDisplay.RenderDebugShapes(m_manager, m_manager->m_collisionDisplayMode);
+	}
 
 	if (m_manager->m_showCenterOfMass)
 	{
@@ -214,5 +213,10 @@ void ndColorRenderPass::UpdateDebugDisplay(ndFloat32)
 	if (m_manager->m_showModelsDebugInfo)
 	{
 		m_debugDisplay.UpdateModelsDebugInfo(m_manager);
+	}
+
+	if (m_manager->m_collisionDisplayMode)
+	{
+		m_debugDisplay.UpdateDebugShapes(m_manager, m_manager->m_collisionDisplayMode);
 	}
 }

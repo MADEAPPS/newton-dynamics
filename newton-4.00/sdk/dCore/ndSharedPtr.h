@@ -61,7 +61,7 @@ void ndSharedPtr<T>::ndRefCounter::AddRef()
 template <typename T>
 ndInt32 ndSharedPtr<T>::ndRefCounter::Release()
 {
-	int ref = fetch_add(-1);
+	ndInt32 ref = fetch_add(-1);
 	return ref - 1;
 }
 
