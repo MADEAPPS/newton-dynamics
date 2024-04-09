@@ -1663,7 +1663,8 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 	ndScene* const scene = m_world->GetScene();
 	const ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 
-	auto CalculateJointsAcceleration = ndMakeObject::ndFunction([this, &jointArray](ndInt32 threadIndex, ndInt32 threadCount)
+	ndAtomic<ndInt32> iterator(0);
+	auto CalculateJointsAcceleration = ndMakeObject::ndFunction([this, &iterator, &jointArray](ndInt32, ndInt32)
 	{
 		D_TRACKTIME_NAMED(CalculateJointsAcceleration);
 		ndJointAccelerationDecriptor joindDesc;
@@ -1673,19 +1674,24 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 		ndArray<ndLeftHandSide>& leftHandSide = m_leftHandSide;
 		ndArray<ndRightHandSide>& rightHandSide = m_rightHandSide;
 
-		const ndStartEnd startEnd(jointArray.GetCount(), threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		const ndInt32 count = jointArray.GetCount();
+		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
-			ndConstraint* const joint = jointArray[i];
-			const ndInt32 pairStart = joint->m_rowStart;
-			joindDesc.m_rowsCount = joint->m_rowCount;
-			joindDesc.m_leftHandSide = &leftHandSide[pairStart];
-			joindDesc.m_rightHandSide = &rightHandSide[pairStart];
-			joint->JointAccelerations(&joindDesc);
+			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
+			for (ndInt32 j = 0; j < maxSpan; ++j)
+			{
+				ndConstraint* const joint = jointArray[i + j];
+				const ndInt32 pairStart = joint->m_rowStart;
+				joindDesc.m_rowsCount = joint->m_rowCount;
+				joindDesc.m_leftHandSide = &leftHandSide[pairStart];
+				joindDesc.m_rightHandSide = &rightHandSide[pairStart];
+				joint->JointAccelerations(&joindDesc);
+			}
 		}
 	});
 
-	auto UpdateAcceleration = ndMakeObject::ndFunction([this, &jointArray](ndInt32 threadIndex, ndInt32 threadCount)
+	ndAtomic<ndInt32> iterator1(0);
+	auto UpdateAcceleration = ndMakeObject::ndFunction([this, &iterator1, &jointArray](ndInt32, ndInt32)
 	{
 		D_TRACKTIME_NAMED(UpdateAcceleration);
 		const ndArray<ndRightHandSide>& rightHandSide = m_rightHandSide;
@@ -1698,40 +1704,46 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 
 		const ndConstraint* const * jointArrayPtr = &jointArray[0];
 		ndAvxMatrixArray& massMatrix = *m_avxMassMatrixArray;
-		for (ndInt32 i = threadIndex; i < soaJointCountBatches; i += threadCount)
+
+		for (ndInt32 i = iterator1.fetch_add(D_WORKER_BATCH_SIZE); i < soaJointCountBatches; i = iterator1.fetch_add(D_WORKER_BATCH_SIZE))
 		{
-			if (groupType[i])
+			const ndInt32 maxSpan = ((soaJointCountBatches - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : soaJointCountBatches - i;
+			for (ndInt32 j = 0; j < maxSpan; ++j)
 			{
-				const ndInt32 soaRowStartBase = soaJointRows[i];
-				const ndConstraint* const* jointGroup = &jointArrayPtr[i * D_AVX_WORK_GROUP];
-				const ndConstraint* const firstJoint = jointGroup[0];
-				const ndInt32 rowCount = firstJoint->m_rowCount;
-				for (ndInt32 j = 0; j < D_AVX_WORK_GROUP; ++j)
+				const ndInt32 m = i + j;
+				if (groupType[m])
 				{
-					const ndConstraint* const Joint = jointGroup[j];
-					const ndInt32 base = Joint->m_rowStart;
-					for (ndInt32 k = 0; k < rowCount; ++k)
+					const ndInt32 soaRowStartBase = soaJointRows[m];
+					const ndConstraint* const* jointGroup = &jointArrayPtr[m * D_AVX_WORK_GROUP];
+					const ndConstraint* const firstJoint = jointGroup[0];
+					const ndInt32 rowCount = firstJoint->m_rowCount;
+					for (ndInt32 k = 0; k < D_AVX_WORK_GROUP; ++k)
 					{
-						ndSoaMatrixElement* const row = &massMatrix[soaRowStartBase + k];
-						row->m_coordenateAccel[j] = rightHandSide[base + k].m_coordenateAccel;
+						const ndConstraint* const Joint = jointGroup[k];
+						const ndInt32 base = Joint->m_rowStart;
+						for (ndInt32 n = 0; n < rowCount; ++n)
+						{
+							ndSoaMatrixElement* const row = &massMatrix[soaRowStartBase + n];
+							row->m_coordenateAccel[k] = rightHandSide[base + n].m_coordenateAccel;
+						}
 					}
 				}
-			}
-			else
-			{
-				const ndInt32 soaRowStartBase = soaJointRows[i];
-				const ndConstraint* const * jointGroup = &jointArrayPtr[i * D_AVX_WORK_GROUP];
-				for (ndInt32 j = 0; j < D_AVX_WORK_GROUP; ++j)
+				else
 				{
-					const ndConstraint* const Joint = jointGroup[j];
-					if (Joint)
+					const ndInt32 soaRowStartBase = soaJointRows[m];
+					const ndConstraint* const* jointGroup = &jointArrayPtr[m * D_AVX_WORK_GROUP];
+					for (ndInt32 k = 0; k < D_AVX_WORK_GROUP; ++k)
 					{
-						const ndInt32 base = Joint->m_rowStart;
-						const ndInt32 rowCount = Joint->m_rowCount;
-						for (ndInt32 k = 0; k < rowCount; ++k)
+						const ndConstraint* const Joint = jointGroup[k];
+						if (Joint)
 						{
-							ndSoaMatrixElement* const row = &massMatrix[soaRowStartBase + k];
-							row->m_coordenateAccel[j] = rightHandSide[base + k].m_coordenateAccel;
+							const ndInt32 base = Joint->m_rowStart;
+							const ndInt32 rowCount = Joint->m_rowCount;
+							for (ndInt32 n = 0; n < rowCount; ++n)
+							{
+								ndSoaMatrixElement* const row = &massMatrix[soaRowStartBase + n];
+								row->m_coordenateAccel[k] = rightHandSide[base + n].m_coordenateAccel;
+							}
 						}
 					}
 				}
