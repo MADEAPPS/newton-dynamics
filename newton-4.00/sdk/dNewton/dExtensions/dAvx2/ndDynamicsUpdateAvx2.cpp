@@ -2186,7 +2186,8 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 		}
 	});
 
-	auto ApplyJacobianAccumulatePartialForces = ndMakeObject::ndFunction([this, &bodyArray](ndInt32 threadIndex, ndInt32 threadCount)
+	ndAtomic<ndInt32> iterator1(0);
+	auto ApplyJacobianAccumulatePartialForces = ndMakeObject::ndFunction([this, &iterator1, &bodyArray](ndInt32, ndInt32)
 	{
 		D_TRACKTIME_NAMED(ApplyJacobianAccumulatePartialForces);
 		const ndAvxFloat zero(ndAvxFloat::m_zero);
@@ -2195,27 +2196,34 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 		const ndAvxFloat* const jointInternalForces = (ndAvxFloat*)&GetTempInternalForces()[0];
 		const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &GetJointBodyPairIndexBuffer()[0];
 
-		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		const ndInt32 bodyCount = bodyArray.GetCount();
+		for (ndInt32 i = iterator1.fetch_add(D_WORKER_BATCH_SIZE); i < bodyCount; i = iterator1.fetch_add(D_WORKER_BATCH_SIZE))
 		{
-			ndAvxFloat force(zero);
-			ndAvxFloat torque(zero);
-			const ndBodyKinematic* const body = bodyArray[i];
-
-			const ndInt32 startIndex = bodyIndex[i];
-			const ndInt32 mask = body->m_isStatic - 1;
-			const ndInt32 count = mask & (bodyIndex[i + 1] - startIndex);
-			for (ndInt32 j = 0; j < count; ++j)
+			const ndInt32 maxSpan = ((bodyCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : bodyCount - i;
+			for (ndInt32 j = 0; j < maxSpan; ++j)
 			{
-				const ndInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
-				force = force + jointInternalForces[index];
+				ndAvxFloat force(zero);
+				ndAvxFloat torque(zero);
+				const ndInt32 m = i + j;
+				const ndBodyKinematic* const body = bodyArray[m];
+
+				const ndInt32 startIndex = bodyIndex[m];
+				const ndInt32 mask = body->m_isStatic - 1;
+				const ndInt32 count = mask & (bodyIndex[m + 1] - startIndex);
+				for (ndInt32 k = 0; k < count; ++k)
+				{
+					const ndInt32 index = jointBodyPairIndexBuffer[startIndex + k].m_joint;
+					force = force + jointInternalForces[index];
+				}
+				internalForces[m] = force;
 			}
-			internalForces[i] = force;
 		}
 	});
 
 	for (ndInt32 i = 0; i < ndInt32(passes); ++i)
 	{
+		//iterator0 = 0;
+		iterator1 = 1;
 		scene->ParallelExecute(CalculateJointsForce);
 		scene->ParallelExecute(ApplyJacobianAccumulatePartialForces);
 	}
