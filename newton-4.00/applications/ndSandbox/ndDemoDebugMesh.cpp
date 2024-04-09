@@ -272,16 +272,7 @@ void ndZbufferDebugMesh::Render(ndDemoEntityManager* const scene, const ndMatrix
 		glUseProgram(m_shader);
 
 		ndDemoCamera* const camera = scene->GetCamera();
-
-		//const ndMatrix& invViewMatrix = camera->GetInvViewMatrix();
-		//const ndMatrix& projectionMatrix = camera->GetProjectionMatrix();
-		//const glMatrix viewModelMatrix(modelMatrix * invViewMatrix);
-		//const glMatrix projMatrix(projectionMatrix);
 		const glMatrix viewModelProjectMatrixLocation(modelMatrix * camera->GetInvViewProjectionMatrix());
-
-		//glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-		//glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projMatrix[0][0]);
-		//glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 		glUniformMatrix4fv(m_viewModelProjectMatrixLocation, 1, false, &viewModelProjectMatrixLocation[0][0]);
 
 		glBindVertexArray(m_vertextArrayBuffer);
