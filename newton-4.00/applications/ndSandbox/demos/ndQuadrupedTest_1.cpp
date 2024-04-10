@@ -22,7 +22,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	class ndLegObsevation
 	{
@@ -762,26 +762,6 @@ namespace ndQuadruped_1
 			return reward;
 		}
 
-		void CheckTrainingCompleted()
-		{
-			#ifdef ND_TRAIN_MODEL
-			if (m_agent->IsTrainer())
-			{
-				ndControllerAgent_trainer* const agent = (ndControllerAgent_trainer*)*m_agent;
-				if (agent->m_modelIsTrained)
-				{
-					char fileName[1024];
-					ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
-					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-					m_agent = ndSharedPtr<ndBrainAgent>(new ndRobot::ndController(actor));
-					((ndRobot::ndController*)*m_agent)->SetModel(this);
-					//ResetModel();
-					((ndPhysicsWorld*)m_world)->NormalUpdates();
-				}
-			}
-			#endif
-		}
-
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
@@ -794,7 +774,7 @@ namespace ndQuadruped_1
 		{
 			m_animBlendTree->Update(timestep * m_control->m_animSpeed);
 			ndModelArticulation::PostUpdate(world, timestep);
-			CheckTrainingCompleted();
+			//CheckTrainingCompleted();
 		}
 
 		ndAnimationPose m_animPose;
@@ -1040,7 +1020,6 @@ namespace ndQuadruped_1
 		return model;
 	}
 
-
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
 	{
 		public:
@@ -1060,6 +1039,24 @@ namespace ndQuadruped_1
 
 		~TrainingUpdata()
 		{
+		}
+
+		void CheckTrainingCompleted()
+		{
+			//if (m_agent->IsTrainer())
+			//{
+			//	ndControllerAgent_trainer* const agent = (ndControllerAgent_trainer*)*m_agent;
+			//	if (agent->m_modelIsTrained)
+			//	{
+			//		char fileName[1024];
+			//		ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
+			//		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+			//		m_agent = ndSharedPtr<ndBrainAgent>(new ndRobot::ndController(actor));
+			//		((ndRobot::ndController*)*m_agent)->SetModel(this);
+			//		//ResetModel();
+			//		((ndPhysicsWorld*)m_world)->NormalUpdates();
+			//	}
+			//}
 		}
 
 		virtual void Update(ndDemoEntityManager* const scene, ndFloat32 timestep)
@@ -1090,13 +1087,12 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_frictionTest, ndDemoContactCallback::m_default);
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-
 	#ifdef ND_TRAIN_MODEL
 		TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix);
 		scene->RegisterPostUpdate(trainer);
 	#else
+		ndWorld* const world = scene->GetWorld();
 		ndSharedPtr<ndModel> model(BuildModel(scene, matrix));
 		world->AddModel(model);
 
