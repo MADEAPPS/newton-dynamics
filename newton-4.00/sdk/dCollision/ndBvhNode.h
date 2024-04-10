@@ -160,7 +160,7 @@ class ndBvhNodeArray : public ndArray<ndBvhNode*>
 
 	ndUnsigned32 m_isDirty;
 	ndUnsigned32 m_scansCount;
-	ndUnsigned32 m_scans[256];
+	ndUnsigned32 m_scans[256 + 32];
 };
 
 class ndBvhSceneManager
