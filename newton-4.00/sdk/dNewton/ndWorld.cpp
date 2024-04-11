@@ -744,6 +744,7 @@ void ndWorld::UpdateSkeletons()
 		}
 	
 		// build the root node
+		ndInt32 skeletonsId = 0;
 		for (ndInt32 i = 0; i < inslandCount; ++i)
 		{
 			ndSkeletonQueue queuePool;
@@ -776,7 +777,8 @@ void ndWorld::UpdateSkeletons()
 								{
 									if (!skeleton)
 									{
-										skeleton = m_skeletonList.CreateContatiner(childBody);
+										skeleton = m_skeletonList.CreateContatiner(childBody, skeletonsId);
+										skeletonsId++;
 									}
 			
 									//dTrace(("%s %d %d\n", constraint->GetClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
@@ -825,7 +827,8 @@ void ndWorld::UpdateSkeletons()
 				{
 					// the root node is not static and has children, 
 					// them add the first children to this root
-					skeleton = m_skeletonList.CreateContatiner(rootBody);
+					skeleton = m_skeletonList.CreateContatiner(rootBody, skeletonsId);
+					skeletonsId++;
 			
 					for (ndBodyKinematic::ndJointList::ndNode* jointNode = rootBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
 					{

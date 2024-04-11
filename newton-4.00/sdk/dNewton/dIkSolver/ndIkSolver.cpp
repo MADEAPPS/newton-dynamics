@@ -266,7 +266,6 @@ void ndIkSolver::BuildMassMatrix()
 	m_contacts.SetCount(0);
 	m_leftHandSide.SetCount(0);
 	m_rightHandSide.SetCount(0);
-	//ndFixSizeArray<ndContact*, 256> contacts;
 	
 	const ndVector zero(ndVector::m_zero);
 	m_bodies.PushBack(&m_sentinelBody);
@@ -279,7 +278,6 @@ void ndIkSolver::BuildMassMatrix()
 	{
 		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
 		ndBodyKinematic* const body = node->m_body;
-int xxxx = body->m_buildSkelIndex;
 		ndAssert(body->m_buildSkelIndex == 0);
 
 		if (body->GetInvMass() > ndFloat32(0.0f))
@@ -300,12 +298,14 @@ int xxxx = body->m_buildSkelIndex;
 		ndAssert(body0->GetInvMass() > ndFloat32(0.0f));
 		if (body0->m_buildSkelIndex == 0)
 		{
+			ndAssert(0);
 			m_bodies.PushBack(body0);
 			body0->m_buildSkelIndex = -1;
 		}
 
 		if ((body1->m_buildSkelIndex == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
 		{
+			ndAssert(0);
 			m_bodies.PushBack(body1);
 			body1->m_buildSkelIndex = -1;
 		}
@@ -351,9 +351,40 @@ int xxxx = body->m_buildSkelIndex;
 			}
 		}
 	}
+
+	//class ndCompareKey
+	//{
+	//	public:
+	//	ndCompareKey()
+	//	{
+	//	}
+	//
+	//	ndInt32 Compare(const ndBodyKinematic* const bodyA, const ndBodyKinematic* const bodyB, void* const context) const
+	//	{
+	//		const ndSkeletonContainer* const skeleton = ((ndIkSolver*)context)->m_skeleton;
+	//		const ndSkeletonContainer* const skeletonA = bodyA->GetSkeleton();
+	//		const ndSkeletonContainer* const skeletonB = bodyB->GetSkeleton();
+	//
+	//		ndInt32 id0 = (skeletonA == skeleton) ? 0 : (skeletonA ? 2 : 0);
+	//		ndInt32 id1 = (skeletonB == skeleton) ? 0 : (skeletonB ? 2 : 0);
+	//
+	//		if (id0 < id1)
+	//		{
+	//			return -1;
+	//		}
+	//		else if (id0 > id1)
+	//		{
+	//			return 1;
+	//		}
+	//		return 0;
+	//	}
+	//
+	//	const ndIkSolver* m_solver;
+	//};
+	//ndSort<ndBodyKinematic*, ndCompareKey>(&m_bodies[1], m_bodies.GetCount() - 1, this);
 	
 	m_savedBodiesIndex.SetCount(m_bodies.GetCount());
-	for (ndInt32 i = m_bodies.GetCount() - 1; i >= 0 ; --i)
+	for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1 ; --i)
 	{
 		ndBodyKinematic* const body = m_bodies[i];
 		m_savedBodiesIndex[i] = body->m_index;

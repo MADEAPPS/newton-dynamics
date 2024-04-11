@@ -351,6 +351,7 @@ ndSkeletonContainer::ndSkeletonContainer()
 	,m_loopingJoints(32)
 	,m_auxiliaryMemoryBuffer(1024 * 8)
 	,m_lock()
+	,m_id(0)
 	,m_blockSize(0)
 	,m_rowCount(0)
 	,m_loopRowCount(0)
@@ -400,8 +401,9 @@ void ndSkeletonContainer::Clear()
 	m_dynamicsLoopCount = 0;
 }
 
-void ndSkeletonContainer::Init(ndBodyKinematic* const rootBody)
+void ndSkeletonContainer::Init(ndBodyKinematic* const rootBody, ndInt32 id)
 {
+	m_id = id;
 	m_skeleton = &m_nodeList.Append()->GetInfo();
 	m_skeleton->m_body = rootBody;
 	if (rootBody->GetInvMass() != ndFloat32(0.0f))

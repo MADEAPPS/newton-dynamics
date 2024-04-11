@@ -32,6 +32,7 @@ class ndSkeletonContainer
 	public:
 	ndSkeletonContainer();
 	~ndSkeletonContainer();
+	ndInt32 GetId() const;
 
 	protected:
 	class ndOrdinal
@@ -127,7 +128,7 @@ class ndSkeletonContainer
 
 	void Clear();
 	void CheckSleepState();
-	void Init(ndBodyKinematic* const rootBody);
+	void Init(ndBodyKinematic* const rootBody, ndInt32 id);
 	ndNode* AddChild(ndJointBilateralConstraint* const joint, ndNode* const parent);
 	void Finalize(ndInt32 loopJoints, ndJointBilateralConstraint** const loopJointArray);
 
@@ -172,6 +173,7 @@ class ndSkeletonContainer
 	ndArray<ndConstraint*> m_loopingJoints;
 	ndArray<ndInt8> m_auxiliaryMemoryBuffer;
 	ndSpinLock m_lock;
+	ndInt32 m_id;
 	ndInt32 m_blockSize;
 	ndInt32 m_rowCount;
 	ndInt32 m_loopRowCount;
@@ -190,6 +192,11 @@ class ndSkeletonContainer
 	friend class ndDynamicsUpdateSycl;
 	friend class ndDynamicsUpdateCuda;
 };
+
+inline ndInt32 ndSkeletonContainer::GetId() const
+{
+	return m_id;
+}
 
 inline ndSkeletonContainer::ndNode* ndSkeletonContainer::GetRoot() const
 {
