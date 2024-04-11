@@ -352,36 +352,27 @@ void ndIkSolver::BuildMassMatrix()
 		}
 	}
 
-	//class ndCompareKey
+	//class EvaluateKey
 	//{
 	//	public:
-	//	ndCompareKey()
+	//	EvaluateKey(void* const context)
+	//		:m_solver((ndIkSolver*)context)
 	//	{
 	//	}
 	//
-	//	ndInt32 Compare(const ndBodyKinematic* const bodyA, const ndBodyKinematic* const bodyB, void* const context) const
+	//	ndInt32 GetKey(const ndBodyKinematic* const body) const
 	//	{
-	//		const ndSkeletonContainer* const skeleton = ((ndIkSolver*)context)->m_skeleton;
-	//		const ndSkeletonContainer* const skeletonA = bodyA->GetSkeleton();
-	//		const ndSkeletonContainer* const skeletonB = bodyB->GetSkeleton();
-	//
-	//		ndInt32 id0 = (skeletonA == skeleton) ? 0 : (skeletonA ? 2 : 0);
-	//		ndInt32 id1 = (skeletonB == skeleton) ? 0 : (skeletonB ? 2 : 0);
-	//
-	//		if (id0 < id1)
-	//		{
-	//			return -1;
-	//		}
-	//		else if (id0 > id1)
-	//		{
-	//			return 1;
-	//		}
-	//		return 0;
+	//		const ndSkeletonContainer* const skeleton = body->GetSkeleton();
+	//		ndInt32 key = (m_solver->m_skeleton == skeleton) ? 0 : (skeleton ? 2 : 1);
+	//		return key;
 	//	}
 	//
 	//	const ndIkSolver* m_solver;
 	//};
-	//ndSort<ndBodyKinematic*, ndCompareKey>(&m_bodies[1], m_bodies.GetCount() - 1, this);
+	//ndBodyKinematic* xxxxx[100];
+	//ndUnsigned32 prefixScanOut[100];
+	//ndCountingSortInPlace<ndBodyKinematic*, EvaluateKey, 3>(&m_bodies[1], xxxxx, m_bodies.GetCount() - 1, prefixScanOut, this);
+
 	
 	m_savedBodiesIndex.SetCount(m_bodies.GetCount());
 	for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1 ; --i)

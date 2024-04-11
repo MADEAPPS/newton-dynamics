@@ -125,22 +125,28 @@ static ndInt32 SortVertices(
 	class ndCompareKey
 	{
 		public:
-		ndInt32 Compare(const ndSortKey& elementA, const ndSortKey& elementB, void* const context) const
+		ndCompareKey(void* const context)
+			:m_sortContext((dVertexSortData*)context)
 		{
-			const dVertexSortData* const sortContext = (dVertexSortData*)context;
-			ndInt32 index0 = elementA.m_vertexIndex * sortContext->m_stride + sortContext->m_vertexSortIndex;
-			ndInt32 index1 = elementB.m_vertexIndex * sortContext->m_stride + sortContext->m_vertexSortIndex;
+		}
 
-			if (sortContext->m_vertex[index0] < sortContext->m_vertex[index1])
+		ndInt32 Compare(const ndSortKey& elementA, const ndSortKey& elementB) const
+		{
+			ndInt32 index0 = elementA.m_vertexIndex * m_sortContext->m_stride + m_sortContext->m_vertexSortIndex;
+			ndInt32 index1 = elementB.m_vertexIndex * m_sortContext->m_stride + m_sortContext->m_vertexSortIndex;
+
+			if (m_sortContext->m_vertex[index0] < m_sortContext->m_vertex[index1])
 			{
 				return -1;
 			}
-			if (sortContext->m_vertex[index0] > sortContext->m_vertex[index1])
+			if (m_sortContext->m_vertex[index0] > m_sortContext->m_vertex[index1])
 			{
 				return 1;
 			}
 			return 0;
 		}
+
+		dVertexSortData* m_sortContext;
 	};
 	ndSort<ndSortKey, ndCompareKey>(remapIndex, cluster.m_count, &sortContext);
 

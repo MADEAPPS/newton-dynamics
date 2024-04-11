@@ -62,7 +62,7 @@ void ndSort(T* const array, ndInt32 elements, void* const context)
 	stack[0][0] = 0;
 	stack[0][1] = elements - 1;
 	ndInt32 stackIndex = 1;
-	const dCompareKey comparator;
+	const dCompareKey comparator(context);
 	while (stackIndex)
 	{
 		stackIndex--;
@@ -71,15 +71,15 @@ void ndSort(T* const array, ndInt32 elements, void* const context)
 		if ((hi - lo) > batchSize)
 		{
 			ndInt32 mid = (lo + hi) >> 1;
-			if (comparator.Compare(array[lo], array[mid], context) > 0)
+			if (comparator.Compare(array[lo], array[mid]) > 0)
 			{
 				ndSwap(array[lo], array[mid]);
 			}
-			if (comparator.Compare(array[mid], array[hi], context) > 0)
+			if (comparator.Compare(array[mid], array[hi]) > 0)
 			{
 				ndSwap(array[mid], array[hi]);
 			}
-			if (comparator.Compare(array[lo], array[mid], context) > 0)
+			if (comparator.Compare(array[lo], array[mid]) > 0)
 			{
 				ndSwap(array[lo], array[mid]);
 			}
@@ -88,11 +88,11 @@ void ndSort(T* const array, ndInt32 elements, void* const context)
 			const T pivot(array[mid]);
 			do
 			{
-				while (comparator.Compare(array[i], pivot, context) < 0)
+				while (comparator.Compare(array[i], pivot) < 0)
 				{
 					i++;
 				}
-				while (comparator.Compare(array[j], pivot, context) > 0)
+				while (comparator.Compare(array[j], pivot) > 0)
 				{
 					j--;
 				}
@@ -128,7 +128,7 @@ void ndSort(T* const array, ndInt32 elements, void* const context)
 	}
 	for (ndInt32 i = 1; i < stride; ++i)
 	{
-		if (comparator.Compare(array[0], array[i], context) > 0)
+		if (comparator.Compare(array[0], array[i]) > 0)
 		{
 			ndSwap(array[0], array[i]);
 		}
@@ -138,7 +138,7 @@ void ndSort(T* const array, ndInt32 elements, void* const context)
 	{
 		ndInt32 j = i;
 		const T tmp(array[i]);
-		for (; comparator.Compare(array[j - 1], tmp, context) > 0; --j)
+		for (; comparator.Compare(array[j - 1], tmp) > 0; --j)
 		{
 			ndAssert(j > 0);
 			array[j] = array[j - 1];
@@ -150,7 +150,7 @@ void ndSort(T* const array, ndInt32 elements, void* const context)
 #if 0
 	for (ndInt32 i = 0; i < (elements - 1); ++i)
 	{
-		ndAssert(comparator.Compare(array[i], array[i + 1], context) <= 0);
+		ndAssert(comparator.Compare(array[i], array[i + 1]) <= 0);
 	}
 #endif
 }

@@ -445,7 +445,11 @@ ndInt32 ndConvexHull3d::GetUniquePoints(ndConvexHull3dVertex* const points, ndIn
 	class CompareVertex
 	{
 		public:
-		ndInt32 Compare(const ndConvexHull3dVertex& elementA, const ndConvexHull3dVertex& elementB, void* const) const
+		CompareVertex(void*)
+		{
+		}
+
+		ndInt32 Compare(const ndConvexHull3dVertex& elementA, const ndConvexHull3dVertex& elementB) const
 		{
 			for (ndInt32 i = 0; i < 3; ++i) 
 			{
@@ -465,12 +469,12 @@ ndInt32 ndConvexHull3d::GetUniquePoints(ndConvexHull3dVertex* const points, ndIn
 	ndSort<ndConvexHull3dVertex, CompareVertex>(points, count, nullptr);
 
 	ndInt32 indexCount = 0;
-	CompareVertex compareVetex;
+	CompareVertex compareVetex(nullptr);
 	for (ndInt32 i = 1; i < count; ++i) 
 	{
 		for (; i < count; ++i) 
 		{
-			if (compareVetex.Compare(points[indexCount], points[i], nullptr))
+			if (compareVetex.Compare(points[indexCount], points[i]))
 			{
 				indexCount++;
 				points[indexCount] = points[i];

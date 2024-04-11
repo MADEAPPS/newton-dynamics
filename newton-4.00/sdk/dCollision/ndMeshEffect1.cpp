@@ -1975,10 +1975,17 @@ void ndMeshEffect::ndAttibutFormat::CompressData(
 	class CompareKey
 	{
 		public:
-		ndInt32 Compare(const ndSortKey& elementA, const ndSortKey& elementB, void* const context) const
+		CompareKey(void* const context)
+			:m_context(context)
 		{
-			return ndMeshEffect::ndFormat::CompareVertex(&elementA, &elementB, context);
 		}
+
+		ndInt32 Compare(const ndSortKey& elementA, const ndSortKey& elementB) const
+		{
+			return ndMeshEffect::ndFormat::CompareVertex(&elementA, &elementB, m_context);
+		}
+
+		void* m_context;
 	};
 	ndSort<ndSortKey, CompareKey>(remapIndex, cluster.m_count, &sortContext);
 

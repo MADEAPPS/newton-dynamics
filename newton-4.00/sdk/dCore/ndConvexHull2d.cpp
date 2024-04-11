@@ -52,7 +52,11 @@ ndInt32 ndConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 	class CompareVertex
 	{
 		public:
-		ndInt32 Compare(const ndVector& elementA, const ndVector& elementB, void* const) const
+		CompareVertex(void*)
+		{
+		}
+
+		ndInt32 Compare(const ndVector& elementA, const ndVector& elementB) const
 		{
 			if (elementA.m_x < elementB.m_x)
 			{
