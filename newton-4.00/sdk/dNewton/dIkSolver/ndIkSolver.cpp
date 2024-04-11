@@ -279,7 +279,9 @@ void ndIkSolver::BuildMassMatrix()
 	{
 		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
 		ndBodyKinematic* const body = node->m_body;
+int xxxx = body->m_buildSkelIndex;
 		ndAssert(body->m_buildSkelIndex == 0);
+
 		if (body->GetInvMass() > ndFloat32(0.0f))
 		{
 			m_bodies.PushBack(body);

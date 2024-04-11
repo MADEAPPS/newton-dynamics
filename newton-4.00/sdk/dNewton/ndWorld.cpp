@@ -601,6 +601,7 @@ void ndWorld::ModelUpdate()
 		const ndInt32 modelCount = modelList.GetCount();
 		for (ndInt32 i = iterator++; i < modelCount; i = iterator++)
 		{
+			D_TRACKTIME_NAMED(ModelUpdate);
 			ndModel* const model = modelList[i];
 			model->Update(this, timestep);
 		}

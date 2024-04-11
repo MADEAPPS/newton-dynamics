@@ -1027,14 +1027,32 @@ namespace ndQuadruped_1
 			:OnPostUpdate()
 		{
 			ndWorld* const world = scene->GetWorld();
-			ndSharedPtr<ndModel> model(BuildModel(scene, matrix));
-			world->AddModel(model);
 
-			ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-			//	world->AddJoint(fixJoint);
+			ndFloat32 x0 = 3.0f;
+			ndFloat32 z0 = 3.0f;
+			const ndInt32 count = 2;
 
-			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model));
+			ndMatrix location(matrix);
+			location.m_posit.m_z -= count * x0 * 0.5f;
+			for (ndInt32 i = 0; i < count; ++i)
+			{
+				location.m_posit.m_x = matrix.m_posit.m_x;
+				//for (ndInt32 j = 0; j < count; ++j)
+				for (ndInt32 j = 0; j < 1; ++j)
+				{
+					ndSharedPtr<ndModel> model(BuildModel(scene, location));
+					world->AddModel(model);
+					location.m_posit.m_x += x0;
+				}
+				location.m_posit.m_z += z0;
+			}
+
+			const ndModelList& modelList = world->GetModelList();
+			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, modelList.GetFirst()->GetInfo()));
 			scene->Set2DDisplayRenderFunction(quadrupedUI);
+
+			//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
+			//world->AddJoint(fixJoint);
 		}
 
 		~TrainingUpdata()
@@ -1061,7 +1079,6 @@ namespace ndQuadruped_1
 
 		virtual void Update(ndDemoEntityManager* const scene, ndFloat32 timestep)
 		{
-			ndTrace(("xxxxxxxxxxx\n"));
 		}
 	};
 }
