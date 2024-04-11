@@ -482,7 +482,6 @@ void ndSkeletonContainer::ClearCloseLoopJoints()
 
 void ndSkeletonContainer::AddCloseLoopJoint(ndConstraint* const joint)
 {
-	//ndScopeSpinLock lock(joint->GetBody0()->GetScene()->m_lock);
 	ndScopeSpinLock lock(m_lock);
 	if (m_loopingJoints.GetCount() < (m_loopCount + m_dynamicsLoopCount + 1)) 
 	{

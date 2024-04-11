@@ -539,7 +539,6 @@ void ndDynamicsUpdateSoa::GetJacobianDerivatives(ndConstraint* const joint)
 				skeleton0->AddCloseLoopJoint(contactJoint);
 			}
 		}
-		//else if (contactJoint->IsSkeletonIntraCollision())
 		else
 		{
 			if (skeleton0 && !skeleton1)

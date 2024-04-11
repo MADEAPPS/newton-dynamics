@@ -114,7 +114,6 @@ class ndContact: public ndConstraint
 	bool IsTestOnly() const;
 	bool IsInTrigger() const;
 	bool IsSkeletonSelftCollision() const;
-	//bool IsSkeletonIntraCollision() const;
 	
 	private:
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
@@ -134,7 +133,6 @@ class ndContact: public ndConstraint
 	ndUnsigned32 m_inTrigger : 1;
 	ndUnsigned32 m_isAttached : 1;
 	ndUnsigned32 m_isIntersetionTestOnly : 1;
-	//ndUnsigned32 m_skeletonIntraCollision : 1;
 	ndUnsigned32 m_skeletonSelftCollision : 1;
 	static ndVector m_initialSeparatingVector;
 
@@ -187,12 +185,6 @@ inline bool ndContact::IsTestOnly() const
 {
 	return m_isIntersetionTestOnly ? true : false;
 }
-
-//inline bool ndContact::IsSkeletonIntraCollision() const
-//{
-//	return m_skeletonIntraCollision ? true : false;
-//}
-
 
 #endif 
 
