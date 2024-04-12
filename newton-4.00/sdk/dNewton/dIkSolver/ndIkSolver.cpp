@@ -381,10 +381,6 @@ void ndIkSolver::BuildMassMatrix()
 	{
 		m_world->m_ikModelLock.Unlock();
 	}
-	else
-	{
-		hasDependencies = true;
-	}
 
 	m_savedBodiesIndex.SetCount(m_bodies.GetCount());
 	for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1 ; --i)
