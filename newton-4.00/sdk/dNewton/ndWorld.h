@@ -174,6 +174,7 @@ class ndWorld: public ndClassAlloc
 	ndSpecialList<ndModel> m_deletedModels;
 	ndSpecialList<ndJointBilateralConstraint> m_deletedJoints;
 	ndArray<ndSkeletonContainer*> m_activeSkeletons;
+	ndSpinLock m_ikModelLock;
 	ndSpinLock m_deletedLock;
 
 	ndFloat32 m_timestep;
@@ -191,6 +192,7 @@ class ndWorld: public ndClassAlloc
 	bool m_inUpdate;
 	
 	friend class ndScene;
+	friend class ndIkSolver;
 	friend class ndWorldScene;
 	friend class ndBodyDynamic;
 	friend class ndDynamicsUpdate;

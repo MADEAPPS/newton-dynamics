@@ -43,6 +43,7 @@ ndIkSolver::ndIkSolver()
 	,m_maxAccel(ndFloat32(1.0e3f))
 	,m_maxAlpha(ndFloat32(1.0e4f))
 {
+	m_sentinelBody.m_uniqueId = 0;
 }
 
 ndIkSolver::~ndIkSolver()
@@ -273,50 +274,80 @@ void ndIkSolver::BuildMassMatrix()
 	m_sentinelBody.m_accel = zero;
 	m_sentinelBody.m_alpha = zero;
 	
+	auto CopyOpenLoopBody = [this](ndBodyKinematic* const body)
+	{
+		ndAssert(body->GetId() > 0);
+		ndAssert(body->GetInvMass() > ndFloat32(0.0f));
+		ndUnsigned32 id = body->GetId();
+
+		m_bodies.PushBack(body);
+		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
+		{
+			if (id > m_bodies[i - 1]->GetId())
+			{
+				m_bodies[i] = body;
+				break;
+			}
+			m_bodies[i] = m_bodies[i - 1];
+		}
+	};
+
 	// add open loop bodies
 	for (ndInt32 i = 0; i < m_skeleton->m_nodeList.GetCount(); ++i)
 	{
 		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
 		ndBodyKinematic* const body = node->m_body;
-		ndAssert(body->m_buildSkelIndex == 0);
-
-		if (body->GetInvMass() > ndFloat32(0.0f))
-		{
-			m_bodies.PushBack(body);
-			body->m_buildSkelIndex = -1;
-		}
+		CopyOpenLoopBody(body);
 	}
 
+	auto CopyCloseLoopBody = [this](ndBodyKinematic* const body)
+	{
+		ndAssert(body->GetId() > 0);
+		if (body->GetInvMass() == ndFloat32(0.0f))
+		{
+			return;
+		}
+
+		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
+		{
+			if (body == m_bodies[i])
+			{
+				return;
+			}
+		}
+
+		ndUnsigned32 id = body->GetId();
+		m_bodies.PushBack(body);
+		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
+		{
+			if (id > m_bodies[i - 1]->GetId())
+			{
+				m_bodies[i] = body;
+				break;
+			}
+			m_bodies[i] = m_bodies[i - 1];
+		}
+	};
+
 	// add close loop 
-	const ndInt32 loopCount = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
-	for (ndInt32 i = 0; i < loopCount; ++i)
+	for (ndInt32 i = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount - 1; i >= 0; --i)
 	{
 		ndConstraint* const joint = m_skeleton->m_loopingJoints[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
 		ndBodyKinematic* const body1 = joint->GetBody1();
 
 		ndAssert(body0->GetInvMass() > ndFloat32(0.0f));
-		if (body0->m_buildSkelIndex == 0)
-		{
-			ndAssert(0);
-			m_bodies.PushBack(body0);
-			body0->m_buildSkelIndex = -1;
-		}
-
-		if ((body1->m_buildSkelIndex == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
-		{
-			ndAssert(0);
-			m_bodies.PushBack(body1);
-			body1->m_buildSkelIndex = -1;
-		}
+		CopyCloseLoopBody(body0);
+		CopyCloseLoopBody(body1);
 	}
-	
+
 	// add contacts loop bodies and joints
-	for (ndInt32 i = 0; i < m_skeleton->m_nodeList.GetCount(); ++i)
+	bool hasDependencies = false;
+	for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 1; i >= 0 ; --i)
 	{
 		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
 		ndBodyKinematic* const body = node->m_body;
-	
+
 		ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
 		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
 		for (it.Begin(); it; it++)
@@ -334,46 +365,27 @@ void ndIkSolver::BuildMassMatrix()
 					m_contacts.PushBack(contact);
 					ndBodyKinematic* const body0 = contact->GetBody0();
 					ndBodyKinematic* const body1 = contact->GetBody1();
-					ndAssert(body0->GetInvMass() > ndFloat32(0.0f));
-
-					if (body0->m_buildSkelIndex == 0)
-					{
-						m_bodies.PushBack(body0);
-						body0->m_buildSkelIndex = -1;
-					}
-
-					if ((body1->m_buildSkelIndex == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
-					{
-						m_bodies.PushBack(body1);
-						body1->m_buildSkelIndex = -1;
-					}
+					CopyCloseLoopBody(body0);
+					CopyCloseLoopBody(body1);
+					const ndSkeletonContainer* const skel0 = body0->GetSkeleton();
+					const ndSkeletonContainer* const skel1 = body1->GetSkeleton();
+					hasDependencies = hasDependencies || (skel0 && (skel0 != m_skeleton));
+					hasDependencies = hasDependencies || (skel1 && (skel1 != m_skeleton));
 				}
 			}
 		}
 	}
 
-	//class EvaluateKey
-	//{
-	//	public:
-	//	EvaluateKey(void* const context)
-	//		:m_solver((ndIkSolver*)context)
-	//	{
-	//	}
-	//
-	//	ndInt32 GetKey(const ndBodyKinematic* const body) const
-	//	{
-	//		const ndSkeletonContainer* const skeleton = body->GetSkeleton();
-	//		ndInt32 key = (m_solver->m_skeleton == skeleton) ? 0 : (skeleton ? 2 : 1);
-	//		return key;
-	//	}
-	//
-	//	const ndIkSolver* m_solver;
-	//};
-	//ndBodyKinematic* xxxxx[100];
-	//ndUnsigned32 prefixScanOut[100];
-	//ndCountingSortInPlace<ndBodyKinematic*, EvaluateKey, 3>(&m_bodies[1], xxxxx, m_bodies.GetCount() - 1, prefixScanOut, this);
+	m_world->m_ikModelLock.Lock();
+	if (!hasDependencies)
+	{
+		m_world->m_ikModelLock.Unlock();
+	}
+	else
+	{
+		hasDependencies = true;
+	}
 
-	
 	m_savedBodiesIndex.SetCount(m_bodies.GetCount());
 	for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1 ; --i)
 	{
@@ -446,6 +458,7 @@ void ndIkSolver::SolverEnd()
 		
 		m_skeleton->ClearCloseLoopJoints();
 	}
+	m_world->m_ikModelLock.Unlock();
 }
 
 void ndIkSolver::Solve()
