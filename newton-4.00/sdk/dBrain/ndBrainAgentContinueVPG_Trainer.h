@@ -164,10 +164,6 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent, public ndBrainThrea
 	ndBrainVector m_workingBuffer;
 	ndMovingAverage<32> m_averageScore;
 	ndMovingAverage<32> m_averageFramesPerEpisodes;
-
-	mutable std::random_device m_rd;
-	mutable std::mt19937 m_gen;
-	mutable std::normal_distribution<ndFloat32> m_d;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -607,13 +603,6 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SaveTrajectory()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrainVector& actions) const
 {
-	//for (ndInt32 i = 0; i < 2000; ++i)
-	//{
-	//	ndBrainFloat xxx0 = ndGaussianRandom(5.0f, 2.0f);
-	//	ndBrainFloat xxx1 = 5.0f + ndBrainFloat(m_d(m_gen) * 2.0f);
-	//	ndTrace (("%f, %f\n", xxx0, xxx1))
-	//}
-
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
 		ndBrainFloat sample = ndBrainFloat (ndGaussianRandom(actions[i], m_sigma));
@@ -680,18 +669,53 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent
 {
 	public:
+
+	class ndTrajectoryStep
+	{
+		public:
+		ndTrajectoryStep()
+			:m_reward(ndBrainFloat(0.0f))
+			,m_action()
+			,m_observation()
+		{
+		}
+
+		ndTrajectoryStep(const ndTrajectoryStep& src)
+			:m_reward(src.m_reward)
+		{
+			ndMemCpy(m_action, src.m_action, actionDim);
+			ndMemCpy(m_observation, src.m_observation, statesDim);
+		}
+
+		ndTrajectoryStep& operator=(const ndTrajectoryStep& src)
+		{
+			new (this) ndTrajectoryStep(src);
+			return*this;
+		}
+
+		ndBrainFloat m_reward;
+		ndBrainFloat m_action[actionDim];
+		ndBrainFloat m_observation[statesDim];
+	};
+
 	ndBrainAgentContinueVPG_Trainer(ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>>& master);
+	~ndBrainAgentContinueVPG_Trainer();
 
 	ndBrain* GetActor();
+	void SelectAction(ndBrainVector& actions) const;
 
 	void InitWeights() { ndAssert(0); }
-	void InitWeights(ndBrainFloat, ndBrainFloat) { ndAssert(0); }
+	virtual void OptimizeStep() { ndAssert(0); }
+	void Save(ndBrainSave* const) { ndAssert(0); }
 	bool IsTrainer() const { ndAssert(0); return true; }
 	ndInt32 GetEpisodeFrames() const { ndAssert(0); return 0; }
-	void Save(ndBrainSave* const) { ndAssert(0); }
+	void InitWeights(ndBrainFloat, ndBrainFloat) { ndAssert(0); }
 
-	virtual void Step() { ndTrace (("xxxx\n")); }
+	virtual bool IsTerminal() const;
+	virtual void Step();
 
+	ndBrainVector m_workingBuffer;
+	ndArray<ndTrajectoryStep> m_trajectory;
 	ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>> m_master;
 };
 
@@ -795,7 +819,9 @@ class ndBrainAgentContinueVPG_TrainerMaster : public ndBrainThreadPool
 	//void BackPropagate();
 	//void SaveTrajectory();
 	//void SelectAction(ndBrainVector& probabilities) const;
-	//
+
+	void OptimizeStep();
+	
 	protected:
 	ndBrain m_actor;
 	ndBrain m_baseLineValue;
@@ -812,12 +838,12 @@ class ndBrainAgentContinueVPG_TrainerMaster : public ndBrainThreadPool
 	ndBrainFloat m_sigma;
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_learnRate;
-	//ndInt32 m_frameCount;
-	//ndInt32 m_framesAlive;
+	ndInt32 m_frameCount;
+	ndInt32 m_framesAlive;
 	//ndInt32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
-	//ndInt32 m_maxTrajectorySteps;
-	//ndInt32 m_extraTrajectorySteps;
+	ndInt32 m_maxTrajectorySteps;
+	ndInt32 m_extraTrajectorySteps;
 	//ndInt32 m_bashTrajectoryIndex;
 	//ndInt32 m_bashTrajectoryCount;
 	ndInt32 m_baseValueWorkingBufferSize;
@@ -828,6 +854,8 @@ class ndBrainAgentContinueVPG_TrainerMaster : public ndBrainThreadPool
 	//mutable std::random_device m_rd;
 	//mutable std::mt19937 m_gen;
 	//mutable std::normal_distribution<ndFloat32> m_d;
+	ndList<ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>*> m_agents;
+	friend class ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>;
 };
 
 /*
@@ -1225,8 +1253,26 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::OptimizeStep()
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_Trainer(ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>>& master)
 	:ndBrainAgent()
+	,m_workingBuffer()
+	,m_trajectory()
 	,m_master(master)
 {
+	m_master->m_agents.Append(this);
+	m_trajectory.SetCount(m_master->m_maxTrajectorySteps + m_master->m_extraTrajectorySteps);
+	m_trajectory.SetCount(0);
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::~ndBrainAgentContinueVPG_Trainer()
+{
+	for (ndList<ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>*>::ndNode* node = m_master->m_agents.GetFirst(); node; node = node->GetNext())
+	{
+		if (node->GetInfo() == this)
+		{
+			m_master->m_agents.Remove(node);
+			break;
+		}
+	}
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -1235,6 +1281,52 @@ ndBrain* ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::GetActor()
 	return m_master->GetActor(); 
 }
 
+template<ndInt32 statesDim, ndInt32 actionDim>
+bool ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::IsTerminal() const
+{
+	return false;
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrainVector& actions) const
+{
+	//for (ndInt32 i = 0; i < 2000; ++i)
+	//{
+	//	ndBrainFloat xxx0 = ndGaussianRandom(5.0f, 2.0f);
+	//	ndBrainFloat xxx1 = 5.0f + ndBrainFloat(m_d(m_gen) * 2.0f);
+	//	ndTrace (("%f, %f\n", xxx0, xxx1))
+	//}
+
+	for (ndInt32 i = actionDim - 1; i >= 0; --i)
+	{
+		ndBrainFloat sample = ndBrainFloat(ndGaussianRandom(actions[i], m_master->m_sigma));
+		ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
+		actions[i] = squashedAction;
+	}
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Step()
+{
+	ndTrajectoryStep trajectoryStep;
+
+	ndBrainMemVector actions(&trajectoryStep.m_action[0], actionDim);
+	ndBrainMemVector observation(&trajectoryStep.m_observation[0], statesDim);
+
+	GetObservation(&observation[0]);
+	m_master->m_actor.MakePrediction(observation, actions, m_workingBuffer);
+
+	SelectAction(actions);
+	ApplyActions(&trajectoryStep.m_action[0]);
+	trajectoryStep.m_reward = CalculateReward();
+
+	ndAssert(m_trajectory.GetCount() < m_trajectory.GetCapacity());
+	m_trajectory.PushBack(trajectoryStep);
+}
+
+// ***************************************************************************************
+//
+// ***************************************************************************************
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::ndBrainAgentContinueVPG_TrainerMaster(const HyperParameters& hyperParameters)
 	:ndBrainThreadPool()
@@ -1251,16 +1343,17 @@ ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::ndBrainAgentContinu
 	,m_sigma(hyperParameters.m_sigma)
 	,m_gamma(hyperParameters.m_discountFactor)
 	,m_learnRate(hyperParameters.m_learnRate)
-	//, m_frameCount(0)
-	//, m_framesAlive(0)
+	,m_frameCount(0)
+	,m_framesAlive(0)
 	//, m_eposideCount(0)
 	,m_bashBufferSize(hyperParameters.m_bashBufferSize)
-	//, m_maxTrajectorySteps(hyperParameters.m_maxTrajectorySteps)
-	//, m_extraTrajectorySteps(hyperParameters.m_extraTrajectorySteps)
+	,m_maxTrajectorySteps(hyperParameters.m_maxTrajectorySteps)
+	,m_extraTrajectorySteps(hyperParameters.m_extraTrajectorySteps)
 	//, m_bashTrajectoryIndex(0)
 	//, m_bashTrajectoryCount(hyperParameters.m_bashTrajectoryCount)
 	,m_baseValueWorkingBufferSize(0)
 	,m_workingBuffer()
+	,m_agents()
 	//, m_averageScore()
 	//, m_averageFramesPerEpisodes()
 	//
@@ -1367,6 +1460,38 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrain* ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::GetActor()
 { 
 	return &m_actor; 
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::OptimizeStep()
+{
+	for (ndList<ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
+	{
+		ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>* const agent = node->GetInfo();
+
+		//bool isTeminal = IsTerminal() || (m_trajectory.GetCount() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
+		bool isTeminal = agent->IsTerminal() || (agent->m_trajectory.GetCount() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
+		if (isTeminal)
+		{
+			ndAssert(0);
+			//SaveTrajectory();
+			//m_bashTrajectoryIndex++;
+			//if (m_bashTrajectoryIndex >= m_bashTrajectoryCount)
+			//{
+			//	Optimize();
+			//	m_trajectoryAccumulator.SetCount(0);
+			//	m_eposideCount++;
+			//	m_framesAlive = 0;
+			//	m_bashTrajectoryIndex = 0;
+			//}
+			//m_trajectory.SetCount(0);
+			//ResetModel();
+		}
+
+		m_frameCount++;
+		m_framesAlive++;
+	}
+
 }
 
 #endif

@@ -389,58 +389,58 @@ namespace ndQuadruped_1
 			void Step()
 			{
 				ndBrainAgentContinueVPG_Trainer::Step();
-				ndTrace(("xxxxxxxx\n"));
+				//ndTrace(("xxxxxxxx\n"));
 				//OptimizeStep();
 			}
 
-			void OptimizeStep()
-			{
-				ndAssert(0);
-				//ndInt32 stopTraining = GetFramesCount();
-				//if (stopTraining <= m_stopTraining)
-				//{
-				//	ndInt32 episodeCount = GetEposideCount();
-				//	ndBrainAgentContinueVPG_Trainer::OptimizeStep();
-				//
-				//	episodeCount -= GetEposideCount();
-				//	if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
-				//	{
-				//		if (m_averageScore.GetAverage() > m_maxGain)
-				//		{
-				//			if (m_lastEpisode != GetEposideCount())
-				//			{
-				//				m_bestActor.CopyFrom(m_actor);
-				//				m_maxGain = m_averageScore.GetAverage();
-				//				ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageScore.GetAverage());
-				//				m_lastEpisode = GetEposideCount();
-				//			}
-				//		}
-				//	}
-				//
-				//	if (episodeCount && !IsSampling())
-				//	{
-				//		ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", GetFramesCount(), m_averageScore.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-				//		if (m_outFile)
-				//		{
-				//			fprintf(m_outFile, "%g\n", m_averageScore.GetAverage());
-				//			fflush(m_outFile);
-				//		}
-				//	}
-				//
-				//	if (stopTraining >= m_stopTraining)
-				//	{
-				//		char fileName[1024];
-				//		m_modelIsTrained = true;
-				//		m_actor.CopyFrom(m_bestActor);
-				//		ndGetWorkingFileName(GetName().GetStr(), fileName);
-				//		SaveToFile(fileName);
-				//		ndExpandTraceMessage("saving to file: %s\n", fileName);
-				//		ndExpandTraceMessage("training complete\n");
-				//		ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-				//		ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-				//	}
-				//}
-			}
+			//void OptimizeStep()
+			//{
+			//	ndAssert(0);
+			//	//ndInt32 stopTraining = GetFramesCount();
+			//	//if (stopTraining <= m_stopTraining)
+			//	//{
+			//	//	ndInt32 episodeCount = GetEposideCount();
+			//	//	ndBrainAgentContinueVPG_Trainer::OptimizeStep();
+			//	//
+			//	//	episodeCount -= GetEposideCount();
+			//	//	if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
+			//	//	{
+			//	//		if (m_averageScore.GetAverage() > m_maxGain)
+			//	//		{
+			//	//			if (m_lastEpisode != GetEposideCount())
+			//	//			{
+			//	//				m_bestActor.CopyFrom(m_actor);
+			//	//				m_maxGain = m_averageScore.GetAverage();
+			//	//				ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageScore.GetAverage());
+			//	//				m_lastEpisode = GetEposideCount();
+			//	//			}
+			//	//		}
+			//	//	}
+			//	//
+			//	//	if (episodeCount && !IsSampling())
+			//	//	{
+			//	//		ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", GetFramesCount(), m_averageScore.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+			//	//		if (m_outFile)
+			//	//		{
+			//	//			fprintf(m_outFile, "%g\n", m_averageScore.GetAverage());
+			//	//			fflush(m_outFile);
+			//	//		}
+			//	//	}
+			//	//
+			//	//	if (stopTraining >= m_stopTraining)
+			//	//	{
+			//	//		char fileName[1024];
+			//	//		m_modelIsTrained = true;
+			//	//		m_actor.CopyFrom(m_bestActor);
+			//	//		ndGetWorkingFileName(GetName().GetStr(), fileName);
+			//	//		SaveToFile(fileName);
+			//	//		ndExpandTraceMessage("saving to file: %s\n", fileName);
+			//	//		ndExpandTraceMessage("training complete\n");
+			//	//		ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+			//	//		ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+			//	//	}
+			//	//}
+			//}
 
 			ndBrain m_bestActor;
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
@@ -1086,6 +1086,7 @@ namespace ndQuadruped_1
 
 		virtual void Update(ndDemoEntityManager* const scene, ndFloat32 timestep)
 		{
+			m_master->OptimizeStep();
 		}
 
 		ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> m_master;
