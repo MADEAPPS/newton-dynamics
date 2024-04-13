@@ -369,8 +369,12 @@ void ndIkSolver::BuildMassMatrix()
 					CopyCloseLoopBody(body1);
 					const ndSkeletonContainer* const skel0 = body0->GetSkeleton();
 					const ndSkeletonContainer* const skel1 = body1->GetSkeleton();
+
+					hasDependencies = hasDependencies || (!skel0);
 					hasDependencies = hasDependencies || (skel0 && (skel0 != m_skeleton));
+
 					hasDependencies = hasDependencies || (skel1 && (skel1 != m_skeleton));
+					hasDependencies = hasDependencies || (!skel1 && (body1->GetInvMass() > ndFloat32(0.0f)));
 				}
 			}
 		}
