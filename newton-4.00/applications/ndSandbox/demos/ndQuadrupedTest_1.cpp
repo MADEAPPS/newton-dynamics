@@ -275,9 +275,9 @@ namespace ndQuadruped_1
 				ndBodyDynamic* m_body;
 			};
 
-			ndControllerAgent_trainer(const HyperParameters& hyperParameters)
-				:ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters)
-				,m_bestActor(m_actor)
+			ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>& master)
+				:ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(master)
+				,m_bestActor(*GetActor())
 				,m_basePose()
 				,m_outFile(nullptr)
 				,m_model(nullptr)
@@ -389,55 +389,57 @@ namespace ndQuadruped_1
 			void Step()
 			{
 				ndBrainAgentContinueVPG_Trainer::Step();
-				OptimizeStep();
+				ndTrace(("xxxxxxxx\n"));
+				//OptimizeStep();
 			}
 
 			void OptimizeStep()
 			{
-				ndInt32 stopTraining = GetFramesCount();
-				if (stopTraining <= m_stopTraining)
-				{
-					ndInt32 episodeCount = GetEposideCount();
-					ndBrainAgentContinueVPG_Trainer::OptimizeStep();
-
-					episodeCount -= GetEposideCount();
-					if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
-					{
-						if (m_averageScore.GetAverage() > m_maxGain)
-						{
-							if (m_lastEpisode != GetEposideCount())
-							{
-								m_bestActor.CopyFrom(m_actor);
-								m_maxGain = m_averageScore.GetAverage();
-								ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageScore.GetAverage());
-								m_lastEpisode = GetEposideCount();
-							}
-						}
-					}
-
-					if (episodeCount && !IsSampling())
-					{
-						ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", GetFramesCount(), m_averageScore.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-						if (m_outFile)
-						{
-							fprintf(m_outFile, "%g\n", m_averageScore.GetAverage());
-							fflush(m_outFile);
-						}
-					}
-
-					if (stopTraining >= m_stopTraining)
-					{
-						char fileName[1024];
-						m_modelIsTrained = true;
-						m_actor.CopyFrom(m_bestActor);
-						ndGetWorkingFileName(GetName().GetStr(), fileName);
-						SaveToFile(fileName);
-						ndExpandTraceMessage("saving to file: %s\n", fileName);
-						ndExpandTraceMessage("training complete\n");
-						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-						ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-					}
-				}
+				ndAssert(0);
+				//ndInt32 stopTraining = GetFramesCount();
+				//if (stopTraining <= m_stopTraining)
+				//{
+				//	ndInt32 episodeCount = GetEposideCount();
+				//	ndBrainAgentContinueVPG_Trainer::OptimizeStep();
+				//
+				//	episodeCount -= GetEposideCount();
+				//	if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
+				//	{
+				//		if (m_averageScore.GetAverage() > m_maxGain)
+				//		{
+				//			if (m_lastEpisode != GetEposideCount())
+				//			{
+				//				m_bestActor.CopyFrom(m_actor);
+				//				m_maxGain = m_averageScore.GetAverage();
+				//				ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageScore.GetAverage());
+				//				m_lastEpisode = GetEposideCount();
+				//			}
+				//		}
+				//	}
+				//
+				//	if (episodeCount && !IsSampling())
+				//	{
+				//		ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", GetFramesCount(), m_averageScore.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+				//		if (m_outFile)
+				//		{
+				//			fprintf(m_outFile, "%g\n", m_averageScore.GetAverage());
+				//			fflush(m_outFile);
+				//		}
+				//	}
+				//
+				//	if (stopTraining >= m_stopTraining)
+				//	{
+				//		char fileName[1024];
+				//		m_modelIsTrained = true;
+				//		m_actor.CopyFrom(m_bestActor);
+				//		ndGetWorkingFileName(GetName().GetStr(), fileName);
+				//		SaveToFile(fileName);
+				//		ndExpandTraceMessage("saving to file: %s\n", fileName);
+				//		ndExpandTraceMessage("training complete\n");
+				//		ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+				//		ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+				//	}
+				//}
 			}
 
 			ndBrain m_bestActor;
@@ -831,19 +833,12 @@ namespace ndQuadruped_1
 		ndSharedPtr<ndModel> m_model;
 	};
 
-	ndSharedPtr<ndBrainAgent> BuildAgent()
+	ndSharedPtr<ndBrainAgent> BuildAgent(ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>& master)
 	{
 		#ifdef ND_TRAIN_MODEL
 		// add a reinforcement learning controller 
-		ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
-
-		//hyperParameters.m_threadsCount = 1;
-		//hyperParameters.m_sigma = ndReal(0.25f);
-		hyperParameters.m_discountFactor = ndReal(0.99f);
-		//hyperParameters.m_maxTrajectorySteps = 1024 * 6;
-		hyperParameters.m_maxTrajectorySteps = 1024 * 8;
-		
-		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(hyperParameters));
+	
+		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(master));
 		#else
 		char fileName[1024];
 		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
@@ -853,7 +848,8 @@ namespace ndQuadruped_1
 		return agent;
 	}
 
-	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation)
+	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation, 
+		ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> master)
 	{
 		ndFloat32 mass = 20.0f;
 		ndFloat32 radius = 0.25f;
@@ -861,7 +857,7 @@ namespace ndQuadruped_1
 		ndFloat32 limbLength = 0.3f;
 		ndFloat32 limbRadios = 0.05f;
 
-		ndSharedPtr<ndBrainAgent> agent(BuildAgent());
+		ndSharedPtr<ndBrainAgent> agent(BuildAgent(master));
 		ndRobot* const model = new ndRobot(agent);
 
 		ndPhysicsWorld* const world = scene->GetWorld();
@@ -1025,12 +1021,23 @@ namespace ndQuadruped_1
 		public:
 		TrainingUpdata(ndDemoEntityManager* const scene, const ndMatrix& matrix)
 			:OnPostUpdate()
+			,m_master()
 		{
 			ndWorld* const world = scene->GetWorld();
 
 			ndFloat32 x0 = 3.0f;
 			ndFloat32 z0 = 3.0f;
 			const ndInt32 count = 2;
+
+			ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
+			
+			//hyperParameters.m_threadsCount = 1;
+			//hyperParameters.m_sigma = ndReal(0.25f);
+			hyperParameters.m_discountFactor = ndReal(0.99f);
+			//hyperParameters.m_maxTrajectorySteps = 1024 * 6;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
+
+			m_master = ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> (new ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
 
 			ndMatrix location(matrix);
 			location.m_posit.m_z -= count * x0 * 0.5f;
@@ -1040,7 +1047,7 @@ namespace ndQuadruped_1
 				//for (ndInt32 j = 0; j < count; ++j)
 				for (ndInt32 j = 0; j < 1; ++j)
 				{
-					ndSharedPtr<ndModel> model(BuildModel(scene, location));
+					ndSharedPtr<ndModel> model(BuildModel(scene, location, m_master));
 					world->AddModel(model);
 					location.m_posit.m_x += x0;
 				}
@@ -1080,6 +1087,8 @@ namespace ndQuadruped_1
 		virtual void Update(ndDemoEntityManager* const scene, ndFloat32 timestep)
 		{
 		}
+
+		ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> m_master;
 	};
 }
 

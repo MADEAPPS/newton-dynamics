@@ -20,6 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+#if 0
 namespace ndCarpole_1
 {
 	//#define D_TRAIN_AGENT
@@ -476,21 +477,23 @@ namespace ndCarpole_1
 }
 
 using namespace ndCarpole_1;
+#endif
 
 void ndCartpoleContinue(ndDemoEntityManager* const scene)
 {
 	BuildFlatPlane(scene, true);
+	ndAssert(0);
 	
-	ndSetRandSeed(42);
-	ndWorld* const world = scene->GetWorld();
-	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-	
-	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	world->AddModel(model);
-	
-	matrix.m_posit.m_x -= 0.0f;
-	matrix.m_posit.m_y += 0.5f;
-	matrix.m_posit.m_z += 2.0f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
-	scene->SetCameraMatrix(rotation, matrix.m_posit);
+	//ndSetRandSeed(42);
+	//ndWorld* const world = scene->GetWorld();
+	//ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
+	//
+	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	//world->AddModel(model);
+	//
+	//matrix.m_posit.m_x -= 0.0f;
+	//matrix.m_posit.m_y += 0.5f;
+	//matrix.m_posit.m_z += 2.0f;
+	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
+	//scene->SetCameraMatrix(rotation, matrix.m_posit);
 }

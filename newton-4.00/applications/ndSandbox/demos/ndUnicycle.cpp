@@ -20,6 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+#if 0
 namespace ndUnicycle
 {
 	//#define ND_TRAIN_MODEL
@@ -592,27 +593,30 @@ namespace ndUnicycle
 }
 
 using namespace ndUnicycle;
+#endif
+
 void ndUnicycleController(ndDemoEntityManager* const scene)
 {
-	// build a floor
-	//BuildFloorBox(scene, ndGetIdentityMatrix());
-	BuildFlatPlane(scene, true);
-	
-	ndSetRandSeed(42);
-	ndWorld* const world = scene->GetWorld();
-	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-
-	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	scene->GetWorld()->AddModel(model);
-
-	ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
-	ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
-	
-	matrix.m_posit.m_x -= 0.0f;
-	matrix.m_posit.m_y += 0.5f;
-	matrix.m_posit.m_z += 3.0f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
-	scene->SetCameraMatrix(rotation, matrix.m_posit);
+	ndAssert(0);
+	//// build a floor
+	////BuildFloorBox(scene, ndGetIdentityMatrix());
+	//BuildFlatPlane(scene, true);
+	//
+	//ndSetRandSeed(42);
+	//ndWorld* const world = scene->GetWorld();
+	//ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
+	//
+	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	//scene->GetWorld()->AddModel(model);
+	//
+	//ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
+	//ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
+	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
+	//world->AddJoint(fixJoint);
+	//
+	//matrix.m_posit.m_x -= 0.0f;
+	//matrix.m_posit.m_y += 0.5f;
+	//matrix.m_posit.m_z += 3.0f;
+	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
+	//scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
