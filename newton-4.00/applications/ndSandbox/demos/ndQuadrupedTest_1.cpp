@@ -1038,7 +1038,7 @@ namespace ndQuadruped_1
 
 			m_master = ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> (new ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
 
-			const ndInt32 count = 3;
+			const ndInt32 count = 7;
 			ndMatrix location(matrix);
 			location.m_posit.m_z -= count * x0 * 0.5f;
 			for (ndInt32 i = 0; i < count; ++i)
@@ -1129,7 +1129,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		scene->Set2DDisplayRenderFunction(quadrupedUI);
 	#endif
 	
-	matrix.m_posit.m_x -= 4.0f;
+	matrix.m_posit.m_x -= 8.0f;
 	matrix.m_posit.m_y += 1.5f;
 	matrix.m_posit.m_z += 0.25f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);

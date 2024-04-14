@@ -24,6 +24,7 @@
 
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"
+#include "ndThreadSyncUtils.h"
 
 #define D_MEMORY_ALIGMNET	32
 typedef void* (*ndMemAllocCallback) (size_t size);

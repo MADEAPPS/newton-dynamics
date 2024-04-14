@@ -52,6 +52,80 @@ class ndFloatExceptions
 	ndUnsigned32 m_simdMask;
 };
 
+#ifdef D_USE_THREAD_EMULATION
+	/// wrapper over standard atomic operations
+	template<class T>
+	class ndAtomic
+	{
+		public:
+		ndAtomic<T>()
+			:m_val(T(0))
+		{
+		}
+
+		ndAtomic<T>(T val)
+			:m_val(val)
+		{
+		}
+
+		operator T() const
+		{
+			return m_val;
+		}
+
+		T load() const
+		{
+			return m_val;
+		}
+
+		void store(T val)
+		{
+			m_val = val;
+		}
+
+		T exchange(T val)
+		{
+			ndSwap(val, m_val);
+			return val;
+		}
+
+		T fetch_add(T val)
+		{
+			T ret = m_val;
+			m_val += val;
+			return ret;
+		}
+
+		T fetch_sub(T val)
+		{
+			T ret = m_val;
+			m_val -= val;
+			return ret;
+		}
+
+		bool compare_exchange_weak(T oldValue, T newValue)
+		{
+			if (m_val == oldValue)
+			{
+				m_val = newValue;
+				return true;
+			}
+			return false;
+		}
+
+		private:
+		T m_val;
+	};
+#else
+	/// wrapper over standard atomic operations
+	template<class T>
+	class ndAtomic : public std::atomic<T>
+	{
+		public:
+		using std::atomic<T>::atomic;
+		using std::atomic<T>::operator=;
+	};
+#endif
 
 /// Simple spin lock for synchronizing threads for very short period of time.
 class ndSpinLock
