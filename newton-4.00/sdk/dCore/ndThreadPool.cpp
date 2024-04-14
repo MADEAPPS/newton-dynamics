@@ -24,6 +24,7 @@
 #include "ndUtils.h"
 #include "ndProfiler.h"
 #include "ndThreadPool.h"
+#include "ndThreadSyncUtils.h"
 
 ndThreadPool::ndWorker::ndWorker()
 	:ndThread()

@@ -23,6 +23,7 @@
 #include "ndTypes.h"
 #include "ndUtils.h"
 #include "ndProbability.h"
+#include "ndThreadSyncUtils.h"
 
 static std::mt19937& GetRandomGenerator()
 {

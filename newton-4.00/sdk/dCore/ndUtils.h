@@ -241,14 +241,6 @@ D_CORE_API ndUnsigned64 ndGetTimeInMicroseconds();
 /// \return a 64 bit double precision with a 32 bit mantissa
 D_CORE_API ndFloat64 ndRoundToFloat(ndFloat64 val);
 
-/// tell the operating system the library is done with this job, 
-/// the OS is free to swith to another task if it needs to.
-D_CORE_API void ndThreadYield();
-
-/// in ssome systems, thread yeild coudl be too expensive 
-/// since ity could taskswicth to anothre thread. 
-D_CORE_API void ndThreadPause();
-
 /// removed all duplicate points from an array and place the location in the index array
 D_CORE_API ndInt32 ndVertexListToIndexList(ndFloat64* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance = ndEpsilon);
 
@@ -326,87 +318,6 @@ class ndMovingAverage: public ndFixSizeArray<ndReal, size>
 	ndReal m_average;
 	ndInt32 m_index;
 };
-
-/// Simple spin lock for synchronizing threads for very short period of time.
-class ndSpinLock
-{
-	public:
-	ndSpinLock()
-	#ifndef D_USE_THREAD_EMULATION	
-		:m_lock(0)
-	#endif
-	{
-	}
-
-	ndSpinLock(ndSpinLock const& other)
-	#ifndef D_USE_THREAD_EMULATION
-		:m_lock(other.m_lock.load())
-	#endif
-	{
-	}
-
-	void Lock()
-	{
-		#ifndef D_USE_THREAD_EMULATION	
-			ndInt32 exp = 1;
-			for (ndUnsigned32 test = 0; !m_lock.compare_exchange_weak(test, 1); test = 0)
-			{
-				Delay(exp);
-			}
-		#endif
-	}
-
-	void Unlock()
-	{
-		#ifndef D_USE_THREAD_EMULATION	
-			m_lock.store(0);
-		#endif
-	}
-
-	#ifndef D_USE_THREAD_EMULATION	
-		private:
-		D_CORE_API void Delay(ndInt32& exp);
-		ndAtomic<ndUnsigned32> m_lock;
-	#endif
-};
-
-/// Simple scope based spin lock.
-class ndScopeSpinLock
-{
-	public:
-	ndScopeSpinLock(ndSpinLock& spinLock)
-		:m_spinLock(spinLock)
-	{
-		m_spinLock.Lock();
-	}
-
-	~ndScopeSpinLock()
-	{
-		m_spinLock.Unlock();
-	}
-
-	ndSpinLock& m_spinLock;
-};
-
-/// Set cpu floating point exceptions, the original exception state is restored when the destructor is called.
-class ndFloatExceptions
-{
-	public:
-	//#if defined (WIN32) || defined(_WIN32)
-	#if defined (_MSC_VER)
-		#define D_FLOAT_EXCEPTIONS_MASK	(_EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL)
-	#else
-		#define D_FLOAT_EXCEPTIONS_MASK	(FE_DIVBYZERO | FE_INVALID | FE_INEXACT)
-	#endif
-
-	D_CORE_API ndFloatExceptions(ndUnsigned32 mask = D_FLOAT_EXCEPTIONS_MASK);
-	D_CORE_API ~ndFloatExceptions();
-
-	private:
-	ndUnsigned32 m_floatMask;
-	ndUnsigned32 m_simdMask;
-};
-
 
 #endif
 

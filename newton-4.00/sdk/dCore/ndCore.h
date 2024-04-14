@@ -65,6 +65,7 @@
 #include <ndGeneralVector.h>
 #include <ndGeneralMatrix.h>
 #include <ndTemplateVector.h>
+#include <ndThreadSyncUtils.h>
 #include <ndContainersAlloc.h>
 #include <ndAabbPolygonSoup.h>
 #include <ndSmallDeterminant.h>

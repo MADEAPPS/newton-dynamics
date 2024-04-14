@@ -25,6 +25,7 @@
 #include "ndClassAlloc.h"
 #include "ndFixSizeArray.h"
 #include "ndContainersAlloc.h"
+#include "ndThreadSyncUtils.h"
 
 #define D_FREELIST_DICTIONARY_SIZE 64
 

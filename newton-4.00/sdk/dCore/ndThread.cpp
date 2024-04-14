@@ -24,6 +24,7 @@
 #include "ndUtils.h"
 #include "ndThread.h"
 #include "ndProfiler.h"
+#include "ndThreadSyncUtils.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )

@@ -28,6 +28,7 @@
 #include "ndSemaphore.h"
 #include "ndClassAlloc.h"
 #include "ndThreadPool.h"
+#include "ndThreadSyncUtils.h"
 
 class ndThreadBackgroundWorker;
 
