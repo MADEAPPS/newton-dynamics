@@ -61,8 +61,6 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	friend class ndBrainLoad;
 	friend class ndBrainSave;
 	friend class ndBrainTrainer;
-
-	//static ndSpinLock m_lock;
 };
 
 #endif 

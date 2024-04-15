@@ -24,8 +24,6 @@
 #include "ndBrainVector.h"
 #include "ndBrainSaveLoad.h"
 
-//ndSpinLock ndBrain::m_lock;
-
 ndBrain::ndBrain()
 	:ndArray<ndBrainLayer*>()
 {
@@ -214,7 +212,6 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, 
 	const ndInt32 maxMemory = CalculateWorkingtBufferSize();
 	if (maxMemory > workingBuffer.GetCapacity())
 	{
-		//ndScopeSpinLock lock(m_lock);
 		workingBuffer.SetCount(maxMemory);
 	}
 	workingBuffer.SetCount(maxMemory);
