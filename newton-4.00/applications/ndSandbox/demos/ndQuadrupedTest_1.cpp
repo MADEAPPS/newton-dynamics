@@ -1038,13 +1038,15 @@ namespace ndQuadruped_1
 
 			m_master = ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> (new ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
 
-			const ndInt32 count = 7;
+			const ndInt32 countX = 6;
+			const ndInt32 countZ = 9;
+
 			ndMatrix location(matrix);
-			location.m_posit.m_z -= count * x0 * 0.5f;
-			for (ndInt32 i = 0; i < count; ++i)
+			location.m_posit.m_z -= countZ * x0 * 0.5f;
+			for (ndInt32 i = 0; i < countZ; ++i)
 			{
 				location.m_posit.m_x = matrix.m_posit.m_x;
-				for (ndInt32 j = 0; j < count; ++j)
+				for (ndInt32 j = 0; j < countX; ++j)
 				{
 					ndSharedPtr<ndModel> model(BuildModel(scene, location, m_master));
 					world->AddModel(model);
