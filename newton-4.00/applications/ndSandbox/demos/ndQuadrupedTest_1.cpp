@@ -1091,7 +1091,6 @@ namespace ndQuadruped_1
 			if (stopTraining <= m_stopTraining)
 			{
 				ndInt32 episodeCount = m_master->GetEposideCount();
-			//	ndBrainAgentContinueVPG_Trainer::OptimizeStep();
 				m_master->OptimizeStep();
 			
 				episodeCount -= m_master->GetEposideCount();
