@@ -1404,6 +1404,7 @@ void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::OptimizeStep()
 					ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>* const nextAgent = node->GetInfo();
 					nextAgent->m_trajectory.SetCount(0);
 				}
+				node = m_agents.GetLast();
 				m_eposideCount++;
 				m_framesAlive = 0;
 				m_bashTrajectoryIndex = 0;
