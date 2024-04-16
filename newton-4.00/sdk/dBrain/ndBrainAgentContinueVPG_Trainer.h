@@ -272,7 +272,6 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * hyperParameters.m_threadsCount);
 
 	m_trajectory.SetCount(m_maxTrajectorySteps + m_extraTrajectorySteps);
-	//m_trajectoryAccumulator.SetCount(m_bashTrajectoryCount * m_maxTrajectorySteps + 1024);
 	m_trajectoryAccumulator.SetCount(m_maxTrajectorySteps + m_extraTrajectorySteps);
 	m_trajectory.SetCount(0);
 	m_trajectoryAccumulator.SetCount(0);
@@ -792,7 +791,6 @@ class ndBrainAgentContinueVPG_TrainerMaster : public ndBrainThreadPool
 	private:
 	void Optimize();
 	void BackPropagate();
-	//void SelectAction(ndBrainVector& probabilities) const;
 	void SaveTrajectory(ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>* const agent);
 
 	ndBrain m_actor;
@@ -803,6 +801,7 @@ class ndBrainAgentContinueVPG_TrainerMaster : public ndBrainThreadPool
 	ndArray<ndBrainTrainer*> m_auxiliaryTrainers;
 	ndBrainOptimizerAdam* m_baseLineValueOptimizer;
 	ndArray<ndBrainTrainer*> m_baseLineValueTrainers;
+	ndArray<ndInt32> m_trajectoryAccumulatorScans;
 	ndArray<ndTrajectoryStep<statesDim, actionDim>> m_trajectoryAccumulator;
 	
 	ndBrainFloat m_sigma;
@@ -916,6 +915,7 @@ ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::ndBrainAgentContinu
 	,m_auxiliaryTrainers()
 	,m_baseLineValueOptimizer(nullptr)
 	,m_baseLineValueTrainers()
+	,m_trajectoryAccumulatorScans()
 	,m_trajectoryAccumulator()
 	,m_sigma(hyperParameters.m_sigma)
 	,m_gamma(hyperParameters.m_discountFactor)
@@ -1069,7 +1069,7 @@ ndFloat32 ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::GetAverag
 	return m_averageScore.GetAverage();
 }
 
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::SaveTrajectory(ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>* const agent)
 {
@@ -1080,101 +1080,12 @@ void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::SaveTrajectory
 	const ndInt32 maxSteps = ndMin(agent->m_trajectory.GetCount(), m_maxTrajectorySteps);
 	ndAssert(maxSteps > 0);
 
-	ndAtomic<ndInt32> iterator(0);
-	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * GetThreadCount());
-	for (ndInt32 base = 0; base < maxSteps; base += m_bashBufferSize)
-	{
-		auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, agent, base, maxSteps](ndInt32 threadIndex, ndInt32)
-		{
-			class ndPolicyLoss : public ndBrainLossHuber
-			{
-				public:
-				ndPolicyLoss()
-					:ndBrainLossHuber(1)
-					,m_lossValid(true)
-				{
-				}
-
-				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
-				{
-					loss.Set(m_truth);
-					if (!m_lossValid)
-					{
-						SetTruth(output);
-					}
-					ndBrainLossHuber::GetLoss(output, loss);
-				}
-
-				bool m_lossValid;
-			};
-
-			ndPolicyLoss loss;
-			ndBrainFixSizeVector<1> stateValue;
-			ndBrainFixSizeVector<actionDim> actions;
-			ndBrainFixSizeVector<statesDim> zeroObservations;
-			ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
-
-			const ndBrainFloat gamma1 = m_gamma;
-			const ndBrainFloat gamma2 = gamma1 * m_gamma;
-			const ndBrainFloat gamma3 = gamma2 * m_gamma;
-			const ndBrainFloat invSigma2 = ndBrainFloat(1.0f) / (ndBrainFloat(2.0f) * m_sigma * m_sigma);
-			//const ndBrainFloat uniVariateGaussian = ndBrainFloat(1.0f) / (m_sigma * ndBrainFloat(ndSqrt(ndBrainFloat(2.0f) * ndPi)));
-			//const ndBrainFloat gaussian = ndPow (uniVariateGaussian, ndBrainFloat(actionDim));
-
-			zeroObservations.Set(ndBrainFloat(0.0f));
-			//const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
-			//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
-			{
-				ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
-				ndInt32 index = base + i;
-				if ((index + 3) < maxSteps)
-				{
-					const ndBrainMemVector observation(&agent->m_trajectory[ndInt32(index)].m_observation[0], statesDim);
-					m_actor.MakePrediction(observation, actions, workingBuffer);
-
-					ndBrainFloat exponent = ndBrainFloat(0.0f);
-					for (ndInt32 j = actions.GetCount() - 1; j >= 0; --j)
-					{
-						ndBrainFloat error = (actions[j] - agent->m_trajectory[ndInt32(index)].m_action[j]);
-						exponent += error * error * invSigma2;
-					}
-					//ndBrainFloat stateProb = ndBrainFloat (gaussian * ndExp(-exponent));
-					ndBrainFloat stateProb = ndBrainFloat(ndExp(-exponent));
-
-					const ndBrainMemVector baseObservation(&agent->m_trajectory[ndInt32(index + 3)].m_observation[0], statesDim);
-					m_baseLineValue.MakePrediction(baseObservation, stateValue, workingBuffer);
-					ndBrainFloat q0 = agent->m_trajectory[ndInt32(index + 0)].m_reward;
-					ndBrainFloat q1 = agent->m_trajectory[ndInt32(index + 1)].m_reward;
-					ndBrainFloat q2 = agent->m_trajectory[ndInt32(index + 2)].m_reward;
-					ndBrainFloat q3 = stateValue[0];
-					stateValue[0] = stateProb * (q0 + q1 * gamma1 + q2 * gamma2 + q3 * gamma3);
-					loss.SetTruth(stateValue);
-					trainer.BackPropagate(observation, loss);
-				}
-				else
-				{
-					loss.m_lossValid = false;
-					trainer.BackPropagate(zeroObservations, loss);
-				}
-			}
-		});
-
-		iterator = 0;
-		ndBrainThreadPool::ParallelExecute(BackPropagateBash);
-		m_baseLineValueOptimizer->Update(this, m_baseLineValueTrainers, m_learnRate);
-	}
-
-	// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
-	for (ndInt32 i = agent->m_trajectory.GetCount() - 2; i >= 0; --i)
-	{
-		agent->m_trajectory[i].m_reward += m_gamma * agent->m_trajectory[i + 1].m_reward;
-	}
-
 	for (ndInt32 i = 0; i < maxSteps; ++i)
 	{
 		m_trajectoryAccumulator.PushBack(agent->m_trajectory[i]);
 	}
+	m_trajectoryAccumulatorScans.PushBack(maxSteps);
+	agent->m_trajectory.SetCount(0);
 }
 
 //#pragma optimize( "", off )
@@ -1316,6 +1227,114 @@ void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::Optimize()
 }
 
 //#pragma optimize( "", off )
+//template<ndInt32 statesDim, ndInt32 actionDim>
+//void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::SaveTrajectory(ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>* const agent)
+//{
+//	// remove last step because if it was a dead state, it will provide misleading feedback.
+//	agent->m_trajectory.SetCount(agent->m_trajectory.GetCount() - 1);
+//
+//	// get the max trajectory steps
+//	const ndInt32 maxSteps = ndMin(agent->m_trajectory.GetCount(), m_maxTrajectorySteps);
+//	ndAssert(maxSteps > 0);
+//
+//	ndAtomic<ndInt32> iterator(0);
+//	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * GetThreadCount());
+//	for (ndInt32 base = 0; base < maxSteps; base += m_bashBufferSize)
+//	{
+//		auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, agent, base, maxSteps](ndInt32 threadIndex, ndInt32)
+//			{
+//				class ndPolicyLoss : public ndBrainLossHuber
+//				{
+//				public:
+//					ndPolicyLoss()
+//						:ndBrainLossHuber(1)
+//						, m_lossValid(true)
+//					{
+//					}
+//
+//					void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+//					{
+//						loss.Set(m_truth);
+//						if (!m_lossValid)
+//						{
+//							SetTruth(output);
+//						}
+//						ndBrainLossHuber::GetLoss(output, loss);
+//					}
+//
+//					bool m_lossValid;
+//				};
+//
+//				ndPolicyLoss loss;
+//				ndBrainFixSizeVector<1> stateValue;
+//				ndBrainFixSizeVector<actionDim> actions;
+//				ndBrainFixSizeVector<statesDim> zeroObservations;
+//				ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
+//
+//				const ndBrainFloat gamma1 = m_gamma;
+//				const ndBrainFloat gamma2 = gamma1 * m_gamma;
+//				const ndBrainFloat gamma3 = gamma2 * m_gamma;
+//				const ndBrainFloat invSigma2 = ndBrainFloat(1.0f) / (ndBrainFloat(2.0f) * m_sigma * m_sigma);
+//				//const ndBrainFloat uniVariateGaussian = ndBrainFloat(1.0f) / (m_sigma * ndBrainFloat(ndSqrt(ndBrainFloat(2.0f) * ndPi)));
+//				//const ndBrainFloat gaussian = ndPow (uniVariateGaussian, ndBrainFloat(actionDim));
+//
+//				zeroObservations.Set(ndBrainFloat(0.0f));
+//				//const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
+//				//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+//				for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
+//				{
+//					ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
+//					ndInt32 index = base + i;
+//					if ((index + 3) < maxSteps)
+//					{
+//						const ndBrainMemVector observation(&agent->m_trajectory[ndInt32(index)].m_observation[0], statesDim);
+//						m_actor.MakePrediction(observation, actions, workingBuffer);
+//
+//						ndBrainFloat exponent = ndBrainFloat(0.0f);
+//						for (ndInt32 j = actions.GetCount() - 1; j >= 0; --j)
+//						{
+//							ndBrainFloat error = (actions[j] - agent->m_trajectory[ndInt32(index)].m_action[j]);
+//							exponent += error * error * invSigma2;
+//						}
+//						//ndBrainFloat stateProb = ndBrainFloat (gaussian * ndExp(-exponent));
+//						ndBrainFloat stateProb = ndBrainFloat(ndExp(-exponent));
+//
+//						const ndBrainMemVector baseObservation(&agent->m_trajectory[ndInt32(index + 3)].m_observation[0], statesDim);
+//						m_baseLineValue.MakePrediction(baseObservation, stateValue, workingBuffer);
+//						ndBrainFloat q0 = agent->m_trajectory[ndInt32(index + 0)].m_reward;
+//						ndBrainFloat q1 = agent->m_trajectory[ndInt32(index + 1)].m_reward;
+//						ndBrainFloat q2 = agent->m_trajectory[ndInt32(index + 2)].m_reward;
+//						ndBrainFloat q3 = stateValue[0];
+//						stateValue[0] = stateProb * (q0 + q1 * gamma1 + q2 * gamma2 + q3 * gamma3);
+//						loss.SetTruth(stateValue);
+//						trainer.BackPropagate(observation, loss);
+//					}
+//					else
+//					{
+//						loss.m_lossValid = false;
+//						trainer.BackPropagate(zeroObservations, loss);
+//					}
+//				}
+//			});
+//
+//		iterator = 0;
+//		ndBrainThreadPool::ParallelExecute(BackPropagateBash);
+//		m_baseLineValueOptimizer->Update(this, m_baseLineValueTrainers, m_learnRate);
+//	}
+//
+//	// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
+//	for (ndInt32 i = agent->m_trajectory.GetCount() - 2; i >= 0; --i)
+//	{
+//		agent->m_trajectory[i].m_reward += m_gamma * agent->m_trajectory[i + 1].m_reward;
+//	}
+//
+//	for (ndInt32 i = 0; i < maxSteps; ++i)
+//	{
+//		m_trajectoryAccumulator.PushBack(agent->m_trajectory[i]);
+//	}
+//}
+
+#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::OptimizeStep()
 {
@@ -1333,11 +1352,11 @@ void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::OptimizeStep()
 			{
 				Optimize();
 				m_trajectoryAccumulator.SetCount(0);
+				m_trajectoryAccumulatorScans.SetCount(0);
 				m_eposideCount++;
 				m_framesAlive = 0;
 				m_bashTrajectoryIndex = 0;
 			}
-			agent->m_trajectory.SetCount(0);
 			agent->ResetModel();
 		}
 
