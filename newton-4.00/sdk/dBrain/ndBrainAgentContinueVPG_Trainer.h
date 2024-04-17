@@ -1209,8 +1209,8 @@ void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::OptimizeCritic
 			};
 	
 			ndPolicyLoss loss;
+			ndBrainFixSizeVector<1> actions;
 			ndBrainFixSizeVector<1> stateValue;
-			ndBrainFixSizeVector<actionDim> actions;
 			ndBrainFixSizeVector<statesDim> zeroObservations;
 			ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
 	

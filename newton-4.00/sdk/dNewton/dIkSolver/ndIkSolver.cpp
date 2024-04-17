@@ -261,6 +261,7 @@ bool ndIkSolver::IsSleeping(ndSkeletonContainer* const skeleton) const
 //	return body->m_alpha;
 //}
 
+#pragma optimize( "", off )
 void ndIkSolver::BuildMassMatrix()
 {
 	m_bodies.SetCount(0);
@@ -380,9 +381,11 @@ void ndIkSolver::BuildMassMatrix()
 		}
 	}
 
+int xxxx = 0;
 	m_world->m_ikModelLock.Lock();
 	if (!hasDependencies)
 	{
+		xxxx = 1;
 		m_world->m_ikModelLock.Unlock();
 	}
 
@@ -421,6 +424,26 @@ void ndIkSolver::BuildMassMatrix()
 		BuildJacobianMatrix(contact);
 	}
 	m_skeleton->InitMassMatrix(&m_leftHandSide[0], &m_rightHandSide[0]);
+
+#if 1
+	for (ndInt32 i = 0; i < m_skeleton->m_rowCount; ++i)
+	{
+		ndConstraint* const joint = (ndConstraint*)m_skeleton->m_pairs[i].m_joint;
+
+		ndInt32 m0 = (joint->GetBody0()->GetInvMass() > ndFloat32(0.0f)) ? joint->GetBody0()->m_index : 0;
+		ndInt32 m1 = (joint->GetBody1()->GetInvMass() > ndFloat32(0.0f)) ? joint->GetBody1()->m_index : 0;
+		if (m0 > m_bodies.GetCount())
+		{
+			m0 *= 1;
+			ndAssert(0);
+		}
+		if (m1 > m_bodies.GetCount())
+		{
+			m1 *= 1;
+			ndAssert(0);
+		}
+	}
+#endif
 }
 
 void ndIkSolver::SolverBegin(ndSkeletonContainer* const skeleton, ndJointBilateralConstraint* const* joints, ndInt32 jointCount, ndWorld* const world, ndFloat32 timestep)
@@ -461,6 +484,7 @@ void ndIkSolver::SolverEnd()
 	m_world->m_ikModelLock.Unlock();
 }
 
+#pragma optimize( "", off )
 void ndIkSolver::Solve()
 {
 	if (m_skeleton)
@@ -520,7 +544,49 @@ void ndIkSolver::Solve()
 			}
 		}
 
+
+#if 1
+		for (ndInt32 i = 0; i < m_skeleton->m_rowCount; ++i)
+		{
+			ndConstraint* const joint = (ndConstraint*)m_skeleton->m_pairs[i].m_joint;
+
+			ndInt32 m0 = (joint->GetBody0()->GetInvMass() > ndFloat32(0.0f)) ? joint->GetBody0()->m_index : 0;
+			ndInt32 m1 = (joint->GetBody1()->GetInvMass() > ndFloat32(0.0f)) ? joint->GetBody1()->m_index : 0;
+			if (m0 > m_bodies.GetCount())
+			{
+				m0 *= 1;
+				ndAssert(0);
+			}
+			if (m1 > m_bodies.GetCount())
+			{
+				m1 *= 1;
+				ndAssert(0);
+			}
+		}
+#endif
+
 		m_skeleton->SolveImmediate(*this);
+
+#if 1
+		for (ndInt32 i = 0; i < m_skeleton->m_rowCount; ++i)
+		{
+			ndConstraint* const joint = (ndConstraint*)m_skeleton->m_pairs[i].m_joint;
+
+			ndInt32 m0 = (joint->GetBody0()->GetInvMass() > ndFloat32(0.0f)) ? joint->GetBody0()->m_index : 0;
+			ndInt32 m1 = (joint->GetBody1()->GetInvMass() > ndFloat32(0.0f)) ? joint->GetBody1()->m_index : 0;
+			if (m0 > m_bodies.GetCount())
+			{
+				m0 *= 1;
+				ndAssert(0);
+			}
+			if (m1 > m_bodies.GetCount())
+			{
+				m1 *= 1;
+				ndAssert(0);
+			}
+		}
+#endif
+
 
 		for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
 		{
