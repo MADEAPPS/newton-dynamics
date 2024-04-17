@@ -174,8 +174,8 @@ class ndWorld: public ndClassAlloc
 	ndSpecialList<ndModel> m_deletedModels;
 	ndSpecialList<ndJointBilateralConstraint> m_deletedJoints;
 	ndArray<ndSkeletonContainer*> m_activeSkeletons;
-	ndSpinLock m_ikModelLock;
 	ndSpinLock m_deletedLock;
+	ndReadWriteSpinLock m_ikModelLock;
 
 	ndFloat32 m_timestep;
 	ndFloat32 m_freezeAccel2;

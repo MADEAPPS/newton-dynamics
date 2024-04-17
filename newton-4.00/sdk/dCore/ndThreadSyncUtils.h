@@ -220,8 +220,8 @@ class ndReadWriteSpinLock
 	void ReadUnlock()
 	{
 		m_readLock.Lock();
-		ndAssert(m_writeActive >= 0);
 		m_writeActive--;
+		ndAssert(m_writeActive >= 0);
 		if (m_writeActive == 0)
 		{
 			m_writeLock.Unlock();
@@ -244,7 +244,6 @@ class ndReadWriteSpinLock
 	ndSpinLock m_writeLock;
 	ndInt32 m_writeActive;
 };
-
 
 /// Simple scope based spin lock.
 class ndScopeReadSpinLock

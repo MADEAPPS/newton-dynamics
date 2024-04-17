@@ -1062,7 +1062,7 @@ ndFloat32 ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::GetAverag
 	return m_averageScore.GetAverage();
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::SaveTrajectory(ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>* const agent)
 {
@@ -1173,14 +1173,15 @@ void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::BackPropagate(
 	m_optimizer->Update(this, m_weightedTrainer, -m_learnRate);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::OptimizeCritic()
 {
 	ndAtomic<ndInt32> iterator(0);
-	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * GetThreadCount());
+	ndBrainFixSizeVector<D_MAX_THREADS_COUNT> averageRewards;
 
-	ndBrainFixSizeVector<D_MAX_THREADS_COUNT + 1> averageRewards;
+	averageRewards.Set(ndBrainFloat(0.0f));
+	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * GetThreadCount());
 	const ndInt32 maxSteps = (m_trajectoryAccumulator.GetCount() + m_bashBufferSize - 1) & -m_bashBufferSize;
 	for (ndInt32 base = 0; base < maxSteps; base += m_bashBufferSize)
 	{
@@ -1215,7 +1216,6 @@ void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::OptimizeCritic
 			ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
 	
 			zeroObservations.Set(ndBrainFloat(0.0f));
-			averageRewards[threadIndex] = ndBrainFloat(0.0f);
 			for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
 			{
 				ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
@@ -1251,14 +1251,15 @@ void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::OptimizeCritic
 	m_averageScore.Update(averageSum / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
 	m_averageFramesPerEpisodes.Update(ndBrainFloat(m_trajectoryAccumulator.GetCount()) / ndBrainFloat(m_bashTrajectoryCount));
 
-	ndBrainFixSizeVector<D_MAX_THREADS_COUNT + 1> rewardVariance;
+	ndBrainFixSizeVector<D_MAX_THREADS_COUNT> rewardVariance;
+
+	rewardVariance.Set(ndBrainFloat(0.0f));
 	auto CalculateAdvantage = ndMakeObject::ndFunction([this, &iterator, &rewardVariance](ndInt32 threadIndex, ndInt32)
 	{
-		ndInt32 const count = m_trajectoryAccumulator.GetCount();
 		ndBrainFixSizeVector<actionDim> actions;
 		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex], m_baseValueWorkingBufferSize);
 
-		rewardVariance[threadIndex] = ndBrainFloat(0.0f);
+		ndInt32 const count = m_trajectoryAccumulator.GetCount();
 		for (ndInt32 i = iterator++; i < count; i = iterator++)
 		{
 			const ndBrainMemVector observation(&m_trajectoryAccumulator[i].m_observation[0], statesDim);
@@ -1280,13 +1281,21 @@ void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::OptimizeCritic
 
 	rewardVarianceSum /= ndBrainFloat(m_trajectoryAccumulator.GetCount());
 	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(rewardVarianceSum + ndBrainFloat(1.0e-6)));
+	ndInt32 newCount = m_trajectoryAccumulator.GetCount();
 	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
 	{
-		m_trajectoryAccumulator[i].m_reward *= invVariance;
+		const ndBrainFloat normalizedAdvantage = m_trajectoryAccumulator[i].m_reward * invVariance;
+		m_trajectoryAccumulator[i].m_reward = normalizedAdvantage;
+		if (ndAbs(normalizedAdvantage) < ndBrainFloat(0.01f))
+		{
+			m_trajectoryAccumulator[i] = m_trajectoryAccumulator[newCount - 1];
+			newCount--;
+		}
 	}
+	m_trajectoryAccumulator.SetCount(newCount);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::OptimizePolicy()
 {
@@ -1374,7 +1383,6 @@ void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::OptimizePolicy
 	m_optimizer->Update(this, m_weightedTrainer, -m_learnRate);
 }
 
-#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::Optimize()
 {
@@ -1382,7 +1390,7 @@ void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::Optimize()
 	OptimizePolicy();
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::OptimizeStep()
 {

@@ -63,6 +63,7 @@ class ndIkSolver: public ndClassAlloc
 	ndFloat32 m_invTimestep;
 	ndFloat32 m_maxAccel;
 	ndFloat32 m_maxAlpha;
+	bool m_hasCollisions;
 
 	friend class ndSkeletonContainer;
 };
