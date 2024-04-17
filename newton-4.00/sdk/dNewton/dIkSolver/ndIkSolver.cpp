@@ -30,12 +30,13 @@
 
 ndIkSolver::ndIkSolver()
 	:ndClassAlloc()
-	,m_sentinelBody()
 	,m_contacts(32)
 	,m_bodies(32)
 	,m_savedBodiesIndex(32)
 	,m_leftHandSide(128)
 	,m_rightHandSide(128)
+	,m_surrogateBodies(32)
+	,m_surrogates(32)
 	,m_world(nullptr)
 	,m_skeleton(nullptr)
 	,m_timestep(ndFloat32(0.0f))
@@ -44,11 +45,17 @@ ndIkSolver::ndIkSolver()
 	,m_maxAlpha(ndFloat32(1.0e4f))
 	,m_hasCollisions(false)
 {
-	m_sentinelBody.m_uniqueId = 0;
+	ndBodyKinematic* const sentinelBody = new ndBodyKinematic;
+	m_surrogateBodies.PushBack(sentinelBody);
+	sentinelBody->m_uniqueId = 0;
 }
 
 ndIkSolver::~ndIkSolver()
 {
+	for (ndInt32 i = m_surrogateBodies.GetCount() - 1; i >= 0; --i)
+	{
+		delete m_surrogateBodies[i];
+	}
 }
 
 void ndIkSolver::SetMaxAccel(ndFloat32 maxAccel, ndFloat32 maxAlpha)
@@ -270,10 +277,10 @@ void ndIkSolver::BuildMassMatrix()
 	m_rightHandSide.SetCount(0);
 	
 	const ndVector zero(ndVector::m_zero);
-	m_bodies.PushBack(&m_sentinelBody);
-	m_sentinelBody.m_index = 0;
-	m_sentinelBody.m_accel = zero;
-	m_sentinelBody.m_alpha = zero;
+	m_bodies.PushBack(m_surrogateBodies[0]);
+	m_surrogateBodies[0]->m_index = 0;
+	m_surrogateBodies[0]->m_accel = zero;
+	m_surrogateBodies[0]->m_alpha = zero;
 	
 	auto CopyOpenLoopBody = [this](ndBodyKinematic* const body)
 	{
@@ -342,7 +349,37 @@ void ndIkSolver::BuildMassMatrix()
 		CopyCloseLoopBody(body1);
 	}
 
+
+	auto CopyContactBody = [this](ndBodyKinematic* const body)
+	{
+		ndAssert(body->GetId() > 0);
+		if (body->GetInvMass() == ndFloat32(0.0f))
+		{
+			return;
+		}
+
+		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
+		{
+			if (body == m_bodies[i])
+			{
+				return;
+			}
+		}
+
+		ndUnsigned32 id = body->GetId();
+		m_bodies.PushBack(body);
+		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
+		{
+			if (id > m_bodies[i - 1]->GetId())
+			{
+				m_bodies[i] = body;
+				break;
+			}
+			m_bodies[i] = m_bodies[i - 1];
+		}
+	};
 	// add contacts loop bodies and joints
+	m_surrogates.SetCount(0);
 	bool hasCollisions = false;
 	for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 1; i >= 0 ; --i)
 	{
@@ -363,11 +400,12 @@ void ndIkSolver::BuildMassMatrix()
 				}
 				if (!duplicate)
 				{
+					xxxxxxxxxxxxxxxx
 					m_contacts.PushBack(contact);
 					ndBodyKinematic* const body0 = contact->GetBody0();
 					ndBodyKinematic* const body1 = contact->GetBody1();
-					CopyCloseLoopBody(body0);
-					CopyCloseLoopBody(body1);
+					CopyContactBody(body0);
+					CopyContactBody(body1);
 					const ndSkeletonContainer* const skel0 = body0->GetSkeleton();
 					const ndSkeletonContainer* const skel1 = body1->GetSkeleton();
 

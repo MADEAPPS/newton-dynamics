@@ -50,12 +50,20 @@ class ndIkSolver: public ndClassAlloc
 	void GetJacobianDerivatives(ndConstraint* const joint);
 	void BuildJacobianMatrix(ndConstraint* const joint); 
 
-	ndBodyKinematic m_sentinelBody;
+	class ndSurrogates
+	{
+		public:
+		ndContact* m_contact;
+		ndBodyKinematic* m_Body;
+	};
+
 	ndArray<ndContact*> m_contacts;
 	ndArray<ndBodyKinematic*> m_bodies;
 	ndArray<ndInt32> m_savedBodiesIndex;
 	ndArray<ndLeftHandSide> m_leftHandSide;
 	ndArray<ndRightHandSide> m_rightHandSide;
+	ndArray<ndBodyKinematic*> m_surrogateBodies;
+	ndArray<ndSurrogates> m_surrogates;
 	
 	ndWorld* m_world;
 	ndSkeletonContainer* m_skeleton;
