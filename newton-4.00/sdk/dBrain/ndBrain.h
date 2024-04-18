@@ -35,6 +35,9 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	ndBrain(const ndBrain& src);
 	~ndBrain();
 
+	void Save(ndBrainSave* const loadSave);
+	void SaveToFile(const char* const pathFilename);
+
 	ndInt32 GetInputSize() const;
 	ndInt32 GetOutputSize() const;
 	void CopyFrom(const ndBrain& src);

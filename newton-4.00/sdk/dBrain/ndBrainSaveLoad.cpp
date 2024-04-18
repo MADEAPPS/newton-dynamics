@@ -215,3 +215,31 @@ void ndBrainSave::Save(const ndBrain* const brain, const char* const pathName)
 	SaveAgent saveAgent(pathName);
 	saveAgent.Save(brain);
 }
+
+
+// *************************************************************************
+// 
+// *************************************************************************
+ndSaveToFile::ndSaveToFile(const char* const pathFilename)
+	:ndBrainSave()
+{
+	m_file = fopen(pathFilename, "wb");
+	ndAssert(m_file);
+}
+
+ndSaveToFile::~ndSaveToFile()
+{
+	if (m_file)
+	{
+		fclose(m_file);
+	}
+}
+
+void ndSaveToFile::WriteData(const char* const data) const
+{
+	if (m_file)
+	{
+		fprintf(m_file, "%s", data);
+	}
+}
+

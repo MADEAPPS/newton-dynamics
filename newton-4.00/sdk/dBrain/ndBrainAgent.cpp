@@ -34,39 +34,40 @@ ndBrainAgent::~ndBrainAgent()
 {
 }
 
-void ndBrainAgent::SaveToFile(const char* const pathFilename)
+void ndBrainAgent::SaveToFile(const char* const)
 {
-	class SaveAgent: public ndBrainSave
-	{
-		public:
-		SaveAgent(const char* const pathFilename)
-			:ndBrainSave()
-		{
-			m_file = fopen(pathFilename, "wb");
-			ndAssert(m_file);
-		}
-
-		~SaveAgent()
-		{
-			if (m_file)
-			{
-				fclose(m_file);
-			}
-		}
-
-		void WriteData(const char* const data) const
-		{
-			if (m_file)
-			{
-				fprintf(m_file, "%s", data);
-			}
-		}
-
-		FILE* m_file;
-	};
-
-	SaveAgent saveAgent(pathFilename);
-	Save(&saveAgent);
+	ndAssert(0);
+	//class SaveAgent: public ndBrainSave
+	//{
+	//	public:
+	//	SaveAgent(const char* const pathFilename)
+	//		:ndBrainSave()
+	//	{
+	//		m_file = fopen(pathFilename, "wb");
+	//		ndAssert(m_file);
+	//	}
+	//
+	//	~SaveAgent()
+	//	{
+	//		if (m_file)
+	//		{
+	//			fclose(m_file);
+	//		}
+	//	}
+	//
+	//	void WriteData(const char* const data) const
+	//	{
+	//		if (m_file)
+	//		{
+	//			fprintf(m_file, "%s", data);
+	//		}
+	//	}
+	//
+	//	FILE* m_file;
+	//};
+	//
+	//SaveAgent saveAgent(pathFilename);
+	//Save(&saveAgent);
 }
 
 

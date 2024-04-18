@@ -49,6 +49,17 @@ ndBrain::~ndBrain()
 	}
 }
 
+void ndBrain::SaveToFile(const char* const pathFilename)
+{
+	ndSaveToFile saveBrain(pathFilename);
+	saveBrain.Save(this);
+}
+
+void ndBrain::Save(ndBrainSave* const loadSave)
+{
+	loadSave->Save(this);
+}
+
 ndInt32 ndBrain::GetInputSize() const
 {
 	return GetCount() ? (*this)[0]->GetInputSize() : 0;

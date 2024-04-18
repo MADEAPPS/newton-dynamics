@@ -52,5 +52,14 @@ class ndBrainSave: public ndClassAlloc
 	static void Save(const ndBrain* const brain, const char* const pathName);
 };
 
+class ndSaveToFile : public ndBrainSave
+{
+	public:
+	ndSaveToFile(const char* const pathFilename);
+	virtual ~ndSaveToFile();
+	virtual void WriteData(const char* const data) const;
+
+	FILE* m_file;
+};
 #endif 
 

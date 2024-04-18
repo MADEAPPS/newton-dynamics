@@ -277,13 +277,8 @@ namespace ndQuadruped_1
 
 			ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>& master)
 				:ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(master)
-				,m_bestActor(*GetActor())
 				,m_basePose()
 				,m_model(nullptr)
-				,m_timer(ndGetTimeInMicroseconds())
-				,m_maxGain(-1.0e10f)
-				,m_lastEpisode(-1)
-				,m_modelIsTrained(false)
 			{
 			}
 
@@ -383,63 +378,8 @@ namespace ndQuadruped_1
 				//OptimizeStep();
 			}
 
-			//void OptimizeStep()
-			//{
-			//	ndAssert(0);
-			//	//ndInt32 stopTraining = GetFramesCount();
-			//	//if (stopTraining <= m_stopTraining)
-			//	//{
-			//	//	ndInt32 episodeCount = GetEposideCount();
-			//	//	ndBrainAgentContinueVPG_Trainer::OptimizeStep();
-			//	//
-			//	//	episodeCount -= GetEposideCount();
-			//	//	if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32(m_maxFrames))
-			//	//	{
-			//	//		if (m_averageScore.GetAverage() > m_maxGain)
-			//	//		{
-			//	//			if (m_lastEpisode != GetEposideCount())
-			//	//			{
-			//	//				m_bestActor.CopyFrom(m_actor);
-			//	//				m_maxGain = m_averageScore.GetAverage();
-			//	//				ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageScore.GetAverage());
-			//	//				m_lastEpisode = GetEposideCount();
-			//	//			}
-			//	//		}
-			//	//	}
-			//	//
-			//	//	if (episodeCount && !IsSampling())
-			//	//	{
-			//	//		ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", GetFramesCount(), m_averageScore.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-			//	//		if (m_outFile)
-			//	//		{
-			//	//			fprintf(m_outFile, "%g\n", m_averageScore.GetAverage());
-			//	//			fflush(m_outFile);
-			//	//		}
-			//	//	}
-			//	//
-			//	//	if (stopTraining >= m_stopTraining)
-			//	//	{
-			//	//		char fileName[1024];
-			//	//		m_modelIsTrained = true;
-			//	//		m_actor.CopyFrom(m_bestActor);
-			//	//		ndGetWorkingFileName(GetName().GetStr(), fileName);
-			//	//		SaveToFile(fileName);
-			//	//		ndExpandTraceMessage("saving to file: %s\n", fileName);
-			//	//		ndExpandTraceMessage("training complete\n");
-			//	//		ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-			//	//		ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-			//	//	}
-			//	//}
-			//}
-
-			ndBrain m_bestActor;
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
 			ndRobot* m_model;
-			ndUnsigned64 m_timer;
-			ndFloat32 m_maxGain;
-			ndInt32 m_maxFrames;
-			ndInt32 m_lastEpisode;
-			bool m_modelIsTrained;
 		};
 
 		ndRobot(ndSharedPtr<ndBrainAgent>& agent)
@@ -764,7 +704,6 @@ namespace ndQuadruped_1
 		{
 			m_animBlendTree->Update(timestep * m_control->m_animSpeed);
 			ndModelArticulation::PostUpdate(world, timestep);
-			//CheckTrainingCompleted();
 		}
 
 		ndAnimationPose m_animPose;
@@ -1010,13 +949,17 @@ namespace ndQuadruped_1
 		TrainingUpdata(ndDemoEntityManager* const scene, const ndMatrix& matrix)
 			:OnPostUpdate()
 			,m_master()
+			,m_bestActor()
 			,m_outFile(nullptr)
-			,m_maxFrames(3500)
+			,m_timer(ndGetTimeInMicroseconds())
+			,m_maxScore(ndFloat32 (-1.0e10f))
+			,m_maxFrames(6000)
+			,m_lastEpisode(-1)
 			,m_stopTraining(300 * 1000000)
+			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
-
-			//SetName(CONTROLLER_NAME);
+	
 			m_outFile = fopen("quadruped_1-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 
@@ -1032,6 +975,9 @@ namespace ndQuadruped_1
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 
 			m_master = ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> (new ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
+			m_bestActor = ndSharedPtr< ndBrain> (new ndBrain(*m_master->GetActor()));
+
+			m_master->SetName(CONTROLLER_NAME);
 
 			const ndInt32 countX = 6;
 			const ndInt32 countZ = 9;
@@ -1085,7 +1031,7 @@ namespace ndQuadruped_1
 		}
 
 		#pragma optimize( "", off )
-		virtual void Update(ndDemoEntityManager* const scene, ndFloat32 timestep)
+		virtual void Update(ndDemoEntityManager* const, ndFloat32)
 		{
 			ndInt32 stopTraining = m_master->GetFramesCount();
 			if (stopTraining <= m_stopTraining)
@@ -1096,17 +1042,16 @@ namespace ndQuadruped_1
 				episodeCount -= m_master->GetEposideCount();
 				if (m_master->GetAverageFrames() >= ndFloat32(m_maxFrames))
 				{
-					ndAssert(0);
-			//		if (m_averageScore.GetAverage() > m_maxGain)
-			//		{
-			//			if (m_lastEpisode != GetEposideCount())
-			//			{
-			//				m_bestActor.CopyFrom(m_actor);
-			//				m_maxGain = m_averageScore.GetAverage();
-			//				ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageScore.GetAverage());
-			//				m_lastEpisode = GetEposideCount();
-			//			}
-			//		}
+					if (m_master->GetAverageScore() > m_maxScore)
+					{
+						if (m_lastEpisode != m_master->GetEposideCount())
+						{
+							m_bestActor->CopyFrom(*m_master->GetActor());
+							m_maxScore = m_master->GetAverageScore();
+							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", m_master->GetEposideCount(), m_master->GetAverageFrames(), m_master->GetAverageScore());
+							m_lastEpisode = m_master->GetEposideCount();
+						}
+					}
 				}
 			
 				if (episodeCount && !m_master->IsSampling())
@@ -1119,25 +1064,30 @@ namespace ndQuadruped_1
 					}
 				}
 			
-			//	if (stopTraining >= m_stopTraining)
-			//	{
-			//		char fileName[1024];
-			//		m_modelIsTrained = true;
-			//		m_actor.CopyFrom(m_bestActor);
-			//		ndGetWorkingFileName(GetName().GetStr(), fileName);
-			//		SaveToFile(fileName);
-			//		ndExpandTraceMessage("saving to file: %s\n", fileName);
-			//		ndExpandTraceMessage("training complete\n");
-			//		ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-			//		ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-			//	}
+				if (stopTraining >= m_stopTraining)
+				{
+					char fileName[1024];
+					m_modelIsTrained = true;
+					m_master->GetActor()->CopyFrom(*(*m_bestActor));
+					ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
+					m_master->GetActor()->SaveToFile(fileName);
+					ndExpandTraceMessage("saving to file: %s\n", fileName);
+					ndExpandTraceMessage("training complete\n");
+					ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+					ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+				}
 			}
 		}
 
 		ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> m_master;
+		ndSharedPtr<ndBrain> m_bestActor;
 		FILE* m_outFile;
+		ndUnsigned64 m_timer;
+		ndFloat32 m_maxScore;
 		ndInt32 m_maxFrames;
+		ndInt32 m_lastEpisode;
 		ndInt32 m_stopTraining;
+		bool m_modelIsTrained;
 	};
 }
 

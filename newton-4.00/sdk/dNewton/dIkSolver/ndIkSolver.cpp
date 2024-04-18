@@ -400,7 +400,7 @@ void ndIkSolver::BuildMassMatrix()
 				}
 				if (!duplicate)
 				{
-					xxxxxxxxxxxxxxxx
+					ndTrace("xxxxxxxx\n");
 					m_contacts.PushBack(contact);
 					ndBodyKinematic* const body0 = contact->GetBody0();
 					ndBodyKinematic* const body1 = contact->GetBody1();
