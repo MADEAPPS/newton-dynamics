@@ -374,8 +374,6 @@ namespace ndQuadruped_1
 			void Step()
 			{
 				ndBrainAgentContinueVPG_Trainer::Step();
-				//ndTrace(("xxxxxxxx\n"));
-				//OptimizeStep();
 			}
 
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
@@ -982,7 +980,7 @@ namespace ndQuadruped_1
 			//const ndInt32 countX = 6;
 			//const ndInt32 countZ = 9;
 
-			const ndInt32 countX = 2;
+			const ndInt32 countX = 1;
 			const ndInt32 countZ = 2;
 
 			ndMatrix location(matrix);

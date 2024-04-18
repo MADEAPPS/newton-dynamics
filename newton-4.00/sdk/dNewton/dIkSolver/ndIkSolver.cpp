@@ -432,10 +432,11 @@ void ndIkSolver::BuildMassMatrix()
 							}
 							if (surrogateBodiesIndex == m_surrogateBodies.GetCount())
 							{
-								ndBodyDynamic* const surrogate = new ndBodyDynamic();
-								m_surrogateBodies.PushBack(surrogate);
+								ndBodyDynamic* const surrogateBody = new ndBodyDynamic();
+								m_surrogateBodies.PushBack(surrogateBody);
 							}
 							ndBodyDynamic* const surrogateBody = m_surrogateBodies[surrogateBodiesIndex];
+							m_bodies.PushBack(surrogateBody);
 							surrogateBodiesIndex++;
 							surrogateBody->GetDataForIkSolver(body);
 							return surrogateBody;
@@ -450,12 +451,12 @@ void ndIkSolver::BuildMassMatrix()
 
 						if (contact->GetBody0() == extraBody)
 						{
-							//contact->SetBodies(surrogateBody, body1);
+							contact->SetBodies(surrogateBody, body1);
 						}
 						else
 						{
 							ndAssert(contact->GetBody1() == extraBody);
-							//contact->SetBodies(body0, surrogateBody);
+							contact->SetBodies(body0, surrogateBody);
 						}
 					}
 				}
@@ -552,12 +553,12 @@ void ndIkSolver::SolverEnd()
 		ndContact* const contact = surrogate.m_contact;
 		if (contact->GetBody0() == surrogate.m_surrogate)
 		{
-			//contact->SetBodies(surrogate.m_body, contact->GetBody1());
+			contact->SetBodies(surrogate.m_body, contact->GetBody1());
 		}
 		else
 		{
-			//ndAssert(contact->GetBody1() == surrogate.m_surrogate);
-			//contact->SetBodies(contact->GetBody0(), surrogate.m_body);
+			ndAssert(contact->GetBody1() == surrogate.m_surrogate);
+			contact->SetBodies(contact->GetBody0(), surrogate.m_body);
 		}
 	}
 	
