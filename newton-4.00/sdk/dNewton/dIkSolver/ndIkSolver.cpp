@@ -269,6 +269,7 @@ bool ndIkSolver::IsSleeping(ndSkeletonContainer* const skeleton) const
 //	return body->m_alpha;
 //}
 
+#pragma optimize( "", off )
 void ndIkSolver::BuildMassMatrix()
 {
 	m_bodies.SetCount(0);
@@ -337,6 +338,7 @@ void ndIkSolver::BuildMassMatrix()
 		}
 	};
 
+
 	// add close loop 
 	for (ndInt32 i = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount - 1; i >= 0; --i)
 	{
@@ -348,7 +350,6 @@ void ndIkSolver::BuildMassMatrix()
 		CopyCloseLoopBody(body0);
 		CopyCloseLoopBody(body1);
 	}
-
 
 	auto CopyContactBody = [this](ndBodyKinematic* const body)
 	{
@@ -378,6 +379,39 @@ void ndIkSolver::BuildMassMatrix()
 			m_bodies[i] = m_bodies[i - 1];
 		}
 	};
+
+	//auto CopySurrogateBody = [this](ndBodyKinematic* const body)
+	//{
+	//	ndAssert(body->GetId() > 0);
+	//	if (body->GetInvMass() == ndFloat32(0.0f))
+	//	{
+	//		ndAssert(0);
+	//		return;
+	//	}
+	//
+	//	for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
+	//	{
+	//		if (body == m_bodies[i])
+	//		{
+	//			ndAssert(0);
+	//			return;
+	//		}
+	//	}
+	//
+	//	ndUnsigned32 id = body->GetId();
+	//	m_bodies.PushBack(body);
+	//	for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
+	//	{
+	//		if (id > m_bodies[i - 1]->GetId())
+	//		{
+	//			m_bodies[i] = body;
+	//			break;
+	//		}
+	//		m_bodies[i] = m_bodies[i - 1];
+	//	}
+	//};
+
+
 	// add contacts loop bodies and joints
 	m_surrogates.SetCount(0);
 	bool hasCollisions = false;
@@ -404,16 +438,23 @@ void ndIkSolver::BuildMassMatrix()
 					m_contacts.PushBack(contact);
 					ndBodyKinematic* const body0 = contact->GetBody0();
 					ndBodyKinematic* const body1 = contact->GetBody1();
-					CopyContactBody(body0);
-					CopyContactBody(body1);
 					const ndSkeletonContainer* const skel0 = body0->GetSkeleton();
 					const ndSkeletonContainer* const skel1 = body1->GetSkeleton();
 
+					CopyContactBody(body0);
+					CopyContactBody(body1);
 					hasCollisions = hasCollisions || (!skel0);
 					hasCollisions = hasCollisions || (skel0 && (skel0 != m_skeleton));
 
 					hasCollisions = hasCollisions || (skel1 && (skel1 != m_skeleton));
 					hasCollisions = hasCollisions || (!skel1 && (body1->GetInvMass() > ndFloat32(0.0f)));
+
+					ndBodyKinematic* const extraBody = (skel0 == m_skeleton) ? body0 : body1;
+					if (extraBody->GetInvMass() > ndFloat32(0.0f))
+					{
+						ndAssert(0);
+						return;
+					}
 				}
 			}
 		}

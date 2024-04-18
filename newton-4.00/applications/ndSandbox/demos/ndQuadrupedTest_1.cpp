@@ -1012,24 +1012,6 @@ namespace ndQuadruped_1
 			}
 		}
 
-		void CheckTrainingCompleted()
-		{
-			//if (m_agent->IsTrainer())
-			//{
-			//	ndControllerAgent_trainer* const agent = (ndControllerAgent_trainer*)*m_agent;
-			//	if (agent->m_modelIsTrained)
-			//	{
-			//		char fileName[1024];
-			//		ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
-			//		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-			//		m_agent = ndSharedPtr<ndBrainAgent>(new ndRobot::ndController(actor));
-			//		((ndRobot::ndController*)*m_agent)->SetModel(this);
-			//		//ResetModel();
-			//		((ndPhysicsWorld*)m_world)->NormalUpdates();
-			//	}
-			//}
-		}
-
 		#pragma optimize( "", off )
 		virtual void Update(ndDemoEntityManager* const, ndFloat32)
 		{
