@@ -54,7 +54,8 @@ class ndIkSolver: public ndClassAlloc
 	{
 		public:
 		ndContact* m_contact;
-		ndBodyKinematic* m_Body;
+		ndBodyDynamic* m_body;
+		ndBodyDynamic* m_surrogate;
 	};
 
 	ndArray<ndContact*> m_contacts;
@@ -62,7 +63,7 @@ class ndIkSolver: public ndClassAlloc
 	ndArray<ndInt32> m_savedBodiesIndex;
 	ndArray<ndLeftHandSide> m_leftHandSide;
 	ndArray<ndRightHandSide> m_rightHandSide;
-	ndArray<ndBodyKinematic*> m_surrogateBodies;
+	ndArray<ndBodyDynamic*> m_surrogateBodies;
 	ndArray<ndSurrogates> m_surrogates;
 	
 	ndWorld* m_world;

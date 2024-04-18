@@ -438,3 +438,16 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 		}
 	}
 }
+
+void ndBodyDynamic::GetDataForIkSolver(const ndBodyKinematic* const srcBody)
+{
+	ndBodyKinematic::GetDataForIkSolver(srcBody);
+	const ndBodyDynamic* const src = ((ndBodyKinematic*)srcBody)->GetAsBodyDynamic();
+
+	m_externalForce = src->m_externalForce;
+	m_externalTorque = src->m_externalTorque;
+	m_impulseForce = src->m_impulseForce;
+	m_impulseTorque = src->m_impulseTorque;
+	m_savedExternalForce = src->m_savedExternalForce;
+	m_savedExternalTorque = src->m_savedExternalTorque;
+}

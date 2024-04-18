@@ -67,6 +67,8 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API ndFloat32 GetSleepAccel() const;
 	D_NEWTON_API void SetSleepAccel(ndFloat32 accelMag2);
 
+	D_NEWTON_API virtual void GetDataForIkSolver(const ndBodyKinematic* const src);
+
 	virtual ndVector GetForce() const;
 	virtual ndVector GetTorque() const;
 	

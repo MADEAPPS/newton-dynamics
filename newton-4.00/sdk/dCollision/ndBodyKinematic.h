@@ -131,8 +131,10 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API ndJacobian CalculateNetForce() const;
 	D_COLLISION_API ndMatrix CalculateInertiaMatrix() const;
 	D_COLLISION_API virtual ndMatrix CalculateInvInertiaMatrix() const;
+	D_COLLISION_API virtual void GetDataForIkSolver(const ndBodyKinematic* const src);
 	D_COLLISION_API virtual void SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia);
 	D_COLLISION_API void SetMassMatrix(ndFloat32 mass, const ndShapeInstance& shapeInstance, bool fullInertia = false);
+
 	
 	void UpdateInvInertiaMatrix();
 	void SetMassMatrix(const ndVector& massMatrix);
@@ -539,5 +541,6 @@ inline void ndBodyKinematic::SetAcceleration(const ndVector&, const ndVector&)
 	m_accel = ndVector::m_zero;
 	m_alpha = ndVector::m_zero;
 }
+
 #endif 
 

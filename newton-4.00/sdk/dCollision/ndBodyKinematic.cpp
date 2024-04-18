@@ -765,3 +765,26 @@ void ndBodyKinematic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32)
 		}
 	}
 }
+
+void ndBodyKinematic::GetDataForIkSolver(const ndBodyKinematic* const src)
+{
+	m_veloc = src->m_veloc;
+	m_omega = src->m_omega;
+	m_matrix = src->m_matrix;
+	m_localCentreOfMass = src->m_localCentreOfMass;
+	m_globalCentreOfMass = src->m_globalCentreOfMass;
+
+	m_mass = src->m_mass;
+	m_accel = src->m_accel;
+	m_alpha = src->m_alpha;
+	m_invMass = src->m_invMass;
+	m_gyroAlpha = src->m_gyroAlpha;
+	m_gyroTorque = src->m_gyroTorque;
+	m_gyroRotation = src->m_gyroRotation;
+	m_invWorldInertiaMatrix = src->m_invWorldInertiaMatrix;
+
+#ifdef D_USE_FULL_INERTIA
+	m_inertiaPrincipalAxis = src->m_inertiaPrincipalAxis;
+#endif
+}
+
