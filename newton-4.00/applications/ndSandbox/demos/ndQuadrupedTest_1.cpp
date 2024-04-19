@@ -953,7 +953,7 @@ namespace ndQuadruped_1
 			,m_maxScore(ndFloat32 (-1.0e10f))
 			,m_maxFrames(6000)
 			,m_lastEpisode(-1)
-			,m_stopTraining(300 * 1000000)
+			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -977,11 +977,11 @@ namespace ndQuadruped_1
 
 			m_master->SetName(CONTROLLER_NAME);
 
-			//const ndInt32 countX = 6;
-			//const ndInt32 countZ = 9;
+			const ndInt32 countX = 6;
+			const ndInt32 countZ = 9;
 
-			const ndInt32 countX = 1;
-			const ndInt32 countZ = 2;
+			//const ndInt32 countX = 2;
+			//const ndInt32 countZ = 2;
 
 			ndMatrix location(matrix);
 			location.m_posit.m_z -= countZ * x0 * 0.5f;
@@ -1014,7 +1014,7 @@ namespace ndQuadruped_1
 		}
 
 		#pragma optimize( "", off )
-		virtual void Update(ndDemoEntityManager* const, ndFloat32)
+		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
 			ndInt32 stopTraining = m_master->GetFramesCount();
 			if (stopTraining <= m_stopTraining)
@@ -1046,19 +1046,20 @@ namespace ndQuadruped_1
 						fflush(m_outFile);
 					}
 				}
-			
-				if (stopTraining >= m_stopTraining)
-				{
-					char fileName[1024];
-					m_modelIsTrained = true;
-					m_master->GetActor()->CopyFrom(*(*m_bestActor));
-					ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
-					m_master->GetActor()->SaveToFile(fileName);
-					ndExpandTraceMessage("saving to file: %s\n", fileName);
-					ndExpandTraceMessage("training complete\n");
-					ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-					ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-				}
+			}
+
+			if (stopTraining >= m_stopTraining)
+			{
+				char fileName[1024];
+				m_modelIsTrained = true;
+				m_master->GetActor()->CopyFrom(*(*m_bestActor));
+				ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
+				m_master->GetActor()->SaveToFile(fileName);
+				ndExpandTraceMessage("saving to file: %s\n", fileName);
+				ndExpandTraceMessage("training complete\n");
+				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+				ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+				manager->Terminate();
 			}
 		}
 
