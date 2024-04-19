@@ -173,6 +173,8 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	void GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues);
 	void GetJoystickButtons (ndFixSizeArray<char, 32>& axisbuttons);
 
+	void Terminate();
+
 	bool GetCaptured () const;
 	bool GetMouseKeyState (ndInt32 button ) const;
 	ndInt32 Print (const ndVector& color, const char *fmt, ... ) const;
@@ -276,6 +278,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	bool m_synchronousParticlesUpdate;
 	bool m_showRaycastHit;
 	bool m_profilerMode;
+	bool m_terminate;
 
 	ndWorld::ndSolverModes m_solverMode;
 

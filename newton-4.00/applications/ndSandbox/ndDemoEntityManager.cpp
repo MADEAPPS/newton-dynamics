@@ -292,6 +292,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_synchronousParticlesUpdate(false)
 	,m_showRaycastHit(false)
 	,m_profilerMode(false)
+	,m_terminate(false)
 	,m_solverMode(ndWorld::ndSimdSoaSolver)
 	,m_colorRenderPass(new ndColorRenderPass())
 	,m_shadowRenderPass(new ndShadowMapRenderPass())
@@ -436,7 +437,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
 	//m_solverPasses = 4;
-	m_workerThreads = 10;
+	m_workerThreads = 2;
 	//m_solverSubSteps = 2;
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
@@ -515,6 +516,11 @@ ndDemoEntityManager::~ndDemoEntityManager ()
 
 	glfwDestroyWindow(m_mainFrame);
 	glfwTerminate();
+}
+
+void ndDemoEntityManager::Terminate()
+{
+	m_terminate = true;
 }
 
 #ifdef _DEBUG
@@ -1168,7 +1174,7 @@ void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, ndInt32 key, ndI
 		manager->m_profilerMode = true;
 	}
 
-	if (key == GLFW_KEY_ESCAPE) 
+	if ((key == GLFW_KEY_ESCAPE) || manager->m_terminate)
 	{
 		glfwSetWindowShouldClose (window, 1);
 	}
