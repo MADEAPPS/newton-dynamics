@@ -165,6 +165,16 @@ void ndDemoEntity::SetName(const ndString& name)
 	m_name = name;
 }
 
+void ndDemoEntity::Hide()
+{
+	m_isVisible = false;
+}
+
+void ndDemoEntity::UnHide()
+{
+	m_isVisible = true;
+}
+
 void ndDemoEntity::SetShadowMode(bool mode)
 {
 	m_castShadow = mode;

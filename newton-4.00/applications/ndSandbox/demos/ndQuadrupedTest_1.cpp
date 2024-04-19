@@ -17,6 +17,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
@@ -963,11 +964,11 @@ namespace ndQuadruped_1
 
 			ndFloat32 x0 = 3.0f;
 			ndFloat32 z0 = 3.0f;
-			//const ndInt32 countX = 6;
-			//const ndInt32 countZ = 9;
+			const ndInt32 countX = 6;
+			const ndInt32 countZ = 9;
 
-			const ndInt32 countX = 2;
-			const ndInt32 countZ = 2;
+			//const ndInt32 countX = 2;
+			//const ndInt32 countZ = 2;
 
 
 			ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
@@ -983,7 +984,6 @@ namespace ndQuadruped_1
 
 			m_master->SetName(CONTROLLER_NAME);
 
-
 			ndMatrix location(matrix);
 			location.m_posit.m_z -= countZ * x0 * 0.5f;
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -994,9 +994,16 @@ namespace ndQuadruped_1
 					ndSharedPtr<ndModel> model(BuildModel(scene, location, m_master));
 					world->AddModel(model);
 					location.m_posit.m_x += x0;
+					HideModel(model);
 				}
 				location.m_posit.m_z += z0;
 			}
+
+			location = matrix;
+			location.m_posit.m_x -= 3.0f;
+			ndSharedPtr<ndModel> model(BuildModel(scene, location, m_master));
+			world->AddModel(model);
+
 
 			const ndModelList& modelList = world->GetModelList();
 			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, modelList.GetFirst()->GetInfo()));
@@ -1011,6 +1018,30 @@ namespace ndQuadruped_1
 			if (m_outFile)
 			{
 				fclose(m_outFile);
+			}
+		}
+
+		void HideModel(ndSharedPtr<ndModel>& model)
+		{
+			ndRobot* const robot = (ndRobot*)*model;
+
+			ndModelArticulation::ndNode* stackMem[128];
+			ndInt32 stack = 1;
+			stackMem[0] = robot->GetRoot();
+			while (stack)
+			{
+				stack--;
+				ndModelArticulation::ndNode* const node = stackMem[stack];
+				ndBody* const body = *node->m_body;
+				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
+				ndDemoEntity* const ent = userData->m_entity;
+				ent->Hide();
+
+				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+				{
+					stackMem[stack] = child;
+					stack++;
+				}
 			}
 		}
 

@@ -66,6 +66,9 @@ class ndDemoEntity: public ndNodeHierarchy<ndDemoEntity>
 	bool CastShadow() const;
 	void SetShadowMode(bool mode);
 
+	void Hide();
+	void UnHide();
+
 	virtual void RenderShadowMap(ndShadowMapRenderPass* const shadowMap, const ndMatrix& matrix);
 
 	protected:
