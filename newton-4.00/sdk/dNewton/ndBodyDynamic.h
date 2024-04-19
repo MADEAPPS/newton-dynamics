@@ -49,6 +49,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API virtual void ApplyExternalForces(ndInt32 threadIndex, ndFloat32 timestep);
 	D_NEWTON_API virtual void AddDampingAcceleration(ndFloat32 timestep);
 	D_NEWTON_API virtual void IntegrateVelocity(ndFloat32 timestep);
+	D_NEWTON_API virtual void InitSurrogateBody(ndBodyKinematic* const surrogate) const;
 
 	D_NEWTON_API void SetForce(const ndVector& force);
 	D_NEWTON_API void SetTorque(const ndVector& torque);
@@ -66,8 +67,6 @@ class ndBodyDynamic: public ndBodyKinematic
 
 	D_NEWTON_API ndFloat32 GetSleepAccel() const;
 	D_NEWTON_API void SetSleepAccel(ndFloat32 accelMag2);
-
-	D_NEWTON_API virtual void GetDataForIkSolver(const ndBodyKinematic* const src);
 
 	virtual ndVector GetForce() const;
 	virtual ndVector GetTorque() const;

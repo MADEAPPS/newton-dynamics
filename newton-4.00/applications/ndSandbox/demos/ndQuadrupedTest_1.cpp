@@ -963,6 +963,12 @@ namespace ndQuadruped_1
 
 			ndFloat32 x0 = 3.0f;
 			ndFloat32 z0 = 3.0f;
+			//const ndInt32 countX = 6;
+			//const ndInt32 countZ = 9;
+
+			const ndInt32 countX = 2;
+			const ndInt32 countZ = 2;
+
 
 			ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			
@@ -977,11 +983,6 @@ namespace ndQuadruped_1
 
 			m_master->SetName(CONTROLLER_NAME);
 
-			const ndInt32 countX = 6;
-			const ndInt32 countZ = 9;
-
-			//const ndInt32 countX = 2;
-			//const ndInt32 countZ = 2;
 
 			ndMatrix location(matrix);
 			location.m_posit.m_z -= countZ * x0 * 0.5f;

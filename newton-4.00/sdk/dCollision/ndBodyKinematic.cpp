@@ -766,25 +766,25 @@ void ndBodyKinematic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32)
 	}
 }
 
-void ndBodyKinematic::GetDataForIkSolver(const ndBodyKinematic* const src)
+void ndBodyKinematic::InitSurrogateBody(ndBodyKinematic* const surrogate) const
 {
-	m_veloc = src->m_veloc;
-	m_omega = src->m_omega;
-	m_matrix = src->m_matrix;
-	m_localCentreOfMass = src->m_localCentreOfMass;
-	m_globalCentreOfMass = src->m_globalCentreOfMass;
-
-	m_mass = src->m_mass;
-	m_accel = src->m_accel;
-	m_alpha = src->m_alpha;
-	m_invMass = src->m_invMass;
-	m_gyroAlpha = src->m_gyroAlpha;
-	m_gyroTorque = src->m_gyroTorque;
-	m_gyroRotation = src->m_gyroRotation;
-	m_invWorldInertiaMatrix = src->m_invWorldInertiaMatrix;
-
-#ifdef D_USE_FULL_INERTIA
-	m_inertiaPrincipalAxis = src->m_inertiaPrincipalAxis;
-#endif
+	surrogate->m_veloc = m_veloc;
+	surrogate->m_omega = m_omega;
+	surrogate->m_matrix = m_matrix;
+	surrogate->m_localCentreOfMass = m_localCentreOfMass;
+	surrogate->m_globalCentreOfMass = m_globalCentreOfMass;
+	
+	surrogate->m_mass = m_mass;
+	surrogate->m_accel = m_accel;
+	surrogate->m_alpha = m_alpha;
+	surrogate->m_invMass = m_invMass;
+	surrogate->m_gyroAlpha = m_gyroAlpha;
+	surrogate->m_gyroTorque = m_gyroTorque;
+	surrogate->m_gyroRotation = m_gyroRotation;
+	surrogate->m_invWorldInertiaMatrix = m_invWorldInertiaMatrix;
+	
+	#ifdef D_USE_FULL_INERTIA
+		surrogate->m_inertiaPrincipalAxis = m_inertiaPrincipalAxis;
+	#endif
 }
 

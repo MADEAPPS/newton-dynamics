@@ -70,6 +70,26 @@ void ndContact::SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const b
 	ndAssert(m_body0->GetInvMass() > ndFloat32(0.0f));
 }
 
+void ndContact::InitSurrogateContact(ndContact* const surrogate, ndBodyKinematic* const body0, ndBodyKinematic* const body1) const
+{
+	ndAssert(m_body0->GetInvMass() > ndFloat32(0.0f));
+	surrogate->m_body0 = body0;
+	surrogate->m_body1 = body1;
+
+	surrogate->m_forceBody0 = m_forceBody0;
+	surrogate->m_forceBody1 = m_forceBody1;
+	surrogate->m_torqueBody0 = m_torqueBody0;
+	surrogate->m_torqueBody1 = m_torqueBody1;
+
+	surrogate->m_active = m_active;
+	surrogate->m_contacPointsList.RemoveAll();
+	for (ndContactPointList::ndNode* node = m_contacPointsList.GetFirst(); node; node = node->GetNext())
+	{
+		const ndContactMaterial& contact = node->GetInfo();
+		surrogate->m_contacPointsList.Append(contact);
+	}
+}
+
 void ndContact::AttachToBodies()
 {
 	m_isAttached = true;

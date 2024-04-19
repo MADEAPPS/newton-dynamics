@@ -114,6 +114,8 @@ class ndContact: public ndConstraint
 	bool IsTestOnly() const;
 	bool IsInTrigger() const;
 	bool IsSkeletonSelftCollision() const;
+
+	D_COLLISION_API void InitSurrogateContact(ndContact* const surrogate, ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 	
 	private:
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);

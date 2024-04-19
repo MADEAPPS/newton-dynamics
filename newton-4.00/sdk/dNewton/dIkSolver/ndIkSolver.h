@@ -65,7 +65,6 @@ class ndIkSolver: public ndClassAlloc
 	ndArray<ndLeftHandSide> m_leftHandSide;
 	ndArray<ndRightHandSide> m_rightHandSide;
 	
-	//ndArray<ndSurrogates> m_surrogates;
 	ndArray<ndContact*> m_surrogateContact;
 	ndArray<ndBodyDynamic*> m_surrogateBodies;
 	
@@ -75,7 +74,6 @@ class ndIkSolver: public ndClassAlloc
 	ndFloat32 m_invTimestep;
 	ndFloat32 m_maxAccel;
 	ndFloat32 m_maxAlpha;
-	bool m_hasCollisions;
 
 	friend class ndSkeletonContainer;
 };
