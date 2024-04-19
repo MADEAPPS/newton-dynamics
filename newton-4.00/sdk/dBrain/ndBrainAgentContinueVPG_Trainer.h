@@ -669,10 +669,14 @@ void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::OptimizeCritic
 	ndInt32 newCount = m_trajectoryAccumulator.GetCount();
 	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
 	{
-		const ndBrainFloat normalizedAdvantage = m_trajectoryAccumulator[i].m_reward * invVariance;
+		// clamp any advantage larger than two standard deviations.
+		const ndBrainFloat normalizedAdvantage = ndClamp (m_trajectoryAccumulator[i].m_reward * invVariance, ndBrainFloat(-2.0f), ndBrainFloat(2.0f));
 		m_trajectoryAccumulator[i].m_reward = normalizedAdvantage;
-		if (ndAbs(normalizedAdvantage) < ndBrainFloat(0.01f))
+
+		// accions within 0.1 standard deviation, are not changed
+		if (ndAbs(normalizedAdvantage) < ndBrainFloat(0.1f))
 		{
+
 			m_trajectoryAccumulator[i] = m_trajectoryAccumulator[newCount - 1];
 			newCount--;
 		}
