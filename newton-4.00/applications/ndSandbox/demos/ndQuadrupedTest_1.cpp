@@ -25,7 +25,7 @@ namespace ndQuadruped_1
 {
 	#define ND_TRAIN_MODEL
 
-	class ndLegObsevation
+	class ndLegObservation
 	{
 		public:
 		ndBrainFloat m_posit_x;
@@ -44,10 +44,10 @@ namespace ndQuadruped_1
 		ndBrainFloat m_z;
 	};
 
-	class ndObsevationVector
+	class ndObservationVector
 	{
 		public:
-		ndLegObsevation n_legs[4];
+		ndLegObservation n_legs[4];
 		ndActionVector m_torso;
 	};
 
@@ -61,8 +61,8 @@ namespace ndQuadruped_1
 	//#define D_SWING_STEP			ndReal(0.01f)
 	#define D_SWING_STEP			ndReal(0.005f)
 
-	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObsevationVector) / sizeof (ndBrainFloat))
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
+	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
 	class ndRobot : public ndModelArticulation
 	{
@@ -368,7 +368,7 @@ namespace ndQuadruped_1
 				}
 				m_model->m_animBlendTree->SetTime(0.0f);
 
-				//ndObsevationVector observation;
+				//ndObservationVector observation;
 				//m_model->GetObservation((ndBrainFloat*) &observation);
 			}
 
@@ -621,7 +621,7 @@ namespace ndQuadruped_1
 
 		void GetObservation(ndBrainFloat* const observationInput)
 		{
-			ndObsevationVector& observation = *((ndObsevationVector*)observationInput);
+			ndObservationVector& observation = *((ndObservationVector*)observationInput);
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];

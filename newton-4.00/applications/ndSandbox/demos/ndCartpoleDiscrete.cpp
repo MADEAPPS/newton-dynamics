@@ -23,7 +23,7 @@
 namespace ndCarpole_0
 {
 	//#define D_TRAIN_AGENT
-
+#if 0
 	#define D_USE_VANILLA_POLICY_GRAD
 
 	#ifdef D_USE_VANILLA_POLICY_GRAD
@@ -473,24 +473,26 @@ namespace ndCarpole_0
 		#endif	
 		return model;
 	}
+#endif
 }
 
 using namespace ndCarpole_0;
 
 void ndCartpoleDiscrete(ndDemoEntityManager* const scene)
 {
-	BuildFlatPlane(scene, true);
-
-	ndSetRandSeed(42);
-	ndWorld* const world = scene->GetWorld();
-	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-
-	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	world->AddModel(model);
-
-	matrix.m_posit.m_x -= 0.0f;
-	matrix.m_posit.m_y += 0.5f;
-	matrix.m_posit.m_z += 2.0f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
-	scene->SetCameraMatrix(rotation, matrix.m_posit);
+	ndAssert(0);
+	//BuildFlatPlane(scene, true);
+	//
+	//ndSetRandSeed(42);
+	//ndWorld* const world = scene->GetWorld();
+	//ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
+	//
+	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	//world->AddModel(model);
+	//
+	//matrix.m_posit.m_x -= 0.0f;
+	//matrix.m_posit.m_y += 0.5f;
+	//matrix.m_posit.m_z += 2.0f;
+	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
+	//scene->SetCameraMatrix(rotation, matrix.m_posit);
 }

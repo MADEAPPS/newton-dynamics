@@ -37,26 +37,26 @@
 template<ndInt32 statesDim, ndInt32 actionDim> class ndBrainAgentContinueVPG_TrainerMaster;
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-class ndTrajectoryStep
+class ndTrajectoryStepContinue
 {
 	public:
-	ndTrajectoryStep()
+	ndTrajectoryStepContinue()
 		:m_reward(ndBrainFloat(0.0f))
 		,m_action()
 		,m_observation()
 	{
 	}
 
-	ndTrajectoryStep(const ndTrajectoryStep& src)
+	ndTrajectoryStepContinue(const ndTrajectoryStepContinue& src)
 		:m_reward(src.m_reward)
 	{
 		ndMemCpy(m_action, src.m_action, actionDim);
 		ndMemCpy(m_observation, src.m_observation, statesDim);
 	}
 
-	ndTrajectoryStep& operator=(const ndTrajectoryStep& src)
+	ndTrajectoryStepContinue& operator=(const ndTrajectoryStepContinue& src)
 	{
-		new (this) ndTrajectoryStep(src);
+		new (this) ndTrajectoryStepContinue(src);
 		return*this;
 	}
 
@@ -86,7 +86,7 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent
 	virtual void Step();
 
 	ndBrainVector m_workingBuffer;
-	ndArray<ndTrajectoryStep<statesDim, actionDim>> m_trajectory;
+	ndArray<ndTrajectoryStepContinue<statesDim, actionDim>> m_trajectory;
 	ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>> m_master;
 
 	friend class ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>;
@@ -174,7 +174,7 @@ class ndBrainAgentContinueVPG_TrainerMaster : public ndBrainThreadPool
 	ndBrainOptimizerAdam* m_baseLineValueOptimizer;
 	ndArray<ndBrainTrainer*> m_baseLineValueTrainers;
 	ndArray<ndInt32> m_trajectoryAccumulatorScans;
-	ndArray<ndTrajectoryStep<statesDim, actionDim>> m_trajectoryAccumulator;
+	ndArray<ndTrajectoryStepContinue<statesDim, actionDim>> m_trajectoryAccumulator;
 	
 	ndBrainFloat m_sigma;
 	ndBrainFloat m_gamma;
@@ -257,7 +257,7 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrain
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::Step()
 {
-	ndTrajectoryStep<statesDim, actionDim> trajectoryStep;
+	ndTrajectoryStepContinue<statesDim, actionDim> trajectoryStep;
 
 	ndBrainMemVector actions(&trajectoryStep.m_action[0], actionDim);
 	ndBrainMemVector observation(&trajectoryStep.m_observation[0], statesDim);
@@ -507,7 +507,7 @@ void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::BackPropagate(
 
 				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 				{
-					const ndTrajectoryStep<statesDim, actionDim>& trajectoryStep = m_agent->m_trajectoryAccumulator[m_index];
+					const ndTrajectoryStepContinue<statesDim, actionDim>& trajectoryStep = m_agent->m_trajectoryAccumulator[m_index];
 					ndBrainFloat logProbAdvantage = trajectoryStep.m_reward * m_invSigmaSquare;
 					for (ndInt32 i = actionDim - 1; i >= 0; --i)
 					{
@@ -720,7 +720,7 @@ void ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::OptimizePolicy
 
 				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 				{
-					const ndTrajectoryStep<statesDim, actionDim>& trajectoryStep = m_agent->m_trajectoryAccumulator[m_index];
+					const ndTrajectoryStepContinue<statesDim, actionDim>& trajectoryStep = m_agent->m_trajectoryAccumulator[m_index];
 					ndBrainFloat logProbAdvantage = trajectoryStep.m_reward * m_invSigmaSquare;
 					for (ndInt32 i = actionDim - 1; i >= 0; --i)
 					{
