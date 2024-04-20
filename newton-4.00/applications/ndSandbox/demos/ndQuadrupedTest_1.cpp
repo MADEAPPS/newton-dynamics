@@ -759,23 +759,25 @@ namespace ndQuadruped_1
 		ndSharedPtr<ndModel> m_model;
 	};
 
+	#ifdef ND_TRAIN_MODEL
 	ndSharedPtr<ndBrainAgent> BuildAgent(ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>& master)
 	{
-		#ifdef ND_TRAIN_MODEL
 		// add a reinforcement learning controller 
-	
 		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(master));
-		#else
+		return agent;
+	}
+	#else
+	ndSharedPtr<ndBrainAgent> BuildAgent()
+	{
 		char fileName[1024];
 		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
 		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
 		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndController(actor));
-		#endif
 		return agent;
 	}
+	#endif
 
-	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation, 
-		ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> master)
+	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation, ndSharedPtr<ndBrainAgent> agent)
 	{
 		ndFloat32 mass = 20.0f;
 		ndFloat32 radius = 0.25f;
@@ -783,7 +785,6 @@ namespace ndQuadruped_1
 		ndFloat32 limbLength = 0.3f;
 		ndFloat32 limbRadios = 0.05f;
 
-		ndSharedPtr<ndBrainAgent> agent(BuildAgent(master));
 		ndRobot* const model = new ndRobot(agent);
 
 		ndPhysicsWorld* const world = scene->GetWorld();
@@ -942,6 +943,7 @@ namespace ndQuadruped_1
 		return model;
 	}
 
+	#ifdef ND_TRAIN_MODEL
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
 	{
 		public:
@@ -954,7 +956,7 @@ namespace ndQuadruped_1
 			,m_maxScore(ndFloat32 (-1.0e10f))
 			,m_maxFrames(6000)
 			,m_lastEpisode(-1)
-			,m_stopTraining(500 * 1000000)
+			,m_stopTraining(350 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -991,7 +993,8 @@ namespace ndQuadruped_1
 				location.m_posit.m_x = matrix.m_posit.m_x;
 				for (ndInt32 j = 0; j < countX; ++j)
 				{
-					ndSharedPtr<ndModel> model(BuildModel(scene, location, m_master));
+					ndSharedPtr<ndBrainAgent> agent(BuildAgent(m_master));
+					ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
 					world->AddModel(model);
 					location.m_posit.m_x += x0;
 					HideModel(model);
@@ -1001,7 +1004,8 @@ namespace ndQuadruped_1
 
 			location = matrix;
 			location.m_posit.m_x -= 3.0f;
-			ndSharedPtr<ndModel> model(BuildModel(scene, location, m_master));
+			ndSharedPtr<ndBrainAgent> agent(BuildAgent(m_master));
+			ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
 			world->AddModel(model);
 
 
@@ -1104,6 +1108,7 @@ namespace ndQuadruped_1
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;
 	};
+	#endif
 }
 
 using namespace ndQuadruped_1;
@@ -1133,7 +1138,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		scene->RegisterPostUpdate(trainer);
 	#else
 		ndWorld* const world = scene->GetWorld();
-		ndSharedPtr<ndModel> model(BuildModel(scene, matrix));
+		ndSharedPtr<ndModel> model(BuildModel(scene, matrix, BuildAgent()));
 		world->AddModel(model);
 
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));

@@ -273,7 +273,7 @@ bool ndIkSolver::IsSleeping(ndSkeletonContainer* const skeleton) const
 //	return body->m_alpha;
 //}
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndIkSolver::BuildMassMatrix()
 {
 	m_bodies.SetCount(0);
