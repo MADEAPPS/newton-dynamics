@@ -278,7 +278,6 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	bool m_synchronousParticlesUpdate;
 	bool m_showRaycastHit;
 	bool m_profilerMode;
-	bool m_terminate;
 
 	ndWorld::ndSolverModes m_solverMode;
 

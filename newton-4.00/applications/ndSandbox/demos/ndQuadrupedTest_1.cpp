@@ -1045,7 +1045,6 @@ namespace ndQuadruped_1
 			}
 		}
 
-		#pragma optimize( "", off )
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
 			ndInt32 stopTraining = m_master->GetFramesCount();
