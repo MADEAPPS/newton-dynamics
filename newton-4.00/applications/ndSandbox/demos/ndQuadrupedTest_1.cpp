@@ -984,6 +984,14 @@ namespace ndQuadruped_1
 
 			m_master->SetName(CONTROLLER_NAME);
 
+			ndSharedPtr<ndBrainAgent> visualAgent(BuildAgent(m_master));
+			ndSharedPtr<ndModel> visualModel(BuildModel(scene, matrix, visualAgent));
+			world->AddModel(visualModel);
+
+			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, visualModel));
+			scene->Set2DDisplayRenderFunction(quadrupedUI);
+
+			// add a hidden battery of model to generate trajectories in parallel
 			ndMatrix location(matrix);
 			location.m_posit.m_z -= countZ * separation * 0.5f;
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -999,15 +1007,6 @@ namespace ndQuadruped_1
 				}
 				location.m_posit.m_z += separation;
 			}
-
-			location = matrix;
-			location.m_posit.m_x -= separation;
-			ndSharedPtr<ndBrainAgent> agent(BuildAgent(m_master));
-			ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
-			world->AddModel(model);
-
-			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model));
-			scene->Set2DDisplayRenderFunction(quadrupedUI);
 		}
 
 		~TrainingUpdata()
