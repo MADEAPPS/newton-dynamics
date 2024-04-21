@@ -1008,9 +1008,6 @@ namespace ndQuadruped_1
 
 			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model));
 			scene->Set2DDisplayRenderFunction(quadrupedUI);
-
-			//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-			//world->AddJoint(fixJoint);
 		}
 
 		~TrainingUpdata()
