@@ -959,7 +959,7 @@ namespace ndQuadruped_1
 			,m_maxScore(ndFloat32 (-1.0e10f))
 			,m_maxFrames(6000)
 			,m_lastEpisode(-1)
-			,m_stopTraining(500 * 1000000)
+			,m_stopTraining(1000 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -967,14 +967,9 @@ namespace ndQuadruped_1
 			m_outFile = fopen("quadruped_1-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			ndFloat32 x0 = 3.0f;
-			ndFloat32 z0 = 3.0f;
+			const ndFloat32 separation = 4.0f;
 			const ndInt32 countX = 6;
 			const ndInt32 countZ = 9;
-
-			//const ndInt32 countX = 2;
-			//const ndInt32 countZ = 2;
-
 
 			ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			
@@ -990,7 +985,7 @@ namespace ndQuadruped_1
 			m_master->SetName(CONTROLLER_NAME);
 
 			ndMatrix location(matrix);
-			location.m_posit.m_z -= countZ * x0 * 0.5f;
+			location.m_posit.m_z -= countZ * separation * 0.5f;
 			for (ndInt32 i = 0; i < countZ; ++i)
 			{
 				location.m_posit.m_x = matrix.m_posit.m_x;
@@ -999,21 +994,19 @@ namespace ndQuadruped_1
 					ndSharedPtr<ndBrainAgent> agent(BuildAgent(m_master));
 					ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
 					world->AddModel(model);
-					location.m_posit.m_x += x0;
+					location.m_posit.m_x += separation;
 					HideModel(model);
 				}
-				location.m_posit.m_z += z0;
+				location.m_posit.m_z += separation;
 			}
 
 			location = matrix;
-			location.m_posit.m_x -= 3.0f;
+			location.m_posit.m_x -= separation;
 			ndSharedPtr<ndBrainAgent> agent(BuildAgent(m_master));
 			ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
 			world->AddModel(model);
 
-
-			const ndModelList& modelList = world->GetModelList();
-			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, modelList.GetFirst()->GetInfo()));
+			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model));
 			scene->Set2DDisplayRenderFunction(quadrupedUI);
 
 			//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
