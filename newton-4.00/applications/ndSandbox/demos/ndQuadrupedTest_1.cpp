@@ -368,6 +368,9 @@ namespace ndQuadruped_1
 				}
 				m_model->m_animBlendTree->SetTime(0.0f);
 
+				ndFloat32 animationSpeed = ndRand() * 4.0f;
+				m_model->m_control->m_animSpeed = animationSpeed;
+
 				//ndObservationVector observation;
 				//m_model->GetObservation((ndBrainFloat*) &observation);
 			}
@@ -604,7 +607,7 @@ namespace ndQuadruped_1
 			//m_control->m_animSpeed = 2.0f;
 			//m_control->m_animSpeed = 1.0f;
 			//m_control->m_animSpeed = 0.5f;
-			m_control->m_animSpeed = 0.25f;
+			//m_control->m_animSpeed = 0.25f;
 			//m_control->m_animSpeed = 0.1f;
 
 			//m_control->m_enableController = 0;
