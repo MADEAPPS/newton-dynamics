@@ -89,6 +89,10 @@ class ndBrainAgentContinueVPG_Trainer : public ndBrainAgent
 	ndArray<ndTrajectoryStepContinue<statesDim, actionDim>> m_trajectory;
 	ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>> m_master;
 
+	mutable std::random_device m_rd;
+	mutable std::mt19937 m_gen;
+	mutable std::normal_distribution<ndFloat32> m_d;
+
 	friend class ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>;
 };
 
@@ -96,7 +100,6 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentContinueVPG_TrainerMaster : public ndBrainThreadPool
 {
 	public:
-
 	class HyperParameters
 	{
 		public:
@@ -146,11 +149,6 @@ class ndBrainAgentContinueVPG_TrainerMaster : public ndBrainThreadPool
 	//bool IsTrainer() const;
 	ndInt32 GetFramesCount() const;
 	ndInt32 GetEposideCount() const;
-	//ndInt32 GetEpisodeFrames() const;
-	
-	//void InitWeights();
-	//void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
-	//bool IsTerminal() const;
 
 	bool IsSampling() const;
 	ndFloat32 GetAverageScore() const;
@@ -192,10 +190,8 @@ class ndBrainAgentContinueVPG_TrainerMaster : public ndBrainThreadPool
 	ndMovingAverage<32> m_averageScore;
 	ndMovingAverage<32> m_averageFramesPerEpisodes;
 	ndString m_name;
-	//mutable std::random_device m_rd;
-	//mutable std::mt19937 m_gen;
-	//mutable std::normal_distribution<ndFloat32> m_d;
 	ndList<ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>*> m_agents;
+
 	friend class ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>;
 };
 
@@ -205,6 +201,9 @@ ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::ndBrainAgentContinueVPG_T
 	,m_workingBuffer()
 	,m_trajectory()
 	,m_master(master)
+	,m_rd()
+	,m_gen(m_rd())
+	,m_d(ndFloat32(0.0f), ndFloat32(1.0f))
 {
 	m_master->m_agents.Append(this);
 	m_trajectory.SetCount(m_master->m_maxTrajectorySteps + m_master->m_extraTrajectorySteps);
@@ -248,7 +247,8 @@ void ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrain
 
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
-		ndBrainFloat sample = ndBrainFloat(ndGaussianRandom(actions[i], m_master->m_sigma));
+		//ndBrainFloat sample = ndBrainFloat(ndGaussianRandom(actions[i], m_master->m_sigma));
+		ndBrainFloat sample = ndBrainFloat(actions[i] + m_d(m_gen) * m_master->m_sigma);
 		ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = squashedAction;
 	}
@@ -305,10 +305,6 @@ ndBrainAgentContinueVPG_TrainerMaster<statesDim, actionDim>::ndBrainAgentContinu
 	,m_averageScore()
 	,m_averageFramesPerEpisodes()
 	,m_agents()
-	
-	//, m_rd()
-	//, m_gen(m_rd())
-	//, m_d(ndFloat32(0.0f), ndFloat32(1.0f))
 {
 	// build neural net
 	SetThreadCount(hyperParameters.m_threadsCount);
