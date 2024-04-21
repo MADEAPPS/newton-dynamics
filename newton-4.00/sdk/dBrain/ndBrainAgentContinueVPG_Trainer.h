@@ -187,8 +187,8 @@ class ndBrainAgentContinueVPG_TrainerMaster : public ndBrainThreadPool
 	ndInt32 m_bashTrajectoryCount;
 	ndInt32 m_baseValueWorkingBufferSize;
 	ndBrainVector m_workingBuffer;
-	ndMovingAverage<32> m_averageScore;
-	ndMovingAverage<32> m_averageFramesPerEpisodes;
+	ndMovingAverage<8> m_averageScore;
+	ndMovingAverage<8> m_averageFramesPerEpisodes;
 	ndString m_name;
 	ndList<ndBrainAgentContinueVPG_Trainer<statesDim, actionDim>*> m_agents;
 
