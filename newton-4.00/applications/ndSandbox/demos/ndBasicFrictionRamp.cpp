@@ -71,7 +71,6 @@ class FrictionMaterial : public ndApplicationMaterial
 	ndFloat32 m_soundSpeed;
 };
 
-
 static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMatrix& matrix, ndSharedPtr<ndDemoMeshInterface> geometry, const ndShapeInstance& shape, ndFloat32 mass)
 {
 	ndBodyKinematic* const body = new ndBodyDynamic();

@@ -661,6 +661,8 @@ void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, 
 	const ndUnsigned8 test0 = ndUnsigned8(!body0->m_equilibrium);
 	const ndUnsigned8 fowardTest = forward ? ndUnsigned8(1) : ndUnsigned8(0);
 
+	ndBodyNotify* const notify = body0->GetNotifyCallback();
+
 	pool[0] = node;
 	ndInt32 stack = 1;
 	while (stack && (stack < (D_SCENE_MAX_STACK_DEPTH - 16)))
@@ -676,21 +678,13 @@ void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, 
 				
 				ndBodyKinematic* const body1 = rootNode->GetBody();
 				ndAssert(body1);
-				//if (body1->m_sceneEquilibrium | fowardTest)
-				//{
-				//	const ndUnsigned8 test1 = ndUnsigned8(!body1->m_equilibrium);
-				//	const ndUnsigned8 test = ndUnsigned8(test0 | test1);
-				//
-				//	const ndUnsigned8 test__ = ndUnsigned8((body1->m_sceneEquilibrium | fowardTest) & (test0 | ndUnsigned8(!body1->m_equilibrium)));
-				//	if (test)
-				//	{
-				//		AddPair(body0, body1, threadId);
-				//	}
-				//}
 				const ndUnsigned8 test = ndUnsigned8((body1->m_sceneEquilibrium | fowardTest) & (test0 | ndUnsigned8(!body1->m_equilibrium)));
 				if (test)
 				{
-					AddPair(body0, body1, threadId);
+					if (notify->OnSceneAabbOverlap(body1))
+					{
+						AddPair(body0, body1, threadId);
+					}
 				}
 			}
 			else 
@@ -870,7 +864,6 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 			if (distance < D_NARROW_PHASE_DIST)
 			{
 				CalculateJointContacts(threadIndex, contact);
-				//if (contact->m_maxDOF || contact->m_isIntersetionTestOnly)
 				if (contact->m_maxDof || contact->m_isIntersetionTestOnly)
 				{
 					contact->SetActive(true);

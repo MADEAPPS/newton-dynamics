@@ -64,6 +64,11 @@ void ndBodyNotify::OnTransform(ndInt32, const ndMatrix&)
 {
 }
 
+bool ndBodyNotify::OnSceneAabbOverlap(const ndBody* const) const
+{
+	return true;
+}
+
 void ndBodyNotify::OnApplyExternalForce(ndInt32, ndFloat32)
 {
 	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();

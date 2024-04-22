@@ -791,7 +791,8 @@ namespace ndQuadruped_1
 		ndRobot* const model = new ndRobot(agent);
 
 		ndPhysicsWorld* const world = scene->GetWorld();
-		ndVector floor(FindFloor(*world, matrixLocation.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		//ndVector floor(FindFloor(*world, matrixLocation.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		ndVector floor(matrixLocation.m_posit);
 		ndSharedPtr<ndBody> torso(world->GetBody(AddSphere(scene, matrixLocation, mass, radius, "smilli.tga")));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(torso);
 		
@@ -967,9 +968,12 @@ namespace ndQuadruped_1
 			m_outFile = fopen("quadruped_1-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			const ndFloat32 separation = 4.0f;
+			//const ndInt32 countX = 2;
+			//const ndInt32 countZ = 2;
 			const ndInt32 countX = 6;
 			const ndInt32 countZ = 9;
+			//const ndFloat32 separation = 4.0f;
+			const ndFloat32 separation = 0.0f;
 
 			ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			
@@ -984,9 +988,11 @@ namespace ndQuadruped_1
 
 			m_master->SetName(CONTROLLER_NAME);
 
+			ndInt32 materialId = 1;
 			ndSharedPtr<ndBrainAgent> visualAgent(BuildAgent(m_master));
 			ndSharedPtr<ndModel> visualModel(BuildModel(scene, matrix, visualAgent));
 			world->AddModel(visualModel);
+			SetMaterial(visualModel, materialId);
 
 			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, visualModel));
 			scene->Set2DDisplayRenderFunction(quadrupedUI);
@@ -994,16 +1000,20 @@ namespace ndQuadruped_1
 			// add a hidden battery of model to generate trajectories in parallel
 			ndMatrix location(matrix);
 			location.m_posit.m_z -= countZ * separation * 0.5f;
+
+			ndFloat32 x0 = matrix.m_posit.m_x + separation;
 			for (ndInt32 i = 0; i < countZ; ++i)
 			{
-				location.m_posit.m_x = matrix.m_posit.m_x;
+				location.m_posit.m_x = x0;
 				for (ndInt32 j = 0; j < countX; ++j)
 				{
 					ndSharedPtr<ndBrainAgent> agent(BuildAgent(m_master));
 					ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
 					world->AddModel(model);
 					location.m_posit.m_x += separation;
-					HideModel(model);
+					//HideModel(model);
+					materialId++;
+					SetMaterial(model, materialId);
 				}
 				location.m_posit.m_z += separation;
 			}
@@ -1017,7 +1027,7 @@ namespace ndQuadruped_1
 			}
 		}
 
-		void HideModel(ndSharedPtr<ndModel>& model)
+		void HideModel(ndSharedPtr<ndModel>& model) const
 		{
 			ndRobot* const robot = (ndRobot*)*model;
 
@@ -1040,6 +1050,63 @@ namespace ndQuadruped_1
 				}
 			}
 		}
+
+		class InvisibleBodyNotify : public ndDemoEntityNotify
+		{
+			public:
+			InvisibleBodyNotify(const ndDemoEntityNotify* const src)
+				:ndDemoEntityNotify(*src)
+			{
+			}
+
+			virtual bool OnSceneAabbOverlap(const ndBody* const otherBody) const
+			{
+				const ndBodyKinematic* const body0 = ((ndBody*)GetBody())->GetAsBodyKinematic();
+				const ndBodyKinematic* const body1 = ((ndBody*)otherBody)->GetAsBodyKinematic();
+				const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
+				const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
+				if (instanceShape0.m_shapeMaterial.m_userParam[0].m_intData != instanceShape1.m_shapeMaterial.m_userParam[0].m_intData)
+				{
+					bool test = instanceShape0.m_shapeMaterial.m_userParam[0].m_intData == 0;
+					test = test || (instanceShape1.m_shapeMaterial.m_userParam[0].m_intData == 0);
+					return test;
+				}
+				return true;
+			}
+		};
+
+		void SetMaterial(ndSharedPtr<ndModel>& model, ndInt32 id) const
+		{
+			ndRobot* const robot = (ndRobot*)*model;
+
+			ndModelArticulation::ndNode* stackMem[128];
+			ndInt32 stack = 1;
+			stackMem[0] = robot->GetRoot();
+			while (stack)
+			{
+				stack--;
+				ndModelArticulation::ndNode* const node = stackMem[stack];
+				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+			
+				ndShapeInstance& instanceShape = body->GetCollisionShape();
+				instanceShape.m_shapeMaterial.m_userParam[0].m_intData = ndUnsigned64 (id);
+				instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+
+				ndDemoEntityNotify* const originalNotify = (ndDemoEntityNotify*)body->GetNotifyCallback();
+				void* const useData = originalNotify->m_entity;
+				originalNotify->m_entity = nullptr;
+				InvisibleBodyNotify* const notify = new InvisibleBodyNotify((InvisibleBodyNotify*)body->GetNotifyCallback());
+				body->SetNotifyCallback(notify);
+				notify->m_entity = (ndDemoEntity*)useData;
+
+				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+				{
+					stackMem[stack] = child;
+					stack++;
+				}
+			}
+		}
+
 
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{

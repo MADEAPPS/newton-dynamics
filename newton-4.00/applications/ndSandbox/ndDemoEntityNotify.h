@@ -41,7 +41,9 @@ class ndDemoEntityNotify : public ndModelNotify
 	//	}
 	//};
 
+	ndDemoEntityNotify(const ndDemoEntityNotify& notify);
 	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody = nullptr, ndFloat32 gravity = DEMO_GRAVITY);
+
 	virtual ~ndDemoEntityNotify();
 
 	void* GetUserData() const

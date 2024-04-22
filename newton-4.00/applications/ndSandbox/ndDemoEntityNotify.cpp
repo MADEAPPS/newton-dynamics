@@ -23,6 +23,13 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDem
 	//static ndDemoEntityNotifyFileLoadSave registerClass;
 }
 
+ndDemoEntityNotify::ndDemoEntityNotify(const ndDemoEntityNotify& notify)
+	:ndModelNotify(notify)
+	,m_entity(notify.m_entity)
+	,m_manager(notify.m_manager)
+{
+}
+
 ndDemoEntityNotify::~ndDemoEntityNotify()
 {
 	if (m_entity)
