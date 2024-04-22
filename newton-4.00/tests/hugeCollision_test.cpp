@@ -59,6 +59,7 @@ TEST(Extremes, OrbitalCollisions)
 		movingbody->SetMatrix(matrix);
 		movingbody->SetMassMatrix(ndFloat32(10), shapeinst);
 		movingbody->SetVelocity(ndVector(ndFloat32(9000), ndFloat32(0), ndFloat32(0), ndFloat32(0)));
+		movingbody->SetDebugMaxLinearAndAngularIntegrationStep(10.0f, 10000.0f);
 		//movingbody->SetDebugMaxLinearAndAngularIntegrationStep(ndPi, 2.0f);
 		ndSharedPtr<ndBody> movingPtr(movingbody);
 		world.AddBody(movingPtr);

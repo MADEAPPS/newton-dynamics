@@ -681,7 +681,8 @@ void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, 
 				const ndUnsigned8 test = ndUnsigned8((body1->m_sceneEquilibrium | fowardTest) & (test0 | ndUnsigned8(!body1->m_equilibrium)));
 				if (test)
 				{
-					if (notify->OnSceneAabbOverlap(body1))
+					//if (notify->OnSceneAabbOverlap(body1))
+					if (!notify || notify->OnSceneAabbOverlap(body1))
 					{
 						AddPair(body0, body1, threadId);
 					}
