@@ -112,10 +112,10 @@ class ndBrainAgentContinueVPG_TrainerMaster : public ndBrainThreadPool
 			m_extraTrajectorySteps = 1024 * 2;
 			m_hiddenLayersNumberOfNeurons = 64;
 
-			//ndBrainFloat sigma2 = ndBrainFloat(0.05f);
+			ndBrainFloat sigma2 = ndBrainFloat(0.05f);
 			//ndBrainFloat sigma2 = ndBrainFloat(0.1f);
-			//ndBrainFloat sigma2 = ndBrainFloat (0.125f);
-			ndBrainFloat sigma2 = ndBrainFloat(0.25f);
+			//ndBrainFloat sigma2 = ndBrainFloat (0.15f);
+			//ndBrainFloat sigma2 = ndBrainFloat(0.2f);
 
 			m_sigma = ndSqrt(sigma2);
 
