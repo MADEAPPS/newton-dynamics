@@ -124,7 +124,10 @@ namespace ndQuadruped_1
 				ndAssert(param >= ndFloat32(0.0f));
 				ndAssert(param <= ndFloat32(1.0f));
 
-				ndFloat32 omega = ndPi / m_gaitFraction;
+				//ndFloat32 omega = ndPi / m_gaitFraction;
+
+				ndFloat32 gaitGuard = m_gaitFraction * 0.05f;
+				ndFloat32 omega = ndPi / (m_gaitFraction - ndFloat32(2.0f) * gaitGuard);
 				
 				ndFloat32 ycontact = D_POSE_REST_POSITION_Y + m_amp / 2.0f;
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
@@ -132,14 +135,12 @@ namespace ndQuadruped_1
 					output[i].m_userParamInt = 0;
 					output[i].m_posit = BasePose(i);
 					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
-					//t = m_gaitFraction / 2;
 					if (t <= m_gaitFraction)
 					{
-						//if (i == 1)
-						//if ((i == 0) || (i == 1))
-						//if ((i == 1) || (i == 2))
+						if ((t >= gaitGuard) && (t <= (m_gaitFraction - gaitGuard)))
 						{
-							output[i].m_posit.m_y += m_amp * ndSin(omega * t);
+							//output[i].m_posit.m_y += m_amp * ndSin(omega * t);
+							output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
 							output[i].m_userParamInt = output[i].m_posit.m_y < ycontact ? -1 : 1;
 						}
 					}
@@ -813,7 +814,7 @@ namespace ndQuadruped_1
 		ndFloat32 offset[] = { -0.3f, 0.3f, -0.3f, 0.3f };
 		
 		//ndFloat32 phase[] = { 0.0f, 0.25f, 0.5f, 0.75f };
-		ndFloat32 phase[] = { 0.0f, 0.5f, 0.75f, 0.25f};
+		ndFloat32 phase[] = { 0.0f, 0.75f, 0.25f, 0.5f};
 		ndSharedPtr<ndAnimationSequence> sequence(new ndRobot::ndPoseGenerator(0.24f, phase));
 		
 		model->m_poseGenerator = new ndAnimationSequencePlayer(sequence);
@@ -1194,7 +1195,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		world->AddModel(model);
 
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-		//	world->AddJoint(fixJoint);
+		//world->AddJoint(fixJoint);
 
 		ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model));
 		scene->Set2DDisplayRenderFunction(quadrupedUI);

@@ -289,19 +289,22 @@ void ndIkSolver::BuildMassMatrix()
 	
 	auto CopyOpenLoopBody = [this](ndBodyKinematic* const body)
 	{
-		ndAssert(body->GetId() > 0);
-		ndAssert(body->GetInvMass() > ndFloat32(0.0f));
-		ndUnsigned32 id = body->GetId();
-
-		m_bodies.PushBack(body);
-		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
+		if (body->GetInvMass() > ndFloat32(0.0f))
 		{
-			if (id > m_bodies[i - 1]->GetId())
+			ndAssert(body->GetId() > 0);
+			ndAssert(body->GetInvMass() > ndFloat32(0.0f));
+			ndUnsigned32 id = body->GetId();
+
+			m_bodies.PushBack(body);
+			for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
 			{
-				m_bodies[i] = body;
-				break;
+				if (id > m_bodies[i - 1]->GetId())
+				{
+					m_bodies[i] = body;
+					break;
+				}
+				m_bodies[i] = m_bodies[i - 1];
 			}
-			m_bodies[i] = m_bodies[i - 1];
 		}
 	};
 
@@ -356,12 +359,12 @@ void ndIkSolver::BuildMassMatrix()
 
 	auto CopyContactBody = [this](ndBodyKinematic* const body)
 	{
-		ndAssert(body->GetId() > 0);
 		if (body->GetInvMass() == ndFloat32(0.0f))
 		{
 			return;
 		}
 
+		ndAssert(body->GetId() > 0);
 		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
 		{
 			if (body == m_bodies[i])
@@ -370,8 +373,8 @@ void ndIkSolver::BuildMassMatrix()
 			}
 		}
 
-		ndUnsigned32 id = body->GetId();
 		m_bodies.PushBack(body);
+		ndUnsigned32 id = body->GetId();
 		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
 		{
 			if (id > m_bodies[i - 1]->GetId())
