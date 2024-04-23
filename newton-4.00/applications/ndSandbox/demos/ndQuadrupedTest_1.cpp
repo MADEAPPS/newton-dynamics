@@ -368,7 +368,8 @@ namespace ndQuadruped_1
 				}
 				m_model->m_animBlendTree->SetTime(0.0f);
 
-				ndFloat32 animationSpeed = ndRand() * 4.0f;
+				ndFloat32 randVar = ndRand();
+				ndFloat32 animationSpeed = randVar * randVar * randVar * 4.0f;
 				m_model->m_control->m_animSpeed = animationSpeed;
 
 				//ndObservationVector observation;
@@ -988,11 +989,11 @@ namespace ndQuadruped_1
 
 			m_master->SetName(CONTROLLER_NAME);
 
-			ndInt32 materialId = 1;
+			//ndInt32 materialId = 1;
 			ndSharedPtr<ndBrainAgent> visualAgent(BuildAgent(m_master));
 			ndSharedPtr<ndModel> visualModel(BuildModel(scene, matrix, visualAgent));
 			world->AddModel(visualModel);
-			SetMaterial(visualModel, materialId);
+			SetMaterial(visualModel);
 
 			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, visualModel));
 			scene->Set2DDisplayRenderFunction(quadrupedUI);
@@ -1011,9 +1012,8 @@ namespace ndQuadruped_1
 					ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
 					world->AddModel(model);
 					location.m_posit.m_x += separation;
-					//HideModel(model);
-					materialId++;
-					SetMaterial(model, materialId);
+					HideModel(model);
+					SetMaterial(model);
 				}
 				location.m_posit.m_z += separation;
 			}
@@ -1041,7 +1041,7 @@ namespace ndQuadruped_1
 				ndBody* const body = *node->m_body;
 				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
 				ndDemoEntity* const ent = userData->m_entity;
-				ent->Hide();
+				//ent->Hide();
 
 				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
 				{
@@ -1065,17 +1065,11 @@ namespace ndQuadruped_1
 				const ndBodyKinematic* const body1 = ((ndBody*)otherBody)->GetAsBodyKinematic();
 				const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
 				const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
-				if (instanceShape0.m_shapeMaterial.m_userParam[0].m_intData != instanceShape1.m_shapeMaterial.m_userParam[0].m_intData)
-				{
-					bool test = instanceShape0.m_shapeMaterial.m_userParam[0].m_intData == 0;
-					test = test || (instanceShape1.m_shapeMaterial.m_userParam[0].m_intData == 0);
-					return test;
-				}
-				return true;
+				return instanceShape0.m_shapeMaterial.m_userId != instanceShape1.m_shapeMaterial.m_userId;
 			}
 		};
 
-		void SetMaterial(ndSharedPtr<ndModel>& model, ndInt32 id) const
+		void SetMaterial(ndSharedPtr<ndModel>& model) const
 		{
 			ndRobot* const robot = (ndRobot*)*model;
 
@@ -1089,7 +1083,6 @@ namespace ndQuadruped_1
 				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
 			
 				ndShapeInstance& instanceShape = body->GetCollisionShape();
-				instanceShape.m_shapeMaterial.m_userParam[0].m_intData = ndUnsigned64 (id);
 				instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
 
 				ndDemoEntityNotify* const originalNotify = (ndDemoEntityNotify*)body->GetNotifyCallback();
