@@ -1041,7 +1041,7 @@ namespace ndQuadruped_1
 				ndBody* const body = *node->m_body;
 				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
 				ndDemoEntity* const ent = userData->m_entity;
-				//ent->Hide();
+				ent->Hide();
 
 				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
 				{
