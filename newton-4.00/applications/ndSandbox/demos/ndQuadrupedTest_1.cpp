@@ -812,8 +812,8 @@ namespace ndQuadruped_1
 		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
 		ndFloat32 offset[] = { -0.3f, 0.3f, -0.3f, 0.3f };
 		
-		//ndFloat32 phase[] = { 0.0f, 0.75f, 0.25f, 0.5f };
-		ndFloat32 phase[] = { 0.0f, 0.25f, 0.5f, 0.75f };
+		//ndFloat32 phase[] = { 0.0f, 0.25f, 0.5f, 0.75f };
+		ndFloat32 phase[] = { 0.0f, 0.5f, 0.75f, 0.25f};
 		ndSharedPtr<ndAnimationSequence> sequence(new ndRobot::ndPoseGenerator(0.24f, phase));
 		
 		model->m_poseGenerator = new ndAnimationSequencePlayer(sequence);
