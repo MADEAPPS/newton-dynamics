@@ -370,7 +370,10 @@ namespace ndQuadruped_1
 				m_model->m_animBlendTree->SetTime(0.0f);
 
 				ndFloat32 randVar = ndRand();
-				ndFloat32 animationSpeed = ndMax (randVar * randVar * randVar * 4.0f, 0.05f);
+				randVar = randVar * randVar * randVar;
+				ndFloat32 speed0 = ndFloat32(0.05f);
+				ndFloat32 speed1 = ndFloat32(1.0f);
+				ndFloat32 animationSpeed = speed0 +  (speed1 - speed0) * randVar;
 				m_model->m_control->m_animSpeed = animationSpeed;
 
 				//ndObservationVector observation;

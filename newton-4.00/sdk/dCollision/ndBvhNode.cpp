@@ -731,7 +731,7 @@ ndInt32 ndBvhSceneManager::BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode
 						ndInt32 m_depth;
 					};
 
-					ndBlockSegment stackPool[8];
+					ndBlockSegment stackPool[32];
 
 					ndInt32 stack = 1;
 					ndInt32 rootNodeIndex = newParentsDest[k].m_location;
