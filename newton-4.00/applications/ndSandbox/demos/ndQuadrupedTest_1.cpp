@@ -1016,7 +1016,7 @@ namespace ndQuadruped_1
 					ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
 					world->AddModel(model);
 					location.m_posit.m_x += separation;
-					HideModel(model);
+					//HideModel(model);
 					SetMaterial(model);
 				}
 				location.m_posit.m_z += separation;

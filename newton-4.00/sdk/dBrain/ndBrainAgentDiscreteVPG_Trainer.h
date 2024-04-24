@@ -1250,7 +1250,7 @@ void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::OptimizeCritic
 	rewardVariance.Set(ndBrainFloat(0.0f));
 	auto CalculateAdvantage = ndMakeObject::ndFunction([this, &iterator, &rewardVariance](ndInt32 threadIndex, ndInt32)
 	{
-		ndBrainFixSizeVector<actionDim> actions;
+		ndBrainFixSizeVector<1> actions;
 		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex], m_baseValueWorkingBufferSize);
 
 		ndInt32 const count = m_trajectoryAccumulator.GetCount();
