@@ -29,11 +29,11 @@
 #include "ndBrainReplayBuffer.h"
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-class ndBrainAgentContinueVPG: public ndBrainAgent
+class ndBrainAgentContinuePolicyGradient: public ndBrainAgent
 {
 	public:
-	ndBrainAgentContinueVPG(const ndSharedPtr<ndBrain>& actor);
-	~ndBrainAgentContinueVPG();
+	ndBrainAgentContinuePolicyGradient(const ndSharedPtr<ndBrain>& actor);
+	~ndBrainAgentContinuePolicyGradient();
 
 	void Step();
 
@@ -53,75 +53,75 @@ class ndBrainAgentContinueVPG: public ndBrainAgent
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentContinueVPG<statesDim, actionDim>::ndBrainAgentContinueVPG(const ndSharedPtr<ndBrain>& actor)
+ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::ndBrainAgentContinuePolicyGradient(const ndSharedPtr<ndBrain>& actor)
 	:ndBrainAgent()
 	,m_actor(actor)
 {
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentContinueVPG<statesDim, actionDim>::~ndBrainAgentContinueVPG()
+ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::~ndBrainAgentContinuePolicyGradient()
 {
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentContinueVPG<statesDim, actionDim>::IsTrainer() const
+bool ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::IsTrainer() const
 {
 	return false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentContinueVPG<statesDim, actionDim>::InitWeights()
+void ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::InitWeights()
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentContinueVPG<statesDim, actionDim>::InitWeights(ndBrainFloat, ndBrainFloat)
+void ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::InitWeights(ndBrainFloat, ndBrainFloat)
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentContinueVPG<statesDim, actionDim>::IsTerminal() const
+bool ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::IsTerminal() const
 {
 	ndAssert(0);
 	return false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentContinueVPG<statesDim, actionDim>::CalculateReward()
+ndBrainFloat ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::CalculateReward()
 {
 	ndAssert(0);
 	return ndBrainFloat(0.0f);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentContinueVPG<statesDim, actionDim>::ResetModel()
+void ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::ResetModel()
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentContinueVPG<statesDim, actionDim>::GetEpisodeFrames() const
+ndInt32 ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::GetEpisodeFrames() const
 {
 	ndAssert(0);
 	return 0;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentContinueVPG<statesDim, actionDim>::Save(ndBrainSave* const)
+void ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::Save(ndBrainSave* const)
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentContinueVPG<statesDim, actionDim>::OptimizeStep()
+void ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::OptimizeStep()
 {
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentContinueVPG<statesDim, actionDim>::Step()
+void ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::Step()
 {
 	ndInt32 bufferSize = m_actor->CalculateWorkingtBufferSize();
 	ndBrainFloat* const bufferMem = ndAlloca(ndBrainFloat, bufferSize);

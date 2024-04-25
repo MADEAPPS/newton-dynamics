@@ -645,7 +645,7 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::OptimizeStep()
 
 #else
 
-template<ndInt32 statesDim, ndInt32 actionDim> class ndBrainAgentDiscreteVPG_TrainerMaster;
+template<ndInt32 statesDim, ndInt32 actionDim> class ndBrainAgentDiscretePolicyGradient_TrainerMaster;
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndTrajectoryStepDiscrete
@@ -677,11 +677,11 @@ class ndTrajectoryStepDiscrete
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent
+class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 {
 	public:
-	ndBrainAgentDiscreteVPG_Trainer(ndSharedPtr<ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>>& master);
-	~ndBrainAgentDiscreteVPG_Trainer();
+	ndBrainAgentDiscretePolicyGradient_Trainer(ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>>& master);
+	~ndBrainAgentDiscretePolicyGradient_Trainer();
 
 	ndBrain* GetActor();
 	void SelectAction(ndBrainVector& actions) const;
@@ -698,13 +698,13 @@ class ndBrainAgentDiscreteVPG_Trainer : public ndBrainAgent
 
 	ndBrainVector m_workingBuffer;
 	ndArray<ndTrajectoryStepDiscrete<statesDim, actionDim>> m_trajectory;
-	ndSharedPtr<ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>> m_master;
+	ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>> m_master;
 
-	friend class ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>;
+	friend class ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-class ndBrainAgentDiscreteVPG_TrainerMaster : public ndBrainThreadPool
+class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPool
 {
 	public:
 	class HyperParameters
@@ -746,8 +746,8 @@ class ndBrainAgentDiscreteVPG_TrainerMaster : public ndBrainThreadPool
 		ndInt32 m_hiddenLayersNumberOfNeurons;
 	};
 
-	ndBrainAgentDiscreteVPG_TrainerMaster(const HyperParameters& hyperParameters);
-	virtual ~ndBrainAgentDiscreteVPG_TrainerMaster();
+	ndBrainAgentDiscretePolicyGradient_TrainerMaster(const HyperParameters& hyperParameters);
+	virtual ~ndBrainAgentDiscretePolicyGradient_TrainerMaster();
 
 	ndBrain* GetActor();
 	const ndString& GetName() const;
@@ -773,7 +773,7 @@ class ndBrainAgentDiscreteVPG_TrainerMaster : public ndBrainThreadPool
 	void BackPropagate();
 	void OptimizePolicy();
 	void OptimizeCritic();
-	void SaveTrajectory(ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>* const agent);
+	void SaveTrajectory(ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>* const agent);
 
 	ndBrain m_actor;
 	ndBrain m_baseLineValue;
@@ -805,12 +805,12 @@ class ndBrainAgentDiscreteVPG_TrainerMaster : public ndBrainThreadPool
 	//mutable std::random_device m_rd;
 	//mutable std::mt19937 m_gen;
 	//mutable std::normal_distribution<ndFloat32> m_d;
-	ndList<ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>*> m_agents;
-	friend class ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>;
+	ndList<ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>*> m_agents;
+	friend class ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::ndBrainAgentDiscreteVPG_Trainer(ndSharedPtr<ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>>& master)
+ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::ndBrainAgentDiscretePolicyGradient_Trainer(ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>>& master)
 	:ndBrainAgent()
 	,m_workingBuffer()
 	,m_trajectory()
@@ -822,9 +822,9 @@ ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::ndBrainAgentDiscreteVPG_T
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::~ndBrainAgentDiscreteVPG_Trainer()
+ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::~ndBrainAgentDiscretePolicyGradient_Trainer()
 {
-	for (ndList<ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>*>::ndNode* node = m_master->m_agents.GetFirst(); node; node = node->GetNext())
+	for (ndList<ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>*>::ndNode* node = m_master->m_agents.GetFirst(); node; node = node->GetNext())
 	{
 		if (node->GetInfo() == this)
 		{
@@ -835,19 +835,19 @@ ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::~ndBrainAgentDiscreteVPG_
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrain* ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::GetActor()
+ndBrain* ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::GetActor()
 {
 	return m_master->GetActor();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::IsTerminal() const
+bool ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::IsTerminal() const
 {
 	return false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrainVector& actions) const
+void ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::SelectAction(ndBrainVector& actions) const
 {
 	//for (ndInt32 i = 0; i < 2000; ++i)
 	//{
@@ -865,7 +865,7 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::SelectAction(ndBrain
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Step()
+void ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::Step()
 {
 	ndTrajectoryStepDiscrete<statesDim, actionDim> trajectoryStep;
 
@@ -887,7 +887,7 @@ void ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>::Step()
 //
 // ***************************************************************************************
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::ndBrainAgentDiscreteVPG_TrainerMaster(const HyperParameters& hyperParameters)
+ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainAgentDiscretePolicyGradient_TrainerMaster(const HyperParameters& hyperParameters)
 	:ndBrainThreadPool()
 	,m_actor()
 	,m_baseLineValue()
@@ -992,7 +992,7 @@ ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::ndBrainAgentDiscret
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::~ndBrainAgentDiscreteVPG_TrainerMaster()
+ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::~ndBrainAgentDiscretePolicyGradient_TrainerMaster()
 {
 	for (ndInt32 i = 0; i < m_trainers.GetCount(); ++i)
 	{
@@ -1009,56 +1009,56 @@ ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::~ndBrainAgentDiscre
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrain* ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::GetActor()
+ndBrain* ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::GetActor()
 {
 	return &m_actor;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-const ndString& ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::GetName() const
+const ndString& ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::GetName() const
 {
 	return m_name;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::SetName(const ndString& name)
+void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::SetName(const ndString& name)
 {
 	m_name = name;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::GetFramesCount() const
+ndInt32 ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::GetFramesCount() const
 {
 	return m_frameCount;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::IsSampling() const
+bool ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::IsSampling() const
 {
 	return false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::GetEposideCount() const
+ndInt32 ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::GetEposideCount() const
 {
 	return m_eposideCount;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndFloat32 ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::GetAverageFrames() const
+ndFloat32 ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::GetAverageFrames() const
 {
 	return m_averageFramesPerEpisodes.GetAverage();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndFloat32 ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::GetAverageScore() const
+ndFloat32 ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::GetAverageScore() const
 {
 	return m_averageScore.GetAverage();
 }
 
 //#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::SaveTrajectory(ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>* const agent)
+void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::SaveTrajectory(ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>* const agent)
 {
 	// remove last step because if it was a dead state, it will provide misleading feedback.
 	agent->m_trajectory.SetCount(agent->m_trajectory.GetCount() - 1);
@@ -1082,7 +1082,7 @@ void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::SaveTrajectory
 
 //#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::BackPropagate()
+void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::BackPropagate()
 {
 	auto ClearGradients = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
@@ -1105,7 +1105,7 @@ void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::BackPropagate(
 			class Loss : public ndBrainLossLeastSquaredError
 			{
 			public:
-				Loss(ndBrainTrainer& trainer, ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>* const agent, ndInt32 index, ndBrainFloat invSigmaSquare)
+				Loss(ndBrainTrainer& trainer, ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>* const agent, ndInt32 index, ndBrainFloat invSigmaSquare)
 					:ndBrainLossLeastSquaredError(trainer.GetBrain()->GetOutputSize())
 					, m_trainer(trainer)
 					, m_agent(agent)
@@ -1125,7 +1125,7 @@ void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::BackPropagate(
 				}
 
 				ndBrainTrainer& m_trainer;
-				ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>* m_agent;
+				ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>* m_agent;
 				const ndBrainFloat m_invSigmaSquare;
 				ndInt32 m_index;
 			};
@@ -1169,7 +1169,7 @@ void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::BackPropagate(
 
 //#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::OptimizeCritic()
+void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeCritic()
 {
 	ndAtomic<ndInt32> iterator(0);
 	ndBrainFixSizeVector<D_MAX_THREADS_COUNT> averageRewards;
@@ -1295,7 +1295,7 @@ void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::OptimizeCritic
 
 //#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::OptimizePolicy()
+void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizePolicy()
 {
 	ndAtomic<ndInt32> iterator(0);
 	auto ClearGradients = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
@@ -1318,7 +1318,7 @@ void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::OptimizePolicy
 			class Loss : public ndBrainLossLeastSquaredError
 			{
 				public:
-				Loss(ndBrainTrainer& trainer, ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>* const agent, ndInt32 index, ndBrainFloat invSigmaSquare)
+				Loss(ndBrainTrainer& trainer, ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>* const agent, ndInt32 index, ndBrainFloat invSigmaSquare)
 					:ndBrainLossLeastSquaredError(trainer.GetBrain()->GetOutputSize())
 					,m_trainer(trainer)
 					,m_agent(agent)
@@ -1338,7 +1338,7 @@ void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::OptimizePolicy
 				}
 
 				ndBrainTrainer& m_trainer;
-				ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>* m_agent;
+				ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>* m_agent;
 				const ndBrainFloat m_invSigmaSquare;
 				ndInt32 m_index;
 			};
@@ -1382,7 +1382,7 @@ void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::OptimizePolicy
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::Optimize()
+void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::Optimize()
 {
 	OptimizeCritic();
 	OptimizePolicy();
@@ -1390,11 +1390,11 @@ void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::Optimize()
 
 //#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::OptimizeStep()
+void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeStep()
 {
-	for (ndList<ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
+	for (ndList<ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
 	{
-		ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>* const agent = node->GetInfo();
+		ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>* const agent = node->GetInfo();
 
 		bool isTeminal = agent->IsTerminal() || (agent->m_trajectory.GetCount() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
 		if (isTeminal)
@@ -1407,7 +1407,7 @@ void ndBrainAgentDiscreteVPG_TrainerMaster<statesDim, actionDim>::OptimizeStep()
 				m_trajectoryAccumulator.SetCount(0);
 				for (node = node->GetNext(); node; node = node->GetNext())
 				{
-					ndBrainAgentDiscreteVPG_Trainer<statesDim, actionDim>* const nextAgent = node->GetInfo();
+					ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>* const nextAgent = node->GetInfo();
 					nextAgent->m_trajectory.SetCount(0);
 				}
 				node = m_agents.GetLast();

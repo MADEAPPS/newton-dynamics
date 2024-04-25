@@ -215,11 +215,11 @@ namespace ndQuadruped_1
 		};
 
 		// implement controller player
-		class ndController : public ndBrainAgentContinueVPG<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>
+		class ndController : public ndBrainAgentContinuePolicyGradient<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>
 		{
 			public:
 			ndController(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentContinueVPG<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(actor)
+				:ndBrainAgentContinuePolicyGradient<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(actor)
 				,m_model(nullptr)
 			{
 			}
@@ -242,7 +242,7 @@ namespace ndQuadruped_1
 			ndRobot* m_model;
 		};
 
-		class ndControllerAgent_trainer : public ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>
+		class ndControllerAgent_trainer : public ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>
 		{
 			public:
 			class ndBasePose
@@ -277,8 +277,8 @@ namespace ndQuadruped_1
 				ndBodyDynamic* m_body;
 			};
 
-			ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>& master)
-				:ndBrainAgentContinueVPG_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(master)
+			ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>& master)
+				:ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(master)
 				,m_basePose()
 				,m_model(nullptr)
 			{
@@ -382,7 +382,7 @@ namespace ndQuadruped_1
 
 			void Step()
 			{
-				ndBrainAgentContinueVPG_Trainer::Step();
+				ndBrainAgentContinuePolicyGradient_Trainer::Step();
 			}
 
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
@@ -768,7 +768,7 @@ namespace ndQuadruped_1
 	};
 
 	#ifdef ND_TRAIN_MODEL
-	ndSharedPtr<ndBrainAgent> BuildAgent(ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>& master)
+	ndSharedPtr<ndBrainAgent> BuildAgent(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>& master)
 	{
 		// add a reinforcement learning controller 
 		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(master));
@@ -980,7 +980,7 @@ namespace ndQuadruped_1
 			//const ndFloat32 separation = 4.0f;
 			const ndFloat32 separation = 0.0f;
 
-			ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
+			ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			
 			//hyperParameters.m_threadsCount = 1;
 			//hyperParameters.m_sigma = ndReal(0.25f);
@@ -988,7 +988,7 @@ namespace ndQuadruped_1
 			//hyperParameters.m_maxTrajectorySteps = 1024 * 6;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 
-			m_master = ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> (new ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> (new ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
 			m_bestActor = ndSharedPtr< ndBrain> (new ndBrain(*m_master->GetActor()));
 
 			m_master->SetName(CONTROLLER_NAME);
@@ -1154,7 +1154,7 @@ namespace ndQuadruped_1
 			}
 		}
 
-		ndSharedPtr<ndBrainAgentContinueVPG_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> m_master;
+		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;

@@ -43,8 +43,6 @@
 #include <ndBrainOptimizerSgd.h>
 #include <ndBrainOptimizerAdam.h>
 #include <ndBrainLayerActivation.h>
-#include <ndBrainAgentDiscreteVPG.h>
-#include <ndBrainAgentContinueVPG.h>
 #include <ndBrainAgentDQN_Trainer.h>
 #include <ndBrainAgentTD3_Trainer.h>
 #include <ndBrainAgentDDPG_Trainer.h>
@@ -59,11 +57,13 @@
 #include <ndBrainLayerSoftmaxActivation.h>
 #include <ndBrainLayerCrossCorrelation_2d.h>
 #include <ndBrainLayerLeakyReluActivation.h>
-#include <ndBrainAgentDiscreteVPG_Trainer.h>
-#include <ndBrainAgentContinueVPG_Trainer.h>
+#include <ndBrainAgentDiscretePolicyGradient.h>
+#include <ndBrainAgentContinuePolicyGradient.h>
 #include <ndBrainLossCategoricalCrossEntropy.h>
 #include <ndBrainLayerConvolutionalWithDropOut_2d.h>
 #include <ndBrainLayerCategoricalSoftmaxActivation.h>
+#include <ndBrainAgentDiscretePolicyGradient_Trainer.h>
+#include <ndBrainAgentContinuePolicyGradient_Trainer.h>
 
 #endif 
 
