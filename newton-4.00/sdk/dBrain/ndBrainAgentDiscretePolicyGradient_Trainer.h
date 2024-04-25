@@ -651,28 +651,51 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 class ndTrajectoryStepDiscrete
 {
 	public:
+	//ndTrajectoryStepDiscrete()
+	//	:m_reward(ndBrainFloat(0.0f))
+	//	,m_action()
+	//	,m_observation()
+	//{
+	//}
+	//
+	//ndTrajectoryStepDiscrete(const ndTrajectoryStepDiscrete& src)
+	//	:m_reward(src.m_reward)
+	//{
+	//	ndMemCpy(m_action, src.m_action, actionDim);
+	//	ndMemCpy(m_observation, src.m_observation, statesDim);
+	//}
+	//
+	//ndTrajectoryStepDiscrete& operator=(const ndTrajectoryStepDiscrete& src)
+	//{
+	//	new (this) ndTrajectoryStepDiscrete(src);
+	//	return*this;
+	//}
+
 	ndTrajectoryStepDiscrete()
 		:m_reward(ndBrainFloat(0.0f))
-		,m_action()
+		,m_action(ndBrainFloat(0.0f))
 		,m_observation()
 	{
 	}
 
 	ndTrajectoryStepDiscrete(const ndTrajectoryStepDiscrete& src)
 		:m_reward(src.m_reward)
+		,m_action(src.m_action)
 	{
-		ndMemCpy(m_action, src.m_action, actionDim);
 		ndMemCpy(m_observation, src.m_observation, statesDim);
 	}
 
 	ndTrajectoryStepDiscrete& operator=(const ndTrajectoryStepDiscrete& src)
 	{
 		new (this) ndTrajectoryStepDiscrete(src);
-		return*this;
+		return *this;
 	}
 
+	//ndBrainFloat m_reward;
+	//ndBrainFloat m_action[actionDim];
+	//ndBrainFloat m_observation[statesDim];
 	ndBrainFloat m_reward;
-	ndBrainFloat m_action[actionDim];
+	ndBrainFloat m_action;
 	ndBrainFloat m_observation[statesDim];
 };
 
@@ -684,16 +707,17 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 	~ndBrainAgentDiscretePolicyGradient_Trainer();
 
 	ndBrain* GetActor();
-	void SelectAction(ndBrainVector& actions) const;
+	ndBrainFloat SelectAction(const ndBrainVector& probabilities) const;
 
 	void InitWeights() { ndAssert(0); }
 	virtual void OptimizeStep() { ndAssert(0); }
 	void Save(ndBrainSave* const) { ndAssert(0); }
 	bool IsTrainer() const { ndAssert(0); return true; }
-	ndInt32 GetEpisodeFrames() const { ndAssert(0); return 0; }
 	void InitWeights(ndBrainFloat, ndBrainFloat) { ndAssert(0); }
 
-	virtual bool IsTerminal() const;
+	bool IsTerminal() const;
+	ndInt32 GetEpisodeFrames() const;
+
 	virtual void Step();
 
 	ndBrainVector m_workingBuffer;
@@ -847,36 +871,50 @@ bool ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::IsTermina
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::SelectAction(ndBrainVector& actions) const
-{
-	//for (ndInt32 i = 0; i < 2000; ++i)
-	//{
-	//	ndBrainFloat xxx0 = ndGaussianRandom(5.0f, 2.0f);
-	//	ndBrainFloat xxx1 = 5.0f + ndBrainFloat(m_d(m_gen) * 2.0f);
-	//	ndTrace (("%f, %f\n", xxx0, xxx1))
-	//}
+ndInt32 ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::GetEpisodeFrames() const 
+{ 
+	return m_trajectory.GetCount();
+}
 
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::SelectAction(const ndBrainVector& probabilities) const
+{
+	ndBrainFixSizeVector<actionDim + 1> pdf;
+
+	pdf.SetCount(0);
+	ndBrainFloat sum = ndBrainFloat(0.0f);
+	for (ndInt32 i = 0; i < actionDim; ++i)
+	{
+		pdf.PushBack(sum);
+		sum += probabilities[i];
+	}
+	pdf.PushBack(sum);
+
+	ndFloat32 r = ndRand();
+	ndInt32 index = actionDim - 1;
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
-		ndBrainFloat sample = ndBrainFloat(ndGaussianRandom(actions[i], m_master->m_sigma));
-		ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
-		actions[i] = squashedAction;
+		index = i;
+		if (pdf[i] < r)
+		{
+			break;
+		}
 	}
+	return ndBrainFloat(index);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::Step()
 {
 	ndTrajectoryStepDiscrete<statesDim, actionDim> trajectoryStep;
-
-	ndBrainMemVector actions(&trajectoryStep.m_action[0], actionDim);
+	ndBrainFixSizeVector<actionDim> probability;
 	ndBrainMemVector observation(&trajectoryStep.m_observation[0], statesDim);
 
 	GetObservation(&observation[0]);
-	m_master->m_actor.MakePrediction(observation, actions, m_workingBuffer);
+	m_master->m_actor.MakePrediction(observation, probability, m_workingBuffer);
 
-	SelectAction(actions);
-	ApplyActions(&trajectoryStep.m_action[0]);
+	trajectoryStep.m_action = SelectAction(probability);
+	ApplyActions(&trajectoryStep.m_action);
 	trajectoryStep.m_reward = CalculateReward();
 
 	ndAssert(m_trajectory.GetCount() < m_trajectory.GetCapacity());

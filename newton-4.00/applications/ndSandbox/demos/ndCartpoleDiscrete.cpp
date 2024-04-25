@@ -23,13 +23,7 @@
 namespace ndCarpole_0
 {
 	#define ND_TRAIN_AGENT
-	#define D_USE_VANILLA_POLICY_GRAD
-
-	#ifdef D_USE_VANILLA_POLICY_GRAD
-		#define CONTROLLER_NAME "cartpoleDiscreteVPG.dnn"
-	#else
-		#define CONTROLLER_NAME "cartpoleDQN.dnn"
-	#endif
+	#define CONTROLLER_NAME "cartpoleDiscreteVPG.dnn"
 
 	#define D_PUSH_ACCEL			ndFloat32 (15.0f)
 	#define D_REWARD_MIN_ANGLE		ndFloat32 (20.0f * ndDegreeToRad)
@@ -49,92 +43,53 @@ namespace ndCarpole_0
 		m_stateSize
 	};
 
-#if 0
 	class ndRobot: public ndModelArticulation
 	{
 		public:
+		//class ndController : public ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>
+		//{
+		//	public:
+		//	ndController(ndSharedPtr<ndBrain>& actor)
+		//		:ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>(actor)
+		//		,m_model(nullptr)
+		//	{
+		//	}
+		//
+		//	void GetObservation(ndBrainFloat* const observation)
+		//	{
+		//		m_model->GetObservation(observation);
+		//	}
+		//
+		//	virtual void ApplyActions(ndBrainFloat* const actions)
+		//	{
+		//		m_model->ApplyActions(actions);
+		//	}
+		//
+		//	void SetModel(ndRobot* const model)
+		//	{
+		//		m_model = model;
+		//	}
+		//
+		//	ndRobot* m_model;
+		//};
 
-		#ifdef D_USE_VANILLA_POLICY_GRAD
-		class ndController : public ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>
-		#else
-		class ndController : public ndBrainAgentDQN<m_stateSize, m_actionsSize>
-		#endif
+		class ndControllerTrainer : public ndBrainAgentDiscretePolicyGradient_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
-			#ifdef D_USE_VANILLA_POLICY_GRAD
-			ndController(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>(actor)
+			ndControllerTrainer(ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>& master)
+				:ndBrainAgentDiscretePolicyGradient_Trainer<m_stateSize, m_actionsSize>(master)
+				//,m_bestActor(m_actor)
 				,m_model(nullptr)
+				//,m_timer(ndGetTimeInMicroseconds())
+				//,m_maxGain(ndFloat32(-1.0e10f))
+				//,m_maxFrames(5000)
+				//,m_stopTraining(10000000)
+				//,m_modelIsTrained(false)
 			{
 			}
-			#else
-			ndController(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentDQN<m_stateSize, m_actionsSize>(actor)
-				,m_model(nullptr)
-			{
-			}
-			#endif
-
-			void GetObservation(ndBrainFloat* const observation)
-			{
-				m_model->GetObservation(observation);
-			}
-
-			virtual void ApplyActions(ndBrainFloat* const actions)
-			{
-				m_model->ApplyActions(actions);
-			}
-
-			void SetModel(ndRobot* const model)
-			{
-				m_model = model;
-			}
-
-			ndRobot* m_model;
-		};
-
-		#ifdef D_USE_VANILLA_POLICY_GRAD
-		class ndControllerTrainer : public ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>
-		#else
-		class ndControllerTrainer : public ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>
-		#endif
-		{
-			public:
-			#ifdef D_USE_VANILLA_POLICY_GRAD
-			ndControllerTrainer(ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
-				:ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
-				,m_bestActor(m_actor)
-				,m_model(nullptr)
-				,m_timer(ndGetTimeInMicroseconds())
-				,m_maxGain(ndFloat32(-1.0e10f))
-				,m_maxFrames(5000)
-				,m_stopTraining(10000000)
-				,m_modelIsTrained(false)
-			{
-				m_outFile = fopen("cartpole-VPG.csv", "wb");
-				fprintf(m_outFile, "VPG\n");
-			}
-			#else
-			ndControllerTrainer(ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters)
-				:ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
-				,m_bestActor(m_actor)
-				,m_model(nullptr)
-				,m_timer(ndGetTimeInMicroseconds())
-				,m_maxGain(ndFloat32(-1.0e10f))
-				,m_maxFrames(5000)
-				,m_stopTraining(2000000)
-			{
-				m_outFile = fopen("cartpole-DQN.csv", "wb");
-				fprintf(m_outFile, "DQN\n");
-			}
-			#endif
 
 			~ndControllerTrainer()
 			{
-				if (m_outFile)
-				{
-					fclose(m_outFile);
-				}
 			}
 
 			ndBrainFloat CalculateReward()
@@ -168,74 +123,75 @@ namespace ndCarpole_0
 				m_model->ResetModel();
 			}
 
-			void OptimizeStep()
+			//void OptimizeStep()
+			//{
+			//	ndInt32 stopTraining = GetFramesCount();
+			//	if (stopTraining <= m_stopTraining)
+			//	{
+			//		ndInt32 episodeCount = GetEposideCount();
+			//		ndBrainAgentDiscretePolicyGradient_Trainer::OptimizeStep();
+			//
+			//		episodeCount -= GetEposideCount();
+			//
+			//		if (m_averageFramesPerEpisodes.GetAverage() >= ndReal(m_maxFrames))
+			//		{
+			//			if (m_averageScore.GetAverage() > m_maxGain)
+			//			{
+			//				m_bestActor.CopyFrom(m_actor);
+			//				m_maxGain = m_averageScore.GetAverage();
+			//				ndExpandTraceMessage("%d: best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetFramesCount(), GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageScore.GetAverage());
+			//			}
+			//		}
+			//
+			//		if (episodeCount && !IsSampling())
+			//		{
+			//			ndExpandTraceMessage("%f %f\n", m_averageScore.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+			//			if (m_outFile)
+			//			{
+			//				fprintf(m_outFile, "%f\n", m_averageScore.GetAverage());
+			//				fflush(m_outFile);
+			//			}
+			//		}
+			//
+			//		if (stopTraining == m_stopTraining)
+			//		{
+			//			char fileName[1024];
+			//			m_actor.CopyFrom(m_bestActor);
+			//			ndGetWorkingFileName(GetName().GetStr(), fileName);
+			//			SaveToFile(fileName);
+			//			ndExpandTraceMessage("saving to file: %s\n", fileName);
+			//			ndExpandTraceMessage("training complete\n\n");
+			//			ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+			//			ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+			//			m_modelIsTrained = true;
+			//			if (m_outFile)
+			//			{
+			//				fclose(m_outFile);
+			//				m_outFile = nullptr;
+			//			}
+			//		}
+			//	}
+			//				
+			//	if (m_model->IsOutOfBounds())
+			//	{
+			//		m_model->TelePort();
+			//	}
+			//}
+
+			void Step()
 			{
-				ndInt32 stopTraining = GetFramesCount();
-				if (stopTraining <= m_stopTraining)
-				{
-					ndInt32 episodeCount = GetEposideCount();
-
-					#ifdef D_USE_VANILLA_POLICY_GRAD
-					ndBrainAgentDiscreteVPG_Trainer::OptimizeStep();
-					#else
-					ndBrainAgentDQN_Trainer::OptimizeStep();
-					#endif
-
-					episodeCount -= GetEposideCount();
-
-					if (m_averageFramesPerEpisodes.GetAverage() >= ndReal(m_maxFrames))
-					{
-						if (m_averageScore.GetAverage() > m_maxGain)
-						{
-							m_bestActor.CopyFrom(m_actor);
-							m_maxGain = m_averageScore.GetAverage();
-							ndExpandTraceMessage("%d: best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetFramesCount(), GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageScore.GetAverage());
-						}
-					}
-
-					if (episodeCount && !IsSampling())
-					{
-						ndExpandTraceMessage("%f %f\n", m_averageScore.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-						if (m_outFile)
-						{
-							fprintf(m_outFile, "%f\n", m_averageScore.GetAverage());
-							fflush(m_outFile);
-						}
-					}
-
-					if (stopTraining == m_stopTraining)
-					{
-						char fileName[1024];
-						m_actor.CopyFrom(m_bestActor);
-						ndGetWorkingFileName(GetName().GetStr(), fileName);
-						SaveToFile(fileName);
-						ndExpandTraceMessage("saving to file: %s\n", fileName);
-						ndExpandTraceMessage("training complete\n\n");
-						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-						ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-						m_modelIsTrained = true;
-						if (m_outFile)
-						{
-							fclose(m_outFile);
-							m_outFile = nullptr;
-						}
-					}
-				}
-							
-				if (m_model->IsOutOfBounds())
-				{
-					m_model->TelePort();
-				}
+				ndBrainAgentDiscretePolicyGradient_Trainer::Step();
 			}
 
-			FILE* m_outFile;
-			ndBrain m_bestActor;
+
+			//FILE* m_outFile;
+			//ndBrain m_bestActor;
 			ndRobot* m_model;
-			ndUnsigned64 m_timer;
-			ndFloat32 m_maxGain;
-			ndInt32 m_maxFrames;
-			ndInt32 m_stopTraining;
-			bool m_modelIsTrained;
+			//ndUnsigned64 m_timer;
+			//ndFloat32 m_maxGain;
+			//ndInt32 m_maxFrames;
+			//ndInt32 m_stopTraining;
+			//bool m_modelIsTrained;
 		};
 
 		ndRobot(const ndSharedPtr<ndBrainAgent>& agent)
@@ -343,24 +299,23 @@ namespace ndCarpole_0
 
 		void CheckTrainingCompleted()
 		{
-			#ifdef D_TRAIN_AGENT
-			if (m_agent->IsTrainer())
-			{
-				ndControllerTrainer* const agent = (ndControllerTrainer*)(*m_agent);
-				if (agent->m_modelIsTrained)
-				{
-					char fileName[1024];
-					ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
-					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-					m_agent = ndSharedPtr<ndBrainAgent>(new ndRobot::ndController(actor));
-					((ndRobot::ndController*)*m_agent)->SetModel(this);
-					//ResetModel();
-					((ndPhysicsWorld*)m_world)->NormalUpdates();
-				}
-			}
-			#endif
+			//#ifdef ND_TRAIN_AGENT
+			//if (m_agent->IsTrainer())
+			//{
+			//	ndControllerTrainer* const agent = (ndControllerTrainer*)(*m_agent);
+			//	if (agent->m_modelIsTrained)
+			//	{
+			//		char fileName[1024];
+			//		ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
+			//		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+			//		m_agent = ndSharedPtr<ndBrainAgent>(new ndRobot::ndController(actor));
+			//		((ndRobot::ndController*)*m_agent)->SetModel(this);
+			//		//ResetModel();
+			//		((ndPhysicsWorld*)m_world)->NormalUpdates();
+			//	}
+			//}
+			//#endif
 		}
-
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
@@ -371,7 +326,6 @@ namespace ndCarpole_0
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
-			m_agent->OptimizeStep();
 		}
 
 		ndMatrix m_cartMatrix;
@@ -429,37 +383,27 @@ namespace ndCarpole_0
 		model->m_poleMatrix = poleBody->GetMatrix();
 	}
 
-	#ifdef D_TRAIN_AGENT
-	ndRobot* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	#ifdef ND_TRAIN_AGENT
+	ndRobot* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location, ndSharedPtr<ndBrainAgent>& agent)
 	{
-		#ifdef D_USE_VANILLA_POLICY_GRAD
-			ndBrainAgentDiscreteVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
-			hyperParameters.m_maxTrajectorySteps = 6000;
-			hyperParameters.m_discountFactor = ndBrainFloat(0.995f);
-		#else
-			ndBrainAgentDQN_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
-		#endif
-		//hyperParameters.m_threadsCount = 1;
-		
-		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerTrainer(hyperParameters));
-
 		ndRobot* const model = new ndRobot(agent);
 		ndRobot::ndControllerTrainer* const trainer = (ndRobot::ndControllerTrainer*)*agent;
 		trainer->m_model = model;
 		trainer->SetName(CONTROLLER_NAME);
-
+		
 		BuildModel(model, scene, location);
-
+		
 		scene->SetAcceleratedUpdate();
 		return model;
 	}
 	#endif
 
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, ndSharedPtr<ndBrainAgent>& agent)
 	{
-		#ifdef D_TRAIN_AGENT
-			ndRobot* const model = CreateTrainModel(scene, location);
+		#ifdef ND_TRAIN_AGENT
+			ndRobot* const model = CreateTrainModel(scene, location, agent);
 		#else
+			ndAssert(0);
 			char fileName[1024];
 			ndGetWorkingFileName(CONTROLLER_NAME, fileName);
 	
@@ -473,7 +417,7 @@ namespace ndCarpole_0
 		#endif	
 		return model;
 	}
-#endif
+
 
 #ifdef ND_TRAIN_AGENT
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
@@ -516,14 +460,11 @@ namespace ndCarpole_0
 			
 			m_master->SetName(CONTROLLER_NAME);
 			
-			////ndInt32 materialId = 1;
-			//ndSharedPtr<ndBrainAgent> visualAgent(BuildAgent(m_master));
-			//ndSharedPtr<ndModel> visualModel(BuildModel(scene, matrix, visualAgent));
-			//world->AddModel(visualModel);
+			//ndInt32 materialId = 1;
+			ndSharedPtr<ndBrainAgent> visualAgent(new ndRobot::ndControllerTrainer(m_master));
+			ndSharedPtr<ndModel> visualModel(CreateModel(scene, matrix, visualAgent));
+			world->AddModel(visualModel);
 			//SetMaterial(visualModel);
-			//
-			//ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, visualModel));
-			//scene->Set2DDisplayRenderFunction(quadrupedUI);
 			//
 			//// add a hidden battery of model to generate trajectories in parallel
 			//ndMatrix location(matrix);
@@ -548,10 +489,10 @@ namespace ndCarpole_0
 
 		~TrainingUpdata()
 		{
-			//if (m_outFile)
-			//{
-			//	fclose(m_outFile);
-			//}
+			if (m_outFile)
+			{
+				fclose(m_outFile);
+			}
 		}
 
 		//void HideModel(ndSharedPtr<ndModel>& model) const

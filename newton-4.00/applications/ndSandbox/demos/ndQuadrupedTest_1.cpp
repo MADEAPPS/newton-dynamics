@@ -785,7 +785,7 @@ namespace ndQuadruped_1
 	}
 	#endif
 
-	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation, ndSharedPtr<ndBrainAgent> agent)
+	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation, ndSharedPtr<ndBrainAgent>& agent)
 	{
 		ndFloat32 mass = 20.0f;
 		ndFloat32 radius = 0.25f;
