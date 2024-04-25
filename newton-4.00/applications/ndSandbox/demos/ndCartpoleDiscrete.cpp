@@ -17,6 +17,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
@@ -78,13 +79,7 @@ namespace ndCarpole_0
 			public:
 			ndControllerTrainer(ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>& master)
 				:ndBrainAgentDiscretePolicyGradient_Trainer<m_stateSize, m_actionsSize>(master)
-				//,m_bestActor(m_actor)
 				,m_model(nullptr)
-				//,m_timer(ndGetTimeInMicroseconds())
-				//,m_maxGain(ndFloat32(-1.0e10f))
-				//,m_maxFrames(5000)
-				//,m_stopTraining(10000000)
-				//,m_modelIsTrained(false)
 			{
 			}
 
@@ -99,7 +94,7 @@ namespace ndCarpole_0
 
 			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
-				if (GetEpisodeFrames() >= 10000)
+				if (GetEpisodeFrames() >= 2000)
 				{
 					ndUnsigned32 randomIndex = ndRandInt();
 					*actions = ndReal (ndInt32(randomIndex % 3));
@@ -123,75 +118,12 @@ namespace ndCarpole_0
 				m_model->ResetModel();
 			}
 
-			//void OptimizeStep()
-			//{
-			//	ndInt32 stopTraining = GetFramesCount();
-			//	if (stopTraining <= m_stopTraining)
-			//	{
-			//		ndInt32 episodeCount = GetEposideCount();
-			//		ndBrainAgentDiscretePolicyGradient_Trainer::OptimizeStep();
-			//
-			//		episodeCount -= GetEposideCount();
-			//
-			//		if (m_averageFramesPerEpisodes.GetAverage() >= ndReal(m_maxFrames))
-			//		{
-			//			if (m_averageScore.GetAverage() > m_maxGain)
-			//			{
-			//				m_bestActor.CopyFrom(m_actor);
-			//				m_maxGain = m_averageScore.GetAverage();
-			//				ndExpandTraceMessage("%d: best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetFramesCount(), GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageScore.GetAverage());
-			//			}
-			//		}
-			//
-			//		if (episodeCount && !IsSampling())
-			//		{
-			//			ndExpandTraceMessage("%f %f\n", m_averageScore.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-			//			if (m_outFile)
-			//			{
-			//				fprintf(m_outFile, "%f\n", m_averageScore.GetAverage());
-			//				fflush(m_outFile);
-			//			}
-			//		}
-			//
-			//		if (stopTraining == m_stopTraining)
-			//		{
-			//			char fileName[1024];
-			//			m_actor.CopyFrom(m_bestActor);
-			//			ndGetWorkingFileName(GetName().GetStr(), fileName);
-			//			SaveToFile(fileName);
-			//			ndExpandTraceMessage("saving to file: %s\n", fileName);
-			//			ndExpandTraceMessage("training complete\n\n");
-			//			ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-			//			ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-			//			m_modelIsTrained = true;
-			//			if (m_outFile)
-			//			{
-			//				fclose(m_outFile);
-			//				m_outFile = nullptr;
-			//			}
-			//		}
-			//	}
-			//				
-			//	if (m_model->IsOutOfBounds())
-			//	{
-			//		m_model->TelePort();
-			//	}
-			//}
-
 			void Step()
 			{
 				ndBrainAgentDiscretePolicyGradient_Trainer::Step();
 			}
 
-
-			//FILE* m_outFile;
-			//ndBrain m_bestActor;
 			ndRobot* m_model;
-			//ndUnsigned64 m_timer;
-			//ndFloat32 m_maxGain;
-			//ndInt32 m_maxFrames;
-			//ndInt32 m_stopTraining;
-			//bool m_modelIsTrained;
 		};
 
 		ndRobot(const ndSharedPtr<ndBrainAgent>& agent)
@@ -329,7 +261,8 @@ namespace ndCarpole_0
 		// make cart
 		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.tga")));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
-		ndMatrix matrix(cartBody->GetMatrix());
+		//ndMatrix matrix(cartBody->GetMatrix());
+		ndMatrix matrix(location);
 		matrix.m_posit.m_y += ySize / 2.0f;
 		cartBody->SetMatrix(matrix);
 		cartBody->GetAsBodyDynamic()->SetSleepAccel(cartBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
@@ -398,7 +331,6 @@ namespace ndCarpole_0
 		return model;
 	}
 
-
 #ifdef ND_TRAIN_AGENT
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
 	{
@@ -412,7 +344,7 @@ namespace ndCarpole_0
 			,m_maxScore(ndFloat32(-1.0e10f))
 			,m_maxFrames(6000)
 			,m_lastEpisode(-1)
-			,m_stopTraining(100 * 1000000)
+			,m_stopTraining(20 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -420,51 +352,35 @@ namespace ndCarpole_0
 			m_outFile = fopen("cartpole-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			////const ndInt32 countX = 2;
-			////const ndInt32 countZ = 2;
-			//const ndInt32 countX = 6;
-			//const ndInt32 countZ = 9;
-			////const ndFloat32 separation = 4.0f;
-			//const ndFloat32 separation = 0.0f;
+			const ndInt32 countX = 32;
 			
 			ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			
-			//hyperParameters.m_threadsCount = 1;
-			//hyperParameters.m_sigma = ndReal(0.25f);
 			hyperParameters.m_discountFactor = ndReal(0.99f);
-			//hyperParameters.m_maxTrajectorySteps = 1024 * 6;
-			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
+			hyperParameters.m_extraTrajectorySteps = 256;
 			
 			m_master = ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>(new ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>(hyperParameters));
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetActor()));
 			
 			m_master->SetName(CONTROLLER_NAME);
 			
-			//ndInt32 materialId = 1;
 			ndSharedPtr<ndBrainAgent> visualAgent(new ndRobot::ndControllerTrainer(m_master));
 			ndSharedPtr<ndModel> visualModel(CreateModel(scene, matrix, visualAgent));
 			world->AddModel(visualModel);
-			//SetMaterial(visualModel);
-			//
-			//// add a hidden battery of model to generate trajectories in parallel
-			//ndMatrix location(matrix);
-			//location.m_posit.m_z -= countZ * separation * 0.5f;
-			//
-			//ndFloat32 x0 = matrix.m_posit.m_x + separation;
-			//for (ndInt32 i = 0; i < countZ; ++i)
-			//{
-			//	location.m_posit.m_x = x0;
-			//	for (ndInt32 j = 0; j < countX; ++j)
-			//	{
-			//		ndSharedPtr<ndBrainAgent> agent(BuildAgent(m_master));
-			//		ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
-			//		world->AddModel(model);
-			//		location.m_posit.m_x += separation;
-			//		//HideModel(model);
-			//		SetMaterial(model);
-			//	}
-			//	location.m_posit.m_z += separation;
-			//}
+			SetMaterial(visualModel);
+			
+			// add a hidden battery of model to generate trajectories in parallel
+			for (ndInt32 i = 0; i < countX; ++i)
+			{
+				ndMatrix location(matrix);
+				location.m_posit.m_x += 3.0f * (ndRand() - 0.5f);
+				ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerTrainer(m_master));
+				ndSharedPtr<ndModel> model(CreateModel(scene, location, agent));
+				world->AddModel(model);
+				//HideModel(model);
+				SetMaterial(model);
+			}
 		}
 
 		~TrainingUpdata()
@@ -475,78 +391,78 @@ namespace ndCarpole_0
 			}
 		}
 
-		//void HideModel(ndSharedPtr<ndModel>& model) const
-		//{
-		//	ndRobot* const robot = (ndRobot*)*model;
-		//
-		//	ndModelArticulation::ndNode* stackMem[128];
-		//	ndInt32 stack = 1;
-		//	stackMem[0] = robot->GetRoot();
-		//	while (stack)
-		//	{
-		//		stack--;
-		//		ndModelArticulation::ndNode* const node = stackMem[stack];
-		//		ndBody* const body = *node->m_body;
-		//		ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
-		//		ndDemoEntity* const ent = userData->m_entity;
-		//		ent->Hide();
-		//
-		//		for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
-		//		{
-		//			stackMem[stack] = child;
-		//			stack++;
-		//		}
-		//	}
-		//}
-		//
-		//class InvisibleBodyNotify : public ndDemoEntityNotify
-		//{
-		//	public:
-		//	InvisibleBodyNotify(const ndDemoEntityNotify* const src)
-		//		:ndDemoEntityNotify(*src)
-		//	{
-		//	}
-		//
-		//	virtual bool OnSceneAabbOverlap(const ndBody* const otherBody) const
-		//	{
-		//		const ndBodyKinematic* const body0 = ((ndBody*)GetBody())->GetAsBodyKinematic();
-		//		const ndBodyKinematic* const body1 = ((ndBody*)otherBody)->GetAsBodyKinematic();
-		//		const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
-		//		const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
-		//		return instanceShape0.m_shapeMaterial.m_userId != instanceShape1.m_shapeMaterial.m_userId;
-		//	}
-		//};
-		//
-		//void SetMaterial(ndSharedPtr<ndModel>& model) const
-		//{
-		//	ndRobot* const robot = (ndRobot*)*model;
-		//
-		//	ndModelArticulation::ndNode* stackMem[128];
-		//	ndInt32 stack = 1;
-		//	stackMem[0] = robot->GetRoot();
-		//	while (stack)
-		//	{
-		//		stack--;
-		//		ndModelArticulation::ndNode* const node = stackMem[stack];
-		//		ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-		//
-		//		ndShapeInstance& instanceShape = body->GetCollisionShape();
-		//		instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
-		//
-		//		ndDemoEntityNotify* const originalNotify = (ndDemoEntityNotify*)body->GetNotifyCallback();
-		//		void* const useData = originalNotify->m_entity;
-		//		originalNotify->m_entity = nullptr;
-		//		InvisibleBodyNotify* const notify = new InvisibleBodyNotify((InvisibleBodyNotify*)body->GetNotifyCallback());
-		//		body->SetNotifyCallback(notify);
-		//		notify->m_entity = (ndDemoEntity*)useData;
-		//
-		//		for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
-		//		{
-		//			stackMem[stack] = child;
-		//			stack++;
-		//		}
-		//	}
-		//}
+		void HideModel(ndSharedPtr<ndModel>& model) const
+		{
+			ndRobot* const robot = (ndRobot*)*model;
+		
+			ndModelArticulation::ndNode* stackMem[128];
+			ndInt32 stack = 1;
+			stackMem[0] = robot->GetRoot();
+			while (stack)
+			{
+				stack--;
+				ndModelArticulation::ndNode* const node = stackMem[stack];
+				ndBody* const body = *node->m_body;
+				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
+				ndDemoEntity* const ent = userData->m_entity;
+				ent->Hide();
+		
+				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+				{
+					stackMem[stack] = child;
+					stack++;
+				}
+			}
+		}
+		
+		class InvisibleBodyNotify : public ndDemoEntityNotify
+		{
+			public:
+			InvisibleBodyNotify(const ndDemoEntityNotify* const src)
+				:ndDemoEntityNotify(*src)
+			{
+			}
+		
+			virtual bool OnSceneAabbOverlap(const ndBody* const otherBody) const
+			{
+				const ndBodyKinematic* const body0 = ((ndBody*)GetBody())->GetAsBodyKinematic();
+				const ndBodyKinematic* const body1 = ((ndBody*)otherBody)->GetAsBodyKinematic();
+				const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
+				const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
+				return instanceShape0.m_shapeMaterial.m_userId != instanceShape1.m_shapeMaterial.m_userId;
+			}
+		};
+		
+		void SetMaterial(ndSharedPtr<ndModel>& model) const
+		{
+			ndRobot* const robot = (ndRobot*)*model;
+		
+			ndModelArticulation::ndNode* stackMem[128];
+			ndInt32 stack = 1;
+			stackMem[0] = robot->GetRoot();
+			while (stack)
+			{
+				stack--;
+				ndModelArticulation::ndNode* const node = stackMem[stack];
+				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+		
+				ndShapeInstance& instanceShape = body->GetCollisionShape();
+				instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+		
+				ndDemoEntityNotify* const originalNotify = (ndDemoEntityNotify*)body->GetNotifyCallback();
+				void* const useData = originalNotify->m_entity;
+				originalNotify->m_entity = nullptr;
+				InvisibleBodyNotify* const notify = new InvisibleBodyNotify((InvisibleBodyNotify*)body->GetNotifyCallback());
+				body->SetNotifyCallback(notify);
+				notify->m_entity = (ndDemoEntity*)useData;
+		
+				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+				{
+					stackMem[stack] = child;
+					stack++;
+				}
+			}
+		}
 
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
