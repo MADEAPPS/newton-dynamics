@@ -297,26 +297,6 @@ namespace ndCarpole_0
 			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
 		}
 
-		void CheckTrainingCompleted()
-		{
-			//#ifdef ND_TRAIN_AGENT
-			//if (m_agent->IsTrainer())
-			//{
-			//	ndControllerTrainer* const agent = (ndControllerTrainer*)(*m_agent);
-			//	if (agent->m_modelIsTrained)
-			//	{
-			//		char fileName[1024];
-			//		ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
-			//		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-			//		m_agent = ndSharedPtr<ndBrainAgent>(new ndRobot::ndController(actor));
-			//		((ndRobot::ndController*)*m_agent)->SetModel(this);
-			//		//ResetModel();
-			//		((ndPhysicsWorld*)m_world)->NormalUpdates();
-			//	}
-			//}
-			//#endif
-		}
-
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
@@ -570,51 +550,51 @@ namespace ndCarpole_0
 
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
-			//ndInt32 stopTraining = m_master->GetFramesCount();
-			//if (stopTraining <= m_stopTraining)
-			//{
-			//	ndInt32 episodeCount = m_master->GetEposideCount();
-			//	m_master->OptimizeStep();
-			//
-			//	episodeCount -= m_master->GetEposideCount();
-			//	if (m_master->GetAverageFrames() >= ndFloat32(m_maxFrames))
-			//	{
-			//		if (m_master->GetAverageScore() > m_maxScore)
-			//		{
-			//			if (m_lastEpisode != m_master->GetEposideCount())
-			//			{
-			//				m_bestActor->CopyFrom(*m_master->GetActor());
-			//				m_maxScore = m_master->GetAverageScore();
-			//				ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", m_master->GetEposideCount(), m_master->GetAverageFrames(), m_master->GetAverageScore());
-			//				m_lastEpisode = m_master->GetEposideCount();
-			//			}
-			//		}
-			//	}
-			//
-			//	if (episodeCount && !m_master->IsSampling())
-			//	{
-			//		ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
-			//		if (m_outFile)
-			//		{
-			//			fprintf(m_outFile, "%g\n", m_master->GetAverageScore());
-			//			fflush(m_outFile);
-			//		}
-			//	}
-			//}
-			//
-			//if (stopTraining >= m_stopTraining)
-			//{
-			//	char fileName[1024];
-			//	m_modelIsTrained = true;
-			//	m_master->GetActor()->CopyFrom(*(*m_bestActor));
-			//	ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
-			//	m_master->GetActor()->SaveToFile(fileName);
-			//	ndExpandTraceMessage("saving to file: %s\n", fileName);
-			//	ndExpandTraceMessage("training complete\n");
-			//	ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-			//	ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-			//	manager->Terminate();
-			//}
+			ndInt32 stopTraining = m_master->GetFramesCount();
+			if (stopTraining <= m_stopTraining)
+			{
+				ndInt32 episodeCount = m_master->GetEposideCount();
+				m_master->OptimizeStep();
+			
+				episodeCount -= m_master->GetEposideCount();
+				if (m_master->GetAverageFrames() >= ndFloat32(m_maxFrames))
+				{
+					if (m_master->GetAverageScore() > m_maxScore)
+					{
+						if (m_lastEpisode != m_master->GetEposideCount())
+						{
+							m_bestActor->CopyFrom(*m_master->GetActor());
+							m_maxScore = m_master->GetAverageScore();
+							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", m_master->GetEposideCount(), m_master->GetAverageFrames(), m_master->GetAverageScore());
+							m_lastEpisode = m_master->GetEposideCount();
+						}
+					}
+				}
+			
+				if (episodeCount && !m_master->IsSampling())
+				{
+					ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
+					if (m_outFile)
+					{
+						fprintf(m_outFile, "%g\n", m_master->GetAverageScore());
+						fflush(m_outFile);
+					}
+				}
+			}
+			
+			if (stopTraining >= m_stopTraining)
+			{
+				char fileName[1024];
+				m_modelIsTrained = true;
+				m_master->GetActor()->CopyFrom(*(*m_bestActor));
+				ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
+				m_master->GetActor()->SaveToFile(fileName);
+				ndExpandTraceMessage("saving to file: %s\n", fileName);
+				ndExpandTraceMessage("training complete\n");
+				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+				ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+				manager->Terminate();
+			}
 		}
 
 		ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>> m_master;
@@ -638,13 +618,13 @@ void ndCartpoleDiscrete(ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 	
 	ndSetRandSeed(42);
-	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
 #ifdef ND_TRAIN_AGENT
 	TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix);
 	scene->RegisterPostUpdate(trainer);
 #else
+	ndWorld* const world = scene->GetWorld();
 	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
 	world->AddModel(model);
 #endif
