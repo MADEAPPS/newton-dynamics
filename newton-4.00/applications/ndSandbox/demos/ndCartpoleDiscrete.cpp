@@ -47,32 +47,32 @@ namespace ndCarpole_0
 	class ndRobot: public ndModelArticulation
 	{
 		public:
-		//class ndController : public ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>
-		//{
-		//	public:
-		//	ndController(ndSharedPtr<ndBrain>& actor)
-		//		:ndBrainAgentDiscreteVPG<m_stateSize, m_actionsSize>(actor)
-		//		,m_model(nullptr)
-		//	{
-		//	}
-		//
-		//	void GetObservation(ndBrainFloat* const observation)
-		//	{
-		//		m_model->GetObservation(observation);
-		//	}
-		//
-		//	virtual void ApplyActions(ndBrainFloat* const actions)
-		//	{
-		//		m_model->ApplyActions(actions);
-		//	}
-		//
-		//	void SetModel(ndRobot* const model)
-		//	{
-		//		m_model = model;
-		//	}
-		//
-		//	ndRobot* m_model;
-		//};
+		class ndController : public ndBrainAgentDiscretePolicyGradient<m_stateSize, m_actionsSize>
+		{
+			public:
+			ndController(ndSharedPtr<ndBrain>& actor)
+				:ndBrainAgentDiscretePolicyGradient<m_stateSize, m_actionsSize>(actor)
+				,m_model(nullptr)
+			{
+			}
+		
+			void GetObservation(ndBrainFloat* const observation)
+			{
+				m_model->GetObservation(observation);
+			}
+		
+			virtual void ApplyActions(ndBrainFloat* const actions)
+			{
+				m_model->ApplyActions(actions);
+			}
+		
+			void SetModel(ndRobot* const model)
+			{
+				m_model = model;
+			}
+		
+			ndRobot* m_model;
+		};
 
 		class ndControllerTrainer : public ndBrainAgentDiscretePolicyGradient_Trainer<m_stateSize, m_actionsSize>
 		{
@@ -290,7 +290,8 @@ namespace ndCarpole_0
 		model->m_poleMatrix = poleBody->GetMatrix();
 	}
 
-	#ifdef ND_TRAIN_AGENT
+#ifdef ND_TRAIN_AGENT
+
 	ndRobot* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location, ndSharedPtr<ndBrainAgent>& agent)
 	{
 		ndRobot* const model = new ndRobot(agent);
@@ -303,29 +304,13 @@ namespace ndCarpole_0
 		scene->SetAcceleratedUpdate();
 		return model;
 	}
-	#endif
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, ndSharedPtr<ndBrainAgent>& agent)
 	{
-		#ifdef ND_TRAIN_AGENT
-			ndRobot* const model = CreateTrainModel(scene, location, agent);
-		#else
-			ndAssert(0);
-			char fileName[1024];
-			ndGetWorkingFileName(CONTROLLER_NAME, fileName);
-	
-			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-			ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndController(actor));
-
-			ndRobot* const model = new ndRobot(agent);
-			((ndRobot::ndController*)*agent)->m_model = model;
-		
-			BuildModel(model, scene, location);
-		#endif	
+		ndRobot* const model = CreateTrainModel(scene, location, agent);
 		return model;
 	}
 
-#ifdef ND_TRAIN_AGENT
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
 	{
 		public:
@@ -336,9 +321,9 @@ namespace ndCarpole_0
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_maxFrames(2000)
+			,m_maxFrames(35000)
 			,m_lastEpisode(-1)
-			,m_stopTraining(20 * 1000000)
+			,m_stopTraining(30 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -517,8 +502,24 @@ namespace ndCarpole_0
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;
 	};
-#endif
 
+#else
+
+	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	{
+		char fileName[1024];
+		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
+
+		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndController(actor));
+
+		ndRobot* const model = new ndRobot(agent);
+		((ndRobot::ndController*)*agent)->m_model = model;
+
+		BuildModel(model, scene, location);
+		return model;
+	}
+#endif
 }
 
 using namespace ndCarpole_0;
