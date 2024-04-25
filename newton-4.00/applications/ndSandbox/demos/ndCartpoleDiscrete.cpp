@@ -94,12 +94,6 @@ namespace ndCarpole_0
 
 			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
-				if (GetEpisodeFrames() >= 2000)
-				{
-					ndUnsigned32 randomIndex = ndRandInt();
-					*actions = ndReal (ndInt32(randomIndex % 3));
-				}
-
 				m_model->ApplyActions(actions);
 			}
 
@@ -342,7 +336,7 @@ namespace ndCarpole_0
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_maxFrames(6000)
+			,m_maxFrames(2000)
 			,m_lastEpisode(-1)
 			,m_stopTraining(20 * 1000000)
 			,m_modelIsTrained(false)
