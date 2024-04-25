@@ -22,8 +22,7 @@
 
 namespace ndCarpole_0
 {
-	//#define D_TRAIN_AGENT
-#if 0
+	#define ND_TRAIN_AGENT
 	#define D_USE_VANILLA_POLICY_GRAD
 
 	#ifdef D_USE_VANILLA_POLICY_GRAD
@@ -50,6 +49,7 @@ namespace ndCarpole_0
 		m_stateSize
 	};
 
+#if 0
 	class ndRobot: public ndModelArticulation
 	{
 		public:
@@ -474,25 +474,243 @@ namespace ndCarpole_0
 		return model;
 	}
 #endif
+
+#ifdef ND_TRAIN_AGENT
+	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
+	{
+		public:
+		TrainingUpdata(ndDemoEntityManager* const scene, const ndMatrix& matrix)
+			:OnPostUpdate()
+			,m_master()
+			,m_bestActor()
+			,m_outFile(nullptr)
+			,m_timer(ndGetTimeInMicroseconds())
+			,m_maxScore(ndFloat32(-1.0e10f))
+			,m_maxFrames(6000)
+			,m_lastEpisode(-1)
+			,m_stopTraining(100 * 1000000)
+			,m_modelIsTrained(false)
+		{
+			ndWorld* const world = scene->GetWorld();
+			
+			m_outFile = fopen("cartpole-VPG.csv", "wb");
+			fprintf(m_outFile, "vpg\n");
+
+			////const ndInt32 countX = 2;
+			////const ndInt32 countZ = 2;
+			//const ndInt32 countX = 6;
+			//const ndInt32 countZ = 9;
+			////const ndFloat32 separation = 4.0f;
+			//const ndFloat32 separation = 0.0f;
+			
+			ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			
+			//hyperParameters.m_threadsCount = 1;
+			//hyperParameters.m_sigma = ndReal(0.25f);
+			hyperParameters.m_discountFactor = ndReal(0.99f);
+			//hyperParameters.m_maxTrajectorySteps = 1024 * 6;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
+			
+			m_master = ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>(new ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>(hyperParameters));
+			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetActor()));
+			
+			m_master->SetName(CONTROLLER_NAME);
+			
+			////ndInt32 materialId = 1;
+			//ndSharedPtr<ndBrainAgent> visualAgent(BuildAgent(m_master));
+			//ndSharedPtr<ndModel> visualModel(BuildModel(scene, matrix, visualAgent));
+			//world->AddModel(visualModel);
+			//SetMaterial(visualModel);
+			//
+			//ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, visualModel));
+			//scene->Set2DDisplayRenderFunction(quadrupedUI);
+			//
+			//// add a hidden battery of model to generate trajectories in parallel
+			//ndMatrix location(matrix);
+			//location.m_posit.m_z -= countZ * separation * 0.5f;
+			//
+			//ndFloat32 x0 = matrix.m_posit.m_x + separation;
+			//for (ndInt32 i = 0; i < countZ; ++i)
+			//{
+			//	location.m_posit.m_x = x0;
+			//	for (ndInt32 j = 0; j < countX; ++j)
+			//	{
+			//		ndSharedPtr<ndBrainAgent> agent(BuildAgent(m_master));
+			//		ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
+			//		world->AddModel(model);
+			//		location.m_posit.m_x += separation;
+			//		//HideModel(model);
+			//		SetMaterial(model);
+			//	}
+			//	location.m_posit.m_z += separation;
+			//}
+		}
+
+		~TrainingUpdata()
+		{
+			//if (m_outFile)
+			//{
+			//	fclose(m_outFile);
+			//}
+		}
+
+		//void HideModel(ndSharedPtr<ndModel>& model) const
+		//{
+		//	ndRobot* const robot = (ndRobot*)*model;
+		//
+		//	ndModelArticulation::ndNode* stackMem[128];
+		//	ndInt32 stack = 1;
+		//	stackMem[0] = robot->GetRoot();
+		//	while (stack)
+		//	{
+		//		stack--;
+		//		ndModelArticulation::ndNode* const node = stackMem[stack];
+		//		ndBody* const body = *node->m_body;
+		//		ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
+		//		ndDemoEntity* const ent = userData->m_entity;
+		//		ent->Hide();
+		//
+		//		for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+		//		{
+		//			stackMem[stack] = child;
+		//			stack++;
+		//		}
+		//	}
+		//}
+		//
+		//class InvisibleBodyNotify : public ndDemoEntityNotify
+		//{
+		//	public:
+		//	InvisibleBodyNotify(const ndDemoEntityNotify* const src)
+		//		:ndDemoEntityNotify(*src)
+		//	{
+		//	}
+		//
+		//	virtual bool OnSceneAabbOverlap(const ndBody* const otherBody) const
+		//	{
+		//		const ndBodyKinematic* const body0 = ((ndBody*)GetBody())->GetAsBodyKinematic();
+		//		const ndBodyKinematic* const body1 = ((ndBody*)otherBody)->GetAsBodyKinematic();
+		//		const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
+		//		const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
+		//		return instanceShape0.m_shapeMaterial.m_userId != instanceShape1.m_shapeMaterial.m_userId;
+		//	}
+		//};
+		//
+		//void SetMaterial(ndSharedPtr<ndModel>& model) const
+		//{
+		//	ndRobot* const robot = (ndRobot*)*model;
+		//
+		//	ndModelArticulation::ndNode* stackMem[128];
+		//	ndInt32 stack = 1;
+		//	stackMem[0] = robot->GetRoot();
+		//	while (stack)
+		//	{
+		//		stack--;
+		//		ndModelArticulation::ndNode* const node = stackMem[stack];
+		//		ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+		//
+		//		ndShapeInstance& instanceShape = body->GetCollisionShape();
+		//		instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+		//
+		//		ndDemoEntityNotify* const originalNotify = (ndDemoEntityNotify*)body->GetNotifyCallback();
+		//		void* const useData = originalNotify->m_entity;
+		//		originalNotify->m_entity = nullptr;
+		//		InvisibleBodyNotify* const notify = new InvisibleBodyNotify((InvisibleBodyNotify*)body->GetNotifyCallback());
+		//		body->SetNotifyCallback(notify);
+		//		notify->m_entity = (ndDemoEntity*)useData;
+		//
+		//		for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+		//		{
+		//			stackMem[stack] = child;
+		//			stack++;
+		//		}
+		//	}
+		//}
+
+		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
+		{
+			//ndInt32 stopTraining = m_master->GetFramesCount();
+			//if (stopTraining <= m_stopTraining)
+			//{
+			//	ndInt32 episodeCount = m_master->GetEposideCount();
+			//	m_master->OptimizeStep();
+			//
+			//	episodeCount -= m_master->GetEposideCount();
+			//	if (m_master->GetAverageFrames() >= ndFloat32(m_maxFrames))
+			//	{
+			//		if (m_master->GetAverageScore() > m_maxScore)
+			//		{
+			//			if (m_lastEpisode != m_master->GetEposideCount())
+			//			{
+			//				m_bestActor->CopyFrom(*m_master->GetActor());
+			//				m_maxScore = m_master->GetAverageScore();
+			//				ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", m_master->GetEposideCount(), m_master->GetAverageFrames(), m_master->GetAverageScore());
+			//				m_lastEpisode = m_master->GetEposideCount();
+			//			}
+			//		}
+			//	}
+			//
+			//	if (episodeCount && !m_master->IsSampling())
+			//	{
+			//		ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
+			//		if (m_outFile)
+			//		{
+			//			fprintf(m_outFile, "%g\n", m_master->GetAverageScore());
+			//			fflush(m_outFile);
+			//		}
+			//	}
+			//}
+			//
+			//if (stopTraining >= m_stopTraining)
+			//{
+			//	char fileName[1024];
+			//	m_modelIsTrained = true;
+			//	m_master->GetActor()->CopyFrom(*(*m_bestActor));
+			//	ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
+			//	m_master->GetActor()->SaveToFile(fileName);
+			//	ndExpandTraceMessage("saving to file: %s\n", fileName);
+			//	ndExpandTraceMessage("training complete\n");
+			//	ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+			//	ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+			//	manager->Terminate();
+			//}
+		}
+
+		ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>> m_master;
+		ndSharedPtr<ndBrain> m_bestActor;
+		FILE* m_outFile;
+		ndUnsigned64 m_timer;
+		ndFloat32 m_maxScore;
+		ndInt32 m_maxFrames;
+		ndInt32 m_lastEpisode;
+		ndInt32 m_stopTraining;
+		bool m_modelIsTrained;
+	};
+#endif
+
 }
 
 using namespace ndCarpole_0;
 
 void ndCartpoleDiscrete(ndDemoEntityManager* const scene)
 {
-	ndAssert(0);
-	//BuildFlatPlane(scene, true);
-	//
-	//ndSetRandSeed(42);
-	//ndWorld* const world = scene->GetWorld();
-	//ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-	//
-	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	//world->AddModel(model);
-	//
-	//matrix.m_posit.m_x -= 0.0f;
-	//matrix.m_posit.m_y += 0.5f;
-	//matrix.m_posit.m_z += 2.0f;
-	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
-	//scene->SetCameraMatrix(rotation, matrix.m_posit);
+	BuildFlatPlane(scene, true);
+	
+	ndSetRandSeed(42);
+	ndWorld* const world = scene->GetWorld();
+	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
+
+#ifdef ND_TRAIN_AGENT
+	TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix);
+	scene->RegisterPostUpdate(trainer);
+#else
+	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	world->AddModel(model);
+#endif
+	
+	matrix.m_posit.m_x -= 0.0f;
+	matrix.m_posit.m_y += 0.5f;
+	matrix.m_posit.m_z += 2.0f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
+	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }

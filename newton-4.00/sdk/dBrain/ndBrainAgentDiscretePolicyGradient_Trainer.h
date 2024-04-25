@@ -933,13 +933,13 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons));
 	}
 	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, actionDim));
-	layers.PushBack(new ndBrainLayerTanhActivation(actionDim));
+	layers.PushBack(new ndBrainLayerSoftmaxActivation(actionDim));
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		m_actor.AddLayer(layers[i]);
 	}
 	m_actor.InitWeightsXavierMethod();
-	ndAssert(!strcmp((m_actor[m_actor.GetCount() - 1])->GetLabelId(), "ndBrainLayerTanhActivation"));
+	ndAssert(!strcmp((m_actor[m_actor.GetCount() - 1])->GetLabelId(), "ndBrainLayerSoftmaxActivation"));
 
 	m_trainers.SetCount(0);
 	m_auxiliaryTrainers.SetCount(0);
