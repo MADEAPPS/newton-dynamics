@@ -589,7 +589,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 			};
 	
 			ndPolicyLoss loss;
-			//ndBrainFixSizeVector<1> actions;
 			ndBrainFixSizeVector<1> stateValue;
 			ndBrainFixSizeVector<statesDim> zeroObservations;
 			ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
@@ -602,8 +601,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 				if (index < maxSteps)
 				{
 					const ndBrainMemVector observation(&m_trajectoryAccumulator[ndInt32(index)].m_observation[0], statesDim);
-					//m_baseLineValue.MakePrediction(observation, actions, workingBuffer);
-	
 					stateValue[0] = m_trajectoryAccumulator[ndInt32(index)].m_reward;
 					averageRewards[threadIndex] += stateValue[0];
 					loss.SetTruth(stateValue);
