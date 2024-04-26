@@ -252,7 +252,7 @@ namespace ndCarpole_0
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
 		//ndMatrix matrix(cartBody->GetMatrix());
 		ndMatrix matrix(location);
-		matrix.m_posit.m_y += ySize / 2.0f;
+		matrix.m_posit.m_y += ySize / 2.0f + 0.05f;
 		cartBody->SetMatrix(matrix);
 		cartBody->GetAsBodyDynamic()->SetSleepAccel(cartBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
 		

@@ -118,6 +118,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 			//ndBrainFloat sigma2 = ndBrainFloat(0.2f);
 
 			m_sigma = ndSqrt(sigma2);
+			m_explorationSigma = m_sigma;
 
 			m_learnRate = ndBrainFloat(0.0005f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
@@ -129,6 +130,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndBrainFloat m_learnRate;
 		ndBrainFloat m_regularizer;
 		ndBrainFloat m_discountFactor;
+		ndBrainFloat m_explorationSigma;
 
 		ndInt32 m_threadsCount;
 		ndInt32 m_bashBufferSize;
@@ -176,6 +178,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndBrainFloat m_sigma;
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_learnRate;
+	ndBrainFloat m_explorationSigma;
 	ndInt32 m_frameCount;
 	ndInt32 m_framesAlive;
 	ndInt32 m_eposideCount;
@@ -234,6 +237,7 @@ bool ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::IsTermina
 	return false;
 }
 
+//#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::SelectAction(ndBrainVector& actions) const
 {
@@ -247,7 +251,7 @@ void ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::SelectAct
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
 		//ndBrainFloat sample = ndBrainFloat(ndGaussianRandom(actions[i], m_master->m_sigma));
-		ndBrainFloat sample = ndBrainFloat(actions[i] + m_d(m_gen) * m_master->m_sigma);
+		ndBrainFloat sample = ndBrainFloat(actions[i] + m_d(m_gen) * m_master->m_explorationSigma);
 		ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = squashedAction;
 	}
@@ -290,6 +294,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	,m_sigma(hyperParameters.m_sigma)
 	,m_gamma(hyperParameters.m_discountFactor)
 	,m_learnRate(hyperParameters.m_learnRate)
+	,m_explorationSigma(hyperParameters.m_explorationSigma)
 	,m_frameCount(0)
 	,m_framesAlive(0)
 	,m_eposideCount(0)
