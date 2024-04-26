@@ -323,9 +323,9 @@ namespace ndCarpole_1
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_maxFrames(6000)
+			,m_maxFrames(7000)
 			,m_lastEpisode(-1)
-			,m_stopTraining(200 * 1000000)
+			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -340,7 +340,6 @@ namespace ndCarpole_1
 			hyperParameters.m_discountFactor = ndReal(0.99f);
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 			hyperParameters.m_extraTrajectorySteps = 256;
-			hyperParameters.m_explorationSigma = 0.5f;
 
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>(new ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>(hyperParameters));
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetActor()));
