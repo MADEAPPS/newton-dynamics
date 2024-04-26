@@ -171,7 +171,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndArray<ndBrainTrainer*> m_auxiliaryTrainers;
 	ndBrainOptimizerAdam* m_baseLineValueOptimizer;
 	ndArray<ndBrainTrainer*> m_baseLineValueTrainers;
-	ndArray<ndInt32> m_trajectoryAccumulatorScans;
 	ndArray<ndTrajectoryStepContinue<statesDim, actionDim>> m_trajectoryAccumulator;
 	
 	ndBrainFloat m_sigma;
@@ -287,7 +286,6 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	,m_auxiliaryTrainers()
 	,m_baseLineValueOptimizer(nullptr)
 	,m_baseLineValueTrainers()
-	,m_trajectoryAccumulatorScans()
 	,m_trajectoryAccumulator()
 	,m_sigma(hyperParameters.m_sigma)
 	,m_gamma(hyperParameters.m_discountFactor)
@@ -563,7 +561,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 
 	averageRewards.Set(ndBrainFloat(0.0f));
 	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * GetThreadCount());
-	const ndInt32 maxSteps = (m_trajectoryAccumulator.GetCount() + m_bashBufferSize - 1) & -m_bashBufferSize;
+	const ndInt32 maxSteps = m_trajectoryAccumulator.GetCount() & -m_bashBufferSize;
 	for (ndInt32 base = 0; base < maxSteps; base += m_bashBufferSize)
 	{
 		auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, base, maxSteps, &averageRewards](ndInt32 threadIndex, ndInt32)
@@ -591,7 +589,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 			};
 	
 			ndPolicyLoss loss;
-			ndBrainFixSizeVector<1> actions;
+			//ndBrainFixSizeVector<1> actions;
 			ndBrainFixSizeVector<1> stateValue;
 			ndBrainFixSizeVector<statesDim> zeroObservations;
 			ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
@@ -604,7 +602,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 				if (index < maxSteps)
 				{
 					const ndBrainMemVector observation(&m_trajectoryAccumulator[ndInt32(index)].m_observation[0], statesDim);
-					m_baseLineValue.MakePrediction(observation, actions, workingBuffer);
+					//m_baseLineValue.MakePrediction(observation, actions, workingBuffer);
 	
 					stateValue[0] = m_trajectoryAccumulator[ndInt32(index)].m_reward;
 					averageRewards[threadIndex] += stateValue[0];
