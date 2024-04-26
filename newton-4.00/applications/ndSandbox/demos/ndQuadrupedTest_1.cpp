@@ -371,8 +371,8 @@ namespace ndQuadruped_1
 
 				ndFloat32 randVar = ndRand();
 				randVar = randVar * randVar * randVar;
-				ndFloat32 speed0 = ndFloat32(0.05f);
-				ndFloat32 speed1 = ndFloat32(1.0f);
+				ndFloat32 speed0 = ndFloat32(0.5f);
+				ndFloat32 speed1 = ndFloat32(4.0f);
 				ndFloat32 animationSpeed = speed0 +  (speed1 - speed0) * randVar;
 				m_model->m_control->m_animSpeed = animationSpeed;
 
@@ -785,7 +785,7 @@ namespace ndQuadruped_1
 	}
 	#endif
 
-	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation, ndSharedPtr<ndBrainAgent>& agent)
+	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation, ndSharedPtr<ndBrainAgent> agent)
 	{
 		ndFloat32 mass = 20.0f;
 		ndFloat32 radius = 0.25f;
@@ -1016,7 +1016,7 @@ namespace ndQuadruped_1
 					ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
 					world->AddModel(model);
 					location.m_posit.m_x += separation;
-					//HideModel(model);
+					HideModel(model);
 					SetMaterial(model);
 				}
 				location.m_posit.m_z += separation;
