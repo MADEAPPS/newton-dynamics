@@ -218,11 +218,6 @@ namespace ndCarpole_0
 			m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, m_cart->GetScene()->GetTimestep());
 		}
 
-		bool IsOutOfBounds() const
-		{
-			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
-		}
-
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);

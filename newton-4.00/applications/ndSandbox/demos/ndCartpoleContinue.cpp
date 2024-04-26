@@ -20,18 +20,12 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
+
 namespace ndCarpole_1
 {
-	//#define D_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 
-	#define D_USE_VANILLA_POLICY_GRAD
-
-	#ifdef D_USE_VANILLA_POLICY_GRAD
-		#define CONTROLLER_NAME "cartpoleContinueVPG.dnn"
-	#else
-		#define CONTROLLER_NAME "cartpoleDDPG.dnn"
-	#endif 
+	#define CONTROLLER_NAME "cartpoleContinueVPG.dnn"
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
@@ -52,27 +46,14 @@ namespace ndCarpole_1
 	class ndRobot: public ndModelArticulation
 	{
 		public:
-
-		#ifdef D_USE_VANILLA_POLICY_GRAD
-		class ndController : public ndBrainAgentContinueVPG<m_stateSize, m_actionsSize>
-		#else
-		class ndController : public ndBrainAgentDDPG<m_stateSize, m_actionsSize>
-		#endif
+		class ndController : public ndBrainAgentContinuePolicyGradient<m_stateSize, m_actionsSize>
 		{
 			public:
-			#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndController(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentContinueVPG<m_stateSize, m_actionsSize>(actor)
+				:ndBrainAgentContinuePolicyGradient<m_stateSize, m_actionsSize>(actor)
 				,m_model(nullptr)
 			{
 			}
-			#else
-			ndController(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentDDPG<m_stateSize, m_actionsSize>(actor)
-				,m_model(nullptr)
-			{
-			}
-			#endif
 
 			void GetObservation(ndBrainFloat* const observation)
 			{
@@ -86,18 +67,12 @@ namespace ndCarpole_1
 
 			ndRobot* m_model;
 		};
-
-
-		#ifdef D_USE_VANILLA_POLICY_GRAD
-		class ndControllerTrainer : public ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>
-		#else
-		class ndControllerTrainer : public ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>
-		#endif
+#if 0
+		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
-			#ifdef D_USE_VANILLA_POLICY_GRAD
 			ndControllerTrainer(const HyperParameters& hyperParameters)
-				:ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
+				:ndBrainAgentContinuePolicyGradient_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
 				,m_bestActor(m_actor)
 				,m_model(nullptr)
 				,m_timer(ndGetTimeInMicroseconds())
@@ -109,21 +84,6 @@ namespace ndCarpole_1
 				m_outFile = fopen("cartpoleContinue-VPG.csv", "wb");
 				fprintf(m_outFile, "vpg\n");
 			}
-			#else
-			ndControllerTrainer(const HyperParameters& hyperParameters)
-				:ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
-				,m_bestActor(m_actor)
-				,m_model(nullptr)
-				,m_timer(ndGetTimeInMicroseconds())
-				,m_maxGain(ndFloat32(-1.0e10f))
-				,m_maxFrames(5000)
-				,m_stopTraining(500000)
-				,m_modelIsTrained(false)
-			{
-				m_outFile = fopen("cartpole-DDPG.csv", "wb");
-				fprintf(m_outFile, "ddpg\n");
-			}
-			#endif
 
 			~ndControllerTrainer()
 			{
@@ -182,12 +142,8 @@ namespace ndCarpole_1
 				if (stopTraining <= m_stopTraining)
 				{
 					ndInt32 episodeCount = GetEposideCount();
-					
-					#ifdef D_USE_VANILLA_POLICY_GRAD
-					ndBrainAgentContinueVPG_Trainer::OptimizeStep();
-					#else
-					ndBrainAgentDDPG_Trainer::OptimizeStep();
-					#endif
+			
+					ndBrainAgentContinuePolicyGradient_Trainer::OptimizeStep();
 
 					episodeCount -= GetEposideCount();
 					if (m_averageFramesPerEpisodes.GetAverage() >= ndReal (m_maxFrames))
@@ -244,6 +200,7 @@ namespace ndCarpole_1
 			ndInt32 m_stopTraining;
 			bool m_modelIsTrained;
 		};
+#endif
 
 		ndRobot(const ndSharedPtr<ndBrainAgent>& agent)
 			:ndModelArticulation()
@@ -341,26 +298,6 @@ namespace ndCarpole_1
 			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
 		}
 
-		void CheckTrainingCompleted()
-		{
-			#ifdef D_TRAIN_AGENT
-			if (m_agent->IsTrainer())
-			{
-				ndControllerTrainer* const agent = (ndControllerTrainer*)(*m_agent);
-				if (agent->m_modelIsTrained)
-				{
-					char fileName[1024];
-					ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
-					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-					m_agent = ndSharedPtr<ndBrainAgent>(new ndRobot::ndController(actor));
-					((ndRobot::ndController*)*m_agent)->m_model = this;
-					//ResetModel();
-					((ndPhysicsWorld*)m_world)->NormalUpdates();
-				}
-			}
-			#endif
-		}
-
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
@@ -370,7 +307,6 @@ namespace ndCarpole_1
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
-			m_agent->OptimizeStep();
 		}
 
 		ndMatrix m_cartMatrix;
@@ -428,17 +364,13 @@ namespace ndCarpole_1
 		model->m_poleMatrix = poleBody->GetMatrix();
 	}
 
-	#ifdef D_TRAIN_AGENT
+	#ifdef ND_TRAIN_AGENT
 		ndRobot* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 		{
 			// add a reinforcement learning controller 
-			#ifdef D_USE_VANILLA_POLICY_GRAD
-			ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			ndBrainAgentContinuePolicyGradient_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			hyperParameters.m_maxTrajectorySteps = 6000;
 			hyperParameters.m_discountFactor = ndBrainFloat(0.995f);
-			#else
-			ndBrainAgentDDPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
-			#endif
 			
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_discountFactor = ndBrainFloat(0.995f);
@@ -454,46 +386,46 @@ namespace ndCarpole_1
 			scene->SetAcceleratedUpdate();
 			return model;
 		}
-	#endif
-
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
-	{
-		#ifdef D_TRAIN_AGENT
-			ndRobot* const model = CreateTrainModel(scene, location);
-		#else
+	
+	#else
+		ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+		{
 			char fileName[1024];
 			ndGetWorkingFileName(CONTROLLER_NAME, fileName);
-	
+
 			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
 			ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndController(actor));
 
 			ndRobot* const model = new ndRobot(agent);
 			((ndRobot::ndController*)*agent)->m_model = model;
-		
+
 			BuildModel(model, scene, location);
-		#endif
-		return model;
-	}
+			return model;
+		}
+	#endif
 }
 
 using namespace ndCarpole_1;
-#endif
 
 void ndCartpoleContinue(ndDemoEntityManager* const scene)
 {
 	BuildFlatPlane(scene, true);
-	ndAssert(0);
 	
-	//ndSetRandSeed(42);
-	//ndWorld* const world = scene->GetWorld();
-	//ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-	//
-	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	//world->AddModel(model);
-	//
-	//matrix.m_posit.m_x -= 0.0f;
-	//matrix.m_posit.m_y += 0.5f;
-	//matrix.m_posit.m_z += 2.0f;
-	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
-	//scene->SetCameraMatrix(rotation, matrix.m_posit);
+	ndSetRandSeed(42);
+	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
+
+#ifdef ND_TRAIN_AGENT
+	TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix);
+	scene->RegisterPostUpdate(trainer);
+#else
+	ndWorld* const world = scene->GetWorld();
+	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	world->AddModel(model);
+#endif
+
+	matrix.m_posit.m_x -= 0.0f;
+	matrix.m_posit.m_y += 0.5f;
+	matrix.m_posit.m_z += 2.0f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
+	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
