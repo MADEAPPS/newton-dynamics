@@ -12,6 +12,12 @@
 #include "ndModelStdafx.h"
 #include "ndModelNotify.h"
 
+ndModelNotify::ndModelNotify(const ndModelNotify& src)
+	:ndBodyNotify(src)
+	,m_parentBody(src.m_parentBody)
+{
+}
+
 ndModelNotify::ndModelNotify(ndBodyKinematic* const parentBody, ndVector gravity)
 	:ndBodyNotify(gravity)
 	,m_parentBody(parentBody)

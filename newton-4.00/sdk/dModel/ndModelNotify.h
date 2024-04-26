@@ -34,6 +34,7 @@ class ndModelNotify: public ndBodyNotify
 	//};
 
 	D_CLASS_REFLECTION(ndModelNotify, ndBodyNotify)
+	ndModelNotify(const ndModelNotify& src);
 	ndModelNotify(ndBodyKinematic* const parentBody = nullptr, ndVector gravity = ndVector (ndFloat32 (0.0f), ndFloat32(-10.0f), ndFloat32(0.0f), ndFloat32(0.0f)));
 	virtual ~ndModelNotify();
 

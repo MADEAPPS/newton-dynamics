@@ -24,6 +24,14 @@
 #include "ndBodyNotify.h"
 #include "ndBodyKinematic.h"
 
+
+ndBodyNotify::ndBodyNotify(const ndBodyNotify& src)
+	:ndContainersFreeListAlloc<ndBodyNotify>()
+	,m_defaultGravity(src.m_defaultGravity)
+	,m_body(src.m_body)
+{
+}
+
 ndBodyNotify::ndBodyNotify(const ndVector& defaultGravity)
 	:ndContainersFreeListAlloc<ndBodyNotify>()
 	,m_defaultGravity(defaultGravity)
