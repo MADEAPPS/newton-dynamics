@@ -20,18 +20,11 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
+
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_MODEL
-
-	#define D_USE_VANILLA_POLICY_GRAD
-
-	#ifdef D_USE_VANILLA_POLICY_GRAD
-		#define CONTROLLER_NAME "unicycleVPG.dnn"
-	#else
-		#define CONTROLLER_NAME "unicycleTD3.dnn"
-	#endif 
+	//#define ND_TRAIN_AGENT
+	#define CONTROLLER_NAME "unicycleVPG.dnn"
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
 	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)
@@ -53,6 +46,7 @@ namespace ndUnicycle
 		m_isOnAir,
 		m_stateSize
 	};
+
 
 	class ndRobot : public ndModelArticulation
 	{
@@ -89,19 +83,11 @@ namespace ndUnicycle
 		};
 
 		// implement controller player
-		#ifdef D_USE_VANILLA_POLICY_GRAD
-		class ndController : public ndBrainAgentContinueVPG<m_stateSize, m_actionsSize>
-		#else
-		class ndController : public ndBrainAgentTD3<m_stateSize, m_actionsSize>
-		#endif
+		class ndController : public ndBrainAgentContinuePolicyGradient<m_stateSize, m_actionsSize>
 		{
 			public:
 			ndController(ndSharedPtr<ndBrain>& actor)
-				#ifdef D_USE_VANILLA_POLICY_GRAD
-				:ndBrainAgentContinueVPG<m_stateSize, m_actionsSize>(actor)
-				#else
-				:ndBrainAgentTD3<m_stateSize, m_actionsSize>(actor)
-				#endif
+				:ndBrainAgentContinuePolicyGradient<m_stateSize, m_actionsSize>(actor)
 				,m_model(nullptr)
 			{
 			}
@@ -124,211 +110,165 @@ namespace ndUnicycle
 			ndRobot* m_model;
 		};
 
-		#ifdef D_USE_VANILLA_POLICY_GRAD
-		class ndControllerTrainer: public ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>
-		#else
-		class ndControllerTrainer : public ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>
-		#endif
-		{
-			public:
-			#ifdef D_USE_VANILLA_POLICY_GRAD
-			ndControllerTrainer(const HyperParameters& hyperParameters)
-				:ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
-				,m_bestActor(m_actor)
-				,m_model(nullptr)
-				,m_maxGain(-1.0e10f)
-				//,m_maxFrames(5000)
-				,m_maxFrames(2300)
-				,m_stopTraining(20000000)
-				,m_timer(ndGetTimeInMicroseconds())
-				,m_modelIsTrained(false)
-			#else
-			ndControllerTrainer(const HyperParameters& hyperParameters)
-				:ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
-				,m_bestActor(m_actor)
-				,m_model(nullptr)
-				,m_maxGain(-1.0e10f)
-				,m_maxFrames(3000)
-				,m_stopTraining(3000000)
-				,m_timer(ndGetTimeInMicroseconds())
-				,m_modelIsTrained(false)
-			#endif
-			{
-				#ifdef D_USE_VANILLA_POLICY_GRAD
-					m_outFile = fopen("unicycle-VPG.csv", "wb");
-					fprintf(m_outFile, "vgp\n");
-				#else
-					m_outFile = fopen("unicycle-TD3.csv", "wb");
-					fprintf(m_outFile, "td3\n");
-				#endif
-			}
-
-			~ndControllerTrainer()
-			{
-				if (m_outFile)
-				{
-					fclose(m_outFile);
-				}
-			}
-
-			void SetModel(ndRobot* const model)
-			{
-				m_model = model;
-			}
-
-			bool IsTerminal() const
-			{
-				#define D_REWARD_MIN_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
-				const ndMatrix& matrix = m_model->GetRoot()->m_body->GetMatrix();
-				ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
-				bool fail = ndAbs(ndAsin(sinAngle)) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
-				return fail;
-			}
-
-			ndBrainFloat CalculateReward()
-			{
-				if (IsTerminal())
-				{
-					return ndReal(0.0f);
-				}
-
-				ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_model->m_legJoint->GetAngle() * m_model->m_legJoint->GetAngle()));
-				if (m_model->HasSupportContact())
-				{
-					ndBodyKinematic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyKinematic();
-					const ndMatrix& matrix = boxBody->GetMatrix();
-					ndFloat32 sinAngle = matrix.m_up.m_x;
-					ndFloat32 boxReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
-
-					ndFloat32 reward = (boxReward + legReward) / 2.0f;
-					return ndReal(reward);
-				}
-				else
-				{
-					ndVector wheelOmega(m_model->m_wheel->GetOmega());
-					ndFloat32 wheelReward = ndReal(ndExp(-ndFloat32(10000.0f) * wheelOmega.m_z * wheelOmega.m_z));
-					ndFloat32 reward = (wheelReward + legReward) / 2.0f;
-					return ndReal(reward);
-				}
-			}
-
-			virtual void ApplyActions(ndBrainFloat* const actions)
-			{
-				#ifndef D_USE_VANILLA_POLICY_GRAD
-					if (GetEpisodeFrames() >= 15000)
-					{
-						for (ndInt32 i = 0; i < m_actionsSize; ++i)
-						{
-							ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(2.0f)));
-							ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
-							actions[i] = clippiedNoisyAction;
-						}
-					}
-					else if (GetEpisodeFrames() >= 10000)
-					{
-						for (ndInt32 i = 0; i < m_actionsSize; ++i)
-						{
-							ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
-							ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
-							actions[i] = clippiedNoisyAction;
-						}
-					}
-				#endif
-
-				m_model->ApplyActions(actions);
-
-				const ndFloat32 probability = 1.0f / 2000.0f;
-				ndFloat32 applyJumpImpule = ndRand();
-				if (applyJumpImpule < probability)
-				{
-					if (m_model->HasSupportContact())
-					{
-						ndBodyDynamic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyDynamic();
-
-						ndFloat32 speed = 4.0f + 2.0f * ndRand();
-						ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
-						ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
-						boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_model->m_timestep);
-					}
-				}
-			}
-
-			void GetObservation(ndBrainFloat* const observation)
-			{
-				m_model->GetObservation(observation);
-			}
-
-			void ResetModel()
-			{
-				m_model->ResetModel();
-			}
-
-			void OptimizeStep()
-			{
-				ndInt32 stopTraining = GetFramesCount();
-				if (stopTraining <= m_stopTraining)
-				{
-					ndInt32 episodeCount = GetEposideCount();
-					#ifdef D_USE_VANILLA_POLICY_GRAD
-						ndBrainAgentContinueVPG_Trainer::OptimizeStep();
-					#else
-						ndBrainAgentTD3_Trainer::OptimizeStep();
-					#endif
-
-					episodeCount -= GetEposideCount();
-					if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32 (m_maxFrames))
-					{
-						if (m_averageScore.GetAverage() > m_maxGain)
-						{
-							m_bestActor.CopyFrom(m_actor);
-							m_maxGain = m_averageScore.GetAverage();
-							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageScore.GetAverage());
-						}
-					}
-
-					if (episodeCount && !IsSampling())
-					{
-						ndExpandTraceMessage("step: %d\treward: %f\tframes: %f\n", GetFramesCount(), m_averageScore.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
-						if (m_outFile)
-						{
-							fprintf(m_outFile, "%g\n", m_averageScore.GetAverage());
-							fflush(m_outFile);
-						}
-					}
-
-					if (stopTraining == m_stopTraining)
-					{
-						char fileName[1024];
-						m_modelIsTrained = true;
-						m_actor.CopyFrom(m_bestActor);
-						ndGetWorkingFileName(GetName().GetStr(), fileName);
-						SaveToFile(fileName);
-						ndExpandTraceMessage("saving to file: %s\n", fileName);
-						ndExpandTraceMessage("training complete\n");
-						ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-						ndExpandTraceMessage("training time: %g seconds", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-						if (m_outFile)
-						{
-							fclose(m_outFile);
-							m_outFile = nullptr;
-						}
-					}
-				}
-				if (m_model->IsOutOfBounds())
-				{
-					m_model->TelePort();
-				}
-			}
-
-			FILE* m_outFile;
-			ndBrain m_bestActor;
-			ndRobot* m_model;
-			ndFloat32 m_maxGain;
-			ndInt32 m_maxFrames;
-			ndInt32 m_stopTraining;
-			ndUnsigned64 m_timer;
-			bool m_modelIsTrained;
-		};
+		//class ndControllerTrainer: public ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>
+		//{
+		//	public:
+		//	ndControllerTrainer(const HyperParameters& hyperParameters)
+		//		:ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>(hyperParameters)
+		//		,m_bestActor(m_actor)
+		//		,m_model(nullptr)
+		//		,m_maxGain(-1.0e10f)
+		//		//,m_maxFrames(5000)
+		//		,m_maxFrames(2300)
+		//		,m_stopTraining(20000000)
+		//		,m_timer(ndGetTimeInMicroseconds())
+		//		,m_modelIsTrained(false)
+		//	{
+		//		m_outFile = fopen("unicycle-VPG.csv", "wb");
+		//		fprintf(m_outFile, "vgp\n");
+		//	}
+		//
+		//	~ndControllerTrainer()
+		//	{
+		//		if (m_outFile)
+		//		{
+		//			fclose(m_outFile);
+		//		}
+		//	}
+		//
+		//	void SetModel(ndRobot* const model)
+		//	{
+		//		m_model = model;
+		//	}
+		//
+		//	bool IsTerminal() const
+		//	{
+		//		#define D_REWARD_MIN_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
+		//		const ndMatrix& matrix = m_model->GetRoot()->m_body->GetMatrix();
+		//		ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
+		//		bool fail = ndAbs(ndAsin(sinAngle)) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
+		//		return fail;
+		//	}
+		//
+		//	ndBrainFloat CalculateReward()
+		//	{
+		//		if (IsTerminal())
+		//		{
+		//			return ndReal(0.0f);
+		//		}
+		//
+		//		ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_model->m_legJoint->GetAngle() * m_model->m_legJoint->GetAngle()));
+		//		if (m_model->HasSupportContact())
+		//		{
+		//			ndBodyKinematic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyKinematic();
+		//			const ndMatrix& matrix = boxBody->GetMatrix();
+		//			ndFloat32 sinAngle = matrix.m_up.m_x;
+		//			ndFloat32 boxReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
+		//
+		//			ndFloat32 reward = (boxReward + legReward) / 2.0f;
+		//			return ndReal(reward);
+		//		}
+		//		else
+		//		{
+		//			ndVector wheelOmega(m_model->m_wheel->GetOmega());
+		//			ndFloat32 wheelReward = ndReal(ndExp(-ndFloat32(10000.0f) * wheelOmega.m_z * wheelOmega.m_z));
+		//			ndFloat32 reward = (wheelReward + legReward) / 2.0f;
+		//			return ndReal(reward);
+		//		}
+		//	}
+		//
+		//	virtual void ApplyActions(ndBrainFloat* const actions)
+		//	{
+		//		m_model->ApplyActions(actions);
+		//
+		//		const ndFloat32 probability = 1.0f / 2000.0f;
+		//		ndFloat32 applyJumpImpule = ndRand();
+		//		if (applyJumpImpule < probability)
+		//		{
+		//			if (m_model->HasSupportContact())
+		//			{
+		//				ndBodyDynamic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyDynamic();
+		//
+		//				ndFloat32 speed = 4.0f + 2.0f * ndRand();
+		//				ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
+		//				ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
+		//				boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_model->m_timestep);
+		//			}
+		//		}
+		//	}
+		//
+		//	void GetObservation(ndBrainFloat* const observation)
+		//	{
+		//		m_model->GetObservation(observation);
+		//	}
+		//
+		//	void ResetModel()
+		//	{
+		//		m_model->ResetModel();
+		//	}
+		//
+		//	void OptimizeStep()
+		//	{
+		//		ndInt32 stopTraining = GetFramesCount();
+		//		if (stopTraining <= m_stopTraining)
+		//		{
+		//			ndInt32 episodeCount = GetEposideCount();
+		//			ndBrainAgentContinueVPG_Trainer::OptimizeStep();
+		//
+		//			episodeCount -= GetEposideCount();
+		//			if (m_averageFramesPerEpisodes.GetAverage() >= ndFloat32 (m_maxFrames))
+		//			{
+		//				if (m_averageScore.GetAverage() > m_maxGain)
+		//				{
+		//					m_bestActor.CopyFrom(m_actor);
+		//					m_maxGain = m_averageScore.GetAverage();
+		//					ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", GetEposideCount(), m_averageFramesPerEpisodes.GetAverage(), m_averageScore.GetAverage());
+		//				}
+		//			}
+		//
+		//			if (episodeCount && !IsSampling())
+		//			{
+		//				ndExpandTraceMessage("step: %d\treward: %f\tframes: %f\n", GetFramesCount(), m_averageScore.GetAverage(), m_averageFramesPerEpisodes.GetAverage());
+		//				if (m_outFile)
+		//				{
+		//					fprintf(m_outFile, "%g\n", m_averageScore.GetAverage());
+		//					fflush(m_outFile);
+		//				}
+		//			}
+		//
+		//			if (stopTraining == m_stopTraining)
+		//			{
+		//				char fileName[1024];
+		//				m_modelIsTrained = true;
+		//				m_actor.CopyFrom(m_bestActor);
+		//				ndGetWorkingFileName(GetName().GetStr(), fileName);
+		//				SaveToFile(fileName);
+		//				ndExpandTraceMessage("saving to file: %s\n", fileName);
+		//				ndExpandTraceMessage("training complete\n");
+		//				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+		//				ndExpandTraceMessage("training time: %g seconds", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+		//				if (m_outFile)
+		//				{
+		//					fclose(m_outFile);
+		//					m_outFile = nullptr;
+		//				}
+		//			}
+		//		}
+		//		if (m_model->IsOutOfBounds())
+		//		{
+		//			m_model->TelePort();
+		//		}
+		//	}
+		//
+		//	FILE* m_outFile;
+		//	ndBrain m_bestActor;
+		//	ndRobot* m_model;
+		//	ndFloat32 m_maxGain;
+		//	ndInt32 m_maxFrames;
+		//	ndInt32 m_stopTraining;
+		//	ndUnsigned64 m_timer;
+		//	bool m_modelIsTrained;
+		//};
 
 		ndRobot(ndSharedPtr<ndBrainAgent> agent)
 			:ndModelArticulation()
@@ -427,26 +367,6 @@ namespace ndUnicycle
 			}
 		}
 
-		void CheckTrainingCompleted()
-		{
-			#ifdef ND_TRAIN_MODEL
-			if (m_agent->IsTrainer())
-			{
-				ndControllerTrainer* const agent = (ndControllerTrainer*)*m_agent;
-				if (agent->m_modelIsTrained)
-				{
-					char fileName[1024];
-					ndGetWorkingFileName(agent->GetName().GetStr(), fileName);
-					ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-					m_agent = ndSharedPtr<ndBrainAgent>(new ndRobot::ndController(actor));
-					((ndRobot::ndController*)*m_agent)->SetModel(this);
-					ResetModel();
-					((ndPhysicsWorld*)m_world)->NormalUpdates();
-				}
-			}
-			#endif
-		}
-
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
@@ -457,8 +377,6 @@ namespace ndUnicycle
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::PostUpdate(world, timestep);
-			m_agent->OptimizeStep();
-			CheckTrainingCompleted();
 		}
 
 		ndSharedPtr<ndBrainAgent> m_agent;
@@ -557,66 +475,68 @@ namespace ndUnicycle
 		}
 	}
 
+#ifdef ND_TRAIN_AGENT
+	//ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	//{
+	//	// build neural net controller
+	//
+	//// add a reinforcement learning controller 
+	//	ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+	//	hyperParameters.m_maxTrajectorySteps = 6000;
+	//	hyperParameters.m_discountFactor = ndReal(0.99f);
+	//
+	//	ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerTrainer(hyperParameters));
+	//	agent->SetName(CONTROLLER_NAME);
+	//	scene->SetAcceleratedUpdate();
+	//}
+
+#else
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		// build neural net controller
-		#ifdef ND_TRAIN_MODEL
-			// add a reinforcement learning controller 
-			#ifdef D_USE_VANILLA_POLICY_GRAD
-			ndBrainAgentContinueVPG_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
-			hyperParameters.m_maxTrajectorySteps = 6000;
-			hyperParameters.m_discountFactor = ndReal(0.99f);
-			#else
-			ndBrainAgentTD3_Trainer<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
-			hyperParameters.m_actionNoiseVariance = ndReal(0.25f);
-			#endif
-
-			ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerTrainer(hyperParameters));
-			agent->SetName(CONTROLLER_NAME);
-			scene->SetAcceleratedUpdate();
-		#else
-			char fileName[1024];
-			ndGetWorkingFileName(CONTROLLER_NAME, fileName);
-			ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-			ndSharedPtr<ndBrainAgent> agent(new  ndRobot::ndController(actor));
-		#endif
+		char fileName[1024];
+		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
+		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndController(actor));
 
 		ndRobot* const model = new ndRobot(agent);
 		BuildModel(model, scene, location);
-		#ifdef ND_TRAIN_MODEL
-			((ndRobot::ndControllerTrainer*)*agent)->SetModel(model);
-		#else
-			((ndRobot::ndController*)*agent)->SetModel(model);
-		#endif
+		((ndRobot::ndController*)*agent)->SetModel(model);
 		return model;
 	}
+#endif
 }
 
 using namespace ndUnicycle;
-#endif
 
 void ndUnicycleController(ndDemoEntityManager* const scene)
 {
 	ndAssert(0);
-	//// build a floor
-	////BuildFloorBox(scene, ndGetIdentityMatrix());
-	//BuildFlatPlane(scene, true);
-	//
-	//ndSetRandSeed(42);
-	//ndWorld* const world = scene->GetWorld();
-	//ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-	//
-	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	//scene->GetWorld()->AddModel(model);
-	//
+	// build a floor
+	//BuildFloorBox(scene, ndGetIdentityMatrix());
+	BuildFlatPlane(scene, true);
+	
+	ndSetRandSeed(42);
+	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
+
+#ifdef ND_TRAIN_AGENT
+	TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix);
+	scene->RegisterPostUpdate(trainer);
+#else
+	ndWorld* const world = scene->GetWorld();
+	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	world->AddModel(model);
+
 	//ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
 	//ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
 	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
 	//world->AddJoint(fixJoint);
-	//
-	//matrix.m_posit.m_x -= 0.0f;
-	//matrix.m_posit.m_y += 0.5f;
-	//matrix.m_posit.m_z += 3.0f;
-	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
-	//scene->SetCameraMatrix(rotation, matrix.m_posit);
+#endif
+
+	
+	matrix.m_posit.m_x -= 0.0f;
+	matrix.m_posit.m_y += 0.5f;
+	matrix.m_posit.m_z += 3.0f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
+	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
