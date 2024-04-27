@@ -333,8 +333,6 @@ namespace ndCarpole_1
 			m_outFile = fopen("cartpole-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			const ndInt32 countX = 32;
-
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 
 			hyperParameters.m_discountFactor = ndReal(0.99f);
@@ -352,6 +350,7 @@ namespace ndCarpole_1
 			SetMaterial(visualModel);
 
 			// add a hidden battery of model to generate trajectories in parallel
+			const ndInt32 countX = 32;
 			for (ndInt32 i = 0; i < countX; ++i)
 			{
 				ndMatrix location(matrix);

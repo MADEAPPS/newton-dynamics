@@ -140,11 +140,6 @@ namespace ndUnicycle
 		
 			ndBrainFloat CalculateReward()
 			{
-				if (IsTerminal())
-				{
-					return ndReal(0.0f);
-				}
-		
 				ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_model->m_legJoint->GetAngle() * m_model->m_legJoint->GetAngle()));
 				if (m_model->HasSupportContact())
 				{
@@ -169,20 +164,20 @@ namespace ndUnicycle
 			{
 				m_model->ApplyActions(actions);
 		
-				const ndFloat32 probability = 1.0f / 2000.0f;
-				ndFloat32 applyJumpImpule = ndRand();
-				if (applyJumpImpule < probability)
-				{
-					if (m_model->HasSupportContact())
-					{
-						ndBodyDynamic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyDynamic();
-		
-						ndFloat32 speed = 4.0f + 2.0f * ndRand();
-						ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
-						ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
-						boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_model->m_timestep);
-					}
-				}
+				//const ndFloat32 probability = 1.0f / 2000.0f;
+				//ndFloat32 applyJumpImpule = ndRand();
+				//if (applyJumpImpule < probability)
+				//{
+				//	if (m_model->HasSupportContact())
+				//	{
+				//		ndBodyDynamic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyDynamic();
+				//
+				//		ndFloat32 speed = 4.0f + 2.0f * ndRand();
+				//		ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
+				//		ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
+				//		boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_model->m_timestep);
+				//	}
+				//}
 			}
 		
 			void GetObservation(ndBrainFloat* const observation)
@@ -450,8 +445,6 @@ namespace ndUnicycle
 			m_outFile = fopen("unicycle-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			const ndInt32 countX = 32;
-
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 
 			hyperParameters.m_discountFactor = ndReal(0.99f);
@@ -469,10 +462,14 @@ namespace ndUnicycle
 			SetMaterial(visualModel);
 
 			// add a hidden battery of model to generate trajectories in parallel
+			const ndInt32 countX = 32;
 			for (ndInt32 i = 0; i < countX; ++i)
 			{
 				ndMatrix location(matrix);
-				location.m_posit.m_x += 3.0f * (ndRand() - 0.5f);
+				ndFloat32 step = 3.0f * (ndRand() - 0.5f);
+				//step += ndSign(step) * 2.0f;
+				location.m_posit.m_x += step;
+
 				ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerTrainer(m_master));
 				ndSharedPtr<ndModel> model(CreateModel(scene, location, agent));
 				world->AddModel(model);
