@@ -57,6 +57,7 @@ class ndBrainLastActivationLayer : public ndBrainLayerTanhActivation
 	virtual void Save(const ndBrainSave* const loadSave) const;
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
+	void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 };
 
 

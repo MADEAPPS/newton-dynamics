@@ -102,6 +102,15 @@ void ndBrainLastActivationLayer::MakePrediction(const ndBrainVector& input, ndBr
 	ndBrainLayerTanhActivation::MakePrediction(input, output);
 	for (ndInt32 i = m_neurons / 2; i < m_neurons; ++i)
 	{
-		output[i] = output[i] += ndBrainFloat(1.01f);
+		output[i] = ndBrainFloat(0.01f) + ndBrainFloat(0.5f) + output[i] * ndBrainFloat(0.5f);
 	}
+}
+
+void ndBrainLastActivationLayer::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+{
+	//for (ndInt32 i = m_neurons / 2; i < m_neurons; ++i)
+	//{
+	//	inputDerivative[i] *= ndBrainFloat(0.5f);
+	//}
+	ndBrainLayerTanhActivation::InputDerivative(output, outputDerivative, inputDerivative);
 }
