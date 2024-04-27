@@ -27,8 +27,9 @@
 #include "ndBrainLayer.h"
 #include "ndBrainAgent.h"
 #include "ndBrainTrainer.h"
-#include "ndBrainReplayBuffer.h"
+#include "ndBrainThreadPool.h"
 #include "ndBrainLayerLinear.h"
+#include "ndBrainOptimizerAdam.h"
 #include "ndBrainLayerTanhActivation.h"
 #include "ndBrainLossLeastSquaredError.h"
 
@@ -53,7 +54,7 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 
 		ndTrajectoryStep(const ndTrajectoryStep& src)
 			:m_reward(src.m_reward)
-			, m_action(src.m_action)
+			,m_action(src.m_action)
 		{
 			ndMemCpy(m_observation, src.m_observation, statesDim);
 		}
@@ -135,14 +136,8 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
 
-	//bool IsTrainer() const;
 	ndInt32 GetFramesCount() const;
 	ndInt32 GetEposideCount() const;
-	//ndInt32 GetEpisodeFrames() const;
-
-	//void InitWeights();
-	//void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
-	//bool IsTerminal() const;
 
 	bool IsSampling() const;
 	ndFloat32 GetAverageScore() const;

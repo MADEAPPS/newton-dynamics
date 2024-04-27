@@ -44,7 +44,6 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual ndBrainVector* GetBias();
 	virtual ndBrainMatrix* GetWeights();
 	
-	
 	virtual void InitWeightsXavierMethod();
 	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 

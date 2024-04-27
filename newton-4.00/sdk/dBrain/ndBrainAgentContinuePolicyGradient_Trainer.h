@@ -26,13 +26,37 @@
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
 #include "ndBrainTrainer.h"
-#include "ndBrainReplayBuffer.h"
+#include "ndBrainThreadPool.h"
 #include "ndBrainLayerLinear.h"
+#include "ndBrainOptimizerAdam.h"
 #include "ndBrainLayerTanhActivation.h"
 #include "ndBrainLossLeastSquaredError.h"
 
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
+
+class ndBrainLastLinearLayer : public ndBrainLayerLinear
+{
+	public:
+	ndBrainLastLinearLayer(ndInt32 inputs, ndInt32 outputs);
+	ndBrainLastLinearLayer(const ndBrainLastLinearLayer& src);
+
+	ndBrainLayer* Clone() const;
+	virtual void Save(const ndBrainSave* const loadSave) const;
+};
+
+class ndBrainLastActivationLayer : public ndBrainLayerTanhActivation 
+{
+	public:
+	ndBrainLastActivationLayer(ndInt32 neurons);
+	ndBrainLastActivationLayer(const ndBrainLastActivationLayer& src);
+
+	ndBrainLayer* Clone() const;
+	virtual void Save(const ndBrainSave* const loadSave) const;
+
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
+};
+
 
 template<ndInt32 statesDim, ndInt32 actionDim> class ndBrainAgentContinuePolicyGradient_TrainerMaster;
 
@@ -318,12 +342,18 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, hyperParameters.m_hiddenLayersNumberOfNeurons));
 		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons));
 	}
+#if 1
 	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, actionDim));
 	layers.PushBack(new ndBrainLayerTanhActivation(actionDim));
+#else
+	layers.PushBack(new ndBrainLastLinearLayer(hyperParameters.m_hiddenLayersNumberOfNeurons, actionDim));
+	layers.PushBack(new ndBrainLastActivationLayer(actionDim));
+#endif
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		m_actor.AddLayer(layers[i]);
 	}
+
 	m_actor.InitWeightsXavierMethod();
 	ndAssert(!strcmp((m_actor[m_actor.GetCount() - 1])->GetLabelId(), "ndBrainLayerTanhActivation"));
 	
@@ -375,6 +405,8 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	
 	m_baseValueWorkingBufferSize = m_baseLineValue.CalculateWorkingtBufferSize();
 	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * hyperParameters.m_threadsCount);
+
+	//m_actor.SaveToFile("xxxx1.xxx");
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
