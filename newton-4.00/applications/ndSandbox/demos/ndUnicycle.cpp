@@ -271,11 +271,12 @@ namespace ndUnicycle
 			return ndAbs(body->GetMatrix().m_posit.m_x) > ndFloat32(30.0f);
 		}
 
+		#pragma optimize( "", off )
 		void TelePort() const
 		{
 			ndBodyKinematic* const body = GetRoot()->m_body->GetAsBodyKinematic();
 
-			ndVector veloc(body->GetVelocity());
+			//ndVector veloc(body->GetVelocity());
 			ndVector posit(body->GetMatrix().m_posit);
 			posit.m_y = 0.0f;
 			posit.m_z = 0.0f;
@@ -283,7 +284,7 @@ namespace ndUnicycle
 			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 			{
 				ndBodyKinematic* const modelBody = m_bodies[i];
-				modelBody->SetVelocity(modelBody->GetVelocity() - veloc);
+				//modelBody->SetVelocity(modelBody->GetVelocity() - veloc);
 				ndMatrix matrix(modelBody->GetMatrix());
 				matrix.m_posit -= posit;
 				modelBody->SetMatrix(matrix);
@@ -365,22 +366,6 @@ namespace ndUnicycle
 		wheelMotor->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
 		model->m_wheelJoint = wheelMotor;
 		model->m_wheel = wheelBody->GetAsBodyKinematic();
-
-		// tele port the model so that is on the floor
-		//ndMatrix probeMatrix(wheelMatrix);
-		//probeMatrix.m_posit.m_x += 1.0f;
-		//ndMatrix floor(FindFloor(*world, probeMatrix, wheelBody->GetAsBodyKinematic()->GetCollisionShape(), 20.0f));
-		//ndFloat32 dist = wheelMatrix.m_posit.m_y - floor.m_posit.m_y;
-		//ndMatrix rootMatrix(modelRoot->m_body->GetMatrix());
-		//rootMatrix.m_posit.m_y -= dist;
-		//wheelMatrix.m_posit.m_y -= dist;
-		//legLocation.m_posit.m_y -= dist;
-		//legBody->SetMatrix(legLocation);
-		//wheelBody->SetMatrix(wheelMatrix);
-		//modelRoot->m_body->SetMatrix(rootMatrix);
-		//legBody->GetNotifyCallback()->OnTransform(0, legLocation);
-		//wheelBody->GetNotifyCallback()->OnTransform(0, wheelMatrix);
-		//modelRoot->m_body->GetNotifyCallback()->OnTransform(0, rootMatrix);
 
 		world->AddJoint(legJoint);
 		world->AddJoint(wheelJoint);
