@@ -447,7 +447,8 @@ namespace ndUnicycle
 			SetMaterial(visualModel);
 
 			// add a hidden battery of model to generate trajectories in parallel
-			const ndInt32 countX = 32;
+			//const ndInt32 countX = 32;
+			const ndInt32 countX = 0;
 			for (ndInt32 i = 0; i < countX; ++i)
 			{
 				ndMatrix location(matrix);

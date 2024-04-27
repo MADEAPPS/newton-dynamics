@@ -100,5 +100,8 @@ void ndBrainLastActivationLayer::Save(const ndBrainSave* const loadSave) const
 void ndBrainLastActivationLayer::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndBrainLayerTanhActivation::MakePrediction(input, output);
-	ndAssert(0);
+	for (ndInt32 i = m_neurons / 2; i < m_neurons; ++i)
+	{
+		output[i] = output[i] += ndBrainFloat(1.01f);
+	}
 }

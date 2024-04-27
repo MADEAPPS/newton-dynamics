@@ -35,6 +35,8 @@
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 
+//#define CONSTANT_SIGMA
+
 class ndBrainLastLinearLayer : public ndBrainLayerLinear
 {
 	public:
@@ -89,7 +91,11 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 		}
 
 		ndBrainFloat m_reward;
+		#ifdef CONSTANT_SIGMA
 		ndBrainFloat m_action[actionDim];
+		#else
+		ndBrainFloat m_action[2 * actionDim];
+		#endif
 		ndBrainFloat m_observation[statesDim];
 	};
 
@@ -268,7 +274,7 @@ void ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::SelectAct
 	//	ndBrainFloat xxx1 = 5.0f + ndBrainFloat(m_d(m_gen) * 2.0f);
 	//	ndTrace (("%f, %f\n", xxx0, xxx1))
 	//}
-
+#ifdef CONSTANT_SIGMA
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
 		//ndBrainFloat sample = ndBrainFloat(ndGaussianRandom(actions[i], m_master->m_sigma));
@@ -276,15 +282,25 @@ void ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::SelectAct
 		ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = squashedAction;
 	}
+#else
+	for (ndInt32 i = actionDim - 1; i >= 0; --i)
+	{
+		//ndBrainFloat sample = ndBrainFloat(ndGaussianRandom(actions[i], m_master->m_sigma));
+		ndBrainFloat sample = ndBrainFloat(actions[i] + m_d(m_gen) * actions[i + actionDim]);
+		ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
+		actions[i] = squashedAction;
+	}
+#endif
 }
+
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::Step()
 {
 	ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::ndTrajectoryStep trajectoryStep;
 
-	ndBrainMemVector actions(&trajectoryStep.m_action[0], actionDim);
 	ndBrainMemVector observation(&trajectoryStep.m_observation[0], statesDim);
+	ndBrainMemVector actions(&trajectoryStep.m_action[0], sizeof (trajectoryStep.m_action) / sizeof (trajectoryStep.m_action[0]));
 
 	GetObservation(&observation[0]);
 	m_master->m_actor.MakePrediction(observation, actions, m_workingBuffer);
@@ -342,7 +358,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, hyperParameters.m_hiddenLayersNumberOfNeurons));
 		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons));
 	}
-#if 1
+#ifdef CONSTANT_SIGMA
 	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, actionDim));
 	layers.PushBack(new ndBrainLayerTanhActivation(actionDim));
 #else
@@ -750,6 +766,14 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 					{
 						loss[i] = logProbAdvantage * (trajectoryStep.m_action[i] - output[i]);
 					}
+
+					#ifndef CONSTANT_SIGMA
+					for (ndInt32 i = actionDim - 1; i >= 0; --i)
+					{
+						// TODO: evaluate the derivative of a mutivarite gaussian with zero covariant
+						loss[actionDim + i] = 0.0f;
+					}
+					#endif	
 				}
 
 				ndBrainTrainer& m_trainer;
