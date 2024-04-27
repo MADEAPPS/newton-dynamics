@@ -35,7 +35,7 @@
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 
-//#define CONSTANT_SIGMA
+#define CONSTANT_SIGMA
 
 class ndBrainLastLinearLayer : public ndBrainLayerLinear
 {
@@ -154,6 +154,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
+			//m_threadsCount = 1;
 		}
 
 		ndBrainFloat m_sigma;
@@ -189,7 +190,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 
 	private:
 	void Optimize();
-	void BackPropagate();
 	void OptimizePolicy();
 	void OptimizeCritic();
 	void SaveTrajectory(ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>* const agent);
@@ -517,93 +517,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Sav
 
 //#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::BackPropagate()
-{
-	auto ClearGradients = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		const ndStartEnd startEnd(m_trainers.GetCount(), threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndBrainTrainer* const trainer = m_trainers[i];
-			trainer->ClearGradients();
-		}
-	});
-	ndBrainThreadPool::ParallelExecute(ClearGradients);
-
-	const ndInt32 steps = m_trajectoryAccumulator.GetCount();
-	const ndBrainFloat invSigmaSquare = ndBrainFloat(1.0f) / (m_sigma * m_sigma);
-
-	for (ndInt32 base = 0; base < steps; base += m_bashBufferSize)
-	{
-		auto CalculateGradients = ndMakeObject::ndFunction([this, base, invSigmaSquare](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			class Loss : public ndBrainLossLeastSquaredError
-			{
-				public:
-				Loss(ndBrainTrainer& trainer, ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>* const agent, ndInt32 index, ndBrainFloat invSigmaSquare)
-					:ndBrainLossLeastSquaredError(trainer.GetBrain()->GetOutputSize())
-					,m_trainer(trainer)
-					,m_agent(agent)
-					,m_invSigmaSquare(invSigmaSquare)
-					,m_index(index)
-				{
-				}
-
-				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
-				{
-					const ndTrajectoryStepContinue<statesDim, actionDim>& trajectoryStep = m_agent->m_trajectoryAccumulator[m_index];
-					ndBrainFloat logProbAdvantage = trajectoryStep.m_reward * m_invSigmaSquare;
-					for (ndInt32 i = actionDim - 1; i >= 0; --i)
-					{
-						loss[i] = logProbAdvantage * (trajectoryStep.m_action[i] - output[i]);
-					}
-				}
-
-				ndBrainTrainer& m_trainer;
-				ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>* m_agent;
-				const ndBrainFloat m_invSigmaSquare;
-				ndInt32 m_index;
-			};
-
-			ndBrainFixSizeVector<statesDim> observations;
-			const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndBrainTrainer& trainer = *m_auxiliaryTrainers[i];
-				Loss loss(trainer, this, base + i, invSigmaSquare);
-				if ((base + i) < m_trajectoryAccumulator.GetCount())
-				{
-					const ndBrainMemVector observation(&m_trajectoryAccumulator[base + i].m_observation[0], statesDim);
-					trainer.BackPropagate(observation, loss);
-				}
-				else
-				{
-					trainer.ClearGradients();
-				}
-			}
-		});
-		ndBrainThreadPool::ParallelExecute(CalculateGradients);
-
-		auto AddGradients = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			const ndStartEnd startEnd(m_trainers.GetCount(), threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndBrainTrainer* const trainer = m_trainers[i];
-				const ndBrainTrainer* const auxiliaryTrainer = m_auxiliaryTrainers[i];
-				trainer->AddGradients(auxiliaryTrainer);
-			}
-		});
-		ndBrainThreadPool::ParallelExecute(AddGradients);
-	}
-
-	m_optimizer->AccumulateGradients(this, m_trainers);
-	m_weightedTrainer[0]->ScaleWeights(ndBrainFloat(1.0f) / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
-	m_optimizer->Update(this, m_weightedTrainer, -m_learnRate);
-}
-
-//#pragma optimize( "", off )
-template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeCritic()
 {
 	ndAtomic<ndInt32> iterator(0);
@@ -710,12 +623,10 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	ndInt32 newCount = m_trajectoryAccumulator.GetCount();
 	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
 	{
-		// clamp any advantage larger than two standard deviations.
-		//const ndBrainFloat normalizedAdvantage = ndClamp (m_trajectoryAccumulator[i].m_reward * invVariance, ndBrainFloat(-2.0f), ndBrainFloat(2.0f));
 		const ndBrainFloat normalizedAdvantage = m_trajectoryAccumulator[i].m_reward * invVariance;
 		m_trajectoryAccumulator[i].m_reward = normalizedAdvantage;
 
-		// actions within 0.1 standard deviation, are not changed
+		// actions within 0.01 standard deviation, are not changed
 		if (ndAbs(normalizedAdvantage) < ndBrainFloat(0.01f))
 		{
 			m_trajectoryAccumulator[i] = m_trajectoryAccumulator[newCount - 1];
@@ -771,8 +682,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 					#ifndef CONSTANT_SIGMA
 					for (ndInt32 i = actionDim - 1; i >= 0; --i)
 					{
-						// TODO: evaluate the derivative of a mutivarite gaussian with zero covariant
-						loss[actionDim + i] = 0.0f;
+						// TODO: evaluate the derivative of a multivariate Gaussian with zero covariant
+						loss[actionDim + i] = 1.0f;
 					}
 					#endif	
 				}
@@ -832,6 +743,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeStep()
 {
+	//ndList<ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>*> m_agents;
 	for (ndList<ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
 	{
 		ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>* const agent = node->GetInfo();

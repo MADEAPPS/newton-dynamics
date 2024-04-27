@@ -147,7 +147,6 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 
 	private:
 	void Optimize();
-	void BackPropagate();
 	void OptimizePolicy();
 	void OptimizeCritic();
 	void SaveTrajectory(ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>* const agent);
@@ -459,90 +458,6 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::Sav
 		m_trajectoryAccumulator.PushBack(agent->m_trajectory[i]);
 	}
 	agent->m_trajectory.SetCount(0);
-}
-
-//#pragma optimize( "", off )
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::BackPropagate()
-{
-	auto ClearGradients = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		const ndStartEnd startEnd(m_trainers.GetCount(), threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndBrainTrainer* const trainer = m_trainers[i];
-			trainer->ClearGradients();
-		}
-	});
-	ndBrainThreadPool::ParallelExecute(ClearGradients);
-
-	const ndInt32 steps = m_trajectoryAccumulator.GetCount();
-	for (ndInt32 base = 0; base < steps; base += m_bashBufferSize)
-	{
-		auto CalculateGradients = ndMakeObject::ndFunction([this, base](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			class Loss : public ndBrainLossLeastSquaredError
-			{
-				public:
-				Loss(ndBrainTrainer& trainer, ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>* const agent, ndInt32 index)
-					:ndBrainLossLeastSquaredError(trainer.GetBrain()->GetOutputSize())
-					,m_trainer(trainer)
-					,m_agent(agent)
-					,m_index(index)
-				{
-				}
-
-				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
-				{
-					const ndTrajectoryStep<statesDim, actionDim>& trajectoryStep& trajectoryStep = m_agent->m_trajectoryAccumulator[m_index];
-					ndInt32 actionIndex = ndInt32(trajectoryStep.m_action);
-
-					loss.Set(ndBrainFloat(0.0f));
-					ndBrainFloat negLogProb = ndBrainFloat(-ndLog(output[actionIndex]));
-
-					loss[actionIndex] = negLogProb * trajectoryStep.m_reward;
-				}
-
-				ndBrainTrainer& m_trainer;
-				ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>* m_agent;
-				ndInt32 m_index;
-			};
-
-			ndBrainFixSizeVector<statesDim> observations;
-			const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndBrainTrainer& trainer = *m_auxiliaryTrainers[i];
-				Loss loss(trainer, this, base + i, invSigmaSquare);
-				if ((base + i) < m_trajectoryAccumulator.GetCount())
-				{
-					const ndBrainMemVector observation(&m_trajectoryAccumulator[base + i].m_observation[0], statesDim);
-					trainer.BackPropagate(observation, loss);
-				}
-				else
-				{
-					trainer.ClearGradients();
-				}
-			}
-		});
-		ndBrainThreadPool::ParallelExecute(CalculateGradients);
-
-		auto AddGradients = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			const ndStartEnd startEnd(m_trainers.GetCount(), threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndBrainTrainer* const trainer = m_trainers[i];
-				const ndBrainTrainer* const auxiliaryTrainer = m_auxiliaryTrainers[i];
-				trainer->AddGradients(auxiliaryTrainer);
-			}
-		});
-		ndBrainThreadPool::ParallelExecute(AddGradients);
-	}
-
-	m_optimizer->AccumulateGradients(this, m_trainers);
-	m_weightedTrainer[0]->ScaleWeights(ndBrainFloat(1.0f) / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
-	m_optimizer->Update(this, m_weightedTrainer, -m_learnRate);
 }
 
 //#pragma optimize( "", off )

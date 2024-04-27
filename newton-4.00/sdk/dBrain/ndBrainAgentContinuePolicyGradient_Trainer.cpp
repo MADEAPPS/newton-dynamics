@@ -108,9 +108,26 @@ void ndBrainLastActivationLayer::MakePrediction(const ndBrainVector& input, ndBr
 
 void ndBrainLastActivationLayer::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
+	//ndBrainFloat buffer[1024];
+	//ndBrainMemVector tmpOut(buffer, inputDerivative.GetCount());
+	//tmpOut.Set(output);
+	//for (ndInt32 i = m_neurons / 2; i < m_neurons; ++i)
+	//{
+	//	tmpOut[i] = (output[i] - ndBrainFloat(0.01f)) * ndBrainFloat(2.0f);
+	//}
+	//ndBrainLayerTanhActivation::InputDerivative(tmpOut, outputDerivative, inputDerivative);
 	//for (ndInt32 i = m_neurons / 2; i < m_neurons; ++i)
 	//{
 	//	inputDerivative[i] *= ndBrainFloat(0.5f);
 	//}
-	ndBrainLayerTanhActivation::InputDerivative(output, outputDerivative, inputDerivative);
+
+	for (ndInt32 i = 0; i < m_neurons / 2; ++i)
+	{
+		inputDerivative[i] = (ndBrainFloat(1.0f) - output[i] * output[i]) * outputDerivative[i];
+	}
+	for (ndInt32 i = m_neurons / 2; i < m_neurons; ++i)
+	{
+		ndBrainFloat y = (output[i] - ndBrainFloat(0.01f)) * ndBrainFloat(2.0f);
+		inputDerivative[i] = ndBrainFloat(0.5f) * ((ndBrainFloat(1.0f) - y * y)) * outputDerivative[i];
+	}
 }
