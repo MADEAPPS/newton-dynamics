@@ -616,7 +616,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	
 				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 				{
-					const ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::ndTrajectoryStep& trajectoryStep = m_agent->m_trajectoryAccumulator[m_index];
+					const typename ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::ndTrajectoryStep& trajectoryStep = m_agent->m_trajectoryAccumulator[m_index];
 					ndInt32 actionIndex = ndInt32(trajectoryStep.m_action);
 	
 					loss.Set(ndBrainFloat(0.0f));

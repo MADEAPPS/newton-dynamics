@@ -672,7 +672,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 
 				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 				{
-					const ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::ndTrajectoryStep& trajectoryStep = m_agent->m_trajectoryAccumulator[m_index];
+					const typename ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::ndTrajectoryStep& trajectoryStep = m_agent->m_trajectoryAccumulator[m_index];
 					ndBrainFloat logProbAdvantage = trajectoryStep.m_reward * m_invSigmaSquare;
 					for (ndInt32 i = actionDim - 1; i >= 0; --i)
 					{
