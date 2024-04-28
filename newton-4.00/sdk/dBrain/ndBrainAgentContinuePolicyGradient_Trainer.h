@@ -742,8 +742,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeStep()
 {
-	//ndList<ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>*> m_agents;
-	for (ndList<ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
+	for (typename ndList<ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
 	{
 		ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>* const agent = node->GetInfo();
 

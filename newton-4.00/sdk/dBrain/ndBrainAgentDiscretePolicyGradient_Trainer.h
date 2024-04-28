@@ -195,7 +195,7 @@ ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::ndBrainAgentDi
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::~ndBrainAgentDiscretePolicyGradient_Trainer()
 {
-	for (ndList<ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>*>::ndNode* node = m_master->m_agents.GetFirst(); node; node = node->GetNext())
+	for (typename ndList<ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>*>::ndNode* node = m_master->m_agents.GetFirst(); node; node = node->GetNext())
 	{
 		if (node->GetInfo() == this)
 		{
@@ -679,7 +679,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeStep()
 {
-	for (ndList<ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
+	for (typename ndList<ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
 	{
 		ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>* const agent = node->GetInfo();
 
