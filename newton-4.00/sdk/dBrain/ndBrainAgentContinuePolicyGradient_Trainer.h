@@ -221,7 +221,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndMovingAverage<8> m_averageFramesPerEpisodes;
 	ndString m_name;
 	ndList<ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>*> m_agents;
-
 	friend class ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>;
 };
 
@@ -243,7 +242,7 @@ ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::ndBrainAgentCo
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::~ndBrainAgentContinuePolicyGradient_Trainer()
 {
-	for (ndList<ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>*>::ndNode* node = m_master->m_agents.GetFirst(); node; node = node->GetNext())
+	for (typename ndList<ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>*>::ndNode* node = m_master->m_agents.GetFirst(); node; node = node->GetNext())
 	{
 		if (node->GetInfo() == this)
 		{
