@@ -35,8 +35,6 @@
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 
-#define CONSTANT_SIGMA
-
 class ndBrainLastLinearLayer : public ndBrainLayerLinear
 {
 	public:
@@ -58,8 +56,11 @@ class ndBrainLastActivationLayer : public ndBrainLayerTanhActivation
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
-};
 
+	ndBrainFloat m_sigma0;
+	ndBrainFloat m_sigmaScale;
+	ndBrainFloat m_sigmaScaleInv;
+};
 
 template<ndInt32 statesDim, ndInt32 actionDim> class ndBrainAgentContinuePolicyGradient_TrainerMaster;
 
@@ -92,11 +93,7 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 		}
 
 		ndBrainFloat m_reward;
-		#ifdef CONSTANT_SIGMA
 		ndBrainFloat m_action[actionDim];
-		#else
-		ndBrainFloat m_action[2 * actionDim];
-		#endif
 		ndBrainFloat m_observation[statesDim];
 	};
 
@@ -148,13 +145,15 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 			//ndBrainFloat sigma2 = ndBrainFloat (0.15f);
 			//ndBrainFloat sigma2 = ndBrainFloat(0.2f);
 
+			m_randomSeed = 42;
 			m_sigma = ndSqrt(sigma2);
+			m_useConstantSigma = true;
 
 			m_learnRate = ndBrainFloat(0.0005f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
-			//m_threadsCount = 1;
+			m_threadsCount = 1;
 		}
 
 		ndBrainFloat m_sigma;
@@ -169,6 +168,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_extraTrajectorySteps;
 		ndInt32 m_numberOfHiddenLayers;
 		ndInt32 m_hiddenLayersNumberOfNeurons;
+		ndUnsigned32 m_randomSeed;
+		bool m_useConstantSigma;
 	};
 
 	ndBrainAgentContinuePolicyGradient_TrainerMaster(const HyperParameters& hyperParameters);
@@ -216,11 +217,13 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_bashTrajectoryIndex;
 	ndInt32 m_bashTrajectoryCount;
 	ndInt32 m_baseValueWorkingBufferSize;
+	ndUnsigned32 m_randomSeed;
 	ndBrainVector m_workingBuffer;
 	ndMovingAverage<8> m_averageScore;
 	ndMovingAverage<8> m_averageFramesPerEpisodes;
 	ndString m_name;
 	ndList<ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>*> m_agents;
+	bool m_useConstantSigma;
 	friend class ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>;
 };
 
@@ -234,6 +237,9 @@ ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::ndBrainAgentCo
 	,m_gen(m_rd())
 	,m_d(ndFloat32(0.0f), ndFloat32(1.0f))
 {
+	m_gen.seed(m_master->m_randomSeed);
+	m_master->m_randomSeed += 1;
+
 	m_master->m_agents.Append(this);
 	m_trajectory.SetCount(m_master->m_maxTrajectorySteps + m_master->m_extraTrajectorySteps);
 	m_trajectory.SetCount(0);
@@ -274,38 +280,55 @@ void ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::SelectAct
 	//	ndBrainFloat xxx1 = 5.0f + ndBrainFloat(m_d(m_gen) * 2.0f);
 	//	ndTrace (("%f, %f\n", xxx0, xxx1))
 	//}
-#ifdef CONSTANT_SIGMA
-	for (ndInt32 i = actionDim - 1; i >= 0; --i)
+	if (m_master->m_useConstantSigma)
 	{
-		//ndBrainFloat sample = ndBrainFloat(ndGaussianRandom(actions[i], m_master->m_sigma));
-		ndBrainFloat sample = ndBrainFloat(actions[i] + m_d(m_gen) * m_master->m_sigma);
-		ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
-		actions[i] = squashedAction;
+		for (ndInt32 i = actionDim - 1; i >= 0; --i)
+		{
+			//ndBrainFloat sample = ndBrainFloat(ndGaussianRandom(actions[i], m_master->m_sigma));
+			ndBrainFloat sample = ndBrainFloat(actions[i] + m_d(m_gen) * m_master->m_sigma);
+			ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
+			actions[i] = squashedAction;
+		}
 	}
-#else
-	for (ndInt32 i = actionDim - 1; i >= 0; --i)
+	else
 	{
-		//ndBrainFloat sample = ndBrainFloat(ndGaussianRandom(actions[i], m_master->m_sigma));
-		ndBrainFloat sample = ndBrainFloat(actions[i] + m_d(m_gen) * actions[i + actionDim]);
-		ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
-		actions[i] = squashedAction;
+		for (ndInt32 i = actionDim - 1; i >= 0; --i)
+		{
+			//ndBrainFloat sample = ndBrainFloat(ndGaussianRandom(actions[i], m_master->m_sigma));
+			ndBrainFloat sample = ndBrainFloat(actions[i] + m_d(m_gen) * actions[i + actionDim]);
+			ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
+			actions[i] = squashedAction;
+		}
 	}
-#endif
 }
-
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::Step()
 {
 	ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::ndTrajectoryStep trajectoryStep;
 
-	ndBrainMemVector observation(&trajectoryStep.m_observation[0], statesDim);
-	ndBrainMemVector actions(&trajectoryStep.m_action[0], sizeof (trajectoryStep.m_action) / sizeof (trajectoryStep.m_action[0]));
+	if (m_master->m_useConstantSigma)
+	{
+		ndBrainFixSizeVector<actionDim> actions;
+		ndBrainMemVector observation(&trajectoryStep.m_observation[0], statesDim);
 
-	GetObservation(&observation[0]);
-	m_master->m_actor.MakePrediction(observation, actions, m_workingBuffer);
+		GetObservation(&observation[0]);
+		m_master->m_actor.MakePrediction(observation, actions, m_workingBuffer);
+		SelectAction(actions);
+		ndMemCpy(trajectoryStep.m_action, &actions[0], actionDim);
+	}
+	else
+	{
+		ndBrainFixSizeVector<actionDim * 2> actions;
+		ndBrainMemVector observation(&trajectoryStep.m_observation[0], statesDim);
 
-	SelectAction(actions);
+		GetObservation(&observation[0]);
+		m_master->m_actor.MakePrediction(observation, actions, m_workingBuffer);
+		actions.SetCount(actionDim);
+		SelectAction(actions);
+		ndMemCpy(trajectoryStep.m_action, &actions[0], actionDim);
+	}
+
 	ApplyActions(&trajectoryStep.m_action[0]);
 	trajectoryStep.m_reward = CalculateReward();
 
@@ -340,10 +363,12 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	,m_bashTrajectoryIndex(0)
 	,m_bashTrajectoryCount(hyperParameters.m_bashTrajectoryCount)
 	,m_baseValueWorkingBufferSize(0)
+	,m_randomSeed(hyperParameters.m_randomSeed)
 	,m_workingBuffer()
 	,m_averageScore()
 	,m_averageFramesPerEpisodes()
 	,m_agents()
+	,m_useConstantSigma(hyperParameters.m_useConstantSigma)
 {
 	// build neural net
 	SetThreadCount(hyperParameters.m_threadsCount);
@@ -358,13 +383,16 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, hyperParameters.m_hiddenLayersNumberOfNeurons));
 		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons));
 	}
-#ifdef CONSTANT_SIGMA
-	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, actionDim));
-	layers.PushBack(new ndBrainLayerTanhActivation(actionDim));
-#else
-	layers.PushBack(new ndBrainLastLinearLayer(hyperParameters.m_hiddenLayersNumberOfNeurons, actionDim));
-	layers.PushBack(new ndBrainLastActivationLayer(actionDim));
-#endif
+	if (m_useConstantSigma)
+	{
+		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, actionDim));
+		layers.PushBack(new ndBrainLayerTanhActivation(actionDim));
+	}
+	else
+	{
+		layers.PushBack(new ndBrainLastLinearLayer(hyperParameters.m_hiddenLayersNumberOfNeurons, actionDim));
+		layers.PushBack(new ndBrainLastActivationLayer(actionDim));
+	}
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		m_actor.AddLayer(layers[i]);
@@ -657,11 +685,11 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	{
 		auto CalculateGradients = ndMakeObject::ndFunction([this, &iterator, base, invSigmaSquare](ndInt32, ndInt32)
 		{
-			class Loss : public ndBrainLossLeastSquaredError
+			class ConstantSigmaLoss : public ndBrainLoss
 			{
 				public:
-				Loss(ndBrainTrainer& trainer, ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>* const agent, ndInt32 index, ndBrainFloat invSigmaSquare)
-					:ndBrainLossLeastSquaredError(trainer.GetBrain()->GetOutputSize())
+				ConstantSigmaLoss(ndBrainTrainer& trainer, ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>* const agent, ndInt32 index, ndBrainFloat invSigmaSquare)
+					:ndBrainLoss()
 					,m_trainer(trainer)
 					,m_agent(agent)
 					,m_invSigmaSquare(invSigmaSquare)
@@ -677,14 +705,43 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 					{
 						loss[i] = logProbAdvantage * (trajectoryStep.m_action[i] - output[i]);
 					}
+				}
 
-					#ifndef CONSTANT_SIGMA
+				ndBrainTrainer& m_trainer;
+				ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>* m_agent;
+				const ndBrainFloat m_invSigmaSquare;
+				ndInt32 m_index;
+			};
+
+			class TrainedSigmaLoss : public ndBrainLoss
+			{
+				public:
+				TrainedSigmaLoss(ndBrainTrainer& trainer, ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>* const agent, ndInt32 index, ndBrainFloat invSigmaSquare)
+					:ndBrainLoss()
+					,m_trainer(trainer)
+					,m_agent(agent)
+					,m_invSigmaSquare(invSigmaSquare)
+					,m_index(index)
+				{
+				}
+
+				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+				{
+					// basically this fits a multivariate Gaussian process with zero cross covariance to the actions.
+					const typename ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::ndTrajectoryStep& trajectoryStep = m_agent->m_trajectoryAccumulator[m_index];
+					const ndBrainFloat advantage = trajectoryStep.m_reward;
 					for (ndInt32 i = actionDim - 1; i >= 0; --i)
 					{
-						// TODO: evaluate the derivative of a multivariate Gaussian with zero covariant
-						loss[actionDim + i] = 1.0f;
+						const ndBrainFloat mean = output[i];
+						const ndBrainFloat sigma1 = output[i + actionDim];
+						const ndBrainFloat sigma2 = sigma1 * sigma1;
+						const ndBrainFloat sigma3 = sigma2 * sigma1;
+						const ndBrainFloat num = (trajectoryStep.m_action[i] - mean);
+						ndAssert(sigma1 > ndFloat32(0.0f));
+
+						loss[i] = advantage * num / sigma2;
+						loss[actionDim + i] = advantage * (num * num / sigma3 - ndBrainFloat(1.0f) / sigma1);
 					}
-					#endif	
 				}
 
 				ndBrainTrainer& m_trainer;
@@ -694,18 +751,38 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 			};
 
 			ndBrainFixSizeVector<statesDim> observations;
-			for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
+			if (m_useConstantSigma)
 			{
-				ndBrainTrainer& trainer = *m_auxiliaryTrainers[i];
-				Loss loss(trainer, this, base + i, invSigmaSquare);
-				if ((base + i) < m_trajectoryAccumulator.GetCount())
+				for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
 				{
-					const ndBrainMemVector observation(&m_trajectoryAccumulator[base + i].m_observation[0], statesDim);
-					trainer.BackPropagate(observation, loss);
+					ndBrainTrainer& trainer = *m_auxiliaryTrainers[i];
+					ConstantSigmaLoss loss(trainer, this, base + i, invSigmaSquare);
+					if ((base + i) < m_trajectoryAccumulator.GetCount())
+					{
+						const ndBrainMemVector observation(&m_trajectoryAccumulator[base + i].m_observation[0], statesDim);
+						trainer.BackPropagate(observation, loss);
+					}
+					else
+					{
+						trainer.ClearGradients();
+					}
 				}
-				else
+			}
+			else
+			{
+				for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
 				{
-					trainer.ClearGradients();
+					ndBrainTrainer& trainer = *m_auxiliaryTrainers[i];
+					TrainedSigmaLoss loss(trainer, this, base + i, invSigmaSquare);
+					if ((base + i) < m_trajectoryAccumulator.GetCount())
+					{
+						const ndBrainMemVector observation(&m_trajectoryAccumulator[base + i].m_observation[0], statesDim);
+						trainer.BackPropagate(observation, loss);
+					}
+					else
+					{
+						trainer.ClearGradients();
+					}
 				}
 			}
 		});

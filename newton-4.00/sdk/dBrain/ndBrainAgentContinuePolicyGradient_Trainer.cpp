@@ -77,11 +77,17 @@ void ndBrainLastLinearLayer::Save(const ndBrainSave* const loadSave) const
 
 ndBrainLastActivationLayer::ndBrainLastActivationLayer(ndInt32 neurons)
 	:ndBrainLayerTanhActivation(neurons * 2)
+	,m_sigma0(ndBrainFloat(0.01f))
+	,m_sigmaScale(ndBrainFloat(0.5f))
+	,m_sigmaScaleInv(ndBrainFloat(1.0f)/ m_sigmaScale)
 {
 }
 
 ndBrainLastActivationLayer::ndBrainLastActivationLayer(const ndBrainLastActivationLayer& src)
 	:ndBrainLayerTanhActivation(src)
+	,m_sigma0(src.m_sigma0)
+	,m_sigmaScale(src.m_sigmaScale)
+	,m_sigmaScaleInv(src.m_sigmaScaleInv)
 {
 }
 
@@ -108,26 +114,29 @@ void ndBrainLastActivationLayer::MakePrediction(const ndBrainVector& input, ndBr
 
 void ndBrainLastActivationLayer::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-	//ndBrainFloat buffer[1024];
+	//ndBrainFloat buffer[1024 * 2];
 	//ndBrainMemVector tmpOut(buffer, inputDerivative.GetCount());
 	//tmpOut.Set(output);
 	//for (ndInt32 i = m_neurons / 2; i < m_neurons; ++i)
 	//{
-	//	tmpOut[i] = (output[i] - ndBrainFloat(0.01f)) * ndBrainFloat(2.0f);
+	//	tmpOut[i] = (output[i] - m_sigma0) * m_sigmaScaleInv;
 	//}
 	//ndBrainLayerTanhActivation::InputDerivative(tmpOut, outputDerivative, inputDerivative);
 	//for (ndInt32 i = m_neurons / 2; i < m_neurons; ++i)
 	//{
-	//	inputDerivative[i] *= ndBrainFloat(0.5f);
+	//	inputDerivative[i] *= m_sigmaScale;
 	//}
 
 	for (ndInt32 i = 0; i < m_neurons / 2; ++i)
 	{
-		inputDerivative[i] = (ndBrainFloat(1.0f) - output[i] * output[i]) * outputDerivative[i];
+		ndBrainFloat y = output[i];
+		ndBrainFloat derivative = ndBrainFloat(1.0f) - y * y;
+		inputDerivative[i] = derivative * outputDerivative[i];
 	}
 	for (ndInt32 i = m_neurons / 2; i < m_neurons; ++i)
 	{
-		ndBrainFloat y = (output[i] - ndBrainFloat(0.01f)) * ndBrainFloat(2.0f);
-		inputDerivative[i] = ndBrainFloat(0.5f) * ((ndBrainFloat(1.0f) - y * y)) * outputDerivative[i];
+		ndBrainFloat y = (output[i] - m_sigma0) * m_sigmaScaleInv;
+		ndBrainFloat derivative = ndBrainFloat(1.0f) - y * y;
+		inputDerivative[i] = m_sigmaScale * derivative * outputDerivative[i];
 	}
 }

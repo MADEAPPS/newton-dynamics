@@ -271,7 +271,6 @@ namespace ndUnicycle
 			return ndAbs(body->GetMatrix().m_posit.m_x) > ndFloat32(30.0f);
 		}
 
-		#pragma optimize( "", off )
 		void TelePort() const
 		{
 			ndBodyKinematic* const body = GetRoot()->m_body->GetAsBodyKinematic();
@@ -447,8 +446,7 @@ namespace ndUnicycle
 			SetMaterial(visualModel);
 
 			// add a hidden battery of model to generate trajectories in parallel
-			//const ndInt32 countX = 32;
-			const ndInt32 countX = 0;
+			const ndInt32 countX = 32;
 			for (ndInt32 i = 0; i < countX; ++i)
 			{
 				ndMatrix location(matrix);
