@@ -57,7 +57,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_exploreMinProbability = ndBrainFloat(1.0f / 100.0f);
 			m_exploreAnnelining = (m_exploreMinProbability / ndBrainFloat(2.0f));
-			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
+			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
 			//m_threadsCount = 1;
 		}
 

@@ -139,7 +139,6 @@ namespace ndUnicycle
 				return fail;
 			}
 		
-			#pragma optimize( "", off )
 			ndBrainFloat CalculateReward()
 			{
 				ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_model->m_legJoint->GetAngle() * m_model->m_legJoint->GetAngle()));

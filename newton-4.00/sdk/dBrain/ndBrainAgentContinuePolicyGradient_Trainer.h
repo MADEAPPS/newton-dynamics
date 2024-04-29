@@ -155,7 +155,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 			m_learnRate = ndBrainFloat(0.0005f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
-			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
+			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
 			//m_threadsCount = 1;
 		}
 
@@ -241,6 +241,15 @@ ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::ndBrainAgentCo
 {
 	m_gen.seed(m_master->m_randomSeed);
 	m_master->m_randomSeed += 1;
+
+	//std::mt19937 m_gen0(m_rd());
+	//std::mt19937 m_gen1(m_rd());
+	//m_gen0.seed(m_master->m_randomSeed);
+	//m_gen1.seed(m_master->m_randomSeed);
+	//std::uniform_real_distribution<ndFloat32> uniform0(ndFloat32(0.0f), ndFloat32(1.0f));
+	//std::uniform_real_distribution<ndFloat32> uniform1(ndFloat32(0.0f), ndFloat32(1.0f));
+	//ndFloat32 xxx0 = uniform0(m_gen0);
+	//ndFloat32 xxx1 = uniform1(m_gen1);
 
 	m_master->m_agents.Append(this);
 	m_trajectory.SetCount(m_master->m_maxTrajectorySteps + m_master->m_extraTrajectorySteps);
