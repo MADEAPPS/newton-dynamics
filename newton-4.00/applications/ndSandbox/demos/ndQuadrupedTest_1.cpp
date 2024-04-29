@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	class ndLegObservation
 	{
@@ -965,7 +965,7 @@ namespace ndQuadruped_1
 			,m_maxScore(ndFloat32 (-1.0e10f))
 			,m_maxFrames(6000)
 			,m_lastEpisode(-1)
-			,m_stopTraining(1000 * 1000000)
+			,m_stopTraining(200 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
