@@ -138,7 +138,8 @@ namespace ndUnicycle
 				bool fail = ndAbs(ndAsin(sinAngle)) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
 				return fail;
 			}
-		
+
+			#pragma optimize( "", off )
 			ndBrainFloat CalculateReward()
 			{
 				ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_model->m_legJoint->GetAngle() * m_model->m_legJoint->GetAngle()));
@@ -167,20 +168,20 @@ namespace ndUnicycle
 			{
 				m_model->ApplyActions(actions);
 		
-				//const ndFloat32 probability = 1.0f / 2000.0f;
-				//ndFloat32 applyJumpImpule = ndRand();
-				//if (applyJumpImpule < probability)
-				//{
-				//	if (m_model->HasSupportContact())
-				//	{
-				//		ndBodyDynamic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyDynamic();
-				//
-				//		ndFloat32 speed = 4.0f + 2.0f * ndRand();
-				//		ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
-				//		ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
-				//		boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_model->m_timestep);
-				//	}
-				//}
+				const ndFloat32 probability = 1.0f / 2000.0f;
+				ndFloat32 applyJumpImpule = ndRand();
+				if (applyJumpImpule < probability)
+				{
+					if (m_model->HasSupportContact())
+					{
+						ndBodyDynamic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyDynamic();
+				
+						ndFloat32 speed = 2.0f + 2.0f * ndRand();
+						ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
+						ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
+						boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_model->m_timestep);
+					}
+				}
 			}
 		
 			void GetObservation(ndBrainFloat* const observation)
@@ -232,20 +233,11 @@ namespace ndUnicycle
 
 			state[m_topBoxAngle] = ndReal(angle);
 			state[m_topBoxOmega] = ndReal(omega.m_z);
+
+			ndVector wheelOmega(m_wheel->GetOmega());
+			state[m_wheelOmega] = ndBrainFloat(wheelOmega.m_z);
 			state[m_jointAngle] = ndReal(m_legJoint->GetAngle() / ND_MAX_LEG_JOINT_ANGLE);
-			if (HasSupportContact())
-			{
-				//ignore wheel omega when robot is landed
-				state[m_isOnAir] = ndReal(0.0f);
-				state[m_wheelOmega] = ndReal(0.0f);
-				
-			}
-			else
-			{
-				ndVector wheelOmega (m_wheel->GetOmega());
-				state[m_isOnAir] = ndBrainFloat(1.0f);
-				state[m_wheelOmega] = ndBrainFloat(wheelOmega.m_z);
-			}
+			state[m_isOnAir] = HasSupportContact() ? ndReal(0.0f) : ndReal(1.0f);
 		}
 
 		void ApplyActions(ndBrainFloat* const actions)
