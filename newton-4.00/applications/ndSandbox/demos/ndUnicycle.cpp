@@ -417,7 +417,7 @@ namespace ndUnicycle
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_maxFrames(7000)
+			,m_maxFrames(2500)
 			,m_lastEpisode(-1)
 			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
