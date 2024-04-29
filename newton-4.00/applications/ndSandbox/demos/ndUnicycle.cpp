@@ -45,6 +45,7 @@ namespace ndUnicycle
 		m_jointAngle,
 		m_wheelOmega,
 		m_isOnAir,
+		m_speed,
 		m_stateSize
 	};
 
@@ -138,24 +139,27 @@ namespace ndUnicycle
 				return fail;
 			}
 		
+			#pragma optimize( "", off )
 			ndBrainFloat CalculateReward()
 			{
 				ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_model->m_legJoint->GetAngle() * m_model->m_legJoint->GetAngle()));
 				if (m_model->HasSupportContact())
 				{
 					ndBodyKinematic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyKinematic();
+
+					const ndVector boxVeloc(boxBody->GetVelocity());
 					const ndMatrix& matrix = boxBody->GetMatrix();
-					ndFloat32 sinAngle = matrix.m_up.m_x;
-					ndFloat32 boxReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
-		
-					ndFloat32 reward = (boxReward + legReward) / 2.0f;
+					const ndFloat32 sinAngle = matrix.m_up.m_x;
+					const ndFloat32 boxReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
+					const ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(0.5f) * boxVeloc.m_x * boxVeloc.m_x));
+					const ndFloat32 reward = (speedReward + boxReward + legReward) / 3.0f;
 					return ndReal(reward);
 				}
 				else
 				{
-					ndVector wheelOmega(m_model->m_wheel->GetOmega());
-					ndFloat32 wheelReward = ndReal(ndExp(-ndFloat32(10000.0f) * wheelOmega.m_z * wheelOmega.m_z));
-					ndFloat32 reward = (wheelReward + legReward) / 2.0f;
+					const ndVector wheelOmega(m_model->m_wheel->GetOmega());
+					const ndFloat32 wheelReward = ndReal(ndExp(-ndFloat32(10000.0f) * wheelOmega.m_z * wheelOmega.m_z));
+					const ndFloat32 reward = (wheelReward + legReward) / 2.0f;
 					return ndReal(reward);
 				}
 			}
@@ -220,9 +224,12 @@ namespace ndUnicycle
 		{
 			ndBodyKinematic* const body = GetRoot()->m_body->GetAsBodyKinematic();
 			const ndVector omega (body->GetOmega());
+			const ndVector veloc(body->GetVelocity());
 			const ndMatrix& matrix = body->GetMatrix();
 			ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
 			ndFloat32 angle = ndAsin(sinAngle);
+
+			state[m_jointAngle] = veloc.m_x;
 
 			state[m_topBoxAngle] = ndReal(angle);
 			state[m_topBoxOmega] = ndReal(omega.m_z);
