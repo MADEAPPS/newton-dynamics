@@ -24,7 +24,7 @@
 
 namespace ndUnicycle
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME "unicycleVPG.dnn"
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
@@ -412,7 +412,7 @@ namespace ndUnicycle
 			,m_maxScore(ndFloat32(-1.0e10f))
 			,m_maxFrames(7000)
 			,m_lastEpisode(-1)
-			,m_stopTraining(100 * 1000000)
+			,m_stopTraining(200 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();

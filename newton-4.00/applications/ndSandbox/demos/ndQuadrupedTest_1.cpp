@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	class ndLegObservation
 	{
@@ -977,8 +977,6 @@ namespace ndQuadruped_1
 			//const ndInt32 countZ = 2;
 			const ndInt32 countX = 6;
 			const ndInt32 countZ = 9;
-			//const ndFloat32 separation = 4.0f;
-			const ndFloat32 separation = 0.0f;
 
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			
@@ -1003,23 +1001,20 @@ namespace ndQuadruped_1
 			scene->Set2DDisplayRenderFunction(quadrupedUI);
 
 			// add a hidden battery of model to generate trajectories in parallel
-			ndMatrix location(matrix);
-			location.m_posit.m_z -= countZ * separation * 0.5f;
-
-			ndFloat32 x0 = matrix.m_posit.m_x + separation;
 			for (ndInt32 i = 0; i < countZ; ++i)
 			{
-				location.m_posit.m_x = x0;
 				for (ndInt32 j = 0; j < countX; ++j)
 				{
+					ndMatrix location(matrix);
+					location.m_posit.m_x += 4.0f * (ndRand() - 0.5f);
+					location.m_posit.m_z += 4.0f * (ndRand() - 0.5f);
 					ndSharedPtr<ndBrainAgent> agent(BuildAgent(m_master));
 					ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
 					world->AddModel(model);
-					location.m_posit.m_x += separation;
-					HideModel(model);
+					m_models.Append(model);
+					//HideModel(model);
 					SetMaterial(model);
 				}
-				location.m_posit.m_z += separation;
 			}
 		}
 
@@ -1031,7 +1026,7 @@ namespace ndQuadruped_1
 			}
 		}
 
-		void HideModel(ndSharedPtr<ndModel>& model) const
+		void HideModel(ndSharedPtr<ndModel>& model, bool mode) const
 		{
 			ndRobot* const robot = (ndRobot*)*model;
 
@@ -1045,7 +1040,7 @@ namespace ndQuadruped_1
 				ndBody* const body = *node->m_body;
 				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
 				ndDemoEntity* const ent = userData->m_entity;
-				ent->Hide();
+				mode ? ent->Hide() : ent->UnHide();
 
 				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
 				{
@@ -1104,6 +1099,13 @@ namespace ndQuadruped_1
 			}
 		}
 
+		void OnDebug(ndDemoEntityManager* const, bool mode)
+		{
+			for (ndList<ndSharedPtr<ndModel>>::ndNode* node = m_models.GetFirst(); node; node = node->GetNext())
+			{
+				HideModel(node->GetInfo(), mode);
+			}
+		}
 
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
@@ -1156,6 +1158,7 @@ namespace ndQuadruped_1
 
 		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
+		ndList<ndSharedPtr<ndModel>> m_models;
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
