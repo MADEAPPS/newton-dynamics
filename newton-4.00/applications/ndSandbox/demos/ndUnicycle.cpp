@@ -24,7 +24,7 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME "unicycleVPG.dnn"
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
@@ -139,7 +139,6 @@ namespace ndUnicycle
 				return fail;
 			}
 
-			#pragma optimize( "", off )
 			ndBrainFloat CalculateReward()
 			{
 				ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_model->m_legJoint->GetAngle() * m_model->m_legJoint->GetAngle()));
@@ -455,6 +454,7 @@ namespace ndUnicycle
 				world->AddModel(model);
 				//HideModel(model);
 				SetMaterial(model);
+				m_models.Append(model);
 			}
 		}
 
@@ -466,7 +466,15 @@ namespace ndUnicycle
 			}
 		}
 
-		void HideModel(ndSharedPtr<ndModel>& model) const
+		void OnDebug(ndDemoEntityManager* const, bool mode)
+		{
+			for (ndList<ndSharedPtr<ndModel>>::ndNode* node = m_models.GetFirst(); node; node = node->GetNext())
+			{
+				HideModel(node->GetInfo(), mode);
+			}
+		}
+
+		void HideModel(ndSharedPtr<ndModel>& model, bool mode) const
 		{
 			ndRobot* const robot = (ndRobot*)*model;
 
@@ -480,7 +488,7 @@ namespace ndUnicycle
 				ndBody* const body = *node->m_body;
 				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
 				ndDemoEntity* const ent = userData->m_entity;
-				ent->Hide();
+				mode ? ent->Hide() : ent->UnHide();
 
 				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
 				{
@@ -590,6 +598,7 @@ namespace ndUnicycle
 
 		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
+		ndList<ndSharedPtr<ndModel>> m_models;
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;

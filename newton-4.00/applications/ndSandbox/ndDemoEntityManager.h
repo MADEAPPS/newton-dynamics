@@ -46,7 +46,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 		{
 		}
 		
-		virtual void OnDebug(ndDemoEntityManager* const) {}
+		virtual void OnDebug(ndDemoEntityManager* const, bool) {}
 		virtual void Update(ndDemoEntityManager* const scene, ndFloat32 timestep) = 0;
 	};
 
@@ -275,6 +275,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	bool m_showModelsDebugInfo;
 	bool m_showCollidingFaces;
 	bool m_showPostUpdate;
+	bool m_showPostUpdate0;
 	bool m_suspendPhysicsUpdate;
 	bool m_synchronousPhysicsUpdate;
 	bool m_synchronousParticlesUpdate;
