@@ -24,7 +24,7 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME "unicycleVPG.dnn"
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
@@ -167,20 +167,20 @@ namespace ndUnicycle
 			{
 				m_model->ApplyActions(actions);
 		
-				const ndFloat32 probability = 1.0f / 2000.0f;
-				ndFloat32 applyJumpImpule = ndRand();
-				if (applyJumpImpule < probability)
-				{
-					if (m_model->HasSupportContact())
-					{
-						ndBodyDynamic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyDynamic();
-				
-						ndFloat32 speed = 2.0f + 2.0f * ndRand();
-						ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
-						ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
-						boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_model->m_timestep);
-					}
-				}
+				//const ndFloat32 probability = 1.0f / 2000.0f;
+				//ndFloat32 applyJumpImpule = ndRand();
+				//if (applyJumpImpule < probability)
+				//{
+				//	if (m_model->HasSupportContact())
+				//	{
+				//		ndBodyDynamic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyDynamic();
+				//
+				//		ndFloat32 speed = 2.0f + 2.0f * ndRand();
+				//		ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
+				//		ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
+				//		boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_model->m_timestep);
+				//	}
+				//}
 			}
 		
 			void GetObservation(ndBrainFloat* const observation)
