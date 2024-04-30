@@ -49,7 +49,6 @@ namespace ndUnicycle
 		m_stateSize
 	};
 
-
 	class ndRobot : public ndModelArticulation
 	{
 		public:
@@ -239,15 +238,27 @@ namespace ndUnicycle
 
 		void ApplyActions(ndBrainFloat* const actions)
 		{
-			ndFloat32 legAngle = ndFloat32(actions[m_softLegControl]) * ND_MAX_LEG_ANGLE_STEP + m_legJoint->GetAngle();
-			legAngle = ndClamp (legAngle, -ND_MAX_LEG_JOINT_ANGLE, ND_MAX_LEG_JOINT_ANGLE);
-			m_legJoint->SetTargetAngle(legAngle);
+			if (HasSupportContact())
+			{
+				ndFloat32 legAngle = ndFloat32(actions[m_softLegControl]) * ND_MAX_LEG_ANGLE_STEP + m_legJoint->GetAngle();
+				legAngle = ndClamp(legAngle, -ND_MAX_LEG_JOINT_ANGLE, ND_MAX_LEG_JOINT_ANGLE);
+				m_legJoint->SetTargetAngle(legAngle);
 
-			ndBodyDynamic* const wheelBody = m_wheelJoint->GetBody0()->GetAsBodyDynamic();
-			const ndMatrix matrix(m_wheelJoint->GetLocalMatrix1() * m_wheelJoint->GetBody1()->GetMatrix());
+				ndBodyDynamic* const wheelBody = m_wheelJoint->GetBody0()->GetAsBodyDynamic();
+				const ndMatrix matrix(m_wheelJoint->GetLocalMatrix1() * m_wheelJoint->GetBody1()->GetMatrix());
 
-			ndVector torque(matrix.m_front.Scale(ndFloat32 (actions[m_softWheelControl]) * ND_MAX_WHEEL_TORQUE));
-			wheelBody->SetTorque(torque);
+				ndVector torque(matrix.m_front.Scale(ndFloat32(actions[m_softWheelControl]) * ND_MAX_WHEEL_TORQUE));
+				wheelBody->SetTorque(torque);
+			}
+			else
+			{
+				m_legJoint->SetTargetAngle(ndFloat32(0.0f));
+				ndBodyDynamic* const wheelBody = m_wheelJoint->GetBody0()->GetAsBodyDynamic();
+				const ndMatrix matrix(m_wheelJoint->GetLocalMatrix1() * m_wheelJoint->GetBody1()->GetMatrix());
+				const ndVector omega(wheelBody->GetOmega());
+				const ndVector torque(matrix.m_front.Scale(ND_MAX_WHEEL_TORQUE) * ndSign(omega.m_z));
+				wheelBody->SetTorque(torque);
+			}
 		}
 
 		void ResetModel()
