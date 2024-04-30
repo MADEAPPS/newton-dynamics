@@ -216,4 +216,9 @@ void ndColorRenderPass::UpdateDebugDisplay(ndFloat32)
 	{
 		m_debugDisplay.UpdateDebugShapes(m_manager, m_manager->m_collisionDisplayMode);
 	}
+
+	if (m_manager->m_showPostUpdate)
+	{
+		ndAssert(0);
+	}
 }

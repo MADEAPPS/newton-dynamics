@@ -287,6 +287,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_showJointDebugInfo(false)
 	,m_showModelsDebugInfo(false)
 	,m_showCollidingFaces(false)
+	,m_showPostUpdate(false)
 	,m_suspendPhysicsUpdate(false)
 	,m_synchronousPhysicsUpdate(false)
 	,m_synchronousParticlesUpdate(false)
@@ -992,6 +993,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show joints debug info", &m_showJointDebugInfo);
 			ImGui::Checkbox("show models debug info", &m_showModelsDebugInfo);
 			ImGui::Checkbox("show colliding faces", &m_showCollidingFaces);
+			ImGui::Checkbox("show post update", &m_showPostUpdate);
 
 			ImGui::EndMenu();
 

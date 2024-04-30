@@ -46,6 +46,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 		{
 		}
 		
+		virtual void OnDebug(ndDemoEntityManager* const) {}
 		virtual void Update(ndDemoEntityManager* const scene, ndFloat32 timestep) = 0;
 	};
 
@@ -273,11 +274,13 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	bool m_showJointDebugInfo;
 	bool m_showModelsDebugInfo;
 	bool m_showCollidingFaces;
+	bool m_showPostUpdate;
 	bool m_suspendPhysicsUpdate;
 	bool m_synchronousPhysicsUpdate;
 	bool m_synchronousParticlesUpdate;
 	bool m_showRaycastHit;
 	bool m_profilerMode;
+	
 
 	ndWorld::ndSolverModes m_solverMode;
 

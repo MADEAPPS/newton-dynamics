@@ -24,7 +24,7 @@
 
 namespace ndUnicycle
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME "unicycleVPG.dnn"
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
@@ -225,19 +225,17 @@ namespace ndUnicycle
 			ndBodyKinematic* const body = GetRoot()->m_body->GetAsBodyKinematic();
 			const ndVector omega (body->GetOmega());
 			const ndVector veloc(body->GetVelocity());
+			const ndVector wheelOmega(m_wheel->GetOmega());
 			const ndMatrix& matrix = body->GetMatrix();
-			ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
-			ndFloat32 angle = ndAsin(sinAngle);
+			const ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
+			const ndFloat32 angle = ndAsin(sinAngle);
 
-			state[m_jointAngle] = veloc.m_x;
-
-			state[m_topBoxAngle] = ndReal(angle);
-			state[m_topBoxOmega] = ndReal(omega.m_z);
-
-			ndVector wheelOmega(m_wheel->GetOmega());
+			state[m_jointAngle] = ndBrainFloat(veloc.m_x);
+			state[m_topBoxAngle] = ndBrainFloat(angle);
+			state[m_topBoxOmega] = ndBrainFloat(omega.m_z);
 			state[m_wheelOmega] = ndBrainFloat(wheelOmega.m_z);
-			state[m_jointAngle] = ndReal(m_legJoint->GetAngle() / ND_MAX_LEG_JOINT_ANGLE);
-			state[m_isOnAir] = HasSupportContact() ? ndReal(0.0f) : ndReal(1.0f);
+			state[m_isOnAir] = HasSupportContact() ? ndBrainFloat(0.0f) : ndBrainFloat(1.0f);
+			state[m_jointAngle] = ndBrainFloat(m_legJoint->GetAngle() / ND_MAX_LEG_JOINT_ANGLE);
 		}
 
 		void ApplyActions(ndBrainFloat* const actions)
