@@ -282,7 +282,6 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	bool m_showRaycastHit;
 	bool m_profilerMode;
 	
-
 	ndWorld::ndSolverModes m_solverMode;
 
 	ndVector m_diretionalLightDir;
