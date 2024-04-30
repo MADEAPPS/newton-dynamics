@@ -165,21 +165,6 @@ namespace ndUnicycle
 			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
 				m_model->ApplyActions(actions);
-		
-				//const ndFloat32 probability = 1.0f / 2000.0f;
-				//ndFloat32 applyJumpImpule = ndRand();
-				//if (applyJumpImpule < probability)
-				//{
-				//	if (m_model->HasSupportContact())
-				//	{
-				//		ndBodyDynamic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyDynamic();
-				//
-				//		ndFloat32 speed = 2.0f + 2.0f * ndRand();
-				//		ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
-				//		ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
-				//		boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_model->m_timestep);
-				//	}
-				//}
 			}
 		
 			void GetObservation(ndBrainFloat* const observation)
@@ -425,7 +410,7 @@ namespace ndUnicycle
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_maxFrames(2000)
+			,m_maxFrames(7000)
 			,m_lastEpisode(-1)
 			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
