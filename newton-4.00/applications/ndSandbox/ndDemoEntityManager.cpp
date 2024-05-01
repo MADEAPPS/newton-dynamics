@@ -57,10 +57,10 @@
 //#define DEFAULT_SCENE	17		// rag doll
 //#define DEFAULT_SCENE	18		// cart pole discrete controller
 //#define DEFAULT_SCENE	19		// cart pole continue controller
-#define DEFAULT_SCENE	20		// unit cycle controller
+//#define DEFAULT_SCENE	20		// unit cycle controller
 //#define DEFAULT_SCENE	21		// quadruped test 1
 //#define DEFAULT_SCENE	22		// quadruped test 2
-//#define DEFAULT_SCENE	23		// quadruped test 3
+#define DEFAULT_SCENE	23		// quadruped test 3
 //#define DEFAULT_SCENE	24		// biped test 1
 //#define DEFAULT_SCENE	25		// biped test 2
 //#define DEFAULT_SCENE	26		// train biped test 2
@@ -983,7 +983,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 
 			ImGui::Checkbox("show aabb", &m_showAABB);
 			ImGui::Checkbox("show broad phase", &m_showScene);
-			ImGui::Checkbox("show concave edge", &m_showConcaveEdge);
+			ImGui::Checkbox("show concave edges", &m_showConcaveEdge);
+			ImGui::Checkbox("hide post update", &m_showPostUpdate);
 			ImGui::Checkbox("hide visual meshes", &m_hideVisualMeshes);
 			ImGui::Checkbox("show mesh skeleton", &m_showMeshSkeleton);
 			ImGui::Checkbox("show contact points", &m_showContactPoints);
@@ -994,7 +995,6 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show joints debug info", &m_showJointDebugInfo);
 			ImGui::Checkbox("show models debug info", &m_showModelsDebugInfo);
 			ImGui::Checkbox("show colliding faces", &m_showCollidingFaces);
-			ImGui::Checkbox("show post update", &m_showPostUpdate);
 
 			ImGui::EndMenu();
 
