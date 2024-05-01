@@ -23,7 +23,8 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
+	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	class ndLegObservation
 	{
@@ -50,8 +51,9 @@ namespace ndQuadruped_1
 		ndLegObservation n_legs[4];
 		ndActionVector m_torso;
 	};
+	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
+	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
-	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
 	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
@@ -60,9 +62,6 @@ namespace ndQuadruped_1
 
 	//#define D_SWING_STEP			ndReal(0.01f)
 	#define D_SWING_STEP			ndReal(0.005f)
-
-	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
-	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
 	class ndRobot : public ndModelArticulation
 	{
@@ -767,24 +766,6 @@ namespace ndQuadruped_1
 		ndSharedPtr<ndModel> m_model;
 	};
 
-	#ifdef ND_TRAIN_MODEL
-	ndSharedPtr<ndBrainAgent> BuildAgent(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>& master)
-	{
-		// add a reinforcement learning controller 
-		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(master));
-		return agent;
-	}
-	#else
-	ndSharedPtr<ndBrainAgent> BuildAgent()
-	{
-		char fileName[1024];
-		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
-		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndController(actor));
-		return agent;
-	}
-	#endif
-
 	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation, ndSharedPtr<ndBrainAgent> agent)
 	{
 		ndFloat32 mass = 20.0f;
@@ -953,6 +934,7 @@ namespace ndQuadruped_1
 	}
 
 	#ifdef ND_TRAIN_MODEL
+
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
 	{
 		public:
@@ -991,8 +973,7 @@ namespace ndQuadruped_1
 
 			m_master->SetName(CONTROLLER_NAME);
 
-			//ndInt32 materialId = 1;
-			ndSharedPtr<ndBrainAgent> visualAgent(BuildAgent(m_master));
+			ndSharedPtr<ndBrainAgent> visualAgent(new ndRobot::ndControllerAgent_trainer(m_master));
 			ndSharedPtr<ndModel> visualModel(BuildModel(scene, matrix, visualAgent));
 			world->AddModel(visualModel);
 			SetMaterial(visualModel);
@@ -1008,7 +989,7 @@ namespace ndQuadruped_1
 					ndMatrix location(matrix);
 					location.m_posit.m_x += 6.0f * (ndRand() - 0.5f);
 					location.m_posit.m_z += 6.0f * (ndRand() - 0.5f);
-					ndSharedPtr<ndBrainAgent> agent(BuildAgent(m_master));
+					ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(m_master));
 					ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
 					world->AddModel(model);
 					m_models.Append(model);
@@ -1167,6 +1148,17 @@ namespace ndQuadruped_1
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;
 	};
+	#else
+
+	ndSharedPtr<ndBrainAgent> BuildAgent()
+	{
+		char fileName[1024];
+		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
+		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndController(actor));
+		return agent;
+	}
+
 	#endif
 }
 
