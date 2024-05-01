@@ -1006,8 +1006,8 @@ namespace ndQuadruped_1
 				for (ndInt32 j = 0; j < countX; ++j)
 				{
 					ndMatrix location(matrix);
-					location.m_posit.m_x += 4.0f * (ndRand() - 0.5f);
-					location.m_posit.m_z += 4.0f * (ndRand() - 0.5f);
+					location.m_posit.m_x += 6.0f * (ndRand() - 0.5f);
+					location.m_posit.m_z += 6.0f * (ndRand() - 0.5f);
 					ndSharedPtr<ndBrainAgent> agent(BuildAgent(m_master));
 					ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
 					world->AddModel(model);

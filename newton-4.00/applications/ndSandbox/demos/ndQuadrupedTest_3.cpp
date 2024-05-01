@@ -25,6 +25,8 @@
 
 namespace ndQuadruped_3
 {
+	//#define ND_TRAIN_MODEL
+
 	class ndDefinition
 	{
 		public:
@@ -259,11 +261,11 @@ namespace ndQuadruped_3
 		ndQuadrupedModel(ndDemoEntityManager* const scene, ndDemoEntity* const robotMesh, const ndMatrix& location)
 			:ndModel()
 			,m_invDynamicsSolver()
-			,m_walk(nullptr)
-			,m_animBlendTree(nullptr)
+			//,m_walk(nullptr)
+			//,m_animBlendTree(nullptr)
 			,m_output()
-			,m_walkCycle(0.8f)
-			,m_trotCycle(0.4f)
+			//,m_walkCycle(0.8f)
+			//,m_trotCycle(0.4f)
 			,m_bodyArray()
 			,m_effectorsInfo()
 			,m_effectorsJoints()
@@ -373,21 +375,21 @@ namespace ndQuadruped_3
 			m_param_xxxx = ndParamMapper(0.0, 0.75f);
 			
 			m_output.SetCount(4);
-			ndAssert(0);
-			//m_walk = new ndAnimationSequencePlayer(&m_walkCycle);
-			m_animBlendTree = m_walk;
+			//ndSharedPtr<ndAnimationSequence> walkCycle(new ndAnimationSequence(0.8f));
+			//m_walk = new ndAnimationSequencePlayer(walkCycle);
+			//m_animBlendTree = m_walk;
 		}
 
 		~ndQuadrupedModel()
 		{
-			if (m_animBlendTree)
-			{
-				delete m_animBlendTree;
-			}
+			//if (m_animBlendTree)
+			//{
+			//	delete m_animBlendTree;
+			//}
 		}
 
-		virtual void OnAddToWorld() { ndAssert(0); }
-		virtual void OnRemoveFromToWorld() { ndAssert(0); }
+		virtual void OnAddToWorld() {}
+		virtual void OnRemoveFromToWorld() {}
 
 		void NormalizeMassDistribution(ndFloat32 mass) const
 		{
@@ -556,12 +558,6 @@ namespace ndQuadruped_3
 				ndJointBilateralConstraint* const joint = info.m_effector;
 				joint->DebugJoint(context);
 			}
-
-		}
-
-		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
-		{
-			ndModel::PostUpdate(world, timestep);
 		}
 
 		void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -569,52 +565,57 @@ namespace ndQuadruped_3
 			ndModel::PostTransformUpdate(world, timestep);
 		}
 
+		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndModel::PostUpdate(world, timestep);
+		}
+
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModel::Update(world, timestep);
 
-			m_bodyArray[0]->SetSleepState(false);
-			ndFloat32 animSpeed = m_param_xxxx.Interpolate(m_param_x0);
-			m_timer = ndMod(m_timer + timestep * animSpeed, ndFloat32(1.0f));
-
-			ndAssert(0);
-			//m_walk->SetParam(1.0f - m_timer);
-			//m_animBlendTree->Evaluate(m_output);
-			//for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); i++)
+			//m_bodyArray[0]->SetSleepState(false);
+			//ndFloat32 animSpeed = m_param_xxxx.Interpolate(m_param_x0);
+			//m_timer = ndMod(m_timer + timestep * animSpeed, ndFloat32(1.0f));
+			//
+			////ndAssert(0);
+			////m_walk->SetParam(1.0f - m_timer);
+			////m_animBlendTree->Evaluate(m_output);
+			////for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); i++)
+			////{
+			////	ndEffectorInfo& info = m_effectorsInfo[i];
+			////	const ndAnimKeyframe& keyFrame = m_output[i];
+			////	ndVector posit(info.m_basePosition);
+			////	posit.m_x += keyFrame.m_posit.m_x;
+			////	posit.m_y += keyFrame.m_posit.m_y;
+			////	posit.m_z += keyFrame.m_posit.m_z;
+			////	info.m_effector->SetLocalTargetPosition(posit);
+			////}
+			//
+			//ndSkeletonContainer* const skeleton = m_bodyArray[0]->GetSkeleton();
+			//ndAssert(skeleton);
+			//
+			////m_invDynamicsSolver.SetMaxIterations(4);
+			//if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
 			//{
-			//	ndEffectorInfo& info = m_effectorsInfo[i];
-			//	const ndAnimKeyframe& keyFrame = m_output[i];
-			//	ndVector posit(info.m_basePosition);
-			//	posit.m_x += keyFrame.m_posit.m_x;
-			//	posit.m_y += keyFrame.m_posit.m_y;
-			//	posit.m_z += keyFrame.m_posit.m_z;
-			//	info.m_effector->SetLocalTargetPosition(posit);
+			//	ndFixSizeArray<ndJointBilateralConstraint*, 8> effectors;
+			//	for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
+			//	{
+			//		effectors.PushBack(*m_effectorsJoints[i]);
+			//	}
+			//
+			//	m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
+			//	m_invDynamicsSolver.Solve();
+			//	m_invDynamicsSolver.SolverEnd();
 			//}
-
-			ndSkeletonContainer* const skeleton = m_bodyArray[0]->GetSkeleton();
-			ndAssert(skeleton);
-
-			//m_invDynamicsSolver.SetMaxIterations(4);
-			if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
-			{
-				ndFixSizeArray<ndJointBilateralConstraint*, 8> effectors;
-				for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
-				{
-					effectors.PushBack(*m_effectorsJoints[i]);
-				}
-
-				m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
-				m_invDynamicsSolver.Solve();
-				m_invDynamicsSolver.SolverEnd();
-			}
 		}
 
 		ndIkSolver m_invDynamicsSolver;
-		ndAnimationSequencePlayer* m_walk;
-		ndAnimationBlendTreeNode* m_animBlendTree;
+		//ndAnimationSequencePlayer* m_walk;
+		//ndAnimationBlendTreeNode* m_animBlendTree;
 		ndAnimationPose m_output;
-		ndWalkSequence m_walkCycle;
-		ndWalkSequence m_trotCycle;
+		//ndWalkSequence m_walkCycle;
+		//ndWalkSequence m_trotCycle;
 		ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
 		ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
@@ -689,34 +690,34 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_default);
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
-	
-	ndQuadrupedModel* const robot0 = new ndQuadrupedModel(scene, *modelMesh, matrix);
-	scene->SetSelectedModel(robot0);
-	ndSharedPtr<ndModel> modelPtr(robot0);
+
+
+#ifdef ND_TRAIN_MODEL
+	ndAssert(0)
+#else
+	ndQuadrupedModel* const robot = new ndQuadrupedModel(scene, *modelMesh, matrix);
+	scene->SetSelectedModel(robot);
+	ndSharedPtr<ndModel> modelPtr(robot);
 	world->AddModel(modelPtr);
-	
-	//matrix.m_posit.m_x += 2.0f;
-	//matrix.m_posit.m_z -= 2.0f;
-	//ndQuadrupedModel* const robot1 = new ndQuadrupedModel(scene, robotEntity, matrix);
-	//world->AddModel(robot1);
-	
+
+	ndModelUI* const quadrupedUI = new ndModelUI(scene, robot);
+	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
+	scene->Set2DDisplayRenderFunction(quadrupedUIPtr);
+
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), world->GetSentinelBody()));
+	world->AddJoint(fixJoint);
+
 	//ndVector posit(matrix.m_posit);
 	//posit.m_x += 1.5f;
 	//posit.m_z += 1.5f;
 	//AddBox(scene, posit, 2.0f, 0.3f, 0.4f, 0.7f);
 	//AddBox(scene, posit, 1.0f, 0.3f, 0.4f, 0.7f);
-	
+
 	//posit.m_x += 0.6f;
 	//posit.m_z += 0.2f;
 	//AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
-	
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
-
-	ndModelUI* const quadrupedUI = new ndModelUI(scene, robot0);
-	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
-	scene->Set2DDisplayRenderFunction(quadrupedUIPtr);
+#endif
 
 	matrix.m_posit.m_x -= 5.0f;
 	matrix.m_posit.m_y += 1.5f;
