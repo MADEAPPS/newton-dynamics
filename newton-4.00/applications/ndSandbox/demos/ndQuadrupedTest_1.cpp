@@ -393,6 +393,7 @@ namespace ndQuadruped_1
 			,m_effectorsInfo()
 			,m_animBlendTree()
 			,m_agent(agent)
+			,m_timestep(0.0f)
 		{
 		}
 

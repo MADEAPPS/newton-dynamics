@@ -52,10 +52,11 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshE
 	,m_lock()
 	,m_isDead(false)
 	,m_isVisible(true)
+	,m_castShadow(true)
 {
 	ndInt32 stack = 1;
-	ndDemoEntity* parentEntityBuffer[256];
 	ndMesh* effectNodeBuffer[256];
+	ndDemoEntity* parentEntityBuffer[256];
 	struct EntityMeshPair
 	{
 		EntityMeshPair()
@@ -139,6 +140,7 @@ ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	,m_lock()
 	,m_isDead(false)
 	,m_isVisible(copyFrom.m_isVisible)
+	,m_castShadow(copyFrom.m_castShadow)
 {
 	if (*m_mesh && m_mesh->GetAsDemoSkinMesh())
 	{

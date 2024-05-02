@@ -439,135 +439,16 @@ namespace ndQuadruped_3
 			ndIkSwivelPositionEffector* m_effector;
 		};
 
-		//ndRobot(ndDemoEntityManager* const scene, ndDemoEntity* const robotMesh, const ndMatrix& location)
 		ndRobot()
 			:ndModelArticulation()
-			//,m_invDynamicsSolver()
-			//,m_walk(nullptr)
-			//,m_animBlendTree(nullptr)
-			//,m_output()
-			//,m_walkCycle(0.8f)
-			//,m_trotCycle(0.4f)
-			//,m_bodyArray()
 			,m_effectorsInfo()
 			,m_effectorsJoints()
+			,m_timerstep(0.0f)
 		{
-			// make a clone of the mesh and add it to the scene
-			//ndDemoEntity* const entity = robotMesh->CreateClone();
-			//scene->AddEntity(entity);
-			//ndWorld* const world = scene->GetWorld();
-			//
-			//ndDemoEntity* const rootEntity = entity->Find(jointsDefinition[0].m_boneName);
-			//
-			//// find the floor location 
-			//ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
-			//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-			//matrix.m_posit.m_y = floor.m_y;
-			//
-			//matrix.m_posit.m_y += 1.0f;
-			//rootEntity->ResetMatrix(matrix);
-			//
-			//// add the root body
-			//ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, 1.0f, nullptr);
-			//m_bodyArray.PushBack(rootBody);
-			//
-			//ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
-			//ndFixSizeArray<ndDemoEntity*, 32> childEntities;
-			//
-			//ndInt32 stack = 0;
-			//for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
-			//{
-			//	childEntities[stack] = child;
-			//	parentBone[stack] = rootBody;
-			//	stack++;
-			//}
-			//
-			//const ndInt32 definitionCount = ndInt32(sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
-			//while (stack)
-			//{
-			//	stack--;
-			//	ndBodyDynamic* parentBody = parentBone[stack];
-			//	ndDemoEntity* const childEntity = childEntities[stack];
-			//
-			//	const char* const name = childEntity->GetName().GetStr();
-			//	for (ndInt32 i = 0; i < definitionCount; ++i)
-			//	{
-			//		const ndDefinition& definition = jointsDefinition[i];
-			//		if (!strcmp(definition.m_boneName, name))
-			//		{
-			//			//dTrace(("name: %s\n", name));
-			//			if (definition.m_type == ndDefinition::m_hinge)
-			//			{
-			//				ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, 1.0f, parentBody);
-			//				m_bodyArray.PushBack(childBody);
-			//
-			//				const ndMatrix pivotMatrix(childBody->GetMatrix());
-			//				ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
-			//				hinge->SetLimitState(true);
-			//				hinge->SetLimits(definition.m_minAngle * ndDegreeToRad, definition.m_maxAngle * ndDegreeToRad);
-			//
-			//				ndSharedPtr<ndJointBilateralConstraint> hingePtr(hinge);
-			//				world->AddJoint(hingePtr);
-			//				parentBody = childBody;
-			//			}
-			//			else
-			//			{
-			//				ndDemoEntityNotify* notify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
-			//				notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
-			//				notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
-			//
-			//				ndMatrix effectorFrame(rootBody->GetMatrix());
-			//				ndMatrix pivotFrame(ndRollMatrix(-90.0f * ndDegreeToRad) * rootBody->GetMatrix());
-			//				pivotFrame.m_posit = notify->GetBody()->GetMatrix().m_posit;
-			//				effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
-			//
-			//				ndFloat32 regularizer = 0.001f;
-			//				ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, parentBody, rootBody);
-			//				
-			//				effector->SetSwivelMode(false);
-			//				effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
-			//				effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
-			//				
-			//				const ndVector elbowPoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
-			//				const ndVector dist0(effectorFrame.m_posit - elbowPoint);
-			//				const ndVector dist1(elbowPoint - pivotFrame.m_posit);
-			//				const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
-			//				effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
-			//				
-			//				ndEffectorInfo info(effector);
-			//				m_effectorsInfo.PushBack(info);
-			//				m_effectorsJoints.PushBack(effector);
-			//			}
-			//			break;
-			//		}
-			//	}
-			//
-			//	for (ndDemoEntity* child = childEntity->GetFirstChild(); child; child = child->GetNext())
-			//	{
-			//		childEntities[stack] = child;
-			//		parentBone[stack] = parentBody;
-			//		stack++;
-			//	}
-			//}
-			//
-			//NormalizeMassDistribution(100.0f);
-			//
-			//m_timer = 0.0f;
-			//m_param_x0 = -1.0f;
-			//m_param_xxxx = ndParamMapper(0.0, 0.75f);
-			//
-			//m_output.SetCount(4);
-			////ndSharedPtr<ndAnimationSequence> walkCycle(new ndAnimationSequence(0.8f));
-			////m_walk = new ndAnimationSequencePlayer(walkCycle);
-			////m_animBlendTree = m_walk;
 		}
 
 		~ndRobot()
 		{
-			//if (m_animBlendTree)
-			//{
-			//	delete m_animBlendTree;
-			//}
 		}
 
 		void NormalizeMassDistribution(ndFloat32 mass) const
@@ -755,6 +636,10 @@ namespace ndQuadruped_3
 		{
 			ndModel::Update(world, timestep);
 
+			m_timerstep = timestep;
+			//m_agent->Step();
+
+
 			//m_bodyArray[0]->SetSleepState(false);
 			//ndFloat32 animSpeed = m_param_xxxx.Interpolate(m_param_x0);
 			//m_timer = ndMod(m_timer + timestep * animSpeed, ndFloat32(1.0f));
@@ -801,7 +686,7 @@ namespace ndQuadruped_3
 		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
 		ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
 		
-		//ndFloat32 m_timer;
+		ndFloat32 m_timerstep;
 		//ndReal m_param_x0;
 		//ndParamMapper m_param_xxxx;
 	};
@@ -901,10 +786,6 @@ namespace ndQuadruped_3
 						hinge->SetLimits(definition.m_minAngle * ndDegreeToRad, definition.m_maxAngle * ndDegreeToRad);
 						
 						ndSharedPtr<ndJointBilateralConstraint> hingePtr(hinge);
-						//world->AddJoint(hingePtr);
-
-						//thighNode = model->AddLimb(modelRoot, thigh, ballJoint);
-						//parentNode = childBody;
 						parentNode = model->AddLimb(parentNode, childBody, hingePtr);
 					}
 					else
