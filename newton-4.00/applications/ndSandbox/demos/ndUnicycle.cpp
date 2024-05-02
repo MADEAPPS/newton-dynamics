@@ -24,7 +24,7 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME "unicycleVPG.dnn"
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
@@ -165,6 +165,22 @@ namespace ndUnicycle
 			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
 				m_model->ApplyActions(actions);
+		
+				const ndFloat32 probability = 1.0f / 1000.0f;
+				ndFloat32 applySideImpule = ndRand();
+				if (applySideImpule < probability)
+				{
+					if (m_model->HasSupportContact())
+					{
+						ndBodyDynamic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyDynamic();
+				
+						ndVector front(boxBody->GetMatrix().m_front);
+						ndFloat32 speed = 0.75f * ndRand();
+						ndVector upVector(front.Scale(speed));
+						ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
+						boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_model->m_timestep);
+					}
+				}
 			}
 		
 			void GetObservation(ndBrainFloat* const observation)
@@ -410,9 +426,9 @@ namespace ndUnicycle
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_maxFrames(7000)
+			,m_maxFrames(2000)
 			,m_lastEpisode(-1)
-			,m_stopTraining(200 * 1000000)
+			,m_stopTraining(300 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
