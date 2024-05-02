@@ -25,7 +25,7 @@
 
 namespace ndQuadruped_3
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndSpot-VPG.dnn"
 
 	class ndLegObservation
@@ -262,11 +262,161 @@ namespace ndQuadruped_3
 		mutable ndFixSizeArray<bool, 4> m_isGrounded;
 	};
 
-	//class ndRobot : public ndModel
 	class ndRobot : public ndModelArticulation
 	{
 		public:
-		#define D_SAMPLES_COUNT 128
+		//#define D_SAMPLES_COUNT 128
+
+		class ndControllerAgent_trainer : public ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>
+		{
+			public:
+			class ndBasePose
+			{
+				public:
+				ndBasePose()
+					:m_body(nullptr)
+				{
+				}
+
+				ndBasePose(ndBodyDynamic* const body)
+					:m_veloc(body->GetVelocity())
+					, m_omega(body->GetOmega())
+					, m_posit(body->GetPosition())
+					, m_rotation(body->GetRotation())
+					, m_body(body)
+				{
+				}
+
+				void SetPose() const
+				{
+					const ndMatrix matrix(ndCalculateMatrix(m_rotation, m_posit));
+					m_body->SetMatrix(matrix);
+					m_body->SetOmega(m_omega);
+					m_body->SetVelocity(m_veloc);
+				}
+
+				ndVector m_veloc;
+				ndVector m_omega;
+				ndVector m_posit;
+				ndQuaternion m_rotation;
+				ndBodyDynamic* m_body;
+			};
+
+			ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>& master)
+				:ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(master)
+				, m_basePose()
+				, m_model(nullptr)
+			{
+			}
+
+			~ndControllerAgent_trainer()
+			{
+			}
+
+			void SetModel(ndRobot* const model)
+			{
+				m_model = model;
+				for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+				{
+					m_basePose.PushBack(node->m_body->GetAsBodyDynamic());
+				}
+			}
+
+			ndBrainFloat CalculateReward()
+			{
+				ndAssert(0);
+				return 0;
+				//ndBrainFloat reward = m_model->CalculateReward();
+				//return reward;
+			}
+
+			virtual void ApplyActions(ndBrainFloat* const actions)
+			{
+				ndAssert(0);
+				//m_model->ApplyActions(actions);
+			}
+
+			void GetObservation(ndBrainFloat* const observation)
+			{
+				ndAssert(0);
+				//m_model->GetObservation(observation);
+			}
+
+			bool IsTerminal() const
+			{
+				ndAssert(0);
+				return false;
+				//ndInt32 count = 0;
+				//ndInt32 isGround = 4;
+				//
+				//bool airborneLeg[4];
+				//bool sequenceAirborne[4];
+				//
+				//for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
+				//{
+				//	ndContact* const contact = m_model->FindContact(i);
+				//	bool isAirborne = !(contact && contact->IsActive());
+				//	isGround -= ndInt32(isAirborne);
+				//
+				//	const ndAnimKeyframe& keyFrame = m_model->m_animPose[i];
+				//	if (keyFrame.m_userParamInt != 0)
+				//	{
+				//		airborneLeg[count] = isAirborne;
+				//		if (keyFrame.m_userParamInt == 0)
+				//		{
+				//			isAirborne = false;
+				//		}
+				//		else if (keyFrame.m_userParamInt == 1)
+				//		{
+				//			isAirborne = true;
+				//		}
+				//		sequenceAirborne[count] = isAirborne;
+				//
+				//		count++;
+				//	}
+				//}
+				//if (isGround < 2)
+				//{
+				//	return false;
+				//}
+				//
+				//for (ndInt32 i = 0; i < count; ++i)
+				//{
+				//	if (airborneLeg[i] != sequenceAirborne[i])
+				//	{
+				//		//return true;
+				//	}
+				//}
+				//
+				//return false;
+			}
+
+			void ResetModel()
+			{
+				ndAssert(0);
+				//m_model->m_control->Reset();
+				//for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
+				//{
+				//	m_basePose[i].SetPose();
+				//}
+				//m_model->m_animBlendTree->SetTime(0.0f);
+				//
+				//ndFloat32 randVar = ndRand();
+				//randVar = randVar * randVar * randVar;
+				//ndFloat32 speed0 = ndFloat32(0.5f);
+				//ndFloat32 speed1 = ndFloat32(4.0f);
+				//ndFloat32 animationSpeed = speed0 + (speed1 - speed0) * randVar;
+				//m_model->m_control->m_animSpeed = animationSpeed;
+			}
+
+			void Step()
+			{
+				ndBrainAgentContinuePolicyGradient_Trainer::Step();
+			}
+
+			ndFixSizeArray<ndBasePose, 32> m_basePose;
+			ndRobot* m_model;
+		};
 
 		D_CLASS_REFLECTION(ndQuadruped_3::ndRobot, ndModel)
 
@@ -695,12 +845,11 @@ namespace ndQuadruped_3
 		ndRobot* m_model;
 	};
 
-	//ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation, ndSharedPtr<ndBrainAgent> agent)
-	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, ndSharedPtr<ndDemoEntity> modelMesh, const ndMatrix& matrixLocation)
+	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, ndSharedPtr<ndDemoEntity> modelMesh, const ndMatrix& matrixLocation, ndSharedPtr<ndBrainAgent> agent)
 	{
 		ndDemoEntity* const entity = modelMesh->CreateClone();
 		scene->AddEntity(entity);
-		ndWorld* const world = scene->GetWorld();
+		//ndWorld* const world = scene->GetWorld();
 		
 		ndRobot* const model = new ndRobot();
 		ndDemoEntity* const rootEntity = entity->Find(jointsDefinition[0].m_boneName);
@@ -710,7 +859,7 @@ namespace ndQuadruped_3
 		//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		//matrix.m_posit.m_y = floor.m_y;
 		
-		matrix.m_posit.m_y += 1.0f;
+		matrix.m_posit.m_y += 0.1f;
 		rootEntity->ResetMatrix(matrix);
 		
 		// add the root body
@@ -813,7 +962,7 @@ namespace ndQuadruped_3
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
 	{
 		public:
-		TrainingUpdata(ndDemoEntityManager* const scene, const ndMatrix& matrix)
+		TrainingUpdata(ndDemoEntityManager* const scene, const ndMatrix& matrix, ndSharedPtr<ndDemoEntity>& modelMesh)
 			:OnPostUpdate()
 			,m_master()
 			,m_bestActor()
@@ -825,54 +974,57 @@ namespace ndQuadruped_3
 			,m_stopTraining(200 * 1000000)
 			,m_modelIsTrained(false)
 		{
-			ndAssert(0);
-			//ndWorld* const world = scene->GetWorld();
-			//
-			//m_outFile = fopen("quadruped_1-VPG.csv", "wb");
-			//fprintf(m_outFile, "vpg\n");
-			//
-			////const ndInt32 countX = 2;
-			////const ndInt32 countZ = 2;
+			ndWorld* const world = scene->GetWorld();
+			
+			m_outFile = fopen("quadruped_3-VPG.csv", "wb");
+			fprintf(m_outFile, "vpg\n");
+			
+			const ndInt32 countX = 0;
+			const ndInt32 countZ = 0;
 			//const ndInt32 countX = 6;
 			//const ndInt32 countZ = 9;
-			//
-			//ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
-			//
-			////hyperParameters.m_threadsCount = 1;
-			////hyperParameters.m_sigma = ndReal(0.25f);
-			//hyperParameters.m_discountFactor = ndReal(0.99f);
-			////hyperParameters.m_maxTrajectorySteps = 1024 * 6;
-			//hyperParameters.m_maxTrajectorySteps = 1024 * 8;
-			//
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>(new ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
-			//m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetActor()));
-			//
-			//m_master->SetName(CONTROLLER_NAME);
-			//
-			//ndSharedPtr<ndBrainAgent> visualAgent(new ndRobot::ndControllerAgent_trainer(m_master));
-			//ndSharedPtr<ndModel> visualModel(BuildModel(scene, matrix, visualAgent));
-			//world->AddModel(visualModel);
+			
+			ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
+			
+			//hyperParameters.m_threadsCount = 1;
+			//hyperParameters.m_sigma = ndReal(0.25f);
+			hyperParameters.m_discountFactor = ndReal(0.99f);
+			//hyperParameters.m_maxTrajectorySteps = 1024 * 6;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
+			
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>(new ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
+			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetActor()));
+			
+			m_master->SetName(CONTROLLER_NAME);
+			
+			ndSharedPtr<ndBrainAgent> visualAgent(new ndRobot::ndControllerAgent_trainer(m_master));
+			ndSharedPtr<ndModel> visualModel(BuildModel(scene, modelMesh, matrix, visualAgent));
+			world->AddModel(visualModel);
 			//SetMaterial(visualModel);
-			//
+
+			ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
+			world->AddJoint(fixJoint);
+
 			//ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, visualModel));
 			//scene->Set2DDisplayRenderFunction(quadrupedUI);
-			//
-			//// add a hidden battery of model to generate trajectories in parallel
-			//for (ndInt32 i = 0; i < countZ; ++i)
-			//{
-			//	for (ndInt32 j = 0; j < countX; ++j)
-			//	{
-			//		ndMatrix location(matrix);
-			//		location.m_posit.m_x += 6.0f * (ndRand() - 0.5f);
-			//		location.m_posit.m_z += 6.0f * (ndRand() - 0.5f);
-			//		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(m_master));
-			//		ndSharedPtr<ndModel> model(BuildModel(scene, location, agent));
-			//		world->AddModel(model);
-			//		m_models.Append(model);
-			//		//HideModel(model);
-			//		SetMaterial(model);
-			//	}
-			//}
+			
+			// add a hidden battery of model to generate trajectories in parallel
+			for (ndInt32 i = 0; i < countZ; ++i)
+			{
+				ndAssert(0);
+				for (ndInt32 j = 0; j < countX; ++j)
+				{
+					ndMatrix location(matrix);
+					location.m_posit.m_x += 6.0f * (ndRand() - 0.5f);
+					location.m_posit.m_z += 6.0f * (ndRand() - 0.5f);
+					ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(m_master));
+					ndSharedPtr<ndModel> model(BuildModel(scene, modelMesh, location, agent));
+					world->AddModel(model);
+					m_models.Append(model);
+					//HideModel(model);
+					//SetMaterial(model);
+				}
+			}
 		}
 
 		~TrainingUpdata()
@@ -966,52 +1118,51 @@ namespace ndQuadruped_3
 		
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
-			ndAssert(0);
-		//	ndInt32 stopTraining = m_master->GetFramesCount();
-		//	if (stopTraining <= m_stopTraining)
-		//	{
-		//		ndInt32 episodeCount = m_master->GetEposideCount();
-		//		m_master->OptimizeStep();
-		//
-		//		episodeCount -= m_master->GetEposideCount();
-		//		if (m_master->GetAverageFrames() >= ndFloat32(m_maxFrames))
-		//		{
-		//			if (m_master->GetAverageScore() > m_maxScore)
-		//			{
-		//				if (m_lastEpisode != m_master->GetEposideCount())
-		//				{
-		//					m_bestActor->CopyFrom(*m_master->GetActor());
-		//					m_maxScore = m_master->GetAverageScore();
-		//					ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", m_master->GetEposideCount(), m_master->GetAverageFrames(), m_master->GetAverageScore());
-		//					m_lastEpisode = m_master->GetEposideCount();
-		//				}
-		//			}
-		//		}
-		//
-		//		if (episodeCount && !m_master->IsSampling())
-		//		{
-		//			ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
-		//			if (m_outFile)
-		//			{
-		//				fprintf(m_outFile, "%g\n", m_master->GetAverageScore());
-		//				fflush(m_outFile);
-		//			}
-		//		}
-		//	}
-		//
-		//	if (stopTraining >= m_stopTraining)
-		//	{
-		//		char fileName[1024];
-		//		m_modelIsTrained = true;
-		//		m_master->GetActor()->CopyFrom(*(*m_bestActor));
-		//		ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
-		//		m_master->GetActor()->SaveToFile(fileName);
-		//		ndExpandTraceMessage("saving to file: %s\n", fileName);
-		//		ndExpandTraceMessage("training complete\n");
-		//		ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-		//		ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-		//		manager->Terminate();
-		//	}
+			ndInt32 stopTraining = m_master->GetFramesCount();
+			if (stopTraining <= m_stopTraining)
+			{
+				ndInt32 episodeCount = m_master->GetEposideCount();
+				m_master->OptimizeStep();
+		
+				episodeCount -= m_master->GetEposideCount();
+				if (m_master->GetAverageFrames() >= ndFloat32(m_maxFrames))
+				{
+					if (m_master->GetAverageScore() > m_maxScore)
+					{
+						if (m_lastEpisode != m_master->GetEposideCount())
+						{
+							m_bestActor->CopyFrom(*m_master->GetActor());
+							m_maxScore = m_master->GetAverageScore();
+							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", m_master->GetEposideCount(), m_master->GetAverageFrames(), m_master->GetAverageScore());
+							m_lastEpisode = m_master->GetEposideCount();
+						}
+					}
+				}
+		
+				if (episodeCount && !m_master->IsSampling())
+				{
+					ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
+					if (m_outFile)
+					{
+						fprintf(m_outFile, "%g\n", m_master->GetAverageScore());
+						fflush(m_outFile);
+					}
+				}
+			}
+		
+			if (stopTraining >= m_stopTraining)
+			{
+				char fileName[1024];
+				m_modelIsTrained = true;
+				m_master->GetActor()->CopyFrom(*(*m_bestActor));
+				ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
+				m_master->GetActor()->SaveToFile(fileName);
+				ndExpandTraceMessage("saving to file: %s\n", fileName);
+				ndExpandTraceMessage("training complete\n");
+				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+				ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+				manager->Terminate();
+			}
 		}
 
 		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> m_master;
@@ -1038,8 +1189,7 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	ndMeshLoader loader;
 	ndSharedPtr<ndDemoEntity> modelMesh (loader.LoadEntity("spotBoston.fbx", scene));
-	
-	ndWorld* const world = scene->GetWorld();
+
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 	
 	// register a material for filtering self collisions 
@@ -1055,9 +1205,10 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
 
 #ifdef ND_TRAIN_MODEL
-	TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix);
+	TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix, modelMesh);
 	scene->RegisterPostUpdate(trainer);
 #else
+	ndWorld* const world = scene->GetWorld();
 	ndSharedPtr<ndModel> model(BuildModel(scene, modelMesh, matrix));
 	world->AddModel(model);
 	scene->SetSelectedModel(*model);

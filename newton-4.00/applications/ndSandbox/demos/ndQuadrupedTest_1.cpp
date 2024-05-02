@@ -374,9 +374,6 @@ namespace ndQuadruped_1
 				ndFloat32 speed1 = ndFloat32(4.0f);
 				ndFloat32 animationSpeed = speed0 +  (speed1 - speed0) * randVar;
 				m_model->m_control->m_animSpeed = animationSpeed;
-
-				//ndObservationVector observation;
-				//m_model->GetObservation((ndBrainFloat*) &observation);
 			}
 
 			void Step()
