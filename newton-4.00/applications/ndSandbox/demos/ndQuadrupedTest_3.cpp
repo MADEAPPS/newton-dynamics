@@ -82,7 +82,7 @@ namespace ndQuadruped_3
 		{ "spot_up_arm_FR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
 		{ "spot_arm_FR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
 		{ "spot_arm_FR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
-
+		
 		{ "spot_shoulder_FL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
 		{ "spot_up_arm_FL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
 		{ "spot_arm_FL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
@@ -299,8 +299,8 @@ namespace ndQuadruped_3
 			//,m_walkCycle(0.8f)
 			//,m_trotCycle(0.4f)
 			//,m_bodyArray()
-			//,m_effectorsInfo()
-			//,m_effectorsJoints()
+			,m_effectorsInfo()
+			,m_effectorsJoints()
 		{
 			// make a clone of the mesh and add it to the scene
 			//ndDemoEntity* const entity = robotMesh->CreateClone();
@@ -422,57 +422,57 @@ namespace ndQuadruped_3
 
 		void NormalizeMassDistribution(ndFloat32 mass) const
 		{
-			ndAssert(0);
-			//ndFloat32 volumeRatio = 0.02f;
-			//ndFloat32 maxVolume = -1.0e10f;
-			//for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
-			//{
-			//	ndFloat32 volume = m_bodyArray[i]->GetCollisionShape().GetVolume();
-			//	maxVolume = ndMax(maxVolume, volume);
-			//}
-			//
-			//ndFloat32 totalVolume = 0.0f;
-			//for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
-			//{
-			//	ndFloat32 volume = m_bodyArray[i]->GetCollisionShape().GetVolume();
-			//	if (volume < volumeRatio * maxVolume)
-			//	{
-			//		volume = volumeRatio * maxVolume;
-			//	}
-			//	totalVolume += volume;
-			//}
-			//
-			//ndFloat32 density = mass / totalVolume;
-			//
-			//for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
-			//{
-			//	ndBodyDynamic* const body = m_bodyArray[i];
-			//	ndFloat32 volume = body->GetCollisionShape().GetVolume();
-			//	if (volume < volumeRatio * maxVolume)
-			//	{
-			//		volume = volumeRatio * maxVolume;
-			//	}
-			//	ndFloat32 normalMass = density * volume;
-			//	body->SetMassMatrix(normalMass, body->GetCollisionShape());
-			//	ndVector inertia(body->GetMassMatrix());
-			//	ndFloat32 maxInertia = ndMax(ndMax(inertia.m_x, inertia.m_y), inertia.m_z);
-			//	ndFloat32 minInertia = ndMin(ndMin(inertia.m_x, inertia.m_y), inertia.m_z);
-			//	if (minInertia < maxInertia * 0.125f)
-			//	{
-			//		minInertia = maxInertia * 0.125f;
-			//		for (ndInt32 j = 0; j < 3; ++j)
-			//		{
-			//			if (inertia[j] < minInertia)
-			//			{
-			//				inertia[j] = minInertia;
-			//			}
-			//		}
-			//	}
-			//	body->SetMassMatrix(inertia);
-			//}
+			ndFloat32 volumeRatio = 0.02f;
+			ndFloat32 maxVolume = -1.0e10f;
+			for (ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+				ndFloat32 volume = body->GetCollisionShape().GetVolume();
+				maxVolume = ndMax(maxVolume, volume);
+			}
+			
+			ndFloat32 totalVolume = 0.0f;
+			for (ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+				ndFloat32 volume = body->GetCollisionShape().GetVolume();
+				if (volume < volumeRatio * maxVolume)
+				{
+					volume = volumeRatio * maxVolume;
+				}
+				totalVolume += volume;
+			}
+			
+			ndFloat32 density = mass / totalVolume;
+			for (ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+				ndFloat32 volume = body->GetCollisionShape().GetVolume();
+				if (volume < volumeRatio * maxVolume)
+				{
+					volume = volumeRatio * maxVolume;
+				}
+				ndFloat32 normalMass = density * volume;
+				body->SetMassMatrix(normalMass, body->GetCollisionShape());
+				ndVector inertia(body->GetMassMatrix());
+				ndFloat32 maxInertia = ndMax(ndMax(inertia.m_x, inertia.m_y), inertia.m_z);
+				ndFloat32 minInertia = ndMin(ndMin(inertia.m_x, inertia.m_y), inertia.m_z);
+				if (minInertia < maxInertia * 0.125f)
+				{
+					minInertia = maxInertia * 0.125f;
+					for (ndInt32 j = 0; j < 3; ++j)
+					{
+						if (inertia[j] < minInertia)
+						{
+							inertia[j] = minInertia;
+						}
+					}
+				}
+				body->SetMassMatrix(inertia);
+			}
 		}
 
-		ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
+		ndSharedPtr<ndBody> CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
 		{
 			ndSharedPtr<ndShapeInstance> shapePtr(entityPart->CreateCollisionFromChildren());
 			ndShapeInstance* const shape = *shapePtr;
@@ -494,8 +494,7 @@ namespace ndQuadruped_3
 			// add body to the world
 			ndSharedPtr<ndBody> bodyPtr(body);
 			scene->GetWorld()->AddBody(bodyPtr);
-
-			return body->GetAsBodyDynamic();
+			return bodyPtr;
 		}
 
 		//ndBodyDynamic* GetRoot() const
@@ -649,9 +648,9 @@ namespace ndQuadruped_3
 		//ndWalkSequence m_walkCycle;
 		//ndWalkSequence m_trotCycle;
 		//ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
-		//ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
-		//ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
-		//
+		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
+		ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
+		
 		//ndFloat32 m_timer;
 		//ndReal m_param_x0;
 		//ndParamMapper m_param_xxxx;
@@ -715,12 +714,9 @@ namespace ndQuadruped_3
 		rootEntity->ResetMatrix(matrix);
 		
 		// add the root body
-		//ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, 1.0f, nullptr);
 		ndSharedPtr<ndBody> rootBody (model->CreateBodyPart(scene, rootEntity, 1.0f, nullptr));
-		//m_bodyArray.PushBack(rootBody);
 		
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(rootBody);
-		//ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
 		ndFixSizeArray<ndModelArticulation::ndNode*, 32> parentBone;
 
@@ -736,7 +732,6 @@ namespace ndQuadruped_3
 		while (stack)
 		{
 			stack--;
-		//	ndBodyDynamic* parentBody = parentBone[stack];
 			ndDemoEntity* const childEntity = childEntities[stack];
 			ndModelArticulation::ndNode* parentNode = parentBone[stack];
 		
@@ -749,10 +744,7 @@ namespace ndQuadruped_3
 					//dTrace(("name: %s\n", name));
 					if (definition.m_type == ndDefinition::m_hinge)
 					{
-						//ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, 1.0f, parentBody);
 						ndSharedPtr<ndBody> childBody(model->CreateBodyPart(scene, childEntity, 1.0f, parentNode->m_body->GetAsBodyDynamic()));
-		 
-						//m_bodyArray.PushBack(childBody);
 		
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody->GetAsBodyDynamic(), parentNode->m_body->GetAsBodyDynamic());
@@ -764,36 +756,36 @@ namespace ndQuadruped_3
 
 						//thighNode = model->AddLimb(modelRoot, thigh, ballJoint);
 						//parentNode = childBody;
-						parentNode = model->AddLimb(modelRoot, childBody, hingePtr);
+						parentNode = model->AddLimb(parentNode, childBody, hingePtr);
 					}
 					else
 					{
-						ndAssert(0);
-		//				ndDemoEntityNotify* notify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
-		//				notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
-		//				notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
-		//
-		//				ndMatrix effectorFrame(rootBody->GetMatrix());
-		//				ndMatrix pivotFrame(ndRollMatrix(-90.0f * ndDegreeToRad) * rootBody->GetMatrix());
-		//				pivotFrame.m_posit = notify->GetBody()->GetMatrix().m_posit;
-		//				effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
-		//
-		//				ndFloat32 regularizer = 0.001f;
-		//				ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, parentBody, rootBody);
-		//
-		//				effector->SetSwivelMode(false);
-		//				effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
-		//				effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
-		//
-		//				const ndVector elbowPoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
-		//				const ndVector dist0(effectorFrame.m_posit - elbowPoint);
-		//				const ndVector dist1(elbowPoint - pivotFrame.m_posit);
-		//				const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
-		//				effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
-		//
-		//				ndEffectorInfo info(effector);
-		//				m_effectorsInfo.PushBack(info);
-		//				m_effectorsJoints.PushBack(effector);
+						ndDemoEntityNotify* notify = (ndDemoEntityNotify*)parentNode->m_body->GetNotifyCallback();
+						
+						notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
+						notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
+		
+						ndMatrix effectorFrame(rootBody->GetMatrix());
+						ndMatrix pivotFrame(ndRollMatrix(-90.0f * ndDegreeToRad) * rootBody->GetMatrix());
+						pivotFrame.m_posit = notify->GetBody()->GetMatrix().m_posit;
+						effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
+		
+						ndFloat32 regularizer = 0.001f;
+						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, parentNode->m_body->GetAsBodyDynamic(), modelRoot->m_body->GetAsBodyDynamic());
+		
+						effector->SetSwivelMode(false);
+						effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+						effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+		
+						const ndVector elbowPoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
+						const ndVector dist0(effectorFrame.m_posit - elbowPoint);
+						const ndVector dist1(elbowPoint - pivotFrame.m_posit);
+						const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
+						effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
+		
+						ndRobot::ndEffectorInfo info(effector);
+						model->m_effectorsInfo.PushBack(info);
+						model->m_effectorsJoints.PushBack(effector);
 					}
 					break;
 				}
@@ -807,12 +799,11 @@ namespace ndQuadruped_3
 			}
 		}
 		
-		//NormalizeMassDistribution(100.0f);
-		//
+		model->NormalizeMassDistribution(100.0f);
+		
 		//m_timer = 0.0f;
 		//m_param_x0 = -1.0f;
 		//m_param_xxxx = ndParamMapper(0.0, 0.75f);
-		//
 		//m_output.SetCount(4);
 
 		return model;
@@ -1067,11 +1058,8 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix);
 	scene->RegisterPostUpdate(trainer);
 #else
-	//ndSharedPtr<ndModel> model(BuildModel(scene, matrix, BuildAgent()));
 	ndSharedPtr<ndModel> model(BuildModel(scene, modelMesh, matrix));
 	world->AddModel(model);
-
-	//ndRobot* const robot = new ndRobot(scene, *modelMesh, matrix);
 	scene->SetSelectedModel(*model);
 
 	//ndModelUI* const quadrupedUI = new ndModelUI(scene, robot);
