@@ -51,8 +51,7 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndVector& childPivo
 	ndVector offset(pinAndPivotParentInGlobalSpace.UntransformVector(childPivotInGlobalSpace) & ndVector::m_triplexMask);
 	m_maxWorkSpaceRadio = ndFloat32(0.99f) * ndSqrt(offset.DotProduct(offset).GetScalar());
 	//m_localTargetPosit.m_x = m_maxWorkSpaceRadio;
-	offset = offset.Normalize().Scale(m_maxWorkSpaceRadio);
-	m_localTargetPosit = offset | ndVector::m_wOne;
+	m_localTargetPosit = offset.Normalize().Scale(m_maxWorkSpaceRadio) | ndVector::m_wOne;
 
 	ndMatrix temp;
 	ndMatrix matrix(pinAndPivotParentInGlobalSpace);

@@ -990,7 +990,7 @@ namespace ndQuadruped_3
 		
 						effector->SetSwivelMode(false);
 						effector->SetLinearSpringDamper(regularizer, 5000.0f, 50.0f);
-						effector->SetAngularSpringDamper(regularizer, 5000.0f, 50.0f);
+						//effector->SetAngularSpringDamper(regularizer, 5000.0f, 50.0f);
 		
 						const ndVector elbowPoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
 						const ndVector dist0(effectorFrame.m_posit - elbowPoint);
