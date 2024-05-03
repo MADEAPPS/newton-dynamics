@@ -32,7 +32,7 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector()
 	m_maxDof = 6;
 }
 
-ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndVector& childPivotInGlbalSpace, const ndMatrix& pinAndPivotParentInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndVector& childPivotInGlobalSpace, const ndMatrix& pinAndPivotParentInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotParentInGlobalSpace)
 	,m_localTargetPosit(ndVector::m_wOne)
 	,m_swivelAngle(ndFloat32(0.0f))
@@ -48,13 +48,15 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndVector& childPivo
 	,m_maxWorkSpaceRadio(ndFloat32(0.0f))
 	,m_enableSwivelControl(true)
 {
-	ndVector offset(pinAndPivotParentInGlobalSpace.UntransformVector(childPivotInGlbalSpace) & ndVector::m_triplexMask);
+	ndVector offset(pinAndPivotParentInGlobalSpace.UntransformVector(childPivotInGlobalSpace) & ndVector::m_triplexMask);
 	m_maxWorkSpaceRadio = ndFloat32(0.99f) * ndSqrt(offset.DotProduct(offset).GetScalar());
-	m_localTargetPosit.m_x = m_maxWorkSpaceRadio;
+	//m_localTargetPosit.m_x = m_maxWorkSpaceRadio;
+	offset = offset.Normalize().Scale(m_maxWorkSpaceRadio);
+	m_localTargetPosit = offset | ndVector::m_wOne;
 
 	ndMatrix temp;
 	ndMatrix matrix(pinAndPivotParentInGlobalSpace);
-	matrix.m_posit = childPivotInGlbalSpace;
+	matrix.m_posit = childPivotInGlobalSpace;
 	CalculateLocalMatrix(matrix, m_localMatrix0, temp);
 	ndAssert((temp[0].DotProduct(m_localMatrix0[0]).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 	ndAssert((temp[1].DotProduct(m_localMatrix0[1]).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));

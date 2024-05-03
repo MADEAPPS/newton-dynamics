@@ -271,15 +271,18 @@ namespace ndQuadruped_3
 		{
 			public:
 			ndEffectorInfo()
-				:m_effector(nullptr)
+				:m_basePosition(ndVector::m_wOne)
+				,m_effector(nullptr)
 			{
 			}
 
 			ndEffectorInfo(const ndSharedPtr<ndJointBilateralConstraint>& effector)
-				:m_effector(effector)
+				:m_basePosition(((ndIkSwivelPositionEffector*)*effector)->GetLocalTargetPosition())
+				,m_effector(effector)
 			{
 			}
 
+			ndVector m_basePosition;
 			ndSharedPtr<ndJointBilateralConstraint> m_effector;
 		};
 
@@ -986,19 +989,14 @@ namespace ndQuadruped_3
 						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, parentNode->m_body->GetAsBodyDynamic(), modelRoot->m_body->GetAsBodyDynamic());
 		
 						effector->SetSwivelMode(false);
-						effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
-						effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+						effector->SetLinearSpringDamper(regularizer, 5000.0f, 50.0f);
+						effector->SetAngularSpringDamper(regularizer, 5000.0f, 50.0f);
 		
 						const ndVector elbowPoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
 						const ndVector dist0(effectorFrame.m_posit - elbowPoint);
 						const ndVector dist1(elbowPoint - pivotFrame.m_posit);
 						const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
 						effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
-		
-						//ndRobot::ndEffectorInfo info(effector);
-						//model->m_effectorsInfo.PushBack(info);
-						//model->m_effectorsJoints.PushBack(effector);
-
 
 						ndSharedPtr<ndJointBilateralConstraint> effectotPtr(effector);
 						ndRobot::ndEffectorInfo info(effectotPtr);
@@ -1078,7 +1076,7 @@ namespace ndQuadruped_3
 			//SetMaterial(visualModel);
 
 			ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-			world->AddJoint(fixJoint);
+			//world->AddJoint(fixJoint);
 
 			//ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, visualModel));
 			//scene->Set2DDisplayRenderFunction(quadrupedUI);
