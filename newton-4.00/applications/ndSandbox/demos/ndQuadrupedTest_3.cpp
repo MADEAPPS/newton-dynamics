@@ -138,136 +138,9 @@ namespace ndQuadruped_3
 		}
 	};
 
-	class ndWalkSequence : public ndAnimationSequence
-	{
-		public:
-		class ndSegment
-		{
-			public:
-			ndSegment()
-				:m_a(ndVector::m_zero)
-				,m_b(ndVector::m_zero)
-				,m_t0(0.0f)
-				,m_perimeter(0.0f)
-			{
-			}
-
-			void Init(const ndVector& p0, const ndVector& p1, ndFloat32 t0, ndFloat32 t1)
-			{
-				ndFloat32 den = t1 - t0;
-				m_a.m_x = (p1.m_x - p0.m_x) / den;
-				m_b.m_x = (p0.m_x * t1 - p1.m_x * t0) / den;
-
-				m_b.m_y = 0.0f;
-				m_a.m_y = p1.m_y;
-
-				m_t0 = t0;
-				m_perimeter = ndPi / den;
-			}
-
-			ndVector Interpolate(ndFloat32 t) const
-			{
-				ndVector point(m_b);
-				point.m_x += m_a.m_x * t;
-				point.m_y += m_a.m_y * ndSin(m_perimeter * (t - m_t0));
-				return point;
-			}
-
-			ndVector m_a;
-			ndVector m_b;
-			ndFloat32 m_t0;
-			ndFloat32 m_perimeter;
-		};
-
-		ndWalkSequence(ndFloat32 midParam)
-			:ndAnimationSequence()
-			,m_segment0()
-			,m_segment1()
-			,m_xBias(0.11f)
-			,m_xStride(1.0f)
-			,m_midParam(midParam)
-			,m_offsets()
-			,m_isGrounded()
-		{
-			ndFloat32 walkStride = 0.3f;
-			const ndVector p0(-walkStride, 0.0f, 0.0f, 0.0f);
-			const ndVector p1(walkStride, 0.0f, 0.0f, 0.0f);
-			const ndVector p2(-walkStride, 0.1f, 0.0f, 0.0f);
-			m_segment0.Init(p0, p1, 0.0f, m_midParam);
-			m_segment1.Init(p1, p2, m_midParam, 1.0f);
-
-			m_isGrounded.SetCount(4);
-			m_offsets.PushBack(0.0f);
-			m_offsets.PushBack(0.0f);
-			m_offsets.PushBack(0.0f);
-			m_offsets.PushBack(0.0f);
-
-			if (m_midParam > 0.5f)
-			{
-				// set walk sequence gait offset
-
-				// front gait, left leg is 1/2 offset form the right leg
-				m_offsets[1] = 0.5f; // front right leg
-				m_offsets[2] = 0.0f; // front left leg
-
-				// rear gait is a 3/4 delay form the front gait
-				m_offsets[3] = 0.25f; // rear right leg
-				m_offsets[0] = 0.75f; // rear left leg
-			}
-			else
-			{
-				// set trot sequence offset
-
-				// front gait, left leg is 1/2 offset form the right leg
-				m_offsets[1] = 0.5f; // front right leg
-				m_offsets[2] = 0.0f; // front left leg
-
-				// rear gait is a 1/2 delay form the front gait
-				m_offsets[3] = 0.0f; // rear right leg
-				m_offsets[0] = 0.5f; // rear left leg
-			}
-		}
-
-		~ndWalkSequence()
-		{
-		}
-
-		void InitParam(ndFloat32& b, ndFloat32& a, ndFloat32 x0, ndFloat32 t0, ndFloat32 x1, ndFloat32 t1) const
-		{
-			ndFloat32 den = t1 - t0;
-			a = (x1 - x0) / den;
-			b = (x0 * t1 - x1 * t0) / den;
-		}
-
-		void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
-		{
-			ndAssert(output.GetCount() == m_offsets.GetCount());
-			for (ndInt32 i = 0; i < m_offsets.GetCount(); ++i)
-			{
-				ndAnimKeyframe& keyFrame = output[i];
-
-				const ndFloat32 t = ndMod(param + m_offsets[i], ndFloat32(1.0f));
-				m_isGrounded[i] = t <= m_midParam;
-				ndVector posit(m_isGrounded[i] ? m_segment0.Interpolate(t) : m_segment1.Interpolate(t));
-				posit.m_x = posit.m_x * m_xStride - m_xBias;
-				keyFrame.m_posit = posit;
-				keyFrame.m_rotation = ndQuaternion();
-			}
-		}
-
-		ndSegment m_segment0;
-		ndSegment m_segment1;
-		ndFloat32 m_xBias;
-		ndFloat32 m_xStride;
-		ndFloat32 m_midParam;
-		ndFixSizeArray<ndFloat32, 4> m_offsets;
-		mutable ndFixSizeArray<bool, 4> m_isGrounded;
-	};
-
 	class ndRobot : public ndModelArticulation
 	{
 		public:
-
 		class ndEffectorInfo
 		{
 			public:
@@ -292,16 +165,15 @@ namespace ndQuadruped_3
 			public:
 			ndPoseGenerator(ndFloat32 gaitFraction, const ndFloat32* const phase)
 				:ndAnimationSequence()
-				,m_amp(0.27f)
+				,m_amp(0.4f)
 				,m_gaitFraction(gaitFraction)
 			{
-				m_currentPose.SetCount(0);
 				m_duration = ndFloat32(4.0f);
 				for (ndInt32 i = 0; i < 4; i++)
 				{
 					m_phase[i] = phase[i];
-					m_offset[i] = ndFloat32(0.0f);
-					m_currentPose.PushBack(BasePose(i));
+					m_offset[i] = ndVector::m_zero;
+					m_currentPose[i] = ndVector::m_zero;
 				}
 			}
 
@@ -310,22 +182,11 @@ namespace ndQuadruped_3
 				return ndVector::m_zero;
 			}
 
-			ndVector BasePose(ndInt32 index) const
-			{
-				ndVector base(ndVector::m_wOne);
-				base.m_x = 0.4f;
-				base.m_z = m_offset[index];
-				base.m_y = D_POSE_REST_POSITION_Y;
-				return base;
-			}
-
 			void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 			{
 				// generate a procedural in place march gait
 				ndAssert(param >= ndFloat32(0.0f));
 				ndAssert(param <= ndFloat32(1.0f));
-
-				//ndFloat32 omega = ndPi / m_gaitFraction;
 
 				ndFloat32 gaitGuard = m_gaitFraction * 0.05f;
 				ndFloat32 omega = ndPi / (m_gaitFraction - ndFloat32(2.0f) * gaitGuard);
@@ -334,14 +195,14 @@ namespace ndQuadruped_3
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
 				{
 					output[i].m_userParamInt = 0;
-					output[i].m_posit = BasePose(i);
+					//output[i].m_posit = BasePose(i);
+					output[i].m_posit = m_offset[i];
 					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
 					if (t <= m_gaitFraction)
 					{
 						if ((t >= gaitGuard) && (t <= (m_gaitFraction - gaitGuard)))
 						{
-							//output[i].m_posit.m_y += m_amp * ndSin(omega * t);
-							output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
+							output[i].m_posit.m_x -= m_amp * ndSin(omega * (t - gaitGuard));
 							output[i].m_userParamInt = output[i].m_posit.m_y < ycontact ? -1 : 1;
 						}
 					}
@@ -350,12 +211,12 @@ namespace ndQuadruped_3
 				}
 			}
 
+			ndVector m_offset[4];
+			mutable ndVector m_currentPose[4];
 			ndFloat32 m_amp;
 			ndFloat32 m_gaitFraction;
 			ndFloat32 m_phase[4];
-			ndFloat32 m_offset[4];
-			mutable ndFixSizeArray<ndVector, 4> m_currentPose;
-		};
+	};
 
 		class ndUIControlNode : public ndAnimationBlendTreeNode
 		{
@@ -778,7 +639,7 @@ namespace ndQuadruped_3
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 
 				ndVector posit(m_animPose[i].m_posit);
-				//effector->SetLocalTargetPosition(posit);
+				effector->SetLocalTargetPosition(posit);
 			}
 
 			m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), m_world, timestep);
@@ -793,9 +654,6 @@ namespace ndQuadruped_3
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
-			//ndVector veloc;
-			//m_animBlendTree->Evaluate(m_animPose, veloc);
-
 			m_animBlendTree->Update(timestep * m_control->m_animSpeed);
 			ndModelArticulation::PostUpdate(world, timestep);
 		}
@@ -970,6 +828,7 @@ namespace ndQuadruped_3
 
 		ndFloat32 offset[] = { -0.3f, 0.3f, -0.3f, 0.3f };
 
+		ndInt32 effectorsCount = 0;
 		const ndInt32 definitionCount = ndInt32(sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
 		while (stack)
 		{
@@ -1029,8 +888,10 @@ namespace ndQuadruped_3
 						keyFrame.m_userData = &model->m_effectorsInfo[model->m_effectorsInfo.GetCount() - 1];
 						model->m_animPose.PushBack(keyFrame);
 						poseGenerator->AddTrack();
-						poseGenerator->m_phase[i] = phase[i];
-						poseGenerator->m_offset[i] = offset[i];
+						poseGenerator->m_phase[effectorsCount] = phase[effectorsCount];
+						//poseGenerator->m_offset[i] = offset[i];
+						poseGenerator->m_offset[effectorsCount] = info.m_basePosition;
+						effectorsCount++;
 					}
 					break;
 				}

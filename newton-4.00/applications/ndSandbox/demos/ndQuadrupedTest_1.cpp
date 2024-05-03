@@ -122,8 +122,6 @@ namespace ndQuadruped_1
 				ndAssert(param >= ndFloat32(0.0f));
 				ndAssert(param <= ndFloat32(1.0f));
 
-				//ndFloat32 omega = ndPi / m_gaitFraction;
-
 				ndFloat32 gaitGuard = m_gaitFraction * 0.05f;
 				ndFloat32 omega = ndPi / (m_gaitFraction - ndFloat32(2.0f) * gaitGuard);
 				
