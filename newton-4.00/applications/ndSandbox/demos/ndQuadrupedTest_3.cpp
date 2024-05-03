@@ -85,20 +85,20 @@ namespace ndQuadruped_3
 		{ "spot_arm_FR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
 		{ "spot_arm_FR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
 		
-		//{ "spot_shoulder_FL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
-		//{ "spot_up_arm_FL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
-		//{ "spot_arm_FL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
-		//{ "spot_arm_FL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
-		//
-		//{ "spot_shoulder_BR", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
-		//{ "spot_up_arm_BR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
-		//{ "spot_arm_BR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
-		//{ "spot_arm_BR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
-		//
-		//{ "spot_shoulder_BL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
-		//{ "spot_up_arm_BL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
-		//{ "spot_arm_BL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
-		//{ "spot_arm_BL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
+		{ "spot_shoulder_FL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
+		{ "spot_up_arm_FL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
+		{ "spot_arm_FL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
+		{ "spot_arm_FL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
+		
+		{ "spot_shoulder_BR", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
+		{ "spot_up_arm_BR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
+		{ "spot_arm_BR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
+		{ "spot_arm_BR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
+		
+		{ "spot_shoulder_BL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
+		{ "spot_up_arm_BL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
+		{ "spot_arm_BL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
+		{ "spot_arm_BL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
 	};
 
 	class ndQuadrupedMaterial: public ndApplicationMaterial
@@ -137,7 +137,6 @@ namespace ndQuadruped_3
 		}
 	};
 
-	//class ndWalkSequence : public ndAnimationSequenceBase
 	class ndWalkSequence : public ndAnimationSequence
 	{
 		public:
@@ -775,24 +774,7 @@ namespace ndQuadruped_3
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 
 				ndVector posit(m_animPose[i].m_posit);
-				effector->SetLocalTargetPosition(posit);
-
-				//ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
-				//effector->SetSwivelAngle(swivelAngle);
-				//
-				//// calculate lookAt angle
-				//ndMatrix lookAtMatrix0;
-				//ndMatrix lookAtMatrix1;
-				//info->m_footHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-				//
-				//ndMatrix upMatrix(ndGetIdentityMatrix());
-				//upMatrix.m_front = lookAtMatrix1.m_front;
-				//upMatrix.m_right = (upMatrix.m_front.CrossProduct(upVector) & ndVector::m_triplexMask).Normalize();
-				//upMatrix.m_up = upMatrix.m_right.CrossProduct(upMatrix.m_front);
-				//upMatrix = upMatrix * lookAtMatrix0.OrthoInverse();
-				//
-				//const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
-				//info->m_footHinge->SetTargetAngle(angle);
+				//effector->SetLocalTargetPosition(posit);
 			}
 
 			m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), m_world, timestep);
