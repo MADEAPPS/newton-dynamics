@@ -588,7 +588,6 @@ namespace ndQuadruped_3
 
 		void NormalizeMassDistribution(ndFloat32 mass) const
 		{
-			ndFloat32 volumeRatio = 0.02f;
 			ndFloat32 maxVolume = -1.0e10f;
 			for (ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
@@ -596,8 +595,9 @@ namespace ndQuadruped_3
 				ndFloat32 volume = body->GetCollisionShape().GetVolume();
 				maxVolume = ndMax(maxVolume, volume);
 			}
-			
+
 			ndFloat32 totalVolume = 0.0f;
+			ndFloat32 volumeRatio = 0.02f;
 			for (ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
 				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
