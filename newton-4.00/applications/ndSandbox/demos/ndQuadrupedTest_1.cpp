@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	class ndLegObservation
@@ -904,8 +904,8 @@ namespace ndQuadruped_1
 		
 				ndFloat32 regularizer = 0.001f;
 				ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame.m_posit, effectorRefFrame, targetBody, torso->GetAsBodyKinematic());
-				effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
-				effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+				effector->SetLinearSpringDamper(regularizer, 4000.0f, 50.0f);
+				effector->SetAngularSpringDamper(regularizer, 4000.0f, 50.0f);
 				effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
 		
 				ndRobot::ndEffectorInfo info(ndSharedPtr<ndJointBilateralConstraint>(effector), footHinge);
@@ -1191,7 +1191,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		world->AddModel(model);
 
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-		//world->AddJoint(fixJoint);
+		world->AddJoint(fixJoint);
 
 		ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model));
 		scene->Set2DDisplayRenderFunction(quadrupedUI);
