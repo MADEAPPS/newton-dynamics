@@ -54,7 +54,6 @@ namespace ndQuadruped_1
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
-
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
 	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
 	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
@@ -1029,10 +1028,18 @@ namespace ndQuadruped_1
 			}
 		}
 
-		class InvisibleBodyNotify : public ndDemoEntityNotify
+		void OnDebug(ndDemoEntityManager* const, bool mode)
+		{
+			for (ndList<ndSharedPtr<ndModel>>::ndNode* node = m_models.GetFirst(); node; node = node->GetNext())
+			{
+				HideModel(node->GetInfo(), mode);
+			}
+		}
+
+		class TrainingRobotBodyNotify : public ndDemoEntityNotify
 		{
 			public:
-			InvisibleBodyNotify(const ndDemoEntityNotify* const src)
+			TrainingRobotBodyNotify(const ndDemoEntityNotify* const src)
 				:ndDemoEntityNotify(*src)
 			{
 			}
@@ -1066,7 +1073,7 @@ namespace ndQuadruped_1
 				ndDemoEntityNotify* const originalNotify = (ndDemoEntityNotify*)body->GetNotifyCallback();
 				void* const useData = originalNotify->m_entity;
 				originalNotify->m_entity = nullptr;
-				InvisibleBodyNotify* const notify = new InvisibleBodyNotify((InvisibleBodyNotify*)body->GetNotifyCallback());
+				TrainingRobotBodyNotify* const notify = new TrainingRobotBodyNotify((TrainingRobotBodyNotify*)body->GetNotifyCallback());
 				body->SetNotifyCallback(notify);
 				notify->m_entity = (ndDemoEntity*)useData;
 
@@ -1075,14 +1082,6 @@ namespace ndQuadruped_1
 					stackMem[stack] = child;
 					stack++;
 				}
-			}
-		}
-
-		void OnDebug(ndDemoEntityManager* const, bool mode)
-		{
-			for (ndList<ndSharedPtr<ndModel>>::ndNode* node = m_models.GetFirst(); node; node = node->GetNext())
-			{
-				HideModel(node->GetInfo(), mode);
 			}
 		}
 

@@ -56,7 +56,8 @@ namespace ndQuadruped_3
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
-
+	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
+	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
 	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
 
 	class ndDefinition
@@ -868,7 +869,7 @@ namespace ndQuadruped_3
 	class ndModelUI : public ndUIEntity
 	{
 		public:
-		ndModelUI(ndDemoEntityManager* const scene, ndRobot* const quadruped)
+		ndModelUI(ndDemoEntityManager* const scene, const ndSharedPtr<ndModel>& quadruped)
 			:ndUIEntity(scene)
 			,m_model(quadruped)
 		{
@@ -899,9 +900,31 @@ namespace ndQuadruped_3
 			//{
 			//	m_model->m_bodyArray[0]->SetSleepState(false);
 			//}
+
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			//m_scene->Print(color, "Control panel");
+
+			ndRobot* const model = (ndRobot*)*m_model;
+			ndRobot::ndUIControlNode* const control = model->m_control;
+
+			bool change = false;
+			change = change || ImGui::SliderFloat("posit x", &control->m_x, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
+			change = change || ImGui::SliderFloat("posit y", &control->m_y, -0.2f, 0.1f);
+			change = change || ImGui::SliderFloat("posit z", &control->m_z, -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
+			change = change || ImGui::SliderFloat("pitch", &control->m_pitch, -15.0f, 15.0f);
+			change = change || ImGui::SliderFloat("yaw", &control->m_yaw, -20.0f, 20.0f);
+			change = change || ImGui::SliderFloat("roll", &control->m_roll, -15.0f, 15.0f);
+			change = change || ImGui::SliderFloat("animSpeed", &control->m_animSpeed, 0.0f, 4.0f);
+			change = change || ImGui::Checkbox("enable controller", &control->m_enableController);
+
+			if (change)
+			{
+				ndBodyKinematic* const body = m_model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
+				body->SetSleepState(false);
+			}
 		}
 
-		ndRobot* m_model;
+		ndSharedPtr<ndModel> m_model;
 	};
 
 	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, ndSharedPtr<ndDemoEntity> modelMesh, const ndMatrix& matrixLocation, ndSharedPtr<ndBrainAgent> agent)
@@ -1076,10 +1099,11 @@ namespace ndQuadruped_3
 			//SetMaterial(visualModel);
 
 			ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-			//world->AddJoint(fixJoint);
+			world->AddJoint(fixJoint);
 
-			//ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, visualModel));
-			//scene->Set2DDisplayRenderFunction(quadrupedUI);
+			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, visualModel));
+			scene->Set2DDisplayRenderFunction(quadrupedUI);
+
 			
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -1132,24 +1156,32 @@ namespace ndQuadruped_3
 			}
 		}
 		
-		//class InvisibleBodyNotify : public ndDemoEntityNotify
-		//{
-		//public:
-		//	InvisibleBodyNotify(const ndDemoEntityNotify* const src)
-		//		:ndDemoEntityNotify(*src)
-		//	{
-		//	}
-		//
-		//	virtual bool OnSceneAabbOverlap(const ndBody* const otherBody) const
-		//	{
-		//		const ndBodyKinematic* const body0 = ((ndBody*)GetBody())->GetAsBodyKinematic();
-		//		const ndBodyKinematic* const body1 = ((ndBody*)otherBody)->GetAsBodyKinematic();
-		//		const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
-		//		const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
-		//		return instanceShape0.m_shapeMaterial.m_userId != instanceShape1.m_shapeMaterial.m_userId;
-		//	}
-		//};
-		//
+		class TrainingRobotBodyNotify : public ndDemoEntityNotify
+		{
+			public:
+			TrainingRobotBodyNotify(const ndDemoEntityNotify* const src)
+				:ndDemoEntityNotify(*src)
+			{
+			}
+		
+			virtual bool OnSceneAabbOverlap(const ndBody* const otherBody) const
+			{
+				const ndBodyKinematic* const body0 = ((ndBody*)GetBody())->GetAsBodyKinematic();
+				const ndBodyKinematic* const body1 = ((ndBody*)otherBody)->GetAsBodyKinematic();
+				const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
+				const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
+				return instanceShape0.m_shapeMaterial.m_userId != instanceShape1.m_shapeMaterial.m_userId;
+			}
+		};
+
+		void OnDebug(ndDemoEntityManager* const, bool mode)
+		{
+			for (ndList<ndSharedPtr<ndModel>>::ndNode* node = m_models.GetFirst(); node; node = node->GetNext())
+			{
+				HideModel(node->GetInfo(), mode);
+			}
+		}
+
 		//void SetMaterial(ndSharedPtr<ndModel>& model) const
 		//{
 		//	ndRobot* const robot = (ndRobot*)*model;
@@ -1169,7 +1201,7 @@ namespace ndQuadruped_3
 		//		ndDemoEntityNotify* const originalNotify = (ndDemoEntityNotify*)body->GetNotifyCallback();
 		//		void* const useData = originalNotify->m_entity;
 		//		originalNotify->m_entity = nullptr;
-		//		InvisibleBodyNotify* const notify = new InvisibleBodyNotify((InvisibleBodyNotify*)body->GetNotifyCallback());
+		//		TrainingRobotBodyNotify* const notify = new TrainingRobotBodyNotify((TrainingRobotBodyNotify*)body->GetNotifyCallback());
 		//		body->SetNotifyCallback(notify);
 		//		notify->m_entity = (ndDemoEntity*)useData;
 		//
@@ -1178,14 +1210,6 @@ namespace ndQuadruped_3
 		//			stackMem[stack] = child;
 		//			stack++;
 		//		}
-		//	}
-		//}
-		//
-		//void OnDebug(ndDemoEntityManager* const, bool mode)
-		//{
-		//	for (ndList<ndSharedPtr<ndModel>>::ndNode* node = m_models.GetFirst(); node; node = node->GetNext())
-		//	{
-		//		HideModel(node->GetInfo(), mode);
 		//	}
 		//}
 		
