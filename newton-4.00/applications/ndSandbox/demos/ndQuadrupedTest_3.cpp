@@ -75,31 +75,32 @@ namespace ndQuadruped_3
 		ndFloat32 m_minAngle;
 		ndFloat32 m_maxAngle;
 		ndFloat32 m_walkPhase;
+		ndFloat32 m_weightDistribution;
 	};
 
 	static ndDefinition jointsDefinition[] =
 	{
-		{ "spot_body", ndDefinition::m_root, 0.0f, 0.0f, 0.0f},
+		{ "spot_body", ndDefinition::m_root, 0.0f, 0.0f, 0.0f, 1.0f},
 
-		{ "spot_shoulder_FR", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
-		{ "spot_up_arm_FR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
-		{ "spot_arm_FR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
-		{ "spot_arm_FR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
+		{ "spot_shoulder_FR", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f, 4.0f },
+		{ "spot_up_arm_FR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 1.0f  },
+		{ "spot_arm_FR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f, 1.0f  },
+		{ "spot_arm_FR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f, 0.0f  },
 		
-		{ "spot_shoulder_FL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
-		{ "spot_up_arm_FL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
-		{ "spot_arm_FL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
-		{ "spot_arm_FL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
+		{ "spot_shoulder_FL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f, 4.0f},
+		{ "spot_up_arm_FL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 1.0f},
+		{ "spot_arm_FL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f, 1.0f},
+		{ "spot_arm_FL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f, 0.0f },
 		
-		{ "spot_shoulder_BR", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
-		{ "spot_up_arm_BR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
-		{ "spot_arm_BR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
-		{ "spot_arm_BR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
+		{ "spot_shoulder_BR", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f, 4.0f},
+		{ "spot_up_arm_BR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 1.0f},
+		{ "spot_arm_BR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f, 1.0f },
+		{ "spot_arm_BR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f, 0.0f },
 		
-		{ "spot_shoulder_BL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
-		{ "spot_up_arm_BL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
-		{ "spot_arm_BL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
-		{ "spot_arm_BL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
+		{ "spot_shoulder_BL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f, 4.0f},
+		{ "spot_up_arm_BL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 1.0f},
+		{ "spot_arm_BL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f, 1.0f},
+		{ "spot_arm_BL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f, 0.0f },
 	};
 
 	class ndQuadrupedMaterial: public ndApplicationMaterial
@@ -448,38 +449,21 @@ namespace ndQuadruped_3
 		{
 		}
 
-		void NormalizeMassDistribution(ndFloat32 mass) const
+		void NormalizeMassDistribution(ndFloat32 mass, ndInt32 bodyCount, ndBodyKinematic** const bodyArray, ndFloat32* const weightFactor) const
 		{
-			ndFloat32 maxVolume = -1.0e10f;
-			for (ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			{
-				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-				ndFloat32 volume = body->GetCollisionShape().GetVolume();
-				maxVolume = ndMax(maxVolume, volume);
-			}
-
 			ndFloat32 totalVolume = 0.0f;
-			ndFloat32 volumeRatio = 0.02f;
-			for (ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			for (ndInt32 i = 0; i < bodyCount; ++i)
 			{
-				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-				ndFloat32 volume = body->GetCollisionShape().GetVolume();
-				if (volume < volumeRatio * maxVolume)
-				{
-					volume = volumeRatio * maxVolume;
-				}
+				ndBodyKinematic* const body = bodyArray[i];
+				ndFloat32 volume = body->GetCollisionShape().GetVolume() * weightFactor[i];
 				totalVolume += volume;
 			}
 			
 			ndFloat32 density = mass / totalVolume;
-			for (ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			for (ndInt32 i = 0; i < bodyCount; ++i)
 			{
-				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-				ndFloat32 volume = body->GetCollisionShape().GetVolume();
-				if (volume < volumeRatio * maxVolume)
-				{
-					volume = volumeRatio * maxVolume;
-				}
+				ndBodyKinematic* const body = bodyArray[i];
+				ndFloat32 volume = body->GetCollisionShape().GetVolume() * weightFactor[i];
 				ndFloat32 normalMass = density * volume;
 				body->SetMassMatrix(normalMass, body->GetCollisionShape());
 				ndVector inertia(body->GetMassMatrix());
@@ -809,6 +793,14 @@ namespace ndQuadruped_3
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
 		ndFixSizeArray<ndModelArticulation::ndNode*, 32> parentBone;
 
+		ndInt32 bodyCount = 0;
+		ndFloat32 weightFactor[32];
+		ndBodyKinematic* bodyArray[32];
+
+		bodyArray[bodyCount] = rootBody->GetAsBodyKinematic();
+		weightFactor[bodyCount] = jointsDefinition[0].m_weightDistribution;
+		bodyCount++;
+
 		ndInt32 stack = 0;
 		for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
 		{
@@ -846,7 +838,11 @@ namespace ndQuadruped_3
 					if (definition.m_type == ndDefinition::m_hinge)
 					{
 						ndSharedPtr<ndBody> childBody(model->CreateBodyPart(scene, childEntity, 1.0f, parentNode->m_body->GetAsBodyDynamic()));
-		
+
+						bodyArray[bodyCount] = childBody->GetAsBodyKinematic();
+						weightFactor[bodyCount] = definition.m_weightDistribution;
+						bodyCount++;
+
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody->GetAsBodyDynamic(), parentNode->m_body->GetAsBodyDynamic());
 						hinge->SetLimitState(true);
@@ -904,13 +900,9 @@ namespace ndQuadruped_3
 				stack++;
 			}
 		}
+
+		model->NormalizeMassDistribution(35.0f, bodyCount, bodyArray, weightFactor);
 		
-		model->NormalizeMassDistribution(100.0f);
-		
-		//m_timer = 0.0f;
-		//m_param_x0 = -1.0f;
-		//m_param_xxxx = ndParamMapper(0.0, 0.75f);
-		//m_output.SetCount(4);
 
 		return model;
 	}
@@ -960,7 +952,7 @@ namespace ndQuadruped_3
 			//SetMaterial(visualModel);
 
 			ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-			world->AddJoint(fixJoint);
+			//world->AddJoint(fixJoint);
 
 			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, visualModel));
 			scene->Set2DDisplayRenderFunction(quadrupedUI);
