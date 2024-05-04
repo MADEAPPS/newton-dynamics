@@ -428,8 +428,8 @@ namespace ndQuadruped_1
 			if (ndAbs(force.m_y) > ndFloat32(1.0e-4f))
 			{
 				ndAssert(ndAbs(force.m_y) > ndFloat32(0.0f));
-				ndFloat32 zZmp = torque.m_z / force.m_y;
-				ndFloat32 xZmp = -torque.m_x / force.m_y;
+				ndFloat32 xZmp = torque.m_z / force.m_y;
+				ndFloat32 zZmp = -torque.m_x / force.m_y;
 				//ndTrace(("x=%f z=%f\n", xZmp, zZmp));
 
 				com.m_x += xZmp;

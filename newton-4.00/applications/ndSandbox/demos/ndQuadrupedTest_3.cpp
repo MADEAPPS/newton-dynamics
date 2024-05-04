@@ -680,8 +680,8 @@ namespace ndQuadruped_3
 			if (ndAbs(force.m_y) > ndFloat32(1.0e-4f))
 			{
 				ndAssert(ndAbs(force.m_y) > ndFloat32(0.0f));
-				ndFloat32 zZmp = torque.m_z / force.m_y;
-				ndFloat32 xZmp = -torque.m_x / force.m_y;
+				ndFloat32 xZmp = torque.m_z / force.m_y;
+				ndFloat32 zZmp = -torque.m_x / force.m_y;
 				//ndTrace(("x=%f z=%f\n", xZmp, zZmp));
 
 				com.m_x += xZmp;
@@ -1084,10 +1084,10 @@ namespace ndQuadruped_3
 			m_outFile = fopen("quadruped_3-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 			
-			//const ndInt32 countX = 1;
-			//const ndInt32 countZ = 1;
-			const ndInt32 countX = 5;
-			const ndInt32 countZ = 5;
+			const ndInt32 countX = 0;
+			const ndInt32 countZ = 0;
+			//const ndInt32 countX = 5;
+			//const ndInt32 countZ = 5;
 			
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			
