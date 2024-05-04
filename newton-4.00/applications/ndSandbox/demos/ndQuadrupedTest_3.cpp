@@ -25,7 +25,7 @@
 
 namespace ndQuadruped_3
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndSpot-VPG.dnn"
 
 	class ndLegObservation
@@ -328,9 +328,12 @@ namespace ndQuadruped_3
 				{
 				}
 
-				void SetPose() const
+				void SetPose(ndFloat32 x0, ndFloat32 z0) const
 				{
-					const ndMatrix matrix(ndCalculateMatrix(m_rotation, m_posit));
+					ndMatrix matrix(ndCalculateMatrix(m_rotation, m_posit));
+					matrix.m_posit.m_x += x0;
+					matrix.m_posit.m_z += z0;
+
 					m_body->SetMatrix(matrix);
 					m_body->SetOmega(m_omega);
 					m_body->SetVelocity(m_veloc);
@@ -426,9 +429,12 @@ namespace ndQuadruped_3
 			void ResetModel()
 			{
 				m_model->m_control->Reset();
+
+				ndFloat32 x0 = 10.0f * (ndRand() - 0.5f);
+				ndFloat32 z0 = 10.0f * (ndRand() - 0.5f);
 				for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
 				{
-					m_basePose[i].SetPose();
+					m_basePose[i].SetPose(x0, z0);
 				}
 				m_model->m_animBlendTree->SetTime(0.0f);
 				
@@ -832,7 +838,7 @@ namespace ndQuadruped_3
 			ndModelArticulation::Update(world, timestep);
 
 			m_timestep = timestep;
-			//m_agent->Step();
+			m_agent->Step();
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -1076,10 +1082,10 @@ namespace ndQuadruped_3
 			m_outFile = fopen("quadruped_3-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 			
-			const ndInt32 countX = 0;
-			const ndInt32 countZ = 0;
-			//const ndInt32 countX = 6;
-			//const ndInt32 countZ = 9;
+			//const ndInt32 countX = 1;
+			//const ndInt32 countZ = 1;
+			const ndInt32 countX = 5;
+			const ndInt32 countZ = 5;
 			
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			

@@ -121,8 +121,9 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshE
 		
 		if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
 		{
-			m_isVisible = false;
 			mesh->m_isVisible = false;
+			entity->m_isVisible = false;
+			entity->m_castShadow = false;
 		}
 	}
 }
