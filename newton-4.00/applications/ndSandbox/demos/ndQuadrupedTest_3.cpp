@@ -430,8 +430,10 @@ namespace ndQuadruped_3
 			{
 				m_model->m_control->Reset();
 
-				ndFloat32 x0 = 10.0f * (ndRand() - 0.5f);
-				ndFloat32 z0 = 10.0f * (ndRand() - 0.5f);
+				//ndFloat32 x0 = 10.0f * (ndRand() - 0.5f);
+				//ndFloat32 z0 = 10.0f * (ndRand() - 0.5f);
+				ndFloat32 x0 = 0.0f;
+				ndFloat32 z0 = 0.0f;
 				for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
 				{
 					m_basePose[i].SetPose(x0, z0);
@@ -440,8 +442,8 @@ namespace ndQuadruped_3
 				
 				ndFloat32 randVar = ndRand();
 				randVar = randVar * randVar * randVar;
-				ndFloat32 speed0 = ndFloat32(0.5f);
-				ndFloat32 speed1 = ndFloat32(4.0f);
+				ndFloat32 speed0 = ndFloat32(0.125f);
+				ndFloat32 speed1 = ndFloat32(1.0f);
 				ndFloat32 animationSpeed = speed0 + (speed1 - speed0) * randVar;
 				m_model->m_control->m_animSpeed = animationSpeed;
 			}
@@ -1014,7 +1016,7 @@ namespace ndQuadruped_3
 						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, parentNode->m_body->GetAsBodyDynamic(), modelRoot->m_body->GetAsBodyDynamic());
 		
 						effector->SetSwivelMode(false);
-						effector->SetLinearSpringDamper(regularizer, 5000.0f, 50.0f);
+						effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 						//effector->SetAngularSpringDamper(regularizer, 5000.0f, 50.0f);
 		
 						const ndVector elbowPoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
