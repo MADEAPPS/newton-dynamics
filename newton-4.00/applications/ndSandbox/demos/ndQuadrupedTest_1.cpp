@@ -373,11 +373,6 @@ namespace ndQuadruped_1
 				m_model->m_control->m_animSpeed = animationSpeed;
 			}
 
-			void Step()
-			{
-				ndBrainAgentContinuePolicyGradient_Trainer::Step();
-			}
-
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
 			ndRobot* m_model;
 		};
@@ -920,7 +915,6 @@ namespace ndQuadruped_1
 		#ifdef ND_TRAIN_MODEL
 			((ndRobot::ndControllerAgent_trainer*)*agent)->SetModel(model);
 			((ndRobot::ndControllerAgent_trainer*)*agent)->ResetModel();
-			scene->SetAcceleratedUpdate();
 		#else
 			((ndRobot::ndController*)*agent)->SetModel(model);
 		#endif
@@ -992,6 +986,7 @@ namespace ndQuadruped_1
 					SetMaterial(model);
 				}
 			}
+			scene->SetAcceleratedUpdate();
 		}
 
 		~TrainingUpdata()
@@ -1188,7 +1183,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		world->AddModel(model);
 
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-		world->AddJoint(fixJoint);
+		//world->AddJoint(fixJoint);
 
 		ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model));
 		scene->Set2DDisplayRenderFunction(quadrupedUI);
