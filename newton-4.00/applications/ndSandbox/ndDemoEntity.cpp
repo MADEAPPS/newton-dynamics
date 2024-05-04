@@ -121,6 +121,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshE
 		
 		if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
 		{
+			m_isVisible = false;
 			mesh->m_isVisible = false;
 		}
 	}
@@ -577,7 +578,6 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMesh();
 			ndAssert(mesh);
 			mesh->GetVertexArray(points);
-
 			ndVector minP(ndFloat32(1.0e10f));
 			ndVector maxP(ndFloat32(-1.0e10f));
 			for (ndInt32 i = 0; i < mesh->m_vertexCount; ++i)

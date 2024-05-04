@@ -295,8 +295,7 @@ namespace ndQuadruped_1
 
 			ndBrainFloat CalculateReward()
 			{
-				ndBrainFloat reward = m_model->CalculateReward();
-				return reward;
+				return m_model->CalculateReward();
 			}
 
 			virtual void ApplyActions(ndBrainFloat* const actions)
