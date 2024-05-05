@@ -46,7 +46,7 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
 
 	ndInt32 GetNumberOfParameters() const;
-	ndInt32 CalculateWorkingtBufferSize() const;
+	ndInt32 CalculateWorkingBufferSize() const;
 
 	void UpdateDropOut();
 	void EnableDropOut();

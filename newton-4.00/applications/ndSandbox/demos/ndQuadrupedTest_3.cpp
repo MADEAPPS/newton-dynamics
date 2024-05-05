@@ -841,6 +841,7 @@ namespace ndQuadruped_3
 
 			m_timestep = timestep;
 			m_agent->Step();
+			//UpdatePose(m_timestep);
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
