@@ -128,7 +128,7 @@ void ndBrainAgentDiscretePolicyGradient<statesDim, actionDim>::Step()
 	ndBrainFixSizeVector<actionDim> actions;
 	ndBrainFixSizeVector<statesDim> observations;
 
-	ndInt32 bufferSize = m_actor->CalculateWorkingtBufferSize();
+	ndInt32 bufferSize = m_actor->CalculateWorkingBufferSize();
 	ndBrainFloat* const bufferMem = ndAlloca(ndBrainFloat, bufferSize);
 
 	ndBrainMemVector workingBuffer(bufferMem, bufferSize);

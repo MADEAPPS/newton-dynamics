@@ -200,7 +200,7 @@ void ndBrain::UpdateDropOut()
 //	output.Set(in);
 //}
 
-ndInt32 ndBrain::CalculateWorkingtBufferSize() const
+ndInt32 ndBrain::CalculateWorkingBufferSize() const
 {
 	const ndArray<ndBrainLayer*>& layers = *this;
 	ndInt32 maxSize = layers[0]->GetInputSize();
@@ -220,7 +220,7 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, 
 		maxSize = ndMax(maxSize, layers[i]->GetOutputBufferSize());
 	}
 
-	const ndInt32 maxMemory = CalculateWorkingtBufferSize();
+	const ndInt32 maxMemory = CalculateWorkingBufferSize();
 	if (maxMemory > workingBuffer.GetCapacity())
 	{
 		workingBuffer.SetCount(maxMemory);

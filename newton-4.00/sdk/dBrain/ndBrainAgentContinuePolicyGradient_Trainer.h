@@ -450,7 +450,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	//m_baseLineValueOptimizer->SetRegularizer(hyperParameters.m_regularizer);
 	m_baseLineValueOptimizer->SetRegularizer(ndBrainFloat(1.0e-4f));
 	
-	m_baseValueWorkingBufferSize = m_baseLineValue.CalculateWorkingtBufferSize();
+	m_baseValueWorkingBufferSize = m_baseLineValue.CalculateWorkingBufferSize();
 	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * hyperParameters.m_threadsCount);
 
 	//m_actor.SaveToFile("xxxx1.xxx");
@@ -545,7 +545,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Sav
 	agent->m_trajectory.SetCount(0);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeCritic()
 {

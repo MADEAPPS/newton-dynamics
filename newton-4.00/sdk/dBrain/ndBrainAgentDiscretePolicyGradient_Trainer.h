@@ -383,7 +383,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	//m_baseLineValueOptimizer->SetRegularizer(hyperParameters.m_regularizer);
 	m_baseLineValueOptimizer->SetRegularizer(ndBrainFloat(1.0e-4f));
 
-	m_baseValueWorkingBufferSize = m_baseLineValue.CalculateWorkingtBufferSize();
+	m_baseValueWorkingBufferSize = m_baseLineValue.CalculateWorkingBufferSize();
 	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * hyperParameters.m_threadsCount);
 }
 
