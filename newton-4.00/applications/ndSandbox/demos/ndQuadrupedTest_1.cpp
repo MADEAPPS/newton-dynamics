@@ -362,7 +362,7 @@ namespace ndQuadruped_1
 				{
 					m_basePose[i].SetPose();
 				}
-				m_model->m_animBlendTree->SetTime(0.0f);
+				//m_model->m_animBlendTree->SetTime(0.0f);
 
 				ndFloat32 randVar = ndRand();
 				randVar = randVar * randVar * randVar;

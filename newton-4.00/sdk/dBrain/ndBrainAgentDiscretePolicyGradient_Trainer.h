@@ -91,6 +91,10 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 	ndArray<ndTrajectoryStep> m_trajectory;
 	ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>> m_master;
 
+	mutable std::random_device m_rd;
+	mutable std::mt19937 m_gen;
+	mutable std::uniform_real_distribution<ndFloat32> m_d;
+
 	friend class ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>;
 };
 
@@ -110,6 +114,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 			m_extraTrajectorySteps = 1024 * 2;
 			m_hiddenLayersNumberOfNeurons = 64;
 
+			m_randomSeed = 47;
 			m_learnRate = ndBrainFloat(0.0005f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
@@ -127,6 +132,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_extraTrajectorySteps;
 		ndInt32 m_numberOfHiddenLayers;
 		ndInt32 m_hiddenLayersNumberOfNeurons;
+		ndUnsigned32 m_randomSeed;
 	};
 
 	ndBrainAgentDiscretePolicyGradient_TrainerMaster(const HyperParameters& hyperParameters);
@@ -172,11 +178,13 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_bashTrajectoryIndex;
 	ndInt32 m_bashTrajectoryCount;
 	ndInt32 m_baseValueWorkingBufferSize;
+	ndUnsigned32 m_randomSeed;
 	ndBrainVector m_workingBuffer;
 	ndMovingAverage<32> m_averageScore;
 	ndMovingAverage<32> m_averageFramesPerEpisodes;
 	ndString m_name;
 	ndList<ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>*> m_agents;
+
 	friend class ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>;
 };
 
@@ -186,7 +194,13 @@ ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::ndBrainAgentDi
 	,m_workingBuffer()
 	,m_trajectory()
 	,m_master(master)
+	,m_rd()
+	,m_gen(m_rd())
+	,m_d(ndFloat32(0.0f), ndFloat32(1.0f))
 {
+	m_gen.seed(m_master->m_randomSeed);
+	m_master->m_randomSeed += 1;
+
 	m_master->m_agents.Append(this);
 	m_trajectory.SetCount(m_master->m_maxTrajectorySteps + m_master->m_extraTrajectorySteps);
 	m_trajectory.SetCount(0);
@@ -237,7 +251,8 @@ ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::S
 	}
 	pdf.PushBack(sum);
 
-	ndFloat32 r = ndRand();
+	//ndFloat32 r = ndRand();
+	ndFloat32 r = m_d(m_gen);
 	ndInt32 index = actionDim - 1;
 	for (ndInt32 i = actionDim - 1; i >= 0; --i)
 	{
@@ -294,6 +309,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	,m_bashTrajectoryIndex(0)
 	,m_bashTrajectoryCount(hyperParameters.m_bashTrajectoryCount)
 	,m_baseValueWorkingBufferSize(0)
+	,m_randomSeed(hyperParameters.m_randomSeed)
 	,m_workingBuffer()
 	,m_averageScore()
 	,m_averageFramesPerEpisodes()

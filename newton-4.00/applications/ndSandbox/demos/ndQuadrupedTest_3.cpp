@@ -438,7 +438,7 @@ namespace ndQuadruped_3
 				{
 					m_basePose[i].SetPose(x0, z0);
 				}
-				m_model->m_animBlendTree->SetTime(0.0f);
+				//m_model->m_animBlendTree->SetTime(0.0f);
 				
 				ndFloat32 randVar = ndRand();
 				randVar = randVar * randVar * randVar;
@@ -809,7 +809,7 @@ namespace ndQuadruped_3
 				ndBigVector p1Out;
 				ndBigVector ray_p0(zmp);
 				ndBigVector ray_p1(zmp);
-				ray_p1.m_y -= ndFloat32(0.5f);
+				ray_p1.m_y -= ndFloat32(1.5f);
 				ndRayToPolygonDistance(ray_p0, ray_p1, &desiredSupportPoint[0], desiredSupportPoint.GetCount(), p0Out, p1Out);
 				ndBigVector error((p0Out - p1Out) & ndBigVector::m_triplexMask);
 			
@@ -1086,8 +1086,8 @@ namespace ndQuadruped_3
 			
 			const ndInt32 countX = 0;
 			const ndInt32 countZ = 0;
-			//const ndInt32 countX = 5;
-			//const ndInt32 countZ = 5;
+			//const ndInt32 countX = 6;
+			//const ndInt32 countZ = 9;
 			
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			

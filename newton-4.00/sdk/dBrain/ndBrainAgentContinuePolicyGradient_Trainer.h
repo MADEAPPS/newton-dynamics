@@ -145,7 +145,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 			//ndBrainFloat sigma2 = ndBrainFloat (0.15f);
 			//ndBrainFloat sigma2 = ndBrainFloat(0.2f);
 
-			m_randomSeed = 42;
+			m_randomSeed = 47;
 			m_sigma = ndSqrt(sigma2);
 			// I can not get the optimizer to succeeds when using sigma optimization,
 			// not sure where the bug is, but the policy just collapse fate few epochs.
@@ -545,7 +545,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Sav
 	agent->m_trajectory.SetCount(0);
 }
 
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeCritic()
 {
@@ -559,11 +559,13 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	{
 		auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, base, maxSteps, &averageRewards](ndInt32 threadIndex, ndInt32)
 		{
-			class ndPolicyLoss : public ndBrainLossHuber
+			//class ndPolicyLoss : public ndBrainLossHuber
+			class ndPolicyLoss : public	ndBrainLossLeastSquaredError
 			{
 				public:
 				ndPolicyLoss()
-					:ndBrainLossHuber(1)
+					//:ndBrainLossHuber(1)
+					:ndBrainLossLeastSquaredError(1)
 					,m_lossValid(true)
 				{
 				}
@@ -575,7 +577,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 					{
 						SetTruth(output);
 					}
-					ndBrainLossHuber::GetLoss(output, loss);
+					//ndBrainLossHuber::GetLoss(output, loss);
+					ndBrainLossLeastSquaredError::GetLoss(output, loss);
 				}
 	
 				bool m_lossValid;
