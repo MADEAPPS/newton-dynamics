@@ -1084,10 +1084,10 @@ namespace ndQuadruped_3
 			m_outFile = fopen("quadruped_3-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 			
-			const ndInt32 countX = 0;
-			const ndInt32 countZ = 0;
-			//const ndInt32 countX = 6;
-			//const ndInt32 countZ = 9;
+			//const ndInt32 countX = 0;
+			//const ndInt32 countZ = 0;
+			const ndInt32 countX = 6;
+			const ndInt32 countZ = 9;
 			
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			

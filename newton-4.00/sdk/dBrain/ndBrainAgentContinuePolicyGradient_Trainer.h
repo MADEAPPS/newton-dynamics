@@ -545,7 +545,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Sav
 	agent->m_trajectory.SetCount(0);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeCritic()
 {
