@@ -25,7 +25,7 @@
 
 namespace ndQuadruped_3
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndSpot-VPG.dnn"
 
 	class ndLegObservation
@@ -84,25 +84,25 @@ namespace ndQuadruped_3
 
 	static ndDefinition jointsDefinition[] =
 	{
-		{ "spot_body", ndDefinition::m_root, 0.0f, 0.0f, 0.0f, 1.0f},
+		{ "spot_body", ndDefinition::m_root, 0.0f, 0.0f, 0.0f, 1.25f},
 
 		{ "spot_shoulder_FR", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f, 4.0f },
-		{ "spot_up_arm_FR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 1.0f  },
+		{ "spot_up_arm_FR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 0.8f  },
 		{ "spot_arm_FR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f, 1.0f  },
 		{ "spot_arm_FR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f, 0.0f  },
 		
 		{ "spot_shoulder_FL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f, 4.0f},
-		{ "spot_up_arm_FL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 1.0f},
+		{ "spot_up_arm_FL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 0.8f},
 		{ "spot_arm_FL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f, 1.0f},
 		{ "spot_arm_FL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f, 0.0f },
 		
 		{ "spot_shoulder_BR", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f, 4.0f},
-		{ "spot_up_arm_BR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 1.0f},
+		{ "spot_up_arm_BR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 0.8f},
 		{ "spot_arm_BR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f, 1.0f },
 		{ "spot_arm_BR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f, 0.0f },
 		
 		{ "spot_shoulder_BL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f, 4.0f},
-		{ "spot_up_arm_BL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 1.0f},
+		{ "spot_up_arm_BL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 0.8f},
 		{ "spot_arm_BL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f, 1.0f},
 		{ "spot_arm_BL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f, 0.0f },
 	};
@@ -167,12 +167,22 @@ namespace ndQuadruped_3
 
 		class ndPoseGenerator : public ndAnimationSequence
 		{
+		public:
+			ndVector m_offset[4];
+			mutable ndVector m_currentPose[4];
+			ndFloat32 m_amp;
+			ndFloat32 m_gaitFraction;
+			ndFloat32 m_phase[4];
+		};
+
+		class ndCrawlPoseGenerator : public ndPoseGenerator
+		{
 			public:
-			ndPoseGenerator(ndFloat32 gaitFraction, const ndFloat32* const phase)
-				:ndAnimationSequence()
-				,m_amp(0.4f)
-				,m_gaitFraction(gaitFraction)
+			ndCrawlPoseGenerator(ndFloat32 gaitFraction, const ndFloat32* const phase)
+				:ndPoseGenerator()
 			{
+				m_amp = 0.4f;
+				m_gaitFraction = gaitFraction;
 				m_duration = ndFloat32(4.0f);
 				for (ndInt32 i = 0; i < 4; i++)
 				{
@@ -200,7 +210,6 @@ namespace ndQuadruped_3
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
 				{
 					output[i].m_userParamInt = 0;
-					//output[i].m_posit = BasePose(i);
 					output[i].m_posit = m_offset[i];
 					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
 					if (t <= m_gaitFraction)
@@ -215,13 +224,58 @@ namespace ndQuadruped_3
 					m_currentPose[i] = output[i].m_posit;
 				}
 			}
+		};
 
-			ndVector m_offset[4];
-			mutable ndVector m_currentPose[4];
-			ndFloat32 m_amp;
-			ndFloat32 m_gaitFraction;
-			ndFloat32 m_phase[4];
-	};
+		class ndWalkPoseGenerator : public ndPoseGenerator
+		{
+			public:
+			ndWalkPoseGenerator(ndFloat32 gaitFraction, const ndFloat32* const phase)
+				:ndPoseGenerator()
+			{
+				m_amp = 0.4f;
+				m_gaitFraction = gaitFraction;
+				m_duration = ndFloat32(4.0f);
+				for (ndInt32 i = 0; i < 4; i++)
+				{
+					m_phase[i] = phase[i];
+					m_offset[i] = ndVector::m_zero;
+					m_currentPose[i] = ndVector::m_zero;
+				}
+			}
+
+			ndVector GetTranslation(ndFloat32) const
+			{
+				return ndVector::m_zero;
+			}
+
+			void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
+			{
+				// generate a procedural in place march gait
+				ndAssert(param >= ndFloat32(0.0f));
+				ndAssert(param <= ndFloat32(1.0f));
+
+				ndFloat32 gaitGuard = m_gaitFraction * 0.05f;
+				ndFloat32 omega = ndPi / (m_gaitFraction - ndFloat32(2.0f) * gaitGuard);
+
+				ndFloat32 ycontact = D_POSE_REST_POSITION_Y + m_amp / 2.0f;
+				for (ndInt32 i = 0; i < output.GetCount(); i++)
+				{
+					output[i].m_userParamInt = 0;
+					output[i].m_posit = m_offset[i];
+					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
+					if (t <= m_gaitFraction)
+					{
+						if ((t >= gaitGuard) && (t <= (m_gaitFraction - gaitGuard)))
+						{
+							output[i].m_posit.m_x -= m_amp * ndSin(omega * (t - gaitGuard));
+							output[i].m_userParamInt = output[i].m_posit.m_y < ycontact ? -1 : 1;
+						}
+					}
+
+					m_currentPose[i] = output[i].m_posit;
+				}
+			}
+		};
 
 		class ndUIControlNode : public ndAnimationBlendTreeNode
 		{
@@ -494,7 +548,7 @@ namespace ndQuadruped_3
 		{
 		}
 
-		void NormalizeMassDistribution(ndFloat32 mass, ndInt32 bodyCount, ndBodyKinematic** const bodyArray, ndFloat32* const weightFactor) const
+		void NormalizeMassDistribution(ndFloat32 totalMass, ndInt32 bodyCount, ndBodyKinematic** const bodyArray, ndFloat32* const weightFactor) const
 		{
 			ndFloat32 totalVolume = 0.0f;
 			for (ndInt32 i = 0; i < bodyCount; ++i)
@@ -504,13 +558,13 @@ namespace ndQuadruped_3
 				totalVolume += volume;
 			}
 			
-			ndFloat32 density = mass / totalVolume;
+			ndFloat32 density = totalMass / totalVolume;
 			for (ndInt32 i = 0; i < bodyCount; ++i)
 			{
 				ndBodyKinematic* const body = bodyArray[i];
 				ndFloat32 volume = body->GetCollisionShape().GetVolume() * weightFactor[i];
-				ndFloat32 normalMass = density * volume;
-				body->SetMassMatrix(normalMass, body->GetCollisionShape());
+				ndFloat32 mass = density * volume;
+				body->SetMassMatrix(mass, body->GetCollisionShape());
 				ndVector inertia(body->GetMassMatrix());
 				ndFloat32 maxInertia = ndMax(ndMax(inertia.m_x, inertia.m_y), inertia.m_z);
 				ndFloat32 minInertia = ndMin(ndMin(inertia.m_x, inertia.m_y), inertia.m_z);
@@ -526,7 +580,9 @@ namespace ndQuadruped_3
 					}
 				}
 				body->SetMassMatrix(inertia);
+				ndTrace(("%f ", mass));
 			}
+			ndTrace(("\n"));
 		}
 
 		ndSharedPtr<ndBody> CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
@@ -853,8 +909,8 @@ namespace ndQuadruped_3
 			ndModelArticulation::Update(world, timestep);
 
 			m_timestep = timestep;
-			m_agent->Step();
-			//UpdatePose(m_timestep);
+			//m_agent->Step();
+			UpdatePose(m_timestep);
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -974,8 +1030,9 @@ namespace ndQuadruped_3
 			stack++;
 		}
 		
-		ndFloat32 phase[] = { 0.0f, 0.75f, 0.25f, 0.5f };
-		ndSharedPtr<ndAnimationSequence> sequence(new ndRobot::ndPoseGenerator(0.24f, phase));
+		//ndFloat32 phase[] = { 0.0f, 0.75f, 0.25f, 0.5f }; // crawling foward
+		ndFloat32 phase[] = { 0.0f, 0.25f, 0.75f, 0.5f };	// crawling backward
+		ndSharedPtr<ndAnimationSequence> sequence(new ndRobot::ndCrawlPoseGenerator(0.24f, phase));
 
 		model->m_poseGenerator = new ndAnimationSequencePlayer(sequence);
 		model->m_control = new ndRobot::ndUIControlNode(model->m_poseGenerator);
@@ -1048,7 +1105,6 @@ namespace ndQuadruped_3
 						model->m_animPose.PushBack(keyFrame);
 						poseGenerator->AddTrack();
 						poseGenerator->m_phase[effectorsCount] = phase[effectorsCount];
-						//poseGenerator->m_offset[i] = offset[i];
 						poseGenerator->m_offset[effectorsCount] = info.m_basePosition;
 						effectorsCount++;
 					}
@@ -1064,7 +1120,7 @@ namespace ndQuadruped_3
 			}
 		}
 
-		model->NormalizeMassDistribution(35.0f, bodyCount, bodyArray, weightFactor);
+		model->NormalizeMassDistribution(25.0f, bodyCount, bodyArray, weightFactor);
 		
 		#ifdef ND_TRAIN_MODEL
 			((ndRobot::ndControllerAgent_trainer*)*agent)->SetModel(model);
