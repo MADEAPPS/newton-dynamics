@@ -25,7 +25,7 @@
 
 namespace ndQuadruped_3
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndSpot-VPG.dnn"
 
 	class ndLegObservation
@@ -541,6 +541,7 @@ namespace ndQuadruped_3
 			,m_animBlendTree()
 			,m_agent(agent)
 			,m_timestep(0.0f)
+			,m_debugId(0)
 		{
 		}
 
@@ -632,6 +633,10 @@ namespace ndQuadruped_3
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
+			if (m_debugId != 0)
+			{
+				return;
+			}
 			//ndMatrix comMatrix(m_bodyArray[0]->GetMatrix());
 			//comMatrix.m_posit = CalculateCenterOfMass();
 			//context.DrawFrame(comMatrix);
@@ -925,8 +930,8 @@ namespace ndQuadruped_3
 			ndModelArticulation::Update(world, timestep);
 
 			m_timestep = timestep;
-			//m_agent->Step();
-			UpdatePose(m_timestep);
+			m_agent->Step();
+			//UpdatePose(m_timestep);
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -944,6 +949,7 @@ namespace ndQuadruped_3
 		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 		ndSharedPtr<ndBrainAgent> m_agent;
 		ndFloat32 m_timestep;
+		ndInt32 m_debugId;
 	};
 
 	class ndModelUI : public ndUIEntity
@@ -1210,6 +1216,7 @@ namespace ndQuadruped_3
 					m_models.Append(model);
 					//HideModel(model);
 					SetMaterial(model);
+					((ndRobot*)*model)->m_debugId = 1;
 				}
 			}
 
