@@ -373,7 +373,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	,m_agents()
 	,m_useConstantSigma(hyperParameters.m_useConstantSigma)
 {
-	// build neural net
+	// build policy neural net
 	SetThreadCount(hyperParameters.m_threadsCount);
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 	
@@ -403,7 +403,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 
 	m_actor.InitWeightsXavierMethod();
 	ndAssert(!strcmp((m_actor[m_actor.GetCount() - 1])->GetLabelId(), "ndBrainLayerTanhActivation"));
-	
+
 	m_trainers.SetCount(0);
 	m_auxiliaryTrainers.SetCount(0);
 	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
@@ -418,17 +418,19 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	m_weightedTrainer.PushBack(m_trainers[0]);
 	m_optimizer = new ndBrainOptimizerAdam();
 	m_optimizer->SetRegularizer(hyperParameters.m_regularizer);
-	
+
+
+	// build state value critic neural net
 	layers.SetCount(0);
-	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_hiddenLayersNumberOfNeurons));
+	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_hiddenLayersNumberOfNeurons * 2));
 	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
 	{
-		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeurons);
-		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, hyperParameters.m_hiddenLayersNumberOfNeurons));
-		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons));
+		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeurons * 2);
+		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hyperParameters.m_hiddenLayersNumberOfNeurons * 2));
+		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
-	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, 1));
+	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		m_baseLineValue.AddLayer(layers[i]);

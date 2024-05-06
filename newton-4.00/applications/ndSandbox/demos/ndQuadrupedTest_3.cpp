@@ -52,6 +52,7 @@ namespace ndQuadruped_3
 		public:
 		ndLegObservation n_legs[4];
 		ndActionVector m_torso;
+		ndFloat32 m_animTime;
 	};
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
@@ -426,6 +427,7 @@ namespace ndQuadruped_3
 				return false;
 			}
 
+			#pragma optimize( "", off )
 			void ResetModel()
 			{
 				m_model->m_control->Reset();
@@ -438,7 +440,10 @@ namespace ndQuadruped_3
 				{
 					m_basePose[i].SetPose(x0, z0);
 				}
-				//m_model->m_animBlendTree->SetTime(0.0f);
+				//ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
+				//ndUnsigned32 randomeStart = ndRandInt() % 4;
+				//m_model->m_animBlendTree->SetTime(ndFloat32(randomeStart) * duration * 0.25f);
+				m_model->m_animBlendTree->SetTime(0.0f);
 				
 				ndFloat32 randVar = ndRand();
 				randVar = randVar * randVar * randVar;
@@ -761,6 +766,8 @@ namespace ndQuadruped_3
 
 			observation.m_torso.m_x = m_control->m_x;
 			observation.m_torso.m_z = m_control->m_z;
+			observation.m_animTime = m_poseGenerator->GetTime();
+			//ndTrace(("%f\n", observation.m_animTime));
 		}
 
 		void ApplyActions(ndBrainFloat* const actions)
@@ -786,6 +793,7 @@ namespace ndQuadruped_3
 
 		ndBrainFloat CalculateReward()
 		{
+			#if 0
 			ndFixSizeArray<ndBigVector, 4> desiredSupportPoint;
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
@@ -826,7 +834,12 @@ namespace ndQuadruped_3
 			{
 				ndAssert(0);
 			}
+			#else
+			const ndMatrix matrix(GetRoot()->m_body->GetMatrix());
+			ndFloat32 upAngle = ndAcos(matrix.m_up.m_y);
+			ndFloat32 reward = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * upAngle * upAngle));
 
+			#endif
 			return reward;
 		}
 
@@ -1075,7 +1088,7 @@ namespace ndQuadruped_3
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_maxFrames(6000)
+			,m_maxFrames(1000)
 			,m_lastEpisode(-1)
 			,m_stopTraining(200 * 1000000)
 			,m_modelIsTrained(false)
@@ -1117,8 +1130,8 @@ namespace ndQuadruped_3
 				for (ndInt32 j = 0; j < countX; ++j)
 				{
 					ndMatrix location(matrix);
-					location.m_posit.m_x += 10.0f * (ndRand() - 0.5f);
-					location.m_posit.m_z += 10.0f * (ndRand() - 0.5f);
+					location.m_posit.m_x += 20.0f * (ndRand() - 0.5f);
+					location.m_posit.m_z += 20.0f * (ndRand() - 0.5f);
 					ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(m_master));
 					ndSharedPtr<ndModel> model(BuildModel(scene, modelMesh, location, agent));
 					world->AddModel(model);
@@ -1348,7 +1361,7 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 #endif
 
-	matrix.m_posit.m_x -= 10.0f;
+	matrix.m_posit.m_x -= 20.0f;
 	matrix.m_posit.m_y += 1.5f;
 	matrix.m_posit.m_z += 0.25f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
