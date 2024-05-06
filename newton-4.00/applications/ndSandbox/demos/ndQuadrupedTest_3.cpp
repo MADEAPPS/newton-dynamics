@@ -57,7 +57,7 @@ namespace ndQuadruped_3
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
-	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
+	#define D_MAX_SWING_DIST_X		ndReal(0.30f)
 	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
 	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
 
@@ -167,7 +167,7 @@ namespace ndQuadruped_3
 
 		class ndPoseGenerator : public ndAnimationSequence
 		{
-		public:
+			public:
 			ndVector m_offset[4];
 			mutable ndVector m_currentPose[4];
 			ndFloat32 m_amp;
@@ -630,69 +630,85 @@ namespace ndQuadruped_3
 			//return com;
 		}
 
-		//void Debug(ndConstraintDebugCallback& context) const
-		void Debug(ndConstraintDebugCallback&) const
+		void Debug(ndConstraintDebugCallback& context) const
 		{
-			////ndMatrix comMatrix(m_bodyArray[0]->GetMatrix());
-			////comMatrix.m_posit = CalculateCenterOfMass();
-			////context.DrawFrame(comMatrix);
-			////
-			////ndFixSizeArray<ndVector, 16> contactPoints;
-			////for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
-			////{
-			////	//const ndEffectorInfo& info = m_effectors[i];
-			////	//ndJointBilateralConstraint* const joint = info.m_effector;
-			////	//ndBodyKinematic* const body = joint->GetBody0();
-			////	//const ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
-			////	//ndBodyKinematic::ndContactMap::Iterator it(contacts);
-			////	//for (it.Begin(); it; it++)
-			////	//{
-			////	//	const ndContact* const contact = *it;
-			////	//	if (contact->IsActive())
-			////	//	{
-			////	//		//const ndContactPointList& contactMap = contact->GetContactPoints();
-			////	//		//contactPoints.PushBack(contactMap.GetFirst()->GetInfo().m_point);
-			////	//		contactPoints.PushBack(body->GetMatrix().TransformVector(info.m_effector->GetLocalMatrix0().m_posit));
-			////	//	}
-			////	//}
-			////	if (m_walkCycle.m_isGrounded[i])
-			////	{
-			////		const ndEffectorInfo& info = m_effectors[i];
-			////		ndJointBilateralConstraint* const joint = info.m_effector;
-			////		ndBodyKinematic* const body = joint->GetBody0();
-			////		contactPoints.PushBack(body->GetMatrix().TransformVector(info.m_effector->GetLocalMatrix0().m_posit));
-			////	}
-			////
-			////	//	joint->DebugJoint(context);
-			////}
-			////
-			////if (contactPoints.GetCount() >= 3)
-			////{
-			////	ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
-			////	rotation.TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
-			////	ndInt32 supportCount = ndConvexHull2d(&contactPoints[0], contactPoints.GetCount());
-			////	rotation.Inverse().TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
-			////	ndVector p0(contactPoints[supportCount - 1]);
-			////	ndBigVector bigPolygon[16];
-			////	for (ndInt32 i = 0; i < supportCount; ++i)
-			////	{
-			////		bigPolygon[i] = contactPoints[i];
-			////		context.DrawLine(contactPoints[i], p0, ndVector::m_zero);
-			////		p0 = contactPoints[i];
-			////	}
-			////
-			////	ndBigVector p0Out;
-			////	ndBigVector p1Out;
-			////	ndBigVector ray_p0(comMatrix.m_posit);
-			////	ndBigVector ray_p1(comMatrix.m_posit);
-			////	ray_p1.m_y -= 1.0f;
-			////
-			////	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-			////
-			////	context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
-			////	context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
-			////}
+			//ndMatrix comMatrix(m_bodyArray[0]->GetMatrix());
+			//comMatrix.m_posit = CalculateCenterOfMass();
+			//context.DrawFrame(comMatrix);
+			
+			ndFixSizeArray<ndVector, 16> contactPoints;
+			for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); ++i)
+			{
+				const ndEffectorInfo& info = m_effectorsInfo[i];
+			//	//ndJointBilateralConstraint* const joint = info.m_effector;
+			//	//ndBodyKinematic* const body = joint->GetBody0();
+			//	//const ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
+			//	//ndBodyKinematic::ndContactMap::Iterator it(contacts);
+			//	//for (it.Begin(); it; it++)
+			//	//{
+			//	//	const ndContact* const contact = *it;
+			//	//	if (contact->IsActive())
+			//	//	{
+			//	//		//const ndContactPointList& contactMap = contact->GetContactPoints();
+			//	//		//contactPoints.PushBack(contactMap.GetFirst()->GetInfo().m_point);
+			//	//		contactPoints.PushBack(body->GetMatrix().TransformVector(info.m_effector->GetLocalMatrix0().m_posit));
+			//	//	}
+			//	//}
+
+				//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+				//{
+				//	ndContact* const contact = m_model->FindContact(i);
+				//	bool isAirborne = !(contact && contact->IsActive());
+				//	isGround -= ndInt32(isAirborne);
+				//
+				const ndAnimKeyframe& keyFrame = m_animPose[i];
+				if (keyFrame.m_userParamInt == 0)
+				{
+					const ndJointBilateralConstraint* const joint = *info.m_effector;
+					ndBodyKinematic* const body = joint->GetBody0();
+					contactPoints.PushBack(body->GetMatrix().TransformVector(info.m_effector->GetLocalMatrix0().m_posit));
+				}
+
+				//m_poseGenerator->GetSequence()
+			//	if (m_walkCycle.m_isGrounded[i])
+			//	{
+			//		const ndEffectorInfo& info = m_effectors[i];
+			//		ndJointBilateralConstraint* const joint = info.m_effector;
+			//		ndBodyKinematic* const body = joint->GetBody0();
+			//		contactPoints.PushBack(body->GetMatrix().TransformVector(info.m_effector->GetLocalMatrix0().m_posit));
+			//	}
 			//
+			//	//	joint->DebugJoint(context);
+			}
+			
+			const ndVector supportPolygonColor(1.0f, 1.0f, 0.0f, 1.0f);
+			if (contactPoints.GetCount() >= 3)
+			{
+				ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
+				rotation.TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
+				ndInt32 supportCount = ndConvexHull2d(&contactPoints[0], contactPoints.GetCount());
+				rotation.OrthoInverse().TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
+				ndVector p0(contactPoints[supportCount - 1]);
+				ndBigVector bigPolygon[16];
+				for (ndInt32 i = 0; i < supportCount; ++i)
+				{
+					bigPolygon[i] = contactPoints[i];
+					context.DrawLine(contactPoints[i], p0, supportPolygonColor);
+					p0 = contactPoints[i];
+				}
+			
+				//ndBigVector p0Out;
+				//ndBigVector p1Out;
+				//ndBigVector ray_p0(comMatrix.m_posit);
+				//ndBigVector ray_p1(comMatrix.m_posit);
+				//ray_p1.m_y -= 1.0f;
+				//
+				//ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
+				//
+				//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
+				//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
+			}
+			
 			//for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); ++i)
 			//{
 			//	const ndEffectorInfo& info = m_effectorsInfo[i];
