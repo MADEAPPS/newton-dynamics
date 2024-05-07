@@ -315,6 +315,8 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	,m_averageFramesPerEpisodes()
 	,m_agents()
 {
+	ndSetRandSeed(m_randomSeed);
+
 	// build policy neural net
 	SetThreadCount(hyperParameters.m_threadsCount);
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
@@ -351,7 +353,6 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	m_weightedTrainer.PushBack(m_trainers[0]);
 	m_optimizer = new ndBrainOptimizerAdam();
 	m_optimizer->SetRegularizer(hyperParameters.m_regularizer);
-
 
 	// build state value critic neural net
 	layers.SetCount(0);
