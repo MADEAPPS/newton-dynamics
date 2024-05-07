@@ -1145,10 +1145,8 @@ namespace ndQuadruped_3
 			
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			
-			//hyperParameters.m_threadsCount = 1;
-			//hyperParameters.m_sigma = ndReal(0.25f);
+			hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_discountFactor = ndReal(0.99f);
-			//hyperParameters.m_maxTrajectorySteps = 1024 * 6;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 			
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>(new ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
