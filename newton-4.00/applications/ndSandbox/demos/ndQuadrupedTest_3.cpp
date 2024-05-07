@@ -581,9 +581,9 @@ namespace ndQuadruped_3
 					}
 				}
 				body->SetMassMatrix(inertia);
-				ndTrace(("%f ", mass));
+				//ndTrace(("%f ", mass));
 			}
-			ndTrace(("\n"));
+			//ndTrace(("\n"));
 		}
 
 		ndSharedPtr<ndBody> CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
