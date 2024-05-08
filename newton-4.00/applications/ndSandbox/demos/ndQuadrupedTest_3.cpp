@@ -57,8 +57,8 @@ namespace ndQuadruped_3
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
-	#define D_MAX_SWING_DIST_X		ndReal(0.30f)
-	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
+	#define D_MAX_SWING_DIST_X		ndReal(0.40f)
+	#define D_MAX_SWING_DIST_Z		ndReal(0.20f)
 	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
 
 	//#define D_SWING_STEP			ndReal(0.01f)
@@ -541,7 +541,7 @@ namespace ndQuadruped_3
 			,m_animBlendTree()
 			,m_agent(agent)
 			,m_timestep(0.0f)
-			,m_debugId(0)
+			,m_showDebug(false)
 		{
 		}
 
@@ -612,35 +612,18 @@ namespace ndQuadruped_3
 			return bodyPtr;
 		}
 
-		ndVector CalculateCenterOfMass() const
-		{
-			ndVector com(ndVector::m_zero);
-			ndFloat32 totalMass = ndFloat32(0.0f);
-			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
-			for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			{
-				const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-
-				const ndMatrix matrix(body->GetMatrix());
-				const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
-				ndFloat32 mass = body->GetMassMatrix().m_w;
-				totalMass += mass;
-				com += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
-			}
-			com = com.Scale(ndFloat32(1.0f) / totalMass);
-			com.m_w = 1.0f;
-			return com;
-		}
-
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			if (m_debugId != 0)
+			if (!m_showDebug)
 			{
 				return;
 			}
 			ndMatrix comMatrix(GetRoot()->m_body->GetMatrix());
 			comMatrix.m_posit = CalculateCenterOfMass();
 			context.DrawFrame(comMatrix);
+
+			ndVector zeroMomentPoint(CalculateZeroMomentPoint());
+			zeroMomentPoint.m_y = comMatrix.m_posit.m_y;
 			
 			ndFixSizeArray<ndVector, 16> contactPoints;
 			for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); ++i)
@@ -673,15 +656,37 @@ namespace ndQuadruped_3
 			
 				ndBigVector p0Out;
 				ndBigVector p1Out;
-				ndBigVector ray_p0(comMatrix.m_posit);
-				ndBigVector ray_p1(comMatrix.m_posit);
-				ray_p1.m_y -= 1.0f;
+				//ndBigVector ray_p0(comMatrix.m_posit);
+				//ndBigVector ray_p1(comMatrix.m_posit);
+				ndBigVector ray_p0(zeroMomentPoint);
+				ndBigVector ray_p1(zeroMomentPoint);
+				ray_p1.m_y -= 1.2f;
 				
 				ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
 				
 				context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
 				context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
 			}
+		}
+
+		ndVector CalculateCenterOfMass() const
+		{
+			ndVector com(ndVector::m_zero);
+			ndFloat32 totalMass = ndFloat32(0.0f);
+			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
+			for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+
+				const ndMatrix matrix(body->GetMatrix());
+				const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+				ndFloat32 mass = body->GetMassMatrix().m_w;
+				totalMass += mass;
+				com += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
+			}
+			com = com.Scale(ndFloat32(1.0f) / totalMass);
+			com.m_w = 1.0f;
+			return com;
 		}
 
 		ndVector CalculateZeroMomentPoint() const
@@ -911,7 +916,7 @@ namespace ndQuadruped_3
 		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 		ndSharedPtr<ndBrainAgent> m_agent;
 		ndFloat32 m_timestep;
-		ndInt32 m_debugId;
+		bool m_showDebug;
 	};
 
 	class ndModelUI : public ndUIEntity
@@ -1109,7 +1114,6 @@ namespace ndQuadruped_3
 		#ifdef ND_TRAIN_MODEL
 			((ndRobot::ndControllerAgent_trainer*)*agent)->SetModel(model);
 			((ndRobot::ndControllerAgent_trainer*)*agent)->ResetModel();
-			scene->SetAcceleratedUpdate();
 		#else
 			((ndRobot::ndController*)*agent)->SetModel(model);
 		#endif
@@ -1176,12 +1180,14 @@ namespace ndQuadruped_3
 					m_models.Append(model);
 					//HideModel(model);
 					SetMaterial(model);
-					((ndRobot*)*model)->m_debugId = 1;
 				}
 			}
 
 			ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
 			//world->AddJoint(fixJoint);
+			((ndRobot*)*visualModel)->m_showDebug = true;
+
+			scene->SetAcceleratedUpdate();
 		}
 
 		~TrainingUpdata()

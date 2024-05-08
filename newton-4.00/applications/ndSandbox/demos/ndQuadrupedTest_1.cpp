@@ -385,6 +385,7 @@ namespace ndQuadruped_1
 			,m_animBlendTree()
 			,m_agent(agent)
 			,m_timestep(0.0f)
+			,m_showDebug(false)
 		{
 		}
 
@@ -440,6 +441,10 @@ namespace ndQuadruped_1
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
+			if (!m_showDebug)
+			{
+				return;
+			}
 			ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
 			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
 			
@@ -708,6 +713,7 @@ namespace ndQuadruped_1
 		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 		ndSharedPtr<ndBrainAgent> m_agent;
 		ndFloat32 m_timestep;
+		bool m_showDebug;
 	};
 
 	class ndModelUI : public ndUIEntity
@@ -957,7 +963,7 @@ namespace ndQuadruped_1
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> (new ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
-			m_bestActor = ndSharedPtr< ndBrain> (new ndBrain(*m_master->GetActor()));
+			m_bestActor = ndSharedPtr<ndBrain> (new ndBrain(*m_master->GetActor()));
 
 			m_master->SetName(CONTROLLER_NAME);
 
@@ -986,6 +992,7 @@ namespace ndQuadruped_1
 				}
 			}
 			scene->SetAcceleratedUpdate();
+			((ndRobot*)*visualModel)->m_showDebug = true;
 		}
 
 		~TrainingUpdata()
