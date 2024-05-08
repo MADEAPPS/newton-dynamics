@@ -1071,7 +1071,7 @@ namespace ndQuadruped_3
 						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, parentNode->m_body->GetAsBodyDynamic(), modelRoot->m_body->GetAsBodyDynamic());
 		
 						effector->SetSwivelMode(false);
-						effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+						effector->SetLinearSpringDamper(regularizer, 5000.0f, 50.0f);
 						//effector->SetAngularSpringDamper(regularizer, 5000.0f, 50.0f);
 		
 						const ndVector elbowPoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
@@ -1130,7 +1130,7 @@ namespace ndQuadruped_3
 			,m_maxScore(ndFloat32(-1.0e10f))
 			,m_maxFrames(1000)
 			,m_lastEpisode(-1)
-			,m_stopTraining(200 * 1000000)
+			,m_stopTraining(1000 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -1146,7 +1146,7 @@ namespace ndQuadruped_3
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			
 			//hyperParameters.m_threadsCount = 4;
-			hyperParameters.m_discountFactor = ndReal(0.99f);
+			hyperParameters.m_discountFactor = ndReal(0.995f);
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 			
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>(new ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
@@ -1338,10 +1338,9 @@ namespace ndQuadruped_3
 
 	ndSharedPtr<ndBrainAgent> BuildAgent()
 	{
-		//char fileName[1024];
-		//ndGetWorkingFileName(CONTROLLER_NAME, fileName);
-		//ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-		ndSharedPtr<ndBrain> actor;
+		char fileName[1024];
+		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
+		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
 		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndController(actor));
 		return agent;
 	}
@@ -1386,7 +1385,7 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	scene->Set2DDisplayRenderFunction(quadrupedUI);
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
+	//world->AddJoint(fixJoint);
 
 	//ndVector posit(matrix.m_posit);
 	//posit.m_x += 1.5f;
