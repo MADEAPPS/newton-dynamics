@@ -73,6 +73,11 @@ class ndFloatExceptions
 			return m_val;
 		}
 
+		T operator++(int)
+		{
+			return fetch_add(1);
+		}
+
 		T load() const
 		{
 			return m_val;
@@ -138,10 +143,12 @@ class ndSpinLock
 	{
 	}
 
+	#ifndef D_USE_THREAD_EMULATION
 	ndSpinLock(ndSpinLock const& other)
-		#ifndef D_USE_THREAD_EMULATION
 		:m_lock(other.m_lock.load())
-		#endif
+	#else
+		ndSpinLock(ndSpinLock const&)
+	#endif
 	{
 	}
 
