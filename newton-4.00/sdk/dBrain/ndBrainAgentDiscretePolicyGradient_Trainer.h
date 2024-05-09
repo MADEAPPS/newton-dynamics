@@ -561,7 +561,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	auto CalculateAdvantage = ndMakeObject::ndFunction([this, &iterator, &rewardVariance](ndInt32 threadIndex, ndInt32)
 	{
 		ndBrainFixSizeVector<1> actions;
-		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex], m_baseValueWorkingBufferSize);
+		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
 
 		ndInt32 const count = m_trajectoryAccumulator.GetCount();
 		for (ndInt32 i = iterator++; i < count; i = iterator++)

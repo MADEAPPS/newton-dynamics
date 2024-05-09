@@ -555,37 +555,39 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	ndBrainFixSizeVector<D_MAX_THREADS_COUNT> averageRewards;
 
 	averageRewards.Set(ndBrainFloat(0.0f));
-	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * GetThreadCount());
-	const ndInt32 maxSteps = m_trajectoryAccumulator.GetCount() & -m_bashBufferSize;
+	const ndInt32 maxSteps = (m_trajectoryAccumulator.GetCount() & -m_bashBufferSize) - m_bashBufferSize;
 	for (ndInt32 base = 0; base < maxSteps; base += m_bashBufferSize)
 	{
 		auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, base, maxSteps, &averageRewards](ndInt32 threadIndex, ndInt32)
 		{
-			//class ndPolicyLoss : public ndBrainLossHuber
 			class ndPolicyLoss : public	ndBrainLossLeastSquaredError
 			{
 				public:
 				ndPolicyLoss()
-					//:ndBrainLossHuber(1)
 					:ndBrainLossLeastSquaredError(1)
-					,m_lossValid(true)
 				{
 				}
-	
+
 				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 				{
-					loss.Set(m_truth);
-					if (!m_lossValid)
-					{
-						SetTruth(output);
-					}
-					//ndBrainLossHuber::GetLoss(output, loss);
 					ndBrainLossLeastSquaredError::GetLoss(output, loss);
 				}
-	
-				bool m_lossValid;
 			};
-	
+
+			//class ndPolicyLoss : public ndBrainLossHuber
+			//{
+			//	public:
+			//	ndPolicyLoss()
+			//		:ndBrainLossHuber(1)
+			//	{
+			//	}
+			//
+			//	void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+			//	{
+			//		ndBrainLossHuber::GetLoss(output, loss);
+			//	}
+			//};
+
 			ndPolicyLoss loss;
 			ndBrainFixSizeVector<1> stateValue;
 			ndBrainFixSizeVector<statesDim> zeroObservations;
@@ -596,20 +598,12 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 			{
 				ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
 				ndInt32 index = base + i;
-				if (index < maxSteps)
-				{
-					const ndBrainMemVector observation(&m_trajectoryAccumulator[ndInt32(index)].m_observation[0], statesDim);
-					stateValue[0] = m_trajectoryAccumulator[ndInt32(index)].m_reward;
-					averageRewards[threadIndex] += stateValue[0];
-					loss.SetTruth(stateValue);
-					trainer.BackPropagate(observation, loss);
-				}
-				else
-				{
-					loss.m_lossValid = false;
-					trainer.BackPropagate(zeroObservations, loss);
-				}
-			}
+				const ndBrainMemVector observation(&m_trajectoryAccumulator[ndInt32(index)].m_observation[0], statesDim);
+				stateValue[0] = m_trajectoryAccumulator[ndInt32(index)].m_reward;
+				averageRewards[threadIndex] += stateValue[0];
+				loss.SetTruth(stateValue);
+				trainer.BackPropagate(observation, loss);
+		}
 		});
 	
 		iterator = 0;
@@ -622,23 +616,26 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	{
 		averageSum += averageRewards[i];
 	}
-	m_averageScore.Update(averageSum / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
-	m_averageFramesPerEpisodes.Update(ndBrainFloat(m_trajectoryAccumulator.GetCount()) / ndBrainFloat(m_bashTrajectoryCount));
+	m_averageScore.Update(averageSum / ndBrainFloat(maxSteps));
+	m_averageFramesPerEpisodes.Update(ndBrainFloat(maxSteps) / ndBrainFloat(m_bashTrajectoryCount));
 
 	ndBrainFixSizeVector<D_MAX_THREADS_COUNT> rewardVariance;
 
 	rewardVariance.Set(ndBrainFloat(0.0f));
+	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * GetThreadCount());
 	auto CalculateAdvantage = ndMakeObject::ndFunction([this, &iterator, &rewardVariance](ndInt32 threadIndex, ndInt32)
 	{
 		ndBrainFixSizeVector<1> actions;
-		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex], m_baseValueWorkingBufferSize);
+		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
 
 		ndInt32 const count = m_trajectoryAccumulator.GetCount();
 		for (ndInt32 i = iterator++; i < count; i = iterator++)
 		{
 			const ndBrainMemVector observation(&m_trajectoryAccumulator[i].m_observation[0], statesDim);
 			m_baseLineValue.MakePrediction(observation, actions, workingBuffer);
-			ndBrainFloat advantage = m_trajectoryAccumulator[i].m_reward - actions[0];
+			ndBrainFloat baseLine = actions[0];
+			ndBrainFloat reward = m_trajectoryAccumulator[i].m_reward;
+			ndBrainFloat advantage = reward - baseLine;
 			m_trajectoryAccumulator[i].m_reward = advantage;
 			rewardVariance[threadIndex] += advantage * advantage;
 		}
