@@ -139,6 +139,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 			m_maxTrajectorySteps = 1024 * 2;
 			m_extraTrajectorySteps = 1024 * 2;
 			m_hiddenLayersNumberOfNeurons = 64;
+			m_baseLineOptimizationPases = 2;
 
 			ndBrainFloat sigma2 = ndBrainFloat(0.05f);
 			//ndBrainFloat sigma2 = ndBrainFloat(0.1f);
@@ -171,6 +172,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_bashTrajectoryCount;
 		ndInt32 m_extraTrajectorySteps;
 		ndInt32 m_numberOfHiddenLayers;
+		ndInt32 m_baseLineOptimizationPases;
 		ndInt32 m_hiddenLayersNumberOfNeurons;
 		ndUnsigned32 m_randomSeed;
 		bool m_useConstantSigma;
@@ -220,6 +222,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_extraTrajectorySteps;
 	ndInt32 m_bashTrajectoryIndex;
 	ndInt32 m_bashTrajectoryCount;
+	ndInt32 m_baseLineOptimizationPases;
 	ndInt32 m_baseValueWorkingBufferSize;
 	ndUnsigned32 m_randomSeed;
 	ndBrainVector m_workingBuffer;
@@ -368,6 +371,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	,m_extraTrajectorySteps(hyperParameters.m_extraTrajectorySteps)
 	,m_bashTrajectoryIndex(0)
 	,m_bashTrajectoryCount(hyperParameters.m_bashTrajectoryCount)
+	,m_baseLineOptimizationPases(hyperParameters.m_baseLineOptimizationPases)
 	,m_baseValueWorkingBufferSize(0)
 	,m_randomSeed(hyperParameters.m_randomSeed)
 	,m_workingBuffer()
@@ -551,14 +555,14 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Sav
 	agent->m_trajectory.SetCount(0);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeCritic()
 {
 	ndAtomic<ndInt32> iterator(0);
 	const ndInt32 maxSteps = (m_trajectoryAccumulator.GetCount() & -m_bashBufferSize) - m_bashBufferSize;
 
-	for (ndInt32 passes = 0; passes < 4; ++passes)
+	for (ndInt32 passes = 0; passes < m_baseLineOptimizationPases; ++passes)
 	{
 		for (ndInt32 base = 0; base < maxSteps; base += m_bashBufferSize)
 		{
