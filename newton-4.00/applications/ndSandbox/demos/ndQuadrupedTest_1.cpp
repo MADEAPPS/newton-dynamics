@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	class ndLegObservation
@@ -901,8 +901,8 @@ namespace ndQuadruped_1
 		
 				ndFloat32 regularizer = 0.001f;
 				ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame.m_posit, effectorRefFrame, targetBody, torso->GetAsBodyKinematic());
-				effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
-				effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+				effector->SetLinearSpringDamper(regularizer, 4000.0f, 50.0f);
+				effector->SetAngularSpringDamper(regularizer, 4000.0f, 50.0f);
 				effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
 		
 				ndRobot::ndEffectorInfo info(ndSharedPtr<ndJointBilateralConstraint>(effector), footHinge);
