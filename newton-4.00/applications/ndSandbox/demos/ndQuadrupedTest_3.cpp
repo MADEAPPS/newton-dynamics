@@ -58,7 +58,7 @@ namespace ndQuadruped_3
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.40f)
-	#define D_MAX_SWING_DIST_Z		ndReal(0.12f)
+	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
 	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
 
 	//#define D_SWING_STEP			ndReal(0.01f)
@@ -853,24 +853,28 @@ namespace ndQuadruped_3
 			}
 			
 			ndBrainFloat reward = ndBrainFloat(0.0f);
+			const ndVector zmp(CalculateZeroMomentPoint());
 			if (desiredSupportPoint.GetCount() >= 3)
 			{
-				const ndVector zmp(CalculateZeroMomentPoint());
-			
 				ndBigVector p0Out;
 				ndBigVector p1Out;
 				ndBigVector ray_p0(zmp);
 				ndBigVector ray_p1(zmp);
 				ray_p1.m_y -= ndFloat32(1.5f);
-				ndRayToPolygonDistance(ray_p0, ray_p1, &desiredSupportPoint[0], desiredSupportPoint.GetCount(), p0Out, p1Out);
-				ndBigVector error((p0Out - p1Out) & ndBigVector::m_triplexMask);
-			
+				#if 1
+					ndRayToPolygonDistance(ray_p0, ray_p1, &desiredSupportPoint[0], desiredSupportPoint.GetCount(), p0Out, p1Out);
+				#else
+					ndVector center(ndVector::m_zero);
+					for (ndInt32 i = desiredSupportPoint.GetCount() - 1; i >= 0; --i)
+					{
+						center += desiredSupportPoint[i];
+					}
+					center = center.Scale(1.0f / ndFloat32(desiredSupportPoint.GetCount()));
+					p0Out = ndBigVector(center);
+					p1Out = ndPointToRayDistance(ndBigVector(p0Out), ray_p0, ray_p1);
+				#endif	
+				const ndBigVector error((p0Out - p1Out) & ndBigVector::m_triplexMask);
 				ndFloat32 dist2 = ndFloat32(error.DotProduct(error).GetScalar());
-			
-				//ndFloat32 dist = ndFloat32(1.0f) - ndFloat32 (ndSqrt (error.DotProduct(error).GetScalar()));
-				//ndFloat32 dist = ndFloat32(1.0f) - ndFloat32 (error.DotProduct(error).GetScalar());
-				//reward = (dist2 < ndBrainFloat(1.0e-5f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-				//reward = ndBrainFloat(ndExp(-ndBrainFloat(200.0f) * dist2));
 				reward = ndBrainFloat(ndExp(-ndBrainFloat(1000.0f) * dist2));
 				//ndTrace(("d2(% f) r(% f)\n", dist2, reward));
 			}
