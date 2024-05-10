@@ -58,7 +58,7 @@ namespace ndQuadruped_3
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.40f)
-	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
+	#define D_MAX_SWING_DIST_Z		ndReal(0.17f)
 	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
 
 	//#define D_SWING_STEP			ndReal(0.01f)
@@ -494,10 +494,11 @@ namespace ndQuadruped_3
 				{
 					m_basePose[i].SetPose(x0, z0);
 				}
-				//ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
-				//ndUnsigned32 randomeStart = ndRandInt() % 4;
-				//m_model->m_animBlendTree->SetTime(ndFloat32(randomeStart) * duration * 0.25f);
-				m_model->m_animBlendTree->SetTime(0.0f);
+				ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
+				ndUnsigned32 randomeStart = ndRandInt() % 2;
+				ndUnsigned32 index = randomeStart * 2 + 1;
+				m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
+				//m_model->m_animBlendTree->SetTime(0.0f);
 				
 				ndFloat32 randVar = ndRand();
 				randVar = randVar * randVar * randVar;
