@@ -154,7 +154,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 			m_useConstantSigma = true;
 
 			m_criticLearnRate = ndBrainFloat(0.0005f);
-			m_policyLearnRate = ndBrainFloat(0.0001f);
+			m_policyLearnRate = ndBrainFloat(0.0002f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
@@ -666,7 +666,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	}
 
 	rewardVarianceSum /= ndBrainFloat(m_trajectoryAccumulator.GetCount());
-	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(rewardVarianceSum + ndBrainFloat(1.0e-6)));
+	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(rewardVarianceSum + ndBrainFloat(1.0e-4f)));
 	ndInt32 newCount = m_trajectoryAccumulator.GetCount();
 	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
 	{

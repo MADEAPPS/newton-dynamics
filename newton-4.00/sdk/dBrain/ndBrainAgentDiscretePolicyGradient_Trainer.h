@@ -113,10 +113,11 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 			m_maxTrajectorySteps = 1024 * 2;
 			m_extraTrajectorySteps = 1024 * 2;
 			m_hiddenLayersNumberOfNeurons = 64;
+			m_baseLineOptimizationPases = 2;
 
 			m_randomSeed = 47;
 			m_criticLearnRate = ndBrainFloat(0.0005f);
-			m_policyLearnRate = ndBrainFloat(0.0001f);
+			m_policyLearnRate = ndBrainFloat(0.0002f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
@@ -133,6 +134,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_bashTrajectoryCount;
 		ndInt32 m_extraTrajectorySteps;
 		ndInt32 m_numberOfHiddenLayers;
+		ndInt32 m_baseLineOptimizationPases;
 		ndInt32 m_hiddenLayersNumberOfNeurons;
 		ndUnsigned32 m_randomSeed;
 	};
@@ -166,6 +168,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndArray<ndBrainTrainer*> m_weightedTrainer;
 	ndArray<ndBrainTrainer*> m_auxiliaryTrainers;
 	ndBrainOptimizerAdam* m_baseLineValueOptimizer;
+	ndArray<ndInt32> m_randomPermutation;
 	ndArray<ndBrainTrainer*> m_baseLineValueTrainers;
 	ndArray<typename ndBrainAgentDiscretePolicyGradient_Trainer<statesDim, actionDim>::ndTrajectoryStep> m_trajectoryAccumulator;
 
@@ -180,6 +183,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_extraTrajectorySteps;
 	ndInt32 m_bashTrajectoryIndex;
 	ndInt32 m_bashTrajectoryCount;
+	ndInt32 m_baseLineOptimizationPases;
 	ndInt32 m_baseValueWorkingBufferSize;
 	ndUnsigned32 m_randomSeed;
 	ndBrainVector m_workingBuffer;
@@ -312,6 +316,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	,m_extraTrajectorySteps(hyperParameters.m_extraTrajectorySteps)
 	,m_bashTrajectoryIndex(0)
 	,m_bashTrajectoryCount(hyperParameters.m_bashTrajectoryCount)
+	,m_baseLineOptimizationPases(hyperParameters.m_baseLineOptimizationPases)
 	,m_baseValueWorkingBufferSize(0)
 	,m_randomSeed(hyperParameters.m_randomSeed)
 	,m_workingBuffer()
@@ -487,68 +492,74 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::Sav
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeCritic()
 {
-	ndAtomic<ndInt32> iterator(0);
-	ndBrainFixSizeVector<D_MAX_THREADS_COUNT> averageRewards;
-
-	averageRewards.Set(ndBrainFloat(0.0f));
-	const ndInt32 maxSteps = m_trajectoryAccumulator.GetCount() & -m_bashBufferSize;
-	for (ndInt32 base = 0; base < maxSteps; base += m_bashBufferSize)
+	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount());
+	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
 	{
-		auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, base, maxSteps, &averageRewards](ndInt32 threadIndex, ndInt32)
+		m_randomPermutation[i] = i;
+	}
+
+	ndAtomic<ndInt32> iterator(0);
+	const ndInt32 maxSteps = m_trajectoryAccumulator.GetCount() & -m_bashBufferSize;
+	for (ndInt32 passes = 0; passes < m_baseLineOptimizationPases; ++passes)
+	{
+		m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
+		for (ndInt32 base = 0; base < maxSteps; base += m_bashBufferSize)
 		{
-			class ndPolicyLoss : public	ndBrainLossLeastSquaredError
+			auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, base](ndInt32 threadIndex, ndInt32)
 			{
-				public:
-				ndPolicyLoss()
-					:ndBrainLossLeastSquaredError(1)
+				class ndPolicyLoss : public	ndBrainLossLeastSquaredError
 				{
-				}
+					public:
+					ndPolicyLoss()
+						:ndBrainLossLeastSquaredError(1)
+					{
+					}
 
-				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+					void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+					{
+						ndBrainLossLeastSquaredError::GetLoss(output, loss);
+					}
+				};
+
+				//class ndPolicyLoss : public ndBrainLossHuber
+				//{
+				//	public:
+				//	ndPolicyLoss()
+				//		:ndBrainLossHuber(1)
+				//	{
+				//	}
+				//
+				//	void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+				//	{
+				//		ndBrainLossHuber::GetLoss(output, loss);
+				//	}
+				//};
+
+				ndPolicyLoss loss;
+				ndBrainFixSizeVector<1> stateValue;
+				ndBrainFixSizeVector<statesDim> zeroObservations;
+
+				zeroObservations.Set(ndBrainFloat(0.0f));
+				for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
 				{
-					ndBrainLossLeastSquaredError::GetLoss(output, loss);
+					ndInt32 index = m_randomPermutation[base + i];
+					ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
+					ndInt32 index = base + i;
+					const ndBrainMemVector observation(&m_trajectoryAccumulator[index].m_observation[0], statesDim);
+					stateValue[0] = m_trajectoryAccumulator[index].m_reward;
+					loss.SetTruth(stateValue);
+					trainer.BackPropagate(observation, loss);
 				}
-			};
+			});
 
-			//class ndPolicyLoss : public ndBrainLossHuber
-			//{
-			//	public:
-			//	ndPolicyLoss()
-			//		:ndBrainLossHuber(1)
-			//	{
-			//	}
-			//
-			//	void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
-			//	{
-			//		ndBrainLossHuber::GetLoss(output, loss);
-			//	}
-			//};
-
-			ndPolicyLoss loss;
-			ndBrainFixSizeVector<1> stateValue;
-			ndBrainFixSizeVector<statesDim> zeroObservations;
-
-			zeroObservations.Set(ndBrainFloat(0.0f));
-			for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
-			{
-				ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
-				ndInt32 index = base + i;
-				const ndBrainMemVector observation(&m_trajectoryAccumulator[ndInt32(index)].m_observation[0], statesDim);
-
-				stateValue[0] = m_trajectoryAccumulator[ndInt32(index)].m_reward;
-				averageRewards[threadIndex] += stateValue[0];
-				loss.SetTruth(stateValue);
-				trainer.BackPropagate(observation, loss);
-			}
-		});
-
-		iterator = 0;
-		ndBrainThreadPool::ParallelExecute(BackPropagateBash);
-		m_baseLineValueOptimizer->Update(this, m_baseLineValueTrainers, m_criticLearnRate);
+			iterator = 0;
+			ndBrainThreadPool::ParallelExecute(BackPropagateBash);
+			m_baseLineValueOptimizer->Update(this, m_baseLineValueTrainers, m_criticLearnRate);
+		}
 	}
 
 	ndBrainFloat averageSum = ndBrainFloat(0.0f);
-	for (ndInt32 i = GetThreadCount() - 1; i >= 0; --i)
+	for (ndInt32 i = m_trajectoryAccumulator.GetCount(); i >= 0; --i)
 	{
 		averageSum += averageRewards[i];
 	}
@@ -585,7 +596,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	}
 
 	rewardVarianceSum /= ndBrainFloat(m_trajectoryAccumulator.GetCount());
-	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(rewardVarianceSum + ndBrainFloat(1.0e-6)));
+	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(rewardVarianceSum + ndBrainFloat(1.0e-4f)));
 	ndInt32 newCount = m_trajectoryAccumulator.GetCount();
 	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
 	{
