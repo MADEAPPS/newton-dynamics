@@ -171,15 +171,15 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 	// build actor network
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 	layers.SetCount(0);
-	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_hiddenLayersNumberOfNeurons));
+	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_neuronPerLayers));
 	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
+	for (ndInt32 i = 1; i < hyperParameters.m_numberOfLayers; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeurons);
-		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, hyperParameters.m_hiddenLayersNumberOfNeurons));
-		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons));
+		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, hyperParameters.m_neuronPerLayers));
+		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_neuronPerLayers));
 	}
-	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, actionDim));
+	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, actionDim));
 	layers.PushBack(new ndBrainLayerTanhActivation(actionDim));
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
@@ -189,15 +189,15 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 
 	// the critic is more complex since is deal with more complex inputs
 	layers.SetCount(0);
-	layers.PushBack(new ndBrainLayerLinear(statesDim + actionDim, hyperParameters.m_hiddenLayersNumberOfNeurons * 2));
+	layers.PushBack(new ndBrainLayerLinear(statesDim + actionDim, hyperParameters.m_neuronPerLayers * 2));
 	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
+	for (ndInt32 i = 1; i < hyperParameters.m_numberOfLayers; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeurons * 2);
-		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons * 2, hyperParameters.m_hiddenLayersNumberOfNeurons * 2));
-		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons * 2));
+		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers * 2, hyperParameters.m_neuronPerLayers * 2));
+		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_neuronPerLayers * 2));
 	}
-	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons * 2, 1));
+	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers * 2, 1));
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		m_critic.AddLayer(layers[i]);

@@ -107,15 +107,15 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		public:
 		HyperParameters()
 		{
-			m_bashBufferSize = 32;
-			m_bashTrajectoryCount = 100;
-			m_numberOfHiddenLayers = 4;
-			m_maxTrajectorySteps = 1024 * 2;
-			m_extraTrajectorySteps = 1024 * 2;
-			m_hiddenLayersNumberOfNeurons = 64;
-			m_baseLineOptimizationPases = 2;
-
 			m_randomSeed = 47;
+			m_numberOfLayers = 4;
+			m_bashBufferSize = 64;
+			m_neuronsPerLayers = 64;
+			m_bashTrajectoryCount = 100;
+			m_maxTrajectorySteps = 4096;
+			m_extraTrajectorySteps = 1024;
+			m_baseLineOptimizationPases = 4;
+
 			m_criticLearnRate = ndBrainFloat(0.0005f);
 			m_policyLearnRate = ndBrainFloat(0.0002f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
@@ -133,9 +133,9 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_maxTrajectorySteps;
 		ndInt32 m_bashTrajectoryCount;
 		ndInt32 m_extraTrajectorySteps;
-		ndInt32 m_numberOfHiddenLayers;
+		ndInt32 m_numberOfLayers;
 		ndInt32 m_baseLineOptimizationPases;
-		ndInt32 m_hiddenLayersNumberOfNeurons;
+		ndInt32 m_neuronsPerLayers;
 		ndUnsigned32 m_randomSeed;
 	};
 
@@ -331,15 +331,15 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
 	layers.SetCount(0);
-	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_hiddenLayersNumberOfNeurons));
+	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_neuronPerLayers));
 	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
+	for (ndInt32 i = 1; i < hyperParameters.m_numberOfLayers; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeurons);
-		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, hyperParameters.m_hiddenLayersNumberOfNeurons));
-		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_hiddenLayersNumberOfNeurons));
+		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, hyperParameters.m_neuronPerLayers));
+		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_neuronPerLayers));
 	}
-	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, actionDim));
+	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, actionDim));
 	layers.PushBack(new ndBrainLayerSoftmaxActivation(actionDim));
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
@@ -365,12 +365,12 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 
 	// build state value critic neural net
 	layers.SetCount(0);
-	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_hiddenLayersNumberOfNeurons * 2));
+	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_neuronPerLayers * 2));
 	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
+	for (ndInt32 i = 1; i < hyperParameters.m_numberOfLayers; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeurons * 2);
-		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hyperParameters.m_hiddenLayersNumberOfNeurons * 2));
+		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hyperParameters.m_neuronPerLayers * 2));
 		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
