@@ -52,13 +52,12 @@ namespace ndQuadruped_3
 		public:
 		ndLegObservation n_legs[4];
 		ndActionVector m_torso;
-		ndFloat32 m_animTime;
 	};
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.40f)
-	#define D_MAX_SWING_DIST_Z		ndReal(0.12f)
+	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
 	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
 
 	//#define D_SWING_STEP			ndReal(0.01f)
@@ -812,7 +811,7 @@ namespace ndQuadruped_3
 
 			observation.m_torso.m_x = m_control->m_x;
 			observation.m_torso.m_z = m_control->m_z;
-			observation.m_animTime = m_poseGenerator->GetTime();
+			//observation.m_animTime = m_poseGenerator->GetTime();
 			//ndTrace(("%f\n", observation.m_animTime));
 		}
 
@@ -999,7 +998,7 @@ namespace ndQuadruped_3
 		//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		//matrix.m_posit.m_y = floor.m_y;
 		
-		matrix.m_posit.m_y += 0.1f;
+		matrix.m_posit.m_y += 0.05f;
 		rootEntity->ResetMatrix(matrix);
 		
 		// add the root body
@@ -1392,6 +1391,7 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndModel> model(BuildModel(scene, modelMesh, matrix, BuildAgent()));
 	world->AddModel(model);
 	scene->SetSelectedModel(*model);
+	((ndRobot*)*model)->m_showDebug = true;
 
 	ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model));
 	scene->Set2DDisplayRenderFunction(quadrupedUI);
