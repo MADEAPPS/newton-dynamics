@@ -557,7 +557,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Sav
 	agent->m_trajectory.SetCount(0);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeCritic()
 {
@@ -837,7 +837,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	OptimizePolicy();
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeStep()
 {
@@ -857,8 +857,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 				m_trajectoryAccumulator.SetCount(0);
 				for (node = m_agents.GetFirst(); node; node = node->GetNext())
 				{
-					ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>* const agent = node->GetInfo();
-					agent->m_trajectory.SetCount(0);
+					node->GetInfo()->m_trajectory.SetCount(0);
 				}
 				node = m_agents.GetLast();
 				m_eposideCount++;
