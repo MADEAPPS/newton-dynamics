@@ -25,7 +25,7 @@
 
 namespace ndQuadruped_3
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndSpot-VPG.dnn"
 
 	class ndLegObservation
@@ -58,7 +58,7 @@ namespace ndQuadruped_3
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.40f)
-	#define D_MAX_SWING_DIST_Z		ndReal(0.17f)
+	#define D_MAX_SWING_DIST_Z		ndReal(0.12f)
 	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
 
 	//#define D_SWING_STEP			ndReal(0.01f)
