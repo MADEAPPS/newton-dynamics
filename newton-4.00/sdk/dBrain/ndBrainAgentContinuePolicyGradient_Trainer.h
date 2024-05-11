@@ -222,7 +222,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_maxTrajectorySteps;
 	ndInt32 m_extraTrajectorySteps;
 	ndInt32 m_bashTrajectoryIndex;
-	ndInt32 m_bashTrajectoryCount;
+	//ndInt32 m_bashTrajectoryCount;
+	ndInt32 m_bashTrajectorySteps;
 	ndInt32 m_baseLineOptimizationPases;
 	ndInt32 m_baseValueWorkingBufferSize;
 	ndUnsigned32 m_randomSeed;
@@ -372,7 +373,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	,m_maxTrajectorySteps(hyperParameters.m_maxTrajectorySteps)
 	,m_extraTrajectorySteps(hyperParameters.m_extraTrajectorySteps)
 	,m_bashTrajectoryIndex(0)
-	,m_bashTrajectoryCount(hyperParameters.m_bashTrajectoryCount)
+	, m_bashTrajectorySteps(hyperParameters.m_bashTrajectoryCount * m_maxTrajectorySteps)
 	,m_baseLineOptimizationPases(hyperParameters.m_baseLineOptimizationPases)
 	,m_baseValueWorkingBufferSize(0)
 	,m_randomSeed(hyperParameters.m_randomSeed)
@@ -540,16 +541,15 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Sav
 	// remove last step because if it was a dead state, it will provide misleading feedback.
 	agent->m_trajectory.SetCount(agent->m_trajectory.GetCount() - 1);
 
-	// get the max trajectory steps
-	const ndInt32 maxSteps = ndMin(agent->m_trajectory.GetCount(), m_maxTrajectorySteps);
-	ndAssert(maxSteps > 0);
-
 	// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 	for (ndInt32 i = agent->m_trajectory.GetCount() - 2; i >= 0; --i)
 	{
 		agent->m_trajectory[i].m_reward += m_gamma * agent->m_trajectory[i + 1].m_reward;
 	}
 
+	// get the max trajectory steps
+	const ndInt32 maxSteps = ndMin(agent->m_trajectory.GetCount(), m_maxTrajectorySteps);
+	ndAssert(maxSteps > 0);
 	for (ndInt32 i = 0; i < maxSteps; ++i)
 	{
 		m_trajectoryAccumulator.PushBack(agent->m_trajectory[i]);
@@ -557,7 +557,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Sav
 	agent->m_trajectory.SetCount(0);
 }
 
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeCritic()
 {
@@ -632,7 +632,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 		averageSum += m_trajectoryAccumulator[i].m_reward;
 	}
 	m_averageScore.Update(averageSum / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
-	m_averageFramesPerEpisodes.Update(ndBrainFloat(m_trajectoryAccumulator.GetCount()) / ndBrainFloat(m_bashTrajectoryCount));
+	m_averageFramesPerEpisodes.Update(ndBrainFloat(m_trajectoryAccumulator.GetCount()) / ndBrainFloat(m_bashTrajectoryIndex));
 
 	ndBrainFixSizeVector<D_MAX_THREADS_COUNT> rewardVariance;
 
@@ -837,7 +837,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	OptimizePolicy();
 }
 
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeStep()
 {
@@ -850,14 +850,15 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 		{
 			SaveTrajectory(agent);
 			m_bashTrajectoryIndex++;
-			if (m_bashTrajectoryIndex >= m_bashTrajectoryCount)
+			//if (m_bashTrajectoryIndex >= m_bashTrajectoryCount)
+			if (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps)
 			{
 				Optimize();
 				m_trajectoryAccumulator.SetCount(0);
-				for (node = node->GetNext(); node; node = node->GetNext())
+				for (node = m_agents.GetFirst(); node; node = node->GetNext())
 				{
-					ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>* const nextAgent = node->GetInfo();
-					nextAgent->m_trajectory.SetCount(0);
+					ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>* const agent = node->GetInfo();
+					agent->m_trajectory.SetCount(0);
 				}
 				node = m_agents.GetLast();
 				m_eposideCount++;
