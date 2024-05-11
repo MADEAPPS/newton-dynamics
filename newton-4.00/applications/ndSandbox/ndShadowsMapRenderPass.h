@@ -16,7 +16,7 @@
 class ndDemoEntity;
 class ndDemoEntityManager;
 
-#define ND_SHADOW_MAP_RESOLUTION (1024 * 2)
+#define ND_SHADOW_MAP_RESOLUTION (1024 * 4)
 
 class ndShadowMapRenderPass: public ndRenderPass
 {
