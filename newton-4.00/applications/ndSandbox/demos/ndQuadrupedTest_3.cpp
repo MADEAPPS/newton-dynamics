@@ -37,7 +37,8 @@ namespace ndQuadruped_3
 		ndBrainFloat m_veloc_x;
 		ndBrainFloat m_veloc_y;
 		ndBrainFloat m_veloc_z;
-		ndBrainFloat m_isLegLifted;
+		ndBrainFloat m_hasContact;
+		ndBrainFloat m_animSequence;
 	};
 
 	class ndActionVector
@@ -806,7 +807,8 @@ namespace ndQuadruped_3
 				observation.n_legs[i].m_veloc_x = ndBrainFloat(effectVelocState.m_x);
 				observation.n_legs[i].m_veloc_y = ndBrainFloat(effectVelocState.m_y);
 				observation.n_legs[i].m_veloc_z = ndBrainFloat(effectVelocState.m_z);
-				observation.n_legs[i].m_isLegLifted = FindContact(i) ? ndBrainFloat(0.0f) : ndBrainFloat(1.0f);;
+				observation.n_legs[i].m_hasContact = ndBrainFloat (FindContact(i) ? 1.0f : 0.0f);
+				observation.n_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamInt ? 1.0f : 0.0f);
 			}
 
 			observation.m_torso.m_x = m_control->m_x;
