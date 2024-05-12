@@ -57,7 +57,7 @@ namespace ndQuadruped_3
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
-	#define D_MAX_SWING_DIST_X		ndReal(0.40f)
+	#define D_MAX_SWING_DIST_X		ndReal(0.35f)
 	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
 	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
 
@@ -486,8 +486,6 @@ namespace ndQuadruped_3
 			{
 				m_model->m_control->Reset();
 
-				//ndFloat32 x0 = 10.0f * (ndRand() - 0.5f);
-				//ndFloat32 z0 = 10.0f * (ndRand() - 0.5f);
 				ndFloat32 x0 = 0.0f;
 				ndFloat32 z0 = 0.0f;
 				for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
@@ -502,9 +500,9 @@ namespace ndQuadruped_3
 				//m_model->m_animBlendTree->SetTime(0.0f);
 				
 				ndFloat32 randVar = ndRand();
-				randVar = randVar * randVar * randVar;
-				ndFloat32 speed0 = ndFloat32(0.125f);
-				ndFloat32 speed1 = ndFloat32(1.0f);
+				randVar = randVar * randVar;
+				ndFloat32 speed0 = ndFloat32(0.05f);
+				ndFloat32 speed1 = ndFloat32(1.5f);
 				ndFloat32 animationSpeed = speed0 + (speed1 - speed0) * randVar;
 				m_model->m_control->m_animSpeed = animationSpeed;
 			}
@@ -1139,7 +1137,7 @@ namespace ndQuadruped_3
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_maxFrames(5000)
+			//,m_maxFrames(5000)
 			,m_lastEpisode(-1)
 			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
@@ -1295,18 +1293,17 @@ namespace ndQuadruped_3
 				m_master->OptimizeStep();
 		
 				episodeCount -= m_master->GetEposideCount();
-				if (m_master->GetAverageFrames() >= ndFloat32(m_maxFrames))
+				ndFloat32 rewardTrajectory = m_master->GetAverageFrames() * m_master->GetAverageScore();
+				if (rewardTrajectory >= ndFloat32(m_maxScore))
 				{
-					if (m_master->GetAverageScore() > m_maxScore)
+					if (m_lastEpisode != m_master->GetEposideCount())
 					{
-						if (m_lastEpisode != m_master->GetEposideCount())
-						{
-							m_bestActor->CopyFrom(*m_master->GetActor());
-							m_maxScore = m_master->GetAverageScore();
-							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", m_master->GetEposideCount(), m_master->GetAverageFrames(), m_master->GetAverageScore());
-							m_lastEpisode = m_master->GetEposideCount();
-						}
+						m_maxScore = rewardTrajectory;
+						m_bestActor->CopyFrom(*m_master->GetActor());
+						ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", m_master->GetEposideCount(), m_master->GetAverageFrames(), m_master->GetAverageScore());
+						m_lastEpisode = m_master->GetEposideCount();
 					}
+
 				}
 		
 				if (episodeCount && !m_master->IsSampling())
@@ -1341,7 +1338,7 @@ namespace ndQuadruped_3
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
-		ndInt32 m_maxFrames;
+		//ndInt32 m_maxFrames;
 		ndInt32 m_lastEpisode;
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;
