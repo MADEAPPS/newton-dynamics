@@ -23,11 +23,12 @@
 
 namespace ndCarpole_0
 {
-	//#define ND_TRAIN_AGENT
-	#define CONTROLLER_NAME "cartpoleDiscreteVPG.dnn"
+	#define ND_TRAIN_AGENT
+	#define CONTROLLER_NAME		"cartpoleDiscreteVPG.dnn"
+	#define CRITIC_NAME			"cartpoleDiscreteCriticVPG.dnn"
 
-	#define D_PUSH_ACCEL			ndFloat32 (15.0f)
-	#define D_REWARD_MIN_ANGLE		ndFloat32 (20.0f * ndDegreeToRad)
+	#define D_PUSH_ACCEL		ndFloat32 (15.0f)
+	#define D_REWARD_MIN_ANGLE	ndFloat32 (20.0f * ndDegreeToRad)
 
 	enum ndActionSpace
 	{
@@ -329,8 +330,9 @@ namespace ndCarpole_0
 			ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 			
 			hyperParameters.m_discountFactor = ndReal(0.99f);
-			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
 			hyperParameters.m_extraTrajectorySteps = 256;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
+			hyperParameters.m_policyLearnRate = hyperParameters.m_policyLearnRate * 2.0f;
 			
 			m_master = ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>(new ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>(hyperParameters));
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetActor()));
@@ -482,6 +484,10 @@ namespace ndCarpole_0
 				ndExpandTraceMessage("training complete\n");
 				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
 				ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+
+				ndGetWorkingFileName(CRITIC_NAME, fileName);
+				m_master->GetCritic()->SaveToFile(fileName);
+
 				manager->Terminate();
 			}
 		}

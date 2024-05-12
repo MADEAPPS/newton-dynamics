@@ -167,13 +167,13 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndBrainFloat m_discountFactor;
 
 		ndInt32 m_threadsCount;
+		ndInt32 m_numberOfLayers;
 		ndInt32 m_bashBufferSize;
+		ndInt32 m_neuronPerLayers;
 		ndInt32 m_maxTrajectorySteps;
 		ndInt32 m_bashTrajectoryCount;
 		ndInt32 m_extraTrajectorySteps;
-		ndInt32 m_numberOfLayers;
 		ndInt32 m_baseLineOptimizationPases;
-		ndInt32 m_neuronPerLayers;
 		ndUnsigned32 m_randomSeed;
 		bool m_useConstantSigma;
 	};
@@ -222,7 +222,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_maxTrajectorySteps;
 	ndInt32 m_extraTrajectorySteps;
 	ndInt32 m_bashTrajectoryIndex;
-	//ndInt32 m_bashTrajectoryCount;
 	ndInt32 m_bashTrajectorySteps;
 	ndInt32 m_baseLineOptimizationPases;
 	ndInt32 m_baseValueWorkingBufferSize;
@@ -611,7 +610,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 				zeroObservations.Set(ndBrainFloat(0.0f));
 				for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
 				{
-					ndInt32 index = m_randomPermutation[base + i];
+					const ndInt32 index = m_randomPermutation[base + i];
 					ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
 					const ndBrainMemVector observation(&m_trajectoryAccumulator[index].m_observation[0], statesDim);
 					stateValue[0] = m_trajectoryAccumulator[index].m_reward;
@@ -850,11 +849,9 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 		{
 			SaveTrajectory(agent);
 			m_bashTrajectoryIndex++;
-			//if (m_bashTrajectoryIndex >= m_bashTrajectoryCount)
 			if (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps)
 			{
 				Optimize();
-				m_trajectoryAccumulator.SetCount(0);
 				for (node = m_agents.GetFirst(); node; node = node->GetNext())
 				{
 					node->GetInfo()->m_trajectory.SetCount(0);
@@ -863,6 +860,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 				m_eposideCount++;
 				m_framesAlive = 0;
 				m_bashTrajectoryIndex = 0;
+				m_trajectoryAccumulator.SetCount(0);
 			}
 			agent->ResetModel();
 		}
