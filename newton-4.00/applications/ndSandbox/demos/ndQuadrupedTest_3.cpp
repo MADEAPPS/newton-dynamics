@@ -1137,7 +1137,6 @@ namespace ndQuadruped_3
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			//,m_maxFrames(5000)
 			,m_lastEpisode(-1)
 			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
