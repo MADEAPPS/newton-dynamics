@@ -685,60 +685,6 @@ namespace ndQuadruped_3
 			return com;
 		}
 
-		ndVector CalculateZeroMomentPoint___() const
-		{
-		}
-
-		ndVector CalculateZeroMomentPoint() const
-		{
-			ndFixSizeArray<ndVector, 32> r;
-			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
-
-			ndVector com(ndVector::m_zero);
-			ndFloat32 totalMass = ndFloat32(0.0f);
-			for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			{
-				const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-
-				const ndMatrix matrix(body->GetMatrix());
-				const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
-				ndFloat32 mass = body->GetMassMatrix().m_w;
-				totalMass += mass;
-				com += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
-
-				r.PushBack(bodyCom);
-				bodies.PushBack(body);
-			}
-			com = com.Scale(ndFloat32(1.0f) / totalMass);
-
-			ndVector force(ndVector::m_zero);
-			ndVector torque(ndVector::m_zero);
-			const ndVector gravity(ndFloat32(0.0f), DEMO_GRAVITY, ndFloat32(0.0f), ndFloat32(0.0f));
-			for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
-			{
-				const ndVector centerOfMass(r[i] - com);
-				const ndBodyKinematic* const body = bodies[i];
-				const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
-				const ndVector bodyForce((body->GetAccel() - gravity).Scale(body->GetMassMatrix().m_w));
-
-				force += bodyForce;
-				torque += centerOfMass.CrossProduct(bodyForce);
-				torque += bodyInertia.RotateVector(body->GetAlpha());
-			}
-			// remember to clamp the values values before calculating xZmp and zZmp
-			if (ndAbs(force.m_y) > ndFloat32(1.0e-4f))
-			{
-				ndAssert(ndAbs(force.m_y) > ndFloat32(0.0f));
-				ndFloat32 xZmp = torque.m_z / force.m_y;
-				ndFloat32 zZmp = -torque.m_x / force.m_y;
-				//ndTrace(("x=%f z=%f\n", xZmp, zZmp));
-
-				com.m_x += xZmp;
-				com.m_z += zZmp;
-			}
-			return com;
-		}
-
 		void UpdatePose(ndFloat32 timestep)
 		{
 			ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
@@ -836,6 +782,56 @@ namespace ndQuadruped_3
 			UpdatePose(m_timestep);
 		}
 
+		ndVector CalculateZeroMomentPoint() const
+		{
+			ndFixSizeArray<ndVector, 32> r;
+			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
+
+			ndVector com(ndVector::m_zero);
+			ndFloat32 totalMass = ndFloat32(0.0f);
+			for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+
+				const ndMatrix matrix(body->GetMatrix());
+				const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+				ndFloat32 mass = body->GetMassMatrix().m_w;
+				totalMass += mass;
+				com += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
+
+				r.PushBack(bodyCom);
+				bodies.PushBack(body);
+			}
+			com = com.Scale(ndFloat32(1.0f) / totalMass);
+
+			ndVector force(ndVector::m_zero);
+			ndVector torque(ndVector::m_zero);
+			const ndVector gravity(ndFloat32(0.0f), DEMO_GRAVITY, ndFloat32(0.0f), ndFloat32(0.0f));
+			for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+			{
+				const ndVector centerOfMass(r[i] - com);
+				const ndBodyKinematic* const body = bodies[i];
+				const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+				const ndVector bodyForce((body->GetAccel() - gravity).Scale(body->GetMassMatrix().m_w));
+
+				force += bodyForce;
+				torque += centerOfMass.CrossProduct(bodyForce);
+				torque += bodyInertia.RotateVector(body->GetAlpha());
+			}
+			// remember to clamp the values values before calculating xZmp and zZmp
+			if (ndAbs(force.m_y) > ndFloat32(1.0e-4f))
+			{
+				ndAssert(ndAbs(force.m_y) > ndFloat32(0.0f));
+				ndFloat32 xZmp = torque.m_z / force.m_y;
+				ndFloat32 zZmp = -torque.m_x / force.m_y;
+				//ndTrace(("x=%f z=%f\n", xZmp, zZmp));
+
+				com.m_x += xZmp;
+				com.m_z += zZmp;
+			}
+			return com;
+		}
+
 		ndBrainFloat CalculateZeroMomentPointReward() const
 		{
 			ndFixSizeArray<ndBigVector, 4> desiredSupportPoint;
@@ -917,14 +913,11 @@ namespace ndQuadruped_3
 			referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
 			referenceFrame.m_posit = com;
 
-			const ndMatrix invReferenceFrame(referenceFrame.OrthoInverse());
-
-			//ndVector force(ndVector::m_zero);
-			//ndVector torque(ndVector::m_zero);
+			ndMatrix inetia(ndGetZeroMatrix());
 			ndVector angularMomentum(ndVector::m_zero);
+			const ndMatrix invReferenceFrame(referenceFrame.OrthoInverse());
 			const ndVector gravity(ndFloat32(0.0f), DEMO_GRAVITY, ndFloat32(0.0f), ndFloat32(0.0f));
 
-			ndMatrix inetia(ndGetZeroMatrix());
 			for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
 			{
 				const ndBodyKinematic* const body = bodies[i];
