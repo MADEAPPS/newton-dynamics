@@ -317,7 +317,6 @@ namespace ndCarpole_0
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_maxFrames(3500)
 			,m_lastEpisode(-1)
 			,m_stopTraining(200 * 1000000)
 			,m_modelIsTrained(false)
@@ -332,7 +331,6 @@ namespace ndCarpole_0
 			hyperParameters.m_discountFactor = ndReal(0.99f);
 			hyperParameters.m_extraTrajectorySteps = 256;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
-			hyperParameters.m_policyLearnRate = hyperParameters.m_policyLearnRate * 2.0f;
 			
 			m_master = ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>(new ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>(hyperParameters));
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetActor()));
@@ -448,17 +446,15 @@ namespace ndCarpole_0
 				m_master->OptimizeStep();
 			
 				episodeCount -= m_master->GetEposideCount();
-				if (m_master->GetAverageFrames() >= ndFloat32(m_maxFrames))
+				ndFloat32 rewardTrajectory = m_master->GetAverageFrames() * m_master->GetAverageScore();
+				if (rewardTrajectory >= ndFloat32(m_maxScore))
 				{
-					if (m_master->GetAverageScore() > m_maxScore)
+					if (m_lastEpisode != m_master->GetEposideCount())
 					{
-						if (m_lastEpisode != m_master->GetEposideCount())
-						{
-							m_bestActor->CopyFrom(*m_master->GetActor());
-							m_maxScore = m_master->GetAverageScore();
-							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", m_master->GetEposideCount(), m_master->GetAverageFrames(), m_master->GetAverageScore());
-							m_lastEpisode = m_master->GetEposideCount();
-						}
+						m_maxScore = rewardTrajectory;
+						m_bestActor->CopyFrom(*m_master->GetActor());
+						ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", m_master->GetEposideCount(), m_master->GetAverageFrames(), m_master->GetAverageScore());
+						m_lastEpisode = m_master->GetEposideCount();
 					}
 				}
 			
@@ -497,7 +493,6 @@ namespace ndCarpole_0
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
-		ndInt32 m_maxFrames;
 		ndInt32 m_lastEpisode;
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;

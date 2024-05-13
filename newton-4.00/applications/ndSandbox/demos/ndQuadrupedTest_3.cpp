@@ -1337,7 +1337,6 @@ namespace ndQuadruped_3
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
-		//ndInt32 m_maxFrames;
 		ndInt32 m_lastEpisode;
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;

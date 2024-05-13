@@ -24,7 +24,7 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME "unicycleVPG.dnn"
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
@@ -429,7 +429,6 @@ namespace ndUnicycle
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_maxFrames(2000)
 			,m_lastEpisode(-1)
 			,m_stopTraining(300 * 1000000)
 			,m_modelIsTrained(false)
@@ -571,17 +570,15 @@ namespace ndUnicycle
 				m_master->OptimizeStep();
 
 				episodeCount -= m_master->GetEposideCount();
-				if (m_master->GetAverageFrames() >= ndFloat32(m_maxFrames))
+				ndFloat32 rewardTrajectory = m_master->GetAverageFrames() * m_master->GetAverageScore();
+				if (rewardTrajectory >= ndFloat32(m_maxScore))
 				{
-					if (m_master->GetAverageScore() > m_maxScore)
+					if (m_lastEpisode != m_master->GetEposideCount())
 					{
-						if (m_lastEpisode != m_master->GetEposideCount())
-						{
-							m_bestActor->CopyFrom(*m_master->GetActor());
-							m_maxScore = m_master->GetAverageScore();
-							ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", m_master->GetEposideCount(), m_master->GetAverageFrames(), m_master->GetAverageScore());
-							m_lastEpisode = m_master->GetEposideCount();
-						}
+						m_maxScore = rewardTrajectory;
+						m_bestActor->CopyFrom(*m_master->GetActor());
+						ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", m_master->GetEposideCount(), m_master->GetAverageFrames(), m_master->GetAverageScore());
+						m_lastEpisode = m_master->GetEposideCount();
 					}
 				}
 
@@ -617,7 +614,6 @@ namespace ndUnicycle
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
-		ndInt32 m_maxFrames;
 		ndInt32 m_lastEpisode;
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;

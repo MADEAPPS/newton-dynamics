@@ -117,6 +117,7 @@ namespace ndQuadruped_1
 				return base;
 			}
 
+			#pragma optimize( "", off )
 			void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 			{
 				// generate a procedural in place march gait
@@ -136,7 +137,6 @@ namespace ndQuadruped_1
 					{
 						if ((t >= gaitGuard) && (t <= (m_gaitFraction - gaitGuard)))
 						{
-							//output[i].m_posit.m_y += m_amp * ndSin(omega * t);
 							output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
 							output[i].m_userParamInt = output[i].m_posit.m_y < ycontact ? -1 : 1;
 						}
@@ -180,6 +180,7 @@ namespace ndQuadruped_1
 				m_pitch = ndReal(0.0f);
 			}
 
+			#pragma optimize( "", off )
 			void Evaluate(ndAnimationPose& output, ndVector& veloc)
 			{
 				ndAnimationBlendTreeNode::Evaluate(output, veloc);
@@ -1099,7 +1100,7 @@ namespace ndQuadruped_1
 				{
 					if (m_lastEpisode != m_master->GetEposideCount())
 					{
-						m_maxScore = m_master->GetAverageScore();
+						m_maxScore = rewardTrajectory;
 						m_bestActor->CopyFrom(*m_master->GetActor());
 						ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", m_master->GetEposideCount(), m_master->GetAverageFrames(), m_master->GetAverageScore());
 						m_lastEpisode = m_master->GetEposideCount();
