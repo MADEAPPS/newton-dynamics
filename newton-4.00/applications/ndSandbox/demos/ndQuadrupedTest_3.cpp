@@ -53,6 +53,7 @@ namespace ndQuadruped_3
 		public:
 		ndLegObservation n_legs[4];
 		ndActionVector m_torso;
+		ndFloat32 m_animSpeed;
 	};
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
@@ -757,6 +758,7 @@ namespace ndQuadruped_3
 
 			observation.m_torso.m_x = m_control->m_x;
 			observation.m_torso.m_z = m_control->m_z;
+			observation.m_animSpeed = m_control->m_animSpeed;
 			//observation.m_animTime = m_poseGenerator->GetTime();
 			//ndTrace(("%f\n", observation.m_animTime));
 		}
