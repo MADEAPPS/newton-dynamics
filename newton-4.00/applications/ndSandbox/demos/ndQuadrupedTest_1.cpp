@@ -118,7 +118,7 @@ namespace ndQuadruped_1
 				return base;
 			}
 
-			#pragma optimize( "", off )
+			//#pragma optimize( "", off )
 			void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 			{
 				// generate a procedural in place march gait
@@ -181,7 +181,7 @@ namespace ndQuadruped_1
 				m_pitch = ndReal(0.0f);
 			}
 
-			#pragma optimize( "", off )
+			//#pragma optimize( "", off )
 			void Evaluate(ndAnimationPose& output, ndVector& veloc)
 			{
 				ndAnimationBlendTreeNode::Evaluate(output, veloc);
@@ -486,6 +486,8 @@ namespace ndQuadruped_1
 				//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
 				//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
 			}
+
+			CalculateReward();
 		}
 
 		void UpdatePose(ndFloat32 timestep)
@@ -703,10 +705,6 @@ namespace ndQuadruped_1
 
 		ndBrainFloat CalculateZeroOmegaReward() const
 		{
-			//const ndMatrix matrix(GetRoot()->m_body->GetMatrix());
-			//ndFloat32 upAngle = ndAcos(matrix.m_up.m_y);
-			//ndFloat32 reward = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * upAngle * upAngle));
-
 			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
 
 			ndVector com(ndVector::m_zero);
@@ -765,19 +763,21 @@ namespace ndQuadruped_1
 			inetia = inetia.Inverse4x4();
 			ndVector localOmega(inetia.RotateVector(angularMomentum));
 			ndFloat32 omegaMag2 = localOmega.m_x * localOmega.m_x + localOmega.m_z * localOmega.m_z;
-			ndFloat32 reward = ndBrainFloat(ndExp(-ndBrainFloat(1.0f) * omegaMag2));
-			//ndTrace(("%f %f\n", localOmega.m_x, localOmega.m_z));
-			// 
-			// 
-			//ndTrace(("\n"));
-			return reward;
+			ndFloat32 speedReward = ndBrainFloat(ndExp(-ndBrainFloat(1.0f) * omegaMag2));
+
+			const ndMatrix matrix(GetRoot()->m_body->GetMatrix());
+			ndFloat32 upAngle = ndAcos(ndClamp(matrix.m_up.m_y, ndFloat32(-1.0f), ndFloat32(1.0f)));
+			ndFloat32 angleReward = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * upAngle * upAngle));
+
+			//ndTrace(("s(%f) a(%f) angle(%f)\n", speedReward, angleReward, upAngle * ndRadToDegree));
+			return (2.0f * angleReward + speedReward) / ndFloat32(3.0f);
 		}
 
 		ndBrainFloat CalculateReward() const
 		{
 			ndBrainFloat reward0 = CalculateZeroOmegaReward();
 			ndBrainFloat reward1 = CalculateZeroMomentPointReward();
-			ndTrace(("w(%f) T(%f)\n", reward0, reward1));
+			ndTrace(("zeroOmega(%f) ZeroMoment(%f)\n", reward0, reward1));
 			return reward0;
 		}
 
@@ -787,6 +787,7 @@ namespace ndQuadruped_1
 
 			m_timestep = timestep;
 			m_agent->Step();
+			//UpdatePose(m_timestep);
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -1272,6 +1273,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		ndWorld* const world = scene->GetWorld();
 		ndSharedPtr<ndModel> model(BuildModel(scene, matrix, BuildAgent()));
 		world->AddModel(model);
+		((ndRobot*)(*model))->m_showDebug = true;
 
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
 		//world->AddJoint(fixJoint);
