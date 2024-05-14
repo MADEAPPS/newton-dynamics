@@ -821,7 +821,8 @@ namespace ndQuadruped_3
 				torque += bodyInertia.RotateVector(body->GetAlpha());
 			}
 			// remember to clamp the values values before calculating xZmp and zZmp
-			if (ndAbs(force.m_y) > ndFloat32(1.0e-4f))
+			//if (ndAbs(force.m_y) > ndFloat32(1.0e-4f))
+			if (force.m_y > ndFloat32(1.0e-4f))
 			{
 				ndAssert(ndAbs(force.m_y) > ndFloat32(0.0f));
 				ndFloat32 xZmp = torque.m_z / force.m_y;
@@ -886,14 +887,9 @@ namespace ndQuadruped_3
 
 		ndBrainFloat CalculateZeroOmegaReward() const
 		{
-			//const ndMatrix matrix(GetRoot()->m_body->GetMatrix());
-			//ndFloat32 upAngle = ndAcos(matrix.m_up.m_y);
-			//ndFloat32 reward = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * upAngle * upAngle));
-
-			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
-
 			ndVector com(ndVector::m_zero);
 			ndFloat32 totalMass = ndFloat32(0.0f);
+			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
 			for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
 				const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
@@ -960,10 +956,10 @@ namespace ndQuadruped_3
 
 		ndBrainFloat CalculateReward() const
 		{
-			ndBrainFloat reward0 = CalculateZeroOmegaReward();
+			//ndBrainFloat reward0 = CalculateZeroOmegaReward();
 			ndBrainFloat reward1 = CalculateZeroMomentPointReward();
-			ndTrace(("w(%f) T(%f)\n", reward0, reward1));
-			return reward0;
+			//ndTrace(("w(%f) T(%f)\n", reward0, reward1));
+			return reward1;
 		}
 
 		void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)

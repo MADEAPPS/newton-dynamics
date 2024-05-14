@@ -640,7 +640,8 @@ namespace ndQuadruped_1
 				torque += bodyInertia.RotateVector(body->GetAlpha());
 			}
 			// remember to clamp the values values before calculating xZmp and zZmp
-			if (ndAbs(force.m_y) > ndFloat32(1.0e-4f))
+			//if (ndAbs(force.m_y) > ndFloat32(1.0e-4f))
+			if (force.m_y > ndFloat32(1.0e-4f))
 			{
 				ndAssert(ndAbs(force.m_y) > ndFloat32(0.0f));
 				ndFloat32 xZmp = torque.m_z / force.m_y;
@@ -678,18 +679,7 @@ namespace ndQuadruped_1
 				ndBigVector ray_p0(zmp);
 				ndBigVector ray_p1(zmp);
 				ray_p1.m_y -= ndFloat32(1.5f);
-#if 1
 				ndRayToPolygonDistance(ray_p0, ray_p1, &desiredSupportPoint[0], desiredSupportPoint.GetCount(), p0Out, p1Out);
-#else
-				ndVector center(ndVector::m_zero);
-				for (ndInt32 i = desiredSupportPoint.GetCount() - 1; i >= 0; --i)
-				{
-					center += desiredSupportPoint[i];
-				}
-				center = center.Scale(1.0f / ndFloat32(desiredSupportPoint.GetCount()));
-				p0Out = ndBigVector(center);
-				p1Out = ndPointToRayDistance(ndBigVector(p0Out), ray_p0, ray_p1);
-#endif	
 				const ndBigVector error((p0Out - p1Out) & ndBigVector::m_triplexMask);
 				ndFloat32 dist2 = ndFloat32(error.DotProduct(error).GetScalar());
 				reward = ndBrainFloat(ndExp(-ndBrainFloat(1000.0f) * dist2));
@@ -775,10 +765,10 @@ namespace ndQuadruped_1
 
 		ndBrainFloat CalculateReward() const
 		{
-			ndBrainFloat reward0 = CalculateZeroOmegaReward();
+			//ndBrainFloat reward0 = CalculateZeroOmegaReward();
 			ndBrainFloat reward1 = CalculateZeroMomentPointReward();
-			ndTrace(("zeroOmega(%f) ZeroMoment(%f)\n", reward0, reward1));
-			return reward0;
+			//ndTrace(("zeroOmega(%f) ZeroMoment(%f)\n", reward0, reward1));
+			return reward1;
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
