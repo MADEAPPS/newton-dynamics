@@ -763,14 +763,14 @@ namespace ndQuadruped_1
 			inetia = inetia.Inverse4x4();
 			ndVector localOmega(inetia.RotateVector(angularMomentum));
 			ndFloat32 omegaMag2 = localOmega.m_x * localOmega.m_x + localOmega.m_z * localOmega.m_z;
-			ndFloat32 speedReward = ndBrainFloat(ndExp(-ndBrainFloat(1.0f) * omegaMag2));
+			ndFloat32 speedRewardProb = ndBrainFloat(ndExp(-ndBrainFloat(1.0f) * omegaMag2));
 
 			const ndMatrix matrix(GetRoot()->m_body->GetMatrix());
 			ndFloat32 upAngle = ndAcos(ndClamp(matrix.m_up.m_y, ndFloat32(-1.0f), ndFloat32(1.0f)));
-			ndFloat32 angleReward = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * upAngle * upAngle));
+			ndFloat32 angleRewardProb = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * upAngle * upAngle));
 
 			//ndTrace(("s(%f) a(%f) angle(%f)\n", speedReward, angleReward, upAngle * ndRadToDegree));
-			return (2.0f * angleReward + speedReward) / ndFloat32(3.0f);
+			return angleRewardProb * speedRewardProb;
 		}
 
 		ndBrainFloat CalculateReward() const
