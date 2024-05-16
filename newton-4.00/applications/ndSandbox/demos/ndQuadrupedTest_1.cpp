@@ -1020,7 +1020,7 @@ namespace ndQuadruped_1
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32 (-1.0e10f))
 			,m_lastEpisode(-1)
-			,m_stopTraining(200 * 1000000)
+			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
