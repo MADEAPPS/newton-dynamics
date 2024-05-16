@@ -860,18 +860,7 @@ namespace ndQuadruped_3
 				ndBigVector ray_p0(zmp);
 				ndBigVector ray_p1(zmp);
 				ray_p1.m_y -= ndFloat32(1.5f);
-				#if 1
-					ndRayToPolygonDistance(ray_p0, ray_p1, &desiredSupportPoint[0], desiredSupportPoint.GetCount(), p0Out, p1Out);
-				#else
-					ndVector center(ndVector::m_zero);
-					for (ndInt32 i = desiredSupportPoint.GetCount() - 1; i >= 0; --i)
-					{
-						center += desiredSupportPoint[i];
-					}
-					center = center.Scale(1.0f / ndFloat32(desiredSupportPoint.GetCount()));
-					p0Out = ndBigVector(center);
-					p1Out = ndPointToRayDistance(ndBigVector(p0Out), ray_p0, ray_p1);
-				#endif	
+				ndRayToPolygonDistance(ray_p0, ray_p1, &desiredSupportPoint[0], desiredSupportPoint.GetCount(), p0Out, p1Out);
 				const ndBigVector error((p0Out - p1Out) & ndBigVector::m_triplexMask);
 				ndFloat32 dist2 = ndFloat32(error.DotProduct(error).GetScalar());
 				reward = ndBrainFloat(ndExp(-ndBrainFloat(1000.0f) * dist2));
