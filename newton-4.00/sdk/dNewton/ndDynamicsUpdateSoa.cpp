@@ -1703,7 +1703,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 	for (ndUnsigned32 i = 0; i < passes; ++i)
 	{
 		iterator0 = 0;
-		iterator1 = 1;
+		iterator1 = 0;
 		scene->ParallelExecute(CalculateJointsForce);
 		scene->ParallelExecute(ApplyJacobianAccumulatePartialForces);
 	}
