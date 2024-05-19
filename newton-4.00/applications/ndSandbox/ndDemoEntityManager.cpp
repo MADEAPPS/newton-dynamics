@@ -473,10 +473,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//Test1__();
 	//ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
-
-	//ndSharedPtr<ndDemoEntityManager> xxx(this);
-	//ndDemoEntityManager* xxx1 = *xxx;
-	//ndDemoEntityManager* xxx2 = *xxx;
+	//TargaToPng();
 }
 
 ndDemoEntityManager::~ndDemoEntityManager ()

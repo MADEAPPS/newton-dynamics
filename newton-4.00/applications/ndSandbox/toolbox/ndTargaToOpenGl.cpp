@@ -382,7 +382,7 @@ GLuint LoadCubeMapTexture(
 		{
 			ndAssert(0);
 			fclose(pFile);
-			delete[] pBits;
+			ndMemory::Free(pBits);
 			return 0;
 		}
 
@@ -395,6 +395,7 @@ GLuint LoadCubeMapTexture(
 	ndTextureEntry* const texture = cache.InsertText(namesArray[0], texturecubemap);
 	return texture->m_textureID;
 }
+
 
 void ReleaseTexture (GLuint texture)
 {
@@ -411,4 +412,174 @@ void TextureCacheCleanUp()
 {
 	ndTextureCache& cache = ndTextureCache::GetChache();
 	cache.CleanUp();
+}
+
+static void TargaToPng(const char* const filename)
+{
+	char fullPathName[2048];
+	ndGetWorkingFileName(filename, fullPathName);
+	strcat(fullPathName, ".tga");
+
+	FILE* const pFile = fopen(fullPathName, "rb");
+	ndAssert(pFile);
+
+	TGAHEADER tgaHeader;		
+	size_t ret = fread(&tgaHeader, 18, 1, pFile);
+	ret = 0;
+
+	// Do byte swap for big vs little endian
+	tgaHeader.colorMapStart = SWAP_INT16(tgaHeader.colorMapStart);
+	tgaHeader.colorMapLength = SWAP_INT16(tgaHeader.colorMapLength);
+	tgaHeader.xstart = SWAP_INT16(tgaHeader.xstart);
+	tgaHeader.ystart = SWAP_INT16(tgaHeader.ystart);
+	tgaHeader.width = SWAP_INT16(tgaHeader.width);
+	tgaHeader.height = SWAP_INT16(tgaHeader.height);
+
+	// Get width, height, and depth of texture
+	ndUnsigned32 width = tgaHeader.width;
+	ndUnsigned32 height = tgaHeader.height;
+	short sDepth = tgaHeader.bits / 8;
+	ndAssert((sDepth == 3) || (sDepth == 4));
+
+	// Put some validity checks here. Very simply, I only understand
+	// or care about 8, 24, or 32 bit targa's.
+	//if(tgaHeader.bits != 8 && tgaHeader.bits != 24 && tgaHeader.bits != 32) 
+	if (!((tgaHeader.bits == 8) || (tgaHeader.bits == 24) || (tgaHeader.bits == 32)))
+	{
+		fclose(pFile);
+		return;
+	}
+
+	// Calculate size of image buffer
+	ndUnsigned32 lImageSize = ndUnsigned32(width * height * sDepth);
+
+	// Allocate memory and check for success
+	unsigned char* const pBits = (unsigned char*)ndMemory::Malloc(width * height * sizeof(ndInt32));
+	if (pBits == nullptr)
+	{
+		fclose(pFile);
+		return;
+	}
+
+	// Read in the bits
+	// Check for read error. This should catch RLE or other 
+	// weird formats that I don't want to recognize
+	ndInt32 readret = ndInt32(fread(pBits, lImageSize, 1, pFile));
+	if (readret != 1)
+	{
+		fclose(pFile);
+		ndMemory::Free(pBits);
+		return;
+	}
+
+	ndGetWorkingFileName(filename, fullPathName);
+	strcat(fullPathName, ".png");
+
+	unsigned char scan0[1024 * 8 * 4];
+	unsigned char scan1[1024 * 8 * 4];
+
+	switch (sDepth)
+	{
+		case 1:
+		{
+			ndAssert(0);
+			//	format = m_luminace;
+			break;
+		}
+	
+		case 3:
+		{
+			ndInt32 y0 = 0;
+			ndInt32 y1 = (ndInt32(height) - 1) * ndInt32(width) * 3;
+
+			for (ndInt32 y = 0; y < ndInt32(height + 1)/2; ++y)
+			{
+				for (ndInt32 x = 0; x < ndInt32 (width * 3); x += 3)
+				{
+					scan0[x + 0] = pBits[y0 + x + 2];
+					scan0[x + 1] = pBits[y0 + x + 1];
+					scan0[x + 2] = pBits[y0 + x + 0];
+					scan1[x + 0] = pBits[y1 + x + 2];
+					scan1[x + 1] = pBits[y1 + x + 1];
+					scan1[x + 2] = pBits[y1 + x + 0];
+				}
+				ndMemCpy(&pBits[y0], scan1, ndInt32(width) * 3);
+				ndMemCpy(&pBits[y1], scan0, ndInt32(width) * 3);
+				y0 += ndInt32(width) * 3;
+				y1 -= ndInt32(width) * 3;
+
+			}
+			lodepng_encode_file(fullPathName, pBits, width, height, LCT_RGB, 8);
+			break;
+		}
+	
+		case 4:
+		{
+			ndInt32 y0 = 0;
+			ndInt32 y1 = (ndInt32(height) - 1) * ndInt32(width) * 4;
+
+			for (ndInt32 y = 0; y < ndInt32(height + 1) / 2; ++y)
+			{
+				for (ndInt32 x = 0; x < ndInt32(width * 4); x += 4)
+				{
+					scan0[x + 0] = pBits[y0 + x + 2];
+					scan0[x + 1] = pBits[y0 + x + 1];
+					scan0[x + 2] = pBits[y0 + x + 0];
+					scan0[x + 3] = pBits[y0 + x + 3];
+
+					scan1[x + 0] = pBits[y1 + x + 2];
+					scan1[x + 1] = pBits[y1 + x + 1];
+					scan1[x + 2] = pBits[y1 + x + 0];
+					scan1[x + 3] = pBits[y1 + x + 3];
+				}
+				ndMemCpy(&pBits[y0], scan1, ndInt32(width) * 4);
+				ndMemCpy(&pBits[y1], scan0, ndInt32(width) * 4);
+				y0 += ndInt32(width) * 4;
+				y1 -= ndInt32(width) * 4;
+			}
+			lodepng_encode_file(fullPathName, pBits, width, height, LCT_RGBA, 8);
+			break;
+		}
+	};
+
+	// Done with File
+	fclose(pFile);
+	ndMemory::Free(pBits);
+}
+
+void TargaToPng()
+{
+	//TargaToPng("sky");
+	//return;
+#if (defined(WIN32) || defined(_WIN32))
+	char appPath[1024];
+	char outPathName[1024];
+	GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
+	strtolwr(appPath);
+
+	char* const end = strstr(appPath, "applications");
+	end[0] = 0;
+	sprintf(outPathName, "%sapplications/media", appPath);
+
+	char rootPath[2048];
+	sprintf(rootPath, "%s/*.tga", outPathName);
+
+	WIN32_FIND_DATAA data;
+	HANDLE handle = FindFirstFile(rootPath, &data);
+
+	if (handle != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			char fileName[256];
+			sprintf(fileName, "%s", data.cFileName);
+			strtolwr(fileName);
+			char* const fileNameEnd = strstr(fileName, ".tga");
+			*fileNameEnd = 0;
+
+			TargaToPng(fileName);
+		} while (FindNextFile(handle, &data));
+		FindClose(handle);
+	}
+#endif
 }

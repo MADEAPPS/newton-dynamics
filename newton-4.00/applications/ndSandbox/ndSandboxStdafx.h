@@ -20,13 +20,19 @@
 // Insert your headers here
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 
+#include <io.h>
 #include <stddef.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <math.h>
 #include <float.h>
 #include <ctype.h>
-#include <cstdarg>
+//#include <cstdarg>
+#include <stdlib.h>
+#include <malloc.h>
+#include <memory.h>
+#include <math.h>
+#include <time.h>
+#include <tchar.h>
 
 #if (defined(WIN32) || defined(_WIN32))
 	#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
@@ -37,12 +43,6 @@
 
 	#include <windows.h>
 	#include <commctrl.h>
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <malloc.h>
-	#include <memory.h>
-	#include <time.h>
-	#include <tchar.h>
 	#include <crtdbg.h>
 	
 	#include <glatter.h>
@@ -58,9 +58,7 @@
 #endif
 	
 #if defined (__linux__ )
-	#include <stdlib.h>
 	#include <unistd.h>
-	#include <time.h>
 
 	#include <glatter.h>
 	#include <GL/glu.h>
@@ -87,6 +85,7 @@
 // some third party libraries includes here
 #include <VHACD.h>
 #include <imgui.h>
+#include <lodepng.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 

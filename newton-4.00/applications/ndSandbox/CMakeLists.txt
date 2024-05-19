@@ -38,6 +38,7 @@ include_directories(../../sdk/dNewton/dModels)
 include_directories(../../sdk/dNewton/dIkSolver)
 include_directories(../../sdk/dNewton/dModels/dVehicle)
 
+include_directories(../../thirdParty/png/)
 include_directories(../../thirdParty/glfw/)
 include_directories(../../thirdParty/imgui/)
 include_directories(../../thirdParty/tinyxml/)
@@ -50,7 +51,7 @@ include_directories(../../thirdParty/openalRuntime/win32sdk/include)
 
 add_executable(${projectName} ${CPP_SOURCE})
 
-target_link_libraries (${projectName} ndNewton ndBrain ndModel ndFileFormat ndTinyxml vhacd openfbx glfw imgui glatter)
+target_link_libraries (${projectName} ndNewton ndBrain ndModel ndFileFormat ndTinyxml vhacd openfbx glfw imgui glatter lodepng)
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndCollision ndCore)
