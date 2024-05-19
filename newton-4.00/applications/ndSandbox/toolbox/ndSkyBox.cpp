@@ -41,14 +41,9 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	m_textureMatrix[1][1] = ndFloat32(-1.0f);
 
 	//m_texturecubemap = LoadCubeMapTexture(
-	//	"NewtonSky0003.tga", "NewtonSky0001.tga",
-	//	"NewtonSky0006.tga", "NewtonSky0005.tga",
-	//	"NewtonSky0002.tga", "NewtonSky0004.tga");
-
-	//m_texturecubemap = LoadCubeMapTexture(
-	//	"skyBox_front.tga", "skyBox_back.tga",
-	//	"skyBox_botton.tga", "skyBox_top.tga",
-	//	"skyBox_left.tga", "skyBox_right.tga");
+	//	"NewtonSky0003.png", "NewtonSky0001.png",
+	//	"NewtonSky0006.png", "NewtonSky0005.png",
+	//	"NewtonSky0002.png", "NewtonSky0004.png");
 
 	m_texturecubemap = LoadCubeMapTexture(
 		"skyBox_front.png", "skyBox_back.png",

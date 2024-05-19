@@ -482,9 +482,6 @@ static void TargaToPng(const char* const filename)
 	ndGetWorkingFileName(filename, fullPathName);
 	strcat(fullPathName, ".png");
 
-	unsigned char scan0[1024 * 8 * 4];
-	unsigned char scan1[1024 * 8 * 4];
-
 	switch (sDepth)
 	{
 		case 1:
@@ -496,25 +493,14 @@ static void TargaToPng(const char* const filename)
 	
 		case 3:
 		{
-			ndInt32 y0 = 0;
-			ndInt32 y1 = (ndInt32(height) - 1) * ndInt32(width) * 3;
-
-			for (ndInt32 y = 0; y < ndInt32(height + 1)/2; ++y)
+			for (ndInt32 i = ndInt32(height * width * 3 - 3); i >= 0; i -= 3)
 			{
-				for (ndInt32 x = 0; x < ndInt32 (width * 3); x += 3)
-				{
-					scan0[x + 0] = pBits[y0 + x + 2];
-					scan0[x + 1] = pBits[y0 + x + 1];
-					scan0[x + 2] = pBits[y0 + x + 0];
-					scan1[x + 0] = pBits[y1 + x + 2];
-					scan1[x + 1] = pBits[y1 + x + 1];
-					scan1[x + 2] = pBits[y1 + x + 0];
-				}
-				ndMemCpy(&pBits[y0], scan1, ndInt32(width) * 3);
-				ndMemCpy(&pBits[y1], scan0, ndInt32(width) * 3);
-				y0 += ndInt32(width) * 3;
-				y1 -= ndInt32(width) * 3;
-
+				unsigned char r = pBits[i + 0];
+				unsigned char g = pBits[i + 1];
+				unsigned char b = pBits[i + 2];
+				pBits[i + 2] = r;
+				pBits[i + 1] = g;
+				pBits[i + 0] = b;
 			}
 			lodepng_encode_file(fullPathName, pBits, width, height, LCT_RGB, 8);
 			break;
@@ -522,27 +508,16 @@ static void TargaToPng(const char* const filename)
 	
 		case 4:
 		{
-			ndInt32 y0 = 0;
-			ndInt32 y1 = (ndInt32(height) - 1) * ndInt32(width) * 4;
-
-			for (ndInt32 y = 0; y < ndInt32(height + 1) / 2; ++y)
+			for (ndInt32 i = ndInt32(height * width * 4 - 4); i >= 0; i -= 4)
 			{
-				for (ndInt32 x = 0; x < ndInt32(width * 4); x += 4)
-				{
-					scan0[x + 0] = pBits[y0 + x + 2];
-					scan0[x + 1] = pBits[y0 + x + 1];
-					scan0[x + 2] = pBits[y0 + x + 0];
-					scan0[x + 3] = pBits[y0 + x + 3];
-
-					scan1[x + 0] = pBits[y1 + x + 2];
-					scan1[x + 1] = pBits[y1 + x + 1];
-					scan1[x + 2] = pBits[y1 + x + 0];
-					scan1[x + 3] = pBits[y1 + x + 3];
-				}
-				ndMemCpy(&pBits[y0], scan1, ndInt32(width) * 4);
-				ndMemCpy(&pBits[y1], scan0, ndInt32(width) * 4);
-				y0 += ndInt32(width) * 4;
-				y1 -= ndInt32(width) * 4;
+				unsigned char r = pBits[i + 0];
+				unsigned char g = pBits[i + 1];
+				unsigned char b = pBits[i + 2];
+				unsigned char a = pBits[i + 3];
+				pBits[i + 2] = r;
+				pBits[i + 1] = g;
+				pBits[i + 0] = b;
+				pBits[i + 3] = a;
 			}
 			lodepng_encode_file(fullPathName, pBits, width, height, LCT_RGBA, 8);
 			break;
