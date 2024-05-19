@@ -113,7 +113,7 @@ class ndTextureCache : public ndList<ndTextureEntry>
 	ndTree<ndList<ndTextureEntry>::ndNode*, ndUnsigned64> m_hashMap;
 };
 
-static GLuint LoadTargaImage(const char* const buffer, ndInt32 width, ndInt32 hight, TextureImageFormat format)
+static GLuint LoadGpuImage(const unsigned char* const buffer, ndInt32 width, ndInt32 hight, TextureImageFormat format)
 {
 	GLint iWidth = width;
 	GLint iHeight = hight;
@@ -124,14 +124,14 @@ static GLuint LoadTargaImage(const char* const buffer, ndInt32 width, ndInt32 hi
 	{
 		case m_rgb:
 			// Most likely case
-			eFormat = GL_BGR;
-			//eFormat = GL_RGB;
+			//eFormat = GL_BGR;
+			eFormat = GL_RGB;
 			iComponents = GL_RGBA;
 			break;
 
 		case m_rgba:
-			eFormat = GL_BGRA;
-			//eFormat = GL_RGBA;
+			//eFormat = GL_BGRA;
+			eFormat = GL_RGBA;
 			iComponents = GL_RGBA;
 			break;
 
@@ -172,24 +172,6 @@ static GLuint LoadTargaImage(const char* const buffer, ndInt32 width, ndInt32 hi
 	return texture;
 }
 
-#pragma pack(1)
-struct TGAHEADER
-{
-	char identsize;					// Size of ID field that follows header (0)
-	char colorMapType;				// 0 = None, 1 = palette
-	char imageType;					// 0 = none, 1 = indexed, 2 = rgb, 3 = grey, +8=rle
-	unsigned short colorMapStart;	// First color map entry
-	unsigned short colorMapLength;	// Number of colors
-	unsigned char colorMapBits;		// bits per palette entry
-	unsigned short xstart;			// image x origin
-	unsigned short ystart;			// image y origin
-	unsigned short width;			// width in pixels
-	unsigned short height;			// height in pixels
-	char bits;						// bits per pixel (8 16, 24, 32)
-	char descriptor;				// image descriptor
-};
-#pragma pack(8)
-
 
 //	Loads the texture from the specified file and stores it in iTexture. Note
 //	that we're using the GLAUX library here, which is generally discouraged,
@@ -197,98 +179,36 @@ struct TGAHEADER
 GLuint LoadTexture(const char* const filename)
 {
 	char fullPathName[2048];
-	ndGetWorkingFileName (filename, fullPathName);
+
+	char pngName[1024];
+	sprintf(pngName, "%s", filename);
+	strtolwr(pngName);
+	char* const fileNameEnd = strstr(pngName, ".tga");
+	*fileNameEnd = 0;
+	strcat(pngName, ".png");
+	ndGetWorkingFileName(pngName, fullPathName);
 	ndTextureCache& cache = ndTextureCache::GetChache();
 	ndTextureEntry* texture = cache.Find(fullPathName);
 	if (texture)
 	{
 		texture->m_ref += 1;
 	}
-	else 
+	else
 	{
-		FILE* const pFile = fopen (fullPathName, "rb");
-		if(pFile == nullptr) 
-		{
-			return 0;
-		}
-		
-		TGAHEADER tgaHeader;		// TGA file header
-		size_t ret = fread(&tgaHeader, 18, 1, pFile);
-		ret = 0;
-		
-		// Do byte swap for big vs little endian
-		tgaHeader.colorMapStart = SWAP_INT16(tgaHeader.colorMapStart);
-		tgaHeader.colorMapLength = SWAP_INT16(tgaHeader.colorMapLength);
-		tgaHeader.xstart = SWAP_INT16(tgaHeader.xstart);
-		tgaHeader.ystart = SWAP_INT16(tgaHeader.ystart);
-		tgaHeader.width = SWAP_INT16(tgaHeader.width);
-		tgaHeader.height = SWAP_INT16(tgaHeader.height);
-		
-		// Get width, height, and depth of texture
-		ndInt32 width = tgaHeader.width;
-		ndInt32 height = tgaHeader.height;
-		short sDepth = tgaHeader.bits / 8;
-		ndAssert ((sDepth == 3) || (sDepth == 4));
-		
-		// Put some validity checks here. Very simply, I only understand
-		// or care about 8, 24, or 32 bit targa's.
-		//if(tgaHeader.bits != 8 && tgaHeader.bits != 24 && tgaHeader.bits != 32) 
-		if (!((tgaHeader.bits == 8) || (tgaHeader.bits == 24) || (tgaHeader.bits == 32)))
-		{
-			fclose(pFile);
-			return 0;
-		}
-		
-		// Calculate size of image buffer
-		ndUnsigned32 lImageSize = ndUnsigned32(width * height * sDepth);
-		
-		// Allocate memory and check for success
-		char* const pBits = (char*)ndMemory::Malloc (width * height * sizeof (ndInt32));
-		if(pBits == nullptr) 
-		{
-			fclose(pFile);
-			return 0;
-		}
-		
-		// Read in the bits
-		// Check for read error. This should catch RLE or other 
-		// weird formats that I don't want to recognize
-		ndInt32 readret = ndInt32 (fread(pBits, lImageSize, 1, pFile));
-		if(readret != 1)  
-		{
-			fclose(pFile);
-			delete[] pBits;
-			return 0; 
-		}
-		
-		TextureImageFormat format = m_rgb;
-		switch(sDepth)
-		{
-			case 1:
-				format = m_luminace;
-				break;
-		
-			case 3:     
-				format = m_rgb;
-				break;
-		
-			case 4:
-				format = m_rgba;
-				break;
-		};
-		
-		GLuint textureId = LoadTargaImage(pBits, tgaHeader.width, tgaHeader.height, format);
-		
-		// Done with File
-		fclose(pFile);
-		ndMemory::Free (pBits);
+		unsigned width;
+		unsigned height;
+		unsigned char* pBits;
+		lodepng_decode_file(&pBits, &width, &height, fullPathName, LCT_RGBA, 8);
+		GLuint textureId = LoadGpuImage(pBits, int(width), int(height), m_rgba);
+		lodepng_free(pBits);
+
 		if (!textureId)
 		{
 			return 0;
 		}
-
 		texture = cache.InsertText(fullPathName, textureId);
 	}
+
 	return texture->m_textureID;
 } 
 
@@ -331,72 +251,13 @@ GLuint LoadCubeMapTexture(
 		char fullPathName[2048];
 		ndGetWorkingFileName(namesArray[i], fullPathName);
 		ndAssert(!cache.Find(namesArray[i]));
-
-#if 0
-		FILE* const pFile = fopen(fullPathName, "rb");
-		if (pFile == nullptr)
-		{
-			ndAssert(0);
-			return 0;
-		}
 		
-		TGAHEADER tgaHeader;
-		size_t ret = fread(&tgaHeader, 18, 1, pFile);
-		ret = 0;
-		
-		// Do byte swap for big vs little endian
-		tgaHeader.colorMapStart = SWAP_INT16(tgaHeader.colorMapStart);
-		tgaHeader.colorMapLength = SWAP_INT16(tgaHeader.colorMapLength);
-		tgaHeader.xstart = SWAP_INT16(tgaHeader.xstart);
-		tgaHeader.ystart = SWAP_INT16(tgaHeader.ystart);
-		tgaHeader.width = SWAP_INT16(tgaHeader.width);
-		tgaHeader.height = SWAP_INT16(tgaHeader.height);
-		
-		// Get width, height, and depth of texture
-		ndInt32 width = tgaHeader.width;
-		ndInt32 height = tgaHeader.height;
-		short sDepth = tgaHeader.bits / 8;
-		
-		if (tgaHeader.bits != 32)
-		{
-			ndAssert(0);
-			fclose(pFile);
-			return 0;
-		}
-		
-		// Calculate size of image buffer
-		ndUnsigned32 lImageSize = ndUnsigned32(width * height * sDepth);
-		
-		// Allocate memory and check for success
-		char* const pBits = (char*)ndMemory::Malloc(width * height * sizeof(ndInt32));
-		if (pBits == nullptr)
-		{
-			fclose(pFile);
-			return 0;
-		}
-		
-		// Read in the bits
-		// Check for read error. This should catch RLE or other 
-		// weird formats that I don't want to recognize
-		ndInt32 readret = ndInt32(fread(pBits, lImageSize, 1, pFile));
-		if (readret != 1)
-		{
-			ndAssert(0);
-			fclose(pFile);
-			ndMemory::Free(pBits);
-			return 0;
-		}
-		glTexImage2D(faceArray[i], 0, GL_RGBA, int (width), int (height), 0, GL_BGRA, GL_UNSIGNED_BYTE, pBits);
-		fclose(pFile);
-		ndMemory::Free(pBits);
-#else		
 		unsigned width;
 		unsigned height;
 		unsigned char* pBits;
 		lodepng_decode_file(&pBits, &width, &height, fullPathName, LCT_RGBA, 8);
 		glTexImage2D(faceArray[i], 0, GL_RGBA, int(width), int(height), 0, GL_RGBA, GL_UNSIGNED_BYTE, pBits);
 		lodepng_free(pBits);
-#endif
 	}
 
 	ndTextureEntry* const texture = cache.InsertText(namesArray[0], texturecubemap);
@@ -421,147 +282,147 @@ void TextureCacheCleanUp()
 	cache.CleanUp();
 }
 
-static void TargaToPng(const char* const filename)
-{
-	char fullPathName[2048];
-	ndGetWorkingFileName(filename, fullPathName);
-	strcat(fullPathName, ".tga");
-
-	FILE* const pFile = fopen(fullPathName, "rb");
-	ndAssert(pFile);
-
-	TGAHEADER tgaHeader;		
-	size_t ret = fread(&tgaHeader, 18, 1, pFile);
-	ret = 0;
-
-	// Do byte swap for big vs little endian
-	tgaHeader.colorMapStart = SWAP_INT16(tgaHeader.colorMapStart);
-	tgaHeader.colorMapLength = SWAP_INT16(tgaHeader.colorMapLength);
-	tgaHeader.xstart = SWAP_INT16(tgaHeader.xstart);
-	tgaHeader.ystart = SWAP_INT16(tgaHeader.ystart);
-	tgaHeader.width = SWAP_INT16(tgaHeader.width);
-	tgaHeader.height = SWAP_INT16(tgaHeader.height);
-
-	// Get width, height, and depth of texture
-	ndUnsigned32 width = tgaHeader.width;
-	ndUnsigned32 height = tgaHeader.height;
-	short sDepth = tgaHeader.bits / 8;
-	ndAssert((sDepth == 3) || (sDepth == 4));
-
-	// Put some validity checks here. Very simply, I only understand
-	// or care about 8, 24, or 32 bit targa's.
-	//if(tgaHeader.bits != 8 && tgaHeader.bits != 24 && tgaHeader.bits != 32) 
-	if (!((tgaHeader.bits == 8) || (tgaHeader.bits == 24) || (tgaHeader.bits == 32)))
-	{
-		fclose(pFile);
-		return;
-	}
-
-	// Calculate size of image buffer
-	ndUnsigned32 lImageSize = ndUnsigned32(width * height * sDepth);
-
-	// Allocate memory and check for success
-	unsigned char* const pBits = (unsigned char*)ndMemory::Malloc(width * height * sizeof(ndInt32));
-	if (pBits == nullptr)
-	{
-		fclose(pFile);
-		return;
-	}
-
-	// Read in the bits
-	// Check for read error. This should catch RLE or other 
-	// weird formats that I don't want to recognize
-	ndInt32 readret = ndInt32(fread(pBits, lImageSize, 1, pFile));
-	if (readret != 1)
-	{
-		fclose(pFile);
-		ndMemory::Free(pBits);
-		return;
-	}
-
-	ndGetWorkingFileName(filename, fullPathName);
-	strcat(fullPathName, ".png");
-
-	switch (sDepth)
-	{
-		case 1:
-		{
-			ndAssert(0);
-			//	format = m_luminace;
-			break;
-		}
-	
-		case 3:
-		{
-			for (ndInt32 i = ndInt32(height * width * 3 - 3); i >= 0; i -= 3)
-			{
-				unsigned char r = pBits[i + 0];
-				unsigned char g = pBits[i + 1];
-				unsigned char b = pBits[i + 2];
-				pBits[i + 2] = r;
-				pBits[i + 1] = g;
-				pBits[i + 0] = b;
-			}
-			lodepng_encode_file(fullPathName, pBits, width, height, LCT_RGB, 8);
-			break;
-		}
-	
-		case 4:
-		{
-			for (ndInt32 i = ndInt32(height * width * 4 - 4); i >= 0; i -= 4)
-			{
-				unsigned char r = pBits[i + 0];
-				unsigned char g = pBits[i + 1];
-				unsigned char b = pBits[i + 2];
-				unsigned char a = pBits[i + 3];
-				pBits[i + 2] = r;
-				pBits[i + 1] = g;
-				pBits[i + 0] = b;
-				pBits[i + 3] = a;
-			}
-			lodepng_encode_file(fullPathName, pBits, width, height, LCT_RGBA, 8);
-			break;
-		}
-	};
-
-	// Done with File
-	fclose(pFile);
-	ndMemory::Free(pBits);
-}
+//static void TargaToPng(const char* const filename)
+//{
+//	char fullPathName[2048];
+//	ndGetWorkingFileName(filename, fullPathName);
+//	strcat(fullPathName, ".tga");
+//
+//	FILE* const pFile = fopen(fullPathName, "rb");
+//	ndAssert(pFile);
+//
+//	TGAHEADER tgaHeader;		
+//	size_t ret = fread(&tgaHeader, 18, 1, pFile);
+//	ret = 0;
+//
+//	// Do byte swap for big vs little endian
+//	tgaHeader.colorMapStart = SWAP_INT16(tgaHeader.colorMapStart);
+//	tgaHeader.colorMapLength = SWAP_INT16(tgaHeader.colorMapLength);
+//	tgaHeader.xstart = SWAP_INT16(tgaHeader.xstart);
+//	tgaHeader.ystart = SWAP_INT16(tgaHeader.ystart);
+//	tgaHeader.width = SWAP_INT16(tgaHeader.width);
+//	tgaHeader.height = SWAP_INT16(tgaHeader.height);
+//
+//	// Get width, height, and depth of texture
+//	ndUnsigned32 width = tgaHeader.width;
+//	ndUnsigned32 height = tgaHeader.height;
+//	short sDepth = tgaHeader.bits / 8;
+//	ndAssert((sDepth == 3) || (sDepth == 4));
+//
+//	// Put some validity checks here. Very simply, I only understand
+//	// or care about 8, 24, or 32 bit targa's.
+//	//if(tgaHeader.bits != 8 && tgaHeader.bits != 24 && tgaHeader.bits != 32) 
+//	if (!((tgaHeader.bits == 8) || (tgaHeader.bits == 24) || (tgaHeader.bits == 32)))
+//	{
+//		fclose(pFile);
+//		return;
+//	}
+//
+//	// Calculate size of image buffer
+//	ndUnsigned32 lImageSize = ndUnsigned32(width * height * sDepth);
+//
+//	// Allocate memory and check for success
+//	unsigned char* const pBits = (unsigned char*)ndMemory::Malloc(width * height * sizeof(ndInt32));
+//	if (pBits == nullptr)
+//	{
+//		fclose(pFile);
+//		return;
+//	}
+//
+//	// Read in the bits
+//	// Check for read error. This should catch RLE or other 
+//	// weird formats that I don't want to recognize
+//	ndInt32 readret = ndInt32(fread(pBits, lImageSize, 1, pFile));
+//	if (readret != 1)
+//	{
+//		fclose(pFile);
+//		ndMemory::Free(pBits);
+//		return;
+//	}
+//
+//	ndGetWorkingFileName(filename, fullPathName);
+//	strcat(fullPathName, ".png");
+//
+//	switch (sDepth)
+//	{
+//		case 1:
+//		{
+//			ndAssert(0);
+//			//	format = m_luminace;
+//			break;
+//		}
+//	
+//		case 3:
+//		{
+//			for (ndInt32 i = ndInt32(height * width * 3 - 3); i >= 0; i -= 3)
+//			{
+//				unsigned char r = pBits[i + 0];
+//				unsigned char g = pBits[i + 1];
+//				unsigned char b = pBits[i + 2];
+//				pBits[i + 2] = r;
+//				pBits[i + 1] = g;
+//				pBits[i + 0] = b;
+//			}
+//			lodepng_encode_file(fullPathName, pBits, width, height, LCT_RGB, 8);
+//			break;
+//		}
+//	
+//		case 4:
+//		{
+//			for (ndInt32 i = ndInt32(height * width * 4 - 4); i >= 0; i -= 4)
+//			{
+//				unsigned char r = pBits[i + 0];
+//				unsigned char g = pBits[i + 1];
+//				unsigned char b = pBits[i + 2];
+//				unsigned char a = pBits[i + 3];
+//				pBits[i + 0] = b;
+//				pBits[i + 1] = g;
+//				pBits[i + 2] = r;
+//				pBits[i + 3] = a;
+//			}
+//			lodepng_encode_file(fullPathName, pBits, width, height, LCT_RGBA, 8);
+//			break;
+//		}
+//	};
+//
+//	// Done with File
+//	fclose(pFile);
+//	ndMemory::Free(pBits);
+//}
 
 void TargaToPng()
 {
-	//TargaToPng("sky");
+	//TargaToPng("smilli");
 	//return;
 #if (defined(WIN32) || defined(_WIN32))
-	char appPath[1024];
-	char outPathName[1024];
-	GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
-	strtolwr(appPath);
-
-	char* const end = strstr(appPath, "applications");
-	end[0] = 0;
-	sprintf(outPathName, "%sapplications/media", appPath);
-
-	char rootPath[2048];
-	sprintf(rootPath, "%s/*.tga", outPathName);
-
-	WIN32_FIND_DATAA data;
-	HANDLE handle = FindFirstFile(rootPath, &data);
-
-	if (handle != INVALID_HANDLE_VALUE)
-	{
-		do
-		{
-			char fileName[256];
-			sprintf(fileName, "%s", data.cFileName);
-			strtolwr(fileName);
-			char* const fileNameEnd = strstr(fileName, ".tga");
-			*fileNameEnd = 0;
-
-			TargaToPng(fileName);
-		} while (FindNextFile(handle, &data));
-		FindClose(handle);
-	}
+	//char appPath[1024];
+	//char outPathName[1024];
+	//GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
+	//strtolwr(appPath);
+	//
+	//char* const end = strstr(appPath, "applications");
+	//end[0] = 0;
+	//sprintf(outPathName, "%sapplications/media", appPath);
+	//
+	//char rootPath[2048];
+	//sprintf(rootPath, "%s/*.tga", outPathName);
+	//
+	//WIN32_FIND_DATAA data;
+	//HANDLE handle = FindFirstFile(rootPath, &data);
+	//
+	//if (handle != INVALID_HANDLE_VALUE)
+	//{
+	//	do
+	//	{
+	//		char fileName[256];
+	//		sprintf(fileName, "%s", data.cFileName);
+	//		strtolwr(fileName);
+	//		char* const fileNameEnd = strstr(fileName, ".tga");
+	//		*fileNameEnd = 0;
+	//
+	//		TargaToPng(fileName);
+	//	} while (FindNextFile(handle, &data));
+	//	FindClose(handle);
+	//}
 #endif
 }

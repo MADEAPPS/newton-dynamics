@@ -22,7 +22,6 @@ enum TextureImageFormat
 };
 
 void TextureCacheCleanUp();
-GLuint GetDefaultTexture();
 GLuint LoadTexture(const char* const filename);
 
 GLuint LoadCubeMapTexture(
