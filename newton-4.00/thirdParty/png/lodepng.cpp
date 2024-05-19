@@ -3012,7 +3012,7 @@ static void addColorBits(unsigned char* out, size_t index, unsigned bits, unsign
   unsigned p = index & m;
   in &= (1u << bits) - 1u; /*filter out any other bits of the input value*/
   in = in << (bits * (m - p));
-  if(p == 0) out[index * bits / 8] = unsigned char(in);
+  if(p == 0) out[index * bits / 8] = (unsigned char)(in);
   else out[index * bits / 8] |= in;
 }
 
@@ -3102,7 +3102,7 @@ static unsigned rgba8ToPixel(unsigned char* out, size_t i,
     else
     {
       /*take the most significant bits of grey*/
-      grey = unsigned char((grey >> (8 - mode->bitdepth)) & ((1 << mode->bitdepth) - 1));
+      grey = (unsigned char)((grey >> (8 - mode->bitdepth)) & ((1 << mode->bitdepth) - 1));
       addColorBits(out, i, mode->bitdepth, grey);
     }
   }
@@ -3125,7 +3125,7 @@ static unsigned rgba8ToPixel(unsigned char* out, size_t i,
   {
     int index = color_tree_get(tree, r, g, b, a);
     if(index < 0) return 82; /*color not in palette*/
-    if(mode->bitdepth == 8) out[i] = unsigned char(index);
+    if(mode->bitdepth == 8) out[i] = (unsigned char)(index);
     else addColorBits(out, i, mode->bitdepth, (unsigned)index);
   }
   else if(mode->colortype == LCT_GREY_ALPHA)
@@ -3171,36 +3171,36 @@ static void rgba16ToPixel(unsigned char* out, size_t i,
   if(mode->colortype == LCT_GREY)
   {
     unsigned short grey = r; /*((unsigned)r + g + b) / 3*/;
-    out[i * 2 + 0] = unsigned char((grey >> 8) & 255);
-    out[i * 2 + 1] = unsigned char(grey & 255);
+    out[i * 2 + 0] = (unsigned char)((grey >> 8) & 255);
+    out[i * 2 + 1] = (unsigned char)(grey & 255);
   }
   else if(mode->colortype == LCT_RGB)
   {
-    out[i * 6 + 0] = unsigned char((r >> 8) & 255);
-    out[i * 6 + 1] = unsigned char(r & 255);
-    out[i * 6 + 2] = unsigned char((g >> 8) & 255);
-    out[i * 6 + 3] = unsigned char(g & 255);
-    out[i * 6 + 4] = unsigned char((b >> 8) & 255);
-    out[i * 6 + 5] = unsigned char(b & 255);
+    out[i * 6 + 0] = (unsigned char)((r >> 8) & 255);
+    out[i * 6 + 1] = (unsigned char)(r & 255);
+    out[i * 6 + 2] = (unsigned char)((g >> 8) & 255);
+    out[i * 6 + 3] = (unsigned char)(g & 255);
+    out[i * 6 + 4] = (unsigned char)((b >> 8) & 255);
+    out[i * 6 + 5] = (unsigned char)(b & 255);
   }
   else if(mode->colortype == LCT_GREY_ALPHA)
   {
     unsigned short grey = r; /*((unsigned)r + g + b) / 3*/;
-    out[i * 4 + 0] = unsigned char((grey >> 8) & 255);
-    out[i * 4 + 1] = unsigned char(grey & 255);
-    out[i * 4 + 2] = unsigned char((a >> 8) & 255);
-    out[i * 4 + 3] = unsigned char(a & 255);
+    out[i * 4 + 0] = (unsigned char)((grey >> 8) & 255);
+    out[i * 4 + 1] = (unsigned char)(grey & 255);
+    out[i * 4 + 2] = (unsigned char)((a >> 8) & 255);
+    out[i * 4 + 3] = (unsigned char)(a & 255);
   }
   else if(mode->colortype == LCT_RGBA)
   {
-    out[i * 8 + 0] = unsigned char((r >> 8) & 255);
-    out[i * 8 + 1] = unsigned char(r & 255);
-    out[i * 8 + 2] = unsigned char((g >> 8) & 255);
-    out[i * 8 + 3] = unsigned char(g & 255);
-    out[i * 8 + 4] = unsigned char((b >> 8) & 255);
-    out[i * 8 + 5] = unsigned char(b & 255);
-    out[i * 8 + 6] = unsigned char((a >> 8) & 255);
-    out[i * 8 + 7] = unsigned char(a & 255);
+    out[i * 8 + 0] = (unsigned char)((r >> 8) & 255);
+    out[i * 8 + 1] = (unsigned char)(r & 255);
+    out[i * 8 + 2] = (unsigned char)((g >> 8) & 255);
+    out[i * 8 + 3] = (unsigned char)(g & 255);
+    out[i * 8 + 4] = (unsigned char)((b >> 8) & 255);
+    out[i * 8 + 5] = (unsigned char)(b & 255);
+    out[i * 8 + 6] = (unsigned char)((a >> 8) & 255);
+    out[i * 8 + 7] = (unsigned char)(a & 255);
   }
 }
 
@@ -3328,7 +3328,7 @@ static void getPixelColorsRGBA8(unsigned char* buffer, size_t numpixels,
       for(i = 0; i != numpixels; ++i, buffer += num_channels)
       {
         buffer[0] = buffer[1] = buffer[2] = in[i];
-        if(has_alpha) buffer[3] = unsigned char(mode->key_defined && in[i] == mode->key_r ? 0 : 255);
+        if(has_alpha) buffer[3] = (unsigned char)(mode->key_defined && in[i] == mode->key_r ? 0 : 255);
       }
     }
     else if(mode->bitdepth == 16)
@@ -3336,7 +3336,7 @@ static void getPixelColorsRGBA8(unsigned char* buffer, size_t numpixels,
       for(i = 0; i != numpixels; ++i, buffer += num_channels)
       {
         buffer[0] = buffer[1] = buffer[2] = in[i * 2];
-        if(has_alpha) buffer[3] = unsigned char(mode->key_defined && 256U * in[i * 2 + 0] + in[i * 2 + 1] == mode->key_r ? 0 : 255);
+        if(has_alpha) buffer[3] = (unsigned char)(mode->key_defined && 256U * in[i * 2 + 0] + in[i * 2 + 1] == mode->key_r ? 0 : 255);
       }
     }
     else
@@ -3347,7 +3347,7 @@ static void getPixelColorsRGBA8(unsigned char* buffer, size_t numpixels,
       {
         unsigned value = readBitsFromReversedStream(&j, in, mode->bitdepth);
         buffer[0] = buffer[1] = buffer[2] = (value * 255) / highest;
-        if(has_alpha) buffer[3] = unsigned char(mode->key_defined && value == mode->key_r ? 0 : 255);
+        if(has_alpha) buffer[3] = (unsigned char)(mode->key_defined && value == mode->key_r ? 0 : 255);
       }
     }
   }
@@ -3360,7 +3360,7 @@ static void getPixelColorsRGBA8(unsigned char* buffer, size_t numpixels,
         buffer[0] = in[i * 3 + 0];
         buffer[1] = in[i * 3 + 1];
         buffer[2] = in[i * 3 + 2];
-        if(has_alpha) buffer[3] = unsigned char(mode->key_defined && buffer[0] == mode->key_r
+        if(has_alpha) buffer[3] = (unsigned char)(mode->key_defined && buffer[0] == mode->key_r
            && buffer[1]== mode->key_g && buffer[2] == mode->key_b ? 0 : 255);
       }
     }
@@ -3371,7 +3371,7 @@ static void getPixelColorsRGBA8(unsigned char* buffer, size_t numpixels,
         buffer[0] = in[i * 6 + 0];
         buffer[1] = in[i * 6 + 2];
         buffer[2] = in[i * 6 + 4];
-        if(has_alpha) buffer[3] = unsigned char(mode->key_defined
+        if(has_alpha) buffer[3] = (unsigned char)(mode->key_defined
            && 256U * in[i * 6 + 0] + in[i * 6 + 1] == mode->key_r
            && 256U * in[i * 6 + 2] + in[i * 6 + 3] == mode->key_g
            && 256U * in[i * 6 + 4] + in[i * 6 + 5] == mode->key_b ? 0 : 255);
@@ -4014,12 +4014,12 @@ static unsigned unfilterScanline(unsigned char* recon, const unsigned char* scan
       break;
     case 1:
       for(i = 0; i != bytewidth; ++i) recon[i] = scanline[i];
-      for(i = bytewidth; i < length; ++i) recon[i] = unsigned char(scanline[i] + recon[i - bytewidth]);
+      for(i = bytewidth; i < length; ++i) recon[i] = (unsigned char)(scanline[i] + recon[i - bytewidth]);
       break;
     case 2:
       if(precon)
       {
-        for(i = 0; i != length; ++i) recon[i] = unsigned char(scanline[i] + precon[i]);
+        for(i = 0; i != length; ++i) recon[i] = (unsigned char)(scanline[i] + precon[i]);
       }
       else
       {
@@ -4029,13 +4029,13 @@ static unsigned unfilterScanline(unsigned char* recon, const unsigned char* scan
     case 3:
       if(precon)
       {
-        for(i = 0; i != bytewidth; ++i) recon[i] = unsigned char(scanline[i] + (precon[i] >> 1));
-        for(i = bytewidth; i < length; ++i) recon[i] = unsigned char(scanline[i] + ((recon[i - bytewidth] + precon[i]) >> 1));
+        for(i = 0; i != bytewidth; ++i) recon[i] = (unsigned char)(scanline[i] + (precon[i] >> 1));
+        for(i = bytewidth; i < length; ++i) recon[i] = (unsigned char)(scanline[i] + ((recon[i - bytewidth] + precon[i]) >> 1));
       }
       else
       {
         for(i = 0; i != bytewidth; ++i) recon[i] = scanline[i];
-        for(i = bytewidth; i < length; ++i) recon[i] = unsigned char(scanline[i] + (recon[i - bytewidth] >> 1));
+        for(i = bytewidth; i < length; ++i) recon[i] = (unsigned char)(scanline[i] + (recon[i - bytewidth] >> 1));
       }
       break;
     case 4:
@@ -4043,11 +4043,11 @@ static unsigned unfilterScanline(unsigned char* recon, const unsigned char* scan
       {
         for(i = 0; i != bytewidth; ++i)
         {
-          recon[i] = unsigned char(scanline[i] + precon[i]); /*paethPredictor(0, precon[i], 0) is always precon[i]*/
+          recon[i] = (unsigned char)(scanline[i] + precon[i]); /*paethPredictor(0, precon[i], 0) is always precon[i]*/
         }
         for(i = bytewidth; i < length; ++i)
         {
-          recon[i] = unsigned char(scanline[i] + paethPredictor(recon[i - bytewidth], precon[i], precon[i - bytewidth]));
+          recon[i] = (unsigned char)(scanline[i] + paethPredictor(recon[i - bytewidth], precon[i], precon[i - bytewidth]));
         }
       }
       else
@@ -4059,7 +4059,7 @@ static unsigned unfilterScanline(unsigned char* recon, const unsigned char* scan
         for(i = bytewidth; i < length; ++i)
         {
           /*paethPredictor(recon[i - bytewidth], 0, 0) is always recon[i - bytewidth]*/
-          recon[i] = unsigned char(scanline[i] + recon[i - bytewidth]);
+          recon[i] = (unsigned char)(scanline[i] + recon[i - bytewidth]);
         }
       }
       break;
@@ -4926,7 +4926,7 @@ static unsigned addChunk_IHDR(ucvector* out, unsigned w, unsigned h,
   ucvector_push_back(&header, (unsigned char)colortype); /*color type*/
   ucvector_push_back(&header, 0); /*compression method*/
   ucvector_push_back(&header, 0); /*filter method*/
-  ucvector_push_back(&header, unsigned char(interlace_method)); /*interlace method*/
+  ucvector_push_back(&header, (unsigned char)(interlace_method)); /*interlace method*/
 
   error = addChunk(out, "IHDR", header.data, header.size);
   ucvector_cleanup(&header);
@@ -5075,7 +5075,7 @@ static unsigned addChunk_iTXt(ucvector* out, unsigned compressed, const char* ke
   for(i = 0; keyword[i] != 0; ++i) ucvector_push_back(&data, (unsigned char)keyword[i]);
   if(i < 1 || i > 79) return 89; /*error: invalid keyword size*/
   ucvector_push_back(&data, 0); /*null termination char*/
-  ucvector_push_back(&data, unsigned char(compressed ? 1 : 0)); /*compression flag*/
+  ucvector_push_back(&data, (unsigned char)(compressed ? 1 : 0)); /*compression flag*/
   ucvector_push_back(&data, 0); /*compression method*/
   for(i = 0; langtag[i] != 0; ++i) ucvector_push_back(&data, (unsigned char)langtag[i]);
   ucvector_push_back(&data, 0); /*null termination char*/
@@ -5159,7 +5159,7 @@ static unsigned addChunk_pHYs(ucvector* out, const LodePNGInfo* info)
 
   lodepng_add32bitInt(&data, info->phys_x);
   lodepng_add32bitInt(&data, info->phys_y);
-  ucvector_push_back(&data, unsigned char(info->phys_unit));
+  ucvector_push_back(&data, (unsigned char)(info->phys_unit));
 
   error = addChunk(out, "pHYs", data.data, data.size);
   ucvector_cleanup(&data);
@@ -5208,10 +5208,10 @@ static void filterScanline(unsigned char* out, const unsigned char* scanline, co
       if(prevline)
       {
         /*paethPredictor(0, prevline[i], 0) is always prevline[i]*/
-        for(i = 0; i != bytewidth; ++i) out[i] = unsigned char(scanline[i] - prevline[i]);
+        for(i = 0; i != bytewidth; ++i) out[i] = (unsigned char)(scanline[i] - prevline[i]);
         for(i = bytewidth; i < length; ++i)
         {
-          out[i] = unsigned char(scanline[i] - paethPredictor(scanline[i - bytewidth], prevline[i], prevline[i - bytewidth]));
+          out[i] = (unsigned char)(scanline[i] - paethPredictor(scanline[i - bytewidth], prevline[i], prevline[i - bytewidth]));
         }
       }
       else
@@ -5444,7 +5444,7 @@ static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, 
         }
       }
       prevline = &in[y * linebytes];
-      out[y * (linebytes + 1)] = unsigned char(bestType); /*the first byte of a scanline will be the filter type*/
+      out[y * (linebytes + 1)] = (unsigned char)(bestType); /*the first byte of a scanline will be the filter type*/
       for(x = 0; x != linebytes; ++x) out[y * (linebytes + 1) + 1 + x] = attempt[bestType][x];
     }
     for(type = 0; type != 5; ++type) lodepng_free(attempt[type]);
