@@ -14,6 +14,7 @@ if(NEWTON_TEST_NEW_V_HACD)
 	add_subdirectory(hacdNew)
 endif(NEWTON_TEST_NEW_V_HACD)
 
+add_subdirectory(png)
 add_subdirectory(tinyxml)
 add_subdirectory(openFBX/src)
 add_subdirectory(hacd/src/VHACD_Lib)
