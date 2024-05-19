@@ -5180,12 +5180,12 @@ static void filterScanline(unsigned char* out, const unsigned char* scanline, co
       break;
     case 1: /*Sub*/
       for(i = 0; i != bytewidth; ++i) out[i] = scanline[i];
-      for(i = bytewidth; i < length; ++i) out[i] = unsigned char (scanline[i] - scanline[i - bytewidth]);
+      for(i = bytewidth; i < length; ++i) out[i] =(unsigned char) (scanline[i] - scanline[i - bytewidth]);
       break;
     case 2: /*Up*/
       if(prevline)
       {
-        for(i = 0; i != length; ++i) out[i] = unsigned char (scanline[i] - prevline[i]);
+        for(i = 0; i != length; ++i) out[i] =(unsigned char) (scanline[i] - prevline[i]);
       }
       else
       {
@@ -5195,13 +5195,13 @@ static void filterScanline(unsigned char* out, const unsigned char* scanline, co
     case 3: /*Average*/
       if(prevline)
       {
-        for(i = 0; i != bytewidth; ++i) out[i] = unsigned char (scanline[i] - (prevline[i] >> 1));
-        for(i = bytewidth; i < length; ++i) out[i] = unsigned char (scanline[i] - ((scanline[i - bytewidth] + prevline[i]) >> 1));
+        for(i = 0; i != bytewidth; ++i) out[i] =(unsigned char) (scanline[i] - (prevline[i] >> 1));
+        for(i = bytewidth; i < length; ++i) out[i] =(unsigned char) (scanline[i] - ((scanline[i - bytewidth] + prevline[i]) >> 1));
       }
       else
       {
         for(i = 0; i != bytewidth; ++i) out[i] = scanline[i];
-        for(i = bytewidth; i < length; ++i) out[i] = unsigned char (scanline[i] - (scanline[i - bytewidth] >> 1));
+        for(i = bytewidth; i < length; ++i) out[i] =(unsigned char) (scanline[i] - (scanline[i - bytewidth] >> 1));
       }
       break;
     case 4: /*Paeth*/
@@ -5218,7 +5218,7 @@ static void filterScanline(unsigned char* out, const unsigned char* scanline, co
       {
         for(i = 0; i != bytewidth; ++i) out[i] = scanline[i];
         /*paethPredictor(scanline[i - bytewidth], 0, 0) is always scanline[i - bytewidth]*/
-        for(i = bytewidth; i < length; ++i) out[i] = unsigned char (scanline[i] - scanline[i - bytewidth]);
+        for(i = bytewidth; i < length; ++i) out[i] =(unsigned char) (scanline[i] - scanline[i - bytewidth]);
       }
       break;
     default: return; /*unexisting filter type given*/
@@ -5360,7 +5360,7 @@ static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, 
       /*try the 5 filter types*/
       for(type = 0; type != 5; ++type)
       {
-        filterScanline(attempt[type], &in[y * linebytes], prevline, linebytes, bytewidth, unsigned char (type));
+        filterScanline(attempt[type], &in[y * linebytes], prevline, linebytes, bytewidth,(unsigned char) (type));
         for(x = 0; x != 256; ++x) count[x] = 0;
         for(x = 0; x != linebytes; ++x) ++count[attempt[type][x]];
         ++count[type]; /*the filter type itself is part of the scanline*/
@@ -5381,7 +5381,7 @@ static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, 
       prevline = &in[y * linebytes];
 
       /*now fill the out values*/
-      out[y * (linebytes + 1)] = unsigned char (bestType); /*the first byte of a scanline will be the filter type*/
+      out[y * (linebytes + 1)] =(unsigned char) (bestType); /*the first byte of a scanline will be the filter type*/
       for(x = 0; x != linebytes; ++x) out[y * (linebytes + 1) + 1 + x] = attempt[bestType][x];
     }
 
@@ -5431,7 +5431,7 @@ static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, 
         unsigned testsize = unsigned(linebytes);
         /*if(testsize > 8) testsize /= 8;*/ /*it already works good enough by testing a part of the row*/
 
-        filterScanline(attempt[type], &in[y * linebytes], prevline, linebytes, bytewidth, unsigned char (type));
+        filterScanline(attempt[type], &in[y * linebytes], prevline, linebytes, bytewidth,(unsigned char) (type));
         size[type] = 0;
         dummy = 0;
         zlib_compress(&dummy, &size[type], attempt[type], testsize, &zlibsettings);
