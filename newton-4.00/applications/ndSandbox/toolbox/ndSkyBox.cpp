@@ -45,10 +45,15 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	//	"NewtonSky0006.tga", "NewtonSky0005.tga",
 	//	"NewtonSky0002.tga", "NewtonSky0004.tga");
 
+	//m_texturecubemap = LoadCubeMapTexture(
+	//	"skyBox_front.tga", "skyBox_back.tga",
+	//	"skyBox_botton.tga", "skyBox_top.tga",
+	//	"skyBox_left.tga", "skyBox_right.tga");
+
 	m_texturecubemap = LoadCubeMapTexture(
-		"skyBox_front.tga", "skyBox_back.tga",
-		"skyBox_botton.tga", "skyBox_top.tga",
-		"skyBox_left.tga", "skyBox_right.tga");
+		"skyBox_front.png", "skyBox_back.png",
+		"skyBox_botton.png", "skyBox_top.png",
+		"skyBox_left.png", "skyBox_right.png");
 
 	glGenVertexArrays(1, &m_vertextArrayBuffer);
 	glBindVertexArray(m_vertextArrayBuffer);

@@ -97,6 +97,11 @@ typedef enum LodePNGColorType
   LCT_RGBA = 6 /*RGB with alpha: 8,16 bit*/
 } LodePNGColorType;
 
+void lodepng_free(void* ptr);
+void* lodepng_malloc(size_t size);
+void* lodepng_realloc(void* ptr, size_t new_size);
+
+
 #ifdef LODEPNG_COMPILE_DECODER
 /*
 Converts PNG data in memory to raw pixel data.

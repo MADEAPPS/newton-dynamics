@@ -332,17 +332,18 @@ GLuint LoadCubeMapTexture(
 		ndGetWorkingFileName(namesArray[i], fullPathName);
 		ndAssert(!cache.Find(namesArray[i]));
 
+#if 0
 		FILE* const pFile = fopen(fullPathName, "rb");
 		if (pFile == nullptr)
 		{
 			ndAssert(0);
 			return 0;
 		}
-
+		
 		TGAHEADER tgaHeader;
 		size_t ret = fread(&tgaHeader, 18, 1, pFile);
 		ret = 0;
-
+		
 		// Do byte swap for big vs little endian
 		tgaHeader.colorMapStart = SWAP_INT16(tgaHeader.colorMapStart);
 		tgaHeader.colorMapLength = SWAP_INT16(tgaHeader.colorMapLength);
@@ -350,22 +351,22 @@ GLuint LoadCubeMapTexture(
 		tgaHeader.ystart = SWAP_INT16(tgaHeader.ystart);
 		tgaHeader.width = SWAP_INT16(tgaHeader.width);
 		tgaHeader.height = SWAP_INT16(tgaHeader.height);
-
+		
 		// Get width, height, and depth of texture
 		ndInt32 width = tgaHeader.width;
 		ndInt32 height = tgaHeader.height;
 		short sDepth = tgaHeader.bits / 8;
-
+		
 		if (tgaHeader.bits != 32)
 		{
 			ndAssert(0);
 			fclose(pFile);
 			return 0;
 		}
-
+		
 		// Calculate size of image buffer
 		ndUnsigned32 lImageSize = ndUnsigned32(width * height * sDepth);
-
+		
 		// Allocate memory and check for success
 		char* const pBits = (char*)ndMemory::Malloc(width * height * sizeof(ndInt32));
 		if (pBits == nullptr)
@@ -373,7 +374,7 @@ GLuint LoadCubeMapTexture(
 			fclose(pFile);
 			return 0;
 		}
-
+		
 		// Read in the bits
 		// Check for read error. This should catch RLE or other 
 		// weird formats that I don't want to recognize
@@ -385,11 +386,17 @@ GLuint LoadCubeMapTexture(
 			ndMemory::Free(pBits);
 			return 0;
 		}
-
-		glTexImage2D(faceArray[i], 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBits);
-
+		glTexImage2D(faceArray[i], 0, GL_RGBA, int (width), int (height), 0, GL_BGRA, GL_UNSIGNED_BYTE, pBits);
 		fclose(pFile);
 		ndMemory::Free(pBits);
+#else		
+		unsigned width;
+		unsigned height;
+		unsigned char* pBits;
+		lodepng_decode_file(&pBits, &width, &height, fullPathName, LCT_RGBA, 8);
+		glTexImage2D(faceArray[i], 0, GL_RGBA, int(width), int(height), 0, GL_RGBA, GL_UNSIGNED_BYTE, pBits);
+		lodepng_free(pBits);
+#endif
 	}
 
 	ndTextureEntry* const texture = cache.InsertText(namesArray[0], texturecubemap);
