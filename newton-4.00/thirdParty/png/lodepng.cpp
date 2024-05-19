@@ -1424,10 +1424,10 @@ static unsigned hash_init(Hash* hash, unsigned windowsize)
   /*initialize hash table*/
   for(i = 0; i != HASH_NUM_VALUES; ++i) hash->head[i] = -1;
   for(i = 0; i != windowsize; ++i) hash->val[i] = -1;
-  for(i = 0; i != windowsize; ++i) hash->chain[i] = unsigned short (i); /*same value as index indicates uninitialized*/
+  for(i = 0; i != windowsize; ++i) hash->chain[i] = (unsigned short) (i); /*same value as index indicates uninitialized*/
 
   for(i = 0; i <= MAX_SUPPORTED_DEFLATE_LENGTH; ++i) hash->headz[i] = -1;
-  for(i = 0; i != windowsize; ++i) hash->chainz[i] = unsigned short (i); /*same value as index indicates uninitialized*/
+  for(i = 0; i != windowsize; ++i) hash->chainz[i] = (unsigned short) (i); /*same value as index indicates uninitialized*/
 
   return 0;
 }
@@ -1481,11 +1481,11 @@ static unsigned countZeros(const unsigned char* data, size_t size, size_t pos)
 static void updateHashChain(Hash* hash, size_t wpos, unsigned hashval, unsigned short numzeros)
 {
   hash->val[wpos] = (int)hashval;
-  if(hash->head[hashval] != -1) hash->chain[wpos] = unsigned short (hash->head[hashval]);
+  if(hash->head[hashval] != -1) hash->chain[wpos] = (unsigned short) (hash->head[hashval]);
   hash->head[hashval] = int (wpos);
 
   hash->zeros[wpos] = numzeros;
-  if(hash->headz[numzeros] != -1) hash->chainz[wpos] = unsigned short (hash->headz[numzeros]);
+  if(hash->headz[numzeros] != -1) hash->chainz[wpos] = (unsigned short) (hash->headz[numzeros]);
   hash->headz[numzeros] = int (wpos);
 }
 
@@ -1543,7 +1543,7 @@ static unsigned encodeLZ77(uivector* out, Hash* hash,
       numzeros = 0;
     }
 
-    updateHashChain(hash, wpos, hashval, unsigned short(numzeros));
+    updateHashChain(hash, wpos, hashval, (unsigned short) (numzeros));
 
     /*the length and offset found for the current position*/
     length = 0;
@@ -1558,7 +1558,7 @@ static unsigned encodeLZ77(uivector* out, Hash* hash,
     for(;;)
     {
       if(chainlength++ >= maxchainlength) break;
-      current_offset = unsigned int (hashpos <= wpos ? wpos - hashpos : wpos - hashpos + windowsize);
+      current_offset = (unsigned int) (hashpos <= wpos ? wpos - hashpos : wpos - hashpos + windowsize);
 
       if(current_offset < prev_offset) break; /*stop when went completely around the circular buffer*/
       prev_offset = current_offset;
@@ -1667,7 +1667,7 @@ static unsigned encodeLZ77(uivector* out, Hash* hash,
         {
           numzeros = 0;
         }
-        updateHashChain(hash, wpos, hashval, unsigned short(numzeros));
+        updateHashChain(hash, wpos, hashval, (unsigned short) (numzeros));
       }
     }
   } /*end of the loop through each character of input*/
@@ -2164,10 +2164,10 @@ unsigned lodepng_zlib_decompress(unsigned char** out, size_t* outsize, const uns
     return 24;
   }
 
-  CM = in[0] & unsigned int(15);
-  CINFO = (in[0] >> 4) & unsigned int(15);
+  CM = in[0] & (unsigned int) (15);
+  CINFO = (in[0] >> 4) & (unsigned int) (15);
   /*FCHECK = in[1] & 31;*/ /*FCHECK is already tested above*/
-  FDICT = (in[1] >> 5) & unsigned int(1);
+  FDICT = (in[1] >> 5) & (unsigned int) (1);
   /*FLEVEL = (in[1] >> 6) & 3;*/ /*FLEVEL is not used here*/
 
   if(CM != 8 || CINFO > 7)
@@ -3007,7 +3007,7 @@ void lodepng_info_swap(LodePNGInfo* a, LodePNGInfo* b)
 /*index: bitgroup index, bits: bitgroup size(1, 2 or 4), in: bitgroup value, out: octet array to add bits to*/
 static void addColorBits(unsigned char* out, size_t index, unsigned bits, unsigned in)
 {
-  unsigned m = unsigned int (bits == 1 ? 7 : bits == 2 ? 3 : 1); /*8 / bits - 1*/
+  unsigned m = (unsigned int) (bits == 1 ? 7 : bits == 2 ? 3 : 1); /*8 / bits - 1*/
   /*p = the partial index in the byte, e.g. with 4 palettebits it is 0 for first half or 1 for second half*/
   unsigned p = index & m;
   in &= (1u << bits) - 1u; /*filter out any other bits of the input value*/
@@ -3319,7 +3319,7 @@ static void getPixelColorsRGBA8(unsigned char* buffer, size_t numpixels,
                                 unsigned has_alpha, const unsigned char* in,
                                 const LodePNGColorMode* mode)
 {
-  unsigned num_channels = unsigned int(has_alpha ? 4 : 3);
+  unsigned num_channels = (unsigned int) (has_alpha ? 4 : 3);
   size_t i;
   if(mode->colortype == LCT_GREY)
   {
@@ -3454,7 +3454,7 @@ static void getPixelColorRGBA16(unsigned short* r, unsigned short* g, unsigned s
 {
   if(mode->colortype == LCT_GREY)
   {
-    *r = *g = *b = unsigned short(256 * in[i * 2 + 0] + in[i * 2 + 1]);
+    *r = *g = *b = (unsigned short) (256 * in[i * 2 + 0] + in[i * 2 + 1]);
     if(mode->key_defined && 256U * in[i * 2 + 0] + in[i * 2 + 1] == mode->key_r) *a = 0;
     else *a = 65535;
   }
@@ -3500,7 +3500,7 @@ unsigned lodepng_convert(unsigned char* out, const unsigned char* in,
 
   if(mode_out->colortype == LCT_PALETTE)
   {
-    unsigned int palettesize = unsigned int (mode_out->palettesize);
+    unsigned int palettesize = (unsigned int) (mode_out->palettesize);
     const unsigned char* palette = mode_out->palette;
 
     unsigned int palsize = 1u << mode_out->bitdepth;
@@ -3509,7 +3509,7 @@ unsigned lodepng_convert(unsigned char* out, const unsigned char* in,
     Note that we never create a new palette ourselves.*/
     if(palettesize == 0)
     {
-      palettesize = unsigned int (mode_in->palettesize);
+      palettesize = (unsigned int) (mode_in->palettesize);
       palette = mode_in->palette;
     }
     if(palettesize < palsize) palsize = palettesize;
@@ -3517,7 +3517,7 @@ unsigned lodepng_convert(unsigned char* out, const unsigned char* in,
     for(i = 0; i != palsize; ++i)
     {
       const unsigned char* p = &palette[i * 4];
-      color_tree_add(&tree, p[0], p[1], p[2], p[3], unsigned int(i));
+      color_tree_add(&tree, p[0], p[1], p[2], p[3], (unsigned int) (i));
     }
   }
 
@@ -3586,7 +3586,7 @@ static unsigned getValueRequiredBits(unsigned char value)
 {
   if(value == 0 || value == 255) return 1;
   /*The scaling of 2-bit and 4-bit values uses multiples of 85 and 17*/
-  if(value % 17 == 0) return unsigned int (value % 85 == 0 ? 2 : 4);
+  if(value % 17 == 0) return (unsigned int) (value % 85 == 0 ? 2 : 4);
   return 8;
 }
 
@@ -3601,14 +3601,14 @@ unsigned lodepng_get_color_profile(LodePNGColorProfile* profile,
   ColorTree tree;
   size_t numpixels = w * h;
 
-  unsigned colored_done = unsigned int (lodepng_is_greyscale_type(mode) ? 1 : 0);
-  unsigned alpha_done = unsigned int(lodepng_can_have_alpha(mode) ? 0 : 1);
+  unsigned colored_done = (unsigned int) (lodepng_is_greyscale_type(mode) ? 1 : 0);
+  unsigned alpha_done = (unsigned int) (lodepng_can_have_alpha(mode) ? 0 : 1);
   unsigned numcolors_done = 0;
   unsigned bpp = lodepng_get_bpp(mode);
-  unsigned bits_done = unsigned int (bpp == 1 ? 1 : 0);
+  unsigned bits_done = (unsigned int) (bpp == 1 ? 1 : 0);
   unsigned maxnumcolors = 257;
   unsigned sixteen = 0;
-  if(bpp <= 8) maxnumcolors = unsigned int (bpp == 1 ? 2 : (bpp == 2 ? 4 : (bpp == 4 ? 16 : 256)));
+  if(bpp <= 8) maxnumcolors = (unsigned int) (bpp == 1 ? 2 : (bpp == 2 ? 4 : (bpp == 4 ? 16 : 256)));
 
   color_tree_init(&tree);
 
@@ -3808,7 +3808,7 @@ unsigned lodepng_auto_choose_color(LodePNGColorMode* mode_out,
     if(prof.bits < 8) prof.bits = 8; /*PNG has no alphachannel modes with less than 8-bit per channel*/
   }
   n = prof.numcolors;
-  palettebits = unsigned int(n <= 2 ? 1 : (n <= 4 ? 2 : (n <= 16 ? 4 : 8)));
+  palettebits = (unsigned int) (n <= 2 ? 1 : (n <= 4 ? 2 : (n <= 16 ? 4 : 8)));
   palette_ok = n <= 256 && prof.bits <= 8;
   if(w * h < n * 2) palette_ok = 0; /*don't add palette overhead if image has only a few pixels*/
   if(!prof.colored && prof.bits <= palettebits) palette_ok = 0; /*grey is less overhead*/
@@ -4357,7 +4357,7 @@ static unsigned readChunk_tEXt(LodePNGInfo* info, const unsigned char* data, siz
 
     string2_begin = length + 1; /*skip keyword null terminator*/
 
-    length = unsigned int (chunkLength < string2_begin ? 0 : chunkLength - string2_begin);
+    length = (unsigned int) (chunkLength < string2_begin ? 0 : chunkLength - string2_begin);
     str = (char*)lodepng_malloc(length + 1);
     if(!str) CERROR_BREAK(error, 83); /*alloc fail*/
 
@@ -4405,7 +4405,7 @@ static unsigned readChunk_zTXt(LodePNGInfo* info, const LodePNGDecompressSetting
     string2_begin = length + 2;
     if(string2_begin > chunkLength) CERROR_BREAK(error, 75); /*no null termination, corrupt?*/
 
-    length = unsigned int (chunkLength - string2_begin);
+    length = (unsigned int) (chunkLength - string2_begin);
     /*will fail if zlib error, e.g. if length is too small*/
     error = zlib_decompress(&decoded.data, &decoded.size,
                             (unsigned char*)(&data[string2_begin]),
@@ -4485,7 +4485,7 @@ static unsigned readChunk_iTXt(LodePNGInfo* info, const LodePNGDecompressSetting
     /*read the actual text*/
     begin += length + 1;
 
-    length = unsigned int (chunkLength < begin ? 0 : chunkLength - begin);
+    length = (unsigned int) (chunkLength < begin ? 0 : chunkLength - begin);
 
     if(compressed)
     {
