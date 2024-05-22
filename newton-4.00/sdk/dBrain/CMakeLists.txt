@@ -15,7 +15,9 @@ message (${projectName})
 
 include_directories(.)
 include_directories(../dCore)
+include_directories(../dCore)
 include_directories(../dProfiler)
+include_directories(../../thirdParty/png)
 
 file(GLOB CPP_SOURCE *.cpp *.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})

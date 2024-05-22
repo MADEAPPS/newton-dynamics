@@ -24,6 +24,7 @@
 #define _ND_BRAIN_STDAFX_H__
 
 #include <ndCore.h>
+#include <lodepng.h>
 
 #define D_BRAIN_USES_REAL
 
