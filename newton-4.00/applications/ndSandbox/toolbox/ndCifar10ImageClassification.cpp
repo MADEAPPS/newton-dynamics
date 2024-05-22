@@ -134,10 +134,11 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 #endif
 }
 
-static void SaveImage(const ndBrainVector& input)
+static void SaveImage(const ndBrainVector& input, const char* const name)
 {
 	unsigned char pBits[32][32][3];
 
+	static ndInt32 index = 0;
 	const ndBrainFloat* src = &input[0];
 	for (ndInt32 y = 0; y < 32; ++y)
 	{
@@ -149,7 +150,11 @@ static void SaveImage(const ndBrainVector& input)
 			src ++;
 		}
 	}
-	lodepng_encode_file("xxxx.png", &pBits[0][0][0], 32, 32, LCT_RGB, 8);
+
+	char name1[256];
+	sprintf(name1, "%s_%d.png", name, index);
+	index++;
+	lodepng_encode_file(name1, &pBits[0][0][0], 32, 32, LCT_RGB, 8);
 }
 
 //static void LoadTestData(ndSharedPtr<ndBrainMatrix>& images, ndSharedPtr<ndBrainMatrix>& labels)
@@ -205,7 +210,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 	brain.DisableDropOut();
 
-	const char* catgories[] = {
+	const char* categories[] = {
 		"airplane",
 		"automobile",
 		"bird",
@@ -242,7 +247,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 		if (truth[index] == ndReal(0.0f))
 		{
 			const ndBrainVector& src = (*srcTestDigits)[i];
-			SaveImage(src);
+			SaveImage(src, categories[index]);
 			failCount++;
 		}
 	}
