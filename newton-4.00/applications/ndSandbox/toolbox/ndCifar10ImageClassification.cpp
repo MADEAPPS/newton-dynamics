@@ -50,11 +50,11 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 					image[k] = ndBrainFloat(data[k]) / ndBrainFloat(255.0f);
 				}
 
-				for (ndInt32 k = 0; k < 3; ++k)
-				{
-					ndBrainMemVector imageChannel (&image[k * pixelSize], pixelSize);
-					imageChannel.GaussianNormalize();
-				}
+				//for (ndInt32 k = 0; k < 3; ++k)
+				//{
+				//	ndBrainMemVector imageChannel (&image[k * pixelSize], pixelSize);
+				//	imageChannel.GaussianNormalize();
+				//}
 			}
 			base += 10000;
 			fclose(fp);
@@ -134,7 +134,26 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 #endif
 }
 
-static void LoadTestData(ndSharedPtr<ndBrainMatrix>& images, ndSharedPtr<ndBrainMatrix>& labels)
+static void SaveImage(const ndBrainVector& input)
+{
+	unsigned char pBits[32][32][3];
+
+	const ndBrainFloat* src = &input[0];
+	for (ndInt32 y = 0; y < 32; ++y)
+	{
+		for (ndInt32 x = 0; x < 32; ++x)
+		{
+			pBits[y][x][0] = unsigned char(src[0 * 32 * 32] * 255.0f);
+			pBits[y][x][1] = unsigned char(src[1 * 32 * 32] * 255.0f);
+			pBits[y][x][2] = unsigned char(src[2 * 32 * 32] * 255.0f);
+			src ++;
+		}
+	}
+	lodepng_encode_file("xxxx.png", &pBits[0][0][0], 32, 32, LCT_RGB, 8);
+}
+
+//static void LoadTestData(ndSharedPtr<ndBrainMatrix>& images, ndSharedPtr<ndBrainMatrix>& labels)
+static void LoadTestData(ndSharedPtr<ndBrainMatrix>& images, ndSharedPtr<ndBrainMatrix>& srcImages, ndSharedPtr<ndBrainMatrix>& labels)
 {
 	const ndInt32 pixelSize = 32 * 32;
 	char outPathName[1024];
@@ -142,9 +161,11 @@ static void LoadTestData(ndSharedPtr<ndBrainMatrix>& images, ndSharedPtr<ndBrain
 
 	labels = new ndBrainMatrix(ndInt32(10000), ndInt32(10));
 	images = new ndBrainMatrix(ndInt32(10000), ndInt32(pixelSize * 3));
+	srcImages = new ndBrainMatrix(ndInt32(10000), ndInt32(pixelSize * 3));
 
 	ndBrainMatrix& labelMatrix = *(*labels);
 	ndBrainMatrix& imageMatrix = *(*images);
+	ndBrainMatrix& srcImageMatrix = *(*srcImages);
 
 	labelMatrix.Set(ndBrainFloat(0.0f));
 	ndGetWorkingFileName("cifar-10-batches-bin/test_batch.bin", outPathName);
@@ -159,10 +180,12 @@ static void LoadTestData(ndSharedPtr<ndBrainMatrix>& images, ndSharedPtr<ndBrain
 
 			labelMatrix[j][label] = ndBrainFloat(1.0f);
 			ndBrainVector& image = imageMatrix[ndInt32(j)];
+			ndBrainVector& src = srcImageMatrix[ndInt32(j)];
 			ret = fread(data, 1, pixelSize * 3, fp);
 			for (ndInt32 k = 0; k < pixelSize * 3; ++k)
 			{
 				image[k] = ndBrainFloat(data[k]) / ndBrainFloat(255.0f);
+				src[k] = image[k];
 			}
 
 			for (ndInt32 k = 0; k < 3; ++k)
@@ -175,12 +198,25 @@ static void LoadTestData(ndSharedPtr<ndBrainMatrix>& images, ndSharedPtr<ndBrain
 	}
 }
 
-static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
+static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits, ndBrainMatrix* const srcTestDigits)
 {
 	ndBrainVector output;
 	output.SetCount((*testLabels)[0].GetCount());
 
 	brain.DisableDropOut();
+
+	const char* catgories[] = {
+		"airplane",
+		"automobile",
+		"bird",
+		"cat",
+		"deer",
+		"dog",
+		"frog",
+		"horse",
+		"ship",
+		"truck" };
+
 
 	ndInt32 failCount = 0;
 	ndBrainVector workingBuffer;
@@ -205,6 +241,8 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 		ndAssert(index >= 0);
 		if (truth[index] == ndReal(0.0f))
 		{
+			const ndBrainVector& src = (*srcTestDigits)[i];
+			SaveImage(src);
 			failCount++;
 		}
 	}
@@ -220,10 +258,11 @@ static void Cifar10TrainingSet()
 
 	ndSharedPtr<ndBrainMatrix> testLabels;
 	ndSharedPtr<ndBrainMatrix> testImages;
+	ndSharedPtr<ndBrainMatrix> srcTestImages;
 	ndSharedPtr<ndBrainMatrix> trainingLabels;
 	ndSharedPtr<ndBrainMatrix> trainingImages;
 
-	LoadTestData(testImages, testLabels);
+	LoadTestData(testImages, srcTestImages, testLabels);
 	LoadTrainingData(trainingImages, trainingLabels);
 
 	class SupervisedTrainer : public ndBrainThreadPool
@@ -634,7 +673,7 @@ static void Cifar10TrainingSet()
 		//ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
 		
 		ndBrainSave::Save(&brain, path);
-		ValidateData("training data", brain, *trainingLabels, *trainingImages);
+		ValidateData("training data", brain, *trainingLabels, *trainingImages, *srcTestImages);
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 }
@@ -643,7 +682,8 @@ static void Cifar10TestSet()
 {
 	ndSharedPtr<ndBrainMatrix> testLabels;
 	ndSharedPtr<ndBrainMatrix> testImages;
-	LoadTestData(testImages, testLabels);
+	ndSharedPtr<ndBrainMatrix> srcTestImages;
+	LoadTestData(testImages, srcTestImages, testLabels);
 	
 	if (testLabels && testImages)
 	{
@@ -654,7 +694,7 @@ static void Cifar10TestSet()
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		ndInt32 numbeOfParam = brain->GetNumberOfParameters();
 		ndExpandTraceMessage("cifar-10 database, number of Parameters %d\n", numbeOfParam);
-		ValidateData("test data", *(*brain), *testLabels, *testImages);
+		ValidateData("test data", *(*brain), *testLabels, *testImages, *srcTestImages);
 		time = ndGetTimeInMicroseconds() - time;
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
@@ -665,5 +705,5 @@ void ndCifar10ImageClassification()
 	ndSetRandSeed(12345);
 
 	//Cifar10TrainingSet();
-	//Cifar10TestSet();
+	Cifar10TestSet();
 }
