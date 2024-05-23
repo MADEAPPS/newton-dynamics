@@ -280,7 +280,7 @@ static void Cifar10TrainingSet()
 			,m_bashBufferSize(BASH_BUFFER_SIZE)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
-	//threadCount = 1;
+			//threadCount = 1;
 			SetThreadCount(threadCount);
 			for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 			{
@@ -367,8 +367,9 @@ static void Cifar10TrainingSet()
 			ndUnsigned32 miniBashArray[64];
 			ndUnsigned32 failCount[D_MAX_THREADS_COUNT];
 
+			ndAtomic<ndInt32> iterator(0);
 			ndBrainMatrix trainingImages(sourceTrainingImages->GetRows(), sourceTrainingImages->GetColumns());
-			auto BackPropagateBash = ndMakeObject::ndFunction([this, &trainingImages, trainingLabels, &miniBashArray, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
+			auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, &trainingImages, trainingLabels, &miniBashArray, &failCount](ndInt32 threadIndex, ndInt32)
 			{
 				class CategoricalLoss : public ndBrainLossCategoricalCrossEntropy
 				{
@@ -406,8 +407,9 @@ static void Cifar10TrainingSet()
 					ndUnsigned32* m_failCount;
 				};
 
-				const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
-				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+				//const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
+				//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+				for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
 				{
 					ndBrainTrainer& trainer = *m_trainers[i];
 					ndUnsigned32 index = miniBashArray[i];
@@ -437,7 +439,7 @@ static void Cifar10TrainingSet()
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
 
-			for (ndInt32 epoch = 0; epoch < 2000; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 5000; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -449,6 +451,7 @@ static void Cifar10TrainingSet()
 				{
 					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_bashBufferSize);
 
+					iterator = 0;
 					ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 					optimizer.Update(this, m_trainers, m_learnRate);
 
@@ -462,14 +465,15 @@ static void Cifar10TrainingSet()
 					trainFailed += failCount[i];
 				}
 
-				auto CrossValidateTest = ndMakeObject::ndFunction([this, testDigits, testLabels, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
+				auto CrossValidateTest = ndMakeObject::ndFunction([this, &iterator, testDigits, testLabels, &failCount](ndInt32 threadIndex, ndInt32)
 				{
 					ndBrainFloat outputBuffer[32];
 					ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
 
 					failCount[threadIndex] = 0;
-					const ndStartEnd startEnd(testLabels->GetCount(), threadIndex, threadCount);
-					for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+					//const ndStartEnd startEnd(testLabels->GetCount(), threadIndex, threadCount);
+					//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+					for (ndInt32 i = iterator++; i < testLabels->GetCount(); i = iterator++)
 					{
 						const ndBrainVector& truth = (*testLabels)[i];
 						const ndBrainVector& input = (*testDigits)[i];
@@ -492,6 +496,7 @@ static void Cifar10TrainingSet()
 					}
 				});
 
+				iterator = 0;
 				m_brain.DisableDropOut();
 				ndBrainThreadPool::ParallelExecute(CrossValidateTest);
 
@@ -709,6 +714,6 @@ void ndCifar10ImageClassification()
 {
 	ndSetRandSeed(12345);
 
-	//Cifar10TrainingSet();
-	Cifar10TestSet();
+	Cifar10TrainingSet();
+	//Cifar10TestSet();
 }
