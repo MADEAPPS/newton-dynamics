@@ -50,11 +50,11 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 					image[k] = ndBrainFloat(data[k]) / ndBrainFloat(255.0f);
 				}
 
-				//for (ndInt32 k = 0; k < 3; ++k)
-				//{
-				//	ndBrainMemVector imageChannel (&image[k * pixelSize], pixelSize);
-				//	imageChannel.GaussianNormalize();
-				//}
+				for (ndInt32 k = 0; k < 3; ++k)
+				{
+					ndBrainMemVector imageChannel (&image[k * pixelSize], pixelSize);
+					imageChannel.GaussianNormalize();
+				}
 			}
 			base += 10000;
 			fclose(fp);
@@ -157,7 +157,6 @@ static void SaveImage(const ndBrainVector& input, const char* const name)
 	lodepng_encode_file(name1, &pBits[0][0][0], 32, 32, LCT_RGB, 8);
 }
 
-//static void LoadTestData(ndSharedPtr<ndBrainMatrix>& images, ndSharedPtr<ndBrainMatrix>& labels)
 static void LoadTestData(ndSharedPtr<ndBrainMatrix>& images, ndSharedPtr<ndBrainMatrix>& srcImages, ndSharedPtr<ndBrainMatrix>& labels)
 {
 	const ndInt32 pixelSize = 32 * 32;
