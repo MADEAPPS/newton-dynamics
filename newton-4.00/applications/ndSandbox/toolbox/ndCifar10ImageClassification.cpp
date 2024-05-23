@@ -549,7 +549,14 @@ static void Cifar10TrainingSet()
 
 		#if ND_CNN_MODEL == 0
 			// so far the simplest configuration seems to yield better results
-			layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(width, height, 3, 3, 32));
+			layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(width, height, 3, 3, 128));
+			conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
+
+			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
+			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
+
+			layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 128));
 			conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
 			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 
@@ -562,10 +569,6 @@ static void Cifar10TrainingSet()
 
 			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
-
-			layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 128));
-			conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 
 			ndInt32 neuronsPerLayers = 64;
 			layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
@@ -664,14 +667,6 @@ static void Cifar10TrainingSet()
 			brain.AddLayer(layers[i]);
 		}
 		brain.InitWeightsXavierMethod();
-
-		//char path[256];
-		//ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
-		//{
-		//	ndSharedPtr<ndBrain> brain1(ndBrainLoad::Load(path));
-		//	brain.CopyFrom(**brain1);
-		//}
-	
 		ndExpandTraceMessage("training cifar-10 database, number of parameters %d\n", brain.GetNumberOfParameters());
 
 		SupervisedTrainer optimizer(&brain);
