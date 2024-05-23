@@ -399,8 +399,7 @@ static void MnistTrainingSet()
 		ndInt32 neuronsPerLayers = 64;
 
 		#if 1
-			//#define DIGIT_ACTIVATION_TYPE ndBrainLayerReluActivation
-			#define DIGIT_ACTIVATION_TYPE ndBrainLayerLeakyReluActivation
+			#define DIGIT_ACTIVATION_TYPE ndBrainLayerReluActivation
 		#else
 			#define DIGIT_ACTIVATION_TYPE ndBrainLayerTanhActivation
 		#endif

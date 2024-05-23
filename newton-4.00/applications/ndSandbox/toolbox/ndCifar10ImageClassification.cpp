@@ -540,25 +540,26 @@ static void Cifar10TrainingSet()
 		const ndBrainLayerConvolutionalWithDropOut_2d* conv;
 	
 		#if 0
-			//#define ACTIVATION_TYPE	ndBrainLayerReluActivation
-			#define ACTIVATION_TYPE ndBrainLayerLeakyReluActivation
+			#define ACTIVATION_TYPE	ndBrainLayerReluActivation
 		#else
 			#define ACTIVATION_TYPE	ndBrainLayerTanhActivation
 		#endif
 	
-		#define ND_CNN_MODEL 1
+		#define ND_CNN_MODEL 0
 
 		#if ND_CNN_MODEL == 0
 			// so far the simplest configuration seems to yield better results
 			layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(width, height, 3, 3, 32));
 			conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
 			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
+
 			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
 			layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 64));
 			conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
 			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
+
 			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
@@ -664,12 +665,12 @@ static void Cifar10TrainingSet()
 		}
 		brain.InitWeightsXavierMethod();
 
-		char path[256];
-		ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
-		{
-			ndSharedPtr<ndBrain> brain1(ndBrainLoad::Load(path));
-			brain.CopyFrom(**brain1);
-		}
+		//char path[256];
+		//ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
+		//{
+		//	ndSharedPtr<ndBrain> brain1(ndBrainLoad::Load(path));
+		//	brain.CopyFrom(**brain1);
+		//}
 	
 		ndExpandTraceMessage("training cifar-10 database, number of parameters %d\n", brain.GetNumberOfParameters());
 
@@ -678,8 +679,8 @@ static void Cifar10TrainingSet()
 		optimizer.Optimize(*trainingLabels, *trainingImages, *testLabels, *testImages);
 		time = ndGetTimeInMicroseconds() - time;
 	
-		//char path[256];
-		//ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
+		char path[256];
+		ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
 		
 		ndBrainSave::Save(&brain, path);
 		ValidateData("training data", brain, *trainingLabels, *trainingImages, *srcTestImages);
