@@ -103,9 +103,12 @@ ndInt32 ndBrain::GetNumberOfParameters() const
 	const ndArray<ndBrainLayer*>& layers = *this;
 
 	ndInt32 parameters = 0;
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
-		parameters += layers[i]->GetNumberOfParameters();
+		const ndBrainLayer* const layer = layers[i];
+		ndInt32 params = layer->GetNumberOfParameters();
+		parameters += params;
 	}
 	return parameters;
 }
