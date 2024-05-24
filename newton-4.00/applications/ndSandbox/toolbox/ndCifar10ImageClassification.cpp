@@ -548,6 +548,40 @@ static void Cifar10TrainingSet()
 		#define ND_CNN_MODEL 0
 
 		#if ND_CNN_MODEL == 0
+#if 1
+		// so far the simplest configuration seems to yield better results
+		layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(width, height, 3, 3, 128));
+		conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
+
+		layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
+		pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
+
+		layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 128));
+		conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
+
+		layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
+		pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
+
+		layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 64));
+		conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
+
+		layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
+		pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
+
+		ndInt32 neuronsPerLayers = 64;
+		layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+		layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
+		layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+#else
 			// so far the simplest configuration seems to yield better results
 			layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(width, height, 3, 3, 128));
 			conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
@@ -576,7 +610,7 @@ static void Cifar10TrainingSet()
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 			layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
+#endif
 		#elif ND_CNN_MODEL == 1
 
 			// trying more layer and with more filters, four time slower and not better results
