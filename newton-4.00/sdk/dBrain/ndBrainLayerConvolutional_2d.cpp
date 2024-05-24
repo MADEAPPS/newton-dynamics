@@ -694,39 +694,6 @@ void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, nd
 		}
 		outputOffset += outputSize;
 	}
-
-#if 0
-	if (m_outputWidth >= 30)
-	{
-		ndBrainFloat* src = &output[0];
-		unsigned char* const pBits = (unsigned char*)ndMemory::Malloc(size_t(output.GetCount()));
-
-		unsigned char* dst = pBits;
-		for (ndInt32 i = 0; i < m_outputLayers; ++i)
-		{
-			ndBrainFloat min = 1.0e10f;
-			ndBrainFloat max = -1.0e10f;
-			for (ndInt32 j = 0; j < m_outputHeight * m_outputWidth; ++j)
-			{
-				min = ndMin(src[j], min);
-				max = ndMax(src[j], max);
-			}
-
-			ndBrainFloat a = min;
-			ndBrainFloat b = 255.0f / (max - min);
-			for (ndInt32 j = 0; j < m_outputHeight * m_outputWidth; ++j)
-			{
-				ndBrainFloat x = (src[j] - a) * b;
-				dst[j] = unsigned char(x);
-			}
-			src += m_outputHeight * m_outputWidth;
-			dst += m_outputHeight * m_outputWidth;
-		}
-
-		lodepng_encode_file("xxxx.png", pBits, ndUnsigned32(m_outputWidth), ndUnsigned32(m_outputLayers * m_outputHeight), LCT_GREY, 8);
-	}
-
-#endif
 }
 
 //void ndBrainLayerConvolutional_2d::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
