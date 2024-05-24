@@ -448,9 +448,8 @@ static void Cifar10TrainingSet()
 				m_brain.EnableDropOut();
 				for (ndInt32 bash = 0; bash < batches; ++bash)
 				{
-					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_bashBufferSize);
-
 					iterator = 0;
+					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_bashBufferSize);
 					ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 					optimizer.Update(this, m_trainers, m_learnRate);
 

@@ -147,7 +147,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void MnistTrainingSet()
 {
-	#define BASH_BUFFER_SIZE	64
+	#define BASH_BUFFER_SIZE	128
 
 	ndSharedPtr<ndBrainMatrix> trainingLabels (LoadMnistLabelData("mnistDatabase/train-labels.idx1-ubyte"));
 	ndSharedPtr<ndBrainMatrix> trainingDigits (LoadMnistSampleData("mnistDatabase/train-images.idx3-ubyte"));
@@ -187,10 +187,11 @@ static void MnistTrainingSet()
 		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits,
 					  ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 		{
-			ndUnsigned32 miniBashArray[64];
+			ndUnsigned32 miniBashArray[BASH_BUFFER_SIZE];
 			ndUnsigned32 failCount[D_MAX_THREADS_COUNT];
 
-			auto BackPropagateBash = ndMakeObject::ndFunction([this, trainingDigits, trainingLabels, &miniBashArray, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
+			ndAtomic<ndInt32> iterator(0);
+			auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, trainingDigits, trainingLabels, &miniBashArray, &failCount](ndInt32 threadIndex, ndInt32)
 			{
 				class CategoricalLoss : public ndBrainLossCategoricalCrossEntropy
 				{
@@ -234,8 +235,9 @@ static void MnistTrainingSet()
 					ndFixSizeArray<ndUnsigned32, 16>& m_priority;
 				};
 
-				const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
-				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+				//const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
+				//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+				for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
 				{
 					ndBrainTrainer& trainer = *m_trainers[i];
 					ndUnsigned32 index = miniBashArray[i];
@@ -262,18 +264,12 @@ static void MnistTrainingSet()
 			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// test data score fully(%)  conv(%)
 
 			ndArray<ndUnsigned32> shuffleBuffer;
-			ndFixSizeArray<ndUnsigned32, 1024 * 2> priorityList;
-
 			for (ndInt32 i = 0; i < trainingDigits->GetCount(); ++i)
 			{
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
-			for (ndInt32 i = 0; i < priorityList.GetCapacity(); ++i)
-			{
-				priorityList.PushBack(ndRandInt() % trainingDigits->GetCount());
-			}
 
-			for (ndInt32 epoch = 0; epoch < 200; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 100; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -281,14 +277,8 @@ static void MnistTrainingSet()
 				m_brain.EnableDropOut();
 				for (ndInt32 bash = 0; bash < batches; ++bash)
 				{
+					iterator = 0;
 					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_bashBufferSize);
-
-					const ndInt32 priorityCount = ndMin(4, priorityList.GetCount());
-					for (ndInt32 i = 0; i < priorityCount; ++i)
-					{
-						miniBashArray[i] = priorityList[ndInt32 (ndRandInt() % priorityList.GetCount())];
-					}
-
 					ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 					optimizer.Update(this, m_trainers, m_learnRate);
 
@@ -369,17 +359,6 @@ static void MnistTrainingSet()
 						ndExpandTraceMessage(" %d\n", minTestFail);
 					}
 				}
-
-				priorityList.SetCount(0);
-				for (ndInt32 i = 0; i < m_prioritySamples.GetCount(); ++i)
-				{
-					ndFixSizeArray<ndUnsigned32, 16>& priority = m_prioritySamples[i];
-					for (ndInt32 j = 0; j < priority.GetCount(); ++j)
-					{
-						priorityList.PushBack(priority[j]);
-					}
-					priority.SetCount(0);
-				}
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 			}
 			m_brain.CopyFrom(bestBrain);
@@ -419,7 +398,7 @@ static void MnistTrainingSet()
 			const DIGIT_FILTER_LAYER_TYPE* conv;
 			const ndBrainLayerImagePolling_2x2* pooling;
 
-			layers.PushBack(new DIGIT_FILTER_LAYER_TYPE(width, height, 1, 3, 16));
+			layers.PushBack(new DIGIT_FILTER_LAYER_TYPE(width, height, 1, 3, 32));
 			conv = (DIGIT_FILTER_LAYER_TYPE*)(layers[layers.GetCount() - 1]);
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
 			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
@@ -434,6 +413,8 @@ static void MnistTrainingSet()
 			layers.PushBack(new DIGIT_FILTER_LAYER_TYPE(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
 			conv = (DIGIT_FILTER_LAYER_TYPE*)(layers[layers.GetCount() - 1]);
 			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
+			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
+			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
 		#else
 		
@@ -503,6 +484,6 @@ void ndHandWrittenDigits()
 {
 	ndSetRandSeed(12345);
 
-	//MnistTrainingSet();
+	MnistTrainingSet();
 	//MnistTestSet();
 }
