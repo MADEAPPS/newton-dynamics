@@ -51,7 +51,7 @@ include_directories(../../thirdParty/openalRuntime/win32sdk/include)
 
 add_executable(${projectName} ${CPP_SOURCE})
 
-target_link_libraries (${projectName} ndNewton ndBrain ndModel ndFileFormat ndTinyxml vhacd openfbx glfw imgui glatter lodepng)
+target_link_libraries (${projectName} ndNewton ndBrain ndModel ndFileFormat ndTinyxml vhacd openfbx glfw imgui glatter lodepng $ENV{VULKAN_SDK}/lib/vulkan-1.lib)
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndCollision ndCore)

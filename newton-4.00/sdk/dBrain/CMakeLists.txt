@@ -19,6 +19,8 @@ include_directories(../dCore)
 include_directories(../dProfiler)
 include_directories(../../thirdParty/png)
 
+include_directories ($ENV{VULKAN_SDK}/Include)
+
 file(GLOB CPP_SOURCE *.cpp *.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
@@ -31,8 +33,32 @@ if (MSVC)
 
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundBrainStdafx.h")
 	set_source_files_properties(ndBrainStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndBrainStdafx.h")
-
 endif()
+
+
+set(BRAIN_SHADER_FOLDER "${CMAKE_SOURCE_DIR}/applications/media/dbrain")
+file (GLOB BRAIN_SHADERS ${BRAIN_SHADER_FOLDER}/source/*.comp)
+
+foreach(file IN LISTS BRAIN_SHADERS)
+	#message (${file})
+	get_filename_component(shaderName ${file} NAME_WE)
+	get_filename_component(dotShaderExt ${file} EXT)
+	string(REPLACE "\." "-" shaderExt ${dotShaderExt})
+
+	file(TIMESTAMP ${BRAIN_SHADER_FOLDER}/${shaderName}${shaderExt}.spv dstDate)
+	if(dstDate)
+		file(TIMESTAMP ${file} srcDate)
+		#message (${srcDate} " " ${dstDate})
+		if(${srcDate} STRGREATER ${dstDate})
+			message (${dstDate} " " ${BRAIN_SHADER_FOLDER}/${shaderName}${shaderExt}.spv)
+			execute_process (COMMAND $ENV{VULKAN_SDK}/Bin/glslang.exe -V ${file} -o ${BRAIN_SHADER_FOLDER}/${shaderName}${shaderExt}.spv)
+		endif()
+	else()
+		message (${BRAIN_SHADER_FOLDER}/${shaderName}${shaderExt}.spv)
+		execute_process (COMMAND $ENV{VULKAN_SDK}/Bin/glslang.exe -V ${file} -o ${BRAIN_SHADER_FOLDER}/${shaderName}${shaderExt}.spv)
+	endif()
+endforeach()
+
 
 
 
