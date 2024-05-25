@@ -538,7 +538,7 @@ static void Cifar10TrainingSet()
 	
 		const ndBrainLayerImagePolling_2x2* pooling;
 		const ndBrainLayerConvolutionalWithDropOut_2d* conv;
-	
+
 		#if 1
 			#define ACTIVATION_TYPE	ndBrainLayerReluActivation			
 		#else
@@ -549,14 +549,14 @@ static void Cifar10TrainingSet()
 
 		#if ND_CNN_MODEL == 0
 			// so far the simplest configuration seems to yield better results
-			layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(width, height, 3, 3, 128));
+			layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(width, height, 3, 3, 64));
 			conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
 			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
-			layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 128));
+			layers.PushBack(new ndBrainLayerConvolutionalWithDropOut_2d(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 64));
 			conv = (ndBrainLayerConvolutionalWithDropOut_2d*)(layers[layers.GetCount() - 1]);
 			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 
