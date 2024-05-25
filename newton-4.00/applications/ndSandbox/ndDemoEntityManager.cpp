@@ -471,8 +471,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	ndHandWrittenDigits();
-	//ndCifar10ImageClassification();
+	//ndHandWrittenDigits();
+	ndCifar10ImageClassification();
 	//TargaToPng();
 }
 

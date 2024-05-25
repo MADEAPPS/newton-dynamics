@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndSharedPtr<ndBrainMatrix>& trainingLabels)
+static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndSharedPtr<ndBrainMatrix>& srcTrainingImages, ndSharedPtr<ndBrainMatrix>& trainingLabels)
 {
 	const ndInt32 batches = 5;
 	const ndInt32 pixelSize = 32 * 32;
@@ -23,9 +23,11 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 	//ndInt32 dataAugmentation = 4;
 	trainingLabels = new ndBrainMatrix(ndInt32(batches * 10000), ndInt32(10));
 	trainingImages = new ndBrainMatrix(ndInt32(batches * 10000), ndInt32(pixelSize * 3));
+	srcTrainingImages = new ndBrainMatrix(ndInt32(batches * 10000), ndInt32(pixelSize * 3));
 
 	ndBrainMatrix& labelMatrix = *(*trainingLabels);
 	ndBrainMatrix& imageMatrix = *(*trainingImages);
+	ndBrainMatrix& srcImageMatrix = *(*srcTrainingImages);
 
 	ndInt32 base = 0;
 	labelMatrix.Set(ndBrainFloat(0.0f));
@@ -44,10 +46,12 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 
 				labelMatrix[j + base][label] = ndBrainFloat(1.0f);
 				ndBrainVector& image = imageMatrix[j + base];
+				ndBrainVector& src = srcImageMatrix[j + base];
 				ret = fread(data, 1, pixelSize * 3, fp);
 				for (ndInt32 k = 0; k < pixelSize * 3; ++k)
 				{
 					image[k] = ndBrainFloat(data[k]) / ndBrainFloat(255.0f);
+					src[k] = image[k];
 				}
 
 				for (ndInt32 k = 0; k < 3; ++k)
@@ -265,9 +269,10 @@ static void Cifar10TrainingSet()
 	ndSharedPtr<ndBrainMatrix> srcTestImages;
 	ndSharedPtr<ndBrainMatrix> trainingLabels;
 	ndSharedPtr<ndBrainMatrix> trainingImages;
+	ndSharedPtr<ndBrainMatrix> srcTrainingImages;
 
 	LoadTestData(testImages, srcTestImages, testLabels);
-	LoadTrainingData(trainingImages, trainingLabels);
+	LoadTrainingData(trainingImages, srcTrainingImages, trainingLabels);
 
 	class SupervisedTrainer : public ndBrainThreadPool
 	{
@@ -439,7 +444,7 @@ static void Cifar10TrainingSet()
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
 
-			for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 2000; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -678,7 +683,7 @@ static void Cifar10TrainingSet()
 		ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
 		
 		ndBrainSave::Save(&brain, path);
-		ValidateData("training data", brain, *trainingLabels, *trainingImages, *srcTestImages);
+		ValidateData("training data", brain, *trainingLabels, *trainingImages, *srcTrainingImages);
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 }
