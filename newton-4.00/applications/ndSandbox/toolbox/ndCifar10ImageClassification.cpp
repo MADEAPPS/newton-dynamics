@@ -540,9 +540,9 @@ static void Cifar10TrainingSet()
 		const ndBrainLayerConvolutionalWithDropOut_2d* conv;
 	
 		#if 1
-			#define ACTIVATION_TYPE	ndBrainLayerTanhActivation
-		#else
 			#define ACTIVATION_TYPE	ndBrainLayerReluActivation			
+		#else
+			#define ACTIVATION_TYPE	ndBrainLayerTanhActivation
 		#endif
 	
 		#define ND_CNN_MODEL 0

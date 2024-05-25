@@ -109,8 +109,6 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const, ndArray<ndBrainTrain
 	ndBrainFloat descendRate = learnRate * ndBrainFloat(-1.0f);
 	ndBrainFloat den = ndBrainFloat(1.0f) / ndBrainFloat(partialGradients.GetCount());
 
-//static int xxx;
-//xxx++;
 	for (ndInt32 i = 0; i < brain.GetCount(); ++i)
 	{
 		if (brain[i]->HasParameters())

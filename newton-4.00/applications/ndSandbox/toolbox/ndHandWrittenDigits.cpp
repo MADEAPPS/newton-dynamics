@@ -235,8 +235,6 @@ static void MnistTrainingSet()
 					ndFixSizeArray<ndUnsigned32, 16>& m_priority;
 				};
 
-				//const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
-				//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
 				{
 					ndBrainTrainer& trainer = *m_trainers[i];
