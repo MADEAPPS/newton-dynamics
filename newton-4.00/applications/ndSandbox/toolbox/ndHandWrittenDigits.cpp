@@ -147,7 +147,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void MnistTrainingSet()
 {
-	#define BASH_BUFFER_SIZE	128
+	#define BASH_BUFFER_SIZE	64
 
 	ndSharedPtr<ndBrainMatrix> trainingLabels (LoadMnistLabelData("mnistDatabase/train-labels.idx1-ubyte"));
 	ndSharedPtr<ndBrainMatrix> trainingDigits (LoadMnistSampleData("mnistDatabase/train-images.idx3-ubyte"));
@@ -257,7 +257,8 @@ static void MnistTrainingSet()
 			//batches = 1;
 
 			// so far best training result on the mnist data set
-			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(98.070%)  conv(99.500%)
+			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(98.070%)  conv(99.902%)
+			//optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(98.070%)  conv(99.500%)
 			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score fully(98.200%)  conv(99.420%)
 			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score fully(97.980%)  conv(99.210%)
 			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score fully(%)  conv(%)
@@ -269,7 +270,7 @@ static void MnistTrainingSet()
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
 
-			for (ndInt32 epoch = 0; epoch < 100; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 200; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -299,14 +300,15 @@ static void MnistTrainingSet()
 					bool traningTest = fails < minTrainingFail;
 					minTrainingFail = ndMax(fails, minTestCheck);
 
-					auto CrossValidateTest = ndMakeObject::ndFunction([this, testDigits, testLabels, &failCount](ndInt32 threadIndex, ndInt32 threadCount)
+					auto CrossValidateTest = ndMakeObject::ndFunction([this, &iterator, testDigits, testLabels, &failCount](ndInt32 threadIndex, ndInt32)
 					{
 						ndBrainFloat outputBuffer[32];
 						ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
 
 						failCount[threadIndex] = 0;
-						const ndStartEnd startEnd(testDigits->GetCount(), threadIndex, threadCount);
-						for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+						//const ndStartEnd startEnd(testDigits->GetCount(), threadIndex, threadCount);
+						//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+						for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
 						{
 							const ndBrainVector& truth = (*testLabels)[i];
 							const ndBrainVector& input = (*testDigits)[i];
@@ -329,6 +331,7 @@ static void MnistTrainingSet()
 						}
 					});
 
+					iterator = 0;
 					m_brain.DisableDropOut();
 					ndBrainThreadPool::ParallelExecute(CrossValidateTest);
 
