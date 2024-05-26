@@ -51,7 +51,7 @@ include_directories(../../thirdParty/openalRuntime/win32sdk/include)
 
 add_executable(${projectName} ${CPP_SOURCE})
 
-target_link_libraries (${projectName} ndNewton ndBrain ndModel ndFileFormat ndTinyxml vhacd openfbx glfw imgui glatter lodepng $ENV{VULKAN_SDK}/lib/vulkan-1.lib)
+target_link_libraries (${projectName} ndNewton ndBrain ndModel ndFileFormat ndTinyxml vhacd openfbx glfw imgui glatter lodepng)
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndCollision ndCore)
@@ -63,6 +63,8 @@ endif ()
 
 
 if(MSVC OR MINGW)
+	target_link_libraries (${projectName} $ENV{VULKAN_SDK}/lib/vulkan-1.lib)
+
 	if(NEWTON_ENABLE_AVX2_SOLVER)
 		if (NOT NEWTON_BUILD_SHARED_LIBS)
 			target_link_libraries (${projectName} ndSolverAvx2)
@@ -107,7 +109,7 @@ if(MSVC OR MINGW)
 endif()
 
 if(UNIX)
-	target_link_libraries (${projectName} GL GLU dl X11 pthread openal)
+	target_link_libraries (${projectName} GL GLU dl X11 pthread openal vulkan-1)
 
 	if(NEWTON_ENABLE_AVX2_SOLVER)
 		target_link_libraries (${projectName} ndSolverAvx2)
