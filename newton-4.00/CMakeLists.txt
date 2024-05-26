@@ -214,8 +214,8 @@ add_subdirectory(applications)
 if (NOT NEWTON_EXCLUDE_UNIX_TEST AND (PTR_SIZE EQUAL 8))
 	message("building unit tests")
 	file(REMOVE_RECURSE ${PROJECT_BINARY_DIR}/_deps)
-	message("temporarity deisable unit test until I figure out how get vulkan compiling")
-	#add_subdirectory(tests)
+	#message("temporarity deisable unit test until I figure out how get vulkan compiling")
+	add_subdirectory(tests)
 endif()
 
 
