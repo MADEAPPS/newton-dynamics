@@ -372,7 +372,8 @@ static void Cifar10TrainingSet()
 			ndUnsigned32 failCount[D_MAX_THREADS_COUNT];
 
 			ndAtomic<ndInt32> iterator(0);
-			ndBrainMatrix trainingImages(sourceTrainingImages->GetRows(), sourceTrainingImages->GetColumns());
+			//ndBrainMatrix trainingImages(sourceTrainingImages->GetRows(), sourceTrainingImages->GetColumns());
+			const ndBrainMatrix& trainingImages = *sourceTrainingImages;
 			auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, &trainingImages, trainingLabels, &miniBashArray, &failCount](ndInt32 threadIndex, ndInt32)
 			{
 				class CategoricalLoss : public ndBrainLossCategoricalCrossEntropy
@@ -411,8 +412,6 @@ static void Cifar10TrainingSet()
 					ndUnsigned32* m_failCount;
 				};
 
-				//const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
-				//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
 				{
 					ndBrainTrainer& trainer = *m_trainers[i];
@@ -449,9 +448,10 @@ static void Cifar10TrainingSet()
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
 
-				GenerateAugmentedImageBash(*sourceTrainingImages, trainingImages);
+				//GenerateAugmentedImageBash(*sourceTrainingImages, trainingImages);
 
 				m_brain.EnableDropOut();
+				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 				for (ndInt32 bash = 0; bash < batches; ++bash)
 				{
 					iterator = 0;
@@ -520,8 +520,6 @@ static void Cifar10TrainingSet()
 					ndExpandTraceMessage("training fail count: %d   ", minTrainingFail);
 					ndExpandTraceMessage("test fail count:  %d\n", minTestFail);
 				}
-
-				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 			}
 			m_brain.CopyFrom(bestBrain);
 		}
