@@ -20,19 +20,16 @@
 // Insert your headers here
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 
-//#include <io.h>
 #include <stddef.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <float.h>
 #include <ctype.h>
-//#include <cstdarg>
 #include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>
 #include <math.h>
 #include <time.h>
-//#include <tchar.h>
 
 #if (defined(WIN32) || defined(_WIN32))
 	#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
