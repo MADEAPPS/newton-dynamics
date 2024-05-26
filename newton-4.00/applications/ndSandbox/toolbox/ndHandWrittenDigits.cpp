@@ -12,8 +12,6 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-#define D_USE_CONVOLUTIONAL_LAYERS
-
 static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 {
 	ndBrainMatrix* labelData = nullptr;
@@ -148,6 +146,33 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 static void MnistTrainingSet()
 {
 	#define BASH_BUFFER_SIZE	64
+	#define USE_CONVOLUTIONAL_LAYERS
+
+	#if 1
+		#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutional_2d
+	#else
+		#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutionalWithDropOut_2d
+	#endif
+
+	#if 1
+		#define LINEAR_LAYER	ndBrainLayerLinear
+	#else
+		#define LINEAR_LAYER	LINEAR_LAYER
+	#endif
+
+
+	#if 1
+		#define ACTIVATION_TYPE ndBrainLayerReluActivation
+	#else
+		#define ACTIVATION_TYPE ndBrainLayerTanhActivation
+	#endif
+
+	//#if 1
+	//	//#define DIGIT_FILTER_LAYER_TYPE ndBrainLayerConvolutional_2d
+	//	#define DIGIT_FILTER_LAYER_TYPE ndBrainLayerConvolutionalWithDropOut_2d
+	//#else
+	//	#define DIGIT_FILTER_LAYER_TYPE ndBrainLayerCrossCorrelation_2d			
+	//#endif
 
 	ndSharedPtr<ndBrainMatrix> trainingLabels (LoadMnistLabelData("mnistDatabase/train-labels.idx1-ubyte"));
 	ndSharedPtr<ndBrainMatrix> trainingDigits (LoadMnistSampleData("mnistDatabase/train-images.idx3-ubyte"));
@@ -361,56 +386,43 @@ static void MnistTrainingSet()
 		ndFixSizeArray<ndBrainLayer*, 32> layers;
 		ndInt32 neuronsPerLayers = 64;
 
-		#if 1
-			#define DIGIT_ACTIVATION_TYPE ndBrainLayerReluActivation
-		#else
-			#define DIGIT_ACTIVATION_TYPE ndBrainLayerTanhActivation
-		#endif
-
-		#if 1
-			//#define DIGIT_FILTER_LAYER_TYPE ndBrainLayerConvolutional_2d
-			#define DIGIT_FILTER_LAYER_TYPE ndBrainLayerConvolutionalWithDropOut_2d
-		#else
-			#define DIGIT_FILTER_LAYER_TYPE ndBrainLayerCrossCorrelation_2d			
-		#endif
-
-		#ifdef D_USE_CONVOLUTIONAL_LAYERS
+		#ifdef USE_CONVOLUTIONAL_LAYERS
 			ndInt32 height = 28;
 			ndInt32 width = trainingDigits->GetColumns() / height;
 			ndAssert((height * width) == trainingDigits->GetColumns());
 
-			const DIGIT_FILTER_LAYER_TYPE* conv;
+			const CONVOLUTIONAL_LAYER* conv;
 			const ndBrainLayerImagePolling_2x2* pooling;
 
-			layers.PushBack(new DIGIT_FILTER_LAYER_TYPE(width, height, 1, 3, 32));
-			conv = (DIGIT_FILTER_LAYER_TYPE*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
+			layers.PushBack(new CONVOLUTIONAL_LAYER(width, height, 1, 3, 32));
+			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
-			layers.PushBack(new DIGIT_FILTER_LAYER_TYPE(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
-			conv = (DIGIT_FILTER_LAYER_TYPE*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
+			layers.PushBack(new CONVOLUTIONAL_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
+			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
-			layers.PushBack(new DIGIT_FILTER_LAYER_TYPE(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
-			conv = (DIGIT_FILTER_LAYER_TYPE*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new DIGIT_ACTIVATION_TYPE(conv->GetOutputSize()));
+			layers.PushBack(new CONVOLUTIONAL_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
+			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
 		#else
 		
-			layers.PushBack(new ndBrainLayerLinearWithDropOut(trainingDigits->GetColumns(), neuronsPerLayers));
-			layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new LINEAR_LAYER(trainingDigits->GetColumns(), neuronsPerLayers));
+			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 		#endif
 
-		layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 		
-		layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-		layers.PushBack(new DIGIT_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -428,7 +440,7 @@ static void MnistTrainingSet()
 		time = ndGetTimeInMicroseconds() - time;
 	
 		char path[256];
-		#ifdef D_USE_CONVOLUTIONAL_LAYERS
+		#ifdef USE_CONVOLUTIONAL_LAYERS
 		ndGetWorkingFileName("mnistDatabase/mnist-cnn.dnn", path);
 		#else
 		ndGetWorkingFileName("mnistDatabase/mnist.dnn", path);
@@ -448,7 +460,7 @@ static void MnistTestSet()
 	if (testLabels && testDigits)
 	{
 		char path[256];
-		#ifdef D_USE_CONVOLUTIONAL_LAYERS
+		#ifdef USE_CONVOLUTIONAL_LAYERS
 		ndGetWorkingFileName("mnistDatabase/mnist-cnn.dnn", path);
 		#else
 		ndGetWorkingFileName("mnistDatabase/mnist.dnn", path);

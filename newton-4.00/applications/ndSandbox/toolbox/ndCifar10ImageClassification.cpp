@@ -191,6 +191,24 @@ static void Cifar10TrainingSet()
 {
 	#define BASH_BUFFER_SIZE	64
 
+	#if 1
+		#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutional_2d
+	#else
+		#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutionalWithDropOut_2d
+	#endif
+
+	#if 1
+		#define LINEAR_LAYER	ndBrainLayerLinear
+	#else
+		#define LINEAR_LAYER	ndBrainLayerLinearWithDropOut
+	#endif
+
+	#if 1
+		#define ACTIVATION_TYPE	ndBrainLayerReluActivation
+	#else
+		#define ACTIVATION_TYPE	ndBrainLayerTanhActivation
+	#endif
+
 	ndSharedPtr<ndBrainMatrix> testLabels;
 	ndSharedPtr<ndBrainMatrix> testImages;
 	ndSharedPtr<ndBrainMatrix> srcTestImages;
@@ -305,12 +323,13 @@ static void Cifar10TrainingSet()
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
 
-			for (ndInt32 epoch = 0; epoch < 2000; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
 
 				m_brain.EnableDropOut();
+				m_brain.UpdateDropOut();
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 				for (ndInt32 bash = 0; bash < batches; ++bash)
 				{
@@ -318,10 +337,9 @@ static void Cifar10TrainingSet()
 					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_bashBufferSize);
 					ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 					optimizer.Update(this, m_trainers, m_learnRate);
-
-					m_brain.UpdateDropOut();
 					start += m_bashBufferSize;
 				}
+				m_brain.DisableDropOut();
 
 				ndInt32 trainFail = 0;
 				for (ndInt32 i = 0; i < GetThreadCount(); ++i)
@@ -359,7 +377,6 @@ static void Cifar10TrainingSet()
 				});
 
 				iterator = 0;
-				m_brain.DisableDropOut();
 				ndBrainThreadPool::ParallelExecute(CrossValidateTest);
 
 				ndInt32 testFail = 0;
@@ -398,18 +415,6 @@ static void Cifar10TrainingSet()
 		ndInt32 height = 32;
 		ndInt32 width = trainingImages->GetColumns() / (height * 3);
 		ndAssert((3 * height * width) == trainingImages->GetColumns());
-
-		#if 1
-			#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutional_2d
-		#else
-			#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutionalWithDropOut_2d
-		#endif
-
-		#if 1
-			#define ACTIVATION_TYPE	ndBrainLayerReluActivation
-		#else
-			#define ACTIVATION_TYPE	ndBrainLayerTanhActivation
-		#endif
 	
 		#define ND_CNN_MODEL 0
 
@@ -440,10 +445,10 @@ static void Cifar10TrainingSet()
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
 			ndInt32 neuronsPerLayers = 64;
-			layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+			layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-			layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+			layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
@@ -483,10 +488,10 @@ static void Cifar10TrainingSet()
 			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 
 			//ndInt32 neuronsPerLayers = 64;
-			//layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+			//layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 			//layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-			//layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+			//layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 			//layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
@@ -520,10 +525,10 @@ static void Cifar10TrainingSet()
 			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 
 			ndInt32 neuronsPerLayers = 64;
-			layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+			layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-			layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
+			layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
 			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));

@@ -25,7 +25,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerConvolutional_2d.h"
 
-#define ND_CNN_DROPOUT_FACTOR ndBrainFloat(0.8f)
+#define ND_CNN_DROPOUT_FACTOR ndBrainFloat(0.7f)
 
 class ndBrainLayerConvolutionalWithDropOut_2d : public ndBrainLayerConvolutional_2d
 {

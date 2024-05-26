@@ -93,7 +93,6 @@ void ndBrainLayerConvolutionalWithDropOut_2d::UpdateDropOut()
 
 void ndBrainLayerConvolutionalWithDropOut_2d::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-	//ndAssert(output.GetCount() == m_dropout.GetCount());
 	ndAssert(output.GetCount() == GetOutputSize());
 	ndBrainLayerConvolutional_2d::MakePrediction(input, output);
 	if (m_droutOutEnable)
