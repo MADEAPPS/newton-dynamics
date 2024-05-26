@@ -165,7 +165,7 @@ static void MnistTrainingSet()
 			,m_learnRate(ndReal(5.0e-4f))
 			,m_bashBufferSize(BASH_BUFFER_SIZE)
 		{
-			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), ndMin(m_bashBufferSize, 16));
+			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
 	//threadCount = 1;
 			SetThreadCount(threadCount);
 			for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
