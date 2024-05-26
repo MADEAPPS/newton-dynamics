@@ -70,16 +70,16 @@ class ndBrainGpuContext::ndBrainGpuContext::ndImplementation : public ndClassAll
 
 	uint32_t m_queueFamilyIndex;
 	bool m_hasValidationLayers;
-	static char* m_apiLayers[];
-	static char* m_apiExtensionLayers[];
+	static const char* m_apiLayers[];
+	static const char* m_apiExtensionLayers[];
 };
 
-char* ndBrainGpuContext::ndBrainGpuContext::ndImplementation::m_apiLayers[] =
+const char* ndBrainGpuContext::ndBrainGpuContext::ndImplementation::m_apiLayers[] =
 {
 	"VK_LAYER_KHRONOS_validation"
 };
 
-char* ndBrainGpuContext::ndBrainGpuContext::ndImplementation::m_apiExtensionLayers[] =
+const char* ndBrainGpuContext::ndBrainGpuContext::ndImplementation::m_apiExtensionLayers[] =
 {
 	"VK_EXT_debug_report"
 };
@@ -554,8 +554,8 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::GetShaderFileName(c
 	CFRelease(appURL);
 	CFRelease(filePath);
 #elif defined(__linux__)
-	char id[2048];
-	char appPath[2048];
+	char id[1024];
+	char appPath[1024];
 
 	sprintf(id, "/proc/%d/exe", getpid());
 	memset(appPath, 0, sizeof(appPath));
@@ -576,7 +576,7 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreateComputePipeli
 	ndFixSizeArray<char, 1024 * 64> code;
 	auto LoadShaderCode = [this, &code](const char* const name)
 	{
-		char fileName[256];
+		char fileName[1024 * 2];
 		GetShaderFileName(name, fileName);
 
 		code.SetCount(0);
