@@ -395,7 +395,8 @@ static void Cifar10TrainingSet()
 					//{
 					//	minTestFail = testFail;
 					//}
-					//minTestFail = testFail;
+
+					minTestFail = testFail;
 					minTrainingFail = trainFail;
 					bestBrain.CopyFrom(m_brain);
 					ndInt32 size = batches * m_bashBufferSize;
