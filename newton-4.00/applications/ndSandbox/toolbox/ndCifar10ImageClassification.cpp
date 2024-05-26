@@ -581,7 +581,7 @@ static void Cifar10TestSet()
 
 void ndCifar10ImageClassification()
 {
-	ndSetRandSeed(12345);
+	ndSetRandSeed(47);
 
 	Cifar10TrainingSet();
 	//Cifar10TestSet();
