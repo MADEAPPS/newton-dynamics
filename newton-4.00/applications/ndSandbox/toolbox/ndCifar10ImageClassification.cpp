@@ -323,7 +323,8 @@ static void Cifar10TrainingSet()
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
 
-			for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
+			//for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 500; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
@@ -347,48 +348,65 @@ static void Cifar10TrainingSet()
 					trainFail += failCount[i];
 				}
 
-				auto CrossValidateTest = ndMakeObject::ndFunction([this, &iterator, testLabels, testImages, &failCount](ndInt32 threadIndex, ndInt32)
-				{
-					ndBrainFloat outputBuffer[32];
-					ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
-
-					failCount[threadIndex] = 0;
-					for (ndInt32 i = iterator++; i < testLabels->GetCount(); i = iterator++)
-					{
-						const ndBrainVector& truth = (*testLabels)[i];
-						const ndBrainVector& input = (*testImages)[i];
-						m_brain.MakePrediction(input, output, m_trainers[threadIndex]->GetWorkingBuffer());
-
-						ndInt32 index = -1;
-						ndBrainFloat maxProbability = ndBrainFloat(-1.0f);
-						for (ndInt32 j = 0; j < output.GetCount(); j++)
-						{
-							if (output[j] > maxProbability)
-							{
-								index = j;
-								maxProbability = output[j];
-							}
-						}
-						if (truth[index] == ndReal(0.0f))
-						{
-							failCount[threadIndex]++;
-						}
-					}
-				});
-
-				iterator = 0;
-				ndBrainThreadPool::ParallelExecute(CrossValidateTest);
-
-				ndInt32 testFail = 0;
-				for (ndInt32 j = 0; j < GetThreadCount(); ++j)
-				{
-					testFail += failCount[j];
-				}
-
-				bool test = (testFail < minTestFail) || ((testFail == minTestFail) && (trainFail < minTrainingFail));
+				bool test = (trainFail <= minTrainingFail);
 				if (test)
 				{
-					minTestFail = testFail;
+					if (trainFail == minTrainingFail)
+					{
+						auto CrossValidateTest = ndMakeObject::ndFunction([this, &iterator, testLabels, testImages, &failCount](ndInt32 threadIndex, ndInt32)
+						{
+							ndBrainFloat outputBuffer[32];
+							ndBrainMemVector output(outputBuffer, m_brain.GetOutputSize());
+
+							failCount[threadIndex] = 0;
+							for (ndInt32 i = iterator++; i < testLabels->GetCount(); i = iterator++)
+							{
+								const ndBrainVector& truth = (*testLabels)[i];
+								const ndBrainVector& input = (*testImages)[i];
+								m_brain.MakePrediction(input, output, m_trainers[threadIndex]->GetWorkingBuffer());
+
+								ndInt32 index = -1;
+								ndBrainFloat maxProbability = ndBrainFloat(-1.0f);
+								for (ndInt32 j = 0; j < output.GetCount(); j++)
+								{
+									if (output[j] > maxProbability)
+									{
+										index = j;
+										maxProbability = output[j];
+									}
+								}
+								if (truth[index] == ndReal(0.0f))
+								{
+									failCount[threadIndex]++;
+								}
+							}
+						});
+
+						iterator = 0;
+						ndBrainThreadPool::ParallelExecute(CrossValidateTest);
+
+						ndInt32 testFail = 0;
+						for (ndInt32 j = 0; j < GetThreadCount(); ++j)
+						{
+							testFail += failCount[j];
+						}
+						test = testFail <= minTestFail;
+						if (test)
+						{
+							minTestFail = testFail;
+						}
+					}
+					else
+					{
+						minTestFail = testLabels->GetCount();
+					}
+				}
+
+				//bool test = (testFail < minTestFail) || ((testFail == minTestFail) && (trainFail < minTrainingFail));
+				//bool test = (trainFail < minTrainingFail) || ((trainFail == minTrainingFail) && (testFail < minTestFail));
+				if (test)
+				{
+					//minTestFail = testFail;
 					minTrainingFail = trainFail;
 					bestBrain.CopyFrom(m_brain);
 					ndInt32 size = batches * m_bashBufferSize;

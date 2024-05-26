@@ -11,6 +11,8 @@
 #ifndef __ND_BRAIN_GPU_CONTEXT_H__
 #define __ND_BRAIN_GPU_CONTEXT_H__
 
+class ndBrainGpuFloatBuffer;
+
 class ndBrainGpuContext: public ndClassAlloc
 {
 	class ndImplementation;
@@ -25,6 +27,8 @@ class ndBrainGpuContext: public ndClassAlloc
 	void* GetAllocator() const;
 	void* GetPhysicalDevice() const;
 	
+
+	void ExecuteTest(ndBrainGpuFloatBuffer& buffer);
 
 	private:
 	ndImplementation* m_context;

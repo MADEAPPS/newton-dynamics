@@ -246,7 +246,6 @@ void TestVulkanStuff()
 	ndBrainGpuContext context;
 	context.Init();
 
-
 	ndBrainVector input;
 	for (ndInt32 i = 0; i < 100; ++i)
 	{
@@ -255,6 +254,8 @@ void TestVulkanStuff()
 
 	ndBrainGpuFloatBuffer buffer(&context, input.GetCount());
 	buffer.LoadData(input);
+
+	context.ExecuteTest(buffer);
 
 	ndBrainVector output;
 	buffer.UnloadData(output);
@@ -492,7 +493,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//Test1__();
 	TestVulkanStuff();
 	//ndHandWrittenDigits();
-	//ndCifar10ImageClassification();
+	ndCifar10ImageClassification();
 	//TargaToPng();
 }
 

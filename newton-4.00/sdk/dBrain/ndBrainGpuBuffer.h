@@ -41,8 +41,10 @@ class ndScopeMapBuffer
 	ndBrainGpuBufferBase* m_buffer;
 };
 
-
-
+// **************************************************************************
+// 
+// 
+// **************************************************************************
 class ndBrainGpuFloatBuffer : public ndBrainGpuBufferBase
 {
 	public:

@@ -267,6 +267,45 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CheckResultVulkan(V
 	}
 }
 
+void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::GetShaderFileName(const char* const name, char* const outPathName)
+{
+	#if (defined(WIN32) || defined(_WIN32))
+		char appPath[256];
+		GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
+		strtolwr(appPath);
+
+		char* const end = strstr(appPath, "applications");
+		end[0] = 0;
+		sprintf(outPathName, "%sapplications/media/dBrain/%s", appPath, name);
+	#elif defined(__APPLE__)
+		char tmp[2048];
+		CFURLRef appURL(CFBundleCopyBundleURL(CFBundleGetMainBundle()));
+		CFStringRef filePath(CFURLCopyFileSystemPath(appURL, kCFURLPOSIXPathStyle));
+		CFStringGetCString(filePath, tmp, PATH_MAX, kCFStringEncodingUTF8);
+		//char* const ptr = strstr (tmp, "applications");
+		//ptr [0] = 0;
+		//sprintf (outPathName, "%sapplications/media/%s", tmp, name);
+		sprintf(outPathName, "%s/Contents/Resources/%s", tmp, name);
+
+		// Clean up 
+		CFRelease(appURL);
+		CFRelease(filePath);
+	#elif defined(__linux__)
+		char id[1024];
+		char appPath[1024];
+
+		sprintf(id, "/proc/%d/exe", getpid());
+		memset(appPath, 0, sizeof(appPath));
+		size_t ret = readlink(id, appPath, sizeof(appPath));
+		ret = 0;
+		char* const end = strstr(appPath, "applications");
+		*end = 0;
+		sprintf(outPathName, "%sapplications/media/dBrain/%s", appPath, name);
+	#else
+		#error  "error: need to implement \"dGetWorkingFileName\" here for this platform"
+	#endif
+}
+
 VKAPI_ATTR VkBool32 VKAPI_CALL ndBrainGpuContext::ndBrainGpuContext::ndImplementation::DebugReportVulkan(
 	//VkDebugReportFlagsEXT                       flags,
 	//VkDebugReportObjectTypeEXT                  objectType,
@@ -530,45 +569,6 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreateDescriptorSet
 	CheckResultVulkan(vkCreateDescriptorSetLayout(m_device, &descriptorSetLayoutCreateInfo, m_allocator, &m_descriptorSetLayout));
 }
 
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::GetShaderFileName(const char* const name, char* const outPathName)
-{
-#if (defined(WIN32) || defined(_WIN32))
-	char appPath[256];
-	GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
-	strtolwr(appPath);
-
-	char* const end = strstr(appPath, "applications");
-	end[0] = 0;
-	sprintf(outPathName, "%sapplications/media/dBrain/%s", appPath, name);
-#elif defined(__APPLE__)
-	char tmp[2048];
-	CFURLRef appURL(CFBundleCopyBundleURL(CFBundleGetMainBundle()));
-	CFStringRef filePath(CFURLCopyFileSystemPath(appURL, kCFURLPOSIXPathStyle));
-	CFStringGetCString(filePath, tmp, PATH_MAX, kCFStringEncodingUTF8);
-	//char* const ptr = strstr (tmp, "applications");
-	//ptr [0] = 0;
-	//sprintf (outPathName, "%sapplications/media/%s", tmp, name);
-	sprintf(outPathName, "%s/Contents/Resources/%s", tmp, name);
-
-	// Clean up 
-	CFRelease(appURL);
-	CFRelease(filePath);
-#elif defined(__linux__)
-	char id[1024];
-	char appPath[1024];
-
-	sprintf(id, "/proc/%d/exe", getpid());
-	memset(appPath, 0, sizeof(appPath));
-	size_t ret = readlink(id, appPath, sizeof(appPath));
-	ret = 0;
-	char* const end = strstr(appPath, "applications");
-	*end = 0;
-	sprintf(outPathName, "%sapplications/media/dBrain/%s", appPath, name);
-#else
-#error  "error: need to implement \"dGetWorkingFileName\" here for this platform"
-#endif
-}
-
 void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreateComputePipeline()
 {
 	//Create a shader module. A shader module basically just encapsulates some shader code.
@@ -703,4 +703,10 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreateDescriptorSet
 	//
 	//// perform the update of the descriptor set.
 	//vkUpdateDescriptorSets(m_device, 1, &writeDescriptorSet, 0, nullptr);
+}
+
+
+void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer& buffer)
+{
+
 }

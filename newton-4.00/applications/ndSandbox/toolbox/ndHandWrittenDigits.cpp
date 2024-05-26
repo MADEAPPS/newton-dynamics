@@ -299,16 +299,16 @@ static void MnistTrainingSet()
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
 
 				m_brain.EnableDropOut();
+				m_brain.UpdateDropOut();
 				for (ndInt32 bash = 0; bash < batches; ++bash)
 				{
 					iterator = 0;
 					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_bashBufferSize);
 					ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 					optimizer.Update(this, m_trainers, m_learnRate);
-
-					m_brain.UpdateDropOut();
 					start += m_bashBufferSize;
 				}
+				m_brain.DisableDropOut();
 
 				ndInt32 trainFail = 0;
 				for (ndInt32 i = 0; i < GetThreadCount(); ++i)
@@ -346,7 +346,6 @@ static void MnistTrainingSet()
 				});
 
 				iterator = 0;
-				m_brain.DisableDropOut();
 				ndBrainThreadPool::ParallelExecute(CrossValidateTest);
 
 				ndInt32 testFail = 0;
