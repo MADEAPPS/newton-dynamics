@@ -148,9 +148,9 @@ static void SaveImage(const ndBrainVector& input, const char* const name)
 	{
 		for (ndInt32 x = 0; x < 32; ++x)
 		{
-			pBits[y][x][0] = unsigned char(src[0 * 32 * 32] * 255.0f);
-			pBits[y][x][1] = unsigned char(src[1 * 32 * 32] * 255.0f);
-			pBits[y][x][2] = unsigned char(src[2 * 32 * 32] * 255.0f);
+			pBits[y][x][0] = (unsigned char)(src[0 * 32 * 32] * 255.0f);
+			pBits[y][x][1] = (unsigned char)(src[1 * 32 * 32] * 255.0f);
+			pBits[y][x][2] = (unsigned char)(src[2 * 32 * 32] * 255.0f);
 			src ++;
 		}
 	}
