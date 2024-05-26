@@ -109,7 +109,7 @@ if(MSVC OR MINGW)
 endif()
 
 if(UNIX)
-	target_link_libraries (${projectName} GL GLU dl X11 pthread openal vulkan-1)
+	target_link_libraries (${projectName} GL GLU dl X11 pthread openal vulkan)
 
 	if(NEWTON_ENABLE_AVX2_SOLVER)
 		target_link_libraries (${projectName} ndSolverAvx2)
