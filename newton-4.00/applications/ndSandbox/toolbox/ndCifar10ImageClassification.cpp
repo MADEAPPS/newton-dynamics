@@ -317,9 +317,9 @@ static void Cifar10TrainingSet()
 			//optimizer.SetRegularizer(ndBrainFloat(0.0f));		// with dropout out train score (99.838%)
 			//optimizer.SetRegularizer(ndBrainFloat(0.0f));		// base score train score       (99.540%)
 			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// with dropout out train score 
-			//optimizer.SetRegularizer(ndBrainFloat(1.0e-4f));	// test data score (83.10%)
-			//optimizer.SetRegularizer(ndBrainFloat(1.0e-3f));	// test data score (83.22%)
-			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score (%)
+			//optimizer.SetRegularizer(ndBrainFloat(1.0e-4f));	// with dropout out train score 
+			//optimizer.SetRegularizer(ndBrainFloat(1.0e-3f));	// with dropout out train score 
+			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// with dropout out train score 
 			
 			ndArray<ndUnsigned32> shuffleBuffer;
 			for (ndInt32 i = 0; i < trainingLabels->GetCount(); ++i)
