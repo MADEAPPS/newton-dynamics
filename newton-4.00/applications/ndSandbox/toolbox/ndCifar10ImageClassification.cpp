@@ -197,10 +197,12 @@ static void Cifar10TrainingSet()
 		#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutionalWithDropOut_2d
 	#endif
 
-	#if 1
-		#define LINEAR_LAYER	ndBrainLayerLinear
+	#if 0
+		#define LINEAR_LAYER_NEURONS	64
+		#define LINEAR_LAYER			ndBrainLayerLinear
 	#else
-		#define LINEAR_LAYER	ndBrainLayerLinearWithDropOut
+		#define LINEAR_LAYER_NEURONS	128
+		#define LINEAR_LAYER			ndBrainLayerLinearWithDropOut
 	#endif
 
 	#if 1
@@ -249,8 +251,8 @@ static void Cifar10TrainingSet()
 		void Optimize(ndBrainMatrix* const trainingLabels, const ndBrainMatrix* const sourceTrainingImages,
 					  ndBrainMatrix* const testLabels, ndBrainMatrix* const testImages)
 		{
-			ndUnsigned32 miniBashArray[64];
 			ndUnsigned32 failCount[D_MAX_THREADS_COUNT];
+			ndUnsigned32 miniBashArray[BASH_BUFFER_SIZE];
 
 			ndAtomic<ndInt32> iterator(0);
 			const ndBrainMatrix& trainingImages = *sourceTrainingImages;
@@ -312,7 +314,8 @@ static void Cifar10TrainingSet()
 			//batches = 1;
 
 			// so far best training result on the cifar-10 data set
-			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score (83.96%)
+			optimizer.SetRegularizer(ndBrainFloat(0.0f));		// test data score (99.540%)
+			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score (83.10%)
 			//optimizer.SetRegularizer(ndBrainFloat(1.0e-4f));	// test data score (83.10%)
 			//optimizer.SetRegularizer(ndBrainFloat(1.0e-3f));	// test data score (83.22%)
 			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score (%)
@@ -323,7 +326,6 @@ static void Cifar10TrainingSet()
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
 
-			//for (ndInt32 epoch = 0; epoch < 1000; ++epoch)
 			for (ndInt32 epoch = 0; epoch < 500; ++epoch)
 			{
 				ndInt32 start = 0;
@@ -400,10 +402,10 @@ static void Cifar10TrainingSet()
 					minTrainingFail = trainFail;
 					bestBrain.CopyFrom(m_brain);
 					ndInt32 size = batches * m_bashBufferSize;
-					ndExpandTraceMessage("epoch: %d  ", epoch);
-					ndExpandTraceMessage("success rate: %f%%   ", (ndFloat32)(size - minTrainingFail) * 100.0f / (ndFloat32)size);
-					ndExpandTraceMessage("training fail count: %d   ", minTrainingFail);
-					ndExpandTraceMessage("test fail count:  %d\n", minTestFail);
+					ndExpandTraceMessage("  epoch: %d", epoch);
+					ndExpandTraceMessage("  success rate:%f%%", (ndFloat32)(size - minTrainingFail) * 100.0f / (ndFloat32)size);
+					ndExpandTraceMessage("  training fail count: %d", minTrainingFail);
+					ndExpandTraceMessage("  test fail count:%d\n", minTestFail);
 				}
 			}
 			m_brain.CopyFrom(bestBrain);
@@ -424,125 +426,39 @@ static void Cifar10TrainingSet()
 		ndInt32 width = trainingImages->GetColumns() / (height * 3);
 		ndAssert((3 * height * width) == trainingImages->GetColumns());
 	
-		#define ND_CNN_MODEL 0
-
-		const ndBrainLayerImagePolling_2x2* pooling;
 		const CONVOLUTIONAL_LAYER* conv;
+		const ndBrainLayerImagePolling_2x2* pooling;
 
-		#if ND_CNN_MODEL == 0
-			// so far the simplest configuration seems to yield better results
-			layers.PushBack(new CONVOLUTIONAL_LAYER(width, height, 3, 3, 64));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
+		// so far the simplest configuration seems to yield better results
+		layers.PushBack(new CONVOLUTIONAL_LAYER(width, height, 3, 3, 64));
+		conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 
-			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
-			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
+		pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
-			layers.PushBack(new CONVOLUTIONAL_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 64));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
+		layers.PushBack(new CONVOLUTIONAL_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 64));
+		conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 
-			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
-			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
+		pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
-			layers.PushBack(new CONVOLUTIONAL_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 64));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
+		layers.PushBack(new CONVOLUTIONAL_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 64));
+		conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
 
-			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
-			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
+		layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
+		pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
-			ndInt32 neuronsPerLayers = 64;
-			layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), LINEAR_LAYER_NEURONS));
+		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-			layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), LINEAR_LAYER_NEURONS));
+		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
-			layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-		#elif ND_CNN_MODEL == 1
-
-			// trying more layer and with more filters, four time slower and not better results
-			layers.PushBack(new CONVOLUTIONAL_LAYER(width, height, 3, 3, 32));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
-
-			layers.PushBack(new CONVOLUTIONAL_LAYER(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels(), 3, 32));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
-			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
-	
-			layers.PushBack(new CONVOLUTIONAL_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 64));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
-
-			layers.PushBack(new CONVOLUTIONAL_LAYER(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels(), 3, 64));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
-			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
-	
-			layers.PushBack(new CONVOLUTIONAL_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 128, 0.7f));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
-
-			layers.PushBack(new CONVOLUTIONAL_LAYER(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels(), 3, 128, 0.7f));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
-
-			//ndInt32 neuronsPerLayers = 64;
-			//layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-			//layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			//layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-			//layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
-			layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-			
-		#else
-		
-			// trying VGG16 style network
-			const ndBrainLayerImagePadding* paddLayer;
-			layers.PushBack(new ndBrainLayerImagePadding(width, height, 3, 5));
-			paddLayer = (ndBrainLayerImagePadding*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new CONVOLUTIONAL_LAYER(paddLayer->GetOutputWidth(), paddLayer->GetOutputHeight(), paddLayer->GetOutputChannels(), paddLayer->GetFilterSize(), 16));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
-			layers.PushBack(new CONVOLUTIONAL_LAYER(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels(), conv->GetFilterSize(), 32));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
-			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
-			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
-
-			//layers.PushBack(new ndBrainLayerImagePadding(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3));
-			//paddLayer = (ndBrainLayerImagePadding*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new CONVOLUTIONAL_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), paddLayer->GetFilterSize(), 32));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
-			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
-			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
-
-			layers.PushBack(new CONVOLUTIONAL_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, 32));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
-
-			ndInt32 neuronsPerLayers = 64;
-			layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), neuronsPerLayers));
-			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
-			layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-		#endif
+		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
+		layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 	
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{
