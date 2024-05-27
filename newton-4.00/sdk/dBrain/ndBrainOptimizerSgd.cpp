@@ -52,7 +52,8 @@ void ndBrainOptimizerSgd::Update(ndBrainThreadPool* const threadPool, ndArray<nd
 	auto UpdateGradients = ndMakeObject::ndFunction([this, learnRate, &paramLayer, &partialGradients](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		ndBrainTrainer* const trainer = partialGradients[0];
-		ndBrainFloat regularizer = -GetRegularizer();
+		//ndBrainFloat regularizer = -GetRegularizer();
+		ndBrainFloat regularizer = GetRegularizer();
 		ndBrainFloat denScale = -learnRate / ndBrainFloat(partialGradients.GetCount());
 
 		const ndStartEnd startEnd(paramLayer.GetCount(), threadIndex, threadCount);
