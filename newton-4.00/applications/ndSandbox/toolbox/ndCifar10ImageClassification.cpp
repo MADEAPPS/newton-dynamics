@@ -189,7 +189,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void Cifar10TrainingSet()
 {
-	#define BASH_BUFFER_SIZE	64
+	#define BATCH_BUFFER_SIZE	64
 
 	#if 1
 		#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutional_2d
@@ -228,7 +228,7 @@ static void Cifar10TrainingSet()
 			:ndBrainThreadPool()
 			,m_brain(*brain)
 			,m_learnRate(ndReal(5.0e-4f))
-			,m_bashBufferSize(BASH_BUFFER_SIZE)
+			,m_bashBufferSize(BATCH_BUFFER_SIZE)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
 			//threadCount = 1;
@@ -252,7 +252,7 @@ static void Cifar10TrainingSet()
 					  ndBrainMatrix* const testLabels, ndBrainMatrix* const testImages)
 		{
 			ndUnsigned32 failCount[D_MAX_THREADS_COUNT];
-			ndUnsigned32 miniBashArray[BASH_BUFFER_SIZE];
+			ndUnsigned32 miniBashArray[BATCH_BUFFER_SIZE];
 
 			ndAtomic<ndInt32> iterator(0);
 			const ndBrainMatrix& trainingImages = *sourceTrainingImages;
@@ -405,7 +405,7 @@ static void Cifar10TrainingSet()
 					ndInt32 size = batches * m_bashBufferSize;
 					ndExpandTraceMessage("  epoch: %d", epoch);
 					ndExpandTraceMessage("  success rate:%f%%", (ndFloat32)(size - minTrainingFail) * 100.0f / (ndFloat32)size);
-					ndExpandTraceMessage("  training fail count: %d", minTrainingFail);
+					ndExpandTraceMessage("  training fail count:%d", minTrainingFail);
 					ndExpandTraceMessage("  test fail count:%d\n", minTestFail);
 				}
 			}
