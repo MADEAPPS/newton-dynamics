@@ -373,7 +373,7 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreatePhysicalDevic
 	// most common cases (multi-gpu/integrated+dedicated graphics). Handling more complicated setups (multiple
 	// dedicated GPUs) is out of scope of this sample.
 	ndInt32 use_gpu = 0;
-	for (ndInt32 i = 0; i < (int)gpuCount; i++)
+	for (ndInt32 i = 0; i < ndInt32(gpuCount); i++)
 	{
 		VkPhysicalDeviceProperties properties;
 		vkGetPhysicalDeviceProperties(gpus[i], &properties);
