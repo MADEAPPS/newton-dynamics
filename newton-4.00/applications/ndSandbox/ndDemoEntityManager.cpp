@@ -493,7 +493,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//Test1__();
 	TestVulkanStuff();
 	//ndHandWrittenDigits();
-	ndCifar10ImageClassification();
+	//ndCifar10ImageClassification();
 	//TargaToPng();
 }
 

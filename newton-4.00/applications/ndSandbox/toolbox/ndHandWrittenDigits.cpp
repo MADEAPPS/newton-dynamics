@@ -149,7 +149,7 @@ static void MnistTrainingSet()
 	#define USE_CONVOLUTIONAL_LAYERS
 	#define BATCH_BUFFER_SIZE				64
 	#define CONVOLUTIONAL_FEATURE_MAPS		32
-	#define MIN_TRAIN_SCORE					0.998f
+	#define MIN_TRAIN_SCORE					0.9995f
 
 	#if 1
 		#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutional_2d
@@ -157,7 +157,7 @@ static void MnistTrainingSet()
 		#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutionalWithDropOut_2d
 	#endif
 
-	#if 1
+	#if 0
 		#define LINEAR_LAYERS_NEURONS	64
 		#define LINEAR_LAYER			ndBrainLayerLinear
 	#else
@@ -183,8 +183,6 @@ static void MnistTrainingSet()
 
 	ndSharedPtr<ndBrainMatrix> testLabels(LoadMnistLabelData("mnistDatabase/t10k-labels.idx1-ubyte"));
 	ndSharedPtr<ndBrainMatrix> testDigits(LoadMnistSampleData("mnistDatabase/t10k-images.idx3-ubyte"));
-
-	
 	
 	class SupervisedTrainer : public ndBrainThreadPool
 	{
@@ -335,10 +333,11 @@ static void MnistTrainingSet()
 					testFail += failCount[j];
 				}
 
-				bool test = testFail < m_minTestFail;
+				bool test = (testFail < m_minTestFail) || ((testFail == m_minTestFail) && (trainFail < m_minTrainingFail));
 				if (test)
 				{
 					m_minTestFail = testFail;
+					m_minTrainingFail = trainFail;
 					bestBrain.CopyFrom(m_brain);
 					LogScore(epoch, trainingDigits->GetCount());
 				}
@@ -416,12 +415,12 @@ static void MnistTrainingSet()
 			ndInt32 batches = m_minTrainingFail / m_bashBufferSize;
 
 			// so far best training result on the mnist data set
-			optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(98.070%)  conv(99.963%)
-			//optimizer.SetRegularizer(ndBrainFloat(0.0e-5f));	// test data score fully(98.070%)  conv(99.500%)
-			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// test data score fully(98.200%)  conv(99.420%)
-			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// test data score fully(97.980%)  conv(99.210%)
-			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// test data score fully(%)  conv(%)
-			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// test data score fully(%)  conv(%)
+			//optimizer.SetRegularizer(ndBrainFloat(0.0f));		//         training(100.0%) test(99.35%) 
+			optimizer.SetRegularizer(ndBrainFloat(0.0f));		// dropout training(100.0%) test() 
+			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// 
+			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// 
+			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// 
+			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// 
 
 			ndArray<ndUnsigned32> shuffleBuffer;
 			for (ndInt32 i = 0; i < trainingDigits->GetCount(); ++i)
