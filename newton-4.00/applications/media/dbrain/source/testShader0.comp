@@ -9,23 +9,21 @@
 * freely
 */
 #version 450
-#extension GL_EXT_scalar_block_layout : enable
 
 #define WORKGROUP_SIZE 256
 layout (local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1 ) in;
 
 //layout(std140, binding = 0) buffer buf
-layout(scalar, binding = 0) buffer buf
+layout(std430, binding = 0) buffer buf
 {
    float m_data[];
 };
 
-
 void main() 
 {
-  //if(gl_GlobalInvocationID.x >= gl_WorkGroupSize.x)
-  if(gl_GlobalInvocationID.x >= 100)
+  uint index = gl_GlobalInvocationID.x;
+  if(index >= 100)
     return;
 
-  m_data[gl_GlobalInvocationID.x] += 1.0f;
+  m_data[index] += 100.0f;
 }
