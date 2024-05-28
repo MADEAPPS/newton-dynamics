@@ -41,12 +41,6 @@
 	#include "ndDynamicsUpdateCuda.h"
 #endif
 
-#ifdef _D_NEWTON_SYCL
-	#include "ndSyclContext.h"
-	#include "ndWorldSceneSycl.h"
-	#include "ndDynamicsUpdateSycl.h"
-#endif
-
 class ndSkeletonQueue : public ndFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>
 {
 	public:
@@ -975,74 +969,6 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 
 					m_solverMode = solverMode;
 					m_solver = new ndDynamicsUpdateAvx2(this);
-				#else
-					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-					delete m_scene;
-					m_scene = newScene;
-
-					m_solverMode = ndSimdSoaSolver;
-					m_solver = new ndDynamicsUpdateSoa(this);
-				#endif
-				break;
-			}
-
-			case ndSyclSolverCpu:
-			{
-				#ifdef _D_NEWTON_SYCL
-					ndMemFreeCallback freeMemory;
-					ndMemAllocCallback allocMemory;
-					ndMemory::GetMemoryAllocators(allocMemory, freeMemory);
-					ndSyclContext::SetMemoryAllocators(allocMemory, freeMemory);
-
-					ndWorldScene* const newScene = new ndWorldSceneSycl(*((ndWorldScene*)m_scene), true);
-					delete m_scene;
-					m_scene = newScene;
-					m_solverMode = solverMode;
-					m_solver = new ndDynamicsUpdateSycl(this);
-					if (!newScene->IsValid())
-					{
-						delete m_solver;
-						ndWorldScene* const defaultScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-						delete m_scene;
-						m_scene = defaultScene;
-
-						m_solverMode = ndSimdSoaSolver;
-						m_solver = new ndDynamicsUpdateSoa(this);
-					}
-				#else
-					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-					delete m_scene;
-					m_scene = newScene;
-
-					m_solverMode = ndSimdSoaSolver;
-					m_solver = new ndDynamicsUpdateSoa(this);
-				#endif
-				break;
-			}
-
-			case ndSyclSolverGpu:
-			{
-				#ifdef _D_NEWTON_SYCL
-					ndMemFreeCallback freeMemory;
-					ndMemAllocCallback allocMemory;
-					ndMemory::GetMemoryAllocators(allocMemory, freeMemory);
-					ndSyclContext::SetMemoryAllocators(allocMemory, freeMemory);
-
-					ndWorldScene* const newScene = new ndWorldSceneSycl(*((ndWorldScene*)m_scene), false);
-					delete m_scene;
-					m_scene = newScene;
-					m_solverMode = solverMode;
-					m_solver = new ndDynamicsUpdateSycl(this);
-					if (!newScene->IsValid())
-					{
-						delete m_solver;
-						ndWorldScene* const defaultScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-						delete m_scene;
-						m_scene = defaultScene;
-
-						m_solverMode = ndSimdSoaSolver;
-						m_solver = new ndDynamicsUpdateSoa(this);
-					}
 				#else
 					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
 					delete m_scene;

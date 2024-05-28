@@ -454,7 +454,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_autoSleepMode = false;
 	//m_solverMode = ndWorld::ndCudaSolver;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
-	//m_solverMode = ndWorld::ndSyclSolverCpu;
 	m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
 	//m_solverPasses = 4;
@@ -979,8 +978,6 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::RadioButton("sse", &solverMode, ndWorld::ndSimdSoaSolver);
 			ImGui::RadioButton("avx2", &solverMode, ndWorld::ndSimdAvx2Solver);
 			ImGui::RadioButton("cuda", &solverMode, ndWorld::ndCudaSolver);
-			ImGui::RadioButton("syclCpu", &solverMode, ndWorld::ndSyclSolverCpu);
-			ImGui::RadioButton("syclGpu", &solverMode, ndWorld::ndSyclSolverGpu);
 
 			m_solverMode = ndWorld::ndSolverModes(solverMode);
 			ImGui::Separator();

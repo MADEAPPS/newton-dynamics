@@ -83,17 +83,6 @@ else()
 			dNewton/dExtensions/dCuda/dContext/*.h) 
 	endif()
 
-	if (NEWTON_ENABLE_SYCL_SOLVER)
-		add_definitions(-D_D_NEWTON_SYCL)
-		include_directories(dNewton/dExtensions/dSycl)
-		include_directories(dNewton/dExtensions/dSycl/ndScene)
-
-		file(GLOB CPP_SOURCE 
-			${CPP_SOURCE} 
-			dNewton/dExtensions/dSycl/ndScene/*.h
-			dNewton/dExtensions/dSycl/ndScene/*.cpp) 
-	endif()
-
 	if(MSVC)
 		file(GLOB CPP_SOURCE ${CPP_SOURCE} dCore/ndTypes.natvis)
 	endif()

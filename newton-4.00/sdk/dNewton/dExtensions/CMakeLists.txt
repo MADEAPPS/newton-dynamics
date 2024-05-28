@@ -19,9 +19,3 @@ if (NEWTON_ENABLE_CUDA_SOLVER)
 	message ("adding cuda solver")
 	add_subdirectory(dCuda)
 endif()
-
-if (NEWTON_ENABLE_SYCL_SOLVER)
-	message ("adding sycl solver")
-	add_subdirectory(dSycl)
-endif()
-

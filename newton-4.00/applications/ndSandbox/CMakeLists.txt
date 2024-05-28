@@ -79,12 +79,6 @@ if(MSVC OR MINGW)
 		endif()
 	endif(NEWTON_ENABLE_CUDA_SOLVER)
 
-	if (NEWTON_ENABLE_SYCL_SOLVER)
-		if (NOT NEWTON_BUILD_SHARED_LIBS)
-			target_link_libraries (${projectName} ndSolverSycl)
-		endif()
-	endif(NEWTON_ENABLE_SYCL_SOLVER)
-
 	if (PTR_SIZE EQUAL 8)
 		target_link_libraries (${projectName} ${CMAKE_SOURCE_DIR}/thirdParty/openalRuntime/win64sdk/lib/OpenAL_32.lib)
 		add_custom_command(
@@ -125,10 +119,6 @@ if(UNIX)
 		target_link_libraries (${projectName} ndSolverCuda)
 	endif(NEWTON_ENABLE_CUDA_SOLVER)
 
-	if (NEWTON_ENABLE_SYCL_SOLVER)
-		target_link_libraries (${projectName} ndSolverSycl)
-	endif(NEWTON_ENABLE_SYCL_SOLVER)
-    
     set (source "${CMAKE_SOURCE_DIR}/applications/media")
     set (destination "${PROJECT_BINARY_DIR}/applications/media")
     add_custom_command(

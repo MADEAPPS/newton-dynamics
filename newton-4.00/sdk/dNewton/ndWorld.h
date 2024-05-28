@@ -52,8 +52,6 @@ class ndWorld: public ndClassAlloc
 		ndSimdSoaSolver,
 		ndSimdAvx2Solver,
 		ndCudaSolver,
-		ndSyclSolverCpu,
-		ndSyclSolverGpu,
 	};
 
 	D_BASE_CLASS_REFLECTION(ndWorld)
@@ -199,7 +197,6 @@ class ndWorld: public ndClassAlloc
 	friend class ndModelArticulation;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
-	friend class ndDynamicsUpdateSycl;
 	friend class ndDynamicsUpdateCuda;
 } D_GCC_NEWTON_ALIGN_32;
 
