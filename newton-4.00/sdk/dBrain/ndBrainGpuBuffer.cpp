@@ -10,11 +10,33 @@
 */
 
 #include "ndBrainStdafx.h"
-#include <vulkan/vulkan.h>
 #include "ndBrainFloat4.h"
 #include "ndBrainVector.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
+
+#ifdef D_USE_VULKAN_SDK
+#include <vulkan/vulkan.h>
+#endif
+
+#if !defined (D_USE_VULKAN_SDK)
+class ndBrainGpuBufferBase::ndBrainGpuBufferBase::ndImplementation : public ndClassAlloc
+{
+	public:
+	ndImplementation(ndBrainGpuContext* const context, ndInt32 sizeInByte)
+		:ndClassAlloc()
+		,m_buffer(nullptr)
+		,m_context(context)
+		,m_sizeInBytes(sizeInByte)
+	{
+	}
+
+	void* m_buffer;
+	ndBrainGpuContext* m_context;
+	ndInt32 m_sizeInBytes;
+};
+
+#else
 
 #define VK_CHECK_RESULT(f) 																				\
 {																										\
@@ -124,6 +146,7 @@ void* ndScopeMapBuffer::GetPointer() const
 	return m_mappedMemory;
 }
 
+#endif
 
 //*************************************************************************************
 //
@@ -149,6 +172,20 @@ void* ndBrainGpuBufferBase::GetBuffer() const
 	return m_buffer->m_buffer;
 }
 
+ndScopeMapBuffer::ndScopeMapBuffer(ndBrainGpuBufferBase& buffer)
+	:m_buffer(&buffer)
+{
+}
+
+ndScopeMapBuffer::~ndScopeMapBuffer()
+{
+}
+
+void* ndScopeMapBuffer::GetPointer() const
+{
+	return nullptr;
+}
+
 //*************************************************************************************
 //
 //*************************************************************************************
@@ -160,23 +197,30 @@ ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, n
 void ndBrainGpuFloatBuffer::LoadData(const ndBrainVector& input)
 {
 	ndScopeMapBuffer mapBuffer(*this);
-	const ndInt32 size = m_buffer->m_sizeInBytes / ndInt32(sizeof(ndReal));
-	ndAssert(size == input.GetCount());
 	ndReal* const dst = (ndReal*)mapBuffer.GetPointer();
-	for (ndInt32 i = 0; i < size; ++i)
+	if (dst)
 	{
-		dst[i] = ndReal(input[i]);
+		const ndInt32 size = m_buffer->m_sizeInBytes / ndInt32(sizeof(ndReal));
+		ndAssert(size == input.GetCount());
+
+		for (ndInt32 i = 0; i < size; ++i)
+		{
+			dst[i] = ndReal(input[i]);
+		}
 	}
 }
 
 void ndBrainGpuFloatBuffer::UnloadData(ndBrainVector& output)
 {
 	ndScopeMapBuffer mapBuffer(*this);
-	const ndInt32 size = m_buffer->m_sizeInBytes / ndInt32(sizeof(ndReal));
 	const ndReal* const src = (ndReal*)mapBuffer.GetPointer();
-	output.SetCount(size);
-	for (ndInt32 i = 0; i < size; ++i)
+	if (src)
 	{
-		output[i] = ndBrainFloat(src[i]);
+		const ndInt32 size = m_buffer->m_sizeInBytes / ndInt32(sizeof(ndReal));
+		output.SetCount(size);
+		for (ndInt32 i = 0; i < size; ++i)
+		{
+			output[i] = ndBrainFloat(src[i]);
+		}
 	}
 }

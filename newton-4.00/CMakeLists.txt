@@ -20,6 +20,7 @@ option("NEWTON_BUILD_SHARED_LIBS" "build shared library" ON)
 option("NEWTON_ENABLE_AVX2_SOLVER" "enable AVX2 solver"  ON)
 option("NEWTON_ENABLE_CUDA_SOLVER" "enable cuda solver" OFF)
 option("NEWTON_ENABLE_SYCL_SOLVER" "enable sycl solver" OFF)
+option("NEWTON_ENABLE_VULKAN_SDK" "enable vulkan compute" OFF)
 option("NEWTON_DOUBLE_PRECISION" "generate double precision" OFF)
 option("NEWTON_SCALAR_VECTOR_CLASS" "generate simd vector class" OFF)
 option("NEWTON_BUILD_NEWTON_JAVA" "build a sharp wrapper" OFF)
@@ -46,6 +47,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(NEWTON_SCALAR_VECTOR_CLASS)
 	add_definitions(-DD_SCALAR_VECTOR_CLASS)
+endif()
+
+if (NEWTON_ENABLE_VULKAN_SDK)
+	add_definitions(-DD_USE_VULKAN_SDK)
 endif()
 
 if (NEWTON_ENABLE_AVX2)

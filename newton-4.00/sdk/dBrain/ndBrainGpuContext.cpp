@@ -10,10 +10,36 @@
 */
 
 #include "ndBrainStdafx.h"
-#include <vulkan/vulkan.h>
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
 
+#ifdef D_USE_VULKAN_SDK
+#include <vulkan/vulkan.h>
+#endif
+
+#if !defined (D_USE_VULKAN_SDK)
+
+class ndBrainGpuContext::ndBrainGpuContext::ndImplementation : public ndClassAlloc
+{
+	public:
+	ndImplementation()
+		:ndClassAlloc()
+		,m_device(nullptr)
+		,m_allocator(nullptr)
+		,m_physicalDevice(nullptr)
+	{
+	}
+
+	~ndImplementation()
+	{
+	}
+
+	void* m_device;
+	void* m_allocator;
+	void* m_physicalDevice;
+};
+
+#else
 #define ND_SELECT_DISCRETE_GPU
 
 class ndBrainGpuContext::ndBrainGpuContext::ndImplementation : public ndClassAlloc
@@ -30,12 +56,6 @@ class ndBrainGpuContext::ndBrainGpuContext::ndImplementation : public ndClassAll
 	void CreateCommandPool();
 	void CreateDescriptorPool();
 	void LoadShaderPrograms();
-
-	//void CreateCommandBuffer();
-	//void CreateDescriptorPools();
-	//void CreateDescriptorSetLayout();
-	//void CreateDescriptorSet();
-	//void CreateComputePipeline();
 
 	static void CheckResultVulkan(VkResult err);
 	static void VulkanFree(void* pUserData, void* memory);
@@ -79,42 +99,6 @@ const char* ndBrainGpuContext::ndBrainGpuContext::ndImplementation::m_apiExtensi
 {
 	"VK_EXT_debug_report"
 };
-
-ndBrainGpuContext::ndBrainGpuContext()
-	:ndClassAlloc()
-	,m_context(nullptr)
-{
-}
-
-ndBrainGpuContext::~ndBrainGpuContext()
-{
-	if (m_context)
-	{
-		delete m_context;
-	}
-}
-
-ndInt32 ndBrainGpuContext::Init()
-{
-	ndAssert(!m_context);
-	m_context = new ndImplementation;
-	return 0;
-}
-
-void* ndBrainGpuContext::GetDevice() const
-{
-	return m_context->m_device;
-}
-
-void* ndBrainGpuContext::GetPhysicalDevice() const
-{
-	return m_context->m_physicalDevice;
-}
-
-void* ndBrainGpuContext::GetAllocator() const
-{
-	return m_context->m_allocator;
-}
 
 //*************************************************************************************
 //
@@ -638,3 +622,52 @@ void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer& buffer)
 	vkDestroyPipelineLayout(m_context->m_device, pipelineLayout, m_context->m_allocator);
 	vkDestroyPipeline(m_context->m_device, pipeline, m_context->m_allocator);
 }
+
+
+
+#endif
+
+
+//*************************************************************************************
+//
+//*************************************************************************************
+ndBrainGpuContext::ndBrainGpuContext()
+	:ndClassAlloc()
+	,m_context(nullptr)
+{
+}
+
+ndBrainGpuContext::~ndBrainGpuContext()
+{
+	if (m_context)
+	{
+		delete m_context;
+	}
+}
+
+ndInt32 ndBrainGpuContext::Init()
+{
+	ndAssert(!m_context);
+	m_context = new ndImplementation;
+	return 0;
+}
+
+void* ndBrainGpuContext::GetDevice() const
+{
+	return m_context->m_device;
+}
+
+void* ndBrainGpuContext::GetPhysicalDevice() const
+{
+	return m_context->m_physicalDevice;
+}
+
+void* ndBrainGpuContext::GetAllocator() const
+{
+	return m_context->m_allocator;
+}
+
+void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer&)
+{
+}
+

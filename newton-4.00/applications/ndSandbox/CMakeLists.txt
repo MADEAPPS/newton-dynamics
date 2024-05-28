@@ -63,7 +63,9 @@ endif ()
 
 
 if(MSVC OR MINGW)
-	target_link_libraries (${projectName} $ENV{VULKAN_SDK}/lib/vulkan-1.lib)
+	if(NEWTON_ENABLE_VULKAN_SDK)
+		target_link_libraries (${projectName} $ENV{VULKAN_SDK}/lib/vulkan-1.lib)
+	endif(NEWTON_ENABLE_VULKAN_SDK)
 
 	if(NEWTON_ENABLE_AVX2_SOLVER)
 		if (NOT NEWTON_BUILD_SHARED_LIBS)
@@ -109,7 +111,11 @@ if(MSVC OR MINGW)
 endif()
 
 if(UNIX)
-	target_link_libraries (${projectName} GL GLU dl X11 pthread openal vulkan)
+	target_link_libraries (${projectName} GL GLU dl X11 pthread openal)
+
+	if(NEWTON_ENABLE_VULKAN_SDK)
+		target_link_libraries (${projectName} vulkan)
+	endif(NEWTON_ENABLE_VULKAN_SDK)
 
 	if(NEWTON_ENABLE_AVX2_SOLVER)
 		target_link_libraries (${projectName} ndSolverAvx2)
@@ -132,8 +138,8 @@ if(UNIX)
         COMMENT "symbolic link resources folder from ${source} => ${destination}")
 endif()
 
-if(WIN32)
-    file(COPY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications")
-endif()
+#if(WIN32)
+#    file(COPY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications")
+#endif()
 
 install(DIRECTORY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications")
