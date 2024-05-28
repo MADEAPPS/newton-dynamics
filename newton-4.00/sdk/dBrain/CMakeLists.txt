@@ -36,7 +36,7 @@ if (MSVC)
 endif()
 
 if (NEWTON_ENABLE_VULKAN_SDK)
-	set(BRAIN_SHADER_FOLDER "${CMAKE_SOURCE_DIR}/applications/media/dbrain")
+	set(BRAIN_SHADER_FOLDER "${CMAKE_SOURCE_DIR}/sdk/dMedia/dbrain")
 	file (GLOB BRAIN_SHADERS ${BRAIN_SHADER_FOLDER}/source/*.comp)
 
 	foreach(file IN LISTS BRAIN_SHADERS)
@@ -58,6 +58,8 @@ if (NEWTON_ENABLE_VULKAN_SDK)
 			execute_process (COMMAND $ENV{VULKAN_SDK}/Bin/glslang.exe -V ${file} -o ${BRAIN_SHADER_FOLDER}/${shaderName}${shaderExt}.spv)
 		endif()
 	endforeach()
+
+	install(DIRECTORY "${CMAKE_SOURCE_DIR}/sdk/dMedia" DESTINATION "${PROJECT_BINARY_DIR}/sdk")
 endif()
 
 

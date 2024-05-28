@@ -239,7 +239,7 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::GetShaderFileName(c
 
 		char* const end = strstr(appPath, "applications");
 		end[0] = 0;
-		sprintf(outPathName, "%sapplications/media/dBrain/%s", appPath, name);
+		sprintf(outPathName, "%ssdk/dMedia/dbrain/%s", appPath, name);
 	#elif defined(__APPLE__)
 		char tmp[2048];
 		CFURLRef appURL(CFBundleCopyBundleURL(CFBundleGetMainBundle()));
@@ -263,7 +263,7 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::GetShaderFileName(c
 		ret = 0;
 		char* const end = strstr(appPath, "applications");
 		*end = 0;
-		sprintf(outPathName, "%sapplications/media/dBrain/%s", appPath, name);
+		sprintf(outPathName, "%ssdk/dMedia/dbrain/%s", appPath, name);
 	#else
 		#error  "error: need to implement \"dGetWorkingFileName\" here for this platform"
 	#endif
