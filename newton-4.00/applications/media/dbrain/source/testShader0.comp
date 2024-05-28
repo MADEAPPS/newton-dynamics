@@ -22,10 +22,11 @@ layout(std140, binding = 0) buffer buf
 void main() 
 {
   //if(gl_GlobalInvocationID.x >= gl_WorkGroupSize.x)
-  if(gl_GlobalInvocationID.x >= 100)
+  //if(gl_GlobalInvocationID.x >= 100)
+  if(gl_GlobalInvocationID.x >= 4)
     return;
 
-  //m_data[gl_GlobalInvocationID.x] += 5.0f;
-  m_data[0] = 100.0f;
-  m_data[1] = 100.0f;
+  m_data[gl_GlobalInvocationID.x] = 100.0f;
+  //m_data[0] = 100.0f;
+  //m_data[1] = 100.0f;
 }
