@@ -36,6 +36,20 @@ class ndBrainGpuBufferBase::ndBrainGpuBufferBase::ndImplementation : public ndCl
 	ndInt32 m_sizeInBytes;
 };
 
+ndScopeMapBuffer::ndScopeMapBuffer(ndBrainGpuBufferBase& buffer)
+	:m_buffer(&buffer)
+{
+}
+
+ndScopeMapBuffer::~ndScopeMapBuffer()
+{
+}
+
+void* ndScopeMapBuffer::GetPointer() const
+{
+	return nullptr;
+}
+
 #else
 
 #define VK_CHECK_RESULT(f) 																				\
@@ -170,20 +184,6 @@ ndInt32 ndBrainGpuBufferBase::SizeInBytes() const
 void* ndBrainGpuBufferBase::GetBuffer() const
 {
 	return m_buffer->m_buffer;
-}
-
-ndScopeMapBuffer::ndScopeMapBuffer(ndBrainGpuBufferBase& buffer)
-	:m_buffer(&buffer)
-{
-}
-
-ndScopeMapBuffer::~ndScopeMapBuffer()
-{
-}
-
-void* ndScopeMapBuffer::GetPointer() const
-{
-	return nullptr;
 }
 
 //*************************************************************************************

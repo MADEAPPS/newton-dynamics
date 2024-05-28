@@ -34,6 +34,10 @@ class ndBrainGpuContext::ndBrainGpuContext::ndImplementation : public ndClassAll
 	{
 	}
 
+	void ExecuteTest(ndBrainGpuFloatBuffer& buffer)
+	{
+	}
+
 	void* m_device;
 	void* m_allocator;
 	void* m_physicalDevice;
@@ -70,6 +74,9 @@ class ndBrainGpuContext::ndBrainGpuContext::ndImplementation : public ndClassAll
 		const char* pLayerPrefix, const char* pMessage, void* pUserData);
 
 	void GetShaderFileName(const char* const name, char* const outPathName);
+
+
+	void ExecuteTest(ndBrainGpuFloatBuffer& buffer);
 
 	VkAllocationCallbacks m_allocatorStruct;
 	VkAllocationCallbacks* m_allocator;
@@ -513,7 +520,7 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreateDescriptorPoo
 	CheckResultVulkan(vkCreateDescriptorPool(m_device, &descriptorPoolCreateInfo, m_allocator, &m_descriptorPool));
 }
 
-void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer& buffer)
+void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::ExecuteTest(ndBrainGpuFloatBuffer& buffer)
 {
 	VkPipeline pipeline;
 	VkDescriptorSet descriptorSet;
@@ -523,10 +530,10 @@ void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer& buffer)
 
 	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
 	commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	commandBufferAllocateInfo.commandPool = m_context->m_commandPool; 
+	commandBufferAllocateInfo.commandPool = m_commandPool; 
 	commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	commandBufferAllocateInfo.commandBufferCount = 1; 
-	m_context->CheckResultVulkan(vkAllocateCommandBuffers(m_context->m_device, &commandBufferAllocateInfo, &commandBuffer));
+	CheckResultVulkan(vkAllocateCommandBuffers(m_device, &commandBufferAllocateInfo, &commandBuffer));
 
 	VkDescriptorSetLayoutBinding descriptorSetLayoutBinding = {};
 	descriptorSetLayoutBinding.binding = 0; // binding = 0
@@ -538,14 +545,14 @@ void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer& buffer)
 	descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	descriptorSetLayoutCreateInfo.bindingCount = 1; // only a single binding in this descriptor set layout. 
 	descriptorSetLayoutCreateInfo.pBindings = &descriptorSetLayoutBinding;
-	m_context->CheckResultVulkan(vkCreateDescriptorSetLayout(m_context->m_device, &descriptorSetLayoutCreateInfo, m_context->m_allocator, &descriptorSetLayout));
+	CheckResultVulkan(vkCreateDescriptorSetLayout(m_device, &descriptorSetLayoutCreateInfo, m_allocator, &descriptorSetLayout));
 
 	VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
 	descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	descriptorSetAllocateInfo.descriptorPool = m_context->m_descriptorPool;
+	descriptorSetAllocateInfo.descriptorPool = m_descriptorPool;
 	descriptorSetAllocateInfo.descriptorSetCount = 1;
 	descriptorSetAllocateInfo.pSetLayouts = &descriptorSetLayout;
-	m_context->CheckResultVulkan(vkAllocateDescriptorSets(m_context->m_device, &descriptorSetAllocateInfo, &descriptorSet));
+	CheckResultVulkan(vkAllocateDescriptorSets(m_device, &descriptorSetAllocateInfo, &descriptorSet));
 
 	// Specify the buffer to bind to the descriptor.
 	VkDescriptorBufferInfo descriptorBufferInfo = {};
@@ -562,38 +569,38 @@ void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer& buffer)
 	writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
 
 	// perform the update of the descriptor set.
-	vkUpdateDescriptorSets(m_context->m_device, 1, &writeDescriptorSet, 0, nullptr);
+	vkUpdateDescriptorSets(m_device, 1, &writeDescriptorSet, 0, nullptr);
 
 
 	VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
 	shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	shaderStageCreateInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-	shaderStageCreateInfo.module = m_context->m_computeShaderModule;
+	shaderStageCreateInfo.module = m_computeShaderModule;
 	shaderStageCreateInfo.pName = "main";
 
 	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
 	pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutCreateInfo.setLayoutCount = 1;
 	pipelineLayoutCreateInfo.pSetLayouts = &descriptorSetLayout;
-	m_context->CheckResultVulkan(vkCreatePipelineLayout(m_context->m_device, &pipelineLayoutCreateInfo, m_context->m_allocator, &pipelineLayout));
+	CheckResultVulkan(vkCreatePipelineLayout(m_device, &pipelineLayoutCreateInfo, m_allocator, &pipelineLayout));
 		
 	VkComputePipelineCreateInfo pipelineCreateInfo = {};
 	pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
 	pipelineCreateInfo.stage = shaderStageCreateInfo;
 	pipelineCreateInfo.layout = pipelineLayout;
-	m_context->CheckResultVulkan(vkCreateComputePipelines(m_context->m_device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, m_context->m_allocator, &pipeline));
+	CheckResultVulkan(vkCreateComputePipelines(m_device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, m_allocator, &pipeline));
 	
 	VkCommandBufferBeginInfo beginInfo = {};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; 
-	m_context->CheckResultVulkan(vkBeginCommandBuffer(commandBuffer, &beginInfo)); // start recording commands.
+	CheckResultVulkan(vkBeginCommandBuffer(commandBuffer, &beginInfo)); // start recording commands.
 	
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
 	
 	//vkCmdDispatch(commandBuffer, (uint32_t)ceil(WIDTH / float(WORKGROUP_SIZE)), (uint32_t)ceil(HEIGHT / float(WORKGROUP_SIZE)), 1);
 	vkCmdDispatch(commandBuffer, 1, 1, 1);
-	m_context->CheckResultVulkan(vkEndCommandBuffer(commandBuffer));
+	CheckResultVulkan(vkEndCommandBuffer(commandBuffer));
 
 
 
@@ -606,23 +613,22 @@ void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer& buffer)
 	VkFenceCreateInfo fenceCreateInfo = {};
 	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 	fenceCreateInfo.flags = 0;
-	m_context->CheckResultVulkan(vkCreateFence(m_context->m_device, &fenceCreateInfo, m_context->m_allocator, &fence));
+	CheckResultVulkan(vkCreateFence(m_device, &fenceCreateInfo, m_allocator, &fence));
 
-	m_context->CheckResultVulkan(vkQueueSubmit(m_context->m_queue, 1, &submitInfo, fence));
+	CheckResultVulkan(vkQueueSubmit(m_queue, 1, &submitInfo, fence));
 	
 	//The command will not have finished executing until the fence is signaled.
 	//So we wait here.
 	//We will directly after this read our buffer from the GPU,
 	//and we will not be sure that the command has finished executing unless we wait for the fence.
 	//Hence, we use a fence here.
-	m_context->CheckResultVulkan(vkWaitForFences(m_context->m_device, 1, &fence, VK_TRUE, 100000000000));
+	CheckResultVulkan(vkWaitForFences(m_device, 1, &fence, VK_TRUE, 100000000000));
 
-	vkDestroyFence(m_context->m_device, fence, m_context->m_allocator);
-	vkDestroyDescriptorSetLayout(m_context->m_device, descriptorSetLayout, m_context->m_allocator);
-	vkDestroyPipelineLayout(m_context->m_device, pipelineLayout, m_context->m_allocator);
-	vkDestroyPipeline(m_context->m_device, pipeline, m_context->m_allocator);
+	vkDestroyFence(m_device, fence, m_allocator);
+	vkDestroyDescriptorSetLayout(m_device, descriptorSetLayout, m_allocator);
+	vkDestroyPipelineLayout(m_device, pipelineLayout, m_allocator);
+	vkDestroyPipeline(m_device, pipeline, m_allocator);
 }
-
 
 
 #endif
@@ -667,7 +673,8 @@ void* ndBrainGpuContext::GetAllocator() const
 	return m_context->m_allocator;
 }
 
-void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer&)
+void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer& buffer)
 {
+	m_context->ExecuteTest(buffer);
 }
 
