@@ -24,6 +24,11 @@ class ndBrainGpuBufferBase : public ndClassAlloc
 	ndBrainGpuBufferBase(ndBrainGpuContext* const context, ndInt32 sizeInByte);
 	virtual ~ndBrainGpuBufferBase();
 
+	public:
+	void* GetBuffer() const;
+	ndInt32 SizeInBytes() const;
+
+	protected:
 	ndImplementation* m_buffer;
 	friend class ndScopeMapBuffer;
 };

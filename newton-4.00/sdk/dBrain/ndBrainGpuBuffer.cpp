@@ -124,6 +124,7 @@ void* ndScopeMapBuffer::GetPointer() const
 	return m_mappedMemory;
 }
 
+
 //*************************************************************************************
 //
 //*************************************************************************************
@@ -136,6 +137,16 @@ ndBrainGpuBufferBase::ndBrainGpuBufferBase(ndBrainGpuContext* const context, ndI
 ndBrainGpuBufferBase::~ndBrainGpuBufferBase()
 {
 	delete m_buffer;
+}
+
+ndInt32 ndBrainGpuBufferBase::SizeInBytes() const
+{
+	return m_buffer->m_sizeInBytes;
+}
+
+void* ndBrainGpuBufferBase::GetBuffer() const
+{
+	return m_buffer->m_buffer;
 }
 
 //*************************************************************************************

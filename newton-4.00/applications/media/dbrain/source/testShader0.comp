@@ -25,5 +25,7 @@ void main()
   if(gl_GlobalInvocationID.x >= 100)
     return;
 
-  m_data[gl_GlobalInvocationID.x] += 5.0f;
+  //m_data[gl_GlobalInvocationID.x] += 5.0f;
+  m_data[0] = 100.0f;
+  m_data[1] = 100.0f;
 }
