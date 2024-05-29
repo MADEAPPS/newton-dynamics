@@ -197,8 +197,8 @@ static void Cifar10TrainingSet()
 		#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutionalWithDropOut_2d
 	#endif
 
-	#if 0
-		#define LINEAR_LAYER_NEURONS	64
+	#if 1
+		#define LINEAR_LAYER_NEURONS	128
 		#define LINEAR_LAYER			ndBrainLayerLinear
 	#else
 		#define LINEAR_LAYER_NEURONS	128

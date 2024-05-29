@@ -157,8 +157,8 @@ static void MnistTrainingSet()
 		#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutionalWithDropOut_2d
 	#endif
 
-	#if 0
-		#define LINEAR_LAYERS_NEURONS	64
+	#if 1
+		#define LINEAR_LAYERS_NEURONS	128
 		#define LINEAR_LAYER			ndBrainLayerLinear
 	#else
 		#define LINEAR_LAYERS_NEURONS	128
@@ -415,8 +415,8 @@ static void MnistTrainingSet()
 			ndInt32 batches = m_minTrainingFail / m_bashBufferSize;
 
 			// so far best training result on the mnist data set
-			//optimizer.SetRegularizer(ndBrainFloat(0.0f));		//         training(100.0%) test(99.35%) 
-			optimizer.SetRegularizer(ndBrainFloat(0.0f));		// dropout training(99.998%) test(99.4%) 
+			optimizer.SetRegularizer(ndBrainFloat(0.0f));		//         training(100.0%) test(99.35%) 
+			//optimizer.SetRegularizer(ndBrainFloat(0.0f));		// dropout training(99.998%) test(99.4%) 
 			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// 
 			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// 
 			//optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// 
