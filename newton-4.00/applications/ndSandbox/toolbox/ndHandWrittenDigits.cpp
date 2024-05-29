@@ -149,7 +149,7 @@ static void MnistTrainingSet()
 	#define USE_CONVOLUTIONAL_LAYERS
 	#define BATCH_BUFFER_SIZE				64
 	#define CONVOLUTIONAL_FEATURE_MAPS		32
-	#define MIN_TRAIN_SCORE					0.9995f
+	#define MIN_TRAIN_SCORE					0.9999f
 
 	#if 1
 		#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutional_2d
@@ -158,7 +158,7 @@ static void MnistTrainingSet()
 	#endif
 
 	#if 1
-		#define LINEAR_LAYERS_NEURONS	128
+		#define LINEAR_LAYERS_NEURONS	64
 		#define LINEAR_LAYER			ndBrainLayerLinear
 	#else
 		#define LINEAR_LAYERS_NEURONS	128
@@ -429,7 +429,7 @@ static void MnistTrainingSet()
 			}
 
 			ndInt32 scoreMode = 0;
-			for (ndInt32 epoch = 0; epoch < 200; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 100; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
