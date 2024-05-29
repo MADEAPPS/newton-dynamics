@@ -380,29 +380,7 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreatePhysicalDevic
 	}
 	m_physicalDevice = gpus[use_gpu];
 	vkGetPhysicalDeviceProperties(m_physicalDevice, &m_gpuProps);
-
-	//ndFixSizeArray<const char*, 128> extensionsNames;
-	//bool swapchainExtFound = false;
-	//uint32_t deviceExtensionCount;
-	//CheckResultVulkan(vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &deviceExtensionCount, nullptr));
-	//ndAssert(deviceExtensionCount < 512);
-	//ndFixSizeArray<VkExtensionProperties, 512> deviceExtensions;
-	//deviceExtensions.SetCount(ndInt32(deviceExtensionCount));
-	//CheckResultVulkan(vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &deviceExtensionCount, &deviceExtensions[0]));
-	//for (ndInt32 i = 0; i < ndInt32(deviceExtensionCount); i++)
-	//{
-	//	const char* const extName = deviceExtensions[i].extensionName;
-	//	if (!strcmp(VK_KHR_SWAPCHAIN_EXTENSION_NAME, extName))
-	//	{
-	//		swapchainExtFound = true;
-	//		//extensionsNames.PushBack(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-	//	}
-	//	//if (!strcmp("VK_KHR_portability_subset", extName))
-	//	//{
-	//	//	extensionsNames.PushBack("VK_KHR_portability_subset");
-	//	//}
-	//}
-	//ndAssert(swapchainExtFound);
+	ndTrace(("accelerator: %s\n", m_gpuProps.deviceName));
 }
 
 void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::SelectGraphicsQueue()
