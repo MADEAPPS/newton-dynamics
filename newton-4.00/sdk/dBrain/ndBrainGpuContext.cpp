@@ -177,12 +177,11 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::SetupDebugMessenger
 	}
 }
 
-void* ndBrainGpuContext::ndBrainGpuContext::ndImplementation::VulkanAlloc(void*, size_t size, size_t alignment, VkSystemAllocationScope)
+void* ndBrainGpuContext::ndBrainGpuContext::ndImplementation::VulkanAlloc(void*, size_t size, size_t, VkSystemAllocationScope)
 {
-	ndAssert(alignment);
-	ndAssert(alignment <= D_MEMORY_ALIGMNET);
-	void* const ptr = ndMemory::Malloc(size);
-	return ptr;
+	//ndAssert(alignment);
+	//ndAssert(alignment <= D_MEMORY_ALIGMNET);
+	return ndMemory::Malloc(size);
 }
 
 void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::VulkanFree(void*, void* memory)
