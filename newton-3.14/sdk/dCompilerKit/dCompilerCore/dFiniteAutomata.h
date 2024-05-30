@@ -34,11 +34,12 @@
 		inline void dExpandTraceMessage (const char *fmt, ...)
 		{
 			va_list v_args;
-			char* const text = (char*) malloc (strlen (fmt) + 2048);
+			int size = strlen(fmt) + 2048;
+			char* const text = (char*) malloc (size);
 
 			text[0] = 0;
 			va_start (v_args, fmt);     
-			vsprintf(text, fmt, v_args);
+			vsnprintf(text, size, fmt, v_args);
 			va_end (v_args);            
 
 			OutputDebugStringA (text);

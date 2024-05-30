@@ -1382,7 +1382,7 @@ ndInt32 ndDemoEntityManager::Print (const ndVector&, const char *fmt, ... ) cons
 	char string[1024];
 
 	va_start (argptr, fmt);
-	vsprintf (string, fmt, argptr);
+	vsnprintf (string, sizeof (string), fmt, argptr);
 	va_end( argptr );
 	ImGui::Text(string, "");
 	return 0;

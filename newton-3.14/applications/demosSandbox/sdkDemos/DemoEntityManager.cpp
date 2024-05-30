@@ -1307,7 +1307,7 @@ int DemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
 	char string[1024];
 
 	va_start (argptr, fmt);
-	vsprintf (string, fmt, argptr);
+	vsnprintf(string, sizeof(string), fmt, argptr);
 	va_end( argptr );
 	ImGui::Text(string, "");
 	return 0;

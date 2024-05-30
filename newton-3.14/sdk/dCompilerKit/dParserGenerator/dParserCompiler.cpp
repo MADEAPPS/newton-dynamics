@@ -617,13 +617,13 @@ dParserCompiler::~dParserCompiler()
 void dParserCompiler::DisplayError (const char* format, ...) const
 {
 	va_list v_args;
-	//char* const text = (char*) malloc (strlen (format) + 2048);
-	char* const text = (char*) alloca (strlen (format) + 2048);
+	int size = strlen(format) + 2048;
+	char* const text = (char*) alloca (size);
 	dAssert (text);
 
 	text[0] = 0;
 	va_start (v_args, format);     
-	vsprintf(text, format, v_args);
+	vsnprintf(text, size, format, v_args);
 	va_end (v_args);            
 
 	fprintf (stderr, text);

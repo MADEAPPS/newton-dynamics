@@ -385,7 +385,7 @@ void dPluginRender::Print (int displayListFont, dFloat x, dFloat y, const char* 
 	char string[4096];
 
 	va_start (argptr, fmt);
-	vsprintf (string, fmt, argptr);
+	vsnprintf(string, sizeof(string), fmt, argptr);
 	va_end( argptr );
 
 

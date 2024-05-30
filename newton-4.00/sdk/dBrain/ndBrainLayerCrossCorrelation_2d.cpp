@@ -247,7 +247,7 @@ void ndBrainLayerCrossCorrelation_2d::Save(const ndBrainSave* const loadSave) co
 			va_list v_args;
 			buffer[0] = 0;
 			va_start(v_args, fmt);
-			vsprintf(buffer, fmt, v_args);
+			vsnprintf(buffer, sizeof(buffer), fmt, v_args);
 			va_end(v_args);
 			loadSave->WriteData(buffer);
 		};

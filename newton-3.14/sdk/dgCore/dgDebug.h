@@ -32,7 +32,7 @@
 
 		text[0] = 0;
 		va_start(v_args, fmt);
-		vsprintf(text, fmt, v_args);
+		vsnprintf(text, sizeof (text), fmt, v_args);
 		va_end(v_args);
 
 	#if defined (_WIN_32_VER) || defined (_WIN_64_VER)

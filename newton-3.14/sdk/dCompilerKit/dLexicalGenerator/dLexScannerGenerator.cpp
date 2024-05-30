@@ -229,7 +229,7 @@ void dLexScannerGenerator::AddText (dString& output, const char* const fmt, ...)
 	text[2] = '\t';
 	text[3] = 0;
 	va_start (v_args, fmt);     
-	vsprintf(&text[3], fmt, v_args);
+	vsnprintf(&text[3], sizeof (text) - 4, fmt, v_args);
 	va_end (v_args);            
 
 	output += text;
