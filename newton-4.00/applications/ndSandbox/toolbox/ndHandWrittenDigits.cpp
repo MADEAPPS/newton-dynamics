@@ -146,7 +146,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 //#pragma optimize( "", off )
 static void MnistTrainingSet()
 {
-	#define USE_CONVOLUTIONAL_LAYERS
+	//#define USE_CONVOLUTIONAL_LAYERS
 	#define BATCH_BUFFER_SIZE				64
 	#define CONVOLUTIONAL_FEATURE_MAPS		32
 	#define MIN_TRAIN_SCORE					0.9999f
@@ -568,6 +568,6 @@ void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
 
-	MnistTrainingSet();
-	//MnistTestSet();
+	//MnistTrainingSet();
+	MnistTestSet();
 }
