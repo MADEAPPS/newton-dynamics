@@ -44,30 +44,31 @@
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
-//#define DEFAULT_SCENE	7		// particle fluid
-//#define DEFAULT_SCENE	8		// static mesh collision 
-//#define DEFAULT_SCENE	9		// static user mesh collision 
-//#define DEFAULT_SCENE	10		// basic joints
-//#define DEFAULT_SCENE	11		// basic vehicle
-//#define DEFAULT_SCENE	12		// heavy vehicle
-//#define DEFAULT_SCENE	13		// background vehicle prop
-//#define DEFAULT_SCENE	14		// simple industrial robot
-//#define DEFAULT_SCENE	15		// advanced industrial robot
-//#define DEFAULT_SCENE	16		// basic player
-//#define DEFAULT_SCENE	17		// rag doll
-//#define DEFAULT_SCENE	18		// cart pole discrete controller
-//#define DEFAULT_SCENE	19		// cart pole continue controller
-//#define DEFAULT_SCENE	20		// unit cycle controller
-#define DEFAULT_SCENE	21		// quadruped test 1
-//#define DEFAULT_SCENE	22		// quadruped test 2
-//#define DEFAULT_SCENE	23		// quadruped test 3
-//#define DEFAULT_SCENE	24		// biped test 1
-//#define DEFAULT_SCENE	25		// biped test 2
-//#define DEFAULT_SCENE	26		// train biped test 2
-//#define DEFAULT_SCENE	27		// simple voronoi fracture
-//#define DEFAULT_SCENE	28		// basic voronoi fracture
-//#define DEFAULT_SCENE	29		// linked voronoi fracture
-//#define DEFAULT_SCENE	30		// skin peel voronoi fracture
+#define DEFAULT_SCENE	7		// object Placement
+//#define DEFAULT_SCENE	8		// particle fluid
+//#define DEFAULT_SCENE	9		// static mesh collision 
+//#define DEFAULT_SCENE	10		// static user mesh collision 
+//#define DEFAULT_SCENE	11		// basic joints
+//#define DEFAULT_SCENE	12		// basic vehicle
+//#define DEFAULT_SCENE	13		// heavy vehicle
+//#define DEFAULT_SCENE	14		// background vehicle prop
+//#define DEFAULT_SCENE	15		// simple industrial robot
+//#define DEFAULT_SCENE	16		// advanced industrial robot
+//#define DEFAULT_SCENE	17		// basic player
+//#define DEFAULT_SCENE	18		// rag doll
+//#define DEFAULT_SCENE	19		// cart pole discrete controller
+//#define DEFAULT_SCENE	20		// cart pole continue controller
+//#define DEFAULT_SCENE	21		// unit cycle controller
+//#define DEFAULT_SCENE	22		// quadruped test 1
+//#define DEFAULT_SCENE	23		// quadruped test 2
+//#define DEFAULT_SCENE	24		// quadruped test 3
+//#define DEFAULT_SCENE	25		// biped test 1
+//#define DEFAULT_SCENE	26		// biped test 2
+//#define DEFAULT_SCENE	27		// train biped test 2
+//#define DEFAULT_SCENE	28		// simple voronoi fracture
+//#define DEFAULT_SCENE	29		// basic voronoi fracture
+//#define DEFAULT_SCENE	30		// linked voronoi fracture
+//#define DEFAULT_SCENE	31		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndRagdollTest(ndDemoEntityManager* const scene);
@@ -83,6 +84,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_2(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
+void ndObjectPlacement(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
@@ -113,6 +115,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic conservation of momentum", ndBasicAngularMomentum },
 	{ "basic stack", ndBasicStacks },
 	{ "basic trigger", ndBasicTrigger },
+	{ "basic object placement", ndObjectPlacement },
 	{ "basic particle fluid", ndBasicParticleFluid },
 	{ "static mesh", ndStaticMeshCollisionDemo },
 	{ "static user mesh", ndStaticUserMeshCollisionDemo },

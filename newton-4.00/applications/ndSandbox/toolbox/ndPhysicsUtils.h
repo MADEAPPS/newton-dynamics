@@ -18,8 +18,8 @@
 
 class ndDemoEntityManager;
 
-ndBodyKinematic* AddSphere(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, const char* const textName = "wood_0.tga");
 ndBodyKinematic* AddBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName = "wood_0.tga");
+ndBodyKinematic* AddSphere(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, const char* const textName = "wood_0.tga");
 ndBodyKinematic* AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName = "wood_1.tga");
 ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, ndFloat32 high, ndInt32 segments, const char* const textName = "wood_0.tga");
 ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& origin, ndFloat32 mass, const char* const textName = "wood_0.tga");
