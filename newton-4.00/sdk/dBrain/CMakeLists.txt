@@ -19,7 +19,9 @@ include_directories(../dCore)
 include_directories(../dProfiler)
 include_directories(../../thirdParty/png)
 
-include_directories ($ENV{VULKAN_SDK}/Include)
+if(NEWTON_ENABLE_VULKAN_SDK)
+	include_directories ($ENV{VULKAN_SDK}/Include)
+endif()
 
 file(GLOB CPP_SOURCE *.cpp *.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})

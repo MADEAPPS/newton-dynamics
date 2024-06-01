@@ -49,6 +49,10 @@ include_directories(../../thirdParty/glatter/include/glatter/)
 include_directories(../../thirdParty/hacd/src/VHACD_Lib/public/)
 include_directories(../../thirdParty/openalRuntime/win32sdk/include)
 
+if(NEWTON_ENABLE_VULKAN_SDK)
+	include_directories ($ENV{VULKAN_SDK}/Include)
+endif()
+
 add_executable(${projectName} ${CPP_SOURCE})
 
 target_link_libraries (${projectName} ndNewton ndBrain ndModel ndFileFormat ndTinyxml vhacd openfbx glfw imgui glatter lodepng)

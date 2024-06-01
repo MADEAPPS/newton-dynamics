@@ -12,26 +12,11 @@
 #define __ND_BRAIN_GPU_BUFFER_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainGpuContext.h"
+//#include "ndBrainGpuContext.h"
 
 class ndBrainVector;
-
-class ndBrainGpuBufferBase : public ndClassAlloc
-{
-	protected:
-	class ndImplementation;
-	
-	ndBrainGpuBufferBase(ndBrainGpuContext* const context, ndInt32 sizeInByte);
-	virtual ~ndBrainGpuBufferBase();
-
-	public:
-	void* GetBuffer() const;
-	ndInt32 SizeInBytes() const;
-
-	protected:
-	ndImplementation* m_buffer;
-	friend class ndScopeMapBuffer;
-};
+class ndBrainGpuContext;
+class ndBrainGpuBufferBase;
 
 class ndScopeMapBuffer
 {
@@ -45,6 +30,47 @@ class ndScopeMapBuffer
 	void* m_mappedMemory;
 	ndBrainGpuBufferBase* m_buffer;
 };
+
+#if !defined (D_USE_VULKAN_SDK)
+
+class ndBrainGpuBufferBase : public ndClassAlloc
+{
+	protected:
+	ndBrainGpuBufferBase(ndBrainGpuContext* const context, ndInt32 sizeInByte);
+	virtual ~ndBrainGpuBufferBase();
+
+	public:
+	void* GetBuffer() const;
+	ndInt32 SizeInBytes() const;
+
+	protected:
+	ndInt32 m_sizeInBytes;
+	friend class ndScopeMapBuffer;
+};
+
+#else
+
+class ndBrainGpuBufferBase : public ndClassAlloc
+{
+	protected:
+	ndBrainGpuBufferBase(ndBrainGpuContext* const context, ndInt32 sizeInByte);
+	virtual ~ndBrainGpuBufferBase();
+
+	uint32_t FindMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
+
+	public:
+	VkBuffer GetBuffer() const;
+	ndInt32 SizeInBytes() const;
+
+	protected:
+	VkBuffer m_buffer;
+	VkDeviceMemory m_bufferMemory;
+	ndBrainGpuContext* m_context;
+	ndInt32 m_sizeInBytes;
+	friend class ndScopeMapBuffer;
+};
+
+#endif
 
 // **************************************************************************
 // 

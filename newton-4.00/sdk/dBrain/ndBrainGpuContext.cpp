@@ -13,104 +13,39 @@
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
 
-#ifdef D_USE_VULKAN_SDK
-#include <vulkan/vulkan.h>
-#endif
 
 #if !defined (D_USE_VULKAN_SDK)
 
-class ndBrainGpuContext::ndBrainGpuContext::ndImplementation : public ndClassAlloc
+ndBrainGpuContext::ndBrainGpuContext()
 {
-	public:
-	ndImplementation()
-		:ndClassAlloc()
-		,m_device(nullptr)
-		,m_allocator(nullptr)
-		,m_physicalDevice(nullptr)
-	{
-	}
 
-	~ndImplementation()
-	{
-	}
+}
 
-	void ExecuteTest(ndBrainGpuFloatBuffer& buffer)
-	{
-	}
+ndBrainGpuContext::~ndBrainGpuContext()
+{
+}
 
-	void* m_device;
-	void* m_allocator;
-	void* m_physicalDevice;
-};
+void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer&)
+{
+
+}
 
 #else
+
+
 #define ND_SELECT_DISCRETE_GPU
 
-class ndBrainGpuContext::ndBrainGpuContext::ndImplementation : public ndClassAlloc
-{
-	public:
-	ndImplementation();
-	~ndImplementation();
-
-	void CreateInstance();
-	void SetupDebugMessenger();
-	void CreatePhysicalDevice();
-	void SelectGraphicsQueue();
-	void CreateLogicalDevice();
-	void CreateCommandPool();
-	void CreateDescriptorPool();
-	void LoadShaderPrograms();
-
-	static void CheckResultVulkan(VkResult err);
-	static void VulkanFree(void* pUserData, void* memory);
-	static void* VulkanAlloc(void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope allocationScope);
-	static void* VulkanRealloc(void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope allocationScope);
-	static void VulkanInternalFree(void* pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope);
-	static void VulkanInternalAlloc(void* pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope);
-
-	static VKAPI_ATTR VkBool32 VKAPI_CALL DebugReportVulkan(
-		VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
-		uint64_t object, size_t location, int32_t messageCode,
-		const char* pLayerPrefix, const char* pMessage, void* pUserData);
-
-	void GetShaderFileName(const char* const name, char* const outPathName);
-
-
-	void ExecuteTest(ndBrainGpuFloatBuffer& buffer);
-
-	VkAllocationCallbacks m_allocatorStruct;
-	VkAllocationCallbacks* m_allocator;
-	VkQueue m_queue;
-	VkDevice m_device;
-	VkInstance m_instance;
-	VkCommandPool m_commandPool;
-	VkDescriptorPool m_descriptorPool;
-	VkPhysicalDevice m_physicalDevice;
-	VkPhysicalDeviceProperties m_gpuProps;
-	VkDebugReportCallbackEXT m_debugMessenger;
-
-	VkShaderModule m_computeShaderModule;
-
-	uint32_t m_queueFamilyIndex;
-	bool m_hasValidationLayers;
-	static const char* m_apiLayers[];
-	static const char* m_apiExtensionLayers[];
-};
-
-const char* ndBrainGpuContext::ndBrainGpuContext::ndImplementation::m_apiLayers[] =
+const char* ndBrainGpuContext::m_apiLayers[] =
 {
 	"VK_LAYER_KHRONOS_validation"
 };
 
-const char* ndBrainGpuContext::ndBrainGpuContext::ndImplementation::m_apiExtensionLayers[] =
+const char* ndBrainGpuContext::m_apiExtensionLayers[] =
 {
 	"VK_EXT_debug_report"
 };
 
-//*************************************************************************************
-//
-//*************************************************************************************
-ndBrainGpuContext::ndBrainGpuContext::ndImplementation::ndImplementation()
+ndBrainGpuContext::ndBrainGpuContext()
 	:ndClassAlloc()
 	,m_allocator(&m_allocatorStruct)
 	,m_queue(VK_NULL_HANDLE)
@@ -141,7 +76,7 @@ ndBrainGpuContext::ndBrainGpuContext::ndImplementation::ndImplementation()
 	LoadShaderPrograms();
 }
 
-ndBrainGpuContext::ndBrainGpuContext::ndImplementation::~ndImplementation()
+ndBrainGpuContext::~ndBrainGpuContext()
 {
 	if (m_hasValidationLayers)
 	{
@@ -160,36 +95,28 @@ ndBrainGpuContext::ndBrainGpuContext::ndImplementation::~ndImplementation()
 	vkDestroyInstance(m_instance, m_allocator);
 }
 
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::SetupDebugMessenger()
+void ndBrainGpuContext::CheckResultVulkan(VkResult err)
 {
-	if (m_hasValidationLayers)
+	if (err != VK_SUCCESS)
 	{
-		auto func = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(m_instance, "vkCreateDebugReportCallbackEXT");
-		if (func != nullptr)
-		{
-			VkDebugReportCallbackCreateInfoEXT createInfo = {};
-			createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
-			createInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
-			createInfo.pfnCallback = &DebugReportVulkan;
-
-			CheckResultVulkan(func(m_instance, &createInfo, m_allocator, &m_debugMessenger));
-		}
+		ndTrace(("[vulkan] Error: VkResult = %d\n", err));
+		ndAssert(0);
 	}
 }
 
-void* ndBrainGpuContext::ndBrainGpuContext::ndImplementation::VulkanAlloc(void*, size_t size, size_t, VkSystemAllocationScope)
+void* ndBrainGpuContext::VulkanAlloc(void*, size_t size, size_t, VkSystemAllocationScope)
 {
 	//ndAssert(alignment);
 	//ndAssert(alignment <= D_MEMORY_ALIGMNET);
 	return ndMemory::Malloc(size);
 }
 
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::VulkanFree(void*, void* memory)
+void ndBrainGpuContext::VulkanFree(void*, void* memory)
 {
 	ndMemory::Free(memory);
 }
 
-void* ndBrainGpuContext::ndBrainGpuContext::ndImplementation::VulkanRealloc(void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope allocationScope)
+void* ndBrainGpuContext::VulkanRealloc(void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope allocationScope)
 {
 	size_t oldSize = ndMemory::GetOriginalSize(pOriginal);
 	if (size > oldSize)
@@ -207,90 +134,37 @@ void* ndBrainGpuContext::ndBrainGpuContext::ndImplementation::VulkanRealloc(void
 	return nullptr;
 }
 
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::VulkanInternalAlloc(void*, size_t, VkInternalAllocationType, VkSystemAllocationScope)
+void ndBrainGpuContext::VulkanInternalAlloc(void*, size_t, VkInternalAllocationType, VkSystemAllocationScope)
 {
 	ndAssert(0);
 }
 
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::VulkanInternalFree(void*, size_t, VkInternalAllocationType, VkSystemAllocationScope)
+void ndBrainGpuContext::VulkanInternalFree(void*, size_t, VkInternalAllocationType, VkSystemAllocationScope)
 {
 	ndAssert(0);
 }
 
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CheckResultVulkan(VkResult err)
+VkDevice ndBrainGpuContext::GetDevice() const
 {
-	if (err != VK_SUCCESS)
-	{
-		ndTrace(("[vulkan] Error: VkResult = %d\n", err));
-		if (err < 0)
-		{
-			abort();
-		}
-	}
+	return m_device;
 }
 
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::GetShaderFileName(const char* const name, char* const outPathName)
+VkAllocationCallbacks* ndBrainGpuContext::GetAllocator() const
 {
-	#if (defined(WIN32) || defined(_WIN32))
-		char appPath[256];
-		GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
-		strtolwr(appPath);
-
-		char* const end = strstr(appPath, "applications");
-		end[0] = 0;
-		sprintf(outPathName, "%ssdk/dMedia/dbrain/%s", appPath, name);
-	#elif defined(__APPLE__)
-		char tmp[2048];
-		CFURLRef appURL(CFBundleCopyBundleURL(CFBundleGetMainBundle()));
-		CFStringRef filePath(CFURLCopyFileSystemPath(appURL, kCFURLPOSIXPathStyle));
-		CFStringGetCString(filePath, tmp, PATH_MAX, kCFStringEncodingUTF8);
-		//char* const ptr = strstr (tmp, "applications");
-		//ptr [0] = 0;
-		//sprintf (outPathName, "%sapplications/media/%s", tmp, name);
-		sprintf(outPathName, "%s/Contents/Resources/%s", tmp, name);
-
-		// Clean up 
-		CFRelease(appURL);
-		CFRelease(filePath);
-	#elif defined(__linux__)
-		char id[1024];
-		char appPath[1024];
-
-		sprintf(id, "/proc/%d/exe", getpid());
-		memset(appPath, 0, sizeof(appPath));
-		size_t ret = readlink(id, appPath, sizeof(appPath));
-		ret = 0;
-		char* const end = strstr(appPath, "applications");
-		*end = 0;
-		sprintf(outPathName, "%ssdk/dMedia/dbrain/%s", appPath, name);
-	#else
-		#error  "error: need to implement \"dGetWorkingFileName\" here for this platform"
-	#endif
+	return m_allocator;
 }
 
-VKAPI_ATTR VkBool32 VKAPI_CALL ndBrainGpuContext::ndBrainGpuContext::ndImplementation::DebugReportVulkan(
-	//VkDebugReportFlagsEXT                       flags,
-	//VkDebugReportObjectTypeEXT                  objectType,
-	//uint64_t                                    object,
-	//size_t                                      location,
-	//int32_t                                     messageCode,
-	//const char* pLayerPrefix,
-	//const char* pMessage,
-	//void* pUserData) 
-	VkDebugReportFlagsEXT, VkDebugReportObjectTypeEXT, uint64_t, size_t, int32_t,
-	const char* pLayerPrefix, const char* pMessage,	void*) 
+VkPhysicalDevice ndBrainGpuContext::GetPhysicalDevice() const
 {
-	ndTrace (("Debug Report: %s: %s\n", pLayerPrefix, pMessage));
-
-	return VK_FALSE;
+	return m_physicalDevice;
 }
 
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreateInstance()
+void ndBrainGpuContext::CreateInstance()
 {
 	uint32_t layerCount;
-	ndFixSizeArray <VkLayerProperties,128> layerProperties;
+	ndFixSizeArray <VkLayerProperties, 128> layerProperties;
 	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-	layerProperties.SetCount(ndInt32 (layerCount));
+	layerProperties.SetCount(ndInt32(layerCount));
 	vkEnumerateInstanceLayerProperties(&layerCount, &layerProperties[0]);
 
 	bool apiLayersFound = false;
@@ -342,11 +216,45 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreateInstance()
 	//debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 	//debugCreateInfo.pfnUserCallback = DebugReportVulkan;
 	//createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
-	
+
 	CheckResultVulkan(vkCreateInstance(&createInfo, m_allocator, &m_instance));
 }
 
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreatePhysicalDevice()
+VKAPI_ATTR VkBool32 VKAPI_CALL ndBrainGpuContext::DebugReportVulkan(
+	//VkDebugReportFlagsEXT                       flags,
+	//VkDebugReportObjectTypeEXT                  objectType,
+	//uint64_t                                    object,
+	//size_t                                      location,
+	//int32_t                                     messageCode,
+	//const char* pLayerPrefix,
+	//const char* pMessage,
+	//void* pUserData) 
+	VkDebugReportFlagsEXT, VkDebugReportObjectTypeEXT, uint64_t, size_t, int32_t,
+	const char* pLayerPrefix, const char* pMessage, void*)
+{
+	ndTrace(("Debug Report: %s: %s\n", pLayerPrefix, pMessage));
+
+	return VK_FALSE;
+}
+
+void ndBrainGpuContext::SetupDebugMessenger()
+{
+	if (m_hasValidationLayers)
+	{
+		auto func = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(m_instance, "vkCreateDebugReportCallbackEXT");
+		if (func != nullptr)
+		{
+			VkDebugReportCallbackCreateInfoEXT createInfo = {};
+			createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+			createInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
+			createInfo.pfnCallback = &DebugReportVulkan;
+
+			CheckResultVulkan(func(m_instance, &createInfo, m_allocator, &m_debugMessenger));
+		}
+	}
+}
+
+void ndBrainGpuContext::CreatePhysicalDevice()
 {
 	m_physicalDevice = VK_NULL_HANDLE;
 
@@ -382,7 +290,7 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreatePhysicalDevic
 	ndTrace(("accelerator: %s\n", m_gpuProps.deviceName));
 }
 
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::SelectGraphicsQueue()
+void ndBrainGpuContext::SelectGraphicsQueue()
 {
 	uint32_t count;
 	m_queueFamilyIndex = uint32_t(-1);
@@ -404,7 +312,7 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::SelectGraphicsQueue
 	ndAssert(m_queueFamilyIndex != (uint32_t)-1);
 }
 
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreateLogicalDevice()
+void ndBrainGpuContext::CreateLogicalDevice()
 {
 	m_queue = VK_NULL_HANDLE;
 	m_device = VK_NULL_HANDLE;
@@ -432,7 +340,71 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreateLogicalDevice
 	vkGetDeviceQueue(m_device, m_queueFamilyIndex, 0, &m_queue);
 }
 
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::LoadShaderPrograms()
+void ndBrainGpuContext::CreateCommandPool()
+{
+	VkCommandPoolCreateInfo commandPoolCreateInfo = {};
+	commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	commandPoolCreateInfo.flags = 0;
+	// the queue family of this command pool. All command buffers allocated from this command pool,
+	// must be submitted to queues of this family ONLY. 
+	commandPoolCreateInfo.queueFamilyIndex = m_queueFamilyIndex;
+	CheckResultVulkan(vkCreateCommandPool(m_device, &commandPoolCreateInfo, m_allocator, &m_commandPool));
+}
+
+void ndBrainGpuContext::CreateDescriptorPool()
+{
+	VkDescriptorPoolSize descriptorPoolSize = {};
+	descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	descriptorPoolSize.descriptorCount = 1;
+
+	VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
+	descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	descriptorPoolCreateInfo.maxSets = 1; // we only need to allocate one descriptor set from the pool.
+	descriptorPoolCreateInfo.poolSizeCount = 1;
+	descriptorPoolCreateInfo.pPoolSizes = &descriptorPoolSize;
+	CheckResultVulkan(vkCreateDescriptorPool(m_device, &descriptorPoolCreateInfo, m_allocator, &m_descriptorPool));
+}
+
+void ndBrainGpuContext::GetShaderFileName(const char* const name, char* const outPathName)
+{
+#if (defined(WIN32) || defined(_WIN32))
+	char appPath[256];
+	GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
+	strtolwr(appPath);
+
+	char* const end = strstr(appPath, "applications");
+	end[0] = 0;
+	sprintf(outPathName, "%ssdk/dMedia/dbrain/%s", appPath, name);
+#elif defined(__APPLE__)
+	char tmp[2048];
+	CFURLRef appURL(CFBundleCopyBundleURL(CFBundleGetMainBundle()));
+	CFStringRef filePath(CFURLCopyFileSystemPath(appURL, kCFURLPOSIXPathStyle));
+	CFStringGetCString(filePath, tmp, PATH_MAX, kCFStringEncodingUTF8);
+	//char* const ptr = strstr (tmp, "applications");
+	//ptr [0] = 0;
+	//sprintf (outPathName, "%sapplications/media/%s", tmp, name);
+	sprintf(outPathName, "%s/Contents/Resources/%s", tmp, name);
+
+	// Clean up 
+	CFRelease(appURL);
+	CFRelease(filePath);
+#elif defined(__linux__)
+	char id[1024];
+	char appPath[1024];
+
+	sprintf(id, "/proc/%d/exe", getpid());
+	memset(appPath, 0, sizeof(appPath));
+	size_t ret = readlink(id, appPath, sizeof(appPath));
+	ret = 0;
+	char* const end = strstr(appPath, "applications");
+	*end = 0;
+	sprintf(outPathName, "%ssdk/dMedia/dbrain/%s", appPath, name);
+#else
+#error  "error: need to implement \"dGetWorkingFileName\" here for this platform"
+#endif
+}
+
+void ndBrainGpuContext::LoadShaderPrograms()
 {
 	//Create a shader module. A shader module basically just encapsulates some shader code.
 
@@ -444,7 +416,7 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::LoadShaderPrograms(
 
 		code.SetCount(0);
 		FILE* const fp = fopen(fileName, "rb");
-		if (fp) 
+		if (fp)
 		{
 			fseek(fp, 0, SEEK_END);
 			long filesize = ftell(fp);
@@ -457,7 +429,7 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::LoadShaderPrograms(
 			fread(&code[0], size_t(filesize), sizeof(char), fp);
 			fclose(fp);
 
-			for (ndInt32 i = filesize; i < filesizepadded; i++) 
+			for (ndInt32 i = filesize; i < filesizepadded; i++)
 			{
 				code[i] = 0;
 			}
@@ -472,32 +444,9 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::LoadShaderPrograms(
 	CheckResultVulkan(vkCreateShaderModule(m_device, &createInfo, m_allocator, &m_computeShaderModule));
 }
 
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreateCommandPool()
-{
-	VkCommandPoolCreateInfo commandPoolCreateInfo = {};
-	commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	commandPoolCreateInfo.flags = 0;
-	// the queue family of this command pool. All command buffers allocated from this command pool,
-	// must be submitted to queues of this family ONLY. 
-	commandPoolCreateInfo.queueFamilyIndex = m_queueFamilyIndex;
-	CheckResultVulkan(vkCreateCommandPool(m_device, &commandPoolCreateInfo, m_allocator, &m_commandPool));
-}
 
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::CreateDescriptorPool()
-{
-	VkDescriptorPoolSize descriptorPoolSize = {};
-	descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-	descriptorPoolSize.descriptorCount = 1;
 
-	VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
-	descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	descriptorPoolCreateInfo.maxSets = 1; // we only need to allocate one descriptor set from the pool.
-	descriptorPoolCreateInfo.poolSizeCount = 1;
-	descriptorPoolCreateInfo.pPoolSizes = &descriptorPoolSize;
-	CheckResultVulkan(vkCreateDescriptorPool(m_device, &descriptorPoolCreateInfo, m_allocator, &m_descriptorPool));
-}
-
-void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::ExecuteTest(ndBrainGpuFloatBuffer& buffer)
+void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer& buffer)
 {
 	VkPipeline pipeline;
 	VkDescriptorSet descriptorSet;
@@ -507,9 +456,9 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::ExecuteTest(ndBrain
 
 	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
 	commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	commandBufferAllocateInfo.commandPool = m_commandPool; 
+	commandBufferAllocateInfo.commandPool = m_commandPool;
 	commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	commandBufferAllocateInfo.commandBufferCount = 1; 
+	commandBufferAllocateInfo.commandBufferCount = 1;
 	CheckResultVulkan(vkAllocateCommandBuffers(m_device, &commandBufferAllocateInfo, &commandBuffer));
 
 	VkDescriptorSetLayoutBinding descriptorSetLayoutBinding = {};
@@ -533,7 +482,7 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::ExecuteTest(ndBrain
 
 	// Specify the buffer to bind to the descriptor.
 	VkDescriptorBufferInfo descriptorBufferInfo = {};
-	descriptorBufferInfo.buffer = (VkBuffer)buffer.GetBuffer();
+	descriptorBufferInfo.buffer = buffer.GetBuffer();
 	descriptorBufferInfo.offset = 0;
 	descriptorBufferInfo.range = (VkDeviceSize)buffer.SizeInBytes();
 
@@ -560,23 +509,25 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::ExecuteTest(ndBrain
 	pipelineLayoutCreateInfo.setLayoutCount = 1;
 	pipelineLayoutCreateInfo.pSetLayouts = &descriptorSetLayout;
 	CheckResultVulkan(vkCreatePipelineLayout(m_device, &pipelineLayoutCreateInfo, m_allocator, &pipelineLayout));
-		
+
 	VkComputePipelineCreateInfo pipelineCreateInfo = {};
 	pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
 	pipelineCreateInfo.stage = shaderStageCreateInfo;
 	pipelineCreateInfo.layout = pipelineLayout;
 	CheckResultVulkan(vkCreateComputePipelines(m_device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, m_allocator, &pipeline));
-	
+
 	VkCommandBufferBeginInfo beginInfo = {};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; 
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 	CheckResultVulkan(vkBeginCommandBuffer(commandBuffer, &beginInfo)); // start recording commands.
-	
+
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
-	
+
 	//vkCmdDispatch(commandBuffer, (uint32_t)ceil(WIDTH / float(WORKGROUP_SIZE)), (uint32_t)ceil(HEIGHT / float(WORKGROUP_SIZE)), 1);
 	vkCmdDispatch(commandBuffer, 1, 1, 1);
+
+
 	CheckResultVulkan(vkEndCommandBuffer(commandBuffer));
 
 
@@ -593,7 +544,7 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::ExecuteTest(ndBrain
 	CheckResultVulkan(vkCreateFence(m_device, &fenceCreateInfo, m_allocator, &fence));
 
 	CheckResultVulkan(vkQueueSubmit(m_queue, 1, &submitInfo, fence));
-	
+
 	//The command will not have finished executing until the fence is signaled.
 	//So we wait here.
 	//We will directly after this read our buffer from the GPU,
@@ -607,51 +558,4 @@ void ndBrainGpuContext::ndBrainGpuContext::ndImplementation::ExecuteTest(ndBrain
 	vkDestroyPipeline(m_device, pipeline, m_allocator);
 }
 
-
 #endif
-
-
-//*************************************************************************************
-//
-//*************************************************************************************
-ndBrainGpuContext::ndBrainGpuContext()
-	:ndClassAlloc()
-	,m_context(nullptr)
-{
-}
-
-ndBrainGpuContext::~ndBrainGpuContext()
-{
-	if (m_context)
-	{
-		delete m_context;
-	}
-}
-
-ndInt32 ndBrainGpuContext::Init()
-{
-	ndAssert(!m_context);
-	m_context = new ndImplementation;
-	return 0;
-}
-
-void* ndBrainGpuContext::GetDevice() const
-{
-	return m_context->m_device;
-}
-
-void* ndBrainGpuContext::GetPhysicalDevice() const
-{
-	return m_context->m_physicalDevice;
-}
-
-void* ndBrainGpuContext::GetAllocator() const
-{
-	return m_context->m_allocator;
-}
-
-void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer& buffer)
-{
-	m_context->ExecuteTest(buffer);
-}
-

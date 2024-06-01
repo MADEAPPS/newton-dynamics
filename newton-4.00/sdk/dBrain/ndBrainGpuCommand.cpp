@@ -8,22 +8,21 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#version 450
 
-#define WORKGROUP_SIZE 256
-layout (local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1 ) in;
+#include "ndBrainStdafx.h"
+#include "ndBrainGpuCommand.h"
+#include "ndBrainGpuContext.h"
 
-//layout(std140, binding = 0) buffer buf
-layout(std430, binding = 0) buffer buf
+ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context)
+	:ndClassAlloc()
+	,m_context(context)
 {
-   float m_data[];
-};
 
-void main() 
-{
-  uint index = gl_GlobalInvocationID.x;
-  if(index >= 100)
-    return;
-
-  m_data[index] = float (index * 2);
 }
+
+ndBrainGpuCommand::~ndBrainGpuCommand()
+{
+	ndAssert(0);
+}
+
+

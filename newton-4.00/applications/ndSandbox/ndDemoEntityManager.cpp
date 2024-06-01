@@ -247,7 +247,6 @@ void Test1__()
 void TestVulkanStuff()
 {
 	ndBrainGpuContext context;
-	context.Init();
 
 	ndBrainVector input;
 	for (ndInt32 i = 0; i < 100; ++i)

@@ -13,25 +13,75 @@
 
 class ndBrainGpuFloatBuffer;
 
-class ndBrainGpuContext: public ndClassAlloc
-{
-	class ndImplementation;
+#if !defined (D_USE_VULKAN_SDK)
 
+class ndBrainGpuContext : public ndClassAlloc
+{
 	public:
 	ndBrainGpuContext();
 	virtual ~ndBrainGpuContext();
 
-	virtual ndInt32 Init();
+	void ExecuteTest(ndBrainGpuFloatBuffer& buffer);
+};
 
-	void* GetDevice() const;
-	void* GetAllocator() const;
-	void* GetPhysicalDevice() const;
-	
+#else
+class ndBrainGpuContext: public ndClassAlloc
+{
+	public:
+	ndBrainGpuContext();
+	virtual ~ndBrainGpuContext();
+
+	VkDevice GetDevice() const;
+	VkAllocationCallbacks* GetAllocator() const;
+	VkPhysicalDevice GetPhysicalDevice() const;
 
 	void ExecuteTest(ndBrainGpuFloatBuffer& buffer);
 
+	static void CheckResultVulkan(VkResult err);
+
 	private:
-	ndImplementation* m_context;
+	void CreateInstance();
+	void CreateCommandPool();
+	void SetupDebugMessenger();
+	void SelectGraphicsQueue();
+	void CreateLogicalDevice();
+	void CreatePhysicalDevice();
+	void CreateDescriptorPool();
+	void LoadShaderPrograms();
+	void GetShaderFileName(const char* const name, char* const outPathName);
+
+	static void VulkanFree(void* pUserData, void* memory);
+	static void* VulkanAlloc(void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope allocationScope);
+	static void* VulkanRealloc(void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope allocationScope);
+	static void VulkanInternalFree(void* pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope);
+	static void VulkanInternalAlloc(void* pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope);
+
+	static VKAPI_ATTR VkBool32 VKAPI_CALL DebugReportVulkan(
+		VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
+		uint64_t object, size_t location, int32_t messageCode,
+		const char* pLayerPrefix, const char* pMessage, void* pUserData);
+
+
+	VkAllocationCallbacks m_allocatorStruct;
+	VkAllocationCallbacks* m_allocator;
+	VkQueue m_queue;
+	VkDevice m_device;
+	VkInstance m_instance;
+	VkCommandPool m_commandPool;
+	VkDescriptorPool m_descriptorPool;
+	VkPhysicalDevice m_physicalDevice;
+	VkPhysicalDeviceProperties m_gpuProps;
+	VkDebugReportCallbackEXT m_debugMessenger;
+
+	VkShaderModule m_computeShaderModule;
+
+	uint32_t m_queueFamilyIndex;
+	bool m_hasValidationLayers;
+	static const char* m_apiLayers[];
+	static const char* m_apiExtensionLayers[];
 };
+
+#endif
+
 
 #endif
