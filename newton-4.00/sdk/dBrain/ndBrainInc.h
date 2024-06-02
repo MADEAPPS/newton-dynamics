@@ -41,6 +41,7 @@
 #include <ndBrainGpuCommand.h>
 #include <ndBrainGpuContext.h>
 #include <ndBrainLayerLinear.h>
+#include <ndBrainGpuInference.h>
 #include <ndBrainReplayBuffer.h>
 #include <ndBrainOptimizerSgd.h>
 #include <ndBrainOptimizerAdam.h>

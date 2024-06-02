@@ -22,18 +22,9 @@ class ndBrainGpuBufferBase;
 class ndScopeMapBuffer
 {
 	public:
-	ndScopeMapBuffer(ndBrainGpuBufferBase& buffer)
-		:m_mappedMemory(nullptr)
-		,m_buffer(&buffer)
-	{
-	}
-	~ndScopeMapBuffer()
-	{
-	}
-	void* GetPointer() const
-	{
-		return m_mappedMemory;
-	}
+	ndScopeMapBuffer(ndBrainGpuBufferBase& buffer):m_mappedMemory(nullptr), m_buffer(&buffer){}
+	~ndScopeMapBuffer(){}
+	void* GetPointer() const{return m_mappedMemory;}
 
 	private:
 	void* m_mappedMemory;
@@ -43,21 +34,12 @@ class ndScopeMapBuffer
 class ndBrainGpuBufferBase : public ndClassAlloc
 {
 	protected:
-	ndBrainGpuBufferBase(ndBrainGpuContext* const, ndInt32)
-		:m_sizeInBytes(0)
-	{
-	}
-	virtual ~ndBrainGpuBufferBase()
-	{
-	}
+	ndBrainGpuBufferBase(ndBrainGpuContext* const, ndInt32):m_sizeInBytes(0){}
+	virtual ~ndBrainGpuBufferBase(){}
 
 	public:
-	void* GetBuffer() const
-	{
-	}
-	ndInt32 SizeInBytes() const
-	{
-	}
+	void* GetBuffer() const{}
+	ndInt32 SizeInBytes() const{}
 
 	protected:
 	ndInt32 m_sizeInBytes;

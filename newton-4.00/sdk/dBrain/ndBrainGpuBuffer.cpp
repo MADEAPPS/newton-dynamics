@@ -10,7 +10,6 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainFloat4.h"
 #include "ndBrainVector.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"

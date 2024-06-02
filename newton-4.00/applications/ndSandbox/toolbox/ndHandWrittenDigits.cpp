@@ -151,13 +151,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	output.SetCount((*testLabels)[0].GetCount());
 
 	ndBrainGpuContext gpuContext;
-
-	ndBrainVector parameters;
-	ndArray<ndInt32> offsets;
-	brain.GetParameterVector(parameters, offsets);
-	
-	ndBrainGpuIntegerBuffer gpuOffsets(&gpuContext, offsets);
-	ndBrainGpuFloatBuffer gpuParameters(&gpuContext, parameters.GetCount());
+	ndBrainGpuInference inference(&gpuContext, &brain);
 
 
 	ndInt32 failCount = 0;
@@ -166,32 +160,31 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
 	{
 		const ndBrainVector& input = (*testDigits)[i];
-		brain.MakePrediction(input, output, workingBuffer);
-
+		brain.MakePrediction_____(input, output, workingBuffer);
+	
 		const ndBrainVector& truth = (*testLabels)[i];
-
-		ndInt32 index = -1;
-		ndBrainFloat maxProbability = -1.0f;
-		for (ndInt32 j = 0; j < output.GetCount(); j++)
-		{
-			if (output[j] > maxProbability)
-			{
-				index = j;
-				maxProbability = output[j];
-			}
-		}
-
-		ndAssert(index >= 0);
-		if (truth[index] == ndReal(0.0f))
-		{
-			failCount++;
-		}
+	
+		//ndInt32 index = -1;
+		//ndBrainFloat maxProbability = -1.0f;
+		//for (ndInt32 j = 0; j < output.GetCount(); j++)
+		//{
+		//	if (output[j] > maxProbability)
+		//	{
+		//		index = j;
+		//		maxProbability = output[j];
+		//	}
+		//}
+		//
+		//ndAssert(index >= 0);
+		//if (truth[index] == ndReal(0.0f))
+		//{
+		//	failCount++;
+		//}
 	}
 	ndExpandTraceMessage("%s\n", title);
 	ndExpandTraceMessage("num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());
 	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testDigits->GetCount());
 	ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
-
 }
 
 //#pragma optimize( "", off )
