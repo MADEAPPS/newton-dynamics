@@ -19,8 +19,16 @@ class ndBrainGpuFloatBuffer;
 class ndBrainGpuContext : public ndClassAlloc
 {
 	public:
-	ndBrainGpuContext();
-	virtual ~ndBrainGpuContext();
+	ndBrainGpuContext()
+	{
+	}
+	virtual ~ndBrainGpuContext()
+	{
+	}
+
+	void SubmitQueue(ndBrainGpuCommand**, ndInt32)
+	{
+	}
 };
 
 #else

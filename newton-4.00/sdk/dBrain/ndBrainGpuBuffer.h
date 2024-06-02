@@ -18,30 +18,47 @@ class ndBrainVector;
 class ndBrainGpuContext;
 class ndBrainGpuBufferBase;
 
+#if !defined (D_USE_VULKAN_SDK)
+
 class ndScopeMapBuffer
 {
 	public:
-	ndScopeMapBuffer(ndBrainGpuBufferBase& buffer);
-	~ndScopeMapBuffer();
-
-	void* GetPointer() const;
+	ndScopeMapBuffer(ndBrainGpuBufferBase& buffer)
+		:m_mappedMemory(nullptr)
+		,m_buffer(&buffer)
+	{
+	}
+	~ndScopeMapBuffer()
+	{
+	}
+	void* GetPointer() const
+	{
+		return m_mappedMemory;
+	}
 
 	private:
 	void* m_mappedMemory;
 	ndBrainGpuBufferBase* m_buffer;
 };
 
-#if !defined (D_USE_VULKAN_SDK)
-
 class ndBrainGpuBufferBase : public ndClassAlloc
 {
 	protected:
-	ndBrainGpuBufferBase(ndBrainGpuContext* const context, ndInt32 sizeInByte);
-	virtual ~ndBrainGpuBufferBase();
+	ndBrainGpuBufferBase(ndBrainGpuContext* const, ndInt32)
+		:m_sizeInBytes(0)
+	{
+	}
+	virtual ~ndBrainGpuBufferBase()
+	{
+	}
 
 	public:
-	void* GetBuffer() const;
-	ndInt32 SizeInBytes() const;
+	void* GetBuffer() const
+	{
+	}
+	ndInt32 SizeInBytes() const
+	{
+	}
 
 	protected:
 	ndInt32 m_sizeInBytes;
@@ -49,6 +66,18 @@ class ndBrainGpuBufferBase : public ndClassAlloc
 };
 
 #else
+
+class ndScopeMapBuffer
+{
+	public:
+	ndScopeMapBuffer(ndBrainGpuBufferBase& buffer);
+	~ndScopeMapBuffer();
+	void* GetPointer() const;
+
+	private:
+	void* m_mappedMemory;
+	ndBrainGpuBufferBase* m_buffer;
+};
 
 class ndBrainGpuBufferBase : public ndClassAlloc
 {

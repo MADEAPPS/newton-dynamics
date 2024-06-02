@@ -15,34 +15,7 @@
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
 
-#if !defined (D_USE_VULKAN_SDK)
-
-ndScopeMapBuffer::ndScopeMapBuffer(ndBrainGpuBufferBase& buffer)
-	:m_mappedMemory(nullptr)
-	,m_buffer(&buffer)
-{
-}
-
-ndScopeMapBuffer::~ndScopeMapBuffer()
-{
-}
-
-void* ndScopeMapBuffer::GetPointer() const
-{
-	return nullptr;
-}
-
-ndBrainGpuBufferBase::ndBrainGpuBufferBase(ndBrainGpuContext* const, ndInt32 sizeInByte)
-	:m_sizeInBytes(sizeInByte)
-{
-
-}
-
-ndBrainGpuBufferBase::~ndBrainGpuBufferBase()
-{
-}
-
-#else
+#if defined (D_USE_VULKAN_SDK)
 
 ndScopeMapBuffer::ndScopeMapBuffer(ndBrainGpuBufferBase& buffer)
 	:m_buffer(&buffer)

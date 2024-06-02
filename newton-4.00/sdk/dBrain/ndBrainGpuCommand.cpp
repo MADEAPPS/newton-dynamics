@@ -14,6 +14,8 @@
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
 
+#if defined (D_USE_VULKAN_SDK)
+
 ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context)
 	:ndClassAlloc()
 	,m_context(context)
@@ -203,3 +205,5 @@ ndBrainGpuCommandTest1::ndBrainGpuCommandTest1(ndBrainGpuContext* const context,
 	vkCmdDispatch(m_commandBuffer, 1, 1, 1);
 	m_context->CheckResultVulkan(vkEndCommandBuffer(m_commandBuffer));
 }
+
+#endif

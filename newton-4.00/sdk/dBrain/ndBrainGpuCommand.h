@@ -19,11 +19,36 @@ class ndBrainGpuFloatBuffer;
 #if !defined (D_USE_VULKAN_SDK)
 class ndBrainGpuCommand : public ndClassAlloc
 {
-	ndBrainGpuCommand(ndBrainGpuContext* const context);
-	virtual ~ndBrainGpuCommand();
+	protected:
+	ndBrainGpuCommand(ndBrainGpuContext* const context)
+		:m_context(context)
+	{
+	}
 
-public:
+	virtual ~ndBrainGpuCommand()
+	{
+	}
+
+	public:
 	ndBrainGpuContext* m_context;
+};
+
+class ndBrainGpuCommandTest0 : public ndBrainGpuCommand
+{
+	public:
+	ndBrainGpuCommandTest0(ndBrainGpuContext* const context, ndBrainGpuFloatBuffer&)
+		:ndBrainGpuCommand(context)
+	{
+	}
+};
+
+class ndBrainGpuCommandTest1 : public ndBrainGpuCommand
+{
+	public:
+	ndBrainGpuCommandTest1(ndBrainGpuContext* const context, ndBrainGpuFloatBuffer&)
+		:ndBrainGpuCommand(context)
+	{
+	}
 };
 
 #else
@@ -43,7 +68,6 @@ class ndBrainGpuCommand : public ndClassAlloc
 	VkDescriptorSetLayout m_descriptorSetLayout;
 };
 
-
 class ndBrainGpuCommandTest0 : public ndBrainGpuCommand
 {
 	public:
@@ -57,5 +81,6 @@ class ndBrainGpuCommandTest1 : public ndBrainGpuCommand
 };
 
 #endif
+
 
 #endif

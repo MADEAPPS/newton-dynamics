@@ -14,24 +14,7 @@
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
 
-#if !defined (D_USE_VULKAN_SDK)
-
-ndBrainGpuContext::ndBrainGpuContext()
-{
-
-}
-
-ndBrainGpuContext::~ndBrainGpuContext()
-{
-}
-
-void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer&)
-{
-
-}
-
-#else
-
+#if defined (D_USE_VULKAN_SDK)
 
 #define ND_SELECT_DISCRETE_GPU
 
@@ -472,7 +455,6 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	createInfo.pCode = (uint32_t*)&code[0];
 	createInfo.codeSize = size_t(code.GetCount());
 	CheckResultVulkan(vkCreateShaderModule(m_device, &createInfo, m_allocator, &m_computeShaderModule1));
-
 }
 
 
