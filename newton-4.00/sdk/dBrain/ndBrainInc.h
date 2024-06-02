@@ -38,6 +38,7 @@
 #include <ndBrainOptimizer.h>
 #include <ndBrainGpuBuffer.h>
 #include <ndBrainThreadPool.h>
+#include <ndBrainGpuCommand.h>
 #include <ndBrainGpuContext.h>
 #include <ndBrainLayerLinear.h>
 #include <ndBrainReplayBuffer.h>

@@ -257,7 +257,19 @@ void TestVulkanStuff()
 	ndBrainGpuFloatBuffer buffer(&context, input.GetCount());
 	buffer.LoadData(input);
 
-	context.ExecuteTest(buffer);
+	ndBrainGpuCommandTest0 command0(&context, buffer);
+	ndBrainGpuCommandTest1 command1(&context, buffer);
+
+	//context.ExecuteTest(buffer);
+	ndBrainGpuCommand* xxxxx[2];
+	xxxxx[0] = &command0;
+	xxxxx[1] = &command1;
+#if 0
+	context.SubmitQueue(xxxxx, 1);
+#else
+	context.SubmitQueue(xxxxx, 2);
+#endif
+
 
 	ndBrainVector output;
 	buffer.UnloadData(output);

@@ -11,6 +11,7 @@
 #ifndef __ND_BRAIN_GPU_CONTEXT_H__
 #define __ND_BRAIN_GPU_CONTEXT_H__
 
+class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 
 #if !defined (D_USE_VULKAN_SDK)
@@ -20,8 +21,6 @@ class ndBrainGpuContext : public ndClassAlloc
 	public:
 	ndBrainGpuContext();
 	virtual ~ndBrainGpuContext();
-
-	void ExecuteTest(ndBrainGpuFloatBuffer& buffer);
 };
 
 #else
@@ -32,11 +31,15 @@ class ndBrainGpuContext: public ndClassAlloc
 	virtual ~ndBrainGpuContext();
 
 	VkDevice GetDevice() const;
+	VkCommandPool GetCommandPool() const;
+	VkDescriptorPool GetDescriptorPool() const;
 	VkAllocationCallbacks* GetAllocator() const;
 	VkPhysicalDevice GetPhysicalDevice() const;
 
-	void ExecuteTest(ndBrainGpuFloatBuffer& buffer);
+	VkShaderModule m_computeShaderModule0;
+	VkShaderModule m_computeShaderModule1;
 
+	void SubmitQueue(ndBrainGpuCommand** commands, ndInt32 commandCount);
 	static void CheckResultVulkan(VkResult err);
 
 	private:
@@ -47,6 +50,7 @@ class ndBrainGpuContext: public ndClassAlloc
 	void CreateLogicalDevice();
 	void CreatePhysicalDevice();
 	void CreateDescriptorPool();
+	void CreateFence();
 	void LoadShaderPrograms();
 	void GetShaderFileName(const char* const name, char* const outPathName);
 
@@ -64,6 +68,7 @@ class ndBrainGpuContext: public ndClassAlloc
 
 	VkAllocationCallbacks m_allocatorStruct;
 	VkAllocationCallbacks* m_allocator;
+	VkFence m_fence;
 	VkQueue m_queue;
 	VkDevice m_device;
 	VkInstance m_instance;
@@ -72,13 +77,14 @@ class ndBrainGpuContext: public ndClassAlloc
 	VkPhysicalDevice m_physicalDevice;
 	VkPhysicalDeviceProperties m_gpuProps;
 	VkDebugReportCallbackEXT m_debugMessenger;
-
-	VkShaderModule m_computeShaderModule;
+	
 
 	uint32_t m_queueFamilyIndex;
 	bool m_hasValidationLayers;
 	static const char* m_apiLayers[];
 	static const char* m_apiExtensionLayers[];
+
+	friend class ndBrainGpuCommand;
 };
 
 #endif

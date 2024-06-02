@@ -12,7 +12,9 @@
 #define __ND_BRAIN_GPU_COMMAND_H__
 
 #include "ndBrainStdafx.h"
+
 class ndBrainGpuContext;
+class ndBrainGpuFloatBuffer;
 
 #if !defined (D_USE_VULKAN_SDK)
 class ndBrainGpuCommand : public ndClassAlloc
@@ -28,6 +30,7 @@ public:
 
 class ndBrainGpuCommand : public ndClassAlloc
 {
+	protected:
 	ndBrainGpuCommand(ndBrainGpuContext* const context);
 	virtual ~ndBrainGpuCommand();
 
@@ -39,6 +42,20 @@ class ndBrainGpuCommand : public ndClassAlloc
 	VkPipelineLayout m_pipelineLayout;
 	VkDescriptorSetLayout m_descriptorSetLayout;
 };
+
+
+class ndBrainGpuCommandTest0 : public ndBrainGpuCommand
+{
+	public:
+	ndBrainGpuCommandTest0(ndBrainGpuContext* const context, ndBrainGpuFloatBuffer& buffer);
+};
+
+class ndBrainGpuCommandTest1 : public ndBrainGpuCommand
+{
+	public:
+	ndBrainGpuCommandTest1(ndBrainGpuContext* const context, ndBrainGpuFloatBuffer& buffer);
+};
+
 #endif
 
 #endif

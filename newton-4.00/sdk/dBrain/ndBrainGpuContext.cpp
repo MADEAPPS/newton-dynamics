@@ -11,8 +11,8 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainGpuBuffer.h"
+#include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
-
 
 #if !defined (D_USE_VULKAN_SDK)
 
@@ -48,6 +48,7 @@ const char* ndBrainGpuContext::m_apiExtensionLayers[] =
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndClassAlloc()
 	,m_allocator(&m_allocatorStruct)
+	,m_fence(VK_NULL_HANDLE)
 	,m_queue(VK_NULL_HANDLE)
 	,m_device(VK_NULL_HANDLE)
 	,m_instance(VK_NULL_HANDLE)
@@ -55,7 +56,6 @@ ndBrainGpuContext::ndBrainGpuContext()
 	,m_descriptorPool(VK_NULL_HANDLE)
 	,m_physicalDevice(VK_NULL_HANDLE)
 	,m_debugMessenger(VK_NULL_HANDLE)
-	,m_computeShaderModule(VK_NULL_HANDLE)
 	,m_queueFamilyIndex(0xffffffff)
 	,m_hasValidationLayers(false)
 {
@@ -73,6 +73,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 	CreateLogicalDevice();
 	CreateCommandPool();
 	CreateDescriptorPool();
+	CreateFence();
 	LoadShaderPrograms();
 }
 
@@ -88,7 +89,9 @@ ndBrainGpuContext::~ndBrainGpuContext()
 		}
 	}
 
-	vkDestroyShaderModule(m_device, m_computeShaderModule, m_allocator);
+	vkDestroyFence(m_device, m_fence, m_allocator);
+	vkDestroyShaderModule(m_device, m_computeShaderModule0, m_allocator);
+	vkDestroyShaderModule(m_device, m_computeShaderModule1, m_allocator);
 	vkDestroyDescriptorPool(m_device, m_descriptorPool, m_allocator);
 	vkDestroyCommandPool(m_device, m_commandPool, m_allocator);
 	vkDestroyDevice(m_device, m_allocator);
@@ -158,6 +161,17 @@ VkPhysicalDevice ndBrainGpuContext::GetPhysicalDevice() const
 {
 	return m_physicalDevice;
 }
+
+VkCommandPool ndBrainGpuContext::GetCommandPool() const
+{
+	return m_commandPool;
+}
+
+VkDescriptorPool ndBrainGpuContext::GetDescriptorPool() const
+{
+	return m_descriptorPool;
+}
+
 
 void ndBrainGpuContext::CreateInstance()
 {
@@ -287,7 +301,7 @@ void ndBrainGpuContext::CreatePhysicalDevice()
 	}
 	m_physicalDevice = gpus[use_gpu];
 	vkGetPhysicalDeviceProperties(m_physicalDevice, &m_gpuProps);
-	ndTrace(("accelerator: %s\n", m_gpuProps.deviceName));
+	ndTrace(("vulkan accelerator: %s\n", m_gpuProps.deviceName));
 }
 
 void ndBrainGpuContext::SelectGraphicsQueue()
@@ -355,14 +369,23 @@ void ndBrainGpuContext::CreateDescriptorPool()
 {
 	VkDescriptorPoolSize descriptorPoolSize = {};
 	descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-	descriptorPoolSize.descriptorCount = 1;
+	descriptorPoolSize.descriptorCount = 2;
 
+	// we only need to allocate one descriptor set from the pool.
 	VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
 	descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	descriptorPoolCreateInfo.maxSets = 1; // we only need to allocate one descriptor set from the pool.
+	descriptorPoolCreateInfo.maxSets = 1000; 
 	descriptorPoolCreateInfo.poolSizeCount = 1;
 	descriptorPoolCreateInfo.pPoolSizes = &descriptorPoolSize;
 	CheckResultVulkan(vkCreateDescriptorPool(m_device, &descriptorPoolCreateInfo, m_allocator, &m_descriptorPool));
+}
+
+void ndBrainGpuContext::CreateFence()
+{
+	VkFenceCreateInfo fenceCreateInfo = {};
+	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceCreateInfo.flags = 0;
+	CheckResultVulkan(vkCreateFence(m_device, &fenceCreateInfo, m_allocator, &m_fence));
 }
 
 void ndBrainGpuContext::GetShaderFileName(const char* const name, char* const outPathName)
@@ -441,121 +464,33 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 	createInfo.pCode = (uint32_t*)&code[0];
 	createInfo.codeSize = size_t(code.GetCount());
-	CheckResultVulkan(vkCreateShaderModule(m_device, &createInfo, m_allocator, &m_computeShaderModule));
+	CheckResultVulkan(vkCreateShaderModule(m_device, &createInfo, m_allocator, &m_computeShaderModule0));
+
+	LoadShaderCode("testShader1-comp.spv");
+	//VkShaderModuleCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	createInfo.pCode = (uint32_t*)&code[0];
+	createInfo.codeSize = size_t(code.GetCount());
+	CheckResultVulkan(vkCreateShaderModule(m_device, &createInfo, m_allocator, &m_computeShaderModule1));
+
 }
 
 
-
-void ndBrainGpuContext::ExecuteTest(ndBrainGpuFloatBuffer& buffer)
+void ndBrainGpuContext::SubmitQueue(ndBrainGpuCommand** commands, ndInt32 commandCount)
 {
-	VkPipeline pipeline;
-	VkDescriptorSet descriptorSet;
-	VkCommandBuffer commandBuffer;
-	VkPipelineLayout pipelineLayout;
-	VkDescriptorSetLayout descriptorSetLayout;
-
-	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
-	commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	commandBufferAllocateInfo.commandPool = m_commandPool;
-	commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	commandBufferAllocateInfo.commandBufferCount = 1;
-	CheckResultVulkan(vkAllocateCommandBuffers(m_device, &commandBufferAllocateInfo, &commandBuffer));
-
-	VkDescriptorSetLayoutBinding descriptorSetLayoutBinding = {};
-	descriptorSetLayoutBinding.binding = 0; // binding = 0
-	descriptorSetLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-	descriptorSetLayoutBinding.descriptorCount = 1;
-	descriptorSetLayoutBinding.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
-
-	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
-	descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	descriptorSetLayoutCreateInfo.bindingCount = 1; // only a single binding in this descriptor set layout. 
-	descriptorSetLayoutCreateInfo.pBindings = &descriptorSetLayoutBinding;
-	CheckResultVulkan(vkCreateDescriptorSetLayout(m_device, &descriptorSetLayoutCreateInfo, m_allocator, &descriptorSetLayout));
-
-	VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
-	descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	descriptorSetAllocateInfo.descriptorPool = m_descriptorPool;
-	descriptorSetAllocateInfo.descriptorSetCount = 1;
-	descriptorSetAllocateInfo.pSetLayouts = &descriptorSetLayout;
-	CheckResultVulkan(vkAllocateDescriptorSets(m_device, &descriptorSetAllocateInfo, &descriptorSet));
-
-	// Specify the buffer to bind to the descriptor.
-	VkDescriptorBufferInfo descriptorBufferInfo = {};
-	descriptorBufferInfo.buffer = buffer.GetBuffer();
-	descriptorBufferInfo.offset = 0;
-	descriptorBufferInfo.range = (VkDeviceSize)buffer.SizeInBytes();
-
-	VkWriteDescriptorSet writeDescriptorSet = {};
-	writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	writeDescriptorSet.dstSet = descriptorSet; // write to this descriptor set.
-	writeDescriptorSet.dstBinding = 0; // write to the first, and only binding.
-	writeDescriptorSet.descriptorCount = 1; // update a single descriptor.
-	writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER; // storage buffer.
-	writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
-
-	// perform the update of the descriptor set.
-	vkUpdateDescriptorSets(m_device, 1, &writeDescriptorSet, 0, nullptr);
-
-
-	VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
-	shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	shaderStageCreateInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-	shaderStageCreateInfo.module = m_computeShaderModule;
-	shaderStageCreateInfo.pName = "main";
-
-	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
-	pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutCreateInfo.setLayoutCount = 1;
-	pipelineLayoutCreateInfo.pSetLayouts = &descriptorSetLayout;
-	CheckResultVulkan(vkCreatePipelineLayout(m_device, &pipelineLayoutCreateInfo, m_allocator, &pipelineLayout));
-
-	VkComputePipelineCreateInfo pipelineCreateInfo = {};
-	pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-	pipelineCreateInfo.stage = shaderStageCreateInfo;
-	pipelineCreateInfo.layout = pipelineLayout;
-	CheckResultVulkan(vkCreateComputePipelines(m_device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, m_allocator, &pipeline));
-
-	VkCommandBufferBeginInfo beginInfo = {};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-	CheckResultVulkan(vkBeginCommandBuffer(commandBuffer, &beginInfo)); // start recording commands.
-
-	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
-	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
-
-	//vkCmdDispatch(commandBuffer, (uint32_t)ceil(WIDTH / float(WORKGROUP_SIZE)), (uint32_t)ceil(HEIGHT / float(WORKGROUP_SIZE)), 1);
-	vkCmdDispatch(commandBuffer, 1, 1, 1);
-
-
-	CheckResultVulkan(vkEndCommandBuffer(commandBuffer));
-
-
+	VkCommandBuffer xxxx[10];
+	for (ndInt32 i = 0; i < commandCount; ++i)
+	{
+		xxxx[i] = commands[i]->m_commandBuffer;
+	}
 
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1; // submit a single command buffer
-	submitInfo.pCommandBuffers = &commandBuffer; // the command buffer to submit.
-
-	VkFence fence;
-	VkFenceCreateInfo fenceCreateInfo = {};
-	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-	fenceCreateInfo.flags = 0;
-	CheckResultVulkan(vkCreateFence(m_device, &fenceCreateInfo, m_allocator, &fence));
-
-	CheckResultVulkan(vkQueueSubmit(m_queue, 1, &submitInfo, fence));
-
-	//The command will not have finished executing until the fence is signaled.
-	//So we wait here.
-	//We will directly after this read our buffer from the GPU,
-	//and we will not be sure that the command has finished executing unless we wait for the fence.
-	//Hence, we use a fence here.
-	CheckResultVulkan(vkWaitForFences(m_device, 1, &fence, VK_TRUE, 100000000000));
-
-	vkDestroyFence(m_device, fence, m_allocator);
-	vkDestroyDescriptorSetLayout(m_device, descriptorSetLayout, m_allocator);
-	vkDestroyPipelineLayout(m_device, pipelineLayout, m_allocator);
-	vkDestroyPipeline(m_device, pipeline, m_allocator);
+	submitInfo.commandBufferCount = uint32_t(commandCount);
+	submitInfo.pCommandBuffers = xxxx; 
+	//CheckResultVulkan(vkQueueSubmit(m_queue, 1, &submitInfo, m_fence));
+	CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(commandCount), &submitInfo, m_fence));
+	CheckResultVulkan(vkWaitForFences(m_device, 1, &m_fence, VK_TRUE, 100000000000));
 }
 
 #endif
