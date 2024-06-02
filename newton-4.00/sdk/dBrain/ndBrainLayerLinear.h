@@ -71,6 +71,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 	void InitGaussianWeights(ndBrainFloat variance);
 	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
+	virtual void GetNumberOfParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const;
 	ndBrainVector m_bias;
 	ndBrainMatrix m_weights;
 };

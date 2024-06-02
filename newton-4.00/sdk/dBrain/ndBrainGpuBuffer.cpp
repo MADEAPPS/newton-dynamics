@@ -127,8 +127,14 @@ ndInt32 ndBrainGpuBufferBase::SizeInBytes() const
 //
 //*************************************************************************************
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt32 size)
-	:ndBrainGpuBufferBase(context, size* ndInt32(sizeof(ndReal)))
+	:ndBrainGpuBufferBase(context, size * ndInt32(sizeof(ndReal)))
 {
+}
+
+ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input)
+	:ndBrainGpuBufferBase(context, input.GetCount() * ndInt32(sizeof(ndReal)))
+{
+	LoadData(input);
 }
 
 void ndBrainGpuFloatBuffer::LoadData(const ndBrainVector& input)
@@ -158,6 +164,51 @@ void ndBrainGpuFloatBuffer::UnloadData(ndBrainVector& output)
 		for (ndInt32 i = 0; i < size; ++i)
 		{
 			output[i] = ndBrainFloat(src[i]);
+		}
+	}
+}
+
+//*************************************************************************************
+//
+//*************************************************************************************
+ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt32 size)
+	:ndBrainGpuBufferBase(context, size * ndInt32(sizeof(ndInt32)))
+{
+}
+
+ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, const ndArray<ndInt32>& input)
+	:ndBrainGpuBufferBase(context, input.GetCount() * ndInt32(sizeof(ndInt32)))
+{
+	LoadData(input);
+}
+
+void ndBrainGpuIntegerBuffer::LoadData(const ndArray<ndInt32>& input)
+{
+	ndScopeMapBuffer mapBuffer(*this);
+	ndInt32* const dst = (ndInt32*)mapBuffer.GetPointer();
+	if (dst)
+	{
+		const ndInt32 size = m_sizeInBytes / ndInt32(sizeof(ndInt32));
+		ndAssert(size == input.GetCount());
+
+		for (ndInt32 i = 0; i < size; ++i)
+		{
+			dst[i] = input[i];
+		}
+	}
+}
+
+void ndBrainGpuIntegerBuffer::UnloadData(ndArray<ndInt32>& output)
+{
+	ndScopeMapBuffer mapBuffer(*this);
+	const ndInt32* const src = (ndInt32*)mapBuffer.GetPointer();
+	if (src)
+	{
+		const ndInt32 size = m_sizeInBytes / ndInt32(sizeof(ndInt32));
+		output.SetCount(size);
+		for (ndInt32 i = 0; i < size; ++i)
+		{
+			output[i] = src[i];
 		}
 	}
 }

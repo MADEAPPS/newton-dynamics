@@ -11,6 +11,8 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
+#include "ndBrainGpuBuffer.h"
+#include "ndBrainGpuContext.h"
 
 static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 {
@@ -149,6 +151,14 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	output.SetCount((*testLabels)[0].GetCount());
 
 	ndBrainGpuContext gpuContext;
+
+	ndBrainVector parameters;
+	ndArray<ndInt32> offsets;
+	brain.GetParameterVector(parameters, offsets);
+	
+	ndBrainGpuIntegerBuffer gpuOffsets(&gpuContext, offsets);
+	ndBrainGpuFloatBuffer gpuParameters(&gpuContext, parameters.GetCount());
+
 
 	ndInt32 failCount = 0;
 	ndBrainVector workingBuffer;

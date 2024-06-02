@@ -27,6 +27,8 @@
 
 class ndBrainLoad;
 class ndBrainSave;
+//class ndBrainGpuFloatBuffer;
+//class ndBrainGpuIntegerBuffer;
 
 class ndBrain: public ndArray<ndBrainLayer*>
 {
@@ -60,6 +62,8 @@ class ndBrain: public ndArray<ndBrainLayer*>
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer);
 	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients, ndBrainVector& workingBuffer);
+
+	void GetParameterVector(ndBrainVector& parameters, ndArray<ndInt32>& offsets);
 
 	friend class ndBrainLoad;
 	friend class ndBrainSave;

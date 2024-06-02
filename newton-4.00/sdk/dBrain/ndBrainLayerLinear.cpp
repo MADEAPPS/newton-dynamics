@@ -79,6 +79,36 @@ ndInt32 ndBrainLayerLinear::GetNumberOfParameters() const
 	return m_bias.GetCount() + m_weights.GetColumns() * m_weights.GetRows();
 }
 
+void ndBrainLayerLinear::GetNumberOfParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const
+{
+	ndInt32 rounding = 32 / sizeof (ndBrainFloat);
+
+	ndAssert(m_bias.GetCount() == m_weights.GetRows());
+
+	ndInt32 biasCount = (m_bias.GetCount() + rounding - 1) & -rounding;
+	ndInt32 width = (m_weights.GetColumns() + rounding - 1) & -rounding;
+	
+	ndInt32 count = width * m_weights.GetRows() + biasCount;
+	offsets.PushBack(count);
+
+	ndInt32 paramStart = parameters.GetCount();
+	parameters.SetCount(paramStart + count);
+
+	ndBrainMemVector memData(&parameters[paramStart], count);
+	memData.Set(ndBrainFloat(0.0f));
+
+	ndBrainMemVector dstBias(&memData[0], m_bias.GetCount());
+	dstBias.Set(m_bias);
+
+	ndBrainMemVector dstWeights(&memData[biasCount], count - biasCount);
+	for (ndInt32 i = 0; i < m_weights.GetRows(); ++i)
+	{
+		const ndBrainVector& src = m_weights[i];
+		ndBrainMemVector dst(&dstWeights[i * width], src.GetCount());
+		dst.Set(src);
+	}
+}
+
 bool ndBrainLayerLinear::HasParameters() const
 {
 	return true;
@@ -287,3 +317,4 @@ void ndBrainLayerLinear::CalculateParamGradients(
 
 	m_weights.TransposeMul(outputDerivative, inputGradient);
 }
+

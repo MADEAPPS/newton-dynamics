@@ -48,6 +48,11 @@ ndInt32 ndBrainLayer::GetNumberOfParameters() const
 	return 0;
 }
 
+void ndBrainLayer::GetNumberOfParameters(ndBrainVector&, ndArray<ndInt32>&) const
+{
+	ndAssert(0);
+}
+
 const char* ndBrainLayer::GetLabelId() const
 {
 	ndAssert(0);

@@ -12,7 +12,6 @@
 #define __ND_BRAIN_GPU_BUFFER_H__
 
 #include "ndBrainStdafx.h"
-//#include "ndBrainGpuContext.h"
 
 class ndBrainVector;
 class ndBrainGpuContext;
@@ -105,10 +104,21 @@ class ndBrainGpuBufferBase : public ndClassAlloc
 // 
 // 
 // **************************************************************************
+class ndBrainGpuIntegerBuffer : public ndBrainGpuBufferBase
+{
+	public:
+	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt32 size);
+	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, const ndArray<ndInt32>& input);
+
+	void UnloadData(ndArray<ndInt32>& output);
+	void LoadData(const ndArray<ndInt32>& input);
+};
+
 class ndBrainGpuFloatBuffer : public ndBrainGpuBufferBase
 {
 	public:
 	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt32 size);
+	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input);
 
 	void UnloadData(ndBrainVector& output);
 	void LoadData(const ndBrainVector& input);

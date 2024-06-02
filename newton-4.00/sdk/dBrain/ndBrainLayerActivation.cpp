@@ -137,3 +137,8 @@ void ndBrainLayerActivation::CalculateParamGradients(const ndBrainVector&, const
 {
 	InputDerivative(output, outputDerivative, inputGradient);
 }
+
+void ndBrainLayerActivation::GetNumberOfParameters(ndBrainVector&, ndArray<ndInt32>& offsets) const
+{
+	offsets.PushBack(0);
+}
