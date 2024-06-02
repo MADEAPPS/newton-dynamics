@@ -19,16 +19,10 @@ class ndBrainGpuFloatBuffer;
 class ndBrainGpuContext : public ndClassAlloc
 {
 	public:
-	ndBrainGpuContext()
-	{
-	}
-	virtual ~ndBrainGpuContext()
-	{
-	}
-
-	void SubmitQueue(ndBrainGpuCommand**, ndInt32)
-	{
-	}
+	ndBrainGpuContext(){}
+	virtual ~ndBrainGpuContext(){}
+	void SubmitQueue(ndBrainGpuCommand**, ndInt32) {}
+	static bool HasGpuSupport(){return false;}
 };
 
 #else
@@ -37,6 +31,8 @@ class ndBrainGpuContext: public ndClassAlloc
 	public:
 	ndBrainGpuContext();
 	virtual ~ndBrainGpuContext();
+
+	static bool HasGpuSupport();
 
 	VkDevice GetDevice() const;
 	VkCommandPool GetCommandPool() const;

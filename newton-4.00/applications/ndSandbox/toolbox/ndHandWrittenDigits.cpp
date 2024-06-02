@@ -143,6 +143,47 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 	ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
 }
 
+static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
+{
+	ndBrainVector output;
+	output.SetCount((*testLabels)[0].GetCount());
+
+	ndBrainGpuContext gpuContext;
+
+	ndInt32 failCount = 0;
+	ndBrainVector workingBuffer;
+	brain.DisableDropOut();
+	for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
+	{
+		const ndBrainVector& input = (*testDigits)[i];
+		brain.MakePrediction(input, output, workingBuffer);
+
+		const ndBrainVector& truth = (*testLabels)[i];
+
+		ndInt32 index = -1;
+		ndBrainFloat maxProbability = -1.0f;
+		for (ndInt32 j = 0; j < output.GetCount(); j++)
+		{
+			if (output[j] > maxProbability)
+			{
+				index = j;
+				maxProbability = output[j];
+			}
+		}
+
+		ndAssert(index >= 0);
+		if (truth[index] == ndReal(0.0f))
+		{
+			failCount++;
+		}
+	}
+	ndExpandTraceMessage("%s\n", title);
+	ndExpandTraceMessage("num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());
+	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testDigits->GetCount());
+	ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
+
+}
+
 //#pragma optimize( "", off )
 static void MnistTrainingSet()
 {
@@ -558,7 +599,14 @@ static void MnistTestSet()
 		ndInt32 numbeOfParam = brain->GetNumberOfParameters();
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		ndExpandTraceMessage("mnist database, number of Parameters %d\n", numbeOfParam);
-		ValidateData("test data", *(*brain), *testLabels, *testDigits);
+		if (ndBrainGpuContext::HasGpuSupport())
+		{
+			ValidateDataGpu("test data", *(*brain), *testLabels, *testDigits);
+		}
+		else
+		{
+			ValidateData("test data", *(*brain), *testLabels, *testDigits);
+		}
 		time = ndGetTimeInMicroseconds() - time;
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}

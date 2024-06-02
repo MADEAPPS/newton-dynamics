@@ -81,6 +81,11 @@ ndBrainGpuContext::~ndBrainGpuContext()
 	vkDestroyInstance(m_instance, m_allocator);
 }
 
+bool ndBrainGpuContext::HasGpuSupport()
+{
+	return true;
+}
+
 void ndBrainGpuContext::CheckResultVulkan(VkResult err)
 {
 	if (err != VK_SUCCESS)
