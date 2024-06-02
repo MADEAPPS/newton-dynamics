@@ -488,8 +488,8 @@ void ndBrainGpuContext::SubmitQueue(ndBrainGpuCommand** commands, ndInt32 comman
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.commandBufferCount = uint32_t(commandCount);
 	submitInfo.pCommandBuffers = xxxx; 
-	//CheckResultVulkan(vkQueueSubmit(m_queue, 1, &submitInfo, m_fence));
-	CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(commandCount), &submitInfo, m_fence));
+	CheckResultVulkan(vkQueueSubmit(m_queue, 1, &submitInfo, m_fence));
+	//CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(commandCount), &submitInfo, m_fence));
 	CheckResultVulkan(vkWaitForFences(m_device, 1, &m_fence, VK_TRUE, 100000000000));
 }
 
