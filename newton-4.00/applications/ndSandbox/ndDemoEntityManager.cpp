@@ -263,6 +263,14 @@ void TestVulkanStuff()
 	ndBrainGpuCommand* xxxxx[1];
 	xxxxx[0] = &command0;
 	context.SubmitQueue(xxxxx, 1);
+
+	input.SetCount(0);
+	for (ndInt32 i = 0; i < 100; ++i)
+	{
+		input.PushBack(ndBrainFloat(i));
+	}
+	buffer0.LoadData(input);
+	context.SubmitQueue(xxxxx, 1);
 #else
 	//ndBrainGpuCommandTest1 command1(&context, buffer);
 	ndBrainGpuCommand* xxxxx[2];
