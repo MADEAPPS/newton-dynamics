@@ -260,12 +260,12 @@ void TestVulkanStuff()
 
 	struct ParamData
 	{
-		ndInt32 m_inputSize[4];
-		ndReal m_scale[4];
+		ndInt32 m_inputSize;
+		ndReal m_scale;
 	};
 	ParamData param;
-	param.m_inputSize[0] = 80;
-	param.m_scale[0] = 2.0f;
+	param.m_inputSize = 10;
+	param.m_scale = 2.0f;
 
 	ndBrainGpuUniformBuffer uniformBuffer(&context, sizeof(ParamData), &param);
 	ndBrainGpuCommandTest0 command0(&context, uniformBuffer, buffer0, buffer1);
@@ -274,13 +274,13 @@ void TestVulkanStuff()
 	xxxxx[0] = &command0;
 	context.SubmitQueue(xxxxx, 1);
 
-	input.SetCount(0);
-	for (ndInt32 i = 0; i < 100; ++i)
-	{
-		input.PushBack(ndBrainFloat(i));
-	}
-	buffer0.LoadData(input);
-	context.SubmitQueue(xxxxx, 1);
+	//input.SetCount(0);
+	//for (ndInt32 i = 0; i < 100; ++i)
+	//{
+	//	input.PushBack(ndBrainFloat(i));
+	//}
+	//buffer0.LoadData(input);
+	//context.SubmitQueue(xxxxx, 1);
 #else
 	//ndBrainGpuCommandTest1 command1(&context, buffer);
 	ndBrainGpuCommand* xxxxx[2];
@@ -289,9 +289,8 @@ void TestVulkanStuff()
 	context.SubmitQueue(xxxxx, 2);
 #endif
 
-
 	ndBrainVector output;
-	buffer0.UnloadData(output);
+	buffer1.UnloadData(output);
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline

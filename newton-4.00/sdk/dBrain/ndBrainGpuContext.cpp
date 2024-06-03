@@ -160,7 +160,6 @@ VkDescriptorPool ndBrainGpuContext::GetDescriptorPool() const
 	return m_descriptorPool;
 }
 
-
 void ndBrainGpuContext::CreateInstance()
 {
 	uint32_t layerCount;
@@ -355,16 +354,21 @@ void ndBrainGpuContext::CreateCommandPool()
 
 void ndBrainGpuContext::CreateDescriptorPool()
 {
-	VkDescriptorPoolSize descriptorPoolSize = {};
-	descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-	descriptorPoolSize.descriptorCount = 2;
+	//VkDescriptorPoolSize descriptorPoolSize = {};
+	VkDescriptorPoolSize descriptorPoolSize[2];
+
+	descriptorPoolSize[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptorPoolSize[0].descriptorCount = 100;
+
+	descriptorPoolSize[1].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	descriptorPoolSize[1].descriptorCount = 100;
 
 	// we only need to allocate one descriptor set from the pool.
 	VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
 	descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	descriptorPoolCreateInfo.maxSets = 1000; 
-	descriptorPoolCreateInfo.poolSizeCount = 1;
-	descriptorPoolCreateInfo.pPoolSizes = &descriptorPoolSize;
+	descriptorPoolCreateInfo.poolSizeCount = 2;
+	descriptorPoolCreateInfo.pPoolSizes = descriptorPoolSize;
 	CheckResultVulkan(vkCreateDescriptorPool(m_device, &descriptorPoolCreateInfo, m_allocator, &m_descriptorPool));
 }
 

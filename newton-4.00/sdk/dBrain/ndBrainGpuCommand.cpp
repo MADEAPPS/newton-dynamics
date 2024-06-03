@@ -172,7 +172,7 @@ ndBrainGpuCommandTest0::ndBrainGpuCommandTest0(ndBrainGpuContext* const context,
 
 	// Specify the buffer to bind to the descriptor.
 	VkDescriptorBufferInfo descriptorBufferInfo[3] = {};
-	descriptorBufferInfo[0].buffer = parammeters.GetBuffer();;
+	descriptorBufferInfo[0].buffer = parammeters.GetBuffer();
 	descriptorBufferInfo[0].offset = 0;
 	descriptorBufferInfo[0].range = (VkDeviceSize)parammeters.SizeInBytes();
 
@@ -194,17 +194,17 @@ ndBrainGpuCommandTest0::ndBrainGpuCommandTest0(ndBrainGpuContext* const context,
 
 	writeDescriptorSet[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 	writeDescriptorSet[1].dstSet = m_descriptorSet;
-	writeDescriptorSet[1].dstBinding = 0;
+	writeDescriptorSet[1].dstBinding = 1;
 	writeDescriptorSet[1].descriptorCount = 1;
 	writeDescriptorSet[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-	writeDescriptorSet[1].pBufferInfo = &descriptorBufferInfo[0];
+	writeDescriptorSet[1].pBufferInfo = &descriptorBufferInfo[1];
 
 	writeDescriptorSet[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 	writeDescriptorSet[2].dstSet = m_descriptorSet;
-	writeDescriptorSet[2].dstBinding = 1;
+	writeDescriptorSet[2].dstBinding = 2;
 	writeDescriptorSet[2].descriptorCount = 1;
 	writeDescriptorSet[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-	writeDescriptorSet[2].pBufferInfo = &descriptorBufferInfo[1];
+	writeDescriptorSet[2].pBufferInfo = &descriptorBufferInfo[2];
 
 	// perform the update of the descriptor set.
 	vkUpdateDescriptorSets(device, 3, writeDescriptorSet, 0, nullptr);

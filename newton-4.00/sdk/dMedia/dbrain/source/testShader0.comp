@@ -37,6 +37,5 @@ void main()
   if(index >= m_inputSize)
     return;
 
-  //m_output[index] = m_input[index];
-  m_output[index] = m_input[index] * m_scaleParam;
+  m_output[index] = m_scaleParam * m_input[index];
 }
