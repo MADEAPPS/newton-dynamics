@@ -48,6 +48,31 @@ class ndBrainGpuBufferBase : public ndClassAlloc
 	friend class ndScopeMapBuffer;
 };
 
+class ndBrainGpuIntegerBuffer : public ndBrainGpuBufferBase
+{
+	public:
+	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt32 size) : ndBrainGpuBufferBase(context, size, 0) {}
+	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, const ndArray<ndInt32>&) : ndBrainGpuBufferBase(context, 0, 0) {}
+	void UnloadData(ndArray<ndInt32>&) {}
+	void LoadData(const ndArray<ndInt32>&) {}
+};
+
+class ndBrainGpuFloatBuffer : public ndBrainGpuBufferBase
+{
+	public:
+	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt32 size): ndBrainGpuBufferBase(context, size, 0){}
+	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector&) : ndBrainGpuBufferBase(context, 0, 0) {}
+	void UnloadData(ndBrainVector&) {}
+	void LoadData(const ndBrainVector&) {}
+};
+
+class ndBrainGpuUniformBuffer : public ndBrainGpuBufferBase
+{
+	public:
+	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32, const void* const) : ndBrainGpuBufferBase(context, 0, 0) {}
+	void LoadData(ndInt32, const void* const) {}
+};
+
 #else
 
 class ndScopeMapBuffer
@@ -82,10 +107,7 @@ class ndBrainGpuBufferBase : public ndClassAlloc
 	friend class ndScopeMapBuffer;
 };
 
-#endif
-
 // **************************************************************************
-// 
 // 
 // **************************************************************************
 class ndBrainGpuIntegerBuffer : public ndBrainGpuBufferBase
@@ -112,9 +134,10 @@ class ndBrainGpuUniformBuffer : public ndBrainGpuBufferBase
 {
 	public:
 	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data);
-
-	//void UnloadData(ndInt32 sizeInBytes, void* const data);
 	void LoadData(ndInt32 sizeInBytes, const void* const data);
 };
+
+#endif
+
 
 #endif

@@ -40,9 +40,6 @@ class ndBrainGpuContext: public ndClassAlloc
 	VkAllocationCallbacks* GetAllocator() const;
 	VkPhysicalDevice GetPhysicalDevice() const;
 
-	VkShaderModule m_computeShaderModule0;
-	VkShaderModule m_computeShaderModule1;
-
 	void SubmitQueue(ndBrainGpuCommand** commands, ndInt32 commandCount);
 	static void CheckResultVulkan(VkResult err);
 
@@ -56,6 +53,7 @@ class ndBrainGpuContext: public ndClassAlloc
 	void CreateDescriptorPool();
 	void CreateFence();
 	void LoadShaderPrograms();
+	VkShaderModule LoadShaderProgram(const char* const name);
 	void GetShaderFileName(const char* const name, char* const outPathName);
 
 	static void VulkanFree(void* pUserData, void* memory);
@@ -81,7 +79,11 @@ class ndBrainGpuContext: public ndClassAlloc
 	VkPhysicalDevice m_physicalDevice;
 	VkPhysicalDeviceProperties m_gpuProps;
 	VkDebugReportCallbackEXT m_debugMessenger;
-	
+
+public:
+	VkShaderModule m_copyInputData;
+	VkShaderModule m_computeShaderModule0;
+	VkShaderModule m_computeShaderModule1;
 
 	uint32_t m_queueFamilyIndex;
 	bool m_hasValidationLayers;

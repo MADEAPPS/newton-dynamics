@@ -419,10 +419,9 @@ void ndBrainGpuContext::GetShaderFileName(const char* const name, char* const ou
 #endif
 }
 
-void ndBrainGpuContext::LoadShaderPrograms()
-{
-	//Create a shader module. A shader module basically just encapsulates some shader code.
 
+VkShaderModule ndBrainGpuContext::LoadShaderProgram(const char* const name)
+{
 	ndFixSizeArray<char, 1024 * 64> code;
 	auto LoadShaderCode = [this, &code](const char* const name)
 	{
@@ -451,21 +450,23 @@ void ndBrainGpuContext::LoadShaderPrograms()
 		}
 	};
 
-	LoadShaderCode("testShader0-comp.spv");
+	LoadShaderCode(name);
 	VkShaderModuleCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 	createInfo.pCode = (uint32_t*)&code[0];
 	createInfo.codeSize = size_t(code.GetCount());
-	CheckResultVulkan(vkCreateShaderModule(m_device, &createInfo, m_allocator, &m_computeShaderModule0));
 
-	LoadShaderCode("testShader1-comp.spv");
-	//VkShaderModuleCreateInfo createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	createInfo.pCode = (uint32_t*)&code[0];
-	createInfo.codeSize = size_t(code.GetCount());
-	CheckResultVulkan(vkCreateShaderModule(m_device, &createInfo, m_allocator, &m_computeShaderModule1));
+	VkShaderModule computeShaderModule;
+	CheckResultVulkan(vkCreateShaderModule(m_device, &createInfo, m_allocator, &computeShaderModule));
+	return computeShaderModule;
 }
 
+void ndBrainGpuContext::LoadShaderPrograms()
+{
+	m_copyInputData = LoadShaderProgram("CopyInput-comp.spv");
+	m_computeShaderModule0 = LoadShaderProgram("testShader0-comp.spv");
+	m_computeShaderModule1 = LoadShaderProgram("testShader1-comp.spv");
+}
 
 void ndBrainGpuContext::SubmitQueue(ndBrainGpuCommand** commands, ndInt32 commandCount)
 {
