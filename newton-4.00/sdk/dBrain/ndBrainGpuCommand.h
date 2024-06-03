@@ -36,7 +36,7 @@ class ndBrainGpuCommand : public ndClassAlloc
 class ndBrainGpuCommandTest0 : public ndBrainGpuCommand
 {
 	public:
-	ndBrainGpuCommandTest0(ndBrainGpuContext* const context, ndBrainGpuFloatBuffer&)
+	ndBrainGpuCommandTest0(ndBrainGpuContext* const context, ndBrainGpuFloatBuffer&, ndBrainGpuFloatBuffer&)
 		:ndBrainGpuCommand(context)
 	{
 	}
@@ -71,7 +71,7 @@ class ndBrainGpuCommand : public ndClassAlloc
 class ndBrainGpuCommandTest0 : public ndBrainGpuCommand
 {
 	public:
-	ndBrainGpuCommandTest0(ndBrainGpuContext* const context, ndBrainGpuFloatBuffer& buffer);
+	ndBrainGpuCommandTest0(ndBrainGpuContext* const context, ndBrainGpuFloatBuffer& input, ndBrainGpuFloatBuffer& output);
 };
 
 class ndBrainGpuCommandTest1 : public ndBrainGpuCommand

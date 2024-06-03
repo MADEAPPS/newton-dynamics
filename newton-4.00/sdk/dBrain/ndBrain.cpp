@@ -264,29 +264,6 @@ void ndBrain::CalculateInputGradient(const ndBrainVector&, ndBrainVector&, ndBra
 	ndAssert(0);
 }
 
-
-void ndBrain::GetParameterVector(ndBrainVector& parameters, ndArray<ndInt32>& offsets)
-{
-	offsets.SetCount(0);
-	parameters.SetCount(0);
-
-	const ndArray<ndBrainLayer*>& layers = *this;
-	for (ndInt32 i = 0; i < GetCount(); ++i)
-	{
-		const ndBrainLayer* const layer = layers[i];
-		layer->GetNumberOfParameters(parameters, offsets);
-	}
-
-	ndInt32 sum = 0;
-	for (ndInt32 i = 0; i < offsets.GetCount(); ++i)
-	{
-		ndInt32 count = offsets[i];
-		offsets[i] = sum;
-		sum += count;
-	}
-	offsets.PushBack(sum);
-}
-
 void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer)
 {
 	const ndArray<ndBrainLayer*>& layers = *this;
@@ -318,7 +295,7 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, 
 	output.Set(in);
 }
 
-void ndBrain::MakePrediction_____(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer)
+void ndBrain::MakePrediction____xxxxx(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer)
 {
 	const ndArray<ndBrainLayer*>& layers = *this;
 	ndInt32 maxSize = layers[0]->GetInputSize();

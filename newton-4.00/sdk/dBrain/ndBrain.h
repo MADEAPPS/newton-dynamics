@@ -60,9 +60,7 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer);
 	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients, ndBrainVector& workingBuffer);
 
-	void GetParameterVector(ndBrainVector& parameters, ndArray<ndInt32>& offsets);
-
-	void MakePrediction_____(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer);
+	void MakePrediction____xxxxx(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer);
 
 	friend class ndBrainLoad;
 	friend class ndBrainSave;

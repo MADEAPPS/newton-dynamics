@@ -151,40 +151,39 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	output.SetCount((*testLabels)[0].GetCount());
 
 	ndBrainGpuContext gpuContext;
-	ndBrainGpuInference inference(&gpuContext, &brain);
+	ndBrainGpuInference inference(&gpuContext, &brain, *testDigits, 2);
 
-
-	ndInt32 failCount = 0;
-	ndBrainVector workingBuffer;
-	brain.DisableDropOut();
-	for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
-	{
-		const ndBrainVector& input = (*testDigits)[i];
-		brain.MakePrediction_____(input, output, workingBuffer);
-	
-		const ndBrainVector& truth = (*testLabels)[i];
-	
-		//ndInt32 index = -1;
-		//ndBrainFloat maxProbability = -1.0f;
-		//for (ndInt32 j = 0; j < output.GetCount(); j++)
-		//{
-		//	if (output[j] > maxProbability)
-		//	{
-		//		index = j;
-		//		maxProbability = output[j];
-		//	}
-		//}
-		//
-		//ndAssert(index >= 0);
-		//if (truth[index] == ndReal(0.0f))
-		//{
-		//	failCount++;
-		//}
-	}
-	ndExpandTraceMessage("%s\n", title);
-	ndExpandTraceMessage("num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());
-	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testDigits->GetCount());
-	ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
+	//ndInt32 failCount = 0;
+	//ndBrainVector workingBuffer;
+	//brain.DisableDropOut();
+	//for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
+	//{
+	//	const ndBrainVector& input = (*testDigits)[i];
+	//	brain.MakePrediction____xxxxx(input, output, workingBuffer);
+	//
+	//	const ndBrainVector& truth = (*testLabels)[i];
+	//
+	//	//ndInt32 index = -1;
+	//	//ndBrainFloat maxProbability = -1.0f;
+	//	//for (ndInt32 j = 0; j < output.GetCount(); j++)
+	//	//{
+	//	//	if (output[j] > maxProbability)
+	//	//	{
+	//	//		index = j;
+	//	//		maxProbability = output[j];
+	//	//	}
+	//	//}
+	//	//
+	//	//ndAssert(index >= 0);
+	//	//if (truth[index] == ndReal(0.0f))
+	//	//{
+	//	//	failCount++;
+	//	//}
+	//}
+	//ndExpandTraceMessage("%s\n", title);
+	//ndExpandTraceMessage("num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());
+	//ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testDigits->GetCount());
+	//ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
 }
 
 //#pragma optimize( "", off )

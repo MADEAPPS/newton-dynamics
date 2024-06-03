@@ -37,7 +37,7 @@ ndBrainGpuCommand::~ndBrainGpuCommand()
 	}
 }
 
-ndBrainGpuCommandTest0::ndBrainGpuCommandTest0(ndBrainGpuContext* const context, ndBrainGpuFloatBuffer& buffer)
+ndBrainGpuCommandTest0::ndBrainGpuCommandTest0(ndBrainGpuContext* const context, ndBrainGpuFloatBuffer& input, ndBrainGpuFloatBuffer& output)
 	:ndBrainGpuCommand(context)
 {
 	VkDevice device = m_context->GetDevice();
@@ -53,19 +53,24 @@ ndBrainGpuCommandTest0::ndBrainGpuCommandTest0(ndBrainGpuContext* const context,
 	m_context->CheckResultVulkan(vkAllocateCommandBuffers(device, &commandBufferAllocateInfo, &m_commandBuffer));
 
 	// binding = 0
-	VkDescriptorSetLayoutBinding descriptorSetLayoutBinding = {};
-	descriptorSetLayoutBinding.binding = 0; 
-	descriptorSetLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-	descriptorSetLayoutBinding.descriptorCount = 1;
-	descriptorSetLayoutBinding.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
-	
-	// only a single binding in this descriptor set layout. 
+	VkDescriptorSetLayoutBinding descriptorSetLayoutBinding[2] = {};
+	descriptorSetLayoutBinding[0].binding = 0; 
+	descriptorSetLayoutBinding[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	descriptorSetLayoutBinding[0].descriptorCount = 1;
+	descriptorSetLayoutBinding[0].stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+
+	// binding = 1
+	descriptorSetLayoutBinding[1].binding = 1;
+	descriptorSetLayoutBinding[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	descriptorSetLayoutBinding[1].descriptorCount = 1;
+	descriptorSetLayoutBinding[1].stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+
 	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
 	descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	descriptorSetLayoutCreateInfo.bindingCount = 1; 
-	descriptorSetLayoutCreateInfo.pBindings = &descriptorSetLayoutBinding;
+	descriptorSetLayoutCreateInfo.bindingCount = 2; 
+	descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayoutBinding;
 	m_context->CheckResultVulkan(vkCreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, allocator, &m_descriptorSetLayout));
-	
+
 	VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
 	descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	descriptorSetAllocateInfo.descriptorPool = descriptorPool;
@@ -74,23 +79,34 @@ ndBrainGpuCommandTest0::ndBrainGpuCommandTest0(ndBrainGpuContext* const context,
 	m_context->CheckResultVulkan(vkAllocateDescriptorSets(device, &descriptorSetAllocateInfo, &m_descriptorSet));
 	
 	// Specify the buffer to bind to the descriptor.
-	VkDescriptorBufferInfo descriptorBufferInfo = {};
-	descriptorBufferInfo.buffer = buffer.GetBuffer();
-	descriptorBufferInfo.offset = 0;
-	descriptorBufferInfo.range = (VkDeviceSize)buffer.SizeInBytes();
-	
-	VkWriteDescriptorSet writeDescriptorSet = {};
-	writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	writeDescriptorSet.dstSet = m_descriptorSet; // write to this descriptor set.
-	writeDescriptorSet.dstBinding = 0; // write to the first, and only binding.
-	writeDescriptorSet.descriptorCount = 1; // update a single descriptor.
-	writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER; // storage buffer.
-	writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
-	
+	//VkDescriptorBufferInfo descriptorBufferInfo = {};
+	VkDescriptorBufferInfo descriptorBufferInfo[2] = {};
+	descriptorBufferInfo[0].buffer = input.GetBuffer();
+	descriptorBufferInfo[0].offset = 0;
+	descriptorBufferInfo[0].range = (VkDeviceSize)input.SizeInBytes();
+
+	descriptorBufferInfo[1].buffer = output.GetBuffer();
+	descriptorBufferInfo[1].offset = 0;
+	descriptorBufferInfo[1].range = (VkDeviceSize)output.SizeInBytes();
+
+	VkWriteDescriptorSet writeDescriptorSet[2] = {};
+	writeDescriptorSet[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	writeDescriptorSet[0].dstSet = m_descriptorSet; 
+	writeDescriptorSet[0].dstBinding = 0; 
+	writeDescriptorSet[0].descriptorCount = 1; 
+	writeDescriptorSet[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	writeDescriptorSet[0].pBufferInfo = &descriptorBufferInfo[0];
+
+	writeDescriptorSet[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	writeDescriptorSet[1].dstSet = m_descriptorSet;
+	writeDescriptorSet[1].dstBinding = 1;
+	writeDescriptorSet[1].descriptorCount = 1;
+	writeDescriptorSet[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	writeDescriptorSet[1].pBufferInfo = &descriptorBufferInfo[1];
+
 	// perform the update of the descriptor set.
-	vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, nullptr);
-	
-	
+	vkUpdateDescriptorSets(device, 2, writeDescriptorSet, 0, nullptr);
+
 	VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
 	shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	shaderStageCreateInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;

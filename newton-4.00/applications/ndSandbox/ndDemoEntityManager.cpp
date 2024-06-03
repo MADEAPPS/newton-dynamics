@@ -251,28 +251,29 @@ void TestVulkanStuff()
 	ndBrainVector input;
 	for (ndInt32 i = 0; i < 100; ++i)
 	{
-		input.PushBack(ndBrainFloat(i));
+		input.PushBack(ndBrainFloat(i * 2));
 	}
 
-	ndBrainGpuFloatBuffer buffer(&context, input.GetCount());
-	buffer.LoadData(input);
+	ndBrainGpuFloatBuffer buffer1(&context, input.GetCount());
+	ndBrainGpuFloatBuffer buffer0(&context, input.GetCount());
+	buffer0.LoadData(input);
 
-	ndBrainGpuCommandTest0 command0(&context, buffer);
-	ndBrainGpuCommandTest1 command1(&context, buffer);
-
-	//context.ExecuteTest(buffer);
+	ndBrainGpuCommandTest0 command0(&context, buffer0, buffer1);
+#if 1
+	ndBrainGpuCommand* xxxxx[1];
+	xxxxx[0] = &command0;
+	context.SubmitQueue(xxxxx, 1);
+#else
+	//ndBrainGpuCommandTest1 command1(&context, buffer);
 	ndBrainGpuCommand* xxxxx[2];
 	xxxxx[0] = &command0;
 	xxxxx[1] = &command1;
-#if 0
-	context.SubmitQueue(xxxxx, 1);
-#else
 	context.SubmitQueue(xxxxx, 2);
 #endif
 
 
 	ndBrainVector output;
-	buffer.UnloadData(output);
+	buffer0.UnloadData(output);
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
@@ -504,7 +505,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	//TestVulkanStuff();
+	TestVulkanStuff();
 	ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();

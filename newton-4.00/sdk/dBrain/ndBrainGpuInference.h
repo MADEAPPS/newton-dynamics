@@ -25,7 +25,7 @@ class ndBrainGpuIntegerBuffer;
 class ndBrainGpuInference : public ndClassAlloc
 {
 	public:
-	ndBrainGpuInference(ndBrainGpuContext* const, ndBrain* const) {}
+	ndBrainGpuInference(ndBrainGpuContext* const, ndBrain* const, const ndBrainMatrix&, ndInt32) {}
 	virtual ~ndBrainGpuInference() {}
 };
 
@@ -34,17 +34,27 @@ class ndBrainGpuInference : public ndClassAlloc
 class ndBrainGpuInference : public ndClassAlloc
 {
 	public:
-	ndBrainGpuInference(ndBrainGpuContext* const context, ndBrain* const brain);
+	ndBrainGpuInference(ndBrainGpuContext* const context, ndBrain* const brain, const ndBrainMatrix& testDigits, ndInt32 inputBatchSize);
 	virtual ~ndBrainGpuInference();
 	
 	protected:
+	void SetWorkingBuffer();
+	void SetParameterVector();
+	void LoadInput(const ndBrainMatrix& input);
+
 	ndBrain* m_brain;
 	ndBrainGpuContext* m_context;
+
+	ndBrainGpuFloatBuffer* m_input;
 	ndBrainGpuFloatBuffer* m_gpuParameters;
-	ndBrainGpuIntegerBuffer* m_gpuOffsets;
+	ndBrainGpuFloatBuffer* m_gpuWorkingBuffer;
+	ndBrainGpuIntegerBuffer* m_gpuParametersOffsets;
+	
 
 	ndBrainVector m_parameters;
 	ndArray<ndInt32> m_offsets;
+
+	ndInt32 m_inputBatchSize;
 };
 
 

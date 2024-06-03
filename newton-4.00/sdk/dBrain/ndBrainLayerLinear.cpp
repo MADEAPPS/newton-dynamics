@@ -19,9 +19,9 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainGpuBuffer.h"
 #include "ndBrainLayerLinear.h"
 
 ndBrainLayerLinear::ndBrainLayerLinear(ndInt32 inputs, ndInt32 outputs)
@@ -81,7 +81,8 @@ ndInt32 ndBrainLayerLinear::GetNumberOfParameters() const
 
 void ndBrainLayerLinear::GetNumberOfParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const
 {
-	ndInt32 rounding = 32 / sizeof (ndBrainFloat);
+	ndInt32 rounding = ND_GPU_BUFFER_ALIGNMENT / sizeof (ndBrainFloat);
+	ndAssert(!(rounding & (rounding - 1)));
 
 	ndAssert(m_bias.GetCount() == m_weights.GetRows());
 

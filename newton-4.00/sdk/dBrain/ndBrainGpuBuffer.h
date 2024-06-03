@@ -17,6 +17,8 @@ class ndBrainVector;
 class ndBrainGpuContext;
 class ndBrainGpuBufferBase;
 
+#define ND_GPU_BUFFER_ALIGNMENT	32
+
 #if !defined (D_USE_VULKAN_SDK)
 
 class ndScopeMapBuffer
