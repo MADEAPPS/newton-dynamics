@@ -42,14 +42,15 @@ ndBrainGpuBufferBase::ndBrainGpuBufferBase(ndBrainGpuContext* const context, ndI
 	,m_context(context)
 	,m_sizeInBytes(sizeInByte)
 {
+	ndAssert(0);
 	VkDevice const device = (VkDevice)m_context->GetDevice();
 	VkAllocationCallbacks* const allocators = (VkAllocationCallbacks*)m_context->GetAllocator();
 
 	VkBufferCreateInfo bufferCreateInfo = {};
 	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferCreateInfo.size = VkDeviceSize(sizeInByte); // buffer size in bytes. 
-	bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT; // buffer is used as a storage buffer.
-	bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE; // buffer is exclusive to a single queue family at a time. 
+	bufferCreateInfo.size = VkDeviceSize(sizeInByte); 
+	bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT; 
+	bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE; 
 
 	ndBrainGpuContext::CheckResultVulkan(vkCreateBuffer(device, &bufferCreateInfo, allocators, &m_buffer));
 
@@ -71,9 +72,7 @@ ndBrainGpuBufferBase::ndBrainGpuBufferBase(ndBrainGpuContext* const context, ndI
 	//visible to the host(CPU), without having to call any extra flushing commands. So mainly for convenience, we set
 	//this flag.
 
-	allocateInfo.memoryTypeIndex = FindMemoryType(
-		memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-
+	allocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
 	ndBrainGpuContext::CheckResultVulkan(vkAllocateMemory(device, &allocateInfo, allocators, &m_bufferMemory)); 
 
