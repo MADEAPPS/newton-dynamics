@@ -267,7 +267,8 @@ void TestVulkanStuff()
 	param.m_inputSize[0] = 80;
 	param.m_scale[0] = 2.0f;
 
-	ndBrainGpuCommandTest0 command0(&context, sizeof(ParamData), &param, buffer0, buffer1);
+	ndBrainGpuUniformBuffer uniformBuffer(&context, sizeof(ParamData), &param);
+	ndBrainGpuCommandTest0 command0(&context, uniformBuffer, buffer0, buffer1);
 #if 1
 	ndBrainGpuCommand* xxxxx[1];
 	xxxxx[0] = &command0;
@@ -522,7 +523,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	//TestVulkanStuff();
+	TestVulkanStuff();
 	//ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();

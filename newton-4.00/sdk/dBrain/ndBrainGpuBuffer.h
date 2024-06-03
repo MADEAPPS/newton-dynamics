@@ -36,7 +36,7 @@ class ndScopeMapBuffer
 class ndBrainGpuBufferBase : public ndClassAlloc
 {
 	protected:
-	ndBrainGpuBufferBase(ndBrainGpuContext* const, ndInt32):m_sizeInBytes(0){}
+	ndBrainGpuBufferBase(ndBrainGpuContext* const, ndInt32, ndUnsigned32):m_sizeInBytes(0){}
 	virtual ~ndBrainGpuBufferBase(){}
 
 	public:
@@ -65,7 +65,7 @@ class ndScopeMapBuffer
 class ndBrainGpuBufferBase : public ndClassAlloc
 {
 	protected:
-	ndBrainGpuBufferBase(ndBrainGpuContext* const context, ndInt32 sizeInByte);
+	ndBrainGpuBufferBase(ndBrainGpuContext* const context, ndInt32 sizeInByte, ndUnsigned32 bufferTypeFlags);
 	virtual ~ndBrainGpuBufferBase();
 
 	uint32_t FindMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
@@ -106,6 +106,15 @@ class ndBrainGpuFloatBuffer : public ndBrainGpuBufferBase
 
 	void UnloadData(ndBrainVector& output);
 	void LoadData(const ndBrainVector& input);
+};
+
+class ndBrainGpuUniformBuffer : public ndBrainGpuBufferBase
+{
+	public:
+	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data);
+
+	//void UnloadData(ndInt32 sizeInBytes, void* const data);
+	void LoadData(ndInt32 sizeInBytes, const void* const data);
 };
 
 #endif

@@ -122,7 +122,7 @@ ndBrainGpuCommandTest1::ndBrainGpuCommandTest1(ndBrainGpuContext* const context,
 }
 
 ndBrainGpuCommandTest0::ndBrainGpuCommandTest0(ndBrainGpuContext* const context, 
-	ndInt32 parameterSize, void* const parammeters,
+	ndBrainGpuUniformBuffer& parammeters,
 	ndBrainGpuFloatBuffer& input, ndBrainGpuFloatBuffer& output)
 	:ndBrainGpuCommand(context)
 {
@@ -171,11 +171,10 @@ ndBrainGpuCommandTest0::ndBrainGpuCommandTest0(ndBrainGpuContext* const context,
 	m_context->CheckResultVulkan(vkAllocateDescriptorSets(device, &descriptorSetAllocateInfo, &m_descriptorSet));
 
 	// Specify the buffer to bind to the descriptor.
-	ndAssert(0);
 	VkDescriptorBufferInfo descriptorBufferInfo[3] = {};
-	//descriptorBufferInfo[0].buffer = parammeters;
-	//descriptorBufferInfo[0].offset = 0;
-	//descriptorBufferInfo[0].range = (VkDeviceSize)parameterSize;
+	descriptorBufferInfo[0].buffer = parammeters.GetBuffer();;
+	descriptorBufferInfo[0].offset = 0;
+	descriptorBufferInfo[0].range = (VkDeviceSize)parammeters.SizeInBytes();
 
 	descriptorBufferInfo[1].buffer = input.GetBuffer();
 	descriptorBufferInfo[1].offset = 0;
@@ -185,23 +184,30 @@ ndBrainGpuCommandTest0::ndBrainGpuCommandTest0(ndBrainGpuContext* const context,
 	descriptorBufferInfo[2].offset = 0;
 	descriptorBufferInfo[2].range = (VkDeviceSize)output.SizeInBytes();
 
-	VkWriteDescriptorSet writeDescriptorSet[2] = {};
+	VkWriteDescriptorSet writeDescriptorSet[3] = {};
 	writeDescriptorSet[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 	writeDescriptorSet[0].dstSet = m_descriptorSet;
 	writeDescriptorSet[0].dstBinding = 0;
 	writeDescriptorSet[0].descriptorCount = 1;
-	writeDescriptorSet[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	writeDescriptorSet[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	writeDescriptorSet[0].pBufferInfo = &descriptorBufferInfo[0];
 
 	writeDescriptorSet[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 	writeDescriptorSet[1].dstSet = m_descriptorSet;
-	writeDescriptorSet[1].dstBinding = 1;
+	writeDescriptorSet[1].dstBinding = 0;
 	writeDescriptorSet[1].descriptorCount = 1;
 	writeDescriptorSet[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-	writeDescriptorSet[1].pBufferInfo = &descriptorBufferInfo[1];
+	writeDescriptorSet[1].pBufferInfo = &descriptorBufferInfo[0];
+
+	writeDescriptorSet[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	writeDescriptorSet[2].dstSet = m_descriptorSet;
+	writeDescriptorSet[2].dstBinding = 1;
+	writeDescriptorSet[2].descriptorCount = 1;
+	writeDescriptorSet[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	writeDescriptorSet[2].pBufferInfo = &descriptorBufferInfo[1];
 
 	// perform the update of the descriptor set.
-	vkUpdateDescriptorSets(device, 2, writeDescriptorSet, 0, nullptr);
+	vkUpdateDescriptorSets(device, 3, writeDescriptorSet, 0, nullptr);
 
 	VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
 	shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;

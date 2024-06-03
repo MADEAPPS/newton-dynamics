@@ -72,7 +72,7 @@ class ndBrainGpuCommandTest0 : public ndBrainGpuCommand
 {
 	public:
 	ndBrainGpuCommandTest0(ndBrainGpuContext* const context, 
-		ndInt32 parameterSize, void* const parammeters, 
+		ndBrainGpuUniformBuffer& parammeters,
 		ndBrainGpuFloatBuffer& input, ndBrainGpuFloatBuffer& output);
 };
 
