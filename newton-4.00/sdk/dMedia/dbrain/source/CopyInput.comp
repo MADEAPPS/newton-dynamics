@@ -34,7 +34,7 @@ layout(std430, binding = 2) buffer outputBuffer
 void main() 
 {
     uint dstBase = gl_WorkGroupID.x * m_outputBlockSize;
-    uint srcBase = (m_batchIndex + gl_WorkGroupID.x) * m_inputBlockSize;
+    uint srcBase = (gl_WorkGroupID.x + m_batchIndex) * m_inputBlockSize;
     for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
     {
         m_destination[dstBase + index] = m_source[srcBase + index];
