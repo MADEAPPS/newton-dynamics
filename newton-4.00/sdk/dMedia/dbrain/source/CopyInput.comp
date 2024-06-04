@@ -23,20 +23,20 @@ layout(std140, binding = 0) uniform UniformBufferObject
 
 layout(std430, binding = 1) readonly buffer inputBuffer
 {
-   float m_source[];
+    float m_source[];
 };
 
 layout(std430, binding = 2) buffer outputBuffer
 {
-   float m_destination[];
+    float m_destination[];
 };
 
 void main() 
 {
-  uint dstBase = gl_WorkGroupID.x * m_outputBlockSize;
-  uint srcBase = (m_batchIndex + gl_WorkGroupID.x) * m_inputBlockSize;
-  for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
-  {
-      m_destination[dstBase + index] = m_source[srcBase + index];
-  }
+    uint dstBase = gl_WorkGroupID.x * m_outputBlockSize;
+    uint srcBase = (m_batchIndex + gl_WorkGroupID.x) * m_inputBlockSize;
+    for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
+    {
+        m_destination[dstBase + index] = m_source[srcBase + index];
+    }
 }
