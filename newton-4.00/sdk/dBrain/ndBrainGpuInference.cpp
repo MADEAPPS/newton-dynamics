@@ -94,6 +94,7 @@ void ndBrainGpuInference::SetWorkingBuffer()
 		sum += offset;
 	}
 
+	m_workingBuffer.m_offsets.PushBack(sum);
 	m_workingBuffer.m_buffer = new ndBrainGpuFloatBuffer(m_context, sum * m_inputBatchSize);
 }
 
@@ -111,8 +112,8 @@ void ndBrainGpuInference::SetInputBuffer(const ndBrainMatrix& input)
 		ndBrainMemVector dst(&temp[i * width], src.GetCount());
 		dst.Set(src);
 	}
-
-	//m_input = new ndBrainGpuFloatBuffer(m_context, temp);
+	m_inputBuffer.m_offsets.PushBack(size);
+	m_inputBuffer.m_buffer = new ndBrainGpuFloatBuffer(m_context, temp);
 }
 
 #endif
