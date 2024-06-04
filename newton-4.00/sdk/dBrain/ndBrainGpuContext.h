@@ -68,6 +68,7 @@ class ndBrainGpuContext: public ndClassAlloc
 		const char* pLayerPrefix, const char* pMessage, void* pUserData);
 
 
+	ndArray<VkCommandBuffer> m_displayList;
 	VkAllocationCallbacks m_allocatorStruct;
 	VkAllocationCallbacks* m_allocator;
 	VkFence m_fence;

@@ -470,19 +470,18 @@ void ndBrainGpuContext::LoadShaderPrograms()
 
 void ndBrainGpuContext::SubmitQueue(ndBrainGpuCommand** commands, ndInt32 commandCount)
 {
-	VkCommandBuffer xxxx[10];
+	m_displayList.SetCount(0);
 	for (ndInt32 i = 0; i < commandCount; ++i)
 	{
-		xxxx[i] = commands[i]->m_commandBuffer;
+		m_displayList.PushBack(commands[i]->m_commandBuffer);
 	}
 
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.commandBufferCount = uint32_t(commandCount);
-	submitInfo.pCommandBuffers = xxxx; 
-	CheckResultVulkan(vkQueueSubmit(m_queue, 1, &submitInfo, m_fence));
-	//CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(commandCount), &submitInfo, m_fence));
-	CheckResultVulkan(vkWaitForFences(m_device, 1, &m_fence, VK_TRUE, 100000000000));
+	submitInfo.pCommandBuffers = &m_displayList[0];
+	CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(1), &submitInfo, m_fence));
+	CheckResultVulkan(vkWaitForFences(m_device, uint32_t(1), &m_fence, VK_TRUE, 100000000000));
 }
 
 #endif
