@@ -15,9 +15,9 @@
 #include "ndBrainVector.h"
 
 class ndBrain;
+class ndBrainGpuBuffer;
 class ndBrainGpuContext;
-//class ndBrainGpuBufferBase;
-class ndBrainGpuFloatBuffer;
+//class ndBrainGpuFloatBuffer;
 class ndBrainGpuIntegerBuffer;
 
 #if !defined (D_USE_VULKAN_SDK)
@@ -34,25 +34,38 @@ class ndBrainGpuInference : public ndClassAlloc
 class ndBrainGpuInference : public ndClassAlloc
 {
 	public:
+	class ndBufferOffsetPair
+	{
+		public:
+		ndBufferOffsetPair():m_buffer(nullptr),m_offsets(){}
+		~ndBufferOffsetPair() {}
+		
+		ndBrainGpuBuffer* m_buffer;
+		ndArray<ndInt32> m_offsets;
+	};
+
 	ndBrainGpuInference(ndBrainGpuContext* const context, ndBrain* const brain, const ndBrainMatrix& testDigits, ndInt32 inputBatchSize);
 	virtual ~ndBrainGpuInference();
 	
 	protected:
 	void SetWorkingBuffer();
 	void SetParameterVector();
-	void LoadInput(const ndBrainMatrix& input);
+	void SetInputBuffer(const ndBrainMatrix& input);
 
 	ndBrain* m_brain;
 	ndBrainGpuContext* m_context;
 
-	ndBrainGpuFloatBuffer* m_input;
-	ndBrainGpuFloatBuffer* m_gpuParameters;
-	ndBrainGpuFloatBuffer* m_gpuWorkingBuffer;
-	ndBrainGpuIntegerBuffer* m_gpuParametersOffsets;
+	ndBufferOffsetPair m_inputBuffer;
+	ndBufferOffsetPair m_workingBuffer;
 	
-
-	ndBrainVector m_parameters;
-	ndArray<ndInt32> m_offsets;
+	//ndBrainGpuFloatBuffer* m_input;
+	//ndBrainGpuFloatBuffer* m_gpuParameters;
+	//ndBrainGpuFloatBuffer* m_gpuWorkingBuffer;
+	//ndBrainGpuIntegerBuffer* m_gpuParametersOffsets;
+	//
+	//ndArray<ndInt32> m_workingBufferOffsets____;
+	//ndBrainVector m_parameters;
+	//ndArray<ndInt32> m_offsets____;
 
 	ndInt32 m_inputBatchSize;
 };

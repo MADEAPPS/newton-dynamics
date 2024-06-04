@@ -15,7 +15,7 @@
 
 class ndBrainVector;
 class ndBrainGpuContext;
-class ndBrainGpuBufferBase;
+class ndBrainGpuBuffer;
 
 #define ND_GPU_BUFFER_ALIGNMENT	32
 
@@ -24,20 +24,20 @@ class ndBrainGpuBufferBase;
 class ndScopeMapBuffer
 {
 	public:
-	ndScopeMapBuffer(ndBrainGpuBufferBase& buffer):m_mappedMemory(nullptr), m_buffer(&buffer){}
+	ndScopeMapBuffer(ndBrainGpuBuffer& buffer):m_mappedMemory(nullptr), m_buffer(&buffer){}
 	~ndScopeMapBuffer(){}
 	void* GetPointer() const{return m_mappedMemory;}
 
 	private:
 	void* m_mappedMemory;
-	ndBrainGpuBufferBase* m_buffer;
+	ndBrainGpuBuffer* m_buffer;
 };
 
-class ndBrainGpuBufferBase : public ndClassAlloc
+class ndBrainGpuBuffer : public ndClassAlloc
 {
 	protected:
-	ndBrainGpuBufferBase(ndBrainGpuContext* const, ndInt32, ndUnsigned32):m_sizeInBytes(0){}
-	virtual ~ndBrainGpuBufferBase(){}
+	ndBrainGpuBuffer(ndBrainGpuContext* const, ndInt32, ndUnsigned32):m_sizeInBytes(0){}
+	virtual ~ndBrainGpuBuffer(){}
 
 	public:
 	void* GetBuffer() const{}
@@ -48,28 +48,28 @@ class ndBrainGpuBufferBase : public ndClassAlloc
 	friend class ndScopeMapBuffer;
 };
 
-class ndBrainGpuIntegerBuffer : public ndBrainGpuBufferBase
+class ndBrainGpuIntegerBuffer : public ndBrainGpuBuffer
 {
 	public:
-	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt32 size) : ndBrainGpuBufferBase(context, size, 0) {}
-	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, const ndArray<ndInt32>&) : ndBrainGpuBufferBase(context, 0, 0) {}
+	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt32 size) : ndBrainGpuBuffer(context, size, 0) {}
+	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, const ndArray<ndInt32>&) : ndBrainGpuBuffer(context, 0, 0) {}
 	void UnloadData(ndArray<ndInt32>&) {}
 	void LoadData(const ndArray<ndInt32>&) {}
 };
 
-class ndBrainGpuFloatBuffer : public ndBrainGpuBufferBase
+class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
 {
 	public:
-	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt32 size): ndBrainGpuBufferBase(context, size, 0){}
-	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector&) : ndBrainGpuBufferBase(context, 0, 0) {}
+	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt32 size): ndBrainGpuBuffer(context, size, 0){}
+	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector&) : ndBrainGpuBuffer(context, 0, 0) {}
 	void UnloadData(ndBrainVector&) {}
 	void LoadData(const ndBrainVector&) {}
 };
 
-class ndBrainGpuUniformBuffer : public ndBrainGpuBufferBase
+class ndBrainGpuUniformBuffer : public ndBrainGpuBuffer
 {
 	public:
-	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32, const void* const) : ndBrainGpuBufferBase(context, 0, 0) {}
+	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32, const void* const) : ndBrainGpuBuffer(context, 0, 0) {}
 	void LoadData(ndInt32, const void* const) {}
 };
 
@@ -78,28 +78,26 @@ class ndBrainGpuUniformBuffer : public ndBrainGpuBufferBase
 class ndScopeMapBuffer
 {
 	public:
-	ndScopeMapBuffer(ndBrainGpuBufferBase& buffer);
+	ndScopeMapBuffer(ndBrainGpuBuffer& buffer);
 	~ndScopeMapBuffer();
 	void* GetPointer() const;
 
 	private:
 	void* m_mappedMemory;
-	ndBrainGpuBufferBase* m_buffer;
+	ndBrainGpuBuffer* m_buffer;
 };
 
-class ndBrainGpuBufferBase : public ndClassAlloc
+class ndBrainGpuBuffer : public ndClassAlloc
 {
-	protected:
-	ndBrainGpuBufferBase(ndBrainGpuContext* const context, ndInt32 sizeInByte, ndUnsigned32 bufferTypeFlags);
-	virtual ~ndBrainGpuBufferBase();
-
-	uint32_t FindMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
-
 	public:
+	virtual ~ndBrainGpuBuffer();
 	VkBuffer GetBuffer() const;
 	ndInt32 SizeInBytes() const;
 
 	protected:
+	ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt32 sizeInByte, ndUnsigned32 bufferTypeFlags);
+	uint32_t FindMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
+
 	VkBuffer m_buffer;
 	VkDeviceMemory m_bufferMemory;
 	ndBrainGpuContext* m_context;
@@ -110,7 +108,7 @@ class ndBrainGpuBufferBase : public ndClassAlloc
 // **************************************************************************
 // 
 // **************************************************************************
-class ndBrainGpuIntegerBuffer : public ndBrainGpuBufferBase
+class ndBrainGpuIntegerBuffer : public ndBrainGpuBuffer
 {
 	public:
 	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt32 size);
@@ -120,7 +118,7 @@ class ndBrainGpuIntegerBuffer : public ndBrainGpuBufferBase
 	void LoadData(const ndArray<ndInt32>& input);
 };
 
-class ndBrainGpuFloatBuffer : public ndBrainGpuBufferBase
+class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
 {
 	public:
 	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt32 size);
@@ -130,7 +128,7 @@ class ndBrainGpuFloatBuffer : public ndBrainGpuBufferBase
 	void LoadData(const ndBrainVector& input);
 };
 
-class ndBrainGpuUniformBuffer : public ndBrainGpuBufferBase
+class ndBrainGpuUniformBuffer : public ndBrainGpuBuffer
 {
 	public:
 	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data);

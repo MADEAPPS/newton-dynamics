@@ -16,7 +16,7 @@
 
 #if defined (D_USE_VULKAN_SDK)
 
-ndScopeMapBuffer::ndScopeMapBuffer(ndBrainGpuBufferBase& buffer)
+ndScopeMapBuffer::ndScopeMapBuffer(ndBrainGpuBuffer& buffer)
 	:m_buffer(&buffer)
 {
 	VkDevice const device = (VkDevice)m_buffer->m_context->GetDevice();
@@ -37,7 +37,7 @@ void* ndScopeMapBuffer::GetPointer() const
 }
 
 
-ndBrainGpuBufferBase::ndBrainGpuBufferBase(ndBrainGpuContext* const context, ndInt32 sizeInByte, ndUnsigned32 bufferTypeFlags)
+ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt32 sizeInByte, ndUnsigned32 bufferTypeFlags)
 	:ndClassAlloc()
 	,m_context(context)
 	,m_sizeInBytes(sizeInByte)
@@ -80,7 +80,7 @@ ndBrainGpuBufferBase::ndBrainGpuBufferBase(ndBrainGpuContext* const context, ndI
 	ndBrainGpuContext::CheckResultVulkan(vkBindBufferMemory(device, m_buffer, m_bufferMemory, 0));
 }
 
-ndBrainGpuBufferBase::~ndBrainGpuBufferBase()
+ndBrainGpuBuffer::~ndBrainGpuBuffer()
 {
 	VkDevice device = (VkDevice)m_context->GetDevice();
 	VkAllocationCallbacks* const allocators = (VkAllocationCallbacks*)m_context->GetAllocator();
@@ -88,7 +88,7 @@ ndBrainGpuBufferBase::~ndBrainGpuBufferBase()
 	vkDestroyBuffer(device, m_buffer, allocators);
 }
 
-uint32_t ndBrainGpuBufferBase::FindMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties)
+uint32_t ndBrainGpuBuffer::FindMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties)
 {
 	VkPhysicalDeviceMemoryProperties memoryProperties;
 
@@ -107,12 +107,12 @@ uint32_t ndBrainGpuBufferBase::FindMemoryType(uint32_t memoryTypeBits, VkMemoryP
 	return uint32_t(-1);
 }
 
-VkBuffer ndBrainGpuBufferBase::GetBuffer() const
+VkBuffer ndBrainGpuBuffer::GetBuffer() const
 {
 	return m_buffer;
 }
 
-ndInt32 ndBrainGpuBufferBase::SizeInBytes() const
+ndInt32 ndBrainGpuBuffer::SizeInBytes() const
 {
 	return m_sizeInBytes;
 }
@@ -121,12 +121,12 @@ ndInt32 ndBrainGpuBufferBase::SizeInBytes() const
 //
 //*************************************************************************************
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt32 size)
-	:ndBrainGpuBufferBase(context, size* ndInt32(sizeof(ndReal)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
+	:ndBrainGpuBuffer(context, size* ndInt32(sizeof(ndReal)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
 {
 }
 
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input)
-	:ndBrainGpuBufferBase(context, input.GetCount()* ndInt32(sizeof(ndReal)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
+	:ndBrainGpuBuffer(context, input.GetCount()* ndInt32(sizeof(ndReal)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
 {
 	LoadData(input);
 }
@@ -135,12 +135,12 @@ ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, c
 //
 //*************************************************************************************
 ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt32 size)
-	:ndBrainGpuBufferBase(context, size* ndInt32(sizeof(ndInt32)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
+	:ndBrainGpuBuffer(context, size* ndInt32(sizeof(ndInt32)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
 {
 }
 
 ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, const ndArray<ndInt32>& input)
-	:ndBrainGpuBufferBase(context, input.GetCount()* ndInt32(sizeof(ndInt32)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
+	:ndBrainGpuBuffer(context, input.GetCount()* ndInt32(sizeof(ndInt32)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
 {
 	LoadData(input);
 }
@@ -149,7 +149,7 @@ ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const contex
 //
 //*************************************************************************************
 ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data)
-	:ndBrainGpuBufferBase(context, sizeInBytes, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
+	:ndBrainGpuBuffer(context, sizeInBytes, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
 {
 	LoadData(sizeInBytes, data);
 }
