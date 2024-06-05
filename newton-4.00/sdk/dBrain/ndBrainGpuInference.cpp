@@ -45,9 +45,9 @@ class ndBrainGpuInference::ndBrainLoadInputData : public ndBrainGpuCommand
 
 		ndBrainGpuBuffer* params[3];
 		params[0] = &m_parammeters;
-		//params[1] = &input;
-		//params[2] = &output;
-		//Assembly(context->m_copyInputData, 3, params);
+		params[1] = me->m_inputBuffer.m_buffer;
+		params[2] = me->m_workingBuffer.m_buffer;
+		Assembly(me->m_context->m_copyInputData, 3, params);
 	}
 
 	ndBrainGpuUniformBuffer m_parammeters;
