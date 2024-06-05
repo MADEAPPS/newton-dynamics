@@ -33,6 +33,8 @@ class ndBrainGpuInference : public ndClassAlloc
 
 class ndBrainGpuInference : public ndClassAlloc
 {
+	class ndBrainLoadInputData;
+
 	public:
 	class ndBufferOffsetPair
 	{
@@ -52,11 +54,15 @@ class ndBrainGpuInference : public ndClassAlloc
 	void SetParameterVector();
 	void SetInputBuffer(const ndBrainMatrix& input);
 
+	void BuildDisplayList();
+
 	ndBrain* m_brain;
 	ndBrainGpuContext* m_context;
 
 	ndBufferOffsetPair m_inputBuffer;
 	ndBufferOffsetPair m_workingBuffer;
+
+	ndArray<ndBrainGpuCommand*> m_displayList;
 	
 	//ndBrainGpuFloatBuffer* m_input;
 	//ndBrainGpuFloatBuffer* m_gpuParameters;

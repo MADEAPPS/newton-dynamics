@@ -19,24 +19,17 @@ class ndBrainGpuFloatBuffer;
 #if !defined (D_USE_VULKAN_SDK)
 class ndBrainGpuCommand : public ndClassAlloc
 {
-	protected:
-	ndBrainGpuCommand(ndBrainGpuContext* const context)
-		:m_context(context)
-	{
-	}
-
-	virtual ~ndBrainGpuCommand()
-	{
-	}
-
 	public:
+	ndBrainGpuCommand(ndBrainGpuContext* const context):m_context(context){}
+	virtual ~ndBrainGpuCommand(){}
+	protected:
 	ndBrainGpuContext* m_context;
 };
 
 class ndBrainGpuCommandTest0 : public ndBrainGpuCommand
 {
 	public:
-	ndBrainGpuCommandTest0(ndBrainGpuContext* const context, ndBrainGpuFloatBuffer&, ndBrainGpuFloatBuffer&)
+		ndBrainGpuCommandTest0(ndBrainGpuContext* const context, ndBrainGpuUniformBuffer&, ndBrainGpuFloatBuffer&, ndBrainGpuFloatBuffer&)
 		:ndBrainGpuCommand(context)
 	{
 	}
@@ -55,17 +48,20 @@ class ndBrainGpuCommandTest1 : public ndBrainGpuCommand
 
 class ndBrainGpuCommand : public ndClassAlloc
 {
-	protected:
-	ndBrainGpuCommand(ndBrainGpuContext* const context);
+	public:
 	virtual ~ndBrainGpuCommand();
 
-	public:
+	protected:
+	ndBrainGpuCommand(ndBrainGpuContext* const context);
+
 	ndBrainGpuContext* m_context;
 	VkPipeline m_pipeline;
 	VkDescriptorSet m_descriptorSet;
 	VkCommandBuffer m_commandBuffer;
 	VkPipelineLayout m_pipelineLayout;
 	VkDescriptorSetLayout m_descriptorSetLayout;
+
+	friend class ndBrainGpuContext;
 };
 
 class ndBrainGpuCommandTest0 : public ndBrainGpuCommand
