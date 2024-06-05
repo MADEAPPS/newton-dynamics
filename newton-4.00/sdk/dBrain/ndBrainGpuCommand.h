@@ -53,6 +53,7 @@ class ndBrainGpuCommand : public ndClassAlloc
 
 	protected:
 	ndBrainGpuCommand(ndBrainGpuContext* const context);
+	void Assembly(VkShaderModule shader, ndInt32 paramCount, ndBrainGpuBuffer** params);
 
 	ndBrainGpuContext* m_context;
 	VkPipeline m_pipeline;

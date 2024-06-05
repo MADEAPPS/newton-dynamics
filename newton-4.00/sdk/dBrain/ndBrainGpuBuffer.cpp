@@ -48,18 +48,13 @@ ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt32 siz
 	VkBufferCreateInfo bufferCreateInfo = {};
 	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferCreateInfo.size = VkDeviceSize(sizeInByte); 
-	//bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT; 
 	bufferCreateInfo.usage = VkBufferUsageFlagBits(bufferTypeFlags);
 	bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE; 
-
 	ndBrainGpuContext::CheckResultVulkan(vkCreateBuffer(device, &bufferCreateInfo, allocators, &m_buffer));
 
-	//But the buffer doesn't allocate memory for itself, so we must do that manually.
-	//First, we find the memory requirements for the buffer.
 	VkMemoryRequirements memoryRequirements;
 	vkGetBufferMemoryRequirements(device, m_buffer, &memoryRequirements);
 
-	//Now use obtained memory requirements info to allocate the memory for the buffer.
 	VkMemoryAllocateInfo allocateInfo = {};
 	allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocateInfo.allocationSize = memoryRequirements.size; // specify required memory.
@@ -71,7 +66,6 @@ ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt32 siz
 	//Also, by setting VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, memory written by the device(GPU) will be easily
 	//visible to the host(CPU), without having to call any extra flushing commands. So mainly for convenience, we set
 	//this flag.
-
 	allocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
 	ndBrainGpuContext::CheckResultVulkan(vkAllocateMemory(device, &allocateInfo, allocators, &m_bufferMemory)); 
@@ -86,6 +80,12 @@ ndBrainGpuBuffer::~ndBrainGpuBuffer()
 	VkAllocationCallbacks* const allocators = (VkAllocationCallbacks*)m_context->GetAllocator();
 	vkFreeMemory(device, m_bufferMemory, allocators);
 	vkDestroyBuffer(device, m_buffer, allocators);
+}
+
+VkDescriptorType ndBrainGpuBuffer::GetType() const
+{
+	ndAssert(0);
+	return VK_DESCRIPTOR_TYPE_MAX_ENUM;
 }
 
 uint32_t ndBrainGpuBuffer::FindMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties)
@@ -131,6 +131,11 @@ ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, c
 	LoadData(input);
 }
 
+VkDescriptorType ndBrainGpuFloatBuffer::GetType() const
+{
+	return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+}
+
 //*************************************************************************************
 //
 //*************************************************************************************
@@ -143,6 +148,11 @@ ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const contex
 	:ndBrainGpuBuffer(context, input.GetCount()* ndInt32(sizeof(ndInt32)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
 {
 	LoadData(input);
+}
+
+VkDescriptorType ndBrainGpuIntegerBuffer::GetType() const
+{
+	return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 }
 
 //*************************************************************************************
@@ -224,6 +234,11 @@ void ndBrainGpuUniformBuffer::LoadData(ndInt32 sizeInBytes, const void* const da
 	{
 		ndMemCpy(dst, (ndUnsigned8*)data, sizeInBytes);
 	}
+}
+
+VkDescriptorType ndBrainGpuUniformBuffer::GetType() const
+{
+	return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 }
 
 #endif
