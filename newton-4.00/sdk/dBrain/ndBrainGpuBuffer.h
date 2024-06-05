@@ -69,6 +69,7 @@ class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
 class ndBrainGpuUniformBuffer : public ndBrainGpuBuffer
 {
 	public:
+	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32) : ndBrainGpuBuffer(context, 0, 0) {}
 	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32, const void* const) : ndBrainGpuBuffer(context, 0, 0) {}
 	void LoadData(ndInt32, const void* const) {}
 };
@@ -134,6 +135,7 @@ class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
 class ndBrainGpuUniformBuffer : public ndBrainGpuBuffer
 {
 	public:
+	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes);
 	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data);
 
 	VkDescriptorType GetType() const;

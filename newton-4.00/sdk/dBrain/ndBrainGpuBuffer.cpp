@@ -158,6 +158,11 @@ VkDescriptorType ndBrainGpuIntegerBuffer::GetType() const
 //*************************************************************************************
 //
 //*************************************************************************************
+ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes)
+	:ndBrainGpuBuffer(context, sizeInBytes, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
+{
+}
+
 ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data)
 	:ndBrainGpuBuffer(context, sizeInBytes, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
 {

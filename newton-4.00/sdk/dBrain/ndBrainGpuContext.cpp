@@ -72,9 +72,15 @@ ndBrainGpuContext::~ndBrainGpuContext()
 		}
 	}
 
+	for (ndInt32 i = 0; i < sizeof(m_modules) / sizeof(m_modules[0]); ++i)
+	{
+		if (m_modules[i])
+		{
+			vkDestroyShaderModule(m_device, m_modules[i], m_allocator);
+		}
+	}
+	
 	vkDestroyFence(m_device, m_fence, m_allocator);
-	vkDestroyShaderModule(m_device, m_computeShaderModule0, m_allocator);
-	vkDestroyShaderModule(m_device, m_computeShaderModule1, m_allocator);
 	vkDestroyDescriptorPool(m_device, m_descriptorPool, m_allocator);
 	vkDestroyCommandPool(m_device, m_commandPool, m_allocator);
 	vkDestroyDevice(m_device, m_allocator);
@@ -463,6 +469,8 @@ VkShaderModule ndBrainGpuContext::LoadShaderProgram(const char* const name)
 
 void ndBrainGpuContext::LoadShaderPrograms()
 {
+	VkShaderModule clean (VK_NULL_HANDLE);
+	ndMemSet(m_modules, clean, sizeof(m_modules) / sizeof(m_modules[0]));
 	m_copyInputData = LoadShaderProgram("CopyInput-comp.spv");
 	m_computeShaderModule0 = LoadShaderProgram("testShader0-comp.spv");
 	m_computeShaderModule1 = LoadShaderProgram("testShader1-comp.spv");

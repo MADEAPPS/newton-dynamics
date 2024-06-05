@@ -54,7 +54,7 @@ class ndBrainGpuInference : public ndClassAlloc
 	void SetParameterVector();
 	void SetInputBuffer(const ndBrainMatrix& input);
 
-	void BuildDisplayList();
+	void BuildDisplayList(const ndBrainMatrix& input);
 
 	ndBrain* m_brain;
 	ndBrainGpuContext* m_context;

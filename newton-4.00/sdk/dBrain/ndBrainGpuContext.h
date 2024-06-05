@@ -81,10 +81,17 @@ class ndBrainGpuContext: public ndClassAlloc
 	VkPhysicalDeviceProperties m_gpuProps;
 	VkDebugReportCallbackEXT m_debugMessenger;
 
-public:
-	VkShaderModule m_copyInputData;
-	VkShaderModule m_computeShaderModule0;
-	VkShaderModule m_computeShaderModule1;
+	public:
+	union
+	{
+		struct
+		{
+			VkShaderModule m_copyInputData;
+			VkShaderModule m_computeShaderModule0;
+			VkShaderModule m_computeShaderModule1;
+		};
+		VkShaderModule m_modules[128];
+	};
 
 	uint32_t m_queueFamilyIndex;
 	bool m_hasValidationLayers;
