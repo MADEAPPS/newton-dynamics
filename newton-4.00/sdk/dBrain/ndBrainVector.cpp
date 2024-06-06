@@ -89,10 +89,10 @@ void ndBrainVector::CategoricalSample(const ndBrainVector& probability, ndBrainF
 	{
 		ndBrainFloat num = ndClamp(probability[i], ndBrainFloat(0.0000001f), ndBrainFloat(0.9999999f));;
 		ndBrainFloat den = ndBrainFloat(1.0f) - num;
-		ndBrainFloat logits = ndLog(num / den);
-		ndBrainFloat r = ndBrainFloat(0.930159f) * ndRand() + ndBrainFloat(1.0e-6f);
+		ndBrainFloat logits = ndBrainFloat (ndLog(num / den));
+		ndBrainFloat r = ndBrainFloat(0.930159f) * ndBrainFloat (ndRand()) + ndBrainFloat(1.0e-6f);
 		ndBrainFloat noise = beta * ndBrainFloat (-ndLog(-ndLog(r)));
-		ndBrainFloat sample = ndExp (logits + noise);
+		ndBrainFloat sample = ndBrainFloat (ndExp (logits + noise));
 		sum += sample;
 		(*this)[i] = sample;
 	}
