@@ -176,39 +176,40 @@ ndVector ndShapeCone::SupportVertexSpecialProjectPoint(const ndVector& point, co
 	return point + dir.Scale(D_PENETRATION_TOL);
 }
 
-ndVector ndShapeCone::SupportVertex(const ndVector& dir, ndInt32* const) const
+ndVector ndShapeCone::SupportVertex(const ndVector& dir, ndInt32* const ptr) const
 {
-	ndAssert(dir.m_w == ndFloat32(0.0f));
-	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
-
-	if (dir.m_x < ndFloat32(-0.9999f)) 
-	{
-		return ndVector(-m_height, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
-	}
-	else if (dir.m_x > ndFloat32(0.9999f)) 
-	{
-		return ndVector(m_height, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
-	}
-	
-	ndVector dir_yz(dir);
-	dir_yz.m_x = ndFloat32(0.0f);
-	ndAssert(dir_yz.DotProduct(dir_yz).GetScalar() > ndFloat32(0.0f));
-	dir_yz = dir_yz.Normalize();
-
-	ndVector p0(dir_yz.Scale(m_radius));
-	ndVector p1(ndVector::m_zero);
-
-	p0.m_x = -m_height;
-	p1.m_x = m_height;
-
-	ndFloat32 dist0 = dir.DotProduct(p0).GetScalar();
-	ndFloat32 dist1 = dir.DotProduct(p1).GetScalar();
-
-	if (dist1 >= dist0) 
-	{
-		p0 = p1;
-	}
-	return p0;
+	//ndAssert(dir.m_w == ndFloat32(0.0f));
+	//ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	//
+	//if (dir.m_x < ndFloat32(-0.9999f)) 
+	//{
+	//	return ndVector(-m_height, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+	//}
+	//else if (dir.m_x > ndFloat32(0.9999f)) 
+	//{
+	//	return ndVector(m_height, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+	//}
+	//
+	//ndVector dir_yz(dir);
+	//dir_yz.m_x = ndFloat32(0.0f);
+	//ndAssert(dir_yz.DotProduct(dir_yz).GetScalar() > ndFloat32(0.0f));
+	//dir_yz = dir_yz.Normalize();
+	//
+	//ndVector p0(dir_yz.Scale(m_radius));
+	//ndVector p1(ndVector::m_zero);
+	//
+	//p0.m_x = -m_height;
+	//p1.m_x = m_height;
+	//
+	//ndFloat32 dist0 = dir.DotProduct(p0).GetScalar();
+	//ndFloat32 dist1 = dir.DotProduct(p1).GetScalar();
+	//
+	//if (dist1 >= dist0) 
+	//{
+	//	p0 = p1;
+	//}
+	//return p0;
+	return SupportVertexSpecial(dir, ndFloat32 (0.0f), ptr);
 }
 
 ndVector ndShapeCone::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt32* const) const
@@ -244,7 +245,39 @@ ndVector ndShapeCone::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt
 	//	p0 = p1;
 	//}
 	//return p0;
-	return SupportVertex(dir, nullptr);
+
+
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	
+	if (dir.m_x < ndFloat32(-0.9999f)) 
+	{
+		return ndVector(-m_height, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+	}
+	else if (dir.m_x > ndFloat32(0.9999f)) 
+	{
+		return ndVector(m_height, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+	}
+	
+	ndVector dir_yz(dir);
+	dir_yz.m_x = ndFloat32(0.0f);
+	ndAssert(dir_yz.DotProduct(dir_yz).GetScalar() > ndFloat32(0.0f));
+	dir_yz = dir_yz.Normalize();
+	
+	ndVector p1(ndVector::m_zero);
+	ndVector p0(dir_yz.Scale(m_radius));
+	
+	p0.m_x = -m_height;
+	p1.m_x = m_height;
+	
+	ndFloat32 dist0 = dir.DotProduct(p0).GetScalar();
+	ndFloat32 dist1 = dir.DotProduct(p1).GetScalar();
+	
+	if (dist1 >= dist0) 
+	{
+		p0 = p1;
+	}
+	return p0;
 }
 
 ndFloat32 ndShapeCone::RayCast(ndRayCastNotify& callback, const ndVector& r0, const ndVector& r1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
