@@ -60,12 +60,12 @@ ndVector ndShapePoint::SupportVertexSpecialProjectPoint(const ndVector&, const n
 	return ndVector::m_zero;
 }
 
-ndVector ndShapePoint::SupportVertexSpecial(const ndVector&, ndFloat32, ndInt32* const) const
+ndVector ndShapePoint::SupportVertexSpecial(const ndVector&, ndFloat32) const
 {
 	return ndVector::m_zero;
 }
 
-ndVector ndShapePoint::SupportVertex(const ndVector&, ndInt32* const) const
+ndVector ndShapePoint::SupportVertex(const ndVector&) const
 {
 	ndAssert(0);
 	//ndAssert(dir.m_w == ndFloat32(0.0f));

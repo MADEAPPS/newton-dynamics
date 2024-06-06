@@ -273,7 +273,7 @@ ndInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normal
 	return count;
 }
 
-ndVector ndShapeConvexPolygon::SupportVertex(const ndVector& dir, ndInt32* const) const
+ndVector ndShapeConvexPolygon::SupportVertex(const ndVector& dir) const
 {
 	ndAssert(ndAbs(dir.m_w) == ndFloat32(0.0f));
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - 1.0f) < ndFloat32(1.0e-2f));

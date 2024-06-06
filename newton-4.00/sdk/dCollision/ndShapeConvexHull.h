@@ -40,7 +40,8 @@ class ndShapeConvexHull : public ndShapeConvex
 	ndBigVector FaceNormal(const ndEdge *face, const ndBigVector* const pool) const;
 	bool RemoveCoplanarEdge(ndPolyhedra& convex, const ndBigVector* const hullVertexArray) const;
 	bool Create(ndInt32 count, ndInt32 strideInBytes, const ndFloat32* const vertexArray, ndFloat32 tolerance, ndInt32 maxPointsOut);
-	virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
+	virtual ndVector SupportVertex(const ndVector& dir) const;
+	virtual ndVector SupportFeatureVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 	
 	private:
 	ndVector SupportVertexBruteForce(const ndVector& dir, ndInt32* const vertexIndex) const;

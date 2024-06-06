@@ -131,10 +131,10 @@ void ndShapeConvex::SetVolumeAndCG()
 	{
 		ndVector dir(ndFloat32(0.0f));
 		dir[i] = ndFloat32(-1.0f);
-		p0[i] = SupportVertex(dir, nullptr)[i];
+		p0[i] = SupportVertex(dir)[i];
 
 		dir[i] = ndFloat32(1.0f);
-		p1[i] = SupportVertex(dir, nullptr)[i];
+		p1[i] = SupportVertex(dir)[i];
 	}
 
 	ndAssert(p0.m_w == ndFloat32(0.0f));
@@ -283,7 +283,7 @@ ndFloat32 ndShapeConvex::RayCast(ndRayCastNotify&, const ndVector& localP0, cons
 	return rayCaster.RayCast(localP0, localP1, contactOut);
 }
 
-ndVector ndShapeConvex::SupportVertex(const ndVector& dir, ndInt32* const) const
+ndVector ndShapeConvex::SupportVertex(const ndVector& dir) const
 {
 	ndAssert(dir.m_w == ndFloat32(0.0f));
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
@@ -506,6 +506,12 @@ ndInt32 ndShapeConvex::RectifyConvexSlice(ndInt32 count, const ndVector& normal,
 	return count;
 }
 
+ndVector ndShapeConvex::SupportFeatureVertex(const ndVector& dir, ndInt32* const vertexIndex) const
+{
+	ndAssert(0);
+	return ndVector::m_zero;
+}
+
 ndInt32 ndShapeConvex::CalculatePlaneIntersection(const ndVector& normal, const ndVector& origin, ndVector* const contactsOut) const
 {
 	ndVector support[4];
@@ -517,7 +523,7 @@ ndInt32 ndShapeConvex::CalculatePlaneIntersection(const ndVector& normal, const 
 	{
 		ndInt32 edgeIndex;
 		featureCount = 1;
-		support[0] = SupportVertex(normal, &edgeIndex);
+		support[0] = SupportFeatureVertex(normal, &edgeIndex);
 		edge = vertToEdgeMapping[edgeIndex];
 
 		// 5 degrees

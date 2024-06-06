@@ -438,8 +438,8 @@ void ndContactSolver::SupportVertex(const ndVector& dir0, ndInt32 vertexIndex)
 	
 	const ndMatrix& matrix0 = m_instance0.m_globalMatrix;
 	const ndMatrix& matrix1 = m_instance1.m_globalMatrix;
-	ndVector p(matrix0.TransformVector(m_instance0.SupportVertexSpecial(matrix0.UnrotateVector (dir0), nullptr)) & ndVector::m_triplexMask);
-	ndVector q(matrix1.TransformVector(m_instance1.SupportVertexSpecial(matrix1.UnrotateVector (dir1), nullptr)) & ndVector::m_triplexMask);
+	ndVector p(matrix0.TransformVector(m_instance0.SupportVertexSpecial(matrix0.UnrotateVector (dir0))) & ndVector::m_triplexMask);
+	ndVector q(matrix1.TransformVector(m_instance1.SupportVertexSpecial(matrix1.UnrotateVector (dir1))) & ndVector::m_triplexMask);
 	m_hullDiff[vertexIndex] = p - q;
 	m_hullSum[vertexIndex] = p + q;
 }
@@ -1824,7 +1824,7 @@ ndFloat32 ndContactSolver::RayCast(const ndVector& localP0, const ndVector& loca
 	const ndShapeConvex* const shape = m_instance0.GetShape()->GetAsShapeConvex();
 
 	ndVector dir1(p0p1.Normalize());
-	m_hullDiff[0] = shape->SupportVertex(dir1, nullptr) - point;
+	m_hullDiff[0] = shape->SupportVertex(dir1) - point;
 	ndBigVector v(m_hullDiff[0]);
 	index = 1;
 	do 
@@ -1857,7 +1857,7 @@ ndFloat32 ndContactSolver::RayCast(const ndVector& localP0, const ndVector& loca
 
 			ndVector dir(v.Scale(-ndRsqrt(ndFloat32(distance))));
 			ndAssert(dir.m_w == ndFloat32(0.0f));
-			m_hullDiff[index] = shape->SupportVertex(dir, nullptr) - point;
+			m_hullDiff[index] = shape->SupportVertex(dir) - point;
 			const ndBigVector w(m_hullDiff[index]);
 			const ndVector wv(w - v);
 			ndAssert(wv.m_w == ndFloat32(0.0f));

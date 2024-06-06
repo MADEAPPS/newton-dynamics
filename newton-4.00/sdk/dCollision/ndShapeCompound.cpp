@@ -485,23 +485,22 @@ void ndShapeCompound::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVect
 	}
 }
 
-ndVector ndShapeCompound::SupportVertex(const ndVector&, ndInt32* const) const
+ndVector ndShapeCompound::SupportVertex(const ndVector&) const
 {
 	ndAssert(0);
 	return ndVector::m_zero;
 }
 
-//ndVector ndShapeCompound::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const
 ndVector ndShapeCompound::SupportVertexSpecialProjectPoint(const ndVector&, const ndVector&) const
 { 
 	ndAssert(0);
 	return ndVector::m_zero;
 }
 
-ndVector ndShapeCompound::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt32* const vertexIndex) const
+ndVector ndShapeCompound::SupportVertexSpecial(const ndVector& dir, ndFloat32) const
 {
 	ndAssert(0);
-	return SupportVertex(dir, vertexIndex);
+	return SupportVertex(dir);
 }
 
 ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndVector&, const ndVector&, ndVector* const) const

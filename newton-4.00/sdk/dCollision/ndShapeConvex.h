@@ -57,7 +57,7 @@ class ndShapeConvex: public ndShape
 
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
-	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
+	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir) const;
 	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 	D_COLLISION_API virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& globalPlane, const ndShapeInstance& parentScale) const;
 	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
@@ -66,24 +66,14 @@ class ndShapeConvex: public ndShape
 	bool SanityCheck(ndInt32 count, const ndVector& normal, ndVector* const contactsOut) const;
 	ndInt32 RectifyConvexSlice(ndInt32 count, const ndVector& normal, ndVector* const contactsOut) const;
 	virtual ndInt32 GetConvexVertexCount() const { return m_vertexCount; }
-	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt32* const vertexIndex) const
-	{
-		return SupportVertex(dir, vertexIndex);
-	}
-
-	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const
-	{
-		return point;
-	}
-
-	virtual const ndConvexSimplexEdge** GetVertexToEdgeMapping() const 
-	{ 
-		return nullptr; 
-	}
+	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32) const;
+	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const;
+	virtual const ndConvexSimplexEdge** GetVertexToEdgeMapping() const;
 
 	virtual ndFloat32 GetVolume() const;
 	virtual ndFloat32 GetBoxMinRadius() const;
 	virtual ndFloat32 GetBoxMaxRadius() const;
+	virtual ndVector SupportFeatureVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 
 	ndVector CalculateVolumeIntegral(const ndPlane& plane) const;
 	ndInt32 BuildCylinderCapPoly (ndFloat32 radius, const ndMatrix& transform, ndVector* const vertexOut) const;
@@ -100,6 +90,22 @@ class ndShapeConvex: public ndShape
 	friend class ndContactSolver;
 	friend class ndFileFormatShapeConvex;
 } D_GCC_NEWTON_ALIGN_32 ;
+
+inline ndVector ndShapeConvex::SupportVertexSpecial(const ndVector& dir, ndFloat32) const
+{
+	return SupportVertex(dir);
+}
+
+inline ndVector ndShapeConvex::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const
+{
+	return point;
+}
+
+inline const ndShapeConvex::ndConvexSimplexEdge** ndShapeConvex::GetVertexToEdgeMapping() const
+{
+	return nullptr;
+}
+
 
 #endif 
 

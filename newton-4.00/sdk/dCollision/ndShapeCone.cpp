@@ -176,7 +176,7 @@ ndVector ndShapeCone::SupportVertexSpecialProjectPoint(const ndVector& point, co
 	return point + dir.Scale(D_PENETRATION_TOL);
 }
 
-ndVector ndShapeCone::SupportVertex(const ndVector& dir, ndInt32* const ptr) const
+ndVector ndShapeCone::SupportVertex(const ndVector& dir) const
 {
 	//ndAssert(dir.m_w == ndFloat32(0.0f));
 	//ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
@@ -209,10 +209,10 @@ ndVector ndShapeCone::SupportVertex(const ndVector& dir, ndInt32* const ptr) con
 	//	p0 = p1;
 	//}
 	//return p0;
-	return SupportVertexSpecial(dir, ndFloat32 (0.0f), ptr);
+	return SupportVertexSpecial(dir, ndFloat32 (0.0f));
 }
 
-ndVector ndShapeCone::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt32* const) const
+ndVector ndShapeCone::SupportVertexSpecial(const ndVector& dir, ndFloat32) const
 {
 	ndAssert(dir.m_w == ndFloat32(0.0f));
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));

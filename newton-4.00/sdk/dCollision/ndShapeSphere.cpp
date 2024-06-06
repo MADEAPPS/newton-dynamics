@@ -188,12 +188,12 @@ ndVector ndShapeSphere::SupportVertexSpecialProjectPoint(const ndVector&, const 
 	return dir.Scale(m_radius - D_PENETRATION_TOL);
 }
 
-ndVector ndShapeSphere::SupportVertexSpecial(const ndVector&, ndFloat32, ndInt32* const) const
+ndVector ndShapeSphere::SupportVertexSpecial(const ndVector&, ndFloat32) const
 {
 	return ndVector::m_zero;
 }
 
-ndVector ndShapeSphere::SupportVertex(const ndVector& dir, ndInt32* const) const
+ndVector ndShapeSphere::SupportVertex(const ndVector& dir) const
 {
 	ndAssert(dir.m_w == ndFloat32(0.0f));
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));

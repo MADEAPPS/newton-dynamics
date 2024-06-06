@@ -356,7 +356,7 @@ ndVector ndShapeCapsule::SupportVertexSpecialProjectPoint(const ndVector& testPo
 }
 
 
-ndVector ndShapeCapsule::SupportVertex(const ndVector& direction, ndInt32* const) const
+ndVector ndShapeCapsule::SupportVertex(const ndVector& direction) const
 {
 	ndVector dir(direction * m_transform);
 	ndAssert(dir.m_w == ndFloat32(0.0f));
@@ -375,7 +375,7 @@ ndVector ndShapeCapsule::SupportVertex(const ndVector& direction, ndInt32* const
 	return p0 * m_transform;
 }
 
-ndVector ndShapeCapsule::SupportVertexSpecial(const ndVector& direction, ndFloat32, ndInt32* const) const
+ndVector ndShapeCapsule::SupportVertexSpecial(const ndVector& direction, ndFloat32) const
 {
 	ndVector dir(direction * m_transform);
 	ndAssert(dir.m_w == ndFloat32(0.0f));

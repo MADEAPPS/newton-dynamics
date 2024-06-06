@@ -236,7 +236,7 @@ ndVector ndShapeChamferCylinder::SupportVertexSpecialProjectPoint(const ndVector
 	return point + dir.Scale(m_height - D_PENETRATION_TOL);
 }
 
-ndVector ndShapeChamferCylinder::SupportVertex(const ndVector& dir, ndInt32* const) const
+ndVector ndShapeChamferCylinder::SupportVertex(const ndVector& dir) const
 {
 	ndAssert(dir.m_w == ndFloat32(0.0f));
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
@@ -252,7 +252,7 @@ ndVector ndShapeChamferCylinder::SupportVertex(const ndVector& dir, ndInt32* con
 	return sideDir.Scale(m_radius) + dir.Scale(m_height);
 }
 
-ndVector ndShapeChamferCylinder::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt32* const) const
+ndVector ndShapeChamferCylinder::SupportVertexSpecial(const ndVector& dir, ndFloat32) const
 {
 	ndAssert(dir.m_w == ndFloat32(0.0f));
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
@@ -399,7 +399,7 @@ ndInt32 ndShapeChamferCylinder::CalculatePlaneIntersection(const ndVector& norma
 	else 
 	{
 		count = 1;
-		contactsOut[0] = SupportVertex(normal, nullptr);
+		contactsOut[0] = SupportVertex(normal);
 	}
 	return count;
 }

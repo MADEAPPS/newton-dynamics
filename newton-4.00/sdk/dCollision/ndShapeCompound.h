@@ -75,8 +75,8 @@ class ndShapeCompound: public ndShape
 	virtual ndFloat32 GetBoxMaxRadius() const;
 
 	virtual ndShapeCompound* GetAsShapeCompound();
-	virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
-	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin, ndInt32* const vertexIndex) const;
+	virtual ndVector SupportVertex(const ndVector& dir) const;
+	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const;
 	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
 	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 	virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& plane, const ndShapeInstance& parentScale) const;

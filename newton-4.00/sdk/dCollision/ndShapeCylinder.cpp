@@ -195,7 +195,7 @@ ndVector ndShapeCylinder::SupportVertexSpecialProjectPoint(const ndVector& point
 	return point + dir.Scale(D_PENETRATION_TOL);
 }
 
-ndVector ndShapeCylinder::SupportVertex(const ndVector& dir, ndInt32* const) const
+ndVector ndShapeCylinder::SupportVertex(const ndVector& dir) const
 {
 	ndAssert(dir.m_w == ndFloat32(0.0f));
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
@@ -212,9 +212,6 @@ ndVector ndShapeCylinder::SupportVertex(const ndVector& dir, ndInt32* const) con
 	ndVector dir_yz(dir);
 	dir_yz.m_x = ndFloat32(0.0f);
 	ndAssert(dir_yz.DotProduct(dir_yz).GetScalar() > ndFloat32(0.0f));
-	//ndFloat32 mag2 = dir_yz.DotProduct(dir_yz).GetScalar();
-	//ndAssert(mag2 > ndFloat32(0.0f));
-	//dir_yz = dir_yz.Scale(ndFloat32(1.0f) / dSqrt(mag2));
 	dir_yz = dir_yz.Normalize();
 	ndVector p0(dir_yz.Scale(m_radius0));
 	ndVector p1(dir_yz.Scale(m_radius1));
@@ -232,7 +229,7 @@ ndVector ndShapeCylinder::SupportVertex(const ndVector& dir, ndInt32* const) con
 	return p0;
 }
 
-ndVector ndShapeCylinder::SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin, ndInt32* const) const
+ndVector ndShapeCylinder::SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const
 {
 	ndAssert(dir.m_w == ndFloat32(0.0f));
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
@@ -249,9 +246,7 @@ ndVector ndShapeCylinder::SupportVertexSpecial(const ndVector& dir, ndFloat32 sk
 
 	ndVector dir_yz(dir);
 	dir_yz.m_x = ndFloat32(0.0f);
-	//ndFloat32 mag2 = dir_yz.DotProduct(dir_yz).GetScalar();
-	//ndAssert(mag2 > ndFloat32(0.0f));
-	//dir_yz = dir_yz.Scale(ndFloat32(1.0f) / dgSqrt(mag2));
+
 	dir_yz = dir_yz.Normalize();
 	ndVector p0(dir_yz.Scale(m_radius0 - thickness));
 	ndVector p1(dir_yz.Scale(m_radius1 - thickness));

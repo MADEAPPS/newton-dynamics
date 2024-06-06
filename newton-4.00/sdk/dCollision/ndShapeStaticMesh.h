@@ -44,8 +44,8 @@ class ndShapeStaticMesh: public ndShape
 	virtual ndFloat32 GetBoxMinRadius() const;
 	virtual ndFloat32 GetBoxMaxRadius() const;
 	virtual ndShapeStaticMesh* GetAsShapeStaticMesh();
-	virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
-	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin, ndInt32* const vertexIndex) const;
+	virtual ndVector SupportVertex(const ndVector& dir) const;
+	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const;
 	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
 	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 	virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& plane, const ndShapeInstance& parentScale) const;
@@ -84,16 +84,16 @@ inline ndFloat32 ndShapeStaticMesh::GetBoxMaxRadius() const
 	return ndFloat32(0.0f);
 }
 
-inline ndVector ndShapeStaticMesh::SupportVertex(const ndVector&, ndInt32* const) const
+inline ndVector ndShapeStaticMesh::SupportVertex(const ndVector&) const
 {
 	ndAssert(0);
 	return ndVector::m_zero;
 }
 
-inline ndVector ndShapeStaticMesh::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt32* const vertexIndex) const
+inline ndVector ndShapeStaticMesh::SupportVertexSpecial(const ndVector& dir, ndFloat32) const
 {
 	ndAssert(0);
-	return SupportVertex(dir, vertexIndex);
+	return SupportVertex(dir);
 }
 
 inline ndVector ndShapeStaticMesh::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const

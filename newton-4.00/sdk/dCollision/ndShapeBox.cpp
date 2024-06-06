@@ -177,7 +177,7 @@ void ndShapeBox::CalculateAabb(const ndMatrix& matrix, ndVector &p0, ndVector &p
 	p1 = (matrix[3] + size) & ndVector::m_triplexMask;
 }
 
-ndVector ndShapeBox::SupportVertex(const ndVector& dir0, ndInt32* const vertexIndex) const
+ndVector ndShapeBox::SupportVertex(const ndVector& dir0) const
 {
 	const ndVector mask0(dir0.Abs() > m_flushZero);
 	const ndVector dir(dir0 & mask0);
@@ -185,16 +185,31 @@ ndVector ndShapeBox::SupportVertex(const ndVector& dir0, ndInt32* const vertexIn
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 	ndAssert(dir.m_w == ndFloat32(0.0f));
 	const ndVector mask(dir < ndVector::m_zero);
-	if (vertexIndex) 
-	{
-		ndVector index(m_indexMark * (mask & ndVector::m_one));
-		index = (index.AddHorizontal()).GetInt();
-		*vertexIndex = ndInt32(index.m_ix);
-	}
+	//if (vertexIndex) 
+	//{
+	//	ndVector index(m_indexMark * (mask & ndVector::m_one));
+	//	index = (index.AddHorizontal()).GetInt();
+	//	*vertexIndex = ndInt32(index.m_ix);
+	//}
 	return m_size[0].Select(m_size[1], mask);
 }
 
-ndVector ndShapeBox::SupportVertexSpecial(const ndVector& dir0, ndFloat32, ndInt32* const vertexIndex) const
+ndVector ndShapeBox::SupportFeatureVertex(const ndVector& dir0, ndInt32* const vertexIndex) const
+{
+	const ndVector mask0(dir0.Abs() > m_flushZero);
+	const ndVector dir(dir0 & mask0);
+
+	ndAssert(vertexIndex);
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	const ndVector mask(dir < ndVector::m_zero);
+	ndVector index(m_indexMark * (mask & ndVector::m_one));
+	index = (index.AddHorizontal()).GetInt();
+	*vertexIndex = ndInt32(index.m_ix);
+	return m_size[0].Select(m_size[1], mask);
+}
+
+ndVector ndShapeBox::SupportVertexSpecial(const ndVector& dir0, ndFloat32) const
 {
 	const ndVector mask0(dir0.Abs() > m_flushZero);
 	const ndVector dir(dir0 & mask0);
@@ -202,12 +217,12 @@ ndVector ndShapeBox::SupportVertexSpecial(const ndVector& dir0, ndFloat32, ndInt
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 	ndAssert(dir.m_w == ndFloat32(0.0f));
 	const ndVector mask(dir < ndVector::m_zero);
-	if (vertexIndex) 
-	{
-		ndVector index(m_indexMark * (mask & ndVector::m_one));
-		index = (index.AddHorizontal()).GetInt();
-		*vertexIndex = ndInt32(index.m_ix);
-	}
+	//if (vertexIndex) 
+	//{
+	//	ndVector index(m_indexMark * (mask & ndVector::m_one));
+	//	index = (index.AddHorizontal()).GetInt();
+	//	*vertexIndex = ndInt32(index.m_ix);
+	//}
 	
 	const ndVector size0(m_size[0] - m_penetrationTol);
 	const ndVector size1(m_size[1] + m_penetrationTol);
@@ -297,8 +312,8 @@ ndInt32 ndShapeBox::CalculatePlaneIntersection(const ndVector& normal, const ndV
 	if (vertToEdgeMapping) 
 	{
 		ndInt32 edgeIndex;
-		support[0] = SupportVertex(normal, &edgeIndex);
-
+		support[0] = SupportFeatureVertex(normal, &edgeIndex);
+		
 		ndFloat32 dist = normal.DotProduct(support[0] - point).GetScalar();
 		if (dist <= D_PENETRATION_TOL) 
 		{
@@ -309,7 +324,7 @@ ndInt32 ndShapeBox::CalculatePlaneIntersection(const ndVector& normal, const ndV
 				const ndFloat32 tiltAngle = ndFloat32(0.005f);
 				const ndFloat32 tiltAngle2 = tiltAngle * tiltAngle;
 				ndPlane testPlane(normal, -(normal.DotProduct(support[0]).GetScalar()));
-
+		
 				featureCount = 1;
 				const ndConvexSimplexEdge* const edge = vertToEdgeMapping[edgeIndex];
 				const ndConvexSimplexEdge* ptr = edge;

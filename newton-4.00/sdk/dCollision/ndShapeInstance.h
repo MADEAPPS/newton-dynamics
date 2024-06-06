@@ -134,7 +134,7 @@ class ndShapeInstance: public ndContainersFreeListAlloc<ndShapeInstance>
 	void SetShape(ndShape* const shape);
 	ndVector SupportVertex(const ndVector& dir) const;
 	ndMatrix GetScaledTransform(const ndMatrix& matrix) const;
-	ndVector SupportVertexSpecial(const ndVector& dir, ndInt32* const vertexIndex) const;
+	ndVector SupportVertexSpecial(const ndVector& dir) const;
 	ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
 
 	const ndMatrix& GetLocalMatrix() const;
@@ -245,29 +245,29 @@ inline ndVector ndShapeInstance::SupportVertex(const ndVector& inDir) const
 	{
 		case m_unit:
 		{
-			return m_shape->SupportVertex(dir, nullptr);
+			return m_shape->SupportVertex(dir);
 		}
 		case m_uniform:
 		{
-			return m_scale * m_shape->SupportVertex(dir, nullptr);
+			return m_scale * m_shape->SupportVertex(dir);
 		}
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p, n * transp(S)) 
 			const ndVector dir1((m_scale * dir).Normalize());
-			return m_scale * m_shape->SupportVertex(dir1, nullptr);
+			return m_scale * m_shape->SupportVertex(dir1);
 		}
 
 		case m_global:
 		default:
 		{
 			const ndVector dir1(m_alignmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
-			return m_scale * m_alignmentMatrix.TransformVector(m_shape->SupportVertex(dir1, nullptr));
+			return m_scale * m_alignmentMatrix.TransformVector(m_shape->SupportVertex(dir1));
 		}
 	}
 }
 
-inline ndVector ndShapeInstance::SupportVertexSpecial(const ndVector& inDir, ndInt32* const vertexIndex) const
+inline ndVector ndShapeInstance::SupportVertexSpecial(const ndVector& inDir) const
 {
 	const ndVector dir(inDir & ndVector::m_triplexMask);
 	ndAssert(dir.m_w == ndFloat32(0.0f));
@@ -276,11 +276,11 @@ inline ndVector ndShapeInstance::SupportVertexSpecial(const ndVector& inDir, ndI
 	{
 		case m_unit:
 		{
-			return m_shape->SupportVertexSpecial(dir, m_skinMargin, vertexIndex);
+			return m_shape->SupportVertexSpecial(dir, m_skinMargin);
 		}
 		case m_uniform:
 		{
-			return m_scale * m_shape->SupportVertexSpecial(dir, m_skinMargin, vertexIndex);
+			return m_scale * m_shape->SupportVertexSpecial(dir, m_skinMargin);
 		}
 
 		case m_global:

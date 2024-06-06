@@ -44,8 +44,6 @@ void ndShapeStaticMesh::CalculateAabb(const ndMatrix& matrix, ndVector &p0, ndVe
 	p1 = (origin + size) & ndVector::m_triplexMask;
 }
 
-
-//ndInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const ndFloat32* const vertex, const ndInt32* const index, ndInt32 indexCount, ndInt32 stride, const dPlane& localPlane, ndVector* const contactsOut) const
 ndInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const ndFloat32* const, const ndInt32* const, ndInt32, ndInt32, const ndPlane&, ndVector* const) const
 {
 	ndAssert(0);

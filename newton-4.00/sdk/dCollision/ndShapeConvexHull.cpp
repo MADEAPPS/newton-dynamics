@@ -783,13 +783,12 @@ bool ndShapeConvexHull::RemoveCoplanarEdge(ndPolyhedra& polyhedra, const ndBigVe
 	return removeEdge;
 }
 
-inline ndVector ndShapeConvexHull::SupportVertexBruteForce(const ndVector& dir, ndInt32* const vertexIndex) const
+ndVector ndShapeConvexHull::SupportVertexBruteForce(const ndVector& dir, ndInt32* const vertexIndex) const
 {
 	const ndVector dirX(dir.m_x);
 	const ndVector dirY(dir.m_y);
 	const ndVector dirZ(dir.m_z);
-	//ndVector support(ndVector::m_negOne);
-	//ndVector maxProj(ndFloat32(-1.0e20f));
+
 	ndVector support(m_soa_index[0]);
 	ndVector maxProj(m_soa_x[0] * dirX + m_soa_y[0] * dirY + m_soa_z[0] * dirZ);
 	for (ndInt32 i = 1; i < m_soaVertexCount; ++i)
@@ -817,7 +816,7 @@ inline ndVector ndShapeConvexHull::SupportVertexBruteForce(const ndVector& dir, 
 	return m_vertex[index];
 }
 
-inline ndVector ndShapeConvexHull::SupportVertexhierarchical(const ndVector& dir, ndInt32* const vertexIndex) const
+ndVector ndShapeConvexHull::SupportVertexhierarchical(const ndVector& dir, ndInt32* const vertexIndex) const
 {
 	const ndInt32 ix = (dir[0] > ndFloat64(0.0f)) ? 1 : 0;
 	const ndInt32 iy = (dir[1] > ndFloat64(0.0f)) ? 1 : 0;
@@ -935,14 +934,29 @@ inline ndVector ndShapeConvexHull::SupportVertexhierarchical(const ndVector& dir
 	return m_vertex[index];
 }
 
-ndVector ndShapeConvexHull::SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const
+ndVector ndShapeConvexHull::SupportVertex(const ndVector& dir) const
+{
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	if (m_vertexCount > D_CONVEX_VERTEX_BRUTE_FORCE_SPLIT)
+	{
+		//return SupportVertexhierarchical(dir, vertexIndex);
+		return SupportVertexhierarchical(dir, nullptr);
+	}
+	else 
+	{
+		//return SupportVertexBruteForce(dir, vertexIndex);
+		return SupportVertexBruteForce(dir, nullptr);
+	}
+}
+
+ndVector ndShapeConvexHull::SupportFeatureVertex(const ndVector& dir, ndInt32* const vertexIndex) const
 {
 	ndAssert(dir.m_w == ndFloat32(0.0f));
 	if (m_vertexCount > D_CONVEX_VERTEX_BRUTE_FORCE_SPLIT)
 	{
 		return SupportVertexhierarchical(dir, vertexIndex);
 	}
-	else 
+	else
 	{
 		return SupportVertexBruteForce(dir, vertexIndex);
 	}
