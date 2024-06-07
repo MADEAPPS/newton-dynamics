@@ -42,7 +42,7 @@ class ndBrainGpuInference : public ndClassAlloc
 		ndBufferOffsetPair():m_buffer(nullptr),m_offsets(){}
 		~ndBufferOffsetPair() {}
 		
-		ndBrainGpuBuffer* m_buffer;
+		ndBrainGpuFloatBuffer* m_buffer;
 		ndArray<ndInt32> m_offsets;
 	};
 

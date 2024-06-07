@@ -47,11 +47,10 @@ class ndBrainGpuInference::ndBrainLoadInputData : public ndBrainGpuCommand
 		params[0] = &m_parammeters;
 		params[1] = me->m_inputBuffer.m_buffer;
 		params[2] = me->m_workingBuffer.m_buffer;
-		Assembly(me->m_context->m_copyInputData, 3, params);
+		Assembly(me->m_context->m_copyInputData, me->m_inputBatchSize, 3, params);
 	}
 
 	ndBrainGpuUniformBuffer m_parammeters;
-
 };
 
 ndBrainGpuInference::ndBrainGpuInference(ndBrainGpuContext* const context, ndBrain* const brain, const ndBrainMatrix& input, ndInt32 inputBatchSize)
@@ -164,7 +163,18 @@ void ndBrainGpuInference::BuildDisplayList(const ndBrainMatrix& input)
 
 
 	m_context->SubmitQueue(&m_displayList[0], m_displayList.GetCount());
+
 	ndBrainVector xxxxx;
-	((ndBrainGpuFloatBuffer*)m_workingBuffer.m_buffer)->UnloadData(xxxxx);
+	m_workingBuffer.m_buffer->UnloadData(xxxxx);
+	ndInt32 stride = m_workingBuffer.m_offsets[m_workingBuffer.m_offsets.GetCount() - 1];
+	for (ndInt32 i = 0; i < m_inputBatchSize; ++i)
+	{
+		const ndBrainVector& src0 = input[i];
+		const ndBrainMemVector src1(&xxxxx[i * stride], src0.GetCount());
+		for (ndInt32 j = 0; j < m_inputBatchSize; ++j)
+		{
+			ndAssert(src0[j] == src1[j]);
+		}
+	}
 }
 #endif
