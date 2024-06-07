@@ -319,3 +319,8 @@ void ndBrainLayerLinear::CalculateParamGradients(
 	m_weights.TransposeMul(outputDerivative, inputGradient);
 }
 
+ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 paramsCount, ndBufferOffsetPair** params)
+{
+	//ndAssert(0);
+	return nullptr;
+}

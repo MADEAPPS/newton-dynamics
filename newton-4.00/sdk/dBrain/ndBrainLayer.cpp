@@ -23,6 +23,8 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
 
+class ndBrainGpuContext;
+
 ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
 	:ndClassAlloc(src)
 {
@@ -165,3 +167,8 @@ void ndBrainLayer::CalculateParamGradients(const ndBrainVector&, const ndBrainVe
 	ndAssert(0);
 }
 
+ndBrainGpuCommand* ndBrainLayer::AssemblyGPUCommand(ndBrainGpuContext* const, ndInt32, ndInt32, ndBufferOffsetPair**)
+{
+	ndAssert(0);
+	return nullptr;
+}

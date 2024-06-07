@@ -1,0 +1,43 @@
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+#version 450
+
+#define WORKGROUP_SIZE 128
+layout (local_size_x = WORKGROUP_SIZE) in;
+
+layout(std140, binding = 0) uniform UniformBufferObject 
+{
+    int m_batchIndex;
+    int m_inputSize;
+    int m_inputBlockSize;
+    int m_outputBlockSize;
+};
+
+layout(std430, binding = 1) readonly buffer inputBuffer
+{
+    float m_source[];
+};
+
+layout(std430, binding = 2) buffer outputBuffer
+{
+    float m_destination[];
+};
+
+// perform one road colum of a matrix multiply. 
+void main() 
+{
+    uint dstBase = gl_WorkGroupID.x * m_outputBlockSize;
+    uint srcBase = (gl_WorkGroupID.x + m_batchIndex) * m_inputBlockSize;
+    for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
+    {
+        m_destination[dstBase + index] = m_source[srcBase + index];
+    }
+}

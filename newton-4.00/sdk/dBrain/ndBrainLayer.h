@@ -28,10 +28,23 @@ class ndBrainLoad;
 class ndBrainSave;
 class ndBrainVector;
 class ndBrainMatrix;
+class ndBrainGpuCommand;
+class ndBrainGpuContext;
+class ndBrainGpuFloatBuffer;
 
 class ndBrainLayer : public ndClassAlloc
 {
 	public: 
+	class ndBufferOffsetPair
+	{
+		public:
+		ndBufferOffsetPair() :m_buffer(nullptr), m_offsets() {}
+		~ndBufferOffsetPair() {}
+
+		ndBrainGpuFloatBuffer* m_buffer;
+		ndArray<ndInt32> m_offsets;
+	};
+
 	ndBrainLayer();
 	ndBrainLayer(const ndBrainLayer& src);
 
@@ -67,11 +80,10 @@ class ndBrainLayer : public ndClassAlloc
 		const ndBrainVector& input, const ndBrainVector& output, 
 		const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const;
 
-	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
-
 	virtual void Save(const ndBrainSave* const loadSave) const;
-
+	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 	virtual void GetNumberOfParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const;
+	virtual ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 paramsCount, ndBufferOffsetPair**  params);
 };
 
 #endif 

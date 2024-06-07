@@ -12,13 +12,14 @@
 #define __ND_BRAIN_GPU_INFERENCE_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrainLayer.h"
 #include "ndBrainVector.h"
 
 class ndBrain;
 class ndBrainGpuBuffer;
 class ndBrainGpuContext;
 //class ndBrainGpuFloatBuffer;
-class ndBrainGpuIntegerBuffer;
+//class ndBrainGpuIntegerBuffer;
 
 #if !defined (D_USE_VULKAN_SDK)
 
@@ -36,15 +37,6 @@ class ndBrainGpuInference : public ndClassAlloc
 	class ndBrainLoadInputData;
 
 	public:
-	class ndBufferOffsetPair
-	{
-		public:
-		ndBufferOffsetPair():m_buffer(nullptr),m_offsets(){}
-		~ndBufferOffsetPair() {}
-		
-		ndBrainGpuFloatBuffer* m_buffer;
-		ndArray<ndInt32> m_offsets;
-	};
 
 	ndBrainGpuInference(ndBrainGpuContext* const context, ndBrain* const brain, const ndBrainMatrix& testDigits, ndInt32 inputBatchSize);
 	virtual ~ndBrainGpuInference();
@@ -59,8 +51,8 @@ class ndBrainGpuInference : public ndClassAlloc
 	ndBrain* m_brain;
 	ndBrainGpuContext* m_context;
 
-	ndBufferOffsetPair m_inputBuffer;
-	ndBufferOffsetPair m_workingBuffer;
+	ndBrainLayer::ndBufferOffsetPair m_inputBuffer;
+	ndBrainLayer::ndBufferOffsetPair m_workingBuffer;
 
 	ndArray<ndBrainGpuCommand*> m_displayList;
 	

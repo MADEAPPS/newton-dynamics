@@ -47,7 +47,7 @@ class ndBrainGpuInference::ndBrainLoadInputData : public ndBrainGpuCommand
 		params[0] = &m_parammeters;
 		params[1] = me->m_inputBuffer.m_buffer;
 		params[2] = me->m_workingBuffer.m_buffer;
-		Assembly(me->m_context->m_copyInputData, me->m_inputBatchSize, 3, params);
+		Assembly(me->m_context->m_ndBrainCopyInput, me->m_inputBatchSize, 3, params);
 	}
 
 	ndBrainGpuUniformBuffer m_parammeters;
@@ -160,6 +160,20 @@ void ndBrainGpuInference::BuildDisplayList(const ndBrainMatrix& input)
 {
 	ndBrainGpuCommand* const comand = new ndBrainLoadInputData(this, input);
 	m_displayList.PushBack(comand);
+
+	const ndArray<ndBrainLayer*>& layers = *m_brain;
+
+
+	ndBrainLayer::ndBufferOffsetPair* inputBuffers[2];
+	inputBuffers[0] = &m_inputBuffer;
+	inputBuffers[1] = &m_workingBuffer;
+
+	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
+	{
+		ndBrainLayer* const layer = layers[i];
+		layer->AssemblyGPUCommand(m_context, i, 2, inputBuffers);
+		break;
+	}
 
 
 	m_context->SubmitQueue(&m_displayList[0], m_displayList.GetCount());

@@ -471,7 +471,8 @@ void ndBrainGpuContext::LoadShaderPrograms()
 {
 	VkShaderModule clean (VK_NULL_HANDLE);
 	ndMemSet(m_modules, clean, sizeof(m_modules) / sizeof(m_modules[0]));
-	m_copyInputData = LoadShaderProgram("CopyInput-comp.spv");
+	m_ndBrainCopyInput = LoadShaderProgram("ndBrainCopyInput-comp.spv");
+	m_ndBrainLayerLinear = LoadShaderProgram("ndBrainLayerLinear-comp.spv");
 	m_computeShaderModule0 = LoadShaderProgram("testShader0-comp.spv");
 	m_computeShaderModule1 = LoadShaderProgram("testShader1-comp.spv");
 }

@@ -67,7 +67,6 @@ class ndBrainGpuContext: public ndClassAlloc
 		uint64_t object, size_t location, int32_t messageCode,
 		const char* pLayerPrefix, const char* pMessage, void* pUserData);
 
-
 	ndArray<VkCommandBuffer> m_displayList;
 	VkAllocationCallbacks m_allocatorStruct;
 	VkAllocationCallbacks* m_allocator;
@@ -86,7 +85,8 @@ class ndBrainGpuContext: public ndClassAlloc
 	{
 		struct
 		{
-			VkShaderModule m_copyInputData;
+			VkShaderModule m_ndBrainCopyInput;
+			VkShaderModule m_ndBrainLayerLinear;
 			VkShaderModule m_computeShaderModule0;
 			VkShaderModule m_computeShaderModule1;
 		};
