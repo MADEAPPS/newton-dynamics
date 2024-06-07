@@ -114,14 +114,6 @@ const char* ndBrainLayerApproximateTanhActivation::GetLabelId() const
 	return "ndBrainLayerApproximateTanhActivation";
 }
 
-//#if defined (D_SCALAR_VECTOR_CLASS) || (defined (D_NEWTON_USE_DOUBLE) && defined (D_BRAIN_USES_REAL))
-#if defined (D_NEWTON_USE_DOUBLE)
-void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
-{
-	ndBrainLayerTanhActivation::MakePrediction(input, output);
-}
-#else
-
 void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	// rational approximation of tanh, approximation 4 time faster that standard tanh.
@@ -129,54 +121,6 @@ void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& 
 	// only problem is that is not exact zero for input zero, 
 	// however this can be very good for dense hidden layers, 
 	// in fact it seems to produce better or equal result than the standard tanh  
-
-#if 0
-	auto ScalarTanhApproximation = [](ndBrainFloat in)
-	{
-		const ndBrainFloat c1 = ndReal(0.03138777f);
-		const ndBrainFloat c2 = ndReal(0.276281267f);
-		const ndBrainFloat log2f = ndReal(1.442695022f);
-
-		ndBrainFloat v = log2f * ndClamp(in, ndBrainFloat(-10.0f), ndBrainFloat(10.0f));
-		ndBrainFloat floatIntPart = ndBrainFloat(ndFloor(v));
-		ndBrainFloat x = v - floatIntPart;
-		ndBrainFloat xx = x * x;
-		ndBrainFloat v1 = log2f + c2 * xx;
-		ndBrainFloat v2 = x + xx * c1 * x;
-		ndBrainFloat v3 = v2 + v1;
-		ndBrainFloat v4 = v2 - v1;
-		#ifdef D_BRAIN_USES_REAL
-			* ((ndInt32*)&v3) += ndInt32(floatIntPart) << 24;
-		#else
-			* ((ndInt64*)&v3) += ndInt64(floatIntPart) << 53;
-		#endif
-		return (v3 + v4) / (v3 - v4);
-	};
-
-	auto VectorTanhApproximation = [](const ndBrainVector4& in)
-	{
-		ndBrainVector4 v(m_log2f * in.GetMin(m_max).GetMax(m_min));
-		ndBrainVector4 intPart(v.GetInt());
-		ndBrainVector4 x(v - v.Floor());
-		ndBrainVector4 xx(x * x);
-		ndBrainVector4 v1(m_log2f + m_c2 * xx);
-		ndBrainVector4 v2(x + xx * m_c1 * x);
-		ndBrainVector4 v3(v2 + v1);
-		for (ndInt32 i = 0; i < 4; ++i)
-		{
-			#ifdef D_BRAIN_USES_REAL
-				v3.m_i[i] += intPart.m_i[i] << 24;
-			#else
-				v3.m_i[i] += intPart.m_i[i] << 53;
-			#endif
-		}
-		ndBrainVector4 v4(v2 - v1);
-		ndBrainVector4 num(v3 + v4);
-		ndBrainVector4 den(v3 - v4);
-		return num.Divide(den);
-	};
-
-#else
 
 	const ndBrainVector4 c1(m_c1);
 	const ndBrainVector4 c2(m_c2);
@@ -194,11 +138,7 @@ void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& 
 		ndBrainFloat v2 = x + xx * c1[0] * x;
 		ndBrainFloat v3 = v2 + v1;
 		ndBrainFloat v4 = v2 - v1;
-		#ifdef D_BRAIN_USES_REAL
-			* ((ndInt32*)&v3) += ndInt32(floatIntPart) << 24;
-		#else
-			* ((ndInt64*)&v3) += ndInt64(floatIntPart) << 53;
-		#endif
+		*((ndInt32*)&v3) += ndInt32(floatIntPart) << 24;
 		return (v3 + v4) / (v3 - v4);
 	};
 	
@@ -213,18 +153,13 @@ void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& 
 		ndBrainVector4 v3(v2 + v1);
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
-			#ifdef D_BRAIN_USES_REAL
-				v3.m_i[i] += intPart.m_i[i] << 24;
-			#else
-				v3.m_i[i] += intPart.m_i[i] << 53;
-			#endif
+			v3.m_i[i] += (intPart.m_i[i] << 24);
 		}
 		ndBrainVector4 v4(v2 - v1);
 		ndBrainVector4 num(v3 + v4);
 		ndBrainVector4 den(v3 - v4);
 		return num.Divide(den);
 	};
-#endif
 
 	const ndInt32 count = input.GetCount() / 4;
 	ndBrainVector4* const vectorOutput = (ndBrainVector4*)&output[0];
@@ -256,4 +191,3 @@ void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& 
 
 	output.FlushToZero();
 }
-#endif
