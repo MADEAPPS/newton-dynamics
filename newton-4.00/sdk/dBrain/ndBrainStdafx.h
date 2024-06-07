@@ -31,7 +31,7 @@
 #endif
 
 typedef ndReal ndBrainFloat;
-typedef ndVector ndBrainVector4;
+
 
 #endif 
 

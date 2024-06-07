@@ -25,6 +25,8 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
+typedef ndVector ndBrainVector4;
+
 class ndBrainLayerTanhActivation : public ndBrainLayerActivation
 {
 	public:
