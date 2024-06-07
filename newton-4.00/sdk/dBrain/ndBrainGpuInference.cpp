@@ -161,5 +161,10 @@ void ndBrainGpuInference::BuildDisplayList(const ndBrainMatrix& input)
 {
 	ndBrainGpuCommand* const comand = new ndBrainLoadInputData(this, input);
 	m_displayList.PushBack(comand);
+
+
+	m_context->SubmitQueue(&m_displayList[0], m_displayList.GetCount());
+	ndBrainVector xxxxx;
+	((ndBrainGpuFloatBuffer*)m_workingBuffer.m_buffer)->UnloadData(xxxxx);
 }
 #endif
