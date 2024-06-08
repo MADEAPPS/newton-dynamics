@@ -55,7 +55,7 @@ class ndBrainGpuInference : public ndClassAlloc
 	ndBrainLayer::ndBufferOffsetPair m_inputBuffer;
 	ndBrainLayer::ndBufferOffsetPair m_workingBuffer;
 
-	ndArray<ndBrainGpuCommand*> m_displayList;
+	ndList<ndSharedPtr<ndBrainGpuCommand>> m_displayList;
 	ndInt32 m_inputBatchSize;
 
 	ndBrainVector m_parameters_____;

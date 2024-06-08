@@ -71,10 +71,10 @@ ndBrainGpuInference::ndBrainGpuInference(ndBrainGpuContext* const context, ndBra
 
 ndBrainGpuInference::~ndBrainGpuInference()
 {
-	for (ndInt32 i = m_displayList.GetCount() - 1; i >= 0; --i)
-	{
-		delete m_displayList[i];
-	}
+	//for (ndInt32 i = m_displayList.GetCount() - 1; i >= 0; --i)
+	//{
+	//	delete m_displayList[i];
+	//}
 }
 
 void ndBrainGpuInference::SetParameterVector()
@@ -154,20 +154,25 @@ void ndBrainGpuInference::BuildDisplayList(const ndBrainMatrix& input)
 	buffers.PushBack(&m_paramBuffer);
 	buffers.PushBack(&m_workingBuffer);
 
-	ndBrainGpuCommand* const comand = new ndBrainLoadInputData(this, input);
-	m_displayList.PushBack(comand);
-
+	ndList<ndSharedPtr<ndBrainGpuCommand>> reusableList;
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
 	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
 	{
 		ndBrainLayer* const layer = layers[i];
-		ndBrainGpuCommand* const layerComand = layer->AssemblyGPUCommand(m_context, i, m_inputBatchSize, buffers);
-		m_displayList.PushBack(layerComand);
+		reusableList.Append(layer->AssemblyGPUCommand(m_context, i, m_inputBatchSize, buffers));
 		break;
 	}
 
+	for (ndInt32 i = 0; i < 1; ++i)
+	{
+		m_displayList.Append(new ndBrainLoadInputData(this, input));
+		for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = reusableList.GetFirst(); node; node = node->GetNext())
+		{
+			m_displayList.Append(node->GetInfo());
+		}
+	}
 
-	m_context->SubmitQueue(&m_displayList[0], m_displayList.GetCount());
+	m_context->SubmitQueue(m_displayList);
 
 	ndBrainVector xxxxx;
 	m_workingBuffer.m_buffer->UnloadData(xxxxx);

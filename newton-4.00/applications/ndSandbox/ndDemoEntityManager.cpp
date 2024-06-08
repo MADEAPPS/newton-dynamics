@@ -244,55 +244,6 @@ void Test1__()
 	//}
 }
 
-void TestVulkanStuff()
-{
-	ndBrainGpuContext context;
-
-	ndBrainVector input;
-	for (ndInt32 i = 0; i < 100; ++i)
-	{
-		input.PushBack(ndBrainFloat(i * 2));
-	}
-
-	ndBrainGpuFloatBuffer buffer1(&context, input.GetCount());
-	ndBrainGpuFloatBuffer buffer0(&context, input.GetCount());
-	buffer0.LoadData(input);
-
-	struct ParamData
-	{
-		ndInt32 m_inputSize;
-		ndReal m_scale;
-	};
-	ParamData param;
-	param.m_inputSize = 10;
-	param.m_scale = 2.0f;
-
-	ndBrainGpuUniformBuffer uniformBuffer(&context, sizeof(ParamData), &param);
-	ndBrainGpuCommandTest0 command0(&context, uniformBuffer, buffer0, buffer1);
-#if 1
-	ndBrainGpuCommand* xxxxx[1];
-	xxxxx[0] = &command0;
-	context.SubmitQueue(xxxxx, 1);
-
-	//input.SetCount(0);
-	//for (ndInt32 i = 0; i < 100; ++i)
-	//{
-	//	input.PushBack(ndBrainFloat(i));
-	//}
-	//buffer0.LoadData(input);
-	//context.SubmitQueue(xxxxx, 1);
-#else
-	//ndBrainGpuCommandTest1 command1(&context, buffer);
-	ndBrainGpuCommand* xxxxx[2];
-	xxxxx[0] = &command0;
-	xxxxx[1] = &command1;
-	context.SubmitQueue(xxxxx, 2);
-#endif
-
-	ndBrainVector output;
-	buffer1.UnloadData(output);
-}
-
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 ndDemoEntityManager::ndDemoEntityManager()
@@ -522,7 +473,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	//TestVulkanStuff();
 	ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();

@@ -237,7 +237,10 @@ void ndArray<T>::Resize(ndInt32 newSize)
 		T* const newArray = (T*)ndMemory::Malloc(size_t(sizeof(T) * newSize));
 		if (m_array) 
 		{
-			CopyData(newArray, m_array, m_size);
+			if (m_size)
+			{
+				CopyData(newArray, m_array, m_size);
+			}
 			ndMemory::Free(m_array);
 		}
 		m_array = newArray;

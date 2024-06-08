@@ -473,21 +473,20 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	ndMemSet(m_modules, clean, sizeof(m_modules) / sizeof(m_modules[0]));
 	m_ndBrainCopyInput = LoadShaderProgram("ndBrainCopyInput-comp.spv");
 	m_ndBrainLayerLinear = LoadShaderProgram("ndBrainLayerLinear-comp.spv");
-	m_computeShaderModule0 = LoadShaderProgram("testShader0-comp.spv");
-	m_computeShaderModule1 = LoadShaderProgram("testShader1-comp.spv");
 }
 
-void ndBrainGpuContext::SubmitQueue(ndBrainGpuCommand** commands, ndInt32 commandCount)
+void ndBrainGpuContext::SubmitQueue(ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList)
 {
 	m_displayList.SetCount(0);
-	for (ndInt32 i = 0; i < commandCount; ++i)
+	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = displayList.GetFirst(); node; node = node->GetNext())
 	{
-		m_displayList.PushBack(commands[i]->m_commandBuffer);
+		ndBrainGpuCommand* command = *node->GetInfo();
+		m_displayList.PushBack(command->m_commandBuffer);
 	}
 
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = uint32_t(commandCount);
+	submitInfo.commandBufferCount = uint32_t(m_displayList.GetCount());
 	submitInfo.pCommandBuffers = &m_displayList[0];
 	CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(1), &submitInfo, m_fence));
 	CheckResultVulkan(vkWaitForFences(m_device, uint32_t(1), &m_fence, VK_TRUE, 100000000000));

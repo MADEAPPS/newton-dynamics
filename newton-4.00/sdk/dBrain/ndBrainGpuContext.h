@@ -21,7 +21,7 @@ class ndBrainGpuContext : public ndClassAlloc
 	public:
 	ndBrainGpuContext(){}
 	virtual ~ndBrainGpuContext(){}
-	void SubmitQueue(ndBrainGpuCommand**, ndInt32) {}
+	void SubmitQueue(ndList<ndSharedPtr<ndBrainGpuCommand>>&) {}
 	static bool HasGpuSupport(){return false;}
 };
 
@@ -40,7 +40,7 @@ class ndBrainGpuContext: public ndClassAlloc
 	VkAllocationCallbacks* GetAllocator() const;
 	VkPhysicalDevice GetPhysicalDevice() const;
 
-	void SubmitQueue(ndBrainGpuCommand** commands, ndInt32 commandCount);
+	void SubmitQueue(ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList);
 	static void CheckResultVulkan(VkResult err);
 
 	private:
@@ -87,8 +87,6 @@ class ndBrainGpuContext: public ndClassAlloc
 		{
 			VkShaderModule m_ndBrainCopyInput;
 			VkShaderModule m_ndBrainLayerLinear;
-			VkShaderModule m_computeShaderModule0;
-			VkShaderModule m_computeShaderModule1;
 		};
 		VkShaderModule m_modules[128];
 	};
