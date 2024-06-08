@@ -22,8 +22,23 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
+#include "ndBrainGpuBuffer.h"
 
 class ndBrainGpuContext;
+
+ndBrainLayer::ndBufferOffsetPair::ndBufferOffsetPair() 
+	:m_buffer(nullptr)
+	,m_offsets()
+{
+}
+
+ndBrainLayer::ndBufferOffsetPair::~ndBufferOffsetPair()
+{
+	if (m_buffer)
+	{
+		delete m_buffer;
+	}
+}
 
 ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
 	:ndClassAlloc(src)
@@ -167,7 +182,7 @@ void ndBrainLayer::CalculateParamGradients(const ndBrainVector&, const ndBrainVe
 	ndAssert(0);
 }
 
-ndBrainGpuCommand* ndBrainLayer::AssemblyGPUCommand(ndBrainGpuContext* const, ndInt32, ndInt32, ndBufferOffsetPair**)
+ndBrainGpuCommand* ndBrainLayer::AssemblyGPUCommand(ndBrainGpuContext* const, ndInt32, ndInt32, ndFixSizeArray<ndBufferOffsetPair*, 8>&)
 {
 	ndAssert(0);
 	return nullptr;

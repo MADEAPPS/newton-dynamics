@@ -294,33 +294,3 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, 
 	ndAssert(in.GetCount() == output.GetCount());
 	output.Set(in);
 }
-
-void ndBrain::MakePrediction____xxxxx(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer)
-{
-	const ndArray<ndBrainLayer*>& layers = *this;
-	ndInt32 maxSize = layers[0]->GetInputSize();
-	for (ndInt32 i = 0; i < GetCount(); ++i)
-	{
-		maxSize = ndMax(maxSize, layers[i]->GetOutputBufferSize());
-	}
-
-	const ndInt32 maxMemory = CalculateWorkingBufferSize();
-	if (maxMemory > workingBuffer.GetCapacity())
-	{
-		workingBuffer.SetCount(maxMemory);
-	}
-	workingBuffer.SetCount(maxMemory);
-
-	ndBrainMemVector in(&workingBuffer[0], input.GetCount());
-	ndBrainMemVector out(&workingBuffer[maxSize + 128], input.GetCount());
-
-	in.Set(input);
-	for (ndInt32 i = 0; i < 1; ++i)
-	{
-		out.SetSize(layers[i]->GetOutputSize());
-		layers[i]->MakePrediction(in, out);
-		in.Swap(out);
-	}
-	output.SetCount(in.GetCount());
-	output.Set(in);
-}

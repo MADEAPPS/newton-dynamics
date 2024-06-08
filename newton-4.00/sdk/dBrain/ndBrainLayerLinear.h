@@ -72,7 +72,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
 	virtual void GetNumberOfParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const;
-	virtual ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 paramsCount, ndBufferOffsetPair** params);
+	virtual ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params);
 
 	ndBrainVector m_bias;
 	ndBrainMatrix m_weights;

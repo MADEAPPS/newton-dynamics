@@ -38,8 +38,8 @@ class ndBrainLayer : public ndClassAlloc
 	class ndBufferOffsetPair
 	{
 		public:
-		ndBufferOffsetPair() :m_buffer(nullptr), m_offsets() {}
-		~ndBufferOffsetPair() {}
+		ndBufferOffsetPair();
+		~ndBufferOffsetPair();
 
 		ndBrainGpuFloatBuffer* m_buffer;
 		ndArray<ndInt32> m_offsets;
@@ -83,7 +83,7 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 	virtual void GetNumberOfParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const;
-	virtual ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 paramsCount, ndBufferOffsetPair**  params);
+	virtual ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params);
 };
 
 #endif 

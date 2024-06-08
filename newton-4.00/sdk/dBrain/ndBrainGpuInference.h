@@ -51,21 +51,14 @@ class ndBrainGpuInference : public ndClassAlloc
 	ndBrain* m_brain;
 	ndBrainGpuContext* m_context;
 
+	ndBrainLayer::ndBufferOffsetPair m_paramBuffer;
 	ndBrainLayer::ndBufferOffsetPair m_inputBuffer;
 	ndBrainLayer::ndBufferOffsetPair m_workingBuffer;
 
 	ndArray<ndBrainGpuCommand*> m_displayList;
-	
-	//ndBrainGpuFloatBuffer* m_input;
-	//ndBrainGpuFloatBuffer* m_gpuParameters;
-	//ndBrainGpuFloatBuffer* m_gpuWorkingBuffer;
-	//ndBrainGpuIntegerBuffer* m_gpuParametersOffsets;
-	//
-	//ndArray<ndInt32> m_workingBufferOffsets____;
-	//ndBrainVector m_parameters;
-	//ndArray<ndInt32> m_offsets____;
-
 	ndInt32 m_inputBatchSize;
+
+	ndBrainVector m_parameters_____;
 };
 
 
