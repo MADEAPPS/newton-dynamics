@@ -1,0 +1,37 @@
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+#version 450
+
+#define WORKGROUP_SIZE 128
+layout (local_size_x = WORKGROUP_SIZE) in;
+
+layout(std140, binding = 0) uniform UniformBufferObject 
+{
+    int m_inputSize;
+    int m_inputStart;
+    int m_outputStart;
+    int m_workBufferSize;
+};
+
+layout(std430, binding = 1) buffer outputBuffer
+{
+    float m_workingBuffer[];
+};
+
+void main() 
+{
+    uint batchOffset = gl_WorkGroupID.x * m_workBufferSize;
+    for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
+    {
+        float value = m_workingBuffer[batchOffset + m_inputStart + index];
+        m_workingBuffer[batchOffset + m_outputStart + index] = (value > 0.0) ? value : 0.0;
+    }
+}

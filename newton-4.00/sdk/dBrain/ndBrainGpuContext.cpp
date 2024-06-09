@@ -473,6 +473,8 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	ndMemSet(m_modules, clean, sizeof(m_modules) / sizeof(m_modules[0]));
 	m_ndBrainCopyInput = LoadShaderProgram("ndBrainCopyInput-comp.spv");
 	m_ndBrainLayerLinear = LoadShaderProgram("ndBrainLayerLinear-comp.spv");
+	m_ndBrainLayerRluActivation = LoadShaderProgram("ndBrainLayerRluActivation-comp.spv");
+	m_ndBrainLayerSoftmaxActivation = LoadShaderProgram("ndBrainLayerSoftmaxActivation-comp.spv");
 }
 
 void ndBrainGpuContext::SubmitQueue(ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList)

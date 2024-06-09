@@ -151,7 +151,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	output.SetCount((*testLabels)[0].GetCount());
 
 	ndBrainGpuContext gpuContext;
-	ndBrainGpuInference inference(&gpuContext, &brain, *testDigits, 2);
+	ndBrainGpuInference inference(&gpuContext, &brain, *testDigits, 32);
 
 	ndInt32 failCount = 0;
 	ndBrainVector workingBuffer;

@@ -87,6 +87,8 @@ class ndBrainGpuContext: public ndClassAlloc
 		{
 			VkShaderModule m_ndBrainCopyInput;
 			VkShaderModule m_ndBrainLayerLinear;
+			VkShaderModule m_ndBrainLayerRluActivation;
+			VkShaderModule m_ndBrainLayerSoftmaxActivation;
 		};
 		VkShaderModule m_modules[128];
 	};

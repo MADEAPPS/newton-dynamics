@@ -160,7 +160,6 @@ void ndBrainGpuInference::BuildDisplayList(const ndBrainMatrix& input)
 	{
 		ndBrainLayer* const layer = layers[i];
 		reusableList.Append(layer->AssemblyGPUCommand(m_context, i, m_inputBatchSize, buffers));
-		break;
 	}
 
 	for (ndInt32 i = 0; i < 1; ++i)

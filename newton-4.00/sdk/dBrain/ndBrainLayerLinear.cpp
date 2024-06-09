@@ -323,7 +323,7 @@ void ndBrainLayerLinear::CalculateParamGradients(
 
 ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
 {
-	class ndBrainLayerLinearndBrainGpuCommand : public ndBrainGpuCommand
+	class ndBrainLayerLinearCommand : public ndBrainGpuCommand
 	{
 		public:
 		struct UniformBufferObject
@@ -340,7 +340,7 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 			ndInt32 m_paramWeightBlockSize;
 		};
 
-		ndBrainLayerLinearndBrainGpuCommand(
+		ndBrainLayerLinearCommand(
 			const ndBrainLayerLinear* const layer, ndBrainGpuContext* const context, 
 			ndInt32 layerIndex, ndInt32 batchCount, 
 			const ndBufferOffsetPair& parameterBuffer,	const ndBufferOffsetPair& workingBuffer)
@@ -364,13 +364,12 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 
 			m_parammeters.LoadData(sizeof(uniformParam), &uniformParam);
 
-
 			ndInt32 outputSize = layer->GetOutputSize();
-			ndBrainGpuBuffer* params[3];
-			params[0] = &m_parammeters;
-			params[1] = parameterBuffer.m_buffer;
-			params[2] = workingBuffer.m_buffer;
-			Assembly(context->m_ndBrainLayerLinear, batchCount * outputSize, 3, params);
+			ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
+			params.PushBack(&m_parammeters);
+			params.PushBack(parameterBuffer.m_buffer);
+			params.PushBack(workingBuffer.m_buffer);
+			Assembly(context->m_ndBrainLayerLinear, batchCount * outputSize, params.GetCount(), &params[0]);
 		}
 
 		ndBrainGpuUniformBuffer m_parammeters;
@@ -379,5 +378,5 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 	ndAssert(params.GetCount() == 2);
 	const ndBufferOffsetPair& parameterBuffer = *params[0];
 	const ndBufferOffsetPair& workingBuffer = *params[1];
-	return new ndBrainLayerLinearndBrainGpuCommand(this, context, layerIndex, batchCount, parameterBuffer, workingBuffer);
+	return new ndBrainLayerLinearCommand(this, context, layerIndex, batchCount, parameterBuffer, workingBuffer);
 }
