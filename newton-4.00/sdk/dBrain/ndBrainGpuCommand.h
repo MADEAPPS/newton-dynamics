@@ -23,7 +23,7 @@ class ndBrainGpuCommand : public ndClassAlloc
 	public:
 	ndBrainGpuCommand(ndBrainGpuContext* const context):m_context(context){}
 	virtual ~ndBrainGpuCommand(){}
-	void Assembly(void*, ndInt32, ndBrainGpuBuffer**) {}
+	void Assembly(void*, ndInt32, ndInt32, ndBrainGpuBuffer**) {}
 
 	protected:
 	ndBrainGpuContext* m_context;

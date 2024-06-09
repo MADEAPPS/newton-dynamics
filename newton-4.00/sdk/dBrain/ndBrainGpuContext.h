@@ -19,10 +19,27 @@ class ndBrainGpuFloatBuffer;
 class ndBrainGpuContext : public ndClassAlloc
 {
 	public:
-	ndBrainGpuContext(){}
+	ndBrainGpuContext() 
+		:ndClassAlloc() 
+	{ 
+		ndMemSet(m_modules, (void*)nullptr, sizeof(m_modules) / sizeof(m_modules[0]));
+	}
 	virtual ~ndBrainGpuContext(){}
 	void SubmitQueue(ndList<ndSharedPtr<ndBrainGpuCommand>>&) {}
 	static bool HasGpuSupport(){return false;}
+
+	union
+	{
+		struct
+		{
+			void* m_ndBrainCopyInput;
+			void* m_ndBrainLayerLinear;
+			void* m_ndBrainLayerRluActivation;
+			void* m_ndBrainLayerSoftmaxActivation;
+		};
+		void* m_modules[128];
+	};
+
 };
 
 #else
