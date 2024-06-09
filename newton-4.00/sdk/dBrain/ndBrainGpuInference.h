@@ -35,24 +35,28 @@ class ndBrainGpuInference : public ndClassAlloc
 class ndBrainGpuInference : public ndClassAlloc
 {
 	class ndBrainLoadInputData;
+	class ndBrainGetResultData;
 
 	public:
 
 	ndBrainGpuInference(ndBrainGpuContext* const context, ndBrain* const brain, const ndBrainMatrix& testDigits, ndInt32 inputBatchSize);
 	virtual ~ndBrainGpuInference();
+
+	void GetResults(ndBrainVector& results);
+	ndList<ndSharedPtr<ndBrainGpuCommand>>& GetDisplayList();
 	
 	protected:
 	void SetWorkingBuffer();
 	void SetParameterVector();
-	void SetInputBuffer(const ndBrainMatrix& input);
-
 	void BuildDisplayList(const ndBrainMatrix& input);
+	void SetInputAndOutputBuffers(const ndBrainMatrix& input);
 
 	ndBrain* m_brain;
 	ndBrainGpuContext* m_context;
 
 	ndBrainLayer::ndBufferOffsetPair m_paramBuffer;
 	ndBrainLayer::ndBufferOffsetPair m_inputBuffer;
+	ndBrainLayer::ndBufferOffsetPair m_outputBuffer;
 	ndBrainLayer::ndBufferOffsetPair m_workingBuffer;
 
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_displayList;

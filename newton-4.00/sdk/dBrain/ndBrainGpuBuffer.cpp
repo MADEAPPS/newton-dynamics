@@ -121,12 +121,12 @@ ndInt32 ndBrainGpuBuffer::SizeInBytes() const
 //
 //*************************************************************************************
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt32 size)
-	:ndBrainGpuBuffer(context, size* ndInt32(sizeof(ndReal)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
+	:ndBrainGpuBuffer(context, size * ndInt32(sizeof(ndReal)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
 {
 }
 
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input)
-	:ndBrainGpuBuffer(context, input.GetCount()* ndInt32(sizeof(ndReal)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
+	:ndBrainGpuBuffer(context, input.GetCount() * ndInt32(sizeof(ndReal)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
 {
 	LoadData(input);
 }

@@ -472,6 +472,7 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	VkShaderModule clean (VK_NULL_HANDLE);
 	ndMemSet(m_modules, clean, sizeof(m_modules) / sizeof(m_modules[0]));
 	m_ndBrainCopyInput = LoadShaderProgram("ndBrainCopyInput-comp.spv");
+	m_ndBrainGetResults = LoadShaderProgram("ndBrainGetResults-comp.spv");
 	m_ndBrainLayerLinear = LoadShaderProgram("ndBrainLayerLinear-comp.spv");
 	m_ndBrainLayerRluActivation = LoadShaderProgram("ndBrainLayerRluActivation-comp.spv");
 	m_ndBrainLayerSoftmaxActivation = LoadShaderProgram("ndBrainLayerSoftmaxActivation-comp.spv");
@@ -491,6 +492,10 @@ void ndBrainGpuContext::SubmitQueue(ndList<ndSharedPtr<ndBrainGpuCommand>>& disp
 	submitInfo.commandBufferCount = uint32_t(m_displayList.GetCount());
 	submitInfo.pCommandBuffers = &m_displayList[0];
 	CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(1), &submitInfo, m_fence));
+}
+
+void ndBrainGpuContext::Sync()
+{
 	CheckResultVulkan(vkWaitForFences(m_device, uint32_t(1), &m_fence, VK_TRUE, 100000000000));
 }
 
