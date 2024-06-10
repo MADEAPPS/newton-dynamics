@@ -354,7 +354,8 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 			if (context->GetSubGroupSize())
 			for (ndInt32 i = context->GetSubGroupSize() >> 1; i; i >>= 1)
 			{
-				subGroupBits++;
+				// sungrup is not right still
+				//subGroupBits++;
 			}
 
 			uniformParam.m_inputSize = layer->GetInputSize();

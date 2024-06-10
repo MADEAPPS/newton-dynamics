@@ -175,35 +175,42 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 		const ndBrainVector& input = (*testDigits)[i];
 		brain.MakePrediction(input, output, workingBuffer);
 	
-		const ndBrainMemVector gpuOutput(&outputBuffer[i * output.GetCount()], output.GetCount());
+		const ndBrainMemVector outputGpu(&outputBuffer[i * output.GetCount()], output.GetCount());
 		const ndBrainVector& truth = (*testLabels)[i];
 	
-		//ndInt32 index = -1;
-		//ndBrainFloat maxProbability = -1.0f;
-		//for (ndInt32 j = 0; j < output.GetCount(); j++)
-		//{
-		//	if (output[j] > maxProbability)
-		//	{
-		//		index = j;
-		//		maxProbability = output[j];
-		//	}
-		//}
-		//
-		//ndAssert(index >= 0);
-		//if (truth[index] == ndReal(0.0f))
-		//{
-		//	failCount++;
-		//}
+		ndInt32 index = -1;
+		ndInt32 indexGpu = -1;
+		ndBrainFloat maxProbability = -1.0f;
+		ndBrainFloat maxProbabilityGpu = -1.0f;
+		for (ndInt32 j = 0; j < output.GetCount(); j++)
+		{
+			if (output[j] > maxProbability)
+			{
+				index = j;
+				maxProbability = output[j];
+			}
+			if (outputGpu[j] > maxProbabilityGpu)
+			{
+				indexGpu = j;
+				maxProbabilityGpu = outputGpu[j];
+			}
+		}
+		ndAssert(indexGpu == index);
+
+		ndAssert(index >= 0);
+		if (truth[index] == ndReal(0.0f))
+		{
+			failCount++;
+		}
 	}
 
 	cpuTime = ndGetTimeInMicroseconds() - cpuTime;
 	ndExpandTraceMessage("cpuTime %f (sec)\n", ndFloat64(cpuTime) / 1000000.0f);
 
-	cpuTime = 0;
-	//ndExpandTraceMessage("%s\n", title);
-	//ndExpandTraceMessage("num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());
-	//ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testDigits->GetCount());
-	//ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
+	ndExpandTraceMessage("%s\n", title);
+	ndExpandTraceMessage("num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());
+	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testDigits->GetCount());
+	ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
 }
 
 //#pragma optimize( "", off )
