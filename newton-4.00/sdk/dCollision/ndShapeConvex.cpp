@@ -506,7 +506,7 @@ ndInt32 ndShapeConvex::RectifyConvexSlice(ndInt32 count, const ndVector& normal,
 	return count;
 }
 
-ndVector ndShapeConvex::SupportFeatureVertex(const ndVector& dir, ndInt32* const vertexIndex) const
+ndVector ndShapeConvex::SupportFeatureVertex(const ndVector&, ndInt32* const) const
 {
 	ndAssert(0);
 	return ndVector::m_zero;
