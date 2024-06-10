@@ -74,7 +74,6 @@ void ndBrainGpuCommand::Assembly(VkShaderModule shader, ndInt32 workGroups, ndIn
 	descriptorSetAllocateInfo.descriptorSetCount = 1;
 	descriptorSetAllocateInfo.pSetLayouts = &m_descriptorSetLayout;
 	m_context->CheckResultVulkan(vkAllocateDescriptorSets(device, &descriptorSetAllocateInfo, &m_descriptorSet));
-	
 
 	ndFixSizeArray<VkWriteDescriptorSet, 32> descriptorSet;
 	ndFixSizeArray<VkDescriptorBufferInfo, 32> bufferInfo;

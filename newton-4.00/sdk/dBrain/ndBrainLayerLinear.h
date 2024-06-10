@@ -71,7 +71,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 	void InitGaussianWeights(ndBrainFloat variance);
 	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
-	virtual void GetNumberOfParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const;
+	virtual void GetNumberOfGPUParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const;
 	virtual ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params);
 
 	ndBrainVector m_bias;

@@ -65,7 +65,7 @@ ndInt32 ndBrainLayer::GetNumberOfParameters() const
 	return 0;
 }
 
-void ndBrainLayer::GetNumberOfParameters(ndBrainVector&, ndArray<ndInt32>&) const
+void ndBrainLayer::GetNumberOfGPUParameters(ndBrainVector&, ndArray<ndInt32>&) const
 {
 	ndAssert(0);
 }

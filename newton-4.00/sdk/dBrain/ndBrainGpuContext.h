@@ -114,6 +114,7 @@ class ndBrainGpuContext: public ndClassAlloc
 			VkShaderModule m_ndBrainGetResults;
 			VkShaderModule m_ndBrainLayerLinear;
 			VkShaderModule m_ndBrainLayerLinearSubGroup;
+			VkShaderModule m_ndBrainLayerLinearTranspose;
 			VkShaderModule m_ndBrainLayerRluActivation;
 			VkShaderModule m_ndBrainLayerSoftmaxActivation;
 			VkShaderModule m_ndBrainLayerSoftmaxActivationSubGroup;

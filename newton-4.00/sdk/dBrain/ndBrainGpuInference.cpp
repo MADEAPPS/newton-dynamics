@@ -127,7 +127,7 @@ void ndBrainGpuInference::SetParameterVector()
 	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
 	{
 		const ndBrainLayer* const layer = layers[i];
-		layer->GetNumberOfParameters(parameters, m_paramBuffer.m_offsets);
+		layer->GetNumberOfGPUParameters(parameters, m_paramBuffer.m_offsets);
 	}
 	
 	ndInt32 sum = 0;
