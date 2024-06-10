@@ -380,8 +380,12 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 			params.PushBack(parameterBuffer.m_buffer);
 			params.PushBack(workingBuffer.m_buffer);
 
+			#if defined (D_USE_VULKAN_SDK)
 			VkShaderModule module = subGroupBits ? context->m_ndBrainLayerLinearSubGroup : context->m_ndBrainLayerLinear;
 			Assembly(module, batchCount * outputSize, params.GetCount(), &params[0]);
+			#else
+			Assembly(context->m_ndBrainLayerLinear, batchCount * outputSize, params.GetCount(), &params[0]);
+			#endif
 		}
 
 		ndBrainGpuUniformBuffer m_parammeters;

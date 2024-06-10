@@ -26,9 +26,10 @@ class ndBrainGpuContext : public ndClassAlloc
 	}
 	virtual ~ndBrainGpuContext(){}
 
-	void Sync();
+	void Sync() {}
 	void SubmitQueue(ndList<ndSharedPtr<ndBrainGpuCommand>>&) {}
-	static bool HasGpuSupport(){return false;}
+	ndInt32 GetSubGroupSize() const { return 0; }
+	static bool HasGpuSupport() { return false; }
 
 	union
 	{
@@ -115,6 +116,7 @@ class ndBrainGpuContext: public ndClassAlloc
 			VkShaderModule m_ndBrainLayerLinearSubGroup;
 			VkShaderModule m_ndBrainLayerRluActivation;
 			VkShaderModule m_ndBrainLayerSoftmaxActivation;
+			VkShaderModule m_ndBrainLayerSoftmaxActivationSubGroup;
 		};
 		VkShaderModule m_modules[128];
 	};

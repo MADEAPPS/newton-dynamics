@@ -28,6 +28,11 @@ class ndBrainGpuInference : public ndClassAlloc
 	public:
 	ndBrainGpuInference(ndBrainGpuContext* const, ndBrain* const, const ndBrainMatrix&, ndInt32) {}
 	virtual ~ndBrainGpuInference() {}
+
+	void GetResults(ndBrainVector&) {};
+	ndList<ndSharedPtr<ndBrainGpuCommand>>& GetDisplayList() {return m_displayList;}
+
+	ndList<ndSharedPtr<ndBrainGpuCommand>> m_displayList;
 };
 
 #else

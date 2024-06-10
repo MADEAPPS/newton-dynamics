@@ -1,0 +1,96 @@
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+#version 450
+
+#define WORKGROUP_SIZE      128
+#define TEMP_BUFFER_SIZE    1024
+
+layout (local_size_x = WORKGROUP_SIZE) in;
+
+layout(std140, binding = 0) uniform UniformBufferObject 
+{
+    int m_inputSize;
+    int m_inputStart;
+    int m_outputStart;
+    int m_workBufferSize;
+};
+
+layout(std430, binding = 1) buffer outputBuffer
+{
+    float m_workingBuffer[];
+};
+
+shared float tmpBuffer [TEMP_BUFFER_SIZE];
+shared float reductionBuffer [WORKGROUP_SIZE];
+
+void main() 
+{
+    uint batchOffset = gl_WorkGroupID.x * m_workBufferSize;
+
+    float maximunValue = 0.0; 
+    for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
+    {
+        float value = m_workingBuffer[batchOffset + m_inputStart + index];
+        maximunValue = (value > maximunValue) ? value : maximunValue; 
+    }
+
+    reductionBuffer[gl_LocalInvocationID.x] = maximunValue;
+    memoryBarrierShared(); 
+    barrier();
+    
+    for (uint i = WORKGROUP_SIZE / 2; i != 0; i = i >> 1)
+    {
+        if (gl_LocalInvocationID.x < i)
+        {
+            float a = reductionBuffer[gl_LocalInvocationID.x];
+            float b = reductionBuffer[gl_LocalInvocationID.x + i];
+            reductionBuffer[gl_LocalInvocationID.x] = (a > b) ? a : b;
+        }
+        memoryBarrierShared();
+        barrier();
+    }
+
+    maximunValue = reductionBuffer[0];
+
+    uint base = m_inputSize / WORKGROUP_SIZE;
+    tmpBuffer[base * WORKGROUP_SIZE + gl_LocalInvocationID.x] = 0.0f;
+
+    float sum = 0.0; 
+    for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
+    {
+        float a = m_workingBuffer[batchOffset + m_inputStart + index] - maximunValue;
+        float b = -30.0;
+        float value = (a > b) ? a : b;
+        float prob = exp(value);
+        tmpBuffer[index] = prob;
+        sum += prob;
+    }
+
+    reductionBuffer[gl_LocalInvocationID.x] = sum;
+    memoryBarrierShared(); 
+    barrier();
+    
+    for (uint i = WORKGROUP_SIZE / 2; i != 0; i = i >> 1)
+    {
+        if (gl_LocalInvocationID.x < i)
+        {
+            reductionBuffer[gl_LocalInvocationID.x] += reductionBuffer[i + gl_LocalInvocationID.x];
+        }
+        memoryBarrierShared();
+        barrier();
+    }
+
+    float scale = 1.0 / reductionBuffer[0];
+    for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
+    {
+        m_workingBuffer[batchOffset + m_outputStart + index] = tmpBuffer[index] * scale;
+    }
+}
