@@ -52,5 +52,11 @@ class ndBrainGpuCommand : public ndClassAlloc
 
 #endif
 
-
+class ndBrainGpuCommandTest : public ndBrainGpuCommand
+{
+	public:
+	ndBrainGpuCommandTest(ndBrainGpuContext* const context,
+		ndBrainGpuUniformBuffer& parammeters,
+		ndBrainGpuFloatBuffer& input, ndBrainGpuFloatBuffer& output);
+};
 #endif

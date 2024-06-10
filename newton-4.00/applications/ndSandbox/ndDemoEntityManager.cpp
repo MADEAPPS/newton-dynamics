@@ -244,6 +244,40 @@ void Test1__()
 	//}
 }
 
+void TestVulkanStuff()
+{
+	ndBrainGpuContext context;
+
+	ndBrainVector input;
+	input.SetCount(500);
+	input.Set(0.0f);
+	for (ndInt32 i = 0; i < 120; ++i)
+	{
+		input[i] = ndBrainFloat(i);
+	}
+
+	ndBrainGpuFloatBuffer buffer1(&context, input.GetCount());
+	ndBrainGpuFloatBuffer buffer0(&context, input.GetCount());
+	buffer0.LoadData(input);
+
+	struct ParamData
+	{
+		ndInt32 m_inputSize;
+	};
+	ParamData param;
+	param.m_inputSize = 250;
+
+	ndBrainGpuUniformBuffer uniformBuffer(&context, sizeof(ParamData), &param);
+	ndList<ndSharedPtr<ndBrainGpuCommand>> displayList;
+	displayList.Append(new ndBrainGpuCommandTest (&context, uniformBuffer, buffer0, buffer1));
+
+	context.SubmitQueue(displayList);
+	context.Sync();
+
+	ndBrainVector output;
+	buffer1.UnloadData(output);
+}
+
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 ndDemoEntityManager::ndDemoEntityManager()
@@ -473,6 +507,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
+	TestVulkanStuff();
 	ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();

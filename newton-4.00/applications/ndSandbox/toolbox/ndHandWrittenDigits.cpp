@@ -164,11 +164,11 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 
 	ndBrainVector outputBuffer;
 	inference.GetResults(outputBuffer);
-	for (ndInt32 i = 0; i < batchSize; ++i)
-	{
-		const ndBrainMemVector src0(&outputBuffer[i * output.GetCount()], output.GetCount());
-		const ndBrainMemVector src1(&outputBuffer[i * output.GetCount()], output.GetCount());
-	}
+	//for (ndInt32 i = 0; i < batchSize; ++i)
+	//{
+	//	const ndBrainMemVector src0(&outputBuffer[i * output.GetCount()], output.GetCount());
+	//	const ndBrainMemVector src1(&outputBuffer[i * output.GetCount()], output.GetCount());
+	//}
 
 	ndInt32 failCount = 0;
 	ndBrainVector workingBuffer;
@@ -181,6 +181,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 		const ndBrainVector& input = (*testDigits)[i];
 		brain.MakePrediction(input, output, workingBuffer);
 	
+		const ndBrainMemVector gpuOutput(&outputBuffer[i * output.GetCount()], output.GetCount());
 		const ndBrainVector& truth = (*testLabels)[i];
 	
 		//ndInt32 index = -1;

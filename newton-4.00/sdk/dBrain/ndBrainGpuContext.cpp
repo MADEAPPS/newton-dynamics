@@ -39,6 +39,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 	,m_descriptorPool(VK_NULL_HANDLE)
 	,m_physicalDevice(VK_NULL_HANDLE)
 	,m_debugMessenger(VK_NULL_HANDLE)
+	,m_subGroupSize(0)
 	,m_queueFamilyIndex(0xffffffff)
 	,m_hasValidationLayers(false)
 {
@@ -54,6 +55,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 	CreatePhysicalDevice();
 	SelectGraphicsQueue();
 	CreateLogicalDevice();
+	CheckSubGroupSupport();
 	CreateCommandPool();
 	CreateDescriptorPool();
 	CreateFence();
@@ -146,6 +148,11 @@ VkDevice ndBrainGpuContext::GetDevice() const
 	return m_device;
 }
 
+ndInt32 ndBrainGpuContext::GetSubGroupSize() const
+{
+	return m_subGroupSize;
+}
+
 VkAllocationCallbacks* ndBrainGpuContext::GetAllocator() const
 {
 	return m_allocator;
@@ -206,8 +213,8 @@ void ndBrainGpuContext::CreateInstance()
 	appInfo.pApplicationName = "newton 4 demos";
 	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 	appInfo.pEngineName = "newton dynamics 4";
-	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.apiVersion = VK_MAKE_VERSION(1, 0, 0);
+	appInfo.engineVersion = VK_MAKE_VERSION(1, 1, 0);
+	appInfo.apiVersion = VK_MAKE_VERSION(1, 1, 0);
 
 	VkInstanceCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -295,6 +302,20 @@ void ndBrainGpuContext::CreatePhysicalDevice()
 	m_physicalDevice = gpus[use_gpu];
 	vkGetPhysicalDeviceProperties(m_physicalDevice, &m_gpuProps);
 	ndTrace(("vulkan accelerator: %s\n", m_gpuProps.deviceName));
+}
+
+void ndBrainGpuContext::CheckSubGroupSupport()
+{
+	VkPhysicalDeviceSubgroupProperties subgroupProperties = {};
+	subgroupProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES; 
+	subgroupProperties.pNext = VK_NULL_HANDLE;
+
+	VkPhysicalDeviceProperties2 physicalDeviceProperties = {};
+	physicalDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+	physicalDeviceProperties.pNext = &subgroupProperties;
+
+	vkGetPhysicalDeviceProperties2(m_physicalDevice, &physicalDeviceProperties);
+	m_subGroupSize = ndInt32((subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_ARITHMETIC_BIT) ? subgroupProperties.subgroupSize : 0);
 }
 
 void ndBrainGpuContext::SelectGraphicsQueue()
@@ -471,10 +492,13 @@ void ndBrainGpuContext::LoadShaderPrograms()
 {
 	VkShaderModule clean (VK_NULL_HANDLE);
 	ndMemSet(m_modules, clean, sizeof(m_modules) / sizeof(m_modules[0]));
+
+	m_testShader = LoadShaderProgram("testShader-comp.spv");
 	m_ndBrainCopyInput = LoadShaderProgram("ndBrainCopyInput-comp.spv");
 	m_ndBrainGetResults = LoadShaderProgram("ndBrainGetResults-comp.spv");
 	m_ndBrainLayerLinear = LoadShaderProgram("ndBrainLayerLinear-comp.spv");
 	m_ndBrainLayerRluActivation = LoadShaderProgram("ndBrainLayerRluActivation-comp.spv");
+	m_ndBrainLayerLinearSubGroup = LoadShaderProgram("ndBrainLayerLinearSubGroup-comp.spv");
 	m_ndBrainLayerSoftmaxActivation = LoadShaderProgram("ndBrainLayerSoftmaxActivation-comp.spv");
 }
 

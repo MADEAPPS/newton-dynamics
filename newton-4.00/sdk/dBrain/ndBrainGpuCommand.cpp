@@ -128,3 +128,16 @@ void ndBrainGpuCommand::Assembly(VkShaderModule shader, ndInt32 workGroups, ndIn
 }
 #endif
 
+ndBrainGpuCommandTest::ndBrainGpuCommandTest(ndBrainGpuContext* const context,
+	ndBrainGpuUniformBuffer& parammeters,
+	ndBrainGpuFloatBuffer& input, ndBrainGpuFloatBuffer& output)
+	:ndBrainGpuCommand(context)
+{
+	ndBrainGpuBuffer* params[3];
+	params[0] = &parammeters;
+	params[1] = &input;
+	params[2] = &output;
+#if defined (D_USE_VULKAN_SDK)
+	Assembly(context->m_testShader, 1, 3, params);
+#endif
+};

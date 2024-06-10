@@ -9,6 +9,7 @@
 * freely
 */
 #version 450
+#extension GL_KHR_shader_subgroup_arithmetic : enable
 
 #define WORKGROUP_SIZE 128
 layout (local_size_x = WORKGROUP_SIZE) in;
@@ -25,6 +26,7 @@ layout(std140, binding = 0) uniform UniformBufferObject
     int m_paramBiasStart;
     int m_paramWeightStart;
     int m_paramWeightBlockSize;
+
     int m_subgroupsSizeBit;
 };
 
@@ -54,25 +56,32 @@ void main()
     {
         acc += m_networkParameters[m_paramStart + m_paramWeightStart + weightRowOffset + index] * m_workingBuffer[batchOffset + m_inputStart + index];
     }
-    
-    // do the a binary reduction
-    reductionBuffer[gl_LocalInvocationID.x] = acc;
+
+    acc = subgroupAdd(acc);
+    uint mask = gl_SubgroupSize - 1;
+    if (gl_LocalInvocationID.x < gl_SubgroupSize)
+    {
+        reductionBuffer[gl_LocalInvocationID.x] = 0.0f;
+    }
+
+    if ((gl_LocalInvocationID.x & mask) == 0)
+    {
+        uint index = (gl_LocalInvocationID.x >> m_subgroupsSizeBit);
+        if (index < gl_NumSubgroups)
+        {
+            reductionBuffer[index] = acc;
+        }
+    }
     memoryBarrierShared(); 
     barrier();
     
-    for (uint i = WORKGROUP_SIZE / 2; i != 0; i = i >> 1)
+    if (gl_LocalInvocationID.x < gl_SubgroupSize)
     {
-        if (gl_LocalInvocationID.x < i)
+        acc = subgroupAdd(reductionBuffer[gl_LocalInvocationID.x]);
+        if (gl_LocalInvocationID.x == 0)
         {
-            reductionBuffer[gl_LocalInvocationID.x] += reductionBuffer[i + gl_LocalInvocationID.x];
+            acc += m_networkParameters[m_paramStart + m_paramBiasStart + batchIndex];
+            m_workingBuffer[batchOffset + m_outputStart + batchIndex] = acc;
         }
-        memoryBarrierShared();
-        barrier();
-    }
-
-    if (gl_LocalInvocationID.x == 0)
-    {
-        acc = reductionBuffer[gl_LocalInvocationID.x] + m_networkParameters[m_paramStart + m_paramBiasStart + batchIndex];
-        m_workingBuffer[batchOffset + m_outputStart + batchIndex] = acc;
     }
 }

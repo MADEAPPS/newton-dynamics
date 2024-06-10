@@ -338,6 +338,8 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 			ndInt32 m_paramBiasStart;
 			ndInt32 m_paramWeightStart;
 			ndInt32 m_paramWeightBlockSize;
+
+			ndInt32 m_subgroupsSizeBit;
 		};
 
 		ndBrainLayerLinearCommand(
@@ -348,11 +350,19 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 			,m_parammeters(m_context, sizeof(UniformBufferObject))
 		{
 			UniformBufferObject uniformParam;
+			ndInt32 subGroupBits = 0;
+			if (context->GetSubGroupSize())
+			for (ndInt32 i = context->GetSubGroupSize() >> 1; i; i >>= 1)
+			{
+				//subGroupBits++;
+			}
+
 			uniformParam.m_inputSize = layer->GetInputSize();
 			uniformParam.m_outputSize = layer->GetOutputSize();
 			uniformParam.m_inputStart = workingBuffer.m_offsets[layerIndex + 0];
 			uniformParam.m_outputStart = workingBuffer.m_offsets[layerIndex + 1];
 			uniformParam.m_workBufferSize = workingBuffer.m_offsets[workingBuffer.m_offsets.GetCount() - 1];
+			uniformParam.m_subgroupsSizeBit = subGroupBits;
 
 			ndInt32 rounding = ND_GPU_BUFFER_ALIGNMENT / sizeof(ndBrainFloat);
 			ndInt32 biasCount = (layer->m_bias.GetCount() + rounding - 1) & -rounding;
@@ -369,7 +379,9 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 			params.PushBack(&m_parammeters);
 			params.PushBack(parameterBuffer.m_buffer);
 			params.PushBack(workingBuffer.m_buffer);
-			Assembly(context->m_ndBrainLayerLinear, batchCount * outputSize, params.GetCount(), &params[0]);
+
+			VkShaderModule module = subGroupBits ? context->m_ndBrainLayerLinearSubGroup : context->m_ndBrainLayerLinear;
+			Assembly(module, batchCount * outputSize, params.GetCount(), &params[0]);
 		}
 
 		ndBrainGpuUniformBuffer m_parammeters;

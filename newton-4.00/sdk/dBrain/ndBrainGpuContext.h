@@ -53,6 +53,8 @@ class ndBrainGpuContext: public ndClassAlloc
 	static bool HasGpuSupport();
 
 	VkDevice GetDevice() const;
+	ndInt32 GetSubGroupSize() const;
+
 	VkCommandPool GetCommandPool() const;
 	VkDescriptorPool GetDescriptorPool() const;
 	VkAllocationCallbacks* GetAllocator() const;
@@ -70,6 +72,7 @@ class ndBrainGpuContext: public ndClassAlloc
 	void SelectGraphicsQueue();
 	void CreateLogicalDevice();
 	void CreatePhysicalDevice();
+	void CheckSubGroupSupport();
 	void CreateDescriptorPool();
 	void CreateFence();
 	void LoadShaderPrograms();
@@ -105,17 +108,21 @@ class ndBrainGpuContext: public ndClassAlloc
 	{
 		struct
 		{
+			VkShaderModule m_testShader;
 			VkShaderModule m_ndBrainCopyInput;
 			VkShaderModule m_ndBrainGetResults;
 			VkShaderModule m_ndBrainLayerLinear;
+			VkShaderModule m_ndBrainLayerLinearSubGroup;
 			VkShaderModule m_ndBrainLayerRluActivation;
 			VkShaderModule m_ndBrainLayerSoftmaxActivation;
 		};
 		VkShaderModule m_modules[128];
 	};
 
+	ndInt32 m_subGroupSize;
 	uint32_t m_queueFamilyIndex;
 	bool m_hasValidationLayers;
+
 	static const char* m_apiLayers[];
 	static const char* m_apiExtensionLayers[];
 
