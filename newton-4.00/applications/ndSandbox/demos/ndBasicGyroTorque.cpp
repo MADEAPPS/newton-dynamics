@@ -80,7 +80,7 @@ static void Phitop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 a
 
 static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 speed, const ndVector& origin)
 {
-	ndMatrix matrix(ndYawMatrix(45.0f * ndDegreeToRad));
+	ndMatrix matrix(ndPitchMatrix(10.0f * ndDegreeToRad) * ndYawMatrix(45.0f * ndDegreeToRad));
 
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
@@ -88,7 +88,6 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndMatrix shapeMatrix(ndYawMatrix(5.0f * ndDegreeToRad));
-	//ndMatrix shapeMatrix(ndYawMatrix(10.0f * ndDegreeToRad));
 
 	ndShapeInstance shape(new ndShapeSphere(1.0f));
 	shape.SetScale(ndVector(0.3f, 0.25f, 1.0f, 0.0f));

@@ -59,14 +59,9 @@ ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt32 siz
 	allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocateInfo.allocationSize = memoryRequirements.size; // specify required memory.
 
-	//There are several types of memory that can be allocated, and we must choose a memory type that:
-	//1) Satisfies the memory requirements(memoryRequirements.memoryTypeBits).
-	//2) Satisfy our own usage requirements. We want to be able to read the buffer memory from the GPU to the CPU
-	//   with vkMapMemory, so we set VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT.
-	//Also, by setting VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, memory written by the device(GPU) will be easily
-	//visible to the host(CPU), without having to call any extra flushing commands. So mainly for convenience, we set
-	//this flag.
-	allocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+	//allocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+	VkMemoryPropertyFlags memoryProperty = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+	allocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, memoryProperty);
 
 	ndBrainGpuContext::CheckResultVulkan(vkAllocateMemory(device, &allocateInfo, allocators, &m_bufferMemory)); 
 
