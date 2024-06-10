@@ -25,6 +25,7 @@ layout(std140, binding = 0) uniform UniformBufferObject
     int m_paramBiasStart;
     int m_paramWeightStart;
     int m_paramWeightBlockSize;
+
     int m_subgroupsSizeBit;
 };
 
@@ -49,14 +50,16 @@ void main()
     uint batchOffset = batch * m_workBufferSize;
     uint weightRowOffset = batchIndex * m_paramWeightBlockSize;
     
-    float acc = 0.0f;
+    float partialSum = 0.0f;
     for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
     {
-        acc += m_networkParameters[m_paramStart + m_paramWeightStart + weightRowOffset + index] * m_workingBuffer[batchOffset + m_inputStart + index];
+        float a = m_workingBuffer[batchOffset + m_inputStart + index];
+        float b = m_networkParameters[m_paramStart + m_paramWeightStart + weightRowOffset + index];
+        partialSum += a * b;
     }
     
     // do the a binary reduction
-    reductionBuffer[gl_LocalInvocationID.x] = acc;
+    reductionBuffer[gl_LocalInvocationID.x] = partialSum;
     memoryBarrierShared(); 
     barrier();
     
@@ -72,7 +75,7 @@ void main()
 
     if (gl_LocalInvocationID.x == 0)
     {
-        acc = reductionBuffer[gl_LocalInvocationID.x] + m_networkParameters[m_paramStart + m_paramBiasStart + batchIndex];
+        float acc = reductionBuffer[gl_LocalInvocationID.x] + m_networkParameters[m_paramStart + m_paramBiasStart + batchIndex];
         m_workingBuffer[batchOffset + m_outputStart + batchIndex] = acc;
     }
 }

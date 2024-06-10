@@ -51,37 +51,38 @@ void main()
     uint batchOffset = batch * m_workBufferSize;
     uint weightRowOffset = batchIndex * m_paramWeightBlockSize;
     
-    float acc = 0.0f;
+    float partialSum = 0.0f;
     for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
     {
-        acc += m_networkParameters[m_paramStart + m_paramWeightStart + weightRowOffset + index] * m_workingBuffer[batchOffset + m_inputStart + index];
+        float a = m_workingBuffer[batchOffset + m_inputStart + index];
+        float b = m_networkParameters[m_paramStart + m_paramWeightStart + weightRowOffset + index];
+        partialSum += a * b;
     }
+    memoryBarrierShared(); 
+    barrier();
 
-    acc = subgroupAdd(acc);
+    float acc = subgroupAdd(partialSum);
     uint mask = gl_SubgroupSize - 1;
     if (gl_LocalInvocationID.x < gl_SubgroupSize)
     {
         reductionBuffer[gl_LocalInvocationID.x] = 0.0f;
     }
-
+    
     if ((gl_LocalInvocationID.x & mask) == 0)
     {
         uint index = (gl_LocalInvocationID.x >> m_subgroupsSizeBit);
-        if (index < gl_NumSubgroups)
-        {
-            reductionBuffer[index] = acc;
-        }
+        reductionBuffer[index] = acc;
     }
     memoryBarrierShared(); 
     barrier();
     
     if (gl_LocalInvocationID.x < gl_SubgroupSize)
     {
-        acc = subgroupAdd(reductionBuffer[gl_LocalInvocationID.x]);
+        float dot = subgroupAdd(reductionBuffer[gl_LocalInvocationID.x]);
         if (gl_LocalInvocationID.x == 0)
         {
-            acc += m_networkParameters[m_paramStart + m_paramBiasStart + batchIndex];
-            m_workingBuffer[batchOffset + m_outputStart + batchIndex] = acc;
+            dot += m_networkParameters[m_paramStart + m_paramBiasStart + batchIndex];
+            m_workingBuffer[batchOffset + m_outputStart + batchIndex] = dot;
         }
     }
 }

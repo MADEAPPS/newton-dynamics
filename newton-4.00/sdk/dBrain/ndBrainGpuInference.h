@@ -61,8 +61,6 @@ class ndBrainGpuInference : public ndClassAlloc
 
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_displayList;
 	ndInt32 m_inputBatchSize;
-
-	ndBrainVector m_parameters_____;
 };
 
 

@@ -139,9 +139,6 @@ void ndBrainGpuInference::SetParameterVector()
 	}
 	m_paramBuffer.m_offsets.PushBack(sum);
 	m_paramBuffer.m_buffer = new ndBrainGpuFloatBuffer(m_context, parameters);
-
-	m_parameters_____.SetCount(parameters.GetCount());
-	m_parameters_____.Set(parameters);
 }
 
 void ndBrainGpuInference::SetWorkingBuffer()

@@ -246,8 +246,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL ndBrainGpuContext::DebugReportVulkan(
 	VkDebugReportFlagsEXT, VkDebugReportObjectTypeEXT, uint64_t, size_t, int32_t,
 	const char* pLayerPrefix, const char* pMessage, void*)
 {
-	ndTrace(("Debug Report: %s: %s\n", pLayerPrefix, pMessage));
-
+	ndExpandTraceMessage("Debug Report: %s: %s\n", pLayerPrefix, pMessage);
 	return VK_FALSE;
 }
 

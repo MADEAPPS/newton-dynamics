@@ -150,6 +150,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	ndBrainVector output;
 	output.SetCount((*testLabels)[0].GetCount());
 
+	//ndInt32 batchSize = 1;
 	//ndInt32 batchSize = 10000;
 	ndInt32 batchSize = testDigits->GetCount();
 	ndBrainGpuContext gpuContext;
@@ -161,14 +162,8 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	gpuTime = ndGetTimeInMicroseconds() - gpuTime;
 	ndExpandTraceMessage("gpuTime %f (sec) batch size(%d)\n", ndFloat64(gpuTime) / 1000000.0f, batchSize);
 
-
 	ndBrainVector outputBuffer;
 	inference.GetResults(outputBuffer);
-	//for (ndInt32 i = 0; i < batchSize; ++i)
-	//{
-	//	const ndBrainMemVector src0(&outputBuffer[i * output.GetCount()], output.GetCount());
-	//	const ndBrainMemVector src1(&outputBuffer[i * output.GetCount()], output.GetCount());
-	//}
 
 	ndInt32 failCount = 0;
 	ndBrainVector workingBuffer;
@@ -176,7 +171,6 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 
 	ndUnsigned64 cpuTime = ndGetTimeInMicroseconds();
 	for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
-	//for (ndInt32 i = 0; i < 32; i++)
 	{
 		const ndBrainVector& input = (*testDigits)[i];
 		brain.MakePrediction(input, output, workingBuffer);
