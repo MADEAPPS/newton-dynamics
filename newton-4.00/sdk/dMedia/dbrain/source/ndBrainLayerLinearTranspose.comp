@@ -14,15 +14,15 @@ layout (local_size_x = WORKGROUP_SIZE) in;
 
 layout(std140, binding = 0) uniform UniformBufferObject 
 {
-    int m_inputSize;
-    int m_inputStart;
-    int m_outputSize;
+    int m_inputColums;
+    //int m_inputStart;
+    //int m_outputSize;
     int m_outputStart;
     int m_workBufferSize;
     
     int m_paramStart;
     int m_paramBiasStart;
-    int m_paramWeightStart;
+    //int m_paramWeightStart;
     int m_paramWeightBlockSize;
 };
 
@@ -41,25 +41,43 @@ shared float reductionBuffer [WORKGROUP_SIZE];
 // perform a full vector * matrix operation
 void main() 
 {
-    uint paramBatchSize = gl_WorkGroupID.x * m_paramWeightBlockSize;
-    uint inputOffset = paramBatchSize + m_paramStart + m_inputStart;
-    uint outPutOffset = paramBatchSize + m_paramStart + m_outputStart;
+    //uint paramBatchSize = gl_WorkGroupID.x * m_paramWeightBlockSize;
+    //uint inputOffset = paramBatchSize + m_paramStart + m_inputStart;
+    //uint outPutOffset = paramBatchSize + m_paramStart + m_outputStart;
+    //
+    //uint workBatchSize = gl_WorkGroupID.x * m_workBufferSize;
+    //uint biasOffset = workBatchSize + m_paramStart + m_paramBiasStart;
+    //for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
+    //{
+    //    reductionBuffer[index] = m_networkParameters[inputOffset + index];
+    //    float acc = m_networkParameters[biasOffset + index];
+    //    uint weightOffset = m_paramStart + m_paramWeightStart;
+    //    memoryBarrierShared(); 
+    //    barrier();
+    //    for (uint i = 0; i < m_outputSize; i ++)
+    //    {
+    //        float scale = reductionBuffer[i];
+    //        acc += scale * m_networkParameters[weightOffset + index];
+    //        weightOffset += gl_WorkGroupSize.x;
+    //    }
+    //    m_workingBuffer[outPutOffset + index] = acc;
+    //}
 
+    
     uint workBatchSize = gl_WorkGroupID.x * m_workBufferSize;
     uint biasOffset = workBatchSize + m_paramStart + m_paramBiasStart;
-    for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
+
+    uint paramBatchSize = gl_WorkGroupID.x * m_paramWeightBlockSize;
+    uint outputOffset = paramBatchSize + m_paramStart + m_outputStart;
+
+    float acc = 0.0;
+    if (gl_LocalInvocationID.x < m_inputColums) 
     {
-        reductionBuffer[index] = m_networkParameters[inputOffset + index];
-        float acc = m_networkParameters[biasOffset + index];
-        uint weightOffset = m_paramStart + m_paramWeightStart;
-        memoryBarrierShared(); 
-        barrier();
-        for (uint i = 0; i < m_outputSize; i ++)
-        {
-            float scale = reductionBuffer[i];
-            acc += scale * m_networkParameters[weightOffset + index];
-            weightOffset += gl_WorkGroupSize.x;
-        }
-        m_workingBuffer[outPutOffset + index] = acc;
+        float acc = m_networkParameters[biasOffset + gl_LocalInvocationID.x];
+    }
+
+    if (gl_LocalInvocationID.x < m_inputColums) 
+    {
+        m_workingBuffer[outputOffset + gl_LocalInvocationID.x] = acc;
     }
 }

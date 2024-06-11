@@ -150,9 +150,9 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	ndBrainVector output;
 	output.SetCount((*testLabels)[0].GetCount());
 
-	//ndInt32 batchSize = 1;
+	ndInt32 batchSize = 2;
 	//ndInt32 batchSize = 10000;
-	ndInt32 batchSize = testDigits->GetCount();
+	//ndInt32 batchSize = testDigits->GetCount();
 	ndBrainGpuContext gpuContext;
 	ndBrainGpuInference inference(&gpuContext, &brain, *testDigits, batchSize);
 
