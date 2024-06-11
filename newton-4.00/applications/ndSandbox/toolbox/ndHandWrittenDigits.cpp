@@ -147,12 +147,10 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 {
-	ndBrainVector output;
-	output.SetCount((*testLabels)[0].GetCount());
-
-	ndInt32 batchSize = 2;
+	//ndInt32 batchSize = 2;
 	//ndInt32 batchSize = 10000;
-	//ndInt32 batchSize = testDigits->GetCount();
+	ndInt32 batchSize = testDigits->GetCount();
+	ndInt32 outputSize = (*testLabels)[0].GetCount();
 	ndBrainGpuContext gpuContext;
 	ndBrainGpuInference inference(&gpuContext, &brain, *testDigits, batchSize);
 
@@ -169,25 +167,34 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	ndBrainVector workingBuffer;
 	brain.DisableDropOut();
 
+	ndBrainVector output;
+	output.SetCount(outputSize * batchSize);
 	ndUnsigned64 cpuTime = ndGetTimeInMicroseconds();
 	for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
 	{
 		const ndBrainVector& input = (*testDigits)[i];
-		brain.MakePrediction(input, output, workingBuffer);
+		ndBrainMemVector outputCpu (&output[i * outputSize], outputSize);
+		brain.MakePrediction(input, outputCpu, workingBuffer);
+	}
+	cpuTime = ndGetTimeInMicroseconds() - cpuTime;
+	ndExpandTraceMessage("cpuTime %f (sec)\n", ndFloat64(cpuTime) / 1000000.0f);
 	
-		const ndBrainMemVector outputGpu(&outputBuffer[i * output.GetCount()], output.GetCount());
+	for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
+	{
+		const ndBrainMemVector outputCpu(&output[i * outputSize], outputSize);
+		const ndBrainMemVector outputGpu(&outputBuffer[i * outputSize], outputSize);
 		const ndBrainVector& truth = (*testLabels)[i];
 	
-		ndInt32 index = -1;
+		ndInt32 indexCpu = -1;
 		ndInt32 indexGpu = -1;
 		ndBrainFloat maxProbability = -1.0f;
 		ndBrainFloat maxProbabilityGpu = -1.0f;
-		for (ndInt32 j = 0; j < output.GetCount(); j++)
+		for (ndInt32 j = 0; j < outputSize; j++)
 		{
-			if (output[j] > maxProbability)
+			if (outputCpu[j] > maxProbability)
 			{
-				index = j;
-				maxProbability = output[j];
+				indexCpu = j;
+				maxProbability = outputCpu[j];
 			}
 			if (outputGpu[j] > maxProbabilityGpu)
 			{
@@ -195,17 +202,14 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 				maxProbabilityGpu = outputGpu[j];
 			}
 		}
-		ndAssert(indexGpu == index);
+		ndAssert(indexGpu == indexCpu);
 
-		ndAssert(index >= 0);
-		if (truth[index] == ndReal(0.0f))
+		ndAssert(indexCpu >= 0);
+		if (truth[indexCpu] == ndReal(0.0f))
 		{
 			failCount++;
 		}
 	}
-
-	cpuTime = ndGetTimeInMicroseconds() - cpuTime;
-	ndExpandTraceMessage("cpuTime %f (sec)\n", ndFloat64(cpuTime) / 1000000.0f);
 
 	ndExpandTraceMessage("%s\n", title);
 	ndExpandTraceMessage("num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());

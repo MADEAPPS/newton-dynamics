@@ -114,8 +114,8 @@ ndList<ndSharedPtr<ndBrainGpuCommand>>& ndBrainGpuInference::GetDisplayList()
 
 void ndBrainGpuInference::GetResults(ndBrainVector& results)
 {
-	//m_outputBuffer.m_buffer->UnloadData(results);
-	m_workingBuffer.m_buffer->UnloadData(results);
+	m_outputBuffer.m_buffer->UnloadData(results);
+	//m_workingBuffer.m_buffer->UnloadData(results);
 }
 
 void ndBrainGpuInference::SetParameterVector()
