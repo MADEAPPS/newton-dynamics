@@ -57,7 +57,10 @@ void main()
     }
     
     // do the a binary reduction
-    reductionBuffer[gl_LocalInvocationID.x] = partialSum;
+    if (gl_LocalInvocationID.x >= WORKGROUP_SIZE / 2))
+    {
+        reductionBuffer[gl_LocalInvocationID.x] = partialSum;
+    }
     memoryBarrierShared(); 
     barrier();
     
@@ -65,7 +68,11 @@ void main()
     {
         if (gl_LocalInvocationID.x < i)
         {
-            reductionBuffer[gl_LocalInvocationID.x] += reductionBuffer[i + gl_LocalInvocationID.x];
+            partialSum += reductionBuffer[i + gl_LocalInvocationID.x];
+            if (gl_LocalInvocationID.x >= i>>1))
+            {
+                reductionBuffer[gl_LocalInvocationID.x] = partialSum;
+            }
         }
         memoryBarrierShared();
         barrier();
@@ -73,7 +80,7 @@ void main()
 
     if (gl_LocalInvocationID.x == 0)
     {
-        float acc = reductionBuffer[gl_LocalInvocationID.x] + m_networkParameters[m_paramStart + m_paramBiasStart + batchIndex];
-        m_workingBuffer[batchOffset + m_outputStart + batchIndex] = acc;
+        partialSum += m_networkParameters[m_paramStart + m_paramBiasStart + batchIndex];
+        m_workingBuffer[batchOffset + m_outputStart + batchIndex] = partialSum;
     }
 }

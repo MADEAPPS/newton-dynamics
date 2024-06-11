@@ -25,7 +25,9 @@ const char* ndBrainGpuContext::m_apiLayers[] =
 
 const char* ndBrainGpuContext::m_apiExtensionLayers[] =
 {
-	"VK_EXT_debug_report"
+	"VK_EXT_debug_report",
+	"VK_EXT_memory_budget",
+	"VK_EXT_device_memory_report"
 };
 
 ndBrainGpuContext::ndBrainGpuContext()
@@ -198,13 +200,19 @@ void ndBrainGpuContext::CreateInstance()
 	extensionProperties.SetCount(ndInt32(extensionCount));
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, &extensionProperties[0]);
 
-	bool foundExtension = false;
-	for (ndInt32 i = 0; i < ndInt32(extensionCount); ++i)
+	ndInt32 extCount = 0;
+	const char* apiExtensionLayers[32];
+
+	for (ndInt32 j = 0; j < sizeof(m_apiExtensionLayers) / sizeof(m_apiExtensionLayers[3]); ++j)
 	{
-		if (strcmp(m_apiExtensionLayers[0], extensionProperties[i].extensionName) == 0)
+		for (ndInt32 i = 0; i < ndInt32(extensionCount); ++i)
 		{
-			foundExtension = true;
-			break;
+			if (strcmp(m_apiExtensionLayers[j], extensionProperties[i].extensionName) == 0)
+			{
+				apiExtensionLayers[extCount] = m_apiExtensionLayers[j];
+				extCount++;
+				break;
+			}
 		}
 	}
 
@@ -221,15 +229,8 @@ void ndBrainGpuContext::CreateInstance()
 	createInfo.pApplicationInfo = &appInfo;
 	createInfo.enabledLayerCount = apiLayersFound ? uint32_t(1) : uint32_t(0);
 	createInfo.ppEnabledLayerNames = &m_apiLayers[0];
-	createInfo.enabledExtensionCount = foundExtension ? uint32_t(1) : uint32_t(0);
-	createInfo.ppEnabledExtensionNames = &m_apiExtensionLayers[0];
-
-	//VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-	//debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-	//debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-	//debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-	//debugCreateInfo.pfnUserCallback = DebugReportVulkan;
-	//createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
+	createInfo.enabledExtensionCount = uint32_t(extCount);
+	createInfo.ppEnabledExtensionNames = &apiExtensionLayers[0];
 
 	CheckResultVulkan(vkCreateInstance(&createInfo, m_allocator, &m_instance));
 }
