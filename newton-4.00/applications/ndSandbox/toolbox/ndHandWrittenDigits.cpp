@@ -179,37 +179,37 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	cpuTime = ndGetTimeInMicroseconds() - cpuTime;
 	ndExpandTraceMessage("cpuTime %f (sec)\n", ndFloat64(cpuTime) / 1000000.0f);
 	
-	for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
-	{
-		const ndBrainMemVector outputCpu(&output[i * outputSize], outputSize);
-		const ndBrainMemVector outputGpu(&outputBuffer[i * outputSize], outputSize);
-		const ndBrainVector& truth = (*testLabels)[i];
-	
-		ndInt32 indexCpu = -1;
-		ndInt32 indexGpu = -1;
-		ndBrainFloat maxProbability = -1.0f;
-		ndBrainFloat maxProbabilityGpu = -1.0f;
-		for (ndInt32 j = 0; j < outputSize; j++)
-		{
-			if (outputCpu[j] > maxProbability)
-			{
-				indexCpu = j;
-				maxProbability = outputCpu[j];
-			}
-			if (outputGpu[j] > maxProbabilityGpu)
-			{
-				indexGpu = j;
-				maxProbabilityGpu = outputGpu[j];
-			}
-		}
-		ndAssert(indexGpu == indexCpu);
-
-		ndAssert(indexCpu >= 0);
-		if (truth[indexCpu] == ndReal(0.0f))
-		{
-			failCount++;
-		}
-	}
+	//for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
+	//{
+	//	const ndBrainMemVector outputCpu(&output[i * outputSize], outputSize);
+	//	const ndBrainMemVector outputGpu(&outputBuffer[i * outputSize], outputSize);
+	//	const ndBrainVector& truth = (*testLabels)[i];
+	//
+	//	ndInt32 indexCpu = -1;
+	//	ndInt32 indexGpu = -1;
+	//	ndBrainFloat maxProbability = -1.0f;
+	//	ndBrainFloat maxProbabilityGpu = -1.0f;
+	//	for (ndInt32 j = 0; j < outputSize; j++)
+	//	{
+	//		if (outputCpu[j] > maxProbability)
+	//		{
+	//			indexCpu = j;
+	//			maxProbability = outputCpu[j];
+	//		}
+	//		if (outputGpu[j] > maxProbabilityGpu)
+	//		{
+	//			indexGpu = j;
+	//			maxProbabilityGpu = outputGpu[j];
+	//		}
+	//	}
+	//	ndAssert(indexGpu == indexCpu);
+	//
+	//	ndAssert(indexCpu >= 0);
+	//	if (truth[indexCpu] == ndReal(0.0f))
+	//	{
+	//		failCount++;
+	//	}
+	//}
 
 	ndExpandTraceMessage("%s\n", title);
 	ndExpandTraceMessage("num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());

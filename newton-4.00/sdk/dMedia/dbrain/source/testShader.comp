@@ -9,64 +9,62 @@
 * freely
 */
 #version 450
-#extension GL_KHR_shader_subgroup_arithmetic : enable
-
 #define WORKGROUP_SIZE 128
 layout (local_size_x = WORKGROUP_SIZE) in;
 
-// use std140 for uniform buffers, data is 16 byte aligned
 layout(std140, binding = 0) uniform UniformBufferObject 
 {
-    int m_inputSize;
+    int m_matrixRows;
+    int m_matrixColumns;
+    int m_matrixColumnsStride;
+
+    int m_paramStart;
+    int m_inputStart;
+    int m_outputStart;
+    int m_workBufferSize;
 };
 
-// use std430 buffer semantic, data is word aligned 
 layout(std430, binding = 1) readonly buffer inputBuffer
 {
-   float m_input[];
+    float m_networkParameters[];
 };
 
 layout(std430, binding = 2) buffer outputBuffer
 {
-   float m_output[];
+    float m_workingBuffer[];
 };
 
-shared float reductionBuffer [WORKGROUP_SIZE];
+shared float inputVector [2048];
 
+// perform a full vector * matrix operation
 void main() 
 {
-    uint index = gl_GlobalInvocationID.x;
-    if(index >= m_inputSize)
-    {
-        return;
-    }
+    uint batchBase = gl_WorkGroupID.x * m_workBufferSize;
+    uint inputOffset = batchBase + m_inputStart;
 
-    float acc = subgroupAdd(m_input[index]);
-
-    uint mask = gl_SubgroupSize - 1;
-    if (gl_LocalInvocationID.x < gl_SubgroupSize)
+    uint matrixColumns = m_matrixColumns;
+    for (uint columnBase = gl_LocalInvocationID.x; columnBase < matrixColumns; columnBase += gl_WorkGroupSize.x)
     {
-        reductionBuffer[gl_LocalInvocationID.x] = 0.0f;
+        inputVector[columnBase] = m_workingBuffer[inputOffset + columnBase];
     }
+    uint outputOffset = batchBase + m_outputStart;
+    uint paramOffset = gl_WorkGroupID.x * m_paramStart;
 
-    if ((gl_LocalInvocationID.x & mask) == 0)
-    {
-        //uint index = (gl_LocalInvocationID.x >> m_subgroupsSizeBit);
-        uint index = (gl_LocalInvocationID.x >> 5);
-        if (index < gl_NumSubgroups)
-        {
-            reductionBuffer[index] = acc;
-        }
-    }
+    uint matrixColumnsStride = m_matrixColumnsStride;
     memoryBarrierShared(); 
     barrier();
-
-    if (gl_LocalInvocationID.x < gl_SubgroupSize)
+    for (uint columnBase = gl_LocalInvocationID.x; columnBase < matrixColumns; columnBase += gl_WorkGroupSize.x)
     {
-        acc = subgroupAdd(reductionBuffer[gl_LocalInvocationID.x]);
-        if (gl_LocalInvocationID.x == 0)
+        float partialSum = 0.0f;
+        uint offset = paramOffset;
+        for (uint rowIndex = 0; rowIndex < m_matrixRows; rowIndex ++)
         {
-            m_output[gl_LocalInvocationID.x] = acc;
+            float scale = inputVector[columnBase];
+            partialSum += scale * m_networkParameters[offset + columnBase];
+            offset += matrixColumnsStride;
         }
+        partialSum += m_networkParameters[offset + columnBase];
+    
+        m_workingBuffer[outputOffset + columnBase] = partialSum;
     }
 }

@@ -34,27 +34,37 @@ layout(std430, binding = 2) buffer outputBuffer
     float m_workingBuffer[];
 };
 
-//shared float reductionBuffer [WORKGROUP_SIZE];
+shared float inputVector [2048];
 
 // perform a full vector * matrix operation
 void main() 
 {
-    //uint paramOffset = gl_WorkGroupID.x * m_paramStart;
-    //uint inputOffset = gl_WorkGroupID.x * m_paramStart;
-    //uint outputOffset = gl_WorkGroupID.x * m_workBufferSize * m_paramStart + m_outputStart;
-    //for (uint columnBase = gl_LocalInvocationID.x; columnBase < m_matrixColumns; columnBase += gl_WorkGroupSize.x)
-    //{
-    //    float partialSum = 0.0f;
-    //    uint offset = paramOffset;
-    //    for (uint rowIndex = 0; rowIndex < m_matrixRows; rowIndex ++)
-    //    {
-    //        //float inpuColumScale = m_workingBuffer[m_inputStart + columnBase];
-    //        //partialSum += inpuColumScale * m_networkParameters[offset + rowIndex];
-    //
-    //        offset += m_matrixColumnsStride;
-    //    }
-    //    partialSum += m_networkParameters[offset + columnBase];
-    //
-    //    m_workingBuffer[outputOffset + columnBase] = partialSum;
-    //}
+    uint batchBase = gl_WorkGroupID.x * m_workBufferSize;
+    uint inputOffset = batchBase + m_inputStart;
+
+    uint matrixColumns = m_matrixColumns;
+    for (uint columnBase = gl_LocalInvocationID.x; columnBase < matrixColumns; columnBase += gl_WorkGroupSize.x)
+    {
+        inputVector[columnBase] = m_workingBuffer[inputOffset + columnBase];
+    }
+    uint outputOffset = batchBase + m_outputStart;
+    uint paramOffset = gl_WorkGroupID.x * m_paramStart;
+
+    uint matrixColumnsStride = m_matrixColumnsStride;
+    memoryBarrierShared(); 
+    barrier();
+    for (uint columnBase = gl_LocalInvocationID.x; columnBase < matrixColumns; columnBase += gl_WorkGroupSize.x)
+    {
+        float partialSum = 0.0f;
+        uint offset = paramOffset;
+        for (uint rowIndex = 0; rowIndex < m_matrixRows; rowIndex ++)
+        {
+            float scale = inputVector[columnBase];
+            partialSum += scale * m_networkParameters[offset + columnBase];
+            offset += matrixColumnsStride;
+        }
+        partialSum += m_networkParameters[offset + columnBase];
+    
+        m_workingBuffer[outputOffset + columnBase] = partialSum;
+    }
 }
