@@ -13,18 +13,20 @@
 #define WORKGROUP_SIZE 128
 layout (local_size_x = WORKGROUP_SIZE) in;
 
-layout(std140, binding = 0) uniform UniformBufferObject 
+layout(std140, binding = 0) uniform param
 {
-    int m_inputSize;
+    int m_matrixRows;
+    int m_matrixColumns;
+    int m_matrixColumnsStride;
+
     int m_inputStart;
-    int m_outputSize;
     int m_outputStart;
     int m_workBufferSize;
 
     int m_paramStart;
     int m_paramBiasStart;
     int m_paramWeightStart;
-    int m_paramWeightBlockSize;
+    
 };
 
 layout(std430, binding = 1) readonly buffer inputBuffer
@@ -42,14 +44,14 @@ shared float reductionBuffer [WORKGROUP_SIZE];
 // perform one road colum of a matrix multiply. 
 void main() 
 {
-    uint batch = gl_WorkGroupID.x / m_outputSize;
-    uint batchIndex = gl_WorkGroupID.x - batch * m_outputSize;
+    uint batch = gl_WorkGroupID.x / m_matrixRows;
+    uint batchIndex = gl_WorkGroupID.x - batch * m_matrixRows;
 
     uint batchOffset = batch * m_workBufferSize;
-    uint weightRowOffset = batchIndex * m_paramWeightBlockSize;
+    uint weightRowOffset = batchIndex * m_matrixColumnsStride;
     
     float partialSum = 0.0f;
-    for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
+    for (uint index = gl_LocalInvocationID.x; index < m_matrixColumns; index += gl_WorkGroupSize.x)
     {
         float a = m_workingBuffer[batchOffset + m_inputStart + index];
         float b = m_networkParameters[m_paramStart + m_paramWeightStart + weightRowOffset + index];
@@ -57,7 +59,7 @@ void main()
     }
     
     // do the a binary reduction
-    if (gl_LocalInvocationID.x >= WORKGROUP_SIZE / 2))
+    if (gl_LocalInvocationID.x >= WORKGROUP_SIZE / 2)
     {
         reductionBuffer[gl_LocalInvocationID.x] = partialSum;
     }
@@ -69,7 +71,7 @@ void main()
         if (gl_LocalInvocationID.x < i)
         {
             partialSum += reductionBuffer[i + gl_LocalInvocationID.x];
-            if (gl_LocalInvocationID.x >= i>>1))
+            if (gl_LocalInvocationID.x >= i>>1)
             {
                 reductionBuffer[gl_LocalInvocationID.x] = partialSum;
             }
