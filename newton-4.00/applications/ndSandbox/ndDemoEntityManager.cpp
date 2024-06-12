@@ -296,6 +296,34 @@ void TestVulkanStuff()
 		memData[stride] = bias[i];
 	}
 
+	ndBrainVector workBuffer;
+	for (ndInt32 i = 0; i < weights.GetColumns(); ++i)
+	{
+		workBuffer.PushBack(input[i]);
+	}
+	for (ndInt32 i = 0; i < weights.GetRows(); ++i)
+	{
+		workBuffer.PushBack(0.0f);
+	}
+
+	ndBrainGpuFloatBuffer inputBuffer(&context, workBuffer);
+	ndBrainGpuFloatBuffer weightParamBuffer(&context, memData);
+
+	struct UniformBufferObject
+	{
+		ndInt32 m_matrixRows;
+		ndInt32 m_matrixColumns;
+		ndInt32 m_matrixColumnsStride;
+
+		ndInt32 m_paramStart;
+		ndInt32 m_inputStart;
+		ndInt32 m_outputStart;
+		ndInt32 m_workBufferSize;
+	};
+
+	UniformBufferObject uniformParam;
+	memset(&uniformParam, -1, sizeof(uniformParam));
+
 
 	//ndBrainVector input;
 	//input.SetCount(500);
