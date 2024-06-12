@@ -318,10 +318,25 @@ void TestVulkanStuff()
 		ndInt32 m_workBufferSize;
 	};
 
+	class TestCommand : public ndBrainGpuCommand
+	{
+		public:
+		TestCommand(
+			ndBrainGpuContext* const context, ndBrainGpuBuffer& uniforms,
+			ndBrainGpuBuffer& weights, ndBrainGpuBuffer& imputOutpus)
+			:ndBrainGpuCommand(context)
+		{
+			ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
+			params.PushBack(&uniforms);
+			params.PushBack(&weights);
+			params.PushBack(&imputOutpus);
+			Assembly(context->m_testShader, 1, params.GetCount(), &params[0]);
+		}
+	};
+
 	UniformBufferObject uniformParam;
 	memset(&uniformParam, -1, sizeof(uniformParam));
 
-	//ndInt32 rounding = ND_GPU_BUFFER_ALIGNMENT / sizeof(ndBrainFloat);
 	ndInt32 weightsWidth = (weights.GetRows() + rounding - 1) & -rounding;
 
 	uniformParam.m_matrixRows = weights.GetColumns(); 
@@ -337,47 +352,15 @@ void TestVulkanStuff()
 	ndBrainGpuFloatBuffer weightParamBuffer(&context, memData);
 	ndBrainGpuUniformBuffer parammeters(&context, sizeof(UniformBufferObject));
 	parammeters.LoadData(sizeof(uniformParam), &uniformParam);
-	
-	//ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
-	//params.PushBack(&parammeters);
-	//params.PushBack(&weightParamBuffer);
-	//params.PushBack(&parammeters);
-	//Assembly(context->m_ndBrainLayerLinearTranspose, batchCount, params.GetCount(), &params[0]);
 
-		//ndBrainGpuUniformBuffer uniformBuffer(&context, sizeof(ParamData), &param);
 	//ndList<ndSharedPtr<ndBrainGpuCommand>> displayList;
-	//displayList.Append(new ndBrainGpuCommandTest (&context, uniformBuffer, buffer0, buffer1));
-
-
-
-	//ndBrainVector input;
-	//input.SetCount(500);
-	//input.Set(0.0f);
-	//for (ndInt32 i = 0; i < 120; ++i)
-	//{
-	//	input[i] = ndBrainFloat(i);
-	//}
-	//
-	//ndBrainGpuFloatBuffer buffer1(&context, input.GetCount());
-	//ndBrainGpuFloatBuffer buffer0(&context, input.GetCount());
-	//buffer0.LoadData(input);
-	//
-	//struct ParamData
-	//{
-	//	ndInt32 m_inputSize;
-	//};
-	//ParamData param;
-	//param.m_inputSize = 250;
-	//
-	//ndBrainGpuUniformBuffer uniformBuffer(&context, sizeof(ParamData), &param);
-	//ndList<ndSharedPtr<ndBrainGpuCommand>> displayList;
-	//displayList.Append(new ndBrainGpuCommandTest (&context, uniformBuffer, buffer0, buffer1));
+	//displayList.Append (new TestCommand(&context, parammeters, weightParamBuffer, inputBuffer));
 	//
 	//context.SubmitQueue(displayList);
 	//context.Sync();
 	//
 	//ndBrainVector output;
-	//buffer1.UnloadData(output);
+	//inputBuffer.UnloadData(output);
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
