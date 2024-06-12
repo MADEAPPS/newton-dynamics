@@ -326,10 +326,10 @@ void ndBrainLayerLinear::GetNumberOfGPUParameters(ndBrainVector& parameters, ndA
 
 #else
 
-	ndInt32 biasCount = (m_bias.GetCount() + rounding - 1) & -rounding;
+	ndInt32 biasStride = (m_bias.GetCount() + rounding - 1) & -rounding;
 	ndInt32 rowsStride = (m_weights.GetColumns() + rounding - 1) & -rounding;
 
-	ndInt32 size = rowsStride * m_weights.GetRows() + biasCount;
+	ndInt32 size = rowsStride * m_weights.GetRows() + biasStride;
 	offsets.PushBack(size);
 
 	ndInt32 paramStart = parameters.GetCount();
@@ -338,17 +338,18 @@ void ndBrainLayerLinear::GetNumberOfGPUParameters(ndBrainVector& parameters, ndA
 	ndBrainMemVector memData(&parameters[paramStart], size);
 	memData.Set(ndBrainFloat(0.0f));
 
-	ndBrainMemVector dstBias(&memData[0], m_bias.GetCount());
-	dstBias.Set(m_bias);
-
-	ndBrainMemVector dstWeights(&memData[biasCount], size - biasCount);
+	//ndBrainMemVector dstBias(&memData[0], m_bias.GetCount());
+	//dstBias.Set(m_bias);
+	//
+	//ndBrainMemVector dstWeights(&memData[biasStride], size - biasStride);
 	for (ndInt32 i = 0; i < m_weights.GetRows(); ++i)
 	{
 		const ndBrainVector& src = m_weights[i];
-		ndBrainMemVector dst(&dstWeights[i * rowsStride], src.GetCount());
+		ndBrainMemVector dst(&memData[i * rowsStride], src.GetCount());
 		dst.Set(src);
 	}
-
+	ndBrainMemVector bias(&memData[size - biasStride], m_bias.GetCount());
+	bias.Set(m_bias);
 #endif
 }
 
@@ -432,7 +433,7 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 				UniformBufferObject uniformParam;
 
 				ndInt32 rounding = ND_GPU_BUFFER_ALIGNMENT / sizeof(ndBrainFloat);
-				ndInt32 biasCount = (layer->m_bias.GetCount() + rounding - 1) & -rounding;
+				//ndInt32 biasCount = (layer->m_bias.GetCount() + rounding - 1) & -rounding;
 				ndInt32 weightsWidth = (layer->m_weights.GetColumns() + rounding - 1) & -rounding;
 
 				uniformParam.m_matrixRows = layer->GetOutputSize();
@@ -444,9 +445,9 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 				uniformParam.m_workBufferSize = workingBuffer.m_offsets[workingBuffer.m_offsets.GetCount() - 1];
 
 				uniformParam.m_paramStart = parameterBuffer.m_offsets[layerIndex];
-				uniformParam.m_paramBiasStart = 0;
-				uniformParam.m_paramWeightStart = biasCount;
 
+				uniformParam.m_paramWeightStart = 0;
+				uniformParam.m_paramBiasStart = weightsWidth * layer->GetOutputSize();
 
 				m_parammeters.LoadData(sizeof(uniformParam), &uniformParam);
 
