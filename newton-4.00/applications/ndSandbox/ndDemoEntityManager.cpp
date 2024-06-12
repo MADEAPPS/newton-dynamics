@@ -306,9 +306,6 @@ void TestVulkanStuff()
 		workBuffer.PushBack(0.0f);
 	}
 
-	ndBrainGpuFloatBuffer inputBuffer(&context, workBuffer);
-	ndBrainGpuFloatBuffer weightParamBuffer(&context, memData);
-
 	struct UniformBufferObject
 	{
 		ndInt32 m_matrixRows;
@@ -323,6 +320,34 @@ void TestVulkanStuff()
 
 	UniformBufferObject uniformParam;
 	memset(&uniformParam, -1, sizeof(uniformParam));
+
+	//ndInt32 rounding = ND_GPU_BUFFER_ALIGNMENT / sizeof(ndBrainFloat);
+	ndInt32 weightsWidth = (weights.GetRows() + rounding - 1) & -rounding;
+
+	uniformParam.m_matrixRows = weights.GetColumns(); 
+	uniformParam.m_matrixColumns = weights.GetRows();
+	uniformParam.m_matrixColumnsStride = weightsWidth;
+	
+	uniformParam.m_inputStart = 0;
+	uniformParam.m_outputStart = weights.GetColumns();
+	uniformParam.m_workBufferSize = weightsWidth * (weights.GetColumns() + 1);
+	uniformParam.m_paramStart = 0;
+
+	ndBrainGpuFloatBuffer inputBuffer(&context, workBuffer);
+	ndBrainGpuFloatBuffer weightParamBuffer(&context, memData);
+	ndBrainGpuUniformBuffer parammeters(&context, sizeof(UniformBufferObject));
+	parammeters.LoadData(sizeof(uniformParam), &uniformParam);
+	
+	//ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
+	//params.PushBack(&parammeters);
+	//params.PushBack(&weightParamBuffer);
+	//params.PushBack(&parammeters);
+	//Assembly(context->m_ndBrainLayerLinearTranspose, batchCount, params.GetCount(), &params[0]);
+
+		//ndBrainGpuUniformBuffer uniformBuffer(&context, sizeof(ParamData), &param);
+	//ndList<ndSharedPtr<ndBrainGpuCommand>> displayList;
+	//displayList.Append(new ndBrainGpuCommandTest (&context, uniformBuffer, buffer0, buffer1));
+
 
 
 	//ndBrainVector input;
