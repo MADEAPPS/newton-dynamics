@@ -19,15 +19,11 @@ layout(std140, binding = 0) uniform param
     int m_matrixColumns;
     int m_matrixColumnsStride;
 
+    int m_paramStart;
     int m_inputStart;
     int m_outputStart;
     int m_workBufferSize;
-
-    int m_paramStart;
-    int m_paramBiasStart;
-    int m_paramWeightStart;
-    
-};
+ };
 
 layout(std430, binding = 1) readonly buffer inputBuffer
 {
@@ -54,7 +50,7 @@ void main()
     for (uint index = gl_LocalInvocationID.x; index < m_matrixColumns; index += gl_WorkGroupSize.x)
     {
         float a = m_workingBuffer[batchOffset + m_inputStart + index];
-        float b = m_networkParameters[m_paramStart + m_paramWeightStart + weightRowOffset + index];
+        float b = m_networkParameters[m_paramStart + weightRowOffset + index];
         partialSum += a * b;
     }
     
@@ -82,7 +78,8 @@ void main()
 
     if (gl_LocalInvocationID.x == 0)
     {
-        partialSum += m_networkParameters[m_paramStart + m_paramBiasStart + batchIndex];
+        uint biasOffset = m_paramStart + m_matrixRows * m_matrixColumnsStride;
+        partialSum += m_networkParameters[biasOffset + batchIndex];
         m_workingBuffer[batchOffset + m_outputStart + batchIndex] = partialSum;
     }
 }
