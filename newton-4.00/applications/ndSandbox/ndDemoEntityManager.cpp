@@ -248,34 +248,83 @@ void TestVulkanStuff()
 {
 	ndBrainGpuContext context;
 
+	ndBrainVector bias;
 	ndBrainVector input;
-	input.SetCount(500);
-	input.Set(0.0f);
-	for (ndInt32 i = 0; i < 120; ++i)
+	ndBrainVector output;
+	ndBrainMatrix weights;
+
+	bias.SetCount(64);
+	input.SetCount(784);
+	output.SetCount(64);
+	weights.Init(64, 784);
+
+	bias.InitGaussianWeights(0.5f);
+	input.InitGaussianWeights(0.5f);
+	for (ndInt32 i = weights.GetCount() - 1; i >= 0; --i)
 	{
-		input[i] = ndBrainFloat(i);
+		weights[i].InitGaussianWeights(0.5f);
+	}
+	weights.Mul(input, output);
+	output.Add(bias);
+
+	ndInt32 rounding = ND_GPU_BUFFER_ALIGNMENT / sizeof(ndBrainFloat);
+	ndAssert(!(rounding & (rounding - 1)));
+	ndAssert(bias.GetCount() == weights.GetRows());
+
+	ndArray<ndInt32> offsets;
+	ndBrainVector parameters;
+	ndInt32 paddedWidth = (bias.GetCount() + rounding - 1) & -rounding;
+	ndInt32 count = (paddedWidth + 1) * weights.GetColumns();
+	offsets.PushBack(count);
+
+	ndInt32 paramStart = parameters.GetCount();
+	parameters.SetCount(paramStart + count);
+
+	ndBrainMemVector memData(&parameters[paramStart], count);
+	memData.Set(ndBrainFloat(0.0f));
+	for (ndInt32 i = 0; i < weights.GetRows(); ++i)
+	{
+		ndInt32 stride = i;
+		const ndBrainVector& src = weights[i];
+		for (ndInt32 j = 0; j < weights.GetColumns(); ++j)
+		{
+			ndBrainFloat value = src[j];
+			ndAssert(weights[i][j] == value);
+			memData[stride] = value;
+			stride += paddedWidth;
+		}
+		memData[stride] = bias[i];
 	}
 
-	ndBrainGpuFloatBuffer buffer1(&context, input.GetCount());
-	ndBrainGpuFloatBuffer buffer0(&context, input.GetCount());
-	buffer0.LoadData(input);
 
-	struct ParamData
-	{
-		ndInt32 m_inputSize;
-	};
-	ParamData param;
-	param.m_inputSize = 250;
-
-	ndBrainGpuUniformBuffer uniformBuffer(&context, sizeof(ParamData), &param);
-	ndList<ndSharedPtr<ndBrainGpuCommand>> displayList;
-	displayList.Append(new ndBrainGpuCommandTest (&context, uniformBuffer, buffer0, buffer1));
-
-	context.SubmitQueue(displayList);
-	context.Sync();
-
-	ndBrainVector output;
-	buffer1.UnloadData(output);
+	//ndBrainVector input;
+	//input.SetCount(500);
+	//input.Set(0.0f);
+	//for (ndInt32 i = 0; i < 120; ++i)
+	//{
+	//	input[i] = ndBrainFloat(i);
+	//}
+	//
+	//ndBrainGpuFloatBuffer buffer1(&context, input.GetCount());
+	//ndBrainGpuFloatBuffer buffer0(&context, input.GetCount());
+	//buffer0.LoadData(input);
+	//
+	//struct ParamData
+	//{
+	//	ndInt32 m_inputSize;
+	//};
+	//ParamData param;
+	//param.m_inputSize = 250;
+	//
+	//ndBrainGpuUniformBuffer uniformBuffer(&context, sizeof(ParamData), &param);
+	//ndList<ndSharedPtr<ndBrainGpuCommand>> displayList;
+	//displayList.Append(new ndBrainGpuCommandTest (&context, uniformBuffer, buffer0, buffer1));
+	//
+	//context.SubmitQueue(displayList);
+	//context.Sync();
+	//
+	//ndBrainVector output;
+	//buffer1.UnloadData(output);
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
@@ -507,7 +556,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	//TestVulkanStuff();
+	TestVulkanStuff();
 	ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
