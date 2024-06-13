@@ -345,7 +345,7 @@ void TestVulkanStuff()
 	
 	uniformParam.m_inputStart = 0;
 	uniformParam.m_outputStart = weights.GetColumns();
-	uniformParam.m_workBufferSize = weightsWidth * (weights.GetColumns() + 1);
+	uniformParam.m_workBufferSize = workBuffer.GetCount();
 	uniformParam.m_paramStart = 0;
 
 	ndBrainGpuFloatBuffer inputBuffer(&context, workBuffer);
@@ -353,14 +353,16 @@ void TestVulkanStuff()
 	ndBrainGpuUniformBuffer parammeters(&context, sizeof(UniformBufferObject));
 	parammeters.LoadData(sizeof(uniformParam), &uniformParam);
 
-	//ndList<ndSharedPtr<ndBrainGpuCommand>> displayList;
-	//displayList.Append (new TestCommand(&context, parammeters, weightParamBuffer, inputBuffer));
-	//
-	//context.SubmitQueue(displayList);
-	//context.Sync();
-	//
-	//ndBrainVector output;
-	//inputBuffer.UnloadData(output);
+	ndList<ndSharedPtr<ndBrainGpuCommand>> displayList;
+	displayList.Append (new TestCommand(&context, parammeters, weightParamBuffer, inputBuffer));
+	
+	context.SubmitQueue(displayList);
+	context.Sync();
+	
+	ndBrainVector outputGpu;
+	inputBuffer.UnloadData(outputGpu);
+
+	ndBrainMemVector xxx(&outputGpu[784], 64);
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
@@ -592,7 +594,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	TestVulkanStuff();
+	//TestVulkanStuff();
 	ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();

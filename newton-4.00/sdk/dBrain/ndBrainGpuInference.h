@@ -59,6 +59,7 @@ class ndBrainGpuInference : public ndClassAlloc
 	ndBrain* m_brain;
 	ndBrainGpuContext* m_context;
 
+public:
 	ndBrainLayer::ndBufferOffsetPair m_paramBuffer;
 	ndBrainLayer::ndBufferOffsetPair m_inputBuffer;
 	ndBrainLayer::ndBufferOffsetPair m_outputBuffer;
