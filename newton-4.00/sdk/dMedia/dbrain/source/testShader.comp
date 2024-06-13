@@ -49,7 +49,8 @@ void main()
         inputVector[rowIndex + gl_LocalInvocationID.x] = m_inputOutputData[inputOffset + rowIndex + gl_LocalInvocationID.x];
     }
     uint outputOffset = batchBase + m_outputStart;
-    uint paramOffset = gl_WorkGroupID.x * m_paramStart;
+    //uint paramOffset = gl_WorkGroupID.x * m_paramStart;
+    uint paramOffset = m_paramStart;
 
     uint matrixColumnsStride = m_matrixColumnsStride;
     memoryBarrierShared(); 

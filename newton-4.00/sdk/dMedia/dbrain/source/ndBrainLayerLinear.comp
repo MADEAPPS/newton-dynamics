@@ -25,14 +25,14 @@ layout(std140, binding = 0) uniform param
     int m_workBufferSize;
  };
 
-layout(std430, binding = 1) readonly buffer inputBuffer
+ layout(std430, binding = 1) buffer inputOutputBuffer
 {
-    float m_networkParameters[];
+    float m_inputOutputData[];
 };
 
-layout(std430, binding = 2) buffer outputBuffer
+layout(std430, binding = 2) readonly buffer newralNetParameters
 {
-    float m_workingBuffer[];
+    float m_weightsAndBias[];
 };
 
 shared float reductionBuffer [WORKGROUP_SIZE];
@@ -49,8 +49,8 @@ void main()
     float partialSum = 0.0f;
     for (uint index = gl_LocalInvocationID.x; index < m_matrixColumns; index += gl_WorkGroupSize.x)
     {
-        float a = m_workingBuffer[batchOffset + m_inputStart + index];
-        float b = m_networkParameters[m_paramStart + weightRowOffset + index];
+        float a = m_inputOutputData[batchOffset + m_inputStart + index];
+        float b = m_weightsAndBias[m_paramStart + weightRowOffset + index];
         partialSum += a * b;
     }
     
@@ -79,7 +79,7 @@ void main()
     if (gl_LocalInvocationID.x == 0)
     {
         uint biasOffset = m_paramStart + m_matrixRows * m_matrixColumnsStride;
-        partialSum += m_networkParameters[biasOffset + batchIndex];
-        m_workingBuffer[batchOffset + m_outputStart + batchIndex] = partialSum;
+        partialSum += m_weightsAndBias[biasOffset + batchIndex];
+        m_inputOutputData[batchOffset + m_outputStart + batchIndex] = partialSum;
     }
 }

@@ -162,12 +162,12 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 
 	ndBrainVector outputBuffer;
 	inference.GetResults(outputBuffer);
-	for (ndInt32 i = 0; i < 8; ++i)
-	{
-		ndBrainMemVector xxxx0(&outputBuffer[inference.m_workingBuffer.m_offsets[i + 0]], 64);
-		ndBrainMemVector xxxx1(&outputBuffer[inference.m_workingBuffer.m_offsets[i + 1]], 64);
-		i *= 1;
-	}
+	//for (ndInt32 i = 0; i < 8; ++i)
+	//{
+	//	ndBrainMemVector xxxx0(&outputBuffer[inference.m_workingBuffer.m_offsets[i + 0]], 64);
+	//	ndBrainMemVector xxxx1(&outputBuffer[inference.m_workingBuffer.m_offsets[i + 1]], 64);
+	//	i *= 1;
+	//}
 
 	ndInt32 failCount = 0;
 	ndBrainVector workingBuffer;
@@ -658,5 +658,5 @@ void ndHandWrittenDigits()
 	ndSetRandSeed(53);
 
 	//MnistTrainingSet();
-	//MnistTestSet();
+	MnistTestSet();
 }

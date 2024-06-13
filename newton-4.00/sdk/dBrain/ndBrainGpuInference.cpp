@@ -114,8 +114,8 @@ ndList<ndSharedPtr<ndBrainGpuCommand>>& ndBrainGpuInference::GetDisplayList()
 
 void ndBrainGpuInference::GetResults(ndBrainVector& results)
 {
-	//m_outputBuffer.m_buffer->UnloadData(results);
-	m_workingBuffer.m_buffer->UnloadData(results);
+	m_outputBuffer.m_buffer->UnloadData(results);
+	//m_workingBuffer.m_buffer->UnloadData(results);
 }
 
 void ndBrainGpuInference::SetParameterVector()
@@ -172,7 +172,6 @@ void ndBrainGpuInference::SetInputAndOutputBuffers(const ndBrainMatrix& input)
 {
 	const ndInt32 rounding = ND_GPU_BUFFER_ALIGNMENT / sizeof(ndBrainFloat); 
 	const ndInt32 width = (input.GetColumns() + rounding - 1) & -rounding;
-	
 
 	const ndInt32 size = width * input.GetRows();
 	ndBrainVector temp;

@@ -25,7 +25,7 @@ layout(std140, binding = 0) uniform UniformBufferObject
 
 layout(std430, binding = 1) buffer outputBuffer
 {
-    float m_workingBuffer[];
+    float m_inputOutputData[];
 };
 
 shared float tmpBuffer [TEMP_BUFFER_SIZE];
@@ -38,7 +38,7 @@ void main()
     float maximunValue = 0.0; 
     for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
     {
-        float value = m_workingBuffer[batchOffset + m_inputStart + index];
+        float value = m_inputOutputData[batchOffset + m_inputStart + index];
         maximunValue = (value > maximunValue) ? value : maximunValue; 
     }
 
@@ -66,7 +66,7 @@ void main()
     float sum = 0.0; 
     for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
     {
-        float a = m_workingBuffer[batchOffset + m_inputStart + index] - maximunValue;
+        float a = m_inputOutputData[batchOffset + m_inputStart + index] - maximunValue;
         float b = -30.0;
         float value = (a > b) ? a : b;
         float prob = exp(value);
@@ -91,6 +91,6 @@ void main()
     float scale = 1.0 / reductionBuffer[0];
     for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
     {
-        m_workingBuffer[batchOffset + m_outputStart + index] = tmpBuffer[index] * scale;
+        m_inputOutputData[batchOffset + m_outputStart + index] = tmpBuffer[index] * scale;
     }
 }

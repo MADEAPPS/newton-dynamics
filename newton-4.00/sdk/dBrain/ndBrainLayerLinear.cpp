@@ -338,10 +338,6 @@ void ndBrainLayerLinear::GetNumberOfGPUParameters(ndBrainVector& parameters, ndA
 	ndBrainMemVector memData(&parameters[paramStart], size);
 	memData.Set(ndBrainFloat(0.0f));
 
-	//ndBrainMemVector dstBias(&memData[0], m_bias.GetCount());
-	//dstBias.Set(m_bias);
-	//
-	//ndBrainMemVector dstWeights(&memData[biasStride], size - biasStride);
 	for (ndInt32 i = 0; i < m_weights.GetRows(); ++i)
 	{
 		const ndBrainVector& src = m_weights[i];
@@ -397,8 +393,8 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 				
 				ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
 				params.PushBack(&m_parammeters);
-				params.PushBack(parameterBuffer.m_buffer);
 				params.PushBack(workingBuffer.m_buffer);
+				params.PushBack(parameterBuffer.m_buffer);
 				Assembly(context->m_ndBrainLayerLinearTranspose, batchCount, params.GetCount(), &params[0]);
 			}
 
@@ -428,8 +424,8 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 
 				ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
 				params.PushBack(&m_parammeters);
-				params.PushBack(parameterBuffer.m_buffer);
 				params.PushBack(workingBuffer.m_buffer);
+				params.PushBack(parameterBuffer.m_buffer);
 
 				ndInt32 outputSize = layer->GetOutputSize();
 				Assembly(context->m_ndBrainLayerLinear, batchCount * outputSize, params.GetCount(), &params[0]);
