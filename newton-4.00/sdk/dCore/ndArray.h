@@ -233,7 +233,7 @@ void ndArray<T>::Resize(ndInt32 newSize)
 	// please use standart lib std::vector
 	if (newSize > m_capacity || (m_capacity == 0))
 	{
-		newSize = ndMax(newSize, 16);
+		newSize = ndMax(newSize, ndInt32(16));
 		T* const newArray = (T*)ndMemory::Malloc(size_t(sizeof(T) * newSize));
 		if (m_array) 
 		{
@@ -248,7 +248,7 @@ void ndArray<T>::Resize(ndInt32 newSize)
 	}
 	else if (newSize < m_capacity)
 	{
-		newSize = ndMax(newSize, 16);
+		newSize = ndMax(newSize, ndInt32 (16));
 		T* const newArray = (T*)ndMemory::Malloc(size_t(sizeof(T) * newSize));
 		if (m_array) 
 		{
@@ -291,8 +291,8 @@ void ndArray<T>::RandomShuffle(ndInt32 count)
 	const ndInt32 size = ndMin (count, GetCount());
 	for (ndInt32 i = size - 1; i >= 0; --i)
 	{
-		ndUnsigned32 randomIndex = ndRandInt();
-		ndUnsigned32 j = randomIndex % ndUnsigned32(size);
+		ndInt32 randomIndex = ndRandInt();
+		ndInt32 j = randomIndex % ndInt32(size);
 		ndSwap (m_array[i], m_array[j]);
 	}
 }

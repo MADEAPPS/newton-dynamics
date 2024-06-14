@@ -125,7 +125,7 @@ class CConvexCaster : public ndModel
 
 		virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const) override
 		{
-			// filter teh floor
+			// filter the floor
 			ndUnsigned32 ret = ndUnsigned32(body->GetInvMass() ? 1 : 0);
 			return ret;
 		}

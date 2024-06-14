@@ -547,7 +547,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Sav
 	}
 
 	// get the max trajectory steps
-	const ndInt32 maxSteps = ndMin(agent->m_trajectory.GetCount(), m_maxTrajectorySteps);
+	const ndInt32 maxSteps = ndMin(ndInt32 (agent->m_trajectory.GetCount()), m_maxTrajectorySteps);
 	ndAssert(maxSteps > 0);
 	for (ndInt32 i = 0; i < maxSteps; ++i)
 	{

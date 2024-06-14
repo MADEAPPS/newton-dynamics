@@ -54,14 +54,6 @@ ndMatrix FindFloor(const ndWorld& world, const ndMatrix& origin, const ndShapeIn
 		}
 	};
 
-	//ndVector boxMin;
-	//ndVector boxMax;
-	//ndVector floor(FindFloor(world, matrix.m_posit + ndVector(0.0f, dist * 0.5f, 0.0f, 0.0f), dist));
-	//shape.CalculateAabb(shape.GetLocalMatrix() * matrix, boxMin, boxMax);
-	//floor.m_y += (boxMax.m_y - boxMin.m_y) * 0.5f;
-	//floor.m_y -= ndShapeInstance::GetBoxPadding();
-	//matrix.m_posit.m_y = ndMax(floor.m_y, matrix.m_posit.m_y);
-
 	ndMatrix matrix(origin);
 	matrix.m_posit.m_y += dist * 0.5f;
 	ndFindFloorConvexCast castShape(world, matrix, shape, dist);

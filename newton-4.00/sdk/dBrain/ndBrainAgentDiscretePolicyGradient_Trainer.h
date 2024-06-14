@@ -480,7 +480,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::Sav
 	agent->m_trajectory.SetCount(agent->m_trajectory.GetCount() - 1);
 
 	// get the max trajectory steps
-	const ndInt32 maxSteps = ndMin(agent->m_trajectory.GetCount(), m_maxTrajectorySteps);
+	const ndInt32 maxSteps = ndMin(ndInt32 (agent->m_trajectory.GetCount()), m_maxTrajectorySteps);
 	ndAssert(maxSteps > 0);
 
 	// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
