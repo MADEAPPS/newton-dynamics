@@ -67,6 +67,12 @@ void main()
             rowOffset += matrixColumnsStride;
         }
         partialSum += m_weightsAndBias[rowOffset + columnBase];
+
+        //if ((columnBase & 1) == 1)
+        //    partialSum = float(columnBase);
+        // else
+        //    partialSum = -1.0f; //float (-columnBase);
+
         m_inputOutputData[outputOffset + columnBase] = partialSum;
     }
 }

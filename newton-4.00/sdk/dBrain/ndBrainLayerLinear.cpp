@@ -26,7 +26,7 @@
 #include "ndBrainGpuContext.h"
 #include "ndBrainLayerLinear.h"
 
-//#define D_USE_GPU_TRANSPOSE_MATRIX
+#define D_USE_GPU_TRANSPOSE_MATRIX
 
 ndBrainLayerLinear::ndBrainLayerLinear(ndInt32 inputs, ndInt32 outputs)
 	:ndBrainLayer()
