@@ -35,9 +35,11 @@ class ndBrainGpuContext : public ndClassAlloc
 	{
 		struct
 		{
+			void* m_testShader;
 			void* m_ndBrainCopyInput;
 			void* m_ndBrainLayerLinear;
 			void* m_ndBrainLayerRluActivation;
+			void* m_ndBrainLayerLinearTranspose;
 			void* m_ndBrainLayerSoftmaxActivation;
 		};
 		void* m_modules[128];
