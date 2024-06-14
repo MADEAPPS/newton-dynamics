@@ -120,19 +120,10 @@ void ndBrainGpuContext::VulkanFree(void*, void* memory)
 void* ndBrainGpuContext::VulkanRealloc(void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope allocationScope)
 {
 	size_t oldSize = ndMemory::GetOriginalSize(pOriginal);
-	if (size > oldSize)
-	{
-		void* const ptr = VulkanAlloc(pUserData, size, alignment, allocationScope);
-		ndMemCpy((char*)ptr, (char*)pOriginal, ndInt32(oldSize));
-		VulkanFree(pUserData, pOriginal);
-		return ptr;
-	}
-	else
-	{
-		ndAssert(0);
-	}
-
-	return nullptr;
+	void* const ptr = VulkanAlloc(pUserData, size, alignment, allocationScope);
+	ndMemCpy((char*)ptr, (char*)pOriginal, ndInt32(ndMin (size, oldSize)));
+	VulkanFree(pUserData, pOriginal);
+	return ptr;
 }
 
 void ndBrainGpuContext::VulkanInternalAlloc(void*, size_t, VkInternalAllocationType, VkSystemAllocationScope)
@@ -301,7 +292,7 @@ void ndBrainGpuContext::CreatePhysicalDevice()
 	}
 	m_physicalDevice = gpus[use_gpu];
 	vkGetPhysicalDeviceProperties(m_physicalDevice, &m_gpuProps);
-	ndTrace(("vulkan accelerator: %s\n", m_gpuProps.deviceName));
+	ndExpandTraceMessage("vulkan accelerator: %s\n", m_gpuProps.deviceName);
 }
 
 void ndBrainGpuContext::CheckSubGroupSupport()
