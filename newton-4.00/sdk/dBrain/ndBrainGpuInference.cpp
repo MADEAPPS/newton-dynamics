@@ -122,6 +122,11 @@ void ndBrainGpuInference::GetWorkBuffer(ndBrainVector& results) const
 	m_workingBuffer.m_buffer->UnloadData(results);
 }
 
+const ndArray<ndInt32>& ndBrainGpuInference::GetWorkBufferOffsets() const
+{
+	return m_workingBuffer.m_offsets;
+}
+
 void ndBrainGpuInference::SetParameterVector()
 {
 	m_paramBuffer.m_offsets.SetCount(0);

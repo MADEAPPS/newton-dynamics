@@ -212,7 +212,23 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 				maxProbabilityGpu = outputGpu[j];
 			}
 		}
+
 		ndAssert(indexGpu == indexCpu);
+		if (indexGpu != indexCpu)
+		{
+			const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();
+			ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
+			for (ndInt32 k = 0; k < 8; ++k)
+			{
+				ndInt32 n0 = offsets[k + 0];
+				ndInt32 n1 = offsets[k + 1];
+				ndInt32 n2 = offsets[k + 2];
+				const ndBrainMemVector xxxx0(&workBufferBatch[n0], n1 - n0);
+				const ndBrainMemVector xxxx1(&workBufferBatch[n1], n2 - n1);
+				k *= 1;
+			}
+
+		}
 	
 		ndAssert(indexCpu >= 0);
 		if (truth[indexCpu] == ndReal(0.0f))

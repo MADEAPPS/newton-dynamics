@@ -44,12 +44,13 @@ class ndBrainGpuInference : public ndClassAlloc
 	class ndBrainGetResultData;
 
 	public:
-
 	ndBrainGpuInference(ndBrainGpuContext* const context, ndBrain* const brain, const ndBrainMatrix& testDigits, ndInt32 inputBatchSize);
 	virtual ~ndBrainGpuInference();
 
 	void GetResults(ndBrainVector& results) const;
 	void GetWorkBuffer(ndBrainVector& results) const;
+	const ndArray<ndInt32>& GetWorkBufferOffsets() const;
+	
 	const ndList<ndSharedPtr<ndBrainGpuCommand>>& GetDisplayList() const;
 	
 	protected:
