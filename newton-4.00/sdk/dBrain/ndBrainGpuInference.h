@@ -29,8 +29,9 @@ class ndBrainGpuInference : public ndClassAlloc
 	ndBrainGpuInference(ndBrainGpuContext* const, ndBrain* const, const ndBrainMatrix&, ndInt32) {}
 	virtual ~ndBrainGpuInference() {}
 
-	void GetResults(ndBrainVector&) {};
-	ndList<ndSharedPtr<ndBrainGpuCommand>>& GetDisplayList() {return m_displayList;}
+	void GetResults(ndBrainVector&) {}
+	void GetWorkBuffer(ndBrainVector&) {}
+	const ndList<ndSharedPtr<ndBrainGpuCommand>>& GetDisplayList() const {return m_displayList;}
 
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_displayList;
 };
@@ -47,8 +48,9 @@ class ndBrainGpuInference : public ndClassAlloc
 	ndBrainGpuInference(ndBrainGpuContext* const context, ndBrain* const brain, const ndBrainMatrix& testDigits, ndInt32 inputBatchSize);
 	virtual ~ndBrainGpuInference();
 
-	void GetResults(ndBrainVector& results);
-	ndList<ndSharedPtr<ndBrainGpuCommand>>& GetDisplayList();
+	void GetResults(ndBrainVector& results) const;
+	void GetWorkBuffer(ndBrainVector& results) const;
+	const ndList<ndSharedPtr<ndBrainGpuCommand>>& GetDisplayList() const;
 	
 	protected:
 	void SetWorkingBuffer();
@@ -62,7 +64,6 @@ class ndBrainGpuInference : public ndClassAlloc
 	ndBrainLayer::ndBufferOffsetPair m_paramBuffer;
 	ndBrainLayer::ndBufferOffsetPair m_inputBuffer;
 	ndBrainLayer::ndBufferOffsetPair m_outputBuffer;
-public:
 	ndBrainLayer::ndBufferOffsetPair m_workingBuffer;
 
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_displayList;

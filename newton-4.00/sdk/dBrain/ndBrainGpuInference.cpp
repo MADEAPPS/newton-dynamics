@@ -107,15 +107,19 @@ ndBrainGpuInference::~ndBrainGpuInference()
 {
 }
 
-ndList<ndSharedPtr<ndBrainGpuCommand>>& ndBrainGpuInference::GetDisplayList()
+const ndList<ndSharedPtr<ndBrainGpuCommand>>& ndBrainGpuInference::GetDisplayList() const
 {
 	return m_displayList;
 }
 
-void ndBrainGpuInference::GetResults(ndBrainVector& results)
+void ndBrainGpuInference::GetResults(ndBrainVector& results) const
 {
 	m_outputBuffer.m_buffer->UnloadData(results);
-	//m_workingBuffer.m_buffer->UnloadData(results);
+}
+
+void ndBrainGpuInference::GetWorkBuffer(ndBrainVector& results) const
+{
+	m_workingBuffer.m_buffer->UnloadData(results);
 }
 
 void ndBrainGpuInference::SetParameterVector()

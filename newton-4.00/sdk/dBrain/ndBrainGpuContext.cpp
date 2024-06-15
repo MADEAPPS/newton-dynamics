@@ -494,7 +494,7 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	m_ndBrainLayerSoftmaxActivationSubGroup = LoadShaderProgram("ndBrainLayerSoftmaxActivationSubGroup-comp.spv");
 }
 
-void ndBrainGpuContext::SubmitQueue(ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList)
+void ndBrainGpuContext::SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList)
 {
 	m_displayList.SetCount(0);
 	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = displayList.GetFirst(); node; node = node->GetNext())

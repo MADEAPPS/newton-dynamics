@@ -64,7 +64,7 @@ class ndBrainGpuContext: public ndClassAlloc
 	VkPhysicalDevice GetPhysicalDevice() const;
 
 	void Sync();
-	void SubmitQueue(ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList);
+	void SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList);
 	
 	static void CheckResultVulkan(VkResult err);
 

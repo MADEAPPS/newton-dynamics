@@ -147,10 +147,9 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 {
-	//ndInt32 batchSize = 2;
-	//ndInt32 batchSize = 10000;
+	//const ndInt32 batchSize = 1;
 	const ndInt32 batchSize = testDigits->GetCount();
-	const ndInt32 outputSize = (*testLabels)[0].GetCount();
+
 	ndBrainGpuContext gpuContext;
 	ndBrainGpuInference inference(&gpuContext, &brain, *testDigits, batchSize);
 
@@ -160,8 +159,11 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	gpuTime = ndGetTimeInMicroseconds() - gpuTime;
 	ndExpandTraceMessage("gpuTime %f (sec) batch size(%d)\n", ndFloat64(gpuTime) / 1000000.0f, batchSize);
 
+	ndBrainVector workBuffer;
 	ndBrainVector outputBuffer;
 	inference.GetResults(outputBuffer);
+	inference.GetWorkBuffer(workBuffer);
+
 	//for (ndInt32 i = 0; i < 8; ++i)
 	//{
 	//	ndBrainMemVector xxxx0(&outputBuffer[inference.m_workingBuffer.m_offsets[i + 0]], 64);
@@ -170,6 +172,8 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	//}
 
 	ndInt32 failCount = 0;
+	const ndInt32 outputSize = (*testLabels)[0].GetCount();
+
 	ndBrainVector workingBuffer;
 	brain.DisableDropOut();
 
