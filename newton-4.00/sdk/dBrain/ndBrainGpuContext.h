@@ -125,6 +125,7 @@ class ndBrainGpuContext: public ndClassAlloc
 
 	ndInt32 m_subGroupSize;
 	uint32_t m_queueFamilyIndex;
+	bool m_queueInProgress;
 	bool m_hasValidationLayers;
 
 	static const char* m_apiLayers[];

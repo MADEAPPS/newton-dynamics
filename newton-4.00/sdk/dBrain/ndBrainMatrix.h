@@ -46,6 +46,7 @@ class ndBrainMatrix: public ndArray<ndBrainMemVector>
 	void ScaleAdd(const ndBrainMatrix& src, ndBrainFloat scale);
 
 	void FlushToZero();
+	void InitGaussianWeights(ndBrainFloat variance);
 	void Mul(const ndBrainVector& input, ndBrainVector& output) const;
 	void TransposeMul(const ndBrainVector& input, ndBrainVector& output) const;
 

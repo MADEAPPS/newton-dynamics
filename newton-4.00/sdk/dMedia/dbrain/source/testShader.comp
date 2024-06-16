@@ -9,14 +9,20 @@
 * freely
 */
 #version 450
-#define WORKGROUP_SIZE 128
+#define WORKGROUP_SIZE  256
+
+#define TILES_BITS      4
+#define TILE_SIZE       (1<<TILES_BITS)
+
 layout (local_size_x = WORKGROUP_SIZE) in;
 
 layout(std140, binding = 0) uniform UniformBufferObject 
 {
     int m_matrixRows;
     int m_matrixColumns;
+    int m_matrixRowsStride;
     int m_matrixColumnsStride;
+    int m_workGroupsPerMatrix;
 
     int m_paramStart;
     int m_inputStart;
@@ -35,37 +41,64 @@ layout(std430, binding = 2) buffer inputOutputBuffer
 };
 
 shared float inputVector [2048];
+shared float tile [TILE_SIZE] [TILE_SIZE + 1];
 
 // perform a full vector * matrix operation
 void main() 
 {
-    uint batchBase = gl_WorkGroupID.x * m_workBufferSize;
-    uint inputOffset = batchBase + m_inputStart;
-
     uint matrixRows = m_matrixRows;
     uint matrixColumns = m_matrixColumns;
-    for (uint rowIndex = 0; rowIndex < matrixRows; rowIndex += gl_WorkGroupSize.x)
-    {
-        inputVector[rowIndex + gl_LocalInvocationID.x] = m_inputOutputData[inputOffset + rowIndex + gl_LocalInvocationID.x];
-    }
-    uint outputOffset = batchBase + m_outputStart;
-    //uint paramOffset = gl_WorkGroupID.x * m_paramStart;
-    uint paramOffset = m_paramStart;
+    uint matrixColumnStride = m_matrixColumnsStride;
 
-    uint matrixColumnsStride = m_matrixColumnsStride;
+    uint inputOutputHigh = gl_WorkGroupID.x / m_workGroupsPerMatrix;
+    uint inputOutputLow = gl_WorkGroupID.x - inputOutputHigh * m_workGroupsPerMatrix;
+    uint inputOffset = m_inputStart + inputOutputHigh * m_workBufferSize;
+    
+    for (uint block = 0; block < matrixColumns; block += gl_WorkGroupSize.x)
+    {
+        uint index = block + gl_LocalInvocationID.x;
+        inputVector[index] = m_inputOutputData[inputOffset + index];
+    }
     memoryBarrierShared(); 
     barrier();
-    for (uint columnBase = gl_LocalInvocationID.x; columnBase < matrixColumns; columnBase += gl_WorkGroupSize.x)
+
+    float acc = 0.0;
+    //uint matrixRowsStart = gl_WorkGroupID.x * TILE_SIZE;
+    uint matrixRowsStart = inputOutputLow * TILE_SIZE;
+    for (uint tileIndex = 0; tileIndex < matrixColumns; tileIndex += TILE_SIZE)
     {
-        float partialSum = 0.0f;
-        uint offset = paramOffset;
-        for (uint rowIndex = 0; rowIndex < matrixRows; rowIndex ++)
+        uint tileX = gl_LocalInvocationID.x & (TILE_SIZE - 1);
+        uint tileY = (gl_LocalInvocationID.x >> TILES_BITS) + matrixRowsStart;
+        if (tileY < m_matrixRows)
         {
-            float scale = inputVector[rowIndex];
-            partialSum += scale * m_weightsAndBias[offset + columnBase];
-            offset += matrixColumnsStride;
+            if ((tileX + tileIndex) < matrixColumns)
+            {
+                float rowValue = m_weightsAndBias[tileIndex + tileY * matrixColumnStride + tileX];
+                acc += rowValue * inputVector[tileIndex + tileX];
+            }
         }
-        partialSum += m_weightsAndBias[offset + columnBase];
-        m_inputOutputData[outputOffset + columnBase] = partialSum;
+    }
+
+    uint tileY = gl_LocalInvocationID.x >> TILES_BITS;
+    uint tileX = gl_LocalInvocationID.x & (TILE_SIZE - 1);
+    tile[tileY][tileX] = acc;
+    memoryBarrierShared(); 
+    barrier();
+
+    if (gl_LocalInvocationID.x < TILE_SIZE)
+    {
+        acc = 0.0;
+        for (uint tileIndex = 0; tileIndex < TILE_SIZE; tileIndex ++)
+        {
+            acc += tile[gl_LocalInvocationID.x][tileIndex];
+        }
+    }
+    
+    if (gl_LocalInvocationID.x < TILE_SIZE)
+    {
+        uint biasOffset = m_matrixColumnsStride * matrixRows;
+        uint outputOffset = m_outputStart + matrixRowsStart + inputOutputHigh * m_workBufferSize;
+        acc += m_weightsAndBias[biasOffset + matrixRowsStart + gl_LocalInvocationID.x];
+        m_inputOutputData[outputOffset + gl_LocalInvocationID.x] = acc;
     }
 }

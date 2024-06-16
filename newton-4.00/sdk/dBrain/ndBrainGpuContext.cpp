@@ -43,6 +43,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 	,m_debugMessenger(VK_NULL_HANDLE)
 	,m_subGroupSize(0)
 	,m_queueFamilyIndex(0xffffffff)
+	,m_queueInProgress(false)
 	,m_hasValidationLayers(false)
 {
 	m_allocatorStruct.pUserData = this;
@@ -496,6 +497,8 @@ void ndBrainGpuContext::LoadShaderPrograms()
 
 void ndBrainGpuContext::SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList)
 {
+	ndAssert(!m_queueInProgress);
+	m_queueInProgress = true;
 	m_displayList.SetCount(0);
 	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = displayList.GetFirst(); node; node = node->GetNext())
 	{
@@ -512,7 +515,11 @@ void ndBrainGpuContext::SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>
 
 void ndBrainGpuContext::Sync()
 {
-	CheckResultVulkan(vkWaitForFences(m_device, uint32_t(1), &m_fence, VK_TRUE, 100000000000));
+	if (m_queueInProgress)
+	{
+		CheckResultVulkan(vkWaitForFences(m_device, uint32_t(1), &m_fence, VK_TRUE, 100000000000));
+	}
+	m_queueInProgress = false;
 }
 
 #endif

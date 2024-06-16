@@ -212,3 +212,13 @@ void ndBrainMatrix::TransposeMul(const ndBrainVector& input, ndBrainVector& outp
 		output.ScaleAdd(row, scale);
 	}
 }
+
+void ndBrainMatrix::InitGaussianWeights(ndBrainFloat variance)
+{
+	ndBrainMatrix& me = *this;
+	variance = ndBrainFloat (ndAbs(variance)) + ndBrainFloat(1.0e-3f);
+	for (ndInt32 i = me.GetCount() - 1; i >= 0; --i)
+	{
+		me[i].InitGaussianWeights(variance);
+	}
+}

@@ -1,0 +1,71 @@
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+#version 450
+#define WORKGROUP_SIZE 128
+layout (local_size_x = WORKGROUP_SIZE) in;
+
+layout(std140, binding = 0) uniform UniformBufferObject 
+{
+    int m_matrixRows;
+    int m_matrixColumns;
+    int m_matrixColumnsStride;
+
+    int m_paramStart;
+    int m_inputStart;
+    int m_outputStart;
+    int m_workBufferSize;
+};
+
+layout(std430, binding = 1) readonly buffer newralNetParameters
+{
+    float m_weightsAndBias[];
+};
+
+layout(std430, binding = 2) buffer inputOutputBuffer
+{
+    float m_inputOutputData[];
+};
+
+shared float inputVector [2048];
+
+// perform a full vector * matrix operation
+void main() 
+{
+    uint batchBase = gl_WorkGroupID.x * m_workBufferSize;
+    uint inputOffset = batchBase + m_inputStart;
+
+    uint matrixRows = m_matrixRows;
+    uint matrixColumns = m_matrixColumns;
+    for (uint rowIndex = 0; rowIndex < matrixRows; rowIndex += gl_WorkGroupSize.x)
+    {
+        inputVector[rowIndex + gl_LocalInvocationID.x] = m_inputOutputData[inputOffset + rowIndex + gl_LocalInvocationID.x];
+    }
+    uint outputOffset = batchBase + m_outputStart;
+    //uint paramOffset = gl_WorkGroupID.x * m_paramStart;
+    uint paramOffset = m_paramStart;
+
+    uint matrixColumnsStride = m_matrixColumnsStride;
+    memoryBarrierShared(); 
+    barrier();
+    for (uint columnBase = gl_LocalInvocationID.x; columnBase < matrixColumns; columnBase += gl_WorkGroupSize.x)
+    {
+        float partialSum = 0.0f;
+        uint offset = paramOffset;
+        for (uint rowIndex = 0; rowIndex < matrixRows; rowIndex ++)
+        {
+            float scale = inputVector[rowIndex];
+            partialSum += scale * m_weightsAndBias[offset + columnBase];
+            offset += matrixColumnsStride;
+        }
+        partialSum += m_weightsAndBias[offset + columnBase];
+        m_inputOutputData[outputOffset + columnBase] = partialSum;
+    }
+}
