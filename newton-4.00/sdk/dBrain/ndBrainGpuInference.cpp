@@ -206,15 +206,18 @@ void ndBrainGpuInference::BuildDisplayList(const ndBrainMatrix& input)
 	buffers.PushBack(&m_paramBuffer);
 	buffers.PushBack(&m_workingBuffer);
 
+
+	ndInt32 workGroupBatch = 1000;
 	ndList<ndSharedPtr<ndBrainGpuCommand>> reusableList;
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
 	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
 	{
 		ndBrainLayer* const layer = layers[i];
-		reusableList.Append(layer->AssemblyGPUCommand(m_context, i, m_inputBatchSize, buffers));
+		//reusableList.Append(layer->AssemblyGPUCommand(m_context, i, m_inputBatchSize, buffers));
+		reusableList.Append(layer->AssemblyGPUCommand(m_context, i, workGroupBatch, buffers));
 	}
 
-	for (ndInt32 i = 0; i < 1; ++i)
+	for (ndInt32 i = 0; i < m_inputBatchSize; i += workGroupBatch)
 	{
 		m_displayList.Append(new ndBrainLoadInputData(this, input));
 		for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = reusableList.GetFirst(); node; node = node->GetNext())

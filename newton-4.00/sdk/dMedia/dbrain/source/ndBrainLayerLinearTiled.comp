@@ -72,8 +72,9 @@ void main()
         {
             if ((tileX + tileIndex) < matrixColumns)
             {
-                float rowValue = m_weightsAndBias[tileIndex + tileY * matrixColumnStride + tileX];
-                acc += rowValue * inputVector[tileIndex + tileX];
+                float a = inputVector[tileIndex + tileX];
+                float b = m_weightsAndBias[m_paramStart + tileIndex + tileY * matrixColumnStride + tileX];
+                acc += a * b;
             }
         }
     }
@@ -95,7 +96,7 @@ void main()
     
     if (gl_LocalInvocationID.x < TILE_SIZE)
     {
-        uint biasOffset = m_matrixColumnsStride * matrixRows;
+        uint biasOffset = m_paramStart + matrixColumnStride * matrixRows;
         uint outputOffset = m_outputStart + matrixRowsStart + inputOutputHigh * m_workBufferSize;
         acc += m_weightsAndBias[biasOffset + matrixRowsStart + gl_LocalInvocationID.x];
         m_inputOutputData[outputOffset + gl_LocalInvocationID.x] = acc;

@@ -253,8 +253,8 @@ void TestVulkanStuff()
 	ndBrainMatrix output;
 	ndBrainMatrix matrix;
 
-	ndInt32 rowds = 17;
-	ndInt32 columns = 21;
+	ndInt32 rowds = 64;
+	ndInt32 columns = 784;
 	ndInt32 inputsCount = 2;
 
 	bias.SetCount(rowds);
@@ -317,8 +317,8 @@ void TestVulkanStuff()
 		{
 			ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
 			params.PushBack(&uniforms);
-			params.PushBack(&weights);
 			params.PushBack(&imputOutpus);
+			params.PushBack(&weights);
 
 			ndInt32 numberOfGroups = numberOfImputs * workGroupsPerMatrix;
 			Assembly(context->m_testShader, numberOfGroups, params.GetCount(), &params[0]);
@@ -602,8 +602,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	TestVulkanStuff();
-	//ndHandWrittenDigits();
+	//TestVulkanStuff();
+	ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
 }

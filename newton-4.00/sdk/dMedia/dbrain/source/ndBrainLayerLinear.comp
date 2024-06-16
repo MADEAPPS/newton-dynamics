@@ -17,7 +17,9 @@ layout(std140, binding = 0) uniform param
 {
     int m_matrixRows;
     int m_matrixColumns;
+    int m_matrixRowsStride;
     int m_matrixColumnsStride;
+    int m_workGroupsPerMatrix;
 
     int m_paramStart;
     int m_inputStart;
@@ -25,7 +27,7 @@ layout(std140, binding = 0) uniform param
     int m_workBufferSize;
  };
 
- layout(std430, binding = 1) buffer inputOutputBuffer
+layout(std430, binding = 1) buffer inputOutputBuffer
 {
     float m_inputOutputData[];
 };
