@@ -147,7 +147,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 {
-	//ndInt32 batchSize = 2000;
+	//ndInt32 batchSize = 1;
 	const ndInt32 batchSize = testDigits->GetCount();
 
 	ndBrainGpuContext gpuContext;
@@ -159,10 +159,10 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	gpuTime = ndGetTimeInMicroseconds() - gpuTime;
 	ndExpandTraceMessage("gpuTime %f (sec) batch size(%d)\n", ndFloat64(gpuTime) / 1000000.0f, batchSize);
 
-	//ndBrainVector workBuffer;
+	ndBrainVector workBuffer;
 	ndBrainVector outputBuffer;
 	inference.GetResults(outputBuffer);
-	//inference.GetWorkBuffer(workBuffer);
+	inference.GetWorkBuffer(workBuffer);
 
 	ndInt32 failCount = 0;
 	const ndInt32 outputSize = (*testLabels)[0].GetCount();
@@ -209,17 +209,17 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 		if (indexGpu != indexCpu)
 		{
 			ndAssert(0);
-			//const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();
-			//ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
-			//for (ndInt32 k = 0; k < brain.GetCount(); ++k)
-			//{
-			//	ndInt32 n0 = offsets[k + 0];
-			//	ndInt32 n1 = offsets[k + 1];
-			//	ndInt32 n2 = offsets[k + 2];
-			//	const ndBrainMemVector xxxx0(&workBufferBatch[n0], n1 - n0);
-			//	const ndBrainMemVector xxxx1(&workBufferBatch[n1], n2 - n1);
-			//	k *= 1;
-			//}
+			const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();
+			ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
+			for (ndInt32 k = 0; k < brain.GetCount(); ++k)
+			{
+				ndInt32 n0 = offsets[k + 0];
+				ndInt32 n1 = offsets[k + 1];
+				ndInt32 n2 = offsets[k + 2];
+				const ndBrainMemVector xxxx0(&workBufferBatch[n0], n1 - n0);
+				const ndBrainMemVector xxxx1(&workBufferBatch[n1], n2 - n1);
+				k *= 1;
+			}
 		}
 	
 		ndAssert(indexCpu >= 0);
