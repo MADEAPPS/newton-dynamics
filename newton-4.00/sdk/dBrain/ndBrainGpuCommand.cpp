@@ -124,22 +124,11 @@ void ndBrainGpuCommand::Assembly(VkShaderModule shader, ndInt32 workGroups, ndIn
 	vkCmdBindDescriptorSets(m_commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
 	vkCmdDispatch(m_commandBuffer, uint32_t(workGroups), 1, 1);
 
-	//VkMemoryBarrier2KHR memoryBarrier = {};
-	//memoryBarrier.srcStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT_KHR;
-	//memoryBarrier.srcAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT_KHR;
-	//memoryBarrier.dstStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT_KHR;
-	//memoryBarrier.dstAccessMask = VK_ACCESS_2_SHADER_READ_BIT_KHR;
-	//
-	//VkDependencyInfoKHR dependencyInfo = {};
-	//dependencyInfo.bufferMemoryBarrierCount = 1;
-	//dependencyInfo.pNext = &memoryBarrier;
-	//vkCmdPipelineBarrier2KHR(m_commandBuffer, &dependencyInfo);
-
 	VkMemoryBarrier memoryBarrier = {};
 	memoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
 	memoryBarrier.pNext = VK_NULL_HANDLE;
-	memoryBarrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
-	memoryBarrier.dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+	memoryBarrier.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+	memoryBarrier.dstAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
 	vkCmdPipelineBarrier(m_commandBuffer,
 		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
 		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
