@@ -147,8 +147,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 {
-	//ndInt32 batchSize = 1;
-	//ndInt32 batchSize = 1000;
+	//ndInt32 batchSize = 2;
 	const ndInt32 batchSize = testDigits->GetCount();
 
 	ndBrainGpuContext gpuContext;
@@ -164,7 +163,6 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	ndBrainVector outputBuffer;
 	inference.GetResults(outputBuffer);
 	inference.GetWorkBuffer(workBuffer);
-	const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();
 
 	ndInt32 failCount = 0;
 	const ndInt32 outputSize = (*testLabels)[0].GetCount();
@@ -179,10 +177,11 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	{
 		const ndBrainVector& input = (*testDigits)[i];
 		ndBrainMemVector outputCpu (&output[i * outputSize], outputSize);
-		//brain.MakePrediction(input, outputCpu, workingBuffer);
+		brain.MakePrediction(input, outputCpu, workingBuffer);
 
-		ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
-		brain.MakePrediction_____(input, outputCpu, workingBuffer, workBufferBatch, offsets);
+		//const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();		
+		//ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
+		//brain.MakePrediction_____(input, outputCpu, workingBuffer, workBufferBatch, offsets);
 	}
 	cpuTime = ndGetTimeInMicroseconds() - cpuTime;
 	ndExpandTraceMessage("cpuTime %f (sec)\n", ndFloat64(cpuTime) / 1000000.0f);
@@ -214,17 +213,17 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 		if (indexGpu != indexCpu)
 		{
 			ndAssert(0);
-			//const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();
-			//ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
-			//for (ndInt32 k = 0; k < brain.GetCount(); ++k)
-			//{
-			//	ndInt32 n0 = offsets[k + 0];
-			//	ndInt32 n1 = offsets[k + 1];
-			//	ndInt32 n2 = offsets[k + 2];
-			//	const ndBrainMemVector xxxx0(&workBufferBatch[n0], n1 - n0);
-			//	const ndBrainMemVector xxxx1(&workBufferBatch[n1], n2 - n1);
-			//	k *= 1;
-			//}
+			const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();
+			ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
+			for (ndInt32 j = 0; j < brain.GetCount(); ++j)
+			{
+				ndInt32 n0 = offsets[j + 0];
+				ndInt32 n1 = offsets[j + 1];
+				ndInt32 n2 = offsets[j + 2];
+				const ndBrainMemVector xxxx0(&workBufferBatch[n0], n1 - n0);
+				const ndBrainMemVector xxxx1(&workBufferBatch[n1], n2 - n1);
+				j *= 1;
+			}
 		}
 	
 		ndAssert(indexCpu >= 0);

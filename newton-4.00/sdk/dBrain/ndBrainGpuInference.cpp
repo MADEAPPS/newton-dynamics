@@ -31,12 +31,12 @@ class ndBrainGpuInference::ndBrainLoadInputData : public ndBrainGpuCommand
 		ndInt32 m_outputBlockSize;
 	};
 
-	ndBrainLoadInputData(ndBrainGpuInference* const me, const ndBrainMatrix& input)
+	ndBrainLoadInputData(ndBrainGpuInference* const me, const ndBrainMatrix& input, ndInt32 workGroups, ndInt32 batchStart)
 		:ndBrainGpuCommand(me->m_context)
 		,m_parammeters(me->m_context, sizeof (UniformBufferObject))
 	{
 		UniformBufferObject uniformParam;
-		uniformParam.m_batchIndex = 0;
+		uniformParam.m_batchIndex = batchStart;
 		uniformParam.m_inputSize = input.GetColumns();
 		uniformParam.m_inputBlockSize = me->m_inputBuffer.m_offsets[0];
 		uniformParam.m_outputBlockSize = me->m_workingBuffer.m_offsets[me->m_workingBuffer.m_offsets.GetCount() - 1];
@@ -45,9 +45,9 @@ class ndBrainGpuInference::ndBrainLoadInputData : public ndBrainGpuCommand
 
 		ndBrainGpuBuffer* params[3];
 		params[0] = &m_parammeters;
-		params[1] = me->m_inputBuffer.m_buffer;
-		params[2] = me->m_workingBuffer.m_buffer;
-		Assembly(me->m_context->m_ndBrainCopyInput, me->m_inputBatchSize, 3, params);
+		params[1] = me->m_workingBuffer.m_buffer;
+		params[2] = me->m_inputBuffer.m_buffer;
+		Assembly(me->m_context->m_ndBrainCopyInput, workGroups, 3, params);
 	}
 
 	ndBrainGpuUniformBuffer m_parammeters;
@@ -58,17 +58,19 @@ class ndBrainGpuInference::ndBrainGetResultData : public ndBrainGpuCommand
 	public:
 	struct UniformBufferObject
 	{
+		ndInt32 m_batchIndex;
 		ndInt32 m_outputSize;
 		ndInt32 m_workBufferStart;
 		ndInt32 m_workBufferSize;
 	};
 
-	ndBrainGetResultData(ndBrainGpuInference* const me)
+	ndBrainGetResultData(ndBrainGpuInference* const me, ndInt32 workGroups, ndInt32 batchStart)
 		:ndBrainGpuCommand(me->m_context)
 		,m_parammeters(me->m_context, sizeof(UniformBufferObject))
 	{
 		UniformBufferObject uniformParam;
 		const ndArray<ndInt32>& workBuffOffsets = me->m_workingBuffer.m_offsets;
+		uniformParam.m_batchIndex = batchStart;
 		uniformParam.m_outputSize = me->m_outputBuffer.m_offsets[0];
 		uniformParam.m_workBufferStart = workBuffOffsets[workBuffOffsets.GetCount() - 2];
 		uniformParam.m_workBufferSize = workBuffOffsets[workBuffOffsets.GetCount() - 1];
@@ -79,7 +81,7 @@ class ndBrainGpuInference::ndBrainGetResultData : public ndBrainGpuCommand
 		params[0] = &m_parammeters;
 		params[1] = me->m_workingBuffer.m_buffer;
 		params[2] = me->m_outputBuffer.m_buffer;
-		Assembly(me->m_context->m_ndBrainGetResults, me->m_inputBatchSize, 3, params);
+		Assembly(me->m_context->m_ndBrainGetResults, workGroups, 3, params);
 	}
 
 	ndBrainGpuUniformBuffer m_parammeters;
@@ -205,26 +207,49 @@ void ndBrainGpuInference::BuildDisplayList(const ndBrainMatrix& input)
 	buffers.PushBack(&m_paramBuffer);
 	buffers.PushBack(&m_workingBuffer);
 
-
+#if 0
 	ndInt32 workGroupBatch = 1000;
 	ndList<ndSharedPtr<ndBrainGpuCommand>> reusableList;
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
 	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
 	{
 		ndBrainLayer* const layer = layers[i];
-		reusableList.Append(layer->AssemblyGPUCommand(m_context, i, m_inputBatchSize, buffers));
-		//reusableList.Append(layer->AssemblyGPUCommand(m_context, i, workGroupBatch, buffers));
+		//reusableList.Append(layer->AssemblyGPUCommand(m_context, i, m_inputBatchSize, buffers));
+		reusableList.Append(layer->AssemblyGPUCommand(m_context, i, workGroupBatch, buffers));
 	}
 
-	//for (ndInt32 i = 0; i < m_inputBatchSize; i += workGroupBatch)
-	for (ndInt32 i = 0; i < 1; i += workGroupBatch)
+	for (ndInt32 i = 0; i < m_inputBatchSize; i += workGroupBatch)
+	//for (ndInt32 i = 0; i < 1; i += workGroupBatch)
 	{
-		m_displayList.Append(new ndBrainLoadInputData(this, input));
+		m_displayList.Append(new ndBrainLoadInputData(this, input, workGroupBatch, i));
+		//for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = reusableList.GetFirst(); node; node = node->GetNext())
+		for (ndInt32 j = 0; j < m_brain->GetCount(); ++j)
+		{
+			//m_displayList.Append(node->GetInfo());
+			ndBrainLayer* const layer = layers[j];
+			m_displayList.Append(layer->AssemblyGPUCommand(m_context, j, workGroupBatch, buffers));
+		}
+		m_displayList.Append(new ndBrainGetResultData(this, workGroupBatch, i));
+	}
+#else
+
+	ndList<ndSharedPtr<ndBrainGpuCommand>> reusableList;
+	const ndArray<ndBrainLayer*>& layers = *m_brain;
+	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
+	{
+		ndBrainLayer* const layer = layers[i];
+		reusableList.Append(layer->AssemblyGPUCommand(m_context, i, m_inputBatchSize, buffers));
+	}
+
+	for (ndInt32 i = 0; i < 1; ++i)
+	{
+		m_displayList.Append(new ndBrainLoadInputData(this, input, m_inputBatchSize, 0));
 		for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = reusableList.GetFirst(); node; node = node->GetNext())
 		{
 			m_displayList.Append(node->GetInfo());
 		}
-		m_displayList.Append(new ndBrainGetResultData(this));
+		m_displayList.Append(new ndBrainGetResultData(this, m_inputBatchSize, 0));
 	}
+#endif
 }
 #endif

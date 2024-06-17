@@ -15,6 +15,7 @@ layout (local_size_x = WORKGROUP_SIZE) in;
 
 layout(std140, binding = 0) uniform UniformBufferObject 
 {
+    int m_batchIndex;
     int m_outputSize;
     int m_workBufferStart;
     int m_workBufferSize;
@@ -33,7 +34,7 @@ layout(std430, binding = 2) buffer outputBuffer
 void main() 
 {
     uint dstBase = gl_WorkGroupID.x * m_outputSize;
-    uint srcBase = gl_WorkGroupID.x * m_workBufferSize + m_workBufferStart;
+    uint srcBase = (gl_WorkGroupID.x + m_batchIndex) * m_workBufferSize + m_workBufferStart;
     for (uint index = gl_LocalInvocationID.x; index < m_outputSize; index += gl_WorkGroupSize.x)
     {
         m_outputBuffer[dstBase + index] = m_inputOutputData[srcBase + index];

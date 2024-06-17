@@ -23,7 +23,6 @@
 #include "ndBrain.h"
 #include "ndBrainVector.h"
 #include "ndBrainSaveLoad.h"
-//#include "ndBrainGpuInference.h"
 
 ndBrain::ndBrain()
 	:ndArray<ndBrainLayer*>()

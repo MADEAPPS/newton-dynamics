@@ -28,8 +28,6 @@
 class ndBrainLoad;
 class ndBrainSave;
 
-//class ndBrainGpuInference;
-
 class ndBrain: public ndArray<ndBrainLayer*>
 {
 	public: 
