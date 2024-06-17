@@ -26,7 +26,7 @@
 #include "ndBrainGpuContext.h"
 #include "ndBrainLayerLinear.h"
 
-//#define D_USE_GPU_TILED_MATRIX
+#define D_USE_GPU_TILED_MATRIX
 
 #if defined (D_USE_GPU_TILED_MATRIX)
 	#define ND_MATRIF_TILE_SIZE 16

@@ -23,6 +23,7 @@
 #include "ndBrain.h"
 #include "ndBrainVector.h"
 #include "ndBrainSaveLoad.h"
+//#include "ndBrainGpuInference.h"
 
 ndBrain::ndBrain()
 	:ndArray<ndBrainLayer*>()
@@ -214,7 +215,7 @@ ndInt32 ndBrain::CalculateWorkingBufferSize() const
 	return maxSize * 2 + 256;
 }
 
-void ndBrain::CalculateInputGradient___(const ndBrainVector& input, ndBrainVector& inputGradients)
+void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients)
 {
 	ndAssert(0);
 	ndFixSizeArray<ndInt32, 256> prefixScan;
@@ -258,7 +259,6 @@ void ndBrain::CalculateInputGradient___(const ndBrainVector& input, ndBrainVecto
 	inputGradients.Set(gradientOut);
 }
 
-//void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients, ndBrainVector& workingBuffer)
 void ndBrain::CalculateInputGradient(const ndBrainVector&, ndBrainVector&, ndBrainVector&)
 {
 	ndAssert(0);
@@ -288,6 +288,50 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, 
 	{
 		out.SetSize(layers[i]->GetOutputSize());
 		layers[i]->MakePrediction(in, out);
+		in.Swap(out);
+	}
+
+	ndAssert(in.GetCount() == output.GetCount());
+	output.Set(in);
+}
+
+
+void ndBrain::MakePrediction_____(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer, const ndBrainVector workBufferGpu, const ndArray<ndInt32>& offsetsGpu)
+{
+	const ndArray<ndBrainLayer*>& layers = *this;
+	ndInt32 maxSize = layers[0]->GetInputSize();
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		maxSize = ndMax(maxSize, layers[i]->GetOutputBufferSize());
+	}
+
+	const ndInt32 maxMemory = CalculateWorkingBufferSize();
+	if (maxMemory > workingBuffer.GetCapacity())
+	{
+		workingBuffer.SetCount(maxMemory);
+	}
+	workingBuffer.SetCount(maxMemory);
+
+	ndBrainMemVector in(&workingBuffer[0], input.GetCount());
+	ndBrainMemVector out(&workingBuffer[maxSize + 128], input.GetCount());
+
+	in.Set(input);
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		out.SetSize(layers[i]->GetOutputSize());
+		layers[i]->MakePrediction(in, out);
+
+		ndInt32 n0 = offsetsGpu[i + 0];
+		ndInt32 n1 = offsetsGpu[i + 1];
+		ndInt32 n2 = offsetsGpu[i + 2];
+		const ndBrainMemVector xxxx0(&workBufferGpu[n0], n1 - n0);
+		const ndBrainMemVector xxxx1(&workBufferGpu[n1], n2 - n1);
+		for (ndInt32 j = 0; j < out.GetCount(); ++j)
+		{
+			ndFloat32 error = ndAbs (out[j] - xxxx1[j]);
+			ndAssert(error < 1.0e-3f);
+		}
+
 		in.Swap(out);
 	}
 

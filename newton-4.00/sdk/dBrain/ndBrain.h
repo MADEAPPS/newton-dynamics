@@ -28,6 +28,8 @@
 class ndBrainLoad;
 class ndBrainSave;
 
+//class ndBrainGpuInference;
+
 class ndBrain: public ndArray<ndBrainLayer*>
 {
 	public: 
@@ -55,10 +57,12 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	void InitWeightsXavierMethod();
 	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
 
-	void CalculateInputGradient___(const ndBrainVector& input, ndBrainVector& inputGradients);
+	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients);
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer);
 	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients, ndBrainVector& workingBuffer);
+
+	void MakePrediction_____(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer, const ndBrainVector workBufferGpu, const ndArray<ndInt32>& offsetsGpu);
 
 	friend class ndBrainLoad;
 	friend class ndBrainSave;
