@@ -282,7 +282,8 @@ void ndBrainGpuContext::CreatePhysicalDevice()
 		VkPhysicalDeviceProperties properties;
 		vkGetPhysicalDeviceProperties(gpus[i], &properties);
 #ifdef ND_SELECT_DISCRETE_GPU
-		if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+		if ((properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) ||
+			(properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU))
 #else
 		if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
 #endif
