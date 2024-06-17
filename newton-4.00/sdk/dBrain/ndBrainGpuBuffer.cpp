@@ -188,10 +188,8 @@ void ndBrainGpuFloatBuffer::UnloadData(ndBrainVector& output)
 	{
 		const ndInt32 size = m_sizeInBytes / ndInt32(sizeof(ndReal));
 		output.SetCount(size);
-		for (ndInt32 i = 0; i < size; ++i)
-		{
-			output[i] = ndBrainFloat(src[i]);
-		}
+		const ndBrainMemVector srcData(src, size);
+		output.Set(srcData);
 	}
 }
 

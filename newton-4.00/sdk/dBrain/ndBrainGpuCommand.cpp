@@ -124,18 +124,18 @@ void ndBrainGpuCommand::Assembly(VkShaderModule shader, ndInt32 workGroups, ndIn
 	vkCmdBindDescriptorSets(m_commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
 	vkCmdDispatch(m_commandBuffer, uint32_t(workGroups), 1, 1);
 
-	VkMemoryBarrier memoryBarrier = {};
-	memoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-	memoryBarrier.pNext = VK_NULL_HANDLE;
-	memoryBarrier.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
-	memoryBarrier.dstAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
-	vkCmdPipelineBarrier(m_commandBuffer,
-		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-		0,
-		0, &memoryBarrier,
-		0, VK_NULL_HANDLE,
-		0, VK_NULL_HANDLE);
+	//VkMemoryBarrier memoryBarrier = {};
+	//memoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+	//memoryBarrier.pNext = VK_NULL_HANDLE;
+	//memoryBarrier.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+	//memoryBarrier.dstAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+	//vkCmdPipelineBarrier(m_commandBuffer,
+	//	VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+	//	VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+	//	0,
+	//	0, &memoryBarrier,
+	//	0, VK_NULL_HANDLE,
+	//	0, VK_NULL_HANDLE);
 
 	m_context->CheckResultVulkan(vkEndCommandBuffer(m_commandBuffer));
 }

@@ -169,13 +169,14 @@ template <class T>
 inline void ndMemSet(T* const dst, const T& val, ndInt32 elements)
 {
 	T value(val);
-	const ndInt32 n = elements & (-0x04);
-	for (ndInt32 i = 0; i < n; i += 4)
+	const ndInt32 stride = 8;
+	const ndInt32 n = elements & (-stride);
+	for (ndInt32 i = 0; i < n; i += stride)
 	{
-		dst[i + 0] = value;
-		dst[i + 1] = value;
-		dst[i + 2] = value;
-		dst[i + 3] = value;
+		for (ndInt32 j = 0; j < stride; ++j)
+		{
+			dst[i + j] = value;
+		}
 	}
 	for (ndInt32 i = n; i < elements; ++i)
 	{
@@ -186,18 +187,20 @@ inline void ndMemSet(T* const dst, const T& val, ndInt32 elements)
 template <class T>
 inline void ndMemCpy(T* const dst, const T* const src, ndInt32 elements)
 {
-	const ndInt32 n = elements & (-0x04);
-	for (ndInt32 i = 0; i < n; i += 4)
-	{
-		dst[i + 0] = src[i + 0];
-		dst[i + 1] = src[i + 1];
-		dst[i + 2] = src[i + 2];
-		dst[i + 3] = src[i + 3];
-	}
-	for (ndInt32 i = n; i < elements; ++i)
-	{
-		dst[i] = src[i];
-	}
+	//const ndInt32 stride = 8;
+	//const ndInt32 n = elements & (-stride);
+	//for (ndInt32 i = 0; i < n; i += stride)
+	//{
+	//	for (ndInt32 j = 0; j < stride; ++j)
+	//	{
+	//		dst[i + j] = src[i + j];
+	//	}
+	//}
+	//for (ndInt32 i = n; i < elements; ++i)
+	//{
+	//	dst[i] = src[i];
+	//}
+	memcpy(dst, src, sizeof(T) * elements);
 }
 
 template <class T>
