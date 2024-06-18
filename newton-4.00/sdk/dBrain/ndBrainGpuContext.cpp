@@ -115,10 +115,12 @@ void* ndBrainGpuContext::VulkanAlloc(void* userData, size_t size, size_t alignme
 	ndTree<ndMemoryEntry, void*>& dictionary = context->m_memoryDictionary;
 	
 	size_t originalSize = size;
+	alignment = ndMax(alignment, size_t(D_MEMORY_ALIGMNET));
 	if (alignment > D_MEMORY_ALIGMNET)
 	{
 		size += alignment;
 	}
+
 	char* const allocatedPtr = (char*)ndMemory::Malloc(size);
 	size_t const ptrValue = ((size_t)(allocatedPtr + alignment - 1)) & ~(alignment - 1);
 	char* const ptr = (char*)ptrValue;

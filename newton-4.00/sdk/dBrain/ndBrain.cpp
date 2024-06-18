@@ -327,7 +327,8 @@ void ndBrain::MakePrediction_____(const ndBrainVector& input, ndBrainVector& out
 		const ndBrainMemVector xxxx1(&workBufferGpu[n1], n2 - n1);
 		for (ndInt32 j = 0; j < out.GetCount(); ++j)
 		{
-			ndFloat32 error = ndAbs (out[j] - xxxx1[j]);
+			ndFloat32 error;
+			error = ndAbs (out[j] - xxxx1[j]);
 			ndAssert(error < 1.0e-3f);
 		}
 
