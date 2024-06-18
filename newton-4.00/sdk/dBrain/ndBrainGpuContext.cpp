@@ -90,6 +90,8 @@ ndBrainGpuContext::~ndBrainGpuContext()
 	vkDestroyCommandPool(m_device, m_commandPool, m_allocator);
 	vkDestroyDevice(m_device, m_allocator);
 	vkDestroyInstance(m_instance, m_allocator);
+
+	ndAssert(!m_memoryDictionary.GetCount());
 }
 
 bool ndBrainGpuContext::HasGpuSupport()
