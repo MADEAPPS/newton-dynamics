@@ -147,8 +147,8 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 {
-	ndInt32 batchSize = 1;
-	//const ndInt32 batchSize = testDigits->GetCount();
+	//ndInt32 batchSize = 1;
+	const ndInt32 batchSize = testDigits->GetCount();
 
 	ndBrainGpuContext gpuContext;
 	ndBrainGpuInference inference(&gpuContext, &brain, *testDigits, batchSize);
@@ -178,10 +178,11 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 		const ndBrainVector& input = (*testDigits)[i];
 		ndBrainMemVector outputCpu (&output[i * outputSize], outputSize);
 		brain.MakePrediction(input, outputCpu, workingBuffer);
-
+		#ifdef _DEBUG
 		const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();		
 		ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
 		brain.MakePrediction_____(input, outputCpu, workingBuffer, workBufferBatch, offsets);
+		#endif
 	}
 	cpuTime = ndGetTimeInMicroseconds() - cpuTime;
 	ndExpandTraceMessage("cpuTime %f (sec)\n", ndFloat64(cpuTime) / 1000000.0f);
@@ -212,6 +213,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 
 		if (indexGpu != indexCpu)
 		{
+			#ifdef _DEBUG
 			ndAssert(0);
 			const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();
 			ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
@@ -224,6 +226,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 				const ndBrainMemVector xxxx1(&workBufferBatch[n1], n2 - n1);
 				j *= 1;
 			}
+			#endif
 		}
 	
 		ndAssert(indexCpu >= 0);
