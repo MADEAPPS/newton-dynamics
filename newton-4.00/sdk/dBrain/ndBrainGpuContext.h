@@ -49,6 +49,13 @@ class ndBrainGpuContext : public ndClassAlloc
 #else
 class ndBrainGpuContext: public ndClassAlloc
 {
+	class ndMemoryEntry
+	{
+		public:
+		void* m_ptr;
+		size_t m_size;
+	};
+
 	public:
 	ndBrainGpuContext();
 	virtual ~ndBrainGpuContext();
@@ -105,6 +112,7 @@ class ndBrainGpuContext: public ndClassAlloc
 	VkPhysicalDevice m_physicalDevice;
 	VkPhysicalDeviceProperties m_gpuProps;
 	VkDebugReportCallbackEXT m_debugMessenger;
+	ndTree<ndMemoryEntry, void*> m_memoryDictionary;
 
 	public:
 	union

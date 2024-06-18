@@ -106,25 +106,53 @@ void ndBrainGpuContext::CheckResultVulkan(VkResult err)
 	}
 }
 
-void* ndBrainGpuContext::VulkanAlloc(void*, size_t size, size_t alignment, VkSystemAllocationScope)
+void* ndBrainGpuContext::VulkanAlloc(void* userData, size_t size, size_t alignment, VkSystemAllocationScope)
 {
-	//ndAssert(alignment);
-	ndAssert(alignment <= D_MEMORY_ALIGMNET);
-	alignment = 0;
-	return ndMemory::Malloc(size);
+	ndBrainGpuContext* const context = (ndBrainGpuContext*)userData;
+
+	ndTree<ndMemoryEntry, void*>& dictionary = context->m_memoryDictionary;
+	
+	size_t originalSize = size;
+	if (alignment > D_MEMORY_ALIGMNET)
+	{
+		size += alignment;
+	}
+	char* const allocatedPtr = (char*)ndMemory::Malloc(size);
+	size_t const ptrValue = ((size_t)(allocatedPtr + alignment - 1)) & ~(alignment - 1);
+	char* const ptr = (char*)ptrValue;
+
+	ndTree<ndMemoryEntry, void*>::ndNode* const node = dictionary.Insert(ptr);
+	ndMemoryEntry& entry = node->GetInfo();
+
+	entry.m_ptr = allocatedPtr;
+	entry.m_size = originalSize;
+	return ptr;
 }
 
-void ndBrainGpuContext::VulkanFree(void*, void* memory)
+void ndBrainGpuContext::VulkanFree(void* userData, void* memory)
 {
-	ndMemory::Free(memory);
+	if (memory)
+	{
+		ndBrainGpuContext* const context = (ndBrainGpuContext*)userData;
+		ndTree<ndMemoryEntry, void*>& dictionary = context->m_memoryDictionary;
+		ndTree<ndMemoryEntry, void*>::ndNode* const node = dictionary.Find(memory);
+		const ndMemoryEntry& entry = node->GetInfo();
+		ndMemory::Free(entry.m_ptr);
+		dictionary.Remove(node);
+	}
 }
 
-void* ndBrainGpuContext::VulkanRealloc(void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope allocationScope)
+void* ndBrainGpuContext::VulkanRealloc(void* userData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope allocationScope)
 {
-	size_t oldSize = ndMemory::GetOriginalSize(pOriginal);
-	void* const ptr = VulkanAlloc(pUserData, size, alignment, allocationScope);
+	ndBrainGpuContext* const context = (ndBrainGpuContext*)userData;
+	ndTree<ndMemoryEntry, void*>& dictionary = context->m_memoryDictionary;
+	ndTree<ndMemoryEntry, void*>::ndNode* const node = dictionary.Find(pOriginal);
+	const ndMemoryEntry& entry = node->GetInfo();
+
+	size_t oldSize = entry.m_size;
+	void* const ptr = VulkanAlloc(userData, size, alignment, allocationScope);
 	ndMemCpy((char*)ptr, (char*)pOriginal, ndInt32(ndMin (size, oldSize)));
-	VulkanFree(pUserData, pOriginal);
+	VulkanFree(userData, pOriginal);
 	return ptr;
 }
 
