@@ -1,13 +1,14 @@
 /* Copyright (c) <2003-2022> <Newton Game Dynamics>
-* 
+*
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
 * arising from the use of this software.
-* 
+*
 * Permission is granted to anyone to use this software for any purpose,
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
+
 
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
@@ -57,126 +58,104 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& orig
 
 class NewtonPhantom : public ndModel
 {
-	typedef void* RenderableNode;
-	// NewtonPhantom: A class representing a phantom collision shape in a physics simulation.
-	// Phantom shapes can interact with other physics bodies to gather collision data
-	// without affecting the physics simulation itself.
+	// A Phantom collision shape can be moved around the world, gathering contact
+	// information with other ndBody's without effecting the simulation
 
-	public:
-	// Constructor: Initializes a new phantom shape with a given shape and scene.
-	NewtonPhantom(ndScene* scene, ndShape* shape, RenderableNode phantomNode) :
+public:
+	NewtonPhantom(ndScene* scene) :
 		ndModel(),
-		phantomNode(phantomNode),
-		phantomShape(shape),
+		phantomShape(new ndShapeBox(1.0f, 1.0f, 1.0f)),
 		worldMatrix(ndGetIdentityMatrix()),
 		notification(scene)
 	{
-		// The constructor initializes the phantom shape, world matrix, and notification system.
 	}
 	~NewtonPhantom() = default;
 
-
-	// GetContactCount: Returns the number of contact points detected.
-	ndInt32 getContactCount() const
+	void OnAddToWorld() override
 	{
-		return contactCount;
+
 	}
 
-	// GetContactPoint: Returns the current contact point in the simulation.
+	void OnRemoveFromToWorld() override
+	{
+
+	}
+
+	void transform(const ndMatrix& matrix) { worldMatrix = matrix; }
+	ndInt32 getContactCount() const { return contactCount; }
 	ndVector getContactPoint() const { return contactPoint; }
 
-	// Update: Overridden function that updates the phantom's state in each simulation step.
-	void Update(ndWorld* const, ndFloat32) override
+
+	void Update(ndWorld* const world, ndFloat32) override
 	{
-		//contactCount = -1;
-		//ndMatrix phantomPose;
-		//eigenToNewton(phantomNode->getSpaceTime().worldTransform, phantomPose);
-		//worldMatrix = phantomPose;
-		//
-		//// Calculates the current Axis-Aligned Bounding Box (AABB) in world space.
-		//ndVector boxMin, boxMax;
-		//phantomShape.CalculateAabb(worldMatrix, boxMin, boxMax);
-		//
-		////LOG(DBUG) << "phantom min{ " << boxMin.GetX() << ", " << boxMin.GetY() << ", " << boxMin.GetZ() << "}";
-		////LOG(DBUG) << "phantom max{ " << boxMax.GetX() << ", " << boxMax.GetY() << ", " << boxMax.GetZ() << "}";
-		//
-		//// Notify callback for bodies within the AABB.
-		//ndBodiesInAabbNotify notifyCallback;
-		//world->BodiesInAabb(notifyCallback, boxMin, boxMax);
-		//
-		//// Processes each body in the AABB.
-		//for (ndInt32 i = 0; i < notifyCallback.m_bodyArray.GetCount(); ++i)
-		//{
-		//	ndBody* const nbody = const_cast<ndBody*> (notifyCallback.m_bodyArray[i]);
-		//	ndBodyKinematic* const kBody = nbody->GetAsBodyKinematic();
-		//
-		//	const ndShapeInstance& otherShape = kBody->GetCollisionShape();
-		//	const ndMatrix& otherMatrix = notifyCallback.m_bodyArray[i]->GetMatrix();
-		//
-		//	// Ignores collisions with phantom's 'resting on' body
-		//	ndBodyNotify* const notify = nbody->GetNotifyCallback();
-		//	Renderable* const node = static_cast<Renderable*> (notify->GetUserData());
-		//
-		//	// if (node && restingOn && node == restingOn.get()) continue;
-		//
-		//	 // Ignores collisions with itself
-		//	if (otherShape.GetShape() != phantomShape.GetShape())
-		//	{
-		//		if (node)
-		//		{
-		//			LOG(DBUG) << "CONTACTING " << node->getName();
-		//			node->getSpaceTime().updateWorldBounds(true);
-		//			AlignedBox3f box = node->getSpaceTime().worldBound;
-		//			LOG(DBUG) << "min{ " << box.min().x() << ", " << box.min().y() << ", " << box.min().z() << "}";
-		//			LOG(DBUG) << "max{ " << box.max().x() << ", " << box.max().y() << ", " << box.max().z() << "}";
-		//		}
-		//
-		//
-		//		ndFixSizeArray<ndContactPoint, 16> contactBuffer;
-		//		ndVector phantomVelocity = ndVector::m_zero;
-		//		ndVector otherVelocity = ndVector::m_zero;
-		//
-		//		ndContactSolver contSolver;
-		//		contSolver.CalculateContacts(&phantomShape, worldMatrix, phantomVelocity, &otherShape, otherMatrix, otherVelocity, contactBuffer, &notification);
-		//		contactCount = contactBuffer.GetCount();
-		//		LOG(DBUG) << "CONTACT COUNT: " << contactCount;
-		//
-		//		if (contactCount)
-		//		{
-		//
-		//			for (int j = 0; j < contactCount; ++j)
-		//			{
-		//				const ndContactPoint& cPnt = contactBuffer[j];
-		//				contactPoint = cPnt.m_point;
-		//			}
-		//		}
-		//	}
-		//	else
-		//	{
-		//
-		//	}
-		//}
+		
+		// calc the current AABB in world space
+		ndVector boxMin;
+		ndVector boxMax;
+		phantomShape.CalculateAabb(worldMatrix, boxMin, boxMax);
+
+		ndBodiesInAabbNotify notifyCallback;
+		world->BodiesInAabb(notifyCallback, boxMin, boxMax);
+
+		for (ndInt32 i = 0; i < notifyCallback.m_bodyArray.GetCount(); ++i)
+		{
+			ndBody* const nbody = const_cast<ndBody*> (notifyCallback.m_bodyArray[i]);
+			ndBodyKinematic* const kBody = nbody->GetAsBodyKinematic();
+
+			const ndShapeInstance& otherShape = kBody->GetCollisionShape();
+			const ndMatrix& otherMatrix = notifyCallback.m_bodyArray[i]->GetMatrix();
+
+			// ignore self collision
+			if (otherShape.GetShape() != phantomShape.GetShape())
+			{
+				ndFixSizeArray<ndContactPoint, 16> contactBuffer;
+
+				ndVector phantomVelocity = ndVector::m_zero;
+				ndVector otherVelocity = ndVector::m_zero;
+
+				ndContactSolver contSolver;
+				contSolver.CalculateContacts(&phantomShape, worldMatrix, phantomVelocity, &otherShape, otherMatrix, otherVelocity, contactBuffer, &notification);
+				contactCount = contactBuffer.GetCount();
+
+				// 
+				std::cout << contactCount << std::endl;
+
+				
+				if (contactCount)
+				{
+					for (int j = 0; j < contactCount; ++j)
+					{
+						const ndContactPoint& cPnt = contactBuffer[j];
+						contactPoint = cPnt.m_point;
+					}
+				}
+			}
+		}
+	}
+	void PostUpdate(ndWorld* const, ndFloat32) override
+	{
+	}
+	void PostTransformUpdate(ndWorld* const, ndFloat32) override
+	{
 	}
 
-	private:
-	RenderableNode phantomNode = nullptr;
+private:
 	ndShapeInstance phantomShape;
-
 	ndMatrix worldMatrix;
 	ndContactNotify notification;
-	ndInt32 contactCount = -1;
-	ndVector contactPoint = ndVector(1.0e10f);
-};
+	ndInt32 contactCount = 0;
+	ndVector contactPoint = ndVector(std::numeric_limits<float>::max());
+}; // end class NewtonPhantom
 
 
-void ndObjectPlacement (ndDemoEntityManager* const scene)
+void ndObjectPlacement(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, ndGetIdentityMatrix());
-
+	//BuildFloorBox(scene, ndGetIdentityMatrix());
+	BuildFlatPlane(scene, true);
 	class PlaceMatrix : public ndMatrix
 	{
-		public:
+	public:
 		PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
 			:ndMatrix(ndGetIdentityMatrix())
 		{
@@ -187,6 +166,10 @@ void ndObjectPlacement (ndDemoEntityManager* const scene)
 	};
 
 	AddBox(scene, PlaceMatrix(0.0f, 20.0f, -3.0f), 0.6f, 10.0f);
+	// create a Phantom model that contains a collision shape and transform matrix
+	NewtonPhantom* const phantom = new NewtonPhantom(scene->GetWorld()->GetScene());
+	ndSharedPtr<ndModel> phantomPtr(phantom);
+	scene->GetWorld()->AddModel(phantomPtr);
 	//AddSphere1(scene, PlaceMatrix(0.0f, 5.0f, 0.0f), 0.5f, 10.0f);
 	//AddCapsule(scene, PlaceMatrix(0.0f, 5.0f, 3.0f), 0.7f, 10.0f);
 	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f, -2.0f), 7, 1.0f, 1.5f, 0.8f, 10.0f);
