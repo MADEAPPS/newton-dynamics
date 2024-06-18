@@ -106,10 +106,11 @@ void ndBrainGpuContext::CheckResultVulkan(VkResult err)
 	}
 }
 
-void* ndBrainGpuContext::VulkanAlloc(void*, size_t size, size_t, VkSystemAllocationScope)
+void* ndBrainGpuContext::VulkanAlloc(void*, size_t size, size_t alignment, VkSystemAllocationScope)
 {
 	//ndAssert(alignment);
-	//ndAssert(alignment <= D_MEMORY_ALIGMNET);
+	ndAssert(alignment <= D_MEMORY_ALIGMNET);
+	alignment = 0;
 	return ndMemory::Malloc(size);
 }
 
