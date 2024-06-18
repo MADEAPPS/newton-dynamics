@@ -26,12 +26,12 @@
 #include "ndBrainGpuContext.h"
 #include "ndBrainLayerLinear.h"
 
-#define D_USE_GPU_TILED_MATRIX
+//#define D_USE_GPU_TILED_MATRIX
 
 #if defined (D_USE_GPU_TILED_MATRIX)
-	#define ND_MATRIF_TILE_SIZE 16
+	#define ND_MATRIX_TILE_SIZE 16
 #else
-	#define ND_MATRIF_TILE_SIZE 1
+	#define ND_MATRIX_TILE_SIZE 1
 #endif
 
 ndBrainLayerLinear::ndBrainLayerLinear(ndInt32 inputs, ndInt32 outputs)
@@ -366,7 +366,7 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 			uniformParam.m_matrixColumns = layer->GetInputSize();
 			uniformParam.m_matrixRowsStride = rowsStride;
 			uniformParam.m_matrixColumnsStride = columnsStride;
-			uniformParam.m_workGroupsPerMatrix = ((uniformParam.m_matrixRows + ND_MATRIF_TILE_SIZE - 1) & -ND_MATRIF_TILE_SIZE) / ND_MATRIF_TILE_SIZE;
+			uniformParam.m_workGroupsPerMatrix = ((uniformParam.m_matrixRows + ND_MATRIX_TILE_SIZE - 1) & -ND_MATRIX_TILE_SIZE) / ND_MATRIX_TILE_SIZE;
 
 			uniformParam.m_inputStart = workingBuffer.m_offsets[layerIndex + 0];
 			uniformParam.m_outputStart = workingBuffer.m_offsets[layerIndex + 1];

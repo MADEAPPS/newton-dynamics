@@ -147,8 +147,8 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 {
-	//ndInt32 batchSize = 2;
-	const ndInt32 batchSize = testDigits->GetCount();
+	ndInt32 batchSize = 1;
+	//const ndInt32 batchSize = testDigits->GetCount();
 
 	ndBrainGpuContext gpuContext;
 	ndBrainGpuInference inference(&gpuContext, &brain, *testDigits, batchSize);
@@ -179,9 +179,9 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 		ndBrainMemVector outputCpu (&output[i * outputSize], outputSize);
 		brain.MakePrediction(input, outputCpu, workingBuffer);
 
-		//const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();		
-		//ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
-		//brain.MakePrediction_____(input, outputCpu, workingBuffer, workBufferBatch, offsets);
+		const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();		
+		ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
+		brain.MakePrediction_____(input, outputCpu, workingBuffer, workBufferBatch, offsets);
 	}
 	cpuTime = ndGetTimeInMicroseconds() - cpuTime;
 	ndExpandTraceMessage("cpuTime %f (sec)\n", ndFloat64(cpuTime) / 1000000.0f);

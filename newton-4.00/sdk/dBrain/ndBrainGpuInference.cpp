@@ -176,6 +176,11 @@ void ndBrainGpuInference::SetWorkingBuffer()
 
 	m_workingBuffer.m_offsets.PushBack(sum);
 	m_workingBuffer.m_buffer = new ndBrainGpuFloatBuffer(m_context, sum * m_inputBatchSize);
+
+	ndBrainVector xxxx;
+	xxxx.SetCount(sum * m_inputBatchSize);
+	xxxx.Set(1.0e14f);
+	m_workingBuffer.m_buffer->LoadData(xxxx);
 }
 
 void ndBrainGpuInference::SetInputAndOutputBuffers(const ndBrainMatrix& input)
@@ -244,11 +249,11 @@ void ndBrainGpuInference::BuildDisplayList(const ndBrainMatrix& input)
 	for (ndInt32 i = 0; i < 1; ++i)
 	{
 		m_displayList.Append(new ndBrainLoadInputData(this, input, m_inputBatchSize, 0));
-		for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = reusableList.GetFirst(); node; node = node->GetNext())
-		{
-			m_displayList.Append(node->GetInfo());
-		}
-		m_displayList.Append(new ndBrainGetResultData(this, m_inputBatchSize, 0));
+		//for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = reusableList.GetFirst(); node; node = node->GetNext())
+		//{
+		//	m_displayList.Append(node->GetInfo());
+		//}
+		//m_displayList.Append(new ndBrainGetResultData(this, m_inputBatchSize, 0));
 	}
 #endif
 }
