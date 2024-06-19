@@ -24,11 +24,11 @@ class PhantomPlacement: public DemoEntity
 	PhantomPlacement (DemoEntityManager* const scene)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 	{
-		dAssert (0);
-/*
+		//dAssert (0);
+
 		NewtonWorld* const world = scene->GetNewton();
 		dMatrix matrix (dGetIdentityMatrix());
-		DemoEntity* const cowEntity = DemoEntity::LoadNGD_mesh("cow.ngd", world, scene->GetShaderCache());
+		DemoEntity* const cowEntity = DemoEntity::LoadNGD_mesh("teapot.ngd", world, scene->GetShaderCache());
 		NewtonMesh* const cowMesh = cowEntity->GetMesh()->CreateNewtonMesh(world, dGetIdentityMatrix());
 		
 		NewtonCollision* const shape = NewtonCreateConvexHullFromMesh(world, cowMesh, 0, 0);
@@ -47,7 +47,6 @@ class PhantomPlacement: public DemoEntity
 		delete cowEntity;
 		NewtonMeshDestroy(cowMesh);
 		NewtonDestroyCollision(shape);
-*/
 	}
 
 	~PhantomPlacement()
@@ -481,9 +480,9 @@ void ObjectPlacement (DemoEntityManager* const scene)
 	location.m_z += 0.0f;
 
 
-DemoEntity* const entity = DemoEntity::LoadNGD_mesh("cow.ngd", scene->GetNewton(), scene->GetShaderCache());
-dAssert(entity);
-scene->Append(entity);
+//DemoEntity* const entity = DemoEntity::LoadNGD_mesh("teapot.ngd", scene->GetNewton(), scene->GetShaderCache());
+//dAssert(entity);
+//scene->Append(entity);
 
 //	int count = 3;
 //	dVector size (0.5f, 0.5f, 0.75f, 0.0f);

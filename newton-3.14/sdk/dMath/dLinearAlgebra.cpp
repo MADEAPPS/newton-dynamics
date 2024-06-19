@@ -654,8 +654,7 @@ void dComplementaritySolver::dFrictionLessContactJoint::SetContacts (int count, 
 void dComplementaritySolver::dFrictionLessContactJoint::JacobianDerivative (dParamInfo* const constraintParams)
 {
 	for (int i = 0; i < m_count; i ++) {
-		AddLinearRowJacobian(constraintParams, m_contacts[i].m_point, m_contacts[i].m_point);
-		dAssert(0);
+		AddLinearRowJacobian(constraintParams, m_contacts[i].m_point, m_contacts[i].m_normal);
 /*
 		dVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
 		//dFloat restitution = 0.05f;
