@@ -68,6 +68,7 @@ public:
 		worldMatrix(ndGetIdentityMatrix()),
 		notification(scene)
 	{
+		contactPoint = ndVector(1.0e20f);
 	}
 	~NewtonPhantom() = default;
 
@@ -144,9 +145,30 @@ private:
 	ndMatrix worldMatrix;
 	ndContactNotify notification;
 	ndInt32 contactCount = 0;
-	ndVector contactPoint = ndVector(std::numeric_limits<float>::max());
+	ndVector contactPoint;
 }; // end class NewtonPhantom
 
+
+//class ObjectPlacement : public ndDemoEntityManager::OnPostUpdate
+//{
+//	public:
+//	ObjectPlacement()
+//		:ndDemoEntityManager::OnPostUpdate()
+//		,m_scene()
+//	{
+//	}
+//
+//	~ObjectPlacement()
+//	{
+//	}
+//
+//	virtual void Update(ndDemoEntityManager* const scene, ndFloat32)
+//	{
+//		scene->GetWorld()->CollisionUpdate(0.01f);
+//	}
+//
+//	ndDemoEntityManager* m_scene;
+//};
 
 void ndObjectPlacement(ndDemoEntityManager* const scene)
 {
@@ -155,7 +177,7 @@ void ndObjectPlacement(ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 	class PlaceMatrix : public ndMatrix
 	{
-	public:
+		public:
 		PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
 			:ndMatrix(ndGetIdentityMatrix())
 		{
@@ -175,6 +197,10 @@ void ndObjectPlacement(ndDemoEntityManager* const scene)
 	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f, -2.0f), 7, 1.0f, 1.5f, 0.8f, 10.0f);
 	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  2.0f), 21, 1.0f, 1.5f, 0.7f, 10.0f);
 	//AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 210, 1.0f, 1.5f, 0.9f, 10.0f);
+
+	//ObjectPlacement* const placementUpdate = new ObjectPlacement();
+	//scene->RegisterPostUpdate(placementUpdate);
+
 
 	ndQuaternion rot;
 	ndVector origin(-40.0f, 5.0f, 0.0f, 1.0f);
