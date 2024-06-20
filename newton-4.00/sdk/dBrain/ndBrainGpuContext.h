@@ -27,7 +27,7 @@ class ndBrainGpuContext : public ndClassAlloc
 	virtual ~ndBrainGpuContext(){}
 
 	void Sync() {}
-	void SubmitQueue(ndList<ndSharedPtr<ndBrainGpuCommand>>&) {}
+	void SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>&) {}
 	ndInt32 GetSubGroupSize() const { return 0; }
 	static bool HasGpuSupport() { return false; }
 

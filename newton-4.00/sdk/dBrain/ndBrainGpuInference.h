@@ -31,8 +31,10 @@ class ndBrainGpuInference : public ndClassAlloc
 
 	void GetResults(ndBrainVector&) {}
 	void GetWorkBuffer(ndBrainVector&) {}
+	const ndArray<ndInt32>& GetWorkBufferOffsets() const {return m_offsets;}
 	const ndList<ndSharedPtr<ndBrainGpuCommand>>& GetDisplayList() const {return m_displayList;}
 
+	ndArray<ndInt32>m_offsets;
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_displayList;
 };
 

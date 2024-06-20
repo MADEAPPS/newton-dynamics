@@ -9,7 +9,6 @@
 * freely
 */
 
-
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
@@ -61,7 +60,7 @@ class NewtonPhantom : public ndModel
 	// A Phantom collision shape can be moved around the world, gathering contact
 	// information with other ndBody's without effecting the simulation
 
-public:
+	public:
 	NewtonPhantom(ndScene* scene) :
 		ndModel(),
 		phantomShape(new ndShapeBox(1.0f, 1.0f, 1.0f)),
@@ -74,69 +73,85 @@ public:
 
 	void OnAddToWorld() override
 	{
-
 	}
 
 	void OnRemoveFromToWorld() override
 	{
-
 	}
 
 	void transform(const ndMatrix& matrix) { worldMatrix = matrix; }
 	ndInt32 getContactCount() const { return contactCount; }
 	ndVector getContactPoint() const { return contactPoint; }
 
+
 	void Update(ndWorld* const world, ndFloat32) override
 	{
-		
-		// calc the current AABB in world space
-		ndVector boxMin;
-		ndVector boxMax;
-		phantomShape.CalculateAabb(worldMatrix, boxMin, boxMax);
+		ndDemoEntityManager* scene = ((ndPhysicsWorld*)world)->GetManager();
+		ndDemoCamera* const camera = scene->GetCamera();
 
-		ndBodiesInAabbNotify notifyCallback;
-		world->BodiesInAabb(notifyCallback, boxMin, boxMax);
+		ndFloat32 mouseX;
+		ndFloat32 mouseY;
+		int buttonState0;
+		int buttonState1;
+		scene->GetMousePosition(mouseX, mouseY);
+		buttonState0 = scene->GetMouseKeyState(0) ? 1 : 0;
+		buttonState1 = scene->GetMouseKeyState(1) ? 1 : 0;
 
-		for (ndInt32 i = 0; i < notifyCallback.m_bodyArray.GetCount(); ++i)
+		if (buttonState1)
 		{
-			ndBody* const nbody = const_cast<ndBody*> (notifyCallback.m_bodyArray[i]);
-			ndBodyKinematic* const kBody = nbody->GetAsBodyKinematic();
+			//ndFloat x = dFloat(mouseX);
+			//dFloat y = dFloat(mouseY);
+			ndVector p0(camera->ScreenToWorld(ndVector(mouseX, mouseY, 0.0f, 0.0f)));
+			ndVector p1(camera->ScreenToWorld(ndVector(mouseX, mouseY, 1.0f, 0.0f)));
 
-			const ndShapeInstance& otherShape = kBody->GetCollisionShape();
-			const ndMatrix& otherMatrix = notifyCallback.m_bodyArray[i]->GetMatrix();
-
-			// ignore self collision
-			if (otherShape.GetShape() != phantomShape.GetShape())
-			{
-				ndFixSizeArray<ndContactPoint, 16> contactBuffer;
-
-				ndVector phantomVelocity = ndVector::m_zero;
-				ndVector otherVelocity = ndVector::m_zero;
-
-				ndContactSolver contSolver;
-				contSolver.CalculateContacts(&phantomShape, worldMatrix, phantomVelocity, &otherShape, otherMatrix, otherVelocity, contactBuffer, &notification);
-				contactCount = contactBuffer.GetCount();
-
-				// 
-				std::cout << contactCount << std::endl;
-
-				
-				if (contactCount)
-				{
-					for (int j = 0; j < contactCount; ++j)
-					{
-						const ndContactPoint& cPnt = contactBuffer[j];
-						contactPoint = cPnt.m_point;
-					}
-				}
-			}
+			ndTrace(("%f %f\n", mouseX, mouseY));
+			//// calc the current AABB in world space
+			//ndVector boxMin;
+			//ndVector boxMax;
+			//phantomShape.CalculateAabb(worldMatrix, boxMin, boxMax);
+			//
+			//ndBodiesInAabbNotify notifyCallback;
+			//world->BodiesInAabb(notifyCallback, boxMin, boxMax);
+			//
+			//for (ndInt32 i = 0; i < notifyCallback.m_bodyArray.GetCount(); ++i)
+			//{
+			//	ndBody* const nbody = const_cast<ndBody*> (notifyCallback.m_bodyArray[i]);
+			//	ndBodyKinematic* const kBody = nbody->GetAsBodyKinematic();
+			//
+			//	const ndShapeInstance& otherShape = kBody->GetCollisionShape();
+			//	const ndMatrix& otherMatrix = notifyCallback.m_bodyArray[i]->GetMatrix();
+			//
+			//	// ignore self collision
+			//	if (otherShape.GetShape() != phantomShape.GetShape())
+			//	{
+			//		ndFixSizeArray<ndContactPoint, 16> contactBuffer;
+			//
+			//		ndVector phantomVelocity = ndVector::m_zero;
+			//		ndVector otherVelocity = ndVector::m_zero;
+			//
+			//		ndContactSolver contSolver;
+			//		contSolver.CalculateContacts(&phantomShape, worldMatrix, phantomVelocity, &otherShape, otherMatrix, otherVelocity, contactBuffer, &notification);
+			//		contactCount = contactBuffer.GetCount();
+			//
+			//		// 
+			//		std::cout << contactCount << std::endl;
+			//
+			//
+			//		if (contactCount)
+			//		{
+			//			for (int j = 0; j < contactCount; ++j)
+			//			{
+			//				const ndContactPoint& cPnt = contactBuffer[j];
+			//				contactPoint = cPnt.m_point;
+			//			}
+			//		}
+			//	}
+			//}
 		}
 	}
-
 	void PostUpdate(ndWorld* const, ndFloat32) override
 	{
 	}
-
 	void PostTransformUpdate(ndWorld* const, ndFloat32) override
 	{
 	}
@@ -207,3 +222,4 @@ void ndObjectPlacement(ndDemoEntityManager* const scene)
 	ndVector origin(-40.0f, 5.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
+
