@@ -60,6 +60,20 @@ class NewtonPhantom : public ndModel
 	// A Phantom collision shape can be moved around the world, gathering contact
 	// information with other ndBody's without effecting the simulation
 
+	class ndRayPickingCallback : public ndRayCastClosestHitCallback
+	{
+		public:
+		ndRayPickingCallback()
+			:ndRayCastClosestHitCallback()
+		{
+		}
+
+		ndFloat32 OnRayCastAction(const ndContactPoint& contact, ndFloat32 intersetParam)
+		{
+			return ndRayCastClosestHitCallback::OnRayCastAction(contact, intersetParam);
+		}
+	};
+
 	public:
 	NewtonPhantom(ndScene* scene) :
 		ndModel(),
@@ -104,49 +118,56 @@ class NewtonPhantom : public ndModel
 			ndVector p0(camera->ScreenToWorld(ndVector(mouseX, mouseY, 0.0f, 0.0f)));
 			ndVector p1(camera->ScreenToWorld(ndVector(mouseX, mouseY, 1.0f, 0.0f)));
 
-			ndTrace(("%f %f\n", mouseX, mouseY));
-			//// calc the current AABB in world space
-			//ndVector boxMin;
-			//ndVector boxMax;
-			//phantomShape.CalculateAabb(worldMatrix, boxMin, boxMax);
-			//
-			//ndBodiesInAabbNotify notifyCallback;
-			//world->BodiesInAabb(notifyCallback, boxMin, boxMax);
-			//
-			//for (ndInt32 i = 0; i < notifyCallback.m_bodyArray.GetCount(); ++i)
-			//{
-			//	ndBody* const nbody = const_cast<ndBody*> (notifyCallback.m_bodyArray[i]);
-			//	ndBodyKinematic* const kBody = nbody->GetAsBodyKinematic();
-			//
-			//	const ndShapeInstance& otherShape = kBody->GetCollisionShape();
-			//	const ndMatrix& otherMatrix = notifyCallback.m_bodyArray[i]->GetMatrix();
-			//
-			//	// ignore self collision
-			//	if (otherShape.GetShape() != phantomShape.GetShape())
-			//	{
-			//		ndFixSizeArray<ndContactPoint, 16> contactBuffer;
-			//
-			//		ndVector phantomVelocity = ndVector::m_zero;
-			//		ndVector otherVelocity = ndVector::m_zero;
-			//
-			//		ndContactSolver contSolver;
-			//		contSolver.CalculateContacts(&phantomShape, worldMatrix, phantomVelocity, &otherShape, otherMatrix, otherVelocity, contactBuffer, &notification);
-			//		contactCount = contactBuffer.GetCount();
-			//
-			//		// 
-			//		std::cout << contactCount << std::endl;
-			//
-			//
-			//		if (contactCount)
-			//		{
-			//			for (int j = 0; j < contactCount; ++j)
-			//			{
-			//				const ndContactPoint& cPnt = contactBuffer[j];
-			//				contactPoint = cPnt.m_point;
-			//			}
-			//		}
-			//	}
-			//}
+			ndRayPickingCallback rayCaster;
+			if (world->RayCast(rayCaster, p0, p1))
+			{
+				ndTrace(("%f %f\n", mouseX, mouseY));
+				worldMatrix.m_posit = p0 + (p1 - p0).Scale(rayCaster.m_param);
+				worldMatrix.m_posit.m_w = 1.0f;
+
+				// calc the current AABB in world space
+				ndVector boxMin;
+				ndVector boxMax;
+				phantomShape.CalculateAabb(worldMatrix, boxMin, boxMax);
+				
+				//ndBodiesInAabbNotify notifyCallback;
+				//world->BodiesInAabb(notifyCallback, boxMin, boxMax);
+				//
+				//for (ndInt32 i = 0; i < notifyCallback.m_bodyArray.GetCount(); ++i)
+				//{
+				//	ndBody* const nbody = const_cast<ndBody*> (notifyCallback.m_bodyArray[i]);
+				//	ndBodyKinematic* const kBody = nbody->GetAsBodyKinematic();
+				//
+				//	const ndShapeInstance& otherShape = kBody->GetCollisionShape();
+				//	const ndMatrix& otherMatrix = notifyCallback.m_bodyArray[i]->GetMatrix();
+				//
+				//	// ignore self collision
+				//	if (otherShape.GetShape() != phantomShape.GetShape())
+				//	{
+				//		ndFixSizeArray<ndContactPoint, 16> contactBuffer;
+				//
+				//		ndVector phantomVelocity = ndVector::m_zero;
+				//		ndVector otherVelocity = ndVector::m_zero;
+				//
+				//		ndContactSolver contSolver;
+				//		contSolver.CalculateContacts(&phantomShape, worldMatrix, phantomVelocity, &otherShape, otherMatrix, otherVelocity, contactBuffer, &notification);
+				//		contactCount = contactBuffer.GetCount();
+				//
+				//		// 
+				//		std::cout << contactCount << std::endl;
+				//
+				//
+				//		if (contactCount)
+				//		{
+				//			for (int j = 0; j < contactCount; ++j)
+				//			{
+				//				const ndContactPoint& cPnt = contactBuffer[j];
+				//				contactPoint = cPnt.m_point;
+				//			}
+				//		}
+				//	}
+				//}
+			}
 		}
 	}
 	void PostUpdate(ndWorld* const, ndFloat32) override
