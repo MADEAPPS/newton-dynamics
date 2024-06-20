@@ -57,6 +57,66 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& orig
 
 class NewtonPhantom : public ndModel
 {
+	//class PhantomPlacement : public ndDemoEntity
+	//{
+	//	public:
+	//	PhantomPlacement(DemoEntityManager* const scene)
+	//		:DemoEntity(dGetIdentityMatrix(), NULL)
+	//	{
+	//		//dAssert (0);
+	//
+	//		NewtonWorld* const world = scene->GetNewton();
+	//		dMatrix matrix(dGetIdentityMatrix());
+	//		DemoEntity* const cowEntity = DemoEntity::LoadNGD_mesh("teapot.ngd", world, scene->GetShaderCache());
+	//		NewtonMesh* const cowMesh = cowEntity->GetMesh()->CreateNewtonMesh(world, dGetIdentityMatrix());
+	//
+	//		NewtonCollision* const shape = NewtonCreateConvexHullFromMesh(world, cowMesh, 0, 0);
+	//		m_phantom = NewtonCreateKinematicBody(world, shape, &matrix[0][0]);
+	//
+	//		m_solideMesh = (DemoMesh*)cowEntity->GetMesh();
+	//		m_solideMesh->AddRef();
+	//		m_redMesh = CreatePhantomMesh(scene, shape, dVector(1.0f, 0.0f, 0.0f, 1.0f));
+	//		m_blueMesh = CreatePhantomMesh(scene, shape, dVector(0.0f, 0.5f, 0.0f, 1.0f));
+	//		SetMesh(m_redMesh, dGetIdentityMatrix());
+	//
+	//		NewtonBodySetUserData(m_phantom, this);
+	//		NewtonBodySetMassProperties(m_phantom, 10.0f, shape);
+	//		NewtonBodySetTransformCallback(m_phantom, DemoEntity::TransformCallback);
+	//
+	//		delete cowEntity;
+	//		NewtonMeshDestroy(cowMesh);
+	//		NewtonDestroyCollision(shape);
+	//	}
+	//
+	//	~PhantomPlacement()
+	//	{
+	//		//m_redMesh->Release();
+	//		//m_blueMesh->Release();
+	//		//m_solideMesh->Release();
+	//	}
+	//
+	//	//DemoMesh* CreatePhantomMesh(DemoEntityManager* const scene, NewtonCollision* const shape, const dVector& color)
+	//	//{
+	//	//	DemoMesh* const mesh = new DemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);
+	//	//	DemoSubMesh& subMesh = mesh->GetFirst()->GetInfo();
+	//	//	subMesh.m_specular = color;
+	//	//	subMesh.m_diffuse = color;
+	//	//	subMesh.m_ambient = color;
+	//	//	mesh->OptimizeForRender();
+	//	//	return mesh;
+	//	//}
+	//
+	//	//void SetPhantomMesh(bool redOrBlue)
+	//	//{
+	//	//	redOrBlue ? SetMesh(m_redMesh, dGetIdentityMatrix()) : SetMesh(m_blueMesh, dGetIdentityMatrix());
+	//	//}
+	//
+	//	//NewtonBody* m_phantom;
+	//	//DemoMesh* m_solideMesh;
+	//	//DemoMesh* m_redMesh;
+	//	//DemoMesh* m_blueMesh;
+	//};
+
 	// A Phantom collision shape can be moved around the world, gathering contact
 	// information with other ndBody's without effecting the simulation
 
@@ -73,6 +133,10 @@ class NewtonPhantom : public ndModel
 			return ndRayCastClosestHitCallback::OnRayCastAction(contact, intersetParam);
 		}
 	};
+
+	//class ndBodiesInAabbNotify : public ndBodiesInAabbNotify
+	//{
+	//};
 
 	public:
 	NewtonPhantom(ndScene* scene) :
@@ -113,8 +177,6 @@ class NewtonPhantom : public ndModel
 
 		if (buttonState1)
 		{
-			//ndFloat x = dFloat(mouseX);
-			//dFloat y = dFloat(mouseY);
 			ndVector p0(camera->ScreenToWorld(ndVector(mouseX, mouseY, 0.0f, 0.0f)));
 			ndVector p1(camera->ScreenToWorld(ndVector(mouseX, mouseY, 1.0f, 0.0f)));
 
@@ -130,14 +192,13 @@ class NewtonPhantom : public ndModel
 				ndVector boxMax;
 				phantomShape.CalculateAabb(worldMatrix, boxMin, boxMax);
 				
-				//ndBodiesInAabbNotify notifyCallback;
-				//world->BodiesInAabb(notifyCallback, boxMin, boxMax);
-				//
-				//for (ndInt32 i = 0; i < notifyCallback.m_bodyArray.GetCount(); ++i)
-				//{
-				//	ndBody* const nbody = const_cast<ndBody*> (notifyCallback.m_bodyArray[i]);
-				//	ndBodyKinematic* const kBody = nbody->GetAsBodyKinematic();
-				//
+				ndBodiesInAabbNotify notifyCallback;
+				world->BodiesInAabb(notifyCallback, boxMin, boxMax);
+				for (ndInt32 i = 0; i < notifyCallback.m_bodyArray.GetCount(); ++i)
+				{
+					ndBody* const nbody = const_cast<ndBody*> (notifyCallback.m_bodyArray[i]);
+					ndBodyKinematic* const kBody = nbody->GetAsBodyKinematic();
+				
 				//	const ndShapeInstance& otherShape = kBody->GetCollisionShape();
 				//	const ndMatrix& otherMatrix = notifyCallback.m_bodyArray[i]->GetMatrix();
 				//
@@ -166,7 +227,7 @@ class NewtonPhantom : public ndModel
 				//			}
 				//		}
 				//	}
-				//}
+				}
 			}
 		}
 	}
