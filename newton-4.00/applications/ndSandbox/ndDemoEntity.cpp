@@ -674,6 +674,11 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 	return shapeArray[0];
 }
 
+ndShapeInstance* ndDemoEntity::CreateConvexHull() const
+{
+	return nullptr;
+}
+
 void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const
 {
 	ndMatrix nodeMatrix(m_matrix * matrix);
