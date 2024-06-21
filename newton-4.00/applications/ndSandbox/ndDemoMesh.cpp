@@ -669,7 +669,7 @@ void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const ndMa
 	{
 		glDepthMask(GL_FALSE);
 		glEnable(GL_BLEND);
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		glFrontFace(GL_CW);

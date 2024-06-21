@@ -80,8 +80,8 @@ class NewtonPhantom : public ndModel
 			
 			//m_solideMesh = (DemoMesh*)cowEntity->GetMesh();
 			//m_solideMesh->AddRef();
-			//m_redMesh = CreatePhantomMesh(scene, shape, dVector(1.0f, 0.0f, 0.0f, 1.0f));
-			//m_blueMesh = CreatePhantomMesh(scene, shape, dVector(0.0f, 0.5f, 0.0f, 1.0f));
+			m_redMesh = CreatePhantomMesh(scene, *shape, ndVector(1.0f, 0.0f, 0.0f, 1.0f));
+			m_blueMesh = CreatePhantomMesh(scene, *shape, ndVector(0.0f, 0.5f, 0.0f, 1.0f));
 			//SetMesh(m_redMesh, dGetIdentityMatrix());
 			//
 			//NewtonBodySetUserData(m_phantom, this);
@@ -103,18 +103,15 @@ class NewtonPhantom : public ndModel
 		ndDemoMesh* CreatePhantomMesh(ndDemoEntityManager* const scene, ndShapeInstance* const shape, const ndVector& color)
 		{
 			//DemoMesh* const mesh = new DemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);
-			//ndDemoMesh(const char* const name, const ndShaderCache & shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, ndFloat32 opacity = 1.0f, const ndMatrix & uvMatrix = ndGetIdentityMatrix(), bool stretchMaping = true);
+			ndDemoMesh* const mesh = new ndDemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);
 			
 			//DemoSubMesh& subMesh = mesh->GetFirst()->GetInfo();
 			//subMesh.m_specular = color;
 			//subMesh.m_diffuse = color;
 			//subMesh.m_ambient = color;
 			//mesh->OptimizeForRender();
-			//return mesh;
-			//ndAssert(0);
-			return nullptr;
+			return mesh;
 		}
-
 
 		ndShapeInstance* CreateConvexHull(ndDemoEntity* const entity) const
 		{
@@ -220,7 +217,7 @@ class NewtonPhantom : public ndModel
 	NewtonPhantom(ndDemoEntityManager* const scene)
 		:ndModel()
 		//,phantomShape(new ndShapeBox(1.0f, 1.0f, 1.0f))
-		//,worldMatrix(ndGetIdentityMatrix())
+		,worldMatrix(ndGetIdentityMatrix())
 		//,notification(scene)
 	{
 		//contactPoint = ndVector(1.0e20f);
@@ -240,7 +237,11 @@ class NewtonPhantom : public ndModel
 	{
 	}
 
-	//void transform(const ndMatrix& matrix) { worldMatrix = matrix; }
+	void transform(const ndMatrix& matrix) 
+	{ 
+		worldMatrix = matrix; 
+	}
+
 	//ndInt32 getContactCount() const { return contactCount; }
 	//ndVector getContactPoint() const { return contactPoint; }
 
@@ -266,9 +267,11 @@ class NewtonPhantom : public ndModel
 			if (world->RayCast(rayCaster, p0, p1))
 			{
 				ndTrace(("%f %f\n", mouseX, mouseY));
-				//worldMatrix.m_posit = p0 + (p1 - p0).Scale(rayCaster.m_param);
-				//worldMatrix.m_posit.m_w = 1.0f;
-				//
+				worldMatrix.m_posit = p0 + (p1 - p0).Scale(rayCaster.m_param);
+				worldMatrix.m_posit.m_w = 1.0f;
+
+				m_phantomEntity->SetMesh(m_phantomEntity->m_redMesh, ndGetIdentityMatrix());
+				
 				//// calc the current AABB in world space
 				//ndVector boxMin;
 				//ndVector boxMax;
@@ -312,19 +315,26 @@ class NewtonPhantom : public ndModel
 				//}
 			}
 		}
+		else
+		{
+			m_phantomEntity->SetMesh(nullptr, ndGetIdentityMatrix());
+		}
 	}
+
 	void PostUpdate(ndWorld* const, ndFloat32) override
 	{
 	}
+
 	void PostTransformUpdate(ndWorld* const, ndFloat32) override
 	{
+		m_phantomEntity->SetMatrix(ndQuaternion(worldMatrix), worldMatrix.m_posit);
 	}
 
 	private:
 	//ndShapeInstance phantomShape;
 	PhantomPlacement* m_phantomEntity;
 
-	//ndMatrix worldMatrix;
+	ndMatrix worldMatrix;
 	//ndContactNotify notification;
 	//ndInt32 contactCount = 0;
 	//ndVector contactPoint;
