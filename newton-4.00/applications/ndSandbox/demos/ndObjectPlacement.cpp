@@ -76,7 +76,7 @@ class NewtonPhantom : public ndModel
 
 			//NewtonCollision* const shape = NewtonCreateConvexHullFromMesh(world, cowMesh, 0, 0);
 			//m_phantom = NewtonCreateKinematicBody(world, shape, &matrix[0][0]);
-			ndSharedPtr<ndShapeInstance> shape(entity->CreateConvexHull());
+			ndSharedPtr<ndShapeInstance> shape(CreateConvexHull(*entity));
 			
 			//m_solideMesh = (DemoMesh*)cowEntity->GetMesh();
 			//m_solideMesh->AddRef();
@@ -99,7 +99,78 @@ class NewtonPhantom : public ndModel
 			//m_blueMesh->Release();
 			//m_solideMesh->Release();
 		}
-	//
+	
+		ndDemoMesh* CreatePhantomMesh(ndDemoEntityManager* const scene, ndShapeInstance* const shape, const ndVector& color)
+		{
+			//DemoMesh* const mesh = new DemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);
+			//ndDemoMesh(const char* const name, const ndShaderCache & shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, ndFloat32 opacity = 1.0f, const ndMatrix & uvMatrix = ndGetIdentityMatrix(), bool stretchMaping = true);
+			
+			//DemoSubMesh& subMesh = mesh->GetFirst()->GetInfo();
+			//subMesh.m_specular = color;
+			//subMesh.m_diffuse = color;
+			//subMesh.m_ambient = color;
+			//mesh->OptimizeForRender();
+			//return mesh;
+			//ndAssert(0);
+			return nullptr;
+		}
+
+
+		ndShapeInstance* CreateConvexHull(ndDemoEntity* const entity) const
+		{
+			ndArray<ndVector> points;
+			const ndDemoMesh* const mesh = (ndDemoMesh*)*entity->GetMesh();
+			if (mesh)
+			{
+				ndAssert(0);
+				return nullptr;
+			}
+
+			ndMatrix parentMatrix[32];
+			ndDemoEntity* stackMem[32];
+			ndInt32 stack = 0;
+			for (ndDemoEntity* child = entity->GetFirstChild(); child; child = child->GetNext())
+			{
+				stackMem[stack] = child;
+				parentMatrix[stack] = ndGetIdentityMatrix();
+				stack++;
+			}
+
+			while (stack)
+			{
+				stack--;
+				ndDemoEntity* const ent = stackMem[stack];
+				const ndMatrix matrix(ent->GetCurrentMatrix() * parentMatrix[stack]);
+				const ndDemoMesh* const entMesh = (ndDemoMesh*)*ent->GetMesh();
+				ndArray<ndVector> localPoints;
+				entMesh->GetVertexArray(localPoints);
+
+				ndMatrix meshMatrix(ent->GetMeshMatrix() * matrix);
+				for (ndInt32 i = 0; i < localPoints.GetCount(); ++i)
+				{
+					ndVector p(meshMatrix.TransformVector(localPoints[i]));
+					points.PushBack(p);
+				}
+
+				for (ndDemoEntity* child = ent->GetFirstChild(); child; child = child->GetNext())
+				{
+					stackMem[stack] = child;
+					parentMatrix[stack] = matrix;
+					stack++;
+				}
+			}
+
+			if (!points.GetCount())
+			{
+				return nullptr;
+			}
+
+			ndShapeInstance* const instance = new ndShapeInstance(new ndShapeConvexHull(points.GetCount(), sizeof(ndVector), 0.01f, &points[0].m_x));
+			const ndMatrix matrix(entity->GetMeshMatrix());
+			instance->SetLocalMatrix(matrix);
+			return instance;
+		}
+
 	//	//DemoMesh* CreatePhantomMesh(DemoEntityManager* const scene, NewtonCollision* const shape, const dVector& color)
 	//	//{
 	//	//	DemoMesh* const mesh = new DemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);

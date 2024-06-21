@@ -51,7 +51,6 @@ class ndDemoEntity: public ndNodeHierarchy<ndDemoEntity>
 
 	void RenderBone(ndDemoEntityManager* const scene, const ndMatrix& nodeMatrix) const;
 
-	ndShapeInstance* CreateConvexHull() const;
 	ndShapeInstance* CreateCollisionFromChildren() const;
 	ndShapeInstance* CreateCompoundFromMesh(bool lowDetail = false);
 
