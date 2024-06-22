@@ -146,6 +146,7 @@ endif ()
 
 if (MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+	add_definitions(-D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR)
 
 	if (PTR_SIZE EQUAL 8)
 		set(CMAKE_INSTALL_PREFIX "win64sdk" CACHE PATH "..." FORCE)

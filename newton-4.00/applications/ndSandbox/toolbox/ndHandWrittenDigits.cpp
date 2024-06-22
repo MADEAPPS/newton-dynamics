@@ -181,7 +181,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 		#ifdef _DEBUG
 		const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();		
 		ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
-		brain.MakePrediction_____(input, outputCpu, workingBuffer, workBufferBatch, offsets);
+		//brain.MakePrediction_____(input, outputCpu, workingBuffer, workBufferBatch, offsets);
 		#endif
 	}
 	cpuTime = ndGetTimeInMicroseconds() - cpuTime;
