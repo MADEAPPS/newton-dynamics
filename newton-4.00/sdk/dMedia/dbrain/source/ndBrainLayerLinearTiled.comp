@@ -41,6 +41,7 @@ layout(std430, binding = 2) readonly buffer newralNetParameters
 };
 
 shared float inputVector [2048];
+//shared float tile [TILE_SIZE] [TILE_SIZE];
 shared float tile [TILE_SIZE] [TILE_SIZE + 1];
 
 // perform a full vector * matrix operation
@@ -81,10 +82,11 @@ void main()
 
     uint tileY = gl_LocalInvocationID.x >> TILES_BITS;
     uint tileX = gl_LocalInvocationID.x & (TILE_SIZE - 1);
+
+#if 1
     tile[tileY][tileX] = acc;
     memoryBarrierShared(); 
     barrier();
-
     if (gl_LocalInvocationID.x < TILE_SIZE)
     {
         acc = 0.0;
@@ -93,6 +95,33 @@ void main()
             acc += tile[gl_LocalInvocationID.x][tileIndex];
         }
     }
+
+#else
+    // save transpose tile, fewer operations but more barries, 
+    // so come out slower on nvidia gpus.
+    tile[tileX][tileY] = acc;
+    memoryBarrierShared(); 
+    barrier();
+
+    // fewer operations but more barries, so comes out slower on nvidia gpus.
+    if (tileY < TILE_SIZE/2)
+    {
+        acc = tile[tileY][tileX];
+    }
+    for (uint tileIndex = TILE_SIZE/2; tileIndex > 0; tileIndex = tileIndex / 2)
+    {
+        if (tileY < tileIndex)
+        {
+            acc += tile[tileY + tileIndex][tileX];
+            if (tileY >= tileIndex / 2)
+            {
+                tile[tileY][tileX] = acc;
+            }
+        }
+        memoryBarrierShared(); 
+        barrier();
+    }
+#endif
     
     if (gl_LocalInvocationID.x < TILE_SIZE)
     {
