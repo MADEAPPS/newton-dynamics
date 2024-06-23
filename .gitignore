@@ -33,6 +33,7 @@ bld/
 *.cs
 *.tt
 *.db
+*.asm
 *.cxx
 *.suo
 *.obj

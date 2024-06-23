@@ -81,7 +81,7 @@ class NewtonPhantom : public ndModel
 			//m_solideMesh = (DemoMesh*)cowEntity->GetMesh();
 			//m_solideMesh->AddRef();
 			m_redMesh = CreatePhantomMesh(scene, *shape, ndVector(1.0f, 0.0f, 0.0f, 1.0f));
-			m_blueMesh = CreatePhantomMesh(scene, *shape, ndVector(0.0f, 0.5f, 0.0f, 1.0f));
+			m_blueMesh = CreatePhantomMesh(scene, *shape, ndVector(0.0f, 0.0f, 0.5f, 1.0f));
 			//SetMesh(m_redMesh, dGetIdentityMatrix());
 			//
 			//NewtonBodySetUserData(m_phantom, this);
@@ -105,10 +105,10 @@ class NewtonPhantom : public ndModel
 			//DemoMesh* const mesh = new DemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);
 			ndDemoMesh* const mesh = new ndDemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);
 			
-			//DemoSubMesh& subMesh = mesh->GetFirst()->GetInfo();
-			//subMesh.m_specular = color;
-			//subMesh.m_diffuse = color;
-			//subMesh.m_ambient = color;
+			ndDemoSubMesh& subMesh = mesh->GetFirst()->GetInfo();
+			subMesh.m_material.m_specular = color;
+			subMesh.m_material.m_diffuse = color;
+			subMesh.m_material.m_ambient = color;
 			//mesh->OptimizeForRender();
 			return mesh;
 		}
@@ -186,8 +186,6 @@ class NewtonPhantom : public ndModel
 	//
 	//	//NewtonBody* m_phantom;
 	//	//DemoMesh* m_solideMesh;
-	//	//DemoMesh* m_redMesh;
-	//	//DemoMesh* m_blueMesh;
 		ndSharedPtr<ndDemoMeshInterface> m_redMesh;
 		ndSharedPtr<ndDemoMeshInterface> m_blueMesh;
 	};
@@ -270,7 +268,7 @@ class NewtonPhantom : public ndModel
 				worldMatrix.m_posit = p0 + (p1 - p0).Scale(rayCaster.m_param);
 				worldMatrix.m_posit.m_w = 1.0f;
 
-				m_phantomEntity->SetMesh(m_phantomEntity->m_redMesh, ndGetIdentityMatrix());
+				m_phantomEntity->SetMesh(m_phantomEntity->m_blueMesh, ndGetIdentityMatrix());
 				
 				//// calc the current AABB in world space
 				//ndVector boxMin;
