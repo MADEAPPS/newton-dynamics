@@ -35,6 +35,10 @@ set(CMAKE_DEBUG_POSTFIX "_d")
 
 project(NewtonSDK)
 
+if (MSVC)
+	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+endif()
+
 # determine if we are compiling for a 32bit or 64bit system
 include(CheckTypeSize)
 CHECK_TYPE_SIZE("void*" PTR_SIZE BUILTIN_TYPES_ONLY)

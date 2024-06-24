@@ -37,5 +37,7 @@ if (MSVC)
 	set_source_files_properties(ndFileFormatStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndFileFormatStdafx.h")
 endif()
 
-
+if (MSVC)
+	set_target_properties(${projectName} PROPERTIES FOLDER "utils")
+endif()
 

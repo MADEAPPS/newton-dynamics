@@ -64,3 +64,6 @@ install(TARGETS ${projectName}
 
 install(FILES ${HEADERS} DESTINATION include/${projectName})
 
+if (MSVC)
+	set_target_properties(${projectName} PROPERTIES FOLDER "physics")
+endif()

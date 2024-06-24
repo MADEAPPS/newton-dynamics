@@ -31,3 +31,6 @@ if (MSVC)
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Zi /GS- /Ox /Oi /Ot /Ob2 /Oy /fp:fast")
 endif()
 
+if (MSVC)
+	set_target_properties(${projectName} PROPERTIES FOLDER "thirdParty")
+endif()

@@ -137,3 +137,7 @@ endif()
 #endif()
 
 install(DIRECTORY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications")
+
+if (MSVC)
+	set_target_properties(${projectName} PROPERTIES FOLDER "demos")
+endif()

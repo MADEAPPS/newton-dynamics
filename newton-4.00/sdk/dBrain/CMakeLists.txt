@@ -77,5 +77,7 @@ if (NEWTON_ENABLE_VULKAN_SDK)
 	install(DIRECTORY "${CMAKE_SOURCE_DIR}/sdk/dMedia" DESTINATION "${PROJECT_BINARY_DIR}/sdk")
 endif()
 
-
+if (MSVC)
+	set_target_properties(${projectName} PROPERTIES FOLDER "deepLearning")
+endif()
 

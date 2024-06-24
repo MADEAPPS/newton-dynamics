@@ -41,6 +41,10 @@ add_library(${projectName} STATIC ${CPP_SOURCE})
 if (MSVC)
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundModelStdafx.h")
 	set_source_files_properties(ndModelStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndModelStdafx.h")
+
+	if (MSVC)
+		set_target_properties(${projectName} PROPERTIES FOLDER "utils")
+	endif()
 endif()
 
 

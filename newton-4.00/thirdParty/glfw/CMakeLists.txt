@@ -35,3 +35,6 @@ file(GLOB source src/init.c src/input.c src/monitor.c src/vulkan.c
 
 add_library(${projectName} STATIC ${source})
 
+if (MSVC)
+	set_target_properties(${projectName} PROPERTIES FOLDER "thirdParty")
+endif()

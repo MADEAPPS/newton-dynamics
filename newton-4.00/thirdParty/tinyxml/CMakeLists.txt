@@ -27,5 +27,8 @@ if (MSVC)
 
 	#set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundTinyxmlStdafx.h")
 	#set_source_files_properties(ndBrainStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndTinyxmlStdafx.h")
+endif()
 
+if (MSVC)
+	set_target_properties(${projectName} PROPERTIES FOLDER "thirdParty")
 endif()
