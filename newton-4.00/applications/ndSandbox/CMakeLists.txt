@@ -27,8 +27,8 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(.)
 include_directories(toolbox)
+
 include_directories(../../sdk/dCore)
-include_directories(../../sdk/dBrain)
 include_directories(../../sdk/dModel)
 include_directories(../../sdk/dNewton)
 include_directories(../../sdk/dCollision)
@@ -37,6 +37,9 @@ include_directories(../../sdk/dNewton/dJoints)
 include_directories(../../sdk/dNewton/dModels)
 include_directories(../../sdk/dNewton/dIkSolver)
 include_directories(../../sdk/dNewton/dModels/dVehicle)
+
+include_directories(../../sdk/dBrain)
+include_directories(../../sdk/dBrain/backends)
 
 include_directories(../../thirdParty/png/)
 include_directories(../../thirdParty/glfw/)
