@@ -381,11 +381,12 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 			params.PushBack(parameterBuffer.m_buffer);
 
 			ndInt32 numberOfWorkGroup = batchCount * uniformParam.m_workGroupsPerMatrix;
-			#if defined (D_USE_GPU_TILED_MATRIX)
-				Assembly(context->m_ndBrainLayerLinearTiled, numberOfWorkGroup, params.GetCount(), &params[0]);
-			#else
-				Assembly(context->m_ndBrainLayerLinear, numberOfWorkGroup, params.GetCount(), &params[0]);
-			#endif
+			ndAssert(0);
+			//#if defined (D_USE_GPU_TILED_MATRIX)
+			//	Assembly(context->m_ndBrainLayerLinearTiled, numberOfWorkGroup, params.GetCount(), &params[0]);
+			//#else
+			//	Assembly(context->m_ndBrainLayerLinear, numberOfWorkGroup, params.GetCount(), &params[0]);
+			//#endif
 		}
 
 		ndBrainGpuUniformBuffer m_parammeters;

@@ -656,19 +656,20 @@ static void MnistTestSet()
 
 		ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
 
-		ndInt32 numbeOfParam = brain->GetNumberOfParameters();
-		ndUnsigned64 time = ndGetTimeInMicroseconds();
-		ndExpandTraceMessage("mnist database, number of Parameters %d\n", numbeOfParam);
-		if (ndBrainGpuContext::HasGpuSupport())
-		{
-			ValidateDataGpu("test data", *(*brain), *testLabels, *testDigits);
-		}
-		else
-		{
-			ValidateData("test data", *(*brain), *testLabels, *testDigits);
-		}
-		time = ndGetTimeInMicroseconds() - time;
-		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
+		ndAssert(0);
+		//ndInt32 numbeOfParam = brain->GetNumberOfParameters();
+		//ndUnsigned64 time = ndGetTimeInMicroseconds();
+		//ndExpandTraceMessage("mnist database, number of Parameters %d\n", numbeOfParam);
+		//if (ndBrainGpuContext::HasGpuSupport())
+		//{
+		//	ValidateDataGpu("test data", *(*brain), *testLabels, *testDigits);
+		//}
+		//else
+		//{
+		//	ValidateData("test data", *(*brain), *testLabels, *testDigits);
+		//}
+		//time = ndGetTimeInMicroseconds() - time;
+		//ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 }
 

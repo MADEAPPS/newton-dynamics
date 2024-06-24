@@ -20,7 +20,6 @@ if(NEWTON_ENABLE_VULKAN_SDK)
 	include_directories ($ENV{VULKAN_SDK}/Include)
 endif()
 
-
 add_definitions(-D_D_BRAIN_VULKAN_DLL_EXPORT)
 
 file(GLOB CPP_SOURCE *.cpp *.h)

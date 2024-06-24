@@ -321,7 +321,8 @@ void TestVulkanStuff()
 			params.PushBack(&weights);
 
 			ndInt32 numberOfGroups = numberOfImputs * workGroupsPerMatrix;
-			Assembly(context->m_testShader, numberOfGroups, params.GetCount(), &params[0]);
+			ndAssert(0);
+			//Assembly(context->m_testShader, numberOfGroups, params.GetCount(), &params[0]);
 		}
 	};
 	struct UniformBufferObject

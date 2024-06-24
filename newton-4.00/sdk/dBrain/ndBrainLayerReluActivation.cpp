@@ -111,7 +111,8 @@ ndBrainGpuCommand* ndBrainLayerReluActivation::AssemblyGPUCommand(ndBrainGpuCont
 			ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
 			params.PushBack(&m_parammeters);
 			params.PushBack(workingBuffer.m_buffer);
-			Assembly(context->m_ndBrainLayerRluActivation, batchCount, params.GetCount(), &params[0]);
+			ndAssert(0);
+			//Assembly(context->m_ndBrainLayerRluActivation, batchCount, params.GetCount(), &params[0]);
 		}
 
 		ndBrainGpuUniformBuffer m_parammeters;
