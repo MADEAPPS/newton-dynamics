@@ -40,6 +40,7 @@ include_directories(../../sdk/dNewton/dModels/dVehicle)
 
 include_directories(../../sdk/dBrain)
 include_directories(../../sdk/dBrain/backends)
+include_directories(../../sdk/dBrain/backends/vulkan)
 
 include_directories(../../thirdParty/png/)
 include_directories(../../thirdParty/glfw/)
