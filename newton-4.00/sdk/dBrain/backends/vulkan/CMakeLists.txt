@@ -10,32 +10,27 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-set (projectName "ndBrain")
+set (projectName "ndBrainVulkan")
 message (${projectName})
 
 include_directories(.)
-include_directories(backends)
-include_directories(backends/vulkan)
 include_directories(../dCore)
-#include_directories(../dProfiler)
-include_directories(../../thirdParty/png)
 
 if(NEWTON_ENABLE_VULKAN_SDK)
 	include_directories ($ENV{VULKAN_SDK}/Include)
 endif()
 
-file(GLOB CPP_SOURCE *.cpp *.h backends/vulkan/*.cpp backends/vulkan/*.h)
+
+add_definitions(-D_D_BRAIN_VULKAN_DLL_EXPORT)
+
+file(GLOB CPP_SOURCE *.cpp *.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 add_library(${projectName} STATIC ${CPP_SOURCE})
 
 if (MSVC)
-	#set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /Od")
-	#set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} /Zi /W4 /O2 /fp:fast")
-	#set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Zi /GS- /W4 /Ox /Oi /Ot /Ob2 /Oy /fp:fast")
-
-	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundBrainStdafx.h")
-	set_source_files_properties(ndBrainStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndBrainStdafx.h")
+	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundBrainVulkanStdafx.h")
+	set_source_files_properties(ndBrainVulkanStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndBrainVulkanStdafx.h")
 endif()
 
 if (NEWTON_ENABLE_VULKAN_SDK)
@@ -83,4 +78,3 @@ if (MSVC)
 	set_target_properties(${projectName} PROPERTIES FOLDER "deepLearning")
 endif()
 
-add_subdirectory(backends)
