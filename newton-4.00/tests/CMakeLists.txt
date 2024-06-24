@@ -65,3 +65,7 @@ endif()
 if (MSVC)
 	target_compile_options(${PROJECT_NAME} PRIVATE "/W4")
 endif()
+
+if (MSVC)
+	set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "demos")
+endif()
