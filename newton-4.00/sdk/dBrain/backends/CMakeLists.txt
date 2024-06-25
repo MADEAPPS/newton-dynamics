@@ -11,6 +11,6 @@
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
 if (NEWTON_ENABLE_VULKAN_SDK)
-    message ("xxxxxxxxx")
-	#add_subdirectory(vulkan)
+    message ("buildding vulak backend")
+	add_subdirectory(vulkan)
 endif()

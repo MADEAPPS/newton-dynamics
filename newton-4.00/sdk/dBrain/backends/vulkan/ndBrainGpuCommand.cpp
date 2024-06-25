@@ -9,13 +9,13 @@
 * freely
 */
 
-#include "ndBrainStdafx.h"
+#include "ndBrainVulkanStdafx.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
-#include "ndBrainGpuContext.h"
+#include "ndBrainVulkanContext.h"
 
-#if defined (D_USE_VULKAN_SDK)
 
+#if 0
 ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context)
 	:ndClassAlloc()
 	,m_context(context)
@@ -139,18 +139,19 @@ void ndBrainGpuCommand::Assembly(VkShaderModule shader, ndInt32 workGroups, ndIn
 
 	m_context->CheckResultVulkan(vkEndCommandBuffer(m_commandBuffer));
 }
-#endif
 
-ndBrainGpuCommandTest::ndBrainGpuCommandTest(ndBrainGpuContext* const context,
-	ndBrainGpuUniformBuffer& parammeters,
-	ndBrainGpuFloatBuffer& input, ndBrainGpuFloatBuffer& output)
-	:ndBrainGpuCommand(context)
-{
-	ndBrainGpuBuffer* params[3];
-	params[0] = &parammeters;
-	params[1] = &input;
-	params[2] = &output;
-#if defined (D_USE_VULKAN_SDK)
-	Assembly(context->m_testShader, 1, 3, params);
+//ndBrainGpuCommandTest::ndBrainGpuCommandTest(ndBrainGpuContext* const context,
+//	ndBrainGpuUniformBuffer& parammeters,
+//	ndBrainGpuFloatBuffer& input, ndBrainGpuFloatBuffer& output)
+//	:ndBrainGpuCommand(context)
+//{
+//	ndBrainGpuBuffer* params[3];
+//	params[0] = &parammeters;
+//	params[1] = &input;
+//	params[2] = &output;
+//#if defined (D_USE_VULKAN_SDK)
+//	Assembly(context->m_testShader, 1, 3, params);
+//#endif
+//};
+
 #endif
-};

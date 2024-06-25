@@ -8,29 +8,15 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __ND_BRAIN_GPU_COMMAND_H__
-#define __ND_BRAIN_GPU_COMMAND_H__
+#ifndef __ND_BRAIN_GPU_VULKAN_COMMAND_H__
+#define __ND_BRAIN_GPU_VULKAN_COMMAND_H__
 
-#include "ndBrainStdafx.h"
+//#include "ndBrainStdafx.h"
 
 class ndBrainGpuContext;
 class ndBrainGpuFloatBuffer;
 
-#if !defined (D_USE_VULKAN_SDK)
-
-class ndBrainGpuCommand : public ndClassAlloc
-{
-	public:
-	ndBrainGpuCommand(ndBrainGpuContext* const context):m_context(context){}
-	virtual ~ndBrainGpuCommand(){}
-	void Assembly(void*, ndInt32, ndInt32, ndBrainGpuBuffer**) {}
-
-	protected:
-	ndBrainGpuContext* m_context;
-};
-
-#else
-
+#if 0
 class ndBrainGpuCommand : public ndClassAlloc
 {
 	public:
@@ -49,14 +35,13 @@ class ndBrainGpuCommand : public ndClassAlloc
 
 	friend class ndBrainGpuContext;
 };
-
 #endif
 
-class ndBrainGpuCommandTest : public ndBrainGpuCommand
-{
-	public:
-	ndBrainGpuCommandTest(ndBrainGpuContext* const context,
-		ndBrainGpuUniformBuffer& parammeters,
-		ndBrainGpuFloatBuffer& input, ndBrainGpuFloatBuffer& output);
-};
+//class ndBrainGpuCommandTest : public ndBrainGpuCommand
+//{
+//	public:
+//	ndBrainGpuCommandTest(ndBrainGpuContext* const context,
+//		ndBrainGpuUniformBuffer& parammeters,
+//		ndBrainGpuFloatBuffer& input, ndBrainGpuFloatBuffer& output);
+//};
 #endif

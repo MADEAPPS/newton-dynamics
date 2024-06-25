@@ -9,13 +9,12 @@
 * freely
 */
 
-#include "ndBrainStdafx.h"
+#include "ndBrainVulkanStdafx.h"
 #include "ndBrainVector.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
 
-#if defined (D_USE_VULKAN_SDK)
-
+#if 0
 ndScopeMapBuffer::ndScopeMapBuffer(ndBrainGpuBuffer& buffer)
 	:m_buffer(&buffer)
 {
@@ -238,7 +237,4 @@ VkDescriptorType ndBrainGpuUniformBuffer::GetType() const
 {
 	return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 }
-
 #endif
-
-

@@ -8,8 +8,8 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __ND_BRAIN_GPU_INFERENCE_H__
-#define __ND_BRAIN_GPU_INFERENCE_H__
+#ifndef __ND_BRAIN_GPU_VULKAN_INFERENCE_H__
+#define __ND_BRAIN_GPU_VULKAN_INFERENCE_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
@@ -18,28 +18,8 @@
 class ndBrain;
 class ndBrainGpuBuffer;
 class ndBrainGpuContext;
-//class ndBrainGpuFloatBuffer;
-//class ndBrainGpuIntegerBuffer;
 
-#if !defined (D_USE_VULKAN_SDK)
-
-class ndBrainGpuInference : public ndClassAlloc
-{
-	public:
-	ndBrainGpuInference(ndBrainGpuContext* const, ndBrain* const, const ndBrainMatrix&, ndInt32) {}
-	virtual ~ndBrainGpuInference() {}
-
-	void GetResults(ndBrainVector&) {}
-	void GetWorkBuffer(ndBrainVector&) {}
-	const ndArray<ndInt32>& GetWorkBufferOffsets() const {return m_offsets;}
-	const ndList<ndSharedPtr<ndBrainGpuCommand>>& GetDisplayList() const {return m_displayList;}
-
-	ndArray<ndInt32>m_offsets;
-	ndList<ndSharedPtr<ndBrainGpuCommand>> m_displayList;
-};
-
-#else
-
+#if 0
 class ndBrainGpuInference : public ndClassAlloc
 {
 	class ndBrainLoadInputData;
@@ -73,7 +53,5 @@ class ndBrainGpuInference : public ndClassAlloc
 	ndInt32 m_inputBatchSize;
 };
 
-
 #endif
-
 #endif

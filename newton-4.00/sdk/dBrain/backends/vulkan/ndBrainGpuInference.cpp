@@ -8,17 +8,17 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#include "ndBrainStdafx.h"
+#include "ndBrainVulkanStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
-#include "ndBrainGpuContext.h"
 #include "ndBrainGpuInference.h"
+#include "ndBrainVulkanContext.h"
 
 
-#if defined (D_USE_VULKAN_SDK)
+#if 0
 
 class ndBrainGpuInference::ndBrainLoadInputData : public ndBrainGpuCommand
 {
@@ -258,4 +258,5 @@ void ndBrainGpuInference::BuildDisplayList(const ndBrainMatrix& input)
 	}
 #endif
 }
+
 #endif

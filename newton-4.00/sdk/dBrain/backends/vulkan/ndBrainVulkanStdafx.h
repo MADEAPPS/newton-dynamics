@@ -27,14 +27,15 @@
 #ifndef __ND_BRAIN_VULKAN_STDAFX_H__
 #define __ND_BRAIN_VULKAN_STDAFX_H__
 
-//#include <ndCore.h>
-//#include <ndCollision.h>
+#include <ndBrainInc.h>
+#include <vulkan/vulkan.h>
 
-#ifdef _D_BRAIN_VULKAN_DLL_EXPORT
-	#define D_BRAIN_VULKAN_API BRAIN_VULKAN_EXPORT
-#else
-	#define D_BRAIN_VULKAN_API BRAIN_VULKAN_IMPORT
-#endif
+
+//#ifdef _D_BRAIN_VULKAN_DLL_EXPORT
+//	#define D_BRAIN_VULKAN_API BRAIN_VULKAN_EXPORT
+//#else
+//	#define D_BRAIN_VULKAN_API BRAIN_VULKAN_IMPORT
+//#endif
 
 #endif 
 

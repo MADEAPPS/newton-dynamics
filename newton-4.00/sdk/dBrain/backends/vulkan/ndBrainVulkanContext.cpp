@@ -9,28 +9,26 @@
 * freely
 */
 
-#include "ndBrainStdafx.h"
+#include "ndBrainVulkanStdafx.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
-#include "ndBrainGpuContext.h"
-
-#if defined (D_USE_VULKAN_SDK)
+#include "ndBrainVulkanContext.h"
 
 #define ND_SELECT_DISCRETE_GPU
 
-const char* ndBrainGpuContext::m_apiLayers[] =
+const char* ndBrainVulkanContext::m_apiLayers[] =
 {
 	"VK_LAYER_KHRONOS_validation"
 };
 
-const char* ndBrainGpuContext::m_apiExtensionLayers[] =
+const char* ndBrainVulkanContext::m_apiExtensionLayers[] =
 {
 	"VK_EXT_debug_report",
 	"VK_EXT_memory_budget",
 	"VK_EXT_device_memory_report"
 };
 
-ndBrainGpuContext::ndBrainGpuContext()
+ndBrainVulkanContext::ndBrainVulkanContext()
 	:ndClassAlloc()
 	,m_allocator(&m_allocatorStruct)
 	,m_fence(VK_NULL_HANDLE)
@@ -65,7 +63,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 	LoadShaderPrograms();
 }
 
-ndBrainGpuContext::~ndBrainGpuContext()
+ndBrainVulkanContext::~ndBrainVulkanContext()
 {
 	if (m_hasValidationLayers)
 	{
@@ -94,12 +92,12 @@ ndBrainGpuContext::~ndBrainGpuContext()
 	ndAssert(!m_memoryDictionary.GetCount());
 }
 
-bool ndBrainGpuContext::HasGpuSupport()
+bool ndBrainVulkanContext::HasGpuSupport()
 {
 	return true;
 }
 
-void ndBrainGpuContext::CheckResultVulkan(VkResult err)
+void ndBrainVulkanContext::CheckResultVulkan(VkResult err)
 {
 	if (err != VK_SUCCESS)
 	{
@@ -108,9 +106,9 @@ void ndBrainGpuContext::CheckResultVulkan(VkResult err)
 	}
 }
 
-void* ndBrainGpuContext::VulkanAlloc(void* userData, size_t size, size_t alignment, VkSystemAllocationScope)
+void* ndBrainVulkanContext::VulkanAlloc(void* userData, size_t size, size_t alignment, VkSystemAllocationScope)
 {
-	ndBrainGpuContext* const context = (ndBrainGpuContext*)userData;
+	ndBrainVulkanContext* const context = (ndBrainVulkanContext*)userData;
 
 	ndTree<ndMemoryEntry, void*>& dictionary = context->m_memoryDictionary;
 	
@@ -133,11 +131,11 @@ void* ndBrainGpuContext::VulkanAlloc(void* userData, size_t size, size_t alignme
 	return ptr;
 }
 
-void ndBrainGpuContext::VulkanFree(void* userData, void* memory)
+void ndBrainVulkanContext::VulkanFree(void* userData, void* memory)
 {
 	if (memory)
 	{
-		ndBrainGpuContext* const context = (ndBrainGpuContext*)userData;
+		ndBrainVulkanContext* const context = (ndBrainVulkanContext*)userData;
 		ndTree<ndMemoryEntry, void*>& dictionary = context->m_memoryDictionary;
 		ndTree<ndMemoryEntry, void*>::ndNode* const node = dictionary.Find(memory);
 		const ndMemoryEntry& entry = node->GetInfo();
@@ -146,9 +144,9 @@ void ndBrainGpuContext::VulkanFree(void* userData, void* memory)
 	}
 }
 
-void* ndBrainGpuContext::VulkanRealloc(void* userData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope allocationScope)
+void* ndBrainVulkanContext::VulkanRealloc(void* userData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope allocationScope)
 {
-	ndBrainGpuContext* const context = (ndBrainGpuContext*)userData;
+	ndBrainVulkanContext* const context = (ndBrainVulkanContext*)userData;
 	ndTree<ndMemoryEntry, void*>& dictionary = context->m_memoryDictionary;
 	ndTree<ndMemoryEntry, void*>::ndNode* const node = dictionary.Find(pOriginal);
 	const ndMemoryEntry& entry = node->GetInfo();
@@ -160,47 +158,47 @@ void* ndBrainGpuContext::VulkanRealloc(void* userData, void* pOriginal, size_t s
 	return ptr;
 }
 
-void ndBrainGpuContext::VulkanInternalAlloc(void*, size_t, VkInternalAllocationType, VkSystemAllocationScope)
+void ndBrainVulkanContext::VulkanInternalAlloc(void*, size_t, VkInternalAllocationType, VkSystemAllocationScope)
 {
 	ndAssert(0);
 }
 
-void ndBrainGpuContext::VulkanInternalFree(void*, size_t, VkInternalAllocationType, VkSystemAllocationScope)
+void ndBrainVulkanContext::VulkanInternalFree(void*, size_t, VkInternalAllocationType, VkSystemAllocationScope)
 {
 	ndAssert(0);
 }
 
-VkDevice ndBrainGpuContext::GetDevice() const
+VkDevice ndBrainVulkanContext::GetDevice() const
 {
 	return m_device;
 }
 
-ndInt32 ndBrainGpuContext::GetSubGroupSize() const
+ndInt32 ndBrainVulkanContext::GetSubGroupSize() const
 {
 	return m_subGroupSize;
 }
 
-VkAllocationCallbacks* ndBrainGpuContext::GetAllocator() const
+VkAllocationCallbacks* ndBrainVulkanContext::GetAllocator() const
 {
 	return m_allocator;
 }
 
-VkPhysicalDevice ndBrainGpuContext::GetPhysicalDevice() const
+VkPhysicalDevice ndBrainVulkanContext::GetPhysicalDevice() const
 {
 	return m_physicalDevice;
 }
 
-VkCommandPool ndBrainGpuContext::GetCommandPool() const
+VkCommandPool ndBrainVulkanContext::GetCommandPool() const
 {
 	return m_commandPool;
 }
 
-VkDescriptorPool ndBrainGpuContext::GetDescriptorPool() const
+VkDescriptorPool ndBrainVulkanContext::GetDescriptorPool() const
 {
 	return m_descriptorPool;
 }
 
-void ndBrainGpuContext::CreateInstance()
+void ndBrainVulkanContext::CreateInstance()
 {
 	uint32_t layerCount;
 	ndFixSizeArray <VkLayerProperties, 128> layerProperties;
@@ -260,7 +258,7 @@ void ndBrainGpuContext::CreateInstance()
 	CheckResultVulkan(vkCreateInstance(&createInfo, m_allocator, &m_instance));
 }
 
-VKAPI_ATTR VkBool32 VKAPI_CALL ndBrainGpuContext::DebugReportVulkan(
+VKAPI_ATTR VkBool32 VKAPI_CALL ndBrainVulkanContext::DebugReportVulkan(
 	//VkDebugReportFlagsEXT                       flags,
 	//VkDebugReportObjectTypeEXT                  objectType,
 	//uint64_t                                    object,
@@ -276,7 +274,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL ndBrainGpuContext::DebugReportVulkan(
 	return VK_FALSE;
 }
 
-void ndBrainGpuContext::SetupDebugMessenger()
+void ndBrainVulkanContext::SetupDebugMessenger()
 {
 	if (m_hasValidationLayers)
 	{
@@ -293,7 +291,7 @@ void ndBrainGpuContext::SetupDebugMessenger()
 	}
 }
 
-void ndBrainGpuContext::CreatePhysicalDevice()
+void ndBrainVulkanContext::CreatePhysicalDevice()
 {
 	m_physicalDevice = VK_NULL_HANDLE;
 
@@ -330,7 +328,7 @@ void ndBrainGpuContext::CreatePhysicalDevice()
 	ndExpandTraceMessage("vulkan accelerator: %s\n", m_gpuProps.deviceName);
 }
 
-void ndBrainGpuContext::CheckSubGroupSupport()
+void ndBrainVulkanContext::CheckSubGroupSupport()
 {
 	VkPhysicalDeviceSubgroupProperties subgroupProperties = {};
 	subgroupProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES; 
@@ -344,7 +342,7 @@ void ndBrainGpuContext::CheckSubGroupSupport()
 	m_subGroupSize = ndInt32((subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_ARITHMETIC_BIT) ? subgroupProperties.subgroupSize : 0);
 }
 
-void ndBrainGpuContext::SelectGraphicsQueue()
+void ndBrainVulkanContext::SelectGraphicsQueue()
 {
 	uint32_t count;
 	m_queueFamilyIndex = uint32_t(-1);
@@ -366,7 +364,7 @@ void ndBrainGpuContext::SelectGraphicsQueue()
 	ndAssert(m_queueFamilyIndex != (uint32_t)-1);
 }
 
-void ndBrainGpuContext::CreateLogicalDevice()
+void ndBrainVulkanContext::CreateLogicalDevice()
 {
 	m_queue = VK_NULL_HANDLE;
 	m_device = VK_NULL_HANDLE;
@@ -394,7 +392,7 @@ void ndBrainGpuContext::CreateLogicalDevice()
 	vkGetDeviceQueue(m_device, m_queueFamilyIndex, 0, &m_queue);
 }
 
-void ndBrainGpuContext::CreateCommandPool()
+void ndBrainVulkanContext::CreateCommandPool()
 {
 	VkCommandPoolCreateInfo commandPoolCreateInfo = {};
 	commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -405,7 +403,7 @@ void ndBrainGpuContext::CreateCommandPool()
 	CheckResultVulkan(vkCreateCommandPool(m_device, &commandPoolCreateInfo, m_allocator, &m_commandPool));
 }
 
-void ndBrainGpuContext::CreateDescriptorPool()
+void ndBrainVulkanContext::CreateDescriptorPool()
 {
 	//VkDescriptorPoolSize descriptorPoolSize = {};
 	VkDescriptorPoolSize descriptorPoolSize[2];
@@ -425,7 +423,7 @@ void ndBrainGpuContext::CreateDescriptorPool()
 	CheckResultVulkan(vkCreateDescriptorPool(m_device, &descriptorPoolCreateInfo, m_allocator, &m_descriptorPool));
 }
 
-void ndBrainGpuContext::CreateFence()
+void ndBrainVulkanContext::CreateFence()
 {
 	VkFenceCreateInfo fenceCreateInfo = {};
 	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -433,7 +431,7 @@ void ndBrainGpuContext::CreateFence()
 	CheckResultVulkan(vkCreateFence(m_device, &fenceCreateInfo, m_allocator, &m_fence));
 }
 
-void ndBrainGpuContext::GetShaderFileName(const char* const name, char* const outPathName)
+void ndBrainVulkanContext::GetShaderFileName(const char* const name, char* const outPathName)
 {
 #if (defined(WIN32) || defined(_WIN32))
 	char appPath[256];
@@ -473,7 +471,7 @@ void ndBrainGpuContext::GetShaderFileName(const char* const name, char* const ou
 }
 
 
-VkShaderModule ndBrainGpuContext::LoadShaderProgram(const char* const name)
+VkShaderModule ndBrainVulkanContext::LoadShaderProgram(const char* const name)
 {
 	ndFixSizeArray<char, 1024 * 64> code;
 	auto LoadShaderCode = [this, &code](const char* const name)
@@ -514,7 +512,7 @@ VkShaderModule ndBrainGpuContext::LoadShaderProgram(const char* const name)
 	return computeShaderModule;
 }
 
-void ndBrainGpuContext::LoadShaderPrograms()
+void ndBrainVulkanContext::LoadShaderPrograms()
 {
 	VkShaderModule clean (VK_NULL_HANDLE);
 	ndMemSet(m_modules, clean, sizeof(m_modules) / sizeof(m_modules[0]));
@@ -529,25 +527,26 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	m_ndBrainLayerSoftmaxActivationSubGroup = LoadShaderProgram("ndBrainLayerSoftmaxActivationSubGroup-comp.spv");
 }
 
-void ndBrainGpuContext::SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList)
+void ndBrainVulkanContext::SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList)
 {
-	ndAssert(!m_queueInProgress);
-	m_queueInProgress = true;
-	m_displayList.SetCount(0);
-	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = displayList.GetFirst(); node; node = node->GetNext())
-	{
-		ndBrainGpuCommand* command = *node->GetInfo();
-		m_displayList.PushBack(command->m_commandBuffer);
-	}
-
-	VkSubmitInfo submitInfo = {};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = uint32_t(m_displayList.GetCount());
-	submitInfo.pCommandBuffers = &m_displayList[0];
-	CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(1), &submitInfo, m_fence));
+	ndAssert(0);
+	//ndAssert(!m_queueInProgress);
+	//m_queueInProgress = true;
+	//m_displayList.SetCount(0);
+	//for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = displayList.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndBrainGpuCommand* command = *node->GetInfo();
+	//	m_displayList.PushBack(command->m_commandBuffer);
+	//}
+	//
+	//VkSubmitInfo submitInfo = {};
+	//submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	//submitInfo.commandBufferCount = uint32_t(m_displayList.GetCount());
+	//submitInfo.pCommandBuffers = &m_displayList[0];
+	//CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(1), &submitInfo, m_fence));
 }
 
-void ndBrainGpuContext::Sync()
+void ndBrainVulkanContext::Sync()
 {
 	if (m_queueInProgress)
 	{
@@ -555,5 +554,3 @@ void ndBrainGpuContext::Sync()
 	}
 	m_queueInProgress = false;
 }
-
-#endif
