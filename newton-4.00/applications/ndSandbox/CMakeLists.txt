@@ -72,7 +72,7 @@ endif ()
 
 if(MSVC OR MINGW)
 	if(NEWTON_ENABLE_VULKAN_SDK)
-		target_link_libraries (${projectName} $ENV{VULKAN_SDK}/lib/vulkan-1.lib)
+		target_link_libraries (${projectName} ndBrainVulkan $ENV{VULKAN_SDK}/lib/vulkan-1.lib)
 	endif(NEWTON_ENABLE_VULKAN_SDK)
 
 	if(NEWTON_ENABLE_AVX2_SOLVER)

@@ -246,69 +246,68 @@ void Test1__()
 
 void TestVulkanStuff()
 {
+	ndBrainVector bias;
+	ndBrainMatrix input;
+	ndBrainMatrix output;
+	ndBrainMatrix matrix;
+	
+	ndInt32 rowds = 64;
+	ndInt32 columns = 784;
+	ndInt32 inputsCount = 2;
+	
+	bias.SetCount(rowds);
+	matrix.Init(rowds, columns);
+	input.Init(inputsCount, columns);
+	output.Init(inputsCount, rowds);
+	
+	bias.InitGaussianWeights(0.5f);
+	input.InitGaussianWeights(0.5f);
+	matrix.InitGaussianWeights(0.5f);
+	for (ndInt32 i = 0; i < inputsCount; ++i)
+	{
+		matrix.Mul(input[i], output[i]);
+		output[i].Add(bias);
+	}
+	
+	ndInt32 rounding = ND_GPU_BUFFER_ALIGNMENT / sizeof(ndBrainFloat);
+	ndAssert(!(rounding & (rounding - 1)));
+	ndAssert(bias.GetCount() == matrix.GetRows());
+	
+	ndBrainVector parameters;
+	ndInt32 rowsStride = (matrix.GetRows() + rounding - 1) & -rounding;
+	ndInt32 columnsStride = (matrix.GetColumns() + rounding - 1) & -rounding;
+	ndInt32 count = columnsStride * rowsStride + rowsStride;
+	
+	ndInt32 paramStart = parameters.GetCount();
+	parameters.SetCount(paramStart + count);
+	
+	ndBrainMemVector memData(&parameters[paramStart], count);
+	memData.Set(ndBrainFloat(-99999999999999.0f));
+	
+	ndInt32 stride = 0;
+	for (ndInt32 i = 0; i < matrix.GetRows(); ++i)
+	{
+		const ndBrainVector& src = matrix[i];
+		ndBrainMemVector dst (&memData[stride], matrix.GetColumns());
+		dst.Set(src);
+		stride += columnsStride;
+	}
+	ndBrainMemVector dst(&memData[stride], bias.GetCount());
+	dst.Set(bias);
+	
+	ndBrainVector workBuffer;
+	ndInt32 workBufferStride = columnsStride + rowsStride;
+	workBuffer.SetCount(workBufferStride * input.GetCount());
+	workBuffer.Set(-99999999999.0);
+	for (ndInt32 i = 0; i < input.GetCount(); ++i)
+	{
+		ndBrainMemVector buff(&workBuffer[workBufferStride * i], input[i].GetCount());
+		buff.Set(input[i]);
+	}
+	
 	//ndBrainGpuContext context;
 	ndSharedPtr<ndBrainGpuContext> context(ndBrainGpuContext::CreateVulkanContext());
 
-	ndAssert(0);
-	//ndBrainVector bias;
-	//ndBrainMatrix input;
-	//ndBrainMatrix output;
-	//ndBrainMatrix matrix;
-	//
-	//ndInt32 rowds = 64;
-	//ndInt32 columns = 784;
-	//ndInt32 inputsCount = 2;
-	//
-	//bias.SetCount(rowds);
-	//matrix.Init(rowds, columns);
-	//input.Init(inputsCount, columns);
-	//output.Init(inputsCount, rowds);
-	//
-	//bias.InitGaussianWeights(0.5f);
-	//input.InitGaussianWeights(0.5f);
-	//matrix.InitGaussianWeights(0.5f);
-	//for (ndInt32 i = 0; i < inputsCount; ++i)
-	//{
-	//	matrix.Mul(input[i], output[i]);
-	//	output[i].Add(bias);
-	//}
-	//
-	//ndInt32 rounding = ND_GPU_BUFFER_ALIGNMENT / sizeof(ndBrainFloat);
-	//ndAssert(!(rounding & (rounding - 1)));
-	//ndAssert(bias.GetCount() == matrix.GetRows());
-	//
-	//ndBrainVector parameters;
-	//ndInt32 rowsStride = (matrix.GetRows() + rounding - 1) & -rounding;
-	//ndInt32 columnsStride = (matrix.GetColumns() + rounding - 1) & -rounding;
-	//ndInt32 count = columnsStride * rowsStride + rowsStride;
-	//
-	//ndInt32 paramStart = parameters.GetCount();
-	//parameters.SetCount(paramStart + count);
-	//
-	//ndBrainMemVector memData(&parameters[paramStart], count);
-	//memData.Set(ndBrainFloat(-99999999999999.0f));
-	//
-	//ndInt32 stride = 0;
-	//for (ndInt32 i = 0; i < matrix.GetRows(); ++i)
-	//{
-	//	const ndBrainVector& src = matrix[i];
-	//	ndBrainMemVector dst (&memData[stride], matrix.GetColumns());
-	//	dst.Set(src);
-	//	stride += columnsStride;
-	//}
-	//ndBrainMemVector dst(&memData[stride], bias.GetCount());
-	//dst.Set(bias);
-	//
-	//ndBrainVector workBuffer;
-	//ndInt32 workBufferStride = columnsStride + rowsStride;
-	//workBuffer.SetCount(workBufferStride * input.GetCount());
-	//workBuffer.Set(-99999999999.0);
-	//for (ndInt32 i = 0; i < input.GetCount(); ++i)
-	//{
-	//	ndBrainMemVector buff(&workBuffer[workBufferStride * i], input[i].GetCount());
-	//	buff.Set(input[i]);
-	//}
-	//
 	//class TestCommand : public ndBrainGpuCommand
 	//{
 	//	public:

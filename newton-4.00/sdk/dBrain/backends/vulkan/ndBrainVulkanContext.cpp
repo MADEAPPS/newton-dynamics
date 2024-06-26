@@ -10,8 +10,8 @@
 */
 
 #include "ndBrainVulkanStdafx.h"
-#include "ndBrainGpuBuffer.h"
-#include "ndBrainGpuCommand.h"
+//#include "ndBrainGpuBuffer.h"
+//#include "ndBrainGpuCommand.h"
 #include "ndBrainVulkanContext.h"
 
 #define ND_SELECT_DISCRETE_GPU
@@ -29,7 +29,7 @@ const char* ndBrainVulkanContext::m_apiExtensionLayers[] =
 };
 
 ndBrainVulkanContext::ndBrainVulkanContext()
-	:ndClassAlloc()
+	:ndBrainGpuContext()
 	,m_allocator(&m_allocatorStruct)
 	,m_fence(VK_NULL_HANDLE)
 	,m_queue(VK_NULL_HANDLE)

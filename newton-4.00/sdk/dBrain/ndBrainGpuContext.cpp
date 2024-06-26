@@ -14,6 +14,11 @@
 //#include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
 
+#ifdef D_USE_VULKAN_SDK
+#include <vulkan/vulkan.h>
+#include "ndBrainVulkanContext.h"
+#endif
+
 ndBrainGpuContext::ndBrainGpuContext()
 {
 }
@@ -37,7 +42,9 @@ void ndBrainGpuContext::SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>
 
 ndBrainGpuContext* ndBrainGpuContext::CreateVulkanContext()
 {
-	ndAssert(0);
-
+	#ifdef D_USE_VULKAN_SDK
+	return new ndBrainVulkanContext();
+	#else
 	return nullptr;
+	#endif
 }

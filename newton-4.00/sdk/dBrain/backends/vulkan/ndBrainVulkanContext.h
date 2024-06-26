@@ -14,7 +14,7 @@
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 
-class ndBrainVulkanContext: public ndClassAlloc
+class ndBrainVulkanContext: public ndBrainGpuContext
 {
 	class ndMemoryEntry
 	{
