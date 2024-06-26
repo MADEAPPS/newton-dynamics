@@ -30,7 +30,14 @@ void ndBrainGpuContext::SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>
 {
 }
 
-bool ndBrainGpuContext::SupportVulkanBackEnd()
+//bool ndBrainGpuContext::SupportVulkanBackEnd()
+//{
+//	return false;
+//}
+
+ndBrainGpuContext* ndBrainGpuContext::CreateVulkanContext()
 {
-	return false;
+	ndAssert(0);
+
+	return nullptr;
 }

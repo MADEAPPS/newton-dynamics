@@ -16,14 +16,18 @@ class ndBrainGpuFloatBuffer;
 
 class ndBrainGpuContext : public ndClassAlloc
 {
-	public:
+	protected:
 	ndBrainGpuContext();
+
+	public:
+	static ndBrainGpuContext* CreateVulkanContext();
+
 	virtual ~ndBrainGpuContext();
 
 	virtual void Sync();
 	virtual void SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>& list);
 
-	static bool SupportVulkanBackEnd();
+	//static bool SupportVulkanBackEnd();
 };
 
 #endif
