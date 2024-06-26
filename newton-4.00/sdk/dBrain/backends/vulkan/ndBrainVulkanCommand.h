@@ -11,19 +11,17 @@
 #ifndef __ND_BRAIN_GPU_VULKAN_COMMAND_H__
 #define __ND_BRAIN_GPU_VULKAN_COMMAND_H__
 
-//#include "ndBrainStdafx.h"
-
 class ndBrainGpuContext;
 class ndBrainGpuFloatBuffer;
 
-#if 0
-class ndBrainGpuCommand : public ndClassAlloc
+#if 1
+class ndBrainVulkanCommand : public ndClassAlloc
 {
 	public:
-	virtual ~ndBrainGpuCommand();
+	virtual ~ndBrainVulkanCommand();
 
 	protected:
-	ndBrainGpuCommand(ndBrainGpuContext* const context);
+	ndBrainVulkanCommand(ndBrainGpuContext* const context);
 	void Assembly(VkShaderModule shader, ndInt32 workGroups, ndInt32 paramCount, ndBrainGpuBuffer** params);
 
 	ndBrainGpuContext* m_context;
@@ -37,10 +35,10 @@ class ndBrainGpuCommand : public ndClassAlloc
 };
 #endif
 
-//class ndBrainGpuCommandTest : public ndBrainGpuCommand
+//class ndBrainVulkanCommandTest : public ndBrainVulkanCommand
 //{
 //	public:
-//	ndBrainGpuCommandTest(ndBrainGpuContext* const context,
+//	ndBrainVulkanCommandTest(ndBrainGpuContext* const context,
 //		ndBrainGpuUniformBuffer& parammeters,
 //		ndBrainGpuFloatBuffer& input, ndBrainGpuFloatBuffer& output);
 //};

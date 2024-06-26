@@ -15,33 +15,33 @@
 
 class ndBrainVector;
 class ndBrainGpuContext;
-class ndBrainGpuBuffer;
+class ndBrainVulkanBuffer;
 
 #define ND_GPU_BUFFER_ALIGNMENT	32
 
-#if 0
-class ndScopeMapBuffer
+#if 1
+//class ndScopeMapBuffer
+//{
+//	public:
+//	ndScopeMapBuffer(ndBrainVulkanBuffer& buffer);
+//	~ndScopeMapBuffer();
+//	void* GetPointer() const;
+//
+//	private:
+//	void* m_mappedMemory;
+//	ndBrainVulkanBuffer* m_buffer;
+//};
+
+class ndBrainVulkanBuffer : public ndClassAlloc
 {
 	public:
-	ndScopeMapBuffer(ndBrainGpuBuffer& buffer);
-	~ndScopeMapBuffer();
-	void* GetPointer() const;
-
-	private:
-	void* m_mappedMemory;
-	ndBrainGpuBuffer* m_buffer;
-};
-
-class ndBrainGpuBuffer : public ndClassAlloc
-{
-	public:
-	virtual ~ndBrainGpuBuffer();
+	virtual ~ndBrainVulkanBuffer();
 	VkBuffer GetBuffer() const;
 	ndInt32 SizeInBytes() const;
 	virtual VkDescriptorType GetType() const;
 	
 	protected:
-	ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt32 sizeInByte, ndUnsigned32 bufferTypeFlags);
+	ndBrainVulkanBuffer(ndBrainGpuContext* const context, ndInt32 sizeInByte, ndUnsigned32 bufferTypeFlags);
 	uint32_t FindMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
 
 	VkBuffer m_buffer;
@@ -54,33 +54,33 @@ class ndBrainGpuBuffer : public ndClassAlloc
 // **************************************************************************
 // 
 // **************************************************************************
-class ndBrainGpuIntegerBuffer : public ndBrainGpuBuffer
+class ndBrainVulkanIntegerBuffer : public ndBrainVulkanBuffer
 {
 	public:
-	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt32 size);
-	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, const ndArray<ndInt32>& input);
+	ndBrainVulkanIntegerBuffer(ndBrainGpuContext* const context, ndInt32 size);
+	ndBrainVulkanIntegerBuffer(ndBrainGpuContext* const context, const ndArray<ndInt32>& input);
 
 	VkDescriptorType GetType() const;
 	void UnloadData(ndArray<ndInt32>& output);
 	void LoadData(const ndArray<ndInt32>& input);
 };
 
-class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
+class ndBrainVulkanFloatBuffer : public ndBrainVulkanBuffer
 {
 	public:
-	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt32 size);
-	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input);
+	ndBrainVulkanFloatBuffer(ndBrainGpuContext* const context, ndInt32 size);
+	ndBrainVulkanFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input);
 
 	VkDescriptorType GetType() const;
 	void UnloadData(ndBrainVector& output);
 	void LoadData(const ndBrainVector& input);
 };
 
-class ndBrainGpuUniformBuffer : public ndBrainGpuBuffer
+class ndBrainVulkanUniformBuffer : public ndBrainVulkanBuffer
 {
 	public:
-	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes);
-	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data);
+	ndBrainVulkanUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes);
+	ndBrainVulkanUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data);
 
 	VkDescriptorType GetType() const;
 	void LoadData(ndInt32 sizeInBytes, const void* const data);
