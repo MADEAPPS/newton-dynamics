@@ -14,11 +14,11 @@
 #include "ndBrainMatrix.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
+#include "ndBrainGpuContext.h"
 #include "ndBrainGpuInference.h"
-//#include "ndBrainVulkanContext.h"
 
 
-#if 1
+#if defined (D_USE_VULKAN_SDK)
 
 class ndBrainGpuInference::ndBrainLoadInputData : public ndBrainGpuCommand
 {
@@ -47,8 +47,7 @@ class ndBrainGpuInference::ndBrainLoadInputData : public ndBrainGpuCommand
 		params[0] = &m_parammeters;
 		params[1] = me->m_workingBuffer.m_buffer;
 		params[2] = me->m_inputBuffer.m_buffer;
-		ndAssert(0);
-		//Assembly(me->m_context->m_ndBrainCopyInput, workGroups, 3, params);
+		Assembly(me->m_context->m_ndBrainCopyInput, workGroups, 3, params);
 	}
 
 	ndBrainGpuUniformBuffer m_parammeters;
@@ -82,8 +81,7 @@ class ndBrainGpuInference::ndBrainGetResultData : public ndBrainGpuCommand
 		params[0] = &m_parammeters;
 		params[1] = me->m_workingBuffer.m_buffer;
 		params[2] = me->m_outputBuffer.m_buffer;
-		ndAssert(0);
-		//Assembly(me->m_context->m_ndBrainGetResults, workGroups, 3, params);
+		Assembly(me->m_context->m_ndBrainGetResults, workGroups, 3, params);
 	}
 
 	ndBrainGpuUniformBuffer m_parammeters;
@@ -260,5 +258,4 @@ void ndBrainGpuInference::BuildDisplayList(const ndBrainMatrix& input)
 	}
 #endif
 }
-
 #endif

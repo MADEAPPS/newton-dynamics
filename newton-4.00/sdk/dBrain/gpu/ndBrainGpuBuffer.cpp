@@ -14,7 +14,7 @@
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
 
-#if 0
+#if defined (D_USE_VULKAN_SDK)
 
 ndScopeMapBuffer::ndScopeMapBuffer(ndBrainGpuBuffer& buffer)
 	:m_buffer(&buffer)

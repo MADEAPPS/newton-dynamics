@@ -305,74 +305,72 @@ void TestVulkanStuff()
 		buff.Set(input[i]);
 	}
 	
-	//ndBrainGpuContext context;
-	ndSharedPtr<ndBrainGpuContext> context(ndBrainGpuContext::CreateVulkanContext());
+	ndBrainGpuContext context;
 
-	//class TestCommand : public ndBrainGpuCommand
-	//{
-	//	public:
-	//	TestCommand(
-	//		ndBrainGpuContext* const context, ndInt32 numberOfImputs, ndInt32 workGroupsPerMatrix, ndBrainGpuBuffer& uniforms,
-	//		ndBrainGpuBuffer& weights, ndBrainGpuBuffer& imputOutpus)
-	//		:ndBrainGpuCommand(context)
-	//	{
-	//		ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
-	//		params.PushBack(&uniforms);
-	//		params.PushBack(&imputOutpus);
-	//		params.PushBack(&weights);
-	//
-	//		ndInt32 numberOfGroups = numberOfImputs * workGroupsPerMatrix;
-	//		ndAssert(0);
-	//		//Assembly(context->m_testShader, numberOfGroups, params.GetCount(), &params[0]);
-	//	}
-	//};
-	//struct UniformBufferObject
-	//{
-	//	ndInt32 m_matrixRows;
-	//	ndInt32 m_matrixColumns;
-	//	ndInt32 m_matrixRowsStride;
-	//	ndInt32 m_matrixColumnsStride;
-	//	ndInt32 m_workGroupsPerMatrix;
-	//
-	//	ndInt32 m_paramStart;
-	//	ndInt32 m_inputStart;
-	//	ndInt32 m_outputStart;
-	//	ndInt32 m_workBufferSize;
-	//};
-	//
-	//UniformBufferObject uniformParam;
-	//memset(&uniformParam, -1, sizeof(uniformParam));
-	//
-	//uniformParam.m_matrixRows = matrix.GetRows();
-	//uniformParam.m_matrixColumns = matrix.GetColumns();
-	//uniformParam.m_matrixRowsStride = rowsStride;
-	//uniformParam.m_matrixColumnsStride = columnsStride;
-	//uniformParam.m_workGroupsPerMatrix = ((matrix.GetRows() + 15) & -16) / 16;
-	//
-	//uniformParam.m_paramStart = 0;
-	//uniformParam.m_inputStart = 0;
-	//uniformParam.m_outputStart = columnsStride;
-	//uniformParam.m_workBufferSize = workBufferStride;
-	//
-	//ndBrainGpuFloatBuffer inputOutputBuffer(&context, workBuffer);
-	//ndBrainGpuFloatBuffer weightParamBuffer(&context, memData);
-	//ndBrainGpuUniformBuffer parammeters(&context, sizeof(UniformBufferObject));
-	//parammeters.LoadData(sizeof(uniformParam), &uniformParam);
-	//
-	//ndList<ndSharedPtr<ndBrainGpuCommand>> displayList;
-	//displayList.Append (new TestCommand(&context, input.GetCount(), uniformParam.m_workGroupsPerMatrix, parammeters, weightParamBuffer, inputOutputBuffer));
-	//
-	//context.SubmitQueue(displayList);
-	//context.Sync();
-	//
-	//ndBrainVector outputGpu;
-	//inputOutputBuffer.UnloadData(outputGpu);
-	//
-	//for (ndInt32 i = 0; i < input.GetCount(); ++i)
-	//{
-	//	ndBrainMemVector xxx(&outputGpu[workBufferStride * i + columnsStride], output[i].GetCount());
-	//	i *= 1;
-	//}
+	class TestCommand : public ndBrainGpuCommand
+	{
+		public:
+		TestCommand(
+			ndBrainGpuContext* const context, ndInt32 numberOfImputs, ndInt32 workGroupsPerMatrix, ndBrainGpuBuffer& uniforms,
+			ndBrainGpuBuffer& weights, ndBrainGpuBuffer& imputOutpus)
+			:ndBrainGpuCommand(context)
+		{
+			ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
+			params.PushBack(&uniforms);
+			params.PushBack(&imputOutpus);
+			params.PushBack(&weights);
+
+			ndInt32 numberOfGroups = numberOfImputs * workGroupsPerMatrix;
+			Assembly(context->m_testShader, numberOfGroups, params.GetCount(), &params[0]);
+		}
+	};
+	struct UniformBufferObject
+	{
+		ndInt32 m_matrixRows;
+		ndInt32 m_matrixColumns;
+		ndInt32 m_matrixRowsStride;
+		ndInt32 m_matrixColumnsStride;
+		ndInt32 m_workGroupsPerMatrix;
+	
+		ndInt32 m_paramStart;
+		ndInt32 m_inputStart;
+		ndInt32 m_outputStart;
+		ndInt32 m_workBufferSize;
+	};
+	
+	UniformBufferObject uniformParam;
+	memset(&uniformParam, -1, sizeof(uniformParam));
+	
+	uniformParam.m_matrixRows = matrix.GetRows();
+	uniformParam.m_matrixColumns = matrix.GetColumns();
+	uniformParam.m_matrixRowsStride = rowsStride;
+	uniformParam.m_matrixColumnsStride = columnsStride;
+	uniformParam.m_workGroupsPerMatrix = ((matrix.GetRows() + 15) & -16) / 16;
+	
+	uniformParam.m_paramStart = 0;
+	uniformParam.m_inputStart = 0;
+	uniformParam.m_outputStart = columnsStride;
+	uniformParam.m_workBufferSize = workBufferStride;
+	
+	ndBrainGpuFloatBuffer inputOutputBuffer(&context, workBuffer);
+	ndBrainGpuFloatBuffer weightParamBuffer(&context, memData);
+	ndBrainGpuUniformBuffer parammeters(&context, sizeof(UniformBufferObject));
+	parammeters.LoadData(sizeof(uniformParam), &uniformParam);
+	
+	ndList<ndSharedPtr<ndBrainGpuCommand>> displayList;
+	displayList.Append (new TestCommand(&context, input.GetCount(), uniformParam.m_workGroupsPerMatrix, parammeters, weightParamBuffer, inputOutputBuffer));
+	
+	context.SubmitQueue(displayList);
+	context.Sync();
+	
+	ndBrainVector outputGpu;
+	inputOutputBuffer.UnloadData(outputGpu);
+
+	for (ndInt32 i = 0; i < input.GetCount(); ++i)
+	{
+		ndBrainMemVector xxx(&outputGpu[workBufferStride * i + columnsStride], output[i].GetCount());
+		i *= 1;
+	}
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline

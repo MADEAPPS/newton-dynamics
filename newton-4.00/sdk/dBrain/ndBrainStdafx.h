@@ -26,6 +26,10 @@
 #include <ndCore.h>
 #include <lodepng.h>
 
+#ifdef D_USE_VULKAN_SDK
+	#include <vulkan/vulkan.h>
+#endif
+
 typedef ndReal ndBrainFloat;
 
 

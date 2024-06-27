@@ -143,8 +143,7 @@ ndBrainGpuCommand* ndBrainLayerSoftmaxActivation::AssemblyGPUCommand(ndBrainGpuC
 			ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
 			params.PushBack(&m_parammeters);
 			params.PushBack(workingBuffer.m_buffer);
-			ndAssert(0);
-			//Assembly(context->m_ndBrainLayerSoftmaxActivation, batchCount, params.GetCount(), &params[0]);
+			Assembly(context->m_ndBrainLayerSoftmaxActivation, batchCount, params.GetCount(), &params[0]);
 		}
 
 		ndBrainGpuUniformBuffer m_parammeters;

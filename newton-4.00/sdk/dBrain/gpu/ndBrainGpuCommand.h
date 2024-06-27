@@ -16,6 +16,8 @@
 class ndBrainGpuContext;
 class ndBrainGpuFloatBuffer;
 
+#if !defined (D_USE_VULKAN_SDK)
+
 class ndBrainGpuCommand : public ndClassAlloc
 {
 	public:
@@ -26,6 +28,29 @@ class ndBrainGpuCommand : public ndClassAlloc
 	protected:
 	ndBrainGpuContext* m_context;
 };
+
+#else
+
+class ndBrainGpuCommand : public ndClassAlloc
+{
+	public:
+	virtual ~ndBrainGpuCommand();
+
+	protected:
+	ndBrainGpuCommand(ndBrainGpuContext* const context);
+	void Assembly(VkShaderModule shader, ndInt32 workGroups, ndInt32 paramCount, ndBrainGpuBuffer** params);
+
+	ndBrainGpuContext* m_context;
+	VkPipeline m_pipeline;
+	VkDescriptorSet m_descriptorSet;
+	VkCommandBuffer m_commandBuffer;
+	VkPipelineLayout m_pipelineLayout;
+	VkDescriptorSetLayout m_descriptorSetLayout;
+
+	friend class ndBrainGpuContext;
+};
+
+#endif
 
 class ndBrainGpuCommandTest : public ndBrainGpuCommand
 {

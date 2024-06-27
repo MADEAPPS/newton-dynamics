@@ -8,13 +8,46 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __ND_BRAIN_GPU_VULKAN_CONTEXT_H__
-#define __ND_BRAIN_GPU_VULKAN_CONTEXT_H__
+#ifndef __ND_BRAIN_GPU_CONTEXT_H__
+#define __ND_BRAIN_GPU_CONTEXT_H__
 
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 
-class ndBrainVulkanContext: public ndBrainGpuContext
+#if !defined (D_USE_VULKAN_SDK)
+
+class ndBrainGpuContext : public ndClassAlloc
+{
+	public:
+	ndBrainGpuContext() 
+		:ndClassAlloc() 
+	{ 
+		ndMemSet(m_modules, (void*)nullptr, sizeof(m_modules) / sizeof(m_modules[0]));
+	}
+	virtual ~ndBrainGpuContext(){}
+
+	void Sync() {}
+	void SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>&) {}
+	ndInt32 GetSubGroupSize() const { return 0; }
+	static bool HasGpuSupport() { return false; }
+
+	union
+	{
+		struct
+		{
+			void* m_testShader;
+			void* m_ndBrainCopyInput;
+			void* m_ndBrainLayerLinear;
+			void* m_ndBrainLayerLinearTiled;
+			void* m_ndBrainLayerRluActivation;
+			void* m_ndBrainLayerSoftmaxActivation;
+		};
+		void* m_modules[128];
+	};
+};
+
+#else
+class ndBrainGpuContext: public ndClassAlloc
 {
 	class ndMemoryEntry
 	{
@@ -24,8 +57,8 @@ class ndBrainVulkanContext: public ndBrainGpuContext
 	};
 
 	public:
-	ndBrainVulkanContext();
-	virtual ~ndBrainVulkanContext();
+	ndBrainGpuContext();
+	virtual ~ndBrainGpuContext();
 
 	static bool HasGpuSupport();
 
@@ -108,5 +141,8 @@ class ndBrainVulkanContext: public ndBrainGpuContext
 
 	friend class ndBrainGpuCommand;
 };
+
+#endif
+
 
 #endif
