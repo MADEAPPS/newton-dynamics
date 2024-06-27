@@ -65,45 +65,43 @@ void main()
 
     float acc = 0.0;
     uint matrixRowsStart = inputOutputLow * TILE_SIZE;
+
+    uint tileY = gl_LocalInvocationID.x >> TILES_BITS;
+    uint tileX = gl_LocalInvocationID.x & (TILE_SIZE - 1);
+
+    uint tileYBase = tileY + matrixRowsStart;
+    uint YOffset = m_paramStart + tileYBase * matrixColumnStride + tileX;
     for (uint tileIndex = 0; tileIndex < matrixColumns; tileIndex += TILE_SIZE)
     {
-        uint tileX = gl_LocalInvocationID.x & (TILE_SIZE - 1);
-        uint tileY = (gl_LocalInvocationID.x >> TILES_BITS) + matrixRowsStart;
-        if (tileY < m_matrixRows)
+        if (tileYBase < m_matrixRows)
         {
             if ((tileX + tileIndex) < matrixColumns)
             {
                 float a = inputVector[tileIndex + tileX];
-                float b = m_weightsAndBias[m_paramStart + tileIndex + tileY * matrixColumnStride + tileX];
+                float b = m_weightsAndBias[YOffset + tileIndex];
                 acc += a * b;
             }
         }
     }
 
-    uint tileY = gl_LocalInvocationID.x >> TILES_BITS;
-    uint tileX = gl_LocalInvocationID.x & (TILE_SIZE - 1);
-
-#if 1
-    tile[tileY][tileX] = acc;
-    memoryBarrierShared(); 
-    barrier();
-    if (gl_LocalInvocationID.x < TILE_SIZE)
-    {
-        acc = 0.0;
-        for (uint tileIndex = 0; tileIndex < TILE_SIZE; tileIndex ++)
-        {
-            acc += tile[gl_LocalInvocationID.x][tileIndex];
-        }
-    }
-
-#else
-    // save transpose tile, fewer operations but more barries, 
-    // so come out slower on nvidia gpus.
+    // save transpose tile, 
     tile[tileX][tileY] = acc;
     memoryBarrierShared(); 
     barrier();
 
-    // fewer operations but more barries, so comes out slower on nvidia gpus.
+#if 1
+    if (tileX < TILE_SIZE)
+    {
+        acc = 0.0;
+        for (uint tileIndex = 0; tileIndex < TILE_SIZE; tileIndex ++)
+        {
+            acc += tile[tileIndex][tileX];
+        }
+    }
+
+#else
+
+    // fewer operations but more barries, but comes out slower on nvidia gpus.
     if (tileY < TILE_SIZE/2)
     {
         acc = tile[tileY][tileX];
@@ -123,11 +121,11 @@ void main()
     }
 #endif
     
-    if (gl_LocalInvocationID.x < TILE_SIZE)
+    if (tileX < TILE_SIZE)
     {
         uint biasOffset = m_paramStart + matrixColumnStride * matrixRows;
         uint outputOffset = m_outputStart + matrixRowsStart + inputOutputHigh * m_workBufferSize;
-        acc += m_weightsAndBias[biasOffset + matrixRowsStart + gl_LocalInvocationID.x];
-        m_inputOutputData[outputOffset + gl_LocalInvocationID.x] = acc;
+        acc += m_weightsAndBias[biasOffset + matrixRowsStart + tileX];
+        m_inputOutputData[outputOffset + tileX] = acc;
     }
 }

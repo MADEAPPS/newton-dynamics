@@ -245,7 +245,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 //#pragma optimize( "", off )
 static void MnistTrainingSet()
 {
-	#define USE_CONVOLUTIONAL_LAYERS
+	//#define USE_CONVOLUTIONAL_LAYERS
 	#define BATCH_BUFFER_SIZE				64
 	#define CONVOLUTIONAL_FEATURE_MAPS		32
 	#define MIN_TRAIN_SCORE					0.9999f
@@ -659,8 +659,8 @@ static void MnistTestSet()
 		ndInt32 numbeOfParam = brain->GetNumberOfParameters();
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		ndExpandTraceMessage("mnist database, number of Parameters %d\n", numbeOfParam);
-		//if (ndBrainGpuContext::HasGpuSupport())
-		if (0)
+		if (ndBrainGpuContext::HasGpuSupport())
+		//if (0)
 		{
 			ValidateDataGpu("test data", *(*brain), *testLabels, *testDigits);
 		}
