@@ -147,8 +147,8 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 {
-	//ndInt32 batchSize = 1;
-	const ndInt32 batchSize = testDigits->GetCount();
+	ndInt32 batchSize = 100;
+	//const ndInt32 batchSize = testDigits->GetCount();
 
 	ndBrainGpuContext gpuContext;
 	ndBrainGpuInference inference(&gpuContext, &brain, *testDigits, batchSize);
@@ -246,6 +246,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 static void MnistTrainingSet()
 {
 	//#define USE_CONVOLUTIONAL_LAYERS
+
 	#define BATCH_BUFFER_SIZE				64
 	#define CONVOLUTIONAL_FEATURE_MAPS		32
 	#define MIN_TRAIN_SCORE					0.9999f

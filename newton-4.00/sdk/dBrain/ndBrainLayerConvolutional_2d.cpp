@@ -138,6 +138,16 @@ ndInt32 ndBrainLayerConvolutional_2d::GetNumberOfParameters() const
 	return m_bias.GetCount() + m_kernelSize * m_kernelSize * m_inputLayers * m_outputLayers;
 }
 
+void ndBrainLayerConvolutional_2d::GetNumberOfGPUParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const
+{
+	ndAssert(0);
+	ndInt32 size = GetNumberOfParameters();
+	ndInt32 paramStart = parameters.GetCount();
+	parameters.SetCount(paramStart + size);
+	offsets.PushBack(size);
+}
+
+
 bool ndBrainLayerConvolutional_2d::HasParameters() const
 {
 	return true;
