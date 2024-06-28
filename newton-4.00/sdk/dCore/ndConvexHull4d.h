@@ -166,7 +166,7 @@ inline ndInt32 ndConvexHull4d::GetVertexIndex(ndInt32 index) const
 {
 	ndAssert (index >= 0);
 	ndAssert (index < m_count);
-	return m_points[index].m_index;
+	return m_points[size_t(index)].m_index;
 }
 
 
@@ -174,7 +174,7 @@ inline const ndBigVector& ndConvexHull4d::GetVertex(ndInt32 index) const
 {
 	ndAssert (index >= 0);
 	ndAssert (index < m_count);
-	return m_points[index];
+	return m_points[size_t (index)];
 }
 
 inline const ndConvexHull4dVector* ndConvexHull4d::GetHullVertexArray() const

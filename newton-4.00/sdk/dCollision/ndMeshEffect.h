@@ -705,18 +705,18 @@ inline void ndMeshEffect::ndPointFormat::Clear()
 inline void ndMeshEffect::ndPointFormat::SetCount(ndInt32 count)
 {
 	m_vertex.Resize(size_t (count));
-	m_vertex.SetCount(count);
+	m_vertex.SetCount(size_t(count));
 
 	if (m_layers.GetCount())
 	{
 		m_layers.Resize(size_t(count));
-		m_layers.SetCount(count);
+		m_layers.SetCount(size_t(count));
 	}
 
 	if (m_skinWeights.GetCount())
 	{
 		m_skinWeights.Resize(size_t(count));
-		m_skinWeights.SetCount(count);
+		m_skinWeights.SetCount(size_t(count));
 	}
 }
 
@@ -762,49 +762,49 @@ inline void ndMeshEffect::ndAttibutFormat::SetCount(ndInt32 count)
 	if (m_pointChannel.GetCount())
 	{
 		m_pointChannel.Resize(size_t(count));
-		m_pointChannel.SetCount(count);
+		m_pointChannel.SetCount(size_t(count));
 	}
 
 	if (m_materialChannel.GetCount())
 	{
 		m_materialChannel.Resize(size_t(count));
-		m_materialChannel.SetCount(count);
+		m_materialChannel.SetCount(size_t(count));
 	}
 
 	if (m_normalChannel.GetCount())
 	{
 		m_normalChannel.Resize(size_t(count));
-		m_normalChannel.SetCount(count);
+		m_normalChannel.SetCount(size_t(count));
 	}
 
 	if (m_binormalChannel.GetCount())
 	{
 		m_binormalChannel.Resize(size_t(count));
-		m_binormalChannel.SetCount(count);
+		m_binormalChannel.SetCount(size_t(count));
 	}
 
 	if (m_colorChannel.GetCount())
 	{
 		m_colorChannel.Resize(size_t(count));
-		m_colorChannel.SetCount(count);
+		m_colorChannel.SetCount(size_t(count));
 	}
 
 	if (m_uv0Channel.GetCount())
 	{
 		m_uv0Channel.Resize(size_t(count));
-		m_uv0Channel.SetCount(count);
+		m_uv0Channel.SetCount(size_t(count));
 	}
 
 	if (m_uv1Channel.GetCount())
 	{
 		m_uv1Channel.Resize(size_t(count));
-		m_uv1Channel.SetCount(count);
+		m_uv1Channel.SetCount(size_t(count));
 	}
 }
 
 inline ndInt32 ndMeshEffect::GetPropertiesCount() const
 {
-	return m_attrib.m_pointChannel.GetCount();
+	return ndInt32(m_attrib.m_pointChannel.GetCount());
 }
 
 inline void ndMeshEffect::SetName(const ndString& name)
@@ -824,7 +824,7 @@ inline ndArray<ndMeshEffect::ndMaterial>& ndMeshEffect::GetMaterials()
 
 inline ndInt32 ndMeshEffect::GetVertexCount() const
 {
-	return m_points.m_vertex.GetCount();
+	return ndInt32(m_points.m_vertex.GetCount());
 }
 
 inline ndInt32 ndMeshEffect::GetVertexStrideInByte() const
@@ -839,7 +839,7 @@ inline const ndFloat64* ndMeshEffect::GetVertexPool() const
 
 inline ndInt32 ndMeshEffect::GetFaceMaterial(ndEdge* const faceEdge) const
 {
-	return ndInt32(m_attrib.m_materialChannel.GetCount() ? m_attrib.m_materialChannel[ndInt32(faceEdge->m_userData)] : 0);
+	return ndInt32(m_attrib.m_materialChannel.GetCount() ? m_attrib.m_materialChannel[size_t(faceEdge->m_userData)] : 0);
 }
 
 inline ndMeshEffect* ndMeshEffect::GetFirstLayer()
