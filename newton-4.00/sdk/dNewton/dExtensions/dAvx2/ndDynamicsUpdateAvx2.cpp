@@ -637,8 +637,8 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	#ifdef _DEBUG
 		for (ndInt32 i = 1; i < m_activeJointCount; ++i)
 		{
-			ndConstraint* const joint0 = jointArray[i - 1];
-			ndConstraint* const joint1 = jointArray[i - 0];
+			ndConstraint* const joint0 = jointArray[size_t(i - 1)];
+			ndConstraint* const joint1 = jointArray[size_t(i - 0)];
 			ndAssert(!joint0->m_resting);
 			ndAssert(!joint1->m_resting);
 			ndAssert(joint0->m_rowCount >= joint1->m_rowCount);
@@ -646,10 +646,10 @@ void ndDynamicsUpdateAvx2::SortJoints()
 			ndAssert(!(joint1->GetBody0()->m_equilibrium0 & joint1->GetBody1()->m_equilibrium0));
 		}
 
-		for (ndInt32 i = m_activeJointCount + 1; i < jointArray.GetCount(); ++i)
+		for (ndInt32 i = m_activeJointCount + 1; i < ndInt32(jointArray.GetCount()); ++i)
 		{
-			ndConstraint* const joint0 = jointArray[i - 1];
-			ndConstraint* const joint1 = jointArray[i - 0];
+			ndConstraint* const joint0 = jointArray[size_t(i - 1)];
+			ndConstraint* const joint1 = jointArray[size_t(i - 0)];
 			ndAssert(joint0->m_resting);
 			ndAssert(joint1->m_resting);
 			ndAssert(joint0->m_rowCount >= joint1->m_rowCount);
@@ -661,7 +661,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	const ndInt32 mask = -ndInt32(D_AVX_WORK_GROUP);
 	const ndInt32 jointCount = ndInt32(jointArray.GetCount());
 	const ndInt32 soaJointCount = (jointCount + D_AVX_WORK_GROUP - 1) & mask;
-	ndAssert(jointArray.GetCapacity() > soaJointCount);
+	ndAssert(jointArray.GetCapacity() > size_t(soaJointCount));
 	ndConstraint** const jointArrayPtr = &jointArray[0];
 	for (ndInt32 i = jointCount; i < soaJointCount; ++i)
 	{
@@ -748,12 +748,12 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	m_avxMassMatrixArray->SetCount(size_t(soaJointRowCount));
 
 	#ifdef _DEBUG
-		ndAssert(m_activeJointCount <= jointArray.GetCount());
-		const ndInt32 maxRowCount = m_leftHandSide.GetCount();
-		for (ndInt32 i = 0; i < jointArray.GetCount(); ++i)
+		ndAssert(size_t(m_activeJointCount) <= jointArray.GetCount());
+		const ndInt32 maxRowCount = ndInt32 (m_leftHandSide.GetCount());
+		for (ndInt32 i = 0; i < ndInt32 (jointArray.GetCount()); ++i)
 		{
-			ndConstraint* const joint = jointArray[i];
-			ndAssert(joint->m_rowStart < m_leftHandSide.GetCount());
+			ndConstraint* const joint = jointArray[size_t(i)];
+			ndAssert(joint->m_rowStart < ndInt32(m_leftHandSide.GetCount()));
 			ndAssert((joint->m_rowStart + joint->m_rowCount) <= maxRowCount);
 		}
 
