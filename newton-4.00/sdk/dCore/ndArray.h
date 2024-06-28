@@ -63,7 +63,7 @@ class ndArray: public ndClassAlloc
 	/// Set a new size.
 	/// the array resized to count, all the data is simply copied 
 	/// to the new array and old array is deleted.
-	void Resize(ndInt32 count);
+	void Resize(size_t count);
 
 	/// return the capacity of the array.
 	ndInt32 GetCapacity() const;
@@ -96,12 +96,12 @@ class ndArray: public ndClassAlloc
 	void SetMembers(ndInt32 size, void* const memory);
 
 	private: 
-	void CopyData(T* const dst, const T* const src, ndInt32 elements);
+	void CopyData(T* const dst, const T* const src, size_t elements);
 
 	protected:
 	T* m_array;
-	ndInt32 m_size;
-	ndInt32 m_capacity;
+	size_t m_size;
+	size_t m_capacity;
 };
 
 template<class T>
@@ -120,7 +120,7 @@ ndArray<T>::ndArray(ndInt32 count)
 	,m_size(0)
 	,m_capacity(0)
 {
-	Resize(count);
+	Resize(size_t(count));
 }
 
 template<class T>
@@ -181,17 +181,17 @@ void ndArray<T>::PushBack(const T& element)
 template<class T>
 ndInt32 ndArray<T>::GetCount() const
 {
-	return m_size;
+	return ndInt32 (m_size);
 }
 
 template<class T>
 void ndArray<T>::SetCount(ndInt32 count)
 {
-	while (count > m_capacity)
+	while (size_t (count) > m_capacity)
 	{
 		Resize(m_capacity * 2);
 	}
-	m_size = count;
+	m_size = size_t(count);
 }
 
 template<class T>
@@ -201,7 +201,7 @@ ndInt32 ndArray<T>::GetCapacity() const
 }
 
 template<class T>
-void ndArray<T>::CopyData(T* const dstPtr, const T* const srcPtr, ndInt32 elements)
+void ndArray<T>::CopyData(T* const dstPtr, const T* const srcPtr, size_t elements)
 {
 	const ndInt32 sizeInBytes = ndInt32 (elements * sizeof(T));
 	const ndInt32 size16 = ndInt32(sizeInBytes / sizeof(ndVector));
@@ -221,7 +221,7 @@ void ndArray<T>::CopyData(T* const dstPtr, const T* const srcPtr, ndInt32 elemen
 }
 
 template<class T>
-void ndArray<T>::Resize(ndInt32 newSize)
+void ndArray<T>::Resize(size_t newSize)
 {
 	// note: I know some tools will detect a warning here
 	// because it is copying object from one array
@@ -233,7 +233,7 @@ void ndArray<T>::Resize(ndInt32 newSize)
 	// please use standart lib std::vector
 	if (newSize > m_capacity || (m_capacity == 0))
 	{
-		newSize = ndMax(newSize, ndInt32(16));
+		newSize = ndMax(newSize, size_t(16));
 		T* const newArray = (T*)ndMemory::Malloc(size_t(sizeof(T) * newSize));
 		if (m_array) 
 		{
@@ -248,7 +248,7 @@ void ndArray<T>::Resize(ndInt32 newSize)
 	}
 	else if (newSize < m_capacity)
 	{
-		newSize = ndMax(newSize, ndInt32 (16));
+		newSize = ndMax(newSize, size_t(16));
 		T* const newArray = (T*)ndMemory::Malloc(size_t(sizeof(T) * newSize));
 		if (m_array) 
 		{

@@ -147,8 +147,8 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 {
-	ndInt32 batchSize = 100;
-	//const ndInt32 batchSize = testDigits->GetCount();
+	//ndInt32 batchSize = 100;
+	const ndInt32 batchSize = testDigits->GetCount();
 
 	ndBrainGpuContext gpuContext;
 	ndBrainGpuInference inference(&gpuContext, &brain, *testDigits, batchSize);
