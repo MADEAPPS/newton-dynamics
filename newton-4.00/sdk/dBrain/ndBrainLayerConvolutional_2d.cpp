@@ -450,8 +450,6 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 	}
 
 	// calculate input gradients
-	//ndBrainFloat convKernelSimdBuffer[128 * 4];
-	//ndBrainFloat4* const  convKernelSimd = (ndBrainFloat4*)&convKernelSimdBuffer[0];
 	ndBrainFloat4 convKernelSimd[64];
 
 	const ndInt32 paddSizeWidth = m_inputWidth + m_kernelSize - 1;
@@ -576,8 +574,6 @@ void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, nd
 	const ndInt32 outputSize = m_outputWidth * m_outputHeight;
 	const ndBrainFloat biasScale = ndBrainFloat(1.0f) / ndBrainFloat(m_inputLayers * outputSize);
 
-	//ndBrainFloat convKernelSimdBuffer[128 * 4];
-	//ndBrainFloat4* const  convKernelSimd = (ndBrainFloat4*)&convKernelSimdBuffer[0];
 	ndBrainFloat4 convKernelSimd[64];
 
 	auto CrossCorrelationSimd = [this, &convKernelSimd](const ndBrainVector& input)
