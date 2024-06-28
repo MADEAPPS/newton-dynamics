@@ -84,7 +84,7 @@ class ndPolygonSoupBuilder: public ndClassAlloc
 		}
 
 		ndVertexArray(ndInt32 count)
-			:ndArray<ndBigVector>(size_t (count))
+			:ndArray<ndBigVector>(count)
 		{
 		}
 	};
@@ -98,7 +98,7 @@ class ndPolygonSoupBuilder: public ndClassAlloc
 		}
 
 		ndIndexArray(ndInt32 count)
-			:ndArray<ndInt32>(size_t(count))
+			:ndArray<ndInt32>(count)
 		{
 		}
 	};

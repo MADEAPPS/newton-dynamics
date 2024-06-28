@@ -637,8 +637,8 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	#ifdef _DEBUG
 		for (ndInt32 i = 1; i < m_activeJointCount; ++i)
 		{
-			ndConstraint* const joint0 = jointArray[size_t(i - 1)];
-			ndConstraint* const joint1 = jointArray[size_t(i - 0)];
+			ndConstraint* const joint0 = jointArray[i - 1];
+			ndConstraint* const joint1 = jointArray[i - 0];
 			ndAssert(!joint0->m_resting);
 			ndAssert(!joint1->m_resting);
 			ndAssert(joint0->m_rowCount >= joint1->m_rowCount);
@@ -648,8 +648,8 @@ void ndDynamicsUpdateAvx2::SortJoints()
 
 		for (ndInt32 i = m_activeJointCount + 1; i < ndInt32(jointArray.GetCount()); ++i)
 		{
-			ndConstraint* const joint0 = jointArray[size_t(i - 1)];
-			ndConstraint* const joint1 = jointArray[size_t(i - 0)];
+			ndConstraint* const joint0 = jointArray[i - 1];
+			ndConstraint* const joint1 = jointArray[i - 0];
 			ndAssert(joint0->m_resting);
 			ndAssert(joint1->m_resting);
 			ndAssert(joint0->m_rowCount >= joint1->m_rowCount);

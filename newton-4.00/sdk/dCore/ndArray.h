@@ -44,7 +44,7 @@ class ndArray: public ndClassAlloc
 	/// constructor, set count and capacity to zero, not memory is allocated.
 	ndArray();
 	/// constructor, set count and capacity, allocated space for count elements.
-	ndArray(size_t count);
+	ndArray(ndInt64 count);
 	/// copy constructor, allocate and copy only m_size elements from source.
 	ndArray(const ndArray& source);
 
@@ -52,29 +52,29 @@ class ndArray: public ndClassAlloc
 	~ndArray ();
 
 	/// return the size of the array.
-	size_t GetCount() const;
+	ndInt64 GetCount() const;
 
 	/// Set a new size.
 	/// if count is larger than m_size, the array resized by doubling its size, 
 	/// all the data is simply copied to the new array and old array is deleted.
-	void SetCount(size_t count);
+	void SetCount(ndInt64 count);
 
 	//void Clear();
 	/// Set a new size.
 	/// the array resized to count, all the data is simply copied 
 	/// to the new array and old array is deleted.
-	void Resize(size_t count);
+	void Resize(ndInt64 count);
 
 	/// return the capacity of the array.
-	size_t GetCapacity() const;
+	ndInt64 GetCapacity() const;
 	
 	/// Get the i element for the array.
 	/// behavior is undefined is i is larger of equal to the array size
-	T& operator[] (size_t i);
+	T& operator[] (ndInt64 i);
 
 	/// Get the i element for the array.
 	/// behavior is undefined is i is larger of equal to the array size
-	const T& operator[] (size_t i) const;
+	const T& operator[] (ndInt64 i) const;
 
 	/// Interchange all the information with other.
 	/// other must be of the same type.
@@ -85,7 +85,7 @@ class ndArray: public ndClassAlloc
 	void PushBack(const T& element);
 
 	/// Randomize the vector entries.
-	void RandomShuffle(size_t count);
+	void RandomShuffle(ndInt64 count);
 
 	/// set all member to 0.
 	/// useful for when making vectors of vectors (ex matrices)
@@ -93,15 +93,15 @@ class ndArray: public ndClassAlloc
 
 	/// assign all members.
 	/// useful for when making vectors of vectors (ex matrices)
-	void SetMembers(size_t size, void* const memory);
+	void SetMembers(ndInt64 size, void* const memory);
 
 	private: 
-	void CopyData(T* const dst, const T* const src, size_t elements);
+	void CopyData(T* const dst, const T* const src, ndInt64 elements);
 
 	protected:
 	T* m_array;
-	size_t m_size;
-	size_t m_capacity;
+	ndInt64 m_size;
+	ndInt64 m_capacity;
 };
 
 template<class T>
@@ -114,7 +114,7 @@ ndArray<T>::ndArray()
 }
 
 template<class T>
-ndArray<T>::ndArray(size_t count)
+ndArray<T>::ndArray(ndInt64 count)
 	:ndClassAlloc()
 	,m_array(nullptr)
 	,m_size(0)
@@ -134,7 +134,7 @@ ndArray<T>::ndArray(const ndArray& source)
 	{
 		Resize(source.m_capacity);
 		SetCount(source.m_size);
-		for (size_t i = 0; i < source.m_size; ++i)
+		for (ndInt64 i = 0; i < source.m_size; ++i)
 		{
 			m_array[i] = source[i];
 		}
@@ -151,7 +151,7 @@ ndArray<T>::~ndArray ()
 }
 
 template<class T>
-const T& ndArray<T>::operator[] (size_t i) const
+const T& ndArray<T>::operator[] (ndInt64 i) const
 {
 	ndAssert(i >= 0);
 	ndAssert(i < m_size);
@@ -159,7 +159,7 @@ const T& ndArray<T>::operator[] (size_t i) const
 }
 
 template<class T>
-T& ndArray<T>::operator[] (size_t i)
+T& ndArray<T>::operator[] (ndInt64 i)
 {
 	ndAssert(i >= 0);
 	ndAssert(i < m_size);
@@ -179,13 +179,13 @@ void ndArray<T>::PushBack(const T& element)
 }
 
 template<class T>
-size_t ndArray<T>::GetCount() const
+ndInt64 ndArray<T>::GetCount() const
 {
 	return m_size;
 }
 
 template<class T>
-void ndArray<T>::SetCount(size_t count)
+void ndArray<T>::SetCount(ndInt64 count)
 {
 	while (count > m_capacity)
 	{
@@ -195,33 +195,19 @@ void ndArray<T>::SetCount(size_t count)
 }
 
 template<class T>
-size_t ndArray<T>::GetCapacity() const
+ndInt64 ndArray<T>::GetCapacity() const
 {
 	return m_capacity;
 }
 
 template<class T>
-void ndArray<T>::CopyData(T* const dstPtr, const T* const srcPtr, size_t elements)
+void ndArray<T>::CopyData(T* const dstPtr, const T* const srcPtr, ndInt64 elements)
 {
-	const size_t sizeInBytes = elements * sizeof(T);
-	const size_t size16 = sizeInBytes / sizeof(ndVector);
-
-	ndVector* const dst = (ndVector*)dstPtr;
-	const ndVector* const src = (ndVector*)srcPtr;
-	for (size_t i = 0; i < size16; ++i)
-	{
-		dst[i] = src[i];
-	}
-	char* const dstBytes = (char*)dst;
-	const char* const srcBytes = (char*)src;
-	for (size_t i = size16 * sizeof(ndVector); i < sizeInBytes; ++i)
-	{
-		dstBytes[i] = srcBytes[i];
-	}
+	ndMemCpy(dstPtr, srcPtr, elements);
 }
 
 template<class T>
-void ndArray<T>::Resize(size_t newSize)
+void ndArray<T>::Resize(ndInt64 newSize)
 {
 	// note: I know some tools will detect a warning here
 	// because it is copying object from one array
@@ -233,7 +219,7 @@ void ndArray<T>::Resize(size_t newSize)
 	// please use standart lib std::vector
 	if (newSize > m_capacity || (m_capacity == 0))
 	{
-		newSize = ndMax(newSize, size_t(16));
+		newSize = ndMax(newSize, ndInt64(16));
 		T* const newArray = (T*)ndMemory::Malloc(size_t(sizeof(T) * newSize));
 		if (m_array) 
 		{
@@ -248,7 +234,7 @@ void ndArray<T>::Resize(size_t newSize)
 	}
 	else if (newSize < m_capacity)
 	{
-		newSize = ndMax(newSize, size_t(16));
+		newSize = ndMax(newSize, ndInt64(16));
 		T* const newArray = (T*)ndMemory::Malloc(size_t(sizeof(T) * newSize));
 		if (m_array) 
 		{
@@ -270,7 +256,7 @@ void ndArray<T>::Swap(ndArray& other)
 }
 
 template<class T>
-void ndArray<T>::SetMembers(size_t size, void* const memory)
+void ndArray<T>::SetMembers(ndInt64 size, void* const memory)
 {
 	m_size = size;
 	m_capacity = size + 1;
@@ -286,13 +272,13 @@ void ndArray<T>::ResetMembers()
 }
 
 template<class T>
-void ndArray<T>::RandomShuffle(size_t count)
+void ndArray<T>::RandomShuffle(ndInt64 count)
 {
-	const size_t size = ndMin (count, GetCount());
-	for (size_t i = size - 1; i >= 0; --i)
+	const ndInt64 size = ndMin (count, GetCount());
+	for (ndInt64 i = size - 1; i >= 0; --i)
 	{
-		size_t randomIndex = ndRandInt();
-		size_t j = randomIndex % size;
+		ndInt64 randomIndex = ndRandInt();
+		ndInt64 j = randomIndex % size;
 		ndSwap (m_array[i], m_array[j]);
 	}
 }
