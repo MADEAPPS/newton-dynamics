@@ -331,7 +331,7 @@ void ndBrainLayerLinear::GetNumberOfGPUParameters(ndBrainVector& parameters, ndA
 
 ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
 {
-	class ndBrainLayerLinearCommand : public ndBrainGpuCommand
+	class ndBrainLayerCommand : public ndBrainGpuCommand
 	{
 		struct UniformBufferObject
 		{
@@ -348,7 +348,7 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 		};
 
 		public:
-		ndBrainLayerLinearCommand(
+		ndBrainLayerCommand(
 			const ndBrainLayerLinear* const layer, ndBrainGpuContext* const context,
 			ndInt32 layerIndex, ndInt32 batchCount,
 			const ndBufferOffsetPair& parameterBuffer, const ndBufferOffsetPair& workingBuffer)
@@ -394,5 +394,5 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 	ndAssert(params.GetCount() == 2);
 	const ndBufferOffsetPair& parameterBuffer = *params[0];
 	const ndBufferOffsetPair& workingBuffer = *params[1];
-	return new ndBrainLayerLinearCommand(this, context, layerIndex, batchCount, parameterBuffer, workingBuffer);
+	return new ndBrainLayerCommand(this, context, layerIndex, batchCount, parameterBuffer, workingBuffer);
 }

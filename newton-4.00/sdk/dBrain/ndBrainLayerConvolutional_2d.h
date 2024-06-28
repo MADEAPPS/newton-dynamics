@@ -76,6 +76,7 @@ class ndBrainLayerConvolutional_2d : public ndBrainLayer
 	void InitGaussianWeights(ndBrainFloat variance);
 
 	virtual void GetNumberOfGPUParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const;
+	ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params);
 
 	ndBrainVector m_bias;
 	ndBrainVector m_kernels;
