@@ -55,7 +55,7 @@ void ndBrainLossHuber::GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 	ndAssert(m_truth.GetCount() == loss.GetCount());
 
 	ndBrainLossLeastSquaredError::GetLoss(output, loss);
-	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(output.GetCount() - 1); i >= 0; --i)
 	{
 		ndBrainFloat x = loss[i];
 		if (x > m_lambda)

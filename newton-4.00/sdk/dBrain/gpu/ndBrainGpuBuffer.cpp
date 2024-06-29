@@ -37,7 +37,7 @@ void* ndScopeMapBuffer::GetPointer() const
 }
 
 
-ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt32 sizeInByte, ndUnsigned32 bufferTypeFlags)
+ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInByte, ndUnsigned32 bufferTypeFlags)
 	:ndClassAlloc()
 	,m_context(context)
 	,m_sizeInBytes(sizeInByte)
@@ -107,7 +107,7 @@ VkBuffer ndBrainGpuBuffer::GetBuffer() const
 	return m_buffer;
 }
 
-ndInt32 ndBrainGpuBuffer::SizeInBytes() const
+ndInt64 ndBrainGpuBuffer::SizeInBytes() const
 {
 	return m_sizeInBytes;
 }
@@ -115,7 +115,7 @@ ndInt32 ndBrainGpuBuffer::SizeInBytes() const
 //*************************************************************************************
 //
 //*************************************************************************************
-ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt32 size)
+ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt64 size)
 	:ndBrainGpuBuffer(context, size * ndInt32(sizeof(ndReal)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
 {
 }
@@ -134,7 +134,7 @@ VkDescriptorType ndBrainGpuFloatBuffer::GetType() const
 //*************************************************************************************
 //
 //*************************************************************************************
-ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt32 size)
+ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt64 size)
 	:ndBrainGpuBuffer(context, size* ndInt32(sizeof(ndInt32)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
 {
 }
@@ -170,10 +170,10 @@ void ndBrainGpuFloatBuffer::LoadData(const ndBrainVector& input)
 	ndReal* const dst = (ndReal*)mapBuffer.GetPointer();
 	if (dst)
 	{
-		const ndInt32 size = m_sizeInBytes / ndInt32(sizeof(ndReal));
+		const ndInt64 size = m_sizeInBytes / ndInt32(sizeof(ndReal));
 		ndAssert(size == input.GetCount());
 
-		for (ndInt32 i = 0; i < size; ++i)
+		for (ndInt64 i = 0; i < size; ++i)
 		{
 			dst[i] = ndReal(input[i]);
 		}
@@ -186,7 +186,7 @@ void ndBrainGpuFloatBuffer::UnloadData(ndBrainVector& output)
 	const ndReal* const src = (ndReal*)mapBuffer.GetPointer();
 	if (src)
 	{
-		const ndInt32 size = m_sizeInBytes / ndInt32(sizeof(ndReal));
+		const ndInt64 size = m_sizeInBytes / ndInt32(sizeof(ndReal));
 		output.SetCount(size);
 		const ndBrainMemVector srcData(src, size);
 		output.Set(srcData);
@@ -199,10 +199,10 @@ void ndBrainGpuIntegerBuffer::LoadData(const ndArray<ndInt32>& input)
 	ndInt32* const dst = (ndInt32*)mapBuffer.GetPointer();
 	if (dst)
 	{
-		const ndInt32 size = m_sizeInBytes / ndInt32(sizeof(ndInt32));
+		const ndInt64 size = m_sizeInBytes / ndInt32(sizeof(ndInt32));
 		ndAssert(size == input.GetCount());
 
-		for (ndInt32 i = 0; i < size; ++i)
+		for (ndInt64 i = 0; i < size; ++i)
 		{
 			dst[i] = input[i];
 		}
@@ -215,9 +215,9 @@ void ndBrainGpuIntegerBuffer::UnloadData(ndArray<ndInt32>& output)
 	const ndInt32* const src = (ndInt32*)mapBuffer.GetPointer();
 	if (src)
 	{
-		const ndInt32 size = m_sizeInBytes / ndInt32(sizeof(ndInt32));
+		const ndInt64 size = m_sizeInBytes / ndInt32(sizeof(ndInt32));
 		output.SetCount(size);
-		for (ndInt32 i = 0; i < size; ++i)
+		for (ndInt64 i = 0; i < size; ++i)
 		{
 			output[i] = src[i];
 		}

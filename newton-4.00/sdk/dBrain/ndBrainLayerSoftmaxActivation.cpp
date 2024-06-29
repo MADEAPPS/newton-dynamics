@@ -63,13 +63,13 @@ void ndBrainLayerSoftmaxActivation::MakePrediction(const ndBrainVector& input, n
 	ndAssert(input.GetCount() == output.GetCount());
 	//ndBrainFloat max = ndBrainFloat(1.0e-16f);
 	ndBrainFloat max = ndBrainFloat(0.0f);
-	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{
 		max = ndMax(input[i], max);
 	}
 
 	ndBrainFloat acc = ndBrainFloat(0.0f);
-	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{
 		ndBrainFloat in = ndMax((input[i] - max), ndBrainFloat(-30.0f));
 		ndAssert(in <= ndBrainFloat(0.0f));

@@ -136,13 +136,13 @@ ndInt32 ndBrainLayerConvolutional_2d::GetOutputChannels() const
 
 ndInt32 ndBrainLayerConvolutional_2d::GetNumberOfParameters() const
 {
-	return m_bias.GetCount() + m_kernelSize * m_kernelSize * m_inputLayers * m_outputLayers;
+	return ndInt32(m_bias.GetCount()) + m_kernelSize * m_kernelSize * m_inputLayers * m_outputLayers;
 }
 
 void ndBrainLayerConvolutional_2d::GetNumberOfGPUParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const
 {
 	ndInt32 size = (GetNumberOfParameters() + ND_GPU_BUFFER_ALIGNMENT - 1) & -ND_GPU_BUFFER_ALIGNMENT;
-	ndInt32 paramStart = parameters.GetCount();
+	ndInt32 paramStart = ndInt32(parameters.GetCount());
 	parameters.SetCount(paramStart + size);
 	offsets.PushBack(size);
 
@@ -244,7 +244,7 @@ void ndBrainLayerConvolutional_2d::AdamUpdate(const ndBrainLayer& u, const ndBra
 
 	const ndBrainVector& bias_U = linear_U.m_bias;
 	const ndBrainVector& bias_V = linear_V.m_bias;
-	for (ndInt32 i = m_bias.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_bias.GetCount() - 1); i >= 0; --i)
 	{
 		ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(bias_V[i])) + epsilon);
 		m_bias[i] = bias_U[i] * bias_den;
@@ -252,7 +252,7 @@ void ndBrainLayerConvolutional_2d::AdamUpdate(const ndBrainLayer& u, const ndBra
 
 	const ndBrainVector& kernels_U = linear_U.m_kernels;
 	const ndBrainVector& kernels_V = linear_V.m_kernels;
-	for (ndInt32 j = m_kernels.GetCount() - 1; j >= 0; --j)
+	for (ndInt32 j = ndInt32(m_kernels.GetCount() - 1); j >= 0; --j)
 	{
 		ndBrainFloat weight_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(kernels_V[j])) + epsilon);
 		m_kernels[j] = kernels_U[j] * weight_den;
@@ -459,7 +459,7 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 
 	auto RotateKernelSimd = [&convKernelSimd](const ndBrainVector& kernel)
 	{
-		for (ndInt32 i = kernel.GetCount() - 1; i >= 0; --i)
+		for (ndInt32 i = ndInt32(kernel.GetCount() - 1); i >= 0; --i)
 		{
 			convKernelSimd[i] = ndBrainFloat4(kernel[i]);
 		}
@@ -619,7 +619,7 @@ void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, nd
 
 	auto RotateKernelSimd = [&convKernelSimd](const ndBrainVector& kernel)
 	{
-		for (ndInt32 i = kernel.GetCount() - 1; i >= 0; --i)
+		for (ndInt32 i = ndInt32(kernel.GetCount() - 1); i >= 0; --i)
 		{
 			convKernelSimd[kernel.GetCount() - 1 - i] = ndBrainFloat4(kernel[i]);
 		}
@@ -689,10 +689,15 @@ ndBrainGpuCommand* ndBrainLayerConvolutional_2d::AssemblyGPUCommand(ndBrainGpuCo
 		};
 
 		public:
+		//ndBrainLayerCommand(
+		//	const ndBrainLayerConvolutional_2d* const layer, ndBrainGpuContext* const context,
+		//	ndInt32 layerIndex, ndInt32 batchCount,
+		//	const ndBufferOffsetPair& parameterBuffer, const ndBufferOffsetPair& workingBuffer)
+		//	:ndBrainGpuCommand(context)
 		ndBrainLayerCommand(
-			const ndBrainLayerConvolutional_2d* const layer, ndBrainGpuContext* const context,
-			ndInt32 layerIndex, ndInt32 batchCount,
-			const ndBufferOffsetPair& parameterBuffer, const ndBufferOffsetPair& workingBuffer)
+			const ndBrainLayerConvolutional_2d* const, ndBrainGpuContext* const context,
+			ndInt32, ndInt32,
+			const ndBufferOffsetPair&, const ndBufferOffsetPair&)
 			:ndBrainGpuCommand(context)
 			,m_parammeters(m_context, sizeof(UniformBufferObject))
 		{

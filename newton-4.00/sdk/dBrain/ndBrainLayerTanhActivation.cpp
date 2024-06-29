@@ -64,7 +64,7 @@ ndBrainLayer* ndBrainLayerTanhActivation::Load(const ndBrainLoad* const loadSave
 void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
-	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32 (input.GetCount() - 1); i >= 0; --i)
 	{
 		output[i] = ndBrainFloat (ndTanh(input[i]));
 	}
@@ -122,6 +122,7 @@ void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& 
 	// however this can be very good for dense hidden layers, 
 	// in fact it seems to produce better or equal result than the standard tanh  
 
+	ndAssert(0);
 	const ndBrainVector4 c1(m_c1);
 	const ndBrainVector4 c2(m_c2);
 	const ndBrainVector4 min(m_min);
@@ -161,7 +162,7 @@ void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& 
 		return num.Divide(den);
 	};
 
-	const ndInt32 count = input.GetCount() / 4;
+	const ndInt32 count = ndInt32(input.GetCount()) / 4;
 	ndBrainVector4* const vectorOutput = (ndBrainVector4*)&output[0];
 	const ndBrainVector4* const vectorInput = (const ndBrainVector4*)&input[0];
 
@@ -178,7 +179,7 @@ void ndBrainLayerApproximateTanhActivation::MakePrediction(const ndBrainVector& 
 			ndAssert(ndAbs(xxx0.m_w - xxx1.m_w) < ndFloat32(2.0e-6f));
 		#endif
 	}
-	for (ndInt32 i = input.GetCount() - 1; i >= count * 4; --i)
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= count * 4; --i)
 	{
 		output[i] = ndBrainFloat(ScalarTanhApproximation(input[i]));
 		#if _DEBUG

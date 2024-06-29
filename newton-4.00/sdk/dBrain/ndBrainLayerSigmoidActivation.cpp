@@ -57,7 +57,7 @@ ndBrainLayer* ndBrainLayerSigmoidActivation::Load(const ndBrainLoad* const loadS
 void ndBrainLayerSigmoidActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
-	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{
 		ndBrainFloat out = ndBrainFloat(0.0f);
 		ndBrainFloat value = input[i];

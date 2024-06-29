@@ -66,7 +66,7 @@ ndBrainLayer* ndBrainLayerLinear::Clone() const
 ndInt32 ndBrainLayerLinear::GetOutputSize() const
 {
 	ndAssert(m_bias.GetCount() == m_weights.GetRows());
-	return m_bias.GetCount();
+	return ndInt32(m_bias.GetCount());
 }
 
 ndInt32 ndBrainLayerLinear::GetInputSize() const
@@ -86,7 +86,7 @@ ndBrainMatrix* ndBrainLayerLinear::GetWeights()
 
 ndInt32 ndBrainLayerLinear::GetNumberOfParameters() const
 {
-	return m_bias.GetCount() + m_weights.GetColumns() * m_weights.GetRows();
+	return ndInt32(m_bias.GetCount()) + m_weights.GetColumns() * m_weights.GetRows();
 }
 
 bool ndBrainLayerLinear::HasParameters() const
@@ -107,7 +107,7 @@ void ndBrainLayerLinear::InitGaussianBias(ndBrainFloat variance)
 
 void ndBrainLayerLinear::InitGaussianWeights(ndBrainFloat variance)
 {
-	for (ndInt32 i = m_weights.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_weights.GetCount() - 1); i >= 0; --i)
 	{
 		m_weights[i].InitGaussianWeights(variance);
 	}
@@ -181,7 +181,7 @@ void ndBrainLayerLinear::AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v
 
 	const ndBrainVector& bias_U = linear_U.m_bias;
 	const ndBrainVector& bias_V = linear_V.m_bias;
-	for (ndInt32 i = m_bias.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_bias.GetCount() - 1); i >= 0; --i)
 	{
 		ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(bias_V[i])) + epsilon);
 		m_bias[i] = bias_U[i] * bias_den;
@@ -191,7 +191,7 @@ void ndBrainLayerLinear::AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v
 	const ndBrainMatrix& weight_V = linear_V.m_weights;
 	for (ndInt32 i = m_weights.GetRows() - 1; i >= 0; --i)
 	{
-		for (ndInt32 j = m_weights[i].GetCount() - 1; j >= 0; --j)
+		for (ndInt32 j = ndInt32(m_weights[i].GetCount() - 1); j >= 0; --j)
 		{
 			ndBrainFloat weight_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(weight_V[i][j])) + epsilon);
 			m_weights[i][j] = weight_U[i][j] * weight_den;
@@ -289,7 +289,7 @@ void ndBrainLayerLinear::CalculateParamGradients(
 	ndAssert(gradients->m_bias.GetCount() == outputDerivative.GetCount());
 
 	gradients->m_bias.Set(outputDerivative);
-	for (ndInt32 i = outputDerivative.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(outputDerivative.GetCount() - 1); i >= 0; --i)
 	{
 		ndBrainFloat value = outputDerivative[i];
 		gradients->m_weights[i].ScaleSet(input, value);
@@ -311,7 +311,7 @@ void ndBrainLayerLinear::GetNumberOfGPUParameters(ndBrainVector& parameters, ndA
 	ndInt32 size = columnsStride * GetOutputSize() + rowsStride;
 	offsets.PushBack(size);
 
-	ndInt32 paramStart = parameters.GetCount();
+	ndInt32 paramStart = ndInt32(parameters.GetCount());
 	parameters.SetCount(paramStart + size);
 
 	ndBrainMemVector memData(&parameters[paramStart], size);

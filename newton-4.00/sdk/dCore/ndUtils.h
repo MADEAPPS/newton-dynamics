@@ -166,19 +166,19 @@ inline T ndAnglesSub(T angleInRadiand1, T angleInRadiand0)
 }
 
 template <class T>
-inline void ndMemSet(T* const dst, const T& val, ndInt32 elements)
+inline void ndMemSet(T* const dst, const T& val, ndInt64 elements)
 {
 	T value(val);
-	const ndInt32 stride = 8;
-	const ndInt32 n = elements & (-stride);
-	for (ndInt32 i = 0; i < n; i += stride)
+	const ndInt64 stride = 8;
+	const ndInt64 n = elements & (-stride);
+	for (ndInt64 i = 0; i < n; i += stride)
 	{
-		for (ndInt32 j = 0; j < stride; ++j)
+		for (ndInt64 j = 0; j < stride; ++j)
 		{
 			dst[i + j] = value;
 		}
 	}
-	for (ndInt32 i = n; i < elements; ++i)
+	for (ndInt64 i = n; i < elements; ++i)
 	{
 		dst[i] = value;
 	}
@@ -187,19 +187,6 @@ inline void ndMemSet(T* const dst, const T& val, ndInt32 elements)
 template <class T>
 inline void ndMemCpy(T* const dst, const T* const src, ndInt64 elements)
 {
-	//const ndInt32 stride = 8;
-	//const ndInt32 n = elements & (-stride);
-	//for (ndInt32 i = 0; i < n; i += stride)
-	//{
-	//	for (ndInt32 j = 0; j < stride; ++j)
-	//	{
-	//		dst[i + j] = src[i + j];
-	//	}
-	//}
-	//for (ndInt32 i = n; i < elements; ++i)
-	//{
-	//	dst[i] = src[i];
-	//}
 	memcpy(dst, src, sizeof(T) * elements);
 }
 

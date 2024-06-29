@@ -48,7 +48,7 @@ ndBrainMatrix::ndBrainMatrix(const ndBrainMatrix& src)
 ndBrainMatrix::~ndBrainMatrix()
 {
 	ndBrainMatrix& me = *this;
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(GetCount() - 1); i >= 0; --i)
 	{
 		ndBrainMemVector& row = me[i];
 		row.~ndBrainMemVector();
@@ -92,7 +92,7 @@ void ndBrainMatrix::Set(ndBrainFloat value)
 	ndBrainMatrix& matrix = *this;
 
 	ndInt32 strideInBytes = (ndInt32(GetColumns() * sizeof(ndBrainFloat)) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT;
-	ndInt32 size = GetCount() * strideInBytes / ndInt32(sizeof(ndBrainFloat));
+	ndInt32 size = ndInt32(GetCount()) * strideInBytes / ndInt32(sizeof(ndBrainFloat));
 	ndBrainFloat* const ptr = &matrix[0][0];
 	ndMemSet(ptr, value, size);
 }
@@ -104,7 +104,7 @@ void ndBrainMatrix::Set(const ndBrainMatrix& src)
 	ndBrainMatrix& matrix = *this;
 
 	ndInt32 strideInBytes = (ndInt32(GetColumns() * sizeof(ndBrainFloat)) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT;
-	ndInt32 size = GetCount() * strideInBytes / ndInt32(sizeof(ndBrainFloat));
+	ndInt32 size = ndInt32(GetCount()) * strideInBytes / ndInt32(sizeof(ndBrainFloat));
 	ndBrainFloat* const dstData = &matrix[0][0];
 	const ndBrainFloat* const srcData = &src[0][0];
 	ndMemCpy(dstData, srcData, size);
@@ -115,7 +115,7 @@ void ndBrainMatrix::Scale(ndBrainFloat scale)
 	ndBrainMatrix& matrix = *this;
 
 	ndInt32 strideInBytes = (ndInt32(GetColumns() * sizeof(ndBrainFloat)) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT;
-	ndInt32 size = GetCount() * strideInBytes / ndInt32(sizeof(ndBrainFloat));
+	ndInt32 size = ndInt32(GetCount()) * strideInBytes / ndInt32(sizeof(ndBrainFloat));
 	ndBrainFloat* const ptr = &matrix[0][0];
 	ndScale(size, ptr, scale);
 }
@@ -125,7 +125,7 @@ void ndBrainMatrix::ScaleAdd(const ndBrainMatrix& src, ndBrainFloat scale)
 	ndBrainMatrix& matrix = *this;
 
 	ndInt32 strideInBytes = (ndInt32(GetColumns() * sizeof(ndBrainFloat)) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT;
-	ndInt32 size = GetCount() * strideInBytes / ndInt32(sizeof(ndBrainFloat));
+	ndInt32 size = ndInt32(GetCount()) * strideInBytes / ndInt32(sizeof(ndBrainFloat));
 	ndBrainFloat* const dstData = &matrix[0][0];
 	const ndBrainFloat* const srcData = &src[0][0];
 	ndScaleAdd(size, dstData, srcData, scale);
@@ -138,7 +138,7 @@ void ndBrainMatrix::Add(const ndBrainMatrix& src)
 	ndBrainMatrix& matrix = *this;
 
 	ndInt32 strideInBytes = (ndInt32(GetColumns() * sizeof(ndBrainFloat)) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT;
-	ndInt32 size = GetCount() * strideInBytes / ndInt32(sizeof(ndBrainFloat));
+	ndInt32 size = ndInt32(GetCount()) * strideInBytes / ndInt32(sizeof(ndBrainFloat));
 	ndBrainFloat* const dstData = &matrix[0][0];
 	const ndBrainFloat* const srcData = &src[0][0];
 	ndAdd(size, dstData, srcData);
@@ -151,7 +151,7 @@ void ndBrainMatrix::Mul(const ndBrainMatrix& src)
 	ndBrainMatrix& matrix = *this;
 
 	ndInt32 strideInBytes = (ndInt32(GetColumns() * sizeof(ndBrainFloat)) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT;
-	ndInt32 size = GetCount() * strideInBytes / ndInt32(sizeof(ndBrainFloat));
+	ndInt32 size = ndInt32(GetCount()) * strideInBytes / ndInt32(sizeof(ndBrainFloat));
 	ndBrainFloat* const dstData = &matrix[0][0];
 	const ndBrainFloat* const srcData = &src[0][0];
 	ndMul(size, dstData, srcData);
@@ -164,7 +164,7 @@ void ndBrainMatrix::Blend(const ndBrainMatrix& src, ndBrainFloat blend)
 	ndBrainMatrix& matrix = *this;
 
 	ndInt32 strideInBytes = (ndInt32(GetColumns() * sizeof(ndBrainFloat)) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT;
-	ndInt32 size = GetCount() * strideInBytes / ndInt32(sizeof(ndBrainFloat));
+	ndInt32 size = ndInt32(GetCount()) * strideInBytes / ndInt32(sizeof(ndBrainFloat));
 	ndBrainFloat* const dstPtr = &matrix[0][0];
 	const ndBrainFloat* const srcPtr = &src[0][0];
 	ndBrainMemVector dstVector(dstPtr, size);
@@ -177,7 +177,7 @@ void ndBrainMatrix::FlushToZero()
 	ndBrainMatrix& matrix = *this;
 
 	ndInt32 strideInBytes = (ndInt32(GetColumns() * sizeof(ndBrainFloat)) + D_BRAIN_MATRIX_ALIGNMENT - 1) & -D_BRAIN_MATRIX_ALIGNMENT;
-	ndInt32 size = GetCount() * strideInBytes / ndInt32(sizeof(ndBrainFloat));
+	ndInt32 size = ndInt32(GetCount()) * strideInBytes / ndInt32(sizeof(ndBrainFloat));
 	ndBrainFloat* const ptr = &matrix[0][0];
 	ndBrainMemVector tmp(ptr, size);
 	tmp.FlushToZero();
@@ -186,11 +186,11 @@ void ndBrainMatrix::FlushToZero()
 void ndBrainMatrix::Mul(const ndBrainVector& input, ndBrainVector& output) const
 {
 	const ndBrainMatrix& me = *this;
-	ndInt32 columns = input.GetCount();
+	ndInt32 columns = ndInt32(input.GetCount());
 	ndAssert(columns == GetColumns());
 	ndAssert(output.GetCount() == GetCount());
 	
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(GetCount() - 1); i >= 0; --i)
 	{
 		const ndBrainVector& row = me[i];
 		output[i] = ndDotProduct(columns, &row[0], &input[0]);
@@ -205,7 +205,7 @@ void ndBrainMatrix::TransposeMul(const ndBrainVector& input, ndBrainVector& outp
 
 	output.Set(me[input.GetCount() - 1]);
 	output.Scale(input[input.GetCount() - 1]);
-	for (ndInt32 j = me.GetCount() - 2; j >= 0; --j)
+	for (ndInt32 j = ndInt32(me.GetCount() - 2); j >= 0; --j)
 	{
 		ndBrainFloat scale = input[j];
 		const ndBrainVector& row = me[j];
@@ -217,7 +217,7 @@ void ndBrainMatrix::InitGaussianWeights(ndBrainFloat variance)
 {
 	ndBrainMatrix& me = *this;
 	variance = ndBrainFloat (ndAbs(variance)) + ndBrainFloat(1.0e-3f);
-	for (ndInt32 i = me.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(me.GetCount() - 1); i >= 0; --i)
 	{
 		me[i].InitGaussianWeights(variance);
 	}

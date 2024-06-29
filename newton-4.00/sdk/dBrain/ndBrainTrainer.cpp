@@ -163,7 +163,7 @@ void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 inde
 
 void ndBrainTrainer::ClearGradients()
 {
-	for (ndInt32 i = m_data.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_data.GetCount() - 1); i >= 0; --i)
 	{
 		m_data[i]->Clear();
 	}
@@ -171,7 +171,7 @@ void ndBrainTrainer::ClearGradients()
 
 void ndBrainTrainer::AddGradients(const ndBrainTrainer* const src)
 {
-	for (ndInt32 i = m_data.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_data.GetCount() - 1); i >= 0; --i)
 	{
 		m_data[i]->Add(*src->m_data[i]);
 	}
@@ -179,7 +179,7 @@ void ndBrainTrainer::AddGradients(const ndBrainTrainer* const src)
 
 void ndBrainTrainer::ScaleWeights(const ndBrainFloat s)
 {
-	for (ndInt32 i = m_data.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_data.GetCount() - 1); i >= 0; --i)
 	{
 		m_data[i]->Scale(s);
 	}
@@ -187,7 +187,7 @@ void ndBrainTrainer::ScaleWeights(const ndBrainFloat s)
 
 void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
 {
-	const ndInt32 layersCount = m_brain->GetCount();
+	const ndInt32 layersCount = ndInt32(m_brain->GetCount());
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
 	ndAssert(!(loss.IsCategorical() ^ (!strcmp(layers[layersCount - 1]->GetLabelId(), "ndBrainLayerCategoricalSoftmaxActivation"))));
 
@@ -211,7 +211,7 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	ndBrainMemVector gradientOut(gradientBuffer + maxSize + 128, m_brain->GetOutputSize());
 	loss.GetLoss(output, gradientOut);
 
-	for (ndInt32 i = m_data.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_data.GetCount() - 1); i >= 0; --i)
 	{
 		const ndBrainLayer* const layer = m_data[i]->m_layer;
 		gradientIn.SetSize(layer->GetInputSize());

@@ -28,7 +28,7 @@ void ndBrainVector::InitGaussianWeights(ndBrainFloat variance)
 	Set(ndFloat32(0.0f));
 	if (variance > ndBrainFloat(1.0e-6f))
 	{
-		for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+		for (ndInt64 i = GetCount() - 1; i >= 0; --i)
 		{
 			(*this)[i] = ndBrainFloat(ndGaussianRandom(ndFloat32(0.0f), ndFloat32(variance)));
 		}
@@ -46,12 +46,11 @@ void ndBrainVector::Set(const ndBrainVector& data)
 	ndMemCpy(&(*this)[0], &data[0], GetCount());
 }
 
-//ndInt32 ndBrainVector::GetMaxIndex() const
-ndInt32 ndBrainVector::ArgMax() const
+ndInt64 ndBrainVector::ArgMax() const
 {
-	ndInt32 index = 0;
+	ndInt64 index = 0;
 	ndBrainFloat maxValue = (*this)[0];
-	for (ndInt32 i = 1; i < GetCount(); ++i)
+	for (ndInt64 i = 1; i < GetCount(); ++i)
 	{
 		ndBrainFloat val = (*this)[i];
 		if (val > maxValue)
@@ -62,7 +61,6 @@ ndInt32 ndBrainVector::ArgMax() const
 	}
 	return index;
 }
-
 
 // using Random variate generation from https://en.wikipedia.org/wiki/Gumbel_distribution 
 void ndBrainVector::CategoricalSample(const ndBrainVector& probability, ndBrainFloat beta)
@@ -103,7 +101,7 @@ void ndBrainVector::CalculateMeanAndDeviation(ndBrainFloat& mean, ndBrainFloat& 
 {
 	ndFloat64 sum = ndFloat64(0.0f);
 	ndFloat64 sum2 = ndFloat64(0.0f);
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
 	{
 		ndFloat64 x = (*this)[i];
 		sum += x;
@@ -123,7 +121,7 @@ void ndBrainVector::GaussianNormalize()
 	ndBrainFloat variance;
 	CalculateMeanAndDeviation(mean, variance);
 	ndBrainFloat invVariance = ndBrainFloat(1.0f) / variance;
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
 	{
 		ndBrainFloat x = (*this)[i];
 		(*this)[i] = (x - mean) * invVariance;
@@ -132,12 +130,13 @@ void ndBrainVector::GaussianNormalize()
 
 void ndBrainVector::Scale(ndBrainFloat scale)
 {
-	ndScale(GetCount(), &(*this)[0], scale);
+	ndAssert(GetCount() < (1ll << 32));
+	ndScale(ndInt32(GetCount()), &(*this)[0], scale);
 }
 
 void ndBrainVector::Clamp(ndBrainFloat min, ndBrainFloat max)
 {
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
 	{
 		ndBrainFloat val = (*this)[i];
 		(*this)[i] = ndClamp(val, min, max);
@@ -168,84 +167,70 @@ void ndBrainVector::FlushToZero()
 
 void ndBrainVector::ScaleSet(const ndBrainVector& a, ndBrainFloat b)
 {
+	ndAssert(GetCount() < (1ll << 32));
 	ndAssert(GetCount() == a.GetCount());
-	ndScaleSet(GetCount(), &(*this)[0], &a[0], b);
+	ndScaleSet(ndInt32 (GetCount()), &(*this)[0], &a[0], b);
 }
 
 void ndBrainVector::ScaleAdd(const ndBrainVector& a, ndBrainFloat b)
 {
+	ndAssert(GetCount() < (1ll << 32));
 	ndAssert(GetCount() == a.GetCount());
-	ndScaleAdd(GetCount(), &(*this)[0], &a[0], b);
+	ndScaleAdd(ndInt32(GetCount()), &(*this)[0], &a[0], b);
 }
 
 void ndBrainVector::Add(const ndBrainVector& a)
 {
+	ndAssert(GetCount() < (1ll << 32));
 	ndAssert(GetCount() == a.GetCount());
-	ndAdd(GetCount(), &(*this)[0], &a[0]);
+	ndAdd(ndInt32(GetCount()), &(*this)[0], &a[0]);
 }
 
 void ndBrainVector::Sub(const ndBrainVector& a)
 {
+	ndAssert(GetCount() < (1ll << 32));
 	ndAssert(GetCount() == a.GetCount());
-	ndSub(GetCount(), &(*this)[0], &a[0]);
+	ndSub(ndInt32(GetCount()), &(*this)[0], &a[0]);
 }
 
 void ndBrainVector::Mul(const ndBrainVector& a)
 {
+	ndAssert(GetCount() < (1ll << 32));
 	ndAssert(GetCount() == a.GetCount());
-	ndMul(GetCount(), &(*this)[0], &a[0]);
+	ndMul(ndInt32(GetCount()), &(*this)[0], &a[0]);
 }
 
 void ndBrainVector::MulAdd(const ndBrainVector& a, const ndBrainVector& b)
 {
+	ndAssert(GetCount() < (1ll << 32));
 	ndAssert(GetCount() == a.GetCount());
 	ndAssert(GetCount() == b.GetCount());
-	ndMulAdd(GetCount(), &(*this)[0], &a[0], &b[0]);
+	ndMulAdd(ndInt32(GetCount()), &(*this)[0], &a[0], &b[0]);
 }
 
 void ndBrainVector::MulSub(const ndBrainVector& a, const ndBrainVector& b)
 {
+	ndAssert(GetCount() < (1ll << 32));
 	ndAssert(GetCount() == a.GetCount());
 	ndAssert(GetCount() == b.GetCount());
-	ndMulSub(GetCount(), &(*this)[0], &a[0], &b[0]);
+	ndMulSub(ndInt32(GetCount()), &(*this)[0], &a[0], &b[0]);
 }
 
 ndBrainFloat ndBrainVector::Dot(const ndBrainVector& a) const
 {
+	ndAssert(GetCount() < (1ll << 32));
 	ndAssert(GetCount() == a.GetCount());
-	return ndDotProduct(GetCount(), &(*this)[0], &a[0]);
+	return ndDotProduct(ndInt32(GetCount()), &(*this)[0], &a[0]);
 }
 
 void ndBrainVector::Blend(const ndBrainVector& target, ndBrainFloat blend)
 {
+	ndAssert(GetCount() < (1ll << 32));
 	Scale(ndBrainFloat(1.0f) - blend);
 	ScaleAdd(target, blend);
 }
 
-//ndBrainMemVector::ndBrainMemVector()
-//	:ndBrainVector()
-//{
-//	m_size = 0;
-//	m_capacity = 0;
-//	m_array = nullptr;
-//}
-//
-//ndBrainMemVector::ndBrainMemVector(const ndBrainFloat* const mem, ndInt32 size)
-//	:ndBrainVector()
-//{
-//	m_size = size;
-//	m_capacity = size + 1;
-//	m_array = (ndBrainFloat*)mem;
-//}
-//
-//ndBrainMemVector::~ndBrainMemVector()
-//{
-//	m_size = 0;
-//	m_capacity = 0;
-//	m_array = nullptr;
-//}
-
-void ndBrainMemVector::SetSize(ndInt32 size)
+void ndBrainMemVector::SetSize(ndInt64 size)
 {
 	m_size = size;
 	m_capacity = size + 1;

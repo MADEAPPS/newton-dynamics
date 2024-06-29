@@ -43,7 +43,7 @@ ndBrain::ndBrain(const ndBrain& src)
 
 ndBrain::~ndBrain()
 {
-	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
+	for (ndInt32 i = ndInt32(GetCount() - 1); i >= 0 ; --i)
 	{
 		delete (*this)[i];
 	}
@@ -116,7 +116,7 @@ ndInt32 ndBrain::GetNumberOfParameters() const
 void ndBrain::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
 {
 	ndArray<ndBrainLayer*>& layers = *this;
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(layers.GetCount() - 1); i >= 0; --i)
 	{
 		layers[i]->InitWeights(weighVariance, biasVariance);
 	}
@@ -125,7 +125,7 @@ void ndBrain::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
 void ndBrain::InitWeightsXavierMethod()
 {
 	ndArray<ndBrainLayer*>& layers = *this;
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(layers.GetCount() - 1); i >= 0; --i)
 	{
 		ndBrainLayer* const layer = layers[i];
 		if (layer->HasParameters())
@@ -153,7 +153,7 @@ void ndBrain::InitWeightsXavierMethod()
 void ndBrain::EnableDropOut()
 {
 	ndArray<ndBrainLayer*>& layers = *this;
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(layers.GetCount() - 1); i >= 0; --i)
 	{
 		layers[i]->EnableDropOut(true);
 	}
@@ -162,7 +162,7 @@ void ndBrain::EnableDropOut()
 void ndBrain::DisableDropOut()
 {
 	ndArray<ndBrainLayer*>& layers = *this;
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(layers.GetCount() - 1); i >= 0; --i)
 	{
 		layers[i]->EnableDropOut(false);
 	}
@@ -171,7 +171,7 @@ void ndBrain::DisableDropOut()
 void ndBrain::UpdateDropOut()
 {
 	ndArray<ndBrainLayer*>& layers = *this;
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(layers.GetCount() - 1); i >= 0; --i)
 	{
 		layers[i]->UpdateDropOut();
 	}
@@ -247,7 +247,7 @@ void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& 
 	ndBrainMemVector gradientIn(gradientBuffer, GetOutputSize());
 	ndBrainMemVector gradientOut(gradientBuffer + maxSize + 128, GetOutputSize());
 	gradientOut.Set(ndBrainFloat(1.0f));
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(layers.GetCount() - 1); i >= 0; --i)
 	{
 		const ndBrainLayer* const layer = layers[i];
 		gradientIn.SetSize(layer->GetInputSize());

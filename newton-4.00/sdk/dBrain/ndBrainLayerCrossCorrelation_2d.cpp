@@ -127,7 +127,7 @@ ndInt32 ndBrainLayerCrossCorrelation_2d::GetOutputChannels() const
 
 ndInt32 ndBrainLayerCrossCorrelation_2d::GetNumberOfParameters() const
 {
-	return m_bias.GetCount() + m_kernelSize * m_kernelSize * m_inputLayers * m_outputLayers;
+	return ndInt32 (m_bias.GetCount()) + m_kernelSize * m_kernelSize * m_inputLayers * m_outputLayers;
 }
 
 bool ndBrainLayerCrossCorrelation_2d::HasParameters() const
@@ -219,7 +219,7 @@ void ndBrainLayerCrossCorrelation_2d::AdamUpdate(const ndBrainLayer& u, const nd
 
 	const ndBrainVector& bias_U = linear_U.m_bias;
 	const ndBrainVector& bias_V = linear_V.m_bias;
-	for (ndInt32 i = m_bias.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_bias.GetCount() - 1); i >= 0; --i)
 	{
 		ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(bias_V[i])) + epsilon);
 		m_bias[i] = bias_U[i] * bias_den;
@@ -227,7 +227,7 @@ void ndBrainLayerCrossCorrelation_2d::AdamUpdate(const ndBrainLayer& u, const nd
 
 	const ndBrainVector& kernels_U = linear_U.m_kernels;
 	const ndBrainVector& kernels_V = linear_V.m_kernels;
-	for (ndInt32 j = m_kernels.GetCount() - 1; j >= 0; --j)
+	for (ndInt32 j = ndInt32(m_kernels.GetCount() - 1); j >= 0; --j)
 	{
 		ndBrainFloat weight_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(kernels_V[j])) + epsilon);
 		m_kernels[j] = kernels_U[j] * weight_den;
@@ -510,7 +510,7 @@ void ndBrainLayerCrossCorrelation_2d::CalculateParamGradients(
 		const ndInt32 gradInputSize = gradInputWidth * m_kernelSize;
 
 		ndBrainMemVector convKernel(convKernelBuffer, m_kernelSize * m_kernelSize);
-		for (ndInt32 i = filter.GetCount() - 1; i >= 0; --i)
+		for (ndInt32 i = ndInt32(filter.GetCount() - 1); i >= 0; --i)
 		{
 			convKernel[filter.GetCount() - 1 - i] = filter[i];
 		}

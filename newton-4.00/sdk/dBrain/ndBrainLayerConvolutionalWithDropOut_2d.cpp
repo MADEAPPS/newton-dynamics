@@ -79,7 +79,7 @@ void ndBrainLayerConvolutionalWithDropOut_2d::EnableDropOut(bool state)
 void ndBrainLayerConvolutionalWithDropOut_2d::UpdateDropOut()
 {
 	ndInt32 activeCount = 0;
-	for (ndInt32 i = m_dropout.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_dropout.GetCount() - 1); i >= 0; --i)
 	{
 		ndInt32 active = (ndRand() <= m_dropoutFactor);
 		m_dropout[i] = active ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);

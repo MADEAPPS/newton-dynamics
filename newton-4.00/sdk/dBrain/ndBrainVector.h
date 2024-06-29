@@ -31,7 +31,7 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	ndBrainVector(const ndBrainVector& src);
 	~ndBrainVector();
 
-	ndInt32 ArgMax() const;
+	ndInt64 ArgMax() const;
 
 	void Set(ndBrainFloat value);
 	void Set(const ndBrainVector& data);
@@ -60,10 +60,10 @@ class ndBrainMemVector: public ndBrainVector
 {
 	public:
 	ndBrainMemVector();
-	ndBrainMemVector(const ndBrainFloat* const mem, ndInt32 size);
+	ndBrainMemVector(const ndBrainFloat* const mem, ndInt64 size);
 	~ndBrainMemVector();
 
-	void SetSize(ndInt32 size);
+	void SetSize(ndInt64 size);
 	void Swap(ndBrainMemVector& src);
 	void SetPointer(ndBrainFloat* const memmory);
 };
@@ -90,7 +90,7 @@ inline ndBrainMemVector::ndBrainMemVector()
 	m_array = nullptr;
 }
 
-inline ndBrainMemVector::ndBrainMemVector(const ndBrainFloat* const mem, ndInt32 size)
+inline ndBrainMemVector::ndBrainMemVector(const ndBrainFloat* const mem, ndInt64 size)
 	:ndBrainVector()
 {
 	m_size = size;

@@ -93,17 +93,17 @@ class ndBrainGpuBuffer : public ndClassAlloc
 	public:
 	virtual ~ndBrainGpuBuffer();
 	VkBuffer GetBuffer() const;
-	ndInt32 SizeInBytes() const;
+	ndInt64 SizeInBytes() const;
 	virtual VkDescriptorType GetType() const;
 	
 	protected:
-	ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt32 sizeInByte, ndUnsigned32 bufferTypeFlags);
+	ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInByte, ndUnsigned32 bufferTypeFlags);
 	uint32_t FindMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
 
 	VkBuffer m_buffer;
 	VkDeviceMemory m_bufferMemory;
 	ndBrainGpuContext* m_context;
-	ndInt32 m_sizeInBytes;
+	ndInt64 m_sizeInBytes;
 	friend class ndScopeMapBuffer;
 };
 
@@ -113,7 +113,7 @@ class ndBrainGpuBuffer : public ndClassAlloc
 class ndBrainGpuIntegerBuffer : public ndBrainGpuBuffer
 {
 	public:
-	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt32 size);
+	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt64 size);
 	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, const ndArray<ndInt32>& input);
 
 	VkDescriptorType GetType() const;
@@ -124,7 +124,7 @@ class ndBrainGpuIntegerBuffer : public ndBrainGpuBuffer
 class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
 {
 	public:
-	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt32 size);
+	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt64 size);
 	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input);
 
 	VkDescriptorType GetType() const;
