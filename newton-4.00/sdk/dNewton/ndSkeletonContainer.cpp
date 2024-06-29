@@ -1631,7 +1631,7 @@ void ndSkeletonContainer::SolveAuxiliaryImmediate(ndArray<ndBodyKinematic*>& bod
 		body1->m_alpha += torque1;
 	}
 
-	for (ndInt32 i = bodyArray.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(bodyArray.GetCount()) - 1; i >= 0; --i)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
 		body->m_accel = body->m_accel.Scale (body->GetInvMass());

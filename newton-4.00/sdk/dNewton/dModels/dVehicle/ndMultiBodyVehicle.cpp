@@ -109,7 +109,8 @@ void ndMultiBodyVehicle::AddChassis(ndBodyKinematic* const chassis)
 	m_chassis = chassis;
 }
 
-ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndMultiBodyVehicleTireJointInfo& desc, ndBodyKinematic* const tire, ndBodyKinematic* const axleBody)
+//ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndMultiBodyVehicleTireJointInfo& desc, ndBodyKinematic* const tire, ndBodyKinematic* const axleBody)
+ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndMultiBodyVehicleTireJointInfo&, ndBodyKinematic* const, ndBodyKinematic* const)
 {
 	ndAssert(0);
 	return nullptr;
@@ -157,7 +158,8 @@ ndBodyKinematic* ndMultiBodyVehicle::CreateInternalBodyPart(ndFloat32 mass, ndFl
 	return body;
 }
 
-ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleTireJoint* const leftTire, ndMultiBodyVehicleTireJoint* const rightTire, ndFloat32 slipOmegaLock)
+//ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleTireJoint* const leftTire, ndMultiBodyVehicleTireJoint* const rightTire, ndFloat32 slipOmegaLock)
+ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32, ndFloat32, ndMultiBodyVehicleTireJoint* const, ndMultiBodyVehicleTireJoint* const, ndFloat32)
 {
 	ndAssert(0);
 	return nullptr;
@@ -182,7 +184,8 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 	//return *differential;
 }
 
-ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleDifferential* const leftDifferential, ndMultiBodyVehicleDifferential* const rightDifferential, ndFloat32 slipOmegaLock)
+//ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleDifferential* const leftDifferential, ndMultiBodyVehicleDifferential* const rightDifferential, ndFloat32 slipOmegaLock)
+ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32, ndFloat32, ndMultiBodyVehicleDifferential* const, ndMultiBodyVehicleDifferential* const, ndFloat32)
 {
 	ndAssert(0);
 	return nullptr;
@@ -208,7 +211,8 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 	//return *differential;
 }
 
-ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndFloat32 mass, ndFloat32 radius)
+//ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndFloat32 mass, ndFloat32 radius)
+ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndFloat32, ndFloat32)
 {
 	ndAssert(0);
 	return nullptr;
@@ -220,7 +224,8 @@ ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndFloat32 mass, ndFloat32 
 	//return *m_motor;
 }
 
-ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleDifferential* const differential)
+//ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleDifferential* const differential)
+ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleDifferential* const)
 {
 	ndAssert(0);
 	return nullptr;
@@ -230,7 +235,8 @@ ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleDiff
 	//return *m_gearBox;
 }
 
-ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyKinematic* const sentinel)
+//ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyKinematic* const sentinel)
+ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyKinematic* const)
 {
 	ndAssert(0);
 	return nullptr;
@@ -273,7 +279,8 @@ void ndMultiBodyVehicle::ApplyAerodynamics()
 	//}
 }
 
-void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
+//void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
+void ndMultiBodyVehicle::SetVehicleSolverModel(bool)
 {
 	ndAssert(0);
 
@@ -369,7 +376,8 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 	//}
 }
 
-void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
+//void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
+void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback&) const
 {
 	ndAssert(0);
 	//// draw vehicle cordinade system;
@@ -851,7 +859,8 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep, ndTireContactPair* c
 }
 #endif
 
-void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep)
+//void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep)
+void ndMultiBodyVehicle::ApplyTireModel(ndFloat32)
 {
 	ndAssert(0);
 	//ndFixSizeArray<ndTireContactPair, 128> tireContacts;

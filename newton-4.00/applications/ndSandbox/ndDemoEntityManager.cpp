@@ -278,7 +278,7 @@ void TestVulkanStuff()
 	ndInt32 columnsStride = (matrix.GetColumns() + rounding - 1) & -rounding;
 	ndInt32 count = columnsStride * rowsStride + rowsStride;
 	
-	ndInt32 paramStart = parameters.GetCount();
+	ndInt32 paramStart = ndInt32(parameters.GetCount());
 	parameters.SetCount(paramStart + count);
 	
 	ndBrainMemVector memData(&parameters[paramStart], count);
@@ -292,7 +292,7 @@ void TestVulkanStuff()
 		dst.Set(src);
 		stride += columnsStride;
 	}
-	ndBrainMemVector dst(&memData[stride], bias.GetCount());
+	ndBrainMemVector dst(&memData[stride], ndInt32(bias.GetCount()));
 	dst.Set(bias);
 	
 	ndBrainVector workBuffer;
@@ -301,7 +301,7 @@ void TestVulkanStuff()
 	workBuffer.Set(-99999999999.0);
 	for (ndInt32 i = 0; i < input.GetCount(); ++i)
 	{
-		ndBrainMemVector buff(&workBuffer[workBufferStride * i], input[i].GetCount());
+		ndBrainMemVector buff(&workBuffer[workBufferStride * i], ndInt32(input[i].GetCount()));
 		buff.Set(input[i]);
 	}
 	
@@ -358,7 +358,7 @@ void TestVulkanStuff()
 	parammeters.LoadData(sizeof(uniformParam), &uniformParam);
 	
 	ndList<ndSharedPtr<ndBrainGpuCommand>> displayList;
-	displayList.Append (new TestCommand(&context, input.GetCount(), uniformParam.m_workGroupsPerMatrix, parammeters, weightParamBuffer, inputOutputBuffer));
+	displayList.Append (new TestCommand(&context, ndInt32(input.GetCount()), uniformParam.m_workGroupsPerMatrix, parammeters, weightParamBuffer, inputOutputBuffer));
 	
 	context.SubmitQueue(displayList);
 	context.Sync();
@@ -366,9 +366,9 @@ void TestVulkanStuff()
 	ndBrainVector outputGpu;
 	inputOutputBuffer.UnloadData(outputGpu);
 
-	for (ndInt32 i = 0; i < input.GetCount(); ++i)
+	for (ndInt32 i = 0; i < ndInt32(input.GetCount()); ++i)
 	{
-		ndBrainMemVector xxx(&outputGpu[workBufferStride * i + columnsStride], output[i].GetCount());
+		ndBrainMemVector xxx(&outputGpu[workBufferStride * i + columnsStride], ndInt32(output[i].GetCount()));
 		i *= 1;
 	}
 }
@@ -1360,7 +1360,7 @@ ndInt32 ndDemoEntityManager::ParticleCount() const
 	for (ndBodyList::ndNode* node = particles.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyParticleSet* const set = node->GetInfo()->GetAsBodyParticleSet();
-		count += set->GetPositions().GetCount();
+		count += ndInt32(set->GetPositions().GetCount());
 	}
 	return count;
 }

@@ -162,7 +162,7 @@ class NewtonPhantom : public ndModel
 				return nullptr;
 			}
 
-			ndShapeInstance* const instance = new ndShapeInstance(new ndShapeConvexHull(points.GetCount(), sizeof(ndVector), 0.01f, &points[0].m_x));
+			ndShapeInstance* const instance = new ndShapeInstance(new ndShapeConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), 0.01f, &points[0].m_x));
 			const ndMatrix matrix(entity->GetMeshMatrix());
 			instance->SetLocalMatrix(matrix);
 			return instance;

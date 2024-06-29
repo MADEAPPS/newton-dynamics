@@ -541,7 +541,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Sav
 	agent->m_trajectory.SetCount(agent->m_trajectory.GetCount() - 1);
 
 	// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
-	for (ndInt32 i = agent->m_trajectory.GetCount() - 2; i >= 0; --i)
+	for (ndInt32 i = ndInt32(agent->m_trajectory.GetCount()) - 2; i >= 0; --i)
 	{
 		agent->m_trajectory[i].m_reward += m_gamma * agent->m_trajectory[i + 1].m_reward;
 	}
@@ -561,7 +561,7 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeCritic()
 {
 	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount());
-	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetCount()) - 1; i >= 0; --i)
 	{
 		m_randomPermutation[i] = i;
 	}
@@ -626,7 +626,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	}
 
 	ndBrainFloat averageSum = ndBrainFloat(0.0f);
-	for (ndInt32 i = m_trajectoryAccumulator.GetCount(); i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetCount()); i >= 0; --i)
 	{
 		averageSum += m_trajectoryAccumulator[i].m_reward;
 	}
@@ -642,7 +642,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 		ndBrainFixSizeVector<1> actions;
 		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
 
-		ndInt32 const count = m_trajectoryAccumulator.GetCount();
+		ndInt32 const count = ndInt32(m_trajectoryAccumulator.GetCount());
 		for (ndInt32 i = iterator++; i < count; i = iterator++)
 		{
 			const ndBrainMemVector observation(&m_trajectoryAccumulator[i].m_observation[0], statesDim);
@@ -666,8 +666,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 
 	rewardVarianceSum /= ndBrainFloat(m_trajectoryAccumulator.GetCount());
 	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(rewardVarianceSum + ndBrainFloat(1.0e-4f)));
-	ndInt32 newCount = m_trajectoryAccumulator.GetCount();
-	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
+	ndInt32 newCount = ndInt32(m_trajectoryAccumulator.GetCount());
+	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetCount()) - 1; i >= 0; --i)
 	{
 		const ndBrainFloat normalizedAdvantage = m_trajectoryAccumulator[i].m_reward * invVariance;
 		m_trajectoryAccumulator[i].m_reward = normalizedAdvantage;
@@ -697,7 +697,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	});
 	ndBrainThreadPool::ParallelExecute(ClearGradients);
 
-	const ndInt32 steps = m_trajectoryAccumulator.GetCount();
+	const ndInt32 steps = ndInt32(m_trajectoryAccumulator.GetCount());
 	const ndBrainFloat invSigmaSquare = ndBrainFloat(1.0f) / (m_sigma * m_sigma);
 
 	for (ndInt32 base = 0; base < steps; base += m_bashBufferSize)

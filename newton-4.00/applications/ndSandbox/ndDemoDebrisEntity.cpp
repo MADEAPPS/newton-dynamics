@@ -21,7 +21,7 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMesh, const ndArra
 {
 	m_indexCount = 0;
 	m_shader = srcMesh->m_shader;
-	m_vertexCount = vertexArray.GetCount();
+	m_vertexCount = ndInt32(vertexArray.GetCount());
 	m_textureLocation = srcMesh->m_textureLocation;
 	m_transparencyLocation = srcMesh->m_transparencyLocation;
 	m_normalMatrixLocation = srcMesh->m_normalMatrixLocation;
@@ -156,7 +156,7 @@ ndDemoDebrisEntity::ndDemoDebrisEntity(ndMeshEffect* const meshNode, ndArray<glD
 {
 	ndInt32 vertexCount = meshNode->GetPropertiesCount();
 
-	ndInt32 const vertexOffsetBase = vertexArray.GetCount();
+	ndInt32 const vertexOffsetBase = ndInt32(vertexArray.GetCount());
 	vertexArray.SetCount(vertexOffsetBase + vertexCount);
 
 	struct dTmpData

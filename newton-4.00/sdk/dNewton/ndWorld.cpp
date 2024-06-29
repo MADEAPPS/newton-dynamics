@@ -592,7 +592,7 @@ void ndWorld::ModelUpdate()
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		const ndArray<ndModel*>& modelList = m_modelList.GetUpdateList();
 
-		const ndInt32 modelCount = modelList.GetCount();
+		const ndInt32 modelCount = ndInt32(modelList.GetCount());
 		for (ndInt32 i = iterator++; i < modelCount; i = iterator++)
 		{
 			D_TRACKTIME_NAMED(ModelUpdate);
@@ -615,7 +615,7 @@ void ndWorld::ModelPostUpdate()
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		const ndArray<ndModel*>& modelList = m_modelList.GetUpdateList();
 
-		const ndInt32 modelCount = modelList.GetCount();
+		const ndInt32 modelCount = ndInt32(modelList.GetCount());
 		for (ndInt32 i = iterator++; i < modelCount; i = iterator++)
 		{
 			ndModel* const model = modelList[i];
@@ -635,7 +635,7 @@ void ndWorld::PostModelTransform()
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		const ndArray<ndModel*>& modelList = m_modelList.GetUpdateList();
 
-		const ndInt32 modelCount = modelList.GetCount();
+		const ndInt32 modelCount = ndInt32(modelList.GetCount());
 		for (ndInt32 i = iterator++; i < modelCount; i = iterator++)
 		{
 			ndModel* const model = modelList[i];
@@ -700,7 +700,7 @@ void ndWorld::UpdateSkeletons()
 	
 		// reset of all bodies dirty state
 		const ndArray<ndBodyKinematic*>& bodyArray = m_scene->GetActiveBodyArray();
-		for (ndInt32 i = bodyArray.GetCount() - 1; i >= 0; i--)
+		for (ndInt32 i = ndInt32(bodyArray.GetCount()) - 1; i >= 0; i--)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
 			body->m_index = -1;
@@ -903,7 +903,7 @@ void ndWorld::UpdateSkeletons()
 			}
 		}
 	
-		for (ndInt32 i = bodyArray.GetCount() - 1; i >= 0; i--)
+		for (ndInt32 i = ndInt32(bodyArray.GetCount()) - 1; i >= 0; i--)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
 			body->PrepareStep(i);

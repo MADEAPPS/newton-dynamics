@@ -46,7 +46,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 
 		BuildTilesArray(indexList, "texture1.tga");
 		BuildVertexAndNormals(indexList, heightfield, points);
-		OptimizeForRender(&points[0], points.GetCount(), &indexList[0], indexList.GetCount());
+		OptimizeForRender(&points[0], ndInt32(points.GetCount()), &indexList[0], ndInt32(indexList.GetCount()));
 	}
 
 	private:
@@ -63,7 +63,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 
 	void BuildTile(ndArray<ndInt32>& indexList, ndInt32 x0, ndInt32 z0, const char* const texName)
 	{
-		const ndInt32 start = indexList.GetCount();
+		const ndInt32 start = ndInt32(indexList.GetCount());
 		const ndInt32 zMax = ((z0 + D_TERRAIN_TILE_SIZE) >= D_TERRAIN_HEIGHT) ? D_TERRAIN_HEIGHT - 1 : z0 + D_TERRAIN_TILE_SIZE;
 		const ndInt32 xMax = ((x0 + D_TERRAIN_TILE_SIZE) >= D_TERRAIN_WIDTH) ? D_TERRAIN_WIDTH - 1 : x0 + D_TERRAIN_TILE_SIZE;
 		
@@ -89,7 +89,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 		
 		segment->SetOpacity(1.0f);
 		segment->m_segmentStart = start;
-		segment->m_indexCount = indexList.GetCount() - start;
+		segment->m_indexCount = ndInt32(indexList.GetCount()) - start;
 	}
 
 	void BuildVertexAndNormals(const ndArray<ndInt32>& indexList, const ndArray<ndVector>& heightfield, ndArray<glPositionNormalUV>& points)

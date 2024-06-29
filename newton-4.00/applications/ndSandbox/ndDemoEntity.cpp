@@ -506,7 +506,7 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail)
 			ndVector p(ndFloat32(ch.m_points[j * 3 + 0]), ndFloat32(ch.m_points[j * 3 + 1]), ndFloat32(ch.m_points[j * 3 + 2]), ndFloat32(0.0f));
 			convexMeshPoints[j] = p;
 		}
-		ndShapeInstance hullShape(new ndShapeConvexHull(convexMeshPoints.GetCount(), sizeof(ndVector), 0.01f, &convexMeshPoints[0].m_x));
+		ndShapeInstance hullShape(new ndShapeConvexHull(ndInt32(convexMeshPoints.GetCount()), sizeof(ndVector), 0.01f, &convexMeshPoints[0].m_x));
 		compoundShape->AddCollision(&hullShape);
 	}
 	compoundShape->EndAddRemove();
@@ -643,7 +643,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 					ndVector p(ndFloat32(ch.m_points[j * 3 + 0]), ndFloat32(ch.m_points[j * 3 + 1]), ndFloat32(ch.m_points[j * 3 + 2]), ndFloat32(0.0f));
 					convexMeshPoints[j] = p;
 				}
-				shapeArray.PushBack(new ndShapeInstance(new ndShapeConvexHull(convexMeshPoints.GetCount(), sizeof(ndVector), 0.01f, &convexMeshPoints[0].m_x)));
+				shapeArray.PushBack(new ndShapeInstance(new ndShapeConvexHull(ndInt32(convexMeshPoints.GetCount()), sizeof(ndVector), 0.01f, &convexMeshPoints[0].m_x)));
 				const ndMatrix matrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
 				shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
 			}

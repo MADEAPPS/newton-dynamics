@@ -148,7 +148,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 {
 	//ndInt32 batchSize = 100;
-	const ndInt32 batchSize = testDigits->GetCount();
+	const ndInt32 batchSize = ndInt32(testDigits->GetCount());
 
 	ndBrainGpuContext gpuContext;
 	ndBrainGpuInference inference(&gpuContext, &brain, *testDigits, batchSize);
@@ -165,7 +165,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	inference.GetWorkBuffer(workBuffer);
 
 	ndInt32 failCount = 0;
-	const ndInt32 outputSize = (*testLabels)[0].GetCount();
+	const ndInt32 outputSize = ndInt32((*testLabels)[0].GetCount());
 
 	ndBrainVector workingBuffer;
 	brain.DisableDropOut();
@@ -376,7 +376,7 @@ static void MnistTrainingSet()
 				m_minTestFail = testFail;
 				m_minTrainingFail = trainFail;
 				bestBrain.CopyFrom(m_brain);
-				ndFloat32 score = LogScore(epoch, trainingDigits->GetCount());
+				ndFloat32 score = LogScore(epoch, ndInt32(trainingDigits->GetCount()));
 				return (score <= MIN_TRAIN_SCORE) ? 0 : 1;
 			}
 			return 0;
@@ -439,7 +439,7 @@ static void MnistTrainingSet()
 					m_minTestFail = testFail;
 					m_minTrainingFail = trainFail;
 					bestBrain.CopyFrom(m_brain);
-					LogScore(epoch, trainingDigits->GetCount());
+					LogScore(epoch, ndInt32(trainingDigits->GetCount()));
 				}
 			}
 			return 0;
@@ -510,8 +510,8 @@ static void MnistTrainingSet()
 			ndBrain bestBrain(m_brain);
 			ndBrainOptimizerAdam optimizer;
 
-			m_minTestFail = testDigits->GetCount();
-			m_minTrainingFail = trainingDigits->GetCount();
+			m_minTestFail = ndInt32(testDigits->GetCount());
+			m_minTrainingFail = ndInt32(trainingDigits->GetCount());
 			ndInt32 batches = m_minTrainingFail / m_bashBufferSize;
 
 			// so far best training result on the mnist data set

@@ -839,7 +839,7 @@ inline const ndFloat64* ndMeshEffect::GetVertexPool() const
 
 inline ndInt32 ndMeshEffect::GetFaceMaterial(ndEdge* const faceEdge) const
 {
-	return ndInt32(m_attrib.m_materialChannel.GetCount() ? m_attrib.m_materialChannel[ndInt64(faceEdge->m_userData)] : 0);
+	return ndInt32(m_attrib.m_materialChannel.GetCount() ? m_attrib.m_materialChannel[ndInt32(faceEdge->m_userData)] : 0);
 }
 
 inline ndMeshEffect* ndMeshEffect::GetFirstLayer()

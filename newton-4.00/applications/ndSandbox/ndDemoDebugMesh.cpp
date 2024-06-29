@@ -83,10 +83,10 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderCache& shaderCache, c
 	{
 		ndArray<ndInt32> m_triangles(drawShapes.m_triangles.GetCount());
 		m_triangles.SetCount(drawShapes.m_triangles.GetCount());
-		ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(glPositionNormal), 6, drawShapes.m_triangles.GetCount(), &m_triangles[0], GLfloat(1.0e-6f));
+		ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(glPositionNormal), 6, ndInt32(drawShapes.m_triangles.GetCount()), &m_triangles[0], GLfloat(1.0e-6f));
 
 		m_shader = shaderCache.m_flatShaded;
-		m_indexCount = m_triangles.GetCount();
+		m_indexCount = ndInt32(m_triangles.GetCount());
 
 		m_color.m_x = 1.0f;
 		m_color.m_y = 1.0f;
@@ -223,10 +223,10 @@ ndZbufferDebugMesh::ndZbufferDebugMesh(const ndShaderCache& shaderCache, const n
 	{
 		ndArray<ndInt32> m_triangles(drawShapes.m_triangles.GetCount());
 		m_triangles.SetCount(drawShapes.m_triangles.GetCount());
-		ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_triangles[0].m_x, sizeof(glVector3), 3, drawShapes.m_triangles.GetCount(), &m_triangles[0], GLfloat(1.0e-6f));
+		ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_triangles[0].m_x, sizeof(glVector3), 3, ndInt32(drawShapes.m_triangles.GetCount()), &m_triangles[0], GLfloat(1.0e-6f));
 
 		m_shader = shaderCache.m_zBufferDebug;
-		m_indexCount = m_triangles.GetCount();
+		m_indexCount = ndInt32(m_triangles.GetCount());
 
 		glGenVertexArrays(1, &m_vertextArrayBuffer);
 		glBindVertexArray(m_vertextArrayBuffer);
@@ -344,11 +344,11 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderCache& shaderCache, con
 	{
 		ndArray<ndInt32> m_lines(drawShapes.m_lines.GetCount());
 		m_lines.SetCount(drawShapes.m_lines.GetCount());
-		ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_lines[0].m_x, sizeof(glVector3), 3, drawShapes.m_lines.GetCount(), &m_lines[0], GLfloat(1.0e-6f));
+		ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_lines[0].m_x, sizeof(glVector3), 3, ndInt32(drawShapes.m_lines.GetCount()), &m_lines[0], GLfloat(1.0e-6f));
 
-		m_indexCount = m_lines.GetCount();
+		m_indexCount = ndInt32(m_lines.GetCount());
 		ndTree<ndUnsigned64, ndUnsigned64> filter;
-		for (ndInt32 i = m_lines.GetCount() - 1; i >= 0; i -= 2)
+		for (ndInt32 i = ndInt32(m_lines.GetCount()) - 1; i >= 0; i -= 2)
 		{
 			union
 			{

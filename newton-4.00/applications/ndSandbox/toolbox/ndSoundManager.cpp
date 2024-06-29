@@ -369,7 +369,7 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 						bytesRead = fread(&size, sizeof(ndInt32), 1, wave);
 
 						ndArray<char> data;
-						data.SetCount(size_t(size));
+						data.SetCount(size);
 						bytesRead = fread(&data[0], sizeof(char), size_t(size), wave);
 
 						ndInt32 waveFormat = AL_FORMAT_MONO8;

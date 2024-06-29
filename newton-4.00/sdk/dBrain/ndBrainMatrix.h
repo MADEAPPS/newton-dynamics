@@ -56,12 +56,12 @@ class ndBrainMatrix: public ndArray<ndBrainMemVector>
 
 inline ndInt32 ndBrainMatrix::GetRows() const
 {
-	return GetCount();
+	return ndInt32(GetCount());
 }
 
 inline ndInt32 ndBrainMatrix::GetColumns() const
 {
-	ndInt32 columns = GetCount() ? (*this)[0].GetCount() : 0;
+	ndInt32 columns = GetCount() ? ndInt32((*this)[0].GetCount()) : 0;
 	return columns;
 }
 

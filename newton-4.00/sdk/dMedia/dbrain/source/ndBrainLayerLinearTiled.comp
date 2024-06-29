@@ -41,14 +41,15 @@ layout(std430, binding = 2) readonly buffer newralNetParameters
 };
 
 shared float inputVector [2048];
-// 32 way bank conflit on nvidia
+
+// 32 way bank conflict on nvidia
 //shared float tile [TILE_SIZE] [TILE_SIZE]; 
 
-// 2 ways bank conflit on nvidia
-//shared float tile [TILE_SIZE] [TILE_SIZE + 1];
+// 2 ways bank conflict on nvidia, so far best result
+shared float tile [TILE_SIZE] [TILE_SIZE + 1];
 
-// 0 ways bank conflit on nvidia
-shared float tile [TILE_SIZE] [33];
+// 0 ways bank conflict on nvidia, but seem far slower 
+//shared float tile [TILE_SIZE] [33];
 
 // perform a full vector * matrix operation
 void main() 

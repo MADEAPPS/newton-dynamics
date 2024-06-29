@@ -182,8 +182,8 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 	glUseProgram(0);
 
 	ReleaseTexture(GLuint(tex0));
-	m_vertexCount = points.GetCount();
-	m_indexCount = indices.GetCount();
+	m_vertexCount = ndInt32(points.GetCount());
+	m_indexCount = ndInt32(indices.GetCount());
 }
 
 ndDemoMeshIntance::~ndDemoMeshIntance()
@@ -261,7 +261,8 @@ void ndDemoMeshIntance::RenderBatch(ndInt32 start, ndDemoEntityManager* const sc
 	glUseProgram(0);
 }
 
-void ndDemoMeshIntance::RenderShadowMapBatch(ndInt32 start, ndShadowMapRenderPass* const shadowMap, const ndMatrix& modelMatrixProjection)
+//void ndDemoMeshIntance::RenderShadowMapBatch(ndInt32 start, ndShadowMapRenderPass* const shadowMap, const ndMatrix& modelMatrixProjection)
+void ndDemoMeshIntance::RenderShadowMapBatch(ndInt32, ndShadowMapRenderPass* const, const ndMatrix&)
 {
 	//glMatrix matrix(modelMatrixProjection);
 	//glUniformMatrix4fv(GLint(shadowMap->GetShaderModelProjMatrix()), 1, false, &matrix[0][0]);

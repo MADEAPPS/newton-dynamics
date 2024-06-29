@@ -152,10 +152,10 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 	{
 		if (points.GetCount())
 		{
-			OptimizeForRender(&points[0], points.GetCount(), &indexList[0], indexList.GetCount());
+			OptimizeForRender(&points[0], ndInt32(points.GetCount()), &indexList[0], ndInt32(indexList.GetCount()));
 
 			ndDemoSubMesh& segment = GetFirst()->GetInfo();
-			segment.m_indexCount = indexList.GetCount();
+			segment.m_indexCount = ndInt32(indexList.GetCount());
 		}
 	}
 

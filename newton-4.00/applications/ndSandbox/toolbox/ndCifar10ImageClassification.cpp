@@ -308,8 +308,8 @@ static void Cifar10TrainingSet()
 			ndBrain bestBrain(m_brain);
 			ndBrainOptimizerAdam optimizer;
 
-			ndInt32 minTestFail = testLabels->GetCount();
-			ndInt32 minTrainingFail = trainingLabels->GetCount();
+			ndInt32 minTestFail = ndInt32(testLabels->GetCount());
+			ndInt32 minTrainingFail = ndInt32(trainingLabels->GetCount());
 			ndInt32 batches = minTrainingFail / m_bashBufferSize;
 			//batches = 1;
 

@@ -662,7 +662,7 @@ void ndDebugDisplay::ndCenterOfMass::Render(ndDemoEntityManager* const scene)
 	if (m_points.GetCount())
 	{
 		//glLineWidth(GLfloat(1.0f));
-		RenderBuffer(scene, GL_LINES, m_points.GetCount(), m_vertextArrayBuffer, m_vertexBuffer);
+		RenderBuffer(scene, GL_LINES, ndInt32 (m_points.GetCount()), m_vertextArrayBuffer, m_vertexBuffer);
 		//glLineWidth(GLfloat(1.0f));
 	}
 }
@@ -706,7 +706,7 @@ void ndDebugDisplay::ndContactPoints::Render(ndDemoEntityManager* const scene)
 	if (m_points.GetCount())
 	{
 		glPointSize(GLfloat(4.0f));
-		RenderBuffer(scene, GL_POINTS, m_points.GetCount(), m_vertextArrayBuffer, m_vertexBuffer);
+		RenderBuffer(scene, GL_POINTS, ndInt32 (m_points.GetCount()), m_vertextArrayBuffer, m_vertexBuffer);
 		glPointSize(GLfloat(1.0f));
 	}
 }
@@ -757,7 +757,7 @@ void ndDebugDisplay::ndNormalForces::Render(ndDemoEntityManager* const scene)
 	{
 		ndFloat32 thickness = 1.0f;
 		glLineWidth(GLfloat(thickness));
-		RenderBuffer(scene, GL_LINES, m_points.GetCount(), m_vertextArrayBuffer, m_vertexBuffer);
+		RenderBuffer(scene, GL_LINES, ndInt32(m_points.GetCount()), m_vertextArrayBuffer, m_vertexBuffer);
 		glLineWidth(GLfloat(1.0f));
 	}
 }
@@ -904,14 +904,14 @@ void ndDebugDisplay::ndModelsDebugInfo::Render(ndDemoEntityManager* const scene)
 	if (m_points.GetCount())
 	{
 		glPointSize(GLfloat(m_pointThickness));
-		RenderBuffer(scene, GL_POINTS, m_points.GetCount(), m_vertextArrayBuffer, m_vertexBuffer);
+		RenderBuffer(scene, GL_POINTS, ndInt32(m_points.GetCount()), m_vertextArrayBuffer, m_vertexBuffer);
 		glPointSize(GLfloat(1.0f));
 	}
 	
 	if (m_lines.GetCount())
 	{
 		glLineWidth(GLfloat(m_lineThickness));
-		RenderBuffer(scene, GL_LINES, m_lines.GetCount(), m_lineArrayBuffer, m_lineBuffer);
+		RenderBuffer(scene, GL_LINES, ndInt32(m_lines.GetCount()), m_lineArrayBuffer, m_lineBuffer);
 		glLineWidth(GLfloat(1.0f));
 	}
 }
