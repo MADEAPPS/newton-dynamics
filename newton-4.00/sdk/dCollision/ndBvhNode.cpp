@@ -161,7 +161,7 @@ ndBvhNodeArray::~ndBvhNodeArray()
 
 void ndBvhNodeArray::CleanUp()
 {
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(GetCount()) - 1; i >= 0; --i)
 	{
 		ndBvhNode* const node = (*this)[i];
 		ndAssert(node->m_isDead);
@@ -207,11 +207,11 @@ ndBvhNode* ndBvhSceneManager::AddBody(ndBodyKinematic* const body, ndBvhNode* ro
 
 	sceneNode->m_isDead = 0;
 	m_workingArray.PushBack(sceneNode);
-	body->m_sceneNodeIndex = m_workingArray.GetCount() - 1;
+	body->m_sceneNodeIndex = ndInt32(m_workingArray.GetCount()) - 1;
 	
 	bodyNode->m_isDead = 0;
 	m_workingArray.PushBack(bodyNode);
-	body->m_bodyNodeIndex = m_workingArray.GetCount() - 1;
+	body->m_bodyNodeIndex = ndInt32(m_workingArray.GetCount()) - 1;
 
 	if (m_workingArray.GetCount() > 2)
 	{
@@ -322,7 +322,7 @@ void ndBvhSceneManager::Update(ndThreadPool& threadPool)
 	if (nodeArray.m_isDirty && nodeArray.GetCount())
 	{
 		D_TRACKTIME();
-		const ndInt32 count = nodeArray.GetCount();
+		const ndInt32 count = ndInt32(nodeArray.GetCount());
 		nodeArray.SetCount(count * 2);
 		ndBvhNode** const src = &nodeArray[0];
 		ndBvhNode** const tmp = &nodeArray[count];
@@ -366,7 +366,7 @@ void ndBvhSceneManager::Update(ndThreadPool& threadPool)
 			{
 				D_TRACKTIME_NAMED(MarkCellBounds);
 				ndBvhNode** const nodes = &nodeArray[0];
-				const ndInt32 baseCount = nodeArray.GetCount() / 2;
+				const ndInt32 baseCount = ndInt32(nodeArray.GetCount()) / 2;
 				for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < baseCount; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 				{
 					const ndInt32 maxSpan = ((baseCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : baseCount - i;
@@ -467,7 +467,7 @@ bool ndBvhSceneManager::BuildBvhTreeInitNodes(ndThreadPool& threadPool)
 		D_TRACKTIME_NAMED(CopyBodyNodes);
 
 		ndBvhNodeArray& nodeArray = m_workingArray;
-		const ndInt32 baseCount = nodeArray.GetCount() / 2;
+		const ndInt32 baseCount = ndInt32(nodeArray.GetCount()) / 2;
 		ndBvhNode** const srcArray = m_bvhBuildState.m_srcArray;
 		ndBvhLeafNode** const bodySceneNodes = (ndBvhLeafNode**)&nodeArray[baseCount];
 
@@ -498,7 +498,7 @@ bool ndBvhSceneManager::BuildBvhTreeInitNodes(ndThreadPool& threadPool)
 		ndBvhInternalNode** const sceneNodes = (ndBvhInternalNode**)&nodeArray[0];
 		ndBvhNode** const parentsArray = m_bvhBuildState.m_parentsArray;
 
-		const ndInt32 baseCount = nodeArray.GetCount() / 2;
+		const ndInt32 baseCount = ndInt32(nodeArray.GetCount()) / 2;
 		for (ndInt32 i = iterator1.fetch_add(D_WORKER_BATCH_SIZE); i < baseCount; i = iterator1.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((baseCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : baseCount - i;
@@ -523,7 +523,7 @@ bool ndBvhSceneManager::BuildBvhTreeInitNodes(ndThreadPool& threadPool)
 	if (nodeArray.GetCount())
 	{
 		ret = true;
-		m_bvhBuildState.Init(nodeArray.GetCount() / 2);
+		m_bvhBuildState.Init(ndInt32(nodeArray.GetCount()) / 2);
 		threadPool.ParallelExecute(CopyBodyNodes);
 		threadPool.ParallelExecute(CopySceneNode);
 	}
@@ -1001,7 +1001,7 @@ void ndBvhSceneManager::BuildBvhTreeSetNodesDepth(ndThreadPool& threadPool)
 
 	ndBvhNodeArray& nodeArray = m_workingArray;
 
-	ndInt32 sceneNodeCount = nodeArray.GetCount() / 2 - 1;
+	ndInt32 sceneNodeCount = ndInt32(nodeArray.GetCount()) / 2 - 1;
 	ndBvhInternalNode** const view = (ndBvhInternalNode**)&nodeArray[0];
 	ndBvhInternalNode** tmpBuffer = (ndBvhInternalNode**)&m_bvhBuildState.m_tempNodeBuffer[0];
 
@@ -1168,7 +1168,7 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 			ndInt32 max_y = 0;
 			ndInt32 max_z = 0;
 
-			const ndInt32 count = m_bvhBuildState.m_cellBuffer0.GetCount();
+			const ndInt32 count = ndInt32(m_bvhBuildState.m_cellBuffer0.GetCount());
 			for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 			{
 				const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
@@ -1240,7 +1240,7 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 			D_TRACKTIME_NAMED(MarkCellBounds);
 			ndCellScanPrefix* const dst = &m_bvhBuildState.m_cellCounts0[0];
 
-			const ndInt32 count = m_bvhBuildState.m_cellBuffer0.GetCount() - 1;
+			const ndInt32 count = ndInt32(m_bvhBuildState.m_cellBuffer0.GetCount()) - 1;
 			for (ndInt32 i = iterator1.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator1.fetch_add(D_WORKER_BATCH_SIZE))
 			{
 				const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;

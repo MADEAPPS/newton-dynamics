@@ -242,7 +242,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
 	rootNode->LinkEndChild(node);
 
-	node->SetAttribute("count", array.GetCount());
+	node->SetAttribute("count", ndInt32(array.GetCount()));
 	node->SetAttribute("intArray", buffer);
 }
 
@@ -261,7 +261,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
 	rootNode->LinkEndChild(node);
 
-	node->SetAttribute("count", array.GetCount());
+	node->SetAttribute("count", ndInt32(array.GetCount()));
 	node->SetAttribute("int64Array", buffer);
 }
 
@@ -281,7 +281,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
 	rootNode->LinkEndChild(node);
 
-	node->SetAttribute("count", array.GetCount());
+	node->SetAttribute("count", ndInt32(array.GetCount()));
 	node->SetAttribute("float3Array", buffer);
 }
 

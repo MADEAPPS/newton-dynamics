@@ -1680,9 +1680,12 @@ inline ndInt32 ndMeshEffect::ndFormat::CompareVertex(const ndSortKey* const ptr0
 	return 0;
 }
 
+//void ndMeshEffect::ndPointFormat::CompressData(
+//	ndPointFormat& output, ndInt32* const indexList, 
+//	ndSortKey* const remapIndex, const ndSortCluster& cluster, ndFloat32 tol)
 void ndMeshEffect::ndPointFormat::CompressData(
-	ndPointFormat& output, ndInt32* const indexList, 
-	ndSortKey* const remapIndex, const ndSortCluster& cluster, ndFloat32 tol)
+		ndPointFormat&, ndInt32* const,
+		ndSortKey* const, const ndSortCluster&, ndFloat32)
 {
 	ndAssert(0);
 #if 0
@@ -1794,7 +1797,8 @@ void ndMeshEffect::ndPointFormat::CompressData(
 #endif
 }
 
-void ndMeshEffect::ndPointFormat::CompactVertexData(ndInt32* const indexList, ndFloat32 tol)
+//void ndMeshEffect::ndPointFormat::CompactVertexData(ndInt32* const indexList, ndFloat32 tol)
+void ndMeshEffect::ndPointFormat::CompactVertexData(ndInt32* const, ndFloat32)
 {
 	ndAssert(0);
 #if 0
@@ -1993,7 +1997,7 @@ void ndMeshEffect::ndAttibutFormat::CompressData(
 	const ndFloat64 tolerance = ndMax(ndMin(minDist, ndFloat64(tol)), ndFloat64(1.0e-8f));
 	const ndFloat64 sweptWindow = ndFloat64(2.0f) * tolerance;
 
-	const ndInt32 base = output.m_pointChannel.GetCount();
+	const ndInt32 base = ndInt32(output.m_pointChannel.GetCount());
 
 	ndInt32 newCount = 0;
 	for (ndInt32 i = 0; i < cluster.m_count; ++i)
@@ -2183,7 +2187,7 @@ void ndMeshEffect::ndAttibutFormat::CompactVertexData(const ndPointFormat& point
 	cluster.m_start = 0;
 	cluster.m_sum = ndBigVector::m_zero;
 	cluster.m_sum2 = ndBigVector::m_zero;
-	cluster.m_count = tmpFormat.m_pointChannel.GetCount();
+	cluster.m_count = ndInt32(tmpFormat.m_pointChannel.GetCount());
 	ndStack<ndSortKey> indirectListBuffer(cluster.m_count);
 	ndSortKey* const indirectList = &indirectListBuffer[0];
 
@@ -2391,12 +2395,12 @@ bool ndMeshEffect::Sanity() const
 
 void ndMeshEffect::BeginBuildFace()
 {
-	m_constructionIndex = m_points.m_vertex.GetCount();
+	m_constructionIndex = ndInt32(m_points.m_vertex.GetCount());
 }
 
 void ndMeshEffect::AddPoint(ndFloat64 x, ndFloat64 y, ndFloat64 z)
 {
-	m_attrib.m_pointChannel.PushBack(m_points.m_vertex.GetCount());
+	m_attrib.m_pointChannel.PushBack(ndInt32(m_points.m_vertex.GetCount()));
 	m_points.m_vertex.PushBack(ndBigVector(QuantizeCordinade(x), QuantizeCordinade(y), QuantizeCordinade(z), ndFloat64(0.0f)));
 }
 
@@ -2602,7 +2606,8 @@ void ndMeshEffect::BeginBuild()
 	m_constructionIndex = 0;
 }
 
-void ndMeshEffect::EndBuild(bool fixTjoint)
+//void ndMeshEffect::EndBuild(bool fixTjoint)
+void ndMeshEffect::EndBuild(bool)
 {
 ndAssert(0);
 #if 0
@@ -2722,7 +2727,7 @@ bool ndMeshEffect::EndFace()
 	for (bool hasVertexCollision = true; hasVertexCollision;)
 	{
 		hasVertexCollision = false;
-		const ndInt32 currentCount = m_points.m_vertex.GetCount();
+		const ndInt32 currentCount = ndInt32(m_points.m_vertex.GetCount());
 		ndStack<ndInt8> verterCollisionBuffer(currentCount);
 		ndInt8* const verterCollision = &verterCollisionBuffer[0];
 		ndMemSet(&verterCollision[0], ndInt8(0), currentCount);
@@ -2776,7 +2781,7 @@ bool ndMeshEffect::EndFace()
 				if (ptr->m_incidentFace > 0)
 				{
 					ndInt32 index = ndInt32(ptr->m_userData);
-					m_attrib.m_pointChannel.PushBack(m_points.m_vertex.GetCount() - 1);
+					m_attrib.m_pointChannel.PushBack(ndInt32(m_points.m_vertex.GetCount()) - 1);
 					if (m_attrib.m_materialChannel.GetCount())
 					{
 						m_attrib.m_materialChannel.PushBack(m_attrib.m_materialChannel[index]);
@@ -2812,7 +2817,7 @@ bool ndMeshEffect::EndFace()
 				ndPairKey twinKey(ptr->m_twin->m_incidentVertex, ptr->m_incidentVertex);
 				ReplaceKey(twinNode, twinKey.GetVal());
 
-				ptr->m_incidentVertex = m_points.m_vertex.GetCount() - 1;
+				ptr->m_incidentVertex = ndInt32(m_points.m_vertex.GetCount()) - 1;
 
 				ptr = ptr->m_twin->m_next;
 			} while (ptr != edge);
@@ -3151,7 +3156,7 @@ ndAssert(0);
 
 void ndMeshEffect::PackAttibuteData()
 {
-	ndStack<ndInt32>attrIndexBuffer(m_attrib.m_pointChannel.GetCount());
+	ndStack<ndInt32>attrIndexBuffer(ndInt32(m_attrib.m_pointChannel.GetCount()));
 	ndInt32* const attrIndexMap = &attrIndexBuffer[0];
 	m_attrib.CompactVertexData(m_points, &attrIndexMap[0], ndFloat32(1.0e-6f));
 
@@ -3165,7 +3170,7 @@ void ndMeshEffect::PackAttibuteData()
 		}
 	}
 
-	ndMemSet(attrIndexMap, -1, m_attrib.m_pointChannel.GetCount());
+	ndMemSet(attrIndexMap, -1, ndInt32(m_attrib.m_pointChannel.GetCount()));
 	ndAttibutFormat tmpFormat(m_attrib);
 	m_attrib.Clear();
 
@@ -3300,7 +3305,8 @@ bool ndMeshEffect::SeparateDuplicateLoops(ndEdge* const face)
 	return false;
 }
 
-ndInt32 ndMeshEffect::AddInterpolatedHalfAttribute(ndEdge* const edge, ndInt32 midPoint)
+//ndInt32 ndMeshEffect::AddInterpolatedHalfAttribute(ndEdge* const edge, ndInt32 midPoint)
+ndInt32 ndMeshEffect::AddInterpolatedHalfAttribute(ndEdge* const, ndInt32)
 {
 ndAssert(0);
 return 0;
@@ -3870,27 +3876,27 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 
 	ndInt32 totalSize = 0;
 	ndInt32 vertexOffset = totalSize;
-	totalSize += m_points.m_vertex.GetCount() * vertexStrideInBytes;
+	totalSize += ndInt32(m_points.m_vertex.GetCount()) * vertexStrideInBytes;
 
 	ndInt32 normalOffset = 0;
 	if (m_attrib.m_normalChannel.m_isValid)
 	{
 		normalOffset = totalSize;
-		totalSize += m_attrib.m_normalChannel.GetCount() * normalStrideInBytes;
+		totalSize += ndInt32(m_attrib.m_normalChannel.GetCount()) * normalStrideInBytes;
 	}
 
 	ndInt32 uvOffset = 0;
 	if (m_attrib.m_uv0Channel.m_isValid)
 	{
 		uvOffset = totalSize;
-		totalSize += m_attrib.m_uv0Channel.GetCount() * uvStrideInBytes;
+		totalSize += ndInt32(m_attrib.m_uv0Channel.GetCount()) * uvStrideInBytes;
 	}
 
 	ndInt32 vertexWeightsOffset = 0;
 	if (m_points.m_skinWeights.m_isValid)
 	{
 		vertexWeightsOffset = totalSize;
-		totalSize += m_points.m_skinWeights.GetCount() * vertexWeightStrideInBytes;
+		totalSize += ndInt32(m_points.m_skinWeights.GetCount()) * vertexWeightStrideInBytes;
 	}
 
 	ndInt32 faceCountOffset = totalSize;
@@ -4169,7 +4175,7 @@ ndInt32 ndMeshEffect::GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<n
 		}
 	}
 
-	return m_points.m_vertex.GetCount();
+	return ndInt32(m_points.m_vertex.GetCount());
 }
 
 ndIndexArray* ndMeshEffect::MaterialGeometryBegin()
@@ -4302,7 +4308,7 @@ void ndMeshEffect::GetMaterialGetIndexStream(ndIndexArray* const handle, ndInt32
 
 void ndMeshEffect::ApplyTransform(const ndMatrix& matrix)
 {
-	matrix.TransformTriplex(&m_points.m_vertex[0].m_x, sizeof(ndBigVector), &m_points.m_vertex[0].m_x, sizeof(ndBigVector), m_points.m_vertex.GetCount());
+	matrix.TransformTriplex(&m_points.m_vertex[0].m_x, sizeof(ndBigVector), &m_points.m_vertex[0].m_x, sizeof(ndBigVector), ndInt32(m_points.m_vertex.GetCount()));
 
 	ndMatrix invMatix(matrix.Inverse4x4());
 	invMatix.m_posit = ndVector::m_wOne;
@@ -4334,7 +4340,8 @@ void ndMeshEffect::ApplyTransform(const ndMatrix& matrix)
 	}
 }
 
-void ndMeshEffect::MergeFaces(const ndMeshEffect* const source)
+//void ndMeshEffect::MergeFaces(const ndMeshEffect* const source)
+void ndMeshEffect::MergeFaces(const ndMeshEffect* const)
 {
 	ndAssert(0);
 #if 0
@@ -4500,13 +4507,13 @@ ndMeshEffect::ndMeshEffect(const ndShapeInstance& shapeInstance)
 		shapeInstance.DebugShape(matrix, builder);
 	}
 
-	ndStack<ndInt32>indexListBuffer(builder.m_vertex.GetCount());
+	ndStack<ndInt32>indexListBuffer(ndInt32(builder.m_vertex.GetCount()));
 	ndInt32* const indexList = &indexListBuffer[0];
-	ndVertexListToIndexList(&builder.m_vertex[0].m_x, sizeof(ndBigVector), 4, builder.m_vertex.GetCount(), &indexList[0], DG_VERTEXLIST_INDEXLIST_TOL);
+	ndVertexListToIndexList(&builder.m_vertex[0].m_x, sizeof(ndBigVector), 4, ndInt32(builder.m_vertex.GetCount()), &indexList[0], DG_VERTEXLIST_INDEXLIST_TOL);
 
 	ndMeshEffect::ndMeshVertexFormat vertexFormat;
 
-	vertexFormat.m_faceCount = builder.m_faceIndexCount.GetCount();
+	vertexFormat.m_faceCount = ndInt32(builder.m_faceIndexCount.GetCount());
 	vertexFormat.m_faceIndexCount = &builder.m_faceIndexCount[0];
 	//vertexFormat.m_faceMaterial = materialIndex;
 
@@ -4643,7 +4650,7 @@ ndMeshEffect* ndMeshEffect::GetNextLayer(ndInt32 mark)
 
 ndShapeInstance* ndMeshEffect::CreateConvexCollision(ndFloat64 tolerance) const
 {
-	ndStack<ndVector> poolPtr(m_points.m_vertex.GetCount() * 2);
+	ndStack<ndVector> poolPtr(ndInt32(m_points.m_vertex.GetCount()) * 2);
 	ndVector* const pool = &poolPtr[0];
 	
 	ndBigVector minBox;
@@ -4770,7 +4777,7 @@ ndEdge* ndMeshEffect::InsertEdgeVertex(ndEdge* const edge, ndFloat64 param)
 	ndEdge* const faceA1 = edge->m_prev;
 	ndEdge* const faceB0 = twin->m_next;
 	ndEdge* const faceB1 = twin->m_prev;
-	SpliteEdge(m_points.m_vertex.GetCount() - 1, edge);
+	SpliteEdge(ndInt32(m_points.m_vertex.GetCount()) - 1, edge);
 
 	faceA0->m_prev->m_userData = ndUnsigned64(m_attrib.m_pointChannel.GetCount() - 2);
 	faceA1->m_next->m_userData = ndUnsigned64(edgeAttrV0);
@@ -4780,7 +4787,8 @@ ndEdge* ndMeshEffect::InsertEdgeVertex(ndEdge* const edge, ndFloat64 param)
 	return faceA1->m_next;
 }
 
-void ndMeshEffect::AddInterpolatedEdgeAttribute(ndEdge* const edge, ndFloat64 param)
+//void ndMeshEffect::AddInterpolatedEdgeAttribute(ndEdge* const edge, ndFloat64 param)
+void ndMeshEffect::AddInterpolatedEdgeAttribute(ndEdge* const, ndFloat64)
 {
 	ndAssert(0);
 #if 0

@@ -2696,7 +2696,7 @@ void ndIsoSurface::ndImplementation::ProcessLowResCell(ndIsoCell& cell)
 		vertlist[midPoint] = InterpolateLowResVertex(cell.m_isoValues[p0], cell.m_isoValues[p1]);
 	}
 	
-	const ndInt32 index = m_triangles.GetCount();
+	const ndInt32 index = ndInt32 (m_triangles.GetCount());
 	const ndInt32 faceStart = m_facesScan[tableIndex];
 	const ndInt32 faceVertexCount = m_facesScan[tableIndex + 1] - faceStart;
 	
@@ -2740,7 +2740,7 @@ void ndIsoSurface::ndImplementation::ProcessHighResCell(ndIsoCell& cell, ndCalcu
 		vertlist[midPoint] = InterpolateHighResVertex(m_isoValue, cell.m_isoValues[p0], cell.m_isoValues[p1]);
 	}
 
-	const ndInt32 index = m_triangles.GetCount();
+	const ndInt32 index = ndInt32 (m_triangles.GetCount());
 	const ndInt32 faceStart = m_facesScan[tableIndex];
 	const ndInt32 faceVertexCount = m_facesScan[tableIndex + 1] - faceStart;
 
@@ -2996,7 +2996,7 @@ void ndIsoSurface::ndImplementation::GenerateLowResIsoSurface()
 {
 	D_TRACKTIME();
 	ndInt32 end = 0;
-	const ndInt32 gridCount = m_hashGridMap.GetCount();
+	const ndInt32 gridCount = ndInt32(m_hashGridMap.GetCount());
 	m_hashGridMap.PushBack(ndGridHash(0xffff, 0xffff, 0xffff));
 
 	m_triangles.SetCount(0);
@@ -3033,7 +3033,7 @@ void ndIsoSurface::ndImplementation::GenerateHighResIsoSurface(ndCalculateIsoVal
 {
 	D_TRACKTIME();
 	ndInt32 end = 0;
-	const ndInt32 gridCount = m_hashGridMap.GetCount();
+	const ndInt32 gridCount = ndInt32(m_hashGridMap.GetCount());
 	m_hashGridMap.PushBack(ndGridHash(0xffff, 0xffff, 0xffff));
 
 	m_triangles.SetCount(0);
@@ -3242,7 +3242,7 @@ ndInt32 ndIsoSurface::ndImplementation::GenerateLowResIndexList(
 		ndCountingSort<ndVector, ndKey_highZ, 8>(m_triangles, m_trianglesScratchBuffer, nullptr, nullptr);
 	}
 	
-	const ndInt32 count = m_triangles.GetCount();
+	const ndInt32 count = ndInt32 (m_triangles.GetCount());
 	const ndArray<ndVector>& triangleList = m_triangles;
 	
 	ndInt32 vertexCount = 0;
@@ -3310,7 +3310,7 @@ void ndIsoSurface::ndImplementation::MakeTriangleList(ndIsoSurface* const me)
 	ndArray<ndVector>& points = me->m_points;
 	points.SetCount(m_triangles.GetCount());
 
-	for (ndInt32 i = 0; i < m_triangles.GetCount(); ++i)
+	for (ndInt32 i = 0; i < ndInt32 (m_triangles.GetCount()); ++i)
 	{
 		points[i] = m_triangles[i] * m_gridSize;
 	}

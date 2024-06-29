@@ -47,7 +47,7 @@ ndInt32 ndContactArray::GetActiveContacts() const
 {
 	ndInt32 count = 0;
 	ndScopeSpinLock lock(m_lock);
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(GetCount()) - 1; i >= 0; --i)
 	{
 		ndContact* const contact = m_array[i];
 		count += contact->IsActive() ? 1 : 0;
@@ -76,7 +76,7 @@ void ndContactArray::DetachContact(ndContact* const contact)
 
 void ndContactArray::DeleteAllContacts()
 {
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(GetCount()) - 1; i >= 0; --i)
 	{
 		ndContact* const contact = m_array[i];
 		if (contact->m_isAttached)

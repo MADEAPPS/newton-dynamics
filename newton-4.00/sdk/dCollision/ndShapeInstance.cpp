@@ -140,11 +140,11 @@ void ndShapeInstance::SavePLY(const char* const fileName) const
 		fprintf(file, "ply\n");
 		fprintf(file, "format ascii 1.0\n");
 
-		fprintf(file, "element vertex %d\n", drawShapes.m_vertex.GetCount());
+		fprintf(file, "element vertex %d\n", ndInt32(drawShapes.m_vertex.GetCount()));
 		fprintf(file, "property float x\n");
 		fprintf(file, "property float y\n");
 		fprintf(file, "property float z\n");
-		fprintf(file, "element face %d\n", drawShapes.m_faceVertexCount.GetCount());
+		fprintf(file, "element face %d\n", ndInt32(drawShapes.m_faceVertexCount.GetCount()));
 		fprintf(file, "property list uchar int vertex_index\n");
 		fprintf(file, "end_header\n");
 

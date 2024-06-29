@@ -1726,13 +1726,13 @@ ndBigVector ndMeshEffect::GetOrigin()const
 	{
 		origin += m_points.m_vertex[i];
 	}
-	return origin.Scale(ndFloat64(1.0f) / m_points.m_vertex.GetCount());
+	return origin.Scale(ndFloat64(1.0f) / ndInt32(m_points.m_vertex.GetCount()));
 }
 
 void ndMeshEffect::BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const ndMatrix& textureMatrix)
 {
 	ndBigVector origin(GetOrigin());
-	ndStack<ndBigVector> buffer(m_points.m_vertex.GetCount());
+	ndStack<ndBigVector> buffer(ndInt32(m_points.m_vertex.GetCount()));
 	ndBigVector pMin(ndFloat64(1.0e10f), ndFloat64(1.0e10f), ndFloat64(1.0e10f), ndFloat64(0.0f));
 	ndBigVector pMax(ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(0.0f));
 
@@ -1880,7 +1880,7 @@ void ndMeshEffect::UniformBoxMapping(ndInt32 material, const ndMatrix& textureMa
 void ndMeshEffect::SphericalMapping(ndInt32 material, const ndMatrix& textureMatrix)
 {
 	ndBigVector origin(GetOrigin());
-	ndStack<ndBigVector>sphere(m_points.m_vertex.GetCount());
+	ndStack<ndBigVector>sphere(ndInt32(m_points.m_vertex.GetCount()));
 	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); ++i)
 	{
 		ndBigVector geoPoint(m_points.m_vertex[i] - origin);

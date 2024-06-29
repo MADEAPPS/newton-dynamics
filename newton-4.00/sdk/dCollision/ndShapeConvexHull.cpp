@@ -162,7 +162,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		//const ndBigVector* const hullVertexArray = convexHull->GetVertexPool();
 		const ndArray<ndBigVector>& hullVertexArray = convexHull->GetVertexPool();
 
-		ndStack<ndInt8> mask(hullVertexArray.GetCount());
+		ndStack<ndInt8> mask(ndInt32(hullVertexArray.GetCount()));
 		memset(&mask[0], 1, size_t(mask.GetSizeInBytes()));
 		for (ndConvexHull3d::ndNode* node = convexHull->GetFirst(); node; node = node->GetNext()) 
 		{
@@ -204,7 +204,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		{
 			ndInt32 count1 = 0;
 			//ndInt32 vertexCount = convexHull->GetVertexCount();
-			const ndInt32 vertexCount = convexHull->GetVertexPool().GetCount();
+			const ndInt32 vertexCount = ndInt32(convexHull->GetVertexPool().GetCount());
 			for (ndInt32 i = 0; i < vertexCount; ++i) 
 			{
 				if (mask[i]) 
@@ -220,7 +220,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 
 	ndAssert(convexHull);
 	//ndInt32 vertexCount = convexHull->GetVertexCount();
-	ndInt32 vertexCount = convexHull->GetVertexPool().GetCount();
+	ndInt32 vertexCount = ndInt32(convexHull->GetVertexPool().GetCount());
 	if (vertexCount < 4) 
 	{
 		delete convexHull;

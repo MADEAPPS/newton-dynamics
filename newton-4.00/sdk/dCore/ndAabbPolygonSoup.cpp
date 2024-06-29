@@ -583,9 +583,9 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 	}
 	ndAssert (builder.m_faceVertexCount.GetCount() >= 1);
 	m_strideInBytes = sizeof (ndTriplex);
-	m_nodesCount = ((builder.m_faceVertexCount.GetCount() - 1) < 1) ? 1 : builder.m_faceVertexCount.GetCount() - 1;
+	m_nodesCount = ((builder.m_faceVertexCount.GetCount() - 1) < 1) ? 1 : ndInt32(builder.m_faceVertexCount.GetCount()) - 1;
 	m_aabb = (ndNode*) ndMemory::Malloc (sizeof (ndNode) * m_nodesCount);
-	m_indexCount = builder.m_vertexIndex.GetCount() * 2 + builder.m_faceVertexCount.GetCount();
+	m_indexCount = ndInt32(builder.m_vertexIndex.GetCount() * 2 + builder.m_faceVertexCount.GetCount());
 
 	if (builder.m_faceVertexCount.GetCount() == 1) 
 	{
@@ -593,7 +593,7 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 	}
 
 	m_indices = (ndInt32*) ndMemory::Malloc (sizeof (ndInt32) * m_indexCount);
-	ndStack<ndVector> tmpVertexArrayCount(builder.m_vertexPoints.GetCount() + builder.m_normalPoints.GetCount() + builder.m_faceVertexCount.GetCount() * 2 + 4);
+	ndStack<ndVector> tmpVertexArrayCount(ndInt32(builder.m_vertexPoints.GetCount() + builder.m_normalPoints.GetCount() + builder.m_faceVertexCount.GetCount() * 2 + 4));
 
 	ndVector* const tmpVertexArray = &tmpVertexArrayCount[0];
 	for (ndInt32 i = 0; i < builder.m_vertexPoints.GetCount(); ++i) 
@@ -607,7 +607,7 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 	}
 
 	const ndInt32* const indices = &builder.m_vertexIndex[0];
-	ndStack<ndNodeBuilder> constructor (builder.m_faceVertexCount.GetCount() * 2 + 16); 
+	ndStack<ndNodeBuilder> constructor (ndInt32(builder.m_faceVertexCount.GetCount() * 2 + 16));
 
 	ndInt32 polygonIndex = 0;
 	ndInt32 allocatorIndex = 0;
@@ -648,7 +648,7 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 	}
 	ndAssert(!list.GetCount());
 
-	ndInt32 aabbBase = builder.m_vertexPoints.GetCount() + builder.m_normalPoints.GetCount();
+	ndInt32 aabbBase = ndInt32(builder.m_vertexPoints.GetCount() + builder.m_normalPoints.GetCount());
 
 	ndVector* const aabbPoints = &tmpVertexArray[aabbBase];
 
@@ -718,7 +718,7 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 			// face attribute
 			m_indices[indexMap + node->m_indexCount] = node->m_faceIndices[node->m_indexCount];
 			// face normal
-			m_indices[indexMap + node->m_indexCount + 1] = builder.m_vertexPoints.GetCount() + builder.m_normalIndex[node->m_faceIndex];
+			m_indices[indexMap + node->m_indexCount + 1] = ndInt32(builder.m_vertexPoints.GetCount()) + builder.m_normalIndex[node->m_faceIndex];
 			// face size
 			ndFloat32 faceMaxDiag = CalculateFaceMaxDiagonal(&tmpVertexArray[0], node->m_indexCount, node->m_faceIndices);
 			ndInt32 quantizedDiagSize = ndInt32(ndFloor(faceMaxDiag / D_FACE_CLIP_DIAGONAL_SCALE + ndFloat32(1.0f)));

@@ -1109,7 +1109,7 @@ dAssert(0);
 
 ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const ndArray<ndVector>& pointCloud, ndInt32 interiorMaterialIndex, const ndMatrix& textureProjectionMatrix)
 {
-	ndStack<ndBigVector> buffer(pointCloud.GetCount() + 32);
+	ndStack<ndBigVector> buffer(ndInt32(pointCloud.GetCount() + 32));
 	ndBigVector* const pool = &buffer[0];
 	ndInt32 count = 0;
 	ndFloat64 quantizeFactor = ndFloat64(16.0f);

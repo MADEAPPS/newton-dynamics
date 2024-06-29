@@ -859,7 +859,8 @@ ndMeshEffect* ndMeshEffect::Intersection (const dMatrix& matrix, const ndMeshEff
 // return 1 if the shape is the positive size of the plane
 // return -1 if the shape is the negative size of the plane
 // return -2 if function fail
-ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* const convexFace)
+//ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* const convexFace)
+ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect&, const ndEdge* const)
 {
 ndAssert(0);
 return 0;
@@ -1208,7 +1209,8 @@ ndMeshEffect* ndMeshEffect::ConvexMeshIntersection(const ndMeshEffect* const con
 	return convexIntersection;
 }
 
-ndMeshEffect* ndMeshEffect::InverseConvexMeshIntersection(const ndMeshEffect* const convexMeshSrc) const
+//ndMeshEffect* ndMeshEffect::InverseConvexMeshIntersection(const ndMeshEffect* const convexMeshSrc) const
+ndMeshEffect* ndMeshEffect::InverseConvexMeshIntersection(const ndMeshEffect* const) const
 {
 	ndAssert(0);
 	return 0;

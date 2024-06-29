@@ -87,7 +87,7 @@ void ndShapeHeightfield::CalculateLocalObb()
 {
 	ndReal y0 = ndReal (1.0e10f);
 	ndReal y1 = -ndReal(1.0e10f);
-	for (ndInt32 i = m_elevationMap.GetCount()-1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_elevationMap.GetCount()-1); i >= 0; --i)
 	{
 		y0 = ndMin(y0, m_elevationMap[i]);
 		y1 = ndMax(y1, m_elevationMap[i]);
@@ -776,7 +776,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 
 ndUnsigned64 ndShapeHeightfield::GetHash(ndUnsigned64 hash) const
 {
-	hash = ndCRC64(&m_atributeMap[0], m_atributeMap.GetCount() * ndInt32(sizeof(ndInt8)), hash);
-	hash = ndCRC64(&m_elevationMap[0], m_elevationMap.GetCount() * ndInt32(sizeof(ndReal)), hash);
+	hash = ndCRC64(&m_atributeMap[0], ndInt32(m_atributeMap.GetCount()) * ndInt32(sizeof(ndInt8)), hash);
+	hash = ndCRC64(&m_elevationMap[0], ndInt32(m_elevationMap.GetCount()) * ndInt32(sizeof(ndReal)), hash);
 	return hash;
 }

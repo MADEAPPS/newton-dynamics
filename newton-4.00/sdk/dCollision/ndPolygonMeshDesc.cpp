@@ -190,7 +190,7 @@ void ndPolygonMeshDesc::SortFaceArray()
 		ndInt32 stack[256][2];
 
 		stack[0][0] = 0;
-		stack[0][1] = query.m_faceIndexCount.GetCount() - 1;
+		stack[0][1] = ndInt32(query.m_faceIndexCount.GetCount() - 1);
 		ndInt32 stackIndex = 1;
 		while (stackIndex)
 		{
@@ -236,7 +236,7 @@ void ndPolygonMeshDesc::SortFaceArray()
 	stride = stride * 2;
 	if (query.m_faceIndexCount.GetCount() < stride)
 	{
-		stride = query.m_faceIndexCount.GetCount();
+		stride = ndInt32(query.m_faceIndexCount.GetCount());
 	}
 	for (ndInt32 i = 1; i < stride; ++i)
 	{

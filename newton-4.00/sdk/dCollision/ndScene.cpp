@@ -806,7 +806,7 @@ void ndScene::UpdateTransform()
 		D_TRACKTIME_NAMED(TransformUpdate);
 		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
 
-		const ndInt32 count = bodyArray.GetCount() - 1;
+		const ndInt32 count = ndInt32(bodyArray.GetCount()) - 1;
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
@@ -1298,7 +1298,7 @@ void ndScene::FindCollidingPairs()
 		D_TRACKTIME_NAMED(FindPairsForward);
 		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
 
-		const ndInt32 count = m_sceneBodyArray.GetCount();
+		const ndInt32 count = ndInt32(m_sceneBodyArray.GetCount());
 		for (ndInt32 i = iterator0.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator0.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
@@ -1316,7 +1316,7 @@ void ndScene::FindCollidingPairs()
 		D_TRACKTIME_NAMED(FindPairsBackward);
 		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
 
-		const ndInt32 count = m_sceneBodyArray.GetCount();
+		const ndInt32 count = ndInt32(m_sceneBodyArray.GetCount());
 		for (ndInt32 i = iterator1.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator1.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
@@ -1341,7 +1341,7 @@ void ndScene::FindCollidingPairs()
 	ndInt32 sum = 0;
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
-		sum += m_partialNewPairs[i].GetCount();
+		sum += ndInt32(m_partialNewPairs[i].GetCount());
 	}
 	m_newPairs.SetCount(sum);
 
@@ -1349,7 +1349,7 @@ void ndScene::FindCollidingPairs()
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
 		const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[i];
-		const ndInt32 count = newPairs.GetCount();
+		const ndInt32 count = ndInt32(newPairs.GetCount());
 		if (count)
 		{
 			ndMemCpy(&m_newPairs[sum], &newPairs[0], count);
@@ -1386,7 +1386,7 @@ void ndScene::ApplyExtForce()
 
 		const ndFloat32 timestep = m_timestep;
 
-		const ndInt32 count = view.GetCount() - 1;
+		const ndInt32 count = ndInt32(view.GetCount()) - 1;
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
@@ -1410,7 +1410,7 @@ void ndScene::InitBodyArray()
 		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
 
 		ndBvhNodeArray& array = m_bvhSceneManager.GetNodeArray();
-		const ndInt32 count = view.GetCount() - 1;
+		const ndInt32 count = ndInt32(view.GetCount()) - 1;
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
@@ -1461,7 +1461,7 @@ void ndScene::InitBodyArray()
 
 	ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
 	ndInt32 movingBodyCount = 0;
-	ndInt32 sceneBodyCount = view.GetCount() - 1;
+	ndInt32 sceneBodyCount = ndInt32(view.GetCount()) - 1;
 	if (sceneBodyCount)
 	{
 		m_sceneBodyArray.SetCount(sceneBodyCount);
@@ -1483,7 +1483,7 @@ void ndScene::InitBodyArray()
 				const ndArray<ndBodyKinematic*>& view = m_sceneBodyArray;
 				ndBvhNodeArray& array = m_bvhSceneManager.GetNodeArray();
 
-				const ndInt32 count = view.GetCount();
+				const ndInt32 count = ndInt32(view.GetCount());
 				for (ndInt32 i = iterator1.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator1.fetch_add(D_WORKER_BATCH_SIZE))
 				{
 					const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
@@ -1523,7 +1523,7 @@ void ndScene::InitBodyArray()
 	}
 	
 	ndBodyKinematic* const sentinelBody = m_sentinelBody;
-	sentinelBody->PrepareStep(GetActiveBodyArray().GetCount() - 1);
+	sentinelBody->PrepareStep(ndInt32(GetActiveBodyArray().GetCount()) - 1);
 	
 	sentinelBody->m_isStatic = 1;
 	sentinelBody->m_autoSleep = 1;
@@ -1539,7 +1539,7 @@ void ndScene::InitBodyArray()
 void ndScene::CreateNewContacts()
 {
 	D_TRACKTIME();
-	const ndInt32 contactCount = m_contactArray.GetCount();
+	const ndInt32 contactCount = ndInt32(m_contactArray.GetCount());
 	m_scratchBuffer.SetCount(ndInt32((contactCount + m_newPairs.GetCount() + 16) * sizeof(ndContact*)));
 
 	ndContact** const tmpJointsArray = (ndContact**)&m_scratchBuffer[0];
@@ -1551,7 +1551,7 @@ void ndScene::CreateNewContacts()
 		const ndArray<ndContactPairs>& newPairs = m_newPairs;
 		ndBodyKinematic** const bodyArray = &GetActiveBodyArray()[0];
 
-		const ndInt32 count = newPairs.GetCount();
+		const ndInt32 count = ndInt32(newPairs.GetCount());
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
@@ -1578,7 +1578,7 @@ void ndScene::CreateNewContacts()
 	if (contactCount)
 	{
 		D_TRACKTIME_NAMED(CopyContactArray)
-		const ndInt32 start = m_newPairs.GetCount();
+		const ndInt32 start = ndInt32(m_newPairs.GetCount());
 		ndContact** const contactArray = &m_contactArray[0];
 		for (ndInt32 i = 0; i < contactCount; ++i)
 		{
@@ -1592,7 +1592,7 @@ void ndScene::CalculateContacts()
 {
 	D_TRACKTIME();
 	m_activeConstraintArray.SetCount(0);
-	const ndInt32 contactCount = m_contactArray.GetCount() + m_newPairs.GetCount();
+	const ndInt32 contactCount = ndInt32(m_contactArray.GetCount() + m_newPairs.GetCount());
 	m_contactArray.SetCount(contactCount);
 	if (contactCount)
 	{
@@ -1603,7 +1603,7 @@ void ndScene::CalculateContacts()
 		{
 			D_TRACKTIME_NAMED(CalculateContactPoints);
 
-			const ndInt32 jointCount = m_contactArray.GetCount();
+			const ndInt32 jointCount = ndInt32(m_contactArray.GetCount());
 			for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < jointCount; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 			{
 				const ndInt32 maxSpan = ((jointCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : jointCount - i;
@@ -1657,7 +1657,7 @@ void ndScene::DeleteDeadContacts()
 	{
 		D_TRACKTIME();
 		ndContact** const tmpJointsArray = (ndContact**)&m_scratchBuffer[0];
-		ndCountingSort<ndContact*, ndJointActive, 2>(*this, tmpJointsArray, &m_contactArray[0], m_contactArray.GetCount(), prefixScan, nullptr);
+		ndCountingSort<ndContact*, ndJointActive, 2>(*this, tmpJointsArray, &m_contactArray[0], ndInt32(m_contactArray.GetCount()), prefixScan, nullptr);
 		if (prefixScan[m_dead + 1] != prefixScan[m_dead])
 		{
 			ndAtomic<ndInt32> iterator(0);

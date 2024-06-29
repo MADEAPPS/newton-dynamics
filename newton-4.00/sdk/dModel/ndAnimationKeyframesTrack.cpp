@@ -16,7 +16,7 @@ template<class OBJECT>
 ndInt32 ndAnimationKeyFramesTrack::ndKeyFramesArray<OBJECT>::GetIndex(ndFloat32 time) const
 {
 	ndAssert(time >= 0.0f);
-	const ndInt32 count = ndArray<OBJECT>::GetCount();
+	const ndInt32 count = ndInt32(ndArray<OBJECT>::GetCount());
 	const ndFloat32* const timePtr = &m_time[0];
 	time = ndClamp(time, timePtr[0], timePtr[count - 1]);
 

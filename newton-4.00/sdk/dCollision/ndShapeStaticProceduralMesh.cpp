@@ -84,7 +84,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 			edge0 = edge1;
 		}
 
-		ndInt32 normalIndex = vertex.GetCount();
+		ndInt32 normalIndex = ndInt32(vertex.GetCount());
 		ndAssert(normal.m_w == ndFloat32(0.0f));
 		vertex.PushBack(normal.Normalize());
 
@@ -92,7 +92,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 
 		const ndPlane plane(normal, -normal.DotProduct(vertex[i0]).GetScalar());
 
-		ndInt32 index = indices.GetCount();
+		ndInt32 index = ndInt32(indices.GetCount());
 		indices.SetCount(index + faceList[i] * 2 + 3);
 		indices[index + faceList[i] + 0] = faceMaterialList[i];
 		indices[index + faceList[i] + 1] = normalIndex;

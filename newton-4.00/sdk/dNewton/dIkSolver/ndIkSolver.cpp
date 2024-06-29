@@ -51,12 +51,12 @@ ndIkSolver::ndIkSolver()
 
 ndIkSolver::~ndIkSolver()
 {
-	for (ndInt32 i = m_surrogateBodies.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_surrogateBodies.GetCount()) - 1; i >= 0; --i)
 	{
 		delete m_surrogateBodies[i];
 	}
 
-	for (ndInt32 i = m_surrogateContact.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_surrogateContact.GetCount()) - 1; i >= 0; --i)
 	{
 		delete m_surrogateContact[i];
 	}
@@ -141,10 +141,10 @@ void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 	}
 
 	joint->m_rowCount = dof;
-	joint->m_rowStart = m_leftHandSide.GetCount();
+	joint->m_rowStart = ndInt32(m_leftHandSide.GetCount());
 	const ndInt32 baseIndex = joint->m_rowStart;
-	ndAssert(baseIndex == m_leftHandSide.GetCount());
-	ndAssert(baseIndex == m_leftHandSide.GetCount());
+	ndAssert(baseIndex == ndInt32(m_leftHandSide.GetCount()));
+	ndAssert(baseIndex == ndInt32(m_leftHandSide.GetCount()));
 	for (ndInt32 i = 0; i < dof; ++i)
 	{
 		ndAssert(constraintParam.m_forceBounds[i].m_jointForce);
@@ -296,7 +296,7 @@ void ndIkSolver::BuildMassMatrix()
 			ndUnsigned32 id = body->GetId();
 
 			m_bodies.PushBack(body);
-			for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
+			for (ndInt32 i = ndInt32(m_bodies.GetCount()) - 1; i >= 1; --i)
 			{
 				if (id > m_bodies[i - 1]->GetId())
 				{
@@ -324,7 +324,7 @@ void ndIkSolver::BuildMassMatrix()
 			return;
 		}
 
-		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
+		for (ndInt32 i = ndInt32(m_bodies.GetCount()) - 1; i >= 1; --i)
 		{
 			if (body == m_bodies[i])
 			{
@@ -334,7 +334,7 @@ void ndIkSolver::BuildMassMatrix()
 
 		ndUnsigned32 id = body->GetId();
 		m_bodies.PushBack(body);
-		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
+		for (ndInt32 i = ndInt32(m_bodies.GetCount()) - 1; i >= 1; --i)
 		{
 			if (id > m_bodies[i - 1]->GetId())
 			{
@@ -365,7 +365,7 @@ void ndIkSolver::BuildMassMatrix()
 		}
 
 		ndAssert(body->GetId() > 0);
-		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
+		for (ndInt32 i = ndInt32(m_bodies.GetCount()) - 1; i >= 1; --i)
 		{
 			if (body == m_bodies[i])
 			{
@@ -375,7 +375,7 @@ void ndIkSolver::BuildMassMatrix()
 
 		m_bodies.PushBack(body);
 		ndUnsigned32 id = body->GetId();
-		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1; --i)
+		for (ndInt32 i = ndInt32(m_bodies.GetCount()) - 1; i >= 1; --i)
 		{
 			if (id > m_bodies[i - 1]->GetId())
 			{
@@ -412,7 +412,7 @@ void ndIkSolver::BuildMassMatrix()
 			if (contact->IsActive())
 			{
 				bool duplicate = false;
-				for (ndInt32 j = m_contacts.GetCount() - 1; j >= 0; --j)
+				for (ndInt32 j = ndInt32(m_contacts.GetCount()) - 1; j >= 0; --j)
 				{
 					duplicate = duplicate || (m_contacts[j] == contact);
 				}
@@ -427,7 +427,7 @@ void ndIkSolver::BuildMassMatrix()
 								return m_surrogateArray[i].m_surrogateBody;
 							}
 						}
-						if (surrogateBodiesIndex == m_surrogateBodies.GetCount())
+						if (surrogateBodiesIndex == ndInt32(m_surrogateBodies.GetCount()))
 						{
 							ndBodyDynamic* const surrogateBody = new ndBodyDynamic();
 							m_surrogateBodies.PushBack(surrogateBody);
@@ -457,7 +457,7 @@ void ndIkSolver::BuildMassMatrix()
 						{
 							ndBodyKinematic* const surrogateBody = GetSurrogateBody(body1);
 					
-							if (surrogateContactIndex == m_surrogateContact.GetCount())
+							if (surrogateContactIndex == ndInt32(m_surrogateContact.GetCount()))
 							{
 								m_surrogateContact.PushBack(new ndContact);
 							}
@@ -473,7 +473,7 @@ void ndIkSolver::BuildMassMatrix()
 						ndAssert(body1->GetInvMass() > ndFloat32(0.0f));
 						ndBodyKinematic* const surrogateBody = GetSurrogateBody(body0);
 
-						if (surrogateContactIndex == m_surrogateContact.GetCount())
+						if (surrogateContactIndex == ndInt32(m_surrogateContact.GetCount()))
 						{
 							m_surrogateContact.PushBack(new ndContact);
 						}
@@ -488,7 +488,7 @@ void ndIkSolver::BuildMassMatrix()
 	}
 
 	m_savedBodiesIndex.SetCount(m_bodies.GetCount());
-	for (ndInt32 i = m_bodies.GetCount() - 1; i >= 1 ; --i)
+	for (ndInt32 i = ndInt32(m_bodies.GetCount()) - 1; i >= 1 ; --i)
 	{
 		ndBodyKinematic* const body = m_bodies[i];
 		m_savedBodiesIndex[i] = body->m_index;
@@ -550,7 +550,7 @@ void ndIkSolver::SolverEnd()
 {
 	if (m_skeleton)
 	{
-		for (ndInt32 i = m_bodies.GetCount()-1; i >= 1; --i)
+		for (ndInt32 i = ndInt32(m_bodies.GetCount())-1; i >= 1; --i)
 		{
 			ndBodyKinematic* const body = m_bodies[i];
 			body->m_buildSkelIndex = 0;
@@ -566,13 +566,13 @@ void ndIkSolver::Solve()
 	if (m_skeleton)
 	{
 		const ndVector zero(ndVector::m_zero);
-		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 0; --i)
+		for (ndInt32 i = ndInt32(m_bodies.GetCount()) - 1; i >= 0; --i)
 		{
 			ndBodyKinematic* const body = m_bodies[i];
 			body->m_accel = body->GetForce();
 			body->m_alpha = body->GetTorque() - body->GetGyroTorque();
 		}
-		for (ndInt32 i = m_contacts.GetCount() - 1; i >= 0; --i)
+		for (ndInt32 i = ndInt32(m_contacts.GetCount()) - 1; i >= 0; --i)
 		{
 			ndContact* const contact = m_contacts[i];
 			ndBodyKinematic* const body1 = contact->GetBody1();

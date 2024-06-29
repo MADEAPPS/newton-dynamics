@@ -118,7 +118,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 		D_TRACKTIME_NAMED(EnumerateJointBodyPairs);
 		ndJointBodyPairIndex* const jointBodyBuffer = &GetJointBodyPairIndexBuffer()[0];
 
-		const ndInt32 jointCount = jointArray.GetCount();
+		const ndInt32 jointCount = ndInt32 (jointArray.GetCount());
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < jointCount; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((jointCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : jointCount - i;
@@ -143,8 +143,8 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	scene->GetScratchBuffer().SetCount(bodyJointPairs.GetCount() * ndInt32 (sizeof (ndJointBodyPairIndex)));
 	ndJointBodyPairIndex* const tempBuffer = (ndJointBodyPairIndex*)&scene->GetScratchBuffer()[0];
 
-	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey0, D_MAX_BODY_RADIX_BIT>(*scene, &bodyJointPairs[0], tempBuffer, bodyJointPairs.GetCount(), nullptr, nullptr);
-	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey1, D_MAX_BODY_RADIX_BIT>(*scene, tempBuffer, &bodyJointPairs[0], bodyJointPairs.GetCount(), nullptr, nullptr);
+	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey0, D_MAX_BODY_RADIX_BIT>(*scene, &bodyJointPairs[0], tempBuffer, ndInt32 (bodyJointPairs.GetCount()), nullptr, nullptr);
+	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey1, D_MAX_BODY_RADIX_BIT>(*scene, tempBuffer, &bodyJointPairs[0], ndInt32 (bodyJointPairs.GetCount()), nullptr, nullptr);
 
 #ifdef _DEBUG
 	for (int i = 1; i < bodyJointPairs.GetCount(); ++i)
@@ -159,11 +159,11 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	bodyJointPairs[bodyJointPairs.GetCount() - 1] = bodyJointPairs[bodyJointPairs.GetCount() - 2];
 
 	ndArray<ndInt32>& bodyJointIndex = GetJointForceIndexBuffer();
-	const ndInt32 bodyJointIndexCount = scene->GetActiveBodyArray().GetCount() + 1;
+	const ndInt32 bodyJointIndexCount = ndInt32 (scene->GetActiveBodyArray().GetCount()) + 1;
 	bodyJointIndex.SetCount(bodyJointIndexCount);
 	ndMemSet(&bodyJointIndex[0], 0, bodyJointIndexCount);
 
-	for (ndInt32 i = 0; i < jointArray.GetCount(); ++i)
+	for (ndInt32 i = 0; i < ndInt32 (jointArray.GetCount()); ++i)
 	{
 		const ndConstraint* const joint = jointArray[i];
 		const ndBodyKinematic* const body0 = joint->GetBody0();
@@ -244,7 +244,7 @@ void ndDynamicsUpdate::SortJointsScan()
 	const ndJointList& jointList = m_world->GetJointList();
 	ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 
-	ndInt32 jointCount = jointArray.GetCount();
+	ndInt32 jointCount = ndInt32 (jointArray.GetCount());
 	jointArray.SetCount(jointCount + jointList.GetCount());
 
 	for (ndJointList::ndNode* node = jointList.GetFirst(); node; node = node->GetNext())
@@ -268,7 +268,7 @@ void ndDynamicsUpdate::SortJointsScan()
 	auto MarkFence0 = ndMakeObject::ndFunction([this, &iterator, &jointArray](ndInt32, ndInt32)
 	{
 		D_TRACKTIME_NAMED(MarkFence0);
-		const ndInt32 jointCount = jointArray.GetCount();
+		const ndInt32 jointCount = ndInt32 (jointArray.GetCount());
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < jointCount; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((jointCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : jointCount - i;
@@ -303,7 +303,7 @@ void ndDynamicsUpdate::SortJointsScan()
 	{
 		D_TRACKTIME_NAMED(MarkFence1);
 		ndInt32 activeJointCount = 0;
-		const ndInt32 jointCount = jointArray.GetCount();
+		const ndInt32 jointCount = ndInt32 (jointArray.GetCount());
 		const ndStartEnd startEnd(jointCount, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -336,7 +336,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		hist[0] = 0;
 		hist[1] = 0;
 
-		const ndStartEnd startEnd(jointArray.GetCount(), threadIndex, threadCount);
+		const ndStartEnd startEnd(ndInt32 (jointArray.GetCount()), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndConstraint* const joint = jointArray[i];
@@ -356,7 +356,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		ndAssert(scene->GetScratchBuffer().GetCount() >= ndInt32 (jointArray.GetCount() * sizeof (ndConstraint*)));
 		ndConstraint** const dstBuffer = (ndConstraint**)&scene->GetScratchBuffer()[0];
 	
-		const ndStartEnd startEnd(jointArray.GetCount(), threadIndex, threadCount);
+		const ndStartEnd startEnd(ndInt32 (jointArray.GetCount()), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndConstraint* const joint = jointArray[i];
@@ -425,7 +425,7 @@ void ndDynamicsUpdate::SortJointsScan()
 	m_activeJointCount = movingJointCount;
 	GetTempInternalForces().SetCount(jointArray.GetCount() * 2);
 	GetJointBodyPairIndexBuffer().SetCount(jointArray.GetCount() * 2);
-	ndCountingSort<ndConstraint*, ndEvaluateCountRows, 7>(*scene, tempJointBuffer, &jointArray[0], jointArray.GetCount(), nullptr, nullptr);
+	ndCountingSort<ndConstraint*, ndEvaluateCountRows, 7>(*scene, tempJointBuffer, &jointArray[0], ndInt32 (jointArray.GetCount()), nullptr, nullptr);
 }
 
 void ndDynamicsUpdate::SortJoints()
@@ -441,7 +441,7 @@ void ndDynamicsUpdate::SortJoints()
 	ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 
 	ndInt32 rowCount = 1;
-	for (ndInt32 i = 0; i < jointArray.GetCount(); ++i)
+	for (ndInt32 i = 0; i < ndInt32 (jointArray.GetCount()); ++i)
 	{
 		ndConstraint* const joint = jointArray[i];
 		joint->m_rowStart = rowCount;
@@ -453,7 +453,7 @@ void ndDynamicsUpdate::SortJoints()
 
 #ifdef _DEBUG
 	ndAssert(m_activeJointCount <= jointArray.GetCount());
-	for (ndInt32 i = 0; i < jointArray.GetCount(); ++i)
+	for (ndInt32 i = 0; i < ndInt32 (jointArray.GetCount()); ++i)
 	{
 		ndConstraint* const joint = jointArray[i];
 		ndAssert(joint->m_rowStart < m_leftHandSide.GetCount());
@@ -471,7 +471,7 @@ void ndDynamicsUpdate::SortJoints()
 		ndAssert(!(joint1->GetBody0()->m_equilibrium0 & joint1->GetBody1()->m_equilibrium0));
 	}
 
-	for (ndInt32 i = m_activeJointCount + 1; i < jointArray.GetCount(); ++i)
+	for (ndInt32 i = m_activeJointCount + 1; i < ndInt32 (jointArray.GetCount()); ++i)
 	{
 		ndConstraint* const joint0 = jointArray[i - 1];
 		ndConstraint* const joint1 = jointArray[i - 0];
@@ -510,7 +510,7 @@ void ndDynamicsUpdate::SortIslands()
 		map[2] = 2;
 		map[3] = 2;
 
-		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
+		const ndStartEnd startEnd(ndInt32 (bodyArray.GetCount()), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
@@ -530,7 +530,7 @@ void ndDynamicsUpdate::SortIslands()
 		map[2] = 2;
 		map[3] = 2;
 
-		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
+		const ndStartEnd startEnd(ndInt32 (bodyArray.GetCount()), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
@@ -592,7 +592,7 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 		ndArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder();
 
 		const ndFloat32 timestep = scene->GetTimestep();
-		const ndInt32 base = bodyArray.GetCount() - GetUnconstrainedBodyCount();
+		const ndInt32 base = ndInt32 (bodyArray.GetCount() - GetUnconstrainedBodyCount());
 
 		const ndInt32 count = GetUnconstrainedBodyCount();
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
@@ -626,7 +626,7 @@ void ndDynamicsUpdate::InitWeights()
 	m_invTimestepRK = m_invTimestep * ndFloat32(4.0f);
 
 	const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
-	const ndInt32 bodyCount = bodyArray.GetCount();
+	const ndInt32 bodyCount = ndInt32 (bodyArray.GetCount());
 	GetInternalForces().SetCount(bodyCount);
 
 	ndInt32 extraPassesArray[D_MAX_THREADS_COUNT];
@@ -639,7 +639,7 @@ void ndDynamicsUpdate::InitWeights()
 		const ndArray<ndJointBodyPairIndex>& jointBodyPairIndex = GetJointBodyPairIndexBuffer();
 
 		ndInt32 maxExtraPasses = 1;
-		const ndInt32 jointCount = jointForceIndexBuffer.GetCount() - 1;
+		const ndInt32 jointCount = ndInt32 (jointForceIndexBuffer.GetCount()) - 1;
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < jointCount; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((jointCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : jointCount - i;
@@ -693,7 +693,7 @@ void ndDynamicsUpdate::InitBodyArray()
 		D_TRACKTIME_NAMED(InitBodyArray);
 		const ndArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder();
 
-		const ndInt32 count = bodyArray.GetCount() - GetUnconstrainedBodyCount();
+		const ndInt32 count = ndInt32 (bodyArray.GetCount() - GetUnconstrainedBodyCount());
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
@@ -914,7 +914,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			outBody1.m_angular = torqueAcc1;
 		};
 
-		const ndInt32 jointCount = jointArray.GetCount();
+		const ndInt32 jointCount = ndInt32 (jointArray.GetCount());
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < jointCount; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((jointCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : jointCount - i;
@@ -938,7 +938,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 		const ndJacobian* const jointInternalForces = &GetTempInternalForces()[0];
 		const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &GetJointBodyPairIndexBuffer()[0];
 
-		const ndInt32 bodyCount = bodyIndex.GetCount() - 1;
+		const ndInt32 bodyCount = ndInt32 (bodyIndex.GetCount()) - 1;
 		for (ndInt32 i = iterator1.fetch_add(D_WORKER_BATCH_SIZE); i < bodyCount; i = iterator1.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((bodyCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : bodyCount - i;
@@ -995,7 +995,7 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 		ndArray<ndLeftHandSide>& leftHandSide = m_leftHandSide;
 		ndArray<ndRightHandSide>& rightHandSide = m_rightHandSide;
 
-		const ndInt32 count = jointArray.GetCount();
+		const ndInt32 count = ndInt32 (jointArray.GetCount());
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
@@ -1030,7 +1030,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 		const ndVector timestep4(GetTimestepRK());
 		const ndVector speedFreeze2(m_world->m_freezeSpeed2 * ndFloat32(0.1f));
 
-		const ndInt32 count = bodyArray.GetCount() - GetUnconstrainedBodyCount();
+		const ndInt32 count = ndInt32 (bodyArray.GetCount() - GetUnconstrainedBodyCount());
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
@@ -1088,7 +1088,7 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 		const ndVector zero(ndVector::m_zero);
 		const ndFloat32 timestepRK = GetTimestepRK();
 
-		const ndInt32 count = jointArray.GetCount();
+		const ndInt32 count = ndInt32 (jointArray.GetCount());
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
@@ -1154,7 +1154,7 @@ void ndDynamicsUpdate::IntegrateBodies()
 		const ndFloat32 speedFreeze2 = world->m_freezeSpeed2;
 		const ndFloat32 accelFreeze2 = world->m_freezeAccel2;
 
-		const ndInt32 count = bodyArray.GetCount();
+		const ndInt32 count = ndInt32 (bodyArray.GetCount());
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
@@ -1189,7 +1189,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 		ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
 
 		const ndVector zero(ndVector::m_zero);
-		const ndInt32 bodyCount = bodyIndex.GetCount() - 1;
+		const ndInt32 bodyCount = ndInt32 (bodyIndex.GetCount()) - 1;
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < bodyCount; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((bodyCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : bodyCount - i;
@@ -1247,7 +1247,7 @@ void ndDynamicsUpdate::InitSkeletons()
 		ndArray<ndRightHandSide>& rightHandSide = m_rightHandSide;
 		const ndArray<ndLeftHandSide>& leftHandSide = m_leftHandSide;
 
-		const ndInt32 count = activeSkeletons.GetCount();
+		const ndInt32 count = ndInt32 (activeSkeletons.GetCount());
 		for (ndInt32 i = iterator++; i < count; i = iterator++)
 		{
 			ndSkeletonContainer* const skeleton = activeSkeletons[i];
@@ -1273,7 +1273,7 @@ void ndDynamicsUpdate::UpdateSkeletons()
 		D_TRACKTIME_NAMED(UpdateSkeletons);
 		ndJacobian* const internalForces = &GetInternalForces()[0];
 	
-		const ndInt32 count = activeSkeletons.GetCount();
+		const ndInt32 count = ndInt32 (activeSkeletons.GetCount());
 		for (ndInt32 i = iterator++; i < count; i = iterator++)
 		{
 			ndSkeletonContainer* const skeleton = activeSkeletons[i];
@@ -1435,7 +1435,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			outBody1.m_angular = torqueM1;
 		};
 
-		const ndInt32 jointCount = jointArray.GetCount();
+		const ndInt32 jointCount = ndInt32 (jointArray.GetCount());
 		for (ndInt32 i = iterator0.fetch_add(D_WORKER_BATCH_SIZE); i < jointCount; i = iterator0.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((jointCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : jointCount - i;
@@ -1459,7 +1459,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		const ndJacobian* const jointInternalForces = &GetTempInternalForces()[0];
 		const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &GetJointBodyPairIndexBuffer()[0];
 
-		const ndInt32 bodyCount = bodyArray.GetCount();
+		const ndInt32 bodyCount = ndInt32 (bodyArray.GetCount());
 		for (ndInt32 i = iterator1.fetch_add(D_WORKER_BATCH_SIZE); i < bodyCount; i = iterator1.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((bodyCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : bodyCount - i;

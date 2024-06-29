@@ -1657,7 +1657,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 	memset(scans, 0, sizeof(scans));
 	const ndInt32 threadCount = threadPool->GetThreadCount();
 
-	ndInt32 particleCount = data.m_hashGridMap.GetCount();
+	ndInt32 particleCount = ndInt32(data.m_hashGridMap.GetCount());
 
 	ndInt32 acc0 = 0;
 	ndInt32 stride = particleCount / threadCount;
@@ -1679,7 +1679,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
 		sums[i] = scansCount;
-		scansCount += data.m_partialsGridScans[i].GetCount();
+		scansCount += ndInt32(data.m_partialsGridScans[i].GetCount());
 	}
 	sums[threadCount] = scansCount;
 
@@ -1712,7 +1712,7 @@ void ndBodySphFluid::BuildBuckets(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
 	ndWorkingBuffers& data = *m_workingBuffers;
-	ndInt32 countReset = data.m_locks.GetCount();
+	ndInt32 countReset = ndInt32(data.m_locks.GetCount());
 	data.m_pairs.SetCount(m_posit.GetCount());
 	data.m_locks.SetCount(m_posit.GetCount());
 	data.m_pairCount.SetCount(m_posit.GetCount());
@@ -1814,7 +1814,7 @@ void ndBodySphFluid::BuildBuckets(ndThreadPool* const threadPool)
 			}
 		};
 
-		const ndInt32 scansCount = gridScans.GetCount() - 1;
+		const ndInt32 scansCount = ndInt32(gridScans.GetCount()) - 1;
 		for (ndInt32 i = threadIndex; i < scansCount; i += threadCount)
 		{
 			const ndInt32 start = gridScans[i];
@@ -1912,7 +1912,7 @@ void ndBodySphFluid::BuildBuckets(ndThreadPool* const threadPool)
 			}
 		};
 
-		const ndInt32 scansCount = gridScans.GetCount() - 1;
+		const ndInt32 scansCount = ndInt32(gridScans.GetCount()) - 1;
 		for (ndInt32 i = threadIndex; i < scansCount; i += threadCount)
 		{
 			const ndInt32 start = gridScans[i];
@@ -1956,7 +1956,7 @@ void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
 		//const ndFloat32 selfDensity = kernelConst * h2 * h2 * h2;
 		const ndFloat32 selfVolume = h2 * h2 * h2;
 
-		const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
+		const ndStartEnd startEnd(ndInt32(posit.GetCount()), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			const ndInt32 count = data.m_pairCount[i];
@@ -2008,7 +2008,7 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 
 		//const ndVector gravity(m_gravity);
 		const ndVector gravity(ndVector::m_zero);
-		const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
+		const ndStartEnd startEnd(ndInt32(posit.GetCount()), threadIndex, threadCount);
 		for (ndInt32 i0 = startEnd.m_start; i0 < startEnd.m_end; ++i0)
 		{
 			const ndVector p0(posit[i0]);
@@ -2074,7 +2074,7 @@ void ndBodySphFluid::IntegrateParticles(ndThreadPool* const threadPool)
 		//const ndVector timestep(m_timestep * 0.5f);
 		const ndVector timestep(m_timestep * 0.25f);
 
-		const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
+		const ndStartEnd startEnd(ndInt32(posit.GetCount()), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			veloc[i] = veloc[i] + accel[i] * timestep;
@@ -2111,7 +2111,7 @@ void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 		D_TRACKTIME_NAMED(CalculateAabb);
 		ndBox box;
 		const ndArray<ndVector>& posit = m_posit;
-		const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
+		const ndStartEnd startEnd(ndInt32(posit.GetCount()), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			box.m_min = box.m_min.GetMin(posit[i]);
@@ -2230,7 +2230,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 		const ndVector* const posit = &m_posit[0];
 		ndInt32* const scans = &data.m_gridScans[0];
 
-		const ndStartEnd startEnd(m_posit.GetCount(), threadIndex, threadCount);
+		const ndStartEnd startEnd(ndInt32(m_posit.GetCount()), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			const ndVector gridPosit(posit[i] - origin);
@@ -2263,7 +2263,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 		const ndVector invGridSize(data.m_hashInvGridSize);
 		const ndVector particleBox(data.m_particleDiameter);
 
-		const ndStartEnd startEnd(m_posit.GetCount(), threadIndex, threadCount);
+		const ndStartEnd startEnd(ndInt32(m_posit.GetCount()), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			const ndVector gridPosit(posit[i] - origin);

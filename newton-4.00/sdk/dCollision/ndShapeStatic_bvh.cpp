@@ -188,7 +188,7 @@ ndIntersectStatus ndShapeStatic_bvh::GetPolygon(void* const context, const ndFlo
 	ndInt32 count = indexCount * 2 + 3;
 	query.m_hitDistance.PushBack(hitDistance);
 	query.m_faceIndexCount.PushBack(indexCount);
-	query.m_faceIndexStart.PushBack(query.m_faceVertexIndex.GetCount());
+	query.m_faceIndexStart.PushBack(ndInt32(query.m_faceVertexIndex.GetCount()));
 
 	for (ndInt32 i = 0; i < count; ++i) 
 	{

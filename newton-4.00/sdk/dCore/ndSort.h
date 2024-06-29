@@ -476,7 +476,7 @@ template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
 void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scratchBuffer, ndUnsigned32* const prefixScanOut, void* const context)
 {
 	scratchBuffer.SetCount(array.GetCount());
-	ndCountingSort<T, ndEvaluateKey, keyBitSize>(threadPool, &array[0], &scratchBuffer[0], array.GetCount(), prefixScanOut, context);
+	ndCountingSort<T, ndEvaluateKey, keyBitSize>(threadPool, &array[0], &scratchBuffer[0], ndInt32(array.GetCount()), prefixScanOut, context);
 	array.Swap(scratchBuffer);
 }
 
@@ -484,7 +484,7 @@ template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
 void ndCountingSort(ndArray<T>& array, ndArray<T>& scratchBuffer, ndUnsigned32* const prefixScanOut, void* const context)
 {
 	scratchBuffer.SetCount(array.GetCount());
-	ndCountingSort<T, ndEvaluateKey, keyBitSize>(&array[0], &scratchBuffer[0], array.GetCount(), prefixScanOut, context);
+	ndCountingSort<T, ndEvaluateKey, keyBitSize>(&array[0], &scratchBuffer[0], ndInt32(array.GetCount()), prefixScanOut, context);
 	array.Swap(scratchBuffer);
 }
 

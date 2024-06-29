@@ -56,7 +56,7 @@ void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose& output, ndVector& veloc)
 	} 
 	else 
 	{
-		const int count = output.GetCount();
+		const int count = ndInt32(output.GetCount());
 		ndAnimKeyframe* const buffer = ndAlloca(ndAnimKeyframe, count + 32);
 		ndAnimationLocalPose localPose(buffer);
 		localPose.SetCount(count);

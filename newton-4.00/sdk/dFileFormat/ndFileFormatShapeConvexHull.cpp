@@ -51,5 +51,5 @@ ndShape* ndFileFormatShapeConvexHull::LoadShape(const nd::TiXmlElement* const no
 {
 	ndArray<ndVector> points;
 	xmlGetFloatArray3(node, "points", points);
-	return new ndShapeConvexHull(points.GetCount(), sizeof(ndVector), (0.0f), &points[0].m_x);
+	return new ndShapeConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), (0.0f), &points[0].m_x);
 }

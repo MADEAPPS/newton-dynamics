@@ -782,7 +782,7 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 						strcpy(material.m_textureName, token);
 
 						ndArray<ndMeshEffect::ndMaterial>& materials = effectMesh->GetMaterials();
-						ndInt32 materialIndex = materials.GetCount();
+						ndInt32 materialIndex = ndInt32(materials.GetCount());
 
 						ReadToken();
 						ndInt32 faceCount;
@@ -863,7 +863,7 @@ ndMesh* ndMesh::Load(const char* const fullPathName)
 				}
 				ReadToken();
 
-				format.m_faceCount = faceArray.GetCount();
+				format.m_faceCount = ndInt32(faceArray.GetCount());
 				format.m_faceIndexCount = &faceArray[0];
 				format.m_faceMaterial = &materialArray[0];
 				effectMesh->BuildFromIndexList(&format);
