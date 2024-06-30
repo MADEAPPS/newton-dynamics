@@ -25,6 +25,9 @@
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
 #include "ndBrainLayerLinear.h"
+#include "ndBrainGpuFloatBuffer.h"
+#include "ndBrainGpuIntegerBuffer.h"
+#include "ndBrainGpuUniformBuffer.h"
 
 #define D_USE_GPU_TILED_MATRIX
 

@@ -45,8 +45,12 @@
 #include <ndBrainReplayBuffer.h>
 #include <ndBrainOptimizerSgd.h>
 #include <ndBrainOptimizerAdam.h>
+#include <ndBrainGpuFloatBuffer.h>
 #include <ndBrainLayerActivation.h>
+#include <ndBrainGpuIntegerBuffer.h>
+#include <ndBrainGpuUniformBuffer.h>
 #include <ndBrainAgentDQN_Trainer.h>
+#include <ndBrainGpuScopeMapBuffer.h>
 #include <ndBrainAgentDDPG_Trainer.h>
 #include <ndBrainLayerImagePadding.h>
 #include <ndBrainLayerReluActivation.h>

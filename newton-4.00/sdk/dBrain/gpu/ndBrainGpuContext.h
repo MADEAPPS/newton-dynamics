@@ -122,6 +122,7 @@ class ndBrainGpuContext: public ndClassAlloc
 			VkShaderModule m_testShader;
 			VkShaderModule m_ndBrainCopyInput;
 			VkShaderModule m_ndBrainGetResults;
+			VkShaderModule m_ndBrainCopyBuffer;
 			VkShaderModule m_ndBrainLayerLinear;
 			VkShaderModule m_ndBrainLayerLinearTiled;
 			VkShaderModule m_ndBrainLayerRluActivation;

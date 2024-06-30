@@ -521,6 +521,7 @@ void ndBrainGpuContext::LoadShaderPrograms()
 
 	m_testShader = LoadShaderProgram("testShader-comp.spv");
 	m_ndBrainCopyInput = LoadShaderProgram("ndBrainCopyInput-comp.spv");
+	m_ndBrainCopyBuffer = LoadShaderProgram("ndBrainCopyBuffer-comp.spv");
 	m_ndBrainGetResults = LoadShaderProgram("ndBrainGetResults-comp.spv");
 	m_ndBrainLayerLinear = LoadShaderProgram("ndBrainLayerLinear-comp.spv");
 	m_ndBrainLayerLinearTiled = LoadShaderProgram("ndBrainLayerLinearTiled-comp.spv");

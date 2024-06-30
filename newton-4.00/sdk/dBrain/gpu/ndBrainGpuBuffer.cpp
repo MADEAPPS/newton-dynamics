@@ -13,42 +13,29 @@
 #include "ndBrainVector.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
+#include "ndBrainGpuScopeMapBuffer.h"
 
 #if defined (D_USE_VULKAN_SDK)
 
-ndScopeMapBuffer::ndScopeMapBuffer(ndBrainGpuBuffer& buffer)
-	:m_buffer(&buffer)
-{
-	VkDevice const device = (VkDevice)m_buffer->m_context->GetDevice();
+ndInt64 ndBrainGpuBuffer::m_memoryUsed = 0;
 
-	// Map the buffer memory, so that we can read from it on the CPU.
-	vkMapMemory(device, m_buffer->m_bufferMemory, 0, ndUnsigned32(m_buffer->m_sizeInBytes), 0, &m_mappedMemory);
-}
-
-ndScopeMapBuffer::~ndScopeMapBuffer()
-{
-	VkDevice const device = (VkDevice)m_buffer->m_context->GetDevice();
-	vkUnmapMemory(device, m_buffer->m_bufferMemory);
-}
-
-void* ndScopeMapBuffer::GetPointer() const
-{
-	return m_mappedMemory;
-}
-
-
-ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInByte, ndUnsigned32 bufferTypeFlags)
+ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags, ndDeviceBufferType deviceType)
 	:ndClassAlloc()
 	,m_context(context)
 	,m_sizeInBytes(sizeInByte)
+	,m_bufferType(bufferTypeFlags)
+	,m_deviceBufferType(deviceType)
 {
 	VkDevice const device = (VkDevice)m_context->GetDevice();
 	VkAllocationCallbacks* const allocators = (VkAllocationCallbacks*)m_context->GetAllocator();
 
+	ndAssert((deviceType == ndCpuMappable) || (deviceType == ndGpuOnly) && (bufferTypeFlags == ndStorageData));
+
 	VkBufferCreateInfo bufferCreateInfo = {};
 	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferCreateInfo.size = VkDeviceSize(sizeInByte); 
-	bufferCreateInfo.usage = VkBufferUsageFlagBits(bufferTypeFlags);
+	//bufferCreateInfo.usage = (bufferTypeFlags == ndStorageData) ? VK_DESCRIPTOR_TYPE_STORAGE_BUFFER : VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	bufferCreateInfo.usage = (bufferTypeFlags == ndStorageData) ? VK_BUFFER_USAGE_STORAGE_BUFFER_BIT : VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
 	bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE; 
 	ndBrainGpuContext::CheckResultVulkan(vkCreateBuffer(device, &bufferCreateInfo, allocators, &m_buffer));
 
@@ -59,28 +46,34 @@ ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 siz
 	allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocateInfo.allocationSize = memoryRequirements.size; // specify required memory.
 
-	//allocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-	VkMemoryPropertyFlags memoryProperty = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+	//VkMemoryPropertyFlags memoryProperty = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+	//VkMemoryPropertyFlags memoryProperty = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+	VkMemoryPropertyFlags memoryProperty = (deviceType == ndCpuMappable) ? VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) : VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 	allocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, memoryProperty);
 
 	ndBrainGpuContext::CheckResultVulkan(vkAllocateMemory(device, &allocateInfo, allocators, &m_bufferMemory)); 
 
 	// Now associate that allocated memory with the buffer. With that, the buffer is backed by actual memory. 
 	ndBrainGpuContext::CheckResultVulkan(vkBindBufferMemory(device, m_buffer, m_bufferMemory, 0));
+
+	m_memoryUsed += m_sizeInBytes;
+	ndTrace(("buffers memory %d (megBytes)\n", ndInt32(m_memoryUsed >> 20)));
 }
 
 ndBrainGpuBuffer::~ndBrainGpuBuffer()
 {
+	m_memoryUsed -= m_sizeInBytes;
 	VkDevice device = (VkDevice)m_context->GetDevice();
 	VkAllocationCallbacks* const allocators = (VkAllocationCallbacks*)m_context->GetAllocator();
 	vkFreeMemory(device, m_bufferMemory, allocators);
 	vkDestroyBuffer(device, m_buffer, allocators);
+
+	ndTrace(("buffers memory %d (megBytes)\n", ndInt32(m_memoryUsed >> 20)));
 }
 
-VkDescriptorType ndBrainGpuBuffer::GetType() const
+ndStorageBufferType ndBrainGpuBuffer::GetType() const
 {
-	ndAssert(0);
-	return VK_DESCRIPTOR_TYPE_MAX_ENUM;
+	return m_bufferType;
 }
 
 uint32_t ndBrainGpuBuffer::FindMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties)
@@ -99,6 +92,7 @@ uint32_t ndBrainGpuBuffer::FindMemoryType(uint32_t memoryTypeBits, VkMemoryPrope
 			return i;
 		}
 	}
+	ndAssert(0);
 	return uint32_t(-1);
 }
 
@@ -111,134 +105,6 @@ ndInt64 ndBrainGpuBuffer::SizeInBytes() const
 {
 	return m_sizeInBytes;
 }
-
-//*************************************************************************************
-//
-//*************************************************************************************
-ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt64 size)
-	:ndBrainGpuBuffer(context, size * ndInt32(sizeof(ndReal)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
-{
-}
-
-ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input)
-	:ndBrainGpuBuffer(context, input.GetCount() * ndInt32(sizeof(ndReal)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
-{
-	LoadData(input);
-}
-
-VkDescriptorType ndBrainGpuFloatBuffer::GetType() const
-{
-	return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-}
-
-//*************************************************************************************
-//
-//*************************************************************************************
-ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt64 size)
-	:ndBrainGpuBuffer(context, size* ndInt32(sizeof(ndInt32)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
-{
-}
-
-ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, const ndArray<ndInt32>& input)
-	:ndBrainGpuBuffer(context, input.GetCount()* ndInt32(sizeof(ndInt32)), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
-{
-	LoadData(input);
-}
-
-VkDescriptorType ndBrainGpuIntegerBuffer::GetType() const
-{
-	return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-}
-
-//*************************************************************************************
-//
-//*************************************************************************************
-ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes)
-	:ndBrainGpuBuffer(context, sizeInBytes, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
-{
-}
-
-ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data)
-	:ndBrainGpuBuffer(context, sizeInBytes, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
-{
-	LoadData(sizeInBytes, data);
-}
-
-void ndBrainGpuFloatBuffer::LoadData(const ndBrainVector& input)
-{
-	ndScopeMapBuffer mapBuffer(*this);
-	ndReal* const dst = (ndReal*)mapBuffer.GetPointer();
-	if (dst)
-	{
-		const ndInt64 size = m_sizeInBytes / ndInt32(sizeof(ndReal));
-		ndAssert(size == input.GetCount());
-
-		for (ndInt64 i = 0; i < size; ++i)
-		{
-			dst[i] = ndReal(input[i]);
-		}
-	}
-}
-
-void ndBrainGpuFloatBuffer::UnloadData(ndBrainVector& output)
-{
-	ndScopeMapBuffer mapBuffer(*this);
-	const ndReal* const src = (ndReal*)mapBuffer.GetPointer();
-	if (src)
-	{
-		const ndInt64 size = m_sizeInBytes / ndInt32(sizeof(ndReal));
-		output.SetCount(size);
-		const ndBrainMemVector srcData(src, size);
-		output.Set(srcData);
-	}
-}
-
-void ndBrainGpuIntegerBuffer::LoadData(const ndArray<ndInt32>& input)
-{
-	ndScopeMapBuffer mapBuffer(*this);
-	ndInt32* const dst = (ndInt32*)mapBuffer.GetPointer();
-	if (dst)
-	{
-		const ndInt64 size = m_sizeInBytes / ndInt32(sizeof(ndInt32));
-		ndAssert(size == input.GetCount());
-
-		for (ndInt64 i = 0; i < size; ++i)
-		{
-			dst[i] = input[i];
-		}
-	}
-}
-
-void ndBrainGpuIntegerBuffer::UnloadData(ndArray<ndInt32>& output)
-{
-	ndScopeMapBuffer mapBuffer(*this);
-	const ndInt32* const src = (ndInt32*)mapBuffer.GetPointer();
-	if (src)
-	{
-		const ndInt64 size = m_sizeInBytes / ndInt32(sizeof(ndInt32));
-		output.SetCount(size);
-		for (ndInt64 i = 0; i < size; ++i)
-		{
-			output[i] = src[i];
-		}
-	}
-}
-
-void ndBrainGpuUniformBuffer::LoadData(ndInt32 sizeInBytes, const void* const data)
-{
-	ndScopeMapBuffer mapBuffer(*this);
-	ndUnsigned8* const dst = (ndUnsigned8*)mapBuffer.GetPointer();
-	if (dst)
-	{
-		ndMemCpy(dst, (ndUnsigned8*)data, sizeInBytes);
-	}
-}
-
-VkDescriptorType ndBrainGpuUniformBuffer::GetType() const
-{
-	return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-}
-
 #endif
 
 

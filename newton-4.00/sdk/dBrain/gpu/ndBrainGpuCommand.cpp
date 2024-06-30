@@ -13,6 +13,9 @@
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
+#include "ndBrainGpuFloatBuffer.h"
+#include "ndBrainGpuIntegerBuffer.h"
+#include "ndBrainGpuUniformBuffer.h"
 
 #if defined (D_USE_VULKAN_SDK)
 
@@ -57,7 +60,7 @@ void ndBrainGpuCommand::Assembly(VkShaderModule shader, ndInt32 workGroups, ndIn
 		VkDescriptorSetLayoutBinding binding = {};
 
 		binding.binding = uint32_t(i);
-		binding.descriptorType = params[i]->GetType();
+		binding.descriptorType = (params[i]->GetType() == ndUniformData) ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER : VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 		binding.descriptorCount = 1;
 		binding.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
 		layoutBinding.PushBack(binding);
@@ -90,7 +93,8 @@ void ndBrainGpuCommand::Assembly(VkShaderModule shader, ndInt32 workGroups, ndIn
 		set.dstSet = m_descriptorSet;
 		set.dstBinding = uint32_t(i);
 		set.descriptorCount = 1;
-		set.descriptorType = params[i]->GetType();
+		//set.descriptorType = params[i]->GetType();
+		set.descriptorType = (params[i]->GetType() == ndUniformData) ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER : VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 		set.pBufferInfo = &bufferInfo[i];
 		descriptorSet.PushBack(set);
 	}

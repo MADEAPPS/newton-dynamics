@@ -22,7 +22,9 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
-#include "ndBrainGpuBuffer.h"
+#include "ndBrainGpuFloatBuffer.h"
+#include "ndBrainGpuIntegerBuffer.h"
+#include "ndBrainGpuUniformBuffer.h"
 
 class ndBrainGpuContext;
 

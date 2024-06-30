@@ -19,24 +19,25 @@ class ndBrainGpuBuffer;
 
 #define ND_GPU_BUFFER_ALIGNMENT	32
 
-#if !defined (D_USE_VULKAN_SDK)
 
-class ndScopeMapBuffer
+enum ndStorageBufferType
 {
-	public:
-	ndScopeMapBuffer(ndBrainGpuBuffer& buffer):m_mappedMemory(nullptr), m_buffer(&buffer){}
-	~ndScopeMapBuffer(){}
-	void* GetPointer() const{return m_mappedMemory;}
-
-	private:
-	void* m_mappedMemory;
-	ndBrainGpuBuffer* m_buffer;
+	ndStorageData,
+	ndUniformData
 };
+
+enum ndDeviceBufferType
+{
+	ndGpuOnly,
+	ndCpuMappable,
+};
+
+#if !defined (D_USE_VULKAN_SDK)
 
 class ndBrainGpuBuffer : public ndClassAlloc
 {
 	protected:
-	ndBrainGpuBuffer(ndBrainGpuContext* const, ndInt32, ndUnsigned32):m_sizeInBytes(0){}
+	ndBrainGpuBuffer(ndBrainGpuContext* const, ndInt64, ndStorageBufferType, ndDeviceBufferType):m_sizeInBytes(0){}
 	virtual ~ndBrainGpuBuffer(){}
 
 	public:
@@ -48,45 +49,7 @@ class ndBrainGpuBuffer : public ndClassAlloc
 	friend class ndScopeMapBuffer;
 };
 
-class ndBrainGpuIntegerBuffer : public ndBrainGpuBuffer
-{
-	public:
-	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt32 size) : ndBrainGpuBuffer(context, size, 0) {}
-	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, const ndArray<ndInt32>&) : ndBrainGpuBuffer(context, 0, 0) {}
-	void UnloadData(ndArray<ndInt32>&) {}
-	void LoadData(const ndArray<ndInt32>&) {}
-};
-
-class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
-{
-	public:
-	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt32 size): ndBrainGpuBuffer(context, size, 0){}
-	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector&) : ndBrainGpuBuffer(context, 0, 0) {}
-	void UnloadData(ndBrainVector&) {}
-	void LoadData(const ndBrainVector&) {}
-};
-
-class ndBrainGpuUniformBuffer : public ndBrainGpuBuffer
-{
-	public:
-	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32) : ndBrainGpuBuffer(context, 0, 0) {}
-	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32, const void* const) : ndBrainGpuBuffer(context, 0, 0) {}
-	void LoadData(ndInt32, const void* const) {}
-};
-
 #else
-
-class ndScopeMapBuffer
-{
-	public:
-	ndScopeMapBuffer(ndBrainGpuBuffer& buffer);
-	~ndScopeMapBuffer();
-	void* GetPointer() const;
-
-	private:
-	void* m_mappedMemory;
-	ndBrainGpuBuffer* m_buffer;
-};
 
 class ndBrainGpuBuffer : public ndClassAlloc
 {
@@ -94,55 +57,22 @@ class ndBrainGpuBuffer : public ndClassAlloc
 	virtual ~ndBrainGpuBuffer();
 	VkBuffer GetBuffer() const;
 	ndInt64 SizeInBytes() const;
-	virtual VkDescriptorType GetType() const;
+	ndStorageBufferType GetType() const;
 	
 	protected:
-	ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInByte, ndUnsigned32 bufferTypeFlags);
+	ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags, ndDeviceBufferType deviceType);
 	uint32_t FindMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
 
 	VkBuffer m_buffer;
 	VkDeviceMemory m_bufferMemory;
 	ndBrainGpuContext* m_context;
 	ndInt64 m_sizeInBytes;
+	ndStorageBufferType m_bufferType;
+	ndDeviceBufferType m_deviceBufferType;
+
+	static ndInt64 m_memoryUsed;
 	friend class ndScopeMapBuffer;
 };
-
-// **************************************************************************
-// 
-// **************************************************************************
-class ndBrainGpuIntegerBuffer : public ndBrainGpuBuffer
-{
-	public:
-	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt64 size);
-	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, const ndArray<ndInt32>& input);
-
-	VkDescriptorType GetType() const;
-	void UnloadData(ndArray<ndInt32>& output);
-	void LoadData(const ndArray<ndInt32>& input);
-};
-
-class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
-{
-	public:
-	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt64 size);
-	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input);
-
-	VkDescriptorType GetType() const;
-	void UnloadData(ndBrainVector& output);
-	void LoadData(const ndBrainVector& input);
-};
-
-class ndBrainGpuUniformBuffer : public ndBrainGpuBuffer
-{
-	public:
-	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes);
-	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data);
-
-	VkDescriptorType GetType() const;
-	void LoadData(ndInt32 sizeInBytes, const void* const data);
-};
-
 #endif
-
 
 #endif

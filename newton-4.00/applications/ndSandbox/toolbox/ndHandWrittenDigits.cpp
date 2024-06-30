@@ -162,7 +162,6 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	ndBrainVector workBuffer;
 	ndBrainVector outputBuffer;
 	inference.GetResults(outputBuffer);
-	inference.GetWorkBuffer(workBuffer);
 
 	ndInt32 failCount = 0;
 	const ndInt32 outputSize = ndInt32((*testLabels)[0].GetCount());
@@ -178,11 +177,11 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 		const ndBrainVector& input = (*testDigits)[i];
 		ndBrainMemVector outputCpu (&output[i * outputSize], outputSize);
 		brain.MakePrediction(input, outputCpu, workingBuffer);
-		#ifdef _DEBUG
-		const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();		
-		ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
-		brain.MakePrediction_____(input, outputCpu, workingBuffer, workBufferBatch, offsets);
-		#endif
+		//#ifdef _DEBUG
+		//const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();		
+		//ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
+		//brain.MakePrediction_____(input, outputCpu, workingBuffer, workBufferBatch, offsets);
+		//#endif
 	}
 	cpuTime = ndGetTimeInMicroseconds() - cpuTime;
 	ndExpandTraceMessage("cpuTime %f (sec)\n", ndFloat64(cpuTime) / 1000000.0f);
@@ -210,24 +209,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 				maxProbabilityGpu = outputGpu[j];
 			}
 		}
-
-		if (indexGpu != indexCpu)
-		{
-			#ifdef _DEBUG
-			ndAssert(0);
-			const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();
-			ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
-			for (ndInt32 j = 0; j < brain.GetCount(); ++j)
-			{
-				ndInt32 n0 = offsets[j + 0];
-				ndInt32 n1 = offsets[j + 1];
-				ndInt32 n2 = offsets[j + 2];
-				const ndBrainMemVector xxxx0(&workBufferBatch[n0], n1 - n0);
-				const ndBrainMemVector xxxx1(&workBufferBatch[n1], n2 - n1);
-				j *= 1;
-			}
-			#endif
-		}
+		ndAssert(indexGpu == indexCpu);
 	
 		ndAssert(indexCpu >= 0);
 		if (truth[indexCpu] == ndReal(0.0f))
@@ -245,7 +227,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 //#pragma optimize( "", off )
 static void MnistTrainingSet()
 {
-	#define USE_CONVOLUTIONAL_LAYERS
+	//#define USE_CONVOLUTIONAL_LAYERS
 
 	#define BATCH_BUFFER_SIZE				64
 	#define CONVOLUTIONAL_FEATURE_MAPS		32

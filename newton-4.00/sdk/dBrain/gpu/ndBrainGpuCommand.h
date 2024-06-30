@@ -15,6 +15,7 @@
 
 class ndBrainGpuContext;
 class ndBrainGpuFloatBuffer;
+class ndBrainGpuUniformBuffer;
 
 #if !defined (D_USE_VULKAN_SDK)
 
