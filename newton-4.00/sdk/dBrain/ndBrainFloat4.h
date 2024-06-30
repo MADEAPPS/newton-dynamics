@@ -44,6 +44,7 @@ class ndBrainFloat4
 	ndBrainFloat4 operator- (const ndBrainFloat4& A) const;
 	ndBrainFloat4 operator* (const ndBrainFloat4& A) const;
 
+	ndBrainFloat HorizontalAdd() const;
 	ndBrainFloat4 MulAdd(const ndBrainFloat4& A, const ndBrainFloat4& B) const;
 	ndBrainFloat4 MulSub(const ndBrainFloat4& A, const ndBrainFloat4& B) const;
 
@@ -144,6 +145,12 @@ inline ndBrainFloat4 ndBrainFloat4::operator* (const ndBrainFloat4& A) const
 	return _mm_mul_ps(m_type, A.m_type);
 }
 
+inline ndBrainFloat ndBrainFloat4::HorizontalAdd() const
+{
+	__m128 tmp(_mm_hadd_ps(m_type, m_type));
+	return _mm_cvtss_f32(_mm_hadd_ps(tmp, tmp));
+}
+
 inline ndBrainFloat4 ndBrainFloat4::MulAdd(const ndBrainFloat4& A, const ndBrainFloat4& B) const
 {
 	return _mm_add_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
@@ -232,6 +239,11 @@ inline ndBrainFloat4 ndBrainFloat4::operator- (const ndBrainFloat4& A) const
 inline ndBrainFloat4 ndBrainFloat4::operator* (const ndBrainFloat4& A) const
 {
 	return ndBrainFloat4(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
+}
+
+inline ndBrainFloat ndBrainFloat4::HorizontalAdd() const
+{
+	return m_x + m_y + m_z + m_w;
 }
 
 inline ndBrainFloat4 ndBrainFloat4::MulAdd(const ndBrainFloat4& A, const ndBrainFloat4& B) const

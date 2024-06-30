@@ -421,7 +421,8 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 			inputBase += m_inputWidth;
 			inputDerivativeBase += m_outputWidth;
 		}
-		value += valueSim.m_x + valueSim.m_y + valueSim.m_z + valueSim.m_w;
+		//value += valueSim.m_x + valueSim.m_y + valueSim.m_z + valueSim.m_w;
+		value += valueSim.HorizontalAdd();
 		return value;
 	};
 
@@ -582,25 +583,20 @@ void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, nd
 	auto CrossCorrelationSimd = [this, &convKernelSimd](const ndBrainVector& input)
 	{
 		ndBrainFloat4 value(0.0f);
-		for (ndInt32 i = 0; i < (m_inputOffsets.GetCount() & -4); i += 4)
+		for (ndInt32 i = 0; i < (m_inputOffsets.GetCount() & -8); i += 8)
 		{
-			ndInt32 index = m_inputOffsets[i + 0];
-			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 0];
-
-			index = m_inputOffsets[i + 1];
-			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 1];
-
-			index = m_inputOffsets[i + 2];
-			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 2];
-
-			index = m_inputOffsets[i + 3];
-			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 3];
+			for (ndInt32 j = 0; j < 8; ++j)
+			{
+				ndInt32 index = m_inputOffsets[i + j];
+				const ndBrainFloat4& src = (ndBrainFloat4&)input[index];
+				value = value + src * convKernelSimd[i + j];
+			}
 		}
-		for (ndInt32 i = m_inputOffsets.GetCount() & -4; i < m_inputOffsets.GetCount(); ++i)
+		for (ndInt32 i = m_inputOffsets.GetCount() & -8; i < m_inputOffsets.GetCount(); ++i)
 		{
 			ndInt32 index = m_inputOffsets[i];
-			const ndBrainFloat4* const src = (ndBrainFloat4*)&input[index];
-			value = value + src[0] * convKernelSimd[i];
+			const ndBrainFloat4& src = (ndBrainFloat4&)input[index];
+			value = value + src * convKernelSimd[i];
 		}
 		return value;
 	};
