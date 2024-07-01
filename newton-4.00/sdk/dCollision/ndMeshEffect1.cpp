@@ -1709,10 +1709,20 @@ void ndMeshEffect::ndPointFormat::CompressData(
 	class CompareKey
 	{
 		public:
-		ndInt32 Compare(const ndSortKey& elementA, const ndSortKey& elementB, void* const context) const
+		//ndInt32 Compare(const ndSortKey& elementA, const ndSortKey& elementB, void* const context) const
+		//{
+		//	return ndMeshEffect::ndFormat::CompareVertex(&elementA, &elementB, context);
+		//}
+		CompareKey(void* const context)
+			:m_context((ndVertexSortData*)context)
 		{
-			return ndMeshEffect::ndFormat::CompareVertex(&elementA, &elementB, context);
 		}
+
+		ndInt32 Compare(const ndSortKey& elementA, const ndSortKey& elementB) const
+		{
+			return ndMeshEffect::ndFormat::CompareVertex(&elementA, &elementB, m_context);
+		}
+		ndVertexSortData* m_context;
 	};
 	ndSort<ndSortKey, CompareKey>(remapIndex, cluster.m_count, &sortContext);
 

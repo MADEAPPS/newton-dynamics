@@ -24,7 +24,6 @@
 
 #include "ndBrainStdafx.h"
 
-#if 0
 class ndBrainFloat8 
 {
 	public: 
@@ -34,7 +33,7 @@ class ndBrainFloat8
 #endif
 	ndBrainFloat8(const ndBrainFloat a);
 	ndBrainFloat8(const ndBrainFloat8& src);
-	ndBrainFloat8(const ndBrainFloat* const ptr);
+	//ndBrainFloat8(const ndBrainFloat* const ptr);
 	ndBrainFloat8(ndBrainFloat x0, ndBrainFloat x1, ndBrainFloat x2, ndBrainFloat x3,
 				  ndBrainFloat x4, ndBrainFloat x5, ndBrainFloat x6, ndBrainFloat x7);
 	~ndBrainFloat8();
@@ -49,15 +48,9 @@ class ndBrainFloat8
 	ndBrainFloat8 MulAdd(const ndBrainFloat8& A, const ndBrainFloat8& B) const;
 	ndBrainFloat8 MulSub(const ndBrainFloat8& A, const ndBrainFloat8& B) const;
 
-	// logical operations;
-	//ndBrainFloat8 operator& (const ndBrainFloat8& data) const;
-	//ndBrainFloat8 operator| (const ndBrainFloat8& data) const;
-	//ndBrainFloat8 operator> (const ndBrainFloat8& data) const;
-	//ndBrainFloat8 operator< (const ndBrainFloat8& data) const;
-
 	union
 	{
-		ndBrainFloat m_f[4];
+		ndBrainFloat m_f[8];
 		#ifdef D_NEWTON_USE_AVX2_OPTION
 		__m256 m_type;
 		#endif
@@ -83,25 +76,23 @@ inline ndBrainFloat8::ndBrainFloat8(const __m256 type)
 }
 
 inline ndBrainFloat8::ndBrainFloat8(const ndBrainFloat a)
-	:m_type(_mm_set1_ps(a))
+	:m_type(_mm256_set1_ps(a))
 {
 }
 
-inline ndBrainFloat8::ndBrainFloat8(ndInt32 x, ndInt32 y, ndInt32 z, ndInt32 w)
-	:m_typeInt(_mm_set_epi32(w, z, y, x))
+inline ndBrainFloat8::ndBrainFloat8(
+	ndBrainFloat x0, ndBrainFloat x1, ndBrainFloat x2, ndBrainFloat x3,
+	ndBrainFloat x4, ndBrainFloat x5, ndBrainFloat x6, ndBrainFloat x7)
 {
 	ndAssert(0);
-}
-
-inline ndBrainFloat8::ndBrainFloat8(ndBrainFloat x, ndBrainFloat y, ndBrainFloat z, ndBrainFloat w)
-	:m_type(_mm_set_ps(w, z, y, x))
-{
-	ndAssert(0);
-}
-
-inline ndBrainFloat8::ndBrainFloat8(const ndBrainFloat* const ptr)
-	:m_type(_mm_loadu_ps(ptr))
-{
+	m_f[0] = x0;
+	m_f[1] = x1;
+	m_f[2] = x2;
+	m_f[3] = x3;
+	m_f[4] = x4;
+	m_f[5] = x5;
+	m_f[6] = x6;
+	m_f[7] = x7;
 }
 
 inline ndBrainFloat8::~ndBrainFloat8()
@@ -116,47 +107,37 @@ inline ndBrainFloat8& ndBrainFloat8::operator= (const ndBrainFloat8& A)
 
 inline ndBrainFloat8 ndBrainFloat8::operator+ (const ndBrainFloat8& A) const
 {
-	return _mm_add_ps(m_type, A.m_type);
+	return _mm256_add_ps(m_type, A.m_type);
 }
 
 inline ndBrainFloat8 ndBrainFloat8::operator- (const ndBrainFloat8& A) const
 {
-	return _mm_sub_ps(m_type, A.m_type);
+	return _mm256_sub_ps(m_type, A.m_type);
 }
 
 inline ndBrainFloat8 ndBrainFloat8::operator* (const ndBrainFloat8& A) const
 {
-	return _mm_mul_ps(m_type, A.m_type);
+	return _mm256_mul_ps(m_type, A.m_type);
+}
+
+inline ndBrainFloat ndBrainFloat8::HorizontalAdd() const
+{
+	__m128 tmp0(_mm_add_ps(_mm256_castps256_ps128(m_type), _mm256_extractf128_ps(m_type, 1)));
+	__m128 tmp1(_mm_add_ps(tmp0, _mm_shuffle_ps(tmp0, tmp0, PERMUTE_MASK(1, 0, 3, 2))));
+	__m128 tmp2(_mm_add_ps(tmp1, _mm_shuffle_ps(tmp1, tmp1, PERMUTE_MASK(2, 3, 0, 1))));
+	return _mm_cvtss_f32(tmp2);
 }
 
 inline ndBrainFloat8 ndBrainFloat8::MulAdd(const ndBrainFloat8& A, const ndBrainFloat8& B) const
 {
-	return _mm_add_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
+	//return _mm_add_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
+	return _mm256_fmadd_ps(A.m_type, B.m_type, m_type);
 }
 
 inline ndBrainFloat8 ndBrainFloat8::MulSub(const ndBrainFloat8& A, const ndBrainFloat8& B) const
 {
-	return _mm_sub_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
-}
-
-inline ndBrainFloat8 ndBrainFloat8::operator& (const ndBrainFloat8& data) const
-{
-	return _mm_and_ps(m_type, data.m_type);
-}
-
-inline ndBrainFloat8 ndBrainFloat8::operator| (const ndBrainFloat8& data) const
-{
-	return _mm_or_ps(m_type, data.m_type);
-}
-
-inline ndBrainFloat8 ndBrainFloat8::operator> (const ndBrainFloat8& data) const
-{
-	return _mm_cmpgt_ps(m_type, data.m_type);
-}
-
-inline ndBrainFloat8 ndBrainFloat8::operator< (const ndBrainFloat8& data) const
-{
-	return _mm_cmplt_ps(m_type, data.m_type);
+	//return _mm_sub_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
+	return _mm256_fnmadd_ps(A.m_type, B.m_type, m_type);
 }
 
 #else
@@ -181,7 +162,8 @@ inline ndBrainFloat8::ndBrainFloat8(const ndBrainFloat a)
 	}
 }
 
-inline ndBrainFloat8::ndBrainFloat8(ndBrainFloat x0, ndBrainFloat x1, ndBrainFloat x2, ndBrainFloat x3,
+inline ndBrainFloat8::ndBrainFloat8(
+	ndBrainFloat x0, ndBrainFloat x1, ndBrainFloat x2, ndBrainFloat x3,
 	ndBrainFloat x4, ndBrainFloat x5, ndBrainFloat x6, ndBrainFloat x7)
 {
 	m_f[0] = x0;
@@ -270,6 +252,3 @@ inline ndBrainFloat8 ndBrainFloat8::MulSub(const ndBrainFloat8& A, const ndBrain
 
 #endif
 #endif
-
-#endif 
-
