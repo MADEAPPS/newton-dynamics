@@ -21,6 +21,7 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainFloat4.h"
+#include "ndBrainFloat8.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
@@ -454,6 +455,7 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 	}
 
 	// calculate input gradients
+	ndAssert(0);
 	ndBrainFloat4 convKernelSimd[64];
 
 	const ndInt32 paddSizeWidth = m_inputWidth + m_kernelSize - 1;
