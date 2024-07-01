@@ -173,7 +173,7 @@ void ndBrainLayerImagePadding::MakePrediction(const ndBrainVector& input, ndBrai
 	}
 }
 
-void ndBrainLayerImagePadding::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerImagePadding::InputDerivative(const ndBrainVector&, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	const ndInt32 outputWidth = GetOutputWidth();
 	const ndInt32 outputHeight = GetOutputHeight();

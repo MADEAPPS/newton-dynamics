@@ -39,7 +39,7 @@ class ndBrainLayerLinearWithDropOut : public ndBrainLayerLinear
 	virtual void EnableDropOut(bool state);
 	virtual const char* GetLabelId() const;
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	virtual void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 
 	virtual void CalculateParamGradients(
 		const ndBrainVector& input, const ndBrainVector& output,

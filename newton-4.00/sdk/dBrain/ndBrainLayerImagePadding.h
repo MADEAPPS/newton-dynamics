@@ -48,7 +48,7 @@ class ndBrainLayerImagePadding : public ndBrainLayerActivation
 	const char* GetLabelId() const;
 	void Save(const ndBrainSave* const loadSave) const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	void InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 		
 	ndInt32 m_width;
 	ndInt32 m_height;

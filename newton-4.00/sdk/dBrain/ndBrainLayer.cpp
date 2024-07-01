@@ -174,7 +174,7 @@ void ndBrainLayer::MakePrediction(const ndBrainVector&, ndBrainVector&) const
 	ndAssert(0);
 }
 
-void ndBrainLayer::InputDerivative(const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
+void ndBrainLayer::InputDerivative(const ndBrainVector&, const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
 {
 	ndAssert(0);
 }

@@ -221,7 +221,7 @@ void ndBrainLayerImagePolling_2x2::MakePrediction(const ndBrainVector& input, nd
 }
 
 
-void ndBrainLayerImagePolling_2x2::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerImagePolling_2x2::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	//ndAssert(m_index.GetCount() == outputDerivative.GetCount());
 	ndAssert(output.GetCount() == outputDerivative.GetCount());

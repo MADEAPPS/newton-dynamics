@@ -361,7 +361,7 @@ ndBrainLayer* ndBrainLayerConvolutional_2d::Load(const ndBrainLoad* const loadSa
 }
 
 //void ndBrainLayerConvolutional_2d::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
-void ndBrainLayerConvolutional_2d::InputDerivative(const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
+void ndBrainLayerConvolutional_2d::InputDerivative(const ndBrainVector&, const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
 {
 	ndAssert(0);
 }
@@ -454,12 +454,11 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 	}
 
 	// calculate input gradients
-	ndAssert(0);
 	ndBrainFloat4 convKernelSimd[64];
 
 	const ndInt32 paddSizeWidth = m_inputWidth + m_kernelSize - 1;
 	const ndInt32 paddSizeHeight = m_inputHeight + m_kernelSize - 1;
-	ndBrainMemVector paddedGradientOut(&output[0] + GetOutputSize(), paddSizeWidth * paddSizeHeight);
+	ndBrainMemVector paddedGradientOut(&output[0] + GetOutputSize(), ndInt32 (paddSizeWidth * paddSizeHeight));
 	paddedGradientOut.Set(ndBrainFloat(0.0f));
 
 	auto RotateKernelSimd = [&convKernelSimd](const ndBrainVector& kernel)

@@ -251,8 +251,9 @@ void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& 
 	{
 		const ndBrainLayer* const layer = layers[i];
 		gradientIn.SetSize(layer->GetInputSize());
+		const ndBrainMemVector in(memBuffer + prefixScan[i + 0], layer->GetOutputSize());
 		const ndBrainMemVector out(memBuffer + prefixScan[i + 1], layer->GetOutputSize());
-		layer->InputDerivative(out, gradientOut, gradientIn);
+		layer->InputDerivative(in, out, gradientOut, gradientIn);
 		gradientIn.Swap(gradientOut);
 	}
 	inputGradients.Set(gradientOut);

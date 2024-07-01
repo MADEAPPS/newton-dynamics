@@ -388,7 +388,7 @@ void ndBrainLayerCrossCorrelation_2d::MakePrediction(const ndBrainVector& input,
 }
 
 //void ndBrainLayerCrossCorrelation_2d::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
-void ndBrainLayerCrossCorrelation_2d::InputDerivative(const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
+void ndBrainLayerCrossCorrelation_2d::InputDerivative(const ndBrainVector&, const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
 {
 	ndAssert(0);
 }

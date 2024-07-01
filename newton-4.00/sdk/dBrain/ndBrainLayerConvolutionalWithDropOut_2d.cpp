@@ -109,7 +109,7 @@ void ndBrainLayerConvolutionalWithDropOut_2d::MakePrediction(const ndBrainVector
 	}
 }
 
-void ndBrainLayerConvolutionalWithDropOut_2d::InputDerivative(const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
+void ndBrainLayerConvolutionalWithDropOut_2d::InputDerivative(const ndBrainVector&, const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
 {
 	ndAssert(0);
 }

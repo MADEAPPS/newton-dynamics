@@ -103,7 +103,7 @@ void ndBrainLayerLinearWithDropOut::MakePrediction(const ndBrainVector& input, n
 }
 
 //void ndBrainLayerLinearWithDropOut::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
-void ndBrainLayerLinearWithDropOut::InputDerivative(const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
+void ndBrainLayerLinearWithDropOut::InputDerivative(const ndBrainVector&, const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
 {
 	ndAssert(0);
 	//m_weights.TransposeMul(outputDerivative, inputDerivative);
