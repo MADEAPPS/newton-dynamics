@@ -23,17 +23,17 @@
 #include "ndBrain.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerLinear.h"
-#include "ndBrainLayerReluActivation.h"
-#include "ndBrainLayerTanhActivation.h"
+#include "ndBrainLayerActivationRelu.h"
+#include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLayerImagePolling_2x2.h"
 #include "ndBrainLayerConvolutional_2d.h"
-#include "ndBrainLayerSoftmaxActivation.h"
-#include "ndBrainLayerSigmoidActivation.h"
+#include "ndBrainLayerActivationSoftmax.h"
+#include "ndBrainLayerActivationSigmoid.h"
 //#include "ndBrainLayerLinearWithDropOut.h"
 #include "ndBrainLayerCrossCorrelation_2d.h"
 //#include "ndBrainLayerConvolutionalWithDropOut_2d.h"
-#include "ndBrainLayerSigmoidLinearActivation.h"
-#include "ndBrainLayerCategoricalSoftmaxActivation.h"
+#include "ndBrainLayerActivationSigmoidLinear.h"
+#include "ndBrainLayerActivationCategoricalSoftmax.h"
 
 ndBrain* ndBrainLoad::Load(const char* const pathName)
 {
@@ -106,29 +106,29 @@ ndBrain* ndBrainLoad::Load() const
 		{
 			layer = ndBrainLayerLinear::Load(this);
 		}
-		else if (!strcmp(layerType, "ndBrainLayerReluActivation"))
+		else if (!strcmp(layerType, "ndBrainLayerActivationRelu"))
 		{
-			layer = ndBrainLayerReluActivation::Load(this);
+			layer = ndBrainLayerActivationRelu::Load(this);
 		}
-		else if (!strcmp(layerType, "ndBrainLayerTanhActivation"))
+		else if (!strcmp(layerType, "ndBrainLayerActivationTanh"))
 		{
-			layer = ndBrainLayerTanhActivation::Load(this);
+			layer = ndBrainLayerActivationTanh::Load(this);
 		}
-		else if (!strcmp(layerType, "ndBrainLayerSigmoidActivation"))
+		else if (!strcmp(layerType, "ndBrainLayerActivationSigmoid"))
 		{
-			layer = ndBrainLayerSigmoidActivation::Load(this);
+			layer = ndBrainLayerActivationSigmoid::Load(this);
 		}
-		else if (!strcmp(layerType, "ndBrainLayerSigmoidLinearActivation"))
+		else if (!strcmp(layerType, "ndBrainLayerActivationSigmoidLinear"))
 		{
-			layer = ndBrainLayerSigmoidLinearActivation::Load(this);
+			layer = ndBrainLayerActivationSigmoidLinear::Load(this);
 		}
-		else if (!strcmp(layerType, "ndBrainLayerSoftmaxActivation"))
+		else if (!strcmp(layerType, "ndBrainLayerActivationSoftmax"))
 		{
-			layer = ndBrainLayerSoftmaxActivation::Load(this);
+			layer = ndBrainLayerActivationSoftmax::Load(this);
 		}
-		else if (!strcmp(layerType, "ndBrainLayerCategoricalSoftmaxActivation"))
+		else if (!strcmp(layerType, "ndBrainLayerActivationCategoricalSoftmax"))
 		{
-			layer = ndBrainLayerCategoricalSoftmaxActivation::Load(this);
+			layer = ndBrainLayerActivationCategoricalSoftmax::Load(this);
 		}
 		else if (!strcmp(layerType, "ndBrainLayerApproximateTanhActivation"))
 		{

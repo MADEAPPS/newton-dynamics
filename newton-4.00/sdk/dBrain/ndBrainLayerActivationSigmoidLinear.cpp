@@ -20,41 +20,41 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainLayerSigmoidLinearActivation.h"
+#include "ndBrainLayerActivationSigmoidLinear.h"
 
-ndBrainLayerSigmoidLinearActivation::ndBrainLayerSigmoidLinearActivation(ndInt32 neurons)
+ndBrainLayerActivationSigmoidLinear::ndBrainLayerActivationSigmoidLinear(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)
 {
 }
 
-ndBrainLayerSigmoidLinearActivation::ndBrainLayerSigmoidLinearActivation(const ndBrainLayerSigmoidLinearActivation& src)
+ndBrainLayerActivationSigmoidLinear::ndBrainLayerActivationSigmoidLinear(const ndBrainLayerActivationSigmoidLinear& src)
 	:ndBrainLayerActivation(src)
 {
 }
 
-ndBrainLayer* ndBrainLayerSigmoidLinearActivation::Clone() const
+ndBrainLayer* ndBrainLayerActivationSigmoidLinear::Clone() const
 {
-	return new ndBrainLayerSigmoidLinearActivation(*this);
+	return new ndBrainLayerActivationSigmoidLinear(*this);
 }
 
-const char* ndBrainLayerSigmoidLinearActivation::GetLabelId() const
+const char* ndBrainLayerActivationSigmoidLinear::GetLabelId() const
 {
-	return "ndBrainLayerSigmoidLinearActivation";
+	return "ndBrainLayerActivationSigmoidLinear";
 }
 
-ndBrainLayer* ndBrainLayerSigmoidLinearActivation::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerActivationSigmoidLinear::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
 	loadSave->ReadString(buffer);
 
 	loadSave->ReadString(buffer);
 	ndInt32 inputs = loadSave->ReadInt();
-	ndBrainLayerSigmoidLinearActivation* const layer = new ndBrainLayerSigmoidLinearActivation(inputs);
+	ndBrainLayerActivationSigmoidLinear* const layer = new ndBrainLayerActivationSigmoidLinear(inputs);
 	loadSave->ReadString(buffer);
 	return layer;
 }
 
-void ndBrainLayerSigmoidLinearActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+void ndBrainLayerActivationSigmoidLinear::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
@@ -70,7 +70,7 @@ void ndBrainLayerSigmoidLinearActivation::MakePrediction(const ndBrainVector& in
 	}
 }
 
-void ndBrainLayerSigmoidLinearActivation::InputDerivative(const ndBrainVector& input, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerActivationSigmoidLinear::InputDerivative(const ndBrainVector& input, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndAssert(input.GetCount() == outputDerivative.GetCount());
 	ndAssert(input.GetCount() == inputDerivative.GetCount());

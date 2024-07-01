@@ -21,30 +21,30 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainLayerCategoricalSoftmaxActivation.h"
+#include "ndBrainLayerActivationCategoricalSoftmax.h"
 
-ndBrainLayerCategoricalSoftmaxActivation::ndBrainLayerCategoricalSoftmaxActivation(ndInt32 neurons)
-	:ndBrainLayerSoftmaxActivation(neurons)
+ndBrainLayerActivationCategoricalSoftmax::ndBrainLayerActivationCategoricalSoftmax(ndInt32 neurons)
+	:ndBrainLayerActivationSoftmax(neurons)
 {
 }
 
-ndBrainLayerCategoricalSoftmaxActivation::ndBrainLayerCategoricalSoftmaxActivation(const ndBrainLayerCategoricalSoftmaxActivation& src)
-	:ndBrainLayerSoftmaxActivation(src)
+ndBrainLayerActivationCategoricalSoftmax::ndBrainLayerActivationCategoricalSoftmax(const ndBrainLayerActivationCategoricalSoftmax& src)
+	:ndBrainLayerActivationSoftmax(src)
 {
 }
 
-ndBrainLayer* ndBrainLayerCategoricalSoftmaxActivation::Clone() const
+ndBrainLayer* ndBrainLayerActivationCategoricalSoftmax::Clone() const
 {
-	return new ndBrainLayerCategoricalSoftmaxActivation(*this);
+	return new ndBrainLayerActivationCategoricalSoftmax(*this);
 }
 
 
-const char* ndBrainLayerCategoricalSoftmaxActivation::GetLabelId() const
+const char* ndBrainLayerActivationCategoricalSoftmax::GetLabelId() const
 {
-	return "ndBrainLayerCategoricalSoftmaxActivation";
+	return "ndBrainLayerActivationCategoricalSoftmax";
 }
 
-void ndBrainLayerCategoricalSoftmaxActivation::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerActivationCategoricalSoftmax::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	#ifdef _DEBUG
 	// check that the ouputDerivative is a one hat encoding 
@@ -67,14 +67,14 @@ void ndBrainLayerCategoricalSoftmaxActivation::InputDerivative(const ndBrainVect
 	inputDerivative.FlushToZero();
 }
 
-ndBrainLayer* ndBrainLayerCategoricalSoftmaxActivation::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerActivationCategoricalSoftmax::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
 	loadSave->ReadString(buffer);
 
 	loadSave->ReadString(buffer);
 	ndInt32 inputs = loadSave->ReadInt();
-	ndBrainLayerCategoricalSoftmaxActivation* const layer = new ndBrainLayerCategoricalSoftmaxActivation(inputs);
+	ndBrainLayerActivationCategoricalSoftmax* const layer = new ndBrainLayerActivationCategoricalSoftmax(inputs);
 	loadSave->ReadString(buffer);
 	return layer;
 }

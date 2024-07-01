@@ -26,7 +26,7 @@
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 #include "ndBrainTrainer.h"
-#include "ndBrainLayerSoftmaxActivation.h"
+#include "ndBrainLayerActivationSoftmax.h"
 
 class ndBrainTrainer::ndLayerData : public ndClassAlloc
 {

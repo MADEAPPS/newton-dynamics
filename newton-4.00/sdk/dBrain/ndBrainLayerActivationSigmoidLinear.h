@@ -27,11 +27,11 @@
 #include "ndBrainLayerActivation.h"
 
 
-class ndBrainLayerSigmoidLinearActivation : public ndBrainLayerActivation
+class ndBrainLayerActivationSigmoidLinear : public ndBrainLayerActivation
 {
 	public:
-	ndBrainLayerSigmoidLinearActivation(ndInt32 neurons);
-	ndBrainLayerSigmoidLinearActivation(const ndBrainLayerSigmoidLinearActivation& src);
+	ndBrainLayerActivationSigmoidLinear(ndInt32 neurons);
+	ndBrainLayerActivationSigmoidLinear(const ndBrainLayerActivationSigmoidLinear& src);
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 

@@ -29,7 +29,7 @@
 #include "ndBrainThreadPool.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainOptimizerAdam.h"
-#include "ndBrainLayerTanhActivation.h"
+#include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLossLeastSquaredError.h"
 
 // this is an implementation of the vanilla policy Gradient as described in:
@@ -45,7 +45,7 @@ class ndBrainLastLinearLayer : public ndBrainLayerLinear
 	virtual void Save(const ndBrainSave* const loadSave) const;
 };
 
-class ndBrainLastActivationLayer : public ndBrainLayerTanhActivation 
+class ndBrainLastActivationLayer : public ndBrainLayerActivationTanh 
 {
 	public:
 	ndBrainLastActivationLayer(ndInt32 neurons);
@@ -390,17 +390,17 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	
 	layers.SetCount(0);
 	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_neuronPerLayers));
-	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 1; i < hyperParameters.m_numberOfLayers; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_neuronPerLayers);
 		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, hyperParameters.m_neuronPerLayers));
-		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_neuronPerLayers));
+		layers.PushBack(new ndBrainLayerActivationTanh(hyperParameters.m_neuronPerLayers));
 	}
 	if (m_useConstantSigma)
 	{
 		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, actionDim));
-		layers.PushBack(new ndBrainLayerTanhActivation(actionDim));
+		layers.PushBack(new ndBrainLayerActivationTanh(actionDim));
 	}
 	else
 	{
@@ -413,7 +413,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	}
 
 	m_actor.InitWeightsXavierMethod();
-	ndAssert(!strcmp((m_actor[m_actor.GetCount() - 1])->GetLabelId(), "ndBrainLayerTanhActivation"));
+	ndAssert(!strcmp((m_actor[m_actor.GetCount() - 1])->GetLabelId(), "ndBrainLayerActivationTanh"));
 
 	m_trainers.SetCount(0);
 	m_auxiliaryTrainers.SetCount(0);
@@ -433,12 +433,12 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	// build state value critic neural net
 	layers.SetCount(0);
 	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_neuronPerLayers * 2));
-	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 1; i < hyperParameters.m_numberOfLayers; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_neuronPerLayers * 2);
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hyperParameters.m_neuronPerLayers * 2));
-		layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)

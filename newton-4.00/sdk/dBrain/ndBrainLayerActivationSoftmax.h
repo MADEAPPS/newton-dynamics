@@ -25,11 +25,11 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
-class ndBrainLayerSoftmaxActivation : public ndBrainLayerActivation
+class ndBrainLayerActivationSoftmax : public ndBrainLayerActivation
 {
 	public:
-	ndBrainLayerSoftmaxActivation(ndInt32 neurons);
-	ndBrainLayerSoftmaxActivation(const ndBrainLayerSoftmaxActivation& src);
+	ndBrainLayerActivationSoftmax(ndInt32 neurons);
+	ndBrainLayerActivationSoftmax(const ndBrainLayerActivationSoftmax& src);
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 

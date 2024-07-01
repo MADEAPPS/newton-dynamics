@@ -21,7 +21,7 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainLayerTanhActivation.h"
+#include "ndBrainLayerActivationTanh.h"
 
 ndBrainVector4 ndBrainLayerApproximateTanhActivation::m_max(ndBrainFloat(10.f));
 ndBrainVector4 ndBrainLayerApproximateTanhActivation::m_min(ndBrainFloat(-10.f));
@@ -29,39 +29,39 @@ ndBrainVector4 ndBrainLayerApproximateTanhActivation::m_c1(ndBrainFloat(0.031387
 ndBrainVector4 ndBrainLayerApproximateTanhActivation::m_c2(ndBrainFloat(0.276281267f));
 ndBrainVector4 ndBrainLayerApproximateTanhActivation::m_log2f(ndBrainFloat(1.442695022f));
 
-ndBrainLayerTanhActivation::ndBrainLayerTanhActivation(ndInt32 neurons)
+ndBrainLayerActivationTanh::ndBrainLayerActivationTanh(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)
 {
 }
 
-ndBrainLayerTanhActivation::ndBrainLayerTanhActivation(const ndBrainLayerTanhActivation& src)
+ndBrainLayerActivationTanh::ndBrainLayerActivationTanh(const ndBrainLayerActivationTanh& src)
 	:ndBrainLayerActivation(src)
 {
 }
 
-ndBrainLayer* ndBrainLayerTanhActivation::Clone() const
+ndBrainLayer* ndBrainLayerActivationTanh::Clone() const
 {
-	return new ndBrainLayerTanhActivation(*this);
+	return new ndBrainLayerActivationTanh(*this);
 }
 
-const char* ndBrainLayerTanhActivation::GetLabelId() const
+const char* ndBrainLayerActivationTanh::GetLabelId() const
 {
-	return "ndBrainLayerTanhActivation";
+	return "ndBrainLayerActivationTanh";
 }
 
-ndBrainLayer* ndBrainLayerTanhActivation::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerActivationTanh::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
 	loadSave->ReadString(buffer);
 
 	loadSave->ReadString(buffer);
 	ndInt32 inputs = loadSave->ReadInt();
-	ndBrainLayerTanhActivation* const layer = new ndBrainLayerTanhActivation(inputs);
+	ndBrainLayerActivationTanh* const layer = new ndBrainLayerActivationTanh(inputs);
 	loadSave->ReadString(buffer);
 	return layer;
 }
 
-void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+void ndBrainLayerActivationTanh::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
 	for (ndInt32 i = ndInt32 (input.GetCount() - 1); i >= 0; --i)
@@ -71,7 +71,7 @@ void ndBrainLayerTanhActivation::MakePrediction(const ndBrainVector& input, ndBr
 	output.FlushToZero();
 }
 
-void ndBrainLayerTanhActivation::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerActivationTanh::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
 	ndAssert(output.GetCount() == inputDerivative.GetCount());
@@ -83,12 +83,12 @@ void ndBrainLayerTanhActivation::InputDerivative(const ndBrainVector&, const ndB
 }
 
 ndBrainLayerApproximateTanhActivation::ndBrainLayerApproximateTanhActivation(ndInt32 neurons)
-	:ndBrainLayerTanhActivation(neurons)
+	:ndBrainLayerActivationTanh(neurons)
 {
 }
 
-ndBrainLayerApproximateTanhActivation::ndBrainLayerApproximateTanhActivation(const ndBrainLayerTanhActivation& src)
-	:ndBrainLayerTanhActivation(src)
+ndBrainLayerApproximateTanhActivation::ndBrainLayerApproximateTanhActivation(const ndBrainLayerActivationTanh& src)
+	:ndBrainLayerActivationTanh(src)
 {
 }
 

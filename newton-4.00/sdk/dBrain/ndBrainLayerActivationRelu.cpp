@@ -27,41 +27,41 @@
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainGpuIntegerBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
-#include "ndBrainLayerReluActivation.h"
+#include "ndBrainLayerActivationRelu.h"
 
-ndBrainLayerReluActivation::ndBrainLayerReluActivation(ndInt32 neurons)
+ndBrainLayerActivationRelu::ndBrainLayerActivationRelu(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)
 {
 }
 
-ndBrainLayerReluActivation::ndBrainLayerReluActivation(const ndBrainLayerReluActivation& src)
+ndBrainLayerActivationRelu::ndBrainLayerActivationRelu(const ndBrainLayerActivationRelu& src)
 	:ndBrainLayerActivation(src)
 {
 }
 
-ndBrainLayer* ndBrainLayerReluActivation::Clone() const
+ndBrainLayer* ndBrainLayerActivationRelu::Clone() const
 {
-	return new ndBrainLayerReluActivation(*this);
+	return new ndBrainLayerActivationRelu(*this);
 }
 
-const char* ndBrainLayerReluActivation::GetLabelId() const
+const char* ndBrainLayerActivationRelu::GetLabelId() const
 {
-	return "ndBrainLayerReluActivation";
+	return "ndBrainLayerActivationRelu";
 }
 
-ndBrainLayer* ndBrainLayerReluActivation::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerActivationRelu::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
 	loadSave->ReadString(buffer);
 
 	loadSave->ReadString(buffer);
 	ndInt32 inputs = loadSave->ReadInt();
-	ndBrainLayerReluActivation* const layer = new ndBrainLayerReluActivation(inputs);
+	ndBrainLayerActivationRelu* const layer = new ndBrainLayerActivationRelu(inputs);
 	loadSave->ReadString(buffer);
 	return layer;
 }
 
-void ndBrainLayerReluActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+void ndBrainLayerActivationRelu::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
@@ -71,7 +71,7 @@ void ndBrainLayerReluActivation::MakePrediction(const ndBrainVector& input, ndBr
 	}
 }
 
-void ndBrainLayerReluActivation::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerActivationRelu::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
 	ndAssert(output.GetCount() == inputDerivative.GetCount());
@@ -84,7 +84,7 @@ void ndBrainLayerReluActivation::InputDerivative(const ndBrainVector&, const ndB
 	inputDerivative.Mul(outputDerivative);
 }
 
-ndBrainGpuCommand* ndBrainLayerReluActivation::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
+ndBrainGpuCommand* ndBrainLayerActivationRelu::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
 {
 	class ndBrainLayerActivationCommand : public ndBrainGpuCommand
 	{

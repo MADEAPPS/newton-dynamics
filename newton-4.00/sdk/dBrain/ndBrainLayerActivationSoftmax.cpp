@@ -27,41 +27,41 @@
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainGpuIntegerBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
-#include "ndBrainLayerSoftmaxActivation.h"
+#include "ndBrainLayerActivationSoftmax.h"
 
-ndBrainLayerSoftmaxActivation::ndBrainLayerSoftmaxActivation(ndInt32 neurons)
+ndBrainLayerActivationSoftmax::ndBrainLayerActivationSoftmax(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)
 {
 }
 
-ndBrainLayerSoftmaxActivation::ndBrainLayerSoftmaxActivation(const ndBrainLayerSoftmaxActivation& src)
+ndBrainLayerActivationSoftmax::ndBrainLayerActivationSoftmax(const ndBrainLayerActivationSoftmax& src)
 	:ndBrainLayerActivation(src)
 {
 }
 
-ndBrainLayer* ndBrainLayerSoftmaxActivation::Clone() const
+ndBrainLayer* ndBrainLayerActivationSoftmax::Clone() const
 {
-	return new ndBrainLayerSoftmaxActivation(*this);
+	return new ndBrainLayerActivationSoftmax(*this);
 }
 
-const char* ndBrainLayerSoftmaxActivation::GetLabelId() const
+const char* ndBrainLayerActivationSoftmax::GetLabelId() const
 {
-	return "ndBrainLayerSoftmaxActivation";
+	return "ndBrainLayerActivationSoftmax";
 }
 
-ndBrainLayer* ndBrainLayerSoftmaxActivation::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerActivationSoftmax::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
 	loadSave->ReadString(buffer);
 
 	loadSave->ReadString(buffer);
 	ndInt32 inputs = loadSave->ReadInt();
-	ndBrainLayerSoftmaxActivation* const layer = new ndBrainLayerSoftmaxActivation(inputs);
+	ndBrainLayerActivationSoftmax* const layer = new ndBrainLayerActivationSoftmax(inputs);
 	loadSave->ReadString(buffer);
 	return layer;
 }
 
-void ndBrainLayerSoftmaxActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+void ndBrainLayerActivationSoftmax::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
 	//ndBrainFloat max = ndBrainFloat(1.0e-16f);
@@ -86,7 +86,7 @@ void ndBrainLayerSoftmaxActivation::MakePrediction(const ndBrainVector& input, n
 	output.FlushToZero();
 }
 
-void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerActivationSoftmax::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
 	ndAssert(output.GetCount() == inputDerivative.GetCount());
@@ -116,7 +116,7 @@ void ndBrainLayerSoftmaxActivation::InputDerivative(const ndBrainVector&, const 
 	inputDerivative.FlushToZero();
 }
 
-ndBrainGpuCommand* ndBrainLayerSoftmaxActivation::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
+ndBrainGpuCommand* ndBrainLayerActivationSoftmax::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
 {
 	class ndBrainLayerActivationCommand : public ndBrainGpuCommand
 	{

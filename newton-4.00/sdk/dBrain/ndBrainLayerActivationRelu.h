@@ -19,43 +19,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_TANH_ACTIVATION_H__
-#define _ND_BRAIN_LAYER_TANH_ACTIVATION_H__
+#ifndef _ND_BRAIN_LAYER_RELU_ACTIVATION_H__
+#define _ND_BRAIN_LAYER_RELU_ACTIVATION_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
-typedef ndVector ndBrainVector4;
-
-class ndBrainLayerTanhActivation : public ndBrainLayerActivation
+class ndBrainLayerActivationRelu : public ndBrainLayerActivation
 {
 	public:
-	ndBrainLayerTanhActivation(ndInt32 neurons);
-	ndBrainLayerTanhActivation(const ndBrainLayerTanhActivation& src);
+	ndBrainLayerActivationRelu(ndInt32 neurons);
+	ndBrainLayerActivationRelu(const ndBrainLayerActivationRelu& src);
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
 	const char* GetLabelId() const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
-};
 
-class ndBrainLayerApproximateTanhActivation : public ndBrainLayerTanhActivation
-{
-	public:
-	ndBrainLayerApproximateTanhActivation(ndInt32 neurons);
-	ndBrainLayerApproximateTanhActivation(const ndBrainLayerTanhActivation& src);
-	ndBrainLayer* Clone() const;
-	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
-
-	const char* GetLabelId() const;
-	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-
-	static ndBrainVector4 m_c1;
-	static ndBrainVector4 m_c2;
-	static ndBrainVector4 m_max;
-	static ndBrainVector4 m_min;
-	static ndBrainVector4 m_log2f;
+	ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params);
 };
 
 #endif 

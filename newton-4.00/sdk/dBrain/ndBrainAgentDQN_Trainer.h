@@ -29,7 +29,7 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainReplayBuffer.h"
 #include "ndBrainLayerLinear.h"
-#include "ndBrainLayerTanhActivation.h"
+#include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLossLeastSquaredError.h"
 
 // this is an implementation of the vanilla dqn agent trainer as described 
@@ -152,12 +152,12 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 	// build neural net
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_neuronPerLayers));
-	layers.PushBack(new ndBrainLayerTanhActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 1; i < hyperParameters.m_numberOfLayers; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeurons);
 		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, hyperParameters.m_neuronPerLayers));
-		layers.PushBack(new ndBrainLayerTanhActivation(hyperParameters.m_neuronPerLayers));
+		layers.PushBack(new ndBrainLayerActivationTanh(hyperParameters.m_neuronPerLayers));
 	}
 	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, actionDim));
 

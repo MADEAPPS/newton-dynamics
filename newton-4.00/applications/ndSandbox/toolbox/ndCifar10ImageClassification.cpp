@@ -206,9 +206,9 @@ static void Cifar10TrainingSet()
 	#endif
 
 	#if 1
-		#define ACTIVATION_TYPE	ndBrainLayerReluActivation
+		#define ACTIVATION_TYPE	ndBrainLayerActivationRelu
 	#else
-		#define ACTIVATION_TYPE	ndBrainLayerTanhActivation
+		#define ACTIVATION_TYPE	ndBrainLayerActivationTanh
 	#endif
 
 	ndSharedPtr<ndBrainMatrix> testLabels;
@@ -458,7 +458,7 @@ static void Cifar10TrainingSet()
 		layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
-		layers.PushBack(new ndBrainLayerCategoricalSoftmaxActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(layers[layers.GetCount() - 1]->GetOutputSize()));
 	
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{

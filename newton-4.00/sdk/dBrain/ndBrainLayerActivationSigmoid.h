@@ -19,30 +19,23 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_CATEGORICAL_SOFTMAX_ACTIVATION_H__
-#define _ND_BRAIN_LAYER_CATEGORICAL_SOFTMAX_ACTIVATION_H__
+#ifndef _ND_BRAIN_LAYER_SIGMOID_ACTIVATION_H__
+#define _ND_BRAIN_LAYER_SIGMOID_ACTIVATION_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainLayerSoftmaxActivation.h"
+#include "ndBrainSaveLoad.h"
+#include "ndBrainLayerActivation.h"
 
-
-// note: Categorical SoftMax activation layer is designed you work with a 
-// Categorical entropy loss. These rules for using it are:
-// 1- can only be used as the last layer of the deep neural net is SoftMax layer.
-// 2- the loss function returns a one hat encoding as the ground truth.  
-// 
-// This activation makes use of the knowledge that only one of the elements 
-// of a one hat encoding truth is always 1 and the rest are always 0, 
-// which greatly simplify the calculation of the derivative. 
-class ndBrainLayerCategoricalSoftmaxActivation : public ndBrainLayerSoftmaxActivation
+class ndBrainLayerActivationSigmoid : public ndBrainLayerActivation
 {
 	public:
-	ndBrainLayerCategoricalSoftmaxActivation(ndInt32 neurons);
-	ndBrainLayerCategoricalSoftmaxActivation(const ndBrainLayerCategoricalSoftmaxActivation& src);
+	ndBrainLayerActivationSigmoid(ndInt32 neurons);
+	ndBrainLayerActivationSigmoid(const ndBrainLayerActivationSigmoid& src);
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
 	const char* GetLabelId() const;
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 };
 

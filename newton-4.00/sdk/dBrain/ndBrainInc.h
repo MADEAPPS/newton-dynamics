@@ -53,21 +53,21 @@
 #include <ndBrainGpuScopeMapBuffer.h>
 #include <ndBrainAgentDDPG_Trainer.h>
 #include <ndBrainLayerImagePadding.h>
-#include <ndBrainLayerReluActivation.h>
-#include <ndBrainLayerTanhActivation.h>
+#include <ndBrainLayerActivationRelu.h>
+#include <ndBrainLayerActivationTanh.h>
 #include <ndBrainLayerImagePolling_2x2.h>
 #include <ndBrainLayerConvolutional_2d.h>
 #include <ndBrainLossLeastSquaredError.h>
 #include <ndBrainLayerLinearWithDropOut.h>
-#include <ndBrainLayerSigmoidActivation.h>
-#include <ndBrainLayerSoftmaxActivation.h>
+#include <ndBrainLayerActivationSigmoid.h>
+#include <ndBrainLayerActivationSoftmax.h>
 #include <ndBrainLayerCrossCorrelation_2d.h>
 #include <ndBrainAgentDiscretePolicyGradient.h>
 #include <ndBrainAgentContinuePolicyGradient.h>
 #include <ndBrainLossCategoricalCrossEntropy.h>
-#include <ndBrainLayerSigmoidLinearActivation.h>
+#include <ndBrainLayerActivationSigmoidLinear.h>
 #include <ndBrainLayerConvolutionalWithDropOut_2d.h>
-#include <ndBrainLayerCategoricalSoftmaxActivation.h>
+#include <ndBrainLayerActivationCategoricalSoftmax.h>
 #include <ndBrainAgentDiscretePolicyGradient_Trainer.h>
 #include <ndBrainAgentContinuePolicyGradient_Trainer.h>
 

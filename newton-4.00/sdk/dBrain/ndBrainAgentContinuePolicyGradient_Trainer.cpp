@@ -76,7 +76,7 @@ void ndBrainLastLinearLayer::Save(const ndBrainSave* const loadSave) const
 
 
 ndBrainLastActivationLayer::ndBrainLastActivationLayer(ndInt32 neurons)
-	:ndBrainLayerTanhActivation(neurons * 2)
+	:ndBrainLayerActivationTanh(neurons * 2)
 	,m_sigma0(ndBrainFloat(0.01f))
 	,m_sigmaScale(ndBrainFloat(0.5f))
 	,m_sigmaScaleInv(ndBrainFloat(1.0f)/ m_sigmaScale)
@@ -84,7 +84,7 @@ ndBrainLastActivationLayer::ndBrainLastActivationLayer(ndInt32 neurons)
 }
 
 ndBrainLastActivationLayer::ndBrainLastActivationLayer(const ndBrainLastActivationLayer& src)
-	:ndBrainLayerTanhActivation(src)
+	:ndBrainLayerActivationTanh(src)
 	,m_sigma0(src.m_sigma0)
 	,m_sigmaScale(src.m_sigmaScale)
 	,m_sigmaScaleInv(src.m_sigmaScaleInv)
@@ -105,7 +105,7 @@ void ndBrainLastActivationLayer::Save(const ndBrainSave* const loadSave) const
 
 void ndBrainLastActivationLayer::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-	ndBrainLayerTanhActivation::MakePrediction(input, output);
+	ndBrainLayerActivationTanh::MakePrediction(input, output);
 	for (ndInt32 i = m_neurons / 2; i < m_neurons; ++i)
 	{
 		output[i] = ndBrainFloat(0.01f) + ndBrainFloat(0.5f) + output[i] * ndBrainFloat(0.5f);
@@ -121,7 +121,7 @@ void ndBrainLastActivationLayer::InputDerivative(const ndBrainVector& output, co
 	//{
 	//	tmpOut[i] = (output[i] - m_sigma0) * m_sigmaScaleInv;
 	//}
-	//ndBrainLayerTanhActivation::InputDerivative(tmpOut, outputDerivative, inputDerivative);
+	//ndBrainLayerActivationTanh::InputDerivative(tmpOut, outputDerivative, inputDerivative);
 	//for (ndInt32 i = m_neurons / 2; i < m_neurons; ++i)
 	//{
 	//	inputDerivative[i] *= m_sigmaScale;
