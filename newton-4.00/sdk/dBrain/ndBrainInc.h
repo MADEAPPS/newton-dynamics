@@ -29,7 +29,6 @@
 #include <ndBrainAgent.h>
 #include <ndBrainLayer.h>
 #include <ndBrainFloat4.h>
-#include <ndBrainFloat8.h>
 #include <ndBrainVector.h>
 #include <ndBrainMatrix.h>
 #include <ndBrainTrainer.h>
