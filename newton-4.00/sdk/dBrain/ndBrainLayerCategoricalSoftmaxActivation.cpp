@@ -44,7 +44,7 @@ const char* ndBrainLayerCategoricalSoftmaxActivation::GetLabelId() const
 	return "ndBrainLayerCategoricalSoftmaxActivation";
 }
 
-void ndBrainLayerCategoricalSoftmaxActivation::InputDerivative(const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerCategoricalSoftmaxActivation::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	#ifdef _DEBUG
 	// check that the ouputDerivative is a one hat encoding 

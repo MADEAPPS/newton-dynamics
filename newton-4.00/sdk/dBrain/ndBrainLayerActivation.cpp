@@ -128,14 +128,14 @@ void ndBrainLayerActivation::MakePrediction(const ndBrainVector& input, ndBrainV
 	output.Set(input);
 }
 
-void ndBrainLayerActivation::InputDerivative(const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
+void ndBrainLayerActivation::InputDerivative(const ndBrainVector&, const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
 {
 	ndAssert(0);
 }
 
-void ndBrainLayerActivation::CalculateParamGradients(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const) const
+void ndBrainLayerActivation::CalculateParamGradients(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const) const
 {
-	InputDerivative(output, outputDerivative, inputGradient);
+	InputDerivative(input, output, outputDerivative, inputGradient);
 }
 
 void ndBrainLayerActivation::GetNumberOfGPUParameters(ndBrainVector&, ndArray<ndInt32>& offsets) const
