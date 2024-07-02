@@ -29,8 +29,10 @@
 #include "ndBrainThreadPool.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainOptimizerAdam.h"
+#include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLossLeastSquaredError.h"
+#include "ndBrainLayerActivationSigmoidLinear.h"
 
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
@@ -388,8 +390,9 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	SetThreadCount(hyperParameters.m_threadsCount);
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
-	#define ACTIVATION_VPG_TYPE ndBrainLayerActivationRelu
+	//#define ACTIVATION_VPG_TYPE ndBrainLayerActivationRelu
 	//#define ACTIVATION_VPG_TYPE ndBrainLayerActivationTanh
+	#define ACTIVATION_VPG_TYPE ndBrainLayerActivationSigmoidLinear
 	
 	layers.SetCount(0);
 	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_neuronPerLayers));

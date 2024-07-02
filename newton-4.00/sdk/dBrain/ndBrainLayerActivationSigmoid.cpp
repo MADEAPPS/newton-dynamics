@@ -57,17 +57,32 @@ ndBrainLayer* ndBrainLayerActivationSigmoid::Load(const ndBrainLoad* const loadS
 void ndBrainLayerActivationSigmoid::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
+	//for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
+	//{
+	//	ndBrainFloat value = ndClamp (input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
+	//	ndBrainFloat p = ndBrainFloat(ndExp(-value));
+	//	ndBrainFloat out = ndFlushToZero(ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) + p));
+	//
+	//	ndAssert(ndCheckFloat(out));
+	//	ndAssert(out <= ndBrainFloat(1.0f));
+	//	ndAssert(out >= ndBrainFloat(0.0f));
+	//	output[i] = out;
+	//}
+
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{
-		ndBrainFloat value = ndClamp (input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
-		ndBrainFloat p = ndBrainFloat(ndExp(-value));
-		ndBrainFloat out = ndFlushToZero(ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) + p));
-
-		ndAssert(ndCheckFloat(out));
-		ndAssert(out <= ndBrainFloat(1.0f));
-		ndAssert(out >= ndBrainFloat(0.0f));
-		output[i] = out;
+		ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
+		output[i] = ndBrainFloat(ndExp(-value));
+		ndAssert(ndCheckFloat(output[i]));
 	}
+
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
+	{
+		output[i] = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) + output[i]);
+		ndAssert(output[i] <= ndBrainFloat(1.0f));
+		ndAssert(output[i] >= ndBrainFloat(0.0f));
+	}
+	output.FlushToZero();
 }
 
 void ndBrainLayerActivationSigmoid::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const

@@ -57,29 +57,45 @@ ndBrainLayer* ndBrainLayerActivationSigmoidLinear::Load(const ndBrainLoad* const
 void ndBrainLayerActivationSigmoidLinear::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
+
+#if 0
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{
 		ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
 		ndBrainFloat p = ndBrainFloat(ndExp(-value));
-		ndBrainFloat out = ndFlushToZero(input[i] / (ndBrainFloat(1.0f) + p));
+		output[i] = input[i] / (ndBrainFloat(1.0f) + p);
 
 		ndAssert(ndCheckFloat(out));
-		ndAssert(out <= ndBrainFloat(100.0f));
-		ndAssert(out >= ndBrainFloat(-0.5f));
-		output[i] = out;
+		ndAssert(output[i] <= ndBrainFloat(100.0f));
+		ndAssert(output[i] >= ndBrainFloat(-0.5f));
 	}
+#else
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
+	{
+		ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
+		output[i] = ndBrainFloat(ndExp(-value));
+		ndAssert(ndCheckFloat(output[i]));
+	}
+
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
+	{
+		output[i] = input[i] / (ndBrainFloat(1.0f) + output[i]);
+		ndAssert(ndCheckFloat(output[i]));
+		ndAssert(output[i] <= ndBrainFloat(100.0f));
+		ndAssert(output[i] >= ndBrainFloat(-0.5f));
+	}
+#endif
+	output.FlushToZero();
 }
 
-void ndBrainLayerActivationSigmoidLinear::InputDerivative(const ndBrainVector& input, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerActivationSigmoidLinear::InputDerivative(const ndBrainVector& input, const ndBrainVector& ouput, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndAssert(input.GetCount() == outputDerivative.GetCount());
 	ndAssert(input.GetCount() == inputDerivative.GetCount());
 
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{
-		ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
-		ndBrainFloat p = ndBrainFloat(ndExp(-value));
-		ndBrainFloat sigmoid = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) + p);
+		ndBrainFloat sigmoid = (input[i] != ndBrainFloat(0.0f)) ? ouput[i] / input[i] : ndBrainFloat(0.0f);
 		ndBrainFloat sigmoidDer = sigmoid * (ndBrainFloat(1.0f) - sigmoid);
 
 		ndBrainFloat derivative = input[i] * sigmoidDer + sigmoid;

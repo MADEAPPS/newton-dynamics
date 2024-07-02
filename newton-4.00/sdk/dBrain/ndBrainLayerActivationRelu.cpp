@@ -65,26 +65,10 @@ ndBrainLayer* ndBrainLayerActivationRelu::Load(const ndBrainLoad* const loadSave
 void ndBrainLayerActivationRelu::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
-	//for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
-	//{
-	//	output[i] = (input[i] > ndBrainFloat(0.0f)) ? input[i] : ndBrainFloat(0.0f);
-	//	ndAssert(ndCheckFloat(output[i]));
-	//}
-
-	const ndBrainFloat4 zero(ndBrainFloat(0.0f));
-	ndBrainFloat4* const dst = (ndBrainFloat4*)&output[0];
-	const ndBrainFloat4* const src = (ndBrainFloat4*)&input[0];
-	
-	const ndInt32 count4 = ndInt32(output.GetCount() / 4);
-	for (ndInt32 i = count4 - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{
-		ndBrainFloat4 test(src[i] > zero);
-		dst[i] = test & src[i];
-	}
-	
-	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= count4 * 4; --i)
-	{
-		output[i] = (input[i] > ndBrainFloat(0.0f)) ? input[i] : ndBrainFloat(0.0f);
+		output[i] = ndMax (input[i], ndBrainFloat (0.0f));
+		ndAssert(ndCheckFloat(output[i]));
 	}
 }
 
@@ -93,25 +77,10 @@ void ndBrainLayerActivationRelu::InputDerivative(const ndBrainVector&, const ndB
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
 	ndAssert(output.GetCount() == inputDerivative.GetCount());
 
-	//for (ndInt32 i = ndInt32(output.GetCount() - 1); i >= 0; --i)
-	//{
-	//	inputDerivative[i] = (output[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-	//	ndAssert(ndCheckFloat(inputDerivative[i]));
-	//}
-
-	const ndBrainFloat4 one(ndBrainFloat(1.0f));
-	const ndBrainFloat4 zero(ndBrainFloat(0.0f));
-	const ndBrainFloat4* const src = (ndBrainFloat4*)&output[0];
-	ndBrainFloat4* const dst = (ndBrainFloat4*)&inputDerivative[0];
-	const ndInt32 count4 = ndInt32(output.GetCount() / 4);
-	for (ndInt32 i = count4 - 1; i >= 0; --i)
-	{
-		ndBrainFloat4 test(src[i] > zero);
-		dst[i] = test & one;
-	}
-	for (ndInt32 i = ndInt32(output.GetCount() - 1); i >= count4 * 4; --i)
+	for (ndInt32 i = ndInt32(output.GetCount() - 1); i >= 0; --i)
 	{
 		inputDerivative[i] = (output[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		ndAssert(ndCheckFloat(inputDerivative[i]));
 	}
 
 	inputDerivative.Mul(outputDerivative);
