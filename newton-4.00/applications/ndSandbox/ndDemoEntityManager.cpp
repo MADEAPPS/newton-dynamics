@@ -44,7 +44,7 @@
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
-#define DEFAULT_SCENE	7		// object Placement
+//#define DEFAULT_SCENE	7		// object Placement
 //#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
@@ -59,7 +59,7 @@
 //#define DEFAULT_SCENE	19		// cart pole discrete controller
 //#define DEFAULT_SCENE	20		// cart pole continue controller
 //#define DEFAULT_SCENE	21		// unit cycle controller
-//#define DEFAULT_SCENE	22		// quadruped test 1
+#define DEFAULT_SCENE	22		// quadruped test 1
 //#define DEFAULT_SCENE	23		// quadruped test 2
 //#define DEFAULT_SCENE	24		// quadruped test 3
 //#define DEFAULT_SCENE	25		// biped test 1

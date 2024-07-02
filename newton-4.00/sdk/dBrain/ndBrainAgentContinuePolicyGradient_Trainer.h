@@ -387,6 +387,9 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	// build policy neural net
 	SetThreadCount(hyperParameters.m_threadsCount);
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
+
+	#define ACTIVATION_VPG_TYPE ndBrainLayerActivationRelu
+	//#define ACTIVATION_VPG_TYPE ndBrainLayerActivationTanh
 	
 	layers.SetCount(0);
 	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_neuronPerLayers));
@@ -395,7 +398,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_neuronPerLayers);
 		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, hyperParameters.m_neuronPerLayers));
-		layers.PushBack(new ndBrainLayerActivationTanh(hyperParameters.m_neuronPerLayers));
+		layers.PushBack(new ACTIVATION_VPG_TYPE(hyperParameters.m_neuronPerLayers));
 	}
 	if (m_useConstantSigma)
 	{
