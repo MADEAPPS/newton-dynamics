@@ -61,17 +61,17 @@ void ndIkJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
 
 ndInt32 ndIkJointSpherical::GetKinematicState(ndKinematicState* const state) const
 {
-	const ndBodyKinematic* const body0 = GetBody0();
-	const ndBodyKinematic* const body1 = GetBody1();
-
 	ndMatrix matrix0;
 	ndMatrix matrix1;
+	ndVector euler1;
+
+	const ndBodyKinematic* const body0 = GetBody0();
+	const ndBodyKinematic* const body1 = GetBody1();
 	CalculateGlobalMatrix(matrix0, matrix1);
 	
-	ndMatrix relMatrix(matrix1 * matrix0.Transpose3x3());
-	ndVector euler1;
-	ndVector euler(relMatrix.CalcPitchYawRoll(euler1));
-	ndVector relOmega(matrix0.UnrotateVector(body1->GetOmega() - body0->GetOmega()));
+	const ndMatrix relMatrix(matrix0 * matrix1.Transpose3x3());
+	const ndVector euler(relMatrix.CalcPitchYawRoll(euler1));
+	const ndVector relOmega(relMatrix.UnrotateVector(body0->GetOmega() - body1->GetOmega()));
 
 	state[0].m_posit = euler.m_x;
 	state[1].m_posit = euler.m_y;

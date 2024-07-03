@@ -596,9 +596,9 @@ namespace ndQuadruped_1
 				ndJointBilateralConstraint::ndKinematicState kinematicState[16];
 #if 1
 				ndInt32 paramCount = 0;
-				paramCount += info->m_foot->GetKinematicState(&kinematicState[paramCount]);
-				paramCount += info->m_calf->GetKinematicState(&kinematicState[paramCount]);
 				paramCount += info->m_thigh->GetKinematicState(&kinematicState[paramCount]);
+				paramCount += info->m_calf->GetKinematicState(&kinematicState[paramCount]);
+				paramCount += info->m_foot->GetKinematicState(&kinematicState[paramCount]);
 				for (ndInt32 j = 0; j < paramCount; ++j)
 				{
 					observation.n_legs[i].m_state[j * 2 + 0] = ndBrainFloat(kinematicState[j].m_posit);
