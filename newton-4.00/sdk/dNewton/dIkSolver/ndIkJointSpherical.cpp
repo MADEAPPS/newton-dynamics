@@ -71,12 +71,11 @@ ndInt32 ndIkJointSpherical::GetKinematicState(ndKinematicState* const state) con
 	
 	const ndMatrix relMatrix(matrix0 * matrix1.Transpose3x3());
 	const ndVector euler(relMatrix.CalcPitchYawRoll(euler1));
-	const ndVector relOmega(relMatrix.UnrotateVector(body0->GetOmega() - body1->GetOmega()));
-
 	state[0].m_posit = euler.m_x;
 	state[1].m_posit = euler.m_y;
 	state[2].m_posit = euler.m_z;
 
+	const ndVector relOmega(matrix1.UnrotateVector(body0->GetOmega() - body1->GetOmega()));
 	state[0].m_velocity = relOmega.m_x;
 	state[1].m_velocity = relOmega.m_y;
 	state[2].m_velocity = relOmega.m_z;
