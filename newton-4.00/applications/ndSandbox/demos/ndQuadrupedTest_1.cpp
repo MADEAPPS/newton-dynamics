@@ -71,18 +71,25 @@ namespace ndQuadruped_1
 		{
 			public:
 			ndEffectorInfo()
-				:m_footHinge(nullptr)
-				,m_effector(nullptr)
 			{
 			}
 
-			ndEffectorInfo(const ndSharedPtr<ndJointBilateralConstraint>& effector, ndJointHinge* const footHinge)
-				:m_footHinge(footHinge)
+			//ndEffectorInfo(const ndSharedPtr<ndJointBilateralConstraint>& effector, ndJointHinge* const footHinge)
+			ndEffectorInfo(
+				const ndSharedPtr<ndJointBilateralConstraint>& thigh,
+				const ndSharedPtr<ndJointBilateralConstraint>& calf,
+				const ndSharedPtr<ndJointBilateralConstraint>& foot,
+				const ndSharedPtr<ndJointBilateralConstraint>& effector)
+				:m_thigh(thigh)
+				,m_calf(calf)
+				,m_foot(foot)
 				,m_effector(effector)
 			{
 			}
 
-			ndJointHinge* m_footHinge;
+			ndSharedPtr<ndJointBilateralConstraint> m_thigh;
+			ndSharedPtr<ndJointBilateralConstraint> m_calf;
+			ndSharedPtr<ndJointBilateralConstraint> m_foot;
 			ndSharedPtr<ndJointBilateralConstraint> m_effector;
 		};
 
@@ -505,28 +512,29 @@ namespace ndQuadruped_1
 			{
 				ndEffectorInfo* const info = &m_effectorsInfo[i];
 				effectors.PushBack(*info->m_effector);
-
+				
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-
+				
 				ndVector posit(m_animPose[i].m_posit);
 				effector->SetLocalTargetPosition(posit);
-
+				
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
 				effector->SetSwivelAngle(swivelAngle);
-
+				
 				// calculate lookAt angle
 				ndMatrix lookAtMatrix0;
 				ndMatrix lookAtMatrix1;
-				info->m_footHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-
+				ndJointHinge* const footHinge = (ndJointHinge*)*info->m_foot;
+				footHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
+				
 				ndMatrix upMatrix(ndGetIdentityMatrix());
 				upMatrix.m_front = lookAtMatrix1.m_front;
 				upMatrix.m_right = (upMatrix.m_front.CrossProduct(upVector) & ndVector::m_triplexMask).Normalize();
 				upMatrix.m_up = upMatrix.m_right.CrossProduct(upMatrix.m_front);
 				upMatrix = upMatrix * lookAtMatrix0.OrthoInverse();
-
+				
 				const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
-				info->m_footHinge->SetTargetAngle(angle);
+				footHinge->SetTargetAngle(angle);
 			}
 
 			m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), m_world, timestep);
@@ -584,16 +592,15 @@ namespace ndQuadruped_1
 				const ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
 				const ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 			
-				ndVector effectPositState;
-				ndVector effectVelocState;
-				effector->GetDynamicState(effectPositState, effectVelocState);
-			
-				observation.n_legs[i].m_posit_x = ndBrainFloat(effectPositState.m_x);
-				observation.n_legs[i].m_posit_y = ndBrainFloat(effectPositState.m_y);
-				observation.n_legs[i].m_posit_z = ndBrainFloat(effectPositState.m_z);
-				observation.n_legs[i].m_veloc_x = ndBrainFloat(effectVelocState.m_x);
-				observation.n_legs[i].m_veloc_y = ndBrainFloat(effectVelocState.m_y);
-				observation.n_legs[i].m_veloc_z = ndBrainFloat(effectVelocState.m_z);
+				ndJointBilateralConstraint::ndKinematicState kinematicState[8];
+				effector->GetKinematicState(kinematicState);
+				
+				observation.n_legs[i].m_posit_x = ndBrainFloat(kinematicState[0].m_posit);
+				observation.n_legs[i].m_posit_y = ndBrainFloat(kinematicState[1].m_posit);
+				observation.n_legs[i].m_posit_z = ndBrainFloat(kinematicState[2].m_posit);
+				observation.n_legs[i].m_veloc_x = ndBrainFloat(kinematicState[0].m_velocity);
+				observation.n_legs[i].m_veloc_y = ndBrainFloat(kinematicState[1].m_velocity);
+				observation.n_legs[i].m_veloc_z = ndBrainFloat(kinematicState[2].m_velocity);
 				observation.n_legs[i].m_hasContact = ndBrainFloat(FindContact(i) ? 1.0f : 0.0f);
 				observation.n_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamInt ? 1.0f : 0.0f);
 			}
@@ -907,7 +914,7 @@ namespace ndQuadruped_1
 			}
 		
 			// add calf0
-			ndModelArticulation::ndNode* calf0Node = nullptr;
+			ndModelArticulation::ndNode* calfNode = nullptr;
 			{
 				limbPivotLocation = ndRollMatrix(-90.0f * ndDegreeToRad) * limbPivotLocation;
 		
@@ -928,14 +935,13 @@ namespace ndQuadruped_1
 				ndIkJointHinge* const hinge = (ndIkJointHinge*)*hingeJoint;
 				hinge->SetLimitState(true);
 				hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
-				calf0Node = model->AddLimb(thighNode, calf0, hingeJoint);
+				calfNode = model->AddLimb(thighNode, calf0, hingeJoint);
 		
 				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
 				workSpace += limbLength;
 			}
 		
 			// add calf1
-			ndJointHinge* footHinge = nullptr;
 			ndModelArticulation::ndNode* footNode = nullptr;
 			{
 				ndFloat32 lenght = limbLength * 0.5f;
@@ -957,13 +963,13 @@ namespace ndQuadruped_1
 				footPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
 		
 				// add joint limit to prevent knee from flipping
-				footHinge = new ndJointHinge(footPinAndPivotFrame, foot->GetAsBodyKinematic(), calf0Node->m_body->GetAsBodyKinematic());
+				ndJointHinge* const footHinge = new ndJointHinge(footPinAndPivotFrame, foot->GetAsBodyKinematic(), calfNode->m_body->GetAsBodyKinematic());
 				//footHinge->SetLimitState(true);
 				//footHinge->SetLimits(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
 				footHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
 		
 				//ndSharedPtr<ndJointBilateralConstraint> hinge(footHinge);
-				footNode = model->AddLimb(calf0Node, foot, ndSharedPtr<ndJointBilateralConstraint>(footHinge));
+				footNode = model->AddLimb(calfNode, foot, ndSharedPtr<ndJointBilateralConstraint>(footHinge));
 		
 				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(lenght);
 				workSpace += lenght;
@@ -985,9 +991,10 @@ namespace ndQuadruped_1
 				effector->SetAngularSpringDamper(regularizer, 4000.0f, 50.0f);
 				effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
 		
-				ndRobot::ndEffectorInfo info(ndSharedPtr<ndJointBilateralConstraint>(effector), footHinge);
+				//ndRobot::ndEffectorInfo info(ndSharedPtr<ndJointBilateralConstraint>(effector), footHinge);
+				ndRobot::ndEffectorInfo info(thighNode->m_joint, calfNode->m_joint, footNode->m_joint, ndSharedPtr<ndJointBilateralConstraint>(effector));
 				model->m_effectorsInfo.PushBack(info);
-		
+				
 				ndAnimKeyframe keyFrame;
 				keyFrame.m_userData = &model->m_effectorsInfo[model->m_effectorsInfo.GetCount() - 1];
 				model->m_animPose.PushBack(keyFrame);
@@ -1020,7 +1027,7 @@ namespace ndQuadruped_1
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32 (-1.0e10f))
 			,m_lastEpisode(-1)
-			,m_stopTraining(500 * 1000000)
+			,m_stopTraining(200 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();

@@ -603,7 +603,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//Test0__();
 	//Test1__();
 	//TestVulkanStuff();
-	ndHandWrittenDigits();
+	//ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
 }

@@ -56,6 +56,7 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 
 	D_NEWTON_API ndVector GetEffectorPosit() const;
 	D_NEWTON_API void GetDynamicState(ndVector& posit, ndVector& veloc) const;
+	D_NEWTON_API ndInt32 GetKinematicState(ndKinematicState* const state) const;
 
 	protected:
 	ndMatrix CalculateSwivelFrame(const ndMatrix& matrix1) const;

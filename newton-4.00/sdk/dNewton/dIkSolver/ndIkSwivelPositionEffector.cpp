@@ -233,6 +233,19 @@ void ndIkSwivelPositionEffector::GetDynamicState(ndVector& posit, ndVector& velo
 	veloc.m_w = (omega0 * swivelMatrix.m_front - omega1 * swivelMatrix.m_front).AddHorizontal().GetScalar();
 }
 
+ndInt32 ndIkSwivelPositionEffector::GetKinematicState(ndKinematicState* const state) const
+{
+	ndVector posit;
+	ndVector veloc;
+	GetDynamicState(posit, veloc);
+	for (ndInt32 i = 0; i < 4; i++)
+	{
+		state[i].m_posit = posit[i];
+		state[i].m_velocity = veloc[i];
+	}
+	return 4;
+}
+
 ndFloat32 ndIkSwivelPositionEffector::CalculateLookAtSwivelAngle(const ndVector& upDir) const
 {
 	ndFloat32 swivelAngle = GetSwivelAngle();

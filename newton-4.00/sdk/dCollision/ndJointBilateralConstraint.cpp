@@ -377,4 +377,8 @@ void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& de
 	desc.m_rowsCount = index + 1;
 }
 
-
+ndInt32 ndJointBilateralConstraint::GetKinematicState(ndKinematicState* const) const
+{
+	ndAssert(0);
+	return 0;
+}

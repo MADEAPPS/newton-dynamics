@@ -71,6 +71,13 @@ class ndJointBilateralConstraint : public ndConstraint
 		bool m_ikMode;
 	};
 
+	class ndKinematicState
+	{
+		public:
+		ndFloat32 m_posit;
+		ndFloat32 m_velocity;
+	};
+
 	D_COLLISION_API ndJointBilateralConstraint();
 	D_COLLISION_API ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrix);
 	D_COLLISION_API ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrixBody0,  const ndMatrix& globalMatrixBody1);
@@ -92,6 +99,9 @@ class ndJointBilateralConstraint : public ndConstraint
 	D_COLLISION_API virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 	D_COLLISION_API ndFloat32 CalculateSpringDamperAcceleration(ndFloat32 dt, ndFloat32 ks, ndFloat32 x, ndFloat32 kd, ndFloat32 v) const;
 	D_COLLISION_API void SetMassSpringDamperAcceleration(ndConstraintDescritor& desc, ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
+
+	D_COLLISION_API ndInt32 GetKinematicState(ndKinematicState* const state) const;
+
 	
 	const ndMatrix& GetLocalMatrix0() const;
 	const ndMatrix& GetLocalMatrix1() const;
