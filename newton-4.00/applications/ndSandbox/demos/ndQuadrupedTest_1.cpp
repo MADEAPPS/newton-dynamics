@@ -29,12 +29,13 @@ namespace ndQuadruped_1
 	class ndLegObservation
 	{
 		public:
-		ndBrainFloat m_posit_x;
-		ndBrainFloat m_posit_y;
-		ndBrainFloat m_posit_z;
-		ndBrainFloat m_veloc_x;
-		ndBrainFloat m_veloc_y;
-		ndBrainFloat m_veloc_z;
+		//ndBrainFloat m_posit_x;
+		//ndBrainFloat m_posit_y;
+		//ndBrainFloat m_posit_z;
+		//ndBrainFloat m_veloc_x;
+		//ndBrainFloat m_veloc_y;
+		//ndBrainFloat m_veloc_z;
+		ndBrainFloat m_state[10];
 		ndBrainFloat m_hasContact;
 		ndBrainFloat m_animSequence;
 	};
@@ -53,6 +54,7 @@ namespace ndQuadruped_1
 		ndActionVector m_torso;
 		ndFloat32 m_animSpeed;
 	};
+
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
@@ -590,17 +592,29 @@ namespace ndQuadruped_1
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
 				const ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-				const ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 			
-				ndJointBilateralConstraint::ndKinematicState kinematicState[8];
-				effector->GetKinematicState(kinematicState);
-				
-				observation.n_legs[i].m_posit_x = ndBrainFloat(kinematicState[0].m_posit);
-				observation.n_legs[i].m_posit_y = ndBrainFloat(kinematicState[1].m_posit);
-				observation.n_legs[i].m_posit_z = ndBrainFloat(kinematicState[2].m_posit);
-				observation.n_legs[i].m_veloc_x = ndBrainFloat(kinematicState[0].m_velocity);
-				observation.n_legs[i].m_veloc_y = ndBrainFloat(kinematicState[1].m_velocity);
-				observation.n_legs[i].m_veloc_z = ndBrainFloat(kinematicState[2].m_velocity);
+				ndJointBilateralConstraint::ndKinematicState kinematicState[16];
+#if 1
+				ndInt32 paramCount = 0;
+				paramCount += info->m_foot->GetKinematicState(&kinematicState[paramCount]);
+				paramCount += info->m_calf->GetKinematicState(&kinematicState[paramCount]);
+				paramCount += info->m_thigh->GetKinematicState(&kinematicState[paramCount]);
+				for (ndInt32 j = 0; j < paramCount; ++j)
+				{
+					observation.n_legs[i].m_state[j * 2 + 0] = ndBrainFloat(kinematicState[j].m_posit);
+					observation.n_legs[i].m_state[j * 2 + 1] = ndBrainFloat(kinematicState[j].m_velocity);
+				}
+#else
+				info->m_effector->GetKinematicState(kinematicState);
+				ndMemSet(&observation.n_legs[i].m_state[0], 0.0f, 10);
+				observation.n_legs[i].m_state[0] = ndBrainFloat(kinematicState[0].m_posit);
+				observation.n_legs[i].m_state[1] = ndBrainFloat(kinematicState[1].m_posit);
+				observation.n_legs[i].m_state[2] = ndBrainFloat(kinematicState[2].m_posit);
+				observation.n_legs[i].m_state[3] = ndBrainFloat(kinematicState[0].m_velocity);
+				observation.n_legs[i].m_state[4] = ndBrainFloat(kinematicState[1].m_velocity);
+				observation.n_legs[i].m_state[5] = ndBrainFloat(kinematicState[2].m_velocity);
+#endif
+
 				observation.n_legs[i].m_hasContact = ndBrainFloat(FindContact(i) ? 1.0f : 0.0f);
 				observation.n_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamInt ? 1.0f : 0.0f);
 			}
@@ -829,9 +843,9 @@ namespace ndQuadruped_1
 			ndRobot::ndUIControlNode* const control = model->m_control;
 
 			bool change = false;
-			change = change || ImGui::SliderFloat("posit x", &control->m_x, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
-			change = change || ImGui::SliderFloat("posit y", &control->m_y, -0.2f, 0.1f);
-			change = change || ImGui::SliderFloat("posit z", &control->m_z, -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
+			change = change || ImGui::SliderFloat("x", &control->m_x, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
+			change = change || ImGui::SliderFloat("y", &control->m_y, -0.2f, 0.1f);
+			change = change || ImGui::SliderFloat("z", &control->m_z, -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
 			change = change || ImGui::SliderFloat("pitch", &control->m_pitch, -15.0f, 15.0f);
 			change = change || ImGui::SliderFloat("yaw", &control->m_yaw, -20.0f, 20.0f);
 			change = change || ImGui::SliderFloat("roll", &control->m_roll, -15.0f, 15.0f);

@@ -58,3 +58,28 @@ void ndIkJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 	SubmitLimits(matrix0, matrix1, desc);
 }
+
+ndInt32 ndIkJointSpherical::GetKinematicState(ndKinematicState* const state) const
+{
+	const ndBodyKinematic* const body0 = GetBody0();
+	const ndBodyKinematic* const body1 = GetBody1();
+
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	
+	ndMatrix relMatrix(matrix1 * matrix0.Transpose3x3());
+	ndVector euler1;
+	ndVector euler(relMatrix.CalcPitchYawRoll(euler1));
+	ndVector relOmega(matrix0.UnrotateVector(body1->GetOmega() - body0->GetOmega()));
+
+	state[0].m_posit = euler.m_x;
+	state[1].m_posit = euler.m_y;
+	state[2].m_posit = euler.m_z;
+
+	state[0].m_velocity = relOmega.m_x;
+	state[1].m_velocity = relOmega.m_y;
+	state[2].m_velocity = relOmega.m_z;
+
+	return 3;
+}

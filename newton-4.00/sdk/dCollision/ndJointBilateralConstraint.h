@@ -100,7 +100,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	D_COLLISION_API ndFloat32 CalculateSpringDamperAcceleration(ndFloat32 dt, ndFloat32 ks, ndFloat32 x, ndFloat32 kd, ndFloat32 v) const;
 	D_COLLISION_API void SetMassSpringDamperAcceleration(ndConstraintDescritor& desc, ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 
-	D_COLLISION_API ndInt32 GetKinematicState(ndKinematicState* const state) const;
+	D_COLLISION_API virtual ndInt32 GetKinematicState(ndKinematicState* const state) const;
 
 	
 	const ndMatrix& GetLocalMatrix0() const;

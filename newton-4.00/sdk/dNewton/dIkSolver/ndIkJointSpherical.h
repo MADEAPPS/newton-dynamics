@@ -31,6 +31,8 @@ class ndIkJointSpherical: public ndJointSpherical, public ndJointBilateralConstr
 	D_NEWTON_API void SubmitAccel(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
+
+	D_NEWTON_API ndInt32 GetKinematicState(ndKinematicState* const state) const;
 };
 
 #endif 

@@ -273,4 +273,9 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	SubmitLimits(desc, matrix0, matrix1);
 }
 
-
+ndInt32 ndJointHinge::GetKinematicState(ndKinematicState* const state) const
+{
+	state->m_posit = m_angle;
+	state->m_velocity = m_omega;
+	return 1;
+}
