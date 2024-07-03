@@ -130,10 +130,6 @@ ndBrain* ndBrainLoad::Load() const
 		{
 			layer = ndBrainLayerActivationCategoricalSoftmax::Load(this);
 		}
-		else if (!strcmp(layerType, "ndBrainLayerApproximateTanhActivation"))
-		{
-			layer = ndBrainLayerApproximateTanhActivation::Load(this);
-		}
 		else if (!strcmp(layerType, "ndBrainLayerConvolutional_2d"))
 		{
 			layer = ndBrainLayerConvolutional_2d::Load(this);

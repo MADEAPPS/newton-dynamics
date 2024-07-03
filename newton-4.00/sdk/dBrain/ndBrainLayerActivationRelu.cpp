@@ -79,7 +79,8 @@ void ndBrainLayerActivationRelu::InputDerivative(const ndBrainVector&, const ndB
 
 	for (ndInt32 i = ndInt32(output.GetCount() - 1); i >= 0; --i)
 	{
-		inputDerivative[i] = (output[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		//inputDerivative[i] = (output[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		inputDerivative[i] = (output[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.5f);
 		ndAssert(ndCheckFloat(inputDerivative[i]));
 	}
 
