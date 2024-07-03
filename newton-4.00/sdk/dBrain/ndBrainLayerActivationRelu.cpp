@@ -72,15 +72,16 @@ void ndBrainLayerActivationRelu::MakePrediction(const ndBrainVector& input, ndBr
 	}
 }
 
-void ndBrainLayerActivationRelu::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerActivationRelu::InputDerivative(const ndBrainVector& input, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-	ndAssert(output.GetCount() == outputDerivative.GetCount());
-	ndAssert(output.GetCount() == inputDerivative.GetCount());
+	ndAssert(input.GetCount() == outputDerivative.GetCount());
+	ndAssert(input.GetCount() == inputDerivative.GetCount());
 
-	for (ndInt32 i = ndInt32(output.GetCount() - 1); i >= 0; --i)
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{
-		//inputDerivative[i] = (output[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-		inputDerivative[i] = (output[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.5f);
+		//inputDerivative[i] = (input[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		inputDerivative[i] = (input[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ((input[i] < ndBrainFloat(0.0f)) ? 0.0f : ndBrainFloat(0.5f));
+
 		ndAssert(ndCheckFloat(inputDerivative[i]));
 	}
 
