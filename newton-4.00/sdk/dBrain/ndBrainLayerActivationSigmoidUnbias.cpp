@@ -20,41 +20,41 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainLayerActivationSigmoid.h"
+#include "ndBrainLayerActivationSigmoidUnbias.h"
 
-ndBrainLayerActivationSigmoid::ndBrainLayerActivationSigmoid(ndInt32 neurons)
+ndBrainLayerActivationSigmoidUnbias::ndBrainLayerActivationSigmoidUnbias(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)
 {
 }
 
-ndBrainLayerActivationSigmoid::ndBrainLayerActivationSigmoid(const ndBrainLayerActivationSigmoid& src)
+ndBrainLayerActivationSigmoidUnbias::ndBrainLayerActivationSigmoidUnbias(const ndBrainLayerActivationSigmoidUnbias& src)
 	:ndBrainLayerActivation(src)
 {
 }
 
-ndBrainLayer* ndBrainLayerActivationSigmoid::Clone() const
+ndBrainLayer* ndBrainLayerActivationSigmoidUnbias::Clone() const
 {
-	return new ndBrainLayerActivationSigmoid(*this);
+	return new ndBrainLayerActivationSigmoidUnbias(*this);
 }
 
-const char* ndBrainLayerActivationSigmoid::GetLabelId() const
+const char* ndBrainLayerActivationSigmoidUnbias::GetLabelId() const
 {
-	return "ndBrainLayerActivationSigmoid";
+	return "ndBrainLayerActivationSigmoidUnbias";
 }
 
-ndBrainLayer* ndBrainLayerActivationSigmoid::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerActivationSigmoidUnbias::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
 	loadSave->ReadString(buffer);
 
 	loadSave->ReadString(buffer);
 	ndInt32 inputs = loadSave->ReadInt();
-	ndBrainLayerActivationSigmoid* const layer = new ndBrainLayerActivationSigmoid(inputs);
+	ndBrainLayerActivationSigmoidUnbias* const layer = new ndBrainLayerActivationSigmoidUnbias(inputs);
 	loadSave->ReadString(buffer);
 	return layer;
 }
 
-void ndBrainLayerActivationSigmoid::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+void ndBrainLayerActivationSigmoidUnbias::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
@@ -66,21 +66,22 @@ void ndBrainLayerActivationSigmoid::MakePrediction(const ndBrainVector& input, n
 
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{
-		output[i] = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) + output[i]);
-		ndAssert(output[i] <= ndBrainFloat(1.0f));
-		ndAssert(output[i] >= ndBrainFloat(0.0f));
+		output[i] = ndBrainFloat(2.0f) / (ndBrainFloat(1.0f) + output[i]) - ndBrainFloat(1.0f);
+		ndAssert(output[i] <= ndBrainFloat( 1.0f));
+		ndAssert(output[i] >= ndBrainFloat(-1.0f));
 	}
 	output.FlushToZero();
 }
 
-void ndBrainLayerActivationSigmoid::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerActivationSigmoidUnbias::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
 	ndAssert(output.GetCount() == inputDerivative.GetCount());
 
-	inputDerivative.Set(ndBrainFloat(1.0f));
-	inputDerivative.Sub(output);
-	inputDerivative.Mul(output);
+	for (ndInt32 i = ndInt32(output.GetCount() - 1); i >= 0; --i)
+	{
+		inputDerivative[i] = ndBrainFloat(0.5f) * (ndBrainFloat(1.0f) + output[i]) * (ndBrainFloat(1.0f) - output[i]);
+	}
 
 	inputDerivative.Mul(outputDerivative);
 	inputDerivative.FlushToZero();

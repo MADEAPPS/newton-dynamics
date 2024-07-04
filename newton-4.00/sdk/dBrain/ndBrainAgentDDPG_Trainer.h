@@ -247,8 +247,8 @@ bool ndBrainAgentDDPG_Trainer<statesDim, actionDim>::IsTrainer() const
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::InitWeights()
 {
-	m_actor.InitWeightsXavierMethod();
-	m_critic.InitWeightsXavierMethod();
+	m_actor.InitWeights();
+	m_critic.InitWeights();
 
 	m_targetActor.CopyFrom(m_actor);
 	m_targetCritic.CopyFrom(m_critic);

@@ -464,7 +464,7 @@ static void Cifar10TrainingSet()
 		{
 			brain.AddLayer(layers[i]);
 		}
-		brain.InitWeightsXavierMethod();
+		brain.InitWeights();
 		ndExpandTraceMessage("training cifar-10 database, number of parameters %d\n", brain.GetNumberOfParameters());
 
 		SupervisedTrainer optimizer(&brain);

@@ -32,6 +32,7 @@
 //#include "ndBrainLayerLinearWithDropOut.h"
 #include "ndBrainLayerCrossCorrelation_2d.h"
 //#include "ndBrainLayerConvolutionalWithDropOut_2d.h"
+#include "ndBrainLayerActivationSigmoidUnbias.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
 #include "ndBrainLayerActivationCategoricalSoftmax.h"
 
@@ -121,6 +122,10 @@ ndBrain* ndBrainLoad::Load() const
 		else if (!strcmp(layerType, "ndBrainLayerActivationSigmoidLinear"))
 		{
 			layer = ndBrainLayerActivationSigmoidLinear::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerActivationSigmoidUnbias"))
+		{
+			layer = ndBrainLayerActivationSigmoidUnbias::Load(this);
 		}
 		else if (!strcmp(layerType, "ndBrainLayerActivationSoftmax"))
 		{

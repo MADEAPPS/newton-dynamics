@@ -418,7 +418,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 		m_actor.AddLayer(layers[i]);
 	}
 
-	m_actor.InitWeightsXavierMethod();
+	m_actor.InitWeights();
 	ndAssert(!strcmp((m_actor[m_actor.GetCount() - 1])->GetLabelId(), "ndBrainLayerActivationTanh"));
 
 	m_trainers.SetCount(0);
@@ -451,7 +451,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	{
 		m_baseLineValue.AddLayer(layers[i]);
 	}
-	m_baseLineValue.InitWeightsXavierMethod();
+	m_baseLineValue.InitWeights();
 	
 	ndAssert(m_baseLineValue.GetOutputSize() == 1);
 	ndAssert(m_baseLineValue.GetInputSize() == m_actor.GetInputSize());

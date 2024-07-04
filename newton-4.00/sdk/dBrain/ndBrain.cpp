@@ -22,7 +22,9 @@
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainVector.h"
+#include "ndBrainTrainer.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainLossLeastSquaredError.h"
 
 ndBrain::ndBrain()
 	:ndArray<ndBrainLayer*>()
@@ -112,7 +114,7 @@ ndInt32 ndBrain::GetNumberOfParameters() const
 	return parameters;
 }
 
-void ndBrain::InitWeightsXavierMethod()
+void ndBrain::InitWeights()
 {
 	ndArray<ndBrainLayer*>& layers = *this;
 	for (ndInt32 i = ndInt32(layers.GetCount() - 1); i >= 0; --i)
@@ -266,7 +268,6 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, 
 	ndAssert(in.GetCount() == output.GetCount());
 	output.Set(in);
 }
-
 
 void ndBrain::MakePrediction_____(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer, const ndBrainVector workBufferGpu, const ndArray<ndInt32>& offsetsGpu)
 {

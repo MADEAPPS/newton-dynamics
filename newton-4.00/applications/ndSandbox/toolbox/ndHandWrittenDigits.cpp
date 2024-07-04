@@ -14,6 +14,7 @@
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
 
+
 static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 {
 	ndBrainMatrix* labelData = nullptr;
@@ -227,7 +228,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 //#pragma optimize( "", off )
 static void MnistTrainingSet()
 {
-	#define USE_CONVOLUTIONAL_LAYERS
+	//#define USE_CONVOLUTIONAL_LAYERS
 
 	#define BATCH_BUFFER_SIZE				64
 	#define CONVOLUTIONAL_FEATURE_MAPS		32
@@ -251,6 +252,7 @@ static void MnistTrainingSet()
 		#define ACTIVATION_TYPE ndBrainLayerActivationRelu
 	#else
 		#define ACTIVATION_TYPE ndBrainLayerActivationTanh
+		//#define ACTIVATION_TYPE ndBrainLayerActivationSigmoidUnbias
 		//#define ACTIVATION_TYPE ndBrainLayerActivationSigmoidLinear
 	#endif
 
@@ -603,7 +605,8 @@ static void MnistTrainingSet()
 		{
 			brain.AddLayer(layers[i]);
 		}
-		brain.InitWeightsXavierMethod();
+
+		brain.InitWeights();
 		ndExpandTraceMessage("training mnist database, number of parameters %d\n", brain.GetNumberOfParameters());
 	
 		SupervisedTrainer optimizer(&brain);
