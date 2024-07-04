@@ -135,28 +135,11 @@ bool ndBrainLayerCrossCorrelation_2d::HasParameters() const
 	return true;
 }
 
-void ndBrainLayerCrossCorrelation_2d::InitWeightsXavierMethod()
-{
-	ndBrainFloat weighVariance = ndBrainFloat(ndSqrt(ndFloat32(6.0f) / ndFloat32(GetInputSize() + GetOutputSize())));
-	InitWeights(weighVariance, ndBrainFloat(0.0f));
-}
-
-void ndBrainLayerCrossCorrelation_2d::InitGaussianBias(ndBrainFloat)
+void ndBrainLayerCrossCorrelation_2d::InitWeights()
 {
 	m_bias.Set(ndBrainFloat(0.0f));
-}
-
-void ndBrainLayerCrossCorrelation_2d::InitGaussianWeights(ndBrainFloat variance)
-{
+	ndBrainFloat variance = ndBrainFloat(ndSqrt(ndFloat32(1.0f) / ndFloat32(GetOutputSize())));
 	m_kernels.InitGaussianWeights(variance);
-}
-
-void ndBrainLayerCrossCorrelation_2d::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
-{
-	biasVariance = ndBrainFloat(0.0f);
-	weighVariance = ndMin(weighVariance, ndBrainFloat(0.05f));
-	InitGaussianBias(biasVariance);
-	InitGaussianWeights(weighVariance);
 }
 
 void ndBrainLayerCrossCorrelation_2d::Set(const ndBrainLayer& src)

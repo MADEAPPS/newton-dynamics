@@ -107,8 +107,6 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void BackPropagateCritic(const ndUnsigned32* const bashIndex);
 
 	void InitWeights();
-	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
-
 	void BackPropagate();
 	void SelectAction(ndBrainFloat* const actions) const;
 	
@@ -251,16 +249,6 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::InitWeights()
 {
 	m_actor.InitWeightsXavierMethod();
 	m_critic.InitWeightsXavierMethod();
-
-	m_targetActor.CopyFrom(m_actor);
-	m_targetCritic.CopyFrom(m_critic);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
-{
-	m_actor.InitWeights(weighVariance, biasVariance);
-	m_critic.InitWeights(weighVariance, biasVariance);
 
 	m_targetActor.CopyFrom(m_actor);
 	m_targetCritic.CopyFrom(m_critic);

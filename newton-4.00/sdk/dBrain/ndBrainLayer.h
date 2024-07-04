@@ -70,8 +70,7 @@ class ndBrainLayer : public ndClassAlloc
 
 	virtual void UpdateDropOut();
 	virtual void EnableDropOut(bool state);
-	virtual void InitWeightsXavierMethod();
-	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
+	virtual void InitWeights();
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;

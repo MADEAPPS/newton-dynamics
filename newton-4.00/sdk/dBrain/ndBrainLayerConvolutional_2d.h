@@ -48,8 +48,7 @@ class ndBrainLayerConvolutional_2d : public ndBrainLayer
 	virtual ndInt32 GetNumberOfParameters() const;
 		
 	virtual void UpdateDropOut();
-	virtual void InitWeightsXavierMethod();
-	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
+	virtual void InitWeights();
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
@@ -72,9 +71,6 @@ class ndBrainLayerConvolutional_2d : public ndBrainLayer
 	virtual void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
 
 	protected:
-	void InitGaussianBias(ndBrainFloat variance);
-	void InitGaussianWeights(ndBrainFloat variance);
-
 	virtual void GetNumberOfGPUParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const;
 	ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params);
 

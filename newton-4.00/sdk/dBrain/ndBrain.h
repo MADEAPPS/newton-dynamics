@@ -53,8 +53,6 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	void DisableDropOut();
 
 	void InitWeightsXavierMethod();
-	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
-
 	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients);
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer);

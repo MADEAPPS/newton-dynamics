@@ -49,8 +49,6 @@ class ndBrainAgentDiscretePolicyGradient: public ndBrainAgent
 	void Save(ndBrainSave* const loadSave);
 
 	void InitWeights();
-	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
-
 	ndSharedPtr<ndBrain> m_actor;
 };
 
@@ -74,12 +72,6 @@ bool ndBrainAgentDiscretePolicyGradient<statesDim, actionDim>::IsTrainer() const
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDiscretePolicyGradient<statesDim, actionDim>::InitWeights()
-{
-	ndAssert(0);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDiscretePolicyGradient<statesDim, actionDim>::InitWeights(ndBrainFloat, ndBrainFloat)
 {
 	ndAssert(0);
 }

@@ -90,8 +90,6 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void Save(ndBrainSave* const loadSave);
 
 	void InitWeights();
-	void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
-
 	bool IsSampling() const;
 	bool IsTerminal() const;
 	ndBrainFloat CalculateReward();
@@ -203,13 +201,6 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::InitWeights()
 {
 	m_actor.InitWeightsXavierMethod();
-	m_target.CopyFrom(m_actor);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDQN_Trainer<statesDim, actionDim>::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
-{
-	m_actor.InitWeights(weighVariance, biasVariance);
 	m_target.CopyFrom(m_actor);
 }
 

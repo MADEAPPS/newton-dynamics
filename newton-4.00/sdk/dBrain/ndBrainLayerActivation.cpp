@@ -109,11 +109,7 @@ void ndBrainLayerActivation::AdamUpdate(const ndBrainLayer&, const ndBrainLayer&
 	ndAssert(0);
 }
 
-void ndBrainLayerActivation::InitWeightsXavierMethod()
-{
-}
-
-void ndBrainLayerActivation::InitWeights(ndBrainFloat, ndBrainFloat)
+void ndBrainLayerActivation::InitWeights()
 {
 }
 

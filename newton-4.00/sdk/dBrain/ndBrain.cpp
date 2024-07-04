@@ -103,7 +103,6 @@ ndInt32 ndBrain::GetNumberOfParameters() const
 	const ndArray<ndBrainLayer*>& layers = *this;
 
 	ndInt32 parameters = 0;
-	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		const ndBrainLayer* const layer = layers[i];
@@ -113,42 +112,13 @@ ndInt32 ndBrain::GetNumberOfParameters() const
 	return parameters;
 }
 
-void ndBrain::InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance)
-{
-	ndArray<ndBrainLayer*>& layers = *this;
-	for (ndInt32 i = ndInt32(layers.GetCount() - 1); i >= 0; --i)
-	{
-		layers[i]->InitWeights(weighVariance, biasVariance);
-	}
-}
-
 void ndBrain::InitWeightsXavierMethod()
 {
 	ndArray<ndBrainLayer*>& layers = *this;
 	for (ndInt32 i = ndInt32(layers.GetCount() - 1); i >= 0; --i)
 	{
 		ndBrainLayer* const layer = layers[i];
-		if (layer->HasParameters())
-		{
-			if (i < (layers.GetCount() - 1))
-			{
-				const char* const labelMame = layers[i + 1]->GetLabelId();
-				if (!strcmp(labelMame, "ndBrainLayerActivationTanh"))
-				{
-					layer->InitWeightsXavierMethod();
-				}
-				else
-				{
-					//layer->InitWeights(ndBrainFloat(0.1f), ndBrainFloat(0.1f));
-					layer->InitWeightsXavierMethod();
-				}
-			}
-			else
-			{
-				//layer->InitWeights(ndBrainFloat(0.1f), ndBrainFloat(0.1f));
-				layer->InitWeightsXavierMethod();
-			}
-		}
+		layer->InitWeights();
 	}
 }
 

@@ -47,8 +47,7 @@ class ndBrainLayerCrossCorrelation_2d : public ndBrainLayer
 	virtual ndInt32 GetNumberOfParameters() const;
 	
 	virtual void UpdateDropOut();
-	virtual void InitWeightsXavierMethod();
-	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
+	virtual void InitWeights();
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
@@ -71,9 +70,6 @@ class ndBrainLayerCrossCorrelation_2d : public ndBrainLayer
 	virtual void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
 
 	private:
-	void InitGaussianBias(ndBrainFloat variance);
-	void InitGaussianWeights(ndBrainFloat variance);
-
 	ndBrainVector m_bias;
 	ndBrainVector m_kernels;
 	ndFixSizeArray<ndInt32, 128> m_inputOffsets;

@@ -109,12 +109,7 @@ void ndBrainLayer::EnableDropOut(bool)
 {
 }
 
-void ndBrainLayer::InitWeights(ndBrainFloat, ndBrainFloat)
-{
-	ndAssert(0);
-}
-
-void ndBrainLayer::InitWeightsXavierMethod()
+void ndBrainLayer::InitWeights()
 {
 	ndAssert(0);
 }

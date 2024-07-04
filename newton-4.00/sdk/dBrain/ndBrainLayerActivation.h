@@ -50,9 +50,7 @@ class ndBrainLayerActivation : public ndBrainLayer
 	void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
 	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
 	
-	virtual void InitWeightsXavierMethod();
-	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
-
+	virtual void InitWeights();
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	//virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;

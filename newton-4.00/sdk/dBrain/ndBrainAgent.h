@@ -41,7 +41,6 @@ class ndBrainAgent: public ndClassAlloc
 
 	virtual void InitWeights() = 0;
 	virtual bool IsTrainer() const = 0;
-	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance) = 0;
 	
 	protected:
 	virtual void ResetModel() = 0;

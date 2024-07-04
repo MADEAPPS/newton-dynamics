@@ -227,7 +227,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 //#pragma optimize( "", off )
 static void MnistTrainingSet()
 {
-	//#define USE_CONVOLUTIONAL_LAYERS
+	#define USE_CONVOLUTIONAL_LAYERS
 
 	#define BATCH_BUFFER_SIZE				64
 	#define CONVOLUTIONAL_FEATURE_MAPS		32
@@ -250,8 +250,8 @@ static void MnistTrainingSet()
 	#if 0
 		#define ACTIVATION_TYPE ndBrainLayerActivationRelu
 	#else
-		//#define ACTIVATION_TYPE ndBrainLayerActivationSigmoid
-		#define ACTIVATION_TYPE ndBrainLayerActivationSigmoidLinear
+		#define ACTIVATION_TYPE ndBrainLayerActivationTanh
+		//#define ACTIVATION_TYPE ndBrainLayerActivationSigmoidLinear
 	#endif
 
 	//#if 1
@@ -663,6 +663,6 @@ void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
 
-	//MnistTrainingSet();
-	MnistTestSet();
+	MnistTrainingSet();
+	//MnistTestSet();
 }

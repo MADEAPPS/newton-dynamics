@@ -44,9 +44,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual ndBrainVector* GetBias();
 	virtual ndBrainMatrix* GetWeights();
 	
-	virtual void InitWeightsXavierMethod();
-	virtual void InitWeights(ndBrainFloat weighVariance, ndBrainFloat biasVariance);
-
+	virtual void InitWeights();
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 
@@ -67,8 +65,6 @@ class ndBrainLayerLinear : public ndBrainLayer
 	void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
 
 	protected:
-	void InitGaussianBias(ndBrainFloat variance);
-	void InitGaussianWeights(ndBrainFloat variance);
 	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
 	virtual void GetNumberOfGPUParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const;

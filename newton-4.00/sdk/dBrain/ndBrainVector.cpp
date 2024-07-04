@@ -25,13 +25,16 @@
 
 void ndBrainVector::InitGaussianWeights(ndBrainFloat variance)
 {
-	Set(ndFloat32(0.0f));
 	if (variance > ndBrainFloat(1.0e-6f))
 	{
 		for (ndInt64 i = GetCount() - 1; i >= 0; --i)
 		{
 			(*this)[i] = ndBrainFloat(ndGaussianRandom(ndFloat32(0.0f), ndFloat32(variance)));
 		}
+	}
+	else
+	{
+		Set(ndFloat32(0.0f));
 	}
 }
 
