@@ -390,8 +390,8 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	SetThreadCount(hyperParameters.m_threadsCount);
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
-	//#define ACTIVATION_VPG_TYPE ndBrainLayerActivationTanh
-	#define ACTIVATION_VPG_TYPE ndBrainLayerActivationRelu
+	#define ACTIVATION_VPG_TYPE ndBrainLayerActivationTanh
+	//#define ACTIVATION_VPG_TYPE ndBrainLayerActivationRelu
 	//#define ACTIVATION_VPG_TYPE ndBrainLayerActivationSigmoidLinear
 	
 	layers.SetCount(0);

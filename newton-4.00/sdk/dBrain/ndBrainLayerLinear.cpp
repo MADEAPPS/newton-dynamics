@@ -99,7 +99,8 @@ bool ndBrainLayerLinear::HasParameters() const
 
 void ndBrainLayerLinear::InitWeightsXavierMethod()
 {
-	ndBrainFloat weighVariance = ndBrainFloat(ndSqrt(ndFloat32(6.0f) / ndFloat32(GetInputSize() + GetOutputSize())));
+	//ndBrainFloat weighVariance = ndBrainFloat(ndSqrt(ndFloat32(6.0f) / ndFloat32(GetInputSize() + GetOutputSize())));
+	ndBrainFloat weighVariance = ndBrainFloat(ndSqrt(ndFloat32(1.0f) / ndFloat32(GetOutputSize())));
 	InitWeights(weighVariance, ndBrainFloat(0.0f));
 }
 

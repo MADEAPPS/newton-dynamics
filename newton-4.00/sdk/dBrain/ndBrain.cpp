@@ -133,18 +133,20 @@ void ndBrain::InitWeightsXavierMethod()
 			if (i < (layers.GetCount() - 1))
 			{
 				const char* const labelMame = layers[i + 1]->GetLabelId();
-				if (!strcmp(labelMame, "ndBrainLayerTanhActivation"))
+				if (!strcmp(labelMame, "ndBrainLayerActivationTanh"))
 				{
 					layer->InitWeightsXavierMethod();
 				}
 				else
 				{
-					layer->InitWeights(ndBrainFloat(0.1f), ndBrainFloat(0.1f));
+					//layer->InitWeights(ndBrainFloat(0.1f), ndBrainFloat(0.1f));
+					layer->InitWeightsXavierMethod();
 				}
 			}
 			else
 			{
-				layer->InitWeights(ndBrainFloat(0.1f), ndBrainFloat(0.1f));
+				//layer->InitWeights(ndBrainFloat(0.1f), ndBrainFloat(0.1f));
+				layer->InitWeightsXavierMethod();
 			}
 		}
 	}
