@@ -31,12 +31,7 @@ namespace ndQuadruped_3
 	class ndLegObservation
 	{
 		public:
-		ndBrainFloat m_posit_x;
-		ndBrainFloat m_posit_y;
-		ndBrainFloat m_posit_z;
-		ndBrainFloat m_veloc_x;
-		ndBrainFloat m_veloc_y;
-		ndBrainFloat m_veloc_z;
+		ndBrainFloat m_state[2 * 3];
 		ndBrainFloat m_hasContact;
 		ndBrainFloat m_animSequence;
 	};
@@ -152,17 +147,27 @@ namespace ndQuadruped_3
 			public:
 			ndEffectorInfo()
 				:m_basePosition(ndVector::m_wOne)
-				,m_effector(nullptr)
 			{
 			}
 
-			ndEffectorInfo(const ndSharedPtr<ndJointBilateralConstraint>& effector)
+			//ndEffectorInfo(const ndSharedPtr<ndJointBilateralConstraint>& effector)
+			ndEffectorInfo(
+				const ndSharedPtr<ndJointBilateralConstraint>& hip,
+				const ndSharedPtr<ndJointBilateralConstraint>& thigh,
+				const ndSharedPtr<ndJointBilateralConstraint>& calf,
+				const ndSharedPtr<ndJointBilateralConstraint>& effector)
 				:m_basePosition(((ndIkSwivelPositionEffector*)*effector)->GetLocalTargetPosition())
+				,m_hip(hip)
+				,m_thigh(thigh)
+				,m_calf(calf)
 				,m_effector(effector)
 			{
 			}
 
 			ndVector m_basePosition;
+			ndSharedPtr<ndJointBilateralConstraint> m_hip;
+			ndSharedPtr<ndJointBilateralConstraint> m_thigh;
+			ndSharedPtr<ndJointBilateralConstraint> m_calf;
 			ndSharedPtr<ndJointBilateralConstraint> m_effector;
 		};
 
@@ -740,18 +745,30 @@ namespace ndQuadruped_3
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
 				const ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-				const ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 
-				ndVector effectPositState;
-				ndVector effectVelocState;
-				effector->GetDynamicState(effectPositState, effectVelocState);
+				//const ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+				//ndVector effectPositState;
+				//ndVector effectVelocState;
+				//effector->GetDynamicState(effectPositState, effectVelocState);
+				//observation.n_legs[i].m_posit_x = ndBrainFloat(effectPositState.m_x);
+				//observation.n_legs[i].m_posit_y = ndBrainFloat(effectPositState.m_y);
+				//observation.n_legs[i].m_posit_z = ndBrainFloat(effectPositState.m_z);
+				//observation.n_legs[i].m_veloc_x = ndBrainFloat(effectVelocState.m_x);
+				//observation.n_legs[i].m_veloc_y = ndBrainFloat(effectVelocState.m_y);
+				//observation.n_legs[i].m_veloc_z = ndBrainFloat(effectVelocState.m_z);
 
-				observation.n_legs[i].m_posit_x = ndBrainFloat(effectPositState.m_x);
-				observation.n_legs[i].m_posit_y = ndBrainFloat(effectPositState.m_y);
-				observation.n_legs[i].m_posit_z = ndBrainFloat(effectPositState.m_z);
-				observation.n_legs[i].m_veloc_x = ndBrainFloat(effectVelocState.m_x);
-				observation.n_legs[i].m_veloc_y = ndBrainFloat(effectVelocState.m_y);
-				observation.n_legs[i].m_veloc_z = ndBrainFloat(effectVelocState.m_z);
+				ndInt32 paramCount = 0;
+				ndJointBilateralConstraint::ndKinematicState kinematicState[16];
+
+				paramCount += info->m_hip->GetKinematicState(&kinematicState[paramCount]);
+				paramCount += info->m_thigh->GetKinematicState(&kinematicState[paramCount]);
+				paramCount += info->m_calf->GetKinematicState(&kinematicState[paramCount]);
+				for (ndInt32 j = 0; j < paramCount; ++j)
+				{
+					observation.n_legs[i].m_state[j * 2 + 0] = ndBrainFloat(kinematicState[j].m_posit);
+					observation.n_legs[i].m_state[j * 2 + 1] = ndBrainFloat(kinematicState[j].m_velocity);
+				}
+
 				observation.n_legs[i].m_hasContact = ndBrainFloat (FindContact(i) ? 1.0f : 0.0f);
 				observation.n_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamInt ? 1.0f : 0.0f);
 			}
@@ -1025,9 +1042,9 @@ namespace ndQuadruped_3
 			ndRobot::ndUIControlNode* const control = model->m_control;
 
 			bool change = false;
-			change = change || ImGui::SliderFloat("posit x", &control->m_x, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
-			change = change || ImGui::SliderFloat("posit y", &control->m_y, -0.2f, 0.1f);
-			change = change || ImGui::SliderFloat("posit z", &control->m_z, -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
+			change = change || ImGui::SliderFloat("x", &control->m_x, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
+			change = change || ImGui::SliderFloat("y", &control->m_y, -0.2f, 0.1f);
+			change = change || ImGui::SliderFloat("z", &control->m_z, -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
 			change = change || ImGui::SliderFloat("pitch", &control->m_pitch, -15.0f, 15.0f);
 			change = change || ImGui::SliderFloat("yaw", &control->m_yaw, -20.0f, 20.0f);
 			change = change || ImGui::SliderFloat("roll", &control->m_roll, -15.0f, 15.0f);
@@ -1127,32 +1144,35 @@ namespace ndQuadruped_3
 					else
 					{
 						ndDemoEntityNotify* notify = (ndDemoEntityNotify*)parentNode->m_body->GetNotifyCallback();
-						
 						notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
 						notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
-		
+
 						ndMatrix effectorFrame(rootBody->GetMatrix());
 						ndMatrix pivotFrame(ndRollMatrix(-90.0f * ndDegreeToRad) * rootBody->GetMatrix());
 						pivotFrame.m_posit = notify->GetBody()->GetMatrix().m_posit;
 						effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
-		
+						
 						ndFloat32 regularizer = 0.001f;
 						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, parentNode->m_body->GetAsBodyDynamic(), modelRoot->m_body->GetAsBodyDynamic());
-		
+						
 						effector->SetSwivelMode(false);
 						effector->SetLinearSpringDamper(regularizer, 5000.0f, 50.0f);
 						//effector->SetAngularSpringDamper(regularizer, 5000.0f, 50.0f);
-		
+						
 						const ndVector elbowPoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
 						const ndVector dist0(effectorFrame.m_posit - elbowPoint);
 						const ndVector dist1(elbowPoint - pivotFrame.m_posit);
 						const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
 						effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
+						
+						ndSharedPtr<ndJointBilateralConstraint> effectorPtr(effector);
+						ndSharedPtr<ndJointBilateralConstraint> calf(parentNode->m_joint);
+						ndSharedPtr<ndJointBilateralConstraint> thigh(parentNode->GetParent()->m_joint);
+						ndSharedPtr<ndJointBilateralConstraint> hip(parentNode->GetParent()->GetParent()->m_joint);
 
-						ndSharedPtr<ndJointBilateralConstraint> effectotPtr(effector);
-						ndRobot::ndEffectorInfo info(effectotPtr);
+						ndRobot::ndEffectorInfo info(hip, thigh, calf, effectorPtr);
 						model->m_effectorsInfo.PushBack(info);
-
+						
 						ndAnimKeyframe keyFrame;
 						keyFrame.m_userData = &model->m_effectorsInfo[model->m_effectorsInfo.GetCount() - 1];
 						model->m_animPose.PushBack(keyFrame);

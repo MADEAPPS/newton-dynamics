@@ -204,10 +204,13 @@ ndVector ndIkSwivelPositionEffector::GetEffectorPosit() const
 	return posit;
 }
 
-void ndIkSwivelPositionEffector::GetDynamicState(ndVector& posit, ndVector& veloc) const
+ndInt32 ndIkSwivelPositionEffector::GetKinematicState(ndKinematicState* const state) const
 {
+	ndVector posit;
+	ndVector veloc;
 	ndMatrix matrix0;
 	ndMatrix matrix1;
+
 	CalculateGlobalMatrix(matrix0, matrix1);
 	matrix1.m_posit = matrix1.TransformVector(m_localTargetPosit);
 
@@ -231,13 +234,7 @@ void ndIkSwivelPositionEffector::GetDynamicState(ndVector& posit, ndVector& velo
 	const ndMatrix swivelMatrix(ndPitchMatrix(-m_swivelAngle) * CalculateSwivelFrame(matrix1));
 	posit.m_w = CalculateAngle(matrix0[1], swivelMatrix[1], swivelMatrix[0]);
 	veloc.m_w = (omega0 * swivelMatrix.m_front - omega1 * swivelMatrix.m_front).AddHorizontal().GetScalar();
-}
 
-ndInt32 ndIkSwivelPositionEffector::GetKinematicState(ndKinematicState* const state) const
-{
-	ndVector posit;
-	ndVector veloc;
-	GetDynamicState(posit, veloc);
 	for (ndInt32 i = 0; i < 4; i++)
 	{
 		state[i].m_posit = posit[i];

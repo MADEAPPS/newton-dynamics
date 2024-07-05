@@ -23,19 +23,13 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	class ndLegObservation
 	{
 		public:
-		//ndBrainFloat m_posit_x;
-		//ndBrainFloat m_posit_y;
-		//ndBrainFloat m_posit_z;
-		//ndBrainFloat m_veloc_x;
-		//ndBrainFloat m_veloc_y;
-		//ndBrainFloat m_veloc_z;
-		ndBrainFloat m_state[10];
+		ndBrainFloat m_state[2 * 5];
 		ndBrainFloat m_hasContact;
 		ndBrainFloat m_animSequence;
 	};
@@ -76,7 +70,6 @@ namespace ndQuadruped_1
 			{
 			}
 
-			//ndEffectorInfo(const ndSharedPtr<ndJointBilateralConstraint>& effector, ndJointHinge* const footHinge)
 			ndEffectorInfo(
 				const ndSharedPtr<ndJointBilateralConstraint>& thigh,
 				const ndSharedPtr<ndJointBilateralConstraint>& calf,
@@ -592,10 +585,10 @@ namespace ndQuadruped_1
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
 				const ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-			
-				ndJointBilateralConstraint::ndKinematicState kinematicState[16];
-#if 1
+
 				ndInt32 paramCount = 0;
+				ndJointBilateralConstraint::ndKinematicState kinematicState[16];
+
 				paramCount += info->m_thigh->GetKinematicState(&kinematicState[paramCount]);
 				paramCount += info->m_calf->GetKinematicState(&kinematicState[paramCount]);
 				paramCount += info->m_foot->GetKinematicState(&kinematicState[paramCount]);
@@ -604,16 +597,6 @@ namespace ndQuadruped_1
 					observation.n_legs[i].m_state[j * 2 + 0] = ndBrainFloat(kinematicState[j].m_posit);
 					observation.n_legs[i].m_state[j * 2 + 1] = ndBrainFloat(kinematicState[j].m_velocity);
 				}
-#else
-				info->m_effector->GetKinematicState(kinematicState);
-				ndMemSet(&observation.n_legs[i].m_state[0], 0.0f, 10);
-				observation.n_legs[i].m_state[0] = ndBrainFloat(kinematicState[0].m_posit);
-				observation.n_legs[i].m_state[1] = ndBrainFloat(kinematicState[1].m_posit);
-				observation.n_legs[i].m_state[2] = ndBrainFloat(kinematicState[2].m_posit);
-				observation.n_legs[i].m_state[3] = ndBrainFloat(kinematicState[0].m_velocity);
-				observation.n_legs[i].m_state[4] = ndBrainFloat(kinematicState[1].m_velocity);
-				observation.n_legs[i].m_state[5] = ndBrainFloat(kinematicState[2].m_velocity);
-#endif
 
 				observation.n_legs[i].m_hasContact = ndBrainFloat(FindContact(i) ? 1.0f : 0.0f);
 				observation.n_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamInt ? 1.0f : 0.0f);
