@@ -504,10 +504,7 @@ namespace ndQuadruped_3
 				
 				ndFloat32 randVar = ndRand();
 				randVar = randVar * randVar;
-				ndFloat32 speed0 = ndFloat32(0.05f);
-				ndFloat32 speed1 = ndFloat32(1.5f);
-				ndFloat32 animationSpeed = speed0 + (speed1 - speed0) * randVar;
-				m_model->m_control->m_animSpeed = animationSpeed;
+				m_model->m_control->m_animSpeed = randVar;
 			}
 
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
@@ -776,8 +773,6 @@ namespace ndQuadruped_3
 			observation.m_torso.m_x = m_control->m_x;
 			observation.m_torso.m_z = m_control->m_z;
 			observation.m_animSpeed = m_control->m_animSpeed;
-			//observation.m_animTime = m_poseGenerator->GetTime();
-			//ndTrace(("%f\n", observation.m_animTime));
 		}
 
 		void ApplyActions(ndBrainFloat* const actions)
@@ -984,7 +979,8 @@ namespace ndQuadruped_3
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
-			m_animBlendTree->Update(timestep * m_control->m_animSpeed);
+			ndFloat32 animSpeed = (m_control->m_animSpeed > 0.0f) ? (1.0f + 3.0f * m_control->m_animSpeed) : 0.0f;
+			m_animBlendTree->Update(timestep * animSpeed);
 			ndModelArticulation::PostUpdate(world, timestep);
 		}
 
@@ -1048,7 +1044,7 @@ namespace ndQuadruped_3
 			change = change || ImGui::SliderFloat("pitch", &control->m_pitch, -15.0f, 15.0f);
 			change = change || ImGui::SliderFloat("yaw", &control->m_yaw, -20.0f, 20.0f);
 			change = change || ImGui::SliderFloat("roll", &control->m_roll, -15.0f, 15.0f);
-			change = change || ImGui::SliderFloat("animSpeed", &control->m_animSpeed, 0.0f, 4.0f);
+			change = change || ImGui::SliderFloat("animSpeed", &control->m_animSpeed, 0.0f, 1.0f);
 			change = change || ImGui::Checkbox("enable controller", &control->m_enableController);
 
 			if (change)
@@ -1217,7 +1213,7 @@ namespace ndQuadruped_3
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
 			,m_lastEpisode(-1)
-			,m_stopTraining(500 * 1000000)
+			,m_stopTraining(300 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
