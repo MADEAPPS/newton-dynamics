@@ -1391,7 +1391,8 @@ namespace ndQuadruped_3
 				}
 			}
 		
-			if (stopTraining >= m_stopTraining)
+			//if (stopTraining >= m_stopTraining)
+			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > ndFloat32(2.0f * 98.5f)))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;

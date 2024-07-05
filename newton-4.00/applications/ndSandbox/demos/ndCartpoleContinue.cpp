@@ -24,7 +24,7 @@
 
 namespace ndCarpole_1
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME "cartpoleContinueVPG.dnn"
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
@@ -474,7 +474,8 @@ namespace ndCarpole_1
 				}
 			}
 
-			if (stopTraining >= m_stopTraining)
+			//if (stopTraining >= m_stopTraining)
+			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > ndFloat32(98.5f)))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
