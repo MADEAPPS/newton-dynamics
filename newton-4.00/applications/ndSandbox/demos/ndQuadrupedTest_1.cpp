@@ -370,10 +370,6 @@ namespace ndQuadruped_1
 				ndFloat32 randVar = ndRand();
 				randVar = randVar * randVar;
 				//randVar = randVar * randVar * randVar;
-				//ndFloat32 speed0 = ndFloat32(1.0f);
-				//ndFloat32 speed1 = ndFloat32(4.0f);
-				//ndFloat32 animationSpeed = speed0 +  (speed1 - speed0) * randVar;
-				//m_model->m_control->m_animSpeed = animationSpeed;
 				m_model->m_control->m_animSpeed = randVar;
 			}
 
@@ -784,7 +780,7 @@ namespace ndQuadruped_1
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
-			ndFloat32 animSpeed = (m_control->m_animSpeed > 0.0f) ? (1.0f + 3.0f * m_control->m_animSpeed) : 0.0f;
+			ndFloat32 animSpeed = (m_control->m_animSpeed > 0.01f) ? (1.0f + 1.0f * m_control->m_animSpeed) : 0.0f;
 			m_animBlendTree->Update(timestep * animSpeed);
 			ndModelArticulation::PostUpdate(world, timestep);
 		}
