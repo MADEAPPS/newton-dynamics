@@ -23,7 +23,7 @@
 
 namespace ndCarpole_0
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME		"cartpoleDiscreteVPG.dnn"
 	#define CRITIC_NAME			"cartpoleDiscreteCriticVPG.dnn"
 
