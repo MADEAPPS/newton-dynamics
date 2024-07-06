@@ -593,7 +593,6 @@ namespace ndUnicycle
 				}
 			}
 
-			//if (stopTraining >= m_stopTraining)
 			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > ndFloat32(98.5f)))
 			{
 				char fileName[1024];

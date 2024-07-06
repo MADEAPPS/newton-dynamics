@@ -249,7 +249,7 @@ namespace ndCarpole_0
 		ndPhysicsWorld* const world = scene->GetWorld();
 		
 		// make cart
-		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.png")));
+		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "wood_0.png")));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
 		//ndMatrix matrix(cartBody->GetMatrix());
 		ndMatrix matrix(location);

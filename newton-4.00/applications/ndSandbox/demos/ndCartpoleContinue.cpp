@@ -24,7 +24,7 @@
 
 namespace ndCarpole_1
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME "cartpoleContinueVPG.dnn"
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
@@ -255,7 +255,7 @@ namespace ndCarpole_1
 		ndPhysicsWorld* const world = scene->GetWorld();
 		
 		// make cart
-		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.png")));
+		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "wood_0.png")));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
 		//ndMatrix matrix(cartBody->GetMatrix());
 		ndMatrix matrix(location);

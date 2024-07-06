@@ -14,7 +14,6 @@
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
 
-
 static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 {
 	ndBrainMatrix* labelData = nullptr;

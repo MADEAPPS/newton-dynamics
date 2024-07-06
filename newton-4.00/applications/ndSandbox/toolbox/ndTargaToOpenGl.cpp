@@ -181,14 +181,18 @@ GLuint LoadTexture(const char* const filename)
 	char pngName[1024];
 	char fullPathName[2048];
 
-	ndAssert(strstr(filename, ".tga"));
+	ndAssert(strstr(filename, ".png"));
 
 	sprintf(pngName, "%s", filename);
 	strtolwr(pngName);
 	char* const fileNameEnd = strstr(pngName, ".tga");
-	*fileNameEnd = 0;
-	strcat(pngName, ".png");
+	if (fileNameEnd)
+	{
+		*fileNameEnd = 0;
+		strcat(pngName, ".png");
+	}
 	ndGetWorkingFileName(pngName, fullPathName);
+
 	ndTextureCache& cache = ndTextureCache::GetChache();
 	ndTextureEntry* texture = cache.Find(fullPathName);
 	if (texture)

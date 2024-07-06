@@ -54,6 +54,7 @@ class ndBrainTrainer: public ndClassAlloc
 	ndBrainVector m_workingBuffer;
 	ndFixSizeArray<ndInt32, 256> m_prefixScan;
 	ndBrain* m_brain;
+	ndInt32 m_workingBufferSize;
 	ndInt32 m_maxLayerBufferSize;
 };
 

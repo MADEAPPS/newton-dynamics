@@ -150,7 +150,6 @@ namespace ndQuadruped_3
 			{
 			}
 
-			//ndEffectorInfo(const ndSharedPtr<ndJointBilateralConstraint>& effector)
 			ndEffectorInfo(
 				const ndSharedPtr<ndJointBilateralConstraint>& hip,
 				const ndSharedPtr<ndJointBilateralConstraint>& thigh,

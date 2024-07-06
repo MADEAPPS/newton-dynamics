@@ -106,7 +106,8 @@ ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
 	m_prefixScan.PushBack(sizeAcc + 32);
 
 	m_maxLayerBufferSize = maxSize;
-	m_workingBuffer.SetCount(sizeAcc + maxSize * 2 + 256);
+	m_workingBufferSize = sizeAcc + maxSize * 2 + 256;
+	m_workingBuffer.SetCount(m_workingBufferSize);
 }
 
 ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
@@ -115,6 +116,7 @@ ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
 	,m_workingBuffer()
 	,m_prefixScan(src.m_prefixScan)
 	,m_brain(src.m_brain)
+	,m_workingBufferSize(src.m_workingBufferSize)
 	,m_maxLayerBufferSize(src.m_maxLayerBufferSize)
 {
 	ndAssert(0);
@@ -191,9 +193,9 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
 	ndAssert(!(loss.IsCategorical() ^ (!strcmp(layers[layersCount - 1]->GetLabelId(), "ndBrainLayerActivationCategoricalSoftmax"))));
 
-	if (m_workingBuffer.GetCount() < m_workingBuffer.GetCapacity())
+	if (m_workingBuffer.GetCount() < m_workingBufferSize)
 	{
-		m_workingBuffer.SetCount(m_workingBuffer.GetCapacity());
+		m_workingBuffer.SetCount(m_workingBufferSize);
 	}
 
 	const ndInt32 gradientOffset = m_prefixScan[m_prefixScan.GetCount() - 1];
