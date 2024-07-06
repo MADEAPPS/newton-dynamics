@@ -178,9 +178,11 @@ static GLuint LoadGpuImage(const unsigned char* const buffer, ndInt32 width, ndI
 //	but in this case spares us having to write a bitmap loading routine.
 GLuint LoadTexture(const char* const filename)
 {
+	char pngName[1024];
 	char fullPathName[2048];
 
-	char pngName[1024];
+	ndAssert(strstr(filename, ".tga"));
+
 	sprintf(pngName, "%s", filename);
 	strtolwr(pngName);
 	char* const fileNameEnd = strstr(pngName, ".tga");
