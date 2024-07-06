@@ -564,7 +564,7 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 		for (ndInt32 i = 0; i < indexCount; ++i)
 		{
 			ofbx::Vec2 n = uv[i];
-			uvArray[i] = ndMeshEffect::ndUV(ndFloat32(n.x), ndFloat32(n.y));
+			uvArray[i] = ndMeshEffect::ndUV(ndFloat32(n.x), ndFloat32(1.0f - n.y));
 		}
 		format.m_uv0.m_data = &uvArray[0].m_u;
 		format.m_uv0.m_indexList = &indexArray[0];

@@ -784,7 +784,8 @@ namespace ndQuadruped_1
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
-			ndFloat32 animSpeed = (m_control->m_animSpeed > 0.01f) ? (1.0f + 1.0f * m_control->m_animSpeed) : 0.0f;
+			//ndFloat32 animSpeed = (m_control->m_animSpeed > 0.01f) ? (1.0f + 1.0f * m_control->m_animSpeed) : 0.0f;
+			ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
 			m_animBlendTree->Update(timestep * animSpeed);
 			ndModelArticulation::PostUpdate(world, timestep);
 		}

@@ -25,7 +25,7 @@
 
 namespace ndQuadruped_3
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndSpot-VPG.dnn"
 
 	class ndLegObservation
@@ -967,7 +967,9 @@ namespace ndQuadruped_3
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
-			ndFloat32 animSpeed = (m_control->m_animSpeed > 0.0f) ? (1.0f + 1.0f * m_control->m_animSpeed) : 0.0f;
+			//ndFloat32 animSpeed = (m_control->m_animSpeed > 0.0f) ? (1.0f + 1.0f * m_control->m_animSpeed) : 0.0f;
+			//ndFloat32 animSpeed = (m_control->m_animSpeed > 0.0f) ? (0.1f + 1.0f * m_control->m_animSpeed) : 0.0f;
+			ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
 			m_animBlendTree->Update(timestep * animSpeed);
 			ndModelArticulation::PostUpdate(world, timestep);
 		}
