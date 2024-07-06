@@ -191,6 +191,11 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 	const ndArray<ndBrainLayer*>& layers = *m_brain;
 	ndAssert(!(loss.IsCategorical() ^ (!strcmp(layers[layersCount - 1]->GetLabelId(), "ndBrainLayerActivationCategoricalSoftmax"))));
 
+	if (m_workingBuffer.GetCount() < m_workingBuffer.GetCapacity())
+	{
+		m_workingBuffer.SetCount(m_workingBuffer.GetCapacity());
+	}
+
 	const ndInt32 gradientOffset = m_prefixScan[m_prefixScan.GetCount() - 1];
 	const ndBrainFloat* const memBuffer = &m_workingBuffer[0];
 	const ndBrainFloat* const gradientBuffer = &m_workingBuffer[gradientOffset];

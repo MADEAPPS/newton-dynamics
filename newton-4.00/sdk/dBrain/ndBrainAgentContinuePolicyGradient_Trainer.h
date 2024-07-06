@@ -155,10 +155,10 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 			// so for now I use const sigma optimization only.
 			m_useConstantSigma = true;
 
-			//m_criticLearnRate = ndBrainFloat(0.0005f);
-			//m_policyLearnRate = ndBrainFloat(0.0002f);
-			m_criticLearnRate = ndBrainFloat(0.001f);
-			m_policyLearnRate = ndBrainFloat(0.001f);
+			m_criticLearnRate = ndBrainFloat(0.0005f);
+			m_policyLearnRate = ndBrainFloat(0.0002f);
+			//m_criticLearnRate = ndBrainFloat(0.001f);
+			//m_policyLearnRate = ndBrainFloat(0.001f);
 
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
