@@ -516,7 +516,8 @@ static void MnistTrainingSet()
 			}
 
 			ndInt32 scoreMode = 0;
-			for (ndInt32 epoch = 0; epoch < 100; ++epoch)
+			//for (ndInt32 epoch = 0; epoch < 100; ++epoch)
+			for (ndInt32 epoch = 0; epoch < 50; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
