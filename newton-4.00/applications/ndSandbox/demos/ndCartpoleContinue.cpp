@@ -255,7 +255,7 @@ namespace ndCarpole_1
 		ndPhysicsWorld* const world = scene->GetWorld();
 		
 		// make cart
-		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.tga")));
+		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.png")));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
 		//ndMatrix matrix(cartBody->GetMatrix());
 		ndMatrix matrix(location);
@@ -266,7 +266,7 @@ namespace ndCarpole_1
 		matrix.m_posit.m_y += ySize / 2.0f;
 
 		// make pole leg
-		ndSharedPtr<ndBody> poleBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), poleMass, poleRadio, poleRadio, poleLength, "smilli.tga")));
+		ndSharedPtr<ndBody> poleBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), poleMass, poleRadio, poleRadio, poleLength, "smilli.png")));
 		ndMatrix poleLocation(ndRollMatrix(90.0f * ndDegreeToRad) * matrix);
 		poleLocation.m_posit.m_y += poleLength * 0.5f;
 		poleBody->SetMatrix(poleLocation);

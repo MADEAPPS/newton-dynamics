@@ -102,8 +102,8 @@ class NewtonPhantom : public ndModel
 	
 		ndDemoMesh* CreatePhantomMesh(ndDemoEntityManager* const scene, ndShapeInstance* const shape, const ndVector& color)
 		{
-			//DemoMesh* const mesh = new DemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);
-			ndDemoMesh* const mesh = new ndDemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);
+			//DemoMesh* const mesh = new DemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.png", "smilli.png", "smilli.png", 0.5f);
+			ndDemoMesh* const mesh = new ndDemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.png", "smilli.png", "smilli.png", 0.5f);
 			
 			ndDemoSubMesh& subMesh = mesh->GetFirst()->GetInfo();
 			subMesh.m_material.m_specular = color;
@@ -170,7 +170,7 @@ class NewtonPhantom : public ndModel
 
 	//	//DemoMesh* CreatePhantomMesh(DemoEntityManager* const scene, NewtonCollision* const shape, const dVector& color)
 	//	//{
-	//	//	DemoMesh* const mesh = new DemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);
+	//	//	DemoMesh* const mesh = new DemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.png", "smilli.png", "smilli.png", 0.5f);
 	//	//	DemoSubMesh& subMesh = mesh->GetFirst()->GetInfo();
 	//	//	subMesh.m_specular = color;
 	//	//	subMesh.m_diffuse = color;

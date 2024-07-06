@@ -44,7 +44,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 
 		m_shader = shaderCache.m_diffuseEffect;
 
-		BuildTilesArray(indexList, "texture1.tga");
+		BuildTilesArray(indexList, "texture1.png");
 		BuildVertexAndNormals(indexList, heightfield, points);
 		OptimizeForRender(&points[0], ndInt32(points.GetCount()), &indexList[0], ndInt32(indexList.GetCount()));
 	}
@@ -83,7 +83,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 		
 		ndDemoSubMesh* const segment = AddSubMesh();
 		segment->m_material.SetTextureName(texName);
-		ndInt32 texHandle = ndInt32(LoadTexture("texture1.tga"));
+		ndInt32 texHandle = ndInt32(LoadTexture("texture1.png"));
 		segment->m_material.SetTexture(texHandle);
 		ReleaseTexture(GLuint(texHandle));
 		

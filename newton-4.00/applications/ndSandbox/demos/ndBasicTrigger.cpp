@@ -31,7 +31,7 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	uvMatrix[1][1] *= 1.0f / 10.0f;
 	uvMatrix[2][2] *= 1.0f / 20.0f;
 	uvMatrix.m_posit = ndVector(0.5f, 0.5f, 0.5f, 1.0f);
-	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("trigger", scene->GetShaderCache(), &box, "metal_30.tga", "metal_30.tga", "logo_php.tga", 0.5f, uvMatrix));
+	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("trigger", scene->GetShaderCache(), &box, "metal_30.png", "metal_30.png", "logo_php.png", 0.5f, uvMatrix));
 
 	ndVector floor(FindFloor(*world, ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	ndMatrix matrix(ndGetIdentityMatrix());

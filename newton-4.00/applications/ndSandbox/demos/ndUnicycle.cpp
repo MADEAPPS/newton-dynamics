@@ -337,7 +337,7 @@ namespace ndUnicycle
 		ndPhysicsWorld* const world = scene->GetWorld();
 		
 		// add hip body
-		ndSharedPtr<ndBody> hipBody(world->GetBody(AddBox(scene, location, mass, xSize, ySize, zSize, "wood_0.tga")));
+		ndSharedPtr<ndBody> hipBody(world->GetBody(AddBox(scene, location, mass, xSize, ySize, zSize, "wood_0.png")));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(hipBody);
 
 		//ndMatrix matrix(hipBody->GetMatrix());
@@ -353,7 +353,7 @@ namespace ndUnicycle
 		ndFloat32 limbLength = 0.3f;
 		ndFloat32 limbRadio = 0.025f;
 
-		ndSharedPtr<ndBody> legBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "wood_1.tga")));
+		ndSharedPtr<ndBody> legBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "wood_1.png")));
 		ndMatrix legLocation(ndRollMatrix(-90.0f * ndDegreeToRad) * limbLocation);
 		legLocation.m_posit.m_y -= limbLength * 0.5f;
 		legBody->SetMatrix(legLocation);
@@ -366,7 +366,7 @@ namespace ndUnicycle
 
 		// make wheel
 		ndFloat32 wheelRadio = 4.0f * limbRadio;
-		ndSharedPtr<ndBody> wheelBody(world->GetBody(AddSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "wood_0.tga")));
+		ndSharedPtr<ndBody> wheelBody(world->GetBody(AddSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "wood_0.png")));
 		ndMatrix wheelMatrix(legPivot);
 		wheelMatrix.m_posit.m_y -= limbLength;
 		wheelBody->SetMatrix(wheelMatrix);

@@ -256,7 +256,7 @@ void ndFbxMeshLoader::ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEff
 			}
  			else
 			{
-				strcpy(material.m_textureName, "default.tga");
+				strcpy(material.m_textureName, "default.png");
 			}
 			materialArray.PushBack(material);
 		}

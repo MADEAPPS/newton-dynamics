@@ -103,7 +103,7 @@ static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndF
 	ndMatrix matrix(ndPitchMatrix(10.0f*ndDegreeToRad) * ndRollMatrix(150.0f*ndDegreeToRad));
 	matrix.m_posit = origin;
 
-	ndSharedPtr<ndDemoMeshIntance> geometry (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
+	ndSharedPtr<ndDemoMeshIntance> geometry (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.png", "marble.png", "marble.png"));
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);

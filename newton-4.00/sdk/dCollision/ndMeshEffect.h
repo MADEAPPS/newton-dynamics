@@ -415,7 +415,7 @@ class ndMeshEffect: public ndPolyhedra
 			,m_opacity(ndFloat32(1.0f))
 			,m_shiness(ndFloat32 (60.0f))
 		{
-			strcpy(m_textureName, "default.tga");
+			strcpy(m_textureName, "default.png");
 		}
 
 		ndVector m_ambient;

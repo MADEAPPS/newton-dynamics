@@ -260,7 +260,7 @@ static void AddAiVehicle(ndDemoEntityManager* const scene)
 {
 	ndShapeInstance shapeInstance = CreateCompondCollision();
 
-	ndDemoMeshIntance* const aiGeometry = new ndDemoMeshIntance("AiVehicle", scene->GetShaderCache(), &shapeInstance, "earthmap.tga", "earthmap.tga", "earthmap.tga");
+	ndDemoMeshIntance* const aiGeometry = new ndDemoMeshIntance("AiVehicle", scene->GetShaderCache(), &shapeInstance, "earthmap.png", "earthmap.png", "earthmap.png");
 	ndDemoInstanceEntity* const aiEntity = new ndDemoInstanceEntity(aiGeometry);
 	scene->AddEntity(aiEntity);
 	ndMatrix mBodyMatrix = ndGetIdentityMatrix();

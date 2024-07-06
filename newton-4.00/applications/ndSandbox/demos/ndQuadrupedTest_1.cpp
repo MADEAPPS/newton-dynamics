@@ -857,7 +857,7 @@ namespace ndQuadruped_1
 		ndPhysicsWorld* const world = scene->GetWorld();
 		//ndVector floor(FindFloor(*world, matrixLocation.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		ndVector floor(matrixLocation.m_posit);
-		ndSharedPtr<ndBody> torso(world->GetBody(AddSphere(scene, matrixLocation, mass, radius, "smilli.tga")));
+		ndSharedPtr<ndBody> torso(world->GetBody(AddSphere(scene, matrixLocation, mass, radius, "smilli.png")));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(torso);
 		
 		ndMatrix location(matrixLocation);

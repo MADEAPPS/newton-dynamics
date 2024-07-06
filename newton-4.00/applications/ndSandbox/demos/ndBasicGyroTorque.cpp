@@ -30,7 +30,7 @@ static void DzhanibekovEffect(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	matrix.m_posit.m_y += 5.0f;
 
 	ndShapeInstance shape(new ndShapeBox(2.0f, 0.5f, 1.0));
-	ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.png", "marble.png", "marble.png"));
 
 	ndVector omega(0.1f, 0.0f, angularSpeed, 0.0f);
 	ndBodyKinematic* const body = new ndBodyDynamic();
@@ -60,7 +60,7 @@ static void Phitop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 a
 	ndShapeInstance shape(new ndShapeSphere(1.0f));
 	shape.SetScale(ndVector (0.5f, 0.5f, 1.0f, 0.0f));
 
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.png", "marble.png", "marble.png"));
 
 	ndVector omega(0.0f, angularSpeed, 0.0f, 0.0f);
 	ndBodyKinematic* const body = new ndBodyDynamic();
@@ -91,7 +91,7 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat
 
 	ndShapeInstance shape(new ndShapeSphere(1.0f));
 	shape.SetScale(ndVector(0.3f, 0.25f, 1.0f, 0.0f));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.png", "marble.png", "marble.png"));
 
 	matrix = FindFloor(*world, matrix, shape, 200.0f);
 
@@ -126,7 +126,7 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const ndVector& orig
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.png", "marble.png", "marble.png"));
 
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(mesh);
@@ -171,7 +171,7 @@ static void CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& ori
 	
 	ndDemoEntity* const entity = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
 	
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("primitive", scene->GetShaderCache(), &flyWheelShape, "smilli.tga", "smilli.tga", "smilli.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("primitive", scene->GetShaderCache(), &flyWheelShape, "smilli.png", "smilli.png", "smilli.png"));
 	entity->SetMesh(mesh);
 	
 	ndBodyKinematic* const body = new ndBodyDynamic();

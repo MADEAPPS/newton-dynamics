@@ -29,7 +29,7 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix&
 	uvMatrix[1][1] *= 1.0f / 4.0f;
 	uvMatrix[2][2] *= 1.0f / 4.0f;
 
-	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix, false));
+	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix, false));
 
 	ndMatrix location(matrix);
 	location.m_posit.m_y -= 0.5f;
@@ -69,7 +69,7 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 
 	ndMeshEffect::ndMaterial material;
 	ndArray<ndMeshEffect::ndMaterial>& materialArray = meshEffect.GetMaterials();
-	strcpy(material.m_textureName, "marbleCheckBoard.tga");
+	strcpy(material.m_textureName, "marbleCheckBoard.png");
 	materialArray.PushBack(material);
 
 	ndPolygonSoupBuilder meshBuilder;
@@ -181,7 +181,7 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 	uvMatrix[1][1] *= 1.0f / 2.0f;
 	uvMatrix[2][2] *= 1.0f / 2.0f;
 
-	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("box", scene->GetShaderCache(), &plane, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix));
+	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("box", scene->GetShaderCache(), &plane, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);

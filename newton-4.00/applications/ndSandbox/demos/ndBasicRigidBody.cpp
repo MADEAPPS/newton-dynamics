@@ -80,8 +80,8 @@ class TestIKSolver : public ndModelArticulation
         ndPhysicsWorld* const world = scene->GetWorld();
 
         // make cart
-        ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.tga")));
-        //ndSharedPtr<ndBody> cartBody(world->GetBody(AddSphere(scene, location, cartMass, xSize, "smilli.tga")));
+        ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.png")));
+        //ndSharedPtr<ndBody> cartBody(world->GetBody(AddSphere(scene, location, cartMass, xSize, "smilli.png")));
         ndModelArticulation::ndNode* const modelRoot = AddRootBody(cartBody);
         ndMatrix matrix(cartBody->GetMatrix());
         matrix.m_posit.m_y += ySize / 2.0f;
@@ -90,7 +90,7 @@ class TestIKSolver : public ndModelArticulation
 
         // make pole leg
         matrix.m_posit.m_y += ySize / 2.0f;
-        ndSharedPtr<ndBody> poleBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), poleMass, poleRadio, poleRadio, poleLength, "smilli.tga")));
+        ndSharedPtr<ndBody> poleBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), poleMass, poleRadio, poleRadio, poleLength, "smilli.png")));
         ndMatrix poleLocation(ndRollMatrix(90.0f * ndDegreeToRad) * matrix);
         poleLocation.m_posit.m_y += poleLength * 0.5f;
 
@@ -247,7 +247,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
     ndWorld* const world = scene->GetWorld();
     ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
-    AddBox(scene, matrix, 10.0f, 1.0f, 0.125f, 1.0f, "smilli.tga");
+    AddBox(scene, matrix, 10.0f, 1.0f, 0.125f, 1.0f, "smilli.png");
 
     ndSharedPtr<ndModel> model(new TestIKSolver(scene, matrix));
     world->AddModel(model);

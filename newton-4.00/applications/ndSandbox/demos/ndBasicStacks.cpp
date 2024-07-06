@@ -54,7 +54,7 @@ static void BuildSphereColumn(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	baseMatrix.m_posit.m_x = origin.m_x;
 	baseMatrix.m_posit.m_z = origin.m_z;
 
-	ndSharedPtr<ndDemoMeshIntance> geometry(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "earthmap.tga", "earthmap.tga", "earthmap.tga", 1.0f, ndRollMatrix(ndFloat32(-90.0f) * ndDegreeToRad)));
+	ndSharedPtr<ndDemoMeshIntance> geometry(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "earthmap.png", "earthmap.png", "earthmap.png", 1.0f, ndRollMatrix(ndFloat32(-90.0f) * ndDegreeToRad)));
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
@@ -78,7 +78,7 @@ static void BuildBoxColumn(ndDemoEntityManager* const scene, ndFloat32 mass, con
 	ndMatrix baseMatrix(ndGetIdentityMatrix());
 
 	ndShapeInstance shape(new ndShapeBox(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z));
-	ndSharedPtr<ndDemoMeshIntance> geometry(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
+	ndSharedPtr<ndDemoMeshIntance> geometry(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
 
 	// for the elevation of the floor at the stack position
 	baseMatrix.m_posit.m_x = origin.m_x;
@@ -113,7 +113,7 @@ static void BuildCylinderColumn(ndDemoEntityManager* const scene, ndFloat32 mass
 
 	ndShapeInstance shape(new ndShapeCylinder(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z));
 	shape.SetLocalMatrix(ndRollMatrix(ndPi * 0.5f));
-	ndSharedPtr<ndDemoMeshIntance> geometry(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
+	ndSharedPtr<ndDemoMeshIntance> geometry(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
@@ -169,7 +169,7 @@ void BuildPyramidStacks(ndDemoEntityManager* const scene, ndFloat32 mass, const 
 
 	ndVector size(boxSize.Scale(1.0f));
 	ndShapeInstance shape(new ndShapeBox(size.m_x, size.m_y, size.m_z));
-	ndSharedPtr<ndDemoMeshIntance> geometry (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
+	ndSharedPtr<ndDemoMeshIntance> geometry (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
@@ -189,7 +189,7 @@ static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndMatrix uvMatrix(ndPitchMatrix(ndPi));
 	ndShapeInstance collision(new ndShapeCapsule(blockBoxSize.m_x, blockBoxSize.m_x, blockBoxSize.m_z));
 
-	ndSharedPtr<ndDemoMeshIntance> geometry (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &collision, "smilli.tga", "smilli.tga", "smilli.tga"));
+	ndSharedPtr<ndDemoMeshIntance> geometry (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &collision, "smilli.png", "smilli.png", "smilli.png"));
 
 	ndFloat32 vertialStep = blockBoxSize.m_x * 2.0f;
 	ndFloat32 horizontalStep = blockBoxSize.m_z * 0.8f;

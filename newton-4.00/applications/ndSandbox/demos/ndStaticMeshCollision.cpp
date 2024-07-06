@@ -210,7 +210,7 @@ static ndBodyKinematic* BuildHeightField(ndDemoEntityManager* const scene)
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
 
-	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &shape, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix, false));
+	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &shape, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix, false));
 	ndMatrix location(ndGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
 	entity->SetMesh(geometry);
@@ -280,7 +280,7 @@ static void BuildHeightField(ndDemoEntityManager* const scene)
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
 
-	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &shape, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix, false));
+	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &shape, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix, false));
 	ndMatrix location(ndGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
 	entity->SetMesh(geometry);
@@ -299,7 +299,7 @@ static void AddBodies(ndDemoEntityManager* const scene)
 	ndMatrix location(ndRollMatrix(10.0 * ndDegreeToRad));
 	location.m_posit = vStart;
 
-	ndBodyKinematic* const body = AddChamferCylinder(scene, location, 1.0f, 1.0f, 1.25f, "wood_0.tga");
+	ndBodyKinematic* const body = AddChamferCylinder(scene, location, 1.0f, 1.0f, 1.25f, "wood_0.png");
 	body->SetMatrix(location);
 }
 

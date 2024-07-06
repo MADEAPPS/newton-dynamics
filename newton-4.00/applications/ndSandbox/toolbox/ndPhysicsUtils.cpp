@@ -136,7 +136,7 @@ static void AddShape(ndDemoEntityManager* const scene,
 void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, ndInt32 rows_x, ndInt32 rows_z, ndInt32 columHigh)
 {
 	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));
-	ndSharedPtr<ndDemoMeshIntance> instanceMesh (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
+	ndSharedPtr<ndDemoMeshIntance> instanceMesh (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.png", "marble.png", "marble.png"));
 	
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);

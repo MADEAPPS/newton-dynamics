@@ -133,7 +133,7 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 		m_shader = shaderCache.m_diffuseEffect;
 
 		ndDemoSubMesh* const segment = AddSubMesh();
-		GLuint tex = LoadTexture("default.tga");
+		GLuint tex = LoadTexture("default.png");
 		segment->m_material.SetTexture(int(tex));
 		ReleaseTexture(tex);
 
@@ -187,7 +187,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		uvMatrix[2][2] *= 1.0f / 20.0f;
 		uvMatrix.m_posit = ndVector(0.5f, 0.5f, 0.5f, 1.0f);
 
-		ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("fluidVolume", scene->GetShaderCache(), &box, "metal_30.tga", "metal_30.tga", "logo_php.tga", 0.5f, uvMatrix));
+		ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("fluidVolume", scene->GetShaderCache(), &box, "metal_30.png", "metal_30.png", "logo_php.png", 0.5f, uvMatrix));
 		SetMesh(geometry);
 		
 		m_isoSurfaceMesh0 = ndSharedPtr<ndIsoSurfaceMesh>(new ndIsoSurfaceMesh(scene->GetShaderCache(), geometry));

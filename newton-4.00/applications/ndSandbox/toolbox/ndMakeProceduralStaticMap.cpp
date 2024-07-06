@@ -207,7 +207,7 @@ ndDemoEntity* BuildVisualEntity(ndDemoEntityManager* const scene, ndInt32 grids,
 
 	ndMeshEffect::ndMaterial material;
 	ndArray<ndMeshEffect::ndMaterial>& materialArray = meshEffect.GetMaterials();
-	strcpy(material.m_textureName, "marbleCheckBoard.tga");
+	strcpy(material.m_textureName, "marbleCheckBoard.png");
 	materialArray.PushBack(material);
 
 	ndFloat32 uvScale = 1.0 / 16.0f;

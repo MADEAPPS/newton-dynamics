@@ -26,7 +26,7 @@ static void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sc
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
-	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix));
+	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix));
 
 	ndMatrix matrix(location);
 	matrix.m_posit.m_y += 1.9f;
@@ -50,7 +50,7 @@ static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInsta
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
-	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("capsule", scene->GetShaderCache(), &capsule, "Concrete_011_COLOR.tga", "Concrete_011_COLOR.tga", "Concrete_011_COLOR.tga", 1.0f, uvMatrix));
+	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("capsule", scene->GetShaderCache(), &capsule, "Concrete_011_COLOR.png", "Concrete_011_COLOR.png", "Concrete_011_COLOR.png", 1.0f, uvMatrix));
 
 	ndFloat32 spacing = 3.0f;
 	ndMatrix matrix(location);

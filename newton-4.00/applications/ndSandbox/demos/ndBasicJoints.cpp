@@ -207,7 +207,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	ndFloat32 mass = 1.0f;
 	ndFloat32 diameter = 0.5f;
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.25f, diameter * 0.25f, diameter * 1.0f));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
@@ -357,7 +357,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	ndFloat32 mass = 1.0f;
 	ndFloat32 diameter = 0.5f;
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.25f, diameter * 0.25f, diameter * 1.0f));
-	ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
 	
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
@@ -475,7 +475,7 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVecto
 	matrix.m_posit.m_w = 1.0f;
 	
 	ndShapeInstance shape2(new ndShapeSphere(diameter * 0.5f));
-	ndSharedPtr<ndDemoMeshInterface> mesh2(new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "earthmap.tga", "earthmap.tga", "earthmap.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh2(new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "earthmap.png", "earthmap.png", "earthmap.png"));
 	matrix.m_posit.m_y += 5.0f;
 	
 	ndPhysicsWorld* const world = scene->GetWorld();
@@ -514,7 +514,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 	};
 	
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
 	
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -604,7 +604,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 	};
 	
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
 	
 	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
@@ -690,7 +690,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 	};
 	
 	ndShapeInstance shape(new ndShapeCylinder(diameter, diameter, diameter * 0.5f));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
 	
 	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
@@ -728,7 +728,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
 	
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -756,7 +756,7 @@ static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin
 static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
 	
 	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
@@ -784,7 +784,7 @@ static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& o
 void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& origin)
 {
 	ndShapeInstance shape(new ndShapeSphere(0.25f));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "earthmap.tga", "earthmap.tga", "earthmap.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "earthmap.png", "earthmap.png", "earthmap.png"));
 	
 	ndMatrix matrix(ndGetIdentityMatrix());
 	
@@ -831,7 +831,7 @@ void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& or
 static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
 	
 	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
@@ -893,7 +893,7 @@ static void BuildPathFollow(ndDemoEntityManager* const scene, const ndVector& or
 	ndFloat32 attachmentOffset = 0.8f;
 	
 	ndShapeInstance shape(new ndShapeChamferCylinder(0.5f, 0.5f));
-	ndSharedPtr<ndDemoMeshIntance> instanceMesh (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
+	ndSharedPtr<ndDemoMeshIntance> instanceMesh (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);
 	

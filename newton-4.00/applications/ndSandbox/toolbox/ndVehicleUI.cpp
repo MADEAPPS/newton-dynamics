@@ -67,11 +67,11 @@ ndVehicleUI::ndVehicleUI(ndDemoEntityManager* const scene)
 	,m_iboDyn(0)
 	,m_iboSta(0)
 {
-	m_gears = LoadTexture("gears_font.tga");
-	m_odometer = LoadTexture("kmh_dial.tga");
-	m_tachometer = LoadTexture("rpm_dial.tga");
-	m_redNeedle = LoadTexture("needle_red.tga");
-	m_greenNeedle = LoadTexture("needle_green.tga");
+	m_gears = LoadTexture("gears_font.png");
+	m_odometer = LoadTexture("kmh_dial.png");
+	m_tachometer = LoadTexture("rpm_dial.png");
+	m_redNeedle = LoadTexture("needle_red.png");
+	m_greenNeedle = LoadTexture("needle_green.png");
 
 	CreateBufferUI();
 };

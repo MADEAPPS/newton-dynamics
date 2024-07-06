@@ -296,7 +296,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 		GLint tex = GLint(LoadTexture(material.m_textureName));
 		if (tex == 0)
 		{
-			tex = GLint(LoadTexture("default.tga"));
+			tex = GLint(LoadTexture("default.png"));
 		}
 		segment->m_material.SetTexture(tex);
 		ReleaseTexture(GLuint(tex));

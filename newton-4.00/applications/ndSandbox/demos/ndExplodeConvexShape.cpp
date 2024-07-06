@@ -92,8 +92,8 @@ static void AddBoxEffect(ndExplodeConvexShapeModel* const manager, const ndMatri
 
 	// next we populate the descriptor for how the shape is going to be broken in pieces.
 	desc.m_shape = &shape;
-	desc.m_outTexture = "reljef.tga";
-	desc.m_innerTexture = "concreteBrick.tga";
+	desc.m_outTexture = "reljef.png";
+	desc.m_innerTexture = "concreteBrick.png";
 	desc.m_breakImpactSpeed = 10.0f;
 	makePointCloud(desc);
 
@@ -128,8 +128,8 @@ static void AddCapsuleEffect(ndExplodeConvexShapeModel* const manager, const ndM
 	ndShapeInstance shape(new ndShapeCapsule(0.25f, 0.25f, 4.0f));
 
 	desc.m_shape = &shape;
-	desc.m_outTexture = "wood_0.tga";
-	desc.m_innerTexture = "wood_1.tga";
+	desc.m_outTexture = "wood_0.png";
+	desc.m_innerTexture = "wood_1.png";
 	desc.m_breakImpactSpeed = 10.0f;
 
 	//ndMatrix location(matrix);
@@ -160,8 +160,8 @@ static void AddCylinderEffect(ndExplodeConvexShapeModel* const manager, const nd
 	ndShapeInstance shape(new ndShapeCylinder(0.25f, 0.25f, 4.0f));
 
 	desc.m_shape = &shape;
-	desc.m_outTexture = "wood_3.tga";
-	desc.m_innerTexture = "wood_4.tga";
+	desc.m_outTexture = "wood_3.png";
+	desc.m_innerTexture = "wood_4.png";
 	desc.m_breakImpactSpeed = 10.0f;
 
 	//ndMatrix location(matrix);

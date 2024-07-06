@@ -99,7 +99,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	uvMatrix[1][1] *= 0.25f;
 	uvMatrix[2][2] *= 0.25f;
 	uvMatrix.m_posit = ndVector(-0.5f, -0.5f, 0.0f, 1.0f);
-	const char* const textureName = "wood_3.tga";
+	const char* const textureName = "wood_3.png";
 	ndSharedPtr<ndDemoMeshInterface> geometry (new ndDemoMesh("box", scene->GetShaderCache(), &box, textureName, textureName, textureName, 1.0f, uvMatrix));
 
 	FrictionMaterial material;
@@ -131,7 +131,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	ndMatrix texMatrix(ndGetIdentityMatrix());
 	texMatrix.m_posit.m_x = -0.5f;
 	texMatrix.m_posit.m_y = -0.5f;
-	const char* const boxTexName = "wood_0.tga";
+	const char* const boxTexName = "wood_0.png";
 	//ndDemoMesh* const boxGeometry = new ndDemoMesh("box", scene->GetShaderCache(), &shape, boxTexName, boxTexName, boxTexName, 1.0f, texMatrix);
 	ndSharedPtr<ndDemoMeshInterface> boxGeometry (new ndDemoMesh("box", scene->GetShaderCache(), &shape, boxTexName, boxTexName, boxTexName, 1.0f, texMatrix));
 
