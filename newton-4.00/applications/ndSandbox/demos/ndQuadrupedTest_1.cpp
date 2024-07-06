@@ -371,6 +371,10 @@ namespace ndQuadruped_1
 				randVar = randVar * randVar;
 				//randVar = randVar * randVar * randVar;
 				m_model->m_control->m_animSpeed = randVar;
+
+				ndUnsigned32 index = ndRandInt() % 4;
+				ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
+				m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
 			}
 
 			ndFixSizeArray<ndBasePose, 32> m_basePose;

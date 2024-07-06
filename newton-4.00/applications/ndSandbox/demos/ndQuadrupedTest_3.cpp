@@ -498,8 +498,9 @@ namespace ndQuadruped_3
 					m_basePose[i].SetPose(x0, z0);
 				}
 				ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
-				ndUnsigned32 randomeStart = ndRandInt() % 2;
-				ndUnsigned32 index = ndUnsigned32(randomeStart ? 1 : 3);
+				//ndUnsigned32 randomeStart = ndRandInt() % 2;
+				//ndUnsigned32 index = ndUnsigned32(randomeStart ? 1 : 3);
+				ndUnsigned32 index = ndRandInt() % 4;
 				m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
 				
 				ndFloat32 randVar = ndRand();
