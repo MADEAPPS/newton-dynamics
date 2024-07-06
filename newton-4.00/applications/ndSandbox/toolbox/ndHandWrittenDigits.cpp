@@ -514,9 +514,13 @@ static void MnistTrainingSet()
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
 
+			#ifdef USE_CONVOLUTIONAL_LAYERS
+				const ndInt32 numberOfEpocks = 50;
+			#else
+				const ndInt32 numberOfEpocks = 100;
+			#endif
 			ndInt32 scoreMode = 0;
-			//for (ndInt32 epoch = 0; epoch < 100; ++epoch)
-			for (ndInt32 epoch = 0; epoch < 50; ++epoch)
+			for (ndInt32 epoch = 0; epoch < numberOfEpocks; ++epoch)
 			{
 				ndInt32 start = 0;
 				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
