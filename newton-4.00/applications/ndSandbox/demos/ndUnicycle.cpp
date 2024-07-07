@@ -166,21 +166,21 @@ namespace ndUnicycle
 			{
 				m_model->ApplyActions(actions);
 		
-				//const ndFloat32 probability = 1.0f / 1000.0f;
-				//ndFloat32 applySideImpule = ndRand();
-				//if (applySideImpule < probability)
-				//{
-				//	if (m_model->HasSupportContact())
-				//	{
-				//		ndBodyDynamic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyDynamic();
-				//
-				//		const ndVector front(boxBody->GetMatrix().m_front);
-				//		ndFloat32 speed = 1.2f * (ndRand() - 0.5f);
-				//		ndVector upVector(front.Scale(speed));
-				//		ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
-				//		boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_model->m_timestep);
-				//	}
-				//}
+				const ndFloat32 probability = 1.0f / 1000.0f;
+				ndFloat32 applySideImpule = ndRand();
+				if (applySideImpule < probability)
+				{
+					if (m_model->HasSupportContact())
+					{
+						ndBodyDynamic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyDynamic();
+				
+						const ndVector front(boxBody->GetMatrix().m_front);
+						ndFloat32 speed = 1.2f * (ndRand() - 0.5f);
+						ndVector upVector(front.Scale(speed));
+						ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
+						boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_model->m_timestep);
+					}
+				}
 			}
 		
 			void GetObservation(ndBrainFloat* const observation)

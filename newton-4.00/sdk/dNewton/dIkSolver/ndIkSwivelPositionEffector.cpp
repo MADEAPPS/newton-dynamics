@@ -108,11 +108,6 @@ void ndIkSwivelPositionEffector::SetLocalTargetPosition(const ndVector& posit)
 	m_localTargetPosit = target | ndVector::m_wOne;
 }
 
-ndMatrix ndIkSwivelPositionEffector::GetReferenceFrame() const
-{
-	return GetLocalMatrix1() * GetBody1()->GetMatrix();
-}
-
 ndVector ndIkSwivelPositionEffector::GetGlobalPosition() const
 {
 	return GetBody0()->GetMatrix().TransformVector(GetLocalMatrix0().m_posit);

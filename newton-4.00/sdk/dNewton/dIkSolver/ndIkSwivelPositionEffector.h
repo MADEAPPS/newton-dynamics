@@ -27,8 +27,8 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API ndVector GetLocalTargetPosition() const;
 	D_NEWTON_API void SetLocalTargetPosition(const ndVector& posit);
 	
+	D_NEWTON_API ndVector GetEffectorPosit() const;
 	D_NEWTON_API ndVector GetGlobalPosition() const;
-	D_NEWTON_API ndMatrix GetReferenceFrame() const;
 
 	D_NEWTON_API ndFloat32 GetSwivelAngle() const;
 	D_NEWTON_API void SetSwivelAngle(ndFloat32 angle);
@@ -53,8 +53,6 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void SetMaxTorque(ndFloat32 torque);
 
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
-
-	D_NEWTON_API ndVector GetEffectorPosit() const;
 	D_NEWTON_API ndInt32 GetKinematicState(ndKinematicState* const state) const;
 
 	protected:
