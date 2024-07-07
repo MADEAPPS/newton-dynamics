@@ -175,9 +175,8 @@ namespace ndUnicycle
 						ndBodyDynamic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyDynamic();
 				
 						const ndVector front(boxBody->GetMatrix().m_front);
-						ndFloat32 speed = 1.2f * (ndRand() - 0.5f);
-						ndVector upVector(front.Scale(speed));
-						ndVector impulse(upVector.Scale(boxBody->GetMassMatrix().m_w * speed));
+						ndFloat32 speed = 0.5f * (ndRand() - 0.5f);
+						ndVector impulse(front.Scale(speed * boxBody->GetMassMatrix().m_w));
 						boxBody->ApplyImpulsePair(impulse, ndVector::m_zero, m_model->m_timestep);
 					}
 				}

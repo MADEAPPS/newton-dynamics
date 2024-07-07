@@ -33,12 +33,13 @@ class ndAnimKeyframe
 
 	ndVector m_posit;
 	ndQuaternion m_rotation;
+	void* m_userData;
+
 	union
 	{
 		ndInt64 m_userParamInt;
 		ndFloat32 m_userParamFloat;
 	};
-	void* m_userData;
 };
 
 class ndAnimationPose: public ndArray<ndAnimKeyframe>
