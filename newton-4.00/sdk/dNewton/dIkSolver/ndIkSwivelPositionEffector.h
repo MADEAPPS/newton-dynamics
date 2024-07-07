@@ -30,6 +30,9 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API ndVector GetEffectorPosit() const;
 	D_NEWTON_API ndVector GetGlobalPosition() const;
 
+	D_NEWTON_API ndVector GetRestPosit() const;
+	D_NEWTON_API void SetRestPosit(const ndVector& posit);
+
 	D_NEWTON_API ndFloat32 GetSwivelAngle() const;
 	D_NEWTON_API void SetSwivelAngle(ndFloat32 angle);
 	D_NEWTON_API ndFloat32 CalculateLookAtSwivelAngle(const ndVector& lookAtDir) const;
@@ -62,6 +65,7 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	void SubmitLinearAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	void SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	
+	ndVector m_restPosition;
 	ndVector m_localTargetPosit;
 	ndFloat32 m_swivelAngle;
 
