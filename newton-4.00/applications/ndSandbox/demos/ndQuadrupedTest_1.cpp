@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	class ndLegObservation
@@ -464,7 +464,7 @@ namespace ndQuadruped_1
 			context.DrawLine(centerOfMass, comLineOfAction, ndVector::m_zero);
 			
 			const ndVector upVector(rootBody->GetMatrix().m_up);
-			ndFixSizeArray<ndVector, 4> desiredSupportPoint;
+			ndFixSizeArray<ndBigVector, 16> supportPoint;
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
@@ -479,13 +479,20 @@ namespace ndQuadruped_1
 				if (keyFrame.m_userParamInt == 0)
 				{
 					ndBodyKinematic* const body = effector->GetBody0();
-					desiredSupportPoint.PushBack(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit));
+					supportPoint.PushBack(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit));
 				}
 			}
 			
 			ndVector supportColor(0.0f, 1.0f, 1.0f, 1.0f);
-			if (desiredSupportPoint.GetCount() >= 3)
+			if (supportPoint.GetCount() >= 3)
 			{
+				ScaleSupportShape(supportPoint);
+				ndFixSizeArray<ndVector, 16> desiredSupportPoint;
+				for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
+				{
+					desiredSupportPoint.PushBack(supportPoint[i]);
+				}
+
 				ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
 				rotation.TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
 				ndInt32 supportCount = ndConvexHull2d(&desiredSupportPoint[0], desiredSupportPoint.GetCount());
@@ -516,10 +523,10 @@ namespace ndQuadruped_1
 				const ndVector zmpSupport(p0Out);
 				context.DrawPoint(zmpSupport, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
 			}
-			else if (desiredSupportPoint.GetCount() == 2)
+			else if (supportPoint.GetCount() == 2)
 			{
 				ndTrace(("xxxxxxxxxx\n"));
-				context.DrawLine(desiredSupportPoint[0], desiredSupportPoint[1], supportColor);
+				context.DrawLine(supportPoint[0], supportPoint[1], supportColor);
 				//ndBigVector p0Out;
 				//ndBigVector p1Out;
 				//ndBigVector ray_p0(comMatrix.m_posit);
@@ -699,9 +706,33 @@ namespace ndQuadruped_1
 			return com;
 		}
 
+		void ScaleSupportShape(ndFixSizeArray<ndBigVector, 16>& shape) const
+		{
+			ndFixSizeArray<ndBigVector, 16> scaleShape;
+			ndBigVector origin0(ndBigVector::m_zero);
+			ndBigVector origin1(ndBigVector::m_zero);
+
+			ndFloat32 scale = 0.8f;
+			for (ndInt32 i = 0; i < shape.GetCount(); ++i)
+			{
+				scaleShape.PushBack(shape[i].Scale(scale));
+				origin0 += shape[i];
+				origin1 += scaleShape[i];
+			}
+
+			origin0 = origin0.Scale(1.0f / ndFloat32(shape.GetCount()));
+			origin1 = origin1.Scale(1.0f / ndFloat32(shape.GetCount()));
+
+			ndBigVector offset((origin1 - origin0) & ndBigVector::m_triplexMask);
+			for (ndInt32 i = 0; i < shape.GetCount(); ++i)
+			{
+				shape[i] = scaleShape[i] - offset;
+			}
+		}
+
 		ndBrainFloat CalculateZeroMomentPointReward() const
 		{
-			ndFixSizeArray<ndBigVector, 4> desiredSupportPoint;
+			ndFixSizeArray<ndBigVector, 16> desiredSupportPoint;
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
@@ -724,6 +755,9 @@ namespace ndQuadruped_1
 				ndBigVector ray_p0(zmp);
 				ndBigVector ray_p1(zmp);
 				ray_p1.m_y -= ndFloat32(1.5f);
+
+				ScaleSupportShape(desiredSupportPoint);
+
 				ndRayToPolygonDistance(ray_p0, ray_p1, &desiredSupportPoint[0], desiredSupportPoint.GetCount(), p0Out, p1Out);
 				const ndBigVector error((p0Out - p1Out) & ndBigVector::m_triplexMask);
 				ndFloat32 dist2 = ndFloat32(error.DotProduct(error).GetScalar());
