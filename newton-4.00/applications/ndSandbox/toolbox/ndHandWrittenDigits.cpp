@@ -247,11 +247,11 @@ static void MnistTrainingSet()
 		#define LINEAR_LAYER			ndBrainLayerLinearWithDropOut
 	#endif
 
-	#if 0
-		#define ACTIVATION_TYPE ndBrainLayerActivationRelu
-	#else
+	#if 1
 		#define ACTIVATION_TYPE ndBrainLayerActivationTanh
-		//#define ACTIVATION_TYPE ndBrainLayerActivationSigmoidUnbias
+	#else
+		#define ACTIVATION_TYPE ndBrainLayerActivationElu
+		//#define ACTIVATION_TYPE ndBrainLayerActivationRelu		
 		//#define ACTIVATION_TYPE ndBrainLayerActivationSigmoidLinear
 	#endif
 

@@ -94,7 +94,8 @@ namespace ndQuadruped_1
 			ndPoseGenerator(const ndFloat32* const phase)
 				:ndAnimationSequence()
 				,m_amp(0.27f)
-				,m_stride(0.3f)
+				,m_stride_x(0.3f)
+				,m_stride_z(0.3f)
 			{
 				m_duration = ndFloat32(4.0f);
 				for (ndInt32 i = 0; i < 4; i++)
@@ -113,10 +114,6 @@ namespace ndQuadruped_1
 			ndVector BasePose(ndInt32 index) const
 			{
 				ndVector base(ndVector::m_wOne);
-				//base.m_x = 0.4f;
-				//base.m_z = m_offset[index];
-				//base.m_y = D_POSE_REST_POSITION_Y;
-
 				base.m_x = m_offset[index].m_x;
 				base.m_z = m_offset[index].m_z;
 				base.m_y = m_offset[index].m_y;
@@ -136,14 +133,24 @@ namespace ndQuadruped_1
 				ndFloat32 ycontact = D_POSE_REST_POSITION_Y + m_amp / 2.0f;
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
 				{
-					ndFloat32 stride = m_stride;
-					if ((i == 2) || (i == 3))
-					{
-						stride *= -1;
-					}
-
 					output[i].m_userParamInt = 0;
 					output[i].m_posit = BasePose(i);
+				}
+
+				for (ndInt32 i = 0; i < output.GetCount(); i++)
+				{
+					ndFloat32 stride_x = m_stride_x;
+					if ((i == 2) || (i == 3))
+					{
+						stride_x *= -1;
+					}
+
+					ndFloat32 stride_z = m_stride_z;
+					if ((i == 2) || (i == 3))
+					{
+						stride_z *= -1;
+					}
+
 					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
 					if ((t >= gaitGuard) && (t <= (gaitFraction - gaitGuard)))
 					{
@@ -154,7 +161,8 @@ namespace ndQuadruped_1
 						ndFloat32 den = gaitFraction - ndFloat32(2.0f) * gaitGuard;
 
 						ndFloat32 t0 = num / den;
-						output[i].m_posit.m_x += -stride * 0.5f +  stride * t0;
+						//output[i].m_posit.m_x += stride_x * t0 - stridem_x * 0.5f;
+						output[i].m_posit.m_z += -(stride_z * t0 - stride_z * 0.5f);
 					}
 					else
 					{
@@ -166,7 +174,8 @@ namespace ndQuadruped_1
 						ndFloat32 num = t - gaitFraction + gaitGuard;
 						ndFloat32 den = 1.0f - gaitFraction - ndFloat32(2.0f) * gaitGuard;
 						ndFloat32 t0 = num / den;
-						output[i].m_posit.m_x += -(-stride * 0.5f + stride * t0);
+						//output[i].m_posit.m_x += -(stride_x * t0 - stridem_x * 0.5f + );
+						output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
 					}
 
 					m_currentPose[i] = output[i].m_posit;
@@ -177,7 +186,8 @@ namespace ndQuadruped_1
 			ndVector m_offset[4];
 			ndFloat32 m_phase[4];
 			ndFloat32 m_amp;
-			ndFloat32 m_stride;
+			ndFloat32 m_stride_x;
+			ndFloat32 m_stride_z;
 		};
 
 		class ndUIControlNode : public ndAnimationBlendTreeNode
@@ -212,12 +222,11 @@ namespace ndQuadruped_1
 				ndAnimationBlendTreeNode::Evaluate(output, veloc);
 
 				ndMatrix matrix(ndPitchMatrix(m_pitch * ndDegreeToRad) * ndYawMatrix(m_yaw * ndDegreeToRad) * ndRollMatrix(m_roll * ndDegreeToRad));
+				matrix.m_posit.m_x = -m_x;
+				matrix.m_posit.m_y = -m_y;
+				matrix.m_posit.m_z = -m_z;
 				for (ndInt32 i = 0; i < output.GetCount(); ++i)
 				{
-					matrix.m_posit.m_x = -m_x;
-					matrix.m_posit.m_y = -m_y;
-					matrix.m_posit.m_z = -m_z;
-
 					ndAnimKeyframe& keyFrame = output[i];
 					ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
 					ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;

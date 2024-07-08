@@ -23,6 +23,7 @@
 #include "ndBrain.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerLinear.h"
+#include "ndBrainLayerActivationElu.h"
 #include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLayerImagePolling_2x2.h"
@@ -32,7 +33,6 @@
 //#include "ndBrainLayerLinearWithDropOut.h"
 #include "ndBrainLayerCrossCorrelation_2d.h"
 //#include "ndBrainLayerConvolutionalWithDropOut_2d.h"
-#include "ndBrainLayerActivationSigmoidUnbias.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
 #include "ndBrainLayerActivationCategoricalSoftmax.h"
 
@@ -123,9 +123,9 @@ ndBrain* ndBrainLoad::Load() const
 		{
 			layer = ndBrainLayerActivationSigmoidLinear::Load(this);
 		}
-		else if (!strcmp(layerType, "ndBrainLayerActivationSigmoidUnbias"))
+		else if (!strcmp(layerType, "ndBrainLayerActivationElu"))
 		{
-			layer = ndBrainLayerActivationSigmoidUnbias::Load(this);
+			layer = ndBrainLayerActivationElu::Load(this);
 		}
 		else if (!strcmp(layerType, "ndBrainLayerActivationSoftmax"))
 		{

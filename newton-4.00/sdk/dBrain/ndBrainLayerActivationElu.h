@@ -19,18 +19,18 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_SIGMOID_UNBIAS_ACTIVATION_H__
-#define _ND_BRAIN_LAYER_SIGMOID_UNBIAS_ACTIVATION_H__
+#ifndef _ND_BRAIN_LAYER_ACTIVATION_EXP_LINEAR_H__
+#define _ND_BRAIN_LAYER_ACTIVATION_EXP_LINEAR_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerActivation.h"
 
-class ndBrainLayerActivationSigmoidUnbias : public ndBrainLayerActivation
+class ndBrainLayerActivationElu : public ndBrainLayerActivation
 {
 	public:
-	ndBrainLayerActivationSigmoidUnbias(ndInt32 neurons);
-	ndBrainLayerActivationSigmoidUnbias(const ndBrainLayerActivationSigmoidUnbias& src);
+	ndBrainLayerActivationElu(ndInt32 neurons);
+	ndBrainLayerActivationElu(const ndBrainLayerActivationElu& src);
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 

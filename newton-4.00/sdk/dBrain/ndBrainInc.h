@@ -53,6 +53,7 @@
 #include <ndBrainGpuScopeMapBuffer.h>
 #include <ndBrainAgentDDPG_Trainer.h>
 #include <ndBrainLayerImagePadding.h>
+#include <ndBrainLayerActivationElu.h>
 #include <ndBrainLayerActivationRelu.h>
 #include <ndBrainLayerActivationTanh.h>
 #include <ndBrainLayerImagePolling_2x2.h>
@@ -65,7 +66,6 @@
 #include <ndBrainAgentDiscretePolicyGradient.h>
 #include <ndBrainAgentContinuePolicyGradient.h>
 #include <ndBrainLossCategoricalCrossEntropy.h>
-#include <ndBrainLayerActivationSigmoidUnbias.h>
 #include <ndBrainLayerActivationSigmoidLinear.h>
 #include <ndBrainLayerConvolutionalWithDropOut_2d.h>
 #include <ndBrainLayerActivationCategoricalSoftmax.h>
