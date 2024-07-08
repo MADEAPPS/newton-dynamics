@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	class ndLegObservation
@@ -708,25 +708,17 @@ namespace ndQuadruped_1
 
 		void ScaleSupportShape(ndFixSizeArray<ndBigVector, 16>& shape) const
 		{
-			ndFixSizeArray<ndBigVector, 16> scaleShape;
-			ndBigVector origin0(ndBigVector::m_zero);
-			ndBigVector origin1(ndBigVector::m_zero);
+			ndBigVector origin(ndBigVector::m_zero);
+			for (ndInt32 i = 0; i < shape.GetCount(); ++i)
+			{
+				origin += shape[i];
+			}
+			origin = origin.Scale(1.0f / ndFloat32(shape.GetCount()));
 
 			ndFloat32 scale = 0.8f;
 			for (ndInt32 i = 0; i < shape.GetCount(); ++i)
 			{
-				scaleShape.PushBack(shape[i].Scale(scale));
-				origin0 += shape[i];
-				origin1 += scaleShape[i];
-			}
-
-			origin0 = origin0.Scale(1.0f / ndFloat32(shape.GetCount()));
-			origin1 = origin1.Scale(1.0f / ndFloat32(shape.GetCount()));
-
-			ndBigVector offset((origin1 - origin0) & ndBigVector::m_triplexMask);
-			for (ndInt32 i = 0; i < shape.GetCount(); ++i)
-			{
-				shape[i] = scaleShape[i] - offset;
+				shape[i] = origin + (shape[i] - origin).Scale (scale);
 			}
 		}
 
