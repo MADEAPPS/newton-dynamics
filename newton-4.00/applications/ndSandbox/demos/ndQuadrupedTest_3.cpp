@@ -502,7 +502,7 @@ namespace ndQuadruped_3
 				m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
 				
 				ndFloat32 randVar = ndRand();
-				randVar = randVar * randVar;
+				//randVar = randVar * randVar;
 				m_model->m_control->m_animSpeed = randVar;
 			}
 
