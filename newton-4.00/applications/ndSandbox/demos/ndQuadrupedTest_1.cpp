@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	class ndLegObservation
@@ -414,7 +414,8 @@ namespace ndQuadruped_1
 				//randVar = randVar * randVar * randVar;
 				m_model->m_control->m_animSpeed = randVar;
 
-				ndUnsigned32 index = ndRandInt() % 4;
+				//ndUnsigned32 index = ndRandInt() % 4;
+				ndUnsigned32 index = 0;
 				ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
 				m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
 			}
@@ -611,8 +612,8 @@ namespace ndQuadruped_1
 			//m_control->m_animSpeed = 4.0f;
 			//m_control->m_animSpeed = 2.0f;
 			//m_control->m_animSpeed = 1.0f;
-			m_control->m_animSpeed = 0.5f;
-			//m_control->m_animSpeed = 0.25f;
+			//m_control->m_animSpeed = 0.5f;
+			m_control->m_animSpeed = 0.25f;
 			//m_control->m_animSpeed = 0.1f;
 
 			//m_control->m_enableController = 0;
@@ -1271,7 +1272,7 @@ namespace ndQuadruped_1
 				}
 			}
 
-			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > ndFloat32(99.0f)))
+			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > ndFloat32(2 * 99.5f)))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
