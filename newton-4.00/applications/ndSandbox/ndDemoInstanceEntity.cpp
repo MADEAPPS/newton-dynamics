@@ -11,7 +11,7 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndDemoCamera.h"
-#include "ndTargaToOpenGl.h"
+#include "ndPngToOpenGl.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 

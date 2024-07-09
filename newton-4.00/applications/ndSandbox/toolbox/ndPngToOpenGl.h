@@ -9,8 +9,8 @@
 * freely
 */
 
-#ifndef __TARGA_TO_OPENGL__ 
-#define __TARGA_TO_OPENGL__ 
+#ifndef __PNG_TO_OPENGL__ 
+#define __PNG_TO_OPENGL__ 
 
 #include "ndSandboxStdafx.h"
 

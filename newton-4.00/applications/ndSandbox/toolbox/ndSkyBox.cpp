@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
 #include "ndDemoCamera.h"
-#include "ndTargaToOpenGl.h"
+#include "ndPngToOpenGl.h"
 
 ndSkyBox::ndSkyBox(GLuint shader)
 	:ndDemoEntity(ndGetIdentityMatrix(), nullptr)

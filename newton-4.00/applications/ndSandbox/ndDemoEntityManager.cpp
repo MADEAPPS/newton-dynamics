@@ -23,7 +23,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndDebugDisplay.h"
 #include "ndTestDeepBrain.h"
-#include "ndTargaToOpenGl.h"
+#include "ndPngToOpenGl.h"
 #include "ndColorRenderPass.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
@@ -603,9 +603,9 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//Test0__();
 	//Test1__();
 	//TestVulkanStuff();
-	ndHandWrittenDigits();
+	//ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
-	//TargaToPng();
+	TargaToPng();
 }
 
 ndDemoEntityManager::~ndDemoEntityManager ()

@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
-#include "ndTargaToOpenGl.h"
+#include "ndPngToOpenGl.h"
 #include "ndDemoDebrisEntity.h"
 #include "ndDemoEntityManager.h"
 

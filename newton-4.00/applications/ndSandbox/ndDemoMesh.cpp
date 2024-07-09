@@ -13,7 +13,7 @@
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
 #include "ndDemoEntity.h"
-#include "ndTargaToOpenGl.h"
+#include "ndPngToOpenGl.h"
 #include "ndDemoEntityManager.h"
 #include "ndShadowsMapRenderPass.h"
 
@@ -121,7 +121,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 		case ndShapeID::m_sphere:
 		case ndShapeID::m_capsule:
 		{
-			mesh.SphericalMapping(tex0, &aligmentUV[0][0]);
+			mesh.SphericalMapping(tex0, aligmentUV);
 			break;
 		}
 

@@ -16,7 +16,7 @@
 #include "ndDebugDisplay.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
-#include "ndTargaToOpenGl.h"
+#include "ndPngToOpenGl.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"

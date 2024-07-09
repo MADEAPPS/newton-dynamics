@@ -14,7 +14,7 @@
 #include "ndDemoCamera.h"
 #include "ndDemoEntity.h"
 #include "ndDemoSkinMesh.h"
-#include "ndTargaToOpenGl.h"
+#include "ndPngToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
 class glSkinVertex : public glPositionNormalUV

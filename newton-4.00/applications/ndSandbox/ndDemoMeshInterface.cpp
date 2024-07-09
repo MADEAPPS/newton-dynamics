@@ -10,7 +10,7 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndTargaToOpenGl.h"
+#include "ndPngToOpenGl.h"
 #include "ndDemoMeshInterface.h"
 
 ndDemoSubMeshMaterial::ndDemoSubMeshMaterial()

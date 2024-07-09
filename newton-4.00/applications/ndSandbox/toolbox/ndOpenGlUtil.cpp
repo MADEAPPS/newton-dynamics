@@ -16,7 +16,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "ndSandboxStdafx.h"
 #include "ndOpenGlUtil.h"
-#include "ndTargaToOpenGl.h"
+#include "ndPngToOpenGl.h"
 
 	
 static dMOUSE_POINT mouse0;

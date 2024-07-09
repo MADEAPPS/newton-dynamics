@@ -17,7 +17,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndVehicleUI.h"
 #include "ndVehicleCommon.h"
-#include "ndTargaToOpenGl.h"
+#include "ndPngToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
 const GLchar* ndVehicleUI::m_vertexShader = R""""(

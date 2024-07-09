@@ -157,14 +157,6 @@ ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInsta
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	//ndVector boxMin;
-	//ndVector boxMax;
-	//ndMatrix matrix(location);
-	//shape.CalculateAabb(location, boxMin, boxMax);
-	//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 500.0f, 0.0f, 0.0f), 1000.0f));
-	//floor.m_y += (boxMax.m_y - boxMin.m_y) * 0.5f;
-	//floor.m_y -= ndShapeInstance::GetBoxPadding();
-	//matrix.m_posit.m_y = ndMax (floor.m_y, matrix.m_posit.m_y);
 	ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
 	ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("shape", scene->GetShaderCache(), &shape, textName, textName, textName));
 
