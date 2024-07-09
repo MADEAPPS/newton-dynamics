@@ -436,12 +436,13 @@ static void TargaToPng(const char* const filename)
 			ndSwap(ptr0[x], ptr1[x]);
 		}
 	}
-	lodepng_encode_file(fullPathName, pBits, width, height, LCT_RGB, 8);
+	lodepng_encode_file(fullPathName, pBits, width, height, LCT_RGBA, 8);
 	lodepng_free(pBits);
 }
 
 void TargaToPng()
 {
+	//TargaToPng("smilli");
 //#if (defined(WIN32) || defined(_WIN32))
 #if 0
 	char appPath[1024];
