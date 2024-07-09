@@ -1121,7 +1121,7 @@ namespace ndQuadruped_1
 			
 			//hyperParameters.m_threadsCount = 1;
 			//hyperParameters.m_sigma = ndReal(0.25f);
-			hyperParameters.m_discountFactor = ndReal(0.99f);
+			hyperParameters.m_discountFactor = ndReal(0.995f);
 			//hyperParameters.m_maxTrajectorySteps = 1024 * 6;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 
@@ -1279,7 +1279,7 @@ namespace ndQuadruped_1
 				}
 			}
 
-			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > ndFloat32(98.5f)))
+			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > ndFloat32(99.0f)))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
