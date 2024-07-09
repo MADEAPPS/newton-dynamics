@@ -102,11 +102,9 @@ ndSkyBox::~ndSkyBox()
 
 void ndSkyBox::Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatrix&) const
 {
-return;
 	//glDepthMask(GL_FALSE);
 
 	ndDemoCamera* const camera = scene->GetCamera();
-	//glMatrix invViewModelProjectionTextureMatrix(camera->GetInvViewProjectionMatrix().Inverse4x4() * m_textureMatrix);
 	glMatrix invViewModelProjectionTextureMatrix(camera->GetInvProjectionMatrix() * camera->GetViewMatrix() * m_textureMatrix);
 	
 	glUseProgram(m_shader);
