@@ -38,7 +38,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 		3, 1, 2,
 	};
 
-	m_textureMatrix[1][1] = ndFloat32(-1.0f);
+	//m_textureMatrix[1][1] = ndFloat32(-1.0f);
 
 	//m_texturecubemap = LoadCubeMapTexture(
 	//	"NewtonSky0003.png", "NewtonSky0001.png",
