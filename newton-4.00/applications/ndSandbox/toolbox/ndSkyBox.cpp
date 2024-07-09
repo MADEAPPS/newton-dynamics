@@ -102,6 +102,7 @@ ndSkyBox::~ndSkyBox()
 
 void ndSkyBox::Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatrix&) const
 {
+return;
 	//glDepthMask(GL_FALSE);
 
 	ndDemoCamera* const camera = scene->GetCamera();

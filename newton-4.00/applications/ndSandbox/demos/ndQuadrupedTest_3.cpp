@@ -25,7 +25,7 @@
 
 namespace ndQuadruped_3
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndSpot-VPG.dnn"
 
 	class ndLegObservation
@@ -502,7 +502,7 @@ namespace ndQuadruped_3
 				m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
 				
 				ndFloat32 randVar = ndRand();
-				randVar = randVar * randVar;
+				//randVar = randVar * randVar;
 				m_model->m_control->m_animSpeed = randVar;
 			}
 
@@ -623,7 +623,7 @@ namespace ndQuadruped_3
 			ndVector zeroMomentPoint(CalculateZeroMomentPoint());
 			zeroMomentPoint.m_y = comMatrix.m_posit.m_y;
 			
-			ndFixSizeArray<ndVector, 16> contactPoints;
+			ndFixSizeArray<ndBigVector, 16> contactPoints;
 			for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); ++i)
 			{
 				const ndEffectorInfo& info = m_effectorsInfo[i];
@@ -639,17 +639,25 @@ namespace ndQuadruped_3
 			const ndVector supportPolygonColor(1.0f, 1.0f, 0.0f, 1.0f);
 			if (contactPoints.GetCount() >= 3)
 			{
+				ScaleSupportShape(contactPoints);
+
+				ndFixSizeArray<ndVector, 16> reducedSupportPolygon;
+				for (ndInt32 i = 0; i < contactPoints.GetCount(); ++i)
+				{
+					reducedSupportPolygon.PushBack(contactPoints[i]);
+				}
+
 				ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
-				rotation.TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
-				ndInt32 supportCount = ndConvexHull2d(&contactPoints[0], contactPoints.GetCount());
-				rotation.OrthoInverse().TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
-				ndVector p0(contactPoints[supportCount - 1]);
+				rotation.TransformTriplex(&reducedSupportPolygon[0].m_x, sizeof(ndVector), &reducedSupportPolygon[0].m_x, sizeof(ndVector), reducedSupportPolygon.GetCount());
+				ndInt32 supportCount = ndConvexHull2d(&reducedSupportPolygon[0], reducedSupportPolygon.GetCount());
+				rotation.OrthoInverse().TransformTriplex(&reducedSupportPolygon[0].m_x, sizeof(ndVector), &reducedSupportPolygon[0].m_x, sizeof(ndVector), reducedSupportPolygon.GetCount());
+				ndVector p0(reducedSupportPolygon[supportCount - 1]);
 				ndBigVector bigPolygon[16];
 				for (ndInt32 i = 0; i < supportCount; ++i)
 				{
-					bigPolygon[i] = contactPoints[i];
-					context.DrawLine(contactPoints[i], p0, supportPolygonColor);
-					p0 = contactPoints[i];
+					bigPolygon[i] = reducedSupportPolygon[i];
+					context.DrawLine(reducedSupportPolygon[i], p0, supportPolygonColor);
+					p0 = reducedSupportPolygon[i];
 				}
 			
 				ndBigVector p0Out;
@@ -664,7 +672,7 @@ namespace ndQuadruped_3
 				context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
 			}
 
-			CalculateReward();
+			//CalculateReward();
 		}
 
 		ndVector CalculateCenterOfMass() const
@@ -784,6 +792,22 @@ namespace ndQuadruped_3
 			UpdatePose(m_timestep);
 		}
 
+		void ScaleSupportShape(ndFixSizeArray<ndBigVector, 16>& shape) const
+		{
+			ndBigVector origin(ndBigVector::m_zero);
+			for (ndInt32 i = 0; i < shape.GetCount(); ++i)
+			{
+				origin += shape[i];
+			}
+			origin = origin.Scale(1.0f / ndFloat32(shape.GetCount()));
+
+			ndFloat32 scale = 0.8f;
+			for (ndInt32 i = 0; i < shape.GetCount(); ++i)
+			{
+				shape[i] = origin + (shape[i] - origin).Scale(scale);
+			}
+		}
+
 		ndVector CalculateZeroMomentPoint() const
 		{
 			ndFixSizeArray<ndVector, 32> r;
@@ -837,7 +861,7 @@ namespace ndQuadruped_3
 
 		ndBrainFloat CalculateZeroMomentPointReward() const
 		{
-			ndFixSizeArray<ndBigVector, 4> desiredSupportPoint;
+			ndFixSizeArray<ndBigVector, 16> desiredSupportPoint;
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
@@ -860,6 +884,9 @@ namespace ndQuadruped_3
 				ndBigVector ray_p0(zmp);
 				ndBigVector ray_p1(zmp);
 				ray_p1.m_y -= ndFloat32(1.5f);
+
+				ScaleSupportShape(desiredSupportPoint);
+
 				ndRayToPolygonDistance(ray_p0, ray_p1, &desiredSupportPoint[0], desiredSupportPoint.GetCount(), p0Out, p1Out);
 				const ndBigVector error((p0Out - p1Out) & ndBigVector::m_triplexMask);
 				ndFloat32 dist2 = ndFloat32(error.DotProduct(error).GetScalar());
@@ -1219,7 +1246,7 @@ namespace ndQuadruped_3
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			
 			//hyperParameters.m_threadsCount = 4;
-			hyperParameters.m_discountFactor = ndReal(0.995f);
+			hyperParameters.m_discountFactor = ndReal(0.99f);
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 			
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>(new ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));

@@ -205,6 +205,17 @@ GLuint LoadTexture(const char* const filename)
 		unsigned height;
 		unsigned char* pBits;
 		lodepng_decode_file(&pBits, &width, &height, fullPathName, LCT_RGBA, 8);
+
+		unsigned* const ptr = (ndUnsigned32*)pBits;
+		for (unsigned y = 0; y < height / 2; ++y)
+		{
+			unsigned* const ptr0 = ptr + y * width;
+			unsigned* const ptr1 = ptr + (height - y - 1) * width;
+			for (unsigned x = 0; x < width; ++x)
+			{
+				ndSwap(ptr0[x], ptr1[x]);
+			}
+		}
 		GLuint textureId = LoadGpuImage(pBits, int(width), int(height), m_rgba);
 		lodepng_free(pBits);
 
@@ -262,6 +273,17 @@ GLuint LoadCubeMapTexture(
 		unsigned height;
 		unsigned char* pBits;
 		lodepng_decode_file(&pBits, &width, &height, fullPathName, LCT_RGBA, 8);
+
+		unsigned* const ptr = (ndUnsigned32*)pBits;
+		for (unsigned y = 0; y < height / 2; ++y)
+		{
+			unsigned* const ptr0 = ptr + y * width;
+			unsigned* const ptr1 = ptr + (height - y - 1) * width;
+			for (unsigned x = 0; x < width; ++x)
+			{
+				ndSwap(ptr0[x], ptr1[x]);
+			}
+		}
 		glTexImage2D(faceArray[i], 0, GL_RGBA, int(width), int(height), 0, GL_RGBA, GL_UNSIGNED_BYTE, pBits);
 		lodepng_free(pBits);
 	}
