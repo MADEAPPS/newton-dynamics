@@ -127,8 +127,8 @@ namespace ndQuadruped_1
 				ndAssert(param <= ndFloat32(1.0f));
 
 				ndFloat32 gaitFraction = 0.25f;
-				ndFloat32 gaitGuard = gaitFraction * 0.05f;
-				ndFloat32 omega = ndPi / (gaitFraction - ndFloat32(2.0f) * gaitGuard);
+				ndFloat32 gaitGuard____ = gaitFraction * 0.25f;
+				ndFloat32 omega = ndPi / (gaitFraction - gaitGuard____);
 				
 				ndFloat32 ycontact = D_POSE_REST_POSITION_Y + m_amp / 2.0f;
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
@@ -138,6 +138,7 @@ namespace ndQuadruped_1
 				}
 
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
+				//for (ndInt32 i = 0; i < 1; i++)
 				{
 					ndFloat32 stride_x = m_stride_x;
 					if ((i == 2) || (i == 3))
@@ -152,13 +153,14 @@ namespace ndQuadruped_1
 					}
 
 					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
-					if ((t >= gaitGuard) && (t <= (gaitFraction - gaitGuard)))
+					//if ((t >= gaitGuard) && (t <= (gaitFraction - gaitGuard)))
+					if (t <= (gaitFraction - gaitGuard____))
 					{
-						output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
+						output[i].m_posit.m_y += m_amp * ndSin(omega * t);
 						output[i].m_userParamInt = output[i].m_posit.m_y < ycontact ? -1 : 1;
 
-						ndFloat32 num = t - gaitGuard;
-						ndFloat32 den = gaitFraction - ndFloat32(2.0f) * gaitGuard;
+						ndFloat32 num = t;
+						ndFloat32 den = gaitFraction - gaitGuard____;
 
 						ndFloat32 t0 = num / den;
 						//output[i].m_posit.m_x += stride_x * t0 - stridem_x * 0.5f;
@@ -166,13 +168,13 @@ namespace ndQuadruped_1
 					}
 					else
 					{
-						if (t <= gaitGuard)
-						{
-							t += 1.0f;
-						}
-
-						ndFloat32 num = t - gaitFraction + gaitGuard;
-						ndFloat32 den = 1.0f - gaitFraction - ndFloat32(2.0f) * gaitGuard;
+						//if (t <= gaitGuard)
+						//{
+						//	t += 1.0f;
+						//}
+						
+						ndFloat32 num = t - (gaitFraction - gaitGuard____);
+						ndFloat32 den = 1.0f - (gaitFraction - gaitGuard____);
 						ndFloat32 t0 = num / den;
 						//output[i].m_posit.m_x += -(stride_x * t0 - stridem_x * 0.5f + );
 						output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
