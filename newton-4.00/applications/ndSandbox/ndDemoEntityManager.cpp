@@ -59,16 +59,16 @@
 //#define DEFAULT_SCENE	19		// cart pole discrete controller
 //#define DEFAULT_SCENE	20		// cart pole continue controller
 //#define DEFAULT_SCENE	21		// unit cycle controller
-//#define DEFAULT_SCENE	22		// quadruped test 1
+#define DEFAULT_SCENE	22		// quadruped test 1
 //#define DEFAULT_SCENE	23		// quadruped test 2
-#define DEFAULT_SCENE	24		// quadruped test 3
+//#define DEFAULT_SCENE	24		// quadruped test 3
 //#define DEFAULT_SCENE	25		// biped test 1
 //#define DEFAULT_SCENE	26		// biped test 2
 //#define DEFAULT_SCENE	27		// train biped test 2
-//#define DEFAULT_SCENE	28		// simple voronoi fracture
-//#define DEFAULT_SCENE	29		// basic voronoi fracture
-//#define DEFAULT_SCENE	30		// linked voronoi fracture
-//#define DEFAULT_SCENE	31		// skin peel voronoi fracture
+//#define DEFAULT_SCENE	28		// simple fracture
+//#define DEFAULT_SCENE	29		// basic fracture
+//#define DEFAULT_SCENE	30		// linked fracture
+//#define DEFAULT_SCENE	31		// skin peel fracture
 						 
 // demos forward declaration 
 void ndRagdollTest(ndDemoEntityManager* const scene);
