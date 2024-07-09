@@ -363,6 +363,12 @@ namespace ndQuadruped_1
 				{
 					return true;
 				}
+
+				ndBrainFloat reward = m_model->CalculateReward();
+				if (reward < 0.1f)
+				{
+					return true;
+				}
 				
 				for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
 				{
