@@ -439,7 +439,7 @@ namespace ndQuadruped_1
 
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
 			ndRobot* m_model;
-			ndReal m_rewardsMemories[3];
+			ndReal m_rewardsMemories[32];
 		};
 
 		ndRobot(ndSharedPtr<ndBrainAgent>& agent)
