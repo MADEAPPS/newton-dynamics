@@ -336,7 +336,9 @@ namespace ndQuadruped_1
 
 			ndBrainFloat CalculateReward()
 			{
-				return m_model->CalculateReward();
+				m_rewardsMemories[0] = m_rewardsMemories[1];
+				m_rewardsMemories[1] = m_model->CalculateReward();
+				return m_rewardsMemories[1];
 			}
 
 			virtual void ApplyActions(ndBrainFloat* const actions)
@@ -351,12 +353,6 @@ namespace ndQuadruped_1
 
 			bool IsTerminal() const
 			{
-				ndInt32 count = 0;
-				ndInt32 isGround = 4;
-
-				bool airborneLeg[4];
-				bool sequenceAirborne[4];
-
 				ndMatrix matrix(m_model->GetRoot()->m_body->GetMatrix());
 				ndVector up(matrix.m_up);
 				if (up.m_y < 0.2f)
@@ -364,47 +360,50 @@ namespace ndQuadruped_1
 					return true;
 				}
 
-				ndBrainFloat reward = m_model->CalculateReward();
-				if (reward < 0.1f)
+				if ((m_rewardsMemories[0] < ndReal(0.05f)) && (m_rewardsMemories[1] < ndReal(0.05f)))
 				{
 					return true;
 				}
-				
-				for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
-				{
-					ndContact* const contact = m_model->FindContact(i);
-					bool isAirborne = !(contact && contact->IsActive());
-					isGround -= ndInt32(isAirborne);
 
-					const ndAnimKeyframe& keyFrame = m_model->m_animPose[i];
-					if (keyFrame.m_userParamInt != 0)
-					{
-						airborneLeg[count] = isAirborne;
-						if (keyFrame.m_userParamInt == 0)
-						{
-							isAirborne = false;
-						}
-						else if (keyFrame.m_userParamInt == 1)
-						{
-							isAirborne = true;
-						}
-						sequenceAirborne[count] = isAirborne;
-
-						count++;
-					}
-				}
-				if (isGround < 2)
-				{
-					return false;
-				}
-
-				for (ndInt32 i = 0; i < count; ++i)
-				{
-					if (airborneLeg[i] != sequenceAirborne[i])
-					{
-						//return true;
-					}
-				}
+				//ndInt32 count = 0;
+				//ndInt32 isGround = 4;
+				//bool airborneLeg[4];
+				//bool sequenceAirborne[4];
+				//for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
+				//{
+				//	ndContact* const contact = m_model->FindContact(i);
+				//	bool isAirborne = !(contact && contact->IsActive());
+				//	isGround -= ndInt32(isAirborne);
+				//
+				//	const ndAnimKeyframe& keyFrame = m_model->m_animPose[i];
+				//	if (keyFrame.m_userParamInt != 0)
+				//	{
+				//		airborneLeg[count] = isAirborne;
+				//		if (keyFrame.m_userParamInt == 0)
+				//		{
+				//			isAirborne = false;
+				//		}
+				//		else if (keyFrame.m_userParamInt == 1)
+				//		{
+				//			isAirborne = true;
+				//		}
+				//		sequenceAirborne[count] = isAirborne;
+				//
+				//		count++;
+				//	}
+				//}
+				//if (isGround < 2)
+				//{
+				//	return false;
+				//}
+				//
+				//for (ndInt32 i = 0; i < count; ++i)
+				//{
+				//	if (airborneLeg[i] != sequenceAirborne[i])
+				//	{
+				//		//return true;
+				//	}
+				//}
 
 				return false;
 			}
@@ -416,6 +415,8 @@ namespace ndQuadruped_1
 				{
 					m_basePose[i].SetPose();
 				}
+
+				ndMemSet(m_rewardsMemories, ndReal(1.0), sizeof(m_rewardsMemories) / sizeof(m_rewardsMemories[0]));
 
 				ndFloat32 randVar = ndRand();
 				randVar = randVar * randVar;
@@ -430,6 +431,7 @@ namespace ndQuadruped_1
 
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
 			ndRobot* m_model;
+			ndReal m_rewardsMemories[2];
 		};
 
 		ndRobot(ndSharedPtr<ndBrainAgent>& agent)
