@@ -95,7 +95,7 @@ namespace ndQuadruped_1
 				:ndAnimationSequence()
 				,m_amp(0.27f)
 				,m_stride_x(0.3f)
-				,m_stride_z(0.3f)
+				,m_stride_z(-0.3f)
 			{
 				m_duration = ndFloat32(4.0f);
 				for (ndInt32 i = 0; i < 4; i++)
@@ -127,8 +127,8 @@ namespace ndQuadruped_1
 				ndAssert(param <= ndFloat32(1.0f));
 
 				ndFloat32 gaitFraction = 0.25f;
-				ndFloat32 gaitGuard____ = gaitFraction * 0.25f;
-				ndFloat32 omega = ndPi / (gaitFraction - gaitGuard____);
+				ndFloat32 gaitGuard = gaitFraction * 0.25f;
+				ndFloat32 omega = ndPi / (gaitFraction - gaitGuard);
 				
 				ndFloat32 ycontact = D_POSE_REST_POSITION_Y + m_amp / 2.0f;
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
@@ -154,13 +154,13 @@ namespace ndQuadruped_1
 
 					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
 					//if ((t >= gaitGuard) && (t <= (gaitFraction - gaitGuard)))
-					if (t <= (gaitFraction - gaitGuard____))
+					if (t <= (gaitFraction - gaitGuard))
 					{
 						output[i].m_posit.m_y += m_amp * ndSin(omega * t);
 						output[i].m_userParamInt = output[i].m_posit.m_y < ycontact ? -1 : 1;
 
 						ndFloat32 num = t;
-						ndFloat32 den = gaitFraction - gaitGuard____;
+						ndFloat32 den = gaitFraction - gaitGuard;
 
 						ndFloat32 t0 = num / den;
 						//output[i].m_posit.m_x += stride_x * t0 - stridem_x * 0.5f;
@@ -173,8 +173,8 @@ namespace ndQuadruped_1
 						//	t += 1.0f;
 						//}
 						
-						ndFloat32 num = t - (gaitFraction - gaitGuard____);
-						ndFloat32 den = 1.0f - (gaitFraction - gaitGuard____);
+						ndFloat32 num = t - (gaitFraction - gaitGuard);
+						ndFloat32 den = 1.0f - (gaitFraction - gaitGuard);
 						ndFloat32 t0 = num / den;
 						//output[i].m_posit.m_x += -(stride_x * t0 - stridem_x * 0.5f + );
 						output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
@@ -336,9 +336,12 @@ namespace ndQuadruped_1
 
 			ndBrainFloat CalculateReward()
 			{
-				m_rewardsMemories[0] = m_rewardsMemories[1];
-				m_rewardsMemories[1] = m_model->CalculateReward();
-				return m_rewardsMemories[1];
+				for (ndInt32 i = sizeof(m_rewardsMemories) / sizeof(m_rewardsMemories[0]) - 1; i >= 1; --i)
+				{
+					m_rewardsMemories[i] = m_rewardsMemories[i - 1];
+				}
+				m_rewardsMemories[0] = m_model->CalculateReward();
+				return m_rewardsMemories[0];
 			}
 
 			virtual void ApplyActions(ndBrainFloat* const actions)
@@ -360,9 +363,14 @@ namespace ndQuadruped_1
 					return true;
 				}
 
-				if ((m_rewardsMemories[0] < ndReal(0.05f)) && (m_rewardsMemories[1] < ndReal(0.05f)))
+				bool isDead = true;
+				for (ndInt32 i = sizeof(m_rewardsMemories) / sizeof(m_rewardsMemories[0]) - 1; i >= 0; --i)
 				{
-					return true;
+					isDead &= m_rewardsMemories[i] < ndReal(0.05f);
+				}
+				if (isDead)
+				{
+					return isDead;
 				}
 
 				//ndInt32 count = 0;
@@ -423,15 +431,15 @@ namespace ndQuadruped_1
 				//randVar = randVar * randVar * randVar;
 				m_model->m_control->m_animSpeed = randVar;
 
-				//ndUnsigned32 index = ndRandInt() % 4;
-				ndUnsigned32 index = 0;
+				ndUnsigned32 index = ndRandInt() % 4;
+				//index = 1;
 				ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
 				m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
 			}
 
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
 			ndRobot* m_model;
-			ndReal m_rewardsMemories[2];
+			ndReal m_rewardsMemories[3];
 		};
 
 		ndRobot(ndSharedPtr<ndBrainAgent>& agent)
@@ -633,6 +641,9 @@ namespace ndQuadruped_1
 				const ndActionVector& actionVector = *((ndActionVector*)actions);
 				m_control->m_x = ndClamp(ndReal(m_control->m_x + actionVector.m_x * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
 				m_control->m_z = ndClamp(ndReal(m_control->m_z + actionVector.m_z * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
+
+				//m_control->m_x = 0;
+				//m_control->m_z = 0;
 			}
 			
 			UpdatePose(m_timestep);
@@ -1115,8 +1126,8 @@ namespace ndQuadruped_1
 			m_outFile = fopen("quadruped_1-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			//const ndInt32 countX = 2;
-			//const ndInt32 countZ = 2;
+			//const ndInt32 countX = 0;
+			//const ndInt32 countZ = 0;
 			const ndInt32 countX = 6;
 			const ndInt32 countZ = 9;
 

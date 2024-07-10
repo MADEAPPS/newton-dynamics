@@ -564,6 +564,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_showConcaveEdge = true;
 	//m_showMeshSkeleton = true;
 	m_autoSleepMode = false;
+	//m_hideVisualMeshes = true;
 	//m_solverMode = ndWorld::ndCudaSolver;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
 	m_solverMode = ndWorld::ndStandardSolver;
@@ -605,7 +606,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//TestVulkanStuff();
 	//ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
-	TargaToPng();
+	//TargaToPng();
 }
 
 ndDemoEntityManager::~ndDemoEntityManager ()

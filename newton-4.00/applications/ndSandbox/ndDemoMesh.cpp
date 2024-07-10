@@ -110,9 +110,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 	m_name = name;
 	ndMeshEffect mesh(*collision);
 
-	ndMatrix flipMatrix(ndGetIdentityMatrix());
+	//ndMatrix flipMatrix(ndGetIdentityMatrix());
 	//flipMatrix[1][1] = ndFloat32(-1.0f);
-	ndMatrix aligmentUV(flipMatrix * uvMatrix);
+	//ndMatrix aligmentUV(flipMatrix * uvMatrix);
 
 	m_shader = shaderCache.m_diffuseEffect;
 	m_shaderShadow = shaderCache.m_diffuseShadowEffect;
@@ -125,6 +125,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 		case ndShapeID::m_sphere:
 		case ndShapeID::m_capsule:
 		{
+			ndMatrix flipMatrix(ndGetIdentityMatrix());
+			flipMatrix[0][0] = ndFloat32(-1.0f);
+			ndMatrix aligmentUV(flipMatrix * uvMatrix);
 			mesh.SphericalMapping(tex0, aligmentUV);
 			break;
 		}
@@ -135,11 +138,11 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 			//ndInt32 tex2 = LoadTexture(texture2);
 			if (stretchMaping)
 			{
-				mesh.BoxMapping(tex0, tex0, tex0, aligmentUV);
+				mesh.BoxMapping(tex0, tex0, tex0, uvMatrix);
 			}
 			else
 			{
-				mesh.UniformBoxMapping(tex0, aligmentUV);
+				mesh.UniformBoxMapping(tex0, uvMatrix);
 			}
 			break;
 		}
@@ -150,7 +153,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 			//ndInt32 tex1 = LoadTexture(texture1);
 			//ndInt32 tex2 = LoadTexture(texture2);
 			//NewtonMeshApplyBoxMapping(mesh, tex0, tex1, tex2, &aligmentUV[0][0]);
-			mesh.UniformBoxMapping(tex0, aligmentUV);
+			mesh.UniformBoxMapping(tex0, uvMatrix);
 		}
 	}
 
