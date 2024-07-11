@@ -866,7 +866,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 		m_framesAlive++;
 	}
 
-	if ((m_bashTrajectoryIndex >= m_bashTrajectoryCount) || (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps))
+	if ((m_bashTrajectoryIndex >= (m_bashTrajectoryCount * 10)) || (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps))
 	{
 		Optimize();
 		m_eposideCount++;
