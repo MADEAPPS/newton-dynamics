@@ -419,22 +419,28 @@ namespace ndQuadruped_1
 			void ResetModel()
 			{
 				m_model->m_control->Reset();
-				for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
-				{
-					m_basePose[i].SetPose();
-				}
-
 				ndMemSet(m_rewardsMemories, ndReal(1.0), sizeof(m_rewardsMemories) / sizeof(m_rewardsMemories[0]));
 
-				ndFloat32 randVar = ndRand();
-				randVar = randVar * randVar;
-				//randVar = randVar * randVar * randVar;
-				m_model->m_control->m_animSpeed = randVar;
 
-				ndUnsigned32 index = ndRandInt() % 4;
-				//index = 1;
-				ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
-				m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
+				ndMatrix matrix(m_model->GetRoot()->m_body->GetMatrix());
+				ndVector up(matrix.m_up);
+				if (up.m_y < 0.2f)
+				{
+					for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
+					{
+						m_basePose[i].SetPose();
+					}
+
+					ndFloat32 randVar = ndRand();
+					//randVar = randVar * randVar;
+					//randVar = randVar * randVar * randVar;
+					m_model->m_control->m_animSpeed = randVar;
+
+					ndUnsigned32 index = 0;
+					//ndUnsigned32 index = ndRandInt() % 4;
+					ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
+					m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
+				}
 			}
 
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
@@ -1126,10 +1132,10 @@ namespace ndQuadruped_1
 			m_outFile = fopen("quadruped_1-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			//const ndInt32 countX = 0;
-			//const ndInt32 countZ = 0;
-			const ndInt32 countX = 6;
-			const ndInt32 countZ = 9;
+			ndInt32 countX = 6;
+			ndInt32 countZ = 9;
+			//countX = 0;
+			//countZ = 0;
 
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			
