@@ -421,10 +421,14 @@ namespace ndQuadruped_1
 				m_model->m_control->Reset();
 				ndMemSet(m_rewardsMemories, ndReal(1.0), sizeof(m_rewardsMemories) / sizeof(m_rewardsMemories[0]));
 
-
 				ndMatrix matrix(m_model->GetRoot()->m_body->GetMatrix());
 				ndVector up(matrix.m_up);
-				if (up.m_y < 0.2f)
+				bool state = up.m_y < 0.2f;
+				state = state || (matrix.m_posit.m_x > 20.0f);
+				state = state || (matrix.m_posit.m_x <- 20.0f);
+				state = state || (matrix.m_posit.m_z > 20.0f);
+				state = state || (matrix.m_posit.m_z < -20.0f);
+				if (state)
 				{
 					for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
 					{
