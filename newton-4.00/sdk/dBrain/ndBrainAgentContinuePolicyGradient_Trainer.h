@@ -862,6 +862,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 			agent->ResetModel();
 			m_bashTrajectoryIndex++;
 		}
+		m_frameCount++;
+		m_framesAlive++;
 	}
 
 	if ((m_bashTrajectoryIndex >= m_bashTrajectoryCount) || (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps))

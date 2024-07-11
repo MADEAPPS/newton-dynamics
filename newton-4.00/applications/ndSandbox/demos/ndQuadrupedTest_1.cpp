@@ -416,6 +416,7 @@ namespace ndQuadruped_1
 				return false;
 			}
 
+			#pragma optimize( "", off )
 			void ResetModel()
 			{
 				m_model->m_control->Reset();
@@ -440,10 +441,12 @@ namespace ndQuadruped_1
 					//randVar = randVar * randVar * randVar;
 					m_model->m_control->m_animSpeed = randVar;
 
-					ndUnsigned32 index = 0;
+					//ndUnsigned32 index = 0;
 					//ndUnsigned32 index = ndRandInt() % 4;
+					//ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
+					//m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
 					ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
-					m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
+					m_model->m_animBlendTree->SetTime(duration * ndRand());
 				}
 			}
 
@@ -988,6 +991,9 @@ namespace ndQuadruped_1
 		model->m_poseGenerator = new ndAnimationSequencePlayer(sequence);
 		model->m_control = new ndRobot::ndUIControlNode(model->m_poseGenerator);
 		model->m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(model->m_control);
+
+		ndFloat32 duration = model->m_poseGenerator->GetSequence()->GetDuration();
+		model->m_animBlendTree->SetTime(duration * ndRand());
 		
 		ndRobot::ndPoseGenerator* const poseGenerator = (ndRobot::ndPoseGenerator*)*sequence;
 
