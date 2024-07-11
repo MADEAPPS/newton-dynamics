@@ -227,6 +227,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_maxTrajectorySteps;
 	ndInt32 m_extraTrajectorySteps;
 	ndInt32 m_bashTrajectoryIndex;
+	ndInt32 m_bashTrajectoryCount;
 	ndInt32 m_bashTrajectorySteps;
 	ndInt32 m_baseLineOptimizationPases;
 	ndInt32 m_baseValueWorkingBufferSize;
@@ -377,7 +378,8 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	,m_maxTrajectorySteps(hyperParameters.m_maxTrajectorySteps)
 	,m_extraTrajectorySteps(hyperParameters.m_extraTrajectorySteps)
 	,m_bashTrajectoryIndex(0)
-	, m_bashTrajectorySteps(hyperParameters.m_bashTrajectoryCount * m_maxTrajectorySteps)
+	,m_bashTrajectoryCount(hyperParameters.m_bashTrajectoryCount)
+	,m_bashTrajectorySteps(hyperParameters.m_bashTrajectoryCount * m_maxTrajectorySteps)
 	,m_baseLineOptimizationPases(hyperParameters.m_baseLineOptimizationPases)
 	,m_baseValueWorkingBufferSize(0)
 	,m_randomSeed(hyperParameters.m_randomSeed)
@@ -635,7 +637,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	}
 
 	ndBrainFloat averageSum = ndBrainFloat(0.0f);
-	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetCount()); i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetCount() - 1); i >= 0; --i)
 	{
 		averageSum += m_trajectoryAccumulator[i].m_reward;
 	}
@@ -857,26 +859,53 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 		if (isTeminal)
 		{
 			SaveTrajectory(agent);
-			m_bashTrajectoryIndex++;
-			if (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps)
-			{
-				Optimize();
-				for (node = m_agents.GetFirst(); node; node = node->GetNext())
-				{
-					node->GetInfo()->m_trajectory.SetCount(0);
-				}
-				node = m_agents.GetLast();
-				m_eposideCount++;
-				m_framesAlive = 0;
-				m_bashTrajectoryIndex = 0;
-				m_trajectoryAccumulator.SetCount(0);
-			}
 			agent->ResetModel();
+			m_bashTrajectoryIndex++;
 		}
-
-		m_frameCount++;
-		m_framesAlive++;
 	}
+
+	if ((m_bashTrajectoryIndex >= m_bashTrajectoryCount) || (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps))
+	{
+		Optimize();
+		m_eposideCount++;
+		m_framesAlive = 0;
+		m_bashTrajectoryIndex = 0;
+		m_trajectoryAccumulator.SetCount(0);
+		for (typename ndList<ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
+		{
+			ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>* const agent = node->GetInfo();
+			agent->m_trajectory.SetCount(0);
+		}
+	}
+
+	//for (typename ndList<ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>* const agent = node->GetInfo();
+	//
+	//	bool isTeminal = agent->IsTerminal() || (agent->m_trajectory.GetCount() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
+	//	if (isTeminal)
+	//	{
+	//		SaveTrajectory(agent);
+	//		m_bashTrajectoryIndex++;
+	//		if (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps)
+	//		{
+	//			Optimize();
+	//			for (node = m_agents.GetFirst(); node; node = node->GetNext())
+	//			{
+	//				node->GetInfo()->m_trajectory.SetCount(0);
+	//			}
+	//			node = m_agents.GetLast();
+	//			m_eposideCount++;
+	//			m_framesAlive = 0;
+	//			m_bashTrajectoryIndex = 0;
+	//			m_trajectoryAccumulator.SetCount(0);
+	//		}
+	//		agent->ResetModel();
+	//	}
+	//
+	//	m_frameCount++;
+	//	m_framesAlive++;
+	//}
 }
 
 #endif 

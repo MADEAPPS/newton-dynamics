@@ -566,7 +566,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	}
 
 	ndBrainFloat averageSum = ndBrainFloat(0.0f);
-	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetCount()); i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetCount() - 1); i >= 0; --i)
 	{
 		averageSum += m_trajectoryAccumulator[i].m_reward;
 	}

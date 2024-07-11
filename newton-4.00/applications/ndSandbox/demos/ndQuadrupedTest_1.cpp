@@ -878,8 +878,8 @@ namespace ndQuadruped_1
 		{
 			ndModelArticulation::Update(world, timestep);
 
-			static int xxx; 
-			ndTrace(("step(%d) reward(%f)\n", xxx++, CalculateReward()));
+			//static int xxx; 
+			//ndTrace(("step(%d) reward(%f)\n", xxx++, CalculateReward()));
 			
 			m_timestep = timestep;
 			m_agent->Step();
