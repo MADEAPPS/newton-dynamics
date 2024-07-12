@@ -525,7 +525,9 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	m_ndBrainGetResults = LoadShaderProgram("ndBrainGetResults-comp.spv");
 	m_ndBrainLayerLinear = LoadShaderProgram("ndBrainLayerLinear-comp.spv");
 	m_ndBrainLayerLinearTiled = LoadShaderProgram("ndBrainLayerLinearTiled-comp.spv");
-	m_ndBrainLayerRluActivation = LoadShaderProgram("ndBrainLayerRluActivation-comp.spv");
+	m_ndBrainLayerEluActivation = LoadShaderProgram("ndBrainLayerEluActivation-comp.spv");
+	m_ndBrainLayerReluActivation = LoadShaderProgram("ndBrainLayerReluActivation-comp.spv");
+	m_ndBrainLayerTanhActivation = LoadShaderProgram("ndBrainLayerTanhActivation-comp.spv");
 	m_ndBrainLayerSoftmaxActivation = LoadShaderProgram("ndBrainLayerSoftmaxActivation-comp.spv");
 	m_ndBrainLayerSoftmaxActivationSubGroup = LoadShaderProgram("ndBrainLayerSoftmaxActivationSubGroup-comp.spv");
 }

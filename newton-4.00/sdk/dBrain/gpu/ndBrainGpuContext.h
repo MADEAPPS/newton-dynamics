@@ -39,7 +39,7 @@ class ndBrainGpuContext : public ndClassAlloc
 			void* m_ndBrainCopyInput;
 			void* m_ndBrainLayerLinear;
 			void* m_ndBrainLayerLinearTiled;
-			void* m_ndBrainLayerRluActivation;
+			void* m_ndBrainLayerReluActivation;
 			void* m_ndBrainLayerSoftmaxActivation;
 		};
 		void* m_modules[128];
@@ -125,7 +125,9 @@ class ndBrainGpuContext: public ndClassAlloc
 			VkShaderModule m_ndBrainCopyBuffer;
 			VkShaderModule m_ndBrainLayerLinear;
 			VkShaderModule m_ndBrainLayerLinearTiled;
-			VkShaderModule m_ndBrainLayerRluActivation;
+			VkShaderModule m_ndBrainLayerEluActivation;
+			VkShaderModule m_ndBrainLayerReluActivation;
+			VkShaderModule m_ndBrainLayerTanhActivation;
 			VkShaderModule m_ndBrainLayerSoftmaxActivation;
 			VkShaderModule m_ndBrainLayerSoftmaxActivationSubGroup;
 		};

@@ -21,7 +21,12 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainGpuContext.h"
+#include "ndBrainGpuCommand.h"
+#include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainLayerActivation.h"
+#include "ndBrainGpuIntegerBuffer.h"
+#include "ndBrainGpuUniformBuffer.h"
 
 ndBrainLayerActivation::ndBrainLayerActivation(ndInt32 neurons)
 	:ndBrainLayer()
@@ -137,4 +142,45 @@ void ndBrainLayerActivation::CalculateParamGradients(const ndBrainVector& input,
 void ndBrainLayerActivation::GetNumberOfGPUParameters(ndBrainVector&, ndArray<ndInt32>& offsets) const
 {
 	offsets.PushBack(0);
+}
+
+ndBrainGpuCommand* ndBrainLayerActivation::AssemblyGPUCommandCommon(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params, void* shader)
+{
+	class ndBrainLayerActivationCommand : public ndBrainGpuCommand
+	{
+		public:
+		struct UniformBufferObject
+		{
+			ndInt32 m_inputSize;
+			ndInt32 m_inputStart;
+			ndInt32 m_outputStart;
+			ndInt32 m_workBufferSize;
+		};
+	
+		ndBrainLayerActivationCommand(
+			const ndBrainLayerActivation* const layer, ndBrainGpuContext* const context,
+			ndInt32 layerIndex, ndInt32 batchCount, const ndBufferOffsetPair& workingBuffer, VkShaderModule shader)
+			:ndBrainGpuCommand(context)
+			,m_parammeters(m_context, sizeof(UniformBufferObject))
+		{
+			UniformBufferObject uniformParam;
+			uniformParam.m_inputSize = layer->GetInputSize();
+			uniformParam.m_inputStart = workingBuffer.m_offsets[layerIndex + 0];
+			uniformParam.m_outputStart = workingBuffer.m_offsets[layerIndex + 1];
+			uniformParam.m_workBufferSize = workingBuffer.m_offsets[workingBuffer.m_offsets.GetCount() - 1];
+	
+			m_parammeters.LoadData(sizeof(uniformParam), &uniformParam);
+	
+			ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
+			params.PushBack(&m_parammeters);
+			params.PushBack(workingBuffer.m_buffer);
+			Assembly(shader, batchCount, params.GetCount(), &params[0]);
+		}
+	
+		ndBrainGpuUniformBuffer m_parammeters;
+	};
+	
+	ndAssert(params.GetCount() == 2);
+	const ndBufferOffsetPair& workingBuffer = *params[1];
+	return new ndBrainLayerActivationCommand(this, context, layerIndex, batchCount, workingBuffer, (VkShaderModule)shader);
 }

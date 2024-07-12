@@ -14,6 +14,7 @@
 #include "ndBrainStdafx.h"
 
 class ndBrainGpuContext;
+class ndBrainGpuBuffer;
 class ndBrainGpuFloatBuffer;
 class ndBrainGpuUniformBuffer;
 

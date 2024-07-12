@@ -21,6 +21,7 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainGpuContext.h"
 #include "ndBrainLayerActivationTanh.h"
 
 ndBrainLayerActivationTanh::ndBrainLayerActivationTanh(ndInt32 neurons)
@@ -75,4 +76,9 @@ void ndBrainLayerActivationTanh::InputDerivative(const ndBrainVector&, const ndB
 	inputDerivative.MulSub(output, output);
 	inputDerivative.Mul(outputDerivative);
 	inputDerivative.FlushToZero();
+}
+
+ndBrainGpuCommand* ndBrainLayerActivationTanh::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
+{
+	return AssemblyGPUCommandCommon(context, layerIndex, batchCount, params, context->m_ndBrainLayerTanhActivation);
 }
