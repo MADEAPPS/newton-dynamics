@@ -879,35 +879,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 			agent->m_trajectory.SetCount(0);
 		}
 	}
-
-	//for (typename ndList<ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>* const agent = node->GetInfo();
-	//
-	//	bool isTeminal = agent->IsTerminal() || (agent->m_trajectory.GetCount() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
-	//	if (isTeminal)
-	//	{
-	//		SaveTrajectory(agent);
-	//		m_bashTrajectoryIndex++;
-	//		if (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps)
-	//		{
-	//			Optimize();
-	//			for (node = m_agents.GetFirst(); node; node = node->GetNext())
-	//			{
-	//				node->GetInfo()->m_trajectory.SetCount(0);
-	//			}
-	//			node = m_agents.GetLast();
-	//			m_eposideCount++;
-	//			m_framesAlive = 0;
-	//			m_bashTrajectoryIndex = 0;
-	//			m_trajectoryAccumulator.SetCount(0);
-	//		}
-	//		agent->ResetModel();
-	//	}
-	//
-	//	m_frameCount++;
-	//	m_framesAlive++;
-	//}
 }
 
 #endif 
