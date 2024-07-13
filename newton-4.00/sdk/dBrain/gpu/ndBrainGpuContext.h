@@ -39,7 +39,9 @@ class ndBrainGpuContext : public ndClassAlloc
 			void* m_ndBrainCopyInput;
 			void* m_ndBrainLayerLinear;
 			void* m_ndBrainLayerLinearTiled;
+			void* m_ndBrainLayerEluActivation;
 			void* m_ndBrainLayerReluActivation;
+			void* m_ndBrainLayerTanhActivation;
 			void* m_ndBrainLayerSoftmaxActivation;
 		};
 		void* m_modules[128];

@@ -159,7 +159,7 @@ ndBrainGpuCommand* ndBrainLayerActivation::AssemblyGPUCommandCommon(ndBrainGpuCo
 	
 		ndBrainLayerActivationCommand(
 			const ndBrainLayerActivation* const layer, ndBrainGpuContext* const context,
-			ndInt32 layerIndex, ndInt32 batchCount, const ndBufferOffsetPair& workingBuffer, VkShaderModule shader)
+			ndInt32 layerIndex, ndInt32 batchCount, const ndBufferOffsetPair& workingBuffer, void* const shader)
 			:ndBrainGpuCommand(context)
 			,m_parammeters(m_context, sizeof(UniformBufferObject))
 		{
@@ -182,5 +182,5 @@ ndBrainGpuCommand* ndBrainLayerActivation::AssemblyGPUCommandCommon(ndBrainGpuCo
 	
 	ndAssert(params.GetCount() == 2);
 	const ndBufferOffsetPair& workingBuffer = *params[1];
-	return new ndBrainLayerActivationCommand(this, context, layerIndex, batchCount, workingBuffer, (VkShaderModule)shader);
+	return new ndBrainLayerActivationCommand(this, context, layerIndex, batchCount, workingBuffer, shader);
 }
