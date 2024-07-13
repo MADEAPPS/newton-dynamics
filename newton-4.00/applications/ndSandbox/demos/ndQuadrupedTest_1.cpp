@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	class ndLegObservation
@@ -54,7 +54,7 @@ namespace ndQuadruped_1
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
 	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
-	#define D_POSE_REST_POSITION_Y	ndReal (-0.3f)
+	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 	#define D_MIN_REWARD_ANGLE		ndReal(ndFloat32 (30.0f) * ndDegreeToRad)
 
 	//#define D_SWING_STEP			ndReal(0.01f)
@@ -95,7 +95,7 @@ namespace ndQuadruped_1
 				:ndAnimationSequence()
 				,m_amp(0.27f)
 				,m_stride_x(0.3f)
-				,m_stride_z(-0.3f)
+				,m_stride_z(0.3f)
 			{
 				m_duration = ndFloat32(4.0f);
 				for (ndInt32 i = 0; i < 4; i++)
