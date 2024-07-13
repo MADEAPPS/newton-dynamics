@@ -40,9 +40,10 @@ ndBrainGpuCommand::~ndBrainGpuCommand()
 	}
 }
 
-void ndBrainGpuCommand::Assembly(VkShaderModule shader, ndInt32 workGroups, ndInt32 paramCount, ndBrainGpuBuffer** params)
+void ndBrainGpuCommand::Assembly(void* const shaderHandle, ndInt32 workGroups, ndInt32 paramCount, ndBrainGpuBuffer** params)
 {
 	VkDevice const device = m_context->GetDevice();
+	VkShaderModule shader = (VkShaderModule)shaderHandle;
 	VkCommandPool const commandPool = m_context->GetCommandPool();
 	VkAllocationCallbacks* const allocator = m_context->GetAllocator();
 	VkDescriptorPool const descriptorPool = m_context->GetDescriptorPool();
