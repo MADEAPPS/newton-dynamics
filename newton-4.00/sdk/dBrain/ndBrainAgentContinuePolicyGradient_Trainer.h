@@ -647,6 +647,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Upd
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizeCritic()
 {
+	UpdateBaseLineValue();
+
 	ndBrainFloat averageSum = ndBrainFloat(0.0f);
 	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetCount() - 1); i >= 0; --i)
 	{
@@ -678,7 +680,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 		}
 	});
 	ndBrainThreadPool::ParallelExecute(CalculateAdvantage);
-	UpdateBaseLineValue();
+	
 
 	ndBrainFloat rewardVarianceSum = ndBrainFloat(0.0f);
 	for (ndInt32 i = GetThreadCount() - 1; i >= 0; --i)

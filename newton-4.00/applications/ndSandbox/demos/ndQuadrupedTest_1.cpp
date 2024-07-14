@@ -367,7 +367,7 @@ namespace ndQuadruped_1
 						break;
 					}
 				}
-				m_trajectory.SetCount(stepsCount);
+				//m_trajectory.SetCount(stepsCount);
 				ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::SaveTrajectory();
 			}
 
