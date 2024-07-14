@@ -1327,7 +1327,7 @@ namespace ndQuadruped_1
 				}
 			}
 
-			ndFloat32 hirozon = ndFloat32(0.99f) / (ndFloat32(1.0f) - m_discountFactor);
+			ndFloat32 hirozon = ndFloat32(0.995f) / (ndFloat32(1.0f) - m_discountFactor);
 			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() >= hirozon))
 			{
 				char fileName[1024];
