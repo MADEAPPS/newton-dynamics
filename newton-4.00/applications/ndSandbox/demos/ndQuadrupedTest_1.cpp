@@ -354,6 +354,23 @@ namespace ndQuadruped_1
 				m_model->GetObservation(observation);
 			}
 
+			void SaveTrajectory()
+			{
+				ndInt32 stepsCount = 0;
+				// if the model is dead, just skip this trajectory, not need to train on a dead model.
+				for (ndInt32 i = 0; i < m_trajectory.GetCount(); ++i)
+				{
+					if (m_trajectory[i].m_reward > ndReal(0.05f))
+					{
+						// model is alive break loop.
+						stepsCount = ndInt32 (m_trajectory.GetCount());
+						break;
+					}
+				}
+				m_trajectory.SetCount(stepsCount);
+				ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::SaveTrajectory();
+			}
+
 			bool IsTerminal() const
 			{
 				ndMatrix matrix(m_model->GetRoot()->m_body->GetMatrix());
