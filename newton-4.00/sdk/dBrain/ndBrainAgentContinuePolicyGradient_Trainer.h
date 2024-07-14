@@ -42,7 +42,7 @@ class ndBrainContinuePolicyGradientLastActivationLayer : public ndBrainLayerActi
 	public:
 	ndBrainContinuePolicyGradientLastActivationLayer(ndInt32 neurons)
 		:ndBrainLayerActivationTanh(neurons * 2)
-		,m_sigma(ndBrainFloat(ndSqrt(0.01f)))
+		,m_sigma(ndBrainFloat(0.1f))
 	{
 	}
 
@@ -169,10 +169,14 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 			//ndBrainFloat sigma2 = ndBrainFloat(0.2f);
 
 			m_sigma = ndSqrt(sigma2);
-			// I can not get the optimizer to succeeds when using sigma optimization,
-			// not sure where the bug is, but the policy just collapses fatally after few epochs.
+			// I can not get the optimizer to succeeds when using constant sigma optimization,
+			// not sure where the bug is, but the policy just fatally collapses after few epochs.
 			// so for now I use const sigma optimization only.
-			m_useConstantSigma = true;
+			//m_useConstantSigma = true;
+			 
+			// finally found the reason why the maximizing sigma was failing. 
+			// now full optimization is the default.
+			m_useConstantSigma = false;
 
 			m_criticLearnRate = ndBrainFloat(0.0005f);
 			m_policyLearnRate = ndBrainFloat(0.0002f);
@@ -182,6 +186,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);
 			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
+			//m_threadsCount = 1;
 		}
 
 		ndBrainFloat m_sigma;
@@ -318,8 +323,7 @@ void ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::SelectAct
 {
 	if (m_master->m_useConstantSigma)
 	{
-		//for (ndInt32 i = actionDim - 1; i >= 0; --i)
-		for (ndInt32 i = 0; i < actionDim; ++i)
+		for (ndInt32 i = actionDim - 1; i >= 0; --i)
 		{
 			ndBrainFloat sample = ndBrainFloat(actions[i] + m_d(m_gen) * m_master->m_sigma);
 			ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
@@ -328,8 +332,7 @@ void ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::SelectAct
 	}
 	else
 	{
-		ndAssert(0);
-		for (ndInt32 i = 0; i < actionDim; ++i)
+		for (ndInt32 i = actionDim - 1; i >= 0; --i)
 		{
 			ndBrainFloat sample = ndBrainFloat(actions[i] + m_d(m_gen) * actions[i + actionDim]);
 			ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
@@ -343,27 +346,14 @@ void ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::Step()
 {
 	ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::ndTrajectoryStep trajectoryStep;
 
-	//if (m_master->m_useConstantSigma)
-	//{
-	//	ndBrainFixSizeVector<actionDim> actions;
-	//	ndBrainMemVector observation(&trajectoryStep.m_observation[0], statesDim);
-	//
-	//	GetObservation(&observation[0]);
-	//	m_master->m_actor.MakePrediction(observation, actions, m_workingBuffer);
-	//	SelectAction(actions);
-	//	ndMemCpy(trajectoryStep.m_action, &actions[0], actionDim);
-	//}
-	//else
-	//{
-		ndBrainFixSizeVector<actionDim * 2> actions;
-		ndBrainMemVector observation(&trajectoryStep.m_observation[0], statesDim);
+	ndBrainFixSizeVector<actionDim * 2> actions;
+	ndBrainMemVector observation(&trajectoryStep.m_observation[0], statesDim);
 
-		GetObservation(&observation[0]);
-		m_master->m_actor.MakePrediction(observation, actions, m_workingBuffer);
-		actions.SetCount(actionDim * 2);
-		SelectAction(actions);
-		ndMemCpy(trajectoryStep.m_action, &actions[0], actionDim * 2);
-	//}
+	GetObservation(&observation[0]);
+	m_master->m_actor.MakePrediction(observation, actions, m_workingBuffer);
+	actions.SetCount(actionDim * 2);
+	SelectAction(actions);
+	ndMemCpy(trajectoryStep.m_action, &actions[0], actionDim * 2);
 
 	ApplyActions(&trajectoryStep.m_action[0]);
 	trajectoryStep.m_reward = CalculateReward();
@@ -455,17 +445,9 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, hyperParameters.m_neuronPerLayers));
 		layers.PushBack(new ACTIVATION_VPG_TYPE(hyperParameters.m_neuronPerLayers));
 	}
-	//if (m_useConstantSigma)
-	//{
-	//	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, actionDim));
-	//	layers.PushBack(new ndBrainLayerActivationTanh(actionDim));
-	//}
-	//else
-	//{
-		//layers.PushBack(new ndBrainLastLinearLayer(hyperParameters.m_neuronPerLayers, actionDim));
-		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, actionDim * 2));
-		layers.PushBack(new ndBrainContinuePolicyGradientLastActivationLayer(actionDim));
-	//}
+	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, actionDim * 2));
+	layers.PushBack(new ndBrainContinuePolicyGradientLastActivationLayer(actionDim));
+
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		m_actor.AddLayer(layers[i]);
@@ -723,7 +705,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 	m_trajectoryAccumulator.SetCount(newCount);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::OptimizePolicy()
 {
@@ -791,7 +773,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Opt
 				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 				{
 					// basically this fits a multivariate Gaussian process with zero cross covariance to the actions.
-					ndAssert(0);
 					const typename ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::ndTrajectoryStep& trajectoryStep = m_agent->m_trajectoryAccumulator[m_index];
 					const ndBrainFloat advantage = trajectoryStep.m_advantage;
 					for (ndInt32 i = actionDim - 1; i >= 0; --i)

@@ -433,7 +433,7 @@ namespace ndQuadruped_1
 				return false;
 			}
 
-			#pragma optimize( "", off )
+			//#pragma optimize( "", off )
 			void ResetModel()
 			{
 				m_model->m_control->Reset();
