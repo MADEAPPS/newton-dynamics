@@ -1153,7 +1153,7 @@ namespace ndQuadruped_1
 			,m_discountFactor(0.995f)
 			,m_horizon(ndFloat32(0.991f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
-			,m_stopTraining(100 * 1000000)
+			,m_stopTraining(150 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
