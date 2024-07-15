@@ -85,7 +85,6 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 {
 	public:
-
 	class ndTrajectoryStep
 	{
 		public:
@@ -130,9 +129,9 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 	ndInt32 GetEpisodeFrames() const { ndAssert(0); return 0; }
 	void InitWeights(ndBrainFloat, ndBrainFloat) { ndAssert(0); }
 
+	virtual void Step();
 	virtual void SaveTrajectory();
 	virtual bool IsTerminal() const;
-	virtual void Step();
 
 	ndBrainVector m_workingBuffer;
 	ndArray<ndTrajectoryStep> m_trajectory;
@@ -211,6 +210,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	virtual ~ndBrainAgentContinuePolicyGradient_TrainerMaster();
 
 	ndBrain* GetActor();
+	ndBrain* GetCritic();
+
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
 
@@ -323,6 +324,7 @@ void ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::SelectAct
 {
 	if (m_master->m_useConstantSigma)
 	{
+		//for (ndInt32 i = 0; i < actionDim; ++i)
 		for (ndInt32 i = actionDim - 1; i >= 0; --i)
 		{
 			ndBrainFloat sample = ndBrainFloat(actions[i] + m_d(m_gen) * m_master->m_sigma);
@@ -332,6 +334,7 @@ void ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::SelectAct
 	}
 	else
 	{
+		//for (ndInt32 i = 0; i < actionDim; ++i)
 		for (ndInt32 i = actionDim - 1; i >= 0; --i)
 		{
 			ndBrainFloat sample = ndBrainFloat(actions[i] + m_d(m_gen) * actions[i + actionDim]);
@@ -530,6 +533,12 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrain* ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::GetActor()
 { 
 	return &m_actor; 
+}
+
+template<ndInt32 statesDim, ndInt32 actionDim>
+ndBrain* ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::GetCritic()
+{
+	return &m_baseLineValue;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>

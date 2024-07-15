@@ -367,7 +367,7 @@ namespace ndQuadruped_1
 						break;
 					}
 				}
-				//m_trajectory.SetCount(stepsCount);
+				m_trajectory.SetCount(stepsCount);
 				ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::SaveTrajectory();
 			}
 
@@ -1151,8 +1151,9 @@ namespace ndQuadruped_1
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32 (-1.0e10f))
 			,m_discountFactor(0.995f)
+			,m_horizon(ndFloat32(0.991f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
-			,m_stopTraining(200 * 1000000)
+			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -1327,8 +1328,7 @@ namespace ndQuadruped_1
 				}
 			}
 
-			ndFloat32 hirozon = ndFloat32(0.995f) / (ndFloat32(1.0f) - m_discountFactor);
-			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() >= hirozon))
+			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() >= m_horizon))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
@@ -1350,6 +1350,7 @@ namespace ndQuadruped_1
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
 		ndFloat32 m_discountFactor;
+		ndFloat32 m_horizon;
 		ndInt32 m_lastEpisode;
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;

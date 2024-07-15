@@ -24,7 +24,7 @@
 
 namespace ndCarpole_1
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME "cartpoleContinueVPG.dnn"
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
@@ -322,8 +322,10 @@ namespace ndCarpole_1
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
+			,m_discountFactor(0.99f)
+			,m_horizon(ndFloat32(0.991f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
-			,m_stopTraining(200 * 1000000)
+			,m_stopTraining(20 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -333,7 +335,7 @@ namespace ndCarpole_1
 
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 
-			hyperParameters.m_discountFactor = ndReal(0.99f);
+			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 			hyperParameters.m_extraTrajectorySteps = 256;
 
@@ -475,7 +477,7 @@ namespace ndCarpole_1
 			}
 
 			//if (stopTraining >= m_stopTraining)
-			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > ndFloat32(98.5f)))
+			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() >= m_horizon))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
@@ -495,6 +497,8 @@ namespace ndCarpole_1
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
+		ndFloat32 m_discountFactor;
+		ndFloat32 m_horizon;
 		ndInt32 m_lastEpisode;
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;
