@@ -56,7 +56,11 @@ if (NEWTON_ENABLE_VULKAN_SDK)
 	add_definitions(-DD_USE_VULKAN_SDK)
 endif()
 
-if (NEWTON_ENABLE_AVX2)
+if (APPLE OR NEWTON_SCALAR_VECTOR_CLASS) 
+	add_definitions(-DD_SCALAR_VECTOR_CLASS)
+endif()
+
+if (NOT APPLE AND NEWTON_ENABLE_AVX2)
 	add_definitions(-DD_NEWTON_USE_AVX2_OPTION)
 endif()
 
@@ -123,13 +127,15 @@ if(UNIX)
 		add_compile_options(-fPIC)
 	endif()
 
-	if (NEWTON_ENABLE_AVX2)
+	if (NOT APPLE AND NEWTON_ENABLE_AVX2)
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -march=haswell ")
 		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
 		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
 	endif()
 
-	add_compile_options(-msse3)
+	if (NOT APPLE)
+		add_compile_options(-msse3)
+	endif()
 
 	include("GNUInstallDirs")
 

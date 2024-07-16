@@ -37,7 +37,7 @@ class ndBrainGpuContext : public ndClassAlloc
 		{
 			void* m_testShader;
 			void* m_ndBrainCopyInput;
-			void* m_ndBrainLayerLinear;
+			//void* m_ndBrainLayerLinear;
 			void* m_ndBrainLayerLinearTiled;
 			void* m_ndBrainLayerEluActivation;
 			void* m_ndBrainLayerReluActivation;
@@ -125,7 +125,7 @@ class ndBrainGpuContext: public ndClassAlloc
 			VkShaderModule m_ndBrainCopyInput;
 			VkShaderModule m_ndBrainGetResults;
 			VkShaderModule m_ndBrainCopyBuffer;
-			VkShaderModule m_ndBrainLayerLinear;
+			//VkShaderModule m_ndBrainLayerLinear;
 			VkShaderModule m_ndBrainLayerLinearTiled;
 			VkShaderModule m_ndBrainLayerEluActivation;
 			VkShaderModule m_ndBrainLayerReluActivation;

@@ -523,7 +523,7 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	m_ndBrainCopyInput = LoadShaderProgram("ndBrainCopyInput-comp.spv");
 	m_ndBrainCopyBuffer = LoadShaderProgram("ndBrainCopyBuffer-comp.spv");
 	m_ndBrainGetResults = LoadShaderProgram("ndBrainGetResults-comp.spv");
-	m_ndBrainLayerLinear = LoadShaderProgram("ndBrainLayerLinear-comp.spv");
+	//m_ndBrainLayerLinear = LoadShaderProgram("ndBrainLayerLinear-comp.spv");
 	m_ndBrainLayerLinearTiled = LoadShaderProgram("ndBrainLayerLinearTiled-comp.spv");
 	m_ndBrainLayerEluActivation = LoadShaderProgram("ndBrainLayerEluActivation-comp.spv");
 	m_ndBrainLayerReluActivation = LoadShaderProgram("ndBrainLayerReluActivation-comp.spv");

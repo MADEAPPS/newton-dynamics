@@ -96,7 +96,6 @@ void main()
     memoryBarrierShared(); 
     barrier();
 
-#if 1
     if (tileX < TILE_SIZE)
     {
         acc = 0.0;
@@ -104,32 +103,7 @@ void main()
         {
             acc += tile[tileIndex][tileX];
         }
-    }
 
-#else
-
-    // fewer operations but more barries, but comes out slower on nvidia gpus.
-    if (tileY < TILE_SIZE/2)
-    {
-        acc = tile[tileY][tileX];
-    }
-    for (uint tileIndex = TILE_SIZE/2; tileIndex > 0; tileIndex = tileIndex / 2)
-    {
-        if (tileY < tileIndex)
-        {
-            acc += tile[tileY + tileIndex][tileX];
-            if (tileY >= tileIndex / 2)
-            {
-                tile[tileY][tileX] = acc;
-            }
-        }
-        memoryBarrierShared(); 
-        barrier();
-    }
-#endif
-    
-    if (tileX < TILE_SIZE)
-    {
         uint biasOffset = m_paramStart + matrixColumnStride * matrixRows;
         uint outputOffset = m_outputStart + matrixRowsStart + inputOutputHigh * m_workBufferSize;
         acc += m_weightsAndBias[biasOffset + matrixRowsStart + tileX];
