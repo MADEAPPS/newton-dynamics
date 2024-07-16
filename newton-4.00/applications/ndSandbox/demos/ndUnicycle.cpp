@@ -425,8 +425,10 @@ namespace ndUnicycle
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
+			,m_discountFactor(0.99f)
+			,m_horizon(ndFloat32(0.99f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
-			,m_stopTraining(200 * 1000000)
+			,m_stopTraining(50 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -436,9 +438,9 @@ namespace ndUnicycle
 
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 
-			hyperParameters.m_discountFactor = ndReal(0.99f);
-			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 			hyperParameters.m_extraTrajectorySteps = 256;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
+			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>(new ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>(hyperParameters));
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetActor()));
@@ -573,7 +575,7 @@ namespace ndUnicycle
 					{
 						m_maxScore = rewardTrajectory;
 						m_bestActor->CopyFrom(*m_master->GetActor());
-						ndExpandTraceMessage("best actor episode: %d\taverageFrames: %f\taverageValue %f\n", m_master->GetEposideCount(), m_master->GetAverageFrames(), m_master->GetAverageScore());
+						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
 						m_lastEpisode = m_master->GetEposideCount();
 					}
 				}
@@ -589,7 +591,7 @@ namespace ndUnicycle
 				}
 			}
 
-			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > ndFloat32(98.5f)))
+			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() >= m_horizon))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
@@ -610,6 +612,8 @@ namespace ndUnicycle
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
+		ndFloat32 m_discountFactor;
+		ndFloat32 m_horizon;
 		ndInt32 m_lastEpisode;
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;

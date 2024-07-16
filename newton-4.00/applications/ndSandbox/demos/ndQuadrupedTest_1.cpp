@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	class ndLegObservation
@@ -1151,9 +1151,9 @@ namespace ndQuadruped_1
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32 (-1.0e10f))
 			,m_discountFactor(0.995f)
-			,m_horizon(ndFloat32(0.991f) / (ndFloat32(1.0f) - m_discountFactor))
+			,m_horizon(ndFloat32(0.99f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
-			,m_stopTraining(150 * 1000000)
+			,m_stopTraining(200 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -1169,9 +1169,7 @@ namespace ndQuadruped_1
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			
 			//hyperParameters.m_threadsCount = 1;
-			//hyperParameters.m_sigma = ndReal(0.25f);
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
-			//hyperParameters.m_maxTrajectorySteps = 1024 * 6;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> (new ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
@@ -1312,7 +1310,7 @@ namespace ndQuadruped_1
 					{
 						m_maxScore = rewardTrajectory;
 						m_bestActor->CopyFrom(*m_master->GetActor());
-						ndExpandTraceMessage("best actor episode: %d\taverageValue %f\taverageFrames: %f\n", m_master->GetEposideCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
+						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
 						m_lastEpisode = m_master->GetEposideCount();
 					}
 				}
@@ -1396,15 +1394,32 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		scene->RegisterPostUpdate(trainer);
 	#else
 		ndWorld* const world = scene->GetWorld();
-		ndSharedPtr<ndModel> model(BuildModel(scene, matrix, BuildAgent()));
-		world->AddModel(model);
-		((ndRobot*)(*model))->m_showDebug = true;
+		ndSharedPtr<ndModel> model1(BuildModel(scene, matrix, BuildAgent()));
+		world->AddModel(model1);
+		((ndRobot*)(*model1))->m_showDebug = true;
 
-		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
+		ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model1));
+		scene->Set2DDisplayRenderFunction(quadrupedUI);
+
+		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model1->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model1->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
 		//world->AddJoint(fixJoint);
 
-		ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model));
-		scene->Set2DDisplayRenderFunction(quadrupedUI);
+		ndInt32 countZ = 5;
+		ndInt32 countX = 5;
+		for (ndInt32 i = 0; i < countZ; ++i)
+		{
+			for (ndInt32 j = 0; j < countX; ++j)
+			{
+				ndMatrix location(matrix);
+				location.m_posit.m_x += 3.0f * ndFloat32 (j - countX/2);
+				location.m_posit.m_z += 3.0f * ndFloat32 (i - countZ/2);
+				ndSharedPtr<ndModel> model(BuildModel(scene, location, BuildAgent()));
+				world->AddModel(model);
+				//m_models.Append(model);
+				//SetMaterial(model);
+			}
+		}
+
 	#endif
 	
 	matrix.m_posit.m_x -= 8.0f;
