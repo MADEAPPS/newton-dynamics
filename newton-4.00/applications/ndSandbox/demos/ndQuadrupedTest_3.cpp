@@ -671,8 +671,6 @@ namespace ndQuadruped_3
 				context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
 				context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
 			}
-
-			//CalculateReward();
 		}
 
 		ndVector CalculateCenterOfMass() const
@@ -1229,6 +1227,8 @@ namespace ndQuadruped_3
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
+			,m_discountFactor(0.99f)
+			,m_horizon(ndFloat32(0.99f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
 			,m_stopTraining(300 * 1000000)
 			,m_modelIsTrained(false)
@@ -1245,8 +1245,7 @@ namespace ndQuadruped_3
 			
 			ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
 			
-			//hyperParameters.m_threadsCount = 4;
-			hyperParameters.m_discountFactor = ndReal(0.99f);
+			hyperParameters.m_discountFactor = m_discountFactor;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 			
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>(new ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
@@ -1408,8 +1407,7 @@ namespace ndQuadruped_3
 				}
 			}
 		
-			//if (stopTraining >= m_stopTraining)
-			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > ndFloat32(2.0f * 98.5f)))
+			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() >= m_horizon))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
@@ -1430,6 +1428,8 @@ namespace ndQuadruped_3
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
+		ndFloat32 m_discountFactor;
+		ndFloat32 m_horizon;
 		ndInt32 m_lastEpisode;
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;

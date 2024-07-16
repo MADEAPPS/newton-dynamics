@@ -671,5 +671,5 @@ void ndHandWrittenDigits()
 	ndSetRandSeed(53);
 
 	//MnistTrainingSet();
-	MnistTestSet();
+	//MnistTestSet();
 }
