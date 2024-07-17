@@ -897,9 +897,6 @@ namespace ndQuadruped_1
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModelArticulation::Update(world, timestep);
-
-			//static int xxx; 
-			//ndTrace(("step(%d) reward(%f)\n", xxx++, CalculateReward()));
 			
 			m_timestep = timestep;
 			m_agent->Step();

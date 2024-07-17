@@ -314,7 +314,7 @@ namespace ndQuadruped_3
 				ndAnimationBlendTreeNode::Evaluate(output, veloc);
 
 				ndMatrix matrix(ndPitchMatrix(m_pitch * ndDegreeToRad) * ndYawMatrix(m_yaw * ndDegreeToRad) * ndRollMatrix(m_roll * ndDegreeToRad));
-				matrix.m_posit.m_x = -m_x;
+				matrix.m_posit.m_x = -m_x - 0.08f;
 				matrix.m_posit.m_y = -m_y;
 				matrix.m_posit.m_z = -m_z;
 				for (ndInt32 i = 0; i < output.GetCount(); ++i)
@@ -985,7 +985,6 @@ namespace ndQuadruped_3
 
 			m_timestep = timestep;
 			m_agent->Step();
-			//UpdatePose(m_timestep);
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -1488,7 +1487,7 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	scene->Set2DDisplayRenderFunction(quadrupedUI);
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	//world->AddJoint(fixJoint);
+	world->AddJoint(fixJoint);
 
 	//ndVector posit(matrix.m_posit);
 	//posit.m_x += 1.5f;
