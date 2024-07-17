@@ -496,13 +496,11 @@ namespace ndQuadruped_3
 				{
 					m_basePose[i].SetPose(x0, z0);
 				}
+
 				ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
-				ndUnsigned32 randomeStart = ndRandInt() % 2;
-				ndUnsigned32 index = ndUnsigned32(randomeStart ? 1 : 3);
-				m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
+				m_model->m_animBlendTree->SetTime(duration * ndRand());
 				
 				ndFloat32 randVar = ndRand();
-				//randVar = randVar * randVar;
 				m_model->m_control->m_animSpeed = randVar;
 			}
 
@@ -1119,6 +1117,9 @@ namespace ndQuadruped_3
 		model->m_control = new ndRobot::ndUIControlNode(model->m_poseGenerator);
 		model->m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(model->m_control);
 
+		ndFloat32 duration = model->m_poseGenerator->GetSequence()->GetDuration();
+		model->m_animBlendTree->SetTime(duration * ndRand());
+
 		ndRobot::ndPoseGenerator* const poseGenerator = (ndRobot::ndPoseGenerator*)*sequence;
 
 		ndInt32 effectorsCount = 0;
@@ -1230,7 +1231,7 @@ namespace ndQuadruped_3
 			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(0.99f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
-			,m_stopTraining(200 * 1000000)
+			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
