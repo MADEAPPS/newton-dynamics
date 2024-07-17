@@ -467,7 +467,7 @@ namespace ndQuadruped_3
 				bool sequenceAirborne[4];
 
 				ndMatrix matrix (m_model->GetRoot()->m_body->GetMatrix());
-				if (matrix.m_up.m_y < 0.7f)
+				if (matrix.m_up.m_y < 0.75f)
 				{
 					return true;
 				}
@@ -516,9 +516,7 @@ namespace ndQuadruped_3
 
 				ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
 				m_model->m_animBlendTree->SetTime(duration * ndRand());
-				
-				ndFloat32 randVar = ndRand();
-				m_model->m_control->m_animSpeed = randVar;
+				m_model->m_control->m_animSpeed = ndMax (ndFloat32(0.1f), ndRand());
 			}
 
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
