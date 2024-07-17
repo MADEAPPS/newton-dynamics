@@ -48,19 +48,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Don't use e.g. GNU extension (like -std=gnu++11) for portability
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(NEWTON_SCALAR_VECTOR_CLASS)
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
+	message ("x86 processor detected")
+    set (X86 TRUE)
+else()
+	message ("non x86 processor detected, assuming arm")
+    set (X86 FALSE)
+endif()
+
+if (X86 OR NEWTON_SCALAR_VECTOR_CLASS) 
 	add_definitions(-DD_SCALAR_VECTOR_CLASS)
 endif()
 
-if (NEWTON_ENABLE_VULKAN_SDK)
-	add_definitions(-DD_USE_VULKAN_SDK)
-endif()
-
-if (APPLE OR NEWTON_SCALAR_VECTOR_CLASS) 
-	add_definitions(-DD_SCALAR_VECTOR_CLASS)
-endif()
-
-if (NOT APPLE AND NEWTON_ENABLE_AVX2)
+if (X86 AND NEWTON_ENABLE_AVX2)
 	add_definitions(-DD_NEWTON_USE_AVX2_OPTION)
 endif()
 
@@ -70,6 +70,10 @@ endif()
 
 if(NEWTON_BUILD_SINGLE_THREADED)
 	add_definitions(-DD_USE_THREAD_EMULATION)
+endif()
+
+if (NEWTON_ENABLE_VULKAN_SDK)
+	add_definitions(-DD_USE_VULKAN_SDK)
 endif()
 
 if(NEWTON_BUILD_SHARED_LIBS)
@@ -127,13 +131,13 @@ if(UNIX)
 		add_compile_options(-fPIC)
 	endif()
 
-	if (NOT APPLE AND NEWTON_ENABLE_AVX2)
+	if (X86 AND NEWTON_ENABLE_AVX2)
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -march=haswell ")
 		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
 		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
 	endif()
 
-	if (NOT APPLE)
+	if (X86)
 		add_compile_options(-msse3)
 	endif()
 
