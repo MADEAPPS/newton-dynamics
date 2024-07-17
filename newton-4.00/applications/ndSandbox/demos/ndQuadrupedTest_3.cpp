@@ -441,6 +441,23 @@ namespace ndQuadruped_3
 				m_model->GetObservation(observation);
 			}
 
+			void SaveTrajectory()
+			{
+				ndInt32 stepsCount = 0;
+				// if the model is dead, just skip this trajectory, not need to train on a dead model.
+				for (ndInt32 i = 0; i < m_trajectory.GetCount(); ++i)
+				{
+					if (m_trajectory[i].m_reward > ndReal(0.05f))
+					{
+						// model is alive break loop.
+						stepsCount = ndInt32(m_trajectory.GetCount());
+						break;
+					}
+				}
+				m_trajectory.SetCount(stepsCount);
+				ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::SaveTrajectory();
+			}
+
 			bool IsTerminal() const
 			{
 				ndInt32 count = 0;
@@ -450,7 +467,7 @@ namespace ndQuadruped_3
 				bool sequenceAirborne[4];
 
 				ndMatrix matrix (m_model->GetRoot()->m_body->GetMatrix());
-				if (matrix.m_up.m_y < 0.5f)
+				if (matrix.m_up.m_y < 0.7f)
 				{
 					return true;
 				}
