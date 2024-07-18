@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_1
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	class ndLegObservation
@@ -138,7 +138,6 @@ namespace ndQuadruped_1
 				}
 
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
-				//for (ndInt32 i = 0; i < 1; i++)
 				{
 					ndFloat32 stride_x = m_stride_x;
 					if ((i == 2) || (i == 3))
@@ -154,12 +153,13 @@ namespace ndQuadruped_1
 
 					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
 					//if ((t >= gaitGuard) && (t <= (gaitFraction - gaitGuard)))
-					if (t <= (gaitFraction - gaitGuard))
+					//if (t <= (gaitFraction - gaitGuard))
+					if ((t >= gaitGuard) && (t <= gaitFraction))
 					{
-						output[i].m_posit.m_y += m_amp * ndSin(omega * t);
+						output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
 						output[i].m_userParamInt = output[i].m_posit.m_y < ycontact ? -1 : 1;
 
-						ndFloat32 num = t;
+						ndFloat32 num = t - gaitGuard;
 						ndFloat32 den = gaitFraction - gaitGuard;
 
 						ndFloat32 t0 = num / den;
@@ -168,12 +168,12 @@ namespace ndQuadruped_1
 					}
 					else
 					{
-						//if (t <= gaitGuard)
-						//{
-						//	t += 1.0f;
-						//}
+						if (t <= gaitGuard)
+						{
+							t += 1.0f;
+						}
 						
-						ndFloat32 num = t - (gaitFraction - gaitGuard);
+						ndFloat32 num = t - gaitFraction;
 						ndFloat32 den = 1.0f - (gaitFraction - gaitGuard);
 						ndFloat32 t0 = num / den;
 						//output[i].m_posit.m_x += -(stride_x * t0 - stridem_x * 0.5f + );
@@ -453,17 +453,13 @@ namespace ndQuadruped_1
 						m_basePose[i].SetPose();
 					}
 
-					ndFloat32 randVar = ndRand();
-					//randVar = randVar * randVar;
-					//randVar = randVar * randVar * randVar;
-					m_model->m_control->m_animSpeed = randVar;
+					m_model->m_control->m_animSpeed = 0.1f + (ndRand() - 0.1f);
 
-					//ndUnsigned32 index = 0;
-					//ndUnsigned32 index = ndRandInt() % 4;
-					//ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
-					//m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
 					ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
-					m_model->m_animBlendTree->SetTime(duration * ndRand());
+
+					ndUnsigned32 index = ndRandInt() % 4;
+					m_model->m_animBlendTree->SetTime(0.25f * ndFloat32(index) * duration);
+					//m_model->m_animBlendTree->SetTime(duration * ndRand());
 				}
 			}
 
@@ -661,7 +657,7 @@ namespace ndQuadruped_1
 			//m_control->m_animSpeed = 2.0f;
 			//m_control->m_animSpeed = 1.0f;
 			//m_control->m_animSpeed = 0.5f;
-			m_control->m_animSpeed = 0.25f;
+			//m_control->m_animSpeed = 0.25f;
 			//m_control->m_animSpeed = 0.1f;
 
 			//m_control->m_enableController = 0;
@@ -671,9 +667,6 @@ namespace ndQuadruped_1
 				const ndActionVector& actionVector = *((ndActionVector*)actions);
 				m_control->m_x = ndClamp(ndReal(m_control->m_x + actionVector.m_x * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
 				m_control->m_z = ndClamp(ndReal(m_control->m_z + actionVector.m_z * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
-
-				//m_control->m_x = 0;
-				//m_control->m_z = 0;
 			}
 			
 			UpdatePose(m_timestep);
@@ -1406,6 +1399,8 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 
 		ndInt32 countZ = 5;
 		ndInt32 countX = 5;
+		//countZ = 0;
+		//countX = 0;
 		for (ndInt32 i = 0; i < countZ; ++i)
 		{
 			for (ndInt32 j = 0; j < countX; ++j)
