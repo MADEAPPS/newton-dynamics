@@ -120,6 +120,7 @@ namespace ndQuadruped_1
 				return base;
 			}
 
+			#pragma optimize( "", off )
 			void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 			{
 				// generate a procedural in place march gait
@@ -133,7 +134,8 @@ namespace ndQuadruped_1
 				ndFloat32 ycontact = D_POSE_REST_POSITION_Y + m_amp / 2.0f;
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
 				{
-					output[i].m_userParamInt = 0;
+					//output[i].m_userParamInt = 0;
+					output[i].m_userParamFloat = 0.0f;
 					output[i].m_posit = BasePose(i);
 				}
 
@@ -155,7 +157,9 @@ namespace ndQuadruped_1
 					if ((t >= gaitGuard) && (t <= gaitFraction))
 					{
 						output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
-						output[i].m_userParamInt = output[i].m_posit.m_y < ycontact ? -1 : 1;
+						//output[i].m_userParamInt = output[i].m_posit.m_y < ycontact ? -1 : 1;
+						//output[i].m_userParamFloat = output[i].m_posit.m_y < ycontact ? 0.5f : 1.0f;
+						output[i].m_userParamFloat = 1.0f;
 
 						ndFloat32 num = t - gaitGuard;
 						ndFloat32 den = gaitFraction - gaitGuard;
@@ -169,6 +173,7 @@ namespace ndQuadruped_1
 						if (t <= gaitGuard)
 						{
 							t += 1.0f;
+							output[i].m_userParamFloat = 0.5f;
 						}
 						
 						ndFloat32 num = t - gaitFraction;
@@ -517,7 +522,8 @@ namespace ndQuadruped_1
 					effector->DebugJoint(context);
 				}
 
-				if (keyFrame.m_userParamInt == 0)
+				//if (keyFrame.m_userParamInt == 0)
+				if (keyFrame.m_userParamFloat < 1.0f)
 				{
 					ndBodyKinematic* const body = effector->GetBody0();
 					supportPoint.PushBack(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit));
@@ -662,6 +668,7 @@ namespace ndQuadruped_1
 			UpdatePose(m_timestep);
 		}
 
+		#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const observationInput)
 		{
 			ndObservationVector& observation = *((ndObservationVector*)observationInput);
@@ -682,7 +689,8 @@ namespace ndQuadruped_1
 				}
 
 				observation.n_legs[i].m_hasContact = ndBrainFloat(FindContact(i) ? 1.0f : 0.0f);
-				observation.n_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamInt ? 1.0f : 0.0f);
+				//observation.n_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamInt ? 1.0f : 0.0f);
+				observation.n_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamFloat);
 			}
 
 			observation.m_torso.m_x = m_control->m_x;
@@ -757,6 +765,7 @@ namespace ndQuadruped_1
 			}
 		}
 
+		#pragma optimize( "", off )
 		ndBrainFloat CalculateZeroMomentPointReward() const
 		{
 			ndFixSizeArray<ndBigVector, 16> desiredSupportPoint;
@@ -766,7 +775,8 @@ namespace ndQuadruped_1
 				ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 
-				if (keyFrame.m_userParamInt == 0)
+				//if (keyFrame.m_userParamInt == 0)
+				if (keyFrame.m_userParamFloat < 1.0f)
 				{
 					ndBodyKinematic* const body = effector->GetBody0();
 					desiredSupportPoint.PushBack(ndBigVector(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit)));
