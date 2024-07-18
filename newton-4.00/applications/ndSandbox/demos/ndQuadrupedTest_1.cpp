@@ -152,8 +152,6 @@ namespace ndQuadruped_1
 					}
 
 					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
-					//if ((t >= gaitGuard) && (t <= (gaitFraction - gaitGuard)))
-					//if (t <= (gaitFraction - gaitGuard))
 					if ((t >= gaitGuard) && (t <= gaitFraction))
 					{
 						output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
@@ -433,7 +431,6 @@ namespace ndQuadruped_1
 				return false;
 			}
 
-			//#pragma optimize( "", off )
 			void ResetModel()
 			{
 				m_model->m_control->Reset();
@@ -459,7 +456,6 @@ namespace ndQuadruped_1
 
 					ndUnsigned32 index = ndRandInt() % 4;
 					m_model->m_animBlendTree->SetTime(0.25f * ndFloat32(index) * duration);
-					//m_model->m_animBlendTree->SetTime(duration * ndRand());
 				}
 			}
 
@@ -894,7 +890,6 @@ namespace ndQuadruped_1
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
-			//ndFloat32 animSpeed = (m_control->m_animSpeed > 0.01f) ? (1.0f + 1.0f * m_control->m_animSpeed) : 0.0f;
 			ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
 			m_animBlendTree->Update(timestep * animSpeed);
 			ndModelArticulation::PostUpdate(world, timestep);
@@ -1143,7 +1138,7 @@ namespace ndQuadruped_1
 			,m_discountFactor(0.995f)
 			,m_horizon(ndFloat32(0.99f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
-			,m_stopTraining(200 * 1000000)
+			,m_stopTraining(50 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
