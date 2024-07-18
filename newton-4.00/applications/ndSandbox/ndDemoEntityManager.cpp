@@ -1329,7 +1329,7 @@ void ndDemoEntityManager::ToggleProfiler()
 	#endif
 }
 
-void ndDemoEntityManager::BeginFrame()
+bool ndDemoEntityManager::PollEvents()
 {
 	// Poll and handle events (inputs, window resize, etc.)
 	// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -1338,6 +1338,13 @@ void ndDemoEntityManager::BeginFrame()
 	// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 	glfwPollEvents();
 
+	ndInt32 w, h;
+	glfwGetWindowSize(m_mainFrame, &w, &h);
+	return (w != 0) && (h != 0);
+}
+
+void ndDemoEntityManager::BeginFrame()
+{
 	ImGuiIO& io = ImGui::GetIO();
 
 	// Setup display size (every frame to accommodate for window resizing)
@@ -1656,10 +1663,13 @@ void ndDemoEntityManager::Run()
 		m_suspendPhysicsUpdate = false;
 		D_TRACKTIME();
 
-		BeginFrame();
-		//TestImGui();
-		RenderScene(ImGui::GetDrawData());
+		if (PollEvents())
+		{
+			BeginFrame();
+			//TestImGui();
+			RenderScene(ImGui::GetDrawData());
 
-		glfwSwapBuffers(m_mainFrame);
+			glfwSwapBuffers(m_mainFrame);
+		}
 	}
 }

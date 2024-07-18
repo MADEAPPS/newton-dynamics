@@ -189,6 +189,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	void RegisterPostUpdate(OnPostUpdate* const postUpdate);
 	
 	private:
+	bool PollEvents();
 	void BeginFrame();
 	void RenderStats();
 	void LoadFont();
