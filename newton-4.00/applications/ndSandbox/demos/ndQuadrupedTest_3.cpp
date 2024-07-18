@@ -467,7 +467,7 @@ namespace ndQuadruped_3
 				bool sequenceAirborne[4];
 
 				ndMatrix matrix (m_model->GetRoot()->m_body->GetMatrix());
-				if (matrix.m_up.m_y < 0.75f)
+				if (matrix.m_up.m_y < 0.86f)
 				{
 					return true;
 				}
