@@ -506,6 +506,7 @@ namespace ndQuadruped_3
 			void ResetModel()
 			{
 				m_model->m_control->Reset();
+				m_model->m_control->m_animSpeed = 0.1f + (ndRand() - 0.1f);
 
 				ndFloat32 x0 = 0.0f;
 				ndFloat32 z0 = 0.0f;
@@ -517,8 +518,6 @@ namespace ndQuadruped_3
 				ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
 				ndUnsigned32 randomIndex = (ndRandInt()>>2) % 4;
 				m_model->m_animBlendTree->SetTime(0.25f * ndFloat32(randomIndex) * duration);
-
-				m_model->m_control->m_animSpeed = 0.1f + (ndRand() - 0.1f);
 			}
 
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
@@ -1131,8 +1130,11 @@ namespace ndQuadruped_3
 		model->m_control = new ndRobot::ndUIControlNode(model->m_poseGenerator);
 		model->m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(model->m_control);
 
+		ndUnsigned32 index = ndRandInt() % 4;
 		ndFloat32 duration = model->m_poseGenerator->GetSequence()->GetDuration();
-		model->m_animBlendTree->SetTime(duration * ndRand());
+		
+		model->m_control->m_animSpeed = 0.1f + (ndRand() - 0.1f);
+		model->m_animBlendTree->SetTime(0.25f * ndFloat32(index) * duration);
 
 		ndRobot::ndPoseGenerator* const poseGenerator = (ndRobot::ndPoseGenerator*)*sequence;
 

@@ -437,6 +437,8 @@ namespace ndQuadruped_1
 			void ResetModel()
 			{
 				m_model->m_control->Reset();
+				m_model->m_control->m_animSpeed = 0.1f + (ndRand() - 0.1f);
+
 				ndMemSet(m_rewardsMemories, ndReal(1.0), sizeof(m_rewardsMemories) / sizeof(m_rewardsMemories[0]));
 
 				ndMatrix matrix(m_model->GetRoot()->m_body->GetMatrix());
@@ -452,8 +454,6 @@ namespace ndQuadruped_1
 					{
 						m_basePose[i].SetPose();
 					}
-
-					m_model->m_control->m_animSpeed = 0.1f + (ndRand() - 0.1f);
 
 					ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
 
@@ -653,13 +653,7 @@ namespace ndQuadruped_1
 
 		void ApplyActions(ndBrainFloat* const actions)
 		{
-			//m_control->m_animSpeed = 4.0f;
-			//m_control->m_animSpeed = 2.0f;
-			//m_control->m_animSpeed = 1.0f;
-			//m_control->m_animSpeed = 0.5f;
-			//m_control->m_animSpeed = 0.25f;
 			//m_control->m_animSpeed = 0.1f;
-
 			//m_control->m_enableController = 0;
 
 			if (m_control->m_enableController)
@@ -1002,8 +996,11 @@ namespace ndQuadruped_1
 		model->m_control = new ndRobot::ndUIControlNode(model->m_poseGenerator);
 		model->m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(model->m_control);
 
+		ndUnsigned32 index = ndRandInt() % 4;
 		ndFloat32 duration = model->m_poseGenerator->GetSequence()->GetDuration();
-		model->m_animBlendTree->SetTime(duration * ndRand());
+
+		model->m_control->m_animSpeed = 0.1f + (ndRand() - 0.1f);
+		model->m_animBlendTree->SetTime(0.25f * ndFloat32(index) * duration);
 		
 		ndRobot::ndPoseGenerator* const poseGenerator = (ndRobot::ndPoseGenerator*)*sequence;
 
