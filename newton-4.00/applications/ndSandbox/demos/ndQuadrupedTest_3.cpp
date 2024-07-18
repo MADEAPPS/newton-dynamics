@@ -515,9 +515,8 @@ namespace ndQuadruped_3
 				}
 
 				ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
-				ndUnsigned32 randomeStart = ndRandInt() % 2;
-				ndUnsigned32 index = ndUnsigned32(randomeStart ? 1 : 3);
-				m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
+				ndUnsigned32 randomIndex = (ndRandInt()>>2) % 4;
+				m_model->m_animBlendTree->SetTime(0.25f * ndFloat32(randomIndex) * duration);
 
 				m_model->m_control->m_animSpeed = 0.1f + (ndRand() - 0.1f);
 			}
