@@ -515,8 +515,11 @@ namespace ndQuadruped_3
 				}
 
 				ndFloat32 duration = m_model->m_poseGenerator->GetSequence()->GetDuration();
-				m_model->m_animBlendTree->SetTime(duration * ndRand());
-				m_model->m_control->m_animSpeed = ndMax (ndFloat32(0.1f), ndRand());
+				ndUnsigned32 randomeStart = ndRandInt() % 2;
+				ndUnsigned32 index = ndUnsigned32(randomeStart ? 1 : 3);
+				m_model->m_animBlendTree->SetTime(ndFloat32(index) * duration * 0.25f);
+
+				m_model->m_control->m_animSpeed = 0.1f + (ndRand() - 0.1f);
 			}
 
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
@@ -1004,8 +1007,6 @@ namespace ndQuadruped_3
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
-			//ndFloat32 animSpeed = (m_control->m_animSpeed > 0.0f) ? (1.0f + 1.0f * m_control->m_animSpeed) : 0.0f;
-			//ndFloat32 animSpeed = (m_control->m_animSpeed > 0.0f) ? (0.1f + 1.0f * m_control->m_animSpeed) : 0.0f;
 			ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
 			m_animBlendTree->Update(timestep * animSpeed);
 			ndModelArticulation::PostUpdate(world, timestep);
@@ -1502,7 +1503,7 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	scene->Set2DDisplayRenderFunction(quadrupedUI);
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
+	//world->AddJoint(fixJoint);
 
 	//ndVector posit(matrix.m_posit);
 	//posit.m_x += 1.5f;
