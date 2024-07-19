@@ -25,7 +25,7 @@
 
 namespace ndQuadruped_3
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndSpot-VPG.dnn"
 
 	class ndLegObservation
@@ -464,7 +464,7 @@ namespace ndQuadruped_3
 			{
 				ndMatrix matrix(m_model->GetRoot()->m_body->GetMatrix());
 				ndVector up(matrix.m_up);
-				if (up.m_y < 0.2f)
+				if (up.m_y < 0.86f)
 				{
 					return true;
 				}
@@ -811,9 +811,7 @@ namespace ndQuadruped_3
 
 		void ApplyActions(ndBrainFloat* const actions)
 		{
-			//m_control->m_animSpeed = 0.1f;
-			m_control->m_enableController = 0;
-
+			//m_control->m_enableController = 0;
 			if (m_control->m_enableController)
 			{
 				const ndActionVector& actionVector = *((ndActionVector*)actions);
