@@ -58,6 +58,7 @@ namespace ndQuadruped_1
 
 	//#define D_SWING_STEP			ndReal(0.01f)
 	#define D_SWING_STEP			ndReal(0.005f)
+	#define D_MODEL_DEAD_ANGLE		ndReal(0.2f)
 
 	class ndRobot : public ndModelArticulation
 	{
@@ -372,7 +373,7 @@ namespace ndQuadruped_1
 			{
 				ndMatrix matrix(m_model->GetRoot()->m_body->GetMatrix());
 				ndVector up(matrix.m_up);
-				if (up.m_y < 0.2f)
+				if (up.m_y < D_MODEL_DEAD_ANGLE)
 				{
 					return true;
 				}
@@ -439,7 +440,7 @@ namespace ndQuadruped_1
 
 				ndMatrix matrix(m_model->GetRoot()->m_body->GetMatrix());
 				ndVector up(matrix.m_up);
-				bool state = up.m_y < 0.2f;
+				bool state = up.m_y < D_MODEL_DEAD_ANGLE;
 				state = state || (matrix.m_posit.m_x > 20.0f);
 				state = state || (matrix.m_posit.m_x <- 20.0f);
 				state = state || (matrix.m_posit.m_z > 20.0f);
