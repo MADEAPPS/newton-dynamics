@@ -131,10 +131,8 @@ namespace ndQuadruped_1
 				ndFloat32 gaitGuard = gaitFraction * 0.25f;
 				ndFloat32 omega = ndPi / (gaitFraction - gaitGuard);
 				
-				ndFloat32 ycontact = D_POSE_REST_POSITION_Y + m_amp / 2.0f;
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
 				{
-					//output[i].m_userParamInt = 0;
 					output[i].m_userParamFloat = 0.0f;
 					output[i].m_posit = BasePose(i);
 				}
@@ -157,8 +155,6 @@ namespace ndQuadruped_1
 					if ((t >= gaitGuard) && (t <= gaitFraction))
 					{
 						output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
-						//output[i].m_userParamInt = output[i].m_posit.m_y < ycontact ? -1 : 1;
-						//output[i].m_userParamFloat = output[i].m_posit.m_y < ycontact ? 0.5f : 1.0f;
 						output[i].m_userParamFloat = 1.0f;
 
 						ndFloat32 num = t - gaitGuard;
