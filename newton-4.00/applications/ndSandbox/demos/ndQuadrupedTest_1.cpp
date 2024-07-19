@@ -579,7 +579,7 @@ namespace ndQuadruped_1
 				//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
 			}
 
-			CalculateReward();
+			//CalculateReward();
 		}
 
 		void UpdatePose(ndFloat32 timestep)

@@ -47,7 +47,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 
 	m_texturecubemap = LoadCubeMapTexture(
 		"skyBox_front.png", "skyBox_back.png",
-		"skyBox_botton.png", "skyBox_top.png",
+		"skyBox_top.png", "skyBox_botton.png",
 		"skyBox_left.png", "skyBox_right.png");
 
 	glGenVertexArrays(1, &m_vertextArrayBuffer);
