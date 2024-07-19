@@ -38,7 +38,7 @@ namespace ndQuadruped_3
 
 	class ndActionVector
 	{
-	public:
+		public:
 		ndBrainFloat m_x;
 		ndBrainFloat m_z;
 	};
@@ -173,8 +173,13 @@ namespace ndQuadruped_3
 		class ndPoseGenerator : public ndAnimationSequence
 		{
 			public:
+			void Init(ndInt32 index, ndVector& offset, ndFloat32 phase)
+			{
+				m_phase[index] = phase;
+				m_offset[index] = offset;
+			}
+
 			ndVector m_offset[4];
-			mutable ndVector m_currentPose[4];
 			ndFloat32 m_amp;
 			ndFloat32 m_gaitFraction;
 			ndFloat32 m_phase[4];
@@ -194,7 +199,6 @@ namespace ndQuadruped_3
 				{
 					m_phase[i] = phase[i];
 					m_offset[i] = ndFloat32(0.0f);
-					m_currentPose[i] = BasePose(i);
 				}
 			}
 
@@ -214,7 +218,6 @@ namespace ndQuadruped_3
 
 			void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 			{
-				param = 0;
 				// generate a procedural in place march gait
 				ndAssert(param >= ndFloat32(0.0f));
 				ndAssert(param <= ndFloat32(1.0f));
@@ -230,6 +233,7 @@ namespace ndQuadruped_3
 				}
 				
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
+				//for (ndInt32 i = 0; i < 1; i++)
 				{
 					ndFloat32 stride_x = m_stride_x;
 					if ((i == 2) || (i == 3))
@@ -246,48 +250,35 @@ namespace ndQuadruped_3
 					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
 					if ((t >= gaitGuard) && (t <= gaitFraction))
 					{
-						output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
+						output[i].m_posit.m_x -= m_amp * ndSin(omega * (t - gaitGuard));
 						output[i].m_userParamFloat = 1.0f;
 				
-						ndFloat32 num = t - gaitGuard;
-						ndFloat32 den = gaitFraction - gaitGuard;
-				
-						ndFloat32 t0 = num / den;
+						//ndFloat32 num = t - gaitGuard;
+						//ndFloat32 den = gaitFraction - gaitGuard;
+						//
+						//ndFloat32 t0 = num / den;
 						//output[i].m_posit.m_x += stride_x * t0 - stridem_x * 0.5f;
-						output[i].m_posit.m_z += -(stride_z * t0 - stride_z * 0.5f);
+						//output[i].m_posit.m_z += -(stride_z * t0 - stride_z * 0.5f);
 					}
 					else
 					{
-						if (t <= gaitGuard)
-						{
-							t += 1.0f;
-							output[i].m_userParamFloat = 0.5f;
-						}
-				
-						ndFloat32 num = t - gaitFraction;
-						ndFloat32 den = 1.0f - (gaitFraction - gaitGuard);
-						ndFloat32 t0 = num / den;
+						//if (t <= gaitGuard)
+						//{
+						//	t += 1.0f;
+						//	output[i].m_userParamFloat = 0.5f;
+						//}
+						//
+						//ndFloat32 num = t - gaitFraction;
+						//ndFloat32 den = 1.0f - (gaitFraction - gaitGuard);
+						//ndFloat32 t0 = num / den;
 						//output[i].m_posit.m_x += -(stride_x * t0 - stridem_x * 0.5f + );
-						output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
+						//output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
 					}
-				
-					m_currentPose[i] = output[i].m_posit;
 				}
 			}
 
-			//mutable ndVector m_currentPose[4];
-			//ndVector m_offset[4];
-			//ndFloat32 m_phase[4];
-			//ndFloat32 m_amp;
 			ndFloat32 m_stride_x;
 			ndFloat32 m_stride_z;
-
-			//ndVector m_offset[4];
-			//mutable ndVector m_currentPose[4];
-			//ndFloat32 m_amp;
-			//ndFloat32 m_gaitFraction;
-			//ndFloat32 m_phase[4];
-
 		};
 
 		class ndUIControlNode : public ndAnimationBlendTreeNode
@@ -781,10 +772,10 @@ namespace ndQuadruped_3
 			m_animBlendTree->Evaluate(m_animPose, veloc);
 			
 			const ndVector upVector(rootBody->GetMatrix().m_up);
-			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
-			for (ndInt32 i = 0; i < 1; ++i)
+			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				ndEffectorInfo* const info = &m_effectorsInfo[i];
+
 				effectors.PushBack(*info->m_effector);
 
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
@@ -1138,7 +1129,7 @@ namespace ndQuadruped_3
 		//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		//matrix.m_posit.m_y = floor.m_y;
 
-		matrix.m_posit.m_y += 0.05f;
+		matrix.m_posit.m_y += 0.00f;
 		rootEntity->ResetMatrix(matrix);
 
 		// add the root body
@@ -1172,8 +1163,9 @@ namespace ndQuadruped_3
 		model->m_control = new ndRobot::ndUIControlNode(model->m_poseGenerator);
 		model->m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(model->m_control);
 
+		ndUnsigned32 index = ndRandInt() % 4;
 		ndFloat32 duration = model->m_poseGenerator->GetSequence()->GetDuration();
-		model->m_animBlendTree->SetTime(duration * ndRand());
+		model->m_animBlendTree->SetTime(0.25f * ndFloat32(index) * duration);
 
 		ndRobot::ndPoseGenerator* const poseGenerator = (ndRobot::ndPoseGenerator*)*sequence;
 
@@ -1244,8 +1236,7 @@ namespace ndQuadruped_3
 						keyFrame.m_userData = &model->m_effectorsInfo[model->m_effectorsInfo.GetCount() - 1];
 						model->m_animPose.PushBack(keyFrame);
 						poseGenerator->AddTrack();
-						poseGenerator->m_phase[effectorsCount] = phase[effectorsCount];
-						poseGenerator->m_offset[effectorsCount] = info.m_basePosition;
+						poseGenerator->Init(effectorsCount, info.m_basePosition, phase[effectorsCount]);
 						effectorsCount++;
 					}
 					break;
