@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	class ndLegObservation
@@ -55,7 +55,6 @@ namespace ndQuadruped_1
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
 	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
-	#define D_MIN_REWARD_ANGLE		ndReal(ndFloat32 (30.0f) * ndDegreeToRad)
 
 	//#define D_SWING_STEP			ndReal(0.01f)
 	#define D_SWING_STEP			ndReal(0.005f)
@@ -120,7 +119,6 @@ namespace ndQuadruped_1
 				return base;
 			}
 
-			#pragma optimize( "", off )
 			void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 			{
 				// generate a procedural in place march gait
@@ -664,7 +662,6 @@ namespace ndQuadruped_1
 			UpdatePose(m_timestep);
 		}
 
-		#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const observationInput)
 		{
 			ndObservationVector& observation = *((ndObservationVector*)observationInput);
@@ -761,7 +758,6 @@ namespace ndQuadruped_1
 			}
 		}
 
-		#pragma optimize( "", off )
 		ndBrainFloat CalculateZeroMomentPointReward() const
 		{
 			ndFixSizeArray<ndBigVector, 16> desiredSupportPoint;
