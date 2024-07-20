@@ -140,6 +140,7 @@ void ndContact::CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& d
 	ndAssert(jacobian1.m_angular.m_w == ndFloat32(0.0f));
 }
 
+//#pragma optimize( "", off )
 void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, ndInt32 normalIndex, ndInt32& frictionIndex)
 {
 	ndPointParam pointData;
@@ -173,13 +174,22 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	const ndFloat32 penetrationVeloc = penetration * penetrationStiffness;
 	ndAssert(ndAbs(penetrationVeloc - D_MAX_PENETRATION_STIFFNESS * contact.m_material.m_softness * penetration) < ndFloat32(1.0e-6f));
 	desc.m_penetrationStiffness[normalIndex] = penetrationStiffness;
-	relSpeed += ndMax(restitutionVelocity, penetrationVeloc);
 
 	const bool isHardContact = !(contact.m_material.m_flags & m_isSoftContact);
 	desc.m_diagonalRegularizer[normalIndex] = isHardContact ? D_DIAGONAL_REGULARIZER : ndMax(D_DIAGONAL_REGULARIZER, contact.m_material.m_skinMargin);
 	const ndFloat32 relGyro = (normalJacobian0.m_angular * gyroAlpha0 + normalJacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
-
+#if 0
+	// this seem really wrong, and could cause really bad stuff 
+	// check it out 
+	relSpeed += ndMax(restitutionVelocity, penetrationVeloc);
 	desc.m_jointAccel[normalIndex] = relGyro + relSpeed * desc.m_timestep;
+#else
+	// correct restititioan calculation, may be more unsatble.
+	relSpeed = ndMax(restitutionVelocity, penetrationVeloc);
+	desc.m_jointAccel[normalIndex] = ndMax (relGyro + relSpeed * desc.m_invTimestep, ndFloat32 (0.0f));
+#endif
+	ndAssert(desc.m_jointAccel[normalIndex] >= ndFloat32(0.0f));
+
 	if (contact.m_material.m_flags & m_overrideNormalAccel)
 	{
 		ndAssert(0);
