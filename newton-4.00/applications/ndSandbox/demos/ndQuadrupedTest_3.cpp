@@ -76,33 +76,32 @@ namespace ndQuadruped_3
 		ndJointType m_type;
 		ndFloat32 m_minAngle;
 		ndFloat32 m_maxAngle;
-		ndFloat32 m_walkPhase;
 		ndFloat32 m_weightDistribution;
 	};
 
 	static ndDefinition jointsDefinition[] =
 	{
-		{ "spot_body", ndDefinition::m_root, 0.0f, 0.0f, 0.0f, 1.25f},
+		{ "spot_body", ndDefinition::m_root, 0.0f, 0.0f, 4.0f},
 
-		{ "spot_shoulder_FR", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f, 4.0f },
-		{ "spot_up_arm_FR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 0.8f  },
-		{ "spot_arm_FR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f, 1.0f  },
-		{ "spot_arm_FR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f, 0.0f  },
+		{ "spot_shoulder_FR", ndDefinition::m_hinge, -90.0f, 90.0f, 4.0f },
+		{ "spot_up_arm_FR", ndDefinition::m_hinge, -130.0f, 130.0f, 1.0f},
+		{ "spot_arm_FR", ndDefinition::m_hinge, -90.0f, 45.0f, 1.0f},
+		{ "spot_arm_FR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f},
 		
-		{ "spot_shoulder_FL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f, 4.0f},
-		{ "spot_up_arm_FL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 0.8f},
-		{ "spot_arm_FL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f, 1.0f},
-		{ "spot_arm_FL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f, 0.0f },
+		{ "spot_shoulder_FL", ndDefinition::m_hinge, -90.0f, 90.0f, 4.0f},
+		{ "spot_up_arm_FL", ndDefinition::m_hinge, -130.0f, 130.0f, 1.0f},
+		{ "spot_arm_FL", ndDefinition::m_hinge, -90.0f, 45.0f, 1.0f},
+		{ "spot_arm_FL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f},
 		
-		{ "spot_shoulder_BR", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f, 4.0f},
-		{ "spot_up_arm_BR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 0.8f},
-		{ "spot_arm_BR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f, 1.0f },
-		{ "spot_arm_BR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f, 0.0f },
+		{ "spot_shoulder_BR", ndDefinition::m_hinge, -90.0f, 90.0f, 4.0f},
+		{ "spot_up_arm_BR", ndDefinition::m_hinge, -130.0f, 130.0f, 1.0f},
+		{ "spot_arm_BR", ndDefinition::m_hinge, -90.0f, 45.0f, 1.0f},
+		{ "spot_arm_BR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f},
 		
-		{ "spot_shoulder_BL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f, 4.0f},
-		{ "spot_up_arm_BL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f, 0.8f},
-		{ "spot_arm_BL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f, 1.0f},
-		{ "spot_arm_BL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f, 0.0f },
+		{ "spot_shoulder_BL", ndDefinition::m_hinge, -90.0f, 90.0f, 4.0f},
+		{ "spot_up_arm_BL", ndDefinition::m_hinge, -130.0f, 130.0f, 1.0f},
+		{ "spot_arm_BL", ndDefinition::m_hinge, -90.0f, 45.0f, 1.0f},
+		{ "spot_arm_BL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f},
 	};
 
 	class ndQuadrupedMaterial: public ndApplicationMaterial
@@ -613,7 +612,7 @@ namespace ndQuadruped_3
 				ndVector inertia(body->GetMassMatrix());
 				ndFloat32 maxInertia = ndMax(ndMax(inertia.m_x, inertia.m_y), inertia.m_z);
 				ndFloat32 minInertia = ndMin(ndMin(inertia.m_x, inertia.m_y), inertia.m_z);
-				if (minInertia < maxInertia * 0.125f)
+				if (minInertia < maxInertia * 0.05f)
 				{
 					minInertia = maxInertia * 0.125f;
 					for (ndInt32 j = 0; j < 3; ++j)
