@@ -59,7 +59,7 @@ namespace ndQuadruped_3
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
 	//#define D_SWING_STEP			ndReal(0.01f)
-	#define D_SWING_STEP			ndReal(0.005f)
+	#define D_SWING_STEP			ndReal(0.001f)
 	#define D_MODEL_DEAD_ANGLE		ndReal(0.75f)
 
 	class ndDefinition
