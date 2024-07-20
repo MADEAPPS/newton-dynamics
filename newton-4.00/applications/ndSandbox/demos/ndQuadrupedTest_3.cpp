@@ -1045,7 +1045,7 @@ namespace ndQuadruped_3
 			ndBrainFloat dstReward = CalculateDistanceToOrigin();
 			ndBrainFloat zmpReward = CalculateZeroMomentPointReward();
 			
-			ndBrainFloat reward = 0.75f * zmpReward + 0.25f * dstReward;
+			ndBrainFloat reward = 0.60f * zmpReward + 0.40f * dstReward;
 			return reward;
 		}
 
