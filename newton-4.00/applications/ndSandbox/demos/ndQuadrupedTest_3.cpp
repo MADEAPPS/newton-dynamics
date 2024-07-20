@@ -61,6 +61,7 @@ namespace ndQuadruped_3
 	//#define D_SWING_STEP			ndReal(0.01f)
 	#define D_SWING_STEP			ndReal(0.001f)
 	#define D_MODEL_DEAD_ANGLE		ndReal(0.75f)
+	#define D_MIN_TRAIN_ANIM_SPEED	ndReal(0.1f)
 
 	class ndDefinition
 	{
@@ -528,7 +529,7 @@ namespace ndQuadruped_3
 			void ResetModel()
 			{
 				m_model->m_control->Reset();
-				m_model->m_control->m_animSpeed = 0.1f + (ndRand() - 0.1f);
+				m_model->m_control->m_animSpeed = D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand();
 
 				ndMemSet(m_rewardsMemories, ndReal(1.0), sizeof(m_rewardsMemories) / sizeof(m_rewardsMemories[0]));
 
@@ -1046,9 +1047,8 @@ namespace ndQuadruped_3
 		{
 			ndFloat32 x = m_control->m_x / D_MAX_SWING_DIST_X;
 			ndFloat32 z = m_control->m_z / D_MAX_SWING_DIST_Z;
-
-			ndFloat32 dist2 = x * x + z * z;
-			ndFloat32 reward = ndExp(-10.0f * dist2);
+			ndFloat32 dist2 = ndMax (x * x + z * z - 0.05f, 0.0f);
+			ndFloat32 reward = ndExp(-20.0f * dist2);
 
 			//if (m_id == 0)
 			//{

@@ -59,6 +59,7 @@ namespace ndQuadruped_1
 	//#define D_SWING_STEP			ndReal(0.01f)
 	#define D_SWING_STEP			ndReal(0.005f)
 	#define D_MODEL_DEAD_ANGLE		ndReal(0.2f)
+	#define D_MIN_TRAIN_ANIM_SPEED	ndReal(0.1f)
 
 	class ndRobot : public ndModelArticulation
 	{
@@ -434,7 +435,7 @@ namespace ndQuadruped_1
 			void ResetModel()
 			{
 				m_model->m_control->Reset();
-				m_model->m_control->m_animSpeed = 0.1f + (ndRand() - 0.1f);
+				m_model->m_control->m_animSpeed = D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand();
 
 				ndMemSet(m_rewardsMemories, ndReal(1.0), sizeof(m_rewardsMemories) / sizeof(m_rewardsMemories[0]));
 
@@ -996,9 +997,9 @@ namespace ndQuadruped_1
 
 		ndUnsigned32 index = ndRandInt() % 4;
 		ndFloat32 duration = model->m_poseGenerator->GetSequence()->GetDuration();
-
-		model->m_control->m_animSpeed = 0.1f + (ndRand() - 0.1f);
+	
 		model->m_animBlendTree->SetTime(0.25f * ndFloat32(index) * duration);
+		model->m_control->m_animSpeed = D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand();
 		
 		ndRobot::ndPoseGenerator* const poseGenerator = (ndRobot::ndPoseGenerator*)*sequence;
 
