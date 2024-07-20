@@ -551,10 +551,10 @@ namespace ndQuadruped_3
 					ndUnsigned32 index = ndRandInt() % 4;
 					m_model->m_animBlendTree->SetTime(0.25f * ndFloat32(index) * duration);
 
-					if (m_model->m_id == 0)
-					{
-						ndExpandTraceMessage("model reset animStart(%f) speed(%f)\n", 0.25f * ndFloat32(index), m_model->m_control->m_animSpeed);
-					}
+					//if (m_model->m_id == 0)
+					//{
+					//	ndExpandTraceMessage("model reset animStart(%f) speed(%f)\n", 0.25f * ndFloat32(index), m_model->m_control->m_animSpeed);
+					//}
 				}
 			}
 
@@ -1036,11 +1036,20 @@ namespace ndQuadruped_3
 		//	return angleRewardProb * speedRewardProb;
 		//}
 
+		#pragma optimize( "", off )
 		ndBrainFloat CalculateDistanceToOrigin() const
 		{
-			ndFloat32 dist2 = m_control->m_x * m_control->m_x + m_control->m_z * m_control->m_z;
-			ndFloat32 reward = ndExp(-1000.0f * dist2);
-			//ndTrace(("%f %f %f\n", m_control->m_x, m_control->m_z, reward));
+			ndFloat32 x = m_control->m_x / D_MAX_SWING_DIST_X;
+			ndFloat32 z = m_control->m_z / D_MAX_SWING_DIST_Z;
+
+			ndFloat32 dist2 = x * x + z * z;
+			ndFloat32 reward = ndExp(-10.0f * dist2);
+
+			if (m_id == 0)
+			{
+				ndExpandTraceMessage("dist reward(%f)\n", reward);
+			}
+
 			return reward;
 		}
 
