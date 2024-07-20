@@ -462,6 +462,7 @@ namespace ndQuadruped_3
 				ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::SaveTrajectory();
 			}
 
+			#pragma optimize( "", off )
 			bool IsTerminal() const
 			{
 				ndMatrix matrix(m_model->GetRoot()->m_body->GetMatrix());
@@ -474,7 +475,7 @@ namespace ndQuadruped_3
 				bool isDead = true;
 				for (ndInt32 i = sizeof(m_rewardsMemories) / sizeof(m_rewardsMemories[0]) - 1; i >= 0; --i)
 				{
-					isDead &= m_rewardsMemories[i] < ndReal(0.05f);
+					isDead &= m_rewardsMemories[i] < ndReal(0.01f);
 				}
 				if (isDead)
 				{
@@ -763,8 +764,6 @@ namespace ndQuadruped_3
 				//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
 				//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
 			}
-
-			//CalculateReward();
 		}
 
 		void UpdatePose(ndFloat32 timestep)
@@ -1045,12 +1044,20 @@ namespace ndQuadruped_3
 			return reward;
 		}
 
+		#pragma optimize( "", off )
 		ndBrainFloat CalculateReward() const
 		{
 			//ndBrainFloat reward0 = CalculateZeroOmegaReward();
 			ndBrainFloat dstReward = CalculateDistanceToOrigin();
 			ndBrainFloat zmpReward = CalculateZeroMomentPointReward();
-			
+			//if (m_id == 0)
+			//{
+			//	ndExpandTraceMessage("dist reward(%f)\n", dstReward);
+			//}
+			if (dstReward < 1.0e-3f)
+			{
+				zmpReward = 0.0f;
+			}
 			ndBrainFloat reward = 0.60f * zmpReward + 0.40f * dstReward;
 			return reward;
 		}
