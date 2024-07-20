@@ -83,7 +83,7 @@ namespace ndQuadruped_3
 	{
 		{ "spot_body", ndDefinition::m_root, 0.0f, 0.0f, 4.0f},
 
-		{ "spot_shoulder_FR", ndDefinition::m_hinge, -90.0f, 90.0f, 4.0f },
+		{ "spot_shoulder_FR", ndDefinition::m_hinge, -90.0f, 90.0f, 4.0f},
 		{ "spot_up_arm_FR", ndDefinition::m_hinge, -130.0f, 130.0f, 1.0f},
 		{ "spot_arm_FR", ndDefinition::m_hinge, -90.0f, 45.0f, 1.0f},
 		{ "spot_arm_FR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f},
@@ -143,6 +143,8 @@ namespace ndQuadruped_3
 	class ndRobot : public ndModelArticulation
 	{
 		public:
+		D_CLASS_REFLECTION(ndQuadruped_3::ndRobot, ndModel)
+
 		class ndEffectorInfo
 		{
 			public:
@@ -547,6 +549,11 @@ namespace ndQuadruped_3
 
 					ndUnsigned32 index = ndRandInt() % 4;
 					m_model->m_animBlendTree->SetTime(0.25f * ndFloat32(index) * duration);
+
+					if (m_model->m_id == 0)
+					{
+						ndExpandTraceMessage("model reset animStart(%f) speed(%f)\n", 0.25f * ndFloat32(index), m_model->m_control->m_animSpeed);
+					}
 				}
 			}
 
@@ -554,8 +561,6 @@ namespace ndQuadruped_3
 			ndRobot* m_model;
 			ndReal m_rewardsMemories[32];
 		};
-
-		D_CLASS_REFLECTION(ndQuadruped_3::ndRobot, ndModel)
 
 		class RobotBodyNotify : public ndDemoEntityNotify
 		{
@@ -575,7 +580,7 @@ namespace ndQuadruped_3
 			}
 		};
 
-		ndRobot(ndSharedPtr<ndBrainAgent>& agent)
+		ndRobot(ndSharedPtr<ndBrainAgent>& agent, ndInt32 id)
 			:ndModelArticulation()
 			,m_animPose()
 			,m_control(nullptr)
@@ -584,6 +589,7 @@ namespace ndQuadruped_3
 			,m_animBlendTree()
 			,m_agent(agent)
 			,m_timestep(0.0f)
+			,m_id(id)
 			,m_showDebug(false)
 		{
 		}
@@ -1076,12 +1082,13 @@ namespace ndQuadruped_3
 		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 		ndSharedPtr<ndBrainAgent> m_agent;
 		ndFloat32 m_timestep;
+		ndInt32 m_id;
 		bool m_showDebug;
 	};
 
 	class ndModelUI : public ndUIEntity
 	{
-	public:
+		public:
 		ndModelUI(ndDemoEntityManager* const scene, const ndSharedPtr<ndModel>& quadruped)
 			:ndUIEntity(scene)
 			, m_model(quadruped)
@@ -1124,12 +1131,12 @@ namespace ndQuadruped_3
 		ndSharedPtr<ndModel> m_model;
 	};
 
-	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, ndSharedPtr<ndDemoEntity> modelMesh, const ndMatrix& matrixLocation, ndSharedPtr<ndBrainAgent> agent)
+	ndModelArticulation* BuildModel(ndDemoEntityManager* const scene, ndSharedPtr<ndDemoEntity> modelMesh, const ndMatrix& matrixLocation, ndSharedPtr<ndBrainAgent> agent, ndInt32 id)
 	{
 		ndDemoEntity* const entity = modelMesh->CreateClone();
 		scene->AddEntity(entity);
 
-		ndRobot* const model = new ndRobot(agent);
+		ndRobot* const model = new ndRobot(agent, id);
 		ndDemoEntity* const rootEntity = entity->Find(jointsDefinition[0].m_boneName);
 
 		// find the floor location 
@@ -1309,8 +1316,9 @@ namespace ndQuadruped_3
 
 			m_master->SetName(CONTROLLER_NAME);
 
+			ndInt32 id = 0;
 			ndSharedPtr<ndBrainAgent> visualAgent(new ndRobot::ndControllerAgent_trainer(m_master));
-			ndSharedPtr<ndModel> visualModel(BuildModel(scene, modelMesh, matrix, visualAgent));
+			ndSharedPtr<ndModel> visualModel(BuildModel(scene, modelMesh, matrix, visualAgent, id));
 			world->AddModel(visualModel);
 			SetMaterial(visualModel);
 
@@ -1322,11 +1330,12 @@ namespace ndQuadruped_3
 			{
 				for (ndInt32 j = 0; j < countX; ++j)
 				{
+					id++;
 					ndMatrix location(matrix);
 					location.m_posit.m_x += 20.0f * (ndRand() - 0.5f);
 					location.m_posit.m_z += 20.0f * (ndRand() - 0.5f);
 					ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerAgent_trainer(m_master));
-					ndSharedPtr<ndModel> model(BuildModel(scene, modelMesh, location, agent));
+					ndSharedPtr<ndModel> model(BuildModel(scene, modelMesh, location, agent, id));
 					world->AddModel(model);
 					m_models.Append(model);
 					//HideModel(model);
