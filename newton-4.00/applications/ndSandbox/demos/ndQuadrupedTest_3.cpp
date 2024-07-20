@@ -1031,7 +1031,7 @@ namespace ndQuadruped_3
 		//	return angleRewardProb * speedRewardProb;
 		//}
 
-		ndBrainFloat DistanceToComReward() const
+		ndBrainFloat CalculateDistanceToOrigin() const
 		{
 			ndFloat32 dist2 = m_control->m_x * m_control->m_x + m_control->m_z * m_control->m_z;
 			ndFloat32 reward = ndExp(-1000.0f * dist2);
@@ -1042,10 +1042,10 @@ namespace ndQuadruped_3
 		ndBrainFloat CalculateReward() const
 		{
 			//ndBrainFloat reward0 = CalculateZeroOmegaReward();
+			ndBrainFloat dstReward = CalculateDistanceToOrigin();
 			ndBrainFloat zmpReward = CalculateZeroMomentPointReward();
-			ndBrainFloat distanceReward = DistanceToComReward();
 			
-			ndBrainFloat reward = 0.75f * zmpReward + 0.25f * distanceReward;
+			ndBrainFloat reward = 0.75f * zmpReward + 0.25f * dstReward;
 			return reward;
 		}
 
