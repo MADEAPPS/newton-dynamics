@@ -1055,7 +1055,7 @@ namespace ndQuadruped_3
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
-			ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
+			ndFloat32 animSpeed = 0.5f * m_control->m_animSpeed;
 			m_animBlendTree->Update(timestep * animSpeed);
 			ndModelArticulation::PostUpdate(world, timestep);
 		}
@@ -1276,7 +1276,7 @@ namespace ndQuadruped_3
 			,m_discountFactor(0.995f)
 			,m_horizon(ndFloat32(0.99f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
-			,m_stopTraining(50 * 1000000)
+			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
