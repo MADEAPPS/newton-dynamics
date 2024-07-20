@@ -1045,11 +1045,10 @@ namespace ndQuadruped_3
 			ndFloat32 dist2 = x * x + z * z;
 			ndFloat32 reward = ndExp(-10.0f * dist2);
 
-			if (m_id == 0)
-			{
-				ndExpandTraceMessage("dist reward(%f)\n", reward);
-			}
-
+			//if (m_id == 0)
+			//{
+			//	ndExpandTraceMessage("dist reward(%f)\n", reward);
+			//}
 			return reward;
 		}
 
