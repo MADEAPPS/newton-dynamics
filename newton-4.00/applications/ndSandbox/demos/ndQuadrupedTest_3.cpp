@@ -193,7 +193,7 @@ namespace ndQuadruped_3
 				,m_stride_x(0.3f)
 				,m_stride_z(0.3f)
 			{
-				m_amp = 0.4f;
+				m_amp = 0.2f;
 				m_duration = ndFloat32(4.0f);
 				for (ndInt32 i = 0; i < 4; i++)
 				{
@@ -961,82 +961,92 @@ namespace ndQuadruped_3
 			return reward;
 		}
 
-		ndBrainFloat CalculateZeroOmegaReward() const
+		//ndBrainFloat CalculateZeroOmegaReward() const
+		//{
+		//	ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
+		//
+		//	ndVector com(ndVector::m_zero);
+		//	ndFloat32 totalMass = ndFloat32(0.0f);
+		//	for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+		//	{
+		//		const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+		//
+		//		const ndMatrix matrix(body->GetMatrix());
+		//		const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+		//		ndFloat32 mass = body->GetMassMatrix().m_w;
+		//		totalMass += mass;
+		//		com += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
+		//		bodies.PushBack(body);
+		//	}
+		//	com = com.Scale(1.0f / totalMass);
+		//	com.m_w = 1.0f;
+		//
+		//	ndMatrix referenceFrame(ndGetIdentityMatrix());
+		//	referenceFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+		//	referenceFrame.m_front = GetRoot()->m_body->GetMatrix().m_front;
+		//	referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
+		//	referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
+		//	referenceFrame.m_posit = com;
+		//
+		//	ndMatrix inetia(ndGetZeroMatrix());
+		//	ndVector angularMomentum(ndVector::m_zero);
+		//
+		//	const ndMatrix invReferenceFrame(referenceFrame.OrthoInverse());
+		//	const ndVector gravity(ndFloat32(0.0f), DEMO_GRAVITY, ndFloat32(0.0f), ndFloat32(0.0f));
+		//	for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+		//	{
+		//		const ndBodyKinematic* const body = bodies[i];
+		//		const ndMatrix& bodyMatrix = body->GetMatrix();
+		//
+		//		ndVector origin(bodyMatrix.TransformVector(body->GetCentreOfMass()));
+		//		ndVector posit(referenceFrame.UntransformVector(origin) & ndVector::m_triplexMask);
+		//		ndMatrix covariance(ndCovarianceMatrix(posit, posit));
+		//		ndFloat32 mag2 = posit.DotProduct(posit).GetScalar();
+		//		ndFloat32 mass(body->GetMassMatrix().m_w);
+		//
+		//		const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+		//		ndMatrix refInertia(referenceFrame * bodyInertia * invReferenceFrame);
+		//		for (ndInt32 j = 0; j < 3; j++)
+		//		{
+		//			refInertia[j][j] += mass * mag2;
+		//			refInertia[j] -= covariance[j].Scale(mass);
+		//			inetia[j] += refInertia[j];
+		//		}
+		//
+		//		ndVector L(origin.CrossProduct(body->GetVelocity()) + bodyInertia.RotateVector(body->GetOmega()));
+		//		angularMomentum += referenceFrame.UnrotateVector(L);
+		//		//ndTrace(("%f %f\n", L.m_x, L.m_z));
+		//	}
+		//	inetia.m_posit.m_w = 1.0f;
+		//	inetia = inetia.Inverse4x4();
+		//	ndVector localOmega(inetia.RotateVector(angularMomentum));
+		//	ndFloat32 omegaMag2 = localOmega.m_x * localOmega.m_x + localOmega.m_z * localOmega.m_z;
+		//	ndFloat32 speedRewardProb = ndBrainFloat(ndExp(-ndBrainFloat(1.0f) * omegaMag2));
+		//
+		//	const ndMatrix matrix(GetRoot()->m_body->GetMatrix());
+		//	ndFloat32 upAngle = ndAcos(ndClamp(matrix.m_up.m_y, ndFloat32(-1.0f), ndFloat32(1.0f)));
+		//	ndFloat32 angleRewardProb = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * upAngle * upAngle));
+		//
+		//	//ndTrace(("s(%f) a(%f) angle(%f)\n", speedReward, angleReward, upAngle * ndRadToDegree));
+		//	return angleRewardProb * speedRewardProb;
+		//}
+
+		ndBrainFloat DistanceToComReward() const
 		{
-			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
-
-			ndVector com(ndVector::m_zero);
-			ndFloat32 totalMass = ndFloat32(0.0f);
-			for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			{
-				const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-
-				const ndMatrix matrix(body->GetMatrix());
-				const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
-				ndFloat32 mass = body->GetMassMatrix().m_w;
-				totalMass += mass;
-				com += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
-				bodies.PushBack(body);
-			}
-			com = com.Scale(1.0f / totalMass);
-			com.m_w = 1.0f;
-
-			ndMatrix referenceFrame(ndGetIdentityMatrix());
-			referenceFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
-			referenceFrame.m_front = GetRoot()->m_body->GetMatrix().m_front;
-			referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
-			referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
-			referenceFrame.m_posit = com;
-
-			ndMatrix inetia(ndGetZeroMatrix());
-			ndVector angularMomentum(ndVector::m_zero);
-
-			const ndMatrix invReferenceFrame(referenceFrame.OrthoInverse());
-			const ndVector gravity(ndFloat32(0.0f), DEMO_GRAVITY, ndFloat32(0.0f), ndFloat32(0.0f));
-			for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
-			{
-				const ndBodyKinematic* const body = bodies[i];
-				const ndMatrix& bodyMatrix = body->GetMatrix();
-
-				ndVector origin(bodyMatrix.TransformVector(body->GetCentreOfMass()));
-				ndVector posit(referenceFrame.UntransformVector(origin) & ndVector::m_triplexMask);
-				ndMatrix covariance(ndCovarianceMatrix(posit, posit));
-				ndFloat32 mag2 = posit.DotProduct(posit).GetScalar();
-				ndFloat32 mass(body->GetMassMatrix().m_w);
-
-				const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
-				ndMatrix refInertia(referenceFrame * bodyInertia * invReferenceFrame);
-				for (ndInt32 j = 0; j < 3; j++)
-				{
-					refInertia[j][j] += mass * mag2;
-					refInertia[j] -= covariance[j].Scale(mass);
-					inetia[j] += refInertia[j];
-				}
-
-				ndVector L(origin.CrossProduct(body->GetVelocity()) + bodyInertia.RotateVector(body->GetOmega()));
-				angularMomentum += referenceFrame.UnrotateVector(L);
-				//ndTrace(("%f %f\n", L.m_x, L.m_z));
-			}
-			inetia.m_posit.m_w = 1.0f;
-			inetia = inetia.Inverse4x4();
-			ndVector localOmega(inetia.RotateVector(angularMomentum));
-			ndFloat32 omegaMag2 = localOmega.m_x * localOmega.m_x + localOmega.m_z * localOmega.m_z;
-			ndFloat32 speedRewardProb = ndBrainFloat(ndExp(-ndBrainFloat(1.0f) * omegaMag2));
-
-			const ndMatrix matrix(GetRoot()->m_body->GetMatrix());
-			ndFloat32 upAngle = ndAcos(ndClamp(matrix.m_up.m_y, ndFloat32(-1.0f), ndFloat32(1.0f)));
-			ndFloat32 angleRewardProb = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * upAngle * upAngle));
-
-			//ndTrace(("s(%f) a(%f) angle(%f)\n", speedReward, angleReward, upAngle * ndRadToDegree));
-			return angleRewardProb * speedRewardProb;
+			ndFloat32 dist2 = m_control->m_x * m_control->m_x + m_control->m_z * m_control->m_z;
+			ndFloat32 reward = ndExp(-1000.0f * dist2);
+			//ndTrace(("%f %f %f\n", m_control->m_x, m_control->m_z, reward));
+			return reward;
 		}
 
 		ndBrainFloat CalculateReward() const
 		{
 			//ndBrainFloat reward0 = CalculateZeroOmegaReward();
-			ndBrainFloat reward1 = CalculateZeroMomentPointReward();
-			//ndTrace(("zeroOmega(%f) ZeroMoment(%f)\n", reward0, reward1));
-			return reward1;
+			ndBrainFloat zmpReward = CalculateZeroMomentPointReward();
+			ndBrainFloat distanceReward = DistanceToComReward();
+			
+			ndBrainFloat reward = 0.75f * zmpReward + 0.25f * distanceReward;
+			return reward;
 		}
 
 		void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
