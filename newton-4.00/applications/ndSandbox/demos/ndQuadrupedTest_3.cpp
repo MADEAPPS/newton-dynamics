@@ -955,8 +955,13 @@ namespace ndQuadruped_3
 				ndRayToPolygonDistance(ray_p0, ray_p1, &desiredSupportPoint[0], desiredSupportPoint.GetCount(), p0Out, p1Out);
 				const ndBigVector error((p0Out - p1Out) & ndBigVector::m_triplexMask);
 				ndFloat32 dist2 = ndFloat32(error.DotProduct(error).GetScalar());
-				reward = ndBrainFloat(ndExp(-ndBrainFloat(1000.0f) * dist2));
+				//reward = ndBrainFloat(ndExp(-ndBrainFloat(1000.0f) * dist2));
+				reward = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * dist2));
 				//ndTrace(("d2(% f) r(% f)\n", dist2, reward));
+				//if (m_id == 0)
+				//{
+				//	ndExpandTraceMessage("zmp reward(%f) (%f)\n", reward, dist2);
+				//}
 			}
 			else
 			{
@@ -1062,8 +1067,9 @@ namespace ndQuadruped_3
 			//{
 			//	ndExpandTraceMessage("dist reward(%f)\n", dstReward);
 			//}
-			if (dstReward < 1.0e-3f)
+			if ((dstReward < 1.0e-3f) || (zmpReward < 1.0e-3f))
 			{
+				dstReward = 0.0f;
 				zmpReward = 0.0f;
 			}
 			ndBrainFloat reward = 0.60f * zmpReward + 0.40f * dstReward;
