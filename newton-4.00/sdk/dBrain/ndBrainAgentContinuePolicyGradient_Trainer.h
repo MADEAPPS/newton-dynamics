@@ -162,10 +162,10 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 			m_extraTrajectorySteps = 1024;
 			m_baseLineOptimizationPases = 4;
 
-			m_criticLearnRate = ndBrainFloat(0.0005f);
-			m_policyLearnRate = ndBrainFloat(0.0002f);
-			//m_criticLearnRate = ndBrainFloat(0.001f);
-			//m_policyLearnRate = ndBrainFloat(0.001f);
+			//m_criticLearnRate = ndBrainFloat(0.0005f);
+			//m_policyLearnRate = ndBrainFloat(0.0002f);
+			m_criticLearnRate = ndBrainFloat(0.0001f);
+			m_policyLearnRate = ndBrainFloat(0.0001f);
 
 			m_regularizer = ndBrainFloat(1.0e-6f);
 			m_discountFactor = ndBrainFloat(0.99f);

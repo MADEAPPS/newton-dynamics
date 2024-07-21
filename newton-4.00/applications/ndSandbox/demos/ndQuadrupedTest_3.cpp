@@ -1334,6 +1334,7 @@ namespace ndQuadruped_3
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
+			hyperParameters.m_bashTrajectoryCount = 500;
 
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>(new ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetActor()));
