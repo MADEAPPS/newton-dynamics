@@ -1047,13 +1047,16 @@ namespace ndQuadruped_3
 		{
 			ndFloat32 x = m_control->m_x / D_MAX_SWING_DIST_X;
 			ndFloat32 z = m_control->m_z / D_MAX_SWING_DIST_Z;
-			ndFloat32 dist2 = ndMax (x * x + z * z - 0.05f, 0.0f);
-			ndFloat32 reward = ndExp(-20.0f * dist2);
+			// L2 distance
+			//ndFloat32 dist2 = ndMax (x * x + z * z - 0.05f, 0.0f);
 
-			//if (m_id == 0)
-			//{
-			//	ndExpandTraceMessage("dist reward(%f)\n", reward);
-			//}
+			// L1 distance
+			ndFloat32 dist = ndMax(ndMax(ndAbs(x), ndAbs(z)) - 0.4f, 0.0f);
+			ndFloat32 reward = ndExp(-100.0f * dist * dist);
+			if (m_id == 0)
+			{
+				ndExpandTraceMessage("dist reward(%f)\n", reward);
+			}
 			return reward;
 		}
 
