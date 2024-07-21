@@ -1053,10 +1053,10 @@ namespace ndQuadruped_3
 			// L1 distance
 			ndFloat32 dist = ndMax(ndMax(ndAbs(x), ndAbs(z)) - 0.4f, 0.0f);
 			ndFloat32 reward = ndExp(-100.0f * dist * dist);
-			if (m_id == 0)
-			{
-				ndExpandTraceMessage("dist reward(%f)\n", reward);
-			}
+			//if (m_id == 0)
+			//{
+			//	ndExpandTraceMessage("dist reward(%f)\n", reward);
+			//}
 			return reward;
 		}
 
