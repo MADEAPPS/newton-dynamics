@@ -278,7 +278,8 @@ namespace ndQuadruped_1
 			ndRobot* m_model;
 		};
 
-		class ndControllerAgent_trainer : public ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>
+		//class ndControllerAgent_trainer : public ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>
+		class ndControllerAgent_trainer : public ndBrainAgentContinuePolicyGradient_Trainer
 		{
 			public:
 			class ndBasePose
@@ -313,8 +314,9 @@ namespace ndQuadruped_1
 				ndBodyDynamic* m_body;
 			};
 
-			ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>& master)
-				:ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(master)
+			//ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>& master)
+			ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
+				:ndBrainAgentContinuePolicyGradient_Trainer(master)
 				,m_basePose()
 				,m_model(nullptr)
 			{
@@ -367,7 +369,8 @@ namespace ndQuadruped_1
 					}
 				}
 				m_trajectory.SetCount(stepsCount);
-				ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::SaveTrajectory();
+				ndAssert(0);
+				//ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::SaveTrajectory();
 			}
 
 			bool IsTerminal() const

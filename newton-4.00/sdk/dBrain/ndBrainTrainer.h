@@ -26,6 +26,7 @@
 #include "ndBrainVector.h"
 class ndBrain;
 class ndBrainLoss;
+class ndBrainLayer;
 
 class ndBrainTrainer: public ndClassAlloc
 {

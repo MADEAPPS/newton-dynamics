@@ -68,11 +68,11 @@ namespace ndCarpole_1
 			ndRobot* m_model;
 		};
 
-		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer<m_stateSize, m_actionsSize>
+		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
 		{
 			public:
-			ndControllerTrainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>& master)
-				:ndBrainAgentContinuePolicyGradient_Trainer<m_stateSize, m_actionsSize>(master)
+			ndControllerTrainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
+				:ndBrainAgentContinuePolicyGradient_Trainer(master)
 				,m_model(nullptr)
 			{
 			}
@@ -333,13 +333,15 @@ namespace ndCarpole_1
 			m_outFile = fopen("cartpole-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
-			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
-			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 			hyperParameters.m_extraTrajectorySteps = 256;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
+			hyperParameters.m_numberOfActions = m_actionsSize;
+			hyperParameters.m_numberOfObservations = m_stateSize;
+			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 
-			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>(new ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetActor()));
 
 			m_master->SetName(CONTROLLER_NAME);
@@ -492,7 +494,7 @@ namespace ndCarpole_1
 			}
 		}
 
-		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>> m_master;
+		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
