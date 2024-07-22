@@ -23,7 +23,7 @@
 
 namespace ndCarpole_0
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME		"cartpoleDiscreteVPG.dnn"
 	#define CRITIC_NAME			"cartpoleDiscreteCriticVPG.dnn"
 
@@ -48,11 +48,11 @@ namespace ndCarpole_0
 	class ndRobot: public ndModelArticulation
 	{
 		public:
-		class ndController : public ndBrainAgentDiscretePolicyGradient<m_stateSize, m_actionsSize>
+		class ndController : public ndBrainAgentDiscretePolicyGradient
 		{
 			public:
 			ndController(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentDiscretePolicyGradient<m_stateSize, m_actionsSize>(actor)
+				:ndBrainAgentDiscretePolicyGradient(actor)
 				,m_model(nullptr)
 			{
 			}
@@ -75,11 +75,11 @@ namespace ndCarpole_0
 			ndRobot* m_model;
 		};
 
-		class ndControllerTrainer : public ndBrainAgentDiscretePolicyGradient_Trainer<m_stateSize, m_actionsSize>
+		class ndControllerTrainer : public ndBrainAgentDiscretePolicyGradient_Trainer
 		{
 			public:
-			ndControllerTrainer(ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>& master)
-				:ndBrainAgentDiscretePolicyGradient_Trainer<m_stateSize, m_actionsSize>(master)
+			ndControllerTrainer(ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster>& master)
+				:ndBrainAgentDiscretePolicyGradient_Trainer(master)
 				,m_model(nullptr)
 			{
 			}
@@ -328,13 +328,15 @@ namespace ndCarpole_0
 			m_outFile = fopen("cartpole-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 			
-			ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
+			ndBrainAgentDiscretePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 			
+			hyperParameters.m_numberOfActions = m_actionsSize;
+			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_extraTrajectorySteps = 256;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			
-			m_master = ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>(new ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster>(new ndBrainAgentDiscretePolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetActor()));
 			
 			m_master->SetName(CONTROLLER_NAME);
@@ -490,7 +492,7 @@ namespace ndCarpole_0
 			}
 		}
 
-		ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>> m_master;
+		ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;

@@ -19,16 +19,13 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_AGENT_CONTINUE_VPG_H__
-#define _ND_AGENT_CONTINUE_VPG_H__
+#ifndef _ND_AGENT_CONTINUE_POLICY_GRADIENT_H__
+#define _ND_AGENT_CONTINUE_POLICY_GRADIENT_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
-#include "ndBrainTrainer.h"
-#include "ndBrainReplayBuffer.h"
 
-template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentContinuePolicyGradient: public ndBrainAgent
 {
 	public:
@@ -49,82 +46,5 @@ class ndBrainAgentContinuePolicyGradient: public ndBrainAgent
 	void InitWeights();
 	ndSharedPtr<ndBrain> m_actor;
 };
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::ndBrainAgentContinuePolicyGradient(const ndSharedPtr<ndBrain>& actor)
-	:ndBrainAgent()
-	,m_actor(actor)
-{
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::~ndBrainAgentContinuePolicyGradient()
-{
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::IsTrainer() const
-{
-	return false;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::InitWeights()
-{
-	ndAssert(0);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::IsTerminal() const
-{
-	ndAssert(0);
-	return false;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::CalculateReward()
-{
-	ndAssert(0);
-	return ndBrainFloat(0.0f);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::ResetModel()
-{
-	ndAssert(0);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::GetEpisodeFrames() const
-{
-	ndAssert(0);
-	return 0;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::Save(ndBrainSave* const)
-{
-	ndAssert(0);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::OptimizeStep()
-{
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentContinuePolicyGradient<statesDim, actionDim>::Step()
-{
-	ndInt32 bufferSize = m_actor->CalculateWorkingBufferSize();
-	ndBrainFloat* const bufferMem = ndAlloca(ndBrainFloat, bufferSize);
-
-	ndBrainFixSizeVector<actionDim * 2> actions;
-	ndBrainFixSizeVector<statesDim> observations;
-	ndBrainMemVector workingBuffer(bufferMem, bufferSize);
-	
-	GetObservation(&observations[0]);
-	m_actor->MakePrediction(observations, actions, workingBuffer);
-	ApplyActions(&actions[0]);
-}
 
 #endif 

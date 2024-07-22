@@ -251,11 +251,11 @@ namespace ndQuadruped_1
 		};
 
 		// implement controller player
-		class ndController : public ndBrainAgentContinuePolicyGradient<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>
+		class ndController : public ndBrainAgentContinuePolicyGradient
 		{
 			public:
 			ndController(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentContinuePolicyGradient<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(actor)
+				:ndBrainAgentContinuePolicyGradient(actor)
 				,m_model(nullptr)
 			{
 			}
@@ -278,7 +278,8 @@ namespace ndQuadruped_1
 			ndRobot* m_model;
 		};
 
-		class ndControllerAgent_trainer : public ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>
+		//class ndControllerAgent_trainer : public ndBrainAgentContinuePolicyGradient_Trainer
+		class ndControllerAgent_trainer : public ndBrainAgentContinuePolicyGradient_Trainer
 		{
 			public:
 			class ndBasePose
@@ -313,8 +314,9 @@ namespace ndQuadruped_1
 				ndBodyDynamic* m_body;
 			};
 
-			ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>& master)
-				:ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(master)
+			//ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
+			ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
+				:ndBrainAgentContinuePolicyGradient_Trainer(master)
 				,m_basePose()
 				,m_model(nullptr)
 			{
@@ -367,7 +369,8 @@ namespace ndQuadruped_1
 					}
 				}
 				m_trajectory.SetCount(stepsCount);
-				ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::SaveTrajectory();
+				ndAssert(0);
+				//ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
 			}
 
 			bool IsTerminal() const
@@ -1155,13 +1158,13 @@ namespace ndQuadruped_1
 			//countX = 0;
 			//countZ = 0;
 
-			ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
+			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 			
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 
-			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> (new ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> (new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr<ndBrain> (new ndBrain(*m_master->GetActor()));
 
 			m_master->SetName(CONTROLLER_NAME);
@@ -1330,7 +1333,7 @@ namespace ndQuadruped_1
 			}
 		}
 
-		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> m_master;
+		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
 		ndList<ndSharedPtr<ndModel>> m_models;
 		FILE* m_outFile;

@@ -41,8 +41,8 @@ class ndBrainGpuBuffer : public ndClassAlloc
 	virtual ~ndBrainGpuBuffer(){}
 
 	public:
-	void* GetBuffer() const{}
-	ndInt32 SizeInBytes() const{}
+	void* GetBuffer() const { return nullptr;}
+	ndInt32 SizeInBytes() const { return 0; }
 
 	protected:
 	ndInt32 m_sizeInBytes;
