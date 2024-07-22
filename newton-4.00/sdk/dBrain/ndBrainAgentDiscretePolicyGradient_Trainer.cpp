@@ -50,10 +50,10 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_extraTrajectorySteps = 1024;
 	m_baseLineOptimizationPases = 4;
 
-	//m_criticLearnRate = ndBrainFloat(0.0005f);
-	//m_policyLearnRate = ndBrainFloat(0.0005f);
-	m_criticLearnRate = ndBrainFloat(0.005f);
-	m_policyLearnRate = ndBrainFloat(0.001f);
+	m_criticLearnRate = ndBrainFloat(0.0005f);
+	m_policyLearnRate = ndBrainFloat(0.0002f);
+	//m_criticLearnRate = ndBrainFloat(0.005f);
+	//m_policyLearnRate = ndBrainFloat(0.001f);
 	m_regularizer = ndBrainFloat(1.0e-6f);
 	m_discountFactor = ndBrainFloat(0.99f);
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
