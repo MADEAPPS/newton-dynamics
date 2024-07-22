@@ -225,8 +225,10 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 
 	//m_criticLearnRate = ndBrainFloat(0.0005f);
 	//m_policyLearnRate = ndBrainFloat(0.0002f);
-	m_criticLearnRate = ndBrainFloat(0.0001f);
-	m_policyLearnRate = ndBrainFloat(0.0001f);
+	//m_criticLearnRate = ndBrainFloat(0.0001f);
+	//m_policyLearnRate = ndBrainFloat(0.0001f);
+	m_criticLearnRate = ndBrainFloat(0.005f);
+	m_policyLearnRate = ndBrainFloat(0.001f);
 
 	m_regularizer = ndBrainFloat(1.0e-6f);
 	m_discountFactor = ndBrainFloat(0.99f);
@@ -347,7 +349,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	
 	m_baseLineValueOptimizer = new ndBrainOptimizerAdam();
 	//m_baseLineValueOptimizer->SetRegularizer(hyperParameters.m_regularizer);
-	m_baseLineValueOptimizer->SetRegularizer(ndBrainFloat(1.0e-4f));
+	m_baseLineValueOptimizer->SetRegularizer(ndBrainFloat(1.0e-5f));
 	
 	m_baseValueWorkingBufferSize = m_baseLineValue.CalculateWorkingBufferSize();
 	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * hyperParameters.m_threadsCount);
