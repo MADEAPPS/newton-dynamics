@@ -147,6 +147,8 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_policyLearnRate;
 	ndBrainFloat m_criticLearnRate;
+	ndInt32 m_numberOfActions;
+	ndInt32 m_numberOfObsevations;
 	ndInt32 m_frameCount;
 	ndInt32 m_framesAlive;
 	ndInt32 m_eposideCount;

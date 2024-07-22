@@ -23,7 +23,7 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainOptimizerAdam.h"
-#include "ndBrainLayerActivationRelu.h"
+#include "ndBrainLayerActivationElu.h"
 #include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLossLeastSquaredError.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
@@ -160,7 +160,7 @@ void ndBrainAgentContinuePolicyGradient_Trainer::Step()
 {
 	ndInt32 startIndex = ndInt32 (m_trajectoryBuffer.GetCount());
 
-	ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep trajectoryStep(startIndex);
+	ndTrajectoryStep trajectoryStep(startIndex);
 	m_trajectoryBuffer.SetCount(m_trajectoryBuffer.GetCount() + m_master->m_numberOfObsevations + m_master->m_numberOfActions * 2);
 
 	ndBrainMemVector actions (&m_trajectoryBuffer[startIndex + m_master->m_numberOfObsevations], m_master->m_numberOfActions * 2);
