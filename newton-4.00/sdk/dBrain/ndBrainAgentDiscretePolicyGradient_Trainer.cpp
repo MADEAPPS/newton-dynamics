@@ -331,7 +331,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	
 	m_baseLineValueOptimizer = new ndBrainOptimizerAdam();
 	//m_baseLineValueOptimizer->SetRegularizer(hyperParameters.m_regularizer);
-	m_baseLineValueOptimizer->SetRegularizer(ndBrainFloat(1.0e-5f));
+	m_baseLineValueOptimizer->SetRegularizer(ndBrainFloat(1.0e-4f));
 	
 	m_baseValueWorkingBufferSize = m_baseLineValue.CalculateWorkingBufferSize();
 	m_workingBuffer.SetCount(ndInt32 (m_baseValueWorkingBufferSize * hyperParameters.m_threadsCount));
