@@ -347,58 +347,70 @@ ndInt32 ndBrainAgentDiscretePolicyGradient_Trainer::GetEpisodeFrames() const
 
 void ndBrainAgentDiscretePolicyGradient_Trainer::SaveTrajectory()
 {
-	ndAssert(0);
-	//if (m_trajectory.GetCount())
-	//{
-	//	m_master->m_bashTrajectoryIndex++;
-	//}
-	//// remove last step because if it was a dead state, it will provide misleading feedback.
-	//m_trajectory.SetCount(m_trajectory.GetCount() - 1);
-	//
-	//// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
-	//for (ndInt32 i = ndInt32(m_trajectory.GetCount()) - 2; i >= 0; --i)
-	//{
-	//	m_trajectory[i].m_reward += m_master->m_gamma * m_trajectory[i + 1].m_reward;
-	//}
-	//
-	//// get the max trajectory steps
-	//const ndInt32 maxSteps = ndMin(ndInt32(m_trajectory.GetCount()), m_master->m_maxTrajectorySteps);
-	//ndAssert(maxSteps > 0);
-	//for (ndInt32 i = 0; i < maxSteps; ++i)
-	//{
-	//	m_master->m_trajectoryAccumulator.PushBack(m_trajectory[i]);
-	//}
-	//m_trajectory.SetCount(0);
+	if (m_trajectory.GetCount())
+	{
+		m_master->m_bashTrajectoryIndex++;
+		// remove last step because if it was a dead state, it will provide misleading feedback.
+		m_trajectory.SetCount(m_trajectory.GetCount() - 1);
+
+		// prune trajectory last steps with no rewards
+		for (ndInt32 i = ndInt32(m_trajectory.GetCount()) - 1; i >= 0; --i)
+		{
+			if (m_trajectory[i].m_reward > ndBrainFloat(1.0e-3f))
+			{
+				m_trajectory.SetCount(ndMin(i + 2, ndInt32(m_trajectory.GetCount())));
+				break;
+			}
+		}
+		
+		// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
+		for (ndInt32 i = ndInt32(m_trajectory.GetCount()) - 2; i >= 0; --i)
+		{
+			m_trajectory[i].m_reward += m_master->m_gamma * m_trajectory[i + 1].m_reward;
+		}
+		
+		// get the max trajectory steps
+		const ndInt32 maxSteps = ndMin(ndInt32(m_trajectory.GetCount()), m_master->m_maxTrajectorySteps);
+		ndAssert(maxSteps > 0);
+		ndInt32 bufferStartIndex = ndInt32(m_master->m_trajectoryAccumulatorBuffer.GetCount());
+		ndInt32 bufferDataSize = m_master->m_numberOfObsevations;
+		m_master->m_trajectoryAccumulatorBuffer.SetCount(bufferStartIndex + bufferDataSize * maxSteps);
+		ndMemCpy(&m_master->m_trajectoryAccumulatorBuffer[bufferStartIndex], &m_trajectoryBuffer[0], bufferDataSize * maxSteps);
+
+		for (ndInt32 i = 0; i < maxSteps; ++i)
+		{
+			m_trajectory[i].m_bufferStart = bufferStartIndex + i * bufferDataSize;
+			m_master->m_trajectoryAccumulator.PushBack(m_trajectory[i]);
+		}
+	 }
+	m_trajectory.SetCount(0);
+	m_trajectoryBuffer.SetCount(0);
 }
 
-//ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::SelectAction(const ndBrainVector& probabilities) const
-ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::SelectAction(const ndBrainVector&) const
+ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::SelectAction(const ndBrainVector& probabilities) const
 {
-	ndAssert(0);
-	return 0;
-	//ndBrainFixSizeVector<actionDim + 1> pdf;
-	//
-	//pdf.SetCount(0);
-	//ndBrainFloat sum = ndBrainFloat(0.0f);
-	//for (ndInt32 i = 0; i < actionDim; ++i)
-	//{
-	//	pdf.PushBack(sum);
-	//	sum += probabilities[i];
-	//}
-	//pdf.PushBack(sum);
-	//
-	////ndFloat32 r = ndRand();
-	//ndFloat32 r = m_d(m_gen);
-	//ndInt32 index = actionDim - 1;
-	//for (ndInt32 i = actionDim - 1; i >= 0; --i)
-	//{
-	//	index = i;
-	//	if (pdf[i] < r)
-	//	{
-	//		break;
-	//	}
-	//}
-	//return ndBrainFloat(index);
+	ndBrainFloat pdf[256];
+	ndAssert(m_master->m_numberOfActions + 1 < sizeof(pdf) / sizeof(pdf[0]));
+
+	ndBrainFloat sum = ndBrainFloat(0.0f);
+	for (ndInt32 i = 0; i < m_master->m_numberOfActions; ++i)
+	{
+		pdf[i] = sum;
+		sum += probabilities[i];
+	}
+	pdf[m_master->m_numberOfActions] = sum;
+	
+	ndFloat32 r = m_d(m_gen);
+	ndInt32 index = m_master->m_numberOfActions - 1;
+	for (ndInt32 i = index; i >= 0; --i)
+	{
+		index = i;
+		if (pdf[i] < r)
+		{
+			break;
+		}
+	}
+	return ndBrainFloat(index);
 }
 
 void ndBrainAgentDiscretePolicyGradient_Trainer::Step()
@@ -406,7 +418,7 @@ void ndBrainAgentDiscretePolicyGradient_Trainer::Step()
 	ndBrainFloat actionsBuffer[256];
 	ndInt32 startIndex = ndInt32(m_trajectoryBuffer.GetCount());
 	
-	ndAssert(m_master->m_numberOfActions <= sizeof(actionsBuffer) / sizeof(actionsBuffer));
+	ndAssert(m_master->m_numberOfActions <= sizeof(actionsBuffer) / sizeof(actionsBuffer[0]));
 	ndBrainMemVector probability(actionsBuffer, m_master->m_numberOfActions);
 	
 	ndTrajectoryStep trajectoryStep(startIndex);
