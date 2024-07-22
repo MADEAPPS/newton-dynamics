@@ -138,14 +138,14 @@ void ndBrainAgentDiscretePolicyGradient_Trainer::SaveTrajectory()
 		m_trajectory.SetCount(m_trajectory.GetCount() - 1);
 
 		// prune trajectory last steps with no rewards
-		for (ndInt32 i = ndInt32(m_trajectory.GetCount()) - 1; i >= 0; --i)
-		{
-			if (m_trajectory[i].m_reward > ndBrainFloat(1.0e-3f))
-			{
-				m_trajectory.SetCount(ndMin(i + 2, ndInt32(m_trajectory.GetCount())));
-				break;
-			}
-		}
+		//for (ndInt32 i = ndInt32(m_trajectory.GetCount()) - 1; i >= 0; --i)
+		//{
+		//	if (m_trajectory[i].m_reward > ndBrainFloat(1.0e-3f))
+		//	{
+		//		m_trajectory.SetCount(ndMin(i + 2, ndInt32(m_trajectory.GetCount())));
+		//		break;
+		//	}
+		//}
 		
 		// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 		for (ndInt32 i = ndInt32(m_trajectory.GetCount()) - 2; i >= 0; --i)
