@@ -84,11 +84,11 @@ namespace ndUnicycle
 		};
 
 		// implement controller player
-		class ndController : public ndBrainAgentContinuePolicyGradient<m_stateSize, m_actionsSize>
+		class ndController : public ndBrainAgentContinuePolicyGradient
 		{
 			public:
 			ndController(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentContinuePolicyGradient<m_stateSize, m_actionsSize>(actor)
+				:ndBrainAgentContinuePolicyGradient(actor)
 				,m_model(nullptr)
 			{
 			}
@@ -111,11 +111,11 @@ namespace ndUnicycle
 			ndRobot* m_model;
 		};
 
-		//class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer<m_stateSize, m_actionsSize>
+		//class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
 		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
 		{
 			public:
-			//ndControllerTrainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>& master)
+			//ndControllerTrainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 			ndControllerTrainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 				:ndBrainAgentContinuePolicyGradient_Trainer(master)
 				,m_model(nullptr)

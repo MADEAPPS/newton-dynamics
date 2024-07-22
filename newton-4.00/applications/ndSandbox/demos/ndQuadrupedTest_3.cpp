@@ -344,11 +344,11 @@ namespace ndQuadruped_3
 		};
 
 		// implement controller player
-		class ndController : public ndBrainAgentContinuePolicyGradient<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>
+		class ndController : public ndBrainAgentContinuePolicyGradient
 		{
 			public:
 			ndController(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentContinuePolicyGradient<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>(actor)
+				:ndBrainAgentContinuePolicyGradient(actor)
 				,m_model(nullptr)
 			{
 			}
@@ -371,7 +371,7 @@ namespace ndQuadruped_3
 			ndRobot* m_model;
 		};
 
-		//class ndControllerAgent_trainer : public ndBrainAgentContinuePolicyGradient_Trainer<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>
+		//class ndControllerAgent_trainer : public ndBrainAgentContinuePolicyGradient_Trainer
 		class ndControllerAgent_trainer : public ndBrainAgentContinuePolicyGradient_Trainer
 		{
 			public:
@@ -407,7 +407,7 @@ namespace ndQuadruped_3
 				ndBodyDynamic* m_body;
 			};
 
-			//ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>>& master)
+			//ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 			ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 				:ndBrainAgentContinuePolicyGradient_Trainer(master)
 				,m_basePose()
@@ -1331,7 +1331,7 @@ namespace ndQuadruped_3
 			//countX = 0;
 			//countZ = 0;
 
-			//ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>::HyperParameters hyperParameters;
+			//ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
 			//hyperParameters.m_threadsCount = 1;
@@ -1513,7 +1513,7 @@ namespace ndQuadruped_3
 			}
 		}
 
-		//ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<ND_AGENT_INPUT_SIZE, ND_AGENT_OUTPUT_SIZE>> m_master;
+		//ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
 		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
 		ndList<ndSharedPtr<ndModel>> m_models;

@@ -75,7 +75,6 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 	mutable std::mt19937 m_gen;
 	mutable std::normal_distribution<ndFloat32> m_d;
 
-	//friend class ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>;
 	friend class ndBrainAgentContinuePolicyGradient_TrainerMaster;
 };
 

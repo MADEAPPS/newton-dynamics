@@ -46,11 +46,11 @@ namespace ndCarpole_1
 	class ndRobot: public ndModelArticulation
 	{
 		public:
-		class ndController : public ndBrainAgentContinuePolicyGradient<m_stateSize, m_actionsSize>
+		class ndController : public ndBrainAgentContinuePolicyGradient
 		{
 			public:
 			ndController(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentContinuePolicyGradient<m_stateSize, m_actionsSize>(actor)
+				:ndBrainAgentContinuePolicyGradient(actor)
 				,m_model(nullptr)
 			{
 			}
