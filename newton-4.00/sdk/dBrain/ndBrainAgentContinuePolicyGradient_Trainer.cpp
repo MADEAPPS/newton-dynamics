@@ -455,6 +455,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 		m_framesAlive = 0;
 		m_bashTrajectoryIndex = 0;
 		m_trajectoryAccumulator.SetCount(0);
+		m_trajectoryAccumulatorBuffer.SetCount(0);
 		for (ndList<ndBrainAgentContinuePolicyGradient_Trainer*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
 		{
 			ndBrainAgentContinuePolicyGradient_Trainer* const agent = node->GetInfo();
@@ -632,7 +633,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 				TrainedSigmaLoss loss(trainer, this, base + i);
 				if ((base + i) < m_trajectoryAccumulator.GetCount())
 				{
-					//const ndBrainMemVector observation(&m_trajectoryAccumulator[base + i].m_observation[0], statesDim);
 					const ndBrainMemVector observation(&m_trajectoryAccumulatorBuffer[bufferStride * (base + i)], m_numberOfObsevations);
 					trainer.BackPropagate(observation, loss);
 				}
