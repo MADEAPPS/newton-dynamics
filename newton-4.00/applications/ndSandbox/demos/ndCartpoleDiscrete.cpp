@@ -149,7 +149,7 @@ namespace ndCarpole_0
 			const ndMatrix& matrix = m_pole->GetMatrix();
 			ndFloat32 sinAngle = matrix.m_front.m_x;
 			//ndFloat32 reward = ndReal(ndExp(-ndFloat32(10000.0f) * sinAngle * sinAngle));
-			ndFloat32 reward = ndReal(ndExp(-ndFloat32(200.0f) * sinAngle * sinAngle));
+			ndFloat32 reward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
 			return ndReal(reward);
 		}
 
