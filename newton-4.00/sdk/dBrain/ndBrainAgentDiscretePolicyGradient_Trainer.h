@@ -31,7 +31,7 @@
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 
-
+class ndBrainTrainer;
 class ndBrainOptimizerAdam;
 class ndBrainAgentDiscretePolicyGradient_TrainerMaster;
 
