@@ -492,7 +492,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 				{
 					const ndInt32 index = m_randomPermutation[base + i];
 					ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
-					const ndInt32 bufferIndex = m_trajectoryAccumulator[i].m_bufferStart;
+					const ndInt32 bufferIndex = m_trajectoryAccumulator[index].m_bufferStart;
 					const ndBrainMemVector observation(&m_trajectoryAccumulatorBuffer[bufferIndex], m_numberOfObsevations);
 					stateValue[0] = m_trajectoryAccumulator[index].m_reward;
 					loss.SetTruth(stateValue);

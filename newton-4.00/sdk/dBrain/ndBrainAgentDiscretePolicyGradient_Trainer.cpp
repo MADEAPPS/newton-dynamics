@@ -31,6 +31,8 @@
 #include "ndBrainLayerActivationSigmoidLinear.h"
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 
+#define ND_USE_MONTE_CARLOS
+
 //********************************************************************************************
 //
 //********************************************************************************************
@@ -139,18 +141,20 @@ void ndBrainAgentDiscretePolicyGradient_Trainer::SaveTrajectory()
 		// remove last step because if it was a dead state, it will provide misleading feedback.
 		m_trajectory.SetCount(m_trajectory.GetCount() - 1);
 
+		#ifdef ND_USE_MONTE_CARLOS
 		// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 		for (ndInt32 i = ndInt32(m_trajectory.GetCount()) - 2; i >= 0; --i)
 		{
 			m_trajectory[i].m_reward += m_master->m_gamma * m_trajectory[i + 1].m_reward;
 		}
+		#endif
 		
 		// get the max trajectory steps
 		const ndInt32 maxSteps = ndMin(ndInt32(m_trajectory.GetCount()), m_master->m_maxTrajectorySteps);
 		ndAssert(maxSteps > 0);
 		ndInt32 bufferStartIndex = ndInt32(m_master->m_trajectoryAccumulatorBuffer.GetCount());
 		ndInt32 bufferDataSize = m_master->m_numberOfObsevations;
-		m_master->m_trajectoryAccumulatorBuffer.SetCount(bufferStartIndex + bufferDataSize * maxSteps);
+		m_master->m_trajectoryAccumulatorBuffer.SetCount(ndInt32 (bufferStartIndex + bufferDataSize * maxSteps));
 		ndMemCpy(&m_master->m_trajectoryAccumulatorBuffer[bufferStartIndex], &m_trajectoryBuffer[0], bufferDataSize * maxSteps);
 
 		for (ndInt32 i = 0; i < maxSteps; ++i)
@@ -470,11 +474,20 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 				
 				for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
 				{
-					const ndInt32 index = m_randomPermutation[base + i];
 					ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
-					const ndInt32 bufferIndex = m_trajectoryAccumulator[i].m_bufferStart;
+					const ndInt32 index = m_randomPermutation[base + i];
+					const ndInt32 bufferIndex = m_trajectoryAccumulator[index].m_bufferStart;
 					const ndBrainMemVector observation(&m_trajectoryAccumulatorBuffer[bufferIndex], m_numberOfObsevations);
-					stateValue[0] = m_trajectoryAccumulator[index].m_reward;
+
+					#ifdef ND_USE_MONTE_CARLOS
+						stateValue[0] = m_trajectoryAccumulator[index].m_reward;
+					#else	
+						const ndInt32 nextStateIndex = index + 1;
+						const ndInt32 nextStateBufferIndex = m_trajectoryAccumulator[nextStateIndex].m_bufferStart;
+						const ndBrainMemVector nextObservation(&m_trajectoryAccumulatorBuffer[nextStateBufferIndex], m_numberOfObsevations);
+						trainer->GetBrain()->MakePrediction(nextObservation, stateValue);
+						stateValue[0] = m_trajectoryAccumulator[index].m_reward + 0.99f * stateValue[0];
+					#endif	
 					loss.SetTruth(stateValue);
 					trainer.BackPropagate(observation, loss);
 				}
