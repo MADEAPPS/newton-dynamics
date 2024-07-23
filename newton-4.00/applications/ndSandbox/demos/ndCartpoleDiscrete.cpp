@@ -139,7 +139,6 @@ namespace ndCarpole_0
 			return fail;
 		}
 
-		#pragma optimize( "", off )
 		ndReal GetReward() const
 		{
 			if (IsTerminal())

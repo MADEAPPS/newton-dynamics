@@ -269,7 +269,6 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, 
 	output.Set(in);
 }
 
-//#pragma optimize( "", off )
 void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	const ndInt32 maxMemory = CalculateWorkingBufferSize();

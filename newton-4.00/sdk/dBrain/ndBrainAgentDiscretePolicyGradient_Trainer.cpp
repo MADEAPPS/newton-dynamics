@@ -438,7 +438,6 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeStep()
 	}
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentDiscretePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 {
 	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount());
@@ -501,7 +500,6 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 	}
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeCritic()
 {
 	UpdateBaseLineValue();

@@ -140,7 +140,6 @@ void ndContact::CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& d
 	ndAssert(jacobian1.m_angular.m_w == ndFloat32(0.0f));
 }
 
-//#pragma optimize( "", off )
 void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, ndInt32 normalIndex, ndInt32& frictionIndex)
 {
 	ndPointParam pointData;

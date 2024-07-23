@@ -81,7 +81,6 @@ ndBrainOptimizerAdam::~ndBrainOptimizerAdam()
 	}
 }
 
-//#pragma optimize( "", off )
 void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
 {
 	ndBrainTrainer* const trainer = partialGradients[0];
