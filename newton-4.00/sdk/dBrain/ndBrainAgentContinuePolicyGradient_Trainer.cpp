@@ -221,12 +221,12 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_bashTrajectoryCount = 100;
 	m_maxTrajectorySteps = 4096;
 	m_extraTrajectorySteps = 1024;
-	m_baseLineOptimizationPases = 4;
+	m_baseLineOptimizationPases = 1;
 
-	m_criticLearnRate = ndBrainFloat(0.0005f);
-	m_policyLearnRate = ndBrainFloat(0.0002f);
-	//m_criticLearnRate = ndBrainFloat(0.0001f);
-	//m_policyLearnRate = ndBrainFloat(0.0001f);
+	//m_criticLearnRate = ndBrainFloat(0.0005f);
+	//m_policyLearnRate = ndBrainFloat(0.0002f);
+	m_criticLearnRate = ndBrainFloat(0.0001f);
+	m_policyLearnRate = ndBrainFloat(0.0001f);
 	//m_criticLearnRate = ndBrainFloat(0.005f);
 	//m_policyLearnRate = ndBrainFloat(0.001f);
 
@@ -521,12 +521,13 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 	m_averageScore.Update(averageSum / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
 	m_averageFramesPerEpisodes.Update(ndBrainFloat(m_trajectoryAccumulator.GetCount()) / ndBrainFloat(m_bashTrajectoryIndex));
 
-	ndBrainFixSizeVector<D_MAX_THREADS_COUNT> rewardVariance;
+	///ndBrainFixSizeVector<D_MAX_THREADS_COUNT> rewardVariance;
 
 	ndAtomic<ndInt32> iterator(0);
-	rewardVariance.Set(ndBrainFloat(0.0f));
+	//rewardVariance.Set(ndBrainFloat(0.0f));
 	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * GetThreadCount());
-	auto CalculateAdvantage = ndMakeObject::ndFunction([this, &iterator, &rewardVariance](ndInt32 threadIndex, ndInt32)
+	//auto CalculateAdvantage = ndMakeObject::ndFunction([this, &iterator, &rewardVariance](ndInt32 threadIndex, ndInt32)
+	auto CalculateAdvantage = ndMakeObject::ndFunction([this, &iterator](ndInt32 threadIndex, ndInt32)
 	{
 		ndBrainFixSizeVector<1> actions;
 		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
@@ -541,24 +542,24 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 			ndBrainFloat reward = m_trajectoryAccumulator[i].m_reward;
 			ndBrainFloat advantage = reward - baseLine;
 			m_trajectoryAccumulator[i].m_advantage = advantage;
-			rewardVariance[threadIndex] += advantage * advantage;
+			//rewardVariance[threadIndex] += advantage * advantage;
 		}
 	});
 	ndBrainThreadPool::ParallelExecute(CalculateAdvantage);
 
-	ndBrainFloat rewardVarianceSum = ndBrainFloat(0.0f);
-	for (ndInt32 i = GetThreadCount() - 1; i >= 0; --i)
-	{
-		rewardVarianceSum += rewardVariance[i];
-	}
-
-	rewardVarianceSum /= ndBrainFloat(m_trajectoryAccumulator.GetCount());
-	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(rewardVarianceSum + ndBrainFloat(1.0e-4f)));
-	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetCount()) - 1; i >= 0; --i)
-	{
-		const ndBrainFloat normalizedAdvantage = m_trajectoryAccumulator[i].m_advantage * invVariance;
-		m_trajectoryAccumulator[i].m_advantage = normalizedAdvantage;
-	}
+	//ndBrainFloat rewardVarianceSum = ndBrainFloat(0.0f);
+	//for (ndInt32 i = GetThreadCount() - 1; i >= 0; --i)
+	//{
+	//	rewardVarianceSum += rewardVariance[i];
+	//}
+	//
+	//rewardVarianceSum /= ndBrainFloat(m_trajectoryAccumulator.GetCount());
+	//ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(rewardVarianceSum + ndBrainFloat(1.0e-4f)));
+	//for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetCount()) - 1; i >= 0; --i)
+	//{
+	//	const ndBrainFloat normalizedAdvantage = m_trajectoryAccumulator[i].m_advantage * invVariance;
+	//	m_trajectoryAccumulator[i].m_advantage = normalizedAdvantage;
+	//}
 }
 
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
