@@ -24,7 +24,7 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME "unicycleVPG.dnn"
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
@@ -230,7 +230,7 @@ namespace ndUnicycle
 			const ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
 			const ndFloat32 angle = ndAsin(sinAngle);
 
-			state[m_jointAngle] = ndBrainFloat(veloc.m_x);
+			state[m_speed] = ndBrainFloat(veloc.m_x);
 			state[m_topBoxAngle] = ndBrainFloat(angle);
 			state[m_topBoxOmega] = ndBrainFloat(omega.m_z);
 			state[m_wheelOmega] = ndBrainFloat(wheelOmega.m_z);
