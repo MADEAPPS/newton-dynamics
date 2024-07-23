@@ -48,7 +48,8 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_bashTrajectoryCount = 100;
 	m_maxTrajectorySteps = 4096;
 	m_extraTrajectorySteps = 1024;
-	m_baseLineOptimizationPases = 4;
+	//m_baseLineOptimizationPases = 4;
+	m_baseLineOptimizationPases = 1;
 
 	m_criticLearnRate = ndBrainFloat(0.0005f);
 	m_policyLearnRate = ndBrainFloat(0.0002f);
@@ -437,7 +438,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeStep()
 	}
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentDiscretePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 {
 	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount());
@@ -500,7 +501,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 	}
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeCritic()
 {
 	UpdateBaseLineValue();

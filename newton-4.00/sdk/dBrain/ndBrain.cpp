@@ -238,7 +238,7 @@ void ndBrain::CalculateInputGradient(const ndBrainVector&, ndBrainVector&, ndBra
 	ndAssert(0);
 }
 
-void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer)
+void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer) const
 {
 	const ndArray<ndBrainLayer*>& layers = *this;
 	ndInt32 maxSize = layers[0]->GetInputSize();
@@ -267,6 +267,15 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, 
 
 	ndAssert(in.GetCount() == output.GetCount());
 	output.Set(in);
+}
+
+//#pragma optimize( "", off )
+void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+{
+	const ndInt32 maxMemory = CalculateWorkingBufferSize();
+	ndBrainFloat* const buffer = ndAlloca(ndBrainFloat, maxMemory + 256);
+	ndBrainMemVector workingBuffer(buffer, maxMemory + 256);
+	MakePrediction(input, output, workingBuffer);
 }
 
 void ndBrain::MakePrediction_____(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer, const ndBrainVector workBufferGpu, const ndArray<ndInt32>& offsetsGpu)
