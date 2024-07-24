@@ -111,13 +111,11 @@ namespace ndUnicycle
 			ndRobot* m_model;
 		};
 
-		//class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
-		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
+		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer<m_stateSize, m_actionsSize>
 		{
 			public:
-			//ndControllerTrainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
-			ndControllerTrainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
-				:ndBrainAgentContinuePolicyGradient_Trainer(master)
+			ndControllerTrainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>& master)
+				:ndBrainAgentContinuePolicyGradient_Trainer<m_stateSize, m_actionsSize>(master)
 				,m_model(nullptr)
 			{
 			}
@@ -430,7 +428,7 @@ namespace ndUnicycle
 			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(0.99f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
-			,m_stopTraining(100 * 1000000)
+			,m_stopTraining(50 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -438,7 +436,7 @@ namespace ndUnicycle
 			m_outFile = fopen("unicycle-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
+			ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>::HyperParameters hyperParameters;
 
 			hyperParameters.m_extraTrajectorySteps = 256;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
@@ -446,7 +444,7 @@ namespace ndUnicycle
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 
-			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>>(new ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>(hyperParameters));
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetActor()));
 
 			m_master->SetName(CONTROLLER_NAME);
@@ -610,7 +608,7 @@ namespace ndUnicycle
 			}
 		}
 
-		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
+		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster<m_stateSize, m_actionsSize>> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
 		ndList<ndSharedPtr<ndModel>> m_models;
 		FILE* m_outFile;

@@ -21,6 +21,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+#if 0
 namespace ndQuadruped_1
 {
 	//#define ND_TRAIN_MODEL
@@ -278,7 +279,6 @@ namespace ndQuadruped_1
 			ndRobot* m_model;
 		};
 
-		//class ndControllerAgent_trainer : public ndBrainAgentContinuePolicyGradient_Trainer
 		class ndControllerAgent_trainer : public ndBrainAgentContinuePolicyGradient_Trainer
 		{
 			public:
@@ -314,7 +314,6 @@ namespace ndQuadruped_1
 				ndBodyDynamic* m_body;
 			};
 
-			//ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 			ndControllerAgent_trainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 				:ndBrainAgentContinuePolicyGradient_Trainer(master)
 				,m_basePose()
@@ -1360,9 +1359,12 @@ namespace ndQuadruped_1
 }
 
 using namespace ndQuadruped_1;
+#endif
 
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 {
+ndAssert(0);
+/*
 	// build a floor
 	ndSetRandSeed(94157);
 
@@ -1424,4 +1426,5 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 
 	//ndFileFormatSave xxxx;
 	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
+*/
 }
