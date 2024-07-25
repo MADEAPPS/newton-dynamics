@@ -506,7 +506,9 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	m_baseValueWorkingBufferSize = m_baseLineValue.CalculateWorkingBufferSize();
 	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * hyperParameters.m_threadsCount);
 
+#ifdef ND_CONTINUE_POLICY_GRADIENT_USE_PAST_REWARDS
 	m_stateValues.SetCount(1024 * 256);
+#endif
 	//m_actor.SaveToFile("xxxx1.xxx");
 }
 
@@ -774,8 +776,10 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Upd
 		m_randomPermutation[i] = i;
 	}
 	m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
+
 	ndInt32 start = m_memoryStateIndex;
-	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetCount()) / 5; i >= 0; --i)
+	ndInt32 samplesCount = ndInt32 (ndMin (m_trajectoryAccumulator.GetCount()) / 5, m_stateValues.GetCount() / 4));
+	for (ndInt32 i = samplesCount; i >= 0; --i)
 	{
 		ndInt32 srcIndex = m_randomPermutation[i];
 		m_memoryStateIndex = (m_memoryStateIndex + 1) % ndInt32 (m_stateValues.GetCount());
