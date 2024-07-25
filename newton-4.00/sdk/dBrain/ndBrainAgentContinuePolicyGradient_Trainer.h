@@ -835,6 +835,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Upd
 			{
 				ndBrainLossLeastSquaredError loss(1);
 				ndBrainFixSizeVector<1> stateValue;
+				const ndInt32 recordSize = 1 + statesDim;
 				for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
 				{
 					const ndInt32 index = m_randomPermutation[base + i];
