@@ -21,7 +21,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-
 namespace ndUnicycle
 {
 	#define ND_TRAIN_AGENT

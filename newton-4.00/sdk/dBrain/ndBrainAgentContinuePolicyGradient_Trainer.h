@@ -270,7 +270,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndBrainOptimizerAdam* m_baseLineValueOptimizer;
 	ndArray<ndBrainTrainer*> m_baseLineValueTrainers;
 
-	MemoryStateValues m_stateValues___;
+	MemoryStateValues m_stateValues;
 	ndArray<ndInt32> m_randomPermutation;
 	ndArray<typename ndBrainAgentContinuePolicyGradient_Trainer<statesDim, actionDim>::ndTrajectoryStep> m_trajectoryAccumulator;
 	
@@ -426,7 +426,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::ndBrainA
 	,m_auxiliaryTrainers()
 	,m_baseLineValueOptimizer(nullptr)
 	,m_baseLineValueTrainers()
-	,m_stateValues___()
+	,m_stateValues()
 	,m_randomPermutation()
 	,m_trajectoryAccumulator()
 	,m_gamma(hyperParameters.m_discountFactor)
@@ -805,14 +805,13 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Upd
 	}
 	m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
 
-	const ndInt32 recordSize = 1 + statesDim;
 	const ndInt32 start = m_memoryStateIndex;
 	const ndInt32 samplesCount = ndMin (ndInt32 (m_trajectoryAccumulator.GetCount() / 5), ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE / 4);
 	for (ndInt32 i = samplesCount; i >= 0; --i)
 	{
 		ndInt32 srcIndex = m_randomPermutation[i];
 		//m_stateValues[m_memoryStateIndex].m_reward = m_trajectoryAccumulator[srcIndex].m_reward;
-		m_stateValues___.SaveTransition(m_memoryStateIndex, m_trajectoryAccumulator[srcIndex].m_reward, m_trajectoryAccumulator[srcIndex].m_observation);
+		m_stateValues.SaveTransition(m_memoryStateIndex, m_trajectoryAccumulator[srcIndex].m_reward, m_trajectoryAccumulator[srcIndex].m_observation);
 		m_memoryStateIndex = (m_memoryStateIndex + 1) % ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE;
 	}
 
@@ -865,8 +864,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Upd
 					const ndInt32 index = m_randomPermutation[base + i];
 					ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
 
-					stateValue[0] = m_stateValues___.GetReward(index);
-					const ndBrainMemVector observation(m_stateValues___.GetObservations(index), statesDim);
+					stateValue[0] = m_stateValues.GetReward(index);
+					const ndBrainMemVector observation(m_stateValues.GetObservations(index), statesDim);
 					loss.SetTruth(stateValue);
 					trainer.BackPropagate(observation, loss);
 				}
