@@ -839,8 +839,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Upd
 				{
 					const ndInt32 index = m_randomPermutation[base + i];
 					ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
-					stateValue[0] = m_stateValues[index * ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE];
-					const ndBrainMemVector observation(&m_stateValues[index * ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE + 1], statesDim);
+					stateValue[0] = m_stateValues[index * recordSize];
+					const ndBrainMemVector observation(&m_stateValues[index * recordSize + 1], statesDim);
 					loss.SetTruth(stateValue);
 					trainer.BackPropagate(observation, loss);
 				}
