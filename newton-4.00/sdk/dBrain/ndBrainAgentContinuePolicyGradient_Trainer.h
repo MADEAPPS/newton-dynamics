@@ -778,7 +778,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster<statesDim, actionDim>::Upd
 	m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
 
 	ndInt32 start = m_memoryStateIndex;
-	ndInt32 samplesCount = ndInt32 (ndMin (m_trajectoryAccumulator.GetCount()) / 5, m_stateValues.GetCount() / 4);
+	ndInt32 samplesCount = ndInt32 (ndMin (m_trajectoryAccumulator.GetCount() / 5, m_stateValues.GetCount() / 4));
 	for (ndInt32 i = samplesCount; i >= 0; --i)
 	{
 		ndInt32 srcIndex = m_randomPermutation[i];
