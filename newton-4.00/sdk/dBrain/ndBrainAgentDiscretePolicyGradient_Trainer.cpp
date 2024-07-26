@@ -30,6 +30,39 @@
 #define ND_DISCRETE_POLICY_GRADIENT_MIN_VARIANCE	ndBrainFloat(0.1f)
 #define ND_DISCRETE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 256)
 
+
+//*********************************************************************************************
+//
+//*********************************************************************************************
+ndBrainAgentDiscretePolicyGradient_TrainerMaster::HyperParameters::HyperParameters()
+{
+	m_randomSeed = 47;
+	m_numberOfLayers = 4;
+	m_bashBufferSize = 64;
+	m_neuronPerLayers = 64;
+	m_numberOfActions = 0;
+	m_numberOfObservations = 0;
+
+	m_bashTrajectoryCount = 100;
+	m_maxTrajectorySteps = 4096;
+	m_extraTrajectorySteps = 1024;
+	//m_baseLineOptimizationPases = 4;
+	m_baseLineOptimizationPases = 1;
+
+	//m_criticLearnRate = ndBrainFloat(0.0005f);
+	//m_policyLearnRate = ndBrainFloat(0.0002f);
+	m_criticLearnRate = ndBrainFloat(0.0002f);
+	m_policyLearnRate = ndBrainFloat(0.0001f);
+
+	m_regularizer = ndBrainFloat(1.0e-6f);
+	m_discountFactor = ndBrainFloat(0.99f);
+	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
+	//m_threadsCount = 1;
+}
+
+//*********************************************************************************************
+//
+//*********************************************************************************************
 ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::ndTrajectoryStep(ndInt32 actionsSize, ndInt32 obsevationsSize)
 	:ndBrainVector()
 	,m_actionsSize(actionsSize)
@@ -91,34 +124,6 @@ ndBrainFloat* ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetO
 	return &me[stride * entry + 3];
 }
 
-//*********************************************************************************************
-//
-//*********************************************************************************************
-ndBrainAgentDiscretePolicyGradient_TrainerMaster::HyperParameters::HyperParameters()
-{
-	m_randomSeed = 47;
-	m_numberOfLayers = 4;
-	m_bashBufferSize = 64;
-	m_neuronPerLayers = 64;
-	m_numberOfActions = 0;
-	m_numberOfObservations = 0;
-
-	m_bashTrajectoryCount = 100;
-	m_maxTrajectorySteps = 4096;
-	m_extraTrajectorySteps = 1024;
-	//m_baseLineOptimizationPases = 4;
-	m_baseLineOptimizationPases = 1;
-
-	//m_criticLearnRate = ndBrainFloat(0.0005f);
-	//m_policyLearnRate = ndBrainFloat(0.0002f);
-	m_criticLearnRate = ndBrainFloat(0.0002f);
-	m_policyLearnRate = ndBrainFloat(0.0001f);
-
-	m_regularizer = ndBrainFloat(1.0e-6f);
-	m_discountFactor = ndBrainFloat(0.99f);
-	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
-	//m_threadsCount = 1;
-}
 
 //*********************************************************************************************
 //

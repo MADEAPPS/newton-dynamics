@@ -32,54 +32,79 @@
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 256)
 
 
+//*********************************************************************************************
+//
+//*********************************************************************************************
+ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParameters()
+{
+	m_randomSeed = 47;
+	m_numberOfLayers = 4;
+	m_bashBufferSize = 256;
+	m_neuronPerLayers = 64;
+	m_numberOfActions = 0;
+	m_numberOfObservations = 0;
+
+	m_bashTrajectoryCount = 100;
+	m_maxTrajectorySteps = 4096;
+	m_extraTrajectorySteps = 1024;
+	//m_baseLineOptimizationPases = 4;
+	m_baseLineOptimizationPases = 1;
+
+	//m_criticLearnRate = ndBrainFloat(0.0005f);
+	//m_policyLearnRate = ndBrainFloat(0.0002f);
+	m_criticLearnRate = ndBrainFloat(0.0002f);
+	m_policyLearnRate = ndBrainFloat(0.0001f);
+
+	m_regularizer = ndBrainFloat(1.0e-6f);
+	m_discountFactor = ndBrainFloat(0.99f);
+	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
+	//m_threadsCount = 1;
+}
+
+//*********************************************************************************************
+//
+//*********************************************************************************************
 class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : public ndBrainLayerActivationTanh
 {
 	public:
-	LastActivationLayer(ndInt32 neurons);
-	LastActivationLayer(const LastActivationLayer& src);
-	ndBrainLayer* Clone() const;
+	LastActivationLayer(ndInt32 neurons)
+		:ndBrainLayerActivationTanh(neurons * 2)
+		,m_sigma(ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE)
+	{
+	}
 
-	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+	LastActivationLayer(const LastActivationLayer& src)
+		:ndBrainLayerActivationTanh(src)
+		,m_sigma(src.m_sigma)
+	{
+	}
+
+	ndBrainLayer* Clone() const
+	{
+		return new LastActivationLayer(*this);
+	}
+
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+	{
+		ndBrainLayerActivationTanh::MakePrediction(input, output);
+		for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
+		{
+			output[i + m_neurons / 2] = ndMax(input[i + m_neurons / 2], m_sigma);
+		}
+	}
+
+	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+	{
+		ndBrainLayerActivationTanh::InputDerivative(input, output, outputDerivative, inputDerivative);
+		for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
+		{
+			inputDerivative[i + m_neurons / 2] = (input[i + m_neurons / 2] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+			inputDerivative[i + m_neurons / 2] *= outputDerivative[i + m_neurons / 2];
+		}
+	}
 
 	ndBrainFloat m_sigma;
 };
-
-ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer::LastActivationLayer(ndInt32 neurons)
-	:ndBrainLayerActivationTanh(neurons * 2)
-	,m_sigma(ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE)
-{
-}
-
-ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer::LastActivationLayer(const LastActivationLayer& src)
-	:ndBrainLayerActivationTanh(src)
-	,m_sigma(src.m_sigma)
-{
-}
-
-ndBrainLayer* ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer::Clone() const
-{
-	return new LastActivationLayer(*this);
-}
-
-void ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
-{
-	ndBrainLayerActivationTanh::MakePrediction(input, output);
-	for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
-	{
-		output[i + m_neurons/2] = ndMax(input[i + m_neurons/2], m_sigma);
-	}
-}
-
-void ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer::InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
-{
-	ndBrainLayerActivationTanh::InputDerivative(input, output, outputDerivative, inputDerivative);
-	for (ndInt32 i = m_neurons / 2 - 1; i >= 0 ; --i)
-	{
-		inputDerivative[i + m_neurons / 2] = (input[i + m_neurons / 2] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-		inputDerivative[i + m_neurons / 2] *= outputDerivative[i + m_neurons / 2];
-	}
-}
 
 //*********************************************************************************************
 //
@@ -143,35 +168,6 @@ ndBrainFloat* ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::GetO
 	ndTrajectoryStep& me = *this;
 	ndInt32 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
 	return &me[stride * entry + 2];
-}
-
-//*********************************************************************************************
-//
-//*********************************************************************************************
-ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParameters()
-{
-	m_randomSeed = 47;
-	m_numberOfLayers = 4;
-	m_bashBufferSize = 64;
-	m_neuronPerLayers = 64;
-	m_numberOfActions = 0;
-	m_numberOfObservations = 0;
-
-	m_bashTrajectoryCount = 100;
-	m_maxTrajectorySteps = 4096;
-	m_extraTrajectorySteps = 1024;
-	//m_baseLineOptimizationPases = 4;
-	m_baseLineOptimizationPases = 1;
-
-	//m_criticLearnRate = ndBrainFloat(0.0005f);
-	//m_policyLearnRate = ndBrainFloat(0.0002f);
-	m_criticLearnRate = ndBrainFloat(0.0002f);
-	m_policyLearnRate = ndBrainFloat(0.0001f);
-
-	m_regularizer = ndBrainFloat(1.0e-6f);
-	m_discountFactor = ndBrainFloat(0.99f);
-	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
-	//m_threadsCount = 1;
 }
 
 //*********************************************************************************************
