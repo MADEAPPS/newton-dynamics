@@ -21,7 +21,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
 namespace ndCarpole_1
 {
 	#define ND_TRAIN_AGENT
@@ -526,12 +525,10 @@ namespace ndCarpole_1
 }
 
 using namespace ndCarpole_1;
-#endif
+
 
 void ndCartpoleContinue(ndDemoEntityManager* const scene)
 {
-	ndAssert(0);
-/*
 	BuildFlatPlane(scene, true);
 	
 	ndSetRandSeed(42);
@@ -551,5 +548,4 @@ void ndCartpoleContinue(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z += 2.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
-*/
 }

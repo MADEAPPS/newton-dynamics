@@ -31,6 +31,20 @@
 
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 256)
 
+
+class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : public ndBrainLayerActivationTanh
+{
+	public:
+	LastActivationLayer(ndInt32 neurons);
+	LastActivationLayer(const LastActivationLayer& src);
+	ndBrainLayer* Clone() const;
+
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
+	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+
+	ndBrainFloat m_sigma;
+};
+
 ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer::LastActivationLayer(ndInt32 neurons)
 	:ndBrainLayerActivationTanh(neurons * 2)
 	,m_sigma(ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE)

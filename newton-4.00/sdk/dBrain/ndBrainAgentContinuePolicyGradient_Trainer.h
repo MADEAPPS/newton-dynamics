@@ -87,6 +87,7 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 
 class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPool
 {
+	class LastActivationLayer;
 	public:
 	class HyperParameters
 	{
@@ -121,19 +122,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		void SaveTransition(ndInt32 index, ndBrainFloat reward, const ndBrainFloat* const observations);
 
 		ndInt32 m_obsevationsSize;
-	};
-
-	class LastActivationLayer : public ndBrainLayerActivationTanh
-	{
-		public:
-		LastActivationLayer(ndInt32 neurons);
-		LastActivationLayer(const LastActivationLayer& src);
-		ndBrainLayer* Clone() const;
-
-		void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-		void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
-
-		ndBrainFloat m_sigma;
 	};
 
 	ndBrainAgentContinuePolicyGradient_TrainerMaster(const HyperParameters& hyperParameters);
