@@ -56,6 +56,8 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API virtual void OnAddToWorld();
 	D_NEWTON_API virtual void OnRemoveFromToWorld();
 
+	D_NEWTON_API virtual void SaveUrdf(const char* fileName) const;
+
 	protected:
 	ndNode* m_rootNode;
 	ndIkSolver m_invDynamicsSolver;

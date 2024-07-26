@@ -197,3 +197,9 @@ void ndModelArticulation::AddCloseLoop(const ndSharedPtr<ndJointBilateralConstra
 
 	m_closeLoops.Append(joint);
 }
+
+
+void ndModelArticulation::SaveUrdf(const char* fileName) const
+{
+
+}
