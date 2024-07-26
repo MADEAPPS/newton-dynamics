@@ -23,7 +23,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
 namespace ndQuadruped_3
 {
 	#define ND_TRAIN_MODEL
@@ -453,16 +452,16 @@ namespace ndQuadruped_3
 			{
 				ndInt32 stepsCount = 0;
 				// if the model is dead, just skip this trajectory, not need to train on a dead model.
-				for (ndInt32 i = 0; i < m_trajectory.GetCount(); ++i)
+				for (ndInt32 i = 0; i < m_trajectory.GetStepNumber(); ++i)
 				{
-					if (m_trajectory[i].m_reward > ndReal(0.05f))
+					if (m_trajectory.GetReward(i) > ndReal(0.05f))
 					{
-						// model is alive break loop.
-						stepsCount = ndInt32(m_trajectory.GetCount());
+						// model is alive, break loop.
+						stepsCount = m_trajectory.GetStepNumber();
 						break;
 					}
 				}
-				m_trajectory.SetCount(stepsCount);
+				m_trajectory.SetStepNumber(stepsCount);
 				ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
 			}
 
@@ -1542,12 +1541,10 @@ namespace ndQuadruped_3
 }
 
 using namespace ndQuadruped_3;
-#endif
+
 
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 {
-	ndAssert(0);
-/*
 	// build a floor
 	BuildFlatPlane(scene, true);
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
@@ -1602,5 +1599,4 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z += 0.25f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
-*/
 }

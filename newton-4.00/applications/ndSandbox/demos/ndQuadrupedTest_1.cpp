@@ -21,7 +21,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
 namespace ndQuadruped_1
 {
 	//#define ND_TRAIN_MODEL
@@ -358,18 +357,17 @@ namespace ndQuadruped_1
 			{
 				ndInt32 stepsCount = 0;
 				// if the model is dead, just skip this trajectory, not need to train on a dead model.
-				for (ndInt32 i = 0; i < m_trajectory.GetCount(); ++i)
+				for (ndInt32 i = 0; i < m_trajectory.GetStepNumber(); ++i)
 				{
-					if (m_trajectory[i].m_reward > ndReal(0.05f))
+					if (m_trajectory.GetReward(i) > ndReal(0.05f))
 					{
-						// model is alive break loop.
-						stepsCount = ndInt32 (m_trajectory.GetCount());
+						// model is alive, break loop.
+						stepsCount = m_trajectory.GetStepNumber();
 						break;
 					}
 				}
-				m_trajectory.SetCount(stepsCount);
-				ndAssert(0);
-				//ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
+				m_trajectory.SetStepNumber(stepsCount);
+				ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
 			}
 
 			bool IsTerminal() const
@@ -1359,12 +1357,9 @@ namespace ndQuadruped_1
 }
 
 using namespace ndQuadruped_1;
-#endif
 
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 {
-ndAssert(0);
-/*
 	// build a floor
 	ndSetRandSeed(94157);
 
@@ -1426,5 +1421,5 @@ ndAssert(0);
 
 	//ndFileFormatSave xxxx;
 	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
-*/
+
 }
