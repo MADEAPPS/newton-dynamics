@@ -26,7 +26,6 @@
 #include "ndBrainOptimizerAdam.h"
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 
-#define ND_CONTINUE_POLICY_GRADIENT_USE_PAST_REWARDS
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
 #define ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE	ndBrainFloat(0.1f)
 
@@ -37,16 +36,14 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 {
 	m_randomSeed = 47;
 	m_numberOfLayers = 4;
-	m_bashBufferSize = 256;
 	m_neuronPerLayers = 64;
+	m_bashBufferSize = 256;
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
 
 	m_bashTrajectoryCount = 100;
 	m_maxTrajectorySteps = 4096;
 	m_extraTrajectorySteps = 1024;
-	//m_baseLineOptimizationPases = 4;
-	m_baseLineOptimizationPases = 1;
 
 	//m_criticLearnRate = ndBrainFloat(0.0005f);
 	//m_policyLearnRate = ndBrainFloat(0.0002f);
@@ -175,9 +172,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::MemoryStateValues::MemoryState
 	:ndBrainVector()
 	,m_obsevationsSize(obsevationsSize)
 {
-	#ifdef ND_CONTINUE_POLICY_GRADIENT_USE_PAST_REWARDS
 	SetCount(ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE * (m_obsevationsSize + 1));
-	#endif
 }
 
 ndBrainFloat ndBrainAgentContinuePolicyGradient_TrainerMaster::MemoryStateValues::GetReward(ndInt32 index) const
@@ -304,6 +299,7 @@ void ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory()
 		{
 			ndInt32 index = trajectoryAccumulator.GetStepNumber();
 			trajectoryAccumulator.SetStepNumber(index + 1);
+			trajectoryAccumulator.SetAdvantage(index, ndBrainFloat(0.0f));
 			trajectoryAccumulator.SetReward(index, m_trajectory.GetReward(i));
 			ndMemCpy(trajectoryAccumulator.GetActions(index), m_trajectory.GetActions(i), m_master->m_numberOfActions * 2);
 			ndMemCpy(trajectoryAccumulator.GetObservations(index), m_trajectory.GetObservations(i), m_master->m_numberOfObservations);
@@ -342,7 +338,6 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	,m_bashTrajectoryIndex(0)
 	,m_bashTrajectoryCount(hyperParameters.m_bashTrajectoryCount)
 	,m_bashTrajectorySteps(hyperParameters.m_bashTrajectoryCount * m_maxTrajectorySteps)
-	,m_baseLineOptimizationPases(hyperParameters.m_baseLineOptimizationPases)
 	,m_baseValueWorkingBufferSize(0)
 	,m_memoryStateIndex(0)
 	,m_memoryStateIndexFull(0)
@@ -428,7 +423,6 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	}
 	
 	m_baseLineValueOptimizer = new ndBrainOptimizerAdam();
-	//m_baseLineValueOptimizer->SetRegularizer(hyperParameters.m_regularizer);
 	m_baseLineValueOptimizer->SetRegularizer(ndBrainFloat(1.0e-4f));
 	
 	m_baseValueWorkingBufferSize = m_baseLineValue.CalculateWorkingBufferSize();
@@ -679,8 +673,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 //#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 {
-#ifdef	ND_CONTINUE_POLICY_GRADIENT_USE_PAST_REWARDS
-
 	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetStepNumber());
 	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetStepNumber()) - 1; i >= 0; --i)
 	{
@@ -758,55 +750,5 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 			m_baseLineValueOptimizer->Update(this, m_baseLineValueTrainers, m_criticLearnRate);
 		}
 	}
-
-#else
-	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetStepNumber());
-	for (ndInt32 i = m_trajectoryAccumulator.GetStepNumber() - 1; i >= 0; --i)
-	{
-		m_randomPermutation[i] = i;
-	}
-
-	ndAtomic<ndInt32> iterator(0);
-	const ndInt32 maxSteps = (m_trajectoryAccumulator.GetStepNumber() & -m_bashBufferSize) - m_bashBufferSize;
-	for (ndInt32 passes = 0; passes < m_baseLineOptimizationPases; ++passes)
-	{
-		m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
-		for (ndInt32 base = 0; base < maxSteps; base += m_bashBufferSize)
-		{
-			auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
-			{
-				class ndPolicyLoss : public	ndBrainLossLeastSquaredError
-				{
-					public:
-					ndPolicyLoss()
-						:ndBrainLossLeastSquaredError(1)
-					{
-					}
-
-					void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
-					{
-						ndBrainLossLeastSquaredError::GetLoss(output, loss);
-					}
-				};
-
-				ndPolicyLoss loss;
-				ndBrainFixSizeVector<1> stateValue;
-				for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
-				{
-					const ndInt32 index = m_randomPermutation[base + i];
-					ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
-					const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), m_numberOfObservations);
-					stateValue[0] = m_trajectoryAccumulator.GetReward(index);
-					loss.SetTruth(stateValue);
-					trainer.BackPropagate(observation, loss);
-				}
-			});
-
-			iterator = 0;
-			ndBrainThreadPool::ParallelExecute(BackPropagateBash);
-			m_baseLineValueOptimizer->Update(this, m_baseLineValueTrainers, m_criticLearnRate);
-		}
-	}
-#endif
 }
 

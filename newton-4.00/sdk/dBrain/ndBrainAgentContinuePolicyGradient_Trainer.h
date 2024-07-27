@@ -45,11 +45,13 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 		ndTrajectoryStep(ndInt32 actionsSize, ndInt32 obsevationsSize);
 
 		ndInt32 GetStepNumber() const;
-		void SetStepNumber(ndInt32 count);
 		ndBrainFloat GetReward(ndInt32 entry) const;
-		void SetReward(ndInt32 entry, ndBrainFloat reward);
 		ndBrainFloat GetAdvantage(ndInt32 entry) const;
+
+		void SetStepNumber(ndInt32 count);
+		void SetReward(ndInt32 entry, ndBrainFloat reward);
 		void SetAdvantage(ndInt32 entry, ndBrainFloat advantage);
+
 		ndBrainFloat* GetActions(ndInt32 entry);
 		ndBrainFloat* GetObservations(ndInt32 entry);
 
@@ -175,7 +177,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_bashTrajectoryIndex;
 	ndInt32 m_bashTrajectoryCount;
 	ndInt32 m_bashTrajectorySteps;
-	ndInt32 m_baseLineOptimizationPases;
 	ndInt32 m_baseValueWorkingBufferSize;
 	ndInt32 m_memoryStateIndex;
 	ndInt32 m_memoryStateIndexFull;
