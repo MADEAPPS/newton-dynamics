@@ -27,10 +27,8 @@
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 
 #define ND_CONTINUE_POLICY_GRADIENT_USE_PAST_REWARDS
+#define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
 #define ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE	ndBrainFloat(0.1f)
-
-#define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 256)
-
 
 //*********************************************************************************************
 //
