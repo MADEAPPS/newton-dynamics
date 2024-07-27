@@ -111,7 +111,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_maxTrajectorySteps;
 		ndInt32 m_bashTrajectoryCount;
 		ndInt32 m_extraTrajectorySteps;
-		ndInt32 m_baseLineOptimizationPases;
 		ndUnsigned32 m_randomSeed;
 	};
 

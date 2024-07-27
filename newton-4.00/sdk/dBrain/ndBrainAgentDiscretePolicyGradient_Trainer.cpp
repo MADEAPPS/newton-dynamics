@@ -26,6 +26,7 @@
 #include "ndBrainLayerActivationSoftmax.h"
 #include "ndBrainAgentDiscretePolicyGradient_Trainer.h"
 
+#if 0
 #define ND_DISCRETE_POLICY_GRADIENT_USE_PAST_REWARDS
 #define ND_DISCRETE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 256)
 
@@ -53,15 +54,14 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_regularizer = ndBrainFloat(1.0e-6f);
 	m_discountFactor = ndBrainFloat(0.99f);
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
-	//m_threadsCount = 1;
+m_threadsCount = 1;
 }
 
 //*********************************************************************************************
 //
 //*********************************************************************************************
-ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::ndTrajectoryStep(ndInt32 actionsSize, ndInt32 obsevationsSize)
+ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::ndTrajectoryStep(ndInt32 obsevationsSize)
 	:ndBrainVector()
-	,m_actionsSize(actionsSize)
 	,m_obsevationsSize(obsevationsSize)
 {
 }
@@ -165,12 +165,15 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::MemoryStateValues::SaveTr
 ndBrainAgentDiscretePolicyGradient_Trainer::ndBrainAgentDiscretePolicyGradient_Trainer(ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster>& master)
 	:ndBrainAgent()
 	,m_workingBuffer()
-	,m_trajectory(master->m_numberOfActions, master->m_numberOfObservations)
+	,m_trajectory(master->m_numberOfObservations)
 	,m_master(master)
 	,m_rd()
 	,m_gen(m_rd())
 	,m_d(ndFloat32(0.0f), ndFloat32(1.0f))
 {
+	static int xxxxxxxxxxx;
+	xxxxx = xxxxxxxxxxx ++;
+
 	m_gen.seed(m_master->m_randomSeed);
 	m_master->m_randomSeed += 1;
 
@@ -222,7 +225,6 @@ ndInt32 ndBrainAgentDiscretePolicyGradient_Trainer::SelectAction(const ndBrainVe
 	}
 	pdf.PushBack(sum);
 
-	//ndFloat32 r = ndRand();
 	ndFloat32 r = m_d(m_gen);
 	ndInt32 index = m_master->m_numberOfActions - 1;
 	for (ndInt32 i = m_master->m_numberOfActions - 1; i >= 0; --i)
@@ -238,6 +240,11 @@ ndInt32 ndBrainAgentDiscretePolicyGradient_Trainer::SelectAction(const ndBrainVe
 
 void ndBrainAgentDiscretePolicyGradient_Trainer::Step()
 {
+	if (xxxxx == 26)
+	{
+		xxxxx *= 1;
+	}
+
 	ndInt32 entryIndex = m_trajectory.GetStepNumber();
 	m_trajectory.SetStepNumber(entryIndex + 1);
 
@@ -306,7 +313,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	,m_baseLineValueTrainers()
 	,m_stateValues(hyperParameters.m_numberOfObservations)
 	,m_randomPermutation()
-	,m_trajectoryAccumulator(hyperParameters.m_numberOfActions, hyperParameters.m_numberOfObservations)
+	,m_trajectoryAccumulator(hyperParameters.m_numberOfObservations)
 	,m_gamma(hyperParameters.m_discountFactor)
 	,m_policyLearnRate(hyperParameters.m_policyLearnRate)
 	,m_criticLearnRate(hyperParameters.m_criticLearnRate)
@@ -723,3 +730,5 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeStep()
 		}
 	}
 }
+
+#endif
