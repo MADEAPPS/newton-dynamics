@@ -23,17 +23,6 @@
 #define _ND_BRAIN_AGENT_DESCRETE_POLICY_GRADIENT_TRAINER_H__
 
 #include "ndBrainStdafx.h"
-//#include "ndBrain.h"
-//#include "ndBrainLayer.h"
-//#include "ndBrainAgent.h"
-//#include "ndBrainTrainer.h"
-//#include "ndBrainThreadPool.h"
-//#include "ndBrainLayerLinear.h"
-//#include "ndBrainOptimizerAdam.h"
-//#include "ndBrainLayerActivationTanh.h"
-//#include "ndBrainLossLeastSquaredError.h"
-
-#include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
 #include "ndBrainThreadPool.h"
@@ -58,12 +47,14 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 		ndTrajectoryStep(ndInt32 actionsSize, ndInt32 obsevationsSize);
 
 		ndInt32 GetStepNumber() const;
-		void SetStepNumber(ndInt32 count);
+		ndInt32 GetAction(ndInt32 entry) const;
 		ndBrainFloat GetReward(ndInt32 entry) const;
-		void SetReward(ndInt32 entry, ndBrainFloat reward);
 		ndBrainFloat GetAdvantage(ndInt32 entry) const;
+
+		void SetStepNumber(ndInt32 count);
+		void SetAction(ndInt32 entry, ndInt32 actionIndex);
+		void SetReward(ndInt32 entry, ndBrainFloat reward);
 		void SetAdvantage(ndInt32 entry, ndBrainFloat advantage);
-		ndInt32 GetAction(ndInt32 entry);
 		ndBrainFloat* GetObservations(ndInt32 entry);
 
 		ndInt32 m_actionsSize;
@@ -75,7 +66,7 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 	~ndBrainAgentDiscretePolicyGradient_Trainer();
 
 	ndBrain* GetActor();
-	void SelectAction(ndBrainVector& actions) const;
+	ndInt32 SelectAction(const ndBrainVector& actions) const;
 
 	void InitWeights() { ndAssert(0); }
 	virtual void OptimizeStep() { ndAssert(0); }

@@ -583,43 +583,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 	m_optimizer->Update(this, m_weightedTrainer, -m_policyLearnRate);
 }
 
-void ndBrainAgentContinuePolicyGradient_TrainerMaster::Optimize()
-{
-	OptimizeCritic();
-	OptimizePolicy();
-}
-
-void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
-{
-	for (ndList<ndBrainAgentContinuePolicyGradient_Trainer*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
-	{
-		ndBrainAgentContinuePolicyGradient_Trainer* const agent = node->GetInfo();
-
-		bool isTeminal = agent->IsTerminal() || (agent->m_trajectory.GetStepNumber() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
-		if (isTeminal)
-		{
-			agent->SaveTrajectory();
-			agent->ResetModel();
-		}
-		m_frameCount++;
-		m_framesAlive++;
-	}
-
-	if ((m_bashTrajectoryIndex >= (m_bashTrajectoryCount * 10)) || (m_trajectoryAccumulator.GetStepNumber() >= m_bashTrajectorySteps))
-	{
-		Optimize();
-		m_eposideCount++;
-		m_framesAlive = 0;
-		m_bashTrajectoryIndex = 0;
-		m_trajectoryAccumulator.SetStepNumber(0);
-		for (ndList<ndBrainAgentContinuePolicyGradient_Trainer*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
-		{
-			ndBrainAgentContinuePolicyGradient_Trainer* const agent = node->GetInfo();
-			agent->m_trajectory.SetStepNumber(0);
-		}
-	}
-}
-
 //#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 {
@@ -668,6 +631,12 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 		const ndBrainFloat normalizedAdvantage = m_trajectoryAccumulator.GetAdvantage(i) * invVariance;
 		m_trajectoryAccumulator.SetAdvantage(i, normalizedAdvantage);
 	}
+}
+
+void ndBrainAgentContinuePolicyGradient_TrainerMaster::Optimize()
+{
+	OptimizeCritic();
+	OptimizePolicy();
 }
 
 //#pragma optimize( "", off )
@@ -748,6 +717,37 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 			iterator = 0;
 			ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 			m_baseLineValueOptimizer->Update(this, m_baseLineValueTrainers, m_criticLearnRate);
+		}
+	}
+}
+
+void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
+{
+	for (ndList<ndBrainAgentContinuePolicyGradient_Trainer*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
+	{
+		ndBrainAgentContinuePolicyGradient_Trainer* const agent = node->GetInfo();
+
+		bool isTeminal = agent->IsTerminal() || (agent->m_trajectory.GetStepNumber() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
+		if (isTeminal)
+		{
+			agent->SaveTrajectory();
+			agent->ResetModel();
+		}
+		m_frameCount++;
+		m_framesAlive++;
+	}
+
+	if ((m_bashTrajectoryIndex >= (m_bashTrajectoryCount * 10)) || (m_trajectoryAccumulator.GetStepNumber() >= m_bashTrajectorySteps))
+	{
+		Optimize();
+		m_eposideCount++;
+		m_framesAlive = 0;
+		m_bashTrajectoryIndex = 0;
+		m_trajectoryAccumulator.SetStepNumber(0);
+		for (ndList<ndBrainAgentContinuePolicyGradient_Trainer*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
+		{
+			ndBrainAgentContinuePolicyGradient_Trainer* const agent = node->GetInfo();
+			agent->m_trajectory.SetStepNumber(0);
 		}
 	}
 }

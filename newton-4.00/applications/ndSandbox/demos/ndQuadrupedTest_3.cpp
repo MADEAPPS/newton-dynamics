@@ -1045,17 +1045,19 @@ namespace ndQuadruped_3
 
 		ndBrainFloat CalculateDistanceToOrigin() const
 		{
-			const ndFloat32 aliveZone = 0.5f;
 			ndFloat32 x = m_control->m_x / D_MAX_SWING_DIST_X;
 			ndFloat32 z = m_control->m_z / D_MAX_SWING_DIST_Z;
-			
-			// L2 distance
-			//ndFloat32 dist2 = ndMax (x * x + z * z - aliveZone * aliveZone, 0.0f);
 
 			// L1 distance
-			ndFloat32 h = ndMax(ndAbs(x), ndAbs(z));
-			ndFloat32 dist = ndMax(h - aliveZone, 0.0f);
-			ndFloat32 reward = ndExp(-200.0f * dist * dist);
+			//const ndFloat32 aliveZone = 0.5f;
+			//ndFloat32 h = ndMax(ndAbs(x), ndAbs(z));
+			//ndFloat32 dist = ndMax(h - aliveZone, 0.0f);
+			//ndFloat32 reward = ndExp(-200.0f * dist * dist);
+
+			// L2 distance
+			ndFloat32 dist2 = x * x + z * z;
+			ndFloat32 reward = ndExp(-25.0f * dist2);
+
 			//if (m_id == 0)
 			//{
 			//	ndExpandTraceMessage("dist reward(%f)\n", reward);
