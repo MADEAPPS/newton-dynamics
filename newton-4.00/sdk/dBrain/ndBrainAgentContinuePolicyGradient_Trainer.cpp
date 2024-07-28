@@ -111,16 +111,16 @@ ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::ndTrajectoryStep(n
 {
 }
 
-ndInt32 ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::GetStepNumber() const
+ndInt32 ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::GetCount() const
 {
 	ndInt32 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
-	return ndInt32(GetCount()) / stride;
+	return ndInt32(ndBrainVector::GetCount()) / stride;
 }
 
-void ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::SetStepNumber(ndInt32 count)
+void ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::SetCount(ndInt32 count)
 {
 	ndInt32 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
-	SetCount(stride * count);
+	ndBrainVector::SetCount(stride * count);
 }
 
 ndBrainFloat ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::GetReward(ndInt32 entry) const
@@ -220,7 +220,7 @@ ndBrainAgentContinuePolicyGradient_Trainer::ndBrainAgentContinuePolicyGradient_T
 	//ndFloat32 xxx1 = uniform1(m_gen1);
 
 	m_master->m_agents.Append(this);
-	m_trajectory.SetStepNumber(0);
+	m_trajectory.SetCount(0);
 }
 
 ndBrainAgentContinuePolicyGradient_Trainer::~ndBrainAgentContinuePolicyGradient_Trainer()
@@ -258,8 +258,8 @@ void ndBrainAgentContinuePolicyGradient_Trainer::SelectAction(ndBrainVector& act
 
 void ndBrainAgentContinuePolicyGradient_Trainer::Step()
 {
-	ndInt32 entryIndex = m_trajectory.GetStepNumber();
-	m_trajectory.SetStepNumber(entryIndex + 1);
+	ndInt32 entryIndex = m_trajectory.GetCount();
+	m_trajectory.SetCount(entryIndex + 1);
 
 	ndBrainMemVector actions(m_trajectory.GetActions(entryIndex), m_master->m_numberOfActions * 2);
 	ndBrainMemVector observation(m_trajectory.GetObservations(entryIndex), m_master->m_numberOfObservations);
@@ -274,16 +274,16 @@ void ndBrainAgentContinuePolicyGradient_Trainer::Step()
 
 void ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory()
 {
-	if (m_trajectory.GetStepNumber())
+	if (m_trajectory.GetCount())
 	{
 		m_master->m_bashTrajectoryIndex++;
 
 		// remove last step because if it was a dead state, it will provide misleading feedback.
-		m_trajectory.SetStepNumber(m_trajectory.GetStepNumber() - 1);
+		m_trajectory.SetCount(m_trajectory.GetCount() - 1);
 		
 		// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 		ndBrainFloat gamma = m_master->m_gamma;
-		for (ndInt32 i = m_trajectory.GetStepNumber() - 2; i >= 0; --i)
+		for (ndInt32 i = m_trajectory.GetCount() - 2; i >= 0; --i)
 		{
 			ndBrainFloat r0 = m_trajectory.GetReward(i);
 			ndBrainFloat r1 = m_trajectory.GetReward(i + 1);
@@ -291,21 +291,21 @@ void ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory()
 		}
 		
 		// get the max trajectory steps
-		const ndInt32 maxSteps = ndMin(m_trajectory.GetStepNumber(), m_master->m_maxTrajectorySteps);
+		const ndInt32 maxSteps = ndMin(m_trajectory.GetCount(), m_master->m_maxTrajectorySteps);
 		ndAssert(maxSteps > 0);
 
 		ndTrajectoryStep& trajectoryAccumulator = m_master->m_trajectoryAccumulator;
 		for (ndInt32 i = 0; i < maxSteps; ++i)
 		{
-			ndInt32 index = trajectoryAccumulator.GetStepNumber();
-			trajectoryAccumulator.SetStepNumber(index + 1);
+			ndInt32 index = trajectoryAccumulator.GetCount();
+			trajectoryAccumulator.SetCount(index + 1);
 			trajectoryAccumulator.SetAdvantage(index, ndBrainFloat(0.0f));
 			trajectoryAccumulator.SetReward(index, m_trajectory.GetReward(i));
 			ndMemCpy(trajectoryAccumulator.GetActions(index), m_trajectory.GetActions(i), m_master->m_numberOfActions * 2);
 			ndMemCpy(trajectoryAccumulator.GetObservations(index), m_trajectory.GetObservations(i), m_master->m_numberOfObservations);
 		}
 	}
-	m_trajectory.SetStepNumber(0);
+	m_trajectory.SetCount(0);
 }
 
 // ***************************************************************************************
@@ -505,7 +505,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 	});
 	ndBrainThreadPool::ParallelExecute(ClearGradients);
 
-	const ndInt32 steps = ndInt32(m_trajectoryAccumulator.GetStepNumber());
+	const ndInt32 steps = ndInt32(m_trajectoryAccumulator.GetCount());
 	for (ndInt32 base = 0; base < steps; base += m_bashBufferSize)
 	{
 		auto CalculateGradients = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
@@ -550,7 +550,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 			{
 				ndBrainTrainer& trainer = *m_auxiliaryTrainers[i];
 				MaxLikelihoodLoss loss(trainer, this, base + i);
-				if ((base + i) < m_trajectoryAccumulator.GetStepNumber())
+				if ((base + i) < m_trajectoryAccumulator.GetCount())
 				{
 					const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(base + i), m_numberOfObservations);
 					trainer.BackPropagate(observation, loss);
@@ -579,7 +579,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 	}
 
 	m_optimizer->AccumulateGradients(this, m_trainers);
-	m_weightedTrainer[0]->ScaleWeights(ndBrainFloat(1.0f) / ndBrainFloat(m_trajectoryAccumulator.GetStepNumber()));
+	m_weightedTrainer[0]->ScaleWeights(ndBrainFloat(1.0f) / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
 	m_optimizer->Update(this, m_weightedTrainer, -m_policyLearnRate);
 }
 
@@ -589,7 +589,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 	UpdateBaseLineValue();
 
 	ndBrainFloat averageSum = ndBrainFloat(0.0f);
-	const ndInt32 stepNumber = m_trajectoryAccumulator.GetStepNumber();
+	const ndInt32 stepNumber = m_trajectoryAccumulator.GetCount();
 	for (ndInt32 i = stepNumber - 1; i >= 0; --i)
 	{
 		averageSum += m_trajectoryAccumulator.GetReward(i);
@@ -604,7 +604,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 		ndBrainFixSizeVector<1> actions;
 		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
 	
-		ndInt32 const count = m_trajectoryAccumulator.GetStepNumber();
+		ndInt32 const count = m_trajectoryAccumulator.GetCount();
 		for (ndInt32 i = iterator++; i < count; i = iterator++)
 		{
 			const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_numberOfObservations);
@@ -642,15 +642,15 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::Optimize()
 //#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 {
-	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetStepNumber());
-	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetStepNumber()) - 1; i >= 0; --i)
+	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount());
+	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetCount()) - 1; i >= 0; --i)
 	{
 		m_randomPermutation[i] = i;
 	}
 	m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
 	
 	const ndInt32 start = m_memoryStateIndex;
-	const ndInt32 samplesCount = ndMin (m_trajectoryAccumulator.GetStepNumber() / 5, ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE / 4);
+	const ndInt32 samplesCount = ndMin (m_trajectoryAccumulator.GetCount() / 5, ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE / 4);
 	for (ndInt32 i = samplesCount; i >= 0; --i)
 	{
 		ndInt32 srcIndex = m_randomPermutation[i];
@@ -661,7 +661,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 	if (!m_memoryStateIndexFull && (start < m_memoryStateIndex))
 	{
 		ndAtomic<ndInt32> iterator(0);
-		const ndInt32 maxSteps = (m_trajectoryAccumulator.GetStepNumber() & -m_bashBufferSize) - m_bashBufferSize;
+		const ndInt32 maxSteps = (m_trajectoryAccumulator.GetCount() & -m_bashBufferSize) - m_bashBufferSize;
 		for (ndInt32 base = 0; base < maxSteps; base += m_bashBufferSize)
 		{
 			auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
@@ -727,7 +727,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 	{
 		ndBrainAgentContinuePolicyGradient_Trainer* const agent = node->GetInfo();
 
-		bool isTeminal = agent->IsTerminal() || (agent->m_trajectory.GetStepNumber() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
+		bool isTeminal = agent->IsTerminal() || (agent->m_trajectory.GetCount() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
 		if (isTeminal)
 		{
 			agent->SaveTrajectory();
@@ -737,17 +737,17 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 		m_framesAlive++;
 	}
 
-	if ((m_bashTrajectoryIndex >= (m_bashTrajectoryCount * 10)) || (m_trajectoryAccumulator.GetStepNumber() >= m_bashTrajectorySteps))
+	if ((m_bashTrajectoryIndex >= (m_bashTrajectoryCount * 10)) || (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps))
 	{
 		Optimize();
 		m_eposideCount++;
 		m_framesAlive = 0;
 		m_bashTrajectoryIndex = 0;
-		m_trajectoryAccumulator.SetStepNumber(0);
+		m_trajectoryAccumulator.SetCount(0);
 		for (ndList<ndBrainAgentContinuePolicyGradient_Trainer*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
 		{
 			ndBrainAgentContinuePolicyGradient_Trainer* const agent = node->GetInfo();
-			agent->m_trajectory.SetStepNumber(0);
+			agent->m_trajectory.SetCount(0);
 		}
 	}
 }

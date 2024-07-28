@@ -44,12 +44,13 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 		public:
 		ndTrajectoryStep(ndInt32 actionsSize, ndInt32 obsevationsSize);
 
-		ndInt32 GetStepNumber() const;
-		ndBrainFloat GetReward(ndInt32 entry) const;
-		ndBrainFloat GetAdvantage(ndInt32 entry) const;
+		ndInt32 GetCount() const;
+		void SetCount(ndInt32 count);
 
-		void SetStepNumber(ndInt32 count);
+		ndBrainFloat GetReward(ndInt32 entry) const;
 		void SetReward(ndInt32 entry, ndBrainFloat reward);
+
+		ndBrainFloat GetAdvantage(ndInt32 entry) const;
 		void SetAdvantage(ndInt32 entry, ndBrainFloat advantage);
 
 		ndBrainFloat* GetActions(ndInt32 entry);

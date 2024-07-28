@@ -357,16 +357,16 @@ namespace ndQuadruped_1
 			{
 				ndInt32 stepsCount = 0;
 				// if the model is dead, just skip this trajectory, not need to train on a dead model.
-				for (ndInt32 i = 0; i < m_trajectory.GetStepNumber(); ++i)
+				for (ndInt32 i = 0; i < m_trajectory.GetCount(); ++i)
 				{
 					if (m_trajectory.GetReward(i) > ndReal(0.05f))
 					{
 						// model is alive, break loop.
-						stepsCount = m_trajectory.GetStepNumber();
+						stepsCount = m_trajectory.GetCount();
 						break;
 					}
 				}
-				m_trajectory.SetStepNumber(stepsCount);
+				m_trajectory.SetCount(stepsCount);
 				ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
 			}
 

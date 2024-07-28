@@ -46,14 +46,17 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 		ndTrajectoryStep(ndInt32 obsevationsSize);
 
 		ndInt32 GetCount() const;
-		ndBrainFloat GetAction(ndInt32 entry) const;
-		ndBrainFloat GetReward(ndInt32 entry) const;
-		ndBrainFloat GetAdvantage(ndInt32 entry) const;
-
 		void SetCount(ndInt32 count);
+
+		ndBrainFloat GetAction(ndInt32 entry) const;
 		void SetAction(ndInt32 entry, ndBrainFloat actionIndex);
+
+		ndBrainFloat GetReward(ndInt32 entry) const;
 		void SetReward(ndInt32 entry, ndBrainFloat reward);
+
+		ndBrainFloat GetAdvantage(ndInt32 entry) const;
 		void SetAdvantage(ndInt32 entry, ndBrainFloat advantage);
+
 		ndBrainFloat* GetObservations(ndInt32 entry);
 
 		ndInt32 m_obsevationsSize;
