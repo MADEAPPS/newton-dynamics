@@ -34,24 +34,24 @@
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 
-#if 0
 class ndBrainOptimizerAdam;
 class ndBrainAgentDiscretePolicyGradient_TrainerMaster;
 
 class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 {
+	public:
 	class ndTrajectoryStep : protected ndBrainVector
 	{
 		public:
 		ndTrajectoryStep(ndInt32 obsevationsSize);
 
-		ndInt32 GetStepNumber() const;
-		ndInt32 GetAction(ndInt32 entry) const;
+		ndInt32 GetCount() const;
+		ndBrainFloat GetAction(ndInt32 entry) const;
 		ndBrainFloat GetReward(ndInt32 entry) const;
 		ndBrainFloat GetAdvantage(ndInt32 entry) const;
 
-		void SetStepNumber(ndInt32 count);
-		void SetAction(ndInt32 entry, ndInt32 actionIndex);
+		void SetCount(ndInt32 count);
+		void SetAction(ndInt32 entry, ndBrainFloat actionIndex);
 		void SetReward(ndInt32 entry, ndBrainFloat reward);
 		void SetAdvantage(ndInt32 entry, ndBrainFloat advantage);
 		ndBrainFloat* GetObservations(ndInt32 entry);
@@ -59,25 +59,23 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 		ndInt32 m_obsevationsSize;
 	};
 
-	public:
 	ndBrainAgentDiscretePolicyGradient_Trainer(ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster>& master);
 	~ndBrainAgentDiscretePolicyGradient_Trainer();
 
 	ndBrain* GetActor();
-	ndInt32 SelectAction(const ndBrainVector& actions) const;
+	ndBrainFloat SelectAction(const ndBrainVector& probabilities) const;
 
 	void InitWeights() { ndAssert(0); }
 	virtual void OptimizeStep() { ndAssert(0); }
 	void Save(ndBrainSave* const) { ndAssert(0); }
 	bool IsTrainer() const { ndAssert(0); return true; }
-	ndInt32 GetEpisodeFrames() const { ndAssert(0); return 0; }
+	ndInt32 GetEpisodeFrames() const;
 	void InitWeights(ndBrainFloat, ndBrainFloat) { ndAssert(0); }
 
 	virtual void Step();
 	virtual void SaveTrajectory();
 	virtual bool IsTerminal() const;
 
-	int xxxxx;
 	ndBrainVector m_workingBuffer;
 	ndTrajectoryStep m_trajectory;
 	ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster> m_master;
@@ -177,10 +175,9 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_bashTrajectoryIndex;
 	ndInt32 m_bashTrajectoryCount;
 	ndInt32 m_bashTrajectorySteps;
-	ndInt32 m_baseLineOptimizationPases;
-	ndInt32 m_baseValueWorkingBufferSize;
 	ndInt32 m_memoryStateIndex;
 	ndInt32 m_memoryStateIndexFull;
+	ndInt32 m_baseValueWorkingBufferSize;
 	ndUnsigned32 m_randomSeed;
 	ndBrainVector m_workingBuffer;
 	ndMovingAverage<8> m_averageScore;
@@ -189,9 +186,5 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndList<ndBrainAgentDiscretePolicyGradient_Trainer*> m_agents;
 	friend class ndBrainAgentDiscretePolicyGradient_Trainer;
 };
-
-#else
-
-#endif
 
 #endif 

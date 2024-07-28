@@ -21,7 +21,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
 namespace ndCarpole_0
 {
 	#define ND_TRAIN_AGENT
@@ -148,8 +147,8 @@ namespace ndCarpole_0
 			}
 			const ndMatrix& matrix = m_pole->GetMatrix();
 			ndFloat32 sinAngle = matrix.m_front.m_x;
-			//ndFloat32 reward = ndReal(ndExp(-ndFloat32(10000.0f) * sinAngle * sinAngle));
-			ndFloat32 reward = ndReal(ndExp(-ndFloat32(10000.0f) * sinAngle * sinAngle));
+			//ndFloat32 reward = ndReal(ndExp(-ndFloat32(2500.0f) * sinAngle * sinAngle));
+			ndFloat32 reward = ndReal(ndExp(-ndFloat32(600.0f) * sinAngle * sinAngle));
 			return ndReal(reward);
 		}
 
@@ -526,13 +525,11 @@ namespace ndCarpole_0
 }
 
 using namespace ndCarpole_0;
-#endif
 
 void ndCartpoleDiscrete(ndDemoEntityManager* const scene)
 {
 	BuildFlatPlane(scene, true);
 	
-#if 0
 	ndSetRandSeed(42);
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
@@ -550,5 +547,4 @@ void ndCartpoleDiscrete(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z += 2.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
-#endif
 }
