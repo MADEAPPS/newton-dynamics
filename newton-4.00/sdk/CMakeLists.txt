@@ -33,6 +33,7 @@ else()
 	include_directories(dCore)
 	include_directories(dNewton)
 	include_directories(dCollision)
+	include_directories(dCore/tinyxml)
 	include_directories(dNewton/dJoints)
 	include_directories(dNewton/dModels)
 	include_directories(dNewton/dIkSolver)
@@ -45,6 +46,7 @@ else()
 		dCore/*.h 
 		dNewton/*.h 
 		dCollision/*.h 
+		dCore/tinyxml/*.h 
 		dNewton/dJoints/*.h 
 		dNewton/dModels/*.h 
 		dNewton/dIkSolver/*.h
@@ -57,6 +59,8 @@ else()
 		dNewton/*.cpp
 		dCollision/*.h 
 		dCollision/*.cpp
+		dCore/tinyxml/*.h
+		dCore/tinyxml/*.cpp 
 		dNewton/dModels/*.h 
 		dNewton/dModels/*.cpp
 		dNewton/dJoints/*.h 
@@ -94,6 +98,7 @@ else()
 	if(NEWTON_BUILD_SHARED_LIBS)
 		add_definitions(-D_D_CORE_EXPORT_DLL)
 		add_definitions(-D_D_NEWTON_EXPORT_DLL)
+		add_definitions(-D_D_TINYXML_EXPORT_DLL)
 		add_definitions(-D_D_COLLISION_EXPORT_DLL)
 		add_library(${projectName} SHARED ${CPP_SOURCE})
 

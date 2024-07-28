@@ -23,7 +23,7 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME "unicycleVPG.dnn"
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
@@ -335,7 +335,6 @@ namespace ndUnicycle
 		ndSharedPtr<ndBody> hipBody(world->GetBody(AddBox(scene, location, mass, xSize, ySize, zSize, "wood_0.png")));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(hipBody);
 
-		//ndMatrix matrix(hipBody->GetMatrix());
 		ndMatrix matrix(location);
 		matrix.m_posit.m_y += 0.6f;
 		hipBody->SetMatrix(matrix);
@@ -401,8 +400,12 @@ namespace ndUnicycle
 		ndWorld* const world = scene->GetWorld();
 		ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
 		ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
-		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
-		world->AddJoint(fixJoint);
+		ndSharedPtr<ndJointBilateralConstraint> planeJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
+		world->AddJoint(planeJoint);
+
+		char fileName[256];
+		ndGetWorkingFileName("unicycle.urdf", fileName);
+		articulation->SaveUrdf(fileName);
 
 		scene->SetAcceleratedUpdate();
 		return model;

@@ -23,12 +23,14 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndModel.h"
+#include "ndUrdfFile.h"
 #include "ndModelArticulation.h"
 
 ndModelArticulation::ndNode::ndNode(const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint, ndNode* const parent)
 	:ndNodeHierarchy<ndNode>()
 	,m_body(body)
 	,m_joint(joint)
+	,m_name("")
 {
 	if (parent)
 	{
@@ -45,6 +47,7 @@ ndModelArticulation::ndModelArticulation()
 	,m_rootNode(nullptr)
 	,m_invDynamicsSolver()
 	,m_closeLoops()
+	,m_name("")
 {
 }
 
@@ -59,6 +62,16 @@ ndModelArticulation::~ndModelArticulation()
 ndModelArticulation* ndModelArticulation::GetAsModelArticulation()
 {
 	return this;
+}
+
+const ndString& ndModelArticulation::GetName() const
+{
+	return m_name;
+}
+
+void ndModelArticulation::SetName(ndString& name)
+{
+	m_name = name;
 }
 
 ndModelArticulation::ndNode* ndModelArticulation::GetRoot() const
@@ -198,7 +211,14 @@ void ndModelArticulation::AddCloseLoop(const ndSharedPtr<ndJointBilateralConstra
 	m_closeLoops.Append(joint);
 }
 
-void ndModelArticulation::SaveUrdf(const char* const fileName) const
+ndModelArticulation* ndModelArticulation::LoadUrdf(const char* const fileName)
 {
+	ndUrdfFile importer;
+	return importer.Import(fileName);
+}
 
+void ndModelArticulation::SaveUrdf(const char* const fileName)
+{
+	ndUrdfFile exporter;
+	exporter.Export(fileName, this);
 }

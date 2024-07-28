@@ -151,7 +151,7 @@ ndSetAllocators::ndSetAllocators()
 	ndMemory::GetMemoryAllocators(alloc, free);
 	if (alloc != PhysicsAlloc) 
 	{
-		nd::SetXmlMemoryFunctions(PhysicsAlloc, PhysicsFree);
+		//nd::SetXmlMemoryFunctions(PhysicsAlloc, PhysicsFree);
 		ndMemory::SetMemoryAllocators(PhysicsAlloc, PhysicsFree);
 	}
 }

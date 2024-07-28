@@ -97,7 +97,7 @@ namespace nd
 	const int TIXML_MINOR_VERSION = 5;
 	const int TIXML_PATCH_VERSION = 3;
 
-	void SetXmlMemoryFunctions(xmlAlloc allocMemory, xmlFree freeMemory);
+	//void SetXmlMemoryFunctions(xmlAlloc allocMemory, xmlFree freeMemory);
 
 
 	/*	Internal structure for tracking location of items 
@@ -133,8 +133,15 @@ namespace nd
 	*/
 	class D_TINY_API TiXmlVisitor
 	{
-	public:
+		public:
+		TiXmlVisitor() {}
+		TiXmlVisitor(const TiXmlVisitor&) {}
 		virtual ~TiXmlVisitor() {}
+
+		TiXmlVisitor& operator=(const TiXmlVisitor&)
+		{
+			return *this;
+		}
 
 		void *operator new (size_t size);
 		void *operator new[](size_t size);

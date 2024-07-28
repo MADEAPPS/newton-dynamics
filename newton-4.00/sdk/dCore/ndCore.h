@@ -30,6 +30,7 @@
 #include <ndSort.h>
 #include <ndTypes.h>
 #include <ndUtils.h>
+#include <tinyxml.h>
 #include <ndArray.h>
 #include <ndStack.h>
 #include <ndDebug.h>

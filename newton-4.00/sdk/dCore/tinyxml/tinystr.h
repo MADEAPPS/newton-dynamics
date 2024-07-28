@@ -45,44 +45,43 @@ distribution.
 typedef void (*xmlFree) (void*);
 typedef void* (*xmlAlloc) (size_t size);
 
-//#if defined(_MSC_VER)
-//	#define D_TINYXML_EXPORT __declspec(dllexport)
-//	#define D_TINYXML_IMPORT __declspec(dllimport)
-//#else
-//	#define D_TINYXML_EXPORT __attribute__((visibility("default")))
-//	#define D_TINYXML_IMPORT __attribute__((visibility("default")))
-//#endif
-//
-//#ifdef _D_TINY_DLL
-//	#ifdef _D_TINYXML_EXPORT_DLL
-//		#define D_TINY_API D_TINYXML_EXPORT
-//	#else
-//		#define D_TINY_API D_TINYXML_IMPORT
-//	#endif
-//#else
-//	#define D_TINY_API
-//#endif
+#if defined(_MSC_VER)
+	#define _D_TINYXML_EXPORT __declspec(dllexport)
+	#define _D_TINYXML_IMPORT __declspec(dllimport)
+#else
+	#define _D_TINYXML_EXPORT __attribute__((visibility("default")))
+	#define _D_TINYXML_IMPORT __attribute__((visibility("default")))
+#endif
 
-#define D_TINY_API
+#ifdef _D_TINY_DLL
+	#ifdef _D_TINYXML_EXPORT_DLL
+		#define D_TINY_API _D_TINYXML_EXPORT
+	#else
+		#define D_TINY_API _D_TINYXML_IMPORT
+	#endif
+#else
+	#define D_TINY_API
+#endif
 
 /*	The support for explicit isn't that universal, and it isn't really
 	required - it is used to check that the TiXmlString class isn't incorrectly
 	used. Be nice to old compilers and macro it here:
 */
-#if defined(_MSC_VER) && (_MSC_VER >= 1200 )
-	// Microsoft visual studio, version 6 and higher.
-	#define TIXML_EXPLICIT explicit
-#elif defined(__GNUC__) && (__GNUC__ >= 3 )
-	// GCC version 3 and higher.s
-	#define TIXML_EXPLICIT explicit
-#else
-	#define TIXML_EXPLICIT
-#endif
+//#if defined(_MSC_VER) && (_MSC_VER >= 1200 )
+//	// Microsoft visual studio, version 6 and higher.
+//	#define TIXML_EXPLICIT explicit
+//#elif defined(__GNUC__) && (__GNUC__ >= 3 )
+//	// GCC version 3 and higher.s
+//	#define TIXML_EXPLICIT explicit
+//#else
+//	#define TIXML_EXPLICIT
+//#endif
+#define TIXML_EXPLICIT
 
 namespace nd
 {
-	extern D_TINY_API xmlFree __free__;
-	extern D_TINY_API xmlAlloc __alloc__;
+	//extern D_TINY_API xmlFree __free__;
+	//extern D_TINY_API xmlAlloc __alloc__;
 
 /*
    TiXmlString is an emulation of a subset of the std::string template.

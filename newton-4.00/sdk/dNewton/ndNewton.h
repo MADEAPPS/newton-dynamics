@@ -30,6 +30,7 @@
 #include <ndNewtonStdafx.h>
 #include <ndWorld.h>
 #include <ndModel.h>
+#include <ndUrdfFile.h>
 #include <ndIkSolver.h>
 #include <ndModelList.h>
 #include <ndJointGear.h>

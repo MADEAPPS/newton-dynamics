@@ -251,20 +251,12 @@ void ndFileFormatSave::BeginSave(const ndWorld* const world, const char* const p
 	m_world = (ndWorld*)world;
 	SetPath(path);
 
-	m_doc = new nd::TiXmlDocument("ndFile");
+	m_doc = new nd::TiXmlDocument("");
 	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
 	m_doc->LinkEndChild(decl);
 	
-	m_oldloc = setlocale(LC_ALL, 0);
+	ndString oldloc (setlocale(LC_ALL, 0));
 	setlocale(LC_ALL, "C");
-
-	m_bodies.SetCount(0);
-	m_models.SetCount(0);
-	m_joints.SetCount(0);
-
-	m_jointsIds.RemoveAll();
-	m_bodiesIds.RemoveAll();
-	m_uniqueShapesIds.RemoveAll();
 }
 
 void ndFileFormatSave::EndSave()

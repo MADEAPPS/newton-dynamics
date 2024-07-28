@@ -40,6 +40,7 @@ class ndModelArticulation: public ndModel
 		
 		ndSharedPtr<ndBody> m_body;
 		ndSharedPtr<ndJointBilateralConstraint> m_joint;
+		ndString m_name;
 	};
 
 	D_NEWTON_API ndModelArticulation();
@@ -56,12 +57,17 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API virtual void OnAddToWorld();
 	D_NEWTON_API virtual void OnRemoveFromToWorld();
 
-	D_NEWTON_API virtual void SaveUrdf(const char* const fileName) const;
+	D_NEWTON_API const ndString& GetName() const;
+	D_NEWTON_API void SetName(ndString& name);
+
+	D_NEWTON_API virtual void SaveUrdf(const char* const fileName);
+	D_NEWTON_API static ndModelArticulation* LoadUrdf(const char* const fileName);
 
 	protected:
 	ndNode* m_rootNode;
 	ndIkSolver m_invDynamicsSolver;
 	ndSharedList<ndJointBilateralConstraint> m_closeLoops;
+	ndString m_name;
 
 	friend class ndFileFormatSave;
 	friend class ndFileFormatModelArticulation;

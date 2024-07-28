@@ -33,6 +33,7 @@ include_directories(../../sdk/dModel)
 include_directories(../../sdk/dNewton)
 include_directories(../../sdk/dCollision)
 include_directories(../../sdk/dFileFormat)
+include_directories(../../sdk/dCore/tinyxml)
 include_directories(../../sdk/dNewton/dJoints)
 include_directories(../../sdk/dNewton/dModels)
 include_directories(../../sdk/dNewton/dIkSolver)
@@ -58,7 +59,7 @@ endif()
 
 add_executable(${projectName} ${CPP_SOURCE})
 
-target_link_libraries (${projectName} ndNewton ndBrain ndModel ndFileFormat ndTinyxml vhacd openfbx glfw imgui glatter lodepng)
+target_link_libraries (${projectName} ndNewton ndBrain ndModel ndFileFormat vhacd openfbx glfw imgui glatter lodepng)
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndCollision ndCore)

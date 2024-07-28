@@ -26,6 +26,9 @@ distribution.
  * THIS FILE WAS ALTERED BY Tyge Løvset, 7. April 2005.
  */
 
+#include "ndCoreStdafx.h"
+#include "ndMemory.h"
+
 #ifndef TIXML_USE_STL
 
 #include "tinystr.h"
@@ -34,8 +37,8 @@ distribution.
 
 namespace nd
 {
-	xmlFree	 __free__ = free;
-	xmlAlloc __alloc__ = malloc;
+	//xmlFree	 __free__ = free;
+	//xmlAlloc __alloc__ = malloc;
 
 	// Error value for find primitive
 	const TiXmlString::size_type TiXmlString::npos = static_cast< TiXmlString::size_type >(-1);
@@ -44,6 +47,15 @@ namespace nd
 	// Null rep.
 	TiXmlString::Rep TiXmlString::nullrep_ = { 0, 0, { '\0' } };
 
+	static void* __alloc__(size_t size)
+	{
+		return ndMemory::Malloc(size);
+	}
+
+	static void __free__(void* const ptr)
+	{
+		return ndMemory::Free(ptr);
+	}
 
 	void *TiXmlString::operator new (size_t size)
 	{

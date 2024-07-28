@@ -22,6 +22,8 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
+#include "ndCoreStdafx.h"
+#include "ndMemory.h"
 #include <ctype.h>
 
 #ifdef TIXML_USE_STL
@@ -34,10 +36,20 @@ distribution.
 namespace nd
 {
 
-	void SetXmlMemoryFunctions(xmlAlloc allocMemory, xmlFree freeMemory)
+	//void SetXmlMemoryFunctions(xmlAlloc allocMemory, xmlFree freeMemory)
+	//{
+	//	__alloc__ = allocMemory;
+	//	__free__ = freeMemory;
+	//}
+
+	static void* __alloc__(size_t size)
 	{
-		__alloc__ = allocMemory;
-		__free__ = freeMemory;
+		return ndMemory::Malloc(size);
+	}
+
+	static void __free__(void* const ptr)
+	{
+		return ndMemory::Free(ptr);
 	}
 
 	void *TiXmlVisitor::operator new (size_t size)
