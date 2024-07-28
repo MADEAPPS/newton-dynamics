@@ -1057,7 +1057,7 @@ namespace ndQuadruped_3
 			// L2 distance
 			ndFloat32 dist2 = x * x + z * z;
 			//ndFloat32 reward = ndExp(-25.0f * dist2);
-			ndFloat32 reward = ndExp(-50.0f * dist2);
+			ndFloat32 reward = ndExp(-20.0f * dist2);
 
 			//if (m_id == 0)
 			//{
