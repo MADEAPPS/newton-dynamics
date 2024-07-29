@@ -397,8 +397,8 @@ void ndUrdfFile::LoadLinks(const nd::TiXmlElement* const rootNode, const ndTree<
 		const nd::TiXmlElement* const linkNode = (nd::TiXmlElement*)node;
 		const char* const name = linkNode->Attribute("name");
 
-		ndBodyDynamic* xxx = nullptr;
-		bodyMap.Insert(xxx, name);
+		ndBodyDynamic* const body = CreateBody(linkNode, materials);
+		bodyMap.Insert(body, name);
 	}
 }
 
@@ -413,4 +413,40 @@ void ndUrdfFile::LoadJoints(const nd::TiXmlElement* const rootNode, const ndTree
 
 		joints.Insert(xxx, name);
 	}
+}
+
+ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const rootNode, const ndTree<Material, ndString>& materials)
+{
+	//ndPhysicsWorld* const world = scene->GetWorld();
+	//ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
+	//ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, textName, textName, textName));
+
+	ndBodyDynamic* const body = new ndBodyDynamic();
+
+	ndArray<const nd::TiXmlNode*> collisions;
+	for (const nd::TiXmlNode* node = rootNode->FirstChild("collision"); node; node = node->NextSibling("collision"))
+	{
+		collisions.PushBack((nd::TiXmlElement*)node);
+	}
+	if (collisions.GetCount() == 1)
+	{
+		//ndAssert(0);
+	}
+	else
+	{
+		ndAssert(0);
+	}
+
+	//ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	//entity->SetMesh(mesh);
+	//ndBodyKinematic* const kinBody = body->GetAsBodyKinematic();
+	//kinBody->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	//kinBody->SetMatrix(matrix);
+	//kinBody->SetCollisionShape(shape);
+	//kinBody->SetMassMatrix(mass, shape);
+	//world->AddBody(body);
+	//scene->AddEntity(entity);
+	//return kinBody;
+
+	return body;
 }
