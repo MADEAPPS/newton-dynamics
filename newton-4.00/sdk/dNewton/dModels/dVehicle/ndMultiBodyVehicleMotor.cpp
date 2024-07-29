@@ -21,9 +21,9 @@
 
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointWheel.h"
 #include "ndBodyDynamic.h"
 #include "ndMultiBodyVehicle.h"
+#include "dJoints/ndJointWheel.h"
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 

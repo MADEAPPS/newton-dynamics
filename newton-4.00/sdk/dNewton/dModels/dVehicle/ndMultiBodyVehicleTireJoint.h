@@ -13,7 +13,7 @@
 #define __ND_MULTIBODY_VEHICLE_TIRE_JOINT_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndJointWheel.h"
+#include "dJoints/ndJointWheel.h"
 
 class ndTireFrictionModel
 {

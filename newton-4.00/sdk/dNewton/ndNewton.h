@@ -33,34 +33,21 @@
 #include <ndUrdfFile.h>
 #include <ndIkSolver.h>
 #include <ndModelList.h>
-#include <ndJointGear.h>
 #include <ndJointList.h>
 #include <ndWorldScene.h>
 #include <ndConstraint.h>
-#include <ndJointHinge.h>
-#include <ndJointPlane.h>
 #include <ndBodyNotify.h>
-#include <ndJointWheel.h>
-#include <ndJointRoller.h>
-#include <ndJointSlider.h>
-#include <ndJointPulley.h>
 #include <ndBodyDynamic.h>
 #include <ndIkJointHinge.h>
 #include <ndContactArray.h>
-#include <ndJointFix6dof.h>
+
 #include <ndBodySphFluid.h>
 #include <ndSkeletonList.h>
 #include <ndBodyKinematic.h>
 #include <ndContactSolver.h>
-#include <ndJointCylinder.h>
-#include <ndJointUpVector.h>
 #include <ndIk6DofEffector.h>
-#include <ndJointSpherical.h>
 #include <ndDynamicsUpdate.h>
-#include <ndJointFollowPath.h>
 #include <ndIkJointSpherical.h>
-#include <ndJointDoubleHinge.h>
-#include <ndJointFixDistance.h>
 #include <ndMultiBodyVehicle.h>
 #include <ndModelArticulation.h>
 #include <ndSkeletonContainer.h>
@@ -68,13 +55,28 @@
 #include <ndIkJointDoubleHinge.h>
 #include <ndMultiBodyVehicleMotor.h>
 #include <ndMultiBodyVehicleGearBox.h>
-#include <ndJointDryRollingFriction.h>
 #include <ndIkSwivelPositionEffector.h>
-#include <ndJointKinematicController.h>
 #include <ndMultiBodyVehicleTireJoint.h>
 #include <ndMultiBodyVehicleTorsionBar.h>
 #include <ndMultiBodyVehicleDifferential.h>
 #include <ndMultiBodyVehicleDifferentialAxle.h>
+
+#include <dJoints/ndJointGear.h>
+#include <dJoints/ndJointHinge.h>
+#include <dJoints/ndJointPlane.h>
+#include <dJoints/ndJointWheel.h>
+#include <dJoints/ndJointRoller.h>
+#include <dJoints/ndJointSlider.h>
+#include <dJoints/ndJointPulley.h>
+#include <dJoints/ndJointFix6dof.h>
+#include <dJoints/ndJointCylinder.h>
+#include <dJoints/ndJointUpVector.h>
+#include <dJoints/ndJointSpherical.h>
+#include <dJoints/ndJointFollowPath.h>
+#include <dJoints/ndJointDoubleHinge.h>
+#include <dJoints/ndJointFixDistance.h>
+#include <dJoints/ndJointDryRollingFriction.h>
+#include <dJoints/ndJointKinematicController.h>
 
 #endif 
 

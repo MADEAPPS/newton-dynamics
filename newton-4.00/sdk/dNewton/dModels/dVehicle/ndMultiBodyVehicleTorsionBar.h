@@ -23,7 +23,7 @@
 #define __ND_MULTIBODY_VEHICLE_TORSION_BAR_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndJointGear.h"
+#include "dJoints/ndJointGear.h"
 
 class ndMultiBodyVehicle;
 

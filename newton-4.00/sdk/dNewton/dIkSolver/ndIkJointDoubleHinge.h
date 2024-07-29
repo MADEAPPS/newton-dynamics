@@ -13,7 +13,7 @@
 #define __ND_IK_DOUBLE_JOINT_HINGE_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndJointDoubleHinge.h"
+#include "dJoints/ndJointDoubleHinge.h"
 
 class ndIkJointDoubleHinge: public ndJointDoubleHinge, public ndJointBilateralConstraint::ndIkInterface
 {

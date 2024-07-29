@@ -23,7 +23,7 @@
 #define __ND_MULTIBODY_VEHICLE_GEAR_BOX_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndJointGear.h"
+#include "dJoints/ndJointGear.h"
 
 class ndMultiBodyVehicle;
 

@@ -13,7 +13,7 @@
 #define __ND_IK_JOINT_SPHERICAL_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndJointSpherical.h"
+#include "dJoints/ndJointSpherical.h"
 
 class ndIkJointSpherical: public ndJointSpherical, public ndJointBilateralConstraint::ndIkInterface
 {
