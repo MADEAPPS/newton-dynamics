@@ -12,6 +12,7 @@
 #ifndef _ND_FBX_MESH_LOADER_H_
 #define _ND_FBX_MESH_LOADER_H_
 
+#include "ndMesh.h"
 class ndAnimationSequence;
 
 using namespace ofbx;

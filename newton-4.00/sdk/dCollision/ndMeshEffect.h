@@ -492,20 +492,20 @@ class ndMeshEffect: public ndPolyhedra
 
 	D_COLLISION_API virtual ~ndMeshEffect();
 
-	void SetName (const ndString& name);
-	const ndString& GetName() const;
+	D_COLLISION_API void SetName (const ndString& name);
+	D_COLLISION_API const ndString& GetName() const;
 
-	ndArray<ndMaterial>& GetMaterials();
-	ndInt32 GetPropertiesCount() const;
+	D_COLLISION_API ndArray<ndMaterial>& GetMaterials();
+	D_COLLISION_API ndInt32 GetPropertiesCount() const;
 
-	ndInt32 GetVertexCount() const;
-	ndInt32 GetVertexStrideInByte() const;
-	const ndFloat64* GetVertexPool() const;
+	D_COLLISION_API ndInt32 GetVertexCount() const;
+	D_COLLISION_API ndInt32 GetVertexStrideInByte() const;
+	D_COLLISION_API const ndFloat64* GetVertexPool() const;
 
-	ndInt32 GetFaceMaterial(ndEdge* const faceEdge) const;
-	ndInt32 GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<ndUnsigned8>& buffer) const;
+	D_COLLISION_API ndInt32 GetFaceMaterial(ndEdge* const faceEdge) const;
+	D_COLLISION_API ndInt32 GenerateVertexFormat(ndMeshVertexFormat& format, ndArray<ndUnsigned8>& buffer) const;
 
-	ndArray<ndVertexWeight>& GetVertexWeights();
+	D_COLLISION_API ndArray<ndVertexWeight>& GetVertexWeights();
 	D_COLLISION_API ndFloat64 CalculateVolume() const;
 	D_COLLISION_API ndMatrix CalculateOOBB(ndBigVector& size) const;
 	D_COLLISION_API void CalculateAABB(ndBigVector& min, ndBigVector& max) const;
@@ -552,8 +552,8 @@ class ndMeshEffect: public ndPolyhedra
 	D_COLLISION_API void BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const ndMatrix& textureMatrix);
 	D_COLLISION_API void RepairTJoints();
 
-	ndMeshEffect* GetFirstLayer();
-	ndMeshEffect* GetNextLayer(ndMeshEffect* const layer);
+	D_COLLISION_API ndMeshEffect* GetFirstLayer();
+	D_COLLISION_API ndMeshEffect* GetNextLayer(ndMeshEffect* const layer);
 	
 	D_COLLISION_API void FlipWinding();
 	D_COLLISION_API bool HasOpenEdges() const;

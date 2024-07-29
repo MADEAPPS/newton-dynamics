@@ -48,32 +48,32 @@ class ndMesh : public ndNodeHierarchy<ndMesh>
 		ndReal m_lenght;
 	};
 
-	D_COLLISION_API ndMesh(ndMesh* const parent);
-	D_COLLISION_API ndMesh(const ndMesh& src);
+	ndMesh(ndMesh* const parent);
+	ndMesh(const ndMesh& src);
 
-	D_COLLISION_API ~ndMesh();
-	D_COLLISION_API ndMesh* CreateClone() const;
+	~ndMesh();
+	ndMesh* CreateClone() const;
 
-	D_COLLISION_API ndSharedPtr<ndMeshEffect>& GetMesh();
-	D_COLLISION_API const ndSharedPtr<ndMeshEffect>& GetMesh() const;
-	D_COLLISION_API void SetMesh(const ndSharedPtr<ndMeshEffect>& mesh);
+	ndSharedPtr<ndMeshEffect>& GetMesh();
+	const ndSharedPtr<ndMeshEffect>& GetMesh() const;
+	void SetMesh(const ndSharedPtr<ndMeshEffect>& mesh);
 
-	D_COLLISION_API const ndString& GetName() const;
-	D_COLLISION_API void SetName(const ndString& name);
+	const ndString& GetName() const;
+	void SetName(const ndString& name);
 
-	D_COLLISION_API ndCurve& GetScaleCurve();
-	D_COLLISION_API ndCurve& GetPositCurve();
-	D_COLLISION_API ndCurve& GetRotationCurve();
+	ndCurve& GetScaleCurve();
+	ndCurve& GetPositCurve();
+	ndCurve& GetRotationCurve();
 
-	D_COLLISION_API const ndCurve& GetScaleCurve() const;
-	D_COLLISION_API const ndCurve& GetPositCurve() const;
-	D_COLLISION_API const ndCurve& GetRotationCurve() const;
+	const ndCurve& GetScaleCurve() const;
+	const ndCurve& GetPositCurve() const;
+	const ndCurve& GetRotationCurve() const;
 
-	D_COLLISION_API void ApplyTransform(const ndMatrix& transform);
-	D_COLLISION_API ndMatrix CalculateGlobalMatrix(ndMesh* const parent = nullptr) const;
+	void ApplyTransform(const ndMatrix& transform);
+	ndMatrix CalculateGlobalMatrix(ndMesh* const parent = nullptr) const;
 
-	D_COLLISION_API static ndMesh* Load(const char* const fullPathName);
-	D_COLLISION_API static void Save(const ndMesh* const mesh, const char* const fullPathName);
+	static ndMesh* Load(const char* const fullPathName);
+	static void Save(const ndMesh* const mesh, const char* const fullPathName);
 
 	ndMatrix m_matrix;
 	ndMatrix m_meshMatrix;

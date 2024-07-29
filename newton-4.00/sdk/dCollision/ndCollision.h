@@ -29,7 +29,6 @@
 
 #include <ndCore.h>
 #include <ndCollisionStdafx.h>
-#include <ndMesh.h>
 #include <ndBody.h>
 #include <ndScene.h>
 #include <ndShape.h>
