@@ -22,10 +22,10 @@
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
-#include "ndIkSolver.h"
 #include "ndBodyDynamic.h"
 #include "ndDynamicsUpdate.h"
 #include "ndSkeletonContainer.h"
+#include "dIkSolver/ndIkSolver.h"
 #include "ndJointBilateralConstraint.h"
 
 #define D_MAX_SKELETON_LCP_VALUE (D_LCP_MAX_VALUE * ndFloat32 (0.25f))

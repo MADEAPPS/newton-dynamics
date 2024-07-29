@@ -29,37 +29,19 @@
 
 #include <ndNewtonStdafx.h>
 #include <ndWorld.h>
-#include <ndModel.h>
-#include <ndUrdfFile.h>
-#include <ndIkSolver.h>
-#include <ndModelList.h>
 #include <ndJointList.h>
 #include <ndWorldScene.h>
 #include <ndConstraint.h>
 #include <ndBodyNotify.h>
 #include <ndBodyDynamic.h>
-#include <ndIkJointHinge.h>
 #include <ndContactArray.h>
-
 #include <ndBodySphFluid.h>
 #include <ndSkeletonList.h>
 #include <ndBodyKinematic.h>
 #include <ndContactSolver.h>
-#include <ndIk6DofEffector.h>
 #include <ndDynamicsUpdate.h>
-#include <ndIkJointSpherical.h>
-#include <ndMultiBodyVehicle.h>
-#include <ndModelArticulation.h>
 #include <ndSkeletonContainer.h>
 #include <ndDynamicsUpdateSoa.h>
-#include <ndIkJointDoubleHinge.h>
-#include <ndMultiBodyVehicleMotor.h>
-#include <ndMultiBodyVehicleGearBox.h>
-#include <ndIkSwivelPositionEffector.h>
-#include <ndMultiBodyVehicleTireJoint.h>
-#include <ndMultiBodyVehicleTorsionBar.h>
-#include <ndMultiBodyVehicleDifferential.h>
-#include <ndMultiBodyVehicleDifferentialAxle.h>
 
 #include <dJoints/ndJointGear.h>
 #include <dJoints/ndJointHinge.h>
@@ -77,6 +59,25 @@
 #include <dJoints/ndJointFixDistance.h>
 #include <dJoints/ndJointDryRollingFriction.h>
 #include <dJoints/ndJointKinematicController.h>
+
+#include <dIkSolver/ndIkSolver.h>
+#include <dIkSolver/ndIkJointHinge.h>
+#include <dIkSolver/ndIk6DofEffector.h>
+#include <dIkSolver/ndIkJointSpherical.h>
+#include <dIkSolver/ndIkJointDoubleHinge.h>
+#include <dIkSolver/ndIkSwivelPositionEffector.h>
+
+#include <dModels/ndModel.h>
+#include <dModels/ndUrdfFile.h>
+#include <dModels/ndModelList.h>
+#include <dModels/ndModelArticulation.h>
+#include <dModels/dVehicle/ndMultiBodyVehicle.h>
+#include <dModels/dVehicle/ndMultiBodyVehicleMotor.h>
+#include <dModels/dVehicle/ndMultiBodyVehicleGearBox.h>
+#include <dModels/dVehicle/ndMultiBodyVehicleTireJoint.h>
+#include <dModels/dVehicle/ndMultiBodyVehicleTorsionBar.h>
+#include <dModels/dVehicle/ndMultiBodyVehicleDifferential.h>
+#include <dModels/dVehicle/ndMultiBodyVehicleDifferentialAxle.h>
 
 #endif 
 

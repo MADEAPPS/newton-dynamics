@@ -23,9 +23,9 @@
 #define __ND_WORLD_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndModelList.h"
 #include "ndJointList.h"
 #include "ndSkeletonList.h"
+#include "dModels/ndModelList.h"
 
 class ndWorld;
 class ndModel;

@@ -21,12 +21,12 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainGpuContext.h"
-#include "ndBrainGpuCommand.h"
-#include "ndBrainGpuFloatBuffer.h"
+#include "gpu/ndBrainGpuContext.h"
+#include "gpu/ndBrainGpuCommand.h"
 #include "ndBrainLayerActivation.h"
-#include "ndBrainGpuIntegerBuffer.h"
-#include "ndBrainGpuUniformBuffer.h"
+#include "gpu/ndBrainGpuFloatBuffer.h"
+#include "gpu/ndBrainGpuIntegerBuffer.h"
+#include "gpu/ndBrainGpuUniformBuffer.h"
 
 ndBrainLayerActivation::ndBrainLayerActivation(ndInt32 neurons)
 	:ndBrainLayer()

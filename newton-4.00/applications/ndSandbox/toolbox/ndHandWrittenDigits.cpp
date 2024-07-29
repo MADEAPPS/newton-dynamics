@@ -11,8 +11,6 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
-#include "ndBrainGpuBuffer.h"
-#include "ndBrainGpuContext.h"
 
 static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 {

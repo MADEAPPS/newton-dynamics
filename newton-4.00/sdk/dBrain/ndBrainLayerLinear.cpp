@@ -21,13 +21,13 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainGpuBuffer.h"
-#include "ndBrainGpuCommand.h"
-#include "ndBrainGpuContext.h"
 #include "ndBrainLayerLinear.h"
-#include "ndBrainGpuFloatBuffer.h"
-#include "ndBrainGpuIntegerBuffer.h"
-#include "ndBrainGpuUniformBuffer.h"
+#include "gpu/ndBrainGpuBuffer.h"
+#include "gpu/ndBrainGpuCommand.h"
+#include "gpu/ndBrainGpuContext.h"
+#include "gpu/ndBrainGpuFloatBuffer.h"
+#include "gpu/ndBrainGpuIntegerBuffer.h"
+#include "gpu/ndBrainGpuUniformBuffer.h"
 
 #define D_USE_GPU_TILED_MATRIX
 

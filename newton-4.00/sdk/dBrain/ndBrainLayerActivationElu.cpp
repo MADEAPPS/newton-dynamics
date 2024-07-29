@@ -20,8 +20,8 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainGpuBuffer.h"
-#include "ndBrainGpuContext.h"
+#include "gpu/ndBrainGpuBuffer.h"
+#include "gpu/ndBrainGpuContext.h"
 #include "ndBrainLayerActivationElu.h"
 
 ndBrainLayerActivationElu::ndBrainLayerActivationElu(ndInt32 neurons)

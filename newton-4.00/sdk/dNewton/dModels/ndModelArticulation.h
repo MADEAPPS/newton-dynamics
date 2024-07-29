@@ -25,7 +25,7 @@
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndModel.h"
-#include "ndIkSolver.h"
+#include "dIkSolver/ndIkSolver.h"
 
 class ndModelArticulation: public ndModel
 {

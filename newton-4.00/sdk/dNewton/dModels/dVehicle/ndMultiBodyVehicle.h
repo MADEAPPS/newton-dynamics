@@ -23,8 +23,8 @@
 #define __ND_MULTIBODY_VEHICLE_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndModel.h"
-#include "ndIkSolver.h"
+#include "dModels/ndModel.h"
+#include "dIkSolver/ndIkSolver.h"
 
 class ndWorld;
 class ndMultiBodyVehicleMotor;

@@ -22,7 +22,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainFloat4.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainGpuContext.h"
+#include "gpu/ndBrainGpuContext.h"
 #include "ndBrainLayerActivationRelu.h"
 
 ndBrainLayerActivationRelu::ndBrainLayerActivationRelu(ndInt32 neurons)

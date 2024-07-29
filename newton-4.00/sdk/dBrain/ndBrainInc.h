@@ -23,7 +23,6 @@
 #define _ND_BRAIN_INC_H__
 
 #include <ndBrainStdafx.h>
-
 #include <ndBrain.h>
 #include <ndBrainLoss.h>
 #include <ndBrainAgent.h>
@@ -36,21 +35,13 @@
 #include <ndBrainAgentDQN.h>
 #include <ndBrainAgentDDPG.h>
 #include <ndBrainOptimizer.h>
-#include <ndBrainGpuBuffer.h>
 #include <ndBrainThreadPool.h>
-#include <ndBrainGpuCommand.h>
-#include <ndBrainGpuContext.h>
 #include <ndBrainLayerLinear.h>
-#include <ndBrainGpuInference.h>
 #include <ndBrainReplayBuffer.h>
 #include <ndBrainOptimizerSgd.h>
 #include <ndBrainOptimizerAdam.h>
-#include <ndBrainGpuFloatBuffer.h>
 #include <ndBrainLayerActivation.h>
-#include <ndBrainGpuIntegerBuffer.h>
-#include <ndBrainGpuUniformBuffer.h>
 #include <ndBrainAgentDQN_Trainer.h>
-#include <ndBrainGpuScopeMapBuffer.h>
 #include <ndBrainAgentDDPG_Trainer.h>
 #include <ndBrainLayerImagePadding.h>
 #include <ndBrainLayerActivationElu.h>
@@ -71,6 +62,15 @@
 #include <ndBrainLayerActivationCategoricalSoftmax.h>
 #include <ndBrainAgentDiscretePolicyGradient_Trainer.h>
 #include <ndBrainAgentContinuePolicyGradient_Trainer.h>
+
+#include <gpu/ndBrainGpuBuffer.h>
+#include <gpu/ndBrainGpuCommand.h>
+#include <gpu/ndBrainGpuContext.h>
+#include <gpu/ndBrainGpuInference.h>
+#include <gpu/ndBrainGpuFloatBuffer.h>
+#include <gpu/ndBrainGpuIntegerBuffer.h>
+#include <gpu/ndBrainGpuUniformBuffer.h>
+#include <gpu/ndBrainGpuScopeMapBuffer.h>
 
 #endif 
 

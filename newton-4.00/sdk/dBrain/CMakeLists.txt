@@ -14,7 +14,6 @@ set (projectName "ndBrain")
 message (${projectName})
 
 include_directories(.)
-include_directories(gpu)
 include_directories(../dCore)
 include_directories(../../thirdParty/png)
 

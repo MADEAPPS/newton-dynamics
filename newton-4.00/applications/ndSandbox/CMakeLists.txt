@@ -33,12 +33,8 @@ include_directories(../../sdk/dModel)
 include_directories(../../sdk/dNewton)
 include_directories(../../sdk/dCollision)
 include_directories(../../sdk/dFileFormat)
-include_directories(../../sdk/dNewton/dModels)
-include_directories(../../sdk/dNewton/dIkSolver)
-include_directories(../../sdk/dNewton/dModels/dVehicle)
 
 include_directories(../../sdk/dBrain)
-include_directories(../../sdk/dBrain/gpu)
 
 include_directories(../../thirdParty/png/)
 include_directories(../../thirdParty/glfw/)
