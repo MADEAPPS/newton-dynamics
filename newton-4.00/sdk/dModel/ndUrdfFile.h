@@ -12,8 +12,6 @@
 #ifndef _ND_URDF_FILE_H_
 #define _ND_URDF_FILE_H_
 
-#include "ndModelArticulation.h"
-
 class ndModelArticulation;
 class ndUrdfFile : public ndClassAlloc
 {

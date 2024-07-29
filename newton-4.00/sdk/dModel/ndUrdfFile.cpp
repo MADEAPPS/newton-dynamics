@@ -9,10 +9,8 @@
 * freely
 */
 
-#include "ndCoreStdafx.h"
-#include "ndNewtonStdafx.h"
+#include "ndModelStdafx.h"
 #include "ndUrdfFile.h"
-
 
 ndUrdfFile::ndUrdfFile()
 	:ndClassAlloc()
@@ -23,12 +21,6 @@ ndUrdfFile::~ndUrdfFile()
 {
 }
 
-//ndModelArticulation* ndUrdfFile::Import(const char* const fileName)
-ndModelArticulation* ndUrdfFile::Import(const char* const)
-{
-	ndAssert(0);
-	return nullptr;
-}
 
 void ndUrdfFile::Export(const char* const filePathName, ndModelArticulation* const model)
 {
@@ -354,4 +346,27 @@ void ndUrdfFile::AddJoint(nd::TiXmlElement* const joint, const ndModelArticulati
 	nd::TiXmlElement* const parent = new nd::TiXmlElement("parent");
 	joint->LinkEndChild(parent);
 	parent->SetAttribute("link", link->GetParent()->m_name.GetStr());
+}
+
+
+//ndModelArticulation* ndUrdfFile::Import(const char* const fileName)
+ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
+{
+	ndAssert(strstr(filePathName, ".urdf"));
+
+	ndString oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+
+	nd::TiXmlDocument doc(filePathName);
+	doc.LoadFile();
+	if (doc.Error())
+	{
+		setlocale(LC_ALL, oldloc.GetStr());
+		return nullptr;
+	}
+
+	const nd::TiXmlElement* const rootNode = doc.RootElement();
+
+	setlocale(LC_ALL, oldloc.GetStr());
+	return nullptr;
 }

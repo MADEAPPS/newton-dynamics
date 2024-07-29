@@ -403,9 +403,13 @@ namespace ndUnicycle
 		ndSharedPtr<ndJointBilateralConstraint> planeJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
 		world->AddJoint(planeJoint);
 
+
 		char fileName[256];
-		ndGetWorkingFileName("unicycle.urdf", fileName);
-		articulation->SaveUrdf(fileName);
+		ndGetWorkingFileName("r2d2.urdf", fileName);
+
+		ndUrdfFile urdf;
+		ndSharedPtr<ndModel> xxxx(urdf.Import(fileName));
+		urdf.Export(fileName, articulation);
 
 		scene->SetAcceleratedUpdate();
 		return model;

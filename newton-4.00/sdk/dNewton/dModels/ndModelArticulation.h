@@ -60,9 +60,6 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API const ndString& GetName() const;
 	D_NEWTON_API void SetName(ndString& name);
 
-	D_NEWTON_API virtual void SaveUrdf(const char* const fileName);
-	D_NEWTON_API static ndModelArticulation* LoadUrdf(const char* const fileName);
-
 	protected:
 	ndNode* m_rootNode;
 	ndIkSolver m_invDynamicsSolver;

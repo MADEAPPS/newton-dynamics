@@ -23,7 +23,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndModel.h"
-#include "ndUrdfFile.h"
 #include "ndModelArticulation.h"
 
 ndModelArticulation::ndNode::ndNode(const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint, ndNode* const parent)
@@ -209,16 +208,4 @@ void ndModelArticulation::AddCloseLoop(const ndSharedPtr<ndJointBilateralConstra
 	}
 
 	m_closeLoops.Append(joint);
-}
-
-ndModelArticulation* ndModelArticulation::LoadUrdf(const char* const fileName)
-{
-	ndUrdfFile importer;
-	return importer.Import(fileName);
-}
-
-void ndModelArticulation::SaveUrdf(const char* const fileName)
-{
-	ndUrdfFile exporter;
-	exporter.Export(fileName, this);
 }

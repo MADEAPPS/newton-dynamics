@@ -1368,7 +1368,7 @@ namespace ndQuadruped_3
 			world->AddModel(visualModel);
 			SetMaterial(visualModel);
 
-			visualModel->GetAsModelArticulation()->SaveUrdf("xxxxxx");
+			//visualModel->GetAsModelArticulation()->SaveUrdf("xxxxxx");
 
 			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, visualModel));
 			scene->Set2DDisplayRenderFunction(quadrupedUI);

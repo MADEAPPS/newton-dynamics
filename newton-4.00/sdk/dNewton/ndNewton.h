@@ -68,7 +68,6 @@
 #include <dIkSolver/ndIkSwivelPositionEffector.h>
 
 #include <dModels/ndModel.h>
-#include <dModels/ndUrdfFile.h>
 #include <dModels/ndModelList.h>
 #include <dModels/ndModelArticulation.h>
 #include <dModels/dVehicle/ndMultiBodyVehicle.h>
