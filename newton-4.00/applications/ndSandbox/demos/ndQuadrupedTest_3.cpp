@@ -1057,7 +1057,7 @@ namespace ndQuadruped_3
 			// L2 distance
 			ndFloat32 dist2 = x * x + z * z;
 			//ndFloat32 reward = ndExp(-25.0f * dist2);
-			ndFloat32 reward = ndExp(-20.0f * dist2);
+			ndFloat32 reward = ndExp(-3.0f * dist2);
 
 			//if (m_id == 0)
 			//{
@@ -1080,7 +1080,7 @@ namespace ndQuadruped_3
 				dstReward = 0.0f;
 				zmpReward = 0.0f;
 			}
-			ndBrainFloat reward = 0.60f * zmpReward + 0.40f * dstReward;
+			ndBrainFloat reward = 0.90f * zmpReward + 0.10f * dstReward;
 			return reward;
 		}
 
@@ -1318,7 +1318,7 @@ namespace ndQuadruped_3
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_discountFactor(0.995f)
+			,m_discountFactor(0.992f)
 			,m_horizon(ndFloat32(0.99f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
 			,m_stopTraining(1000 * 1000000)
@@ -1494,7 +1494,7 @@ namespace ndQuadruped_3
 
 				if (episodeCount && !m_master->IsSampling())
 				{
-					ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
+					ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
 					if (m_outFile)
 					{
 						fprintf(m_outFile, "%g\n", m_master->GetAverageScore());
