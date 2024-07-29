@@ -12,6 +12,8 @@
 #ifndef _ND_URDF_FILE_H_
 #define _ND_URDF_FILE_H_
 
+#include "ndModelArticulation.h"
+
 class ndModelArticulation;
 class ndUrdfFile : public ndClassAlloc
 {
@@ -26,6 +28,17 @@ class ndUrdfFile : public ndClassAlloc
 	void CheckUniqueNames(ndModelArticulation* const model);
 	void AddLinks(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
 	void AddJoints(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
+
+	void AddMaterials(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
+	void AddLink(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
+	void AddJoint(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
+
+	void AddInertia(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
+	void AddGeometry(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
+	void AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
+
+	void AddPose(nd::TiXmlElement* const linkNode, const ndMatrix& pose);
+	void AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndShapeInstance& collision);
 };
 
 
