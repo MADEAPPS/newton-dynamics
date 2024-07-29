@@ -409,6 +409,8 @@ namespace ndUnicycle
 
 		ndUrdfFile urdf;
 		ndSharedPtr<ndModel> xxxx(urdf.Import(fileName));
+
+		ndGetWorkingFileName("unicycle.urdf", fileName);
 		urdf.Export(fileName, articulation);
 
 		scene->SetAcceleratedUpdate();

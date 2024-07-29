@@ -348,7 +348,6 @@ void ndUrdfFile::AddJoint(nd::TiXmlElement* const joint, const ndModelArticulati
 	parent->SetAttribute("link", link->GetParent()->m_name.GetStr());
 }
 
-
 //ndModelArticulation* ndUrdfFile::Import(const char* const fileName)
 ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 {
@@ -367,6 +366,51 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 
 	const nd::TiXmlElement* const rootNode = doc.RootElement();
 
+	ndTree<Material, ndString> materials;
+	ndTree<ndBodyDynamic*, ndString> bodies;
+	ndTree<ndJointBilateralConstraint*, ndString> joints;
+
+	LoadMaterials(rootNode, materials);
+	LoadLinks(rootNode, materials, bodies);
+	LoadJoints(rootNode, bodies, joints);
+
 	setlocale(LC_ALL, oldloc.GetStr());
 	return nullptr;
+}
+
+void ndUrdfFile::LoadMaterials(const nd::TiXmlElement* const rootNode, ndTree<Material, ndString>& materials)
+{
+	for (const nd::TiXmlNode* node = rootNode->FirstChild("material"); node; node = node->NextSibling("material"))
+	{
+		Material material;
+
+		const nd::TiXmlElement* const materialNode = (nd::TiXmlElement*)node;
+		const char* const name = materialNode->Attribute("name");
+		materials.Insert(material, name);
+	}
+}
+
+void ndUrdfFile::LoadLinks(const nd::TiXmlElement* const rootNode, const ndTree<Material, ndString>& materials, ndTree<ndBodyDynamic*, ndString>& bodyMap)
+{
+	for (const nd::TiXmlNode* node = rootNode->FirstChild("link"); node; node = node->NextSibling("link"))
+	{
+		const nd::TiXmlElement* const linkNode = (nd::TiXmlElement*)node;
+		const char* const name = linkNode->Attribute("name");
+
+		ndBodyDynamic* xxx = nullptr;
+		bodyMap.Insert(xxx, name);
+	}
+}
+
+void ndUrdfFile::LoadJoints(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& joints)
+{
+	for (const nd::TiXmlNode* node = rootNode->FirstChild("joint"); node; node = node->NextSibling("joint"))
+	{
+		const nd::TiXmlElement* const linkNode = (nd::TiXmlElement*)node;
+		const char* const name = linkNode->Attribute("name");
+
+		ndJointBilateralConstraint* xxx = nullptr;
+
+		joints.Insert(xxx, name);
+	}
 }
