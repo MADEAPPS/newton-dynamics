@@ -16,7 +16,6 @@ message (${projectName})
 include_directories(.)
 include_directories(gpu)
 include_directories(../dCore)
-include_directories(../dCore/tinyxml)
 include_directories(../../thirdParty/png)
 
 if(NEWTON_ENABLE_VULKAN_SDK)

@@ -1337,6 +1337,17 @@ namespace ndQuadruped_3
 			//ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
+			//float xxxx = 0;
+			//int xxx = 0;
+			//float gama = 0.997;
+			//float sum = .99 / (1.0 - gama);
+			//while (xxxx < sum)
+			//{
+			//	xxx++;
+			//	xxxx = (1.0 + gama * xxxx);
+			//}
+
+
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_randomSeed = 147;
 			hyperParameters.m_bashTrajectoryCount = 500;

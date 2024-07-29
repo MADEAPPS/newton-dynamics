@@ -7,7 +7,6 @@ project(newton_tests)
 
 include_directories(../sdk/dCore)
 include_directories(../sdk/dNewton)
-include_directories(../sdk/dTinyxml)
 include_directories(../sdk/dCollision)
 include_directories(../sdk/dNewton/dJoints)
 include_directories(../sdk/dNewton/dModels)

@@ -32,15 +32,6 @@ ndModelArticulation* ndUrdfFile::Import(const char* const)
 
 void ndUrdfFile::Export(const char* const filePathName, ndModelArticulation* const model)
 {
-	//float xxxx = 0;
-	//int xxx = 0;
-	//float gama = 0.997;
-	//float sum = .99 / (1.0 - gama);
-	//while (xxxx < sum)
-	//{
-	//	xxx++;
-	//	xxxx = (1.0 + gama * xxxx);
-	//}
 	ndAssert(strstr(filePathName, ".urdf"));
 
 	nd::TiXmlDocument* const doc = new nd::TiXmlDocument("");
