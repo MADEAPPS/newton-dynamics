@@ -1318,7 +1318,7 @@ namespace ndQuadruped_3
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_discountFactor(0.992f)
+			,m_discountFactor(0.997f)
 			,m_horizon(ndFloat32(0.99f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
 			,m_stopTraining(1000 * 1000000)
@@ -1338,6 +1338,7 @@ namespace ndQuadruped_3
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
 			//hyperParameters.m_threadsCount = 1;
+			hyperParameters.m_randomSeed = 147;
 			hyperParameters.m_bashTrajectoryCount = 500;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 			//hyperParameters.m_bashTrajectoryCount = 10;
