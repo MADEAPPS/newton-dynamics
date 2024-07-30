@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_MESH_EFFECT_NODE_H__
-#define __ND_MESH_EFFECT_NODE_H__
+#ifndef __ND_MESH_H__
+#define __ND_MESH_H__
 
 #include "ndCollisionStdafx.h"
 #include "ndMeshEffect.h"
@@ -72,15 +72,8 @@ class ndMesh : public ndNodeHierarchy<ndMesh>
 	void ApplyTransform(const ndMatrix& transform);
 	ndMatrix CalculateGlobalMatrix(ndMesh* const parent = nullptr) const;
 
-	static ndMesh* Load(const char* const fullPathName);
-	static void Save(const ndMesh* const mesh, const char* const fullPathName);
-
 	ndMatrix m_matrix;
 	ndMatrix m_meshMatrix;
-
-	private:
-	void Load(FILE* const file, const ndTree<ndSharedPtr<ndMeshEffect>, ndInt32>& meshEffects);
-	void Save(FILE* const file, const ndTree<ndInt32, const ndMeshEffect*>& meshEffects, ndInt32 level = 0) const;
 
 	protected:
 	ndString m_name;
@@ -88,7 +81,8 @@ class ndMesh : public ndNodeHierarchy<ndMesh>
 	ndCurve m_scale;
 	ndCurve m_posit;
 	ndCurve m_rotation;
-};
 
+	friend class ndMeshFile;
+};
 #endif
 
