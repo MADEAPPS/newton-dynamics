@@ -19,7 +19,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndFileFormatStdafx.h"
+#include "ndCoreStdafx.h"
 #include "ndTinyXmlGlue.h"
 
 static char* FloatToString(char* const buffer, ndFloat32 value)

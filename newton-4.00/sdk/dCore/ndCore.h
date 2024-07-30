@@ -75,6 +75,7 @@
 #include <ndConjugateGradient.h>
 #include <ndPolygonSoupBuilder.h>
 #include <ndPolygonSoupDatabase.h>
+#include <tinyxml/ndTinyXmlGlue.h>
 #include <ndThreadBackgroundWorker.h>
 #include <ndPolyhedraMassProperties.h>
 #include <ndDelaunayTetrahedralization.h>

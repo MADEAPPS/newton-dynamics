@@ -23,7 +23,6 @@
 #define _ND_FILE_FORMAT_REGISTRY_H__
 
 #include "ndFileFormatStdafx.h"
-#include "ndTinyXmlGlue.h"
 
 class ndFileFormatSave;
 

@@ -427,9 +427,6 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const rootNode, co
 
 	auto GetCollisionShape = [](const nd::TiXmlNode* const node)
 	{
-	//	ndInt32 error = 0;
-	//	error = fscanf(file, "%s", token);
-
 		const nd::TiXmlNode* const geometryNode = node->FirstChild("geometry");
 		const nd::TiXmlElement* const shapeNode = (nd::TiXmlElement*)geometryNode->FirstChild();
 		const char* const name = shapeNode->Value();
@@ -486,6 +483,44 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const rootNode, co
 	{
 		ndAssert(0);
 	}
+
+	const nd::TiXmlNode* const inertialNode = rootNode->FirstChild("inertial");
+	const nd::TiXmlElement* const massNode = (nd::TiXmlElement*)inertialNode->FirstChild("mass");
+	const nd::TiXmlElement* const inertiaNode = (nd::TiXmlElement*)inertialNode->FirstChild("inertia");
+	
+	
+	ndFloat64 xx;
+	ndFloat64 xy;
+	ndFloat64 xz;
+	ndFloat64 yy;
+	ndFloat64 yz;
+	ndFloat64 zz;
+	ndFloat64 mass;
+
+	massNode->Attribute("value", &mass);
+	inertiaNode->Attribute("ixx", &xx);
+	inertiaNode->Attribute("ixy", &xy);
+	inertiaNode->Attribute("ixz", &xz);
+	inertiaNode->Attribute("iyy", &yy);
+	inertiaNode->Attribute("iyz", &yz);
+	inertiaNode->Attribute("izz", &zz);
+
+	ndMatrix inetiaMatrix(ndGetIdentityMatrix());
+	inetiaMatrix[0][0] = ndFloat32(xx);
+	inetiaMatrix[1][1] = ndFloat32(yy);
+	inetiaMatrix[2][2] = ndFloat32(zz);
+
+	inetiaMatrix[0][1] = ndFloat32(xy);
+	inetiaMatrix[1][0] = ndFloat32(xy);
+
+	inetiaMatrix[0][2] = ndFloat32(xz);
+	inetiaMatrix[2][0] = ndFloat32(xz);
+
+	inetiaMatrix[1][2] = ndFloat32(yz);
+	inetiaMatrix[2][1] = ndFloat32(yz);
+
+	body->SetCollisionShape(shape);
+	body->SetMassMatrix(mass, inetiaMatrix);
 
 	//ndPhysicsWorld* const world = scene->GetWorld();
 	//ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
