@@ -1334,7 +1334,6 @@ namespace ndQuadruped_3
 			//countX = 0;
 			//countZ = 0;
 
-			//ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
 			//float xxxx = 0;
@@ -1499,7 +1498,7 @@ namespace ndQuadruped_3
 					{
 						m_maxScore = rewardTrajectory;
 						m_bestActor->CopyFrom(*m_master->GetActor());
-						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
+						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
 						m_lastEpisode = m_master->GetEposideCount();
 					}
 				}
