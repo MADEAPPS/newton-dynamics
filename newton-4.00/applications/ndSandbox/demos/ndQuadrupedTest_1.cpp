@@ -886,7 +886,7 @@ namespace ndQuadruped_1
 
 			// L2 distance
 			ndFloat32 dist2 = x * x + z * z;
-			ndFloat32 reward = ndExp(-50.0f * dist2);
+			ndFloat32 reward = ndExp(-10.0f * dist2);
 
 			//if (m_id == 0)
 			//{
@@ -908,7 +908,7 @@ namespace ndQuadruped_1
 				dstReward = 0.0f;
 				zmpReward = 0.0f;
 			}
-			ndBrainFloat reward = 0.60f * zmpReward + 0.40f * dstReward;
+			ndBrainFloat reward = 0.80f * zmpReward + 0.20f * dstReward;
 			return reward;
 		}
 
@@ -1173,7 +1173,7 @@ namespace ndQuadruped_1
 			,m_discountFactor(0.995f)
 			,m_horizon(ndFloat32(0.99f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
-			,m_stopTraining(500 * 1000000)
+			,m_stopTraining(150 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
