@@ -319,7 +319,7 @@ namespace ndCarpole_0
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
 			,m_discountFactor(0.99f)
-			,m_horizon(ndFloat32(0.99f) / (ndFloat32(1.0f) - m_discountFactor))
+			,m_horizon(ndFloat32(0.96f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
 			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
@@ -458,14 +458,14 @@ namespace ndCarpole_0
 					{
 						m_maxScore = rewardTrajectory;
 						m_bestActor->CopyFrom(*m_master->GetActor());
-						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
+						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
 						m_lastEpisode = m_master->GetEposideCount();
 					}
 				}
 			
 				if (episodeCount && !m_master->IsSampling())
 				{
-					ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
+					ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
 					if (m_outFile)
 					{
 						fprintf(m_outFile, "%g\n", m_master->GetAverageScore());

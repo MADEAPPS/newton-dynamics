@@ -417,26 +417,79 @@ void ndUrdfFile::LoadJoints(const nd::TiXmlElement* const rootNode, const ndTree
 
 ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const rootNode, const ndTree<Material, ndString>& materials)
 {
-	//ndPhysicsWorld* const world = scene->GetWorld();
-	//ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
-	//ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, textName, textName, textName));
-
 	ndBodyDynamic* const body = new ndBodyDynamic();
 
 	ndArray<const nd::TiXmlNode*> collisions;
 	for (const nd::TiXmlNode* node = rootNode->FirstChild("collision"); node; node = node->NextSibling("collision"))
 	{
-		collisions.PushBack((nd::TiXmlElement*)node);
+		collisions.PushBack(node);
 	}
+
+	auto GetCollisionShape = [](const nd::TiXmlNode* const node)
+	{
+	//	ndInt32 error = 0;
+	//	error = fscanf(file, "%s", token);
+
+		const nd::TiXmlNode* const geometryNode = node->FirstChild("geometry");
+		const nd::TiXmlElement* const shapeNode = (nd::TiXmlElement*)geometryNode->FirstChild();
+		const char* const name = shapeNode->Value();
+
+		ndShape* shape = nullptr;
+		if (strcmp(name, "cylinder") == 0)
+		{
+			ndFloat64 length;
+			ndFloat64 radius;
+			shapeNode->Attribute("length", &length);
+			shapeNode->Attribute("radius", &radius);
+			shape = new ndShapeCylinder(ndFloat32(radius), ndFloat32(radius), ndFloat32(length));
+		}
+		else if (strcmp(name, "box") == 0)
+		{
+			ndFloat32 x;
+			ndFloat32 y;
+			ndFloat32 z;
+			const char* const size = shapeNode->Attribute("size");
+			sscanf(size, "%f %f %f", &x, &y, &z);
+			shape = new ndShapeBox(x, y, z);
+		}
+		else
+		{
+			ndAssert(0);
+			shape = new ndShapeNull();
+		}
+		return shape;
+	};
+
+	ndShapeInstance shape(new ndShapeNull());
 	if (collisions.GetCount() == 1)
 	{
-		//ndAssert(0);
+		const nd::TiXmlNode* const node = collisions[0];
+		shape.SetShape (GetCollisionShape(node));
+		const nd::TiXmlElement* const origin = (nd::TiXmlElement*)node->FirstChild("origin");
+		if (origin)
+		{
+			ndFloat32 x;
+			ndFloat32 y;
+			ndFloat32 z;
+			ndFloat32 pitch;
+			ndFloat32 yaw;
+			ndFloat32 roll;
+
+			const char* const rpy = origin->Attribute("rpy");
+			const char* const xyz = origin->Attribute("xyz");
+			sscanf(xyz, "%f %f %f", &x, &y, &z);
+			sscanf(rpy, "%f %f %f", &roll, &pitch, &yaw);
+
+		}
 	}
 	else
 	{
 		ndAssert(0);
 	}
 
+	//ndPhysicsWorld* const world = scene->GetWorld();
+	//ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
+	//ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, textName, textName, textName));
 	//ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	//entity->SetMesh(mesh);
 	//ndBodyKinematic* const kinBody = body->GetAsBodyKinematic();
