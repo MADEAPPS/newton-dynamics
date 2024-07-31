@@ -272,7 +272,8 @@ void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia)
 
 #ifdef D_USE_FULL_INERTIA
 	m_inertiaPrincipalAxis = ndGetIdentityMatrix();
-	if ((mass < D_MINIMUM_MASS) || shape->GetAsShapeNull() || shape->GetAsShapeStaticMesh())
+	//if ((mass < D_MINIMUM_MASS) || shape->GetAsShapeNull() || shape->GetAsShapeStaticMesh())
+	if ((mass < D_MINIMUM_MASS) || shape->GetAsShapeStaticMesh())
 	{
 		mass = D_INFINITE_MASS * 2.0f;
 	}
