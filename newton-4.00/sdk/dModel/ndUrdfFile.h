@@ -54,6 +54,7 @@ class ndUrdfFile : public ndClassAlloc
 	void LoadJoints(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& joints);
 
 	ndBodyDynamic* CreateBody(const nd::TiXmlElement* const rootNode, const ndTree<Material, ndString>& materials);
+	ndJointBilateralConstraint* CreateJoint(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap);
 };
 
 

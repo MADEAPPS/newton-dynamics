@@ -348,7 +348,6 @@ void ndUrdfFile::AddJoint(nd::TiXmlElement* const joint, const ndModelArticulati
 	parent->SetAttribute("link", link->GetParent()->m_name.GetStr());
 }
 
-//ndModelArticulation* ndUrdfFile::Import(const char* const fileName)
 ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 {
 	ndAssert(strstr(filePathName, ".urdf"));
@@ -402,25 +401,23 @@ void ndUrdfFile::LoadLinks(const nd::TiXmlElement* const rootNode, const ndTree<
 	}
 }
 
-void ndUrdfFile::LoadJoints(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& joints)
+void ndUrdfFile::LoadJoints(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& jointMap)
 {
 	for (const nd::TiXmlNode* node = rootNode->FirstChild("joint"); node; node = node->NextSibling("joint"))
 	{
-		const nd::TiXmlElement* const linkNode = (nd::TiXmlElement*)node;
-		const char* const name = linkNode->Attribute("name");
-
-		ndJointBilateralConstraint* xxx = nullptr;
-
-		joints.Insert(xxx, name);
+		const nd::TiXmlElement* const jointNode = (nd::TiXmlElement*)node;
+		const char* const name = jointNode->Attribute("name");
+		ndJointBilateralConstraint* const joint = CreateJoint(jointNode, bodyMap);
+		jointMap.Insert(joint, name);
 	}
 }
 
-ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const rootNode, const ndTree<Material, ndString>& materials)
+ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const linkNode, const ndTree<Material, ndString>& materials)
 {
 	ndBodyDynamic* const body = new ndBodyDynamic();
 
 	ndArray<const nd::TiXmlNode*> collisions;
-	for (const nd::TiXmlNode* node = rootNode->FirstChild("collision"); node; node = node->NextSibling("collision"))
+	for (const nd::TiXmlNode* node = linkNode->FirstChild("collision"); node; node = node->NextSibling("collision"))
 	{
 		collisions.PushBack(node);
 	}
@@ -432,7 +429,14 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const rootNode, co
 		const char* const name = shapeNode->Value();
 
 		ndShape* shape = nullptr;
-		if (strcmp(name, "cylinder") == 0)
+
+		if (strcmp(name, "sphere") == 0)
+		{
+			ndFloat64 radius;
+			shapeNode->Attribute("radius", &radius);
+			shape = new ndShapeSphere(ndFloat32(radius));
+		}
+		else if (strcmp(name, "cylinder") == 0)
 		{
 			ndFloat64 length;
 			ndFloat64 radius;
@@ -451,7 +455,7 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const rootNode, co
 		}
 		else
 		{
-			ndAssert(0);
+			ndTrace(("FIX ME urdf load collision %s\n", name));
 			shape = new ndShapeNull();
 		}
 		return shape;
@@ -477,6 +481,11 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const rootNode, co
 			sscanf(xyz, "%f %f %f", &x, &y, &z);
 			sscanf(rpy, "%f %f %f", &roll, &pitch, &yaw);
 
+			ndMatrix matrix(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
+			matrix.m_posit.m_x = x;
+			matrix.m_posit.m_y = y;
+			matrix.m_posit.m_z = z;
+			shape.SetGlobalMatrix(matrix);
 		}
 	}
 	else
@@ -484,10 +493,9 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const rootNode, co
 		ndAssert(0);
 	}
 
-	const nd::TiXmlNode* const inertialNode = rootNode->FirstChild("inertial");
+	const nd::TiXmlNode* const inertialNode = linkNode->FirstChild("inertial");
 	const nd::TiXmlElement* const massNode = (nd::TiXmlElement*)inertialNode->FirstChild("mass");
 	const nd::TiXmlElement* const inertiaNode = (nd::TiXmlElement*)inertialNode->FirstChild("inertia");
-	
 	
 	ndFloat64 xx;
 	ndFloat64 xy;
@@ -520,21 +528,26 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const rootNode, co
 	inetiaMatrix[2][1] = ndFloat32(yz);
 
 	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, inetiaMatrix);
-
-	//ndPhysicsWorld* const world = scene->GetWorld();
-	//ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
-	//ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, textName, textName, textName));
-	//ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	//entity->SetMesh(mesh);
-	//ndBodyKinematic* const kinBody = body->GetAsBodyKinematic();
-	//kinBody->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	//kinBody->SetMatrix(matrix);
-	//kinBody->SetCollisionShape(shape);
-	//kinBody->SetMassMatrix(mass, shape);
-	//world->AddBody(body);
-	//scene->AddEntity(entity);
-	//return kinBody;
+	body->SetMassMatrix(ndFloat32(mass), inetiaMatrix);
 
 	return body;
 }
+
+ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlElement* const jointNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap)
+{
+	const char* const jointType = jointNode->Attribute("type");
+
+	ndJointBilateralConstraint* joint = nullptr;
+	if (strcmp(jointType, "fixed") == 0)
+	{
+		ndTrace(("FIX ME urdf load jointType %s\n", jointType));
+
+	}
+	else
+	{
+		ndTrace(("FIX ME urdf load jointType %s\n", jointType));
+	}
+
+	return joint;
+}
+
