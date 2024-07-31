@@ -139,7 +139,8 @@ namespace ndUnicycle
 
 			ndBrainFloat CalculateReward()
 			{
-				ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_model->m_legJoint->GetAngle() * m_model->m_legJoint->GetAngle()));
+				//ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_model->m_legJoint->GetAngle() * m_model->m_legJoint->GetAngle()));
+				ndFloat32 legReward = ndReal(ndExp(-ndFloat32(5000.0f) * m_model->m_legJoint->GetAngle() * m_model->m_legJoint->GetAngle()));
 				if (m_model->HasSupportContact())
 				{
 					ndBodyKinematic* const boxBody = m_model->GetRoot()->m_body->GetAsBodyKinematic();
@@ -147,16 +148,16 @@ namespace ndUnicycle
 					const ndVector boxVeloc(boxBody->GetVelocity());
 					const ndMatrix& matrix = boxBody->GetMatrix();
 					const ndFloat32 sinAngle = matrix.m_up.m_x;
-					const ndFloat32 boxReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
-					const ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(0.5f) * boxVeloc.m_x * boxVeloc.m_x));
-					const ndFloat32 reward = (speedReward + boxReward + legReward) / 3.0f;
+					const ndFloat32 boxReward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
+					const ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(1.0f) * boxVeloc.m_x * boxVeloc.m_x));
+					const ndFloat32 reward = 0.2f * speedReward + 0.5f * boxReward + 0.3f * legReward;
 					return ndReal(reward);
 				}
 				else
 				{
 					const ndVector wheelOmega(m_model->m_wheel->GetOmega());
-					const ndFloat32 wheelReward = ndReal(ndExp(-ndFloat32(10000.0f) * wheelOmega.m_z * wheelOmega.m_z));
-					const ndFloat32 reward = (wheelReward + legReward) / 2.0f;
+					const ndFloat32 wheelReward = ndReal(ndExp(-ndFloat32(2000.0f) * wheelOmega.m_z * wheelOmega.m_z));
+					const ndFloat32 reward = 0.5f * wheelReward + 0.5f * legReward;
 					return ndReal(reward);
 				}
 			}
@@ -434,7 +435,7 @@ namespace ndUnicycle
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
 			,m_discountFactor(0.99f)
-			,m_horizon(ndFloat32(0.96f) / (ndFloat32(1.0f) - m_discountFactor))
+			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
 			,m_stopTraining(200 * 1000000)
 			,m_modelIsTrained(false)
@@ -585,7 +586,7 @@ namespace ndUnicycle
 					{
 						m_maxScore = rewardTrajectory;
 						m_bestActor->CopyFrom(*m_master->GetActor());
-						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageScore(), m_master->GetAverageFrames());
+						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
 						m_lastEpisode = m_master->GetEposideCount();
 					}
 				}
