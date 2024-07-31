@@ -538,10 +538,45 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlElement* cons
 	const char* const jointType = jointNode->Attribute("type");
 
 	ndJointBilateralConstraint* joint = nullptr;
+
+	const nd::TiXmlElement* const childNode = (nd::TiXmlElement*)jointNode->FirstChild("child");
+	const nd::TiXmlElement* const parentNode = (nd::TiXmlElement*)jointNode->FirstChild("parent");
+	
+	ndBodyDynamic* const childBody = bodyMap.Find(childNode->Attribute("link"))->GetInfo();
+	ndBodyDynamic* const parentBody = bodyMap.Find(parentNode->Attribute("link"))->GetInfo();
 	if (strcmp(jointType, "fixed") == 0)
 	{
-		ndTrace(("FIX ME urdf load jointType %s\n", jointType));
+		joint = new ndJointFix6dof(childBody->GetMatrix(), childBody, parentBody);
+	}
+	else if (strcmp(jointType, "continuous") == 0)
+	{
+		ndFloat32 x = ndFloat32(0.0f);
+		ndFloat32 y = ndFloat32(0.0f);
+		ndFloat32 z = ndFloat32(0.0f);
 
+		ndFloat32 x_did = ndFloat32(0.0f);
+		ndFloat32 y_did = ndFloat32(0.0f);
+		ndFloat32 z_did = ndFloat32(0.0f);
+
+		const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
+		const nd::TiXmlElement* const originNode = (nd::TiXmlElement*)jointNode->FirstChild("origin");
+
+		ndMatrix rotationMatrix(ndGetIdentityMatrix());
+		//const char* const axisRot = axisNode->Attribute("rpy");
+		//const char* const axisPosit = originNode->Attribute("xyz");
+
+		//const char* const originRot = originNode->Attribute("rpy");
+		//const char* const originPosit = originNode->Attribute("xyz");
+
+		//sscanf(originPosit, "%f %f %f", &x, &y, &z);
+		//sscanf(originRot, "%f %f %f", &x_did, &y_did, &z_did);
+		//ndMatrix matrix(ndGramSchmidtMatrix(ndVector (x_did, y_did, z_did, ndFloat32 (0.0f))));
+		//matrix.m_posit.m_x = x;
+		//matrix.m_posit.m_y = y;
+		//matrix.m_posit.m_z = z;
+
+		ndMatrix matrix(rotationMatrix);
+		joint = new ndJointHinge(matrix, childBody, parentBody);
 	}
 	else
 	{
