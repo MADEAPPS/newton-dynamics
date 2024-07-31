@@ -601,7 +601,7 @@ namespace ndUnicycle
 				}
 			}
 
-			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() >= m_horizon))
+			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 96.0f))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
