@@ -15,6 +15,16 @@
 class ndModelArticulation;
 class ndUrdfFile : public ndClassAlloc
 {
+	class Material
+	{
+		public:
+		Material()
+			:m_color(1.0f, 1.0f, 1.0f, 1.0f)
+		{
+		}
+		ndVector m_color;
+	};
+
 	public:
 	ndUrdfFile();
 	virtual ~ndUrdfFile();
@@ -38,23 +48,14 @@ class ndUrdfFile : public ndClassAlloc
 	void AddPose(nd::TiXmlElement* const linkNode, const ndMatrix& pose);
 	void AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndShapeInstance& collision);
 
-
-	class Material
-	{
-		public:
-		Material()
-			:m_color(1.0f, 1.0f, 1.0f, 1.0f)
-		{
-		}
-		ndVector m_color;
-	};
-
 	void LoadMaterials(const nd::TiXmlElement* const rootNode, ndTree<Material, ndString>& materials);
 	void LoadLinks(const nd::TiXmlElement* const rootNode, const ndTree<Material, ndString>& materials, ndTree<ndBodyDynamic*, ndString>& bodyMap);
 	void LoadJoints(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& joints);
 
 	ndBodyDynamic* CreateBody(const nd::TiXmlElement* const rootNode, const ndTree<Material, ndString>& materials);
 	ndJointBilateralConstraint* CreateJoint(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap);
+
+	ndModelArticulation* BuildModel(const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& joints);
 };
 
 

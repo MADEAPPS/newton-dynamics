@@ -372,9 +372,10 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 	LoadMaterials(rootNode, materials);
 	LoadLinks(rootNode, materials, bodies);
 	LoadJoints(rootNode, bodies, joints);
+	ndModelArticulation* const model = BuildModel(bodies, joints);
 
 	setlocale(LC_ALL, oldloc.GetStr());
-	return nullptr;
+	return model;
 }
 
 void ndUrdfFile::LoadMaterials(const nd::TiXmlElement* const rootNode, ndTree<Material, ndString>& materials)
@@ -627,3 +628,37 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlElement* cons
 	return joint;
 }
 
+ndModelArticulation* ndUrdfFile::BuildModel(const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& joints)
+{
+	ndTree<ndInt32, ndBodyDynamic*> parentBody;
+	ndTree<ndBodyDynamic*, ndString>::Iterator bodyIter(bodyMap);
+	for (bodyIter.Begin(); bodyIter; bodyIter++)
+	{
+		ndBodyDynamic* const body = bodyIter.GetNode()->GetInfo();
+		parentBody.Insert(0, body);
+	}
+
+	ndTree<ndJointBilateralConstraint*, ndString>::Iterator jointIter(joints);
+	for (jointIter.Begin(); jointIter; jointIter++)
+	{
+		ndJointBilateralConstraint* const joint = jointIter.GetNode()->GetInfo();
+		//ndTrace(("%d %d\n", joint->GetBody0()->GetId(), joint->GetBody1()->GetId()));
+		ndTree<ndInt32, ndBodyDynamic*>::ndNode* bodyNode = parentBody.Find(joint->GetBody0()->GetAsBodyDynamic());
+		bodyNode->GetInfo() = 1;
+	}
+
+	ndBodyDynamic* root = nullptr;
+	ndTree<ndInt32, ndBodyDynamic*>::Iterator parentBodyIter(parentBody);
+	for (parentBodyIter.Begin(); parentBodyIter; parentBodyIter++)
+	{
+		ndTree<ndInt32, ndBodyDynamic*>::ndNode* const bodyNode = parentBodyIter.GetNode();
+		if (bodyNode->GetInfo() == 0)
+		{
+			root = bodyNode->GetKey();
+			break;
+		}
+	}
+	ndAssert(root);
+
+	return nullptr;
+}
