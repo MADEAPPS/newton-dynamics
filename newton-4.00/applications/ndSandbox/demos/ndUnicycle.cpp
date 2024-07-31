@@ -409,7 +409,7 @@ namespace ndUnicycle
 		ndGetWorkingFileName("r2d2.urdf", fileName);
 
 		ndUrdfFile urdf;
-		ndSharedPtr<ndModel> xxxx(urdf.Import(fileName));
+		ndSharedPtr<ndModel> r2d2(urdf.Import(fileName));
 
 		ndGetWorkingFileName("unicycle.urdf", fileName);
 		urdf.Export(fileName, articulation);

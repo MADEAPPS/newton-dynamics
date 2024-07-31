@@ -660,5 +660,28 @@ ndModelArticulation* ndUrdfFile::BuildModel(const ndTree<ndBodyDynamic*, ndStrin
 	}
 	ndAssert(root);
 
-	return nullptr;
+	ndModelArticulation* const model = new ndModelArticulation;
+	ndModelArticulation::ndNode* const node = model->AddRootBody(root);
+
+	ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
+	stack.PushBack(node);
+	while (stack.GetCount())
+	{
+		ndModelArticulation::ndNode* const parentNode = stack[stack.GetCount() - 1];
+		stack.SetCount(stack.GetCount() - 1);
+
+		ndBodyDynamic* const parentBody = parentNode->m_body->GetAsBodyDynamic();
+		for (jointIter.Begin(); jointIter; jointIter++)
+		{
+			ndJointBilateralConstraint* const joint = jointIter.GetNode()->GetInfo();
+			if (joint->GetBody1() == parentBody)
+			{
+				ndModelArticulation::ndNode* const limb = model->AddLimb(parentNode, joint->GetBody0(), joint);
+				//ndTrace(("%d %d\n", joint->GetBody0()->GetId(), joint->GetBody1()->GetId()));
+				stack.PushBack(limb);
+			}
+		}
+	}
+
+	return model;
 }
