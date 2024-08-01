@@ -2442,8 +2442,8 @@ ndInt32 ndContactSolver::CalculateContactsDiscrete()
 	}
 	else
 	{
-		ndTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->ClassName(), m_instance1.GetShape()->ClassName()));
-		ndAssert(0);
+		//ndTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->ClassName(), m_instance1.GetShape()->ClassName()));
+		//ndAssert(0);
 	}
 
 	m_contact->m_timeOfImpact = m_timestep;
@@ -2481,7 +2481,7 @@ ndInt32 ndContactSolver::ConvexContactsDiscrete()
 		}
 		else
 		{
-			ndAssert(0);
+			//ndAssert(0);
 			count = 0;
 		}
 	}

@@ -405,15 +405,6 @@ namespace ndUnicycle
 		world->AddJoint(planeJoint);
 
 
-		char fileName[256];
-		ndGetWorkingFileName("r2d2.urdf", fileName);
-
-		ndUrdfFile urdf;
-		ndSharedPtr<ndModel> r2d2(urdf.Import(fileName));
-
-		ndGetWorkingFileName("unicycle.urdf", fileName);
-		urdf.Export(fileName, articulation);
-
 		scene->SetAcceleratedUpdate();
 		return model;
 	}
@@ -670,12 +661,43 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
 	world->AddJoint(fixJoint);
+
+
+	char fileName[256];
+	//ndGetWorkingFileName("r2d2.urdf", fileName);
+	ndGetWorkingFileName("r2d3.urdf", fileName);
+
+	ndUrdfFile urdf;
+	ndSharedPtr<ndModel> r2d2(urdf.Import(fileName));
+
+	ndModelArticulation* const root = r2d2->GetAsModelArticulation();
+	for (ndModelArticulation::ndNode* node = root->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+	{
+		ndSharedPtr<ndBody> body(node->m_body);
+		ndMatrix matrix__(body->GetMatrix());
+		matrix__.m_posit.m_y += 1.0f;
+		matrix__.m_posit.m_z += 1.0f;
+		body->SetMatrix(matrix__);
+
+		world->AddBody(body);
+		if (node->m_joint)
+		{
+			world->AddJoint(node->m_joint);
+		}
+	}
+
+
+	//ndGetWorkingFileName("unicycle.urdf", fileName);
+	//urdf.Export(fileName, articulation);
+
 #endif
 
 	
-	matrix.m_posit.m_x -= 0.0f;
+	//matrix.m_posit.m_x -= 0.0f;
+	matrix.m_posit.m_x -= 3.0f;
 	matrix.m_posit.m_y += 0.5f;
-	matrix.m_posit.m_z += 3.0f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
+	//matrix.m_posit.m_z += 3.0f;
+	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }

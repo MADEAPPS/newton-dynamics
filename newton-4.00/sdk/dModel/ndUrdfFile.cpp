@@ -423,7 +423,8 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const linkNode, co
 		collisions.PushBack(node);
 	}
 
-	auto GetCollisionShape = [](const nd::TiXmlNode* const node)
+	ndShapeInstance collision(new ndShapeNull());
+	auto GetCollisionShape = [&collision](const nd::TiXmlNode* const node)
 	{
 		const nd::TiXmlNode* const geometryNode = node->FirstChild("geometry");
 		const nd::TiXmlElement* const shapeNode = (nd::TiXmlElement*)geometryNode->FirstChild();
@@ -444,6 +445,8 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const linkNode, co
 			shapeNode->Attribute("length", &length);
 			shapeNode->Attribute("radius", &radius);
 			shape = new ndShapeCylinder(ndFloat32(radius), ndFloat32(radius), ndFloat32(length));
+			ndMatrix matrix(ndYawMatrix(ndPi * ndFloat32(0.5f)));
+			collision.SetLocalMatrix(matrix);
 		}
 		else if (strcmp(name, "box") == 0)
 		{
@@ -462,12 +465,13 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const linkNode, co
 		return shape;
 	};
 
-	ndShapeInstance shape(new ndShapeNull());
+	
 	if (collisions.GetCount() == 1)
 	{
 		const nd::TiXmlNode* const node = collisions[0];
-		shape.SetShape (GetCollisionShape(node));
+		collision.SetShape (GetCollisionShape(node));
 		const nd::TiXmlElement* const origin = (nd::TiXmlElement*)node->FirstChild("origin");
+
 		if (origin)
 		{
 			ndFloat32 x;
@@ -480,14 +484,16 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const linkNode, co
 			const char* const rpy = origin->Attribute("rpy");
 			const char* const xyz = origin->Attribute("xyz");
 			sscanf(xyz, "%f %f %f", &x, &y, &z);
-			sscanf(rpy, "%f %f %f", &roll, &pitch, &yaw);
+			//sscanf(rpy, "%f %f %f", &roll, &pitch, &yaw);
+			sscanf(rpy, "%f %f %f", &roll, &yaw, &pitch);
 
-			ndMatrix matrix(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
-			matrix.m_posit.m_x = x;
-			matrix.m_posit.m_y = y;
-			matrix.m_posit.m_z = z;
-			shape.SetGlobalMatrix(matrix);
+			ndMatrix offsetMatrix(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
+			offsetMatrix.m_posit.m_x = x;
+			offsetMatrix.m_posit.m_y = y;
+			offsetMatrix.m_posit.m_z = z;
+			collision.SetLocalMatrix(collision.GetLocalMatrix() * offsetMatrix);
 		}
+		
 	}
 	else
 	{
@@ -514,22 +520,22 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const linkNode, co
 	inertiaNode->Attribute("iyz", &yz);
 	inertiaNode->Attribute("izz", &zz);
 
-	ndMatrix inetiaMatrix(ndGetIdentityMatrix());
-	inetiaMatrix[0][0] = ndFloat32(xx);
-	inetiaMatrix[1][1] = ndFloat32(yy);
-	inetiaMatrix[2][2] = ndFloat32(zz);
+	ndMatrix inertiaMatrix(ndGetIdentityMatrix());
+	inertiaMatrix[0][0] = ndFloat32(xx);
+	inertiaMatrix[1][1] = ndFloat32(yy);
+	inertiaMatrix[2][2] = ndFloat32(zz);
 
-	inetiaMatrix[0][1] = ndFloat32(xy);
-	inetiaMatrix[1][0] = ndFloat32(xy);
+	inertiaMatrix[0][1] = ndFloat32(xy);
+	inertiaMatrix[1][0] = ndFloat32(xy);
 
-	inetiaMatrix[0][2] = ndFloat32(xz);
-	inetiaMatrix[2][0] = ndFloat32(xz);
+	inertiaMatrix[0][2] = ndFloat32(xz);
+	inertiaMatrix[2][0] = ndFloat32(xz);
 
-	inetiaMatrix[1][2] = ndFloat32(yz);
-	inetiaMatrix[2][1] = ndFloat32(yz);
+	inertiaMatrix[1][2] = ndFloat32(yz);
+	inertiaMatrix[2][1] = ndFloat32(yz);
 
-	body->SetCollisionShape(shape);
-	body->SetMassMatrix(ndFloat32(mass), inetiaMatrix);
+	body->SetCollisionShape(collision);
+	body->SetMassMatrix(ndFloat32(mass), inertiaMatrix);
 
 	return body;
 }
