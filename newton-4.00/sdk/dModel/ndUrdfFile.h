@@ -47,19 +47,31 @@ class ndUrdfFile : public ndClassAlloc
 	//
 	//void AddPose(nd::TiXmlElement* const linkNode, const ndMatrix& pose);
 	//void AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndShapeInstance& collision);
-	//
-	
-	//void LoadLinks(const nd::TiXmlElement* const rootNode, const ndTree<Material, ndString>& materials, ndTree<ndBodyDynamic*, ndString>& bodyMap);
-	//void LoadJoints(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& joints);
-	//
 
-	//ndJointBilateralConstraint* CreateJoint(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap);
-	//
-	//ndModelArticulation* BuildModel(const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& joints);
-	
+
+	class Hierarchy
+	{
+		public:
+		Hierarchy(const nd::TiXmlNode* const link)
+			:m_parent(nullptr)
+			,m_link(link)
+			,m_joint(link)
+			,m_parentLink(nullptr)
+			,m_articulation(nullptr)
+		{
+		}
+
+		Hierarchy* m_parent;
+		const nd::TiXmlNode* m_link;
+		const nd::TiXmlNode* m_joint;
+		const nd::TiXmlNode* m_parentLink;
+		ndModelArticulation::ndNode* m_articulation;
+	};
+
 	ndMatrix GetMatrix(const nd::TiXmlNode* const parentNode) const;
 	void LoadMaterials(const nd::TiXmlNode* const rootNode, ndTree<Material, ndString>& materials);
-	ndBodyDynamic* CreateBody(const nd::TiXmlNode* const rootNode, const ndTree<Material, ndString>& materials);
+	ndBodyDynamic* CreateBody(const nd::TiXmlNode* const linkNode, const ndTree<Material, ndString>& materials);
+	ndJointBilateralConstraint* CreateJoint(const nd::TiXmlNode* const jointNode, ndBodyDynamic* const child, ndBodyDynamic* const parent);
 };
 
 

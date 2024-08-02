@@ -349,193 +349,6 @@ void ndUrdfFile::AddJoint(nd::TiXmlElement* const joint, const ndModelArticulati
 	parent->SetAttribute("link", link->GetParent()->m_name.GetStr());
 }
 
-
-
-
-void ndUrdfFile::LoadLinks(const nd::TiXmlElement* const rootNode, const ndTree<Material, ndString>& materials, ndTree<ndBodyDynamic*, ndString>& bodyMap)
-{
-	for (const nd::TiXmlNode* node = rootNode->FirstChild("link"); node; node = node->NextSibling("link"))
-	{
-		const nd::TiXmlElement* const linkNode = (nd::TiXmlElement*)node;
-		const char* const name = linkNode->Attribute("name");
-
-		ndBodyDynamic* const body = CreateBody(linkNode, materials);
-		bodyMap.Insert(body, name);
-	}
-}
-
-void ndUrdfFile::LoadJoints(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& jointMap)
-{
-	for (const nd::TiXmlNode* node = rootNode->FirstChild("joint"); node; node = node->NextSibling("joint"))
-	{
-		const nd::TiXmlElement* const jointNode = (nd::TiXmlElement*)node;
-		const char* const name = jointNode->Attribute("name");
-		ndJointBilateralConstraint* const joint = CreateJoint(jointNode, bodyMap);
-		jointMap.Insert(joint, name);
-	}
-}
-
-
-ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlElement* const jointNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap)
-{
-	const char* const jointType = jointNode->Attribute("type");
-
-	ndJointBilateralConstraint* joint = nullptr;
-
-	const nd::TiXmlElement* const childNode = (nd::TiXmlElement*)jointNode->FirstChild("child");
-	const nd::TiXmlElement* const parentNode = (nd::TiXmlElement*)jointNode->FirstChild("parent");
-	
-	const char* const childName = childNode->Attribute("link");
-	const char* const parentName = parentNode->Attribute("link");
-	ndBodyDynamic* const childBody = bodyMap.Find(childName)->GetInfo();
-	ndBodyDynamic* const parentBody = bodyMap.Find(parentName)->GetInfo();
-
-	ndMatrix childMatrix(GetMatrix(jointNode));
-	childBody->SetMatrix(childMatrix);
-
-	ndMatrix pivotMatrix(childMatrix);
-	if (strcmp(jointType, "fixed") == 0)
-	{
-		joint = new ndJointFix6dof(pivotMatrix, childBody, parentBody);
-	}
-	else if (strcmp(jointType, "continuous") == 0)
-	{
-		ndFloat32 x = ndFloat32(0.0f);
-		ndFloat32 y = ndFloat32(0.0f);
-		ndFloat32 z = ndFloat32(0.0f);
-
-		ndFloat32 x_did = ndFloat32(0.0f);
-		ndFloat32 y_did = ndFloat32(0.0f);
-		ndFloat32 z_did = ndFloat32(0.0f);
-
-		ndAssert(0);
-		const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
-		const nd::TiXmlElement* const originNode = (nd::TiXmlElement*)jointNode->FirstChild("origin");
-		
-		ndMatrix rotationMatrix(ndGetIdentityMatrix());
-		//const char* const axisRot = axisNode->Attribute("rpy");
-		//const char* const axisPosit = originNode->Attribute("xyz");
-
-		//const char* const originRot = originNode->Attribute("rpy");
-		//const char* const originPosit = originNode->Attribute("xyz");
-
-		//sscanf(originPosit, "%f %f %f", &x, &y, &z);
-		//sscanf(originRot, "%f %f %f", &x_did, &y_did, &z_did);
-		//ndMatrix matrix(ndGramSchmidtMatrix(ndVector (x_did, y_did, z_did, ndFloat32 (0.0f))));
-		//matrix.m_posit.m_x = x;
-		//matrix.m_posit.m_y = y;
-		//matrix.m_posit.m_z = z;
-
-		ndMatrix matrix(rotationMatrix);
-		joint = new ndJointHinge(matrix, childBody, parentBody);
-	}
-	else if (strcmp(jointType, "revolute") == 0)
-	{
-		ndAssert(0);
-		ndFloat32 x = ndFloat32(0.0f);
-		ndFloat32 y = ndFloat32(0.0f);
-		ndFloat32 z = ndFloat32(0.0f);
-
-		ndFloat32 x_did = ndFloat32(0.0f);
-		ndFloat32 y_did = ndFloat32(0.0f);
-		ndFloat32 z_did = ndFloat32(0.0f);
-
-		const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
-		const nd::TiXmlElement* const originNode = (nd::TiXmlElement*)jointNode->FirstChild("origin");
-
-		ndMatrix rotationMatrix(ndGetIdentityMatrix());
-		//const char* const axisRot = axisNode->Attribute("rpy");
-		//const char* const axisPosit = originNode->Attribute("xyz");
-
-		//const char* const originRot = originNode->Attribute("rpy");
-		//const char* const originPosit = originNode->Attribute("xyz");
-
-		//sscanf(originPosit, "%f %f %f", &x, &y, &z);
-		//sscanf(originRot, "%f %f %f", &x_did, &y_did, &z_did);
-		//ndMatrix matrix(ndGramSchmidtMatrix(ndVector (x_did, y_did, z_did, ndFloat32 (0.0f))));
-		//matrix.m_posit.m_x = x;
-		//matrix.m_posit.m_y = y;
-		//matrix.m_posit.m_z = z;
-
-		ndMatrix matrix(rotationMatrix);
-		joint = new ndJointHinge(matrix, childBody, parentBody);
-	}
-
-	else if (strcmp(jointType, "prismatic") == 0)
-	{
-		ndAssert(0);
-		const nd::TiXmlElement* const limitNode = (nd::TiXmlElement*)jointNode->FirstChild("limit");
-		const nd::TiXmlElement* const originNode = (nd::TiXmlElement*)jointNode->FirstChild("origin");
-
-		ndMatrix matrix(ndGetIdentityMatrix());
-		joint = new ndJointSlider (matrix, childBody, parentBody);
-	}
-	else
-	{
-		ndTrace(("FIX ME urdf load jointType %s\n", jointType));
-	}
-
-	return joint;
-}
-
-ndModelArticulation* ndUrdfFile::BuildModel(const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& joints)
-{
-	ndTree<ndInt32, ndBodyDynamic*> parentBody;
-	ndTree<ndBodyDynamic*, ndString>::Iterator bodyIter(bodyMap);
-	for (bodyIter.Begin(); bodyIter; bodyIter++)
-	{
-		ndBodyDynamic* const body = bodyIter.GetNode()->GetInfo();
-		parentBody.Insert(0, body);
-	}
-
-	ndTree<ndJointBilateralConstraint*, ndString>::Iterator jointIter(joints);
-	for (jointIter.Begin(); jointIter; jointIter++)
-	{
-		ndJointBilateralConstraint* const joint = jointIter.GetNode()->GetInfo();
-		//ndTrace(("%d %d\n", joint->GetBody0()->GetId(), joint->GetBody1()->GetId()));
-		ndTree<ndInt32, ndBodyDynamic*>::ndNode* bodyNode = parentBody.Find(joint->GetBody0()->GetAsBodyDynamic());
-		bodyNode->GetInfo() = 1;
-	}
-
-	ndBodyDynamic* root = nullptr;
-	ndTree<ndInt32, ndBodyDynamic*>::Iterator parentBodyIter(parentBody);
-	for (parentBodyIter.Begin(); parentBodyIter; parentBodyIter++)
-	{
-		ndTree<ndInt32, ndBodyDynamic*>::ndNode* const bodyNode = parentBodyIter.GetNode();
-		if (bodyNode->GetInfo() == 0)
-		{
-			root = bodyNode->GetKey();
-			break;
-		}
-	}
-	ndAssert(root);
-
-	ndModelArticulation* const model = new ndModelArticulation;
-	ndModelArticulation::ndNode* const node = model->AddRootBody(root);
-
-	ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
-	stack.PushBack(node);
-	while (stack.GetCount())
-	{
-		ndModelArticulation::ndNode* const parentNode = stack[stack.GetCount() - 1];
-		stack.SetCount(stack.GetCount() - 1);
-
-		ndBodyDynamic* const parentBody = parentNode->m_body->GetAsBodyDynamic();
-		for (jointIter.Begin(); jointIter; jointIter++)
-		{
-			ndJointBilateralConstraint* const joint = jointIter.GetNode()->GetInfo();
-			if (joint->GetBody1() == parentBody)
-			{
-				ndModelArticulation::ndNode* const limb = model->AddLimb(parentNode, joint->GetBody0(), joint);
-				//ndTrace(("%d %d\n", joint->GetBody0()->GetId(), joint->GetBody1()->GetId()));
-				stack.PushBack(limb);
-			}
-		}
-	}
-
-	return model;
-}
-
 #endif
 
 // *******************************************************************************
@@ -696,6 +509,101 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode, const
 	return body;
 }
 
+ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlNode* const jointNode, ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody)
+{
+	ndJointBilateralConstraint* joint = nullptr;
+	const char* const jointType = ((nd::TiXmlElement*)jointNode)->Attribute("type");
+	const nd::TiXmlElement* const childNode = (nd::TiXmlElement*)jointNode->FirstChild("child");
+	const nd::TiXmlElement* const parentNode = (nd::TiXmlElement*)jointNode->FirstChild("parent");
+
+	ndMatrix childMatrix(GetMatrix(jointNode));
+	childBody->SetMatrix(childMatrix * parentBody->GetMatrix());
+	ndMatrix pivotMatrix(childBody->GetMatrix());
+	
+	if (strcmp(jointType, "fixed") == 0)
+	{
+		joint = new ndJointFix6dof(pivotMatrix, childBody, parentBody);
+	}
+	else if (strcmp(jointType, "continuous") == 0)
+	{
+		ndFloat32 x = ndFloat32(0.0f);
+		ndFloat32 y = ndFloat32(0.0f);
+		ndFloat32 z = ndFloat32(0.0f);
+
+		ndFloat32 x_did = ndFloat32(0.0f);
+		ndFloat32 y_did = ndFloat32(0.0f);
+		ndFloat32 z_did = ndFloat32(0.0f);
+
+		ndAssert(0);
+		const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
+		const nd::TiXmlElement* const originNode = (nd::TiXmlElement*)jointNode->FirstChild("origin");
+
+		ndMatrix rotationMatrix(ndGetIdentityMatrix());
+		//const char* const axisRot = axisNode->Attribute("rpy");
+		//const char* const axisPosit = originNode->Attribute("xyz");
+
+		//const char* const originRot = originNode->Attribute("rpy");
+		//const char* const originPosit = originNode->Attribute("xyz");
+
+		//sscanf(originPosit, "%f %f %f", &x, &y, &z);
+		//sscanf(originRot, "%f %f %f", &x_did, &y_did, &z_did);
+		//ndMatrix matrix(ndGramSchmidtMatrix(ndVector (x_did, y_did, z_did, ndFloat32 (0.0f))));
+		//matrix.m_posit.m_x = x;
+		//matrix.m_posit.m_y = y;
+		//matrix.m_posit.m_z = z;
+
+		ndMatrix matrix(rotationMatrix);
+		joint = new ndJointHinge(matrix, childBody, parentBody);
+	}
+	else if (strcmp(jointType, "revolute") == 0)
+	{
+		ndAssert(0);
+		ndFloat32 x = ndFloat32(0.0f);
+		ndFloat32 y = ndFloat32(0.0f);
+		ndFloat32 z = ndFloat32(0.0f);
+
+		ndFloat32 x_did = ndFloat32(0.0f);
+		ndFloat32 y_did = ndFloat32(0.0f);
+		ndFloat32 z_did = ndFloat32(0.0f);
+
+		const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
+		const nd::TiXmlElement* const originNode = (nd::TiXmlElement*)jointNode->FirstChild("origin");
+
+		ndMatrix rotationMatrix(ndGetIdentityMatrix());
+		//const char* const axisRot = axisNode->Attribute("rpy");
+		//const char* const axisPosit = originNode->Attribute("xyz");
+
+		//const char* const originRot = originNode->Attribute("rpy");
+		//const char* const originPosit = originNode->Attribute("xyz");
+
+		//sscanf(originPosit, "%f %f %f", &x, &y, &z);
+		//sscanf(originRot, "%f %f %f", &x_did, &y_did, &z_did);
+		//ndMatrix matrix(ndGramSchmidtMatrix(ndVector (x_did, y_did, z_did, ndFloat32 (0.0f))));
+		//matrix.m_posit.m_x = x;
+		//matrix.m_posit.m_y = y;
+		//matrix.m_posit.m_z = z;
+
+		ndMatrix matrix(rotationMatrix);
+		joint = new ndJointHinge(matrix, childBody, parentBody);
+	}
+
+	else if (strcmp(jointType, "prismatic") == 0)
+	{
+		ndAssert(0);
+		const nd::TiXmlElement* const limitNode = (nd::TiXmlElement*)jointNode->FirstChild("limit");
+		const nd::TiXmlElement* const originNode = (nd::TiXmlElement*)jointNode->FirstChild("origin");
+
+		ndMatrix matrix(ndGetIdentityMatrix());
+		joint = new ndJointSlider(matrix, childBody, parentBody);
+	}
+	else
+	{
+		ndTrace(("FIX ME urdf load jointType %s\n", jointType));
+	}
+
+	return joint;
+}
+
 ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 {
 	ndAssert(strstr(filePathName, ".urdf"));
@@ -711,30 +619,10 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 		return nullptr;
 	}
 
-	const nd::TiXmlElement* const rootNode = doc.RootElement();
-
 	ndTree<Material, ndString> materials;
-	//ndTree<ndBodyDynamic*, ndString> bodies;
-	//ndTree<ndJointBilateralConstraint*, ndString> joints;
-	
-	class Hierarchy
-	{
-		public: 
-		Hierarchy(const nd::TiXmlNode* const link)
-			:m_link(link)
-			,m_joint(link)
-			,m_parentLink(nullptr)
-			,m_articulation(nullptr)
-		{
-		}
-	
-		const nd::TiXmlNode* m_link;
-		const nd::TiXmlNode* m_joint;
-		const nd::TiXmlNode* m_parentLink;
-		ndModelArticulation::ndNode* m_articulation;
-	};
-
 	ndTree<Hierarchy, ndString> bodyLinks;
+
+	const nd::TiXmlElement* const rootNode = doc.RootElement();
 	for (const nd::TiXmlNode* node = rootNode->FirstChild("link"); node; node = node->NextSibling("link"))
 	{
 		const nd::TiXmlElement* const linkNode = (nd::TiXmlElement*)node;
@@ -758,6 +646,7 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 		Hierarchy& hierachyParent = hierarchyParentNode->GetInfo();
 
 		hierachyChild.m_joint = node;
+		hierachyChild.m_parent = &hierachyParent;
 		hierachyChild.m_parentLink = hierachyParent.m_link;
 	}	
 
@@ -786,28 +675,21 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 		Hierarchy* const parent = stack[stack.GetCount() - 1];
 		stack.SetCount(stack.GetCount() - 1);
 
-		//AddLink(rootNode, node);
 		for (iter.Begin(); iter; iter++)
 		{
 			Hierarchy& link = iter.GetNode()->GetInfo();
 			if (link.m_parentLink == parent->m_link)
 			{
+				ndBodyDynamic* const childBody = CreateBody(link.m_link, materials);
+				ndJointBilateralConstraint* const joint = CreateJoint(link.m_joint, childBody, parent->m_articulation->m_body->GetAsBodyDynamic());
+				link.m_articulation = model->AddLimb(parent->m_articulation, joint->GetBody0(), joint);
+
 				stack.PushBack(&link);
 			}
 		}
 	}
-
-	//LoadMaterials(rootNode, materials);
-	//LoadLinks(rootNode, materials, bodies);
-	//LoadJoints(rootNode, bodies, joints);
-	//ndModelArticulation* const model = BuildModel(bodies, joints);
 	
 	setlocale(LC_ALL, oldloc.GetStr());
 	return model;
 	return nullptr;
 }
-
-//ndUrdfFile::Hierarchy* ndUrdfFile::ImportHierachy(const nd::TiXmlNode* const rootNode)
-//{
-//	return nullptr;
-//}
