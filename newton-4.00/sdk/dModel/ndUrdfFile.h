@@ -33,31 +33,33 @@ class ndUrdfFile : public ndClassAlloc
 	virtual void Export(const char* const fileName, ndModelArticulation* const model);
 
 	private:
-	void CheckUniqueNames(ndModelArticulation* const model);
-	void AddLinks(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
-	void AddJoints(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
+	//void CheckUniqueNames(ndModelArticulation* const model);
+	//void AddLinks(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
+	//void AddJoints(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
+	//
+	//void AddMaterials(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
+	//void AddLink(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
+	//void AddJoint(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
+	//
+	//void AddInertia(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
+	//void AddGeometry(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
+	//void AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
+	//
+	//void AddPose(nd::TiXmlElement* const linkNode, const ndMatrix& pose);
+	//void AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndShapeInstance& collision);
+	//
+	
+	//void LoadLinks(const nd::TiXmlElement* const rootNode, const ndTree<Material, ndString>& materials, ndTree<ndBodyDynamic*, ndString>& bodyMap);
+	//void LoadJoints(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& joints);
+	//
 
-	void AddMaterials(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
-	void AddLink(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
-	void AddJoint(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
-
-	void AddInertia(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
-	void AddGeometry(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
-	void AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
-
-	void AddPose(nd::TiXmlElement* const linkNode, const ndMatrix& pose);
-	void AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndShapeInstance& collision);
-
-	void LoadMaterials(const nd::TiXmlElement* const rootNode, ndTree<Material, ndString>& materials);
-	void LoadLinks(const nd::TiXmlElement* const rootNode, const ndTree<Material, ndString>& materials, ndTree<ndBodyDynamic*, ndString>& bodyMap);
-	void LoadJoints(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& joints);
-
-	ndBodyDynamic* CreateBody(const nd::TiXmlElement* const rootNode, const ndTree<Material, ndString>& materials);
-	ndJointBilateralConstraint* CreateJoint(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap);
-
-	ndModelArticulation* BuildModel(const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& joints);
-
+	//ndJointBilateralConstraint* CreateJoint(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap);
+	//
+	//ndModelArticulation* BuildModel(const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& joints);
+	
 	ndMatrix GetMatrix(const nd::TiXmlNode* const parentNode) const;
+	void LoadMaterials(const nd::TiXmlNode* const rootNode, ndTree<Material, ndString>& materials);
+	ndBodyDynamic* CreateBody(const nd::TiXmlNode* const rootNode, const ndTree<Material, ndString>& materials);
 };
 
 
