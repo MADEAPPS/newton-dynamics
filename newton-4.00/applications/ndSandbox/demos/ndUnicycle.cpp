@@ -654,14 +654,13 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	scene->RegisterPostUpdate(trainer);
 #else
 	ndWorld* const world = scene->GetWorld();
-	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	world->AddModel(model);
 
-	ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
-	ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
-
+	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	//world->AddModel(model);
+	//ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
+	//ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
+	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
+	//world->AddJoint(fixJoint);
 
 	char fileName[256];
 	//ndGetWorkingFileName("r2d2.urdf", fileName);
@@ -676,7 +675,7 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 		ndSharedPtr<ndBody> body(node->m_body);
 		ndMatrix matrix__(body->GetMatrix());
 		matrix__.m_posit.m_y += 1.0f;
-		matrix__.m_posit.m_z += 1.0f;
+		matrix__.m_posit.m_z += 0.0f;
 		body->SetMatrix(matrix__);
 
 		world->AddBody(body);
