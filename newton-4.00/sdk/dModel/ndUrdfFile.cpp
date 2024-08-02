@@ -348,6 +348,9 @@ void ndUrdfFile::AddJoint(nd::TiXmlElement* const joint, const ndModelArticulati
 	parent->SetAttribute("link", link->GetParent()->m_name.GetStr());
 }
 
+// *******************************************************************************
+// 
+// *******************************************************************************
 ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 {
 	ndAssert(strstr(filePathName, ".urdf"));
@@ -376,6 +379,40 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 
 	setlocale(LC_ALL, oldloc.GetStr());
 	return model;
+}
+
+ndMatrix ndUrdfFile::GetMatrix(const nd::TiXmlNode* const parentNode) const
+{
+	const nd::TiXmlElement* const origin = (nd::TiXmlElement*)parentNode->FirstChild("origin");
+
+	ndMatrix matrix(ndGetIdentityMatrix());
+	if (origin)
+	{
+		ndFloat32 x = ndFloat32(0.0f);
+		ndFloat32 y = ndFloat32(0.0f);
+		ndFloat32 z = ndFloat32(0.0f);
+		ndFloat32 yaw = ndFloat32(0.0f);
+		ndFloat32 roll = ndFloat32(0.0f);
+		ndFloat32 pitch = ndFloat32(0.0f);
+
+		const char* const xyz = origin->Attribute("xyz");
+		if (xyz)
+		{
+			sscanf(xyz, "%f %f %f", &x, &y, &z);
+		}
+		const char* const rpy = origin->Attribute("rpy");
+		if (rpy)
+		{
+			//sscanf(rpy, "%f %f %f", &roll, &pitch, &yaw);
+			sscanf(rpy, "%f %f %f", &roll, &yaw, &pitch);
+		}
+
+		matrix = ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll);
+		matrix.m_posit.m_x = x;
+		matrix.m_posit.m_y = y;
+		matrix.m_posit.m_z = z;
+	}
+	return matrix;
 }
 
 void ndUrdfFile::LoadMaterials(const nd::TiXmlElement* const rootNode, ndTree<Material, ndString>& materials)
@@ -464,36 +501,13 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlElement* const linkNode, co
 		}
 		return shape;
 	};
-
 	
 	if (collisions.GetCount() == 1)
 	{
 		const nd::TiXmlNode* const node = collisions[0];
 		collision.SetShape (GetCollisionShape(node));
-		const nd::TiXmlElement* const origin = (nd::TiXmlElement*)node->FirstChild("origin");
-
-		if (origin)
-		{
-			ndFloat32 x;
-			ndFloat32 y;
-			ndFloat32 z;
-			ndFloat32 pitch;
-			ndFloat32 yaw;
-			ndFloat32 roll;
-
-			const char* const rpy = origin->Attribute("rpy");
-			const char* const xyz = origin->Attribute("xyz");
-			sscanf(xyz, "%f %f %f", &x, &y, &z);
-			//sscanf(rpy, "%f %f %f", &roll, &pitch, &yaw);
-			sscanf(rpy, "%f %f %f", &roll, &yaw, &pitch);
-
-			ndMatrix offsetMatrix(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
-			offsetMatrix.m_posit.m_x = x;
-			offsetMatrix.m_posit.m_y = y;
-			offsetMatrix.m_posit.m_z = z;
-			collision.SetLocalMatrix(collision.GetLocalMatrix() * offsetMatrix);
-		}
-		
+		ndMatrix matrix(GetMatrix(node));
+		collision.SetLocalMatrix(collision.GetLocalMatrix() * matrix);
 	}
 	else
 	{
@@ -553,9 +567,14 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlElement* cons
 	const char* const parentName = parentNode->Attribute("link");
 	ndBodyDynamic* const childBody = bodyMap.Find(childName)->GetInfo();
 	ndBodyDynamic* const parentBody = bodyMap.Find(parentName)->GetInfo();
+
+	ndMatrix childMatrix(GetMatrix(jointNode));
+	childBody->SetMatrix(childMatrix);
+
+	ndMatrix pivotMatrix(childMatrix);
 	if (strcmp(jointType, "fixed") == 0)
 	{
-		joint = new ndJointFix6dof(childBody->GetMatrix(), childBody, parentBody);
+		joint = new ndJointFix6dof(pivotMatrix, childBody, parentBody);
 	}
 	else if (strcmp(jointType, "continuous") == 0)
 	{
@@ -567,9 +586,10 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlElement* cons
 		ndFloat32 y_did = ndFloat32(0.0f);
 		ndFloat32 z_did = ndFloat32(0.0f);
 
+		ndAssert(0);
 		const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
 		const nd::TiXmlElement* const originNode = (nd::TiXmlElement*)jointNode->FirstChild("origin");
-
+		
 		ndMatrix rotationMatrix(ndGetIdentityMatrix());
 		//const char* const axisRot = axisNode->Attribute("rpy");
 		//const char* const axisPosit = originNode->Attribute("xyz");
@@ -589,6 +609,7 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlElement* cons
 	}
 	else if (strcmp(jointType, "revolute") == 0)
 	{
+		ndAssert(0);
 		ndFloat32 x = ndFloat32(0.0f);
 		ndFloat32 y = ndFloat32(0.0f);
 		ndFloat32 z = ndFloat32(0.0f);
@@ -620,6 +641,7 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlElement* cons
 
 	else if (strcmp(jointType, "prismatic") == 0)
 	{
+		ndAssert(0);
 		const nd::TiXmlElement* const limitNode = (nd::TiXmlElement*)jointNode->FirstChild("limit");
 		const nd::TiXmlElement* const originNode = (nd::TiXmlElement*)jointNode->FirstChild("origin");
 

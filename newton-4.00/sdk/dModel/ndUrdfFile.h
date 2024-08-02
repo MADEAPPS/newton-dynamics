@@ -56,6 +56,8 @@ class ndUrdfFile : public ndClassAlloc
 	ndJointBilateralConstraint* CreateJoint(const nd::TiXmlElement* const rootNode, const ndTree<ndBodyDynamic*, ndString>& bodyMap);
 
 	ndModelArticulation* BuildModel(const ndTree<ndBodyDynamic*, ndString>& bodyMap, ndTree<ndJointBilateralConstraint*, ndString>& joints);
+
+	ndMatrix GetMatrix(const nd::TiXmlNode* const parentNode) const;
 };
 
 
