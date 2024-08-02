@@ -393,7 +393,8 @@ ndMatrix ndUrdfFile::GetMatrix(const nd::TiXmlNode* const parentNode) const
 		if (rpy)
 		{
 			//sscanf(rpy, "%f %f %f", &roll, &pitch, &yaw);
-			sscanf(rpy, "%f %f %f", &roll, &yaw, &pitch);
+			//sscanf(rpy, "%f %f %f", &roll, &yaw, &pitch);
+			sscanf(rpy, "%f %f %f", &pitch, &yaw, &roll);
 		}
 
 		matrix = ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll);
@@ -526,19 +527,18 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlNode* const j
 	}
 	else if (strcmp(jointType, "continuous") == 0)
 	{
-		ndFloat32 x = ndFloat32(0.0f);
-		ndFloat32 y = ndFloat32(0.0f);
-		ndFloat32 z = ndFloat32(0.0f);
+		//ndFloat32 x = ndFloat32(0.0f);
+		//ndFloat32 y = ndFloat32(0.0f);
+		//ndFloat32 z = ndFloat32(0.0f);
+		//
+		//ndFloat32 x_did = ndFloat32(0.0f);
+		//ndFloat32 y_did = ndFloat32(0.0f);
+		//ndFloat32 z_did = ndFloat32(0.0f);
+		//
+		//const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
+		//const nd::TiXmlElement* const originNode = (nd::TiXmlElement*)jointNode->FirstChild("origin");
 
-		ndFloat32 x_did = ndFloat32(0.0f);
-		ndFloat32 y_did = ndFloat32(0.0f);
-		ndFloat32 z_did = ndFloat32(0.0f);
-
-		ndAssert(0);
-		const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
-		const nd::TiXmlElement* const originNode = (nd::TiXmlElement*)jointNode->FirstChild("origin");
-
-		ndMatrix rotationMatrix(ndGetIdentityMatrix());
+		//ndMatrix rotationMatrix(ndGetIdentityMatrix());
 		//const char* const axisRot = axisNode->Attribute("rpy");
 		//const char* const axisPosit = originNode->Attribute("xyz");
 
@@ -551,9 +551,8 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlNode* const j
 		//matrix.m_posit.m_x = x;
 		//matrix.m_posit.m_y = y;
 		//matrix.m_posit.m_z = z;
-
-		ndMatrix matrix(rotationMatrix);
-		joint = new ndJointHinge(matrix, childBody, parentBody);
+		//ndMatrix matrix(rotationMatrix);
+		joint = new ndJointHinge(pivotMatrix, childBody, parentBody);
 	}
 	else if (strcmp(jointType, "revolute") == 0)
 	{
