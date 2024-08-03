@@ -1082,7 +1082,6 @@ ndMesh* ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bool loadAnima
 
 	ndSharedPtr<ofbx::IScene> fbxScene(ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE));
 
-	//const ofbx::GlobalSettings& globalSettings = *fbxScene->getGlobalSettings();
 	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(*fbxScene));
 	ndMesh* const mesh = Fbx2ndMesh(*fbxScene);
 	if (loadAnimation)

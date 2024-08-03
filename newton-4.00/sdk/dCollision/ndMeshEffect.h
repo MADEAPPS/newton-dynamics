@@ -387,7 +387,9 @@ class ndMeshEffect: public ndPolyhedra
 		~ndAttibutFormat();
 
 		void Clear();
+		ndInt32 GetCount() const;
 		void SetCount(ndInt32 count);
+		
 		//void CopyFrom(const ndAttibutFormat& source);
 		//void CopyEntryFrom(ndInt32 index, const ndAttibutFormat& source, ndInt32 sourceIndex);
 		void CompactVertexData(const ndPointFormat& points, ndInt32* const indexList, ndFloat32 tol);
@@ -800,6 +802,11 @@ inline void ndMeshEffect::ndAttibutFormat::SetCount(ndInt32 count)
 		m_uv1Channel.Resize(count);
 		m_uv1Channel.SetCount(count);
 	}
+}
+
+inline ndInt32 ndMeshEffect::ndAttibutFormat::GetCount() const
+{
+	return ndInt32(m_pointChannel.GetCount());
 }
 
 inline ndInt32 ndMeshEffect::GetPropertiesCount() const

@@ -1039,7 +1039,6 @@ class ndBigVector
 
 	union 
 	{
-		ndInt64 m_i[4];
 		struct 
 		{
 			ndFloat64 m_x;
@@ -1054,6 +1053,7 @@ class ndBigVector
 			ndInt64 m_iz;
 			ndInt64 m_iw;
 		};
+		ndInt64 m_i[4];
 	};
 
 	D_CORE_API static ndBigVector m_zero;

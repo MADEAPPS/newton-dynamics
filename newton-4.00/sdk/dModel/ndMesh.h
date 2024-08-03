@@ -48,8 +48,10 @@ class ndMesh : public ndNodeHierarchy<ndMesh>
 		ndReal m_lenght;
 	};
 
-	ndMesh(ndMesh* const parent);
+	
 	ndMesh(const ndMesh& src);
+	ndMesh(ndMesh* const parent);
+	ndMesh(const ndShapeInstance& src);
 
 	~ndMesh();
 	ndMesh* CreateClone() const;

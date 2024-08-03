@@ -10,6 +10,7 @@
 */
 
 #include "ndModelStdafx.h"
+#include "ndMesh.h"
 #include "ndUrdfFile.h"
 
 ndUrdfFile::ndUrdfFile()
@@ -501,9 +502,102 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode, const
 	inertiaMatrix[1][2] = ndFloat32(yz);
 	inertiaMatrix[2][1] = ndFloat32(yz);
 
+	// create a visual mesh
+	ndMeshEffect::ndMaterial defaultMaterial;
+	ndMeshEffect* meshEffect = new ndMeshEffect;
+	meshEffect->GetMaterials().PushBack(defaultMaterial);
+	auto AddMeshShape = [this, meshEffect](const nd::TiXmlNode* const node)
+	{
+		const nd::TiXmlNode* const geometryNode = node->FirstChild("geometry");
+		const nd::TiXmlElement* const shapeNode = (nd::TiXmlElement*)geometryNode->FirstChild();
+		const char* const name = shapeNode->Value();
+
+		ndShape* shape = nullptr;
+		ndMatrix m_localMatrix(ndGetIdentityMatrix());
+		if (strcmp(name, "sphere") == 0)
+		{
+			ndFloat64 radius;
+			shapeNode->Attribute("radius", &radius);
+			shape = new ndShapeSphere(ndFloat32(radius));
+		}
+		else if (strcmp(name, "cylinder") == 0)
+		{
+			ndFloat64 length;
+			ndFloat64 radius;
+			shapeNode->Attribute("length", &length);
+			shapeNode->Attribute("radius", &radius);
+			shape = new ndShapeCylinder(ndFloat32(radius), ndFloat32(radius), ndFloat32(length));
+			m_localMatrix = ndYawMatrix(ndPi * ndFloat32(0.5f));
+		}
+		else if (strcmp(name, "box") == 0)
+		{
+			ndFloat32 x;
+			ndFloat32 y;
+			ndFloat32 z;
+			const char* const size = shapeNode->Attribute("size");
+			sscanf(size, "%f %f %f", &x, &y, &z);
+			shape = new ndShapeBox(x, y, z);
+		}
+		else
+		{
+			ndTrace(("FIX ME urdf load geometry mesh %s\n", name));
+			//shape = new ndShapeNull();
+			shape = new ndShapeSphere(0.05f);
+		}
+
+		ndShapeInstance collision(shape);
+		ndMatrix matrix(GetMatrix(node));
+		collision.SetLocalMatrix(m_localMatrix * matrix);
+
+		class PolygonizeMesh: public ndShapeDebugNotify
+		{
+			public:
+			PolygonizeMesh(ndMeshEffect* const meshEffect)
+				:ndShapeDebugNotify()
+				,m_meshEffect(meshEffect)
+			{
+			}
+
+			void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const edgeType)
+			{
+				ndVector normal(ndVector::m_zero);
+				for (ndInt32 i = 2; i < vertexCount; ++i)
+				{
+					ndVector e0(faceArray[i - 1] - faceArray[0]);
+					ndVector e1(faceArray[i - 0] - faceArray[0]);
+					normal += e0.CrossProduct(e1);
+				}
+				normal = normal & ndVector::m_triplexMask;
+				normal = normal.Normalize();
+
+				m_meshEffect->BeginBuildFace();
+				for (ndInt32 i = 0; i < vertexCount; ++i)
+				{
+					m_meshEffect->AddMaterial(0);
+					m_meshEffect->AddPoint(faceArray[i].m_x, faceArray[i].m_y, faceArray[i].m_z);
+					m_meshEffect->AddNormal(normal.m_x, normal.m_y, normal.m_z);
+				}
+				m_meshEffect->EndBuildFace();
+			}
+
+			ndMeshEffect* m_meshEffect;
+		};
+
+		PolygonizeMesh polygonize(meshEffect);
+		collision.DebugShape(ndGetIdentityMatrix(), polygonize);
+	};
+
+	meshEffect->BeginBuild();
+	for (const nd::TiXmlNode* node = linkNode->FirstChild("visual"); node; node = node->NextSibling("visual"))
+	{
+		AddMeshShape(node);
+	}
+	meshEffect->EndBuild();
+
 	body->SetCollisionShape(collision);
 	body->SetMassMatrix(ndFloat32(mass), collision);
 	body->SetMassMatrix(ndFloat32(mass), inertiaMatrix);
+	body->SetNotifyCallback(new ndUrdfBodyNotify(meshEffect));
 
 	return body;
 }

@@ -733,7 +733,13 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 			world->AddJoint(node->m_joint);
 		}
 
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, nullptr));
+		ndUrdfBodyNotify* const urdfNotify = (ndUrdfBodyNotify*)body->GetNotifyCallback();
+		ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh ("urdfMesh", *urdfNotify->m_mesh, scene->GetShaderCache()));
+		ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+		entity->SetMesh(mesh);
+		scene->AddEntity(entity);
+
+		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 
 		ndShapeInstance& instanceShape = body->GetAsBodyDynamic()->GetCollisionShape();
 		instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;

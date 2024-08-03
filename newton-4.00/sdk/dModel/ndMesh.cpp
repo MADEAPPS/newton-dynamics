@@ -64,6 +64,19 @@ ndMesh::ndMesh(const ndMesh& src)
 	}
 }
 
+ndMesh::ndMesh(const ndShapeInstance& src)
+	:ndNodeHierarchy<ndMesh>()
+	,m_matrix(ndGetIdentityMatrix())
+	,m_meshMatrix(ndGetIdentityMatrix())
+	,m_name()
+	,m_mesh()
+	,m_scale()
+	,m_posit()
+	,m_rotation()
+{
+
+}
+
 ndMesh::~ndMesh()
 {
 }

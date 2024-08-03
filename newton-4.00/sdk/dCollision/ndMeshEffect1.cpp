@@ -1490,15 +1490,17 @@ dgCollisionInstance* ndMeshEffect::CreateCollisionTree(dgWorld* const world, ndI
 
 	ndInt32 mark = IncLRU();
 	ndPolyhedra::Iterator iter(*this);
-	for (iter.Begin(); iter; iter++) {
+	for (iter.Begin(); iter; iter++) 
+	{
 		ndNode* const faceNode = iter.GetNode();
-		//ndEdge* const face = &(*iter);
 		ndEdge* const face = &faceNode->GetInfo();
-		if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {
+		if ((face->m_mark != mark) && (face->m_incidentFace > 0)) 
+		{
 			ndInt32 count = 0;
 			ndVector polygon[256];
 			ndEdge* ptr = face;
-			do {
+			do 
+			{
 				//polygon[count] = ndVector (m_points[ptr->m_incidentVertex]);
 				polygon[count] = GetVertex(ptr->m_incidentVertex);
 				count++;
@@ -1680,15 +1682,10 @@ inline ndInt32 ndMeshEffect::ndFormat::CompareVertex(const ndSortKey* const ptr0
 	return 0;
 }
 
-//void ndMeshEffect::ndPointFormat::CompressData(
-//	ndPointFormat& output, ndInt32* const indexList, 
-//	ndSortKey* const remapIndex, const ndSortCluster& cluster, ndFloat32 tol)
 void ndMeshEffect::ndPointFormat::CompressData(
-		ndPointFormat&, ndInt32* const,
-		ndSortKey* const, const ndSortCluster&, ndFloat32)
+	ndPointFormat& output, ndInt32* const indexList, 
+	ndSortKey* const remapIndex, const ndSortCluster& cluster, ndFloat32 tol)
 {
-	ndAssert(0);
-#if 0
 	const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
 	const ndBigVector x2c(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin);
 	const ndBigVector variance((x2c.GetMax(ndVector::m_zero)).Sqrt());
@@ -1730,7 +1727,7 @@ void ndMeshEffect::ndPointFormat::CompressData(
 	const ndFloat64 tolerance = ndMax(ndMin(minDist, ndFloat64(tol)), ndFloat64(1.0e-8f));
 	const ndFloat64 sweptWindow = ndFloat64(2.0f) * tolerance;
 
-	const ndInt32 base = output.m_vertex.GetCount();
+	const ndInt32 base = ndInt32 (output.m_vertex.GetCount());
 	
 	ndInt32 newCount = 0;
 	for (ndInt32 i = 0; i < cluster.m_count; ++i)
@@ -1804,18 +1801,13 @@ void ndMeshEffect::ndPointFormat::CompressData(
 		ndInt32 index = remapIndex[i].m_mask;
 		indexList[i1] = index;
 	}
-#endif
 }
 
-//void ndMeshEffect::ndPointFormat::CompactVertexData(ndInt32* const indexList, ndFloat32 tol)
-void ndMeshEffect::ndPointFormat::CompactVertexData(ndInt32* const, ndFloat32)
+void ndMeshEffect::ndPointFormat::CompactVertexData(ndInt32* const indexList, ndFloat32 tol)
 {
-	ndAssert(0);
-#if 0
-
 	ndPointFormat tmpFormat(*this);
 	Clear();
-	const ndInt32 vertexCount = tmpFormat.m_vertex.GetCount();
+	const ndInt32 vertexCount = ndInt32 (tmpFormat.m_vertex.GetCount());
 
 	ndStack<ndSortKey> indirectListBuffer(vertexCount);
 	ndSortKey* const indirectList = &indirectListBuffer[0];
@@ -1961,7 +1953,6 @@ void ndMeshEffect::ndPointFormat::CompactVertexData(ndInt32* const, ndFloat32)
 	{
 		tmpFormat.CompressData(*this, indexList, indirectList, cluster, tol);
 	}
-#endif
 }
 
 void ndMeshEffect::ndAttibutFormat::CompressData(
@@ -2411,7 +2402,8 @@ void ndMeshEffect::BeginBuildFace()
 void ndMeshEffect::AddPoint(ndFloat64 x, ndFloat64 y, ndFloat64 z)
 {
 	m_attrib.m_pointChannel.PushBack(ndInt32(m_points.m_vertex.GetCount()));
-	m_points.m_vertex.PushBack(ndBigVector(QuantizeCordinade(x), QuantizeCordinade(y), QuantizeCordinade(z), ndFloat64(0.0f)));
+	const ndBigVector point(QuantizeCordinade(x), QuantizeCordinade(y), QuantizeCordinade(z), ndFloat64(0.0f));
+	m_points.m_vertex.PushBack(point);
 }
 
 void ndMeshEffect::AddLayer(ndInt32 layer)
@@ -2451,10 +2443,7 @@ void ndMeshEffect::AddMaterial(ndInt32 materialIndex)
 
 void ndMeshEffect::EndBuildFace()
 {
-	ndAssert(0);
-#if 0
-
-	ndInt32 count = m_points.m_vertex.GetCount() - m_constructionIndex;
+	ndInt32 count = ndInt32 (m_points.m_vertex.GetCount()) - m_constructionIndex;
 	if (count > 3) 
 	{
 		ndInt32 indexList[256];
@@ -2512,6 +2501,10 @@ void ndMeshEffect::EndBuildFace()
 		
 		ndInt32 mark = polygon.IncLRU();
 		ndPolyhedra::Iterator iter(polygon);
+		
+		m_points.m_vertex.SetCount(m_constructionIndex);
+		m_attrib.SetCount(GetPropertiesCount() - count);
+
 		for (iter.Begin(); iter; iter++) 
 		{
 			ndEdge* const edge = &iter.GetNode()->GetInfo();
@@ -2603,7 +2596,6 @@ void ndMeshEffect::EndBuildFace()
 			m_points.SetCount(m_constructionIndex);
 		}
 	}
-#endif
 }
 
 void ndMeshEffect::BeginBuild()
@@ -2616,12 +2608,8 @@ void ndMeshEffect::BeginBuild()
 	m_constructionIndex = 0;
 }
 
-//void ndMeshEffect::EndBuild(bool fixTjoint)
-void ndMeshEffect::EndBuild(bool)
+void ndMeshEffect::EndBuild(bool fixTjoint)
 {
-ndAssert(0);
-#if 0
-
 	#ifdef _DEBUG
 	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); i += 3)
 	{
@@ -2640,7 +2628,7 @@ ndAssert(0);
 	}
 	#endif
 
-	ndInt32 triangCount = m_points.m_vertex.GetCount() / 3;
+	ndInt32 triangCount = ndInt32 (m_points.m_vertex.GetCount() / 3);
 	const ndInt32* const indexList = &m_attrib.m_pointChannel[0];
 	for (ndInt32 i = 0; i < triangCount; ++i) 
 	{
@@ -2722,7 +2710,6 @@ ndAssert(0);
 		}
 	}
 	#endif
-#endif
 }
 
 void ndMeshEffect::BeginFace()
@@ -3060,9 +3047,7 @@ void ndMeshEffect::BuildFromIndexList(const ndMeshVertexFormat* const format)
 
 void ndMeshEffect::PackPoints()
 {
-	ndAssert(0);
-#if 0
-	ndStack<ndInt32>vertexIndexMapBuffer(m_points.m_vertex.GetCount());
+	ndStack<ndInt32>vertexIndexMapBuffer(ndInt32 (m_points.m_vertex.GetCount()));
 	ndInt32* const vertexIndexMap = &vertexIndexMapBuffer[0];
 	m_points.CompactVertexData(&vertexIndexMap[0], ndFloat32 (1.0e-6f));
 
@@ -3102,7 +3087,6 @@ void ndMeshEffect::PackPoints()
 		}
 	}
 	EndFace();
-#endif
 }
 
 void ndMeshEffect::UnpackPoints()

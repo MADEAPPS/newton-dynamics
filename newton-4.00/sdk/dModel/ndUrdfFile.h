@@ -13,6 +13,20 @@
 #define _ND_URDF_FILE_H_
 
 class ndModelArticulation;
+
+
+class ndUrdfBodyNotify : public ndBodyNotify
+{
+	public:
+	ndUrdfBodyNotify(ndMeshEffect* const mesh)
+		:ndBodyNotify(ndVector (0.0f, 0.0f, -9.8f, 0.0f))
+		,m_mesh(mesh)
+	{
+	}
+	
+	ndSharedPtr<ndMeshEffect> m_mesh;
+};
+
 class ndUrdfFile : public ndClassAlloc
 {
 	class Material
