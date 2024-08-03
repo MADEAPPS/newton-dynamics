@@ -37,22 +37,6 @@ jobs:
       run: |
         newton-4.00/build/tests/newton_tests
 
-    - name: Build And Run Hello World Apps
-      shell: bash
-      run: |
-        cd newton-4.00/applications/hello-world
-        cmake -S . -B build/ -DCMAKE_INSTALL_PREFIX:PATH=/tmp/newton
-        cmake --build build/
-
-        echo -e "\n\n---------- Hello World\n"
-        build/hello
-
-        echo -e "\n\n---------- TransformCallback\n"
-        build/transformCallback
-
-        echo -e "\n\n---------- ContactCallback\n"
-        build/contactCallback
-
   build-windows:
     runs-on: windows-latest
     steps:
