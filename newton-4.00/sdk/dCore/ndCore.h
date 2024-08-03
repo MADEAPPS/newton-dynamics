@@ -30,7 +30,6 @@
 #include <ndSort.h>
 #include <ndTypes.h>
 #include <ndUtils.h>
-
 #include <ndArray.h>
 #include <ndStack.h>
 #include <ndDebug.h>
@@ -70,7 +69,6 @@
 #include <ndThreadSyncUtils.h>
 #include <ndContainersAlloc.h>
 #include <ndAabbPolygonSoup.h>
-
 #include <ndSmallDeterminant.h>
 #include <ndConjugateGradient.h>
 #include <ndPolygonSoupBuilder.h>

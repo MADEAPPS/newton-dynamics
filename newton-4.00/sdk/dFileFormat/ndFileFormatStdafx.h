@@ -25,7 +25,6 @@
 
 #include <ndNewton.h>
 #include <ndModelInc.h>
-#include <tinyxml/tinyxml.h>
 
 #define D_WORD_CLASS		"ndWorld"
 #define D_BODY_CLASS		"ndBodyClass"

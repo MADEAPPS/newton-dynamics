@@ -5,10 +5,10 @@
     <color rgba="0 0 0.8 1"/>
   </material>
   <material name="black">
-    <color rgba="0 0 0 1"/>
+    <color rgba="0 1 0 1"/>
   </material>
   <material name="white">
-    <color rgba="1 1 1 1"/>
+    <color rgba="1 1 0 1"/>
   </material>
 
   <link name="base_link">

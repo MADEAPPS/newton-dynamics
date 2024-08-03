@@ -355,15 +355,33 @@ void ndUrdfFile::AddJoint(nd::TiXmlElement* const joint, const ndModelArticulati
 // *******************************************************************************
 // 
 // *******************************************************************************
-void ndUrdfFile::LoadMaterials(const nd::TiXmlNode* const rootNode, ndTree<Material, ndString>& materials)
+void ndUrdfFile::LoadMaterials(const nd::TiXmlNode* const rootNode, ndTree<ndInt32, ndString>& materialMap, ndArray<Material>& materials)
 {
+	materials.PushBack(Material());
 	for (const nd::TiXmlNode* node = rootNode->FirstChild("material"); node; node = node->NextSibling("material"))
 	{
-		Material material;
-
 		const nd::TiXmlElement* const materialNode = (nd::TiXmlElement*)node;
-		const char* const name = materialNode->Attribute("name");
-		materials.Insert(material, name);
+		const nd::TiXmlElement* const color = (nd::TiXmlElement*)node->FirstChild("color");
+		if (color)
+		{
+			Material material;
+
+			const char* const name = materialNode->Attribute("name");
+			materialMap.Insert(ndInt32(materials.GetCount()), name);
+
+			const char* const rgba = color->Attribute("rgba");
+
+			ndFloat32 r;
+			ndFloat32 g;
+			ndFloat32 b;
+			ndFloat32 a;
+			sscanf(rgba, "%f %f %f", &r, &g, &b, &a);
+			material.m_color.m_x = r;
+			material.m_color.m_y = g;
+			material.m_color.m_z = b;
+			material.m_color.m_w = a;
+			materials.PushBack(material);
+		}
 	}
 }
 
@@ -404,7 +422,7 @@ ndMatrix ndUrdfFile::GetMatrix(const nd::TiXmlNode* const parentNode) const
 	return matrix;
 }
 
-ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode, const ndTree<Material, ndString>& materials)
+ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode, const ndTree<ndInt32, ndString>& materialMap, const ndArray<Material>& materials)
 {
 	ndBodyDynamic* const body = new ndBodyDynamic();
 
@@ -503,10 +521,15 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode, const
 	inertiaMatrix[2][1] = ndFloat32(yz);
 
 	// create a visual mesh
-	ndMeshEffect::ndMaterial defaultMaterial;
 	ndMeshEffect* meshEffect = new ndMeshEffect;
-	meshEffect->GetMaterials().PushBack(defaultMaterial);
-	auto AddMeshShape = [this, meshEffect](const nd::TiXmlNode* const node)
+	for (ndInt32 i = 0; i < ndInt32 (materials.GetCount()); ++i)
+	{
+		ndMeshEffect::ndMaterial meshMaterial;
+		meshMaterial.m_diffuse = materials[i].m_color;
+		//meshMaterial.m_ambient = materials[i].m_color;
+		meshEffect->GetMaterials().PushBack(meshMaterial);
+	}
+	auto AddMeshShape = [this, meshEffect, &materialMap](const nd::TiXmlNode* const node)
 	{
 		const nd::TiXmlNode* const geometryNode = node->FirstChild("geometry");
 		const nd::TiXmlElement* const shapeNode = (nd::TiXmlElement*)geometryNode->FirstChild();
@@ -542,7 +565,7 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode, const
 		{
 			ndTrace(("FIX ME urdf load geometry mesh %s\n", name));
 			//shape = new ndShapeNull();
-			shape = new ndShapeSphere(0.05f);
+			shape = new ndShapeSphere(0.01f);
 		}
 
 		ndShapeInstance collision(shape);
@@ -552,9 +575,10 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode, const
 		class PolygonizeMesh: public ndShapeDebugNotify
 		{
 			public:
-			PolygonizeMesh(ndMeshEffect* const meshEffect)
+			PolygonizeMesh(ndMeshEffect* const meshEffect, ndInt32 materialIndex)
 				:ndShapeDebugNotify()
 				,m_meshEffect(meshEffect)
+				,m_materialIndex(materialIndex)
 			{
 			}
 
@@ -573,7 +597,7 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode, const
 				m_meshEffect->BeginBuildFace();
 				for (ndInt32 i = 0; i < vertexCount; ++i)
 				{
-					m_meshEffect->AddMaterial(0);
+					m_meshEffect->AddMaterial(m_materialIndex);
 					m_meshEffect->AddPoint(faceArray[i].m_x, faceArray[i].m_y, faceArray[i].m_z);
 					m_meshEffect->AddNormal(normal.m_x, normal.m_y, normal.m_z);
 				}
@@ -581,9 +605,20 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode, const
 			}
 
 			ndMeshEffect* m_meshEffect;
+			ndInt32 m_materialIndex;
 		};
 
-		PolygonizeMesh polygonize(meshEffect);
+		ndInt32 materialIndex = 0;
+
+		const nd::TiXmlElement* const materialNode = (nd::TiXmlElement*)node->FirstChild("material");
+		if (materialNode)
+		{
+			const char* const name = materialNode->Attribute("name");
+			const ndTree<ndInt32, ndString>::ndNode* const materialNode = materialMap.Find(name);
+			materialIndex = materialNode->GetInfo();
+		}
+
+		PolygonizeMesh polygonize(meshEffect, materialIndex);
 		collision.DebugShape(ndGetIdentityMatrix(), polygonize);
 	};
 
@@ -784,10 +819,12 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 		return nullptr;
 	}
 
-	ndTree<Material, ndString> materials;
+	ndArray<Material> materials;
+	ndTree<ndInt32, ndString> materialMap;
 	ndTree<Hierarchy, ndString> bodyLinks;
 
 	const nd::TiXmlElement* const rootNode = doc.RootElement();
+
 	for (const nd::TiXmlNode* node = rootNode->FirstChild("link"); node; node = node->NextSibling("link"))
 	{
 		const nd::TiXmlElement* const linkNode = (nd::TiXmlElement*)node;
@@ -827,7 +864,8 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 		}
 	}
 
-	ndBodyDynamic* const rootBody = CreateBody(root->m_link, materials);
+	LoadMaterials(rootNode, materialMap, materials);
+	ndBodyDynamic* const rootBody = CreateBody(root->m_link, materialMap, materials);
 
 	ndModelArticulation* const model = new ndModelArticulation;
 	root->m_articulation = model->AddRootBody(rootBody);
@@ -845,7 +883,7 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 			Hierarchy& link = iter.GetNode()->GetInfo();
 			if (link.m_parentLink == parent->m_link)
 			{
-				ndBodyDynamic* const childBody = CreateBody(link.m_link, materials);
+				ndBodyDynamic* const childBody = CreateBody(link.m_link, materialMap, materials);
 				ndJointBilateralConstraint* const joint = CreateJoint(link.m_joint, childBody, parent->m_articulation->m_body->GetAsBodyDynamic());
 				link.m_articulation = model->AddLimb(parent->m_articulation, joint->GetBody0(), joint);
 				stack.PushBack(&link);
