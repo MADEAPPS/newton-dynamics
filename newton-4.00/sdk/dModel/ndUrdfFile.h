@@ -86,6 +86,8 @@ class ndUrdfFile : public ndClassAlloc
 	void LoadMaterials(const nd::TiXmlNode* const rootNode, ndTree<Material, ndString>& materials);
 	ndBodyDynamic* CreateBody(const nd::TiXmlNode* const linkNode, const ndTree<Material, ndString>& materials);
 	ndJointBilateralConstraint* CreateJoint(const nd::TiXmlNode* const jointNode, ndBodyDynamic* const child, ndBodyDynamic* const parent);
+
+	void ApplyRotation(const ndMatrix& rotation, ndModelArticulation* const model);
 };
 
 

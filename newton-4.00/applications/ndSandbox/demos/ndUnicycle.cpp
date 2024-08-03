@@ -723,7 +723,7 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	{
 		ndSharedPtr<ndBody> body(node->m_body);
 		ndMatrix matrix__(body->GetMatrix());
-		matrix__.m_posit.m_y += 1.0f;
+		matrix__.m_posit.m_y += 0.5f;
 		matrix__.m_posit.m_z += 0.0f;
 		body->SetMatrix(matrix__);
 

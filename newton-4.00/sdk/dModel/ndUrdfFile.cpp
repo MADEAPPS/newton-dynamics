@@ -596,7 +596,7 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode, const
 
 	body->SetCollisionShape(collision);
 	body->SetMassMatrix(ndFloat32(mass), collision);
-	body->SetMassMatrix(ndFloat32(mass), inertiaMatrix);
+	//body->SetMassMatrix(ndFloat32(mass), inertiaMatrix);
 	body->SetNotifyCallback(new ndUrdfBodyNotify(meshEffect));
 
 	return body;
@@ -703,6 +703,72 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlNode* const j
 	return joint;
 }
 
+void ndUrdfFile::ApplyRotation(const ndMatrix& rotation, ndModelArticulation* const model)
+{
+	ndMatrix rotationInv(rotation.OrthoInverse());
+
+	ndArray<ndMatrix> matrix0;
+	ndArray<ndMatrix> matrix1;
+	ndArray<ndJointBilateralConstraint*> joints;
+	ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
+
+	stack.PushBack(model->GetRoot());
+	while (stack.GetCount())
+	{
+		ndModelArticulation::ndNode* node = stack.Pop();
+		ndJointBilateralConstraint* const joint = *node->m_joint;
+		if (joint)
+		{
+			ndMatrix pivotMatrix0;
+			ndMatrix pivotMatrix1;
+			joint->CalculateGlobalMatrix(pivotMatrix0, pivotMatrix1);
+
+			joints.PushBack(joint);
+			matrix0.PushBack(pivotMatrix0 * rotation);
+			matrix1.PushBack(pivotMatrix1 * rotation);
+		}
+	
+		for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+		{
+			stack.PushBack(child);
+		}
+	}
+
+	stack.PushBack(model->GetRoot());
+	while (stack.GetCount())
+	{
+		ndModelArticulation::ndNode* node = stack.Pop();
+		ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+
+		ndShapeInstance& shape = body->GetCollisionShape();
+		ndMatrix shapeMatrix(shape.GetLocalMatrix() * body->GetMatrix() * rotation);
+
+		body->SetCentreOfMass(rotation.RotateVector(body->GetCentreOfMass()));
+		ndMatrix bodyMatrix(rotationInv * body->GetMatrix() * rotation);
+
+		body->SetMatrix(bodyMatrix);
+		shape.SetLocalMatrix(shapeMatrix * bodyMatrix.OrthoInverse());
+
+		ndUrdfBodyNotify* const notify = (ndUrdfBodyNotify*)body->GetNotifyCallback();
+		notify->m_mesh->ApplyTransform(rotation);
+
+		for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+		{
+			stack.PushBack(child);
+		}
+	}
+
+	for (ndInt32 i = 0; i < joints.GetCount(); ++i)
+	{
+		ndBodyKinematic* const body0 = joints[i]->GetBody0();
+		ndBodyKinematic* const body1 = joints[i]->GetBody1();
+		ndMatrix localMatrix0(matrix0[i] * body0->GetMatrix().OrthoInverse());
+		ndMatrix localMatrix1(matrix1[i] * body1->GetMatrix().OrthoInverse());
+		joints[i]->SetLocalMatrix0(localMatrix0);
+		joints[i]->SetLocalMatrix1(localMatrix1);
+	}
+}
+
 ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 {
 	ndAssert(strstr(filePathName, ".urdf"));
@@ -767,7 +833,7 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 	root->m_articulation = model->AddRootBody(rootBody);
 
 	ndFixSizeArray<Hierarchy*, 256> stack;
-	//stack.PushBack(root);
+	stack.PushBack(root);
 
 	while (stack.GetCount())
 	{
@@ -782,12 +848,13 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 				ndBodyDynamic* const childBody = CreateBody(link.m_link, materials);
 				ndJointBilateralConstraint* const joint = CreateJoint(link.m_joint, childBody, parent->m_articulation->m_body->GetAsBodyDynamic());
 				link.m_articulation = model->AddLimb(parent->m_articulation, joint->GetBody0(), joint);
-
 				stack.PushBack(&link);
 			}
 		}
 	}
-	
 	setlocale(LC_ALL, oldloc.GetStr());
+
+	ndMatrix rotation(ndPitchMatrix(-ndPi * 0.5f));
+	ApplyRotation(rotation, model);
 	return model;
 }

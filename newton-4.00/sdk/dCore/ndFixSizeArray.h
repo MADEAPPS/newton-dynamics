@@ -38,6 +38,7 @@ class ndFixSizeArray: public ndClassAlloc
 	T& operator[] (ndInt32 i);
 	const T& operator[] (ndInt32 i) const;
 
+	T Pop();
 	void PushBack(const T& element);
 
 	T m_array[maxSize];
@@ -83,6 +84,14 @@ const T& ndFixSizeArray<T, maxSize>::operator[] (ndInt32 i) const
 	ndAssert(i >= 0);
 	ndAssert(i < maxSize);
 	return m_array[i];
+}
+
+template<class T, ndInt32 maxSize>
+T ndFixSizeArray<T, maxSize>::Pop()
+{
+	ndAssert(m_count >= 1);
+	m_count--;
+	return (*this)[m_count];
 }
 
 template<class T, ndInt32 maxSize>

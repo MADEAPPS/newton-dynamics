@@ -101,10 +101,12 @@ class ndJointBilateralConstraint : public ndConstraint
 	D_COLLISION_API void SetMassSpringDamperAcceleration(ndConstraintDescritor& desc, ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 
 	D_COLLISION_API virtual ndInt32 GetKinematicState(ndKinematicState* const state) const;
-
 	
 	const ndMatrix& GetLocalMatrix0() const;
 	const ndMatrix& GetLocalMatrix1() const;
+
+	void SetLocalMatrix0(const ndMatrix& matrix);
+	void SetLocalMatrix1(const ndMatrix& matrix);
 
 	bool IsInWorld() const;
 	bool IsSkeleton() const;
@@ -197,6 +199,17 @@ inline const ndMatrix& ndJointBilateralConstraint::GetLocalMatrix1() const
 {
 	return m_localMatrix1;
 }
+
+inline void ndJointBilateralConstraint::SetLocalMatrix0(const ndMatrix& matrix)
+{
+	m_localMatrix0 = matrix;
+}
+
+inline void ndJointBilateralConstraint::SetLocalMatrix1(const ndMatrix& matrix)
+{
+	m_localMatrix1 = matrix;
+}
+
 
 inline ndFloat32 ndJointBilateralConstraint::GetMotorZeroAcceleration(ndConstraintDescritor& desc) const
 {
