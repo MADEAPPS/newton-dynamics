@@ -767,7 +767,7 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 	root->m_articulation = model->AddRootBody(rootBody);
 
 	ndFixSizeArray<Hierarchy*, 256> stack;
-	stack.PushBack(root);
+	//stack.PushBack(root);
 
 	while (stack.GetCount())
 	{
@@ -790,5 +790,4 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 	
 	setlocale(LC_ALL, oldloc.GetStr());
 	return model;
-	return nullptr;
 }
