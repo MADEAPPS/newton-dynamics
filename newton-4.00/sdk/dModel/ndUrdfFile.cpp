@@ -525,11 +525,6 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlNode* const j
 	}
 	else if (strcmp(jointType, "continuous") == 0)
 	{
-		//
-		//ndFloat32 x_did = ndFloat32(0.0f);
-		//ndFloat32 y_did = ndFloat32(0.0f);
-		//ndFloat32 z_did = ndFloat32(0.0f);
-		
 		const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
 		if (axisNode)
 		{
@@ -544,46 +539,67 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlNode* const j
 		}
 		joint = new ndJointHinge(pivotMatrix, childBody, parentBody);
 	}
-	else if (strcmp(jointType, "revolute") == 0)
-	{
-		ndAssert(0);
-		ndFloat32 x = ndFloat32(0.0f);
-		ndFloat32 y = ndFloat32(0.0f);
-		ndFloat32 z = ndFloat32(0.0f);
-
-		ndFloat32 x_did = ndFloat32(0.0f);
-		ndFloat32 y_did = ndFloat32(0.0f);
-		ndFloat32 z_did = ndFloat32(0.0f);
-
-		const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
-		const nd::TiXmlElement* const originNode = (nd::TiXmlElement*)jointNode->FirstChild("origin");
-
-		ndMatrix rotationMatrix(ndGetIdentityMatrix());
-		//const char* const axisRot = axisNode->Attribute("rpy");
-		//const char* const axisPosit = originNode->Attribute("xyz");
-
-		//const char* const originRot = originNode->Attribute("rpy");
-		//const char* const originPosit = originNode->Attribute("xyz");
-
-		//sscanf(originPosit, "%f %f %f", &x, &y, &z);
-		//sscanf(originRot, "%f %f %f", &x_did, &y_did, &z_did);
-		//ndMatrix matrix(ndGramSchmidtMatrix(ndVector (x_did, y_did, z_did, ndFloat32 (0.0f))));
-		//matrix.m_posit.m_x = x;
-		//matrix.m_posit.m_y = y;
-		//matrix.m_posit.m_z = z;
-
-		ndMatrix matrix(rotationMatrix);
-		joint = new ndJointHinge(matrix, childBody, parentBody);
-	}
-
 	else if (strcmp(jointType, "prismatic") == 0)
 	{
-		ndAssert(0);
-		const nd::TiXmlElement* const limitNode = (nd::TiXmlElement*)jointNode->FirstChild("limit");
-		const nd::TiXmlElement* const originNode = (nd::TiXmlElement*)jointNode->FirstChild("origin");
+		const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
+		if (axisNode)
+		{
+			ndFloat32 x = ndFloat32(0.0f);
+			ndFloat32 y = ndFloat32(0.0f);
+			ndFloat32 z = ndFloat32(0.0f);
+			const char* const axisPin = axisNode->Attribute("xyz");
+			sscanf(axisPin, "%f %f %f", &x, &y, &z);
 
-		ndMatrix matrix(ndGetIdentityMatrix());
-		joint = new ndJointSlider(matrix, childBody, parentBody);
+			ndMatrix matrix(ndGramSchmidtMatrix(ndVector(x, y, z, ndFloat32(0.0f))));
+			pivotMatrix = matrix * pivotMatrix;
+		}
+		joint = new ndJointSlider(pivotMatrix, childBody, parentBody);
+
+		const nd::TiXmlElement* const limit = (nd::TiXmlElement*)jointNode->FirstChild("limit");
+		if (limit)
+		{
+			ndFloat64 effort = 0.0f;
+			ndFloat64 lower = 0.0f;
+			ndFloat64 upper = 0.0f;
+			limit->Attribute("effort", &effort);
+			limit->Attribute("lower", &lower);
+			limit->Attribute("upper", &upper);
+
+			ndJointSlider* const slider = (ndJointSlider*)joint;
+			slider->SetLimits(ndFloat32 (lower), ndFloat32 (upper));
+			slider->SetLimitState(true);
+		}
+	}
+	else if (strcmp(jointType, "revolute") == 0)
+	{
+		const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
+		if (axisNode)
+		{
+			ndFloat32 x = ndFloat32(0.0f);
+			ndFloat32 y = ndFloat32(0.0f);
+			ndFloat32 z = ndFloat32(0.0f);
+			const char* const axisPin = axisNode->Attribute("xyz");
+			sscanf(axisPin, "%f %f %f", &x, &y, &z);
+
+			ndMatrix matrix(ndGramSchmidtMatrix(ndVector(x, y, z, ndFloat32(0.0f))));
+			pivotMatrix = matrix * pivotMatrix;
+		}
+		joint = new ndJointHinge(pivotMatrix, childBody, parentBody);
+
+		const nd::TiXmlElement* const limit = (nd::TiXmlElement*)jointNode->FirstChild("limit");
+		if (limit)
+		{
+			ndFloat64 effort = 0.0f;
+			ndFloat64 lower = 0.0f;
+			ndFloat64 upper = 0.0f;
+			limit->Attribute("effort", &effort);
+			limit->Attribute("lower", &lower);
+			limit->Attribute("upper", &upper);
+
+			ndJointHinge* const hinge = (ndJointHinge*)joint;
+			hinge->SetLimits(ndFloat32(lower), ndFloat32(upper));
+			hinge->SetLimitState(true);
+		}
 	}
 	else
 	{

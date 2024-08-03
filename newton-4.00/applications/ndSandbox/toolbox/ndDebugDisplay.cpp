@@ -1096,7 +1096,13 @@ void ndDebugDisplay::ndShapesDebugInfo::Render(ndDemoEntityManager* const scene)
 		}
 		else
 		{
-			ndAssert(0);
+			ndDebugMeshCache::ndNode* const shapeNode = m_meshCache.Find(key);
+			if (shapeNode)
+			{
+				ndFlatShadedDebugMesh* const shadedMesh = *shapeNode->GetInfo().m_flatShaded;
+				shadedMesh->SetColor(color);
+				shadedMesh->Render(scene, matrix);
+			}
 		}
 	}
 
