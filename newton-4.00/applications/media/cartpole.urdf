@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<robot name="physics">
+
+  <material name="wood">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.25 0.125 0.15"/>
+      </geometry>
+      <material name="wood"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.25 0.125 0.15"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+  </link>
+
+</robot>
