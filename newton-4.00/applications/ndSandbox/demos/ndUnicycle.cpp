@@ -718,6 +718,9 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	ndUrdfFile urdf;
 	ndSharedPtr<ndModel> r2d2(urdf.Import(fileName));
 
+	//ndGetWorkingFileName("r2d3.urdf", fileName);
+	//urdf.Export(fileName, r2d2->GetAsModelArticulation());
+
 	ndModelArticulation* const root = r2d2->GetAsModelArticulation();
 	for (ndModelArticulation::ndNode* node = root->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 	{
