@@ -35,6 +35,12 @@ ndModelNotify::ndModelNotify()
 {
 }
 
+ndModelNotify* ndModelNotify::Clone() const
+{
+	ndAssert(0);
+	return nullptr;
+}
+
 ndModelNotify::~ndModelNotify()
 {
 }

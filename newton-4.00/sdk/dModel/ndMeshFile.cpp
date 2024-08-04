@@ -32,7 +32,8 @@ ndMeshFile::~ndMeshFile()
 {
 }
 
-void ndMeshFile::Export(const ndMesh* const mesh, const char* const fullPathName)
+//void ndMeshFile::Export(const ndMesh* const mesh, const char* const fullPathName)
+void ndMeshFile::Export(const ndMesh* const, const char* const)
 {
 	ndAssert(0);
 	//FILE* const file = fopen(fullPathName, "wb");
@@ -411,7 +412,8 @@ void ndMeshFile::Export(const ndMesh* const mesh, const char* const fullPathName
 //	fprintf(file, "}\n");
 //}
 
-ndMesh* ndMeshFile::Import(const char* const fullPathName)
+//ndMesh* ndMeshFile::Import(const char* const fullPathName)
+ndMesh* ndMeshFile::Import(const char* const)
 {
 	ndAssert(0);
 	return nullptr;

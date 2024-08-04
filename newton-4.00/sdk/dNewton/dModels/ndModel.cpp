@@ -34,10 +34,25 @@ ndModel::ndModel()
 {
 }
 
+ndModel::ndModel(const ndModel& src)
+	:ndContainersFreeListAlloc<ndModel>()
+	,m_world(nullptr)
+	,m_worldNode(nullptr)
+	,m_deletedNode(nullptr)
+	,m_notifyCallback(*src.m_notifyCallback ? src.m_notifyCallback->Clone() : nullptr)
+{
+}
+
 ndModel::~ndModel()
 {
 	ndAssert(!m_worldNode);
 	ndAssert(!m_deletedNode);
+}
+
+ndModel* ndModel::Clone() const
+{
+	ndAssert(0);
+	return nullptr;
 }
 
 ndModel* ndModel::GetAsModel()

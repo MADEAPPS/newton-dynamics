@@ -687,6 +687,7 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode)
 						m_meshEffect->AddMaterial(m_materialIndex);
 						m_meshEffect->AddPoint(faceArray[i].m_x, faceArray[i].m_y, faceArray[i].m_z);
 						m_meshEffect->AddNormal(normal.m_x, normal.m_y, normal.m_z);
+						m_meshEffect->AddUV0(0.0f, 0.0f);
 					}
 					m_meshEffect->EndBuildFace();
 				}

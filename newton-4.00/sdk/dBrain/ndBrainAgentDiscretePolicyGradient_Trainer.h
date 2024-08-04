@@ -62,7 +62,7 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 		ndInt32 m_obsevationsSize;
 	};
 
-	ndBrainAgentDiscretePolicyGradient_Trainer(ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster>& master);
+	ndBrainAgentDiscretePolicyGradient_Trainer(const ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster>& master);
 	~ndBrainAgentDiscretePolicyGradient_Trainer();
 
 	ndBrain* GetActor();

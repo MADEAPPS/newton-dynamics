@@ -38,7 +38,10 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	D_BASE_CLASS_REFLECTION(ndModel)
 
 	D_NEWTON_API ndModel();
+	D_NEWTON_API ndModel(const ndModel& src);
+
 	D_NEWTON_API virtual ~ndModel ();
+	D_NEWTON_API virtual ndModel* Clone() const;
 
 	D_NEWTON_API virtual ndModel* GetAsModel();
 	D_NEWTON_API virtual ndModelBase* GetAsModelBase();

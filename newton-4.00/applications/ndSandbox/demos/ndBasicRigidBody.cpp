@@ -64,8 +64,18 @@ class R2D2ModelNotify : public ndModelNotify
 	{
 	}
 
+	R2D2ModelNotify(const R2D2ModelNotify& src)
+		:ndModelNotify(src)
+	{
+	}
+
 	~R2D2ModelNotify()
 	{
+	}
+
+	ndModelNotify* Clone() const
+	{
+		return new R2D2ModelNotify(*this);
 	}
 
 	void Update(ndWorld* const, ndFloat32)
@@ -116,13 +126,6 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	for (ndModelArticulation::ndNode* node = root->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 	{
 		ndSharedPtr<ndBody> body(node->m_body);
-		//ndUrdfBodyNotify* const urdfNotify = (ndUrdfBodyNotify*)body->GetNotifyCallback();
-		//ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("urdfMesh", *urdfNotify->m_mesh, scene->GetShaderCache()));
-		//ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-		//entity->SetMesh(mesh);
-		//scene->AddEntity(entity);
-		//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	
 		ndShapeInstance& instanceShape = body->GetAsBodyDynamic()->GetCollisionShape();
 		instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
 		instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = r2d2;

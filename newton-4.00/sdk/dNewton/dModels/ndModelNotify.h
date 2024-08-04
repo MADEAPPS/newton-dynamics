@@ -37,6 +37,9 @@ class ndModelNotify : public ndContainersFreeListAlloc<ndModelNotify>
 
 	D_NEWTON_API virtual ~ndModelNotify();
 
+	ndModel* GetModel() const;
+
+	virtual ndModelNotify* Clone() const = 0;
 	virtual void Update(ndWorld* const world, ndFloat32 timestep) = 0;
 	virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep) = 0;
 	virtual void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep) = 0;
@@ -46,5 +49,10 @@ class ndModelNotify : public ndContainersFreeListAlloc<ndModelNotify>
 	friend class ndModel;
 } D_GCC_NEWTON_ALIGN_32;
 
+
+inline ndModel* ndModelNotify::GetModel() const
+{
+	return m_model;
+}
 #endif 
 

@@ -158,7 +158,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::MemoryStateValues::SaveTr
 //*********************************************************************************************
 //
 //*********************************************************************************************
-ndBrainAgentDiscretePolicyGradient_Trainer::ndBrainAgentDiscretePolicyGradient_Trainer(ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster>& master)
+ndBrainAgentDiscretePolicyGradient_Trainer::ndBrainAgentDiscretePolicyGradient_Trainer(const ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster>& master)
 	:ndBrainAgent()
 	,m_workingBuffer()
 	,m_trajectory(master->m_numberOfObservations)

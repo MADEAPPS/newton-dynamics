@@ -50,12 +50,27 @@ ndModelArticulation::ndModelArticulation()
 {
 }
 
+ndModelArticulation::ndModelArticulation(const ndModelArticulation& src)
+	:ndModel(src)
+	,m_rootNode(nullptr)
+	,m_invDynamicsSolver()
+	,m_closeLoops()
+	,m_name(src.m_name)
+{
+	ndAssert(0);
+}
+
 ndModelArticulation::~ndModelArticulation()
 {
 	if (m_rootNode)
 	{
 		delete m_rootNode;
 	}
+}
+
+ndModel* ndModelArticulation::Clone() const
+{
+	return new ndModelArticulation(*this);
 }
 
 ndModelArticulation* ndModelArticulation::GetAsModelArticulation()

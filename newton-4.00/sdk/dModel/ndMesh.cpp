@@ -64,7 +64,8 @@ ndMesh::ndMesh(const ndMesh& src)
 	}
 }
 
-ndMesh::ndMesh(const ndShapeInstance& src)
+//ndMesh::ndMesh(const ndShapeInstance& src)
+ndMesh::ndMesh(const ndShapeInstance&)
 	:ndNodeHierarchy<ndMesh>()
 	,m_matrix(ndGetIdentityMatrix())
 	,m_meshMatrix(ndGetIdentityMatrix())
