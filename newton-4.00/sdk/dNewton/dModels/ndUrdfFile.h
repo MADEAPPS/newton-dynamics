@@ -22,6 +22,17 @@ class ndUrdfBodyNotify : public ndBodyNotify
 		,m_mesh(mesh)
 	{
 	}
+
+	ndUrdfBodyNotify(const ndUrdfBodyNotify& src)
+		:ndBodyNotify(src)
+		,m_mesh(src.m_mesh)
+	{
+	}
+
+	ndBodyNotify* Clone() const
+	{
+		return new ndUrdfBodyNotify(*this);
+	}
 	
 	ndSharedPtr<ndMeshEffect> m_mesh;
 };

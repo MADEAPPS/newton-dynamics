@@ -34,9 +34,15 @@ class ndModelBodyNotify: public ndBodyNotify
 	//};
 
 	D_CLASS_REFLECTION(ndModelBodyNotify, ndBodyNotify)
+
 	ndModelBodyNotify(const ndModelBodyNotify& src);
 	ndModelBodyNotify(ndBodyKinematic* const parentBody = nullptr, ndVector gravity = ndVector (ndFloat32 (0.0f), ndFloat32(-10.0f), ndFloat32(0.0f), ndFloat32(0.0f)));
 	virtual ~ndModelBodyNotify();
+
+	ndBodyNotify* Clone() const
+	{
+		return new ndModelBodyNotify(*this);
+	}
 
 	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
 	virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);

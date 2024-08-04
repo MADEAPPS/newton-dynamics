@@ -309,13 +309,22 @@ namespace ndCarpole_0
 			{
 				ndMatrix location(matrix);
 				location.m_posit.m_x += 3.0f * (ndRand() - 0.5f);
+				#if 0
 				//ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerTrainer(m_master));
 				//ndSharedPtr<ndModel> model(CreateModel(scene, location, agent));
-				//ndModelArticulation* const model = (ndModelArticulation*)visualModel->Clone();
+				ndModelArticulation* const model = (ndModelArticulation*)visualModel->Clone();
 
 				//world->AddModel(model);
 				////HideModel(model);
 				//SetMaterial(model);
+				#else
+				ndModelArticulation* const model = CreateModel(scene, location);
+				model->AddToWorld(world);
+				#ifdef ND_TRAIN_AGENT
+					model->SetNotifyCallback(new RobotModelNotify(m_master, model));
+				#endif
+				SetMaterial(model);
+				#endif
 			}
 		}
 
@@ -355,6 +364,16 @@ namespace ndCarpole_0
 			InvisibleBodyNotify(const ndDemoEntityNotify* const src)
 				:ndDemoEntityNotify(*src)
 			{
+			}
+
+			InvisibleBodyNotify(const InvisibleBodyNotify& src)
+				:ndDemoEntityNotify(src)
+			{
+			}
+
+			ndBodyNotify* Clone() const
+			{
+				return new InvisibleBodyNotify(*this);
 			}
 		
 			virtual bool OnSceneAabbOverlap(const ndBody* const otherBody) const

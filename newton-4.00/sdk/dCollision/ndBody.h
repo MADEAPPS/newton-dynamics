@@ -44,7 +44,9 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 {
 	public:
 	D_BASE_CLASS_REFLECTION(ndBody)
+
 	D_COLLISION_API ndBody();
+	D_COLLISION_API ndBody(const ndBody& src);
 	D_COLLISION_API virtual ~ndBody();
 
 	virtual ndBody* GetAsBody() { return this;}

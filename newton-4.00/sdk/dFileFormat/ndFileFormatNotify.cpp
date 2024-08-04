@@ -46,7 +46,9 @@ void ndFileFormatNotify::LoadNotify(const nd::TiXmlElement* const node, ndBodyNo
 
 ndBodyNotify* ndFileFormatNotify::LoadNotify(const nd::TiXmlElement* const node)
 {
-	ndBodyNotify* const notify = new ndBodyNotify(ndVector::m_zero);
-	LoadNotify(node, notify);
-	return notify;
+	ndAssert(0);
+	//ndBodyNotify* const notify = new ndBodyNotify(ndVector::m_zero);
+	//LoadNotify(node, notify);
+	//return notify;
+	return nullptr;
 }

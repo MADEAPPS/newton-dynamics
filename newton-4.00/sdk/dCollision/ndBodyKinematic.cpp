@@ -127,6 +127,40 @@ ndBodyKinematic::ndBodyKinematic()
 	SetMassMatrix(ndVector::m_zero);
 }
 
+ndBodyKinematic::ndBodyKinematic(const ndBodyKinematic& src)
+	:ndBody(src)
+#ifdef D_USE_FULL_INERTIA
+	,m_inertiaPrincipalAxis(src.m_inertiaPrincipalAxis)
+#endif
+	,m_invWorldInertiaMatrix(src.m_invWorldInertiaMatrix)
+	,m_shapeInstance(src.m_shapeInstance)
+	,m_mass(ndVector::m_zero)
+	,m_invMass(ndVector::m_zero)
+	,m_accel(ndVector::m_zero)
+	,m_alpha(ndVector::m_zero)
+	,m_gyroAlpha(ndVector::m_zero)
+	,m_gyroTorque(ndVector::m_zero)
+	,m_gyroRotation()
+	,m_jointList()
+	,m_contactList()
+	,m_lock()
+	,m_scene(nullptr)
+	,m_islandParent(nullptr)
+	,m_sceneNode(nullptr)
+	,m_skeletonContainer(nullptr)
+	,m_spetialUpdateNode(nullptr)
+	,m_maxAngleStep(ndFloat32(90.0f)* ndDegreeToRad)
+	,m_maxLinearStep(ndFloat32(1.0f))
+	,m_weigh(ndFloat32(0.0f))
+	,m_index(0)
+	,m_bodyNodeIndex(-1)
+	,m_buildSkelIndex(0)
+	,m_sceneNodeIndex(-1)
+	,m_buildBodyNodeIndex(-1)
+	,m_buildSceneNodeIndex(-1)
+{
+}
+
 ndBodyKinematic::~ndBodyKinematic()
 {
 	ndAssert(m_scene == nullptr);

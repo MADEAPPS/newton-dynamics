@@ -134,9 +134,6 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	//ndGetWorkingFileName("unicycle.urdf", fileName);
 	//urdf.Export(fileName, articulation);
 
-	
-
-
 	ndMatrix origin1(ndGetIdentityMatrix());
 	origin1.m_posit.m_x = 20.0f;
 

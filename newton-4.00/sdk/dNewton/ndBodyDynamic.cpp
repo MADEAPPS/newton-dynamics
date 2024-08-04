@@ -42,6 +42,12 @@ ndBodyDynamic::ndBodyDynamic()
 	m_isDynamics = 1;
 }
 
+ndBodyDynamic::ndBodyDynamic(const ndBodyDynamic& src)
+	:ndBodyKinematic(src)
+{
+	m_isDynamics = 1;
+}
+
 ndBodyDynamic::~ndBodyDynamic()
 {
 }

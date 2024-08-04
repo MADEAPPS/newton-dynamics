@@ -23,6 +23,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndModel.h"
+#include "ndBodyDynamic.h"
 #include "ndModelArticulation.h"
 
 ndModelArticulation::ndNode::ndNode(const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint, ndNode* const parent)
@@ -57,7 +58,26 @@ ndModelArticulation::ndModelArticulation(const ndModelArticulation& src)
 	,m_closeLoops()
 	,m_name(src.m_name)
 {
-	ndAssert(0);
+	ndAssert(src.GetRoot()->m_body->GetAsBodyDynamic());
+
+	ndFixSizeArray<ndNode*, 256> stack;
+	stack.PushBack(src.GetRoot());
+	while (stack.GetCount())
+	{
+		ndNode* const node = stack.Pop();
+		ndBodyDynamic* xxx = node->m_body->GetAsBodyDynamic();
+		ndBodyDynamic* xxx1 = new ndBodyDynamic(*xxx);
+		AddRootBody(new ndBodyDynamic(*node->m_body->GetAsBodyDynamic()));
+		if (*node->m_joint)
+		{
+
+		}
+
+		for (ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+		{
+			stack.PushBack(child);
+		}
+	}
 }
 
 ndModelArticulation::~ndModelArticulation()

@@ -55,6 +55,38 @@ ndBody::ndBody()
 	m_transformIsDirty = 1;
 }
 
+ndBody::ndBody(const ndBody& src)
+	:ndContainersFreeListAlloc<ndBody>()
+	,m_matrix(src.m_matrix)
+	,m_veloc(src.m_veloc)
+	,m_omega(src.m_omega)
+	,m_localCentreOfMass(src.m_localCentreOfMass)
+	,m_globalCentreOfMass(src.m_globalCentreOfMass)
+	,m_minAabb(src.m_minAabb)
+	,m_maxAabb(src.m_maxAabb)
+	,m_rotation(src.m_rotation)
+	,m_notifyCallback(nullptr)
+	,m_deletedNode(nullptr)
+	,m_uniqueId(m_uniqueIdCount)
+	,m_flags(0)
+	,m_isStatic(0)
+	,m_autoSleep(src.m_autoSleep)
+	,m_equilibrium(0)
+	,m_equilibrium0(0)
+	,m_isJointFence0(0)
+	,m_isJointFence1(0)
+	,m_isConstrained(0)
+	,m_sceneForceUpdate(1)
+	,m_sceneEquilibrium(0)
+{
+	m_uniqueIdCount++;
+	m_transformIsDirty = 1;
+	if (src.m_notifyCallback)
+	{
+		SetNotifyCallback(src.m_notifyCallback->Clone());
+	}
+}
+
 ndBody::~ndBody()
 {
 	ndAssert(!m_deletedNode);
