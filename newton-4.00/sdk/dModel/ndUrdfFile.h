@@ -82,12 +82,19 @@ class ndUrdfFile : public ndClassAlloc
 		ndModelArticulation::ndNode* m_articulation;
 	};
 
+	void LoadMaterials(const nd::TiXmlNode* const rootNode);
 	ndMatrix GetMatrix(const nd::TiXmlNode* const parentNode) const;
-	void LoadMaterials(const nd::TiXmlNode* const rootNode, ndTree<ndInt32, ndString>& materialMap, ndArray<Material>& materials);
+	
+	ndBodyDynamic* CreateBody(const nd::TiXmlNode* const linkNode);
 	ndJointBilateralConstraint* CreateJoint(const nd::TiXmlNode* const jointNode, ndBodyDynamic* const child, ndBodyDynamic* const parent);
-	ndBodyDynamic* CreateBody(const nd::TiXmlNode* const linkNode, const ndTree<ndInt32, ndString>& materialMap, const ndArray<Material>& materials);
 
 	void ApplyRotation(const ndMatrix& rotation, ndModelArticulation* const model);
+
+	void LoadStlMesh(const char* const pathName, ndMeshEffect* const meshEffect) const;
+	ndString m_path;
+	ndArray<Material> m_materials;
+	ndTree<Hierarchy, ndString> m_bodyLinks;
+	ndTree<ndInt32, ndString> m_materialMap;
 };
 
 
