@@ -272,7 +272,7 @@
 
   <link name="left_gripper">
     <visual>
-      <origin rpy="0.0 0 0" xyz="0 0 0"/>
+      <origin rpy="-1.57075 0 0" xyz="0 0 0"/>
       <geometry>
         <mesh filename="package://urdf_tutorial/meshes/l_finger.dae"/>
       </geometry>
@@ -281,7 +281,7 @@
       <geometry>
         <mesh filename="package://urdf_tutorial/meshes/l_finger.dae"/>
       </geometry>
-      <origin rpy="0.0 0 0" xyz="0 0 0"/>
+      <origin rpy="-1.57075 0 0" xyz="0 0 0"/>
     </collision>
     <inertial>
       <mass value="0.05"/>
@@ -296,7 +296,7 @@
 
   <link name="left_tip">
     <visual>
-      <origin rpy="0.0 0 0" xyz="0.09137 0.00495 0"/>
+      <origin rpy="-1.57075 0 0" xyz="0.09137 0.00495 0"/>
       <geometry>
         <mesh filename="package://urdf_tutorial/meshes/l_finger_tip.dae"/>
       </geometry>
@@ -305,7 +305,7 @@
       <geometry>
         <mesh filename="package://urdf_tutorial/meshes/l_finger_tip.dae"/>
       </geometry>
-      <origin rpy="0.0 0 0" xyz="0.09137 0.00495 0"/>
+      <origin rpy="-1.57075 0 0" xyz="0.09137 0.00495 0"/>
     </collision>
     <inertial>
       <mass value="0.05"/>
@@ -323,7 +323,7 @@
 
   <link name="right_gripper">
     <visual>
-      <origin rpy="-3.1415 0 0" xyz="0 0 0"/>
+      <origin rpy="1.57075 0 0" xyz="0 0 0"/>
       <geometry>
         <mesh filename="package://urdf_tutorial/meshes/l_finger.dae"/>
       </geometry>
@@ -332,7 +332,7 @@
       <geometry>
         <mesh filename="package://urdf_tutorial/meshes/l_finger.dae"/>
       </geometry>
-      <origin rpy="-3.1415 0 0" xyz="0 0 0"/>
+      <origin rpy="1.57075 0 0" xyz="0 0 0"/>
     </collision>
     <inertial>
       <mass value="0.05"/>
@@ -347,7 +347,7 @@
 
   <link name="right_tip">
     <visual>
-      <origin rpy="-3.1415 0 0" xyz="0.09137 0.00495 0"/>
+      <origin rpy="1.57075 0 0" xyz="0.09137 0.00495 0"/>
       <geometry>
         <mesh filename="package://urdf_tutorial/meshes/l_finger_tip.dae"/>
       </geometry>
@@ -356,7 +356,7 @@
       <geometry>
         <mesh filename="package://urdf_tutorial/meshes/l_finger_tip.dae"/>
       </geometry>
-      <origin rpy="-3.1415 0 0" xyz="0.09137 0.00495 0"/>
+      <origin rpy="1.57075 0 0" xyz="0.09137 0.00495 0"/>
     </collision>
     <inertial>
       <mass value="0.05"/>

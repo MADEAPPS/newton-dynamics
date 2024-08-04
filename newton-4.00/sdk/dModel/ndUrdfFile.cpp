@@ -445,15 +445,10 @@ void ndUrdfFile::LoadStlMesh(const char* const pathName, ndMeshEffect* const mes
 	if (file)
 	{
 		char buffer[256];
-		for (ndInt32 i = 0; i < 256; ++i)
-		{
-			buffer[i] = 'a';
-		}
 		for (ndInt32 i = 0; i < 80; ++i)
 		{
-			buffer[i] = fgetc(file);
+			buffer[i] =char(fgetc(file));
 		}
-		
 
 		ndInt32 numberOfTriangles;
 		fread(&numberOfTriangles, 1, 4, file);
@@ -470,10 +465,10 @@ void ndUrdfFile::LoadStlMesh(const char* const pathName, ndMeshEffect* const mes
 			fread(&flags, 1, sizeof(flags), file);
 
 			meshEffect->BeginBuildFace();
-			for (ndInt32 i = 0; i < 3; ++i)
+			for (ndInt32 j = 0; j < 3; ++j)
 			{
 				meshEffect->AddMaterial(0);
-				meshEffect->AddPoint(triangle[i][0] * inchToMeters, triangle[i][1] * inchToMeters, triangle[i][2] * inchToMeters);
+				meshEffect->AddPoint(triangle[j][0] * inchToMeters, triangle[j][1] * inchToMeters, triangle[j][2] * inchToMeters);
 				meshEffect->AddNormal(normal[0], normal[1], normal[2]);
 			}
 			meshEffect->EndBuildFace();
@@ -536,20 +531,19 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode)
 			LoadStlMesh(meshPathName, &meshEffect);
 			meshEffect.EndBuild();
 
-			ndArray<ndFloat32> hull;
+			ndArray<ndVector> hull;
 			ndInt32 vertexCount = meshEffect.GetVertexCount();
 			ndInt32 stride = meshEffect.GetVertexStrideInByte();
 			const char* vertexPoolPtr = (char*)meshEffect.GetVertexPool();
 			for (ndInt32 i = 0; i < vertexCount; ++i)
 			{
 				const ndFloat64* const vertexPool = (ndFloat64*)vertexPoolPtr;
-				hull.PushBack(ndFloat32(vertexPool[i * 3 + 0]));
-				hull.PushBack(ndFloat32(vertexPool[i * 3 + 1]));
-				hull.PushBack(ndFloat32(vertexPool[i * 3 + 2]));
+				ndVector point(ndFloat32(vertexPool[0]), ndFloat32(vertexPool[1]), ndFloat32(vertexPool[2]), ndFloat32(0.0f));
+				hull.PushBack(point);
 				vertexPoolPtr += stride;
 			}
 
-			shape = new ndShapeConvexHull(vertexCount, ndInt32 (3 * sizeof(ndFloat32)), 1.0e-6f, &hull[0], 64);
+			shape = new ndShapeConvexHull(vertexCount, ndInt32 (sizeof(ndVector)), 1.0e-6f, &hull[0].m_x, 64);
 		}
 		return shape;
 	};
@@ -645,6 +639,8 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode)
 		{
 			const char* const meshPathName = shapeNode->Attribute("filename");
 			LoadStlMesh(meshPathName, meshEffect);
+			ndMatrix matrix(GetMatrix(node));
+			meshEffect->ApplyTransform(m_localMatrix * matrix);
 		}
 
 		if (shape)
