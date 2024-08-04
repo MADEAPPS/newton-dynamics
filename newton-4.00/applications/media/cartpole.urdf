@@ -5,6 +5,10 @@
     <color rgba="0 0 0.8 1"/>
   </material>
 
+  <material name="pole">
+    <color rgba="1 0 0 1"/>
+  </material>
+
   <link name="base_link">
     <visual>
       <geometry>
@@ -22,5 +26,32 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
     </inertial>
   </link>
+
+  <link name="pole_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.4" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.2"/>
+      <material name="pole"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.4" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.2"/>
+    </collision>
+    <inertial>
+      <mass value="10.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+  </link>
+
+  <joint name="pole_link_base_link" type="continuous">
+    <axis rpy="0 0 0" xyz="0 1 0"/>
+    <parent link="base_link"/>
+    <child link="pole_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
 
 </robot>
