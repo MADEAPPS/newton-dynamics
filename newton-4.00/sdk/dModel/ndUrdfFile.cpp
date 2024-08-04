@@ -377,7 +377,8 @@ void ndUrdfFile::LoadMaterials(const nd::TiXmlNode* const rootNode)
 			ndFloat32 g;
 			ndFloat32 b;
 			ndFloat32 a;
-			sscanf(rgba, "%f %f %f %f", &r, &g, &b, &a);
+			ndInt32 ret = 0;
+			ret = sscanf(rgba, "%f %f %f %f", &r, &g, &b, &a);
 			material.m_color.m_x = r;
 			material.m_color.m_y = g;
 			material.m_color.m_z = b;
@@ -408,12 +409,14 @@ ndMatrix ndUrdfFile::GetMatrix(const nd::TiXmlNode* const parentNode) const
 		const char* const xyz = origin->Attribute("xyz");
 		if (xyz)
 		{
-			sscanf(xyz, "%f %f %f", &x, &y, &z);
+			ndInt32 ret = 0;
+			ret = sscanf(xyz, "%f %f %f", &x, &y, &z);
 		}
 		const char* const rpy = origin->Attribute("rpy");
 		if (rpy)
 		{
-			sscanf(rpy, "%f %f %f", &pitch, &yaw, &roll);
+			ndInt32 ret = 0;
+			ret = sscanf(rpy, "%f %f %f", &pitch, &yaw, &roll);
 		}
 
 		matrix = ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll);
@@ -427,7 +430,7 @@ ndMatrix ndUrdfFile::GetMatrix(const nd::TiXmlNode* const parentNode) const
 void ndUrdfFile::LoadStlMesh(const char* const pathName, ndMeshEffect* const meshEffect) const
 {
 	char meshFile[256];
-	char meshPath[256];
+	char meshPath[1024];
 
 	const char* meshName = strrchr(pathName, '/');
 	if (!meshName)
@@ -519,7 +522,8 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode)
 			ndFloat32 y;
 			ndFloat32 z;
 			const char* const size = shapeNode->Attribute("size");
-			sscanf(size, "%f %f %f", &x, &y, &z);
+			ndInt32 ret = 0;
+			ret = sscanf(size, "%f %f %f", &x, &y, &z);
 			shape = new ndShapeBox(x, y, z);
 		}
 		else
@@ -632,7 +636,8 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode)
 			ndFloat32 y;
 			ndFloat32 z;
 			const char* const size = shapeNode->Attribute("size");
-			sscanf(size, "%f %f %f", &x, &y, &z);
+			ndInt32 ret = 0;
+			ret = sscanf(size, "%f %f %f", &x, &y, &z);
 			shape = new ndShapeBox(x, y, z);
 		}
 		else
@@ -738,7 +743,8 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlNode* const j
 			ndFloat32 y = ndFloat32(0.0f);
 			ndFloat32 z = ndFloat32(0.0f);
 			const char* const axisPin = axisNode->Attribute("xyz");
-			sscanf(axisPin, "%f %f %f", &x, &y, &z);
+			ndInt32 ret = 0;
+			ret = sscanf(axisPin, "%f %f %f", &x, &y, &z);
 
 			ndMatrix matrix(ndGramSchmidtMatrix(ndVector (x, y, z, ndFloat32 (0.0f))));
 			pivotMatrix = matrix * pivotMatrix;
@@ -754,7 +760,8 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlNode* const j
 			ndFloat32 y = ndFloat32(0.0f);
 			ndFloat32 z = ndFloat32(0.0f);
 			const char* const axisPin = axisNode->Attribute("xyz");
-			sscanf(axisPin, "%f %f %f", &x, &y, &z);
+			ndInt32 ret = 0;
+			ret = sscanf(axisPin, "%f %f %f", &x, &y, &z);
 
 			ndMatrix matrix(ndGramSchmidtMatrix(ndVector(x, y, z, ndFloat32(0.0f))));
 			pivotMatrix = matrix * pivotMatrix;
@@ -785,7 +792,8 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlNode* const j
 			ndFloat32 y = ndFloat32(0.0f);
 			ndFloat32 z = ndFloat32(0.0f);
 			const char* const axisPin = axisNode->Attribute("xyz");
-			sscanf(axisPin, "%f %f %f", &x, &y, &z);
+			ndInt32 ret = 0;
+			ret = sscanf(axisPin, "%f %f %f", &x, &y, &z);
 
 			ndMatrix matrix(ndGramSchmidtMatrix(ndVector(x, y, z, ndFloat32(0.0f))));
 			pivotMatrix = matrix * pivotMatrix;
