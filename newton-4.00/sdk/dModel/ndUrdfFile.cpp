@@ -454,7 +454,8 @@ void ndUrdfFile::LoadStlMesh(const char* const pathName, ndMeshEffect* const mes
 		}
 
 		ndInt32 numberOfTriangles;
-		fread(&numberOfTriangles, 1, 4, file);
+		size_t ret = 0;
+		ret = fread(&numberOfTriangles, 1, 4, file);
 		ndFloat32 inchToMeters = 0.0254f;
 
 		ndReal normal[3];
@@ -463,9 +464,9 @@ void ndUrdfFile::LoadStlMesh(const char* const pathName, ndMeshEffect* const mes
 
 		for (ndInt32 i = 0; i < numberOfTriangles; ++i)
 		{
-			fread(normal, 1, sizeof (normal), file);
-			fread(triangle, 1, sizeof(triangle), file);
-			fread(&flags, 1, sizeof(flags), file);
+			ret = fread(normal, 1, sizeof (normal), file);
+			ret = fread(triangle, 1, sizeof(triangle), file);
+			ret = fread(&flags, 1, sizeof(flags), file);
 
 			meshEffect->BeginBuildFace();
 			for (ndInt32 j = 0; j < 3; ++j)
