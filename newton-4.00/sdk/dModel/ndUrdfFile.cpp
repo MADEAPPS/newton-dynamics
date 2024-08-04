@@ -534,13 +534,13 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode)
 			ndArray<ndVector> hull;
 			ndInt32 vertexCount = meshEffect.GetVertexCount();
 			ndInt32 stride = meshEffect.GetVertexStrideInByte();
-			const char* vertexPoolPtr = (char*)meshEffect.GetVertexPool();
+			const char* vertexPoolBytes = (char*)meshEffect.GetVertexPool();
 			for (ndInt32 i = 0; i < vertexCount; ++i)
 			{
-				const ndFloat64* const vertexPool = (ndFloat64*)vertexPoolPtr;
-				ndVector point(ndFloat32(vertexPool[0]), ndFloat32(vertexPool[1]), ndFloat32(vertexPool[2]), ndFloat32(0.0f));
+				const ndFloat64* const vertexPoolFloat = (ndFloat64*)vertexPoolBytes;
+				ndVector point(vertexPoolFloat[0], vertexPoolFloat[1], vertexPoolFloat[2], ndFloat64(0.0f));
 				hull.PushBack(point);
-				vertexPoolPtr += stride;
+				vertexPoolBytes += stride;
 			}
 
 			shape = new ndShapeConvexHull(vertexCount, ndInt32 (sizeof(ndVector)), 1.0e-6f, &hull[0].m_x, 64);
