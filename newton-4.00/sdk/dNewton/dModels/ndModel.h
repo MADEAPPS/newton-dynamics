@@ -26,6 +26,7 @@
 #include "ndModelList.h"
 
 class ndModelBase;
+class ndModelNotify;
 class ndMultiBodyVehicle;
 class ndModelArticulation;
 class ndConstraintDebugCallback;
@@ -36,83 +37,33 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	public:
 	D_BASE_CLASS_REFLECTION(ndModel)
 
-	ndModel();
-	virtual ~ndModel ();
+	D_NEWTON_API ndModel();
+	D_NEWTON_API virtual ~ndModel ();
 
-	virtual ndModel* GetAsModel();
-	virtual ndModelBase* GetAsModelBase();
-	virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
-	virtual ndModelArticulation* GetAsModelArticulation();
-	virtual void Debug(ndConstraintDebugCallback& context) const;
+	D_NEWTON_API virtual ndModel* GetAsModel();
+	D_NEWTON_API virtual ndModelBase* GetAsModelBase();
+	D_NEWTON_API virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
+	D_NEWTON_API virtual ndModelArticulation* GetAsModelArticulation();
+	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
+
+	D_NEWTON_API ndSharedPtr<ndModelNotify>& GetNotifyCallback();
+	D_NEWTON_API void SetNotifyCallback(const ndSharedPtr<ndModelNotify>& notifyCallback);
 
 	protected:
 	virtual void OnAddToWorld() = 0;
 	virtual void OnRemoveFromToWorld() = 0;
 
-	virtual void Update(ndWorld* const world, ndFloat32 timestep);
-	virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
-	virtual void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep);
-
 	ndWorld* m_world;
+
 	private:
 	ndModelList::ndNode* m_worldNode;
 	ndSpecialList<ndModel>::ndNode* m_deletedNode;
+	ndSharedPtr<ndModelNotify> m_notifyCallback;
 
 	friend class ndWorld;
 	friend class ndLoadSave;
 	friend class ndModelList;
 } D_GCC_NEWTON_ALIGN_32;
-
-
-inline ndModel::ndModel()
-	:ndContainersFreeListAlloc<ndModel>()
-	,m_world(nullptr)
-	,m_worldNode(nullptr)
-	,m_deletedNode(nullptr)
-{
-}
-
-inline ndModel::~ndModel()
-{
-	ndAssert(!m_worldNode);
-	ndAssert(!m_deletedNode);
-}
-
-inline ndModel* ndModel::GetAsModel()
-{ 
-	return this; 
-}
-
-inline ndModelBase* ndModel::GetAsModelBase()
-{
-	return nullptr;
-}
-
-inline ndMultiBodyVehicle* ndModel::GetAsMultiBodyVehicle()
-{ 
-	return nullptr; 
-}
-
-inline ndModelArticulation* ndModel::GetAsModelArticulation()
-{
-	return nullptr;
-}
-
-inline void ndModel::Debug(ndConstraintDebugCallback&) const
-{
-}
-
-inline void ndModel::Update(ndWorld* const, ndFloat32)
-{
-}
-
-inline void ndModel::PostUpdate(ndWorld* const, ndFloat32)
-{
-}
-
-inline void ndModel::PostTransformUpdate(ndWorld* const, ndFloat32)
-{
-}
 
 #endif 
 

@@ -209,3 +209,26 @@ void ndModelArticulation::AddCloseLoop(const ndSharedPtr<ndJointBilateralConstra
 
 	m_closeLoops.Append(joint);
 }
+
+void ndModelArticulation::SetTransform(const ndMatrix& matrix)
+{
+	const ndMatrix offset(m_rootNode->m_body->GetMatrix().OrthoInverse() * matrix);
+	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+	{
+		ndSharedPtr<ndBody> body(node->m_body);
+		body->SetMatrix(body->GetMatrix() * offset);
+	}
+}
+
+void ndModelArticulation::AddToWorld(ndWorld* const world)
+{
+	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+	{
+		world->AddBody(node->m_body);
+		if (node->m_joint)
+		{
+			world->AddJoint(node->m_joint);
+		}
+	}
+	world->AddModel(this);
+}

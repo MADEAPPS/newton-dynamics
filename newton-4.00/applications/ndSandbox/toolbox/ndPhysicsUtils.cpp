@@ -216,3 +216,23 @@ ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix&
 	ndBodyKinematic* const body = CreateBody(scene, shape, location, mass, textName);
 	return body;
 }
+
+void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* const model)
+{
+	//ndModelArticulation* const root = r2d2->GetAsModelArticulation();
+	for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+	{
+		ndSharedPtr<ndBody> body(node->m_body);
+
+		ndUrdfBodyNotify* const urdfNotify = (ndUrdfBodyNotify*)body->GetNotifyCallback();
+		ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("urdfMesh", *urdfNotify->m_mesh, scene->GetShaderCache()));
+		ndDemoEntity* const entity = new ndDemoEntity(body->GetMatrix(), nullptr);
+		entity->SetMesh(mesh);
+		scene->AddEntity(entity);
+		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+
+		//ndShapeInstance& instanceShape = body->GetAsBodyDynamic()->GetCollisionShape();
+		//instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+		//instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = r2d2;
+	}
+}

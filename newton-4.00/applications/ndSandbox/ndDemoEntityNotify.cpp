@@ -16,7 +16,7 @@
 #include "ndDemoEntityNotify.h"
 
 ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody, ndFloat32 gravity)
-	:ndModelNotify(parentBody, ndVector(0.0f, gravity, 0.0f, 0.0f))
+	:ndModelBodyNotify(parentBody, ndVector(0.0f, gravity, 0.0f, 0.0f))
 	,m_entity(entity)
 	,m_manager(manager)
 {
@@ -24,7 +24,7 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDem
 }
 
 ndDemoEntityNotify::ndDemoEntityNotify(const ndDemoEntityNotify& notify)
-	:ndModelNotify(notify)
+	:ndModelBodyNotify(notify)
 	,m_entity(notify.m_entity)
 	,m_manager(notify.m_manager)
 {

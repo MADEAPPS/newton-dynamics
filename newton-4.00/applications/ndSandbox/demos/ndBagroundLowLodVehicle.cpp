@@ -84,29 +84,29 @@ class BackGroundVehicleController : public ndModel
 	virtual void OnRemoveFromToWorld() { ndAssert(0); }
 
 	protected:
-	virtual void Update(ndWorld* const, ndFloat32 timestep) override
-	{
-		ndMatrix mMatrix(ndCalculateMatrix(m_pAiBody->GetRotation(), ndVector::m_wOne));
-		ndVector vForward = mMatrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0)));
-		ndVector vVelocity = m_pAiBody->GetVelocity();
-		m_dCurrentSpeed = (vForward.DotProduct(vVelocity)).GetScalar();
-		ndFloat32 dSpeedDifference = m_dDesiredSpeed - m_dCurrentSpeed;
-		ndFloat32 dForce = _UpdatePIDForDriveForces(dSpeedDifference, timestep);
-		dForce = ndClamp(dForce, -m_dCombinedMaximumForce, m_dCombinedMaximumForce);
-		ndVector vForce(ndFloat32(0.0), ndFloat32(0.0), dForce, ndFloat32(0.0));
-		ndVector vOffset(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0));
-		ndVector vOffsetLS = mMatrix.TransformVector(vOffset);      // Offset in local space
-		ndVector vForceLS = mMatrix.TransformVector(vForce);      // Force in local space
-		m_pAiBody->SetForce(m_pAiBody->GetForce() + vForceLS);
-		m_pAiBody->SetTorque(m_pAiBody->GetTorque() + (vOffsetLS.CrossProduct(vForceLS)));
-		_ApplyLateralForces(timestep);
-
-		// Get the camera to follow the vehicle
-		ndVector origin(m_pAiBody->GetPosition());
-		ndQuaternion rot(ndYawMatrix(180.0f * ndDegreeToRad));
-		origin.m_x += 10.0f;
-		m_pScene->SetCameraMatrix(rot, origin);
-	}
+	//virtual void Update(ndWorld* const, ndFloat32 timestep) override
+	//{
+	//	ndMatrix mMatrix(ndCalculateMatrix(m_pAiBody->GetRotation(), ndVector::m_wOne));
+	//	ndVector vForward = mMatrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0)));
+	//	ndVector vVelocity = m_pAiBody->GetVelocity();
+	//	m_dCurrentSpeed = (vForward.DotProduct(vVelocity)).GetScalar();
+	//	ndFloat32 dSpeedDifference = m_dDesiredSpeed - m_dCurrentSpeed;
+	//	ndFloat32 dForce = _UpdatePIDForDriveForces(dSpeedDifference, timestep);
+	//	dForce = ndClamp(dForce, -m_dCombinedMaximumForce, m_dCombinedMaximumForce);
+	//	ndVector vForce(ndFloat32(0.0), ndFloat32(0.0), dForce, ndFloat32(0.0));
+	//	ndVector vOffset(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0));
+	//	ndVector vOffsetLS = mMatrix.TransformVector(vOffset);      // Offset in local space
+	//	ndVector vForceLS = mMatrix.TransformVector(vForce);      // Force in local space
+	//	m_pAiBody->SetForce(m_pAiBody->GetForce() + vForceLS);
+	//	m_pAiBody->SetTorque(m_pAiBody->GetTorque() + (vOffsetLS.CrossProduct(vForceLS)));
+	//	_ApplyLateralForces(timestep);
+	//
+	//	// Get the camera to follow the vehicle
+	//	ndVector origin(m_pAiBody->GetPosition());
+	//	ndQuaternion rot(ndYawMatrix(180.0f * ndDegreeToRad));
+	//	origin.m_x += 10.0f;
+	//	m_pScene->SetCameraMatrix(rot, origin);
+	//}
 
 	private:
 	ndFloat32 _UpdatePIDForDriveForces(ndFloat32 dError, ndFloat32 dTimestep)

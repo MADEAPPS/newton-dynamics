@@ -12,14 +12,13 @@
 #ifndef _ND_URDF_FILE_H_
 #define _ND_URDF_FILE_H_
 
-class ndModelArticulation;
-
+#include "ndModelArticulation.h"
 
 class ndUrdfBodyNotify : public ndBodyNotify
 {
 	public:
 	ndUrdfBodyNotify(ndMeshEffect* const mesh)
-		:ndBodyNotify(ndVector (0.0f, 0.0f, -9.8f, 0.0f))
+		:ndBodyNotify(ndVector::m_zero)
 		,m_mesh(mesh)
 	{
 	}
@@ -40,11 +39,11 @@ class ndUrdfFile : public ndClassAlloc
 	};
 
 	public:
-	ndUrdfFile();
-	virtual ~ndUrdfFile();
+	D_NEWTON_API ndUrdfFile();
+	D_NEWTON_API virtual ~ndUrdfFile();
 
-	virtual ndModelArticulation* Import(const char* const fileName);
-	virtual void Export(const char* const fileName, ndModelArticulation* const model);
+	D_NEWTON_API virtual ndModelArticulation* Import(const char* const fileName);
+	D_NEWTON_API virtual void Export(const char* const fileName, ndModelArticulation* const model);
 
 	private:
 	//void CheckUniqueNames(ndModelArticulation* const model);
@@ -96,6 +95,5 @@ class ndUrdfFile : public ndClassAlloc
 	ndTree<Hierarchy, ndString> m_bodyLinks;
 	ndTree<ndInt32, ndString> m_materialMap;
 };
-
 
 #endif

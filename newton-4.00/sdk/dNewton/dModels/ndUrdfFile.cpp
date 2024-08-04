@@ -9,9 +9,13 @@
 * freely
 */
 
-#include "ndModelStdafx.h"
-#include "ndMesh.h"
+#include "ndCoreStdafx.h"
+#include "ndNewtonStdafx.h"
 #include "ndUrdfFile.h"
+#include "ndBodyDynamic.h"
+#include "dJoints/ndJointHinge.h"
+#include "dJoints/ndJointSlider.h"
+#include "dJoints/ndJointFix6dof.h"
 
 ndUrdfFile::ndUrdfFile()
 	:ndClassAlloc()

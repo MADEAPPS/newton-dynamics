@@ -21,6 +21,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+#if 0
 namespace ndQuadruped_1
 {
 	//#define ND_TRAIN_MODEL
@@ -1390,9 +1391,12 @@ namespace ndQuadruped_1
 }
 
 using namespace ndQuadruped_1;
+#endif
 
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 {
+	ndAssert(0);
+#if 0
 	// build a floor
 	ndSetRandSeed(94157);
 
@@ -1454,5 +1458,5 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 
 	//ndFileFormatSave xxxx;
 	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
-
+#endif
 }

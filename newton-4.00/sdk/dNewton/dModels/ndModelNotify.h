@@ -19,22 +19,32 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_MODEL_INC_H__
-#define _ND_MODEL_INC_H__
+#ifndef __ND_MODEL_NOTIFY_H__
+#define __ND_MODEL_NOTIFY_H__
 
-#include <ndModelStdafx.h>
-#include <ndMesh.h>
-#include <ndMeshFile.h>
-#include <ndFbxMeshLoader.h>
-#include <ndAnimationPose.h>
-#include <ndContactCallback.h>
-#include <ndModelBodyNotify.h>
-#include <ndAnimationSequence.h>
-#include <ndModelPassiveRagdoll.h>
-#include <ndAnimationTwoWayBlend.h>
-#include <ndAnimationBlendTreeNode.h>
-#include <ndAnimationKeyframesTrack.h>
-#include <ndAnimationSequencePlayer.h>
+#include "ndNewtonStdafx.h"
+//#include "ndModelList.h"
+
+
+D_MSV_NEWTON_ALIGN_32
+class ndModelNotify : public ndContainersFreeListAlloc<ndModelNotify>
+{
+	public:  
+	D_BASE_CLASS_REFLECTION(ndModelNotify)
+
+	D_NEWTON_API ndModelNotify();
+	D_NEWTON_API ndModelNotify(const ndModelNotify& src);
+
+	D_NEWTON_API virtual ~ndModelNotify();
+
+	virtual void Update(ndWorld* const world, ndFloat32 timestep) = 0;
+	virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep) = 0;
+	virtual void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep) = 0;
+
+	private:
+	ndModel* m_model;
+	friend class ndModel;
+} D_GCC_NEWTON_ALIGN_32;
 
 #endif 
 

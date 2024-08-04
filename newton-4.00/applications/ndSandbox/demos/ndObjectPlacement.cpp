@@ -55,7 +55,7 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& orig
 	body->GetCollisionShape().SetMaterial(material);
 }
 
-
+#if 0
 class NewtonPhantom : public ndModel
 {
 	class PhantomPlacement : public ndDemoEntity
@@ -337,9 +337,12 @@ class NewtonPhantom : public ndModel
 	//ndInt32 contactCount = 0;
 	//ndVector contactPoint;
 }; // end class NewtonPhantom
+#endif
 
 void ndObjectPlacement(ndDemoEntityManager* const scene)
 {
+	ndAssert(0);
+#if 0
 	// build a floor
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
 	BuildFlatPlane(scene, true);
@@ -371,5 +374,6 @@ void ndObjectPlacement(ndDemoEntityManager* const scene)
 	ndQuaternion rot;
 	ndVector origin(-40.0f, 5.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
+#endif
 }
 

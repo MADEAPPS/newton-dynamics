@@ -23,7 +23,7 @@
 #include "ndFileFormatModelNotify.h"
 
 ndFileFormatModelNotify::ndFileFormatModelNotify()
-	:ndFileFormatNotify(ndModelNotify::StaticClassName())
+	:ndFileFormatNotify(ndModelBodyNotify::StaticClassName())
 {
 }
 
@@ -34,13 +34,13 @@ ndFileFormatModelNotify::ndFileFormatModelNotify(const char* const className)
 
 void ndFileFormatModelNotify::SaveNotify(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
 {
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_NOTIFY_CLASS, ndModelNotify::StaticClassName());
+	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_NOTIFY_CLASS, ndModelBodyNotify::StaticClassName());
 	ndFileFormatNotify::SaveNotify(scene, classNode, notify);
 }
 
 ndBodyNotify* ndFileFormatModelNotify::LoadNotify(const nd::TiXmlElement* const node)
 {
-	ndModelNotify* const notify = new ndModelNotify();
+	ndModelBodyNotify* const notify = new ndModelBodyNotify();
 	LoadNotify(node, notify);
 	return notify;
 }

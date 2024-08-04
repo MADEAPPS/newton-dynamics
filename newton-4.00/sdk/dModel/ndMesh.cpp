@@ -74,7 +74,8 @@ ndMesh::ndMesh(const ndShapeInstance& src)
 	,m_posit()
 	,m_rotation()
 {
-
+	ndAssert(0);
+	// TO DO: build the mesh form the collision shape;
 }
 
 ndMesh::~ndMesh()

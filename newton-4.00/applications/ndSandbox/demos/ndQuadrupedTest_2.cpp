@@ -23,6 +23,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+#if 0
 namespace ndQuadruped_2
 {
 	class ndDefinition
@@ -888,9 +889,12 @@ namespace ndQuadruped_2
 }
 
 using namespace ndQuadruped_2;
+#endif
 
 void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 {
+	ndAssert(0);
+#if 0
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 	
@@ -946,4 +950,5 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z += 5.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
+#endif
 }

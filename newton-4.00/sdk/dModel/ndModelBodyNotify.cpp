@@ -10,26 +10,26 @@
 */
 
 #include "ndModelStdafx.h"
-#include "ndModelNotify.h"
+#include "ndModelBodyNotify.h"
 
-ndModelNotify::ndModelNotify(const ndModelNotify& src)
+ndModelBodyNotify::ndModelBodyNotify(const ndModelBodyNotify& src)
 	:ndBodyNotify(src)
 	,m_parentBody(src.m_parentBody)
 {
 }
 
-ndModelNotify::ndModelNotify(ndBodyKinematic* const parentBody, ndVector gravity)
+ndModelBodyNotify::ndModelBodyNotify(ndBodyKinematic* const parentBody, ndVector gravity)
 	:ndBodyNotify(gravity)
 	,m_parentBody(parentBody)
 {
-	//static ndModelNotifyFileLoadSave registerClass;
+	//static ndModelBodyNotifyFileLoadSave registerClass;
 }
 
-ndModelNotify::~ndModelNotify()
+ndModelBodyNotify::~ndModelBodyNotify()
 {
 }
 
-void ndModelNotify::OnApplyExternalForce(ndInt32, ndFloat32)
+void ndModelBodyNotify::OnApplyExternalForce(ndInt32, ndFloat32)
 {
 	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
 	ndAssert(body);
@@ -42,12 +42,12 @@ void ndModelNotify::OnApplyExternalForce(ndInt32, ndFloat32)
 	}
 }
 
-bool ndModelNotify::CheckInWorld(const ndMatrix& matrix) const
+bool ndModelBodyNotify::CheckInWorld(const ndMatrix& matrix) const
 {
 	return matrix.m_posit.m_y > -100.0f;
 }
 
-void ndModelNotify::CalculateMatrix(const ndMatrix& matrix, ndQuaternion& rot, ndVector& posit) const
+void ndModelBodyNotify::CalculateMatrix(const ndMatrix& matrix, ndQuaternion& rot, ndVector& posit) const
 {
 	const ndBody* const body = GetBody();
 	if (!m_parentBody)
@@ -62,7 +62,7 @@ void ndModelNotify::CalculateMatrix(const ndMatrix& matrix, ndQuaternion& rot, n
 	posit = localMatrix.m_posit;
 }
 
-void ndModelNotify::OnTransform(ndInt32, const ndMatrix&)
+void ndModelBodyNotify::OnTransform(ndInt32, const ndMatrix&)
 {
 	//ndAssert(0);
 }

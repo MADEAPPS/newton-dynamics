@@ -21,7 +21,7 @@ class ndAnimKeyframe;
 class ndDemoMeshInterface;
 
 //class ndDemoEntityNotify: public ndBodyNotify
-class ndDemoEntityNotify : public ndModelNotify
+class ndDemoEntityNotify : public ndModelBodyNotify
 {
 	public:
 	//D_CLASS_REFLECTION(ndDemoEntityNotify, ndBodyNotify)

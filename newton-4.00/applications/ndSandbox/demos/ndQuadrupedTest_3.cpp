@@ -23,6 +23,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+#if 0
 namespace ndQuadruped_3
 {
 	#define ND_TRAIN_MODEL
@@ -1557,10 +1558,12 @@ namespace ndQuadruped_3
 }
 
 using namespace ndQuadruped_3;
-
+#endif
 
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 {
+	ndAssert(0);
+#if 0
 	// build a floor
 	BuildFlatPlane(scene, true);
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
@@ -1615,4 +1618,5 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z += 0.25f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
+#endif
 }

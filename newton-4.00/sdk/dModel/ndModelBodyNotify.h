@@ -9,34 +9,34 @@
 * freely
 */
 
-#ifndef __ND_MODEL_NOTIFY_H__
-#define __ND_MODEL_NOTIFY_H__
+#ifndef __ND_MODEL_BODY_NOTIFY_H__
+#define __ND_MODEL_BODY_NOTIFY_H__
 
 #include "ndModelStdafx.h"
 
-class ndModelNotify: public ndBodyNotify
+class ndModelBodyNotify: public ndBodyNotify
 {
 	public:
-	//class ndModelNotifyFileLoadSave: public ndFileFormatNotify
+	//class ndModelBodyNotifyFileLoadSave: public ndFileFormatNotify
 	//{
 	//	public:
-	//	ndModelNotifyFileLoadSave(const char* const className = ndModelNotify::StaticClassName())
+	//	ndModelBodyNotifyFileLoadSave(const char* const className = ndModelBodyNotify::StaticClassName())
 	//		:ndFileFormatNotify(className)
 	//	{
 	//	}
 	//
 	//	void SaveNotify(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
 	//	{
-	//		nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_NOTIFY_CLASS, ndModelNotify::StaticClassName());
+	//		nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_NOTIFY_CLASS, ndModelBodyNotify::StaticClassName());
 	//		ndFileFormatNotify::SaveNotify(scene, classNode, notify);
 	//		xmlSaveParam(classNode, "useCollisionForVisual", 1);
 	//	}
 	//};
 
-	D_CLASS_REFLECTION(ndModelNotify, ndBodyNotify)
-	ndModelNotify(const ndModelNotify& src);
-	ndModelNotify(ndBodyKinematic* const parentBody = nullptr, ndVector gravity = ndVector (ndFloat32 (0.0f), ndFloat32(-10.0f), ndFloat32(0.0f), ndFloat32(0.0f)));
-	virtual ~ndModelNotify();
+	D_CLASS_REFLECTION(ndModelBodyNotify, ndBodyNotify)
+	ndModelBodyNotify(const ndModelBodyNotify& src);
+	ndModelBodyNotify(ndBodyKinematic* const parentBody = nullptr, ndVector gravity = ndVector (ndFloat32 (0.0f), ndFloat32(-10.0f), ndFloat32(0.0f), ndFloat32(0.0f)));
+	virtual ~ndModelBodyNotify();
 
 	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
 	virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);

@@ -21,6 +21,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+#if 0
 namespace ndUnicycle
 {
 	//#define ND_TRAIN_AGENT
@@ -47,43 +48,6 @@ namespace ndUnicycle
 		m_speed,
 		m_stateSize
 	};
-
-	class ndR2D2Material : public ndApplicationMaterial
-	{
-		public:
-		ndR2D2Material()
-			:ndApplicationMaterial()
-		{
-		}
-
-		ndR2D2Material(const ndR2D2Material& src)
-			:ndApplicationMaterial(src)
-		{
-		}
-
-		ndApplicationMaterial* Clone() const
-		{
-			return new ndR2D2Material(*this);
-		}
-
-		bool OnAabbOverlap(const ndContact* const, ndFloat32, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const
-		{
-			// filter self collision when the contact is with in the same model
-			const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
-			const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
-
-			ndUnsigned64 pointer0 = material0.m_userParam[ndDemoContactCallback::m_modelPointer].m_intData;
-			ndUnsigned64 pointer1 = material1.m_userParam[ndDemoContactCallback::m_modelPointer].m_intData;
-			if (pointer0 == pointer1)
-			{
-				// here we know the part are from the same model.
-				// we can apply some more filtering by for now we just disable all self model collisions. 
-				return false;
-			}
-			return true;
-		}
-	};
-
 
 	class ndRobot : public ndModelArticulation
 	{
@@ -676,9 +640,12 @@ namespace ndUnicycle
 }
 
 using namespace ndUnicycle;
+#endif
 
 void ndUnicycleController(ndDemoEntityManager* const scene)
 {
+	ndAssert(0);
+#if 0
 	// build a floor
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
 	BuildFlatPlane(scene, true);
@@ -692,65 +659,12 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 #else
 	ndWorld* const world = scene->GetWorld();
 
-	//ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	//world->AddModel(model);
-	//ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
-	//ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
-	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
-	//world->AddJoint(fixJoint);
-
-
-
-	ndR2D2Material material;
-	material.m_restitution = 0.0f;
-	material.m_staticFriction0 = 0.9f;
-	material.m_staticFriction1 = 0.9f;
-	material.m_dynamicFriction0 = 0.9f;
-	material.m_dynamicFriction1 = 0.9f;
-
-	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
-	//callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_default);
-	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
-
-	char fileName[256];
-	ndGetWorkingFileName("r2d2.urdf", fileName);
-
-	ndUrdfFile urdf;
-	ndSharedPtr<ndModel> r2d2(urdf.Import(fileName));
-
-	//ndGetWorkingFileName("r2d3.urdf", fileName);
-	//urdf.Export(fileName, r2d2->GetAsModelArticulation());
-
-	ndModelArticulation* const root = r2d2->GetAsModelArticulation();
-	for (ndModelArticulation::ndNode* node = root->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-	{
-		ndSharedPtr<ndBody> body(node->m_body);
-		ndMatrix matrix__(body->GetMatrix());
-		matrix__.m_posit.m_y += 0.5f;
-		matrix__.m_posit.m_z += 0.0f;
-		body->SetMatrix(matrix__);
-
-		world->AddBody(body);
-		if (node->m_joint)
-		{
-			world->AddJoint(node->m_joint);
-		}
-
-		ndUrdfBodyNotify* const urdfNotify = (ndUrdfBodyNotify*)body->GetNotifyCallback();
-		ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh ("urdfMesh", *urdfNotify->m_mesh, scene->GetShaderCache()));
-		ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-		entity->SetMesh(mesh);
-		scene->AddEntity(entity);
-
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-
-		ndShapeInstance& instanceShape = body->GetAsBodyDynamic()->GetCollisionShape();
-		instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
-		instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = *r2d2;
-	}
-
-	//ndGetWorkingFileName("unicycle.urdf", fileName);
-	//urdf.Export(fileName, articulation);
+	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
+	world->AddModel(model);
+	ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
+	ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
+	world->AddJoint(fixJoint);
 
 #endif
 
@@ -762,4 +676,5 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
+#endif
 }

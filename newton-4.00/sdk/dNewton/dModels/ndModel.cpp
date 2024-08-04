@@ -23,3 +23,63 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndModel.h"
+#include "ndModelNotify.h"
+
+ndModel::ndModel()
+	:ndContainersFreeListAlloc<ndModel>()
+	,m_world(nullptr)
+	,m_worldNode(nullptr)
+	,m_deletedNode(nullptr)
+	,m_notifyCallback()
+{
+}
+
+ndModel::~ndModel()
+{
+	ndAssert(!m_worldNode);
+	ndAssert(!m_deletedNode);
+}
+
+ndModel* ndModel::GetAsModel()
+{
+	return this;
+}
+
+ndModelBase* ndModel::GetAsModelBase()
+{
+	return nullptr;
+}
+
+ndMultiBodyVehicle* ndModel::GetAsMultiBodyVehicle()
+{
+	return nullptr;
+}
+
+ndModelArticulation* ndModel::GetAsModelArticulation()
+{
+	return nullptr;
+}
+
+void ndModel::Debug(ndConstraintDebugCallback&) const
+{
+}
+
+ndSharedPtr<ndModelNotify>& ndModel::GetNotifyCallback()
+{
+	return m_notifyCallback;
+}
+
+void ndModel::SetNotifyCallback(const ndSharedPtr<ndModelNotify>& notifyCallback)
+{
+	if (*m_notifyCallback)
+	{
+		m_notifyCallback->m_model = nullptr;
+	}
+
+	m_notifyCallback = notifyCallback;
+
+	if (*m_notifyCallback)
+	{
+		m_notifyCallback->m_model = this;
+	}
+}

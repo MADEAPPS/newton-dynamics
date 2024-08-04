@@ -597,7 +597,10 @@ void ndWorld::ModelUpdate()
 		{
 			D_TRACKTIME_NAMED(ModelUpdate);
 			ndModel* const model = modelList[i];
-			model->Update(this, timestep);
+			if (*model->m_notifyCallback)
+			{
+				model->m_notifyCallback->Update(this, timestep);
+			}
 		}
 	});
 
@@ -619,7 +622,11 @@ void ndWorld::ModelPostUpdate()
 		for (ndInt32 i = iterator++; i < modelCount; i = iterator++)
 		{
 			ndModel* const model = modelList[i];
-			model->PostUpdate(this, timestep);
+			//model->PostUpdate(this, timestep);
+			if (*model->m_notifyCallback)
+			{
+				model->m_notifyCallback->PostUpdate(this, timestep);
+			}
 		}
 	});
 	m_scene->ParallelExecute(ModelPostUpdate);
@@ -639,7 +646,11 @@ void ndWorld::PostModelTransform()
 		for (ndInt32 i = iterator++; i < modelCount; i = iterator++)
 		{
 			ndModel* const model = modelList[i];
-			model->PostTransformUpdate(this, timestep);
+			//model->PostTransformUpdate(this, timestep);
+			if (*model->m_notifyCallback)
+			{
+				model->m_notifyCallback->PostTransformUpdate(this, timestep);
+			}
 		}
 	});
 	m_scene->ParallelExecute(PostModelTransform);

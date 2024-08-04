@@ -31,6 +31,8 @@ ndVector FindFloor(const ndWorld& world, const ndVector& origin, ndFloat32 dist)
 ndMatrix FindFloor(const ndWorld& world, const ndMatrix& origin, const ndShapeInstance& shape, ndFloat32 dist);
 ndBodyKinematic* MousePickBody(ndWorld* const nWorld, const ndVector& origin, const ndVector& end, ndFloat32& paramter, ndVector& positionOut, ndVector& normalOut);
 
+void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* const model);
+
 class ndParamMapper
 {
 	public:

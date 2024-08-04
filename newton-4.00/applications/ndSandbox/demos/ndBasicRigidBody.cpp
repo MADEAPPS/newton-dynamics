@@ -20,13 +20,122 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
-void ndBasicRigidBody (ndDemoEntityManager* const scene)
+class ndR2D2Material : public ndApplicationMaterial
+{
+	public:
+	ndR2D2Material()
+		:ndApplicationMaterial()
+	{
+	}
+
+	ndR2D2Material(const ndR2D2Material& src)
+		:ndApplicationMaterial(src)
+	{
+	}
+
+	ndApplicationMaterial* Clone() const
+	{
+		return new ndR2D2Material(*this);
+	}
+
+	bool OnAabbOverlap(const ndContact* const, ndFloat32, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const
+	{
+		// filter self collision when the contact is with in the same model
+		const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
+		const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
+
+		ndUnsigned64 pointer0 = material0.m_userParam[ndDemoContactCallback::m_modelPointer].m_intData;
+		ndUnsigned64 pointer1 = material1.m_userParam[ndDemoContactCallback::m_modelPointer].m_intData;
+		if (pointer0 == pointer1)
+		{
+			// here we know the part are from the same model.
+			// we can apply some more filtering by for now we just disable all self model collisions. 
+			return false;
+		}
+		return true;
+	}
+};
+
+class R2D2ModelNotify : public ndModelNotify
+{
+	public:
+	R2D2ModelNotify()
+		:ndModelNotify()
+	{
+	}
+
+	~R2D2ModelNotify()
+	{
+	}
+
+	void Update(ndWorld* const, ndFloat32)
+	{
+	}
+
+	void PostUpdate(ndWorld* const, ndFloat32)
+	{
+	}
+
+	void PostTransformUpdate(ndWorld* const, ndFloat32)
+	{
+	}
+};
+
+void ndBasicRigidBody(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, ndGetIdentityMatrix());
+	//BuildFloorBox(scene, ndGetIdentityMatrix());
+	BuildFlatPlane(scene, true);
+
+	ndMatrix matrix(ndGetIdentityMatrix());
+
+	ndWorld* const world = scene->GetWorld();
+
+	ndR2D2Material material;
+
+	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
+
+	char fileName[256];
+	ndGetWorkingFileName("r2d2.urdf", fileName);
+
+	ndUrdfFile urdf;
+	ndModelArticulation* const r2d2 = urdf.Import(fileName);
+
+	//ndGetWorkingFileName("r2d3.urdf", fileName);
+	//urdf.Export(fileName, r2d2->GetAsModelArticulation());
+
+	ndMatrix modelMatrix(ndGetIdentityMatrix());
+	modelMatrix.m_posit.m_y = 0.5f;
+	r2d2->SetTransform(modelMatrix);
+	r2d2->AddToWorld(world);
+	r2d2->SetNotifyCallback(new R2D2ModelNotify);
+	SetModelVisualMesh(scene, r2d2);
+
+	ndModelArticulation* const root = r2d2->GetAsModelArticulation();
+	for (ndModelArticulation::ndNode* node = root->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+	{
+		ndSharedPtr<ndBody> body(node->m_body);
+		//ndUrdfBodyNotify* const urdfNotify = (ndUrdfBodyNotify*)body->GetNotifyCallback();
+		//ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("urdfMesh", *urdfNotify->m_mesh, scene->GetShaderCache()));
+		//ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+		//entity->SetMesh(mesh);
+		//scene->AddEntity(entity);
+		//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	
+		ndShapeInstance& instanceShape = body->GetAsBodyDynamic()->GetCollisionShape();
+		instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+		instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = r2d2;
+	}
+
+	//ndGetWorkingFileName("unicycle.urdf", fileName);
+	//urdf.Export(fileName, articulation);
+
+	
+
+
 	ndMatrix origin1(ndGetIdentityMatrix());
+	origin1.m_posit.m_x = 20.0f;
 
 	//AddSphere(scene, origin1, 1.0f, 0.5f);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 1, 2, 7);
@@ -34,229 +143,10 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 4, 4, 4);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 2, 2, 7);
 
-	ndQuaternion rot;
-	ndVector origin(-60.0f, 5.0f, 0.0f, 1.0f);
-	scene->SetCameraMatrix(rot, origin);
+	matrix.m_posit.m_x -= 5.0f;
+	matrix.m_posit.m_y += 2.0f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
+	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
 
-#else
 
-class ndCustomJointHinge : public ndIkJointHinge
-{
-    public:
-    ndCustomJointHinge(const ndMatrix& frame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-        :ndIkJointHinge(frame, child, parent)
-    {
-        SetAsSpringDamper(1.0e-3f, 1000.0f, 10.0f);
-    }
-
-    void JacobianDerivative(ndConstraintDescritor& desc)
-    {
-        ndIkJointHinge::JacobianDerivative(desc);
-
-        if (m_ikMode)
-        {
-            ndMatrix matrix0;
-            ndMatrix matrix1;
-            CalculateGlobalMatrix(matrix0, matrix1);
-            SubmitSpringDamper(desc, matrix0, matrix1);
-        }
-    }
-};
-
-class TestIKSolver : public ndModelArticulation
-{
-    public:
-    TestIKSolver(ndDemoEntityManager* const scene, ndMatrix& location)
-        :ndModelArticulation()
-    {
-        ndFloat32 xSize = 0.25f;
-        ndFloat32 ySize = 0.125f;
-        ndFloat32 zSize = 0.15f;
-        ndFloat32 cartMass = 5.0f;
-        ndFloat32 poleMass = 10.0f;
-        ndFloat32 poleLength = 0.4f;
-        ndFloat32 poleRadio = 0.05f;
-        ndPhysicsWorld* const world = scene->GetWorld();
-
-        // make cart
-        ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "smilli.png")));
-        //ndSharedPtr<ndBody> cartBody(world->GetBody(AddSphere(scene, location, cartMass, xSize, "smilli.png")));
-        ndModelArticulation::ndNode* const modelRoot = AddRootBody(cartBody);
-        ndMatrix matrix(cartBody->GetMatrix());
-        matrix.m_posit.m_y += ySize / 2.0f;
-        cartBody->SetMatrix(matrix);
-        cartBody->GetAsBodyDynamic()->SetSleepAccel(cartBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
-
-        // make pole leg
-        matrix.m_posit.m_y += ySize / 2.0f;
-        ndSharedPtr<ndBody> poleBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), poleMass, poleRadio, poleRadio, poleLength, "smilli.png")));
-        ndMatrix poleLocation(ndRollMatrix(90.0f * ndDegreeToRad) * matrix);
-        poleLocation.m_posit.m_y += poleLength * 0.5f;
-
-        ndMatrix translate(ndGetIdentityMatrix());
-        translate.m_posit.m_y = -poleLength * 0.5f;
-        //poleLocation = poleLocation * translate * ndRollMatrix(45.0f * ndDegreeToRad) * translate.OrthoInverse();
-
-        poleBody->SetMatrix(poleLocation);
-        poleBody->GetAsBodyDynamic()->SetSleepAccel(poleBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
-
-        ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
-        polePivot.m_posit -= poleLocation.m_front.Scale (poleLength * 0.5f);
-        ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndCustomJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
-        world->AddJoint(poleJoint);
-        AddLimb(modelRoot, poleBody, poleJoint);
-
-        // fix model to the world for first test.
-        //ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
-        //world->AddJoint(fixJoint);
-        //cartBody->GetAsBodyKinematic()->SetMassMatrix(0.0f, 0.0f, 0.0f, 0.0f);
-    }
-
-    ndVector CalculateIKtorque(ndWorld* const world, ndFloat32 timestep)
-    {
-        //a) Mt = sum(m(i))
-        //b) cg = sum(p(i) * m(i)) / Mt
-        //c) Vcg = sum(v(i) * m(i)) / Mt
-        //d) Icg = sum(I(i) +  m(i) * (Identity * ((p(i) - cg) * transpose (p(i) - cg)) - covarianMatrix(p(i) - cg))
-        //e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
-        //f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
-        //g) Bcg = (Icg ^ -1) * (T0 + T1)
-
-        ndSkeletonContainer* const skeleton = GetRoot()->GetFirstChild()->m_body->GetAsBodyKinematic()->GetSkeleton();
-
-        ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
-        invDynamicsSolver->SolverBegin(skeleton, nullptr, 0, world, timestep);
-        invDynamicsSolver->Solve();
-
-        ndFloat32 totalMass = 0.0f;
-        ndVector com(ndVector::m_zero);
-        ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
-        for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-        {
-            const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-            const ndMatrix matrix(body->GetMatrix());
-            ndFloat32 mass = body->GetMassMatrix().m_w;
-            totalMass += mass;
-            com += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
-            bodies.PushBack(body);
-        }
-        ndFloat32 invMass = 1.0f / totalMass;
-        com = com.Scale(invMass);
-        com.m_w = ndFloat32(1.0f);
-
-        ndVector netTorque(ndVector::m_zero);
-        for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
-        {
-            const ndBodyKinematic* const body = bodies[i];
-            const ndMatrix matrix(body->GetMatrix());
-            const ndVector comDist((matrix.TransformVector(body->GetCentreOfMass()) - com) & ndVector::m_triplexMask);
-
-            const ndVector omega(body->GetOmega());
-            const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
-
-            //ndVector force(invDynamicsSolver->GetBodyForce(body));
-            //ndVector torque(invDynamicsSolver->GetBodyTorque(body));
-            ndVector torque(bodyInertia.RotateVector(body->GetAlpha()));
-            ndVector force(body->GetAccel().Scale(body->GetMassMatrix().m_w));
-            torque += comDist.CrossProduct(force);
-            torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
-            netTorque += torque;
-        }
-        invDynamicsSolver->SolverEnd();
-        return netTorque;
-    }
-
-    ndVector CalculateFKtorque(ndWorld* const, ndFloat32)
-    {
-        //a) Mt = sum(m(i))
-        //b) cg = sum(p(i) * m(i)) / Mt
-        //c) Vcg = sum(v(i) * m(i)) / Mt
-        //d) Icg = sum(I(i) +  m(i) * (Identity * ((p(i) - cg) * transpose (p(i) - cg)) - covarianMatrix(p(i) - cg))
-        //e) T0 = sum[w(i) x (I(i) * w(i)) - Vcg x (m(i) * v(i))]
-        //f) T1 = sum[(p(i) - cg) x Fext(i) + Text(i)]
-        //g) Bcg = (Icg ^ -1) * (T0 + T1)
-
-        //ndSkeletonContainer* const skeleton = GetRoot()->GetFirstChild()->m_body->GetAsBodyKinematic()->GetSkeleton();
-
-        ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
-        invDynamicsSolver->Solve();
-
-        ndFloat32 totalMass = 0.0f;
-        ndVector com(ndVector::m_zero);
-        ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
-        for (ndModelArticulation::ndNode* node = GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-        {
-            const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-            const ndMatrix matrix(body->GetMatrix());
-            ndFloat32 mass = body->GetMassMatrix().m_w;
-            totalMass += mass;
-            com += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
-            bodies.PushBack(body);
-        }
-        ndFloat32 invMass = 1.0f / totalMass;
-        com = com.Scale(invMass);
-        com.m_w = ndFloat32(1.0f);
-
-        ndVector netTorque(ndVector::m_zero);
-        for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
-        {
-            const ndBodyKinematic* const body = bodies[i];
-            const ndMatrix matrix(body->GetMatrix());
-            const ndVector comDist((matrix.TransformVector(body->GetCentreOfMass()) - com) & ndVector::m_triplexMask);
-
-            const ndVector omega(body->GetOmega());
-            const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
-
-            //ndVector force(invDynamicsSolver->GetBodyForce(body));
-            //ndVector torque(invDynamicsSolver->GetBodyTorque(body));
-            ndVector torque(bodyInertia.RotateVector(body->GetAlpha()));
-            ndVector force(body->GetAccel().Scale(body->GetMassMatrix().m_w));
-            torque += comDist.CrossProduct(force);
-            torque += omega.CrossProduct(bodyInertia.RotateVector(omega));
-            netTorque += torque;
-        }
-        invDynamicsSolver->SolverEnd();
-        return netTorque;
-    }
-
-    void Update(ndWorld* const world, ndFloat32 timestep)
-    {
-        ndBodyKinematic* const rootBody = GetRoot()->GetFirstChild()->m_body->GetAsBodyKinematic();
-        ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
-        if (!skeleton)
-        {
-            return;
-        }
-
-        ndVector ikTorque(CalculateIKtorque(world, timestep));
-        //ndVector fkTorque(CalculateFKtorque(world, timestep));
-
-        ndIkSolver* const invDynamicsSolver = (ndIkSolver*)&m_invDynamicsSolver;
-        invDynamicsSolver->SolverBegin(skeleton, nullptr, 0, world, timestep);
-        invDynamicsSolver->Solve();
-        invDynamicsSolver->SolverEnd();
-    }
-};
-
-void ndBasicRigidBody(ndDemoEntityManager* const scene)
-{
-    BuildFlatPlane(scene, true);
-
-    ndSetRandSeed(42);
-    ndWorld* const world = scene->GetWorld();
-    ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-
-    AddBox(scene, matrix, 10.0f, 1.0f, 0.125f, 1.0f, "smilli.png");
-
-    ndSharedPtr<ndModel> model(new TestIKSolver(scene, matrix));
-    world->AddModel(model);
-
-    matrix.m_posit.m_x -= 0.0f;
-    matrix.m_posit.m_y += 0.5f;
-    matrix.m_posit.m_z += 2.0f;
-    ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
-    scene->SetCameraMatrix(rotation, matrix.m_posit);
-}
-
-#endif
