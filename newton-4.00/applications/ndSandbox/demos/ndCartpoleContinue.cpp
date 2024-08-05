@@ -23,7 +23,7 @@
 
 namespace ndCarpole_1
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"cartpoleContinueVPG.dnn"
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
@@ -194,7 +194,7 @@ namespace ndCarpole_1
 			return ndReal(0.0f);
 		}
 		ndFloat32 sinAngle = GetPoleAngle();
-		ndFloat32 reward = ndReal(ndExp(-ndFloat32(600.0f) * sinAngle * sinAngle));
+		ndFloat32 reward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
 		return ndReal(reward);
 	}
 
@@ -481,8 +481,7 @@ namespace ndCarpole_1
 				ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 
 				//ndGetWorkingFileName(CRITIC_NAME, fileName);
-				m_master->GetCritic()->SaveToFile(fileName);
-
+				//m_master->GetCritic()->SaveToFile(fileName);
 				manager->Terminate();
 			}
 		}

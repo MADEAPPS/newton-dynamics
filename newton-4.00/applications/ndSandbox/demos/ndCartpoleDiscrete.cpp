@@ -197,7 +197,7 @@ namespace ndCarpole_0
 				return ndReal(0.0f);
 			}
 			ndFloat32 sinAngle = GetPoleAngle();
-			ndFloat32 reward = ndReal(ndExp(-ndFloat32(600.0f) * sinAngle * sinAngle));
+			ndFloat32 reward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
 			return ndReal(reward);
 		}
 
@@ -479,7 +479,6 @@ namespace ndCarpole_0
 
 				//ndGetWorkingFileName(CRITIC_NAME, fileName);
 				//m_master->GetCritic()->SaveToFile(fileName);
-
 				manager->Terminate();
 			}
 		}
