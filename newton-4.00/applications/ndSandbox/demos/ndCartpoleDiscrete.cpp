@@ -23,7 +23,7 @@
 
 namespace ndCarpole_0
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME		"cartpoleDiscreteVPG.dnn"
 	//#define CRITIC_NAME			"cartpoleDiscreteCriticVPG.dnn"
 
@@ -58,7 +58,7 @@ namespace ndCarpole_0
 			}
 
 			ndController(const ndController& src)
-				:ApplyActions(src.m_master)
+				:ndBrainAgentDiscretePolicyGradient_Trainer(src.m_master)
 				,m_robot(nullptr)
 			{
 			}
