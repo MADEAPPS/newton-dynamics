@@ -26,58 +26,7 @@ ndUrdfFile::~ndUrdfFile()
 {
 }
 
-void ndUrdfFile::Export(const char* const filePathName, ndModelArticulation* const model)
-{
-	ndAssert(0);
-	//ndAssert(strstr(filePathName, ".urdf"));
-	//
-	//nd::TiXmlDocument* const doc = new nd::TiXmlDocument("");
-	//nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
-	//doc->LinkEndChild(decl);
-	//ndString oldloc(setlocale(LC_ALL, 0));
-	//
-	//nd::TiXmlElement* const rootNode = new nd::TiXmlElement("robot");
-	//doc->LinkEndChild(rootNode);
-	//if (model->GetName() == "")
-	//{
-	//	rootNode->SetAttribute("name", "robot_model");
-	//}
-	//else
-	//{
-	//	rootNode->SetAttribute("name", model->GetName().GetStr());
-	//}
-	//
-	//CheckUniqueNames(model);
-	////AddMaterials(rootNode, model);
-	//AddLinks(rootNode, model);
-	////AddJoints(rootNode, model);
-	//
-	//doc->SaveFile(filePathName);
-	//setlocale(LC_ALL, oldloc.GetStr());
-	//delete doc;
-}
-
 #if 0
-void ndUrdfFile::CheckUniqueNames(ndModelArticulation* const model)
-{
-	ndTree < ndModelArticulation::ndNode*, ndString> filter;
-	
-	ndString baseName("link_");
-	for (ndModelArticulation::ndNode* childNode = model->GetRoot()->GetFirstIterator(); childNode; childNode = childNode->GetNextIterator())
-	{
-		if (childNode->m_name == "")
-		{
-			childNode->m_name = baseName + "0";
-		}
-		ndInt32 count = 1;
-		while (filter.Find(childNode->m_name))
-		{
-			childNode->m_name = baseName + count;
-			count++;
-		}
-		filter.Insert(childNode, childNode->m_name);
-	}
-}
 
 //void ndUrdfFile::AddMaterials(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model)
 void ndUrdfFile::AddMaterials(nd::TiXmlElement* const rootNode, const ndModelArticulation* const)
@@ -89,37 +38,6 @@ void ndUrdfFile::AddMaterials(nd::TiXmlElement* const rootNode, const ndModelArt
 	nd::TiXmlElement* const color = new nd::TiXmlElement("color");
 	material->LinkEndChild(color);
 	color->SetAttribute("rgba", "0.5 0.6 0.2, 1.0");
-}
-
-void ndUrdfFile::AddLinks(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model)
-{
-	ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
-	stack.PushBack(model->GetRoot());
-
-	while (stack.GetCount())
-	{
-		ndModelArticulation::ndNode* const node = stack[stack.GetCount() - 1];
-		stack.SetCount(stack.GetCount() - 1);
-
-		AddLink(rootNode, node);
-
-		for (ndModelArticulation::ndNode* childNode = node->GetFirstChild(); childNode; childNode = childNode->GetNext())
-		{
-			stack.PushBack(childNode);
-		}
-	}
-}
-
-void ndUrdfFile::AddLink(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link)
-{
-	nd::TiXmlElement* const linkNode = new nd::TiXmlElement("link");
-	rootNode->LinkEndChild(linkNode);
-
-	linkNode->SetAttribute("name", link->m_name.GetStr());
-
-	AddInertia(linkNode, link);
-	AddGeometry(linkNode, link);
-	AddCollision(linkNode, link);
 }
 
 void ndUrdfFile::AddInertia(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link)
@@ -174,72 +92,6 @@ void ndUrdfFile::AddPose(nd::TiXmlElement* const parentNode, const ndMatrix& pos
 	ndVector euler(pose.CalcPitchYawRoll(euler1));
 	sprintf(buffer, "%g %g %g", euler.m_z, euler.m_x, euler.m_y);
 	origin->SetAttribute("rpy", buffer);
-}
-
-void ndUrdfFile::AddGeometry(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link)
-{
-	char buffer[256];
-
-	nd::TiXmlElement* const visualNode = new nd::TiXmlElement("visual");
-	linkNode->LinkEndChild(visualNode);
-
-	// add position and orientation
-	const ndBodyKinematic* const body = link->m_body->GetAsBodyKinematic();
-	const ndShapeInstance& collision = body->GetCollisionShape();
-	ndMatrix matrix(collision.GetScaledTransform(body->GetMatrix()));
-
-	AddPose(visualNode, matrix);
-
-	// add geometry node
-	nd::TiXmlElement* const geometry = new nd::TiXmlElement("geometry");
-	visualNode->LinkEndChild(geometry);
-	const ndShape* const collisionShape = collision.GetShape();
-	const char* const className = collisionShape->ClassName();
-	if (!strcmp(className, "ndShapeBox"))
-	{
-		ndShapeInfo info (collisionShape->GetShapeInfo());
-		sprintf(buffer, "%g %g %g", info.m_box.m_x, info.m_box.m_y, info.m_box.m_z);
-
-		nd::TiXmlElement* const shape = new nd::TiXmlElement("box");
-		geometry->LinkEndChild(shape);
-		shape->SetAttribute("size", buffer);
-	}
-	else if (!strcmp(className, "ndShapeCapsule"))
-	{
-		ndShapeInfo info(collisionShape->GetShapeInfo());
-
-		nd::TiXmlElement* const shape = new nd::TiXmlElement("cylinder");
-		geometry->LinkEndChild(shape);
-
-		sprintf(buffer, "%g", info.m_capsule.m_radio0);
-		shape->SetAttribute("radius", buffer);
-
-		sprintf(buffer, "%g", info.m_capsule.m_height + info.m_capsule.m_radio0 * 2.0f);
-		shape->SetAttribute("length", buffer);
-	}
-	else if (!strcmp(className, "ndShapeSphere"))
-	{
-		ndShapeInfo info(collisionShape->GetShapeInfo());
-
-		nd::TiXmlElement* const shape = new nd::TiXmlElement("sphere");
-		geometry->LinkEndChild(shape);
-
-		sprintf(buffer, "%g", info.m_sphere.m_radius);
-		shape->SetAttribute("radius", buffer);
-	}
-	else
-	{
-		ndAssert(0);
-	}
-
-	// add material node
-	nd::TiXmlElement* const material = new nd::TiXmlElement("material");
-	visualNode->LinkEndChild(material);
-	material->SetAttribute("name", "material_0");
-
-	nd::TiXmlElement* const color = new nd::TiXmlElement("color");
-	material->LinkEndChild(color);
-	color->SetAttribute("rgba", "0.5 0.6 0.2, 1.0");
 }
 
 void ndUrdfFile::AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndShapeInstance& collision)
@@ -669,7 +521,7 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode)
 				{
 				}
 
-				void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const edgeType)
+				void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const)
 				{
 					ndVector normal(ndVector::m_zero);
 					for (ndInt32 i = 2; i < vertexCount; ++i)
@@ -700,9 +552,9 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode)
 			const nd::TiXmlElement* const materialNode = (nd::TiXmlElement*)node->FirstChild("material");
 			if (materialNode)
 			{
-				const char* const name = materialNode->Attribute("name");
-				const ndTree<ndInt32, ndString>::ndNode* const materialNode = m_materialMap.Find(name);
-				materialIndex = materialNode->GetInfo();
+				const char* const materialName = materialNode->Attribute("name");
+				const ndTree<ndInt32, ndString>::ndNode* const materialNameNode = m_materialMap.Find(materialName);
+				materialIndex = materialNameNode->GetInfo();
 			}
 
 			PolygonizeMesh polygonize(meshEffect, materialIndex);
@@ -730,9 +582,9 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode)
 		const nd::TiXmlElement* const materialNode = (nd::TiXmlElement*)node->FirstChild("material");
 		if (materialNode)
 		{
-			const char* const name = materialNode->Attribute("name");
-			const ndTree<ndInt32, ndString>::ndNode* const materialNode = m_materialMap.Find(name);
-			materialIndex = materialNode->GetInfo();
+			const char* const materialName = materialNode->Attribute("name");
+			const ndTree<ndInt32, ndString>::ndNode* const materialNameNode = m_materialMap.Find(materialName);
+			materialIndex = materialNameNode->GetInfo();
 		}
 
 		ndMatrix uvMatrix(ndGetIdentityMatrix());
@@ -769,8 +621,8 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlNode* const j
 {
 	ndJointBilateralConstraint* joint = nullptr;
 	const char* const jointType = ((nd::TiXmlElement*)jointNode)->Attribute("type");
-	const nd::TiXmlElement* const childNode = (nd::TiXmlElement*)jointNode->FirstChild("child");
-	const nd::TiXmlElement* const parentNode = (nd::TiXmlElement*)jointNode->FirstChild("parent");
+	//const nd::TiXmlElement* const childNode = (nd::TiXmlElement*)jointNode->FirstChild("child");
+	//const nd::TiXmlElement* const parentNode = (nd::TiXmlElement*)jointNode->FirstChild("parent");
 
 	ndMatrix childMatrix(GetMatrix(jointNode));
 	childBody->SetMatrix(childMatrix * parentBody->GetMatrix());
@@ -1034,4 +886,165 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 	ndMatrix rotation(ndPitchMatrix(-ndPi * 0.5f));
 	ApplyRotation(rotation, model);
 	return model;
+}
+
+
+// *******************************************************************************
+// 
+// *******************************************************************************
+void ndUrdfFile::MakeNamesUnique(ndModelArticulation* const model)
+{
+	ndTree < ndModelArticulation::ndNode*, ndString> filter;
+
+	if (model->GetName() == "")
+	{
+		model->SetName("robot_model");
+	}
+	model->GetRoot()->m_name = "base";
+
+	ndString baseName("node_");
+	for (ndModelArticulation::ndNode* childNode = model->GetRoot()->GetFirstIterator(); childNode; childNode = childNode->GetNextIterator())
+	{
+		if (childNode->m_name == "")
+		{
+			childNode->m_name = baseName + "0";
+		}
+		ndInt32 count = 1;
+		while (filter.Find(childNode->m_name))
+		{
+			childNode->m_name = baseName + count;
+			count++;
+		}
+		filter.Insert(childNode, childNode->m_name);
+	}
+}
+
+void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link)
+{
+	char buffer[256];
+
+	nd::TiXmlElement* const visualNode = new nd::TiXmlElement("visual");
+	linkNode->LinkEndChild(visualNode);
+
+	// add position and orientation
+	const ndBodyKinematic* const body = link->m_body->GetAsBodyKinematic();
+	const ndShapeInstance& collision = body->GetCollisionShape();
+	ndMatrix matrix(collision.GetScaledTransform(body->GetMatrix()));
+	
+	//AddPose(visualNode, matrix);
+	
+	// add geometry node
+	nd::TiXmlElement* const geometry = new nd::TiXmlElement("geometry");
+	visualNode->LinkEndChild(geometry);
+	//const ndShape* const collisionShape = collision.GetShape();
+	//const char* const className = collisionShape->ClassName();
+	//if (!strcmp(className, "ndShapeBox"))
+	//{
+	//	ndShapeInfo info(collisionShape->GetShapeInfo());
+	//	sprintf(buffer, "%g %g %g", info.m_box.m_x, info.m_box.m_y, info.m_box.m_z);
+	//
+	//	nd::TiXmlElement* const shape = new nd::TiXmlElement("box");
+	//	geometry->LinkEndChild(shape);
+	//	shape->SetAttribute("size", buffer);
+	//}
+	//else if (!strcmp(className, "ndShapeCapsule"))
+	//{
+	//	ndShapeInfo info(collisionShape->GetShapeInfo());
+	//
+	//	nd::TiXmlElement* const shape = new nd::TiXmlElement("cylinder");
+	//	geometry->LinkEndChild(shape);
+	//
+	//	sprintf(buffer, "%g", info.m_capsule.m_radio0);
+	//	shape->SetAttribute("radius", buffer);
+	//
+	//	sprintf(buffer, "%g", info.m_capsule.m_height + info.m_capsule.m_radio0 * 2.0f);
+	//	shape->SetAttribute("length", buffer);
+	//}
+	//else if (!strcmp(className, "ndShapeSphere"))
+	//{
+	//	ndShapeInfo info(collisionShape->GetShapeInfo());
+	//
+	//	nd::TiXmlElement* const shape = new nd::TiXmlElement("sphere");
+	//	geometry->LinkEndChild(shape);
+	//
+	//	sprintf(buffer, "%g", info.m_sphere.m_radius);
+	//	shape->SetAttribute("radius", buffer);
+	//}
+	//else
+	//{
+	//	ndAssert(0);
+	//}
+	//
+	//// add material node
+	//nd::TiXmlElement* const material = new nd::TiXmlElement("material");
+	//visualNode->LinkEndChild(material);
+	//material->SetAttribute("name", "material_0");
+	//
+	//nd::TiXmlElement* const color = new nd::TiXmlElement("color");
+	//material->LinkEndChild(color);
+	//color->SetAttribute("rgba", "0.5 0.6 0.2, 1.0");
+}
+
+void ndUrdfFile::ExportLink(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link)
+{
+	nd::TiXmlElement* const linkNode = new nd::TiXmlElement("link");
+	rootNode->LinkEndChild(linkNode);
+
+	char name[256];
+	sprintf(name, "%s_link", link->m_name.GetStr());
+	linkNode->SetAttribute("name", name);
+
+	ExportVisual(linkNode, link);
+	//AddCollision(linkNode, link);
+	//AddInertia(linkNode, link);
+}
+
+void ndUrdfFile::Export(const char* const filePathName, ndModelArticulation* const model)
+{
+	ndAssert(strstr(filePathName, ".urdf"));
+	
+	nd::TiXmlDocument* const doc = new nd::TiXmlDocument("");
+	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
+	doc->LinkEndChild(decl);
+	ndString oldloc(setlocale(LC_ALL, 0));
+	
+	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("robot");
+	doc->LinkEndChild(rootNode);
+
+	MakeNamesUnique(model);
+	rootNode->SetAttribute("name", model->GetName().GetStr());
+	
+	////AddMaterials(rootNode, model);
+	//AddLinks(rootNode, model);
+	////AddJoints(rootNode, model);
+
+	ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
+	stack.PushBack(model->GetRoot());
+
+	while (stack.GetCount())
+	{
+		const ndModelArticulation::ndNode* const node = stack.Pop();
+		ExportLink(rootNode, node);
+
+		const ndJointBilateralConstraint* const joint = *node->m_joint;
+		if (joint)
+		{
+			//ndMatrix pivotMatrix0;
+			//ndMatrix pivotMatrix1;
+			//joint->CalculateGlobalMatrix(pivotMatrix0, pivotMatrix1);
+			//
+			//joints.PushBack(joint);
+			//matrix0.PushBack(pivotMatrix0 * rotation);
+			//matrix1.PushBack(pivotMatrix1 * rotation);
+		}
+
+		for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+		{
+			stack.PushBack(child);
+		}
+	}
+	
+	doc->SaveFile(filePathName);
+	setlocale(LC_ALL, oldloc.GetStr());
+	delete doc;
 }

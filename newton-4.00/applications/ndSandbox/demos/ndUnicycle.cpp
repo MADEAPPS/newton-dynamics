@@ -21,7 +21,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
 namespace ndUnicycle
 {
 	//#define ND_TRAIN_AGENT
@@ -48,7 +47,7 @@ namespace ndUnicycle
 		m_speed,
 		m_stateSize
 	};
-
+	
 	class ndRobot : public ndModelArticulation
 	{
 		public:
@@ -297,16 +296,16 @@ namespace ndUnicycle
 			}
 		}
 
-		void Update(ndWorld* const world, ndFloat32 timestep)
+		void Update(ndWorld* const, ndFloat32 timestep)
 		{
-			ndModelArticulation::Update(world, timestep);
+			//ndModelArticulation::Update(world, timestep);
 			m_timestep = timestep;
 			m_agent->Step();
 		}
 
-		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+		void PostUpdate(ndWorld* const, ndFloat32)
 		{
-			ndModelArticulation::PostUpdate(world, timestep);
+			//ndModelArticulation::PostUpdate(world, timestep);
 			if (IsOutOfBounds())
 			{
 				TelePort();
@@ -320,6 +319,46 @@ namespace ndUnicycle
 		ndJointHinge* m_wheelJoint;
 		ndBodyKinematic* m_wheel;
 		ndFloat32 m_timestep;
+	};
+
+
+	class RobotModelNotify : public ndModelNotify
+	{
+	public:
+		RobotModelNotify()
+			:ndModelNotify()
+		{
+		}
+
+		RobotModelNotify(const RobotModelNotify& src)
+			:ndModelNotify(src)
+		{
+		}
+
+		~RobotModelNotify()
+		{
+		}
+
+		ndModelNotify* Clone() const
+		{
+			return new RobotModelNotify(*this);
+		}
+
+		void Update(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndRobot* const robot = (ndRobot*)GetModel();
+			robot->Update(world, timestep);
+		}
+
+		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndRobot* const robot = (ndRobot*)GetModel();
+			robot->PostUpdate(world, timestep);
+		}
+
+		void PostTransformUpdate(ndWorld* const, ndFloat32)
+		{
+		}
 	};
 
 	void BuildModel(ndRobot* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -372,8 +411,8 @@ namespace ndUnicycle
 		model->m_wheelJoint = wheelMotor;
 		model->m_wheel = wheelBody->GetAsBodyKinematic();
 
-		world->AddJoint(legJoint);
-		world->AddJoint(wheelJoint);
+		//world->AddJoint(legJoint);
+		//world->AddJoint(wheelJoint);
 
 		// add model limbs
 		ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
@@ -634,18 +673,19 @@ namespace ndUnicycle
 		ndRobot* const model = new ndRobot(agent);
 		BuildModel(model, scene, location);
 		((ndRobot::ndController*)*agent)->SetModel(model);
+
+		model->SetNotifyCallback(new RobotModelNotify());
+
 		return model;
 	}
 #endif
 }
 
 using namespace ndUnicycle;
-#endif
+
 
 void ndUnicycleController(ndDemoEntityManager* const scene)
 {
-	ndAssert(0);
-#if 0
 	// build a floor
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
 	BuildFlatPlane(scene, true);
@@ -659,10 +699,16 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 #else
 	ndWorld* const world = scene->GetWorld();
 
-	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	world->AddModel(model);
-	ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
-	ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
+	ndModelArticulation* const model = CreateModel(scene, matrix);
+	model->AddToWorld(world);
+
+	ndUrdfFile urdf;
+	char fileName[256];
+	ndGetWorkingFileName("unicycle.urdf", fileName);
+	urdf.Export(fileName, model);
+
+	//ndModelArticulation* const articulation = (ndModelArticulation*)model->GetAsModelArticulation();
+	ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
 	world->AddJoint(fixJoint);
 
@@ -676,5 +722,5 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
-#endif
+
 }

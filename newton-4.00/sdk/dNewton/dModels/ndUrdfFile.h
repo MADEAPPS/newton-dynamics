@@ -57,22 +57,6 @@ class ndUrdfFile : public ndClassAlloc
 	D_NEWTON_API virtual void Export(const char* const fileName, ndModelArticulation* const model);
 
 	private:
-	//void CheckUniqueNames(ndModelArticulation* const model);
-	//void AddLinks(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
-	//void AddJoints(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
-	//
-	//void AddMaterials(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
-	//void AddLink(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
-	//void AddJoint(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
-	//
-	//void AddInertia(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
-	//void AddGeometry(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
-	//void AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
-	//
-	//void AddPose(nd::TiXmlElement* const linkNode, const ndMatrix& pose);
-	//void AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndShapeInstance& collision);
-
-
 	class Hierarchy
 	{
 		public:
@@ -92,6 +76,20 @@ class ndUrdfFile : public ndClassAlloc
 		ndModelArticulation::ndNode* m_articulation;
 	};
 
+	void MakeNamesUnique(ndModelArticulation* const model);
+	void ExportLink(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
+	void ExportVisual(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
+	//void AddJoints(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
+	//void AddMaterials(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
+	//void AddJoint(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
+	//
+	//void AddInertia(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
+	
+	//void AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
+	//
+	//void AddPose(nd::TiXmlElement* const linkNode, const ndMatrix& pose);
+	//void AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndShapeInstance& collision);
+
 	void LoadMaterials(const nd::TiXmlNode* const rootNode);
 	ndMatrix GetMatrix(const nd::TiXmlNode* const parentNode) const;
 	
@@ -99,8 +97,8 @@ class ndUrdfFile : public ndClassAlloc
 	ndJointBilateralConstraint* CreateJoint(const nd::TiXmlNode* const jointNode, ndBodyDynamic* const child, ndBodyDynamic* const parent);
 
 	void ApplyRotation(const ndMatrix& rotation, ndModelArticulation* const model);
-
 	void LoadStlMesh(const char* const pathName, ndMeshEffect* const meshEffect) const;
+
 	ndString m_path;
 	ndArray<Material> m_materials;
 	ndTree<Hierarchy, ndString> m_bodyLinks;

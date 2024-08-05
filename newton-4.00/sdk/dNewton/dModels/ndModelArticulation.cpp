@@ -104,7 +104,7 @@ const ndString& ndModelArticulation::GetName() const
 	return m_name;
 }
 
-void ndModelArticulation::SetName(ndString& name)
+void ndModelArticulation::SetName(const ndString& name)
 {
 	m_name = name;
 }
