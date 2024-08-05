@@ -56,8 +56,8 @@
 //#define DEFAULT_SCENE	16		// advanced industrial robot
 //#define DEFAULT_SCENE	17		// basic player
 //#define DEFAULT_SCENE	18		// rag doll
-#define DEFAULT_SCENE	19		// cart pole discrete controller
-//#define DEFAULT_SCENE	20		// cart pole continue controller
+//#define DEFAULT_SCENE	19		// cart pole discrete controller
+#define DEFAULT_SCENE	20		// cart pole continue controller
 //#define DEFAULT_SCENE	21		// unit cycle controller
 //#define DEFAULT_SCENE	22		// quadruped test 1
 //#define DEFAULT_SCENE	23		// quadruped test 2

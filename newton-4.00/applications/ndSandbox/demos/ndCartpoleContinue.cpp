@@ -21,11 +21,10 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
 namespace ndCarpole_1
 {
-	//#define ND_TRAIN_AGENT
-	#define CONTROLLER_NAME "cartpoleContinueVPG.dnn"
+	#define ND_TRAIN_AGENT
+	#define CONTROLLER_NAME			"cartpoleContinueVPG.dnn"
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
@@ -43,275 +42,241 @@ namespace ndCarpole_1
 		m_stateSize
 	};
 
-	class ndRobot: public ndModelArticulation
+	class RobotModelNotify : public ndModelNotify
 	{
-		public:
-		class ndController : public ndBrainAgentContinuePolicyGradient
+		#ifdef ND_TRAIN_AGENT
+		class ndController : public ndBrainAgentContinuePolicyGradient_Trainer
 		{
 			public:
-			ndController(ndSharedPtr<ndBrain>& actor)
-				:ndBrainAgentContinuePolicyGradient(actor)
-				,m_model(nullptr)
-			{
-			}
-
-			void GetObservation(ndBrainFloat* const observation)
-			{
-				m_model->GetObservation(observation);
-			}
-
-			virtual void ApplyActions(ndBrainFloat* const actions)
-			{
-				m_model->ApplyActions(actions);
-			}
-
-			ndRobot* m_model;
-		};
-
-		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
-		{
-			public:
-			ndControllerTrainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
+			ndController(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 				:ndBrainAgentContinuePolicyGradient_Trainer(master)
-				,m_model(nullptr)
+				,m_robot(nullptr)
 			{
 			}
 
-			~ndControllerTrainer()
+			ndController(const ndController& src)
+				:ndBrainAgentContinuePolicyGradient_Trainer(src.m_master)
+				,m_robot(nullptr)
 			{
 			}
 
 			ndBrainFloat CalculateReward()
 			{
-				return m_model->GetReward();
-			}
-
-			virtual void ApplyActions(ndBrainFloat* const actions)
-			{
-				//if (GetEpisodeFrames() >= 7000)
-				//{
-				//	ndAssert(0);
-				//	for (ndInt32 i = 0; i < m_actionsSize; ++i)
-				//	{
-				//		ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(2.0f)));
-				//		ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
-				//		actions[i] = clippiedNoisyAction;
-				//	}
-				//}
-				//else if (GetEpisodeFrames() >= 6000)
-				//{
-				//	ndAssert(0);
-				//	for (ndInt32 i = 0; i < m_actionsSize; ++i)
-				//	{
-				//		ndReal gaussianNoise = ndReal(ndGaussianRandom(ndFloat32(actions[i]), ndFloat32(1.0f)));
-				//		ndReal clippiedNoisyAction = ndClamp(gaussianNoise, ndReal(-1.0f), ndReal(1.0f));
-				//		actions[i] = clippiedNoisyAction;
-				//	}
-				//}
-				m_model->ApplyActions(actions);
-			}
-
-			void GetObservation(ndBrainFloat* const observation)
-			{
-				m_model->GetObservation(observation);
+				return m_robot->GetReward();
 			}
 
 			bool IsTerminal() const
 			{
-				return m_model->IsTerminal();
+				return m_robot->IsTerminal();
+			}
+
+			void GetObservation(ndBrainFloat* const observation)
+			{
+				m_robot->GetObservation(observation);
+			}
+
+			virtual void ApplyActions(ndBrainFloat* const actions)
+			{
+				m_robot->ApplyActions(actions);
 			}
 
 			void ResetModel()
 			{
-				m_model->ResetModel();
+				m_robot->ResetModel();
 			}
 
-			ndRobot* m_model;
+			RobotModelNotify* m_robot;
 		};
 
-		ndRobot(const ndSharedPtr<ndBrainAgent>& agent)
-			:ndModelArticulation()
-			,m_cartMatrix(ndGetIdentityMatrix())
-			,m_poleMatrix(ndGetIdentityMatrix())
-			,m_cart(nullptr)
-			,m_pole(nullptr)
-			,m_agent(agent)
-		{
-		}
+	#else
 
-		bool IsTerminal() const
+		class ndController : public ndBrainAgentContinuePolicyGradient
 		{
-			const ndMatrix& matrix = m_pole->GetMatrix();
-			// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
-			bool fail = ndAbs(ndAsin (matrix.m_front.m_x)) > (D_REWARD_MIN_ANGLE * ndFloat32 (2.0f));
-			return fail;
-		}
-
-		ndReal GetReward() const
-		{
-			if (IsTerminal())
+			public:
+			ndController(const ndSharedPtr<ndBrain>& brain)
+				:ndBrainAgentContinuePolicyGradient(brain)
+				,m_robot(nullptr)
 			{
-				return ndReal(0.0f);
 			}
-			const ndMatrix& matrix = m_pole->GetMatrix();
-			ndFloat32 sinAngle = matrix.m_front.m_x;
-			//ndFloat32 reward = ndReal(ndExp(-ndFloat32(10000.0f) * sinAngle * sinAngle));
-			//ndFloat32 reward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
-			ndFloat32 reward = ndReal(ndExp(-ndFloat32(600.0f) * sinAngle * sinAngle));
-			return ndReal(reward);
-		}
 
-		void ApplyActions(ndBrainFloat* const actions)
+			ndController(const ndController& src)
+				:ndBrainAgentContinuePolicyGradient(src.m_actor)
+				, m_robot(nullptr)
+			{
+			}
+
+			void GetObservation(ndBrainFloat* const observation)
+			{
+				m_robot->GetObservation(observation);
+			}
+
+			virtual void ApplyActions(ndBrainFloat* const actions)
+			{
+				m_robot->ApplyActions(actions);
+			}
+
+			RobotModelNotify* m_robot;
+		};
+	#endif
+
+	public:
+	#ifdef ND_TRAIN_AGENT
+	RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
+		:ndModelNotify()
+		,m_controller(master)
+	{
+		Init(robot);
+	}
+
+	RobotModelNotify(const RobotModelNotify& src)
+		:ndModelNotify(src)
+		, m_controller(src.m_controller)
+	{
+		//Init(robot);
+	}
+
+	#else
+
+	RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const robot)
+		:ndModelNotify()
+		,m_controller(brain)
+	{
+		Init(robot);
+	}
+
+	RobotModelNotify(const RobotModelNotify& src)
+		:ndModelNotify(src)
+		,m_controller(src.m_controller)
+	{
+		//Init(robot);
+		ndAssert(0);
+	}
+	#endif
+
+	~RobotModelNotify()
+	{
+	}
+
+	ndModelNotify* Clone() const
+	{
+		return new RobotModelNotify(*this);
+	}
+
+	void Init(ndModelArticulation* const robot)
+	{
+		m_controller.m_robot = this;
+		m_cart = robot->GetRoot()->m_body->GetAsBodyDynamic();
+		m_pole = robot->GetRoot()->GetLastChild()->m_body->GetAsBodyDynamic();
+		m_poleJoint = *robot->GetRoot()->GetLastChild()->m_joint;
+
+		m_cartMatrix = m_cart->GetMatrix();
+		m_poleMatrix = m_pole->GetMatrix();
+	}
+
+	bool IsTerminal() const
+	{
+		// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
+		bool fail = ndAbs(GetPoleAngle()) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
+		return fail;
+	}
+
+	ndFloat32 GetPoleAngle() const
+	{
+		const ndMatrix& matrix = m_poleJoint->GetLocalMatrix0() * m_pole->GetMatrix();
+		ndFloat32 angle = ndAsin(matrix.m_right.m_x);
+		return angle;
+	}
+
+	ndReal GetReward() const
+	{
+		if (IsTerminal())
 		{
-			ndVector force(m_cart->GetForce());
-			ndBrainFloat action = actions[0];
-			force.m_x = ndFloat32 (ndBrainFloat(2.0f) * action * (m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL));
-			m_cart->SetForce(force);
+			return ndReal(0.0f);
 		}
+		ndFloat32 sinAngle = GetPoleAngle();
+		ndFloat32 reward = ndReal(ndExp(-ndFloat32(600.0f) * sinAngle * sinAngle));
+		return ndReal(reward);
+	}
 
-		void GetObservation(ndBrainFloat* const observation)
-		{
-			ndVector omega(m_pole->GetOmega());
-			const ndMatrix& matrix = m_pole->GetMatrix();
-			ndFloat32 angle = ndAsin (matrix.m_front.m_x);
-			observation[m_poleAngle] = ndReal(angle);
-			observation[m_poleOmega] = ndReal(omega.m_z);
-		}
+	void GetObservation(ndBrainFloat* const state)
+	{
+		ndVector omega(m_pole->GetOmega());
+		ndFloat32 angle = GetPoleAngle();
+		state[m_poleAngle] = ndReal(angle);
+		state[m_poleOmega] = ndReal(omega.m_z);
+	}
 
-		void TelePort() const
-		{
-			ndVector veloc(m_cart->GetVelocity());
-			ndVector posit(m_cart->GetMatrix().m_posit & ndVector::m_triplexMask);
-			posit.m_y = 0.0f;
-			posit.m_z = 0.0f;
-			veloc.m_y = 0.0f;
-			veloc.m_z = 0.0f;
+	void ApplyActions(ndBrainFloat* const actions)
+	{
+		ndVector force(m_cart->GetForce());
+		ndBrainFloat action = actions[0];
+		force.m_x = ndFloat32(ndBrainFloat(2.0f) * action * (m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL));
+		m_cart->SetForce(force);
+	}
 
-			ndMatrix cartMatrix(m_cart->GetMatrix());
-			ndVector cartVeloc(m_cart->GetVelocity());
-			cartVeloc -= veloc;
-			cartMatrix.m_posit -= posit;
-			m_cart->SetMatrix(cartMatrix);
-			m_cart->SetVelocity(cartVeloc);
+	void ResetModel()
+	{
+		m_cart->SetMatrix(m_cartMatrix);
+		m_pole->SetMatrix(m_poleMatrix);
 
-			ndMatrix poleMatrix(m_pole->GetMatrix());
-			ndVector poleVeloc(m_pole->GetVelocity());
-			poleVeloc -= veloc;
-			poleMatrix.m_posit -= posit;
-			m_pole->SetMatrix(poleMatrix);
-			m_pole->SetVelocity(poleVeloc);
-		}
+		m_pole->SetOmega(ndVector::m_zero);
+		m_pole->SetVelocity(ndVector::m_zero);
 
-		void ResetModel()
-		{
-			m_cart->SetMatrix(m_cartMatrix);
-			m_pole->SetMatrix(m_poleMatrix);
+		m_cart->SetOmega(ndVector::m_zero);
+		m_cart->SetVelocity(ndVector::m_zero);
+	}
 
-			m_pole->SetOmega(ndVector::m_zero);
-			m_pole->SetVelocity(ndVector::m_zero);
+	void RandomePush()
+	{
+		ndVector impulsePush(ndVector::m_zero);
+		ndFloat32 randValue = ndClamp(ndGaussianRandom(0.0f, 0.5f), ndFloat32 (-1.0f), ndFloat32(1.0f));
+		impulsePush.m_x = 5.0f * randValue * m_cart->GetMassMatrix().m_w;
+		m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, m_cart->GetScene()->GetTimestep());
+	}
 
-			m_cart->SetOmega(ndVector::m_zero);
-			m_cart->SetVelocity(ndVector::m_zero);
-		}
+	bool IsOutOfBounds() const
+	{
+		return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
+	}
 
-		void RandomePush()
-		{
-			ndVector impulsePush(ndVector::m_zero);
-			ndFloat32 randValue = ndClamp(ndGaussianRandom(0.0f, 0.5f), ndFloat32 (-1.0f), ndFloat32(1.0f));
-			impulsePush.m_x = 5.0f * randValue * m_cart->GetMassMatrix().m_w;
-			m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, m_cart->GetScene()->GetTimestep());
-		}
+	void Update(ndWorld* const, ndFloat32)
+	{
+		m_controller.Step();
+	}
 
-		bool IsOutOfBounds() const
-		{
-			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
-		}
+	void PostUpdate(ndWorld* const, ndFloat32)
+	{
+	}
 
-		void Update(ndWorld* const world, ndFloat32 timestep)
-		{
-			ndModelArticulation::Update(world, timestep);
-			m_agent->Step();
-		}
+	void PostTransformUpdate(ndWorld* const, ndFloat32)
+	{
+	}
 
-		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
-		{
-			ndModelArticulation::PostUpdate(world, timestep);
-		}
-
-		ndMatrix m_cartMatrix;
-		ndMatrix m_poleMatrix;
-		ndBodyDynamic* m_cart;
-		ndBodyDynamic* m_pole;
-		ndSharedPtr<ndBrainAgent> m_agent;
+	ndMatrix m_cartMatrix;
+	ndMatrix m_poleMatrix;
+	ndController m_controller;
+	ndBodyDynamic* m_cart;
+	ndBodyDynamic* m_pole;
+	ndJointBilateralConstraint* m_poleJoint;
 	};
 
-	void BuildModel(ndRobot* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
+	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
-		ndFloat32 xSize = 0.25f;
-		ndFloat32 ySize = 0.125f;
-		ndFloat32 zSize = 0.15f;
-		ndFloat32 cartMass = 5.0f;
-		ndFloat32 poleMass = 10.0f;
-		ndFloat32 poleLength = 0.4f;
-		ndFloat32 poleRadio = 0.05f;
-		ndPhysicsWorld* const world = scene->GetWorld();
-		
-		// make cart
-		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "wood_0.png")));
-		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
-		//ndMatrix matrix(cartBody->GetMatrix());
-		ndMatrix matrix(location);
-		matrix.m_posit.m_y += ySize / 2.0f + 0.05f;
-		cartBody->SetMatrix(matrix);
-		cartBody->GetAsBodyDynamic()->SetSleepAccel(cartBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
-		
-		matrix.m_posit.m_y += ySize / 2.0f;
+		ndUrdfFile urdf;
+		char fileName[256];
+		ndGetWorkingFileName("cartpole.urdf", fileName);
+		ndModelArticulation* const cartPole = urdf.Import(fileName);
 
-		// make pole leg
-		ndSharedPtr<ndBody> poleBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), poleMass, poleRadio, poleRadio, poleLength, "smilli.png")));
-		ndMatrix poleLocation(ndRollMatrix(90.0f * ndDegreeToRad) * matrix);
-		poleLocation.m_posit.m_y += poleLength * 0.5f;
-		poleBody->SetMatrix(poleLocation);
-		poleBody->GetAsBodyDynamic()->SetSleepAccel(poleBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
-		
-		// link cart and body with a hinge
-		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
-		polePivot.m_posit.m_y -= poleLength * 0.5f;
-		ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
+		SetModelVisualMesh(scene, cartPole);
+		cartPole->SetTransform(location);
 
-		// make the car move alone the z axis only (2d problem)
-		ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
+		// make the car move along the z axis only (2d problem)
+		ndWorld* const world = scene->GetWorld();
+		ndBodyKinematic* const boxBody = cartPole->GetRoot()->m_body->GetAsBodyKinematic();
+		ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(boxBody->GetMatrix(), boxBody, world->GetSentinelBody()));
 		world->AddJoint(xDirSlider);
 
-		// add path to the model
-		world->AddJoint(poleJoint);
-		model->AddLimb(modelRoot, poleBody, poleJoint);
-
-		// save some useful data
-		model->m_cart = cartBody->GetAsBodyDynamic();
-		model->m_pole = poleBody->GetAsBodyDynamic();
-		model->m_cartMatrix = cartBody->GetMatrix();
-		model->m_poleMatrix = poleBody->GetMatrix();
-	}
-
-#ifdef ND_TRAIN_AGENT
-	ndRobot* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location, ndSharedPtr<ndBrainAgent>& agent)
-	{
-		ndRobot* const model = new ndRobot(agent);
-		ndRobot::ndControllerTrainer* const trainer = (ndRobot::ndControllerTrainer*)*agent;
-		trainer->m_model = model;
-		trainer->SetName(CONTROLLER_NAME);
-
-		BuildModel(model, scene, location);
-
-		scene->SetAcceleratedUpdate();
-		return model;
-	}
-
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, ndSharedPtr<ndBrainAgent>& agent)
-	{
-		ndRobot* const model = CreateTrainModel(scene, location, agent);
-		return model;
+		return cartPole;
 	}
 
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
@@ -338,7 +303,7 @@ namespace ndCarpole_1
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
 			hyperParameters.m_extraTrajectorySteps = 256;
-			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
@@ -348,9 +313,12 @@ namespace ndCarpole_1
 
 			m_master->SetName(CONTROLLER_NAME);
 
-			ndSharedPtr<ndBrainAgent> visualAgent(new ndRobot::ndControllerTrainer(m_master));
-			ndSharedPtr<ndModel> visualModel(CreateModel(scene, matrix, visualAgent));
-			world->AddModel(visualModel);
+			ndModelArticulation* const visualModel = CreateModel(scene, matrix);
+			visualModel->AddToWorld(world);
+
+			#ifdef ND_TRAIN_AGENT
+				visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel));
+			#endif
 			SetMaterial(visualModel);
 
 			// add a hidden battery of model to generate trajectories in parallel
@@ -359,11 +327,24 @@ namespace ndCarpole_1
 			{
 				ndMatrix location(matrix);
 				location.m_posit.m_x += 3.0f * (ndRand() - 0.5f);
-				ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerTrainer(m_master));
-				ndSharedPtr<ndModel> model(CreateModel(scene, location, agent));
-				world->AddModel(model);
-				//HideModel(model);
+				#if 0
+				//ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerTrainer(m_master));
+				//ndSharedPtr<ndModel> model(CreateModel(scene, location, agent));
+				ndModelArticulation* const model = (ndModelArticulation*)visualModel->Clone();
+
+				//world->AddModel(model);
+				////HideModel(model);
+				//SetMaterial(model);
+				#else
+				ndModelArticulation* const model = CreateModel(scene, location);
+				model->AddToWorld(world);
+				#ifdef ND_TRAIN_AGENT
+					model->SetNotifyCallback(new RobotModelNotify(m_master, model));
+				#endif
 				SetMaterial(model);
+				#endif
+
+				scene->SetAcceleratedUpdate();
 			}
 		}
 
@@ -375,13 +356,11 @@ namespace ndCarpole_1
 			}
 		}
 
-		void HideModel(ndSharedPtr<ndModel>& model) const
+		void HideModel(ndModelArticulation* const model) const
 		{
-			ndRobot* const robot = (ndRobot*)*model;
-
 			ndModelArticulation::ndNode* stackMem[128];
 			ndInt32 stack = 1;
-			stackMem[0] = robot->GetRoot();
+			stackMem[0] = model->GetRoot();
 			while (stack)
 			{
 				stack--;
@@ -407,6 +386,16 @@ namespace ndCarpole_1
 			{
 			}
 
+			InvisibleBodyNotify(const InvisibleBodyNotify& src)
+				:ndDemoEntityNotify(src)
+			{
+			}
+
+			ndBodyNotify* Clone() const
+			{
+				return new InvisibleBodyNotify(*this);
+			}
+
 			virtual bool OnSceneAabbOverlap(const ndBody* const otherBody) const
 			{
 				const ndBodyKinematic* const body0 = ((ndBody*)GetBody())->GetAsBodyKinematic();
@@ -417,18 +406,17 @@ namespace ndCarpole_1
 			}
 		};
 
-		void SetMaterial(ndSharedPtr<ndModel>& model) const
+		void SetMaterial(ndModelArticulation* const model) const
 		{
-			ndRobot* const robot = (ndRobot*)*model;
-
 			ndModelArticulation::ndNode* stackMem[128];
 			ndInt32 stack = 1;
-			stackMem[0] = robot->GetRoot();
+			stackMem[0] = model->GetRoot();
 			while (stack)
 			{
 				stack--;
 				ndModelArticulation::ndNode* const node = stackMem[stack];
 				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+				body->GetAsBodyDynamic()->SetSleepAccel(body->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
 
 				ndShapeInstance& instanceShape = body->GetCollisionShape();
 				instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
@@ -480,7 +468,6 @@ namespace ndCarpole_1
 				}
 			}
 
-			//if (stopTraining >= m_stopTraining)
 			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 96.0f))
 			{
 				char fileName[1024];
@@ -492,6 +479,10 @@ namespace ndCarpole_1
 				ndExpandTraceMessage("training complete\n");
 				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
 				ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+
+				//ndGetWorkingFileName(CRITIC_NAME, fileName);
+				m_master->GetCritic()->SaveToFile(fileName);
+
 				manager->Terminate();
 			}
 		}
@@ -507,50 +498,36 @@ namespace ndCarpole_1
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;
 	};
-
-#else
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
-	{
-		char fileName[1024];
-		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
-
-		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndController(actor));
-
-		ndRobot* const model = new ndRobot(agent);
-		((ndRobot::ndController*)*agent)->m_model = model;
-
-		BuildModel(model, scene, location);
-		return model;
-	}
-#endif
 }
 
 using namespace ndCarpole_1;
-#endif
+
 
 void ndCartpoleContinue(ndDemoEntityManager* const scene)
 {
-	ndAssert(0);
-#if 0
 	BuildFlatPlane(scene, true);
-	
-	ndSetRandSeed(42);
-	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
+
+	ndMatrix matrix(ndGetIdentityMatrix());
+	matrix.m_posit.m_y = 0.11f;
 
 #ifdef ND_TRAIN_AGENT
+	ndSetRandSeed(42);
 	TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix);
 	scene->RegisterPostUpdate(trainer);
 #else
 	ndWorld* const world = scene->GetWorld();
-	ndSharedPtr<ndModel> model(CreateModel(scene, matrix));
-	world->AddModel(model);
+	ndModelArticulation* const model = CreateModel(scene, matrix);
+	model->AddToWorld(world);
+
+	// add the deep learning controller
+	char fileName[256];
+	ndGetWorkingFileName(CONTROLLER_NAME, fileName);
+	ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
+	model->SetNotifyCallback(new RobotModelNotify(brain, model));
 #endif
 
-	matrix.m_posit.m_x -= 0.0f;
-	matrix.m_posit.m_y += 0.5f;
-	matrix.m_posit.m_z += 2.0f;
+	matrix.m_posit.m_y = 0.5f;
+	matrix.m_posit.m_z = 2.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
-#endif
 }

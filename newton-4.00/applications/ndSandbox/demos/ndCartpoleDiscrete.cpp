@@ -23,9 +23,9 @@
 
 namespace ndCarpole_0
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME		"cartpoleDiscreteVPG.dnn"
-	#define CRITIC_NAME			"cartpoleDiscreteCriticVPG.dnn"
+	//#define CRITIC_NAME			"cartpoleDiscreteCriticVPG.dnn"
 
 	#define D_PUSH_ACCEL		ndFloat32 (15.0f)
 	#define D_REWARD_MIN_ANGLE	ndFloat32 (20.0f * ndDegreeToRad)
@@ -58,7 +58,7 @@ namespace ndCarpole_0
 			}
 
 			ndController(const ndController& src)
-				:ndBrainAgentDiscretePolicyGradient_Trainer(src.m_master)
+				:ApplyActions(src.m_master)
 				,m_robot(nullptr)
 			{
 			}
@@ -102,6 +102,12 @@ namespace ndCarpole_0
 			{
 			}
 
+			ndController(const ndController& src)
+				:ndBrainAgentDiscretePolicyGradient(src.m_actor)
+				,m_robot(nullptr)
+			{
+			}
+
 			void GetObservation(ndBrainFloat* const observation)
 			{
 				m_robot->GetObservation(observation);
@@ -139,6 +145,15 @@ namespace ndCarpole_0
 		{
 			Init(robot);
 		}
+
+		RobotModelNotify(const RobotModelNotify& src)
+			:ndModelNotify(src)
+			,m_controller(src.m_controller)
+		{
+			//Init(robot);
+			ndAssert(0);
+		}
+
 		#endif
 
 		~RobotModelNotify()
@@ -326,6 +341,8 @@ namespace ndCarpole_0
 				SetMaterial(model);
 				#endif
 			}
+
+			scene->SetAcceleratedUpdate();
 		}
 
 		~TrainingUpdata()
@@ -396,6 +413,7 @@ namespace ndCarpole_0
 				stack--;
 				ndModelArticulation::ndNode* const node = stackMem[stack];
 				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+				body->GetAsBodyDynamic()->SetSleepAccel(body->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
 		
 				ndShapeInstance& instanceShape = body->GetCollisionShape();
 				instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
@@ -459,8 +477,8 @@ namespace ndCarpole_0
 				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
 				ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 
-				ndGetWorkingFileName(CRITIC_NAME, fileName);
-				m_master->GetCritic()->SaveToFile(fileName);
+				//ndGetWorkingFileName(CRITIC_NAME, fileName);
+				//m_master->GetCritic()->SaveToFile(fileName);
 
 				manager->Terminate();
 			}
