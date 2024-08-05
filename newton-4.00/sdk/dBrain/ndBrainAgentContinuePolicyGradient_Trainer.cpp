@@ -36,14 +36,14 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 {
 	m_randomSeed = 47;
 	m_numberOfLayers = 4;
-	m_neuronPerLayers = 64;
 	m_bashBufferSize = 256;
-	m_numberOfActions = 0;
-	m_numberOfObservations = 0;
-
+	m_neuronPerLayers = 64;
 	m_bashTrajectoryCount = 100;
 	m_maxTrajectorySteps = 4096;
 	m_extraTrajectorySteps = 1024;
+
+	m_numberOfActions = 0;
+	m_numberOfObservations = 0;
 
 	m_criticLearnRate = ndBrainFloat(0.0004f);
 	m_policyLearnRate = ndBrainFloat(0.0002f);
