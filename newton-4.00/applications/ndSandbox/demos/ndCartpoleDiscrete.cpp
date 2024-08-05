@@ -23,7 +23,7 @@
 
 namespace ndCarpole_0
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME		"cartpoleDiscreteVPG.dnn"
 	//#define CRITIC_NAME			"cartpoleDiscreteCriticVPG.dnn"
 
@@ -494,6 +494,61 @@ namespace ndCarpole_0
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;
 	};
+
+	void BuildUrdfModel(ndDemoEntityManager* const scene)
+	{
+		ndFloat32 xSize = 0.25f;
+		ndFloat32 ySize = 0.125f;
+		ndFloat32 zSize = 0.15f;
+		ndFloat32 cartMass = 5.0f;
+		ndFloat32 poleMass = 10.0f;
+		ndFloat32 poleLength = 0.4f;
+		ndFloat32 poleRadio = 0.05f;
+		ndMatrix location(ndGetIdentityMatrix());
+
+		ndModelArticulation model;
+
+		ndShapeInstance boxShape(new ndShapeBox(xSize, ySize, zSize));
+		ndSharedPtr<ndDemoMeshInterface> boxMesh(new ndDemoMesh("shape", scene->GetShaderCache(), &boxShape, "wood_0.png", "wood_0.png", "wood_0.png"));
+		ndDemoEntity* const boxEntity = new ndDemoEntity(location, nullptr);
+		boxEntity->SetMesh(boxMesh);
+		ndBodyKinematic* const cartBody = new ndBodyDynamic();
+		cartBody->SetNotifyCallback(new ndDemoEntityNotify(nullptr, boxEntity));
+		cartBody->SetMatrix(location);
+		cartBody->SetCollisionShape(boxShape);
+		cartBody->SetMassMatrix(cartMass, boxShape);
+		ndModelArticulation::ndNode* const modelRoot = model.AddRootBody(cartBody);
+
+		//ndMatrix matrix(location);
+		//matrix.m_posit.m_y += ySize / 2.0f + 0.05f;
+		//cartBody->SetMatrix(matrix);
+		//location.m_posit.m_y += ySize / 2.0f;
+
+		// make pole leg
+		ndMatrix poleLocation(ndRollMatrix(90.0f * ndDegreeToRad) * location);
+		poleLocation.m_posit.m_y += poleLength * 0.5f;
+		
+		ndShapeInstance poleShape(new ndShapeCapsule(poleRadio, poleRadio, poleLength));
+		ndSharedPtr<ndDemoMeshInterface> poleMesh(new ndDemoMesh("shape", scene->GetShaderCache(), &boxShape, "wood_0.png", "wood_0.png", "wood_0.png"));
+		ndDemoEntity* const poleEntity = new ndDemoEntity(poleLocation, nullptr);
+		poleEntity->SetMesh(poleMesh);
+		ndBodyKinematic* const poleBody = new ndBodyDynamic();
+		poleBody->SetNotifyCallback(new ndDemoEntityNotify(nullptr, poleEntity));
+		poleBody->SetMatrix(poleLocation);
+		poleBody->SetCollisionShape(poleShape);
+		poleBody->SetMassMatrix(poleMass, poleShape);
+		
+		// link cart and body with a hinge
+		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
+		polePivot.m_posit.m_y -= poleLength * 0.5f;
+		ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
+		model.AddLimb(modelRoot, poleBody, poleJoint);
+
+		ndUrdfFile urdf;
+		char fileName[256];
+		ndGetWorkingFileName("cartpole_1.urdf", fileName);
+		urdf.Export(fileName, &model);
+	}
 }
 
 using namespace ndCarpole_0;
@@ -504,6 +559,8 @@ void ndCartpoleDiscrete(ndDemoEntityManager* const scene)
 	
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.11f;
+
+	BuildUrdfModel(scene);
 
 #ifdef ND_TRAIN_AGENT
 	ndSetRandSeed(42);
