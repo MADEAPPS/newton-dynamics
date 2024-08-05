@@ -81,9 +81,9 @@ class ndUrdfFile : public ndClassAlloc
 
 	void ExportLink(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation);
 	void ExportMaterials(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
-	void ExportInertia(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
+	void ExportInertia(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation);
 	void ExportCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation);
-	void ExportVisual(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
+	void ExportVisual(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation);
 	void ExportJoint(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
 
 	void LoadMaterials(const nd::TiXmlNode* const rootNode);

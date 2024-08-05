@@ -763,7 +763,7 @@ void ndUrdfFile::ExportOrigin(nd::TiXmlElement* const parentNode, const ndMatrix
 	origin->SetAttribute("xyz", buffer);
 }
 
-void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link)
+void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation)
 {
 	char buffer[256];
 
@@ -773,9 +773,12 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const ndModelArt
 	// add position and orientation
 	const ndBodyKinematic* const body = link->m_body->GetAsBodyKinematic();
 	const ndShapeInstance& collision = body->GetCollisionShape();
-	ndMatrix matrix(collision.GetScaledTransform(body->GetMatrix()));
-	
-	ExportOrigin(visualNode, matrix);
+	//ndMatrix matrix(collision.GetScaledTransform(body->GetMatrix()));
+
+	const ndMatrix matrix(collision.GetScaledTransform(body->GetMatrix()));
+	const ndMatrix shapeMatrix(matrix * rotation);
+	//ExportOrigin(collisionNode, matrix);
+	ExportOrigin(visualNode, shapeMatrix);
 	
 	// add geometry node
 	nd::TiXmlElement* const geometry = new nd::TiXmlElement("geometry");
@@ -848,7 +851,6 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const ndModel
 
 	const ndMatrix matrix(collision.GetScaledTransform(body->GetMatrix()));
 	const ndMatrix shapeMatrix(matrix * rotation);
-	//ExportOrigin(collisionNode, matrix);
 	ExportOrigin(collisionNode, shapeMatrix);
 
 	nd::TiXmlElement* const geometry = new nd::TiXmlElement("geometry");
@@ -892,7 +894,7 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const ndModel
 	}
 }
 
-void ndUrdfFile::ExportInertia(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link)
+void ndUrdfFile::ExportInertia(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation)
 {
 	char buffer[256];
 	nd::TiXmlElement* const inertial = new nd::TiXmlElement("inertial");
@@ -901,7 +903,8 @@ void ndUrdfFile::ExportInertia(nd::TiXmlElement* const linkNode, const ndModelAr
 	const ndBodyKinematic* const body = link->m_body->GetAsBodyKinematic();
 	ndMatrix matrix(body->GetMatrix());
 	ndVector com(matrix.TransformVector(body->GetCentreOfMass()));
-	ExportOrigin(inertial, matrix);
+	const ndMatrix comMatrix(matrix * rotation);
+	ExportOrigin(inertial, comMatrix);
 
 	nd::TiXmlElement* const mass = new nd::TiXmlElement("mass");
 	inertial->LinkEndChild(mass);
@@ -913,6 +916,8 @@ void ndUrdfFile::ExportInertia(nd::TiXmlElement* const linkNode, const ndModelAr
 	inertial->LinkEndChild(inertia);
 
 	ndMatrix inertiaMatrix(body->CalculateInertiaMatrix());
+	inertiaMatrix = rotation.OrthoInverse() * inertiaMatrix * rotation;
+
 	sprintf(buffer, "%g", inertiaMatrix[0][0]);
 	inertia->SetAttribute("xx", buffer);
 
@@ -941,9 +946,9 @@ void ndUrdfFile::ExportLink(nd::TiXmlElement* const rootNode, const ndModelArtic
 	sprintf(name, "%s_link", link->m_name.GetStr());
 	linkNode->SetAttribute("name", name);
 
-	ExportVisual(linkNode, link);
+	ExportVisual(linkNode, link, rotation);
 	ExportCollision(linkNode, link, rotation);
-	ExportInertia(linkNode, link);
+	ExportInertia(linkNode, link, rotation);
 }
 
 void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link)
@@ -965,11 +970,12 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const ndModelArti
 	sprintf(buffer, "%s_link", link->m_name.GetStr());
 	child->SetAttribute("link", buffer);
 
+	jointNode->SetAttribute("type", "fixed");
+
 	ndMatrix pivotMatrix0;
 	ndMatrix pivotMatrix1;
 	const ndJointBilateralConstraint* const joint = *link->m_joint;
 	joint->CalculateGlobalMatrix(pivotMatrix0, pivotMatrix1);
-
 	ExportOrigin(jointNode, pivotMatrix0);
 }
 
@@ -1011,7 +1017,7 @@ int xxxx = 0;
 		xxxx++;
 		if (xxxx == 1)
 		{
-			break;
+//			break;
 		}
 
 		for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
