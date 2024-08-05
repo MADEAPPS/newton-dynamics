@@ -568,6 +568,7 @@ void ndUrdfFile::ApplyRotation(const ndMatrix& rotation, ndModelArticulation* co
 		}
 	}
 
+	// rotate bodies.
 	stack.PushBack(model->GetRoot());
 	while (stack.GetCount())
 	{
@@ -592,6 +593,7 @@ void ndUrdfFile::ApplyRotation(const ndMatrix& rotation, ndModelArticulation* co
 		}
 	}
 
+	// rotate joints.
 	for (ndInt32 i = 0; i < joints.GetCount(); ++i)
 	{
 		ndBodyKinematic* const body0 = joints[i]->GetBody0();
@@ -823,8 +825,7 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const ndModelArt
 	material->SetAttribute("name", "material_0");
 }
 
-//void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndShapeInstance& collision)
-void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link)
+void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation)
 {
 	char buffer[256];
 	const ndBodyKinematic* const body = link->m_body->GetAsBodyKinematic();
@@ -836,8 +837,19 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const ndModel
 	nd::TiXmlElement* const collisionNode = new nd::TiXmlElement("collision");
 	linkNode->LinkEndChild(collisionNode);
 
-	ndMatrix matrix(collision.GetScaledTransform(body->GetMatrix()));
-	ExportOrigin(collisionNode, matrix);
+	//ndShapeInstance& shape = body->GetCollisionShape();
+	//ndMatrix shapeMatrix(shape.GetLocalMatrix() * body->GetMatrix() * rotation);
+	//body->SetCentreOfMass(rotation.RotateVector(body->GetCentreOfMass()));
+	//ndMatrix bodyMatrix(rotationInv * body->GetMatrix() * rotation);
+	//body->SetMatrix(bodyMatrix);
+	//shape.SetLocalMatrix(shapeMatrix * bodyMatrix.OrthoInverse());
+	//ndUrdfBodyNotify* const notify = (ndUrdfBodyNotify*)body->GetNotifyCallback();
+	//notify->m_mesh->ApplyTransform(rotation);
+
+	const ndMatrix matrix(collision.GetScaledTransform(body->GetMatrix()));
+	const ndMatrix shapeMatrix(matrix * rotation);
+	//ExportOrigin(collisionNode, matrix);
+	ExportOrigin(collisionNode, shapeMatrix);
 
 	nd::TiXmlElement* const geometry = new nd::TiXmlElement("geometry");
 	collisionNode->LinkEndChild(geometry);
@@ -920,7 +932,7 @@ void ndUrdfFile::ExportInertia(nd::TiXmlElement* const linkNode, const ndModelAr
 	inertia->SetAttribute("zz", buffer);
 }
 
-void ndUrdfFile::ExportLink(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link)
+void ndUrdfFile::ExportLink(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation)
 {
 	nd::TiXmlElement* const linkNode = new nd::TiXmlElement("link");
 	rootNode->LinkEndChild(linkNode);
@@ -930,7 +942,7 @@ void ndUrdfFile::ExportLink(nd::TiXmlElement* const rootNode, const ndModelArtic
 	linkNode->SetAttribute("name", name);
 
 	ExportVisual(linkNode, link);
-	ExportCollision(linkNode, link);
+	ExportCollision(linkNode, link, rotation);
 	ExportInertia(linkNode, link);
 }
 
@@ -969,7 +981,10 @@ void ndUrdfFile::Export(const char* const filePathName, ndModelArticulation* con
 	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
 	doc->LinkEndChild(decl);
 	ndString oldloc(setlocale(LC_ALL, 0));
-	
+
+	ndMatrix rootMatrix(model->GetRoot()->m_body->GetMatrix());
+	model->SetTransform(rootMatrix.OrthoInverse());
+
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("robot");
 	doc->LinkEndChild(rootNode);
 
@@ -980,11 +995,13 @@ void ndUrdfFile::Export(const char* const filePathName, ndModelArticulation* con
 	ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
 	stack.PushBack(model->GetRoot());
 
+	const ndMatrix rotation(ndRollMatrix(ndPi * 0.5f));
+	//const ndMatrix rotation(ndGetIdentityMatrix());
 int xxxx = 0;
 	while (stack.GetCount())
 	{
 		const ndModelArticulation::ndNode* const node = stack.Pop();
-		ExportLink(rootNode, node);
+		ExportLink(rootNode, node, rotation);
 
 		const ndJointBilateralConstraint* const joint = *node->m_joint;
 		if (joint)
@@ -1002,7 +1019,8 @@ int xxxx = 0;
 			stack.PushBack(child);
 		}
 	}
-	
+
+	model->SetTransform(rootMatrix);
 	doc->SaveFile(filePathName);
 	setlocale(LC_ALL, oldloc.GetStr());
 	delete doc;
