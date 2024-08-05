@@ -77,18 +77,14 @@ class ndUrdfFile : public ndClassAlloc
 	};
 
 	void MakeNamesUnique(ndModelArticulation* const model);
+	void ExportOrigin(nd::TiXmlElement* const linkNode, const ndMatrix& pose);
+
 	void ExportLink(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
+	void ExportMaterials(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
+	void ExportInertia(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
+	void ExportCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
 	void ExportVisual(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
-	//void AddJoints(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
-	//void AddMaterials(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
-	//void AddJoint(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
-	//
-	//void AddInertia(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
-	
-	//void AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link);
-	//
-	//void AddPose(nd::TiXmlElement* const linkNode, const ndMatrix& pose);
-	//void AddCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndShapeInstance& collision);
+	void ExportJoint(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
 
 	void LoadMaterials(const nd::TiXmlNode* const rootNode);
 	ndMatrix GetMatrix(const nd::TiXmlNode* const parentNode) const;
