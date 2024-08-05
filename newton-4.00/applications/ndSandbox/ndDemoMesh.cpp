@@ -110,10 +110,6 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 	m_name = name;
 	ndMeshEffect mesh(*collision);
 
-	//ndMatrix flipMatrix(ndGetIdentityMatrix());
-	//flipMatrix[1][1] = ndFloat32(-1.0f);
-	//ndMatrix aligmentUV(flipMatrix * uvMatrix);
-
 	m_shader = shaderCache.m_diffuseEffect;
 	m_shaderShadow = shaderCache.m_diffuseShadowEffect;
 

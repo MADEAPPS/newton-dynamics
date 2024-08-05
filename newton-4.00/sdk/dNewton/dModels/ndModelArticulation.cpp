@@ -58,6 +58,7 @@ ndModelArticulation::ndModelArticulation(const ndModelArticulation& src)
 	,m_closeLoops()
 	,m_name(src.m_name)
 {
+	ndAssert(0);
 	ndAssert(src.GetRoot()->m_body->GetAsBodyDynamic());
 
 	ndFixSizeArray<ndNode*, 256> stack;

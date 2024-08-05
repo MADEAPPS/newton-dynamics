@@ -392,7 +392,6 @@ void ndUrdfFile::LoadMaterials(const nd::TiXmlNode* const rootNode)
 	}
 }
 
-
 // *******************************************************************************
 // 
 // *******************************************************************************
@@ -610,6 +609,7 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode)
 		ndMeshEffect::ndMaterial meshMaterial;
 		meshMaterial.m_diffuse = m_materials[i].m_color;
 		//meshMaterial.m_ambient = materials[i].m_color;
+		strcpy(meshMaterial.m_textureName, "wood_0.png");
 		meshEffect->GetMaterials().PushBack(meshMaterial);
 	}
 	auto AddMeshShape = [this, meshEffect](const nd::TiXmlNode* const node)
@@ -711,11 +711,51 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode)
 	};
 
 	meshEffect->BeginBuild();
+	ndInt32 count = 0;
 	for (const nd::TiXmlNode* node = linkNode->FirstChild("visual"); node; node = node->NextSibling("visual"))
 	{
+		count++;
 		AddMeshShape(node);
 	}
 	meshEffect->EndBuild();
+
+	if (count == 1)
+	{
+		const nd::TiXmlNode* node = linkNode->FirstChild("visual");
+		const nd::TiXmlNode* const geometryNode = node->FirstChild("geometry");
+		const nd::TiXmlElement* const shapeNode = (nd::TiXmlElement*)geometryNode->FirstChild();
+		const char* const name = shapeNode->Value();
+
+		ndInt32 materialIndex = 0;
+		const nd::TiXmlElement* const materialNode = (nd::TiXmlElement*)node->FirstChild("material");
+		if (materialNode)
+		{
+			const char* const name = materialNode->Attribute("name");
+			const ndTree<ndInt32, ndString>::ndNode* const materialNode = m_materialMap.Find(name);
+			materialIndex = materialNode->GetInfo();
+		}
+
+		ndMatrix uvMatrix(ndGetIdentityMatrix());
+		if (strcmp(name, "sphere") == 0)
+		{
+			ndMatrix flipMatrix(ndGetIdentityMatrix());
+			flipMatrix[0][0] = ndFloat32(-1.0f);
+			ndMatrix aligmentUV(flipMatrix* uvMatrix);
+			meshEffect->SphericalMapping(materialIndex, aligmentUV);
+		}
+		else if (strcmp(name, "cylinder") == 0)
+		{
+			ndMatrix flipMatrix(ndGetIdentityMatrix());
+			flipMatrix[0][0] = ndFloat32(-1.0f);
+			ndMatrix aligmentUV(flipMatrix* uvMatrix);
+			//meshEffect->SphericalMapping(materialIndex, aligmentUV);
+			meshEffect->BoxMapping(materialIndex, materialIndex, materialIndex, aligmentUV);
+		}
+		else if (strcmp(name, "box") == 0)
+		{
+			meshEffect->BoxMapping(materialIndex, materialIndex, materialIndex, uvMatrix);
+		}
+	}
 
 	body->SetCollisionShape(collision);
 	body->SetMassMatrix(ndFloat32(mass), collision);

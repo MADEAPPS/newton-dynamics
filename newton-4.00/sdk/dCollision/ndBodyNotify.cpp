@@ -43,6 +43,11 @@ ndBodyNotify::~ndBodyNotify()
 {
 }
 
+ndBodyNotify* ndBodyNotify::Clone() const
+{
+	return new ndBodyNotify(*this);
+}
+
 ndBody* ndBodyNotify::GetBody()
 { 
 	return m_body; 

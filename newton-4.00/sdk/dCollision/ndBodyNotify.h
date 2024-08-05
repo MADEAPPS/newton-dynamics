@@ -35,7 +35,7 @@ class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 	D_COLLISION_API ndBodyNotify(const ndBodyNotify& src);
 	D_COLLISION_API ndBodyNotify(const ndVector& defaultGravity);
 	D_COLLISION_API virtual ~ndBodyNotify();
-	D_COLLISION_API virtual ndBodyNotify* Clone() const = 0;
+	D_COLLISION_API virtual ndBodyNotify* Clone() const;
 
 	D_COLLISION_API ndBody* GetBody();
 	D_COLLISION_API const ndBody* GetBody() const;

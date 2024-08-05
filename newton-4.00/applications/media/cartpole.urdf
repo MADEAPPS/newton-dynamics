@@ -2,11 +2,13 @@
 <robot name="physics">
 
   <material name="wood">
-    <color rgba="0 0 0.8 1"/>
+    <color rgba="1 1 1 1"/>
+    <texture filename="wood_0.png"/>
   </material>
 
   <material name="pole">
-    <color rgba="1 0 0 1"/>
+    <color rgba="1 1 1 1"/>
+    <texture filename="smilli.png"/>
   </material>
 
   <link name="base_link">

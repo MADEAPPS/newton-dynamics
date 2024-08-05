@@ -43,16 +43,55 @@ static ndBodyDynamic* BuildSphere(const ndVector& pos, const ndVector& gravity =
 
 class NewtonPhantom : public ndModel
 {
+	class NewtonPhantomModelNotify : public ndModelNotify
+	{
+		public:
+		NewtonPhantomModelNotify()
+			:ndModelNotify()
+		{
+		}
+
+		NewtonPhantomModelNotify(const NewtonPhantomModelNotify& src)
+			:ndModelNotify(src)
+		{
+		}
+
+		~NewtonPhantomModelNotify()
+		{
+		}
+
+		ndModelNotify* Clone() const
+		{
+			return new NewtonPhantomModelNotify(*this);
+		}
+
+		void Update(ndWorld* const world, ndFloat32)
+		{
+			NewtonPhantom* const model = (NewtonPhantom*)GetModel();
+			model->Update(world);
+		}
+
+		void PostUpdate(ndWorld* const, ndFloat32)
+		{
+		}
+
+		void PostTransformUpdate(ndWorld* const, ndFloat32)
+		{
+		}
+	};
+
+
 	// A Phantom collision shape can be moved around the world, gathering contact
 	// information with other ndBody's without effecting the simulation
 
-public:
+	public:
 	NewtonPhantom(ndScene* scene) :
 		ndModel(),
 		phantomShape(new ndShapeBox(1.0f, 1.0f, 1.0f)),
 		worldMatrix(ndGetIdentityMatrix()),
 		notification(scene)
 	{
+		ndTrace(("Fix NewtonPhantom\n"));
 	}
 	~NewtonPhantom() = default;
 
@@ -66,42 +105,40 @@ public:
 		// do nothing since is does not uses bodies or joints
 	}
 
-
 	void transform(const ndMatrix& matrix) { worldMatrix = matrix; }
 	ndInt32 getContactCount() const { return contactCount; }
 	ndVector getContactPoint() const { return contactPoint; }
 
-	//void Update(ndWorld* const world, ndFloat32 timestep) override
-	void Update(ndWorld* const world, ndFloat32) override
+	void Update(ndWorld* const world)
 	{
 		// calc the current AABB in world space
 		ndVector boxMin;
 		ndVector boxMax;
 		phantomShape.CalculateAabb(worldMatrix, boxMin, boxMax);
-
+	
 		ndBodiesInAabbNotify notifyCallback;
 		world->BodiesInAabb(notifyCallback, boxMin, boxMax);
-
+	
 		for (ndInt32 i = 0; i < notifyCallback.m_bodyArray.GetCount(); ++i)
 		{
 			ndBody* const nbody = const_cast<ndBody*> (notifyCallback.m_bodyArray[i]);
 			ndBodyKinematic* const kBody = nbody->GetAsBodyKinematic();
-
+	
 			const ndShapeInstance& otherShape = kBody->GetCollisionShape();
 			const ndMatrix& otherMatrix = notifyCallback.m_bodyArray[i]->GetMatrix();
-
+	
 			// ignore self collision
 			if (otherShape.GetShape() != phantomShape.GetShape())
 			{
 				ndFixSizeArray<ndContactPoint, 16> contactBuffer;
-
+	
 				ndVector phantomVelocity = ndVector::m_zero;
 				ndVector otherVelocity = ndVector::m_zero;
-
+	
 				ndContactSolver contSolver;
 				contSolver.CalculateContacts(&phantomShape, worldMatrix, phantomVelocity, &otherShape, otherMatrix, otherVelocity, contactBuffer, &notification);
 				contactCount = contactBuffer.GetCount();
-
+	
 				// should be 1 when a box hits a sphere dead on, correct?
 				if (contactCount)
 				{
@@ -113,12 +150,6 @@ public:
 				}
 			}
 		}
-	}
-	void PostUpdate(ndWorld* const, ndFloat32) override
-	{
-	}
-	void PostTransformUpdate(ndWorld* const, ndFloat32) override
-	{
 	}
 
 private:
