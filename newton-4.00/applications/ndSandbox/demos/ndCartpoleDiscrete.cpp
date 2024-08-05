@@ -506,7 +506,7 @@ namespace ndCarpole_0
 		ndFloat32 poleRadio = 0.05f;
 		ndMatrix location(ndGetIdentityMatrix());
 
-		ndModelArticulation model;
+		ndModelArticulation* const model = new ndModelArticulation;
 
 		ndShapeInstance boxShape(new ndShapeBox(xSize, ySize, zSize));
 		ndSharedPtr<ndDemoMeshInterface> boxMesh(new ndDemoMesh("shape", scene->GetShaderCache(), &boxShape, "wood_0.png", "wood_0.png", "wood_0.png"));
@@ -517,12 +517,7 @@ namespace ndCarpole_0
 		cartBody->SetMatrix(location);
 		cartBody->SetCollisionShape(boxShape);
 		cartBody->SetMassMatrix(cartMass, boxShape);
-		ndModelArticulation::ndNode* const modelRoot = model.AddRootBody(cartBody);
-
-		//ndMatrix matrix(location);
-		//matrix.m_posit.m_y += ySize / 2.0f + 0.05f;
-		//cartBody->SetMatrix(matrix);
-		//location.m_posit.m_y += ySize / 2.0f;
+		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
 
 		// make pole leg
 		ndMatrix poleLocation(ndRollMatrix(90.0f * ndDegreeToRad) * location);
@@ -542,12 +537,23 @@ namespace ndCarpole_0
 		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
 		polePivot.m_posit.m_y -= poleLength * 0.5f;
 		ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
-		model.AddLimb(modelRoot, poleBody, poleJoint);
+		model->AddLimb(modelRoot, poleBody, poleJoint);
 
 		ndUrdfFile urdf;
 		char fileName[256];
 		ndGetWorkingFileName("cartpole_1.urdf", fileName);
-		urdf.Export(fileName, &model);
+		urdf.Export(fileName, model);
+
+		ndMatrix matrix(ndGetIdentityMatrix());
+		matrix.m_posit.m_y += 0.125f;
+		model->SetTransform(matrix);
+		ndWorld* const world = scene->GetWorld();
+		model->AddToWorld(world);
+
+		ndModelArticulation* const model1 = urdf.Import(fileName);
+		matrix.m_posit.m_x += 0.25f;
+		model1->SetTransform(matrix);
+		model1->AddToWorld(world);
 	}
 }
 
@@ -567,15 +573,15 @@ void ndCartpoleDiscrete(ndDemoEntityManager* const scene)
 	TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix);
 	scene->RegisterPostUpdate(trainer);
 #else
-	ndWorld* const world = scene->GetWorld();
-	ndModelArticulation* const model = CreateModel(scene, matrix);
-	model->AddToWorld(world);
-
-	// add the deep learning controller
-	char fileName[256];
-	ndGetWorkingFileName(CONTROLLER_NAME, fileName);
-	ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
-	model->SetNotifyCallback(new RobotModelNotify(brain, model));
+	//ndWorld* const world = scene->GetWorld();
+	//ndModelArticulation* const model = CreateModel(scene, matrix);
+	//model->AddToWorld(world);
+	//
+	//// add the deep learning controller
+	//char fileName[256];
+	//ndGetWorkingFileName(CONTROLLER_NAME, fileName);
+	//ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
+	//model->SetNotifyCallback(new RobotModelNotify(brain, model));
 #endif
 	
 	matrix.m_posit.m_y = 0.5f;
