@@ -438,12 +438,11 @@ ndBodyDynamic* ndUrdfFile::ImportLink(const nd::TiXmlNode* const linkNode)
 ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const jointNode, ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody)
 {
 	ndJointBilateralConstraint* joint = nullptr;
-	const char* const jointType = ((nd::TiXmlElement*)jointNode)->Attribute("type");
-
 	ndMatrix childMatrix(ImportOrigin(jointNode));
 	childBody->SetMatrix(childMatrix * parentBody->GetMatrix());
 	ndMatrix pivotMatrix(childBody->GetMatrix());
-	
+
+	const char* const jointType = ((nd::TiXmlElement*)jointNode)->Attribute("type");
 	if (strcmp(jointType, "fixed") == 0)
 	{
 		joint = new ndJointFix6dof(pivotMatrix, childBody, parentBody);
@@ -945,6 +944,7 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 	const ndJointBilateralConstraint* const joint = *link->m_joint;
 	const char* const className = joint->ClassName();
 
+	ndMatrix localMatrix(surroratelink->m_jointBodyMatrix1);
 	if (!strcmp(className, "ndJointFix6dof"))
 	{
 		jointNode->SetAttribute("type", "fixed");
@@ -953,9 +953,10 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 	{
 		jointNode->SetAttribute("type", "continuous");
 
-		//ndMatrix localMatrix(joint->GetLocalMatrix0());
-		ndMatrix localMatrix(surroratelink->m_jointBodyMatrix0);
-		sprintf(buffer, "%g %g %g", localMatrix[0].m_x, localMatrix[0].m_y, localMatrix[0].m_z);
+		ndMatrix pinMatrix(ndGramSchmidtMatrix(localMatrix[0]));
+		localMatrix = pinMatrix.OrthoInverse() * localMatrix;
+
+		sprintf(buffer, "%g %g %g", pinMatrix[0].m_x, pinMatrix[0].m_y, pinMatrix[0].m_z);
 		nd::TiXmlElement* const axis = new nd::TiXmlElement("axis");
 		jointNode->LinkEndChild(axis);
 		axis->SetAttribute("xyz", buffer);
@@ -965,7 +966,8 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 		ndAssert(0);
 	}
 
-	ExportOrigin(jointNode, surroratelink->m_jointBodyMatrix1);
+	//ExportOrigin(jointNode, surroratelink->m_jointBodyMatrix1);
+	ExportOrigin(jointNode, localMatrix);
 }
 
 void ndUrdfFile::Export(const char* const filePathName, ndModelArticulation* const model)
@@ -1153,11 +1155,10 @@ ndUrdfFile::Surrogate* ndUrdfFile::ApplyInvRotation(ndModelArticulation* const m
 			ndMatrix matrix1;
 			node->m_articulation->m_joint->CalculateGlobalMatrix(matrix0, matrix1);
 
-			node->m_jointBodyMatrix0 = node->m_articulation->m_joint->GetLocalMatrix0() * rotation;
-			node->m_jointBodyMatrix1 = node->m_articulation->m_joint->GetLocalMatrix1() * rotation;
-			//node->m_jointBodyMatrix0 = matrix0 * node->m_bodyMatrix.OrthoInverse();
-			//node->m_jointBodyMatrix1 = matrix1 * node->GetParent()->m_bodyMatrix.OrthoInverse();
-			//node->m_jointBodyMatrix1 = matrix1 * node->GetParent()->m_bodyMatrix.OrthoInverse();
+			matrix0 = matrix0 * rotation;
+			matrix1 = matrix1 * rotation;
+			node->m_jointBodyMatrix0 = matrix0 * node->m_bodyMatrix.OrthoInverse();
+			node->m_jointBodyMatrix1 = matrix1 * node->GetParent()->m_bodyMatrix.OrthoInverse();
 		}
 
 		for (Surrogate* child = node->GetFirstChild(); child; child = child->GetNext())
