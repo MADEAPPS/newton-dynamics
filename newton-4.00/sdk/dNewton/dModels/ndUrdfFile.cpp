@@ -764,7 +764,12 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const Surrogate*
 	}
 	else
 	{
-		ndAssert(0);
+		ndTrace((" export convex hull stl mesh\n"));
+		sprintf(buffer, "%g %g %g", 0.1f, 0.1f, 0.1f);
+
+		nd::TiXmlElement* const shape = new nd::TiXmlElement("box");
+		geometry->LinkEndChild(shape);
+		shape->SetAttribute("size", buffer);
 	}
 
 	ndMatrix matrix(aligment * surroratelink->m_shapeMatrixMatrix);
@@ -843,7 +848,12 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const Surroga
 	}
 	else
 	{
-		ndAssert(0);
+		ndTrace((" export convex hull stl mesh\n"));
+		sprintf(buffer, "%g %g %g", 0.1f, 0.1f, 0.1f);
+
+		nd::TiXmlElement* const shape = new nd::TiXmlElement("box");
+		geometry->LinkEndChild(shape);
+		shape->SetAttribute("size", buffer);
 	}
 
 	ndMatrix matrix(aligment * surroratelink->m_shapeMatrixMatrix);

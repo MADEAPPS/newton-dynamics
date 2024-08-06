@@ -107,13 +107,10 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
 
 	char fileName[256];
-	ndGetWorkingFileName("r2d2__.urdf", fileName);
+	ndGetWorkingFileName("r2d2.urdf", fileName);
 
 	ndUrdfFile urdf;
 	ndModelArticulation* const r2d2 = urdf.Import(fileName);
-
-	ndGetWorkingFileName("r2d3.urdf", fileName);
-	urdf.Export(fileName, r2d2);
 
 	ndMatrix modelMatrix(ndGetIdentityMatrix());
 	modelMatrix.m_posit.m_y = 0.5f;
@@ -131,8 +128,26 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 		instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = r2d2;
 	}
 
-	//ndGetWorkingFileName("unicycle.urdf", fileName);
-	//urdf.Export(fileName, articulation);
+#if 1
+	{
+		ndGetWorkingFileName("r2d2__.urdf", fileName);
+		ndModelArticulation* const src = urdf.Import(fileName);
+
+		ndGetWorkingFileName("r2d3.urdf", fileName);
+		urdf.Export(fileName, src);
+		delete src;
+
+		ndModelArticulation* const r2d3 = urdf.Import(fileName);
+
+		ndMatrix modelMatrix1(ndGetIdentityMatrix());
+		modelMatrix1.m_posit.m_y = 0.5f;
+		modelMatrix1.m_posit.m_z = 1.0f;
+		r2d3->SetTransform(modelMatrix1);
+		r2d3->AddToWorld(world);
+		r2d3->SetNotifyCallback(new R2D2ModelNotify);
+		SetModelVisualMesh(scene, r2d3);
+	}
+#endif
 
 	ndMatrix origin1(ndGetIdentityMatrix());
 	origin1.m_posit.m_x = 20.0f;
