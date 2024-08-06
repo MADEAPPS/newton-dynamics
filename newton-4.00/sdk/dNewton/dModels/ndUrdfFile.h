@@ -76,23 +76,35 @@ class ndUrdfFile : public ndClassAlloc
 		ndModelArticulation::ndNode* m_articulation;
 	};
 
+	class Surrogate: public ndNodeHierarchy<Surrogate>
+	{
+		public:
+		ndMatrix m_bodyMatrix;
+		ndMatrix m_bodyInertia;
+		ndMatrix m_shapeMatrixMatrix;
+		ndMatrix m_jointBodyMatrix0;
+		ndMatrix m_jointBodyMatrix1;
+		ndVector m_com;
+		ndModelArticulation::ndNode* m_articulation;
+	};
+
 	void MakeNamesUnique(ndModelArticulation* const model);
 	void ExportOrigin(nd::TiXmlElement* const linkNode, const ndMatrix& pose);
 
-	void ExportLink(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation);
-	void ExportMaterials(nd::TiXmlElement* const rootNode, const ndModelArticulation* const model);
-	void ExportInertia(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation);
-	void ExportCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation);
-	void ExportVisual(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation);
-	void ExportJoint(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link);
+	void ExportLink(nd::TiXmlElement* const rootNode, const Surrogate* const link);
+	void ExportMaterials(nd::TiXmlElement* const rootNode, const Surrogate* const link);
+	void ExportInertia(nd::TiXmlElement* const linkNode, const Surrogate* const link);
+	void ExportCollision(nd::TiXmlElement* const linkNode, const Surrogate* const link);
+	void ExportVisual(nd::TiXmlElement* const linkNode, const Surrogate* const link);
+	void ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* const link);
 
-	void LoadMaterials(const nd::TiXmlNode* const rootNode);
-	ndMatrix GetMatrix(const nd::TiXmlNode* const parentNode) const;
-	
-	ndBodyDynamic* CreateBody(const nd::TiXmlNode* const linkNode);
+	void ImportMaterials(const nd::TiXmlNode* const rootNode);
+	ndBodyDynamic* ImportLink(const nd::TiXmlNode* const linkNode);
+	ndMatrix ImportOrigin(const nd::TiXmlNode* const parentNode) const;
 	ndJointBilateralConstraint* CreateJoint(const nd::TiXmlNode* const jointNode, ndBodyDynamic* const child, ndBodyDynamic* const parent);
 
-	void ApplyRotation(const ndMatrix& rotation, ndModelArticulation* const model);
+	void ApplyRotation(ndModelArticulation* const model);
+	Surrogate* ApplyInvRotation(ndModelArticulation* const model);
 	void LoadStlMesh(const char* const pathName, ndMeshEffect* const meshEffect) const;
 
 	ndString m_path;

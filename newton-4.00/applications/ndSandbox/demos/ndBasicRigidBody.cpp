@@ -107,13 +107,13 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
 
 	char fileName[256];
-	ndGetWorkingFileName("r2d2.urdf", fileName);
+	ndGetWorkingFileName("r2d2__.urdf", fileName);
 
 	ndUrdfFile urdf;
 	ndModelArticulation* const r2d2 = urdf.Import(fileName);
 
-	//ndGetWorkingFileName("r2d3.urdf", fileName);
-	//urdf.Export(fileName, r2d2->GetAsModelArticulation());
+	ndGetWorkingFileName("r2d3.urdf", fileName);
+	urdf.Export(fileName, r2d2);
 
 	ndMatrix modelMatrix(ndGetIdentityMatrix());
 	modelMatrix.m_posit.m_y = 0.5f;
@@ -139,7 +139,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 
 	//AddSphere(scene, origin1, 1.0f, 0.5f);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 1, 2, 7);
-	AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
+	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 4, 4, 4);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 2, 2, 7);
 

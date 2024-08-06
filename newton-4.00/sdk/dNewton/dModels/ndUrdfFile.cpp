@@ -29,7 +29,7 @@ ndUrdfFile::~ndUrdfFile()
 // *******************************************************************************
 // 
 // *******************************************************************************
-void ndUrdfFile::LoadMaterials(const nd::TiXmlNode* const rootNode)
+void ndUrdfFile::ImportMaterials(const nd::TiXmlNode* const rootNode)
 {
 	m_materials.SetCount(0);
 	m_materialMap.RemoveAll();
@@ -65,7 +65,7 @@ void ndUrdfFile::LoadMaterials(const nd::TiXmlNode* const rootNode)
 // *******************************************************************************
 // 
 // *******************************************************************************
-ndMatrix ndUrdfFile::GetMatrix(const nd::TiXmlNode* const parentNode) const
+ndMatrix ndUrdfFile::ImportOrigin(const nd::TiXmlNode* const parentNode) const
 {
 	const nd::TiXmlElement* const origin = (nd::TiXmlElement*)parentNode->FirstChild("origin");
 
@@ -155,7 +155,7 @@ void ndUrdfFile::LoadStlMesh(const char* const pathName, ndMeshEffect* const mes
 	}
 }
 
-ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode)
+ndBodyDynamic* ndUrdfFile::ImportLink(const nd::TiXmlNode* const linkNode)
 {
 	ndBodyDynamic* const body = new ndBodyDynamic();
 
@@ -230,7 +230,7 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode)
 	{
 		const nd::TiXmlNode* const node = collisions[0];
 		collision.SetShape(GetCollisionShape(node));
-		ndMatrix matrix(GetMatrix(node));
+		ndMatrix matrix(ImportOrigin(node));
 		collision.SetLocalMatrix(collision.GetLocalMatrix() * matrix);
 	}
 	else
@@ -319,14 +319,14 @@ ndBodyDynamic* ndUrdfFile::CreateBody(const nd::TiXmlNode* const linkNode)
 		{
 			const char* const meshPathName = shapeNode->Attribute("filename");
 			LoadStlMesh(meshPathName, meshEffect);
-			ndMatrix matrix(GetMatrix(node));
+			ndMatrix matrix(ImportOrigin(node));
 			meshEffect->ApplyTransform(m_localMatrix * matrix);
 		}
 
 		if (shape)
 		{
 			ndShapeInstance collision(shape);
-			ndMatrix matrix(GetMatrix(node));
+			ndMatrix matrix(ImportOrigin(node));
 			collision.SetLocalMatrix(m_localMatrix * matrix);
 
 			class PolygonizeMesh : public ndShapeDebugNotify
@@ -440,7 +440,7 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlNode* const j
 	ndJointBilateralConstraint* joint = nullptr;
 	const char* const jointType = ((nd::TiXmlElement*)jointNode)->Attribute("type");
 
-	ndMatrix childMatrix(GetMatrix(jointNode));
+	ndMatrix childMatrix(ImportOrigin(jointNode));
 	childBody->SetMatrix(childMatrix * parentBody->GetMatrix());
 	ndMatrix pivotMatrix(childBody->GetMatrix());
 	
@@ -537,74 +537,6 @@ ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlNode* const j
 	return joint;
 }
 
-void ndUrdfFile::ApplyRotation(const ndMatrix& rotation, ndModelArticulation* const model)
-{
-	ndMatrix rotationInv(rotation.OrthoInverse());
-
-	ndArray<ndMatrix> matrix0;
-	ndArray<ndMatrix> matrix1;
-	ndArray<ndJointBilateralConstraint*> joints;
-	ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
-
-	stack.PushBack(model->GetRoot());
-	while (stack.GetCount())
-	{
-		ndModelArticulation::ndNode* node = stack.Pop();
-		ndJointBilateralConstraint* const joint = *node->m_joint;
-		if (joint)
-		{
-			ndMatrix pivotMatrix0;
-			ndMatrix pivotMatrix1;
-			joint->CalculateGlobalMatrix(pivotMatrix0, pivotMatrix1);
-
-			joints.PushBack(joint);
-			matrix0.PushBack(pivotMatrix0 * rotation);
-			matrix1.PushBack(pivotMatrix1 * rotation);
-		}
-	
-		for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
-		{
-			stack.PushBack(child);
-		}
-	}
-
-	// rotate bodies.
-	stack.PushBack(model->GetRoot());
-	while (stack.GetCount())
-	{
-		ndModelArticulation::ndNode* node = stack.Pop();
-		ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-
-		ndShapeInstance& shape = body->GetCollisionShape();
-		ndMatrix shapeMatrix(shape.GetLocalMatrix() * body->GetMatrix() * rotation);
-
-		body->SetCentreOfMass(rotation.RotateVector(body->GetCentreOfMass()));
-		ndMatrix bodyMatrix(rotationInv * body->GetMatrix() * rotation);
-
-		body->SetMatrix(bodyMatrix);
-		shape.SetLocalMatrix(shapeMatrix * bodyMatrix.OrthoInverse());
-
-		ndUrdfBodyNotify* const notify = (ndUrdfBodyNotify*)body->GetNotifyCallback();
-		notify->m_mesh->ApplyTransform(rotation);
-
-		for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
-		{
-			stack.PushBack(child);
-		}
-	}
-
-	// rotate joints.
-	for (ndInt32 i = 0; i < joints.GetCount(); ++i)
-	{
-		ndBodyKinematic* const body0 = joints[i]->GetBody0();
-		ndBodyKinematic* const body1 = joints[i]->GetBody1();
-		ndMatrix localMatrix0(matrix0[i] * body0->GetMatrix().OrthoInverse());
-		ndMatrix localMatrix1(matrix1[i] * body1->GetMatrix().OrthoInverse());
-		joints[i]->SetLocalMatrix0(localMatrix0);
-		joints[i]->SetLocalMatrix1(localMatrix1);
-	}
-}
-
 ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 {
 	ndAssert(strstr(filePathName, ".urdf"));
@@ -673,8 +605,8 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 		}
 	}
 
-	LoadMaterials(rootNode);
-	ndBodyDynamic* const rootBody = CreateBody(root->m_link);
+	ImportMaterials(rootNode);
+	ndBodyDynamic* const rootBody = ImportLink(root->m_link);
 
 	ndModelArticulation* const model = new ndModelArticulation;
 	root->m_articulation = model->AddRootBody(rootBody);
@@ -692,7 +624,7 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 			Hierarchy& link = iter.GetNode()->GetInfo();
 			if (link.m_parentLink == parent->m_link)
 			{
-				ndBodyDynamic* const childBody = CreateBody(link.m_link);
+				ndBodyDynamic* const childBody = ImportLink(link.m_link);
 				ndJointBilateralConstraint* const joint = CreateJoint(link.m_joint, childBody, parent->m_articulation->m_body->GetAsBodyDynamic());
 				link.m_articulation = model->AddLimb(parent->m_articulation, joint->GetBody0(), joint);
 				stack.PushBack(&link);
@@ -701,8 +633,7 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 	}
 	setlocale(LC_ALL, oldloc.GetStr());
 
-	ndMatrix rotation(ndPitchMatrix(-ndPi * 0.5f));
-	ApplyRotation(rotation, model);
+	ApplyRotation(model);
 	return model;
 }
 
@@ -737,7 +668,7 @@ void ndUrdfFile::MakeNamesUnique(ndModelArticulation* const model)
 	}
 }
 
-void ndUrdfFile::ExportMaterials(nd::TiXmlElement* const rootNode, const ndModelArticulation* const)
+void ndUrdfFile::ExportMaterials(nd::TiXmlElement* const rootNode, const Surrogate* const)
 {
 	nd::TiXmlElement* const material = new nd::TiXmlElement("material");
 	rootNode->LinkEndChild(material);
@@ -756,35 +687,33 @@ void ndUrdfFile::ExportOrigin(nd::TiXmlElement* const parentNode, const ndMatrix
 
 	ndVector euler1;
 	ndVector euler(pose.CalcPitchYawRoll(euler1));
-	sprintf(buffer, "%g %g %g", euler.m_z, euler.m_x, euler.m_y);
+	//ret = sscanf(rpy, "%f %f %f", &pitch, &yaw, &roll);
+	sprintf(buffer, "%g %g %g", euler.m_x, euler.m_y, euler.m_z);
 	origin->SetAttribute("rpy", buffer);
 
 	sprintf(buffer, "%g %g %g", pose.m_posit.m_x, pose.m_posit.m_y, pose.m_posit.m_z);
 	origin->SetAttribute("xyz", buffer);
 }
 
-void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation)
+void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const Surrogate* const surroratelink)
 {
 	char buffer[256];
-
+	
 	nd::TiXmlElement* const visualNode = new nd::TiXmlElement("visual");
 	linkNode->LinkEndChild(visualNode);
-
+	const ndModelArticulation::ndNode* const link = surroratelink->m_articulation;
+	
 	// add position and orientation
 	const ndBodyKinematic* const body = link->m_body->GetAsBodyKinematic();
 	const ndShapeInstance& collision = body->GetCollisionShape();
-	//ndMatrix matrix(collision.GetScaledTransform(body->GetMatrix()));
-
-	const ndMatrix matrix(collision.GetScaledTransform(body->GetMatrix()));
-	const ndMatrix shapeMatrix(matrix * rotation);
-	//ExportOrigin(collisionNode, matrix);
-	ExportOrigin(visualNode, shapeMatrix);
 	
 	// add geometry node
 	nd::TiXmlElement* const geometry = new nd::TiXmlElement("geometry");
 	visualNode->LinkEndChild(geometry);
 	const ndShape* const collisionShape = collision.GetShape();
 	const char* const className = collisionShape->ClassName();
+
+	ndMatrix aligment(ndGetIdentityMatrix());
 	if (!strcmp(className, "ndShapeBox"))
 	{
 		ndShapeInfo info(collisionShape->GetShapeInfo());
@@ -796,16 +725,32 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const ndModelArt
 	}
 	else if (!strcmp(className, "ndShapeCapsule"))
 	{
+		ndAssert(0);
 		ndShapeInfo info(collisionShape->GetShapeInfo());
 	
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("cylinder");
 		geometry->LinkEndChild(shape);
 	
-		sprintf(buffer, "%g", info.m_capsule.m_radio0);
-		shape->SetAttribute("radius", buffer);
-	
 		sprintf(buffer, "%g", info.m_capsule.m_height + info.m_capsule.m_radio0 * 2.0f);
 		shape->SetAttribute("length", buffer);
+	
+		sprintf(buffer, "%g", info.m_capsule.m_radio0);
+		shape->SetAttribute("radius", buffer);
+		aligment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
+	}
+	else if (!strcmp(className, "ndShapeCylinder"))
+	{
+		ndShapeInfo info(collisionShape->GetShapeInfo());
+	
+		nd::TiXmlElement* const shape = new nd::TiXmlElement("cylinder");
+		geometry->LinkEndChild(shape);
+	
+		sprintf(buffer, "%g", info.m_cylinder.m_height);
+		shape->SetAttribute("length", buffer);
+	
+		sprintf(buffer, "%g", info.m_cylinder.m_radio0);
+		shape->SetAttribute("radius", buffer);
+		aligment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
 	}
 	else if (!strcmp(className, "ndShapeSphere"))
 	{
@@ -821,70 +766,78 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const ndModelArt
 	{
 		ndAssert(0);
 	}
-	
+
+	ndMatrix matrix(aligment * surroratelink->m_shapeMatrixMatrix);
+	ExportOrigin(visualNode, matrix);
+
 	// add material node
 	nd::TiXmlElement* const material = new nd::TiXmlElement("material");
 	visualNode->LinkEndChild(material);
 	material->SetAttribute("name", "material_0");
 }
 
-void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation)
+void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const Surrogate* const surroratelink)
 {
 	char buffer[256];
+	const ndModelArticulation::ndNode* const link = surroratelink->m_articulation;
 	const ndBodyKinematic* const body = link->m_body->GetAsBodyKinematic();
-
+	
 	const ndShapeInstance& collision = body->GetCollisionShape();
 	const ndShape* const collisionShape = collision.GetShape();
-	const char* const className = collisionShape->ClassName();
-
+	
 	nd::TiXmlElement* const collisionNode = new nd::TiXmlElement("collision");
 	linkNode->LinkEndChild(collisionNode);
-
-	//ndShapeInstance& shape = body->GetCollisionShape();
-	//ndMatrix shapeMatrix(shape.GetLocalMatrix() * body->GetMatrix() * rotation);
-	//body->SetCentreOfMass(rotation.RotateVector(body->GetCentreOfMass()));
-	//ndMatrix bodyMatrix(rotationInv * body->GetMatrix() * rotation);
-	//body->SetMatrix(bodyMatrix);
-	//shape.SetLocalMatrix(shapeMatrix * bodyMatrix.OrthoInverse());
-	//ndUrdfBodyNotify* const notify = (ndUrdfBodyNotify*)body->GetNotifyCallback();
-	//notify->m_mesh->ApplyTransform(rotation);
-
-	const ndMatrix matrix(collision.GetScaledTransform(body->GetMatrix()));
-	const ndMatrix shapeMatrix(matrix * rotation);
-	ExportOrigin(collisionNode, shapeMatrix);
-
+	
 	nd::TiXmlElement* const geometry = new nd::TiXmlElement("geometry");
 	collisionNode->LinkEndChild(geometry);
-
+	
+	ndMatrix aligment(ndGetIdentityMatrix());
+	const char* const className = collisionShape->ClassName();
 	if (!strcmp(className, "ndShapeBox"))
 	{
 		ndShapeInfo info(collisionShape->GetShapeInfo());
 		sprintf(buffer, "%g %g %g", info.m_box.m_x, info.m_box.m_y, info.m_box.m_z);
-
+	
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("box");
 		geometry->LinkEndChild(shape);
 		shape->SetAttribute("size", buffer);
 	}
 	else if (!strcmp(className, "ndShapeCapsule"))
 	{
+		ndAssert(0);
 		ndShapeInfo info(collisionShape->GetShapeInfo());
-
+	
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("cylinder");
 		geometry->LinkEndChild(shape);
-
-		sprintf(buffer, "%g", info.m_capsule.m_radio0);
-		shape->SetAttribute("radius", buffer);
-
+	
 		sprintf(buffer, "%g", info.m_capsule.m_height + info.m_capsule.m_radio0 * 2.0f);
 		shape->SetAttribute("length", buffer);
+	
+		sprintf(buffer, "%g", info.m_capsule.m_radio0);
+		shape->SetAttribute("radius", buffer);
+		aligment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
+	}
+	else if (!strcmp(className, "ndShapeCylinder"))
+	{
+		ndShapeInfo info(collisionShape->GetShapeInfo());
+	
+		nd::TiXmlElement* const shape = new nd::TiXmlElement("cylinder");
+		geometry->LinkEndChild(shape);
+	
+		sprintf(buffer, "%g", info.m_cylinder.m_height);
+		shape->SetAttribute("length", buffer);
+	
+		sprintf(buffer, "%g", info.m_cylinder.m_radio0);
+		shape->SetAttribute("radius", buffer);
+		aligment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
 	}
 	else if (!strcmp(className, "ndShapeSphere"))
 	{
 		ndShapeInfo info(collisionShape->GetShapeInfo());
-
+	
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("sphere");
 		geometry->LinkEndChild(shape);
-
+	
 		sprintf(buffer, "%g", info.m_sphere.m_radius);
 		shape->SetAttribute("radius", buffer);
 	}
@@ -892,68 +845,77 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const ndModel
 	{
 		ndAssert(0);
 	}
+
+	ndMatrix matrix(aligment * surroratelink->m_shapeMatrixMatrix);
+	ExportOrigin(collisionNode, matrix);
 }
 
-void ndUrdfFile::ExportInertia(nd::TiXmlElement* const linkNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation)
+void ndUrdfFile::ExportInertia(nd::TiXmlElement* const linkNode, const Surrogate* const surroratelink)
 {
 	char buffer[256];
 	nd::TiXmlElement* const inertial = new nd::TiXmlElement("inertial");
 	linkNode->LinkEndChild(inertial);
-
+	const ndModelArticulation::ndNode* const link = surroratelink->m_articulation;
+	
 	const ndBodyKinematic* const body = link->m_body->GetAsBodyKinematic();
-	ndMatrix matrix(body->GetMatrix());
-	ndVector com(matrix.TransformVector(body->GetCentreOfMass()));
-	const ndMatrix comMatrix(matrix * rotation);
+	//ndMatrix matrix(body->GetMatrix());
+	//ndVector com(matrix.TransformVector(body->GetCentreOfMass()));
+	ndMatrix comMatrix(ndGetIdentityMatrix());
+	comMatrix.m_posit = surroratelink->m_com;
 	ExportOrigin(inertial, comMatrix);
-
+	
 	nd::TiXmlElement* const mass = new nd::TiXmlElement("mass");
 	inertial->LinkEndChild(mass);
 	ndVector massMatrix(body->GetMassMatrix());
 	sprintf(buffer, "%g", massMatrix.m_w);
 	mass->SetAttribute("value", buffer);
-
+	
 	nd::TiXmlElement* const inertia = new nd::TiXmlElement("inertia");
 	inertial->LinkEndChild(inertia);
-
-	ndMatrix inertiaMatrix(body->CalculateInertiaMatrix());
-	inertiaMatrix = rotation.OrthoInverse() * inertiaMatrix * rotation;
-
+	
+	//ndMatrix inertiaMatrix(body->CalculateInertiaMatrix());
+	//inertiaMatrix = rotation.OrthoInverse() * inertiaMatrix * rotation;
+	ndMatrix inertiaMatrix(surroratelink->m_bodyInertia);
+	
 	sprintf(buffer, "%g", inertiaMatrix[0][0]);
 	inertia->SetAttribute("xx", buffer);
-
+	
 	sprintf(buffer, "%g", inertiaMatrix[0][1]);
 	inertia->SetAttribute("xy", buffer);
-
+	
 	sprintf(buffer, "%g", inertiaMatrix[0][2]);
 	inertia->SetAttribute("xz", buffer);
-
+	
 	sprintf(buffer, "%g", inertiaMatrix[1][1]);
 	inertia->SetAttribute("yy", buffer);
-
+	
 	sprintf(buffer, "%g", inertiaMatrix[1][2]);
 	inertia->SetAttribute("yz", buffer);
-
+	
 	sprintf(buffer, "%g", inertiaMatrix[2][2]);
 	inertia->SetAttribute("zz", buffer);
 }
 
-void ndUrdfFile::ExportLink(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link, const ndMatrix& rotation)
+void ndUrdfFile::ExportLink(nd::TiXmlElement* const rootNode, const Surrogate* const surroratelink)
 {
+	char name[256];
 	nd::TiXmlElement* const linkNode = new nd::TiXmlElement("link");
 	rootNode->LinkEndChild(linkNode);
-
-	char name[256];
+	const ndModelArticulation::ndNode* const link = surroratelink->m_articulation;
+	
 	sprintf(name, "%s_link", link->m_name.GetStr());
 	linkNode->SetAttribute("name", name);
 
-	ExportVisual(linkNode, link, rotation);
-	ExportCollision(linkNode, link, rotation);
-	ExportInertia(linkNode, link, rotation);
+	ExportVisual(linkNode, surroratelink);
+	ExportCollision(linkNode, surroratelink);
+	ExportInertia(linkNode, surroratelink);
 }
 
-void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const ndModelArticulation::ndNode* const link)
+void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* const surroratelink)
 {
 	char buffer[256];
+	const ndModelArticulation::ndNode* const link = surroratelink->m_articulation;
+
 	sprintf(buffer, "%s_link_to_%s_link", link->m_name.GetStr(), link->GetParent()->m_name.GetStr());
 
 	nd::TiXmlElement* const jointNode = new nd::TiXmlElement("joint");
@@ -971,12 +933,7 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const ndModelArti
 	child->SetAttribute("link", buffer);
 
 	jointNode->SetAttribute("type", "fixed");
-
-	ndMatrix pivotMatrix0;
-	ndMatrix pivotMatrix1;
-	const ndJointBilateralConstraint* const joint = *link->m_joint;
-	joint->CalculateGlobalMatrix(pivotMatrix0, pivotMatrix1);
-	ExportOrigin(jointNode, pivotMatrix0);
+	ExportOrigin(jointNode, surroratelink->m_jointBodyMatrix1);
 }
 
 void ndUrdfFile::Export(const char* const filePathName, ndModelArticulation* const model)
@@ -988,36 +945,65 @@ void ndUrdfFile::Export(const char* const filePathName, ndModelArticulation* con
 	doc->LinkEndChild(decl);
 	ndString oldloc(setlocale(LC_ALL, 0));
 
-	ndMatrix rootMatrix(model->GetRoot()->m_body->GetMatrix());
-	model->SetTransform(rootMatrix.OrthoInverse());
-
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("robot");
 	doc->LinkEndChild(rootNode);
 
 	MakeNamesUnique(model);
 	rootNode->SetAttribute("name", model->GetName().GetStr());
 
-	ExportMaterials(rootNode, model);
-	ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
-	stack.PushBack(model->GetRoot());
+	Surrogate* const surrogate = ApplyInvRotation(model);
+	ndAssert(surrogate);
 
-	const ndMatrix rotation(ndRollMatrix(ndPi * 0.5f));
-	//const ndMatrix rotation(ndGetIdentityMatrix());
-int xxxx = 0;
+	ExportMaterials(rootNode, surrogate);
+
+	ndFixSizeArray<Surrogate*, 256> stack;
+	stack.PushBack(surrogate);
+
 	while (stack.GetCount())
 	{
-		const ndModelArticulation::ndNode* const node = stack.Pop();
-		ExportLink(rootNode, node, rotation);
-
-		const ndJointBilateralConstraint* const joint = *node->m_joint;
-		if (joint)
+		const Surrogate* const node = stack.Pop();
+		ExportLink(rootNode, node);
+		if (node->GetParent())
 		{
 			ExportJoint(rootNode, node);
 		}
-		xxxx++;
-		if (xxxx == 1)
+
+		for (Surrogate* child = node->GetFirstChild(); child; child = child->GetNext())
 		{
-//			break;
+			stack.PushBack(child);
+		}
+	}
+	 
+	delete surrogate;
+	doc->SaveFile(filePathName);
+	setlocale(LC_ALL, oldloc.GetStr());
+	delete doc;
+}
+
+void ndUrdfFile::ApplyRotation(ndModelArticulation* const model)
+{
+	const ndMatrix rotation(ndPitchMatrix(-ndPi * 0.5f));
+	const ndMatrix rotationInv(rotation.OrthoInverse());
+
+	ndArray<ndMatrix> matrix0;
+	ndArray<ndMatrix> matrix1;
+	ndArray<ndJointBilateralConstraint*> joints;
+	ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
+
+	stack.PushBack(model->GetRoot());
+	while (stack.GetCount())
+	{
+		ndModelArticulation::ndNode* node = stack.Pop();
+		ndJointBilateralConstraint* const joint = *node->m_joint;
+		if (joint)
+		{
+			ndMatrix pivotMatrix0;
+			ndMatrix pivotMatrix1;
+			joint->CalculateGlobalMatrix(pivotMatrix0, pivotMatrix1);
+
+			joints.PushBack(joint);
+			matrix0.PushBack(pivotMatrix0 * rotation);
+			matrix1.PushBack(pivotMatrix1 * rotation);
 		}
 
 		for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
@@ -1026,8 +1012,127 @@ int xxxx = 0;
 		}
 	}
 
-	model->SetTransform(rootMatrix);
-	doc->SaveFile(filePathName);
-	setlocale(LC_ALL, oldloc.GetStr());
-	delete doc;
+	// rotate bodies.
+	stack.PushBack(model->GetRoot());
+	while (stack.GetCount())
+	{
+		ndModelArticulation::ndNode* node = stack.Pop();
+		ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+
+		ndShapeInstance& shape = body->GetCollisionShape();
+		ndMatrix shapeMatrix(shape.GetLocalMatrix() * body->GetMatrix() * rotation);
+
+		body->SetCentreOfMass(rotation.RotateVector(body->GetCentreOfMass()));
+		ndMatrix bodyMatrix(rotationInv * body->GetMatrix() * rotation);
+
+		body->SetMatrix(bodyMatrix);
+		shape.SetLocalMatrix(shapeMatrix * bodyMatrix.OrthoInverse());
+
+		ndUrdfBodyNotify* const notify = (ndUrdfBodyNotify*)body->GetNotifyCallback();
+		notify->m_mesh->ApplyTransform(rotation);
+
+		for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+		{
+			stack.PushBack(child);
+		}
+	}
+
+	// rotate joints.
+	for (ndInt32 i = 0; i < joints.GetCount(); ++i)
+	{
+		ndBodyKinematic* const body0 = joints[i]->GetBody0();
+		ndBodyKinematic* const body1 = joints[i]->GetBody1();
+		ndMatrix localMatrix0(matrix0[i] * body0->GetMatrix().OrthoInverse());
+		ndMatrix localMatrix1(matrix1[i] * body1->GetMatrix().OrthoInverse());
+		joints[i]->SetLocalMatrix0(localMatrix0);
+		joints[i]->SetLocalMatrix1(localMatrix1);
+	}
+}
+
+ndUrdfFile::Surrogate* ndUrdfFile::ApplyInvRotation(ndModelArticulation* const model)
+{
+	Surrogate* surrogateRoot = nullptr;
+	ndFixSizeArray<Surrogate*, 256> surrogateStack;
+	ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
+
+	stack.PushBack(model->GetRoot());
+	surrogateStack.PushBack(nullptr);
+
+	while (stack.GetCount())
+	{
+		Surrogate* const surrogateParent = surrogateStack.Pop();
+		ndModelArticulation::ndNode* const node = stack.Pop();
+
+		Surrogate* const surrogateNode = new Surrogate;
+		if (surrogateParent)
+		{
+			surrogateNode->Attach(surrogateParent);
+		}
+		surrogateNode->m_articulation = node;
+
+		if (surrogateRoot == nullptr)
+		{
+			surrogateRoot = surrogateNode;
+		}
+
+		for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+		{
+			stack.PushBack(child);
+			surrogateStack.PushBack(surrogateNode);
+		}
+	}
+
+	const ndMatrix rotation(ndPitchMatrix(ndPi * 0.5f));
+	const ndMatrix rotationInv(rotation.OrthoInverse());
+
+	surrogateStack.PushBack(surrogateRoot);
+	while (surrogateStack.GetCount())
+	{
+		Surrogate* const node = surrogateStack.Pop();
+
+		ndBodyKinematic* const body = node->m_articulation->m_body->GetAsBodyKinematic();
+
+		ndShapeInstance& shape = body->GetCollisionShape();
+		ndMatrix shapeMatrix(shape.GetLocalMatrix() * body->GetMatrix() * rotation);
+		node->m_com = rotation.RotateVector(body->GetCentreOfMass());
+
+		node->m_bodyMatrix = rotationInv * body->GetMatrix() * rotation;
+		node->m_shapeMatrixMatrix = shapeMatrix * node->m_bodyMatrix.OrthoInverse();
+
+		ndMatrix inertia(body->CalculateInertiaMatrix());
+		node->m_bodyInertia = rotationInv * inertia * rotation;
+
+		//ndUrdfBodyNotify* const notify = (ndUrdfBodyNotify*)body->GetNotifyCallback();
+		//notify->m_mesh->ApplyTransform(rotation);
+
+		for (Surrogate* child = node->GetFirstChild(); child; child = child->GetNext())
+		{
+			surrogateStack.PushBack(child);
+		}
+	}
+
+	surrogateStack.PushBack(surrogateRoot);
+	while (surrogateStack.GetCount())
+	{
+		Surrogate* const node = surrogateStack.Pop();
+		if (*node->m_articulation->m_joint)
+		{
+			ndMatrix matrix0;
+			ndMatrix matrix1;
+			node->m_articulation->m_joint->CalculateGlobalMatrix(matrix0, matrix1);
+
+			node->m_jointBodyMatrix0 = node->m_articulation->m_joint->GetLocalMatrix0() * rotation;
+			node->m_jointBodyMatrix1 = node->m_articulation->m_joint->GetLocalMatrix1() * rotation;
+			//node->m_jointBodyMatrix0 = matrix0 * node->m_bodyMatrix.OrthoInverse();
+			//node->m_jointBodyMatrix1 = matrix1 * node->GetParent()->m_bodyMatrix.OrthoInverse();
+			//node->m_jointBodyMatrix1 = matrix1 * node->GetParent()->m_bodyMatrix.OrthoInverse();
+		}
+
+		for (Surrogate* child = node->GetFirstChild(); child; child = child->GetNext())
+		{
+			surrogateStack.PushBack(child);
+		}
+	}
+
+	return surrogateRoot;
 }
