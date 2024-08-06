@@ -676,7 +676,7 @@ void ndUrdfFile::ExportMaterials(nd::TiXmlElement* const rootNode, const Surroga
 
 	nd::TiXmlElement* const color = new nd::TiXmlElement("color");
 	material->LinkEndChild(color);
-	color->SetAttribute("rgba", "0.5 0.6 0.2 1.0");
+	color->SetAttribute("rgba", "1.0 0.0 0.0 1.0");
 }
 
 void ndUrdfFile::ExportOrigin(nd::TiXmlElement* const parentNode, const ndMatrix& pose)

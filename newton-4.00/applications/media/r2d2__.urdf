@@ -2,7 +2,7 @@
 <robot name="physics">
 
   <material name="blue">
-    <color rgba="0 0 0.8 1"/>
+    <color rgba="1.0 1.0 1.0 1.0" />
   </material>
 
   <link name="base_link">
