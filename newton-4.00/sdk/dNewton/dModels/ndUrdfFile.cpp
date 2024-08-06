@@ -435,7 +435,7 @@ ndBodyDynamic* ndUrdfFile::ImportLink(const nd::TiXmlNode* const linkNode)
 	return body;
 }
 
-ndJointBilateralConstraint* ndUrdfFile::CreateJoint(const nd::TiXmlNode* const jointNode, ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody)
+ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const jointNode, ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody)
 {
 	ndJointBilateralConstraint* joint = nullptr;
 	const char* const jointType = ((nd::TiXmlElement*)jointNode)->Attribute("type");
@@ -625,7 +625,7 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 			if (link.m_parentLink == parent->m_link)
 			{
 				ndBodyDynamic* const childBody = ImportLink(link.m_link);
-				ndJointBilateralConstraint* const joint = CreateJoint(link.m_joint, childBody, parent->m_articulation->m_body->GetAsBodyDynamic());
+				ndJointBilateralConstraint* const joint = ImportJoint(link.m_joint, childBody, parent->m_articulation->m_body->GetAsBodyDynamic());
 				link.m_articulation = model->AddLimb(parent->m_articulation, joint->GetBody0(), joint);
 				stack.PushBack(&link);
 			}

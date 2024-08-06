@@ -101,7 +101,7 @@ class ndUrdfFile : public ndClassAlloc
 	void ImportMaterials(const nd::TiXmlNode* const rootNode);
 	ndBodyDynamic* ImportLink(const nd::TiXmlNode* const linkNode);
 	ndMatrix ImportOrigin(const nd::TiXmlNode* const parentNode) const;
-	ndJointBilateralConstraint* CreateJoint(const nd::TiXmlNode* const jointNode, ndBodyDynamic* const child, ndBodyDynamic* const parent);
+	ndJointBilateralConstraint* ImportJoint(const nd::TiXmlNode* const jointNode, ndBodyDynamic* const child, ndBodyDynamic* const parent);
 
 	void ApplyRotation(ndModelArticulation* const model);
 	Surrogate* ApplyInvRotation(ndModelArticulation* const model);
