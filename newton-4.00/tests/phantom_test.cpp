@@ -91,7 +91,8 @@ class NewtonPhantom : public ndModel
 		worldMatrix(ndGetIdentityMatrix()),
 		notification(scene)
 	{
-		ndTrace(("Fix NewtonPhantom\n"));
+		//ndTrace(("Fix NewtonPhantom\n"));
+		SetNotifyCallback(new NewtonPhantomModelNotify);
 	}
 	~NewtonPhantom() = default;
 
