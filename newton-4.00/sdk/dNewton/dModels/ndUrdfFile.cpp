@@ -942,7 +942,29 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 	sprintf(buffer, "%s_link", link->m_name.GetStr());
 	child->SetAttribute("link", buffer);
 
-	jointNode->SetAttribute("type", "fixed");
+	const ndJointBilateralConstraint* const joint = *link->m_joint;
+	const char* const className = joint->ClassName();
+
+	if (!strcmp(className, "ndJointFix6dof"))
+	{
+		jointNode->SetAttribute("type", "fixed");
+	}
+	else if (!strcmp(className, "ndJointHinge"))
+	{
+		jointNode->SetAttribute("type", "continuous");
+
+		//ndMatrix localMatrix(joint->GetLocalMatrix0());
+		ndMatrix localMatrix(surroratelink->m_jointBodyMatrix0);
+		sprintf(buffer, "%g %g %g", localMatrix[0].m_x, localMatrix[0].m_y, localMatrix[0].m_z);
+		nd::TiXmlElement* const axis = new nd::TiXmlElement("axis");
+		jointNode->LinkEndChild(axis);
+		axis->SetAttribute("xyz", buffer);
+	}
+	else
+	{
+		ndAssert(0);
+	}
+
 	ExportOrigin(jointNode, surroratelink->m_jointBodyMatrix1);
 }
 
