@@ -106,6 +106,18 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
 
+	auto SetMaterial = [](ndModelArticulation* const root)
+	{
+		for (ndModelArticulation::ndNode* node = root->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+		{
+			ndSharedPtr<ndBody> body(node->m_body);
+			ndShapeInstance& instanceShape = body->GetAsBodyDynamic()->GetCollisionShape();
+			instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+			instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = root;
+		}
+	};
+
+
 	//char fileName[256];
 	//ndGetWorkingFileName("r2d2.urdf", fileName);
 	//ndUrdfFile urdf;
@@ -117,21 +129,23 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	//r2d2->AddToWorld(world);
 	//r2d2->SetNotifyCallback(new R2D2ModelNotify);
 	//SetModelVisualMesh(scene, r2d2);
-	//
-	//ndModelArticulation* const root = r2d2->GetAsModelArticulation();
-	//for (ndModelArticulation::ndNode* node = root->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-	//{
-	//	ndSharedPtr<ndBody> body(node->m_body);
-	//	ndShapeInstance& instanceShape = body->GetAsBodyDynamic()->GetCollisionShape();
-	//	instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
-	//	instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = r2d2;
-	//}
+	
+	////ndModelArticulation* const root = r2d2->GetAsModelArticulation();
+	////for (ndModelArticulation::ndNode* node = root->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+	////{
+	////	ndSharedPtr<ndBody> body(node->m_body);
+	////	ndShapeInstance& instanceShape = body->GetAsBodyDynamic()->GetCollisionShape();
+	////	instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+	////	instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = r2d2;
+	////}
+	//SetMaterial(r2d2);
 
 #if 1
 	{
 		ndUrdfFile urdf1;
 		char fileName1[256];
-		ndGetWorkingFileName("r2d2__.urdf", fileName1);
+		//ndGetWorkingFileName("r2d2__.urdf", fileName1);
+		ndGetWorkingFileName("r2d2.urdf", fileName1);
 		ndModelArticulation* const src = urdf1.Import(fileName1);
 
 		ndMatrix modelMatrix1(ndGetIdentityMatrix());
@@ -144,6 +158,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 		src->AddToWorld(world);
 		src->SetNotifyCallback(new R2D2ModelNotify);
 		SetModelVisualMesh(scene, src);
+		SetMaterial(src);
 
 		ndModelArticulation* const r2d3 = urdf1.Import(fileName1);
 		modelMatrix1.m_posit.m_z = 1.0f;
@@ -151,6 +166,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 		r2d3->AddToWorld(world);
 		r2d3->SetNotifyCallback(new R2D2ModelNotify);
 		SetModelVisualMesh(scene, r2d3);
+		SetMaterial(r2d3);
 	}
 #endif
 

@@ -953,7 +953,8 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 	{
 		jointNode->SetAttribute("type", "continuous");
 
-		ndMatrix pinMatrix(ndGramSchmidtMatrix(localMatrix[0]));
+		//ndMatrix pinMatrix(ndGramSchmidtMatrix(localMatrix[0]));
+		const ndMatrix pinMatrix(ndGramSchmidtMatrix(surroratelink->m_jointBodyMatrix0[0]));
 		localMatrix = pinMatrix.OrthoInverse() * localMatrix;
 
 		sprintf(buffer, "%g %g %g", pinMatrix[0].m_x, pinMatrix[0].m_y, pinMatrix[0].m_z);
@@ -963,7 +964,9 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 	}
 	else
 	{
-		ndAssert(0);
+		//ndAssert(0);
+		ndTrace(("xxxxxxxxxxxx\n"));
+		jointNode->SetAttribute("type", "fixed");
 	}
 
 	//ExportOrigin(jointNode, surroratelink->m_jointBodyMatrix1);
