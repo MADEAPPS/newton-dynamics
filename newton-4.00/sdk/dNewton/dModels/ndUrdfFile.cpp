@@ -951,9 +951,26 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 	}
 	else if (!strcmp(className, "ndJointHinge"))
 	{
-		jointNode->SetAttribute("type", "continuous");
+		const ndJointHinge* const hinge = (ndJointHinge*)joint;
+		if (!hinge->GetLimitState())
+		{
+			jointNode->SetAttribute("type", "continuous");
+		}
+		else
+		{
+			ndFloat32 minLimit;
+			ndFloat32 maxLimit;
+			jointNode->SetAttribute("type", "revolute");
 
-		//ndMatrix pinMatrix(ndGramSchmidtMatrix(localMatrix[0]));
+			nd::TiXmlElement* const limit = new nd::TiXmlElement("limit");
+			jointNode->LinkEndChild(limit);
+			hinge->GetLimits(minLimit, maxLimit);
+			limit->SetDoubleAttribute("effort", 1000);
+			limit->SetDoubleAttribute("lower", minLimit);
+			limit->SetDoubleAttribute("upper", maxLimit);
+			limit->SetDoubleAttribute("velocity", 0.5f);
+		}
+
 		const ndMatrix pinMatrix(ndGramSchmidtMatrix(surroratelink->m_jointBodyMatrix0[0]));
 		localMatrix = pinMatrix.OrthoInverse() * localMatrix;
 
@@ -961,6 +978,30 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 		nd::TiXmlElement* const axis = new nd::TiXmlElement("axis");
 		jointNode->LinkEndChild(axis);
 		axis->SetAttribute("xyz", buffer);
+	}
+	else if (!strcmp(className, "ndJointSlider"))
+	{
+		const ndJointSlider* const slider = (ndJointSlider*)joint;
+
+		jointNode->SetAttribute("type", "prismatic");
+		const ndMatrix pinMatrix(ndGramSchmidtMatrix(surroratelink->m_jointBodyMatrix0[0]));
+		localMatrix = pinMatrix.OrthoInverse() * localMatrix;
+
+		sprintf(buffer, "%g %g %g", pinMatrix[0].m_x, pinMatrix[0].m_y, pinMatrix[0].m_z);
+		nd::TiXmlElement* const axis = new nd::TiXmlElement("axis");
+		jointNode->LinkEndChild(axis);
+		axis->SetAttribute("xyz", buffer);
+		
+		nd::TiXmlElement* const limit = new nd::TiXmlElement("limit");
+		jointNode->LinkEndChild(limit);
+
+		ndFloat32 minLimit;
+		ndFloat32 maxLimit;
+		slider->GetLimits(minLimit, maxLimit);
+		limit->SetDoubleAttribute("effort", 1000);
+		limit->SetDoubleAttribute("lower", minLimit);
+		limit->SetDoubleAttribute("upper", maxLimit);
+		limit->SetDoubleAttribute("velocity", 0.5f);
 	}
 	else
 	{

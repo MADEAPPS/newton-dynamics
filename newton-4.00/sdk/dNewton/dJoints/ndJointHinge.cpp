@@ -119,7 +119,7 @@ void ndJointHinge::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 	}
 }
 
-void ndJointHinge::GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit)
+void ndJointHinge::GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit) const
 {
 	minLimit = m_minLimit;
 	maxLimit = m_maxLimit;
