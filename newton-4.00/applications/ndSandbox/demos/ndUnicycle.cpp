@@ -321,10 +321,9 @@ namespace ndUnicycle
 		ndFloat32 m_timestep;
 	};
 
-
 	class RobotModelNotify : public ndModelNotify
 	{
-	public:
+		public:
 		RobotModelNotify()
 			:ndModelNotify()
 		{
@@ -613,6 +612,7 @@ namespace ndUnicycle
 
 		ndMatrix matrix(location);
 		matrix.m_posit.m_y += 0.6f;
+		matrix.m_posit.m_y += 0.1f;
 		hipBody->SetMatrix(matrix);
 
 		ndMatrix limbLocation(matrix);
@@ -694,10 +694,6 @@ namespace ndUnicycle
 
 		ndSharedPtr<ndModelArticulation> model(new ndModelArticulation);
 
-		//ndPhysicsWorld* const world = scene->GetWorld();
-		//
-		//// add hip body
-		//ndSharedPtr<ndBody> hipBody(world->GetBody(AddBox(scene, location, mass, xSize, ySize, zSize, "wood_0.png")));
 		ndMatrix location(ndGetIdentityMatrix());
 		ndBodyKinematic* const hipBody = CreateBox(scene, ndGetIdentityMatrix(), mass, xSize, ySize, zSize, "wood_0.png");
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(hipBody);
@@ -712,42 +708,26 @@ namespace ndUnicycle
 		ndMatrix poleLocation(ndGetIdentityMatrix());
 		poleLocation.m_posit.m_x = -limbLength * 0.5f;
 		legBody->GetCollisionShape().SetLocalMatrix(poleLocation);
-
 		ndMatrix legPivot(ndYawMatrix(-ndPi * ndFloat32 (0.5f)) * hipBody->GetMatrix());
+		//ndMatrix legPivot(ndRollMatrix(-ndPi * ndFloat32(0.5f)) * hipBody->GetMatrix());
 		legPivot.m_posit.m_y = -ySize * 0.5f;
-		ndJointHinge* const legJoint = new ndJointHinge(legPivot, legBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic());
+		ndJointHinge* const legJoint = new ndJointHinge(legPivot, legBody, hipBody);
 		legJoint->SetAsSpringDamper(0.02f, 1500, 40.0f);
 		ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
 
-		//// make wheel
-		//ndFloat32 wheelRadio = 4.0f * limbRadio;
-		//ndBodyKinematic* const wheelBody = CreateSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "wood_0.png");
-		////ndMatrix wheelMatrix(legPivot);
-		////wheelMatrix.m_posit.m_y -= limbLength;
-		////wheelBody->SetMatrix(wheelMatrix);
-		////ndSharedPtr<ndJointBilateralConstraint> wheelJoint(new ndJointHinge(wheelMatrix, wheelBody->GetAsBodyKinematic(), legBody->GetAsBodyKinematic()));
-		//ndJointHinge* const wheelJoint = new ndJointHinge(legPivot, legBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic());
-		////ndJointHinge* const wheelMotor = (ndJointHinge*)*wheelJoint;
-		////wheelMotor->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
-		////model->m_wheelJoint = wheelMotor;
-		////model->m_wheel = wheelBody->GetAsBodyKinematic();
-		//
-		////world->AddJoint(legJoint);
-		////world->AddJoint(wheelJoint);
-		//
-		//// add model limbs
-		//ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
-		//model->AddLimb(legLimb, wheelBody, wheelJoint);
-		//
-		//model->m_bodies.SetCount(0);
-		//model->m_basePose.SetCount(0);
-		//for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-		//{
-		//	ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-		//	model->m_bodies.PushBack(body);
-		//	model->m_basePose.PushBack(body);
-		//}
+		// make wheel
+		ndFloat32 wheelRadio = 4.0f * limbRadio;
+		ndBodyKinematic* const wheelBody = CreateSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "wood_0.png");
+		wheelBody->GetCollisionShape().SetLocalMatrix(ndRollMatrix(ndPi * ndFloat32(0.5f)));
 
+		ndMatrix wheelMatrix(legBody->GetMatrix());
+		wheelBody->SetMatrix(wheelMatrix);
+		wheelMatrix = ndYawMatrix(-ndPi * ndFloat32(0.5f)) * wheelMatrix;
+		wheelMatrix.m_posit.m_x -= 0.3f;
+		ndJointHinge* const wheelJoint = new ndJointHinge(wheelMatrix, wheelBody, legBody);
+		model->AddLimb(legLimb, wheelBody, wheelJoint);
+		wheelJoint->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
+	
 		ndUrdfFile urdf;
 		char fileName[256];
 		ndGetWorkingFileName("unicycle.urdf", fileName);
@@ -787,7 +767,6 @@ namespace ndUnicycle
 		unicycle->SetNotifyCallback(new RobotModelNotify());
 		return unicycle;
 	}
-
 }
 
 using namespace ndUnicycle;
@@ -802,7 +781,7 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	ndSetRandSeed(42);
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
-	ExportUrdfModel(scene);
+	//ExportUrdfModel(scene);
 
 #ifdef ND_TRAIN_AGENT
 	TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix);
