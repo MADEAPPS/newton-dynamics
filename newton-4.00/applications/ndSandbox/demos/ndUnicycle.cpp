@@ -47,7 +47,8 @@ namespace ndUnicycle
 		m_speed,
 		m_stateSize
 	};
-	
+
+#if 0
 	class ndRobot : public ndModelArticulation
 	{
 		public:
@@ -321,44 +322,170 @@ namespace ndUnicycle
 		ndFloat32 m_timestep;
 	};
 
+#endif
+
 	class RobotModelNotify : public ndModelNotify
 	{
-		public:
-		RobotModelNotify()
-			:ndModelNotify()
+		// implement controller player
+		class ndController : public ndBrainAgentContinuePolicyGradient
 		{
-		}
+			public:
+			ndController(const ndSharedPtr<ndBrain>& brain)
+				:ndBrainAgentContinuePolicyGradient(brain)
+				,m_robot(nullptr)
+			{
+			}
 
+			//void SetModel(RobotModelNotify* const model)
+			//{
+			//	m_robot = model;
+			//}
+
+			void GetObservation(ndBrainFloat* const observation)
+			{
+				m_robot->GetObservation(observation);
+			}
+
+			virtual void ApplyActions(ndBrainFloat* const actions)
+			{
+				m_robot->ApplyActions(actions);
+			}
+
+			RobotModelNotify* m_robot;
+		};
+
+		public:
+		class ndBasePose
+		{
+			public:
+			ndBasePose()
+				:m_body(nullptr)
+			{
+			}
+	
+			ndBasePose(ndBodyDynamic* const body)
+				:m_veloc(body->GetVelocity())
+				,m_omega(body->GetOmega())
+				,m_posit(body->GetPosition())
+				,m_rotation(body->GetRotation())
+				,m_body(body)
+			{
+			}
+	
+			void SetPose() const
+			{
+				m_body->SetMatrix(ndCalculateMatrix(m_rotation, m_posit));
+				m_body->SetOmega(m_omega);
+				m_body->SetVelocity(m_veloc);
+			}
+	
+			ndVector m_veloc;
+			ndVector m_omega;
+			ndVector m_posit;
+			ndQuaternion m_rotation;
+			ndBodyDynamic* m_body;
+		};
+	
+		RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const model)
+			:ndModelNotify()
+			,m_controller(brain)
+		{
+			//ndAssert(0);
+			//ndRobot* const robot = (ndRobot*)GetModel();
+			//robot->m_agent = brain;
+			m_controller.m_robot = this;
+		}
+	
 		RobotModelNotify(const RobotModelNotify& src)
 			:ndModelNotify(src)
+			,m_controller(src.m_controller)
 		{
 		}
-
+	
 		~RobotModelNotify()
 		{
 		}
-
+	
 		ndModelNotify* Clone() const
 		{
 			return new RobotModelNotify(*this);
 		}
-
+	
+		ndBrainFloat CalculateReward()
+		{
+			ndAssert(0);
+			//return m_robot->GetReward();
+		}
+	
+		bool IsTerminal() const
+		{
+			ndAssert(0);
+			//return m_robot->IsTerminal();
+			return false;
+		}
+	
+		void GetObservation(ndBrainFloat* const observation)
+		{
+			//m_robot->GetObservation(observation);
+			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
+			ndBodyKinematic* const body = model->GetRoot()->m_body->GetAsBodyKinematic();
+			//const ndVector omega(body->GetOmega());
+			//const ndVector veloc(body->GetVelocity());
+			//const ndVector wheelOmega(m_wheel->GetOmega());
+			//const ndMatrix& matrix = body->GetMatrix();
+			//const ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
+			//const ndFloat32 angle = ndAsin(sinAngle);
+			//
+			//observation[m_speed] = ndBrainFloat(veloc.m_x);
+			//observation[m_topBoxAngle] = ndBrainFloat(angle);
+			//observation[m_topBoxOmega] = ndBrainFloat(omega.m_z);
+			//observation[m_wheelOmega] = ndBrainFloat(wheelOmega.m_z);
+			//observation[m_isOnAir] = HasSupportContact() ? ndBrainFloat(0.0f) : ndBrainFloat(1.0f);
+			//observation[m_jointAngle] = ndBrainFloat(m_legJoint->GetAngle() / ND_MAX_LEG_JOINT_ANGLE);
+		}
+	
+		virtual void ApplyActions(ndBrainFloat* const actions)
+		{
+			//ndAssert(0);
+			//m_robot->ApplyActions(actions);
+		}
+	
+		void ResetModel()
+		{
+			ndAssert(0);
+			//m_robot->ResetModel();
+		}
+	
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
-			ndRobot* const robot = (ndRobot*)GetModel();
+			//ndAssert(0);
+			//ndRobot* const robot = (ndRobot*)GetModel();
 			//robot->Update(world, timestep);
+			m_controller.Step();
 		}
-
+	
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
-			ndRobot* const robot = (ndRobot*)GetModel();
+			//ndAssert(0);
+			//ndRobot* const robot = (ndRobot*)GetModel();
 			//robot->PostUpdate(world, timestep);
 		}
-
+	
 		void PostTransformUpdate(ndWorld* const, ndFloat32)
 		{
+			//ndAssert(0);
 		}
+	
+		ndController m_controller;;
+		//ndSharedPtr<ndBrainAgent> m_agent;
+		//ndFixSizeArray<ndBasePose, 8> m_basePose;
+		//ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
+		//ndJointHinge* m_legJoint;
+		//ndJointHinge* m_wheelJoint;
+		//ndBodyKinematic* m_wheel;
+		//ndFloat32 m_timestep;
 	};
+
 
 #ifdef ND_TRAIN_AGENT
 	ndRobot* CreateTrainModel(ndDemoEntityManager* const scene, const ndMatrix& location, ndSharedPtr<ndBrainAgent>& agent)
@@ -592,96 +719,21 @@ namespace ndUnicycle
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;
 	};
-
-#else
-
-	void BuildModel(ndRobot* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
-	{
-		ndFloat32 mass = 20.0f;
-		ndFloat32 limbMass = 1.0f;
-		ndFloat32 wheelMass = 1.0f;
-
-		ndFloat32 xSize = 0.25f;
-		ndFloat32 ySize = 0.40f;
-		ndFloat32 zSize = 0.30f;
-		ndPhysicsWorld* const world = scene->GetWorld();
-
-		// add hip body
-		ndSharedPtr<ndBody> hipBody(world->GetBody(AddBox(scene, location, mass, xSize, ySize, zSize, "wood_0.png")));
-		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(hipBody);
-
-		ndMatrix matrix(location);
-		matrix.m_posit.m_y += 0.6f;
-		matrix.m_posit.m_y += 0.1f;
-		hipBody->SetMatrix(matrix);
-
-		ndMatrix limbLocation(matrix);
-		limbLocation.m_posit.m_z += zSize * 0.0f;
-		limbLocation.m_posit.m_y -= ySize * 0.5f;
-
-		// make single leg
-		ndFloat32 limbLength = 0.3f;
-		ndFloat32 limbRadio = 0.025f;
-
-		ndSharedPtr<ndBody> legBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "wood_1.png")));
-		ndMatrix legLocation(ndRollMatrix(-90.0f * ndDegreeToRad) * limbLocation);
-		legLocation.m_posit.m_y -= limbLength * 0.5f;
-		legBody->SetMatrix(legLocation);
-		ndMatrix legPivot(ndYawMatrix(90.0f * ndDegreeToRad) * legLocation);
-		legPivot.m_posit.m_y += limbLength * 0.5f;
-		ndSharedPtr<ndJointBilateralConstraint> legJoint(new ndJointHinge(legPivot, legBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
-		ndJointHinge* const hinge = (ndJointHinge*)*legJoint;
-		hinge->SetAsSpringDamper(0.02f, 1500, 40.0f);
-		model->m_legJoint = hinge;
-
-		// make wheel
-		ndFloat32 wheelRadio = 4.0f * limbRadio;
-		ndSharedPtr<ndBody> wheelBody(world->GetBody(AddSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "wood_0.png")));
-		ndMatrix wheelMatrix(legPivot);
-		wheelMatrix.m_posit.m_y -= limbLength;
-		wheelBody->SetMatrix(wheelMatrix);
-		ndSharedPtr<ndJointBilateralConstraint> wheelJoint(new ndJointHinge(wheelMatrix, wheelBody->GetAsBodyKinematic(), legBody->GetAsBodyKinematic()));
-		ndJointHinge* const wheelMotor = (ndJointHinge*)*wheelJoint;
-		wheelMotor->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
-		model->m_wheelJoint = wheelMotor;
-		model->m_wheel = wheelBody->GetAsBodyKinematic();
-
-		//world->AddJoint(legJoint);
-		//world->AddJoint(wheelJoint);
-
-		// add model limbs
-		ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
-		model->AddLimb(legLimb, wheelBody, wheelJoint);
-
-		model->m_bodies.SetCount(0);
-		model->m_basePose.SetCount(0);
-		for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-		{
-			ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-			model->m_bodies.PushBack(body);
-			model->m_basePose.PushBack(body);
-		}
-	}
+#endif
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
-		// build neural net controller
-		char fileName[1024];
-		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
-		ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-		ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndController(actor));
+		ndUrdfFile urdf;
+		char fileName[256];
+		ndGetWorkingFileName("unicycle.urdf", fileName);
+		ndModelArticulation* const unicycle = urdf.Import(fileName);
 
-		ndRobot* const model = new ndRobot(agent);
-		BuildModel(model, scene, location);
-		((ndRobot::ndController*)*agent)->SetModel(model);
-
-		model->SetNotifyCallback(new RobotModelNotify());
-
-		return model;
+		SetModelVisualMesh(scene, unicycle);
+		unicycle->SetTransform(location);
+		//unicycle->SetNotifyCallback(new RobotModelNotify());
+		return unicycle;
 	}
-#endif
 
-	//void ExportUrdfModel(ndRobot* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
 	void ExportUrdfModel(ndDemoEntityManager* const scene)
 	{
 		ndFloat32 mass = 20.0f;
@@ -733,40 +785,6 @@ namespace ndUnicycle
 		ndGetWorkingFileName("unicycle.urdf", fileName);
 		urdf.Export(fileName, *model);
 	}
-
-	ndModelArticulation* CreateModel____(ndDemoEntityManager* const scene, const ndMatrix& location)
-	{
-		//ndUrdfFile urdf;
-		//char fileName[256];
-		//ndGetWorkingFileName("cartpole.urdf", fileName);
-		//ndModelArticulation* const cartPole = urdf.Import(fileName);
-		//
-		//SetModelVisualMesh(scene, cartPole);
-		//cartPole->SetTransform(location);
-		//
-		//// make the car move along the z axis only (2d problem)
-		//ndWorld* const world = scene->GetWorld();
-		//ndBodyKinematic* const boxBody = cartPole->GetRoot()->m_body->GetAsBodyKinematic();
-		//ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(boxBody->GetMatrix(), boxBody, world->GetSentinelBody()));
-		//world->AddJoint(xDirSlider);
-		//
-		//return cartPole;
-
-		//char fileName[1024];
-		//ndGetWorkingFileName(CONTROLLER_NAME, fileName);
-		//ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-		//ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndController(actor));
-
-		ndUrdfFile urdf;
-		char fileName[256];
-		ndGetWorkingFileName("unicycle.urdf", fileName);
-		ndModelArticulation* const unicycle = urdf.Import(fileName);
-
-		SetModelVisualMesh(scene, unicycle);
-		unicycle->SetTransform(location);
-		unicycle->SetNotifyCallback(new RobotModelNotify());
-		return unicycle;
-	}
 }
 
 using namespace ndUnicycle;
@@ -789,24 +807,20 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 #else
 	ndWorld* const world = scene->GetWorld();
 
-	ndModelArticulation* const oldModel = CreateModel(scene, matrix);
-	oldModel->AddToWorld(world);
-	ndBodyKinematic* const oldRootBody = oldModel->GetRoot()->m_body->GetAsBodyKinematic();
-	//ndSharedPtr<ndJointBilateralConstraint> oldFixJoint(new ndJointPlane(oldRootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
-	ndSharedPtr<ndJointBilateralConstraint> oldFixJoint(new ndJointFix6dof(oldRootBody->GetMatrix(), oldRootBody, world->GetSentinelBody()));
-	world->AddJoint(oldFixJoint);
-
-	ndMatrix matrix____(oldRootBody->GetMatrix());
-	matrix____.m_posit.m_z += 0.35f;
-	ndModelArticulation* model = CreateModel____(scene, matrix____);
+	ndMatrix matrix____(matrix);
+	matrix____.m_posit.m_y = 0.6f;
+	ndModelArticulation* model = CreateModel(scene, matrix____);
 	model->AddToWorld(world);
 	ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
-	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody____->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody____, world->GetSentinelBody()));
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(rootBody->GetMatrix(), rootBody, world->GetSentinelBody()));
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
+	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(rootBody->GetMatrix(), rootBody, world->GetSentinelBody()));
 	world->AddJoint(fixJoint);
 
+	char fileName[256];
+	ndGetWorkingFileName(CONTROLLER_NAME, fileName);
+	ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
+	model->SetNotifyCallback(new RobotModelNotify(brain, model));
 #endif
-
 	
 	//matrix.m_posit.m_x -= 0.0f;
 	matrix.m_posit.m_x -= 3.0f;
