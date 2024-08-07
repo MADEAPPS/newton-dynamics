@@ -34,7 +34,7 @@ void ndUrdfFile::ImportMaterials(const nd::TiXmlNode* const rootNode)
 	m_materials.SetCount(0);
 	m_materialMap.RemoveAll();
 	m_materials.PushBack(Material());
-	sprintf(m_materials[0].m_texture, "default.png");
+	sprintf(m_materials[0].m_texture, "wood_0.png");
 	for (const nd::TiXmlNode* node = rootNode->FirstChild("material"); node; node = node->NextSibling("material"))
 	{
 		const nd::TiXmlElement* const materialNode = (nd::TiXmlElement*)node;
@@ -63,6 +63,10 @@ void ndUrdfFile::ImportMaterials(const nd::TiXmlNode* const rootNode)
 		{
 			const char* const texName = texture->Attribute("filename");
 			sprintf(material.m_texture, texName);
+		}
+		else
+		{
+			sprintf(material.m_texture, "default.png");
 		}
 		m_materials.PushBack(material);
 	}
@@ -481,7 +485,7 @@ ndBodyDynamic* ndUrdfFile::ImportLink(const nd::TiXmlNode* const linkNode)
 		{
 			ndMatrix flipMatrix(ndGetIdentityMatrix());
 			flipMatrix[0][0] = ndFloat32(-1.0f);
-			ndMatrix aligmentUV(flipMatrix* uvMatrix);
+			ndMatrix aligmentUV(flipMatrix * uvMatrix);
 			meshEffect->SphericalMapping(materialIndex, aligmentUV);
 			//meshEffect->BoxMapping(materialIndex, materialIndex, materialIndex, aligmentUV);
 		}
@@ -744,7 +748,8 @@ void ndUrdfFile::ExportMaterials(nd::TiXmlElement* const rootNode, const Surroga
 
 	nd::TiXmlElement* const texture = new nd::TiXmlElement("texture");
 	material->LinkEndChild(texture);
-	texture->SetAttribute("filename", "default.png");
+	//texture->SetAttribute("filename", "default.png");
+	texture->SetAttribute("filename", "wood_0.png");
 }
 
 void ndUrdfFile::ExportOrigin(nd::TiXmlElement* const parentNode, const ndMatrix& pose)

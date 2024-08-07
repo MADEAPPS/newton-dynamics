@@ -268,3 +268,16 @@ void ndModelArticulation::AddToWorld(ndWorld* const world)
 	}
 	world->AddModel(this);
 }
+
+ndModelArticulation::ndNode* ndModelArticulation::FindByName(const char* const name) const
+{
+	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+	{
+		if (strcmp(node->m_name.GetStr(), name) == 0)
+		{
+			return node;
+		}
+	}
+
+	return nullptr;
+}

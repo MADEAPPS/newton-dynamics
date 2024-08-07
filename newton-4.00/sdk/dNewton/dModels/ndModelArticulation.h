@@ -37,7 +37,7 @@ class ndModelArticulation: public ndModel
 		public:
 		D_NEWTON_API ndNode(const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint, ndNode* const parent);
 		D_NEWTON_API virtual ~ndNode();
-		
+
 		ndSharedPtr<ndBody> m_body;
 		ndSharedPtr<ndJointBilateralConstraint> m_joint;
 		ndString m_name;
@@ -61,6 +61,7 @@ class ndModelArticulation: public ndModel
 
 	D_NEWTON_API const ndString& GetName() const;
 	D_NEWTON_API void SetName(const ndString& name);
+	D_NEWTON_API ndNode* FindByName(const char* const name) const;
 
 	D_NEWTON_API void AddToWorld(ndWorld* const world);
 	D_NEWTON_API void SetTransform(const ndMatrix& matrix);
