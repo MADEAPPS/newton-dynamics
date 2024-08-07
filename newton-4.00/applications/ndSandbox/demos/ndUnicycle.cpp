@@ -347,13 +347,13 @@ namespace ndUnicycle
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndRobot* const robot = (ndRobot*)GetModel();
-			robot->Update(world, timestep);
+			//robot->Update(world, timestep);
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndRobot* const robot = (ndRobot*)GetModel();
-			robot->PostUpdate(world, timestep);
+			//robot->PostUpdate(world, timestep);
 		}
 
 		void PostTransformUpdate(ndWorld* const, ndFloat32)
@@ -684,19 +684,24 @@ namespace ndUnicycle
 	//void ExportUrdfModel(ndRobot* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
 	void ExportUrdfModel(ndDemoEntityManager* const scene)
 	{
-		//ndFloat32 mass = 20.0f;
-		//ndFloat32 limbMass = 1.0f;
-		//ndFloat32 wheelMass = 1.0f;
-		//
-		//ndFloat32 xSize = 0.25f;
-		//ndFloat32 ySize = 0.40f;
-		//ndFloat32 zSize = 0.30f;
+		ndFloat32 mass = 20.0f;
+		ndFloat32 limbMass = 1.0f;
+		ndFloat32 wheelMass = 1.0f;
+		
+		ndFloat32 xSize = 0.25f;
+		ndFloat32 ySize = 0.40f;
+		ndFloat32 zSize = 0.30f;
+
+		ndSharedPtr<ndModelArticulation> model(new ndModelArticulation);
+
 		//ndPhysicsWorld* const world = scene->GetWorld();
 		//
 		//// add hip body
 		//ndSharedPtr<ndBody> hipBody(world->GetBody(AddBox(scene, location, mass, xSize, ySize, zSize, "wood_0.png")));
-		//ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(hipBody);
-		//
+		ndMatrix location(ndGetIdentityMatrix());
+		ndBodyKinematic* const hipBody = CreateBox(scene, location, mass, xSize, ySize, zSize, "wood_0.png");
+		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(hipBody);
+		
 		//ndMatrix matrix(location);
 		//matrix.m_posit.m_y += 0.6f;
 		//hipBody->SetMatrix(matrix);
@@ -748,11 +753,46 @@ namespace ndUnicycle
 		//	model->m_basePose.PushBack(body);
 		//}
 
+		ndUrdfFile urdf;
+		char fileName[256];
+		ndGetWorkingFileName("unicycle.urdf", fileName);
+		urdf.Export(fileName, *model);
+	}
+
+	ndModelArticulation* CreateModel____(ndDemoEntityManager* const scene, const ndMatrix& location)
+	{
 		//ndUrdfFile urdf;
 		//char fileName[256];
-		//ndGetWorkingFileName("unicycle.urdf", fileName);
-		//urdf.Export(fileName, model);
+		//ndGetWorkingFileName("cartpole.urdf", fileName);
+		//ndModelArticulation* const cartPole = urdf.Import(fileName);
+		//
+		//SetModelVisualMesh(scene, cartPole);
+		//cartPole->SetTransform(location);
+		//
+		//// make the car move along the z axis only (2d problem)
+		//ndWorld* const world = scene->GetWorld();
+		//ndBodyKinematic* const boxBody = cartPole->GetRoot()->m_body->GetAsBodyKinematic();
+		//ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(boxBody->GetMatrix(), boxBody, world->GetSentinelBody()));
+		//world->AddJoint(xDirSlider);
+		//
+		//return cartPole;
+
+		//char fileName[1024];
+		//ndGetWorkingFileName(CONTROLLER_NAME, fileName);
+		//ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+		//ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndController(actor));
+
+		ndUrdfFile urdf;
+		char fileName[256];
+		ndGetWorkingFileName("unicycle.urdf", fileName);
+		ndModelArticulation* const unicycle = urdf.Import(fileName);
+
+		SetModelVisualMesh(scene, unicycle);
+		unicycle->SetTransform(location);
+		unicycle->SetNotifyCallback(new RobotModelNotify());
+		return unicycle;
 	}
+
 }
 
 using namespace ndUnicycle;
@@ -767,7 +807,7 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	ndSetRandSeed(42);
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
-	//ExportUrdfModel(scene);
+	ExportUrdfModel(scene);
 
 #ifdef ND_TRAIN_AGENT
 	TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix);
@@ -775,12 +815,22 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 #else
 	ndWorld* const world = scene->GetWorld();
 
-	ndModelArticulation* const model = CreateModel(scene, matrix);
-	model->AddToWorld(world);
+	ndModelArticulation* const oldModel = CreateModel(scene, matrix);
+	oldModel->AddToWorld(world);
+	ndBodyKinematic* const oldRootBody = oldModel->GetRoot()->m_body->GetAsBodyKinematic();
+	//ndSharedPtr<ndJointBilateralConstraint> oldFixJoint(new ndJointPlane(oldRootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
+	ndSharedPtr<ndJointBilateralConstraint> oldFixJoint(new ndJointFix6dof(oldRootBody->GetMatrix(), oldRootBody, world->GetSentinelBody()));
+	world->AddJoint(oldFixJoint);
 
+	ndMatrix matrix____(oldRootBody->GetMatrix());
+	matrix____.m_posit.m_z += 0.5f;
+	ndModelArticulation* model = CreateModel____(scene, matrix____);
+	model->AddToWorld(world);
 	ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
+	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody____->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody____, world->GetSentinelBody()));
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(rootBody->GetMatrix(), rootBody, world->GetSentinelBody()));
 	world->AddJoint(fixJoint);
+
 #endif
 
 	

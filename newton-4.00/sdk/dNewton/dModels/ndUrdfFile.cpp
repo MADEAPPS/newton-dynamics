@@ -741,6 +741,10 @@ void ndUrdfFile::ExportMaterials(nd::TiXmlElement* const rootNode, const Surroga
 	material->LinkEndChild(color);
 	//color->SetAttribute("rgba", "1.0 0.0 0.0 1.0");
 	color->SetAttribute("rgba", "1.0 1.0 1.0 1.0");
+
+	nd::TiXmlElement* const texture = new nd::TiXmlElement("texture");
+	material->LinkEndChild(texture);
+	texture->SetAttribute("filename", "default.png");
 }
 
 void ndUrdfFile::ExportOrigin(nd::TiXmlElement* const parentNode, const ndMatrix& pose)
