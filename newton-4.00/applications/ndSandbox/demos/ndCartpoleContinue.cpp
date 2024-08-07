@@ -173,18 +173,19 @@ namespace ndCarpole_1
 		m_poleMatrix = m_pole->GetMatrix();
 	}
 
+	ndFloat32 GetPoleAngle() const
+	{
+		const ndMatrix& matrix = m_poleJoint->GetLocalMatrix0() * m_pole->GetMatrix();
+		//ndFloat32 angle = ndAsin(matrix.m_right.m_x);
+		ndFloat32 angle = ndAsin(matrix.m_up.m_x);
+		return angle;
+	}
+
 	bool IsTerminal() const
 	{
 		// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
 		bool fail = ndAbs(GetPoleAngle()) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
 		return fail;
-	}
-
-	ndFloat32 GetPoleAngle() const
-	{
-		const ndMatrix& matrix = m_poleJoint->GetLocalMatrix0() * m_pole->GetMatrix();
-		ndFloat32 angle = ndAsin(matrix.m_right.m_x);
-		return angle;
 	}
 
 	ndReal GetReward() const

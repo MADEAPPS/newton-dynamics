@@ -186,7 +186,35 @@ ndBodyDynamic* ndUrdfFile::ImportLink(const nd::TiXmlNode* const linkNode)
 			ndFloat64 radius;
 			shapeNode->Attribute("length", &length);
 			shapeNode->Attribute("radius", &radius);
-			shape = new ndShapeCylinder(ndFloat32(radius), ndFloat32(radius), ndFloat32(length));
+
+			nd::TiXmlElement* const newtonExt = (nd::TiXmlElement*)geometryNode->FirstChild("newton");
+			ndInt32 cylinderKind = 0;
+			if (newtonExt)
+			{
+				const char* const surrogateShape = newtonExt->Attribute("replaceWith");
+				if (strcmp(surrogateShape, "capsule") == 0)
+				{
+					cylinderKind = 1;
+				}
+				else if (strcmp(surrogateShape, "wheel") == 0)
+				{
+					cylinderKind = 2;
+				}
+			}
+
+			switch (cylinderKind)
+			{
+				case 0:
+					shape = new ndShapeCylinder(ndFloat32(radius), ndFloat32(radius), ndFloat32(length));
+					break;
+				case 1:
+					length = length - 2.0f * radius;
+					shape = new ndShapeCapsule(ndFloat32(radius), ndFloat32(radius), ndFloat32(length));
+					break;
+				default:
+					ndAssert(0);
+					shape = new ndShapeCylinder(ndFloat32(radius), ndFloat32(radius), ndFloat32(length));
+			}
 			ndMatrix matrix(ndYawMatrix(ndPi * ndFloat32(0.5f)));
 			collision.SetLocalMatrix(matrix);
 		}
@@ -302,7 +330,36 @@ ndBodyDynamic* ndUrdfFile::ImportLink(const nd::TiXmlNode* const linkNode)
 			ndFloat64 radius;
 			shapeNode->Attribute("length", &length);
 			shapeNode->Attribute("radius", &radius);
-			shape = new ndShapeCylinder(ndFloat32(radius), ndFloat32(radius), ndFloat32(length));
+
+			nd::TiXmlElement* const newtonExt = (nd::TiXmlElement*)geometryNode->FirstChild("newton");
+			ndInt32 cylinderKind = 0;
+			if (newtonExt)
+			{
+				const char* const surrogateShape = newtonExt->Attribute("replaceWith");
+				if (strcmp(surrogateShape, "capsule") == 0)
+				{
+					cylinderKind = 1;
+				}
+				else if (strcmp(surrogateShape, "wheel") == 0)
+				{
+					cylinderKind = 2;
+				}
+			}
+
+			//shape = new ndShapeCylinder(ndFloat32(radius), ndFloat32(radius), ndFloat32(length));
+			switch (cylinderKind)
+			{
+				case 0:
+					shape = new ndShapeCylinder(ndFloat32(radius), ndFloat32(radius), ndFloat32(length));
+					break;
+				case 1:
+					length = length - 2.0f * radius;
+					shape = new ndShapeCapsule(ndFloat32(radius), ndFloat32(radius), ndFloat32(length));
+					break;
+				default:
+					ndAssert(0);
+					shape = new ndShapeCylinder(ndFloat32(radius), ndFloat32(radius), ndFloat32(length));
+			}
 			m_localMatrix = ndYawMatrix(ndPi * ndFloat32(0.5f));
 		}
 		else if (strcmp(name, "box") == 0)
@@ -675,7 +732,8 @@ void ndUrdfFile::ExportMaterials(nd::TiXmlElement* const rootNode, const Surroga
 
 	nd::TiXmlElement* const color = new nd::TiXmlElement("color");
 	material->LinkEndChild(color);
-	color->SetAttribute("rgba", "1.0 0.0 0.0 1.0");
+	//color->SetAttribute("rgba", "1.0 0.0 0.0 1.0");
+	color->SetAttribute("rgba", "1.0 1.0 1.0 1.0");
 }
 
 void ndUrdfFile::ExportOrigin(nd::TiXmlElement* const parentNode, const ndMatrix& pose)
@@ -735,6 +793,10 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const Surrogate*
 		sprintf(buffer, "%g", info.m_capsule.m_radio0);
 		shape->SetAttribute("radius", buffer);
 		aligment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
+
+		nd::TiXmlElement* const newtonExt = new nd::TiXmlElement("newton");
+		geometry->LinkEndChild(newtonExt);
+		newtonExt->SetAttribute("replaceWith", "capsule");
 	}
 	else if (!strcmp(className, "ndShapeCylinder"))
 	{
@@ -818,6 +880,10 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const Surroga
 		sprintf(buffer, "%g", info.m_capsule.m_radio0);
 		shape->SetAttribute("radius", buffer);
 		aligment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
+
+		nd::TiXmlElement* const newtonExt = new nd::TiXmlElement("newton");
+		geometry->LinkEndChild(newtonExt);
+		newtonExt->SetAttribute("replaceWith", "capsule");
 	}
 	else if (!strcmp(className, "ndShapeCylinder"))
 	{

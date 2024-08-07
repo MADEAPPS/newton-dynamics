@@ -25,7 +25,7 @@ namespace ndCarpole_0
 {
 	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME		"cartpoleDiscreteVPG.dnn"
-	//#define CRITIC_NAME			"cartpoleDiscreteCriticVPG.dnn"
+	//#define CRITIC_NAME		"cartpoleDiscreteCriticVPG.dnn"
 
 	#define D_PUSH_ACCEL		ndFloat32 (15.0f)
 	#define D_REWARD_MIN_ANGLE	ndFloat32 (20.0f * ndDegreeToRad)
@@ -504,15 +504,16 @@ namespace ndCarpole_0
 		ndFloat32 cartMass = 5.0f;
 		ndFloat32 poleMass = 10.0f;
 		ndFloat32 poleLength = 0.4f;
-		ndFloat32 poleRadio = 0.03f;
+		ndFloat32 poleRadio = 0.035f;
 
 		ndMatrix location(ndGetIdentityMatrix());
 		location.m_posit.m_y = 0.25f;
 
-		ndModelArticulation* const model = new ndModelArticulation;
+		//ndModelArticulation* const model = new ndModelArticulation;
+		ndSharedPtr<ndModelArticulation> model (new ndModelArticulation);
 
 		// make cart
-		ndBodyKinematic* const cartBody = AddBox(scene, location, cartMass, xSize, ySize, zSize, "wood_0.png");
+		ndBodyKinematic* const cartBody = CreateBox(scene, location, cartMass, xSize, ySize, zSize, "wood_0.png");
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
 
 		ndMatrix matrix(ndGetIdentityMatrix());
@@ -520,7 +521,7 @@ namespace ndCarpole_0
 		cartBody->SetMatrix(matrix);
 
 		// make pole leg
-		ndBodyKinematic* const poleBody = AddCapsule(scene, matrix, poleMass, poleRadio, poleRadio, poleLength, "smilli.png");
+		ndBodyKinematic* const poleBody = CreateCapsule(scene, matrix, poleMass, poleRadio, poleRadio, poleLength, "smilli.png");
 		ndMatrix poleLocation(ndGetIdentityMatrix());
 		//poleLocation.m_posit.m_x = -(poleLength * 0.5f - poleRadio);
 		poleLocation.m_posit.m_x = -(poleLength * 0.5f);
@@ -528,14 +529,14 @@ namespace ndCarpole_0
 
 		// link cart and body with a hinge
 		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * matrix);
-		//polePivot.m_posit.m_y += ySize * 0.5f;
+		polePivot.m_posit.m_y += ySize * 0.25f;
 		ndJointBilateralConstraint* const poleJoint = new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic());
 		model->AddLimb(modelRoot, poleBody, poleJoint);
 		 
 		ndUrdfFile urdf;
 		char fileName[256];
 		ndGetWorkingFileName("cartpole.urdf", fileName);
-		urdf.Export(fileName, model);
+		urdf.Export(fileName, *model);
 	}
 }
 

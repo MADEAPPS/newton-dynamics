@@ -381,7 +381,8 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	ndFixSizeArray<ndBodyKinematic*, plankCount> array;
 	for (ndInt32 i = 0; i < plankCount; ++i)
 	{
-		array.PushBack(CreateBody(scene, plankShape, matrix, 20.0f));
+		ndAssert(0);
+		//array.PushBack(CreateBody(scene, plankShape, matrix, 20.0f));
 		matrix.m_posit.m_z += sizez;
 	}
 

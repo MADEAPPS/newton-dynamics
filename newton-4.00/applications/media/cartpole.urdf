@@ -26,27 +26,27 @@
     <link name="node_0_link">
         <visual>
             <geometry>
-                <cylinder length="0.46" radius="0.03" />
+                <cylinder length="0.47" radius="0.035" />
             </geometry>
             <origin rpy="1.5708 -3.13916e-07 -1.5708" xyz="-0.2 0 0" />
             <material name="material_0" />
         </visual>
         <collision>
             <geometry>
-                <cylinder length="0.46" radius="0.03" />
+                <cylinder length="0.47" radius="0.035" />
             </geometry>
             <origin rpy="1.5708 -3.13916e-07 -1.5708" xyz="-0.2 0 0" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="4.27628e-09 6.37708e-10 1.2479e-10" />
+            <origin rpy="0 -0 0" xyz="-1.18438e-09 -1.41997e-09 -3.06055e-11" />
             <mass value="10" />
-            <inertia xx="0.00430032" xy="0" xz="0" yy="0.162159" yz="0" zz="0.162159" />
+            <inertia xx="0.00583573" xy="0" xz="0" yy="0.167709" yz="0" zz="0.167709" />
         </inertial>
     </link>
     <joint name="node_0_link_to_base_link" type="continuous">
         <parent link="base_link" />
         <child link="node_0_link" />
         <axis xyz="3.13916e-07 1 -3.13916e-07" />
-        <origin rpy="6.27833e-07 1.5708 0" xyz="0 0 0" />
+        <origin rpy="6.27833e-07 1.5708 0" xyz="0 9.8099e-09 0.03125" />
     </joint>
 </robot>
