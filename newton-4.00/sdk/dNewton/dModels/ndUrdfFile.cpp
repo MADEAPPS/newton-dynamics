@@ -34,31 +34,37 @@ void ndUrdfFile::ImportMaterials(const nd::TiXmlNode* const rootNode)
 	m_materials.SetCount(0);
 	m_materialMap.RemoveAll();
 	m_materials.PushBack(Material());
+	sprintf(m_materials[0].m_texture, "default.png");
 	for (const nd::TiXmlNode* node = rootNode->FirstChild("material"); node; node = node->NextSibling("material"))
 	{
 		const nd::TiXmlElement* const materialNode = (nd::TiXmlElement*)node;
+
+		const char* const name = materialNode->Attribute("name");
+		m_materialMap.Insert(ndInt32(m_materials.GetCount()), name);
+
+		Material material;
 		const nd::TiXmlElement* const color = (nd::TiXmlElement*)node->FirstChild("color");
 		if (color)
 		{
-			Material material;
-
-			const char* const name = materialNode->Attribute("name");
-			m_materialMap.Insert(ndInt32(m_materials.GetCount()), name);
-
-			const char* const rgba = color->Attribute("rgba");
-
 			ndFloat32 r;
 			ndFloat32 g;
 			ndFloat32 b;
 			ndFloat32 a;
 			ndInt32 ret = 0;
+			const char* const rgba = color->Attribute("rgba");
 			ret = sscanf(rgba, "%f %f %f %f", &r, &g, &b, &a);
 			material.m_color.m_x = r;
 			material.m_color.m_y = g;
 			material.m_color.m_z = b;
 			material.m_color.m_w = a;
-			m_materials.PushBack(material);
 		}
+		const nd::TiXmlElement* const texture = (nd::TiXmlElement*)node->FirstChild("texture");
+		if (texture)
+		{
+			const char* const texName = texture->Attribute("filename");
+			sprintf(material.m_texture, texName);
+		}
+		m_materials.PushBack(material);
 	}
 }
 
@@ -307,7 +313,8 @@ ndBodyDynamic* ndUrdfFile::ImportLink(const nd::TiXmlNode* const linkNode)
 		ndMeshEffect::ndMaterial meshMaterial;
 		meshMaterial.m_diffuse = m_materials[i].m_color;
 		//meshMaterial.m_ambient = materials[i].m_color;
-		strcpy(meshMaterial.m_textureName, "wood_0.png");
+		//strcpy(meshMaterial.m_textureName, "wood_0.png");
+		sprintf(meshMaterial.m_textureName, m_materials[i].m_texture);
 		meshEffect->GetMaterials().PushBack(meshMaterial);
 	}
 	auto AddMeshShape = [this, meshEffect](const nd::TiXmlNode* const node)
@@ -475,8 +482,8 @@ ndBodyDynamic* ndUrdfFile::ImportLink(const nd::TiXmlNode* const linkNode)
 			ndMatrix flipMatrix(ndGetIdentityMatrix());
 			flipMatrix[0][0] = ndFloat32(-1.0f);
 			ndMatrix aligmentUV(flipMatrix* uvMatrix);
-			//meshEffect->SphericalMapping(materialIndex, aligmentUV);
-			meshEffect->BoxMapping(materialIndex, materialIndex, materialIndex, aligmentUV);
+			meshEffect->SphericalMapping(materialIndex, aligmentUV);
+			//meshEffect->BoxMapping(materialIndex, materialIndex, materialIndex, aligmentUV);
 		}
 		else if (strcmp(name, "box") == 0)
 		{

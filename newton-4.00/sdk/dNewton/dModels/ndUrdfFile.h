@@ -45,8 +45,10 @@ class ndUrdfFile : public ndClassAlloc
 		Material()
 			:m_color(1.0f, 1.0f, 1.0f, 1.0f)
 		{
+			m_texture[0] = 0;
 		}
 		ndVector m_color;
+		char m_texture[256];
 	};
 
 	public:

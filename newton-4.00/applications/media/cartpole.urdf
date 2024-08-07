@@ -2,8 +2,13 @@
 <robot name="robot_model">
     <material name="material_0">
         <color rgba="1.0 1.0 1.0 1.0" />
+        <texture filename="wood_0.png" />
     </material>
-    <link name="base_link">
+    <material name="material_1">
+      <color rgba="1.0 1.0 1.0 1.0" />
+      <texture filename="smilli.png" />
+    </material>
+  <link name="base_link">
         <visual>
             <geometry>
                 <box size="0.25 0.125 0.15" />
@@ -27,13 +32,15 @@
         <visual>
             <geometry>
                 <cylinder length="0.47" radius="0.035" />
+                <newton replaceWith="capsule" />
             </geometry>
             <origin rpy="1.5708 -3.13916e-07 -1.5708" xyz="-0.2 0 0" />
-            <material name="material_0" />
+            <material name="material_1" />
         </visual>
         <collision>
             <geometry>
                 <cylinder length="0.47" radius="0.035" />
+                <newton replaceWith="capsule" />
             </geometry>
             <origin rpy="1.5708 -3.13916e-07 -1.5708" xyz="-0.2 0 0" />
         </collision>
