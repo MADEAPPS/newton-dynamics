@@ -699,43 +699,38 @@ namespace ndUnicycle
 		//// add hip body
 		//ndSharedPtr<ndBody> hipBody(world->GetBody(AddBox(scene, location, mass, xSize, ySize, zSize, "wood_0.png")));
 		ndMatrix location(ndGetIdentityMatrix());
-		ndBodyKinematic* const hipBody = CreateBox(scene, location, mass, xSize, ySize, zSize, "wood_0.png");
+		ndBodyKinematic* const hipBody = CreateBox(scene, ndGetIdentityMatrix(), mass, xSize, ySize, zSize, "wood_0.png");
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(hipBody);
+		hipBody->SetMatrix(location);
 		
-		//ndMatrix matrix(location);
-		//matrix.m_posit.m_y += 0.6f;
-		//hipBody->SetMatrix(matrix);
-		//
-		//ndMatrix limbLocation(matrix);
-		//limbLocation.m_posit.m_z += zSize * 0.0f;
-		//limbLocation.m_posit.m_y -= ySize * 0.5f;
-		//
-		//// make single leg
-		//ndFloat32 limbLength = 0.3f;
-		//ndFloat32 limbRadio = 0.025f;
-		//
-		//ndSharedPtr<ndBody> legBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "wood_1.png")));
-		//ndMatrix legLocation(ndRollMatrix(-90.0f * ndDegreeToRad) * limbLocation);
-		//legLocation.m_posit.m_y -= limbLength * 0.5f;
-		//legBody->SetMatrix(legLocation);
-		//ndMatrix legPivot(ndYawMatrix(90.0f * ndDegreeToRad) * legLocation);
-		//legPivot.m_posit.m_y += limbLength * 0.5f;
-		//ndSharedPtr<ndJointBilateralConstraint> legJoint(new ndJointHinge(legPivot, legBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
-		//ndJointHinge* const hinge = (ndJointHinge*)*legJoint;
-		//hinge->SetAsSpringDamper(0.02f, 1500, 40.0f);
-		//model->m_legJoint = hinge;
-		//
+		// make single leg
+		ndFloat32 limbLength = 0.3f;
+		ndFloat32 limbRadio = 0.025f;
+		ndBodyKinematic* const legBody = CreateCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "wood_1.png");
+		legBody->SetMatrix(ndGetIdentityMatrix());
+
+		ndMatrix poleLocation(ndGetIdentityMatrix());
+		poleLocation.m_posit.m_x = -limbLength * 0.5f;
+		legBody->GetCollisionShape().SetLocalMatrix(poleLocation);
+
+		ndMatrix legPivot(ndYawMatrix(-ndPi * ndFloat32 (0.5f)) * hipBody->GetMatrix());
+		legPivot.m_posit.m_y = -ySize * 0.5f;
+		ndJointHinge* const legJoint = new ndJointHinge(legPivot, legBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic());
+		legJoint->SetAsSpringDamper(0.02f, 1500, 40.0f);
+		ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
+
 		//// make wheel
 		//ndFloat32 wheelRadio = 4.0f * limbRadio;
-		//ndSharedPtr<ndBody> wheelBody(world->GetBody(AddSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "wood_0.png")));
-		//ndMatrix wheelMatrix(legPivot);
-		//wheelMatrix.m_posit.m_y -= limbLength;
-		//wheelBody->SetMatrix(wheelMatrix);
-		//ndSharedPtr<ndJointBilateralConstraint> wheelJoint(new ndJointHinge(wheelMatrix, wheelBody->GetAsBodyKinematic(), legBody->GetAsBodyKinematic()));
-		//ndJointHinge* const wheelMotor = (ndJointHinge*)*wheelJoint;
-		//wheelMotor->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
-		//model->m_wheelJoint = wheelMotor;
-		//model->m_wheel = wheelBody->GetAsBodyKinematic();
+		//ndBodyKinematic* const wheelBody = CreateSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "wood_0.png");
+		////ndMatrix wheelMatrix(legPivot);
+		////wheelMatrix.m_posit.m_y -= limbLength;
+		////wheelBody->SetMatrix(wheelMatrix);
+		////ndSharedPtr<ndJointBilateralConstraint> wheelJoint(new ndJointHinge(wheelMatrix, wheelBody->GetAsBodyKinematic(), legBody->GetAsBodyKinematic()));
+		//ndJointHinge* const wheelJoint = new ndJointHinge(legPivot, legBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic());
+		////ndJointHinge* const wheelMotor = (ndJointHinge*)*wheelJoint;
+		////wheelMotor->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
+		////model->m_wheelJoint = wheelMotor;
+		////model->m_wheel = wheelBody->GetAsBodyKinematic();
 		//
 		////world->AddJoint(legJoint);
 		////world->AddJoint(wheelJoint);
@@ -823,7 +818,7 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	world->AddJoint(oldFixJoint);
 
 	ndMatrix matrix____(oldRootBody->GetMatrix());
-	matrix____.m_posit.m_z += 0.5f;
+	matrix____.m_posit.m_z += 0.35f;
 	ndModelArticulation* model = CreateModel____(scene, matrix____);
 	model->AddToWorld(world);
 	ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
