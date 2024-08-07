@@ -176,18 +176,19 @@ namespace ndCarpole_0
 			m_poleMatrix = m_pole->GetMatrix();
 		}
 
+		ndFloat32 GetPoleAngle() const
+		{
+			const ndMatrix& matrix = m_poleJoint->GetLocalMatrix0() * m_pole->GetMatrix();
+			//ndFloat32 angle = ndAsin(matrix.m_right.m_x);
+			ndFloat32 angle = ndAsin(matrix.m_up.m_x);
+			return angle;
+		}
+
 		bool IsTerminal() const
 		{
 			// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
 			bool fail = ndAbs(GetPoleAngle()) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
 			return fail;
-		}
-
-		ndFloat32 GetPoleAngle() const
-		{
-			const ndMatrix& matrix = m_poleJoint->GetLocalMatrix0() * m_pole->GetMatrix();
-			ndFloat32 angle = ndAsin(matrix.m_right.m_x);
-			return angle;
 		}
 
 		ndReal GetReward() const
@@ -495,7 +496,7 @@ namespace ndCarpole_0
 		bool m_modelIsTrained;
 	};
 
-	void BuildUrdfModel(ndDemoEntityManager* const scene)
+	void ExportUrdfModel(ndDemoEntityManager* const scene)
 	{
 		ndFloat32 xSize = 0.25f;
 		ndFloat32 ySize = 0.125f;
@@ -503,57 +504,38 @@ namespace ndCarpole_0
 		ndFloat32 cartMass = 5.0f;
 		ndFloat32 poleMass = 10.0f;
 		ndFloat32 poleLength = 0.4f;
-		ndFloat32 poleRadio = 0.05f;
+		ndFloat32 poleRadio = 0.03f;
+
 		ndMatrix location(ndGetIdentityMatrix());
+		location.m_posit.m_y = 0.25f;
 
 		ndModelArticulation* const model = new ndModelArticulation;
 
-		ndShapeInstance boxShape(new ndShapeBox(xSize, ySize, zSize));
-		ndSharedPtr<ndDemoMeshInterface> boxMesh(new ndDemoMesh("shape", scene->GetShaderCache(), &boxShape, "wood_0.png", "wood_0.png", "wood_0.png"));
-		ndDemoEntity* const boxEntity = new ndDemoEntity(location, nullptr);
-		boxEntity->SetMesh(boxMesh);
-		ndBodyKinematic* const cartBody = new ndBodyDynamic();
-		cartBody->SetNotifyCallback(new ndDemoEntityNotify(nullptr, boxEntity));
-		cartBody->SetMatrix(location);
-		cartBody->SetCollisionShape(boxShape);
-		cartBody->SetMassMatrix(cartMass, boxShape);
+		// make cart
+		ndBodyKinematic* const cartBody = AddBox(scene, location, cartMass, xSize, ySize, zSize, "wood_0.png");
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
 
-		// make pole leg
-		ndMatrix poleLocation(ndRollMatrix(90.0f * ndDegreeToRad) * location);
-		poleLocation.m_posit.m_y += poleLength * 0.5f;
-		
-		ndShapeInstance poleShape(new ndShapeCapsule(poleRadio, poleRadio, poleLength));
-		ndSharedPtr<ndDemoMeshInterface> poleMesh(new ndDemoMesh("shape", scene->GetShaderCache(), &boxShape, "wood_0.png", "wood_0.png", "wood_0.png"));
-		ndDemoEntity* const poleEntity = new ndDemoEntity(poleLocation, nullptr);
-		poleEntity->SetMesh(poleMesh);
-		ndBodyKinematic* const poleBody = new ndBodyDynamic();
-		poleBody->SetNotifyCallback(new ndDemoEntityNotify(nullptr, poleEntity));
-		poleBody->SetMatrix(poleLocation);
-		poleBody->SetCollisionShape(poleShape);
-		poleBody->SetMassMatrix(poleMass, poleShape);
-		
-		// link cart and body with a hinge
-		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
-		polePivot.m_posit.m_y -= poleLength * 0.5f;
-		ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
-		model->AddLimb(modelRoot, poleBody, poleJoint);
+		ndMatrix matrix(ndGetIdentityMatrix());
+		matrix.m_posit.m_y = 1.0f;
+		cartBody->SetMatrix(matrix);
 
+		// make pole leg
+		ndBodyKinematic* const poleBody = AddCapsule(scene, matrix, poleMass, poleRadio, poleRadio, poleLength, "smilli.png");
+		ndMatrix poleLocation(ndGetIdentityMatrix());
+		//poleLocation.m_posit.m_x = -(poleLength * 0.5f - poleRadio);
+		poleLocation.m_posit.m_x = -(poleLength * 0.5f);
+		poleBody->GetCollisionShape().SetLocalMatrix(poleLocation);
+
+		// link cart and body with a hinge
+		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * matrix);
+		//polePivot.m_posit.m_y += ySize * 0.5f;
+		ndJointBilateralConstraint* const poleJoint = new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic());
+		model->AddLimb(modelRoot, poleBody, poleJoint);
+		 
 		ndUrdfFile urdf;
 		char fileName[256];
-		ndGetWorkingFileName("cartpole_1.urdf", fileName);
+		ndGetWorkingFileName("cartpole.urdf", fileName);
 		urdf.Export(fileName, model);
-
-		ndMatrix matrix(ndGetIdentityMatrix());
-		matrix.m_posit.m_y += 0.125f;
-		model->SetTransform(matrix);
-		ndWorld* const world = scene->GetWorld();
-		model->AddToWorld(world);
-
-		ndModelArticulation* const model1 = urdf.Import(fileName);
-		matrix.m_posit.m_x += 0.25f;
-		model1->SetTransform(matrix);
-		model1->AddToWorld(world);
 	}
 }
 
@@ -566,22 +548,22 @@ void ndCartpoleDiscrete(ndDemoEntityManager* const scene)
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.11f;
 
-	BuildUrdfModel(scene);
+	//ExportUrdfModel(scene);
 
 #ifdef ND_TRAIN_AGENT
 	ndSetRandSeed(42);
 	TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix);
 	scene->RegisterPostUpdate(trainer);
 #else
-	//ndWorld* const world = scene->GetWorld();
-	//ndModelArticulation* const model = CreateModel(scene, matrix);
-	//model->AddToWorld(world);
-	//
-	//// add the deep learning controller
-	//char fileName[256];
-	//ndGetWorkingFileName(CONTROLLER_NAME, fileName);
-	//ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
-	//model->SetNotifyCallback(new RobotModelNotify(brain, model));
+	ndWorld* const world = scene->GetWorld();
+	ndModelArticulation* const model = CreateModel(scene, matrix);
+	model->AddToWorld(world);
+	
+	// add the deep learning controller
+	char fileName[256];
+	ndGetWorkingFileName(CONTROLLER_NAME, fileName);
+	ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
+	model->SetNotifyCallback(new RobotModelNotify(brain, model));
 #endif
 	
 	matrix.m_posit.m_y = 0.5f;

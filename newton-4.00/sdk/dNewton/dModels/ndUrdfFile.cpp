@@ -724,7 +724,6 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const Surrogate*
 	}
 	else if (!strcmp(className, "ndShapeCapsule"))
 	{
-		ndAssert(0);
 		ndShapeInfo info(collisionShape->GetShapeInfo());
 	
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("cylinder");
@@ -808,7 +807,6 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const Surroga
 	}
 	else if (!strcmp(className, "ndShapeCapsule"))
 	{
-		ndAssert(0);
 		ndShapeInfo info(collisionShape->GetShapeInfo());
 	
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("cylinder");
@@ -1029,6 +1027,9 @@ void ndUrdfFile::Export(const char* const filePathName, ndModelArticulation* con
 	MakeNamesUnique(model);
 	rootNode->SetAttribute("name", model->GetName().GetStr());
 
+	const ndMatrix rootMatrix(model->GetRoot()->m_body->GetMatrix());
+	model->SetTransform(rootMatrix.OrthoInverse());
+
 	Surrogate* const surrogate = ApplyInvRotation(model);
 	ndAssert(surrogate);
 
@@ -1051,6 +1052,8 @@ void ndUrdfFile::Export(const char* const filePathName, ndModelArticulation* con
 			stack.PushBack(child);
 		}
 	}
+
+	model->SetTransform(rootMatrix);
 	 
 	delete surrogate;
 	doc->SaveFile(filePathName);

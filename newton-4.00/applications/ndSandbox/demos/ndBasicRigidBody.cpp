@@ -117,50 +117,40 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 		}
 	};
 
-
-	//char fileName[256];
-	//ndGetWorkingFileName("r2d2.urdf", fileName);
-	//ndUrdfFile urdf;
-	//ndModelArticulation* const r2d2 = urdf.Import(fileName);
-	//
-	//ndMatrix modelMatrix(ndGetIdentityMatrix());
-	//modelMatrix.m_posit.m_y = 0.5f;
-	//r2d2->SetTransform(modelMatrix);
-	//r2d2->AddToWorld(world);
-	//r2d2->SetNotifyCallback(new R2D2ModelNotify);
-	//SetModelVisualMesh(scene, r2d2);
+	char fileName[256];
+	ndGetWorkingFileName("r2d2.urdf", fileName);
+	ndUrdfFile urdf;
+	ndModelArticulation* const r2d2 = urdf.Import(fileName);
 	
-	////ndModelArticulation* const root = r2d2->GetAsModelArticulation();
-	////for (ndModelArticulation::ndNode* node = root->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-	////{
-	////	ndSharedPtr<ndBody> body(node->m_body);
-	////	ndShapeInstance& instanceShape = body->GetAsBodyDynamic()->GetCollisionShape();
-	////	instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
-	////	instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = r2d2;
-	////}
-	//SetMaterial(r2d2);
+	ndMatrix modelMatrix(ndGetIdentityMatrix());
+	modelMatrix.m_posit.m_y = 0.5f;
+	r2d2->SetTransform(modelMatrix);
+	r2d2->AddToWorld(world);
+	r2d2->SetNotifyCallback(new R2D2ModelNotify);
+	SetModelVisualMesh(scene, r2d2);
+	
+	//ndModelArticulation* const root = r2d2->GetAsModelArticulation();
+	//for (ndModelArticulation::ndNode* node = root->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+	//{
+	//	ndSharedPtr<ndBody> body(node->m_body);
+	//	ndShapeInstance& instanceShape = body->GetAsBodyDynamic()->GetCollisionShape();
+	//	instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+	//	instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = r2d2;
+	//}
+	SetMaterial(r2d2);
 
 #if 1
 	{
 		ndUrdfFile urdf1;
 		char fileName1[256];
-		//ndGetWorkingFileName("r2d2__.urdf", fileName1);
-		ndGetWorkingFileName("r2d2.urdf", fileName1);
-		ndModelArticulation* const src = urdf1.Import(fileName1);
+
+		// export and import file 
+		ndGetWorkingFileName("r2d3.urdf", fileName1);
+		urdf1.Export(fileName1, r2d2);
+		ndModelArticulation* const r2d3 = urdf1.Import(fileName1);
 
 		ndMatrix modelMatrix1(ndGetIdentityMatrix());
 		modelMatrix1.m_posit.m_y = 0.5f;
-
-		ndGetWorkingFileName("r2d3.urdf", fileName1);
-		urdf1.Export(fileName1, src);
-		//delete src;
-		src->SetTransform(modelMatrix1);
-		src->AddToWorld(world);
-		src->SetNotifyCallback(new R2D2ModelNotify);
-		SetModelVisualMesh(scene, src);
-		SetMaterial(src);
-
-		ndModelArticulation* const r2d3 = urdf1.Import(fileName1);
 		modelMatrix1.m_posit.m_z = 1.0f;
 		r2d3->SetTransform(modelMatrix1);
 		r2d3->AddToWorld(world);
@@ -175,7 +165,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 
 	//AddSphere(scene, origin1, 1.0f, 0.5f);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 1, 2, 7);
-	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
+	AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 4, 4, 4);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 2, 2, 7);
 
