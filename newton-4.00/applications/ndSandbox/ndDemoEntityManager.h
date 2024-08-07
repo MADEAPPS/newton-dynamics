@@ -53,9 +53,9 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	enum ndMenuSelection
 	{
 		m_new,
-		m_load,
-		m_save,
-		m_saveModel,
+		//m_load,
+		//m_save,
+		//m_saveModel,
 		m_none,
 	};
 

@@ -1027,20 +1027,20 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			{
 				menuSelection = m_new;
 			}
-			ImGui::Separator();
 
-			if (ImGui::MenuItem("Open", "")) 
-			{
-				menuSelection = m_load;
-			}
-			if (ImGui::MenuItem("Save", "")) 
-			{
-				menuSelection = m_save;
-			}
-			if (ImGui::MenuItem("Save model", ""))
-			{
-				menuSelection = m_saveModel;
-			}
+			//ImGui::Separator();
+			//if (ImGui::MenuItem("Open", "")) 
+			//{
+			//	menuSelection = m_load;
+			//}
+			//if (ImGui::MenuItem("Save", "")) 
+			//{
+			//	menuSelection = m_save;
+			//}
+			//if (ImGui::MenuItem("Save model", ""))
+			//{
+			//	menuSelection = m_saveModel;
+			//}
 
 			ImGui::Separator();
 			if (ImGui::MenuItem("import ply file", "")) 
@@ -1158,42 +1158,42 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			break;
 		}
 
-		case m_load:
-		{
-			m_currentScene = -1;
-			char fileName[1024];
-			if (dGetLoadNdFileName(fileName, 1024))
-			{
-				ndFileFormatLoad fileLoad;
-				fileLoad.Load(fileName);
-				fileLoad.AddToWorld(m_world);
-			}
-			break;
-		}
-
-		case m_save:
-		{
-			m_currentScene = -1;
-			char fileName[1024];
-			if (dGetSaveNdFileName(fileName, 1024))
-			{
-				ndFileFormatSave fileSave;
-				fileSave.SaveWorld(m_world, fileName);
-			}
-			break;
-		}
-
-		case m_saveModel:
-		{
-			m_currentScene = -1;
-			char fileName[1024];
-			if (dGetSaveNdFileName(fileName, 1024))
-			{
-				ndAssert(0);
-				//m_world->SaveSceneModel(fileName);
-			}
-			break;
-		}
+		//case m_load:
+		//{
+		//	m_currentScene = -1;
+		//	char fileName[1024];
+		//	if (dGetLoadNdFileName(fileName, 1024))
+		//	{
+		//		ndFileFormatLoad fileLoad;
+		//		fileLoad.Load(fileName);
+		//		fileLoad.AddToWorld(m_world);
+		//	}
+		//	break;
+		//}
+		//
+		//case m_save:
+		//{
+		//	m_currentScene = -1;
+		//	char fileName[1024];
+		//	if (dGetSaveNdFileName(fileName, 1024))
+		//	{
+		//		ndFileFormatSave fileSave;
+		//		fileSave.SaveWorld(m_world, fileName);
+		//	}
+		//	break;
+		//}
+		//
+		//case m_saveModel:
+		//{
+		//	m_currentScene = -1;
+		//	char fileName[1024];
+		//	if (dGetSaveNdFileName(fileName, 1024))
+		//	{
+		//		ndAssert(0);
+		//		//m_world->SaveSceneModel(fileName);
+		//	}
+		//	break;
+		//}
 
 		case m_none:
 		default:

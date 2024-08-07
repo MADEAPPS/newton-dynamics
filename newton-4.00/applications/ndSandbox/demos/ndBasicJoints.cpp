@@ -26,28 +26,6 @@ class ndSplinePathBody : public ndBodyDynamic
 	public:
 	D_CLASS_REFLECTION(ndSplinePathBody, ndBodyDynamic)
 
-	class ndSplinePathBodySaveLoad : public ndFileFormatBodyDynamic
-	{
-		public:
-		ndSplinePathBodySaveLoad()
-			:ndFileFormatBodyDynamic(ndSplinePathBody::StaticClassName())
-		{
-		}
-
-		void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
-		{
-			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_BODY_CLASS, ndSplinePathBody::StaticClassName());
-			ndFileFormatBodyDynamic::SaveBody(scene, classNode, body);
-		}
-
-		virtual ndBody* LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap)
-		{
-			ndSplinePathBody* const body = new ndSplinePathBody();
-			ndFileFormatBodyDynamic::LoadBody((nd::TiXmlElement*)node->FirstChild(D_BODY_CLASS), shapeMap, body);
-			return body;
-		}
-	};
-
 	ndSplinePathBody()
 		:ndBodyDynamic()
 	{
@@ -56,7 +34,6 @@ class ndSplinePathBody : public ndBodyDynamic
 	ndSplinePathBody(ndDemoEntityManager* const scene, ndMatrix& matrix)
 		:ndBodyDynamic()
 	{
-		static ndSplinePathBodySaveLoad loadSave;
 		// create a Bezier Spline path for AI car to drive
 		ndShapeInstance box(new ndShapeBox(1.0f, 1.0f, 1.0f));
 		
@@ -100,28 +77,6 @@ class ndJointFollowSplinePath : public ndJointFollowPath
 {
 	public:
 	D_CLASS_REFLECTION(ndJointFollowSplinePath, ndJointFollowPath)
-
-	class ndJointFollowSplinePathSaveLoad : public ndFileFormatJointFollowPath
-	{
-		public:
-		ndJointFollowSplinePathSaveLoad()
-			:ndFileFormatJointFollowPath(ndJointFollowSplinePath::StaticClassName())
-		{
-		}
-
-		void SaveJoint(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndJointBilateralConstraint* const joint)
-		{
-			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_JOINT_CLASS, ndJointFollowSplinePath::StaticClassName());
-			ndFileFormatJointFollowPath::SaveJoint(scene, classNode, joint);
-		}
-
-		ndJointBilateralConstraint* LoadJoint(const nd::TiXmlElement* const node, const ndTree<ndSharedPtr<ndBody>, ndInt32>& bodyMap)
-		{
-			ndJointFollowSplinePath* const joint = new ndJointFollowSplinePath();
-			ndFileFormatJointFollowPath::LoadJoint((nd::TiXmlElement*)node->FirstChild(D_JOINT_CLASS), bodyMap, joint);
-			return joint;
-		}
-	};
 
 	ndJointFollowSplinePath()
 		:ndJointFollowPath()

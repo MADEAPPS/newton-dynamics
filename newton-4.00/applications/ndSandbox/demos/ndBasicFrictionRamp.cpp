@@ -160,10 +160,6 @@ void ndBasicFrictionRamp (ndDemoEntityManager* const scene)
 
 	//ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 
-	
-	ndFileFormatSave xxxx;
-	xxxx.SaveBodies(scene->GetWorld(), "xxxx.nd");
-
 	ndMatrix camMatrix(ndRollMatrix(10.0f * ndDegreeToRad) *  ndYawMatrix(20.0f * ndDegreeToRad));
 	ndQuaternion rot(camMatrix);
 	ndVector origin(-40.0f, 10.0f, 15.0f, 1.0f);
