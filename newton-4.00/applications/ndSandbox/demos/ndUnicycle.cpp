@@ -532,6 +532,8 @@ namespace ndUnicycle
 				SetMaterial(model);
 				m_models.Append(model);
 			}
+
+			scene->SetAcceleratedUpdate();
 		}
 
 		~TrainingUpdata()
