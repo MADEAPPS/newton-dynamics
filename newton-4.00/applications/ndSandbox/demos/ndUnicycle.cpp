@@ -514,6 +514,10 @@ namespace ndUnicycle
 			ndModelArticulation* const visualModel = CreateModel(scene, matrix);
 			visualModel->AddToWorld(world);
 
+			ndBodyKinematic* const rootBody = visualModel->GetRoot()->m_body->GetAsBodyKinematic();
+			ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
+			world->AddJoint(fixJoint);
+
 			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel));
 			SetMaterial(visualModel);
 			
@@ -527,6 +531,12 @@ namespace ndUnicycle
 			 
 				ndModelArticulation* const model = CreateModel(scene, location);
 				model->AddToWorld(world);
+
+				ndBodyKinematic* const body = visualModel->GetRoot()->m_body->GetAsBodyKinematic();
+				ndSharedPtr<ndJointBilateralConstraint> planeJoint(new ndJointPlane(body->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), body, world->GetSentinelBody()));
+				world->AddJoint(planeJoint);
+
+
 				model->SetNotifyCallback(new RobotModelNotify(m_master, model));
 				//HideModel(model);
 				SetMaterial(model);
