@@ -23,7 +23,7 @@
 
 namespace ndCarpole_1
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"cartpoleContinueVPG.dnn"
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
@@ -42,19 +42,65 @@ namespace ndCarpole_1
 		m_stateSize
 	};
 
+	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	{
+		ndUrdfFile urdf;
+		char fileName[256];
+		ndGetWorkingFileName("cartpole.urdf", fileName);
+		ndModelArticulation* const cartPole = urdf.Import(fileName);
+
+		SetModelVisualMesh(scene, cartPole);
+		cartPole->SetTransform(location);
+
+		// make the car move along the z axis only (2d problem)
+		ndWorld* const world = scene->GetWorld();
+		ndBodyKinematic* const boxBody = cartPole->GetRoot()->m_body->GetAsBodyKinematic();
+		ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(boxBody->GetMatrix(), boxBody, world->GetSentinelBody()));
+		world->AddJoint(xDirSlider);
+
+		return cartPole;
+	}
+
 	class RobotModelNotify : public ndModelNotify
 	{
-		#ifdef ND_TRAIN_AGENT
-		class ndController : public ndBrainAgentContinuePolicyGradient_Trainer
+		class ndController : public ndBrainAgentContinuePolicyGradient
 		{
 			public:
-			ndController(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
-				:ndBrainAgentContinuePolicyGradient_Trainer(master)
+			ndController(const ndSharedPtr<ndBrain>& brain)
+				:ndBrainAgentContinuePolicyGradient(brain)
 				,m_robot(nullptr)
 			{
 			}
 
 			ndController(const ndController& src)
+				:ndBrainAgentContinuePolicyGradient(src.m_actor)
+				,m_robot(nullptr)
+			{
+			}
+
+			void GetObservation(ndBrainFloat* const observation)
+			{
+				m_robot->GetObservation(observation);
+			}
+
+			virtual void ApplyActions(ndBrainFloat* const actions)
+			{
+				m_robot->ApplyActions(actions);
+			}
+
+			RobotModelNotify* m_robot;
+		};
+
+		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
+		{
+			public:
+			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
+				:ndBrainAgentContinuePolicyGradient_Trainer(master)
+				,m_robot(nullptr)
+			{
+			}
+
+			ndControllerTrainer(const ndControllerTrainer& src)
 				:ndBrainAgentContinuePolicyGradient_Trainer(src.m_master)
 				,m_robot(nullptr)
 			{
@@ -88,197 +134,159 @@ namespace ndCarpole_1
 			RobotModelNotify* m_robot;
 		};
 
-	#else
+		public:
 
-		class ndController : public ndBrainAgentContinuePolicyGradient
+		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
+			:ndModelNotify()
+			,m_controller(nullptr)
+			,m_controllerTrainer(nullptr)
 		{
-			public:
-			ndController(const ndSharedPtr<ndBrain>& brain)
-				:ndBrainAgentContinuePolicyGradient(brain)
-				,m_robot(nullptr)
-			{
-			}
-
-			ndController(const ndController& src)
-				:ndBrainAgentContinuePolicyGradient(src.m_actor)
-				, m_robot(nullptr)
-			{
-			}
-
-			void GetObservation(ndBrainFloat* const observation)
-			{
-				m_robot->GetObservation(observation);
-			}
-
-			virtual void ApplyActions(ndBrainFloat* const actions)
-			{
-				m_robot->ApplyActions(actions);
-			}
-
-			RobotModelNotify* m_robot;
-		};
-	#endif
-
-	public:
-	#ifdef ND_TRAIN_AGENT
-	RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
-		:ndModelNotify()
-		,m_controller(master)
-	{
-		Init(robot);
-	}
-
-	RobotModelNotify(const RobotModelNotify& src)
-		:ndModelNotify(src)
-		, m_controller(src.m_controller)
-	{
-		//Init(robot);
-	}
-
-	#else
-
-	RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const robot)
-		:ndModelNotify()
-		,m_controller(brain)
-	{
-		Init(robot);
-	}
-
-	RobotModelNotify(const RobotModelNotify& src)
-		:ndModelNotify(src)
-		,m_controller(src.m_controller)
-	{
-		//Init(robot);
-		ndAssert(0);
-	}
-	#endif
-
-	~RobotModelNotify()
-	{
-	}
-
-	ndModelNotify* Clone() const
-	{
-		return new RobotModelNotify(*this);
-	}
-
-	void Init(ndModelArticulation* const robot)
-	{
-		m_controller.m_robot = this;
-		m_cart = robot->GetRoot()->m_body->GetAsBodyDynamic();
-		m_pole = robot->GetRoot()->GetLastChild()->m_body->GetAsBodyDynamic();
-		m_poleJoint = *robot->GetRoot()->GetLastChild()->m_joint;
-
-		m_cartMatrix = m_cart->GetMatrix();
-		m_poleMatrix = m_pole->GetMatrix();
-	}
-
-	ndFloat32 GetPoleAngle() const
-	{
-		const ndMatrix& matrix = m_poleJoint->GetLocalMatrix0() * m_pole->GetMatrix();
-		//ndFloat32 angle = ndAsin(matrix.m_right.m_x);
-		ndFloat32 angle = ndAsin(matrix.m_up.m_x);
-		return angle;
-	}
-
-	bool IsTerminal() const
-	{
-		// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
-		bool fail = ndAbs(GetPoleAngle()) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
-		return fail;
-	}
-
-	ndReal GetReward() const
-	{
-		if (IsTerminal())
-		{
-			return ndReal(0.0f);
+			m_controllerTrainer = new ndControllerTrainer(master);
+			m_controllerTrainer->m_robot = this;
+			Init(robot);
 		}
-		ndFloat32 sinAngle = GetPoleAngle();
-		ndFloat32 reward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
-		return ndReal(reward);
-	}
 
-	void GetObservation(ndBrainFloat* const state)
-	{
-		ndVector omega(m_pole->GetOmega());
-		ndFloat32 angle = GetPoleAngle();
-		state[m_poleAngle] = ndReal(angle);
-		state[m_poleOmega] = ndReal(omega.m_z);
-	}
+		RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const robot)
+			:ndModelNotify()
+			,m_controller(nullptr)
+			,m_controllerTrainer(nullptr)
+		{
+			m_controller = new ndController(brain);
+			m_controller->m_robot = this;
+			Init(robot);
+		}
 
-	void ApplyActions(ndBrainFloat* const actions)
-	{
-		ndVector force(m_cart->GetForce());
-		ndBrainFloat action = actions[0];
-		force.m_x = ndFloat32(ndBrainFloat(2.0f) * action * (m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL));
-		m_cart->SetForce(force);
-	}
+		RobotModelNotify(const RobotModelNotify& src)
+			:ndModelNotify(src)
+			,m_controller(src.m_controller)
+		{
+			//Init(robot);
+			ndAssert(0);
+		}
 
-	void ResetModel()
-	{
-		m_cart->SetMatrix(m_cartMatrix);
-		m_pole->SetMatrix(m_poleMatrix);
+		~RobotModelNotify()
+		{
+			if (m_controller)
+			{
+				delete m_controller;
+			}
 
-		m_pole->SetOmega(ndVector::m_zero);
-		m_pole->SetVelocity(ndVector::m_zero);
+			if (m_controllerTrainer)
+			{
+				delete m_controllerTrainer;
+			}
+		}
 
-		m_cart->SetOmega(ndVector::m_zero);
-		m_cart->SetVelocity(ndVector::m_zero);
-	}
+		ndModelNotify* Clone() const
+		{
+			return new RobotModelNotify(*this);
+		}
 
-	void RandomePush()
-	{
-		ndVector impulsePush(ndVector::m_zero);
-		ndFloat32 randValue = ndClamp(ndGaussianRandom(0.0f, 0.5f), ndFloat32 (-1.0f), ndFloat32(1.0f));
-		impulsePush.m_x = 5.0f * randValue * m_cart->GetMassMatrix().m_w;
-		m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, m_cart->GetScene()->GetTimestep());
-	}
+		void Init(ndModelArticulation* const robot)
+		{
+			m_cart = robot->GetRoot()->m_body->GetAsBodyDynamic();
+			m_pole = robot->GetRoot()->GetLastChild()->m_body->GetAsBodyDynamic();
+			m_poleJoint = *robot->GetRoot()->GetLastChild()->m_joint;
 
-	bool IsOutOfBounds() const
-	{
-		return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
-	}
+			m_cartMatrix = m_cart->GetMatrix();
+			m_poleMatrix = m_pole->GetMatrix();
+		}
 
-	void Update(ndWorld* const, ndFloat32)
-	{
-		m_controller.Step();
-	}
+		ndFloat32 GetPoleAngle() const
+		{
+			const ndMatrix& matrix = m_poleJoint->GetLocalMatrix0() * m_pole->GetMatrix();
+			//ndFloat32 angle = ndAsin(matrix.m_right.m_x);
+			ndFloat32 angle = ndAsin(matrix.m_up.m_x);
+			return angle;
+		}
 
-	void PostUpdate(ndWorld* const, ndFloat32)
-	{
-	}
+		bool IsTerminal() const
+		{
+			// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
+			bool fail = ndAbs(GetPoleAngle()) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
+			return fail;
+		}
 
-	void PostTransformUpdate(ndWorld* const, ndFloat32)
-	{
-	}
+		ndReal GetReward() const
+		{
+			if (IsTerminal())
+			{
+				return ndReal(0.0f);
+			}
+			ndFloat32 sinAngle = GetPoleAngle();
+			ndFloat32 reward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
+			return ndReal(reward);
+		}
 
-	ndMatrix m_cartMatrix;
-	ndMatrix m_poleMatrix;
-	ndController m_controller;
-	ndBodyDynamic* m_cart;
-	ndBodyDynamic* m_pole;
-	ndJointBilateralConstraint* m_poleJoint;
+		void GetObservation(ndBrainFloat* const state)
+		{
+			ndVector omega(m_pole->GetOmega());
+			ndFloat32 angle = GetPoleAngle();
+			state[m_poleAngle] = ndReal(angle);
+			state[m_poleOmega] = ndReal(omega.m_z);
+		}
+
+		void ApplyActions(ndBrainFloat* const actions)
+		{
+			ndVector force(m_cart->GetForce());
+			ndBrainFloat action = actions[0];
+			force.m_x = ndFloat32(ndBrainFloat(2.0f) * action * (m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL));
+			m_cart->SetForce(force);
+		}
+
+		void ResetModel()
+		{
+			m_cart->SetMatrix(m_cartMatrix);
+			m_pole->SetMatrix(m_poleMatrix);
+
+			m_pole->SetOmega(ndVector::m_zero);
+			m_pole->SetVelocity(ndVector::m_zero);
+
+			m_cart->SetOmega(ndVector::m_zero);
+			m_cart->SetVelocity(ndVector::m_zero);
+		}
+
+		void RandomePush()
+		{
+			ndVector impulsePush(ndVector::m_zero);
+			ndFloat32 randValue = ndClamp(ndGaussianRandom(0.0f, 0.5f), ndFloat32 (-1.0f), ndFloat32(1.0f));
+			impulsePush.m_x = 5.0f * randValue * m_cart->GetMassMatrix().m_w;
+			m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, m_cart->GetScene()->GetTimestep());
+		}
+
+		bool IsOutOfBounds() const
+		{
+			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
+		}
+
+		void Update(ndWorld* const, ndFloat32)
+		{
+			if (m_controllerTrainer)
+			{
+				m_controllerTrainer->Step();
+			}
+			else
+			{
+				m_controller->Step();
+			}
+		}
+
+		void PostUpdate(ndWorld* const, ndFloat32)
+		{
+		}
+
+		void PostTransformUpdate(ndWorld* const, ndFloat32)
+		{
+		}
+
+		ndMatrix m_cartMatrix;
+		ndMatrix m_poleMatrix;
+		ndController* m_controller;
+		ndControllerTrainer* m_controllerTrainer;
+		ndBodyDynamic* m_cart;
+		ndBodyDynamic* m_pole;
+		ndJointBilateralConstraint* m_poleJoint;
 	};
-
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
-	{
-		ndUrdfFile urdf;
-		char fileName[256];
-		ndGetWorkingFileName("cartpole.urdf", fileName);
-		ndModelArticulation* const cartPole = urdf.Import(fileName);
-
-		SetModelVisualMesh(scene, cartPole);
-		cartPole->SetTransform(location);
-
-		// make the car move along the z axis only (2d problem)
-		ndWorld* const world = scene->GetWorld();
-		ndBodyKinematic* const boxBody = cartPole->GetRoot()->m_body->GetAsBodyKinematic();
-		ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(boxBody->GetMatrix(), boxBody, world->GetSentinelBody()));
-		world->AddJoint(xDirSlider);
-
-		return cartPole;
-	}
 
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
 	{

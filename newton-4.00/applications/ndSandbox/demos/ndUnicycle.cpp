@@ -48,29 +48,6 @@ namespace ndUnicycle
 		m_stateSize
 	};
 
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
-	{
-		ndUrdfFile urdf;
-		char fileName[256];
-		ndGetWorkingFileName("unicycle.urdf", fileName);
-		ndModelArticulation* const unicycle = urdf.Import(fileName);
-
-		SetModelVisualMesh(scene, unicycle);
-		unicycle->SetTransform(location);
-
-		ndModelArticulation::ndNode* const wheel = unicycle->FindByName("node_0_link");
-		ndAssert(wheel);
-		ndJointHinge* const wheelHinge = (ndJointHinge*)*wheel->m_joint;
-		wheelHinge->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
-
-		ndModelArticulation::ndNode* const pole = unicycle->FindByName("node_1_link");
-		ndAssert(pole);
-		ndJointHinge* const poleHinge = (ndJointHinge*)*pole->m_joint;
-		poleHinge->SetAsSpringDamper(0.02f, 1500, 40.0f);
-
-		return unicycle;
-	}
-
 	void ExportUrdfModel(ndDemoEntityManager* const scene)
 	{
 		ndFloat32 mass = 20.0f;
@@ -123,6 +100,29 @@ namespace ndUnicycle
 		urdf.Export(fileName, *model);
 	}
 
+	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	{
+		ndUrdfFile urdf;
+		char fileName[256];
+		ndGetWorkingFileName("unicycle.urdf", fileName);
+		ndModelArticulation* const unicycle = urdf.Import(fileName);
+
+		SetModelVisualMesh(scene, unicycle);
+		unicycle->SetTransform(location);
+
+		ndModelArticulation::ndNode* const wheel = unicycle->FindByName("node_0_link");
+		ndAssert(wheel);
+		ndJointHinge* const wheelHinge = (ndJointHinge*)*wheel->m_joint;
+		wheelHinge->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
+
+		ndModelArticulation::ndNode* const pole = unicycle->FindByName("node_1_link");
+		ndAssert(pole);
+		ndJointHinge* const poleHinge = (ndJointHinge*)*pole->m_joint;
+		poleHinge->SetAsSpringDamper(0.02f, 1500, 40.0f);
+
+		return unicycle;
+	}
+
 	class ndBasePose
 	{
 		public:
@@ -133,10 +133,10 @@ namespace ndUnicycle
 
 		ndBasePose(ndBodyDynamic* const body)
 			:m_veloc(body->GetVelocity())
-			, m_omega(body->GetOmega())
-			, m_posit(body->GetPosition())
-			, m_rotation(body->GetRotation())
-			, m_body(body)
+			,m_omega(body->GetOmega())
+			,m_posit(body->GetPosition())
+			,m_rotation(body->GetRotation())
+			,m_body(body)
 		{
 		}
 
@@ -178,10 +178,10 @@ namespace ndUnicycle
 			RobotModelNotify* m_robot;
 		};
 
-		class ndController_Trainer : public ndBrainAgentContinuePolicyGradient_Trainer
+		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
 		{
 			public:
-			ndController_Trainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
+			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 				:ndBrainAgentContinuePolicyGradient_Trainer(master)
 				,m_robot(nullptr)
 			{
@@ -222,7 +222,7 @@ namespace ndUnicycle
 			,m_controllerTrainer(nullptr)
 		{
 			m_timestep = 0.0f;
-			m_controllerTrainer = new ndController_Trainer(master);
+			m_controllerTrainer = new ndControllerTrainer(master);
 			m_controllerTrainer->m_robot = this;
 			Init(robot);
 		}
@@ -236,6 +236,13 @@ namespace ndUnicycle
 			m_controller = new ndController(brain);
 			m_controller->m_robot = this;
 			Init(model);
+		}
+
+		RobotModelNotify(const RobotModelNotify& src)
+			:ndModelNotify(src)
+		{
+			//Init(robot);
+			ndAssert(0);
 		}
 
 		~RobotModelNotify()
@@ -470,7 +477,7 @@ namespace ndUnicycle
 		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
 
 		ndController* m_controller;
-		ndController_Trainer* m_controllerTrainer;
+		ndControllerTrainer* m_controllerTrainer;
 		ndJointHinge* m_legJoint;
 		ndJointHinge* m_wheelJoint;
 		ndBodyKinematic* m_wheel;
@@ -515,8 +522,8 @@ namespace ndUnicycle
 			visualModel->AddToWorld(world);
 
 			ndBodyKinematic* const rootBody = visualModel->GetRoot()->m_body->GetAsBodyKinematic();
-			ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
-			world->AddJoint(fixJoint);
+			ndSharedPtr<ndJointBilateralConstraint> visualPlaneJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
+			world->AddJoint(visualPlaneJoint);
 
 			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel));
 			SetMaterial(visualModel);
@@ -532,10 +539,9 @@ namespace ndUnicycle
 				ndModelArticulation* const model = CreateModel(scene, location);
 				model->AddToWorld(world);
 
-				ndBodyKinematic* const body = visualModel->GetRoot()->m_body->GetAsBodyKinematic();
+				ndBodyKinematic* const body = model->GetRoot()->m_body->GetAsBodyKinematic();
 				ndSharedPtr<ndJointBilateralConstraint> planeJoint(new ndJointPlane(body->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), body, world->GetSentinelBody()));
 				world->AddJoint(planeJoint);
-
 
 				model->SetNotifyCallback(new RobotModelNotify(m_master, model));
 				//HideModel(model);
