@@ -168,9 +168,6 @@ static ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndSha
 	kinBody->SetMatrix(matrix);
 	kinBody->SetCollisionShape(shape);
 	kinBody->SetMassMatrix(mass, shape);
-
-	//world->AddBody(body);
-	//scene->AddEntity(entity);
 	return kinBody;
 }
 

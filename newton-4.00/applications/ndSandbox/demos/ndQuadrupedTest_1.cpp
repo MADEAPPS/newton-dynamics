@@ -1224,15 +1224,13 @@ namespace ndQuadruped_1
 
 		ndRobot* const model = new ndRobot(agent);
 
-		ndPhysicsWorld* const world = scene->GetWorld();
+		//ndPhysicsWorld* const world = scene->GetWorld();
 		ndVector floor(matrixLocation.m_posit);
-		ndSharedPtr<ndBody> torso(world->GetBody(AddSphere(scene, matrixLocation, mass, radius, "smilli.png")));
-		//ndBodyKinematic* const torso = CreateSphere(scene, matrixLocation, mass, radius, "smilli.png");
+		//ndSharedPtr<ndBody> torso(world->GetBody(AddSphere(scene, matrixLocation, mass, radius, "smilli.png")));
+		ndBodyKinematic* const torso = CreateSphere(scene, matrixLocation, mass, radius, "smilli.png");
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(torso);
-
 		ndMatrix location(matrixLocation);
 		location.m_posit.m_y = floor.m_y + 0.5f;
-		//location.m_posit.m_y += 1.5f;
 		torso->SetMatrix(location);
 
 		ndDemoEntity* const entity = (ndDemoEntity*)torso->GetNotifyCallback()->GetUserData();
@@ -1277,9 +1275,11 @@ namespace ndQuadruped_1
 			{
 				ndMatrix bodyMatrix(limbPivotLocation);
 				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
-				ndSharedPtr<ndBody> thigh(world->GetBody(AddCapsule(scene, bodyMatrix, limbMass, limbRadios, limbRadios, limbLength)));
+				//ndSharedPtr<ndBody> thigh(world->GetBody(AddCapsule(scene, bodyMatrix, limbMass, limbRadios, limbRadios, limbLength)));
+				ndBodyKinematic* const thigh = CreateCapsule(scene, bodyMatrix, limbMass, limbRadios, limbRadios, limbLength);
 				thigh->SetMatrix(bodyMatrix);
-				ndSharedPtr<ndJointBilateralConstraint> ballJoint(new ndIkJointSpherical(limbPivotLocation, thigh->GetAsBodyKinematic(), torso->GetAsBodyKinematic()));
+				//ndSharedPtr<ndJointBilateralConstraint> ballJoint(new ndIkJointSpherical(limbPivotLocation, thigh->GetAsBodyKinematic(), torso->GetAsBodyKinematic()));
+				ndJointBilateralConstraint* const ballJoint = new ndIkJointSpherical(limbPivotLocation, thigh, torso);
 				thighNode = model->AddLimb(modelRoot, thigh, ballJoint);
 
 				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
@@ -1294,7 +1294,8 @@ namespace ndQuadruped_1
 
 				ndMatrix bodyMatrix(limbPivotLocation);
 				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
-				ndSharedPtr<ndBody> calf0(world->GetBody(AddCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, limbLength)));
+				//ndSharedPtr<ndBody> calf0(world->GetBody(AddCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, limbLength)));
+				ndBodyKinematic* const calf0 = CreateCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, limbLength);
 				calf0->SetMatrix(bodyMatrix);
 
 				ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
@@ -1303,13 +1304,14 @@ namespace ndQuadruped_1
 				caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
 				caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
 				caffPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
-				ndSharedPtr<ndJointBilateralConstraint> hingeJoint(new ndIkJointHinge(caffPinAndPivotFrame, calf0->GetAsBodyKinematic(), thighNode->m_body->GetAsBodyKinematic()));
+				//ndSharedPtr<ndJointBilateralConstraint> hingeJoint(new ndIkJointHinge(caffPinAndPivotFrame, calf0->GetAsBodyKinematic(), thighNode->m_body->GetAsBodyKinematic()));
+				ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0->GetAsBodyKinematic(), thighNode->m_body->GetAsBodyKinematic());
 
 				// add joint limit to prevent knee from flipping
-				ndIkJointHinge* const hinge = (ndIkJointHinge*)*hingeJoint;
+				//ndIkJointHinge* const hinge = (ndIkJointHinge*)*hingeJoint;
 				hinge->SetLimitState(true);
 				hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
-				calfNode = model->AddLimb(thighNode, calf0, hingeJoint);
+				calfNode = model->AddLimb(thighNode, calf0, hinge);
 
 				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
 				workSpace += limbLength;
@@ -1323,7 +1325,8 @@ namespace ndQuadruped_1
 				ndMatrix bodyMatrix(limbPivotLocation);
 				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(lenght * 0.5f);
 
-				ndSharedPtr<ndBody> foot(world->GetBody(AddCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, lenght)));
+				//ndSharedPtr<ndBody> foot(world->GetBody(AddCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, lenght)));
+				ndBodyKinematic* const foot = CreateCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, lenght);
 				foot->SetMatrix(bodyMatrix);
 
 				// set a Material with zero restitution for the feet
@@ -1341,7 +1344,7 @@ namespace ndQuadruped_1
 				//footHinge->SetLimitState(true);
 				//footHinge->SetLimits(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
 				footHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
-				footNode = model->AddLimb(calfNode, foot, ndSharedPtr<ndJointBilateralConstraint>(footHinge));
+				footNode = model->AddLimb(calfNode, foot, footHinge);
 
 				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(lenght);
 				workSpace += lenght;
@@ -1414,9 +1417,13 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		scene->RegisterPostUpdate(trainer);
 	#else
 		ndWorld* const world = scene->GetWorld();
-		ndSharedPtr<ndModel> model1(CreateModel(scene, matrix, BuildAgent()));
-		world->AddModel(model1);
-		((ndRobot*)(*model1))->m_showDebug = true;
+		//ndSharedPtr<ndModel> model1(CreateModel(scene, matrix, BuildAgent()));
+		ndModelArticulation* const model1 = CreateModel(scene, matrix, BuildAgent());
+		//world->AddModel(model1);
+		model1->AddToWorld(world);
+		//SetModelVisualMesh(scene, model1);
+		//((ndRobot*)(*model1))->m_showDebug = true;
+		((ndRobot*)model1)->m_showDebug = true;
 
 		ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model1));
 		scene->Set2DDisplayRenderFunction(quadrupedUI);
@@ -1449,8 +1456,4 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z += 0.25f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
-
-	//ndFileFormatSave xxxx;
-	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
-
 }
