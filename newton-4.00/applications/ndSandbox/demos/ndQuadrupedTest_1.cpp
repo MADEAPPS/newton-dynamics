@@ -61,6 +61,107 @@ namespace ndQuadruped_1
 	#define D_MODEL_DEAD_ANGLE		ndReal(0.2f)
 	#define D_MIN_TRAIN_ANIM_SPEED	ndReal(0.1f)
 
+	void ExportUrdfModel(ndDemoEntityManager* const scene)
+	{
+		ndFloat32 mass = 20.0f;
+		ndFloat32 radius = 0.25f;
+		ndFloat32 limbMass = 0.25f;
+		ndFloat32 limbLength = 0.3f;
+		ndFloat32 limbRadios = 0.05f;
+
+		ndSharedPtr<ndModelArticulation> model(new ndModelArticulation);
+
+		ndBodyKinematic* const torso = CreateSphere(scene, ndGetIdentityMatrix(), mass, radius, "smilli.png");
+		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(torso);
+		ndMatrix location(ndGetIdentityMatrix());
+		torso->SetMatrix(location);
+
+		ndMatrix matrix(ndRollMatrix(45.0f * ndDegreeToRad));
+		matrix.m_posit.m_x = radius * 0.9f;
+		matrix.m_posit.m_y = -radius * 0.5f;
+
+		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
+
+		//for (ndInt32 i = 0; i < 4; ++i)
+		for (ndInt32 i = 0; i < 0; ++i)
+		{
+			ndMatrix limbPivotLocation(matrix * ndYawMatrix(angles[i] * ndDegreeToRad));
+			limbPivotLocation.m_posit += torso->GetMatrix().m_posit;
+			limbPivotLocation.m_posit.m_w = 1.0f;
+
+			// add leg thigh
+			const ndVector thighPivot(limbPivotLocation.m_posit);
+
+			//ndFloat32 workSpace = 0.0f;
+			ndModelArticulation::ndNode* thighNode = nullptr;
+			{
+				ndMatrix bodyMatrix(limbPivotLocation);
+				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
+				ndBodyKinematic* const thigh = CreateCapsule(scene, bodyMatrix, limbMass, limbRadios, limbRadios, limbLength);
+				thigh->SetMatrix(bodyMatrix);
+				ndJointBilateralConstraint* const ballJoint = new ndIkJointSpherical(limbPivotLocation, thigh, torso);
+				thighNode = model->AddLimb(modelRoot, thigh, ballJoint);
+				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
+				//workSpace += limbLength;
+			}
+
+			// add calf0
+			ndModelArticulation::ndNode* calfNode = nullptr;
+			{
+				limbPivotLocation = ndRollMatrix(-90.0f * ndDegreeToRad) * limbPivotLocation;
+
+				ndMatrix bodyMatrix(limbPivotLocation);
+				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
+				ndBodyKinematic* const calf0 = CreateCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, limbLength);
+				calf0->SetMatrix(bodyMatrix);
+
+				ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
+				ndFloat32 sign = angles[i] > 180.0f ? -1.0f : 1.0f;
+				caffPinAndPivotFrame.m_front = limbPivotLocation.m_right.Scale(sign);
+				caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
+				caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
+				caffPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
+				ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0->GetAsBodyKinematic(), thighNode->m_body->GetAsBodyKinematic());
+
+				hinge->SetLimitState(true);
+				hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
+				calfNode = model->AddLimb(thighNode, calf0, hinge);
+
+				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
+			}
+
+			// add calf1
+			ndModelArticulation::ndNode* footNode = nullptr;
+			{
+				ndFloat32 lenght = limbLength * 0.5f;
+				limbPivotLocation = ndRollMatrix(-45.0f * ndDegreeToRad) * limbPivotLocation;
+				ndMatrix bodyMatrix(limbPivotLocation);
+				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(lenght * 0.5f);
+
+				ndBodyKinematic* const foot = CreateCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, lenght);
+				foot->SetMatrix(bodyMatrix);
+
+				ndMatrix footPinAndPivotFrame(ndGetIdentityMatrix());
+				footPinAndPivotFrame.m_front = limbPivotLocation.m_right;
+				footPinAndPivotFrame.m_up = limbPivotLocation.m_front.Scale(-1.0f);
+				footPinAndPivotFrame.m_right = footPinAndPivotFrame.m_front.CrossProduct(footPinAndPivotFrame.m_up);
+				footPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
+
+				// add joint limit to prevent knee from flipping
+				ndJointHinge* const footHinge = new ndJointHinge(footPinAndPivotFrame, foot->GetAsBodyKinematic(), calfNode->m_body->GetAsBodyKinematic());
+				footHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
+				footNode = model->AddLimb(calfNode, foot, footHinge);
+
+				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(lenght);
+			}
+		}
+
+		ndUrdfFile urdf;
+		char fileName[256];
+		ndGetWorkingFileName("quadSpider.urdf", fileName);
+		urdf.Export(fileName, *model);
+	}
+
 	class ndRobot : public ndModelArticulation
 	{
 		public:
@@ -1400,6 +1501,8 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildFlatPlane(scene, true);
 
+	ExportUrdfModel(scene);
+
 	// register a zero restitution and high friction material for the feet
 	ndApplicationMaterial material;
 	material.m_restitution = 0.0f;
@@ -1425,11 +1528,22 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		//((ndRobot*)(*model1))->m_showDebug = true;
 		((ndRobot*)model1)->m_showDebug = true;
 
-		ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model1));
-		scene->Set2DDisplayRenderFunction(quadrupedUI);
+		//ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model1));
+		//scene->Set2DDisplayRenderFunction(quadrupedUI);
 
-		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model1->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model1->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
+		//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model1->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model1->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
 		//world->AddJoint(fixJoint);
+
+		ndUrdfFile urdf;
+		char fileName[256];
+		ndMatrix testLocation(model1->GetRoot()->m_body->GetMatrix());
+		testLocation.m_posit.m_z += 1.0f;
+		ndGetWorkingFileName("quadSpider.urdf", fileName);
+		ndModelArticulation* const quadruped = urdf.Import(fileName);
+		SetModelVisualMesh(scene, quadruped);
+		quadruped->SetTransform(testLocation);
+		quadruped->AddToWorld(world);
+
 
 		ndInt32 countZ = 5;
 		ndInt32 countX = 5;
