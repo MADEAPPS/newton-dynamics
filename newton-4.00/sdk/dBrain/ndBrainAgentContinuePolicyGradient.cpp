@@ -30,6 +30,12 @@ ndBrainAgentContinuePolicyGradient::ndBrainAgentContinuePolicyGradient(const ndS
 {
 }
 
+ndBrainAgentContinuePolicyGradient::ndBrainAgentContinuePolicyGradient(const ndBrainAgentContinuePolicyGradient& src)
+	:ndBrainAgent(src)
+	,m_actor(src.m_actor)
+{
+}
+
 ndBrainAgentContinuePolicyGradient::~ndBrainAgentContinuePolicyGradient()
 {
 }

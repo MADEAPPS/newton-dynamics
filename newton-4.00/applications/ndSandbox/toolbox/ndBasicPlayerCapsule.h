@@ -41,18 +41,6 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 		bool m_jump;
 	};
 
-	class ndFileBasicPlayerCapsule : public ndFileFormatBodyKinematicPlayerCapsule
-	{
-		public:
-		ndFileBasicPlayerCapsule()
-			:ndFileFormatBodyKinematicPlayerCapsule(ndBasicPlayerCapsule::StaticClassName())
-		{
-		}
-
-		virtual ndBody* LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap);
-		virtual void SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body);
-	};
-
 	ndBasicPlayerCapsule();
 	ndBasicPlayerCapsule(
 		ndDemoEntityManager* const scene, ndMeshLoader& loader,

@@ -31,19 +31,6 @@
 	#define PLAYER_THIRD_PERSON_VIEW_DIST	5.0f
 #endif
 
-void ndBasicPlayerCapsule::ndFileBasicPlayerCapsule::SaveBody(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndBody* const body)
-{
-	nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_BODY_CLASS, ndBasicPlayerCapsule::StaticClassName());
-	ndFileFormatBodyKinematicPlayerCapsule::SaveBody(scene, classNode, body);
-}
-
-ndBody* ndBasicPlayerCapsule::ndFileBasicPlayerCapsule::LoadBody(const nd::TiXmlElement* const node, const ndTree<ndShape*, ndInt32>& shapeMap)
-{
-	ndBasicPlayerCapsule* const player = new ndBasicPlayerCapsule();
-	ndFileFormatBodyKinematicPlayerCapsule::LoadBody((nd::TiXmlElement*)node->FirstChild(D_BODY_CLASS), shapeMap, player);
-	return player;
-}
-
 class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 {
 	public:
@@ -119,8 +106,6 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	,m_idleWalkBlend(nullptr)
 	,m_animBlendTree(nullptr)
 {
-	static ndFileBasicPlayerCapsule loadSave;
-
 	ndMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));

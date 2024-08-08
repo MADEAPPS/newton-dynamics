@@ -57,21 +57,6 @@ class ndPhysicsWorld: public ndWorld
 	public:
 	D_CLASS_REFLECTION(ndPhysicsWorld, ndWorld)
 
-	class ndPhysicsWorldFileLoadSave : public ndFileFormatWorld
-	{
-		public:
-		ndPhysicsWorldFileLoadSave()
-			:ndFileFormatWorld(ndPhysicsWorld::StaticClassName())
-		{
-		}
-
-		void SaveWorld(ndFileFormatSave* const scene, nd::TiXmlElement* const parentNode, const ndWorld* const world)
-		{
-			nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndPhysicsWorld", ndPhysicsWorld::StaticClassName());
-			ndFileFormatWorld::SaveWorld(scene, classNode, world);
-		}
-	};
-
 	class ndDefferentDeleteEntities : public ndArray<ndDemoEntity*>
 	{
 		public:

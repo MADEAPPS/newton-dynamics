@@ -52,7 +52,7 @@ endif()
 
 add_executable(${projectName} ${CPP_SOURCE})
 
-target_link_libraries (${projectName} ndNewton ndBrain ndModel ndFileFormat vhacd openfbx glfw imgui glatter lodepng)
+target_link_libraries (${projectName} ndNewton ndBrain ndModel vhacd openfbx glfw imgui glatter lodepng)
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndCollision ndCore)

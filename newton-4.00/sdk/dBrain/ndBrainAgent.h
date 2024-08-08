@@ -28,6 +28,7 @@ class ndBrainAgent: public ndClassAlloc
 {
 	public: 
 	ndBrainAgent();
+	ndBrainAgent(const ndBrainAgent& src);
 	virtual ~ndBrainAgent();
 
 	virtual void Step() = 0;
