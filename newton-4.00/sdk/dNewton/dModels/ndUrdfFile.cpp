@@ -677,7 +677,8 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 
 	ndModelArticulation* const model = new ndModelArticulation;
 	root->m_articulation = model->AddRootBody(rootBody);
-
+	root->m_articulation->m_name = ((nd::TiXmlElement*)root->m_link)->Attribute("name");
+	
 	ndFixSizeArray<Hierarchy*, 256> stack;
 	stack.PushBack(root);
 
@@ -694,6 +695,7 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 				ndBodyDynamic* const childBody = ImportLink(link.m_link);
 				ndJointBilateralConstraint* const joint = ImportJoint(link.m_joint, childBody, parent->m_articulation->m_body->GetAsBodyDynamic());
 				link.m_articulation = model->AddLimb(parent->m_articulation, joint->GetBody0(), joint);
+				link.m_articulation->m_name = ((nd::TiXmlElement*)link.m_link)->Attribute("name");
 				stack.PushBack(&link);
 			}
 		}

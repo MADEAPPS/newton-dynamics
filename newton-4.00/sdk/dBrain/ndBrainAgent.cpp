@@ -30,6 +30,13 @@ ndBrainAgent::ndBrainAgent()
 {
 }
 
+ndBrainAgent::ndBrainAgent(const ndBrainAgent& src)
+	:ndClassAlloc()
+	,m_name(src.m_name)
+{
+
+}
+
 ndBrainAgent::~ndBrainAgent()
 {
 }
