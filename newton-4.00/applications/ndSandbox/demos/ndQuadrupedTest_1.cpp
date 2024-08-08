@@ -83,7 +83,7 @@ namespace ndQuadruped_1
 		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
 
 		//for (ndInt32 i = 0; i < 4; ++i)
-		for (ndInt32 i = 0; i < 0; ++i)
+		for (ndInt32 i = 0; i < 1; ++i)
 		{
 			ndMatrix limbPivotLocation(matrix * ndYawMatrix(angles[i] * ndDegreeToRad));
 			limbPivotLocation.m_posit += torso->GetMatrix().m_posit;
@@ -106,54 +106,54 @@ namespace ndQuadruped_1
 			}
 
 			// add calf0
-			ndModelArticulation::ndNode* calfNode = nullptr;
-			{
-				limbPivotLocation = ndRollMatrix(-90.0f * ndDegreeToRad) * limbPivotLocation;
-
-				ndMatrix bodyMatrix(limbPivotLocation);
-				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
-				ndBodyKinematic* const calf0 = CreateCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, limbLength);
-				calf0->SetMatrix(bodyMatrix);
-
-				ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
-				ndFloat32 sign = angles[i] > 180.0f ? -1.0f : 1.0f;
-				caffPinAndPivotFrame.m_front = limbPivotLocation.m_right.Scale(sign);
-				caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
-				caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
-				caffPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
-				ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0->GetAsBodyKinematic(), thighNode->m_body->GetAsBodyKinematic());
-
-				hinge->SetLimitState(true);
-				hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
-				calfNode = model->AddLimb(thighNode, calf0, hinge);
-
-				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
-			}
-
-			// add calf1
-			ndModelArticulation::ndNode* footNode = nullptr;
-			{
-				ndFloat32 lenght = limbLength * 0.5f;
-				limbPivotLocation = ndRollMatrix(-45.0f * ndDegreeToRad) * limbPivotLocation;
-				ndMatrix bodyMatrix(limbPivotLocation);
-				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(lenght * 0.5f);
-
-				ndBodyKinematic* const foot = CreateCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, lenght);
-				foot->SetMatrix(bodyMatrix);
-
-				ndMatrix footPinAndPivotFrame(ndGetIdentityMatrix());
-				footPinAndPivotFrame.m_front = limbPivotLocation.m_right;
-				footPinAndPivotFrame.m_up = limbPivotLocation.m_front.Scale(-1.0f);
-				footPinAndPivotFrame.m_right = footPinAndPivotFrame.m_front.CrossProduct(footPinAndPivotFrame.m_up);
-				footPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
-
-				// add joint limit to prevent knee from flipping
-				ndJointHinge* const footHinge = new ndJointHinge(footPinAndPivotFrame, foot->GetAsBodyKinematic(), calfNode->m_body->GetAsBodyKinematic());
-				footHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
-				footNode = model->AddLimb(calfNode, foot, footHinge);
-
-				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(lenght);
-			}
+			//ndModelArticulation::ndNode* calfNode = nullptr;
+			//{
+			//	limbPivotLocation = ndRollMatrix(-90.0f * ndDegreeToRad) * limbPivotLocation;
+			//
+			//	ndMatrix bodyMatrix(limbPivotLocation);
+			//	bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
+			//	ndBodyKinematic* const calf0 = CreateCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, limbLength);
+			//	calf0->SetMatrix(bodyMatrix);
+			//
+			//	ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
+			//	ndFloat32 sign = angles[i] > 180.0f ? -1.0f : 1.0f;
+			//	caffPinAndPivotFrame.m_front = limbPivotLocation.m_right.Scale(sign);
+			//	caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
+			//	caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
+			//	caffPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
+			//	ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0->GetAsBodyKinematic(), thighNode->m_body->GetAsBodyKinematic());
+			//
+			//	hinge->SetLimitState(true);
+			//	hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
+			//	calfNode = model->AddLimb(thighNode, calf0, hinge);
+			//
+			//	limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
+			//}
+			//
+			//// add calf1
+			//ndModelArticulation::ndNode* footNode = nullptr;
+			//{
+			//	ndFloat32 lenght = limbLength * 0.5f;
+			//	limbPivotLocation = ndRollMatrix(-45.0f * ndDegreeToRad) * limbPivotLocation;
+			//	ndMatrix bodyMatrix(limbPivotLocation);
+			//	bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(lenght * 0.5f);
+			//
+			//	ndBodyKinematic* const foot = CreateCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, lenght);
+			//	foot->SetMatrix(bodyMatrix);
+			//
+			//	ndMatrix footPinAndPivotFrame(ndGetIdentityMatrix());
+			//	footPinAndPivotFrame.m_front = limbPivotLocation.m_right;
+			//	footPinAndPivotFrame.m_up = limbPivotLocation.m_front.Scale(-1.0f);
+			//	footPinAndPivotFrame.m_right = footPinAndPivotFrame.m_front.CrossProduct(footPinAndPivotFrame.m_up);
+			//	footPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
+			//
+			//	// add joint limit to prevent knee from flipping
+			//	ndJointHinge* const footHinge = new ndJointHinge(footPinAndPivotFrame, foot->GetAsBodyKinematic(), calfNode->m_body->GetAsBodyKinematic());
+			//	footHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
+			//	footNode = model->AddLimb(calfNode, foot, footHinge);
+			//
+			//	limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(lenght);
+			//}
 		}
 
 		ndUrdfFile urdf;
@@ -1537,7 +1537,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		ndUrdfFile urdf;
 		char fileName[256];
 		ndMatrix testLocation(model1->GetRoot()->m_body->GetMatrix());
-		testLocation.m_posit.m_z += 1.0f;
+		testLocation.m_posit.m_z += 1.5f;
 		ndGetWorkingFileName("quadSpider.urdf", fileName);
 		ndModelArticulation* const quadruped = urdf.Import(fileName);
 		SetModelVisualMesh(scene, quadruped);
