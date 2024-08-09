@@ -12,15 +12,11 @@
 #ifndef __PHYSICS_UTIL__
 #define __PHYSICS_UTIL__
 
-#define DEMO_GRAVITY  ndFloat32(-10.0f)
+//#define DEMO_GRAVITY  ndFloat32(-10.0f)
 //#define DEMO_GRAVITY  ndFloat32(-1.0f)
-//#define DEMO_GRAVITY  ndFloat32(0.0f)
+#define DEMO_GRAVITY  ndFloat32(0.0f)
 
 class ndDemoEntityManager;
-
-
-ndBodyKinematic* CreateBody____(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& origin, ndFloat32 mass, const char* const textName = "wood_0.png");
-
 
 ndBodyKinematic* CreateBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName = "wood_0.png");
 ndBodyKinematic* CreateSphere(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, const char* const textName = "wood_0.png");
