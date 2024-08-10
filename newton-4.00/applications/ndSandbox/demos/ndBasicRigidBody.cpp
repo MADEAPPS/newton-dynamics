@@ -122,30 +122,21 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	ndUrdfFile urdf;
 	ndModelArticulation* const r2d2 = urdf.Import(fileName);
 	
-	ndMatrix modelMatrix(ndGetIdentityMatrix());
+	ndMatrix modelMatrix(r2d2->GetRoot()->m_body->GetMatrix());
 	modelMatrix.m_posit.m_y = 0.5f;
 	r2d2->SetTransform(modelMatrix);
 	r2d2->AddToWorld(world);
 	r2d2->SetNotifyCallback(new R2D2ModelNotify);
 	SetModelVisualMesh(scene, r2d2);
-	
-	//ndModelArticulation* const root = r2d2->GetAsModelArticulation();
-	//for (ndModelArticulation::ndNode* node = root->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-	//{
-	//	ndSharedPtr<ndBody> body(node->m_body);
-	//	ndShapeInstance& instanceShape = body->GetAsBodyDynamic()->GetCollisionShape();
-	//	instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
-	//	instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = r2d2;
-	//}
 	SetMaterial(r2d2);
 
-#if 1
+#if 0
 	{
 		ndUrdfFile urdf1;
 		char fileName1[256];
 
 		// export and import file 
-		ndGetWorkingFileName("r2d3.urdf", fileName1);
+		ndGetWorkingFileName("r2d2Exported.urdf", fileName1);
 		urdf1.Export(fileName1, r2d2);
 		ndModelArticulation* const r2d3 = urdf1.Import(fileName1);
 
@@ -165,7 +156,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 
 	//AddSphere(scene, origin1, 1.0f, 0.5f);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 1, 2, 7);
-	AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
+	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 4, 4, 4);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 2, 2, 7);
 
