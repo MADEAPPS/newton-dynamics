@@ -69,30 +69,30 @@ namespace ndUnicycle
 		ndFloat32 limbLength = 0.3f;
 		ndFloat32 limbRadio = 0.025f;
 		ndBodyKinematic* const legBody = CreateCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "wood_1.png");
-		legBody->SetMatrix(ndGetIdentityMatrix());
 
-		ndMatrix poleLocation(ndGetIdentityMatrix());
-		poleLocation.m_posit.m_x = -limbLength * 0.5f;
-		legBody->GetCollisionShape().SetLocalMatrix(poleLocation);
-		ndMatrix legPivot(ndYawMatrix(-ndPi * ndFloat32(0.5f)) * hipBody->GetMatrix());
-		//ndMatrix legPivot(ndRollMatrix(-ndPi * ndFloat32(0.5f)) * hipBody->GetMatrix());
-		legPivot.m_posit.m_y = -ySize * 0.5f;
-		ndJointHinge* const legJoint = new ndJointHinge(legPivot, legBody, hipBody);
-		legJoint->SetAsSpringDamper(0.02f, 1500, 40.0f);
+		ndMatrix legPivot(ndRollMatrix(ndPi * ndFloat32(0.5f)) * hipBody->GetMatrix());
+		legPivot.m_posit.m_y -= (limbLength * 0.5f + ySize * 0.5f);
+		legBody->SetMatrix(legPivot);
+
+		legPivot.m_posit.m_y += limbLength * 0.5f;
+		ndMatrix legJointMatrix(ndYawMatrix(-ndPi * ndFloat32(0.5f)) * legPivot);
+		ndJointHinge* const legJoint = new ndJointHinge(legJointMatrix, legBody, hipBody);
 		ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
+		//legJoint->SetAsSpringDamper(0.02f, 1500, 40.0f);
 
 		// make wheel
 		ndFloat32 wheelRadio = 4.0f * limbRadio;
 		ndBodyKinematic* const wheelBody = CreateSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "wood_0.png");
-		wheelBody->GetCollisionShape().SetLocalMatrix(ndRollMatrix(ndPi * ndFloat32(0.5f)));
-
+		
 		ndMatrix wheelMatrix(legBody->GetMatrix());
+		wheelMatrix.m_posit.m_y -= limbLength * 0.5f;
 		wheelBody->SetMatrix(wheelMatrix);
-		wheelMatrix = ndYawMatrix(-ndPi * ndFloat32(0.5f)) * wheelMatrix;
-		wheelMatrix.m_posit.m_x -= 0.3f;
-		ndJointHinge* const wheelJoint = new ndJointHinge(wheelMatrix, wheelBody, legBody);
+		ndMatrix wheelJointMatrix(ndYawMatrix(-ndPi * ndFloat32(0.5f)) * wheelMatrix);
+		ndJointHinge* const wheelJoint = new ndJointHinge(wheelJointMatrix, wheelBody, legBody);
 		model->AddLimb(legLimb, wheelBody, wheelJoint);
-		wheelJoint->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
+		//wheelJoint->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
+
+		model->ConvertToUrdf();
 
 		ndUrdfFile urdf;
 		char fileName[256];
@@ -108,7 +108,9 @@ namespace ndUnicycle
 		ndModelArticulation* const unicycle = urdf.Import(fileName);
 
 		SetModelVisualMesh(scene, unicycle);
-		unicycle->SetTransform(location);
+		ndMatrix matrix(unicycle->GetRoot()->m_body->GetMatrix() * location * ndPitchMatrix(-ndPi * 0.5f));
+		matrix.m_posit = location.m_posit;
+		unicycle->SetTransform(matrix);
 
 		ndModelArticulation::ndNode* const wheel = unicycle->FindByName("node_0_link");
 		ndAssert(wheel);
@@ -295,12 +297,19 @@ namespace ndUnicycle
 			return false;
 		}
 
+		ndFloat32 GetAngle() const
+		{
+			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
+			const ndMatrix& matrix = model->GetRoot()->m_body->GetMatrix();
+			return matrix.m_right.m_x;
+		}
+
 		bool IsTerminal() const
 		{
 			#define D_REWARD_MIN_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
-			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
-			const ndMatrix& matrix = model->GetRoot()->m_body->GetMatrix();
-			ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
+			//ndModelArticulation* const model = (ndModelArticulation*)GetModel();
+			//const ndMatrix& matrix = model->GetRoot()->m_body->GetMatrix();
+			ndFloat32 sinAngle = ndClamp(GetAngle(), ndFloat32(-0.9f), ndFloat32(0.9f));
 			bool fail = ndAbs(ndAsin(sinAngle)) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
 			return fail;
 		}
@@ -346,8 +355,8 @@ namespace ndUnicycle
 				ndBodyKinematic* const boxBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 
 				const ndVector boxVeloc(boxBody->GetVelocity());
-				const ndMatrix& matrix = boxBody->GetMatrix();
-				const ndFloat32 sinAngle = matrix.m_up.m_x;
+				//const ndMatrix& matrix = boxBody->GetMatrix();
+				const ndFloat32 sinAngle = GetAngle();
 				const ndFloat32 boxReward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
 				const ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(1.0f) * boxVeloc.m_x * boxVeloc.m_x));
 				const ndFloat32 reward = 0.2f * speedReward + 0.5f * boxReward + 0.3f * legReward;
@@ -410,8 +419,8 @@ namespace ndUnicycle
 			const ndVector omega(body->GetOmega());
 			const ndVector veloc(body->GetVelocity());
 			const ndVector wheelOmega(m_wheel->GetOmega());
-			const ndMatrix& matrix = body->GetMatrix();
-			const ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
+			//const ndMatrix& matrix = body->GetMatrix();
+			const ndFloat32 sinAngle = ndClamp(GetAngle(), ndFloat32(-0.9f), ndFloat32(0.9f));
 			const ndFloat32 angle = ndAsin(sinAngle);
 
 			observation[m_speed] = ndBrainFloat(veloc.m_x);
@@ -724,8 +733,8 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	model->AddToWorld(world);
 
 	ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
+	ndSharedPtr<ndJointBilateralConstraint> planeJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
+	world->AddJoint(planeJoint);
 
 	char fileName[256];
 	ndGetWorkingFileName(CONTROLLER_NAME, fileName);

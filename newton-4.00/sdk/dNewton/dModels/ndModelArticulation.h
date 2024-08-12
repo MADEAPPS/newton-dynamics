@@ -66,6 +66,8 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API void AddToWorld(ndWorld* const world);
 	D_NEWTON_API void SetTransform(const ndMatrix& matrix);
 
+	D_NEWTON_API void ConvertToUrdf();
+
 	protected:
 	ndNode* m_rootNode;
 	ndIkSolver m_invDynamicsSolver;

@@ -122,7 +122,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	ndUrdfFile urdf;
 	ndModelArticulation* const r2d2 = urdf.Import(fileName);
 	
-	ndMatrix modelMatrix(r2d2->GetRoot()->m_body->GetMatrix());
+	ndMatrix modelMatrix(r2d2->GetRoot()->m_body->GetMatrix() * ndPitchMatrix(-ndPi * 0.5f));
 	modelMatrix.m_posit.m_y = 0.5f;
 	r2d2->SetTransform(modelMatrix);
 	r2d2->AddToWorld(world);

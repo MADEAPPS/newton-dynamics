@@ -53,37 +53,38 @@ namespace ndCarpole_0
 		ndFloat32 cartMass = 5.0f;
 		ndFloat32 poleMass = 10.0f;
 		ndFloat32 poleLength = 0.4f;
-		ndFloat32 poleRadio = 0.035f;
+		ndFloat32 poleRadio = 0.05f;
+		ndSharedPtr<ndModelArticulation> model(new ndModelArticulation);
 
 		ndMatrix location(ndGetIdentityMatrix());
 		location.m_posit.m_y = 0.25f;
 
-		//ndModelArticulation* const model = new ndModelArticulation;
-		ndSharedPtr<ndModelArticulation> model(new ndModelArticulation);
-
 		// make cart
 		ndBodyKinematic* const cartBody = CreateBox(scene, location, cartMass, xSize, ySize, zSize, "wood_0.png");
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
-
-		ndMatrix matrix(ndGetIdentityMatrix());
-		matrix.m_posit.m_y = 1.0f;
+		ndMatrix matrix(location);
+		matrix.m_posit.m_y += ySize / 2.0f + 0.05f;
 		cartBody->SetMatrix(matrix);
 
+		matrix.m_posit.m_y += ySize / 2.0f;
+		
 		// make pole leg
 		ndBodyKinematic* const poleBody = CreateCapsule(scene, matrix, poleMass, poleRadio, poleRadio, poleLength, "smilli.png");
-		ndMatrix poleLocation(ndGetIdentityMatrix());
-		//poleLocation.m_posit.m_x = -(poleLength * 0.5f - poleRadio);
-		poleLocation.m_posit.m_x = -(poleLength * 0.5f);
-		poleBody->GetCollisionShape().SetLocalMatrix(poleLocation);
-
+		ndMatrix poleLocation(ndRollMatrix(90.0f * ndDegreeToRad) * matrix);
+		poleLocation.m_posit.m_y += poleLength * 0.5f;
+		poleBody->SetMatrix(poleLocation);
+		
 		// link cart and body with a hinge
-		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * matrix);
-		polePivot.m_posit.m_y += ySize * 0.25f;
+		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
+		polePivot.m_posit.m_y -= poleLength * 0.5f;
 		ndJointBilateralConstraint* const poleJoint = new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic());
 		model->AddLimb(modelRoot, poleBody, poleJoint);
 
 		ndUrdfFile urdf;
 		char fileName[256];
+
+		model->ConvertToUrdf();
+
 		ndGetWorkingFileName("cartpole.urdf", fileName);
 		urdf.Export(fileName, *model);
 	}
@@ -93,10 +94,13 @@ namespace ndCarpole_0
 		ndUrdfFile urdf;
 		char fileName[256];
 		ndGetWorkingFileName("cartpole.urdf", fileName);
+		//ndGetWorkingFileName("cartpoleHandMade.urdf", fileName);
 		ndModelArticulation* const cartPole = urdf.Import(fileName);
 
 		SetModelVisualMesh(scene, cartPole);
-		cartPole->SetTransform(location);
+		ndMatrix matrix(cartPole->GetRoot()->m_body->GetMatrix() * location * ndPitchMatrix(-ndPi * 0.5f));
+		matrix.m_posit = location.m_posit;
+		cartPole->SetTransform(matrix);
 
 		// make the car move along the z axis only (2d problem)
 		ndWorld* const world = scene->GetWorld();
@@ -248,8 +252,7 @@ namespace ndCarpole_0
 		ndFloat32 GetPoleAngle() const
 		{
 			const ndMatrix& matrix = m_poleJoint->GetLocalMatrix0() * m_pole->GetMatrix();
-			//ndFloat32 angle = ndAsin(matrix.m_right.m_x);
-			ndFloat32 angle = ndAsin(matrix.m_up.m_x);
+			ndFloat32 angle = ndAsin(matrix.m_right.m_x);
 			return angle;
 		}
 
@@ -538,7 +541,6 @@ namespace ndCarpole_0
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;
 	};
-
 }
 
 using namespace ndCarpole_0;
@@ -550,7 +552,7 @@ void ndCartpoleDiscrete(ndDemoEntityManager* const scene)
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.11f;
 
-	//ExportUrdfModel(scene);
+//	ExportUrdfModel(scene);
 
 #ifdef ND_TRAIN_AGENT
 	ndSetRandSeed(42);

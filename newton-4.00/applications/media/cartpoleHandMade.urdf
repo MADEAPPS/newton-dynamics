@@ -9,19 +9,19 @@
             <geometry>
                 <box size="0.25 0.125 0.15" />
             </geometry>
-            <origin rpy="1.5708 -0 0" xyz="0 0 0" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
             <material name="material_0" />
         </visual>
         <collision>
             <geometry>
                 <box size="0.25 0.125 0.15" />
             </geometry>
-            <origin rpy="1.5708 -0 0" xyz="0 0 0" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
         </collision>
         <inertial>
             <origin rpy="0 -0 0" xyz="0 0 0" />
             <mass value="5" />
-            <inertia xx="0.0158854" xy="0" xz="0" yy="0.0354167" yz="0" zz="0.0325521" />
+            <inertia xx="1" xy="0" xz="0" yy="1" yz="0" zz="1" />
         </inertial>
     </link>
     <link name="node_0_link">
@@ -30,7 +30,7 @@
                 <cylinder length="0.5" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="3.14159 -6.27833e-07 3.14159" xyz="6.27833e-08 6.27833e-08 0.2" />
+            <origin rpy="-0 0 0" xyz="0 0 0.25" />
             <material name="material_0" />
         </visual>
         <collision>
@@ -38,17 +38,17 @@
                 <cylinder length="0.5" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="3.14159 -6.27833e-07 3.14159" xyz="6.27833e-08 6.27833e-08 0.2" />
+            <origin rpy="-0 0 0" xyz="0 0 0.25" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="6.31554e-08 6.28556e-08 0.2" />
+            <origin rpy="0 -0 0" xyz="0 0 0" />
             <mass value="10" />
-            <inertia xx="0.185619" xy="-1.71279e-14" xz="0" yy="0.0118084" yz="5.74201e-21" zz="0.185619" />
+            <inertia xx="1" xy="0" xz="0" yy="1" yz="0" zz="1" />
         </inertial>
     </link>
     <joint name="node_0_link_to_base_link" type="continuous">
         <parent link="base_link" />
         <child link="node_0_link" />
-        <origin rpy="3.13916e-07 -0 1.5708" xyz="0 1.96198e-08 0.0625" />
+        <origin rpy="0 0 1.57075" xyz="0 0 0" />
     </joint>
 </robot>

@@ -50,7 +50,9 @@ namespace ndCarpole_1
 		ndModelArticulation* const cartPole = urdf.Import(fileName);
 
 		SetModelVisualMesh(scene, cartPole);
-		cartPole->SetTransform(location);
+		ndMatrix matrix(cartPole->GetRoot()->m_body->GetMatrix() * location * ndPitchMatrix(-ndPi * 0.5f));
+		matrix.m_posit = location.m_posit;
+		cartPole->SetTransform(matrix);
 
 		// make the car move along the z axis only (2d problem)
 		ndWorld* const world = scene->GetWorld();
@@ -195,8 +197,7 @@ namespace ndCarpole_1
 		ndFloat32 GetPoleAngle() const
 		{
 			const ndMatrix& matrix = m_poleJoint->GetLocalMatrix0() * m_pole->GetMatrix();
-			//ndFloat32 angle = ndAsin(matrix.m_right.m_x);
-			ndFloat32 angle = ndAsin(matrix.m_up.m_x);
+			ndFloat32 angle = ndAsin(matrix.m_right.m_x);
 			return angle;
 		}
 

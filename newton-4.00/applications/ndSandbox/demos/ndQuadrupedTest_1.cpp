@@ -89,15 +89,26 @@ namespace ndQuadruped_1
 			limbPivotLocation.m_posit += torso->GetMatrix().m_posit;
 			limbPivotLocation.m_posit.m_w = 1.0f;
 
+			limbPivotLocation = location;
+
 			// add leg thigh
-			const ndVector thighPivot(limbPivotLocation.m_posit);
+			//const ndVector thighPivot(limbPivotLocation.m_posit);
 
 			ndModelArticulation::ndNode* thighNode = nullptr;
 			{
 				ndMatrix bodyMatrix(limbPivotLocation);
-				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
+				//bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
+				//bodyMatrix = ndYawMatrix(ndPi * 0.5f) * bodyMatrix;
+				bodyMatrix.m_posit.m_y += 0.0f;
+				bodyMatrix.m_posit.m_x += 0.3f + limbLength * 0.5f;
+
 				ndBodyKinematic* const thigh = CreateCapsule(scene, bodyMatrix, limbMass, limbRadios, limbRadios, limbLength);
 				thigh->SetMatrix(bodyMatrix);
+
+				//limbPivotLocation = bodyMatrix;
+				limbPivotLocation = limbPivotLocation;
+				limbPivotLocation.m_posit.m_x += 0.3f;
+
 				ndJointBilateralConstraint* const ballJoint = new ndIkJointSpherical(limbPivotLocation, thigh, torso);
 				thighNode = model->AddLimb(modelRoot, thigh, ballJoint);
 				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
@@ -1364,8 +1375,11 @@ namespace ndQuadruped_1
 		for (ndInt32 i = 0; i < 1; ++i)
 		{
 			ndMatrix limbPivotLocation(matrix * ndYawMatrix(angles[i] * ndDegreeToRad));
+
 			limbPivotLocation.m_posit += torso->GetMatrix().m_posit;
 			limbPivotLocation.m_posit.m_w = 1.0f;
+
+			limbPivotLocation = location;
 
 			// add leg thigh
 			const ndVector thighPivot(limbPivotLocation.m_posit);
@@ -1374,10 +1388,17 @@ namespace ndQuadruped_1
 			ndModelArticulation::ndNode* thighNode = nullptr;
 			{
 				ndMatrix bodyMatrix(limbPivotLocation);
-				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
+				//bodyMatrix = ndYawMatrix(ndPi * 0.5f) * bodyMatrix;
+				bodyMatrix.m_posit.m_y += 0.0f;
+				bodyMatrix.m_posit.m_x += 0.3f + limbLength * 0.5f;
+
+				//bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
 				//ndSharedPtr<ndBody> thigh(world->GetBody(AddCapsule(scene, bodyMatrix, limbMass, limbRadios, limbRadios, limbLength)));
 				ndBodyKinematic* const thigh = CreateCapsule(scene, bodyMatrix, limbMass, limbRadios, limbRadios, limbLength);
 				thigh->SetMatrix(bodyMatrix);
+
+				limbPivotLocation = limbPivotLocation;
+				limbPivotLocation.m_posit.m_x += 0.3f;
 				//ndSharedPtr<ndJointBilateralConstraint> ballJoint(new ndIkJointSpherical(limbPivotLocation, thigh->GetAsBodyKinematic(), torso->GetAsBodyKinematic()));
 				ndJointBilateralConstraint* const ballJoint = new ndIkJointSpherical(limbPivotLocation, thigh, torso);
 				thighNode = model->AddLimb(modelRoot, thigh, ballJoint);
