@@ -16,6 +16,8 @@
 #include "dJoints/ndJointHinge.h"
 #include "dJoints/ndJointSlider.h"
 #include "dJoints/ndJointFix6dof.h"
+#include "dIkSolver/ndIkJointHinge.h"
+#include "dIkSolver/ndIkJointSpherical.h"
 
 ndUrdfFile::ndUrdfFile()
 	:ndClassAlloc()
@@ -86,8 +88,13 @@ void ndUrdfFile::ExportMakeNamesUnique(ndModelArticulation* const model)
 	//model->GetRoot()->m_name = "base_link";
 
 	ndString baseName("node_");
-	for (ndModelArticulation::ndNode* childNode = model->GetRoot()->GetFirstIterator(); childNode; childNode = childNode->GetNextIterator())
+
+	ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
+	stack.PushBack(model->GetRoot());
+
+	while (stack.GetCount())
 	{
+		ndModelArticulation::ndNode* const childNode = stack.Pop();
 		if (childNode->m_name == "")
 		{
 			if (childNode->GetParent())
@@ -106,6 +113,11 @@ void ndUrdfFile::ExportMakeNamesUnique(ndModelArticulation* const model)
 			count++;
 		}
 		filter.Insert(childNode, childNode->m_name);
+
+		for (ndModelArticulation::ndNode* child = childNode->GetFirstChild(); child; child = child->GetNext())
+		{
+			stack.PushBack(child);
+		}
 	}
 }
 
@@ -402,16 +414,12 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 	else if (!strcmp(className, "ndJointHinge"))
 	{
 		const ndJointHinge* const hinge = (ndJointHinge*)joint;
-		if (!hinge->GetLimitState())
-		{
-			jointNode->SetAttribute("type", "continuous");
-		}
-		else
+		if (hinge->GetLimitState())
 		{
 			ndFloat32 minLimit;
 			ndFloat32 maxLimit;
 			jointNode->SetAttribute("type", "revolute");
-	
+
 			nd::TiXmlElement* const limit = new nd::TiXmlElement("limit");
 			jointNode->LinkEndChild(limit);
 			hinge->GetLimits(minLimit, maxLimit);
@@ -419,6 +427,24 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 			limit->SetDoubleAttribute("lower", minLimit);
 			limit->SetDoubleAttribute("upper", maxLimit);
 			limit->SetDoubleAttribute("velocity", 0.5f);
+		}
+		else
+		{
+			jointNode->SetAttribute("type", "continuous");
+		}
+
+		
+		ndFloat32 spring;
+		ndFloat32 damper;
+		ndFloat32 regularizer;
+		hinge->GetSpringDamper(regularizer, spring, damper);
+		if ((spring != ndFloat32(0.0f)) || (damper != ndFloat32(0.0f)))
+		{
+			nd::TiXmlElement* const newtonExt = new nd::TiXmlElement("newton");
+			jointNode->LinkEndChild(newtonExt);
+			newtonExt->SetDoubleAttribute("springPD", spring);
+			newtonExt->SetDoubleAttribute("damperPD", damper);
+			newtonExt->SetDoubleAttribute("regularizer", regularizer);
 		}
 	
 		//const ndMatrix pinMatrix(ndGramSchmidtMatrix(surroratelink->m_jointBodyMatrix0[0]));
@@ -454,6 +480,23 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 		limit->SetDoubleAttribute("lower", minLimit);
 		limit->SetDoubleAttribute("upper", maxLimit);
 		limit->SetDoubleAttribute("velocity", 0.5f);
+	}
+	else if (!strcmp(className, "ndIkJointSpherical"))
+	{
+		//const ndIkJointSpherical* const ikJoint = (ndIkJointSpherical*)joint;
+		jointNode->SetAttribute("type", "floating");
+
+		nd::TiXmlElement* const newtonExt = new nd::TiXmlElement("newton");
+		jointNode->LinkEndChild(newtonExt);
+		newtonExt->SetAttribute("replaceWith", "ndIkJointSpherical");
+	}
+	else if (!strcmp(className, "ndIkJointHinge"))
+	{
+		jointNode->SetAttribute("type", "floating");
+
+		nd::TiXmlElement* const newtonExt = new nd::TiXmlElement("newton");
+		jointNode->LinkEndChild(newtonExt);
+		newtonExt->SetAttribute("replaceWith", "ndIkJointHinge");
 	}
 	else
 	{
@@ -986,6 +1029,23 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 			pivotMatrix = matrix * pivotMatrix;
 		}
 		joint = new ndJointHinge(pivotMatrix, childBody, parentBody);
+		const nd::TiXmlElement* const newtonEx = (nd::TiXmlElement*)jointNode->FirstChild("newton");
+		if (newtonEx)
+		{
+			ndInt32 ret = 0;
+			const char* const spring = newtonEx->Attribute("springPD");
+			const char* const damper = newtonEx->Attribute("damperPD");
+			const char* const regularizer = newtonEx->Attribute("regularizer");
+			ndFloat32 springPD;
+			ndFloat32 damperPD;
+			ndFloat32 regularizerPD;
+			ret = sscanf(spring, "%f", &springPD);
+			ret = sscanf(damper, "%f", &damperPD);
+			ret = sscanf(regularizer, "%f", &regularizerPD);
+
+			ndJointHinge* const hinge = (ndJointHinge*)joint;
+			hinge->SetAsSpringDamper(regularizerPD, springPD, damperPD);
+		}
 	}
 	else if (strcmp(jointType, "prismatic") == 0)
 	{
@@ -1050,6 +1110,48 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 			hinge->SetLimits(ndFloat32(lower), ndFloat32(upper));
 			hinge->SetLimitState(true);
 		}
+		const nd::TiXmlElement* const newtonEx = (nd::TiXmlElement*)jointNode->FirstChild("newton");
+		if (newtonEx)
+		{
+			ndInt32 ret = 0;
+			const char* const spring = newtonEx->Attribute("springPD");
+			const char* const damper = newtonEx->Attribute("damperPD");
+			const char* const regularizer = newtonEx->Attribute("regularizer");
+			ndFloat32 springPD;
+			ndFloat32 damperPD;
+			ndFloat32 regularizerPD;
+			ret = sscanf(spring, "%f", &springPD);
+			ret = sscanf(damper, "%f", &damperPD);
+			ret = sscanf(regularizer, "%f", &regularizerPD);
+
+			ndJointHinge* const hinge = (ndJointHinge*)joint;
+			hinge->SetAsSpringDamper(regularizerPD, springPD, damperPD);
+		}
+	}
+	else if (strcmp(jointType, "floating") == 0)
+	{
+		const nd::TiXmlElement* const newtonEx = (nd::TiXmlElement*)jointNode->FirstChild("newton");
+		if (newtonEx) 
+		{
+			const char* const subJointType = newtonEx->Attribute("replaceWith");
+			if (strcmp(subJointType, "ndIkJointSpherical") == 0)
+			{
+				joint = new ndIkJointSpherical(pivotMatrix, childBody, parentBody);
+			}
+			else if (strcmp(subJointType, "ndIkJointHinge") == 0)
+			{
+				joint = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
+			}
+			else
+			{
+				ndAssert(0);
+			}
+		}
+		else
+		{
+			ndAssert(0);
+		}
+
 	}
 	else
 	{

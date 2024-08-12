@@ -70,7 +70,7 @@ class ndModelArticulation: public ndModel
 
 	protected:
 	ndNode* m_rootNode;
-	ndIkSolver m_invDynamicsSolver;
+	//ndIkSolver m_invDynamicsSolver;
 	ndSharedList<ndJointBilateralConstraint> m_closeLoops;
 	ndString m_name;
 

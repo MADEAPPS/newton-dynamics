@@ -45,7 +45,7 @@ ndModelArticulation::ndNode::~ndNode()
 ndModelArticulation::ndModelArticulation()
 	:ndModel()
 	,m_rootNode(nullptr)
-	,m_invDynamicsSolver()
+	//,m_invDynamicsSolver()
 	,m_closeLoops()
 	,m_name("")
 {
@@ -54,7 +54,7 @@ ndModelArticulation::ndModelArticulation()
 ndModelArticulation::ndModelArticulation(const ndModelArticulation& src)
 	:ndModel(src)
 	,m_rootNode(nullptr)
-	,m_invDynamicsSolver()
+	//,m_invDynamicsSolver()
 	,m_closeLoops()
 	,m_name(src.m_name)
 {
@@ -295,7 +295,7 @@ void ndModelArticulation::ConvertToUrdf()
 	};
 
 	ndMatrix rootMatrix(m_rootNode->m_body->GetMatrix());
-	SetTransform(ndGetIdentityMatrix());
+	//SetTransform(ndGetIdentityMatrix());
 	SetTransform(ndPitchMatrix(ndPi * 0.5f));
 
 	ndTree<BodyInfo, ndModelArticulation::ndNode*> map;

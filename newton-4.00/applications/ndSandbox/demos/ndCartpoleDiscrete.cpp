@@ -23,7 +23,7 @@
 
 namespace ndCarpole_0
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME		"cartpoleDiscreteVPG.dnn"
 	//#define CRITIC_NAME		"cartpoleDiscreteCriticVPG.dnn"
 
@@ -351,7 +351,7 @@ namespace ndCarpole_0
 			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
-			,m_stopTraining(300 * 1000000)
+			,m_stopTraining(200 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();

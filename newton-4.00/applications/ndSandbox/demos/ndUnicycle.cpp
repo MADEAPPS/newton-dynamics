@@ -78,7 +78,7 @@ namespace ndUnicycle
 		ndMatrix legJointMatrix(ndYawMatrix(-ndPi * ndFloat32(0.5f)) * legPivot);
 		ndJointHinge* const legJoint = new ndJointHinge(legJointMatrix, legBody, hipBody);
 		ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
-		//legJoint->SetAsSpringDamper(0.02f, 1500, 40.0f);
+		legJoint->SetAsSpringDamper(0.02f, 1500, 40.0f);
 
 		// make wheel
 		ndFloat32 wheelRadio = 4.0f * limbRadio;
@@ -90,7 +90,7 @@ namespace ndUnicycle
 		ndMatrix wheelJointMatrix(ndYawMatrix(-ndPi * ndFloat32(0.5f)) * wheelMatrix);
 		ndJointHinge* const wheelJoint = new ndJointHinge(wheelJointMatrix, wheelBody, legBody);
 		model->AddLimb(legLimb, wheelBody, wheelJoint);
-		//wheelJoint->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
+		wheelJoint->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
 
 		model->ConvertToUrdf();
 
@@ -112,15 +112,15 @@ namespace ndUnicycle
 		matrix.m_posit = location.m_posit;
 		unicycle->SetTransform(matrix);
 
-		ndModelArticulation::ndNode* const wheel = unicycle->FindByName("node_0_link");
-		ndAssert(wheel);
-		ndJointHinge* const wheelHinge = (ndJointHinge*)*wheel->m_joint;
-		wheelHinge->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
-
-		ndModelArticulation::ndNode* const pole = unicycle->FindByName("node_1_link");
-		ndAssert(pole);
-		ndJointHinge* const poleHinge = (ndJointHinge*)*pole->m_joint;
-		poleHinge->SetAsSpringDamper(0.02f, 1500, 40.0f);
+		//ndModelArticulation::ndNode* const wheel = unicycle->FindByName("node_0_link");
+		//ndAssert(wheel);
+		//ndJointHinge* const wheelHinge = (ndJointHinge*)*wheel->m_joint;
+		//wheelHinge->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
+		//
+		//ndModelArticulation::ndNode* const pole = unicycle->FindByName("node_1_link");
+		//ndAssert(pole);
+		//ndJointHinge* const poleHinge = (ndJointHinge*)*pole->m_joint;
+		//poleHinge->SetAsSpringDamper(0.02f, 1500, 40.0f);
 
 		return unicycle;
 	}
@@ -718,7 +718,7 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	
 	ndSetRandSeed(42);
 
-	//ExportUrdfModel(scene);
+//	ExportUrdfModel(scene);
 
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 	matrix.m_posit.m_y = 0.6f;
