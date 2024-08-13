@@ -75,10 +75,6 @@ ndModelArticulation* ndModel::GetAsModelArticulation()
 	return nullptr;
 }
 
-void ndModel::Debug(ndConstraintDebugCallback&) const
-{
-}
-
 ndSharedPtr<ndModelNotify>& ndModel::GetNotifyCallback()
 {
 	return m_notifyCallback;

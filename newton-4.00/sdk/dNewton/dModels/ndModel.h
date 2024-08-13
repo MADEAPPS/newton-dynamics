@@ -47,7 +47,6 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	D_NEWTON_API virtual ndModelBase* GetAsModelBase();
 	D_NEWTON_API virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 	D_NEWTON_API virtual ndModelArticulation* GetAsModelArticulation();
-	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 
 	D_NEWTON_API ndSharedPtr<ndModelNotify>& GetNotifyCallback();
 	D_NEWTON_API void SetNotifyCallback(const ndSharedPtr<ndModelNotify>& notifyCallback);

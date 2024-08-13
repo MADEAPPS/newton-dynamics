@@ -864,7 +864,11 @@ void ndDebugDisplay::ndModelsDebugInfo::UpdateBuffers(ndDemoEntityManager* const
 	for (ndModelList::ndNode* modelNode = modelList.GetFirst(); modelNode; modelNode = modelNode->GetNext())
 	{ 
 		ndModel* const model = *modelNode->GetInfo();
-		model->Debug(debugJoint);
+		ndSharedPtr<ndModelNotify>& notify = model->GetNotifyCallback();
+		if (*notify)
+		{
+			notify->Debug(debugJoint);
+		}
 	}
 	m_frameTick1++;
 }

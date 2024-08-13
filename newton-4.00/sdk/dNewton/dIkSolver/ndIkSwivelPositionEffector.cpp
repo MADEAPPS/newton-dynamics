@@ -283,13 +283,16 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
-	debugCallback.DrawLine(matrix0.m_posit, matrix1.m_posit, ndVector(ndFloat32(0.89f), ndFloat32(0.70f), ndFloat32(0.13f), ndFloat32(1.0f)));
 
+	//debugCallback.DrawFrame(matrix0);
+	//debugCallback.DrawFrame(matrix1);
+	debugCallback.DrawLine(matrix0.m_posit, matrix1.m_posit, ndVector(ndFloat32(0.89f), ndFloat32(0.70f), ndFloat32(0.13f), ndFloat32(1.0f)));
+	
 	const ndVector origin((matrix0.m_posit + matrix1.m_posit) * ndVector::m_half);
 	ndMatrix swivelMatrix1(CalculateSwivelFrame(matrix1));
 	swivelMatrix1.m_posit = origin;
 	debugCallback.DrawFrame(swivelMatrix1);
-
+	
 	const ndMatrix swivelMatrix0(ndPitchMatrix(-m_swivelAngle) * swivelMatrix1);
 	debugCallback.DrawFrame(swivelMatrix0);
 }
