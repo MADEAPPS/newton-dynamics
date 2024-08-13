@@ -299,10 +299,6 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 
 void ndIkSwivelPositionEffector::SubmitLinearAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
-	//static ndVector xxx0;
-	//static ndVector xxx1;
-	//GetDynamicState(xxx0, xxx1);
-
 	const ndVector posit0(matrix0.m_posit);
 	const ndVector posit1(matrix1.TransformVector(m_localTargetPosit));
 	const ndMatrix& axisDir = matrix1;

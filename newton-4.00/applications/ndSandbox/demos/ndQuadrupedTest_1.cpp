@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	class ndLegObservation
@@ -81,8 +81,8 @@ namespace ndQuadruped_1
 
 		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
 
+		//for (ndInt32 i = 0; i < 1; ++i)
 		for (ndInt32 i = 0; i < 4; ++i)
-		//for (ndInt32 i = 0; i < 2; ++i)
 		{
 			ndMatrix limbPivotLocation(matrix * ndYawMatrix(angles[i] * ndDegreeToRad));
 
@@ -95,6 +95,7 @@ namespace ndQuadruped_1
 				thigh->SetMatrix(bodyMatrix);
 				ndJointBilateralConstraint* const ballJoint = new ndIkJointSpherical(limbPivotLocation, thigh, torso);
 				thighNode = model->AddLimb(modelRoot, thigh, ballJoint);
+				thighNode->m_name = ndString ("thigh_") + i;
 
 				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
 			}
@@ -120,6 +121,7 @@ namespace ndQuadruped_1
 				hinge->SetLimitState(true);
 				hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
 				calfNode = model->AddLimb(thighNode, calf0, hinge);
+				calfNode->m_name = ndString("calf_") + i;
 			
 				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
 			}
@@ -146,13 +148,8 @@ namespace ndQuadruped_1
 				ndModelArticulation::ndNode* const footNode = model->AddLimb(calfNode, foot, footHinge);
 
 				footNode->m_name = ndString("foot_") + i;
-			
-				//limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(lenght);
 			}
 		}
-
-		ndAssert(0);
-		//model->ConvertToUrdf();
 
 		ndUrdfFile urdf;
 		char fileName[256];
@@ -168,7 +165,7 @@ namespace ndQuadruped_1
 		ndModelArticulation* const model = urdf.Import(fileName);
 
 		SetModelVisualMesh(scene, model);
-		ndMatrix matrix(model->GetRoot()->m_body->GetMatrix() * location * ndPitchMatrix(-ndPi * 0.5f));
+		ndMatrix matrix(model->GetRoot()->m_body->GetMatrix() * location);
 		matrix.m_posit = location.m_posit;
 		model->SetTransform(matrix);
 
@@ -251,8 +248,7 @@ namespace ndQuadruped_1
 					output[i].m_posit = BasePose(i);
 				}
 
-				//for (ndInt32 i = 0; i < output.GetCount(); i++)
-				for (ndInt32 i = 0; i < 0; i++)
+				for (ndInt32 i = 0; i < output.GetCount(); i++)
 				{
 					ndFloat32 stride_x = m_stride_x;
 					if ((i == 2) || (i == 3))
@@ -1930,8 +1926,7 @@ namespace ndQuadruped_1
 			ndVector veloc;
 			m_animBlendTree->Evaluate(m_animPose, veloc);
 			
-			//const ndVector upVector(rootBody->GetMatrix().m_up);
-			const ndVector upVector(rootBody->GetMatrix().m_right);
+			const ndVector upVector(rootBody->GetMatrix().m_up);
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				ndEffectorInfo* const info = &m_effectorsInfo[i];
@@ -2236,8 +2231,8 @@ namespace ndQuadruped_1
 
 			bool change = false;
 			change = change || ImGui::SliderFloat("x", &control->m_x, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
-			change = change || ImGui::SliderFloat("y", &control->m_z, -0.2f, 0.1f);
-			change = change || ImGui::SliderFloat("z", &control->m_y, -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z );
+			change = change || ImGui::SliderFloat("y", &control->m_y, -0.2f, 0.1f);
+			change = change || ImGui::SliderFloat("z", &control->m_z, -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z );
 			change = change || ImGui::SliderFloat("pitch", &control->m_pitch, -15.0f, 15.0f);
 			change = change || ImGui::SliderFloat("yaw", &control->m_yaw, -20.0f, 20.0f);
 			change = change || ImGui::SliderFloat("roll", &control->m_roll, -15.0f, 15.0f);
