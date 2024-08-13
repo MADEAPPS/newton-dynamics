@@ -117,15 +117,14 @@ namespace ndQuadruped_1
 				caffPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
 				ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0->GetAsBodyKinematic(), thighNode->m_body->GetAsBodyKinematic());
 			
-				//hinge->SetLimitState(true);
-				//hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
+				hinge->SetLimitState(true);
+				hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
 				calfNode = model->AddLimb(thighNode, calf0, hinge);
 			
 				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
 			}
 			
-			//// add calf1
-			//ndModelArticulation::ndNode* footNode = nullptr;
+			// add calf1
 			{
 				ndFloat32 lenght = limbLength * 0.5f;
 				limbPivotLocation = ndRollMatrix(-45.0f * ndDegreeToRad) * limbPivotLocation;
@@ -251,7 +250,8 @@ namespace ndQuadruped_1
 					output[i].m_posit = BasePose(i);
 				}
 
-				for (ndInt32 i = 0; i < output.GetCount(); i++)
+				//for (ndInt32 i = 0; i < output.GetCount(); i++)
+				for (ndInt32 i = 0; i < 0; i++)
 				{
 					ndFloat32 stride_x = m_stride_x;
 					if ((i == 2) || (i == 3))
@@ -696,7 +696,7 @@ namespace ndQuadruped_1
 			//CalculateReward();
 		}
 
-		void UpdatePose(ndFloat32 timestep)
+		void UpdatePose(ndFloat32)
 		{
 			ndAssert(0);
 			//ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
@@ -1050,51 +1050,6 @@ namespace ndQuadruped_1
 		ndSharedPtr<ndBrainAgent> m_agent;
 		ndFloat32 m_timestep;
 		bool m_showDebug;
-	};
-
-	class ndModelUI : public ndUIEntity
-	{
-		public:
-		ndModelUI(ndDemoEntityManager* const scene, const ndSharedPtr<ndModel>& quadruped)
-			:ndUIEntity(scene)
-			,m_model(quadruped)
-		{
-		}
-
-		~ndModelUI()
-		{
-		}
-
-		virtual void RenderUI()
-		{
-		}
-
-		virtual void RenderHelp()
-		{
-			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			//m_scene->Print(color, "Control panel");
-
-			ndRobot* const model = (ndRobot*)*m_model;
-			ndRobot::ndUIControlNode* const control = model->m_control;
-
-			bool change = false;
-			change = change || ImGui::SliderFloat("x", &control->m_x, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
-			change = change || ImGui::SliderFloat("y", &control->m_y, -0.2f, 0.1f);
-			change = change || ImGui::SliderFloat("z", &control->m_z, -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
-			change = change || ImGui::SliderFloat("pitch", &control->m_pitch, -15.0f, 15.0f);
-			change = change || ImGui::SliderFloat("yaw", &control->m_yaw, -20.0f, 20.0f);
-			change = change || ImGui::SliderFloat("roll", &control->m_roll, -15.0f, 15.0f);
-			change = change || ImGui::SliderFloat("animSpeed", &control->m_animSpeed, 0.0f, 1.0f);
-			change = change || ImGui::Checkbox("enable controller", &control->m_enableController);
-
-			if (change)
-			{
-				ndBodyKinematic* const body = m_model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
-				body->SetSleepState(false);
-			}
-		}
-
-		ndSharedPtr<ndModel> m_model;
 	};
 
 
@@ -1588,26 +1543,28 @@ namespace ndQuadruped_1
 		};
 
 		public:
-		RobotModelNotify(ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
+		RobotModelNotify(ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot, bool showDebug)
 			:ndModelNotify()
 			,m_invDynamicsSolver()
 			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 			,m_world(nullptr)
 			,m_timestep(ndFloat32(0.0f))
+			,m_showDebug(showDebug)
 		{
 			m_controllerTrainer = new ndControllerTrainer(master);
 			m_controllerTrainer->m_robot = this;
 			Init(robot);
 		}
 
-		RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const robot)
+		RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const robot, bool showDebug)
 			:ndModelNotify()
 			,m_invDynamicsSolver()
 			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 			,m_world(nullptr)
 			,m_timestep(ndFloat32 (0.0f))
+			,m_showDebug(showDebug)
 		{
 			m_controller = new ndController(brain);
 			m_controller->m_robot = this;
@@ -1963,12 +1920,12 @@ namespace ndQuadruped_1
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			//if (!m_showDebug)
-			//{
-			//	return;
-			//}
+			if (!m_showDebug)
+			{
+				return;
+			}
 
-			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			//ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 
 			//ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			//ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
@@ -2077,6 +2034,53 @@ namespace ndQuadruped_1
 		ndControllerTrainer* m_controllerTrainer;
 		ndWorld* m_world;
 		ndFloat32 m_timestep;
+		bool m_showDebug;
+
+		friend class ndModelUI;
+	};
+
+	class ndModelUI : public ndUIEntity
+	{
+		public:
+		ndModelUI(ndDemoEntityManager* const scene, RobotModelNotify* const modelNotify)
+			:ndUIEntity(scene)
+			,m_modelNotify(modelNotify)
+		{
+		}
+
+		~ndModelUI()
+		{
+		}
+
+		virtual void RenderUI()
+		{
+		}
+
+		virtual void RenderHelp()
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			//m_scene->Print(color, "Control panel");
+			
+			RobotModelNotify::ndUIControlNode* const control = m_modelNotify->m_control;
+
+			bool change = false;
+			change = change || ImGui::SliderFloat("x", &control->m_x, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
+			change = change || ImGui::SliderFloat("y", &control->m_z, -0.2f, 0.1f);
+			change = change || ImGui::SliderFloat("z", &control->m_y, -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z );
+			change = change || ImGui::SliderFloat("pitch", &control->m_pitch, -15.0f, 15.0f);
+			change = change || ImGui::SliderFloat("yaw", &control->m_yaw, -20.0f, 20.0f);
+			change = change || ImGui::SliderFloat("roll", &control->m_roll, -15.0f, 15.0f);
+			change = change || ImGui::SliderFloat("animSpeed", &control->m_animSpeed, 0.0f, 1.0f);
+			change = change || ImGui::Checkbox("enable controller", &control->m_enableController);
+
+			if (change)
+			{
+				ndBodyKinematic* const body = m_modelNotify->GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
+				body->SetSleepState(false);
+			}
+		}
+
+		RobotModelNotify* m_modelNotify;
 	};
 }
 
@@ -2102,7 +2106,6 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_frictionTest, ndDemoContactCallback::m_default);
 
-	//ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.6f;
 
@@ -2114,19 +2117,16 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		ndModelArticulation* const model = CreateModel(scene, matrix);
 		model->AddToWorld(world);
 
-		//((ndRobot*)(*model1))->m_showDebug = true;
-		//BuildAgent()
-
-		//ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, model1));
-		//scene->Set2DDisplayRenderFunction(quadrupedUI);
-
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-		world->AddJoint(fixJoint);
+		//world->AddJoint(fixJoint);
 
 		char fileName[256];
 		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
 		ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
-		model->SetNotifyCallback(new RobotModelNotify(brain, model));
+		model->SetNotifyCallback(new RobotModelNotify(brain, model, true));
+
+		ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*model->GetNotifyCallback()));
+		scene->Set2DDisplayRenderFunction(quadrupedUI);
 
 		ndInt32 countZ = 5;
 		ndInt32 countX = 5;
