@@ -100,7 +100,6 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	static ndInt32 m_cellIndices[][4];
 
 	friend class ndContactSolver;
-	friend class ndFileFormatShapeStaticHeightfield;
 };
 
 inline ndArray<ndReal>& ndShapeHeightfield::GetElevationMap()

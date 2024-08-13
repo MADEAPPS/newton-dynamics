@@ -66,16 +66,14 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API void AddToWorld(ndWorld* const world);
 	D_NEWTON_API void SetTransform(const ndMatrix& matrix);
 
+	private:
 	D_NEWTON_API void ConvertToUrdf();
 
-	protected:
-	ndNode* m_rootNode;
-	//ndIkSolver m_invDynamicsSolver;
-	ndSharedList<ndJointBilateralConstraint> m_closeLoops;
 	ndString m_name;
+	ndNode* m_rootNode;
+	ndSharedList<ndJointBilateralConstraint> m_closeLoops;
 
-	friend class ndFileFormatSave;
-	friend class ndFileFormatModelArticulation;
+	friend class ndUrdfFile;
 };
 
 #endif 

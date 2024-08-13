@@ -61,8 +61,6 @@ class ndShapeBox: public ndShapeConvex
 	static ndConvexSimplexEdge m_edgeArray[];
 	static ndConvexSimplexEdge* m_edgeEdgeMap[];
 	static ndConvexSimplexEdge* m_vertexToEdgeMap[];
-	friend class ndFileFormatShapeConvexBox;
-
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif 

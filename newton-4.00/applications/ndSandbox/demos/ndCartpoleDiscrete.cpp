@@ -83,8 +83,6 @@ namespace ndCarpole_0
 		ndUrdfFile urdf;
 		char fileName[256];
 
-		model->ConvertToUrdf();
-
 		ndGetWorkingFileName("cartpole.urdf", fileName);
 		urdf.Export(fileName, *model);
 	}
@@ -98,7 +96,7 @@ namespace ndCarpole_0
 		ndModelArticulation* const cartPole = urdf.Import(fileName);
 
 		SetModelVisualMesh(scene, cartPole);
-		ndMatrix matrix(cartPole->GetRoot()->m_body->GetMatrix() * location * ndPitchMatrix(-ndPi * 0.5f));
+		ndMatrix matrix(cartPole->GetRoot()->m_body->GetMatrix() * location);
 		matrix.m_posit = location.m_posit;
 		cartPole->SetTransform(matrix);
 

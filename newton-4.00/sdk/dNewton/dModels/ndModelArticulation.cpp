@@ -44,19 +44,17 @@ ndModelArticulation::ndNode::~ndNode()
 
 ndModelArticulation::ndModelArticulation()
 	:ndModel()
-	,m_rootNode(nullptr)
-	//,m_invDynamicsSolver()
-	,m_closeLoops()
 	,m_name("")
+	,m_rootNode(nullptr)
+	,m_closeLoops()
 {
 }
 
 ndModelArticulation::ndModelArticulation(const ndModelArticulation& src)
 	:ndModel(src)
-	,m_rootNode(nullptr)
-	//,m_invDynamicsSolver()
-	,m_closeLoops()
 	,m_name(src.m_name)
+	,m_rootNode(nullptr)
+	,m_closeLoops()
 {
 	ndAssert(0);
 	ndAssert(src.GetRoot()->m_body->GetAsBodyDynamic());
@@ -284,8 +282,9 @@ void ndModelArticulation::SetTransform(const ndMatrix& matrix)
 
 void ndModelArticulation::ConvertToUrdf()
 {
-	struct BodyInfo
+	class BodyInfo
 	{
+		public:
 		ndVector m_centerOfMass;
 		ndMatrix m_bodyMatrix;
 		ndMatrix m_collisionMatrix;
@@ -294,9 +293,8 @@ void ndModelArticulation::ConvertToUrdf()
 		ndJointBilateralConstraint* m_joint;
 	};
 
-	ndMatrix rootMatrix(m_rootNode->m_body->GetMatrix());
-	//SetTransform(ndGetIdentityMatrix());
-	SetTransform(ndPitchMatrix(ndPi * 0.5f));
+	//ndMatrix rootMatrix(m_rootNode->m_body->GetMatrix());
+	//SetTransform(ndPitchMatrix(ndPi * 0.5f));
 
 	ndTree<BodyInfo, ndModelArticulation::ndNode*> map;
 	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
@@ -386,6 +384,5 @@ void ndModelArticulation::ConvertToUrdf()
 			stack.PushBack(child);
 		}
 	}
-
-	SetTransform(rootMatrix);
+	//SetTransform(rootMatrix);
 }

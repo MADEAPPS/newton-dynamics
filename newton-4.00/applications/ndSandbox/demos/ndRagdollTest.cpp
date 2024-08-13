@@ -290,19 +290,4 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	origin.m_y += 1.0f;
 	origin.m_z += -0.0f;
 	scene->SetCameraMatrix(playerMatrix, origin);
-
-	//ndFileFormatSave xxxxSave;
-	//xxxxSave.SaveModels(scene->GetWorld(), "xxxx.nd");
-	//ndFileFormatLoad xxxxLoad;
-	//xxxxLoad.Load("xxxx.nd");
-	//// offset bodies positions for calibration
-	//const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
-	//for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndSharedPtr<ndBody>& body = node->GetInfo();
-	//	ndMatrix bodyMatrix (body->GetMatrix());
-	//	bodyMatrix.m_posit.m_x += 1.0f;
-	//	body->SetMatrix(bodyMatrix);
-	//}
-	//xxxxLoad.AddToWorld(scene->GetWorld());
 }

@@ -57,7 +57,6 @@ class ndShapeCone : public ndShapeConvex
 
 	static ndInt32 m_shapeRefCount;
 	static ndConvexSimplexEdge m_edgeArray[];
-	friend class ndFileFormatShapeConvexCone;
 
 } D_GCC_NEWTON_ALIGN_32;
 

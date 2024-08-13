@@ -269,7 +269,4 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 
 	ndQuaternion rot(ndYawMatrix(45.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);
-
-	//ndFileFormatSave xxxx;
-	//xxxx.SaveBodies(scene->GetWorld(), "xxxx.nd");
 }

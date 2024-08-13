@@ -92,7 +92,6 @@ class ndBodyPlayerCapsule : public ndBodyKinematicBase
 	bool m_isAirbone;
 	bool m_isOnFloor;
 	bool m_isCrouched;
-	friend class ndFileFormatBodyKinematicPlayerCapsule;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule()

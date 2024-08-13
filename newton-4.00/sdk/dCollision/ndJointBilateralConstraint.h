@@ -158,7 +158,6 @@ class ndJointBilateralConstraint : public ndConstraint
 	friend class ndWorld;
 	friend class ndIkSolver;
 	friend class ndDynamicsUpdate;
-	friend class ndFileFormatJoint;
 	friend class ndModelArticulation;
 	friend class ndSkeletonContainer;
 	friend class ndDynamicsUpdateSoa;

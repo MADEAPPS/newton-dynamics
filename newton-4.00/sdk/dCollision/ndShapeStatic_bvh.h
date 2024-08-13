@@ -60,7 +60,6 @@ class ndShapeStatic_bvh: public ndShapeStaticMesh, public ndAabbPolygonSoup
 	ndInt32 m_trianglesCount;
 
 	friend class ndContactSolver;
-	friend class ndFileFormatShapeStaticMesh_bvh;
 };
 
 inline void* ndShapeStatic_bvh::operator new (size_t size)

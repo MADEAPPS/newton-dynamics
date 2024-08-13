@@ -279,7 +279,6 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	mutable ndAtomic<ndInt32> m_refCount;
 	ndShapeID m_collisionId;
 	static ndVector m_flushZero;
-	friend class ndFileFormatShape;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndShapeInfo::ndShapeInfo()

@@ -106,7 +106,6 @@ class ndShapeCompound: public ndShape
 	friend class ndBodyKinematic;
 	friend class ndShapeInstance;
 	friend class ndContactSolver;
-	friend class ndFileFormatShapeCompound;
 };
 
 inline ndShapeCompound* ndShapeCompound::GetAsShapeCompound()

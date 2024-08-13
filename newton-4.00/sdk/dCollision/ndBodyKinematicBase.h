@@ -35,7 +35,6 @@ class ndBodyKinematicBase : public ndBodyKinematic
 
 	void SpecialUpdate(ndFloat32 timestep);
 	ndBodyKinematicBase* GetAsBodyKinematicSpecial();
-	friend class ndFileFormatBodyKinematicBase;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndBodyKinematicBase* ndBodyKinematicBase::GetAsBodyKinematicSpecial()

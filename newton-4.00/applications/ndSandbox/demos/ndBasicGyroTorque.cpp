@@ -220,9 +220,6 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	RattleBack(scene, 10.0f, -5.0f, ndVector(0.0f, 0.0f,  4.0f, 0.0f));
 	
 	scene->GetCameraManager()->SetPickMode(true);
-
-	//ndFileFormatSave xxxx;
-	//xxxx.SaveWorld(scene->GetWorld(), "xxxx.nd");
 	
 	ndQuaternion rot;
 	ndVector origin(-15.0f, 5.0f, 0.0f, 1.0f);

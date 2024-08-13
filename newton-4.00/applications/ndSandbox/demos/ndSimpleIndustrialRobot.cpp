@@ -529,19 +529,4 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z += 5.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 45.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
-
-	//ndFileFormatSave xxxxSave;
-	//xxxxSave.SaveModels(scene->GetWorld(), "xxxx.nd");
-	//ndFileFormatLoad xxxxLoad;
-	//xxxxLoad.Load("xxxx.nd");
-	//// offset bodies positions for calibration;
-	//const ndList<ndSharedPtr<ndBody>>& bodyList = xxxxLoad.GetBodyList();
-	//for (ndList<ndSharedPtr<ndBody>>::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndSharedPtr<ndBody>& body = node->GetInfo();
-	//	ndMatrix bodyMatrix(body->GetMatrix());
-	//	bodyMatrix.m_posit.m_x += 4.0f;
-	//	body->SetMatrix(bodyMatrix);
-	//}
-	//xxxxLoad.AddToWorld(scene->GetWorld());
 }

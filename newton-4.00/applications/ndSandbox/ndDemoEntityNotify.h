@@ -20,27 +20,9 @@ class ndShaderCache;
 class ndAnimKeyframe;
 class ndDemoMeshInterface;
 
-//class ndDemoEntityNotify: public ndBodyNotify
 class ndDemoEntityNotify : public ndModelBodyNotify
 {
 	public:
-	//D_CLASS_REFLECTION(ndDemoEntityNotify, ndBodyNotify)
-	//class ndDemoEntityNotifyFileLoadSave: public ndFileFormatNotify
-	//{
-	//	public:
-	//	ndDemoEntityNotifyFileLoadSave(const char* const className = ndDemoEntityNotify::StaticClassName())
-	//		:ndFileFormatNotify(className)
-	//	{
-	//	}
-	//
-	//	void SaveNotify(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
-	//	{
-	//		nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, D_NOTIFY_CLASS, ndDemoEntityNotify::StaticClassName());
-	//		ndFileFormatNotify::SaveNotify(scene, classNode, notify);
-	//		xmlSaveParam(classNode, "useCollisionForVisual", 1);
-	//	}
-	//};
-
 	ndDemoEntityNotify(const ndDemoEntityNotify& notify);
 	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody = nullptr, ndFloat32 gravity = DEMO_GRAVITY);
 
@@ -72,26 +54,6 @@ class ndDemoEntityNotify : public ndModelBodyNotify
 class ndBindingRagdollEntityNotify : public ndDemoEntityNotify
 {
 	public:
-	//D_CLASS_REFLECTION(ndBindingRagdollEntityNotify, ndDemoEntityNotify)
-	//class ndBindingRagdollEntityNotifyFileSaveLoad : public ndDemoEntityNotifyFileLoadSave
-	//{
-	//	public:
-	//	ndBindingRagdollEntityNotifyFileSaveLoad()
-	//		:ndDemoEntityNotifyFileLoadSave(ndBindingRagdollEntityNotify::StaticClassName())
-	//	{
-	//	}
-	//
-	//	void SaveNotify(ndFileFormat* const scene, nd::TiXmlElement* const parentNode, const ndBodyNotify* const notify)
-	//	{
-	//		nd::TiXmlElement* const classNode = xmlCreateClassNode(parentNode, "ndBindingNotifyClass", ndBindingRagdollEntityNotify::StaticClassName());
-	//		ndDemoEntityNotifyFileLoadSave::SaveNotify(scene, classNode, notify);
-	//
-	//		ndBindingRagdollEntityNotify* const bindNotiFy = (ndBindingRagdollEntityNotify*)notify;
-	//		xmlSaveParam(classNode, "bindMatrix", bindNotiFy->m_bindMatrix);
-	//		xmlSaveParam(classNode, "capSpeed", bindNotiFy->m_capSpeed);
-	//	}
-	//};
-
 	ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody, ndFloat32 campSpeed);
 	~ndBindingRagdollEntityNotify();
 

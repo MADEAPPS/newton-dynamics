@@ -23,7 +23,7 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"unicycleVPG.dnn"
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
@@ -64,6 +64,7 @@ namespace ndUnicycle
 		ndBodyKinematic* const hipBody = CreateBox(scene, ndGetIdentityMatrix(), mass, xSize, ySize, zSize, "wood_0.png");
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(hipBody);
 		hipBody->SetMatrix(location);
+		modelRoot->m_name = "base_link";
 
 		// make single leg
 		ndFloat32 limbLength = 0.3f;
@@ -80,6 +81,8 @@ namespace ndUnicycle
 		ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
 		legJoint->SetAsSpringDamper(0.02f, 1500, 40.0f);
 
+		legLimb->m_name = "leg";
+
 		// make wheel
 		ndFloat32 wheelRadio = 4.0f * limbRadio;
 		ndBodyKinematic* const wheelBody = CreateSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "wood_0.png");
@@ -89,10 +92,10 @@ namespace ndUnicycle
 		wheelBody->SetMatrix(wheelMatrix);
 		ndMatrix wheelJointMatrix(ndYawMatrix(-ndPi * ndFloat32(0.5f)) * wheelMatrix);
 		ndJointHinge* const wheelJoint = new ndJointHinge(wheelJointMatrix, wheelBody, legBody);
-		model->AddLimb(legLimb, wheelBody, wheelJoint);
+		ndModelArticulation::ndNode* const wheel = model->AddLimb(legLimb, wheelBody, wheelJoint);
 		wheelJoint->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
 
-		model->ConvertToUrdf();
+		wheel->m_name = "wheel";
 
 		ndUrdfFile urdf;
 		char fileName[256];
@@ -108,19 +111,9 @@ namespace ndUnicycle
 		ndModelArticulation* const unicycle = urdf.Import(fileName);
 
 		SetModelVisualMesh(scene, unicycle);
-		ndMatrix matrix(unicycle->GetRoot()->m_body->GetMatrix() * location * ndPitchMatrix(-ndPi * 0.5f));
+		ndMatrix matrix(unicycle->GetRoot()->m_body->GetMatrix() * location);
 		matrix.m_posit = location.m_posit;
 		unicycle->SetTransform(matrix);
-
-		//ndModelArticulation::ndNode* const wheel = unicycle->FindByName("node_0_link");
-		//ndAssert(wheel);
-		//ndJointHinge* const wheelHinge = (ndJointHinge*)*wheel->m_joint;
-		//wheelHinge->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
-		//
-		//ndModelArticulation::ndNode* const pole = unicycle->FindByName("node_1_link");
-		//ndAssert(pole);
-		//ndJointHinge* const poleHinge = (ndJointHinge*)*pole->m_joint;
-		//poleHinge->SetAsSpringDamper(0.02f, 1500, 40.0f);
 
 		return unicycle;
 	}
@@ -262,9 +255,9 @@ namespace ndUnicycle
 
 		void Init(ndModelArticulation* const model)
 		{
-			m_legJoint = (ndJointHinge*)*model->FindByName("node_1_link")->m_joint;;
-			m_wheelJoint = (ndJointHinge*)*model->FindByName("node_0_link")->m_joint;
-			m_wheel = model->FindByName("node_0_link")->m_body->GetAsBodyDynamic();
+			m_legJoint = (ndJointHinge*)*model->FindByName("leg")->m_joint;
+			m_wheelJoint = (ndJointHinge*)*model->FindByName("wheel")->m_joint;
+			m_wheel = model->FindByName("wheel")->m_body->GetAsBodyDynamic();
 
 			m_bodies.SetCount(0);
 			m_basePose.SetCount(0);
@@ -301,14 +294,12 @@ namespace ndUnicycle
 		{
 			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
 			const ndMatrix& matrix = model->GetRoot()->m_body->GetMatrix();
-			return matrix.m_right.m_x;
+			return matrix.m_up.m_x;
 		}
 
 		bool IsTerminal() const
 		{
 			#define D_REWARD_MIN_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
-			//ndModelArticulation* const model = (ndModelArticulation*)GetModel();
-			//const ndMatrix& matrix = model->GetRoot()->m_body->GetMatrix();
 			ndFloat32 sinAngle = ndClamp(GetAngle(), ndFloat32(-0.9f), ndFloat32(0.9f));
 			bool fail = ndAbs(ndAsin(sinAngle)) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
 			return fail;
@@ -355,7 +346,6 @@ namespace ndUnicycle
 				ndBodyKinematic* const boxBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 
 				const ndVector boxVeloc(boxBody->GetVelocity());
-				//const ndMatrix& matrix = boxBody->GetMatrix();
 				const ndFloat32 sinAngle = GetAngle();
 				const ndFloat32 boxReward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
 				const ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(1.0f) * boxVeloc.m_x * boxVeloc.m_x));
@@ -419,7 +409,6 @@ namespace ndUnicycle
 			const ndVector omega(body->GetOmega());
 			const ndVector veloc(body->GetVelocity());
 			const ndVector wheelOmega(m_wheel->GetOmega());
-			//const ndMatrix& matrix = body->GetMatrix();
 			const ndFloat32 sinAngle = ndClamp(GetAngle(), ndFloat32(-0.9f), ndFloat32(0.9f));
 			const ndFloat32 angle = ndAsin(sinAngle);
 
@@ -720,7 +709,7 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 
 //	ExportUrdfModel(scene);
 
-	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
+	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.6f;
 
 #ifdef ND_TRAIN_AGENT

@@ -1332,6 +1332,9 @@ ndModelArticulation* ndUrdfFile::Import(const char* const filePathName)
 		}
 	}
 
+	model->SetTransform(ndPitchMatrix(-ndPi * 0.5f));
+	model->ConvertToUrdf();
+
 	setlocale(LC_ALL, oldloc.GetStr());
 	return model;
 }
@@ -1355,7 +1358,8 @@ void ndUrdfFile::Export(const char* const filePathName, ndModelArticulation* con
 	rootNode->SetAttribute("name", model->GetName().GetStr());
 
 	const ndMatrix modelMatrix(model->GetRoot()->m_body->GetMatrix());
-	model->SetTransform(ndGetIdentityMatrix());
+	model->SetTransform(ndPitchMatrix(ndPi * 0.5f));
+	model->ConvertToUrdf();
 
 	Surrogate* const surrogate = ExportMakeSurrogate(model);
 	ndAssert(surrogate);

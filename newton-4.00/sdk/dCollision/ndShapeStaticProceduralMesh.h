@@ -71,7 +71,6 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 
 	private:
 	friend class ndContactSolver;
-	friend class ndFileFormatShapeStaticProceduralMesh;
 };
 
 inline void ndShapeStaticProceduralMesh::GetCollidingFaces(const ndVector&, const ndVector&, ndArray<ndVector>&, ndArray<ndInt32>&, ndArray<ndInt32>&, ndArray<ndInt32>&) const

@@ -58,8 +58,6 @@ class ndShapeCylinder : public ndShapeConvex
 
 	static ndInt32 m_shapeRefCount;
 	static ndConvexSimplexEdge m_edgeArray[];
-	friend class ndFileFormatShapeConvexCylinder;
-
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif 
