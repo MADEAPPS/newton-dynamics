@@ -1993,25 +1993,24 @@ namespace ndQuadruped_1
 			//
 			//const ndVector upVector(rootBody->GetMatrix().m_up);
 			//ndFixSizeArray<ndBigVector, 16> supportPoint;
-			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
-			//{
-			//	const ndAnimKeyframe& keyFrame = m_animPose[i];
-			//	ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-			//	ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-			//
-			//	if (i == 0)
-			//	{
-			//		effector->DebugJoint(context);
-			//	}
-			//
+			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			{
+				const ndAnimKeyframe& keyFrame = m_animPose[i];
+				ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
+				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+				if (i == 0)
+				{
+					effector->DebugJoint(context);
+				}
+			
 			//	//if (keyFrame.m_userParamInt == 0)
 			//	if (keyFrame.m_userParamFloat < 1.0f)
 			//	{
 			//		ndBodyKinematic* const body = effector->GetBody0();
 			//		supportPoint.PushBack(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit));
 			//	}
-			//}
-			//
+			}
+			
 			//ndVector supportColor(0.0f, 1.0f, 1.0f, 1.0f);
 			//if (supportPoint.GetCount() >= 3)
 			//{
@@ -2066,12 +2065,6 @@ namespace ndQuadruped_1
 			//	//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
 			//	//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
 			//}
-
-			for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); ++i)
-			{
-				const ndEffectorInfo& info = m_effectorsInfo[i];
-				info.m_effector->DebugJoint(context);
-			}
 		}
 
 		ndIkSolver m_invDynamicsSolver;
@@ -2111,7 +2104,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 
 	//ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 0.5f;
+	matrix.m_posit.m_y = 0.6f;
 
 	#ifdef ND_TRAIN_MODEL
 		TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix);
