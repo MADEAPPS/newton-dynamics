@@ -266,6 +266,7 @@ namespace ndQuadruped_1
 				:ndBrainAgentContinuePolicyGradient_Trainer(master)
 				,m_robot(nullptr)
 			{
+				ndMemSet(m_rewardsMemories, ndReal(1.0), sizeof(m_rewardsMemories) / sizeof(m_rewardsMemories[0]));
 			}
 
 			ndControllerTrainer(const ndControllerTrainer& src)
@@ -315,7 +316,6 @@ namespace ndQuadruped_1
 				m_trajectory.SetCount(stepsCount);
 				ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
 			}
-
 
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
 			RobotModelNotify* m_robot;
@@ -617,6 +617,7 @@ namespace ndQuadruped_1
 			}
 		}
 
+		//#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
 			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
@@ -1227,6 +1228,7 @@ namespace ndQuadruped_1
 					m_models.Append(model);
 					//HideModel(model);
 					SetMaterial(model);
+					((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
 				}
 			}
 			scene->SetAcceleratedUpdate();
