@@ -23,6 +23,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndModel.h"
+#include "ndUrdfFile.h"
 #include "ndBodyDynamic.h"
 #include "ndModelArticulation.h"
 
@@ -287,14 +288,12 @@ void ndModelArticulation::ConvertToUrdf()
 		public:
 		ndVector m_centerOfMass;
 		ndMatrix m_bodyMatrix;
+		ndMatrix m_visualMatrix;
 		ndMatrix m_collisionMatrix;
 		ndMatrix m_jointMatrix0;
 		ndMatrix m_jointMatrix1;
 		ndJointBilateralConstraint* m_joint;
 	};
-
-	//ndMatrix rootMatrix(m_rootNode->m_body->GetMatrix());
-	//SetTransform(ndPitchMatrix(ndPi * 0.5f));
 
 	ndTree<BodyInfo, ndModelArticulation::ndNode*> map;
 	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
@@ -306,6 +305,13 @@ void ndModelArticulation::ConvertToUrdf()
 			info.m_bodyMatrix = body->GetMatrix();
 			info.m_centerOfMass = info.m_bodyMatrix.TransformVector(body->GetCentreOfMass());
 			info.m_collisionMatrix = body->GetCollisionShape().GetLocalMatrix() * info.m_bodyMatrix;
+			info.m_visualMatrix = ndGetIdentityMatrix();
+			ndUrdfBodyNotify* const notify = body->GetNotifyCallback()->GetAsUrdfBodyNotify();
+			if (notify)
+			{
+				info.m_visualMatrix = notify->m_offset * info.m_bodyMatrix;
+			}
+
 			info.m_joint = *node->m_joint;
 			info.m_joint->CalculateGlobalMatrix(info.m_jointMatrix0, info.m_jointMatrix1);
 			map.Insert(info, node);
@@ -320,6 +326,12 @@ void ndModelArticulation::ConvertToUrdf()
 		info.m_bodyMatrix = body->GetMatrix();
 		info.m_centerOfMass = info.m_bodyMatrix.TransformVector(body->GetCentreOfMass());
 		info.m_collisionMatrix = body->GetCollisionShape().GetLocalMatrix() * info.m_bodyMatrix;
+		ndUrdfBodyNotify* const notify = body->GetNotifyCallback()->GetAsUrdfBodyNotify();
+		if (notify)
+		{
+			info.m_visualMatrix = notify->m_offset * info.m_bodyMatrix;
+		}
+
 		info.m_joint = *child->m_joint;
 		info.m_joint->CalculateGlobalMatrix(info.m_jointMatrix0, info.m_jointMatrix1);
 		saved.PushBack(info);
@@ -327,13 +339,25 @@ void ndModelArticulation::ConvertToUrdf()
 
 	BodyInfo rootBodyInfo;
 	ndBodyKinematic* const rootBody = m_rootNode->m_body->GetAsBodyKinematic();
+	ndShapeInstance& rootCollision = rootBody->GetCollisionShape();
+
 	rootBodyInfo.m_bodyMatrix = rootBody->GetMatrix();
 	rootBodyInfo.m_centerOfMass = rootBodyInfo.m_bodyMatrix.TransformVector(rootBody->GetCentreOfMass());
-	rootBodyInfo.m_collisionMatrix = rootBody->GetCollisionShape().GetLocalMatrix() * rootBodyInfo.m_bodyMatrix;
+	rootBodyInfo.m_collisionMatrix = rootCollision.GetLocalMatrix() * rootBodyInfo.m_bodyMatrix;
+	ndUrdfBodyNotify* const rootNotify = rootBody->GetNotifyCallback()->GetAsUrdfBodyNotify();
+	if (rootNotify)
+	{
+		rootBodyInfo.m_visualMatrix = rootNotify->m_offset * rootBodyInfo.m_bodyMatrix;
+	}
 
 	rootBody->SetMatrix(ndGetIdentityMatrix());
-	rootBody->GetCollisionShape().SetLocalMatrix(rootBodyInfo.m_collisionMatrix);
+	rootCollision.SetLocalMatrix(rootBodyInfo.m_collisionMatrix);
 	rootBody->SetCentreOfMass(rootBodyInfo.m_centerOfMass);
+	if (rootNotify)
+	{
+		rootNotify->m_offset = rootBodyInfo.m_visualMatrix;
+	}
+
 	for (ndInt32 i = 0; i < saved.GetCount(); ++i)
 	{
 		const BodyInfo& info = saved[i];
@@ -349,11 +373,17 @@ void ndModelArticulation::ConvertToUrdf()
 		{
 			const BodyInfo& info = map.Find(node)->GetInfo();
 			ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+			ndShapeInstance& collision = body->GetCollisionShape();
 			
 			body->SetMatrix(info.m_jointMatrix0);
-			ndMatrix localMatrix(info.m_collisionMatrix * info.m_jointMatrix0.OrthoInverse());
-			body->GetCollisionShape().SetLocalMatrix(localMatrix);
+			collision.SetLocalMatrix(info.m_collisionMatrix* info.m_jointMatrix0.OrthoInverse());
 			body->SetCentreOfMass(info.m_jointMatrix0.UntransformVector(info.m_centerOfMass));
+
+			ndUrdfBodyNotify* const notify = body->GetNotifyCallback()->GetAsUrdfBodyNotify();
+			if (notify)
+			{
+				notify->m_offset = info.m_visualMatrix * info.m_jointMatrix0.OrthoInverse();
+			}
 		}
 
 		for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
@@ -384,5 +414,4 @@ void ndModelArticulation::ConvertToUrdf()
 			stack.PushBack(child);
 		}
 	}
-	//SetTransform(rootMatrix);
 }

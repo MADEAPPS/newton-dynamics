@@ -261,11 +261,15 @@ void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* c
 	{
 		ndSharedPtr<ndBody> body(node->m_body);
 
-		ndUrdfBodyNotify* const urdfNotify = (ndUrdfBodyNotify*)body->GetNotifyCallback();
-		ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("urdfMesh", *urdfNotify->m_mesh, scene->GetShaderCache()));
-		ndDemoEntity* const entity = new ndDemoEntity(body->GetMatrix(), nullptr);
-		entity->SetMesh(mesh);
-		scene->AddEntity(entity);
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+		ndUrdfBodyNotify* const urdfNotify = body->GetNotifyCallback()->GetAsUrdfBodyNotify();
+		if (urdfNotify)
+		{
+			ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("urdfMesh", *urdfNotify->m_mesh, scene->GetShaderCache()));
+			ndDemoEntity* const entity = new ndDemoEntity(body->GetMatrix(), nullptr);
+			entity->SetMesh(mesh);
+			entity->SetMeshMatrix(urdfNotify->m_offset);
+			scene->AddEntity(entity);
+			body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+		}
 	}
 }

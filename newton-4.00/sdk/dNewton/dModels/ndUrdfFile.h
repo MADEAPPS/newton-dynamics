@@ -19,12 +19,14 @@ class ndUrdfBodyNotify : public ndBodyNotify
 	public:
 	ndUrdfBodyNotify(ndMeshEffect* const mesh)
 		:ndBodyNotify(ndVector::m_zero)
+		,m_offset(ndGetIdentityMatrix())
 		,m_mesh(mesh)
 	{
 	}
 
 	ndUrdfBodyNotify(const ndUrdfBodyNotify& src)
 		:ndBodyNotify(src)
+		,m_offset(src.m_offset)
 		,m_mesh(src.m_mesh)
 	{
 	}
@@ -33,7 +35,13 @@ class ndUrdfBodyNotify : public ndBodyNotify
 	{
 		return new ndUrdfBodyNotify(*this);
 	}
+
+	ndUrdfBodyNotify* GetAsUrdfBodyNotify()
+	{
+		return this;
+	}
 	
+	ndMatrix m_offset;
 	ndSharedPtr<ndMeshEffect> m_mesh;
 };
 

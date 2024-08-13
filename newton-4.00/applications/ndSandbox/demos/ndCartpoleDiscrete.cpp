@@ -67,6 +67,7 @@ namespace ndCarpole_0
 		cartBody->SetMatrix(matrix);
 
 		matrix.m_posit.m_y += ySize / 2.0f;
+		modelRoot->m_name = "base_link";
 		
 		// make pole leg
 		ndBodyKinematic* const poleBody = CreateCapsule(scene, matrix, poleMass, poleRadio, poleRadio, poleLength, "smilli.png");
@@ -78,7 +79,8 @@ namespace ndCarpole_0
 		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
 		polePivot.m_posit.m_y -= poleLength * 0.5f;
 		ndJointBilateralConstraint* const poleJoint = new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic());
-		model->AddLimb(modelRoot, poleBody, poleJoint);
+		ndModelArticulation::ndNode* const pole = model->AddLimb(modelRoot, poleBody, poleJoint);
+		pole->m_name = "pole_link";
 
 		ndUrdfFile urdf;
 		char fileName[256];

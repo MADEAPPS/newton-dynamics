@@ -1621,7 +1621,9 @@ void ndDemoEntityManager::TestImGui()
 		ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
 		ImGui::Text("Hello from another window!");
 		if (ImGui::Button("Close Me"))
+		{
 			show_another_window = false;
+		}
 		ImGui::End();
 	}
 }

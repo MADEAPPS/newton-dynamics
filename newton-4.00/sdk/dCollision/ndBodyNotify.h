@@ -25,6 +25,7 @@
 #include "ndCollisionStdafx.h"
 
 class ndBody;
+class ndUrdfBodyNotify;
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
@@ -40,6 +41,9 @@ class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 	D_COLLISION_API ndBody* GetBody();
 	D_COLLISION_API const ndBody* GetBody() const;
 	D_COLLISION_API virtual void* GetUserData() const;
+
+	D_COLLISION_API virtual ndBodyNotify* GetAsBodyNotify();
+	D_COLLISION_API virtual ndUrdfBodyNotify* GetAsUrdfBodyNotify();
 
 	D_COLLISION_API ndVector GetGravity() const;
 	D_COLLISION_API void SetGravity(const ndVector& defaultGravity);

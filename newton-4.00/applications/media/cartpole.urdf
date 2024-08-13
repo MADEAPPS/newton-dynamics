@@ -24,7 +24,7 @@
             <inertia xx="0.0158854" xy="0" xz="0" yy="0.0354167" yz="0" zz="0.0325521" />
         </inertial>
     </link>
-    <link name="node_0_link">
+    <link name="pole_link">
         <visual>
             <geometry>
                 <cylinder length="0.5" radius="0.05" />
@@ -46,9 +46,9 @@
             <inertia xx="0.185619" xy="-1.71279e-14" xz="0" yy="0.0118084" yz="5.74201e-21" zz="0.185619" />
         </inertial>
     </link>
-    <joint name="node_0_link_to_base_link" type="continuous">
+    <joint name="pole_link_to_base_link" type="continuous">
         <parent link="base_link" />
-        <child link="node_0_link" />
+        <child link="pole_link" />
         <origin rpy="3.13916e-07 -0 1.5708" xyz="0 1.96198e-08 0.0625" />
     </joint>
 </robot>
