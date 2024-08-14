@@ -181,8 +181,6 @@ GLuint LoadTexture(const char* const filename)
 	char pngName[1024];
 	char fullPathName[2048];
 
-	ndAssert(strstr(filename, ".png"));
-
 	sprintf(pngName, "%s", filename);
 	strtolwr(pngName);
 	char* const fileNameEnd = strstr(pngName, ".tga");
@@ -190,6 +188,8 @@ GLuint LoadTexture(const char* const filename)
 	{
 		*fileNameEnd = 0;
 		strcat(pngName, ".png");
+		ndTrace(("subtitute texture %s with %s version\n", filename, pngName));
+		ndAssert(0);
 	}
 	ndGetWorkingFileName(pngName, fullPathName);
 

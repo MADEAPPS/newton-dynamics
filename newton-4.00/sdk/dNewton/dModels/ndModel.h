@@ -52,8 +52,8 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	D_NEWTON_API void SetNotifyCallback(const ndSharedPtr<ndModelNotify>& notifyCallback);
 
 	protected:
-	virtual void OnAddToWorld() = 0;
-	virtual void OnRemoveFromToWorld() = 0;
+	virtual void OnAddToWorld() {}
+	virtual void OnRemoveFromToWorld() {}
 
 	ndWorld* m_world;
 

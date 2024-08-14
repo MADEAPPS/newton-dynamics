@@ -22,7 +22,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
-
 static void AddBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)
 {
 	ndBodyKinematic* const body = AddBox(scene, origin, mass, 1.0f, 1.0f, 1.0f);
@@ -55,8 +54,8 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& orig
 	body->GetCollisionShape().SetMaterial(material);
 }
 
-#if 0
-class NewtonPhantom : public ndModel
+//class NewtonPhantom : public ndModel
+class NewtonPhantom : public ndModelNotify
 {
 	class PhantomPlacement : public ndDemoEntity
 	{
@@ -168,31 +167,30 @@ class NewtonPhantom : public ndModel
 			return instance;
 		}
 
-	//	//DemoMesh* CreatePhantomMesh(DemoEntityManager* const scene, NewtonCollision* const shape, const dVector& color)
-	//	//{
-	//	//	DemoMesh* const mesh = new DemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.png", "smilli.png", "smilli.png", 0.5f);
-	//	//	DemoSubMesh& subMesh = mesh->GetFirst()->GetInfo();
-	//	//	subMesh.m_specular = color;
-	//	//	subMesh.m_diffuse = color;
-	//	//	subMesh.m_ambient = color;
-	//	//	mesh->OptimizeForRender();
-	//	//	return mesh;
-	//	//}
-	//
-	//	//void SetPhantomMesh(bool redOrBlue)
-	//	//{
-	//	//	redOrBlue ? SetMesh(m_redMesh, dGetIdentityMatrix()) : SetMesh(m_blueMesh, dGetIdentityMatrix());
-	//	//}
-	//
-	//	//NewtonBody* m_phantom;
-	//	//DemoMesh* m_solideMesh;
+		//DemoMesh* CreatePhantomMesh(DemoEntityManager* const scene, NewtonCollision* const shape, const dVector& color)
+		//{
+		//	DemoMesh* const mesh = new DemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.png", "smilli.png", "smilli.png", 0.5f);
+		//	DemoSubMesh& subMesh = mesh->GetFirst()->GetInfo();
+		//	subMesh.m_specular = color;
+		//	subMesh.m_diffuse = color;
+		//	subMesh.m_ambient = color;
+		//	mesh->OptimizeForRender();
+		//	return mesh;
+		//}
+	
+		//void SetPhantomMesh(bool redOrBlue)
+		//{
+		//	redOrBlue ? SetMesh(m_redMesh, dGetIdentityMatrix()) : SetMesh(m_blueMesh, dGetIdentityMatrix());
+		//}
+	
+		//NewtonBody* m_phantom;
+		//DemoMesh* m_solideMesh;
 		ndSharedPtr<ndDemoMeshInterface> m_redMesh;
 		ndSharedPtr<ndDemoMeshInterface> m_blueMesh;
 	};
 
 	// A Phantom collision shape can be moved around the world, gathering contact
 	// information with other ndBody's without effecting the simulation
-
 	class ndRayPickingCallback : public ndRayCastClosestHitCallback
 	{
 		public:
@@ -213,7 +211,7 @@ class NewtonPhantom : public ndModel
 
 	public:
 	NewtonPhantom(ndDemoEntityManager* const scene)
-		:ndModel()
+		:ndModelNotify()
 		//,phantomShape(new ndShapeBox(1.0f, 1.0f, 1.0f))
 		,worldMatrix(ndGetIdentityMatrix())
 		//,notification(scene)
@@ -227,12 +225,10 @@ class NewtonPhantom : public ndModel
 	{
 	}
 
-	void OnAddToWorld() override
+	virtual ndModelNotify* Clone() const override
 	{
-	}
-
-	void OnRemoveFromToWorld() override
-	{
+		ndAssert(0);
+		return nullptr;
 	}
 
 	void transform(const ndMatrix& matrix) 
@@ -337,12 +333,9 @@ class NewtonPhantom : public ndModel
 	//ndInt32 contactCount = 0;
 	//ndVector contactPoint;
 }; // end class NewtonPhantom
-#endif
 
 void ndObjectPlacement(ndDemoEntityManager* const scene)
 {
-	ndAssert(0);
-#if 0
 	// build a floor
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
 	BuildFlatPlane(scene, true);
@@ -365,15 +358,13 @@ void ndObjectPlacement(ndDemoEntityManager* const scene)
 	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  2.0f), 21, 1.0f, 1.5f, 0.7f, 10.0f);
 	//AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 210, 1.0f, 1.5f, 0.9f, 10.0f);
 
-
 	// create a Phantom model that contains a collision shape and transform matrix
-	NewtonPhantom* const phantom = new NewtonPhantom(scene);
-	ndSharedPtr<ndModel> phantomPtr(phantom);
+	ndSharedPtr<ndModel> phantomPtr(new ndModel);
+	phantomPtr->SetNotifyCallback(new NewtonPhantom(scene));
 	scene->GetWorld()->AddModel(phantomPtr);
 
 	ndQuaternion rot;
 	ndVector origin(-40.0f, 5.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
-#endif
 }
 
