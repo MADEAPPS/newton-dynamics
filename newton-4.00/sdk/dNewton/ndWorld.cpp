@@ -28,6 +28,7 @@
 #include "dModels/ndModel.h"
 #include "ndDynamicsUpdate.h"
 #include "ndDynamicsUpdateSoa.h"
+#include "dModels/ndModelNotify.h"
 #include "ndJointBilateralConstraint.h"
 
 #ifdef _D_USE_AVX2_SOLVER
