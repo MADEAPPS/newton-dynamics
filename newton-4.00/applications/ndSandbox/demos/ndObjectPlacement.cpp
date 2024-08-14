@@ -54,7 +54,6 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& orig
 	body->GetCollisionShape().SetMaterial(material);
 }
 
-//class NewtonPhantom : public ndModel
 class NewtonPhantom : public ndModelNotify
 {
 	class PhantomPlacement : public ndDemoEntity

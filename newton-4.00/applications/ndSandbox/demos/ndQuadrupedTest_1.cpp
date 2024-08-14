@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
 
 	class ndLegObservation
@@ -515,6 +515,7 @@ namespace ndQuadruped_1
 			m_controller = new ndController(brain);
 			m_controller->m_robot = this;
 			Init(robot);
+			m_control->m_animSpeed = D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand();
 		}
 
 		RobotModelNotify(const RobotModelNotify& src)
@@ -588,12 +589,8 @@ namespace ndQuadruped_1
 					ndShapeInfo shapeInfo (footCollision.GetShapeInfo());
 					effectorMatrix.m_posit += effectorMatrix.m_front.Scale(shapeInfo.m_capsule.m_height * 0.5f);
 
-					//ndFloat32 angle(i < 2 ? -90.0f : 90.0f);
 					ndMatrix effectorRefFrame(ndYawMatrix(angles[i] * ndDegreeToRad));
 					effectorRefFrame.m_posit = rootMatrix.TransformVector(thighNode->m_joint->GetLocalMatrix1().m_posit);
-
-					//ndMatrix effectorToeFrame(ndGetIdentityMatrix());
-					//effectorToeFrame.m_posit = effectorMatrix.m_posit;
 
 					ndFloat32 regularizer = 0.001f;
 					ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorMatrix.m_posit, effectorRefFrame, footBody, robot->GetRoot()->m_body->GetAsBodyKinematic());
@@ -1008,31 +1005,31 @@ namespace ndQuadruped_1
 				return;
 			}
 
-			//ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 
-			//ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
-			//ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
-			//
-			//ndFloat32 totalMass = ndFloat32(0.0f);
-			//ndVector centerOfMass(ndVector::m_zero);
-			//for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			//{
-			//	const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-			//	const ndMatrix matrix(body->GetMatrix());
-			//	ndFloat32 mass = body->GetMassMatrix().m_w;
-			//	totalMass += mass;
-			//	centerOfMass += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
-			//	bodies.PushBack(body);
-			//}
-			//ndFloat32 invMass = 1.0f / totalMass;
-			//centerOfMass = centerOfMass.Scale(invMass);
-			//
-			//ndVector comLineOfAction(centerOfMass);
-			//comLineOfAction.m_y -= ndFloat32(0.5f);
-			//context.DrawLine(centerOfMass, comLineOfAction, ndVector::m_zero);
-			//
-			//const ndVector upVector(rootBody->GetMatrix().m_up);
-			//ndFixSizeArray<ndBigVector, 16> supportPoint;
+			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
+			
+			ndFloat32 totalMass = ndFloat32(0.0f);
+			ndVector centerOfMass(ndVector::m_zero);
+			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+				const ndMatrix matrix(body->GetMatrix());
+				ndFloat32 mass = body->GetMassMatrix().m_w;
+				totalMass += mass;
+				centerOfMass += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
+				bodies.PushBack(body);
+			}
+			ndFloat32 invMass = 1.0f / totalMass;
+			centerOfMass = centerOfMass.Scale(invMass);
+			
+			ndVector comLineOfAction(centerOfMass);
+			comLineOfAction.m_y -= ndFloat32(0.5f);
+			context.DrawLine(centerOfMass, comLineOfAction, ndVector::m_zero);
+
+			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
+			const ndVector upVector(rootBody->GetMatrix().m_up);
+			ndFixSizeArray<ndBigVector, 16> supportPoint;
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
@@ -1043,68 +1040,68 @@ namespace ndQuadruped_1
 					effector->DebugJoint(context);
 				}
 			
-			//	//if (keyFrame.m_userParamInt == 0)
-			//	if (keyFrame.m_userParamFloat < 1.0f)
-			//	{
-			//		ndBodyKinematic* const body = effector->GetBody0();
-			//		supportPoint.PushBack(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit));
-			//	}
+				//if (keyFrame.m_userParamInt == 0)
+				if (keyFrame.m_userParamFloat < 1.0f)
+				{
+					ndBodyKinematic* const body = effector->GetBody0();
+					supportPoint.PushBack(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit));
+				}
 			}
 			
-			//ndVector supportColor(0.0f, 1.0f, 1.0f, 1.0f);
-			//if (supportPoint.GetCount() >= 3)
-			//{
-			//	ScaleSupportShape(supportPoint);
-			//	ndFixSizeArray<ndVector, 16> desiredSupportPoint;
-			//	for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
-			//	{
-			//		desiredSupportPoint.PushBack(supportPoint[i]);
-			//	}
-			//
-			//	ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
-			//	rotation.TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
-			//	ndInt32 supportCount = ndConvexHull2d(&desiredSupportPoint[0], desiredSupportPoint.GetCount());
-			//	rotation.OrthoInverse().TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
-			//	ndVector p0(desiredSupportPoint[supportCount - 1]);
-			//	ndBigVector bigPolygon[16];
-			//	for (ndInt32 i = 0; i < supportCount; ++i)
-			//	{
-			//		bigPolygon[i] = desiredSupportPoint[i];
-			//		context.DrawLine(desiredSupportPoint[i], p0, supportColor);
-			//		p0 = desiredSupportPoint[i];
-			//	}
-			//
-			//	ndBigVector p0Out;
-			//	ndBigVector p1Out;
-			//	ndBigVector ray_p0(centerOfMass);
-			//	ndBigVector ray_p1(comLineOfAction);
-			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-			//
-			//	const ndVector centerOfPresure(p0Out);
-			//	context.DrawPoint(centerOfPresure, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 5);
-			//
-			//	ndVector zmp(CalculateZeroMomentPoint());
-			//	ray_p0 = zmp;
-			//	ray_p1 = zmp;
-			//	ray_p1.m_y -= ndFloat32(0.5f);
-			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-			//	const ndVector zmpSupport(p0Out);
-			//	context.DrawPoint(zmpSupport, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
-			//}
-			//else if (supportPoint.GetCount() == 2)
-			//{
-			//	ndTrace(("xxxxxxxxxx\n"));
-			//	context.DrawLine(supportPoint[0], supportPoint[1], supportColor);
-			//	//ndBigVector p0Out;
-			//	//ndBigVector p1Out;
-			//	//ndBigVector ray_p0(comMatrix.m_posit);
-			//	//ndBigVector ray_p1(comMatrix.m_posit);
-			//	//ray_p1.m_y -= 1.0f;
-			//	//
-			//	//ndRayToRayDistance(ray_p0, ray_p1, contactPoints[0], contactPoints[1], p0Out, p1Out);
-			//	//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
-			//	//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
-			//}
+			ndVector supportColor(0.0f, 1.0f, 1.0f, 1.0f);
+			if (supportPoint.GetCount() >= 3)
+			{
+				ScaleSupportShape(supportPoint);
+				ndFixSizeArray<ndVector, 16> desiredSupportPoint;
+				for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
+				{
+					desiredSupportPoint.PushBack(supportPoint[i]);
+				}
+			
+				ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
+				rotation.TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
+				ndInt32 supportCount = ndConvexHull2d(&desiredSupportPoint[0], desiredSupportPoint.GetCount());
+				rotation.OrthoInverse().TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
+				ndVector p0(desiredSupportPoint[supportCount - 1]);
+				ndBigVector bigPolygon[16];
+				for (ndInt32 i = 0; i < supportCount; ++i)
+				{
+					bigPolygon[i] = desiredSupportPoint[i];
+					context.DrawLine(desiredSupportPoint[i], p0, supportColor);
+					p0 = desiredSupportPoint[i];
+				}
+			
+				ndBigVector p0Out;
+				ndBigVector p1Out;
+				ndBigVector ray_p0(centerOfMass);
+				ndBigVector ray_p1(comLineOfAction);
+				ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
+			
+				const ndVector centerOfPresure(p0Out);
+				context.DrawPoint(centerOfPresure, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 5);
+			
+				ndVector zmp(CalculateZeroMomentPoint());
+				ray_p0 = zmp;
+				ray_p1 = zmp;
+				ray_p1.m_y -= ndFloat32(0.5f);
+				ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
+				const ndVector zmpSupport(p0Out);
+				context.DrawPoint(zmpSupport, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
+			}
+			else if (supportPoint.GetCount() == 2)
+			{
+				ndTrace(("xxxxxxxxxx\n"));
+				context.DrawLine(supportPoint[0], supportPoint[1], supportColor);
+				//ndBigVector p0Out;
+				//ndBigVector p1Out;
+				//ndBigVector ray_p0(comMatrix.m_posit);
+				//ndBigVector ray_p1(comMatrix.m_posit);
+				//ray_p1.m_y -= 1.0f;
+				//
+				//ndRayToRayDistance(ray_p0, ray_p1, contactPoints[0], contactPoints[1], p0Out, p1Out);
+				//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
+				//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
+			}
 		}
 
 		ndIkSolver m_invDynamicsSolver;
@@ -1211,8 +1208,6 @@ namespace ndQuadruped_1
 
 			ndInt32 countX = 6;
 			ndInt32 countZ = 9;
-			//countX = 1;
-			//countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -1408,34 +1403,34 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		scene->RegisterPostUpdate(new TrainingUpdata(scene, matrix));
 	#else
 		ndWorld* const world = scene->GetWorld();
-		ndModelArticulation* const model = CreateModel(scene, matrix);
-		model->AddToWorld(world);
+		ndModelArticulation* const referenceModel = CreateModel(scene, matrix);
+		referenceModel->AddToWorld(world);
 
-		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
+		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
 		//world->AddJoint(fixJoint);
 
 		char fileName[256];
 		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
 		ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
-		model->SetNotifyCallback(new RobotModelNotify(brain, model, true));
+		referenceModel->SetNotifyCallback(new RobotModelNotify(brain, referenceModel, true));
 
-		ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*model->GetNotifyCallback()));
+		ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*referenceModel->GetNotifyCallback()));
 		scene->Set2DDisplayRenderFunction(quadrupedUI);
+
+		matrix.m_posit.m_z += 1.5f;
 
 		ndInt32 countZ = 5;
 		ndInt32 countX = 5;
-		countZ = 0;
-		countX = 0;
 		for (ndInt32 i = 0; i < countZ; ++i)
 		{
 			for (ndInt32 j = 0; j < countX; ++j)
 			{
-				ndAssert(0);
-				//ndMatrix location(matrix);
-				//location.m_posit.m_x += 3.0f * ndFloat32 (j - countX/2);
-				//location.m_posit.m_z += 3.0f * ndFloat32 (i - countZ/2);
-				//ndSharedPtr<ndModel> model(CreateModel(scene, location, BuildAgent()));
-				//world->AddModel(model);
+				ndMatrix location(matrix);
+				location.m_posit.m_x += 3.0f * ndFloat32 (j - countX/2);
+				location.m_posit.m_z += 3.0f * ndFloat32 (i - countZ/2);
+				ndModelArticulation* const model = CreateModel(scene, location);
+				model->SetNotifyCallback(new RobotModelNotify(brain, model, false));
+				model->AddToWorld(world);
 				//m_models.Append(model);
 				//SetMaterial(model);
 			}
