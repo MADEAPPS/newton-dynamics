@@ -26,14 +26,6 @@ namespace ndQuadruped_2
 	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_2-VPG.dnn"
 
-	class ndLegObservation
-	{
-		public:
-		ndBrainFloat m_state[2 * 5];
-		ndBrainFloat m_hasContact;
-		ndBrainFloat m_animSequence;
-	};
-
 	class ndActionVector
 	{
 		public:
@@ -41,10 +33,28 @@ namespace ndQuadruped_2
 		ndBrainFloat m_z;
 	};
 
+	class ndAnimPose
+	{
+		public:
+		ndBrainFloat m_x;
+		ndBrainFloat m_y;
+		ndBrainFloat m_z;
+	};
+
+	class ndLegObservation
+	{
+		public:
+		ndBrainFloat m_state[2 * 5];
+		ndAnimPose m_posit;
+		ndAnimPose m_prevPosit;
+		ndBrainFloat m_hasContact;
+		ndBrainFloat m_animSequence;
+	};
+
 	class ndObservationVector
 	{
 		public:
-		ndLegObservation n_legs[4];
+		ndLegObservation m_legs[4];
 		ndActionVector m_torso;
 		ndFloat32 m_animSpeed;
 	};
@@ -563,6 +573,8 @@ namespace ndQuadruped_2
 			ndFloat32 duration = m_poseGenerator->GetSequence()->GetDuration();
 			m_animBlendTree->SetTime(duration * ndRand());
 
+			ndMemSet (m_animPrevPose, ndVector::m_zero, 4);
+
 			ndFloat32 offset_x[] = { 0.2f, 0.2f, 0.2f, 0.2f };
 			ndFloat32 offset_z[] = { -0.3f, 0.3f, -0.3f, 0.3f };
 			ndFloat32 offset_y[] = { D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y };
@@ -801,13 +813,23 @@ namespace ndQuadruped_2
 				paramCount += info->m_foot->GetKinematicState(&kinematicState[paramCount]);
 				for (ndInt32 j = 0; j < paramCount; ++j)
 				{
-					observation.n_legs[i].m_state[j * 2 + 0] = ndBrainFloat(kinematicState[j].m_posit);
-					observation.n_legs[i].m_state[j * 2 + 1] = ndBrainFloat(kinematicState[j].m_velocity);
+					observation.m_legs[i].m_state[j * 2 + 0] = ndBrainFloat(kinematicState[j].m_posit);
+					observation.m_legs[i].m_state[j * 2 + 1] = ndBrainFloat(kinematicState[j].m_velocity);
 				}
 
-				observation.n_legs[i].m_hasContact = ndBrainFloat(FindContact(i) ? 1.0f : 0.0f);
-				//observation.n_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamInt ? 1.0f : 0.0f);
-				observation.n_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamFloat);
+				const ndVector& posit = m_animPose[i].m_posit;
+				observation.m_legs[i].m_posit.m_x = posit.m_x;
+				observation.m_legs[i].m_posit.m_y = posit.m_y;
+				observation.m_legs[i].m_posit.m_z = posit.m_z;
+
+				observation.m_legs[i].m_prevPosit.m_x = m_animPrevPose[i].m_x;
+				observation.m_legs[i].m_prevPosit.m_y = m_animPrevPose[i].m_y;
+				observation.m_legs[i].m_prevPosit.m_z = m_animPrevPose[i].m_z;
+
+				m_animPrevPose[i] = posit;
+
+				observation.m_legs[i].m_hasContact = ndBrainFloat(FindContact(i) ? 1.0f : 0.0f);
+				observation.m_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamFloat);
 			}
 
 			observation.m_torso.m_x = m_control->m_x;
@@ -847,7 +869,7 @@ namespace ndQuadruped_2
 				
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 				
-				ndVector posit(m_animPose[i].m_posit);
+				const ndVector posit = m_animPose[i].m_posit;
 				effector->SetLocalTargetPosition(posit);
 				
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
@@ -1108,12 +1130,14 @@ namespace ndQuadruped_2
 		ndAnimationPose m_animPose;
 		ndUIControlNode* m_control;
 		ndAnimationSequencePlayer* m_poseGenerator;
+		ndVector m_animPrevPose[4];
 		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
 		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 		ndController* m_controller;
 		ndControllerTrainer* m_controllerTrainer;
 		ndWorld* m_world;
 		ndFloat32 m_timestep;
+		
 		bool m_showDebug;
 
 		friend class ndModelUI;
@@ -1208,8 +1232,8 @@ namespace ndQuadruped_2
 
 			ndInt32 countX = 6;
 			ndInt32 countZ = 9;
-			countX = 0;
-			countZ = 0;
+			countX = 2;
+			countZ = 2;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
