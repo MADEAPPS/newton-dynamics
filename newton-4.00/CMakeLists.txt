@@ -238,7 +238,7 @@ add_subdirectory(sdk)
 add_subdirectory(thirdParty)
 add_subdirectory(applications)
 
-if (APPLE)
+if (NOT APPLE)
 	if (NOT NEWTON_EXCLUDE_UNIX_TEST AND (PTR_SIZE EQUAL 8))
 		message("building unit tests")
 		file(REMOVE_RECURSE ${PROJECT_BINARY_DIR}/_deps)
