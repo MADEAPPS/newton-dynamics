@@ -10,14 +10,12 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" ON)
 #option("NEWTON_BUILD_PHYSIC_EDITOR" "generates authoring tool" OFF)
 option("NEWTON_EXCLUDE_UNIX_TEST" "generate unit test projects" OFF)
 option("NEWTON_BUILD_PROFILER" "build profiler" OFF)
 option("NEWTON_ENABLE_AVX2" "enable AVX2"  OFF)
 option("NEWTON_BUILD_SINGLE_THREADED" "single threaded" OFF)
 option("NEWTON_BUILD_SHARED_LIBS" "build shared library" ON)
-option("NEWTON_ENABLE_AVX2_SOLVER" "enable AVX2 solver"  ON)
 #option("NEWTON_ENABLE_CUDA_SOLVER" "enable cuda solver" OFF)
 option("NEWTON_ENABLE_VULKAN_SDK" "enable vulkan compute" OFF)
 option("NEWTON_DOUBLE_PRECISION" "generate double precision" OFF)
@@ -34,6 +32,11 @@ set(CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo Release)
 set(CMAKE_DEBUG_POSTFIX "_d")
 
 project(NewtonSDK)
+
+if (NOT APPLE)
+	option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" ON)
+	option("NEWTON_ENABLE_AVX2_SOLVER" "enable AVX2 solver"  ON)
+endif()
 
 if (MSVC)
 	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
