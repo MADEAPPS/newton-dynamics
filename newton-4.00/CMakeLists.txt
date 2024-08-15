@@ -33,7 +33,8 @@ set(CMAKE_DEBUG_POSTFIX "_d")
 
 project(NewtonSDK)
 
-if (NOT APPLE)
+if (NOT MACOSX)
+    message ("xxxxxxxx1")
 	option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" ON)
 	option("NEWTON_ENABLE_AVX2_SOLVER" "enable AVX2 solver"  ON)
 endif()
