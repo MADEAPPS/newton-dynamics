@@ -2304,7 +2304,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	threadPool->ParallelExecute(CountGrids);
 
 	ndInt32 gridCount = 0;
-	const ndInt32 itemsCount = data.m_gridScans.GetCount() & (-8);
+	const ndInt32 itemsCount = ndInt32 (data.m_gridScans.GetCount()) & (-8);
 	for (ndInt32 i = 0; i < itemsCount; i += 8)
 	{
 		for (ndInt32 j = 0; j < 8; ++j)

@@ -84,7 +84,7 @@ ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 	#endif
 
 	#if defined (__APPLE__)
-		#pragma message ("warning!!! apple flush to zero not defined for x86 platforms")
+		//#pragma message ("warning!!! apple flush to zero not defined for x86 platforms")
 	#endif
 
 	//ndFloat32 a = ndFloat32(1.0f);
