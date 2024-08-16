@@ -133,11 +133,13 @@ if(UNIX)
 		set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 	  endif("${isSystemDir}" STREQUAL "-1")
 	  # ----------------------------------------------------------------------
-
-	#set(CMAKE_POLICY_DEFAULT_CMP0072 NEW)
-	#if(NOT NEWTON_BUILD_SHARED_LIBS)
-	#	add_compile_options(-fPIC)
-	#endif()
+	
+	if(NOT APPLE)
+		set(CMAKE_POLICY_DEFAULT_CMP0072 NEW)
+		if(NOT NEWTON_BUILD_SHARED_LIBS)
+			add_compile_options(-fPIC)
+		endif()
+	endif()
 
 	if (X86)
 		if (NEWTON_ENABLE_AVX2)
