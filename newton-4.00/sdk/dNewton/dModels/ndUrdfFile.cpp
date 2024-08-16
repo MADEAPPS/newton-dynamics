@@ -64,7 +64,7 @@ void ndUrdfFile::ImportMaterials(const nd::TiXmlNode* const rootNode)
 		if (texture)
 		{
 			const char* const texName = texture->Attribute("filename");
-			snprintf(material.m_texture, sizeof (material.m_texture), texName);
+			snprintf(material.m_texture, sizeof (material.m_texture), "%s", texName);
 		}
 		else
 		{

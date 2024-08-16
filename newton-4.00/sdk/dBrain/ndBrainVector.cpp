@@ -149,15 +149,13 @@ void ndBrainVector::Clamp(ndBrainFloat min, ndBrainFloat max)
 void ndBrainVector::FlushToZero()
 {
 	//return (val > T(1.0e-16f)) ? val : ((val < T(-1.0e-16f)) ? val : T(0.0f));
-
 	const ndBrainFloat4 max(ndBrainFloat(1.0e-16f));
 	const ndBrainFloat4 min(ndBrainFloat(-1.0e-16f));
 	ndBrainFloat4* const ptrSimd =(ndBrainFloat4*) &(*this)[0];
 
-	const ndInt32 roundCount = (GetCount() & -4) / 4;
+	const ndInt32 roundCount = (ndInt32 (GetCount()) & -4) / 4;
 	for (ndInt32 i = 0; i < roundCount; ++i)
 	{
-		//(*this)[i] = ndFlushToZero((*this)[i]);
 		const ndBrainFloat4 mask((ptrSimd[i] < min) | (ptrSimd[i] > max));
 		ptrSimd[i] = ptrSimd[i] & mask;
 	}
