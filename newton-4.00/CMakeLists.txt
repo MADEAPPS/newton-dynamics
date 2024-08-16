@@ -22,7 +22,6 @@ if (NOT APPLE)
 	option("NEWTON_BUILD_PROFILER" "build profiler" OFF)
 endif()
 
-#option("NEWTON_BUILD_PHYSIC_EDITOR" "generates authoring tool" OFF)
 option("NEWTON_BUILD_SINGLE_THREADED" "single threaded" OFF)
 #option("NEWTON_ENABLE_CUDA_SOLVER" "enable cuda solver" OFF)
 option("NEWTON_ENABLE_VULKAN_SDK" "enable vulkan compute" OFF)
