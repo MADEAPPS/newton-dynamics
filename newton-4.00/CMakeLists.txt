@@ -134,18 +134,17 @@ if(UNIX)
 	  endif("${isSystemDir}" STREQUAL "-1")
 	  # ----------------------------------------------------------------------
 
-	set(CMAKE_POLICY_DEFAULT_CMP0072 NEW)
-	if(NOT NEWTON_BUILD_SHARED_LIBS)
-		add_compile_options(-fPIC)
-	endif()
-
-	if (X86 AND NEWTON_ENABLE_AVX2)
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -march=haswell ")
-		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
-		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
-	endif()
+	#set(CMAKE_POLICY_DEFAULT_CMP0072 NEW)
+	#if(NOT NEWTON_BUILD_SHARED_LIBS)
+	#	add_compile_options(-fPIC)
+	#endif()
 
 	if (X86)
+		if (NEWTON_ENABLE_AVX2)
+			set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -march=haswell ")
+			set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
+			set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
+		endif()
 		add_compile_options(-msse3)
 	endif()
 
