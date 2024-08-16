@@ -118,7 +118,7 @@ ndThreadPool::ndThreadPool(const char* const baseName)
 {
 	char name[256];
 	strncpy(m_baseName, baseName, sizeof (m_baseName));
-	sprintf(name, "%s_%d", m_baseName, 0);
+	snprintf(name, sizeof (name), "%s_%d", m_baseName, 0);
 	SetName(name);
 }
 
@@ -160,7 +160,7 @@ void ndThreadPool::SetThreadCount(ndInt32 count)
 				char name[256];
 				m_workers[i].m_owner = this;
 				m_workers[i].m_threadIndex = i;
-				sprintf(name, "%s_%d", m_baseName, i + 1);
+				snprintf(name, sizeof(name), "%s_%d", m_baseName, i + 1);
 				m_workers[i].SetName(name);
 			}
 		}

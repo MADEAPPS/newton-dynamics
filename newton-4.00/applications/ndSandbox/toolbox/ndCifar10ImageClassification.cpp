@@ -32,7 +32,7 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 	labelMatrix.Set(ndBrainFloat(0.0f));
 	for (ndInt32 i = 0; i < batches; ++i)
 	{
-		sprintf(filename, "cifar-10-batches-bin/data_batch_%d.bin", i + 1);
+		snprintf(filename, sizeof (filename), "cifar-10-batches-bin/data_batch_%d.bin", i + 1);
 		ndGetWorkingFileName(filename, outPathName);
 		FILE* const fp = fopen(outPathName, "rb");
 		if (fp)
@@ -83,7 +83,7 @@ static void SaveImage(const ndBrainVector& input, const char* const name)
 	}
 
 	char name1[256];
-	sprintf(name1, "%s_%d.png", name, index);
+	snprintf(name1, sizeof (name1), "%s_%d.png", name, index);
 	index++;
 	lodepng_encode_file(name1, &pBits[0][0][0], 32, 32, LCT_RGB, 8);
 }

@@ -22,9 +22,9 @@
 #include "ndCoreStdafx.h"
 #include "ndTinyXmlGlue.h"
 
-static char* FloatToString(char* const buffer, ndFloat32 value)
+static char* FloatToString(char* const buffer, ndInt32 size, ndFloat32 value)
 {
-	sprintf(buffer, "%g", value);
+	snprintf(buffer, size_t(size), "%g", value);
 	char* ptr = buffer + strlen(buffer);
 	*ptr = ' ';
 	ptr++;
@@ -200,7 +200,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 value)
 {
 	char buffer[1024];
-	sprintf(buffer, "%d", value);
+	snprintf(buffer, sizeof (buffer), "%d", value);
 	xmlSaveParam(rootNode, name, "int32", buffer);
 }
 
@@ -208,23 +208,23 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndIn
 {
 	char buffer[1024];
 	long long x = value;
-	sprintf(buffer, "%llu", x);
+	snprintf(buffer, sizeof (buffer), "%llu", x);
 	xmlSaveParam(rootNode, name, "int64", buffer);
 }
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndFloat32 value)
 {
 	char buffer[1024];
-	FloatToString(buffer, value);
+	FloatToString(buffer, sizeof (buffer), value);
 	xmlSaveParam(rootNode, name, "float", buffer);
 }
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndVector& value)
 {
 	char buffer[1024];
-	char* ptr0 = FloatToString(buffer, value.m_x);
-	char* ptr1 = FloatToString(ptr0, value.m_y);
-	FloatToString(ptr1, value.m_z);
+	char* ptr0 = FloatToString(buffer, sizeof (buffer), value.m_x);
+	char* ptr1 = FloatToString(ptr0, sizeof (buffer) - 256, value.m_y);
+	FloatToString(ptr1, sizeof(buffer) - 256, value.m_z);
 	xmlSaveParam(rootNode, name, "float3", buffer);
 }
 
@@ -234,7 +234,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	char* ptr = buffer;
 	for (ndInt32 i = 0; i < array.GetCount(); ++i)
 	{
-		sprintf(ptr, "%d ", array[i]);
+		snprintf(ptr, 256, "%d ", array[i]);
 		ptr += strlen(ptr);
 	}
 	CleanWhiteSpace(buffer);
@@ -253,7 +253,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	for (ndInt32 i = 0; i < array.GetCount(); ++i)
 	{
 		long long int value = array[i];
-		sprintf(ptr, "%lld ", value);
+		snprintf(ptr, 256, "%lld ", value);
 		ptr += strlen(ptr);
 	}
 	CleanWhiteSpace(buffer);
@@ -273,7 +273,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	{
 		for (ndInt32 j = 0; j < 3; ++j)
 		{
-			ptr = FloatToString(ptr, array[i][j]);
+			ptr = FloatToString(ptr, 256, array[i][j]);
 		}
 	}
 	CleanWhiteSpace(buffer);

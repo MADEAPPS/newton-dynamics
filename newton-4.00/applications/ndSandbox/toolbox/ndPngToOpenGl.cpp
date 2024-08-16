@@ -181,7 +181,7 @@ GLuint LoadTexture(const char* const filename)
 	char pngName[1024];
 	char fullPathName[2048];
 
-	sprintf(pngName, "%s", filename);
+	snprintf(pngName, sizeof (pngName), "%s", filename);
 	strtolwr(pngName);
 	char* const fileNameEnd = strstr(pngName, ".tga");
 	if (fileNameEnd)
@@ -432,10 +432,10 @@ void TargaToPng()
 	
 	char* const end = strstr(appPath, "applications");
 	end[0] = 0;
-	sprintf(outPathName, "%sapplications/media", appPath);
+	snprintf(outPathName, sizeof (outPathName), "%sapplications/media", appPath);
 	
 	char rootPath[2048];
-	sprintf(rootPath, "%s/*.png", outPathName);
+	snprintf(rootPath, sizeof(rootPath), "%s/*.png", outPathName);
 	
 	WIN32_FIND_DATAA data;
 	HANDLE handle = FindFirstFile(rootPath, &data);
@@ -445,7 +445,7 @@ void TargaToPng()
 		do
 		{
 			char fileName[256];
-			sprintf(fileName, "%s", data.cFileName);
+			snprintf(fileName, sizeof(fileName), "%s", data.cFileName);
 			strtolwr(fileName);
 			char* const fileNameEnd = strstr(fileName, ".png");
 			*fileNameEnd = 0;

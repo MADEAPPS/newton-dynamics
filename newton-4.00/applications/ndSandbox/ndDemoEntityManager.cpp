@@ -468,7 +468,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	// Create window with graphics context
 	char version[256];
-	sprintf(version, "Newton Dynamics %d.%.2i sandbox demos", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION);
+	snprintf(version, sizeof (version), "Newton Dynamics %d.%.2i sandbox demos", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION);
 	m_mainFrame = glfwCreateWindow(1280, 768, version, nullptr, nullptr);
 	glfwMakeContextCurrent(m_mainFrame);
 	glfwSwapInterval(0); // Enable vsync
@@ -1198,7 +1198,7 @@ void ndDemoEntityManager::LoadDemo(ndInt32 menu)
 	CreateSkyBox();
 	m_demosSelection[menu].m_launchDemoCallback(this);
 
-	sprintf(newTitle, "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_name);
+	snprintf(newTitle, sizeof(newTitle), "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_name);
 	glfwSetWindowTitle(m_mainFrame, newTitle);
 	ApplyMenuOptions();
 	ResetTimer();
@@ -1369,43 +1369,43 @@ void ndDemoEntityManager::RenderStats()
 		
 		if (ImGui::Begin("statistics", &m_showStats)) 
 		{
-			sprintf (text, "fps:            %6.3f", m_fps);
+			snprintf(text, sizeof (text), "fps:            %6.3f", m_fps);
 			ImGui::Text(text, "");
 
-			sprintf(text, "physics time:  %6.3f ms", m_world->GetAverageUpdateTime() * 1.0e3f);
+			snprintf(text, sizeof (text), "physics time:  %6.3f ms", m_world->GetAverageUpdateTime() * 1.0e3f);
 			ImGui::Text(text, "");
 
-			sprintf(text, "update mode:    %s", m_synchronousPhysicsUpdate ? "synchronous" : "asynchronous");
+			snprintf(text, sizeof (text), "update mode:    %s", m_synchronousPhysicsUpdate ? "synchronous" : "asynchronous");
 			ImGui::Text(text, "");
 
-			sprintf(text, "particle mode:  %s", m_synchronousParticlesUpdate ? "synchronous" : "asynchronous");
+			snprintf(text, sizeof (text), "particle mode:  %s", m_synchronousParticlesUpdate ? "synchronous" : "asynchronous");
 			ImGui::Text(text, "");
 
-			sprintf(text, "bodies:         %d", m_world->GetBodyList().GetCount());
+			snprintf(text, sizeof (text), "bodies:         %d", m_world->GetBodyList().GetCount());
 			ImGui::Text(text, "");
 
-			sprintf(text, "joints:         %d", m_world->GetJointList().GetCount());
+			snprintf(text, sizeof (text), "joints:         %d", m_world->GetJointList().GetCount());
 			ImGui::Text(text, "");
 
-			sprintf(text, "contact joints: %d", m_world->GetContactList().GetActiveContacts());
+			snprintf(text, sizeof (text), "contact joints: %d", m_world->GetContactList().GetActiveContacts());
 			ImGui::Text(text, "");
 
-			sprintf(text, "particles:      %d", ParticleCount());
+			snprintf(text, sizeof (text), "particles:      %d", ParticleCount());
 			ImGui::Text(text, "");
 
-			sprintf(text, "memory used:   %6.3f mbytes", ndFloat32(ndFloat64(ndMemory::GetMemoryUsed()) / (1024 * 1024)));
+			snprintf(text, sizeof (text), "memory used:   %6.3f mbytes", ndFloat32(ndFloat64(ndMemory::GetMemoryUsed()) / (1024 * 1024)));
 			ImGui::Text(text, "");
 
-			sprintf(text, "threads:        %d", m_world->GetThreadCount());
+			snprintf(text, sizeof (text), "threads:        %d", m_world->GetThreadCount());
 			ImGui::Text(text, "");
 
-			sprintf(text, "iterations:     %d", m_world->GetSolverIterations());
+			snprintf(text, sizeof (text), "iterations:     %d", m_world->GetSolverIterations());
 			ImGui::Text(text, "");
 
-			sprintf(text, "Substeps:       %d", m_world->GetSubSteps());
+			snprintf(text, sizeof (text), "Substeps:       %d", m_world->GetSubSteps());
 			ImGui::Text(text, "");
 
-			sprintf(text, "solver:         %s", m_world->GetSolverString());
+			snprintf(text, sizeof (text), "solver:         %s", m_world->GetSolverString());
 			ImGui::Text(text, "");
 
 			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsWindowHovered() && ImGui::IsMouseDown(0));

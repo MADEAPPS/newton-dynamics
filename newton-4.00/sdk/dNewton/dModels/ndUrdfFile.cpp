@@ -36,7 +36,7 @@ void ndUrdfFile::ImportMaterials(const nd::TiXmlNode* const rootNode)
 	m_materials.SetCount(0);
 	m_materialMap.RemoveAll();
 	m_materials.PushBack(Material());
-	sprintf(m_materials[0].m_texture, "wood_0.png");
+	snprintf(m_materials[0].m_texture, sizeof (m_materials[0].m_texture), "wood_0.png");
 	for (const nd::TiXmlNode* node = rootNode->FirstChild("material"); node; node = node->NextSibling("material"))
 	{
 		const nd::TiXmlElement* const materialNode = (nd::TiXmlElement*)node;
@@ -64,11 +64,11 @@ void ndUrdfFile::ImportMaterials(const nd::TiXmlNode* const rootNode)
 		if (texture)
 		{
 			const char* const texName = texture->Attribute("filename");
-			sprintf(material.m_texture, texName);
+			snprintf(material.m_texture, sizeof (material.m_texture), texName);
 		}
 		else
 		{
-			sprintf(material.m_texture, "default.png");
+			snprintf(material.m_texture, sizeof(material.m_texture), "default.png");
 		}
 		m_materials.PushBack(material);
 	}
@@ -147,10 +147,10 @@ void ndUrdfFile::ExportOrigin(nd::TiXmlElement* const parentNode, const ndMatrix
 	ndVector euler1;
 	ndVector euler(pose.CalcPitchYawRoll(euler1));
 	//ret = sscanf(rpy, "%f %f %f", &pitch, &yaw, &roll);
-	sprintf(buffer, "%g %g %g", euler.m_x, euler.m_y, euler.m_z);
+	snprintf(buffer, sizeof(buffer), "%g %g %g", euler.m_x, euler.m_y, euler.m_z);
 	origin->SetAttribute("rpy", buffer);
 
-	sprintf(buffer, "%g %g %g", pose.m_posit.m_x, pose.m_posit.m_y, pose.m_posit.m_z);
+	snprintf(buffer, sizeof(buffer), "%g %g %g", pose.m_posit.m_x, pose.m_posit.m_y, pose.m_posit.m_z);
 	origin->SetAttribute("xyz", buffer);
 }
 
@@ -176,7 +176,7 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const Surrogate*
 	if (!strcmp(className, "ndShapeBox"))
 	{
 		ndShapeInfo info(collisionShape->GetShapeInfo());
-		sprintf(buffer, "%g %g %g", info.m_box.m_x, info.m_box.m_y, info.m_box.m_z);
+		snprintf(buffer, sizeof(buffer), "%g %g %g", info.m_box.m_x, info.m_box.m_y, info.m_box.m_z);
 	
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("box");
 		geometry->LinkEndChild(shape);
@@ -189,10 +189,10 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const Surrogate*
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("cylinder");
 		geometry->LinkEndChild(shape);
 	
-		sprintf(buffer, "%g", info.m_capsule.m_height + info.m_capsule.m_radio0 * 2.0f);
+		snprintf(buffer, sizeof(buffer), "%g", info.m_capsule.m_height + info.m_capsule.m_radio0 * 2.0f);
 		shape->SetAttribute("length", buffer);
 	
-		sprintf(buffer, "%g", info.m_capsule.m_radio0);
+		snprintf(buffer, sizeof(buffer), "%g", info.m_capsule.m_radio0);
 		shape->SetAttribute("radius", buffer);
 		aligment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
 	
@@ -207,10 +207,10 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const Surrogate*
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("cylinder");
 		geometry->LinkEndChild(shape);
 	
-		sprintf(buffer, "%g", info.m_cylinder.m_height);
+		snprintf(buffer, sizeof(buffer), "%g", info.m_cylinder.m_height);
 		shape->SetAttribute("length", buffer);
 	
-		sprintf(buffer, "%g", info.m_cylinder.m_radio0);
+		snprintf(buffer, sizeof(buffer), "%g", info.m_cylinder.m_radio0);
 		shape->SetAttribute("radius", buffer);
 		aligment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
 	}
@@ -221,13 +221,13 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const Surrogate*
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("sphere");
 		geometry->LinkEndChild(shape);
 	
-		sprintf(buffer, "%g", info.m_sphere.m_radius);
+		snprintf(buffer, sizeof(buffer), "%g", info.m_sphere.m_radius);
 		shape->SetAttribute("radius", buffer);
 	}
 	else
 	{
 		ndTrace((" export convex hull stl mesh\n"));
-		sprintf(buffer, "%g %g %g", 0.1f, 0.1f, 0.1f);
+		snprintf(buffer, sizeof(buffer), "%g %g %g", 0.1f, 0.1f, 0.1f);
 	
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("box");
 		geometry->LinkEndChild(shape);
@@ -264,7 +264,7 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const Surroga
 	if (!strcmp(className, "ndShapeBox"))
 	{
 		ndShapeInfo info(collisionShape->GetShapeInfo());
-		sprintf(buffer, "%g %g %g", info.m_box.m_x, info.m_box.m_y, info.m_box.m_z);
+		snprintf(buffer, sizeof(buffer), "%g %g %g", info.m_box.m_x, info.m_box.m_y, info.m_box.m_z);
 	
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("box");
 		geometry->LinkEndChild(shape);
@@ -277,10 +277,10 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const Surroga
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("cylinder");
 		geometry->LinkEndChild(shape);
 	
-		sprintf(buffer, "%g", info.m_capsule.m_height + info.m_capsule.m_radio0 * 2.0f);
+		snprintf(buffer, sizeof(buffer), "%g", info.m_capsule.m_height + info.m_capsule.m_radio0 * 2.0f);
 		shape->SetAttribute("length", buffer);
 	
-		sprintf(buffer, "%g", info.m_capsule.m_radio0);
+		snprintf(buffer, sizeof(buffer), "%g", info.m_capsule.m_radio0);
 		shape->SetAttribute("radius", buffer);
 		aligment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
 	
@@ -295,10 +295,10 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const Surroga
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("cylinder");
 		geometry->LinkEndChild(shape);
 	
-		sprintf(buffer, "%g", info.m_cylinder.m_height);
+		snprintf(buffer, sizeof(buffer), "%g", info.m_cylinder.m_height);
 		shape->SetAttribute("length", buffer);
 	
-		sprintf(buffer, "%g", info.m_cylinder.m_radio0);
+		snprintf(buffer, sizeof(buffer), "%g", info.m_cylinder.m_radio0);
 		shape->SetAttribute("radius", buffer);
 		aligment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
 	}
@@ -309,13 +309,13 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const Surroga
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("sphere");
 		geometry->LinkEndChild(shape);
 	
-		sprintf(buffer, "%g", info.m_sphere.m_radius);
+		snprintf(buffer, sizeof(buffer), "%g", info.m_sphere.m_radius);
 		shape->SetAttribute("radius", buffer);
 	}
 	else
 	{
 		ndTrace((" export convex hull stl mesh\n"));
-		sprintf(buffer, "%g %g %g", 0.1f, 0.1f, 0.1f);
+		snprintf(buffer, sizeof(buffer), "%g %g %g", 0.1f, 0.1f, 0.1f);
 	
 		nd::TiXmlElement* const shape = new nd::TiXmlElement("box");
 		geometry->LinkEndChild(shape);
@@ -341,29 +341,29 @@ void ndUrdfFile::ExportInertia(nd::TiXmlElement* const linkNode, const Surrogate
 	nd::TiXmlElement* const mass = new nd::TiXmlElement("mass");
 	inertial->LinkEndChild(mass);
 	ndVector massMatrix(body->GetMassMatrix());
-	sprintf(buffer, "%g", massMatrix.m_w);
+	snprintf(buffer, sizeof(buffer), "%g", massMatrix.m_w);
 	mass->SetAttribute("value", buffer);
 	
 	nd::TiXmlElement* const inertia = new nd::TiXmlElement("inertia");
 	inertial->LinkEndChild(inertia);
 	
 	ndMatrix inertiaMatrix(surroratelink->m_bodyInertia);
-	sprintf(buffer, "%g", inertiaMatrix[0][0]);
+	snprintf(buffer, sizeof(buffer), "%g", inertiaMatrix[0][0]);
 	inertia->SetAttribute("xx", buffer);
 	
-	sprintf(buffer, "%g", inertiaMatrix[0][1]);
+	snprintf(buffer, sizeof(buffer), "%g", inertiaMatrix[0][1]);
 	inertia->SetAttribute("xy", buffer);
 	
-	sprintf(buffer, "%g", inertiaMatrix[0][2]);
+	snprintf(buffer, sizeof(buffer), "%g", inertiaMatrix[0][2]);
 	inertia->SetAttribute("xz", buffer);
 	
-	sprintf(buffer, "%g", inertiaMatrix[1][1]);
+	snprintf(buffer, sizeof(buffer), "%g", inertiaMatrix[1][1]);
 	inertia->SetAttribute("yy", buffer);
 	
-	sprintf(buffer, "%g", inertiaMatrix[1][2]);
+	snprintf(buffer, sizeof(buffer), "%g", inertiaMatrix[1][2]);
 	inertia->SetAttribute("yz", buffer);
 	
-	sprintf(buffer, "%g", inertiaMatrix[2][2]);
+	snprintf(buffer, sizeof(buffer), "%g", inertiaMatrix[2][2]);
 	inertia->SetAttribute("zz", buffer);
 }
 
@@ -374,7 +374,7 @@ void ndUrdfFile::ExportLink(nd::TiXmlElement* const rootNode, const Surrogate* c
 	rootNode->LinkEndChild(linkNode);
 	const ndModelArticulation::ndNode* const link = surroratelink->m_articulation;
 	
-	sprintf(name, "%s", link->m_name.GetStr());
+	snprintf(name, sizeof (name), "%s", link->m_name.GetStr());
 	linkNode->SetAttribute("name", name);
 
 	ExportVisual(linkNode, surroratelink);
@@ -387,7 +387,7 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 	char buffer[256];
 	const ndModelArticulation::ndNode* const link = surroratelink->m_articulation;
 	
-	sprintf(buffer, "%s_to_%s", link->m_name.GetStr(), link->GetParent()->m_name.GetStr());
+	snprintf(buffer, sizeof(buffer), "%s_to_%s", link->m_name.GetStr(), link->GetParent()->m_name.GetStr());
 	
 	nd::TiXmlElement* const jointNode = new nd::TiXmlElement("joint");
 	rootNode->LinkEndChild(jointNode);
@@ -395,12 +395,12 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 	
 	nd::TiXmlElement* const parent = new nd::TiXmlElement("parent");
 	jointNode->LinkEndChild(parent);
-	sprintf(buffer, "%s", link->GetParent()->m_name.GetStr());
+	snprintf(buffer, sizeof(buffer), "%s", link->GetParent()->m_name.GetStr());
 	parent->SetAttribute("link", buffer);
 	
 	nd::TiXmlElement* const child = new nd::TiXmlElement("child");
 	jointNode->LinkEndChild(child);
-	sprintf(buffer, "%s", link->m_name.GetStr());
+	snprintf(buffer, sizeof(buffer), "%s", link->m_name.GetStr());
 	child->SetAttribute("link", buffer);
 	
 	const ndJointBilateralConstraint* const joint = *link->m_joint;
@@ -451,7 +451,7 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 		const ndMatrix pinMatrix(ndGetIdentityMatrix());
 		localMatrix = pinMatrix.OrthoInverse() * localMatrix;
 	
-		//sprintf(buffer, "%g %g %g", pinMatrix[0].m_x, pinMatrix[0].m_y, pinMatrix[0].m_z);
+		//snprintf(buffer, "%g %g %g", pinMatrix[0].m_x, pinMatrix[0].m_y, pinMatrix[0].m_z);
 		//nd::TiXmlElement* const axis = new nd::TiXmlElement("axis");
 		//jointNode->LinkEndChild(axis);
 		//axis->SetAttribute("xyz", buffer);
@@ -465,7 +465,7 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 		const ndMatrix pinMatrix(ndGetIdentityMatrix());
 		localMatrix = pinMatrix.OrthoInverse() * localMatrix;
 	
-		//sprintf(buffer, "%g %g %g", pinMatrix[0].m_x, pinMatrix[0].m_y, pinMatrix[0].m_z);
+		//snprintf(buffer, "%g %g %g", pinMatrix[0].m_x, pinMatrix[0].m_y, pinMatrix[0].m_z);
 		//nd::TiXmlElement* const axis = new nd::TiXmlElement("axis");
 		//jointNode->LinkEndChild(axis);
 		//axis->SetAttribute("xyz", buffer);
@@ -605,11 +605,11 @@ void ndUrdfFile::ImportStlMesh(const char* const pathName, ndMeshEffect* const m
 	{
 		meshName = strrchr(pathName, '\\');
 	}
-	sprintf(meshFile, "%s", meshName + 1);
+	snprintf(meshFile, sizeof (meshFile), "%s", meshName + 1);
 	char* ptr = strrchr(meshFile, '.');
-	sprintf(ptr, ".stl");
+	snprintf(ptr, 32, ".stl");
 
-	sprintf(meshPath, "%s/%s", m_path.GetStr(), meshFile);
+	snprintf(meshPath, sizeof (meshPath), "%s/%s", m_path.GetStr(), meshFile);
 
 	FILE* const file = fopen(meshPath, "rb");
 	ndAssert(file);
@@ -659,7 +659,7 @@ void ndUrdfFile::ImportVisual(const nd::TiXmlNode* const linkNode, ndBodyDynamic
 		meshMaterial.m_diffuse = m_materials[i].m_color;
 		//meshMaterial.m_ambient = materials[i].m_color;
 		//strcpy(meshMaterial.m_textureName, "wood_0.png");
-		sprintf(meshMaterial.m_textureName, m_materials[i].m_texture);
+		snprintf(meshMaterial.m_textureName, sizeof (meshMaterial.m_textureName), m_materials[i].m_texture);
 		meshEffect->GetMaterials().PushBack(meshMaterial);
 	}
 

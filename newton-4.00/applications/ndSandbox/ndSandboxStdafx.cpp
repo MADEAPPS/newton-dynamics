@@ -25,7 +25,7 @@ void ndGetWorkingFileName (const char* const name, char* const outPathName)
 
 		char* const end = strstr (appPath, "applications");
 		end [0] = 0;
-		sprintf (outPathName, "%sapplications/media/%s", appPath, name);
+		snprintf (outPathName, sizeof (appPath), "%sapplications/media/%s", appPath, name);
 	#elif defined(__APPLE__)
         char tmp[2048];
 		CFURLRef appURL (CFBundleCopyBundleURL(CFBundleGetMainBundle()));
@@ -33,8 +33,7 @@ void ndGetWorkingFileName (const char* const name, char* const outPathName)
         CFStringGetCString (filePath, tmp, PATH_MAX, kCFStringEncodingUTF8);
         //char* const ptr = strstr (tmp, "applications");
         //ptr [0] = 0;
-        //sprintf (outPathName, "%sapplications/media/%s", tmp, name);
-        sprintf (outPathName, "%s/Contents/Resources/%s", tmp, name);
+        snprintf (outPathName, sizeof (tmp), "%s/Contents/Resources/%s", tmp, name);
 
 		// Clean up 
 		CFRelease( appURL ); 
@@ -43,13 +42,13 @@ void ndGetWorkingFileName (const char* const name, char* const outPathName)
 		char id[2048];
 		char appPath[2048];
 
-		sprintf(id, "/proc/%d/exe", getpid());
+		snprintf(id, sizeof (id), "/proc/%d/exe", getpid());
 		memset (appPath, 0, sizeof (appPath));
 		size_t ret = readlink(id, appPath, sizeof (appPath));
 		ret = 0;
 		char* const end = strstr (appPath, "applications");
 		*end = 0;
-		sprintf (outPathName, "%sapplications/media/%s", appPath, name);
+		snprintf (outPathName, sizeof(appPath), "%sapplications/media/%s", appPath, name);
 	#else
 		#error  "error: need to implement \"dGetWorkingFileName\" here for this platform"
 	#endif
