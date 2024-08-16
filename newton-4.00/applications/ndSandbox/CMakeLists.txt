@@ -51,8 +51,7 @@ if(NEWTON_ENABLE_VULKAN_SDK)
 endif()
 
 add_executable(${projectName} ${CPP_SOURCE})
-
-target_link_libraries (${projectName} ndNewton ndBrain ndModel vhacd openfbx glfw imgui glatter lodepng)
+target_link_libraries (${projectName} ndNewton ndBrain ndModel vhacd openfbx lodepng glfw imgui glatter)
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndCollision ndCore)
