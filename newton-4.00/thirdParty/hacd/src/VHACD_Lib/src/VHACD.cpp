@@ -356,7 +356,8 @@ namespace nd_
 		const int32_t convexhullDownsampling, const double, const double, Plane& bestPlane,
 		double& minConcavity, const Parameters& params)
 	{
-		if (GetCancel()) {
+		if (GetCancel()) 
+		{
 			return;
 		}
 		char msg[256];
@@ -371,9 +372,11 @@ namespace nd_
 		inputPSet->SelectOnSurface(onSurfacePSet);
 
 		PrimitiveSet** psets = 0;
-		if (!params.m_convexhullApproximation) {
+		if (!params.m_convexhullApproximation) 
+		{
 			psets = new PrimitiveSet*[2];
-			for (int32_t i = 0; i < 2; ++i) {
+			for (int32_t i = 0; i < 2; ++i) 
+			{
 				psets[i] = inputPSet->Create();
 			}
 		}
@@ -384,7 +387,7 @@ namespace nd_
 	#endif // DEBUG_TEMP
 
 
-	class CommonData
+		class CommonData
 	{
 		public:
 		CommonData(VHACD* me, const Parameters& params)
@@ -408,7 +411,7 @@ namespace nd_
 		PrimitiveSet** m_psets;
 	};
 
-	class BestClippingPlaneJob : public Job
+		class BestClippingPlaneJob : public Job
 	{
 		public:
 		BestClippingPlaneJob()
@@ -473,63 +476,67 @@ namespace nd_
 		CommonData* m_commonData;
 	};
 
-	std::vector<BestClippingPlaneJob> jobs;
-	jobs.resize(size_t(nPlanes));
+		std::vector<BestClippingPlaneJob> jobs;
+		jobs.resize(size_t(nPlanes));
 
-	CommonData data(this, params);
-	data.m_w = w;
-	data.m_beta = beta;
-	data.m_alpha = alpha;
-	data.m_psets = psets;
-	data.m_inputPSet = inputPSet;
-	data.m_onSurfacePSet = onSurfacePSet;
-	data.m_preferredCuttingDirection = preferredCuttingDirection;
-	data.m_convexhullDownsampling = convexhullDownsampling;
-	for (size_t i = 0; i < size_t(nPlanes); ++i)
-	{
-		jobs[i].m_plane = planes[i];
-		jobs[i].m_commonData = &data;
-		m_parallelQueue.PushTask(&jobs[i]);
-	}
-	m_parallelQueue.Sync();
-
-	iBest = 0;
-	minConcavity = jobs[0].m_concavity;
-	minBalance = jobs[0].m_balance;
-	minSymmetry = jobs[0].m_symmetry;
-	bestPlane = jobs[0].m_plane;
-	minTotal = jobs[0].m_concavity + jobs[0].m_balance + jobs[0].m_symmetry;
-	for (size_t i = 1; i < size_t(nPlanes); ++i)
-	{
-		double total = jobs[i].m_concavity + jobs[i].m_balance + jobs[i].m_symmetry;
-		if ((total < minTotal && int32_t(i) < iBest) || total < minTotal)
+		CommonData data(this, params);
+		data.m_w = w;
+		data.m_beta = beta;
+		data.m_alpha = alpha;
+		data.m_psets = psets;
+		data.m_inputPSet = inputPSet;
+		data.m_onSurfacePSet = onSurfacePSet;
+		data.m_preferredCuttingDirection = preferredCuttingDirection;
+		data.m_convexhullDownsampling = convexhullDownsampling;
+		for (size_t i = 0; i < size_t(nPlanes); ++i)
 		{
-			minConcavity = jobs[i].m_concavity;
-			minBalance = jobs[i].m_balance;
-			minSymmetry = jobs[i].m_symmetry;
-			bestPlane = jobs[i].m_plane;
-			minTotal = total;
-			iBest = int32_t(i);
+			jobs[i].m_plane = planes[i];
+			jobs[i].m_commonData = &data;
+			m_parallelQueue.PushTask(&jobs[i]);
 		}
-	}
+		m_parallelQueue.Sync();
+
+		iBest = 0;
+		minConcavity = jobs[0].m_concavity;
+		minBalance = jobs[0].m_balance;
+		minSymmetry = jobs[0].m_symmetry;
+		bestPlane = jobs[0].m_plane;
+		minTotal = jobs[0].m_concavity + jobs[0].m_balance + jobs[0].m_symmetry;
+		for (size_t i = 1; i < size_t(nPlanes); ++i)
+		{
+			double total = jobs[i].m_concavity + jobs[i].m_balance + jobs[i].m_symmetry;
+			if ((total < minTotal && int32_t(i) < iBest) || total < minTotal)
+			{
+				minConcavity = jobs[i].m_concavity;
+				minBalance = jobs[i].m_balance;
+				minSymmetry = jobs[i].m_symmetry;
+				bestPlane = jobs[i].m_plane;
+				minTotal = total;
+				iBest = int32_t(i);
+			}
+		}
 
 	#ifdef DEBUG_TEMP
 		timerComputeCost.Toc();
 		printf_s("Cost[%i] = %f\n", nPlanes, timerComputeCost.GetElapsedTime());
 	#endif // DEBUG_TEMP
 
-		if (psets) {
-			for (int32_t i = 0; i < 2; ++i) {
+		if (psets) 
+		{
+			for (int32_t i = 0; i < 2; ++i) 
+			{
 				delete psets[i];
 			}
 			delete[] psets;
 		}
 		delete onSurfacePSet;
-		if (params.m_logger) {
-			sprintf(msg, "\n\t\t\t Best  %04i T=%2.6f C=%2.6f B=%2.6f S=%2.6f (%1.1f, %1.1f, %1.1f, %3.3f)\n\n", int (iBest), minTotal, minConcavity, minBalance, minSymmetry, bestPlane.m_a, bestPlane.m_b, bestPlane.m_c, bestPlane.m_d);
+		if (params.m_logger) 
+		{
+			snprintf(msg, sizeof (msg), "\n\t\t\t Best  %04i T=%2.6f C=%2.6f B=%2.6f S=%2.6f (%1.1f, %1.1f, %1.1f, %3.3f)\n\n", int (iBest), minTotal, minConcavity, minBalance, minSymmetry, bestPlane.m_a, bestPlane.m_b, bestPlane.m_c, bestPlane.m_d);
 			params.m_logger->Log(msg);
 		}
 	}
+
 	void VHACD::ComputeACD(const Parameters& params)
 	{
 		if (GetCancel()) {

@@ -1128,7 +1128,7 @@ static unsigned getTreeInflateDynamic(HuffmanTree* tree_ll, HuffmanTree* tree_d,
         {
           /*return error code 10 or 11 depending on the situation that happened in huffmanDecodeSymbol
           (10=no endcode, 11=wrong jump outside of tree)*/
-          error = size_t((*bp) > inbitlength ? 10 : 11);
+          error = unsigned((*bp) > inbitlength ? 10 : 11);
         }
         else error = 16; /*unexisting code, this can never happen*/
         break;
