@@ -19,14 +19,16 @@ add_subdirectory(png)
 add_subdirectory(openFBX/src)
 add_subdirectory(hacd/src/VHACD_Lib)
 
-if (NEWTON_BUILD_SANDBOX_DEMOS)
-	if (MSVC OR MINGW)
-        add_subdirectory(glfw)
-	endif(MSVC OR MINGW)
+if (NOT APPLE)
+	if (NEWTON_BUILD_SANDBOX_DEMOS)
+		if (MSVC OR MINGW)
+			add_subdirectory(glfw)
+		endif(MSVC OR MINGW)
 
-    add_subdirectory(imgui)
-	#add_subdirectory(openAL)
-	add_subdirectory(glatter)
+		add_subdirectory(imgui)
+		#add_subdirectory(openAL)
+		add_subdirectory(glatter)
+	endif()
 endif()
 
 
