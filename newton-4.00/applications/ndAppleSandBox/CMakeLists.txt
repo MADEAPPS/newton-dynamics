@@ -13,7 +13,6 @@ message (${projectName})
 file(GLOB CPP_SOURCE *.swift)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
-#project(hello LANGUAGES Swift)
-#add_executable(hello hello.swift)
+project(${projectName} LANGUAGES Swift)
 
 add_executable(${projectName} ${CPP_SOURCE})
