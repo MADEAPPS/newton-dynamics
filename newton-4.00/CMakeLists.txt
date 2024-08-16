@@ -83,7 +83,7 @@ if (NEWTON_ENABLE_VULKAN_SDK)
 	add_definitions(-DD_USE_VULKAN_SDK)
 endif()
 
-if(NEWTON_BUILD_SHARED_LIBS OR NOT APPLE)
+if(NEWTON_BUILD_SHARED_LIBS OR APPLE)
 	add_definitions(-D_D_TINY_DLL)
     add_definitions(-D_D_CORE_DLL)
 	add_definitions(-D_D_TINY_DLL)

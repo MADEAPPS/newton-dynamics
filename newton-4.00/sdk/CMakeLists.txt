@@ -90,7 +90,7 @@ else()
 
 	add_definitions(-D_D_SINGLE_LIBRARY)
 
-	if(NEWTON_BUILD_SHARED_LIBS OR NOT APPLE)
+	if(NEWTON_BUILD_SHARED_LIBS OR APPLE)
 		add_definitions(-D_D_CORE_EXPORT_DLL)
 		add_definitions(-D_D_NEWTON_EXPORT_DLL)
 		add_definitions(-D_D_TINYXML_EXPORT_DLL)
