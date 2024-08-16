@@ -7,6 +7,13 @@
 
 cmake_minimum_required(VERSION 3.22)
 
-project(hello LANGUAGES Swift)
+set (projectName "ndSandbox")
+message (${projectName})
 
-add_executable(hello hello.swift)
+file(GLOB CPP_SOURCE *.swift)
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
+
+#project(hello LANGUAGES Swift)
+#add_executable(hello hello.swift)
+
+add_executable(${projectName} ${CPP_SOURCE})
