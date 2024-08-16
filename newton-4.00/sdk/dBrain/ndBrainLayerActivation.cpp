@@ -63,7 +63,7 @@ ndBrainLayer* ndBrainLayerActivation::Clone() const
 void ndBrainLayerActivation::Save(const ndBrainSave* const loadSave) const
 {
 	char buffer[1024];
-	sprintf(buffer, "\tnewrons %d\n", m_neurons);
+	snprintf(buffer, sizeof (buffer), "\tnewrons %d\n", m_neurons);
 	loadSave->WriteData(buffer);
 }
 

@@ -94,13 +94,13 @@ void ndBrainLayerImagePolling_2x2::Save(const ndBrainSave* const loadSave) const
 {
 	char buffer[1024];
 
-	sprintf(buffer, "\tinput_width %d\n", m_width);
+	snprintf(buffer, sizeof (buffer), "\tinput_width %d\n", m_width);
 	loadSave->WriteData(buffer);
 
-	sprintf(buffer, "\tinput_heigh %d\n", m_height);
+	snprintf(buffer, sizeof (buffer), "\tinput_heigh %d\n", m_height);
 	loadSave->WriteData(buffer);
 
-	sprintf(buffer, "\tinput_layers %d\n", m_channels);
+	snprintf(buffer, sizeof (buffer), "\tinput_layers %d\n", m_channels);
 	loadSave->WriteData(buffer);
 }
 

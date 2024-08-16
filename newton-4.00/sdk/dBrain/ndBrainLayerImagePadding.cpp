@@ -101,16 +101,16 @@ void ndBrainLayerImagePadding::Save(const ndBrainSave* const loadSave) const
 {
 	char buffer[1024];
 
-	sprintf(buffer, "\twidth %d\n", m_width);
+	snprintf(buffer, sizeof (buffer), "\twidth %d\n", m_width);
 	loadSave->WriteData(buffer);
 	
-	sprintf(buffer, "\theigh %d\n", m_height);
+	snprintf(buffer, sizeof (buffer), "\theigh %d\n", m_height);
 	loadSave->WriteData(buffer);
 	
-	sprintf(buffer, "\tchannels %d\n", m_channels);
+	snprintf(buffer, sizeof (buffer), "\tchannels %d\n", m_channels);
 	loadSave->WriteData(buffer);
 
-	sprintf(buffer, "\tfilterSize %d\n", m_filterSize);
+	snprintf(buffer, sizeof (buffer), "\tfilterSize %d\n", m_filterSize);
 	loadSave->WriteData(buffer);
 }
 

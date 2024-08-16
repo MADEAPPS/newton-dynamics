@@ -117,7 +117,7 @@ void ndBrainThreadPool::SetThreadCount(ndInt32 count)
 			for (ndInt32 i = m_workers.GetCount(); i < count; ++i)
 			{
 				char name[256];
-				sprintf(name, "ndBrain_%d", i + 1);
+				snprintf(name, sizeof (name), "ndBrain_%d", i + 1);
 				ndWorker* const worker = new ndWorker(name, this, i + 1);
 				m_workers.PushBack(worker);
 			}
