@@ -20,7 +20,6 @@ endif()
 
 add_subdirectory(dModel)
 add_subdirectory(dBrain)
-#add_subdirectory(dFileFormat)
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	add_subdirectory(dCore)
@@ -104,7 +103,7 @@ else()
 				MACOSX_FRAMEWORK_IDENTIFIER ndNewton
 				VERSION 1.0.0
 				SOVERSION 1.0.0
-				PUBLIC_HEADER dynamicFramework.h
+				PUBLIC_HEADER ndNewton.h
 				XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Apple Development")
 		endif()
 
