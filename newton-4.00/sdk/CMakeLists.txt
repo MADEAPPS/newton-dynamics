@@ -97,6 +97,18 @@ else()
 		add_definitions(-D_D_COLLISION_EXPORT_DLL)
 		add_library(${projectName} SHARED ${CPP_SOURCE})
 
+		if (APPLE)
+			set_target_properties(${projectName} PROPERTIES
+				FRAMEWORK TRUE
+				FRAMEWORK_VERSION C
+				MACOSX_FRAMEWORK_IDENTIFIER com.cmake.${projectName}
+				MACOSX_FRAMEWORK_INFO_PLIST Info.plist
+				VERSION 16.4.0
+				SOVERSION 1.0.0
+				PUBLIC_HEADER dynamicFramework.h
+				XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "MacOS Developer")
+		endif()
+
 		if(NEWTON_ENABLE_AVX2_SOLVER)
 			target_link_libraries (${projectName} ndSolverAvx2)
 		endif()
