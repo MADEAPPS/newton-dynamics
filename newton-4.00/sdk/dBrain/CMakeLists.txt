@@ -30,11 +30,10 @@ if (APPLE)
 	  FRAMEWORK TRUE
 	  FRAMEWORK_VERSION C
 	  MACOSX_FRAMEWORK_IDENTIFIER com.cmake.${projectName}
-	  MACOSX_FRAMEWORK_INFO_PLIST Info.plist
-	  VERSION 16.4.0
+	  VERSION 1.0.0
 	  SOVERSION 1.0.0
 	  PUBLIC_HEADER dynamicFramework.h
-	  XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "MacOS Developer")
+	  XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Apple Development")
 
 else()
 	add_library(${projectName} STATIC ${CPP_SOURCE})
