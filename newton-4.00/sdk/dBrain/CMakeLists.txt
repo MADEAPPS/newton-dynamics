@@ -24,7 +24,21 @@ endif()
 file(GLOB CPP_SOURCE *.cpp gpu/*.cpp *.h gpu/*.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
-add_library(${projectName} STATIC ${CPP_SOURCE})
+if (APPLE)
+	add_library(${projectName} SHARED ${CPP_SOURCE})
+	set_target_properties(${projectName} PROPERTIES
+	  FRAMEWORK TRUE
+	  FRAMEWORK_VERSION C
+	  MACOSX_FRAMEWORK_IDENTIFIER com.cmake.${projectName}
+	  MACOSX_FRAMEWORK_INFO_PLIST Info.plist
+	  VERSION 16.4.0
+	  SOVERSION 1.0.0
+	  PUBLIC_HEADER dynamicFramework.h
+	  XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "MacOS Developer")
+
+else()
+	add_library(${projectName} STATIC ${CPP_SOURCE})
+endif()
 
 if (MSVC)
 	#set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /Od")
