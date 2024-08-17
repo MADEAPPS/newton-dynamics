@@ -20,12 +20,14 @@ set(CMAKE_CXX_FLAGS "-x objective-c++")
 set(CMAKE_XCODE_ATTRIBUTE_SWIFT_OBJC_INTEROP_MODE objcxx CACHE INTERNAL “”)
 
 
-file(GLOB CPP_SOURCE *.swift)
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
+file(GLOB SOURCE_FILES *.swift, *.modulemap)
 
-add_executable(${projectName} ${CPP_SOURCE})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${SOURCE_FILES})
 
-target_link_libraries (${projectName} ndNewton ndBrain)
+add_executable(${projectName} ${SOURCE_FILES})
+
+#target_link_libraries (${projectName} ndNewton ndBrain)
+target_link_libraries (${projectName} ndNewton)
     
 target_compile_options(${projectName} PRIVATE "SHELL:-cxx-interoperability-mode=default")
 
