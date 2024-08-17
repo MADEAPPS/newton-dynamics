@@ -26,6 +26,8 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 if (APPLE)
 	add_library(${projectName} SHARED ${CPP_SOURCE})
+	target_link_libraries (${projectName} ndNewton)
+
 	set_target_properties(${projectName} PROPERTIES
 	  FRAMEWORK TRUE
 	  FRAMEWORK_VERSION C
