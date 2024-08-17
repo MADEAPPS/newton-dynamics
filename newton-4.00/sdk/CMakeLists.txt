@@ -101,7 +101,7 @@ else()
 			set_target_properties(${projectName} PROPERTIES
 				FRAMEWORK TRUE
 				FRAMEWORK_VERSION C
-				MACOSX_FRAMEWORK_IDENTIFIER com.cmake.ndNewton
+				MACOSX_FRAMEWORK_IDENTIFIER ndNewton
 				VERSION 1.0.0
 				SOVERSION 1.0.0
 				PUBLIC_HEADER dynamicFramework.h

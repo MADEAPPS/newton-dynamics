@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ndNewton
 
 struct ContentView: View {
     var body: some View {
