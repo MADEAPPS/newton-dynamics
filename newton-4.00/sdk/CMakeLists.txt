@@ -160,10 +160,12 @@ else()
 		target_link_libraries (${projectName} dProfiler)
 	endif()
 
-	install(TARGETS ${projectName} 
-			LIBRARY DESTINATION lib
-			ARCHIVE DESTINATION lib
-			RUNTIME DESTINATION bin)
+	if (NOT APPLE)
+		install(TARGETS ${projectName} 
+				LIBRARY DESTINATION lib
+				ARCHIVE DESTINATION lib
+				RUNTIME DESTINATION bin)
+	endif()
 
 	install(FILES ${HEADERS} DESTINATION include/${projectName})
 
