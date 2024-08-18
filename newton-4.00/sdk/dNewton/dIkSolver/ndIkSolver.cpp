@@ -356,34 +356,34 @@ void ndIkSolver::BuildMassMatrix()
 		CopyCloseLoopBody(body1);
 	}
 
-	auto CopyContactBody = [this](ndBodyKinematic* const body)
-	{
-		if (body->GetInvMass() == ndFloat32(0.0f))
-		{
-			return;
-		}
-
-		ndAssert(body->GetId() > 0);
-		for (ndInt32 i = ndInt32(m_bodies.GetCount()) - 1; i >= 1; --i)
-		{
-			if (body == m_bodies[i])
-			{
-				return;
-			}
-		}
-
-		m_bodies.PushBack(body);
-		ndUnsigned32 id = body->GetId();
-		for (ndInt32 i = ndInt32(m_bodies.GetCount()) - 1; i >= 1; --i)
-		{
-			if (id > m_bodies[i - 1]->GetId())
-			{
-				m_bodies[i] = body;
-				break;
-			}
-			m_bodies[i] = m_bodies[i - 1];
-		}
-	};
+	//auto CopyContactBody = [this](ndBodyKinematic* const body)
+	//{
+	//	if (body->GetInvMass() == ndFloat32(0.0f))
+	//	{
+	//		return;
+	//	}
+	//
+	//	ndAssert(body->GetId() > 0);
+	//	for (ndInt32 i = ndInt32(m_bodies.GetCount()) - 1; i >= 1; --i)
+	//	{
+	//		if (body == m_bodies[i])
+	//		{
+	//			return;
+	//		}
+	//	}
+	//
+	//	m_bodies.PushBack(body);
+	//	ndUnsigned32 id = body->GetId();
+	//	for (ndInt32 i = ndInt32(m_bodies.GetCount()) - 1; i >= 1; --i)
+	//	{
+	//		if (id > m_bodies[i - 1]->GetId())
+	//		{
+	//			m_bodies[i] = body;
+	//			break;
+	//		}
+	//		m_bodies[i] = m_bodies[i - 1];
+	//	}
+	//};
 
 	// add contacts loop bodies and joints
 

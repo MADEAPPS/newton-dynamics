@@ -56,12 +56,9 @@ else()
     set (X86 FALSE)
 endif()
 
-if (X86 OR NEWTON_SCALAR_VECTOR_CLASS) 
+#if (X86 OR NEWTON_SCALAR_VECTOR_CLASS) 
+if (NEWTON_SCALAR_VECTOR_CLASS) 
 	add_definitions(-DD_SCALAR_VECTOR_CLASS)
-endif()
-
-if (X86 AND NEWTON_ENABLE_AVX2)
-	add_definitions(-DD_NEWTON_USE_AVX2_OPTION)
 endif()
 
 if(NEWTON_DOUBLE_PRECISION)
@@ -74,6 +71,10 @@ endif()
 
 if (NEWTON_ENABLE_VULKAN_SDK)
 	add_definitions(-DD_USE_VULKAN_SDK)
+endif()
+
+if (X86 AND NEWTON_ENABLE_AVX2)
+	add_definitions(-DD_NEWTON_USE_AVX2_OPTION)
 endif()
 
 if(NEWTON_BUILD_SHARED_LIBS)
