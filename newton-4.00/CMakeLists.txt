@@ -91,12 +91,6 @@ if(NOT CMAKE_BUILD_TYPE)
           FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
-#check for MAC
-if(APPLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fms-extensions")
-	set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -undefined dynamic_lookup")
-endif(APPLE)
-
 #check for UNIX
 if(UNIX)
 	  # ----------------------------------------------------------------------
