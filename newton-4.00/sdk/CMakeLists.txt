@@ -89,23 +89,12 @@ else()
 
 	add_definitions(-D_D_SINGLE_LIBRARY)
 
-	if(NEWTON_BUILD_SHARED_LIBS OR APPLE)
+	if(NEWTON_BUILD_SHARED_LIBS)
 		add_definitions(-D_D_CORE_EXPORT_DLL)
 		add_definitions(-D_D_NEWTON_EXPORT_DLL)
 		add_definitions(-D_D_TINYXML_EXPORT_DLL)
 		add_definitions(-D_D_COLLISION_EXPORT_DLL)
 		add_library(${projectName} SHARED ${CPP_SOURCE})
-
-		if (APPLE)
-			set_target_properties(${projectName} PROPERTIES
-				FRAMEWORK TRUE
-				FRAMEWORK_VERSION C
-				MACOSX_FRAMEWORK_IDENTIFIER ndNewton
-				VERSION 1.0.0
-				SOVERSION 1.0.0
-				PUBLIC_HEADER ndNewton.h
-				XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Apple Development")
-		endif()
 
 		if(NEWTON_ENABLE_AVX2_SOLVER)
 			target_link_libraries (${projectName} ndSolverAvx2)
@@ -158,12 +147,10 @@ else()
 		target_link_libraries (${projectName} dProfiler)
 	endif()
 
-	if (NOT APPLE)
-		install(TARGETS ${projectName} 
-				LIBRARY DESTINATION lib
-				ARCHIVE DESTINATION lib
-				RUNTIME DESTINATION bin)
-	endif()
+	install(TARGETS ${projectName} 
+			LIBRARY DESTINATION lib
+			ARCHIVE DESTINATION lib
+			RUNTIME DESTINATION bin)
 
 	install(FILES ${HEADERS} DESTINATION include/${projectName})
 

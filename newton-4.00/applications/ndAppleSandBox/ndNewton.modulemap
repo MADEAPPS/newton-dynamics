@@ -1,6 +1,0 @@
-// In module.modulemap
-module ndNewton
-{
-    header "ndNewton.h"
-    requires cplusplus
-}
