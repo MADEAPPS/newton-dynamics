@@ -34,8 +34,8 @@
 		DADCED962A83E875003D359E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		DADCED982A83F1A3003D359E /* CppInteropInlineExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CppInteropInlineExample-Bridging-Header.h"; sourceTree = "<group>"; };
 		DADCED992A83F1A3003D359E /* SimpleCxxFunctions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SimpleCxxFunctions.cpp; sourceTree = "<group>"; };
-		DADCED9A2A83F1A3003D359E /* SimpleCxxFunctions.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SimpleCxxFunctions.hpp; sourceTree = "<group>"; };
 		FF09CAEA2C725DF8002039FD /* ndNewton.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ndNewton.xcodeproj; path = ../../ndNewton/ndNewton.xcodeproj; sourceTree = "<group>"; };
+		FF09CAF22C726132002039FD /* SimpleCxxFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCxxFunctions.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,8 +52,8 @@
 		DADCED782A83E3DF003D359E = {
 			isa = PBXGroup;
 			children = (
-				FF09CAEA2C725DF8002039FD /* ndNewton.xcodeproj */,
 				DADCED832A83E3DF003D359E /* CppInteropInlineExample */,
+				FF09CAEA2C725DF8002039FD /* ndNewton.xcodeproj */,
 				DADCED822A83E3DF003D359E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -69,11 +69,11 @@
 		DADCED832A83E3DF003D359E /* CppInteropInlineExample */ = {
 			isa = PBXGroup;
 			children = (
+				FF09CAF22C726132002039FD /* SimpleCxxFunctions.h */,
 				DADCED962A83E875003D359E /* README.md */,
 				DADCED842A83E3DF003D359E /* CppInteropInlineExampleApp.swift */,
 				DADCED862A83E3DF003D359E /* ContentView.swift */,
 				DADCED992A83F1A3003D359E /* SimpleCxxFunctions.cpp */,
-				DADCED9A2A83F1A3003D359E /* SimpleCxxFunctions.hpp */,
 				DADCED882A83E3E3003D359E /* Assets.xcassets */,
 				DADCED8A2A83E3E3003D359E /* CppInteropInlineExample.entitlements */,
 				DADCED8B2A83E3E3003D359E /* Preview Content */,
