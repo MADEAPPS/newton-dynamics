@@ -111,6 +111,180 @@
 		FF09C93F2C724739002039FD /* ndVectorArmNeon.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8D62C724739002039FD /* ndVectorArmNeon.h */; };
 		FF09C9402C724739002039FD /* ndVectorScalar.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8D72C724739002039FD /* ndVectorScalar.h */; };
 		FF09C9412C724739002039FD /* ndVectorSimd.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8D82C724739002039FD /* ndVectorSimd.h */; };
+		FF09C99E2C724A52002039FD /* ndBodiesInAabbNotify.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9432C724A52002039FD /* ndBodiesInAabbNotify.h */; };
+		FF09C99F2C724A52002039FD /* ndBody.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9442C724A52002039FD /* ndBody.cpp */; };
+		FF09C9A02C724A52002039FD /* ndBody.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9452C724A52002039FD /* ndBody.h */; };
+		FF09C9A12C724A52002039FD /* ndBodyKinematic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9462C724A52002039FD /* ndBodyKinematic.cpp */; };
+		FF09C9A22C724A52002039FD /* ndBodyKinematic.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9472C724A52002039FD /* ndBodyKinematic.h */; };
+		FF09C9A32C724A52002039FD /* ndBodyKinematicBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9482C724A52002039FD /* ndBodyKinematicBase.cpp */; };
+		FF09C9A42C724A52002039FD /* ndBodyKinematicBase.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9492C724A52002039FD /* ndBodyKinematicBase.h */; };
+		FF09C9A52C724A52002039FD /* ndBodyListView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C94A2C724A52002039FD /* ndBodyListView.cpp */; };
+		FF09C9A62C724A52002039FD /* ndBodyListView.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C94B2C724A52002039FD /* ndBodyListView.h */; };
+		FF09C9A72C724A52002039FD /* ndBodyNotify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C94C2C724A52002039FD /* ndBodyNotify.cpp */; };
+		FF09C9A82C724A52002039FD /* ndBodyNotify.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C94D2C724A52002039FD /* ndBodyNotify.h */; };
+		FF09C9A92C724A52002039FD /* ndBodyParticleSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C94E2C724A52002039FD /* ndBodyParticleSet.cpp */; };
+		FF09C9AA2C724A52002039FD /* ndBodyParticleSet.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C94F2C724A52002039FD /* ndBodyParticleSet.h */; };
+		FF09C9AB2C724A52002039FD /* ndBodyPlayerCapsule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9502C724A52002039FD /* ndBodyPlayerCapsule.cpp */; };
+		FF09C9AC2C724A52002039FD /* ndBodyPlayerCapsule.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9512C724A52002039FD /* ndBodyPlayerCapsule.h */; };
+		FF09C9AD2C724A52002039FD /* ndBodySphFluid_New.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9522C724A52002039FD /* ndBodySphFluid_New.cpp */; };
+		FF09C9AE2C724A52002039FD /* ndBodySphFluid_New.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9532C724A52002039FD /* ndBodySphFluid_New.h */; };
+		FF09C9AF2C724A52002039FD /* ndBodySphFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9542C724A52002039FD /* ndBodySphFluid.cpp */; };
+		FF09C9B02C724A52002039FD /* ndBodySphFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9552C724A52002039FD /* ndBodySphFluid.h */; };
+		FF09C9B12C724A52002039FD /* ndBodyTriggerVolume.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9562C724A52002039FD /* ndBodyTriggerVolume.cpp */; };
+		FF09C9B22C724A52002039FD /* ndBodyTriggerVolume.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9572C724A52002039FD /* ndBodyTriggerVolume.h */; };
+		FF09C9B32C724A52002039FD /* ndBvhNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9582C724A52002039FD /* ndBvhNode.cpp */; };
+		FF09C9B42C724A52002039FD /* ndBvhNode.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9592C724A52002039FD /* ndBvhNode.h */; };
+		FF09C9B52C724A52002039FD /* ndCollision.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C95A2C724A52002039FD /* ndCollision.h */; };
+		FF09C9B62C724A52002039FD /* ndCollisionStdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C95B2C724A52002039FD /* ndCollisionStdafx.cpp */; };
+		FF09C9B72C724A52002039FD /* ndCollisionStdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C95C2C724A52002039FD /* ndCollisionStdafx.h */; };
+		FF09C9B82C724A52002039FD /* ndConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C95D2C724A52002039FD /* ndConstraint.cpp */; };
+		FF09C9B92C724A52002039FD /* ndConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C95E2C724A52002039FD /* ndConstraint.h */; };
+		FF09C9BA2C724A52002039FD /* ndContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C95F2C724A52002039FD /* ndContact.cpp */; };
+		FF09C9BB2C724A52002039FD /* ndContact.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9602C724A52002039FD /* ndContact.h */; };
+		FF09C9BC2C724A52002039FD /* ndContactArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9612C724A52002039FD /* ndContactArray.cpp */; };
+		FF09C9BD2C724A52002039FD /* ndContactArray.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9622C724A52002039FD /* ndContactArray.h */; };
+		FF09C9BE2C724A52002039FD /* ndContactNotify.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9632C724A52002039FD /* ndContactNotify.h */; };
+		FF09C9BF2C724A52002039FD /* ndContactOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9642C724A52002039FD /* ndContactOptions.h */; };
+		FF09C9C02C724A52002039FD /* ndContactSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9652C724A52002039FD /* ndContactSolver.cpp */; };
+		FF09C9C12C724A52002039FD /* ndContactSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9662C724A52002039FD /* ndContactSolver.h */; };
+		FF09C9C22C724A52002039FD /* ndConvexCastNotify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9672C724A52002039FD /* ndConvexCastNotify.cpp */; };
+		FF09C9C32C724A52002039FD /* ndConvexCastNotify.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9682C724A52002039FD /* ndConvexCastNotify.h */; };
+		FF09C9C42C724A52002039FD /* ndJointBilateralConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9692C724A52002039FD /* ndJointBilateralConstraint.cpp */; };
+		FF09C9C52C724A52002039FD /* ndJointBilateralConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C96A2C724A52002039FD /* ndJointBilateralConstraint.h */; };
+		FF09C9C62C724A52002039FD /* ndJointList.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C96B2C724A52002039FD /* ndJointList.h */; };
+		FF09C9C72C724A52002039FD /* ndMeshEffect.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C96C2C724A52002039FD /* ndMeshEffect.h */; };
+		FF09C9C82C724A52002039FD /* ndMeshEffect1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C96D2C724A52002039FD /* ndMeshEffect1.cpp */; };
+		FF09C9C92C724A52002039FD /* ndMeshEffect2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C96E2C724A52002039FD /* ndMeshEffect2.cpp */; };
+		FF09C9CA2C724A52002039FD /* ndMeshEffect3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C96F2C724A52002039FD /* ndMeshEffect3.cpp */; };
+		FF09C9CB2C724A52002039FD /* ndMeshEffect4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9702C724A52002039FD /* ndMeshEffect4.cpp */; };
+		FF09C9CC2C724A52002039FD /* ndMeshEffect5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9712C724A52002039FD /* ndMeshEffect5.cpp */; };
+		FF09C9CD2C724A52002039FD /* ndMeshEffect6.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9722C724A52002039FD /* ndMeshEffect6.cpp */; };
+		FF09C9CE2C724A52002039FD /* ndPolygonMeshDesc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9732C724A52002039FD /* ndPolygonMeshDesc.cpp */; };
+		FF09C9CF2C724A52002039FD /* ndPolygonMeshDesc.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9742C724A52002039FD /* ndPolygonMeshDesc.h */; };
+		FF09C9D02C724A52002039FD /* ndRayCastNotify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9752C724A52002039FD /* ndRayCastNotify.cpp */; };
+		FF09C9D12C724A52002039FD /* ndRayCastNotify.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9762C724A52002039FD /* ndRayCastNotify.h */; };
+		FF09C9D22C724A52002039FD /* ndScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9772C724A52002039FD /* ndScene.cpp */; };
+		FF09C9D32C724A52002039FD /* ndScene.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9782C724A52002039FD /* ndScene.h */; };
+		FF09C9D42C724A52002039FD /* ndShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9792C724A52002039FD /* ndShape.cpp */; };
+		FF09C9D52C724A52002039FD /* ndShape.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C97A2C724A52002039FD /* ndShape.h */; };
+		FF09C9D62C724A52002039FD /* ndShapeBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C97B2C724A52002039FD /* ndShapeBox.cpp */; };
+		FF09C9D72C724A52002039FD /* ndShapeBox.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C97C2C724A52002039FD /* ndShapeBox.h */; };
+		FF09C9D82C724A52002039FD /* ndShapeCapsule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C97D2C724A52002039FD /* ndShapeCapsule.cpp */; };
+		FF09C9D92C724A52002039FD /* ndShapeCapsule.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C97E2C724A52002039FD /* ndShapeCapsule.h */; };
+		FF09C9DA2C724A52002039FD /* ndShapeChamferCylinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C97F2C724A52002039FD /* ndShapeChamferCylinder.cpp */; };
+		FF09C9DB2C724A52002039FD /* ndShapeChamferCylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9802C724A52002039FD /* ndShapeChamferCylinder.h */; };
+		FF09C9DC2C724A52002039FD /* ndShapeCompound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9812C724A52002039FD /* ndShapeCompound.cpp */; };
+		FF09C9DD2C724A52002039FD /* ndShapeCompound.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9822C724A52002039FD /* ndShapeCompound.h */; };
+		FF09C9DE2C724A52002039FD /* ndShapeCone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9832C724A52002039FD /* ndShapeCone.cpp */; };
+		FF09C9DF2C724A52002039FD /* ndShapeCone.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9842C724A52002039FD /* ndShapeCone.h */; };
+		FF09C9E02C724A52002039FD /* ndShapeConvex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9852C724A52002039FD /* ndShapeConvex.cpp */; };
+		FF09C9E12C724A52002039FD /* ndShapeConvex.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9862C724A52002039FD /* ndShapeConvex.h */; };
+		FF09C9E22C724A52002039FD /* ndShapeConvexHull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9872C724A52002039FD /* ndShapeConvexHull.cpp */; };
+		FF09C9E32C724A52002039FD /* ndShapeConvexHull.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9882C724A52002039FD /* ndShapeConvexHull.h */; };
+		FF09C9E42C724A52002039FD /* ndShapeConvexPolygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9892C724A52002039FD /* ndShapeConvexPolygon.cpp */; };
+		FF09C9E52C724A52002039FD /* ndShapeConvexPolygon.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C98A2C724A52002039FD /* ndShapeConvexPolygon.h */; };
+		FF09C9E62C724A52002039FD /* ndShapeCylinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C98B2C724A52002039FD /* ndShapeCylinder.cpp */; };
+		FF09C9E72C724A52002039FD /* ndShapeCylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C98C2C724A52002039FD /* ndShapeCylinder.h */; };
+		FF09C9E82C724A52002039FD /* ndShapeHeightfield.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C98D2C724A52002039FD /* ndShapeHeightfield.cpp */; };
+		FF09C9E92C724A52002039FD /* ndShapeHeightfield.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C98E2C724A52002039FD /* ndShapeHeightfield.h */; };
+		FF09C9EA2C724A52002039FD /* ndShapeInstance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C98F2C724A52002039FD /* ndShapeInstance.cpp */; };
+		FF09C9EB2C724A52002039FD /* ndShapeInstance.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9902C724A52002039FD /* ndShapeInstance.h */; };
+		FF09C9EC2C724A52002039FD /* ndShapeNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9912C724A52002039FD /* ndShapeNull.cpp */; };
+		FF09C9ED2C724A52002039FD /* ndShapeNull.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9922C724A52002039FD /* ndShapeNull.h */; };
+		FF09C9EE2C724A52002039FD /* ndShapePoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9932C724A52002039FD /* ndShapePoint.cpp */; };
+		FF09C9EF2C724A52002039FD /* ndShapePoint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9942C724A52002039FD /* ndShapePoint.h */; };
+		FF09C9F02C724A52002039FD /* ndShapeSphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9952C724A52002039FD /* ndShapeSphere.cpp */; };
+		FF09C9F12C724A52002039FD /* ndShapeSphere.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9962C724A52002039FD /* ndShapeSphere.h */; };
+		FF09C9F22C724A52002039FD /* ndShapeStatic_bvh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9972C724A52002039FD /* ndShapeStatic_bvh.cpp */; };
+		FF09C9F32C724A52002039FD /* ndShapeStatic_bvh.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C9982C724A52002039FD /* ndShapeStatic_bvh.h */; };
+		FF09C9F42C724A52002039FD /* ndShapeStaticMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C9992C724A52002039FD /* ndShapeStaticMesh.cpp */; };
+		FF09C9F52C724A52002039FD /* ndShapeStaticMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C99A2C724A52002039FD /* ndShapeStaticMesh.h */; };
+		FF09C9F62C724A52002039FD /* ndShapeStaticProceduralMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C99B2C724A52002039FD /* ndShapeStaticProceduralMesh.cpp */; };
+		FF09C9F72C724A52002039FD /* ndShapeStaticProceduralMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C99C2C724A52002039FD /* ndShapeStaticProceduralMesh.h */; };
+		FF09CA962C724A85002039FD /* ndIk6DofEffector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA232C724A85002039FD /* ndIk6DofEffector.cpp */; };
+		FF09CA972C724A85002039FD /* ndIk6DofEffector.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA242C724A85002039FD /* ndIk6DofEffector.h */; };
+		FF09CA982C724A85002039FD /* ndIkJointDoubleHinge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA252C724A85002039FD /* ndIkJointDoubleHinge.cpp */; };
+		FF09CA992C724A85002039FD /* ndIkJointDoubleHinge.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA262C724A85002039FD /* ndIkJointDoubleHinge.h */; };
+		FF09CA9A2C724A85002039FD /* ndIkJointHinge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA272C724A85002039FD /* ndIkJointHinge.cpp */; };
+		FF09CA9B2C724A85002039FD /* ndIkJointHinge.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA282C724A85002039FD /* ndIkJointHinge.h */; };
+		FF09CA9C2C724A85002039FD /* ndIkJointSpherical.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA292C724A85002039FD /* ndIkJointSpherical.cpp */; };
+		FF09CA9D2C724A85002039FD /* ndIkJointSpherical.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA2A2C724A85002039FD /* ndIkJointSpherical.h */; };
+		FF09CA9E2C724A85002039FD /* ndIkSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA2B2C724A85002039FD /* ndIkSolver.cpp */; };
+		FF09CA9F2C724A85002039FD /* ndIkSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA2C2C724A85002039FD /* ndIkSolver.h */; };
+		FF09CAA02C724A85002039FD /* ndIkSwivelPositionEffector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA2D2C724A85002039FD /* ndIkSwivelPositionEffector.cpp */; };
+		FF09CAA12C724A85002039FD /* ndIkSwivelPositionEffector.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA2E2C724A85002039FD /* ndIkSwivelPositionEffector.h */; };
+		FF09CAA22C724A85002039FD /* ndJointCylinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA302C724A85002039FD /* ndJointCylinder.cpp */; };
+		FF09CAA32C724A85002039FD /* ndJointCylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA312C724A85002039FD /* ndJointCylinder.h */; };
+		FF09CAA42C724A85002039FD /* ndJointDoubleHinge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA322C724A85002039FD /* ndJointDoubleHinge.cpp */; };
+		FF09CAA52C724A85002039FD /* ndJointDoubleHinge.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA332C724A85002039FD /* ndJointDoubleHinge.h */; };
+		FF09CAA62C724A85002039FD /* ndJointDryRollingFriction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA342C724A85002039FD /* ndJointDryRollingFriction.cpp */; };
+		FF09CAA72C724A85002039FD /* ndJointDryRollingFriction.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA352C724A85002039FD /* ndJointDryRollingFriction.h */; };
+		FF09CAA82C724A85002039FD /* ndJointFix6dof.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA362C724A85002039FD /* ndJointFix6dof.cpp */; };
+		FF09CAA92C724A85002039FD /* ndJointFix6dof.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA372C724A85002039FD /* ndJointFix6dof.h */; };
+		FF09CAAA2C724A85002039FD /* ndJointFixDistance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA382C724A85002039FD /* ndJointFixDistance.cpp */; };
+		FF09CAAB2C724A85002039FD /* ndJointFixDistance.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA392C724A85002039FD /* ndJointFixDistance.h */; };
+		FF09CAAC2C724A85002039FD /* ndJointFollowPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA3A2C724A85002039FD /* ndJointFollowPath.cpp */; };
+		FF09CAAD2C724A85002039FD /* ndJointFollowPath.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA3B2C724A85002039FD /* ndJointFollowPath.h */; };
+		FF09CAAE2C724A85002039FD /* ndJointGear.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA3C2C724A85002039FD /* ndJointGear.cpp */; };
+		FF09CAAF2C724A85002039FD /* ndJointGear.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA3D2C724A85002039FD /* ndJointGear.h */; };
+		FF09CAB02C724A85002039FD /* ndJointHinge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA3E2C724A85002039FD /* ndJointHinge.cpp */; };
+		FF09CAB12C724A85002039FD /* ndJointHinge.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA3F2C724A85002039FD /* ndJointHinge.h */; };
+		FF09CAB22C724A85002039FD /* ndJointKinematicController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA402C724A85002039FD /* ndJointKinematicController.cpp */; };
+		FF09CAB32C724A85002039FD /* ndJointKinematicController.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA412C724A85002039FD /* ndJointKinematicController.h */; };
+		FF09CAB42C724A85002039FD /* ndJointPlane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA422C724A85002039FD /* ndJointPlane.cpp */; };
+		FF09CAB52C724A85002039FD /* ndJointPlane.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA432C724A85002039FD /* ndJointPlane.h */; };
+		FF09CAB62C724A85002039FD /* ndJointPulley.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA442C724A85002039FD /* ndJointPulley.cpp */; };
+		FF09CAB72C724A85002039FD /* ndJointPulley.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA452C724A85002039FD /* ndJointPulley.h */; };
+		FF09CAB82C724A85002039FD /* ndJointRoller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA462C724A85002039FD /* ndJointRoller.cpp */; };
+		FF09CAB92C724A85002039FD /* ndJointRoller.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA472C724A85002039FD /* ndJointRoller.h */; };
+		FF09CABA2C724A85002039FD /* ndJointSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA482C724A85002039FD /* ndJointSlider.cpp */; };
+		FF09CABB2C724A85002039FD /* ndJointSlider.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA492C724A85002039FD /* ndJointSlider.h */; };
+		FF09CABC2C724A85002039FD /* ndJointSpherical.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA4A2C724A85002039FD /* ndJointSpherical.cpp */; };
+		FF09CABD2C724A85002039FD /* ndJointSpherical.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA4B2C724A85002039FD /* ndJointSpherical.h */; };
+		FF09CABE2C724A85002039FD /* ndJointUpVector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA4C2C724A85002039FD /* ndJointUpVector.cpp */; };
+		FF09CABF2C724A85002039FD /* ndJointUpVector.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA4D2C724A85002039FD /* ndJointUpVector.h */; };
+		FF09CAC02C724A85002039FD /* ndJointWheel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA4E2C724A85002039FD /* ndJointWheel.cpp */; };
+		FF09CAC12C724A85002039FD /* ndJointWheel.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA4F2C724A85002039FD /* ndJointWheel.h */; };
+		FF09CAC22C724A85002039FD /* ndMultiBodyVehicle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA512C724A85002039FD /* ndMultiBodyVehicle.cpp */; };
+		FF09CAC32C724A85002039FD /* ndMultiBodyVehicle.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA522C724A85002039FD /* ndMultiBodyVehicle.h */; };
+		FF09CAC42C724A85002039FD /* ndMultiBodyVehicleDifferential.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA532C724A85002039FD /* ndMultiBodyVehicleDifferential.cpp */; };
+		FF09CAC52C724A85002039FD /* ndMultiBodyVehicleDifferential.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA542C724A85002039FD /* ndMultiBodyVehicleDifferential.h */; };
+		FF09CAC62C724A85002039FD /* ndMultiBodyVehicleDifferentialAxle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA552C724A85002039FD /* ndMultiBodyVehicleDifferentialAxle.cpp */; };
+		FF09CAC72C724A85002039FD /* ndMultiBodyVehicleDifferentialAxle.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA562C724A85002039FD /* ndMultiBodyVehicleDifferentialAxle.h */; };
+		FF09CAC82C724A85002039FD /* ndMultiBodyVehicleGearBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA572C724A85002039FD /* ndMultiBodyVehicleGearBox.cpp */; };
+		FF09CAC92C724A85002039FD /* ndMultiBodyVehicleGearBox.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA582C724A85002039FD /* ndMultiBodyVehicleGearBox.h */; };
+		FF09CACA2C724A85002039FD /* ndMultiBodyVehicleMotor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA592C724A85002039FD /* ndMultiBodyVehicleMotor.cpp */; };
+		FF09CACB2C724A85002039FD /* ndMultiBodyVehicleMotor.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA5A2C724A85002039FD /* ndMultiBodyVehicleMotor.h */; };
+		FF09CACC2C724A85002039FD /* ndMultiBodyVehicleTireJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA5B2C724A85002039FD /* ndMultiBodyVehicleTireJoint.cpp */; };
+		FF09CACD2C724A85002039FD /* ndMultiBodyVehicleTireJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA5C2C724A85002039FD /* ndMultiBodyVehicleTireJoint.h */; };
+		FF09CACE2C724A85002039FD /* ndMultiBodyVehicleTorsionBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA5D2C724A85002039FD /* ndMultiBodyVehicleTorsionBar.cpp */; };
+		FF09CACF2C724A85002039FD /* ndMultiBodyVehicleTorsionBar.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA5E2C724A85002039FD /* ndMultiBodyVehicleTorsionBar.h */; };
+		FF09CAD02C724A85002039FD /* ndModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA602C724A85002039FD /* ndModel.cpp */; };
+		FF09CAD12C724A85002039FD /* ndModel.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA612C724A85002039FD /* ndModel.h */; };
+		FF09CAD22C724A85002039FD /* ndModelArticulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA622C724A85002039FD /* ndModelArticulation.cpp */; };
+		FF09CAD32C724A85002039FD /* ndModelArticulation.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA632C724A85002039FD /* ndModelArticulation.h */; };
+		FF09CAD42C724A85002039FD /* ndModelList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA642C724A85002039FD /* ndModelList.cpp */; };
+		FF09CAD52C724A85002039FD /* ndModelList.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA652C724A85002039FD /* ndModelList.h */; };
+		FF09CAD62C724A85002039FD /* ndModelNotify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA662C724A85002039FD /* ndModelNotify.cpp */; };
+		FF09CAD72C724A85002039FD /* ndModelNotify.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA672C724A85002039FD /* ndModelNotify.h */; };
+		FF09CAD82C724A85002039FD /* ndUrdfFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA682C724A85002039FD /* ndUrdfFile.cpp */; };
+		FF09CAD92C724A85002039FD /* ndUrdfFile.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA692C724A85002039FD /* ndUrdfFile.h */; };
+		FF09CADA2C724A85002039FD /* ndBodyDynamic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA6C2C724A85002039FD /* ndBodyDynamic.cpp */; };
+		FF09CADB2C724A85002039FD /* ndBodyDynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA6D2C724A85002039FD /* ndBodyDynamic.h */; };
+		FF09CADC2C724A85002039FD /* ndDynamicsUpdate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA6E2C724A85002039FD /* ndDynamicsUpdate.cpp */; };
+		FF09CADD2C724A85002039FD /* ndDynamicsUpdate.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA6F2C724A85002039FD /* ndDynamicsUpdate.h */; };
+		FF09CADE2C724A85002039FD /* ndDynamicsUpdateSoa.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA702C724A85002039FD /* ndDynamicsUpdateSoa.cpp */; };
+		FF09CADF2C724A85002039FD /* ndDynamicsUpdateSoa.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA712C724A85002039FD /* ndDynamicsUpdateSoa.h */; };
+		FF09CAE02C724A85002039FD /* ndNewton.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA722C724A85002039FD /* ndNewton.h */; };
+		FF09CAE12C724A85002039FD /* ndNewtonStdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA732C724A85002039FD /* ndNewtonStdafx.cpp */; };
+		FF09CAE22C724A85002039FD /* ndNewtonStdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA742C724A85002039FD /* ndNewtonStdafx.h */; };
+		FF09CAE32C724A85002039FD /* ndSkeletonContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA752C724A85002039FD /* ndSkeletonContainer.cpp */; };
+		FF09CAE42C724A85002039FD /* ndSkeletonContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA762C724A85002039FD /* ndSkeletonContainer.h */; };
+		FF09CAE52C724A85002039FD /* ndSkeletonList.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA772C724A85002039FD /* ndSkeletonList.h */; };
+		FF09CAE62C724A85002039FD /* ndWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA782C724A85002039FD /* ndWorld.cpp */; };
+		FF09CAE72C724A85002039FD /* ndWorld.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA792C724A85002039FD /* ndWorld.h */; };
+		FF09CAE82C724A85002039FD /* ndWorldScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CA7A2C724A85002039FD /* ndWorldScene.cpp */; };
+		FF09CAE92C724A85002039FD /* ndWorldScene.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CA7B2C724A85002039FD /* ndWorldScene.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -279,6 +453,183 @@
 		FF09C8D62C724739002039FD /* ndVectorArmNeon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndVectorArmNeon.h; sourceTree = "<group>"; };
 		FF09C8D72C724739002039FD /* ndVectorScalar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndVectorScalar.h; sourceTree = "<group>"; };
 		FF09C8D82C724739002039FD /* ndVectorSimd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndVectorSimd.h; sourceTree = "<group>"; };
+		FF09C9422C724A52002039FD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		FF09C9432C724A52002039FD /* ndBodiesInAabbNotify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBodiesInAabbNotify.h; sourceTree = "<group>"; };
+		FF09C9442C724A52002039FD /* ndBody.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBody.cpp; sourceTree = "<group>"; };
+		FF09C9452C724A52002039FD /* ndBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBody.h; sourceTree = "<group>"; };
+		FF09C9462C724A52002039FD /* ndBodyKinematic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBodyKinematic.cpp; sourceTree = "<group>"; };
+		FF09C9472C724A52002039FD /* ndBodyKinematic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBodyKinematic.h; sourceTree = "<group>"; };
+		FF09C9482C724A52002039FD /* ndBodyKinematicBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBodyKinematicBase.cpp; sourceTree = "<group>"; };
+		FF09C9492C724A52002039FD /* ndBodyKinematicBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBodyKinematicBase.h; sourceTree = "<group>"; };
+		FF09C94A2C724A52002039FD /* ndBodyListView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBodyListView.cpp; sourceTree = "<group>"; };
+		FF09C94B2C724A52002039FD /* ndBodyListView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBodyListView.h; sourceTree = "<group>"; };
+		FF09C94C2C724A52002039FD /* ndBodyNotify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBodyNotify.cpp; sourceTree = "<group>"; };
+		FF09C94D2C724A52002039FD /* ndBodyNotify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBodyNotify.h; sourceTree = "<group>"; };
+		FF09C94E2C724A52002039FD /* ndBodyParticleSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBodyParticleSet.cpp; sourceTree = "<group>"; };
+		FF09C94F2C724A52002039FD /* ndBodyParticleSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBodyParticleSet.h; sourceTree = "<group>"; };
+		FF09C9502C724A52002039FD /* ndBodyPlayerCapsule.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBodyPlayerCapsule.cpp; sourceTree = "<group>"; };
+		FF09C9512C724A52002039FD /* ndBodyPlayerCapsule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBodyPlayerCapsule.h; sourceTree = "<group>"; };
+		FF09C9522C724A52002039FD /* ndBodySphFluid_New.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBodySphFluid_New.cpp; sourceTree = "<group>"; };
+		FF09C9532C724A52002039FD /* ndBodySphFluid_New.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBodySphFluid_New.h; sourceTree = "<group>"; };
+		FF09C9542C724A52002039FD /* ndBodySphFluid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBodySphFluid.cpp; sourceTree = "<group>"; };
+		FF09C9552C724A52002039FD /* ndBodySphFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBodySphFluid.h; sourceTree = "<group>"; };
+		FF09C9562C724A52002039FD /* ndBodyTriggerVolume.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBodyTriggerVolume.cpp; sourceTree = "<group>"; };
+		FF09C9572C724A52002039FD /* ndBodyTriggerVolume.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBodyTriggerVolume.h; sourceTree = "<group>"; };
+		FF09C9582C724A52002039FD /* ndBvhNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBvhNode.cpp; sourceTree = "<group>"; };
+		FF09C9592C724A52002039FD /* ndBvhNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBvhNode.h; sourceTree = "<group>"; };
+		FF09C95A2C724A52002039FD /* ndCollision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndCollision.h; sourceTree = "<group>"; };
+		FF09C95B2C724A52002039FD /* ndCollisionStdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndCollisionStdafx.cpp; sourceTree = "<group>"; };
+		FF09C95C2C724A52002039FD /* ndCollisionStdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndCollisionStdafx.h; sourceTree = "<group>"; };
+		FF09C95D2C724A52002039FD /* ndConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndConstraint.cpp; sourceTree = "<group>"; };
+		FF09C95E2C724A52002039FD /* ndConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndConstraint.h; sourceTree = "<group>"; };
+		FF09C95F2C724A52002039FD /* ndContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndContact.cpp; sourceTree = "<group>"; };
+		FF09C9602C724A52002039FD /* ndContact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndContact.h; sourceTree = "<group>"; };
+		FF09C9612C724A52002039FD /* ndContactArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndContactArray.cpp; sourceTree = "<group>"; };
+		FF09C9622C724A52002039FD /* ndContactArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndContactArray.h; sourceTree = "<group>"; };
+		FF09C9632C724A52002039FD /* ndContactNotify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndContactNotify.h; sourceTree = "<group>"; };
+		FF09C9642C724A52002039FD /* ndContactOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndContactOptions.h; sourceTree = "<group>"; };
+		FF09C9652C724A52002039FD /* ndContactSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndContactSolver.cpp; sourceTree = "<group>"; };
+		FF09C9662C724A52002039FD /* ndContactSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndContactSolver.h; sourceTree = "<group>"; };
+		FF09C9672C724A52002039FD /* ndConvexCastNotify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndConvexCastNotify.cpp; sourceTree = "<group>"; };
+		FF09C9682C724A52002039FD /* ndConvexCastNotify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndConvexCastNotify.h; sourceTree = "<group>"; };
+		FF09C9692C724A52002039FD /* ndJointBilateralConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointBilateralConstraint.cpp; sourceTree = "<group>"; };
+		FF09C96A2C724A52002039FD /* ndJointBilateralConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointBilateralConstraint.h; sourceTree = "<group>"; };
+		FF09C96B2C724A52002039FD /* ndJointList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointList.h; sourceTree = "<group>"; };
+		FF09C96C2C724A52002039FD /* ndMeshEffect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndMeshEffect.h; sourceTree = "<group>"; };
+		FF09C96D2C724A52002039FD /* ndMeshEffect1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMeshEffect1.cpp; sourceTree = "<group>"; };
+		FF09C96E2C724A52002039FD /* ndMeshEffect2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMeshEffect2.cpp; sourceTree = "<group>"; };
+		FF09C96F2C724A52002039FD /* ndMeshEffect3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMeshEffect3.cpp; sourceTree = "<group>"; };
+		FF09C9702C724A52002039FD /* ndMeshEffect4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMeshEffect4.cpp; sourceTree = "<group>"; };
+		FF09C9712C724A52002039FD /* ndMeshEffect5.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMeshEffect5.cpp; sourceTree = "<group>"; };
+		FF09C9722C724A52002039FD /* ndMeshEffect6.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMeshEffect6.cpp; sourceTree = "<group>"; };
+		FF09C9732C724A52002039FD /* ndPolygonMeshDesc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndPolygonMeshDesc.cpp; sourceTree = "<group>"; };
+		FF09C9742C724A52002039FD /* ndPolygonMeshDesc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndPolygonMeshDesc.h; sourceTree = "<group>"; };
+		FF09C9752C724A52002039FD /* ndRayCastNotify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndRayCastNotify.cpp; sourceTree = "<group>"; };
+		FF09C9762C724A52002039FD /* ndRayCastNotify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndRayCastNotify.h; sourceTree = "<group>"; };
+		FF09C9772C724A52002039FD /* ndScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndScene.cpp; sourceTree = "<group>"; };
+		FF09C9782C724A52002039FD /* ndScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndScene.h; sourceTree = "<group>"; };
+		FF09C9792C724A52002039FD /* ndShape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShape.cpp; sourceTree = "<group>"; };
+		FF09C97A2C724A52002039FD /* ndShape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShape.h; sourceTree = "<group>"; };
+		FF09C97B2C724A52002039FD /* ndShapeBox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeBox.cpp; sourceTree = "<group>"; };
+		FF09C97C2C724A52002039FD /* ndShapeBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeBox.h; sourceTree = "<group>"; };
+		FF09C97D2C724A52002039FD /* ndShapeCapsule.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeCapsule.cpp; sourceTree = "<group>"; };
+		FF09C97E2C724A52002039FD /* ndShapeCapsule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeCapsule.h; sourceTree = "<group>"; };
+		FF09C97F2C724A52002039FD /* ndShapeChamferCylinder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeChamferCylinder.cpp; sourceTree = "<group>"; };
+		FF09C9802C724A52002039FD /* ndShapeChamferCylinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeChamferCylinder.h; sourceTree = "<group>"; };
+		FF09C9812C724A52002039FD /* ndShapeCompound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeCompound.cpp; sourceTree = "<group>"; };
+		FF09C9822C724A52002039FD /* ndShapeCompound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeCompound.h; sourceTree = "<group>"; };
+		FF09C9832C724A52002039FD /* ndShapeCone.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeCone.cpp; sourceTree = "<group>"; };
+		FF09C9842C724A52002039FD /* ndShapeCone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeCone.h; sourceTree = "<group>"; };
+		FF09C9852C724A52002039FD /* ndShapeConvex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeConvex.cpp; sourceTree = "<group>"; };
+		FF09C9862C724A52002039FD /* ndShapeConvex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeConvex.h; sourceTree = "<group>"; };
+		FF09C9872C724A52002039FD /* ndShapeConvexHull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeConvexHull.cpp; sourceTree = "<group>"; };
+		FF09C9882C724A52002039FD /* ndShapeConvexHull.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeConvexHull.h; sourceTree = "<group>"; };
+		FF09C9892C724A52002039FD /* ndShapeConvexPolygon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeConvexPolygon.cpp; sourceTree = "<group>"; };
+		FF09C98A2C724A52002039FD /* ndShapeConvexPolygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeConvexPolygon.h; sourceTree = "<group>"; };
+		FF09C98B2C724A52002039FD /* ndShapeCylinder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeCylinder.cpp; sourceTree = "<group>"; };
+		FF09C98C2C724A52002039FD /* ndShapeCylinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeCylinder.h; sourceTree = "<group>"; };
+		FF09C98D2C724A52002039FD /* ndShapeHeightfield.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeHeightfield.cpp; sourceTree = "<group>"; };
+		FF09C98E2C724A52002039FD /* ndShapeHeightfield.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeHeightfield.h; sourceTree = "<group>"; };
+		FF09C98F2C724A52002039FD /* ndShapeInstance.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeInstance.cpp; sourceTree = "<group>"; };
+		FF09C9902C724A52002039FD /* ndShapeInstance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeInstance.h; sourceTree = "<group>"; };
+		FF09C9912C724A52002039FD /* ndShapeNull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeNull.cpp; sourceTree = "<group>"; };
+		FF09C9922C724A52002039FD /* ndShapeNull.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeNull.h; sourceTree = "<group>"; };
+		FF09C9932C724A52002039FD /* ndShapePoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapePoint.cpp; sourceTree = "<group>"; };
+		FF09C9942C724A52002039FD /* ndShapePoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapePoint.h; sourceTree = "<group>"; };
+		FF09C9952C724A52002039FD /* ndShapeSphere.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeSphere.cpp; sourceTree = "<group>"; };
+		FF09C9962C724A52002039FD /* ndShapeSphere.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeSphere.h; sourceTree = "<group>"; };
+		FF09C9972C724A52002039FD /* ndShapeStatic_bvh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeStatic_bvh.cpp; sourceTree = "<group>"; };
+		FF09C9982C724A52002039FD /* ndShapeStatic_bvh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeStatic_bvh.h; sourceTree = "<group>"; };
+		FF09C9992C724A52002039FD /* ndShapeStaticMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeStaticMesh.cpp; sourceTree = "<group>"; };
+		FF09C99A2C724A52002039FD /* ndShapeStaticMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeStaticMesh.h; sourceTree = "<group>"; };
+		FF09C99B2C724A52002039FD /* ndShapeStaticProceduralMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndShapeStaticProceduralMesh.cpp; sourceTree = "<group>"; };
+		FF09C99C2C724A52002039FD /* ndShapeStaticProceduralMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndShapeStaticProceduralMesh.h; sourceTree = "<group>"; };
+		FF09CA212C724A85002039FD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		FF09CA232C724A85002039FD /* ndIk6DofEffector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndIk6DofEffector.cpp; sourceTree = "<group>"; };
+		FF09CA242C724A85002039FD /* ndIk6DofEffector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndIk6DofEffector.h; sourceTree = "<group>"; };
+		FF09CA252C724A85002039FD /* ndIkJointDoubleHinge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndIkJointDoubleHinge.cpp; sourceTree = "<group>"; };
+		FF09CA262C724A85002039FD /* ndIkJointDoubleHinge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndIkJointDoubleHinge.h; sourceTree = "<group>"; };
+		FF09CA272C724A85002039FD /* ndIkJointHinge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndIkJointHinge.cpp; sourceTree = "<group>"; };
+		FF09CA282C724A85002039FD /* ndIkJointHinge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndIkJointHinge.h; sourceTree = "<group>"; };
+		FF09CA292C724A85002039FD /* ndIkJointSpherical.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndIkJointSpherical.cpp; sourceTree = "<group>"; };
+		FF09CA2A2C724A85002039FD /* ndIkJointSpherical.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndIkJointSpherical.h; sourceTree = "<group>"; };
+		FF09CA2B2C724A85002039FD /* ndIkSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndIkSolver.cpp; sourceTree = "<group>"; };
+		FF09CA2C2C724A85002039FD /* ndIkSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndIkSolver.h; sourceTree = "<group>"; };
+		FF09CA2D2C724A85002039FD /* ndIkSwivelPositionEffector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndIkSwivelPositionEffector.cpp; sourceTree = "<group>"; };
+		FF09CA2E2C724A85002039FD /* ndIkSwivelPositionEffector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndIkSwivelPositionEffector.h; sourceTree = "<group>"; };
+		FF09CA302C724A85002039FD /* ndJointCylinder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointCylinder.cpp; sourceTree = "<group>"; };
+		FF09CA312C724A85002039FD /* ndJointCylinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointCylinder.h; sourceTree = "<group>"; };
+		FF09CA322C724A85002039FD /* ndJointDoubleHinge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointDoubleHinge.cpp; sourceTree = "<group>"; };
+		FF09CA332C724A85002039FD /* ndJointDoubleHinge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointDoubleHinge.h; sourceTree = "<group>"; };
+		FF09CA342C724A85002039FD /* ndJointDryRollingFriction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointDryRollingFriction.cpp; sourceTree = "<group>"; };
+		FF09CA352C724A85002039FD /* ndJointDryRollingFriction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointDryRollingFriction.h; sourceTree = "<group>"; };
+		FF09CA362C724A85002039FD /* ndJointFix6dof.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointFix6dof.cpp; sourceTree = "<group>"; };
+		FF09CA372C724A85002039FD /* ndJointFix6dof.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointFix6dof.h; sourceTree = "<group>"; };
+		FF09CA382C724A85002039FD /* ndJointFixDistance.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointFixDistance.cpp; sourceTree = "<group>"; };
+		FF09CA392C724A85002039FD /* ndJointFixDistance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointFixDistance.h; sourceTree = "<group>"; };
+		FF09CA3A2C724A85002039FD /* ndJointFollowPath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointFollowPath.cpp; sourceTree = "<group>"; };
+		FF09CA3B2C724A85002039FD /* ndJointFollowPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointFollowPath.h; sourceTree = "<group>"; };
+		FF09CA3C2C724A85002039FD /* ndJointGear.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointGear.cpp; sourceTree = "<group>"; };
+		FF09CA3D2C724A85002039FD /* ndJointGear.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointGear.h; sourceTree = "<group>"; };
+		FF09CA3E2C724A85002039FD /* ndJointHinge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointHinge.cpp; sourceTree = "<group>"; };
+		FF09CA3F2C724A85002039FD /* ndJointHinge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointHinge.h; sourceTree = "<group>"; };
+		FF09CA402C724A85002039FD /* ndJointKinematicController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointKinematicController.cpp; sourceTree = "<group>"; };
+		FF09CA412C724A85002039FD /* ndJointKinematicController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointKinematicController.h; sourceTree = "<group>"; };
+		FF09CA422C724A85002039FD /* ndJointPlane.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointPlane.cpp; sourceTree = "<group>"; };
+		FF09CA432C724A85002039FD /* ndJointPlane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointPlane.h; sourceTree = "<group>"; };
+		FF09CA442C724A85002039FD /* ndJointPulley.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointPulley.cpp; sourceTree = "<group>"; };
+		FF09CA452C724A85002039FD /* ndJointPulley.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointPulley.h; sourceTree = "<group>"; };
+		FF09CA462C724A85002039FD /* ndJointRoller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointRoller.cpp; sourceTree = "<group>"; };
+		FF09CA472C724A85002039FD /* ndJointRoller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointRoller.h; sourceTree = "<group>"; };
+		FF09CA482C724A85002039FD /* ndJointSlider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointSlider.cpp; sourceTree = "<group>"; };
+		FF09CA492C724A85002039FD /* ndJointSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointSlider.h; sourceTree = "<group>"; };
+		FF09CA4A2C724A85002039FD /* ndJointSpherical.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointSpherical.cpp; sourceTree = "<group>"; };
+		FF09CA4B2C724A85002039FD /* ndJointSpherical.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointSpherical.h; sourceTree = "<group>"; };
+		FF09CA4C2C724A85002039FD /* ndJointUpVector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointUpVector.cpp; sourceTree = "<group>"; };
+		FF09CA4D2C724A85002039FD /* ndJointUpVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointUpVector.h; sourceTree = "<group>"; };
+		FF09CA4E2C724A85002039FD /* ndJointWheel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndJointWheel.cpp; sourceTree = "<group>"; };
+		FF09CA4F2C724A85002039FD /* ndJointWheel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndJointWheel.h; sourceTree = "<group>"; };
+		FF09CA512C724A85002039FD /* ndMultiBodyVehicle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMultiBodyVehicle.cpp; sourceTree = "<group>"; };
+		FF09CA522C724A85002039FD /* ndMultiBodyVehicle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndMultiBodyVehicle.h; sourceTree = "<group>"; };
+		FF09CA532C724A85002039FD /* ndMultiBodyVehicleDifferential.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMultiBodyVehicleDifferential.cpp; sourceTree = "<group>"; };
+		FF09CA542C724A85002039FD /* ndMultiBodyVehicleDifferential.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndMultiBodyVehicleDifferential.h; sourceTree = "<group>"; };
+		FF09CA552C724A85002039FD /* ndMultiBodyVehicleDifferentialAxle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMultiBodyVehicleDifferentialAxle.cpp; sourceTree = "<group>"; };
+		FF09CA562C724A85002039FD /* ndMultiBodyVehicleDifferentialAxle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndMultiBodyVehicleDifferentialAxle.h; sourceTree = "<group>"; };
+		FF09CA572C724A85002039FD /* ndMultiBodyVehicleGearBox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMultiBodyVehicleGearBox.cpp; sourceTree = "<group>"; };
+		FF09CA582C724A85002039FD /* ndMultiBodyVehicleGearBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndMultiBodyVehicleGearBox.h; sourceTree = "<group>"; };
+		FF09CA592C724A85002039FD /* ndMultiBodyVehicleMotor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMultiBodyVehicleMotor.cpp; sourceTree = "<group>"; };
+		FF09CA5A2C724A85002039FD /* ndMultiBodyVehicleMotor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndMultiBodyVehicleMotor.h; sourceTree = "<group>"; };
+		FF09CA5B2C724A85002039FD /* ndMultiBodyVehicleTireJoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMultiBodyVehicleTireJoint.cpp; sourceTree = "<group>"; };
+		FF09CA5C2C724A85002039FD /* ndMultiBodyVehicleTireJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndMultiBodyVehicleTireJoint.h; sourceTree = "<group>"; };
+		FF09CA5D2C724A85002039FD /* ndMultiBodyVehicleTorsionBar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMultiBodyVehicleTorsionBar.cpp; sourceTree = "<group>"; };
+		FF09CA5E2C724A85002039FD /* ndMultiBodyVehicleTorsionBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndMultiBodyVehicleTorsionBar.h; sourceTree = "<group>"; };
+		FF09CA602C724A85002039FD /* ndModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndModel.cpp; sourceTree = "<group>"; };
+		FF09CA612C724A85002039FD /* ndModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndModel.h; sourceTree = "<group>"; };
+		FF09CA622C724A85002039FD /* ndModelArticulation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndModelArticulation.cpp; sourceTree = "<group>"; };
+		FF09CA632C724A85002039FD /* ndModelArticulation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndModelArticulation.h; sourceTree = "<group>"; };
+		FF09CA642C724A85002039FD /* ndModelList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndModelList.cpp; sourceTree = "<group>"; };
+		FF09CA652C724A85002039FD /* ndModelList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndModelList.h; sourceTree = "<group>"; };
+		FF09CA662C724A85002039FD /* ndModelNotify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndModelNotify.cpp; sourceTree = "<group>"; };
+		FF09CA672C724A85002039FD /* ndModelNotify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndModelNotify.h; sourceTree = "<group>"; };
+		FF09CA682C724A85002039FD /* ndUrdfFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndUrdfFile.cpp; sourceTree = "<group>"; };
+		FF09CA692C724A85002039FD /* ndUrdfFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndUrdfFile.h; sourceTree = "<group>"; };
+		FF09CA6B2C724A85002039FD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		FF09CA6C2C724A85002039FD /* ndBodyDynamic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBodyDynamic.cpp; sourceTree = "<group>"; };
+		FF09CA6D2C724A85002039FD /* ndBodyDynamic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBodyDynamic.h; sourceTree = "<group>"; };
+		FF09CA6E2C724A85002039FD /* ndDynamicsUpdate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndDynamicsUpdate.cpp; sourceTree = "<group>"; };
+		FF09CA6F2C724A85002039FD /* ndDynamicsUpdate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndDynamicsUpdate.h; sourceTree = "<group>"; };
+		FF09CA702C724A85002039FD /* ndDynamicsUpdateSoa.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndDynamicsUpdateSoa.cpp; sourceTree = "<group>"; };
+		FF09CA712C724A85002039FD /* ndDynamicsUpdateSoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndDynamicsUpdateSoa.h; sourceTree = "<group>"; };
+		FF09CA722C724A85002039FD /* ndNewton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndNewton.h; sourceTree = "<group>"; };
+		FF09CA732C724A85002039FD /* ndNewtonStdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndNewtonStdafx.cpp; sourceTree = "<group>"; };
+		FF09CA742C724A85002039FD /* ndNewtonStdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndNewtonStdafx.h; sourceTree = "<group>"; };
+		FF09CA752C724A85002039FD /* ndSkeletonContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndSkeletonContainer.cpp; sourceTree = "<group>"; };
+		FF09CA762C724A85002039FD /* ndSkeletonContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndSkeletonContainer.h; sourceTree = "<group>"; };
+		FF09CA772C724A85002039FD /* ndSkeletonList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndSkeletonList.h; sourceTree = "<group>"; };
+		FF09CA782C724A85002039FD /* ndWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndWorld.cpp; sourceTree = "<group>"; };
+		FF09CA792C724A85002039FD /* ndWorld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndWorld.h; sourceTree = "<group>"; };
+		FF09CA7A2C724A85002039FD /* ndWorldScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndWorldScene.cpp; sourceTree = "<group>"; };
+		FF09CA7B2C724A85002039FD /* ndWorldScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndWorldScene.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -295,6 +646,8 @@
 		FF09C7142C72459B002039FD = {
 			isa = PBXGroup;
 			children = (
+				FF09CA7C2C724A85002039FD /* dNewton */,
+				FF09C99D2C724A52002039FD /* dCollision */,
 				FF09C8D92C724739002039FD /* dCore */,
 				FF09C71E2C72459B002039FD /* Products */,
 			);
@@ -496,6 +849,239 @@
 			path = ../../sdk/dCore;
 			sourceTree = "<group>";
 		};
+		FF09C99D2C724A52002039FD /* dCollision */ = {
+			isa = PBXGroup;
+			children = (
+				FF09C9422C724A52002039FD /* CMakeLists.txt */,
+				FF09C9432C724A52002039FD /* ndBodiesInAabbNotify.h */,
+				FF09C9442C724A52002039FD /* ndBody.cpp */,
+				FF09C9452C724A52002039FD /* ndBody.h */,
+				FF09C9462C724A52002039FD /* ndBodyKinematic.cpp */,
+				FF09C9472C724A52002039FD /* ndBodyKinematic.h */,
+				FF09C9482C724A52002039FD /* ndBodyKinematicBase.cpp */,
+				FF09C9492C724A52002039FD /* ndBodyKinematicBase.h */,
+				FF09C94A2C724A52002039FD /* ndBodyListView.cpp */,
+				FF09C94B2C724A52002039FD /* ndBodyListView.h */,
+				FF09C94C2C724A52002039FD /* ndBodyNotify.cpp */,
+				FF09C94D2C724A52002039FD /* ndBodyNotify.h */,
+				FF09C94E2C724A52002039FD /* ndBodyParticleSet.cpp */,
+				FF09C94F2C724A52002039FD /* ndBodyParticleSet.h */,
+				FF09C9502C724A52002039FD /* ndBodyPlayerCapsule.cpp */,
+				FF09C9512C724A52002039FD /* ndBodyPlayerCapsule.h */,
+				FF09C9522C724A52002039FD /* ndBodySphFluid_New.cpp */,
+				FF09C9532C724A52002039FD /* ndBodySphFluid_New.h */,
+				FF09C9542C724A52002039FD /* ndBodySphFluid.cpp */,
+				FF09C9552C724A52002039FD /* ndBodySphFluid.h */,
+				FF09C9562C724A52002039FD /* ndBodyTriggerVolume.cpp */,
+				FF09C9572C724A52002039FD /* ndBodyTriggerVolume.h */,
+				FF09C9582C724A52002039FD /* ndBvhNode.cpp */,
+				FF09C9592C724A52002039FD /* ndBvhNode.h */,
+				FF09C95A2C724A52002039FD /* ndCollision.h */,
+				FF09C95B2C724A52002039FD /* ndCollisionStdafx.cpp */,
+				FF09C95C2C724A52002039FD /* ndCollisionStdafx.h */,
+				FF09C95D2C724A52002039FD /* ndConstraint.cpp */,
+				FF09C95E2C724A52002039FD /* ndConstraint.h */,
+				FF09C95F2C724A52002039FD /* ndContact.cpp */,
+				FF09C9602C724A52002039FD /* ndContact.h */,
+				FF09C9612C724A52002039FD /* ndContactArray.cpp */,
+				FF09C9622C724A52002039FD /* ndContactArray.h */,
+				FF09C9632C724A52002039FD /* ndContactNotify.h */,
+				FF09C9642C724A52002039FD /* ndContactOptions.h */,
+				FF09C9652C724A52002039FD /* ndContactSolver.cpp */,
+				FF09C9662C724A52002039FD /* ndContactSolver.h */,
+				FF09C9672C724A52002039FD /* ndConvexCastNotify.cpp */,
+				FF09C9682C724A52002039FD /* ndConvexCastNotify.h */,
+				FF09C9692C724A52002039FD /* ndJointBilateralConstraint.cpp */,
+				FF09C96A2C724A52002039FD /* ndJointBilateralConstraint.h */,
+				FF09C96B2C724A52002039FD /* ndJointList.h */,
+				FF09C96C2C724A52002039FD /* ndMeshEffect.h */,
+				FF09C96D2C724A52002039FD /* ndMeshEffect1.cpp */,
+				FF09C96E2C724A52002039FD /* ndMeshEffect2.cpp */,
+				FF09C96F2C724A52002039FD /* ndMeshEffect3.cpp */,
+				FF09C9702C724A52002039FD /* ndMeshEffect4.cpp */,
+				FF09C9712C724A52002039FD /* ndMeshEffect5.cpp */,
+				FF09C9722C724A52002039FD /* ndMeshEffect6.cpp */,
+				FF09C9732C724A52002039FD /* ndPolygonMeshDesc.cpp */,
+				FF09C9742C724A52002039FD /* ndPolygonMeshDesc.h */,
+				FF09C9752C724A52002039FD /* ndRayCastNotify.cpp */,
+				FF09C9762C724A52002039FD /* ndRayCastNotify.h */,
+				FF09C9772C724A52002039FD /* ndScene.cpp */,
+				FF09C9782C724A52002039FD /* ndScene.h */,
+				FF09C9792C724A52002039FD /* ndShape.cpp */,
+				FF09C97A2C724A52002039FD /* ndShape.h */,
+				FF09C97B2C724A52002039FD /* ndShapeBox.cpp */,
+				FF09C97C2C724A52002039FD /* ndShapeBox.h */,
+				FF09C97D2C724A52002039FD /* ndShapeCapsule.cpp */,
+				FF09C97E2C724A52002039FD /* ndShapeCapsule.h */,
+				FF09C97F2C724A52002039FD /* ndShapeChamferCylinder.cpp */,
+				FF09C9802C724A52002039FD /* ndShapeChamferCylinder.h */,
+				FF09C9812C724A52002039FD /* ndShapeCompound.cpp */,
+				FF09C9822C724A52002039FD /* ndShapeCompound.h */,
+				FF09C9832C724A52002039FD /* ndShapeCone.cpp */,
+				FF09C9842C724A52002039FD /* ndShapeCone.h */,
+				FF09C9852C724A52002039FD /* ndShapeConvex.cpp */,
+				FF09C9862C724A52002039FD /* ndShapeConvex.h */,
+				FF09C9872C724A52002039FD /* ndShapeConvexHull.cpp */,
+				FF09C9882C724A52002039FD /* ndShapeConvexHull.h */,
+				FF09C9892C724A52002039FD /* ndShapeConvexPolygon.cpp */,
+				FF09C98A2C724A52002039FD /* ndShapeConvexPolygon.h */,
+				FF09C98B2C724A52002039FD /* ndShapeCylinder.cpp */,
+				FF09C98C2C724A52002039FD /* ndShapeCylinder.h */,
+				FF09C98D2C724A52002039FD /* ndShapeHeightfield.cpp */,
+				FF09C98E2C724A52002039FD /* ndShapeHeightfield.h */,
+				FF09C98F2C724A52002039FD /* ndShapeInstance.cpp */,
+				FF09C9902C724A52002039FD /* ndShapeInstance.h */,
+				FF09C9912C724A52002039FD /* ndShapeNull.cpp */,
+				FF09C9922C724A52002039FD /* ndShapeNull.h */,
+				FF09C9932C724A52002039FD /* ndShapePoint.cpp */,
+				FF09C9942C724A52002039FD /* ndShapePoint.h */,
+				FF09C9952C724A52002039FD /* ndShapeSphere.cpp */,
+				FF09C9962C724A52002039FD /* ndShapeSphere.h */,
+				FF09C9972C724A52002039FD /* ndShapeStatic_bvh.cpp */,
+				FF09C9982C724A52002039FD /* ndShapeStatic_bvh.h */,
+				FF09C9992C724A52002039FD /* ndShapeStaticMesh.cpp */,
+				FF09C99A2C724A52002039FD /* ndShapeStaticMesh.h */,
+				FF09C99B2C724A52002039FD /* ndShapeStaticProceduralMesh.cpp */,
+				FF09C99C2C724A52002039FD /* ndShapeStaticProceduralMesh.h */,
+			);
+			name = dCollision;
+			path = ../../sdk/dCollision;
+			sourceTree = "<group>";
+		};
+		FF09CA222C724A85002039FD /* dExtensions */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CA212C724A85002039FD /* CMakeLists.txt */,
+			);
+			path = dExtensions;
+			sourceTree = "<group>";
+		};
+		FF09CA2F2C724A85002039FD /* dIkSolver */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CA232C724A85002039FD /* ndIk6DofEffector.cpp */,
+				FF09CA242C724A85002039FD /* ndIk6DofEffector.h */,
+				FF09CA252C724A85002039FD /* ndIkJointDoubleHinge.cpp */,
+				FF09CA262C724A85002039FD /* ndIkJointDoubleHinge.h */,
+				FF09CA272C724A85002039FD /* ndIkJointHinge.cpp */,
+				FF09CA282C724A85002039FD /* ndIkJointHinge.h */,
+				FF09CA292C724A85002039FD /* ndIkJointSpherical.cpp */,
+				FF09CA2A2C724A85002039FD /* ndIkJointSpherical.h */,
+				FF09CA2B2C724A85002039FD /* ndIkSolver.cpp */,
+				FF09CA2C2C724A85002039FD /* ndIkSolver.h */,
+				FF09CA2D2C724A85002039FD /* ndIkSwivelPositionEffector.cpp */,
+				FF09CA2E2C724A85002039FD /* ndIkSwivelPositionEffector.h */,
+			);
+			path = dIkSolver;
+			sourceTree = "<group>";
+		};
+		FF09CA502C724A85002039FD /* dJoints */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CA302C724A85002039FD /* ndJointCylinder.cpp */,
+				FF09CA312C724A85002039FD /* ndJointCylinder.h */,
+				FF09CA322C724A85002039FD /* ndJointDoubleHinge.cpp */,
+				FF09CA332C724A85002039FD /* ndJointDoubleHinge.h */,
+				FF09CA342C724A85002039FD /* ndJointDryRollingFriction.cpp */,
+				FF09CA352C724A85002039FD /* ndJointDryRollingFriction.h */,
+				FF09CA362C724A85002039FD /* ndJointFix6dof.cpp */,
+				FF09CA372C724A85002039FD /* ndJointFix6dof.h */,
+				FF09CA382C724A85002039FD /* ndJointFixDistance.cpp */,
+				FF09CA392C724A85002039FD /* ndJointFixDistance.h */,
+				FF09CA3A2C724A85002039FD /* ndJointFollowPath.cpp */,
+				FF09CA3B2C724A85002039FD /* ndJointFollowPath.h */,
+				FF09CA3C2C724A85002039FD /* ndJointGear.cpp */,
+				FF09CA3D2C724A85002039FD /* ndJointGear.h */,
+				FF09CA3E2C724A85002039FD /* ndJointHinge.cpp */,
+				FF09CA3F2C724A85002039FD /* ndJointHinge.h */,
+				FF09CA402C724A85002039FD /* ndJointKinematicController.cpp */,
+				FF09CA412C724A85002039FD /* ndJointKinematicController.h */,
+				FF09CA422C724A85002039FD /* ndJointPlane.cpp */,
+				FF09CA432C724A85002039FD /* ndJointPlane.h */,
+				FF09CA442C724A85002039FD /* ndJointPulley.cpp */,
+				FF09CA452C724A85002039FD /* ndJointPulley.h */,
+				FF09CA462C724A85002039FD /* ndJointRoller.cpp */,
+				FF09CA472C724A85002039FD /* ndJointRoller.h */,
+				FF09CA482C724A85002039FD /* ndJointSlider.cpp */,
+				FF09CA492C724A85002039FD /* ndJointSlider.h */,
+				FF09CA4A2C724A85002039FD /* ndJointSpherical.cpp */,
+				FF09CA4B2C724A85002039FD /* ndJointSpherical.h */,
+				FF09CA4C2C724A85002039FD /* ndJointUpVector.cpp */,
+				FF09CA4D2C724A85002039FD /* ndJointUpVector.h */,
+				FF09CA4E2C724A85002039FD /* ndJointWheel.cpp */,
+				FF09CA4F2C724A85002039FD /* ndJointWheel.h */,
+			);
+			path = dJoints;
+			sourceTree = "<group>";
+		};
+		FF09CA5F2C724A85002039FD /* dVehicle */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CA512C724A85002039FD /* ndMultiBodyVehicle.cpp */,
+				FF09CA522C724A85002039FD /* ndMultiBodyVehicle.h */,
+				FF09CA532C724A85002039FD /* ndMultiBodyVehicleDifferential.cpp */,
+				FF09CA542C724A85002039FD /* ndMultiBodyVehicleDifferential.h */,
+				FF09CA552C724A85002039FD /* ndMultiBodyVehicleDifferentialAxle.cpp */,
+				FF09CA562C724A85002039FD /* ndMultiBodyVehicleDifferentialAxle.h */,
+				FF09CA572C724A85002039FD /* ndMultiBodyVehicleGearBox.cpp */,
+				FF09CA582C724A85002039FD /* ndMultiBodyVehicleGearBox.h */,
+				FF09CA592C724A85002039FD /* ndMultiBodyVehicleMotor.cpp */,
+				FF09CA5A2C724A85002039FD /* ndMultiBodyVehicleMotor.h */,
+				FF09CA5B2C724A85002039FD /* ndMultiBodyVehicleTireJoint.cpp */,
+				FF09CA5C2C724A85002039FD /* ndMultiBodyVehicleTireJoint.h */,
+				FF09CA5D2C724A85002039FD /* ndMultiBodyVehicleTorsionBar.cpp */,
+				FF09CA5E2C724A85002039FD /* ndMultiBodyVehicleTorsionBar.h */,
+			);
+			path = dVehicle;
+			sourceTree = "<group>";
+		};
+		FF09CA6A2C724A85002039FD /* dModels */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CA5F2C724A85002039FD /* dVehicle */,
+				FF09CA602C724A85002039FD /* ndModel.cpp */,
+				FF09CA612C724A85002039FD /* ndModel.h */,
+				FF09CA622C724A85002039FD /* ndModelArticulation.cpp */,
+				FF09CA632C724A85002039FD /* ndModelArticulation.h */,
+				FF09CA642C724A85002039FD /* ndModelList.cpp */,
+				FF09CA652C724A85002039FD /* ndModelList.h */,
+				FF09CA662C724A85002039FD /* ndModelNotify.cpp */,
+				FF09CA672C724A85002039FD /* ndModelNotify.h */,
+				FF09CA682C724A85002039FD /* ndUrdfFile.cpp */,
+				FF09CA692C724A85002039FD /* ndUrdfFile.h */,
+			);
+			path = dModels;
+			sourceTree = "<group>";
+		};
+		FF09CA7C2C724A85002039FD /* dNewton */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CA222C724A85002039FD /* dExtensions */,
+				FF09CA2F2C724A85002039FD /* dIkSolver */,
+				FF09CA502C724A85002039FD /* dJoints */,
+				FF09CA6A2C724A85002039FD /* dModels */,
+				FF09CA6B2C724A85002039FD /* CMakeLists.txt */,
+				FF09CA6C2C724A85002039FD /* ndBodyDynamic.cpp */,
+				FF09CA6D2C724A85002039FD /* ndBodyDynamic.h */,
+				FF09CA6E2C724A85002039FD /* ndDynamicsUpdate.cpp */,
+				FF09CA6F2C724A85002039FD /* ndDynamicsUpdate.h */,
+				FF09CA702C724A85002039FD /* ndDynamicsUpdateSoa.cpp */,
+				FF09CA712C724A85002039FD /* ndDynamicsUpdateSoa.h */,
+				FF09CA722C724A85002039FD /* ndNewton.h */,
+				FF09CA732C724A85002039FD /* ndNewtonStdafx.cpp */,
+				FF09CA742C724A85002039FD /* ndNewtonStdafx.h */,
+				FF09CA752C724A85002039FD /* ndSkeletonContainer.cpp */,
+				FF09CA762C724A85002039FD /* ndSkeletonContainer.h */,
+				FF09CA772C724A85002039FD /* ndSkeletonList.h */,
+				FF09CA782C724A85002039FD /* ndWorld.cpp */,
+				FF09CA792C724A85002039FD /* ndWorld.h */,
+				FF09CA7A2C724A85002039FD /* ndWorldScene.cpp */,
+				FF09CA7B2C724A85002039FD /* ndWorldScene.h */,
+			);
+			name = dNewton;
+			path = ../../sdk/dNewton;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -505,64 +1091,152 @@
 			files = (
 				FF09C8ED2C724739002039FD /* ndConvexHull2d.h in Headers */,
 				FF09C9112C724739002039FD /* ndPlane.h in Headers */,
+				FF09CAE02C724A85002039FD /* ndNewton.h in Headers */,
 				FF09C8F42C724739002039FD /* ndCoreStdafx.h in Headers */,
+				FF09CAB32C724A85002039FD /* ndJointKinematicController.h in Headers */,
+				FF09C9DD2C724A52002039FD /* ndShapeCompound.h in Headers */,
+				FF09C9B22C724A52002039FD /* ndBodyTriggerVolume.h in Headers */,
 				FF09C9082C724739002039FD /* ndIsoSurface.h in Headers */,
 				FF09C9362C724739002039FD /* ndThreadSyncUtils.h in Headers */,
+				FF09C9A82C724A52002039FD /* ndBodyNotify.h in Headers */,
 				FF09C8E32C724739002039FD /* ndAabbPolygonSoup.h in Headers */,
+				FF09C9F52C724A52002039FD /* ndShapeStaticMesh.h in Headers */,
+				FF09C9EB2C724A52002039FD /* ndShapeInstance.h in Headers */,
 				FF09C9412C724739002039FD /* ndVectorSimd.h in Headers */,
 				FF09C9252C724739002039FD /* ndSort.h in Headers */,
+				FF09C9BD2C724A52002039FD /* ndContactArray.h in Headers */,
+				FF09C9D12C724A52002039FD /* ndRayCastNotify.h in Headers */,
+				FF09CACF2C724A85002039FD /* ndMultiBodyVehicleTorsionBar.h in Headers */,
 				FF09C9102C724739002039FD /* ndPerlinNoise.h in Headers */,
+				FF09CAD12C724A85002039FD /* ndModel.h in Headers */,
 				FF09C8F62C724739002039FD /* ndCRC.h in Headers */,
+				FF09CAE52C724A85002039FD /* ndSkeletonList.h in Headers */,
+				FF09C9DB2C724A52002039FD /* ndShapeChamferCylinder.h in Headers */,
+				FF09C9B02C724A52002039FD /* ndBodySphFluid.h in Headers */,
+				FF09C9D32C724A52002039FD /* ndScene.h in Headers */,
 				FF09C9322C724739002039FD /* ndThreadBackgroundWorker.h in Headers */,
+				FF09CAA12C724A85002039FD /* ndIkSwivelPositionEffector.h in Headers */,
+				FF09CA972C724A85002039FD /* ndIk6DofEffector.h in Headers */,
+				FF09C9F32C724A52002039FD /* ndShapeStatic_bvh.h in Headers */,
+				FF09C9BF2C724A52002039FD /* ndContactOptions.h in Headers */,
+				FF09CAA32C724A85002039FD /* ndJointCylinder.h in Headers */,
+				FF09C9F12C724A52002039FD /* ndShapeSphere.h in Headers */,
 				FF09C8E82C724739002039FD /* ndClassAlloc.h in Headers */,
+				FF09C9E12C724A52002039FD /* ndShapeConvex.h in Headers */,
+				FF09C9BE2C724A52002039FD /* ndContactNotify.h in Headers */,
+				FF09CAB12C724A85002039FD /* ndJointHinge.h in Headers */,
 				FF09C8DD2C724739002039FD /* tinystr.h in Headers */,
 				FF09C9042C724739002039FD /* ndHeap.h in Headers */,
 				FF09C9342C724739002039FD /* ndThreadPool.h in Headers */,
 				FF09C92E2C724739002039FD /* ndTemplateVector.h in Headers */,
+				FF09C9A62C724A52002039FD /* ndBodyListView.h in Headers */,
+				FF09CADF2C724A85002039FD /* ndDynamicsUpdateSoa.h in Headers */,
+				FF09C9C52C724A52002039FD /* ndJointBilateralConstraint.h in Headers */,
 				FF09C8FA2C724739002039FD /* ndDelaunayTetrahedralization.h in Headers */,
 				FF09C8EF2C724739002039FD /* ndConvexHull3d.h in Headers */,
+				FF09CABF2C724A85002039FD /* ndJointUpVector.h in Headers */,
 				FF09C8E92C724739002039FD /* ndConjugateGradient.h in Headers */,
+				FF09CAAD2C724A85002039FD /* ndJointFollowPath.h in Headers */,
+				FF09C9B72C724A52002039FD /* ndCollisionStdafx.h in Headers */,
+				FF09CAD32C724A85002039FD /* ndModelArticulation.h in Headers */,
+				FF09CA9F2C724A85002039FD /* ndIkSolver.h in Headers */,
+				FF09C9AC2C724A52002039FD /* ndBodyPlayerCapsule.h in Headers */,
 				FF09C8FF2C724739002039FD /* ndFixSizeArray.h in Headers */,
+				FF09CAD52C724A85002039FD /* ndModelList.h in Headers */,
 				FF09C8F82C724739002039FD /* ndDebug.h in Headers */,
+				FF09CAAB2C724A85002039FD /* ndJointFixDistance.h in Headers */,
+				FF09CAA72C724A85002039FD /* ndJointDryRollingFriction.h in Headers */,
 				FF09C8E62C724739002039FD /* ndBezierSpline.h in Headers */,
+				FF09CAAF2C724A85002039FD /* ndJointGear.h in Headers */,
 				FF09C9302C724739002039FD /* ndThread.h in Headers */,
 				FF09C9192C724739002039FD /* ndPolyhedraMassProperties.h in Headers */,
 				FF09C90E2C724739002039FD /* ndNodeHierarchy.h in Headers */,
 				FF09C9382C724739002039FD /* ndTree.h in Headers */,
+				FF09C9C72C724A52002039FD /* ndMeshEffect.h in Headers */,
+				FF09CAB92C724A85002039FD /* ndJointRoller.h in Headers */,
 				FF09C9222C724739002039FD /* ndSharedPtr.h in Headers */,
+				FF09CACD2C724A85002039FD /* ndMultiBodyVehicleTireJoint.h in Headers */,
+				FF09C9A42C724A52002039FD /* ndBodyKinematicBase.h in Headers */,
 				FF09C9272C724739002039FD /* ndSpatialMatrix.h in Headers */,
 				FF09C90D2C724739002039FD /* ndMemory.h in Headers */,
+				FF09C9A22C724A52002039FD /* ndBodyKinematic.h in Headers */,
+				FF09C9CF2C724A52002039FD /* ndPolygonMeshDesc.h in Headers */,
+				FF09CA992C724A85002039FD /* ndIkJointDoubleHinge.h in Headers */,
 				FF09C8DB2C724739002039FD /* ndTinyXmlGlue.h in Headers */,
 				FF09C9282C724739002039FD /* ndSpatialVector.h in Headers */,
+				FF09CADB2C724A85002039FD /* ndBodyDynamic.h in Headers */,
+				FF09C9AA2C724A52002039FD /* ndBodyParticleSet.h in Headers */,
 				FF09C93E2C724739002039FD /* ndVector.h in Headers */,
+				FF09C9E32C724A52002039FD /* ndShapeConvexHull.h in Headers */,
+				FF09CAD72C724A85002039FD /* ndModelNotify.h in Headers */,
+				FF09C9A02C724A52002039FD /* ndBody.h in Headers */,
+				FF09C9EF2C724A52002039FD /* ndShapePoint.h in Headers */,
+				FF09C9D52C724A52002039FD /* ndShape.h in Headers */,
 				FF09C8F12C724739002039FD /* ndConvexHull4d.h in Headers */,
+				FF09C9ED2C724A52002039FD /* ndShapeNull.h in Headers */,
+				FF09CABB2C724A85002039FD /* ndJointSlider.h in Headers */,
 				FF09C9132C724739002039FD /* ndPolygonSoupBuilder.h in Headers */,
 				FF09C8F22C724739002039FD /* ndCore.h in Headers */,
+				FF09CABD2C724A85002039FD /* ndJointSpherical.h in Headers */,
 				FF09C8E42C724739002039FD /* ndArray.h in Headers */,
+				FF09CA9D2C724A85002039FD /* ndIkJointSpherical.h in Headers */,
+				FF09CAC32C724A85002039FD /* ndMultiBodyVehicle.h in Headers */,
+				FF09C9AE2C724A52002039FD /* ndBodySphFluid_New.h in Headers */,
+				FF09CAB72C724A85002039FD /* ndJointPulley.h in Headers */,
 				FF09C9152C724739002039FD /* ndPolygonSoupDatabase.h in Headers */,
 				FF09C8FE2C724739002039FD /* ndFastRay.h in Headers */,
 				FF09C9402C724739002039FD /* ndVectorScalar.h in Headers */,
+				FF09CAC92C724A85002039FD /* ndMultiBodyVehicleGearBox.h in Headers */,
 				FF09C93A2C724739002039FD /* ndTypes.h in Headers */,
 				FF09C9032C724739002039FD /* ndGoogol.h in Headers */,
 				FF09C91D2C724739002039FD /* ndProfiler.h in Headers */,
 				FF09C9092C724739002039FD /* ndList.h in Headers */,
 				FF09C9242C724739002039FD /* ndSmallDeterminant.h in Headers */,
+				FF09CADD2C724A85002039FD /* ndDynamicsUpdate.h in Headers */,
+				FF09C9C32C724A52002039FD /* ndConvexCastNotify.h in Headers */,
+				FF09C9B92C724A52002039FD /* ndConstraint.h in Headers */,
 				FF09C9172C724739002039FD /* ndPolyhedra.h in Headers */,
 				FF09C8DF2C724739002039FD /* tinyxml.h in Headers */,
+				FF09CAE72C724A85002039FD /* ndWorld.h in Headers */,
 				FF09C8FC2C724739002039FD /* ndFastAabb.h in Headers */,
+				FF09C9B42C724A52002039FD /* ndBvhNode.h in Headers */,
+				FF09C9E52C724A52002039FD /* ndShapeConvexPolygon.h in Headers */,
+				FF09CAC52C724A85002039FD /* ndMultiBodyVehicleDifferential.h in Headers */,
+				FF09CAE42C724A85002039FD /* ndSkeletonContainer.h in Headers */,
+				FF09CAE92C724A85002039FD /* ndWorldScene.h in Headers */,
+				FF09C9B52C724A52002039FD /* ndCollision.h in Headers */,
+				FF09C9C12C724A52002039FD /* ndContactSolver.h in Headers */,
 				FF09C92D2C724739002039FD /* ndSyncMutex.h in Headers */,
 				FF09C9002C724739002039FD /* ndGeneralMatrix.h in Headers */,
+				FF09CA9B2C724A85002039FD /* ndIkJointHinge.h in Headers */,
+				FF09C9BB2C724A52002039FD /* ndContact.h in Headers */,
 				FF09C9212C724739002039FD /* ndSemaphore.h in Headers */,
+				FF09C9D92C724A52002039FD /* ndShapeCapsule.h in Headers */,
+				FF09CAC72C724A85002039FD /* ndMultiBodyVehicleDifferentialAxle.h in Headers */,
+				FF09CAA52C724A85002039FD /* ndJointDoubleHinge.h in Headers */,
+				FF09C9E92C724A52002039FD /* ndShapeHeightfield.h in Headers */,
+				FF09CAB52C724A85002039FD /* ndJointPlane.h in Headers */,
 				FF09C91F2C724739002039FD /* ndQuaternion.h in Headers */,
 				FF09C9012C724739002039FD /* ndGeneralVector.h in Headers */,
 				FF09C8EB2C724739002039FD /* ndContainersAlloc.h in Headers */,
 				FF09C93C2C724739002039FD /* ndUtils.h in Headers */,
 				FF09C9062C724739002039FD /* ndIntersections.h in Headers */,
+				FF09C9D72C724A52002039FD /* ndShapeBox.h in Headers */,
+				FF09C99E2C724A52002039FD /* ndBodiesInAabbNotify.h in Headers */,
+				FF09CAA92C724A85002039FD /* ndJointFix6dof.h in Headers */,
+				FF09C9E72C724A52002039FD /* ndShapeCylinder.h in Headers */,
 				FF09C91B2C724739002039FD /* ndProbability.h in Headers */,
 				FF09C93F2C724739002039FD /* ndVectorArmNeon.h in Headers */,
+				FF09CAC12C724A85002039FD /* ndJointWheel.h in Headers */,
 				FF09C90B2C724739002039FD /* ndMatrix.h in Headers */,
+				FF09C9F72C724A52002039FD /* ndShapeStaticProceduralMesh.h in Headers */,
 				FF09C92B2C724739002039FD /* ndString.h in Headers */,
+				FF09C9DF2C724A52002039FD /* ndShapeCone.h in Headers */,
+				FF09CAE22C724A85002039FD /* ndNewtonStdafx.h in Headers */,
 				FF09C9292C724739002039FD /* ndStack.h in Headers */,
+				FF09CACB2C724A85002039FD /* ndMultiBodyVehicleMotor.h in Headers */,
+				FF09C9C62C724A52002039FD /* ndJointList.h in Headers */,
+				FF09CAD92C724A85002039FD /* ndUrdfFile.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -624,49 +1298,135 @@
 			buildActionMask = 2147483647;
 			files = (
 				FF09C8E02C724739002039FD /* tinyxmlerror.cpp in Sources */,
+				FF09C9AF2C724A52002039FD /* ndBodySphFluid.cpp in Sources */,
+				FF09CAB62C724A85002039FD /* ndJointPulley.cpp in Sources */,
+				FF09C9C82C724A52002039FD /* ndMeshEffect1.cpp in Sources */,
+				FF09C9BA2C724A52002039FD /* ndContact.cpp in Sources */,
+				FF09C9B82C724A52002039FD /* ndConstraint.cpp in Sources */,
+				FF09C9DA2C724A52002039FD /* ndShapeChamferCylinder.cpp in Sources */,
+				FF09CA9C2C724A85002039FD /* ndIkJointSpherical.cpp in Sources */,
 				FF09C93B2C724739002039FD /* ndUtils.cpp in Sources */,
 				FF09C9122C724739002039FD /* ndPolygonSoupBuilder.cpp in Sources */,
+				FF09C9CA2C724A52002039FD /* ndMeshEffect3.cpp in Sources */,
+				FF09CAD42C724A85002039FD /* ndModelList.cpp in Sources */,
 				FF09C8DA2C724739002039FD /* ndTinyXmlGlue.cpp in Sources */,
 				FF09C90A2C724739002039FD /* ndMatrix.cpp in Sources */,
 				FF09C92A2C724739002039FD /* ndString.cpp in Sources */,
 				FF09C8F32C724739002039FD /* ndCoreStdafx.cpp in Sources */,
 				FF09C9352C724739002039FD /* ndThreadSyncUtils.cpp in Sources */,
+				FF09C9CE2C724A52002039FD /* ndPolygonMeshDesc.cpp in Sources */,
 				FF09C92C2C724739002039FD /* ndSyncMutex.cpp in Sources */,
+				FF09CAE12C724A85002039FD /* ndNewtonStdafx.cpp in Sources */,
+				FF09C9BC2C724A52002039FD /* ndContactArray.cpp in Sources */,
 				FF09C90F2C724739002039FD /* ndPerlinNoise.cpp in Sources */,
 				FF09C8DE2C724739002039FD /* tinyxml.cpp in Sources */,
 				FF09C8FB2C724739002039FD /* ndFastAabb.cpp in Sources */,
+				FF09C9DC2C724A52002039FD /* ndShapeCompound.cpp in Sources */,
 				FF09C91C2C724739002039FD /* ndProfiler.cpp in Sources */,
 				FF09C9312C724739002039FD /* ndThreadBackgroundWorker.cpp in Sources */,
+				FF09C9CB2C724A52002039FD /* ndMeshEffect4.cpp in Sources */,
+				FF09C9E02C724A52002039FD /* ndShapeConvex.cpp in Sources */,
+				FF09CACA2C724A85002039FD /* ndMultiBodyVehicleMotor.cpp in Sources */,
+				FF09CA982C724A85002039FD /* ndIkJointDoubleHinge.cpp in Sources */,
 				FF09C8E12C724739002039FD /* tinyxmlparser.cpp in Sources */,
+				FF09CADC2C724A85002039FD /* ndDynamicsUpdate.cpp in Sources */,
+				FF09C9EC2C724A52002039FD /* ndShapeNull.cpp in Sources */,
+				FF09C9D82C724A52002039FD /* ndShapeCapsule.cpp in Sources */,
+				FF09C9B12C724A52002039FD /* ndBodyTriggerVolume.cpp in Sources */,
+				FF09CAB02C724A85002039FD /* ndJointHinge.cpp in Sources */,
+				FF09C9D02C724A52002039FD /* ndRayCastNotify.cpp in Sources */,
+				FF09CAB42C724A85002039FD /* ndJointPlane.cpp in Sources */,
+				FF09C9EE2C724A52002039FD /* ndShapePoint.cpp in Sources */,
+				FF09CAC42C724A85002039FD /* ndMultiBodyVehicleDifferential.cpp in Sources */,
+				FF09C9E82C724A52002039FD /* ndShapeHeightfield.cpp in Sources */,
+				FF09CACC2C724A85002039FD /* ndMultiBodyVehicleTireJoint.cpp in Sources */,
+				FF09CAE62C724A85002039FD /* ndWorld.cpp in Sources */,
+				FF09CAC62C724A85002039FD /* ndMultiBodyVehicleDifferentialAxle.cpp in Sources */,
 				FF09C8FD2C724739002039FD /* ndFastRay.cpp in Sources */,
+				FF09C9EA2C724A52002039FD /* ndShapeInstance.cpp in Sources */,
+				FF09C9F62C724A52002039FD /* ndShapeStaticProceduralMesh.cpp in Sources */,
+				FF09C9F02C724A52002039FD /* ndShapeSphere.cpp in Sources */,
+				FF09C9A72C724A52002039FD /* ndBodyNotify.cpp in Sources */,
 				FF09C9022C724739002039FD /* ndGoogol.cpp in Sources */,
+				FF09CAA02C724A85002039FD /* ndIkSwivelPositionEffector.cpp in Sources */,
+				FF09C9F22C724A52002039FD /* ndShapeStatic_bvh.cpp in Sources */,
+				FF09CAB82C724A85002039FD /* ndJointRoller.cpp in Sources */,
 				FF09C9332C724739002039FD /* ndThreadPool.cpp in Sources */,
+				FF09C9DE2C724A52002039FD /* ndShapeCone.cpp in Sources */,
+				FF09CAD02C724A85002039FD /* ndModel.cpp in Sources */,
+				FF09C9AD2C724A52002039FD /* ndBodySphFluid_New.cpp in Sources */,
 				FF09C9052C724739002039FD /* ndIntersections.cpp in Sources */,
+				FF09C9D42C724A52002039FD /* ndShape.cpp in Sources */,
 				FF09C8E72C724739002039FD /* ndClassAlloc.cpp in Sources */,
+				FF09CAAC2C724A85002039FD /* ndJointFollowPath.cpp in Sources */,
+				FF09CAD62C724A85002039FD /* ndModelNotify.cpp in Sources */,
 				FF09C9182C724739002039FD /* ndPolyhedraMassProperties.cpp in Sources */,
+				FF09C9E42C724A52002039FD /* ndShapeConvexPolygon.cpp in Sources */,
+				FF09CACE2C724A85002039FD /* ndMultiBodyVehicleTorsionBar.cpp in Sources */,
+				FF09CA9E2C724A85002039FD /* ndIkSolver.cpp in Sources */,
+				FF09CAA82C724A85002039FD /* ndJointFix6dof.cpp in Sources */,
+				FF09C9F42C724A52002039FD /* ndShapeStaticMesh.cpp in Sources */,
 				FF09C9262C724739002039FD /* ndSpatialMatrix.cpp in Sources */,
 				FF09C8F02C724739002039FD /* ndConvexHull4d.cpp in Sources */,
 				FF09C9072C724739002039FD /* ndIsoSurface.cpp in Sources */,
+				FF09CAD22C724A85002039FD /* ndModelArticulation.cpp in Sources */,
+				FF09C9C92C724A52002039FD /* ndMeshEffect2.cpp in Sources */,
+				FF09CAAE2C724A85002039FD /* ndJointGear.cpp in Sources */,
+				FF09C9A32C724A52002039FD /* ndBodyKinematicBase.cpp in Sources */,
 				FF09C8DC2C724739002039FD /* tinystr.cpp in Sources */,
+				FF09CAE32C724A85002039FD /* ndSkeletonContainer.cpp in Sources */,
 				FF09C8F92C724739002039FD /* ndDelaunayTetrahedralization.cpp in Sources */,
+				FF09CADA2C724A85002039FD /* ndBodyDynamic.cpp in Sources */,
+				FF09CABC2C724A85002039FD /* ndJointSpherical.cpp in Sources */,
+				FF09CAC02C724A85002039FD /* ndJointWheel.cpp in Sources */,
 				FF09C8E52C724739002039FD /* ndBezierSpline.cpp in Sources */,
+				FF09C9AB2C724A52002039FD /* ndBodyPlayerCapsule.cpp in Sources */,
+				FF09C9E22C724A52002039FD /* ndShapeConvexHull.cpp in Sources */,
+				FF09CAE82C724A85002039FD /* ndWorldScene.cpp in Sources */,
+				FF09C9A12C724A52002039FD /* ndBodyKinematic.cpp in Sources */,
 				FF09C8EE2C724739002039FD /* ndConvexHull3d.cpp in Sources */,
+				FF09C9C22C724A52002039FD /* ndConvexCastNotify.cpp in Sources */,
+				FF09C9CC2C724A52002039FD /* ndMeshEffect5.cpp in Sources */,
 				FF09C8EC2C724739002039FD /* ndConvexHull2d.cpp in Sources */,
+				FF09CAA22C724A85002039FD /* ndJointCylinder.cpp in Sources */,
+				FF09CAC82C724A85002039FD /* ndMultiBodyVehicleGearBox.cpp in Sources */,
 				FF09C9202C724739002039FD /* ndSemaphore.cpp in Sources */,
 				FF09C9392C724739002039FD /* ndTypes.cpp in Sources */,
 				FF09C9372C724739002039FD /* ndTree.cpp in Sources */,
+				FF09CAA42C724A85002039FD /* ndJointDoubleHinge.cpp in Sources */,
 				FF09C91A2C724739002039FD /* ndProbability.cpp in Sources */,
+				FF09CA962C724A85002039FD /* ndIk6DofEffector.cpp in Sources */,
+				FF09CADE2C724A85002039FD /* ndDynamicsUpdateSoa.cpp in Sources */,
+				FF09C9A92C724A52002039FD /* ndBodyParticleSet.cpp in Sources */,
+				FF09C9D62C724A52002039FD /* ndShapeBox.cpp in Sources */,
 				FF09C91E2C724739002039FD /* ndQuaternion.cpp in Sources */,
+				FF09CAB22C724A85002039FD /* ndJointKinematicController.cpp in Sources */,
 				FF09C93D2C724739002039FD /* ndVector.cpp in Sources */,
 				FF09C8E22C724739002039FD /* ndAabbPolygonSoup.cpp in Sources */,
 				FF09C9162C724739002039FD /* ndPolyhedra.cpp in Sources */,
+				FF09CABA2C724A85002039FD /* ndJointSlider.cpp in Sources */,
 				FF09C8F72C724739002039FD /* ndDebug.cpp in Sources */,
 				FF09C9142C724739002039FD /* ndPolygonSoupDatabase.cpp in Sources */,
 				FF09C9232C724739002039FD /* ndSmallDeterminant.cpp in Sources */,
+				FF09CAA62C724A85002039FD /* ndJointDryRollingFriction.cpp in Sources */,
+				FF09C9E62C724A52002039FD /* ndShapeCylinder.cpp in Sources */,
+				FF09C9A52C724A52002039FD /* ndBodyListView.cpp in Sources */,
+				FF09C9B32C724A52002039FD /* ndBvhNode.cpp in Sources */,
+				FF09CAD82C724A85002039FD /* ndUrdfFile.cpp in Sources */,
+				FF09C9C42C724A52002039FD /* ndJointBilateralConstraint.cpp in Sources */,
+				FF09C9CD2C724A52002039FD /* ndMeshEffect6.cpp in Sources */,
 				FF09C8F52C724739002039FD /* ndCRC.cpp in Sources */,
+				FF09CAC22C724A85002039FD /* ndMultiBodyVehicle.cpp in Sources */,
+				FF09C9D22C724A52002039FD /* ndScene.cpp in Sources */,
+				FF09CAAA2C724A85002039FD /* ndJointFixDistance.cpp in Sources */,
+				FF09CA9A2C724A85002039FD /* ndIkJointHinge.cpp in Sources */,
 				FF09C92F2C724739002039FD /* ndThread.cpp in Sources */,
 				FF09C90C2C724739002039FD /* ndMemory.cpp in Sources */,
+				FF09CABE2C724A85002039FD /* ndJointUpVector.cpp in Sources */,
 				FF09C8EA2C724739002039FD /* ndContainersAlloc.cpp in Sources */,
+				FF09C9C02C724A52002039FD /* ndContactSolver.cpp in Sources */,
+				FF09C9B62C724A52002039FD /* ndCollisionStdafx.cpp in Sources */,
+				FF09C99F2C724A52002039FD /* ndBody.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -690,7 +1450,7 @@
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
@@ -725,6 +1485,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "../../sdk/**";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -751,7 +1512,7 @@
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
@@ -780,6 +1541,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "../../sdk/**";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
 				MTL_ENABLE_DEBUG_INFO = NO;

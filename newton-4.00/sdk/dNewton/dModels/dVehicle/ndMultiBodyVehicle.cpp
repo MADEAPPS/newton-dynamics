@@ -576,7 +576,7 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		// tire is in breaking and traction mode.
 		const ndVector contactVeloc(tireBody->GetVelocityAtPoint(contactPoint.m_point) - contactVeloc1);
 
-		const ndVector tireVeloc(tireBody->GetVelocity());
+		//const ndVector tireVeloc(tireBody->GetVelocity());
 		const ndFloat32 vr = contactVeloc.DotProduct(longitudDir).GetScalar();
 		const ndFloat32 longitudialSlip = ndAbs(vr) / relSpeed;
 

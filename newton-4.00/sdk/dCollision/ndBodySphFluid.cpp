@@ -1710,231 +1710,232 @@ void ndBodySphFluid::SortGrids(ndThreadPool* const threadPool)
 
 void ndBodySphFluid::BuildBuckets(ndThreadPool* const threadPool)
 {
-	D_TRACKTIME();
-	ndWorkingBuffers& data = *m_workingBuffers;
-	ndInt32 countReset = ndInt32(data.m_locks.GetCount());
-	data.m_pairs.SetCount(m_posit.GetCount());
-	data.m_locks.SetCount(m_posit.GetCount());
-	data.m_pairCount.SetCount(m_posit.GetCount());
-	data.m_kernelDistance.SetCount(m_posit.GetCount());
-	for (ndInt32 i = countReset; i < data.m_locks.GetCount(); ++i)
-	{
-		data.m_locks[i].Unlock();
-	}
-	for (ndInt32 i = 0; i < data.m_pairCount.GetCount(); ++i)
-	{
-		data.m_pairCount[i] = 0;
-	}
-
-	auto AddPairs = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME_NAMED(AddPairs);
-		const ndArray<ndGridHash>& hashGridMap = data.m_hashGridMap;
-		const ndArray<ndInt32>& gridScans = data.m_gridScans;
-		//const ndFloat32 diameter = ndFloat32(1.5f) * ndFloat32(2.0f) * GetParticleRadius();
-		const ndFloat32 diameter = data.m_particleDiameter;
-		const ndFloat32 diameter2 = diameter * diameter;
-		const ndInt32 windowsTest = data.WorldToGrid(ndVector(data.m_worlToGridOrigin + diameter)) + 1;
-
-		ndArray<ndSpinLock>& locks = data.m_locks;
-		ndArray<ndInt8>& pairCount = data.m_pairCount;
-		ndArray<ndParticlePair>& pair = data.m_pairs;
-		ndArray<ndParticleKernelDistance>& distance = data.m_kernelDistance;
-
-		auto ProccessCell = [this, &data, &hashGridMap, &pair, &pairCount, &locks, &distance, windowsTest, diameter2](ndInt32 start, ndInt32 count)
-		{
-			const ndInt32 count0 = count - 1;
-			for (ndInt32 i = 0; i < count0; ++i)
-			{
-				const ndGridHash hash0 = hashGridMap[start + i];
-				const ndInt32 particle0 = ndInt32(hash0.m_particleIndex);
-				const ndInt32 x0 = data.WorldToGrid(m_posit[particle0]);
-				const bool homeGridTest0 = (hash0.m_cellType == ndGridHash::m_homeGrid);
-				for (ndInt32 j = i + 1; j < count; ++j)
-				{
-					const ndGridHash hash1 = hashGridMap[start + j];
-					const ndInt32 particle1 = ndInt32(hash1.m_particleIndex);
-					ndAssert(particle0 != particle1);
-					const ndInt32 x1 = data.WorldToGrid(m_posit[particle1]);
-					const ndInt32 sweeptTest = ((x1 - x0) >= windowsTest);
-					if (sweeptTest)
-					{
-						break;
-					}
-					ndAssert(particle0 != particle1);
-					const bool homeGridTest1 = (hash1.m_cellType == ndGridHash::m_homeGrid);
-					const ndInt32 test = homeGridTest0 | homeGridTest1;
-					if (test)
-					{
-						const ndVector p1p0(m_posit[particle0] - m_posit[particle1]);
-						const ndFloat32 dist2(p1p0.DotProduct(p1p0).GetScalar());
-						if (dist2 <= diameter2)
-						{
-							const ndFloat32 dist = ndSqrt(ndMax(dist2, ndFloat32(1.0e-8f)));
-							{
-								ndSpinLock lock(locks[particle0]);
-								ndInt8 neigborCount = pairCount[particle0];
-								if (neigborCount < D_PARTICLE_BUCKET_SIZE)
-								{
-									ndInt8 isUnique = 1;
-									ndInt32* const neighborg = pair[particle0].m_neighborg;
-									for (ndInt32 k = neigborCount - 1; k >= 0; --k)
-									{
-										isUnique = isUnique & (neighborg[k] != particle1);
-									}
-									//ndAssert(isUnique);
-
-									neighborg[neigborCount] = particle1;
-									distance[particle0].m_dist[neigborCount] = dist;
-									pairCount[particle0] = neigborCount + isUnique;
-								}
-							}
-
-							{
-								ndSpinLock lock(locks[particle1]);
-								ndInt8 neigborCount = pairCount[particle1];
-								if (neigborCount < D_PARTICLE_BUCKET_SIZE)
-								{
-									ndInt8 isUnique = 1;
-									ndInt32* const neighborg = pair[particle1].m_neighborg;
-									for (ndInt32 k = neigborCount - 1; k >= 0; --k)
-									{
-										isUnique = isUnique & (neighborg[k] != particle0);
-									}
-									//ndAssert(isUnique);
-
-									neighborg[neigborCount] = particle0;
-									distance[particle1].m_dist[neigborCount] = dist;
-									pairCount[particle1] = neigborCount + isUnique;
-								}
-							}
-						}
-					}
-				}
-			}
-		};
-
-		const ndInt32 scansCount = ndInt32(gridScans.GetCount()) - 1;
-		for (ndInt32 i = threadIndex; i < scansCount; i += threadCount)
-		{
-			const ndInt32 start = gridScans[i];
-			const ndInt32 count = gridScans[i + 1] - start;
-			ProccessCell(start, count);
-		}
-	});
-
-	auto AddPairs_new = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME_NAMED(AddPairs);
-		const ndArray<ndGridHash>& hashGridMap = data.m_hashGridMap;
-		const ndArray<ndInt32>& gridScans = data.m_gridScans;
-		const ndFloat32 diameter = data.m_particleDiameter;
-		const ndFloat32 diameter2 = diameter * diameter;
-		const ndInt32 windowsTest = data.WorldToGrid(ndVector(data.m_worlToGridOrigin + diameter)) + 1;
-
-		ndArray<ndSpinLock>& locks = data.m_locks;
-		ndArray<ndInt8>& pairCount = data.m_pairCount;
-		ndArray<ndParticlePair>& pair = data.m_pairs;
-		ndArray<ndParticleKernelDistance>& distance = data.m_kernelDistance;
-
-		auto ProccessCell = [this, &data, &hashGridMap, &pair, &pairCount, &locks, &distance, windowsTest, diameter2](ndInt32 start, ndInt32 count)
-		{
-			const ndInt32 count0 = count - 1;
-			for (ndInt32 i = 0; i < count0; ++i)
-			{
-				const ndGridHash hash0 = hashGridMap[start + i];
-				const ndInt32 particle0 = ndInt32(hash0.m_particleIndex);
-				const ndInt32 x0 = data.WorldToGrid(m_posit[particle0]);
-				const bool homeGridTest0 = (hash0.m_cellType == ndGridHash::m_homeGrid);
-				for (ndInt32 j = i + 1; j < count; ++j)
-				{
-					const ndGridHash hash1 = hashGridMap[start + j];
-					const ndInt32 particle1 = ndInt32(hash1.m_particleIndex);
-					ndAssert(particle0 != particle1);
-					const ndInt32 x1 = data.WorldToGrid(m_posit[particle1]);
-					const ndInt32 sweeptTest = ((x1 - x0) >= windowsTest);
-					if (sweeptTest)
-					{
-						break;
-					}
-					ndAssert(particle0 != particle1);
-					const ndVector p1p0(m_posit[particle0] - m_posit[particle1]);
-					const ndFloat32 dist2(p1p0.DotProduct(p1p0).GetScalar());
-					if (dist2 < diameter2)
-					{
-						const bool homeGridTest1 = (hash1.m_cellType == ndGridHash::m_homeGrid);
-						if (homeGridTest0 && homeGridTest1)
-						{
-							ndInt8 neigborCount0 = pairCount[particle0];
-							const ndFloat32 dist = ndSqrt(ndMax(dist2, ndFloat32(1.0e-8f)));
-							if (neigborCount0 < D_PARTICLE_BUCKET_SIZE)
-							{
-								pair[particle0].m_neighborg[neigborCount0] = particle1;
-								distance[particle0].m_dist[neigborCount0] = dist;
-								pairCount[particle0] = neigborCount0 + 1;
-							}
-
-							ndInt8 neigborCount1 = pairCount[particle1];
-							if (neigborCount1 < D_PARTICLE_BUCKET_SIZE)
-							{
-								pair[particle1].m_neighborg[neigborCount1] = particle0;
-								distance[particle1].m_dist[neigborCount1] = dist;
-								pairCount[particle1] = neigborCount1 + 1;
-							}
-
-						}
-						else if (homeGridTest0)
-						{
-							ndAssert(!homeGridTest1);
-							ndInt8 neigborCount0 = pairCount[particle0];
-							const ndFloat32 dist = ndSqrt(ndMax(dist2, ndFloat32(1.0e-8f)));
-							if (neigborCount0 < D_PARTICLE_BUCKET_SIZE)
-							{
-								pair[particle0].m_neighborg[neigborCount0] = particle1;
-								distance[particle0].m_dist[neigborCount0] = dist;
-								pairCount[particle0] = neigborCount0 + 1;
-							}
-						}
-						else if (homeGridTest1)
-						{
-							ndAssert(!homeGridTest0);
-							ndInt8 neigborCount1 = pairCount[particle1];
-							const ndFloat32 dist = ndSqrt(ndMax(dist2, ndFloat32(1.0e-8f)));
-							if (neigborCount1 < D_PARTICLE_BUCKET_SIZE)
-							{
-								pair[particle1].m_neighborg[neigborCount1] = particle0;
-								distance[particle1].m_dist[neigborCount1] = dist;
-								pairCount[particle1] = neigborCount1 + 1;
-							}
-						}
-					}
-				}
-			}
-		};
-
-		const ndInt32 scansCount = ndInt32(gridScans.GetCount()) - 1;
-		for (ndInt32 i = threadIndex; i < scansCount; i += threadCount)
-		{
-			const ndInt32 start = gridScans[i];
-			const ndInt32 count = gridScans[i + 1] - start;
-			ProccessCell(start, count);
-		}
-	});
-
-	//#ifdef _DEBUG 
+    //#ifdef _DEBUG
 #if 0
-	ndTree<ndInt32, ndInt32> filter;
-	for (ndInt32 i = 0; i < data.m_hashGridMap.GetCount(); ++i)
-	{
-		if (data.m_hashGridMap[i].m_cellType == ndGridHash::m_homeGrid)
-		{
-			ndAssert(filter.Insert(ndInt32(data.m_hashGridMap[i].m_particleIndex)));
-		}
-	}
-#endif	
-
-	threadPool->ParallelExecute(AddPairs);
-	//threadPool->ParallelExecute(AddPairs_new);
+    D_TRACKTIME();
+    ndWorkingBuffers& data = *m_workingBuffers;
+    ndInt32 countReset = ndInt32(data.m_locks.GetCount());
+    data.m_pairs.SetCount(m_posit.GetCount());
+    data.m_locks.SetCount(m_posit.GetCount());
+    data.m_pairCount.SetCount(m_posit.GetCount());
+    data.m_kernelDistance.SetCount(m_posit.GetCount());
+    for (ndInt32 i = countReset; i < data.m_locks.GetCount(); ++i)
+    {
+        data.m_locks[i].Unlock();
+    }
+    for (ndInt32 i = 0; i < data.m_pairCount.GetCount(); ++i)
+    {
+        data.m_pairCount[i] = 0;
+    }
+    
+    auto AddPairs = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
+                                             {
+        D_TRACKTIME_NAMED(AddPairs);
+        const ndArray<ndGridHash>& hashGridMap = data.m_hashGridMap;
+        const ndArray<ndInt32>& gridScans = data.m_gridScans;
+        //const ndFloat32 diameter = ndFloat32(1.5f) * ndFloat32(2.0f) * GetParticleRadius();
+        const ndFloat32 diameter = data.m_particleDiameter;
+        const ndFloat32 diameter2 = diameter * diameter;
+        const ndInt32 windowsTest = data.WorldToGrid(ndVector(data.m_worlToGridOrigin + diameter)) + 1;
+        
+        ndArray<ndSpinLock>& locks = data.m_locks;
+        ndArray<ndInt8>& pairCount = data.m_pairCount;
+        ndArray<ndParticlePair>& pair = data.m_pairs;
+        ndArray<ndParticleKernelDistance>& distance = data.m_kernelDistance;
+        
+        auto ProccessCell = [this, &data, &hashGridMap, &pair, &pairCount, &locks, &distance, windowsTest, diameter2](ndInt32 start, ndInt32 count)
+        {
+            const ndInt32 count0 = count - 1;
+            for (ndInt32 i = 0; i < count0; ++i)
+            {
+                const ndGridHash hash0 = hashGridMap[start + i];
+                const ndInt32 particle0 = ndInt32(hash0.m_particleIndex);
+                const ndInt32 x0 = data.WorldToGrid(m_posit[particle0]);
+                const bool homeGridTest0 = (hash0.m_cellType == ndGridHash::m_homeGrid);
+                for (ndInt32 j = i + 1; j < count; ++j)
+                {
+                    const ndGridHash hash1 = hashGridMap[start + j];
+                    const ndInt32 particle1 = ndInt32(hash1.m_particleIndex);
+                    ndAssert(particle0 != particle1);
+                    const ndInt32 x1 = data.WorldToGrid(m_posit[particle1]);
+                    const ndInt32 sweeptTest = ((x1 - x0) >= windowsTest);
+                    if (sweeptTest)
+                    {
+                        break;
+                    }
+                    ndAssert(particle0 != particle1);
+                    const bool homeGridTest1 = (hash1.m_cellType == ndGridHash::m_homeGrid);
+                    const ndInt32 test = homeGridTest0 | homeGridTest1;
+                    if (test)
+                    {
+                        const ndVector p1p0(m_posit[particle0] - m_posit[particle1]);
+                        const ndFloat32 dist2(p1p0.DotProduct(p1p0).GetScalar());
+                        if (dist2 <= diameter2)
+                        {
+                            const ndFloat32 dist = ndSqrt(ndMax(dist2, ndFloat32(1.0e-8f)));
+                            {
+                                ndSpinLock lock(locks[particle0]);
+                                ndInt8 neigborCount = pairCount[particle0];
+                                if (neigborCount < D_PARTICLE_BUCKET_SIZE)
+                                {
+                                    ndInt8 isUnique = 1;
+                                    ndInt32* const neighborg = pair[particle0].m_neighborg;
+                                    for (ndInt32 k = neigborCount - 1; k >= 0; --k)
+                                    {
+                                        isUnique = isUnique & (neighborg[k] != particle1);
+                                    }
+                                    //ndAssert(isUnique);
+                                    
+                                    neighborg[neigborCount] = particle1;
+                                    distance[particle0].m_dist[neigborCount] = dist;
+                                    pairCount[particle0] = neigborCount + isUnique;
+                                }
+                            }
+                            
+                            {
+                                ndSpinLock lock(locks[particle1]);
+                                ndInt8 neigborCount = pairCount[particle1];
+                                if (neigborCount < D_PARTICLE_BUCKET_SIZE)
+                                {
+                                    ndInt8 isUnique = 1;
+                                    ndInt32* const neighborg = pair[particle1].m_neighborg;
+                                    for (ndInt32 k = neigborCount - 1; k >= 0; --k)
+                                    {
+                                        isUnique = isUnique & (neighborg[k] != particle0);
+                                    }
+                                    //ndAssert(isUnique);
+                                    
+                                    neighborg[neigborCount] = particle0;
+                                    distance[particle1].m_dist[neigborCount] = dist;
+                                    pairCount[particle1] = neigborCount + isUnique;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        
+        const ndInt32 scansCount = ndInt32(gridScans.GetCount()) - 1;
+        for (ndInt32 i = threadIndex; i < scansCount; i += threadCount)
+        {
+            const ndInt32 start = gridScans[i];
+            const ndInt32 count = gridScans[i + 1] - start;
+            ProccessCell(start, count);
+        }
+    });
+    
+    auto AddPairs_new = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
+                                                 {
+        D_TRACKTIME_NAMED(AddPairs);
+        const ndArray<ndGridHash>& hashGridMap = data.m_hashGridMap;
+        const ndArray<ndInt32>& gridScans = data.m_gridScans;
+        const ndFloat32 diameter = data.m_particleDiameter;
+        const ndFloat32 diameter2 = diameter * diameter;
+        const ndInt32 windowsTest = data.WorldToGrid(ndVector(data.m_worlToGridOrigin + diameter)) + 1;
+        
+        ndArray<ndSpinLock>& locks = data.m_locks;
+        ndArray<ndInt8>& pairCount = data.m_pairCount;
+        ndArray<ndParticlePair>& pair = data.m_pairs;
+        ndArray<ndParticleKernelDistance>& distance = data.m_kernelDistance;
+        
+        auto ProccessCell = [this, &data, &hashGridMap, &pair, &pairCount, &locks, &distance, windowsTest, diameter2](ndInt32 start, ndInt32 count)
+        {
+            const ndInt32 count0 = count - 1;
+            for (ndInt32 i = 0; i < count0; ++i)
+            {
+                const ndGridHash hash0 = hashGridMap[start + i];
+                const ndInt32 particle0 = ndInt32(hash0.m_particleIndex);
+                const ndInt32 x0 = data.WorldToGrid(m_posit[particle0]);
+                const bool homeGridTest0 = (hash0.m_cellType == ndGridHash::m_homeGrid);
+                for (ndInt32 j = i + 1; j < count; ++j)
+                {
+                    const ndGridHash hash1 = hashGridMap[start + j];
+                    const ndInt32 particle1 = ndInt32(hash1.m_particleIndex);
+                    ndAssert(particle0 != particle1);
+                    const ndInt32 x1 = data.WorldToGrid(m_posit[particle1]);
+                    const ndInt32 sweeptTest = ((x1 - x0) >= windowsTest);
+                    if (sweeptTest)
+                    {
+                        break;
+                    }
+                    ndAssert(particle0 != particle1);
+                    const ndVector p1p0(m_posit[particle0] - m_posit[particle1]);
+                    const ndFloat32 dist2(p1p0.DotProduct(p1p0).GetScalar());
+                    if (dist2 < diameter2)
+                    {
+                        const bool homeGridTest1 = (hash1.m_cellType == ndGridHash::m_homeGrid);
+                        if (homeGridTest0 && homeGridTest1)
+                        {
+                            ndInt8 neigborCount0 = pairCount[particle0];
+                            const ndFloat32 dist = ndSqrt(ndMax(dist2, ndFloat32(1.0e-8f)));
+                            if (neigborCount0 < D_PARTICLE_BUCKET_SIZE)
+                            {
+                                pair[particle0].m_neighborg[neigborCount0] = particle1;
+                                distance[particle0].m_dist[neigborCount0] = dist;
+                                pairCount[particle0] = neigborCount0 + 1;
+                            }
+                            
+                            ndInt8 neigborCount1 = pairCount[particle1];
+                            if (neigborCount1 < D_PARTICLE_BUCKET_SIZE)
+                            {
+                                pair[particle1].m_neighborg[neigborCount1] = particle0;
+                                distance[particle1].m_dist[neigborCount1] = dist;
+                                pairCount[particle1] = neigborCount1 + 1;
+                            }
+                            
+                        }
+                        else if (homeGridTest0)
+                        {
+                            ndAssert(!homeGridTest1);
+                            ndInt8 neigborCount0 = pairCount[particle0];
+                            const ndFloat32 dist = ndSqrt(ndMax(dist2, ndFloat32(1.0e-8f)));
+                            if (neigborCount0 < D_PARTICLE_BUCKET_SIZE)
+                            {
+                                pair[particle0].m_neighborg[neigborCount0] = particle1;
+                                distance[particle0].m_dist[neigborCount0] = dist;
+                                pairCount[particle0] = neigborCount0 + 1;
+                            }
+                        }
+                        else if (homeGridTest1)
+                        {
+                            ndAssert(!homeGridTest0);
+                            ndInt8 neigborCount1 = pairCount[particle1];
+                            const ndFloat32 dist = ndSqrt(ndMax(dist2, ndFloat32(1.0e-8f)));
+                            if (neigborCount1 < D_PARTICLE_BUCKET_SIZE)
+                            {
+                                pair[particle1].m_neighborg[neigborCount1] = particle0;
+                                distance[particle1].m_dist[neigborCount1] = dist;
+                                pairCount[particle1] = neigborCount1 + 1;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        
+        const ndInt32 scansCount = ndInt32(gridScans.GetCount()) - 1;
+        for (ndInt32 i = threadIndex; i < scansCount; i += threadCount)
+        {
+            const ndInt32 start = gridScans[i];
+            const ndInt32 count = gridScans[i + 1] - start;
+            ProccessCell(start, count);
+        }
+    });
+    
+    ndTree<ndInt32, ndInt32> filter;
+    for (ndInt32 i = 0; i < data.m_hashGridMap.GetCount(); ++i)
+    {
+        if (data.m_hashGridMap[i].m_cellType == ndGridHash::m_homeGrid)
+        {
+            ndAssert(filter.Insert(ndInt32(data.m_hashGridMap[i].m_particleIndex)));
+        }
+    }
+    
+    
+    threadPool->ParallelExecute(AddPairs);
+    //threadPool->ParallelExecute(AddPairs_new);
+#endif    
 }
 
 void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)

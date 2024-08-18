@@ -226,10 +226,10 @@ void ndIkSolver::BuildJacobianMatrix (ndConstraint* const joint)
 	const ndVector invMass1(body1->m_invMass[3]);
 	const ndFloat32 diagDampScale = joint->GetAsContact() ? ndFloat32(0.1f) : ndFloat32(1.0f);
 
-	const ndVector force0(body0->GetForce());
-	const ndVector torque0(body0->GetTorque());
-	const ndVector force1(body1->GetForce());
-	const ndVector torque1(body1->GetTorque());
+	//const ndVector force0(body0->GetForce());
+	//const ndVector torque0(body0->GetTorque());
+	//const ndVector force1(body1->GetForce());
+	//const ndVector torque1(body1->GetTorque());
 
 	for (ndInt32 i = 0; i < count; ++i)
 	{
