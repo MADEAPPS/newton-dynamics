@@ -1,0 +1,837 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FF09C8DA2C724739002039FD /* ndTinyXmlGlue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C86B2C724739002039FD /* ndTinyXmlGlue.cpp */; };
+		FF09C8DB2C724739002039FD /* ndTinyXmlGlue.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C86C2C724739002039FD /* ndTinyXmlGlue.h */; };
+		FF09C8DC2C724739002039FD /* tinystr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C86D2C724739002039FD /* tinystr.cpp */; };
+		FF09C8DD2C724739002039FD /* tinystr.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C86E2C724739002039FD /* tinystr.h */; };
+		FF09C8DE2C724739002039FD /* tinyxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C86F2C724739002039FD /* tinyxml.cpp */; };
+		FF09C8DF2C724739002039FD /* tinyxml.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8702C724739002039FD /* tinyxml.h */; };
+		FF09C8E02C724739002039FD /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8712C724739002039FD /* tinyxmlerror.cpp */; };
+		FF09C8E12C724739002039FD /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8722C724739002039FD /* tinyxmlparser.cpp */; };
+		FF09C8E22C724739002039FD /* ndAabbPolygonSoup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8782C724739002039FD /* ndAabbPolygonSoup.cpp */; };
+		FF09C8E32C724739002039FD /* ndAabbPolygonSoup.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8792C724739002039FD /* ndAabbPolygonSoup.h */; };
+		FF09C8E42C724739002039FD /* ndArray.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C87A2C724739002039FD /* ndArray.h */; };
+		FF09C8E52C724739002039FD /* ndBezierSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C87B2C724739002039FD /* ndBezierSpline.cpp */; };
+		FF09C8E62C724739002039FD /* ndBezierSpline.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C87C2C724739002039FD /* ndBezierSpline.h */; };
+		FF09C8E72C724739002039FD /* ndClassAlloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C87D2C724739002039FD /* ndClassAlloc.cpp */; };
+		FF09C8E82C724739002039FD /* ndClassAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C87E2C724739002039FD /* ndClassAlloc.h */; };
+		FF09C8E92C724739002039FD /* ndConjugateGradient.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C87F2C724739002039FD /* ndConjugateGradient.h */; };
+		FF09C8EA2C724739002039FD /* ndContainersAlloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8802C724739002039FD /* ndContainersAlloc.cpp */; };
+		FF09C8EB2C724739002039FD /* ndContainersAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8812C724739002039FD /* ndContainersAlloc.h */; };
+		FF09C8EC2C724739002039FD /* ndConvexHull2d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8822C724739002039FD /* ndConvexHull2d.cpp */; };
+		FF09C8ED2C724739002039FD /* ndConvexHull2d.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8832C724739002039FD /* ndConvexHull2d.h */; };
+		FF09C8EE2C724739002039FD /* ndConvexHull3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8842C724739002039FD /* ndConvexHull3d.cpp */; };
+		FF09C8EF2C724739002039FD /* ndConvexHull3d.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8852C724739002039FD /* ndConvexHull3d.h */; };
+		FF09C8F02C724739002039FD /* ndConvexHull4d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8862C724739002039FD /* ndConvexHull4d.cpp */; };
+		FF09C8F12C724739002039FD /* ndConvexHull4d.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8872C724739002039FD /* ndConvexHull4d.h */; };
+		FF09C8F22C724739002039FD /* ndCore.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8882C724739002039FD /* ndCore.h */; };
+		FF09C8F32C724739002039FD /* ndCoreStdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8892C724739002039FD /* ndCoreStdafx.cpp */; };
+		FF09C8F42C724739002039FD /* ndCoreStdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C88A2C724739002039FD /* ndCoreStdafx.h */; };
+		FF09C8F52C724739002039FD /* ndCRC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C88B2C724739002039FD /* ndCRC.cpp */; };
+		FF09C8F62C724739002039FD /* ndCRC.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C88C2C724739002039FD /* ndCRC.h */; };
+		FF09C8F72C724739002039FD /* ndDebug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C88D2C724739002039FD /* ndDebug.cpp */; };
+		FF09C8F82C724739002039FD /* ndDebug.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C88E2C724739002039FD /* ndDebug.h */; };
+		FF09C8F92C724739002039FD /* ndDelaunayTetrahedralization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C88F2C724739002039FD /* ndDelaunayTetrahedralization.cpp */; };
+		FF09C8FA2C724739002039FD /* ndDelaunayTetrahedralization.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8902C724739002039FD /* ndDelaunayTetrahedralization.h */; };
+		FF09C8FB2C724739002039FD /* ndFastAabb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8912C724739002039FD /* ndFastAabb.cpp */; };
+		FF09C8FC2C724739002039FD /* ndFastAabb.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8922C724739002039FD /* ndFastAabb.h */; };
+		FF09C8FD2C724739002039FD /* ndFastRay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8932C724739002039FD /* ndFastRay.cpp */; };
+		FF09C8FE2C724739002039FD /* ndFastRay.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8942C724739002039FD /* ndFastRay.h */; };
+		FF09C8FF2C724739002039FD /* ndFixSizeArray.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8952C724739002039FD /* ndFixSizeArray.h */; };
+		FF09C9002C724739002039FD /* ndGeneralMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8962C724739002039FD /* ndGeneralMatrix.h */; };
+		FF09C9012C724739002039FD /* ndGeneralVector.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8972C724739002039FD /* ndGeneralVector.h */; };
+		FF09C9022C724739002039FD /* ndGoogol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8982C724739002039FD /* ndGoogol.cpp */; };
+		FF09C9032C724739002039FD /* ndGoogol.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8992C724739002039FD /* ndGoogol.h */; };
+		FF09C9042C724739002039FD /* ndHeap.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C89A2C724739002039FD /* ndHeap.h */; };
+		FF09C9052C724739002039FD /* ndIntersections.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C89B2C724739002039FD /* ndIntersections.cpp */; };
+		FF09C9062C724739002039FD /* ndIntersections.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C89C2C724739002039FD /* ndIntersections.h */; };
+		FF09C9072C724739002039FD /* ndIsoSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C89D2C724739002039FD /* ndIsoSurface.cpp */; };
+		FF09C9082C724739002039FD /* ndIsoSurface.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C89E2C724739002039FD /* ndIsoSurface.h */; };
+		FF09C9092C724739002039FD /* ndList.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C89F2C724739002039FD /* ndList.h */; };
+		FF09C90A2C724739002039FD /* ndMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8A02C724739002039FD /* ndMatrix.cpp */; };
+		FF09C90B2C724739002039FD /* ndMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8A12C724739002039FD /* ndMatrix.h */; };
+		FF09C90C2C724739002039FD /* ndMemory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8A22C724739002039FD /* ndMemory.cpp */; };
+		FF09C90D2C724739002039FD /* ndMemory.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8A32C724739002039FD /* ndMemory.h */; };
+		FF09C90E2C724739002039FD /* ndNodeHierarchy.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8A42C724739002039FD /* ndNodeHierarchy.h */; };
+		FF09C90F2C724739002039FD /* ndPerlinNoise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8A52C724739002039FD /* ndPerlinNoise.cpp */; };
+		FF09C9102C724739002039FD /* ndPerlinNoise.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8A62C724739002039FD /* ndPerlinNoise.h */; };
+		FF09C9112C724739002039FD /* ndPlane.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8A72C724739002039FD /* ndPlane.h */; };
+		FF09C9122C724739002039FD /* ndPolygonSoupBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8A82C724739002039FD /* ndPolygonSoupBuilder.cpp */; };
+		FF09C9132C724739002039FD /* ndPolygonSoupBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8A92C724739002039FD /* ndPolygonSoupBuilder.h */; };
+		FF09C9142C724739002039FD /* ndPolygonSoupDatabase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8AA2C724739002039FD /* ndPolygonSoupDatabase.cpp */; };
+		FF09C9152C724739002039FD /* ndPolygonSoupDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8AB2C724739002039FD /* ndPolygonSoupDatabase.h */; };
+		FF09C9162C724739002039FD /* ndPolyhedra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8AC2C724739002039FD /* ndPolyhedra.cpp */; };
+		FF09C9172C724739002039FD /* ndPolyhedra.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8AD2C724739002039FD /* ndPolyhedra.h */; };
+		FF09C9182C724739002039FD /* ndPolyhedraMassProperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8AE2C724739002039FD /* ndPolyhedraMassProperties.cpp */; };
+		FF09C9192C724739002039FD /* ndPolyhedraMassProperties.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8AF2C724739002039FD /* ndPolyhedraMassProperties.h */; };
+		FF09C91A2C724739002039FD /* ndProbability.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8B02C724739002039FD /* ndProbability.cpp */; };
+		FF09C91B2C724739002039FD /* ndProbability.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8B12C724739002039FD /* ndProbability.h */; };
+		FF09C91C2C724739002039FD /* ndProfiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8B22C724739002039FD /* ndProfiler.cpp */; };
+		FF09C91D2C724739002039FD /* ndProfiler.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8B32C724739002039FD /* ndProfiler.h */; };
+		FF09C91E2C724739002039FD /* ndQuaternion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8B42C724739002039FD /* ndQuaternion.cpp */; };
+		FF09C91F2C724739002039FD /* ndQuaternion.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8B52C724739002039FD /* ndQuaternion.h */; };
+		FF09C9202C724739002039FD /* ndSemaphore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8B62C724739002039FD /* ndSemaphore.cpp */; };
+		FF09C9212C724739002039FD /* ndSemaphore.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8B72C724739002039FD /* ndSemaphore.h */; };
+		FF09C9222C724739002039FD /* ndSharedPtr.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8B82C724739002039FD /* ndSharedPtr.h */; };
+		FF09C9232C724739002039FD /* ndSmallDeterminant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8B92C724739002039FD /* ndSmallDeterminant.cpp */; };
+		FF09C9242C724739002039FD /* ndSmallDeterminant.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8BA2C724739002039FD /* ndSmallDeterminant.h */; };
+		FF09C9252C724739002039FD /* ndSort.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8BB2C724739002039FD /* ndSort.h */; };
+		FF09C9262C724739002039FD /* ndSpatialMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8BC2C724739002039FD /* ndSpatialMatrix.cpp */; };
+		FF09C9272C724739002039FD /* ndSpatialMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8BD2C724739002039FD /* ndSpatialMatrix.h */; };
+		FF09C9282C724739002039FD /* ndSpatialVector.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8BE2C724739002039FD /* ndSpatialVector.h */; };
+		FF09C9292C724739002039FD /* ndStack.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8BF2C724739002039FD /* ndStack.h */; };
+		FF09C92A2C724739002039FD /* ndString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8C02C724739002039FD /* ndString.cpp */; };
+		FF09C92B2C724739002039FD /* ndString.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8C12C724739002039FD /* ndString.h */; };
+		FF09C92C2C724739002039FD /* ndSyncMutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8C22C724739002039FD /* ndSyncMutex.cpp */; };
+		FF09C92D2C724739002039FD /* ndSyncMutex.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8C32C724739002039FD /* ndSyncMutex.h */; };
+		FF09C92E2C724739002039FD /* ndTemplateVector.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8C42C724739002039FD /* ndTemplateVector.h */; };
+		FF09C92F2C724739002039FD /* ndThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8C52C724739002039FD /* ndThread.cpp */; };
+		FF09C9302C724739002039FD /* ndThread.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8C62C724739002039FD /* ndThread.h */; };
+		FF09C9312C724739002039FD /* ndThreadBackgroundWorker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8C72C724739002039FD /* ndThreadBackgroundWorker.cpp */; };
+		FF09C9322C724739002039FD /* ndThreadBackgroundWorker.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8C82C724739002039FD /* ndThreadBackgroundWorker.h */; };
+		FF09C9332C724739002039FD /* ndThreadPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8C92C724739002039FD /* ndThreadPool.cpp */; };
+		FF09C9342C724739002039FD /* ndThreadPool.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8CA2C724739002039FD /* ndThreadPool.h */; };
+		FF09C9352C724739002039FD /* ndThreadSyncUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8CB2C724739002039FD /* ndThreadSyncUtils.cpp */; };
+		FF09C9362C724739002039FD /* ndThreadSyncUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8CC2C724739002039FD /* ndThreadSyncUtils.h */; };
+		FF09C9372C724739002039FD /* ndTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8CD2C724739002039FD /* ndTree.cpp */; };
+		FF09C9382C724739002039FD /* ndTree.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8CE2C724739002039FD /* ndTree.h */; };
+		FF09C9392C724739002039FD /* ndTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8CF2C724739002039FD /* ndTypes.cpp */; };
+		FF09C93A2C724739002039FD /* ndTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8D02C724739002039FD /* ndTypes.h */; };
+		FF09C93B2C724739002039FD /* ndUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8D22C724739002039FD /* ndUtils.cpp */; };
+		FF09C93C2C724739002039FD /* ndUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8D32C724739002039FD /* ndUtils.h */; };
+		FF09C93D2C724739002039FD /* ndVector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09C8D42C724739002039FD /* ndVector.cpp */; };
+		FF09C93E2C724739002039FD /* ndVector.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8D52C724739002039FD /* ndVector.h */; };
+		FF09C93F2C724739002039FD /* ndVectorArmNeon.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8D62C724739002039FD /* ndVectorArmNeon.h */; };
+		FF09C9402C724739002039FD /* ndVectorScalar.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8D72C724739002039FD /* ndVectorScalar.h */; };
+		FF09C9412C724739002039FD /* ndVectorSimd.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09C8D82C724739002039FD /* ndVectorSimd.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		FF09C71D2C72459B002039FD /* libndNewton.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libndNewton.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF09C8332C724739002039FD /* annotated.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = annotated.html; sourceTree = "<group>"; };
+		FF09C8342C724739002039FD /* classTiXmlAttribute-members.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "classTiXmlAttribute-members.html"; sourceTree = "<group>"; };
+		FF09C8352C724739002039FD /* classTiXmlAttribute.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = classTiXmlAttribute.html; sourceTree = "<group>"; };
+		FF09C8362C724739002039FD /* classTiXmlAttribute.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = classTiXmlAttribute.png; sourceTree = "<group>"; };
+		FF09C8372C724739002039FD /* classTiXmlBase-members.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "classTiXmlBase-members.html"; sourceTree = "<group>"; };
+		FF09C8382C724739002039FD /* classTiXmlBase.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = classTiXmlBase.html; sourceTree = "<group>"; };
+		FF09C8392C724739002039FD /* classTiXmlBase.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = classTiXmlBase.png; sourceTree = "<group>"; };
+		FF09C83A2C724739002039FD /* classTiXmlComment-members.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "classTiXmlComment-members.html"; sourceTree = "<group>"; };
+		FF09C83B2C724739002039FD /* classTiXmlComment.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = classTiXmlComment.html; sourceTree = "<group>"; };
+		FF09C83C2C724739002039FD /* classTiXmlComment.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = classTiXmlComment.png; sourceTree = "<group>"; };
+		FF09C83D2C724739002039FD /* classTiXmlDeclaration-members.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "classTiXmlDeclaration-members.html"; sourceTree = "<group>"; };
+		FF09C83E2C724739002039FD /* classTiXmlDeclaration.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = classTiXmlDeclaration.html; sourceTree = "<group>"; };
+		FF09C83F2C724739002039FD /* classTiXmlDeclaration.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = classTiXmlDeclaration.png; sourceTree = "<group>"; };
+		FF09C8402C724739002039FD /* classTiXmlDocument-members.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "classTiXmlDocument-members.html"; sourceTree = "<group>"; };
+		FF09C8412C724739002039FD /* classTiXmlDocument.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = classTiXmlDocument.html; sourceTree = "<group>"; };
+		FF09C8422C724739002039FD /* classTiXmlDocument.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = classTiXmlDocument.png; sourceTree = "<group>"; };
+		FF09C8432C724739002039FD /* classTiXmlElement-members.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "classTiXmlElement-members.html"; sourceTree = "<group>"; };
+		FF09C8442C724739002039FD /* classTiXmlElement.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = classTiXmlElement.html; sourceTree = "<group>"; };
+		FF09C8452C724739002039FD /* classTiXmlElement.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = classTiXmlElement.png; sourceTree = "<group>"; };
+		FF09C8462C724739002039FD /* classTiXmlHandle-members.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "classTiXmlHandle-members.html"; sourceTree = "<group>"; };
+		FF09C8472C724739002039FD /* classTiXmlHandle.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = classTiXmlHandle.html; sourceTree = "<group>"; };
+		FF09C8482C724739002039FD /* classTiXmlNode-members.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "classTiXmlNode-members.html"; sourceTree = "<group>"; };
+		FF09C8492C724739002039FD /* classTiXmlNode.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = classTiXmlNode.html; sourceTree = "<group>"; };
+		FF09C84A2C724739002039FD /* classTiXmlNode.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = classTiXmlNode.png; sourceTree = "<group>"; };
+		FF09C84B2C724739002039FD /* classTiXmlPrinter-members.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "classTiXmlPrinter-members.html"; sourceTree = "<group>"; };
+		FF09C84C2C724739002039FD /* classTiXmlPrinter.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = classTiXmlPrinter.html; sourceTree = "<group>"; };
+		FF09C84D2C724739002039FD /* classTiXmlPrinter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = classTiXmlPrinter.png; sourceTree = "<group>"; };
+		FF09C84E2C724739002039FD /* classTiXmlText-members.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "classTiXmlText-members.html"; sourceTree = "<group>"; };
+		FF09C84F2C724739002039FD /* classTiXmlText.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = classTiXmlText.html; sourceTree = "<group>"; };
+		FF09C8502C724739002039FD /* classTiXmlText.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = classTiXmlText.png; sourceTree = "<group>"; };
+		FF09C8512C724739002039FD /* classTiXmlUnknown-members.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "classTiXmlUnknown-members.html"; sourceTree = "<group>"; };
+		FF09C8522C724739002039FD /* classTiXmlUnknown.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = classTiXmlUnknown.html; sourceTree = "<group>"; };
+		FF09C8532C724739002039FD /* classTiXmlUnknown.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = classTiXmlUnknown.png; sourceTree = "<group>"; };
+		FF09C8542C724739002039FD /* classTiXmlVisitor-members.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "classTiXmlVisitor-members.html"; sourceTree = "<group>"; };
+		FF09C8552C724739002039FD /* classTiXmlVisitor.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = classTiXmlVisitor.html; sourceTree = "<group>"; };
+		FF09C8562C724739002039FD /* classTiXmlVisitor.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = classTiXmlVisitor.png; sourceTree = "<group>"; };
+		FF09C8572C724739002039FD /* deprecated.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = deprecated.html; sourceTree = "<group>"; };
+		FF09C8582C724739002039FD /* doxygen.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = doxygen.css; sourceTree = "<group>"; };
+		FF09C8592C724739002039FD /* doxygen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = doxygen.png; sourceTree = "<group>"; };
+		FF09C85A2C724739002039FD /* files.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = files.html; sourceTree = "<group>"; };
+		FF09C85B2C724739002039FD /* functions_enum.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = functions_enum.html; sourceTree = "<group>"; };
+		FF09C85C2C724739002039FD /* functions_func.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = functions_func.html; sourceTree = "<group>"; };
+		FF09C85D2C724739002039FD /* functions_rela.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = functions_rela.html; sourceTree = "<group>"; };
+		FF09C85E2C724739002039FD /* functions_vars.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = functions_vars.html; sourceTree = "<group>"; };
+		FF09C85F2C724739002039FD /* functions.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = functions.html; sourceTree = "<group>"; };
+		FF09C8602C724739002039FD /* hierarchy.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = hierarchy.html; sourceTree = "<group>"; };
+		FF09C8612C724739002039FD /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		FF09C8622C724739002039FD /* pages.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = pages.html; sourceTree = "<group>"; };
+		FF09C8632C724739002039FD /* tab_b.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = tab_b.gif; sourceTree = "<group>"; };
+		FF09C8642C724739002039FD /* tab_l.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = tab_l.gif; sourceTree = "<group>"; };
+		FF09C8652C724739002039FD /* tab_r.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = tab_r.gif; sourceTree = "<group>"; };
+		FF09C8662C724739002039FD /* tabs.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = tabs.css; sourceTree = "<group>"; };
+		FF09C8672C724739002039FD /* tinystr_8h-source.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "tinystr_8h-source.html"; sourceTree = "<group>"; };
+		FF09C8682C724739002039FD /* tinyxml_8h-source.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "tinyxml_8h-source.html"; sourceTree = "<group>"; };
+		FF09C8692C724739002039FD /* tutorial0.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = tutorial0.html; sourceTree = "<group>"; };
+		FF09C86B2C724739002039FD /* ndTinyXmlGlue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndTinyXmlGlue.cpp; sourceTree = "<group>"; };
+		FF09C86C2C724739002039FD /* ndTinyXmlGlue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndTinyXmlGlue.h; sourceTree = "<group>"; };
+		FF09C86D2C724739002039FD /* tinystr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinystr.cpp; sourceTree = "<group>"; };
+		FF09C86E2C724739002039FD /* tinystr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinystr.h; sourceTree = "<group>"; };
+		FF09C86F2C724739002039FD /* tinyxml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxml.cpp; sourceTree = "<group>"; };
+		FF09C8702C724739002039FD /* tinyxml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinyxml.h; sourceTree = "<group>"; };
+		FF09C8712C724739002039FD /* tinyxmlerror.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxmlerror.cpp; sourceTree = "<group>"; };
+		FF09C8722C724739002039FD /* tinyxmlparser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxmlparser.cpp; sourceTree = "<group>"; };
+		FF09C8732C724739002039FD /* utf8test.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = utf8test.gif; sourceTree = "<group>"; };
+		FF09C8742C724739002039FD /* utf8test.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = utf8test.xml; sourceTree = "<group>"; };
+		FF09C8752C724739002039FD /* utf8testverify.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = utf8testverify.xml; sourceTree = "<group>"; };
+		FF09C8772C724739002039FD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		FF09C8782C724739002039FD /* ndAabbPolygonSoup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndAabbPolygonSoup.cpp; sourceTree = "<group>"; };
+		FF09C8792C724739002039FD /* ndAabbPolygonSoup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndAabbPolygonSoup.h; sourceTree = "<group>"; };
+		FF09C87A2C724739002039FD /* ndArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndArray.h; sourceTree = "<group>"; };
+		FF09C87B2C724739002039FD /* ndBezierSpline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBezierSpline.cpp; sourceTree = "<group>"; };
+		FF09C87C2C724739002039FD /* ndBezierSpline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBezierSpline.h; sourceTree = "<group>"; };
+		FF09C87D2C724739002039FD /* ndClassAlloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndClassAlloc.cpp; sourceTree = "<group>"; };
+		FF09C87E2C724739002039FD /* ndClassAlloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndClassAlloc.h; sourceTree = "<group>"; };
+		FF09C87F2C724739002039FD /* ndConjugateGradient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndConjugateGradient.h; sourceTree = "<group>"; };
+		FF09C8802C724739002039FD /* ndContainersAlloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndContainersAlloc.cpp; sourceTree = "<group>"; };
+		FF09C8812C724739002039FD /* ndContainersAlloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndContainersAlloc.h; sourceTree = "<group>"; };
+		FF09C8822C724739002039FD /* ndConvexHull2d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndConvexHull2d.cpp; sourceTree = "<group>"; };
+		FF09C8832C724739002039FD /* ndConvexHull2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndConvexHull2d.h; sourceTree = "<group>"; };
+		FF09C8842C724739002039FD /* ndConvexHull3d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndConvexHull3d.cpp; sourceTree = "<group>"; };
+		FF09C8852C724739002039FD /* ndConvexHull3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndConvexHull3d.h; sourceTree = "<group>"; };
+		FF09C8862C724739002039FD /* ndConvexHull4d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndConvexHull4d.cpp; sourceTree = "<group>"; };
+		FF09C8872C724739002039FD /* ndConvexHull4d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndConvexHull4d.h; sourceTree = "<group>"; };
+		FF09C8882C724739002039FD /* ndCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndCore.h; sourceTree = "<group>"; };
+		FF09C8892C724739002039FD /* ndCoreStdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndCoreStdafx.cpp; sourceTree = "<group>"; };
+		FF09C88A2C724739002039FD /* ndCoreStdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndCoreStdafx.h; sourceTree = "<group>"; };
+		FF09C88B2C724739002039FD /* ndCRC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndCRC.cpp; sourceTree = "<group>"; };
+		FF09C88C2C724739002039FD /* ndCRC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndCRC.h; sourceTree = "<group>"; };
+		FF09C88D2C724739002039FD /* ndDebug.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndDebug.cpp; sourceTree = "<group>"; };
+		FF09C88E2C724739002039FD /* ndDebug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndDebug.h; sourceTree = "<group>"; };
+		FF09C88F2C724739002039FD /* ndDelaunayTetrahedralization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndDelaunayTetrahedralization.cpp; sourceTree = "<group>"; };
+		FF09C8902C724739002039FD /* ndDelaunayTetrahedralization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndDelaunayTetrahedralization.h; sourceTree = "<group>"; };
+		FF09C8912C724739002039FD /* ndFastAabb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndFastAabb.cpp; sourceTree = "<group>"; };
+		FF09C8922C724739002039FD /* ndFastAabb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndFastAabb.h; sourceTree = "<group>"; };
+		FF09C8932C724739002039FD /* ndFastRay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndFastRay.cpp; sourceTree = "<group>"; };
+		FF09C8942C724739002039FD /* ndFastRay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndFastRay.h; sourceTree = "<group>"; };
+		FF09C8952C724739002039FD /* ndFixSizeArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndFixSizeArray.h; sourceTree = "<group>"; };
+		FF09C8962C724739002039FD /* ndGeneralMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndGeneralMatrix.h; sourceTree = "<group>"; };
+		FF09C8972C724739002039FD /* ndGeneralVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndGeneralVector.h; sourceTree = "<group>"; };
+		FF09C8982C724739002039FD /* ndGoogol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndGoogol.cpp; sourceTree = "<group>"; };
+		FF09C8992C724739002039FD /* ndGoogol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndGoogol.h; sourceTree = "<group>"; };
+		FF09C89A2C724739002039FD /* ndHeap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndHeap.h; sourceTree = "<group>"; };
+		FF09C89B2C724739002039FD /* ndIntersections.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndIntersections.cpp; sourceTree = "<group>"; };
+		FF09C89C2C724739002039FD /* ndIntersections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndIntersections.h; sourceTree = "<group>"; };
+		FF09C89D2C724739002039FD /* ndIsoSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndIsoSurface.cpp; sourceTree = "<group>"; };
+		FF09C89E2C724739002039FD /* ndIsoSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndIsoSurface.h; sourceTree = "<group>"; };
+		FF09C89F2C724739002039FD /* ndList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndList.h; sourceTree = "<group>"; };
+		FF09C8A02C724739002039FD /* ndMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMatrix.cpp; sourceTree = "<group>"; };
+		FF09C8A12C724739002039FD /* ndMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndMatrix.h; sourceTree = "<group>"; };
+		FF09C8A22C724739002039FD /* ndMemory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMemory.cpp; sourceTree = "<group>"; };
+		FF09C8A32C724739002039FD /* ndMemory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndMemory.h; sourceTree = "<group>"; };
+		FF09C8A42C724739002039FD /* ndNodeHierarchy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndNodeHierarchy.h; sourceTree = "<group>"; };
+		FF09C8A52C724739002039FD /* ndPerlinNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndPerlinNoise.cpp; sourceTree = "<group>"; };
+		FF09C8A62C724739002039FD /* ndPerlinNoise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndPerlinNoise.h; sourceTree = "<group>"; };
+		FF09C8A72C724739002039FD /* ndPlane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndPlane.h; sourceTree = "<group>"; };
+		FF09C8A82C724739002039FD /* ndPolygonSoupBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndPolygonSoupBuilder.cpp; sourceTree = "<group>"; };
+		FF09C8A92C724739002039FD /* ndPolygonSoupBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndPolygonSoupBuilder.h; sourceTree = "<group>"; };
+		FF09C8AA2C724739002039FD /* ndPolygonSoupDatabase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndPolygonSoupDatabase.cpp; sourceTree = "<group>"; };
+		FF09C8AB2C724739002039FD /* ndPolygonSoupDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndPolygonSoupDatabase.h; sourceTree = "<group>"; };
+		FF09C8AC2C724739002039FD /* ndPolyhedra.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndPolyhedra.cpp; sourceTree = "<group>"; };
+		FF09C8AD2C724739002039FD /* ndPolyhedra.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndPolyhedra.h; sourceTree = "<group>"; };
+		FF09C8AE2C724739002039FD /* ndPolyhedraMassProperties.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndPolyhedraMassProperties.cpp; sourceTree = "<group>"; };
+		FF09C8AF2C724739002039FD /* ndPolyhedraMassProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndPolyhedraMassProperties.h; sourceTree = "<group>"; };
+		FF09C8B02C724739002039FD /* ndProbability.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndProbability.cpp; sourceTree = "<group>"; };
+		FF09C8B12C724739002039FD /* ndProbability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndProbability.h; sourceTree = "<group>"; };
+		FF09C8B22C724739002039FD /* ndProfiler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndProfiler.cpp; sourceTree = "<group>"; };
+		FF09C8B32C724739002039FD /* ndProfiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndProfiler.h; sourceTree = "<group>"; };
+		FF09C8B42C724739002039FD /* ndQuaternion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndQuaternion.cpp; sourceTree = "<group>"; };
+		FF09C8B52C724739002039FD /* ndQuaternion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndQuaternion.h; sourceTree = "<group>"; };
+		FF09C8B62C724739002039FD /* ndSemaphore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndSemaphore.cpp; sourceTree = "<group>"; };
+		FF09C8B72C724739002039FD /* ndSemaphore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndSemaphore.h; sourceTree = "<group>"; };
+		FF09C8B82C724739002039FD /* ndSharedPtr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndSharedPtr.h; sourceTree = "<group>"; };
+		FF09C8B92C724739002039FD /* ndSmallDeterminant.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndSmallDeterminant.cpp; sourceTree = "<group>"; };
+		FF09C8BA2C724739002039FD /* ndSmallDeterminant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndSmallDeterminant.h; sourceTree = "<group>"; };
+		FF09C8BB2C724739002039FD /* ndSort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndSort.h; sourceTree = "<group>"; };
+		FF09C8BC2C724739002039FD /* ndSpatialMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndSpatialMatrix.cpp; sourceTree = "<group>"; };
+		FF09C8BD2C724739002039FD /* ndSpatialMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndSpatialMatrix.h; sourceTree = "<group>"; };
+		FF09C8BE2C724739002039FD /* ndSpatialVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndSpatialVector.h; sourceTree = "<group>"; };
+		FF09C8BF2C724739002039FD /* ndStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndStack.h; sourceTree = "<group>"; };
+		FF09C8C02C724739002039FD /* ndString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndString.cpp; sourceTree = "<group>"; };
+		FF09C8C12C724739002039FD /* ndString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndString.h; sourceTree = "<group>"; };
+		FF09C8C22C724739002039FD /* ndSyncMutex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndSyncMutex.cpp; sourceTree = "<group>"; };
+		FF09C8C32C724739002039FD /* ndSyncMutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndSyncMutex.h; sourceTree = "<group>"; };
+		FF09C8C42C724739002039FD /* ndTemplateVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndTemplateVector.h; sourceTree = "<group>"; };
+		FF09C8C52C724739002039FD /* ndThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndThread.cpp; sourceTree = "<group>"; };
+		FF09C8C62C724739002039FD /* ndThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndThread.h; sourceTree = "<group>"; };
+		FF09C8C72C724739002039FD /* ndThreadBackgroundWorker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndThreadBackgroundWorker.cpp; sourceTree = "<group>"; };
+		FF09C8C82C724739002039FD /* ndThreadBackgroundWorker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndThreadBackgroundWorker.h; sourceTree = "<group>"; };
+		FF09C8C92C724739002039FD /* ndThreadPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndThreadPool.cpp; sourceTree = "<group>"; };
+		FF09C8CA2C724739002039FD /* ndThreadPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndThreadPool.h; sourceTree = "<group>"; };
+		FF09C8CB2C724739002039FD /* ndThreadSyncUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndThreadSyncUtils.cpp; sourceTree = "<group>"; };
+		FF09C8CC2C724739002039FD /* ndThreadSyncUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndThreadSyncUtils.h; sourceTree = "<group>"; };
+		FF09C8CD2C724739002039FD /* ndTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndTree.cpp; sourceTree = "<group>"; };
+		FF09C8CE2C724739002039FD /* ndTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndTree.h; sourceTree = "<group>"; };
+		FF09C8CF2C724739002039FD /* ndTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndTypes.cpp; sourceTree = "<group>"; };
+		FF09C8D02C724739002039FD /* ndTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndTypes.h; sourceTree = "<group>"; };
+		FF09C8D12C724739002039FD /* ndTypes.natvis */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ndTypes.natvis; sourceTree = "<group>"; };
+		FF09C8D22C724739002039FD /* ndUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndUtils.cpp; sourceTree = "<group>"; };
+		FF09C8D32C724739002039FD /* ndUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndUtils.h; sourceTree = "<group>"; };
+		FF09C8D42C724739002039FD /* ndVector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndVector.cpp; sourceTree = "<group>"; };
+		FF09C8D52C724739002039FD /* ndVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndVector.h; sourceTree = "<group>"; };
+		FF09C8D62C724739002039FD /* ndVectorArmNeon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndVectorArmNeon.h; sourceTree = "<group>"; };
+		FF09C8D72C724739002039FD /* ndVectorScalar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndVectorScalar.h; sourceTree = "<group>"; };
+		FF09C8D82C724739002039FD /* ndVectorSimd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndVectorSimd.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FF09C71B2C72459B002039FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FF09C7142C72459B002039FD = {
+			isa = PBXGroup;
+			children = (
+				FF09C8D92C724739002039FD /* dCore */,
+				FF09C71E2C72459B002039FD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FF09C71E2C72459B002039FD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF09C71D2C72459B002039FD /* libndNewton.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF09C86A2C724739002039FD /* docs */ = {
+			isa = PBXGroup;
+			children = (
+				FF09C8332C724739002039FD /* annotated.html */,
+				FF09C8342C724739002039FD /* classTiXmlAttribute-members.html */,
+				FF09C8352C724739002039FD /* classTiXmlAttribute.html */,
+				FF09C8362C724739002039FD /* classTiXmlAttribute.png */,
+				FF09C8372C724739002039FD /* classTiXmlBase-members.html */,
+				FF09C8382C724739002039FD /* classTiXmlBase.html */,
+				FF09C8392C724739002039FD /* classTiXmlBase.png */,
+				FF09C83A2C724739002039FD /* classTiXmlComment-members.html */,
+				FF09C83B2C724739002039FD /* classTiXmlComment.html */,
+				FF09C83C2C724739002039FD /* classTiXmlComment.png */,
+				FF09C83D2C724739002039FD /* classTiXmlDeclaration-members.html */,
+				FF09C83E2C724739002039FD /* classTiXmlDeclaration.html */,
+				FF09C83F2C724739002039FD /* classTiXmlDeclaration.png */,
+				FF09C8402C724739002039FD /* classTiXmlDocument-members.html */,
+				FF09C8412C724739002039FD /* classTiXmlDocument.html */,
+				FF09C8422C724739002039FD /* classTiXmlDocument.png */,
+				FF09C8432C724739002039FD /* classTiXmlElement-members.html */,
+				FF09C8442C724739002039FD /* classTiXmlElement.html */,
+				FF09C8452C724739002039FD /* classTiXmlElement.png */,
+				FF09C8462C724739002039FD /* classTiXmlHandle-members.html */,
+				FF09C8472C724739002039FD /* classTiXmlHandle.html */,
+				FF09C8482C724739002039FD /* classTiXmlNode-members.html */,
+				FF09C8492C724739002039FD /* classTiXmlNode.html */,
+				FF09C84A2C724739002039FD /* classTiXmlNode.png */,
+				FF09C84B2C724739002039FD /* classTiXmlPrinter-members.html */,
+				FF09C84C2C724739002039FD /* classTiXmlPrinter.html */,
+				FF09C84D2C724739002039FD /* classTiXmlPrinter.png */,
+				FF09C84E2C724739002039FD /* classTiXmlText-members.html */,
+				FF09C84F2C724739002039FD /* classTiXmlText.html */,
+				FF09C8502C724739002039FD /* classTiXmlText.png */,
+				FF09C8512C724739002039FD /* classTiXmlUnknown-members.html */,
+				FF09C8522C724739002039FD /* classTiXmlUnknown.html */,
+				FF09C8532C724739002039FD /* classTiXmlUnknown.png */,
+				FF09C8542C724739002039FD /* classTiXmlVisitor-members.html */,
+				FF09C8552C724739002039FD /* classTiXmlVisitor.html */,
+				FF09C8562C724739002039FD /* classTiXmlVisitor.png */,
+				FF09C8572C724739002039FD /* deprecated.html */,
+				FF09C8582C724739002039FD /* doxygen.css */,
+				FF09C8592C724739002039FD /* doxygen.png */,
+				FF09C85A2C724739002039FD /* files.html */,
+				FF09C85B2C724739002039FD /* functions_enum.html */,
+				FF09C85C2C724739002039FD /* functions_func.html */,
+				FF09C85D2C724739002039FD /* functions_rela.html */,
+				FF09C85E2C724739002039FD /* functions_vars.html */,
+				FF09C85F2C724739002039FD /* functions.html */,
+				FF09C8602C724739002039FD /* hierarchy.html */,
+				FF09C8612C724739002039FD /* index.html */,
+				FF09C8622C724739002039FD /* pages.html */,
+				FF09C8632C724739002039FD /* tab_b.gif */,
+				FF09C8642C724739002039FD /* tab_l.gif */,
+				FF09C8652C724739002039FD /* tab_r.gif */,
+				FF09C8662C724739002039FD /* tabs.css */,
+				FF09C8672C724739002039FD /* tinystr_8h-source.html */,
+				FF09C8682C724739002039FD /* tinyxml_8h-source.html */,
+				FF09C8692C724739002039FD /* tutorial0.html */,
+			);
+			path = docs;
+			sourceTree = "<group>";
+		};
+		FF09C8762C724739002039FD /* tinyxml */ = {
+			isa = PBXGroup;
+			children = (
+				FF09C86A2C724739002039FD /* docs */,
+				FF09C86B2C724739002039FD /* ndTinyXmlGlue.cpp */,
+				FF09C86C2C724739002039FD /* ndTinyXmlGlue.h */,
+				FF09C86D2C724739002039FD /* tinystr.cpp */,
+				FF09C86E2C724739002039FD /* tinystr.h */,
+				FF09C86F2C724739002039FD /* tinyxml.cpp */,
+				FF09C8702C724739002039FD /* tinyxml.h */,
+				FF09C8712C724739002039FD /* tinyxmlerror.cpp */,
+				FF09C8722C724739002039FD /* tinyxmlparser.cpp */,
+				FF09C8732C724739002039FD /* utf8test.gif */,
+				FF09C8742C724739002039FD /* utf8test.xml */,
+				FF09C8752C724739002039FD /* utf8testverify.xml */,
+			);
+			path = tinyxml;
+			sourceTree = "<group>";
+		};
+		FF09C8D92C724739002039FD /* dCore */ = {
+			isa = PBXGroup;
+			children = (
+				FF09C8762C724739002039FD /* tinyxml */,
+				FF09C8772C724739002039FD /* CMakeLists.txt */,
+				FF09C8782C724739002039FD /* ndAabbPolygonSoup.cpp */,
+				FF09C8792C724739002039FD /* ndAabbPolygonSoup.h */,
+				FF09C87A2C724739002039FD /* ndArray.h */,
+				FF09C87B2C724739002039FD /* ndBezierSpline.cpp */,
+				FF09C87C2C724739002039FD /* ndBezierSpline.h */,
+				FF09C87D2C724739002039FD /* ndClassAlloc.cpp */,
+				FF09C87E2C724739002039FD /* ndClassAlloc.h */,
+				FF09C87F2C724739002039FD /* ndConjugateGradient.h */,
+				FF09C8802C724739002039FD /* ndContainersAlloc.cpp */,
+				FF09C8812C724739002039FD /* ndContainersAlloc.h */,
+				FF09C8822C724739002039FD /* ndConvexHull2d.cpp */,
+				FF09C8832C724739002039FD /* ndConvexHull2d.h */,
+				FF09C8842C724739002039FD /* ndConvexHull3d.cpp */,
+				FF09C8852C724739002039FD /* ndConvexHull3d.h */,
+				FF09C8862C724739002039FD /* ndConvexHull4d.cpp */,
+				FF09C8872C724739002039FD /* ndConvexHull4d.h */,
+				FF09C8882C724739002039FD /* ndCore.h */,
+				FF09C8892C724739002039FD /* ndCoreStdafx.cpp */,
+				FF09C88A2C724739002039FD /* ndCoreStdafx.h */,
+				FF09C88B2C724739002039FD /* ndCRC.cpp */,
+				FF09C88C2C724739002039FD /* ndCRC.h */,
+				FF09C88D2C724739002039FD /* ndDebug.cpp */,
+				FF09C88E2C724739002039FD /* ndDebug.h */,
+				FF09C88F2C724739002039FD /* ndDelaunayTetrahedralization.cpp */,
+				FF09C8902C724739002039FD /* ndDelaunayTetrahedralization.h */,
+				FF09C8912C724739002039FD /* ndFastAabb.cpp */,
+				FF09C8922C724739002039FD /* ndFastAabb.h */,
+				FF09C8932C724739002039FD /* ndFastRay.cpp */,
+				FF09C8942C724739002039FD /* ndFastRay.h */,
+				FF09C8952C724739002039FD /* ndFixSizeArray.h */,
+				FF09C8962C724739002039FD /* ndGeneralMatrix.h */,
+				FF09C8972C724739002039FD /* ndGeneralVector.h */,
+				FF09C8982C724739002039FD /* ndGoogol.cpp */,
+				FF09C8992C724739002039FD /* ndGoogol.h */,
+				FF09C89A2C724739002039FD /* ndHeap.h */,
+				FF09C89B2C724739002039FD /* ndIntersections.cpp */,
+				FF09C89C2C724739002039FD /* ndIntersections.h */,
+				FF09C89D2C724739002039FD /* ndIsoSurface.cpp */,
+				FF09C89E2C724739002039FD /* ndIsoSurface.h */,
+				FF09C89F2C724739002039FD /* ndList.h */,
+				FF09C8A02C724739002039FD /* ndMatrix.cpp */,
+				FF09C8A12C724739002039FD /* ndMatrix.h */,
+				FF09C8A22C724739002039FD /* ndMemory.cpp */,
+				FF09C8A32C724739002039FD /* ndMemory.h */,
+				FF09C8A42C724739002039FD /* ndNodeHierarchy.h */,
+				FF09C8A52C724739002039FD /* ndPerlinNoise.cpp */,
+				FF09C8A62C724739002039FD /* ndPerlinNoise.h */,
+				FF09C8A72C724739002039FD /* ndPlane.h */,
+				FF09C8A82C724739002039FD /* ndPolygonSoupBuilder.cpp */,
+				FF09C8A92C724739002039FD /* ndPolygonSoupBuilder.h */,
+				FF09C8AA2C724739002039FD /* ndPolygonSoupDatabase.cpp */,
+				FF09C8AB2C724739002039FD /* ndPolygonSoupDatabase.h */,
+				FF09C8AC2C724739002039FD /* ndPolyhedra.cpp */,
+				FF09C8AD2C724739002039FD /* ndPolyhedra.h */,
+				FF09C8AE2C724739002039FD /* ndPolyhedraMassProperties.cpp */,
+				FF09C8AF2C724739002039FD /* ndPolyhedraMassProperties.h */,
+				FF09C8B02C724739002039FD /* ndProbability.cpp */,
+				FF09C8B12C724739002039FD /* ndProbability.h */,
+				FF09C8B22C724739002039FD /* ndProfiler.cpp */,
+				FF09C8B32C724739002039FD /* ndProfiler.h */,
+				FF09C8B42C724739002039FD /* ndQuaternion.cpp */,
+				FF09C8B52C724739002039FD /* ndQuaternion.h */,
+				FF09C8B62C724739002039FD /* ndSemaphore.cpp */,
+				FF09C8B72C724739002039FD /* ndSemaphore.h */,
+				FF09C8B82C724739002039FD /* ndSharedPtr.h */,
+				FF09C8B92C724739002039FD /* ndSmallDeterminant.cpp */,
+				FF09C8BA2C724739002039FD /* ndSmallDeterminant.h */,
+				FF09C8BB2C724739002039FD /* ndSort.h */,
+				FF09C8BC2C724739002039FD /* ndSpatialMatrix.cpp */,
+				FF09C8BD2C724739002039FD /* ndSpatialMatrix.h */,
+				FF09C8BE2C724739002039FD /* ndSpatialVector.h */,
+				FF09C8BF2C724739002039FD /* ndStack.h */,
+				FF09C8C02C724739002039FD /* ndString.cpp */,
+				FF09C8C12C724739002039FD /* ndString.h */,
+				FF09C8C22C724739002039FD /* ndSyncMutex.cpp */,
+				FF09C8C32C724739002039FD /* ndSyncMutex.h */,
+				FF09C8C42C724739002039FD /* ndTemplateVector.h */,
+				FF09C8C52C724739002039FD /* ndThread.cpp */,
+				FF09C8C62C724739002039FD /* ndThread.h */,
+				FF09C8C72C724739002039FD /* ndThreadBackgroundWorker.cpp */,
+				FF09C8C82C724739002039FD /* ndThreadBackgroundWorker.h */,
+				FF09C8C92C724739002039FD /* ndThreadPool.cpp */,
+				FF09C8CA2C724739002039FD /* ndThreadPool.h */,
+				FF09C8CB2C724739002039FD /* ndThreadSyncUtils.cpp */,
+				FF09C8CC2C724739002039FD /* ndThreadSyncUtils.h */,
+				FF09C8CD2C724739002039FD /* ndTree.cpp */,
+				FF09C8CE2C724739002039FD /* ndTree.h */,
+				FF09C8CF2C724739002039FD /* ndTypes.cpp */,
+				FF09C8D02C724739002039FD /* ndTypes.h */,
+				FF09C8D12C724739002039FD /* ndTypes.natvis */,
+				FF09C8D22C724739002039FD /* ndUtils.cpp */,
+				FF09C8D32C724739002039FD /* ndUtils.h */,
+				FF09C8D42C724739002039FD /* ndVector.cpp */,
+				FF09C8D52C724739002039FD /* ndVector.h */,
+				FF09C8D62C724739002039FD /* ndVectorArmNeon.h */,
+				FF09C8D72C724739002039FD /* ndVectorScalar.h */,
+				FF09C8D82C724739002039FD /* ndVectorSimd.h */,
+			);
+			name = dCore;
+			path = ../../sdk/dCore;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		FF09C7192C72459B002039FD /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF09C8ED2C724739002039FD /* ndConvexHull2d.h in Headers */,
+				FF09C9112C724739002039FD /* ndPlane.h in Headers */,
+				FF09C8F42C724739002039FD /* ndCoreStdafx.h in Headers */,
+				FF09C9082C724739002039FD /* ndIsoSurface.h in Headers */,
+				FF09C9362C724739002039FD /* ndThreadSyncUtils.h in Headers */,
+				FF09C8E32C724739002039FD /* ndAabbPolygonSoup.h in Headers */,
+				FF09C9412C724739002039FD /* ndVectorSimd.h in Headers */,
+				FF09C9252C724739002039FD /* ndSort.h in Headers */,
+				FF09C9102C724739002039FD /* ndPerlinNoise.h in Headers */,
+				FF09C8F62C724739002039FD /* ndCRC.h in Headers */,
+				FF09C9322C724739002039FD /* ndThreadBackgroundWorker.h in Headers */,
+				FF09C8E82C724739002039FD /* ndClassAlloc.h in Headers */,
+				FF09C8DD2C724739002039FD /* tinystr.h in Headers */,
+				FF09C9042C724739002039FD /* ndHeap.h in Headers */,
+				FF09C9342C724739002039FD /* ndThreadPool.h in Headers */,
+				FF09C92E2C724739002039FD /* ndTemplateVector.h in Headers */,
+				FF09C8FA2C724739002039FD /* ndDelaunayTetrahedralization.h in Headers */,
+				FF09C8EF2C724739002039FD /* ndConvexHull3d.h in Headers */,
+				FF09C8E92C724739002039FD /* ndConjugateGradient.h in Headers */,
+				FF09C8FF2C724739002039FD /* ndFixSizeArray.h in Headers */,
+				FF09C8F82C724739002039FD /* ndDebug.h in Headers */,
+				FF09C8E62C724739002039FD /* ndBezierSpline.h in Headers */,
+				FF09C9302C724739002039FD /* ndThread.h in Headers */,
+				FF09C9192C724739002039FD /* ndPolyhedraMassProperties.h in Headers */,
+				FF09C90E2C724739002039FD /* ndNodeHierarchy.h in Headers */,
+				FF09C9382C724739002039FD /* ndTree.h in Headers */,
+				FF09C9222C724739002039FD /* ndSharedPtr.h in Headers */,
+				FF09C9272C724739002039FD /* ndSpatialMatrix.h in Headers */,
+				FF09C90D2C724739002039FD /* ndMemory.h in Headers */,
+				FF09C8DB2C724739002039FD /* ndTinyXmlGlue.h in Headers */,
+				FF09C9282C724739002039FD /* ndSpatialVector.h in Headers */,
+				FF09C93E2C724739002039FD /* ndVector.h in Headers */,
+				FF09C8F12C724739002039FD /* ndConvexHull4d.h in Headers */,
+				FF09C9132C724739002039FD /* ndPolygonSoupBuilder.h in Headers */,
+				FF09C8F22C724739002039FD /* ndCore.h in Headers */,
+				FF09C8E42C724739002039FD /* ndArray.h in Headers */,
+				FF09C9152C724739002039FD /* ndPolygonSoupDatabase.h in Headers */,
+				FF09C8FE2C724739002039FD /* ndFastRay.h in Headers */,
+				FF09C9402C724739002039FD /* ndVectorScalar.h in Headers */,
+				FF09C93A2C724739002039FD /* ndTypes.h in Headers */,
+				FF09C9032C724739002039FD /* ndGoogol.h in Headers */,
+				FF09C91D2C724739002039FD /* ndProfiler.h in Headers */,
+				FF09C9092C724739002039FD /* ndList.h in Headers */,
+				FF09C9242C724739002039FD /* ndSmallDeterminant.h in Headers */,
+				FF09C9172C724739002039FD /* ndPolyhedra.h in Headers */,
+				FF09C8DF2C724739002039FD /* tinyxml.h in Headers */,
+				FF09C8FC2C724739002039FD /* ndFastAabb.h in Headers */,
+				FF09C92D2C724739002039FD /* ndSyncMutex.h in Headers */,
+				FF09C9002C724739002039FD /* ndGeneralMatrix.h in Headers */,
+				FF09C9212C724739002039FD /* ndSemaphore.h in Headers */,
+				FF09C91F2C724739002039FD /* ndQuaternion.h in Headers */,
+				FF09C9012C724739002039FD /* ndGeneralVector.h in Headers */,
+				FF09C8EB2C724739002039FD /* ndContainersAlloc.h in Headers */,
+				FF09C93C2C724739002039FD /* ndUtils.h in Headers */,
+				FF09C9062C724739002039FD /* ndIntersections.h in Headers */,
+				FF09C91B2C724739002039FD /* ndProbability.h in Headers */,
+				FF09C93F2C724739002039FD /* ndVectorArmNeon.h in Headers */,
+				FF09C90B2C724739002039FD /* ndMatrix.h in Headers */,
+				FF09C92B2C724739002039FD /* ndString.h in Headers */,
+				FF09C9292C724739002039FD /* ndStack.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		FF09C71C2C72459B002039FD /* ndNewton */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FF09C7212C72459B002039FD /* Build configuration list for PBXNativeTarget "ndNewton" */;
+			buildPhases = (
+				FF09C7192C72459B002039FD /* Headers */,
+				FF09C71A2C72459B002039FD /* Sources */,
+				FF09C71B2C72459B002039FD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ndNewton;
+			productName = ndNewton;
+			productReference = FF09C71D2C72459B002039FD /* libndNewton.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FF09C7152C72459B002039FD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					FF09C71C2C72459B002039FD = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = FF09C7182C72459B002039FD /* Build configuration list for PBXProject "ndNewton" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FF09C7142C72459B002039FD;
+			productRefGroup = FF09C71E2C72459B002039FD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FF09C71C2C72459B002039FD /* ndNewton */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FF09C71A2C72459B002039FD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF09C8E02C724739002039FD /* tinyxmlerror.cpp in Sources */,
+				FF09C93B2C724739002039FD /* ndUtils.cpp in Sources */,
+				FF09C9122C724739002039FD /* ndPolygonSoupBuilder.cpp in Sources */,
+				FF09C8DA2C724739002039FD /* ndTinyXmlGlue.cpp in Sources */,
+				FF09C90A2C724739002039FD /* ndMatrix.cpp in Sources */,
+				FF09C92A2C724739002039FD /* ndString.cpp in Sources */,
+				FF09C8F32C724739002039FD /* ndCoreStdafx.cpp in Sources */,
+				FF09C9352C724739002039FD /* ndThreadSyncUtils.cpp in Sources */,
+				FF09C92C2C724739002039FD /* ndSyncMutex.cpp in Sources */,
+				FF09C90F2C724739002039FD /* ndPerlinNoise.cpp in Sources */,
+				FF09C8DE2C724739002039FD /* tinyxml.cpp in Sources */,
+				FF09C8FB2C724739002039FD /* ndFastAabb.cpp in Sources */,
+				FF09C91C2C724739002039FD /* ndProfiler.cpp in Sources */,
+				FF09C9312C724739002039FD /* ndThreadBackgroundWorker.cpp in Sources */,
+				FF09C8E12C724739002039FD /* tinyxmlparser.cpp in Sources */,
+				FF09C8FD2C724739002039FD /* ndFastRay.cpp in Sources */,
+				FF09C9022C724739002039FD /* ndGoogol.cpp in Sources */,
+				FF09C9332C724739002039FD /* ndThreadPool.cpp in Sources */,
+				FF09C9052C724739002039FD /* ndIntersections.cpp in Sources */,
+				FF09C8E72C724739002039FD /* ndClassAlloc.cpp in Sources */,
+				FF09C9182C724739002039FD /* ndPolyhedraMassProperties.cpp in Sources */,
+				FF09C9262C724739002039FD /* ndSpatialMatrix.cpp in Sources */,
+				FF09C8F02C724739002039FD /* ndConvexHull4d.cpp in Sources */,
+				FF09C9072C724739002039FD /* ndIsoSurface.cpp in Sources */,
+				FF09C8DC2C724739002039FD /* tinystr.cpp in Sources */,
+				FF09C8F92C724739002039FD /* ndDelaunayTetrahedralization.cpp in Sources */,
+				FF09C8E52C724739002039FD /* ndBezierSpline.cpp in Sources */,
+				FF09C8EE2C724739002039FD /* ndConvexHull3d.cpp in Sources */,
+				FF09C8EC2C724739002039FD /* ndConvexHull2d.cpp in Sources */,
+				FF09C9202C724739002039FD /* ndSemaphore.cpp in Sources */,
+				FF09C9392C724739002039FD /* ndTypes.cpp in Sources */,
+				FF09C9372C724739002039FD /* ndTree.cpp in Sources */,
+				FF09C91A2C724739002039FD /* ndProbability.cpp in Sources */,
+				FF09C91E2C724739002039FD /* ndQuaternion.cpp in Sources */,
+				FF09C93D2C724739002039FD /* ndVector.cpp in Sources */,
+				FF09C8E22C724739002039FD /* ndAabbPolygonSoup.cpp in Sources */,
+				FF09C9162C724739002039FD /* ndPolyhedra.cpp in Sources */,
+				FF09C8F72C724739002039FD /* ndDebug.cpp in Sources */,
+				FF09C9142C724739002039FD /* ndPolygonSoupDatabase.cpp in Sources */,
+				FF09C9232C724739002039FD /* ndSmallDeterminant.cpp in Sources */,
+				FF09C8F52C724739002039FD /* ndCRC.cpp in Sources */,
+				FF09C92F2C724739002039FD /* ndThread.cpp in Sources */,
+				FF09C90C2C724739002039FD /* ndMemory.cpp in Sources */,
+				FF09C8EA2C724739002039FD /* ndContainersAlloc.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		FF09C71F2C72459B002039FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		FF09C7202C72459B002039FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		FF09C7222C72459B002039FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3ZT53J83GC;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		FF09C7232C72459B002039FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3ZT53J83GC;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FF09C7182C72459B002039FD /* Build configuration list for PBXProject "ndNewton" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF09C71F2C72459B002039FD /* Debug */,
+				FF09C7202C72459B002039FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FF09C7212C72459B002039FD /* Build configuration list for PBXNativeTarget "ndNewton" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF09C7222C72459B002039FD /* Debug */,
+				FF09C7232C72459B002039FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FF09C7152C72459B002039FD /* Project object */;
+}
