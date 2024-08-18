@@ -24,7 +24,7 @@
 		DADCED962A83E875003D359E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		DADCED982A83F1A3003D359E /* CppInteropInlineExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CppInteropInlineExample-Bridging-Header.h"; sourceTree = "<group>"; };
 		DADCED992A83F1A3003D359E /* SimpleCxxFunctions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SimpleCxxFunctions.cpp; sourceTree = "<group>"; };
-		FF09C6112C719639002039FD /* SimpleCxxFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCxxFunctions.h; sourceTree = "<group>"; };
+		DADCED9A2A83F1A3003D359E /* SimpleCxxFunctions.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SimpleCxxFunctions.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,10 +58,10 @@
 		DADCED832A83E3DF003D359E /* CppInteropInlineExample */ = {
 			isa = PBXGroup;
 			children = (
-				FF09C6112C719639002039FD /* SimpleCxxFunctions.h */,
 				DADCED842A83E3DF003D359E /* CppInteropInlineExampleApp.swift */,
 				DADCED862A83E3DF003D359E /* ContentView.swift */,
 				DADCED992A83F1A3003D359E /* SimpleCxxFunctions.cpp */,
+				DADCED9A2A83F1A3003D359E /* SimpleCxxFunctions.hpp */,
 				DADCED882A83E3E3003D359E /* Assets.xcassets */,
 				DADCED8A2A83E3E3003D359E /* CppInteropInlineExample.entitlements */,
 				DADCED8B2A83E3E3003D359E /* Preview Content */,

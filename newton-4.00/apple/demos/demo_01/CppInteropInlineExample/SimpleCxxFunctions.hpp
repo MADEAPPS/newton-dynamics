@@ -12,4 +12,4 @@
 
 int myFavoriteNumber();
 
-#endif /* SimpleCxxFunctions_hpp */
+#endif
