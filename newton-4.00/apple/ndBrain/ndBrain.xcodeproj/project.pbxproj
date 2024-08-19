@@ -1,0 +1,671 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FF09CC5D2C73977D002039FD /* ndBrainGpuBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CBFE2C73977D002039FD /* ndBrainGpuBuffer.cpp */; };
+		FF09CC5E2C73977D002039FD /* ndBrainGpuBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CBFF2C73977D002039FD /* ndBrainGpuBuffer.h */; };
+		FF09CC5F2C73977D002039FD /* ndBrainGpuCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC002C73977D002039FD /* ndBrainGpuCommand.cpp */; };
+		FF09CC602C73977D002039FD /* ndBrainGpuCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC012C73977D002039FD /* ndBrainGpuCommand.h */; };
+		FF09CC612C73977D002039FD /* ndBrainGpuContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC022C73977D002039FD /* ndBrainGpuContext.cpp */; };
+		FF09CC622C73977D002039FD /* ndBrainGpuContext.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC032C73977D002039FD /* ndBrainGpuContext.h */; };
+		FF09CC632C73977D002039FD /* ndBrainGpuFloatBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC042C73977D002039FD /* ndBrainGpuFloatBuffer.cpp */; };
+		FF09CC642C73977D002039FD /* ndBrainGpuFloatBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC052C73977D002039FD /* ndBrainGpuFloatBuffer.h */; };
+		FF09CC652C73977D002039FD /* ndBrainGpuInference.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC062C73977D002039FD /* ndBrainGpuInference.cpp */; };
+		FF09CC662C73977D002039FD /* ndBrainGpuInference.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC072C73977D002039FD /* ndBrainGpuInference.h */; };
+		FF09CC672C73977D002039FD /* ndBrainGpuIntegerBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC082C73977D002039FD /* ndBrainGpuIntegerBuffer.cpp */; };
+		FF09CC682C73977D002039FD /* ndBrainGpuIntegerBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC092C73977D002039FD /* ndBrainGpuIntegerBuffer.h */; };
+		FF09CC692C73977D002039FD /* ndBrainGpuScopeMapBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC0A2C73977D002039FD /* ndBrainGpuScopeMapBuffer.cpp */; };
+		FF09CC6A2C73977D002039FD /* ndBrainGpuScopeMapBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC0B2C73977D002039FD /* ndBrainGpuScopeMapBuffer.h */; };
+		FF09CC6B2C73977D002039FD /* ndBrainGpuUniformBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC0C2C73977D002039FD /* ndBrainGpuUniformBuffer.cpp */; };
+		FF09CC6C2C73977D002039FD /* ndBrainGpuUniformBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC0D2C73977D002039FD /* ndBrainGpuUniformBuffer.h */; };
+		FF09CC6D2C73977D002039FD /* ndBrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC102C73977D002039FD /* ndBrain.cpp */; };
+		FF09CC6E2C73977D002039FD /* ndBrain.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC112C73977D002039FD /* ndBrain.h */; };
+		FF09CC6F2C73977D002039FD /* ndBrainAgent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC122C73977D002039FD /* ndBrainAgent.cpp */; };
+		FF09CC702C73977D002039FD /* ndBrainAgent.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC132C73977D002039FD /* ndBrainAgent.h */; };
+		FF09CC712C73977D002039FD /* ndBrainAgentContinuePolicyGradient_Trainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC142C73977D002039FD /* ndBrainAgentContinuePolicyGradient_Trainer.cpp */; };
+		FF09CC722C73977D002039FD /* ndBrainAgentContinuePolicyGradient_Trainer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC152C73977D002039FD /* ndBrainAgentContinuePolicyGradient_Trainer.h */; };
+		FF09CC732C73977D002039FD /* ndBrainAgentContinuePolicyGradient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC162C73977D002039FD /* ndBrainAgentContinuePolicyGradient.cpp */; };
+		FF09CC742C73977D002039FD /* ndBrainAgentContinuePolicyGradient.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC172C73977D002039FD /* ndBrainAgentContinuePolicyGradient.h */; };
+		FF09CC752C73977D002039FD /* ndBrainAgentDDPG_Trainer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC182C73977D002039FD /* ndBrainAgentDDPG_Trainer.h */; };
+		FF09CC762C73977D002039FD /* ndBrainAgentDDPG.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC192C73977D002039FD /* ndBrainAgentDDPG.h */; };
+		FF09CC772C73977D002039FD /* ndBrainAgentDiscretePolicyGradient_Trainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC1A2C73977D002039FD /* ndBrainAgentDiscretePolicyGradient_Trainer.cpp */; };
+		FF09CC782C73977D002039FD /* ndBrainAgentDiscretePolicyGradient_Trainer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC1B2C73977D002039FD /* ndBrainAgentDiscretePolicyGradient_Trainer.h */; };
+		FF09CC792C73977D002039FD /* ndBrainAgentDiscretePolicyGradient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC1C2C73977D002039FD /* ndBrainAgentDiscretePolicyGradient.cpp */; };
+		FF09CC7A2C73977D002039FD /* ndBrainAgentDiscretePolicyGradient.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC1D2C73977D002039FD /* ndBrainAgentDiscretePolicyGradient.h */; };
+		FF09CC7B2C73977D002039FD /* ndBrainAgentDQN_Trainer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC1E2C73977D002039FD /* ndBrainAgentDQN_Trainer.h */; };
+		FF09CC7C2C73977D002039FD /* ndBrainAgentDQN.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC1F2C73977D002039FD /* ndBrainAgentDQN.h */; };
+		FF09CC7D2C73977D002039FD /* ndBrainFloat4.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC202C73977D002039FD /* ndBrainFloat4.h */; };
+		FF09CC7E2C73977D002039FD /* ndBrainInc.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC212C73977D002039FD /* ndBrainInc.h */; };
+		FF09CC7F2C73977D002039FD /* ndBrainLayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC222C73977D002039FD /* ndBrainLayer.cpp */; };
+		FF09CC802C73977D002039FD /* ndBrainLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC232C73977D002039FD /* ndBrainLayer.h */; };
+		FF09CC812C73977D002039FD /* ndBrainLayerActivation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC242C73977D002039FD /* ndBrainLayerActivation.cpp */; };
+		FF09CC822C73977D002039FD /* ndBrainLayerActivation.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC252C73977D002039FD /* ndBrainLayerActivation.h */; };
+		FF09CC832C73977D002039FD /* ndBrainLayerActivationCategoricalSoftmax.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC262C73977D002039FD /* ndBrainLayerActivationCategoricalSoftmax.cpp */; };
+		FF09CC842C73977D002039FD /* ndBrainLayerActivationCategoricalSoftmax.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC272C73977D002039FD /* ndBrainLayerActivationCategoricalSoftmax.h */; };
+		FF09CC852C73977D002039FD /* ndBrainLayerActivationElu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC282C73977D002039FD /* ndBrainLayerActivationElu.cpp */; };
+		FF09CC862C73977D002039FD /* ndBrainLayerActivationElu.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC292C73977D002039FD /* ndBrainLayerActivationElu.h */; };
+		FF09CC872C73977D002039FD /* ndBrainLayerActivationRelu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC2A2C73977D002039FD /* ndBrainLayerActivationRelu.cpp */; };
+		FF09CC882C73977D002039FD /* ndBrainLayerActivationRelu.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC2B2C73977D002039FD /* ndBrainLayerActivationRelu.h */; };
+		FF09CC892C73977D002039FD /* ndBrainLayerActivationSigmoid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC2C2C73977D002039FD /* ndBrainLayerActivationSigmoid.cpp */; };
+		FF09CC8A2C73977D002039FD /* ndBrainLayerActivationSigmoid.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC2D2C73977D002039FD /* ndBrainLayerActivationSigmoid.h */; };
+		FF09CC8B2C73977D002039FD /* ndBrainLayerActivationSigmoidLinear.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC2E2C73977D002039FD /* ndBrainLayerActivationSigmoidLinear.cpp */; };
+		FF09CC8C2C73977D002039FD /* ndBrainLayerActivationSigmoidLinear.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC2F2C73977D002039FD /* ndBrainLayerActivationSigmoidLinear.h */; };
+		FF09CC8D2C73977D002039FD /* ndBrainLayerActivationSoftmax.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC302C73977D002039FD /* ndBrainLayerActivationSoftmax.cpp */; };
+		FF09CC8E2C73977D002039FD /* ndBrainLayerActivationSoftmax.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC312C73977D002039FD /* ndBrainLayerActivationSoftmax.h */; };
+		FF09CC8F2C73977D002039FD /* ndBrainLayerActivationTanh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC322C73977D002039FD /* ndBrainLayerActivationTanh.cpp */; };
+		FF09CC902C73977D002039FD /* ndBrainLayerActivationTanh.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC332C73977D002039FD /* ndBrainLayerActivationTanh.h */; };
+		FF09CC912C73977D002039FD /* ndBrainLayerConvolutional_2d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC342C73977D002039FD /* ndBrainLayerConvolutional_2d.cpp */; };
+		FF09CC922C73977D002039FD /* ndBrainLayerConvolutional_2d.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC352C73977D002039FD /* ndBrainLayerConvolutional_2d.h */; };
+		FF09CC932C73977D002039FD /* ndBrainLayerConvolutionalWithDropOut_2d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC362C73977D002039FD /* ndBrainLayerConvolutionalWithDropOut_2d.cpp */; };
+		FF09CC942C73977D002039FD /* ndBrainLayerConvolutionalWithDropOut_2d.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC372C73977D002039FD /* ndBrainLayerConvolutionalWithDropOut_2d.h */; };
+		FF09CC952C73977D002039FD /* ndBrainLayerCrossCorrelation_2d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC382C73977D002039FD /* ndBrainLayerCrossCorrelation_2d.cpp */; };
+		FF09CC962C73977D002039FD /* ndBrainLayerCrossCorrelation_2d.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC392C73977D002039FD /* ndBrainLayerCrossCorrelation_2d.h */; };
+		FF09CC972C73977D002039FD /* ndBrainLayerImagePadding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC3A2C73977D002039FD /* ndBrainLayerImagePadding.cpp */; };
+		FF09CC982C73977D002039FD /* ndBrainLayerImagePadding.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC3B2C73977D002039FD /* ndBrainLayerImagePadding.h */; };
+		FF09CC992C73977D002039FD /* ndBrainLayerImagePolling_2x2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC3C2C73977D002039FD /* ndBrainLayerImagePolling_2x2.cpp */; };
+		FF09CC9A2C73977D002039FD /* ndBrainLayerImagePolling_2x2.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC3D2C73977D002039FD /* ndBrainLayerImagePolling_2x2.h */; };
+		FF09CC9B2C73977D002039FD /* ndBrainLayerLinear.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC3E2C73977D002039FD /* ndBrainLayerLinear.cpp */; };
+		FF09CC9C2C73977D002039FD /* ndBrainLayerLinear.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC3F2C73977D002039FD /* ndBrainLayerLinear.h */; };
+		FF09CC9D2C73977D002039FD /* ndBrainLayerLinearWithDropOut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC402C73977D002039FD /* ndBrainLayerLinearWithDropOut.cpp */; };
+		FF09CC9E2C73977D002039FD /* ndBrainLayerLinearWithDropOut.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC412C73977D002039FD /* ndBrainLayerLinearWithDropOut.h */; };
+		FF09CC9F2C73977D002039FD /* ndBrainLoss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC422C73977D002039FD /* ndBrainLoss.cpp */; };
+		FF09CCA02C73977D002039FD /* ndBrainLoss.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC432C73977D002039FD /* ndBrainLoss.h */; };
+		FF09CCA12C73977D002039FD /* ndBrainLossCategoricalCrossEntropy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC442C73977D002039FD /* ndBrainLossCategoricalCrossEntropy.cpp */; };
+		FF09CCA22C73977D002039FD /* ndBrainLossCategoricalCrossEntropy.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC452C73977D002039FD /* ndBrainLossCategoricalCrossEntropy.h */; };
+		FF09CCA32C73977D002039FD /* ndBrainLossLeastSquaredError.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC462C73977D002039FD /* ndBrainLossLeastSquaredError.cpp */; };
+		FF09CCA42C73977D002039FD /* ndBrainLossLeastSquaredError.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC472C73977D002039FD /* ndBrainLossLeastSquaredError.h */; };
+		FF09CCA52C73977D002039FD /* ndBrainMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC482C73977D002039FD /* ndBrainMatrix.cpp */; };
+		FF09CCA62C73977D002039FD /* ndBrainMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC492C73977D002039FD /* ndBrainMatrix.h */; };
+		FF09CCA72C73977D002039FD /* ndBrainOptimizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC4A2C73977D002039FD /* ndBrainOptimizer.cpp */; };
+		FF09CCA82C73977D002039FD /* ndBrainOptimizer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC4B2C73977D002039FD /* ndBrainOptimizer.h */; };
+		FF09CCA92C73977D002039FD /* ndBrainOptimizerAdam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC4C2C73977D002039FD /* ndBrainOptimizerAdam.cpp */; };
+		FF09CCAA2C73977D002039FD /* ndBrainOptimizerAdam.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC4D2C73977D002039FD /* ndBrainOptimizerAdam.h */; };
+		FF09CCAB2C73977D002039FD /* ndBrainOptimizerSgd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC4E2C73977D002039FD /* ndBrainOptimizerSgd.cpp */; };
+		FF09CCAC2C73977D002039FD /* ndBrainOptimizerSgd.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC4F2C73977D002039FD /* ndBrainOptimizerSgd.h */; };
+		FF09CCAD2C73977D002039FD /* ndBrainReplayBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC502C73977D002039FD /* ndBrainReplayBuffer.cpp */; };
+		FF09CCAE2C73977D002039FD /* ndBrainReplayBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC512C73977D002039FD /* ndBrainReplayBuffer.h */; };
+		FF09CCAF2C73977D002039FD /* ndBrainSaveLoad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC522C73977D002039FD /* ndBrainSaveLoad.cpp */; };
+		FF09CCB02C73977D002039FD /* ndBrainSaveLoad.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC532C73977D002039FD /* ndBrainSaveLoad.h */; };
+		FF09CCB12C73977D002039FD /* ndBrainStdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC542C73977D002039FD /* ndBrainStdafx.cpp */; };
+		FF09CCB22C73977D002039FD /* ndBrainStdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC552C73977D002039FD /* ndBrainStdafx.h */; };
+		FF09CCB32C73977D002039FD /* ndBrainThreadPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC562C73977D002039FD /* ndBrainThreadPool.cpp */; };
+		FF09CCB42C73977D002039FD /* ndBrainThreadPool.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC572C73977D002039FD /* ndBrainThreadPool.h */; };
+		FF09CCB52C73977D002039FD /* ndBrainTrainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC582C73977D002039FD /* ndBrainTrainer.cpp */; };
+		FF09CCB62C73977D002039FD /* ndBrainTrainer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC592C73977D002039FD /* ndBrainTrainer.h */; };
+		FF09CCB72C73977D002039FD /* ndBrainVector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CC5A2C73977D002039FD /* ndBrainVector.cpp */; };
+		FF09CCB82C73977D002039FD /* ndBrainVector.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CC5B2C73977D002039FD /* ndBrainVector.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		FF09CBF72C73973B002039FD /* libndBrain.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libndBrain.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF09CBFE2C73977D002039FD /* ndBrainGpuBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainGpuBuffer.cpp; sourceTree = "<group>"; };
+		FF09CBFF2C73977D002039FD /* ndBrainGpuBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainGpuBuffer.h; sourceTree = "<group>"; };
+		FF09CC002C73977D002039FD /* ndBrainGpuCommand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainGpuCommand.cpp; sourceTree = "<group>"; };
+		FF09CC012C73977D002039FD /* ndBrainGpuCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainGpuCommand.h; sourceTree = "<group>"; };
+		FF09CC022C73977D002039FD /* ndBrainGpuContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainGpuContext.cpp; sourceTree = "<group>"; };
+		FF09CC032C73977D002039FD /* ndBrainGpuContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainGpuContext.h; sourceTree = "<group>"; };
+		FF09CC042C73977D002039FD /* ndBrainGpuFloatBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainGpuFloatBuffer.cpp; sourceTree = "<group>"; };
+		FF09CC052C73977D002039FD /* ndBrainGpuFloatBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainGpuFloatBuffer.h; sourceTree = "<group>"; };
+		FF09CC062C73977D002039FD /* ndBrainGpuInference.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainGpuInference.cpp; sourceTree = "<group>"; };
+		FF09CC072C73977D002039FD /* ndBrainGpuInference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainGpuInference.h; sourceTree = "<group>"; };
+		FF09CC082C73977D002039FD /* ndBrainGpuIntegerBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainGpuIntegerBuffer.cpp; sourceTree = "<group>"; };
+		FF09CC092C73977D002039FD /* ndBrainGpuIntegerBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainGpuIntegerBuffer.h; sourceTree = "<group>"; };
+		FF09CC0A2C73977D002039FD /* ndBrainGpuScopeMapBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainGpuScopeMapBuffer.cpp; sourceTree = "<group>"; };
+		FF09CC0B2C73977D002039FD /* ndBrainGpuScopeMapBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainGpuScopeMapBuffer.h; sourceTree = "<group>"; };
+		FF09CC0C2C73977D002039FD /* ndBrainGpuUniformBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainGpuUniformBuffer.cpp; sourceTree = "<group>"; };
+		FF09CC0D2C73977D002039FD /* ndBrainGpuUniformBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainGpuUniformBuffer.h; sourceTree = "<group>"; };
+		FF09CC0F2C73977D002039FD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		FF09CC102C73977D002039FD /* ndBrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrain.cpp; sourceTree = "<group>"; };
+		FF09CC112C73977D002039FD /* ndBrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrain.h; sourceTree = "<group>"; };
+		FF09CC122C73977D002039FD /* ndBrainAgent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainAgent.cpp; sourceTree = "<group>"; };
+		FF09CC132C73977D002039FD /* ndBrainAgent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainAgent.h; sourceTree = "<group>"; };
+		FF09CC142C73977D002039FD /* ndBrainAgentContinuePolicyGradient_Trainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainAgentContinuePolicyGradient_Trainer.cpp; sourceTree = "<group>"; };
+		FF09CC152C73977D002039FD /* ndBrainAgentContinuePolicyGradient_Trainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainAgentContinuePolicyGradient_Trainer.h; sourceTree = "<group>"; };
+		FF09CC162C73977D002039FD /* ndBrainAgentContinuePolicyGradient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainAgentContinuePolicyGradient.cpp; sourceTree = "<group>"; };
+		FF09CC172C73977D002039FD /* ndBrainAgentContinuePolicyGradient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainAgentContinuePolicyGradient.h; sourceTree = "<group>"; };
+		FF09CC182C73977D002039FD /* ndBrainAgentDDPG_Trainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainAgentDDPG_Trainer.h; sourceTree = "<group>"; };
+		FF09CC192C73977D002039FD /* ndBrainAgentDDPG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainAgentDDPG.h; sourceTree = "<group>"; };
+		FF09CC1A2C73977D002039FD /* ndBrainAgentDiscretePolicyGradient_Trainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainAgentDiscretePolicyGradient_Trainer.cpp; sourceTree = "<group>"; };
+		FF09CC1B2C73977D002039FD /* ndBrainAgentDiscretePolicyGradient_Trainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainAgentDiscretePolicyGradient_Trainer.h; sourceTree = "<group>"; };
+		FF09CC1C2C73977D002039FD /* ndBrainAgentDiscretePolicyGradient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainAgentDiscretePolicyGradient.cpp; sourceTree = "<group>"; };
+		FF09CC1D2C73977D002039FD /* ndBrainAgentDiscretePolicyGradient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainAgentDiscretePolicyGradient.h; sourceTree = "<group>"; };
+		FF09CC1E2C73977D002039FD /* ndBrainAgentDQN_Trainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainAgentDQN_Trainer.h; sourceTree = "<group>"; };
+		FF09CC1F2C73977D002039FD /* ndBrainAgentDQN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainAgentDQN.h; sourceTree = "<group>"; };
+		FF09CC202C73977D002039FD /* ndBrainFloat4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainFloat4.h; sourceTree = "<group>"; };
+		FF09CC212C73977D002039FD /* ndBrainInc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainInc.h; sourceTree = "<group>"; };
+		FF09CC222C73977D002039FD /* ndBrainLayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayer.cpp; sourceTree = "<group>"; };
+		FF09CC232C73977D002039FD /* ndBrainLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayer.h; sourceTree = "<group>"; };
+		FF09CC242C73977D002039FD /* ndBrainLayerActivation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerActivation.cpp; sourceTree = "<group>"; };
+		FF09CC252C73977D002039FD /* ndBrainLayerActivation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerActivation.h; sourceTree = "<group>"; };
+		FF09CC262C73977D002039FD /* ndBrainLayerActivationCategoricalSoftmax.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerActivationCategoricalSoftmax.cpp; sourceTree = "<group>"; };
+		FF09CC272C73977D002039FD /* ndBrainLayerActivationCategoricalSoftmax.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerActivationCategoricalSoftmax.h; sourceTree = "<group>"; };
+		FF09CC282C73977D002039FD /* ndBrainLayerActivationElu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerActivationElu.cpp; sourceTree = "<group>"; };
+		FF09CC292C73977D002039FD /* ndBrainLayerActivationElu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerActivationElu.h; sourceTree = "<group>"; };
+		FF09CC2A2C73977D002039FD /* ndBrainLayerActivationRelu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerActivationRelu.cpp; sourceTree = "<group>"; };
+		FF09CC2B2C73977D002039FD /* ndBrainLayerActivationRelu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerActivationRelu.h; sourceTree = "<group>"; };
+		FF09CC2C2C73977D002039FD /* ndBrainLayerActivationSigmoid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerActivationSigmoid.cpp; sourceTree = "<group>"; };
+		FF09CC2D2C73977D002039FD /* ndBrainLayerActivationSigmoid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerActivationSigmoid.h; sourceTree = "<group>"; };
+		FF09CC2E2C73977D002039FD /* ndBrainLayerActivationSigmoidLinear.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerActivationSigmoidLinear.cpp; sourceTree = "<group>"; };
+		FF09CC2F2C73977D002039FD /* ndBrainLayerActivationSigmoidLinear.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerActivationSigmoidLinear.h; sourceTree = "<group>"; };
+		FF09CC302C73977D002039FD /* ndBrainLayerActivationSoftmax.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerActivationSoftmax.cpp; sourceTree = "<group>"; };
+		FF09CC312C73977D002039FD /* ndBrainLayerActivationSoftmax.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerActivationSoftmax.h; sourceTree = "<group>"; };
+		FF09CC322C73977D002039FD /* ndBrainLayerActivationTanh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerActivationTanh.cpp; sourceTree = "<group>"; };
+		FF09CC332C73977D002039FD /* ndBrainLayerActivationTanh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerActivationTanh.h; sourceTree = "<group>"; };
+		FF09CC342C73977D002039FD /* ndBrainLayerConvolutional_2d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerConvolutional_2d.cpp; sourceTree = "<group>"; };
+		FF09CC352C73977D002039FD /* ndBrainLayerConvolutional_2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerConvolutional_2d.h; sourceTree = "<group>"; };
+		FF09CC362C73977D002039FD /* ndBrainLayerConvolutionalWithDropOut_2d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerConvolutionalWithDropOut_2d.cpp; sourceTree = "<group>"; };
+		FF09CC372C73977D002039FD /* ndBrainLayerConvolutionalWithDropOut_2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerConvolutionalWithDropOut_2d.h; sourceTree = "<group>"; };
+		FF09CC382C73977D002039FD /* ndBrainLayerCrossCorrelation_2d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerCrossCorrelation_2d.cpp; sourceTree = "<group>"; };
+		FF09CC392C73977D002039FD /* ndBrainLayerCrossCorrelation_2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerCrossCorrelation_2d.h; sourceTree = "<group>"; };
+		FF09CC3A2C73977D002039FD /* ndBrainLayerImagePadding.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerImagePadding.cpp; sourceTree = "<group>"; };
+		FF09CC3B2C73977D002039FD /* ndBrainLayerImagePadding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerImagePadding.h; sourceTree = "<group>"; };
+		FF09CC3C2C73977D002039FD /* ndBrainLayerImagePolling_2x2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerImagePolling_2x2.cpp; sourceTree = "<group>"; };
+		FF09CC3D2C73977D002039FD /* ndBrainLayerImagePolling_2x2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerImagePolling_2x2.h; sourceTree = "<group>"; };
+		FF09CC3E2C73977D002039FD /* ndBrainLayerLinear.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerLinear.cpp; sourceTree = "<group>"; };
+		FF09CC3F2C73977D002039FD /* ndBrainLayerLinear.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerLinear.h; sourceTree = "<group>"; };
+		FF09CC402C73977D002039FD /* ndBrainLayerLinearWithDropOut.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLayerLinearWithDropOut.cpp; sourceTree = "<group>"; };
+		FF09CC412C73977D002039FD /* ndBrainLayerLinearWithDropOut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLayerLinearWithDropOut.h; sourceTree = "<group>"; };
+		FF09CC422C73977D002039FD /* ndBrainLoss.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLoss.cpp; sourceTree = "<group>"; };
+		FF09CC432C73977D002039FD /* ndBrainLoss.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLoss.h; sourceTree = "<group>"; };
+		FF09CC442C73977D002039FD /* ndBrainLossCategoricalCrossEntropy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLossCategoricalCrossEntropy.cpp; sourceTree = "<group>"; };
+		FF09CC452C73977D002039FD /* ndBrainLossCategoricalCrossEntropy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLossCategoricalCrossEntropy.h; sourceTree = "<group>"; };
+		FF09CC462C73977D002039FD /* ndBrainLossLeastSquaredError.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainLossLeastSquaredError.cpp; sourceTree = "<group>"; };
+		FF09CC472C73977D002039FD /* ndBrainLossLeastSquaredError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainLossLeastSquaredError.h; sourceTree = "<group>"; };
+		FF09CC482C73977D002039FD /* ndBrainMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainMatrix.cpp; sourceTree = "<group>"; };
+		FF09CC492C73977D002039FD /* ndBrainMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainMatrix.h; sourceTree = "<group>"; };
+		FF09CC4A2C73977D002039FD /* ndBrainOptimizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainOptimizer.cpp; sourceTree = "<group>"; };
+		FF09CC4B2C73977D002039FD /* ndBrainOptimizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainOptimizer.h; sourceTree = "<group>"; };
+		FF09CC4C2C73977D002039FD /* ndBrainOptimizerAdam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainOptimizerAdam.cpp; sourceTree = "<group>"; };
+		FF09CC4D2C73977D002039FD /* ndBrainOptimizerAdam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainOptimizerAdam.h; sourceTree = "<group>"; };
+		FF09CC4E2C73977D002039FD /* ndBrainOptimizerSgd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainOptimizerSgd.cpp; sourceTree = "<group>"; };
+		FF09CC4F2C73977D002039FD /* ndBrainOptimizerSgd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainOptimizerSgd.h; sourceTree = "<group>"; };
+		FF09CC502C73977D002039FD /* ndBrainReplayBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainReplayBuffer.cpp; sourceTree = "<group>"; };
+		FF09CC512C73977D002039FD /* ndBrainReplayBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainReplayBuffer.h; sourceTree = "<group>"; };
+		FF09CC522C73977D002039FD /* ndBrainSaveLoad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainSaveLoad.cpp; sourceTree = "<group>"; };
+		FF09CC532C73977D002039FD /* ndBrainSaveLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainSaveLoad.h; sourceTree = "<group>"; };
+		FF09CC542C73977D002039FD /* ndBrainStdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainStdafx.cpp; sourceTree = "<group>"; };
+		FF09CC552C73977D002039FD /* ndBrainStdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainStdafx.h; sourceTree = "<group>"; };
+		FF09CC562C73977D002039FD /* ndBrainThreadPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainThreadPool.cpp; sourceTree = "<group>"; };
+		FF09CC572C73977D002039FD /* ndBrainThreadPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainThreadPool.h; sourceTree = "<group>"; };
+		FF09CC582C73977D002039FD /* ndBrainTrainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainTrainer.cpp; sourceTree = "<group>"; };
+		FF09CC592C73977D002039FD /* ndBrainTrainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainTrainer.h; sourceTree = "<group>"; };
+		FF09CC5A2C73977D002039FD /* ndBrainVector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndBrainVector.cpp; sourceTree = "<group>"; };
+		FF09CC5B2C73977D002039FD /* ndBrainVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndBrainVector.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FF09CBF52C73973B002039FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FF09CBEE2C73973B002039FD = {
+			isa = PBXGroup;
+			children = (
+				FF09CC5C2C73977D002039FD /* dBrain */,
+				FF09CBF82C73973B002039FD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FF09CBF82C73973B002039FD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CBF72C73973B002039FD /* libndBrain.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF09CC0E2C73977D002039FD /* gpu */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CBFE2C73977D002039FD /* ndBrainGpuBuffer.cpp */,
+				FF09CBFF2C73977D002039FD /* ndBrainGpuBuffer.h */,
+				FF09CC002C73977D002039FD /* ndBrainGpuCommand.cpp */,
+				FF09CC012C73977D002039FD /* ndBrainGpuCommand.h */,
+				FF09CC022C73977D002039FD /* ndBrainGpuContext.cpp */,
+				FF09CC032C73977D002039FD /* ndBrainGpuContext.h */,
+				FF09CC042C73977D002039FD /* ndBrainGpuFloatBuffer.cpp */,
+				FF09CC052C73977D002039FD /* ndBrainGpuFloatBuffer.h */,
+				FF09CC062C73977D002039FD /* ndBrainGpuInference.cpp */,
+				FF09CC072C73977D002039FD /* ndBrainGpuInference.h */,
+				FF09CC082C73977D002039FD /* ndBrainGpuIntegerBuffer.cpp */,
+				FF09CC092C73977D002039FD /* ndBrainGpuIntegerBuffer.h */,
+				FF09CC0A2C73977D002039FD /* ndBrainGpuScopeMapBuffer.cpp */,
+				FF09CC0B2C73977D002039FD /* ndBrainGpuScopeMapBuffer.h */,
+				FF09CC0C2C73977D002039FD /* ndBrainGpuUniformBuffer.cpp */,
+				FF09CC0D2C73977D002039FD /* ndBrainGpuUniformBuffer.h */,
+			);
+			path = gpu;
+			sourceTree = "<group>";
+		};
+		FF09CC5C2C73977D002039FD /* dBrain */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CC0E2C73977D002039FD /* gpu */,
+				FF09CC0F2C73977D002039FD /* CMakeLists.txt */,
+				FF09CC102C73977D002039FD /* ndBrain.cpp */,
+				FF09CC112C73977D002039FD /* ndBrain.h */,
+				FF09CC122C73977D002039FD /* ndBrainAgent.cpp */,
+				FF09CC132C73977D002039FD /* ndBrainAgent.h */,
+				FF09CC142C73977D002039FD /* ndBrainAgentContinuePolicyGradient_Trainer.cpp */,
+				FF09CC152C73977D002039FD /* ndBrainAgentContinuePolicyGradient_Trainer.h */,
+				FF09CC162C73977D002039FD /* ndBrainAgentContinuePolicyGradient.cpp */,
+				FF09CC172C73977D002039FD /* ndBrainAgentContinuePolicyGradient.h */,
+				FF09CC182C73977D002039FD /* ndBrainAgentDDPG_Trainer.h */,
+				FF09CC192C73977D002039FD /* ndBrainAgentDDPG.h */,
+				FF09CC1A2C73977D002039FD /* ndBrainAgentDiscretePolicyGradient_Trainer.cpp */,
+				FF09CC1B2C73977D002039FD /* ndBrainAgentDiscretePolicyGradient_Trainer.h */,
+				FF09CC1C2C73977D002039FD /* ndBrainAgentDiscretePolicyGradient.cpp */,
+				FF09CC1D2C73977D002039FD /* ndBrainAgentDiscretePolicyGradient.h */,
+				FF09CC1E2C73977D002039FD /* ndBrainAgentDQN_Trainer.h */,
+				FF09CC1F2C73977D002039FD /* ndBrainAgentDQN.h */,
+				FF09CC202C73977D002039FD /* ndBrainFloat4.h */,
+				FF09CC212C73977D002039FD /* ndBrainInc.h */,
+				FF09CC222C73977D002039FD /* ndBrainLayer.cpp */,
+				FF09CC232C73977D002039FD /* ndBrainLayer.h */,
+				FF09CC242C73977D002039FD /* ndBrainLayerActivation.cpp */,
+				FF09CC252C73977D002039FD /* ndBrainLayerActivation.h */,
+				FF09CC262C73977D002039FD /* ndBrainLayerActivationCategoricalSoftmax.cpp */,
+				FF09CC272C73977D002039FD /* ndBrainLayerActivationCategoricalSoftmax.h */,
+				FF09CC282C73977D002039FD /* ndBrainLayerActivationElu.cpp */,
+				FF09CC292C73977D002039FD /* ndBrainLayerActivationElu.h */,
+				FF09CC2A2C73977D002039FD /* ndBrainLayerActivationRelu.cpp */,
+				FF09CC2B2C73977D002039FD /* ndBrainLayerActivationRelu.h */,
+				FF09CC2C2C73977D002039FD /* ndBrainLayerActivationSigmoid.cpp */,
+				FF09CC2D2C73977D002039FD /* ndBrainLayerActivationSigmoid.h */,
+				FF09CC2E2C73977D002039FD /* ndBrainLayerActivationSigmoidLinear.cpp */,
+				FF09CC2F2C73977D002039FD /* ndBrainLayerActivationSigmoidLinear.h */,
+				FF09CC302C73977D002039FD /* ndBrainLayerActivationSoftmax.cpp */,
+				FF09CC312C73977D002039FD /* ndBrainLayerActivationSoftmax.h */,
+				FF09CC322C73977D002039FD /* ndBrainLayerActivationTanh.cpp */,
+				FF09CC332C73977D002039FD /* ndBrainLayerActivationTanh.h */,
+				FF09CC342C73977D002039FD /* ndBrainLayerConvolutional_2d.cpp */,
+				FF09CC352C73977D002039FD /* ndBrainLayerConvolutional_2d.h */,
+				FF09CC362C73977D002039FD /* ndBrainLayerConvolutionalWithDropOut_2d.cpp */,
+				FF09CC372C73977D002039FD /* ndBrainLayerConvolutionalWithDropOut_2d.h */,
+				FF09CC382C73977D002039FD /* ndBrainLayerCrossCorrelation_2d.cpp */,
+				FF09CC392C73977D002039FD /* ndBrainLayerCrossCorrelation_2d.h */,
+				FF09CC3A2C73977D002039FD /* ndBrainLayerImagePadding.cpp */,
+				FF09CC3B2C73977D002039FD /* ndBrainLayerImagePadding.h */,
+				FF09CC3C2C73977D002039FD /* ndBrainLayerImagePolling_2x2.cpp */,
+				FF09CC3D2C73977D002039FD /* ndBrainLayerImagePolling_2x2.h */,
+				FF09CC3E2C73977D002039FD /* ndBrainLayerLinear.cpp */,
+				FF09CC3F2C73977D002039FD /* ndBrainLayerLinear.h */,
+				FF09CC402C73977D002039FD /* ndBrainLayerLinearWithDropOut.cpp */,
+				FF09CC412C73977D002039FD /* ndBrainLayerLinearWithDropOut.h */,
+				FF09CC422C73977D002039FD /* ndBrainLoss.cpp */,
+				FF09CC432C73977D002039FD /* ndBrainLoss.h */,
+				FF09CC442C73977D002039FD /* ndBrainLossCategoricalCrossEntropy.cpp */,
+				FF09CC452C73977D002039FD /* ndBrainLossCategoricalCrossEntropy.h */,
+				FF09CC462C73977D002039FD /* ndBrainLossLeastSquaredError.cpp */,
+				FF09CC472C73977D002039FD /* ndBrainLossLeastSquaredError.h */,
+				FF09CC482C73977D002039FD /* ndBrainMatrix.cpp */,
+				FF09CC492C73977D002039FD /* ndBrainMatrix.h */,
+				FF09CC4A2C73977D002039FD /* ndBrainOptimizer.cpp */,
+				FF09CC4B2C73977D002039FD /* ndBrainOptimizer.h */,
+				FF09CC4C2C73977D002039FD /* ndBrainOptimizerAdam.cpp */,
+				FF09CC4D2C73977D002039FD /* ndBrainOptimizerAdam.h */,
+				FF09CC4E2C73977D002039FD /* ndBrainOptimizerSgd.cpp */,
+				FF09CC4F2C73977D002039FD /* ndBrainOptimizerSgd.h */,
+				FF09CC502C73977D002039FD /* ndBrainReplayBuffer.cpp */,
+				FF09CC512C73977D002039FD /* ndBrainReplayBuffer.h */,
+				FF09CC522C73977D002039FD /* ndBrainSaveLoad.cpp */,
+				FF09CC532C73977D002039FD /* ndBrainSaveLoad.h */,
+				FF09CC542C73977D002039FD /* ndBrainStdafx.cpp */,
+				FF09CC552C73977D002039FD /* ndBrainStdafx.h */,
+				FF09CC562C73977D002039FD /* ndBrainThreadPool.cpp */,
+				FF09CC572C73977D002039FD /* ndBrainThreadPool.h */,
+				FF09CC582C73977D002039FD /* ndBrainTrainer.cpp */,
+				FF09CC592C73977D002039FD /* ndBrainTrainer.h */,
+				FF09CC5A2C73977D002039FD /* ndBrainVector.cpp */,
+				FF09CC5B2C73977D002039FD /* ndBrainVector.h */,
+			);
+			name = dBrain;
+			path = ../../sdk/dBrain;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		FF09CBF32C73973B002039FD /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF09CCAC2C73977D002039FD /* ndBrainOptimizerSgd.h in Headers */,
+				FF09CC9E2C73977D002039FD /* ndBrainLayerLinearWithDropOut.h in Headers */,
+				FF09CC9A2C73977D002039FD /* ndBrainLayerImagePolling_2x2.h in Headers */,
+				FF09CC6E2C73977D002039FD /* ndBrain.h in Headers */,
+				FF09CC822C73977D002039FD /* ndBrainLayerActivation.h in Headers */,
+				FF09CCAA2C73977D002039FD /* ndBrainOptimizerAdam.h in Headers */,
+				FF09CC622C73977D002039FD /* ndBrainGpuContext.h in Headers */,
+				FF09CC922C73977D002039FD /* ndBrainLayerConvolutional_2d.h in Headers */,
+				FF09CC6A2C73977D002039FD /* ndBrainGpuScopeMapBuffer.h in Headers */,
+				FF09CC8E2C73977D002039FD /* ndBrainLayerActivationSoftmax.h in Headers */,
+				FF09CC862C73977D002039FD /* ndBrainLayerActivationElu.h in Headers */,
+				FF09CC7B2C73977D002039FD /* ndBrainAgentDQN_Trainer.h in Headers */,
+				FF09CC602C73977D002039FD /* ndBrainGpuCommand.h in Headers */,
+				FF09CC7C2C73977D002039FD /* ndBrainAgentDQN.h in Headers */,
+				FF09CCA22C73977D002039FD /* ndBrainLossCategoricalCrossEntropy.h in Headers */,
+				FF09CC7E2C73977D002039FD /* ndBrainInc.h in Headers */,
+				FF09CC6C2C73977D002039FD /* ndBrainGpuUniformBuffer.h in Headers */,
+				FF09CCB22C73977D002039FD /* ndBrainStdafx.h in Headers */,
+				FF09CC882C73977D002039FD /* ndBrainLayerActivationRelu.h in Headers */,
+				FF09CCA62C73977D002039FD /* ndBrainMatrix.h in Headers */,
+				FF09CCB82C73977D002039FD /* ndBrainVector.h in Headers */,
+				FF09CC5E2C73977D002039FD /* ndBrainGpuBuffer.h in Headers */,
+				FF09CCAE2C73977D002039FD /* ndBrainReplayBuffer.h in Headers */,
+				FF09CC842C73977D002039FD /* ndBrainLayerActivationCategoricalSoftmax.h in Headers */,
+				FF09CC742C73977D002039FD /* ndBrainAgentContinuePolicyGradient.h in Headers */,
+				FF09CCB42C73977D002039FD /* ndBrainThreadPool.h in Headers */,
+				FF09CCA82C73977D002039FD /* ndBrainOptimizer.h in Headers */,
+				FF09CC642C73977D002039FD /* ndBrainGpuFloatBuffer.h in Headers */,
+				FF09CC982C73977D002039FD /* ndBrainLayerImagePadding.h in Headers */,
+				FF09CC7A2C73977D002039FD /* ndBrainAgentDiscretePolicyGradient.h in Headers */,
+				FF09CC9C2C73977D002039FD /* ndBrainLayerLinear.h in Headers */,
+				FF09CCB02C73977D002039FD /* ndBrainSaveLoad.h in Headers */,
+				FF09CC8C2C73977D002039FD /* ndBrainLayerActivationSigmoidLinear.h in Headers */,
+				FF09CC942C73977D002039FD /* ndBrainLayerConvolutionalWithDropOut_2d.h in Headers */,
+				FF09CC702C73977D002039FD /* ndBrainAgent.h in Headers */,
+				FF09CC802C73977D002039FD /* ndBrainLayer.h in Headers */,
+				FF09CC662C73977D002039FD /* ndBrainGpuInference.h in Headers */,
+				FF09CC7D2C73977D002039FD /* ndBrainFloat4.h in Headers */,
+				FF09CC8A2C73977D002039FD /* ndBrainLayerActivationSigmoid.h in Headers */,
+				FF09CC962C73977D002039FD /* ndBrainLayerCrossCorrelation_2d.h in Headers */,
+				FF09CCA42C73977D002039FD /* ndBrainLossLeastSquaredError.h in Headers */,
+				FF09CC752C73977D002039FD /* ndBrainAgentDDPG_Trainer.h in Headers */,
+				FF09CCB62C73977D002039FD /* ndBrainTrainer.h in Headers */,
+				FF09CC782C73977D002039FD /* ndBrainAgentDiscretePolicyGradient_Trainer.h in Headers */,
+				FF09CC902C73977D002039FD /* ndBrainLayerActivationTanh.h in Headers */,
+				FF09CCA02C73977D002039FD /* ndBrainLoss.h in Headers */,
+				FF09CC722C73977D002039FD /* ndBrainAgentContinuePolicyGradient_Trainer.h in Headers */,
+				FF09CC762C73977D002039FD /* ndBrainAgentDDPG.h in Headers */,
+				FF09CC682C73977D002039FD /* ndBrainGpuIntegerBuffer.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		FF09CBF62C73973B002039FD /* ndBrain */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FF09CBFB2C73973B002039FD /* Build configuration list for PBXNativeTarget "ndBrain" */;
+			buildPhases = (
+				FF09CBF32C73973B002039FD /* Headers */,
+				FF09CBF42C73973B002039FD /* Sources */,
+				FF09CBF52C73973B002039FD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ndBrain;
+			productName = ndBrain;
+			productReference = FF09CBF72C73973B002039FD /* libndBrain.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FF09CBEF2C73973B002039FD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					FF09CBF62C73973B002039FD = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = FF09CBF22C73973B002039FD /* Build configuration list for PBXProject "ndBrain" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FF09CBEE2C73973B002039FD;
+			productRefGroup = FF09CBF82C73973B002039FD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FF09CBF62C73973B002039FD /* ndBrain */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FF09CBF42C73973B002039FD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF09CCB52C73977D002039FD /* ndBrainTrainer.cpp in Sources */,
+				FF09CC9B2C73977D002039FD /* ndBrainLayerLinear.cpp in Sources */,
+				FF09CC6B2C73977D002039FD /* ndBrainGpuUniformBuffer.cpp in Sources */,
+				FF09CC672C73977D002039FD /* ndBrainGpuIntegerBuffer.cpp in Sources */,
+				FF09CCAB2C73977D002039FD /* ndBrainOptimizerSgd.cpp in Sources */,
+				FF09CC932C73977D002039FD /* ndBrainLayerConvolutionalWithDropOut_2d.cpp in Sources */,
+				FF09CC6F2C73977D002039FD /* ndBrainAgent.cpp in Sources */,
+				FF09CC952C73977D002039FD /* ndBrainLayerCrossCorrelation_2d.cpp in Sources */,
+				FF09CC8D2C73977D002039FD /* ndBrainLayerActivationSoftmax.cpp in Sources */,
+				FF09CC7F2C73977D002039FD /* ndBrainLayer.cpp in Sources */,
+				FF09CC632C73977D002039FD /* ndBrainGpuFloatBuffer.cpp in Sources */,
+				FF09CCB12C73977D002039FD /* ndBrainStdafx.cpp in Sources */,
+				FF09CCA32C73977D002039FD /* ndBrainLossLeastSquaredError.cpp in Sources */,
+				FF09CC892C73977D002039FD /* ndBrainLayerActivationSigmoid.cpp in Sources */,
+				FF09CC832C73977D002039FD /* ndBrainLayerActivationCategoricalSoftmax.cpp in Sources */,
+				FF09CC9D2C73977D002039FD /* ndBrainLayerLinearWithDropOut.cpp in Sources */,
+				FF09CCA92C73977D002039FD /* ndBrainOptimizerAdam.cpp in Sources */,
+				FF09CC5D2C73977D002039FD /* ndBrainGpuBuffer.cpp in Sources */,
+				FF09CC872C73977D002039FD /* ndBrainLayerActivationRelu.cpp in Sources */,
+				FF09CC5F2C73977D002039FD /* ndBrainGpuCommand.cpp in Sources */,
+				FF09CCA72C73977D002039FD /* ndBrainOptimizer.cpp in Sources */,
+				FF09CCA12C73977D002039FD /* ndBrainLossCategoricalCrossEntropy.cpp in Sources */,
+				FF09CC772C73977D002039FD /* ndBrainAgentDiscretePolicyGradient_Trainer.cpp in Sources */,
+				FF09CC9F2C73977D002039FD /* ndBrainLoss.cpp in Sources */,
+				FF09CC992C73977D002039FD /* ndBrainLayerImagePolling_2x2.cpp in Sources */,
+				FF09CC812C73977D002039FD /* ndBrainLayerActivation.cpp in Sources */,
+				FF09CC692C73977D002039FD /* ndBrainGpuScopeMapBuffer.cpp in Sources */,
+				FF09CC712C73977D002039FD /* ndBrainAgentContinuePolicyGradient_Trainer.cpp in Sources */,
+				FF09CC972C73977D002039FD /* ndBrainLayerImagePadding.cpp in Sources */,
+				FF09CC652C73977D002039FD /* ndBrainGpuInference.cpp in Sources */,
+				FF09CCB32C73977D002039FD /* ndBrainThreadPool.cpp in Sources */,
+				FF09CC6D2C73977D002039FD /* ndBrain.cpp in Sources */,
+				FF09CCB72C73977D002039FD /* ndBrainVector.cpp in Sources */,
+				FF09CCAD2C73977D002039FD /* ndBrainReplayBuffer.cpp in Sources */,
+				FF09CC8B2C73977D002039FD /* ndBrainLayerActivationSigmoidLinear.cpp in Sources */,
+				FF09CC792C73977D002039FD /* ndBrainAgentDiscretePolicyGradient.cpp in Sources */,
+				FF09CCAF2C73977D002039FD /* ndBrainSaveLoad.cpp in Sources */,
+				FF09CC612C73977D002039FD /* ndBrainGpuContext.cpp in Sources */,
+				FF09CCA52C73977D002039FD /* ndBrainMatrix.cpp in Sources */,
+				FF09CC912C73977D002039FD /* ndBrainLayerConvolutional_2d.cpp in Sources */,
+				FF09CC8F2C73977D002039FD /* ndBrainLayerActivationTanh.cpp in Sources */,
+				FF09CC732C73977D002039FD /* ndBrainAgentContinuePolicyGradient.cpp in Sources */,
+				FF09CC852C73977D002039FD /* ndBrainLayerActivationElu.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		FF09CBF92C73973B002039FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../sdk/**",
+					"../../thirdParty/png/**",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		FF09CBFA2C73973B002039FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../sdk/**",
+					"../../thirdParty/png/**",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		FF09CBFC2C73973B002039FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3ZT53J83GC;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		FF09CBFD2C73973B002039FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3ZT53J83GC;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FF09CBF22C73973B002039FD /* Build configuration list for PBXProject "ndBrain" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF09CBF92C73973B002039FD /* Debug */,
+				FF09CBFA2C73973B002039FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FF09CBFB2C73973B002039FD /* Build configuration list for PBXNativeTarget "ndBrain" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF09CBFC2C73973B002039FD /* Debug */,
+				FF09CBFD2C73973B002039FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FF09CBEF2C73973B002039FD /* Project object */;
+}
