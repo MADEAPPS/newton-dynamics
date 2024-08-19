@@ -43,6 +43,34 @@
 			remoteGlobalIDString = FF09CBF62C73973B002039FD;
 			remoteInfo = ndBrain;
 		};
+		FF09CD932C73B751002039FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF09CD8F2C73B751002039FD /* ndOpenFbx.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FF09CD302C739E87002039FD;
+			remoteInfo = ndOpenFbx;
+		};
+		FF09CD992C73B767002039FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF09CD952C73B767002039FD /* ndVhacd.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FF09CCE22C739E34002039FD;
+			remoteInfo = ndVhacd;
+		};
+		FF09CD9F2C73B774002039FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF09CD9B2C73B774002039FD /* ndPng.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FF09CCCC2C739D54002039FD;
+			remoteInfo = ndPng;
+		};
+		FF09CDA52C73B78A002039FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF09CDA12C73B78A002039FD /* ndModels.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FF09CD4E2C73B5BC002039FD;
+			remoteInfo = ndModels;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +84,10 @@
 		FF09CAEA2C725DF8002039FD /* ndNewton.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ndNewton.xcodeproj; path = ../../ndNewton/ndNewton.xcodeproj; sourceTree = "<group>"; };
 		FF09CAF22C726132002039FD /* SimpleCxxFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCxxFunctions.h; sourceTree = "<group>"; };
 		FF09CCBA2C739C28002039FD /* ndBrain.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ndBrain.xcodeproj; path = ../../ndBrain/ndBrain.xcodeproj; sourceTree = "<group>"; };
+		FF09CD8F2C73B751002039FD /* ndOpenFbx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ndOpenFbx.xcodeproj; path = ../../thirdParty/ndOpenFbx/ndOpenFbx.xcodeproj; sourceTree = "<group>"; };
+		FF09CD952C73B767002039FD /* ndVhacd.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ndVhacd.xcodeproj; path = ../../thirdParty/ndVhacd/ndVhacd.xcodeproj; sourceTree = "<group>"; };
+		FF09CD9B2C73B774002039FD /* ndPng.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ndPng.xcodeproj; path = ../../thirdParty/ndPng/ndPng.xcodeproj; sourceTree = "<group>"; };
+		FF09CDA12C73B78A002039FD /* ndModels.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ndModels.xcodeproj; path = ../../utils/ndModels/ndModels.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,9 +106,13 @@
 		DADCED782A83E3DF003D359E = {
 			isa = PBXGroup;
 			children = (
+				FF09CD9B2C73B774002039FD /* ndPng.xcodeproj */,
 				FF09CCBA2C739C28002039FD /* ndBrain.xcodeproj */,
-				DADCED832A83E3DF003D359E /* CppInteropInlineExample */,
 				FF09CAEA2C725DF8002039FD /* ndNewton.xcodeproj */,
+				FF09CDA12C73B78A002039FD /* ndModels.xcodeproj */,
+				FF09CD952C73B767002039FD /* ndVhacd.xcodeproj */,
+				FF09CD8F2C73B751002039FD /* ndOpenFbx.xcodeproj */,
+				DADCED832A83E3DF003D359E /* CppInteropInlineExample */,
 				DADCED822A83E3DF003D359E /* Products */,
 				FF09CAF52C72E01D002039FD /* Frameworks */,
 			);
@@ -123,6 +159,38 @@
 			isa = PBXGroup;
 			children = (
 				FF09CCBF2C739C28002039FD /* libndBrain.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF09CD902C73B751002039FD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CD942C73B751002039FD /* libndOpenFbx.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF09CD962C73B767002039FD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CD9A2C73B767002039FD /* libndVhacd.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF09CD9C2C73B774002039FD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CDA02C73B774002039FD /* libndPng.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF09CDA22C73B78A002039FD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CDA62C73B78A002039FD /* libndModels.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -182,8 +250,24 @@
 					ProjectRef = FF09CCBA2C739C28002039FD /* ndBrain.xcodeproj */;
 				},
 				{
+					ProductGroup = FF09CDA22C73B78A002039FD /* Products */;
+					ProjectRef = FF09CDA12C73B78A002039FD /* ndModels.xcodeproj */;
+				},
+				{
 					ProductGroup = FF09CAEB2C725DF8002039FD /* Products */;
 					ProjectRef = FF09CAEA2C725DF8002039FD /* ndNewton.xcodeproj */;
+				},
+				{
+					ProductGroup = FF09CD902C73B751002039FD /* Products */;
+					ProjectRef = FF09CD8F2C73B751002039FD /* ndOpenFbx.xcodeproj */;
+				},
+				{
+					ProductGroup = FF09CD9C2C73B774002039FD /* Products */;
+					ProjectRef = FF09CD9B2C73B774002039FD /* ndPng.xcodeproj */;
+				},
+				{
+					ProductGroup = FF09CD962C73B767002039FD /* Products */;
+					ProjectRef = FF09CD952C73B767002039FD /* ndVhacd.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -206,6 +290,34 @@
 			fileType = archive.ar;
 			path = libndBrain.a;
 			remoteRef = FF09CCBE2C739C28002039FD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FF09CD942C73B751002039FD /* libndOpenFbx.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libndOpenFbx.a;
+			remoteRef = FF09CD932C73B751002039FD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FF09CD9A2C73B767002039FD /* libndVhacd.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libndVhacd.a;
+			remoteRef = FF09CD992C73B767002039FD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FF09CDA02C73B774002039FD /* libndPng.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libndPng.a;
+			remoteRef = FF09CD9F2C73B774002039FD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FF09CDA62C73B78A002039FD /* libndModels.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libndModels.a;
+			remoteRef = FF09CDA52C73B78A002039FD /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
