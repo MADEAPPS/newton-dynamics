@@ -11,6 +11,7 @@
 		DADCED872A83E3DF003D359E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADCED862A83E3DF003D359E /* ContentView.swift */; };
 		DADCED9B2A83F1A3003D359E /* SimpleCxxFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DADCED992A83F1A3003D359E /* SimpleCxxFunctions.cpp */; };
 		FF09CAF62C72E01D002039FD /* libndNewton.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF09CAEF2C725DF8002039FD /* libndNewton.a */; platformFilters = (macos, ); };
+		FF09CCC22C739C4A002039FD /* libndBrain.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF09CCBF2C739C28002039FD /* libndBrain.a */; platformFilters = (macos, ); };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,6 +29,20 @@
 			remoteGlobalIDString = FF09C71C2C72459B002039FD;
 			remoteInfo = ndNewton;
 		};
+		FF09CCBE2C739C28002039FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF09CCBA2C739C28002039FD /* ndBrain.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FF09CBF72C73973B002039FD;
+			remoteInfo = ndBrain;
+		};
+		FF09CCC02C739C3B002039FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF09CCBA2C739C28002039FD /* ndBrain.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FF09CBF62C73973B002039FD;
+			remoteInfo = ndBrain;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +55,7 @@
 		DADCED992A83F1A3003D359E /* SimpleCxxFunctions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SimpleCxxFunctions.cpp; sourceTree = "<group>"; };
 		FF09CAEA2C725DF8002039FD /* ndNewton.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ndNewton.xcodeproj; path = ../../ndNewton/ndNewton.xcodeproj; sourceTree = "<group>"; };
 		FF09CAF22C726132002039FD /* SimpleCxxFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCxxFunctions.h; sourceTree = "<group>"; };
+		FF09CCBA2C739C28002039FD /* ndBrain.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ndBrain.xcodeproj; path = ../../ndBrain/ndBrain.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF09CCC22C739C4A002039FD /* libndBrain.a in Frameworks */,
 				FF09CAF62C72E01D002039FD /* libndNewton.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -57,6 +74,7 @@
 		DADCED782A83E3DF003D359E = {
 			isa = PBXGroup;
 			children = (
+				FF09CCBA2C739C28002039FD /* ndBrain.xcodeproj */,
 				DADCED832A83E3DF003D359E /* CppInteropInlineExample */,
 				FF09CAEA2C725DF8002039FD /* ndNewton.xcodeproj */,
 				DADCED822A83E3DF003D359E /* Products */,
@@ -101,6 +119,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		FF09CCBB2C739C28002039FD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CCBF2C739C28002039FD /* libndBrain.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -115,6 +141,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				FF09CCC12C739C3B002039FD /* PBXTargetDependency */,
 				FF09CAF42C72DFC2002039FD /* PBXTargetDependency */,
 			);
 			name = CppInteropInlineExample;
@@ -151,6 +178,10 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
+					ProductGroup = FF09CCBB2C739C28002039FD /* Products */;
+					ProjectRef = FF09CCBA2C739C28002039FD /* ndBrain.xcodeproj */;
+				},
+				{
 					ProductGroup = FF09CAEB2C725DF8002039FD /* Products */;
 					ProjectRef = FF09CAEA2C725DF8002039FD /* ndNewton.xcodeproj */;
 				},
@@ -168,6 +199,13 @@
 			fileType = archive.ar;
 			path = libndNewton.a;
 			remoteRef = FF09CAEE2C725DF8002039FD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FF09CCBF2C739C28002039FD /* libndBrain.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libndBrain.a;
+			remoteRef = FF09CCBE2C739C28002039FD /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -200,6 +238,11 @@
 			isa = PBXTargetDependency;
 			name = ndNewton;
 			targetProxy = FF09CAF32C72DFC2002039FD /* PBXContainerItemProxy */;
+		};
+		FF09CCC12C739C3B002039FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = ndBrain;
+			targetProxy = FF09CCC02C739C3B002039FD /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
