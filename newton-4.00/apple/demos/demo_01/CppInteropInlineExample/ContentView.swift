@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     let number = myFavoriteNumber()
+    let newton = UnsafeMutablePointer<Void>(CreateWorld())
     var body: some View {
         VStack {
             Image(systemName: "globe")
