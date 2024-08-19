@@ -1,0 +1,443 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FF09CD0F2C739E4C002039FD /* FloatMath.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCEB2C739E4C002039FD /* FloatMath.h */; };
+		FF09CD102C739E4C002039FD /* vhacdCircularList.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCEC2C739E4C002039FD /* vhacdCircularList.h */; };
+		FF09CD112C739E4C002039FD /* vhacdConvexHull.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCEE2C739E4C002039FD /* vhacdConvexHull.h */; };
+		FF09CD122C739E4C002039FD /* vhacdConvexHullUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCEF2C739E4C002039FD /* vhacdConvexHullUtils.h */; };
+		FF09CD132C739E4C002039FD /* vhacdDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCF02C739E4C002039FD /* vhacdDefines.h */; };
+		FF09CD142C739E4C002039FD /* vhacdICHull.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCF12C739E4C002039FD /* vhacdICHull.h */; };
+		FF09CD152C739E4C002039FD /* vhacdManifoldMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCF22C739E4C002039FD /* vhacdManifoldMesh.h */; };
+		FF09CD162C739E4C002039FD /* vhacdMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCF32C739E4C002039FD /* vhacdMesh.h */; };
+		FF09CD172C739E4C002039FD /* vhacdRaycastMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCF42C739E4C002039FD /* vhacdRaycastMesh.h */; };
+		FF09CD182C739E4C002039FD /* vhacdSArray.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCF52C739E4C002039FD /* vhacdSArray.h */; };
+		FF09CD192C739E4C002039FD /* vhacdTimer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCF62C739E4C002039FD /* vhacdTimer.h */; };
+		FF09CD1A2C739E4C002039FD /* vhacdVector.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCF72C739E4C002039FD /* vhacdVector.h */; };
+		FF09CD1B2C739E4C002039FD /* vhacdVHACD.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCF92C739E4C002039FD /* vhacdVHACD.h */; };
+		FF09CD1C2C739E4C002039FD /* vhacdVolume.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCFA2C739E4C002039FD /* vhacdVolume.h */; };
+		FF09CD1D2C739E4C002039FD /* VHACD.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CCFC2C739E4C002039FD /* VHACD.h */; };
+		FF09CD1E2C739E4C002039FD /* FloatMath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CCFE2C739E4C002039FD /* FloatMath.cpp */; };
+		FF09CD1F2C739E4C002039FD /* VHACD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD002C739E4C002039FD /* VHACD.cpp */; };
+		FF09CD202C739E4C002039FD /* vhacdConvexHull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD012C739E4C002039FD /* vhacdConvexHull.cpp */; };
+		FF09CD212C739E4C002039FD /* vhacdConvexHullUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD022C739E4C002039FD /* vhacdConvexHullUtils.cpp */; };
+		FF09CD222C739E4C002039FD /* vhacdICHull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD032C739E4C002039FD /* vhacdICHull.cpp */; };
+		FF09CD232C739E4C002039FD /* vhacdManifoldMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD042C739E4C002039FD /* vhacdManifoldMesh.cpp */; };
+		FF09CD242C739E4C002039FD /* vhacdMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD052C739E4C002039FD /* vhacdMesh.cpp */; };
+		FF09CD252C739E4C002039FD /* vhacdRaycastMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD062C739E4C002039FD /* vhacdRaycastMesh.cpp */; };
+		FF09CD262C739E4C002039FD /* vhacdVolume.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD072C739E4C002039FD /* vhacdVolume.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		FF09CCE22C739E34002039FD /* libndVhacd.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libndVhacd.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF09CCE92C739E4C002039FD /* vhacd-config.cmake */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "vhacd-config.cmake"; sourceTree = "<group>"; };
+		FF09CCEB2C739E4C002039FD /* FloatMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FloatMath.h; sourceTree = "<group>"; };
+		FF09CCEC2C739E4C002039FD /* vhacdCircularList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhacdCircularList.h; sourceTree = "<group>"; };
+		FF09CCED2C739E4C002039FD /* vhacdCircularList.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vhacdCircularList.inl; sourceTree = "<group>"; };
+		FF09CCEE2C739E4C002039FD /* vhacdConvexHull.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhacdConvexHull.h; sourceTree = "<group>"; };
+		FF09CCEF2C739E4C002039FD /* vhacdConvexHullUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhacdConvexHullUtils.h; sourceTree = "<group>"; };
+		FF09CCF02C739E4C002039FD /* vhacdDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhacdDefines.h; sourceTree = "<group>"; };
+		FF09CCF12C739E4C002039FD /* vhacdICHull.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhacdICHull.h; sourceTree = "<group>"; };
+		FF09CCF22C739E4C002039FD /* vhacdManifoldMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhacdManifoldMesh.h; sourceTree = "<group>"; };
+		FF09CCF32C739E4C002039FD /* vhacdMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhacdMesh.h; sourceTree = "<group>"; };
+		FF09CCF42C739E4C002039FD /* vhacdRaycastMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhacdRaycastMesh.h; sourceTree = "<group>"; };
+		FF09CCF52C739E4C002039FD /* vhacdSArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhacdSArray.h; sourceTree = "<group>"; };
+		FF09CCF62C739E4C002039FD /* vhacdTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhacdTimer.h; sourceTree = "<group>"; };
+		FF09CCF72C739E4C002039FD /* vhacdVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhacdVector.h; sourceTree = "<group>"; };
+		FF09CCF82C739E4C002039FD /* vhacdVector.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vhacdVector.inl; sourceTree = "<group>"; };
+		FF09CCF92C739E4C002039FD /* vhacdVHACD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhacdVHACD.h; sourceTree = "<group>"; };
+		FF09CCFA2C739E4C002039FD /* vhacdVolume.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhacdVolume.h; sourceTree = "<group>"; };
+		FF09CCFC2C739E4C002039FD /* VHACD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VHACD.h; sourceTree = "<group>"; };
+		FF09CCFE2C739E4C002039FD /* FloatMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FloatMath.cpp; sourceTree = "<group>"; };
+		FF09CCFF2C739E4C002039FD /* FloatMath.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = FloatMath.inl; sourceTree = "<group>"; };
+		FF09CD002C739E4C002039FD /* VHACD.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VHACD.cpp; sourceTree = "<group>"; };
+		FF09CD012C739E4C002039FD /* vhacdConvexHull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhacdConvexHull.cpp; sourceTree = "<group>"; };
+		FF09CD022C739E4C002039FD /* vhacdConvexHullUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhacdConvexHullUtils.cpp; sourceTree = "<group>"; };
+		FF09CD032C739E4C002039FD /* vhacdICHull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhacdICHull.cpp; sourceTree = "<group>"; };
+		FF09CD042C739E4C002039FD /* vhacdManifoldMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhacdManifoldMesh.cpp; sourceTree = "<group>"; };
+		FF09CD052C739E4C002039FD /* vhacdMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhacdMesh.cpp; sourceTree = "<group>"; };
+		FF09CD062C739E4C002039FD /* vhacdRaycastMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhacdRaycastMesh.cpp; sourceTree = "<group>"; };
+		FF09CD072C739E4C002039FD /* vhacdVolume.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhacdVolume.cpp; sourceTree = "<group>"; };
+		FF09CD092C739E4C002039FD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		FF09CD0C2C739E4C002039FD /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		FF09CD0D2C739E4C002039FD /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FF09CCE02C739E34002039FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FF09CCD92C739E34002039FD = {
+			isa = PBXGroup;
+			children = (
+				FF09CD0E2C739E4C002039FD /* hacd */,
+				FF09CCE32C739E34002039FD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FF09CCE32C739E34002039FD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CCE22C739E34002039FD /* libndVhacd.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF09CCEA2C739E4C002039FD /* cmake */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CCE92C739E4C002039FD /* vhacd-config.cmake */,
+			);
+			path = cmake;
+			sourceTree = "<group>";
+		};
+		FF09CCFB2C739E4C002039FD /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CCEB2C739E4C002039FD /* FloatMath.h */,
+				FF09CCEC2C739E4C002039FD /* vhacdCircularList.h */,
+				FF09CCED2C739E4C002039FD /* vhacdCircularList.inl */,
+				FF09CCEE2C739E4C002039FD /* vhacdConvexHull.h */,
+				FF09CCEF2C739E4C002039FD /* vhacdConvexHullUtils.h */,
+				FF09CCF02C739E4C002039FD /* vhacdDefines.h */,
+				FF09CCF12C739E4C002039FD /* vhacdICHull.h */,
+				FF09CCF22C739E4C002039FD /* vhacdManifoldMesh.h */,
+				FF09CCF32C739E4C002039FD /* vhacdMesh.h */,
+				FF09CCF42C739E4C002039FD /* vhacdRaycastMesh.h */,
+				FF09CCF52C739E4C002039FD /* vhacdSArray.h */,
+				FF09CCF62C739E4C002039FD /* vhacdTimer.h */,
+				FF09CCF72C739E4C002039FD /* vhacdVector.h */,
+				FF09CCF82C739E4C002039FD /* vhacdVector.inl */,
+				FF09CCF92C739E4C002039FD /* vhacdVHACD.h */,
+				FF09CCFA2C739E4C002039FD /* vhacdVolume.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		FF09CCFD2C739E4C002039FD /* public */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CCFC2C739E4C002039FD /* VHACD.h */,
+			);
+			path = public;
+			sourceTree = "<group>";
+		};
+		FF09CD082C739E4C002039FD /* src */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CCFE2C739E4C002039FD /* FloatMath.cpp */,
+				FF09CCFF2C739E4C002039FD /* FloatMath.inl */,
+				FF09CD002C739E4C002039FD /* VHACD.cpp */,
+				FF09CD012C739E4C002039FD /* vhacdConvexHull.cpp */,
+				FF09CD022C739E4C002039FD /* vhacdConvexHullUtils.cpp */,
+				FF09CD032C739E4C002039FD /* vhacdICHull.cpp */,
+				FF09CD042C739E4C002039FD /* vhacdManifoldMesh.cpp */,
+				FF09CD052C739E4C002039FD /* vhacdMesh.cpp */,
+				FF09CD062C739E4C002039FD /* vhacdRaycastMesh.cpp */,
+				FF09CD072C739E4C002039FD /* vhacdVolume.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		FF09CD0A2C739E4C002039FD /* VHACD_Lib */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CCEA2C739E4C002039FD /* cmake */,
+				FF09CCFB2C739E4C002039FD /* inc */,
+				FF09CCFD2C739E4C002039FD /* public */,
+				FF09CD082C739E4C002039FD /* src */,
+				FF09CD092C739E4C002039FD /* CMakeLists.txt */,
+			);
+			path = VHACD_Lib;
+			sourceTree = "<group>";
+		};
+		FF09CD0B2C739E4C002039FD /* src */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CD0A2C739E4C002039FD /* VHACD_Lib */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		FF09CD0E2C739E4C002039FD /* hacd */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CD0B2C739E4C002039FD /* src */,
+				FF09CD0C2C739E4C002039FD /* LICENSE */,
+				FF09CD0D2C739E4C002039FD /* README.md */,
+			);
+			name = hacd;
+			path = ../../../thirdParty/hacd;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		FF09CCDE2C739E34002039FD /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF09CD152C739E4C002039FD /* vhacdManifoldMesh.h in Headers */,
+				FF09CD142C739E4C002039FD /* vhacdICHull.h in Headers */,
+				FF09CD132C739E4C002039FD /* vhacdDefines.h in Headers */,
+				FF09CD1D2C739E4C002039FD /* VHACD.h in Headers */,
+				FF09CD182C739E4C002039FD /* vhacdSArray.h in Headers */,
+				FF09CD102C739E4C002039FD /* vhacdCircularList.h in Headers */,
+				FF09CD162C739E4C002039FD /* vhacdMesh.h in Headers */,
+				FF09CD172C739E4C002039FD /* vhacdRaycastMesh.h in Headers */,
+				FF09CD192C739E4C002039FD /* vhacdTimer.h in Headers */,
+				FF09CD1A2C739E4C002039FD /* vhacdVector.h in Headers */,
+				FF09CD0F2C739E4C002039FD /* FloatMath.h in Headers */,
+				FF09CD112C739E4C002039FD /* vhacdConvexHull.h in Headers */,
+				FF09CD1C2C739E4C002039FD /* vhacdVolume.h in Headers */,
+				FF09CD1B2C739E4C002039FD /* vhacdVHACD.h in Headers */,
+				FF09CD122C739E4C002039FD /* vhacdConvexHullUtils.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		FF09CCE12C739E34002039FD /* ndVhacd */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FF09CCE62C739E34002039FD /* Build configuration list for PBXNativeTarget "ndVhacd" */;
+			buildPhases = (
+				FF09CCDE2C739E34002039FD /* Headers */,
+				FF09CCDF2C739E34002039FD /* Sources */,
+				FF09CCE02C739E34002039FD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ndVhacd;
+			productName = ndVhacd;
+			productReference = FF09CCE22C739E34002039FD /* libndVhacd.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FF09CCDA2C739E34002039FD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					FF09CCE12C739E34002039FD = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = FF09CCDD2C739E34002039FD /* Build configuration list for PBXProject "ndVhacd" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FF09CCD92C739E34002039FD;
+			productRefGroup = FF09CCE32C739E34002039FD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FF09CCE12C739E34002039FD /* ndVhacd */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FF09CCDF2C739E34002039FD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF09CD212C739E4C002039FD /* vhacdConvexHullUtils.cpp in Sources */,
+				FF09CD222C739E4C002039FD /* vhacdICHull.cpp in Sources */,
+				FF09CD262C739E4C002039FD /* vhacdVolume.cpp in Sources */,
+				FF09CD1F2C739E4C002039FD /* VHACD.cpp in Sources */,
+				FF09CD202C739E4C002039FD /* vhacdConvexHull.cpp in Sources */,
+				FF09CD1E2C739E4C002039FD /* FloatMath.cpp in Sources */,
+				FF09CD232C739E4C002039FD /* vhacdManifoldMesh.cpp in Sources */,
+				FF09CD242C739E4C002039FD /* vhacdMesh.cpp in Sources */,
+				FF09CD252C739E4C002039FD /* vhacdRaycastMesh.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		FF09CCE42C739E34002039FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		FF09CCE52C739E34002039FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		FF09CCE72C739E34002039FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3ZT53J83GC;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		FF09CCE82C739E34002039FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3ZT53J83GC;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FF09CCDD2C739E34002039FD /* Build configuration list for PBXProject "ndVhacd" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF09CCE42C739E34002039FD /* Debug */,
+				FF09CCE52C739E34002039FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FF09CCE62C739E34002039FD /* Build configuration list for PBXNativeTarget "ndVhacd" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF09CCE72C739E34002039FD /* Debug */,
+				FF09CCE82C739E34002039FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FF09CCDA2C739E34002039FD /* Project object */;
+}
