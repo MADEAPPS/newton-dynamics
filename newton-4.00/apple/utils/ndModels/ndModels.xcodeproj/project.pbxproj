@@ -1,0 +1,403 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FF09CD722C73B5DD002039FD /* ndAnimationBlendTreeNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD562C73B5DD002039FD /* ndAnimationBlendTreeNode.cpp */; };
+		FF09CD732C73B5DD002039FD /* ndAnimationBlendTreeNode.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CD572C73B5DD002039FD /* ndAnimationBlendTreeNode.h */; };
+		FF09CD742C73B5DD002039FD /* ndAnimationKeyframesTrack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD582C73B5DD002039FD /* ndAnimationKeyframesTrack.cpp */; };
+		FF09CD752C73B5DD002039FD /* ndAnimationKeyframesTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CD592C73B5DD002039FD /* ndAnimationKeyframesTrack.h */; };
+		FF09CD762C73B5DD002039FD /* ndAnimationPose.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD5A2C73B5DD002039FD /* ndAnimationPose.cpp */; };
+		FF09CD772C73B5DD002039FD /* ndAnimationPose.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CD5B2C73B5DD002039FD /* ndAnimationPose.h */; };
+		FF09CD782C73B5DD002039FD /* ndAnimationSequence.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD5C2C73B5DD002039FD /* ndAnimationSequence.cpp */; };
+		FF09CD792C73B5DD002039FD /* ndAnimationSequence.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CD5D2C73B5DD002039FD /* ndAnimationSequence.h */; };
+		FF09CD7A2C73B5DD002039FD /* ndAnimationSequencePlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD5E2C73B5DD002039FD /* ndAnimationSequencePlayer.cpp */; };
+		FF09CD7B2C73B5DD002039FD /* ndAnimationSequencePlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CD5F2C73B5DD002039FD /* ndAnimationSequencePlayer.h */; };
+		FF09CD7C2C73B5DD002039FD /* ndAnimationTwoWayBlend.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD602C73B5DD002039FD /* ndAnimationTwoWayBlend.cpp */; };
+		FF09CD7D2C73B5DD002039FD /* ndAnimationTwoWayBlend.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CD612C73B5DD002039FD /* ndAnimationTwoWayBlend.h */; };
+		FF09CD7E2C73B5DD002039FD /* ndContactCallback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD622C73B5DD002039FD /* ndContactCallback.cpp */; };
+		FF09CD7F2C73B5DD002039FD /* ndContactCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CD632C73B5DD002039FD /* ndContactCallback.h */; };
+		FF09CD802C73B5DD002039FD /* ndFbxMeshLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD642C73B5DD002039FD /* ndFbxMeshLoader.cpp */; };
+		FF09CD812C73B5DD002039FD /* ndFbxMeshLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CD652C73B5DD002039FD /* ndFbxMeshLoader.h */; };
+		FF09CD822C73B5DD002039FD /* ndMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD662C73B5DD002039FD /* ndMesh.cpp */; };
+		FF09CD832C73B5DD002039FD /* ndMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CD672C73B5DD002039FD /* ndMesh.h */; };
+		FF09CD842C73B5DD002039FD /* ndMeshFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD682C73B5DD002039FD /* ndMeshFile.cpp */; };
+		FF09CD852C73B5DD002039FD /* ndMeshFile.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CD692C73B5DD002039FD /* ndMeshFile.h */; };
+		FF09CD862C73B5DD002039FD /* ndModelBodyNotify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD6A2C73B5DD002039FD /* ndModelBodyNotify.cpp */; };
+		FF09CD872C73B5DD002039FD /* ndModelBodyNotify.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CD6B2C73B5DD002039FD /* ndModelBodyNotify.h */; };
+		FF09CD882C73B5DD002039FD /* ndModelInc.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CD6C2C73B5DD002039FD /* ndModelInc.h */; };
+		FF09CD892C73B5DD002039FD /* ndModelPassiveRagdoll.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD6D2C73B5DD002039FD /* ndModelPassiveRagdoll.cpp */; };
+		FF09CD8A2C73B5DD002039FD /* ndModelPassiveRagdoll.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CD6E2C73B5DD002039FD /* ndModelPassiveRagdoll.h */; };
+		FF09CD8B2C73B5DD002039FD /* ndModelStdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF09CD6F2C73B5DD002039FD /* ndModelStdafx.cpp */; };
+		FF09CD8C2C73B5DD002039FD /* ndModelStdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = FF09CD702C73B5DD002039FD /* ndModelStdafx.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		FF09CD4E2C73B5BC002039FD /* libndModels.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libndModels.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF09CD552C73B5DD002039FD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		FF09CD562C73B5DD002039FD /* ndAnimationBlendTreeNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndAnimationBlendTreeNode.cpp; sourceTree = "<group>"; };
+		FF09CD572C73B5DD002039FD /* ndAnimationBlendTreeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndAnimationBlendTreeNode.h; sourceTree = "<group>"; };
+		FF09CD582C73B5DD002039FD /* ndAnimationKeyframesTrack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndAnimationKeyframesTrack.cpp; sourceTree = "<group>"; };
+		FF09CD592C73B5DD002039FD /* ndAnimationKeyframesTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndAnimationKeyframesTrack.h; sourceTree = "<group>"; };
+		FF09CD5A2C73B5DD002039FD /* ndAnimationPose.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndAnimationPose.cpp; sourceTree = "<group>"; };
+		FF09CD5B2C73B5DD002039FD /* ndAnimationPose.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndAnimationPose.h; sourceTree = "<group>"; };
+		FF09CD5C2C73B5DD002039FD /* ndAnimationSequence.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndAnimationSequence.cpp; sourceTree = "<group>"; };
+		FF09CD5D2C73B5DD002039FD /* ndAnimationSequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndAnimationSequence.h; sourceTree = "<group>"; };
+		FF09CD5E2C73B5DD002039FD /* ndAnimationSequencePlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndAnimationSequencePlayer.cpp; sourceTree = "<group>"; };
+		FF09CD5F2C73B5DD002039FD /* ndAnimationSequencePlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndAnimationSequencePlayer.h; sourceTree = "<group>"; };
+		FF09CD602C73B5DD002039FD /* ndAnimationTwoWayBlend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndAnimationTwoWayBlend.cpp; sourceTree = "<group>"; };
+		FF09CD612C73B5DD002039FD /* ndAnimationTwoWayBlend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndAnimationTwoWayBlend.h; sourceTree = "<group>"; };
+		FF09CD622C73B5DD002039FD /* ndContactCallback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndContactCallback.cpp; sourceTree = "<group>"; };
+		FF09CD632C73B5DD002039FD /* ndContactCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndContactCallback.h; sourceTree = "<group>"; };
+		FF09CD642C73B5DD002039FD /* ndFbxMeshLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndFbxMeshLoader.cpp; sourceTree = "<group>"; };
+		FF09CD652C73B5DD002039FD /* ndFbxMeshLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndFbxMeshLoader.h; sourceTree = "<group>"; };
+		FF09CD662C73B5DD002039FD /* ndMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMesh.cpp; sourceTree = "<group>"; };
+		FF09CD672C73B5DD002039FD /* ndMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndMesh.h; sourceTree = "<group>"; };
+		FF09CD682C73B5DD002039FD /* ndMeshFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndMeshFile.cpp; sourceTree = "<group>"; };
+		FF09CD692C73B5DD002039FD /* ndMeshFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndMeshFile.h; sourceTree = "<group>"; };
+		FF09CD6A2C73B5DD002039FD /* ndModelBodyNotify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndModelBodyNotify.cpp; sourceTree = "<group>"; };
+		FF09CD6B2C73B5DD002039FD /* ndModelBodyNotify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndModelBodyNotify.h; sourceTree = "<group>"; };
+		FF09CD6C2C73B5DD002039FD /* ndModelInc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndModelInc.h; sourceTree = "<group>"; };
+		FF09CD6D2C73B5DD002039FD /* ndModelPassiveRagdoll.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndModelPassiveRagdoll.cpp; sourceTree = "<group>"; };
+		FF09CD6E2C73B5DD002039FD /* ndModelPassiveRagdoll.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndModelPassiveRagdoll.h; sourceTree = "<group>"; };
+		FF09CD6F2C73B5DD002039FD /* ndModelStdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ndModelStdafx.cpp; sourceTree = "<group>"; };
+		FF09CD702C73B5DD002039FD /* ndModelStdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndModelStdafx.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FF09CD4C2C73B5BC002039FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FF09CD452C73B5BC002039FD = {
+			isa = PBXGroup;
+			children = (
+				FF09CD712C73B5DD002039FD /* dModel */,
+				FF09CD4F2C73B5BC002039FD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FF09CD4F2C73B5BC002039FD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CD4E2C73B5BC002039FD /* libndModels.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF09CD712C73B5DD002039FD /* dModel */ = {
+			isa = PBXGroup;
+			children = (
+				FF09CD552C73B5DD002039FD /* CMakeLists.txt */,
+				FF09CD562C73B5DD002039FD /* ndAnimationBlendTreeNode.cpp */,
+				FF09CD572C73B5DD002039FD /* ndAnimationBlendTreeNode.h */,
+				FF09CD582C73B5DD002039FD /* ndAnimationKeyframesTrack.cpp */,
+				FF09CD592C73B5DD002039FD /* ndAnimationKeyframesTrack.h */,
+				FF09CD5A2C73B5DD002039FD /* ndAnimationPose.cpp */,
+				FF09CD5B2C73B5DD002039FD /* ndAnimationPose.h */,
+				FF09CD5C2C73B5DD002039FD /* ndAnimationSequence.cpp */,
+				FF09CD5D2C73B5DD002039FD /* ndAnimationSequence.h */,
+				FF09CD5E2C73B5DD002039FD /* ndAnimationSequencePlayer.cpp */,
+				FF09CD5F2C73B5DD002039FD /* ndAnimationSequencePlayer.h */,
+				FF09CD602C73B5DD002039FD /* ndAnimationTwoWayBlend.cpp */,
+				FF09CD612C73B5DD002039FD /* ndAnimationTwoWayBlend.h */,
+				FF09CD622C73B5DD002039FD /* ndContactCallback.cpp */,
+				FF09CD632C73B5DD002039FD /* ndContactCallback.h */,
+				FF09CD642C73B5DD002039FD /* ndFbxMeshLoader.cpp */,
+				FF09CD652C73B5DD002039FD /* ndFbxMeshLoader.h */,
+				FF09CD662C73B5DD002039FD /* ndMesh.cpp */,
+				FF09CD672C73B5DD002039FD /* ndMesh.h */,
+				FF09CD682C73B5DD002039FD /* ndMeshFile.cpp */,
+				FF09CD692C73B5DD002039FD /* ndMeshFile.h */,
+				FF09CD6A2C73B5DD002039FD /* ndModelBodyNotify.cpp */,
+				FF09CD6B2C73B5DD002039FD /* ndModelBodyNotify.h */,
+				FF09CD6C2C73B5DD002039FD /* ndModelInc.h */,
+				FF09CD6D2C73B5DD002039FD /* ndModelPassiveRagdoll.cpp */,
+				FF09CD6E2C73B5DD002039FD /* ndModelPassiveRagdoll.h */,
+				FF09CD6F2C73B5DD002039FD /* ndModelStdafx.cpp */,
+				FF09CD702C73B5DD002039FD /* ndModelStdafx.h */,
+			);
+			name = dModel;
+			path = ../../../sdk/dModel;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		FF09CD4A2C73B5BC002039FD /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF09CD7D2C73B5DD002039FD /* ndAnimationTwoWayBlend.h in Headers */,
+				FF09CD772C73B5DD002039FD /* ndAnimationPose.h in Headers */,
+				FF09CD8A2C73B5DD002039FD /* ndModelPassiveRagdoll.h in Headers */,
+				FF09CD732C73B5DD002039FD /* ndAnimationBlendTreeNode.h in Headers */,
+				FF09CD852C73B5DD002039FD /* ndMeshFile.h in Headers */,
+				FF09CD872C73B5DD002039FD /* ndModelBodyNotify.h in Headers */,
+				FF09CD7B2C73B5DD002039FD /* ndAnimationSequencePlayer.h in Headers */,
+				FF09CD792C73B5DD002039FD /* ndAnimationSequence.h in Headers */,
+				FF09CD832C73B5DD002039FD /* ndMesh.h in Headers */,
+				FF09CD812C73B5DD002039FD /* ndFbxMeshLoader.h in Headers */,
+				FF09CD8C2C73B5DD002039FD /* ndModelStdafx.h in Headers */,
+				FF09CD7F2C73B5DD002039FD /* ndContactCallback.h in Headers */,
+				FF09CD752C73B5DD002039FD /* ndAnimationKeyframesTrack.h in Headers */,
+				FF09CD882C73B5DD002039FD /* ndModelInc.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		FF09CD4D2C73B5BC002039FD /* ndModels */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FF09CD522C73B5BC002039FD /* Build configuration list for PBXNativeTarget "ndModels" */;
+			buildPhases = (
+				FF09CD4A2C73B5BC002039FD /* Headers */,
+				FF09CD4B2C73B5BC002039FD /* Sources */,
+				FF09CD4C2C73B5BC002039FD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ndModels;
+			productName = ndModels;
+			productReference = FF09CD4E2C73B5BC002039FD /* libndModels.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FF09CD462C73B5BC002039FD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					FF09CD4D2C73B5BC002039FD = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = FF09CD492C73B5BC002039FD /* Build configuration list for PBXProject "ndModels" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FF09CD452C73B5BC002039FD;
+			productRefGroup = FF09CD4F2C73B5BC002039FD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FF09CD4D2C73B5BC002039FD /* ndModels */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FF09CD4B2C73B5BC002039FD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF09CD742C73B5DD002039FD /* ndAnimationKeyframesTrack.cpp in Sources */,
+				FF09CD8B2C73B5DD002039FD /* ndModelStdafx.cpp in Sources */,
+				FF09CD822C73B5DD002039FD /* ndMesh.cpp in Sources */,
+				FF09CD842C73B5DD002039FD /* ndMeshFile.cpp in Sources */,
+				FF09CD7A2C73B5DD002039FD /* ndAnimationSequencePlayer.cpp in Sources */,
+				FF09CD862C73B5DD002039FD /* ndModelBodyNotify.cpp in Sources */,
+				FF09CD892C73B5DD002039FD /* ndModelPassiveRagdoll.cpp in Sources */,
+				FF09CD802C73B5DD002039FD /* ndFbxMeshLoader.cpp in Sources */,
+				FF09CD722C73B5DD002039FD /* ndAnimationBlendTreeNode.cpp in Sources */,
+				FF09CD7C2C73B5DD002039FD /* ndAnimationTwoWayBlend.cpp in Sources */,
+				FF09CD7E2C73B5DD002039FD /* ndContactCallback.cpp in Sources */,
+				FF09CD762C73B5DD002039FD /* ndAnimationPose.cpp in Sources */,
+				FF09CD782C73B5DD002039FD /* ndAnimationSequence.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		FF09CD502C73B5BC002039FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../../sdk/**",
+					"../../../thirdParty/openFBX/**",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		FF09CD512C73B5BC002039FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../../sdk/**",
+					"../../../thirdParty/openFBX/**",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		FF09CD532C73B5BC002039FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3ZT53J83GC;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		FF09CD542C73B5BC002039FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3ZT53J83GC;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FF09CD492C73B5BC002039FD /* Build configuration list for PBXProject "ndModels" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF09CD502C73B5BC002039FD /* Debug */,
+				FF09CD512C73B5BC002039FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FF09CD522C73B5BC002039FD /* Build configuration list for PBXNativeTarget "ndModels" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF09CD532C73B5BC002039FD /* Debug */,
+				FF09CD542C73B5BC002039FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FF09CD462C73B5BC002039FD /* Project object */;
+}
