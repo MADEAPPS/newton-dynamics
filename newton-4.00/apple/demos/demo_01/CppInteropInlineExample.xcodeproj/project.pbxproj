@@ -12,6 +12,10 @@
 		DADCED9B2A83F1A3003D359E /* SimpleCxxFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DADCED992A83F1A3003D359E /* SimpleCxxFunctions.cpp */; };
 		FF09CAF62C72E01D002039FD /* libndNewton.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF09CAEF2C725DF8002039FD /* libndNewton.a */; platformFilters = (macos, ); };
 		FF09CCC22C739C4A002039FD /* libndBrain.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF09CCBF2C739C28002039FD /* libndBrain.a */; platformFilters = (macos, ); };
+		FF09CDAF2C73B87F002039FD /* libndModels.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF09CDA62C73B78A002039FD /* libndModels.a */; platformFilters = (macos, ); };
+		FF09CDB02C73B87F002039FD /* libndOpenFbx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF09CD942C73B751002039FD /* libndOpenFbx.a */; platformFilters = (macos, ); };
+		FF09CDB12C73B87F002039FD /* libndPng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF09CDA02C73B774002039FD /* libndPng.a */; platformFilters = (macos, ); };
+		FF09CDB22C73B87F002039FD /* libndVhacd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF09CD9A2C73B767002039FD /* libndVhacd.a */; platformFilters = (macos, ); };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +75,34 @@
 			remoteGlobalIDString = FF09CD4E2C73B5BC002039FD;
 			remoteInfo = ndModels;
 		};
+		FF09CDA72C73B851002039FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF09CD9B2C73B774002039FD /* ndPng.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FF09CCCB2C739D54002039FD;
+			remoteInfo = ndPng;
+		};
+		FF09CDA92C73B851002039FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF09CDA12C73B78A002039FD /* ndModels.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FF09CD4D2C73B5BC002039FD;
+			remoteInfo = ndModels;
+		};
+		FF09CDAB2C73B851002039FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF09CD952C73B767002039FD /* ndVhacd.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FF09CCE12C739E34002039FD;
+			remoteInfo = ndVhacd;
+		};
+		FF09CDAD2C73B851002039FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF09CD8F2C73B751002039FD /* ndOpenFbx.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FF09CD2F2C739E87002039FD;
+			remoteInfo = ndOpenFbx;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -95,6 +127,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF09CDAF2C73B87F002039FD /* libndModels.a in Frameworks */,
+				FF09CDB02C73B87F002039FD /* libndOpenFbx.a in Frameworks */,
+				FF09CDB12C73B87F002039FD /* libndPng.a in Frameworks */,
+				FF09CDB22C73B87F002039FD /* libndVhacd.a in Frameworks */,
 				FF09CCC22C739C4A002039FD /* libndBrain.a in Frameworks */,
 				FF09CAF62C72E01D002039FD /* libndNewton.a in Frameworks */,
 			);
@@ -209,8 +245,12 @@
 			buildRules = (
 			);
 			dependencies = (
+				FF09CDA82C73B851002039FD /* PBXTargetDependency */,
 				FF09CCC12C739C3B002039FD /* PBXTargetDependency */,
 				FF09CAF42C72DFC2002039FD /* PBXTargetDependency */,
+				FF09CDAA2C73B851002039FD /* PBXTargetDependency */,
+				FF09CDAC2C73B851002039FD /* PBXTargetDependency */,
+				FF09CDAE2C73B851002039FD /* PBXTargetDependency */,
 			);
 			name = CppInteropInlineExample;
 			productName = CppInteropInlineExample;
@@ -355,6 +395,26 @@
 			isa = PBXTargetDependency;
 			name = ndBrain;
 			targetProxy = FF09CCC02C739C3B002039FD /* PBXContainerItemProxy */;
+		};
+		FF09CDA82C73B851002039FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = ndPng;
+			targetProxy = FF09CDA72C73B851002039FD /* PBXContainerItemProxy */;
+		};
+		FF09CDAA2C73B851002039FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = ndModels;
+			targetProxy = FF09CDA92C73B851002039FD /* PBXContainerItemProxy */;
+		};
+		FF09CDAC2C73B851002039FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = ndVhacd;
+			targetProxy = FF09CDAB2C73B851002039FD /* PBXContainerItemProxy */;
+		};
+		FF09CDAE2C73B851002039FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = ndOpenFbx;
+			targetProxy = FF09CDAD2C73B851002039FD /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
