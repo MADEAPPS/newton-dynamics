@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		DADCED852A83E3DF003D359E /* CppInteropInlineExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADCED842A83E3DF003D359E /* CppInteropInlineExampleApp.swift */; };
 		DADCED872A83E3DF003D359E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADCED862A83E3DF003D359E /* ContentView.swift */; };
-		DADCED892A83E3E3003D359E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DADCED882A83E3E3003D359E /* Assets.xcassets */; };
-		DADCED8D2A83E3E3003D359E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DADCED8C2A83E3E3003D359E /* Preview Assets.xcassets */; };
 		DADCED9B2A83F1A3003D359E /* SimpleCxxFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DADCED992A83F1A3003D359E /* SimpleCxxFunctions.cpp */; };
 		FF09CAF62C72E01D002039FD /* libndNewton.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF09CAEF2C725DF8002039FD /* libndNewton.a */; platformFilters = (macos, ); };
 /* End PBXBuildFile section */
@@ -36,9 +34,7 @@
 		DADCED812A83E3DF003D359E /* CppInteropInlineExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CppInteropInlineExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DADCED842A83E3DF003D359E /* CppInteropInlineExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CppInteropInlineExampleApp.swift; sourceTree = "<group>"; };
 		DADCED862A83E3DF003D359E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		DADCED882A83E3E3003D359E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DADCED8A2A83E3E3003D359E /* CppInteropInlineExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CppInteropInlineExample.entitlements; sourceTree = "<group>"; };
-		DADCED8C2A83E3E3003D359E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		DADCED962A83E875003D359E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		DADCED982A83F1A3003D359E /* CppInteropInlineExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CppInteropInlineExample-Bridging-Header.h"; sourceTree = "<group>"; };
 		DADCED992A83F1A3003D359E /* SimpleCxxFunctions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SimpleCxxFunctions.cpp; sourceTree = "<group>"; };
@@ -84,20 +80,10 @@
 				DADCED842A83E3DF003D359E /* CppInteropInlineExampleApp.swift */,
 				DADCED862A83E3DF003D359E /* ContentView.swift */,
 				DADCED992A83F1A3003D359E /* SimpleCxxFunctions.cpp */,
-				DADCED882A83E3E3003D359E /* Assets.xcassets */,
 				DADCED8A2A83E3E3003D359E /* CppInteropInlineExample.entitlements */,
-				DADCED8B2A83E3E3003D359E /* Preview Content */,
 				DADCED982A83F1A3003D359E /* CppInteropInlineExample-Bridging-Header.h */,
 			);
 			path = CppInteropInlineExample;
-			sourceTree = "<group>";
-		};
-		DADCED8B2A83E3E3003D359E /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				DADCED8C2A83E3E3003D359E /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 		FF09CAEB2C725DF8002039FD /* Products */ = {
@@ -191,8 +177,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DADCED8D2A83E3E3003D359E /* Preview Assets.xcassets in Resources */,
-				DADCED892A83E3E3003D359E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -347,7 +331,7 @@
 				CODE_SIGN_ENTITLEMENTS = CppInteropInlineExample/CppInteropInlineExample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"CppInteropInlineExample/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -386,7 +370,7 @@
 				CODE_SIGN_ENTITLEMENTS = CppInteropInlineExample/CppInteropInlineExample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"CppInteropInlineExample/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
