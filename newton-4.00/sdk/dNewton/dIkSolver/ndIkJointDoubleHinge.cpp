@@ -42,13 +42,13 @@ void ndIkJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
 		ndFloat32 accel0 = (pin0 * m_accel0.m_angular - pin0 * m_accel1.m_angular).AddHorizontal().GetScalar();
 		AddAngularRowJacobian(desc, pin0, 0.0f);
 		SetMotorAcceleration(desc, accel0);
-		SetDiagonalRegularizer(desc, m_defualRegularizer);
+		SetDiagonalRegularizer(desc, m_defualtRegularizer);
 
 		const ndVector pin1(matrix1.m_up);
 		ndFloat32 accel1 = (pin1 * m_accel0.m_angular - pin1 * m_accel1.m_angular).AddHorizontal().GetScalar();
 		AddAngularRowJacobian(desc, pin1, 0.0f);
 		SetMotorAcceleration(desc, accel1);
-		SetDiagonalRegularizer(desc, m_defualRegularizer);
+		SetDiagonalRegularizer(desc, m_defualtRegularizer);
 	}
 	SubmitLimits(desc, matrix0, matrix1);
 }
