@@ -1708,7 +1708,8 @@ void ndBodySphFluid::SortGrids(ndThreadPool* const threadPool)
 #endif
 }
 
-void ndBodySphFluid::BuildBuckets(ndThreadPool* const threadPool)
+//void ndBodySphFluid::BuildBuckets(ndThreadPool* const threadPool)
+void ndBodySphFluid::BuildBuckets(ndThreadPool* const)
 {
     //#ifdef _DEBUG
 #if 0

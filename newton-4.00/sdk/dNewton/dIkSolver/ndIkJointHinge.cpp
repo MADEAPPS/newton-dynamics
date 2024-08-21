@@ -61,7 +61,7 @@ void ndIkJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 		ndFloat32 accel = (pin * m_accel0.m_angular - pin * m_accel1.m_angular).AddHorizontal().GetScalar();
 		AddAngularRowJacobian(desc, pin, 0.0f);
 		SetMotorAcceleration(desc, accel);
-		SetDiagonalRegularizer(desc, m_defualRegularizer);
+		SetDiagonalRegularizer(desc, m_defualtRegularizer);
 		if (m_maxTorque < D_IK_HINGE_MAX_TORQUE)
 		{
 			SetHighFriction(desc, m_maxTorque);

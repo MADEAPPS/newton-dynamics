@@ -42,7 +42,7 @@ void ndIkJointSpherical::SubmitAccel(const ndMatrix&, const ndMatrix& matrix1, n
 		ndFloat32 accel = (matrix1[i] * m_accel0.m_angular - matrix1[i] * m_accel1.m_angular).AddHorizontal().GetScalar();
 		AddAngularRowJacobian(desc, matrix1[i], ndFloat32(0.0f));
 		SetMotorAcceleration(desc, accel);
-		SetDiagonalRegularizer(desc, m_defualRegularizer);
+		SetDiagonalRegularizer(desc, m_defualtRegularizer);
 	}
 }
 

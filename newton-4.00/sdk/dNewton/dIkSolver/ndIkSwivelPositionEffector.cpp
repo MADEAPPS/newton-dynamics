@@ -50,11 +50,6 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndVector& childPivo
 	,m_maxWorkSpaceRadio(ndFloat32(0.0f))
 	,m_enableSwivelControl(true)
 {
-	//ndVector offset(pinAndPivotParentInGlobalSpace.UntransformVector(childPivotInGlobalSpace) & ndVector::m_triplexMask);
-	//m_maxWorkSpaceRadio = ndFloat32(0.99f) * ndSqrt(offset.DotProduct(offset).GetScalar());
-	//m_restPosition = offset.Normalize().Scale(m_maxWorkSpaceRadio) | ndVector::m_wOne;
-	//m_localTargetPosit = m_restPosition;
-
 	ndMatrix temp;
 	ndMatrix matrix(pinAndPivotParentInGlobalSpace);
 	matrix.m_posit = childPivotInGlobalSpace;
@@ -320,6 +315,8 @@ void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc, 
 
 	AddAngularRowJacobian(desc, pin, angle);
 	SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+	SetHighFriction(desc, m_angularMaxTorque);
+	SetLowerFriction(desc, -m_angularMaxTorque);
 }
 
 void ndIkSwivelPositionEffector::JacobianDerivative(ndConstraintDescritor& desc)

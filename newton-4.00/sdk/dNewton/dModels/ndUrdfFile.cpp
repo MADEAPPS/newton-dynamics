@@ -492,7 +492,26 @@ void ndUrdfFile::ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* 
 	}
 	else if (!strcmp(className, "ndIkJointHinge"))
 	{
-		jointNode->SetAttribute("type", "floating");
+		//jointNode->SetAttribute("type", "floating");
+		const ndJointHinge* const hinge = (ndJointHinge*)joint;
+		if (hinge->GetLimitState())
+		{
+			ndFloat32 minLimit;
+			ndFloat32 maxLimit;
+			jointNode->SetAttribute("type", "revolute");
+
+			nd::TiXmlElement* const limit = new nd::TiXmlElement("limit");
+			jointNode->LinkEndChild(limit);
+			hinge->GetLimits(minLimit, maxLimit);
+			limit->SetDoubleAttribute("effort", 1000);
+			limit->SetDoubleAttribute("lower", minLimit);
+			limit->SetDoubleAttribute("upper", maxLimit);
+			limit->SetDoubleAttribute("velocity", 0.5f);
+		}
+		else
+		{
+			jointNode->SetAttribute("type", "continuous");
+		}
 
 		nd::TiXmlElement* const newtonExt = new nd::TiXmlElement("newton");
 		jointNode->LinkEndChild(newtonExt);
@@ -1094,7 +1113,20 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 			ndMatrix matrix(ndGramSchmidtMatrix(ndVector(x, y, z, ndFloat32(0.0f))));
 			pivotMatrix = matrix * pivotMatrix;
 		}
-		joint = new ndJointHinge(pivotMatrix, childBody, parentBody);
+
+		const nd::TiXmlElement* const newtonEx = (nd::TiXmlElement*)jointNode->FirstChild("newton");
+		if (newtonEx)
+		{
+			const char* const subJointType = newtonEx->Attribute("replaceWith");
+			if (strcmp(subJointType, "ndIkJointHinge") == 0)
+			{
+				joint = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
+			}
+			else
+			{
+				joint = new ndJointHinge(pivotMatrix, childBody, parentBody);
+			}
+		}
 
 		const nd::TiXmlElement* const limit = (nd::TiXmlElement*)jointNode->FirstChild("limit");
 		if (limit)
@@ -1110,22 +1142,34 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 			hinge->SetLimits(ndFloat32(lower), ndFloat32(upper));
 			hinge->SetLimitState(true);
 		}
-		const nd::TiXmlElement* const newtonEx = (nd::TiXmlElement*)jointNode->FirstChild("newton");
+
+		//const nd::TiXmlElement* const newtonEx = (nd::TiXmlElement*)jointNode->FirstChild("newton");
 		if (newtonEx)
 		{
 			ndInt32 ret = 0;
 			const char* const spring = newtonEx->Attribute("springPD");
 			const char* const damper = newtonEx->Attribute("damperPD");
 			const char* const regularizer = newtonEx->Attribute("regularizer");
-			ndFloat32 springPD;
-			ndFloat32 damperPD;
-			ndFloat32 regularizerPD;
-			ret = sscanf(spring, "%f", &springPD);
-			ret = sscanf(damper, "%f", &damperPD);
-			ret = sscanf(regularizer, "%f", &regularizerPD);
-
-			ndJointHinge* const hinge = (ndJointHinge*)joint;
-			hinge->SetAsSpringDamper(regularizerPD, springPD, damperPD);
+			if (regularizer || damper || spring)
+			{
+				ndFloat32 springPD = 0.0f;
+				ndFloat32 damperPD = 0.0f;
+				ndFloat32 regularizerPD = 0.0f;
+				if (spring)
+				{
+					ret = sscanf(spring, "%f", &springPD);
+				}
+				if (damperPD)
+				{
+					ret = sscanf(damper, "%f", &damperPD);
+				}
+				if (regularizerPD)
+				{
+					ret = sscanf(regularizer, "%f", &regularizerPD);
+				}
+				ndJointHinge* const hinge = (ndJointHinge*)joint;
+				hinge->SetAsSpringDamper(regularizerPD, springPD, damperPD);
+			}
 		}
 	}
 	else if (strcmp(jointType, "floating") == 0)
@@ -1137,10 +1181,6 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 			if (strcmp(subJointType, "ndIkJointSpherical") == 0)
 			{
 				joint = new ndIkJointSpherical(pivotMatrix, childBody, parentBody);
-			}
-			else if (strcmp(subJointType, "ndIkJointHinge") == 0)
-			{
-				joint = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
 			}
 			else
 			{

@@ -61,13 +61,13 @@ class ndJointBilateralConstraint : public ndConstraint
 	{
 		public:
 		ndIkInterface()
-			:m_defualRegularizer(ndFloat32 (1.0e-3f))
+			:m_defualtRegularizer(ndFloat32 (1.0e-3f))
 			,m_ikMode(true)
 		{}
 
 		ndJacobian m_accel0;
 		ndJacobian m_accel1;
-		ndFloat32 m_defualRegularizer;
+		ndFloat32 m_defualtRegularizer;
 		bool m_ikMode;
 	};
 

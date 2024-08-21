@@ -69,14 +69,15 @@
             <origin rpy="-1.5708 -8.22321e-09 3.14159" xyz="-1.31544e-08 0.15 -2.98023e-08" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="-5.70385e-09 0.15 -2.23517e-08" />
+            <origin rpy="0 -0 0" xyz="-7.45058e-09 0.15 -2.23517e-08" />
             <mass value="0.0625" />
             <inertia xx="0.000237425" xy="-0.000284521" xz="1.16415e-10" yy="0.000565963" yz="0" zz="0.000730231" />
         </inertial>
     </link>
-    <joint name="calf_0_to_thigh_0" type="floating">
+    <joint name="calf_0_to_thigh_0" type="revolute">
         <parent link="thigh_0" />
         <child link="calf_0" />
+        <limit effort="1000.000000" lower="-1.221730" upper="1.221730" velocity="0.500000" />
         <newton replaceWith="ndIkJointHinge" />
         <origin rpy="3.14159 1.5708 0" xyz="0.3 0 -2.63088e-08" />
     </joint>
@@ -153,14 +154,15 @@
             <origin rpy="-1.5708 -5.13818e-08 3.14159" xyz="1.09192e-08 0.15 -2.98023e-08" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="1.09192e-08 0.15 0" />
+            <origin rpy="0 -0 0" xyz="1.11759e-08 0.15 0" />
             <mass value="0.0625" />
             <inertia xx="0.000237426" xy="0.000284522" xz="-4.36557e-11" yy="0.000565962" yz="5.82077e-11" zz="0.000730231" />
         </inertial>
     </link>
-    <joint name="calf_1_to_thigh_1" type="floating">
+    <joint name="calf_1_to_thigh_1" type="revolute">
         <parent link="thigh_1" />
         <child link="calf_1" />
+        <limit effort="1000.000000" lower="-1.221730" upper="1.221730" velocity="0.500000" />
         <newton replaceWith="ndIkJointHinge" />
         <origin rpy="3.14159 1.5708 0" xyz="0.3 1.49012e-08 8.42733e-09" />
     </joint>
@@ -237,14 +239,15 @@
             <origin rpy="1.5708 -3.80255e-08 2.46089e-07" xyz="-1.76247e-08 0.15 0" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="-2.50753e-08 0.15 7.45058e-09" />
+            <origin rpy="0 -0 0" xyz="-2.6077e-08 0.15 7.45058e-09" />
             <mass value="0.0625" />
             <inertia xx="0.000237425" xy="-0.000284522" xz="7.27596e-11" yy="0.000565963" yz="1.74623e-10" zz="0.000730231" />
         </inertial>
     </link>
-    <joint name="calf_2_to_thigh_2" type="floating">
+    <joint name="calf_2_to_thigh_2" type="revolute">
         <parent link="thigh_2" />
         <child link="calf_2" />
+        <limit effort="1000.000000" lower="-1.221730" upper="1.221730" velocity="0.500000" />
         <newton replaceWith="ndIkJointHinge" />
         <origin rpy="-3.14159 -1.5708 0" xyz="0.3 2.98023e-08 -3.49351e-09" />
     </joint>
@@ -293,7 +296,7 @@
             <origin rpy="-2.98023e-08 -1.5708 0" xyz="0.15 -1.49012e-08 1.14325e-08" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="0.15 0 3.98195e-09" />
+            <origin rpy="0 -0 0" xyz="0.15 -3.72529e-09 3.98195e-09" />
             <mass value="0.25" />
             <inertia xx="0.00259239" xy="-0.000569044" xz="-0.000657075" yy="0.00193531" yz="-0.00113809" zz="0.00160678" />
         </inertial>
@@ -321,14 +324,15 @@
             <origin rpy="1.5708 6.78277e-08 3.22139e-07" xyz="1.53896e-08 0.15 -2.98023e-08" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="1.53896e-08 0.15 -2.23517e-08" />
+            <origin rpy="0 -0 0" xyz="1.49012e-08 0.15 -2.23517e-08" />
             <mass value="0.0625" />
             <inertia xx="0.000237425" xy="0.000284522" xz="-1.01863e-10" yy="0.000565963" yz="1.16415e-10" zz="0.000730231" />
         </inertial>
     </link>
-    <joint name="calf_3_to_thigh_3" type="floating">
+    <joint name="calf_3_to_thigh_3" type="revolute">
         <parent link="thigh_3" />
         <child link="calf_3" />
+        <limit effort="1000.000000" lower="-1.221730" upper="1.221730" velocity="0.500000" />
         <newton replaceWith="ndIkJointHinge" />
         <origin rpy="-3.14159 -1.5708 0" xyz="0.3 0 5.13314e-10" />
     </joint>
