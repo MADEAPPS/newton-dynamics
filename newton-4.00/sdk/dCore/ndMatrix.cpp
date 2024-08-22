@@ -133,7 +133,7 @@ ndMatrix ndMatrix::Inverse4x4 () const
 	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		ndFloat32 pivot = ndAbs(tmp[i][i]);
-		if (pivot < ndFloat32(0.1f)) 
+		if (pivot < ndFloat32(0.01f)) 
 		{
 			ndInt32 permute = i;
 			for (ndInt32 j = i + 1; j < 4; ++j) 
@@ -163,7 +163,7 @@ ndMatrix ndMatrix::Inverse4x4 () const
 		}
 	}
 
-	for (ndInt32 i = 3; i >= 0; i--) 
+	for (ndInt32 i = 3; i >= 0; --i) 
 	{
 		ndVector acc(ndVector::m_zero);
 		for (ndInt32 j = i + 1; j < 4; ++j) 
@@ -192,6 +192,7 @@ ndMatrix ndMatrix::Inverse4x4 () const
 	return inv;
 }
 
+#pragma optimize( "", off )
 ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 {
 	ndMatrix tmp(*this);
@@ -229,7 +230,7 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 		}
 	}
 
-	for (ndInt32 i = 3; i >= 0; i--) 
+	for (ndInt32 i = 3; i >= 0; --i) 
 	{
 		const ndVector pivot(tmp[i] * ret);
 		ret[i] = (ret[i] - pivot.AddHorizontal().GetScalar() + tmp[i][i] * ret[i]) / tmp[i][i];

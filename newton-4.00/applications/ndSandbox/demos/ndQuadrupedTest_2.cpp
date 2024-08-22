@@ -26,13 +26,6 @@ namespace ndQuadruped_2
 	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_2-VPG.dnn"
 
-	class ndActionVector
-	{
-		public:
-		ndBrainFloat m_x;
-		ndBrainFloat m_z;
-	};
-
 	class ndAnimPose
 	{
 		public:
@@ -55,8 +48,16 @@ namespace ndQuadruped_2
 	{
 		public:
 		ndLegObservation m_legs[4];
-		ndActionVector m_torso;
+		//ndActionVector m_torso;
 		ndFloat32 m_animSpeed;
+	};
+
+	class ndActionVector
+	{
+		public:
+	//	//ndBrainFloat m_x;
+	//	//ndBrainFloat m_z;
+		ndAnimPose m_pose[4];
 	};
 
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
@@ -64,10 +65,10 @@ namespace ndQuadruped_2
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
 	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
-	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
+	#define D_POSE_REST_POSITION_Y	ndReal(-0.4f)
 
-	//#define D_SWING_STEP			ndReal(0.01f)
-	#define D_SWING_STEP			ndReal(0.005f)
+	#define D_SWING_STEP			ndReal(0.01f)
+	//#define D_SWING_STEP			ndReal(0.005f)
 	#define D_MODEL_DEAD_ANGLE		ndReal(0.2f)
 	#define D_MIN_TRAIN_ANIM_SPEED	ndReal(0.1f)
 
@@ -195,7 +196,7 @@ namespace ndQuadruped_2
 
 			ndController(const ndController& src)
 				:ndBrainAgentContinuePolicyGradient(src.m_actor)
-				, m_robot(nullptr)
+				,m_robot(nullptr)
 			{
 			}
 
@@ -263,6 +264,14 @@ namespace ndQuadruped_2
 					m_body->SetMatrix(matrix);
 					m_body->SetOmega(m_omega);
 					m_body->SetVelocity(m_veloc);
+
+					ndBodyKinematic::ndContactMap& contacts = m_body->GetContactMap();
+					ndBodyKinematic::ndContactMap::Iterator it(contacts);
+					for (it.Begin(); it; it++)
+					{
+						ndContact* const contact = *it;
+						contact->SetActive(false);
+					}
 				}
 
 				ndVector m_veloc;
@@ -584,6 +593,7 @@ namespace ndQuadruped_2
 
 			ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*sequence;
 
+			ndFloat32 effectorStrength = 20.0f * 10.0f * 500.0f;
 			const ndMatrix rootMatrix(robot->GetRoot()->m_body->GetMatrix());
 			for (ndInt32 i = 0; i < 4; ++i)
 			{
@@ -610,6 +620,8 @@ namespace ndQuadruped_2
 					effector->SetAngularSpringDamper(regularizer, 4000.0f, 50.0f);
 					//effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
 					effector->SetWorkSpaceConstraints(0.0f, 0.75f * 0.9f);
+					effector->SetMaxForce(effectorStrength);
+					effector->SetMaxTorque(effectorStrength);
 
 					ndEffectorInfo info(thighNode->m_joint, calfNode->m_joint, footNode->m_joint, ndSharedPtr<ndJointBilateralConstraint>(effector));
 					m_effectorsInfo.PushBack(info);
@@ -755,19 +767,40 @@ namespace ndQuadruped_2
 			return reward;
 		}
 
+		ndReal CalculatePoseMatchReward() const
+		{
+			ndVector errorAcc (ndVector::m_zero);
+			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			{
+				const ndEffectorInfo* const info = &m_effectorsInfo[i];
+				const ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+
+				const ndVector posit0(m_animPose[i].m_posit);
+				//const ndVector posit1(effector->GetLocalTargetPosition());
+				const ndVector posit1(effector->GetEffectorPosit());
+				const ndVector error(ndVector::m_triplexMask & (posit1 - posit0));
+				errorAcc += error * error;
+			}
+			ndFloat32 dist2 = errorAcc.DotProduct(errorAcc).GetScalar();
+			ndFloat32 reward = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * dist2));
+			return reward;
+		}
+
 		ndReal GetReward() const
 		{
 			//ndBrainFloat reward0 = CalculateZeroOmegaReward();
 			ndBrainFloat dstReward = CalculateDistanceToOrigin();
 			ndBrainFloat zmpReward = CalculateZeroMomentPointReward();
-			//ndTrace(("zeroOmega(%f) ZeroMoment(%f)\n", reward0, reward1));
+			ndBrainFloat poseMatchReward = CalculatePoseMatchReward();
 
-			if ((dstReward < 1.0e-3f) || (zmpReward < 1.0e-3f))
+			if ((poseMatchReward < 1.0e-3f) || (dstReward < 1.0e-3f) || (zmpReward < 1.0e-3f))
 			{
 				dstReward = 0.0f;
 				zmpReward = 0.0f;
+				poseMatchReward = 0.0f;
 			}
-			ndBrainFloat reward = 0.80f * zmpReward + 0.20f * dstReward;
+			//ndBrainFloat reward = 0.80f * zmpReward + 0.20f * dstReward;
+			ndBrainFloat reward = 0.50f * poseMatchReward + 0.30f * zmpReward + 0.20f * dstReward;
 
 			for (ndInt32 i = sizeof(m_controllerTrainer->m_rewardsMemories) / sizeof(m_controllerTrainer->m_rewardsMemories[0]) - 1; i >= 1; --i)
 			{
@@ -832,68 +865,74 @@ namespace ndQuadruped_2
 				observation.m_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamFloat);
 			}
 
-			observation.m_torso.m_x = m_control->m_x;
-			observation.m_torso.m_z = m_control->m_z;
+			//observation.m_torso.m_x = m_control->m_x;
+			//observation.m_torso.m_z = m_control->m_z;
 			observation.m_animSpeed = m_control->m_animSpeed;
 		}
 
-		void ApplyActions(ndBrainFloat* const actions)
+		void ApplyActions(const ndBrainFloat* const actions)
 		{
 			//m_control->m_animSpeed = 0.25f;
-			if (m_control->m_enableController)
-			{
-				const ndActionVector& actionVector = *((ndActionVector*)actions);
-				m_control->m_x = ndClamp(ndReal(m_control->m_x + actionVector.m_x * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
-				m_control->m_z = ndClamp(ndReal(m_control->m_z + actionVector.m_z * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
-			}
+			//if (m_control->m_enableController)
+			//{
+			//	const ndActionVector& actionVector = *((ndActionVector*)actions);
+			//	m_control->m_x = ndClamp(ndReal(m_control->m_x + actionVector.m_x * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
+			//	m_control->m_z = ndClamp(ndReal(m_control->m_z + actionVector.m_z * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
+			//}
 
-			UpdatePose();
-		}
-
-		void UpdatePose()
-		{
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
 			ndAssert(skeleton);
 			ndFixSizeArray<ndJointBilateralConstraint*, 32> effectors;
-			
+
 			ndVector veloc;
 			m_animBlendTree->Evaluate(m_animPose, veloc);
-			
+
+			const ndActionVector* const legActions = (const ndActionVector*)actions;
 			const ndVector upVector(rootBody->GetMatrix().m_up);
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				ndEffectorInfo* const info = &m_effectorsInfo[i];
 				effectors.PushBack(*info->m_effector);
-				
+
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-				
-				const ndVector posit = m_animPose[i].m_posit;
+
+				//ndVector posit (m_animPose[i].m_posit);
+				//ndVector posit(effector->GetLocalTargetPosition());
+				ndVector posit(effector->GetEffectorPosit());
+				if (m_control->m_enableController)
+				{
+					posit.m_x += legActions->m_pose[i].m_x * D_SWING_STEP;
+					posit.m_y += legActions->m_pose[i].m_y * D_SWING_STEP;
+					posit.m_z += legActions->m_pose[i].m_z * D_SWING_STEP;
+				}
 				effector->SetLocalTargetPosition(posit);
-				
+
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
 				effector->SetSwivelAngle(swivelAngle);
-				
+
 				// calculate lookAt angle
 				ndMatrix lookAtMatrix0;
 				ndMatrix lookAtMatrix1;
 				ndJointHinge* const footHinge = (ndJointHinge*)*info->m_foot;
 				footHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-				
+
 				ndMatrix upMatrix(ndGetIdentityMatrix());
 				upMatrix.m_front = lookAtMatrix1.m_front;
 				upMatrix.m_right = (upMatrix.m_front.CrossProduct(upVector) & ndVector::m_triplexMask).Normalize();
 				upMatrix.m_up = upMatrix.m_right.CrossProduct(upMatrix.m_front);
 				upMatrix = upMatrix * lookAtMatrix0.OrthoInverse();
-				
+
 				const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
 				footHinge->SetTargetAngle(angle);
 			}
-			
+
 			m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), m_world, m_timestep);
 			m_invDynamicsSolver.Solve();
 			m_invDynamicsSolver.SolverEnd();
+
+			//UpdatePose();
 		}
 
 		void ResetModel()
@@ -1139,7 +1178,6 @@ namespace ndQuadruped_2
 		ndFloat32 m_timestep;
 		
 		bool m_showDebug;
-
 		friend class ndModelUI;
 	};
 
@@ -1232,8 +1270,8 @@ namespace ndQuadruped_2
 
 			ndInt32 countX = 6;
 			ndInt32 countZ = 9;
-			countX = 2;
-			countZ = 2;
+			//countX = 0;
+			//countZ = 0;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -1241,8 +1279,8 @@ namespace ndQuadruped_2
 				for (ndInt32 j = 0; j < countX; ++j)
 				{
 					ndMatrix location(matrix);
-					location.m_posit.m_x += 6.0f * (ndRand() - 0.5f);
-					location.m_posit.m_z += 6.0f * (ndRand() - 0.5f);
+					location.m_posit.m_x += 10.0f * (ndRand() - 0.5f);
+					location.m_posit.m_z += 10.0f * (ndRand() - 0.5f);
 
 					ndModelArticulation* const model = CreateModel(scene, location);
 					model->SetNotifyCallback(new RobotModelNotify(m_master, model, false));
@@ -1423,7 +1461,7 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_frictionTest, ndDemoContactCallback::m_default);
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 0.6f;
+	matrix.m_posit.m_y = 0.5f;
 
 	#ifdef ND_TRAIN_MODEL
 		scene->RegisterPostUpdate(new TrainingUpdata(scene, matrix));
@@ -1433,7 +1471,7 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 		referenceModel->AddToWorld(world);
 
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-		//world->AddJoint(fixJoint);
+		world->AddJoint(fixJoint);
 
 		char fileName[256];
 		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
@@ -1447,6 +1485,10 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 
 		ndInt32 countZ = 5;
 		ndInt32 countX = 5;
+
+		countZ = 0;
+		countX = 0;
+
 		for (ndInt32 i = 0; i < countZ; ++i)
 		{
 			for (ndInt32 j = 0; j < countX; ++j)

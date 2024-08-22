@@ -261,18 +261,6 @@ bool ndIkSolver::IsSleeping(ndSkeletonContainer* const skeleton) const
 	return skeleton->m_isResting ? true : false;
 }
 
-//ndVector ndIkSolver::GetBodyForce(const ndBodyKinematic* const body) const
-//{
-//	ndAssert(0);
-//	return body->m_accel;
-//}
-//
-//ndVector ndIkSolver::GetBodyTorque(const ndBodyKinematic* const body) const
-//{
-//	ndAssert(0);
-//	return body->m_alpha;
-//}
-
 void ndIkSolver::BuildMassMatrix()
 {
 	m_bodies.SetCount(0);
@@ -356,37 +344,7 @@ void ndIkSolver::BuildMassMatrix()
 		CopyCloseLoopBody(body1);
 	}
 
-	//auto CopyContactBody = [this](ndBodyKinematic* const body)
-	//{
-	//	if (body->GetInvMass() == ndFloat32(0.0f))
-	//	{
-	//		return;
-	//	}
-	//
-	//	ndAssert(body->GetId() > 0);
-	//	for (ndInt32 i = ndInt32(m_bodies.GetCount()) - 1; i >= 1; --i)
-	//	{
-	//		if (body == m_bodies[i])
-	//		{
-	//			return;
-	//		}
-	//	}
-	//
-	//	m_bodies.PushBack(body);
-	//	ndUnsigned32 id = body->GetId();
-	//	for (ndInt32 i = ndInt32(m_bodies.GetCount()) - 1; i >= 1; --i)
-	//	{
-	//		if (id > m_bodies[i - 1]->GetId())
-	//		{
-	//			m_bodies[i] = body;
-	//			break;
-	//		}
-	//		m_bodies[i] = m_bodies[i - 1];
-	//	}
-	//};
-
 	// add contacts loop bodies and joints
-
 	class ndBodyPair
 	{
 		public:
@@ -497,7 +455,7 @@ void ndIkSolver::BuildMassMatrix()
 		const ndVector gyroTorque(body->m_omega.CrossProduct(body->CalculateAngularMomentum()));
 		body->m_gyroTorque = gyroTorque;
 	}
-	
+
 	for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
 	{
 		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
@@ -520,6 +478,7 @@ void ndIkSolver::BuildMassMatrix()
 		GetJacobianDerivatives(contact);
 		BuildJacobianMatrix(contact);
 	}
+
 	m_skeleton->InitMassMatrix(&m_leftHandSide[0], &m_rightHandSide[0]);
 }
 
@@ -527,22 +486,26 @@ void ndIkSolver::SolverBegin(ndSkeletonContainer* const skeleton, ndJointBilater
 {
 	m_world = world;
 	m_skeleton = skeleton;
-	m_timestep = timestep;
-	m_invTimestep = ndFloat32(1.0f) / m_timestep;
+	if (m_skeleton)
+	{
+		m_timestep = timestep;
+		m_invTimestep = ndFloat32(1.0f) / m_timestep;
 
-	m_skeleton->ClearCloseLoopJoints();
-	for (ndInt32 i = jointCount - 1; i >= 0; --i)
-	{
-		m_skeleton->AddCloseLoopJoint((ndConstraint*)joints[i]);
+		m_skeleton->ClearCloseLoopJoints();
+		for (ndInt32 i = jointCount - 1; i >= 0; --i)
+		{
+			m_skeleton->AddCloseLoopJoint((ndConstraint*)joints[i]);
+		}
+
+		for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
+		{
+			ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
+			ndJointBilateralConstraint* const joint = node->m_joint;
+			joint->SetIkMode(true);
+		}
+
+		BuildMassMatrix();
 	}
-	
-	for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
-	{
-		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
-		ndJointBilateralConstraint* const joint = node->m_joint;
-		joint->SetIkMode(true);
-	}
-	BuildMassMatrix();
 }
 
 void ndIkSolver::SolverEnd()
@@ -562,6 +525,7 @@ void ndIkSolver::SolverEnd()
 
 void ndIkSolver::Solve()
 {
+	ndAssert(m_skeleton);
 	if (m_skeleton)
 	{
 		const ndVector zero(ndVector::m_zero);
@@ -581,21 +545,6 @@ void ndIkSolver::Solve()
 				ndAssert((body0->GetSkeleton() == m_skeleton) || (body1->GetSkeleton() == m_skeleton));
 
 				ndBodyKinematic* const body = (body0->GetSkeleton() != m_skeleton) ? body0 : body1;
-
-				//auto AddContactForce = [contact](ndBodyKinematic* const body)
-				//{
-				//	ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
-				//	ndBodyKinematic::ndContactMap::Iterator it(contactMap);
-				//	for (it.Begin(); it; it++)
-				//	{
-				//		ndContact* const fronterContact = it.GetNode()->GetInfo();
-				//		if (fronterContact->IsActive() && (fronterContact != contact))
-				//		{
-				//
-				//		}
-				//	}
-				//};
-
 				ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
 				ndBodyKinematic::ndContactMap::Iterator it(contactMap);
 				for (it.Begin(); it; it++)
@@ -633,6 +582,7 @@ void ndIkSolver::Solve()
 			accel0.m_angular = body0->m_alpha;
 			accel1.m_linear = body1->m_accel;
 			accel1.m_angular = body1->m_alpha;
+
 			joint->SetIkSetAccel(accel0, accel1);
 			joint->SetIkMode(false);
 		}

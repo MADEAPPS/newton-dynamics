@@ -129,7 +129,6 @@ class ndContact: public ndConstraint
 	ndMaterial* m_material;
 	ndFloat32 m_timeOfImpact;
 	ndFloat32 m_separationDistance;
-	//ndUnsigned32 m_maxDOF;
 	ndUnsigned32 m_sceneLru;
 	ndUnsigned32 m_isDead : 1;
 	ndUnsigned32 m_inTrigger : 1;

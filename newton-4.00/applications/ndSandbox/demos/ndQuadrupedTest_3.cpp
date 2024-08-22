@@ -1560,7 +1560,8 @@ namespace ndQuadruped_3
 using namespace ndQuadruped_3;
 #endif
 
-void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
+//void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
+void ndQuadrupedTest_3(ndDemoEntityManager* const)
 {
 	ndAssert(0);
 #if 0

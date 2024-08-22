@@ -322,13 +322,8 @@ class ndVector
 
 	inline ndVector AddHorizontal () const
 	{
-		#ifdef D_USE_SSE3
-			__m128 tmp (_mm_hadd_ps (m_type, m_type));
-			return _mm_hadd_ps (tmp, tmp);
-		#else
-			__m128 tmp (_mm_add_ps (m_type, _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(1, 0, 3, 2))));
-			return _mm_add_ps(tmp, _mm_shuffle_ps(tmp, tmp, PERMUTE_MASK(2, 3, 0, 1)));
-		#endif	
+		__m128 tmp (_mm_hadd_ps (m_type, m_type));
+		return _mm_hadd_ps (tmp, tmp);
 	}
 
 	inline ndVector Abs () const
@@ -1312,11 +1307,7 @@ class ndBigVector
 	inline ndBigVector AddHorizontal() const
 	{
 		__m128d tmp0(_mm_add_pd(m_typeHigh, m_typeLow));
-		#ifdef D_USE_SSE3
 		__m128d tmp1(_mm_hadd_pd(tmp0, tmp0));
-		#else
-		__m128d tmp1(_mm_add_pd(tmp0, _mm_shuffle_pd(tmp0, tmp0, PERMUT_MASK_DOUBLE(0, 1))));
-		#endif
 		return ndBigVector(tmp1, tmp1);
 	}
 

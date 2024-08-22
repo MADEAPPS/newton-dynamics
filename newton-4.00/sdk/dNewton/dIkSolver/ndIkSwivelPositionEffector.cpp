@@ -210,9 +210,8 @@ ndVector ndIkSwivelPositionEffector::GetEffectorPosit() const
 	CalculateGlobalMatrix(matrix0, matrix1);
 	ndVector posit(matrix1.UntransformVector(matrix0.m_posit));
 
-	ndAssert(0);
-	const ndMatrix swivelMatrix(ndPitchMatrix(-m_swivelAngle) * CalculateSwivelFrame(matrix1));
-	posit.m_w = CalculateAngle(matrix0[1], swivelMatrix[1], swivelMatrix[0]);
+	//const ndMatrix swivelMatrix(ndPitchMatrix(-m_swivelAngle) * CalculateSwivelFrame(matrix1));
+	//posit.m_w = CalculateAngle(matrix0[1], swivelMatrix[1], swivelMatrix[0]);
 	return posit;
 }
 
