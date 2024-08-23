@@ -48,15 +48,12 @@ namespace ndQuadruped_2
 	{
 		public:
 		ndLegObservation m_legs[4];
-		//ndActionVector m_torso;
 		ndFloat32 m_animSpeed;
 	};
 
 	class ndActionVector
 	{
 		public:
-	//	//ndBrainFloat m_x;
-	//	//ndBrainFloat m_z;
 		ndAnimPose m_pose[4];
 	};
 
@@ -67,7 +64,7 @@ namespace ndQuadruped_2
 	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
-	#define D_SWING_STEP			ndReal(0.01f)
+	#define D_SWING_STEP			ndReal(0.05f)
 	#define D_MODEL_DEAD_ANGLE		ndReal(0.2f)
 	#define D_MIN_TRAIN_ANIM_SPEED	ndReal(0.1f)
 
@@ -359,18 +356,18 @@ namespace ndQuadruped_2
 
 			void SaveTrajectory()
 			{
-				ndInt32 stepsCount = 0;
-				// if the model is dead, just skip this trajectory, not need to train on a dead model.
-				for (ndInt32 i = 0; i < m_trajectory.GetCount(); ++i)
-				{
-					if (m_trajectory.GetReward(i) > ndReal(0.05f))
-					{
-						// model is alive, break loop.
-						stepsCount = m_trajectory.GetCount();
-						break;
-					}
-				}
-				m_trajectory.SetCount(stepsCount);
+				//ndInt32 stepsCount = 0;
+				//// if the model is dead, just skip this trajectory, not need to train on a dead model.
+				//for (ndInt32 i = 0; i < m_trajectory.GetCount(); ++i)
+				//{
+				//	if (m_trajectory.GetReward(i) > ndReal(0.05f))
+				//	{
+				//		// model is alive, break loop.
+				//		stepsCount = m_trajectory.GetCount();
+				//		break;
+				//	}
+				//}
+				//m_trajectory.SetCount(stepsCount);
 				ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
 			}
 
@@ -818,7 +815,8 @@ namespace ndQuadruped_2
 				errorAcc += error * error;
 			}
 			ndFloat32 dist2 = errorAcc.DotProduct(errorAcc).GetScalar();
-			ndBrainFloat reward = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * dist2));
+			ndFloat32 dist = ndSqrt(dist2);
+			ndBrainFloat reward = ndBrainFloat(ndExp(-ndBrainFloat(1000.0f) * dist2));
 			return reward;
 		}
 
@@ -829,13 +827,12 @@ namespace ndQuadruped_2
 			ndBrainFloat zmpReward = CalculateZeroMomentPointReward();
 			ndBrainFloat poseMatchReward = CalculatePoseMatchReward();
 
-			if ((poseMatchReward < 1.0e-3f) || (dstReward < 1.0e-3f) || (zmpReward < 1.0e-3f))
+			if ((poseMatchReward < 1.0e-8f) || (dstReward < 1.0e-3f) || (zmpReward < 1.0e-3f))
 			{
 				dstReward = 0.0f;
 				zmpReward = 0.0f;
 				poseMatchReward = 0.0f;
 			}
-			//ndBrainFloat reward = 0.80f * zmpReward + 0.20f * dstReward;
 			ndBrainFloat reward = 0.50f * poseMatchReward + 0.30f * zmpReward + 0.20f * dstReward;
 
 			for (ndInt32 i = sizeof(m_controllerTrainer->m_rewardsMemories) / sizeof(m_controllerTrainer->m_rewardsMemories[0]) - 1; i >= 1; --i)
@@ -1311,8 +1308,8 @@ namespace ndQuadruped_2
 				for (ndInt32 j = 0; j < countX; ++j)
 				{
 					ndMatrix location(matrix);
-					location.m_posit.m_x += 10.0f * (ndRand() - 0.5f);
-					location.m_posit.m_z += 10.0f * (ndRand() - 0.5f);
+					location.m_posit.m_x += 20.0f * (ndRand() - 0.5f);
+					location.m_posit.m_z += 20.0f * (ndRand() - 0.5f);
 
 					ndModelArticulation* const model = CreateModel(scene, location);
 					model->SetNotifyCallback(new RobotModelNotify(m_master, model, false));
