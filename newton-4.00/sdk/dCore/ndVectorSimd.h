@@ -595,7 +595,6 @@ class ndBigVector
 		,m_z(baseAddr[index[2]])
 		,m_w(baseAddr[index[3]])
 	{
-		ndAssert(0);
 	}
 
 #ifdef D_NEWTON_USE_DOUBLE
@@ -809,14 +808,9 @@ class ndBigVector
 
 	inline ndBigVector GetMax() const
 	{
-		ndAssert(0);
-		//__m128d tmp(_mm_max_pd(m_typeLow, m_typeHigh));
-		//tmp = _mm_max_pd(tmp, _mm_shuffle_pd(tmp, tmp, PERMUT_MASK_DOUBLE(0, 1)));
-		//return ndBigVector(tmp, tmp);
-
-		__m256d tmp1(_mm256_max_pd(m_type, _mm256_permute2f128_pd(m_type, m_type, 1)));
-		__m256d tmp2(_mm256_max_pd(tmp1, _mm256_unpackhi_pd(tmp1, tmp1)));
-		return ndBigVector(tmp2);
+		__m256d tmp2(_mm256_max_pd(m_type, _mm256_permute2f128_pd(m_type, m_type, 1)));
+		__m256d tmp3(_mm256_max_pd(tmp2, _mm256_shuffle_pd(tmp2, tmp2, 0x05)));
+		return ndBigVector(tmp3);
 	}
 
 	inline ndBigVector GetMax(const ndBigVector& data) const

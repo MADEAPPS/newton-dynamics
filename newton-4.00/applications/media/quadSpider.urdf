@@ -30,7 +30,7 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="2.58142e-15 -1.5708 0" xyz="0.15 0 1.74674e-09" />
+            <origin rpy="-2.22045e-16 -1.5708 0" xyz="0.15 0 -2.27178e-17" />
             <material name="material_0" />
         </visual>
         <collision>
@@ -38,12 +38,12 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="2.58142e-15 -1.5708 0" xyz="0.15 0 1.74674e-09" />
+            <origin rpy="-2.22045e-16 -1.5708 0" xyz="0.15 0 -2.27178e-17" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="0.15 0 -5.70384e-09" />
+            <origin rpy="0 -0 0" xyz="0.15 -2.77556e-17 -1.57789e-17" />
             <mass value="0.25" />
-            <inertia xx="0.00259239" xy="0.000569043" xz="-0.000657074" yy="0.00193531" yz="0.00113809" zz="0.00160678" />
+            <inertia xx="0.00259239" xy="0.000569043" xz="-0.000657074" yy="0.00193531" yz="0.00113809" zz="0.00160677" />
         </inertial>
     </link>
     <joint name="thigh_0_to_base_link" type="floating">
@@ -58,7 +58,7 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-1.5708 -8.22321e-09 3.14159" xyz="-1.31544e-08 0.15 -2.98023e-08" />
+            <origin rpy="-1.5708 -4.88977e-17 3.14159" xyz="7.095e-17 0.15 0" />
             <material name="material_0" />
         </visual>
         <collision>
@@ -66,20 +66,20 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-1.5708 -8.22321e-09 3.14159" xyz="-1.31544e-08 0.15 -2.98023e-08" />
+            <origin rpy="-1.5708 -4.88977e-17 3.14159" xyz="7.095e-17 0.15 0" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="-7.45058e-09 0.15 -2.23517e-08" />
+            <origin rpy="0 -0 0" xyz="2.93166e-17 0.15 -1.38778e-17" />
             <mass value="0.0625" />
-            <inertia xx="0.000237425" xy="-0.000284521" xz="1.16415e-10" yy="0.000565963" yz="0" zz="0.000730231" />
+            <inertia xx="0.000237424" xy="-0.000284521" xz="8.93159e-11" yy="0.000565963" yz="5.15664e-11" zz="0.000730231" />
         </inertial>
     </link>
     <joint name="calf_0_to_thigh_0" type="revolute">
         <parent link="thigh_0" />
         <child link="calf_0" />
-        <limit effort="1000.000000" lower="-1.221730" upper="1.221730" velocity="0.500000" />
+        <limit effort="1000.000000" lower="-1.047197" upper="1.047197" velocity="0.500000" />
         <newton replaceWith="ndIkJointHinge" />
-        <origin rpy="3.14159 1.5708 0" xyz="0.3 0 -2.63088e-08" />
+        <origin rpy="3.14159 1.5708 0" xyz="0.3 -5.55112e-17 2.39534e-17" />
     </joint>
     <link name="foot_0">
         <visual>
@@ -87,7 +87,7 @@
                 <cylinder length="0.25" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-1.5708 8.51837e-14 -2.98231e-07" xyz="1.74423e-08 -0.075 0" />
+            <origin rpy="-1.5708 -1.50752e-16 -3.13916e-07" xyz="-2.92479e-17 -0.075 0" />
             <material name="material_0" />
         </visual>
         <collision>
@@ -95,19 +95,19 @@
                 <cylinder length="0.25" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-1.5708 8.51837e-14 -2.98231e-07" xyz="1.74423e-08 -0.075 0" />
+            <origin rpy="-1.5708 -1.50752e-16 -3.13916e-07" xyz="-2.92479e-17 -0.075 0" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="1.74422e-08 -0.075 -4.40761e-09" />
+            <origin rpy="0 -0 0" xyz="-2.03909e-18 -0.075 -2.89669e-17" />
             <mass value="0.0625" />
-            <inertia xx="0.000123308" xy="-9.05194e-05" xz="3.62802e-11" yy="0.000227831" yz="-7.11733e-12" zz="0.000280093" />
+            <inertia xx="0.000123308" xy="-9.05194e-05" xz="2.84155e-11" yy="0.000227831" yz="1.64057e-11" zz="0.000280093" />
         </inertial>
     </link>
     <joint name="foot_0_to_calf_0" type="continuous">
         <parent link="calf_0" />
         <child link="foot_0" />
         <newton springPD="2000.000000" damperPD="50.000000" regularizer="0.001000" />
-        <origin rpy="-0.785398 -8.22321e-09 3.14159" xyz="3.49347e-09 0.3 -2.98023e-08" />
+        <origin rpy="-0.785398 -4.88977e-17 -3.14159" xyz="3.08777e-17 0.3 -5.55112e-17" />
     </joint>
     <link name="thigh_1">
         <visual>
@@ -115,7 +115,7 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="2.98023e-08 -1.5708 0" xyz="0.15 -1.49012e-08 -6.9622e-09" />
+            <origin rpy="5.55112e-17 -1.5708 0" xyz="0.15 2.77556e-17 3.92655e-17" />
             <material name="material_0" />
         </visual>
         <collision>
@@ -123,12 +123,12 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="2.98023e-08 -1.5708 0" xyz="0.15 -1.49012e-08 -6.9622e-09" />
+            <origin rpy="5.55112e-17 -1.5708 0" xyz="0.15 2.77556e-17 3.92655e-17" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="0.15 -7.45058e-09 4.21367e-09" />
+            <origin rpy="0 -0 0" xyz="0.15 2.77556e-17 3.23266e-17" />
             <mass value="0.25" />
-            <inertia xx="0.00259239" xy="-0.000569044" xz="0.000657076" yy="0.00193531" yz="0.00113809" zz="0.00160678" />
+            <inertia xx="0.00259239" xy="-0.000569044" xz="0.000657076" yy="0.00193531" yz="0.00113809" zz="0.00160677" />
         </inertial>
     </link>
     <joint name="thigh_1_to_base_link" type="floating">
@@ -143,7 +143,7 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-1.5708 -5.13818e-08 3.14159" xyz="1.09192e-08 0.15 -2.98023e-08" />
+            <origin rpy="-1.5708 2.03389e-17 3.14159" xyz="-1.27492e-17 0.15 -1.11022e-16" />
             <material name="material_0" />
         </visual>
         <collision>
@@ -151,20 +151,20 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-1.5708 -5.13818e-08 3.14159" xyz="1.09192e-08 0.15 -2.98023e-08" />
+            <origin rpy="-1.5708 2.03389e-17 3.14159" xyz="-1.27492e-17 0.15 -1.11022e-16" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="1.11759e-08 0.15 0" />
+            <origin rpy="0 -0 0" xyz="-5.81028e-18 0.15 -6.93889e-17" />
             <mass value="0.0625" />
-            <inertia xx="0.000237426" xy="0.000284522" xz="-4.36557e-11" yy="0.000565962" yz="5.82077e-11" zz="0.000730231" />
+            <inertia xx="0.000237425" xy="0.000284522" xz="-8.93161e-11" yy="0.000565962" yz="5.15668e-11" zz="0.000730231" />
         </inertial>
     </link>
     <joint name="calf_1_to_thigh_1" type="revolute">
         <parent link="thigh_1" />
         <child link="calf_1" />
-        <limit effort="1000.000000" lower="-1.221730" upper="1.221730" velocity="0.500000" />
+        <limit effort="1000.000000" lower="-1.047197" upper="1.047197" velocity="0.500000" />
         <newton replaceWith="ndIkJointHinge" />
-        <origin rpy="3.14159 1.5708 0" xyz="0.3 1.49012e-08 8.42733e-09" />
+        <origin rpy="3.14159 1.5708 0" xyz="0.3 1.11022e-16 5.07754e-17" />
     </joint>
     <link name="foot_1">
         <visual>
@@ -172,7 +172,7 @@
                 <cylinder length="0.25" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-1.5708 -1.10084e-13 -3.5541e-07" xyz="-1.64744e-08 -0.075 0" />
+            <origin rpy="-1.5708 9.49869e-17 -3.13916e-07" xyz="8.02879e-17 -0.075 0" />
             <material name="material_0" />
         </visual>
         <collision>
@@ -180,19 +180,19 @@
                 <cylinder length="0.25" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-1.5708 -1.10084e-13 -3.5541e-07" xyz="-1.64744e-08 -0.075 0" />
+            <origin rpy="-1.5708 9.49869e-17 -3.13916e-07" xyz="8.02879e-17 -0.075 0" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="-1.64745e-08 -0.075 -4.40757e-09" />
+            <origin rpy="0 -0 0" xyz="3.26135e-17 -0.075 -6.19376e-18" />
             <mass value="0.0625" />
-            <inertia xx="0.000123308" xy="9.05196e-05" xz="-2.71392e-11" yy="0.000227831" yz="-7.57541e-12" zz="0.000280093" />
+            <inertia xx="0.000123308" xy="9.05196e-05" xz="-2.84156e-11" yy="0.000227831" yz="1.64058e-11" zz="0.000280093" />
         </inertial>
     </link>
     <joint name="foot_1_to_calf_1" type="continuous">
         <parent link="calf_1" />
         <child link="foot_1" />
         <newton springPD="2000.000000" damperPD="50.000000" regularizer="0.001000" />
-        <origin rpy="-0.785398 -6.67831e-09 3.14159" xyz="-5.26674e-08 0.3 -5.96046e-08" />
+        <origin rpy="-0.785398 4.80945e-17 3.14159" xyz="-2.54984e-17 0.3 -5.55112e-17" />
     </joint>
     <link name="thigh_2">
         <visual>
@@ -200,7 +200,7 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-2.98023e-08 -1.5708 0" xyz="0.15 0 -3.15491e-08" />
+            <origin rpy="-1.11022e-16 -1.5708 0" xyz="0.15 5.55112e-17 -8.53515e-18" />
             <material name="material_0" />
         </visual>
         <collision>
@@ -208,12 +208,12 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-2.98023e-08 -1.5708 0" xyz="0.15 0 -3.15491e-08" />
+            <origin rpy="-1.11022e-16 -1.5708 0" xyz="0.15 5.55112e-17 -8.53515e-18" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="0.15 -7.45058e-09 -1.66479e-08" />
+            <origin rpy="0 -0 0" xyz="0.15 5.55112e-17 -1.59625e-18" />
             <mass value="0.25" />
-            <inertia xx="0.00259239" xy="0.000569044" xz="0.000657074" yy="0.00193531" yz="-0.00113809" zz="0.00160678" />
+            <inertia xx="0.00259239" xy="0.000569043" xz="0.000657074" yy="0.00193531" yz="-0.00113809" zz="0.00160678" />
         </inertial>
     </link>
     <joint name="thigh_2_to_base_link" type="floating">
@@ -228,7 +228,7 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="1.5708 -3.80255e-08 2.46089e-07" xyz="-1.76247e-08 0.15 0" />
+            <origin rpy="1.5708 1.14797e-17 3.13916e-07" xyz="-6.56972e-17 0.15 0" />
             <material name="material_0" />
         </visual>
         <collision>
@@ -236,20 +236,20 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="1.5708 -3.80255e-08 2.46089e-07" xyz="-1.76247e-08 0.15 0" />
+            <origin rpy="1.5708 1.14797e-17 3.13916e-07" xyz="-6.56972e-17 0.15 0" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="-2.6077e-08 0.15 7.45058e-09" />
+            <origin rpy="0 -0 0" xyz="-3.79416e-17 0.15 -1.38778e-17" />
             <mass value="0.0625" />
-            <inertia xx="0.000237425" xy="-0.000284522" xz="7.27596e-11" yy="0.000565963" yz="1.74623e-10" zz="0.000730231" />
+            <inertia xx="0.000237425" xy="-0.000284522" xz="8.9316e-11" yy="0.000565963" yz="5.15666e-11" zz="0.000730231" />
         </inertial>
     </link>
     <joint name="calf_2_to_thigh_2" type="revolute">
         <parent link="thigh_2" />
         <child link="calf_2" />
-        <limit effort="1000.000000" lower="-1.221730" upper="1.221730" velocity="0.500000" />
+        <limit effort="1000.000000" lower="-1.047197" upper="1.047197" velocity="0.500000" />
         <newton replaceWith="ndIkJointHinge" />
-        <origin rpy="-3.14159 -1.5708 0" xyz="0.3 2.98023e-08 -3.49351e-09" />
+        <origin rpy="-3.14159 -1.5708 0" xyz="0.3 2.77556e-17 2.45631e-17" />
     </joint>
     <link name="foot_2">
         <visual>
@@ -257,7 +257,7 @@
                 <cylinder length="0.25" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-1.5708 -2.98024e-08 -2.12818e-07" xyz="7.98065e-09 -0.075 1.19209e-07" />
+            <origin rpy="-1.5708 -5.08357e-17 -3.13916e-07" xyz="-5.2737e-17 -0.075 1.11022e-16" />
             <material name="material_0" />
         </visual>
         <collision>
@@ -265,19 +265,19 @@
                 <cylinder length="0.25" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-1.5708 -2.98024e-08 -2.12818e-07" xyz="7.98065e-09 -0.075 1.19209e-07" />
+            <origin rpy="-1.5708 -5.08357e-17 -3.13916e-07" xyz="-5.2737e-17 -0.075 1.11022e-16" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="3.98793e-09 -0.075 7.29529e-08" />
+            <origin rpy="0 -0 0" xyz="-1.58384e-17 -0.075 5.4573e-17" />
             <mass value="0.0625" />
-            <inertia xx="0.000123308" xy="-9.05195e-05" xz="3.15258e-11" yy="0.000227831" yz="7.48354e-11" zz="0.000280093" />
+            <inertia xx="0.000123308" xy="-9.05195e-05" xz="2.84156e-11" yy="0.000227831" yz="1.64057e-11" zz="0.000280093" />
         </inertial>
     </link>
     <joint name="foot_2_to_calf_2" type="continuous">
         <parent link="calf_2" />
         <child link="foot_2" />
         <newton springPD="2000.000000" damperPD="50.000000" regularizer="0.001000" />
-        <origin rpy="2.35619 -6.78278e-08 -9.76301e-08" xyz="-5.01507e-08 0.3 -2.98023e-08" />
+        <origin rpy="2.35619 -4.40315e-17 -1.85238e-16" xyz="-7.58832e-17 0.3 -5.55112e-17" />
     </joint>
     <link name="thigh_3">
         <visual>
@@ -285,7 +285,7 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-2.98023e-08 -1.5708 0" xyz="0.15 -1.49012e-08 1.14325e-08" />
+            <origin rpy="9.35933e-24 -1.5708 0" xyz="0.15 2.77556e-17 1.62489e-18" />
             <material name="material_0" />
         </visual>
         <collision>
@@ -293,10 +293,10 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-2.98023e-08 -1.5708 0" xyz="0.15 -1.49012e-08 1.14325e-08" />
+            <origin rpy="9.35933e-24 -1.5708 0" xyz="0.15 2.77556e-17 1.62489e-18" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="0.15 -3.72529e-09 3.98195e-09" />
+            <origin rpy="0 -0 0" xyz="0.15 -1.38778e-17 1.62489e-18" />
             <mass value="0.25" />
             <inertia xx="0.00259239" xy="-0.000569044" xz="-0.000657075" yy="0.00193531" yz="-0.00113809" zz="0.00160678" />
         </inertial>
@@ -313,7 +313,7 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="1.5708 6.78277e-08 3.22139e-07" xyz="1.53896e-08 0.15 -2.98023e-08" />
+            <origin rpy="1.5708 -2.09556e-17 3.13916e-07" xyz="2.68041e-17 0.15 0" />
             <material name="material_0" />
         </visual>
         <collision>
@@ -321,20 +321,20 @@
                 <cylinder length="0.4" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="1.5708 6.78277e-08 3.22139e-07" xyz="1.53896e-08 0.15 -2.98023e-08" />
+            <origin rpy="1.5708 -2.09556e-17 3.13916e-07" xyz="2.68041e-17 0.15 0" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="1.49012e-08 0.15 -2.23517e-08" />
+            <origin rpy="0 -0 0" xyz="1.29263e-17 0.15 -4.16334e-17" />
             <mass value="0.0625" />
-            <inertia xx="0.000237425" xy="0.000284522" xz="-1.01863e-10" yy="0.000565963" yz="1.16415e-10" zz="0.000730231" />
+            <inertia xx="0.000237425" xy="0.000284522" xz="-8.93161e-11" yy="0.000565962" yz="5.15667e-11" zz="0.000730231" />
         </inertial>
     </link>
     <joint name="calf_3_to_thigh_3" type="revolute">
         <parent link="thigh_3" />
         <child link="calf_3" />
-        <limit effort="1000.000000" lower="-1.221730" upper="1.221730" velocity="0.500000" />
+        <limit effort="1000.000000" lower="-1.047197" upper="1.047197" velocity="0.500000" />
         <newton replaceWith="ndIkJointHinge" />
-        <origin rpy="-3.14159 -1.5708 0" xyz="0.3 0 5.13314e-10" />
+        <origin rpy="-3.14159 -1.5708 0" xyz="0.3 -2.77556e-17 -2.45058e-17" />
     </joint>
     <link name="foot_3">
         <visual>
@@ -342,7 +342,7 @@
                 <cylinder length="0.25" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-1.5708 -1.57329e-16 -3.29601e-07" xyz="-1.11837e-08 -0.075 0" />
+            <origin rpy="-1.5708 -6.0164e-17 -3.13916e-07" xyz="-3.97691e-17 -0.075 -2.22045e-16" />
             <material name="material_0" />
         </visual>
         <collision>
@@ -350,18 +350,18 @@
                 <cylinder length="0.25" radius="0.05" />
                 <newton replaceWith="capsule" />
             </geometry>
-            <origin rpy="-1.5708 -1.57329e-16 -3.29601e-07" xyz="-1.11837e-08 -0.075 0" />
+            <origin rpy="-1.5708 -6.0164e-17 -3.13916e-07" xyz="-3.97691e-17 -0.075 -2.22045e-16" />
         </collision>
         <inertial>
-            <origin rpy="0 -0 0" xyz="-1.11837e-08 -0.075 6.43262e-09" />
+            <origin rpy="0 -0 0" xyz="-5.57362e-17 -0.075 -1.07335e-16" />
             <mass value="0.0625" />
-            <inertia xx="0.000123308" xy="9.05196e-05" xz="-2.05506e-11" yy="0.000227831" yz="3.99286e-11" zz="0.000280093" />
+            <inertia xx="0.000123308" xy="9.05195e-05" xz="-2.84156e-11" yy="0.000227831" yz="1.64057e-11" zz="0.000280093" />
         </inertial>
     </link>
     <joint name="foot_3_to_calf_3" type="continuous">
         <parent link="calf_3" />
         <child link="foot_3" />
         <newton springPD="2000.000000" damperPD="50.000000" regularizer="0.001000" />
-        <origin rpy="2.35619 8.27288e-08 2.31242e-08" xyz="1.58779e-08 0.3 -5.96046e-08" />
+        <origin rpy="2.35619 6.80001e-18 3.69787e-17" xyz="5.36083e-17 0.3 0" />
     </joint>
 </robot>

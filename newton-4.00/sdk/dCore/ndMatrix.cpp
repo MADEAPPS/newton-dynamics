@@ -192,7 +192,7 @@ ndMatrix ndMatrix::Inverse4x4 () const
 	return inv;
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 {
 	ndMatrix tmp(*this);

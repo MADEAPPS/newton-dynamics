@@ -48,10 +48,10 @@ void ndUrdfFile::ImportMaterials(const nd::TiXmlNode* const rootNode)
 		const nd::TiXmlElement* const color = (nd::TiXmlElement*)node->FirstChild("color");
 		if (color)
 		{
-			ndFloat32 r;
-			ndFloat32 g;
-			ndFloat32 b;
-			ndFloat32 a;
+			ndReal r;
+			ndReal g;
+			ndReal b;
+			ndReal a;
 			ndInt32 ret = 0;
 			const char* const rgba = color->Attribute("rgba");
 			ret = sscanf(rgba, "%f %f %f %f", &r, &g, &b, &a);
@@ -586,12 +586,12 @@ ndMatrix ndUrdfFile::ImportOrigin(const nd::TiXmlNode* const parentNode) const
 	ndMatrix matrix(ndGetIdentityMatrix());
 	if (origin)
 	{
-		ndFloat32 x = ndFloat32(0.0f);
-		ndFloat32 y = ndFloat32(0.0f);
-		ndFloat32 z = ndFloat32(0.0f);
-		ndFloat32 yaw = ndFloat32(0.0f);
-		ndFloat32 roll = ndFloat32(0.0f);
-		ndFloat32 pitch = ndFloat32(0.0f);
+		ndReal x = ndFloat32(0.0f);
+		ndReal y = ndFloat32(0.0f);
+		ndReal z = ndFloat32(0.0f);
+		ndReal yaw = ndFloat32(0.0f);
+		ndReal roll = ndFloat32(0.0f);
+		ndReal pitch = ndFloat32(0.0f);
 
 		const char* const xyz = origin->Attribute("xyz");
 		if (xyz)
@@ -736,11 +736,11 @@ void ndUrdfFile::ImportVisual(const nd::TiXmlNode* const linkNode, ndBodyDynamic
 		}
 		else if (strcmp(name, "box") == 0)
 		{
-			ndFloat32 x;
-			ndFloat32 y;
-			ndFloat32 z;
-			const char* const size = shapeNode->Attribute("size");
+			ndReal x;
+			ndReal y;
+			ndReal z;
 			ndInt32 ret = 0;
+			const char* const size = shapeNode->Attribute("size");
 			ret = sscanf(size, "%f %f %f", &x, &y, &z);
 			shape = new ndShapeBox(x, y, z);
 		}
@@ -922,11 +922,11 @@ void ndUrdfFile::ImportCollision(const nd::TiXmlNode* const linkNode, ndBodyDyna
 		}
 		else if (strcmp(name, "box") == 0)
 		{
-			ndFloat32 x;
-			ndFloat32 y;
-			ndFloat32 z;
-			const char* const size = shapeNode->Attribute("size");
+			ndReal x;
+			ndReal y;
+			ndReal z;
 			ndInt32 ret = 0;
+			const char* const size = shapeNode->Attribute("size");
 			ret = sscanf(size, "%f %f %f", &x, &y, &z);
 			shape = new ndShapeBox(x, y, z);
 		}
@@ -1037,9 +1037,9 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 		const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
 		if (axisNode)
 		{
-			ndFloat32 x = ndFloat32(0.0f);
-			ndFloat32 y = ndFloat32(0.0f);
-			ndFloat32 z = ndFloat32(0.0f);
+			ndReal x = ndFloat32(0.0f);
+			ndReal y = ndFloat32(0.0f);
+			ndReal z = ndFloat32(0.0f);
 			const char* const axisPin = axisNode->Attribute("xyz");
 			ndInt32 ret = 0;
 			ret = sscanf(axisPin, "%f %f %f", &x, &y, &z);
@@ -1052,12 +1052,13 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 		if (newtonEx)
 		{
 			ndInt32 ret = 0;
+			ndReal springPD;
+			ndReal damperPD;
+			ndReal regularizerPD;
+
 			const char* const spring = newtonEx->Attribute("springPD");
 			const char* const damper = newtonEx->Attribute("damperPD");
 			const char* const regularizer = newtonEx->Attribute("regularizer");
-			ndFloat32 springPD;
-			ndFloat32 damperPD;
-			ndFloat32 regularizerPD;
 			ret = sscanf(spring, "%f", &springPD);
 			ret = sscanf(damper, "%f", &damperPD);
 			ret = sscanf(regularizer, "%f", &regularizerPD);
@@ -1071,9 +1072,9 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 		const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
 		if (axisNode)
 		{
-			ndFloat32 x = ndFloat32(0.0f);
-			ndFloat32 y = ndFloat32(0.0f);
-			ndFloat32 z = ndFloat32(0.0f);
+			ndReal x = ndFloat32(0.0f);
+			ndReal y = ndFloat32(0.0f);
+			ndReal z = ndFloat32(0.0f);
 			const char* const axisPin = axisNode->Attribute("xyz");
 			ndInt32 ret = 0;
 			ret = sscanf(axisPin, "%f %f %f", &x, &y, &z);
@@ -1103,9 +1104,9 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 		const nd::TiXmlElement* const axisNode = (nd::TiXmlElement*)jointNode->FirstChild("axis");
 		if (axisNode)
 		{
-			ndFloat32 x = ndFloat32(0.0f);
-			ndFloat32 y = ndFloat32(0.0f);
-			ndFloat32 z = ndFloat32(0.0f);
+			ndReal x = ndFloat32(0.0f);
+			ndReal y = ndFloat32(0.0f);
+			ndReal z = ndFloat32(0.0f);
 			const char* const axisPin = axisNode->Attribute("xyz");
 			ndInt32 ret = 0;
 			ret = sscanf(axisPin, "%f %f %f", &x, &y, &z);
@@ -1152,9 +1153,9 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 			const char* const regularizer = newtonEx->Attribute("regularizer");
 			if (regularizer || damper || spring)
 			{
-				ndFloat32 springPD = 0.0f;
-				ndFloat32 damperPD = 0.0f;
-				ndFloat32 regularizerPD = 0.0f;
+				ndReal springPD = 0.0f;
+				ndReal damperPD = 0.0f;
+				ndReal regularizerPD = 0.0f;
 				if (spring)
 				{
 					ret = sscanf(spring, "%f", &springPD);

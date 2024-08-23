@@ -119,7 +119,7 @@ namespace ndQuadruped_1
 				ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0->GetAsBodyKinematic(), thighNode->m_body->GetAsBodyKinematic());
 			
 				hinge->SetLimitState(true);
-				hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
+				hinge->SetLimits(-60.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
 				calfNode = model->AddLimb(thighNode, calf0, hinge);
 				calfNode->m_name = ndString("calf_") + i;
 			
@@ -515,7 +515,7 @@ namespace ndQuadruped_1
 			m_controller = new ndController(brain);
 			m_controller->m_robot = this;
 			Init(robot);
-			m_control->m_animSpeed = D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand();
+			m_control->m_animSpeed = ndReal (D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand());
 		}
 
 		RobotModelNotify(const RobotModelNotify& src)
@@ -572,6 +572,7 @@ namespace ndQuadruped_1
 
 			ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*sequence;
 
+			ndFloat32 effectorStrength = 20.0f * 10.0f * 500.0f;
 			const ndMatrix rootMatrix(robot->GetRoot()->m_body->GetMatrix());
 			for (ndInt32 i = 0; i < 4; ++i)
 			{
@@ -598,6 +599,8 @@ namespace ndQuadruped_1
 					effector->SetAngularSpringDamper(regularizer, 4000.0f, 50.0f);
 					//effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
 					effector->SetWorkSpaceConstraints(0.0f, 0.75f * 0.9f);
+					effector->SetMaxForce(effectorStrength);
+					effector->SetMaxTorque(effectorStrength);
 
 					ndEffectorInfo info(thighNode->m_joint, calfNode->m_joint, footNode->m_joint, ndSharedPtr<ndJointBilateralConstraint>(effector));
 					m_effectorsInfo.PushBack(info);
@@ -691,7 +694,7 @@ namespace ndQuadruped_1
 
 			// L2 distance
 			ndFloat32 dist2 = x * x + z * z;
-			ndFloat32 reward = ndExp(-10.0f * dist2);
+			ndBrainFloat reward = ndBrainFloat(ndExp(-10.0f * dist2));
 
 			//if (m_id == 0)
 			//{
@@ -879,7 +882,7 @@ namespace ndQuadruped_1
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 
 			m_control->Reset();
-			m_control->m_animSpeed = D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand();
+			m_control->m_animSpeed = ndReal (D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand());
 
 			ndMemSet(m_controllerTrainer->m_rewardsMemories, ndReal(1.0), sizeof(m_controllerTrainer->m_rewardsMemories) / sizeof(m_controllerTrainer->m_rewardsMemories[0]));
 
@@ -1423,6 +1426,9 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 
 		ndInt32 countZ = 5;
 		ndInt32 countX = 5;
+
+		//countZ = 0;
+		//countX = 0;
 		for (ndInt32 i = 0; i < countZ; ++i)
 		{
 			for (ndInt32 j = 0; j < countX; ++j)

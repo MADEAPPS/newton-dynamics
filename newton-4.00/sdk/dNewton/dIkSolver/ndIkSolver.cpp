@@ -159,6 +159,7 @@ void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 		rhs->m_diagonalRegularizer = ndMax(constraintParam.m_diagonalRegularizer[i], ndFloat32(1.0e-5f));
 
 		rhs->m_coordenateAccel = constraintParam.m_jointAccel[i];
+ndAssert(ndAbs(rhs->m_coordenateAccel) < 600);
 		rhs->m_restitution = constraintParam.m_restitution[i];
 		rhs->m_penetration = constraintParam.m_penetration[i];
 		rhs->m_penetrationStiffness = constraintParam.m_penetrationStiffness[i];
@@ -523,6 +524,7 @@ void ndIkSolver::SolverEnd()
 	}
 }
 
+//#pragma optimize( "", off )
 void ndIkSolver::Solve()
 {
 	ndAssert(m_skeleton);
@@ -583,6 +585,12 @@ void ndIkSolver::Solve()
 			accel1.m_linear = body1->m_accel;
 			accel1.m_angular = body1->m_alpha;
 
+			//ndFloat32 xxx0 = accel0.m_angular.DotProduct(accel0.m_angular).GetScalar();
+			//ndFloat32 xxx1 = accel1.m_angular.DotProduct(accel1.m_angular).GetScalar();
+			//if ((xxx0 > 100000) || (xxx1 > 100000))
+			//{
+			//	xxx0 = accel0.m_angular.DotProduct(accel0.m_angular).GetScalar();
+			//}
 			joint->SetIkSetAccel(accel0, accel1);
 			joint->SetIkMode(false);
 		}

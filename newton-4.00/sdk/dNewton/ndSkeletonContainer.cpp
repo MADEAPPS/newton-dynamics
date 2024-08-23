@@ -1634,8 +1634,9 @@ void ndSkeletonContainer::SolveAuxiliaryImmediate(ndArray<ndBodyKinematic*>& bod
 	for (ndInt32 i = ndInt32(bodyArray.GetCount()) - 1; i >= 0; --i)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
+		const ndMatrix& invInertia = body->GetInvInertiaMatrix();
+		body->m_alpha = invInertia.RotateVector(body->m_alpha);
 		body->m_accel = body->m_accel.Scale (body->GetInvMass());
-		body->m_alpha = body->GetInvInertiaMatrix().RotateVector(body->m_alpha);
 	}
 }
 

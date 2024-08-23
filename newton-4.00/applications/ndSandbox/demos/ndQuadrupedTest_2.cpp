@@ -130,7 +130,7 @@ namespace ndQuadruped_2
 				ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0->GetAsBodyKinematic(), thighNode->m_body->GetAsBodyKinematic());
 			
 				hinge->SetLimitState(true);
-				hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
+				hinge->SetLimits(-60.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
 				calfNode = model->AddLimb(thighNode, calf0, hinge);
 				calfNode->m_name = ndString("calf_") + i;
 			
@@ -179,6 +179,45 @@ namespace ndQuadruped_2
 		ndMatrix matrix(model->GetRoot()->m_body->GetMatrix() * location);
 		matrix.m_posit = location.m_posit;
 		model->SetTransform(matrix);
+
+		ndFloat32 totalVolume = 0.0f;
+		ndFixSizeArray<ndBodyKinematic*, 256> bodyArray;
+		for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+		{
+			ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+			ndFloat32 volume = body->GetCollisionShape().GetVolume();
+			if (node->m_name != "base_link")
+			{
+				volume *= 4.0f;
+			}
+			totalVolume += volume;
+			bodyArray.PushBack(body);
+		}
+
+		ndFloat32 totalMass = 25.0f;
+		ndFloat32 density = totalMass / totalVolume;
+		for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
+		{
+			ndBodyKinematic* const body = bodyArray[i];
+			ndFloat32 volume = body->GetCollisionShape().GetVolume();
+			ndFloat32 mass = density * volume;
+			body->SetMassMatrix(mass, body->GetCollisionShape());
+			ndVector inertia(body->GetMassMatrix());
+			ndFloat32 maxInertia = ndMax(ndMax(inertia.m_x, inertia.m_y), inertia.m_z);
+			ndFloat32 minInertia = ndMin(ndMin(inertia.m_x, inertia.m_y), inertia.m_z);
+			if (minInertia < maxInertia * 0.125f)
+			{
+				minInertia = maxInertia * 0.125f;
+				for (ndInt32 j = 0; j < 3; ++j)
+				{
+					if (inertia[j] < minInertia)
+					{
+						inertia[j] = minInertia;
+					}
+				}
+			}
+			body->SetMassMatrix(inertia);
+		}
 
 		return model;
 	}
@@ -534,7 +573,7 @@ namespace ndQuadruped_2
 			m_controller = new ndController(brain);
 			m_controller->m_robot = this;
 			Init(robot);
-			m_control->m_animSpeed = D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand();
+			m_control->m_animSpeed = ndReal (D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand());
 		}
 
 		RobotModelNotify(const RobotModelNotify& src)
@@ -715,7 +754,7 @@ namespace ndQuadruped_2
 
 			// L2 distance
 			ndFloat32 dist2 = x * x + z * z;
-			ndFloat32 reward = ndExp(-10.0f * dist2);
+			ndBrainFloat reward = ndBrainFloat(ndExp(-10.0f * dist2));
 
 			//if (m_id == 0)
 			//{
@@ -733,7 +772,6 @@ namespace ndQuadruped_2
 				ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 
-				//if (keyFrame.m_userParamInt == 0)
 				if (keyFrame.m_userParamFloat < 1.0f)
 				{
 					ndBodyKinematic* const body = effector->GetBody0();
@@ -782,7 +820,7 @@ namespace ndQuadruped_2
 				errorAcc += error * error;
 			}
 			ndFloat32 dist2 = errorAcc.DotProduct(errorAcc).GetScalar();
-			ndFloat32 reward = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * dist2));
+			ndBrainFloat reward = ndBrainFloat(ndExp(-ndBrainFloat(100.0f) * dist2));
 			return reward;
 		}
 
@@ -851,13 +889,13 @@ namespace ndQuadruped_2
 				}
 
 				const ndVector& posit = m_animPose[i].m_posit;
-				observation.m_legs[i].m_posit.m_x = posit.m_x;
-				observation.m_legs[i].m_posit.m_y = posit.m_y;
-				observation.m_legs[i].m_posit.m_z = posit.m_z;
+				observation.m_legs[i].m_posit.m_x = ndReal (posit.m_x);
+				observation.m_legs[i].m_posit.m_y = ndReal (posit.m_y);
+				observation.m_legs[i].m_posit.m_z = ndReal (posit.m_z);
 
-				observation.m_legs[i].m_prevPosit.m_x = m_animPrevPose[i].m_x;
-				observation.m_legs[i].m_prevPosit.m_y = m_animPrevPose[i].m_y;
-				observation.m_legs[i].m_prevPosit.m_z = m_animPrevPose[i].m_z;
+				observation.m_legs[i].m_prevPosit.m_x = ndReal (m_animPrevPose[i].m_x);
+				observation.m_legs[i].m_prevPosit.m_y = ndReal (m_animPrevPose[i].m_y);
+				observation.m_legs[i].m_prevPosit.m_z = ndReal (m_animPrevPose[i].m_z);
 
 				m_animPrevPose[i] = posit;
 
@@ -872,14 +910,6 @@ namespace ndQuadruped_2
 
 		void ApplyActions(const ndBrainFloat* const actions)
 		{
-			//m_control->m_animSpeed = 0.25f;
-			//if (m_control->m_enableController)
-			//{
-			//	const ndActionVector& actionVector = *((ndActionVector*)actions);
-			//	m_control->m_x = ndClamp(ndReal(m_control->m_x + actionVector.m_x * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
-			//	m_control->m_z = ndClamp(ndReal(m_control->m_z + actionVector.m_z * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
-			//}
-
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
@@ -931,8 +961,6 @@ namespace ndQuadruped_2
 			m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), m_world, m_timestep);
 			m_invDynamicsSolver.Solve();
 			m_invDynamicsSolver.SolverEnd();
-
-			//UpdatePose();
 		}
 
 		void ResetModel()
@@ -940,7 +968,7 @@ namespace ndQuadruped_2
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 
 			m_control->Reset();
-			m_control->m_animSpeed = D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand();
+			m_control->m_animSpeed = ndReal (D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand());
 
 			ndMemSet(m_controllerTrainer->m_rewardsMemories, ndReal(1.0), sizeof(m_controllerTrainer->m_rewardsMemories) / sizeof(m_controllerTrainer->m_rewardsMemories[0]));
 
@@ -951,7 +979,7 @@ namespace ndQuadruped_2
 			state = state || (matrix.m_posit.m_x < -20.0f);
 			state = state || (matrix.m_posit.m_z > 20.0f);
 			state = state || (matrix.m_posit.m_z < -20.0f);
-			if (state)
+			//if (state)
 			{
 				for (ndInt32 i = 0; i < m_controllerTrainer->m_basePose.GetCount(); i++)
 				{
@@ -963,31 +991,6 @@ namespace ndQuadruped_2
 				ndUnsigned32 index = ndRandInt() % 4;
 				m_animBlendTree->SetTime(0.25f * ndFloat32(index) * duration);
 			}
-		}
-
-		void Update(ndWorld* const world, ndFloat32 timestep)
-		{
-			m_world = world;
-			m_timestep = timestep;
-			if (m_controllerTrainer)
-			{
-				m_controllerTrainer->Step();
-			}
-			else
-			{
-				m_controller->Step();
-			}
-		}
-
-		void PostUpdate(ndWorld* const, ndFloat32 timestep)
-		{
-			//ndFloat32 animSpeed = (m_control->m_animSpeed > 0.01f) ? (1.0f + 1.0f * m_control->m_animSpeed) : 0.0f;
-			ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
-			m_animBlendTree->Update(timestep * animSpeed);
-		}
-
-		void PostTransformUpdate(ndWorld* const, ndFloat32)
-		{
 		}
 
 		void ScaleSupportShape(ndFixSizeArray<ndBigVector, 16>& shape) const
@@ -1163,6 +1166,31 @@ namespace ndQuadruped_2
 				//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
 				//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
 			}
+		}
+
+		void Update(ndWorld* const world, ndFloat32 timestep)
+		{
+			m_world = world;
+			m_timestep = timestep;
+			if (m_controllerTrainer)
+			{
+				m_controllerTrainer->Step();
+			}
+			else
+			{
+				m_controller->Step();
+			}
+		}
+
+		void PostUpdate(ndWorld* const, ndFloat32 timestep)
+		{
+			//ndFloat32 animSpeed = (m_control->m_animSpeed > 0.01f) ? (1.0f + 1.0f * m_control->m_animSpeed) : 0.0f;
+			ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
+			m_animBlendTree->Update(timestep * animSpeed);
+		}
+
+		void PostTransformUpdate(ndWorld* const, ndFloat32)
+		{
 		}
 
 		ndIkSolver m_invDynamicsSolver;
@@ -1461,7 +1489,7 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_frictionTest, ndDemoContactCallback::m_default);
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 0.5f;
+	matrix.m_posit.m_y = 0.4f;
 
 	#ifdef ND_TRAIN_MODEL
 		scene->RegisterPostUpdate(new TrainingUpdata(scene, matrix));

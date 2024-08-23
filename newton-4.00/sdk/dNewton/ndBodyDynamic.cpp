@@ -280,7 +280,7 @@ void ndBodyDynamic::IntegrateVelocity(ndFloat32 timestep)
 	SaveExternalForces();
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 ndJacobian ndBodyDynamic::IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const
 {
 	ndJacobian velocStep;
@@ -352,6 +352,7 @@ void ndBodyDynamic::IntegrateGyroSubstep(const ndVector& timestep)
 		const ndVector localGyroTorque(localOmega.CrossProduct(m_mass * localOmega));
 		m_gyroTorque = matrix.RotateVector(m_inertiaPrincipalAxis.RotateVector(localGyroTorque));
 		m_gyroAlpha = matrix.RotateVector(m_inertiaPrincipalAxis.RotateVector(localGyroTorque * m_invMass));
+		//ndAssert(m_gyroTorque.DotProduct(m_gyroTorque).GetScalar() < ndFloat32 (10000.0f));
 #else
 		const ndVector localOmega(matrix.UnrotateVector(m_omega));
 		const ndVector localGyroTorque(localOmega.CrossProduct(m_mass * localOmega));
