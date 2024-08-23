@@ -803,6 +803,7 @@ namespace ndQuadruped_2
 			return reward;
 		}
 
+		#pragma optimize( "", off )
 		ndReal CalculatePoseMatchReward() const
 		{
 			ndVector errorAcc (ndVector::m_zero);

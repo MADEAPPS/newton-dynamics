@@ -1137,11 +1137,6 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 	{
 		D_TRACKTIME_NAMED(InitJacobianMatrix);
 		ndAvxFloat* const internalForces = (ndAvxFloat*)&GetTempInternalForces()[0];
-
-		ndAvxFloat xxx (ndVector(0.0f, 1.0f, 2.0f, 3.0f), ndVector(4.0f, 5.0f, 6.0f, 7.0f));
-		ndFloat32 xxx0 = xxx.AddHorizontal();
-		ndFloat32 xxx1 = xxx.GetMax();
-
 		auto BuildJacobianMatrix = [this, &internalForces](ndConstraint* const joint, ndInt32 jointIndex)
 		{
 			ndAssert(joint->GetBody0());
