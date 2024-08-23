@@ -65,10 +65,9 @@ namespace ndQuadruped_2
 
 	#define D_MAX_SWING_DIST_X		ndReal(0.10f)
 	#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
-	#define D_POSE_REST_POSITION_Y	ndReal(-0.4f)
+	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
 	#define D_SWING_STEP			ndReal(0.01f)
-	//#define D_SWING_STEP			ndReal(0.005f)
 	#define D_MODEL_DEAD_ANGLE		ndReal(0.2f)
 	#define D_MIN_TRAIN_ANIM_SPEED	ndReal(0.1f)
 
@@ -774,8 +773,7 @@ namespace ndQuadruped_2
 
 				if (keyFrame.m_userParamFloat < 1.0f)
 				{
-					ndBodyKinematic* const body = effector->GetBody0();
-					desiredSupportPoint.PushBack(ndBigVector(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit)));
+					desiredSupportPoint.PushBack(effector->GetGlobalPosition());
 				}
 			}
 
@@ -814,7 +812,6 @@ namespace ndQuadruped_2
 				const ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 
 				const ndVector posit0(m_animPose[i].m_posit);
-				//const ndVector posit1(effector->GetLocalTargetPosition());
 				const ndVector posit1(effector->GetEffectorPosit());
 				const ndVector error(ndVector::m_triplexMask & (posit1 - posit0));
 				errorAcc += error * error;
@@ -888,7 +885,8 @@ namespace ndQuadruped_2
 					observation.m_legs[i].m_state[j * 2 + 1] = ndBrainFloat(kinematicState[j].m_velocity);
 				}
 
-				const ndVector& posit = m_animPose[i].m_posit;
+				//const ndVector& posit = m_animPose[i].m_posit;
+				const ndVector& posit = keyFrame.m_posit;
 				observation.m_legs[i].m_posit.m_x = ndReal (posit.m_x);
 				observation.m_legs[i].m_posit.m_y = ndReal (posit.m_y);
 				observation.m_legs[i].m_posit.m_z = ndReal (posit.m_z);
@@ -903,8 +901,6 @@ namespace ndQuadruped_2
 				observation.m_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamFloat);
 			}
 
-			//observation.m_torso.m_x = m_control->m_x;
-			//observation.m_torso.m_z = m_control->m_z;
 			observation.m_animSpeed = m_control->m_animSpeed;
 		}
 
@@ -990,6 +986,13 @@ namespace ndQuadruped_2
 
 				ndUnsigned32 index = ndRandInt() % 4;
 				m_animBlendTree->SetTime(0.25f * ndFloat32(index) * duration);
+			}
+
+			ndVector veloc;
+			m_animBlendTree->Evaluate(m_animPose, veloc);
+			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			{
+				m_animPrevPose[i] = m_animPose[i].m_posit;
 			}
 		}
 

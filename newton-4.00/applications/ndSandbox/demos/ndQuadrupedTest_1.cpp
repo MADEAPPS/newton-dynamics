@@ -712,11 +712,9 @@ namespace ndQuadruped_1
 				ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 
-				//if (keyFrame.m_userParamInt == 0)
 				if (keyFrame.m_userParamFloat < 1.0f)
 				{
-					ndBodyKinematic* const body = effector->GetBody0();
-					desiredSupportPoint.PushBack(ndBigVector(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit)));
+					desiredSupportPoint.PushBack(effector->GetGlobalPosition());
 				}
 			}
 
@@ -905,6 +903,9 @@ namespace ndQuadruped_1
 				ndUnsigned32 index = ndRandInt() % 4;
 				m_animBlendTree->SetTime(0.25f * ndFloat32(index) * duration);
 			}
+
+			ndVector veloc;
+			m_animBlendTree->Evaluate(m_animPose, veloc);
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
