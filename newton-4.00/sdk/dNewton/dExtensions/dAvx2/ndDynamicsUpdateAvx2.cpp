@@ -185,11 +185,6 @@
 
 		inline ndFloat32 GetMax() const
 		{
-			//__m256d tmp0__(_mm256_max_pd(m_low, m_high));
-			//__m128d tmp1__(_mm_max_pd(_mm256_castpd256_pd128(tmp0__), _mm256_extractf128_pd(tmp0__, 1)));
-			//__m128d tmp2__(_mm_max_pd(tmp1__, _mm_unpackhi_pd(tmp1__, tmp1__)));
-			//return _mm_cvtsd_f64(tmp2);
-
 			__m256d tmp0(_mm256_max_pd(m_low, m_high));
 			__m256d tmp1(_mm256_max_pd(tmp0, _mm256_permute2f128_pd(tmp0, tmp0, 1)));
 			__m256d tmp2(_mm256_max_pd(tmp1, _mm256_unpackhi_pd(tmp1, tmp1)));
@@ -198,14 +193,9 @@
 
 		inline ndFloat32 AddHorizontal() const
 		{
-			//__m256d tmp0(_mm256_add_pd(m_low, m_high));
-			//__m128d tmp1(_mm_add_pd(_mm256_castpd256_pd128(tmp0), _mm256_extractf128_pd(tmp0, 1)));
-			//__m128d tmp2(_mm_hadd_pd(tmp1, tmp1));
-			//return _mm_cvtsd_f64(tmp2);
-
 			__m256d tmp0(_mm256_add_pd(m_low, m_high));
-			__m256d tmp1(_mm256_hadd_pd(tmp0, tmp0));
-			__m256d tmp2(_mm256_add_pd(tmp1, _mm256_permute2f128_pd(tmp1, tmp1, 1)));
+			__m256d tmp1(_mm256_add_pd(tmp0, _mm256_permute2f128_pd(tmp0, tmp0, 1)));
+			__m256d tmp2(_mm256_add_pd(tmp1, _mm256_unpackhi_pd(tmp1, tmp1)));
 			return _mm256_cvtsd_f64(tmp2);
 		}
 

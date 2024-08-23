@@ -739,12 +739,6 @@ class ndBigVector
 		return ndBigVector(_mm256_fnmadd_pd(A.m_type, B.m_type, m_type));
 	}
 
-	inline ndBigVector AddHorizontal() const
-	{
-		__m256d tmp(_mm256_hadd_pd(m_type, m_type));
-		return ndBigVector(_mm256_add_pd(tmp, _mm256_permute2f128_pd(tmp, tmp, 1)));
-	}
-
 	inline ndBigVector BroadcastX() const
 	{
 		return ndBigVector(m_x);
@@ -808,9 +802,16 @@ class ndBigVector
 
 	inline ndBigVector GetMax() const
 	{
-		__m256d tmp2(_mm256_max_pd(m_type, _mm256_permute2f128_pd(m_type, m_type, 1)));
-		__m256d tmp3(_mm256_max_pd(tmp2, _mm256_shuffle_pd(tmp2, tmp2, 0x05)));
-		return ndBigVector(tmp3);
+		__m256d tmp1(_mm256_max_pd(m_type, _mm256_permute2f128_pd(m_type, m_type, 1)));
+		__m256d tmp2(_mm256_max_pd(tmp1, _mm256_shuffle_pd(tmp1, tmp1, 0x05)));
+		return ndBigVector(tmp2);
+	}
+
+	inline ndBigVector AddHorizontal() const
+	{
+		__m256d tmp0(_mm256_add_pd(m_type, _mm256_shuffle_pd(m_type, m_type, 0x05)));
+		__m256d tmp1(_mm256_add_pd(tmp0, _mm256_permute2f128_pd(tmp0, tmp0, 1)));
+		return ndBigVector(tmp1);
 	}
 
 	inline ndBigVector GetMax(const ndBigVector& data) const
@@ -825,38 +826,11 @@ class ndBigVector
 
 	inline ndBigVector Floor() const
 	{
-		//ndInt64 x = _mm_cvtsd_si64(m_typeLow);
-		//ndInt64 y = _mm_cvtsd_si64(_mm_unpackhi_pd(m_typeLow, m_typeLow));
-		//ndInt64 z = _mm_cvtsd_si64(m_typeHigh);
-		//ndInt64 w = _mm_cvtsd_si64(_mm_unpackhi_pd(m_typeHigh, m_typeHigh));
-		//
-		//__m128d one(ndBigVector::m_one.m_typeLow);
-		//__m128d xy(_mm_unpacklo_pd(_mm_cvtsi64_sd(m_typeHigh, x), _mm_cvtsi64_sd(m_typeHigh, y)));
-		//__m128d zw(_mm_unpacklo_pd(_mm_cvtsi64_sd(m_typeHigh, z), _mm_cvtsi64_sd(m_typeHigh, w)));
-		//
-		//__m128d xy_round(_mm_and_pd(one, _mm_cmplt_pd(m_typeLow, xy)));
-		//__m128d zw_round(_mm_and_pd(one, _mm_cmplt_pd(m_typeHigh, zw)));
-		//return ndBigVector(_mm_sub_pd(xy, xy_round), _mm_sub_pd(zw, zw_round));
 		return ndBigVector(_mm256_floor_pd(m_type));
 	}
 
 	inline ndBigVector GetInt() const
 	{
-		//ndInt64 x = _mm_cvtsd_si64(m_typeLow);
-		//ndInt64 y = _mm_cvtsd_si64(_mm_unpackhi_pd(m_typeLow, m_typeLow));
-		//ndInt64 z = _mm_cvtsd_si64(m_typeHigh);
-		//ndInt64 w = _mm_cvtsd_si64(_mm_unpackhi_pd(m_typeHigh, m_typeHigh));
-		//
-		//__m128i xy_int(_mm_set_epi64x(y, x));
-		//__m128i zw_int(_mm_set_epi64x(w, z));
-		//
-		//__m128d xy_float(_mm_unpacklo_pd(_mm_cvtsi64_sd(m_typeHigh, x), _mm_cvtsi64_sd(m_typeHigh, y)));
-		//__m128d zw_float(_mm_unpacklo_pd(_mm_cvtsi64_sd(m_typeHigh, z), _mm_cvtsi64_sd(m_typeHigh, w)));
-		//
-		//__m128i xy_round(_mm_castpd_si128(_mm_cmplt_pd(m_typeLow, xy_float)));
-		//__m128i zw_round(_mm_castpd_si128(_mm_cmplt_pd(m_typeHigh, zw_float)));
-		//return ndBigVector(_mm_add_epi64(xy_int, xy_round), _mm_add_epi64(zw_int, zw_round));
-
 		__m256d tmp0(_mm256_floor_pd(m_type));
 		__m128i tmp1(_mm256_cvtpd_epi32(tmp0));
 		__m256i tmp2(_mm256_cvtepi32_epi64(tmp1));
