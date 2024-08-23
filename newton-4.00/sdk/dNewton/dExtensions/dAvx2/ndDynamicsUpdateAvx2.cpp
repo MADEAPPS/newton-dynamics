@@ -408,16 +408,16 @@
 
 		inline ndFloat32 GetMax() const
 		{
-			__m128 tmp0(_mm_max_ps(_mm256_castps256_ps128(m_type), _mm256_extractf128_ps(m_type, 1)));
-			__m128 tmp1(_mm_max_ps(tmp0, _mm_shuffle_ps(tmp0, tmp0, PERMUTE_MASK(1, 0, 3, 2))));
+			__m128 tmp0(_mm_max_ps(m_typeLow, m_typeHigh));
+			__m128 tmp1(_mm_max_ps(tmp0, _mm_movehl_ps(tmp0, tmp0)));
 			__m128 tmp2(_mm_max_ps(tmp1, _mm_shuffle_ps(tmp1, tmp1, PERMUTE_MASK(2, 3, 0, 1))));
 			return _mm_cvtss_f32(tmp2);
 		}
 
 		inline ndFloat32 AddHorizontal() const
 		{
-			__m128 tmp0(_mm_add_ps(_mm256_castps256_ps128(m_type), _mm256_extractf128_ps(m_type, 1)));
-			__m128 tmp1(_mm_add_ps(tmp0, _mm_shuffle_ps(tmp0, tmp0, PERMUTE_MASK(1, 0, 3, 2))));
+			__m128 tmp0(_mm_add_ps(m_typeLow, m_typeHigh));
+			__m128 tmp1(_mm_add_ps(tmp0, _mm_movehl_ps(tmp0, tmp0)));
 			__m128 tmp2(_mm_add_ps(tmp1, _mm_shuffle_ps(tmp1, tmp1, PERMUTE_MASK(2, 3, 0, 1))));
 			return _mm_cvtss_f32(tmp2);
 		}
@@ -468,6 +468,11 @@
 		{
 			__m256 m_type;
 			__m256i m_typeInt;
+			struct
+			{
+				__m128 m_typeLow;
+				__m128 m_typeHigh;
+			};
 			ndJacobian m_vector8;
 			ndInt32 m_int[D_AVX_WORK_GROUP];
 		};
@@ -1132,6 +1137,11 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 	{
 		D_TRACKTIME_NAMED(InitJacobianMatrix);
 		ndAvxFloat* const internalForces = (ndAvxFloat*)&GetTempInternalForces()[0];
+
+		ndAvxFloat xxx (ndVector(0.0f, 1.0f, 2.0f, 3.0f), ndVector(4.0f, 5.0f, 6.0f, 7.0f));
+		ndFloat32 xxx0 = xxx.AddHorizontal();
+		ndFloat32 xxx1 = xxx.GetMax();
+
 		auto BuildJacobianMatrix = [this, &internalForces](ndConstraint* const joint, ndInt32 jointIndex)
 		{
 			ndAssert(joint->GetBody0());
