@@ -127,7 +127,8 @@ namespace ndQuadruped_2
 				ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0->GetAsBodyKinematic(), thighNode->m_body->GetAsBodyKinematic());
 			
 				hinge->SetLimitState(true);
-				hinge->SetLimits(-60.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
+				//hinge->SetLimits(-60.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
+				hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
 				calfNode = model->AddLimb(thighNode, calf0, hinge);
 				calfNode->m_name = ndString("calf_") + i;
 			
@@ -1330,8 +1331,8 @@ namespace ndQuadruped_2
 
 			ndInt32 countX = 6;
 			ndInt32 countZ = 9;
-			countX = 0;
-			countZ = 0;
+			//countX = 0;
+			//countZ = 0;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -1508,7 +1509,7 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildFlatPlane(scene, true);
 
-//	ExportUrdfModel(scene);
+	ExportUrdfModel(scene);
 
 	// register a zero restitution and high friction material for the feet
 	ndApplicationMaterial material;

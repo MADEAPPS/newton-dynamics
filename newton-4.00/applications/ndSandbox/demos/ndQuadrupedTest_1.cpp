@@ -119,7 +119,8 @@ namespace ndQuadruped_1
 				ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0->GetAsBodyKinematic(), thighNode->m_body->GetAsBodyKinematic());
 			
 				hinge->SetLimitState(true);
-				hinge->SetLimits(-60.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
+				//hinge->SetLimits(-60.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
+				hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
 				calfNode = model->AddLimb(thighNode, calf0, hinge);
 				calfNode->m_name = ndString("calf_") + i;
 			
