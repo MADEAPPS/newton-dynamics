@@ -824,17 +824,28 @@ namespace ndQuadruped_2
 			return reward;
 		}
 
+		#pragma optimize( "", off )
 		bool CalculateHolonomicReward() const
 		{
-			bool isHolonimic = true;
-			for (ndInt32 i = 0; isHolonimic && (i < m_animPose.GetCount()); ++i)
+			bool isHolonomic = true;
+			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); isHolonomic && node; node = node->GetNextIterator())
+			{
+				ndVector veloc(node->m_body->GetVelocity());
+				ndVector omega(node->m_body->GetOmega());
+				isHolonomic = isHolonomic && (veloc.DotProduct(veloc).GetScalar() < 100.0f);
+				isHolonomic = isHolonomic && (omega.DotProduct(omega).GetScalar() < 100.0f);
+			}
+			ndAssert(isHolonomic);
+			
+			for (ndInt32 i = 0; isHolonomic && (i < m_animPose.GetCount()); ++i)
 			{
 				const ndEffectorInfo* const info = &m_effectorsInfo[i];
 				const ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 				bool holonomic = effector->IsHolonomic(m_timestep);
-				isHolonimic = isHolonimic && holonomic;
+				isHolonomic = isHolonomic && holonomic;
 			}
-			return isHolonimic;
+			return isHolonomic;
 		}
 
 		ndReal GetReward() const
