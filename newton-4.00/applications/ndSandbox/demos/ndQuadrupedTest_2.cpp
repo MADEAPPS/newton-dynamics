@@ -844,7 +844,11 @@ namespace ndQuadruped_2
 				isHolonomic = isHolonomic && (veloc.DotProduct(veloc).GetScalar() < 100.0f);
 				isHolonomic = isHolonomic && (omega.DotProduct(omega).GetScalar() < 100.0f);
 			}
-			ndAssert(isHolonomic);
+			if (!isHolonomic)
+			{
+				// catastrophic penalty,  results in a immediate kill.
+				ndMemSet(m_controllerTrainer->m_rewardsMemories, 0.0f, sizeof(m_controllerTrainer->m_rewardsMemories) / sizeof(m_controllerTrainer->m_rewardsMemories[0]));
+			}
 			
 			for (ndInt32 i = 0; isHolonomic && (i < m_animPose.GetCount()); ++i)
 			{
