@@ -588,7 +588,7 @@ void ndIkSolver::Solve()
 
 			ndFloat32 xxx0 = body0->m_omega.DotProduct(body0->m_omega).GetScalar();
 			ndFloat32 xxx1 = body1->m_omega.DotProduct(body1->m_omega).GetScalar();
-			if ((xxx0 > 10000.0f) || (xxx1 > 10000.0f))
+			if ((xxx0 > 50000.0f) || (xxx1 > 50000.0f))
 			{
 				xxx0 = accel0.m_angular.DotProduct(accel0.m_angular).GetScalar();
 			}
