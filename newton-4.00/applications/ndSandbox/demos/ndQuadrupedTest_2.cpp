@@ -841,8 +841,10 @@ namespace ndQuadruped_2
 			{
 				ndVector veloc(node->m_body->GetVelocity());
 				ndVector omega(node->m_body->GetOmega());
-				isHolonomic = isHolonomic && (veloc.DotProduct(veloc).GetScalar() < 100.0f);
-				isHolonomic = isHolonomic && (omega.DotProduct(omega).GetScalar() < 100.0f);
+				ndFloat32 vMag2 = veloc.DotProduct(veloc).GetScalar();
+				ndFloat32 wMag2 = omega.DotProduct(omega).GetScalar();
+				isHolonomic = isHolonomic && (vMag2 < 100.0f);
+				isHolonomic = isHolonomic && (wMag2 < 400.0f);
 			}
 			if (!isHolonomic)
 			{
