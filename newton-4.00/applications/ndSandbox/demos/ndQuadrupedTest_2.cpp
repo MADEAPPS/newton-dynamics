@@ -610,6 +610,8 @@ namespace ndQuadruped_2
 		void Init(ndModelArticulation* const robot)
 		{
 			xxxxxxxx = 0;
+			static ndInt32 modelId = 0;
+			m_modelId = modelId++;
 
 			ndFloat32 phase[] = { 0.0f, 0.75f, 0.25f, 0.5f };
 			ndSharedPtr<ndAnimationSequence> sequence(new ndPoseGenerator(phase));
@@ -827,6 +829,12 @@ namespace ndQuadruped_2
 		#pragma optimize( "", off )
 		bool CalculateHolonomicReward() const
 		{
+			static int xxxxxxxxxxx = 0x7fffffff;
+			if (m_modelId == xxxxxxxxxxx)
+			{
+				xxxxxxxxxxx *= 1;
+			}
+
 			bool isHolonomic = true;
 			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); isHolonomic && node; node = node->GetNextIterator())
@@ -1246,6 +1254,7 @@ namespace ndQuadruped_2
 		ndControllerTrainer* m_controllerTrainer;
 		ndWorld* m_world;
 		ndFloat32 m_timestep;
+		ndInt32 m_modelId;
 		bool m_showDebug;
 
 		int xxxxxxxx;
