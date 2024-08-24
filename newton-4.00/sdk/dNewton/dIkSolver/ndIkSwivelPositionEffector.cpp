@@ -11,6 +11,7 @@
 
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
+#include "ndSkeletonContainer.h"
 #include "ndIkSwivelPositionEffector.h"
 
 ndIkSwivelPositionEffector::ndIkSwivelPositionEffector()
@@ -252,6 +253,31 @@ ndInt32 ndIkSwivelPositionEffector::GetKinematicState(ndKinematicState* const st
 		state[i].m_velocity = veloc[i];
 	}
 	return 4;
+}
+
+bool ndIkSwivelPositionEffector::IsHolonomic(ndFloat32 timestep) const
+{
+	//ndFixSizeArray<ndJointBilateralConstraint*, 16> joints;
+
+	ndAssert(m_body0->GetSkeleton());
+
+	const ndSkeletonContainer* const skeleton = m_body0->GetSkeleton();
+	const ndSkeletonContainer::ndNode* effectorNode = nullptr;
+	for (ndSkeletonContainer::ndNodeList::ndNode* node = skeleton->GetNodeList().GetFirst(); node; node = node->GetNext())
+	{
+		if (node->GetInfo().m_body == m_body0)
+		{
+			effectorNode = &node->GetInfo();
+			break;
+		}
+	}
+
+	bool isHolonomic = true;
+	for (const ndSkeletonContainer::ndNode* node = effectorNode; isHolonomic && node && (node->m_body != m_body1); node = node->m_parent)
+	{
+		isHolonomic = isHolonomic && node->m_joint->IsHolonomic(timestep);
+	}
+	return isHolonomic;
 }
 
 ndFloat32 ndIkSwivelPositionEffector::CalculateLookAtSwivelAngle(const ndVector& upDir) const

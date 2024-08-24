@@ -30,9 +30,13 @@ class ndJointBilateralConstraint;
 class ndSkeletonContainer 
 {
 	public:
+	class ndNodeList;
+
 	ndSkeletonContainer();
 	~ndSkeletonContainer();
 	ndInt32 GetId() const;
+
+	const ndNodeList& GetNodeList() const;
 
 	protected:
 	class ndOrdinal
@@ -81,6 +85,7 @@ class ndSkeletonContainer
 		ndMatriData m_joint;
 	} D_GCC_NEWTON_ALIGN_32;
 
+	public:
 	class ndNode
 	{
 		public:
@@ -203,6 +208,10 @@ inline ndSkeletonContainer::ndNode* ndSkeletonContainer::GetRoot() const
 	return m_skeleton;
 }
 
+inline const ndSkeletonContainer::ndNodeList& ndSkeletonContainer::GetNodeList() const
+{
+	return m_nodeList;
+}
 #endif
 
 

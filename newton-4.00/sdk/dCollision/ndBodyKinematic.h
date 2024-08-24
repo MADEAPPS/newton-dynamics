@@ -135,9 +135,7 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API virtual ndMatrix CalculateInvInertiaMatrix() const;
 	D_COLLISION_API virtual void SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia);
 	D_COLLISION_API void SetMassMatrix(ndFloat32 mass, const ndShapeInstance& shapeInstance, bool fullInertia = false);
-
 	D_COLLISION_API virtual void InitSurrogateBody(ndBodyKinematic* const surrogate) const;
-
 	
 	void UpdateInvInertiaMatrix();
 	void SetMassMatrix(const ndVector& massMatrix);

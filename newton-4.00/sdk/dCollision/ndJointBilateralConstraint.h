@@ -101,7 +101,9 @@ class ndJointBilateralConstraint : public ndConstraint
 	D_COLLISION_API void SetMassSpringDamperAcceleration(ndConstraintDescritor& desc, ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 
 	D_COLLISION_API virtual ndInt32 GetKinematicState(ndKinematicState* const state) const;
-	
+
+	virtual bool IsHolonomic(ndFloat32 timestep) const;
+
 	const ndMatrix& GetLocalMatrix0() const;
 	const ndMatrix& GetLocalMatrix1() const;
 
@@ -113,7 +115,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	bool IsBilateral() const;
 	bool IsCollidable() const;
 	bool GetSkeletonFlag() const;
-
+	
 	void SetCollidable(bool state);
 	void SetSkeletonFlag(bool flag);
 	void CalculateGlobalMatrix(ndMatrix& matrix0, ndMatrix& matrix1) const;
@@ -376,5 +378,9 @@ inline ndJointBilateralConstraint* ndJointBilateralConstraint::GetAsBilateral()
 	return this; 
 }
 
+inline bool ndJointBilateralConstraint::IsHolonomic(ndFloat32) const
+{
+	return true;
+}
 #endif
 

@@ -41,6 +41,7 @@ namespace ndQuadruped_2
 		ndAnimPose m_posit;
 		ndAnimPose m_prevPosit;
 		ndBrainFloat m_hasContact;
+		ndBrainFloat m_isHolonomic;
 		ndBrainFloat m_animSequence;
 	};
 
@@ -607,6 +608,8 @@ namespace ndQuadruped_2
 
 		void Init(ndModelArticulation* const robot)
 		{
+			xxxxxxxx = 0;
+
 			ndFloat32 phase[] = { 0.0f, 0.75f, 0.25f, 0.5f };
 			ndSharedPtr<ndAnimationSequence> sequence(new ndPoseGenerator(phase));
 
@@ -816,8 +819,21 @@ namespace ndQuadruped_2
 			}
 			ndFloat32 dist2 = errorAcc.DotProduct(errorAcc).GetScalar();
 			ndFloat32 dist = ndSqrt(dist2);
-			ndBrainFloat reward = ndBrainFloat(ndExp(-ndBrainFloat(1000.0f) * dist2));
+			ndBrainFloat reward = ndBrainFloat(ndExp(-ndBrainFloat(200.0f) * dist2));
 			return reward;
+		}
+
+		bool CalculateHolonomicReward() const
+		{
+			bool isHolonimic = true;
+			for (ndInt32 i = 0; isHolonimic && (i < m_animPose.GetCount()); ++i)
+			{
+				const ndEffectorInfo* const info = &m_effectorsInfo[i];
+				const ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+				bool holonomic = effector->IsHolonomic(m_timestep);
+				isHolonimic = isHolonimic && holonomic;
+			}
+			return isHolonimic;
 		}
 
 		ndReal GetReward() const
@@ -826,8 +842,12 @@ namespace ndQuadruped_2
 			ndBrainFloat dstReward = CalculateDistanceToOrigin();
 			ndBrainFloat zmpReward = CalculateZeroMomentPointReward();
 			ndBrainFloat poseMatchReward = CalculatePoseMatchReward();
+			bool isHolonomic = CalculateHolonomicReward();
 
-			if ((poseMatchReward < 1.0e-8f) || (dstReward < 1.0e-3f) || (zmpReward < 1.0e-3f))
+			if (!isHolonomic ||
+				(dstReward < 1.0e-3f) || 
+				(zmpReward < 1.0e-3f) ||
+				(poseMatchReward < 1.0e-8f))
 			{
 				dstReward = 0.0f;
 				zmpReward = 0.0f;
@@ -865,6 +885,9 @@ namespace ndQuadruped_2
 
 		void GetObservation(ndBrainFloat* const observationInput)
 		{
+			if (xxxxxxxx == 29)
+			xxxxxxxx *= 1;
+
 			ndMemSet(observationInput, 0.0f, ND_AGENT_INPUT_SIZE);
 			ndObservationVector& observation = *((ndObservationVector*)observationInput);
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
@@ -883,7 +906,6 @@ namespace ndQuadruped_2
 					observation.m_legs[i].m_state[j * 2 + 1] = ndBrainFloat(kinematicState[j].m_velocity);
 				}
 
-				//const ndVector& posit = m_animPose[i].m_posit;
 				const ndVector& posit = keyFrame.m_posit;
 				observation.m_legs[i].m_posit.m_x = ndReal (posit.m_x);
 				observation.m_legs[i].m_posit.m_y = ndReal (posit.m_y);
@@ -895,7 +917,10 @@ namespace ndQuadruped_2
 
 				m_animPrevPose[i] = posit;
 
-				observation.m_legs[i].m_hasContact = ndBrainFloat(FindContact(i) ? 1.0f : 0.0f);
+				const ndContact* const contact = FindContact(i);
+				bool isHolonomic = info->m_effector->IsHolonomic(m_timestep);
+				observation.m_legs[i].m_isHolonomic = ndBrainFloat(isHolonomic ? 0.0f : 1.0f);
+				observation.m_legs[i].m_hasContact = ndBrainFloat(contact ? 0.0f : 1.0f);
 				observation.m_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamFloat);
 			}
 
@@ -904,6 +929,9 @@ namespace ndQuadruped_2
 
 		void ApplyActions(const ndBrainFloat* const actions)
 		{
+			if (xxxxxxxx == 29)
+			xxxxxxxx *= 1;
+
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
@@ -922,8 +950,6 @@ namespace ndQuadruped_2
 
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
 
-				//ndVector posit (m_animPose[i].m_posit);
-				//ndVector posit(effector->GetLocalTargetPosition());
 				ndVector posit(effector->GetEffectorPosit());
 				if (m_control->m_enableController)
 				{
@@ -932,6 +958,7 @@ namespace ndQuadruped_2
 					posit.m_z += legActions->m_pose[i].m_z * D_SWING_STEP;
 				}
 				effector->SetLocalTargetPosition(posit);
+				//bool isHolonomic = effector->IsHolonomic(m_timestep);
 
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
 				effector->SetSwivelAngle(swivelAngle);
@@ -1181,6 +1208,8 @@ namespace ndQuadruped_2
 			{
 				m_controller->Step();
 			}
+
+			xxxxxxxx++;
 		}
 
 		void PostUpdate(ndWorld* const, ndFloat32 timestep)
@@ -1205,8 +1234,10 @@ namespace ndQuadruped_2
 		ndControllerTrainer* m_controllerTrainer;
 		ndWorld* m_world;
 		ndFloat32 m_timestep;
-		
 		bool m_showDebug;
+
+		int xxxxxxxx;
+
 		friend class ndModelUI;
 	};
 
@@ -1299,8 +1330,8 @@ namespace ndQuadruped_2
 
 			ndInt32 countX = 6;
 			ndInt32 countZ = 9;
-			//countX = 0;
-			//countZ = 0;
+			countX = 0;
+			countZ = 0;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
