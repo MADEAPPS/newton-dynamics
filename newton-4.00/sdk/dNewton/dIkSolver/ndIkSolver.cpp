@@ -525,7 +525,7 @@ void ndIkSolver::SolverEnd()
 	}
 }
 
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 void ndIkSolver::Solve()
 {
 	ndAssert(m_skeleton);
@@ -586,12 +586,12 @@ void ndIkSolver::Solve()
 			accel1.m_linear = body1->m_accel;
 			accel1.m_angular = body1->m_alpha;
 
-			//ndFloat32 xxx0 = accel0.m_angular.DotProduct(accel0.m_angular).GetScalar();
-			//ndFloat32 xxx1 = accel1.m_angular.DotProduct(accel1.m_angular).GetScalar();
-			//if ((xxx0 > 100000) || (xxx1 > 100000))
-			//{
-			//	xxx0 = accel0.m_angular.DotProduct(accel0.m_angular).GetScalar();
-			//}
+			ndFloat32 xxx0 = body0->m_omega.DotProduct(body0->m_omega).GetScalar();
+			ndFloat32 xxx1 = body1->m_omega.DotProduct(body1->m_omega).GetScalar();
+			if ((xxx0 > 10000.0f) || (xxx1 > 10000.0f))
+			{
+				xxx0 = accel0.m_angular.DotProduct(accel0.m_angular).GetScalar();
+			}
 			joint->SetIkSetAccel(accel0, accel1);
 			joint->SetIkMode(false);
 		}
