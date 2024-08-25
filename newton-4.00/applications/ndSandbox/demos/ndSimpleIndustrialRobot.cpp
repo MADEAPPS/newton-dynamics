@@ -615,36 +615,7 @@ namespace ndSimpleRobot
 
 		void ResetModel()
 		{
-			ndAssert(0);
-			//ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
-			//
-			//m_control->Reset();
-			//m_control->m_animSpeed = ndReal(D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand());
-			//
-			//ndMemSet(m_controllerTrainer->m_rewardsMemories, ndReal(1.0), sizeof(m_controllerTrainer->m_rewardsMemories) / sizeof(m_controllerTrainer->m_rewardsMemories[0]));
-			//
-			//const ndMatrix matrix(model->GetRoot()->m_body->GetMatrix());
-			//const ndVector& up = matrix.m_up;
-			//bool state = up.m_y < D_MODEL_DEAD_ANGLE;
-			//state = state || (matrix.m_posit.m_x > 20.0f);
-			//state = state || (matrix.m_posit.m_x < -20.0f);
-			//state = state || (matrix.m_posit.m_z > 20.0f);
-			//state = state || (matrix.m_posit.m_z < -20.0f);
-			//if (state)
-			//{
-			//	for (ndInt32 i = 0; i < m_controllerTrainer->m_basePose.GetCount(); i++)
-			//	{
-			//		m_controllerTrainer->m_basePose[i].SetPose();
-			//	}
-			//
-			//	ndFloat32 duration = m_poseGenerator->GetSequence()->GetDuration();
-			//
-			//	ndUnsigned32 index = ndRandInt() % 4;
-			//	m_animBlendTree->SetTime(0.25f * ndFloat32(index) * duration);
-			//}
-			//
-			//ndVector veloc;
-			//m_animBlendTree->Evaluate(m_animPose, veloc);
+			ndTrace(("Reset Model\n"));
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -662,10 +633,8 @@ namespace ndSimpleRobot
 			}
 		}
 
-		void PostUpdate(ndWorld* const, ndFloat32 timestep)
+		void PostUpdate(ndWorld* const, ndFloat32)
 		{
-			//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
-			//m_animBlendTree->Update(timestep * animSpeed);
 		}
 
 		void PostTransformUpdate(ndWorld* const, ndFloat32)
@@ -674,7 +643,7 @@ namespace ndSimpleRobot
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			ndTrace(("xxxxx\n"));
+			//ndTrace(("xxxxx\n"));
 			//if (!m_showDebug)
 			//{
 			//	return;
@@ -1016,8 +985,7 @@ namespace ndSimpleRobot
 			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
 		{
-			ndWorld* const world = scene->GetWorld();
-			
+			//ndWorld* const world = scene->GetWorld();
 			m_outFile = fopen("robotArmReach-vpg.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 			
@@ -1034,32 +1002,35 @@ namespace ndSimpleRobot
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetActor()));
 			m_master->SetName(CONTROLLER_NAME);
 			
-			ndModelArticulation* const visualModel = CreateModel(scene, *visualMesh, matrix);
+			auto SpawnModel = [this, scene, &visualMesh, floor](const ndMatrix& matrix)
+			{
+				ndWorld* const world = scene->GetWorld();
+				ndModelArticulation* const model = CreateModel(scene, *visualMesh, matrix);
 
-			//SetMaterial(visualModel);
-			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel, true));
-			visualModel->AddToWorld(world);
-			//((RobotModelNotify*)*visualModel->GetNotifyCallback())->ResetModel();
+				//SetMaterial(visualModel);
+				model->SetNotifyCallback(new RobotModelNotify(m_master, model, true));
+				model->AddToWorld(world);
+				((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
 
-			ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(visualModel->GetRoot()->m_body->GetMatrix(), visualModel->GetRoot()->m_body->GetAsBodyKinematic(), floor));
-			world->AddJoint (fixJoint);
-			
+				ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetRoot()->m_body->GetMatrix(), model->GetRoot()->m_body->GetAsBodyKinematic(), floor));
+				world->AddJoint(fixJoint);
+				return model;
+			};
+
+			ndModelArticulation* const visualModel = SpawnModel(matrix);
 			ndSharedPtr<ndUIEntity> robotUI(new ndRobotUI(scene, (RobotModelNotify*)*visualModel->GetNotifyCallback()));
 			scene->Set2DDisplayRenderFunction(robotUI);
 
-			//ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*visualModel->GetNotifyCallback()));
-			//scene->Set2DDisplayRenderFunction(quadrupedUI);
+			ndInt32 countX = 6;
+			ndInt32 countZ = 9;
+			countX = 0;
+			countZ = 0;
 			
-			//ndInt32 countX = 6;
-			//ndInt32 countZ = 9;
-			////countX = 0;
-			////countZ = 0;
-			//
-			//// add a hidden battery of model to generate trajectories in parallel
-			//for (ndInt32 i = 0; i < countZ; ++i)
-			//{
-			//	for (ndInt32 j = 0; j < countX; ++j)
-			//	{
+			// add a hidden battery of model to generate trajectories in parallel
+			for (ndInt32 i = 0; i < countZ; ++i)
+			{
+				for (ndInt32 j = 0; j < countX; ++j)
+				{
 			//		ndMatrix location(matrix);
 			//		location.m_posit.m_x += 6.0f * (ndRand() - 0.5f);
 			//		location.m_posit.m_z += 6.0f * (ndRand() - 0.5f);
@@ -1071,8 +1042,8 @@ namespace ndSimpleRobot
 			//		//HideModel(model);
 			//		SetMaterial(model);
 			//		((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
-			//	}
-			//}
+				}
+			}
 			//scene->SetAcceleratedUpdate();
 		}
 
