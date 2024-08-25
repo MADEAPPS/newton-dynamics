@@ -1080,7 +1080,7 @@ ndMesh* ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bool loadAnima
 	readBytes = fread(&content[0], 1, size_t(file_size), file);
 	fclose(file);
 
-	ndSharedPtr<ofbx::IScene> fbxScene(ofbx::load(&content[0], int(file_size), (ofbx::u64)ofbx::LoadFlags::TRIANGULATE));
+	ndSharedPtr<ofbx::IScene> fbxScene(ofbx::load(&content[0], ndInt32(file_size), (ofbx::u64)ofbx::LoadFlags::TRIANGULATE));
 
 	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(*fbxScene));
 	ndMesh* const mesh = Fbx2ndMesh(*fbxScene);

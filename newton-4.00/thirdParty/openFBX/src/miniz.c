@@ -60,7 +60,9 @@ mz_ulong mz_adler32(mz_ulong adler, const unsigned char *ptr, size_t buf_len)
             s1 += ptr[7]; s2 += s1;
         }
         for (; i < block_len; ++i)
+        {
             s1 += *ptr++; s2 += s1;
+        }
         s1 %= 65521U; s2 %= 65521U;
         buf_len -= block_len;
         block_len = 5552;
@@ -2779,7 +2781,9 @@ common_exit:
                 s1 += ptr[7]; s2 += s1;
             }
             for (; i < block_len; ++i)
+            {
                 s1 += *ptr++; s2 += s1;
+            }
             s1 %= 65521U; s2 %= 65521U;
             buf_len -= block_len;
             block_len = 5552;

@@ -2781,7 +2781,6 @@ static OptionalError<Object*> parseGeometryNormals(
 	return {nullptr};
 }
 
-
 static OptionalError<Object*> parseGeometry(const Element& element, bool triangulate, GeometryImpl* geom)
 {
 	assert(element.first_property);
@@ -2830,31 +2829,55 @@ static OptionalError<Object*> parseGeometry(const Element& element, bool triangu
 	}
 
 	const Element* polys_element = findChild(element, "PolygonVertexIndex");
-	if (!polys_element || !polys_element->first_property) return Error("Indices missing");
+	if (!polys_element || !polys_element->first_property)
+	{
+		return Error("Indices missing");
+	}
 
 	std::vector<Vec3> vertices;
 	std::vector<int> original_indices;
 	std::vector<int> to_old_indices;
 	Temporaries tmp;
-	if (!parseDoubleVecData(*vertices_element->first_property, &vertices, &tmp.f)) return Error("Failed to parse vertices");
-	if (!parseBinaryArray(*polys_element->first_property, &original_indices)) return Error("Failed to parse indices");
+	if (!parseDoubleVecData(*vertices_element->first_property, &vertices, &tmp.f))
+	{
+		return Error("Failed to parse vertices");
+	}
+	if (!parseBinaryArray(*polys_element->first_property, &original_indices))
+	{
+		return Error("Failed to parse indices");
+	}
 
 	buildGeometryVertexData(geom, vertices, original_indices, to_old_indices, triangulate);
 
 	OptionalError<Object*> materialParsingError = parseGeometryMaterials(geom, element, original_indices);
-	if (materialParsingError.isError()) return materialParsingError;
+	if (materialParsingError.isError())
+	{
+		return materialParsingError;
+	}
 
 	OptionalError<Object*> uvParsingError = parseGeometryUVs(geom, element, original_indices, to_old_indices, &tmp);
-	if (uvParsingError.isError()) return uvParsingError;
+	if (uvParsingError.isError())
+	{
+		return uvParsingError;
+	}
 
 	OptionalError<Object*> tangentsParsingError = parseGeometryTangents(geom, element, original_indices, to_old_indices, &tmp);
-	if (tangentsParsingError.isError()) return tangentsParsingError;
+	if (tangentsParsingError.isError())
+	{
+		return tangentsParsingError;
+	}
 
 	OptionalError<Object*> colorsParsingError = parseGeometryColors(geom, element, original_indices, to_old_indices, &tmp);
-	if (colorsParsingError.isError()) return colorsParsingError;
+	if (colorsParsingError.isError()) 
+	{
+		return colorsParsingError;
+	}
 
 	OptionalError<Object*> normalsParsingError = parseGeometryNormals(geom, element, original_indices, to_old_indices, &tmp);
-	if (normalsParsingError.isError()) return normalsParsingError;
+	if (normalsParsingError.isError())
+	{
+		return normalsParsingError;
+	}
 
 	return geom;
 }
@@ -3127,9 +3150,11 @@ struct ParseGeometryJob {
 	bool is_error;
 };
 
-void sync_job_processor(JobFunction fn, void*, void* data, u32 size, u32 count) {
+void sync_job_processor(JobFunction fn, void*, void* data, u32 size, u32 count) 
+{
 	u8* ptr = (u8*)data;
-	for(u32 i = 0; i < count; ++i) {
+	for(u32 i = 0; i < count; ++i) 
+	{
 		fn(ptr);
 		ptr += size;
 	}
@@ -3286,7 +3311,10 @@ static bool parseObjects(const Element& root, Scene* scene, u64 flags, Allocator
 
 	for (const ParseGeometryJob& job : parse_geom_jobs) 
 	{
-		if (job.is_error) return false;
+		if (job.is_error)
+		{
+			return false;
+		}
 		scene->m_object_map[job.id].object = job.geom;
 		if (job.geom) {
 			scene->m_all_objects.push_back(job.geom);
@@ -3746,7 +3774,8 @@ IScene* load(const u8* data, int size, u64 flags, JobProcessor job_processor, vo
 
 	const bool is_binary = size >= 18 && strncmp((const char*)data, "Kaydara FBX Binary", 18) == 0;
 	OptionalError<Element*> root(nullptr);
-	if (is_binary) {
+	if (is_binary) 
+	{
 		root = tokenize(&scene->m_data[0], size_t(size), version, scene->m_allocator);
 		if (version < 6200)
 		{
@@ -3759,7 +3788,8 @@ IScene* load(const u8* data, int size, u64 flags, JobProcessor job_processor, vo
 			if (root.isError()) return nullptr;
 		}
 	}
-	else {
+	else 
+	{
 		root = tokenizeText(&scene->m_data[0], size_t(size), scene->m_allocator);
 		if (root.isError()) return nullptr;
 	}
@@ -3768,9 +3798,18 @@ IScene* load(const u8* data, int size, u64 flags, JobProcessor job_processor, vo
 	assert(scene->m_root_element);
 
 	// if (parseTemplates(*root.getValue()).isError()) return nullptr;
-	if (!parseConnections(*root.getValue(), scene.get())) return nullptr;
-	if (!parseTakes(scene.get())) return nullptr;
-	if (!parseObjects(*root.getValue(), scene.get(), flags, scene->m_allocator, job_processor, job_user_ptr)) return nullptr;
+	if (!parseConnections(*root.getValue(), scene.get()))
+	{
+		return nullptr;
+	}
+	if (!parseTakes(scene.get()))
+	{
+		return nullptr;
+	}
+	if (!parseObjects(*root.getValue(), scene.get(), flags, scene->m_allocator, job_processor, job_user_ptr))
+	{
+		return nullptr;
+	}
 	parseGlobalSettings(*root.getValue(), scene.get());
 
 	return scene.release();
