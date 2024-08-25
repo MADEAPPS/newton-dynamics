@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_2
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_2-VPG.dnn"
 
 	class ndAnimPose
@@ -830,17 +830,17 @@ namespace ndQuadruped_2
 
 				ndBrainFloat contactDist = FindContactDist(i);
 				ndBrainFloat expectedSequence = ndBrainFloat(keyFrame.m_userParamFloat);
-				bool hasSupport = ((expectedSequence < 1.0f) && (contactDist == 0.1f));
-				hasSupport = hasSupport || ((expectedSequence == 1.0f) && (contactDist > 0.1f));
+				bool hasSupport = ((expectedSequence < 1.0f) && (contactDist <= 0.06f));
+				hasSupport = hasSupport || ((expectedSequence == 1.0f) && (contactDist > 0.06f));
 				if (!hasSupport)
 				{
-					contactPenalty *= 0.8f;
+					contactPenalty *= 0.75f;
 				}
 			}
-			if (contactPenalty > 0.6f)
-			ndExpandTraceMessage("%f\n", contactPenalty);
+			//if (contactPenalty > 0.6f)
+			//ndExpandTraceMessage("%f\n", contactPenalty);
 			ndFloat32 dist2 = errorAcc.DotProduct(errorAcc).GetScalar();
-			ndBrainFloat reward =  ndBrainFloat(contactPenalty * ndExp(-ndBrainFloat(200.0f) * dist2));
+			ndBrainFloat reward =  ndBrainFloat(contactPenalty * ndExp(-ndBrainFloat(300.0f) * dist2));
 			//ndFloat32 dist = ndSqrt(dist2);
 			//ndBrainFloat reward = ndBrainFloat(ndClamp (1.0f - D_INV_POSE_MATCHING_DISTANCE * dist, 0.0f, 1.0f));
 			//ndTrace(("%f %f %f\n", reward, reward1, dist));
@@ -898,11 +898,14 @@ namespace ndQuadruped_2
 			}
 			ndBrainFloat reward = 0.50f * poseMatchReward + 0.30f * zmpReward + 0.20f * dstReward;
 
-			for (ndInt32 i = sizeof(m_controllerTrainer->m_rewardsMemories) / sizeof(m_controllerTrainer->m_rewardsMemories[0]) - 1; i >= 1; --i)
+			if (m_controllerTrainer)
 			{
-				m_controllerTrainer->m_rewardsMemories[i] = m_controllerTrainer->m_rewardsMemories[i - 1];
+				for (ndInt32 i = sizeof(m_controllerTrainer->m_rewardsMemories) / sizeof(m_controllerTrainer->m_rewardsMemories[0]) - 1; i >= 1; --i)
+				{
+					m_controllerTrainer->m_rewardsMemories[i] = m_controllerTrainer->m_rewardsMemories[i - 1];
+				}
+				m_controllerTrainer->m_rewardsMemories[0] = reward;
 			}
-			m_controllerTrainer->m_rewardsMemories[0] = reward;
 			return reward;
 		}
 
@@ -922,7 +925,7 @@ namespace ndQuadruped_2
 				if (contact->IsActive())
 				{
 					//return contact;
-					ndVector posit(effector->GetGlobalPosition());
+					//ndVector posit(effector->GetGlobalPosition());
 					return 0.0f;
 				}
 			}
@@ -1149,6 +1152,8 @@ namespace ndQuadruped_2
 			{
 				return;
 			}
+
+			//ndFloat32 xxx = GetReward();
 
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 
