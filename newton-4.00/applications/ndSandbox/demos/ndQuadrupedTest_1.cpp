@@ -44,7 +44,7 @@ namespace ndQuadruped_1
 	class ndObservationVector
 	{
 		public:
-		ndLegObservation n_legs[4];
+		ndLegObservation m_legs[4];
 		ndBrainFloat m_torso_x;
 		ndBrainFloat m_torso_z;
 		ndBrainFloat m_animSpeed;
@@ -804,13 +804,13 @@ namespace ndQuadruped_1
 				paramCount += info->m_foot->GetKinematicState(&kinematicState[paramCount]);
 				for (ndInt32 j = 0; j < paramCount; ++j)
 				{
-					observation.n_legs[i].m_state[j * 2 + 0] = ndBrainFloat(kinematicState[j].m_posit);
-					observation.n_legs[i].m_state[j * 2 + 1] = ndBrainFloat(kinematicState[j].m_velocity);
+					observation.m_legs[i].m_state[j * 2 + 0] = ndBrainFloat(kinematicState[j].m_posit);
+					observation.m_legs[i].m_state[j * 2 + 1] = ndBrainFloat(kinematicState[j].m_velocity);
 				}
 
-				observation.n_legs[i].m_hasContact = ndBrainFloat(FindContact(i) ? 1.0f : 0.0f);
-				//observation.n_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamInt ? 1.0f : 0.0f);
-				observation.n_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamFloat);
+				observation.m_legs[i].m_hasContact = ndBrainFloat(FindContact(i) ? 1.0f : 0.0f);
+				//observation.m_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamInt ? 1.0f : 0.0f);
+				observation.m_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamFloat);
 			}
 
 			observation.m_torso_x = m_control->m_x;
@@ -828,50 +828,45 @@ namespace ndQuadruped_1
 				m_control->m_z = ndClamp(ndReal(m_control->m_z + actionVector.m_torso_z * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
 			}
 
-			UpdatePose();
-		}
-
-		void UpdatePose()
-		{
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
 			ndAssert(skeleton);
 			ndFixSizeArray<ndJointBilateralConstraint*, 32> effectors;
-			
+
 			ndVector veloc;
 			m_animBlendTree->Evaluate(m_animPose, veloc);
-			
+
 			const ndVector upVector(rootBody->GetMatrix().m_up);
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				ndEffectorInfo* const info = &m_effectorsInfo[i];
 				effectors.PushBack(*info->m_effector);
-				
+
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-				
+
 				ndVector posit(m_animPose[i].m_posit);
 				effector->SetLocalTargetPosition(posit);
-				
+
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
 				effector->SetSwivelAngle(swivelAngle);
-				
+
 				// calculate lookAt angle
 				ndMatrix lookAtMatrix0;
 				ndMatrix lookAtMatrix1;
 				ndJointHinge* const footHinge = (ndJointHinge*)*info->m_foot;
 				footHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-				
+
 				ndMatrix upMatrix(ndGetIdentityMatrix());
 				upMatrix.m_front = lookAtMatrix1.m_front;
 				upMatrix.m_right = (upMatrix.m_front.CrossProduct(upVector) & ndVector::m_triplexMask).Normalize();
 				upMatrix.m_up = upMatrix.m_right.CrossProduct(upMatrix.m_front);
 				upMatrix = upMatrix * lookAtMatrix0.OrthoInverse();
-				
+
 				const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
 				footHinge->SetTargetAngle(angle);
 			}
-			
+
 			m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), m_world, m_timestep);
 			m_invDynamicsSolver.Solve();
 			m_invDynamicsSolver.SolverEnd();

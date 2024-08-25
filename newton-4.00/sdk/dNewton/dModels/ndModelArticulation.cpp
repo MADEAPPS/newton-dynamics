@@ -39,6 +39,14 @@ ndModelArticulation::ndNode::ndNode(const ndSharedPtr<ndBody>& body, const ndSha
 	}
 }
 
+ndModelArticulation::ndNode::ndNode(const ndNode& src)
+	:ndNodeHierarchy<ndNode>(src)
+	,m_body(src.m_body)
+	,m_joint(src.m_joint)
+	,m_name(src.m_name)
+{
+}
+
 ndModelArticulation::ndNode::~ndNode()
 {
 }
@@ -154,9 +162,10 @@ void ndModelArticulation::OnAddToWorld()
 		}
 	}
 
-	for (ndSharedList<ndJointBilateralConstraint>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
+	for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
 	{
-		m_world->AddJoint(node->GetInfo());
+		//ndNode* const node = *node->GetInfo();
+		m_world->AddJoint(node->GetInfo().m_joint);
 	}
 }
 
@@ -166,11 +175,13 @@ void ndModelArticulation::OnRemoveFromToWorld()
 	ndFixSizeArray<ndNode*, 256> stack;
 	if (m_rootNode)
 	{
-		for (ndSharedList<ndJointBilateralConstraint>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
+		//for (ndSharedList<ndJointBilateralConstraint>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
+		for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
 		{
-			if (node->GetInfo()->m_worldNode)
+			if (node->GetInfo().m_joint->m_worldNode)
 			{
-				m_world->RemoveJoint(node->GetInfo());
+				//m_world->RemoveJoint(node->GetInfo());
+				m_world->RemoveJoint(node->GetInfo().m_joint);
 			}
 		}
 
@@ -200,7 +211,7 @@ void ndModelArticulation::OnRemoveFromToWorld()
 	}
 }
 
-void ndModelArticulation::AddCloseLoop(const ndSharedPtr<ndJointBilateralConstraint>& joint)
+void ndModelArticulation::AddCloseLoop(const ndSharedPtr<ndJointBilateralConstraint>& joint, const char* const name)
 {
 	#ifdef _DEBUG
 
@@ -234,15 +245,26 @@ void ndModelArticulation::AddCloseLoop(const ndSharedPtr<ndJointBilateralConstra
 	ndAssert(Check(joint->GetBody0()) || Check(joint->GetBody1()));
 	#endif
 
-	for (ndSharedList<ndJointBilateralConstraint>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
+	//for (ndSharedList<ndJointBilateralConstraint>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
+	for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
 	{
-		if (*node->GetInfo() == *joint)
+		//if (*node->GetInfo() == *joint)
+		if (*node->GetInfo().m_joint == *joint)
 		{
 			return;
 		}
 	}
 
-	m_closeLoops.Append(joint);
+	char loopName[256];
+	snprintf(loopName, sizeof (loopName), "loop_%d", m_closeLoops.GetCount());
+	if (name)
+	{
+		snprintf(loopName, sizeof(loopName), name);
+	}
+
+	ndSharedPtr<ndBody> body;
+	ndList<ndNode>::ndNode* const node = m_closeLoops.Append(ndNode(body, joint, nullptr));
+	node->GetInfo().m_name = loopName;
 }
 
 void ndModelArticulation::AddToWorld(ndWorld* const world)
@@ -265,6 +287,19 @@ ndModelArticulation::ndNode* ndModelArticulation::FindByName(const char* const n
 		if (strcmp(node->m_name.GetStr(), name) == 0)
 		{
 			return node;
+		}
+	}
+
+	return nullptr;
+}
+
+ndModelArticulation::ndNode* ndModelArticulation::FindLoopByName(const char* const name) const
+{
+	for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
+	{
+		if (strcmp(node->GetInfo().m_name.GetStr(), name) == 0)
+		{
+			return &node->GetInfo();
 		}
 	}
 

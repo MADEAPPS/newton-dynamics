@@ -257,10 +257,7 @@ ndInt32 ndIkSwivelPositionEffector::GetKinematicState(ndKinematicState* const st
 
 bool ndIkSwivelPositionEffector::IsHolonomic(ndFloat32 timestep) const
 {
-	//ndFixSizeArray<ndJointBilateralConstraint*, 16> joints;
-
 	ndAssert(m_body0->GetSkeleton());
-
 	const ndSkeletonContainer* const skeleton = m_body0->GetSkeleton();
 	const ndSkeletonContainer::ndNode* effectorNode = nullptr;
 	for (ndSkeletonContainer::ndNodeList::ndNode* node = skeleton->GetNodeList().GetFirst(); node; node = node->GetNext())

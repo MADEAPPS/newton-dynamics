@@ -52,15 +52,15 @@
 //#define DEFAULT_SCENE	12		// basic vehicle
 //#define DEFAULT_SCENE	13		// heavy vehicle
 //#define DEFAULT_SCENE	14		// background vehicle prop
-//#define DEFAULT_SCENE	15		// simple industrial robot
-//#define DEFAULT_SCENE	16		// advanced industrial robot
-//#define DEFAULT_SCENE	17		// basic player
-//#define DEFAULT_SCENE	18		// rag doll
-//#define DEFAULT_SCENE	19		// cart pole discrete controller
-//#define DEFAULT_SCENE	20		// cart pole continue controller
-//#define DEFAULT_SCENE	21		// unit cycle controller
+//#define DEFAULT_SCENE	15		// basic player
+//#define DEFAULT_SCENE	16		// rag doll
+//#define DEFAULT_SCENE	17		// cart pole discrete controller
+//#define DEFAULT_SCENE	18		// cart pole continue controller
+//#define DEFAULT_SCENE	19		// unit cycle controller
+#define DEFAULT_SCENE	20		// simple industrial robot
+//#define DEFAULT_SCENE	21		// advanced industrial robot
 //#define DEFAULT_SCENE	22		// quadruped test 1
-#define DEFAULT_SCENE	23		// quadruped test 2
+//#define DEFAULT_SCENE	23		// quadruped test 2
 //#define DEFAULT_SCENE	24		// quadruped test 3
 //#define DEFAULT_SCENE	25		// biped test 1
 //#define DEFAULT_SCENE	26		// biped test 2
@@ -123,13 +123,13 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic vehicle", ndBasicVehicle },
 	{ "heavy vehicle", ndHeavyVehicle },
 	{ "low lod vehicle", ndBagroundLowLodVehicle },
-	{ "simple industrial robot", ndSimpleIndustrialRobot },
-	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
 	{ "basic player", ndPlayerCapsuleDemo },
 	{ "rag doll", ndRagdollTest },
 	{ "cartpole discrete controller", ndCartpoleDiscrete },
 	{ "cartpole continue controller", ndCartpoleContinue },
 	{ "unicycle controller", ndUnicycleController },
+	{ "simple industrial robot", ndSimpleIndustrialRobot },
+	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
 	{ "quadruped test one", ndQuadrupedTest_1 },
 	{ "quadruped test two", ndQuadrupedTest_2 },
 	{ "quadruped test three", ndQuadrupedTest_3},

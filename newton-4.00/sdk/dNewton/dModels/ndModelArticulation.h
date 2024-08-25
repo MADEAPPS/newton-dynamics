@@ -35,6 +35,7 @@ class ndModelArticulation: public ndModel
 	class ndNode : public ndNodeHierarchy<ndNode>
 	{
 		public:
+		D_NEWTON_API ndNode(const ndNode& src);
 		D_NEWTON_API ndNode(const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint, ndNode* const parent);
 		D_NEWTON_API virtual ~ndNode();
 
@@ -54,7 +55,7 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API ndNode* AddRootBody(const ndSharedPtr<ndBody>& rootBody);
 	D_NEWTON_API ndNode* AddLimb(ndNode* const parent, const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint);
 
-	D_NEWTON_API void AddCloseLoop(const ndSharedPtr<ndJointBilateralConstraint>& joint);
+	D_NEWTON_API void AddCloseLoop(const ndSharedPtr<ndJointBilateralConstraint>& joint, const char* const name = nullptr);
 
 	D_NEWTON_API virtual void OnAddToWorld();
 	D_NEWTON_API virtual void OnRemoveFromToWorld();
@@ -62,6 +63,7 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API const ndString& GetName() const;
 	D_NEWTON_API void SetName(const ndString& name);
 	D_NEWTON_API ndNode* FindByName(const char* const name) const;
+	D_NEWTON_API ndNode* FindLoopByName(const char* const name) const;
 
 	D_NEWTON_API void AddToWorld(ndWorld* const world);
 	D_NEWTON_API void SetTransform(const ndMatrix& matrix);
@@ -71,7 +73,8 @@ class ndModelArticulation: public ndModel
 
 	ndString m_name;
 	ndNode* m_rootNode;
-	ndSharedList<ndJointBilateralConstraint> m_closeLoops;
+	//ndSharedList<ndJointBilateralConstraint> m_closeLoops;
+	ndList<ndNode> m_closeLoops;
 
 	friend class ndUrdfFile;
 };

@@ -12,6 +12,7 @@
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndIk6DofEffector.h"
+#include "ndSkeletonContainer.h"
 
 ndIk6DofEffector::ndIk6DofEffector()
 	:ndJointBilateralConstraint()
@@ -291,6 +292,29 @@ void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix&
 		}
 	}
 #endif
+}
+
+bool ndIk6DofEffector::IsHolonomic(ndFloat32 timestep) const
+{
+	ndAssert(0);
+	ndAssert(m_body0->GetSkeleton());
+	const ndSkeletonContainer* const skeleton = m_body0->GetSkeleton();
+	const ndSkeletonContainer::ndNode* effectorNode = nullptr;
+	for (ndSkeletonContainer::ndNodeList::ndNode* node = skeleton->GetNodeList().GetFirst(); node; node = node->GetNext())
+	{
+		if (node->GetInfo().m_body == m_body0)
+		{
+			effectorNode = &node->GetInfo();
+			break;
+		}
+	}
+
+	bool isHolonomic = true;
+	for (const ndSkeletonContainer::ndNode* node = effectorNode; isHolonomic && node && (node->m_body != m_body1); node = node->m_parent)
+	{
+		isHolonomic = isHolonomic && node->m_joint->IsHolonomic(timestep);
+	}
+	return isHolonomic;
 }
 
 void ndIk6DofEffector::JacobianDerivative(ndConstraintDescritor& desc)
