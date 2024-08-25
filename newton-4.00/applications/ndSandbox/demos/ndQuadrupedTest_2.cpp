@@ -23,7 +23,7 @@
 
 namespace ndQuadruped_2
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_2-VPG.dnn"
 
 	class ndAnimPose
@@ -1583,7 +1583,7 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 		referenceModel->AddToWorld(world);
 
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-		world->AddJoint(fixJoint);
+		//world->AddJoint(fixJoint);
 
 		char fileName[256];
 		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
