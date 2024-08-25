@@ -37,16 +37,17 @@ namespace ndQuadruped_1
 	class ndActionVector
 	{
 		public:
-		ndBrainFloat m_x;
-		ndBrainFloat m_z;
+		ndBrainFloat m_torso_x;
+		ndBrainFloat m_torso_z;
 	};
 
 	class ndObservationVector
 	{
 		public:
 		ndLegObservation n_legs[4];
-		ndActionVector m_torso;
-		ndFloat32 m_animSpeed;
+		ndBrainFloat m_torso_x;
+		ndBrainFloat m_torso_z;
+		ndBrainFloat m_animSpeed;
 	};
 
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
@@ -336,7 +337,7 @@ namespace ndQuadruped_1
 				for (ndInt32 i = 0; i < 4; i++)
 				{
 					m_phase[i] = phase[i];
-					m_offset[i] = ndFloat32(0.0f);
+					m_offset[i] = ndVector::m_zero;
 					m_currentPose[i] = BasePose(i);
 				}
 			}
@@ -812,8 +813,8 @@ namespace ndQuadruped_1
 				observation.n_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamFloat);
 			}
 
-			observation.m_torso.m_x = m_control->m_x;
-			observation.m_torso.m_z = m_control->m_z;
+			observation.m_torso_x = m_control->m_x;
+			observation.m_torso_z = m_control->m_z;
 			observation.m_animSpeed = m_control->m_animSpeed;
 		}
 
@@ -823,8 +824,8 @@ namespace ndQuadruped_1
 			if (m_control->m_enableController)
 			{
 				const ndActionVector& actionVector = *((ndActionVector*)actions);
-				m_control->m_x = ndClamp(ndReal(m_control->m_x + actionVector.m_x * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
-				m_control->m_z = ndClamp(ndReal(m_control->m_z + actionVector.m_z * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
+				m_control->m_x = ndClamp(ndReal(m_control->m_x + actionVector.m_torso_x * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
+				m_control->m_z = ndClamp(ndReal(m_control->m_z + actionVector.m_torso_z * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
 			}
 
 			UpdatePose();
@@ -1045,7 +1046,6 @@ namespace ndQuadruped_1
 					effector->DebugJoint(context);
 				}
 			
-				//if (keyFrame.m_userParamInt == 0)
 				if (keyFrame.m_userParamFloat < 1.0f)
 				{
 					ndBodyKinematic* const body = effector->GetBody0();
