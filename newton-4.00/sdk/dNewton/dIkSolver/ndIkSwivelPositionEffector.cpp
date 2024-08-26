@@ -258,16 +258,21 @@ ndInt32 ndIkSwivelPositionEffector::GetKinematicState(ndKinematicState* const st
 bool ndIkSwivelPositionEffector::IsHolonomic(ndFloat32 timestep) const
 {
 	ndAssert(m_body0->GetSkeleton());
+	//const ndSkeletonContainer* const skeleton = m_body0->GetSkeleton();
+	//const ndSkeletonContainer::ndNode* effectorNode = nullptr;
+	//for (ndSkeletonContainer::ndNodeList::ndNode* node = skeleton->GetNodeList().GetFirst(); node; node = node->GetNext())
+	//{
+	//	if (node->GetInfo().m_body == m_body0)
+	//	{
+	//		effectorNode = &node->GetInfo();
+	//		break;
+	//	}
+	//}
+
 	const ndSkeletonContainer* const skeleton = m_body0->GetSkeleton();
-	const ndSkeletonContainer::ndNode* effectorNode = nullptr;
-	for (ndSkeletonContainer::ndNodeList::ndNode* node = skeleton->GetNodeList().GetFirst(); node; node = node->GetNext())
-	{
-		if (node->GetInfo().m_body == m_body0)
-		{
-			effectorNode = &node->GetInfo();
-			break;
-		}
-	}
+	ndAssert(skeleton);
+	const ndSkeletonContainer::ndNode* const effectorNode = skeleton->GetNodeList().FindNode(m_body0);
+	ndAssert(effectorNode);
 
 	bool isHolonomic = true;
 	for (const ndSkeletonContainer::ndNode* node = effectorNode; isHolonomic && node && (node->m_body != m_body1); node = node->m_parent)

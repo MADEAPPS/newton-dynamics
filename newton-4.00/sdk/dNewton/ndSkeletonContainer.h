@@ -126,6 +126,22 @@ class ndSkeletonContainer
 			:ndList<ndSkeletonContainer::ndNode, ndContainersFreeListAlloc<ndSkeletonContainer::ndNode> >()
 		{
 		}
+
+		const ndSkeletonContainer::ndNode* FindNode(const ndBody* const body) const
+		{
+			const ndSkeletonContainer::ndNode* node = nullptr;
+			for (ndNodeList::ndNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext())
+			{
+				if (ptr->GetInfo().m_body == body)
+				{
+					node = &ptr->GetInfo();
+					break;
+				}
+			}
+			return node;
+		}
+
+
 	};
 
 	private:

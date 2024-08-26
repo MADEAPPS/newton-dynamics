@@ -36,8 +36,8 @@ namespace ndAdvancedRobot
 	class ndObservationVector
 	{
 		public:
-		ndBrainFloat m_posit[6];
-		ndBrainFloat m_veloc[6];
+		ndBrainFloat m_posit[8];
+		ndBrainFloat m_veloc[8];
 	};
 
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
@@ -73,7 +73,7 @@ namespace ndAdvancedRobot
 		{ "arm_4", ndDefinition::m_hinge , 2.0f, -1.0e10f, 1.0e10f},
 		{ "gripperLeft", ndDefinition::m_slider  , 1.0f, -0.2f, 0.03f},
 		{ "gripperRight", ndDefinition::m_slider , 1.0f, -0.2f, 0.03f},
-		{ "effector", ndDefinition::m_effector , 0.0f, 0.0f, 0.0f},
+		//{ "effector", ndDefinition::m_effector , 0.0f, 0.0f, 0.0f},
 	};
 
 #if 0
@@ -388,30 +388,30 @@ namespace ndAdvancedRobot
 			RobotModelNotify* m_robot;
 		};
 
-		class ndEffectorInfo
-		{
-			public:
-			ndEffectorInfo()
-			{
-			}
-
-			ndEffectorInfo(
-				const ndSharedPtr<ndJointBilateralConstraint>& thigh,
-				const ndSharedPtr<ndJointBilateralConstraint>& calf,
-				const ndSharedPtr<ndJointBilateralConstraint>& foot,
-				const ndSharedPtr<ndJointBilateralConstraint>& effector)
-				:m_thigh(thigh)
-				,m_calf(calf)
-				,m_foot(foot)
-				,m_effector(effector)
-			{
-			}
-
-			ndSharedPtr<ndJointBilateralConstraint> m_thigh;
-			ndSharedPtr<ndJointBilateralConstraint> m_calf;
-			ndSharedPtr<ndJointBilateralConstraint> m_foot;
-			ndSharedPtr<ndJointBilateralConstraint> m_effector;
-		};
+		//class ndEffectorInfo
+		//{
+		//	public:
+		//	ndEffectorInfo()
+		//	{
+		//	}
+		//
+		//	ndEffectorInfo(
+		//		const ndSharedPtr<ndJointBilateralConstraint>& thigh,
+		//		const ndSharedPtr<ndJointBilateralConstraint>& calf,
+		//		const ndSharedPtr<ndJointBilateralConstraint>& foot,
+		//		const ndSharedPtr<ndJointBilateralConstraint>& effector)
+		//		:m_thigh(thigh)
+		//		,m_calf(calf)
+		//		,m_foot(foot)
+		//		,m_effector(effector)
+		//	{
+		//	}
+		//
+		//	ndSharedPtr<ndJointBilateralConstraint> m_thigh;
+		//	ndSharedPtr<ndJointBilateralConstraint> m_calf;
+		//	ndSharedPtr<ndJointBilateralConstraint> m_foot;
+		//	ndSharedPtr<ndJointBilateralConstraint> m_effector;
+		//};
 
 		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
 		{
@@ -512,6 +512,10 @@ namespace ndAdvancedRobot
 		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot, bool showDebug)
 			:ndModelNotify()
 			,m_invDynamicsSolver()
+			,m_effector()
+			,m_rootBody(nullptr)
+			,m_leftGripper(nullptr)
+			,m_rightGripper(nullptr)
 			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 			,m_world(nullptr)
@@ -538,6 +542,10 @@ namespace ndAdvancedRobot
 		RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const robot, bool showDebug)
 			:ndModelNotify()
 			,m_invDynamicsSolver()
+			,m_effector()
+			,m_rootBody(nullptr)
+			,m_leftGripper(nullptr)
+			,m_rightGripper(nullptr)
 			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 			,m_world(nullptr)
@@ -612,9 +620,23 @@ namespace ndAdvancedRobot
 			effectorJoint->SetMaxTorque(10000.0f);
 
 			m_rootBody = robot->GetRoot()->m_body->GetAsBodyDynamic();
-			m_leftGripper = (ndJointSlider*)robot->FindByName("leftGripper")->m_joint->GetAsBilateral();
-			m_rightGripper = (ndJointSlider*)robot->FindByName("rightGripper")->m_joint->GetAsBilateral();
+			m_leftGripper = (ndJointSlider*)robot->FindByName("gripperLeft")->m_joint->GetAsBilateral();
+			m_rightGripper = (ndJointSlider*)robot->FindByName("gripperRight")->m_joint->GetAsBilateral();
 			m_effectorOffset = effectorJoint->GetOffsetMatrix().m_posit;
+
+			ndModelArticulation::ndNode* node = robot->FindByName("arm_4");
+			ndAssert(node);
+			while (node->GetParent())
+			{
+				m_jointx.PushBack(*node->m_joint);
+				node = node->GetParent();
+			};
+
+			ndModelArticulation::ndNode* const leftGripperNode = robot->FindByName("gripperLeft");
+			//m_jointx.PushBack(*leftGripperNode->m_joint);
+
+			ndModelArticulation::ndNode* const rightGripperNode = robot->FindByName("gripperRight");
+			//m_jointx.PushBack(*rightGripperNode->m_joint);
 		}
 
 		bool IsTerminal() const
@@ -630,31 +652,18 @@ namespace ndAdvancedRobot
 		void GetObservation(ndBrainFloat* const observationInput)
 		{
 			ndMemSet(observationInput, 0.0f, ND_AGENT_INPUT_SIZE);
-			//ndObservationVector& observation = *((ndObservationVector*)observationInput);
-			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
-			//{
-			//	const ndAnimKeyframe& keyFrame = m_animPose[i];
-			//	const ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-			//
-			//	ndInt32 paramCount = 0;
-			//	ndJointBilateralConstraint::ndKinematicState kinematicState[16];
-			//	paramCount += info->m_thigh->GetKinematicState(&kinematicState[paramCount]);
-			//	paramCount += info->m_calf->GetKinematicState(&kinematicState[paramCount]);
-			//	paramCount += info->m_foot->GetKinematicState(&kinematicState[paramCount]);
-			//	for (ndInt32 j = 0; j < paramCount; ++j)
-			//	{
-			//		observation.m_legs[i].m_state[j * 2 + 0] = ndBrainFloat(kinematicState[j].m_posit);
-			//		observation.m_legs[i].m_state[j * 2 + 1] = ndBrainFloat(kinematicState[j].m_velocity);
-			//	}
-			//
-			//	observation.m_legs[i].m_hasContact = ndBrainFloat(FindContact(i) ? 1.0f : 0.0f);
-			//	//observation.m_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamInt ? 1.0f : 0.0f);
-			//	observation.m_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamFloat);
-			//}
-			//
-			//observation.m_torso_x = m_control->m_x;
-			//observation.m_torso_z = m_control->m_z;
-			//observation.m_animSpeed = m_control->m_animSpeed;
+
+			ndObservationVector& observation = *((ndObservationVector*)observationInput);
+			for (ndInt32 i = m_jointx.GetCount() - 1; i >= 0; --i)
+			{ 
+				const ndJointBilateralConstraint* const joint = m_jointx[i];
+			
+				ndJointBilateralConstraint::ndKinematicState kinematicState[16];
+				ndInt32 paramCount = joint->GetKinematicState(&kinematicState[0]);
+				ndAssert(paramCount == 1);
+				observation.m_posit[i] = kinematicState[0].m_posit;
+				observation.m_veloc[i] = kinematicState[0].m_velocity;
+			}
 		}
 
 		void ApplyActions(ndBrainFloat* const actions)
@@ -822,14 +831,15 @@ namespace ndAdvancedRobot
 
 		ndIkSolver m_invDynamicsSolver;
 		ndVector m_effectorOffset;
+		ndSharedPtr<ndJointBilateralConstraint> m_effector;
 
 		ndBodyDynamic* m_rootBody;
 		ndJointSlider* m_leftGripper;
 		ndJointSlider* m_rightGripper;
-		ndSharedPtr<ndJointBilateralConstraint> m_effector;
 		ndController* m_controller;
 		ndControllerTrainer* m_controllerTrainer;
 		ndWorld* m_world;
+		ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointx;
 
 		ndReal m_x;
 		ndReal m_y;
@@ -953,7 +963,7 @@ namespace ndAdvancedRobot
 					{
 						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body->GetAsBodyDynamic()));
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
-						ndSharedPtr<ndJointBilateralConstraint> hinge(new ndJointHinge(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body->GetAsBodyKinematic()));
+						ndSharedPtr<ndJointBilateralConstraint> hinge(new ndIkJointHinge(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body->GetAsBodyKinematic()));
 
 						ndJointHinge* const hingeJoint = (ndJointHinge*)*hinge;
 						hingeJoint->SetLimits(definition.m_minLimit, definition.m_maxLimit);
@@ -970,21 +980,15 @@ namespace ndAdvancedRobot
 						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body->GetAsBodyDynamic()));
 
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
+						ndTrace(("inIkeSlider\n"));
 						ndSharedPtr<ndJointBilateralConstraint> slider(new ndJointSlider(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body->GetAsBodyKinematic()));
+						//ndSharedPtr<ndJointBilateralConstraint> slider(new ndIkJointSlider(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body->GetAsBodyKinematic()));
 
 						ndJointSlider* const sliderJoint = (ndJointSlider*)*slider;
 						sliderJoint->SetLimits(definition.m_minLimit, definition.m_maxLimit);
 						sliderJoint->SetAsSpringDamper(0.001f, 2000.0f, 100.0f);
 						parentBone = model->AddLimb(parentBone, childBody, slider);
-
-						if (!strstr(definition.m_boneName, "Left"))
-						{
-							parentBone->m_name = "leftGripper";
-						}
-						else
-						{
-							parentBone->m_name = "rightGripper";
-						}
+						parentBone->m_name = definition.m_boneName;
 					}
 					//else if (definition.m_type == ndDefinition::m_effector)
 					//{
