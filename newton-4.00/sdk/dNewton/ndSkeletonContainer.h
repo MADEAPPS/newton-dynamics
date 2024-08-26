@@ -140,8 +140,6 @@ class ndSkeletonContainer
 			}
 			return node;
 		}
-
-
 	};
 
 	private:

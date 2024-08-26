@@ -661,8 +661,8 @@ namespace ndAdvancedRobot
 				ndJointBilateralConstraint::ndKinematicState kinematicState[16];
 				ndInt32 paramCount = joint->GetKinematicState(&kinematicState[0]);
 				ndAssert(paramCount == 1);
-				observation.m_posit[i] = kinematicState[0].m_posit;
-				observation.m_veloc[i] = kinematicState[0].m_velocity;
+				observation.m_posit[i] = ndBrainFloat(kinematicState[0].m_posit);
+				observation.m_veloc[i] = ndBrainFloat(kinematicState[0].m_velocity);
 			}
 		}
 

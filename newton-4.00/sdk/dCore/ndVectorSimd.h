@@ -65,7 +65,17 @@ class ndVector
 	{
 	}
 
-	// emulate gather instruction
+	#ifdef D_NEWTON_USE_AVX2_OPTION
+	inline ndVector(const ndFloat32* const baseAddr, const ndInt32* const index)
+		:m_type(_mm_i32gather_ps(baseAddr, (__m128i&)* index, 4))
+	{
+		ndAssert(baseAddr[index[0]] == m_x);
+		ndAssert(baseAddr[index[1]] == m_y);
+		ndAssert(baseAddr[index[2]] == m_z);
+		ndAssert(baseAddr[index[3]] == m_w);
+	}
+	#else
+	// emulate gather instruction for non avx2 abi
 	inline ndVector(const ndFloat32* const baseAddr, const ndInt32* const index)
 		:m_x(baseAddr[index[0]])
 		,m_y(baseAddr[index[1]])
@@ -73,7 +83,7 @@ class ndVector
 		,m_w(baseAddr[index[3]])
 	{
 	}
-
+	#endif
 #ifndef	D_NEWTON_USE_DOUBLE
 	inline ndVector(const ndFloat64* const ptr)
 		:m_x(ndFloat32(ptr[0]))
@@ -556,8 +566,8 @@ class ndVector
 // 4 x 1 double precision SSE2 vector class declaration
 //
 // *****************************************************************************************
-D_MSV_NEWTON_ALIGN_32
 #ifdef D_NEWTON_USE_AVX2_OPTION
+D_MSV_NEWTON_ALIGN_32
 class ndBigVector
 {
 	#define PERMUT_MASK_DOUBLE(y, x) _MM_SHUFFLE2 (y, x)
@@ -590,11 +600,12 @@ class ndBigVector
 	}
 
 	inline ndBigVector(const ndFloat64* const baseAddr, const ndInt64* const index)
-		:m_x(baseAddr[index[0]])
-		,m_y(baseAddr[index[1]])
-		,m_z(baseAddr[index[2]])
-		,m_w(baseAddr[index[3]])
+		:m_type (_mm256_i64gather_pd(baseAddr, (__m256i&) * index, 8))
 	{
+		ndAssert(baseAddr[index[0]] == m_x);
+		ndAssert(baseAddr[index[1]] == m_y);
+		ndAssert(baseAddr[index[2]] == m_z);
+		ndAssert(baseAddr[index[3]] == m_w);
 	}
 
 #ifdef D_NEWTON_USE_DOUBLE
@@ -1052,6 +1063,11 @@ class ndBigVector
 			ndInt64 m_iz;
 			ndInt64 m_iw;
 		};
+		struct
+		{
+			__m128d m_typeLow;
+			__m128d m_typeHigh;
+		};
 	};
 
 	D_CORE_API static ndBigVector m_zero;
@@ -1073,6 +1089,7 @@ class ndBigVector
 
 #else
 
+D_MSV_NEWTON_ALIGN_32
 class ndBigVector
 {
 	#define PERMUT_MASK_DOUBLE(y, x) _MM_SHUFFLE2 (y, x)
@@ -1569,16 +1586,6 @@ class ndBigVector
 		ndInt64 m_i[4];
 		struct
 		{
-			__m128d m_typeLow;
-			__m128d m_typeHigh;
-		};
-		struct
-		{
-			__m128i m_typeIntLow;
-			__m128i m_typeIntHigh;
-		};
-		struct
-		{
 			ndFloat64 m_x;
 			ndFloat64 m_y;
 			ndFloat64 m_z;
@@ -1590,6 +1597,16 @@ class ndBigVector
 			ndInt64 m_iy;
 			ndInt64 m_iz;
 			ndInt64 m_iw;
+		};
+		struct
+		{
+			__m128d m_typeLow;
+			__m128d m_typeHigh;
+		};
+		struct
+		{
+			__m128i m_typeIntLow;
+			__m128i m_typeIntHigh;
 		};
 	};
 

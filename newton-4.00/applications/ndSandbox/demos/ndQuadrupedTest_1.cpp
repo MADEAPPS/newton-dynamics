@@ -171,6 +171,45 @@ namespace ndQuadruped_1
 		matrix.m_posit = location.m_posit;
 		model->SetTransform(matrix);
 
+		ndFloat32 totalVolume = 0.0f;
+		ndFixSizeArray<ndBodyKinematic*, 256> bodyArray;
+		for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+		{
+			ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+			ndFloat32 volume = body->GetCollisionShape().GetVolume();
+			if (node->m_name != "base_link")
+			{
+				volume *= 4.0f;
+			}
+			totalVolume += volume;
+			bodyArray.PushBack(body);
+		}
+
+		ndFloat32 totalMass = 25.0f;
+		ndFloat32 density = totalMass / totalVolume;
+		for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
+		{
+			ndBodyKinematic* const body = bodyArray[i];
+			ndFloat32 volume = body->GetCollisionShape().GetVolume();
+			ndFloat32 mass = density * volume;
+			body->SetMassMatrix(mass, body->GetCollisionShape());
+			ndVector inertia(body->GetMassMatrix());
+			ndFloat32 maxInertia = ndMax(ndMax(inertia.m_x, inertia.m_y), inertia.m_z);
+			ndFloat32 minInertia = ndMin(ndMin(inertia.m_x, inertia.m_y), inertia.m_z);
+			if (minInertia < maxInertia * 0.125f)
+			{
+				minInertia = maxInertia * 0.125f;
+				for (ndInt32 j = 0; j < 3; ++j)
+				{
+					if (inertia[j] < minInertia)
+					{
+						inertia[j] = minInertia;
+					}
+				}
+			}
+			body->SetMassMatrix(inertia);
+		}
+
 		return model;
 	}
 
@@ -555,6 +594,9 @@ namespace ndQuadruped_1
 
 		void Init(ndModelArticulation* const robot)
 		{
+			static ndInt32 modelId = 0;
+			m_modelId = modelId++;
+
 			ndFloat32 phase[] = { 0.0f, 0.75f, 0.25f, 0.5f };
 			ndSharedPtr<ndAnimationSequence> sequence(new ndPoseGenerator(phase));
 
@@ -746,12 +788,46 @@ namespace ndQuadruped_1
 			return reward;
 		}
 
+		//#pragma optimize( "", off )
+		bool CalculateExplosionReward() const
+		{
+			bool isAlive = true;
+			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); isAlive && node; node = node->GetNextIterator())
+			{
+				const ndVector veloc(node->m_body->GetVelocity());
+				const ndVector omega(node->m_body->GetOmega());
+				ndFloat32 vMag2 = veloc.DotProduct(veloc).GetScalar();
+				ndFloat32 wMag2 = omega.DotProduct(omega).GetScalar();
+				isAlive = isAlive && (vMag2 < 100.0f);
+				isAlive = isAlive && (wMag2 < 500.0f);
+				if (!isAlive)
+				{
+					isAlive = false;
+				}
+			}
+			return isAlive;
+		}
+
+		//#pragma optimize( "", off )
 		ndReal GetReward() const
 		{
-			//ndBrainFloat reward0 = CalculateZeroOmegaReward();
-			ndBrainFloat dstReward = CalculateDistanceToOrigin();
-			ndBrainFloat zmpReward = CalculateZeroMomentPointReward();
-			//ndTrace(("zeroOmega(%f) ZeroMoment(%f)\n", reward0, reward1));
+			ndBrainFloat dstReward = 0.0f;
+			ndBrainFloat zmpReward = 0.0f;
+
+			bool isAlived = CalculateExplosionReward();
+			if (isAlived)
+			{
+				dstReward = CalculateDistanceToOrigin();
+				zmpReward = CalculateZeroMomentPointReward();
+				//ndBrainFloat reward0 = CalculateZeroOmegaReward();
+			}
+			else
+			{
+				// catastrophic penalty,  results in a immediate kill.
+				CalculateExplosionReward();
+				ndMemSet(m_controllerTrainer->m_rewardsMemories, 0.0f, sizeof(m_controllerTrainer->m_rewardsMemories) / sizeof(m_controllerTrainer->m_rewardsMemories[0]));
+			}
 
 			if ((dstReward < 1.0e-3f) || (zmpReward < 1.0e-3f))
 			{
@@ -1119,6 +1195,7 @@ namespace ndQuadruped_1
 		ndControllerTrainer* m_controllerTrainer;
 		ndWorld* m_world;
 		ndFloat32 m_timestep;
+		ndInt32 m_modelId;
 		bool m_showDebug;
 
 		friend class ndModelUI;
@@ -1212,8 +1289,8 @@ namespace ndQuadruped_1
 			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*visualModel->GetNotifyCallback()));
 			scene->Set2DDisplayRenderFunction(quadrupedUI);
 
-			ndInt32 countX = 20;
-			ndInt32 countZ = 20;
+			ndInt32 countX = 22;
+			ndInt32 countZ = 23;
 			//countX = 0;
 			//countZ = 0;
 

@@ -856,8 +856,8 @@ namespace ndQuadruped_2
 			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); isHolonomic && node; node = node->GetNextIterator())
 			{
-				ndVector veloc(node->m_body->GetVelocity());
-				ndVector omega(node->m_body->GetOmega());
+				const ndVector veloc(node->m_body->GetVelocity());
+				const ndVector omega(node->m_body->GetOmega());
 				ndFloat32 vMag2 = veloc.DotProduct(veloc).GetScalar();
 				ndFloat32 wMag2 = omega.DotProduct(omega).GetScalar();
 				isHolonomic = isHolonomic && (vMag2 < 100.0f);
