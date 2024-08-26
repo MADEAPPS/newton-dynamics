@@ -1194,6 +1194,7 @@ namespace ndQuadruped_1
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 			hyperParameters.m_extraTrajectorySteps = 1024 * 2;
+			hyperParameters.m_bashTrajectoryCount = 1000;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
 			hyperParameters.m_numberOfObservations = ND_AGENT_INPUT_SIZE;
@@ -1211,8 +1212,8 @@ namespace ndQuadruped_1
 			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*visualModel->GetNotifyCallback()));
 			scene->Set2DDisplayRenderFunction(quadrupedUI);
 
-			ndInt32 countX = 6;
-			ndInt32 countZ = 9;
+			ndInt32 countX = 20;
+			ndInt32 countZ = 20;
 			//countX = 0;
 			//countZ = 0;
 
@@ -1222,8 +1223,8 @@ namespace ndQuadruped_1
 				for (ndInt32 j = 0; j < countX; ++j)
 				{
 					ndMatrix location(matrix);
-					location.m_posit.m_x += 6.0f * (ndRand() - 0.5f);
-					location.m_posit.m_z += 6.0f * (ndRand() - 0.5f);
+					location.m_posit.m_x += 20.0f * (ndRand() - 0.5f);
+					location.m_posit.m_z += 20.0f * (ndRand() - 0.5f);
 
 					ndModelArticulation* const model = CreateModel(scene, location);
 					model->SetNotifyCallback(new RobotModelNotify(m_master, model, false));
