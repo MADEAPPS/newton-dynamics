@@ -897,22 +897,20 @@ class ndBigVector
 
 	inline ndBigVector ShiftRight() const
 	{
-		ndAssert(0);
-		return ndBigVector (m_w, m_x, m_y, m_z); 
-		//return ndBigVector(_mm_shuffle_pd(m_typeHigh, m_typeLow, PERMUT_MASK_DOUBLE(0, 1)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(0, 1)));
+		//return ndBigVector (m_w, m_x, m_y, m_z); 
+		return ndBigVector (_mm256_permute4x64_pd(m_type, (3 << 0) + (0 << 2) + (1 << 4) + (2 << 6)));
 	}
 
 	inline ndBigVector ShiftTripleRight() const
 	{
-		//return ndBigVector(_mm_shuffle_pd(m_typeHigh, m_typeLow, PERMUT_MASK_DOUBLE(0, 0)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
-		return ndBigVector(_mm256_shuffle_pd(_mm256_permute2f128_pd(m_type, m_type, 1), m_type, 0x0c));
+		//return ndBigVector(_mm256_shuffle_pd(_mm256_permute2f128_pd(m_type, m_type, 1), m_type, 0x0c));
+		return ndBigVector(_mm256_permute4x64_pd(m_type, (2 << 0) + (0 << 2) + (1 << 4) + (3 << 6)));
 	}
 
 	inline ndBigVector ShiftTripleLeft() const
 	{
-		ndAssert(0);
-		return ndBigVector(m_y, m_z, m_x, m_w);
-		//return ndBigVector(_mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(0, 1)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(1, 0)));
+		//return ndBigVector(m_y, m_z, m_x, m_w);
+		return ndBigVector(_mm256_permute4x64_pd(m_type, (1 << 0) + (2 << 2) + (0 << 4) + (3 << 6)));
 	}
 
 	inline ndBigVector ShiftRightLogical(ndInt32 bits) const

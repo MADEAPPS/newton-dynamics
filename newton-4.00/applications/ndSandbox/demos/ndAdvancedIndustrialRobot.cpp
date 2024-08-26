@@ -668,15 +668,6 @@ namespace ndAdvancedRobot
 
 		void ApplyActions(ndBrainFloat* const actions)
 		{
-			//if (m_control->m_enableController)
-			//{
-			//	const ndActionVector& actionVector = *((ndActionVector*)actions);
-			//	m_control->m_x = ndClamp(ndReal(m_control->m_x + actionVector.m_torso_x * D_SWING_STEP), -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);
-			//	m_control->m_z = ndClamp(ndReal(m_control->m_z + actionVector.m_torso_z * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
-			//}
-			//
-			//UpdatePose();
-
 			// apply target position collected by control panel
 			ndMatrix targetMatrix(
 				ndRollMatrix(90.0f * ndDegreeToRad) *

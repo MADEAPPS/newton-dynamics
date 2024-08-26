@@ -910,6 +910,7 @@ ndVector ndShapeConvexHull::SupportVertexhierarchical(const ndVector& dir, ndInt
 					support = support.Select(m_soa_index[i], dot > maxVertexProjection);
 					maxVertexProjection = maxVertexProjection.GetMax(dot);
 				}
+
 				maxProj = maxProj.GetMax(maxVertexProjection.ShiftRight().ShiftRight());
 				maxProj = maxProj.GetMax(maxProj.ShiftRight());
 			}

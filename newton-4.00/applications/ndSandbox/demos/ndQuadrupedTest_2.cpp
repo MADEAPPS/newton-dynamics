@@ -932,7 +932,7 @@ namespace ndQuadruped_2
 
 			ndVector posit(effector->GetGlobalPosition());
 			ndFloat32 dist = posit.m_y - 0.05f;
-			ndBrainFloat input = ndBrainFloat(ndClamp (dist / 0.4f, 0.0f, 1.0f));
+			ndBrainFloat input = ndBrainFloat(ndClamp (ndBrainFloat(dist / 0.4f), ndBrainFloat(0.0f), ndBrainFloat(1.0f)));
 			//ndTrace(("%f %f\n", input, posit.m_y));
 			//FindFloor(m_world, posit, 1.0f);
 			return input;

@@ -297,18 +297,6 @@ void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix&
 bool ndIk6DofEffector::IsHolonomic(ndFloat32 timestep) const
 {
 	ndAssert(0);
-	//ndAssert(m_body0->GetSkeleton());
-	//const ndSkeletonContainer* const skeleton = m_body0->GetSkeleton();
-	//const ndSkeletonContainer::ndNode* effectorNode = nullptr;
-	//for (ndSkeletonContainer::ndNodeList::ndNode* node = skeleton->GetNodeList().GetFirst(); node; node = node->GetNext())
-	//{
-	//	if (node->GetInfo().m_body == m_body0)
-	//	{
-	//		effectorNode = &node->GetInfo();
-	//		break;
-	//	}
-	//}
-
 	ndAssert(m_body0->GetSkeleton());
 	const ndSkeletonContainer* const skeleton = m_body0->GetSkeleton();
 	ndAssert(skeleton);
