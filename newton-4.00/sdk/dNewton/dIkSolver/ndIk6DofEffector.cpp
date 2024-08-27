@@ -106,6 +106,15 @@ void ndIk6DofEffector::SetOffsetMatrix(const ndMatrix& matrix)
 	m_targetFrame = matrix;
 }
 
+ndMatrix ndIk6DofEffector::GetEffectorMatrix() const
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	const ndMatrix matrix(matrix0 * matrix1.OrthoInverse());
+	return matrix;
+}
+
 ndFloat32 ndIk6DofEffector::GetMaxForce() const
 {
 	return m_linearMaxForce;
