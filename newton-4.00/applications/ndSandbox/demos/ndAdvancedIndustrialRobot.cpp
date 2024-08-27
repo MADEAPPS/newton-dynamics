@@ -470,6 +470,7 @@ namespace ndAdvancedRobot
 			ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
 			ndMatrix matrix(ndGetIdentityMatrix());
 			matrix.m_posit = m_effectorOffset;
+			matrix.m_posit.m_x += ND_MAX_X_SPAND * 0.5f;
 			effector->SetOffsetMatrix(matrix);
 			SetCurrentLocation();
 
