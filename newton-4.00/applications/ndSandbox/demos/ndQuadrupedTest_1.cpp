@@ -1261,8 +1261,7 @@ namespace ndQuadruped_1
 			,m_stopTraining(300 * 1000000)
 			,m_modelIsTrained(false)
 		{
-			ndWorld* const world = scene->GetWorld();
-			
+			//ndWorld* const world = scene->GetWorld();
 			m_outFile = fopen("quadruped_1-VPG.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 			
@@ -1279,20 +1278,26 @@ namespace ndQuadruped_1
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetActor()));
 			m_master->SetName(CONTROLLER_NAME);
-			
-			ndModelArticulation* const visualModel = CreateModel(scene, matrix);
-			SetMaterial(visualModel);
-			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel, true));
-			visualModel->AddToWorld(world);
-			((RobotModelNotify*)*visualModel->GetNotifyCallback())->ResetModel();
 
+			auto SpawnModel = [this, scene](const ndMatrix& matrix, bool debug)
+			{
+				ndWorld* const world = scene->GetWorld();
+				ndModelArticulation* const model = CreateModel(scene, matrix);
+				SetMaterial(model);
+				model->SetNotifyCallback(new RobotModelNotify(m_master, model, debug));
+				model->AddToWorld(world);
+				((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
+				return model;
+			};
+
+			ndModelArticulation* const visualModel = SpawnModel(matrix, true);
 			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*visualModel->GetNotifyCallback()));
 			scene->Set2DDisplayRenderFunction(quadrupedUI);
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			//countX = 0;
-			//countZ = 0;
+			countX = 1;
+			countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -1303,13 +1308,8 @@ namespace ndQuadruped_1
 					location.m_posit.m_x += 20.0f * (ndRand() - 0.5f);
 					location.m_posit.m_z += 20.0f * (ndRand() - 0.5f);
 
-					ndModelArticulation* const model = CreateModel(scene, location);
-					model->SetNotifyCallback(new RobotModelNotify(m_master, model, false));
-					model->AddToWorld(world);
+					ndModelArticulation* const model = SpawnModel(location, false);
 					m_models.Append(model);
-					//HideModel(model);
-					SetMaterial(model);
-					((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
 				}
 			}
 			scene->SetAcceleratedUpdate();

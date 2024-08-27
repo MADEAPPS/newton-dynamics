@@ -1048,12 +1048,12 @@ namespace ndAdvancedRobot
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetActor()));
 			m_master->SetName(CONTROLLER_NAME);
 
-			auto SpawnModel = [this, scene, &visualMesh, floor](const ndMatrix& matrix)
+			auto SpawnModel = [this, scene, &visualMesh, floor](const ndMatrix& matrix, bool debug)
 			{
 				ndWorld* const world = scene->GetWorld();
 				ndModelArticulation* const model = CreateModel(scene, *visualMesh, matrix);
 
-				model->SetNotifyCallback(new RobotModelNotify(m_master, model, true));
+				model->SetNotifyCallback(new RobotModelNotify(m_master, model, debug));
 				model->AddToWorld(world);
 				((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
 
@@ -1062,31 +1062,30 @@ namespace ndAdvancedRobot
 				return model;
 			};
 
-			ndModelArticulation* const visualModel = SpawnModel(matrix);
-			ndSharedPtr<ndUIEntity> robotUI(new ndRobotUI(scene, (RobotModelNotify*)*visualModel->GetNotifyCallback()));
-			scene->Set2DDisplayRenderFunction(robotUI);
-
-			ndInt32 countX = 6;
-			ndInt32 countZ = 9;
-			countX = 0;
-			countZ = 0;
+			ndInt32 countX = 10;
+			ndInt32 countZ = 10;
+			countX = 2;
+			countZ = 2;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
 			{
 				for (ndInt32 j = 0; j < countX; ++j)
 				{
-					//ndMatrix location(matrix);
-					//location.m_posit.m_x += 6.0f * (ndRand() - 0.5f);
-					//location.m_posit.m_z += 6.0f * (ndRand() - 0.5f);
-					//
-					//ndModelArticulation* const model = CreateModel(scene, location);
-					//model->SetNotifyCallback(new RobotModelNotify(m_master, model, false));
-					//model->AddToWorld(world);
-					//m_models.Append(model);
-					////HideModel(model);
-					//SetMaterial(model);
-					//((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
+					ndMatrix location(matrix);
+					location.m_posit.m_x += 10.0f + 10.0f * ndFloat32(j - countX/2);
+					location.m_posit.m_z += 10.0f + 10.0f * ndFloat32(i - countZ/2);
+					ndModelArticulation* const model = SpawnModel(location, false);
+					if ((i == 0) && (j == 0))
+					{
+						ndSharedPtr<ndUIEntity> robotUI(new ndRobotUI(scene, (RobotModelNotify*)*model->GetNotifyCallback()));
+						scene->Set2DDisplayRenderFunction(robotUI);
+					}
+					else
+					{
+						m_models.Append(model);
+					}
+
 				}
 			}
 			//scene->SetAcceleratedUpdate();
