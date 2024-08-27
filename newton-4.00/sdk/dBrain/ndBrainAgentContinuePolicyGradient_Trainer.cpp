@@ -41,7 +41,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_maxTrajectorySteps = 4096;
 	m_extraTrajectorySteps = 1024;
 	//m_bashTrajectoryCount = 100;
-	m_bashTrajectoryCount = 1000;
+	m_bashTrajectoryCount = 500;
 
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
