@@ -672,7 +672,7 @@ namespace ndSimpleRobot
 
 	void AddBackgroundScene(ndDemoEntityManager* const scene, const ndMatrix& matrix)
 	{
-		ndMatrix location(matrix * ndYawMatrix(90.0f * ndDegreeToRad));
+		ndMatrix location(matrix);
 		location.m_posit.m_x += 1.5f;
 		location.m_posit.m_z += 1.5f;
 		AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f);

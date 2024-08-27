@@ -223,30 +223,13 @@ namespace ndAdvancedRobot
 				m_robot->ResetModel();
 			}
 
-			void SaveTrajectory()
-			{
-				//ndInt32 stepsCount = 0;
-				//// if the model is dead, just skip this trajectory, not need to train on a dead model.
-				//for (ndInt32 i = 0; i < m_trajectory.GetCount(); ++i)
-				//{
-				//	if (m_trajectory.GetReward(i) > ndReal(0.05f))
-				//	{
-				//		// model is alive, break loop.
-				//		stepsCount = m_trajectory.GetCount();
-				//		break;
-				//	}
-				//}
-				//m_trajectory.SetCount(stepsCount);
-				ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
-			}
-
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
 			RobotModelNotify* m_robot;
 			ndReal m_rewardsMemories[32];
 		};
 
 		public:
-		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot, bool showDebug)
+		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
 			:ndModelNotify()
 			,m_invDynamicsSolver()
 			,m_effector()
@@ -259,7 +242,7 @@ namespace ndAdvancedRobot
 			,m_location()
 			,m_targetLocation()
 			,m_timestep(ndFloat32(0.0f))
-			,m_showDebug(showDebug)
+			,m_showDebug(false)
 		{
 			m_controllerTrainer = new ndControllerTrainer(master);
 			m_controllerTrainer->m_robot = this;
@@ -404,7 +387,14 @@ namespace ndAdvancedRobot
 				return 0.0f;
 			}
 
-			return 0.0f;
+			const ndMatrix targetMatrix(CalculateTargetMatrix());
+			const ndMatrix effectorMatrix(m_effector->GetLocalMatrix0() * m_effector->GetBody0()->GetMatrix());
+
+			ndVector error(effectorMatrix.m_posit - targetMatrix.m_posit);
+			ndFloat32 errorMag = ndSqrt (error.DotProduct(error).GetScalar());
+			ndFloat32 errorMagDev = ndSqrt(ND_MAX_X_SPAND * ND_MAX_X_SPAND + (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND) * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
+			errorMag = ndClamp (errorMag / errorMagDev, ndFloat32(0.0f), ndFloat32(1.0f));
+			return 1.0f - errorMag;
 		}
 
 		void GetObservation(ndBrainFloat* const inputObservations)
@@ -456,7 +446,7 @@ namespace ndAdvancedRobot
 			m_invDynamicsSolver.SolverEnd();
 		}
 
-		void GetCurrentLocation()
+		void SetCurrentLocation()
 		{
 			ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
 			ndMatrix matrix(effector->GetEffectorMatrix());
@@ -481,7 +471,7 @@ namespace ndAdvancedRobot
 			ndMatrix matrix(ndGetIdentityMatrix());
 			matrix.m_posit = m_effectorOffset;
 			effector->SetOffsetMatrix(matrix);
-			GetCurrentLocation();
+			SetCurrentLocation();
 
 			m_targetLocation.m_x = ndRand() * ND_MAX_X_SPAND;
 			m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
@@ -504,30 +494,35 @@ namespace ndAdvancedRobot
 
 		void PostUpdate(ndWorld* const, ndFloat32)
 		{
-			GetCurrentLocation();
+			SetCurrentLocation();
 		}
 
 		void PostTransformUpdate(ndWorld* const, ndFloat32)
 		{
 		}
 
-		void Debug(ndConstraintDebugCallback& context) const
+		ndMatrix CalculateTargetMatrix() const
 		{
-			//if (!m_showDebug)
-			//{
-			//	return;
-			//}
-
 			const ndMatrix alignMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
 			const ndMatrix rotation(ndPitchMatrix(m_targetLocation.m_pitch * ndDegreeToRad) * ndYawMatrix(m_targetLocation.m_yaw * ndDegreeToRad) * ndRollMatrix(m_targetLocation.m_roll * ndDegreeToRad));
 			ndMatrix targetMatrix(alignMatrix * rotation * alignMatrix.OrthoInverse());
-			
+
 			ndVector localPosit(m_targetLocation.m_x, m_targetLocation.m_y, 0.0f, 0.0f);
 			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth * ndDegreeToRad));
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
 			ndMatrix matrix(targetMatrix * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
+			return matrix;
+		}
 
-			const ndVector color(1.0f, 0.0f, 0.0f, 1.0f);
+		void Debug(ndConstraintDebugCallback& context) const
+		{
+			if (!m_showDebug)
+			{
+				return;
+			}
+
+			ndMatrix matrix(CalculateTargetMatrix());
+			const ndVector color(0.0f, 1.0f, 0.0f, 1.0f);
 			context.DrawPoint(matrix.m_posit, color, ndFloat32(4.0f));
 		}
 
@@ -708,26 +703,6 @@ namespace ndAdvancedRobot
 						parentBone = model->AddLimb(parentBone, childBody, slider);
 						parentBone->m_name = definition.m_boneName;
 					}
-					//else if (definition.m_type == ndDefinition::m_effector)
-					//{
-					//	ndBodyDynamic* const childBody = parentBone->m_body->GetAsBodyDynamic();
-					//
-					//	const ndMatrix pivotFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
-					//	const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
-					//
-					//	ndSharedPtr<ndJointBilateralConstraint> effector(new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, modelNode->m_body->GetAsBodyKinematic()));
-					//
-					//	ndIk6DofEffector* const effectorJoint = (ndIk6DofEffector*)*effector;
-					//	ndFloat32 relaxation = 1.0e-4f;
-					//	effectorJoint->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
-					//	effectorJoint->SetLinearSpringDamper(relaxation, 10000.0f, 500.0f);
-					//	effectorJoint->SetAngularSpringDamper(relaxation, 10000.0f, 500.0f);
-					//	effectorJoint->SetMaxForce(10000.0f);
-					//	effectorJoint->SetMaxTorque(10000.0f);
-					//
-					//	// the effector is part of the rig
-					//	model->AddCloseLoop(effector, "effector");
-					//}
 					break;
 				}
 			}
@@ -742,6 +717,22 @@ namespace ndAdvancedRobot
 		return model;
 	}
 
+	void AddBackgroundScene(ndDemoEntityManager* const scene, const ndMatrix& matrix)
+	{
+		//ndMatrix location(matrix * ndYawMatrix(90.0f * ndDegreeToRad));
+		ndMatrix location(matrix);
+		location.m_posit.m_x += 1.5f;
+		location.m_posit.m_z += 1.5f;
+		AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f);
+		AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f);
+
+		location = ndYawMatrix(90.0f * ndDegreeToRad) * location;
+		location.m_posit.m_x += 1.0f;
+		location.m_posit.m_z += 0.5f;
+		AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f);
+		AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f);
+	}
+
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
 	{
 		public:
@@ -752,7 +743,7 @@ namespace ndAdvancedRobot
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_discountFactor(0.995f)
+			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
 			,m_stopTraining(100 * 1000000)
@@ -765,8 +756,8 @@ namespace ndAdvancedRobot
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
 			//hyperParameters.m_threadsCount = 1;
-			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
-			hyperParameters.m_extraTrajectorySteps = 1024 * 2;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 2;
+			hyperParameters.m_extraTrajectorySteps = 512;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
 			hyperParameters.m_numberOfObservations = ND_AGENT_INPUT_SIZE;
@@ -775,12 +766,12 @@ namespace ndAdvancedRobot
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetActor()));
 			m_master->SetName(CONTROLLER_NAME);
 
-			auto SpawnModel = [this, scene, &visualMesh, floor](const ndMatrix& matrix, bool debug)
+			auto SpawnModel = [this, scene, &visualMesh, floor](const ndMatrix& matrix)
 			{
 				ndWorld* const world = scene->GetWorld();
 				ndModelArticulation* const model = CreateModel(scene, *visualMesh, matrix);
 
-				model->SetNotifyCallback(new RobotModelNotify(m_master, model, debug));
+				model->SetNotifyCallback(new RobotModelNotify(m_master, model));
 				model->AddToWorld(world);
 				((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
 
@@ -791,8 +782,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 10;
 			ndInt32 countZ = 10;
-			countX = 3;
-			countZ = 3;
+			//countX = 1;
+			//countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -802,12 +793,16 @@ namespace ndAdvancedRobot
 					ndMatrix location(matrix);
 					location.m_posit.m_x += 10.0f * ndFloat32(j - countX/2);
 					location.m_posit.m_z += 10.0f * ndFloat32(i - countZ/2);
-					ndModelArticulation* const model = SpawnModel(location, true);
+					ndModelArticulation* const model = SpawnModel(location);
 					if ((i == 0) && (j == 0))
 					{
-						HideModel(model, false);
 						ndSharedPtr<ndUIEntity> robotUI(new ndRobotUI(scene, (RobotModelNotify*)*model->GetNotifyCallback()));
 						scene->Set2DDisplayRenderFunction(robotUI);
+
+						RobotModelNotify* const notify = (RobotModelNotify*)*model->GetNotifyCallback();
+						notify->m_showDebug = true;
+
+						AddBackgroundScene(scene, location);
 					}
 					else
 					{
@@ -823,36 +818,6 @@ namespace ndAdvancedRobot
 			if (m_outFile)
 			{
 				fclose(m_outFile);
-			}
-		}
-
-		void HideModel(ndModelArticulation* const robot, bool mode) const
-		{
-			ndModelArticulation::ndNode* stackMem[128];
-			ndInt32 stack = 1;
-			stackMem[0] = robot->GetRoot();
-			while (stack)
-			{
-				stack--;
-				ndModelArticulation::ndNode* const node = stackMem[stack];
-				ndBody* const body = *node->m_body;
-				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
-				ndDemoEntity* const ent = userData->m_entity;
-				mode ? ent->Hide() : ent->UnHide();
-
-				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
-				{
-					stackMem[stack] = child;
-					stack++;
-				}
-			}
-		}
-
-		void OnDebug(ndDemoEntityManager* const, bool mode)
-		{
-			for (ndList<ndModelArticulation*>::ndNode* node = m_models.GetFirst(); node; node = node->GetNext())
-			{
-				HideModel(node->GetInfo(), mode);
 			}
 		}
 
@@ -960,21 +925,6 @@ namespace ndAdvancedRobot
 		ndInt32 m_stopTraining;
 		bool m_modelIsTrained;
 	};
-
-	void AddBackgroundScene(ndDemoEntityManager* const scene, const ndMatrix& matrix)
-	{
-		ndMatrix location(matrix * ndYawMatrix(90.0f * ndDegreeToRad));
-		location.m_posit.m_x += 1.5f;
-		location.m_posit.m_z += 1.5f;
-		AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f);
-		AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f);
-
-		location = ndYawMatrix(90.0f * ndDegreeToRad) * location;
-		location.m_posit.m_x += 1.0f;
-		location.m_posit.m_z += 0.5f;
-		AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f);
-		AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f);
-	}
 }
 
 using namespace ndAdvancedRobot;
@@ -990,7 +940,6 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	ndMatrix matrix(ndYawMatrix(-90.0f * ndDegreeToRad));
 
 #ifdef ND_TRAIN_MODEL
-	AddBackgroundScene(scene, matrix);
 	scene->RegisterPostUpdate(new TrainingUpdata(scene, matrix, modelMesh, floor));
 #else
 	ndAssert(0);
