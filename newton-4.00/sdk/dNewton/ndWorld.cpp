@@ -623,7 +623,6 @@ void ndWorld::ModelPostUpdate()
 		for (ndInt32 i = iterator++; i < modelCount; i = iterator++)
 		{
 			ndModel* const model = modelList[i];
-			//model->PostUpdate(this, timestep);
 			if (*model->m_notifyCallback)
 			{
 				model->m_notifyCallback->PostUpdate(this, timestep);
@@ -647,7 +646,6 @@ void ndWorld::PostModelTransform()
 		for (ndInt32 i = iterator++; i < modelCount; i = iterator++)
 		{
 			ndModel* const model = modelList[i];
-			//model->PostTransformUpdate(this, timestep);
 			if (*model->m_notifyCallback)
 			{
 				model->m_notifyCallback->PostTransformUpdate(this, timestep);

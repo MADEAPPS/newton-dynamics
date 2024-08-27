@@ -30,18 +30,36 @@ namespace ndAdvancedRobot
 	class ndActionVector
 	{
 		public:
-		ndBrainFloat m_dest[3];
+		ndBrainFloat m_x;
+		ndBrainFloat m_y;
+
+		// first use a fix orientation and fix gripper, until we get the position
+		//ndBrainFloat m_pitch;
+		//ndBrainFloat m_yaw;
+		//ndBrainFloat m_roll;
+		//ndBrainFloat m_azimth;
+		//ndBrainFloat m_gripper;
 	};
 
 	class ndObservationVector
 	{
 		public:
-		ndBrainFloat m_posit[8];
-		ndBrainFloat m_veloc[8];
+		ndBrainFloat m_jointPosit[8];
+		ndBrainFloat m_jointVeloc[8];
+
+		ndBrainFloat m_effectorPosit_x;
+		ndBrainFloat m_effectorPosit_y;
 	};
 
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
+
+	#define ND_POSITION_X_STEP		ndBrainFloat (0.5f)
+	#define ND_POSITION_Y_STEP		ndBrainFloat (0.5f)
+
+	#define ND_MAX_X_SPAND			ndBrainFloat (4.0f)
+	#define ND_MIN_Y_SPAND			ndBrainFloat (-2.5f)
+	#define ND_MAX_Y_SPAND			ndBrainFloat (2.0f)
 
 	class ndDefinition
 	{
@@ -75,287 +93,6 @@ namespace ndAdvancedRobot
 		{ "gripperRight", ndDefinition::m_slider , 1.0f, -0.2f, 0.03f},
 		//{ "effector", ndDefinition::m_effector , 0.0f, 0.0f, 0.0f},
 	};
-
-#if 0
-	class ndIndustrialRobot : public ndModel
-	{
-		public:
-		D_CLASS_REFLECTION(ndAdvancedRobot::ndIndustrialRobot, ndBodyDynamic)
-
-		ndIndustrialRobot(ndDemoEntityManager* const scene, ndDemoEntity* const robotMesh, const ndMatrix& location)
-			:ndModel()
-			,m_rootBody(nullptr)
-			,m_leftGripper(nullptr)
-			,m_rightGripper(nullptr)
-			,m_effector()
-			,m_invDynamicsSolver()
-			,m_effectorOffset(ndVector::m_wOne)
-			,m_x(0.0f)
-			,m_y(0.0f)
-			,m_azimuth(0.0f)
-			,m_gripperPosit(0.0f)
-			,m_pitch(0.0f)
-			,m_yaw(0.0f)
-			,m_roll(0.0f)
-		{
-			// make a clone of the mesh and add it to the scene
-			ndDemoEntity* const rootEntity = robotMesh->CreateClone();
-			scene->AddEntity(rootEntity);
-			ndWorld* const world = scene->GetWorld();
-			
-			// find the floor location 
-			ndMatrix matrix(location);
-			ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-			matrix.m_posit.m_y = floor.m_y;
-			
-			//matrix.m_posit.m_y += 1.0f;
-			rootEntity->ResetMatrix(matrix);
-			
-			// add the root body
-			m_rootBody = CreateBodyPart(scene, rootEntity, jointsDefinition[0].m_mass, nullptr);
-			m_bodyArray.PushBack(m_rootBody);
-			
-			ndFixSizeArray<ndDemoEntity*, 32> childEntities;
-			ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
-			
-			ndInt32 stack = 0;
-			for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
-			{
-				childEntities[stack] = child;
-				parentBone[stack] = m_rootBody;
-				stack++;
-			}
-			
-			const ndInt32 definitionCount = ndInt32(sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
-			while (stack)
-			{
-				stack--;
-				ndBodyDynamic* parentBody = parentBone[stack];
-				ndDemoEntity* const childEntity = childEntities[stack];
-			
-				const char* const name = childEntity->GetName().GetStr();
-				for (ndInt32 i = 0; i < definitionCount; ++i)
-				{
-					const ndDefinition& definition = jointsDefinition[i];
-					if (!strcmp(definition.m_boneName, name))
-					{
-						//dTrace(("name: %s\n", name));
-						if (definition.m_type == ndDefinition::m_hinge)
-						{
-							ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-							m_bodyArray.PushBack(childBody);
-							const ndMatrix pivotMatrix(childBody->GetMatrix());
-			
-							// here we use a ik joints instead of a regular one.
-							ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
-							hinge->SetLimits(definition.m_minLimit, definition.m_maxLimit);
-							if ((definition.m_minLimit > -1000.0f) && (definition.m_maxLimit < 1000.0f))
-							{
-								hinge->SetLimitState(true);
-							}
-
-							if (definition.m_maxStrength != 0.0f)
-							{
-								hinge->SetMaxTorque(definition.m_maxStrength);
-							}
-							m_jointArray.PushBack(hinge);
-
-							ndSharedPtr<ndJointBilateralConstraint> hingePtr(hinge);
-							world->AddJoint(hingePtr);
-							parentBody = childBody;
-						}
-						else if (definition.m_type == ndDefinition::m_slider)
-						{
-							ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-							m_bodyArray.PushBack(childBody);
-			
-							const ndMatrix pivotMatrix(childBody->GetMatrix());
-							ndJointSlider* const slider = new ndJointSlider(pivotMatrix, childBody, parentBody);
-							slider->SetLimits(definition.m_minLimit, definition.m_maxLimit);
-							slider->SetLimitState(true);
-							slider->SetAsSpringDamper(0.01f, 2000.0f, 100.0f);
-			
-							if (!strstr(definition.m_boneName, "Left"))
-							{
-								m_leftGripper = slider;
-							}
-							else
-							{
-								m_rightGripper = slider;
-							}
-
-							ndSharedPtr<ndJointBilateralConstraint> sliderPtr(slider);
-							world->AddJoint(sliderPtr);
-							parentBody = childBody;
-						}
-						else
-						{
-							ndBodyDynamic* const childBody = parentBody;
-			
-							const ndMatrix pivotFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
-							const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
-							m_effector = ndSharedPtr<ndIk6DofEffector>(new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, m_rootBody));
-			
-							m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
-			
-							ndFloat32 relaxation = 0.003f;
-							m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
-							m_effector->SetLinearSpringDamper(relaxation, 1500.0f, 200.0f);
-							m_effector->SetAngularSpringDamper(relaxation, 1500.0f, 100.0f);
-							m_effector->SetMaxForce(10000.0f);
-							m_effector->SetMaxTorque(10000.0f);
-			
-							// the effector is not added to the world, 
-							// because is use by the IK solver to calculate joint motors.
-						}
-						break;
-					}
-				}
-			
-				for (ndDemoEntity* child = childEntity->GetFirstChild(); child; child = child->GetNext())
-				{
-					childEntities[stack] = child;
-					parentBone[stack] = parentBody;
-					stack++;
-				}
-			}
-		}
-
-		~ndIndustrialRobot()
-		{
-		}
-
-		ndBodyDynamic* GetRoot() const
-		{
-			return m_rootBody;
-		}
-
-		void Debug(ndConstraintDebugCallback& context) const
-		{
-			if (*m_effector)
-			{
-				//((ndJointBilateralConstraint*)m_effector)->DebugJoint(context);
-				ndJointBilateralConstraint* const effectJoint = (ndJointBilateralConstraint*)*m_effector;
-				effectJoint->DebugJoint(context);
-			}
-		}
-
-		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
-		{
-			ndModel::PostUpdate(world, timestep);
-		}
-
-		void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
-		{
-			ndModel::PostTransformUpdate(world, timestep);
-		}
-
-		void PlaceEffector()
-		{
-			// apply target position collected by control panel
-			ndMatrix targetMatrix(
-				ndRollMatrix(90.0f * ndDegreeToRad) *
-				ndPitchMatrix(m_pitch * ndDegreeToRad) *
-				ndYawMatrix(m_yaw * ndDegreeToRad) *
-				ndRollMatrix(m_roll * ndDegreeToRad) *
-				ndRollMatrix(-90.0f * ndDegreeToRad));
-
-			ndVector localPosit(m_x, m_y, 0.0f, 0.0f);
-			const ndMatrix aximuthMatrix(ndYawMatrix(m_azimuth * ndDegreeToRad));
-			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
-			m_effector->SetOffsetMatrix(targetMatrix);
-
-			m_leftGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
-			m_rightGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
-		}
-
-		void Update(ndWorld* const world, ndFloat32 timestep)
-		{
-			ndModel::Update(world, timestep);
-
-			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
-			ndAssert(skeleton);
-
-			//m_invDynamicsSolver.SetMaxIterations(4);
-			if (*m_effector && !m_invDynamicsSolver.IsSleeping(skeleton))
-			{
-				PlaceEffector();
-				ndJointBilateralConstraint* const joint = *m_effector;
-				m_invDynamicsSolver.SolverBegin(skeleton, &joint, 1, world, timestep);
-				m_invDynamicsSolver.Solve();
-				m_invDynamicsSolver.SolverEnd();
-			}
-		}
-
-		ndBodyDynamic* m_rootBody;
-		ndJointSlider* m_leftGripper;
-		ndJointSlider* m_rightGripper;
-		ndSharedPtr<ndIk6DofEffector> m_effector;
-		ndIkSolver m_invDynamicsSolver;
-		ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
-		ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
-
-		ndVector m_effectorOffset;
-		ndReal m_x;
-		ndReal m_y;
-		ndReal m_azimuth;
-		ndReal m_gripperPosit;
-		ndReal m_pitch;
-		ndReal m_yaw;
-		ndReal m_roll;
-	};
-
-	class ndRobotUI : public ndUIEntity
-	{
-		public:
-		ndRobotUI(ndDemoEntityManager* const scene, ndIndustrialRobot* const robot)
-			:ndUIEntity(scene)
-			, m_robot(robot)
-		{
-		}
-
-		~ndRobotUI()
-		{
-		}
-
-		virtual void RenderUI()
-		{
-		}
-
-		virtual void RenderHelp()
-		{
-			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			m_scene->Print(color, "Control panel");
-
-			bool change = false;
-			//ImGui::Text("ik solver passes");
-
-			ImGui::Text("position x");
-			change = change | ImGui::SliderFloat("##x", &m_robot->m_x, 0.0f, 5.0f);
-			ImGui::Text("position y");
-			change = change | ImGui::SliderFloat("##y", &m_robot->m_y, -2.5f, 2.0f);
-			ImGui::Text("azimuth");
-			change = change | ImGui::SliderFloat("##azimuth", &m_robot->m_azimuth, -180.0f, 180.0f);
-
-			ImGui::Text("gripper");
-			change = change | ImGui::SliderFloat("##gripper", &m_robot->m_gripperPosit, -0.2f, 0.4f);
-
-			ImGui::Text("pitch");
-			change = change | ImGui::SliderFloat("##pitch", &m_robot->m_pitch, -180.0f, 180.0f);
-			ImGui::Text("yaw");
-			change = change | ImGui::SliderFloat("##yaw", &m_robot->m_yaw, -180.0f, 180.0f);
-			ImGui::Text("roll");
-			change = change | ImGui::SliderFloat("##roll", &m_robot->m_roll, -180.0f, 180.0f);
-
-			if (change)
-			{
-				m_robot->m_rootBody->SetSleepState(false);
-			}
-		}
-
-		ndIndustrialRobot* m_robot;
-	};
-#endif
 
 	class RobotModelNotify : public ndModelNotify
 	{
@@ -457,7 +194,7 @@ namespace ndAdvancedRobot
 
 			ndControllerTrainer(const ndControllerTrainer& src)
 				:ndBrainAgentContinuePolicyGradient_Trainer(src.m_master)
-				, m_robot(nullptr)
+				,m_robot(nullptr)
 			{
 			}
 
@@ -519,27 +256,18 @@ namespace ndAdvancedRobot
 			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 			,m_world(nullptr)
-			,m_x(0.0f)
-			,m_y(0.0f)
-			,m_azimuth(0.0f)
-			,m_yaw(0.0f)
-			,m_pitch(0.0f)
-			,m_roll(0.0f)
-			,m_gripperPosit(0.0f)
+			,m_location()
+			,m_targetLocation()
 			,m_timestep(ndFloat32(0.0f))
 			,m_showDebug(showDebug)
 		{
 			m_controllerTrainer = new ndControllerTrainer(master);
 			m_controllerTrainer->m_robot = this;
 			Init(robot);
-
-			for (ndModelArticulation::ndNode* node = robot->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			{
-				m_controllerTrainer->m_basePose.PushBack(node->m_body->GetAsBodyDynamic());
-			}
 		}
 
-		RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const robot, bool showDebug)
+		//RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const robot, bool showDebug)
+		RobotModelNotify(const ndSharedPtr<ndBrain>&, ndModelArticulation* const robot, bool showDebug)
 			:ndModelNotify()
 			,m_invDynamicsSolver()
 			,m_effector()
@@ -549,13 +277,8 @@ namespace ndAdvancedRobot
 			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 			,m_world(nullptr)
-			,m_x(0.0f)
-			,m_y(0.0f)
-			,m_azimuth(0.0f)
-			,m_yaw(0.0f)
-			,m_pitch(0.0f)
-			,m_roll(0.0f)
-			,m_gripperPosit(0.0f)
+			,m_location()
+			,m_targetLocation()
 			,m_timestep(ndFloat32(0.0f))
 			,m_showDebug(showDebug)
 		{
@@ -633,62 +356,135 @@ namespace ndAdvancedRobot
 			};
 
 			ndModelArticulation::ndNode* const leftGripperNode = robot->FindByName("gripperLeft");
-			//m_jointx.PushBack(*leftGripperNode->m_joint);
+			m_jointx.PushBack(*leftGripperNode->m_joint);
 
 			ndModelArticulation::ndNode* const rightGripperNode = robot->FindByName("gripperRight");
-			//m_jointx.PushBack(*rightGripperNode->m_joint);
+			m_jointx.PushBack(*rightGripperNode->m_joint);
+
+			for (ndModelArticulation::ndNode* poseNode = robot->GetRoot()->GetFirstIterator(); poseNode; poseNode = poseNode->GetNextIterator())
+			{
+				m_controllerTrainer->m_basePose.PushBack(poseNode->m_body->GetAsBodyDynamic());
+			}
 		}
 
 		bool IsTerminal() const
 		{
+			if (m_location.m_x < 0.0f)
+			{
+				return true;
+			}
+			if (m_location.m_x > ND_MAX_X_SPAND)
+			{
+				return true;
+			}
+
+			if (m_location.m_y < ND_MIN_Y_SPAND)
+			{
+				return true;
+			}
+
+			if (m_location.m_y > ND_MAX_Y_SPAND)
+			{
+				return true;
+			}
+
 			return false;
 		}
 
 		ndReal GetReward() const
 		{
+			if (IsTerminal())
+			{
+				return 0.0f;
+			}
+
+			ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
+			if (!effector->IsHolonomic(m_timestep))
+			{
+				return 0.0f;
+			}
+
 			return 0.0f;
 		}
 
-		void GetObservation(ndBrainFloat* const observationInput)
+		void GetObservation(ndBrainFloat* const inputObservations)
 		{
-			ndMemSet(observationInput, 0.0f, ND_AGENT_INPUT_SIZE);
-
-			ndObservationVector& observation = *((ndObservationVector*)observationInput);
+			//ndMemSet(inputObservations, 1.0f, ND_AGENT_INPUT_SIZE);
+			ndObservationVector* const observation = (ndObservationVector*)inputObservations;
 			for (ndInt32 i = m_jointx.GetCount() - 1; i >= 0; --i)
 			{ 
 				const ndJointBilateralConstraint* const joint = m_jointx[i];
 			
-				ndJointBilateralConstraint::ndKinematicState kinematicState[16];
-				ndInt32 paramCount = joint->GetKinematicState(&kinematicState[0]);
-				ndAssert(paramCount == 1);
-				observation.m_posit[i] = ndBrainFloat(kinematicState[0].m_posit);
-				observation.m_veloc[i] = ndBrainFloat(kinematicState[0].m_velocity);
+				ndJointBilateralConstraint::ndKinematicState kinematicState;
+				joint->GetKinematicState(&kinematicState);
+				observation->m_jointPosit[i] = ndBrainFloat(kinematicState.m_posit);
+				observation->m_jointVeloc[i] = ndBrainFloat(kinematicState.m_velocity);
 			}
+
+			observation->m_effectorPosit_x = ndBrainFloat(m_location.m_x);
+			observation->m_effectorPosit_y = ndBrainFloat(m_location.m_y);
 		}
 
-		void ApplyActions(ndBrainFloat* const actions)
+		void ApplyActions(ndBrainFloat* const outputActions)
 		{
-			// apply target position collected by control panel
-			ndMatrix targetMatrix(
-				ndRollMatrix(90.0f * ndDegreeToRad) *
-				ndPitchMatrix(m_pitch * ndDegreeToRad) *
-				ndYawMatrix(m_yaw * ndDegreeToRad) *
-				ndRollMatrix(m_roll * ndDegreeToRad) *
-				ndRollMatrix(-90.0f * ndDegreeToRad));
+			ndJointBilateralConstraint* loops = *m_effector;
+			ndIk6DofEffector* const effector = (ndIk6DofEffector*)loops;
+			ndActionVector* const actions = (ndActionVector*)outputActions;
 
-			ndVector localPosit(m_x, m_y, 0.0f, 0.0f);
-			const ndMatrix aximuthMatrix(ndYawMatrix(m_azimuth * ndDegreeToRad));
+			m_leftGripper->SetOffsetPosit(-m_targetLocation.m_gripperPosit * 0.5f);
+			m_rightGripper->SetOffsetPosit(-m_targetLocation.m_gripperPosit * 0.5f);
+
+			const ndMatrix alignMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
+			const ndMatrix rotation(ndPitchMatrix(m_targetLocation.m_pitch * ndDegreeToRad) * ndYawMatrix(m_targetLocation.m_yaw * ndDegreeToRad) * ndRollMatrix(m_targetLocation.m_roll * ndDegreeToRad));
+			ndMatrix targetMatrix(alignMatrix * rotation * alignMatrix.OrthoInverse());
+
+			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth * ndDegreeToRad));
+			ndFloat32 x = m_location.m_x;
+			ndFloat32 y = m_location.m_y;
+			x += actions->m_x * ND_POSITION_X_STEP;
+			y += actions->m_y * ND_POSITION_Y_STEP;
+			ndVector localPosit(x, y, 0.0f, 0.0f);
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
 
-			ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
 			effector->SetOffsetMatrix(targetMatrix);
-			m_leftGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
-			m_rightGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
+			
+			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
+			ndAssert(skeleton);
+
+			m_invDynamicsSolver.SolverBegin(skeleton, &loops, 1, m_world, m_timestep);
+			m_invDynamicsSolver.Solve();
+			m_invDynamicsSolver.SolverEnd();
+		}
+
+		void GetCurrentLocation()
+		{
+			ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
+			ndMatrix matrix(effector->GetEffectorMatrix());
+
+			const ndVector posit(matrix.m_posit - m_effectorOffset);
+			ndFloat32 athimuthAngle = ndAtan2(-posit.m_z, posit.m_x);
+			const ndMatrix aximuthMatrix(ndYawMatrix(athimuthAngle));
+			const ndVector currenPosit(aximuthMatrix.UnrotateVector(posit));
+			//ndTrace(("(%f %f) (%f %f)\n", m_targetLocation.m_x, m_targetLocation.m_y, currenPosit.m_x, currenPosit.m_y));
+			m_location.m_x = currenPosit.m_x;
+			m_location.m_y = currenPosit.m_y;
 		}
 
 		void ResetModel()
 		{
-			ndTrace(("Reset Model\n"));
+			for (ndInt32 i = 0; i < m_controllerTrainer->m_basePose.GetCount(); i++)
+			{
+				m_controllerTrainer->m_basePose[i].SetPose();
+			}
+
+			ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
+			ndMatrix matrix(ndGetIdentityMatrix());
+			matrix.m_posit = m_effectorOffset;
+			effector->SetOffsetMatrix(matrix);
+			GetCurrentLocation();
+
+			m_targetLocation.m_x = ndRand() * ND_MAX_X_SPAND;
+			m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -708,6 +504,7 @@ namespace ndAdvancedRobot
 
 		void PostUpdate(ndWorld* const, ndFloat32)
 		{
+			GetCurrentLocation();
 		}
 
 		void PostTransformUpdate(ndWorld* const, ndFloat32)
@@ -716,108 +513,22 @@ namespace ndAdvancedRobot
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			//ndTrace(("xxxxx\n"));
 			//if (!m_showDebug)
 			//{
 			//	return;
 			//}
-			//
-			//ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
-			//
-			//ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
-			//
-			//ndFloat32 totalMass = ndFloat32(0.0f);
-			//ndVector centerOfMass(ndVector::m_zero);
-			//for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			//{
-			//	const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-			//	const ndMatrix matrix(body->GetMatrix());
-			//	ndFloat32 mass = body->GetMassMatrix().m_w;
-			//	totalMass += mass;
-			//	centerOfMass += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
-			//	bodies.PushBack(body);
-			//}
-			//ndFloat32 invMass = 1.0f / totalMass;
-			//centerOfMass = centerOfMass.Scale(invMass);
-			//
-			//ndVector comLineOfAction(centerOfMass);
-			//comLineOfAction.m_y -= ndFloat32(0.5f);
-			//context.DrawLine(centerOfMass, comLineOfAction, ndVector::m_zero);
-			//
-			//ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
-			//const ndVector upVector(rootBody->GetMatrix().m_up);
-			//ndFixSizeArray<ndBigVector, 16> supportPoint;
-			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
-			//{
-			//	const ndAnimKeyframe& keyFrame = m_animPose[i];
-			//	ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-			//	ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-			//	if (i == 0)
-			//	{
-			//		effector->DebugJoint(context);
-			//	}
-			//
-			//	if (keyFrame.m_userParamFloat < 1.0f)
-			//	{
-			//		ndBodyKinematic* const body = effector->GetBody0();
-			//		supportPoint.PushBack(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit));
-			//	}
-			//}
-			//
-			//ndVector supportColor(0.0f, 1.0f, 1.0f, 1.0f);
-			//if (supportPoint.GetCount() >= 3)
-			//{
-			//	ScaleSupportShape(supportPoint);
-			//	ndFixSizeArray<ndVector, 16> desiredSupportPoint;
-			//	for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
-			//	{
-			//		desiredSupportPoint.PushBack(supportPoint[i]);
-			//	}
-			//
-			//	ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
-			//	rotation.TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
-			//	ndInt32 supportCount = ndConvexHull2d(&desiredSupportPoint[0], desiredSupportPoint.GetCount());
-			//	rotation.OrthoInverse().TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
-			//	ndVector p0(desiredSupportPoint[supportCount - 1]);
-			//	ndBigVector bigPolygon[16];
-			//	for (ndInt32 i = 0; i < supportCount; ++i)
-			//	{
-			//		bigPolygon[i] = desiredSupportPoint[i];
-			//		context.DrawLine(desiredSupportPoint[i], p0, supportColor);
-			//		p0 = desiredSupportPoint[i];
-			//	}
-			//
-			//	ndBigVector p0Out;
-			//	ndBigVector p1Out;
-			//	ndBigVector ray_p0(centerOfMass);
-			//	ndBigVector ray_p1(comLineOfAction);
-			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-			//
-			//	const ndVector centerOfPresure(p0Out);
-			//	context.DrawPoint(centerOfPresure, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 5);
-			//
-			//	ndVector zmp(CalculateZeroMomentPoint());
-			//	ray_p0 = zmp;
-			//	ray_p1 = zmp;
-			//	ray_p1.m_y -= ndFloat32(0.5f);
-			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-			//	const ndVector zmpSupport(p0Out);
-			//	context.DrawPoint(zmpSupport, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
-			//}
-			//else if (supportPoint.GetCount() == 2)
-			//{
-			//	ndTrace(("xxxxxxxxxx\n"));
-			//	context.DrawLine(supportPoint[0], supportPoint[1], supportColor);
-			//	//ndBigVector p0Out;
-			//	//ndBigVector p1Out;
-			//	//ndBigVector ray_p0(comMatrix.m_posit);
-			//	//ndBigVector ray_p1(comMatrix.m_posit);
-			//	//ray_p1.m_y -= 1.0f;
-			//	//
-			//	//ndRayToRayDistance(ray_p0, ray_p1, contactPoints[0], contactPoints[1], p0Out, p1Out);
-			//	//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
-			//	//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
-			//}
+
+			const ndMatrix alignMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
+			const ndMatrix rotation(ndPitchMatrix(m_targetLocation.m_pitch * ndDegreeToRad) * ndYawMatrix(m_targetLocation.m_yaw * ndDegreeToRad) * ndRollMatrix(m_targetLocation.m_roll * ndDegreeToRad));
+			ndMatrix targetMatrix(alignMatrix * rotation * alignMatrix.OrthoInverse());
+			
+			ndVector localPosit(m_targetLocation.m_x, m_targetLocation.m_y, 0.0f, 0.0f);
+			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth * ndDegreeToRad));
+			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
+			ndMatrix matrix(targetMatrix * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
+
+			const ndVector color(1.0f, 0.0f, 0.0f, 1.0f);
+			context.DrawPoint(matrix.m_posit, color, ndFloat32(4.0f));
 		}
 
 		ndIkSolver m_invDynamicsSolver;
@@ -832,13 +543,31 @@ namespace ndAdvancedRobot
 		ndWorld* m_world;
 		ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointx;
 
-		ndReal m_x;
-		ndReal m_y;
-		ndReal m_azimuth;
-		ndReal m_yaw;
-		ndReal m_pitch;
-		ndReal m_roll;
-		ndReal m_gripperPosit;
+		class EffectorLocation
+		{
+			public:
+			EffectorLocation()
+				:m_x(0.0f)
+				,m_y(0.0f)
+				,m_yaw(0.0f)
+				,m_roll(0.0f)
+				,m_pitch(0.0f)
+				,m_azimuth(0.0f)
+				,m_gripperPosit(0.0f)
+			{
+			}
+
+			ndReal m_x;
+			ndReal m_y;
+			ndReal m_yaw;
+			ndReal m_roll;
+			ndReal m_pitch;
+			ndReal m_azimuth;
+			ndReal m_gripperPosit;
+		};
+
+		EffectorLocation m_location;
+		EffectorLocation m_targetLocation;
 		ndFloat32 m_timestep;
 		bool m_showDebug;
 
@@ -868,13 +597,13 @@ namespace ndAdvancedRobot
 			m_scene->Print(color, "Control panel");
 
 			ndInt8 change = 0;
-			change = change | ndInt8(ImGui::SliderFloat("x", &m_robot->m_x, 0.0f, 5.0f));
-			change = change | ndInt8 (ImGui::SliderFloat("y", &m_robot->m_y, -2.5f, 2.0f));
-			change = change | ndInt8 (ImGui::SliderFloat("azimuth", &m_robot->m_azimuth, -180.0f, 180.0f));
-			change = change | ndInt8 (ImGui::SliderFloat("gripper", &m_robot->m_gripperPosit, -0.2f, 0.4f));
-			change = change | ndInt8 (ImGui::SliderFloat("pitch", &m_robot->m_pitch, -180.0f, 180.0f));
-			change = change | ndInt8 (ImGui::SliderFloat("yaw", &m_robot->m_yaw, -180.0f, 180.0f));
-			change = change | ndInt8 (ImGui::SliderFloat("roll", &m_robot->m_roll, -180.0f, 180.0f));
+			change = change | ndInt8(ImGui::SliderFloat("x", &m_robot->m_targetLocation.m_x, 0.0f, ND_MAX_X_SPAND));
+			change = change | ndInt8 (ImGui::SliderFloat("y", &m_robot->m_targetLocation.m_y, ND_MIN_Y_SPAND, ND_MAX_Y_SPAND));
+			change = change | ndInt8 (ImGui::SliderFloat("azimuth", &m_robot->m_targetLocation.m_azimuth, -180.0f, 180.0f));
+			change = change | ndInt8 (ImGui::SliderFloat("gripper", &m_robot->m_targetLocation.m_gripperPosit, -0.2f, 0.4f));
+			change = change | ndInt8 (ImGui::SliderFloat("pitch", &m_robot->m_targetLocation.m_pitch, -180.0f, 180.0f));
+			change = change | ndInt8 (ImGui::SliderFloat("yaw", &m_robot->m_targetLocation.m_yaw, -180.0f, 180.0f));
+			change = change | ndInt8 (ImGui::SliderFloat("roll", &m_robot->m_targetLocation.m_roll, -180.0f, 180.0f));
 
 			if (change)
 			{
@@ -949,7 +678,7 @@ namespace ndAdvancedRobot
 				const ndDefinition& definition = jointsDefinition[i];
 				if (!strcmp(definition.m_boneName, name))
 				{
-					ndTrace(("name: %s\n", name));
+					//ndTrace(("name: %s\n", name));
 					if (definition.m_type == ndDefinition::m_hinge)
 					{
 						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body->GetAsBodyDynamic()));
@@ -971,9 +700,7 @@ namespace ndAdvancedRobot
 						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body->GetAsBodyDynamic()));
 
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
-						ndTrace(("inIkeSlider\n"));
 						ndSharedPtr<ndJointBilateralConstraint> slider(new ndJointSlider(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body->GetAsBodyKinematic()));
-						//ndSharedPtr<ndJointBilateralConstraint> slider(new ndIkJointSlider(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body->GetAsBodyKinematic()));
 
 						ndJointSlider* const sliderJoint = (ndJointSlider*)*slider;
 						sliderJoint->SetLimits(definition.m_minLimit, definition.m_maxLimit);
@@ -1064,8 +791,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 10;
 			ndInt32 countZ = 10;
-			countX = 2;
-			countZ = 2;
+			countX = 3;
+			countZ = 3;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -1073,11 +800,12 @@ namespace ndAdvancedRobot
 				for (ndInt32 j = 0; j < countX; ++j)
 				{
 					ndMatrix location(matrix);
-					location.m_posit.m_x += 10.0f + 10.0f * ndFloat32(j - countX/2);
-					location.m_posit.m_z += 10.0f + 10.0f * ndFloat32(i - countZ/2);
-					ndModelArticulation* const model = SpawnModel(location, false);
+					location.m_posit.m_x += 10.0f * ndFloat32(j - countX/2);
+					location.m_posit.m_z += 10.0f * ndFloat32(i - countZ/2);
+					ndModelArticulation* const model = SpawnModel(location, true);
 					if ((i == 0) && (j == 0))
 					{
+						HideModel(model, false);
 						ndSharedPtr<ndUIEntity> robotUI(new ndRobotUI(scene, (RobotModelNotify*)*model->GetNotifyCallback()));
 						scene->Set2DDisplayRenderFunction(robotUI);
 					}
@@ -1085,7 +813,6 @@ namespace ndAdvancedRobot
 					{
 						m_models.Append(model);
 					}
-
 				}
 			}
 			//scene->SetAcceleratedUpdate();

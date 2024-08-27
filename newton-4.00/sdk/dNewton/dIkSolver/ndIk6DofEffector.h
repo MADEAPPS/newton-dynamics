@@ -42,6 +42,7 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	D_NEWTON_API ndRotationType GetRotationAxis() const;
 
 	D_NEWTON_API ndMatrix GetOffsetMatrix() const;
+	D_NEWTON_API ndMatrix GetEffectorMatrix() const;
 	D_NEWTON_API void SetOffsetMatrix(const ndMatrix& matrix);
 	
 	D_NEWTON_API void SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst);

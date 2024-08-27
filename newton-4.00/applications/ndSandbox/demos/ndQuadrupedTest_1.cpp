@@ -537,11 +537,6 @@ namespace ndQuadruped_1
 			m_controllerTrainer = new ndControllerTrainer(master);
 			m_controllerTrainer->m_robot = this;
 			Init(robot);
-
-			for (ndModelArticulation::ndNode* node = robot->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			{
-				m_controllerTrainer->m_basePose.PushBack(node->m_body->GetAsBodyDynamic());
-			}
 		}
 
 		RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const robot, bool showDebug)
@@ -658,6 +653,11 @@ namespace ndQuadruped_1
 					poseGenerator->m_offset[i].m_y = offset_y[i];
 					poseGenerator->m_offset[i].m_z = offset_z[i];
 				}
+			}
+
+			for (ndModelArticulation::ndNode* node = robot->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				m_controllerTrainer->m_basePose.PushBack(node->m_body->GetAsBodyDynamic());
 			}
 		}
 
@@ -864,10 +864,10 @@ namespace ndQuadruped_1
 			return nullptr;
 		};
 
-		void GetObservation(ndBrainFloat* const observationInput)
+		void GetObservation(ndBrainFloat* const inputObservations)
 		{
-			ndMemSet(observationInput, 0.0f, ND_AGENT_INPUT_SIZE);
-			ndObservationVector& observation = *((ndObservationVector*)observationInput);
+			ndMemSet(inputObservations, 0.0f, ND_AGENT_INPUT_SIZE);
+			ndObservationVector& observation = *((ndObservationVector*)inputObservations);
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];
@@ -913,12 +913,12 @@ namespace ndQuadruped_1
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
 			ndAssert(skeleton);
-			ndFixSizeArray<ndJointBilateralConstraint*, 32> effectors;
 			
 			ndVector veloc;
 			m_animBlendTree->Evaluate(m_animPose, veloc);
 			
 			const ndVector upVector(rootBody->GetMatrix().m_up);
+			ndFixSizeArray<ndJointBilateralConstraint*, 32> effectors;
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				ndEffectorInfo* const info = &m_effectorsInfo[i];

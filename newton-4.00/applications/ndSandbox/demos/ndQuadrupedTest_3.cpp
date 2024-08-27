@@ -830,9 +830,9 @@ namespace ndQuadruped_3
 			UpdatePose(m_timestep);
 		}
 
-		void GetObservation(ndBrainFloat* const observationInput)
+		void GetObservation(ndBrainFloat* const inputObservations)
 		{
-			ndObservationVector& observation = *((ndObservationVector*)observationInput);
+			ndObservationVector& observation = *((ndObservationVector*)inputObservations);
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];

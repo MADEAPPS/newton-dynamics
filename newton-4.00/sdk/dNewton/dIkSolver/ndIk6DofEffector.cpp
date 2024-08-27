@@ -106,6 +106,15 @@ void ndIk6DofEffector::SetOffsetMatrix(const ndMatrix& matrix)
 	m_targetFrame = matrix;
 }
 
+ndMatrix ndIk6DofEffector::GetEffectorMatrix() const
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	const ndMatrix matrix(matrix0 * matrix1.OrthoInverse());
+	return matrix;
+}
+
 ndFloat32 ndIk6DofEffector::GetMaxForce() const
 {
 	return m_linearMaxForce;
@@ -296,7 +305,6 @@ void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix&
 
 bool ndIk6DofEffector::IsHolonomic(ndFloat32 timestep) const
 {
-	ndAssert(0);
 	ndAssert(m_body0->GetSkeleton());
 	const ndSkeletonContainer* const skeleton = m_body0->GetSkeleton();
 	ndAssert(skeleton);
@@ -304,9 +312,11 @@ bool ndIk6DofEffector::IsHolonomic(ndFloat32 timestep) const
 	ndAssert(effectorNode);
 
 	bool isHolonomic = true;
+int xxxx = 0;
 	for (const ndSkeletonContainer::ndNode* node = effectorNode; isHolonomic && node && (node->m_body != m_body1); node = node->m_parent)
 	{
 		isHolonomic = isHolonomic && node->m_joint->IsHolonomic(timestep);
+xxxx++;
 	}
 	return isHolonomic;
 }

@@ -938,10 +938,10 @@ namespace ndQuadruped_2
 			return input;
 		};
 
-		void GetObservation(ndBrainFloat* const observationInput)
+		void GetObservation(ndBrainFloat* const inputObservations)
 		{
-			ndMemSet(observationInput, 0.0f, ND_AGENT_INPUT_SIZE);
-			ndObservationVector& observation = *((ndObservationVector*)observationInput);
+			ndMemSet(inputObservations, 0.0f, ND_AGENT_INPUT_SIZE);
+			ndObservationVector& observation = *((ndObservationVector*)inputObservations);
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				const ndAnimKeyframe& keyFrame = m_animPose[i];

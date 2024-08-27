@@ -225,6 +225,13 @@ ndFloat32 ndJointHinge::PenetrationOmega(ndFloat32 penetration) const
 	return omega;
 }
 
+ndInt32 ndJointHinge::GetKinematicState(ndKinematicState* const state) const
+{
+	state->m_posit = m_angle;
+	state->m_velocity = m_omega;
+	return 1;
+}
+
 void ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	if (m_limitState)
@@ -271,11 +278,4 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 		SubmitSpringDamper(desc, matrix0, matrix1);
 	}
 	SubmitLimits(desc, matrix0, matrix1);
-}
-
-ndInt32 ndJointHinge::GetKinematicState(ndKinematicState* const state) const
-{
-	state->m_posit = m_angle;
-	state->m_velocity = m_omega;
-	return 1;
 }
