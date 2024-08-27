@@ -537,11 +537,6 @@ namespace ndQuadruped_1
 			m_controllerTrainer = new ndControllerTrainer(master);
 			m_controllerTrainer->m_robot = this;
 			Init(robot);
-
-			for (ndModelArticulation::ndNode* node = robot->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			{
-				m_controllerTrainer->m_basePose.PushBack(node->m_body->GetAsBodyDynamic());
-			}
 		}
 
 		RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const robot, bool showDebug)
@@ -658,6 +653,11 @@ namespace ndQuadruped_1
 					poseGenerator->m_offset[i].m_y = offset_y[i];
 					poseGenerator->m_offset[i].m_z = offset_z[i];
 				}
+			}
+
+			for (ndModelArticulation::ndNode* node = robot->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				m_controllerTrainer->m_basePose.PushBack(node->m_body->GetAsBodyDynamic());
 			}
 		}
 
