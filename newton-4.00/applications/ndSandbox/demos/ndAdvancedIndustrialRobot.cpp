@@ -438,11 +438,6 @@ namespace ndAdvancedRobot
 			const ndMatrix rotation(ndPitchMatrix(m_targetLocation.m_pitch * ndDegreeToRad) * ndYawMatrix(m_targetLocation.m_yaw * ndDegreeToRad) * ndRollMatrix(m_targetLocation.m_roll * ndDegreeToRad));
 			ndMatrix targetMatrix(alignMatrix * rotation * alignMatrix.OrthoInverse());
 
-			#if 0
-			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth * ndDegreeToRad));
-			ndVector localPosit(m_targetLocation.m_x, m_targetLocation.m_y, 0.0f, 0.0f);
-			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
-			#else
 			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth * ndDegreeToRad));
 			ndFloat32 x = m_location.m_x;
 			ndFloat32 y = m_location.m_y;
@@ -450,7 +445,6 @@ namespace ndAdvancedRobot
 			y += actions->m_y * ND_POSITION_Y_STEP;
 			ndVector localPosit(x, y, 0.0f, 0.0f);
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
-			#endif
 
 			effector->SetOffsetMatrix(targetMatrix);
 			
@@ -488,6 +482,9 @@ namespace ndAdvancedRobot
 			matrix.m_posit = m_effectorOffset;
 			effector->SetOffsetMatrix(matrix);
 			GetCurrentLocation();
+
+			m_targetLocation.m_x = ndRand() * ND_MAX_X_SPAND;
+			m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -514,111 +511,24 @@ namespace ndAdvancedRobot
 		{
 		}
 
-		//void Debug(ndConstraintDebugCallback& context) const
-		void Debug(ndConstraintDebugCallback&) const
+		void Debug(ndConstraintDebugCallback& context) const
 		{
-			//ndTrace(("xxxxx\n"));
 			//if (!m_showDebug)
 			//{
 			//	return;
 			//}
-			//
-			//ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
-			//
-			//ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
-			//
-			//ndFloat32 totalMass = ndFloat32(0.0f);
-			//ndVector centerOfMass(ndVector::m_zero);
-			//for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			//{
-			//	const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-			//	const ndMatrix matrix(body->GetMatrix());
-			//	ndFloat32 mass = body->GetMassMatrix().m_w;
-			//	totalMass += mass;
-			//	centerOfMass += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
-			//	bodies.PushBack(body);
-			//}
-			//ndFloat32 invMass = 1.0f / totalMass;
-			//centerOfMass = centerOfMass.Scale(invMass);
-			//
-			//ndVector comLineOfAction(centerOfMass);
-			//comLineOfAction.m_y -= ndFloat32(0.5f);
-			//context.DrawLine(centerOfMass, comLineOfAction, ndVector::m_zero);
-			//
-			//ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
-			//const ndVector upVector(rootBody->GetMatrix().m_up);
-			//ndFixSizeArray<ndBigVector, 16> supportPoint;
-			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
-			//{
-			//	const ndAnimKeyframe& keyFrame = m_animPose[i];
-			//	ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-			//	ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-			//	if (i == 0)
-			//	{
-			//		effector->DebugJoint(context);
-			//	}
-			//
-			//	if (keyFrame.m_userParamFloat < 1.0f)
-			//	{
-			//		ndBodyKinematic* const body = effector->GetBody0();
-			//		supportPoint.PushBack(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit));
-			//	}
-			//}
-			//
-			//ndVector supportColor(0.0f, 1.0f, 1.0f, 1.0f);
-			//if (supportPoint.GetCount() >= 3)
-			//{
-			//	ScaleSupportShape(supportPoint);
-			//	ndFixSizeArray<ndVector, 16> desiredSupportPoint;
-			//	for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
-			//	{
-			//		desiredSupportPoint.PushBack(supportPoint[i]);
-			//	}
-			//
-			//	ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
-			//	rotation.TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
-			//	ndInt32 supportCount = ndConvexHull2d(&desiredSupportPoint[0], desiredSupportPoint.GetCount());
-			//	rotation.OrthoInverse().TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
-			//	ndVector p0(desiredSupportPoint[supportCount - 1]);
-			//	ndBigVector bigPolygon[16];
-			//	for (ndInt32 i = 0; i < supportCount; ++i)
-			//	{
-			//		bigPolygon[i] = desiredSupportPoint[i];
-			//		context.DrawLine(desiredSupportPoint[i], p0, supportColor);
-			//		p0 = desiredSupportPoint[i];
-			//	}
-			//
-			//	ndBigVector p0Out;
-			//	ndBigVector p1Out;
-			//	ndBigVector ray_p0(centerOfMass);
-			//	ndBigVector ray_p1(comLineOfAction);
-			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-			//
-			//	const ndVector centerOfPresure(p0Out);
-			//	context.DrawPoint(centerOfPresure, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 5);
-			//
-			//	ndVector zmp(CalculateZeroMomentPoint());
-			//	ray_p0 = zmp;
-			//	ray_p1 = zmp;
-			//	ray_p1.m_y -= ndFloat32(0.5f);
-			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-			//	const ndVector zmpSupport(p0Out);
-			//	context.DrawPoint(zmpSupport, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
-			//}
-			//else if (supportPoint.GetCount() == 2)
-			//{
-			//	ndTrace(("xxxxxxxxxx\n"));
-			//	context.DrawLine(supportPoint[0], supportPoint[1], supportColor);
-			//	//ndBigVector p0Out;
-			//	//ndBigVector p1Out;
-			//	//ndBigVector ray_p0(comMatrix.m_posit);
-			//	//ndBigVector ray_p1(comMatrix.m_posit);
-			//	//ray_p1.m_y -= 1.0f;
-			//	//
-			//	//ndRayToRayDistance(ray_p0, ray_p1, contactPoints[0], contactPoints[1], p0Out, p1Out);
-			//	//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
-			//	//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
-			//}
+
+			const ndMatrix alignMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
+			const ndMatrix rotation(ndPitchMatrix(m_targetLocation.m_pitch * ndDegreeToRad) * ndYawMatrix(m_targetLocation.m_yaw * ndDegreeToRad) * ndRollMatrix(m_targetLocation.m_roll * ndDegreeToRad));
+			ndMatrix targetMatrix(alignMatrix * rotation * alignMatrix.OrthoInverse());
+			
+			ndVector localPosit(m_targetLocation.m_x, m_targetLocation.m_y, 0.0f, 0.0f);
+			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth * ndDegreeToRad));
+			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
+			ndMatrix matrix(targetMatrix * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
+
+			const ndVector color(1.0f, 0.0f, 0.0f, 1.0f);
+			context.DrawPoint(matrix.m_posit, color, ndFloat32(4.0f));
 		}
 
 		ndIkSolver m_invDynamicsSolver;
@@ -892,9 +802,10 @@ namespace ndAdvancedRobot
 					ndMatrix location(matrix);
 					location.m_posit.m_x += 10.0f * ndFloat32(j - countX/2);
 					location.m_posit.m_z += 10.0f * ndFloat32(i - countZ/2);
-					ndModelArticulation* const model = SpawnModel(location, false);
+					ndModelArticulation* const model = SpawnModel(location, true);
 					if ((i == 0) && (j == 0))
 					{
+						HideModel(model, false);
 						ndSharedPtr<ndUIEntity> robotUI(new ndRobotUI(scene, (RobotModelNotify*)*model->GetNotifyCallback()));
 						scene->Set2DDisplayRenderFunction(robotUI);
 					}
