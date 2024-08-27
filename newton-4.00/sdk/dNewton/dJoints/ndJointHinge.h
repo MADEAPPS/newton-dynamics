@@ -43,8 +43,8 @@ class ndJointHinge: public ndJointBilateralConstraint
 	D_NEWTON_API void SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	D_NEWTON_API ndInt32 GetKinematicState(ndKinematicState* const state) const;
+	D_NEWTON_API void ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 
 	ndFloat32 m_angle;
 	ndFloat32 m_omega;

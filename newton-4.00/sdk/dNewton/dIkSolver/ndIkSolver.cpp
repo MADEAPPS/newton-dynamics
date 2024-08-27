@@ -362,84 +362,87 @@ void ndIkSolver::BuildMassMatrix()
 		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
 		ndBodyKinematic* const body = node->m_body;
 
-		ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
-		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
+		if (body->GetInvMass() > ndFloat32(0.0f))
+		{ 
+			ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
+			ndBodyKinematic::ndContactMap::Iterator it(contactMap);
 
-		for (it.Begin(); it; it++)
-		{
-			ndContact* const contact = it.GetNode()->GetInfo();
-			if (contact->IsActive())
+			for (it.Begin(); it; it++)
 			{
-				bool duplicate = false;
-				for (ndInt32 j = ndInt32(m_contacts.GetCount()) - 1; j >= 0; --j)
+				ndContact* const contact = it.GetNode()->GetInfo();
+				if (contact->IsActive())
 				{
-					duplicate = duplicate || (m_contacts[j] == contact);
-				}
-				if (!duplicate)
-				{
-					auto GetSurrogateBody = [this, &m_surrogateArray, &surrogateBodiesIndex](ndBodyKinematic* const body)
+					bool duplicate = false;
+					for (ndInt32 j = ndInt32(m_contacts.GetCount()) - 1; j >= 0; --j)
 					{
-						for (ndInt32 i = m_surrogateArray.GetCount() - 1; i >= 0; --i)
+						duplicate = duplicate || (m_contacts[j] == contact);
+					}
+					if (!duplicate)
+					{
+						auto GetSurrogateBody = [this, &m_surrogateArray, &surrogateBodiesIndex](ndBodyKinematic* const body)
 						{
-							if (body == m_surrogateArray[i].m_body)
+							for (ndInt32 i = m_surrogateArray.GetCount() - 1; i >= 0; --i)
 							{
-								return m_surrogateArray[i].m_surrogateBody;
+								if (body == m_surrogateArray[i].m_body)
+								{
+									return m_surrogateArray[i].m_surrogateBody;
+								}
 							}
-						}
-						if (surrogateBodiesIndex == ndInt32(m_surrogateBodies.GetCount()))
-						{
-							ndBodyDynamic* const surrogateBody = new ndBodyDynamic();
-							m_surrogateBodies.PushBack(surrogateBody);
-						}
-						ndBodyKinematic* const surrogateBody = m_surrogateBodies[surrogateBodiesIndex];
+							if (surrogateBodiesIndex == ndInt32(m_surrogateBodies.GetCount()))
+							{
+								ndBodyDynamic* const surrogateBody = new ndBodyDynamic();
+								m_surrogateBodies.PushBack(surrogateBody);
+							}
+							ndBodyKinematic* const surrogateBody = m_surrogateBodies[surrogateBodiesIndex];
 
-						ndBodyPair pair;
-						pair.m_body = body;
-						pair.m_surrogateBody = surrogateBody;
-						m_surrogateArray.PushBack(pair);
+							ndBodyPair pair;
+							pair.m_body = body;
+							pair.m_surrogateBody = surrogateBody;
+							m_surrogateArray.PushBack(pair);
 
-						m_bodies.PushBack(surrogateBody);
-						surrogateBodiesIndex++;
-						body->InitSurrogateBody(surrogateBody);
-						return surrogateBody;
-					};
-					
-					ndBodyKinematic* const body0 = contact->GetBody0()->GetAsBodyDynamic();
-					ndBodyKinematic* const body1 = contact->GetBody1()->GetAsBodyDynamic();
-					if (body0 == body)
-					{
-						if (body1->GetInvMass() == ndFloat32(0.0f))
+							m_bodies.PushBack(surrogateBody);
+							surrogateBodiesIndex++;
+							body->InitSurrogateBody(surrogateBody);
+							return surrogateBody;
+						};
+
+						ndBodyKinematic* const body0 = contact->GetBody0()->GetAsBodyDynamic();
+						ndBodyKinematic* const body1 = contact->GetBody1()->GetAsBodyDynamic();
+						if (body0 == body)
 						{
-							m_contacts.PushBack(contact);
+							if (body1->GetInvMass() == ndFloat32(0.0f))
+							{
+								m_contacts.PushBack(contact);
+							}
+							else
+							{
+								ndBodyKinematic* const surrogateBody = GetSurrogateBody(body1);
+
+								if (surrogateContactIndex == ndInt32(m_surrogateContact.GetCount()))
+								{
+									m_surrogateContact.PushBack(new ndContact);
+								}
+								ndContact* const surrogateContact = m_surrogateContact[surrogateContactIndex];
+								surrogateContactIndex++;
+								contact->InitSurrogateContact(surrogateContact, body0, surrogateBody);
+								m_contacts.PushBack(surrogateContact);
+							}
 						}
 						else
 						{
-							ndBodyKinematic* const surrogateBody = GetSurrogateBody(body1);
-					
+							ndAssert(body1 == body);
+							ndAssert(body1->GetInvMass() > ndFloat32(0.0f));
+							ndBodyKinematic* const surrogateBody = GetSurrogateBody(body0);
+
 							if (surrogateContactIndex == ndInt32(m_surrogateContact.GetCount()))
 							{
 								m_surrogateContact.PushBack(new ndContact);
 							}
 							ndContact* const surrogateContact = m_surrogateContact[surrogateContactIndex];
 							surrogateContactIndex++;
-							contact->InitSurrogateContact(surrogateContact, body0, surrogateBody);
+							contact->InitSurrogateContact(surrogateContact, surrogateBody, body1);
 							m_contacts.PushBack(surrogateContact);
 						}
-					}
-					else
-					{
-						ndAssert(body1 == body);
-						ndAssert(body1->GetInvMass() > ndFloat32(0.0f));
-						ndBodyKinematic* const surrogateBody = GetSurrogateBody(body0);
-
-						if (surrogateContactIndex == ndInt32(m_surrogateContact.GetCount()))
-						{
-							m_surrogateContact.PushBack(new ndContact);
-						}
-						ndContact* const surrogateContact = m_surrogateContact[surrogateContactIndex];
-						surrogateContactIndex++;
-						contact->InitSurrogateContact(surrogateContact, surrogateBody, body1);
-						m_contacts.PushBack(surrogateContact);
 					}
 				}
 			}

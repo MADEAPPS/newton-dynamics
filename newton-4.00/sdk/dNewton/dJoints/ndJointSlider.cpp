@@ -152,6 +152,13 @@ ndFloat32 ndJointSlider::PenetrationSpeed(ndFloat32 penetration) const
 	return speed;
 }
 
+ndInt32 ndJointSlider::GetKinematicState(ndKinematicState* const state) const
+{
+	state->m_posit = m_posit;
+	state->m_velocity = m_speed;
+	return 1;
+}
+
 void ndJointSlider::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	if (m_limitState)
@@ -239,6 +246,3 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 
 	SubmitLimits(desc, matrix0, matrix1);
 }
-
-
-
