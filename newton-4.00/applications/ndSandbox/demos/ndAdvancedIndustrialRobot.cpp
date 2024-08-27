@@ -794,7 +794,7 @@ namespace ndAdvancedRobot
 					location.m_posit.m_x += 10.0f * ndFloat32(j - countX/2);
 					location.m_posit.m_z += 10.0f * ndFloat32(i - countZ/2);
 					ndModelArticulation* const model = SpawnModel(location);
-					if ((i == 0) && (j == 0))
+					if ((i == countZ/2) && (j == countX/2))
 					{
 						ndSharedPtr<ndUIEntity> robotUI(new ndRobotUI(scene, (RobotModelNotify*)*model->GetNotifyCallback()));
 						scene->Set2DDisplayRenderFunction(robotUI);
