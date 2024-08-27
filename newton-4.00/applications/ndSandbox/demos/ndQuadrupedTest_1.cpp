@@ -1296,8 +1296,8 @@ namespace ndQuadruped_1
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			countX = 1;
-			countZ = 1;
+			//countX = 1;
+			//countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
