@@ -596,8 +596,8 @@ namespace ndAdvancedRobot
 			}
 
 			ndMatrix matrix(CalculateTargetMatrix());
-			const ndVector color(0.0f, 1.0f, 0.0f, 1.0f);
-			context.DrawPoint(matrix.m_posit, color, ndFloat32(4.0f));
+			const ndVector color(1.0f, 0.0f, 0.0f, 1.0f);
+			context.DrawPoint(matrix.m_posit, color, ndFloat32(5.0f));
 		}
 
 		ndIkSolver m_invDynamicsSolver;
