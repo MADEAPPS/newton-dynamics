@@ -37,7 +37,7 @@ namespace ndAdvancedRobot
 		//ndBrainFloat m_pitch;
 		//ndBrainFloat m_yaw;
 		//ndBrainFloat m_roll;
-		//ndBrainFloat m_azimth;
+		//ndBrainFloat m_azimuth;
 		//ndBrainFloat m_gripper;
 	};
 
@@ -127,31 +127,6 @@ namespace ndAdvancedRobot
 
 			RobotModelNotify* m_robot;
 		};
-
-		//class ndEffectorInfo
-		//{
-		//	public:
-		//	ndEffectorInfo()
-		//	{
-		//	}
-		//
-		//	ndEffectorInfo(
-		//		const ndSharedPtr<ndJointBilateralConstraint>& thigh,
-		//		const ndSharedPtr<ndJointBilateralConstraint>& calf,
-		//		const ndSharedPtr<ndJointBilateralConstraint>& foot,
-		//		const ndSharedPtr<ndJointBilateralConstraint>& effector)
-		//		:m_thigh(thigh)
-		//		,m_calf(calf)
-		//		,m_foot(foot)
-		//		,m_effector(effector)
-		//	{
-		//	}
-		//
-		//	ndSharedPtr<ndJointBilateralConstraint> m_thigh;
-		//	ndSharedPtr<ndJointBilateralConstraint> m_calf;
-		//	ndSharedPtr<ndJointBilateralConstraint> m_foot;
-		//	ndSharedPtr<ndJointBilateralConstraint> m_effector;
-		//};
 
 		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
 		{
@@ -463,7 +438,7 @@ namespace ndAdvancedRobot
 			const ndMatrix rotation(ndPitchMatrix(m_targetLocation.m_pitch * ndDegreeToRad) * ndYawMatrix(m_targetLocation.m_yaw * ndDegreeToRad) * ndRollMatrix(m_targetLocation.m_roll * ndDegreeToRad));
 			ndMatrix targetMatrix(alignMatrix * rotation * alignMatrix.OrthoInverse());
 
-			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth * ndDegreeToRad));
+			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth));
 			ndFloat32 x = m_location.m_x;
 			ndFloat32 y = m_location.m_y;
 			x += actions->m_x * ND_POSITION_X_STEP;
@@ -543,9 +518,9 @@ namespace ndAdvancedRobot
 			effector->SetOffsetMatrix(matrix);
 			SetCurrentLocation();
 
-			m_targetLocation.m_x = ndRand() * ND_MAX_X_SPAND;
-			m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
-			//m_targetLocation.m_y = ND_MIN_Y_SPAND + 0.5f * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
+			// prevent setting target outside work robot workspace.
+			m_targetLocation.m_x = ndRand() * ND_MAX_X_SPAND * 0.9f;
+			m_targetLocation.m_y = 0.9f * (ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -583,7 +558,7 @@ namespace ndAdvancedRobot
 			ndFloat32 x = m_targetLocation.m_x;
 			ndFloat32 y = m_targetLocation.m_y;
 			ndVector localPosit(x, y, 0.0f, 0.0f);
-			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth * ndDegreeToRad));
+			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth));
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
 			return targetMatrix * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix();
 		}
@@ -669,7 +644,7 @@ namespace ndAdvancedRobot
 			ndInt8 change = 0;
 			change = change | ndInt8(ImGui::SliderFloat("x", &m_robot->m_targetLocation.m_x, 0.0f, ND_MAX_X_SPAND));
 			change = change | ndInt8 (ImGui::SliderFloat("y", &m_robot->m_targetLocation.m_y, ND_MIN_Y_SPAND, ND_MAX_Y_SPAND));
-			change = change | ndInt8 (ImGui::SliderFloat("azimuth", &m_robot->m_targetLocation.m_azimuth, -180.0f, 180.0f));
+			change = change | ndInt8 (ImGui::SliderFloat("azimuth", &m_robot->m_targetLocation.m_azimuth, -ndPi, ndPi));
 			change = change | ndInt8 (ImGui::SliderFloat("gripper", &m_robot->m_targetLocation.m_gripperPosit, -0.2f, 0.4f));
 			change = change | ndInt8 (ImGui::SliderFloat("pitch", &m_robot->m_targetLocation.m_pitch, -180.0f, 180.0f));
 			change = change | ndInt8 (ImGui::SliderFloat("yaw", &m_robot->m_targetLocation.m_yaw, -180.0f, 180.0f));
@@ -821,7 +796,7 @@ namespace ndAdvancedRobot
 			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
-			,m_stopTraining(100 * 1000000)
+			,m_stopTraining(200 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			//ndWorld* const world = scene->GetWorld();
