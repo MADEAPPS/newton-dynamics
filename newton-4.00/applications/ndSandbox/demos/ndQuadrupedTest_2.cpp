@@ -1398,7 +1398,7 @@ namespace ndQuadruped_2
 		{
 			ndWorld* const world = scene->GetWorld();
 			
-			m_outFile = fopen("quadruped_2-VPG.csv", "wb");
+			m_outFile = fopen("quadruped_2-vpg.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 			
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;

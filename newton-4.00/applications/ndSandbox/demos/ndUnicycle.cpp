@@ -500,7 +500,7 @@ namespace ndUnicycle
 		{
 			ndWorld* const world = scene->GetWorld();
 			
-			m_outFile = fopen("unicycle-VPG.csv", "wb");
+			m_outFile = fopen("unicycle-vpg.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 			
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;

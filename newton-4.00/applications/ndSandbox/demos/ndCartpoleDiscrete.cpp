@@ -356,7 +356,7 @@ namespace ndCarpole_0
 		{
 			ndWorld* const world = scene->GetWorld();
 			
-			m_outFile = fopen("cartpole-VPG.csv", "wb");
+			m_outFile = fopen("cartpole-vpg.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 			
 			ndBrainAgentDiscretePolicyGradient_TrainerMaster::HyperParameters hyperParameters;

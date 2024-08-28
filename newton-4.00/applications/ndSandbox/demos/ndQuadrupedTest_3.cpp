@@ -1327,7 +1327,7 @@ namespace ndQuadruped_3
 		{
 			ndWorld* const world = scene->GetWorld();
 
-			m_outFile = fopen("quadruped_3-VPG.csv", "wb");
+			m_outFile = fopen("quadruped_3-vpg.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 
 			ndInt32 countX = 10;
