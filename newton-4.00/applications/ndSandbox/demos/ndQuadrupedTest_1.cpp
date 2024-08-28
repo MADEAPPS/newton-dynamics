@@ -681,47 +681,6 @@ namespace ndQuadruped_1
 			{
 				return isDead;
 			}
-
-			//ndInt32 count = 0;
-			//ndInt32 isGround = 4;
-			//bool airborneLeg[4];
-			//bool sequenceAirborne[4];
-			//for (ndInt32 i = 0; i < m_model->m_animPose.GetCount(); ++i)
-			//{
-			//	ndContact* const contact = m_model->FindContact(i);
-			//	bool isAirborne = !(contact && contact->IsActive());
-			//	isGround -= ndInt32(isAirborne);
-			//
-			//	const ndAnimKeyframe& keyFrame = m_model->m_animPose[i];
-			//	if (keyFrame.m_userParamInt != 0)
-			//	{
-			//		airborneLeg[count] = isAirborne;
-			//		if (keyFrame.m_userParamInt == 0)
-			//		{
-			//			isAirborne = false;
-			//		}
-			//		else if (keyFrame.m_userParamInt == 1)
-			//		{
-			//			isAirborne = true;
-			//		}
-			//		sequenceAirborne[count] = isAirborne;
-			//
-			//		count++;
-			//	}
-			//}
-			//if (isGround < 2)
-			//{
-			//	return false;
-			//}
-			//
-			//for (ndInt32 i = 0; i < count; ++i)
-			//{
-			//	if (airborneLeg[i] != sequenceAirborne[i])
-			//	{
-			//		//return true;
-			//	}
-			//}
-
 			return false;
 		}
 

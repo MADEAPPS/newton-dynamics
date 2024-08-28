@@ -589,20 +589,22 @@ void ndIkSolver::Solve()
 			accel1.m_linear = body1->m_accel;
 			accel1.m_angular = body1->m_alpha;
 
-			//ndFloat32 xxx0 = body0->m_omega.DotProduct(body0->m_omega).GetScalar();
-			//ndFloat32 xxx1 = body1->m_omega.DotProduct(body1->m_omega).GetScalar();
-			//ndFloat32 xxx2 = body0->m_accel.DotProduct(body0->m_accel).GetScalar();
-			//ndFloat32 xxx3 = body1->m_alpha.DotProduct(body1->m_alpha).GetScalar();
-			//if ((xxx0 > 50000.0f) || (xxx1 > 50000.0f) || (xxx2 > 1.0e8f) || (xxx3 > 1.0e8f))
-			//{
-			//	for (ndInt32 j = ndInt32(m_bodies.GetCount()) - 1; j >= 0; --j)
-			//	{
-			//		ndBodyKinematic* const body = m_bodies[j];
-			//		body->m_accel = body->GetForce();
-			//		body->m_alpha = body->GetTorque() - body->GetGyroTorque();
-			//	}
-			//	m_skeleton->SolveImmediate(*this);
-			//}
+			#if 0
+			ndFloat32 xxx0 = body0->m_omega.DotProduct(body0->m_omega).GetScalar();
+			ndFloat32 xxx1 = body1->m_omega.DotProduct(body1->m_omega).GetScalar();
+			ndFloat32 xxx2 = body0->m_accel.DotProduct(body0->m_accel).GetScalar();
+			ndFloat32 xxx3 = body1->m_alpha.DotProduct(body1->m_alpha).GetScalar();
+			if ((xxx0 > 50000.0f) || (xxx1 > 50000.0f) || (xxx2 > 1.0e8f) || (xxx3 > 1.0e8f))
+			{
+				for (ndInt32 j = ndInt32(m_bodies.GetCount()) - 1; j >= 0; --j)
+				{
+					ndBodyKinematic* const body = m_bodies[j];
+					body->m_accel = body->GetForce();
+					body->m_alpha = body->GetTorque() - body->GetGyroTorque();
+				}
+				m_skeleton->SolveImmediate(*this);
+			}
+			#endif
 			joint->SetIkSetAccel(accel0, accel1);
 			joint->SetIkMode(false);
 		}
