@@ -355,7 +355,7 @@ namespace ndAdvancedRobot
 			}
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
 			if (!m_modelAlive)
@@ -405,7 +405,7 @@ namespace ndAdvancedRobot
 			return false;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		ndReal GetReward() const
 		{
 			if (IsTerminal())
@@ -544,8 +544,8 @@ namespace ndAdvancedRobot
 			SetCurrentLocation();
 
 			m_targetLocation.m_x = ndRand() * ND_MAX_X_SPAND;
-			//m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
-			m_targetLocation.m_y = ND_MIN_Y_SPAND + 0.5f * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
+			m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
+			//m_targetLocation.m_y = ND_MIN_Y_SPAND + 0.5f * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
