@@ -31,7 +31,7 @@ namespace ndAdvancedRobot
 	{
 		public:
 		ndBrainFloat m_x;
-		//ndBrainFloat m_y;
+		ndBrainFloat m_y;
 
 		// first use a fix orientation and fix gripper, until we get the position
 		//ndBrainFloat m_pitch;
@@ -57,8 +57,8 @@ namespace ndAdvancedRobot
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
-	#define ND_POSITION_X_STEP		ndBrainFloat (0.5f)
-	#define ND_POSITION_Y_STEP		ndBrainFloat (0.5f)
+	#define ND_POSITION_X_STEP		ndBrainFloat (0.25f)
+	#define ND_POSITION_Y_STEP		ndBrainFloat (0.25f)
 
 	#define ND_MAX_X_SPAND			ndBrainFloat (4.0f)
 	#define ND_MIN_Y_SPAND			ndBrainFloat (-2.5f)
@@ -245,6 +245,7 @@ namespace ndAdvancedRobot
 			,m_location()
 			,m_targetLocation()
 			,m_timestep(ndFloat32(0.0f))
+			,m_modelAlive(true)
 			,m_showDebug(false)
 		{
 			m_controllerTrainer = new ndControllerTrainer(master);
@@ -353,8 +354,14 @@ namespace ndAdvancedRobot
 			}
 		}
 
+		#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
+			if (!m_modelAlive)
+			{
+				return true;
+			}
+
 			if (m_location.m_x < 0.0f)
 			{
 				return true;
@@ -372,6 +379,26 @@ namespace ndAdvancedRobot
 			if (m_location.m_y > ND_MAX_Y_SPAND)
 			{
 				return true;
+			}
+
+			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				const ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+				const ndVector veloc(body->GetVelocity());
+				const ndVector omega(body->GetOmega());
+
+				ndFloat32 vMag2 = veloc.DotProduct(veloc).GetScalar();
+				if (vMag2 > 200.0f)
+				{
+					return true;
+				}
+
+				ndFloat32 wMag2 = omega.DotProduct(omega).GetScalar();
+				if (wMag2 > 400.0f)
+				{
+					return true;
+				}
 			}
 
 			return false;
@@ -395,13 +422,17 @@ namespace ndAdvancedRobot
 			const ndMatrix effectorMatrix(m_effector->GetLocalMatrix0() * m_effector->GetBody0()->GetMatrix());
 
 			ndVector error(effectorMatrix.m_posit - targetMatrix.m_posit);
-			error.m_y = 0.0f;
+			//error.m_y = 0.0f;
 			ndFloat32 errorMag2 = error.DotProduct(error).GetScalar();
-			//ndFloat32 errorMagDev = ndSqrt(ND_MAX_X_SPAND * ND_MAX_X_SPAND + (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND) * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
-			//ndFloat32 invErrorMag2 = 1.0f / (ND_MAX_X_SPAND * ND_MAX_X_SPAND);
-			ndFloat32 invErrorMag2 = 1.0f;
-			ndFloat32 reward = 1.0f - ndClamp (errorMag2 * invErrorMag2, ndFloat32(0.0f), ndFloat32(1.0f));
-			return reward * reward;
+			////ndFloat32 errorMagDev = ndSqrt(ND_MAX_X_SPAND * ND_MAX_X_SPAND + (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND) * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
+			////ndFloat32 invErrorMag2 = 1.0f / (ND_MAX_X_SPAND * ND_MAX_X_SPAND);
+			//ndFloat32 invErrorMag2 = 1.0f;
+			//ndFloat32 reward = 1.0f - ndClamp (errorMag2 * invErrorMag2, ndFloat32(0.0f), ndFloat32(1.0f));
+			//return reward * reward;
+			ndFloat32 reward = ndExp(-5.0f * errorMag2);
+			if (reward > 0.999f)
+			ndExpandTraceMessage("%f %f\n", ndSqrt(errorMag2), reward);
+			return reward;
 		}
 
 		void GetObservation(ndBrainFloat* const inputObservations)
@@ -424,6 +455,7 @@ namespace ndAdvancedRobot
 			observation->m_effectorTargetPosit_y = ndBrainFloat(m_targetLocation.m_y);
 		}
 
+		#pragma optimize( "", off )
 		void ApplyActions(ndBrainFloat* const outputActions)
 		{
 			ndJointBilateralConstraint* loops = *m_effector;
@@ -441,8 +473,7 @@ namespace ndAdvancedRobot
 			ndFloat32 x = m_location.m_x;
 			ndFloat32 y = m_location.m_y;
 			x += actions->m_x * ND_POSITION_X_STEP;
-			//y += actions->m_y * ND_POSITION_Y_STEP;
-			//x += 0.2f * ND_POSITION_Y_STEP;
+			y += actions->m_y * ND_POSITION_Y_STEP;
 			ndVector localPosit(x, y, 0.0f, 0.0f);
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
 
@@ -454,6 +485,35 @@ namespace ndAdvancedRobot
 			m_invDynamicsSolver.SolverBegin(skeleton, &loops, 1, m_world, m_timestep);
 			m_invDynamicsSolver.Solve();
 			m_invDynamicsSolver.SolverEnd();
+
+			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				const ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+				const ndVector accel(body->GetAccel());
+				const ndVector alpha(body->GetAlpha());
+
+				ndFloat32 accelMag2 = accel.DotProduct(accel).GetScalar();
+				if (accelMag2 > 1.0e6f)
+				{
+					m_modelAlive = false;
+				}
+
+				ndFloat32 alphaMag2 = alpha.DotProduct(alpha).GetScalar();
+				if (alphaMag2 > 1.0e6f)
+				{
+					m_modelAlive = false;
+				}
+			}
+			if (!m_modelAlive)
+			{
+				for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+				{
+					ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+					body->SetAccel(ndVector::m_zero);
+					body->SetAlpha(ndVector::m_zero);
+				}
+			}
 		}
 
 		void SetCurrentLocation()
@@ -472,6 +532,7 @@ namespace ndAdvancedRobot
 
 		void ResetModel()
 		{
+			m_modelAlive = true;
 			for (ndInt32 i = 0; i < m_controllerTrainer->m_basePose.GetCount(); i++)
 			{
 				m_controllerTrainer->m_basePose[i].SetPose();
@@ -579,6 +640,7 @@ namespace ndAdvancedRobot
 		EffectorLocation m_location;
 		EffectorLocation m_targetLocation;
 		ndFloat32 m_timestep;
+		bool m_modelAlive;
 		bool m_showDebug;
 
 		friend class ndRobotUI;
