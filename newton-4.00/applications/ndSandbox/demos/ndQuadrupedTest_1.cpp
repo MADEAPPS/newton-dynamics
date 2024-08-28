@@ -532,6 +532,7 @@ namespace ndQuadruped_1
 			,m_controllerTrainer(nullptr)
 			,m_world(nullptr)
 			,m_timestep(ndFloat32(0.0f))
+			,m_modelAlive(true)
 			,m_showDebug(showDebug)
 		{
 			m_controllerTrainer = new ndControllerTrainer(master);
@@ -546,6 +547,7 @@ namespace ndQuadruped_1
 			,m_controllerTrainer(nullptr)
 			,m_world(nullptr)
 			,m_timestep(ndFloat32 (0.0f))
+			,m_modelAlive(true)
 			,m_showDebug(showDebug)
 		{
 			m_controller = new ndController(brain);
@@ -664,6 +666,11 @@ namespace ndQuadruped_1
 		//#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
+			if (!m_modelAlive)
+			{
+				return true;
+			}
+
 			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			const ndMatrix matrix(model->GetRoot()->m_body->GetMatrix());
 			const ndVector& up = matrix.m_up;
@@ -863,64 +870,91 @@ namespace ndQuadruped_1
 				m_control->m_z = ndClamp(ndReal(m_control->m_z + actionVector.m_torso_z * D_SWING_STEP), -D_MAX_SWING_DIST_Z, D_MAX_SWING_DIST_Z);
 			}
 
-			UpdatePose();
-		}
-
-		void UpdatePose()
-		{
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
 			ndAssert(skeleton);
-			
+
 			ndVector veloc;
 			m_animBlendTree->Evaluate(m_animPose, veloc);
-			
+
 			const ndVector upVector(rootBody->GetMatrix().m_up);
 			ndFixSizeArray<ndJointBilateralConstraint*, 32> effectors;
 			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
 			{
 				ndEffectorInfo* const info = &m_effectorsInfo[i];
 				effectors.PushBack(*info->m_effector);
-				
+
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-				
+
 				ndVector posit(m_animPose[i].m_posit);
 				effector->SetLocalTargetPosition(posit);
-				
+
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
 				effector->SetSwivelAngle(swivelAngle);
-				
+
 				// calculate lookAt angle
 				ndMatrix lookAtMatrix0;
 				ndMatrix lookAtMatrix1;
 				ndJointHinge* const footHinge = (ndJointHinge*)*info->m_foot;
 				footHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-				
+
 				ndMatrix upMatrix(ndGetIdentityMatrix());
 				upMatrix.m_front = lookAtMatrix1.m_front;
 				upMatrix.m_right = (upMatrix.m_front.CrossProduct(upVector) & ndVector::m_triplexMask).Normalize();
 				upMatrix.m_up = upMatrix.m_right.CrossProduct(upMatrix.m_front);
 				upMatrix = upMatrix * lookAtMatrix0.OrthoInverse();
-				
+
 				const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
 				footHinge->SetTargetAngle(angle);
 			}
-			
+
 			m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), m_world, m_timestep);
 			m_invDynamicsSolver.Solve();
 			m_invDynamicsSolver.SolverEnd();
 		}
 
+		void CheckModelStability()
+		{
+			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				const ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+				const ndVector accel(body->GetAccel());
+				const ndVector alpha(body->GetAlpha());
+
+				ndFloat32 accelMag2 = accel.DotProduct(accel).GetScalar();
+				if (accelMag2 > 1.0e6f)
+				{
+					m_modelAlive = false;
+				}
+
+				ndFloat32 alphaMag2 = alpha.DotProduct(alpha).GetScalar();
+				if (alphaMag2 > 1.0e6f)
+				{
+					m_modelAlive = false;
+				}
+			}
+			if (!m_modelAlive)
+			{
+				for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+				{
+					ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+					body->SetAccel(ndVector::m_zero);
+					body->SetAlpha(ndVector::m_zero);
+				}
+			}
+		}
+
 		void ResetModel()
 		{
-			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
-
+			m_modelAlive = true;
 			m_control->Reset();
 			m_control->m_animSpeed = ndReal (D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand());
 
 			ndMemSet(m_controllerTrainer->m_rewardsMemories, ndReal(1.0), sizeof(m_controllerTrainer->m_rewardsMemories) / sizeof(m_controllerTrainer->m_rewardsMemories[0]));
 
+			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			const ndMatrix matrix(model->GetRoot()->m_body->GetMatrix());
 			const ndVector& up = matrix.m_up;
 			bool state = up.m_y < D_MODEL_DEAD_ANGLE;
@@ -1155,6 +1189,7 @@ namespace ndQuadruped_1
 		ndWorld* m_world;
 		ndFloat32 m_timestep;
 		ndInt32 m_modelId;
+		bool m_modelAlive;
 		bool m_showDebug;
 
 		friend class ndModelUI;

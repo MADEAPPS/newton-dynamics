@@ -267,6 +267,7 @@ namespace ndAdvancedRobot
 			,m_location()
 			,m_targetLocation()
 			,m_timestep(ndFloat32(0.0f))
+			,m_modelAlive(true)
 			,m_showDebug(showDebug)
 		{
 			ndAssert(0);
@@ -422,16 +423,9 @@ namespace ndAdvancedRobot
 			const ndMatrix effectorMatrix(m_effector->GetLocalMatrix0() * m_effector->GetBody0()->GetMatrix());
 
 			ndVector error(effectorMatrix.m_posit - targetMatrix.m_posit);
-			//error.m_y = 0.0f;
 			ndFloat32 errorMag2 = error.DotProduct(error).GetScalar();
-			////ndFloat32 errorMagDev = ndSqrt(ND_MAX_X_SPAND * ND_MAX_X_SPAND + (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND) * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
-			////ndFloat32 invErrorMag2 = 1.0f / (ND_MAX_X_SPAND * ND_MAX_X_SPAND);
-			//ndFloat32 invErrorMag2 = 1.0f;
-			//ndFloat32 reward = 1.0f - ndClamp (errorMag2 * invErrorMag2, ndFloat32(0.0f), ndFloat32(1.0f));
-			//return reward * reward;
 			ndFloat32 reward = ndExp(-5.0f * errorMag2);
-			if (reward > 0.99999f)
-			ndExpandTraceMessage("%f %f\n", ndSqrt(errorMag2), reward);
+			//if (reward > 0.99999f) ndExpandTraceMessage("%f %f\n", ndSqrt(errorMag2), reward);
 			return reward;
 		}
 
@@ -455,7 +449,7 @@ namespace ndAdvancedRobot
 			observation->m_effectorTargetPosit_y = ndBrainFloat(m_targetLocation.m_y);
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		void ApplyActions(ndBrainFloat* const outputActions)
 		{
 			ndJointBilateralConstraint* loops = *m_effector;
@@ -485,7 +479,11 @@ namespace ndAdvancedRobot
 			m_invDynamicsSolver.SolverBegin(skeleton, &loops, 1, m_world, m_timestep);
 			m_invDynamicsSolver.Solve();
 			m_invDynamicsSolver.SolverEnd();
+			CheckModelStability();
+		}
 
+		void CheckModelStability()
+		{
 			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
