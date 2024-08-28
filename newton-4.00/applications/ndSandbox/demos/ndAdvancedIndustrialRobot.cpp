@@ -430,7 +430,7 @@ namespace ndAdvancedRobot
 			//ndFloat32 reward = 1.0f - ndClamp (errorMag2 * invErrorMag2, ndFloat32(0.0f), ndFloat32(1.0f));
 			//return reward * reward;
 			ndFloat32 reward = ndExp(-5.0f * errorMag2);
-			if (reward > 0.999f)
+			if (reward > 0.99999f)
 			ndExpandTraceMessage("%f %f\n", ndSqrt(errorMag2), reward);
 			return reward;
 		}
