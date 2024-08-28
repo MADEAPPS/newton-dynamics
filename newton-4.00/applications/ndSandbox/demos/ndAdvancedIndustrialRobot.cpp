@@ -32,12 +32,12 @@ namespace ndAdvancedRobot
 		public:
 		ndBrainFloat m_x;
 		ndBrainFloat m_y;
+		ndBrainFloat m_azimuth;
 
 		// first use a fix orientation and fix gripper, until we get the position
 		//ndBrainFloat m_pitch;
 		//ndBrainFloat m_yaw;
 		//ndBrainFloat m_roll;
-		//ndBrainFloat m_azimuth;
 		//ndBrainFloat m_gripper;
 	};
 
@@ -59,6 +59,7 @@ namespace ndAdvancedRobot
 
 	#define ND_POSITION_X_STEP		ndBrainFloat (0.25f)
 	#define ND_POSITION_Y_STEP		ndBrainFloat (0.25f)
+	#define ND_POSITION_AZIMTH_STEP	ndBrainFloat (0.0f * ndDegreeToRad)
 
 	#define ND_MAX_X_SPAND			ndBrainFloat (4.0f)
 	#define ND_MIN_Y_SPAND			ndBrainFloat (-2.5f)
@@ -438,12 +439,16 @@ namespace ndAdvancedRobot
 			const ndMatrix rotation(ndPitchMatrix(m_targetLocation.m_pitch * ndDegreeToRad) * ndYawMatrix(m_targetLocation.m_yaw * ndDegreeToRad) * ndRollMatrix(m_targetLocation.m_roll * ndDegreeToRad));
 			ndMatrix targetMatrix(alignMatrix * rotation * alignMatrix.OrthoInverse());
 
-			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth));
 			ndFloat32 x = m_location.m_x;
 			ndFloat32 y = m_location.m_y;
+			ndFloat32 azimuth = m_location.m_azimuth;
 			x += actions->m_x * ND_POSITION_X_STEP;
 			y += actions->m_y * ND_POSITION_Y_STEP;
+			azimuth += actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
 			ndVector localPosit(x, y, 0.0f, 0.0f);
+
+			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth));
+			//const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
 
 			effector->SetOffsetMatrix(targetMatrix);
@@ -494,13 +499,19 @@ namespace ndAdvancedRobot
 			ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
 			ndMatrix matrix(effector->GetEffectorMatrix());
 
-			const ndVector posit(matrix.m_posit - m_effectorOffset);
-			ndFloat32 athimuthAngle = ndAtan2(-posit.m_z, posit.m_x);
-			const ndMatrix aximuthMatrix(ndYawMatrix(athimuthAngle));
-			const ndVector currenPosit(aximuthMatrix.UnrotateVector(posit));
+			ndFloat32 azimuth = 0.0f;
+			//const ndVector posit(matrix.m_posit - m_effectorOffset);
+			const ndVector posit(matrix.m_posit);
+			if ((posit.m_x * posit.m_x + posit.m_z * posit.m_z) > 1.0e-3f)
+			{
+				azimuth = ndAtan2(posit.m_z, posit.m_x);
+			}
+			const ndMatrix aximuthMatrix(ndYawMatrix(-azimuth));
+			const ndVector currenPosit(aximuthMatrix.UnrotateVector(posit) - m_effectorOffset);
 			//ndTrace(("(%f %f) (%f %f)\n", m_targetLocation.m_x, m_targetLocation.m_y, currenPosit.m_x, currenPosit.m_y));
 			m_location.m_x = currenPosit.m_x;
 			m_location.m_y = currenPosit.m_y;
+			m_location.m_azimuth = azimuth;
 		}
 
 		void ResetModel()
@@ -519,7 +530,7 @@ namespace ndAdvancedRobot
 			SetCurrentLocation();
 
 			// prevent setting target outside work robot workspace.
-			m_targetLocation.m_x = ndRand() * ND_MAX_X_SPAND * 0.9f;
+			m_targetLocation.m_x = 0.2f + ndRand() * (ND_MAX_X_SPAND - 0.4f);
 			m_targetLocation.m_y = 0.9f * (ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
 		}
 
@@ -591,22 +602,24 @@ namespace ndAdvancedRobot
 		{
 			public:
 			EffectorLocation()
-				:m_x(0.0f)
-				,m_y(0.0f)
-				,m_yaw(0.0f)
+				:m_yaw(0.0f)
 				,m_roll(0.0f)
 				,m_pitch(0.0f)
+				,m_x(0.0f)
+				,m_y(0.0f)
 				,m_azimuth(0.0f)
 				,m_gripperPosit(0.0f)
 			{
 			}
 
-			ndReal m_x;
-			ndReal m_y;
 			ndReal m_yaw;
 			ndReal m_roll;
 			ndReal m_pitch;
+
+			ndReal m_x;
+			ndReal m_y;
 			ndReal m_azimuth;
+
 			ndReal m_gripperPosit;
 		};
 
