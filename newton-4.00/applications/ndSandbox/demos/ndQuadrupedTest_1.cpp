@@ -912,6 +912,7 @@ namespace ndQuadruped_1
 			m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), m_world, m_timestep);
 			m_invDynamicsSolver.Solve();
 			m_invDynamicsSolver.SolverEnd();
+			CheckModelStability();
 		}
 
 		void CheckModelStability()
