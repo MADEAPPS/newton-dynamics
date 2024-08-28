@@ -377,6 +377,7 @@ namespace ndAdvancedRobot
 			return false;
 		}
 
+		#pragma optimize( "", off )
 		ndReal GetReward() const
 		{
 			if (IsTerminal())
@@ -393,18 +394,13 @@ namespace ndAdvancedRobot
 			const ndMatrix targetMatrix(CalculateTargetMatrix());
 			const ndMatrix effectorMatrix(m_effector->GetLocalMatrix0() * m_effector->GetBody0()->GetMatrix());
 
-			//ndMatrix matrix0;
-			//ndMatrix matrix1;
-			//m_effector->CalculateGlobalMatrix(matrix0, matrix1);
-			//const ndMatrix m0(effectorMatrix * effector->GetBody1()->GetMatrix().OrthoInverse());
-			//const ndMatrix m1(targetMatrix * effector->GetBody1()->GetMatrix().OrthoInverse());
-
 			ndVector error(effectorMatrix.m_posit - targetMatrix.m_posit);
 			error.m_y = 0.0f;
-			ndFloat32 errorMag = ndSqrt (error.DotProduct(error).GetScalar());
-			ndFloat32 errorMagDev = ndSqrt(ND_MAX_X_SPAND * ND_MAX_X_SPAND + (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND) * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
-			errorMag = ndClamp (errorMag / errorMagDev, ndFloat32(0.0f), ndFloat32(1.0f));
-			return 1.0f - errorMag;
+			ndFloat32 errorMag2 = error.DotProduct(error).GetScalar();
+			//ndFloat32 errorMagDev = ndSqrt(ND_MAX_X_SPAND * ND_MAX_X_SPAND + (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND) * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
+			ndFloat32 invErrorMag2 = 1.0f / (ND_MAX_X_SPAND * ND_MAX_X_SPAND);
+			ndFloat32 reward = 1.0f - ndClamp (errorMag2 * invErrorMag2, ndFloat32(0.0f), ndFloat32(1.0f));
+			return reward;
 		}
 
 		void GetObservation(ndBrainFloat* const inputObservations)
