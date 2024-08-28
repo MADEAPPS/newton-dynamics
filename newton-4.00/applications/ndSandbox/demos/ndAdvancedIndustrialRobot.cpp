@@ -398,9 +398,10 @@ namespace ndAdvancedRobot
 			error.m_y = 0.0f;
 			ndFloat32 errorMag2 = error.DotProduct(error).GetScalar();
 			//ndFloat32 errorMagDev = ndSqrt(ND_MAX_X_SPAND * ND_MAX_X_SPAND + (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND) * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
-			ndFloat32 invErrorMag2 = 1.0f / (ND_MAX_X_SPAND * ND_MAX_X_SPAND);
+			//ndFloat32 invErrorMag2 = 1.0f / (ND_MAX_X_SPAND * ND_MAX_X_SPAND);
+			ndFloat32 invErrorMag2 = 1.0f;
 			ndFloat32 reward = 1.0f - ndClamp (errorMag2 * invErrorMag2, ndFloat32(0.0f), ndFloat32(1.0f));
-			return reward;
+			return reward * reward;
 		}
 
 		void GetObservation(ndBrainFloat* const inputObservations)
@@ -824,7 +825,7 @@ namespace ndAdvancedRobot
 					}
 				}
 			}
-			//scene->SetAcceleratedUpdate();
+			scene->SetAcceleratedUpdate();
 		}
 
 		~TrainingUpdata()
