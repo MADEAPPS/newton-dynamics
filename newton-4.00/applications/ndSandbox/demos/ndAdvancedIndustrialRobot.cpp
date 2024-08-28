@@ -49,6 +49,9 @@ namespace ndAdvancedRobot
 
 		ndBrainFloat m_effectorPosit_x;
 		ndBrainFloat m_effectorPosit_y;
+		ndBrainFloat m_effectorTargetPosit_x;
+		ndBrainFloat m_effectorTargetPosit_y;
+
 	};
 
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
@@ -420,6 +423,8 @@ namespace ndAdvancedRobot
 
 			observation->m_effectorPosit_x = ndBrainFloat(m_location.m_x);
 			observation->m_effectorPosit_y = ndBrainFloat(m_location.m_y);
+			observation->m_effectorTargetPosit_x = ndBrainFloat(m_targetLocation.m_x);
+			observation->m_effectorTargetPosit_y = ndBrainFloat(m_targetLocation.m_y);
 		}
 
 		void ApplyActions(ndBrainFloat* const outputActions)
@@ -531,7 +536,7 @@ namespace ndAdvancedRobot
 		{
 			if (!m_showDebug)
 			{
-				return;
+				//return;
 			}
 
 			ndMatrix matrix(CalculateTargetMatrix());
