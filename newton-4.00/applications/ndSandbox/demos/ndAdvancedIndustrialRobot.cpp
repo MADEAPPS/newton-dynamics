@@ -31,7 +31,7 @@ namespace ndAdvancedRobot
 	{
 		public:
 		ndBrainFloat m_x;
-		ndBrainFloat m_y;
+		//ndBrainFloat m_y;
 
 		// first use a fix orientation and fix gripper, until we get the position
 		//ndBrainFloat m_pitch;
@@ -390,7 +390,14 @@ namespace ndAdvancedRobot
 			const ndMatrix targetMatrix(CalculateTargetMatrix());
 			const ndMatrix effectorMatrix(m_effector->GetLocalMatrix0() * m_effector->GetBody0()->GetMatrix());
 
+			//ndMatrix matrix0;
+			//ndMatrix matrix1;
+			//m_effector->CalculateGlobalMatrix(matrix0, matrix1);
+			//const ndMatrix m0(effectorMatrix * effector->GetBody1()->GetMatrix().OrthoInverse());
+			//const ndMatrix m1(targetMatrix * effector->GetBody1()->GetMatrix().OrthoInverse());
+
 			ndVector error(effectorMatrix.m_posit - targetMatrix.m_posit);
+			error.m_y = 0.0f;
 			ndFloat32 errorMag = ndSqrt (error.DotProduct(error).GetScalar());
 			ndFloat32 errorMagDev = ndSqrt(ND_MAX_X_SPAND * ND_MAX_X_SPAND + (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND) * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
 			errorMag = ndClamp (errorMag / errorMagDev, ndFloat32(0.0f), ndFloat32(1.0f));
@@ -432,7 +439,8 @@ namespace ndAdvancedRobot
 			ndFloat32 x = m_location.m_x;
 			ndFloat32 y = m_location.m_y;
 			x += actions->m_x * ND_POSITION_X_STEP;
-			y += actions->m_y * ND_POSITION_Y_STEP;
+			//y += actions->m_y * ND_POSITION_Y_STEP;
+			//x += 0.2f * ND_POSITION_Y_STEP;
 			ndVector localPosit(x, y, 0.0f, 0.0f);
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
 
@@ -475,7 +483,8 @@ namespace ndAdvancedRobot
 			SetCurrentLocation();
 
 			m_targetLocation.m_x = ndRand() * ND_MAX_X_SPAND;
-			m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
+			//m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
+			m_targetLocation.m_y = ND_MIN_Y_SPAND + 0.5f * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -504,15 +513,18 @@ namespace ndAdvancedRobot
 
 		ndMatrix CalculateTargetMatrix() const
 		{
-			const ndMatrix alignMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
-			const ndMatrix rotation(ndPitchMatrix(m_targetLocation.m_pitch * ndDegreeToRad) * ndYawMatrix(m_targetLocation.m_yaw * ndDegreeToRad) * ndRollMatrix(m_targetLocation.m_roll * ndDegreeToRad));
-			ndMatrix targetMatrix(alignMatrix * rotation * alignMatrix.OrthoInverse());
-
-			ndVector localPosit(m_targetLocation.m_x, m_targetLocation.m_y, 0.0f, 0.0f);
+			ndMatrix targetMatrix(
+				ndRollMatrix(90.0f * ndDegreeToRad) *
+				ndPitchMatrix(m_targetLocation.m_pitch * ndDegreeToRad) *
+				ndYawMatrix(m_targetLocation.m_yaw * ndDegreeToRad) *
+				ndRollMatrix(m_targetLocation.m_roll * ndDegreeToRad) *
+				ndRollMatrix(-90.0f * ndDegreeToRad));
+			ndFloat32 x = m_targetLocation.m_x;
+			ndFloat32 y = m_targetLocation.m_y;
+			ndVector localPosit(x, y, 0.0f, 0.0f);
 			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth * ndDegreeToRad));
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
-			ndMatrix matrix(targetMatrix * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
-			return matrix;
+			return targetMatrix * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix();
 		}
 
 		void Debug(ndConstraintDebugCallback& context) const
