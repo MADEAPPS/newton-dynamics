@@ -50,9 +50,9 @@ namespace ndAdvancedRobot
 		ndBrainFloat m_effectorPosit_x;
 		ndBrainFloat m_effectorPosit_y;
 		ndBrainFloat m_effectorAzimuth;
-		ndBrainFloat m_effectorTargetPosit_x;
-		ndBrainFloat m_effectorTargetPosit_y;
-		ndBrainFloat m_effectorTargetAzimuth;
+		//ndBrainFloat m_effectorTargetPosit_x;
+		//ndBrainFloat m_effectorTargetPosit_y;
+		//ndBrainFloat m_effectorTargetAzimuth;
 	};
 
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
@@ -426,6 +426,7 @@ namespace ndAdvancedRobot
 			return azimuthReward * 0.6f + positReward * 0.4f;
 		}
 
+		#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const inputObservations)
 		{
 			//ndMemSet(inputObservations, 1.0f, ND_AGENT_INPUT_SIZE);
@@ -440,12 +441,16 @@ namespace ndAdvancedRobot
 				observation->m_jointVeloc[i] = ndBrainFloat(kinematicState.m_velocity);
 			}
 
-			observation->m_effectorPosit_x = ndBrainFloat(m_location.m_x);
-			observation->m_effectorPosit_y = ndBrainFloat(m_location.m_y);
-			observation->m_effectorAzimuth = ndBrainFloat(m_location.m_azimuth);
-			observation->m_effectorTargetPosit_x = ndBrainFloat(m_targetLocation.m_x);
-			observation->m_effectorTargetPosit_y = ndBrainFloat(m_targetLocation.m_y);
-			observation->m_effectorTargetAzimuth = ndBrainFloat(m_targetLocation.m_azimuth);
+			//observation->m_effectorPosit_x = ndBrainFloat(m_location.m_x);
+			//observation->m_effectorPosit_y = ndBrainFloat(m_location.m_y);
+			//observation->m_effectorAzimuth = ndBrainFloat(m_location.m_azimuth);
+			//observation->m_effectorTargetPosit_x = ndBrainFloat(m_targetLocation.m_x);
+			//observation->m_effectorTargetPosit_y = ndBrainFloat(m_targetLocation.m_y);
+			//observation->m_effectorTargetAzimuth = ndBrainFloat(m_targetLocation.m_azimuth);
+
+			observation->m_effectorPosit_x = ndBrainFloat(m_targetLocation.m_x - m_location.m_x);
+			observation->m_effectorPosit_y = ndBrainFloat(m_targetLocation.m_y - m_location.m_y);
+			observation->m_effectorAzimuth = ndBrainFloat(m_targetLocation.m_azimuth - m_location.m_azimuth);
 		}
 
 		//#pragma optimize( "", off )
@@ -559,7 +564,8 @@ namespace ndAdvancedRobot
 			// prevent setting target outside work robot workspace.
 			m_targetLocation.m_x = 0.5f + ndRand() * (ND_MAX_X_SPAND - 0.8f);
 			m_targetLocation.m_y = 0.9f * (ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
-			m_targetLocation.m_azimuth = (ndRand() - 0.5f) * ndPi * 0.9f;
+			m_targetLocation.m_azimuth = (2.0f * ndRand() - 1.0f) * ndPi * 0.9f;
+			ndTrace(("%f\n", m_targetLocation.m_azimuth * ndRadToDegree));
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -875,8 +881,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 10;
 			ndInt32 countZ = 10;
-			//countX = 1;
-			//countZ = 1;
+			countX = 1;
+			countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
