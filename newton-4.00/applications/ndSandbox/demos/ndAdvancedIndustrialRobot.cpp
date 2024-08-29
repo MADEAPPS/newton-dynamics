@@ -423,7 +423,7 @@ namespace ndAdvancedRobot
 		
 			ndFloat32 positReward = ndExp(-5.0f * positError2);
 			ndFloat32 azimuthReward = ndExp(-10.0f * angleErr * angleErr);
-			return azimuthReward * 0.6f + positReward * 0.4f;
+			return azimuthReward * 0.5f + positReward * 0.5f;
 		}
 
 		#pragma optimize( "", off )
@@ -474,6 +474,10 @@ namespace ndAdvancedRobot
 			x += actions->m_x * ND_POSITION_X_STEP;
 			y += actions->m_y * ND_POSITION_Y_STEP;
 			azimuth += actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
+
+			x = m_targetLocation.m_x;
+			//y = m_targetLocation.m_y;
+			//azimuth = m_targetLocation.m_azimuth;
 
 			x = ndClamp(x, ndFloat32(0.5f), ndFloat32(0.2 * (ND_MAX_X_SPAND - 0.8f)));
 			y = ndClamp(y, ndFloat32(0.9f * ND_MIN_Y_SPAND), ndFloat32(0.9f * ND_MAX_Y_SPAND));
@@ -565,7 +569,11 @@ namespace ndAdvancedRobot
 			m_targetLocation.m_x = 0.5f + ndRand() * (ND_MAX_X_SPAND - 0.8f);
 			m_targetLocation.m_y = 0.9f * (ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
 			m_targetLocation.m_azimuth = (2.0f * ndRand() - 1.0f) * ndPi * 0.9f;
-			ndTrace(("%f\n", m_targetLocation.m_azimuth * ndRadToDegree));
+
+			m_targetLocation.m_x = 1.0f;
+			//m_targetLocation.m_y = 0.0f;
+			//m_targetLocation.m_azimuth = 0.0f;
+			//ndTrace(("%f\n", m_targetLocation.m_azimuth * ndRadToDegree));
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -881,8 +889,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 10;
 			ndInt32 countZ = 10;
-			countX = 1;
-			countZ = 1;
+			//countX = 1;
+			//countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
