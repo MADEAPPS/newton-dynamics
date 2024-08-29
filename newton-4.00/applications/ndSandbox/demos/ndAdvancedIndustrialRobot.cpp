@@ -476,7 +476,7 @@ namespace ndAdvancedRobot
 			ndFloat32 azimuth = m_location.m_azimuth + deltaAzimuth;
 
 			//x = m_targetLocation.m_x;
-			y = m_targetLocation.m_y;
+			//y = m_targetLocation.m_y;
 			azimuth = m_targetLocation.m_azimuth;
 
 			x = ndClamp(x, ndFloat32(0.9f * ND_MIN_X_SPAND), ndFloat32(0.9f * ND_MAX_X_SPAND));
@@ -573,8 +573,8 @@ namespace ndAdvancedRobot
 			m_targetLocation.m_y = ndClamp(m_targetLocation.m_y, ndReal(ND_MIN_Y_SPAND + 0.05f), ndReal(ND_MAX_Y_SPAND - 0.05f));
 			m_targetLocation.m_azimuth = ndClamp(m_targetLocation.m_azimuth, ndReal(-ndPi + 0.09f), ndReal(ndPi - 0.09f));
 
-			//m_targetLocation.m_x = 1.0f;
-			m_targetLocation.m_y = 0.0f;
+			//m_targetLocation.m_x = 0.0f;
+			//m_targetLocation.m_y = 0.0f;
 			m_targetLocation.m_azimuth = 0.0f;
 			//ndTrace(("%f\n", m_targetLocation.m_azimuth * ndRadToDegree));
 		}
