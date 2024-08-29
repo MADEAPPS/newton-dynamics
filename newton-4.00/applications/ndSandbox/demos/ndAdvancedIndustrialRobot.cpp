@@ -341,21 +341,21 @@ namespace ndAdvancedRobot
 				return true;
 			}
 
-			if (m_location.m_x < 0.0f)
+			if (m_location.m_x <= ND_MIN_X_SPAND)
 			{
 				return true;
 			}
-			if (m_location.m_x > ND_MAX_X_SPAND)
-			{
-				return true;
-			}
-
-			if (m_location.m_y < ND_MIN_Y_SPAND)
+			if (m_location.m_x >= ND_MAX_X_SPAND)
 			{
 				return true;
 			}
 
-			if (m_location.m_y > ND_MAX_Y_SPAND)
+			if (m_location.m_y <= ND_MIN_Y_SPAND)
+			{
+				return true;
+			}
+
+			if (m_location.m_y >= ND_MAX_Y_SPAND)
 			{
 				return true;
 			}
