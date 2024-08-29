@@ -565,9 +565,13 @@ namespace ndAdvancedRobot
 			SetCurrentLocation();
 
 			// prevent setting target outside work robot workspace.
-			m_targetLocation.m_x = 0.9f * (ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
-			m_targetLocation.m_y = 0.9f * (ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
-			m_targetLocation.m_azimuth = (2.0f * ndRand() - 1.0f) * ndPi * 0.9f;
+			m_targetLocation.m_x = ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND);
+			m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
+			m_targetLocation.m_azimuth = (2.0f * ndRand() - 1.0f) * ndPi;
+
+			m_targetLocation.m_x = ndClamp(m_targetLocation.m_x, ndReal(ND_MIN_X_SPAND + 0.05f), ndReal(ND_MAX_X_SPAND - 0.05f));
+			m_targetLocation.m_y = ndClamp(m_targetLocation.m_y, ndReal(ND_MIN_Y_SPAND + 0.05f), ndReal(ND_MAX_Y_SPAND - 0.05f));
+			m_targetLocation.m_azimuth = ndClamp(m_targetLocation.m_azimuth, ndReal(-ndPi + 0.09f), ndReal(ndPi - 0.09f));
 
 			//m_targetLocation.m_x = 1.0f;
 			m_targetLocation.m_y = 0.0f;
