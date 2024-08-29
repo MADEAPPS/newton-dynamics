@@ -411,7 +411,8 @@ namespace ndAdvancedRobot
 			};
 
 			const ndMatrix targetMatrix(CalculateTargetMatrix());
-			const ndMatrix effectorMatrix(m_effector->GetLocalMatrix0() * m_effector->GetBody0()->GetMatrix());
+			const ndMatrix baseMatrix(m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
+			const ndMatrix effectorMatrix(m_effector->GetLocalMatrix0() * m_effector->GetBody0()->GetMatrix() * baseMatrix.OrthoInverse());
 
 			const ndVector targetPosit(GetAnglePosit(targetMatrix.m_posit));
 			const ndVector effectPosit(GetAnglePosit(effectorMatrix.m_posit));
