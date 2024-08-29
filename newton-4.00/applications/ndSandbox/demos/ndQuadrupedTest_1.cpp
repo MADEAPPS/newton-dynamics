@@ -24,7 +24,7 @@
 namespace ndQuadruped_1
 {
 	#define ND_TRAIN_MODEL
-	#define CONTROLLER_NAME "ndQuadruped_1-VPG.dnn"
+	#define CONTROLLER_NAME "ndQuadruped_1-vpg.dnn"
 
 	class ndLegObservation
 	{

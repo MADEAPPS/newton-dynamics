@@ -25,7 +25,7 @@
 namespace ndAdvancedRobot
 {
 	#define ND_TRAIN_MODEL
-	#define CONTROLLER_NAME "ndRobotArmReach-VPG.dnn"
+	#define CONTROLLER_NAME "ndRobotArmReach-vpg.dnn"
 
 	class ndActionVector
 	{

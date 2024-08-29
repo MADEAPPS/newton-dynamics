@@ -24,7 +24,7 @@
 namespace ndQuadruped_2
 {
 	#define ND_TRAIN_MODEL
-	#define CONTROLLER_NAME "ndQuadruped_2-VPG.dnn"
+	#define CONTROLLER_NAME "ndQuadruped_2-vpg.dnn"
 
 	class ndAnimPose
 	{
