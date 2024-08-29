@@ -129,9 +129,9 @@ namespace ndSimpleRobot
 			// apply target position collected by control panel
 			ndMatrix targetMatrix(
 				ndRollMatrix(90.0f * ndDegreeToRad) *
-				ndPitchMatrix(m_pitch * ndDegreeToRad) *
-				ndYawMatrix(m_yaw * ndDegreeToRad) *
-				ndRollMatrix(m_roll * ndDegreeToRad) *
+				ndPitchMatrix(m_pitch) *
+				ndYawMatrix(m_yaw) *
+				ndRollMatrix(m_roll) *
 				ndRollMatrix(-90.0f * ndDegreeToRad));
 
 			ndVector localPosit(m_x, m_y, 0.0f, 0.0f);
@@ -156,6 +156,11 @@ namespace ndSimpleRobot
 			//const ndVector currenPosit(aximuthMatrix.UnrotateVector(posit) - m_effectorOffset);
 			//ndAssert(currenPosit.m_x >= -1.0e-2f);
 			//const ndVector currenPosit1(aximuthMatrix.UnrotateVector(posit) - m_effectorOffset);
+
+			ndMatrix matrix(m_effector->GetEffectorMatrix());
+			ndMatrix rotation0(ndRollMatrix(-90.0f * ndDegreeToRad) * matrix * ndRollMatrix(90.0f * ndDegreeToRad));
+			ndMatrix rotation1(ndPitchMatrix(m_pitch) * ndYawMatrix(m_yaw) * ndRollMatrix(m_roll));
+			ndMatrix rotation2(ndPitchMatrix(m_pitch) * ndYawMatrix(m_yaw) * ndRollMatrix(m_roll));
 		}
 
 		void PostTransformUpdate(ndWorld* const, ndFloat32)
@@ -317,10 +322,10 @@ namespace ndSimpleRobot
 			change = change | ndInt8(ImGui::SliderFloat("x", &m_robot->m_x, ND_MIN_X_SPAND, ND_MAX_X_SPAND));
 			change = change | ndInt8(ImGui::SliderFloat("y", &m_robot->m_y, ND_MIN_Y_SPAND, ND_MAX_Y_SPAND));
 			change = change | ndInt8(ImGui::SliderFloat("azimuth", &m_robot->m_azimuth, -ndPi, ndPi));
+			change = change | ndInt8(ImGui::SliderFloat("pitch", &m_robot->m_pitch, -ndPi, ndPi));
+			change = change | ndInt8(ImGui::SliderFloat("yaw", &m_robot->m_yaw, -ndPi * 0.5f, ndPi * 0.5f));
+			change = change | ndInt8(ImGui::SliderFloat("roll", &m_robot->m_roll, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("gripper", &m_robot->m_gripperPosit, -0.2f, 0.4f));
-			change = change | ndInt8(ImGui::SliderFloat("pitch", &m_robot->m_pitch, -180.0f, 180.0f));
-			change = change | ndInt8(ImGui::SliderFloat("yaw", &m_robot->m_yaw, -180.0f, 180.0f));
-			change = change | ndInt8(ImGui::SliderFloat("roll", &m_robot->m_roll, -180.0f, 180.0f));
 
 			if (change)
 			{

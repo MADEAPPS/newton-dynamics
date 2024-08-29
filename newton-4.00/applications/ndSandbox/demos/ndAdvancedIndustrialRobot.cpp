@@ -24,7 +24,7 @@
 
 namespace ndAdvancedRobot
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach-vpg.dnn"
 
 	class ndActionVector
@@ -421,8 +421,8 @@ namespace ndAdvancedRobot
 			ndFloat32 angleErr(ndAnglesSub(targetPosit.m_z, effectPosit.m_z));
 			ndFloat32 positError2 = error.m_x * error.m_x + error.m_y * error.m_y;
 		
-			ndFloat32 positReward = ndExp(-5.0f * positError2);
-			ndFloat32 azimuthReward = ndExp(-10.0f * angleErr * angleErr);
+			ndFloat32 positReward = ndExp(-50.0f * positError2);
+			ndFloat32 azimuthReward = ndExp(-50.0f * angleErr * angleErr);
 			return azimuthReward * 0.5f + positReward * 0.5f;
 		}
 
@@ -561,7 +561,8 @@ namespace ndAdvancedRobot
 			m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
 			m_targetLocation.m_azimuth = (2.0f * ndRand() - 1.0f) * ndPi;
 
-			m_targetLocation.m_x = ndClamp(m_targetLocation.m_x, ndReal(ND_MIN_X_SPAND + 0.05f), ndReal(ND_MAX_X_SPAND - 0.05f));
+			//m_targetLocation.m_x = ndClamp(m_targetLocation.m_x, ndReal(ND_MIN_X_SPAND + 0.05f), ndReal(ND_MAX_X_SPAND - 0.05f));
+			m_targetLocation.m_x = ndClamp(m_targetLocation.m_x, ndReal(ND_MIN_X_SPAND + 0.05f), ndReal(ND_MAX_X_SPAND - 0.25f));
 			m_targetLocation.m_y = ndClamp(m_targetLocation.m_y, ndReal(ND_MIN_Y_SPAND + 0.05f), ndReal(ND_MAX_Y_SPAND - 0.05f));
 			m_targetLocation.m_azimuth = ndClamp(m_targetLocation.m_azimuth, ndReal(-ndPi + 0.09f), ndReal(ndPi - 0.09f));
 
