@@ -58,13 +58,14 @@ namespace ndAdvancedRobot
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
-	#define ND_MAX_X_SPAND			ndBrainFloat ( 4.0f)
-	#define ND_MIN_Y_SPAND			ndBrainFloat (-2.5f)
-	#define ND_MAX_Y_SPAND			ndBrainFloat ( 2.0f)
-
-	#define ND_POSITION_X_STEP		ndBrainFloat (0.125f)
-	#define ND_POSITION_Y_STEP		ndBrainFloat (0.125f)
-	#define ND_POSITION_AZIMTH_STEP	ndBrainFloat (2.0f * ndDegreeToRad)
+	#define ND_MIN_X_SPAND			ndReal (-1.5f)
+	#define ND_MAX_X_SPAND			ndReal ( 1.5f)
+	#define ND_MIN_Y_SPAND			ndReal (-2.2f)
+	#define ND_MAX_Y_SPAND			ndReal ( 1.5f)
+									
+	#define ND_POSITION_X_STEP		ndReal (0.125f)
+	#define ND_POSITION_Y_STEP		ndReal (0.125f)
+	#define ND_POSITION_AZIMTH_STEP	ndReal (2.0f * ndDegreeToRad)
 
 	class ndDefinition
 	{
@@ -88,13 +89,13 @@ namespace ndAdvancedRobot
 	static ndDefinition jointsDefinition[] =
 	{
 		{ "base", ndDefinition::m_root, 100.0f, 0.0f, 0.0f},
-		{ "base_rotator", ndDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f, 5.0e4f},
-		{ "arm_0", ndDefinition::m_hinge , 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad, 5.0e4f},
-		{ "arm_1", ndDefinition::m_hinge , 5.0f, -30.0f * ndDegreeToRad, 110.0f * ndDegreeToRad},
+		{ "base_rotator", ndDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f},
+		{ "arm_0", ndDefinition::m_hinge , 5.0f, -120.0f * ndDegreeToRad, 120.0f * ndDegreeToRad},
+		{ "arm_1", ndDefinition::m_hinge , 5.0f, -90.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
 		{ "arm_2", ndDefinition::m_hinge , 5.0f, -1.0e10f, 1.0e10f},
 		{ "arm_3", ndDefinition::m_hinge , 3.0f, -1.0e10f, 1.0e10f},
 		{ "arm_4", ndDefinition::m_hinge , 2.0f, -1.0e10f, 1.0e10f},
-		{ "gripperLeft", ndDefinition::m_slider  , 1.0f, -0.2f, 0.03f},
+		{ "gripperLeft", ndDefinition::m_slider , 1.0f, -0.2f, 0.03f},
 		{ "gripperRight", ndDefinition::m_slider , 1.0f, -0.2f, 0.03f},
 		//{ "effector", ndDefinition::m_effector , 0.0f, 0.0f, 0.0f},
 	};
@@ -332,7 +333,7 @@ namespace ndAdvancedRobot
 			}
 		}
 
-		//#pragma optimize( "", off )
+		#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
 			if (!m_modelAlive)
@@ -395,7 +396,6 @@ namespace ndAdvancedRobot
 			{
 				return 0.0f;
 			}
-
 
 			auto GetAnglePosit = [this](const ndVector& posit)
 			{
@@ -467,19 +467,19 @@ namespace ndAdvancedRobot
 			const ndMatrix rotation(ndPitchMatrix(m_targetLocation.m_pitch * ndDegreeToRad) * ndYawMatrix(m_targetLocation.m_yaw * ndDegreeToRad) * ndRollMatrix(m_targetLocation.m_roll * ndDegreeToRad));
 			ndMatrix targetMatrix(alignMatrix * rotation * alignMatrix.OrthoInverse());
 
-			ndFloat32 x = m_location.m_x;
-			ndFloat32 y = m_location.m_y;
-			ndFloat32 azimuth = m_location.m_azimuth;
+			ndFloat32 deltaX = actions->m_x * ND_POSITION_X_STEP;
+			ndFloat32 deltaY = actions->m_y * ND_POSITION_Y_STEP;
+			ndFloat32 deltaAzimuth = actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
 
-			x += actions->m_x * ND_POSITION_X_STEP;
-			y += actions->m_y * ND_POSITION_Y_STEP;
-			azimuth += actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
+			ndFloat32 x = m_location.m_x + deltaX;
+			ndFloat32 y = m_location.m_y + deltaY;
+			ndFloat32 azimuth = m_location.m_azimuth + deltaAzimuth;
 
-			x = m_targetLocation.m_x;
-			//y = m_targetLocation.m_y;
-			//azimuth = m_targetLocation.m_azimuth;
+			//x = m_targetLocation.m_x;
+			y = m_targetLocation.m_y;
+			azimuth = m_targetLocation.m_azimuth;
 
-			x = ndClamp(x, ndFloat32(0.5f), ndFloat32(0.2 * (ND_MAX_X_SPAND - 0.8f)));
+			x = ndClamp(x, ndFloat32(0.9f * ND_MIN_X_SPAND), ndFloat32(0.9f * ND_MAX_X_SPAND));
 			y = ndClamp(y, ndFloat32(0.9f * ND_MIN_Y_SPAND), ndFloat32(0.9f * ND_MAX_Y_SPAND));
 			azimuth = ndClamp(azimuth, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
 
@@ -545,8 +545,7 @@ namespace ndAdvancedRobot
 			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
 			const ndVector currenPosit(aximuthMatrix.UnrotateVector(posit) - m_effectorOffset);
 			m_location.m_azimuth = azimuth;
-			ndAssert(currenPosit.m_x > -1.0e-1f);
-			m_location.m_x = ndMax (currenPosit.m_x, 0.0f);
+			m_location.m_x = currenPosit.m_x;
 			m_location.m_y = currenPosit.m_y;
 			//ndTrace(("%f %f %f\n", m_location.m_x, m_location.m_y, m_location.m_azimuth));
 		}
@@ -566,13 +565,13 @@ namespace ndAdvancedRobot
 			SetCurrentLocation();
 
 			// prevent setting target outside work robot workspace.
-			m_targetLocation.m_x = 0.5f + ndRand() * (ND_MAX_X_SPAND - 0.8f);
+			m_targetLocation.m_x = 0.9f * (ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
 			m_targetLocation.m_y = 0.9f * (ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
 			m_targetLocation.m_azimuth = (2.0f * ndRand() - 1.0f) * ndPi * 0.9f;
 
-			m_targetLocation.m_x = 1.0f;
-			//m_targetLocation.m_y = 0.0f;
-			//m_targetLocation.m_azimuth = 0.0f;
+			//m_targetLocation.m_x = 1.0f;
+			m_targetLocation.m_y = 0.0f;
+			m_targetLocation.m_azimuth = 0.0f;
 			//ndTrace(("%f\n", m_targetLocation.m_azimuth * ndRadToDegree));
 		}
 
@@ -613,7 +612,6 @@ namespace ndAdvancedRobot
 			ndVector localPosit(x, y, 0.0f, 0.0f);
 			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth));
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
-			//return targetMatrix * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix();
 			return targetMatrix;
 		}
 
@@ -624,7 +622,6 @@ namespace ndAdvancedRobot
 				//return;
 			}
 
-			//return targetMatrix * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix();
 			ndMatrix matrix(CalculateTargetMatrix() * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
 			const ndVector color(1.0f, 0.0f, 0.0f, 1.0f);
 			context.DrawPoint(matrix.m_posit, color, ndFloat32(5.0f));
@@ -699,7 +696,7 @@ namespace ndAdvancedRobot
 			m_scene->Print(color, "Control panel");
 
 			ndInt8 change = 0;
-			change = change | ndInt8(ImGui::SliderFloat("x", &m_robot->m_targetLocation.m_x, 0.0f, ND_MAX_X_SPAND));
+			change = change | ndInt8(ImGui::SliderFloat("x", &m_robot->m_targetLocation.m_x, ND_MIN_X_SPAND, ND_MAX_X_SPAND));
 			change = change | ndInt8 (ImGui::SliderFloat("y", &m_robot->m_targetLocation.m_y, ND_MIN_Y_SPAND, ND_MAX_Y_SPAND));
 			change = change | ndInt8 (ImGui::SliderFloat("azimuth", &m_robot->m_targetLocation.m_azimuth, -ndPi, ndPi));
 			change = change | ndInt8 (ImGui::SliderFloat("gripper", &m_robot->m_targetLocation.m_gripperPosit, -0.2f, 0.4f));
@@ -900,6 +897,12 @@ namespace ndAdvancedRobot
 					ndMatrix location(matrix);
 					location.m_posit.m_x += 10.0f * ndFloat32(j - countX/2);
 					location.m_posit.m_z += 10.0f * ndFloat32(i - countZ/2);
+
+					if ((i == countZ / 2) && (j == countX / 2))
+					{
+						AddBackgroundScene(scene, location);
+					}
+
 					ndModelArticulation* const model = SpawnModel(location);
 					if ((i == countZ/2) && (j == countX/2))
 					{
@@ -908,8 +911,6 @@ namespace ndAdvancedRobot
 
 						RobotModelNotify* const notify = (RobotModelNotify*)*model->GetNotifyCallback();
 						notify->m_showDebug = true;
-
-						AddBackgroundScene(scene, location);
 					}
 					else
 					{
