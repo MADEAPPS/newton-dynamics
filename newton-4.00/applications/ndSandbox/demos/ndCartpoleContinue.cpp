@@ -24,7 +24,7 @@
 namespace ndCarpole_1
 {
 	//#define ND_TRAIN_AGENT
-	#define CONTROLLER_NAME			"cartpoleContinueVPG.dnn"
+	#define CONTROLLER_NAME			"cartpoleContinue-vpg.dnn"
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)

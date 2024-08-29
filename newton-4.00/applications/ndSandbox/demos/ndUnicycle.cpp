@@ -24,7 +24,7 @@
 namespace ndUnicycle
 {
 	//#define ND_TRAIN_AGENT
-	#define CONTROLLER_NAME			"unicycleVPG.dnn"
+	#define CONTROLLER_NAME			"unicycle-vpg.dnn"
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
 	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)

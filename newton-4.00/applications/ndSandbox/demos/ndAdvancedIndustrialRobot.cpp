@@ -106,7 +106,6 @@ namespace ndAdvancedRobot
 				:ndBrainAgentContinuePolicyGradient(brain)
 				,m_robot(nullptr)
 			{
-				ndAssert(0);
 			}
 
 			ndController(const ndController& src)
@@ -194,6 +193,7 @@ namespace ndAdvancedRobot
 			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
 				m_robot->ApplyActions(actions);
+				m_robot->CheckModelStability();
 			}
 
 			void ResetModel()
@@ -226,10 +226,14 @@ namespace ndAdvancedRobot
 			m_controllerTrainer = new ndControllerTrainer(master);
 			m_controllerTrainer->m_robot = this;
 			Init(robot);
+
+			for (ndModelArticulation::ndNode* poseNode = robot->GetRoot()->GetFirstIterator(); poseNode; poseNode = poseNode->GetNextIterator())
+			{
+				m_controllerTrainer->m_basePose.PushBack(poseNode->m_body->GetAsBodyDynamic());
+			}
 		}
 
-		//RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const robot, bool showDebug)
-		RobotModelNotify(const ndSharedPtr<ndBrain>&, ndModelArticulation* const robot, bool showDebug)
+		RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const robot, bool showDebug)
 			:ndModelNotify()
 			,m_invDynamicsSolver()
 			,m_effector()
@@ -245,11 +249,9 @@ namespace ndAdvancedRobot
 			,m_modelAlive(true)
 			,m_showDebug(showDebug)
 		{
-			ndAssert(0);
-			//m_controller = new ndController(brain);
-			//m_controller->m_robot = this;
+			m_controller = new ndController(brain);
+			m_controller->m_robot = this;
 			Init(robot);
-			//m_control->m_animSpeed = ndReal(D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand());
 		}
 
 		RobotModelNotify(const RobotModelNotify& src)
@@ -323,11 +325,6 @@ namespace ndAdvancedRobot
 			//
 			//ndModelArticulation::ndNode* const rightGripperNode = robot->FindByName("gripperRight");
 			//m_jointx.PushBack(*rightGripperNode->m_joint);
-
-			for (ndModelArticulation::ndNode* poseNode = robot->GetRoot()->GetFirstIterator(); poseNode; poseNode = poseNode->GetNextIterator())
-			{
-				m_controllerTrainer->m_basePose.PushBack(poseNode->m_body->GetAsBodyDynamic());
-			}
 		}
 
 		#pragma optimize( "", off )
@@ -486,7 +483,6 @@ namespace ndAdvancedRobot
 			m_invDynamicsSolver.SolverBegin(skeleton, &loops, 1, m_world, m_timestep);
 			m_invDynamicsSolver.Solve();
 			m_invDynamicsSolver.SolverEnd();
-			CheckModelStability();
 		}
 
 		void CheckModelStability()
@@ -579,8 +575,7 @@ namespace ndAdvancedRobot
 			}
 			else
 			{
-				ndAssert(0);
-				//	m_controller->Step();
+				m_controller->Step();
 			}
 		}
 
@@ -817,7 +812,6 @@ namespace ndAdvancedRobot
 
 	void AddBackgroundScene(ndDemoEntityManager* const scene, const ndMatrix& matrix)
 	{
-		//ndMatrix location(matrix * ndYawMatrix(90.0f * ndDegreeToRad));
 		ndMatrix location(matrix);
 		location.m_posit.m_x += 1.5f;
 		location.m_posit.m_z += 1.5f;
@@ -1044,7 +1038,43 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 #ifdef ND_TRAIN_MODEL
 	scene->RegisterPostUpdate(new TrainingUpdata(scene, matrix, modelMesh, floor));
 #else
-	ndAssert(0);
+	ndWorld* const world = scene->GetWorld();
+	ndModelArticulation* const model = CreateModel(scene, *modelMesh, matrix);
+	model->AddToWorld(world);
+
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetRoot()->m_body->GetMatrix(), model->GetRoot()->m_body->GetAsBodyKinematic(), floor));
+	world->AddJoint(fixJoint);
+
+	char fileName[256];
+	ndGetWorkingFileName(CONTROLLER_NAME, fileName);
+	ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
+	model->SetNotifyCallback(new RobotModelNotify(brain, model, true));
+	
+	//ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*referenceModel->GetNotifyCallback()));
+	//scene->Set2DDisplayRenderFunction(quadrupedUI);
+	//
+	//matrix.m_posit.m_z += 1.5f;
+	//
+	//ndInt32 countZ = 5;
+	//ndInt32 countX = 5;
+	//
+	////countZ = 0;
+	////countX = 0;
+	//for (ndInt32 i = 0; i < countZ; ++i)
+	//{
+	//	for (ndInt32 j = 0; j < countX; ++j)
+	//	{
+	//		ndMatrix location(matrix);
+	//		location.m_posit.m_x += 3.0f * ndFloat32(j - countX / 2);
+	//		location.m_posit.m_z += 3.0f * ndFloat32(i - countZ / 2);
+	//		ndModelArticulation* const model = CreateModel(scene, location);
+	//		model->SetNotifyCallback(new RobotModelNotify(brain, model, false));
+	//		model->AddToWorld(world);
+	//		//m_models.Append(model);
+	//		//SetMaterial(model);
+	//	}
+	//}
+
 #endif
 	
 	matrix.m_posit.m_x -= 6.0f;

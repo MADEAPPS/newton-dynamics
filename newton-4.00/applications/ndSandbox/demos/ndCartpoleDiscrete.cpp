@@ -24,8 +24,8 @@
 namespace ndCarpole_0
 {
 	//#define ND_TRAIN_AGENT
-	#define CONTROLLER_NAME		"cartpoleDiscreteVPG.dnn"
-	//#define CRITIC_NAME		"cartpoleDiscreteCriticVPG.dnn"
+	#define CONTROLLER_NAME		"cartpoleDiscrete-vpg.dnn"
+	//#define CRITIC_NAME		"cartpoleDiscreteCritic-vpg.dnn"
 
 	#define D_PUSH_ACCEL		ndFloat32 (15.0f)
 	#define D_REWARD_MIN_ANGLE	ndFloat32 (20.0f * ndDegreeToRad)
