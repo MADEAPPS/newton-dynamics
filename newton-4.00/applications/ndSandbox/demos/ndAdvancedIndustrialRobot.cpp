@@ -382,7 +382,7 @@ namespace ndAdvancedRobot
 			return false;
 		}
 
-		//#pragma optimize( "", off )
+		#pragma optimize( "", off )
 		ndReal GetReward() const
 		{
 			if (IsTerminal())
@@ -413,21 +413,12 @@ namespace ndAdvancedRobot
 			const ndMatrix targetMatrix(CalculateTargetMatrix());
 			const ndMatrix effectorMatrix(m_effector->GetLocalMatrix0() * m_effector->GetBody0()->GetMatrix());
 
-			//ndVector error(effectorMatrix.m_posit - targetMatrix.m_posit);
-			//ndFloat32 errorMag2 = error.DotProduct(error).GetScalar();
-			//ndFloat32 reward = ndExp(-5.0f * errorMag2);
-			//return reward;
-
 			const ndVector targetPosit(GetAnglePosit(targetMatrix.m_posit));
 			const ndVector effectPosit(GetAnglePosit(effectorMatrix.m_posit));
 
 			const ndVector error(targetPosit - effectPosit);
 			ndFloat32 angleErr(ndAnglesSub(targetPosit.m_z, effectPosit.m_z));
-			//if (ndAbs(angleErr) > 0.3)
-			//{
-			//	angleErr *= 1;
-			//}
-			ndFloat32 positError2 = error.m_x * error.m_x + error.m_y * error.m_y + angleErr * angleErr;
+			ndFloat32 positError2 = error.m_x * error.m_x + error.m_y * error.m_y;
 		
 			ndFloat32 positReward = ndExp(-5.0f * positError2);
 			ndFloat32 azimuthReward = ndExp(-10.0f * angleErr * angleErr);
