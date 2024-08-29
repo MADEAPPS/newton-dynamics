@@ -63,8 +63,8 @@ namespace ndAdvancedRobot
 	#define ND_MIN_Y_SPAND			ndReal (-2.2f)
 	#define ND_MAX_Y_SPAND			ndReal ( 1.5f)
 									
-	#define ND_POSITION_X_STEP		ndReal (0.125f)
-	#define ND_POSITION_Y_STEP		ndReal (0.125f)
+	#define ND_POSITION_X_STEP		ndReal (0.25f)
+	#define ND_POSITION_Y_STEP		ndReal (0.25f)
 	#define ND_POSITION_AZIMTH_STEP	ndReal (2.0f * ndDegreeToRad)
 
 	class ndDefinition
