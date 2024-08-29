@@ -478,7 +478,7 @@ namespace ndAdvancedRobot
 			y += actions->m_y * ND_POSITION_Y_STEP;
 			azimuth += actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
 
-			x = ndClamp(x, ndFloat32(0.02f), ndFloat32(0.2 * (ND_MAX_X_SPAND - 0.4f)));
+			x = ndClamp(x, ndFloat32(0.5f), ndFloat32(0.2 * (ND_MAX_X_SPAND - 0.8f)));
 			y = ndClamp(y, ndFloat32(0.9f * ND_MIN_Y_SPAND), ndFloat32(0.9f * ND_MAX_Y_SPAND));
 			azimuth = ndClamp(azimuth, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
 
@@ -565,7 +565,7 @@ namespace ndAdvancedRobot
 			SetCurrentLocation();
 
 			// prevent setting target outside work robot workspace.
-			m_targetLocation.m_x = 0.2f + ndRand() * (ND_MAX_X_SPAND - 0.4f);
+			m_targetLocation.m_x = 0.5f + ndRand() * (ND_MAX_X_SPAND - 0.8f);
 			m_targetLocation.m_y = 0.9f * (ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
 			m_targetLocation.m_azimuth = (ndRand() - 0.5f) * ndPi * 0.9f;
 		}
