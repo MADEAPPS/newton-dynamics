@@ -1050,31 +1050,29 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
 	model->SetNotifyCallback(new RobotModelNotify(brain, model, true));
 	
-	//ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*referenceModel->GetNotifyCallback()));
-	//scene->Set2DDisplayRenderFunction(quadrupedUI);
-	//
-	//matrix.m_posit.m_z += 1.5f;
-	//
-	//ndInt32 countZ = 5;
-	//ndInt32 countX = 5;
-	//
-	////countZ = 0;
-	////countX = 0;
-	//for (ndInt32 i = 0; i < countZ; ++i)
-	//{
-	//	for (ndInt32 j = 0; j < countX; ++j)
-	//	{
-	//		ndMatrix location(matrix);
-	//		location.m_posit.m_x += 3.0f * ndFloat32(j - countX / 2);
-	//		location.m_posit.m_z += 3.0f * ndFloat32(i - countZ / 2);
-	//		ndModelArticulation* const model = CreateModel(scene, location);
-	//		model->SetNotifyCallback(new RobotModelNotify(brain, model, false));
-	//		model->AddToWorld(world);
-	//		//m_models.Append(model);
-	//		//SetMaterial(model);
-	//	}
-	//}
+	ndSharedPtr<ndUIEntity> robotUI(new ndRobotUI(scene, (RobotModelNotify*)*model->GetNotifyCallback()));
+	scene->Set2DDisplayRenderFunction(robotUI);
 
+	matrix.m_posit.m_z += 1.5f;
+	ndInt32 countZ = 5;
+	ndInt32 countX = 5;
+	
+	//countZ = 0;
+	//countX = 0;
+	for (ndInt32 i = 0; i < countZ; ++i)
+	{
+		for (ndInt32 j = 0; j < countX; ++j)
+		{
+			//ndMatrix location(matrix);
+			//location.m_posit.m_x += 3.0f * ndFloat32(j - countX / 2);
+			//location.m_posit.m_z += 3.0f * ndFloat32(i - countZ / 2);
+			//ndModelArticulation* const model = CreateModel(scene, location);
+			//model->SetNotifyCallback(new RobotModelNotify(brain, model, false));
+			//model->AddToWorld(world);
+			////m_models.Append(model);
+			////SetMaterial(model);
+		}
+	}
 #endif
 	
 	matrix.m_posit.m_x -= 6.0f;
