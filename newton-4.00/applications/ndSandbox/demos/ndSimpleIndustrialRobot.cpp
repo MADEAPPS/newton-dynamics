@@ -108,26 +108,6 @@ namespace ndSimpleRobot
 			m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
 		}
 
-		//void ApplyActions(ndBrainFloat* const actions)
-		void ApplyActions()
-		{
-			// apply target position collected by control panel
-			ndMatrix targetMatrix(
-				ndRollMatrix(90.0f * ndDegreeToRad) *
-				ndPitchMatrix(m_pitch * ndDegreeToRad) *
-				ndYawMatrix(m_yaw * ndDegreeToRad) *
-				ndRollMatrix(m_roll * ndDegreeToRad) *
-				ndRollMatrix(-90.0f * ndDegreeToRad));
-
-			ndVector localPosit(m_x, m_y, 0.0f, 0.0f);
-			const ndMatrix aximuthMatrix(ndYawMatrix(m_azimuth * ndDegreeToRad));
-			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
-
-			m_effector->SetOffsetMatrix(targetMatrix);
-			m_leftGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
-			m_rightGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
-		}
-
 		void ResetModel()
 		{
 			ndTrace(("Reset Model\n"));
@@ -137,11 +117,40 @@ namespace ndSimpleRobot
 		{
 			m_world = world;
 			m_timestep = timestep;
-			ApplyActions();
+
+			m_leftGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
+			m_rightGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
+
+			// apply target position collected by control panel
+			ndMatrix targetMatrix(
+				ndRollMatrix(90.0f * ndDegreeToRad) *
+				ndPitchMatrix(m_pitch * ndDegreeToRad) *
+				ndYawMatrix(m_yaw * ndDegreeToRad) *
+				ndRollMatrix(m_roll * ndDegreeToRad) *
+				ndRollMatrix(-90.0f * ndDegreeToRad));
+
+			ndVector localPosit(m_x, m_y, 0.0f, 0.0f);
+			const ndMatrix aximuthMatrix(ndYawMatrix(m_azimuth));
+			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
+			m_effector->SetOffsetMatrix(targetMatrix);
+
+			//xxxx0 = m_effector->GetEffectorMatrix();
 		}
 
 		void PostUpdate(ndWorld* const, ndFloat32)
 		{
+			//xxxx1 = m_effector->GetEffectorMatrix();
+			//
+			//ndFloat32 azimuth = 0.0f;
+			//const ndVector posit(xxxx1.m_posit);
+			//if ((posit.m_x * posit.m_x + posit.m_z * posit.m_z) > 1.0e-3f)
+			//{
+			//	azimuth = ndAtan2(-posit.m_z, posit.m_x);
+			//}
+			//const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
+			//const ndVector currenPosit(aximuthMatrix.UnrotateVector(posit) - m_effectorOffset);
+			//ndAssert(currenPosit.m_x >= -1.0e-2f);
+			//const ndVector currenPosit1(aximuthMatrix.UnrotateVector(posit) - m_effectorOffset);
 		}
 
 		void PostTransformUpdate(ndWorld* const, ndFloat32)
@@ -255,6 +264,8 @@ namespace ndSimpleRobot
 			//}
 		}
 
+		ndMatrix xxxx0;
+		ndMatrix xxxx1;
 		ndVector m_effectorOffset;
 		ndBodyDynamic* m_rootBody;
 		ndJointSlider* m_leftGripper;
@@ -300,7 +311,7 @@ namespace ndSimpleRobot
 			ndInt8 change = 0;
 			change = change | ndInt8(ImGui::SliderFloat("x", &m_robot->m_x, 0.0f, 5.0f));
 			change = change | ndInt8(ImGui::SliderFloat("y", &m_robot->m_y, -2.5f, 2.0f));
-			change = change | ndInt8(ImGui::SliderFloat("azimuth", &m_robot->m_azimuth, -180.0f, 180.0f));
+			change = change | ndInt8(ImGui::SliderFloat("azimuth", &m_robot->m_azimuth, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("gripper", &m_robot->m_gripperPosit, -0.2f, 0.4f));
 			change = change | ndInt8(ImGui::SliderFloat("pitch", &m_robot->m_pitch, -180.0f, 180.0f));
 			change = change | ndInt8(ImGui::SliderFloat("yaw", &m_robot->m_yaw, -180.0f, 180.0f));
