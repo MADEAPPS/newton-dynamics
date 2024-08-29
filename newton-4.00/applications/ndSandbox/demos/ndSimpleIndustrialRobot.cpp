@@ -264,8 +264,8 @@ namespace ndSimpleRobot
 			//}
 		}
 
-		ndMatrix xxxx0;
-		ndMatrix xxxx1;
+		//ndMatrix xxxx0;
+		//ndMatrix xxxx1;
 		ndVector m_effectorOffset;
 		ndBodyDynamic* m_rootBody;
 		ndJointSlider* m_leftGripper;

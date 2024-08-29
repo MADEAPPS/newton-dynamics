@@ -382,7 +382,7 @@ namespace ndAdvancedRobot
 			return false;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		ndReal GetReward() const
 		{
 			if (IsTerminal())
@@ -607,7 +607,8 @@ namespace ndAdvancedRobot
 			ndVector localPosit(x, y, 0.0f, 0.0f);
 			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth));
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
-			return targetMatrix * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix();
+			//return targetMatrix * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix();
+			return targetMatrix;
 		}
 
 		void Debug(ndConstraintDebugCallback& context) const
@@ -617,7 +618,8 @@ namespace ndAdvancedRobot
 				//return;
 			}
 
-			ndMatrix matrix(CalculateTargetMatrix());
+			//return targetMatrix * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix();
+			ndMatrix matrix(CalculateTargetMatrix() * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
 			const ndVector color(1.0f, 0.0f, 0.0f, 1.0f);
 			context.DrawPoint(matrix.m_posit, color, ndFloat32(5.0f));
 		}
