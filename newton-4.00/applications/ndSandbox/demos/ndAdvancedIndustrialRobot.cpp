@@ -44,15 +44,12 @@ namespace ndAdvancedRobot
 	class ndObservationVector
 	{
 		public:
-		ndBrainFloat m_jointPosit[8];
-		ndBrainFloat m_jointVeloc[8];
+		ndBrainFloat m_jointPosit[6];
+		ndBrainFloat m_jointVeloc[6];
 
 		ndBrainFloat m_effectorPosit_x;
 		ndBrainFloat m_effectorPosit_y;
 		ndBrainFloat m_effectorAzimuth;
-		//ndBrainFloat m_effectorTargetPosit_x;
-		//ndBrainFloat m_effectorTargetPosit_y;
-		//ndBrainFloat m_effectorTargetAzimuth;
 	};
 
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
@@ -317,15 +314,15 @@ namespace ndAdvancedRobot
 			ndAssert(node);
 			while (node->GetParent())
 			{
-				m_jointx.PushBack(*node->m_joint);
+				m_armJoints.PushBack(*node->m_joint);
 				node = node->GetParent();
 			};
 
-			ndModelArticulation::ndNode* const leftGripperNode = robot->FindByName("gripperLeft");
-			m_jointx.PushBack(*leftGripperNode->m_joint);
-
-			ndModelArticulation::ndNode* const rightGripperNode = robot->FindByName("gripperRight");
-			m_jointx.PushBack(*rightGripperNode->m_joint);
+			//ndModelArticulation::ndNode* const leftGripperNode = robot->FindByName("gripperLeft");
+			//m_jointx.PushBack(*leftGripperNode->m_joint);
+			//
+			//ndModelArticulation::ndNode* const rightGripperNode = robot->FindByName("gripperRight");
+			//m_jointx.PushBack(*rightGripperNode->m_joint);
 
 			for (ndModelArticulation::ndNode* poseNode = robot->GetRoot()->GetFirstIterator(); poseNode; poseNode = poseNode->GetNextIterator())
 			{
@@ -431,22 +428,15 @@ namespace ndAdvancedRobot
 		{
 			//ndMemSet(inputObservations, 1.0f, ND_AGENT_INPUT_SIZE);
 			ndObservationVector* const observation = (ndObservationVector*)inputObservations;
-			for (ndInt32 i = m_jointx.GetCount() - 1; i >= 0; --i)
+			for (ndInt32 i = m_armJoints.GetCount() - 1; i >= 0; --i)
 			{ 
-				const ndJointBilateralConstraint* const joint = m_jointx[i];
+				const ndJointBilateralConstraint* const joint = m_armJoints[i];
 			
 				ndJointBilateralConstraint::ndKinematicState kinematicState;
 				joint->GetKinematicState(&kinematicState);
 				observation->m_jointPosit[i] = ndBrainFloat(kinematicState.m_posit);
 				observation->m_jointVeloc[i] = ndBrainFloat(kinematicState.m_velocity);
 			}
-
-			//observation->m_effectorPosit_x = ndBrainFloat(m_location.m_x);
-			//observation->m_effectorPosit_y = ndBrainFloat(m_location.m_y);
-			//observation->m_effectorAzimuth = ndBrainFloat(m_location.m_azimuth);
-			//observation->m_effectorTargetPosit_x = ndBrainFloat(m_targetLocation.m_x);
-			//observation->m_effectorTargetPosit_y = ndBrainFloat(m_targetLocation.m_y);
-			//observation->m_effectorTargetAzimuth = ndBrainFloat(m_targetLocation.m_azimuth);
 
 			observation->m_effectorPosit_x = ndBrainFloat(m_targetLocation.m_x - m_location.m_x);
 			observation->m_effectorPosit_y = ndBrainFloat(m_targetLocation.m_y - m_location.m_y);
@@ -641,7 +631,7 @@ namespace ndAdvancedRobot
 		ndController* m_controller;
 		ndControllerTrainer* m_controllerTrainer;
 		ndWorld* m_world;
-		ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointx;
+		ndFixSizeArray<ndJointBilateralConstraint*, 16> m_armJoints;
 
 		class EffectorLocation
 		{
