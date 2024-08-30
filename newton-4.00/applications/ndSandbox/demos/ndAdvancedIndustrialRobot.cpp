@@ -418,7 +418,7 @@ namespace ndAdvancedRobot
 			const ndVector effectPosit(GetAnglePosit(effectorMatrix.m_posit));
 
 			const ndVector error(targetPosit - effectPosit);
-			ndFloat32 angleErr(ndAnglesSub(targetPosit.m_z, effectPosit.m_z));
+			ndFloat32 azimuthErr(ndAnglesSub(targetPosit.m_z, effectPosit.m_z));
 			ndFloat32 positError2 = error.m_x * error.m_x + error.m_y * error.m_y;
 		
 			ndQuaternion q1(effectorMatrix);
@@ -427,11 +427,11 @@ namespace ndAdvancedRobot
 			{
 				q1 = q1.Scale(-1.0f);
 			}
-			ndFloat32 mag2 = 1.0f - q1.DotProduct(q0).GetScalar();
+			ndFloat32 rotError2 = 1.0f - q1.DotProduct(q0).GetScalar();
 
-			ndFloat32 rotationReward = ndExp(-100.0f * mag2);
+			ndFloat32 rotationReward = ndExp(-100.0f * rotError2);
 			ndFloat32 positReward = ndExp(-100.0f * positError2);
-			ndFloat32 azimuthReward = ndExp(-100.0f * angleErr * angleErr);
+			ndFloat32 azimuthReward = ndExp(-100.0f * azimuthErr * azimuthErr);
 			return rotationReward * 0.3f + azimuthReward * 0.3f + positReward * 0.4f;
 		}
 
