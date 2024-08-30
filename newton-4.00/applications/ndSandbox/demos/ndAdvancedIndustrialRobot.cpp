@@ -728,6 +728,30 @@ namespace ndAdvancedRobot
 		return body->GetAsBodyDynamic();
 	}
 
+	void NormalizeInertia(ndModelArticulation* const model)
+	{
+		for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+		{
+			ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+
+			ndVector inertia(body->GetMassMatrix());
+			ndFloat32 maxInertia = ndMax(ndMax(inertia.m_x, inertia.m_y), inertia.m_z);
+			ndFloat32 minInertia = ndMin(ndMin(inertia.m_x, inertia.m_y), inertia.m_z);
+			if (minInertia < maxInertia * 0.125f)
+			{
+				minInertia = maxInertia * 0.125f;
+				for (ndInt32 j = 0; j < 3; ++j)
+				{
+					if (inertia[j] < minInertia)
+					{
+						inertia[j] = minInertia;
+					}
+				}
+			}
+			body->SetMassMatrix(inertia);
+		}
+	}
+
 	void NormalizeMassRatios(ndModelArticulation* const model)
 	{
 		ndFloat32 totalVolume = 0.0f;
@@ -857,7 +881,7 @@ namespace ndAdvancedRobot
 			}
 		}
 
-		NormalizeMassRatios(model);
+		NormalizeInertia(model);
 		return model;
 	}
 
