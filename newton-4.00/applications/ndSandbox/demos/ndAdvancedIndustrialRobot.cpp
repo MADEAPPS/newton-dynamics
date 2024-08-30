@@ -421,8 +421,8 @@ namespace ndAdvancedRobot
 			ndFloat32 angleErr(ndAnglesSub(targetPosit.m_z, effectPosit.m_z));
 			ndFloat32 positError2 = error.m_x * error.m_x + error.m_y * error.m_y;
 		
+			ndQuaternion q1(effectorMatrix);
 			const ndQuaternion q0(targetMatrix);
-			ndQuaternion q1(targetMatrix);
 			if (q1.DotProduct(q0).GetScalar() < 0.0f)
 			{
 				q1 = q1.Scale(-1.0f);
@@ -569,6 +569,7 @@ namespace ndAdvancedRobot
 			//ndTrace(("%f %f %f\n", m_location.m_x, m_location.m_y, m_location.m_azimuth));
 		}
 
+		#pragma optimize( "", off )
 		void ResetModel()
 		{
 			m_modelAlive = true;
@@ -955,8 +956,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 10;
 			ndInt32 countZ = 10;
-			//countX = 1;
-			//countZ = 1;
+			countX = 1;
+			countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
