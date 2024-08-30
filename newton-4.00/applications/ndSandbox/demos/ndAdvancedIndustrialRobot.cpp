@@ -485,7 +485,8 @@ namespace ndAdvancedRobot
 			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
 
 			ndVector euler1;
-			ndVector euler (m_targetLocation.m_rotation.GetEulerAngles(euler1));
+			//ndVector euler (m_targetLocation.m_rotation.GetEulerAngles(euler1));
+			ndVector euler(m_location.m_rotation.GetEulerAngles(euler1));
 
 			ndFloat32 deltaYaw = actions->m_yaw * ND_YAW_STEP;
 			ndFloat32 deltaRoll = actions->m_roll * ND_ROLL_STEP;
