@@ -167,111 +167,27 @@ namespace ndSimpleRobot
 		{
 		}
 
-		//void Debug(ndConstraintDebugCallback& context) const
-		void Debug(ndConstraintDebugCallback&) const
+		ndMatrix CalculateTargetMatrix() const
 		{
-			//ndTrace(("xxxxx\n"));
-			//if (!m_showDebug)
-			//{
-			//	return;
-			//}
-			//
-			//ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
-			//
-			//ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
-			//
-			//ndFloat32 totalMass = ndFloat32(0.0f);
-			//ndVector centerOfMass(ndVector::m_zero);
-			//for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			//{
-			//	const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-			//	const ndMatrix matrix(body->GetMatrix());
-			//	ndFloat32 mass = body->GetMassMatrix().m_w;
-			//	totalMass += mass;
-			//	centerOfMass += matrix.TransformVector(body->GetCentreOfMass()).Scale(mass);
-			//	bodies.PushBack(body);
-			//}
-			//ndFloat32 invMass = 1.0f / totalMass;
-			//centerOfMass = centerOfMass.Scale(invMass);
-			//
-			//ndVector comLineOfAction(centerOfMass);
-			//comLineOfAction.m_y -= ndFloat32(0.5f);
-			//context.DrawLine(centerOfMass, comLineOfAction, ndVector::m_zero);
-			//
-			//ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
-			//const ndVector upVector(rootBody->GetMatrix().m_up);
-			//ndFixSizeArray<ndBigVector, 16> supportPoint;
-			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
-			//{
-			//	const ndAnimKeyframe& keyFrame = m_animPose[i];
-			//	ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-			//	ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-			//	if (i == 0)
-			//	{
-			//		effector->DebugJoint(context);
-			//	}
-			//
-			//	if (keyFrame.m_userParamFloat < 1.0f)
-			//	{
-			//		ndBodyKinematic* const body = effector->GetBody0();
-			//		supportPoint.PushBack(body->GetMatrix().TransformVector(effector->GetLocalMatrix0().m_posit));
-			//	}
-			//}
-			//
-			//ndVector supportColor(0.0f, 1.0f, 1.0f, 1.0f);
-			//if (supportPoint.GetCount() >= 3)
-			//{
-			//	ScaleSupportShape(supportPoint);
-			//	ndFixSizeArray<ndVector, 16> desiredSupportPoint;
-			//	for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
-			//	{
-			//		desiredSupportPoint.PushBack(supportPoint[i]);
-			//	}
-			//
-			//	ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
-			//	rotation.TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
-			//	ndInt32 supportCount = ndConvexHull2d(&desiredSupportPoint[0], desiredSupportPoint.GetCount());
-			//	rotation.OrthoInverse().TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
-			//	ndVector p0(desiredSupportPoint[supportCount - 1]);
-			//	ndBigVector bigPolygon[16];
-			//	for (ndInt32 i = 0; i < supportCount; ++i)
-			//	{
-			//		bigPolygon[i] = desiredSupportPoint[i];
-			//		context.DrawLine(desiredSupportPoint[i], p0, supportColor);
-			//		p0 = desiredSupportPoint[i];
-			//	}
-			//
-			//	ndBigVector p0Out;
-			//	ndBigVector p1Out;
-			//	ndBigVector ray_p0(centerOfMass);
-			//	ndBigVector ray_p1(comLineOfAction);
-			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-			//
-			//	const ndVector centerOfPresure(p0Out);
-			//	context.DrawPoint(centerOfPresure, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 5);
-			//
-			//	ndVector zmp(CalculateZeroMomentPoint());
-			//	ray_p0 = zmp;
-			//	ray_p1 = zmp;
-			//	ray_p1.m_y -= ndFloat32(0.5f);
-			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-			//	const ndVector zmpSupport(p0Out);
-			//	context.DrawPoint(zmpSupport, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
-			//}
-			//else if (supportPoint.GetCount() == 2)
-			//{
-			//	ndTrace(("xxxxxxxxxx\n"));
-			//	context.DrawLine(supportPoint[0], supportPoint[1], supportColor);
-			//	//ndBigVector p0Out;
-			//	//ndBigVector p1Out;
-			//	//ndBigVector ray_p0(comMatrix.m_posit);
-			//	//ndBigVector ray_p1(comMatrix.m_posit);
-			//	//ray_p1.m_y -= 1.0f;
-			//	//
-			//	//ndRayToRayDistance(ray_p0, ray_p1, contactPoints[0], contactPoints[1], p0Out, p1Out);
-			//	//context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
-			//	//context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
-			//}
+			ndMatrix targetMatrix(
+				ndRollMatrix(90.0f * ndDegreeToRad) *
+				ndPitchMatrix(m_pitch) * ndYawMatrix(m_yaw) * ndRollMatrix(m_roll) *
+				ndRollMatrix(-90.0f * ndDegreeToRad));
+			ndFloat32 x = m_x;
+			ndFloat32 y = m_y;
+			ndVector localPosit(x, y, 0.0f, 0.0f);
+			const ndMatrix aximuthMatrix(ndYawMatrix(m_azimuth));
+			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
+			return targetMatrix;
+		}
+
+		void Debug(ndConstraintDebugCallback& context) const
+		{
+			ndMatrix matrix(CalculateTargetMatrix() * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
+			const ndVector color(1.0f, 0.0f, 0.0f, 1.0f);
+
+			context.DrawFrame(matrix);
+			context.DrawPoint(matrix.m_posit, color, ndFloat32(5.0f));
 		}
 
 		//ndMatrix xxxx0;
@@ -326,7 +242,14 @@ namespace ndSimpleRobot
 			change = change | ndInt8(ImGui::SliderFloat("yaw", &m_robot->m_yaw, -ndPi * 0.5f, ndPi * 0.5f));
 			change = change | ndInt8(ImGui::SliderFloat("roll", &m_robot->m_roll, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("gripper", &m_robot->m_gripperPosit, -0.2f, 0.4f));
-
+			bool newTarget = ndInt8(ImGui::Button("random target"));
+			if (newTarget)
+			{
+				change = 1;
+				m_robot->m_x = ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND);
+				m_robot->m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
+				m_robot->m_azimuth = (2.0f * ndRand() - 1.0f) * ndPi;
+			}
 			if (change)
 			{
 				m_robot->GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic()->SetSleepState(false);

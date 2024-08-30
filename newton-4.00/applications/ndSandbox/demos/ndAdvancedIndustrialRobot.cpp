@@ -702,6 +702,15 @@ namespace ndAdvancedRobot
 			change = change | ndInt8 (ImGui::SliderFloat("roll", &m_robot->m_targetLocation.m_roll, -ndPi, ndPi));
 			change = change | ndInt8 (ImGui::SliderFloat("gripper", &m_robot->m_targetLocation.m_gripperPosit, -0.2f, 0.4f));
 
+			bool newTarget = ndInt8(ImGui::Button("random target"));
+			if (newTarget)
+			{
+				change = 1;
+				m_robot->m_targetLocation.m_x = ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND);
+				m_robot->m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
+				m_robot->m_targetLocation.m_azimuth = (2.0f * ndRand() - 1.0f) * ndPi;
+			}
+
 			if (change)
 			{
 				m_robot->GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic()->SetSleepState(false);
@@ -881,7 +890,8 @@ namespace ndAdvancedRobot
 			}
 		}
 
-		NormalizeInertia(model);
+		//NormalizeInertia(model);
+		NormalizeMassRatios(model);
 		return model;
 	}
 
