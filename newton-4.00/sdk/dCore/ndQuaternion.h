@@ -46,9 +46,9 @@ class ndQuaternion: public ndVector
 
 	D_CORE_API ndQuaternion operator* (const ndQuaternion &B) const;
 
+	D_CORE_API ndVector GetEulerAngles(ndVector& euler) const;
 	D_CORE_API ndVector RotateVector(const ndVector& point) const;
 	D_CORE_API ndVector UnrotateVector(const ndVector& point) const;
-	D_CORE_API void GetEulerAngles(ndVector& euler1, ndVector& euler2) const;
 	D_CORE_API ndQuaternion Slerp(const ndQuaternion &q1, ndFloat32 t) const;
 	D_CORE_API ndVector CalcAverageOmega(const ndQuaternion &q1, ndFloat32 invdt) const;
 };

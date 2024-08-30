@@ -254,6 +254,8 @@ namespace ndSimpleRobot
 			{
 				m_robot->GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic()->SetSleepState(false);
 			}
+
+			//m_robot->m_yaw = 45.0f * ndDegreeToRad;
 		}
 	
 		RobotModelNotify* m_robot;
