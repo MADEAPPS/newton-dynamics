@@ -1123,6 +1123,9 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 #ifdef ND_TRAIN_MODEL
 	scene->RegisterPostUpdate(new TrainingUpdata(scene, matrix, modelMesh, floor));
 #else
+
+	AddBackgroundScene(scene, matrix);
+
 	ndWorld* const world = scene->GetWorld();
 	ndModelArticulation* const model = CreateModel(scene, *modelMesh, matrix);
 	model->AddToWorld(world);
