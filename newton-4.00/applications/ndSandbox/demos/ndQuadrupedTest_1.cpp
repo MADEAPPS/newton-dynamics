@@ -159,18 +159,8 @@ namespace ndQuadruped_1
 		urdf.Export(fileName, *model);
 	}
 
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	void NormalizeMassRatios(ndModelArticulation* const model)
 	{
-		ndUrdfFile urdf;
-		char fileName[256];
-		ndGetWorkingFileName("quadSpider.urdf", fileName);
-		ndModelArticulation* const model = urdf.Import(fileName);
-
-		SetModelVisualMesh(scene, model);
-		ndMatrix matrix(model->GetRoot()->m_body->GetMatrix() * location);
-		matrix.m_posit = location.m_posit;
-		model->SetTransform(matrix);
-
 		ndFloat32 totalVolume = 0.0f;
 		ndFixSizeArray<ndBodyKinematic*, 256> bodyArray;
 		for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
@@ -209,7 +199,21 @@ namespace ndQuadruped_1
 			}
 			body->SetMassMatrix(inertia);
 		}
+	}
 
+	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	{
+		ndUrdfFile urdf;
+		char fileName[256];
+		ndGetWorkingFileName("quadSpider.urdf", fileName);
+		ndModelArticulation* const model = urdf.Import(fileName);
+
+		SetModelVisualMesh(scene, model);
+		ndMatrix matrix(model->GetRoot()->m_body->GetMatrix() * location);
+		matrix.m_posit = location.m_posit;
+		model->SetTransform(matrix);
+
+		NormalizeMassRatios(model);
 		return model;
 	}
 

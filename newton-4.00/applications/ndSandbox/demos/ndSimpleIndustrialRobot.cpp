@@ -353,6 +353,47 @@ namespace ndSimpleRobot
 		return body->GetAsBodyDynamic();
 	}
 
+	void NormalizeMassRatios(ndModelArticulation* const model)
+	{
+		ndFloat32 totalVolume = 0.0f;
+		ndFixSizeArray<ndBodyKinematic*, 256> bodyArray;
+
+		ndFloat32 totalMass = 0.0f;
+		for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+		{
+			ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+			ndFloat32 volume = body->GetCollisionShape().GetVolume();
+			totalMass += body->GetMassMatrix().m_w;
+			totalVolume += volume;
+			bodyArray.PushBack(body);
+		}
+
+		ndFloat32 density = totalMass / totalVolume;
+		for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
+		{
+			ndBodyKinematic* const body = bodyArray[i];
+			ndFloat32 volume = body->GetCollisionShape().GetVolume();
+			ndFloat32 mass = density * volume;
+
+			body->SetMassMatrix(mass, body->GetCollisionShape());
+			ndVector inertia(body->GetMassMatrix());
+			ndFloat32 maxInertia = ndMax(ndMax(inertia.m_x, inertia.m_y), inertia.m_z);
+			ndFloat32 minInertia = ndMin(ndMin(inertia.m_x, inertia.m_y), inertia.m_z);
+			if (minInertia < maxInertia * 0.125f)
+			{
+				minInertia = maxInertia * 0.125f;
+				for (ndInt32 j = 0; j < 3; ++j)
+				{
+					if (inertia[j] < minInertia)
+					{
+						inertia[j] = minInertia;
+					}
+				}
+			}
+			body->SetMassMatrix(inertia);
+		}
+	}
+
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, ndDemoEntity* const modelMesh, const ndMatrix& location)
 	{
 		// make a clone of the mesh and add it to the scene
@@ -466,7 +507,7 @@ namespace ndSimpleRobot
 				parentBones.PushBack(parentBone);
 			}
 		}
-
+		NormalizeMassRatios(model);
 		return model;
 	}
 
