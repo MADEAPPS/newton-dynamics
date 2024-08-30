@@ -421,9 +421,9 @@ namespace ndAdvancedRobot
 			ndFloat32 angleErr(ndAnglesSub(targetPosit.m_z, effectPosit.m_z));
 			ndFloat32 positError2 = error.m_x * error.m_x + error.m_y * error.m_y;
 		
-			ndFloat32 positReward = ndExp(-50.0f * positError2);
-			ndFloat32 azimuthReward = ndExp(-50.0f * angleErr * angleErr);
-			return azimuthReward * 0.5f + positReward * 0.5f;
+			ndFloat32 positReward = ndExp(-100.0f * positError2);
+			ndFloat32 azimuthReward = ndExp(-100.0f * angleErr * angleErr);
+			return azimuthReward * 0.4f + positReward * 0.6f;
 		}
 
 		#pragma optimize( "", off )
