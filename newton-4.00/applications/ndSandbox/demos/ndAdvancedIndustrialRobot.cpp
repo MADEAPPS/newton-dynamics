@@ -593,6 +593,10 @@ namespace ndAdvancedRobot
 			m_targetLocation.m_y = ndClamp(m_targetLocation.m_y, ndReal(ND_MIN_Y_SPAND + 0.05f), ndReal(ND_MAX_Y_SPAND - 0.05f));
 			m_targetLocation.m_azimuth = ndClamp(m_targetLocation.m_azimuth, ndReal(-ndPi + 0.09f), ndReal(ndPi - 0.09f));
 
+			m_targetLocation.m_x = 0.0f;
+			m_targetLocation.m_y = 0.0f;
+			m_targetLocation.m_azimuth = 0.0f;
+
 			ndFloat32 roll = (2.0f * ndRand() - 1.0f) * ndPi;
 			ndFloat32 pitch = (2.0f * ndRand() - 1.0f) * ndPi;
 			ndFloat32 yaw = (2.0f * ndRand() - 1.0f) * ndPi * 0.5f;
@@ -601,16 +605,11 @@ namespace ndAdvancedRobot
 			roll = ndClamp(roll, ndReal(-ndPi + 0.09f), ndReal(ndPi - 0.09f));
 			pitch = ndClamp(pitch, ndReal(-ndPi + 0.09f), ndReal(ndPi - 0.09f));
 
-			//yaw = 45.0f * ndDegreeToRad;
-			//roll = 0.0f;
-			//pitch = 0.0f;
+			yaw = 45.0f * ndDegreeToRad;
+			roll = 0.0f;
+			pitch = 0.0f;
 			const ndQuaternion quat(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
 			m_targetLocation.m_rotation = quat;
-
-			//m_targetLocation.m_x = 0.0f;
-			//m_targetLocation.m_y = 0.0f;
-			//m_targetLocation.m_azimuth = 0.0f;
-			//ndTrace(("%f\n", m_targetLocation.m_azimuth * ndRadToDegree));
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -956,8 +955,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 10;
 			ndInt32 countZ = 10;
-			//countX = 1;
-			//countZ = 1;
+			countX = 1;
+			countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
