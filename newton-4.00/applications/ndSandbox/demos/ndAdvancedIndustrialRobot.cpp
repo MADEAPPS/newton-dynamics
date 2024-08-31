@@ -433,7 +433,8 @@ namespace ndAdvancedRobot
 			ndFloat32 rotationReward = ndExp(-100.0f * rotError2);
 			ndFloat32 positReward = ndExp(-100.0f * positError2);
 			ndFloat32 azimuthReward = ndExp(-100.0f * azimuthErr * azimuthErr);
-			return rotationReward * 0.3f + azimuthReward * 0.3f + positReward * 0.4f;
+			//return rotationReward * 0.3f + azimuthReward * 0.3f + positReward * 0.4f;
+			return rotationReward;
 		}
 
 		#pragma optimize( "", off )
@@ -454,7 +455,7 @@ namespace ndAdvancedRobot
 			observation->m_effectorPosit_y = ndBrainFloat(m_targetLocation.m_y - m_location.m_y);
 			observation->m_effectorAzimuth = ndBrainFloat(m_targetLocation.m_azimuth - m_location.m_azimuth);
 
-			const ndQuaternion quartError(m_targetLocation.m_rotation * m_location.m_rotation.Inverse());
+			const ndQuaternion quartError(m_location.m_rotation * m_targetLocation.m_rotation.Inverse());
 			observation->m_effectorRotation[0] = ndBrainFloat(quartError.m_x);
 			observation->m_effectorRotation[1] = ndBrainFloat(quartError.m_y);
 			observation->m_effectorRotation[2] = ndBrainFloat(quartError.m_z);
@@ -499,8 +500,9 @@ namespace ndAdvancedRobot
 			pitch = ndClamp(pitch, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
 			yaw = ndClamp(yaw, ndFloat32(-ndPi * 0.9f * 0.5f), ndFloat32(ndPi * 0.9f * 0.5f));
 
-			roll = 0.0f;
-			pitch = 0.0f;
+			//yaw = 0.0f;
+			//roll = 0.0f;
+			//pitch = 0.0f;
 			x = m_targetLocation.m_x;
 			y = m_targetLocation.m_y;
 			azimuth = m_targetLocation.m_azimuth;
@@ -614,9 +616,9 @@ namespace ndAdvancedRobot
 			roll = ndClamp(roll, ndReal(-ndPi + 0.09f), ndReal(ndPi - 0.09f));
 			pitch = ndClamp(pitch, ndReal(-ndPi + 0.09f), ndReal(ndPi - 0.09f));
 
-			yaw = 45.0f * ndDegreeToRad;
-			roll = 0.0f;
-			pitch = 0.0f;
+			//yaw = 45.0f * ndDegreeToRad;
+			//roll = 0.0f;
+			//pitch = 0.0f;
 			const ndQuaternion quat(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
 			m_targetLocation.m_rotation = quat;
 		}
@@ -938,7 +940,7 @@ namespace ndAdvancedRobot
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
 			//hyperParameters.m_threadsCount = 1;
-			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 2;
 			hyperParameters.m_extraTrajectorySteps = 512;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
