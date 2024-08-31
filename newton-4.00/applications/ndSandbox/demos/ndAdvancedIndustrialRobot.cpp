@@ -591,10 +591,10 @@ namespace ndAdvancedRobot
 				quat = quat.Scale(-1.0f);
 			}
 
-			m_targetLocation.m_x = ndReal(x);
-			m_targetLocation.m_y = ndReal(y);
+			m_targetLocation.m_x = x;
+			m_targetLocation.m_y = y;
 			m_targetLocation.m_rotation = quat;
-			m_targetLocation.m_azimuth = ndReal(azimuth);
+			m_targetLocation.m_azimuth = azimuth;
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -918,7 +918,7 @@ namespace ndAdvancedRobot
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
 			//hyperParameters.m_threadsCount = 1;
-			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 2;
 			hyperParameters.m_extraTrajectorySteps = 512;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
