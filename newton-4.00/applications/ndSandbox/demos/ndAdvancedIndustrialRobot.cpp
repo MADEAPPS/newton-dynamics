@@ -66,9 +66,9 @@ namespace ndAdvancedRobot
 	#define ND_POSITION_Y_STEP		ndReal (0.25f)
 	#define ND_POSITION_AZIMTH_STEP	ndReal (2.0f * ndDegreeToRad)
 
-	#define ND_YAW_STEP				ndReal (2.0f * ndDegreeToRad)
-	#define ND_ROLL_STEP			ndReal (2.0f * ndDegreeToRad)
-	#define ND_PITCH_STEP			ndReal (2.0f * ndDegreeToRad)
+	#define ND_YAW_STEP				ndReal (4.0f * ndDegreeToRad)
+	#define ND_ROLL_STEP			ndReal (4.0f * ndDegreeToRad)
+	#define ND_PITCH_STEP			ndReal (4.0f * ndDegreeToRad)
 
 	class ndDefinition
 	{
@@ -473,16 +473,9 @@ namespace ndAdvancedRobot
 			ndFloat32 y = m_location.m_y + deltaY;
 			ndFloat32 azimuth = m_location.m_azimuth + deltaAzimuth;
 
-			//x = m_targetLocation.m_x;
-			//y = m_targetLocation.m_y;
-			//azimuth = m_targetLocation.m_azimuth;
-
 			x = ndClamp(x, ndFloat32(0.9f * ND_MIN_X_SPAND), ndFloat32(0.9f * ND_MAX_X_SPAND));
 			y = ndClamp(y, ndFloat32(0.9f * ND_MIN_Y_SPAND), ndFloat32(0.9f * ND_MAX_Y_SPAND));
 			azimuth = ndClamp(azimuth, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
-
-			ndVector localPosit(x, y, 0.0f, 0.0f);
-			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
 
 			ndVector euler1;
 			//ndVector euler (m_targetLocation.m_rotation.GetEulerAngles(euler1));
@@ -500,6 +493,14 @@ namespace ndAdvancedRobot
 			pitch = ndClamp(pitch, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
 			yaw = ndClamp(yaw, ndFloat32(-ndPi * 0.9f * 0.5f), ndFloat32(ndPi * 0.9f * 0.5f));
 
+			roll = 0.0f;
+			pitch = 0.0f;
+			x = m_targetLocation.m_x;
+			y = m_targetLocation.m_y;
+			azimuth = m_targetLocation.m_azimuth;
+
+			ndVector localPosit(x, y, 0.0f, 0.0f);
+			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
 			const ndMatrix alignMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
 			const ndMatrix rotation(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
 			ndMatrix targetMatrix(alignMatrix * rotation * alignMatrix.OrthoInverse());
