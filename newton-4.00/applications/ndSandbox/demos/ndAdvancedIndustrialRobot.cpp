@@ -31,9 +31,9 @@ namespace ndAdvancedRobot
 	{
 		public:
 		// effector location.
-		ndBrainFloat m_x;
-		ndBrainFloat m_y;
-		ndBrainFloat m_azimuth;
+		//ndBrainFloat m_x;
+		//ndBrainFloat m_y;
+		//ndBrainFloat m_azimuth;
 
 		// effector orientation
 		ndBrainFloat m_yaw;
@@ -76,9 +76,9 @@ namespace ndAdvancedRobot
 	#define ND_POSITION_Y_STEP		ndReal (0.25f)
 	#define ND_POSITION_AZIMTH_STEP	ndReal (2.0f * ndDegreeToRad)
 
-	#define ND_YAW_STEP				ndReal (4.0f * ndDegreeToRad)
-	#define ND_ROLL_STEP			ndReal (4.0f * ndDegreeToRad)
-	#define ND_PITCH_STEP			ndReal (4.0f * ndDegreeToRad)
+	#define ND_YAW_STEP				ndReal (2.0f * ndDegreeToRad)
+	#define ND_ROLL_STEP			ndReal (2.0f * ndDegreeToRad)
+	#define ND_PITCH_STEP			ndReal (2.0f * ndDegreeToRad)
 
 	class ndDefinition
 	{
@@ -540,26 +540,16 @@ namespace ndAdvancedRobot
 			m_leftGripper->SetOffsetPosit(-m_targetLocation.m_gripperPosit * 0.5f);
 			m_rightGripper->SetOffsetPosit(-m_targetLocation.m_gripperPosit * 0.5f);
 
-			ndFloat32 deltaX = actions->m_x * ND_POSITION_X_STEP;
-			ndFloat32 deltaY = actions->m_y * ND_POSITION_Y_STEP;
-			ndFloat32 deltaAzimuth = actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
+			//ndFloat32 x = m_location.m_x + actions->m_x * ND_POSITION_X_STEP;
+			//ndFloat32 y = m_location.m_y + actions->m_y * ND_POSITION_Y_STEP;
+			//ndFloat32 azimuth = actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
+			//x = ndClamp(x, ndFloat32(0.9f * ND_MIN_X_SPAND), ndFloat32(0.9f * ND_MAX_X_SPAND));
+			//y = ndClamp(y, ndFloat32(0.9f * ND_MIN_Y_SPAND), ndFloat32(0.9f * ND_MAX_Y_SPAND));
+			//azimuth = ndClamp(azimuth, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
 
-			ndFloat32 deltaYaw = actions->m_yaw * ND_YAW_STEP;
-			ndFloat32 deltaRoll = actions->m_roll * ND_ROLL_STEP;
-			ndFloat32 deltaPitch = actions->m_pitch * ND_PITCH_STEP;
-
-			ndFloat32 x = m_location.m_x + deltaX;
-			ndFloat32 y = m_location.m_y + deltaY;
-			ndFloat32 azimuth = m_location.m_azimuth + deltaAzimuth;
-
-			ndFloat32 yaw = m_location.m_yaw + deltaYaw;
-			ndFloat32 roll = m_location.m_roll + deltaRoll;
-			ndFloat32 pitch = m_location.m_pitch + deltaPitch;
-
-			x = ndClamp(x, ndFloat32(0.9f * ND_MIN_X_SPAND), ndFloat32(0.9f * ND_MAX_X_SPAND));
-			y = ndClamp(y, ndFloat32(0.9f * ND_MIN_Y_SPAND), ndFloat32(0.9f * ND_MAX_Y_SPAND));
-			azimuth = ndClamp(azimuth, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
-
+			ndFloat32 yaw = m_location.m_yaw + actions->m_yaw * ND_YAW_STEP;
+			ndFloat32 roll = m_location.m_roll + actions->m_roll * ND_ROLL_STEP;
+			ndFloat32 pitch = m_location.m_pitch + actions->m_pitch * ND_PITCH_STEP;
 			roll = ndClamp(roll, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
 			pitch = ndClamp(pitch, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
 			yaw = ndClamp(yaw, ndFloat32(-ndPi * 0.9f * 0.5f), ndFloat32(ndPi * 0.9f * 0.5f));
@@ -567,9 +557,13 @@ namespace ndAdvancedRobot
 			//yaw = 0.0f;
 			//roll = 0.0f;
 			//pitch = 0.0f;
-			x = m_targetLocation.m_x;
-			y = m_targetLocation.m_y;
-			azimuth = m_targetLocation.m_azimuth;
+			//x = m_targetLocation.m_x;
+			//y = m_targetLocation.m_y;
+			//azimuth = m_targetLocation.m_azimuth;
+
+			ndFloat32 x = 0.0f;
+			ndFloat32 y = 0.0f;
+			ndFloat32 azimuth = 0.0f;
 
 			ndVector localPosit(x, y, 0.0f, 0.0f);
 			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
@@ -826,9 +820,13 @@ namespace ndAdvancedRobot
 			if (newTarget)
 			{
 				change = 1;
-				m_robot->m_targetLocation.m_x = ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND);
-				m_robot->m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
-				m_robot->m_targetLocation.m_azimuth = (2.0f * ndRand() - 1.0f) * ndPi;
+				//m_robot->m_targetLocation.m_x = ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND);
+				//m_robot->m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
+				//m_robot->m_targetLocation.m_azimuth = (2.0f * ndRand() - 1.0f) * ndPi;
+
+				m_robot->m_targetLocation.m_roll = (2.0f * ndRand() - 1.0f) * ndPi;
+				m_robot->m_targetLocation.m_pitch = (2.0f * ndRand() - 1.0f) * ndPi;
+				m_robot->m_targetLocation.m_yaw = (2.0f * ndRand() - 1.0f) * ndPi * 0.5f;
 			}
 
 			if (change)
