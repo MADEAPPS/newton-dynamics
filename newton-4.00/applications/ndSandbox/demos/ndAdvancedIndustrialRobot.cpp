@@ -473,11 +473,25 @@ namespace ndAdvancedRobot
 			////return rotationReward * 0.3f + azimuthReward * 0.3f + positReward * 0.4f;
 			//return rotationReward;
 
+			const ndVector scale(ndFloat32(1.0f / (2.0f * ndPi)), ndFloat32(1.0f / ndPi), ndFloat32(1.0f / (2.0f * ndPi)), ndFloat32(0.0f));
 			const ndVector srcRot(m_location.m_pitch, m_location.m_yaw, m_location.m_roll, ndReal(0.0f));
 			const ndVector dstRot(m_targetLocation.m_pitch, m_targetLocation.m_yaw, m_targetLocation.m_roll, ndReal(0.0f));
-			const ndVector distRot(srcRot - dstRot);
+			const ndVector distRot(scale * (srcRot - dstRot));
 			ndFloat32 dstRot2 = distRot.DotProduct(distRot).GetScalar();
-			ndFloat32 rotationReward = ndExp(-100.0f * dstRot2);
+
+			ndFloat32 clipDist = 0.12f;
+			ndFloat32 rotationReward = 0.0f;
+			if (dstRot2 < (clipDist * clipDist))
+			{
+				rotationReward = rotationReward = ndExp(-50.0f * dstRot2);
+			}
+			else
+			{
+				ndFloat32 den = ndSqrt(3.0f) - clipDist;
+				ndFloat32 param = ndClamp(ndFloat32(ndSqrt(dstRot2) - clipDist), ndFloat32(0.0f), den);
+				rotationReward = 0.5f - 0.5f * param / den;
+			}
+
 			return rotationReward;
 		}
 
