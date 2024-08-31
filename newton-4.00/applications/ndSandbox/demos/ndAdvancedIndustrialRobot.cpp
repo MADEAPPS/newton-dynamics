@@ -477,7 +477,11 @@ namespace ndAdvancedRobot
 			ndFloat32 x = m_location.m_x + actions->m_x * ND_POSITION_X_STEP;
 			ndFloat32 y = m_location.m_y + actions->m_y * ND_POSITION_Y_STEP;
 			ndFloat32 rotationParam = actions->m_rotationParam * ND_ROTATION_STEP;
-			ndFloat32 azimuth = m_location.m_azimuth + actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
+			ndFloat32 azimuth = m_location.m_azimuth + actions->m_azimuth * ND_POSITION_AZIMTH_STEP;\
+
+			x = ndClamp(x, ndFloat32(ND_MIN_X_SPAND + 0.05f), ndFloat32(ND_MAX_X_SPAND - 0.25f));
+			y = ndClamp(y, ndFloat32(ND_MIN_Y_SPAND + 0.05f), ndFloat32(ND_MAX_Y_SPAND - 0.05f));
+			azimuth = ndClamp(azimuth, ndFloat32(-ndPi + 0.09f), ndFloat32(ndPi - 0.09f));
 
 			ndVector localPosit(x, y, 0.0f, 0.0f);
 			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
