@@ -718,7 +718,7 @@ namespace ndAdvancedRobot
 
 		ndMatrix CalculateTargetMatrix() const
 		{
-			const ndMatrix paramMatrix(ndPitchMatrix(m_targetLocation.m_pitch)* ndPitchMatrix(m_targetLocation.m_yaw)* ndPitchMatrix(m_targetLocation.m_roll));
+			const ndMatrix paramMatrix(ndPitchMatrix(m_targetLocation.m_pitch)* ndYawMatrix(m_targetLocation.m_yaw)* ndRollMatrix(m_targetLocation.m_roll));
 			ndMatrix targetMatrix(ndRollMatrix(90.0f * ndDegreeToRad) *	paramMatrix * ndRollMatrix(-90.0f * ndDegreeToRad));
 			ndFloat32 x = m_targetLocation.m_x;
 			ndFloat32 y = m_targetLocation.m_y;
