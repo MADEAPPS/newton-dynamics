@@ -52,6 +52,7 @@ namespace ndAdvancedRobot
 		ndBrainFloat m_effectorPosit_x;
 		ndBrainFloat m_effectorPosit_y;
 		ndBrainFloat m_effectorAzimuth;
+		ndBrainFloat m_effectorRotation[4];
 	};
 
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
@@ -438,7 +439,6 @@ namespace ndAdvancedRobot
 		#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const inputObservations)
 		{
-			//ndMemSet(inputObservations, 1.0f, ND_AGENT_INPUT_SIZE);
 			ndObservationVector* const observation = (ndObservationVector*)inputObservations;
 			for (ndInt32 i = m_armJoints.GetCount() - 1; i >= 0; --i)
 			{ 
@@ -453,6 +453,12 @@ namespace ndAdvancedRobot
 			observation->m_effectorPosit_x = ndBrainFloat(m_targetLocation.m_x - m_location.m_x);
 			observation->m_effectorPosit_y = ndBrainFloat(m_targetLocation.m_y - m_location.m_y);
 			observation->m_effectorAzimuth = ndBrainFloat(m_targetLocation.m_azimuth - m_location.m_azimuth);
+
+			const ndQuaternion quartError(m_targetLocation.m_rotation * m_location.m_rotation.Inverse());
+			observation->m_effectorRotation[0] = ndBrainFloat(quartError.m_x);
+			observation->m_effectorRotation[1] = ndBrainFloat(quartError.m_y);
+			observation->m_effectorRotation[2] = ndBrainFloat(quartError.m_z);
+			observation->m_effectorRotation[3] = ndBrainFloat(quartError.m_w);
 		}
 
 		//#pragma optimize( "", off )
@@ -932,7 +938,7 @@ namespace ndAdvancedRobot
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
 			//hyperParameters.m_threadsCount = 1;
-			hyperParameters.m_maxTrajectorySteps = 1024 * 2;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
 			hyperParameters.m_extraTrajectorySteps = 512;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
