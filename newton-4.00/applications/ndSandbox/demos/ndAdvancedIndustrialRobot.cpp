@@ -36,9 +36,6 @@ namespace ndAdvancedRobot
 		//ndBrainFloat m_azimuth;
 
 		// effector orientation
-		//ndBrainFloat m_yaw;
-		//ndBrainFloat m_roll;
-		//ndBrainFloat m_pitch;
 		ndBrainFloat m_rotationParam;
 	};
 
@@ -50,12 +47,12 @@ namespace ndAdvancedRobot
 		ndBrainFloat m_jointVeloc[6];
 
 		// distance to target error.
-		ndBrainFloat m_effectorPosit_x;
-		ndBrainFloat m_effectorPosit_y;
-		ndBrainFloat m_effectorAzimuth;
-		ndBrainFloat m_effectorDeltaPosit_x;
-		ndBrainFloat m_effectorDeltaPosit_y;
-		ndBrainFloat m_effectorDeltaAzimuth;
+		ndBrainFloat m_effectorSrc_x;
+		ndBrainFloat m_effectorSrc_y;
+		ndBrainFloat m_effectorSrcAzimuth;
+		ndBrainFloat m_effectorDst_x;
+		ndBrainFloat m_effectorDst_y;
+		ndBrainFloat m_effectorDstAzimuth;
 
 		ndBrainFloat m_effectorSrcRot[4];
 		ndBrainFloat m_effectorDstRot[4];
@@ -72,10 +69,6 @@ namespace ndAdvancedRobot
 	#define ND_POSITION_X_STEP		ndReal (0.25f)
 	#define ND_POSITION_Y_STEP		ndReal (0.25f)
 	#define ND_POSITION_AZIMTH_STEP	ndReal (2.0f * ndDegreeToRad)
-
-	//#define ND_YAW_STEP				ndReal (2.0f * ndDegreeToRad)
-	//#define ND_ROLL_STEP			ndReal (2.0f * ndDegreeToRad)
-	//#define ND_PITCH_STEP			ndReal (2.0f * ndDegreeToRad)
 	#define ND_ROTATION_STEP		ndReal (0.1f)
 
 	class ndDefinition
@@ -426,51 +419,12 @@ namespace ndAdvancedRobot
 			//const ndMatrix targetMatrix(CalculateTargetMatrix());
 			//const ndMatrix baseMatrix(m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
 			//const ndMatrix effectorMatrix(m_effector->GetLocalMatrix0() * m_effector->GetBody0()->GetMatrix() * baseMatrix.OrthoInverse());
-			//
 			//const ndVector targetPosit(GetAnglePosit(targetMatrix.m_posit));
 			//const ndVector effectPosit(GetAnglePosit(effectorMatrix.m_posit));
-			//
 			//const ndVector error(targetPosit - effectPosit);
 			//ndFloat32 azimuthErr(ndAnglesSub(targetPosit.m_z, effectPosit.m_z));
 			//ndFloat32 positError2 = error.m_x * error.m_x + error.m_y * error.m_y;
-			//
-			//ndQuaternion q1(effectorMatrix);
-			//const ndQuaternion q0(targetMatrix);
-			//if (q1.DotProduct(q0).GetScalar() < 0.0f)
-			//{
-			//	q1 = q1.Scale(-1.0f);
-			//}
-			//ndFloat32 rotError2 = 1.0f - q1.DotProduct(q0).GetScalar();
-			//
-			//ndFloat32 rotationReward = ndExp(-100.0f * rotError2);
-			//ndFloat32 positReward = ndExp(-100.0f * positError2);
-			//ndFloat32 azimuthReward = ndExp(-100.0f * azimuthErr * azimuthErr);
-			////return rotationReward * 0.3f + azimuthReward * 0.3f + positReward * 0.4f;
-			//return rotationReward;
 
-			//const ndVector scale(ndFloat32(1.0f / (2.0f * ndPi)), ndFloat32(1.0f / ndPi), ndFloat32(1.0f / (2.0f * ndPi)), ndFloat32(0.0f));
-			//const ndVector srcRot(m_location.m_pitch, m_location.m_yaw, m_location.m_roll, ndReal(0.0f));
-			//const ndVector dstRot(m_targetLocation.m_pitch, m_targetLocation.m_yaw, m_targetLocation.m_roll, ndReal(0.0f));
-			//const ndVector distRot(scale * (srcRot - dstRot));
-			//ndFloat32 dstRot2 = distRot.DotProduct(distRot).GetScalar();
-			//ndFloat32 clipDist = 0.12f;
-			//ndFloat32 rotationReward = 0.0f;
-			//if (dstRot2 < (clipDist * clipDist))
-			//{
-			//	rotationReward = ndExp(-50.0f * dstRot2);
-			//}
-			//else
-			//{
-			//	ndFloat32 den = ndSqrt(3.0f) - clipDist;
-			//	ndFloat32 param = ndClamp(ndFloat32(ndSqrt(dstRot2) - clipDist), ndFloat32(0.0f), den);
-			//	rotationReward = 0.5f - 0.5f * param / den;
-			//}
-			//ndFloat32 rotationReward = 0.0f;
-			//for (ndInt32 i = 0; i < 3; ++i)
-			//{
-			//	ndFloat32 dstRot2 = distRot[i] * distRot[i];
-			//	rotationReward += ndExp(-40.0f * dstRot2) / 3.0f;
-			//}
 
 			ndFloat32 rotationError2 = ndFloat32(1.0f) - m_location.m_rotation.DotProduct(m_targetLocation.m_rotation).GetScalar();
 			ndFloat32 rotationReward = ndExp(ndFloat32 (-40.0f) * rotationError2);
@@ -491,12 +445,13 @@ namespace ndAdvancedRobot
 				observation->m_jointVeloc[i] = ndBrainFloat(kinematicState.m_velocity);
 			}
 
-			observation->m_effectorPosit_x = ndBrainFloat(m_location.m_x);
-			observation->m_effectorPosit_y = ndBrainFloat(m_location.m_y);
-			observation->m_effectorAzimuth = ndBrainFloat(m_location.m_azimuth);
-			observation->m_effectorDeltaPosit_x = ndBrainFloat(m_targetLocation.m_x - m_location.m_x);
-			observation->m_effectorDeltaPosit_y = ndBrainFloat(m_targetLocation.m_y - m_location.m_y);
-			observation->m_effectorDeltaAzimuth = ndBrainFloat(m_targetLocation.m_azimuth - m_location.m_azimuth);
+			observation->m_effectorSrc_x = ndBrainFloat(m_location.m_x);
+			observation->m_effectorSrc_y = ndBrainFloat(m_location.m_y);
+			observation->m_effectorDst_x = ndBrainFloat(m_targetLocation.m_x);
+			observation->m_effectorDst_y = ndBrainFloat(m_targetLocation.m_y);
+
+			observation->m_effectorSrcAzimuth = ndBrainFloat(m_location.m_azimuth);
+			observation->m_effectorDstAzimuth = ndBrainFloat(m_targetLocation.m_azimuth);
 
 			for (ndInt32 i = 0; i < 4; ++i)
 			{
@@ -545,14 +500,11 @@ namespace ndAdvancedRobot
 			ndVector localPosit(x, y, 0.0f, 0.0f);
 			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
 			const ndMatrix alignMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
-			//const ndMatrix rotation(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
-
 			const ndQuaternion rotQuat (m_location.m_rotation.Slerp(m_targetLocation.m_rotation, rotationParam));
 			ndMatrix rotationMatrix(ndCalculateMatrix(rotQuat, ndVector::m_wOne));
 			ndMatrix targetMatrix(alignMatrix * rotationMatrix * alignMatrix.OrthoInverse());
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
 		
-
 			effector->SetOffsetMatrix(targetMatrix);
 			
 			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
@@ -614,15 +566,6 @@ namespace ndAdvancedRobot
 
 			const ndMatrix alignMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
 			const ndMatrix rotation(alignMatrix.OrthoInverse() * matrix * alignMatrix);
-
-			//ndVector euler1;
-			//ndVector euler(rotation.CalcPitchYawRoll(euler1));
-			//m_location.m_rotation = rotation;
-			//ndAssert(ndAbs(m_location.m_roll - euler.m_z) < 90.0f * ndRadToDegree);
-			//ndAssert(ndAbs(m_location.m_pitch - euler.m_x) < 90.0f * ndRadToDegree);
-			//m_location.m_yaw = euler.m_y;
-			//m_location.m_roll = euler.m_z;
-			//m_location.m_pitch = euler.m_x;
 			m_location.m_rotation = rotation;
 		}
 
@@ -663,13 +606,7 @@ namespace ndAdvancedRobot
 			roll = ndClamp(roll, ndReal(-ndPi + 0.09f), ndReal(ndPi - 0.09f));
 			pitch = ndClamp(pitch, ndReal(-ndPi + 0.09f), ndReal(ndPi - 0.09f));
 
-			//yaw = 45.0f * ndDegreeToRad;
-			//roll = 0.0f;
-			//pitch = 0.0f;
 			ndQuaternion quat(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
-			//m_targetLocation.m_yaw = yaw;
-			//m_targetLocation.m_roll = roll;
-			//m_targetLocation.m_pitch = pitch;
 			if (m_location.m_rotation.DotProduct(quat).GetScalar() < 0.0f)
 			{
 				quat = quat.Scale(-1.0f);
@@ -702,7 +639,6 @@ namespace ndAdvancedRobot
 
 		ndMatrix CalculateTargetMatrix() const
 		{
-			//const ndMatrix paramMatrix(ndPitchMatrix(m_targetLocation.m_pitch)* ndYawMatrix(m_targetLocation.m_yaw)* ndRollMatrix(m_targetLocation.m_roll));
 			const ndMatrix paramMatrix(ndCalculateMatrix(m_targetLocation.m_rotation, ndVector::m_wOne));
 			ndMatrix targetMatrix(ndRollMatrix(90.0f * ndDegreeToRad) *	paramMatrix * ndRollMatrix(-90.0f * ndDegreeToRad));
 			ndFloat32 x = m_targetLocation.m_x;
@@ -999,7 +935,7 @@ namespace ndAdvancedRobot
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
 			//hyperParameters.m_threadsCount = 1;
-			hyperParameters.m_maxTrajectorySteps = 1024 * 2;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
 			hyperParameters.m_extraTrajectorySteps = 512;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
