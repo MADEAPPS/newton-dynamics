@@ -363,6 +363,34 @@ namespace ndAdvancedRobot
 				return true;
 			}
 
+			if (m_location.m_pitch >= ndPi * 0.9f)
+			{
+				return true;
+			}
+			if (m_location.m_pitch <= -ndPi * 0.9f)
+			{
+				return true;
+			}
+
+			if (m_location.m_roll >= ndPi * 0.9f)
+			{
+				return true;
+			}
+			if (m_location.m_roll <= -ndPi * 0.9f)
+			{
+				return true;
+			}
+
+			if (m_location.m_yaw >= ndPi * 0.9f * 0.5f)
+			{
+				return true;
+			}
+
+			if (m_location.m_yaw <= -ndPi * 0.9f * 0.5f)
+			{
+				return true;
+			}
+
 			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
