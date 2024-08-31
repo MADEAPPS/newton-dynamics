@@ -55,6 +55,13 @@ namespace ndAdvancedRobot
 		ndBrainFloat m_effectorPosit_x;
 		ndBrainFloat m_effectorPosit_y;
 		ndBrainFloat m_effectorAzimuth;
+
+		ndBrainFloat m_effectorDeltaYaw;
+		ndBrainFloat m_effectorDeltaRoll;
+		ndBrainFloat m_effectorDeltaPitch;
+		ndBrainFloat m_effectorDeltaPosit_x;
+		ndBrainFloat m_effectorDeltaPosit_y;
+		ndBrainFloat m_effectorDeltaAzimuth;
 	};
 
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
@@ -488,13 +495,20 @@ namespace ndAdvancedRobot
 				observation->m_jointVeloc[i] = ndBrainFloat(kinematicState.m_velocity);
 			}
 
-			observation->m_effectorPosit_x = ndBrainFloat(m_targetLocation.m_x - m_location.m_x);
-			observation->m_effectorPosit_y = ndBrainFloat(m_targetLocation.m_y - m_location.m_y);
-			observation->m_effectorAzimuth = ndBrainFloat(m_targetLocation.m_azimuth - m_location.m_azimuth);
+			observation->m_effectorDeltaPosit_x = ndBrainFloat(m_targetLocation.m_x - m_location.m_x);
+			observation->m_effectorDeltaPosit_y = ndBrainFloat(m_targetLocation.m_y - m_location.m_y);
+			observation->m_effectorDeltaAzimuth = ndBrainFloat(m_targetLocation.m_azimuth - m_location.m_azimuth);
+			observation->m_effectorDeltaYaw = ndBrainFloat(m_targetLocation.m_yaw - m_location.m_yaw);
+			observation->m_effectorDeltaRoll = ndBrainFloat(m_targetLocation.m_roll - m_location.m_roll);
+			observation->m_effectorDeltaPitch = ndBrainFloat(m_targetLocation.m_pitch - m_location.m_pitch);
 
-			observation->m_effectorYaw = ndBrainFloat(m_targetLocation.m_yaw - m_location.m_yaw);
-			observation->m_effectorRoll = ndBrainFloat(m_targetLocation.m_roll - m_location.m_roll);
-			observation->m_effectorPitch = ndBrainFloat(m_targetLocation.m_pitch - m_location.m_pitch);
+			observation->m_effectorPosit_x = ndBrainFloat(m_location.m_x);
+			observation->m_effectorPosit_y = ndBrainFloat(m_location.m_y);
+			observation->m_effectorAzimuth = ndBrainFloat(m_location.m_azimuth);
+			observation->m_effectorYaw = ndBrainFloat(m_location.m_yaw);
+			observation->m_effectorRoll = ndBrainFloat(m_location.m_roll);
+			observation->m_effectorPitch = ndBrainFloat(m_location.m_pitch);
+
 		}
 
 		//#pragma optimize( "", off )
