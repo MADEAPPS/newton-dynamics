@@ -246,9 +246,13 @@ namespace ndSimpleRobot
 			if (newTarget)
 			{
 				change = 1;
-				m_robot->m_x = ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND);
-				m_robot->m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
-				m_robot->m_azimuth = (2.0f * ndRand() - 1.0f) * ndPi;
+
+				m_robot->m_roll = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
+				m_robot->m_pitch = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
+				m_robot->m_yaw = ndReal((2.0f * ndRand() - 1.0f) * ndPi * 0.5f);
+				m_robot->m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
+				m_robot->m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
+				m_robot->m_y = ndReal(ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
 			}
 			if (change)
 			{
