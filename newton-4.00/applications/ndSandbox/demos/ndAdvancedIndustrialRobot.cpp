@@ -403,16 +403,35 @@ namespace ndAdvancedRobot
 
 			const ndVector effectPosit(m_location.m_x, m_location.m_y, m_location.m_azimuth, ndReal(0.0f));
 			const ndVector targetPosit(m_targetLocation.m_x, m_targetLocation.m_y, m_targetLocation.m_azimuth, ndReal(0.0f));
-			const ndVector error(targetPosit - effectPosit);
-			ndAssert(ndAbs(error.m_z - ndAnglesSub(targetPosit.m_z, effectPosit.m_z)) < 1.0e-3f);
+			ndVector error(targetPosit - effectPosit);
+			error.m_z = ndAnglesSub(targetPosit.m_z, effectPosit.m_z);
 			const ndVector error2(error * error);
 			ndFloat32 rotationError2 = ndFloat32(1.0f) - m_location.m_rotation.DotProduct(m_targetLocation.m_rotation).GetScalar();
 
-			ndFloat32 positReward_x = ndExp(ndFloat32(-100.0f) * error2.m_x);
-			ndFloat32 positReward_y = ndExp(ndFloat32(-100.0f) * error2.m_y);
-			ndFloat32 positReward_azimuth = ndExp(ndFloat32(-100.0f) * error2.m_z);
-			ndFloat32 rotationReward = ndExp(ndFloat32 (-40.0f) * rotationError2);
-			ndTrace(("x=%f y=%f a=%f r=%f\n", positReward_x, positReward_y, positReward_azimuth, rotationReward));
+			auto ExponentialReward = [this](ndFloat32 dist2, ndFloat32 sigma)
+			{
+				ndFloat32 distBreak2 = 0.69314f / sigma;
+				if (dist2 <= distBreak2)
+				{
+					return ndExp(-sigma * dist2);
+				}
+
+				// do a linear decay, so that there is some gradient in search space land scape
+				ndFloat32 maxDist = 0.25f;
+				ndFloat32 dist = ndSqrt(dist2);
+				ndFloat32 distBreak = ndSqrt(distBreak2);
+				
+				ndFloat32 param = ndClamp ((dist - distBreak) / (maxDist - distBreak), ndFloat32(0.0f), ndFloat32(1.0f));
+				ndFloat32 param2 = param * param;
+				ndFloat32 reward = 0.5f * (1.0f - param2);
+				return reward;
+			};
+
+			ndFloat32 positReward_x = ExponentialReward(error2.m_x, 100.0f);
+			ndFloat32 positReward_y = ExponentialReward(error2.m_y, 100.0f);
+			ndFloat32 rotationReward = ExponentialReward(rotationError2, 40.0f);
+			ndFloat32 positReward_azimuth = ExponentialReward(error2.m_z, 100.0f);
+			//ndTrace(("x=%f y=%f a=%f r=%f\n", positReward_x, positReward_y, positReward_azimuth, rotationReward));
 			return ndReal (rotationReward * 0.25f + positReward_x * 0.25f * positReward_y * 0.25f + positReward_azimuth * 0.25f);
 		}
 
@@ -459,13 +478,6 @@ namespace ndAdvancedRobot
 			ndFloat32 y = m_location.m_y + actions->m_y * ND_POSITION_Y_STEP;
 			ndFloat32 rotationParam = actions->m_rotationParam * ND_ROTATION_STEP;
 			ndFloat32 azimuth = m_location.m_azimuth + actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
-
-			//x = ndClamp(x, ndFloat32(0.9f * ND_MIN_X_SPAND), ndFloat32(0.9f * ND_MAX_X_SPAND));
-			//y = ndClamp(y, ndFloat32(0.9f * ND_MIN_Y_SPAND), ndFloat32(0.9f * ND_MAX_Y_SPAND));
-			//azimuth = ndClamp(azimuth, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
-			//ndFloat32 x = 0.0f;
-			//ndFloat32 y = 0.0f;
-			//ndFloat32 azimuth = 0.0f;
 
 			ndVector localPosit(x, y, 0.0f, 0.0f);
 			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
