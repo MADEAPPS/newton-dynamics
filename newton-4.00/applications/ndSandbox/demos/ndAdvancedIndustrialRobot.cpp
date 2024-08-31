@@ -411,29 +411,38 @@ namespace ndAdvancedRobot
 				return parametricPosit;
 			};
 
-			const ndMatrix targetMatrix(CalculateTargetMatrix());
-			const ndMatrix baseMatrix(m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
-			const ndMatrix effectorMatrix(m_effector->GetLocalMatrix0() * m_effector->GetBody0()->GetMatrix() * baseMatrix.OrthoInverse());
+			//const ndMatrix targetMatrix(CalculateTargetMatrix());
+			//const ndMatrix baseMatrix(m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
+			//const ndMatrix effectorMatrix(m_effector->GetLocalMatrix0() * m_effector->GetBody0()->GetMatrix() * baseMatrix.OrthoInverse());
+			//
+			//const ndVector targetPosit(GetAnglePosit(targetMatrix.m_posit));
+			//const ndVector effectPosit(GetAnglePosit(effectorMatrix.m_posit));
+			//
+			//const ndVector error(targetPosit - effectPosit);
+			//ndFloat32 azimuthErr(ndAnglesSub(targetPosit.m_z, effectPosit.m_z));
+			//ndFloat32 positError2 = error.m_x * error.m_x + error.m_y * error.m_y;
+			//
+			//ndQuaternion q1(effectorMatrix);
+			//const ndQuaternion q0(targetMatrix);
+			//if (q1.DotProduct(q0).GetScalar() < 0.0f)
+			//{
+			//	q1 = q1.Scale(-1.0f);
+			//}
+			//ndFloat32 rotError2 = 1.0f - q1.DotProduct(q0).GetScalar();
+			//
+			//ndFloat32 rotationReward = ndExp(-100.0f * rotError2);
+			//ndFloat32 positReward = ndExp(-100.0f * positError2);
+			//ndFloat32 azimuthReward = ndExp(-100.0f * azimuthErr * azimuthErr);
+			////return rotationReward * 0.3f + azimuthReward * 0.3f + positReward * 0.4f;
+			//return rotationReward;
 
-			const ndVector targetPosit(GetAnglePosit(targetMatrix.m_posit));
-			const ndVector effectPosit(GetAnglePosit(effectorMatrix.m_posit));
-
-			const ndVector error(targetPosit - effectPosit);
-			ndFloat32 azimuthErr(ndAnglesSub(targetPosit.m_z, effectPosit.m_z));
-			ndFloat32 positError2 = error.m_x * error.m_x + error.m_y * error.m_y;
-		
-			ndQuaternion q1(effectorMatrix);
-			const ndQuaternion q0(targetMatrix);
-			if (q1.DotProduct(q0).GetScalar() < 0.0f)
+			ndFloat32 rotateError2 (m_location.m_rotation.DotProduct(m_targetLocation.m_rotation).GetScalar());
+			if (rotateError2 < 0.0f)
 			{
-				q1 = q1.Scale(-1.0f);
+				rotateError2 *= -1.0f;
 			}
-			ndFloat32 rotError2 = 1.0f - q1.DotProduct(q0).GetScalar();
-
-			ndFloat32 rotationReward = ndExp(-100.0f * rotError2);
-			ndFloat32 positReward = ndExp(-100.0f * positError2);
-			ndFloat32 azimuthReward = ndExp(-100.0f * azimuthErr * azimuthErr);
-			//return rotationReward * 0.3f + azimuthReward * 0.3f + positReward * 0.4f;
+			rotateError2 = 1.0f - rotateError2;
+			ndFloat32 rotationReward = ndExp(-100.0f * rotateError2);
 			return rotationReward;
 		}
 
