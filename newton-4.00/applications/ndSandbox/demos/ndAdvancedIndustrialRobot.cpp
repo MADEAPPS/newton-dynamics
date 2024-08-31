@@ -49,10 +49,12 @@ namespace ndAdvancedRobot
 		ndBrainFloat m_jointVeloc[6];
 
 		// distance to target error.
+		ndBrainFloat m_effectorYaw;
+		ndBrainFloat m_effectorRoll;
+		ndBrainFloat m_effectorPitch;
 		ndBrainFloat m_effectorPosit_x;
 		ndBrainFloat m_effectorPosit_y;
 		ndBrainFloat m_effectorAzimuth;
-		ndBrainFloat m_effectorRotation[4];
 	};
 
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
@@ -436,13 +438,11 @@ namespace ndAdvancedRobot
 			////return rotationReward * 0.3f + azimuthReward * 0.3f + positReward * 0.4f;
 			//return rotationReward;
 
-			ndFloat32 rotateError2 (m_location.m_rotation.DotProduct(m_targetLocation.m_rotation).GetScalar());
-			if (rotateError2 < 0.0f)
-			{
-				rotateError2 *= -1.0f;
-			}
-			rotateError2 = 1.0f - rotateError2;
-			ndFloat32 rotationReward = ndExp(-100.0f * rotateError2);
+			const ndVector srcRot(m_location.m_pitch, m_location.m_yaw, m_location.m_roll, ndReal(0.0f));
+			const ndVector dstRot(m_targetLocation.m_pitch, m_targetLocation.m_yaw, m_targetLocation.m_roll, ndReal(0.0f));
+			const ndVector distRot(srcRot - dstRot);
+			ndFloat32 dstRot2 = distRot.DotProduct(distRot).GetScalar();
+			ndFloat32 rotationReward = ndExp(-100.0f * dstRot2);
 			return rotationReward;
 		}
 
@@ -464,11 +464,9 @@ namespace ndAdvancedRobot
 			observation->m_effectorPosit_y = ndBrainFloat(m_targetLocation.m_y - m_location.m_y);
 			observation->m_effectorAzimuth = ndBrainFloat(m_targetLocation.m_azimuth - m_location.m_azimuth);
 
-			const ndQuaternion quartError(m_location.m_rotation * m_targetLocation.m_rotation.Inverse());
-			observation->m_effectorRotation[0] = ndBrainFloat(quartError.m_x);
-			observation->m_effectorRotation[1] = ndBrainFloat(quartError.m_y);
-			observation->m_effectorRotation[2] = ndBrainFloat(quartError.m_z);
-			observation->m_effectorRotation[3] = ndBrainFloat(quartError.m_w);
+			observation->m_effectorYaw = ndBrainFloat(m_targetLocation.m_yaw - m_location.m_yaw);
+			observation->m_effectorRoll = ndBrainFloat(m_targetLocation.m_roll - m_location.m_roll);
+			observation->m_effectorPitch = ndBrainFloat(m_targetLocation.m_pitch - m_location.m_pitch);
 		}
 
 		//#pragma optimize( "", off )
@@ -485,25 +483,21 @@ namespace ndAdvancedRobot
 			ndFloat32 deltaY = actions->m_y * ND_POSITION_Y_STEP;
 			ndFloat32 deltaAzimuth = actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
 
-			ndFloat32 x = m_location.m_x + deltaX;
-			ndFloat32 y = m_location.m_y + deltaY;
-			ndFloat32 azimuth = m_location.m_azimuth + deltaAzimuth;
-
-			x = ndClamp(x, ndFloat32(0.9f * ND_MIN_X_SPAND), ndFloat32(0.9f * ND_MAX_X_SPAND));
-			y = ndClamp(y, ndFloat32(0.9f * ND_MIN_Y_SPAND), ndFloat32(0.9f * ND_MAX_Y_SPAND));
-			azimuth = ndClamp(azimuth, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
-
-			ndVector euler1;
-			//ndVector euler (m_targetLocation.m_rotation.GetEulerAngles(euler1));
-			ndVector euler(m_location.m_rotation.GetEulerAngles(euler1));
-
 			ndFloat32 deltaYaw = actions->m_yaw * ND_YAW_STEP;
 			ndFloat32 deltaRoll = actions->m_roll * ND_ROLL_STEP;
 			ndFloat32 deltaPitch = actions->m_pitch * ND_PITCH_STEP;
 
-			ndFloat32 yaw = euler.m_y + deltaYaw;
-			ndFloat32 roll = euler.m_z + deltaRoll;
-			ndFloat32 pitch = euler.m_x + deltaPitch;
+			ndFloat32 x = m_location.m_x + deltaX;
+			ndFloat32 y = m_location.m_y + deltaY;
+			ndFloat32 azimuth = m_location.m_azimuth + deltaAzimuth;
+
+			ndFloat32 yaw = m_location.m_yaw + deltaYaw;
+			ndFloat32 roll = m_location.m_roll + deltaRoll;
+			ndFloat32 pitch = m_location.m_pitch + deltaPitch;
+
+			x = ndClamp(x, ndFloat32(0.9f * ND_MIN_X_SPAND), ndFloat32(0.9f * ND_MAX_X_SPAND));
+			y = ndClamp(y, ndFloat32(0.9f * ND_MIN_Y_SPAND), ndFloat32(0.9f * ND_MAX_Y_SPAND));
+			azimuth = ndClamp(azimuth, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
 
 			roll = ndClamp(roll, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
 			pitch = ndClamp(pitch, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
@@ -584,8 +578,15 @@ namespace ndAdvancedRobot
 
 			const ndMatrix alignMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
 			const ndMatrix rotation(alignMatrix.OrthoInverse() * matrix * alignMatrix);
-			m_location.m_rotation = rotation;
-			//ndTrace(("%f %f %f\n", m_location.m_x, m_location.m_y, m_location.m_azimuth));
+
+			ndVector euler1;
+			ndVector euler(rotation.CalcPitchYawRoll(euler1));
+			//m_location.m_rotation = rotation;
+			ndAssert(ndAbs(m_location.m_roll - euler.m_z) < 90.0f * ndRadToDegree);
+			ndAssert(ndAbs(m_location.m_pitch - euler.m_x) < 90.0f * ndRadToDegree);
+			m_location.m_yaw = euler.m_y;
+			m_location.m_roll = euler.m_z;
+			m_location.m_pitch = euler.m_x;
 		}
 
 		#pragma optimize( "", off )
@@ -628,8 +629,12 @@ namespace ndAdvancedRobot
 			//yaw = 45.0f * ndDegreeToRad;
 			//roll = 0.0f;
 			//pitch = 0.0f;
-			const ndQuaternion quat(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
-			m_targetLocation.m_rotation = quat;
+			//const ndQuaternion quat(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
+			//m_targetLocation.m_rotation = quat;
+
+			m_targetLocation.m_yaw = yaw;
+			m_targetLocation.m_roll = roll;
+			m_targetLocation.m_pitch = pitch;
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -657,10 +662,8 @@ namespace ndAdvancedRobot
 
 		ndMatrix CalculateTargetMatrix() const
 		{
-			ndMatrix targetMatrix(
-				ndRollMatrix(90.0f * ndDegreeToRad) *
-				ndCalculateMatrix (m_targetLocation.m_rotation, ndVector::m_wOne) *
-				ndRollMatrix(-90.0f * ndDegreeToRad));
+			const ndMatrix paramMatrix(ndPitchMatrix(m_targetLocation.m_pitch)* ndPitchMatrix(m_targetLocation.m_yaw)* ndPitchMatrix(m_targetLocation.m_roll));
+			ndMatrix targetMatrix(ndRollMatrix(90.0f * ndDegreeToRad) *	paramMatrix * ndRollMatrix(-90.0f * ndDegreeToRad));
 			ndFloat32 x = m_targetLocation.m_x;
 			ndFloat32 y = m_targetLocation.m_y;
 			ndVector localPosit(x, y, 0.0f, 0.0f);
@@ -695,14 +698,16 @@ namespace ndAdvancedRobot
 		ndWorld* m_world;
 		ndFixSizeArray<ndJointBilateralConstraint*, 16> m_armJoints;
 
-		class EffectorLocation
+		class EffectorParemeters
 		{
 			public:
-			EffectorLocation()
+			EffectorParemeters()
 				:m_x(0.0f)
 				,m_y(0.0f)
 				,m_azimuth(0.0f)
-				,m_rotation()
+				,m_yaw(0.0f)
+				,m_roll(0.0f)
+				,m_pitch(0.0f)
 				,m_gripperPosit(0.0f)
 			{
 			}
@@ -710,12 +715,14 @@ namespace ndAdvancedRobot
 			ndReal m_x;
 			ndReal m_y;
 			ndReal m_azimuth;
-			ndQuaternion m_rotation;
+			ndReal m_yaw;
+			ndReal m_roll;
+			ndReal m_pitch;
 			ndReal m_gripperPosit;
 		};
 
-		EffectorLocation m_location;
-		EffectorLocation m_targetLocation;
+		EffectorParemeters m_location;
+		EffectorParemeters m_targetLocation;
 		ndFloat32 m_timestep;
 		bool m_modelAlive;
 		bool m_showDebug;
@@ -746,19 +753,13 @@ namespace ndAdvancedRobot
 			m_scene->Print(color, "Control panel");
 
 			ndInt8 change = 0;
-
-			ndVector euler1;
-			ndVector euler(m_robot->m_targetLocation.m_rotation.GetEulerAngles(euler1));
-
 			change = change | ndInt8(ImGui::SliderFloat("x", &m_robot->m_targetLocation.m_x, ND_MIN_X_SPAND, ND_MAX_X_SPAND));
 			change = change | ndInt8 (ImGui::SliderFloat("y", &m_robot->m_targetLocation.m_y, ND_MIN_Y_SPAND, ND_MAX_Y_SPAND));
 			change = change | ndInt8 (ImGui::SliderFloat("azimuth", &m_robot->m_targetLocation.m_azimuth, -ndPi, ndPi));
-			change = change | ndInt8 (ImGui::SliderFloat("pitch", &euler.m_x, -ndPi, ndPi));
-			change = change | ndInt8 (ImGui::SliderFloat("yaw", &euler.m_y, -ndPi * 0.5f, ndPi * 0.5f));
-			change = change | ndInt8 (ImGui::SliderFloat("roll", &euler.m_z, -ndPi, ndPi));
+			change = change | ndInt8 (ImGui::SliderFloat("pitch", &m_robot->m_targetLocation.m_pitch, -ndPi, ndPi));
+			change = change | ndInt8 (ImGui::SliderFloat("yaw", &m_robot->m_targetLocation.m_yaw, -ndPi * 0.5f, ndPi * 0.5f));
+			change = change | ndInt8 (ImGui::SliderFloat("roll", &m_robot->m_targetLocation.m_roll, -ndPi, ndPi));
 			change = change | ndInt8 (ImGui::SliderFloat("gripper", &m_robot->m_targetLocation.m_gripperPosit, -0.2f, 0.4f));
-
-			m_robot->m_targetLocation.m_rotation = ndPitchMatrix(euler.m_x) * ndYawMatrix(euler.m_y) * ndRollMatrix(euler.m_z);
 
 			bool newTarget = ndInt8(ImGui::Button("random target"));
 			if (newTarget)
