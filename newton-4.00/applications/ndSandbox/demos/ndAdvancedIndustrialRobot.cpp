@@ -24,7 +24,7 @@
 
 namespace ndAdvancedRobot
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach-vpg.dnn"
 
 	class ndActionVector
@@ -49,12 +49,10 @@ namespace ndAdvancedRobot
 		ndBrainFloat m_jointVeloc[6];
 
 		// distance to target error.
-		ndBrainFloat m_effectorPosit_x;
-		ndBrainFloat m_effectorPosit_y;
-		ndBrainFloat m_effectorAzimuth;
-		//ndBrainFloat m_effectorTargetPosit_x;
-		//ndBrainFloat m_effectorTargetPosit_y;
-		//ndBrainFloat m_effectorTargetAzimuth;
+		ndBrainFloat m_effectortDeltaX;
+		ndBrainFloat m_effectortDeltaY;
+		ndBrainFloat m_effectorDeltaAzimuth;
+		ndBrainFloat m_effectorDeltaRotation;
 	};
 
 	class ndControlParameters
@@ -422,37 +420,14 @@ namespace ndAdvancedRobot
 				return 0.0f;
 			}
 
-			auto GetAnglePosit = [this](const ndVector& posit)
-			{
-				ndFloat32 azimuth = 0.0f;
-				if ((posit.m_x * posit.m_x + posit.m_z * posit.m_z) > 1.0e-3f)
-				{
-					azimuth = ndAtan2(-posit.m_z, posit.m_x);
-				}
-				const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
-				ndVector parametricPosit(aximuthMatrix.UnrotateVector(posit) - m_effectorOffset);
-				parametricPosit.m_z = azimuth;
-				return parametricPosit;
-			};
-
-			ndMatrix baseMatrix;
-			ndMatrix effectorMatrix;
-			const ndMatrix targetMatrix(CalculateTargetMatrix());
-			//const ndMatrix baseMatrix(m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
-			//const ndMatrix effectorMatrix(m_effector->GetLocalMatrix0() * m_effector->GetBody0()->GetMatrix() * baseMatrix.OrthoInverse());
-
-			m_effector->CalculateGlobalMatrix(effectorMatrix, baseMatrix);
-			effectorMatrix = effectorMatrix * baseMatrix.OrthoInverse();
-
-			const ndVector targetPosit(GetAnglePosit(targetMatrix.m_posit));
-			const ndVector effectPosit(GetAnglePosit(effectorMatrix.m_posit));
-
-			const ndVector error(targetPosit - effectPosit);
-			ndFloat32 angleErr(ndAnglesSub(targetPosit.m_z, effectPosit.m_z));
-			ndFloat32 positError2 = error.m_x * error.m_x + error.m_y * error.m_y;
+			const ndVector effectPosit(m_location.m_x, m_location.m_y, m_location.m_azimuth, ndReal(0.0f));
+			const ndVector targetPosit(m_targetLocation.m_x, m_targetLocation.m_y, m_targetLocation.m_azimuth, ndReal(0.0f));
+			ndVector positError(targetPosit - effectPosit);
+			positError.m_z = ndAnglesSub(targetPosit.m_z, effectPosit.m_z);
+			const ndVector positError2(positError * positError);
 		
-			ndFloat32 positReward = ndExp(-50.0f * positError2);
-			ndFloat32 azimuthReward = ndExp(-50.0f * angleErr * angleErr);
+			ndFloat32 azimuthReward = ndExp(-50.0f * positError2.m_z);
+			ndFloat32 positReward = ndExp(-50.0f * (positError2.m_x + positError2.m_y));
 			return azimuthReward * 0.5f + positReward * 0.5f;
 		}
 
@@ -470,16 +445,11 @@ namespace ndAdvancedRobot
 				observation->m_jointVeloc[i] = ndBrainFloat(kinematicState.m_velocity);
 			}
 
-			//observation->m_effectorPosit_x = ndBrainFloat(m_location.m_x);
-			//observation->m_effectorPosit_y = ndBrainFloat(m_location.m_y);
-			//observation->m_effectorAzimuth = ndBrainFloat(m_location.m_azimuth);
-			//observation->m_effectorTargetPosit_x = ndBrainFloat(m_targetLocation.m_x);
-			//observation->m_effectorTargetPosit_y = ndBrainFloat(m_targetLocation.m_y);
-			//observation->m_effectorTargetAzimuth = ndBrainFloat(m_targetLocation.m_azimuth);
-
-			observation->m_effectorPosit_x = ndBrainFloat(m_targetLocation.m_x - m_location.m_x);
-			observation->m_effectorPosit_y = ndBrainFloat(m_targetLocation.m_y - m_location.m_y);
-			observation->m_effectorAzimuth = ndBrainFloat(m_targetLocation.m_azimuth - m_location.m_azimuth);
+			ndFloat32 rotationDist = m_location.m_headRotation.DotProduct(m_targetLocation.m_headRotation).GetScalar();
+			observation->m_effectortDeltaX = ndBrainFloat(m_targetLocation.m_x - m_location.m_x);
+			observation->m_effectortDeltaY = ndBrainFloat(m_targetLocation.m_y - m_location.m_y);
+			observation->m_effectorDeltaAzimuth = ndBrainFloat(ndAnglesSub(m_targetLocation.m_azimuth, m_location.m_azimuth));
+			observation->m_effectorDeltaRotation = ndBrainFloat(rotationDist);
 		}
 
 		//#pragma optimize( "", off )
