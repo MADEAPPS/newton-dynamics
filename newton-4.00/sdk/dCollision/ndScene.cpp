@@ -277,6 +277,7 @@ bool ndScene::RemoveBody(const ndSharedPtr<ndBody>& body)
 		m_forceBalanceSceneCounter = 0;
 		m_bvhSceneManager.RemoveBody(kinematicBody);
 
+		//ndAssert(0);
 		ndBodyKinematic::ndContactMap& contactMap = kinematicBody->GetContactMap();
 		while (contactMap.GetRoot())
 		{
@@ -1201,12 +1202,10 @@ void ndScene::Cleanup()
 	m_contactArray.DeleteAllContacts();
 
 	ndFreeListAlloc::Flush();
-	m_contactArray.Resize(1024);
 	m_sceneBodyArray.Resize(1024);
 	m_activeConstraintArray.Resize(1024);
 	m_scratchBuffer.Resize(1024 * sizeof(void*));
 
-	m_contactArray.SetCount(0);
 	m_scratchBuffer.SetCount(0);
 	m_sceneBodyArray.SetCount(0);
 	m_activeConstraintArray.SetCount(0);
@@ -1592,6 +1591,7 @@ void ndScene::CalculateContacts()
 {
 	D_TRACKTIME();
 	m_activeConstraintArray.SetCount(0);
+	ndScopeSpinLock lock(m_contactArray.GetLock());
 	const ndInt32 contactCount = ndInt32(m_contactArray.GetCount() + m_newPairs.GetCount());
 	m_contactArray.SetCount(contactCount);
 	if (contactCount)
@@ -1653,6 +1653,7 @@ void ndScene::DeleteDeadContacts()
 	};
 	ndUnsigned32 prefixScan[5];
 
+	ndScopeSpinLock lock(m_contactArray.GetLock());
 	if (m_contactArray.GetCount())
 	{
 		D_TRACKTIME();

@@ -677,6 +677,7 @@ void ndDebugDisplay::ndContactPoints::UpdateBuffers(ndDemoEntityManager* const s
 	m_points.SetCount(0);
 	ndWorld* const world = scene->GetWorld();
 	const ndContactArray& contactList = world->GetContactList();
+	ndScopeSpinLock contactLock(contactList.GetLock());
 
 	glVector3 color(GLfloat(1.0f), GLfloat(0.0f), GLfloat(0.0f));
 	for (ndInt32 i = 0; i < contactList.GetCount(); ++i)
@@ -722,6 +723,8 @@ void ndDebugDisplay::ndNormalForces::UpdateBuffers(ndDemoEntityManager* const sc
 	
 	ndWorld* const world = scene->GetWorld();
 	const ndContactArray& contactList = world->GetContactList();
+	ndScopeSpinLock contactLock(contactList.GetLock());
+
 	for (ndInt32 i = 0; i < contactList.GetCount(); ++i)
 	{
 		const ndContact* const contact = contactList[i];

@@ -60,6 +60,7 @@ ndContact* ndContactArray::CreateContact(ndBodyKinematic* const body0, ndBodyKin
 	ndContact* const contact = new ndContact;
 	contact->SetBodies(body0, body1);
 	contact->AttachToBodies();
+
 	ndScopeSpinLock lock(m_lock);
 	PushBack(contact);
 	return contact;
@@ -76,6 +77,7 @@ void ndContactArray::DetachContact(ndContact* const contact)
 
 void ndContactArray::DeleteAllContacts()
 {
+	ndScopeSpinLock lock(m_lock);
 	for (ndInt32 i = ndInt32(GetCount()) - 1; i >= 0; --i)
 	{
 		ndContact* const contact = m_array[i];
