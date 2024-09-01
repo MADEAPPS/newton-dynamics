@@ -196,18 +196,18 @@ ndQuaternion ndQuaternion::Slerp (const ndQuaternion &q1, ndFloat32 t) const
 
 ndVector ndQuaternion::GetEulerAngles(ndVector& euler) const
 {
-	const ndMatrix matrix (ndCalculateMatrix(*this, ndVector::m_wOne));
+	const ndMatrix matrix (ndCalculateMatrix(*this));
 	return matrix.CalcPitchYawRoll(euler);
 }
 
 ndVector ndQuaternion::RotateVector(const ndVector& point) const
 {
-	ndMatrix matrix(ndCalculateMatrix(*this, ndVector::m_wOne));
+	ndMatrix matrix(ndCalculateMatrix(*this));
 	return matrix.RotateVector(point);
 }
 
 ndVector ndQuaternion::UnrotateVector(const ndVector& point) const
 {
-	ndMatrix matrix(ndCalculateMatrix(*this, ndVector::m_wOne));
+	ndMatrix matrix(ndCalculateMatrix(*this));
 	return matrix.UnrotateVector(point);
 }

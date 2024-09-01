@@ -38,7 +38,7 @@ D_CORE_API ndMatrix ndRollMatrix(ndFloat32 ang);
 D_CORE_API ndMatrix ndPitchMatrix(ndFloat32 ang);
 D_CORE_API ndMatrix ndGramSchmidtMatrix(const ndVector& dir);
 D_CORE_API ndMatrix ndCovarianceMatrix(const ndVector& p, const ndVector& q);
-D_CORE_API ndMatrix ndCalculateMatrix(const ndQuaternion& rotation, const ndVector& position);
+D_CORE_API ndMatrix ndCalculateMatrix(const ndQuaternion& rotation, const ndVector& position = ndVector::m_wOne);
 
 D_MSV_NEWTON_ALIGN_32
 class ndMatrix
