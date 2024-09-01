@@ -24,7 +24,7 @@
 
 namespace ndAdvancedRobot
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach-vpg.dnn"
 
 	class ndActionVector
@@ -358,13 +358,18 @@ namespace ndAdvancedRobot
 				return true;
 			}
 
+			//if (m_location.m_rotation.DotProduct(m_targetLocation.m_rotation).GetScalar() < 0.0f)
+			//{
+			//	return true;
+			//}
+
 			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
 				const ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-				const ndVector veloc(body->GetVelocity());
-				const ndVector omega(body->GetOmega());
 
+				const ndVector omega(body->GetOmega());
+				const ndVector veloc(body->GetVelocity());
 				ndFloat32 vMag2 = veloc.DotProduct(veloc).GetScalar();
 				if (vMag2 > 200.0f)
 				{
@@ -589,8 +594,7 @@ namespace ndAdvancedRobot
 			}
 			else
 			{
-				ndAssert(0);
-				//	m_controller->Step();
+				m_controller->Step();
 			}
 		}
 
@@ -1140,9 +1144,9 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	}
 #endif
 	
-	matrix.m_posit.m_x -= 6.0f;
+	matrix.m_posit.m_x -= 7.0f;
 	matrix.m_posit.m_y += 2.0f;
-	matrix.m_posit.m_z += 6.0f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), ndPi * 0.25f);
+	matrix.m_posit.m_z += 0.0f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), ndPi * 0.0f);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
