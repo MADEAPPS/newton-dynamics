@@ -378,6 +378,11 @@ namespace ndAdvancedRobot
 				return true;
 			}
 
+			if (!m_effector->IsHolonomic(m_timestep))
+			{
+				return true;
+			}
+
 			//if (m_location.m_rotation.DotProduct(m_targetLocation.m_rotation).GetScalar() < 0.0f)
 			//{
 			//	return true;
@@ -414,11 +419,11 @@ namespace ndAdvancedRobot
 				return 0.0f;
 			}
 
-			ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
-			if (!effector->IsHolonomic(m_timestep))
-			{
-				return 0.0f;
-			}
+			//ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
+			//if (!effector->IsHolonomic(m_timestep))
+			//{
+			//	return 0.0f;
+			//}
 
 			const ndVector effectPosit(m_location.m_x, m_location.m_y, m_location.m_azimuth, ndReal(0.0f));
 			const ndVector targetPosit(m_targetLocation.m_x, m_targetLocation.m_y, m_targetLocation.m_azimuth, ndReal(0.0f));
@@ -620,13 +625,11 @@ namespace ndAdvancedRobot
 			ndMatrix matrix1;
 			m_effector->CalculateGlobalMatrix(matrix0, matrix1);
 			matrix1 = CalculateTargetMatrix() * matrix1;
-			//ndMatrix matrix1(CalculateTargetMatrix() * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
 			const ndVector color(1.0f, 0.0f, 0.0f, 1.0f);
 
 			context.DrawFrame(matrix0);
 			context.DrawFrame(matrix1);
 			context.DrawPoint(matrix1.m_posit, color, ndFloat32(5.0f));
-			//const ndMatrix matrix0(m_effector->GetLocalMatrix0() * m_effector->GetBody0()->GetMatrix());
 		}
 
 		ndMatrix m_rotationOffset;
@@ -703,6 +706,7 @@ namespace ndAdvancedRobot
 				m_robot->m_targetLocation.m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
 				m_robot->m_targetLocation.m_y = ndReal(ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
 			}
+
 			m_robot->m_targetLocation.m_headRotation = ndQuaternion (ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
 
 			if (m_robot->m_targetLocation.m_headRotation.DotProduct(m_robot->m_location.m_headRotation).GetScalar() < 0.0f)
@@ -1121,8 +1125,8 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 #endif
 	
 	matrix.m_posit.m_x -= 7.0f;
-	matrix.m_posit.m_y += 2.0f;
-	matrix.m_posit.m_z += 0.0f;
+	matrix.m_posit.m_y += 2.5f;
+	matrix.m_posit.m_z += 0.25f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), ndPi * 0.0f);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
