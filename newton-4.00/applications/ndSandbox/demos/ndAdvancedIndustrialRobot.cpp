@@ -57,6 +57,25 @@ namespace ndAdvancedRobot
 		//ndBrainFloat m_effectorTargetAzimuth;
 	};
 
+	class ndControlParameters
+	{
+		public:
+		ndControlParameters()
+			:m_x(0.0f)
+			,m_y(0.0f)
+			,m_azimuth(0.0f)
+			,m_gripperPosit(0.0f)
+			,m_headRotation()
+		{
+		}
+
+		ndReal m_x;
+		ndReal m_y;
+		ndReal m_azimuth;
+		ndReal m_gripperPosit;
+		ndQuaternion m_headRotation;
+	};
+
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
 	#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
 
@@ -68,6 +87,7 @@ namespace ndAdvancedRobot
 	#define ND_POSITION_X_STEP		ndReal (0.25f)
 	#define ND_POSITION_Y_STEP		ndReal (0.25f)
 	#define ND_POSITION_AZIMTH_STEP	ndReal (2.0f * ndDegreeToRad)
+	#define ND_ROTATION_STEP		ndReal (0.1f)
 
 	class ndDefinition
 	{
@@ -309,6 +329,8 @@ namespace ndAdvancedRobot
 			m_rootBody = robot->GetRoot()->m_body->GetAsBodyDynamic();
 			m_leftGripper = (ndJointSlider*)robot->FindByName("gripperLeft")->m_joint->GetAsBilateral();
 			m_rightGripper = (ndJointSlider*)robot->FindByName("gripperRight")->m_joint->GetAsBilateral();
+
+			m_rotationOffset = ndRollMatrix(ndPi * 0.5f);
 			m_effectorOffset = effectorJoint->GetOffsetMatrix().m_posit;
 
 			ndModelArticulation::ndNode* node = robot->FindByName("arm_4");
@@ -470,10 +492,6 @@ namespace ndAdvancedRobot
 			m_leftGripper->SetOffsetPosit(-m_targetLocation.m_gripperPosit * 0.5f);
 			m_rightGripper->SetOffsetPosit(-m_targetLocation.m_gripperPosit * 0.5f);
 
-			const ndMatrix alignMatrix(ndRollMatrix(ndPi * 0.5f));
-			const ndMatrix rotation(ndPitchMatrix(m_targetLocation.m_pitch) * ndYawMatrix(m_targetLocation.m_yaw) * ndRollMatrix(m_targetLocation.m_roll));
-			ndMatrix targetMatrix(alignMatrix * rotation * alignMatrix.OrthoInverse());
-			
 			ndFloat32 deltaX = actions->m_x * ND_POSITION_X_STEP;
 			ndFloat32 deltaY = actions->m_y * ND_POSITION_Y_STEP;
 			ndFloat32 deltaAzimuth = actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
@@ -492,6 +510,9 @@ namespace ndAdvancedRobot
 
 			ndVector localPosit(x, y, 0.0f, 0.0f);
 			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
+
+			const ndMatrix rotation(ndCalculateMatrix(m_targetLocation.m_headRotation));
+			ndMatrix targetMatrix(m_rotationOffset * rotation * m_rotationOffset.OrthoInverse());
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
 
 			effector->SetOffsetMatrix(targetMatrix);
@@ -609,12 +630,7 @@ namespace ndAdvancedRobot
 
 		ndMatrix CalculateTargetMatrix() const
 		{
-			ndMatrix targetMatrix(
-				ndRollMatrix(ndPi * 0.5f) *
-				ndPitchMatrix(m_targetLocation.m_pitch) *
-				ndYawMatrix(m_targetLocation.m_yaw) *
-				ndRollMatrix(m_targetLocation.m_roll) *
-				ndRollMatrix(-ndPi * 0.5f));
+			ndMatrix targetMatrix(m_rotationOffset * ndCalculateMatrix(m_targetLocation.m_headRotation) * m_rotationOffset.OrthoInverse());
 			ndFloat32 x = m_targetLocation.m_x;
 			ndFloat32 y = m_targetLocation.m_y;
 			ndVector localPosit(x, y, 0.0f, 0.0f);
@@ -643,8 +659,10 @@ namespace ndAdvancedRobot
 			//const ndMatrix matrix0(m_effector->GetLocalMatrix0() * m_effector->GetBody0()->GetMatrix());
 		}
 
-		ndIkSolver m_invDynamicsSolver;
+		ndMatrix m_rotationOffset;
 		ndVector m_effectorOffset;
+
+		ndIkSolver m_invDynamicsSolver;
 		ndSharedPtr<ndJointBilateralConstraint> m_effector;
 
 		ndBodyDynamic* m_rootBody;
@@ -656,33 +674,8 @@ namespace ndAdvancedRobot
 		ndFixSizeArray<ndBasePose, 32> m_basePose;
 		ndFixSizeArray<ndJointBilateralConstraint*, 16> m_armJoints;
 
-		class EffectorLocation
-		{
-			public:
-			EffectorLocation()
-				:m_yaw(0.0f)
-				,m_roll(0.0f)
-				,m_pitch(0.0f)
-				,m_x(0.0f)
-				,m_y(0.0f)
-				,m_azimuth(0.0f)
-				,m_gripperPosit(0.0f)
-			{
-			}
-
-			ndReal m_yaw;
-			ndReal m_roll;
-			ndReal m_pitch;
-
-			ndReal m_x;
-			ndReal m_y;
-			ndReal m_azimuth;
-
-			ndReal m_gripperPosit;
-		};
-
-		EffectorLocation m_location;
-		EffectorLocation m_targetLocation;
+		ndControlParameters m_location;
+		ndControlParameters m_targetLocation;
 		ndFloat32 m_timestep;
 		bool m_modelAlive;
 		bool m_showDebug;
@@ -713,13 +706,20 @@ namespace ndAdvancedRobot
 			m_scene->Print(color, "Control panel");
 
 			ndInt8 change = 0;
+
+			ndVector euler1;
+			ndVector euler(m_robot->m_targetLocation.m_headRotation.GetEulerAngles(euler1));
+			ndReal pitch = ndReal(euler.m_x);
+			ndReal yaw = ndReal(euler.m_y);
+			ndReal roll = ndReal(euler.m_z);
+
 			change = change | ndInt8(ImGui::SliderFloat("x", &m_robot->m_targetLocation.m_x, ND_MIN_X_SPAND, ND_MAX_X_SPAND));
 			change = change | ndInt8 (ImGui::SliderFloat("y", &m_robot->m_targetLocation.m_y, ND_MIN_Y_SPAND, ND_MAX_Y_SPAND));
 			change = change | ndInt8 (ImGui::SliderFloat("azimuth", &m_robot->m_targetLocation.m_azimuth, -ndPi, ndPi));
+			change = change | ndInt8(ImGui::SliderFloat("pitch", &pitch, -ndPi, ndPi));
+			change = change | ndInt8(ImGui::SliderFloat("yaw", &yaw, -ndPi * 0.5f, ndPi * 0.5f));
+			change = change | ndInt8(ImGui::SliderFloat("roll", &roll, -ndPi, ndPi));
 			change = change | ndInt8 (ImGui::SliderFloat("gripper", &m_robot->m_targetLocation.m_gripperPosit, -0.2f, 0.4f));
-			change = change | ndInt8 (ImGui::SliderFloat("pitch", &m_robot->m_targetLocation.m_pitch, -ndPi, ndPi));
-			change = change | ndInt8 (ImGui::SliderFloat("yaw", &m_robot->m_targetLocation.m_yaw, -ndPi * 0.5f, ndPi * 0.5f));
-			change = change | ndInt8 (ImGui::SliderFloat("roll", &m_robot->m_targetLocation.m_roll, -ndPi, ndPi));
 
 			bool newTarget = ndInt8(ImGui::Button("random target"));
 			if (newTarget)
@@ -732,6 +732,12 @@ namespace ndAdvancedRobot
 				m_robot->m_targetLocation.m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				m_robot->m_targetLocation.m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
 				m_robot->m_targetLocation.m_y = ndReal(ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
+			}
+			m_robot->m_targetLocation.m_headRotation = ndQuaternion (ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
+
+			if (m_robot->m_targetLocation.m_headRotation.DotProduct(m_robot->m_location.m_headRotation).GetScalar() < 0.0f)
+			{
+				m_robot->m_targetLocation.m_headRotation = m_robot->m_targetLocation.m_headRotation.Scale(-1.0f);
 			}
 
 			if (change)
