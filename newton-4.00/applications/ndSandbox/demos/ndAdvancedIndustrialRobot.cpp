@@ -24,7 +24,7 @@
 
 namespace ndAdvancedRobot
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach-vpg.dnn"
 
 	class ndActionVector
@@ -118,6 +118,30 @@ namespace ndAdvancedRobot
 		{ "gripperLeft", ndDefinition::m_slider  , 1.0f, -0.2f, 0.03f},
 		{ "gripperRight", ndDefinition::m_slider , 1.0f, -0.2f, 0.03f},
 		//{ "effector", ndDefinition::m_effector , 0.0f, 0.0f, 0.0f},
+	};
+
+	class ndRobotBodyNotify : public ndDemoEntityNotify
+	{
+		public:
+		ndRobotBodyNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody = nullptr)
+			:ndDemoEntityNotify(manager, entity, parentBody)
+		{
+		}
+
+		virtual bool OnSceneAabbOverlap(const ndBody* const otherBody) const
+		{
+			const ndBodyKinematic* const body0 = ((ndBody*)GetBody())->GetAsBodyKinematic();
+			const ndBodyKinematic* const body1 = ((ndBody*)otherBody)->GetAsBodyKinematic();
+			const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
+			const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
+
+			if ((instanceShape0.m_shapeMaterial.m_userId == ndDemoContactCallback::m_modelPart) &&
+				(instanceShape1.m_shapeMaterial.m_userId == ndDemoContactCallback::m_modelPart))
+			{
+				return false;
+			}
+			return true;
+		}
 	};
 
 	class RobotModelNotify : public ndModelNotify
@@ -328,6 +352,9 @@ namespace ndAdvancedRobot
 			m_leftGripper = (ndJointSlider*)robot->FindByName("gripperLeft")->m_joint->GetAsBilateral();
 			m_rightGripper = (ndJointSlider*)robot->FindByName("gripperRight")->m_joint->GetAsBilateral();
 
+			ndAssert(robot->FindByName("arm_3"));
+			m_pivotJoint = *robot->FindByName("arm_3")->m_joint;
+
 			m_rotationOffset = ndRollMatrix(ndPi * 0.5f);
 			m_effectorOffset = effectorJoint->GetOffsetMatrix().m_posit;
 
@@ -383,10 +410,10 @@ namespace ndAdvancedRobot
 				return true;
 			}
 
-			//if (m_location.m_rotation.DotProduct(m_targetLocation.m_rotation).GetScalar() < 0.0f)
-			//{
-			//	return true;
-			//}
+			if (m_location.m_headRotation.DotProduct(m_targetLocation.m_headRotation).GetScalar() < 0.0f)
+			{
+				return true;
+			}
 
 			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
@@ -483,12 +510,13 @@ namespace ndAdvancedRobot
 			y = ndClamp(y, ndFloat32(0.9f * ND_MIN_Y_SPAND), ndFloat32(0.9f * ND_MAX_Y_SPAND));
 			azimuth = ndClamp(azimuth, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
 
-			ndVector localPosit(x, y, 0.0f, 0.0f);
+			const ndVector localPosit(x, y, 0.0f, 0.0f);
 			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
+			const ndVector posit (aximuthMatrix.TransformVector(m_effectorOffset + localPosit));
 
 			const ndMatrix rotation(ndCalculateMatrix(m_targetLocation.m_headRotation));
 			ndMatrix targetMatrix(m_rotationOffset * rotation * m_rotationOffset.OrthoInverse());
-			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
+			targetMatrix.m_posit = posit;
 
 			effector->SetOffsetMatrix(targetMatrix);
 			
@@ -574,10 +602,15 @@ namespace ndAdvancedRobot
 			m_targetLocation.m_y = ndClamp(m_targetLocation.m_y, ndReal(ND_MIN_Y_SPAND + 0.05f), ndReal(ND_MAX_Y_SPAND - 0.05f));
 			m_targetLocation.m_azimuth = ndClamp(m_targetLocation.m_azimuth, ndReal(-ndPi + 0.09f), ndReal(ndPi - 0.09f));
 
-			//m_targetLocation.m_x = 0.0f;
-			//m_targetLocation.m_y = 0.0f;
-			//m_targetLocation.m_azimuth = 0.0f;
-			//ndTrace(("%f\n", m_targetLocation.m_azimuth * ndRadToDegree));
+			//ndFloat32 yaw = ndFloat32((1.0f * ndRand() - 0.5f) * ndPi);
+			//ndFloat32 pitch = ndFloat32((2.0f * ndRand() - 1.0f) * ndPi);
+			//ndFloat32 roll = ndFloat32(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
+			//m_targetLocation.m_headRotation = ndQuaternion(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
+			//if (m_targetLocation.m_headRotation.DotProduct(m_location.m_headRotation).GetScalar() < 0.0f)
+			//{
+			//	m_targetLocation.m_headRotation = m_targetLocation.m_headRotation.Scale(-1.0f);
+			//}
+
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -630,6 +663,9 @@ namespace ndAdvancedRobot
 			context.DrawFrame(matrix0);
 			context.DrawFrame(matrix1);
 			context.DrawPoint(matrix1.m_posit, color, ndFloat32(5.0f));
+
+			//const ndMatrix pivotMatrix(m_pivotJoint->GetLocalMatrix1() * m_pivotJoint->GetBody1()->GetMatrix());
+			//context.DrawFrame(pivotMatrix);
 		}
 
 		ndMatrix m_rotationOffset;
@@ -642,6 +678,7 @@ namespace ndAdvancedRobot
 		ndJointSlider* m_leftGripper;
 		ndJointSlider* m_rightGripper;
 		ndController* m_controller;
+		ndJointBilateralConstraint* m_pivotJoint;
 		ndControllerTrainer* m_controllerTrainer;
 		ndWorld* m_world;
 		ndFixSizeArray<ndBasePose, 32> m_basePose;
@@ -691,16 +728,16 @@ namespace ndAdvancedRobot
 			change = change | ndInt8 (ImGui::SliderFloat("azimuth", &m_robot->m_targetLocation.m_azimuth, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("pitch", &pitch, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("yaw", &yaw, -ndPi * 0.5f, ndPi * 0.5f));
-			change = change | ndInt8(ImGui::SliderFloat("roll", &roll, -ndPi, ndPi));
+			change = change | ndInt8(ImGui::SliderFloat("roll", &roll, -ndPi * 0.35f, ndPi * 0.9f));
 			change = change | ndInt8 (ImGui::SliderFloat("gripper", &m_robot->m_targetLocation.m_gripperPosit, -0.2f, 0.4f));
 
 			bool newTarget = ndInt8(ImGui::Button("random target"));
 			if (newTarget)
 			{
 				change = 1;
-				//roll = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				//pitch = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				//yaw = ndReal((2.0f * ndRand() - 1.0f) * ndPi * 0.5f);
+				//roll = ndReal(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
 
 				m_robot->m_targetLocation.m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				m_robot->m_targetLocation.m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
@@ -736,7 +773,11 @@ namespace ndAdvancedRobot
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(*shape);
 		body->SetMassMatrix(mass, *shape);
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entityPart, parentBone));
+		body->SetNotifyCallback(new ndRobotBodyNotify(scene, entityPart, parentBone));
+
+		ndShapeInstance& instanceShape = body->GetCollisionShape();
+		instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+
 		return body->GetAsBodyDynamic();
 	}
 

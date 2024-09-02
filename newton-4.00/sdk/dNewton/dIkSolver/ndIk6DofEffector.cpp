@@ -115,9 +115,14 @@ ndMatrix ndIk6DofEffector::GetEffectorMatrix() const
 	return matrix;
 }
 
+ndMatrix ndIk6DofEffector::CalculateGlobalBaseMatrix1() const
+{
+	return ndJointBilateralConstraint::CalculateGlobalMatrix1();
+}
+
 ndMatrix ndIk6DofEffector::CalculateGlobalMatrix1() const
 {
-	return m_targetFrame * ndJointBilateralConstraint::CalculateGlobalMatrix1();
+	return m_targetFrame * CalculateGlobalBaseMatrix1();
 }
 
 ndFloat32 ndIk6DofEffector::GetMaxForce() const

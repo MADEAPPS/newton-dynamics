@@ -1386,7 +1386,7 @@ namespace ndQuadruped_1
 				ndDemoEntityNotify* const originalNotify = (ndDemoEntityNotify*)body->GetNotifyCallback();
 				void* const useData = originalNotify->m_entity;
 				originalNotify->m_entity = nullptr;
-				TrainingRobotBodyNotify* const notify = new TrainingRobotBodyNotify((TrainingRobotBodyNotify*)body->GetNotifyCallback());
+				TrainingRobotBodyNotify* const notify = new TrainingRobotBodyNotify((ndDemoEntityNotify*)body->GetNotifyCallback());
 				body->SetNotifyCallback(notify);
 				notify->m_entity = (ndDemoEntity*)useData;
 			

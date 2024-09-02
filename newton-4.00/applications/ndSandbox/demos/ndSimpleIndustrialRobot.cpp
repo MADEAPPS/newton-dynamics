@@ -61,6 +61,30 @@ namespace ndSimpleRobot
 	#define ND_MIN_Y_SPAND			ndReal (-2.2f)
 	#define ND_MAX_Y_SPAND			ndReal ( 1.5f)
 
+	class ndRobotBodyNotify : public ndDemoEntityNotify
+	{
+		public:
+		ndRobotBodyNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody = nullptr)
+			:ndDemoEntityNotify(manager, entity, parentBody)
+		{
+		}
+
+		virtual bool OnSceneAabbOverlap(const ndBody* const otherBody) const
+		{
+			const ndBodyKinematic* const body0 = ((ndBody*)GetBody())->GetAsBodyKinematic();
+			const ndBodyKinematic* const body1 = ((ndBody*)otherBody)->GetAsBodyKinematic();
+			const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
+			const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
+
+			if ((instanceShape0.m_shapeMaterial.m_userId == ndDemoContactCallback::m_modelPart) &&
+				(instanceShape1.m_shapeMaterial.m_userId == ndDemoContactCallback::m_modelPart))
+			{
+				return false;
+			}
+			return true;
+		}
+	};
+
 	class RobotModelNotify : public ndModelNotify
 	{
 		public:
@@ -106,11 +130,15 @@ namespace ndSimpleRobot
 
 		void Init(ndModelArticulation* const robot)
 		{
+			ndAssert(robot->FindByName("arm_3"));
+			m_pivotJoint = *robot->FindByName("arm_3")->m_joint;
+
 			m_rootBody = robot->GetRoot()->m_body->GetAsBodyDynamic();
 			m_leftGripper = (ndJointSlider*)robot->FindByName("leftGripper")->m_joint->GetAsBilateral();
 			m_rightGripper = (ndJointSlider*)robot->FindByName("rightGripper")->m_joint->GetAsBilateral();
 			m_effector = (ndIk6DofEffector*)robot->FindLoopByName("effector")->m_joint->GetAsBilateral();
 			m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
+			m_rotationOffset = ndRollMatrix(ndPi * 0.5f);
 		}
 
 		void ResetModel()
@@ -126,41 +154,21 @@ namespace ndSimpleRobot
 			m_leftGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
 			m_rightGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
 
-			// apply target position collected by control panel
-			ndMatrix targetMatrix(
-				ndRollMatrix(90.0f * ndDegreeToRad) *
-				ndPitchMatrix(m_pitch) *
-				ndYawMatrix(m_yaw) *
-				ndRollMatrix(m_roll) *
-				ndRollMatrix(-90.0f * ndDegreeToRad));
-
 			ndVector localPosit(m_x, m_y, 0.0f, 0.0f);
 			const ndMatrix aximuthMatrix(ndYawMatrix(m_azimuth));
-			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
-			m_effector->SetOffsetMatrix(targetMatrix);
+			const ndVector posit(aximuthMatrix.TransformVector(m_effectorOffset + localPosit));
 
-			//xxxx0 = m_effector->GetEffectorMatrix();
+			ndMatrix targetMatrix(
+				m_rotationOffset *
+				ndPitchMatrix(m_pitch) * ndYawMatrix(m_yaw) * ndRollMatrix(m_roll) *
+				m_rotationOffset.OrthoInverse());
+
+			targetMatrix.m_posit = posit;
+			m_effector->SetOffsetMatrix(targetMatrix);
 		}
 
 		void PostUpdate(ndWorld* const, ndFloat32)
 		{
-			//xxxx1 = m_effector->GetEffectorMatrix();
-			//
-			//ndFloat32 azimuth = 0.0f;
-			//const ndVector posit(xxxx1.m_posit);
-			//if ((posit.m_x * posit.m_x + posit.m_z * posit.m_z) > 1.0e-3f)
-			//{
-			//	azimuth = ndAtan2(-posit.m_z, posit.m_x);
-			//}
-			//const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
-			//const ndVector currenPosit(aximuthMatrix.UnrotateVector(posit) - m_effectorOffset);
-			//ndAssert(currenPosit.m_x >= -1.0e-2f);
-			//const ndVector currenPosit1(aximuthMatrix.UnrotateVector(posit) - m_effectorOffset);
-
-			ndMatrix matrix(m_effector->GetEffectorMatrix());
-			ndMatrix rotation0(ndRollMatrix(-90.0f * ndDegreeToRad) * matrix * ndRollMatrix(90.0f * ndDegreeToRad));
-			ndMatrix rotation1(ndPitchMatrix(m_pitch) * ndYawMatrix(m_yaw) * ndRollMatrix(m_roll));
-			ndMatrix rotation2(ndPitchMatrix(m_pitch) * ndYawMatrix(m_yaw) * ndRollMatrix(m_roll));
 		}
 
 		void PostTransformUpdate(ndWorld* const, ndFloat32)
@@ -170,9 +178,9 @@ namespace ndSimpleRobot
 		ndMatrix CalculateTargetMatrix() const
 		{
 			ndMatrix targetMatrix(
-				ndRollMatrix(90.0f * ndDegreeToRad) *
+				m_rotationOffset *
 				ndPitchMatrix(m_pitch) * ndYawMatrix(m_yaw) * ndRollMatrix(m_roll) *
-				ndRollMatrix(-90.0f * ndDegreeToRad));
+				m_rotationOffset.OrthoInverse());
 			ndFloat32 x = m_x;
 			ndFloat32 y = m_y;
 			ndVector localPosit(x, y, 0.0f, 0.0f);
@@ -183,20 +191,24 @@ namespace ndSimpleRobot
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			ndMatrix matrix(CalculateTargetMatrix() * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
+			//ndMatrix matrix(CalculateTargetMatrix() * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
+			ndMatrix matrix(m_effector->CalculateGlobalMatrix1());
 			const ndVector color(1.0f, 0.0f, 0.0f, 1.0f);
 
 			context.DrawFrame(matrix);
 			context.DrawPoint(matrix.m_posit, color, ndFloat32(5.0f));
+
+			//ndMatrix matrix1(m_pivotJoint->CalculateGlobalMatrix1());
+			//context.DrawFrame(matrix1);
 		}
 
-		//ndMatrix xxxx0;
-		//ndMatrix xxxx1;
+		ndMatrix m_rotationOffset;
 		ndVector m_effectorOffset;
 		ndBodyDynamic* m_rootBody;
 		ndJointSlider* m_leftGripper;
 		ndJointSlider* m_rightGripper;
 		ndIk6DofEffector* m_effector;
+		ndJointBilateralConstraint* m_pivotJoint;
 		ndWorld* m_world;
 
 		ndReal m_x;
@@ -240,20 +252,23 @@ namespace ndSimpleRobot
 			change = change | ndInt8(ImGui::SliderFloat("azimuth", &m_robot->m_azimuth, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("pitch", &m_robot->m_pitch, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("yaw", &m_robot->m_yaw, -ndPi * 0.5f, ndPi * 0.5f));
-			change = change | ndInt8(ImGui::SliderFloat("roll", &m_robot->m_roll, -ndPi, ndPi));
+			change = change | ndInt8(ImGui::SliderFloat("roll", &m_robot->m_roll, -ndPi * 0.35f, ndPi * 0.9f));
 			change = change | ndInt8(ImGui::SliderFloat("gripper", &m_robot->m_gripperPosit, -0.2f, 0.4f));
 			bool newTarget = ndInt8(ImGui::Button("random target"));
 			if (newTarget)
 			{
 				change = 1;
 
-				m_robot->m_roll = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
+				//m_robot->m_roll = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				m_robot->m_pitch = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				m_robot->m_yaw = ndReal((2.0f * ndRand() - 1.0f) * ndPi * 0.5f);
+				m_robot->m_roll = ndReal(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
+
 				m_robot->m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				m_robot->m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
 				m_robot->m_y = ndReal(ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
 			}
+
 			if (change)
 			{
 				m_robot->GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic()->SetSleepState(false);
@@ -278,7 +293,11 @@ namespace ndSimpleRobot
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(*shape);
 		body->SetMassMatrix(mass, *shape);
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entityPart, parentBone));
+		body->SetNotifyCallback(new ndRobotBodyNotify(scene, entityPart, parentBone));
+
+		ndShapeInstance& instanceShape = body->GetCollisionShape();
+		instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+
 		return body->GetAsBodyDynamic();
 	}
 
@@ -367,6 +386,7 @@ namespace ndSimpleRobot
 						}
 
 						parentBone = model->AddLimb(parentBone, childBody, hinge);
+						parentBone->m_name = name;
 					}
 					else if (definition.m_type == ndDefinition::m_slider)
 					{
