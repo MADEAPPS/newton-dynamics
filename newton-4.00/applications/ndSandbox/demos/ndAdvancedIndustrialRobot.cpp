@@ -458,12 +458,12 @@ namespace ndAdvancedRobot
 			matrix1 = matrix1 * invBaseMatrix;
 
 			ndFloat32 azimuth0 = ndAtan2(-matrix0.m_posit.m_z, matrix0.m_posit.m_x);
-			ndFloat32 azimuth1 = ndAtan2(-matrix0.m_posit.m_z, matrix0.m_posit.m_x);
+			ndFloat32 azimuth1 = ndAtan2(-matrix1.m_posit.m_z, matrix1.m_posit.m_x);
 			ndFloat32 azimuth = ndAnglesSub(azimuth0, azimuth1);
 			ndFloat32 azimuth2 = azimuth * azimuth;
 
-			ndVector posit0(ndRollMatrix(azimuth0).RotateVector(matrix0.m_posit));
-			ndVector posit1(ndRollMatrix(azimuth1).RotateVector(matrix1.m_posit));
+			ndVector posit0(ndYawMatrix(azimuth0).UnrotateVector(matrix0.m_posit));
+			ndVector posit1(ndYawMatrix(azimuth1).UnrotateVector(matrix1.m_posit));
 
 			ndVector positError(posit1 - posit0);
 			positError.m_z = 0.0f;
