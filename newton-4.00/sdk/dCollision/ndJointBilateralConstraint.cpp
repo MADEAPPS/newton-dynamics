@@ -173,7 +173,7 @@ void ndJointBilateralConstraint::CalculateGlobalMatrix(ndMatrix& matrix0, ndMatr
 
 ndMatrix ndJointBilateralConstraint::CalculateGlobalMatrix0() const
 {
-	return m_localMatrix0* m_body0->GetMatrix();
+	return m_localMatrix0 * m_body0->GetMatrix();
 }
 
 ndMatrix ndJointBilateralConstraint::CalculateGlobalMatrix1() const
