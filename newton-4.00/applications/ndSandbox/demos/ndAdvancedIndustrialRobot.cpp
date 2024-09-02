@@ -645,8 +645,8 @@ namespace ndAdvancedRobot
 			roll = 0.0f * ndDegreeToRad;
 			pitch = 0.0f * ndDegreeToRad;
 			//m_targetLocation.m_x = m_location.m_x + 0.2f;
-			m_targetLocation.m_y = 0.0f;
-			m_targetLocation.m_azimuth = 0.0f;
+			//m_targetLocation.m_y = 0.0f;
+			//m_targetLocation.m_azimuth = 0.0f;
 			m_targetLocation.m_headRotation = ndQuaternion(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
 			if (m_targetLocation.m_headRotation.DotProduct(m_location.m_headRotation).GetScalar() < 0.0f)
 			{
