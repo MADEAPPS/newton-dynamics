@@ -130,9 +130,6 @@ namespace ndSimpleRobot
 
 		void Init(ndModelArticulation* const robot)
 		{
-			ndAssert(robot->FindByName("arm_3"));
-			m_pivotJoint = *robot->FindByName("arm_3")->m_joint;
-
 			m_rootBody = robot->GetRoot()->m_body->GetAsBodyDynamic();
 			m_leftGripper = (ndJointSlider*)robot->FindByName("leftGripper")->m_joint->GetAsBilateral();
 			m_rightGripper = (ndJointSlider*)robot->FindByName("rightGripper")->m_joint->GetAsBilateral();
@@ -208,7 +205,6 @@ namespace ndSimpleRobot
 		ndJointSlider* m_leftGripper;
 		ndJointSlider* m_rightGripper;
 		ndIk6DofEffector* m_effector;
-		ndJointBilateralConstraint* m_pivotJoint;
 		ndWorld* m_world;
 
 		ndReal m_x;
