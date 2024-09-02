@@ -92,7 +92,6 @@ class ndJointBilateralConstraint : public ndConstraint
 
 	D_COLLISION_API ndFloat32 CalculateAngle(const ndVector& planeDir, const ndVector& cosDir, const ndVector& sinDir) const;
 	D_COLLISION_API virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
-	D_COLLISION_API void CalculateLocalMatrix(const ndMatrix& pinsAndPivotFrame, ndMatrix& localMatrix0, ndMatrix& localMatrix1) const;
 	D_COLLISION_API void AddAngularRowJacobian(ndConstraintDescritor& desc, const ndVector& dir, ndFloat32 relAngle);
 	D_COLLISION_API void AddLinearRowJacobian(ndConstraintDescritor& desc, const ndVector& pivot0, const ndVector& pivot1, const ndVector& dir);
 
@@ -102,10 +101,12 @@ class ndJointBilateralConstraint : public ndConstraint
 
 	D_COLLISION_API virtual ndInt32 GetKinematicState(ndKinematicState* const state) const;
 
-	virtual bool IsHolonomic(ndFloat32 timestep) const;
-
 	const ndMatrix& GetLocalMatrix0() const;
 	const ndMatrix& GetLocalMatrix1() const;
+	D_COLLISION_API virtual ndMatrix CalculateGlobalMatrix0() const;
+	D_COLLISION_API virtual ndMatrix CalculateGlobalMatrix1() const;
+	D_COLLISION_API virtual void CalculateGlobalMatrix(ndMatrix& matrix0, ndMatrix& matrix1) const;
+	D_COLLISION_API void CalculateLocalMatrix(const ndMatrix& pinsAndPivotFrame, ndMatrix& localMatrix0, ndMatrix& localMatrix1) const;
 
 	void SetLocalMatrix0(const ndMatrix& matrix);
 	void SetLocalMatrix1(const ndMatrix& matrix);
@@ -115,10 +116,9 @@ class ndJointBilateralConstraint : public ndConstraint
 	bool IsBilateral() const;
 	bool IsCollidable() const;
 	bool GetSkeletonFlag() const;
-	
 	void SetCollidable(bool state);
 	void SetSkeletonFlag(bool flag);
-	void CalculateGlobalMatrix(ndMatrix& matrix0, ndMatrix& matrix1) const;
+	virtual bool IsHolonomic(ndFloat32 timestep) const;
 
 	void SetHighFriction(ndConstraintDescritor& desc, ndFloat32 friction);
 	void SetLowerFriction(ndConstraintDescritor& desc, ndFloat32 friction);
@@ -184,12 +184,6 @@ inline void ndJointBilateralConstraint::SetSolverModel(ndJointBilateralSolverMod
 //{
 //	return m_maxDof;
 //}
-
-inline void ndJointBilateralConstraint::CalculateGlobalMatrix(ndMatrix& matrix0, ndMatrix& matrix1) const
-{
-	matrix0 = m_localMatrix0 * m_body0->GetMatrix();
-	matrix1 = m_localMatrix1 * m_body1->GetMatrix();
-}
 
 inline const ndMatrix& ndJointBilateralConstraint::GetLocalMatrix0() const
 {

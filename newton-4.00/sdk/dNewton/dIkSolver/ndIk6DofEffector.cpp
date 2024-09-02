@@ -110,9 +110,14 @@ ndMatrix ndIk6DofEffector::GetEffectorMatrix() const
 {
 	ndMatrix matrix0;
 	ndMatrix matrix1;
-	CalculateGlobalMatrix(matrix0, matrix1);
+	ndJointBilateralConstraint::CalculateGlobalMatrix(matrix0, matrix1);
 	const ndMatrix matrix(matrix0 * matrix1.OrthoInverse());
 	return matrix;
+}
+
+ndMatrix ndIk6DofEffector::CalculateGlobalMatrix1() const
+{
+	return m_targetFrame * ndJointBilateralConstraint::CalculateGlobalMatrix1();
 }
 
 ndFloat32 ndIk6DofEffector::GetMaxForce() const
@@ -165,9 +170,12 @@ void ndIk6DofEffector::GetAngularSpringDamper(ndFloat32& regularizer, ndFloat32&
 
 void ndIk6DofEffector::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
-	const ndMatrix matrix0(m_localMatrix0 * m_body0->GetMatrix());
-	const ndMatrix matrix1(m_localMatrix1 * m_body1->GetMatrix());
-	const ndMatrix targetFrame(m_targetFrame * matrix1);
+	//const ndMatrix matrix0(m_localMatrix0 * m_body0->GetMatrix());
+	//const ndMatrix matrix1(m_localMatrix1 * m_body1->GetMatrix());
+	//const ndMatrix targetFrame(m_targetFrame * matrix1);
+	const ndMatrix matrix0(CalculateGlobalMatrix0());
+	const ndMatrix matrix1(ndJointBilateralConstraint::CalculateGlobalMatrix1());
+	const ndMatrix targetFrame(CalculateGlobalMatrix1());
 	
 	debugCallback.DrawFrame(matrix0);
 	debugCallback.DrawFrame(matrix1);

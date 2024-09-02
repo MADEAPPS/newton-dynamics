@@ -165,6 +165,22 @@ void ndJointBilateralConstraint::CalculateLocalMatrix(const ndMatrix& globalMatr
 	localMatrix1 = globalMatrix * m_body1->GetMatrix().OrthoInverse();
 }
 
+void ndJointBilateralConstraint::CalculateGlobalMatrix(ndMatrix& matrix0, ndMatrix& matrix1) const
+{
+	matrix0 = m_localMatrix0 * m_body0->GetMatrix();
+	matrix1 = m_localMatrix1 * m_body1->GetMatrix();
+}
+
+ndMatrix ndJointBilateralConstraint::CalculateGlobalMatrix0() const
+{
+	return m_localMatrix0* m_body0->GetMatrix();
+}
+
+ndMatrix ndJointBilateralConstraint::CalculateGlobalMatrix1() const
+{
+	return m_localMatrix1 * m_body1->GetMatrix();
+}
+
 ndFloat32 ndJointBilateralConstraint::CalculateSpringDamperAcceleration(ndFloat32 dt, ndFloat32 ks, ndFloat32 x, ndFloat32 kd, ndFloat32 v) const
 {
 	//at = - (ks * x + kd * v);

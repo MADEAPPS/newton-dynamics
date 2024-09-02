@@ -58,6 +58,7 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void SetMaxTorque(ndFloat32 torque);
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
+	D_NEWTON_API ndMatrix CalculateGlobalMatrix1() const;
 	D_NEWTON_API virtual bool IsHolonomic(ndFloat32 timestep) const;
 
 	protected:
