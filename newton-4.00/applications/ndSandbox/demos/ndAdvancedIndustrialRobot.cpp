@@ -227,6 +227,17 @@ namespace ndAdvancedRobot
 				return m_robot->IsTerminal();
 			}
 
+			#pragma optimize( "", off )
+			void SaveTrajectory()
+			{
+				if (IsTerminal())
+				{
+					ndInt32 index = m_trajectory.GetCount() - 1;
+					m_trajectory.SetReward(index, -100.0f);
+				}
+				ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
+			}
+
 			void GetObservation(ndBrainFloat* const observation)
 			{
 				m_robot->GetObservation(observation);
