@@ -233,7 +233,10 @@ namespace ndAdvancedRobot
 				if (IsTerminal())
 				{
 					ndInt32 index = m_trajectory.GetCount() - 1;
-					m_trajectory.SetReward(index, -100.0f);
+					if (m_trajectory.GetReward(index) != -100.0f)
+					{
+						m_trajectory.SetReward(index, -100.0f);
+					}
 				}
 				ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
 			}
