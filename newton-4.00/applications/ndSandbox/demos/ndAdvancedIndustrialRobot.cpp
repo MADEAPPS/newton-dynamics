@@ -325,6 +325,7 @@ namespace ndAdvancedRobot
 
 		void Init(ndModelArticulation* const robot)
 		{
+			m_modelId = ndInt32(robot->GetRoot()->m_body->GetId());
 			ndModelArticulation::ndNode* const parentNode = robot->FindByName("base");
 			ndModelArticulation::ndNode* const effectorNode = robot->FindByName("arm_4");
 
@@ -712,6 +713,7 @@ namespace ndAdvancedRobot
 		ndControlParameters m_location;
 		ndControlParameters m_targetLocation;
 		ndFloat32 m_timestep;
+		ndInt32 m_modelId;
 		bool m_modelAlive;
 		bool m_showDebug;
 
@@ -835,7 +837,6 @@ namespace ndAdvancedRobot
 		// make a clone of the mesh and add it to the scene
 		ndModelArticulation* const model = new ndModelArticulation();
 
-		ndWorld* const world = scene->GetWorld();
 		ndDemoEntity* const entity = modelMesh->CreateClone();
 		scene->AddEntity(entity);
 
@@ -843,8 +844,9 @@ namespace ndAdvancedRobot
 		ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
 
 		// find the floor location 
-		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		matrix.m_posit.m_y = floor.m_y;
+		// ndWorld* const world = scene->GetWorld();
+		//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		//matrix.m_posit.m_y = floor.m_y;
 
 		rootEntity->ResetMatrix(matrix);
 
@@ -962,6 +964,7 @@ namespace ndAdvancedRobot
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 2;
 			hyperParameters.m_extraTrajectorySteps = 512;
+			hyperParameters.m_bashTrajectoryCount = 2000;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
 			hyperParameters.m_numberOfObservations = ND_AGENT_INPUT_SIZE;
@@ -984,10 +987,10 @@ namespace ndAdvancedRobot
 				return model;
 			};
 
-			ndInt32 countX = 10;
-			ndInt32 countZ = 10;
-			//countX = 1;
-			//countZ = 1;
+			ndInt32 countX = 22;
+			ndInt32 countZ = 23;
+			//countX = 2;
+			//countZ = 2;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -1000,7 +1003,7 @@ namespace ndAdvancedRobot
 
 					if ((i == countZ / 2) && (j == countX / 2))
 					{
-						AddBackgroundScene(scene, location);
+						//AddBackgroundScene(scene, location);
 					}
 
 					ndModelArticulation* const model = SpawnModel(location);

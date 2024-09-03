@@ -299,11 +299,11 @@ class ndTriplex
 #define D_BASE_CLASS_REFLECTION(Class)			\
 	virtual const char* ClassName() const		\
 	{											\
-	return #Class;								\
+		return #Class;							\
 	}											\
 	static const char* StaticClassName()		\
 	{											\
-	return #Class;								\
+		return #Class;							\
 	}											\
 	virtual const char* SuperClassName() const	\
 	{											\

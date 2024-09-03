@@ -674,7 +674,19 @@ void ndWorld::UpdateSkeletons()
 		{
 			m_skeletonList.Remove(m_skeletonList.GetFirst());
 		}
-	
+
+		// reset of all bodies dirty state
+		const ndArray<ndBodyKinematic*>& bodyArray = m_scene->GetActiveBodyArray();
+		for (ndInt32 i = ndInt32(bodyArray.GetCount()) - 1; i >= 0; i--)
+		{
+			ndBodyKinematic* const body = bodyArray[i];
+			body->m_index = -1;
+			body->m_skeletonMark = 0;
+			body->m_skeletonMark0 = 0;
+			body->m_skeletonMark1 = 0;
+			body->m_islandParent = body;
+		}
+
 		// build connectivity graph and reset of all joint dirty state
 		ndDynamicsUpdate& solverUpdate = *m_solver;
 		for (ndJointList::ndNode* node = m_jointList.GetFirst(); node; node = node->GetNext())
@@ -708,16 +720,16 @@ void ndWorld::UpdateSkeletons()
 			}
 		}
 	
-		// reset of all bodies dirty state
-		const ndArray<ndBodyKinematic*>& bodyArray = m_scene->GetActiveBodyArray();
-		for (ndInt32 i = ndInt32(bodyArray.GetCount()) - 1; i >= 0; i--)
-		{
-			ndBodyKinematic* const body = bodyArray[i];
-			body->m_index = -1;
-			body->m_skeletonMark = 0;
-			body->m_skeletonMark0 = 0;
-			body->m_skeletonMark1 = 0;
-		}
+		//// reset of all bodies dirty state
+		//const ndArray<ndBodyKinematic*>& bodyArray = m_scene->GetActiveBodyArray();
+		//for (ndInt32 i = ndInt32(bodyArray.GetCount()) - 1; i >= 0; i--)
+		//{
+		//	ndBodyKinematic* const body = bodyArray[i];
+		//	body->m_index = -1;
+		//	body->m_skeletonMark = 0;
+		//	body->m_skeletonMark0 = 0;
+		//	body->m_skeletonMark1 = 0;
+		//}
 	
 		// find all root nodes for all independent joint arrangements
 		ndInt32 inslandCount = 0;
@@ -752,17 +764,16 @@ void ndWorld::UpdateSkeletons()
 		for (ndInt32 i = 0; i < inslandCount; ++i)
 		{
 			ndSkeletonQueue queuePool;
-			ndInt32 stack = 1;
-			ndBodyKinematic* stackPool[256];
-			stackPool[0] = islands[i].m_body;
+			ndFixSizeArray<ndBodyKinematic*, 512> stack;
+
+			stack.PushBack(islands[i].m_body);
 			ndSkeletonContainer* skeleton = nullptr;
 			
 			// find if this root node is connected to static bodies 
 			// if so, them make that static body the root node and add all the children
-			while (stack)
+			while (stack.GetCount())
 			{
-				stack--;
-				ndBodyKinematic* const rootBody = stackPool[stack];
+				ndBodyKinematic* const rootBody = stack.Pop();
 				if (!rootBody->m_skeletonMark1)
 				{
 					rootBody->m_skeletonMark1 = 1;
@@ -795,8 +806,7 @@ void ndWorld::UpdateSkeletons()
 								}
 								else if (!childBody->m_skeletonMark1)
 								{
-									stackPool[stack] = childBody;
-									stack++;
+									stack.PushBack(childBody);
 								}
 							}
 						}
@@ -837,7 +847,7 @@ void ndWorld::UpdateSkeletons()
 					for (ndBodyKinematic::ndJointList::ndNode* jointNode = rootBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
 					{
 						ndJointBilateralConstraint* const constraint = jointNode->GetInfo();
-						//dTrace(("%s %d %d\n", constraint->GetClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
+						//ndTrace(("%s %d %d\n", constraint->ClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
 						const bool test = SkeletonJointTest(constraint);
 						if (test && (constraint->GetSolverModel() != m_jointkinematicCloseLoop))
 						{
@@ -854,7 +864,7 @@ void ndWorld::UpdateSkeletons()
 			
 			if (skeleton)
 			{
-				// add the rest the children to this skeleton
+				// add the rest of the children to this skeleton
 				ndInt32 loopCount = 0;
 				ndJointBilateralConstraint* loopJoints[128];
 			
@@ -881,7 +891,7 @@ void ndWorld::UpdateSkeletons()
 								ndJointBilateralConstraint* const constraint = jointNode->GetInfo();
 								if (!constraint->m_mark0)
 								{
-									//dTrace(("%s %d %d\n", constraint->GetClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
+									//ndTrace(("%s %d %d\n", constraint->ClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
 									constraint->m_mark0 = 1;
 									if (SkeletonJointTest(constraint))
 									{
@@ -910,6 +920,7 @@ void ndWorld::UpdateSkeletons()
 					}
 				}
 				skeleton->Finalize(loopCount, loopJoints);
+				//ndTrace(("\n"));
 			}
 		}
 	
