@@ -1003,7 +1003,7 @@ namespace ndAdvancedRobot
 
 					if ((i == countZ / 2) && (j == countX / 2))
 					{
-						//AddBackgroundScene(scene, location);
+						AddBackgroundScene(scene, location);
 					}
 
 					ndModelArticulation* const model = SpawnModel(location);
