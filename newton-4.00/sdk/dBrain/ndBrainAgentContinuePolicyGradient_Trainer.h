@@ -53,6 +53,7 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 		ndBrainFloat GetAdvantage(ndInt32 entry) const;
 		void SetAdvantage(ndInt32 entry, ndBrainFloat advantage);
 
+		void Clear(ndInt32 entry);
 		ndBrainFloat* GetActions(ndInt32 entry);
 		ndBrainFloat* GetObservations(ndInt32 entry);
 

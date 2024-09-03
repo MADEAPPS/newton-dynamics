@@ -443,7 +443,7 @@ namespace ndAdvancedRobot
 		{
 			if (IsTerminal())
 			{
-				return 0.0f;
+				return -100.0f;
 			}
 
 #if 1
@@ -456,6 +456,15 @@ namespace ndAdvancedRobot
 
 			matrix0 = matrix0 * invBaseMatrix;
 			matrix1 = matrix1 * invBaseMatrix;
+
+			const ndQuaternion rotation0(matrix0);
+			const ndQuaternion rotation1(matrix1);
+			ndFloat32 angleError2 = rotation0.DotProduct(rotation1).GetScalar();
+			if (angleError2 < 0.0f)
+			{
+				angleError2 = rotation0.DotProduct(rotation1.Scale (-1.0f)).GetScalar();
+			}
+			angleError2 = 1.0f - angleError2;
 
 			ndFloat32 azimuth0 = ndAtan2(-matrix0.m_posit.m_z, matrix0.m_posit.m_x);
 			ndFloat32 azimuth1 = ndAtan2(-matrix1.m_posit.m_z, matrix1.m_posit.m_x);
@@ -471,7 +480,8 @@ namespace ndAdvancedRobot
 
 			ndFloat32 positReward = ndExp(-50.0f * positError2);
 			ndFloat32 azimuthReward = ndExp(-50.0f * azimuth2);
-			return azimuthReward * 0.5f + positReward * 0.5f;
+			ndFloat32 rotationReward = ndExp(-50.0f * angleError2);
+			return azimuthReward * 0.4f + positReward * 0.3f + rotationReward * 0.3f;
 
 #else
 			ndControlParameters location(m_location);
@@ -527,13 +537,9 @@ namespace ndAdvancedRobot
 			ndFloat32 y = m_location.m_y + deltaY;
 			ndFloat32 azimuth = m_location.m_azimuth + deltaAzimuth;
 
-			x = ndClamp(x, ndFloat32(0.9f * ND_MIN_X_SPAND), ndFloat32(0.9f * ND_MAX_X_SPAND));
-			y = ndClamp(y, ndFloat32(0.9f * ND_MIN_Y_SPAND), ndFloat32(0.9f * ND_MAX_Y_SPAND));
-			azimuth = ndClamp(azimuth, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
-
-			//x = m_targetLocation.m_x;
-			//y = m_targetLocation.m_y;
-			//azimuth = m_targetLocation.m_azimuth;
+			//x = ndClamp(x, ndFloat32(0.9f * ND_MIN_X_SPAND), ndFloat32(0.9f * ND_MAX_X_SPAND));
+			//y = ndClamp(y, ndFloat32(0.9f * ND_MIN_Y_SPAND), ndFloat32(0.9f * ND_MAX_Y_SPAND));
+			//azimuth = ndClamp(azimuth, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
 
 			const ndVector localPosit(x, y, 0.0f, 0.0f);
 			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
@@ -627,7 +633,7 @@ namespace ndAdvancedRobot
 			matrix.m_posit = m_effectorOffset;
 			effector->SetOffsetMatrix(matrix);
 			SetCurrentLocation();
-
+			
 			// prevent setting target outside work robot workspace.
 			m_targetLocation.m_x = ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND);
 			m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
@@ -641,12 +647,13 @@ namespace ndAdvancedRobot
 			ndFloat32 pitch = ndFloat32((2.0f * ndRand() - 1.0f) * ndPi);
 			ndFloat32 roll = ndFloat32(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
 			
-			yaw = 0.0f * ndDegreeToRad;
+			yaw = -45.0f * ndDegreeToRad;
 			roll = 0.0f * ndDegreeToRad;
 			pitch = 0.0f * ndDegreeToRad;
-			//m_targetLocation.m_x = m_location.m_x + 0.2f;
-			//m_targetLocation.m_y = 0.0f;
-			//m_targetLocation.m_azimuth = 0.0f;
+			m_targetLocation.m_x = m_location.m_x + 0.2f;
+			m_targetLocation.m_x = 0.0f;
+			m_targetLocation.m_y = 0.0f;
+			m_targetLocation.m_azimuth = 0.0f;
 			m_targetLocation.m_headRotation = ndQuaternion(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
 			if (m_targetLocation.m_headRotation.DotProduct(m_location.m_headRotation).GetScalar() < 0.0f)
 			{

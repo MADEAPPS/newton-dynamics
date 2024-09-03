@@ -152,6 +152,13 @@ void ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::SetAdvantage(
 	me[stride * entry + 1] = advantage;
 }
 
+void ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::Clear(ndInt32 entry)
+{
+	ndTrajectoryStep& me = *this;
+	ndInt32 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
+	ndMemSet(&me[stride * entry], ndBrainFloat(0.0f), stride);
+}
+
 ndBrainFloat* ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::GetActions(ndInt32 entry)
 {
 	ndTrajectoryStep& me = *this;
@@ -261,6 +268,7 @@ void ndBrainAgentContinuePolicyGradient_Trainer::Step()
 {
 	ndInt32 entryIndex = m_trajectory.GetCount();
 	m_trajectory.SetCount(entryIndex + 1);
+	m_trajectory.Clear(entryIndex);
 
 	ndBrainMemVector actions(m_trajectory.GetActions(entryIndex), m_master->m_numberOfActions * 2);
 	ndBrainMemVector observation(m_trajectory.GetObservations(entryIndex), m_master->m_numberOfObservations);
@@ -280,7 +288,7 @@ void ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory()
 		m_master->m_bashTrajectoryIndex++;
 
 		// remove last step because if it was a dead state, it will provide misleading feedback.
-		m_trajectory.SetCount(m_trajectory.GetCount() - 1);
+		//m_trajectory.SetCount(m_trajectory.GetCount() - 1);
 		
 		// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 		ndBrainFloat gamma = m_master->m_gamma;
