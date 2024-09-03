@@ -510,26 +510,48 @@ namespace ndAdvancedRobot
 			m_leftGripper->SetOffsetPosit(-m_targetLocation.m_gripperPosit * 0.5f);
 			m_rightGripper->SetOffsetPosit(-m_targetLocation.m_gripperPosit * 0.5f);
 
+			#if 0
+			// using relative steps
 			ndFloat32 deltaX = actions->m_x * ND_POSITION_X_STEP;
 			ndFloat32 deltaY = actions->m_y * ND_POSITION_Y_STEP;
 			ndFloat32 deltaAzimuth = actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
 			ndFloat32 deltaRotation = actions->m_rotation * ND_ROTATION_STEP;
-
+			
 			ndFloat32 x = m_location.m_x + deltaX;
 			ndFloat32 y = m_location.m_y + deltaY;
 			ndFloat32 azimuth = m_location.m_azimuth + deltaAzimuth;
-
+			
 			const ndVector localPosit(x, y, 0.0f, 0.0f);
 			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
 			const ndVector posit (aximuthMatrix.TransformVector(m_effectorOffset + localPosit));
-
+			
 			const ndQuaternion quatRotation(m_location.m_headRotation.Slerp(m_targetLocation.m_headRotation, deltaRotation));
 			const ndMatrix rotation(ndCalculateMatrix(quatRotation));
 			ndMatrix targetMatrix(m_rotationOffset * rotation * m_rotationOffset.OrthoInverse());
 			targetMatrix.m_posit = posit;
 
+			#else
+			// using absolute steps
+			ndFloat32 deltaRotation = actions->m_rotation * ND_ROTATION_STEP;
+			ndFloat32 actionMapX = ND_MIN_X_SPAND + actions->m_x * (ND_MAX_X_SPAND - ND_MIN_X_SPAND);
+			ndFloat32 actionMapY = ND_MIN_Y_SPAND + actions->m_y * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
+			ndFloat32 actionMapAzimuth = -ndPi + actions->m_azimuth * (2.0f * ndPi);
+
+			ndFloat32 x = m_location.m_x - actionMapX;
+			ndFloat32 y = m_location.m_y - actionMapY;
+			ndFloat32 azimuth = m_location.m_azimuth - actionMapAzimuth;
+			const ndVector localPosit(x, y, 0.0f, 0.0f);
+			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
+			const ndVector posit (aximuthMatrix.TransformVector(m_effectorOffset + localPosit));
+
+			const ndQuaternion quatRotation(m_targetLocation.m_headRotation.Slerp(m_location.m_headRotation, deltaRotation));
+			const ndMatrix rotation(ndCalculateMatrix(quatRotation));
+			ndMatrix targetMatrix(m_rotationOffset * rotation * m_rotationOffset.OrthoInverse());
+			targetMatrix.m_posit = posit;
+			#endif
+
 			effector->SetOffsetMatrix(targetMatrix);
-			
+
 			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
 			ndAssert(skeleton);
 
@@ -964,7 +986,7 @@ namespace ndAdvancedRobot
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 2;
 			hyperParameters.m_extraTrajectorySteps = 512;
-			hyperParameters.m_bashTrajectoryCount = 2000;
+			//hyperParameters.m_bashTrajectoryCount = 2000;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
 			hyperParameters.m_numberOfObservations = ND_AGENT_INPUT_SIZE;
@@ -989,8 +1011,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			//countX = 1;
-			//countZ = 1;
+			countX = 10;
+			countZ = 10;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)

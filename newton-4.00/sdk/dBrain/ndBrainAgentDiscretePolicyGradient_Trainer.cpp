@@ -256,7 +256,7 @@ void ndBrainAgentDiscretePolicyGradient_Trainer::SaveTrajectory()
 		m_master->m_bashTrajectoryIndex++;
 	}
 	// remove last step because if it was a dead state, it will provide misleading feedback.
-	m_trajectory.SetCount(m_trajectory.GetCount() - 1);
+	//m_trajectory.SetCount(m_trajectory.GetCount() - 1);
 
 	// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 	ndBrainFloat gamma = m_master->m_gamma;
