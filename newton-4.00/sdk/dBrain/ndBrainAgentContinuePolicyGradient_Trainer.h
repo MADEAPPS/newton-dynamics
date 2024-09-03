@@ -60,6 +60,15 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 		ndInt32 m_actionsSize;
 		ndInt32 m_obsevationsSize;
 	};
+
+	class ndRandomGenerator
+	{
+		public:
+		std::mt19937 m_gen;
+		std::random_device m_rd;
+		std::normal_distribution<ndFloat32> m_d;
+	};
+
 	public:
 	ndBrainAgentContinuePolicyGradient_Trainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master);
 	~ndBrainAgentContinuePolicyGradient_Trainer();
@@ -82,9 +91,10 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 	ndTrajectoryStep m_trajectory;
 	ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
 
-	mutable std::random_device m_rd;
-	mutable std::mt19937 m_gen;
-	mutable std::normal_distribution<ndFloat32> m_d;
+	//mutable std::random_device m_rd;
+	//mutable std::mt19937 m_gen;
+	//mutable std::normal_distribution<ndFloat32> m_d;
+	ndRandomGenerator* m_randomGenerator;
 
 	friend class ndBrainAgentContinuePolicyGradient_TrainerMaster;
 };
@@ -150,6 +160,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	void OptimizePolicy();
 	void OptimizeCritic();
 	void UpdateBaseLineValue();
+	ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* GetRandomGenerator();
 
 	ndBrain m_actor;
 	ndBrain m_baseLineValue;
@@ -162,6 +173,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 
 	MemoryStateValues m_stateValues;
 	ndArray<ndInt32> m_randomPermutation;
+	ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* m_randomGenerator;
 	ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep m_trajectoryAccumulator;
 	
 	ndBrainFloat m_gamma;
