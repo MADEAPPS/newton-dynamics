@@ -33,7 +33,7 @@ namespace ndAdvancedRobot
 		ndBrainFloat m_x;
 		ndBrainFloat m_y;
 		ndBrainFloat m_azimuth;
-		ndBrainFloat m_rotation;
+		//ndBrainFloat m_rotation;
 	};
 
 	class ndObservationVector
@@ -79,8 +79,8 @@ namespace ndAdvancedRobot
 
 	#define ND_POSITION_X_STEP		ndReal (0.25f)
 	#define ND_POSITION_Y_STEP		ndReal (0.25f)
+	#define ND_ROTATION_STEP		ndReal (0.01f)
 	#define ND_POSITION_AZIMTH_STEP	ndReal (2.0f * ndDegreeToRad)
-	#define ND_ROTATION_STEP		ndReal (0.05f)
 
 	class ndDefinition
 	{
@@ -524,12 +524,13 @@ namespace ndAdvancedRobot
 			m_leftGripper->SetOffsetPosit(-m_targetLocation.m_gripperPosit * 0.5f);
 			m_rightGripper->SetOffsetPosit(-m_targetLocation.m_gripperPosit * 0.5f);
 
-			#if 0
+			#if 1
 			// using relative steps
 			ndFloat32 deltaX = actions->m_x * ND_POSITION_X_STEP;
 			ndFloat32 deltaY = actions->m_y * ND_POSITION_Y_STEP;
 			ndFloat32 deltaAzimuth = actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
-			ndFloat32 deltaRotation = actions->m_rotation * ND_ROTATION_STEP;
+			//ndFloat32 deltaRotation = actions->m_rotation * ND_ROTATION_STEP;
+			ndFloat32 deltaRotation = ND_ROTATION_STEP;
 			
 			ndFloat32 x = m_location.m_x + deltaX;
 			ndFloat32 y = m_location.m_y + deltaY;
