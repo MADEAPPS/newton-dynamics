@@ -33,12 +33,7 @@ namespace ndAdvancedRobot
 		ndBrainFloat m_x;
 		ndBrainFloat m_y;
 		ndBrainFloat m_azimuth;
-
-		// first use a fix orientation and fix gripper, until we get the position
-		//ndBrainFloat m_pitch;
-		//ndBrainFloat m_yaw;
-		//ndBrainFloat m_roll;
-		//ndBrainFloat m_gripper;
+		ndBrainFloat m_rotation;
 	};
 
 	class ndObservationVector
@@ -85,7 +80,7 @@ namespace ndAdvancedRobot
 	#define ND_POSITION_X_STEP		ndReal (0.25f)
 	#define ND_POSITION_Y_STEP		ndReal (0.25f)
 	#define ND_POSITION_AZIMTH_STEP	ndReal (2.0f * ndDegreeToRad)
-	#define ND_ROTATION_STEP		ndReal (0.1f)
+	#define ND_ROTATION_STEP		ndReal (0.05f)
 
 	class ndDefinition
 	{
@@ -446,7 +441,6 @@ namespace ndAdvancedRobot
 				return -100.0f;
 			}
 
-#if 1
 			const ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
 			ndMatrix matrix0;
 			ndMatrix matrix1;
@@ -482,20 +476,6 @@ namespace ndAdvancedRobot
 			ndFloat32 azimuthReward = ndExp(-50.0f * azimuth2);
 			ndFloat32 rotationReward = ndExp(-50.0f * angleError2);
 			return azimuthReward * 0.4f + positReward * 0.3f + rotationReward * 0.3f;
-
-#else
-			ndControlParameters location(m_location);
-			ndControlParameters targetLocation(m_targetLocation);
-			const ndVector effectPosit(location.m_x, location.m_y, location.m_azimuth, ndReal(0.0f));
-			const ndVector targetPosit(targetLocation.m_x, targetLocation.m_y, targetLocation.m_azimuth, ndReal(0.0f));
-			ndVector positError(targetPosit - effectPosit);
-			positError.m_z = ndAnglesSub(targetPosit.m_z, effectPosit.m_z);
-			const ndVector positError2(positError * positError);
-		
-			ndFloat32 azimuthReward = ndExp(-50.0f * positError2.m_z);
-			ndFloat32 positReward = ndExp(-50.0f * (positError2.m_x + positError2.m_y));
-			return azimuthReward * 0.5f + positReward * 0.5f;
-#endif
 		}
 
 		#pragma optimize( "", off )
@@ -532,21 +512,17 @@ namespace ndAdvancedRobot
 			ndFloat32 deltaX = actions->m_x * ND_POSITION_X_STEP;
 			ndFloat32 deltaY = actions->m_y * ND_POSITION_Y_STEP;
 			ndFloat32 deltaAzimuth = actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
+			ndFloat32 deltaRotation = actions->m_rotation * ND_ROTATION_STEP;
 
 			ndFloat32 x = m_location.m_x + deltaX;
 			ndFloat32 y = m_location.m_y + deltaY;
 			ndFloat32 azimuth = m_location.m_azimuth + deltaAzimuth;
 
-			//x = ndClamp(x, ndFloat32(0.9f * ND_MIN_X_SPAND), ndFloat32(0.9f * ND_MAX_X_SPAND));
-			//y = ndClamp(y, ndFloat32(0.9f * ND_MIN_Y_SPAND), ndFloat32(0.9f * ND_MAX_Y_SPAND));
-			//azimuth = ndClamp(azimuth, ndFloat32(-ndPi * 0.9f), ndFloat32(ndPi * 0.9f));
-
 			const ndVector localPosit(x, y, 0.0f, 0.0f);
 			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
 			const ndVector posit (aximuthMatrix.TransformVector(m_effectorOffset + localPosit));
 
-			//const ndMatrix rotation(ndCalculateMatrix(m_targetLocation.m_headRotation));
-			const ndQuaternion quatRotation(m_location.m_headRotation.Slerp(m_targetLocation.m_headRotation, 0.05f));
+			const ndQuaternion quatRotation(m_location.m_headRotation.Slerp(m_targetLocation.m_headRotation, deltaRotation));
 			const ndMatrix rotation(ndCalculateMatrix(quatRotation));
 			ndMatrix targetMatrix(m_rotationOffset * rotation * m_rotationOffset.OrthoInverse());
 			targetMatrix.m_posit = posit;
@@ -647,9 +623,9 @@ namespace ndAdvancedRobot
 			ndFloat32 pitch = ndFloat32((2.0f * ndRand() - 1.0f) * ndPi);
 			ndFloat32 roll = ndFloat32(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
 			
-			yaw = -45.0f * ndDegreeToRad;
-			roll = 0.0f * ndDegreeToRad;
-			pitch = 0.0f * ndDegreeToRad;
+			//yaw = -45.0f * ndDegreeToRad;
+			//roll = 0.0f * ndDegreeToRad;
+			//pitch = 0.0f * ndDegreeToRad;
 			m_targetLocation.m_x = m_location.m_x + 0.2f;
 			m_targetLocation.m_x = 0.0f;
 			m_targetLocation.m_y = 0.0f;
