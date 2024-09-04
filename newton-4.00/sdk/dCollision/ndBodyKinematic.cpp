@@ -635,6 +635,11 @@ ndFloat32 ndBodyKinematic::TotalEnergy() const
 	return energy.AddHorizontal().GetScalar()* ndFloat32(0.5f);
 }
 
+void ndBodyKinematic::ClearMemory()
+{
+
+}
+
 void ndBodyKinematic::IntegrateVelocity(ndFloat32 timestep)
 {
 	ndAssert(m_veloc.m_w == ndFloat32(0.0f));

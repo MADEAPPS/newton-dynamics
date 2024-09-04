@@ -230,6 +230,7 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 
 	protected:
 	ndConstraint();
+	virtual void ClearMemory() = 0;
 
 	ndVector m_forceBody0;
 	ndVector m_torqueBody0;

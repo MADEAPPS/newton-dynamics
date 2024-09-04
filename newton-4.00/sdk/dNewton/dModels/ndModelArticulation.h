@@ -65,6 +65,7 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API ndNode* FindByName(const char* const name) const;
 	D_NEWTON_API ndNode* FindLoopByName(const char* const name) const;
 
+	D_NEWTON_API void ClearMemory();
 	D_NEWTON_API void AddToWorld(ndWorld* const world);
 	D_NEWTON_API void SetTransform(const ndMatrix& matrix);
 
@@ -73,7 +74,6 @@ class ndModelArticulation: public ndModel
 
 	ndString m_name;
 	ndNode* m_rootNode;
-	//ndSharedList<ndJointBilateralConstraint> m_closeLoops;
 	ndList<ndNode> m_closeLoops;
 
 	friend class ndUrdfFile;

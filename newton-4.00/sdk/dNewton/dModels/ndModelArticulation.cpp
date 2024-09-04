@@ -121,6 +121,50 @@ ndModelArticulation::ndNode* ndModelArticulation::GetRoot() const
 	return m_rootNode;
 }
 
+void ndModelArticulation::ClearMemory()
+{
+	for (ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+	{
+		ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+
+		ndBodyKinematic::ndJointList& jointList = body->GetJointList();
+		for (ndBodyKinematic::ndJointList::ndNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+		{
+			jointNode->GetInfo()->ClearMemory();
+		}
+
+		ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
+		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
+		for (it.Begin(); it; it++)
+		{
+			ndContact* const contact = it.GetNode()->GetInfo();
+			contact->ClearMemory();
+		}
+	}
+
+	for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
+	{
+		ndAssert(0);
+		ndBodyKinematic* const body = node->GetInfo().m_body->GetAsBodyKinematic();
+		ndBodyKinematic::ndJointList& jointList = body->GetJointList();
+
+		for (ndBodyKinematic::ndJointList::ndNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+		{
+			jointNode->GetInfo()->ClearMemory();
+		}
+
+		//ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
+		//ndBodyKinematic::ndContactMap::Iterator it(contactMap);
+		//for (it.Begin(); it; it++)
+		//{
+		//	ndContact* const contact = it.GetNode()->GetInfo();
+		//	contact->ClearMemory();
+		//}
+
+	}
+
+}
+
 ndModelArticulation::ndNode* ndModelArticulation::AddRootBody(const ndSharedPtr<ndBody>& rootBody)
 {
 	ndAssert(!m_rootNode);

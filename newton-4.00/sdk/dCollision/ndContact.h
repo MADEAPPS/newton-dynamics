@@ -118,6 +118,7 @@ class ndContact: public ndConstraint
 	D_COLLISION_API void InitSurrogateContact(ndContact* const surrogate, ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 	
 	private:
+	virtual void ClearMemory();
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 	void CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir, const ndPointParam& param) const;
 	void JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, ndInt32 normalIndex, ndInt32& frictionIndex);
@@ -144,6 +145,7 @@ class ndContact: public ndConstraint
 	friend class ndContactSolver;
 	friend class ndShapeInstance;
 	friend class ndConvexCastNotify;
+	friend class ndModelArticulation;
 	friend class ndShapeConvexPolygon;
 	friend class ndBodyPlayerCapsuleContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;

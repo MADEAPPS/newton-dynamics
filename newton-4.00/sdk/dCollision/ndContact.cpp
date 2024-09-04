@@ -70,6 +70,18 @@ void ndContact::SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const b
 	ndAssert(m_body0->GetInvMass() > ndFloat32(0.0f));
 }
 
+void ndContact::ClearMemory()
+{
+	ndContactPointList& contacts = GetContactPoints();
+	for (ndContactPointList::ndNode* node = contacts.GetFirst(); node; node = node->GetNext())
+	{
+		ndContactMaterial& contact = node->GetInfo();
+		contact.m_dir0_Force.Clear();
+		contact.m_dir1_Force.Clear();
+		contact.m_normal_Force.Clear();
+	}
+}
+
 void ndContact::InitSurrogateContact(ndContact* const surrogate, ndBodyKinematic* const body0, ndBodyKinematic* const body1) const
 {
 	ndAssert(m_body0->GetInvMass() > ndFloat32(0.0f));

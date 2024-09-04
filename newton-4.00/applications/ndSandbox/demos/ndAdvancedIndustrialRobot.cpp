@@ -155,9 +155,9 @@ namespace ndAdvancedRobot
 			void SetPose() const
 			{
 				const ndMatrix matrix(ndCalculateMatrix(m_rotation, m_posit));
-				m_body->SetMatrix(matrix);
 				m_body->SetOmega(m_omega);
 				m_body->SetVelocity(m_veloc);
+				m_body->SetMatrix(matrix);
 			}
 
 			ndVector m_veloc;
@@ -631,6 +631,32 @@ namespace ndAdvancedRobot
 			{
 				m_armJoints[i]->SetTargetAngle(0.0f);
 			}
+
+			GetModel()->GetAsModelArticulation()->ClearMemory();
+
+			m_leftGripper->SetOffsetPosit(0.0f);
+			m_rightGripper->SetOffsetPosit(0.0f);
+
+			m_targetLocation.m_x = ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND);
+			m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
+			m_targetLocation.m_azimuth = (2.0f * ndRand() - 1.0f) * ndPi;
+
+			m_targetLocation.m_x = ndClamp(m_targetLocation.m_x, ndReal(ND_MIN_X_SPAND + 0.05f), ndReal(ND_MAX_X_SPAND - 0.05f));
+			m_targetLocation.m_y = ndClamp(m_targetLocation.m_y, ndReal(ND_MIN_Y_SPAND + 0.05f), ndReal(ND_MAX_Y_SPAND - 0.05f));
+			m_targetLocation.m_azimuth = ndClamp(m_targetLocation.m_azimuth, ndReal(-ndPi + 0.09f), ndReal(ndPi - 0.09f));
+
+			ndFloat32 yaw = ndFloat32((1.0f * ndRand() - 0.5f) * ndPi);
+			ndFloat32 pitch = ndFloat32((2.0f * ndRand() - 1.0f) * ndPi);
+			ndFloat32 roll = ndFloat32(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
+
+			//yaw = 0.0f * ndDegreeToRad;
+			//roll = 0.0f * ndDegreeToRad;
+			//pitch = 0.0f * ndDegreeToRad;
+			//m_targetLocation.m_x = 0.0f;
+			//m_targetLocation.m_x = 0.0f;
+			//m_targetLocation.m_y = 0.0f;
+			//m_targetLocation.m_azimuth = 0.0f;
+			m_targetLocation.m_headRotation = ndQuaternion(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -995,8 +1021,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			//countX = 10;
-			//countZ = 10;
+			//countX = 1;
+			//countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)

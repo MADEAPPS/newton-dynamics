@@ -126,6 +126,7 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API virtual ndVector CalculateAngularMomentum() const;
 	D_COLLISION_API ndFloat32 TotalEnergy() const;
 
+	D_COLLISION_API void ClearMemory();
 	D_COLLISION_API virtual void IntegrateVelocity(ndFloat32 timestep);
 	D_COLLISION_API void SetMatrixUpdateScene(const ndMatrix& matrix);
 	D_COLLISION_API virtual ndContact* FindContact(const ndBody* const otherBody) const;
@@ -164,9 +165,10 @@ class ndBodyKinematic : public ndBody
 	void SetAccel(const ndVector& accel);
 	void SetAlpha(const ndVector& alpha);
 
+	ndJointList& GetJointList();
 	ndContactMap& GetContactMap();
-	const ndContactMap& GetContactMap() const;
 	const ndJointList& GetJointList() const;
+	const ndContactMap& GetContactMap() const;
 
 	protected:
 	D_COLLISION_API virtual void AttachContact(ndContact* const contact);
@@ -402,6 +404,11 @@ inline ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap()
 inline const ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap() const
 {
 	return m_contactList;
+}
+
+inline ndBodyKinematic::ndJointList& ndBodyKinematic::GetJointList()
+{
+	return m_jointList;
 }
 
 inline const ndBodyKinematic::ndJointList& ndBodyKinematic::GetJointList() const

@@ -193,6 +193,14 @@ void ndJointSlider::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& ma
 	}
 }
 
+void ndJointSlider::ClearMemory()
+{
+	ndJointBilateralConstraint::ClearMemory();
+	m_posit = ndFloat32(0.0f);
+	m_speed = ndFloat32(0.0f);
+	m_positOffset = ndFloat32(0.0f);
+}
+
 void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	// add spring damper row

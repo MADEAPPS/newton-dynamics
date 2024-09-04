@@ -103,6 +103,7 @@ class ndJointBilateralConstraint : public ndConstraint
 
 	const ndMatrix& GetLocalMatrix0() const;
 	const ndMatrix& GetLocalMatrix1() const;
+
 	D_COLLISION_API virtual ndMatrix CalculateGlobalMatrix0() const;
 	D_COLLISION_API virtual ndMatrix CalculateGlobalMatrix1() const;
 	D_COLLISION_API virtual void CalculateGlobalMatrix(ndMatrix& matrix0, ndMatrix& matrix1) const;
@@ -134,6 +135,7 @@ class ndJointBilateralConstraint : public ndConstraint
 
 	protected:
 	// inverse dynamics interface
+	D_COLLISION_API virtual void ClearMemory();
 	D_COLLISION_API virtual void SetIkMode(bool mode);
 	D_COLLISION_API virtual void SetIkSetAccel(const ndJacobian& body0Accel, const ndJacobian& body1Accel);
 

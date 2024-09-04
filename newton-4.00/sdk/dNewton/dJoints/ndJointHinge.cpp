@@ -195,6 +195,14 @@ void ndJointHinge::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatri
 	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 }
 
+void ndJointHinge::ClearMemory()
+{
+	ndJointBilateralConstraint::ClearMemory();
+	m_angle = ndFloat32(0.0f);
+	m_omega = ndFloat32(0.0f);
+	m_targetAngle = ndFloat32(0.0f);
+}
+
 void ndJointHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);

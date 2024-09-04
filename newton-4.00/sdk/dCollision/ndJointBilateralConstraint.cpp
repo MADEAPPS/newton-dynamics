@@ -267,6 +267,15 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 	}
 }
 
+void ndJointBilateralConstraint::ClearMemory()
+{
+	for (ndInt32 i = 0; i < sizeof(m_jointForce) / sizeof(m_jointForce[0]); ++i)
+	{
+		m_jointForce[i].Clear();
+		m_motorAcceleration[i] = ndFloat32 (0.0f);
+	}
+}
+
 void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& desc, const ndVector& pivot0, const ndVector& pivot1, const ndVector& dir)
 {
 	ndPointParam param;
