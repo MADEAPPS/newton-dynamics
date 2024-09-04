@@ -24,16 +24,13 @@
 
 namespace ndAdvancedRobot
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach-vpg.dnn"
 
 	class ndActionVector
 	{
 		public:
-		ndBrainFloat m_x;
-		ndBrainFloat m_y;
-		ndBrainFloat m_azimuth;
-		//ndBrainFloat m_rotation;
+		ndBrainFloat m_actions[6];
 	};
 
 	class ndObservationVector
@@ -47,7 +44,7 @@ namespace ndAdvancedRobot
 		ndBrainFloat m_effectortDeltaX;
 		ndBrainFloat m_effectortDeltaY;
 		ndBrainFloat m_effectorDeltaAzimuth;
-		//ndBrainFloat m_effectorDeltaRotation;
+		ndBrainFloat m_rotation[4];
 	};
 
 	class ndControlParameters
@@ -77,10 +74,7 @@ namespace ndAdvancedRobot
 	#define ND_MIN_Y_SPAND			ndReal (-2.2f)
 	#define ND_MAX_Y_SPAND			ndReal ( 1.5f)
 
-	#define ND_POSITION_X_STEP		ndReal (0.25f)
-	#define ND_POSITION_Y_STEP		ndReal (0.25f)
-	#define ND_ROTATION_STEP		ndReal (0.01f)
-	#define ND_POSITION_AZIMTH_STEP	ndReal (2.0f * ndDegreeToRad)
+	#define ND_ACTION_SENSITIVITY	ndReal (0.005f)
 
 	class ndDefinition
 	{
@@ -264,15 +258,22 @@ namespace ndAdvancedRobot
 		public:
 		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
 			:ndModelNotify()
-			,m_invDynamicsSolver()
-			,m_effector()
-			,m_rootBody(nullptr)
-			,m_leftGripper(nullptr)
-			,m_rightGripper(nullptr)
-			,m_controller(nullptr)
+			,m_effectorMatrixOffset(ndGetIdentityMatrix())
+			,m_effectorPositOffset(ndVector::m_wOne)
+			//,m_rootBody(nullptr)
+			//,m_leftGripper(nullptr)
+			//,m_rightGripper(nullptr)
+			//,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 			,m_world(nullptr)
-			,m_location()
+			,m_arm_0(nullptr)
+			,m_arm_1(nullptr)
+			,m_arm_2(nullptr)
+			,m_arm_3(nullptr)
+			,m_arm_4(nullptr)
+			,m_base_rotator(nullptr)
+			,m_leftGripper(nullptr)
+			,m_rightGripper(nullptr)
 			,m_targetLocation()
 			,m_timestep(ndFloat32(0.0f))
 			,m_modelAlive(true)
@@ -285,23 +286,31 @@ namespace ndAdvancedRobot
 
 		RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const robot, bool showDebug)
 			:ndModelNotify()
-			,m_invDynamicsSolver()
-			,m_effector()
-			,m_rootBody(nullptr)
-			,m_leftGripper(nullptr)
-			,m_rightGripper(nullptr)
-			,m_controller(nullptr)
+			,m_effectorMatrixOffset(ndGetIdentityMatrix())
+			,m_effectorPositOffset(ndVector::m_wOne)
+			//,m_rootBody(nullptr)
+			//,m_leftGripper(nullptr)
+			//,m_rightGripper(nullptr)
+			//,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 			,m_world(nullptr)
-			,m_location()
+			,m_arm_0(nullptr)
+			,m_arm_1(nullptr)
+			,m_arm_2(nullptr)
+			,m_arm_3(nullptr)
+			,m_arm_4(nullptr)
+			,m_base_rotator(nullptr)
+			,m_leftGripper(nullptr)
+			,m_rightGripper(nullptr)
 			,m_targetLocation()
 			,m_timestep(ndFloat32(0.0f))
 			,m_modelAlive(true)
 			,m_showDebug(showDebug)
 		{
-			m_controller = new ndController(brain);
-			m_controller->m_robot = this;
-			Init(robot);
+			ndAssert(0);
+			//m_controller = new ndController(brain);
+			//m_controller->m_robot = this;
+			//Init(robot);
 		}
 
 		RobotModelNotify(const RobotModelNotify& src)
@@ -321,10 +330,10 @@ namespace ndAdvancedRobot
 
 		~RobotModelNotify()
 		{
-			if (m_controller)
-			{
-				delete m_controller;
-			}
+			//if (m_controller)
+			//{
+			//	delete m_controller;
+			//}
 
 			if (m_controllerTrainer)
 			{
@@ -339,88 +348,80 @@ namespace ndAdvancedRobot
 
 		void Init(ndModelArticulation* const robot)
 		{
-			m_modelId = ndInt32(robot->GetRoot()->m_body->GetId());
-			ndModelArticulation::ndNode* const parentNode = robot->FindByName("base");
-			ndModelArticulation::ndNode* const effectorNode = robot->FindByName("arm_4");
+			m_arm_0 = (ndJointHinge*)*robot->FindByName("arm_0")->m_joint;
+			m_arm_1 = (ndJointHinge*)*robot->FindByName("arm_1")->m_joint;
+			m_arm_2 = (ndJointHinge*)*robot->FindByName("arm_2")->m_joint;
+			m_arm_3 = (ndJointHinge*)*robot->FindByName("arm_3")->m_joint;
+			m_arm_4 = (ndJointHinge*)*robot->FindByName("arm_4")->m_joint;
+			m_base_rotator = (ndJointHinge*)* robot->FindByName("base_rotator")->m_joint;
+			m_leftGripper = (ndJointSlider*)*robot->FindByName("gripperLeft")->m_joint;
+			m_rightGripper = (ndJointSlider*)*robot->FindByName("gripperRight")->m_joint;
 
-			const ndDemoEntity* const rootEntity = (ndDemoEntity*)parentNode->m_body->GetNotifyCallback()->GetUserData();
-			const ndDemoEntity* const childEntity = rootEntity->Find("effector");
-
-			const ndMatrix pivotFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
-			const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
-			m_effector = ndSharedPtr<ndJointBilateralConstraint>(new ndIk6DofEffector(effectorFrame, pivotFrame, effectorNode->m_body->GetAsBodyKinematic(), parentNode->m_body->GetAsBodyKinematic()));
+			m_armJoints.PushBack(m_arm_0);
+			m_armJoints.PushBack(m_arm_1);
+			m_armJoints.PushBack(m_arm_2);
+			m_armJoints.PushBack(m_arm_3);
+			m_armJoints.PushBack(m_arm_4);
+			m_armJoints.PushBack(m_base_rotator);
 			
-			ndFloat32 relaxation = 1.0e-4f;
-			ndIk6DofEffector* const effectorJoint = (ndIk6DofEffector*)*m_effector;
-			effectorJoint->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
-			effectorJoint->SetLinearSpringDamper(relaxation, 10000.0f, 500.0f);
-			effectorJoint->SetAngularSpringDamper(relaxation, 10000.0f, 500.0f);
-			effectorJoint->SetMaxForce(10000.0f);
-			effectorJoint->SetMaxTorque(10000.0f);
+			ndBodyDynamic* const body = m_arm_4->GetBody0()->GetAsBodyDynamic();
+			ndDemoEntity* const entity = (ndDemoEntity*)body->GetNotifyCallback()->GetUserData();
+			ndDemoEntity* const effectoEntity = entity->Find("effector");
 
-			m_rootBody = robot->GetRoot()->m_body->GetAsBodyDynamic();
-			m_leftGripper = (ndJointSlider*)robot->FindByName("gripperLeft")->m_joint->GetAsBilateral();
-			m_rightGripper = (ndJointSlider*)robot->FindByName("gripperRight")->m_joint->GetAsBilateral();
+			const ndMatrix alignMatrix(ndRollMatrix(-ndPi * 0.5f));
+			m_effectorMatrixOffset = alignMatrix * effectoEntity->GetCurrentMatrix();
 
-			ndAssert(robot->FindByName("arm_3"));
-			m_pivotJoint = *robot->FindByName("arm_3")->m_joint;
+			const ndMatrix effectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0());
+			const ndMatrix baseMatrix(m_base_rotator->CalculateGlobalMatrix1());
+			m_effectorPositOffset = baseMatrix.UntransformVector(effectorMatrix.m_posit);
 
-			m_rotationOffset = ndRollMatrix(ndPi * 0.5f);
-			m_effectorOffset = effectorJoint->GetOffsetMatrix().m_posit;
-
-			ndModelArticulation::ndNode* node = robot->FindByName("arm_4");
-			ndAssert(node);
-			while (node->GetParent())
+			for (ndModelArticulation::ndNode* node = robot->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
-				m_armJoints.PushBack(*node->m_joint);
-				node = node->GetParent();
-			};
-
-			//ndModelArticulation::ndNode* const leftGripperNode = robot->FindByName("gripperLeft");
-			//m_armJoints.PushBack(*leftGripperNode->m_joint);
-			//
-			//ndModelArticulation::ndNode* const rightGripperNode = robot->FindByName("gripperRight");
-			//m_armJoints.PushBack(*rightGripperNode->m_joint);
-
-			for (ndModelArticulation::ndNode* poseNode = robot->GetRoot()->GetFirstIterator(); poseNode; poseNode = poseNode->GetNextIterator())
-			{
-				m_basePose.PushBack(poseNode->m_body->GetAsBodyDynamic());
+				m_basePose.PushBack(node->m_body->GetAsBodyDynamic());
 			}
 		}
 
 		#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
+			//ndAssert(0);
 			if (!m_modelAlive)
 			{
 				return true;
 			}
+			
+			auto ChechHingeLimits = [this](const ndJointHinge* const joint)
+			{
+				ndFloat32 minLimit;
+				ndFloat32 maxLimit;
+				ndFloat32 angle = joint->GetAngle();
+				joint->GetLimits(minLimit, maxLimit);
+				return (angle >= minLimit) && (angle <= maxLimit);
+			};
 
-			if (m_location.m_x <= ND_MIN_X_SPAND)
+			for (ndInt32 i = 0; i < m_armJoints.GetCount(); ++i)
+			{
+				if (!ChechHingeLimits(m_armJoints[i]))
+				{
+					return true;
+				}
+			}
+
+			auto ChechGripperLimits = [this](const ndJointSlider* const joint)
+			{
+				ndFloat32 minLimit;
+				ndFloat32 maxLimit;
+				ndFloat32 posit = joint->GetPosit();
+				joint->GetLimits(minLimit, maxLimit);
+				return (posit >= minLimit) && (posit <= maxLimit);
+			};
+
+			if (!ChechGripperLimits(m_leftGripper))
 			{
 				return true;
 			}
-			if (m_location.m_x >= ND_MAX_X_SPAND)
-			{
-				return true;
-			}
 
-			if (m_location.m_y <= ND_MIN_Y_SPAND)
-			{
-				return true;
-			}
-
-			if (m_location.m_y >= ND_MAX_Y_SPAND)
-			{
-				return true;
-			}
-
-			if (!m_effector->IsHolonomic(m_timestep))
-			{
-				return true;
-			}
-
-			if (m_location.m_headRotation.DotProduct(m_targetLocation.m_headRotation).GetScalar() < 0.0f)
+			if (!ChechGripperLimits(m_rightGripper))
 			{
 				return true;
 			}
@@ -429,7 +430,7 @@ namespace ndAdvancedRobot
 			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
 				const ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-
+			
 				const ndVector omega(body->GetOmega());
 				const ndVector veloc(body->GetVelocity());
 				ndFloat32 vMag2 = veloc.DotProduct(veloc).GetScalar();
@@ -437,7 +438,7 @@ namespace ndAdvancedRobot
 				{
 					return true;
 				}
-
+			
 				ndFloat32 wMag2 = omega.DotProduct(omega).GetScalar();
 				if (wMag2 > 400.0f)
 				{
@@ -456,42 +457,39 @@ namespace ndAdvancedRobot
 				return -100.0f;
 			}
 
-			const ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
-			ndMatrix matrix0;
-			ndMatrix matrix1;
-			effector->CalculateGlobalMatrix(matrix0, matrix1);
-			matrix1 = CalculateTargetMatrix() * matrix1;
-			const ndMatrix invBaseMatrix(effector->CalculateGlobalBaseMatrix1().OrthoInverse());
+			const ndMatrix invBaseMatrix(m_base_rotator->CalculateGlobalMatrix1().OrthoInverse());
+			const ndMatrix effectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0() * invBaseMatrix);
 
-			matrix0 = matrix0 * invBaseMatrix;
-			matrix1 = matrix1 * invBaseMatrix;
-
-			const ndQuaternion rotation0(matrix0);
-			const ndQuaternion rotation1(matrix1);
-			ndFloat32 angleError2 = rotation0.DotProduct(rotation1).GetScalar();
-			if (angleError2 < 0.0f)
+			ndQuaternion effectorRotation(effectorMatrix);
+			ndFloat32 dRotation = effectorRotation.DotProduct(m_targetLocation.m_headRotation).GetScalar();
+			if (dRotation < 0.0f)
 			{
-				angleError2 = rotation0.DotProduct(rotation1.Scale (-1.0f)).GetScalar();
+				dRotation = effectorRotation.DotProduct(m_targetLocation.m_headRotation.Scale(-1.0f)).GetScalar();
 			}
-			angleError2 = 1.0f - angleError2;
+			dRotation = 1.0f - dRotation;
 
-			ndFloat32 azimuth0 = ndAtan2(-matrix0.m_posit.m_z, matrix0.m_posit.m_x);
-			ndFloat32 azimuth1 = ndAtan2(-matrix1.m_posit.m_z, matrix1.m_posit.m_x);
-			ndFloat32 azimuth = ndAnglesSub(azimuth0, azimuth1);
-			ndFloat32 azimuth2 = azimuth * azimuth;
+			ndFloat32 azimuth = 0.0f;
+			const ndVector& posit = effectorMatrix.m_posit;
+			if ((posit.m_y * posit.m_y + posit.m_z * posit.m_z) > 1.0e-3f)
+			{
+				azimuth = ndAtan2(posit.m_z, posit.m_y);
+			}
+			const ndMatrix aximuthMatrix(ndPitchMatrix(azimuth));
+			const ndVector currenPosit(aximuthMatrix.UnrotateVector(posit) - m_effectorPositOffset);
 
-			ndVector posit0(ndYawMatrix(azimuth0).UnrotateVector(matrix0.m_posit));
-			ndVector posit1(ndYawMatrix(azimuth1).UnrotateVector(matrix1.m_posit));
-
-			ndVector positError(posit1 - posit0);
-			positError.m_z = 0.0f;
-			ndFloat32 positError2 = positError.DotProduct(positError).GetScalar();
+			ndFloat32 dx = m_targetLocation.m_x - currenPosit.m_x;
+			ndFloat32 dy = m_targetLocation.m_y - currenPosit.m_y;
+			//ndFloat32 dAzimuth = m_targetLocation.m_azimuth - azimuth;
+			ndFloat32 dAzimuth = ndAnglesSub(m_targetLocation.m_azimuth, azimuth);
+			
+			ndFloat32 azimuth2 = dAzimuth * dAzimuth;
+			ndFloat32 positError2 = dx * dx + dy * dy;
+			ndFloat32 angleError2 = dRotation * dRotation;
 
 			ndFloat32 positReward = ndExp(-100.0f * positError2);
 			ndFloat32 azimuthReward = ndExp(-100.0f * azimuth2);
-			//ndFloat32 rotationReward = ndExp(-50.0f * angleError2);
-			//return azimuthReward * 0.4f + positReward * 0.3f + rotationReward * 0.3f;
-			return azimuthReward * 0.5f + positReward * 0.5f;
+			ndFloat32 rotationReward = ndExp(-50.0f * angleError2);
+			return azimuthReward * 0.4f + positReward * 0.3f + rotationReward * 0.3f;
 		}
 
 		#pragma optimize( "", off )
@@ -508,130 +506,116 @@ namespace ndAdvancedRobot
 				observation->m_jointVeloc[i] = ndBrainFloat(kinematicState.m_velocity);
 			}
 
-			//ndFloat32 rotationDist = m_location.m_headRotation.DotProduct(m_targetLocation.m_headRotation).GetScalar();
-			observation->m_effectortDeltaX = ndBrainFloat(m_targetLocation.m_x - m_location.m_x);
-			observation->m_effectortDeltaY = ndBrainFloat(m_targetLocation.m_y - m_location.m_y);
-			observation->m_effectorDeltaAzimuth = ndBrainFloat(ndAnglesSub(m_targetLocation.m_azimuth, m_location.m_azimuth));
-			//observation->m_effectorDeltaRotation = ndBrainFloat(rotationDist);
+			const ndMatrix invBaseMatrix(m_base_rotator->CalculateGlobalMatrix1().OrthoInverse());
+			const ndMatrix effectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0() * invBaseMatrix);
+
+			ndQuaternion effectorRotation(effectorMatrix);
+			if (effectorRotation.DotProduct(m_targetLocation.m_headRotation).GetScalar() < 0.0f)
+			{
+				effectorRotation = effectorRotation.Scale(-1.0f);
+			}
+			const ndQuaternion rotation(effectorRotation * m_targetLocation.m_headRotation.Inverse());
+
+			observation->m_rotation[0] = ndBrainFloat(rotation.m_x);
+			observation->m_rotation[1] = ndBrainFloat(rotation.m_y);
+			observation->m_rotation[2] = ndBrainFloat(rotation.m_z);
+			observation->m_rotation[3] = ndBrainFloat(rotation.m_w);
+
+			ndFloat32 azimuth = 0.0f;
+			const ndVector& posit = effectorMatrix.m_posit;
+			if ((posit.m_y * posit.m_y + posit.m_z * posit.m_z) > 1.0e-3f)
+			{
+				azimuth = ndAtan2(posit.m_z, posit.m_y);
+			}
+			const ndMatrix aximuthMatrix(ndPitchMatrix(azimuth));
+			const ndVector currenPosit(aximuthMatrix.UnrotateVector(posit) - m_effectorPositOffset);
+
+			observation->m_effectortDeltaX = ndBrainFloat(m_targetLocation.m_x - currenPosit.m_x);
+			observation->m_effectortDeltaY = ndBrainFloat(m_targetLocation.m_y - currenPosit.m_y);
+			//observation->m_effectorDeltaAzimuth = ndBrainFloat(m_targetLocation.m_azimuth - azimuth);
+			observation->m_effectorDeltaAzimuth = ndBrainFloat(ndAnglesSub(m_targetLocation.m_azimuth, azimuth));
+
+			//ndTrace(("%f %f %f %f\n", rotation.m_x, rotation.m_y, rotation.m_z, rotation.m_w));
+			//ndTrace(("%f %f %f %f\n\n", currenPosit.m_x, currenPosit.m_y, currenPosit.m_z, azimuth * ndRadToDegree));
+			//ndTrace(("%f %f %f %f\n", m_targetLocation.m_x, m_targetLocation.m_y, 0.0f, m_targetLocation.m_azimuth  * ndRadToDegree));
 		}
 
 		//#pragma optimize( "", off )
-		void ApplyActions(ndBrainFloat* const outputActions)
+		void ApplyActions(ndBrainFloat* const actions)
 		{
-			ndJointBilateralConstraint* loops = *m_effector;
-			ndIk6DofEffector* const effector = (ndIk6DofEffector*)loops;
-			ndActionVector* const actions = (ndActionVector*)outputActions;
+			auto SetParamter = [this, actions](ndJointHinge* const hinge, ndInt32 index)
+			{
+				ndFloat32 angle = hinge->GetTargetAngle();
+				ndFloat32 targetAngle = angle + actions[index] * ND_ACTION_SENSITIVITY;
+				hinge->SetTargetAngle(targetAngle);
+			};
 
-			m_leftGripper->SetOffsetPosit(-m_targetLocation.m_gripperPosit * 0.5f);
-			m_rightGripper->SetOffsetPosit(-m_targetLocation.m_gripperPosit * 0.5f);
-
-			#if 1
-			// using relative steps
-			ndFloat32 deltaX = actions->m_x * ND_POSITION_X_STEP;
-			ndFloat32 deltaY = actions->m_y * ND_POSITION_Y_STEP;
-			ndFloat32 deltaAzimuth = actions->m_azimuth * ND_POSITION_AZIMTH_STEP;
-			//ndFloat32 deltaRotation = actions->m_rotation * ND_ROTATION_STEP;
-			ndFloat32 deltaRotation = ND_ROTATION_STEP;
-			
-			ndFloat32 x = m_location.m_x + deltaX;
-			ndFloat32 y = m_location.m_y + deltaY;
-			ndFloat32 azimuth = m_location.m_azimuth + deltaAzimuth;
-			
-			const ndVector localPosit(x, y, 0.0f, 0.0f);
-			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
-			const ndVector posit (aximuthMatrix.TransformVector(m_effectorOffset + localPosit));
-			
-			const ndQuaternion quatRotation(m_location.m_headRotation.Slerp(m_targetLocation.m_headRotation, deltaRotation));
-			const ndMatrix rotation(ndCalculateMatrix(quatRotation));
-			ndMatrix targetMatrix(m_rotationOffset * rotation * m_rotationOffset.OrthoInverse());
-			targetMatrix.m_posit = posit;
-
-			#else
-			// using absolute steps
-			ndFloat32 deltaRotation = actions->m_rotation * ND_ROTATION_STEP;
-			ndFloat32 actionMapX = ND_MIN_X_SPAND + actions->m_x * (ND_MAX_X_SPAND - ND_MIN_X_SPAND);
-			ndFloat32 actionMapY = ND_MIN_Y_SPAND + actions->m_y * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
-			ndFloat32 actionMapAzimuth = -ndPi + actions->m_azimuth * (2.0f * ndPi);
-
-			ndFloat32 x = m_location.m_x - actionMapX;
-			ndFloat32 y = m_location.m_y - actionMapY;
-			ndFloat32 azimuth = m_location.m_azimuth - actionMapAzimuth;
-			const ndVector localPosit(x, y, 0.0f, 0.0f);
-			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
-			const ndVector posit (aximuthMatrix.TransformVector(m_effectorOffset + localPosit));
-
-			const ndQuaternion quatRotation(m_targetLocation.m_headRotation.Slerp(m_location.m_headRotation, deltaRotation));
-			const ndMatrix rotation(ndCalculateMatrix(quatRotation));
-			ndMatrix targetMatrix(m_rotationOffset * rotation * m_rotationOffset.OrthoInverse());
-			targetMatrix.m_posit = posit;
-			#endif
-
-			effector->SetOffsetMatrix(targetMatrix);
-
-			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
-			ndAssert(skeleton);
-
-			m_invDynamicsSolver.SolverBegin(skeleton, &loops, 1, m_world, m_timestep);
-			m_invDynamicsSolver.Solve();
-			m_invDynamicsSolver.SolverEnd();
+			SetParamter(m_arm_0, 0);
+			SetParamter(m_arm_1, 1);
+			SetParamter(m_arm_2, 2);
+			SetParamter(m_arm_3, 3);
+			SetParamter(m_arm_4, 4);
+			SetParamter(m_base_rotator, 5);
 		}
 
 		void CheckModelStability()
 		{
-			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
-			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			{
-				const ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-				const ndVector accel(body->GetAccel());
-				const ndVector alpha(body->GetAlpha());
-
-				ndFloat32 accelMag2 = accel.DotProduct(accel).GetScalar();
-				if (accelMag2 > 1.0e6f)
-				{
-					m_modelAlive = false;
-				}
-
-				ndFloat32 alphaMag2 = alpha.DotProduct(alpha).GetScalar();
-				if (alphaMag2 > 1.0e6f)
-				{
-					m_modelAlive = false;
-				}
-			}
-			if (!m_modelAlive)
-			{
-				for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-				{
-					ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-					body->SetAccel(ndVector::m_zero);
-					body->SetAlpha(ndVector::m_zero);
-				}
-			}
+			//ndAssert(0);
+			//const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			//for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			//{
+			//	const ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+			//	const ndVector accel(body->GetAccel());
+			//	const ndVector alpha(body->GetAlpha());
+			//
+			//	ndFloat32 accelMag2 = accel.DotProduct(accel).GetScalar();
+			//	if (accelMag2 > 1.0e6f)
+			//	{
+			//		m_modelAlive = false;
+			//	}
+			//
+			//	ndFloat32 alphaMag2 = alpha.DotProduct(alpha).GetScalar();
+			//	if (alphaMag2 > 1.0e6f)
+			//	{
+			//		m_modelAlive = false;
+			//	}
+			//}
+			//if (!m_modelAlive)
+			//{
+			//	for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			//	{
+			//		ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+			//		body->SetAccel(ndVector::m_zero);
+			//		body->SetAlpha(ndVector::m_zero);
+			//	}
+			//}
 		}
 
 		void SetCurrentLocation()
 		{
-			const ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
-			const ndMatrix matrix(effector->GetEffectorMatrix());
-
-			ndFloat32 azimuth = 0.0f;
-			const ndVector posit(matrix.m_posit);
-			if ((posit.m_x * posit.m_x + posit.m_z * posit.m_z) > 1.0e-3f)
-			{
-				azimuth = ndAtan2(-posit.m_z, posit.m_x);
-			}
-			const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
-			const ndVector currenPosit(aximuthMatrix.UnrotateVector(posit) - m_effectorOffset);
-			const ndMatrix paramMatrix(m_rotationOffset.OrthoInverse() * matrix * m_rotationOffset);
-			ndQuaternion rotation(paramMatrix);
-			if (rotation.DotProduct(m_location.m_headRotation).GetScalar() < 0.0f)
-			{
-				rotation = rotation.Scale(-1.0f);
-			}
-
-			m_location.m_azimuth = azimuth;
-			m_location.m_x = currenPosit.m_x;
-			m_location.m_y = currenPosit.m_y;
-			m_location.m_headRotation = rotation;
+			ndAssert(0);
+			//const ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
+			//const ndMatrix matrix(effector->GetEffectorMatrix());
+			//
+			//ndFloat32 azimuth = 0.0f;
+			//const ndVector posit(matrix.m_posit);
+			//if ((posit.m_x * posit.m_x + posit.m_z * posit.m_z) > 1.0e-3f)
+			//{
+			//	azimuth = ndAtan2(-posit.m_z, posit.m_x);
+			//}
+			//const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
+			//const ndVector currenPosit(aximuthMatrix.UnrotateVector(posit) - m_effectorOffset);
+			//const ndMatrix paramMatrix(m_rotationOffset.OrthoInverse() * matrix * m_rotationOffset);
+			//ndQuaternion rotation(paramMatrix);
+			//if (rotation.DotProduct(m_location.m_headRotation).GetScalar() < 0.0f)
+			//{
+			//	rotation = rotation.Scale(-1.0f);
+			//}
+			//
+			//m_location.m_azimuth = azimuth;
+			//m_location.m_x = currenPosit.m_x;
+			//m_location.m_y = currenPosit.m_y;
+			//m_location.m_headRotation = rotation;
 		}
 
 		#pragma optimize( "", off )
@@ -643,36 +627,9 @@ namespace ndAdvancedRobot
 				m_basePose[i].SetPose();
 			}
 
-			ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
-			ndMatrix matrix(ndGetIdentityMatrix());
-			matrix.m_posit = m_effectorOffset;
-			effector->SetOffsetMatrix(matrix);
-			SetCurrentLocation();
-			
-			// prevent setting target outside work robot workspace.
-			m_targetLocation.m_x = ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND);
-			m_targetLocation.m_y = ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND);
-			m_targetLocation.m_azimuth = (2.0f * ndRand() - 1.0f) * ndPi;
-
-			m_targetLocation.m_x = ndClamp(m_targetLocation.m_x, ndReal(ND_MIN_X_SPAND + 0.05f), ndReal(ND_MAX_X_SPAND - 0.05f));
-			m_targetLocation.m_y = ndClamp(m_targetLocation.m_y, ndReal(ND_MIN_Y_SPAND + 0.05f), ndReal(ND_MAX_Y_SPAND - 0.05f));
-			m_targetLocation.m_azimuth = ndClamp(m_targetLocation.m_azimuth, ndReal(-ndPi + 0.09f), ndReal(ndPi - 0.09f));
-
-			ndFloat32 yaw = ndFloat32((1.0f * ndRand() - 0.5f) * ndPi);
-			ndFloat32 pitch = ndFloat32((2.0f * ndRand() - 1.0f) * ndPi);
-			ndFloat32 roll = ndFloat32(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
-			
-			yaw = 0.0f * ndDegreeToRad;
-			roll = 0.0f * ndDegreeToRad;
-			pitch = 0.0f * ndDegreeToRad;
-			//m_targetLocation.m_x = m_location.m_x + 0.2f;
-			//m_targetLocation.m_x = 0.0f;
-			//m_targetLocation.m_y = 0.0f;
-			//m_targetLocation.m_azimuth = 0.0f;
-			m_targetLocation.m_headRotation = ndQuaternion(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
-			if (m_targetLocation.m_headRotation.DotProduct(m_location.m_headRotation).GetScalar() < 0.0f)
+			for (ndInt32 i = 0; i < m_armJoints.GetCount(); ++i)
 			{
-				m_targetLocation.m_headRotation = m_targetLocation.m_headRotation.Scale(-1.0f);
+				m_armJoints[i]->SetTargetAngle(0.0f);
 			}
 		}
 
@@ -686,13 +643,14 @@ namespace ndAdvancedRobot
 			}
 			else
 			{
-				m_controller->Step();
+				ndAssert(0);
+				//m_controller->Step();
 			}
 		}
 
 		void PostUpdate(ndWorld* const, ndFloat32)
 		{
-			SetCurrentLocation();
+			//SetCurrentLocation();
 		}
 
 		void PostTransformUpdate(ndWorld* const, ndFloat32)
@@ -701,12 +659,13 @@ namespace ndAdvancedRobot
 
 		ndMatrix CalculateTargetMatrix() const
 		{
-			ndMatrix targetMatrix(m_rotationOffset * ndCalculateMatrix(m_targetLocation.m_headRotation) * m_rotationOffset.OrthoInverse());
+			ndMatrix targetMatrix(ndCalculateMatrix(m_targetLocation.m_headRotation));
 			ndFloat32 x = m_targetLocation.m_x;
 			ndFloat32 y = m_targetLocation.m_y;
-			ndVector localPosit(x, y, 0.0f, 0.0f);
-			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth));
-			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
+			const ndVector localPosit(x, y, ndFloat32(0.0f), ndFloat32(0.0f));
+			const ndMatrix aximuthMatrix(ndPitchMatrix(m_targetLocation.m_azimuth));
+			const ndVector offsetPosit(localPosit + m_effectorPositOffset);
+			targetMatrix.m_posit = aximuthMatrix.TransformVector(offsetPosit);
 			return targetMatrix;
 		}
 
@@ -716,42 +675,48 @@ namespace ndAdvancedRobot
 			{
 				//return;
 			}
-
-			ndMatrix matrix0;
-			ndMatrix matrix1;
-			m_effector->CalculateGlobalMatrix(matrix0, matrix1);
-			matrix1 = CalculateTargetMatrix() * matrix1;
 			
-			context.DrawFrame(matrix0);
-			context.DrawFrame(matrix1);
-
 			const ndVector color(1.0f, 0.0f, 0.0f, 1.0f);
-			context.DrawPoint(matrix1.m_posit, color, ndFloat32(5.0f));
 
-			//const ndMatrix pivotMatrix(m_pivotJoint->GetLocalMatrix1() * m_pivotJoint->GetBody1()->GetMatrix());
-			//context.DrawFrame(pivotMatrix);
+			const ndMatrix effectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0());
+			context.DrawFrame(effectorMatrix);
+			context.DrawPoint(effectorMatrix.m_posit, color, ndFloat32(5.0f));
+
+			const ndMatrix targetMatrix(CalculateTargetMatrix() * m_base_rotator->CalculateGlobalMatrix1());
+			context.DrawFrame(targetMatrix);
+			context.DrawPoint(targetMatrix.m_posit, color, ndFloat32(5.0f));
+
+			const ndMatrix baseMatrix(m_base_rotator->CalculateGlobalMatrix1());
+			context.DrawFrame(baseMatrix);
+			context.DrawPoint(baseMatrix.m_posit, color, ndFloat32(5.0f));
 		}
 
-		ndMatrix m_rotationOffset;
-		ndVector m_effectorOffset;
+		ndMatrix m_effectorMatrixOffset;
+		ndVector m_effectorPositOffset;
 
-		ndIkSolver m_invDynamicsSolver;
-		ndSharedPtr<ndJointBilateralConstraint> m_effector;
-
-		ndBodyDynamic* m_rootBody;
-		ndJointSlider* m_leftGripper;
-		ndJointSlider* m_rightGripper;
-		ndController* m_controller;
-		ndJointBilateralConstraint* m_pivotJoint;
+		//ndBodyDynamic* m_rootBody;
+		//ndController* m_controller;
+		//ndJointBilateralConstraint* m_pivotJoint;
 		ndControllerTrainer* m_controllerTrainer;
 		ndWorld* m_world;
-		ndFixSizeArray<ndBasePose, 16> m_basePose;
-		ndFixSizeArray<ndJointBilateralConstraint*, 16> m_armJoints;
+		ndJointHinge* m_arm_0;
+		ndJointHinge* m_arm_1;
+		ndJointHinge* m_arm_2;
+		ndJointHinge* m_arm_3;
+		ndJointHinge* m_arm_4;
+		ndJointHinge* m_base_rotator;
+		ndJointSlider* m_leftGripper;
+		ndJointSlider* m_rightGripper;
 
-		ndControlParameters m_location;
+		ndFixSizeArray<ndBasePose, 16> m_basePose;
+		ndFixSizeArray<ndJointHinge*, 16> m_armJoints;
+		
+		//ndControlParameters m_location;
+		
+
 		ndControlParameters m_targetLocation;
 		ndFloat32 m_timestep;
-		ndInt32 m_modelId;
+		//ndInt32 m_modelId;
 		bool m_modelAlive;
 		bool m_showDebug;
 
@@ -763,7 +728,7 @@ namespace ndAdvancedRobot
 		public:
 		ndRobotUI(ndDemoEntityManager* const scene, RobotModelNotify* const robot)
 			:ndUIEntity(scene)
-			, m_robot(robot)
+			,m_robot(robot)
 		{
 		}
 
@@ -781,21 +746,21 @@ namespace ndAdvancedRobot
 			m_scene->Print(color, "Control panel");
 
 			ndInt8 change = 0;
-
+			
 			ndVector euler1;
 			ndVector euler(m_robot->m_targetLocation.m_headRotation.GetEulerAngles(euler1));
 			ndReal pitch = ndReal(euler.m_x);
 			ndReal yaw = ndReal(euler.m_y);
 			ndReal roll = ndReal(euler.m_z);
-
-			change = change | ndInt8(ImGui::SliderFloat("x", &m_robot->m_targetLocation.m_x, ND_MIN_X_SPAND, ND_MAX_X_SPAND));
-			change = change | ndInt8 (ImGui::SliderFloat("y", &m_robot->m_targetLocation.m_y, ND_MIN_Y_SPAND, ND_MAX_Y_SPAND));
+			
+			change = change | ndInt8 (ImGui::SliderFloat("x", &m_robot->m_targetLocation.m_x, ND_MIN_Y_SPAND, ND_MAX_Y_SPAND));
+			change = change | ndInt8(ImGui::SliderFloat("y", &m_robot->m_targetLocation.m_y, ND_MIN_X_SPAND, ND_MAX_X_SPAND));
 			change = change | ndInt8 (ImGui::SliderFloat("azimuth", &m_robot->m_targetLocation.m_azimuth, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("pitch", &pitch, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("yaw", &yaw, -ndPi * 0.5f, ndPi * 0.5f));
 			change = change | ndInt8(ImGui::SliderFloat("roll", &roll, -ndPi * 0.35f, ndPi * 0.9f));
 			change = change | ndInt8 (ImGui::SliderFloat("gripper", &m_robot->m_targetLocation.m_gripperPosit, -0.2f, 0.4f));
-
+			
 			bool newTarget = ndInt8(ImGui::Button("random target"));
 			if (newTarget)
 			{
@@ -803,19 +768,19 @@ namespace ndAdvancedRobot
 				//pitch = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				//yaw = ndReal((2.0f * ndRand() - 1.0f) * ndPi * 0.5f);
 				//roll = ndReal(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
-
+			
 				m_robot->m_targetLocation.m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				m_robot->m_targetLocation.m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
 				m_robot->m_targetLocation.m_y = ndReal(ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
 			}
-
+			
 			m_robot->m_targetLocation.m_headRotation = ndQuaternion (ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
-
-			if (m_robot->m_targetLocation.m_headRotation.DotProduct(m_robot->m_location.m_headRotation).GetScalar() < 0.0f)
-			{
-				m_robot->m_targetLocation.m_headRotation = m_robot->m_targetLocation.m_headRotation.Scale(-1.0f);
-			}
-
+			
+			//if (m_robot->m_targetLocation.m_headRotation.DotProduct(m_robot->m_location.m_headRotation).GetScalar() < 0.0f)
+			//{
+			//	m_robot->m_targetLocation.m_headRotation = m_robot->m_targetLocation.m_headRotation.Scale(-1.0f);
+			//}
+			
 			if (change)
 			{
 				m_robot->GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic()->SetSleepState(false);
@@ -922,9 +887,11 @@ namespace ndAdvancedRobot
 					{
 						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body->GetAsBodyDynamic()));
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
-						ndSharedPtr<ndJointBilateralConstraint> hinge(new ndIkJointHinge(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body->GetAsBodyKinematic()));
+						ndSharedPtr<ndJointBilateralConstraint> hinge(new ndJointHinge(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body->GetAsBodyKinematic()));
 
 						ndJointHinge* const hingeJoint = (ndJointHinge*)*hinge;
+
+						hingeJoint->SetAsSpringDamper(1.0e-3f, 3000.0f, 100.0f);
 						hingeJoint->SetLimits(definition.m_minLimit, definition.m_maxLimit);
 						if ((definition.m_minLimit > -1000.0f) && (definition.m_maxLimit < 1000.0f))
 						{
@@ -943,6 +910,7 @@ namespace ndAdvancedRobot
 
 						ndJointSlider* const sliderJoint = (ndJointSlider*)*slider;
 						sliderJoint->SetLimits(definition.m_minLimit, definition.m_maxLimit);
+						sliderJoint->SetLimitState(true);
 						sliderJoint->SetAsSpringDamper(0.001f, 2000.0f, 100.0f);
 						parentBone = model->AddLimb(parentBone, childBody, slider);
 						parentBone->m_name = definition.m_boneName;
@@ -1041,7 +1009,7 @@ namespace ndAdvancedRobot
 
 					if ((i == countZ / 2) && (j == countX / 2))
 					{
-						AddBackgroundScene(scene, location);
+						//AddBackgroundScene(scene, location);
 					}
 
 					ndModelArticulation* const model = SpawnModel(location);
@@ -1122,7 +1090,7 @@ namespace ndAdvancedRobot
 			{
 				ndInt32 episodeCount = m_master->GetEposideCount();
 				m_master->OptimizeStep();
-
+			
 				episodeCount -= m_master->GetEposideCount();
 				ndFloat32 rewardTrajectory = m_master->GetAverageFrames() * m_master->GetAverageScore();
 				if (rewardTrajectory >= ndFloat32(m_maxScore))
@@ -1135,7 +1103,7 @@ namespace ndAdvancedRobot
 						m_lastEpisode = m_master->GetEposideCount();
 					}
 				}
-
+			
 				if (episodeCount && !m_master->IsSampling())
 				{
 					ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
@@ -1146,7 +1114,7 @@ namespace ndAdvancedRobot
 					}
 				}
 			}
-
+			
 			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 96.0f))
 			{
 				char fileName[1024];

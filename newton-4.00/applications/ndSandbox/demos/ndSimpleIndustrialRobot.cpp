@@ -188,15 +188,15 @@ namespace ndSimpleRobot
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			//ndMatrix matrix(CalculateTargetMatrix() * m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix());
 			ndMatrix matrix(m_effector->CalculateGlobalMatrix1());
 			const ndVector color(1.0f, 0.0f, 0.0f, 1.0f);
 
 			context.DrawFrame(matrix);
 			context.DrawPoint(matrix.m_posit, color, ndFloat32(5.0f));
 
-			//ndMatrix matrix1(m_pivotJoint->CalculateGlobalMatrix1());
-			//context.DrawFrame(matrix1);
+			ndJointBilateralConstraint* const joint = *GetModel()->GetAsModelArticulation()->FindByName("arm_4")->m_joint;
+			ndMatrix jointMatrix(joint->CalculateGlobalMatrix0());
+			context.DrawFrame(jointMatrix);
 		}
 
 		ndMatrix m_rotationOffset;
@@ -393,6 +393,7 @@ namespace ndSimpleRobot
 
 						ndJointSlider* const sliderJoint = (ndJointSlider*)*slider;
 						sliderJoint->SetLimits(definition.m_minLimit, definition.m_maxLimit);
+						sliderJoint->SetLimitState(true);
 						sliderJoint->SetAsSpringDamper(0.001f, 2000.0f, 100.0f);
 						parentBone = model->AddLimb(parentBone, childBody, slider);
 
