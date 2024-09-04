@@ -47,7 +47,7 @@ namespace ndAdvancedRobot
 		ndBrainFloat m_effectortDeltaX;
 		ndBrainFloat m_effectortDeltaY;
 		ndBrainFloat m_effectorDeltaAzimuth;
-		ndBrainFloat m_effectorDeltaRotation;
+		//ndBrainFloat m_effectorDeltaRotation;
 	};
 
 	class ndControlParameters
@@ -507,11 +507,11 @@ namespace ndAdvancedRobot
 				observation->m_jointVeloc[i] = ndBrainFloat(kinematicState.m_velocity);
 			}
 
-			ndFloat32 rotationDist = m_location.m_headRotation.DotProduct(m_targetLocation.m_headRotation).GetScalar();
+			//ndFloat32 rotationDist = m_location.m_headRotation.DotProduct(m_targetLocation.m_headRotation).GetScalar();
 			observation->m_effectortDeltaX = ndBrainFloat(m_targetLocation.m_x - m_location.m_x);
 			observation->m_effectortDeltaY = ndBrainFloat(m_targetLocation.m_y - m_location.m_y);
 			observation->m_effectorDeltaAzimuth = ndBrainFloat(ndAnglesSub(m_targetLocation.m_azimuth, m_location.m_azimuth));
-			observation->m_effectorDeltaRotation = ndBrainFloat(rotationDist);
+			//observation->m_effectorDeltaRotation = ndBrainFloat(rotationDist);
 		}
 
 		//#pragma optimize( "", off )
