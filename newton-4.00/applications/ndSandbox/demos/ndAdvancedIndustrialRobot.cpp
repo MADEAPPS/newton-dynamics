@@ -73,7 +73,6 @@ namespace ndAdvancedRobot
 	#define ND_MAX_X_SPAND			ndReal ( 1.5f)
 	#define ND_MIN_Y_SPAND			ndReal (-2.2f)
 	#define ND_MAX_Y_SPAND			ndReal ( 1.5f)
-
 	#define ND_ACTION_SENSITIVITY	ndReal (0.005f)
 
 	class ndDefinition
@@ -993,6 +992,14 @@ namespace ndAdvancedRobot
 
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
+			//float xxx = 0.0f;
+			//int xxxxx = 0; 
+			//while (xxx < 99)
+			//{
+			//	xxxxx++;
+			//	xxx = 1.0 + xxx * 0.99;
+			//}
+
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 2;
 			hyperParameters.m_extraTrajectorySteps = 512;
@@ -1021,8 +1028,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			countX = 10;
-			countZ = 10;
+			//countX = 10;
+			//countZ = 10;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
