@@ -487,10 +487,11 @@ namespace ndAdvancedRobot
 			positError.m_z = 0.0f;
 			ndFloat32 positError2 = positError.DotProduct(positError).GetScalar();
 
-			ndFloat32 positReward = ndExp(-50.0f * positError2);
-			ndFloat32 azimuthReward = ndExp(-50.0f * azimuth2);
-			ndFloat32 rotationReward = ndExp(-50.0f * angleError2);
-			return azimuthReward * 0.4f + positReward * 0.3f + rotationReward * 0.3f;
+			ndFloat32 positReward = ndExp(-100.0f * positError2);
+			ndFloat32 azimuthReward = ndExp(-100.0f * azimuth2);
+			//ndFloat32 rotationReward = ndExp(-50.0f * angleError2);
+			//return azimuthReward * 0.4f + positReward * 0.3f + rotationReward * 0.3f;
+			return azimuthReward * 0.5f + positReward * 0.5f;
 		}
 
 		#pragma optimize( "", off )
@@ -989,7 +990,7 @@ namespace ndAdvancedRobot
 			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(-1)
-			,m_stopTraining(300 * 1000000)
+			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			//ndWorld* const world = scene->GetWorld();
@@ -1001,7 +1002,7 @@ namespace ndAdvancedRobot
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 2;
 			hyperParameters.m_extraTrajectorySteps = 512;
-			//hyperParameters.m_bashTrajectoryCount = 2000;
+			hyperParameters.m_bashTrajectoryCount = 1000;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
 			hyperParameters.m_numberOfObservations = ND_AGENT_INPUT_SIZE;
@@ -1026,8 +1027,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			countX = 10;
-			countZ = 10;
+			//countX = 10;
+			//countZ = 10;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
