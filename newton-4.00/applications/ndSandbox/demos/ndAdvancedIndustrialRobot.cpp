@@ -99,7 +99,7 @@ namespace ndAdvancedRobot
 	{
 		{ "base", ndDefinition::m_root, 100.0f, 0.0f, 0.0f},
 		{ "base_rotator", ndDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f},
-		{ "arm_0", ndDefinition::m_hinge , 5.0f, -120.0f * ndDegreeToRad, 120.0f * ndDegreeToRad},
+		{ "arm_0", ndDefinition::m_hinge , 5.0f, -120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
 		{ "arm_1", ndDefinition::m_hinge , 5.0f, -90.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
 		{ "arm_2", ndDefinition::m_hinge , 5.0f, -1.0e10f, 1.0e10f},
 		{ "arm_3", ndDefinition::m_hinge , 3.0f, -1.0e10f, 1.0e10f},
@@ -1021,8 +1021,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			//countX = 1;
-			//countZ = 1;
+			countX = 10;
+			countZ = 10;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
