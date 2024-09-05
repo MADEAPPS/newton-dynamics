@@ -220,7 +220,7 @@ namespace ndAdvancedRobot
 				return m_robot->IsTerminal();
 			}
 
-			#pragma optimize( "", off )
+			//#pragma optimize( "", off )
 			void SaveTrajectory()
 			{
 				if (IsTerminal())
@@ -259,10 +259,6 @@ namespace ndAdvancedRobot
 			:ndModelNotify()
 			,m_effectorMatrixOffset(ndGetIdentityMatrix())
 			,m_effectorPositOffset(ndVector::m_wOne)
-			//,m_rootBody(nullptr)
-			//,m_leftGripper(nullptr)
-			//,m_rightGripper(nullptr)
-			//,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 			,m_world(nullptr)
 			,m_arm_0(nullptr)
@@ -287,10 +283,6 @@ namespace ndAdvancedRobot
 			:ndModelNotify()
 			,m_effectorMatrixOffset(ndGetIdentityMatrix())
 			,m_effectorPositOffset(ndVector::m_wOne)
-			//,m_rootBody(nullptr)
-			//,m_leftGripper(nullptr)
-			//,m_rightGripper(nullptr)
-			//,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 			,m_world(nullptr)
 			,m_arm_0(nullptr)
@@ -443,12 +435,23 @@ namespace ndAdvancedRobot
 				{
 					return true;
 				}
+
+				const ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
+				ndBodyKinematic::ndContactMap::Iterator it(contacts);
+				for (it.Begin(); it; it++)
+				{
+					ndContact* const contact = *it;
+					if (contact->IsActive())
+					{
+						return true;
+					}
+				}
 			}
 
 			return false;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		ndReal GetReward() const
 		{
 			if (IsTerminal())
@@ -478,7 +481,6 @@ namespace ndAdvancedRobot
 
 			ndFloat32 dx = m_targetLocation.m_x - currenPosit.m_x;
 			ndFloat32 dy = m_targetLocation.m_y - currenPosit.m_y;
-			//ndFloat32 dAzimuth = m_targetLocation.m_azimuth - azimuth;
 			ndFloat32 dAzimuth = ndAnglesSub(m_targetLocation.m_azimuth, azimuth);
 			
 			ndFloat32 azimuth2 = dAzimuth * dAzimuth;
@@ -491,7 +493,7 @@ namespace ndAdvancedRobot
 			return azimuthReward * 0.4f + positReward * 0.3f + rotationReward * 0.3f;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const inputObservations)
 		{
 			ndObservationVector* const observation = (ndObservationVector*)inputObservations;
@@ -559,65 +561,37 @@ namespace ndAdvancedRobot
 
 		void CheckModelStability()
 		{
-			//ndAssert(0);
-			//const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
-			//for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			//{
-			//	const ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-			//	const ndVector accel(body->GetAccel());
-			//	const ndVector alpha(body->GetAlpha());
-			//
-			//	ndFloat32 accelMag2 = accel.DotProduct(accel).GetScalar();
-			//	if (accelMag2 > 1.0e6f)
-			//	{
-			//		m_modelAlive = false;
-			//	}
-			//
-			//	ndFloat32 alphaMag2 = alpha.DotProduct(alpha).GetScalar();
-			//	if (alphaMag2 > 1.0e6f)
-			//	{
-			//		m_modelAlive = false;
-			//	}
-			//}
-			//if (!m_modelAlive)
-			//{
-			//	for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			//	{
-			//		ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-			//		body->SetAccel(ndVector::m_zero);
-			//		body->SetAlpha(ndVector::m_zero);
-			//	}
-			//}
+			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				const ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+				const ndVector accel(body->GetAccel());
+				const ndVector alpha(body->GetAlpha());
+			
+				ndFloat32 accelMag2 = accel.DotProduct(accel).GetScalar();
+				if (accelMag2 > 1.0e6f)
+				{
+					m_modelAlive = false;
+				}
+			
+				ndFloat32 alphaMag2 = alpha.DotProduct(alpha).GetScalar();
+				if (alphaMag2 > 1.0e6f)
+				{
+					m_modelAlive = false;
+				}
+			}
+			if (!m_modelAlive)
+			{
+				for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+				{
+					ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+					body->SetAccel(ndVector::m_zero);
+					body->SetAlpha(ndVector::m_zero);
+				}
+			}
 		}
 
-		void SetCurrentLocation()
-		{
-			ndAssert(0);
-			//const ndIk6DofEffector* const effector = (ndIk6DofEffector*)*m_effector;
-			//const ndMatrix matrix(effector->GetEffectorMatrix());
-			//
-			//ndFloat32 azimuth = 0.0f;
-			//const ndVector posit(matrix.m_posit);
-			//if ((posit.m_x * posit.m_x + posit.m_z * posit.m_z) > 1.0e-3f)
-			//{
-			//	azimuth = ndAtan2(-posit.m_z, posit.m_x);
-			//}
-			//const ndMatrix aximuthMatrix(ndYawMatrix(azimuth));
-			//const ndVector currenPosit(aximuthMatrix.UnrotateVector(posit) - m_effectorOffset);
-			//const ndMatrix paramMatrix(m_rotationOffset.OrthoInverse() * matrix * m_rotationOffset);
-			//ndQuaternion rotation(paramMatrix);
-			//if (rotation.DotProduct(m_location.m_headRotation).GetScalar() < 0.0f)
-			//{
-			//	rotation = rotation.Scale(-1.0f);
-			//}
-			//
-			//m_location.m_azimuth = azimuth;
-			//m_location.m_x = currenPosit.m_x;
-			//m_location.m_y = currenPosit.m_y;
-			//m_location.m_headRotation = rotation;
-		}
-
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		void ResetModel()
 		{
 			m_modelAlive = true;
@@ -675,7 +649,6 @@ namespace ndAdvancedRobot
 
 		void PostUpdate(ndWorld* const, ndFloat32)
 		{
-			//SetCurrentLocation();
 		}
 
 		void PostTransformUpdate(ndWorld* const, ndFloat32)
@@ -1028,8 +1001,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			//countX = 10;
-			//countZ = 10;
+			countX = 10;
+			countZ = 10;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
