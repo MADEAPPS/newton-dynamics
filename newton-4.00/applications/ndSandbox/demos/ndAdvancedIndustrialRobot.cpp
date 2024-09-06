@@ -27,7 +27,7 @@ namespace ndAdvancedRobot
 	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach-vpg.dnn"
 
-	//#define ND_USE_EULERS
+	#define ND_USE_EULERS
 
 	class ndActionVector
 	{
@@ -96,6 +96,8 @@ namespace ndAdvancedRobot
 	#define ND_MIN_Y_SPAND			ndReal (-2.2f)
 	#define ND_MAX_Y_SPAND			ndReal ( 1.5f)
 	#define ND_ACTION_SENSITIVITY	ndReal (0.05f)
+
+	#define ND_DEAD_PENALTY			ndReal (-10.0f)
 
 	class ndDefinition
 	{
@@ -248,9 +250,9 @@ namespace ndAdvancedRobot
 				if (IsTerminal())
 				{
 					ndInt32 index = m_trajectory.GetCount() - 1;
-					if (m_trajectory.GetReward(index) != -100.0f)
+					if (m_trajectory.GetReward(index) != ND_DEAD_PENALTY)
 					{
-						m_trajectory.SetReward(index, -100.0f);
+						m_trajectory.SetReward(index, ND_DEAD_PENALTY);
 					}
 				}
 				ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
@@ -320,10 +322,9 @@ namespace ndAdvancedRobot
 			,m_modelAlive(true)
 			,m_showDebug(showDebug)
 		{
-			ndAssert(0);
-			//m_controller = new ndController(brain);
-			//m_controller->m_robot = this;
-			//Init(robot);
+			m_controller = new ndController(brain);
+			m_controller->m_robot = this;
+			Init(robot);
 		}
 
 		RobotModelNotify(const RobotModelNotify& src)
@@ -343,10 +344,10 @@ namespace ndAdvancedRobot
 
 		~RobotModelNotify()
 		{
-			//if (m_controller)
-			//{
-			//	delete m_controller;
-			//}
+			if (m_controller)
+			{
+				delete m_controller;
+			}
 
 			if (m_controllerTrainer)
 			{
@@ -361,6 +362,7 @@ namespace ndAdvancedRobot
 
 		void Init(ndModelArticulation* const robot)
 		{
+			m_modelId = ndInt32 (robot->GetRoot()->m_body->GetId());
 			m_arm_0 = (ndJointHinge*)*robot->FindByName("arm_0")->m_joint;
 			m_arm_1 = (ndJointHinge*)*robot->FindByName("arm_1")->m_joint;
 			m_arm_2 = (ndJointHinge*)*robot->FindByName("arm_2")->m_joint;
@@ -478,8 +480,7 @@ namespace ndAdvancedRobot
 		{
 			if (IsTerminal())
 			{
-				//return -100.0f;
-				return 0.0f;
+				return ND_DEAD_PENALTY;
 			}
 
 			const ndMatrix invBaseMatrix(m_base_rotator->CalculateGlobalMatrix1().OrthoInverse());
@@ -689,8 +690,7 @@ namespace ndAdvancedRobot
 			}
 			else
 			{
-				ndAssert(0);
-				//m_controller->Step();
+				m_controller->Step();
 			}
 		}
 
@@ -743,9 +743,7 @@ namespace ndAdvancedRobot
 		ndMatrix m_effectorMatrixOffset;
 		ndVector m_effectorPositOffset;
 
-		//ndBodyDynamic* m_rootBody;
-		//ndController* m_controller;
-		//ndJointBilateralConstraint* m_pivotJoint;
+		ndController* m_controller;
 		ndControllerTrainer* m_controllerTrainer;
 		ndWorld* m_world;
 		ndJointHinge* m_arm_0;
@@ -759,13 +757,10 @@ namespace ndAdvancedRobot
 
 		ndFixSizeArray<ndBasePose, 16> m_basePose;
 		ndFixSizeArray<ndJointHinge*, 16> m_armJoints;
-		
-		//ndControlParameters m_location;
-		
 
 		ndControlParameters m_targetLocation;
 		ndFloat32 m_timestep;
-		//ndInt32 m_modelId;
+		ndInt32 m_modelId;
 		bool m_modelAlive;
 		bool m_showDebug;
 
