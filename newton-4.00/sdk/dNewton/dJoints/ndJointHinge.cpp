@@ -195,14 +195,6 @@ void ndJointHinge::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatri
 	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 }
 
-void ndJointHinge::ClearMemory()
-{
-	ndJointBilateralConstraint::ClearMemory();
-	m_angle = ndFloat32(0.0f);
-	m_omega = ndFloat32(0.0f);
-	m_targetAngle = ndFloat32(0.0f);
-}
-
 void ndJointHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
@@ -231,6 +223,25 @@ ndFloat32 ndJointHinge::PenetrationOmega(ndFloat32 penetration) const
 	ndFloat32 param = ndClamp(penetration, ndFloat32(0.0f), D_MAX_HINGE_PENETRATION) / D_MAX_HINGE_PENETRATION;
 	ndFloat32 omega = D_MAX_HINGE_RECOVERY_SPEED * param;
 	return omega;
+}
+
+//#pragma optimize( "", off )
+void ndJointHinge::ClearMemory()
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	ndJointBilateralConstraint::ClearMemory();
+
+	// save the current joint Omega
+	const ndVector omega0(m_body0->GetOmega());
+	const ndVector omega1(m_body1->GetOmega());
+
+	// the joint angle can be determined by getting the angle between any two non parallel vectors
+	m_angle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
+	m_omega = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
+	m_targetAngle = m_angle;
 }
 
 ndInt32 ndJointHinge::GetKinematicState(ndKinematicState* const state) const

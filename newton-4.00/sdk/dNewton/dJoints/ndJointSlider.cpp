@@ -159,6 +159,28 @@ ndInt32 ndJointSlider::GetKinematicState(ndKinematicState* const state) const
 	return 1;
 }
 
+//#pragma optimize( "", off )
+void ndJointSlider::ClearMemory()
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	ndJointBilateralConstraint::ClearMemory();
+
+	const ndVector& p0 = matrix0.m_posit;
+	const ndVector& p1 = matrix1.m_posit;
+	const ndVector veloc0(m_body0->GetVelocityAtPoint(matrix0.m_posit));
+	const ndVector veloc1(m_body1->GetVelocityAtPoint(matrix1.m_posit));
+
+	const ndVector prel(p0 - p1);
+	const ndVector vrel(veloc0 - veloc1);
+
+	m_speed = vrel.DotProduct(matrix1.m_front).GetScalar();
+	m_posit = prel.DotProduct(matrix1.m_front).GetScalar();
+	m_positOffset = m_posit;
+}
+
 void ndJointSlider::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	if (m_limitState)
@@ -191,14 +213,6 @@ void ndJointSlider::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& ma
 			}
 		}
 	}
-}
-
-void ndJointSlider::ClearMemory()
-{
-	ndJointBilateralConstraint::ClearMemory();
-	m_posit = ndFloat32(0.0f);
-	m_speed = ndFloat32(0.0f);
-	m_positOffset = ndFloat32(0.0f);
 }
 
 void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
