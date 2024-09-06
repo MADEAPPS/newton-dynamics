@@ -27,7 +27,7 @@ namespace ndAdvancedRobot
 	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach-vpg.dnn"
 
-	#define ND_USE_EULERS
+	//#define ND_USE_EULERS
 
 	class ndActionVector
 	{
@@ -283,6 +283,7 @@ namespace ndAdvancedRobot
 			:ndModelNotify()
 			,m_effectorMatrixOffset(ndGetIdentityMatrix())
 			,m_effectorPositOffset(ndVector::m_wOne)
+			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 			,m_world(nullptr)
 			,m_arm_0(nullptr)
@@ -307,6 +308,7 @@ namespace ndAdvancedRobot
 			:ndModelNotify()
 			,m_effectorMatrixOffset(ndGetIdentityMatrix())
 			,m_effectorPositOffset(ndVector::m_wOne)
+			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 			,m_world(nullptr)
 			,m_arm_0(nullptr)
