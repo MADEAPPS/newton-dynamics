@@ -451,13 +451,13 @@ namespace ndAdvancedRobot
 				const ndVector omega(body->GetOmega());
 				const ndVector veloc(body->GetVelocity());
 				ndFloat32 vMag2 = veloc.DotProduct(veloc).GetScalar();
-				if (vMag2 > 200.0f)
+				if (vMag2 > 400.0f)
 				{
 					return true;
 				}
 			
 				ndFloat32 wMag2 = omega.DotProduct(omega).GetScalar();
-				if (wMag2 > 400.0f)
+				if (wMag2 > 250.0f)
 				{
 					return true;
 				}
