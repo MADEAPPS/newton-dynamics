@@ -23,8 +23,8 @@
 #define __ND_JOINT_LIST_H__
 
 #include "ndCoreStdafx.h"
-#include "ndNewtonStdafx.h"
 
+class ndJointBilateralConstraint;
 class ndJointList: public ndList<ndSharedPtr<ndJointBilateralConstraint>, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>
 {
 	public:

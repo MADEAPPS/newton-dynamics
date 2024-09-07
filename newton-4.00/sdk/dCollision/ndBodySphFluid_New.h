@@ -22,7 +22,6 @@
 #ifndef __ND_BODY_SPH_NEW_FLUID_H__
 #define __ND_BODY_SPH_NEW_FLUID_H__
 
-#include "ndNewtonStdafx.h"
 #include "ndBodyParticleSet.h"
 
 #ifdef D_USE_NEW_FLUID

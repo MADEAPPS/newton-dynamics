@@ -21,7 +21,7 @@
 
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
-#include "ndWorld.h"
+#include "ndScene.h"
 #include "ndBodySphFluid.h"
 
 #ifndef D_USE_NEW_FLUID
