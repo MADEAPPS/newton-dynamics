@@ -27,7 +27,7 @@ namespace ndAdvancedRobot
 	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach-vpg.dnn"
 
-	//#define ND_USE_EULERS
+	#define ND_USE_EULERS
 
 	class ndActionVector
 	{
@@ -510,7 +510,17 @@ namespace ndAdvancedRobot
 				ndFloat32 deltaYaw = ndAnglesSub(euler.m_y, m_targetLocation.m_yaw);
 				ndFloat32 deltaRoll = ndAnglesSub(euler.m_z, m_targetLocation.m_roll);
 				ndFloat32 deltaPitch = ndAnglesSub(euler.m_x, m_targetLocation.m_pitch);
-				ndFloat32 angleError2 = deltaYaw * deltaYaw + deltaRoll * deltaRoll + deltaPitch * deltaPitch;
+				//ndFloat32 angleError2 = deltaYaw * deltaYaw + deltaRoll * deltaRoll + deltaPitch * deltaPitch;
+
+				ndFloat32 positReward = ndExp(-100.0f * positError2);
+				ndFloat32 azimuthReward = ndExp(-100.0f * azimuth2);
+				ndFloat32 yawReward = ndExp(-100.0f * deltaYaw * deltaYaw);
+				ndFloat32 rollReward = ndExp(-100.0f * deltaRoll * deltaRoll);
+				ndFloat32 pitchReward = ndExp(-100.0f * deltaPitch * deltaPitch);
+
+				return azimuthReward * 0.2f + positReward * 0.2f + 
+					   yawReward * 0.2f + rollReward * 0.2f + pitchReward * 0.2f;
+
 			#else
 				ndQuaternion effectorRotation(effectorMatrix);
 				ndFloat32 dRotation = effectorRotation.DotProduct(m_targetLocation.m_headRotation).GetScalar();
@@ -520,12 +530,12 @@ namespace ndAdvancedRobot
 				}
 				dRotation = 1.0f - dRotation;
 				ndFloat32 angleError2 = dRotation * dRotation;
-			#endif
 
-			ndFloat32 positReward = ndExp(-100.0f * positError2);
-			ndFloat32 azimuthReward = ndExp(-100.0f * azimuth2);
-			ndFloat32 rotationReward = ndExp(-50.0f * angleError2);
-			return azimuthReward * 0.4f + positReward * 0.3f + rotationReward * 0.3f;
+				ndFloat32 positReward = ndExp(-100.0f * positError2);
+				ndFloat32 azimuthReward = ndExp(-100.0f * azimuth2);
+				ndFloat32 rotationReward = ndExp(-50.0f * angleError2);
+				return azimuthReward * 0.4f + positReward * 0.3f + rotationReward * 0.3f;
+			#endif
 		}
 
 		//#pragma optimize( "", off )
