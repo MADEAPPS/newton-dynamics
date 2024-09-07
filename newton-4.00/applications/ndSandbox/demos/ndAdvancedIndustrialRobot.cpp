@@ -42,6 +42,8 @@ namespace ndAdvancedRobot
 		ndBrainFloat m_jointPosit[6];
 		ndBrainFloat m_jointVeloc[6];
 
+		ndBrainFloat m_collided;
+
 		// distance to target error.
 		ndBrainFloat m_delta_x;
 		ndBrainFloat m_delta_y;
@@ -140,6 +142,7 @@ namespace ndAdvancedRobot
 		{
 		}
 
+		#pragma optimize( "", off )
 		virtual bool OnSceneAabbOverlap(const ndBody* const otherBody) const
 		{
 			const ndBodyKinematic* const body0 = ((ndBody*)GetBody())->GetAsBodyKinematic();
@@ -147,11 +150,19 @@ namespace ndAdvancedRobot
 			const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
 			const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
 
-			if ((instanceShape0.m_shapeMaterial.m_userId == ndDemoContactCallback::m_modelPart) &&
-				(instanceShape1.m_shapeMaterial.m_userId == ndDemoContactCallback::m_modelPart))
+			if (instanceShape0.m_shapeMaterial.m_userParam[0].m_ptrData != instanceShape1.m_shapeMaterial.m_userParam[0].m_ptrData)
 			{
-				return false;
+				if (instanceShape0.m_shapeMaterial.m_userParam[0].m_ptrData && instanceShape1.m_shapeMaterial.m_userParam[0].m_ptrData)
+				{
+					return false;
+				}
 			}
+
+			//if ((instanceShape0.m_shapeMaterial.m_userId == ndDemoContactCallback::m_modelPart) &&
+			//	(instanceShape1.m_shapeMaterial.m_userId == ndDemoContactCallback::m_modelPart))
+			//{
+			//	return false;
+			//}
 			return true;
 		}
 	};
@@ -398,6 +409,26 @@ namespace ndAdvancedRobot
 			}
 		}
 
+		bool ModelCollided() const 
+		{
+			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				const ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+				const ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
+				ndBodyKinematic::ndContactMap::Iterator it(contacts);
+				for (it.Begin(); it; it++)
+				{
+					ndContact* const contact = *it;
+					if (contact->IsActive())
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
 		#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
@@ -461,17 +492,11 @@ namespace ndAdvancedRobot
 				{
 					return true;
 				}
+			}
 
-				const ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
-				ndBodyKinematic::ndContactMap::Iterator it(contacts);
-				for (it.Begin(); it; it++)
-				{
-					ndContact* const contact = *it;
-					if (contact->IsActive())
-					{
-						return true;
-					}
-				}
+			if (ModelCollided())
+			{
+				return true;
 			}
 
 			return false;
@@ -518,8 +543,11 @@ namespace ndAdvancedRobot
 				ndFloat32 rollReward = ndExp(-100.0f * deltaRoll * deltaRoll);
 				ndFloat32 pitchReward = ndExp(-100.0f * deltaPitch * deltaPitch);
 
-				return azimuthReward * 0.2f + positReward * 0.2f + 
-					   yawReward * 0.2f + rollReward * 0.2f + pitchReward * 0.2f;
+				ndFloat32 rotatWeight = 0.7f;
+				ndFloat32 positWeight = 0.3f;
+
+				return positWeight * (positReward * 0.4f + azimuthReward * 0.6f) +
+					   rotatWeight * (yawReward * 0.34f + rollReward * 0.33f + pitchReward * 0.33f);
 
 			#else
 				ndQuaternion effectorRotation(effectorMatrix);
@@ -538,7 +566,7 @@ namespace ndAdvancedRobot
 			#endif
 		}
 
-		//#pragma optimize( "", off )
+		#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const inputObservations)
 		{
 			ndObservationVector* const observation = (ndObservationVector*)inputObservations;
@@ -551,6 +579,8 @@ namespace ndAdvancedRobot
 				observation->m_jointPosit[i] = ndBrainFloat(kinematicState.m_posit);
 				observation->m_jointVeloc[i] = ndBrainFloat(kinematicState.m_velocity);
 			}
+
+			observation->m_collided = ndBrainFloat(ModelCollided() ? 1.0f : 0.0f);
 
 			const ndMatrix invBaseMatrix(m_base_rotator->CalculateGlobalMatrix1().OrthoInverse());
 			const ndMatrix effectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0() * invBaseMatrix);
@@ -856,7 +886,7 @@ namespace ndAdvancedRobot
 		RobotModelNotify* m_robot;
 	};
 
-	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
+	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone, ndModelArticulation* const model)
 	{
 		ndSharedPtr<ndShapeInstance> shapePtr(entityPart->CreateCollisionFromChildren());
 		ndShapeInstance* const shape = *shapePtr;
@@ -873,6 +903,7 @@ namespace ndAdvancedRobot
 
 		ndShapeInstance& instanceShape = body->GetCollisionShape();
 		instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+		instanceShape.m_shapeMaterial.m_userParam[0].m_ptrData = model;
 
 		return body->GetAsBodyDynamic();
 	}
@@ -920,7 +951,7 @@ namespace ndAdvancedRobot
 		rootEntity->ResetMatrix(matrix);
 
 		// add the root body
-		ndSharedPtr<ndBody> rootBody(CreateBodyPart(scene, rootEntity, jointsDefinition[0].m_mass, nullptr));
+		ndSharedPtr<ndBody> rootBody(CreateBodyPart(scene, rootEntity, jointsDefinition[0].m_mass, nullptr, model));
 
 		rootBody->SetMatrix(rootEntity->CalculateGlobalMatrix());
 
@@ -951,7 +982,7 @@ namespace ndAdvancedRobot
 					//ndTrace(("name: %s\n", name));
 					if (definition.m_type == ndDefinition::m_hinge)
 					{
-						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body->GetAsBodyDynamic()));
+						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body->GetAsBodyDynamic(), model));
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndSharedPtr<ndJointBilateralConstraint> hinge(new ndJointHinge(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body->GetAsBodyKinematic()));
 
@@ -969,7 +1000,7 @@ namespace ndAdvancedRobot
 					}
 					else if (definition.m_type == ndDefinition::m_slider)
 					{
-						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body->GetAsBodyDynamic()));
+						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, childEntity, definition.m_mass, parentBone->m_body->GetAsBodyDynamic(), model));
 
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndSharedPtr<ndJointBilateralConstraint> slider(new ndJointSlider(pivotMatrix, childBody->GetAsBodyKinematic(), parentBone->m_body->GetAsBodyKinematic()));
