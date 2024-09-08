@@ -31,7 +31,7 @@ class ndThreadName
 	public:
 	ndThreadName()
 	{
-		strcpy(m_name, "newtonWorker");
+		strcpy_s(m_name, sizeof(m_name), "newtonWorker");
 	}
 	char m_name[32];
 };

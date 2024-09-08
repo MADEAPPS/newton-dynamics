@@ -301,7 +301,7 @@ namespace ndCarpole_1
 			,m_maxScore(ndFloat32(-1.0e10f))
 			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
-			,m_lastEpisode(-1)
+			,m_lastEpisode(0xfffffff)
 			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
 		{
@@ -448,10 +448,10 @@ namespace ndCarpole_1
 
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
-			ndInt32 stopTraining = m_master->GetFramesCount();
+			ndUnsigned32 stopTraining = m_master->GetFramesCount();
 			if (stopTraining <= m_stopTraining)
 			{
-				ndInt32 episodeCount = m_master->GetEposideCount();
+				ndUnsigned32 episodeCount = m_master->GetEposideCount();
 				m_master->OptimizeStep();
 
 				episodeCount -= m_master->GetEposideCount();
@@ -503,8 +503,8 @@ namespace ndCarpole_1
 		ndFloat32 m_maxScore;
 		ndFloat32 m_discountFactor;
 		ndFloat32 m_horizon;
-		ndInt32 m_lastEpisode;
-		ndInt32 m_stopTraining;
+		ndUnsigned32 m_lastEpisode;
+		ndUnsigned32 m_stopTraining;
 		bool m_modelIsTrained;
 	};
 }

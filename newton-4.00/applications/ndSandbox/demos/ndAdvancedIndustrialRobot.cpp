@@ -526,8 +526,8 @@ namespace ndAdvancedRobot
 			ndFloat32 dy = m_targetLocation.m_y - currenPosit.m_y;
 			ndFloat32 dAzimuth = ndAnglesSub(m_targetLocation.m_azimuth, azimuth);
 
-			ndFloat32 azimuth2 = dAzimuth * dAzimuth;
-			ndFloat32 positError2 = dx * dx + dy * dy;
+			//ndFloat32 azimuth2 = dAzimuth * dAzimuth;
+			//ndFloat32 positError2 = dx * dx + dy * dy;
 
 			#ifdef ND_USE_EULERS 
 				ndVector euler1;
@@ -535,19 +535,16 @@ namespace ndAdvancedRobot
 				ndFloat32 deltaYaw = ndAnglesSub(euler.m_y, m_targetLocation.m_yaw);
 				ndFloat32 deltaRoll = ndAnglesSub(euler.m_z, m_targetLocation.m_roll);
 				ndFloat32 deltaPitch = ndAnglesSub(euler.m_x, m_targetLocation.m_pitch);
-				//ndFloat32 angleError2 = deltaYaw * deltaYaw + deltaRoll * deltaRoll + deltaPitch * deltaPitch;
 
-				ndFloat32 positReward = ndExp(-100.0f * positError2);
-				ndFloat32 azimuthReward = ndExp(-100.0f * azimuth2);
+				ndFloat32 posit_xReward = ndExp(-100.0f * dx * dx);
+				ndFloat32 posit_yReward = ndExp(-100.0f * dy * dy);
+				ndFloat32 azimuthReward = ndExp(-100.0f * dAzimuth * dAzimuth);
 				ndFloat32 yawReward = ndExp(-100.0f * deltaYaw * deltaYaw);
 				ndFloat32 rollReward = ndExp(-100.0f * deltaRoll * deltaRoll);
 				ndFloat32 pitchReward = ndExp(-100.0f * deltaPitch * deltaPitch);
 
-				ndFloat32 rotatWeight = 0.7f;
-				ndFloat32 positWeight = 0.3f;
-
-				return positWeight * (positReward * 0.4f + azimuthReward * 0.6f) +
-					   rotatWeight * (yawReward * 0.34f + rollReward * 0.33f + pitchReward * 0.33f);
+				ndFloat32 rewardWeight = 1.0 / 6.0f;
+				return rewardWeight * (posit_xReward + posit_yReward + azimuthReward + yawReward + rollReward + pitchReward);
 
 			#else
 				ndQuaternion effectorRotation(effectorMatrix);
@@ -1054,8 +1051,8 @@ namespace ndAdvancedRobot
 			,m_maxScore(ndFloat32(-1.0e10f))
 			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
-			,m_lastEpisode(-1)
-			,m_stopTraining(2000 * 1000000)
+			,m_lastEpisode(0xffffffff)
+			,m_stopTraining(ndUnsigned32(4000) * ndUnsigned32(1000000))
 			,m_modelIsTrained(false)
 		{
 			m_outFile = fopen("robotArmReach-vpg.csv", "wb");
@@ -1189,10 +1186,10 @@ namespace ndAdvancedRobot
 
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
-			ndInt32 stopTraining = m_master->GetFramesCount();
+			ndUnsigned32 stopTraining = m_master->GetFramesCount();
 			if (stopTraining <= m_stopTraining)
 			{
-				ndInt32 episodeCount = m_master->GetEposideCount();
+				ndUnsigned32 episodeCount = m_master->GetEposideCount();
 				m_master->OptimizeStep();
 			
 				episodeCount -= m_master->GetEposideCount();
@@ -1242,8 +1239,8 @@ namespace ndAdvancedRobot
 		ndFloat32 m_maxScore;
 		ndFloat32 m_discountFactor;
 		ndFloat32 m_horizon;
-		ndInt32 m_lastEpisode;
-		ndInt32 m_stopTraining;
+		ndUnsigned32 m_lastEpisode;
+		ndUnsigned32 m_stopTraining;
 		bool m_modelIsTrained;
 	};
 }

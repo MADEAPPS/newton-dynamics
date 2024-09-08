@@ -342,8 +342,8 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	,m_criticLearnRate(hyperParameters.m_criticLearnRate)
 	,m_numberOfActions(hyperParameters.m_numberOfActions)
 	,m_numberOfObservations(hyperParameters.m_numberOfObservations)
-	,m_frameCount(0)
 	,m_framesAlive(0)
+	,m_frameCount(0)
 	,m_eposideCount(0)
 	,m_bashBufferSize(hyperParameters.m_bashBufferSize)
 	,m_maxTrajectorySteps(hyperParameters.m_maxTrajectorySteps)
@@ -499,7 +499,7 @@ ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* ndBrainAgentConti
 	return &m_randomGenerator[m_randomSeed];
 }
 
-ndInt32 ndBrainAgentContinuePolicyGradient_TrainerMaster::GetFramesCount() const
+ndUnsigned32 ndBrainAgentContinuePolicyGradient_TrainerMaster::GetFramesCount() const
 {
 	return m_frameCount;
 }
@@ -509,7 +509,7 @@ bool ndBrainAgentContinuePolicyGradient_TrainerMaster::IsSampling() const
 	return false;
 }
 
-ndInt32 ndBrainAgentContinuePolicyGradient_TrainerMaster::GetEposideCount() const
+ndUnsigned32 ndBrainAgentContinuePolicyGradient_TrainerMaster::GetEposideCount() const
 {
 	return m_eposideCount;
 }

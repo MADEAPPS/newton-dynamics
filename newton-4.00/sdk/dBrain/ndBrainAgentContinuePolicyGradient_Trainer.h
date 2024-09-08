@@ -146,8 +146,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
 
-	ndInt32 GetFramesCount() const;
-	ndInt32 GetEposideCount() const;
+	ndUnsigned32 GetFramesCount() const;
+	ndUnsigned32 GetEposideCount() const;
 
 	bool IsSampling() const;
 	ndFloat32 GetAverageScore() const;
@@ -181,9 +181,9 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndBrainFloat m_criticLearnRate;
 	ndInt32 m_numberOfActions;
 	ndInt32 m_numberOfObservations;
-	ndInt32 m_frameCount;
 	ndInt32 m_framesAlive;
-	ndInt32 m_eposideCount;
+	ndUnsigned32 m_frameCount;
+	ndUnsigned32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
 	ndInt32 m_maxTrajectorySteps;
 	ndInt32 m_extraTrajectorySteps;
