@@ -502,7 +502,7 @@ namespace ndAdvancedRobot
 			return false;
 		}
 
-		//#pragma optimize( "", off )
+		#pragma optimize( "", off )
 		ndReal GetReward() const
 		{
 			if (IsTerminal())
@@ -510,8 +510,13 @@ namespace ndAdvancedRobot
 				return ND_DEAD_PENALTY;
 			}
 
-			const ndMatrix invBaseMatrix(m_base_rotator->CalculateGlobalMatrix1().OrthoInverse());
-			const ndMatrix effectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0() * invBaseMatrix);
+			const ndMatrix globalBaseMatrix(m_base_rotator->CalculateGlobalMatrix1());
+			const ndMatrix globalEffectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0());
+			const ndMatrix globalTargetMatrix(CalculateTargetMatrix() * globalBaseMatrix);
+
+			//const ndMatrix invBaseMatrix(m_base_rotator->CalculateGlobalMatrix1().OrthoInverse());
+			//const ndMatrix effectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0() * invBaseMatrix);
+			const ndMatrix effectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0() * globalBaseMatrix.OrthoInverse());
 
 			ndFloat32 azimuth = 0.0f;
 			const ndVector& posit = effectorMatrix.m_posit;
@@ -525,9 +530,6 @@ namespace ndAdvancedRobot
 			ndFloat32 dx = m_targetLocation.m_x - currenPosit.m_x;
 			ndFloat32 dy = m_targetLocation.m_y - currenPosit.m_y;
 			ndFloat32 dAzimuth = ndAnglesSub(m_targetLocation.m_azimuth, azimuth);
-
-			//ndFloat32 azimuth2 = dAzimuth * dAzimuth;
-			//ndFloat32 positError2 = dx * dx + dy * dy;
 
 			#ifdef ND_USE_EULERS 
 				ndVector euler1;
@@ -543,7 +545,7 @@ namespace ndAdvancedRobot
 				ndFloat32 rollReward = ndExp(-100.0f * deltaRoll * deltaRoll);
 				ndFloat32 pitchReward = ndExp(-100.0f * deltaPitch * deltaPitch);
 
-				ndFloat32 rewardWeight = 1.0 / 6.0f;
+				const ndFloat32 rewardWeight = 1.0 / 6.0f;
 				return rewardWeight * (posit_xReward + posit_yReward + azimuthReward + yawReward + rollReward + pitchReward);
 
 			#else
