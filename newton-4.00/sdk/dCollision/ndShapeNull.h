@@ -29,106 +29,26 @@ class ndShapeNull : public ndShape
 {
 	public:
 	D_CLASS_REFLECTION(ndShapeNull, ndShape)
-	ndShapeNull();
-	virtual ~ndShapeNull();
+	D_COLLISION_API ndShapeNull();
+	D_COLLISION_API virtual ~ndShapeNull();
 
-	virtual ndShapeNull* GetAsShapeNull();
+	D_COLLISION_API virtual ndShapeNull* GetAsShapeNull();
 
-	virtual ndFloat32 GetVolume() const;
-	virtual ndShapeInfo GetShapeInfo() const;
-	virtual ndFloat32 GetBoxMinRadius() const;
-	virtual ndFloat32 GetBoxMaxRadius() const;
-	virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
-	virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
-	virtual ndVector SupportVertex(const ndVector& dir) const;
-	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
-	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const;
-	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
-	virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& globalPlane, const ndShapeInstance& parentScale) const;
-	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API virtual ndFloat32 GetVolume() const;
+	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
+	D_COLLISION_API virtual ndFloat32 GetBoxMinRadius() const;
+	D_COLLISION_API virtual ndFloat32 GetBoxMaxRadius() const;
+	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
+	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
+	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir) const;
+	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
+	D_COLLISION_API virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
+	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const;
+	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
+	D_COLLISION_API virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& globalPlane, const ndShapeInstance& parentScale) const;
+	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 };
 
-inline ndShapeNull::ndShapeNull()
-	:ndShape(m_nullCollision)
-{
-	m_inertia = ndVector::m_one | ndVector::m_triplexMask;
-}
 
-inline ndShapeNull::~ndShapeNull()
-{
-}
-
-inline ndShapeNull* ndShapeNull::GetAsShapeNull()
-{ 
-	return this; 
-}
-
-inline ndVector ndShapeNull::SupportVertex(const ndVector&) const
-{
-	return ndVector::m_zero;
-}
-
-inline ndVector ndShapeNull::SupportVertexSpecial(const ndVector&, ndFloat32) const
-{
-	return ndVector::m_zero;
-}
-
-inline ndFloat32 ndShapeNull::RayCast(ndRayCastNotify&, const ndVector&, const ndVector&, ndFloat32, const ndBody* const, ndContactPoint&) const
-{
-	return ndFloat32(1.2f);
-}
-
-inline void ndShapeNull::DebugShape(const ndMatrix&, ndShapeDebugNotify&) const
-{
-}
-
-inline void ndShapeNull::CalculateAabb(const ndMatrix&, ndVector& p0, ndVector& p1) const
-{
-	p0 = ndVector::m_zero;
-	p1 = ndVector::m_zero;
-}
-
-inline ndShapeInfo ndShapeNull::GetShapeInfo() const
-{
-	ndAssert(0);
-	ndShapeInfo info;
-	return info;
-}
-
-inline ndFloat32 ndShapeNull::GetVolume() const
-{
-	return ndFloat32(0.0f);
-}
-
-inline ndFloat32 ndShapeNull::GetBoxMinRadius() const
-{
-	return ndFloat32(0.0f);
-}
-
-inline ndFloat32 ndShapeNull::GetBoxMaxRadius() const
-{
-	return ndFloat32(0.0f);
-}
-
-inline ndVector ndShapeNull::CalculateVolumeIntegral(const ndMatrix&, const ndVector&, const ndShapeInstance&) const
-{
-	return ndVector::m_zero;
-}
-
-inline ndVector ndShapeNull::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const
-{
-	return point;
-}
-
-inline ndInt32 ndShapeNull::CalculatePlaneIntersection(const ndVector&, const ndVector&, ndVector* const) const
-{
-	return 0;
-}
-
-inline ndUnsigned64 ndShapeNull::GetHash(ndUnsigned64) const
-{
-	return 12345678;
-}
 #endif 
 

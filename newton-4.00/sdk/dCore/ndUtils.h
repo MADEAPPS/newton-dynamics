@@ -190,9 +190,9 @@ inline void ndMemCpy(T* const dst, const T* const src, ndInt64 elements)
 	memcpy(dst, src, sizeof(T) * elements);
 }
 
-
 #ifndef _MSC_VER 
 	#define _stricmp(x,y) strcasecmp(x,y)
+	#define strcpy_s(x,n,y) strncpy(x,y,n)
 #endif
 
 inline void strtolwr(char* const string)

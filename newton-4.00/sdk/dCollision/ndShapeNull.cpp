@@ -24,4 +24,84 @@
 #include "ndCollisionStdafx.h"
 #include "ndShapeNull.h"
 
+ndShapeNull::ndShapeNull()
+	:ndShape(m_nullCollision)
+{
+	m_inertia = ndVector::m_one | ndVector::m_triplexMask;
+}
 
+ndShapeNull::~ndShapeNull()
+{
+}
+
+ndShapeNull* ndShapeNull::GetAsShapeNull()
+{
+	return this;
+}
+
+ndVector ndShapeNull::SupportVertex(const ndVector&) const
+{
+	return ndVector::m_zero;
+}
+
+ndVector ndShapeNull::SupportVertexSpecial(const ndVector&, ndFloat32) const
+{
+	return ndVector::m_zero;
+}
+
+ndFloat32 ndShapeNull::RayCast(ndRayCastNotify&, const ndVector&, const ndVector&, ndFloat32, const ndBody* const, ndContactPoint&) const
+{
+	return ndFloat32(1.2f);
+}
+
+void ndShapeNull::DebugShape(const ndMatrix&, ndShapeDebugNotify&) const
+{
+}
+
+void ndShapeNull::CalculateAabb(const ndMatrix&, ndVector& p0, ndVector& p1) const
+{
+	p0 = ndVector::m_zero;
+	p1 = ndVector::m_zero;
+}
+
+ndShapeInfo ndShapeNull::GetShapeInfo() const
+{
+	ndAssert(0);
+	ndShapeInfo info;
+	return info;
+}
+
+ndFloat32 ndShapeNull::GetVolume() const
+{
+	return ndFloat32(0.0f);
+}
+
+ndFloat32 ndShapeNull::GetBoxMinRadius() const
+{
+	return ndFloat32(0.0f);
+}
+
+ndFloat32 ndShapeNull::GetBoxMaxRadius() const
+{
+	return ndFloat32(0.0f);
+}
+
+ndVector ndShapeNull::CalculateVolumeIntegral(const ndMatrix&, const ndVector&, const ndShapeInstance&) const
+{
+	return ndVector::m_zero;
+}
+
+ndVector ndShapeNull::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const
+{
+	return point;
+}
+
+ndInt32 ndShapeNull::CalculatePlaneIntersection(const ndVector&, const ndVector&, ndVector* const) const
+{
+	return 0;
+}
+
+ndUnsigned64 ndShapeNull::GetHash(ndUnsigned64) const
+{
+	return 12345678;
+}

@@ -34,7 +34,7 @@ class ndShapeCylinder : public ndShapeConvex
 	D_COLLISION_API ndShapeCylinder(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height);
 	D_COLLISION_API ~ndShapeCylinder();
 
-	virtual ndShapeCylinder* GetAsShapeCylinder() { return this; }
+	D_COLLISION_API virtual ndShapeCylinder* GetAsShapeCylinder() { return this; }
 
 	protected:
 	D_COLLISION_API void Init (ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height);
