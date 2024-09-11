@@ -1054,7 +1054,8 @@ namespace ndAdvancedRobot
 			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(ndUnsigned32(4000) * ndUnsigned32(1000000))
+			,m_stopTraining(ndUnsigned32(4000)* ndUnsigned32(1000000))
+			,m_savePartial(0)
 			,m_modelIsTrained(false)
 		{
 			m_outFile = fopen("robotArmReach-vpg.csv", "wb");
@@ -1098,8 +1099,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			//countX = 10;
-			//countZ = 10;
+			//countX = 1;
+			//countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -1217,6 +1218,19 @@ namespace ndAdvancedRobot
 					}
 				}
 			}
+
+			if (stopTraining / 100000000 == m_savePartial)
+			{
+				m_savePartial++;
+				char fileName[1024];
+				ndBrain* const actor = m_master->GetActor();
+				ndGetWorkingFileName("ndRobotArmReach_actor.dnn", fileName);
+				actor->SaveToFile(fileName);
+
+				ndBrain* const critic = m_master->GetCritic();
+				ndGetWorkingFileName("ndRobotArmReach_critic.dnn", fileName);
+				critic->SaveToFile(fileName);
+			}
 			
 			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 96.0f))
 			{
@@ -1243,6 +1257,7 @@ namespace ndAdvancedRobot
 		ndFloat32 m_horizon;
 		ndUnsigned32 m_lastEpisode;
 		ndUnsigned32 m_stopTraining;
+		ndUnsigned32 m_savePartial;
 		bool m_modelIsTrained;
 	};
 }
