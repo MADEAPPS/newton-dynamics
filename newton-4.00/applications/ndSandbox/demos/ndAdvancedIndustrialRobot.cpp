@@ -510,13 +510,13 @@ namespace ndAdvancedRobot
 				return ND_DEAD_PENALTY;
 			}
 
-			const ndMatrix globalBaseMatrix(m_base_rotator->CalculateGlobalMatrix1());
-			const ndMatrix globalEffectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0());
-			const ndMatrix globalTargetMatrix(CalculateTargetMatrix() * globalBaseMatrix);
+			//const ndMatrix globalBaseMatrix(m_base_rotator->CalculateGlobalMatrix1());
+			//const ndMatrix globalEffectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0());
+			//const ndMatrix globalTargetMatrix(CalculateTargetMatrix() * globalBaseMatrix);
+			//const ndMatrix effectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0() * globalBaseMatrix.OrthoInverse());
 
-			//const ndMatrix invBaseMatrix(m_base_rotator->CalculateGlobalMatrix1().OrthoInverse());
-			//const ndMatrix effectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0() * invBaseMatrix);
-			const ndMatrix effectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0() * globalBaseMatrix.OrthoInverse());
+			const ndMatrix invBaseMatrix(m_base_rotator->CalculateGlobalMatrix1().OrthoInverse());
+			const ndMatrix effectorMatrix(m_effectorMatrixOffset * m_arm_4->CalculateGlobalMatrix0() * invBaseMatrix);
 
 			ndFloat32 azimuth = 0.0f;
 			const ndVector& posit = effectorMatrix.m_posit;
