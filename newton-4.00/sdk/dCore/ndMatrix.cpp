@@ -602,3 +602,165 @@ ndMatrix ndGramSchmidtMatrix(const ndVector& dir)
 	ndAssert(ndMatrix(front, up, right, ndVector::m_wOne).TestOrthogonal());
 	return ndMatrix(front, up, right, ndVector::m_wOne);
 }
+
+ndMatrix ndMatrix::Transpose3x3() const
+{
+	ndMatrix inv;
+	ndVector::Transpose4x4(inv[0], inv[1], inv[2], inv[3], m_front, m_up, m_right, ndVector::m_wOne);
+	return inv;
+}
+
+ndMatrix ndMatrix::Transpose4X4() const
+{
+	ndMatrix inv;
+	ndVector::Transpose4x4(inv[0], inv[1], inv[2], inv[3], m_front, m_up, m_right, m_posit);
+	return inv;
+}
+
+ndVector ndMatrix::RotateVector(const ndVector& v) const
+{
+	return m_front * v.BroadcastX() + m_up * v.BroadcastY() + m_right * v.BroadcastZ();
+}
+
+ndVector ndMatrix::UnrotateVector(const ndVector& v) const
+{
+	return v.OptimizedVectorUnrotate(m_front, m_up, m_right);
+}
+
+ndVector ndMatrix::TransformVector(const ndVector& v) const
+{
+	return m_front * v.BroadcastX() + m_up * v.BroadcastY() + m_right * v.BroadcastZ() + m_posit;
+}
+
+ndVector ndMatrix::TransformVector1x4(const ndVector& v) const
+{
+	return m_front * v.BroadcastX() + m_up * v.BroadcastY() + m_right * v.BroadcastZ() + m_posit * v.BroadcastW();
+}
+
+ndVector ndMatrix::UntransformVector(const ndVector& v) const
+{
+	return UnrotateVector(v - m_posit) | ndVector::m_wOne;
+}
+
+ndPlane ndMatrix::TransformPlane(const ndPlane& localPlane) const
+{
+	return ndPlane(RotateVector(localPlane), localPlane.m_w - (localPlane.DotProduct(UnrotateVector(m_posit)).GetScalar()));
+}
+
+ndPlane ndMatrix::UntransformPlane(const ndPlane& globalPlane) const
+{
+	return ndPlane(UnrotateVector(globalPlane), globalPlane.Evalue(m_posit));
+}
+
+ndMatrix ndMatrix::Inverse() const
+{
+	ndTrace(("funtion: %s deprecated, please use ndMatrix::OrthoInverse instead", __FUNCTION__));
+	ndAssert(0);
+	return OrthoInverse();
+}
+
+ndMatrix ndMatrix::OrthoInverse() const
+{
+	ndMatrix inv;
+	ndVector::Transpose4x4(inv[0], inv[1], inv[2], inv[3], m_front, m_up, m_right, ndVector::m_wOne);
+	inv.m_posit -= inv[0] * m_posit.BroadcastX() + inv[1] * m_posit.BroadcastY() + inv[2] * m_posit.BroadcastZ();
+	return inv;
+}
+
+bool ndMatrix::TestIdentity() const
+{
+	const ndMatrix& me = *this;
+	for (ndInt32 i = 0; i < 4; ++i)
+	{
+		if (me[i][i] != ndFloat32(1.0f))
+		{
+			return false;
+		}
+		for (ndInt32 j = i + 1; j < 4; ++j)
+		{
+			if (me[i][j] != ndFloat32(0.0f))
+			{
+				return false;
+			}
+			if (me[j][i] != ndFloat32(0.0f))
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+bool ndMatrix::TestOrthogonal(ndFloat32 tol) const
+{
+#ifdef _DEBUG
+	for (ndInt32 i = 0; i < 4; ++i)
+	{
+		for (ndInt32 j = 0; j < 4; ++j)
+		{
+			ndAssert(ndCheckFloat((*this)[i][j]));
+		}
+	}
+#endif
+
+	ndVector n(m_front.CrossProduct(m_up));
+	ndFloat32 a = m_right.DotProduct(m_right).GetScalar();
+	ndFloat32 b = m_up.DotProduct(m_up).GetScalar();
+	ndFloat32 c = m_front.DotProduct(m_front).GetScalar();
+	ndFloat32 d = n.DotProduct(m_right).GetScalar();
+	bool ret = (m_front[3] == ndFloat32(0.0f)) &&
+		(m_up[3] == ndFloat32(0.0f)) &&
+		(m_right[3] == ndFloat32(0.0f)) &&
+		(m_posit[3] == ndFloat32(1.0f)) &&
+		(ndAbs(a - ndFloat32(1.0f)) < tol) &&
+		(ndAbs(b - ndFloat32(1.0f)) < tol) &&
+		(ndAbs(c - ndFloat32(1.0f)) < tol) &&
+		(ndAbs(d - ndFloat32(1.0f)) < tol);
+	if (!ret)
+	{
+		ndAssert(0);
+	}
+	return ret;
+}
+
+bool ndMatrix::TestSymetric3x3() const
+{
+	const ndMatrix& me = *this;
+	return (ndAbs(me[0][1] - me[1][0]) < ndFloat32(1.0e-5f)) &&
+		(ndAbs(me[0][2] - me[2][0]) < ndFloat32(1.0e-5f)) &&
+		(ndAbs(me[1][2] - me[2][1]) < ndFloat32(1.0e-5f)) &&
+		(me[0][3] == ndFloat32(0.0f)) &&
+		(me[1][3] == ndFloat32(0.0f)) &&
+		(me[2][3] == ndFloat32(0.0f)) &&
+		(me[3][0] == ndFloat32(0.0f)) &&
+		(me[3][1] == ndFloat32(0.0f)) &&
+		(me[3][2] == ndFloat32(0.0f)) &&
+		(me[3][3] == ndFloat32(1.0f));
+}
+
+bool ndMatrix::SanityCheck() const
+{
+	if (ndAbs(m_right.m_w) > ndFloat32(0.0f))
+	{
+		return false;
+	}
+	if (ndAbs(m_up.m_w) > ndFloat32(0.0f))
+	{
+		return false;
+	}
+	if (ndAbs(m_right.m_w) > ndFloat32(0.0f))
+	{
+		return false;
+	}
+	if (ndAbs(m_posit.m_w) != ndFloat32(1.0f))
+	{
+		return false;
+	}
+
+	ndVector right(m_front.CrossProduct(m_up));
+	if (ndAbs(right.DotProduct(m_right).GetScalar()) < ndFloat32(0.9999f))
+	{
+		return false;
+	}
+	return true;
+}
