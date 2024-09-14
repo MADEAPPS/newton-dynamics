@@ -782,6 +782,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 		{
 			ndBrainAgentContinuePolicyGradient_Trainer* const agent = node->GetInfo();
 			agent->m_trajectory.SetCount(0);
+			agent->ResetModel();
 		}
 	}
 }

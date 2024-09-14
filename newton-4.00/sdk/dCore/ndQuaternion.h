@@ -54,7 +54,8 @@ class ndQuaternion: public ndVector
 };
 
 inline ndQuaternion::ndQuaternion()
-	:ndVector(ndVector::m_wOne)
+	//:ndVector(ndVector::m_wOne)
+	:ndVector(ndFloat32 (0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f))
 {
 }
 
