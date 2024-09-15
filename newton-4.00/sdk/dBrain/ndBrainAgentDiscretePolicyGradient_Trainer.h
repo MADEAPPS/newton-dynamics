@@ -62,6 +62,14 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 		ndInt32 m_obsevationsSize;
 	};
 
+	class ndRandomGenerator
+	{
+		public:
+		std::mt19937 m_gen;
+		std::random_device m_rd;
+		std::normal_distribution<ndFloat32> m_d;
+	};
+
 	ndBrainAgentDiscretePolicyGradient_Trainer(const ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster>& master);
 	~ndBrainAgentDiscretePolicyGradient_Trainer();
 
@@ -82,10 +90,7 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 	ndBrainVector m_workingBuffer;
 	ndTrajectoryStep m_trajectory;
 	ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster> m_master;
-
-	mutable std::random_device m_rd;
-	mutable std::mt19937 m_gen;
-	mutable std::uniform_real_distribution<ndFloat32> m_d;
+	ndRandomGenerator* m_randomGenerator;
 
 	friend class ndBrainAgentDiscretePolicyGradient_TrainerMaster;
 };
@@ -136,8 +141,8 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
 
-	ndInt32 GetFramesCount() const;
-	ndInt32 GetEposideCount() const;
+	ndUnsigned32 GetFramesCount() const;
+	ndUnsigned32 GetEposideCount() const;
 
 	bool IsSampling() const;
 	ndFloat32 GetAverageScore() const;
@@ -150,6 +155,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	void OptimizePolicy();
 	void OptimizeCritic();
 	void UpdateBaseLineValue();
+	ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator* GetRandomGenerator();
 
 	ndBrain m_actor;
 	ndBrain m_baseLineValue;
@@ -162,6 +168,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 
 	MemoryStateValues m_stateValues;
 	ndArray<ndInt32> m_randomPermutation;
+	ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator* m_randomGenerator;
 	ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep m_trajectoryAccumulator;
 
 	ndBrainFloat m_gamma;
@@ -169,9 +176,9 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndBrainFloat m_criticLearnRate;
 	ndInt32 m_numberOfActions;
 	ndInt32 m_numberOfObservations;
-	ndInt32 m_frameCount;
 	ndInt32 m_framesAlive;
-	ndInt32 m_eposideCount;
+	ndUnsigned32 m_frameCount;
+	ndUnsigned32 m_eposideCount;
 	ndInt32 m_bashBufferSize;
 	ndInt32 m_maxTrajectorySteps;
 	ndInt32 m_extraTrajectorySteps;

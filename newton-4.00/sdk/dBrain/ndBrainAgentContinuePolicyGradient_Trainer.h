@@ -90,10 +90,6 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 	ndBrainVector m_workingBuffer;
 	ndTrajectoryStep m_trajectory;
 	ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
-
-	//mutable std::random_device m_rd;
-	//mutable std::mt19937 m_gen;
-	//mutable std::normal_distribution<ndFloat32> m_d;
 	ndRandomGenerator* m_randomGenerator;
 
 	friend class ndBrainAgentContinuePolicyGradient_TrainerMaster;

@@ -212,13 +212,7 @@ ndBrainAgentContinuePolicyGradient_Trainer::ndBrainAgentContinuePolicyGradient_T
 	,m_trajectory(master->m_numberOfActions, master->m_numberOfObservations)
 	,m_master(master)
 	,m_randomGenerator(nullptr)
-	//,m_rd()
-	//,m_gen(m_rd())
-	//,m_d(ndFloat32(0.0f), ndFloat32(1.0f))
 {
-	//m_gen.seed(m_master->m_randomSeed);
-	//m_master->m_randomSeed += 1;
-
 	//std::mt19937 m_gen0(m_rd());
 	//std::mt19937 m_gen1(m_rd());
 	//m_gen0.seed(m_master->m_randomSeed);

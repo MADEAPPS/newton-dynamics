@@ -24,8 +24,10 @@
 
 namespace ndAdvancedRobot
 {
-	//#define ND_TRAIN_MODEL
-	#define CONTROLLER_NAME "ndRobotArmReach-vpg.dnn"
+	#define ND_TRAIN_MODEL
+	#define CONTROLLER_NAME "ndRobotArmReach"
+
+	#define CONTROLLER_RESUME_TRANING
 
 	#define ND_USE_EULERS
 
@@ -1078,8 +1080,10 @@ namespace ndAdvancedRobot
 			,m_stopTraining(ndUnsigned32(2000)* ndUnsigned32(1000000))
 			,m_modelIsTrained(false)
 		{
+			char name[256];
 			m_horizon = ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor);
-			m_outFile = fopen("robotArmReach-vpg.csv", "wb");
+			snprintf(name, sizeof(name), "%s-vpg.csv", CONTROLLER_NAME);
+			m_outFile = fopen(name, "wb");
 			fprintf(m_outFile, "vpg\n");
 
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
@@ -1102,7 +1106,21 @@ namespace ndAdvancedRobot
 
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetActor()));
-			m_master->SetName(CONTROLLER_NAME);
+			snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
+			m_master->SetName(name);
+
+			#ifdef CONTROLLER_RESUME_TRANING
+				char fileName[256];
+				snprintf(name, sizeof(name), "%s_critic.dnn", CONTROLLER_NAME);
+				ndGetWorkingFileName(name, fileName);
+				ndSharedPtr<ndBrain> critic(ndBrainLoad::Load(fileName));
+				m_master->GetCritic()->CopyFrom(**critic);
+
+				snprintf(name, sizeof(name), "%s_actor.dnn", CONTROLLER_NAME);
+				ndGetWorkingFileName(name, fileName);
+				ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+				m_master->GetActor()->CopyFrom(**actor);
+			#endif
 
 			auto SpawnModel = [this, scene, &visualMesh, floor](const ndMatrix& matrix)
 			{
@@ -1120,8 +1138,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			countX = 10;
-			countZ = 10;
+			//countX = 10;
+			//countZ = 10;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -1241,16 +1259,19 @@ namespace ndAdvancedRobot
 
 				if (rewardTrajectory > m_saveScore)
 				{
-					char fileName[1024];
+					char fileName[256];
 					m_saveScore = ndFloor(rewardTrajectory) + 2.0f;
 
 					// save partial controller in case of crash 
 					ndBrain* const actor = m_master->GetActor();
-					ndGetWorkingFileName("ndRobotArmReach_actor.dnn", fileName);
+					char name[256];
+					snprintf(name, sizeof(name), "%s_actor.dnn", CONTROLLER_NAME);
+					ndGetWorkingFileName(name, fileName);
 					actor->SaveToFile(fileName);
 
 					ndBrain* const critic = m_master->GetCritic();
-					ndGetWorkingFileName("ndRobotArmReach_critic.dnn", fileName);
+					snprintf(name, sizeof(name), "%s_critic.dnn", CONTROLLER_NAME);
+					ndGetWorkingFileName(name, fileName);
 					critic->SaveToFile(fileName);
 				}
 			}
@@ -1281,7 +1302,6 @@ namespace ndAdvancedRobot
 		ndFloat32 m_discountFactor;
 		ndUnsigned32 m_lastEpisode;
 		ndUnsigned32 m_stopTraining;
-		
 		bool m_modelIsTrained;
 	};
 }

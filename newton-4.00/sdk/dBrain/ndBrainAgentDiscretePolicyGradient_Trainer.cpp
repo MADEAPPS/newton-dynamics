@@ -164,16 +164,12 @@ ndBrainAgentDiscretePolicyGradient_Trainer::ndBrainAgentDiscretePolicyGradient_T
 	,m_workingBuffer()
 	,m_trajectory(master->m_numberOfObservations)
 	,m_master(master)
-	,m_rd()
-	,m_gen(m_rd())
-	,m_d(ndFloat32(0.0f), ndFloat32(1.0f))
+	,m_randomGenerator(nullptr)
 {
-	m_gen.seed(m_master->m_randomSeed);
-	m_master->m_randomSeed += 1;
-
 	m_master->m_agents.Append(this);
 	m_trajectory.SetCount(m_master->m_maxTrajectorySteps + m_master->m_extraTrajectorySteps);
 	m_trajectory.SetCount(0);
+	m_randomGenerator = m_master->GetRandomGenerator();
 }
 
 ndBrainAgentDiscretePolicyGradient_Trainer::~ndBrainAgentDiscretePolicyGradient_Trainer()
@@ -216,7 +212,8 @@ ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::SelectAction(const ndBr
 	}
 	pdf.PushBack(sum);
 	
-	ndFloat32 r = m_d(m_gen);
+	ndRandomGenerator& generator = *m_randomGenerator;
+	ndFloat32 r = generator.m_d(generator.m_gen);
 	ndInt32 index = m_master->m_numberOfActions - 1;
 	for (ndInt32 i = index; i >= 0; --i)
 	{
@@ -306,8 +303,8 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	,m_criticLearnRate(hyperParameters.m_criticLearnRate)
 	,m_numberOfActions(hyperParameters.m_numberOfActions)
 	,m_numberOfObservations(hyperParameters.m_numberOfObservations)
-	,m_frameCount(0)
 	,m_framesAlive(0)
+	,m_frameCount(0)
 	,m_eposideCount(0)
 	,m_bashBufferSize(hyperParameters.m_bashBufferSize)
 	,m_maxTrajectorySteps(hyperParameters.m_maxTrajectorySteps)
@@ -326,8 +323,15 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 {
 	ndAssert(m_numberOfActions);
 	ndAssert(m_numberOfObservations);
-	ndSetRandSeed(m_randomSeed);
 	
+	m_randomGenerator = new ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator[size_t(hyperParameters.m_bashTrajectoryCount)];
+	for (ndInt32 i = 0; i < hyperParameters.m_bashTrajectoryCount; ++i)
+	{
+		m_randomSeed++;
+		m_randomGenerator[i].m_gen.seed(m_randomSeed);
+	}
+
+	m_randomSeed = 0;
 	// build policy neural net
 	SetThreadCount(hyperParameters.m_threadsCount);
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
@@ -418,7 +422,9 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::~ndBrainAgentDiscretePolicyGra
 	{
 		delete m_baseLineValueTrainers[i];
 	}
+
 	delete m_baseLineValueOptimizer;
+	delete[] m_randomGenerator;
 }
 
 ndBrain* ndBrainAgentDiscretePolicyGradient_TrainerMaster::GetActor()
@@ -441,7 +447,13 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::SetName(const ndString& n
 	m_name = name;
 }
 
-ndInt32 ndBrainAgentDiscretePolicyGradient_TrainerMaster::GetFramesCount() const
+ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator* ndBrainAgentDiscretePolicyGradient_TrainerMaster::GetRandomGenerator()
+{
+	m_randomSeed = (m_randomSeed + 1) % m_bashTrajectoryCount;
+	return &m_randomGenerator[m_randomSeed];
+}
+
+ndUnsigned32 ndBrainAgentDiscretePolicyGradient_TrainerMaster::GetFramesCount() const
 {
 	return m_frameCount;
 }
@@ -451,7 +463,7 @@ bool ndBrainAgentDiscretePolicyGradient_TrainerMaster::IsSampling() const
 	return false;
 }
 
-ndInt32 ndBrainAgentDiscretePolicyGradient_TrainerMaster::GetEposideCount() const
+ndUnsigned32 ndBrainAgentDiscretePolicyGradient_TrainerMaster::GetEposideCount() const
 {
 	return m_eposideCount;
 }
@@ -702,6 +714,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeStep()
 		{
 			agent->SaveTrajectory();
 			agent->ResetModel();
+			agent->m_randomGenerator = GetRandomGenerator();
 		}
 		m_frameCount++;
 		m_framesAlive++;
@@ -718,6 +731,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeStep()
 		{
 			ndBrainAgentDiscretePolicyGradient_Trainer* const agent = node->GetInfo();
 			agent->m_trajectory.SetCount(0);
+			agent->ResetModel();
 		}
 	}
 }
