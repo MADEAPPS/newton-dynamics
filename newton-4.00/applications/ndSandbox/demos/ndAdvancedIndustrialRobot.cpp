@@ -24,7 +24,7 @@
 
 namespace ndAdvancedRobot
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach-vpg.dnn"
 
 	#define ND_USE_EULERS
