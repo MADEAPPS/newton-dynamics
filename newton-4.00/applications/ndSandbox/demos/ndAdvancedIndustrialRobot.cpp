@@ -35,7 +35,7 @@ namespace ndAdvancedRobot
 	{
 		public:
 		//ndBrainFloat m_actions[6];
-		ndBrainFloat m_actions[1];
+		ndBrainFloat m_actions[3];
 	};
 
 	class ndObservationVector
@@ -548,9 +548,9 @@ namespace ndAdvancedRobot
 				ndFloat32 rollReward = ndExp(-200.0f * deltaRoll * deltaRoll);
 				ndFloat32 pitchReward = ndExp(-200.0f * deltaPitch * deltaPitch);
 
-				const ndFloat32 rewardWeight = 1.0 / 8.0f;
+				//const ndFloat32 rewardWeight = 1.0 / 8.0f;
 				//return rewardWeight * (posit_xReward + posit_yReward + yawReward + rollReward + pitchReward + 3.0f * azimuthReward);
-				return azimuthReward;
+				return (posit_xReward + posit_yReward + azimuthReward) / 3.0f;
 
 			#else
 				ndQuaternion effectorRotation(effectorMatrix);
@@ -654,7 +654,6 @@ namespace ndAdvancedRobot
 		{
 			auto SetParamter = [this, actions](ndJointHinge* const hinge, ndInt32 index)
 			{
-				//ndFloat32 angle__ = hinge->GetTargetAngle();
 				ndFloat32 angle = hinge->GetAngle();
 				ndFloat32 deltaAngle = actions[index] * ND_ACTION_SENSITIVITY;
 				ndFloat32 targetAngle = ndAnglesAdd (angle, deltaAngle);
@@ -662,15 +661,13 @@ namespace ndAdvancedRobot
 				hinge->SetTargetAngle(targetAngle);
 			};
 
-			//ndFloat32 xxxx = GetReward();
-
-			//SetParamter(m_arm_0, 0);
-			//SetParamter(m_arm_1, 1);
+			SetParamter(m_arm_0, 0);
+			SetParamter(m_arm_1, 1);
 			//SetParamter(m_arm_2, 2);
 			//SetParamter(m_arm_3, 3);
 			//SetParamter(m_arm_4, 4);
 			//SetParamter(m_base_rotator, 5);
-			SetParamter(m_base_rotator, 0);
+			SetParamter(m_base_rotator, 2);
 		}
 
 		void CheckModelStability()
@@ -736,8 +733,8 @@ namespace ndAdvancedRobot
 			ndFloat32 pitch = ndFloat32((2.0f * ndRand() - 1.0f) * ndPi);
 			ndFloat32 roll = ndFloat32(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
 
-			m_targetLocation.m_x = 0.0f;
-			m_targetLocation.m_y = 0.0f;
+			//m_targetLocation.m_x = 0.0f;
+			//m_targetLocation.m_y = 0.0f;
 			//m_targetLocation.m_azimuth = 0.0f;
 			yaw = 0.0f * ndDegreeToRad;
 			roll = 0.0f * ndDegreeToRad;
