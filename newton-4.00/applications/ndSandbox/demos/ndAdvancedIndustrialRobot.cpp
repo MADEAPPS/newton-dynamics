@@ -27,7 +27,7 @@ namespace ndAdvancedRobot
 	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach"
 
-	#define CONTROLLER_RESUME_TRANING
+	//#define CONTROLLER_RESUME_TRANING
 
 	#define ND_USE_EULERS
 
@@ -728,12 +728,12 @@ namespace ndAdvancedRobot
 			ndFloat32 pitch = ndFloat32((2.0f * ndRand() - 1.0f) * ndPi);
 			ndFloat32 roll = ndFloat32(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
 
-			//m_targetLocation.m_x = 0.0f;
-			//m_targetLocation.m_y = 0.0f;
+			m_targetLocation.m_x = 0.0f;
+			m_targetLocation.m_y = 0.0f;
 			//m_targetLocation.m_azimuth = 0.0f;
-			//yaw = 0.0f * ndDegreeToRad;
-			//roll = 0.0f * ndDegreeToRad;
-			//pitch = 0.0f * ndDegreeToRad;
+			yaw = 0.0f * ndDegreeToRad;
+			roll = 0.0f * ndDegreeToRad;
+			pitch = 0.0f * ndDegreeToRad;
 			#ifdef ND_USE_EULERS
 				m_targetLocation.m_yaw = yaw;
 				m_targetLocation.m_roll = roll;
