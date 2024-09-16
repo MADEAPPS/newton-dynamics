@@ -29,6 +29,8 @@
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
 #define ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE	ndBrainFloat(0.1f)
 
+#define ND_USE_LOG_DEVIATION
+
 //*********************************************************************************************
 //
 //*********************************************************************************************
@@ -83,20 +85,35 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 	{
 		ndBrainLayerActivationTanh::MakePrediction(input, output);
-		for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
-		{
-			output[i + m_neurons / 2] = ndMax(input[i + m_neurons / 2], m_sigma);
-		}
+		#ifdef ND_USE_LOG_DEVIATION
+			for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
+			{
+				output[i + m_neurons / 2] = input[i + m_neurons / 2];
+			}
+		#else
+			for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
+			{
+				output[i + m_neurons / 2] = ndMax(input[i + m_neurons / 2], m_sigma);
+			}
+		#endif
 	}
 
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 	{
 		ndBrainLayerActivationTanh::InputDerivative(input, output, outputDerivative, inputDerivative);
-		for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
-		{
-			inputDerivative[i + m_neurons / 2] = (input[i + m_neurons / 2] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-			inputDerivative[i + m_neurons / 2] *= outputDerivative[i + m_neurons / 2];
-		}
+		#ifdef ND_USE_LOG_DEVIATION
+			for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
+			{
+				//inputDerivative[i + m_neurons / 2] = ndBrainFloat(1.0f);
+				inputDerivative[i + m_neurons / 2] = outputDerivative[i + m_neurons / 2];
+			}
+		#else
+			for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
+			{
+				inputDerivative[i + m_neurons / 2] = (input[i + m_neurons / 2] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+				inputDerivative[i + m_neurons / 2] *= outputDerivative[i + m_neurons / 2];
+			}
+		#endif
 	}
 
 	ndBrainFloat m_sigma;
@@ -518,6 +535,7 @@ ndFloat32 ndBrainAgentContinuePolicyGradient_TrainerMaster::GetAverageScore() co
 	return m_averageScore.GetAverage();
 }
 
+#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 {
 	ndAtomic<ndInt32> iterator(0);
@@ -553,18 +571,34 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 					const ndBrainFloat advantage = m_agent->m_trajectoryAccumulator.GetAdvantage(m_index);
 					const ndBrainFloat* const actions = m_agent->m_trajectoryAccumulator.GetActions(m_index);
 					const ndInt32 numberOfActions = m_agent->m_numberOfActions;
-					for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
-					{
-						const ndBrainFloat mean = output[i];
-						const ndBrainFloat sigma1 = output[i + numberOfActions];
-						const ndBrainFloat sigma2 = sigma1 * sigma1;
-						const ndBrainFloat sigma3 = sigma2 * sigma1;
-						const ndBrainFloat num = (actions[i] - mean);
-						ndAssert(sigma1 >= ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE);
+
+					#ifdef ND_USE_LOG_DEVIATION
+						for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
+						{
+							const ndBrainFloat mean = output[i];
+							ndAssert(ndExp(output[i + numberOfActions]) > 0.0f);
+							const ndBrainFloat sigma1 = ndMax (ndExp(output[i + numberOfActions]), ndFloat32(1.0e-2f));
+							const ndBrainFloat sigma2 = sigma1 * sigma1;
+							const ndBrainFloat sigma3 = sigma2 * sigma1;
+							const ndBrainFloat num = (actions[i] - mean);
 					
-						loss[i] = advantage * num / sigma2;
-						loss[i + numberOfActions] = advantage * (num * num / sigma3 - ndBrainFloat(1.0f) / sigma1);
-					}
+							loss[i] = advantage * num / sigma2;
+							loss[i + numberOfActions] = advantage * (num * num / sigma3 - ndBrainFloat(1.0f) / sigma1);
+						}
+					#else
+						for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
+						{
+							const ndBrainFloat mean = output[i];
+							const ndBrainFloat sigma1 = output[i + numberOfActions];
+							const ndBrainFloat sigma2 = sigma1 * sigma1;
+							const ndBrainFloat sigma3 = sigma2 * sigma1;
+							const ndBrainFloat num = (actions[i] - mean);
+							ndAssert(sigma1 >= ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE);
+
+							loss[i] = advantage * num / sigma2;
+							loss[i + numberOfActions] = advantage * (num * num / sigma3 - ndBrainFloat(1.0f) / sigma1);
+						}
+					#endif
 				}
 
 				ndBrainTrainer& m_trainer;

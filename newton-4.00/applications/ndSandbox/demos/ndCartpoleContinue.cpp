@@ -26,7 +26,7 @@ namespace ndCarpole_1
 	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"cartpoleContinue"
 
-	#define CONTROLLER_RESUME_TRANING
+	//#define CONTROLLER_RESUME_TRAINING
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
@@ -335,7 +335,7 @@ namespace ndCarpole_1
 			snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
 			m_master->SetName(name);
 
-			#ifdef CONTROLLER_RESUME_TRANING
+			#ifdef CONTROLLER_RESUME_TRAINING
 				char fileName[256];
 				snprintf(name, sizeof(name), "%s_critic.dnn", CONTROLLER_NAME);
 				ndGetWorkingFileName(name, fileName);

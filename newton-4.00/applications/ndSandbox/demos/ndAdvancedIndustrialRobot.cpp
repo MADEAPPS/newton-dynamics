@@ -27,7 +27,7 @@ namespace ndAdvancedRobot
 	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach"
 
-	//#define CONTROLLER_RESUME_TRANING
+	//#define CONTROLLER_RESUME_TRAINING
 
 	#define ND_USE_EULERS
 
@@ -100,7 +100,7 @@ namespace ndAdvancedRobot
 	#define ND_MAX_X_SPAND			ndReal ( 1.5f)
 	#define ND_MIN_Y_SPAND			ndReal (-2.2f)
 	#define ND_MAX_Y_SPAND			ndReal ( 1.5f)
-	#define ND_ACTION_SENSITIVITY	ndReal (0.05f)
+	#define ND_ACTION_SENSITIVITY	ndReal ( 0.05f)
 
 	#define ND_DEAD_PENALTY			ndReal (-10.0f)
 
@@ -1125,7 +1125,7 @@ namespace ndAdvancedRobot
 			snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
 			m_master->SetName(name);
 
-			#ifdef CONTROLLER_RESUME_TRANING
+			#ifdef CONTROLLER_RESUME_TRAINING
 				char fileName[256];
 				snprintf(name, sizeof(name), "%s_critic.dnn", CONTROLLER_NAME);
 				ndGetWorkingFileName(name, fileName);
@@ -1154,8 +1154,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			//countX = 1;
-			//countZ = 1;
+			//countX = 10;
+			//countZ = 10;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
