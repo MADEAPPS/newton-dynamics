@@ -24,7 +24,7 @@
 
 namespace ndAdvancedRobot
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach"
 
 	//#define CONTROLLER_RESUME_TRANING
@@ -34,7 +34,8 @@ namespace ndAdvancedRobot
 	class ndActionVector
 	{
 		public:
-		ndBrainFloat m_actions[6];
+		//ndBrainFloat m_actions[6];
+		ndBrainFloat m_actions[1];
 	};
 
 	class ndObservationVector
@@ -548,7 +549,8 @@ namespace ndAdvancedRobot
 				ndFloat32 pitchReward = ndExp(-100.0f * deltaPitch * deltaPitch);
 
 				const ndFloat32 rewardWeight = 1.0 / 8.0f;
-				return rewardWeight * (posit_xReward + posit_yReward + yawReward + rollReward + pitchReward + 3.0f * azimuthReward);
+				//return rewardWeight * (posit_xReward + posit_yReward + yawReward + rollReward + pitchReward + 3.0f * azimuthReward);
+				return azimuthReward;
 
 			#else
 				ndQuaternion effectorRotation(effectorMatrix);
@@ -653,16 +655,18 @@ namespace ndAdvancedRobot
 			auto SetParamter = [this, actions](ndJointHinge* const hinge, ndInt32 index)
 			{
 				ndFloat32 angle = hinge->GetTargetAngle();
-				ndFloat32 targetAngle = angle + actions[index] * ND_ACTION_SENSITIVITY;
+				ndFloat32 deltaAngle = actions[index] * ND_ACTION_SENSITIVITY;
+				ndFloat32 targetAngle = angle + deltaAngle;
 				hinge->SetTargetAngle(targetAngle);
 			};
 
-			SetParamter(m_arm_0, 0);
-			SetParamter(m_arm_1, 1);
-			SetParamter(m_arm_2, 2);
-			SetParamter(m_arm_3, 3);
-			SetParamter(m_arm_4, 4);
-			SetParamter(m_base_rotator, 5);
+			//SetParamter(m_arm_0, 0);
+			//SetParamter(m_arm_1, 1);
+			//SetParamter(m_arm_2, 2);
+			//SetParamter(m_arm_3, 3);
+			//SetParamter(m_arm_4, 4);
+			//SetParamter(m_base_rotator, 5);
+			SetParamter(m_base_rotator, 0);
 		}
 
 		void CheckModelStability()
@@ -878,13 +882,20 @@ namespace ndAdvancedRobot
 			if (newTarget)
 			{
 				change = 1;
-				//pitch = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
-				//yaw = ndReal((2.0f * ndRand() - 1.0f) * ndPi * 0.5f);
-				//roll = ndReal(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
+				pitch = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
+				yaw = ndReal((2.0f * ndRand() - 1.0f) * ndPi * 0.5f);
+				roll = ndReal(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
 			
 				m_robot->m_targetLocation.m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				m_robot->m_targetLocation.m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
 				m_robot->m_targetLocation.m_y = ndReal(ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
+
+				yaw = 0.0f;
+				roll = 0.0f;
+				pitch = 0.0f;
+				m_robot->m_targetLocation.m_x = 0.0f;
+				m_robot->m_targetLocation.m_y = 0.0f;
+				//m_robot->m_targetLocation.m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 			}
 			#ifdef ND_USE_EULERS
 				m_robot->m_targetLocation.m_yaw = yaw;
@@ -1139,8 +1150,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			//countX = 10;
-			//countZ = 10;
+			//countX = 1;
+			//countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
