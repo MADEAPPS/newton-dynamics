@@ -24,7 +24,7 @@
 
 namespace ndAdvancedRobot
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach"
 
 	//#define CONTROLLER_RESUME_TRANING
@@ -541,12 +541,12 @@ namespace ndAdvancedRobot
 				ndFloat32 deltaRoll = ndAnglesSub(euler.m_z, m_targetLocation.m_roll);
 				ndFloat32 deltaPitch = ndAnglesSub(euler.m_x, m_targetLocation.m_pitch);
 
-				ndFloat32 posit_xReward = ndExp(-100.0f * dx * dx);
-				ndFloat32 posit_yReward = ndExp(-100.0f * dy * dy);
-				ndFloat32 azimuthReward = ndExp(-100.0f * dAzimuth * dAzimuth);
-				ndFloat32 yawReward = ndExp(-100.0f * deltaYaw * deltaYaw);
-				ndFloat32 rollReward = ndExp(-100.0f * deltaRoll * deltaRoll);
-				ndFloat32 pitchReward = ndExp(-100.0f * deltaPitch * deltaPitch);
+				ndFloat32 posit_xReward = ndExp(-200.0f * dx * dx);
+				ndFloat32 posit_yReward = ndExp(-200.0f * dy * dy);
+				ndFloat32 azimuthReward = ndExp(-200.0f * dAzimuth * dAzimuth);
+				ndFloat32 yawReward = ndExp(-200.0f * deltaYaw * deltaYaw);
+				ndFloat32 rollReward = ndExp(-200.0f * deltaRoll * deltaRoll);
+				ndFloat32 pitchReward = ndExp(-200.0f * deltaPitch * deltaPitch);
 
 				const ndFloat32 rewardWeight = 1.0 / 8.0f;
 				//return rewardWeight * (posit_xReward + posit_yReward + yawReward + rollReward + pitchReward + 3.0f * azimuthReward);
@@ -654,11 +654,15 @@ namespace ndAdvancedRobot
 		{
 			auto SetParamter = [this, actions](ndJointHinge* const hinge, ndInt32 index)
 			{
-				ndFloat32 angle = hinge->GetTargetAngle();
+				//ndFloat32 angle__ = hinge->GetTargetAngle();
+				ndFloat32 angle = hinge->GetAngle();
 				ndFloat32 deltaAngle = actions[index] * ND_ACTION_SENSITIVITY;
-				ndFloat32 targetAngle = angle + deltaAngle;
+				ndFloat32 targetAngle = ndAnglesAdd (angle, deltaAngle);
+				ndAssert(ndAbs(targetAngle - (angle + deltaAngle)) < 1.0e-4f);
 				hinge->SetTargetAngle(targetAngle);
 			};
+
+			//ndFloat32 xxxx = GetReward();
 
 			//SetParamter(m_arm_0, 0);
 			//SetParamter(m_arm_1, 1);
