@@ -577,7 +577,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 						{
 							const ndBrainFloat mean = output[i];
 							ndAssert(ndExp(output[i + numberOfActions]) > 0.0f);
-							const ndBrainFloat sigma1 = ndMax (ndExp(output[i + numberOfActions]), ndFloat32(1.0e-2f));
+							const ndBrainFloat sigma1 = ndMax (ndExp(output[i + numberOfActions]), ndFloat32(1.0e-4f));
 							const ndBrainFloat sigma2 = sigma1 * sigma1;
 							const ndBrainFloat sigma3 = sigma2 * sigma1;
 							const ndBrainFloat num = (actions[i] - mean);
