@@ -27,7 +27,7 @@
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
-#define ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE	ndBrainFloat(0.1f)
+#define ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE	ndBrainFloat(1.0e-4f)
 
 #define ND_USE_LOG_DEVIATION
 
@@ -67,13 +67,13 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 	public:
 	LastActivationLayer(ndInt32 neurons)
 		:ndBrainLayerActivationTanh(neurons * 2)
-		,m_sigma(ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE)
+		,m_minimumSigma(ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE)
 	{
 	}
 
 	LastActivationLayer(const LastActivationLayer& src)
 		:ndBrainLayerActivationTanh(src)
-		,m_sigma(src.m_sigma)
+		,m_minimumSigma(src.m_minimumSigma)
 	{
 	}
 
@@ -93,7 +93,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 		#else
 			for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
 			{
-				output[i + m_neurons / 2] = ndMax(input[i + m_neurons / 2], m_sigma);
+				output[i + m_neurons / 2] = ndMax(input[i + m_neurons / 2], m_minimumSigma);
 			}
 		#endif
 	}
@@ -116,7 +116,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 		#endif
 	}
 
-	ndBrainFloat m_sigma;
+	ndBrainFloat m_minimumSigma;
 };
 
 //*********************************************************************************************
@@ -577,7 +577,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 						{
 							const ndBrainFloat mean = output[i];
 							ndAssert(ndExp(output[i + numberOfActions]) > 0.0f);
-							const ndBrainFloat sigma1 = ndMax (ndExp(output[i + numberOfActions]), ndFloat32(1.0e-4f));
+							const ndBrainFloat sigma1 = ndMax (ndExp(output[i + numberOfActions]), ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE);
 							const ndBrainFloat sigma2 = sigma1 * sigma1;
 							const ndBrainFloat sigma3 = sigma2 * sigma1;
 							const ndBrainFloat num = (actions[i] - mean);
