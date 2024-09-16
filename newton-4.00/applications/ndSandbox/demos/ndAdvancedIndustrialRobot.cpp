@@ -1106,6 +1106,7 @@ namespace ndAdvancedRobot
 
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetActor()));
+
 			snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
 			m_master->SetName(name);
 
@@ -1331,8 +1332,10 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetRoot()->m_body->GetMatrix(), model->GetRoot()->m_body->GetAsBodyKinematic(), floor));
 	world->AddJoint(fixJoint);
 
+	char name[256];
 	char fileName[256];
-	ndGetWorkingFileName(CONTROLLER_NAME, fileName);
+	snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
+	ndGetWorkingFileName(name, fileName);
 	ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
 	model->SetNotifyCallback(new RobotModelNotify(brain, model, true));
 	

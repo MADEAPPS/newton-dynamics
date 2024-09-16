@@ -24,7 +24,9 @@
 namespace ndCarpole_1
 {
 	//#define ND_TRAIN_AGENT
-	#define CONTROLLER_NAME			"cartpoleContinue-vpg.dnn"
+	#define CONTROLLER_NAME			"cartpoleContinue"
+
+	#define CONTROLLER_RESUME_TRANING
 
 	#define D_PUSH_ACCEL			ndBrainFloat (15.0f)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
@@ -137,7 +139,6 @@ namespace ndCarpole_1
 		};
 
 		public:
-
 		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
 			:ndModelNotify()
 			,m_controller(nullptr)
@@ -165,6 +166,14 @@ namespace ndCarpole_1
 			//Init(robot);
 			ndAssert(0);
 		}
+
+		//RobotModelNotify(const RobotModelNotify& src)
+		//	:ndModelNotify(src)
+		//	,m_controller(src.m_controller)
+		//{
+		//	//Init(robot);
+		//	ndAssert(0);
+		//}
 
 		~RobotModelNotify()
 		{
@@ -299,17 +308,19 @@ namespace ndCarpole_1
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
+			,m_saveScore(m_maxScore)
 			,m_discountFactor(0.99f)
-			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
+			//,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(0xfffffff)
 			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
 		{
-			ndWorld* const world = scene->GetWorld();
-
-			m_outFile = fopen("cartpole-vpg.csv", "wb");
+			char name[256];
+			snprintf(name, sizeof(name), "%s-vpg.csv", CONTROLLER_NAME);
+			m_outFile = fopen(name, "wb");
 			fprintf(m_outFile, "vpg\n");
 
+			m_horizon = ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor);
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
 			hyperParameters.m_extraTrajectorySteps = 256;
@@ -321,14 +332,26 @@ namespace ndCarpole_1
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetActor()));
 
-			m_master->SetName(CONTROLLER_NAME);
+			snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
+			m_master->SetName(name);
 
+			#ifdef CONTROLLER_RESUME_TRANING
+				char fileName[256];
+				snprintf(name, sizeof(name), "%s_critic.dnn", CONTROLLER_NAME);
+				ndGetWorkingFileName(name, fileName);
+				ndSharedPtr<ndBrain> critic(ndBrainLoad::Load(fileName));
+				m_master->GetCritic()->CopyFrom(**critic);
+
+				snprintf(name, sizeof(name), "%s_actor.dnn", CONTROLLER_NAME);
+				ndGetWorkingFileName(name, fileName);
+				ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
+				m_master->GetActor()->CopyFrom(**actor);
+			#endif
+
+			ndWorld* const world = scene->GetWorld();
 			ndModelArticulation* const visualModel = CreateModel(scene, matrix);
 			visualModel->AddToWorld(world);
-
-			#ifdef ND_TRAIN_AGENT
-				visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel));
-			#endif
+			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel));
 			SetMaterial(visualModel);
 
 			// add a hidden battery of model to generate trajectories in parallel
@@ -337,25 +360,12 @@ namespace ndCarpole_1
 			{
 				ndMatrix location(matrix);
 				location.m_posit.m_x += 3.0f * (ndRand() - 0.5f);
-				#if 0
-				//ndSharedPtr<ndBrainAgent> agent(new ndRobot::ndControllerTrainer(m_master));
-				//ndSharedPtr<ndModel> model(CreateModel(scene, location, agent));
-				ndModelArticulation* const model = (ndModelArticulation*)visualModel->Clone();
-
-				//world->AddModel(model);
-				////HideModel(model);
-				//SetMaterial(model);
-				#else
 				ndModelArticulation* const model = CreateModel(scene, location);
 				model->AddToWorld(world);
-				#ifdef ND_TRAIN_AGENT
-					model->SetNotifyCallback(new RobotModelNotify(m_master, model));
-				#endif
+				model->SetNotifyCallback(new RobotModelNotify(m_master, model));
 				SetMaterial(model);
-				#endif
-
-				scene->SetAcceleratedUpdate();
 			}
+			scene->SetAcceleratedUpdate();
 		}
 
 		~TrainingUpdata()
@@ -467,6 +477,24 @@ namespace ndCarpole_1
 					}
 				}
 
+				if (rewardTrajectory > m_saveScore)
+				{
+					char fileName[256];
+					m_saveScore = ndFloor(rewardTrajectory) + 2.0f;
+
+					// save partial controller in case of crash 
+					ndBrain* const actor = m_master->GetActor();
+					char name[256];
+					snprintf(name, sizeof(name), "%s_actor.dnn", CONTROLLER_NAME);
+					ndGetWorkingFileName(name, fileName);
+					actor->SaveToFile(fileName);
+
+					ndBrain* const critic = m_master->GetCritic();
+					snprintf(name, sizeof(name), "%s_critic.dnn", CONTROLLER_NAME);
+					ndGetWorkingFileName(name, fileName);
+					critic->SaveToFile(fileName);
+				}
+
 				if (episodeCount && !m_master->IsSampling())
 				{
 					ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
@@ -490,8 +518,6 @@ namespace ndCarpole_1
 				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
 				ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 
-				//ndGetWorkingFileName(CRITIC_NAME, fileName);
-				//m_master->GetCritic()->SaveToFile(fileName);
 				manager->Terminate();
 			}
 		}
@@ -501,6 +527,7 @@ namespace ndCarpole_1
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
+		ndFloat32 m_saveScore;
 		ndFloat32 m_discountFactor;
 		ndFloat32 m_horizon;
 		ndUnsigned32 m_lastEpisode;
@@ -529,8 +556,11 @@ void ndCartpoleContinue(ndDemoEntityManager* const scene)
 	model->AddToWorld(world);
 
 	// add the deep learning controller
+	char name[256];
 	char fileName[256];
-	ndGetWorkingFileName(CONTROLLER_NAME, fileName);
+	snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
+	ndGetWorkingFileName(name, fileName);
+
 	ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
 	model->SetNotifyCallback(new RobotModelNotify(brain, model));
 #endif
