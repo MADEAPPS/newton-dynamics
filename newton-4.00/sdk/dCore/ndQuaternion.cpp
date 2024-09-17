@@ -128,7 +128,7 @@ ndVector ndQuaternion::CalcAverageOmega (const ndQuaternion &q1, ndFloat32 invdt
 	ndFloat32 dirMag2 = omegaDir.DotProduct(omegaDir).GetScalar();
 	if (dirMag2	< ndFloat32(ndFloat32 (1.0e-5f) * ndFloat32 (1.0e-5f))) 
 	{
-		return ndVector (ndFloat32(0.0f));
+		return ndVector::m_zero;
 	}
 
 	ndFloat32 dirMagInv = ndRsqrt (dirMag2);
