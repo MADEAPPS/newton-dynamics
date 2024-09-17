@@ -771,6 +771,42 @@ namespace ndAdvancedRobot
 			#endif
 		}
 
+		ndMatrix CalculateTargetMatrix() const
+		{
+			ndFloat32 x = m_targetLocation.m_x + m_effectorReference.m_posit.m_x;
+			ndFloat32 y = m_targetLocation.m_y + m_effectorReference.m_posit.m_y;
+			ndFloat32 z = m_effectorReference.m_posit.m_z;
+
+			const ndMatrix aximuthMatrix(ndYawMatrix(m_targetLocation.m_azimuth));
+			const ndVector localPosit(ndVector::m_wOne + aximuthMatrix.RotateVector(ndVector(x, y, z, ndFloat32(1.0f))));
+
+			ndMatrix targetMatrix(ndPitchMatrix(m_targetLocation.m_pitch) * ndYawMatrix(m_targetLocation.m_yaw) * ndRollMatrix(m_targetLocation.m_roll));
+			targetMatrix.m_posit = localPosit;
+			return targetMatrix;
+		}
+
+		void Debug(ndConstraintDebugCallback& context) const
+		{
+			if (!m_showDebug)
+			{
+				//return;
+			}
+
+			const ndVector color(1.0f, 0.0f, 0.0f, 1.0f);
+
+			const ndMatrix baseMatrix(m_effectorLocalBase * m_base_rotator->GetBody1()->GetMatrix());
+			context.DrawFrame(baseMatrix);
+			context.DrawPoint(baseMatrix.m_posit, color, ndFloat32(5.0f));
+			
+			const ndMatrix effectorTarget(CalculateTargetMatrix() * m_effectorLocalBase * m_base_rotator->GetBody1()->GetMatrix());
+			context.DrawFrame(effectorTarget);
+			context.DrawPoint(effectorTarget.m_posit, color, ndFloat32(5.0f));
+
+			const ndMatrix effectorMatrix(m_effectorLocalTarget * m_arm_4->GetBody0()->GetMatrix());
+			context.DrawFrame(effectorMatrix);
+			context.DrawPoint(effectorMatrix.m_posit, color, ndFloat32(5.0f));
+		}
+
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			m_world = world;
@@ -791,46 +827,6 @@ namespace ndAdvancedRobot
 
 		void PostTransformUpdate(ndWorld* const, ndFloat32)
 		{
-		}
-
-		ndMatrix CalculateTargetMatrix() const
-		{
-			#ifdef ND_USE_EULERS
-				ndMatrix targetMatrix(ndPitchMatrix(m_targetLocation.m_pitch) * ndYawMatrix(m_targetLocation.m_yaw) * ndRollMatrix(m_targetLocation.m_roll));
-			#else
-				ndMatrix targetMatrix(ndCalculateMatrix(m_targetLocation.m_headRotation));
-			#endif
-
-			return m_effectorReference * m_effectorLocalBase;
-			//ndFloat32 x = m_targetLocation.m_x;
-			//ndFloat32 y = m_targetLocation.m_y;
-			//const ndVector localPosit(x, y, ndFloat32(0.0f), ndFloat32(0.0f));
-			//const ndMatrix aximuthMatrix(ndPitchMatrix(m_targetLocation.m_azimuth));
-			//const ndVector offsetPosit(localPosit + m_effectorPositOffset);
-			//targetMatrix.m_posit = aximuthMatrix.TransformVector(offsetPosit);
-			//return targetMatrix;
-		}
-
-		void Debug(ndConstraintDebugCallback& context) const
-		{
-			if (!m_showDebug)
-			{
-				//return;
-			}
-			
-			const ndVector color(1.0f, 0.0f, 0.0f, 1.0f);
-
-			const ndMatrix baseMatrix(m_effectorLocalBase * m_base_rotator->GetBody1()->GetMatrix());
-			context.DrawFrame(baseMatrix);
-			context.DrawPoint(baseMatrix.m_posit, color, ndFloat32(5.0f));
-
-			const ndMatrix effectorMatrix(m_effectorLocalTarget * m_arm_4->GetBody0()->GetMatrix());
-			context.DrawFrame(effectorMatrix);
-			context.DrawPoint(effectorMatrix.m_posit, color, ndFloat32(5.0f));
-
-			const ndMatrix targetMatrix(CalculateTargetMatrix() * m_base_rotator->GetBody1()->GetMatrix());
-			context.DrawFrame(targetMatrix);
-			context.DrawPoint(targetMatrix.m_posit, color, ndFloat32(5.0f));
 		}
 
 		ndMatrix m_effectorLocalBase;
