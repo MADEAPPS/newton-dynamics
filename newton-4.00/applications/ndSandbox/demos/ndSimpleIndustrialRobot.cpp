@@ -188,7 +188,7 @@ namespace ndSimpleRobot
 			ndFloat32 x = localPosit.m_x + dx * invPositMag;
 			ndFloat32 y = localPosit.m_y + dy * invPositMag;
 
-			ndFloat32 azimuthSpeed = 2.0f * ndDegreeToRad;
+			ndFloat32 azimuthSpeed = 3.0f * ndDegreeToRad;
 			ndFloat32 deltaAzimuth = ndAnglesSub(m_azimuth, azimuth);
 			if (ndAbs(deltaAzimuth) > azimuthSpeed) 
 			{
@@ -204,9 +204,28 @@ namespace ndSimpleRobot
 			const ndMatrix azimuthMatrix1(ndYawMatrix(angle));
 			const ndVector localPosit1(ndVector::m_wOne + azimuthMatrix1.RotateVector(ndVector(x1, y1, z1, ndFloat32 (1.0f))));
 
-			ndMatrix targetMatrix(ndPitchMatrix(m_pitch) * ndYawMatrix(m_yaw) * ndRollMatrix(m_roll));
-			targetMatrix.m_posit = localPosit1;
-			return targetMatrix;
+			const ndMatrix targetMatrix(ndPitchMatrix(m_pitch) * ndYawMatrix(m_yaw) * ndRollMatrix(m_roll));
+			const ndQuaternion targetRotation(targetMatrix);
+			ndQuaternion currentRotation(currentEffectorMatrix);
+			if (currentRotation.DotProduct(targetRotation).GetScalar() < 0.0f)
+			{
+				currentRotation = currentRotation.Scale(-1.0f);
+			}
+
+			ndQuaternion rotation(targetMatrix);
+
+			ndVector omega(currentRotation.CalcAverageOmega(targetRotation, 1.0f));
+			ndFloat32 omegaMag = ndSqrt(omega.DotProduct(omega).GetScalar());
+
+			ndFloat32 omegaSpeed = 5.0f * ndDegreeToRad;
+			if (omegaMag > omegaSpeed)
+			{
+				omega = omega.Normalize().Scale(omegaSpeed);
+				rotation = currentRotation.IntegrateOmega(omega, 1.0f);
+			}
+
+			ndMatrix matrix(ndCalculateMatrix(rotation, localPosit1));
+			return matrix;
 		}
 
 		void Debug(ndConstraintDebugCallback& context) const
@@ -312,9 +331,9 @@ namespace ndSimpleRobot
 			{
 				change = 1;
 
-				//m_robot->m_pitch = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
-				//m_robot->m_yaw = ndReal((2.0f * ndRand() - 1.0f) * ndPi * 0.5f);
-				//m_robot->m_roll = ndReal(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
+				m_robot->m_pitch = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
+				m_robot->m_yaw = ndReal((2.0f * ndRand() - 1.0f) * ndPi * 0.5f);
+				m_robot->m_roll = ndReal(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
 
 				m_robot->m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				m_robot->m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));

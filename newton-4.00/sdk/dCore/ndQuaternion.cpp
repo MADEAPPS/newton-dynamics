@@ -120,7 +120,6 @@ ndVector ndQuaternion::CalcAverageOmega (const ndQuaternion &q1, ndFloat32 invdt
 	ndQuaternion q0 (*this);
 	if (q0.DotProduct (q1).GetScalar() < ndFloat32 (0.0f)) 
 	{
-		//q0 = q0.Scale(ndFloat32 (-1.0f));
 		q0 = q0 * ndVector::m_negOne;
 	}
 	ndQuaternion dq (q0.Inverse() * q1);
@@ -137,6 +136,25 @@ ndVector ndQuaternion::CalcAverageOmega (const ndQuaternion &q1, ndFloat32 invdt
 
 	ndFloat32 omegaMag = ndFloat32(2.0f) * ndAtan2 (dirMag, dq.m_w) * invdt;
 	return omegaDir.Scale (dirMagInv * omegaMag);
+}
+
+ndQuaternion ndQuaternion::IntegrateOmega(const ndVector& omega, ndFloat32 timestep) const
+{
+	const ndFloat32 tol = (ndFloat32(0.0125f) * ndDegreeToRad);
+	const ndFloat32 tol2 = tol * tol;
+
+	ndQuaternion result(*this);
+	ndFloat32 omegaMag2 = omega.DotProduct(omega & ndVector::m_triplexMask).GetScalar();
+	if (omegaMag2 > tol2)
+	{
+		const ndFloat32 omegaAngle = ndSqrt(omegaMag2);
+		const ndVector omegaAxis(omega.Scale(ndFloat32(1.0f) / omegaAngle));
+		const ndQuaternion rotationStep(omegaAxis, omegaAngle * timestep);
+		result = result * rotationStep;
+		result = result.Normalize();
+		ndAssert((result.DotProduct(result).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-5f));
+	}
+	return result;
 }
 
 ndQuaternion ndQuaternion::Slerp (const ndQuaternion &q1, ndFloat32 t) const 
