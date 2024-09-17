@@ -547,7 +547,8 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			ndMatrix alighMatrix(ndGetIdentityMatrix());
 			alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
 			alighMatrix.m_posit.m_w = ndFloat32(1.0f);
-			const ndMatrix matrix(child->GetMeshMatrix() * alighMatrix * child->GetCurrentMatrix());
+
+			const ndMatrix matrix(alighMatrix * child->GetMeshMatrix() * child->GetCurrentMatrix());
 			shapeArray.PushBack(new ndShapeInstance(new ndShapeSphere(size.m_x)));
 			shapeArray[shapeArray.GetCount()-1]->SetLocalMatrix(matrix);
 		} 
@@ -567,11 +568,12 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			ndVector size(maxP - minP);
 			shapeArray.PushBack(new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z)));
 
-			ndVector origin((maxP + minP).Scale (ndFloat32 (0.5f)));
+			const ndVector origin((maxP + minP).Scale (ndFloat32 (0.5f)));
+			ndMatrix alighMatrix(ndGetIdentityMatrix());
+			alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
+			alighMatrix.m_posit.m_w = ndFloat32(1.0f);
 
-			ndMatrix matrix(child->GetMeshMatrix());
-			matrix.m_posit += origin;
-			matrix = matrix * child->GetCurrentMatrix();
+			const ndMatrix matrix(alighMatrix * child->GetMeshMatrix() * child->GetCurrentMatrix());
 			shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
 		} 
 		else if (strstr (name, "capsule")) 
@@ -592,7 +594,8 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			ndMatrix alighMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
 			alighMatrix.m_posit = origin;
 			alighMatrix.m_posit.m_w = ndFloat32(1.0f);
-			const ndMatrix matrix (alighMatrix * child->GetMeshMatrix() * child->GetCurrentMatrix());
+
+			const ndMatrix matrix(alighMatrix * child->GetMeshMatrix() * child->GetCurrentMatrix());
 
 			shapeArray.PushBack(new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high)));
 			shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
