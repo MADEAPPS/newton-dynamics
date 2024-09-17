@@ -145,6 +145,17 @@ void ndJointSlider::GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, n
 	regularizer = m_springDamperRegularizer;
 }
 
+void ndJointSlider::DebugJoint(ndConstraintDebugCallback& debugCallback) const
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	debugCallback.DrawFrame(matrix0);
+	debugCallback.DrawFrame(matrix1, 0.5f);
+
+}
+
 ndFloat32 ndJointSlider::PenetrationSpeed(ndFloat32 penetration) const
 {
 	ndFloat32 param = ndClamp(penetration, ndFloat32(0.0f), D_MAX_SLIDER_PENETRATION) / D_MAX_SLIDER_PENETRATION;
