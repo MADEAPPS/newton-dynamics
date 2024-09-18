@@ -539,27 +539,28 @@ namespace ndAdvancedRobot
 				return ND_DEAD_PENALTY;
 			}
 
+			ndFloat32 invRewardSigma2 = 500.0f;
+			ndFloat32 rewardWeigh = 1.0f / 6.0f;
+
 			const ndMatrix effectorMatrix(m_effectorLocalTarget * m_arm_4->GetBody0()->GetMatrix());
 			const ndMatrix baseMatrix(m_effectorLocalBase * m_base_rotator->GetBody1()->GetMatrix());
 			const ndMatrix currentEffectorMatrix(effectorMatrix * baseMatrix.OrthoInverse());
 			const ndVector positError(CalculateDeltaTargetPosit(currentEffectorMatrix));
-			const ndVector rotationError(CalculateDeltaTargetRotation(currentEffectorMatrix));
-
 			const ndVector positError2 = positError * positError;
-			const ndVector rotationError2 = rotationError * rotationError;
 
-			ndFloat32 invRewardSigma2 = 500.0f;
-			ndFloat32 rewardWeigh = 1.0f / 6.0f;
 			ndFloat32 azimuthReward = rewardWeigh * ndExp(-invRewardSigma2 * positError2.m_z);
 
 			ndFloat32 reward = azimuthReward;
 			if (azimuthReward > 1.0e-5f)
 			{
+				const ndVector rotationError(CalculateDeltaTargetRotation(currentEffectorMatrix));
+				const ndVector rotationError2 = rotationError * rotationError;
+
 				ndFloat32 omega_xReward = rewardWeigh * ndExp(-invRewardSigma2 * rotationError2.m_x);
 				ndFloat32 omega_yReward = rewardWeigh * ndExp(-invRewardSigma2 * rotationError2.m_y);
 				ndFloat32 omega_zReward = rewardWeigh * ndExp(-invRewardSigma2 * rotationError2.m_z);
 				reward += (omega_xReward + omega_yReward + omega_zReward);
-				if ((omega_xReward > 1.0e-5f) && (omega_yReward > 1.0e-5f) && (omega_zReward > 1.0e-5f))
+				if ((omega_xReward > 1.0e-5f) || (omega_yReward > 1.0e-5f) || (omega_zReward > 1.0e-5f))
 				{
 					ndFloat32 posit_xReward = rewardWeigh * ndExp(-invRewardSigma2 * positError2.m_x);
 					ndFloat32 posit_yReward = rewardWeigh * ndExp(-invRewardSigma2 * positError2.m_y);
