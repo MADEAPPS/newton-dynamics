@@ -548,10 +548,12 @@ namespace ndAdvancedRobot
 			const ndVector positError(CalculateDeltaTargetPosit(currentEffectorMatrix));
 			const ndVector positError2 = positError * positError;
 
-			ndFloat32 azimuthReward = rewardWeigh * ndExp(-invRewardSigma2 * positError2.m_z);
+			//ndFloat32 azimuthReward = rewardWeigh * ndExp(-invRewardSigma2 * positError2.m_z);
+			//ndFloat32 azimuthReward = rewardWeigh * ndExp(-50.0f * positError2.m_z);
+			ndFloat32 azimuthReward = ndClamp (ndFloat32 (1.0f - positError2.m_z), 0.0f, 1.0f);
 
 			ndFloat32 reward = azimuthReward;
-			if (azimuthReward > 1.0e-2f)
+			if (azimuthReward > 0.5f)
 			{
 				const ndVector rotationError(CalculateDeltaTargetRotation(currentEffectorMatrix));
 				const ndVector rotationError2 = rotationError * rotationError;
@@ -1086,8 +1088,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 10;
 			ndInt32 countZ = 11;
-			countX = 1;
-			countZ = 1;
+			//countX = 1;
+			//countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
