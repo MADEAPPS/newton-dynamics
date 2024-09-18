@@ -547,33 +547,33 @@ namespace ndAdvancedRobot
 
 			auto ScalarReward = [](ndFloat32 param2)
 			{
-				ndFloat32 rewardWeigh = 1.0f / 6.0f;
-				return rewardWeigh * ndClamp(ndFloat32(1.0f - param2), ndFloat32(0.0f), ndFloat32(1.0f));
+				ndFloat32 x = ndSqrt (ndSqrt(param2));
+				return ndClamp(ndFloat32(1.0f - x), ndFloat32(0.0f), ndFloat32(1.0f));
 			};
 
 			auto GaussianReward = [](ndFloat32 param2)
 			{
-				ndFloat32 rewardWeigh = 1.0f / 6.0f;
 				ndFloat32 invRewardSigma2 = 500.0f;
-				return rewardWeigh * ndExp(-invRewardSigma2 * param2);
+				return ndExp(-invRewardSigma2 * param2);
 			};
 
+			ndFloat32 rewardWeigh = 1.0f / 6.0f;
 			ndFloat32 azimuthReward = ScalarReward(positError2.m_z);
 
-			ndFloat32 reward = azimuthReward;
-			if (azimuthReward > 0.1f)
+			ndFloat32 reward = rewardWeigh * azimuthReward;
+			if (azimuthReward > 0.5f)
 			{
 				const ndVector rotationError(CalculateDeltaTargetRotation(currentEffectorMatrix));
 				const ndVector rotationError2 = rotationError * rotationError;
 
-				ndFloat32 omega_xReward = GaussianReward(rotationError2.m_x);
-				ndFloat32 omega_yReward = GaussianReward(rotationError2.m_y);
-				ndFloat32 omega_zReward = GaussianReward(rotationError2.m_z);
+				ndFloat32 omega_xReward = rewardWeigh * GaussianReward(rotationError2.m_x);
+				ndFloat32 omega_yReward = rewardWeigh * GaussianReward(rotationError2.m_y);
+				ndFloat32 omega_zReward = rewardWeigh * GaussianReward(rotationError2.m_z);
 				reward += (omega_xReward + omega_yReward + omega_zReward);
 				if ((omega_xReward > 1.0e-3f) || (omega_yReward > 1.0e-3f) || (omega_zReward > 1.0e-3f))
 				{
-					ndFloat32 posit_xReward = GaussianReward(positError2.m_x);
-					ndFloat32 posit_yReward = GaussianReward(positError2.m_y);
+					ndFloat32 posit_xReward = rewardWeigh * GaussianReward(positError2.m_x);
+					ndFloat32 posit_yReward = rewardWeigh * GaussianReward(positError2.m_y);
 					reward += (posit_xReward + posit_yReward);
 				}
 			}
