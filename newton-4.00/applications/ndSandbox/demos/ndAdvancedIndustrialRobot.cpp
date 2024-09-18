@@ -560,7 +560,7 @@ namespace ndAdvancedRobot
 				ndFloat32 omega_yReward = rewardWeigh * ndExp(-invRewardSigma2 * rotationError2.m_y);
 				ndFloat32 omega_zReward = rewardWeigh * ndExp(-invRewardSigma2 * rotationError2.m_z);
 				reward += (omega_xReward + omega_yReward + omega_zReward);
-				if ((omega_xReward > 1.0e-5f) || (omega_yReward > 1.0e-5f) || (omega_zReward > 1.0e-5f))
+				if ((omega_xReward > 1.0e-3f) || (omega_yReward > 1.0e-3f) || (omega_zReward > 1.0e-3f))
 				{
 					ndFloat32 posit_xReward = rewardWeigh * ndExp(-invRewardSigma2 * positError2.m_x);
 					ndFloat32 posit_yReward = rewardWeigh * ndExp(-invRewardSigma2 * positError2.m_y);
@@ -1084,10 +1084,10 @@ namespace ndAdvancedRobot
 				return model;
 			};
 
-			ndInt32 countX = 22;
-			ndInt32 countZ = 23;
-			countX = 10;
-			countZ = 10;
+			ndInt32 countX = 10;
+			ndInt32 countZ = 11;
+			countX = 1;
+			countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
