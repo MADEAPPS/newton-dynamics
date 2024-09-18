@@ -561,7 +561,7 @@ namespace ndAdvancedRobot
 			ndFloat32 azimuthReward = ScalarReward(positError2.m_z);
 
 			ndFloat32 reward = azimuthReward;
-			if (azimuthReward > 0.5f)
+			if (azimuthReward > 0.1f)
 			{
 				const ndVector rotationError(CalculateDeltaTargetRotation(currentEffectorMatrix));
 				const ndVector rotationError2 = rotationError * rotationError;
