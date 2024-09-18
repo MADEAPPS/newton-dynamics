@@ -548,22 +548,25 @@ namespace ndAdvancedRobot
 			const ndVector positError2 = positError * positError;
 			const ndVector rotationError2 = rotationError * rotationError;
 
-			ndFloat32 invSigma2 = 500.0f;
-			ndFloat32 posit_xReward = ndExp(-invSigma2 * positError2.m_x);
-			ndFloat32 posit_yReward = ndExp(-invSigma2 * positError2.m_y);
-			ndFloat32 azimuthReward = ndExp(-invSigma2 * positError2.m_z);
+			ndFloat32 invRewardSigma2 = 500.0f;
+			ndFloat32 rewardWeigh = 1.0f / 6.0f;
+			ndFloat32 azimuthReward = rewardWeigh * ndExp(-invRewardSigma2 * positError2.m_z);
 
-			ndFloat32 omega_xReward = ndExp(-invSigma2 * rotationError2.m_x);
-			ndFloat32 omega_yReward = ndExp(-invSigma2 * rotationError2.m_y);
-			ndFloat32 omega_zReward = ndExp(-invSigma2 * rotationError2.m_z);
+			ndFloat32 reward = azimuthReward;
 			if (azimuthReward > 1.0e-5f)
 			{
-				return (omega_xReward + omega_yReward + omega_zReward + posit_xReward + posit_yReward + azimuthReward) / 6.0f;
+				ndFloat32 omega_xReward = rewardWeigh * ndExp(-invRewardSigma2 * rotationError2.m_x);
+				ndFloat32 omega_yReward = rewardWeigh * ndExp(-invRewardSigma2 * rotationError2.m_y);
+				ndFloat32 omega_zReward = rewardWeigh * ndExp(-invRewardSigma2 * rotationError2.m_z);
+				reward += (omega_xReward + omega_yReward + omega_zReward);
+				if ((omega_xReward > 1.0e-5f) && (omega_yReward > 1.0e-5f) && (omega_zReward > 1.0e-5f))
+				{
+					ndFloat32 posit_xReward = rewardWeigh * ndExp(-invRewardSigma2 * positError2.m_x);
+					ndFloat32 posit_yReward = rewardWeigh * ndExp(-invRewardSigma2 * positError2.m_y);
+					reward += (posit_xReward + posit_yReward);
+				}
 			}
-			else
-			{
-				return azimuthReward / 6.0f;
-			}
+			return reward;
 		}
 
 		#pragma optimize( "", off )
@@ -608,8 +611,6 @@ namespace ndAdvancedRobot
 				//ndAssert(ndAbs(targetAngle - ndAnglesAdd(angle, deltaAngle)) < 1.0e-3f);
 				hinge->SetTargetAngle(targetAngle);
 			};
-
-			//GetReward();
 
 			//SetParamter(m_arm_0, 0);
 			//SetParamter(m_arm_1, 1);
