@@ -46,13 +46,13 @@ namespace ndSimpleRobot
 	{
 		{ "base", ndDefinition::m_root, 100.0f, 0.0f, 0.0f},
 		{ "base_rotator", ndDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f},
-		{ "arm_0", ndDefinition::m_hinge , 5.0f, -120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
-		{ "arm_1", ndDefinition::m_hinge , 5.0f, -90.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
-		{ "arm_2", ndDefinition::m_hinge , 5.0f, -1.0e10f, 1.0e10f},
-		{ "arm_3", ndDefinition::m_hinge , 3.0f, -1.0e10f, 1.0e10f},
-		{ "arm_4", ndDefinition::m_hinge , 2.0f, -1.0e10f, 1.0e10f},
-		{ "gripperLeft", ndDefinition::m_slider , 1.0f, -0.2f, 0.03f},
-		{ "gripperRight", ndDefinition::m_slider , 1.0f, -0.2f, 0.03f},
+		{ "arm_0", ndDefinition::m_hinge , 20.0f, -120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
+		{ "arm_1", ndDefinition::m_hinge , 20.0f, -90.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
+		{ "arm_2", ndDefinition::m_hinge , 20.0f, -1.0e10f, 1.0e10f},
+		{ "arm_3", ndDefinition::m_hinge , 10.0f, -1.0e10f, 1.0e10f},
+		{ "arm_4", ndDefinition::m_hinge , 10.0f, -1.0e10f, 1.0e10f},
+		{ "gripperLeft", ndDefinition::m_slider , 5.0f, -0.2f, 0.03f},
+		{ "gripperRight", ndDefinition::m_slider , 5.0f, -0.2f, 0.03f},
 		{ "effector", ndDefinition::m_effector , 0.0f, 0.0f, 0.0f},
 	};
 
@@ -471,7 +471,7 @@ namespace ndSimpleRobot
 						ndJointSlider* const sliderJoint = (ndJointSlider*)*slider;
 						sliderJoint->SetLimits(definition.m_minLimit, definition.m_maxLimit);
 						sliderJoint->SetLimitState(true);
-						sliderJoint->SetAsSpringDamper(0.001f, 2000.0f, 100.0f);
+						sliderJoint->SetAsSpringDamper(0.1f, 1000.0f, 50.0f);
 						parentBone = model->AddLimb(parentBone, childBody, slider);
 
 						if (!strstr(definition.m_boneName, "Left"))
