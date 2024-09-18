@@ -325,7 +325,7 @@ namespace ndSimpleRobot
 			change = change | ndInt8(ImGui::SliderFloat("y", &m_robot->m_y, ND_MIN_Y_SPAND, ND_MAX_Y_SPAND));
 			change = change | ndInt8(ImGui::SliderFloat("azimuth", &m_robot->m_azimuth, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("pitch", &m_robot->m_pitch, -ndPi, ndPi));
-			change = change | ndInt8(ImGui::SliderFloat("yaw", &m_robot->m_yaw, -ndPi * 0.5f, ndPi * 0.5f));
+			change = change | ndInt8(ImGui::SliderFloat("yaw", &m_robot->m_yaw, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("roll", &m_robot->m_roll, -ndPi * 0.35f, ndPi * 0.9f));
 			change = change | ndInt8(ImGui::SliderFloat("gripper", &m_robot->m_gripperPosit, -0.2f, 0.4f));
 			bool newTarget = ndInt8(ImGui::Button("random target"));
@@ -334,7 +334,7 @@ namespace ndSimpleRobot
 				change = 1;
 
 				m_robot->m_pitch = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
-				m_robot->m_yaw = ndReal((2.0f * ndRand() - 1.0f) * ndPi * 0.5f);
+				m_robot->m_yaw = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				m_robot->m_roll = ndReal(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
 
 				m_robot->m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);

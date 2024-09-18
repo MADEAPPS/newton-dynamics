@@ -33,7 +33,7 @@ namespace ndAdvancedRobot
 	{
 		public:
 		//ndBrainFloat m_actions[6];
-		ndBrainFloat m_actions[4];
+		ndBrainFloat m_actions[5];
 	};
 
 	class ndObservationVector
@@ -110,7 +110,7 @@ namespace ndAdvancedRobot
 	static ndDefinition jointsDefinition[] =
 	{
 		{ "base", ndDefinition::m_root, 100.0f, 0.0f, 0.0f},
-		{ "base_rotator", ndDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f},
+		{ "base_rotator", ndDefinition::m_hinge, 50.0f, -ndPi * 2.0f, ndPi * 2.0f},
 		{ "arm_0", ndDefinition::m_hinge , 5.0f, -120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
 		{ "arm_1", ndDefinition::m_hinge , 5.0f, -90.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
 		{ "arm_2", ndDefinition::m_hinge , 5.0f, -1.0e10f, 1.0e10f},
@@ -556,8 +556,14 @@ namespace ndAdvancedRobot
 			ndFloat32 omega_xReward = ndExp(-invSigma2 * rotationError2.m_x);
 			ndFloat32 omega_yReward = ndExp(-invSigma2 * rotationError2.m_y);
 			ndFloat32 omega_zReward = ndExp(-invSigma2 * rotationError2.m_z);
-
-			return (omega_xReward + omega_yReward + omega_zReward + posit_xReward + posit_yReward + azimuthReward) / 6.0f;
+			if (azimuthReward > 1.0e-5f)
+			{
+				return (omega_xReward + omega_yReward + omega_zReward + posit_xReward + posit_yReward + azimuthReward) / 6.0f;
+			}
+			else
+			{
+				return azimuthReward / 6.0f;
+			}
 		}
 
 		#pragma optimize( "", off )
@@ -614,8 +620,10 @@ namespace ndAdvancedRobot
 
 			SetParamter(m_arm_0, 0);
 			SetParamter(m_arm_1, 1);
-			SetParamter(m_arm_3, 2);
-			SetParamter(m_base_rotator, 3);
+			SetParamter(m_arm_2, 2);
+			SetParamter(m_arm_3, 3);
+			//SetParamter(m_arm_4, 3);
+			SetParamter(m_base_rotator, 4);
 		}
 
 		void CheckModelStability()
@@ -677,7 +685,7 @@ namespace ndAdvancedRobot
 			m_targetLocation.m_y = ndClamp(m_targetLocation.m_y, ndReal(ND_MIN_Y_SPAND + 0.05f), ndReal(ND_MAX_Y_SPAND - 0.05f));
 			m_targetLocation.m_azimuth = ndClamp(m_targetLocation.m_azimuth, ndReal(-ndPi + 0.09f), ndReal(ndPi - 0.09f));
 
-			ndFloat32 yaw = ndFloat32((1.0f * ndRand() - 0.5f) * ndPi);
+			ndFloat32 yaw = ndFloat32((2.0f * ndRand() - 1.0f) * ndPi);
 			ndFloat32 pitch = ndFloat32((2.0f * ndRand() - 1.0f) * ndPi);
 			ndFloat32 roll = ndFloat32(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
 
@@ -687,7 +695,7 @@ namespace ndAdvancedRobot
 		
 			yaw = 0.0f * ndDegreeToRad;
 			//roll = 0.0f * ndDegreeToRad;
-			pitch = 0.0f * ndDegreeToRad;
+			//pitch = 0.0f * ndDegreeToRad;
 
 			m_targetLocation.m_yaw = yaw;
 			m_targetLocation.m_roll = roll;
@@ -812,7 +820,7 @@ namespace ndAdvancedRobot
 			change = change | ndInt8(ImGui::SliderFloat("y", &m_robot->m_targetLocation.m_y, ND_MIN_X_SPAND, ND_MAX_X_SPAND));
 			change = change | ndInt8 (ImGui::SliderFloat("azimuth", &m_robot->m_targetLocation.m_azimuth, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("pitch", &pitch, -ndPi, ndPi));
-			change = change | ndInt8(ImGui::SliderFloat("yaw", &yaw, -ndPi * 0.5f, ndPi * 0.5f));
+			change = change | ndInt8(ImGui::SliderFloat("yaw", &yaw, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("roll", &roll, -ndPi * 0.35f, ndPi * 0.9f));
 			change = change | ndInt8 (ImGui::SliderFloat("gripper", &m_robot->m_targetLocation.m_gripperPosit, -0.2f, 0.4f));
 			
@@ -821,7 +829,7 @@ namespace ndAdvancedRobot
 			{
 				change = 1;
 				pitch = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
-				yaw = ndReal((2.0f * ndRand() - 1.0f) * ndPi * 0.5f);
+				yaw = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				roll = ndReal(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
 			
 				m_robot->m_targetLocation.m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
@@ -830,7 +838,7 @@ namespace ndAdvancedRobot
 
 				yaw = 0.0f;
 				//roll = 0.0f;
-				pitch = 0.0f;
+				//pitch = 0.0f;
 				//m_robot->m_targetLocation.m_x = 0.0f;
 				//m_robot->m_targetLocation.m_y = 0.0f;
 				//m_robot->m_targetLocation.m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
@@ -1076,8 +1084,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			//countX = 1;
-			//countZ = 1;
+			countX = 10;
+			countZ = 10;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
