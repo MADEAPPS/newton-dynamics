@@ -33,8 +33,7 @@ namespace ndAdvancedRobot
 	{
 		public:
 		//ndBrainFloat m_actions[6];
-		ndBrainFloat m_actions[3];
-		//ndBrainFloat m_actions[1];
+		ndBrainFloat m_actions[4];
 	};
 
 	class ndObservationVector
@@ -47,6 +46,9 @@ namespace ndAdvancedRobot
 		ndBrainFloat m_collided;
 
 		// distance to target error.
+		ndBrainFloat m_omega_x;
+		ndBrainFloat m_omega_y;
+		ndBrainFloat m_omega_z;
 		ndBrainFloat m_delta_x;
 		ndBrainFloat m_delta_y;
 		ndBrainFloat m_deltaAzimuth;
@@ -58,22 +60,21 @@ namespace ndAdvancedRobot
 		ndControlParameters()
 			:m_x(0.0f)
 			,m_y(0.0f)
+			,m_yaw(0.0f)
+			,m_roll(0.0f)
+			,m_pitch(0.0f)
 			,m_azimuth(0.0f)
 			,m_gripperPosit(0.0f)
 		{
-			m_yaw = 0.0f;
-			m_roll = 0.0f;
-			m_pitch = 0.0f;
 		}
 
 		ndReal m_x;
 		ndReal m_y;
-		ndReal m_azimuth;
-		ndReal m_gripperPosit;
-
 		ndReal m_yaw;
 		ndReal m_roll;
 		ndReal m_pitch;
+		ndReal m_azimuth;
+		ndReal m_gripperPosit;
 	};
 
 	#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
@@ -83,7 +84,7 @@ namespace ndAdvancedRobot
 	#define ND_MAX_X_SPAND			ndReal ( 1.5f)
 	#define ND_MIN_Y_SPAND			ndReal (-2.2f)
 	#define ND_MAX_Y_SPAND			ndReal ( 1.5f)
-	#define ND_ACTION_SENSITIVITY	ndReal ( 0.05f)
+	#define ND_ACTION_SENSITIVITY	ndReal ( 0.10f)
 
 	#define ND_DEAD_PENALTY			ndReal (-10.0f)
 
@@ -510,12 +511,13 @@ namespace ndAdvancedRobot
 			ndFloat32 dx = m_targetLocation.m_x - localPosit.m_x;
 			ndFloat32 dy = m_targetLocation.m_y - localPosit.m_y;
 			ndFloat32 deltaAzimuth = ndAnglesSub(m_targetLocation.m_azimuth, azimuth);
+			//ndFloat32 deltaAzimuth = m_targetLocation.m_azimuth - azimuth;
+			//ndAssert(ndAbs(deltaAzimuth - (m_targetLocation.m_azimuth - azimuth)) < 1.0e-3f);
 			return ndVector(dx, dy, deltaAzimuth, ndFloat32(0.0f));
 		}
 
 		const ndVector CalculateDeltaTargetRotation(const ndMatrix& currentEffectorMatrix) const
 		{
-			//const ndMatrix currentEffectorMatrix(m_effector->GetEffectorMatrix());
 			const ndMatrix targetMatrix(ndPitchMatrix(m_targetLocation.m_pitch) * ndYawMatrix(m_targetLocation.m_yaw) * ndRollMatrix(m_targetLocation.m_roll));
 			const ndQuaternion targetRotation(targetMatrix);
 			ndQuaternion currentRotation(currentEffectorMatrix);
@@ -555,7 +557,7 @@ namespace ndAdvancedRobot
 			ndFloat32 omega_yReward = ndExp(-invSigma2 * rotationError2.m_y);
 			ndFloat32 omega_zReward = ndExp(-invSigma2 * rotationError2.m_z);
 
-			return (posit_xReward + posit_yReward + azimuthReward) / 3.0f;
+			return (omega_xReward + omega_yReward + omega_zReward + posit_xReward + posit_yReward + azimuthReward) / 6.0f;
 		}
 
 		#pragma optimize( "", off )
@@ -582,6 +584,9 @@ namespace ndAdvancedRobot
 
 			observation->m_delta_x = ndBrainFloat(positError.m_x);
 			observation->m_delta_y = ndBrainFloat(positError.m_y);
+			observation->m_omega_x = ndBrainFloat(rotationError.m_x);
+			observation->m_omega_y = ndBrainFloat(rotationError.m_y);
+			observation->m_omega_z = ndBrainFloat(rotationError.m_z);
 			observation->m_deltaAzimuth = ndBrainFloat(positError.m_z);
 		}
 
@@ -592,7 +597,9 @@ namespace ndAdvancedRobot
 			{
 				ndFloat32 angle = hinge->GetAngle();
 				ndFloat32 deltaAngle = actions[index] * ND_ACTION_SENSITIVITY;
-				ndFloat32 targetAngle = ndAnglesAdd (angle, deltaAngle);
+				//ndFloat32 targetAngle = ndAnglesAdd (angle, deltaAngle);
+				ndFloat32 targetAngle = angle + deltaAngle;
+				//ndAssert(ndAbs(targetAngle - ndAnglesAdd(angle, deltaAngle)) < 1.0e-3f);
 				hinge->SetTargetAngle(targetAngle);
 			};
 
@@ -607,7 +614,8 @@ namespace ndAdvancedRobot
 
 			SetParamter(m_arm_0, 0);
 			SetParamter(m_arm_1, 1);
-			SetParamter(m_base_rotator, 2);
+			SetParamter(m_arm_3, 2);
+			SetParamter(m_base_rotator, 3);
 		}
 
 		void CheckModelStability()
@@ -678,7 +686,7 @@ namespace ndAdvancedRobot
 			//m_targetLocation.m_azimuth = 0.0f;
 		
 			yaw = 0.0f * ndDegreeToRad;
-			roll = 0.0f * ndDegreeToRad;
+			//roll = 0.0f * ndDegreeToRad;
 			pitch = 0.0f * ndDegreeToRad;
 
 			m_targetLocation.m_yaw = yaw;
@@ -821,10 +829,10 @@ namespace ndAdvancedRobot
 				m_robot->m_targetLocation.m_y = ndReal(ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
 
 				yaw = 0.0f;
-				roll = 0.0f;
+				//roll = 0.0f;
 				pitch = 0.0f;
-				m_robot->m_targetLocation.m_x = 0.0f;
-				m_robot->m_targetLocation.m_y = 0.0f;
+				//m_robot->m_targetLocation.m_x = 0.0f;
+				//m_robot->m_targetLocation.m_y = 0.0f;
 				//m_robot->m_targetLocation.m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 			}
 			
