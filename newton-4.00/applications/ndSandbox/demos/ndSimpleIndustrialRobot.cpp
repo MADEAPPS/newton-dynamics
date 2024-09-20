@@ -88,7 +88,7 @@ namespace ndSimpleRobot
 	class RobotModelNotify : public ndModelNotify
 	{
 		public:
-		RobotModelNotify(ndModelArticulation* const robot, bool showDebug)
+		RobotModelNotify(ndModelArticulation* const robot, bool showDebug, ndFixSizeArray<ndBodyKinematic*, 16>& backGround)
 			:ndModelNotify()
 			,m_effectorLocalBase(ndGetIdentityMatrix())
 			,m_effectorLocalTarget(ndGetIdentityMatrix())
@@ -104,6 +104,11 @@ namespace ndSimpleRobot
 			,m_timestep(ndFloat32(0.0f))
 			,m_showDebug(showDebug)
 		{
+
+			for (ndInt32 i = 0; i < backGround.GetCount(); ++i)
+			{
+				m_backGround.PushBack(backGround[i]);
+			}
 			Init(robot);
 		}
 
@@ -266,12 +271,11 @@ namespace ndSimpleRobot
 			const ndMatrix targetMatrix(CalculateNextTargetMatrix());
 			m_effector->SetOffsetMatrix(targetMatrix);
 
-			ndModelArticulation* const robot = GetModel()->GetAsModelArticulation();
-			ndJointHinge* xxxx4 = (ndJointHinge*)robot->FindByName("arm_4")->m_joint->GetAsBilateral();
-			ndJointHinge* xxxx3 = (ndJointHinge*)robot->FindByName("arm_3")->m_joint->GetAsBilateral();
-			ndJointHinge* xxxx2 = (ndJointHinge*)robot->FindByName("arm_2")->m_joint->GetAsBilateral();
-			ndJointHinge* xxxx1 = (ndJointHinge*)robot->FindByName("arm_1")->m_joint->GetAsBilateral();
-
+			//ndModelArticulation* const robot = GetModel()->GetAsModelArticulation();
+			//ndJointHinge* xxxx4 = (ndJointHinge*)robot->FindByName("arm_4")->m_joint->GetAsBilateral();
+			//ndJointHinge* xxxx3 = (ndJointHinge*)robot->FindByName("arm_3")->m_joint->GetAsBilateral();
+			//ndJointHinge* xxxx2 = (ndJointHinge*)robot->FindByName("arm_2")->m_joint->GetAsBilateral();
+			//ndJointHinge* xxxx1 = (ndJointHinge*)robot->FindByName("arm_1")->m_joint->GetAsBilateral();
 		}
 
 		void PostUpdate(ndWorld* const, ndFloat32)
@@ -291,6 +295,7 @@ namespace ndSimpleRobot
 		ndJointSlider* m_rightGripper;
 		ndIk6DofEffector* m_effector;
 		ndWorld* m_world;
+		ndFixSizeArray<ndBodyKinematic*, 16> m_backGround;
 
 		ndReal m_x;
 		ndReal m_y;
@@ -335,6 +340,7 @@ namespace ndSimpleRobot
 			change = change | ndInt8(ImGui::SliderFloat("yaw", &m_robot->m_yaw, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("roll", &m_robot->m_roll, -ndPi * 0.35f, ndPi * 0.9f));
 			change = change | ndInt8(ImGui::SliderFloat("gripper", &m_robot->m_gripperPosit, -0.2f, 0.4f));
+
 			bool newTarget = ndInt8(ImGui::Button("random target"));
 			if (newTarget)
 			{
@@ -347,8 +353,33 @@ namespace ndSimpleRobot
 				m_robot->m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				m_robot->m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
 				m_robot->m_y = ndReal(ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
+			}
 
-				//m_robot->m_yaw = 0.0f;
+			bool newBoxTarget = ndInt8(ImGui::Button("random box target"));
+			if (newBoxTarget)
+			{
+				change = 1;
+
+				ndInt32 index = ndInt32 (ndRandInt() % 4);
+				ndBodyKinematic* const body = m_robot->m_backGround[index];
+				const ndMatrix baseMatrix(m_robot->m_effector->CalculateGlobalBaseMatrix1());
+				ndMatrix matrix(body->GetMatrix() * baseMatrix.OrthoInverse());
+				matrix.m_posit.m_y += 0.75f;
+
+				// intepolate in local space;
+				ndFloat32 azimuth = -ndAtan2(matrix.m_posit.m_z, matrix.m_posit.m_x);
+				const ndVector localPosit(ndYawMatrix(-azimuth).RotateVector(matrix.m_posit) - m_robot->m_effectorReference.m_posit);
+
+				m_robot->m_azimuth = azimuth;
+				m_robot->m_x = localPosit.m_x;
+				m_robot->m_y = localPosit.m_y;
+
+				ndVector euler1;
+				ndVector euler(matrix.CalcPitchYawRoll(euler1));
+
+				m_robot->m_roll = euler.m_z;
+				m_robot->m_pitch = euler.m_x;
+				m_robot->m_yaw = euler.m_y + 45.0f * ndDegreeToRad;
 			}
 
 			if (change)
@@ -526,19 +557,19 @@ namespace ndSimpleRobot
 		return model;
 	}
 
-	void AddBackgroundScene(ndDemoEntityManager* const scene, const ndMatrix& matrix)
+	void AddBackgroundScene(ndDemoEntityManager* const scene, const ndMatrix& matrix, ndFixSizeArray<ndBodyKinematic*, 16>& bodyList)
 	{
 		ndMatrix location(matrix);
 		location.m_posit.m_x += 1.5f;
 		location.m_posit.m_z += 1.5f;
-		AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f);
-		AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f);
+		bodyList.PushBack(AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f));
+		bodyList.PushBack(AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f));
 		
 		location = ndYawMatrix(90.0f * ndDegreeToRad) * location;
 		location.m_posit.m_x += 1.0f;
 		location.m_posit.m_z += 0.5f;
-		AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f);
-		AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f);
+		bodyList.PushBack(AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f));
+		bodyList.PushBack(AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f));
 	}
 }
 
@@ -553,13 +584,14 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("robot.fbx", scene));
 	ndMatrix matrix(ndYawMatrix(-90.0f * ndDegreeToRad));
 
-	AddBackgroundScene(scene, matrix);
+	ndFixSizeArray<ndBodyKinematic*, 16> backGround;
+	AddBackgroundScene(scene, matrix, backGround);
 
-	auto SpawnModel = [scene, &modelMesh, floor](const ndMatrix& matrix)
+	auto SpawnModel = [scene, &modelMesh, floor, &backGround](const ndMatrix& matrix)
 	{
 		ndWorld* const world = scene->GetWorld();
 		ndModelArticulation* const model = CreateModel(scene, *modelMesh, matrix);
-		model->SetNotifyCallback(new RobotModelNotify(model, true));
+		model->SetNotifyCallback(new RobotModelNotify(model, true, backGround));
 		model->AddToWorld(world);
 		((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
 

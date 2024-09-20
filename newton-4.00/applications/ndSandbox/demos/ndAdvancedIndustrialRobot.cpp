@@ -831,13 +831,6 @@ namespace ndAdvancedRobot
 				m_robot->m_targetLocation.m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				m_robot->m_targetLocation.m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
 				m_robot->m_targetLocation.m_y = ndReal(ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
-
-				//yaw = 0.0f;
-				//roll = 0.0f;
-				//pitch = 0.0f;
-				//m_robot->m_targetLocation.m_x = 0.0f;
-				//m_robot->m_targetLocation.m_y = 0.0f;
-				//m_robot->m_targetLocation.m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 			}
 			
 			m_robot->m_targetLocation.m_yaw = yaw;
