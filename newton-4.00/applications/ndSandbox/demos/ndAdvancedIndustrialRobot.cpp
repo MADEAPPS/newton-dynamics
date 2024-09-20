@@ -689,8 +689,7 @@ namespace ndAdvancedRobot
 			//m_targetLocation.m_x = 0.0f;
 			//m_targetLocation.m_y = 0.0f;
 			//m_targetLocation.m_azimuth = 0.0f;
-		
-			yaw = 0.0f * ndDegreeToRad;
+			//yaw = 0.0f * ndDegreeToRad;
 			//roll = 0.0f * ndDegreeToRad;
 			//pitch = 0.0f * ndDegreeToRad;
 
