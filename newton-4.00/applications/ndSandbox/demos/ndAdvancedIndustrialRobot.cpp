@@ -32,8 +32,7 @@ namespace ndAdvancedRobot
 	class ndActionVector
 	{
 		public:
-		//ndBrainFloat m_actions[6];
-		ndBrainFloat m_actions[5];
+		ndBrainFloat m_actions[6];
 	};
 
 	class ndObservationVector
@@ -618,19 +617,12 @@ namespace ndAdvancedRobot
 				hinge->SetTargetAngle(targetAngle);
 			};
 
-			//SetParamter(m_arm_0, 0);
-			//SetParamter(m_arm_1, 1);
-			//SetParamter(m_arm_2, 2);
-			//SetParamter(m_arm_3, 3);
-			//SetParamter(m_arm_4, 4);
-			//SetParamter(m_base_rotator, 5);
-
 			SetParamter(m_arm_0, 0);
 			SetParamter(m_arm_1, 1);
 			SetParamter(m_arm_2, 2);
 			SetParamter(m_arm_3, 3);
-			//SetParamter(m_arm_4, 3);
-			SetParamter(m_base_rotator, 4);
+			SetParamter(m_arm_4, 4);
+			SetParamter(m_base_rotator, 5);
 		}
 
 		void CheckModelStability()
