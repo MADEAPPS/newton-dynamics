@@ -611,9 +611,7 @@ namespace ndAdvancedRobot
 			{
 				ndFloat32 angle = hinge->GetAngle();
 				ndFloat32 deltaAngle = actions[index] * ND_ACTION_SENSITIVITY;
-				//ndFloat32 targetAngle = ndAnglesAdd (angle, deltaAngle);
 				ndFloat32 targetAngle = angle + deltaAngle;
-				//ndAssert(ndAbs(targetAngle - ndAnglesAdd(angle, deltaAngle)) < 1.0e-3f);
 				hinge->SetTargetAngle(targetAngle);
 			};
 
@@ -835,7 +833,7 @@ namespace ndAdvancedRobot
 				m_robot->m_targetLocation.m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
 				m_robot->m_targetLocation.m_y = ndReal(ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
 
-				yaw = 0.0f;
+				//yaw = 0.0f;
 				//roll = 0.0f;
 				//pitch = 0.0f;
 				//m_robot->m_targetLocation.m_x = 0.0f;

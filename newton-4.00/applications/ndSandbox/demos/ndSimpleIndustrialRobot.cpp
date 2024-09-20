@@ -348,7 +348,7 @@ namespace ndSimpleRobot
 				m_robot->m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
 				m_robot->m_y = ndReal(ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
 
-				m_robot->m_yaw = 0.0f;
+				//m_robot->m_yaw = 0.0f;
 			}
 
 			if (change)
