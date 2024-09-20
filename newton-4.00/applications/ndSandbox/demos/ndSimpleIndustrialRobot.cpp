@@ -257,7 +257,9 @@ namespace ndSimpleRobot
 
 		const ndMatrix CalculateNextTargetMatrix() const
 		{
-			return ndCalculateMatrix(CalculateTargetRotation(), CalculateTargetPosit());
+			const ndVector posit(CalculateTargetPosit());
+			const ndQuaternion rotation(CalculateTargetRotation());
+			return ndCalculateMatrix(rotation, posit);
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -379,7 +381,7 @@ namespace ndSimpleRobot
 
 				m_robot->m_roll = euler.m_z;
 				m_robot->m_pitch = euler.m_x;
-				m_robot->m_yaw = euler.m_y + 45.0f * ndDegreeToRad;
+				m_robot->m_yaw = euler.m_y + ndPi * 0.5f;
 			}
 
 			if (change)
@@ -529,7 +531,6 @@ namespace ndSimpleRobot
 						
 						const ndMatrix pivotFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
 						const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
-						
 						ndSharedPtr<ndJointBilateralConstraint> effector (new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, modelNode->m_body->GetAsBodyKinematic()));
 						
 						ndIk6DofEffector* const effectorJoint = (ndIk6DofEffector*)*effector;
@@ -560,8 +561,8 @@ namespace ndSimpleRobot
 	void AddBackgroundScene(ndDemoEntityManager* const scene, const ndMatrix& matrix, ndFixSizeArray<ndBodyKinematic*, 16>& bodyList)
 	{
 		ndMatrix location(matrix);
-		location.m_posit.m_x += 1.5f;
-		location.m_posit.m_z += 1.5f;
+		location.m_posit.m_x -= 1.0f;
+		location.m_posit.m_z += 2.5f;
 		bodyList.PushBack(AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f));
 		bodyList.PushBack(AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f));
 		
@@ -583,6 +584,7 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndMeshLoader loader;
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("robot.fbx", scene));
 	ndMatrix matrix(ndYawMatrix(-90.0f * ndDegreeToRad));
+	//ndMatrix matrix(ndYawMatrix(0.0f * ndDegreeToRad));
 
 	ndFixSizeArray<ndBodyKinematic*, 16> backGround;
 	AddBackgroundScene(scene, matrix, backGround);
@@ -604,9 +606,9 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndUIEntity> robotUI(new ndRobotUI(scene, (RobotModelNotify*)*visualModel->GetNotifyCallback()));
 	scene->Set2DDisplayRenderFunction(robotUI);
 
-	matrix.m_posit.m_x -= 5.0f;
+	matrix.m_posit.m_x -= 8.0f;
 	matrix.m_posit.m_y += 2.0f;
-	matrix.m_posit.m_z += 5.0f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 45.0f * ndDegreeToRad);
+	matrix.m_posit.m_z += 0.0f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
