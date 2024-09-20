@@ -265,6 +265,13 @@ namespace ndSimpleRobot
 						
 			const ndMatrix targetMatrix(CalculateNextTargetMatrix());
 			m_effector->SetOffsetMatrix(targetMatrix);
+
+			ndModelArticulation* const robot = GetModel()->GetAsModelArticulation();
+			ndJointHinge* xxxx4 = (ndJointHinge*)robot->FindByName("arm_4")->m_joint->GetAsBilateral();
+			ndJointHinge* xxxx3 = (ndJointHinge*)robot->FindByName("arm_3")->m_joint->GetAsBilateral();
+			ndJointHinge* xxxx2 = (ndJointHinge*)robot->FindByName("arm_2")->m_joint->GetAsBilateral();
+			ndJointHinge* xxxx1 = (ndJointHinge*)robot->FindByName("arm_1")->m_joint->GetAsBilateral();
+
 		}
 
 		void PostUpdate(ndWorld* const, ndFloat32)
@@ -340,6 +347,8 @@ namespace ndSimpleRobot
 				m_robot->m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				m_robot->m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
 				m_robot->m_y = ndReal(ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
+
+				m_robot->m_yaw = 0.0f;
 			}
 
 			if (change)
