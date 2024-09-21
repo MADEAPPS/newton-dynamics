@@ -59,8 +59,11 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	D_COLLISION_API ndShapeHeightfield(ndInt32 width, ndInt32 height, ndGridConstruction constructionMode,ndFloat32 horizontalScale_x, ndFloat32 horizontalScale_z);
 	D_COLLISION_API virtual ~ndShapeHeightfield();
 
-	ndArray<ndReal>& GetElevationMap();
-	const ndArray<ndReal>& GetElevationMap() const;
+	D_COLLISION_API ndArray<ndReal>& GetElevationMap();
+	D_COLLISION_API const ndArray<ndReal>& GetElevationMap() const;
+
+	D_COLLISION_API ndArray<ndInt8>& GetAttributeMap();
+	D_COLLISION_API const ndArray<ndInt8>& GetAttributeMap() const;
 
 	D_COLLISION_API void UpdateElevationMapAabb();
 	D_COLLISION_API void GetLocalAabb(const ndVector& p0, const ndVector& p1, ndVector& boxP0, ndVector& boxP1) const;
@@ -84,7 +87,7 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 
 	ndVector m_minBox;
 	ndVector m_maxBox;
-	ndArray<ndInt8> m_atributeMap;
+	ndArray<ndInt8> m_attributeMap;
 	ndArray<ndReal> m_elevationMap;
 	ndFloat32 m_horizontalScale_x;
 	ndFloat32 m_horizontalScale_z;
@@ -102,24 +105,5 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	friend class ndContactSolver;
 };
 
-inline ndArray<ndReal>& ndShapeHeightfield::GetElevationMap()
-{
-	return m_elevationMap;
-}
-
-inline const ndArray<ndReal>& ndShapeHeightfield::GetElevationMap() const
-{
-	return m_elevationMap;
-}
-
-inline ndInt32 ndShapeHeightfield::FastInt(ndFloat32 x) const
-{
-	ndInt32 i = ndInt32(x);
-	if (ndFloat32(i) > x) 
-	{
-		i--;
-	}
-	return i;
-}
 
 #endif

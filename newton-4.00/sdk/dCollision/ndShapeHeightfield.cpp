@@ -43,7 +43,7 @@ ndShapeHeightfield::ndShapeHeightfield(
 	:ndShapeStaticMesh(m_heightField)
 	,m_minBox(ndVector::m_zero)
 	,m_maxBox(ndVector::m_zero)
-	,m_atributeMap(width * height)
+	,m_attributeMap(width * height)
 	,m_elevationMap(width * height)
 	,m_horizontalScale_x(horizontalScale_x)
 	,m_horizontalScale_z(horizontalScale_z)
@@ -55,17 +55,49 @@ ndShapeHeightfield::ndShapeHeightfield(
 {
 	ndAssert(width >= 2);
 	ndAssert(height >= 2);
-	m_atributeMap.SetCount(width * height);
+	m_attributeMap.SetCount(width * height);
 	m_elevationMap.SetCount(width * height);
 
-	memset(&m_atributeMap[0], 0, sizeof(ndInt8) * m_atributeMap.GetCount());
-	memset(&m_elevationMap[0], 0, sizeof(ndReal) * m_elevationMap.GetCount());
+	//memset(&m_atributeMap[0], 0, sizeof(ndInt8) * m_atributeMap.GetCount());
+	//memset(&m_elevationMap[0], 0, sizeof(ndReal) * m_elevationMap.GetCount());
+	ndMemSet(&m_attributeMap[0], ndInt8(0), m_attributeMap.GetCount());
+	ndMemSet(&m_elevationMap[0], ndReal(0.0f), m_elevationMap.GetCount());
 
 	CalculateLocalObb();
 }
 
 ndShapeHeightfield::~ndShapeHeightfield(void)
 {
+}
+
+ndArray<ndReal>& ndShapeHeightfield::GetElevationMap()
+{
+	return m_elevationMap;
+}
+
+const ndArray<ndReal>& ndShapeHeightfield::GetElevationMap() const
+{
+	return m_elevationMap;
+}
+
+ndArray<ndInt8>& ndShapeHeightfield::GetAttributeMap()
+{
+	return m_attributeMap;
+}
+
+const ndArray<ndInt8>& ndShapeHeightfield::GetAttributeMap() const
+{
+	return m_attributeMap;
+}
+
+ndInt32 ndShapeHeightfield::FastInt(ndFloat32 x) const
+{
+	ndInt32 i = ndInt32(x);
+	if (ndFloat32(i) > x)
+	{
+		i--;
+	}
+	return i;
 }
 
 ndShapeInfo ndShapeHeightfield::GetShapeInfo() const
@@ -78,7 +110,7 @@ ndShapeInfo ndShapeHeightfield::GetShapeInfo() const
 	info.m_heightfield.m_horizonalScale_x = m_horizontalScale_x;
 	info.m_heightfield.m_horizonalScale_z = m_horizontalScale_z;
 	info.m_heightfield.m_elevation = (ndReal*)&m_elevationMap[0];
-	info.m_heightfield.m_atributes = (ndInt8*)&m_atributeMap[0];
+	info.m_heightfield.m_atributes = (ndInt8*)&m_attributeMap[0];
 
 	return info;
 }
@@ -405,8 +437,8 @@ ndFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify&, const ndVector& localP0,
 				// bail out at the first intersection and copy the data into the descriptor
 				ndAssert(normalOut.m_w == ndFloat32(0.0f));
 				contactOut.m_normal = normalOut.Normalize();
-				contactOut.m_shapeId0 = m_atributeMap[zIndex0 * m_width + xIndex0];
-				contactOut.m_shapeId1 = m_atributeMap[zIndex0 * m_width + xIndex0];
+				contactOut.m_shapeId0 = m_attributeMap[zIndex0 * m_width + xIndex0];
+				contactOut.m_shapeId1 = m_attributeMap[zIndex0 * m_width + xIndex0];
 	
 				return t;
 			}
@@ -568,7 +600,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 					quad.m_triangle0.m_i0 = i2;
 					quad.m_triangle0.m_i1 = i1;
 					quad.m_triangle0.m_i2 = i0;
-					quad.m_triangle0.m_material = m_atributeMap[zStep + x];
+					quad.m_triangle0.m_material = m_attributeMap[zStep + x];
 					quad.m_triangle0.m_normal = normalIndex0;
 					quad.m_triangle0.m_normal_edge01 = normalIndex0;
 					quad.m_triangle0.m_normal_edge12 = normalIndex0;
@@ -579,7 +611,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 					quad.m_triangle1.m_i0 = i1;
 					quad.m_triangle1.m_i1 = i2;
 					quad.m_triangle1.m_i2 = i3;
-					quad.m_triangle1.m_material = m_atributeMap[zStep + x];
+					quad.m_triangle1.m_material = m_attributeMap[zStep + x];
 					quad.m_triangle1.m_normal = normalIndex1;
 					quad.m_triangle1.m_normal_edge01 = normalIndex1;
 					quad.m_triangle1.m_normal_edge12 = normalIndex1;
@@ -776,7 +808,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 
 ndUnsigned64 ndShapeHeightfield::GetHash(ndUnsigned64 hash) const
 {
-	hash = ndCRC64(&m_atributeMap[0], ndInt32(m_atributeMap.GetCount()) * ndInt32(sizeof(ndInt8)), hash);
+	hash = ndCRC64(&m_attributeMap[0], ndInt32(m_attributeMap.GetCount()) * ndInt32(sizeof(ndInt8)), hash);
 	hash = ndCRC64(&m_elevationMap[0], ndInt32(m_elevationMap.GetCount()) * ndInt32(sizeof(ndReal)), hash);
 	return hash;
 }
