@@ -559,7 +559,7 @@ namespace ndAdvancedRobot
 				//return ndExp(-invRewardSigma2 * param2);
 				//ndFloat32 x = ndSqrt(param2);
 				//return ndClamp(x, ndFloat32(0.0f), ndFloat32(1.0f));
-				return param2;
+				return param2 * param2;
 			};
 
 			ndFloat32 rewardWeigh = 1.0f / 6.0f;
@@ -1100,8 +1100,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 10;
 			ndInt32 countZ = 11;
-			countX = 1;
-			countZ = 1;
+			//countX = 1;
+			//countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
