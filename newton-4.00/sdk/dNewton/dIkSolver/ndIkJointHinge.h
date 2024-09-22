@@ -35,7 +35,6 @@ class ndIkJointHinge: public ndJointHinge, public ndJointBilateralConstraint::nd
 	D_NEWTON_API void SetMaxTorque(ndFloat32 maxTorque);
 
 	protected:
-	D_NEWTON_API bool IsHolonomic(ndFloat32 timestep) const;
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
 	ndFloat32 m_maxTorque;

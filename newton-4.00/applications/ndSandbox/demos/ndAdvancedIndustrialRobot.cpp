@@ -1277,7 +1277,7 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	ndMeshLoader loader;
-	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("robot.fbx", scene));
+	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("robot_old.fbx", scene));
 	ndMatrix matrix(ndYawMatrix(-ndPi * 0.5f));
 
 #ifdef ND_TRAIN_MODEL

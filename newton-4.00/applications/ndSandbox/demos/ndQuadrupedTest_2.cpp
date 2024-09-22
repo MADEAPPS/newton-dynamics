@@ -863,31 +863,33 @@ namespace ndQuadruped_2
 		//#pragma optimize( "", off )
 		bool CalculateHolonomicReward() const
 		{
-			bool isHolonomic = true;
-			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
-			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); isHolonomic && node; node = node->GetNextIterator())
-			{
-				const ndVector veloc(node->m_body->GetVelocity());
-				const ndVector omega(node->m_body->GetOmega());
-				ndFloat32 vMag2 = veloc.DotProduct(veloc).GetScalar();
-				ndFloat32 wMag2 = omega.DotProduct(omega).GetScalar();
-				isHolonomic = isHolonomic && (vMag2 < 100.0f);
-				isHolonomic = isHolonomic && (wMag2 < 400.0f);
-			}
-			if (!isHolonomic)
-			{
-				// catastrophic penalty,  results in a immediate kill.
-				ndMemSet(m_controllerTrainer->m_rewardsMemories, 0.0f, sizeof(m_controllerTrainer->m_rewardsMemories) / sizeof(m_controllerTrainer->m_rewardsMemories[0]));
-			}
-			
-			for (ndInt32 i = 0; isHolonomic && (i < m_animPose.GetCount()); ++i)
-			{
-				const ndEffectorInfo* const info = &m_effectorsInfo[i];
-				const ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
-				bool holonomic = effector->IsHolonomic(m_timestep);
-				isHolonomic = isHolonomic && holonomic;
-			}
-			return isHolonomic;
+			ndAssert(0);
+			return false;
+			//bool isHolonomic = true;
+			//const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			//for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); isHolonomic && node; node = node->GetNextIterator())
+			//{
+			//	const ndVector veloc(node->m_body->GetVelocity());
+			//	const ndVector omega(node->m_body->GetOmega());
+			//	ndFloat32 vMag2 = veloc.DotProduct(veloc).GetScalar();
+			//	ndFloat32 wMag2 = omega.DotProduct(omega).GetScalar();
+			//	isHolonomic = isHolonomic && (vMag2 < 100.0f);
+			//	isHolonomic = isHolonomic && (wMag2 < 400.0f);
+			//}
+			//if (!isHolonomic)
+			//{
+			//	// catastrophic penalty,  results in a immediate kill.
+			//	ndMemSet(m_controllerTrainer->m_rewardsMemories, 0.0f, sizeof(m_controllerTrainer->m_rewardsMemories) / sizeof(m_controllerTrainer->m_rewardsMemories[0]));
+			//}
+			//
+			//for (ndInt32 i = 0; isHolonomic && (i < m_animPose.GetCount()); ++i)
+			//{
+			//	const ndEffectorInfo* const info = &m_effectorsInfo[i];
+			//	const ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*info->m_effector;
+			//	bool holonomic = effector->IsHolonomic(m_timestep);
+			//	isHolonomic = isHolonomic && holonomic;
+			//}
+			//return isHolonomic;
 		}
 
 		ndReal GetReward() const
@@ -951,45 +953,46 @@ namespace ndQuadruped_2
 
 		void GetObservation(ndBrainFloat* const inputObservations)
 		{
+			ndAssert(0);
 			ndMemSet(inputObservations, 0.0f, ND_AGENT_INPUT_SIZE);
-			ndObservationVector& observation = *((ndObservationVector*)inputObservations);
-			for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
-			{
-				const ndAnimKeyframe& keyFrame = m_animPose[i];
-				const ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
-
-				ndInt32 paramCount = 0;
-				ndJointBilateralConstraint::ndKinematicState kinematicState[16];
-				paramCount += info->m_thigh->GetKinematicState(&kinematicState[paramCount]);
-				paramCount += info->m_calf->GetKinematicState(&kinematicState[paramCount]);
-				paramCount += info->m_foot->GetKinematicState(&kinematicState[paramCount]);
-				for (ndInt32 j = 0; j < paramCount; ++j)
-				{
-					observation.m_legs[i].m_state[j * 2 + 0] = ndBrainFloat(kinematicState[j].m_posit);
-					observation.m_legs[i].m_state[j * 2 + 1] = ndBrainFloat(kinematicState[j].m_velocity);
-				}
-
-				const ndVector& posit = keyFrame.m_posit;
-				observation.m_legs[i].m_posit.m_x = ndReal (posit.m_x);
-				observation.m_legs[i].m_posit.m_y = ndReal (posit.m_y);
-				observation.m_legs[i].m_posit.m_z = ndReal (posit.m_z);
-
-				observation.m_legs[i].m_prevPosit.m_x = ndReal (m_animPrevPose[i].m_x);
-				observation.m_legs[i].m_prevPosit.m_y = ndReal (m_animPrevPose[i].m_y);
-				observation.m_legs[i].m_prevPosit.m_z = ndReal (m_animPrevPose[i].m_z);
-
-				m_animPrevPose[i] = posit;
-
-				ndBrainFloat contactDist = FindContactDist(i);
-				bool isHolonomic = info->m_effector->IsHolonomic(m_timestep);
-				observation.m_legs[i].m_hasContact = contactDist;
-				observation.m_legs[i].m_isHolonomic = ndBrainFloat(isHolonomic ? 0.0f : 1.0f);
-				observation.m_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamFloat);
-			}
-
-			observation.m_torso_x = m_control->m_x;
-			observation.m_torso_z = m_control->m_z;
-			observation.m_animSpeed = m_control->m_animSpeed;
+			//ndObservationVector& observation = *((ndObservationVector*)inputObservations);
+			//for (ndInt32 i = 0; i < m_animPose.GetCount(); ++i)
+			//{
+			//	const ndAnimKeyframe& keyFrame = m_animPose[i];
+			//	const ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
+			//
+			//	ndInt32 paramCount = 0;
+			//	ndJointBilateralConstraint::ndKinematicState kinematicState[16];
+			//	paramCount += info->m_thigh->GetKinematicState(&kinematicState[paramCount]);
+			//	paramCount += info->m_calf->GetKinematicState(&kinematicState[paramCount]);
+			//	paramCount += info->m_foot->GetKinematicState(&kinematicState[paramCount]);
+			//	for (ndInt32 j = 0; j < paramCount; ++j)
+			//	{
+			//		observation.m_legs[i].m_state[j * 2 + 0] = ndBrainFloat(kinematicState[j].m_posit);
+			//		observation.m_legs[i].m_state[j * 2 + 1] = ndBrainFloat(kinematicState[j].m_velocity);
+			//	}
+			//
+			//	const ndVector& posit = keyFrame.m_posit;
+			//	observation.m_legs[i].m_posit.m_x = ndReal (posit.m_x);
+			//	observation.m_legs[i].m_posit.m_y = ndReal (posit.m_y);
+			//	observation.m_legs[i].m_posit.m_z = ndReal (posit.m_z);
+			//
+			//	observation.m_legs[i].m_prevPosit.m_x = ndReal (m_animPrevPose[i].m_x);
+			//	observation.m_legs[i].m_prevPosit.m_y = ndReal (m_animPrevPose[i].m_y);
+			//	observation.m_legs[i].m_prevPosit.m_z = ndReal (m_animPrevPose[i].m_z);
+			//
+			//	m_animPrevPose[i] = posit;
+			//
+			//	ndBrainFloat contactDist = FindContactDist(i);
+			//	bool isHolonomic = info->m_effector->IsHolonomic(m_timestep);
+			//	observation.m_legs[i].m_hasContact = contactDist;
+			//	observation.m_legs[i].m_isHolonomic = ndBrainFloat(isHolonomic ? 0.0f : 1.0f);
+			//	observation.m_legs[i].m_animSequence = ndBrainFloat(keyFrame.m_userParamFloat);
+			//}
+			//
+			//observation.m_torso_x = m_control->m_x;
+			//observation.m_torso_z = m_control->m_z;
+			//observation.m_animSpeed = m_control->m_animSpeed;
 		}
 
 		void ApplyActions(const ndBrainFloat* const actions)

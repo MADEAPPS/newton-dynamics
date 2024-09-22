@@ -253,6 +253,7 @@ ndInt32 ndJointHinge::GetKinematicState(ndKinematicState* const state) const
 
 void ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
+	m_hitLimits = false;
 	if (m_limitState)
 	{
 		if ((m_minLimit > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_maxLimit < (ndFloat32(1.0f) * ndDegreeToRad)))
@@ -264,6 +265,7 @@ void ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& mat
 			const ndFloat32 angle = m_angle + m_omega * desc.m_timestep;
 			if (angle < m_minLimit)
 			{
+				m_hitLimits = true;
 				AddAngularRowJacobian(desc, &matrix0.m_front[0], ndFloat32(0.0f));
 				const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 				const ndFloat32 penetration = angle - m_minLimit;
@@ -273,6 +275,7 @@ void ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& mat
 			}
 			else if (angle > m_maxLimit)
 			{
+				m_hitLimits = true;
 				AddAngularRowJacobian(desc, &matrix0.m_front[0], ndFloat32(0.0f));
 				const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 				const ndFloat32 penetration = angle - m_maxLimit;

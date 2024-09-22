@@ -48,31 +48,6 @@ void ndIkJointHinge::SetMaxTorque(ndFloat32 maxTorque)
 	m_maxTorque = ndAbs(maxTorque);
 }
 
-bool ndIkJointHinge::IsHolonomic(ndFloat32 timestep) const
-{
-	if (m_limitState)
-	{
-		if ((m_minLimit > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_maxLimit < (ndFloat32(1.0f) * ndDegreeToRad)))
-		{
-			ndAssert(0);
-			return false;
-		}
-		else
-		{
-			const ndFloat32 angle = m_angle + m_omega * timestep;
-			if (angle < m_minLimit)
-			{
-				return false;
-			}
-			else if (angle > m_maxLimit)
-			{
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
 void ndIkJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;

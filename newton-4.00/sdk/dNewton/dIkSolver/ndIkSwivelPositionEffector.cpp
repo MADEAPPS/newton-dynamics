@@ -255,26 +255,6 @@ ndInt32 ndIkSwivelPositionEffector::GetKinematicState(ndKinematicState* const st
 	return 4;
 }
 
-bool ndIkSwivelPositionEffector::IsHolonomic(ndFloat32 timestep) const
-{
-	ndAssert(m_body0->GetSkeleton());
-
-	bool isHolonomic = true;
-	const ndSkeletonContainer* const skeleton = m_body0->GetSkeleton();
-	if (skeleton)
-	{
-		const ndSkeletonContainer::ndNode* const effectorNode = skeleton->GetNodeList().FindNode(m_body0);
-		ndAssert(effectorNode);
-
-		isHolonomic = true;
-		for (const ndSkeletonContainer::ndNode* node = effectorNode; isHolonomic && node && (node->m_body != m_body1); node = node->m_parent)
-		{
-			isHolonomic = isHolonomic && node->m_joint->IsHolonomic(timestep);
-		}
-	}
-	return isHolonomic;
-}
-
 ndFloat32 ndIkSwivelPositionEffector::CalculateLookAtSwivelAngle(const ndVector& upDir) const
 {
 	ndFloat32 swivelAngle = GetSwivelAngle();

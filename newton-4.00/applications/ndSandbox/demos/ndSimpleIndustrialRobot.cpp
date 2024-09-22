@@ -56,10 +56,10 @@ namespace ndSimpleRobot
 		{ "effector", ndDefinition::m_effector , 0.0f, 0.0f, 0.0f},
 	};
 
-	#define ND_MIN_X_SPAND			ndReal (-1.5f)
-	#define ND_MAX_X_SPAND			ndReal ( 1.5f)
-	#define ND_MIN_Y_SPAND			ndReal (-2.2f)
-	#define ND_MAX_Y_SPAND			ndReal ( 1.5f)
+	#define ND_MIN_X_SPAND	ndReal (-2.2f)
+	#define ND_MAX_X_SPAND	ndReal ( 1.5f)
+	#define ND_MIN_Z_SPAND	ndReal (-1.5f)
+	#define ND_MAX_Z_SPAND	ndReal ( 1.5f)
 
 	class ndRobotBodyNotify : public ndDemoEntityNotify
 	{
@@ -95,7 +95,7 @@ namespace ndSimpleRobot
 			,m_effectorReference(ndGetIdentityMatrix())
 			,m_world(nullptr)
 			,m_x(0.0f)
-			,m_y(0.0f)
+			,m_z(0.0f)
 			,m_azimuth(0.0f)
 			,m_yaw(0.0f)
 			,m_pitch(0.0f)
@@ -143,6 +143,9 @@ namespace ndSimpleRobot
 			m_rightGripper = (ndJointSlider*)robot->FindByName("rightGripper")->m_joint->GetAsBilateral();
 			m_effector = (ndIk6DofEffector*)robot->FindLoopByName("effector")->m_joint->GetAsBilateral();
 
+			m_baseLimitJoint = (ndJointHinge*)robot->FindByName("arm_0")->m_joint->GetAsBilateral();
+			m_elbowLimitJoint = (ndJointHinge*)robot->FindByName("arm_1")->m_joint->GetAsBilateral();
+
 			ndBodyDynamic* const rootBody = robot->GetRoot()->m_body->GetAsBodyDynamic();
 			ndDemoEntity* const rootEntity = (ndDemoEntity*)rootBody->GetNotifyCallback()->GetUserData();
 			ndDemoEntity* const effectorEntity = rootEntity->Find("effector");
@@ -163,13 +166,14 @@ namespace ndSimpleRobot
 		ndMatrix CalculateTargetMatrix() const
 		{
 			ndFloat32 x = m_x + m_effectorReference.m_posit.m_x;
-			ndFloat32 y = m_y + m_effectorReference.m_posit.m_y;
-			ndFloat32 z = m_effectorReference.m_posit.m_z;
+			ndFloat32 y = m_effectorReference.m_posit.m_y;
+			ndFloat32 z = m_z + m_effectorReference.m_posit.m_z;
 
-			const ndMatrix aximuthMatrix(ndYawMatrix(m_azimuth));
+			const ndMatrix aximuthMatrix(ndPitchMatrix(m_azimuth));
 			const ndVector localPosit(ndVector::m_wOne + aximuthMatrix.RotateVector(ndVector(x, y, z, ndFloat32(1.0f))));
 
 			ndMatrix targetMatrix(ndPitchMatrix(m_pitch) * ndYawMatrix(m_yaw) * ndRollMatrix(m_roll));
+
 			targetMatrix.m_posit = localPosit;
 			return targetMatrix;
 		}
@@ -194,59 +198,77 @@ namespace ndSimpleRobot
 		const ndVector CalculateTargetPosit() const
 		{
 			const ndMatrix currentEffectorMatrix(m_effector->GetEffectorMatrix());
-
+			
 			// intepolate in local space;
-			ndFloat32 azimuth = -ndAtan2(currentEffectorMatrix.m_posit.m_z, currentEffectorMatrix.m_posit.m_x);
-
-			const ndVector localPosit(ndYawMatrix(-azimuth).RotateVector(currentEffectorMatrix.m_posit) - m_effectorReference.m_posit);
-
+			ndFloat32 azimuth = -ndAtan2(currentEffectorMatrix.m_posit.m_y, currentEffectorMatrix.m_posit.m_z);
+			
+			const ndVector localPosit(ndPitchMatrix(-azimuth).RotateVector(currentEffectorMatrix.m_posit) - m_effectorReference.m_posit);
+			
 			// move on the plane with constant speed
 			ndFloat32 planeSpeed = 0.05f;
 			ndFloat32 dx = m_x - localPosit.m_x;
-			ndFloat32 dy = m_y - localPosit.m_y;
-			ndFloat32 mag = ndSqrt(dx * dx + dy * dy);
+			ndFloat32 dz = m_z - localPosit.m_z;
+			ndFloat32 mag = ndSqrt(dx * dx + dz * dz);
 			ndFloat32 invPositMag = 1.0f;
 			if (mag > planeSpeed)
 			{
 				invPositMag = planeSpeed / mag;
 			}
 			ndFloat32 x = localPosit.m_x + dx * invPositMag;
-			ndFloat32 y = localPosit.m_y + dy * invPositMag;
-
-			ndFloat32 azimuthSpeed = 3.0f * ndDegreeToRad;
+			ndFloat32 z = localPosit.m_z + dz * invPositMag;
+			
+			ndFloat32 azimuthSpeed = 5.0f * ndDegreeToRad;
 			ndFloat32 deltaAzimuth = ndAnglesSub(m_azimuth, azimuth);
 			if (ndAbs(deltaAzimuth) > azimuthSpeed)
 			{
 				deltaAzimuth = azimuthSpeed * ndSign(deltaAzimuth);
 			}
 			ndFloat32 angle = azimuth + deltaAzimuth;
-
+			
 			// now calculate the in between matrix;
 			ndFloat32 x1 = x + m_effectorReference.m_posit.m_x;
-			ndFloat32 y1 = y + m_effectorReference.m_posit.m_y;
-			ndFloat32 z1 = m_effectorReference.m_posit.m_z;
-
-			const ndMatrix azimuthMatrix1(ndYawMatrix(angle));
-			return ndVector::m_wOne + azimuthMatrix1.RotateVector(ndVector(x1, y1, z1, ndFloat32(1.0f)));
+			ndFloat32 y1 = m_effectorReference.m_posit.m_y;
+			ndFloat32 z1 = z + m_effectorReference.m_posit.m_z;
+			
+			const ndMatrix azimuthMatrix1(ndPitchMatrix(angle));
+			const ndVector posit(ndVector::m_wOne + azimuthMatrix1.RotateVector(ndVector(x1, y1, z1, ndFloat32(1.0f))));
+			return posit;
 		}
 
 		const ndQuaternion CalculateTargetRotation() const
 		{
 			const ndMatrix currentEffectorMatrix(m_effector->GetEffectorMatrix());
+			const ndQuaternion currentRotation(currentEffectorMatrix);
+
 			const ndMatrix targetMatrix(ndPitchMatrix(m_pitch) * ndYawMatrix(m_yaw) * ndRollMatrix(m_roll));
-			const ndQuaternion targetRotation(targetMatrix);
-			ndQuaternion currentRotation(currentEffectorMatrix);
+#if 0
+			ndQuaternion targetRotation(targetMatrix);
+#else
+			ndQuaternion targetRotation(currentRotation);
+			ndFloat32 angleCos = currentEffectorMatrix.m_front.DotProduct(targetMatrix.m_front).GetScalar();
+			if (angleCos < 0.999f)
+			{
+				ndFloat32 angle = ndAcos(angleCos);
+				ndVector pin(currentEffectorMatrix.m_front.CrossProduct(targetMatrix.m_front).Normalize());
+				targetRotation = currentRotation * ndQuaternion(pin, angle);
+				//ndQuaternion targetRotation2(targetMatrix);
+				//ndQuaternion targetRotation3(targetMatrix);
+				//ndMatrix xxxx(ndCalculateMatrix(targetRotation));
+				//ndMatrix xxxx1(targetMatrix * xxxx);
+				//ndMatrix xxxx2(targetMatrix * xxxx);
+			}
+#endif
 			if (currentRotation.DotProduct(targetRotation).GetScalar() < 0.0f)
 			{
-				currentRotation = currentRotation.Scale(-1.0f);
+				targetRotation = targetRotation.Scale(-1.0f);
 			}
-
-			ndQuaternion rotation(targetMatrix);
 
 			ndVector omega(currentRotation.CalcAverageOmega(targetRotation, 1.0f));
 			ndFloat32 omegaMag = ndSqrt(omega.DotProduct(omega).GetScalar());
 
 			ndFloat32 omegaSpeed = 5.0f * ndDegreeToRad;
+
+			ndQuaternion rotation(targetRotation);
 			if (omegaMag > omegaSpeed)
 			{
 				omega = omega.Normalize().Scale(omegaSpeed);
@@ -267,9 +289,18 @@ namespace ndSimpleRobot
 			m_world = world;
 			m_timestep = timestep;
 
+			if (m_baseLimitJoint->GetJointHitLimits() || m_elbowLimitJoint->GetJointHitLimits())
+			{
+				const ndMatrix currentEffectorMatrix(m_effector->GetEffectorMatrix());
+				m_azimuth = -ndAtan2(currentEffectorMatrix.m_posit.m_y, currentEffectorMatrix.m_posit.m_z);
+				const ndVector localPosit(ndPitchMatrix(-m_azimuth).RotateVector(currentEffectorMatrix.m_posit) - m_effectorReference.m_posit);
+				m_x = localPosit.m_x;
+				m_z = localPosit.m_z;
+			}
+
 			m_leftGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
 			m_rightGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
-						
+
 			const ndMatrix targetMatrix(CalculateNextTargetMatrix());
 			m_effector->SetOffsetMatrix(targetMatrix);
 
@@ -295,12 +326,15 @@ namespace ndSimpleRobot
 		ndBodyDynamic* m_rootBody;
 		ndJointSlider* m_leftGripper;
 		ndJointSlider* m_rightGripper;
+		ndJointHinge* m_baseLimitJoint;
+		ndJointHinge* m_elbowLimitJoint;
 		ndIk6DofEffector* m_effector;
+
 		ndWorld* m_world;
 		ndFixSizeArray<ndBodyKinematic*, 16> m_backGround;
 
 		ndReal m_x;
-		ndReal m_y;
+		ndReal m_z;
 		ndReal m_azimuth;
 		ndReal m_yaw;
 		ndReal m_pitch;
@@ -335,13 +369,15 @@ namespace ndSimpleRobot
 			m_scene->Print(color, "Control panel");
 
 			ndInt8 change = 0;
-			change = change | ndInt8(ImGui::SliderFloat("x", &m_robot->m_x, ND_MIN_X_SPAND, ND_MAX_X_SPAND));
-			change = change | ndInt8(ImGui::SliderFloat("y", &m_robot->m_y, ND_MIN_Y_SPAND, ND_MAX_Y_SPAND));
+			change = change | ndInt8(ImGui::SliderFloat("y", &m_robot->m_x, ND_MIN_X_SPAND, ND_MAX_X_SPAND));
+			change = change | ndInt8(ImGui::SliderFloat("z", &m_robot->m_z, ND_MIN_Z_SPAND, ND_MAX_Z_SPAND));
 			change = change | ndInt8(ImGui::SliderFloat("azimuth", &m_robot->m_azimuth, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("pitch", &m_robot->m_pitch, -ndPi, ndPi));
-			change = change | ndInt8(ImGui::SliderFloat("yaw", &m_robot->m_yaw, -ndPi, ndPi));
-			change = change | ndInt8(ImGui::SliderFloat("roll", &m_robot->m_roll, -ndPi * 0.35f, ndPi * 0.9f));
+			change = change | ndInt8(ImGui::SliderFloat("yaw", &m_robot->m_yaw, -ndPi * 0.35f, ndPi * 0.8f));
+			change = change | ndInt8(ImGui::SliderFloat("roll", &m_robot->m_roll, -ndPi, ndPi));
 			change = change | ndInt8(ImGui::SliderFloat("gripper", &m_robot->m_gripperPosit, -0.2f, 0.4f));
+
+			//m_robot->m_azimuth = 60.0f * ndDegreeToRad;
 
 			bool newTarget = ndInt8(ImGui::Button("random target"));
 			if (newTarget)
@@ -349,39 +385,42 @@ namespace ndSimpleRobot
 				change = 1;
 
 				m_robot->m_pitch = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
-				m_robot->m_yaw = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
-				m_robot->m_roll = ndReal(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
+				m_robot->m_roll = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
+				m_robot->m_yaw = ndReal(-ndPi * 0.35f + ndRand() * (ndPi * 0.8f - (-ndPi * 0.35f)));
 
 				m_robot->m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 				m_robot->m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
-				m_robot->m_y = ndReal(ND_MIN_Y_SPAND + ndRand() * (ND_MAX_Y_SPAND - ND_MIN_Y_SPAND));
+				m_robot->m_z = ndReal(ND_MIN_Z_SPAND + ndRand() * (ND_MAX_Z_SPAND - ND_MIN_Z_SPAND));
 			}
 
 			bool newBoxTarget = ndInt8(ImGui::Button("random box target"));
 			if (newBoxTarget)
 			{
 				change = 1;
-
+				
 				ndInt32 index = ndInt32 (ndRandInt() % 4);
 				ndBodyKinematic* const body = m_robot->m_backGround[index];
 				const ndMatrix baseMatrix(m_robot->m_effector->CalculateGlobalBaseMatrix1());
-				ndMatrix matrix(body->GetMatrix() * baseMatrix.OrthoInverse());
-				matrix.m_posit.m_y += 0.75f;
 
+				ndMatrix bodyMatrix(ndGramSchmidtMatrix(ndVector(0.0f, 1.0f, 0.0f, 0.0f)));
+				bodyMatrix.m_posit = body->GetMatrix().m_posit;
+				ndMatrix matrix(bodyMatrix * baseMatrix.OrthoInverse());
+				matrix.m_posit.m_x += 0.5f;
+				
 				// intepolate in local space;
-				ndFloat32 azimuth = -ndAtan2(matrix.m_posit.m_z, matrix.m_posit.m_x);
-				const ndVector localPosit(ndYawMatrix(-azimuth).RotateVector(matrix.m_posit) - m_robot->m_effectorReference.m_posit);
-
+				ndFloat32 azimuth = -ndAtan2(matrix.m_posit.m_y, matrix.m_posit.m_z);
+				const ndVector localPosit(ndPitchMatrix(-azimuth).RotateVector(matrix.m_posit) - m_robot->m_effectorReference.m_posit);
+				
 				m_robot->m_azimuth = azimuth;
 				m_robot->m_x = localPosit.m_x;
-				m_robot->m_y = localPosit.m_y;
+				m_robot->m_z = localPosit.m_z;
 
 				ndVector euler1;
 				ndVector euler(matrix.CalcPitchYawRoll(euler1));
-
+				
+				m_robot->m_yaw = euler.m_y;
 				m_robot->m_roll = euler.m_z;
 				m_robot->m_pitch = euler.m_x;
-				m_robot->m_yaw = euler.m_y + ndPi * 0.5f;
 			}
 
 			if (change)
