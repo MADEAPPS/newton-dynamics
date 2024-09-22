@@ -24,7 +24,7 @@
 
 namespace ndAdvancedRobot
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach"
 
 	//#define CONTROLLER_RESUME_TRAINING
