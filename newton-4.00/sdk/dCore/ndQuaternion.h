@@ -52,7 +52,6 @@ class ndQuaternion: public ndVector
 	D_CORE_API ndQuaternion Slerp(const ndQuaternion &q1, ndFloat32 t) const;
 	D_CORE_API ndVector CalcAverageOmega(const ndQuaternion &q1, ndFloat32 invdt) const;
 	D_CORE_API ndQuaternion IntegrateOmega(const ndVector& omega, ndFloat32 timestep) const;
-
 };
 
 inline ndQuaternion::ndQuaternion()

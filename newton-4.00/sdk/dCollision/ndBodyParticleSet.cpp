@@ -20,8 +20,6 @@
 */
 
 #include "ndCoreStdafx.h"
-#include "ndNewtonStdafx.h"
-#include "ndWorld.h"
 #include "ndBodyParticleSet.h"
 
 ndBodyParticleSet::ndBodyParticleSet()

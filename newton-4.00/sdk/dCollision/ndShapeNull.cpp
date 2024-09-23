@@ -105,3 +105,4 @@ ndUnsigned64 ndShapeNull::GetHash(ndUnsigned64) const
 {
 	return 12345678;
 }
+

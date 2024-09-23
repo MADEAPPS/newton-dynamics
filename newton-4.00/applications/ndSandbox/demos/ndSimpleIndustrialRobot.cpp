@@ -173,7 +173,6 @@ namespace ndSimpleRobot
 			const ndVector localPosit(ndVector::m_wOne + aximuthMatrix.RotateVector(ndVector(x, y, z, ndFloat32(1.0f))));
 
 			ndMatrix targetMatrix(ndPitchMatrix(m_pitch) * ndYawMatrix(m_yaw) * ndRollMatrix(m_roll));
-
 			targetMatrix.m_posit = localPosit;
 			return targetMatrix;
 		}
@@ -241,7 +240,7 @@ namespace ndSimpleRobot
 			const ndQuaternion currentRotation(currentEffectorMatrix);
 
 			const ndMatrix targetMatrix(ndPitchMatrix(m_pitch) * ndYawMatrix(m_yaw) * ndRollMatrix(m_roll));
-#if 0
+#if 1
 			ndQuaternion targetRotation(targetMatrix);
 #else
 			ndQuaternion targetRotation(currentRotation);
@@ -281,7 +280,8 @@ namespace ndSimpleRobot
 		{
 			const ndVector posit(CalculateTargetPosit());
 			const ndQuaternion rotation(CalculateTargetRotation());
-			return ndCalculateMatrix(rotation, posit);
+			const ndMatrix matrix(ndCalculateMatrix(rotation, posit));
+			return matrix;
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -622,7 +622,7 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	ndMeshLoader loader;
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("robot.fbx", scene));
-	ndMatrix matrix(ndYawMatrix(-90.0f * ndDegreeToRad));
+	ndMatrix matrix(ndYawMatrix(-ndPi * 0.5f));
 	//ndMatrix matrix(ndYawMatrix(0.0f * ndDegreeToRad));
 
 	ndFixSizeArray<ndBodyKinematic*, 16> backGround;

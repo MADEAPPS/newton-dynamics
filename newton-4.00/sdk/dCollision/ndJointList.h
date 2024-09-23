@@ -25,6 +25,7 @@
 #include "ndCoreStdafx.h"
 
 class ndJointBilateralConstraint;
+
 class ndJointList: public ndList<ndSharedPtr<ndJointBilateralConstraint>, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>
 {
 	public:

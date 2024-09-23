@@ -58,8 +58,6 @@ ndShapeHeightfield::ndShapeHeightfield(
 	m_attributeMap.SetCount(width * height);
 	m_elevationMap.SetCount(width * height);
 
-	//memset(&m_atributeMap[0], 0, sizeof(ndInt8) * m_atributeMap.GetCount());
-	//memset(&m_elevationMap[0], 0, sizeof(ndReal) * m_elevationMap.GetCount());
 	ndMemSet(&m_attributeMap[0], ndInt8(0), m_attributeMap.GetCount());
 	ndMemSet(&m_elevationMap[0], ndReal(0.0f), m_elevationMap.GetCount());
 
@@ -68,6 +66,21 @@ ndShapeHeightfield::ndShapeHeightfield(
 
 ndShapeHeightfield::~ndShapeHeightfield(void)
 {
+}
+
+ndShapeInfo ndShapeHeightfield::GetShapeInfo() const
+{
+	ndShapeInfo info(ndShapeStaticMesh::GetShapeInfo());
+
+	info.m_heightfield.m_width = m_width;
+	info.m_heightfield.m_height = m_height;
+	info.m_heightfield.m_gridsDiagonals = m_diagonalMode;
+	info.m_heightfield.m_horizonalScale_x = m_horizontalScale_x;
+	info.m_heightfield.m_horizonalScale_z = m_horizontalScale_z;
+	info.m_heightfield.m_elevation = (ndReal*)&m_elevationMap[0];
+	info.m_heightfield.m_atributes = (ndInt8*)&m_attributeMap[0];
+
+	return info;
 }
 
 ndArray<ndReal>& ndShapeHeightfield::GetElevationMap()
@@ -98,21 +111,6 @@ ndInt32 ndShapeHeightfield::FastInt(ndFloat32 x) const
 		i--;
 	}
 	return i;
-}
-
-ndShapeInfo ndShapeHeightfield::GetShapeInfo() const
-{
-	ndShapeInfo info(ndShapeStaticMesh::GetShapeInfo());
-
-	info.m_heightfield.m_width = m_width;
-	info.m_heightfield.m_height = m_height;
-	info.m_heightfield.m_gridsDiagonals = m_diagonalMode;
-	info.m_heightfield.m_horizonalScale_x = m_horizontalScale_x;
-	info.m_heightfield.m_horizonalScale_z = m_horizontalScale_z;
-	info.m_heightfield.m_elevation = (ndReal*)&m_elevationMap[0];
-	info.m_heightfield.m_atributes = (ndInt8*)&m_attributeMap[0];
-
-	return info;
 }
 
 void ndShapeHeightfield::CalculateLocalObb()
