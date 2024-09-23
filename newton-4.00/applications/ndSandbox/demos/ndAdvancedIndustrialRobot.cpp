@@ -43,6 +43,7 @@ namespace ndAdvancedRobot
 		ndBrainFloat m_jointVeloc[6];
 
 		ndBrainFloat m_collided;
+		ndBrainFloat m_hitLimit;
 
 		// distance to target error.
 		ndBrainFloat m_delta_x;
@@ -563,30 +564,21 @@ namespace ndAdvancedRobot
 				return ndClamp(ndFloat32(1.0f - x), ndFloat32(0.0f), ndFloat32(1.0f));
 			};
 
-			auto GaussianReward = [](ndFloat32 param2)
+			auto GaussianReward = [](ndFloat32 param)
 			{
 				//ndFloat32 invRewardSigma2 = 500.0f;
 				//return ndExp(-invRewardSigma2 * param2);
-				return param2 * param2;
+				return param * param * param * param;
 			};
 
 			ndFloat32 rewardWeigh = 1.0f / 4.0f;
 			ndFloat32 posit_xReward = rewardWeigh * ScalarReward(positError2.m_x);
-			ndFloat32 posit_yReward = rewardWeigh * ScalarReward(positError2.m_y);
-			ndFloat32 azimuthReward = rewardWeigh * ScalarReward(positError2.m_z);
+			ndFloat32 posit_zReward = rewardWeigh * ScalarReward(positError2.m_z);
+			ndFloat32 azimuthReward = rewardWeigh * ScalarReward(positError2.m_w);
 
-			//const ndMatrix targetMatrix(ndPitchMatrix(m_targetLocation.m_pitch) * ndYawMatrix(m_targetLocation.m_yaw) * ndRollMatrix(m_targetLocation.m_roll));
-			//const ndQuaternion targetRotation(targetMatrix);
-			//ndQuaternion currentRotation(currentEffectorMatrix);
-			//if (currentRotation.DotProduct(targetRotation).GetScalar() < 0.0f)
-			//{
-			//	currentRotation = currentRotation.Scale(-1.0f);
-			//}
-			//ndFloat32 rotationError2 = currentRotation.DotProduct(targetRotation).GetScalar();
-			//ndFloat32 angularReward = 0.25f * GaussianReward(rotationError2);
 			ndFloat32 angleError = CalculateDeltaTargetRotation(currentEffectorMatrix);
 			ndFloat32 angularReward = rewardWeigh * GaussianReward((angleError + 1.0f) * 0.5f);
-			return angularReward + posit_xReward + posit_yReward + azimuthReward;
+			return angularReward + posit_xReward + posit_zReward + azimuthReward;
 		}
 
 		#pragma optimize( "", off )
@@ -602,7 +594,10 @@ namespace ndAdvancedRobot
 				observation->m_jointPosit[i] = ndBrainFloat(kinematicState.m_posit);
 				observation->m_jointVeloc[i] = ndBrainFloat(kinematicState.m_velocity);
 			}
-					
+
+			bool hitaLimit = m_arm_0->GetJointHitLimits() || m_arm_1->GetJointHitLimits();
+			
+			observation->m_hitLimit = ndBrainFloat (hitaLimit ? 1.0 : 0.0f);
 			observation->m_collided = ndBrainFloat(ModelCollided() ? 1.0f : 0.0f);
 
 			const ndMatrix effectorMatrix(m_effectorLocalTarget * m_arm_4->GetBody0()->GetMatrix());
