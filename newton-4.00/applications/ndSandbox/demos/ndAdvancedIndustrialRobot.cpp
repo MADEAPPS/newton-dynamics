@@ -1084,8 +1084,8 @@ namespace ndAdvancedRobot
 				return model;
 			};
 
-			ndInt32 countX = 10;
-			ndInt32 countZ = 11;
+			ndInt32 countX = 22;
+			ndInt32 countZ = 23;
 			//countX = 1;
 			//countZ = 1;
 
