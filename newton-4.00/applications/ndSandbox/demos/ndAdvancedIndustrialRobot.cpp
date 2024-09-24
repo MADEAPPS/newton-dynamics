@@ -49,7 +49,9 @@ namespace ndAdvancedRobot
 		ndBrainFloat m_delta_x;
 		ndBrainFloat m_delta_z;
 		ndBrainFloat m_deltaAzimuth;
-		ndBrainFloat m_deltaRotation;
+		//ndBrainFloat m_deltaRotation;
+		ndBrainFloat m_sourcePin[3];
+		ndBrainFloat m_targetPin[3];
 	};
 
 	class ndControlParameters
@@ -579,6 +581,7 @@ namespace ndAdvancedRobot
 			ndFloat32 angleError = CalculateDeltaTargetRotation(currentEffectorMatrix);
 			ndFloat32 angularReward = rewardWeigh * GaussianReward((angleError + 1.0f) * 0.5f);
 			return angularReward + posit_xReward + posit_zReward + azimuthReward;
+			//return GaussianReward((angleError + 1.0f) * 0.5f);;
 		}
 
 		#pragma optimize( "", off )
@@ -608,8 +611,16 @@ namespace ndAdvancedRobot
 			observation->m_delta_z = ndBrainFloat(positError.m_z);
 			observation->m_deltaAzimuth = ndBrainFloat(positError.m_w);
 
-			ndFloat32 angleError(CalculateDeltaTargetRotation(currentEffectorMatrix));
-			observation->m_deltaRotation = ndBrainFloat(angleError);
+			//ndFloat32 angleError(CalculateDeltaTargetRotation(currentEffectorMatrix));
+			//observation->m_deltaRotation = ndBrainFloat(angleError);
+			observation->m_sourcePin[0] = ndBrainFloat(currentEffectorMatrix.m_front.m_x);
+			observation->m_sourcePin[1] = ndBrainFloat(currentEffectorMatrix.m_front.m_y);
+			observation->m_sourcePin[2] = ndBrainFloat(currentEffectorMatrix.m_front.m_z);
+
+			const ndMatrix targetMatrix(ndPitchMatrix(m_targetLocation.m_pitch) * ndYawMatrix(m_targetLocation.m_yaw) * ndRollMatrix(m_targetLocation.m_roll));
+			observation->m_targetPin[0] = ndBrainFloat(targetMatrix.m_front.m_x);
+			observation->m_targetPin[1] = ndBrainFloat(targetMatrix.m_front.m_y);
+			observation->m_targetPin[2] = ndBrainFloat(targetMatrix.m_front.m_z);
 		}
 
 		//#pragma optimize( "", off )
@@ -622,6 +633,9 @@ namespace ndAdvancedRobot
 				ndFloat32 targetAngle = angle + deltaAngle;
 				hinge->SetTargetAngle(targetAngle);
 			};
+
+			//SetParamter(m_arm_2, 2);
+			//SetParamter(m_arm_3, 3);
 
 			SetParamter(m_arm_0, 0);
 			SetParamter(m_arm_1, 1);
@@ -696,7 +710,7 @@ namespace ndAdvancedRobot
 			ndFloat32 roll = ndFloat32(-ndPi * 0.35f + ndRand() * (ndPi * 0.9f - (-ndPi * 0.35f)));
 
 			//m_targetLocation.m_x = 0.0f;
-			//m_targetLocation.m_y = 0.0f;
+			//m_targetLocation.m_z = 0.0f;
 			//m_targetLocation.m_azimuth = 0.0f;
 			//yaw = 0.0f * ndDegreeToRad;
 			//roll = 0.0f * ndDegreeToRad;
@@ -1086,8 +1100,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			//countX = 1;
-			//countZ = 1;
+			//countX = 10;
+			//countZ = 11;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
