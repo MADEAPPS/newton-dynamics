@@ -47,9 +47,12 @@ namespace ndAdvancedRobot
 
 		// distance to target error.
 		ndBrainFloat m_delta_x;
+		ndBrainFloat m_target_x;
 		ndBrainFloat m_delta_z;
-		ndBrainFloat m_deltaAzimuth;
-		//ndBrainFloat m_deltaRotation;
+		ndBrainFloat m_target_z;
+		ndBrainFloat m_delta_Azimuth;
+		ndBrainFloat m_target_Azimuth;
+
 		ndBrainFloat m_sourcePin[3];
 		ndBrainFloat m_targetPin[3];
 	};
@@ -609,7 +612,11 @@ namespace ndAdvancedRobot
 			const ndVector positError(CalculateDeltaTargetPosit(currentEffectorMatrix));
 			observation->m_delta_x = ndBrainFloat(positError.m_x);
 			observation->m_delta_z = ndBrainFloat(positError.m_z);
-			observation->m_deltaAzimuth = ndBrainFloat(positError.m_w);
+			observation->m_delta_Azimuth = ndBrainFloat(positError.m_w);
+
+			observation->m_target_x = ndBrainFloat(m_targetLocation.m_x);
+			observation->m_target_z = ndBrainFloat(m_targetLocation.m_z);
+			observation->m_target_Azimuth = ndBrainFloat(m_targetLocation.m_azimuth);
 
 			//ndFloat32 angleError(CalculateDeltaTargetRotation(currentEffectorMatrix));
 			//observation->m_deltaRotation = ndBrainFloat(angleError);
