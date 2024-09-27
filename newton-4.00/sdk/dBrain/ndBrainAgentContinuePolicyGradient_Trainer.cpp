@@ -590,28 +590,18 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 					#else
 						for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
 						{
-							ndBrainFloat meanLoss = ndBrainFloat(0.0f);
-							ndBrainFloat sigmaLoss = ndBrainFloat(0.0f);
+							const ndBrainFloat mean = output[i];
+							const ndBrainFloat sigma1 = output[i + numberOfActions];
+							const ndBrainFloat sigma2 = sigma1 * sigma1;
+							const ndBrainFloat sigma3 = sigma2 * sigma1;
+							const ndBrainFloat num = (actions[i] - mean);
 
-							if (output[i + numberOfActions] <= ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE)
-							{
-								sigmaLoss = 0.0f;
-							}
+							// this was a huge bug, it is gradient ascend
+							ndBrainFloat meanGradient = -num / sigma2;
+							ndBrainFloat sigmaGradient = num * num / sigma3 - ndBrainFloat(1.0f) / sigma1;
 
-							if (output[i + numberOfActions] >= ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE)
-							{
-								const ndBrainFloat mean = output[i];
-								const ndBrainFloat sigma1 = output[i + numberOfActions];
-								const ndBrainFloat sigma2 = sigma1 * sigma1;
-								const ndBrainFloat sigma3 = sigma2 * sigma1;
-								const ndBrainFloat num = (actions[i] - mean);
-
-								// this was a huge bug, it is gradient ascend
-								meanLoss = -num / sigma2;
-								sigmaLoss = num * num / sigma3 - ndBrainFloat(1.0f) / sigma1;
-							}
-							loss[i] = -meanLoss * advantage;
-							loss[i + numberOfActions] = -sigmaLoss * advantage;
+							loss[i] = -meanGradient * advantage;
+							loss[i + numberOfActions] = -sigmaGradient * advantage;
 						}
 					#endif
 				}
