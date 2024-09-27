@@ -77,7 +77,7 @@ namespace ndCarpole_1
 			}
 
 			ndController(const ndController& src)
-				:ndBrainAgentContinuePolicyGradient(src.m_actor)
+				:ndBrainAgentContinuePolicyGradient(src.m_policy)
 				,m_robot(nullptr)
 			{
 			}
@@ -330,7 +330,7 @@ namespace ndCarpole_1
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetActor()));
+			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 
 			snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
 			m_master->SetName(name);
@@ -340,12 +340,12 @@ namespace ndCarpole_1
 				snprintf(name, sizeof(name), "%s_critic.dnn", CONTROLLER_NAME);
 				ndGetWorkingFileName(name, fileName);
 				ndSharedPtr<ndBrain> critic(ndBrainLoad::Load(fileName));
-				m_master->GetCritic()->CopyFrom(**critic);
+				m_master->GetValueNetwork()->CopyFrom(**critic);
 
 				snprintf(name, sizeof(name), "%s_actor.dnn", CONTROLLER_NAME);
 				ndGetWorkingFileName(name, fileName);
 				ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-				m_master->GetActor()->CopyFrom(**actor);
+				m_master->GetPolicyNetwork()->CopyFrom(**actor);
 			#endif
 
 			ndWorld* const world = scene->GetWorld();
@@ -471,7 +471,7 @@ namespace ndCarpole_1
 					if (m_lastEpisode != m_master->GetEposideCount())
 					{
 						m_maxScore = rewardTrajectory;
-						m_bestActor->CopyFrom(*m_master->GetActor());
+						m_bestActor->CopyFrom(*m_master->GetPolicyNetwork());
 						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
 						m_lastEpisode = m_master->GetEposideCount();
 					}
@@ -483,13 +483,13 @@ namespace ndCarpole_1
 					m_saveScore = ndFloor(rewardTrajectory) + 2.0f;
 
 					// save partial controller in case of crash 
-					ndBrain* const actor = m_master->GetActor();
+					ndBrain* const actor = m_master->GetPolicyNetwork();
 					char name[256];
 					snprintf(name, sizeof(name), "%s_actor.dnn", CONTROLLER_NAME);
 					ndGetWorkingFileName(name, fileName);
 					actor->SaveToFile(fileName);
 
-					ndBrain* const critic = m_master->GetCritic();
+					ndBrain* const critic = m_master->GetValueNetwork();
 					snprintf(name, sizeof(name), "%s_critic.dnn", CONTROLLER_NAME);
 					ndGetWorkingFileName(name, fileName);
 					critic->SaveToFile(fileName);
@@ -510,9 +510,9 @@ namespace ndCarpole_1
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
-				m_master->GetActor()->CopyFrom(*(*m_bestActor));
+				m_master->GetPolicyNetwork()->CopyFrom(*(*m_bestActor));
 				ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
-				m_master->GetActor()->SaveToFile(fileName);
+				m_master->GetPolicyNetwork()->SaveToFile(fileName);
 				ndExpandTraceMessage("saving to file: %s\n", fileName);
 				ndExpandTraceMessage("training complete\n");
 				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;

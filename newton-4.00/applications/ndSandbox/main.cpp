@@ -27,6 +27,24 @@ int main(int, char**)
 	//	ndTrace(("%g\n", x));
 	//}
 
+	//ndArray<ndVector> xxxx;
+	//for (int y = 0; y < 256; y++)
+	//{
+	//	for (int x = 0; x < 256; x++)
+	//	{
+	//		ndVector p(ndFloat32(x), ndFloat32(y), 0.0f, 0.0f);
+	//		xxxx.PushBack(p);
+	//		xxxx.PushBack(p);
+	//		xxxx.PushBack(p);
+	//		xxxx.PushBack(p);
+	//		xxxx.PushBack(p);
+	//		xxxx.PushBack(p);
+	//	}
+	//}
+	//ndArray<ndInt32> index;
+	//index.SetCount(xxxx.GetCount());
+	//ndInt32 vertexCount = ndVertexListToIndexList(&xxxx[0].m_x, sizeof(ndVector), 3, ndInt32(xxxx.GetCount()), &index[0], ndFloat32(1.0e-6f));
+
 	ndDemoEntityManager demos;
 	demos.Run();
 	return 0;

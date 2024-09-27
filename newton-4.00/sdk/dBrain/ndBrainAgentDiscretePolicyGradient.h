@@ -46,7 +46,7 @@ class ndBrainAgentDiscretePolicyGradient: public ndBrainAgent
 
 	void InitWeights();
 	ndInt32 GetEpisodeFrames() const;
-	ndSharedPtr<ndBrain> m_actor;
+	ndSharedPtr<ndBrain> m_policy;
 };
 
 #endif 

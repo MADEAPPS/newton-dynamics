@@ -243,7 +243,7 @@ namespace ndQuadruped_2
 			}
 
 			ndController(const ndController& src)
-				:ndBrainAgentContinuePolicyGradient(src.m_actor)
+				:ndBrainAgentContinuePolicyGradient(src.m_policy)
 				,m_robot(nullptr)
 			{
 			}
@@ -1418,7 +1418,7 @@ namespace ndQuadruped_2
 			hyperParameters.m_numberOfObservations = ND_AGENT_INPUT_SIZE;
 			
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetActor()));
+			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 			m_master->SetName(CONTROLLER_NAME);
 			
 			ndModelArticulation* const visualModel = CreateModel(scene, matrix);
@@ -1557,7 +1557,7 @@ namespace ndQuadruped_2
 					if (m_lastEpisode != m_master->GetEposideCount())
 					{
 						m_maxScore = rewardTrajectory;
-						m_bestActor->CopyFrom(*m_master->GetActor());
+						m_bestActor->CopyFrom(*m_master->GetPolicyNetwork());
 						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
 						m_lastEpisode = m_master->GetEposideCount();
 					}
@@ -1578,9 +1578,9 @@ namespace ndQuadruped_2
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
-				m_master->GetActor()->CopyFrom(*(*m_bestActor));
+				m_master->GetPolicyNetwork()->CopyFrom(*(*m_bestActor));
 				ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
-				m_master->GetActor()->SaveToFile(fileName);
+				m_master->GetPolicyNetwork()->SaveToFile(fileName);
 				ndExpandTraceMessage("saving to file: %s\n", fileName);
 				ndExpandTraceMessage("training complete\n");
 				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;

@@ -26,13 +26,13 @@
 
 ndBrainAgentContinuePolicyGradient::ndBrainAgentContinuePolicyGradient(const ndSharedPtr<ndBrain>& actor)
 	:ndBrainAgent()
-	,m_actor(actor)
+	,m_policy(actor)
 {
 }
 
 ndBrainAgentContinuePolicyGradient::ndBrainAgentContinuePolicyGradient(const ndBrainAgentContinuePolicyGradient& src)
 	:ndBrainAgent(src)
-	,m_actor(src.m_actor)
+	,m_policy(src.m_policy)
 {
 }
 
@@ -85,16 +85,16 @@ void ndBrainAgentContinuePolicyGradient::OptimizeStep()
 
 void ndBrainAgentContinuePolicyGradient::Step()
 {
-	ndInt32 bufferSize = m_actor->CalculateWorkingBufferSize();
+	ndInt32 bufferSize = m_policy->CalculateWorkingBufferSize();
 	ndBrainFloat* const bufferMem = ndAlloca(ndBrainFloat, bufferSize);
-	ndBrainFloat* const actionBuffer = ndAlloca(ndBrainFloat, m_actor->GetOutputSize());
-	ndBrainFloat* const observationBuffer = ndAlloca(ndBrainFloat, m_actor->GetInputSize());
+	ndBrainFloat* const actionBuffer = ndAlloca(ndBrainFloat, m_policy->GetOutputSize());
+	ndBrainFloat* const observationBuffer = ndAlloca(ndBrainFloat, m_policy->GetInputSize());
 	
 	ndBrainMemVector workingBuffer(bufferMem, bufferSize);
-	ndBrainMemVector actions(actionBuffer, m_actor->GetOutputSize());
-	ndBrainMemVector observations(observationBuffer, m_actor->GetInputSize());
+	ndBrainMemVector actions(actionBuffer, m_policy->GetOutputSize());
+	ndBrainMemVector observations(observationBuffer, m_policy->GetInputSize());
 	
 	GetObservation(observationBuffer);
-	m_actor->MakePrediction(observations, actions, workingBuffer);
+	m_policy->MakePrediction(observations, actions, workingBuffer);
 	ApplyActions(&actions[0]);
 }

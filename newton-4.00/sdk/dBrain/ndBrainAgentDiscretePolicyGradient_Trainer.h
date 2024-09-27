@@ -135,8 +135,8 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndBrainAgentDiscretePolicyGradient_TrainerMaster(const HyperParameters& hyperParameters);
 	virtual ~ndBrainAgentDiscretePolicyGradient_TrainerMaster();
 
-	ndBrain* GetActor();
-	ndBrain* GetCritic();
+	ndBrain* GetValueNetwork();
+	ndBrain* GetPolicyNetwork();
 
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
@@ -157,8 +157,8 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	void UpdateBaseLineValue();
 	ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator* GetRandomGenerator();
 
-	ndBrain m_actor;
-	ndBrain m_baseLineValue;
+	ndBrain m_policy;
+	ndBrain m_value;
 	ndBrainOptimizerAdam* m_optimizer;
 	ndArray<ndBrainTrainer*> m_trainers;
 	ndArray<ndBrainTrainer*> m_weightedTrainer;

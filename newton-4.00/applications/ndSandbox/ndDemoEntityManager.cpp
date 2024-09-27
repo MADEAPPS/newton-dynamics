@@ -46,7 +46,7 @@
 //#define DEFAULT_SCENE	6		// basic Trigger
 //#define DEFAULT_SCENE	7		// object Placement
 //#define DEFAULT_SCENE	8		// particle fluid
-//#define DEFAULT_SCENE	9		// static mesh collision 
+#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	11		// basic joints
 //#define DEFAULT_SCENE	12		// basic vehicle
@@ -58,7 +58,7 @@
 //#define DEFAULT_SCENE	18		// cart pole continue controller
 //#define DEFAULT_SCENE	19		// unit cycle controller
 //#define DEFAULT_SCENE	20		// simple industrial robot
-#define DEFAULT_SCENE	21		// advanced industrial robot
+//#define DEFAULT_SCENE	21		// advanced industrial robot
 //#define DEFAULT_SCENE	22		// quadruped test 1
 //#define DEFAULT_SCENE	23		// quadruped test 2
 //#define DEFAULT_SCENE	24		// quadruped test 3

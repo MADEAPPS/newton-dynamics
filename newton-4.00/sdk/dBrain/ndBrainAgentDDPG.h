@@ -45,13 +45,13 @@ class ndBrainAgentDDPG: public ndBrainAgent
 	void Save(ndBrainSave* const loadSave);
 
 	void InitWeights();
-	ndSharedPtr<ndBrain> m_actor;
+	ndSharedPtr<ndBrain> m_policy;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDDPG<statesDim, actionDim>::ndBrainAgentDDPG(const ndSharedPtr<ndBrain>& actor)
 	:ndBrainAgent()
-	,m_actor(actor)
+	,m_policy(actor)
 {
 }
 
@@ -112,7 +112,7 @@ void ndBrainAgentDDPG<statesDim, actionDim>::Step()
 	ndBrainFixSizeVector<statesDim> observations;
 
 	GetObservation(&observations[0]);
-	m_actor->MakePrediction(observations, actions);
+	m_policy->MakePrediction(observations, actions);
 	ApplyActions(&actions[0]);
 }
 

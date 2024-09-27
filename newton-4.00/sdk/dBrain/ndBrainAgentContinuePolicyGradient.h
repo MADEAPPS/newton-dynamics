@@ -45,7 +45,7 @@ class ndBrainAgentContinuePolicyGradient: public ndBrainAgent
 	void Save(ndBrainSave* const loadSave);
 
 	void InitWeights();
-	ndSharedPtr<ndBrain> m_actor;
+	ndSharedPtr<ndBrain> m_policy;
 };
 
 #endif 
