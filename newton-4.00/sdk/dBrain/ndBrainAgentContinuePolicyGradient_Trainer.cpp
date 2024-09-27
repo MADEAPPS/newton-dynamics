@@ -27,7 +27,7 @@
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
-#define ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE	ndBrainFloat(1.0e-2f)
+#define ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE	ndBrainFloat(1.0e-3f)
 
 //#define ND_USE_LOG_DEVIATION
 
@@ -133,62 +133,62 @@ ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::ndTrajectoryStep(n
 
 ndInt32 ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::GetCount() const
 {
-	ndInt32 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
-	return ndInt32(ndBrainVector::GetCount()) / stride;
+	ndInt64 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
+	return ndInt32(ndBrainVector::GetCount() / stride);
 }
 
 void ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::SetCount(ndInt32 count)
 {
-	ndInt32 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
+	ndInt64 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
 	ndBrainVector::SetCount(stride * count);
 }
 
 ndBrainFloat ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::GetReward(ndInt32 entry) const
 {
 	const ndTrajectoryStep& me = *this;
-	ndInt32 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
+	ndInt64 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
 	return me[stride * entry];
 }
 
 void ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::SetReward(ndInt32 entry, ndBrainFloat reward)
 {
 	ndTrajectoryStep& me = *this;
-	ndInt32 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
+	ndInt64 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
 	me[stride * entry] = reward;
 }
 
 ndBrainFloat ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::GetAdvantage(ndInt32 entry) const
 {
 	const ndTrajectoryStep& me = *this;
-	ndInt32 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
+	ndInt64 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
 	return me[stride * entry + 1];
 }
 
 void ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::SetAdvantage(ndInt32 entry, ndBrainFloat advantage)
 {
 	ndTrajectoryStep& me = *this;
-	ndInt32 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
+	ndInt64 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
 	me[stride * entry + 1] = advantage;
 }
 
 void ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::Clear(ndInt32 entry)
 {
 	ndTrajectoryStep& me = *this;
-	ndInt32 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
+	ndInt64 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
 	ndMemSet(&me[stride * entry], ndBrainFloat(0.0f), stride);
 }
 
 ndBrainFloat* ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::GetActions(ndInt32 entry)
 {
 	ndTrajectoryStep& me = *this;
-	ndInt32 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
+	ndInt64 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
 	return &me[stride * entry + 2 + m_obsevationsSize];
 }
 
 ndBrainFloat* ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep::GetObservations(ndInt32 entry)
 {
 	ndTrajectoryStep& me = *this;
-	ndInt32 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
+	ndInt64 stride = 2 + m_actionsSize * 2 + m_obsevationsSize;
 	return &me[stride * entry + 2];
 }
 
@@ -217,7 +217,7 @@ const ndBrainFloat* ndBrainAgentContinuePolicyGradient_TrainerMaster::MemoryStat
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::MemoryStateValues::SaveTransition(ndInt32 index, ndBrainFloat reward, const ndBrainFloat* const observations)
 {
 	ndBrainVector& me = *this;
-	ndInt32 stride = m_obsevationsSize + 1;
+	ndInt64 stride = m_obsevationsSize + 1;
 	me[index * stride] = reward;
 	ndMemCpy(&me[index * stride + 1], observations, m_obsevationsSize);
 }
@@ -590,15 +590,28 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 					#else
 						for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
 						{
-							const ndBrainFloat mean = output[i];
-							const ndBrainFloat sigma1 = output[i + numberOfActions];
-							const ndBrainFloat sigma2 = sigma1 * sigma1;
-							const ndBrainFloat sigma3 = sigma2 * sigma1;
-							const ndBrainFloat num = (actions[i] - mean);
-							ndAssert(sigma1 >= ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE);
+							ndBrainFloat meanLoss = ndBrainFloat(0.0f);
+							ndBrainFloat sigmaLoss = ndBrainFloat(0.0f);
 
-							loss[i] = advantage * num / sigma2;
-							loss[i + numberOfActions] = advantage * (num * num / sigma3 - ndBrainFloat(1.0f) / sigma1);
+							if (output[i + numberOfActions] <= ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE)
+							{
+								sigmaLoss = 0.0f;
+							}
+
+							if (output[i + numberOfActions] >= ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE)
+							{
+								const ndBrainFloat mean = output[i];
+								const ndBrainFloat sigma1 = output[i + numberOfActions];
+								const ndBrainFloat sigma2 = sigma1 * sigma1;
+								const ndBrainFloat sigma3 = sigma2 * sigma1;
+								const ndBrainFloat num = (actions[i] - mean);
+
+								// this was a huge bug, it is gradient ascend
+								meanLoss = -num / sigma2;
+								sigmaLoss = num * num / sigma3 - ndBrainFloat(1.0f) / sigma1;
+							}
+							loss[i] = -meanLoss * advantage;
+							loss[i + numberOfActions] = -sigmaLoss * advantage;
 						}
 					#endif
 				}
