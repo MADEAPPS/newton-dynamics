@@ -112,7 +112,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	
 	void CalculateQvalue(const ndBrainVector& state, const ndBrainVector& actions);
 
-	ndBrain m_policy;
+	ndBrain m_actor;
 	ndBrain m_critic;
 	ndBrain m_targetActor;
 	ndBrain m_targetCritic;
@@ -143,7 +143,7 @@ class ndBrainAgentDDPG_Trainer: public ndBrainAgent, public ndBrainThreadPool
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const HyperParameters& hyperParameters)
 	:ndBrainAgent()
-	,m_policy()
+	,m_actor()
 	,m_critic()
 	,m_targetActor()
 	,m_targetCritic()
@@ -181,7 +181,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 	layers.PushBack(new ndBrainLayerActivationTanh(actionDim));
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
-		m_policy.AddLayer(layers[i]);
+		m_actor.AddLayer(layers[i]);
 		m_targetActor.AddLayer(layers[i]->Clone());
 	}
 
@@ -203,8 +203,8 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 	}
 
 	ndAssert(m_critic.GetOutputSize() == 1);
-	ndAssert(m_critic.GetInputSize() == (m_policy.GetInputSize() + m_policy.GetOutputSize()));
-	ndAssert(!strcmp((m_policy[m_policy.GetCount() - 1])->GetLabelId(), "ndBrainLayerActivationTanh"));
+	ndAssert(m_critic.GetInputSize() == (m_actor.GetInputSize() + m_actor.GetOutputSize()));
+	ndAssert(!strcmp((m_actor[m_actor.GetCount() - 1])->GetLabelId(), "ndBrainLayerActivationTanh"));
 	
 	m_actorTrainers.SetCount(0);
 	m_criticTrainers.SetCount(0);
@@ -212,7 +212,7 @@ ndBrainAgentDDPG_Trainer<statesDim, actionDim>::ndBrainAgentDDPG_Trainer(const H
 
 	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 	{
-		m_actorTrainers.PushBack(new ndBrainTrainer(&m_policy));
+		m_actorTrainers.PushBack(new ndBrainTrainer(&m_actor));
 		m_criticTrainers.PushBack(new ndBrainTrainer(&m_critic));
 	}
 	
@@ -247,10 +247,10 @@ bool ndBrainAgentDDPG_Trainer<statesDim, actionDim>::IsTrainer() const
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::InitWeights()
 {
-	m_policy.InitWeights();
+	m_actor.InitWeights();
 	m_critic.InitWeights();
 
-	m_targetActor.CopyFrom(m_policy);
+	m_targetActor.CopyFrom(m_actor);
 	m_targetCritic.CopyFrom(m_critic);
 }
 
@@ -436,7 +436,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagateActor(const nd
 
 	ParallelExecute(PropagateBash);
 	m_actorOptimizer->Update(this, m_actorTrainers, -m_actorLearnRate);
-	m_targetActor.SoftCopy(m_policy, m_softTargetFactor);
+	m_targetActor.SoftCopy(m_actor, m_softTargetFactor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -455,7 +455,7 @@ void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::BackPropagate()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Save(ndBrainSave* const loadSave)
 {
-	loadSave->Save(&m_policy);
+	loadSave->Save(&m_actor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -510,7 +510,7 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDDPG_Trainer<statesDim, actionDim>::Step()
 {
 	GetObservation(&m_currentTransition.m_observation[0]);
-	m_policy.MakePrediction(m_currentTransition.m_observation, m_currentTransition.m_action);
+	m_actor.MakePrediction(m_currentTransition.m_observation, m_currentTransition.m_action);
 
 	// explore environment
 	SelectAction(&m_currentTransition.m_action[0]);

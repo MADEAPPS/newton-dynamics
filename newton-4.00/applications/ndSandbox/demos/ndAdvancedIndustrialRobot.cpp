@@ -27,7 +27,7 @@ namespace ndAdvancedRobot
 	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndRobotArmReach"
 
-	//#define CONTROLLER_RESUME_TRAINING
+	#define CONTROLLER_RESUME_TRAINING
 
 	class ndActionVector
 	{
@@ -197,8 +197,8 @@ namespace ndAdvancedRobot
 		class ndController : public ndBrainAgentContinuePolicyGradient
 		{
 			public:
-			ndController(const ndSharedPtr<ndBrain>& brain)
-				:ndBrainAgentContinuePolicyGradient(brain)
+			ndController(const ndSharedPtr<ndBrain>& policyNetwork)
+				:ndBrainAgentContinuePolicyGradient(policyNetwork)
 				,m_robot(nullptr)
 			{
 			}
@@ -562,8 +562,6 @@ namespace ndAdvancedRobot
 
 			auto GaussianReward = [](ndFloat32 param)
 			{
-				//ndFloat32 invRewardSigma2 = 500.0f;
-				//return ndExp(-invRewardSigma2 * param2);
 				return param * param * param * param;
 			};
 
@@ -572,7 +570,6 @@ namespace ndAdvancedRobot
 			ndFloat32 posit_zReward = rewardWeigh * ScalarReward(positError2.m_z);
 			ndFloat32 azimuthReward = rewardWeigh * ScalarReward(positError2.m_w);
 
-			//ndFloat32 angleError = CalculateDeltaTargetRotation(currentEffectorMatrix);
 			const ndMatrix targetMatrix(ndPitchMatrix(m_targetLocation.m_pitch) * ndYawMatrix(m_targetLocation.m_yaw) * ndRollMatrix(m_targetLocation.m_roll));
 			const ndMatrix relativeRotation(currentEffectorMatrix * targetMatrix.OrthoInverse());
 			ndFloat32 sideCos = currentEffectorMatrix.m_up.DotProduct(targetMatrix.m_up).GetScalar();
@@ -582,7 +579,7 @@ namespace ndAdvancedRobot
 			ndFloat32 angularReward1 = rewardWeigh * GaussianReward((frontCos + 1.0f) * 0.5f);
 			 
 			ndFloat32 reward = angularReward0 + angularReward1;
-			if ((angularReward0 > 0.195) && (angularReward1 > 0.195f))
+			//if ((angularReward0 > 0.195) && (angularReward1 > 0.195f))
 			{
 				reward = reward + posit_xReward + posit_zReward + azimuthReward;
 			}
@@ -1087,13 +1084,13 @@ namespace ndAdvancedRobot
 				char fileName[256];
 				snprintf(name, sizeof(name), "%s_critic.dnn", CONTROLLER_NAME);
 				ndGetWorkingFileName(name, fileName);
-				ndSharedPtr<ndBrain> critic(ndBrainLoad::Load(fileName));
-				m_master->GetValueNetwork()->CopyFrom(**critic);
+				ndSharedPtr<ndBrain> valueNetwork(ndBrainLoad::Load(fileName));
+				m_master->GetValueNetwork()->CopyFrom(**valueNetwork);
 
 				snprintf(name, sizeof(name), "%s_actor.dnn", CONTROLLER_NAME);
 				ndGetWorkingFileName(name, fileName);
-				ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-				m_master->GetPolicyNetwork()->CopyFrom(**actor);
+				ndSharedPtr<ndBrain> policyNetwork(ndBrainLoad::Load(fileName));
+				m_master->GetPolicyNetwork()->CopyFrom(**policyNetwork);
 			#endif
 
 			auto SpawnModel = [this, scene, &visualMesh, floor](const ndMatrix& matrix)
@@ -1112,8 +1109,8 @@ namespace ndAdvancedRobot
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			countX = 10;
-			countZ = 11;
+			//countX = 10;
+			//countZ = 11;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -1309,8 +1306,8 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	char fileName[256];
 	snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
 	ndGetWorkingFileName(name, fileName);
-	ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
-	model->SetNotifyCallback(new RobotModelNotify(brain, model, true));
+	ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
+	model->SetNotifyCallback(new RobotModelNotify(policy, model, true));
 	
 	ndSharedPtr<ndUIEntity> robotUI(new ndRobotUI(scene, (RobotModelNotify*)*model->GetNotifyCallback()));
 	scene->Set2DDisplayRenderFunction(robotUI);

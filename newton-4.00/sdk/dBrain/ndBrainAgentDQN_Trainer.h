@@ -102,7 +102,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	void AddExploration(ndBrainFloat* const actions);
 
 	protected:
-	ndBrain m_policy;
+	ndBrain m_actor;
 	ndBrain m_target;
 	ndBrainOptimizerAdam* m_optimizer;
 	ndArray<ndBrainTrainer*> m_trainers;
@@ -129,7 +129,7 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const HyperParameters& hyperParameters)
 	:ndBrainAgent()
 	,ndBrainThreadPool()
-	,m_policy()
+	,m_actor()
 	,m_target()
 	,m_optimizer(nullptr)
 	,m_replayBuffer()
@@ -161,7 +161,7 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
-		m_policy.AddLayer(layers[i]);
+		m_actor.AddLayer(layers[i]);
 		m_target.AddLayer(layers[i]->Clone());
 	}
 
@@ -169,7 +169,7 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 	SetThreadCount(hyperParameters.m_threadsCount);
 	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
 	{
-		ndBrainTrainer* const trainer = new ndBrainTrainer(&m_policy);
+		ndBrainTrainer* const trainer = new ndBrainTrainer(&m_actor);
 		m_trainers.PushBack(trainer);
 	}
 
@@ -200,8 +200,8 @@ bool ndBrainAgentDQN_Trainer<statesDim, actionDim>::IsTrainer() const
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::InitWeights()
 {
-	m_policy.InitWeights();
-	m_target.CopyFrom(m_policy);
+	m_actor.InitWeights();
+	m_target.CopyFrom(m_actor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -305,14 +305,14 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
 	{
 		// update on line network
-		m_target.CopyFrom(m_policy);
+		m_target.CopyFrom(m_actor);
 	}
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Save(ndBrainSave* const loadSave)
 {
-	loadSave->Save(&m_policy);
+	loadSave->Save(&m_actor);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -411,7 +411,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 	ndBrainFixSizeVector<actionDim> actions;
 
 	GetObservation(&m_currentTransition.m_observation[0]);
-	m_policy.MakePrediction(m_currentTransition.m_observation, actions);
+	m_actor.MakePrediction(m_currentTransition.m_observation, actions);
 
 	AddExploration(&actions[0]);
 	ndBrainFloat bestAction = ndBrainFloat(m_currentTransition.m_action[0]);

@@ -149,12 +149,12 @@ namespace ndCarpole_1
 			Init(robot);
 		}
 
-		RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const robot)
+		RobotModelNotify(const ndSharedPtr<ndBrain>& policy, ndModelArticulation* const robot)
 			:ndModelNotify()
 			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 		{
-			m_controller = new ndController(brain);
+			m_controller = new ndController(policy);
 			m_controller->m_robot = this;
 			Init(robot);
 		}
@@ -339,13 +339,13 @@ namespace ndCarpole_1
 				char fileName[256];
 				snprintf(name, sizeof(name), "%s_critic.dnn", CONTROLLER_NAME);
 				ndGetWorkingFileName(name, fileName);
-				ndSharedPtr<ndBrain> critic(ndBrainLoad::Load(fileName));
-				m_master->GetValueNetwork()->CopyFrom(**critic);
+				ndSharedPtr<ndBrain> valueNetwork(ndBrainLoad::Load(fileName));
+				m_master->GetValueNetwork()->CopyFrom(**valueNetwork);
 
 				snprintf(name, sizeof(name), "%s_actor.dnn", CONTROLLER_NAME);
 				ndGetWorkingFileName(name, fileName);
-				ndSharedPtr<ndBrain> actor(ndBrainLoad::Load(fileName));
-				m_master->GetPolicyNetwork()->CopyFrom(**actor);
+				ndSharedPtr<ndBrain> policyNetwork(ndBrainLoad::Load(fileName));
+				m_master->GetPolicyNetwork()->CopyFrom(**policyNetwork);
 			#endif
 
 			ndWorld* const world = scene->GetWorld();
@@ -561,8 +561,8 @@ void ndCartpoleContinue(ndDemoEntityManager* const scene)
 	snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
 	ndGetWorkingFileName(name, fileName);
 
-	ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
-	model->SetNotifyCallback(new RobotModelNotify(brain, model));
+	ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
+	model->SetNotifyCallback(new RobotModelNotify(policy, model));
 #endif
 
 	matrix.m_posit.m_y = 0.5f;

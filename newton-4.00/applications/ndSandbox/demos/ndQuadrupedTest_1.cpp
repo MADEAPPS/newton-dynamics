@@ -1495,8 +1495,8 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 
 		char fileName[256];
 		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
-		ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
-		referenceModel->SetNotifyCallback(new RobotModelNotify(brain, referenceModel, true));
+		ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
+		referenceModel->SetNotifyCallback(new RobotModelNotify(policy, referenceModel, true));
 
 		ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*referenceModel->GetNotifyCallback()));
 		scene->Set2DDisplayRenderFunction(quadrupedUI);

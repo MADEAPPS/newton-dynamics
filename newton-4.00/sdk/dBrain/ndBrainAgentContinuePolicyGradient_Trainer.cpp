@@ -27,7 +27,7 @@
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
-#define ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE	ndBrainFloat(1.0e-1f)
+#define ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE	ndBrainFloat(1.0e-2f)
 
 //#define ND_USE_LOG_DEVIATION
 
@@ -62,18 +62,17 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 //*********************************************************************************************
 //
 //*********************************************************************************************
-//class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : public ndBrainLayerActivationTanh
-class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : public ndBrainLayerActivation
+class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : public ndBrainLayerActivationTanh
 {
 	public:
 	LastActivationLayer(ndInt32 neurons)
-		:ndBrainLayerActivation(neurons * 2)
+		:ndBrainLayerActivationTanh(neurons * 2)
 		,m_minimumSigma(ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE)
 	{
 	}
 
 	LastActivationLayer(const LastActivationLayer& src)
-		:ndBrainLayerActivation(src)
+		:ndBrainLayerActivationTanh(src)
 		,m_minimumSigma(src.m_minimumSigma)
 	{
 	}
@@ -86,7 +85,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 	#pragma optimize( "", off )
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 	{
-		ndBrainLayerActivation::MakePrediction(input, output);
+		ndBrainLayerActivationTanh::MakePrediction(input, output);
 		#ifdef ND_USE_LOG_DEVIATION
 			for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
 			{
@@ -103,8 +102,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 	#pragma optimize( "", off )
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 	{
-		//ndBrainLayerActivationTanh::InputDerivative(input, output, outputDerivative, inputDerivative);
-		ndBrainLayerActivation::InputDerivative(input, output, outputDerivative, inputDerivative);
+		ndBrainLayerActivationTanh::InputDerivative(input, output, outputDerivative, inputDerivative);
 		#ifdef ND_USE_LOG_DEVIATION
 			for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
 			{
@@ -278,8 +276,7 @@ void ndBrainAgentContinuePolicyGradient_Trainer::SelectAction(ndBrainVector& act
 	for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
 	{
 		ndBrainFloat sample = ndBrainFloat(actions[i] + generator.m_d(generator.m_gen) * actions[i + numberOfActions]);
-		//ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
-		ndBrainFloat squashedAction = sample;
+		ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = squashedAction;
 	}
 }

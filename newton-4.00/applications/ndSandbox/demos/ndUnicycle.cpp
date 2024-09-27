@@ -222,13 +222,13 @@ namespace ndUnicycle
 			Init(robot);
 		}
 
-		RobotModelNotify(const ndSharedPtr<ndBrain>& brain, ndModelArticulation* const model)
+		RobotModelNotify(const ndSharedPtr<ndBrain>& policy, ndModelArticulation* const model)
 			:ndModelNotify()
 			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 		{
 			m_timestep = 0.0f;
-			m_controller = new ndController(brain);
+			m_controller = new ndController(policy);
 			m_controller->m_robot = this;
 			Init(model);
 		}
@@ -727,8 +727,8 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 
 	char fileName[256];
 	ndGetWorkingFileName(CONTROLLER_NAME, fileName);
-	ndSharedPtr<ndBrain> brain(ndBrainLoad::Load(fileName));
-	model->SetNotifyCallback(new RobotModelNotify(brain, model));
+	ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
+	model->SetNotifyCallback(new RobotModelNotify(policy, model));
 #endif
 	
 	matrix.m_posit.m_x -= 0.0f;

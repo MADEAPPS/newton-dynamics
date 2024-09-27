@@ -49,13 +49,13 @@ class ndBrainAgentDQN: public ndBrainAgent
 	void InitWeights();
 	ndInt32 SelectBestAction(const ndBrainVector& actions) const;
 
-	ndSharedPtr<ndBrain> m_policy;
+	ndSharedPtr<ndBrain> m_actor;
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 ndBrainAgentDQN<statesDim, actionDim>::ndBrainAgentDQN(const ndSharedPtr<ndBrain>& actor)
 	:ndBrainAgent()
-	,m_policy(actor)
+	,m_actor(actor)
 {
 }
 
@@ -116,7 +116,7 @@ void ndBrainAgentDQN<statesDim, actionDim>::Step()
 	ndBrainFixSizeVector<statesDim> observations;
 
 	GetObservation(&observations[0]);
-	m_policy->MakePrediction(observations, actions);
+	m_actor->MakePrediction(observations, actions);
 
 	ndBrainFloat bestAction = ndBrainFloat(actions.ArgMax());
 	ApplyActions(&bestAction);
