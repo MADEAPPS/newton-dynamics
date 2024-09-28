@@ -254,6 +254,32 @@ ndFloat32 ndJointDoubleHinge::PenetrationOmega(ndFloat32 penetration) const
 	return omega;
 }
 
+void ndJointDoubleHinge::ClearMemory()
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	ndJointBilateralConstraint::ClearMemory();
+
+	// save the current joint Omega
+	const ndVector omega0(m_body0->GetOmega());
+	const ndVector omega1(m_body1->GetOmega());
+
+	const ndVector frontDir((matrix0.m_front - matrix1.m_up.Scale(matrix0.m_front.DotProduct(matrix1.m_up).GetScalar())).Normalize());
+
+	// calculate joint parameters, angles and omega
+	const ndFloat32 deltaAngle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir);
+	m_axis0.m_angle = deltaAngle0;
+	m_axis0.m_offsetAngle = deltaAngle0;
+	m_axis0.m_omega = frontDir.DotProduct(omega0 - omega1).GetScalar();
+
+	const ndFloat32 deltaAngle1 = CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up);
+	m_axis1.m_angle += deltaAngle1;
+	m_axis1.m_offsetAngle = deltaAngle1;
+	m_axis1.m_omega = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
+}
+
 void ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	if ((m_axis0.m_minLimit > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_axis0.m_maxLimit < (ndFloat32(1.0f) * ndDegreeToRad)))
