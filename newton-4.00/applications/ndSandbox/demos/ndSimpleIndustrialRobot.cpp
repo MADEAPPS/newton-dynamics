@@ -58,7 +58,7 @@ namespace ndSimpleRobot
 
 	#define ND_MIN_X_SPAND	ndReal (-2.2f)
 	#define ND_MAX_X_SPAND	ndReal ( 1.5f)
-	#define ND_MIN_Z_SPAND	ndReal (-1.2f)
+	#define ND_MIN_Z_SPAND	ndReal (-1.0f)
 	#define ND_MAX_Z_SPAND	ndReal ( 1.2f)
 
 	class ndRobotBodyNotify : public ndDemoEntityNotify
