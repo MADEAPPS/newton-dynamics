@@ -87,8 +87,8 @@ namespace ndAdvancedRobot
 
 	#define ND_MIN_X_SPAND			ndReal (-2.2f)
 	#define ND_MAX_X_SPAND			ndReal ( 1.5f)
-	#define ND_MIN_Z_SPAND			ndReal (-1.5f)
-	#define ND_MAX_Z_SPAND			ndReal ( 1.5f)
+	#define ND_MIN_Z_SPAND			ndReal (-1.2f)
+	#define ND_MAX_Z_SPAND			ndReal ( 1.3f)
 
 	#define ND_ACTION_SENSITIVITY	ndReal ( 0.10f)
 
@@ -117,7 +117,7 @@ namespace ndAdvancedRobot
 	{
 		{ "base", ndDefinition::m_root, 100.0f, 0.0f, 0.0f},
 		{ "base_rotator", ndDefinition::m_hinge, 50.0f, -ndPi * 2.0f, ndPi * 2.0f},
-		{ "arm_0", ndDefinition::m_hinge , 20.0f, -120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
+		{ "arm_0", ndDefinition::m_hinge , 20.0f, -135.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
 		{ "arm_1", ndDefinition::m_hinge , 20.0f, -90.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
 		{ "arm_2", ndDefinition::m_hinge , 20.0f, -1.0e10f, 1.0e10f},
 		{ "arm_3", ndDefinition::m_hinge , 10.0f, -1.0e10f, 1.0e10f},
@@ -444,40 +444,12 @@ namespace ndAdvancedRobot
 			{
 				return true;
 			}
-			
-			auto ChechHingeLimits = [this](const ndJointHinge* const joint)
-			{
-				ndFloat32 minLimit;
-				ndFloat32 maxLimit;
-				ndFloat32 angle = joint->GetAngle();
-				joint->GetLimits(minLimit, maxLimit);
-				return (angle >= minLimit) && (angle <= maxLimit);
-			};
-
-			for (ndInt32 i = 0; i < m_armJoints.GetCount(); ++i)
-			{
-				if (!ChechHingeLimits(m_armJoints[i]))
-				{
-					return true;
-				}
-			}
-
-			auto ChechGripperLimits = [this](const ndJointSlider* const joint)
-			{
-				ndFloat32 minLimit;
-				ndFloat32 maxLimit;
-				ndFloat32 posit = joint->GetPosit();
-				joint->GetLimits(minLimit, maxLimit);
-				return (posit >= minLimit) && (posit <= maxLimit);
-			};
-
-			//if (!ChechGripperLimits(m_leftGripper))
+		
 			if (m_leftGripper->GetJointHitLimits())
 			{
 				return true;
 			}
 
-			//if (!ChechGripperLimits(m_rightGripper))
 			if (m_rightGripper->GetJointHitLimits())
 			{
 				return true;

@@ -46,7 +46,7 @@ namespace ndSimpleRobot
 	{
 		{ "base", ndDefinition::m_root, 100.0f, 0.0f, 0.0f},
 		{ "base_rotator", ndDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f},
-		{ "arm_0", ndDefinition::m_hinge , 20.0f, -120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
+		{ "arm_0", ndDefinition::m_hinge , 20.0f, -135.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
 		{ "arm_1", ndDefinition::m_hinge , 20.0f, -90.0f * ndDegreeToRad, 60.0f * ndDegreeToRad},
 		{ "arm_2", ndDefinition::m_hinge , 20.0f, -1.0e10f, 1.0e10f},
 		{ "arm_3", ndDefinition::m_hinge , 10.0f, -1.0e10f, 1.0e10f},
@@ -58,8 +58,8 @@ namespace ndSimpleRobot
 
 	#define ND_MIN_X_SPAND	ndReal (-2.2f)
 	#define ND_MAX_X_SPAND	ndReal ( 1.5f)
-	#define ND_MIN_Z_SPAND	ndReal (-1.5f)
-	#define ND_MAX_Z_SPAND	ndReal ( 1.5f)
+	#define ND_MIN_Z_SPAND	ndReal (-1.2f)
+	#define ND_MAX_Z_SPAND	ndReal ( 1.2f)
 
 	class ndRobotBodyNotify : public ndDemoEntityNotify
 	{
