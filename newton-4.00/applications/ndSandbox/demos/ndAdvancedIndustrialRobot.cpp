@@ -251,14 +251,12 @@ namespace ndAdvancedRobot
 			//#pragma optimize( "", off )
 			void SaveTrajectory()
 			{
-				if (IsTerminal())
+				ndInt32 index = m_trajectory.GetCount() - 1;
+				if (m_trajectory.GetReward(index) == ND_DEAD_PENALTY)
 				{
-					ndInt32 index = m_trajectory.GetCount() - 1;
-					if (m_trajectory.GetReward(index) != ND_DEAD_PENALTY)
-					{
-						m_trajectory.SetReward(index, ND_DEAD_PENALTY);
-					}
+					m_trajectory.SetReward(index, ND_DEAD_PENALTY * 4.0f);
 				}
+
 				ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
 			}
 
@@ -445,26 +443,6 @@ namespace ndAdvancedRobot
 				return true;
 			}
 		
-			if (m_leftGripper->GetJointHitLimits())
-			{
-				return true;
-			}
-
-			if (m_rightGripper->GetJointHitLimits())
-			{
-				return true;
-			}
-
-			if (m_arm_0->GetJointHitLimits())
-			{
-				return true;
-			}
-
-			if (m_arm_1->GetJointHitLimits())
-			{
-				return true;
-			}
-
 			const ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
@@ -516,6 +494,26 @@ namespace ndAdvancedRobot
 		ndReal GetReward() const
 		{
 			if (IsTerminal())
+			{
+				return ND_DEAD_PENALTY;
+			}
+
+			if (m_leftGripper->GetJointHitLimits())
+			{
+				return ND_DEAD_PENALTY;
+			}
+
+			if (m_rightGripper->GetJointHitLimits())
+			{
+				return ND_DEAD_PENALTY;
+			}
+
+			if (m_arm_0->GetJointHitLimits())
+			{
+				return ND_DEAD_PENALTY;
+			}
+
+			if (m_arm_1->GetJointHitLimits())
 			{
 				return ND_DEAD_PENALTY;
 			}
