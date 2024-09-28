@@ -59,7 +59,7 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 
 		ndBrainFloat* GetObservations(ndInt32 entry);
 
-		ndInt32 m_obsevationsSize;
+		ndInt64 m_obsevationsSize;
 	};
 
 	class ndRandomGenerator

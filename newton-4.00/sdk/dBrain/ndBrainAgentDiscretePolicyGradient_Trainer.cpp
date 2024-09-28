@@ -67,62 +67,62 @@ ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::ndTrajectoryStep(n
 
 ndInt32 ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetCount() const
 {
-	ndInt32 stride = 3 + m_obsevationsSize;
-	return ndInt32(ndBrainVector::GetCount()) / stride;
+	ndInt64 stride = 3 + m_obsevationsSize;
+	return ndInt32(ndBrainVector::GetCount() / stride);
 }
 
 void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::SetCount(ndInt32 count)
 {
-	ndInt32 stride = 3 + m_obsevationsSize;
+	ndInt64 stride = 3 + m_obsevationsSize;
 	ndBrainVector::SetCount(stride * count);
 }
 
 ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetReward(ndInt32 entry) const
 {
 	const ndTrajectoryStep& me = *this;
-	ndInt32 stride = 3 + m_obsevationsSize;
+	ndInt64 stride = 3 + m_obsevationsSize;
 	return me[stride * entry];
 }
 
 void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::SetReward(ndInt32 entry, ndBrainFloat reward)
 {
 	ndTrajectoryStep& me = *this;
-	ndInt32 stride = 3 + m_obsevationsSize;
+	ndInt64 stride = 3 + m_obsevationsSize;
 	me[stride * entry] = reward;
 }
 
 ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetAdvantage(ndInt32 entry) const
 {
 	const ndTrajectoryStep& me = *this;
-	ndInt32 stride = 3 + m_obsevationsSize;
+	ndInt64 stride = 3 + m_obsevationsSize;
 	return me[stride * entry + 1];
 }
 
 void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::SetAdvantage(ndInt32 entry, ndBrainFloat advantage)
 {
 	ndTrajectoryStep& me = *this;
-	ndInt32 stride = 3 + m_obsevationsSize;
+	ndInt64 stride = 3 + m_obsevationsSize;
 	me[stride * entry + 1] = advantage;
 }
 
 ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetAction(ndInt32 entry) const
 {
 	const ndTrajectoryStep& me = *this;
-	ndInt32 stride = 3 + m_obsevationsSize;
+	ndInt64 stride = 3 + m_obsevationsSize;
 	return me[stride * entry + 2];
 }
 
 void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::SetAction(ndInt32 entry, ndBrainFloat actionIndex)
 {
 	ndTrajectoryStep& me = *this;
-	ndInt32 stride = 3 + m_obsevationsSize;
+	ndInt64 stride = 3 + m_obsevationsSize;
 	me[stride * entry + 2] = actionIndex;
 }
 
 ndBrainFloat* ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetObservations(ndInt32 entry)
 {
 	ndTrajectoryStep& me = *this;
-	ndInt32 stride = 3 + m_obsevationsSize;
+	ndInt64 stride = 3 + m_obsevationsSize;
 	return &me[stride * entry + 3];
 }
 
@@ -151,7 +151,7 @@ const ndBrainFloat* ndBrainAgentDiscretePolicyGradient_TrainerMaster::MemoryStat
 void ndBrainAgentDiscretePolicyGradient_TrainerMaster::MemoryStateValues::SaveTransition(ndInt32 index, ndBrainFloat reward, const ndBrainFloat* const observations)
 {
 	ndBrainVector& me = *this;
-	ndInt32 stride = m_obsevationsSize + 1;
+	ndInt64 stride = m_obsevationsSize + 1;
 	me[index * stride] = reward;
 	ndMemCpy(&me[index * stride + 1], observations, m_obsevationsSize);
 }
