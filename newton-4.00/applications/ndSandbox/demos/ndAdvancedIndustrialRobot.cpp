@@ -463,11 +463,6 @@ namespace ndAdvancedRobot
 				}
 			}
 
-			if (ModelCollided())
-			{
-				return true;
-			}
-
 			return false;
 		}
 
@@ -514,6 +509,11 @@ namespace ndAdvancedRobot
 			}
 
 			if (m_arm_1->GetJointHitLimits())
+			{
+				return ND_DEAD_PENALTY;
+			}
+
+			if (ModelCollided())
 			{
 				return ND_DEAD_PENALTY;
 			}
@@ -574,7 +574,7 @@ namespace ndAdvancedRobot
 
 			bool hitaLimit = m_arm_0->GetJointHitLimits() || m_arm_1->GetJointHitLimits();
 			
-			observation->m_hitLimit = ndBrainFloat (hitaLimit ? 1.0 : 0.0f);
+			observation->m_hitLimit = ndBrainFloat (hitaLimit ? 1.0f : 0.0f);
 			observation->m_collided = ndBrainFloat(ModelCollided() ? 1.0f : 0.0f);
 
 			const ndMatrix effectorMatrix(m_effectorLocalTarget * m_arm_4->GetBody0()->GetMatrix());
