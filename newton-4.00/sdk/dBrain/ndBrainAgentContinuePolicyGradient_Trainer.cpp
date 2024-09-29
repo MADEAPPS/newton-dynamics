@@ -94,7 +94,16 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 		#else
 			for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
 			{
-				output[i + m_neurons / 2] = ndMax(input[i + m_neurons / 2], m_minimumSigma);
+				//output[i + m_neurons / 2] = ndMax(input[i + m_neurons / 2], m_minimumSigma);
+				// 
+				//ndBrainFloat value = ndClamp(input[i + m_neurons / 2], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
+				//ndBrainFloat x = ndBrainFloat(ndExp(-value));
+				//output[i + m_neurons / 2] = m_minimumSigma + ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) + x);
+				//ndAssert(ndCheckFloat(output[i]));
+				//ndAssert(output[i] <= (ndBrainFloat(1.0f) + m_minimumSigma));
+				//ndAssert(output[i] >= m_minimumSigma);
+
+				output[i + m_neurons / 2] = m_minimumSigma * 0.5f * output[i + m_neurons / 2];
 			}
 		#endif
 	}
@@ -112,8 +121,16 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 		#else
 			for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
 			{
-				inputDerivative[i + m_neurons / 2] = (input[i + m_neurons / 2] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-				inputDerivative[i + m_neurons / 2] *= outputDerivative[i + m_neurons / 2];
+				//inputDerivative[i + m_neurons / 2] = (input[i + m_neurons / 2] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+				//inputDerivative[i + m_neurons / 2] *= outputDerivative[i + m_neurons / 2];
+
+				//ndBrainFloat out = output[i + m_neurons / 2] - m_minimumSigma;
+				//ndBrainFloat derivative = out * (ndBrainFloat(1.0f) - out);
+				//inputDerivative[i + m_neurons / 2] = outputDerivative[i + m_neurons / 2] * derivative;
+
+				ndBrainFloat out = output[i + m_neurons / 2] - (ndBrainFloat(0.5f) + m_minimumSigma);
+				ndBrainFloat derivative = ndBrainFloat(0.5f) - ndBrainFloat(2.0f) * out * out;
+				inputDerivative[i + m_neurons / 2] = outputDerivative[i + m_neurons / 2] * derivative;
 			}
 		#endif
 	}
