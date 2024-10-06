@@ -12,6 +12,7 @@
 #include "ndCoreStdafx.h"
 #include "ndCRC.h"
 
+#if 0
 static ndUnsigned64 randBits0[] =
 {
     static_cast<ndUnsigned64>(7266447313870364031ULL), static_cast<ndUnsigned64>(4946485549665804864ULL), static_cast<ndUnsigned64>(16945909448695747420ULL), static_cast<ndUnsigned64>(16394063075524226720ULL),
@@ -128,6 +129,59 @@ ndUnsigned64 ndCRC64 (const void* const buffer, ndInt32 size, ndUnsigned64 crcAc
     return crcAcc;
 }
 
+#else
+
+ndUnsigned64 ndCRC64(const char* const name, ndUnsigned64 crcAcc)
+{
+    // https://en.wikipedia.org/wiki/Jenkins_hash_function
+    // the simplest hash function I could find from wikipedia
+    // no sure how uniform distributed it is,
+    // but it seems pretty good so far.
+	//size_t i = 0;
+	//hash = 0;
+    //for (ndInt32 i = 0; i < size; ++i)
+	//	hash += key[i++];
+	//	hash += hash << 10;
+	//	hash ^= hash >> 6;
+	//}
+	//hash += hash << 3;
+	//hash ^= hash >> 11;
+	//hash += hash << 15;
+	//return hash;
+
+	if (name)
+	{
+		for (ndInt32 i = 0; name[i]; ++i)
+		{
+			char c = name[i];
+            crcAcc += c;
+            crcAcc += crcAcc << 10;
+            crcAcc ^= crcAcc >> 6;
+		}
+		crcAcc += crcAcc << 3;
+		crcAcc ^= crcAcc >> 11;
+		crcAcc += crcAcc << 15;
+	}
+	return crcAcc;
+}
+
+ndUnsigned64 ndCRC64(const void* const buffer, ndInt32 size, ndUnsigned64 crcAcc)
+{
+	const unsigned char* const ptr = (unsigned char*)buffer;
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+        unsigned char c = ptr[i];
+		crcAcc += c;
+		crcAcc += crcAcc << 10;
+		crcAcc ^= crcAcc >> 6;
+	}
+	crcAcc += crcAcc << 3;
+	crcAcc ^= crcAcc >> 11;
+	crcAcc += crcAcc << 15;
+	return crcAcc;
+}
+
+#endif
 
 
 

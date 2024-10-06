@@ -38,61 +38,31 @@ ndModelNotify::ndModelNotify()
 ndModelNotify* ndModelNotify::Clone() const
 {
 	ndAssert(0);
-	return nullptr;
+	return new ndModelNotify();
 }
 
 ndModelNotify::~ndModelNotify()
 {
 }
 
-#if 0
-ndBody* ndModelNotify::GetBody()
-{ 
-	return m_body; 
-}
-
-const ndBody* ndModelNotify::GetBody() const
-{ 
-	return m_body; 
-}
-
-void* ndModelNotify::GetUserData() const
-{ 
-	return nullptr; 
-}
-
-ndVector ndModelNotify::GetGravity() const
+ndModel* ndModelNotify::GetModel() const
 {
-	return m_defaultGravity;
+	return m_model;
 }
 
-void ndModelNotify::SetGravity(const ndVector & defaultGravity)
-{
-	m_defaultGravity = defaultGravity;
-}
-
-void ndModelNotify::OnTransform(ndInt32, const ndMatrix&)
+void ndModelNotify::Debug(ndConstraintDebugCallback&) const
 {
 }
 
-bool ndModelNotify::OnSceneAabbOverlap(const ndBody* const) const
+
+void ndModelNotify::Update(ndWorld* const, ndFloat32)
 {
-	return true;
 }
 
-void ndModelNotify::OnApplyExternalForce(ndInt32, ndFloat32)
+void ndModelNotify::PostUpdate(ndWorld* const, ndFloat32)
 {
-	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
-	ndAssert(body);
-	if (body->GetInvMass() > 0.0f)
-	{
-		ndVector massMatrix(body->GetMassMatrix());
-		ndVector force (m_defaultGravity.Scale(massMatrix.m_w));
-		body->SetForce(force);
-		body->SetTorque(ndVector::m_zero);
-
-		//ndVector L(body->CalculateAngularMomentum());
-		//dTrace(("%f %f %f\n", L.m_x, L.m_y, L.m_z));
-	}
 }
-#endif
+
+void ndModelNotify::PostTransformUpdate(ndWorld* const, ndFloat32)
+{
+}

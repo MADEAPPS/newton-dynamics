@@ -63,13 +63,24 @@ void ndBrainLayerActivationSigmoid::MakePrediction(const ndBrainVector& input, n
 		output[i] = ndBrainFloat(ndExp(-value));
 		ndAssert(ndCheckFloat(output[i]));
 	}
+	
+	//for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
+	//{
+	//	output[i] = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) + output[i]);
+	//	ndAssert(output[i] <= ndBrainFloat(1.0f));
+	//	ndAssert(output[i] >= ndBrainFloat(0.0f));
+	//}
 
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{
-		output[i] = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) + output[i]);
+		ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
+		ndBrainFloat x = ndBrainFloat(ndExp(-value));
+		output[i] = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) + x);
+		ndAssert(ndCheckFloat(output[i]));
 		ndAssert(output[i] <= ndBrainFloat(1.0f));
 		ndAssert(output[i] >= ndBrainFloat(0.0f));
 	}
+
 	output.FlushToZero();
 }
 

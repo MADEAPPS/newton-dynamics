@@ -11,8 +11,9 @@ namespace nd_
 {
 	namespace FLOAT_MATH
 	{
-		#define REAL float
-		#undef REAL
+		#ifdef REAL
+			#undef REAL
+		#endif
 		#define REAL double
 	}
 }

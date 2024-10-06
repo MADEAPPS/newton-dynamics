@@ -13,10 +13,6 @@
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
@@ -458,8 +454,8 @@ namespace nd_
 			
 			m_commonData->m_inputPSet->ComputeClippedVolumes(m_plane, volumeRight, volumeLeft);
 			
-			double concavityLeft = ComputeConcavity(volumeLeft, volumeLeftCH, m_commonData->m_me->m_volumeCH0);
-			double concavityRight = ComputeConcavity(volumeRight, volumeRightCH, m_commonData->m_me->m_volumeCH0);
+			double concavityLeft = float(ComputeConcavity(volumeLeft, volumeLeftCH, m_commonData->m_me->m_volumeCH0));
+			double concavityRight = float(ComputeConcavity(volumeRight, volumeRightCH, m_commonData->m_me->m_volumeCH0));
 			double concavity = (concavityLeft + concavityRight);
 			
 			// compute cost
@@ -622,7 +618,7 @@ namespace nd_
 					m_volumeCH0 = volumeCH;
 				}
 
-				double concavity = ComputeConcavity(volume, volumeCH, m_volumeCH0);
+				double concavity = float(ComputeConcavity(volume, volumeCH, m_volumeCH0));
 				double error = 1.01 * pset->ComputeMaxVolumeError() / m_volumeCH0;
 				// make the value smaller, later put it the parameters.
 				error *= params.m_concavityToVolumeWeigh;
@@ -926,10 +922,10 @@ namespace nd_
 				for (int i = 0; i < m_pairsCount; i++)
 				{
 					ConvexPair& pair = m_pairs[i];
-					const float volume0 = m_convexHulls[pair.m_p0]->ComputeVolume();
-					const float volume1 = m_convexHulls[pair.m_p1]->ComputeVolume();
+					const float volume0 = float(m_convexHulls[pair.m_p0]->ComputeVolume());
+					const float volume1 = float(m_convexHulls[pair.m_p1]->ComputeVolume());
 					ComputeConvexHull(m_convexHulls[pair.m_p0], m_convexHulls[pair.m_p1], pts, &combinedCH);
-					pair.m_cost = ComputeConcavity(volume0 + volume1, combinedCH.ComputeVolume(), m_volumeCH0);
+					pair.m_cost = float(ComputeConcavity(volume0 + volume1, combinedCH.ComputeVolume(), m_volumeCH0));
 				}
 			}
 
@@ -1039,7 +1035,7 @@ namespace nd_
 					convexProxyArray[size_t(key.m_p0)].m_hull = nullptr;
 					convexProxyArray[size_t(key.m_p1)].m_hull = nullptr;
 
-					const float volume0 = newHull->ComputeVolume();
+					const float volume0 = float(newHull->ComputeVolume());
 
 					const Vec3<double> bmin(convexProxyArray[index].m_bmin);
 					const Vec3<double> bmax(convexProxyArray[index].m_bmax);
@@ -1058,9 +1054,9 @@ namespace nd_
 							{
 								int i0 = int(i);
 								ConvexPair pair(i0, int(index));
-								const float volume1 = convexProxyArray[i].m_hull->ComputeVolume();
+								const float volume1 = float(convexProxyArray[i].m_hull->ComputeVolume());
 								ComputeConvexHull(newHull, convexProxyArray[i].m_hull, pts, &combinedCH);
-								float cost = ComputeConcavity(volume0 + volume1, combinedCH.ComputeVolume(), m_volumeCH0);
+								float cost = float(ComputeConcavity(volume0 + volume1, combinedCH.ComputeVolume(), m_volumeCH0));
 								priority.Push(pair, cost);
 							}
 						}

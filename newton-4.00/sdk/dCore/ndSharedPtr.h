@@ -31,6 +31,7 @@ class ndSharedPtr
 	const T* operator* () const;
 
 	operator bool() const;
+	ndInt32 GetRefCount() const;
 
 	private:
 	class ndRefCounter : public ndAtomic<ndInt32>, public ndContainersFreeListAlloc<ndRefCounter>
@@ -161,5 +162,10 @@ ndSharedPtr<T>::operator bool() const
 	return m_ptr != nullptr;
 }
 
+template <typename T>
+ndInt32 ndSharedPtr<T>::GetRefCount() const
+{
+	return m_references->load();
+}
 #endif 
 

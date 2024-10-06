@@ -23,8 +23,6 @@
 #define __ND_MODEL_NOTIFY_H__
 
 #include "ndNewtonStdafx.h"
-//#include "ndModelList.h"
-
 
 D_MSV_NEWTON_ALIGN_32
 class ndModelNotify : public ndContainersFreeListAlloc<ndModelNotify>
@@ -37,27 +35,19 @@ class ndModelNotify : public ndContainersFreeListAlloc<ndModelNotify>
 
 	D_NEWTON_API virtual ~ndModelNotify();
 
-	ndModel* GetModel() const;
+	D_NEWTON_API ndModel* GetModel() const;
 
-	virtual ndModelNotify* Clone() const = 0;
-	virtual void Update(ndWorld* const world, ndFloat32 timestep) = 0;
-	virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep) = 0;
-	virtual void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep) = 0;
+	D_NEWTON_API virtual ndModelNotify* Clone() const;
+	D_NEWTON_API virtual void Update(ndWorld* const world, ndFloat32 timestep);
+	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
+	D_NEWTON_API virtual void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep);
 
-	virtual void Debug(ndConstraintDebugCallback& context) const;
+	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 
 	private:
 	ndModel* m_model;
 	friend class ndModel;
 } D_GCC_NEWTON_ALIGN_32;
 
-inline ndModel* ndModelNotify::GetModel() const
-{
-	return m_model;
-}
-
-inline void ndModelNotify::Debug(ndConstraintDebugCallback&) const
-{
-}
 #endif 
 
