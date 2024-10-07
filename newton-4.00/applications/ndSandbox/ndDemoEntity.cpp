@@ -468,31 +468,34 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail)
 {
 	ndArray<ndVector> points;
 	ndArray<ndInt32> indices;
+	ndArray<ndInt32> remapIndex;
 	const ndSharedPtr<ndDemoMeshInterface> meshPtr = GetMesh();
 	ndDemoMesh* const mesh = (ndDemoMesh*)*meshPtr;
 	ndAssert(mesh);
 	mesh->GetVertexArray(points);
 	mesh->GetIndexArray(indices);
 
-	//ndArray<ndTriplex> meshPoints;
-	ndArray<ndReal> meshPoints;
-	for (ndInt32 i = 0; i < points.GetCount(); ++i)
+	remapIndex.SetCount(points.GetCount());
+
+	ndInt32 vCount = ndVertexListToIndexList(&points[0].m_x, sizeof(ndVector), 3, ndInt32(points.GetCount()), &remapIndex[0], ndFloat32(1.0e-6f));
+	for (ndInt32 i = ndInt32 (indices.GetCount()) - 1; i >= 0; --i)
 	{
-		//ndTriplex p;
-		//p.m_x = points[i].m_x;
-		//p.m_y = points[i].m_y;
-		//p.m_z = points[i].m_z;
-		//meshPoints.PushBack(p);
+		ndInt32 j = indices[i];
+		indices[i] = remapIndex[j];
+	}
+
+	ndArray<ndReal> meshPoints;
+	for (ndInt32 i = 0; i < vCount; ++i)
+	{
 		meshPoints.PushBack(ndReal(points[i].m_x));
 		meshPoints.PushBack(ndReal(points[i].m_y));
 		meshPoints.PushBack(ndReal(points[i].m_z));
 	}
-
+	
 	nd_::VHACD::IVHACD* const interfaceVHACD = nd_::VHACD::CreateVHACD();
 	nd_::VHACD::IVHACD::Parameters paramsVHACD;
-	//paramsVHACD.m_maxConvexHulls = 24;
 	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
-	interfaceVHACD->Compute(&meshPoints[0], uint32_t(points.GetCount() / 3), (uint32_t*)&indices[0], uint32_t(indices.GetCount() / 3), paramsVHACD);
+	interfaceVHACD->Compute(&meshPoints[0], uint32_t(meshPoints.GetCount() / 3), (uint32_t*)&indices[0], uint32_t(indices.GetCount() / 3), paramsVHACD);
 
 	ndShapeInstance* const compoundShapeInstance = new ndShapeInstance(new ndShapeCompound());
 

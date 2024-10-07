@@ -976,20 +976,34 @@ namespace nd_
 		size_t nConvexHulls = m_convexHulls.Size();
 		if (nConvexHulls > 1 && !m_cancel)
 		{
+			size_t start = 0;
 			size_t bashSize = pairsCount / (VHACD_WORKERS_THREADS * 4);
-			for (size_t j = 0; j <= VHACD_WORKERS_THREADS * 4; ++j)
+			for (size_t j = 0; j < VHACD_WORKERS_THREADS * 4; ++j)
 			{
-				size_t i = j * bashSize;
-				size_t count = ((i + bashSize) <= pairsCount) ? bashSize : pairsCount - i;
+				//size_t i = j * bashSize;
+				//size_t count = ((i + bashSize) <= pairsCount) ? bashSize : pairsCount - i;
+				//size_t count = ((i + bashSize) <= pairsCount) ? bashSize : pairsCount - i;
+				size_t count = (j + 1) * bashSize - start;
 				if (count > 0)
 				{
-					jobBashes[j].m_pairs = &convexPairArray[i];
+					jobBashes[j].m_pairs = &convexPairArray[start];
 					jobBashes[j].m_pairsCount = int(count);
 					jobBashes[j].m_volumeCH0 = m_volumeCH0;
 					jobBashes[j].m_convexHulls = &m_convexHulls[0];
 					m_parallelQueue.PushTask(&jobBashes[j]);
 				}
+				start += bashSize;
 			}
+			size_t count = pairsCount - start;
+			if (count > 0)
+			{
+				jobBashes[VHACD_WORKERS_THREADS * 4].m_pairs = &convexPairArray[start];
+				jobBashes[VHACD_WORKERS_THREADS * 4].m_pairsCount = int(count);
+				jobBashes[VHACD_WORKERS_THREADS * 4].m_volumeCH0 = m_volumeCH0;
+				jobBashes[VHACD_WORKERS_THREADS * 4].m_convexHulls = &m_convexHulls[0];
+				m_parallelQueue.PushTask(&jobBashes[VHACD_WORKERS_THREADS * 4]);
+			}
+
 			m_parallelQueue.Sync();
 
 			for (size_t i = 0; i < pairsCount; i++)

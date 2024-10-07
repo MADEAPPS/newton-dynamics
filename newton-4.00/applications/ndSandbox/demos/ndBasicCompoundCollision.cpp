@@ -120,7 +120,6 @@ static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatri
 {
 	ndMeshLoader loader;
 	ndDemoEntity* const rootEntity = loader.LoadEntity(meshName, scene);
-	//ndShapeInstance* const compoundShapeInstance = bowlEntity->CreateCompoundFromMesh();
 	ndDemoEntity* const childEntity = rootEntity->GetFirstChild();
 	ndShapeInstance* const compoundShapeInstance = childEntity->CreateCompoundFromMesh();
 	
@@ -155,12 +154,16 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 
 	ndMatrix location(ndGetIdentityMatrix());
 
-	AddSphere(scene);
-	AddEmptyBox(scene);
+	//AddSphere(scene);
+	//AddEmptyBox(scene);
 	
 	location.m_posit.m_y = 0.5f;
 	location.m_posit.m_z = -3.0f;
-	AddSimpleConcaveMesh(scene, location, "bowl.fbx", 4);
+	//AddSimpleConcaveMesh(scene, location, "bowl.fbx", 4);
+	AddSimpleConcaveMesh(scene, location, "bowl.fbx", 1);
+
+	location.m_posit.m_z = -5.0f;
+	AddSimpleConcaveMesh(scene, location, "testConcave.fbx", 1);
 	
 	location.m_posit.m_x = 5.0f;
 	location.m_posit.m_z = -2.0f;
