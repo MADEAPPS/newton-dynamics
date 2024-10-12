@@ -32,7 +32,6 @@ class ndModel;
 class ndSkeletonContainer;
 class ndJointBilateralConstraint;
 
-#define D_USE_FULL_INERTIA
 #define	D_FREEZZING_VELOCITY_DRAG	ndFloat32 (0.9f)
 #define	D_SOLVER_MAX_ACCEL_ERROR	(D_FREEZE_MAG * ndFloat32 (0.5f))
 
@@ -195,9 +194,7 @@ class ndBodyKinematic : public ndBody
 
 	virtual void SetAcceleration(const ndVector& accel, const ndVector& alpha);
 
-#ifdef D_USE_FULL_INERTIA
 	ndMatrix m_inertiaPrincipalAxis;
-#endif
 	ndMatrix m_invWorldInertiaMatrix;
 	ndShapeInstance m_shapeInstance;
 	ndVector m_mass;
@@ -311,11 +308,7 @@ inline void ndBodyKinematic::SetMassMatrix(ndFloat32 Ixx, ndFloat32 Iyy, ndFloat
 
 inline ndMatrix ndBodyKinematic::GetPrincipalAxis() const
 {
-#ifdef D_USE_FULL_INERTIA	
 	return m_inertiaPrincipalAxis;
-#else
-	return ndGetIdentityMatrix();
-#endif
 }
 
 inline ndBodyKinematic* ndBodyKinematic::GetAsBodyKinematic() 

@@ -254,13 +254,8 @@ void ndBodyDynamic::AddDampingAcceleration(ndFloat32 timestep)
 	}
 
 	const ndVector omegaDamp(m_cachedDampCoef & ndVector::m_triplexMask);
-#ifdef D_USE_FULL_INERTIA	
 	const ndVector omega(omegaDamp * m_inertiaPrincipalAxis.UnrotateVector(m_matrix.UnrotateVector(m_omega)));
 	m_omega = m_matrix.RotateVector(m_inertiaPrincipalAxis.RotateVector(omega));
-#else
-	const ndVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
-	m_omega = m_matrix.RotateVector(omega);
-#endif
 	m_veloc = m_veloc.Scale(m_cachedDampCoef.m_w);
 }
 
@@ -286,13 +281,8 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const ndVector& force, const nd
 	ndJacobian velocStep;
 
 	const ndMatrix matrix(ndCalculateMatrix(m_gyroRotation, ndVector::m_wOne));
-#ifdef D_USE_FULL_INERTIA
 	const ndVector localOmega(m_inertiaPrincipalAxis.UnrotateVector(matrix.UnrotateVector(m_omega)));
 	const ndVector localTorque(m_inertiaPrincipalAxis.UnrotateVector(matrix.UnrotateVector(torque)));
-#else
-	const ndVector localOmega(matrix.UnrotateVector(m_omega));
-	const ndVector localTorque(matrix.UnrotateVector(torque));
-#endif
 
 	// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
 	const ndVector dw(localOmega * timestep);
@@ -306,11 +296,7 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const ndVector& force, const nd
 	// calculate gradient at a full time step
 	const ndVector gradientStep(jacobianMatrix.SolveByGaussianElimination(localTorque * timestep));
 
-#ifdef D_USE_FULL_INERTIA
 	velocStep.m_angular = matrix.RotateVector(m_inertiaPrincipalAxis.RotateVector(gradientStep));
-#else
-	velocStep.m_angular = matrix.RotateVector(gradientStep);
-#endif
 	velocStep.m_linear = force.Scale(m_invMass.m_w) * timestep;
 
 #ifdef _DEBUG
@@ -347,18 +333,10 @@ void ndBodyDynamic::IntegrateGyroSubstep(const ndVector& timestep)
 		// calculate new Gyro torque and Gyro acceleration
 		const ndMatrix matrix(ndCalculateMatrix(m_gyroRotation, ndVector::m_wOne));
 
-#ifdef D_USE_FULL_INERTIA
 		const ndVector localOmega(m_inertiaPrincipalAxis.UnrotateVector(matrix.UnrotateVector(m_omega)));
 		const ndVector localGyroTorque(localOmega.CrossProduct(m_mass * localOmega));
 		m_gyroTorque = matrix.RotateVector(m_inertiaPrincipalAxis.RotateVector(localGyroTorque));
 		m_gyroAlpha = matrix.RotateVector(m_inertiaPrincipalAxis.RotateVector(localGyroTorque * m_invMass));
-		//ndAssert(m_gyroTorque.DotProduct(m_gyroTorque).GetScalar() < ndFloat32 (10000.0f));
-#else
-		const ndVector localOmega(matrix.UnrotateVector(m_omega));
-		const ndVector localGyroTorque(localOmega.CrossProduct(m_mass * localOmega));
-		m_gyroTorque = matrix.RotateVector(localGyroTorque);
-		m_gyroAlpha = matrix.RotateVector(localGyroTorque * m_invMass);
-#endif
 	}
 	else
 	{
