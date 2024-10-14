@@ -417,7 +417,7 @@
     <ClCompile Include="Public\dNewton\dIkSolver\ndIkSwivelPositionEffector.cpp">
       <Filter>dNewton\dIkSolver</Filter>
     </ClCompile>
-    <ClCompile Include="Public\thirdParty\GenerateConvecApproximation.cpp">
+    <ClCompile Include="Public\thirdParty\ndConvexApproximation.cpp">
       <Filter>thirdParty</Filter>
     </ClCompile>
   </ItemGroup>
@@ -866,7 +866,7 @@
     <ClInclude Include="Public\dNewton\dIkSolver\ndIkSwivelPositionEffector.h">
       <Filter>dNewton\dIkSolver</Filter>
     </ClInclude>
-    <ClInclude Include="Public\thirdParty\GenerateConvecApproximation.h">
+    <ClInclude Include="Public\thirdParty\ndConvexApproximation.h">
       <Filter>thirdParty</Filter>
     </ClInclude>
   </ItemGroup>

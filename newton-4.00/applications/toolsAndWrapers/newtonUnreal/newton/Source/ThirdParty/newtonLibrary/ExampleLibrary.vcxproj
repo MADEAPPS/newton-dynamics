@@ -158,7 +158,7 @@
     <ClCompile Include="Public\dNewton\ndSkeletonContainer.cpp" />
     <ClCompile Include="Public\dNewton\ndWorld.cpp" />
     <ClCompile Include="Public\dNewton\ndWorldScene.cpp" />
-    <ClCompile Include="Public\thirdParty\GenerateConvecApproximation.cpp" />
+    <ClCompile Include="Public\thirdParty\ndConvexApproximation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\dCollision\ndBodiesInAabbNotify.h" />
@@ -309,7 +309,7 @@
     <ClInclude Include="Public\dNewton\ndSkeletonList.h" />
     <ClInclude Include="Public\dNewton\ndWorld.h" />
     <ClInclude Include="Public\dNewton\ndWorldScene.h" />
-    <ClInclude Include="Public\thirdParty\GenerateConvecApproximation.h" />
+    <ClInclude Include="Public\thirdParty\ndConvexApproximation.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Public\dCore\ndTypes.natvis" />

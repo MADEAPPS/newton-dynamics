@@ -94,5 +94,5 @@ sdk/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 
 # Unreal engine filters
 .vs
-intemediate/*.*
-practiceGames/
+practice/
+intemediate/

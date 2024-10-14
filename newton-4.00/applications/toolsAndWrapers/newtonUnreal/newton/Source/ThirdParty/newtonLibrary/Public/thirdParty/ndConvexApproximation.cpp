@@ -21,7 +21,7 @@
 
 #include "ndCoreStdafx.h"
 #include "VHACD.h"
-#include "GenerateConvecApproximation.h"
+#include "ndConvexApproximation.h"
 
 class ndConvexApproximation::ProgressBar: public nd_::VHACD::IVHACD::IUserCallback
 {
