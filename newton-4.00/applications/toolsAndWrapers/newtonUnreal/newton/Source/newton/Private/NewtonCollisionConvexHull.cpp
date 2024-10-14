@@ -7,7 +7,7 @@
 #include "NewtonRigidBody.h"
 #include "NewtonSceneActor.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
-#include "ThirdParty/newtonLibrary/Public/thirdParty/GenerateConvecApproximation.h"
+#include "ThirdParty/newtonLibrary/Public/thirdParty/ndConvexApproximation.h"
 
 UNewtonCollisionConvexHull::UNewtonCollisionConvexHull()
 	:Super()

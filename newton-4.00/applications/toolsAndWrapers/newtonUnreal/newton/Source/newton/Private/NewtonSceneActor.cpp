@@ -16,7 +16,7 @@
 #include "NewtonCollisionLandscape.h"
 #include "NewtonCollisionConvexHull.h"
 #include "NewtonCollisionPolygonalMesh.h"
-#include "ThirdParty/newtonLibrary/Public/thirdParty/GenerateConvecApproximation.h"
+#include "ThirdParty/newtonLibrary/Public/thirdParty/ndConvexApproximation.h"
 
 // Sets default values
 ANewtonSceneActor::ANewtonSceneActor()

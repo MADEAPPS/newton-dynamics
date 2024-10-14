@@ -14,7 +14,7 @@
 #include "NewtonCollision.h"
 #include "NewtonWorldActor.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
-#include "ThirdParty/newtonLibrary/Public/thirdParty/GenerateConvecApproximation.h"
+#include "ThirdParty/newtonLibrary/Public/thirdParty/ndConvexApproximation.h"
 
 //FLinearColor UNewtonRigidBody::m_awakeColor(1.0f, 0.0f, 0.f);
 //FLinearColor UNewtonRigidBody::m_sleepingColor(0.0f, 1.0f, 0.f);
