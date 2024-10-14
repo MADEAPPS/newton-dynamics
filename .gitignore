@@ -22,9 +22,9 @@ DerivedData
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
+#[Rr]elease/
+#[Rr]eleases/
+#x64/
 x86/
 bld/
 [Bb]in/
@@ -92,6 +92,7 @@ sdk/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 */.ccls-cache/
 */.projectile
 
-# Unreal engine filers
+# Unreal engine filters
 .vs
 intemediate/*.*
+practiceGames/
