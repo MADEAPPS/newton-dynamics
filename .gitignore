@@ -30,7 +30,7 @@ bld/
 [Bb]in/
 [Oo]bj/
 
-*.cs
+#*.cs
 *.tt
 *.db
 *.asm
@@ -38,9 +38,10 @@ bld/
 *.suo
 *.obj
 *.sdf
-*.pdb
-*.dll
-*.lib
+#*.bin
+#*.pdb
+#*.dll
+#*.lib
 *.exe
 *.spv
 *.dat
@@ -49,7 +50,6 @@ bld/
 *.ilk
 *.map
 *.idb
-#*.bin
 *.ncb
 *.htm
 *.dep
