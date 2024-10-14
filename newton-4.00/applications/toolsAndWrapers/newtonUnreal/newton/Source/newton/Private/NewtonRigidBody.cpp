@@ -13,6 +13,7 @@
 #include "NewtonJoint.h"
 #include "NewtonCollision.h"
 #include "NewtonWorldActor.h"
+#include "NewtonCollisionConvexHull.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 #include "ThirdParty/newtonLibrary/Public/thirdParty/ndConvexApproximation.h"
 

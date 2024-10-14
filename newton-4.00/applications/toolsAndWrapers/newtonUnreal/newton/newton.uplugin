@@ -12,6 +12,7 @@
 	"SupportURL": "",
 	"EngineVersion": "5.4.0",
 	"CanContainContent": true,
+	"IsBetaVersion": true,
 	"Installed": true,
 	"Modules": [
 		{

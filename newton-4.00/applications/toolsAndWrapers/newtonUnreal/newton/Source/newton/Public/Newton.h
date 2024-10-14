@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Modules/ModuleManager.h"
+#include "DynamicMesh/DynamicMesh3.h"
 #include "Interfaces/IPluginManager.h"
 
 #define UNREAL_UNIT_SYSTEM		ndFloat32 (100.0f)
