@@ -5,6 +5,7 @@
 #include "LevelEditor.h"
 #include "EngineUtils.h"
 #include "LandscapeProxy.h"
+#include "LandscapeStreamingProxy.h"
 
 #include "Newton.h"
 #include "NewtonCollision.h"
@@ -52,7 +53,6 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 		auto GenerateSimpleCollision = [this, staticComponent]()
 		{
 			bool hasSimple = false;
-			//AActor* const actor = staticComponent->GetOwner();
 			const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
 			const UBodySetup* const bodySetup = staticMesh->GetBodySetup();
 
@@ -64,9 +64,10 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 				FinishAddComponent(childComp, false, FTransform());
 				AddInstanceComponent(childComp);
 				childComp->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
+				childComp->SetGeometryMesh(staticComponent);
+				childComp->SetGlobalTransform();
 				childComp->MarkRenderDynamicDataDirty();
 				childComp->NotifyMeshUpdated();
-				childComp->SetGeometryMesh(staticComponent);
 			};
 
 			for (int i = aggGeom.SphereElems.Num() - 1; i >= 0; --i)
@@ -117,24 +118,14 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 
 		auto GenerateComplexCollision = [this, staticComponent]()
 		{
-			//AActor* const actor = staticComponent->GetOwner();
-			auto AddComponent = [this, staticComponent](UNewtonCollision* const childComp)
-			{
-				FinishAddComponent(childComp, false, FTransform());
-				AddInstanceComponent(childComp);
-				childComp->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
-				childComp->MarkRenderDynamicDataDirty();
-				childComp->NotifyMeshUpdated();
-				childComp->SetGeometryMesh(staticComponent);
-
-				//const FTransform bodyTransform(RootBody->GetComponentToWorld());
-				//const FTransform meshTransform(staticComponent->GetComponentToWorld());
-				//const FTransform transform(meshTransform * bodyTransform.Inverse());
-				//childComp->SetComponentToWorld(transform);
-			};
-
-			UNewtonCollisionPolygonalMesh* const child = Cast<UNewtonCollisionPolygonalMesh>(AddComponentByClass(UNewtonCollisionPolygonalMesh::StaticClass(), false, FTransform(), true));
-			AddComponent(child);
+			UNewtonCollisionPolygonalMesh* const childComp = Cast<UNewtonCollisionPolygonalMesh>(AddComponentByClass(UNewtonCollisionPolygonalMesh::StaticClass(), false, FTransform(), true));
+			FinishAddComponent(childComp, false, FTransform());
+			AddInstanceComponent(childComp);
+			childComp->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
+			childComp->SetGeometryMesh(staticComponent);
+			childComp->SetGlobalTransform();
+			childComp->MarkRenderDynamicDataDirty();
+			childComp->NotifyMeshUpdated();
 		};
 
 		const UBodySetup* const bodySetup = staticMesh->GetBodySetup();
@@ -165,7 +156,6 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 			}
 			case CTF_UseComplexAsSimple:
 			{
-				check(0);
 				GenerateComplexCollision();
 				break;
 			}
@@ -186,6 +176,12 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 		return;
 	}
 	GenerateShapes = false;
+
+	UNewtonSceneRigidBody* const staticSceneBody = FindComponentByClass<UNewtonSceneRigidBody>();
+	if (!staticSceneBody)
+	{
+		return;
+	}
 
 	FFolder folder(GetFolder());
 	if (folder.IsNone())
@@ -208,9 +204,21 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 			{
 				actorList.PushBack(actor);
 			}
+			else if (Cast<ALandscapeStreamingProxy>(actor))
+			{
+				const ALandscapeStreamingProxy* const streamingProxy = Cast<ALandscapeStreamingProxy>(actor);
+				const AActor* const parent = streamingProxy->GetSceneOutlinerParent();
+				const FString streamingKey(parent->GetFolder().ToString());
+				index = streamingKey.Find(key);
+				if (index == 0)
+				{
+					actorList.PushBack(actor);
+				}
+			}
 		}
 	}
 
+	staticSceneBody->RemoveAllCollisions();
 	for (ndInt32 i = ndInt32(actorList.GetCount()) - 1; i >= 0; --i)
 	{
 		AActor* const sceneActor = actorList[i];
@@ -251,62 +259,28 @@ void ANewtonSceneActor::GenerateStaticMeshCollision(const AActor* const actor)
 		}
 	}
 
-	const TArray<TObjectPtr<USceneComponent>>& children = RootBody->GetAttachChildren();
-	auto HasCollision = [this, &children](const UStaticMeshComponent* const meshComp)
-		{
-			for (ndInt32 i = children.Num() - 1; i >= 0; --i)
-			{
-				const UNewtonCollision* const collision = Cast<UNewtonCollision>(children[i]);
-				if (collision && (collision->GetGeometryMesh() == meshComp))
-				{
-					return true;
-				}
-			}
-			return false;
-		};
-
 	for (ndInt32 i = staticMesh.Num() - 1; i >= 0; --i)
 	{
 		TObjectPtr<UStaticMeshComponent>meshComponent(staticMesh[i]);
-		if (!HasCollision(meshComponent.Get()))
-		{
-			CreateCollisionFromUnrealPrimitive(meshComponent);
-		}
+		CreateCollisionFromUnrealPrimitive(meshComponent);
 	}
 }
 
 void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const landscapeProxy)
 {
 	const TArray<TObjectPtr<ULandscapeHeightfieldCollisionComponent>>& landScapeTiles = landscapeProxy->CollisionComponents;
-	check(landScapeTiles.Num());
-	const TArray<TObjectPtr<USceneComponent>>& children = RootBody->GetAttachChildren();
-
-	auto HasCollision = [this, &children](const TObjectPtr<ULandscapeHeightfieldCollisionComponent>& tile)
-	{
-		for (ndInt32 i = children.Num() - 1; i >= 0; --i)
-		{
-			UNewtonCollisionLandscape* const collision = Cast<UNewtonCollisionLandscape>(children[i]);
-			if (collision && (collision->GetGeometryMesh() == tile))
-			{
-				return true;
-			}
-		}
-		return false;
-	};
-
-	for (ndInt32 i = landScapeTiles.Num() - 1; i >= 0; --i)
-	//for (ndInt32 i = 0; i < 1; ++i)
+	for (ndInt32 i = 0; i < landScapeTiles.Num(); ++i)
 	{
 		const TObjectPtr<ULandscapeHeightfieldCollisionComponent>& tile = landScapeTiles[i];
-		if (!HasCollision(tile))
-		{
-			UNewtonCollisionLandscape* const collisionTile = Cast<UNewtonCollisionLandscape>(AddComponentByClass(UNewtonCollisionLandscape::StaticClass(), false, FTransform(), true));
-			FinishAddComponent(collisionTile, false, FTransform());
-			AddInstanceComponent(collisionTile);
-			collisionTile->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
-			collisionTile->MarkRenderDynamicDataDirty();
-			collisionTile->NotifyMeshUpdated();
-			collisionTile->SetGeometryMesh(tile);
-		}
+		UNewtonCollisionLandscape* const collisionTile = Cast<UNewtonCollisionLandscape>(AddComponentByClass(UNewtonCollisionLandscape::StaticClass(), false, FTransform(), true));
+		FinishAddComponent(collisionTile, false, FTransform());
+		AddInstanceComponent(collisionTile);
+		collisionTile->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
+
+		collisionTile->SetGeometryMesh(tile);
+		collisionTile->SetGlobalTransform();
+		collisionTile->MarkRenderDynamicDataDirty();
+		collisionTile->NotifyMeshUpdated();
 	}
 }
+

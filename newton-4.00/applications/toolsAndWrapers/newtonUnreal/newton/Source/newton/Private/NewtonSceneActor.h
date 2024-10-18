@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "NewtonSceneActor.generated.h"
 
-
 class ALandscapeProxy;
 
 UCLASS(ClassGroup = NewtonScene, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision), MinimalAPI)

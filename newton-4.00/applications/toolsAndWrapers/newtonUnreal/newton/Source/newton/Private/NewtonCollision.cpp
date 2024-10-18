@@ -7,17 +7,12 @@
 #include "Newton.h"
 #include "NewtonRigidBody.h"
 #include "NewtonWorldActor.h"
-#include "NewtonSceneActor.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 // Sets default values for this component's properties
 UNewtonCollision::UNewtonCollision()
 	:Super()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	//PrimaryComponentTick.bCanEverTick = true;
-
 	m_hash = 0;
 	m_shape = nullptr;
 	m_showDebug = false;
@@ -26,8 +21,8 @@ UNewtonCollision::UNewtonCollision()
 
 	BestFit = false;
 	CastShadow = 0;
+	m_savedMeshComponent = nullptr;
 	bExplicitShowWireframe = true;
-	m_geometryMesh = TObjectPtr<USceneComponent>(nullptr);
 	m_visualMesh = TSharedPtr<UE::Geometry::FDynamicMesh3>(nullptr);
 
 	ConstructorHelpers::FObjectFinder<UMaterial> TexObj(TEXT("/newton/NewtonTransparentMaterial"));
@@ -50,25 +45,13 @@ void UNewtonCollision::OnUnregister()
 		m_shape = nullptr;
 	}
 	m_hash = 0;
+	m_savedMeshComponent = nullptr;
 	m_visualMesh = TSharedPtr<UE::Geometry::FDynamicMesh3>(nullptr);
 }
 
-//USceneComponent* UNewtonCollision::GetGeometryMesh() const
-TObjectPtr<USceneComponent> UNewtonCollision::GetGeometryMesh() const
+void UNewtonCollision::SetGeometryMesh(USceneComponent* const staticMesh)
 {
-	return m_geometryMesh;
-}
-
-//void UNewtonCollision::SetGeometryMesh(USceneComponent* const geometry)
-void UNewtonCollision::SetGeometryMesh(const TObjectPtr<USceneComponent>& geometry)
-{
-	m_geometryMesh = geometry;
-}
-
-void UNewtonCollision::Serialize(FArchive& ar)
-{
-	Super::Serialize(ar);
-	ar << m_geometryMesh;
+	m_savedMeshComponent = staticMesh;
 }
 
 void UNewtonCollision::PostLoad()
@@ -131,15 +114,6 @@ ndShape* UNewtonCollision::CreateShape() const
 
 void UNewtonCollision::BuildNewtonShape()
 {
-	const ANewtonSceneActor* const owner = Cast<ANewtonSceneActor>(GetOwner());
-	if (owner)
-	{
-		const FTransform bodyTransform(owner->GetRootComponent()->GetComponentToWorld());
-		const FTransform meshTransform(m_geometryMesh->GetComponentToWorld());
-		const FTransform transform(meshTransform * bodyTransform.Inverse());
-		SetComponentToWorld(transform);
-	}
-
 	long long hash = CalculateHash();
 	if (m_hash != hash)
 	{
@@ -256,11 +230,6 @@ void UNewtonCollision::ApplyPropertyChanges()
 		ndArray<ndVector> m_points;
 	};
 
-	if (m_geometryMesh.Get())
-	{
-		m_debugVisualIsDirty = true;
-	}
-
 	m_propertyChanged = false;
 
 	if (m_shape)
@@ -318,6 +287,40 @@ void UNewtonCollision::ApplyPropertyChanges()
 		OnRenderingStateChanged(false);
 		MarkRenderDynamicDataDirty();
 		NotifyMeshUpdated();
+	}
+}
+
+UStaticMesh* UNewtonCollision::FindStaticMesh() const
+{
+	if (m_savedMeshComponent)
+	{
+		UStaticMeshComponent* const staticMesh = Cast<UStaticMeshComponent>(m_savedMeshComponent);
+		return staticMesh ? staticMesh->GetStaticMesh().Get() : (UStaticMesh*) nullptr;
+	}
+
+	const UStaticMeshComponent* const mesh = Cast<UStaticMeshComponent>(GetAttachParent());
+	if (mesh && mesh->GetStaticMesh().Get())
+	{
+		return mesh->GetStaticMesh().Get();
+	}
+
+	return nullptr;
+}
+
+void UNewtonCollision::SetGlobalTransform()
+{
+	UStaticMesh* const staticMesh = FindStaticMesh();
+	if (staticMesh && m_savedMeshComponent)
+	{
+		//const ANewtonSceneActor* const owner = Cast<ANewtonSceneActor>(GetOwner());
+		const AActor* const owner = GetOwner();
+		check(owner);
+		const FTransform bodyTransform(owner->GetRootComponent()->GetComponentToWorld());
+		const FTransform globalTransform(m_savedMeshComponent->GetComponentToWorld());
+		const FTransform localTransform(globalTransform * bodyTransform.Inverse());
+
+		SetRelativeTransform(localTransform);
+		SetComponentToWorld(globalTransform);
 	}
 }
 

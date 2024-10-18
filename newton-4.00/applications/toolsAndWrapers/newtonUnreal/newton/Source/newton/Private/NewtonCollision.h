@@ -26,9 +26,9 @@ class UNewtonCollision : public UDynamicMeshComponent
 	// Sets default values for this component's properties
 	UNewtonCollision();
 
+	virtual void SetGlobalTransform();
 	virtual ndVector GetVolumePosition() const;
-	TObjectPtr<USceneComponent> GetGeometryMesh() const;
-	void SetGeometryMesh(const TObjectPtr<USceneComponent>& tile);
+	void SetGeometryMesh(USceneComponent* const staticMesh);
 	virtual void SetWireFrameColor(const FLinearColor& color);
 
 	protected:
@@ -41,12 +41,13 @@ class UNewtonCollision : public UDynamicMeshComponent
 	virtual void PostLoad() override;
 	virtual void OnAttachmentChanged();
 	virtual void BeginDestroy() override;
-	virtual void Serialize(FArchive& Ar) override;
 	virtual bool ShouldCreatePhysicsState() const override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
 	virtual void BuildNewtonShape();
 	virtual void ApplyPropertyChanges();
+	virtual UStaticMesh* FindStaticMesh() const;
+
 	virtual ndShape* CreateShape() const;
 	virtual long long CalculateHash() const;
 	virtual ndShapeInstance* CreateInstanceShape() const;
@@ -55,7 +56,7 @@ class UNewtonCollision : public UDynamicMeshComponent
 	//public:	
 	long long m_hash;
 	ndShape* m_shape;
-	TObjectPtr<USceneComponent> m_geometryMesh;
+	USceneComponent* m_savedMeshComponent;
 	TSharedPtr<UE::Geometry::FDynamicMesh3> m_visualMesh;
 	UMaterial* m_transparentMaterial;
 	bool m_propertyChanged;

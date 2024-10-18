@@ -176,7 +176,6 @@ struct ndHeighfieldInfo
 	ndInt32 m_width;
 	ndInt32 m_height;
 	ndInt32 m_gridsDiagonals;
-	ndFloat32 m_verticalScale;
 	ndFloat32 m_horizonalScale_x;
 	ndFloat32 m_horizonalScale_z;
 	ndReal* m_elevation;
@@ -210,7 +209,6 @@ class ndShapeInfo
 		ndChamferCylinderInfo m_chamferCylinder;
 		ndFloat32 m_paramArray[32];
 	};
-
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -240,17 +238,17 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return nullptr; }
 	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return nullptr; }
 
-	virtual ndInt32 GetConvexVertexCount() const;
+	D_COLLISION_API virtual ndInt32 GetConvexVertexCount() const;
 
-	ndVector GetObbSize() const;
-	ndVector GetObbOrigin() const;
-	ndFloat32 GetUmbraClipSize() const;
+	D_COLLISION_API ndVector GetObbSize() const;
+	D_COLLISION_API ndVector GetObbOrigin() const;
+	D_COLLISION_API ndFloat32 GetUmbraClipSize() const;
 
 	D_COLLISION_API virtual void MassProperties();
+	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
+	D_COLLISION_API virtual ndMatrix CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const;
+	D_COLLISION_API virtual ndFloat32 CalculateMassProperties(const ndMatrix& offset, ndVector& inertia, ndVector& crossInertia, ndVector& centerOfMass) const;
 
-	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const = 0;
-
-	virtual ndShapeInfo GetShapeInfo() const;
 	virtual ndFloat32 GetVolume() const = 0;
 	virtual ndFloat32 GetBoxMinRadius() const = 0;
 	virtual ndFloat32 GetBoxMaxRadius() const = 0;
@@ -263,9 +261,7 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const = 0;
 	virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& globalPlane, const ndShapeInstance& parentScale) const = 0;
 	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const = 0;
-
-	virtual ndMatrix CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const;
-	virtual ndFloat32 CalculateMassProperties(const ndMatrix& offset, ndVector& inertia, ndVector& crossInertia, ndVector& centerOfMass) const;
+	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const = 0;
 
 	protected:
 	D_COLLISION_API ndShape(ndShapeID id);
@@ -280,64 +276,6 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	ndShapeID m_collisionId;
 	static ndVector m_flushZero;
 } D_GCC_NEWTON_ALIGN_32;
-
-inline ndShapeInfo::ndShapeInfo()
-	:m_offsetMatrix(ndGetIdentityMatrix())
-	,m_scale(ndFloat32 (1.0f))
-	,m_shapeMaterial()
-	,m_collisionType(::m_box)
-{
-	for (ndInt32 i = 0; i < sizeof(m_paramArray) / sizeof(m_paramArray[0]); ++i)
-	{
-		m_paramArray[i] = ndFloat32(0);
-	}
-}
-
-inline ndUnsigned64 ndShapeInfo::GetHash(ndUnsigned64 hash)
-{
-	ndInt32 id = m_collisionType;
-	hash = ndCRC64(m_paramArray, sizeof (m_paramArray), hash);
-	hash = ndCRC64(&id, sizeof(id), hash);
-	return hash;
-}
-
-inline ndInt32 ndShape::GetConvexVertexCount() const
-{
-	return 0;
-}
-
-inline ndFloat32 ndShape::CalculateMassProperties(const ndMatrix&, ndVector&, ndVector&, ndVector&) const
-{ 
-	ndAssert(0); 
-	return 0; 
-}
-
-inline ndMatrix ndShape::CalculateInertiaAndCenterOfMass(const ndMatrix&, const ndVector&, const ndMatrix&) const
-{
-	ndAssert(0);
-	return ndGetZeroMatrix();
-}
-
-inline ndVector ndShape::GetObbOrigin() const
-{
-	return m_boxOrigin;
-}
-
-inline ndVector ndShape::GetObbSize() const
-{
-	return m_boxSize;
-}
-
-inline ndFloat32 ndShape::GetUmbraClipSize() const
-{
-	return ndFloat32(3.0f) * GetBoxMaxRadius();
-}
-
-inline ndUnsigned64 ndShape::GetHash(ndUnsigned64 hash) const
-{
-	ndAssert(0);
-	return hash;
-}
 
 #endif 
 

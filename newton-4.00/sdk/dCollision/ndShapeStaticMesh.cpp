@@ -35,6 +35,66 @@ ndShapeStaticMesh::~ndShapeStaticMesh()
 {
 }
 
+ndFloat32 ndShapeStaticMesh::GetVolume() const
+{
+	return ndFloat32(0.0f);
+}
+
+ndFloat32 ndShapeStaticMesh::GetBoxMinRadius() const
+{
+	return ndFloat32(0.0f);
+}
+
+ndFloat32 ndShapeStaticMesh::GetBoxMaxRadius() const
+{
+	return ndFloat32(0.0f);
+}
+
+ndVector ndShapeStaticMesh::SupportVertex(const ndVector&) const
+{
+	ndAssert(0);
+	return ndVector::m_zero;
+}
+
+ndVector ndShapeStaticMesh::SupportVertexSpecial(const ndVector& dir, ndFloat32) const
+{
+	ndAssert(0);
+	return SupportVertex(dir);
+}
+
+ndVector ndShapeStaticMesh::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const
+{
+	return point;
+}
+
+ndInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const ndVector&, const ndVector&, ndVector* const) const
+{
+	return 0;
+}
+
+ndVector ndShapeStaticMesh::CalculateVolumeIntegral(const ndMatrix&, const ndVector&, const ndShapeInstance&) const
+{
+	return ndVector::m_zero;
+}
+
+ndShapeStaticMesh* ndShapeStaticMesh::GetAsShapeStaticMesh()
+{
+	return this;
+}
+
+void ndShapeStaticMesh::DebugShape(const ndMatrix&, ndShapeDebugNotify&) const
+{
+}
+
+ndFloat32 ndShapeStaticMesh::RayCast(ndRayCastNotify&, const ndVector&, const ndVector&, ndFloat32, const ndBody* const, ndContactPoint&) const
+{
+	return ndFloat32(1.2f);
+}
+
+void ndShapeStaticMesh::GetCollidingFaces(ndPolygonMeshDesc* const) const
+{
+}
+
 void ndShapeStaticMesh::CalculateAabb(const ndMatrix& matrix, ndVector &p0, ndVector &p1) const
 {
 	ndVector origin(matrix.TransformVector(m_boxOrigin));

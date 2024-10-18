@@ -90,6 +90,16 @@ ndShapeStatic_bvh::~ndShapeStatic_bvh(void)
 {
 }
 
+void* ndShapeStatic_bvh::operator new (size_t size)
+{
+	return ndShapeStaticMesh::operator new (size);
+}
+
+void ndShapeStatic_bvh::operator delete (void* ptr)
+{
+	ndShapeStaticMesh::operator delete(ptr);
+}
+
 ndIntersectStatus ndShapeStatic_bvh::GetTriangleCount(void* const context, const ndFloat32* const, ndInt32, const ndInt32* const, ndInt32 indexCount, ndFloat32)
 {
 	ndMeshVertexListIndexList& data = (*(ndMeshVertexListIndexList*)context);

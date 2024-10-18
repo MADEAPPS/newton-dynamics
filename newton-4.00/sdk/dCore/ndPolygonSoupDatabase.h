@@ -26,50 +26,27 @@
 #include "ndTypes.h"
 #include "ndClassAlloc.h"
 
+D_MSV_NEWTON_ALIGN_32
 class ndPolygonSoupDatabase: public ndClassAlloc
 {
 	public:
-	ndFloat32 GetRadius() const;
-	ndInt32 GetVertexCount() const;
-	ndInt32 GetStrideInBytes() const;
-	ndFloat32* GetLocalVertexPool() const;
+	D_CORE_API ndFloat32 GetRadius() const;
+	D_CORE_API ndInt32 GetVertexCount() const;
+	D_CORE_API ndInt32 GetStrideInBytes() const;
+	D_CORE_API ndFloat32* GetLocalVertexPool() const;
 
-	ndUnsigned32 GetTagId(const ndInt32* const face, ndInt32 indexCount) const;
-	void SetTagId(const ndInt32* const face, ndInt32 indexCount, ndUnsigned32 newID) const;
+	D_CORE_API ndUnsigned32 GetTagId(const ndInt32* const face, ndInt32 indexCount) const;
+	D_CORE_API void SetTagId(const ndInt32* const face, ndInt32 indexCount, ndUnsigned32 newID) const;
 		
 	protected:
-	ndPolygonSoupDatabase(const char* const name = nullptr);
-	virtual ~ndPolygonSoupDatabase ();
+	D_CORE_API ndPolygonSoupDatabase(const char* const name = nullptr);
+	D_CORE_API virtual ~ndPolygonSoupDatabase ();
 
 	ndInt32 m_vertexCount;
 	ndInt32 m_strideInBytes;
 	ndFloat32* m_localVertex;
 };
-
-inline ndInt32 ndPolygonSoupDatabase::GetVertexCount()	const
-{
-	return m_vertexCount;
-}
-
-inline ndFloat32* ndPolygonSoupDatabase::GetLocalVertexPool() const
-{
-	return m_localVertex;
-}
-
-inline ndInt32 ndPolygonSoupDatabase::GetStrideInBytes() const
-{
-	return m_strideInBytes;
-}
-
-inline ndFloat32 ndPolygonSoupDatabase::GetRadius() const
-{
-	return ndFloat32 (0.0f);
-}
-
-inline ndUnsigned32 ndPolygonSoupDatabase::GetTagId(const ndInt32* const face, ndInt32 indexCount) const
-{
-	return ndUnsigned32(face[indexCount]);
-}
+D_GCC_NEWTON_ALIGN_32;
 
 #endif
 

@@ -50,4 +50,28 @@ void ndPolygonSoupDatabase::SetTagId(const ndInt32* const facePtr, ndInt32 index
 	face[indexCount] = newID;
 }
 
+ndInt32 ndPolygonSoupDatabase::GetVertexCount()	const
+{
+	return m_vertexCount;
+}
+
+ndFloat32* ndPolygonSoupDatabase::GetLocalVertexPool() const
+{
+	return m_localVertex;
+}
+
+ndInt32 ndPolygonSoupDatabase::GetStrideInBytes() const
+{
+	return m_strideInBytes;
+}
+
+ndFloat32 ndPolygonSoupDatabase::GetRadius() const
+{
+	return ndFloat32(0.0f);
+}
+
+ndUnsigned32 ndPolygonSoupDatabase::GetTagId(const ndInt32* const face, ndInt32 indexCount) const
+{
+	return ndUnsigned32(face[indexCount]);
+}
 

@@ -24,10 +24,21 @@ class UNewtonCollisionLandscape : public UNewtonCollision
 	// Sets default values for this component's properties
 	UNewtonCollisionLandscape();
 
-	private:
-	virtual void ApplyPropertyChanges();
-	virtual ndShape* CreateShape() const;
-	virtual long long CalculateHash() const;
-	virtual ndShapeInstance* CreateInstanceShape() const;
-	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const;
+	virtual void SetGlobalTransform() override;
+
+	protected:
+	virtual void Serialize(FArchive& Ar) override;
+	virtual void ApplyPropertyChanges() override;
+	virtual ndShape* CreateShape() const override;
+	virtual long long CalculateHash() const override;
+	virtual ndShapeInstance* CreateInstanceShape() const override;
+	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const override;;
+
+	TArray<char> m_materials;
+	TArray<float> m_heightfield;
+	float m_scale_x;
+	float m_scale_y;
+	float m_scale_z;
+	int m_tileSize_x;
+	int m_tileSize_y;
 };

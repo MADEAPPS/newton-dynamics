@@ -17,6 +17,6 @@ class UNewtonSceneRigidBody : public UNewtonRigidBody
 	public:
 	UNewtonSceneRigidBody();
 
-	//virtual void ApplyPropertyChanges() override;
+	void RemoveAllCollisions();
 	virtual ndShapeInstance* CreateCollision(const ndMatrix& bodyMatrix) const override;
 };

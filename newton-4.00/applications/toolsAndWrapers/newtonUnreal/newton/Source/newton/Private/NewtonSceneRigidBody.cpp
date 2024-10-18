@@ -16,6 +16,15 @@ UNewtonSceneRigidBody::UNewtonSceneRigidBody()
 {
 }
 
+void UNewtonSceneRigidBody::RemoveAllCollisions()
+{
+	const TArray<TObjectPtr<USceneComponent>>& chidren = GetAttachChildren();
+	for (int i = chidren.Num() - 1; i >= 0; --i)
+	{
+		chidren[i]->DestroyComponent();
+	}
+}
+
 ndShapeInstance* UNewtonSceneRigidBody::CreateCollision(const ndMatrix& bodyMatrix) const
 {
 	ndArray<const UNewtonCollision*> subShapes;

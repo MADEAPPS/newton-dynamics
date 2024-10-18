@@ -54,6 +54,64 @@ ndShape::~ndShape()
 	ndAssert(m_refCount.load() == 0);
 }
 
+ndShapeInfo::ndShapeInfo()
+	:m_offsetMatrix(ndGetIdentityMatrix())
+	, m_scale(ndFloat32(1.0f))
+	, m_shapeMaterial()
+	, m_collisionType(::m_box)
+{
+	for (ndInt32 i = 0; i < sizeof(m_paramArray) / sizeof(m_paramArray[0]); ++i)
+	{
+		m_paramArray[i] = ndFloat32(0);
+	}
+}
+
+ndUnsigned64 ndShapeInfo::GetHash(ndUnsigned64 hash)
+{
+	ndInt32 id = m_collisionType;
+	hash = ndCRC64(m_paramArray, sizeof(m_paramArray), hash);
+	hash = ndCRC64(&id, sizeof(id), hash);
+	return hash;
+}
+
+ndInt32 ndShape::GetConvexVertexCount() const
+{
+	return 0;
+}
+
+ndFloat32 ndShape::CalculateMassProperties(const ndMatrix&, ndVector&, ndVector&, ndVector&) const
+{
+	ndAssert(0);
+	return 0;
+}
+
+ndMatrix ndShape::CalculateInertiaAndCenterOfMass(const ndMatrix&, const ndVector&, const ndMatrix&) const
+{
+	ndAssert(0);
+	return ndGetZeroMatrix();
+}
+
+ndVector ndShape::GetObbOrigin() const
+{
+	return m_boxOrigin;
+}
+
+ndVector ndShape::GetObbSize() const
+{
+	return m_boxSize;
+}
+
+ndFloat32 ndShape::GetUmbraClipSize() const
+{
+	return ndFloat32(3.0f) * GetBoxMaxRadius();
+}
+
+ndUnsigned64 ndShape::GetHash(ndUnsigned64 hash) const
+{
+	ndAssert(0);
+	return hash;
+}
+
 void ndShape::MassProperties()
 {
 	// using general central theorem, to extract the Inertia relative to the center of mass 

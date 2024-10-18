@@ -10,8 +10,8 @@ class ndWorld;
 class ndMatrix;
 class ndBodyDynamic;
 class ndShapeInstance;
-class ANewtonWorldActor;
 class UNewtonCollision;
+class ANewtonWorldActor;
 
 USTRUCT()
 struct FConvexApproximationStruct
