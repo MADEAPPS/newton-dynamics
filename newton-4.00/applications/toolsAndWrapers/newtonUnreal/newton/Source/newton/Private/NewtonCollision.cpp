@@ -21,7 +21,6 @@ UNewtonCollision::UNewtonCollision()
 
 	BestFit = false;
 	CastShadow = 0;
-	m_savedMeshComponent = nullptr;
 	bExplicitShowWireframe = true;
 	m_visualMesh = TSharedPtr<UE::Geometry::FDynamicMesh3>(nullptr);
 
@@ -45,13 +44,34 @@ void UNewtonCollision::OnUnregister()
 		m_shape = nullptr;
 	}
 	m_hash = 0;
-	m_savedMeshComponent = nullptr;
 	m_visualMesh = TSharedPtr<UE::Geometry::FDynamicMesh3>(nullptr);
 }
 
-void UNewtonCollision::SetGeometryMesh(USceneComponent* const staticMesh)
+//void UNewtonCollision::SetGeometryMesh(USceneComponent* const staticMesh)
+//{
+//	m_savedMeshComponent = staticMesh;
+//}
+
+void UNewtonCollision::SetTransform(const USceneComponent* const meshComponent)
 {
-	m_savedMeshComponent = staticMesh;
+	const AActor* const owner = GetOwner();
+	check(owner);
+	const FTransform bodyTransform(owner->GetRootComponent()->GetComponentToWorld());
+	const FTransform globalTransform(meshComponent->GetComponentToWorld());
+	const FTransform localTransform(globalTransform * bodyTransform.Inverse());
+
+	SetComponentToWorld(globalTransform);
+
+	// for some reason, this does not work in the unreal editor
+	//SetRelativeTransform(localTransform);
+	SetRelativeScale3D_Direct(localTransform.GetScale3D());
+	SetRelativeRotation_Direct(FRotator(localTransform.GetRotation()));
+	SetRelativeLocation_Direct(localTransform.GetLocation());
+}
+
+void UNewtonCollision::InitStaticMeshCompoment(const USceneComponent* const meshComponent)
+{
+	check(0);
 }
 
 void UNewtonCollision::PostLoad()
@@ -184,11 +204,13 @@ void UNewtonCollision::ApplyPropertyChanges()
 				m_points.PushBack(faceArray[i] * m_scale);
 			}
 
-			for (ndInt32 i = 2; i < vertexCount; ++i)
+			ndArray<ndInt32> triangles;
+			ndTriangulatePolygon(&m_points[0], vertexCount, triangles);
+			for (ndInt32 i = 0; i < ndInt32 (triangles.GetCount()); i+=3)
 			{
-				m_index.PushBack(baseIndex);
-				m_index.PushBack(baseIndex + i - 0);
-				m_index.PushBack(baseIndex + i - 1);
+				m_index.PushBack(baseIndex + triangles[i + 0]);
+				m_index.PushBack(baseIndex + triangles[i + 1]);
+				m_index.PushBack(baseIndex + triangles[i + 2]);
 			}
 		}
 
@@ -290,39 +312,22 @@ void UNewtonCollision::ApplyPropertyChanges()
 	}
 }
 
-UStaticMesh* UNewtonCollision::FindStaticMesh() const
-{
-	if (m_savedMeshComponent)
-	{
-		UStaticMeshComponent* const staticMesh = Cast<UStaticMeshComponent>(m_savedMeshComponent);
-		return staticMesh ? staticMesh->GetStaticMesh().Get() : (UStaticMesh*) nullptr;
-	}
-
-	const UStaticMeshComponent* const mesh = Cast<UStaticMeshComponent>(GetAttachParent());
-	if (mesh && mesh->GetStaticMesh().Get())
-	{
-		return mesh->GetStaticMesh().Get();
-	}
-
-	return nullptr;
-}
-
-void UNewtonCollision::SetGlobalTransform()
-{
-	UStaticMesh* const staticMesh = FindStaticMesh();
-	if (staticMesh && m_savedMeshComponent)
-	{
-		//const ANewtonSceneActor* const owner = Cast<ANewtonSceneActor>(GetOwner());
-		const AActor* const owner = GetOwner();
-		check(owner);
-		const FTransform bodyTransform(owner->GetRootComponent()->GetComponentToWorld());
-		const FTransform globalTransform(m_savedMeshComponent->GetComponentToWorld());
-		const FTransform localTransform(globalTransform * bodyTransform.Inverse());
-
-		SetRelativeTransform(localTransform);
-		SetComponentToWorld(globalTransform);
-	}
-}
+//UStaticMesh* UNewtonCollision::FindStaticMesh() const
+//{
+//	if (m_savedMeshComponent)
+//	{
+//		UStaticMeshComponent* const staticMesh = Cast<UStaticMeshComponent>(m_savedMeshComponent);
+//		return staticMesh ? staticMesh->GetStaticMesh().Get() : (UStaticMesh*) nullptr;
+//	}
+//
+//	const UStaticMeshComponent* const mesh = Cast<UStaticMeshComponent>(GetAttachParent());
+//	if (mesh && mesh->GetStaticMesh().Get())
+//	{
+//		return mesh->GetStaticMesh().Get();
+//	}
+//
+//	return nullptr;
+//}
 
 ndVector UNewtonCollision::GetVolumePosition() const
 {

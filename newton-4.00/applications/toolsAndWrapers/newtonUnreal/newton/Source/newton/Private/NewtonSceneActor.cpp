@@ -64,8 +64,7 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 				FinishAddComponent(childComp, false, FTransform());
 				AddInstanceComponent(childComp);
 				childComp->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
-				childComp->SetGeometryMesh(staticComponent);
-				childComp->SetGlobalTransform();
+				childComp->InitStaticMeshCompoment(staticComponent);
 				childComp->MarkRenderDynamicDataDirty();
 				childComp->NotifyMeshUpdated();
 			};
@@ -122,8 +121,7 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 			FinishAddComponent(childComp, false, FTransform());
 			AddInstanceComponent(childComp);
 			childComp->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
-			childComp->SetGeometryMesh(staticComponent);
-			childComp->SetGlobalTransform();
+			childComp->InitStaticMeshCompoment(staticComponent);
 			childComp->MarkRenderDynamicDataDirty();
 			childComp->NotifyMeshUpdated();
 		};
@@ -134,7 +132,6 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 		{
 			case CTF_UseDefault:
 			{
-				check(0);
 				if (!GenerateSimpleCollision())
 				{
 					GenerateComplexCollision();
@@ -229,6 +226,7 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 		}
 		else
 		{
+//if (sceneActor->GetName() == FString("CWall_001"))
 			GenerateStaticMeshCollision(sceneActor);
 		}
 	}
@@ -277,8 +275,7 @@ void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const 
 		AddInstanceComponent(collisionTile);
 		collisionTile->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
 
-		collisionTile->SetGeometryMesh(tile);
-		collisionTile->SetGlobalTransform();
+		collisionTile->InitStaticMeshCompoment(tile);
 		collisionTile->MarkRenderDynamicDataDirty();
 		collisionTile->NotifyMeshUpdated();
 	}

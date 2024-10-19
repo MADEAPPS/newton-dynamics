@@ -20,6 +20,7 @@ class UNewtonCollisionBox : public UNewtonCollision
 	public:
 	// Sets default values for this component's properties
 	UNewtonCollisionBox();
+	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent) override;
 
 	protected:
 	virtual void ApplyPropertyChanges();

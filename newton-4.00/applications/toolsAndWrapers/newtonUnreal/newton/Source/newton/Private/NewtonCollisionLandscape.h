@@ -24,7 +24,7 @@ class UNewtonCollisionLandscape : public UNewtonCollision
 	// Sets default values for this component's properties
 	UNewtonCollisionLandscape();
 
-	virtual void SetGlobalTransform() override;
+	//virtual void SetGlobalTransform() override;
 
 	protected:
 	virtual void Serialize(FArchive& Ar) override;

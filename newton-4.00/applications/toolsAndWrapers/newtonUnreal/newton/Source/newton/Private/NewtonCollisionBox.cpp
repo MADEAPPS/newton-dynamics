@@ -20,6 +20,34 @@ ndShape* UNewtonCollisionBox::CreateShape() const
 	return new ndShapeBox(SizeX * UNREAL_INV_UNIT_SYSTEM, SizeY * UNREAL_INV_UNIT_SYSTEM, SizeZ * UNREAL_INV_UNIT_SYSTEM);
 }
 
+void UNewtonCollisionBox::InitStaticMeshCompoment(const USceneComponent* const meshComponent)
+{
+	const UStaticMeshComponent* const staticMeshComponent = Cast<UStaticMeshComponent>(meshComponent);
+	check(staticMeshComponent);
+	const UStaticMesh* const staticMesh = staticMeshComponent->GetStaticMesh().Get();
+	const UBodySetup* const bodySetup = staticMesh->GetBodySetup();
+	const FKAggregateGeom& aggGeom = bodySetup->AggGeom;
+	check(aggGeom.BoxElems.Num() == 1);
+	const FKBoxElem& box = aggGeom.BoxElems[0];
+
+	SetTransform(meshComponent);
+	const FTransform localTransformOffset(box.GetTransform());
+	const FTransform globalTransform(localTransformOffset * GetComponentToWorld());
+	SetComponentToWorld(globalTransform);
+
+	const AActor* const owner = GetOwner();
+	const FTransform bodyTransform(owner->GetRootComponent()->GetComponentToWorld());
+	const FTransform localTransform(globalTransform * bodyTransform.Inverse());
+
+	SetRelativeScale3D_Direct(localTransform.GetScale3D());
+	SetRelativeRotation_Direct(FRotator(localTransform.GetRotation()));
+	SetRelativeLocation_Direct(localTransform.GetLocation());
+
+	SizeX = box.X;
+	SizeY = box.Y;
+	SizeZ = box.Z;
+}
+
 long long UNewtonCollisionBox::CalculateHash() const
 {
 	long long hash = ndCRC64(ndShapeBox::StaticClassName(), strlen(ndShapeBox::StaticClassName()), 0);

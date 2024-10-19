@@ -20,6 +20,7 @@ class UNewtonCollisionPolygonalMesh : public UNewtonCollision
 	public:
 	// Sets default values for this component's properties
 	UNewtonCollisionPolygonalMesh();
+	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent) override;
 
 	protected:
 	virtual void Serialize(FArchive& Ar) override;

@@ -14,6 +14,11 @@
 UNewtonSceneRigidBody::UNewtonSceneRigidBody()
 	:Super()
 {
+	const FTransform transform;
+	SetComponentToWorld(transform);
+	SetRelativeScale3D_Direct(transform.GetScale3D());
+	SetRelativeRotation_Direct(FRotator(transform.GetRotation()));
+	SetRelativeLocation_Direct(transform.GetLocation());
 }
 
 void UNewtonSceneRigidBody::RemoveAllCollisions()

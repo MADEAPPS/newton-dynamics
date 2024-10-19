@@ -109,6 +109,7 @@
     <ClCompile Include="Public\dCore\ndThreadPool.cpp" />
     <ClCompile Include="Public\dCore\ndThreadSyncUtils.cpp" />
     <ClCompile Include="Public\dCore\ndTree.cpp" />
+    <ClCompile Include="Public\dCore\ndTriangulatePolygon.cpp" />
     <ClCompile Include="Public\dCore\ndTypes.cpp" />
     <ClCompile Include="Public\dCore\ndUtils.cpp" />
     <ClCompile Include="Public\dCore\ndVector.cpp" />
@@ -257,6 +258,7 @@
     <ClInclude Include="Public\dCore\ndThreadPool.h" />
     <ClInclude Include="Public\dCore\ndThreadSyncUtils.h" />
     <ClInclude Include="Public\dCore\ndTree.h" />
+    <ClInclude Include="Public\dCore\ndTriangulatePolygon.h" />
     <ClInclude Include="Public\dCore\ndTypes.h" />
     <ClInclude Include="Public\dCore\ndUtils.h" />
     <ClInclude Include="Public\dCore\ndVector.h" />

@@ -420,6 +420,9 @@
     <ClCompile Include="Public\thirdParty\ndConvexApproximation.cpp">
       <Filter>thirdParty</Filter>
     </ClCompile>
+    <ClCompile Include="Public\dCore\ndTriangulatePolygon.cpp">
+      <Filter>dCore</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\dCore\ndAabbPolygonSoup.h">
@@ -868,6 +871,9 @@
     </ClInclude>
     <ClInclude Include="Public\thirdParty\ndConvexApproximation.h">
       <Filter>thirdParty</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\dCore\ndTriangulatePolygon.h">
+      <Filter>dCore</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

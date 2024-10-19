@@ -45,6 +45,15 @@ int main(int, char**)
 	//index.SetCount(xxxx.GetCount());
 	//ndInt32 vertexCount = ndVertexListToIndexList(&xxxx[0].m_x, sizeof(ndVector), 3, ndInt32(xxxx.GetCount()), &index[0], ndFloat32(1.0e-6f));
 
+	//ndVector points[5];
+	//points[0] = ndVector(-1.0f, -1.0f, 0.0f, 0.0f);
+	//points[1] = ndVector( 1.0f, -1.0f, 0.0f, 0.0f);
+	//points[2] = ndVector(1.2f, 0.6f, 0.0f, 0.0f);
+	//points[3] = ndVector(0.9f, 0.9f, 0.0f, 0.0f);
+	//points[4] = ndVector(-1.0f, 1.0f, 0.0f, 0.0f);
+	//ndArray<ndInt32> triangles;
+	//ndTriangulatePolygon(points, 5, triangles);
+
 	ndDemoEntityManager demos;
 	demos.Run();
 	return 0;
