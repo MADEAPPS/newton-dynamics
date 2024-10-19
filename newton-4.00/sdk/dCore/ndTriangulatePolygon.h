@@ -19,12 +19,13 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __NDCONVEXHULL_2D_H__
-#define __NDG_CONVEXHULL_2D_H__
+#ifndef __ND_TRIANGULATE_POLYGON_H__
+#define __ND_TRIANGULATE_POLYGON_H__
 
 #include "ndCoreStdafx.h"
+#include "ndArray.h"
 #include "ndVector.h"
 
-D_CORE_API ndInt32 ndConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count);
+D_CORE_API void ndTriangulatePolygon(ndVector* const points, ndInt32 count, ndArray<ndInt32>& triangles);
 
 #endif

@@ -71,6 +71,7 @@
 #include <ndAabbPolygonSoup.h>
 #include <ndSmallDeterminant.h>
 #include <ndConjugateGradient.h>
+#include <ndTriangulatePolygon.h>
 #include <ndPolygonSoupBuilder.h>
 #include <ndPolygonSoupDatabase.h>
 #include <tinyxml/ndTinyXmlGlue.h>

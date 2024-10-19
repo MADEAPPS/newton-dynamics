@@ -110,6 +110,5 @@ ndInt32 ndConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 	{
 		vertexCloud2d[i] = hull[i];
 	}
-	//return k - 1;
 	return k;
 }
