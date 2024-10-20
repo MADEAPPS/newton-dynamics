@@ -109,6 +109,233 @@ ndShapeInstance::~ndShapeInstance()
 	}
 }
 
+ndShape* ndShapeInstance::GetShape()
+{
+	return (ndShape*)m_shape;
+}
+
+const ndShape* ndShapeInstance::GetShape() const
+{
+	return m_shape;
+}
+
+const ndMatrix& ndShapeInstance::GetAlignmentMatrix() const
+{
+	return m_alignmentMatrix;
+}
+
+const ndMatrix& ndShapeInstance::GetLocalMatrix() const
+{
+	return m_localMatrix;
+}
+
+void ndShapeInstance::SetLocalMatrix(const ndMatrix& matrix)
+{
+	m_localMatrix = matrix;
+}
+
+const ndMatrix& ndShapeInstance::GetGlobalMatrix() const
+{
+	return m_globalMatrix;
+}
+
+void ndShapeInstance::SetGlobalMatrix(const ndMatrix& matrix)
+{
+	m_globalMatrix = matrix;
+}
+
+ndMatrix ndShapeInstance::GetScaledTransform(const ndMatrix& matrix) const
+{
+	ndMatrix scale(ndGetIdentityMatrix());
+	scale[0][0] = m_scale.m_x;
+	scale[1][1] = m_scale.m_y;
+	scale[2][2] = m_scale.m_z;
+	return m_alignmentMatrix * scale * m_localMatrix * matrix;
+}
+
+ndInt32 ndShapeInstance::GetConvexVertexCount() const
+{
+	return m_shape->GetConvexVertexCount();
+}
+
+ndVector ndShapeInstance::SupportVertex(const ndVector& inDir) const
+{
+	const ndVector dir(inDir & ndVector::m_triplexMask);
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
+	switch (m_scaleType)
+	{
+	case m_unit:
+	{
+		return m_shape->SupportVertex(dir);
+	}
+	case m_uniform:
+	{
+		return m_scale * m_shape->SupportVertex(dir);
+	}
+	case m_nonUniform:
+	{
+		// support((p * S), n) = S * support (p, n * transp(S)) 
+		const ndVector dir1((m_scale * dir).Normalize());
+		return m_scale * m_shape->SupportVertex(dir1);
+	}
+
+	case m_global:
+	default:
+	{
+		const ndVector dir1(m_alignmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
+		return m_scale * m_alignmentMatrix.TransformVector(m_shape->SupportVertex(dir1));
+	}
+	}
+}
+
+ndVector ndShapeInstance::SupportVertexSpecial(const ndVector& inDir) const
+{
+	const ndVector dir(inDir & ndVector::m_triplexMask);
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
+	switch (m_scaleType)
+	{
+	case m_unit:
+	{
+		return m_shape->SupportVertexSpecial(dir, m_skinMargin);
+	}
+	case m_uniform:
+	{
+		return m_scale * m_shape->SupportVertexSpecial(dir, m_skinMargin);
+	}
+
+	case m_global:
+	case m_nonUniform:
+	default:
+		return SupportVertex(dir);
+	}
+}
+
+ndVector ndShapeInstance::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& inDir) const
+{
+	const ndVector dir(inDir & ndVector::m_triplexMask);
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
+	switch (m_scaleType)
+	{
+	case m_unit:
+	{
+		return m_shape->SupportVertexSpecialProjectPoint(point, dir);
+	}
+	case m_uniform:
+	{
+		return m_scale * m_shape->SupportVertexSpecialProjectPoint(point * m_invScale, dir);
+	}
+
+	case m_global:
+	case m_nonUniform:
+	default:
+		return point;
+
+#if 0
+	case m_nonUniform:
+	{
+		// support((p * S), n) = S * support (p/S, n * transp(S)) 
+		dVector dir1((m_scale * dir).Normalize());
+		return m_scale * m_shape->SupportVertexSpecialProjectPoint(point * m_invScale, dir1);
+	}
+
+	case m_global:
+	default:
+	{
+		dVector dir1(m_alignmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
+		return m_scale * m_alignmentMatrix.TransformVector(m_shape->SupportVertexSpecialProjectPoint(m_alignmentMatrix.UntransformVector(point * m_invScale), dir1));
+	}
+#endif
+	}
+}
+
+bool ndShapeInstance::GetCollisionMode() const
+{
+	return m_collisionMode;
+}
+
+void ndShapeInstance::SetCollisionMode(bool mode)
+{
+	m_collisionMode = mode;
+}
+
+const ndVector& ndShapeInstance::GetScale() const
+{
+	return m_scale;
+}
+
+const ndVector& ndShapeInstance::GetInvScale() const
+{
+	return m_invScale;
+}
+
+ndFloat32 ndShapeInstance::GetBoxMinRadius() const
+{
+	return m_shape->GetBoxMinRadius() * m_maxScale.m_x;
+}
+
+ndFloat32 ndShapeInstance::GetBoxMaxRadius() const
+{
+	return m_shape->GetBoxMaxRadius() * m_maxScale.m_x;
+}
+
+ndFloat32 ndShapeInstance::GetVolume() const
+{
+	return m_shape->GetVolume() * m_scale.m_x * m_scale.m_y * m_scale.m_z;
+}
+
+ndShapeMaterial ndShapeInstance::GetMaterial() const
+{
+	return m_shapeMaterial;
+}
+
+void ndShapeInstance::SetMaterial(const ndShapeMaterial& material)
+{
+	m_shapeMaterial = material;
+}
+
+ndShapeInstance::ndScaleType ndShapeInstance::GetScaleType() const
+{
+	return m_scaleType;
+}
+
+ndFloat32 ndShapeInstance::GetUmbraClipSize() const
+{
+	return m_shape->GetUmbraClipSize() * m_maxScale.m_x;
+}
+
+ndUnsigned64 ndShapeInstance::GetUserDataID() const
+{
+	return ndUnsigned64(m_shapeMaterial.m_userId);
+}
+
+void ndShapeInstance::SetShape(ndShape* const shape)
+{
+	if (m_shape)
+	{
+		m_shape->Release();
+	}
+	m_shape = shape ? shape->AddRef() : shape;
+}
+
+const char* ndShapeInstance::ClassName() const
+{
+	return "ndShapeInstance";
+}
+
+const char* ndShapeInstance::StaticClassName()
+{
+	return "ndShapeInstance";
+}
+
+const char* ndShapeInstance::SuperClassName() const
+{
+	return "ndShapeInstance";
+}
+
+
 void ndShapeInstance::SavePLY(const char* const fileName) const
 {
 	class ndDrawShape : public ndShapeDebugNotify
