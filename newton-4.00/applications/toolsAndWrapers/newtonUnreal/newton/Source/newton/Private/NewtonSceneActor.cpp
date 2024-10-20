@@ -226,7 +226,7 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 		}
 		else
 		{
-//if (sceneActor->GetName() == FString("CWall_001"))
+//if (sceneActor->GetName() == FString("Railing_Stairs_001"))
 			GenerateStaticMeshCollision(sceneActor);
 		}
 	}

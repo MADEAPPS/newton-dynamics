@@ -19,6 +19,35 @@ ndShape* UNewtonCollisionCylinder::CreateShape() const
 	return new ndShapeCylinder(Radio0 * UNREAL_INV_UNIT_SYSTEM, Radio1 * UNREAL_INV_UNIT_SYSTEM, Length * UNREAL_INV_UNIT_SYSTEM);
 }
 
+void UNewtonCollisionCylinder::InitStaticMeshCompoment(const USceneComponent* const meshComponent)
+{
+	check(0);
+	//const UStaticMeshComponent* const staticMeshComponent = Cast<UStaticMeshComponent>(meshComponent);
+	//check(staticMeshComponent);
+	//const UStaticMesh* const staticMesh = staticMeshComponent->GetStaticMesh().Get();
+	//const UBodySetup* const bodySetup = staticMesh->GetBodySetup();
+	//const FKAggregateGeom& aggGeom = bodySetup->AggGeom;
+	//check(aggGeom.BoxElems.Num() == 1);
+	//const FKSphylElem& element = aggGeom.SphylElems[0];
+	//
+	//SetTransform(meshComponent);
+	//const FTransform localTransformOffset(element.GetTransform());
+	//const FTransform globalTransform(localTransformOffset * GetComponentToWorld());
+	//SetComponentToWorld(globalTransform);
+	//
+	//const AActor* const owner = GetOwner();
+	//const FTransform bodyTransform(owner->GetRootComponent()->GetComponentToWorld());
+	//const FTransform localTransform(globalTransform * bodyTransform.Inverse());
+	//
+	//SetRelativeScale3D_Direct(localTransform.GetScale3D());
+	//SetRelativeRotation_Direct(FRotator(localTransform.GetRotation()));
+	//SetRelativeLocation_Direct(localTransform.GetLocation());
+	//
+	//Radio0 = element.Radius;
+	//Radio1 = element.Radius;
+	//Length = element.Length;
+}
+
 long long UNewtonCollisionCylinder::CalculateHash() const
 {
 	long long hash = ndCRC64(ndShapeCylinder::StaticClassName(), strlen(ndShapeCylinder::StaticClassName()), 0);

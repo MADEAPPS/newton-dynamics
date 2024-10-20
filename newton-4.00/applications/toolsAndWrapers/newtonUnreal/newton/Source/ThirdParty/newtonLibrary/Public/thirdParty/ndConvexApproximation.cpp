@@ -37,14 +37,15 @@ class ndConvexApproximation::ProgressBar: public nd_::VHACD::IVHACD::IUserCallba
 		const char* const stage,
 		const char* const operation)
 	{
-		m_owner->Progress();
+		m_owner->ShowProgress();
 	}
 
 	ndConvexApproximation* m_owner;
 };
 
 ndConvexApproximation::ndConvexApproximation(ndInt32 maxConvexes, bool quality)
-	:m_maxConvexes(maxConvexes)
+	:ndClassAlloc()
+	,m_maxConvexes(maxConvexes)
 	,m_quality(quality)
 {
 }
@@ -57,21 +58,12 @@ ndConvexApproximation::~ndConvexApproximation()
 	}
 }
 
-void ndConvexApproximation::InitProgress()
-{
-}
-
-void ndConvexApproximation::Progress()
-{
-}
-
-void ndConvexApproximation::EndProgress()
+void ndConvexApproximation::ShowProgress()
 {
 }
 
 void ndConvexApproximation::Execute()
 {
-	InitProgress();
 	ndArray<ndHullPoint> points;
 	ndArray<ndInt32> remapIndex;
 	ndArray<ndHullInputMesh::ndFace> faces;
@@ -126,5 +118,4 @@ void ndConvexApproximation::Execute()
 
 	interfaceVHACD->Clean();
 	interfaceVHACD->Release();
-	EndProgress();
 }

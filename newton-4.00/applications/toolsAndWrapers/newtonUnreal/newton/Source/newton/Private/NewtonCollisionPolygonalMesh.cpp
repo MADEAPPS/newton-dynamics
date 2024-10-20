@@ -34,8 +34,8 @@ class UNewtonCollisionPolygonalMesh::ndShapeStatic : public ndShapeStatic_bvh
 		for (ndInt32 i = 2; i < indexCount; ++i)
 		{
 			polyMesh->m_indexData.Push(indexArray[0]);
+			polyMesh->m_indexData.Push(indexArray[i - 0]);
 			polyMesh->m_indexData.Push(indexArray[i - 1]);
-			polyMesh->m_indexData.Push(indexArray[i + 0]);
 		}
 		return m_continueSearh;
 	}

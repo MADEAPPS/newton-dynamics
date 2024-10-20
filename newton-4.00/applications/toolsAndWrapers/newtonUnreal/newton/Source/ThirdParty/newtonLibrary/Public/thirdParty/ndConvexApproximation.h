@@ -48,7 +48,7 @@ class ndHullOutput: public ndArray<ndHullPoint>
 {
 };
 
-class ndConvexApproximation
+class ndConvexApproximation: public ndClassAlloc
 {
 	class ProgressBar;
 	public:
@@ -56,10 +56,7 @@ class ndConvexApproximation
 	D_CORE_API virtual ~ndConvexApproximation();
 
 	D_CORE_API void Execute();
-
-	D_CORE_API virtual void InitProgress();
-	D_CORE_API virtual void Progress();
-	D_CORE_API virtual void EndProgress();
+	D_CORE_API virtual void ShowProgress();
 
 	ndHullInputMesh m_inputMesh;
 	ndArray<ndHullOutput*> m_ouputHulls;

@@ -17,11 +17,52 @@
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 #include "ThirdParty/newtonLibrary/Public/thirdParty/ndConvexApproximation.h"
 
+#define SHOW_VHACD_PROGRESS_BAR
+
 //FLinearColor UNewtonRigidBody::m_awakeColor(1.0f, 0.0f, 0.f);
 //FLinearColor UNewtonRigidBody::m_sleepingColor(0.0f, 1.0f, 0.f);
 
 FLinearColor UNewtonRigidBody::m_awakeColor(0.0f, 0.5f, 1.0f);
 FLinearColor UNewtonRigidBody::m_sleepingColor(0.0f, 0.125f, 0.25f);
+
+class UNewtonRigidBody::ConvexVhacdGenerator : public ndConvexApproximation
+{
+	public:
+	ConvexVhacdGenerator(ndInt32 maxConvexes, bool quality)
+		:ndConvexApproximation(maxConvexes, quality)
+		,m_progressBar(nullptr)
+		,m_acc(0.0f)
+	{
+		#ifdef SHOW_VHACD_PROGRESS_BAR  
+		// for some reason the progress bar invalidate some UClasses
+		// I need to report this some day to unreal.
+		// for now just do not report progress.
+		m_progressBar = new FScopedSlowTask(100.0f, NSLOCTEXT("Newton", "Newton", "Generation Convex Approximation"));
+		m_progressBar->MakeDialog();
+		#endif
+	}
+
+	~ConvexVhacdGenerator()
+	{
+		if (m_progressBar)
+		{
+			delete m_progressBar;
+			m_progressBar = nullptr;
+		}
+	}
+
+	virtual void ShowProgress() override
+	{
+		m_acc += 1.0f;
+		if (m_acc < 99.0f)
+		{
+			m_progressBar->EnterProgressFrame();
+		}
+	}
+
+	FScopedSlowTask* m_progressBar;
+	float m_acc;
+};
 
 class UNewtonRigidBody::NotifyCallback : public ndBodyNotify
 {
@@ -335,7 +376,7 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 			ndFixSizeArray<USceneComponent*, 1024> stack;
 			stack.PushBack(this);
 
-			ndFloat32 volume = ndFloat32(1.0e-3f);
+			ndFloat32 volume = ndFloat32(0.0f);
 			while (stack.GetCount())
 			{
 				const USceneComponent* const component = stack.Pop();
@@ -344,7 +385,7 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 				{
 					const ndVector pv(shape->GetVolumePosition());
 					volume += pv.m_w;
-					positVolume += pv;
+					positVolume += pv.Scale (pv.m_w);
 				}
 
 				const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
@@ -353,6 +394,7 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 					stack.PushBack(childrenComp[i].Get());
 				}
 			}
+			volume = ndMax (volume, ndFloat32(1.0e-3f));
 			positVolume = positVolume.Scale(ndFloat32(1.0f) / volume);
 
 			const ndVector centerOfMass(
@@ -517,77 +559,34 @@ void UNewtonRigidBody::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 void UNewtonRigidBody::CreateConvexApproximationShapes(UStaticMeshComponent* const staticComponent)
 {
-	class ConveHullGenerator : public ndConvexApproximation
-	{
-		public:
-		ConveHullGenerator(ndInt32 maxConvexes, bool quality)
-			:ndConvexApproximation(maxConvexes, quality)
-			,m_progressBar(nullptr)
-			,m_acc(0.0f)
-		{
-		}
-		
-		~ConveHullGenerator()
-		{
-			check(!m_progressBar);
-		}
-
-		// for some reason the progress bar invalidate some UClasses
-		// I need to report this some day to unreal.
-		// for now just do not report progress.
-		//void InitProgress()
-		//{
-		//	m_progressBar = new FScopedSlowTask(100.0f, NSLOCTEXT("Newton", "Newton", "Generation Convex Approximation"));
-		//	m_progressBar->MakeDialog();
-		//}
-		//void EndProgress()
-		//{
-		//	check(m_progressBar);
-		//	delete m_progressBar;
-		//	m_progressBar = nullptr;
-		//}
-
-		virtual void Progress() override
-		{
-			//m_acc += 1.0f;
-			//if (m_acc < 99.9f)
-			//{
-			//	m_progressBar->EnterProgressFrame();
-			//}
-		}
-
-		FScopedSlowTask* m_progressBar;
-		float m_acc;
-	};
-
-	ConveHullGenerator convexHullSet(ConvexApproximate.MaxConvexes, ConvexApproximate.HighResolution);
-
+	ConvexVhacdGenerator* const convexHullSet = new ConvexVhacdGenerator(ConvexApproximate.MaxConvexes, ConvexApproximate.HighResolution);
+	
 	const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
 	check(staticMesh);
 	const FStaticMeshRenderData* const renderData = staticMesh->GetRenderData();
 	check(renderData);
 	const FStaticMeshLODResourcesArray& renderResource = renderData->LODResources;
-
+	
 	const FVector uScale(GetComponentTransform().GetScale3D());
 	const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
 	const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
-
+	
 	const FStaticMeshLODResources& renderLOD = renderResource[0];
 	const FStaticMeshVertexBuffers& staticMeshVertexBuffer = renderLOD.VertexBuffers;;
 	const FPositionVertexBuffer& positBuffer = staticMeshVertexBuffer.PositionVertexBuffer;
-
-	ndHullInputMesh& inputMesh = convexHullSet.m_inputMesh;
+	
+	ndHullInputMesh& inputMesh = convexHullSet->m_inputMesh;
 	for (ndInt32 i = 0; i < ndInt32(positBuffer.GetNumVertices()); ++i)
 	{
 		ndHullPoint q;
 		const FVector3f p(positBuffer.VertexPosition(i));
-
+	
 		q.m_x = ndReal(p.X * bakedScale.m_x);
 		q.m_y = ndReal(p.Y * bakedScale.m_y);
 		q.m_z = ndReal(p.Z * bakedScale.m_z);
 		inputMesh.m_points.PushBack(q);
 	}
-
+	
 	const FRawStaticIndexBuffer& indexBuffer = renderLOD.IndexBuffer;
 	for (ndInt32 i = 0; i < ndInt32(indexBuffer.GetNumIndices()); i += 3)
 	{
@@ -600,24 +599,26 @@ void UNewtonRigidBody::CreateConvexApproximationShapes(UStaticMeshComponent* con
 		check(face.m_i1 != face.m_i2);
 		inputMesh.m_faces.PushBack(face);
 	}
-
-	convexHullSet.Execute();
-
+	
+	convexHullSet->Execute();
+	
 	AActor* const actor = staticComponent->GetOwner();
 	check(actor);
-	ndArray<ndHullOutput*>& hullArray = convexHullSet.m_ouputHulls;
+	ndArray<ndHullOutput*>& hullArray = convexHullSet->m_ouputHulls;
 	for (ndInt32 i = hullArray.GetCount() - 1; i >= 0; --i)
 	{
+		const ndHullOutput* const convexHull = hullArray[i];
+
 		UNewtonCollisionConvexHull* const childConvex = Cast<UNewtonCollisionConvexHull>(actor->AddComponentByClass(UNewtonCollisionConvexHull::StaticClass(), false, FTransform(), true));
 		actor->FinishAddComponent(childConvex, false, FTransform());
 		actor->AddInstanceComponent(childConvex);
 		childConvex->AttachToComponent(staticComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
+		childConvex->InitVhacdConvex(convexHull);
 		childConvex->MarkRenderDynamicDataDirty();
 		childConvex->NotifyMeshUpdated();
-
-		const ndHullOutput* const convexHull = hullArray[i];
-		childConvex->SetProceduralData(*convexHull);
 	}
+	delete convexHullSet;
 }
 
 void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool overrideAutoSleep)
@@ -635,8 +636,11 @@ void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool
 
 	m_body->SetLinearDamping(LinearDamp);
 	m_body->SetAngularDamping(ndVector(AngularDamp));
-	m_body->SetOmega(ndVector(ndFloat32(InitialOmega.X), ndFloat32(InitialOmega.Y), ndFloat32(InitialOmega.Z), ndFloat32(0.0f)));
-	m_body->SetVelocity(ndVector(ndFloat32(InitialVeloc.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(InitialVeloc.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(InitialVeloc.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f)));
+
+	const ndVector omega(ndVector(ndFloat32(InitialOmega.X), ndFloat32(InitialOmega.Y), ndFloat32(InitialOmega.Z), ndFloat32(0.0f)));
+	const ndVector veloc(ndFloat32(InitialVeloc.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(InitialVeloc.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(InitialVeloc.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
+	m_body->SetOmega(matrix.RotateVector(omega));
+	m_body->SetVelocity(matrix.RotateVector(veloc));
 
 	ndVector centerOfGravity(m_body->GetCentreOfMass());
 	centerOfGravity += ndVector(ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));

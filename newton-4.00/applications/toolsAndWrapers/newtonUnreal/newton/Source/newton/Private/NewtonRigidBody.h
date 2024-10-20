@@ -55,6 +55,7 @@ class UNewtonRigidBody : public USceneComponent
 	GENERATED_BODY()
 
 	class NotifyCallback;
+	class ConvexVhacdGenerator;
 
 	public:
 	// Sets default values for this component's properties
@@ -112,6 +113,7 @@ class UNewtonRigidBody : public USceneComponent
 	float AngularDamp;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
+	//UPROPERTY(EditAnywhere, Category = Newton, ReplicatedUsing=OnRep_Transform)
 	FVector InitialVeloc;
 
 	UPROPERTY(EditAnywhere, Category = Newton)

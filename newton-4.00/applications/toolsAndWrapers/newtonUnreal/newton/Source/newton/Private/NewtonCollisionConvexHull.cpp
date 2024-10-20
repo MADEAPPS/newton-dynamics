@@ -27,16 +27,6 @@ void UNewtonCollisionConvexHull::Serialize(FArchive& ar)
 	ar << m_proceduralData;
 }
 
-void UNewtonCollisionConvexHull::SetProceduralData(const ndHullOutput& pointCloud)
-{
-	m_proceduralData.Empty();
-	for (ndInt32 i = pointCloud.GetCount() - 1; i >= 0; --i)
-	{
-		FVector3f p(pointCloud[i].m_x, pointCloud[i].m_y, pointCloud[i].m_z);
-		m_proceduralData.Push(p);
-	}
-}
-
 long long UNewtonCollisionConvexHull::CalculateHash() const
 {
 	long long hash = ndCRC64(ndShapeConvexHull::StaticClassName(), strlen(ndShapeConvexHull::StaticClassName()), 0);
@@ -64,58 +54,68 @@ ndShape* UNewtonCollisionConvexHull::CreateShape() const
 	return new ndShapeNull();
 }
 
+void UNewtonCollisionConvexHull::InitStaticMeshCompoment(const USceneComponent* const meshComponent)
+{
+	SetTransform(meshComponent);
+
+	const UStaticMeshComponent* const staticMeshComponent = Cast<UStaticMeshComponent>(meshComponent);
+	check(staticMeshComponent);
+	UStaticMesh* const staticMesh = staticMeshComponent->GetStaticMesh().Get();
+
+	const FStaticMeshRenderData* const renderData = staticMesh->GetRenderData();
+	const FStaticMeshLODResourcesArray& renderResource = renderData->LODResources;
+	
+	const FVector uScale(GetComponentTransform().GetScale3D());
+	const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
+	const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
+	
+	const FStaticMeshLODResources& renderLOD = renderResource[0];
+	const FStaticMeshVertexBuffers& staticMeshVertexBuffer = renderLOD.VertexBuffers;;
+	const FPositionVertexBuffer& positBuffer = staticMeshVertexBuffer.PositionVertexBuffer;
+	
+	ndArray<ndBigVector> points;
+	for (ndInt32 i = positBuffer.GetNumVertices() - 1; i >= 0; --i)
+	{
+		const FVector3f p(positBuffer.VertexPosition(i));
+		const ndVector q(ndFloat32(p.X), ndFloat32(p.Y), ndFloat32(p.Z), ndFloat32(0.0f));
+		points.PushBack(q * bakedScale);
+	}
+	ndConvexHull3d convexHull(&points[0].m_x, sizeof(ndBigVector), points.GetCount(), Tolerance, MaxVertexCount);
+	const ndArray<ndBigVector>& convexVertex = convexHull.GetVertexPool();
+
+	for (ndInt32 i = convexVertex.GetCount() - 1; i >= 0; --i)
+	{
+		FVector3f p(convexVertex[i].m_x, convexVertex[i].m_y, convexVertex[i].m_z);
+		m_proceduralData.Push(p);
+	}
+}
+
+void UNewtonCollisionConvexHull::InitVhacdConvex(const ndHullOutput* const conveHullMesh)
+{
+	SetTransform(GetAttachParent());
+
+	const ndArray<ndHullPoint>& points = *conveHullMesh;
+	for (ndInt32 i = ndInt32(points.GetCount()) - 1; i >= 0; --i)
+	{
+		FVector3f p(points[i].m_x, points[i].m_y, points[i].m_z);
+		m_proceduralData.Push(p);
+	}
+}
+
 void UNewtonCollisionConvexHull::ApplyPropertyChanges()
 {
-	check(0);
-	//if (m_proceduralData.Num() == 0)
-	//{
-	//	m_debugVisualIsDirty = true;
-	//
-	//	const UStaticMesh* const staticMesh = FindStaticMesh();
-	//	if (staticMesh)
-	//	{
-	//		const ANewtonSceneActor* const owner = Cast<ANewtonSceneActor>(GetOwner());
-	//		if (owner && m_savedMeshComponent)
-	//		{
-	//			const FTransform bodyTransform(owner->GetRootComponent()->GetComponentToWorld());
-	//			const FTransform meshTransform(m_savedMeshComponent->GetComponentToWorld());
-	//			const FTransform transform(meshTransform * bodyTransform.Inverse());
-	//			SetComponentToWorld(transform);
-	//		}
-	//
-	//		const FStaticMeshRenderData* const renderData = staticMesh->GetRenderData();
-	//		const FStaticMeshLODResourcesArray& renderResource = renderData->LODResources;
-	//
-	//		const FVector uScale(GetComponentTransform().GetScale3D());
-	//		const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
-	//		const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
-	//
-	//		const FStaticMeshLODResources& renderLOD = renderResource[0];
-	//		const FStaticMeshVertexBuffers& staticMeshVertexBuffer = renderLOD.VertexBuffers;;
-	//		const FPositionVertexBuffer& positBuffer = staticMeshVertexBuffer.PositionVertexBuffer;
-	//
-	//		ndArray<ndBigVector> points;
-	//		for (int i = positBuffer.GetNumVertices() - 1; i >= 0; --i)
-	//		{
-	//			const FVector3f p(positBuffer.VertexPosition(i));
-	//			const ndVector q(ndFloat32(p.X), ndFloat32(p.Y), ndFloat32(p.Z), ndFloat32(0.0f));
-	//			points.PushBack(q * bakedScale);
-	//		}
-	//		ndConvexHull3d convexHull(&points[0].m_x, sizeof(ndBigVector), points.GetCount(), Tolerance, MaxVertexCount);
-	//		const ndArray<ndBigVector>& convexVertex = convexHull.GetVertexPool();
-	//
-	//		ndHullOutput hullMesh;
-	//		for (ndInt32 i = convexVertex.GetCount() - 1; i >= 0; --i)
-	//		{
-	//			ndHullPoint p;
-	//			p.m_x = convexVertex[i].m_x;
-	//			p.m_y = convexVertex[i].m_y;
-	//			p.m_z = convexVertex[i].m_z;
-	//			hullMesh.PushBack(p);
-	//		}
-	//		SetProceduralData(hullMesh);
-	//	}
-	//}
+	if (!m_proceduralData.Num())
+	{
+		if (!Cast<ANewtonSceneActor>(GetOwner()))
+		{
+			const USceneComponent* const parent = Cast<UStaticMeshComponent>(GetAttachParent());
+			if (parent)
+			{
+				InitStaticMeshCompoment(parent);
+			}
+		}
+	}
+	m_debugVisualIsDirty = true;
 
 	BuildNewtonShape();
 	Super::ApplyPropertyChanges();

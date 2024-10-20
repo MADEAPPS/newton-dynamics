@@ -21,6 +21,7 @@ UCLASS(Abstract, meta=(BlueprintSpawnableComponent), HideCategories = (RayTracin
 class UNewtonCollision : public UDynamicMeshComponent
 {
 	GENERATED_BODY()
+	class PolygonizeMesh;
 
 	public:	
 	// Sets default values for this component's properties

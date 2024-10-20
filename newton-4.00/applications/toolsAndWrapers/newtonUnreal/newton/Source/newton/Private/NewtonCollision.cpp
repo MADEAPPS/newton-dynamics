@@ -9,6 +9,71 @@
 #include "NewtonWorldActor.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
+class UNewtonCollision::PolygonizeMesh : public ndShapeDebugNotify
+{
+	public:
+	PolygonizeMesh()
+		:ndShapeDebugNotify()
+		,m_scale(UNREAL_UNIT_SYSTEM)
+	{
+	}
+
+	void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const)
+	{
+		ndInt32 baseIndex = m_points.GetCount();
+		for (ndInt32 i = 0; i < vertexCount; ++i)
+		{
+			m_points.PushBack(faceArray[i] * m_scale);
+		}
+
+		ndArray<ndInt32> triangles;
+		ndTriangulatePolygon(&m_points[0], vertexCount, triangles);
+		for (ndInt32 i = 0; i < ndInt32(triangles.GetCount()); i += 3)
+		{
+			m_index.PushBack(baseIndex + triangles[i + 0]);
+			m_index.PushBack(baseIndex + triangles[i + 2]);
+			m_index.PushBack(baseIndex + triangles[i + 1]);
+		}
+	}
+
+	TSharedPtr<UE::Geometry::FDynamicMesh3> CreateDynamicMesh3()
+	{
+		ndArray<ndInt32> remapIndex;
+		remapIndex.SetCount(m_points.GetCount());
+		ndInt32 vertexCount = ndVertexListToIndexList(&m_points[0].m_x, sizeof(ndVector), 3, ndInt32(m_points.GetCount()), &remapIndex[0], 1.0e-5f);
+
+		ndArray<ndInt32> unrealVertexIndex;
+		unrealVertexIndex.SetCount(m_points.GetCount());
+
+		TSharedPtr<UE::Geometry::FDynamicMesh3> mesh3(new UE::Geometry::FDynamicMesh3());
+		UE::Geometry::FDynamicMesh3* const triangleMesh = mesh3.Get();
+
+		triangleMesh->Clear();
+		for (ndInt32 i = 0; i < vertexCount; ++i)
+		{
+			FVector3d p(m_points[i].m_x, m_points[i].m_y, m_points[i].m_z);
+			unrealVertexIndex[i] = triangleMesh->AppendVertex(p);
+		}
+
+		for (ndInt32 i = 0; i < m_index.GetCount(); i += 3)
+		{
+			int k0 = remapIndex[m_index[i + 0]];
+			int k1 = remapIndex[m_index[i + 1]];
+			int k2 = remapIndex[m_index[i + 2]];
+
+			int j0 = unrealVertexIndex[k0];
+			int j1 = unrealVertexIndex[k1];
+			int j2 = unrealVertexIndex[k2];
+			triangleMesh->AppendTriangle(j0, j1, j2);
+		}
+		return 	mesh3;
+	}
+
+	const ndVector m_scale;
+	ndArray<ndInt32> m_index;
+	ndArray<ndVector> m_points;
+};
+
 // Sets default values for this component's properties
 UNewtonCollision::UNewtonCollision()
 	:Super()
@@ -46,11 +111,6 @@ void UNewtonCollision::OnUnregister()
 	m_hash = 0;
 	m_visualMesh = TSharedPtr<UE::Geometry::FDynamicMesh3>(nullptr);
 }
-
-//void UNewtonCollision::SetGeometryMesh(USceneComponent* const staticMesh)
-//{
-//	m_savedMeshComponent = staticMesh;
-//}
 
 void UNewtonCollision::SetTransform(const USceneComponent* const meshComponent)
 {
@@ -187,71 +247,6 @@ ndShapeInstance* UNewtonCollision::CreateBodyInstanceShape(const ndMatrix& bodyM
 
 void UNewtonCollision::ApplyPropertyChanges()
 {
-	class PolygonizeMesh : public ndShapeDebugNotify
-	{
-		public:
-		PolygonizeMesh()
-			:ndShapeDebugNotify()
-			,m_scale(UNREAL_UNIT_SYSTEM)
-		{
-		}
-
-		void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const)
-		{
-			ndInt32 baseIndex = m_points.GetCount();
-			for (ndInt32 i = 0; i < vertexCount; ++i)
-			{
-				m_points.PushBack(faceArray[i] * m_scale);
-			}
-
-			ndArray<ndInt32> triangles;
-			ndTriangulatePolygon(&m_points[0], vertexCount, triangles);
-			for (ndInt32 i = 0; i < ndInt32 (triangles.GetCount()); i+=3)
-			{
-				m_index.PushBack(baseIndex + triangles[i + 0]);
-				m_index.PushBack(baseIndex + triangles[i + 1]);
-				m_index.PushBack(baseIndex + triangles[i + 2]);
-			}
-		}
-
-		TSharedPtr<UE::Geometry::FDynamicMesh3> CreateDynamicMesh3()
-		{
-			ndArray<ndInt32> remapIndex;
-			remapIndex.SetCount(m_points.GetCount());
-			ndInt32 vertexCount = ndVertexListToIndexList(&m_points[0].m_x, sizeof(ndVector), 3, ndInt32(m_points.GetCount()), &remapIndex[0], 1.0e-5f);
-
-			ndArray<ndInt32> unrealVertexIndex;
-			unrealVertexIndex.SetCount(m_points.GetCount());
-
-			TSharedPtr<UE::Geometry::FDynamicMesh3> mesh3(new UE::Geometry::FDynamicMesh3());
-			UE::Geometry::FDynamicMesh3* const triangleMesh = mesh3.Get();
-
-			triangleMesh->Clear();
-			for (ndInt32 i = 0; i < vertexCount; ++i)
-			{
-				FVector3d p(m_points[i].m_x, m_points[i].m_y, m_points[i].m_z);
-				unrealVertexIndex[i] = triangleMesh->AppendVertex(p);
-			}
-
-			for (ndInt32 i = 0; i < m_index.GetCount(); i += 3)
-			{
-				int k0 = remapIndex[m_index[i + 0]];
-				int k1 = remapIndex[m_index[i + 1]];
-				int k2 = remapIndex[m_index[i + 2]];
-
-				int j0 = unrealVertexIndex[k0];
-				int j1 = unrealVertexIndex[k1];
-				int j2 = unrealVertexIndex[k2];
-				triangleMesh->AppendTriangle(j0, j1, j2);
-			}
-			return 	mesh3;
-		}
-
-		const ndVector m_scale;
-		ndArray<ndInt32> m_index;
-		ndArray<ndVector> m_points;
-	};
-
 	m_propertyChanged = false;
 
 	if (m_shape)
@@ -312,30 +307,14 @@ void UNewtonCollision::ApplyPropertyChanges()
 	}
 }
 
-//UStaticMesh* UNewtonCollision::FindStaticMesh() const
-//{
-//	if (m_savedMeshComponent)
-//	{
-//		UStaticMeshComponent* const staticMesh = Cast<UStaticMeshComponent>(m_savedMeshComponent);
-//		return staticMesh ? staticMesh->GetStaticMesh().Get() : (UStaticMesh*) nullptr;
-//	}
-//
-//	const UStaticMeshComponent* const mesh = Cast<UStaticMeshComponent>(GetAttachParent());
-//	if (mesh && mesh->GetStaticMesh().Get())
-//	{
-//		return mesh->GetStaticMesh().Get();
-//	}
-//
-//	return nullptr;
-//}
-
 ndVector UNewtonCollision::GetVolumePosition() const
 {
 	ndVector posit(0.0f);
 	const ndShapeInstance* const instance = CreateInstanceShape();
 	if (instance)
 	{
-		posit = instance->GetLocalMatrix().m_posit;
+		const ndMatrix inertia(instance->CalculateInertia());
+		posit = inertia.m_posit;
 		posit.m_w = instance->GetVolume();
 		delete instance;
 	}

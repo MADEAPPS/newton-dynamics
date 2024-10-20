@@ -23,8 +23,7 @@ class UNewtonCollisionLandscape : public UNewtonCollision
 	public:
 	// Sets default values for this component's properties
 	UNewtonCollisionLandscape();
-
-	//virtual void SetGlobalTransform() override;
+	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent) override;
 
 	protected:
 	virtual void Serialize(FArchive& Ar) override;

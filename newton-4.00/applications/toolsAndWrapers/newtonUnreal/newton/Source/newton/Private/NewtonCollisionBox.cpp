@@ -28,10 +28,10 @@ void UNewtonCollisionBox::InitStaticMeshCompoment(const USceneComponent* const m
 	const UBodySetup* const bodySetup = staticMesh->GetBodySetup();
 	const FKAggregateGeom& aggGeom = bodySetup->AggGeom;
 	check(aggGeom.BoxElems.Num() == 1);
-	const FKBoxElem& box = aggGeom.BoxElems[0];
+	const FKBoxElem& element = aggGeom.BoxElems[0];
 
 	SetTransform(meshComponent);
-	const FTransform localTransformOffset(box.GetTransform());
+	const FTransform localTransformOffset(element.GetTransform());
 	const FTransform globalTransform(localTransformOffset * GetComponentToWorld());
 	SetComponentToWorld(globalTransform);
 
@@ -43,9 +43,9 @@ void UNewtonCollisionBox::InitStaticMeshCompoment(const USceneComponent* const m
 	SetRelativeRotation_Direct(FRotator(localTransform.GetRotation()));
 	SetRelativeLocation_Direct(localTransform.GetLocation());
 
-	SizeX = box.X;
-	SizeY = box.Y;
-	SizeZ = box.Z;
+	SizeX = element.X;
+	SizeY = element.Y;
+	SizeZ = element.Z;
 }
 
 long long UNewtonCollisionBox::CalculateHash() const
