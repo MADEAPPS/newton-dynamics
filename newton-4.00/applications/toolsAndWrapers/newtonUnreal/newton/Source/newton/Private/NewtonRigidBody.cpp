@@ -303,7 +303,7 @@ ndMatrix UNewtonRigidBody::CalculateInertiaMatrix() const
 			instances.PushBack(instance);
 		}
 		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
-		for (int i = childrenComp.Num() - 1; i >= 0; --i)
+		for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
 		{
 			stack.PushBack(childrenComp[i].Get());
 		}
@@ -389,7 +389,7 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 				}
 
 				const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
-				for (int i = childrenComp.Num() - 1; i >= 0; --i)
+				for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
 				{
 					stack.PushBack(childrenComp[i].Get());
 				}
@@ -432,7 +432,7 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 				}
 
 				const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
-				for (int i = childrenComp.Num() - 1; i >= 0; --i)
+				for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
 				{
 					stack.PushBack(childrenComp[i].Get());
 				}
@@ -452,7 +452,7 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 				}
 
 				const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
-				for (int i = childrenComp.Num() - 1; i >= 0; --i)
+				for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
 				{
 					stack.PushBack(childrenComp[i].Get());
 				}
@@ -521,7 +521,7 @@ void UNewtonRigidBody::ApplyPropertyChanges()
 			{
 				bool hasCollision = false;
 				const TArray<TObjectPtr<USceneComponent>>& childrenComp = staticMeshComponent->GetAttachChildren();
-				for (int i = childrenComp.Num() - 1; i >= 0; --i)
+				for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
 				{
 					hasCollision = hasCollision || (Cast<UNewtonCollision>(childrenComp[i]) ? true : false);
 				}
@@ -560,6 +560,8 @@ void UNewtonRigidBody::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 void UNewtonRigidBody::CreateConvexApproximationShapes(UStaticMeshComponent* const staticComponent)
 {
 	ConvexVhacdGenerator* const convexHullSet = new ConvexVhacdGenerator(ConvexApproximate.MaxConvexes, ConvexApproximate.HighResolution);
+	convexHullSet->m_tolerance = 1.0e-3f + ConvexApproximate.Tolerance * 0.1f;
+	convexHullSet->m_maxPointPerHull = ConvexApproximate.MaxVertexPerConvex;
 	
 	const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
 	check(staticMesh);
@@ -606,6 +608,7 @@ void UNewtonRigidBody::CreateConvexApproximationShapes(UStaticMeshComponent* con
 	check(actor);
 	ndArray<ndHullOutput*>& hullArray = convexHullSet->m_ouputHulls;
 	for (ndInt32 i = hullArray.GetCount() - 1; i >= 0; --i)
+	//for (ndInt32 i = 0; i < 3; ++i)
 	{
 		const ndHullOutput* const convexHull = hullArray[i];
 
@@ -664,7 +667,7 @@ void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool
 		}
 
 		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
-		for (int i = childrenComp.Num() - 1; i >= 0; --i)
+		for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
 		{
 			stack.PushBack(childrenComp[i].Get());
 		}
@@ -686,7 +689,7 @@ ndShapeInstance* UNewtonRigidBody::CreateCollision(const ndMatrix& bodyMatrix) c
 			collisionShapes.PushBack(shape);
 		}
 		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
-		for (int i = childrenComp.Num() - 1; i >= 0; --i)
+		for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
 		{
 			stack.PushBack(childrenComp[i].Get());
 		}

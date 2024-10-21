@@ -20,9 +20,9 @@ class UNewtonCollisionConvexHull : public UNewtonCollision
 	public:
 	// Sets default values for this component's properties
 	UNewtonCollisionConvexHull();
+	void InitVhacdConvex(const ndHullOutput* const conveHullMesh);
 	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent) override;
 
-	void InitVhacdConvex(const ndHullOutput* const conveHullMesh);
 	protected:
 	virtual void Serialize(FArchive& Ar) override;
 
@@ -38,7 +38,7 @@ class UNewtonCollisionConvexHull : public UNewtonCollision
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 16))
 	int MaxVertexCount;
 
-	TArray<FVector3f> m_proceduralData;
+	TArray<FVector3f> m_convexHullPoints;
 };
 	
 

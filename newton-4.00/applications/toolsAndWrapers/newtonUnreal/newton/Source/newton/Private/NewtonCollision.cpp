@@ -27,7 +27,9 @@ class UNewtonCollision::PolygonizeMesh : public ndShapeDebugNotify
 		}
 
 		ndArray<ndInt32> triangles;
-		ndTriangulatePolygon(&m_points[0], vertexCount, triangles);
+		ndTriangulatePolygon(&m_points[baseIndex], vertexCount, triangles);
+		//check((vertexCount - 2) == ndInt32 (triangles.GetCount() / 3));
+
 		for (ndInt32 i = 0; i < ndInt32(triangles.GetCount()); i += 3)
 		{
 			m_index.PushBack(baseIndex + triangles[i + 0]);
@@ -90,8 +92,12 @@ UNewtonCollision::UNewtonCollision()
 	m_visualMesh = TSharedPtr<UE::Geometry::FDynamicMesh3>(nullptr);
 
 	ConstructorHelpers::FObjectFinder<UMaterial> TexObj(TEXT("/newton/NewtonTransparentMaterial"));
-	m_transparentMaterial = Cast<UMaterial>(TexObj.Object);
-	m_transparentMaterial->OpacityMaskClipValue = 0.0f;
+	TObjectPtr<UMaterial> debugMaterial(Cast<UMaterial>(TexObj.Object));
+	debugMaterial->OpacityMaskClipValue = 0.0f;
+
+	UMaterialInstanceDynamic* const debugMaterialInstance = UMaterialInstanceDynamic::Create(debugMaterial, nullptr);
+	debugMaterialInstance->OpacityMaskClipValue = 0.1f;
+	SetMaterial(0, debugMaterialInstance);
 }
 
 void UNewtonCollision::OnRegister()
@@ -287,9 +293,6 @@ void UNewtonCollision::ApplyPropertyChanges()
 				m_visualMesh = visualMesh;
 				UDynamicMesh* const dynMesh = GetDynamicMesh();
 				dynMesh->SetMesh(UE::Geometry::FDynamicMesh3(*visualMesh.Get()));
-
-				UMaterialInstanceDynamic* const transparentMaterialInstance = UMaterialInstanceDynamic::Create(m_transparentMaterial, nullptr);
-				SetMaterial(0, transparentMaterialInstance);
 			}
 		}
 		else

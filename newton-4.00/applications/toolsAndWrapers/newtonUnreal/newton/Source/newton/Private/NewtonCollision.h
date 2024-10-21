@@ -56,7 +56,6 @@ class UNewtonCollision : public UDynamicMeshComponent
 	long long m_hash;
 	ndShape* m_shape;
 	TSharedPtr<UE::Geometry::FDynamicMesh3> m_visualMesh;
-	UMaterial* m_transparentMaterial;
 	bool m_propertyChanged;
 	bool m_showDebug;
 	bool m_debugVisualIsDirty;

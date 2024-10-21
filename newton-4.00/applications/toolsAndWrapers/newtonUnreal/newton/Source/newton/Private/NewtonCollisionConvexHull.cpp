@@ -23,35 +23,47 @@ void UNewtonCollisionConvexHull::Serialize(FArchive& ar)
 	// this actually sucks big time in unreal
 	//ar.UsingCustomVersion(FnewtonModule::m_guiID);
 	//int xxxx0 = ar.CustomVer(FnewtonModule::m_guiID);
-	
-	ar << m_proceduralData;
+	//ndConvexHullPoints& points = *m_convexHullPoints.Get();
+	ar << m_convexHullPoints;
 }
 
 long long UNewtonCollisionConvexHull::CalculateHash() const
 {
 	long long hash = ndCRC64(ndShapeConvexHull::StaticClassName(), strlen(ndShapeConvexHull::StaticClassName()), 0);
-	if (m_proceduralData.Num())
+	if (m_convexHullPoints.Num())
 	{
-		const FVector3f* const vexterBuffer = &m_proceduralData[0];
-		hash = ndCRC64(vexterBuffer, m_proceduralData.Num() * sizeof(FVector3f), hash);
+		const FVector3f* const vexterBuffer = &m_convexHullPoints[0];
+		hash = ndCRC64(vexterBuffer, m_convexHullPoints.Num() * sizeof(FVector3f), hash);
 	}
 	return hash;
 }
 
 ndShape* UNewtonCollisionConvexHull::CreateShape() const
 {
-	if (m_proceduralData.Num())
+	if (m_convexHullPoints.Num())
 	{
 		ndArray<ndVector> points;
-		for (int i = m_proceduralData.Num() - 1; i >= 0; --i)
+		for (ndInt32 i = m_convexHullPoints.Num() - 1; i >= 0; --i)
 		{
-			const ndVector p(ndFloat32(m_proceduralData[i].X), ndFloat32(m_proceduralData[i].Y), ndFloat32(m_proceduralData[i].Z), ndFloat32(0.0f));
+			const ndVector p(ndFloat32(m_convexHullPoints[i].X), ndFloat32(m_convexHullPoints[i].Y), ndFloat32(m_convexHullPoints[i].Z), ndFloat32(0.0f));
 			points.PushBack(p);
 		}
-		ndShape* const shape = new ndShapeConvexHull(m_proceduralData.Num(), sizeof(ndVector), Tolerance, &points[0].m_x, MaxVertexCount);
+		ndShape* const shape = new ndShapeConvexHull(m_convexHullPoints.Num(), sizeof(ndVector), Tolerance, &points[0].m_x, MaxVertexCount);
 		return shape;
 	}
 	return new ndShapeNull();
+}
+
+void UNewtonCollisionConvexHull::InitVhacdConvex(const ndHullOutput* const conveHullMesh)
+{
+	SetTransform(GetAttachParent());
+
+	const ndArray<ndHullPoint>& points = *conveHullMesh;
+	for (ndInt32 i = ndInt32(points.GetCount()) - 1; i >= 0; --i)
+	{
+		FVector3f p(points[i].m_x, points[i].m_y, points[i].m_z);
+		m_convexHullPoints.Push(p);
+	}
 }
 
 void UNewtonCollisionConvexHull::InitStaticMeshCompoment(const USceneComponent* const meshComponent)
@@ -86,25 +98,13 @@ void UNewtonCollisionConvexHull::InitStaticMeshCompoment(const USceneComponent* 
 	for (ndInt32 i = convexVertex.GetCount() - 1; i >= 0; --i)
 	{
 		FVector3f p(convexVertex[i].m_x, convexVertex[i].m_y, convexVertex[i].m_z);
-		m_proceduralData.Push(p);
-	}
-}
-
-void UNewtonCollisionConvexHull::InitVhacdConvex(const ndHullOutput* const conveHullMesh)
-{
-	SetTransform(GetAttachParent());
-
-	const ndArray<ndHullPoint>& points = *conveHullMesh;
-	for (ndInt32 i = ndInt32(points.GetCount()) - 1; i >= 0; --i)
-	{
-		FVector3f p(points[i].m_x, points[i].m_y, points[i].m_z);
-		m_proceduralData.Push(p);
+		m_convexHullPoints.Push(p);
 	}
 }
 
 void UNewtonCollisionConvexHull::ApplyPropertyChanges()
 {
-	if (!m_proceduralData.Num())
+	if (!m_convexHullPoints.Num())
 	{
 		if (!Cast<ANewtonSceneActor>(GetOwner()))
 		{

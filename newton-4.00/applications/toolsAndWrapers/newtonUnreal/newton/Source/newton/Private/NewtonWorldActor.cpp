@@ -290,7 +290,7 @@ void ANewtonWorldActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-// tick surrugate
+// tick surugate
 void ANewtonWorldActor::Update(float timestep)
 {
 	if (m_world)

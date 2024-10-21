@@ -51,6 +51,7 @@ class ndHullOutput: public ndArray<ndHullPoint>
 class ndConvexApproximation: public ndClassAlloc
 {
 	class ProgressBar;
+
 	public:
 	D_CORE_API ndConvexApproximation(ndInt32 maxConvexes, bool quality);
 	D_CORE_API virtual ~ndConvexApproximation();
@@ -60,6 +61,9 @@ class ndConvexApproximation: public ndClassAlloc
 
 	ndHullInputMesh m_inputMesh;
 	ndArray<ndHullOutput*> m_ouputHulls;
+	ndFloat32 m_tolerance;
 	ndInt32 m_maxConvexes;
+	ndInt32 m_maxPointPerHull;
+	
 	bool m_quality;
 };

@@ -15,6 +15,11 @@ class ANewtonWorldActor;
 template <typename T>
 class ndSharedPtr;
 
+class ndConvexHullPoints : public TArray<FVector3f>
+{
+
+};
+
 class FnewtonModule : public IModuleInterface
 {
 	class ResourceCache;
@@ -22,7 +27,6 @@ class FnewtonModule : public IModuleInterface
 	enum Version	
 	{
 		m_firstVersion,
-
 	};
 
 	/** IModuleInterface implementation */
@@ -32,9 +36,11 @@ class FnewtonModule : public IModuleInterface
 	static FnewtonModule* GetPlugin();
 
 	ndShape* FindShape(long long hash) const;
+	TSharedPtr<ndConvexHullPoints> FindConvexHull(long long hash) const;
 	TSharedPtr<UE::Geometry::FDynamicMesh3> FindDynamicMesh (long long hash) const;
 
 	void AddShape(ndShape* const shape, long long hash);
+	void AddConvexHull(const TSharedPtr<ndConvexHullPoints>& hull, long long hash);
 	void AddDynamicMesh(const TSharedPtr<UE::Geometry::FDynamicMesh3>& mesh, long long hash);
 
 	private:

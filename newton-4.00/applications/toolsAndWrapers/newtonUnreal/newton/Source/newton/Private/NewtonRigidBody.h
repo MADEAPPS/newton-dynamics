@@ -25,7 +25,13 @@ struct FConvexApproximationStruct
 	bool HighResolution = false;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 1, ClampMax = 128))
+	int MaxVertexPerConvex = 32;
+
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 1, ClampMax = 128))
 	int MaxConvexes = 16;
+
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0, ClampMax = 1.0))
+	float Tolerance = 0.0;
 };
 
 USTRUCT()

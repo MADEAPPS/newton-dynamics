@@ -3675,7 +3675,7 @@ ndInt32 ndContactSolver::ConvexToConvexContactsContinue()
 						count = ndMin(m_maxCount, count);
 						ndContactPoint* const contactOut = m_contactBuffer;
 
-						for (int i = 0; i < count; ++i)
+						for (ndInt32 i = 0; i < count; ++i)
 						{
 							contactOut[i].m_point = m_hullDiff[i] + step;
 							contactOut[i].m_normal = m_separatingVector;

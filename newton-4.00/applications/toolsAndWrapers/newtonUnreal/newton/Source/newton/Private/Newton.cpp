@@ -72,10 +72,7 @@ class FnewtonModule::ResourceCache
 				ndInt32 refCount = resource.GetSharedReferenceCount();
 				if (refCount == 1)
 				{
-					//TSharedPtr<OBJECT>* xxxx = &node->GetInfo();
-					//node->GetInfo() = TSharedPtr<OBJECT>(nullptr);
 					Cache::Remove(node);
-					//refCount *= 1;
 				}
 			}
 		}
@@ -85,9 +82,20 @@ class FnewtonModule::ResourceCache
 	{
 	}
 
+	ndShape* FindShape(long long hash) const
+	{
+		ndTree<ndShape*, long long>::ndNode* const node = m_shapeCache.Find(hash);
+		return node ? node->GetInfo() : nullptr;
+	}
+
 	TSharedPtr<UE::Geometry::FDynamicMesh3> FindDynamicMesh(long long hash) const
 	{
 		return m_visualMeshCache.Find(hash);
+	}
+
+	TSharedPtr<ndConvexHullPoints> FindConvexHull(long long hash) const
+	{
+		return m_convexVhacdCache.Find(hash);
 	}
 
 	void AddDynamicMesh(const TSharedPtr<UE::Geometry::FDynamicMesh3>& mesh, long long hash)
@@ -95,17 +103,16 @@ class FnewtonModule::ResourceCache
 		m_visualMeshCache.Insert(mesh, hash);
 	}
 
-	ndShape* FindShape(long long hash) const
-	{
-		ndTree<ndShape*, long long>::ndNode* const node = m_shapeCache.Find(hash);
-		return node ? node->GetInfo() : nullptr;
-	}
-
 	void AddShape(ndShape* const shape, long long hash)
 	{
 		check(!m_shapeCache.Find(hash));
 		shape->AddRef();
 		m_shapeCache.Insert(shape, hash);
+	}
+
+	void AddConvexHull(const TSharedPtr<ndConvexHullPoints>& hull, long long hash)
+	{
+		m_convexVhacdCache.Insert(hull, hash);
 	}
 
 	void CollectGarbage()
@@ -123,9 +130,11 @@ class FnewtonModule::ResourceCache
 			}
 		}
 		m_visualMeshCache.CollectGarbage();
+		m_convexVhacdCache.CollectGarbage();
 	}
 
 	ndTree<ndShape*, long long> m_shapeCache;
+	Cache<ndConvexHullPoints> m_convexVhacdCache;
 	Cache<UE::Geometry::FDynamicMesh3> m_visualMeshCache;
 };
 
@@ -249,6 +258,16 @@ void FnewtonModule::AddShape(ndShape* shape, long long hash)
 	m_resourceCache->AddShape(shape, hash);
 }
 
+TSharedPtr<ndConvexHullPoints> FnewtonModule::FindConvexHull(long long hash) const
+{
+	return m_resourceCache->FindConvexHull(hash);
+}
+
+void FnewtonModule::AddConvexHull(const TSharedPtr<ndConvexHullPoints>& hull, long long hash)
+{
+	m_resourceCache->AddConvexHull(hull, hash);
+}
+
 void FnewtonModule::RegisterMenus()
 {
 	FToolMenuOwnerScoped OwnerScoped(this);
@@ -304,7 +323,7 @@ void FnewtonModule::CleanupDebugLines(const UWorld* const world, float timestep)
 	ULineBatchComponent* const debugLines = world->PersistentLineBatcher.Get();
 	{
 		ndInt32 lineCount = debugLines->BatchedLines.Num();
-		for (int i = lineCount - 1; i >= 0; --i)
+		for (ndInt32 i = lineCount - 1; i >= 0; --i)
 		{
 			FBatchedLine& line = debugLines->BatchedLines[i];
 			if (line.RemainingLifeTime >= 0.0f)
@@ -326,7 +345,7 @@ void FnewtonModule::CleanupDebugLines(const UWorld* const world, float timestep)
 
 	{
 		ndInt32 pointCount = debugLines->BatchedPoints.Num();
-		for (int i = pointCount - 1; i >= 0; --i)
+		for (ndInt32 i = pointCount - 1; i >= 0; --i)
 		{
 			FBatchedPoint& point = debugLines->BatchedPoints[i];
 			if (point.RemainingLifeTime >= 0.0f)
@@ -348,7 +367,7 @@ void FnewtonModule::CleanupDebugLines(const UWorld* const world, float timestep)
 
 	{
 		ndInt32 meshCount = debugLines->BatchedMeshes.Num();
-		for (int i = meshCount - 1; i >= 0; --i)
+		for (ndInt32 i = meshCount - 1; i >= 0; --i)
 		{
 			FBatchedMesh& mesh = debugLines->BatchedMeshes[i];
 			if (mesh.RemainingLifeTime >= 0.0f)
@@ -367,8 +386,6 @@ void FnewtonModule::CleanupDebugLines(const UWorld* const world, float timestep)
 			debugLines->MarkRenderStateDirty();
 		}
 	}
-
-	m_resourceCache->CollectGarbage();
 }
 
 void FnewtonModule::UpdatePropertyChanges(const UWorld* const world) const
@@ -497,7 +514,7 @@ bool FnewtonModule::Tick(float timestep)
 	auto FindNewtonWorldActor = [this]()
 	{
 		const TIndirectArray<FWorldContext>& contexts = GEngine->GetWorldContexts();
-		for (int i = contexts.Num() - 1; i >= 0; --i)
+		for (ndInt32 i = contexts.Num() - 1; i >= 0; --i)
 		{
 			const FWorldContext& context = contexts[i];
 			if (context.WorldType == EWorldType::PIE)
@@ -525,6 +542,7 @@ bool FnewtonModule::Tick(float timestep)
 			InitNewtonWorld(newtonWorld);
 		}
 		newtonWorld->Update(timestep);
+		m_resourceCache->CollectGarbage();
 	}
 	else
 	{
@@ -533,7 +551,7 @@ bool FnewtonModule::Tick(float timestep)
 
 		//float persitentTimestep = timestep * 1.5f;
 		float persitentTimestep = ndClamp(timestep * 1.5f, 0.0f, 1.0f);
-		for (int i = contexts.Num() - 1; i >= 0; --i)
+		for (ndInt32 i = contexts.Num() - 1; i >= 0; --i)
 		{
 			const FWorldContext& context = contexts[i];
 			if (context.WorldType != EWorldType::PIE)

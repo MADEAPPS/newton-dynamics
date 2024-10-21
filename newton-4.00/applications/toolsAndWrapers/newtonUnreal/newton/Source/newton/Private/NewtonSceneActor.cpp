@@ -69,45 +69,45 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 				childComp->NotifyMeshUpdated();
 			};
 
-			for (int i = aggGeom.SphereElems.Num() - 1; i >= 0; --i)
+			for (ndInt32 i = aggGeom.SphereElems.Num() - 1; i >= 0; --i)
 			{
 				UNewtonCollisionSphere* const child = Cast<UNewtonCollisionSphere>(AddComponentByClass(UNewtonCollisionSphere::StaticClass(), false, FTransform(), true));
 				AddComponent(child);
 				hasSimple = true;
 			}
 
-			for (int i = aggGeom.SphylElems.Num() - 1; i >= 0; --i)
+			for (ndInt32 i = aggGeom.SphylElems.Num() - 1; i >= 0; --i)
 			{
 				UNewtonCollisionCapsule* const child = Cast<UNewtonCollisionCapsule>(AddComponentByClass(UNewtonCollisionCapsule::StaticClass(), false, FTransform(), true));
 				AddComponent(child);
 				hasSimple = true;
 			}
 
-			for (int i = aggGeom.BoxElems.Num() - 1; i >= 0; --i)
+			for (ndInt32 i = aggGeom.BoxElems.Num() - 1; i >= 0; --i)
 			{
 				UNewtonCollisionBox* const child = Cast<UNewtonCollisionBox>(AddComponentByClass(UNewtonCollisionBox::StaticClass(), false, FTransform(), true));
 				AddComponent(child);
 				hasSimple = true;
 			}
 
-			for (int i = aggGeom.ConvexElems.Num() - 1; i >= 0; --i)
+			for (ndInt32 i = aggGeom.ConvexElems.Num() - 1; i >= 0; --i)
 			{
 				UNewtonCollisionConvexHull* const child = Cast<UNewtonCollisionConvexHull>(AddComponentByClass(UNewtonCollisionConvexHull::StaticClass(), false, FTransform(), true));
 				AddComponent(child);
 				hasSimple = true;
 			}
 
-			for (int i = aggGeom.TaperedCapsuleElems.Num() - 1; i >= 0; --i)
+			for (ndInt32 i = aggGeom.TaperedCapsuleElems.Num() - 1; i >= 0; --i)
 			{
 				check(0);
 			}
 
-			for (int i = aggGeom.LevelSetElems.Num() - 1; i >= 0; --i)
+			for (ndInt32 i = aggGeom.LevelSetElems.Num() - 1; i >= 0; --i)
 			{
 				check(0);
 			}
 
-			for (int i = aggGeom.SkinnedLevelSetElems.Num() - 1; i >= 0; --i)
+			for (ndInt32 i = aggGeom.SkinnedLevelSetElems.Num() - 1; i >= 0; --i)
 			{
 				check(0);
 			}

@@ -54,7 +54,7 @@ class UNewtonCollisionPolygonalMesh::ndShapeStatic : public ndShapeStatic_bvh
 		m_vertexCount++;
 		for (ndInt32 j = 0; j < m_vertexCount; ++j)
 		{
-			int i = j * stride;
+			ndInt32 i =  j * stride;
 			FVector3f p(points[i + 0], points[i + 1], points[i + 2]);
 			m_self->m_vetexData.Push(p);
 		}
@@ -99,7 +99,7 @@ ndShape* UNewtonCollisionPolygonalMesh::CreateShape() const
 	ndPolygonSoupBuilder meshBuilder;
 	meshBuilder.Begin();
 	ndVector face[8];
-	for (int i = m_indexData.Num() - 3; i >= 0; i -= 3)
+	for (ndInt32 i =  m_indexData.Num() - 3; i >= 0; i -= 3)
 	{
 		ndInt32 i0 = m_indexData[i + 0];
 		ndInt32 i1 = m_indexData[i + 1];
@@ -143,7 +143,7 @@ void UNewtonCollisionPolygonalMesh::InitStaticMeshCompoment(const USceneComponen
 	bool data = staticMesh->GetPhysicsTriMeshData(&collisionData, true);
 	if (data)
 	{
-		for (int i = collisionData.Indices.Num() - 1; i >= 0; --i)
+		for (ndInt32 i =  collisionData.Indices.Num() - 1; i >= 0; --i)
 		{
 			ndInt32 i0 = collisionData.Indices[i].v0;
 			ndInt32 i1 = collisionData.Indices[i].v1;

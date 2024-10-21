@@ -45,8 +45,10 @@ class ndConvexApproximation::ProgressBar: public nd_::VHACD::IVHACD::IUserCallba
 
 ndConvexApproximation::ndConvexApproximation(ndInt32 maxConvexes, bool quality)
 	:ndClassAlloc()
+	,m_tolerance(ndFloat32 (1.0e-3f))
 	,m_maxConvexes(maxConvexes)
 	,m_quality(quality)
+	,m_maxPointPerHull(64)
 {
 }
 
@@ -97,6 +99,7 @@ void ndConvexApproximation::Execute()
 	paramsVHACD.m_callback = &progressBar;
 	paramsVHACD.m_maxConvexHulls = m_maxConvexes;
 	paramsVHACD.m_concavityToVolumeWeigh = m_quality ? 1.0f : 0.5f;
+
 	interfaceVHACD->Compute(&points[0].m_x, uint32_t(vCount), (uint32_t*)&faces[0].m_i0, uint32_t(faces.GetCount()), paramsVHACD);
 
 	ndInt32 hullCount = ndInt32(interfaceVHACD->GetNConvexHulls());
@@ -105,13 +108,29 @@ void ndConvexApproximation::Execute()
 		nd_::VHACD::IVHACD::ConvexHull ch;
 		interfaceVHACD->GetConvexHull(uint32_t(i), ch);
 		ndHullOutput* const outputHull = new ndHullOutput;
-		for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)
+		if (ndInt32 (ch.m_nPoints) <= m_maxPointPerHull)
 		{
-			ndHullPoint point;
-			point.m_x = ndReal(ch.m_points[j * 3 + 0]);
-			point.m_y = ndReal(ch.m_points[j * 3 + 1]);
-			point.m_z = ndReal(ch.m_points[j * 3 + 2]);
-			outputHull->PushBack(point);
+			for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)
+			{
+				ndHullPoint point;
+				point.m_x = ndReal(ch.m_points[j * 3 + 0]);
+				point.m_y = ndReal(ch.m_points[j * 3 + 1]);
+				point.m_z = ndReal(ch.m_points[j * 3 + 2]);
+				outputHull->PushBack(point);
+			}
+		}
+		else
+		{
+			ndConvexHull3d convexHull(&ch.m_points[0], 3 * sizeof(ndFloat64), ch.m_nPoints, m_tolerance, m_maxPointPerHull);
+			const ndArray<ndBigVector>& points = convexHull.GetVertexPool();
+			for (ndInt32 j = 0; j < ndInt32(points.GetCount()); ++j)
+			{
+				ndHullPoint point;
+				point.m_x = ndReal(points[j].m_x);
+				point.m_y = ndReal(points[j].m_y);
+				point.m_z = ndReal(points[j].m_z);
+				outputHull->PushBack(point);
+			}
 		}
 		m_ouputHulls.PushBack(outputHull);
 	}
