@@ -181,7 +181,7 @@ static ndBodyKinematic* BuildHeightField(ndDemoEntityManager* const scene)
 	shape.SetLocalMatrix(mLocal);
 	auto pShapeHeightField = shape.GetShape()->GetAsShapeHeightfield();
 
-	for (int i = 0; i < iDim * iDim; ++i)
+	for (ndInt32 i = 0; i < iDim * iDim; ++i)
 	{
 		pShapeHeightField->GetElevationMap()[i] = ndReal(rand() * 2.0 * dMaxHeight / RAND_MAX);
 	}
@@ -256,7 +256,7 @@ static void BuildHeightField(ndDemoEntityManager* const scene)
 	mLocal.m_posit = ndVector(-(dSize * 0.5), 0.0, -(dSize * 0.5), 1.0);
 	shape.SetLocalMatrix(mLocal);
 	auto pShapeHeightField = shape.GetShape()->GetAsShapeHeightfield();
-	for (int i = 0; i < ndInt32(iDim * iDim); ++i)
+	for (ndInt32 i = 0; i < ndInt32(iDim * iDim); ++i)
 	{
 		pShapeHeightField->GetElevationMap()[i] = ndReal(ndFloat32(rand()) * ndFloat32(2.0) * dMaxHeight / RAND_MAX);
 	}
