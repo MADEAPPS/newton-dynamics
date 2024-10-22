@@ -41,19 +41,19 @@ ndShapeInstance::ndShapeInstance(ndShape* const shape)
 	,m_shape(shape ? shape->AddRef() : shape)
 	,m_ownerBody(nullptr)
 	,m_subCollisionHandle(nullptr)
-	,m_parent(nullptr)
+	//,m_parent____(nullptr)
 	,m_skinMargin(ndFloat32(0.0f))
 	,m_scaleType(m_unit)
 	,m_collisionMode(true)
 {
-	if (shape)
-	{
-		ndShapeCompound* const compound = shape->GetAsShapeCompound();
-		if (compound)
-		{
-			compound->SetOwner(this);
-		}
-	}
+	//if (shape)
+	//{
+	//	ndShapeCompound* const compound = shape->GetAsShapeCompound();
+	//	if (compound)
+	//	{
+	//		compound->SetOwner(this);
+	//	}
+	//}
 }
 
 ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
@@ -68,7 +68,7 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 	,m_shape(instance.m_shape->AddRef())
 	,m_ownerBody(instance.m_ownerBody)
 	,m_subCollisionHandle(instance.m_subCollisionHandle)
-	,m_parent(instance.m_parent)
+	//,m_parent____(instance.m_parent____)
 	,m_skinMargin(instance.m_skinMargin)
 	,m_scaleType(instance.m_scaleType)
 	,m_collisionMode(instance.m_collisionMode)
@@ -77,7 +77,7 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 	if (compound)
 	{
 		m_shape->Release();
-		m_shape = new ndShapeCompound(*compound, this);
+		m_shape = new ndShapeCompound(*compound);
 		m_shape->AddRef();
 	}
 }
@@ -94,7 +94,7 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance, ndShape* const
 	,m_shape(shape->AddRef())
 	,m_ownerBody(instance.m_ownerBody)
 	,m_subCollisionHandle(instance.m_subCollisionHandle)
-	,m_parent(instance.m_parent)
+	//,m_parent____(instance.m_parent____)
 	,m_skinMargin(instance.m_skinMargin)
 	,m_scaleType(instance.m_scaleType)
 	,m_collisionMode(instance.m_collisionMode)
@@ -417,7 +417,7 @@ ndShapeInstance& ndShapeInstance::operator=(const ndShapeInstance& instance)
 	m_ownerBody = instance.m_ownerBody;
 
 	m_subCollisionHandle = instance.m_subCollisionHandle;
-	m_parent = instance.m_parent;
+	//m_parent____ = instance.m_parent____;
 
 	return *this;
 }

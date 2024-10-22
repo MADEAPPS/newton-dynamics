@@ -245,11 +245,11 @@ ndShapeCompound::ndTreeArray::ndTreeArray()
 {
 }
 
-void ndShapeCompound::ndTreeArray::AddNode(ndNodeBase* const node, ndInt32 index, const ndShapeInstance* const parent)
+void ndShapeCompound::ndTreeArray::AddNode(ndNodeBase* const node, ndInt32 index)
 {
 	ndTreeArray::ndNode* const myNode = Insert(node, index);
 	node->m_myNode = myNode;
-	node->m_shapeInstance->m_parent = parent;
+	//node->m_shapeInstance->m_parent____ = parent;
 	node->m_shapeInstance->m_subCollisionHandle = myNode;
 }
 
@@ -260,19 +260,19 @@ ndShapeCompound::ndShapeCompound()
 	,m_boxMinRadius(ndFloat32(0.0f))
 	,m_boxMaxRadius(ndFloat32(0.0f))
 	,m_root(nullptr)
-	,m_myInstance(nullptr)
+	//,m_ownerInstance(nullptr)
 	,m_idIndex(0)
 {
 }
 
-ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeInstance* const myInstance)
+ndShapeCompound::ndShapeCompound(const ndShapeCompound& source)
 	:ndShape(source)
 	,m_array()
 	,m_treeEntropy(ndFloat32(0.0f))
 	,m_boxMinRadius(ndFloat32(0.0f))
 	,m_boxMaxRadius(ndFloat32(0.0f))
 	,m_root(nullptr)
-	,m_myInstance(myInstance)
+	//,m_ownerInstance(m_ownerInstance)
 	,m_idIndex(0)
 {
 	ndTreeArray::Iterator iter(source.m_array);
@@ -281,7 +281,7 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeIns
 		ndNodeBase* const node = iter.GetNode()->GetInfo();
 		ndShapeInstance* const shape = node->GetShape();
 		ndNodeBase* const newNode = new ndNodeBase(shape);
-		m_array.AddNode(newNode, iter.GetNode()->GetKey(), m_myInstance);
+		m_array.AddNode(newNode, iter.GetNode()->GetKey());
 	}
 
 	if (source.m_root) 
@@ -371,6 +371,16 @@ ndShapeCompound::~ndShapeCompound()
 	}
 }
 
+ndShapeCompound* ndShapeCompound::GetAsShapeCompound()
+{
+	return this;
+}
+
+//void ndShapeCompound::SetOwner(const ndShapeInstance* const instance)
+//{
+//	//m_ownerInstance = instance;
+//}
+
 /*
 //ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndFloat32* const vertex, const ndInt32* const index, ndInt32 indexCount, ndInt32 stride, const dPlane& localPlane, ndVector* const contactsOut) const
 ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndFloat32* const, const ndInt32* const, ndInt32, ndInt32, const dPlane&, ndVector* const) const
@@ -455,7 +465,7 @@ void ndShapeCompound::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& deb
 
 ndFloat32 ndShapeCompound::GetVolume() const
 {
-	ndFloat32 volume = ndFloat32 (0.0f);
+	ndFloat32 volume = ndFloat32(0.0f);
 	ndTreeArray::Iterator iter(m_array);
 	for (iter.Begin(); iter; iter++)
 	{
@@ -612,7 +622,7 @@ ndFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& lo
 
 void ndShapeCompound::BeginAddRemove()
 {
-	ndAssert(m_myInstance);
+	//ndAssert(m_ownerInstance);
 }
 
 ndFloat32 ndShapeCompound::CalculateSurfaceArea(ndNodeBase* const node0, ndNodeBase* const node1, ndVector& minBox, ndVector& maxBox) const
@@ -1026,9 +1036,9 @@ ndShapeInstance* ndShapeCompound::GetShapeInstance(ndTreeArray::ndNode* const no
 
 ndShapeCompound::ndTreeArray::ndNode* ndShapeCompound::AddCollision(ndShapeInstance* const subInstance)
 {
-	ndAssert(m_myInstance);
+	//ndAssert(m_ownerInstance);
 	ndNodeBase* const newNode = new ndNodeBase(subInstance);
-	m_array.AddNode(newNode, m_idIndex, m_myInstance);
+	m_array.AddNode(newNode, m_idIndex);
 
 	m_idIndex++;
 	

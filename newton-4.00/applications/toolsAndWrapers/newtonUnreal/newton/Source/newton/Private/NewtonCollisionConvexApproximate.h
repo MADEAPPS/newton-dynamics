@@ -26,12 +26,15 @@ class UNewtonCollisionConvexApproximate : public UNewtonCollision
 	virtual void ApplyPropertyChanges();
 	virtual ndShape* CreateShape() const;
 	virtual long long CalculateHash() const;
-	virtual void Serialize(FArchive& ar) override;
 	virtual ndShapeInstance* CreateInstanceShape() const;
 	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const;
 
 	long long CalculateStaticMeshHash() const;
 	ndConvexHullSet* CreateConvexApproximationShapes() const;
+	const FStaticMeshLODResources* GetRenderLOD() const;
+
+	virtual void Serialize(FArchive& ar) override;
+	void SerializeLoadRevision_firstVersion(FArchive& ar);
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	bool Generate = false;
@@ -47,7 +50,8 @@ class UNewtonCollisionConvexApproximate : public UNewtonCollision
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0, ClampMax = 1.0))
 	float Tolerance = 0.0f;
-
-	bool m_generateFlipFlop;
+	
+	long long m_meshHash;
 	TSharedPtr<ndConvexHullSet> m_convexHullSet;
+	bool m_generateFlipFlop;
 };

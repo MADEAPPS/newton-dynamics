@@ -85,25 +85,6 @@ void UNewtonCollisionConvexHull::InitStaticMeshCompoment(const USceneComponent* 
 	}
 }
 
-void UNewtonCollisionConvexHull::ApplyPropertyChanges()
-{
-	if (!m_convexHullPoints.Num())
-	{
-		if (!Cast<ANewtonSceneActor>(GetOwner()))
-		{
-			const USceneComponent* const parent = Cast<UStaticMeshComponent>(GetAttachParent());
-			if (parent)
-			{
-				InitStaticMeshCompoment(parent);
-			}
-		}
-	}
-	m_debugVisualIsDirty = true;
-
-	BuildNewtonShape();
-	Super::ApplyPropertyChanges();
-}
-
 ndShapeInstance* UNewtonCollisionConvexHull::CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const
 {
 	ndShapeInstance* const instance = CreateInstanceShape();
@@ -124,4 +105,23 @@ ndShapeInstance* UNewtonCollisionConvexHull::CreateInstanceShape() const
 	const ndVector scale(ndFloat32(1.0f / uScale.X), ndFloat32(1.0f / uScale.Y), ndFloat32(1.0f / uScale.Z), ndFloat32(0.0f));
 	instance->SetScale(scale);
 	return instance;
+}
+
+void UNewtonCollisionConvexHull::ApplyPropertyChanges()
+{
+	if (!m_convexHullPoints.Num())
+	{
+		if (!Cast<ANewtonSceneActor>(GetOwner()))
+		{
+			const USceneComponent* const parent = Cast<UStaticMeshComponent>(GetAttachParent());
+			if (parent)
+			{
+				InitStaticMeshCompoment(parent);
+			}
+		}
+	}
+	m_debugVisualIsDirty = true;
+
+	BuildNewtonShape();
+	Super::ApplyPropertyChanges();
 }

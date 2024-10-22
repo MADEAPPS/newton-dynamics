@@ -20,21 +20,13 @@ enum ndPluginVersion
 class ndHullPoints : public TArray<FVector3f>
 {
 	public:
+	ndHullPoints();
+	~ndHullPoints();
 };
 
 class ndConvexHullSet : public TArray<ndHullPoints*>
 {
 	public:
-	ndConvexHullSet()
-		:TArray<ndHullPoints*>()
-	{
-	}
-
-	~ndConvexHullSet()
-	{
-		for (int i = 0; i < Num(); ++i)
-		{
-			delete (*this)[i];
-		}
-	}
+	ndConvexHullSet();
+	~ndConvexHullSet();
 };

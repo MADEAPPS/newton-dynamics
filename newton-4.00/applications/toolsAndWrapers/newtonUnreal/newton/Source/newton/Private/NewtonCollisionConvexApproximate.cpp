@@ -56,21 +56,60 @@ class UNewtonCollisionConvexApproximate::ConvexVhacdGenerator : public ndConvexA
 UNewtonCollisionConvexApproximate::UNewtonCollisionConvexApproximate()
 	:Super()
 {
-	Generate = false;
+	m_meshHash = 0x15263412;
 	m_generateFlipFlop = false;
-	HighResolution = false;
+	m_convexHullSet = TSharedPtr<ndConvexHullSet>(nullptr);
+
+	Generate = false;
 	MaxConvexes = 16;
 	Tolerance = 0.0f;
+	HighResolution = false;
 	MaxVertexPerConvex = 32;
+}
+
+void UNewtonCollisionConvexApproximate::SerializeLoadRevision_firstVersion(FArchive& ar)
+{
+	FnewtonModule* const plugin = FnewtonModule::GetPlugin();
+	check(plugin);
+	TSharedPtr<ndConvexHullSet> serializedSet(plugin->FindConvexHull(m_hash));
+
+	int numOfConvex = 0;
+	ar << numOfConvex;
+	if (serializedSet == nullptr)
+	{
+		if (numOfConvex)
+		{
+			serializedSet = TSharedPtr<ndConvexHullSet>(new ndConvexHullSet);
+			for (int j = 0; j < numOfConvex; ++j)
+			{
+				ndHullPoints* const newHull = new ndHullPoints;
+				ndHullPoints& hull = *newHull;
+				ar << hull;
+				serializedSet->Push(newHull);
+			}
+			plugin->AddConvexHull(serializedSet, m_meshHash);
+		}
+	}
+	else if (numOfConvex)
+	{
+		// only parse this data
+		ndConvexHullSet convexHullSet;
+		for (int j = 0; j < numOfConvex; ++j)
+		{
+			ndHullPoints* const newHull = new ndHullPoints;
+			ndHullPoints& hull = *newHull;
+			ar << hull;
+			convexHullSet.Push(newHull);
+		}
+	}
+	m_convexHullSet = serializedSet;
 }
 
 void UNewtonCollisionConvexApproximate::Serialize(FArchive& ar)
 {
 	Super::Serialize(ar);
 
-	// this actually sucks big time in unreal
-	//ar.UsingCustomVersion(FnewtonModule::m_guiID);
-	//int version = ar.CustomVer(FnewtonModule::m_guiID);
+	ar << m_meshHash;
 	if (ar.IsSaving())
 	{
 		int numOfConvex = m_convexHullSet ? m_convexHullSet->Num() : 0;
@@ -83,46 +122,70 @@ void UNewtonCollisionConvexApproximate::Serialize(FArchive& ar)
 	}
 	else
 	{
-		FnewtonModule* const plugin = FnewtonModule::GetPlugin();
-		check(plugin);
-		long long meshHash = CalculateStaticMeshHash();
-		TSharedPtr<ndConvexHullSet> serializedSet(plugin->FindConvexHull(m_hash));
-		if (serializedSet == nullptr)
+		// this actually sucks big time in unreal
+		ar.UsingCustomVersion(FnewtonModule::m_guiID);
+		int version = ar.CustomVer(FnewtonModule::m_guiID);
+		check (version <= ndPluginVersion::m_firstVersion)
+		switch (version)
 		{
-			int numOfConvex = m_convexHullSet ? m_convexHullSet->Num() : 0;
-			ar << numOfConvex;
-			if (numOfConvex)
-			{
-				TSharedPtr<ndConvexHullSet> convexHullSet(new ndConvexHullSet);
-				for (int j = 0; j < numOfConvex; ++j)
-				{
-					ndHullPoints* const newHull = new ndHullPoints;
-					ndHullPoints& hull = *newHull;
-					ar << hull;
-					convexHullSet->Push(newHull);
-				}
-				m_convexHullSet = convexHullSet;
-				plugin->AddConvexHull(convexHullSet, meshHash);
-			}
-			
+			case ndPluginVersion::m_firstVersion:
+			default:
+				SerializeLoadRevision_firstVersion(ar);
 		}
-		else
+	}
+}
+
+const FStaticMeshLODResources* UNewtonCollisionConvexApproximate::GetRenderLOD() const
+{
+	const UStaticMeshComponent* const staticComponent = Cast<UStaticMeshComponent>(GetAttachParent());
+	if (staticComponent)
+	{
+		const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
+		if (staticMesh)
 		{
-			int numOfConvex = m_convexHullSet ? m_convexHullSet->Num() : 0;
-			ar << numOfConvex;
-			if (numOfConvex)
+			const FStaticMeshRenderData* const renderData = staticMesh->GetRenderData();
+			if (renderData)
 			{
-				ndConvexHullSet convexHullSet;
-				for (int j = 0; j < numOfConvex; ++j)
-				{
-					ndHullPoints* const newHull = new ndHullPoints;
-					ndHullPoints& hull = *newHull;
-					ar << hull;
-					convexHullSet.Push(newHull);
-				}
+				return &renderData->LODResources[0];
 			}
 		}
 	}
+	return nullptr;
+}
+
+long long UNewtonCollisionConvexApproximate::CalculateStaticMeshHash() const
+{
+	long long hash = ndCRC64(ndShapeCompound::StaticClassName(), strlen(ndShapeConvexHull::StaticClassName()), 0);
+	const FStaticMeshLODResources* const renderLOD = GetRenderLOD();
+	if (renderLOD)
+	{
+		const FVector uScale(GetComponentTransform().GetScale3D());
+		const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
+		const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
+
+		const FStaticMeshVertexBuffers& staticMeshVertexBuffer = renderLOD->VertexBuffers;;
+		const FPositionVertexBuffer& positBuffer = staticMeshVertexBuffer.PositionVertexBuffer;
+		for (ndInt32 i = 0; i < ndInt32(positBuffer.GetNumVertices()); ++i)
+		{
+			const FVector3f p(positBuffer.VertexPosition(i));
+			FVector3f q;
+			q.X = ndReal(p.X * bakedScale.m_x);
+			q.Y = ndReal(p.Y * bakedScale.m_y);
+			q.Z = ndReal(p.Z * bakedScale.m_z);
+			hash = ndCRC64(&q, sizeof(FVector3f), hash);
+		}
+		const FRawStaticIndexBuffer& indexBuffer = renderLOD->IndexBuffer;
+		for (ndInt32 i = 0; i < ndInt32(indexBuffer.GetNumIndices()); i += 3)
+		{
+			ndInt32 j = indexBuffer.GetIndex(i);
+			hash = ndCRC64(&j, sizeof(ndInt32), hash);
+		}
+		hash = ndCRC64(&HighResolution, sizeof(bool), hash);
+		hash = ndCRC64(&MaxVertexPerConvex, sizeof(int), hash);
+		hash = ndCRC64(&MaxConvexes, sizeof(int), hash);
+		hash = ndCRC64(&Tolerance, sizeof(float), hash);
+	}
+	return hash;
 }
 
 ndConvexHullSet* UNewtonCollisionConvexApproximate::CreateConvexApproximationShapes() const
@@ -137,19 +200,15 @@ ndConvexHullSet* UNewtonCollisionConvexApproximate::CreateConvexApproximationSha
 	ConvexVhacdGenerator* const vhacdHullSet = new ConvexVhacdGenerator(MaxConvexes, HighResolution);
 	vhacdHullSet->m_tolerance = 1.0e-3f + Tolerance * 0.1f;
 	vhacdHullSet->m_maxPointPerHull = MaxVertexPerConvex;
-	
-	const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
-	check(staticMesh);
-	const FStaticMeshRenderData* const renderData = staticMesh->GetRenderData();
-	check(renderData);
-	const FStaticMeshLODResourcesArray& renderResource = renderData->LODResources;
-	
+
+	const FStaticMeshLODResources* const renderLOD = GetRenderLOD();
+	check(renderLOD);
+
 	const FVector uScale(GetComponentTransform().GetScale3D());
 	const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
 	const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
-	
-	const FStaticMeshLODResources& renderLOD = renderResource[0];
-	const FStaticMeshVertexBuffers& staticMeshVertexBuffer = renderLOD.VertexBuffers;;
+
+	const FStaticMeshVertexBuffers& staticMeshVertexBuffer = renderLOD->VertexBuffers;
 	const FPositionVertexBuffer& positBuffer = staticMeshVertexBuffer.PositionVertexBuffer;
 	
 	ndHullInputMesh& inputMesh = vhacdHullSet->m_inputMesh;
@@ -164,7 +223,7 @@ ndConvexHullSet* UNewtonCollisionConvexApproximate::CreateConvexApproximationSha
 		inputMesh.m_points.PushBack(q);
 	}
 	
-	const FRawStaticIndexBuffer& indexBuffer = renderLOD.IndexBuffer;
+	const FRawStaticIndexBuffer& indexBuffer = renderLOD->IndexBuffer;
 	for (ndInt32 i = 0; i < ndInt32(indexBuffer.GetNumIndices()); i += 3)
 	{
 		ndHullInputMesh::ndFace face;
@@ -247,74 +306,6 @@ void UNewtonCollisionConvexApproximate::InitStaticMeshCompoment(const USceneComp
 	check(0);
 }
 
-long long UNewtonCollisionConvexApproximate::CalculateStaticMeshHash() const
-{
-	long long hash = ndCRC64(ndShapeCompound::StaticClassName(), strlen(ndShapeConvexHull::StaticClassName()), 0);
-	const UStaticMeshComponent* const staticComponent = Cast<UStaticMeshComponent>(GetAttachParent());
-	if (staticComponent)
-	{
-		ConvexVhacdGenerator* const convexHullSet = new ConvexVhacdGenerator(MaxConvexes, HighResolution);
-		convexHullSet->m_tolerance = 1.0e-3f + Tolerance * 0.1f;
-		convexHullSet->m_maxPointPerHull = MaxVertexPerConvex;
-
-		const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
-		check(staticMesh);
-		const FStaticMeshRenderData* const renderData = staticMesh->GetRenderData();
-		if (renderData)
-		{
-			const FStaticMeshLODResourcesArray& renderResource = renderData->LODResources;
-
-			//const FVector uScale(GetComponentTransform().GetScale3D());
-			//const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
-			//const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
-
-			const FStaticMeshLODResources& renderLOD = renderResource[0];
-			const FStaticMeshVertexBuffers& staticMeshVertexBuffer = renderLOD.VertexBuffers;;
-			const FPositionVertexBuffer& positBuffer = staticMeshVertexBuffer.PositionVertexBuffer;
-			for (ndInt32 i = 0; i < ndInt32(positBuffer.GetNumVertices()); ++i)
-			{
-				const FVector3f p(positBuffer.VertexPosition(i));
-				hash = ndCRC64(&p, sizeof(FVector3f), hash);
-			}
-			const FRawStaticIndexBuffer& indexBuffer = renderLOD.IndexBuffer;
-			for (ndInt32 i = 0; i < ndInt32(indexBuffer.GetNumIndices()); i += 3)
-			{
-				ndInt32 j = indexBuffer.GetIndex(i);
-				hash = ndCRC64(&j, sizeof(ndInt32), hash);
-			}
-		}
-	}
-	return hash;
-}
-
-void UNewtonCollisionConvexApproximate::ApplyPropertyChanges()
-{
-	FnewtonModule* const plugin = FnewtonModule::GetPlugin();
-	check(plugin);
-	long long meshHash = CalculateStaticMeshHash();
-	if (Generate && !m_generateFlipFlop)
-	{
-		TSharedPtr<ndConvexHullSet> convexHullSet (plugin->FindConvexHull(m_hash));
-		if (convexHullSet == nullptr)
-		{
-			convexHullSet = TSharedPtr<ndConvexHullSet>(CreateConvexApproximationShapes());
-			plugin->AddConvexHull(convexHullSet, meshHash);
-		}
-	}
-	if (m_convexHullSet == nullptr)
-	{
-		m_convexHullSet = plugin->FindConvexHull(meshHash);
-		m_debugVisualIsDirty = true;
-	}
-	MarkRenderDynamicDataDirty();
-	NotifyMeshUpdated();
-
-	m_generateFlipFlop = Generate;
-	Generate = false;
-	BuildNewtonShape();
-	Super::ApplyPropertyChanges();
-}
-
 ndShapeInstance* UNewtonCollisionConvexApproximate::CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const
 {
 	ndShapeInstance* const instance = CreateInstanceShape();
@@ -335,4 +326,33 @@ ndShapeInstance* UNewtonCollisionConvexApproximate::CreateInstanceShape() const
 	const ndVector scale(ndFloat32(1.0f / uScale.X), ndFloat32(1.0f / uScale.Y), ndFloat32(1.0f / uScale.Z), ndFloat32(0.0f));
 	instance->SetScale(scale);
 	return instance;
+}
+
+void UNewtonCollisionConvexApproximate::ApplyPropertyChanges()
+{
+	FnewtonModule* const plugin = FnewtonModule::GetPlugin();
+	check(plugin);
+	long long meshHash = CalculateStaticMeshHash();
+	if ((m_meshHash != meshHash) || Generate && !m_generateFlipFlop)
+	{
+		TSharedPtr<ndConvexHullSet> convexHullSet (plugin->FindConvexHull(meshHash));
+		if (convexHullSet == nullptr)
+		{
+			convexHullSet = TSharedPtr<ndConvexHullSet>(CreateConvexApproximationShapes());
+			plugin->AddConvexHull(convexHullSet, meshHash);
+		}
+	}
+	if (m_convexHullSet == nullptr)
+	{
+		m_convexHullSet = plugin->FindConvexHull(meshHash);
+		m_debugVisualIsDirty = true;
+	}
+	MarkRenderDynamicDataDirty();
+	NotifyMeshUpdated();
+
+	m_meshHash = meshHash;
+	m_generateFlipFlop = Generate;
+	Generate = false;
+	BuildNewtonShape();
+	Super::ApplyPropertyChanges();
 }
