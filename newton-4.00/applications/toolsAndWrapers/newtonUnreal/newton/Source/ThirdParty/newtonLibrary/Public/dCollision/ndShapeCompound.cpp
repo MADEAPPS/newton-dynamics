@@ -1184,7 +1184,8 @@ void ndShapeCompound::ApplyScale(const ndVector& scale)
 	{
 		ndNodeBase* const node = iter.GetNode()->GetInfo();
 		ndShapeInstance* const collision = node->GetShape();
-		const ndMatrix matrix(collision->GetScaledTransform(scaleMatrix));
+		//const ndMatrix matrix(collision->GetScaledTransform(scaleMatrix));
+		const ndMatrix matrix(collision->GetLocalMatrix() * scaleMatrix);
 		collision->SetLocalMatrix(ndGetIdentityMatrix());
 		collision->SetGlobalScale(matrix);
 	}
