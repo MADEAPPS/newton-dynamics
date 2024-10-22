@@ -43,7 +43,7 @@ class ndShapeCompound: public ndShape
 	{
 		public:
 		D_COLLISION_API ndTreeArray();
-		D_COLLISION_API void AddNode(ndNodeBase* const node, ndInt32 index, const ndShapeInstance* const parent);
+		D_COLLISION_API void AddNode(ndNodeBase* const node, ndInt32 index);
 	};
 
 	D_CLASS_REFLECTION(ndShapeCompound,ndShape)
@@ -51,7 +51,7 @@ class ndShapeCompound: public ndShape
 	D_COLLISION_API ndShapeCompound();
 	D_COLLISION_API virtual ~ndShapeCompound();
 
-	void SetOwner(const ndShapeInstance* const myInstance);
+	//void SetOwner(const ndShapeInstance* const myInstance);
 
 	D_COLLISION_API const ndTreeArray& GetTree() const;
 	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
@@ -64,7 +64,7 @@ class ndShapeCompound: public ndShape
 
 	protected:
 	class ndSpliteInfo;
-	D_COLLISION_API ndShapeCompound(const ndShapeCompound& source, const ndShapeInstance* const myInstance);
+	D_COLLISION_API ndShapeCompound(const ndShapeCompound& source);
 
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
@@ -100,23 +100,13 @@ class ndShapeCompound: public ndShape
 	ndFloat32 m_boxMinRadius;
 	ndFloat32 m_boxMaxRadius;
 	ndNodeBase* m_root;
-	const ndShapeInstance* m_myInstance;
+	//const ndShapeInstance* m_ownerInstance;
 	ndInt32 m_idIndex;
 
 	friend class ndBodyKinematic;
 	friend class ndShapeInstance;
 	friend class ndContactSolver;
 };
-
-inline ndShapeCompound* ndShapeCompound::GetAsShapeCompound()
-{ 
-	return this; 
-}
-
-inline void ndShapeCompound::SetOwner(const ndShapeInstance* const instance)
-{
-	m_myInstance = instance;
-}
 
 class ndShapeCompound::ndNodeBase: public ndClassAlloc
 {

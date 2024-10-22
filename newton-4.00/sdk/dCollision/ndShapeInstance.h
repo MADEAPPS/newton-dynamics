@@ -178,7 +178,7 @@ class ndShapeInstance: public ndContainersFreeListAlloc<ndShapeInstance>
 	const ndShape* m_shape;
 	const ndBody* m_ownerBody;
 	const void* m_subCollisionHandle;
-	const ndShapeInstance* m_parent;
+	//const ndShapeInstance* m_parent____;
 	ndFloat32 m_skinMargin;
 	ndScaleType m_scaleType;
 	bool m_collisionMode;
