@@ -260,26 +260,28 @@ long long UNewtonCollisionConvexApproximate::CalculateStaticMeshHash() const
 		const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
 		check(staticMesh);
 		const FStaticMeshRenderData* const renderData = staticMesh->GetRenderData();
-		check(renderData);
-		const FStaticMeshLODResourcesArray& renderResource = renderData->LODResources;
-
-		//const FVector uScale(GetComponentTransform().GetScale3D());
-		//const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
-		//const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
-
-		const FStaticMeshLODResources& renderLOD = renderResource[0];
-		const FStaticMeshVertexBuffers& staticMeshVertexBuffer = renderLOD.VertexBuffers;;
-		const FPositionVertexBuffer& positBuffer = staticMeshVertexBuffer.PositionVertexBuffer;
-		for (ndInt32 i = 0; i < ndInt32(positBuffer.GetNumVertices()); ++i)
+		if (renderData)
 		{
-			const FVector3f p(positBuffer.VertexPosition(i));
-			hash = ndCRC64(&p, sizeof(FVector3f), hash);
-		}
-		const FRawStaticIndexBuffer& indexBuffer = renderLOD.IndexBuffer;
-		for (ndInt32 i = 0; i < ndInt32(indexBuffer.GetNumIndices()); i += 3)
-		{
-			ndInt32 j = indexBuffer.GetIndex(i);
-			hash = ndCRC64(&j, sizeof(ndInt32), hash);
+			const FStaticMeshLODResourcesArray& renderResource = renderData->LODResources;
+
+			//const FVector uScale(GetComponentTransform().GetScale3D());
+			//const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
+			//const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
+
+			const FStaticMeshLODResources& renderLOD = renderResource[0];
+			const FStaticMeshVertexBuffers& staticMeshVertexBuffer = renderLOD.VertexBuffers;;
+			const FPositionVertexBuffer& positBuffer = staticMeshVertexBuffer.PositionVertexBuffer;
+			for (ndInt32 i = 0; i < ndInt32(positBuffer.GetNumVertices()); ++i)
+			{
+				const FVector3f p(positBuffer.VertexPosition(i));
+				hash = ndCRC64(&p, sizeof(FVector3f), hash);
+			}
+			const FRawStaticIndexBuffer& indexBuffer = renderLOD.IndexBuffer;
+			for (ndInt32 i = 0; i < ndInt32(indexBuffer.GetNumIndices()); i += 3)
+			{
+				ndInt32 j = indexBuffer.GetIndex(i);
+				hash = ndCRC64(&j, sizeof(ndInt32), hash);
+			}
 		}
 	}
 	return hash;

@@ -455,8 +455,14 @@ void ndShapeCompound::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& deb
 
 ndFloat32 ndShapeCompound::GetVolume() const
 {
-	ndAssert(0);
-	return ndFloat32(0.0f);
+	ndFloat32 volume = ndFloat32(0.0f);
+	ndTreeArray::Iterator iter(m_array);
+	for (iter.Begin(); iter; iter++)
+	{
+		const ndShapeInstance* const collision = iter.GetNode()->GetInfo()->GetShape();
+		volume += collision->GetVolume();
+	}
+	return volume;
 }
 
 ndFloat32 ndShapeCompound::GetBoxMinRadius() const
