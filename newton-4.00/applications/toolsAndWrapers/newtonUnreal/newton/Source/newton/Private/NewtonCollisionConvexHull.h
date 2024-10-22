@@ -20,11 +20,10 @@ class UNewtonCollisionConvexHull : public UNewtonCollision
 	public:
 	// Sets default values for this component's properties
 	UNewtonCollisionConvexHull();
-	void InitVhacdConvex(const ndHullOutput* const conveHullMesh);
 	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent) override;
-
+	
 	protected:
-	virtual void Serialize(FArchive& Ar) override;
+	virtual void Serialize(FArchive& ar) override;
 
 	virtual void ApplyPropertyChanges();
 	virtual ndShape* CreateShape() const;

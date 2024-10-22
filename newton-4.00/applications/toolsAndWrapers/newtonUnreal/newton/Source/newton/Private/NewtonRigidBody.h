@@ -13,26 +13,6 @@ class ndShapeInstance;
 class UNewtonCollision;
 class ANewtonWorldActor;
 
-USTRUCT()
-struct FConvexApproximationStruct
-{
-	GENERATED_BODY();
-
-	UPROPERTY(EditAnywhere, Category = Newton)
-	bool Generate = false;
-
-	UPROPERTY(EditAnywhere, Category = Newton)
-	bool HighResolution = false;
-
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 1, ClampMax = 128))
-	int MaxVertexPerConvex = 32;
-
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 1, ClampMax = 128))
-	int MaxConvexes = 16;
-
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0, ClampMax = 1.0))
-	float Tolerance = 0.0;
-};
 
 USTRUCT()
 struct FInertiaStruct
@@ -59,9 +39,7 @@ UCLASS(ClassGroup = Newton, meta=(BlueprintSpawnableComponent), HideCategories =
 class UNewtonRigidBody : public USceneComponent
 {
 	GENERATED_BODY()
-
 	class NotifyCallback;
-	class ConvexVhacdGenerator;
 
 	public:
 	// Sets default values for this component's properties
@@ -86,7 +64,6 @@ class UNewtonRigidBody : public USceneComponent
 	void CalculateLocalTransform();
 	void DrawGizmo(float timestep);
 	void InterpolateTransform(float param);
-	void CreateConvexApproximationShapes(UStaticMeshComponent* const staticComponent);
 
 	virtual void ClearDebug();
 	virtual void ApplyPropertyChanges();
@@ -130,9 +107,6 @@ class UNewtonRigidBody : public USceneComponent
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	FVector Gravity;
-
-	UPROPERTY(EditAnywhere, Category = Newton)
-	FConvexApproximationStruct ConvexApproximate;
 
 	FVector m_localScale;
 	FVector m_globalScale;

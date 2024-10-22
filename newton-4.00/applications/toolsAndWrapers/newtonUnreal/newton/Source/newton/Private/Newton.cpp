@@ -28,7 +28,7 @@
 
 FnewtonModule* FnewtonModule::m_pluginSingleton;
 
-int FnewtonModule::m_currentVersion = FnewtonModule::m_firstVersion;
+int FnewtonModule::m_currentVersion = ndPluginVersion::m_firstVersion;
 const FGuid FnewtonModule::m_guiID(0x2EabFDBD, 0x0105C4D10, 0x8876F38F, 0x2516A5DA);
 FCustomVersionRegistration FnewtonModule::m_guidRegistration(FnewtonModule::m_guiID, FnewtonModule::m_currentVersion, TEXT("FnewtonModule"));
 
@@ -93,7 +93,7 @@ class FnewtonModule::ResourceCache
 		return m_visualMeshCache.Find(hash);
 	}
 
-	TSharedPtr<ndConvexHullPoints> FindConvexHull(long long hash) const
+	TSharedPtr<ndConvexHullSet> FindConvexHull(long long hash) const
 	{
 		return m_convexVhacdCache.Find(hash);
 	}
@@ -110,7 +110,7 @@ class FnewtonModule::ResourceCache
 		m_shapeCache.Insert(shape, hash);
 	}
 
-	void AddConvexHull(const TSharedPtr<ndConvexHullPoints>& hull, long long hash)
+	void AddConvexHull(const TSharedPtr<ndConvexHullSet>& hull, long long hash)
 	{
 		m_convexVhacdCache.Insert(hull, hash);
 	}
@@ -134,7 +134,7 @@ class FnewtonModule::ResourceCache
 	}
 
 	ndTree<ndShape*, long long> m_shapeCache;
-	Cache<ndConvexHullPoints> m_convexVhacdCache;
+	Cache<ndConvexHullSet> m_convexVhacdCache;
 	Cache<UE::Geometry::FDynamicMesh3> m_visualMeshCache;
 };
 
@@ -258,12 +258,12 @@ void FnewtonModule::AddShape(ndShape* shape, long long hash)
 	m_resourceCache->AddShape(shape, hash);
 }
 
-TSharedPtr<ndConvexHullPoints> FnewtonModule::FindConvexHull(long long hash) const
+TSharedPtr<ndConvexHullSet> FnewtonModule::FindConvexHull(long long hash) const
 {
 	return m_resourceCache->FindConvexHull(hash);
 }
 
-void FnewtonModule::AddConvexHull(const TSharedPtr<ndConvexHullPoints>& hull, long long hash)
+void FnewtonModule::AddConvexHull(const TSharedPtr<ndConvexHullSet>& hull, long long hash)
 {
 	m_resourceCache->AddConvexHull(hull, hash);
 }

@@ -5,29 +5,12 @@
 #include "Modules/ModuleManager.h"
 #include "DynamicMesh/DynamicMesh3.h"
 #include "Interfaces/IPluginManager.h"
-
-#define UNREAL_UNIT_SYSTEM		ndFloat32 (100.0f)
-#define UNREAL_INV_UNIT_SYSTEM	ndFloat32 (1.0f / UNREAL_UNIT_SYSTEM)
-
-class ndShape;
-class ANewtonWorldActor;
-
-template <typename T>
-class ndSharedPtr;
-
-class ndConvexHullPoints : public TArray<FVector3f>
-{
-
-};
+#include "NewtonCommons.h"
 
 class FnewtonModule : public IModuleInterface
 {
 	class ResourceCache;
 	public:
-	enum Version	
-	{
-		m_firstVersion,
-	};
 
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
@@ -36,11 +19,11 @@ class FnewtonModule : public IModuleInterface
 	static FnewtonModule* GetPlugin();
 
 	ndShape* FindShape(long long hash) const;
-	TSharedPtr<ndConvexHullPoints> FindConvexHull(long long hash) const;
+	TSharedPtr<ndConvexHullSet> FindConvexHull(long long hash) const;
 	TSharedPtr<UE::Geometry::FDynamicMesh3> FindDynamicMesh (long long hash) const;
 
 	void AddShape(ndShape* const shape, long long hash);
-	void AddConvexHull(const TSharedPtr<ndConvexHullPoints>& hull, long long hash);
+	void AddConvexHull(const TSharedPtr<ndConvexHullSet>& hull, long long hash);
 	void AddDynamicMesh(const TSharedPtr<UE::Geometry::FDynamicMesh3>& mesh, long long hash);
 
 	private:

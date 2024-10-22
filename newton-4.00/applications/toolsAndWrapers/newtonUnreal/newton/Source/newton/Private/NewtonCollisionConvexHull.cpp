@@ -19,11 +19,6 @@ UNewtonCollisionConvexHull::UNewtonCollisionConvexHull()
 void UNewtonCollisionConvexHull::Serialize(FArchive& ar)
 {
 	Super::Serialize(ar);
-
-	// this actually sucks big time in unreal
-	//ar.UsingCustomVersion(FnewtonModule::m_guiID);
-	//int xxxx0 = ar.CustomVer(FnewtonModule::m_guiID);
-	//ndConvexHullPoints& points = *m_convexHullPoints.Get();
 	ar << m_convexHullPoints;
 }
 
@@ -52,18 +47,6 @@ ndShape* UNewtonCollisionConvexHull::CreateShape() const
 		return shape;
 	}
 	return new ndShapeNull();
-}
-
-void UNewtonCollisionConvexHull::InitVhacdConvex(const ndHullOutput* const conveHullMesh)
-{
-	SetTransform(GetAttachParent());
-
-	const ndArray<ndHullPoint>& points = *conveHullMesh;
-	for (ndInt32 i = ndInt32(points.GetCount()) - 1; i >= 0; --i)
-	{
-		FVector3f p(points[i].m_x, points[i].m_y, points[i].m_z);
-		m_convexHullPoints.Push(p);
-	}
 }
 
 void UNewtonCollisionConvexHull::InitStaticMeshCompoment(const USceneComponent* const meshComponent)

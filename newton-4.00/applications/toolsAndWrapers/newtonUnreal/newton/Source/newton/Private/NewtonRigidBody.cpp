@@ -13,56 +13,13 @@
 #include "NewtonJoint.h"
 #include "NewtonCollision.h"
 #include "NewtonWorldActor.h"
-#include "NewtonCollisionConvexHull.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
-#include "ThirdParty/newtonLibrary/Public/thirdParty/ndConvexApproximation.h"
-
-#define SHOW_VHACD_PROGRESS_BAR
 
 //FLinearColor UNewtonRigidBody::m_awakeColor(1.0f, 0.0f, 0.f);
 //FLinearColor UNewtonRigidBody::m_sleepingColor(0.0f, 1.0f, 0.f);
 
 FLinearColor UNewtonRigidBody::m_awakeColor(0.0f, 0.5f, 1.0f);
 FLinearColor UNewtonRigidBody::m_sleepingColor(0.0f, 0.125f, 0.25f);
-
-class UNewtonRigidBody::ConvexVhacdGenerator : public ndConvexApproximation
-{
-	public:
-	ConvexVhacdGenerator(ndInt32 maxConvexes, bool quality)
-		:ndConvexApproximation(maxConvexes, quality)
-		,m_progressBar(nullptr)
-		,m_acc(0.0f)
-	{
-		#ifdef SHOW_VHACD_PROGRESS_BAR  
-		// for some reason the progress bar invalidate some UClasses
-		// I need to report this some day to unreal.
-		// for now just do not report progress.
-		m_progressBar = new FScopedSlowTask(100.0f, NSLOCTEXT("Newton", "Newton", "Generation Convex Approximation"));
-		m_progressBar->MakeDialog();
-		#endif
-	}
-
-	~ConvexVhacdGenerator()
-	{
-		if (m_progressBar)
-		{
-			delete m_progressBar;
-			m_progressBar = nullptr;
-		}
-	}
-
-	virtual void ShowProgress() override
-	{
-		m_acc += 1.0f;
-		if (m_acc < 99.0f)
-		{
-			m_progressBar->EnterProgressFrame();
-		}
-	}
-
-	FScopedSlowTask* m_progressBar;
-	float m_acc;
-};
 
 class UNewtonRigidBody::NotifyCallback : public ndBodyNotify
 {
@@ -509,39 +466,39 @@ void UNewtonRigidBody::ApplyPropertyChanges()
 	const FVector inertia(inertiaMatrix[0][0] * scale, inertiaMatrix[1][1] * scale, inertiaMatrix[2][2] * scale);
 	Inertia.PrincipalInertia = inertia * Inertia.PrincipalInertiaScaler;
 
-	if (ConvexApproximate.Generate)
-	{
-		const AActor* const owner = GetOwner();
-		const TArray<TObjectPtr<USceneComponent>>& children = GetAttachChildren();
-		for (int j = children.Num() - 1; j >= 0; --j)
-		{
-			UStaticMeshComponent* const staticMeshComponent = Cast<UStaticMeshComponent>(children[j]);
-
-			if (staticMeshComponent && staticMeshComponent->GetOwner() && staticMeshComponent->GetStaticMesh().Get())
-			{
-				bool hasCollision = false;
-				const TArray<TObjectPtr<USceneComponent>>& childrenComp = staticMeshComponent->GetAttachChildren();
-				for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
-				{
-					hasCollision = hasCollision || (Cast<UNewtonCollision>(childrenComp[i]) ? true : false);
-				}
-
-				if (hasCollision)
-				{
-					UE_LOG(LogTemp, Warning, TEXT("static mesh: %s, has one or more child collision shape alreary. You must delete all the UNewtonCollision children first"), *staticMeshComponent->GetName());
-				}
-				else
-				{
-					CreateConvexApproximationShapes(staticMeshComponent);
-				}
-			}
-		}
-
-		ConvexApproximate.Generate = false;
-		FLevelEditorModule& levelEditor = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
-		levelEditor.BroadcastComponentsEdited();
-		levelEditor.BroadcastRedrawViewports(false);
-	}
+	//if (ConvexApproximate.Generate)
+	//{
+	//	const AActor* const owner = GetOwner();
+	//	const TArray<TObjectPtr<USceneComponent>>& children = GetAttachChildren();
+	//	for (int j = children.Num() - 1; j >= 0; --j)
+	//	{
+	//		UStaticMeshComponent* const staticMeshComponent = Cast<UStaticMeshComponent>(children[j]);
+	//
+	//		if (staticMeshComponent && staticMeshComponent->GetOwner() && staticMeshComponent->GetStaticMesh().Get())
+	//		{
+	//			bool hasCollision = false;
+	//			const TArray<TObjectPtr<USceneComponent>>& childrenComp = staticMeshComponent->GetAttachChildren();
+	//			for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
+	//			{
+	//				hasCollision = hasCollision || (Cast<UNewtonCollision>(childrenComp[i]) ? true : false);
+	//			}
+	//
+	//			if (hasCollision)
+	//			{
+	//				UE_LOG(LogTemp, Warning, TEXT("static mesh: %s, has one or more child collision shape alreary. You must delete all the UNewtonCollision children first"), *staticMeshComponent->GetName());
+	//			}
+	//			else
+	//			{
+	//				CreateConvexApproximationShapes(staticMeshComponent);
+	//			}
+	//		}
+	//	}
+	//
+	//	ConvexApproximate.Generate = false;
+	//	FLevelEditorModule& levelEditor = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
+	//	levelEditor.BroadcastComponentsEdited();
+	//	levelEditor.BroadcastRedrawViewports(false);
+	//}
 }
 
 // Called every frame
@@ -555,73 +512,6 @@ void UNewtonRigidBody::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 		DrawGizmo(DeltaTime);
 	}
-}
-
-void UNewtonRigidBody::CreateConvexApproximationShapes(UStaticMeshComponent* const staticComponent)
-{
-	ConvexVhacdGenerator* const convexHullSet = new ConvexVhacdGenerator(ConvexApproximate.MaxConvexes, ConvexApproximate.HighResolution);
-	convexHullSet->m_tolerance = 1.0e-3f + ConvexApproximate.Tolerance * 0.1f;
-	convexHullSet->m_maxPointPerHull = ConvexApproximate.MaxVertexPerConvex;
-	
-	const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
-	check(staticMesh);
-	const FStaticMeshRenderData* const renderData = staticMesh->GetRenderData();
-	check(renderData);
-	const FStaticMeshLODResourcesArray& renderResource = renderData->LODResources;
-	
-	const FVector uScale(GetComponentTransform().GetScale3D());
-	const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
-	const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
-	
-	const FStaticMeshLODResources& renderLOD = renderResource[0];
-	const FStaticMeshVertexBuffers& staticMeshVertexBuffer = renderLOD.VertexBuffers;;
-	const FPositionVertexBuffer& positBuffer = staticMeshVertexBuffer.PositionVertexBuffer;
-	
-	ndHullInputMesh& inputMesh = convexHullSet->m_inputMesh;
-	for (ndInt32 i = 0; i < ndInt32(positBuffer.GetNumVertices()); ++i)
-	{
-		ndHullPoint q;
-		const FVector3f p(positBuffer.VertexPosition(i));
-	
-		q.m_x = ndReal(p.X * bakedScale.m_x);
-		q.m_y = ndReal(p.Y * bakedScale.m_y);
-		q.m_z = ndReal(p.Z * bakedScale.m_z);
-		inputMesh.m_points.PushBack(q);
-	}
-	
-	const FRawStaticIndexBuffer& indexBuffer = renderLOD.IndexBuffer;
-	for (ndInt32 i = 0; i < ndInt32(indexBuffer.GetNumIndices()); i += 3)
-	{
-		ndHullInputMesh::ndFace face;
-		face.m_i0 = indexBuffer.GetIndex(i + 0);
-		face.m_i1 = indexBuffer.GetIndex(i + 1);
-		face.m_i2 = indexBuffer.GetIndex(i + 2);
-		check(face.m_i0 != face.m_i1);
-		check(face.m_i0 != face.m_i2);
-		check(face.m_i1 != face.m_i2);
-		inputMesh.m_faces.PushBack(face);
-	}
-	
-	convexHullSet->Execute();
-	
-	AActor* const actor = staticComponent->GetOwner();
-	check(actor);
-	ndArray<ndHullOutput*>& hullArray = convexHullSet->m_ouputHulls;
-	for (ndInt32 i = hullArray.GetCount() - 1; i >= 0; --i)
-	//for (ndInt32 i = 0; i < 3; ++i)
-	{
-		const ndHullOutput* const convexHull = hullArray[i];
-
-		UNewtonCollisionConvexHull* const childConvex = Cast<UNewtonCollisionConvexHull>(actor->AddComponentByClass(UNewtonCollisionConvexHull::StaticClass(), false, FTransform(), true));
-		actor->FinishAddComponent(childConvex, false, FTransform());
-		actor->AddInstanceComponent(childConvex);
-		childConvex->AttachToComponent(staticComponent, FAttachmentTransformRules::KeepRelativeTransform);
-
-		childConvex->InitVhacdConvex(convexHull);
-		childConvex->MarkRenderDynamicDataDirty();
-		childConvex->NotifyMeshUpdated();
-	}
-	delete convexHullSet;
 }
 
 void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool overrideAutoSleep)
@@ -700,12 +590,18 @@ ndShapeInstance* UNewtonRigidBody::CreateCollision(const ndMatrix& bodyMatrix) c
 		return new ndShapeInstance(new ndShapeNull());
 	}
 
+	if (collisionShapes.GetCount() == 1)
+	{
+		return collisionShapes[0]->CreateBodyInstanceShape(bodyMatrix);
+	}
+
 	ndShapeInstance* const compoundInstance = new ndShapeInstance(new ndShapeCompound());
 	ndShapeCompound* const compound = compoundInstance->GetShape()->GetAsShapeCompound();
 	compound->BeginAddRemove();
 	for (ndInt32 i = collisionShapes.GetCount() - 1; i >= 0; --i)
 	{
 		ndShapeInstance* const subShape = collisionShapes[i]->CreateBodyInstanceShape(bodyMatrix);
+		check(subShape->GetShape()->GetAsShapeCompound() == nullptr);
 		compound->AddCollision(subShape);
 		delete subShape;
 	}

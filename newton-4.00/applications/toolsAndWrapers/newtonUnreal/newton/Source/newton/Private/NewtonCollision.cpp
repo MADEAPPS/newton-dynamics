@@ -28,7 +28,7 @@ class UNewtonCollision::PolygonizeMesh : public ndShapeDebugNotify
 
 		ndArray<ndInt32> triangles;
 		ndTriangulatePolygon(&m_points[baseIndex], vertexCount, triangles);
-		//check((vertexCount - 2) == ndInt32 (triangles.GetCount() / 3));
+		check((vertexCount - 2) == ndInt32 (triangles.GetCount() / 3));
 
 		for (ndInt32 i = 0; i < ndInt32(triangles.GetCount()); i += 3)
 		{
@@ -92,12 +92,13 @@ UNewtonCollision::UNewtonCollision()
 	m_visualMesh = TSharedPtr<UE::Geometry::FDynamicMesh3>(nullptr);
 
 	ConstructorHelpers::FObjectFinder<UMaterial> TexObj(TEXT("/newton/NewtonTransparentMaterial"));
-	TObjectPtr<UMaterial> debugMaterial(Cast<UMaterial>(TexObj.Object));
-	debugMaterial->OpacityMaskClipValue = 0.0f;
+	m_debugMaterial = Cast<UMaterial>(TexObj.Object);
+	m_debugMaterial->OpacityMaskClipValue = 0.0f;
 
-	UMaterialInstanceDynamic* const debugMaterialInstance = UMaterialInstanceDynamic::Create(debugMaterial, nullptr);
-	debugMaterialInstance->OpacityMaskClipValue = 0.1f;
-	SetMaterial(0, debugMaterialInstance);
+	//UMaterialInstanceDynamic* const debugMaterialInstance = UMaterialInstanceDynamic::Create(m_debugMaterial, nullptr);
+	//debugMaterialInstance->OpacityMaskClipValue = 0.0f;
+	//SetMaterial(0, debugMaterialInstance);
+	SetMaterial(0, m_debugMaterial);
 }
 
 void UNewtonCollision::OnRegister()
