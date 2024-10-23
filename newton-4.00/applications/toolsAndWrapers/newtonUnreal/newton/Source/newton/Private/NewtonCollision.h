@@ -26,8 +26,8 @@ class UNewtonCollision : public UDynamicMeshComponent
 	public:	
 	// Sets default values for this component's properties
 	UNewtonCollision();
-	virtual ndVector GetVolumePosition() const;
 	virtual void SetWireFrameColor(const FLinearColor& color);
+	virtual ndVector GetVolumePosition(const ndMatrix& bodyMatrix) const;
 	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent);
 
 	protected:
@@ -44,7 +44,6 @@ class UNewtonCollision : public UDynamicMeshComponent
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual void BuildNewtonShape();
 	virtual void ApplyPropertyChanges();
-	//virtual UStaticMesh* FindStaticMesh() const;
 
 	virtual ndShape* CreateShape() const;
 	virtual long long CalculateHash() const;

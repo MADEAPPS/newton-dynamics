@@ -226,6 +226,50 @@ void UNewtonRigidBody::ClearDebug()
 	ShowCenterOfMass = false;
 	m_propertyChanged = true;
 	Inertia.ShowPrincipalAxis = false;
+
+	ndFixSizeArray<USceneComponent*, 1024> stack;
+	stack.PushBack(this);
+	while (stack.GetCount())
+	{
+		USceneComponent* const component = stack.Pop();
+		UNewtonCollision* const collisionComponent = Cast<UNewtonCollision>(component);
+		if (collisionComponent)
+		{
+			collisionComponent->m_debugVisualIsDirty = true;
+			collisionComponent->ApplyPropertyChanges();
+		}
+		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
+		for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
+		{
+			stack.PushBack(childrenComp[i].Get());
+		}
+	}
+}
+
+void UNewtonRigidBody::ActivateDebug()
+{
+	ShowDebug = true;
+	ShowCenterOfMass = true;
+	m_propertyChanged = true;
+	Inertia.ShowPrincipalAxis = true;
+
+	ndFixSizeArray<USceneComponent*, 1024> stack;
+	stack.PushBack(this);
+	while (stack.GetCount())
+	{
+		USceneComponent* const component = stack.Pop();
+		UNewtonCollision* const collisionComponent = Cast<UNewtonCollision>(component);
+		if (collisionComponent)
+		{
+			collisionComponent->m_debugVisualIsDirty = true;
+			collisionComponent->ApplyPropertyChanges();
+		}
+		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
+		for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
+		{
+			stack.PushBack(childrenComp[i].Get());
+		}
+	}
 }
 
 ndMatrix UNewtonRigidBody::CalculateInertiaMatrix() const
@@ -236,11 +280,7 @@ ndMatrix UNewtonRigidBody::CalculateInertiaMatrix() const
 	stack.PushBack(this);
 
 	bool isDynamics = true;
-	FVector invScale(GetComponentToWorld().GetScale3D());
-	const ndMatrix bodyMatrix(ToNewtonMatrix(GetComponentToWorld()).OrthoInverse());
-	invScale.X = 1.0f / invScale.X;
-	invScale.Y = 1.0f / invScale.Y;
-	invScale.Z = 1.0f / invScale.Z;
+	const ndMatrix bodyMatrix(ToNewtonMatrix(GetComponentToWorld()));
 	while (stack.GetCount())
 	{
 		const USceneComponent* const component = stack.Pop();
@@ -250,13 +290,7 @@ ndMatrix UNewtonRigidBody::CalculateInertiaMatrix() const
 			check(collisionComponent->m_shape);
 			isDynamics = isDynamics || (!collisionComponent->m_shape->GetAsShapeStaticMesh()) ? true : false;
 
-			const FTransform transform(collisionComponent->GetComponentToWorld());
-			const ndMatrix localMatrix(ToNewtonMatrix(transform) * bodyMatrix);
-			const FVector localScale(transform.GetScale3D() * invScale);
-
-			ndShapeInstance* const instance = collisionComponent->CreateInstanceShape();
-			instance->SetScale(ndVector(ndFloat32 (localScale.X), ndFloat32(localScale.Y), ndFloat32(localScale.Z), ndFloat32 (1.0f)));
-			instance->SetLocalMatrix(instance->GetLocalMatrix() * localMatrix);
+			ndShapeInstance* const instance = collisionComponent->CreateBodyInstanceShape(bodyMatrix);
 			instances.PushBack(instance);
 		}
 		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
@@ -302,7 +336,9 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 	if (Inertia.ShowPrincipalAxis)
 	{
 		ndMatrix inertiaMatrix(CalculateInertiaMatrix());
+		const ndVector saveCom(inertiaMatrix.m_posit);
 		inertiaMatrix.EigenVectors();
+		inertiaMatrix.m_posit = saveCom;
 
 		const FTransform tranform(GetComponentToWorld());
 		const ndMatrix matrix(ToNewtonMatrix(tranform));
@@ -310,9 +346,6 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 		FTransform offsetInertia;
 		offsetInertia.SetRotation(Inertia.PrincipalInertiaAxis.Quaternion());
 		const ndMatrix offsetMatrix(ToNewtonMatrix(offsetInertia));
-		//const FRotator axisRot(tranform.GetRotation());
-		//const FVector axisLoc(axisMatrix.m_posit.m_x * UNREAL_UNIT_SYSTEM, axisMatrix.m_posit.m_y * UNREAL_UNIT_SYSTEM, axisMatrix.m_posit.m_z * UNREAL_UNIT_SYSTEM);
-		//DrawDebugCoordinateSystem(GetWorld(), axisLoc, axisRot, DebugScale * UNREAL_UNIT_SYSTEM, false, timestep);
 
 		const ndMatrix axisMatrix(offsetMatrix * inertiaMatrix * matrix);
 		const FTransform inertiaAxisTransform (ToUnRealTransform(axisMatrix));
@@ -333,6 +366,9 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 			ndFixSizeArray<USceneComponent*, 1024> stack;
 			stack.PushBack(this);
 
+			const FTransform tranform(GetComponentToWorld());
+			const ndMatrix bodyMatrix(ToNewtonMatrix(tranform));
+
 			ndFloat32 volume = ndFloat32(0.0f);
 			while (stack.GetCount())
 			{
@@ -340,7 +376,7 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 				const UNewtonCollision* const shape = Cast<UNewtonCollision>(component);
 				if (shape)
 				{
-					const ndVector pv(shape->GetVolumePosition());
+					const ndVector pv(shape->GetVolumePosition(bodyMatrix));
 					volume += pv.m_w;
 					positVolume += pv.Scale (pv.m_w);
 				}
@@ -446,59 +482,6 @@ void UNewtonRigidBody::CalculateLocalTransform()
 
 	m_localTransform = m_globalTransform * parentTransform.Inverse();
 	m_localTransform.SetScale3D(m_localScale);
-}
-
-void UNewtonRigidBody::ApplyPropertyChanges()
-{
-	m_propertyChanged = false;
-
-	m_localTransform = GetRelativeTransform();
-	m_globalTransform = GetComponentTransform();
-
-	m_localScale = m_localTransform.GetScale3D();
-	m_globalScale = m_globalTransform.GetScale3D();
-
-	const ndMatrix inertiaMatrix(CalculateInertiaMatrix());
-	//float scale = UNREAL_UNIT_SYSTEM * UNREAL_UNIT_SYSTEM * Mass;
-	//show it in MKS units 
-	//(not in centimeters because it is usually too big number)
-	float scale = Mass;
-	const FVector inertia(inertiaMatrix[0][0] * scale, inertiaMatrix[1][1] * scale, inertiaMatrix[2][2] * scale);
-	Inertia.PrincipalInertia = inertia * Inertia.PrincipalInertiaScaler;
-
-	//if (ConvexApproximate.Generate)
-	//{
-	//	const AActor* const owner = GetOwner();
-	//	const TArray<TObjectPtr<USceneComponent>>& children = GetAttachChildren();
-	//	for (int j = children.Num() - 1; j >= 0; --j)
-	//	{
-	//		UStaticMeshComponent* const staticMeshComponent = Cast<UStaticMeshComponent>(children[j]);
-	//
-	//		if (staticMeshComponent && staticMeshComponent->GetOwner() && staticMeshComponent->GetStaticMesh().Get())
-	//		{
-	//			bool hasCollision = false;
-	//			const TArray<TObjectPtr<USceneComponent>>& childrenComp = staticMeshComponent->GetAttachChildren();
-	//			for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
-	//			{
-	//				hasCollision = hasCollision || (Cast<UNewtonCollision>(childrenComp[i]) ? true : false);
-	//			}
-	//
-	//			if (hasCollision)
-	//			{
-	//				UE_LOG(LogTemp, Warning, TEXT("static mesh: %s, has one or more child collision shape alreary. You must delete all the UNewtonCollision children first"), *staticMeshComponent->GetName());
-	//			}
-	//			else
-	//			{
-	//				CreateConvexApproximationShapes(staticMeshComponent);
-	//			}
-	//		}
-	//	}
-	//
-	//	ConvexApproximate.Generate = false;
-	//	FLevelEditorModule& levelEditor = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
-	//	levelEditor.BroadcastComponentsEdited();
-	//	levelEditor.BroadcastRedrawViewports(false);
-	//}
 }
 
 // Called every frame
@@ -607,4 +590,23 @@ ndShapeInstance* UNewtonRigidBody::CreateCollision(const ndMatrix& bodyMatrix) c
 	}
 	compound->EndAddRemove();
 	return compoundInstance;
+}
+
+void UNewtonRigidBody::ApplyPropertyChanges()
+{
+	m_propertyChanged = false;
+
+	m_localTransform = GetRelativeTransform();
+	m_globalTransform = GetComponentTransform();
+
+	m_localScale = m_localTransform.GetScale3D();
+	m_globalScale = m_globalTransform.GetScale3D();
+
+	const ndMatrix inertiaMatrix(CalculateInertiaMatrix());
+	//float scale = UNREAL_UNIT_SYSTEM * UNREAL_UNIT_SYSTEM * Mass;
+	//show it in MKS units 
+	//(not in centimeters because it is usually too big number)
+	float scale = Mass;
+	const FVector inertia(inertiaMatrix[0][0] * scale, inertiaMatrix[1][1] * scale, inertiaMatrix[2][2] * scale);
+	Inertia.PrincipalInertia = inertia * Inertia.PrincipalInertiaScaler;
 }

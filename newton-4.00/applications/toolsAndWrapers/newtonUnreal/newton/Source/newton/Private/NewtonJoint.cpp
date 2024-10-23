@@ -27,6 +27,12 @@ void UNewtonJoint::ClearDebug()
 	m_propertyChanged = true;
 }
 
+void UNewtonJoint::ActivateDebug()
+{
+	ShowDebug = true;
+	m_propertyChanged = true;
+}
+
 void UNewtonJoint::CreateJoint(ANewtonWorldActor* const)
 {
 	m_transfrom = GetComponentTransform();

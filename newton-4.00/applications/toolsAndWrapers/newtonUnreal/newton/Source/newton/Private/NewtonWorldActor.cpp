@@ -63,7 +63,9 @@ ANewtonWorldActor::ANewtonWorldActor()
 	ParallelThreads = 1;
 	SolverIterations = 4;
 
+	ShowDebug = false;
 	ClearDebug = false;
+	
 	AutoSleepMode = true;
 	ConcurrentUpdate = false;
 	SolverMode = SolverModeTypes::scalar;
@@ -221,7 +223,8 @@ void ANewtonWorldActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyCh
 		ApplySettings();
 	}
 
-	if (PropertyChangedEvent.GetPropertyName() == "ClearDebug")
+	bool clearOption = PropertyChangedEvent.GetPropertyName() == "ClearDebug";
+	if (clearOption || (PropertyChangedEvent.GetPropertyName() == "ShowDebug"))
 	{
 		const UWorld* const world = GetWorld();
 		for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
@@ -233,17 +236,18 @@ void ANewtonWorldActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyCh
 				UNewtonRigidBody* const body = Cast<UNewtonRigidBody>(*it);
 				if (body)
 				{
-					body->ClearDebug();
+					clearOption ? body->ClearDebug() : body->ActivateDebug();
 				}
 
 				UNewtonJoint* const joint = Cast<UNewtonJoint>(*it);
 				if (joint)
 				{
-					joint->ClearDebug();
+					clearOption ? joint->ClearDebug() : joint->ActivateDebug();
 				}
 			}
 		}
 
+		ShowDebug = false;
 		ClearDebug = false;
 		FLevelEditorModule& levelEditor = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
 		levelEditor.BroadcastComponentsEdited();

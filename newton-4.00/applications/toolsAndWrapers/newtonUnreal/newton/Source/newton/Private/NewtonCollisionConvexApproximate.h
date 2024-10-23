@@ -23,33 +23,37 @@ class UNewtonCollisionConvexApproximate : public UNewtonCollision
 	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent) override;
 	
 	protected:
-	virtual void ApplyPropertyChanges();
-	virtual ndShape* CreateShape() const;
-	virtual long long CalculateHash() const;
-	virtual ndShapeInstance* CreateInstanceShape() const;
-	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const;
-
+	virtual void ApplyPropertyChanges() override;
+	virtual ndShape* CreateShape() const override;
+	virtual long long CalculateHash() const override;
+	virtual ndShapeInstance* CreateInstanceShape() const override;
+	virtual ndVector GetVolumePosition(const ndMatrix& bodyMatrix) const override;
+	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const override;
+	
 	long long CalculateStaticMeshHash() const;
-	ndConvexHullSet* CreateConvexApproximationShapes() const;
 	const FStaticMeshLODResources* GetRenderLOD() const;
+	ndConvexHullSet* CreateConvexApproximationShapes() const;
 
 	virtual void Serialize(FArchive& ar) override;
 	void SerializeLoadRevision_firstVersion(FArchive& ar);
 
 	UPROPERTY(EditAnywhere, Category = Newton)
-	bool Generate = false;
+	bool Generate;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
-	bool HighResolution = false;
+	bool HighResolution;
+
+	UPROPERTY(VisibleAnywhere, Category = Newton)
+	int NumberOfConvex;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 1, ClampMax = 128))
-	int MaxVertexPerConvex = 32;
+	int MaxVertexPerConvex;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 1, ClampMax = 128))
-	int MaxConvexes = 16;
+	int MaxConvexes;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0, ClampMax = 1.0))
-	float Tolerance = 0.0f;
+	float Tolerance;
 	
 	long long m_meshHash;
 	TSharedPtr<ndConvexHullSet> m_convexHullSet;

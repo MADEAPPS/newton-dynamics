@@ -24,6 +24,8 @@ class UNewtonJoint : public USceneComponent
 	UNewtonJoint();
 
 	void ClearDebug();
+	void ActivateDebug();
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

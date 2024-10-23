@@ -65,6 +65,9 @@ class ANewtonWorldActor : public AActor
 	UPROPERTY(EditAnywhere, Category=Newton)
 	bool ClearDebug;
 
+	UPROPERTY(EditAnywhere, Category=Newton)
+	bool ShowDebug;
+
 	private:
 	void Cleanup();
 	void StartGame();

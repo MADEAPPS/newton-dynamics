@@ -19,7 +19,7 @@ class UNewtonCollisionConvexApproximate::ConvexVhacdGenerator : public ndConvexA
 		,m_progressBar(nullptr)
 		,m_acc(0.0f)
 	{
-	#ifdef SHOW_VHACD_PROGRESS_BAR  
+		#ifdef SHOW_VHACD_PROGRESS_BAR  
 		// for some reason the progress bar invalidate some UClasses
 		// I need to report this some day to unreal.
 		// for now just do not report progress.
@@ -63,6 +63,7 @@ UNewtonCollisionConvexApproximate::UNewtonCollisionConvexApproximate()
 	Generate = false;
 	MaxConvexes = 16;
 	Tolerance = 0.0f;
+	NumberOfConvex = 0;
 	HighResolution = false;
 	MaxVertexPerConvex = 32;
 }
@@ -328,6 +329,23 @@ ndShapeInstance* UNewtonCollisionConvexApproximate::CreateInstanceShape() const
 	return instance;
 }
 
+ndVector UNewtonCollisionConvexApproximate::GetVolumePosition(const ndMatrix& bodyMatrix) const
+{
+	ndVector posit(0.0f);
+	ndShapeInstance* const instance = CreateInstanceShape();
+	if (instance)
+	{
+		instance->SetScale(ndVector(1.0f));
+
+		const ndMatrix inertia(instance->CalculateInertia());
+		posit = inertia.m_posit;
+
+		posit.m_w = instance->GetVolume();
+		delete instance;
+	}
+	return posit;
+}
+
 void UNewtonCollisionConvexApproximate::ApplyPropertyChanges()
 {
 	FnewtonModule* const plugin = FnewtonModule::GetPlugin();
@@ -335,7 +353,7 @@ void UNewtonCollisionConvexApproximate::ApplyPropertyChanges()
 	long long meshHash = CalculateStaticMeshHash();
 	if ((m_meshHash != meshHash) || Generate && !m_generateFlipFlop)
 	{
-		TSharedPtr<ndConvexHullSet> convexHullSet (plugin->FindConvexHull(meshHash));
+		TSharedPtr<ndConvexHullSet> convexHullSet(plugin->FindConvexHull(meshHash));
 		if (convexHullSet == nullptr)
 		{
 			convexHullSet = TSharedPtr<ndConvexHullSet>(CreateConvexApproximationShapes());
@@ -347,6 +365,7 @@ void UNewtonCollisionConvexApproximate::ApplyPropertyChanges()
 		m_convexHullSet = plugin->FindConvexHull(meshHash);
 		m_debugVisualIsDirty = true;
 	}
+	NumberOfConvex = m_convexHullSet ? m_convexHullSet->Num() : 0;
 	MarkRenderDynamicDataDirty();
 	NotifyMeshUpdated();
 

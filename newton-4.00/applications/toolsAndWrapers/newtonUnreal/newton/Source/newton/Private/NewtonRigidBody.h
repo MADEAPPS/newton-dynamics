@@ -66,6 +66,7 @@ class UNewtonRigidBody : public USceneComponent
 	void InterpolateTransform(float param);
 
 	virtual void ClearDebug();
+	virtual void ActivateDebug();
 	virtual void ApplyPropertyChanges();
 	ndMatrix CalculateInertiaMatrix() const;
 	void CreateRigidBody(ANewtonWorldActor* const worldActor, bool overrideAutoSleep);

@@ -233,6 +233,7 @@ void UNewtonCollision::SetWireFrameColor(const FLinearColor& color)
 
 ndShapeInstance* UNewtonCollision::CreateInstanceShape() const
 {
+	// implicit shape does use unreal scale, for rendering
 	ndShapeInstance* const instance = new ndShapeInstance(m_shape);
 	return instance;
 }
@@ -241,6 +242,7 @@ ndShapeInstance* UNewtonCollision::CreateBodyInstanceShape(const ndMatrix& bodyM
 {
 	ndShapeInstance* const instance = CreateInstanceShape();
 
+	// implicit set the scale and local transform to the instance
 	const FVector uScale(GetComponentTransform().GetScale3D());
 	const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(1.0f));
 
@@ -250,6 +252,21 @@ ndShapeInstance* UNewtonCollision::CreateBodyInstanceShape(const ndMatrix& bodyM
 	instance->SetScale(scale);
 	instance->SetLocalMatrix(matrix);
 	return instance;
+}
+
+ndVector UNewtonCollision::GetVolumePosition(const ndMatrix& bodyMatrix) const
+{
+	ndVector posit(0.0f);
+	ndShapeInstance* const instance = CreateBodyInstanceShape(bodyMatrix);
+	if (instance)
+	{
+		const ndMatrix inertia(instance->CalculateInertia());
+		posit = inertia.m_posit;
+		
+		posit.m_w = instance->GetVolume();
+		delete instance;
+	}
+	return posit;
 }
 
 void UNewtonCollision::ApplyPropertyChanges()
@@ -309,23 +326,4 @@ void UNewtonCollision::ApplyPropertyChanges()
 		MarkRenderDynamicDataDirty();
 		NotifyMeshUpdated();
 	}
-}
-
-ndVector UNewtonCollision::GetVolumePosition() const
-{
-	ndVector posit(0.0f);
-	ndShapeInstance* const instance = CreateInstanceShape();
-	if (instance)
-	{
-		//const FVector uScale(GetComponentTransform().GetScale3D());
-		//const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
-		instance->SetScale(ndVector(1.0f));
-
-		const ndMatrix inertia(instance->CalculateInertia());
-		posit = inertia.m_posit;
-		
-		posit.m_w = instance->GetVolume();
-		delete instance;
-	}
-	return posit;
 }
