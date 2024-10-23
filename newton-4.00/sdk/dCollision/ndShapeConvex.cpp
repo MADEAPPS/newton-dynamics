@@ -242,12 +242,14 @@ ndMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const ndMatrix& alignMat
 		scaledMatrix = alignMatrix * scaledMatrix;
 	
 		ndFloat32 volume = CalculateMassProperties(scaledMatrix, inertiaII, crossInertia, centerOfMass);
-		if (volume < D_MAX_MIN_VOLUME) {
+		if (volume < D_MAX_MIN_VOLUME) 
+		{
 			volume = D_MAX_MIN_VOLUME;
 		}
 	
 		ndFloat32 invVolume = ndFloat32(1.0f) / volume;
 		centerOfMass = centerOfMass.Scale(invVolume);
+		centerOfMass.m_w = ndFloat32(1.0f);
 		inertiaII = inertiaII.Scale(invVolume);
 		crossInertia = crossInertia.Scale(invVolume);
 		ndMatrix inertia(ndGetIdentityMatrix());

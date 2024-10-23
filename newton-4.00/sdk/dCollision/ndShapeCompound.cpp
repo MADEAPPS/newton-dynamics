@@ -1231,6 +1231,7 @@ ndMatrix ndShapeCompound::CalculateInertiaAndCenterOfMass(const ndMatrix& alignM
 
 	ndFloat32 invVolume = ndFloat32(1.0f) / volume;
 	centerOfMass = centerOfMass.Scale(invVolume);
+	centerOfMass.m_w = ndFloat32(1.0f);
 	inertiaII = inertiaII.Scale(invVolume);
 	crossInertia = crossInertia.Scale(invVolume);
 	ndMatrix inertia(ndGetIdentityMatrix());
