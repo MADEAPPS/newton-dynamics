@@ -314,11 +314,16 @@ void UNewtonCollision::ApplyPropertyChanges()
 ndVector UNewtonCollision::GetVolumePosition() const
 {
 	ndVector posit(0.0f);
-	const ndShapeInstance* const instance = CreateInstanceShape();
+	ndShapeInstance* const instance = CreateInstanceShape();
 	if (instance)
 	{
+		//const FVector uScale(GetComponentTransform().GetScale3D());
+		//const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
+		instance->SetScale(ndVector(1.0f));
+
 		const ndMatrix inertia(instance->CalculateInertia());
 		posit = inertia.m_posit;
+		
 		posit.m_w = instance->GetVolume();
 		delete instance;
 	}
