@@ -107,7 +107,7 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat
 	body->SetMassMatrix(mass, shape, true);
 	body->SetCentreOfMass(ndVector(0.0f, -0.1f, 0.0f, 0.0f));
 
-	ndVector omega(0.01f, speed, 0.0f, 0.0f);
+	ndVector omega(0.0f, speed, 0.0f, 0.0f);
 	body->SetOmega(omega);
 
 	ndSharedPtr<ndBody> bodyPtr(body);

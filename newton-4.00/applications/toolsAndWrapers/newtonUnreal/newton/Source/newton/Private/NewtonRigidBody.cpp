@@ -314,7 +314,13 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 		ndMatrix inertiaMatrix(CalculateInertiaMatrix());
 		const ndVector saveCom(inertiaMatrix.m_posit);
 		inertiaMatrix.EigenVectors();
-		inertiaMatrix.m_posit = saveCom;
+
+		const ndVector centerOfMass(
+			ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM),
+			ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM),
+			ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM),
+			ndFloat32(0.0f));
+		inertiaMatrix.m_posit = saveCom + centerOfMass;
 
 		const FTransform tranform(GetComponentToWorld());
 		const ndMatrix matrix(ToNewtonMatrix(tranform));
@@ -482,7 +488,21 @@ void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool
 
 	ndShapeInstance* const shape = CreateCollision(matrix);
 	m_body->SetCollisionShape(*shape);
-	m_body->SetMassMatrix(Mass, *shape);
+
+	if (shape->GetShape()->GetAsShapeSphere())
+	{
+		shape->GetShape()->GetAsShapeSphere();
+	}
+
+	FTransform tranform;
+	tranform.SetRotation(FQuat(Inertia.PrincipalInertiaAxis));
+	const ndMatrix shapeMatrix(ToNewtonMatrix(tranform));
+	shape->SetLocalMatrix(shapeMatrix * shape->GetLocalMatrix());
+
+	bool fullInertia = ndAbs(Inertia.PrincipalInertiaAxis.Pitch) > 0.1f;
+	fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Yaw) > 0.1f);
+	fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Roll) > 0.1f);
+	m_body->SetMassMatrix(Mass, *shape, fullInertia);
 	m_body->SetAutoSleep(AutoSleepMode && overrideAutoSleep);
 	m_body->SetNotifyCallback(new NotifyCallback(this, ndVector(ndFloat32(Gravity.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Gravity.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Gravity.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f))));
 
