@@ -7,6 +7,7 @@
 #define UNREAL_INV_UNIT_SYSTEM	ndFloat32 (1.0f / UNREAL_UNIT_SYSTEM)
 
 class ndShape;
+class ndMatrix;
 class ANewtonWorldActor;
 
 template <typename T>
@@ -30,3 +31,6 @@ class ndConvexHullSet : public TArray<ndHullPoints*>
 	ndConvexHullSet();
 	~ndConvexHullSet();
 };
+
+ndMatrix ToNewtonMatrix(const FTransform& tranform);
+FTransform ToUnRealTransform(const ndMatrix& matrix);

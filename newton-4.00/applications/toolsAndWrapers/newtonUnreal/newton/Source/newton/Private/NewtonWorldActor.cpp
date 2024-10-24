@@ -53,11 +53,11 @@ ANewtonWorldActor::ANewtonWorldActor()
 	:m_world(nullptr)
 	,m_timeAccumulator(0.0f)
 	,m_interpolationParam(1.0f)
-	,m_beginPlay(false)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	//PrimaryActorTick.bCanEverTick = true;
 
+	m_beginPlay = false;
 	SolverPasses = 2;
 	UpdateRate = 60.0f;
 	ParallelThreads = 1;
@@ -87,6 +87,34 @@ void ANewtonWorldActor::BeginPlay()
 	}
 	ApplySettings();
 	m_world->Sync();
+}
+
+void ANewtonWorldActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	if (m_world)
+	{
+		Cleanup();
+		switch (EndPlayReason)
+		{
+			case EEndPlayReason::Destroyed:
+				ndAssert(0);
+				break;
+			case EEndPlayReason::LevelTransition:
+				ndAssert(0);
+				break;
+			case EEndPlayReason::EndPlayInEditor:
+				ndAssert(0);
+				break;
+			case EEndPlayReason::RemovedFromWorld:
+				ndAssert(0);
+				break;
+			case EEndPlayReason::Quit:
+				m_world->Sync();
+				delete m_world;
+				break;
+		}
+	}
 }
 
 void ANewtonWorldActor::StartGame()
@@ -172,34 +200,6 @@ void ANewtonWorldActor::Cleanup()
 					meshComp->DestroyRigidBody();
 				}
 			}
-		}
-	}
-}
-
-void ANewtonWorldActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-	if (m_world)
-	{
-		Cleanup();
-		switch (EndPlayReason)
-		{
-			case EEndPlayReason::Destroyed:
-				ndAssert(0);
-				break;
-			case EEndPlayReason::LevelTransition:
-				ndAssert(0);
-				break;
-			case EEndPlayReason::EndPlayInEditor:
-				ndAssert(0);
-				break;
-			case EEndPlayReason::RemovedFromWorld:
-				ndAssert(0);
-				break;
-			case EEndPlayReason::Quit:
-				m_world->Sync();
-				delete m_world;
-				break;
 		}
 	}
 }

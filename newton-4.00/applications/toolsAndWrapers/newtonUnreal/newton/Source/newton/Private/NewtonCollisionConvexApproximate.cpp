@@ -257,6 +257,7 @@ ndConvexHullSet* UNewtonCollisionConvexApproximate::CreateConvexApproximationSha
 		hullSet->Push(pointsSet);
 	}
 
+	UE_LOG(LogTemp, Display, TEXT("number of vhcd convex generated: %d"), hullArray.GetCount());
 	delete vhacdHullSet;
 	return hullSet;
 }
@@ -313,7 +314,7 @@ ndShapeInstance* UNewtonCollisionConvexApproximate::CreateBodyInstanceShape(cons
 
 	const ndVector scale(ndFloat32(1.0f));
 	const FTransform transform(GetComponentToWorld());
-	const ndMatrix matrix(UNewtonRigidBody::ToNewtonMatrix(transform) * bodyMatrix.OrthoInverse());
+	const ndMatrix matrix(ToNewtonMatrix(transform) * bodyMatrix.OrthoInverse());
 
 	instance->SetScale(scale);
 	instance->SetLocalMatrix(matrix);

@@ -23,7 +23,7 @@ void UNewtonJointHinge::DrawGizmo(float timestep) const
 {
 	ndFloat32 scale = DebugScale * UNREAL_UNIT_SYSTEM;
 	const FTransform transform(GetComponentTransform());
-	const ndMatrix matrix(UNewtonRigidBody::ToNewtonMatrix(transform));
+	const ndMatrix matrix(ToNewtonMatrix(transform));
 	const FColor pinColor(255.0f, 255.0f, 0.0f);
 	const ndVector pinDir(matrix.m_front.Scale(scale * 0.9f));
 	const FVector coneDir(matrix.m_front.m_x, matrix.m_front.m_y, matrix.m_front.m_z);
@@ -48,7 +48,7 @@ void UNewtonJointHinge::DrawGizmo(float timestep) const
 			ndFloat32 angleStep = ndMin(deltaTwist, 360.0f) / subdiv;
 		
 			const FVector parentOrigin(transform.GetLocation());
-			const ndMatrix parentMatrix(UNewtonRigidBody::ToNewtonMatrix(transform));
+			const ndMatrix parentMatrix(ToNewtonMatrix(transform));
 			verts.Push(parentOrigin);
 			for (ndInt32 i = 0; i <= subdiv; ++i)
 			{
@@ -83,7 +83,7 @@ void UNewtonJointHinge::CreateJoint(ANewtonWorldActor* const newtonWorldActor)
 	if (body0 && body1)
 	{
 		const FTransform transform(GetRelativeTransform());
-		const ndMatrix matrix(UNewtonRigidBody::ToNewtonMatrix(transform) * body1->GetMatrix());
+		const ndMatrix matrix(ToNewtonMatrix(transform) * body1->GetMatrix());
 		ndJointHinge* const joint = new ndJointHinge(matrix, body0, body1);
 
 		joint->SetLimitState(EnableLimits);

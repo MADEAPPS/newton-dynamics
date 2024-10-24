@@ -192,7 +192,7 @@ ndShapeInstance* UNewtonCollisionPolygonalMesh::CreateBodyInstanceShape(const nd
 
 	const ndVector scale(ndFloat32(1.0f));
 	const FTransform transform(GetComponentToWorld());
-	const ndMatrix matrix(UNewtonRigidBody::ToNewtonMatrix(transform) * bodyMatrix.OrthoInverse());
+	const ndMatrix matrix(ToNewtonMatrix(transform) * bodyMatrix.OrthoInverse());
 
 	instance->SetScale(scale);
 	instance->SetLocalMatrix(matrix);

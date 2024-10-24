@@ -45,6 +45,7 @@ class UNewtonCollision : public UDynamicMeshComponent
 	virtual void BuildNewtonShape();
 	virtual void ApplyPropertyChanges();
 
+	bool GetDebugMode() const;
 	virtual ndShape* CreateShape() const;
 	virtual long long CalculateHash() const;
 	virtual ndShapeInstance* CreateInstanceShape() const;

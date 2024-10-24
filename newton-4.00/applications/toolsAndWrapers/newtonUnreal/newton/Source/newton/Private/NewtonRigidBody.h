@@ -45,9 +45,6 @@ class UNewtonRigidBody : public USceneComponent
 	// Sets default values for this component's properties
 	UNewtonRigidBody();
 
-	static ndMatrix ToNewtonMatrix(const FTransform& tranform);
-	static FTransform ToUnRealTransform(const ndMatrix& matrix);
-
 	protected:
 	// Called every frame
 	virtual void PostLoad() override;

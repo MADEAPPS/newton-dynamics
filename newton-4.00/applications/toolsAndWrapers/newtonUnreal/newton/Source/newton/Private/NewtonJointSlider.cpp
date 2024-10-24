@@ -23,7 +23,7 @@ void UNewtonJointSlider::DrawGizmo(float timestep) const
 {
 	ndFloat32 scale = DebugScale * UNREAL_UNIT_SYSTEM;
 	const FTransform transform(GetComponentTransform());
-	const ndMatrix matrix(UNewtonRigidBody::ToNewtonMatrix(transform));
+	const ndMatrix matrix(ToNewtonMatrix(transform));
 	const FColor pinColor(255.0f, 255.0f, 0.0f);
 	const ndVector pinDir(matrix.m_front.Scale(scale * 0.9f));
 	const FVector pingStart(transform.GetLocation());
@@ -60,7 +60,7 @@ void UNewtonJointSlider::CreateJoint(ANewtonWorldActor* const newtonWorldActor)
 	if (body0 && body1)
 	{
 		const FTransform transform(GetRelativeTransform());
-		const ndMatrix matrix(UNewtonRigidBody::ToNewtonMatrix(transform) * body1->GetMatrix());
+		const ndMatrix matrix(ToNewtonMatrix(transform) * body1->GetMatrix());
 
 		ndJointSlider* const joint = new ndJointSlider(matrix, body0, body1);
 

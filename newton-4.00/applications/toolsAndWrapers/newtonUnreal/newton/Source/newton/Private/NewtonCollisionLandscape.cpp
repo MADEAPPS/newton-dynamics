@@ -166,7 +166,7 @@ ndShapeInstance* UNewtonCollisionLandscape::CreateBodyInstanceShape(const ndMatr
 {
 	ndShapeInstance* const instance = new ndShapeInstance(m_shape);
 	const FTransform transform(GetComponentToWorld());
-	const ndMatrix matrix (UNewtonRigidBody::ToNewtonMatrix(transform));
+	const ndMatrix matrix (ToNewtonMatrix(transform));
 	const FVector uScale(transform.GetScale3D());
 	ndMatrix origin(ndGetIdentityMatrix());
 	origin.m_posit.m_y = ndFloat32(ndFloat32(m_tileSize_y - 1) * m_scale_y * uScale.Y * UNREAL_INV_UNIT_SYSTEM);

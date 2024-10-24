@@ -121,9 +121,17 @@ void UNewtonCollision::OnUnregister()
 
 void UNewtonCollision::SetTransform(const USceneComponent* const meshComponent)
 {
-	const AActor* const owner = GetOwner();
-	check(owner);
-	const FTransform bodyTransform(owner->GetRootComponent()->GetComponentToWorld());
+	//const AActor* const owner = GetOwner();
+	//check(owner);
+	FTransform bodyTransform(GetComponentTransform());
+	for (USceneComponent* parent = GetAttachParent(); parent; parent = parent->GetAttachParent())
+	{
+		bodyTransform = parent->GetComponentTransform();
+		if (Cast<UNewtonRigidBody>(parent))
+		{
+			break;
+		}
+	}
 	const FTransform globalTransform(meshComponent->GetComponentToWorld());
 	const FTransform localTransform(globalTransform * bodyTransform.Inverse());
 
@@ -247,7 +255,7 @@ ndShapeInstance* UNewtonCollision::CreateBodyInstanceShape(const ndMatrix& bodyM
 	const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(1.0f));
 
 	const FTransform transform(GetComponentToWorld());
-	const ndMatrix matrix(UNewtonRigidBody::ToNewtonMatrix(transform) * bodyMatrix.OrthoInverse());
+	const ndMatrix matrix(ToNewtonMatrix(transform) * bodyMatrix.OrthoInverse());
 
 	instance->SetScale(scale);
 	instance->SetLocalMatrix(matrix);
@@ -269,25 +277,25 @@ ndVector UNewtonCollision::GetVolumePosition(const ndMatrix& bodyMatrix) const
 	return posit;
 }
 
+bool UNewtonCollision::GetDebugMode() const
+{
+	for (USceneComponent* component = GetAttachParent(); component; component = component->GetAttachParent())
+	{
+		const UNewtonRigidBody* const rigidBody = Cast<UNewtonRigidBody>(component);
+		if (rigidBody)
+		{
+			return rigidBody->ShowDebug;
+		}
+	}
+	return false;
+}
+
 void UNewtonCollision::ApplyPropertyChanges()
 {
 	m_propertyChanged = false;
 
 	if (m_shape)
 	{
-		auto GetDebugMode = [this]()
-		{
-			for (USceneComponent* component = GetAttachParent(); component; component = component->GetAttachParent())
-			{
-				const UNewtonRigidBody* const rigidBody = Cast<UNewtonRigidBody>(component);
-				if (rigidBody)
-				{
-					return rigidBody->ShowDebug;
-				}
-			}
-			return false;
-		};
-
 		bool showDebug = GetDebugMode();
 		if (showDebug)
 		{
@@ -300,12 +308,12 @@ void UNewtonCollision::ApplyPropertyChanges()
 				{
 					//UE_LOG(LogTemp, Warning, TEXT("Rebuild Mesh"));
 					PolygonizeMesh wireMesh;
-					ndShapeInstance* const instanceShape = CreateInstanceShape();
-					instanceShape->DebugShape(ndGetIdentityMatrix(), wireMesh);
+					ndShapeInstance* const instance = CreateInstanceShape();
+					instance->DebugShape(ndGetIdentityMatrix(), wireMesh);
 					visualMesh = wireMesh.CreateDynamicMesh3();
 					plugin->AddDynamicMesh(visualMesh, m_hash);
 
-					delete instanceShape;
+					delete instance;
 				}
 
 				m_visualMesh = visualMesh;
