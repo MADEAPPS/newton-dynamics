@@ -26,6 +26,6 @@
 #include "ndArray.h"
 #include "ndVector.h"
 
-D_CORE_API void ndTriangulatePolygon(ndVector* const vertexCloud2d, ndInt32 count, ndArray<ndInt32>& triangles);
+D_CORE_API void ndTriangulatePolygon(ndVector* const points, ndInt32 count, ndArray<ndInt32>& triangles);
 
 #endif

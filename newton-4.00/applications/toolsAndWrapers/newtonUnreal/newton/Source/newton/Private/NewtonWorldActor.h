@@ -33,8 +33,6 @@ class ANewtonWorldActor : public AActor
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	virtual void Destroyed();
-	virtual void Tick(float DeltaTime) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	
 	void ApplySettings();
@@ -60,9 +58,6 @@ class ANewtonWorldActor : public AActor
 	bool AutoSleepMode;
 
 	UPROPERTY(EditAnywhere, Category=Newton)
-	bool ConcurrentUpdate;
-
-	UPROPERTY(EditAnywhere, Category=Newton)
 	bool ClearDebug;
 
 	UPROPERTY(EditAnywhere, Category=Newton)
@@ -71,6 +66,9 @@ class ANewtonWorldActor : public AActor
 	private:
 	void Cleanup();
 	void StartGame();
+
+	void VisualTick();
+	void PhysicsTick();
 
 	NewtonWorld* m_world;
 	float m_timeAccumulator;

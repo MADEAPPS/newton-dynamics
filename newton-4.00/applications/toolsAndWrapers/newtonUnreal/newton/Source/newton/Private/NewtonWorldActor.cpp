@@ -67,7 +67,6 @@ ANewtonWorldActor::ANewtonWorldActor()
 	ClearDebug = false;
 	
 	AutoSleepMode = true;
-	ConcurrentUpdate = false;
 	SolverMode = SolverModeTypes::scalar;
 }
 
@@ -95,25 +94,26 @@ void ANewtonWorldActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (m_world)
 	{
 		Cleanup();
-		switch (EndPlayReason)
-		{
-			case EEndPlayReason::Destroyed:
-				ndAssert(0);
-				break;
-			case EEndPlayReason::LevelTransition:
-				ndAssert(0);
-				break;
-			case EEndPlayReason::EndPlayInEditor:
-				ndAssert(0);
-				break;
-			case EEndPlayReason::RemovedFromWorld:
-				ndAssert(0);
-				break;
-			case EEndPlayReason::Quit:
-				m_world->Sync();
-				delete m_world;
-				break;
-		}
+		delete m_world;
+		//switch (EndPlayReason)
+		//{
+		//	case EEndPlayReason::Destroyed:
+		//		ndAssert(0);
+		//		break;
+		//	case EEndPlayReason::LevelTransition:
+		//		ndAssert(0);
+		//		break;
+		//	case EEndPlayReason::EndPlayInEditor:
+		//		ndAssert(0);
+		//		break;
+		//	case EEndPlayReason::RemovedFromWorld:
+		//		ndAssert(0);
+		//		break;
+		//	case EEndPlayReason::Quit:
+		//		m_world->Sync();
+		//		delete m_world;
+		//		break;
+		//}
 	}
 }
 
@@ -162,10 +162,7 @@ void ANewtonWorldActor::StartGame()
 void ANewtonWorldActor::Cleanup()
 {
 	m_world->Sync();
-
 	UWorld* const world = GetWorld();
-
-	m_world->Sync();
 
 	// remove all joints body actors.
 	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
@@ -201,17 +198,6 @@ void ANewtonWorldActor::Cleanup()
 				}
 			}
 		}
-	}
-}
-
-void ANewtonWorldActor::Destroyed()
-{
-	Super::Destroyed();
-
-	if (m_world)
-	{
-		m_world->Sync();
-		delete m_world;
 	}
 }
 
@@ -257,7 +243,7 @@ void ANewtonWorldActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyCh
 
 float ANewtonWorldActor::GetSimTime() const
 {
-	return float (m_world->GetAverageUpdateTime());
+	return float (m_world ? m_world->GetAverageUpdateTime(): 0.0f);
 }
 
 void ANewtonWorldActor::ApplySettings()
@@ -288,105 +274,92 @@ void ANewtonWorldActor::ApplySettings()
 	}
 }
 
-// Called every frame
-void ANewtonWorldActor::Tick(float DeltaTime)
+void ANewtonWorldActor::PhysicsTick()
 {
-	Super::Tick(DeltaTime);
+	const ndFloat32 descreteStep = ndFloat32(1.0f) / UpdateRate;
+
+	if (m_timeAccumulator > descreteStep * ndFloat32(2.0f))
+	{
+		// truncate slow frame updates 
+		m_timeAccumulator = m_timeAccumulator - descreteStep * ndFloor(m_timeAccumulator / descreteStep) + descreteStep;
+	}
+
+	UWorld* const world = GetWorld();
+	while (m_timeAccumulator > descreteStep)
+	{
+		m_world->Update(descreteStep);
+		m_world->Sync();
+		m_timeAccumulator -= descreteStep;
+
+		//UE_LOG(LogTemp, Display, TEXT("loop time step %f(ms)  ticks %d"), ndFloat32(microSecondStep) * 1.0e-3f, thicks1 - thicks0);
+	}
 }
 
-// tick surugate
+void ANewtonWorldActor::VisualTick()
+{
+	const ndFloat32 descreteStep = (1.0f / UpdateRate);
+	m_interpolationParam = ndClamp(m_timeAccumulator / descreteStep, ndFloat32(0.0f), ndFloat32(1.0f));
+
+	UWorld* const world = GetWorld();
+	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
+	{
+		AActor* const actor = *actorItr;
+		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
+		{
+			const TSet<UActorComponent*>& components = actor->GetComponents();
+			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
+			{
+				UNewtonRigidBody* const rigidBody = Cast<UNewtonRigidBody>(*it);
+				if (rigidBody)
+				{
+					rigidBody->InterpolateTransform(m_interpolationParam);
+				}
+			}
+		}
+	}
+
+	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
+	{
+		AActor* const actor = *actorItr;
+		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
+		{
+			const TSet<UActorComponent*>& components = actor->GetComponents();
+			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
+			{
+				UNewtonRigidBody* const meshComp = Cast<UNewtonRigidBody>(*it);
+				if (meshComp)
+				{
+					meshComp->CalculateLocalTransform();
+				}
+			}
+		}
+	}
+
+	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
+	{
+		AActor* const actor = *actorItr;
+		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
+		{
+			const TSet<UActorComponent*>& components = actor->GetComponents();
+			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
+			{
+				UNewtonJoint* const joint = Cast<UNewtonJoint>(*it);
+				if (joint)
+				{
+					joint->UpdateTransform();
+				}
+			}
+		}
+	}
+}
+
+// surrogate tick function
 void ANewtonWorldActor::Update(float timestep)
 {
 	if (m_world)
 	{
-		const ndFloat32 descreteStep = (1.0f / UpdateRate);
 		m_timeAccumulator += timestep;
-
-		if (m_timeAccumulator > descreteStep * ndFloat32 (2.0f))
-		{
-			// truncate slow frame updates 
-			m_timeAccumulator = m_timeAccumulator - descreteStep * ndFloor(m_timeAccumulator / descreteStep) + descreteStep;
-		}
-
-		UWorld* const world = GetWorld();
-		while (m_timeAccumulator > descreteStep)
-		{
-			m_world->Update(descreteStep);
-			for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
-			{
-				AActor* const actor = *actorItr;
-				if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
-				{
-					const TSet<UActorComponent*>& components = actor->GetComponents();
-					for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
-					{
-						UNewtonRigidBody* const rigidBody = Cast<UNewtonRigidBody>(*it);
-						if (rigidBody)
-						{
-							rigidBody->InterpolateTransform(m_interpolationParam);
-						}
-					}
-				}
-			}
-
-			m_timeAccumulator -= descreteStep;
-			if (!ConcurrentUpdate)
-			{
-				m_world->Sync();
-			}
-		}
-
-		m_interpolationParam = ndClamp(m_timeAccumulator / descreteStep, ndFloat32(0.0f), ndFloat32(1.0f));
-
-		for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
-		{
-			AActor* const actor = *actorItr;
-			if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
-			{
-				const TSet<UActorComponent*>& components = actor->GetComponents();
-				for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
-				{
-					UNewtonRigidBody* const rigidBody = Cast<UNewtonRigidBody>(*it);
-					if (rigidBody)
-					{
-						rigidBody->InterpolateTransform(m_interpolationParam);
-					}
-				}
-			}
-		}
-
-		for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
-		{
-			AActor* const actor = *actorItr;
-			if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
-			{
-				const TSet<UActorComponent*>& components = actor->GetComponents();
-				for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
-				{
-					UNewtonRigidBody* const meshComp = Cast<UNewtonRigidBody>(*it);
-					if (meshComp)
-					{
-						meshComp->CalculateLocalTransform();
-					}
-				}
-			}
-		}
-
-		for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
-		{
-			AActor* const actor = *actorItr;
-			if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
-			{
-				const TSet<UActorComponent*>& components = actor->GetComponents();
-				for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
-				{
-					UNewtonJoint* const joint = Cast<UNewtonJoint>(*it);
-					if (joint)
-					{
-						joint->UpdateTransform();
-					}
-				}
-			}
-		}
+		PhysicsTick();
+		VisualTick();
 	}
 }

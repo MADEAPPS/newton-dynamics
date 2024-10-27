@@ -1115,6 +1115,7 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 			pivotMatrix = matrix * pivotMatrix;
 		}
 
+		ndAssert(0);
 		const nd::TiXmlElement* const newtonEx = (nd::TiXmlElement*)jointNode->FirstChild("newton");
 		if (newtonEx)
 		{

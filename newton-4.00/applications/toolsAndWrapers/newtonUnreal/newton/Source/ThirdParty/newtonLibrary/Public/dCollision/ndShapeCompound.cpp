@@ -249,7 +249,6 @@ void ndShapeCompound::ndTreeArray::AddNode(ndNodeBase* const node, ndInt32 index
 {
 	ndTreeArray::ndNode* const myNode = Insert(node, index);
 	node->m_myNode = myNode;
-	//node->m_shapeInstance->m_parent____ = parent;
 	node->m_shapeInstance->m_subCollisionHandle = myNode;
 }
 
@@ -260,7 +259,6 @@ ndShapeCompound::ndShapeCompound()
 	,m_boxMinRadius(ndFloat32(0.0f))
 	,m_boxMaxRadius(ndFloat32(0.0f))
 	,m_root(nullptr)
-	//,m_ownerInstance(nullptr)
 	,m_idIndex(0)
 {
 }
@@ -272,7 +270,6 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source)
 	,m_boxMinRadius(ndFloat32(0.0f))
 	,m_boxMaxRadius(ndFloat32(0.0f))
 	,m_root(nullptr)
-	//,m_ownerInstance(m_ownerInstance)
 	,m_idIndex(0)
 {
 	ndTreeArray::Iterator iter(source.m_array);

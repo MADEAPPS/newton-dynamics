@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __NDG_CONVEXHULL_2D__
-#define __NDG_CONVEXHULL_2D__
+#ifndef __ND_CONVEXHULL_2D_H__
+#define __ND_CONVEXHULL_2D_H__
 
 #include "ndCoreStdafx.h"
 #include "ndVector.h"
