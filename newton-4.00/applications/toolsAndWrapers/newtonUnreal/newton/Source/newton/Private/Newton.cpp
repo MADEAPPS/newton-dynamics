@@ -530,8 +530,8 @@ bool FnewtonModule::Tick(float timestep)
 	if (newtonWorld)
 	{
 		char tmp[256];
-		float simTime = newtonWorld->GetSimTime() * 1.0e3f;
-		snprintf(tmp, sizeof(tmp), "timestep:%f(ms)   physicsTime:%f(ms)", timestep * 1.0e3f, simTime);
+		float simTime = newtonWorld->GetSimTime();
+		snprintf(tmp, sizeof(tmp), "timestep:%f(ms)   physicsTime:%f(ms)", timestep * 1.0e3f, simTime * 1.0e3f);
 
 		FString msg(tmp);
 		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 0.0f, FColor::Yellow, msg);
