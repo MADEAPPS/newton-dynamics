@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "NewtonWorldActor.generated.h"
 
+class ndWorld;
+class NewtonWorld;
 class UDynamicMesh;
 
 UENUM()
@@ -15,21 +17,17 @@ enum class SolverModeTypes : uint8
 	soaSimd,
 };
 
-class ndWorld;
-
 UCLASS( ClassGroup = NewtonActors, meta=(BlueprintSpawnableComponent) )
 class ANewtonWorldActor : public AActor
 {
 	GENERATED_BODY()
-	
-	class NewtonWorld;
+
 	public:	
 	// Sets default values for this actor's properties
 	ANewtonWorldActor();
 
 	ndWorld* GetNewtonWorld() const;
 
-	protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -67,12 +65,7 @@ class ANewtonWorldActor : public AActor
 	void Cleanup();
 	void StartGame();
 
-	void VisualTick();
-	void PhysicsTick();
-
 	NewtonWorld* m_world;
-	float m_timeAccumulator;
-	float m_interpolationParam;
 	bool m_beginPlay;
 
 	friend class FnewtonModule;

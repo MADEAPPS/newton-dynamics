@@ -236,6 +236,23 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 	levelEditor.BroadcastRedrawViewports(false);
 }
 
+void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const landscapeProxy)
+{
+	const TArray<TObjectPtr<ULandscapeHeightfieldCollisionComponent>>& landScapeTiles = landscapeProxy->CollisionComponents;
+	for (ndInt32 i = 0; i < landScapeTiles.Num(); ++i)
+	{
+		const TObjectPtr<ULandscapeHeightfieldCollisionComponent>& tile = landScapeTiles[i];
+		UNewtonCollisionLandscape* const collisionTile = Cast<UNewtonCollisionLandscape>(AddComponentByClass(UNewtonCollisionLandscape::StaticClass(), false, FTransform(), true));
+		FinishAddComponent(collisionTile, false, FTransform());
+		AddInstanceComponent(collisionTile);
+		collisionTile->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
+
+		collisionTile->InitStaticMeshCompoment(tile);
+		collisionTile->MarkRenderDynamicDataDirty();
+		collisionTile->NotifyMeshUpdated();
+	}
+}
+
 void ANewtonSceneActor::GenerateStaticMeshCollision(const AActor* const actor)
 {
 	TArray<TObjectPtr<USceneComponent>> stack;
@@ -261,23 +278,6 @@ void ANewtonSceneActor::GenerateStaticMeshCollision(const AActor* const actor)
 	{
 		TObjectPtr<UStaticMeshComponent>meshComponent(staticMesh[i]);
 		CreateCollisionFromUnrealPrimitive(meshComponent);
-	}
-}
-
-void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const landscapeProxy)
-{
-	const TArray<TObjectPtr<ULandscapeHeightfieldCollisionComponent>>& landScapeTiles = landscapeProxy->CollisionComponents;
-	for (ndInt32 i = 0; i < landScapeTiles.Num(); ++i)
-	{
-		const TObjectPtr<ULandscapeHeightfieldCollisionComponent>& tile = landScapeTiles[i];
-		UNewtonCollisionLandscape* const collisionTile = Cast<UNewtonCollisionLandscape>(AddComponentByClass(UNewtonCollisionLandscape::StaticClass(), false, FTransform(), true));
-		FinishAddComponent(collisionTile, false, FTransform());
-		AddInstanceComponent(collisionTile);
-		collisionTile->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
-
-		collisionTile->InitStaticMeshCompoment(tile);
-		collisionTile->MarkRenderDynamicDataDirty();
-		collisionTile->NotifyMeshUpdated();
 	}
 }
 

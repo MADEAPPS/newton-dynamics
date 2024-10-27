@@ -31,17 +31,26 @@
 #pragma warning( disable : 4355)
 #endif
 
-ndThread::ndThread()
+ndThreadInterface::ndThreadInterface()
 	:ndClassAlloc()
-	,ndThreadName()
 	,ndSemaphore()
+{
+}
+
+ndThreadInterface::~ndThreadInterface()
+{
+}
+
+
+ndThread::ndThread()
+	:ndThreadInterface()
 #ifndef D_USE_THREAD_EMULATION
 	,ndAtomic<bool>(true)
 	,std::condition_variable()
 	,std::thread(&ndThread::ThreadFunctionCallback, this)
 #endif
 {
-	strcpy (m_name, "newtonWorker");
+	strcpy (m_name.m_name, "newtonWorker");
 #ifndef D_USE_THREAD_EMULATION
 	store(false);
 #endif
@@ -57,7 +66,7 @@ ndThread::~ndThread()
 
 void ndThread::SetName(const char* const name)
 {
-	strncpy(m_name, name, sizeof(m_name) - 1);
+	strncpy(m_name.m_name, name, sizeof(m_name) - 1);
 #if defined(_MSC_VER) && !defined (D_USE_THREAD_EMULATION)
 	// a hideous way to set the thread name, bu this is how Microsoft does it
 	const DWORD MS_VC_EXCEPTION = 0x406D1388;
@@ -101,6 +110,10 @@ void ndThread::Signal()
 #ifndef D_USE_THREAD_EMULATION
 	ndSemaphore::Signal();
 #endif
+}
+
+void ndThread::Release()
+{
 }
 
 void ndThread::ThreadFunctionCallback()

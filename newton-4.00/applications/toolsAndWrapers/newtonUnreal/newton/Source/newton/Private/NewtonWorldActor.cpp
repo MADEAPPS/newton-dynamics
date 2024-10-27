@@ -8,51 +8,14 @@
 #include "Kismet/GameplayStatics.h"
 #include "Interfaces/IPluginManager.h"
 
+#include "NewtonWorld.h"
 #include "NewtonJoint.h"
 #include "NewtonRigidBody.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
-class ANewtonWorldActor::NewtonWorld: public ndWorld
-{
-	public:
-	NewtonWorld(ANewtonWorldActor* const owner)
-		:ndWorld()
-		,m_owner(owner)
-	{
-	}
-
-	virtual ~NewtonWorld()
-	{
-	}
-
-	virtual void UpdateTransforms()
-	{
-		ndWorld::UpdateTransforms();
-
-		const ndArray<ndBodyKinematic*>& bodyList = GetBodyList().GetView();
-		for (ndInt32 i = bodyList.GetCount() - 1; i >= 0; --i)
-		{
-			ndBodyKinematic* const body = bodyList[i];
-			ndBodyNotify* const notify = body->GetNotifyCallback();
-			if (notify)
-			{
-				UNewtonRigidBody* const meshComp = Cast<UNewtonRigidBody>((USceneComponent*)notify->GetUserData());
-				if (meshComp)
-				{
-					meshComp->UpdateTransform();
-				}
-			}
-		}
-	}
-
-	ANewtonWorldActor* m_owner;
-};
-
 // Sets default values
 ANewtonWorldActor::ANewtonWorldActor()
 	:m_world(nullptr)
-	,m_timeAccumulator(0.0f)
-	,m_interpolationParam(1.0f)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	//PrimaryActorTick.bCanEverTick = true;
@@ -72,7 +35,7 @@ ANewtonWorldActor::ANewtonWorldActor()
 
 ndWorld* ANewtonWorldActor::GetNewtonWorld() const
 {
-	return m_world;
+	return m_world ? m_world->GetNewtonWorld() : nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -120,43 +83,10 @@ void ANewtonWorldActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void ANewtonWorldActor::StartGame()
 {
 	m_beginPlay = false;
-
-	check(m_world);
-
-	m_world->Sync();
-	
-	UWorld* const world = GetWorld();
-	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
+	if (m_world)
 	{
-		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
-		{
-			const TSet<UActorComponent*>& components = actor->GetComponents();
-			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
-			{
-				UNewtonRigidBody* const meshComp = Cast<UNewtonRigidBody>(*it);
-				if (meshComp)
-				{
-					meshComp->CreateRigidBody(this, AutoSleepMode);
-				}
-			}
-		}
+		m_world->StartGame();
 	}
-	
-	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
-	{
-		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
-		{
-			UNewtonJoint* const component = Cast<UNewtonJoint>(actor->FindComponentByClass(UNewtonJoint::StaticClass()));
-			if (component)
-			{
-				component->CreateJoint(this);
-			}
-		}
-	}
-	
-	m_timeAccumulator = 0.0f;
 }
 
 void ANewtonWorldActor::Cleanup()
@@ -248,108 +178,9 @@ float ANewtonWorldActor::GetSimTime() const
 
 void ANewtonWorldActor::ApplySettings()
 {
-	m_world->Sync();
-	
-	ndWorld::ndSolverModes mode = ndWorld::ndStandardSolver;
-	switch(SolverMode)
+	if (m_world)
 	{
-		case SolverModeTypes::scalar:
-			mode = ndWorld::ndStandardSolver;
-			break;
-		case SolverModeTypes::soaSimd:
-			mode = ndWorld::ndSimdSoaSolver;
-			break;
-	};
-	
-	m_world->SelectSolver(mode);
-	m_world->SetSubSteps(SolverPasses);
-	m_world->SetThreadCount(ParallelThreads);
-	m_world->SetSolverIterations(SolverIterations);
-	
-	const ndBodyListView& bodyList = m_world->GetBodyList();
-	for (ndBodyListView::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
-	{
-		ndBodyKinematic* const body = node->GetInfo()->GetAsBodyKinematic();
-		body->SetAutoSleep(AutoSleepMode);
-	}
-}
-
-void ANewtonWorldActor::PhysicsTick()
-{
-	const ndFloat32 descreteStep = ndFloat32(1.0f) / UpdateRate;
-
-	if (m_timeAccumulator > descreteStep * ndFloat32(2.0f))
-	{
-		// truncate slow frame updates 
-		m_timeAccumulator = m_timeAccumulator - descreteStep * ndFloor(m_timeAccumulator / descreteStep) + descreteStep;
-	}
-
-	UWorld* const world = GetWorld();
-	while (m_timeAccumulator > descreteStep)
-	{
-		m_world->Update(descreteStep);
-		m_world->Sync();
-		m_timeAccumulator -= descreteStep;
-
-		//UE_LOG(LogTemp, Display, TEXT("loop time step %f(ms)  ticks %d"), ndFloat32(microSecondStep) * 1.0e-3f, thicks1 - thicks0);
-	}
-}
-
-void ANewtonWorldActor::VisualTick()
-{
-	const ndFloat32 descreteStep = (1.0f / UpdateRate);
-	m_interpolationParam = ndClamp(m_timeAccumulator / descreteStep, ndFloat32(0.0f), ndFloat32(1.0f));
-
-	UWorld* const world = GetWorld();
-	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
-	{
-		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
-		{
-			const TSet<UActorComponent*>& components = actor->GetComponents();
-			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
-			{
-				UNewtonRigidBody* const rigidBody = Cast<UNewtonRigidBody>(*it);
-				if (rigidBody)
-				{
-					rigidBody->InterpolateTransform(m_interpolationParam);
-				}
-			}
-		}
-	}
-
-	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
-	{
-		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
-		{
-			const TSet<UActorComponent*>& components = actor->GetComponents();
-			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
-			{
-				UNewtonRigidBody* const meshComp = Cast<UNewtonRigidBody>(*it);
-				if (meshComp)
-				{
-					meshComp->CalculateLocalTransform();
-				}
-			}
-		}
-	}
-
-	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
-	{
-		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
-		{
-			const TSet<UActorComponent*>& components = actor->GetComponents();
-			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
-			{
-				UNewtonJoint* const joint = Cast<UNewtonJoint>(*it);
-				if (joint)
-				{
-					joint->UpdateTransform();
-				}
-			}
-		}
+		m_world->ApplySettings();
 	}
 }
 
@@ -358,8 +189,6 @@ void ANewtonWorldActor::Update(float timestep)
 {
 	if (m_world)
 	{
-		m_timeAccumulator += timestep;
-		PhysicsTick();
-		VisualTick();
+		m_world->Update(timestep);
 	}
 }

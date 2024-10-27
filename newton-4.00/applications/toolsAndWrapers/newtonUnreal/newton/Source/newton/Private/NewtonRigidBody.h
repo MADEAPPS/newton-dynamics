@@ -44,6 +44,10 @@ class UNewtonRigidBody : public USceneComponent
 	public:
 	// Sets default values for this component's properties
 	UNewtonRigidBody();
+	void UpdateTransform();
+	void CalculateLocalTransform();
+	void InterpolateTransform(float param);
+	void CreateRigidBody(ANewtonWorldActor* const worldActor, bool overrideAutoSleep);
 
 	protected:
 	// Called every frame
@@ -56,17 +60,15 @@ class UNewtonRigidBody : public USceneComponent
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
-	void UpdateTransform();
 	void DestroyRigidBody();
-	void CalculateLocalTransform();
+	
 	void DrawGizmo(float timestep);
-	void InterpolateTransform(float param);
 
 	virtual void ClearDebug();
 	virtual void ActivateDebug();
 	virtual void ApplyPropertyChanges();
 	ndMatrix CalculateInertiaMatrix() const;
-	void CreateRigidBody(ANewtonWorldActor* const worldActor, bool overrideAutoSleep);
+
 	virtual ndShapeInstance* CreateCollision(const ndMatrix& bodyMatrix) const;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
