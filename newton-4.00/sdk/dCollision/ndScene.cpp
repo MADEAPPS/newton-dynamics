@@ -46,7 +46,8 @@ ndVector ndScene::m_angularContactError2(D_CONTACT_ANGULAR_ERROR * D_CONTACT_ANG
 ndVector ndScene::m_linearContactError2(D_CONTACT_TRANSLATION_ERROR * D_CONTACT_TRANSLATION_ERROR);
 
 ndScene::ndScene()
-	:ndThreadPool("newtonWorker")
+	:ndClassAlloc()
+	,ndThreadPool("newtonWorker")
 	,m_bodyList()
 	,m_particleSetList()
 	,m_contactArray()
@@ -77,7 +78,8 @@ ndScene::ndScene()
 }
 
 ndScene::ndScene(const ndScene& src)
-	:ndThreadPool("newtonWorker")
+	:ndClassAlloc()
+	,ndThreadPool("newtonWorker")
 	,m_bodyList(src.m_bodyList)
 	,m_particleSetList()
 	,m_contactArray(src.m_contactArray)

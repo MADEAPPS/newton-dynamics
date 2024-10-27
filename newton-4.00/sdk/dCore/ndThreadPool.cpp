@@ -26,6 +26,28 @@
 #include "ndThreadPool.h"
 #include "ndThreadSyncUtils.h"
 
+class ndThreadPool::ndMainThread: public ndThread
+{
+	public:
+	ndMainThread(ndThreadPool* const owner)
+		:ndThread()
+		,m_owner(owner)
+	{
+	}
+
+	void ThreadFunction() override
+	{
+		m_owner->ThreadFunction();
+	}
+
+	virtual void Release() 
+	{
+		m_owner->Release();
+	}
+
+	ndThreadPool* const m_owner;
+};
+
 ndThreadPool::ndWorker::ndWorker()
 	:ndThread()
 	,m_owner(nullptr)
@@ -112,19 +134,21 @@ void ndThreadPool::ndWorker::ThreadFunction()
 
 ndThreadPool::ndThreadPool(const char* const baseName)
 	:ndSyncMutex()
-	,ndThread()
+	,m_main(nullptr)
 	,m_workers(nullptr)
 	,m_count(0)
 {
 	char name[256];
+	m_main = new ndMainThread(this);
 	strncpy(m_baseName, baseName, sizeof (m_baseName));
 	snprintf(name, sizeof (name), "%s_%d", m_baseName, 0);
-	SetName(name);
+	m_main->SetName(name);
 }
 
 ndThreadPool::~ndThreadPool()
 {
 	SetThreadCount(0);
+	delete m_main;
 }
 
 ndInt32 ndThreadPool::GetMaxThreads()
@@ -147,21 +171,29 @@ void ndThreadPool::SetThreadCount(ndInt32 count)
 	{
 		if (m_workers)
 		{
+			//m_count = 0;
+			//delete[] m_workers;
+			//m_workers = nullptr;
+			for (ndInt32 i = m_count - 1; i >= 0; --i)
+			{
+				m_workers[i] = ndSharedPtr<ndWorker>(nullptr);
+			}
 			m_count = 0;
 			delete[] m_workers;
-			m_workers = nullptr;
 		}
 		if (count)
 		{
 			m_count = count;
-			m_workers = new ndWorker[size_t(count)];
+			//m_workers = new ndWorker[size_t(count)];
+			m_workers = new ndSharedPtr<ndWorker>[size_t(count)];
 			for (ndInt32 i = 0; i < count; ++i)
 			{
 				char name[256];
-				m_workers[i].m_owner = this;
-				m_workers[i].m_threadIndex = i;
+				m_workers[i] = ndSharedPtr<ndWorker>(new ndWorker);
+				m_workers[i]->m_owner = this;
+				m_workers[i]->m_threadIndex = i;
 				snprintf(name, sizeof(name), "%s_%d", m_baseName, i + 1);
-				m_workers[i].SetName(name);
+				m_workers[i]->SetName(name);
 			}
 		}
 	}
@@ -173,7 +205,7 @@ void ndThreadPool::Begin()
 	D_TRACKTIME();
 	for (ndInt32 i = 0; i < m_count; ++i)
 	{
-		m_workers[i].Signal();
+		m_workers[i]->Signal();
 	}
 
 	auto BeginJobs = ndMakeObject::ndFunction([this](ndInt32, ndInt32)
@@ -188,9 +220,9 @@ void ndThreadPool::End()
 	#ifndef	D_USE_THREAD_EMULATION
 	for (ndInt32 i = 0; i < m_count; ++i)
 	{
-		m_workers[i].ExecuteTask(nullptr);
+		m_workers[i]->ExecuteTask(nullptr);
 		#if !defined(D_USE_SYNC_SEMAPHORE)
-		m_workers[i].m_begin = 0;
+		m_workers[i]->m_begin = 0;
 		#endif
 	}
 
@@ -200,7 +232,7 @@ void ndThreadPool::End()
 		ndUnsigned8 looping = 0;
 		for (ndInt32 i = 0; i < m_count; ++i)
 		{
-			looping = ndUnsigned8(looping | m_workers[i].m_stillLooping);
+			looping = ndUnsigned8(looping | m_workers[i]->m_stillLooping);
 		}
 		stillLooping = ndUnsigned8(stillLooping & looping);
 		if (m_count)
@@ -216,10 +248,20 @@ void ndThreadPool::Release()
 	ndSyncMutex::Release();
 }
 
+void ndThreadPool::Finish()
+{
+	m_main->Finish();
+}
+
+void ndThreadPool::Signal()
+{
+	m_main->Signal();
+}
+
 void ndThreadPool::TickOne()
 {
 	ndSyncMutex::Tick();
-	ndSemaphore::Signal();
+	m_main->ndSemaphore::Signal();
 #ifdef D_USE_THREAD_EMULATION	
 	ThreadFunction();
 #endif
@@ -234,7 +276,7 @@ void ndThreadPool::WaitForWorkers()
 		ndUnsigned8 inProgess = 0;
 		for (ndInt32 i = 0; i < m_count; ++i)
 		{
-			inProgess = ndUnsigned8(inProgess | (m_workers[i].IsTaskInProgress()));
+			inProgess = ndUnsigned8(inProgess | (m_workers[i]->IsTaskInProgress()));
 		}
 		jobsInProgress = ndUnsigned8 (jobsInProgress & inProgess);
 		if (jobsInProgress)
