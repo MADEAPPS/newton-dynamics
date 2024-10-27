@@ -122,6 +122,7 @@ class ndWorld: public ndClassAlloc
 
 	private:
 	void ThreadFunction();
+	void DeleteDeferredObjects();
 	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();

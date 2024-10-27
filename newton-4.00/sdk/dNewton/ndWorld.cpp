@@ -154,6 +154,7 @@ ndWorld::ndWorld()
 
 ndWorld::~ndWorld()
 {
+	DeleteDeferredObjects();
 	CleanUp();
 
 	delete m_scene;
@@ -428,15 +429,9 @@ ndInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const j
 	return 0;
 }
 
-void ndWorld::ThreadFunction()
+void ndWorld::DeleteDeferredObjects()
 {
-	D_TRACKTIME();
-	ndUnsigned64 timeAcc = ndGetTimeInMicroseconds();
-
-	m_inUpdate = true;
-	m_scene->Begin();
-
-	// clean up all batched deletd objects, before update
+	// clean up all batched deleted objects, before update
 	while (m_deletedModels.GetCount())
 	{
 		D_TRACKTIME();
@@ -486,6 +481,16 @@ void ndWorld::ThreadFunction()
 		ndSharedPtr<ndBody> sharedBody(GetBody(body));
 		RemoveBody(sharedBody);
 	}
+}
+
+void ndWorld::ThreadFunction()
+{
+	D_TRACKTIME();
+	ndUnsigned64 timeAcc = ndGetTimeInMicroseconds();
+
+	m_inUpdate = true;
+	m_scene->Begin();
+	DeleteDeferredObjects();
 
 	//m_inUpdate = true;
 	//m_scene->Begin();
