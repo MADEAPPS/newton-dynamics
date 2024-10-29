@@ -55,7 +55,7 @@ class ndSceneTreeNotiFy : public ndClassAlloc
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
-class ndScene : public ndClassAlloc, public ndThreadPool
+class ndScene : public ndThreadPool
 {
 	protected:
 	class ndContactPairs
@@ -162,7 +162,6 @@ class ndScene : public ndClassAlloc, public ndThreadPool
 	ndArray<ndBodyKinematic*> m_sceneBodyArray;
 	ndArray<ndConstraint*> m_activeConstraintArray;
 	ndSpecialList<ndBodyKinematic> m_specialUpdateList;
-	ndThreadBackgroundWorker m_backgroundThread;
 	ndArray<ndContactPairs> m_newPairs;
 	ndArray<ndContactPairs> m_partialNewPairs[D_MAX_THREADS_COUNT];
 	ndPolygonMeshDesc::ndStaticMeshFaceQuery m_staticMeshQuery[D_MAX_THREADS_COUNT];
@@ -172,6 +171,7 @@ class ndScene : public ndClassAlloc, public ndThreadPool
 	ndBvhNode* m_rootNode;
 	ndBodyKinematic* m_sentinelBody;
 	ndContactNotify* m_contactNotifyCallback;
+	ndThreadBackgroundWorker* m_backgroundThread;
 	
 	ndFloat32 m_timestep;
 	ndUnsigned32 m_lru;

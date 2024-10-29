@@ -52,7 +52,7 @@ void ndTriangulatePolygon(ndVector* const points, ndInt32 count, ndArray<ndInt32
 	polyhedra.EndFace();
 
 	ndPolyhedra leftOversOut;
-	polyhedra.Triangulate(&vertexBuffer[0].m_x, sizeof(ndBigVector), &leftOversOut);
+	polyhedra.Triangulate(&vertexBuffer[0].m_x, sizeof (ndBigVector), &leftOversOut);
 
 	ndInt32 mark = polyhedra.IncLRU();
 	ndPolyhedra::Iterator it(polyhedra);

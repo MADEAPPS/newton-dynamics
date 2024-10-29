@@ -128,7 +128,7 @@ inline ndMatrix::ndMatrix (const ndVector &front, const ndVector &up, const ndVe
 {
 }
 
-inline ndVector& ndMatrix::operator[] (ndInt32 i)
+inline ndVector& ndMatrix::operator[] (ndInt32  i)
 {
 	ndAssert (i < 4);
 	ndAssert (i >= 0);

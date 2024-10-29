@@ -29,9 +29,6 @@
 #include "ndSyncMutex.h"
 #include "ndSemaphore.h"
 #include "ndClassAlloc.h"
-#include "ndThreadSyncUtils.h"
-#include "ndContainersAlloc.h"
-#include "ndSharedPtr.h"
 
 //#define	D_USE_SYNC_SEMAPHORE
 
@@ -66,20 +63,16 @@ class ndTask
 	virtual void Execute() const = 0;
 };
 
-D_MSV_NEWTON_ALIGN_32
-//class ndThreadPool: public ndSyncMutex, public ndThread
-class ndThreadPool: public ndSyncMutex
+class ndThreadPool: public ndSyncMutex, public ndThread
 {
-	class ndMainThread;
-
 	class ndWorker: public ndThread
 	{
 		public:
 		D_CORE_API ndWorker();
 		D_CORE_API virtual ~ndWorker();
 
-		D_CORE_API virtual ndUnsigned8 IsTaskInProgress() const;
-		D_CORE_API virtual void ExecuteTask(ndTask* const task);
+		D_CORE_API ndUnsigned8 IsTaskInProgress() const;
+		D_CORE_API void ExecuteTask(ndTask* const task);
 	
 		private:
 		virtual void ThreadFunction();
@@ -109,10 +102,6 @@ class ndThreadPool: public ndSyncMutex
 	D_CORE_API void TickOne();
 	D_CORE_API void Begin();
 	D_CORE_API void End();
-	D_CORE_API void Signal();
-	D_CORE_API void Finish();
-
-	virtual void ThreadFunction() = 0;
 
 	template <typename Function>
 	void ParallelExecute(const Function& ndFunction);
@@ -121,11 +110,10 @@ class ndThreadPool: public ndSyncMutex
 	D_CORE_API virtual void Release();
 	D_CORE_API virtual void WaitForWorkers();
 
-	ndThreadInterface* m_main;
-	ndSharedPtr<ndWorker>* m_workers;
+	ndWorker* m_workers;
 	ndInt32 m_count;
 	char m_baseName[32];
-}D_GCC_NEWTON_ALIGN_32;
+};
 
 inline ndInt32 ndThreadPool::GetThreadCount() const
 {
@@ -218,8 +206,7 @@ void ndThreadPool::ParallelExecute(const Function& callback)
 		for (ndInt32 i = 0; i < m_count; ++i)
 		{
 			ndTaskImplement<Function>* const job = &jobsArray[i + 1];
-			//m_workers[i].ExecuteTask(job);
-			m_workers[i]->ExecuteTask(job);
+			m_workers[i].ExecuteTask(job);
 		}
 	
 		ndTaskImplement<Function>* const job = &jobsArray[0];

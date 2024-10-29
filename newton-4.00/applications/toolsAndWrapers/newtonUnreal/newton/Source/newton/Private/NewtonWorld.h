@@ -10,6 +10,7 @@ class ndWorld;
 class ANewtonWorldActor;
 
 #define D_USING_UNREAL_TRHEADS
+
 #ifndef D_USING_UNREAL_TRHEADS
 
 class NewtonWorld
@@ -42,6 +43,8 @@ class NewtonWorld: public FRunnable
 {
 	class PhysicsEngine;
 	public:
+	class EngineMainThread;
+
 	NewtonWorld(ANewtonWorldActor* const owner);
 	~NewtonWorld();
 
@@ -68,6 +71,7 @@ class NewtonWorld: public FRunnable
 	std::atomic<float> m_timeAcc;
 	std::atomic<bool> m_active;
 	std::atomic<bool> m_terminated;
+	bool m_initialized;
 };
 
 #endif

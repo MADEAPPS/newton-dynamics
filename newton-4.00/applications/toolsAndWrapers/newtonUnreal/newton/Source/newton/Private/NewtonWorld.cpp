@@ -231,10 +231,14 @@ NewtonWorld::NewtonWorld(ANewtonWorldActor* const owner)
 	,m_timeAcc(0.0f)
 	,m_active(true)
 	,m_terminated(false)
+	,m_initialized(false)
 {
 	m_world = new PhysicsEngine;
 	m_worker = FRunnableThread::Create(this, TEXT("newtonUnrealGlue"));
 	check(m_worker);
+
+	// block until thread is initialized.
+	while (!m_initialized);
 }
 
 NewtonWorld::~NewtonWorld()
@@ -270,8 +274,6 @@ bool NewtonWorld::IsTerminated() const
 
 void NewtonWorld::Stop()
 {
-	//UE_LOG(LogTemp, Display, TEXT("thread stops"));
-	//Cleanup();
 	m_active.store(false);
 	while (!IsTerminated());
 }
@@ -286,9 +288,9 @@ uint32 NewtonWorld::Run()
 	ndFloat32 updateRate = m_owner->UpdateRate;
 	const ndFloat32 timestep = (1.0f / updateRate);
 
-	//ndInt32 thicks0 = 0;
-	//ndInt32 thicks1 = 0;
-
+	ndInt32 thicks0 = 0;
+	ndInt32 thicks1 = 0;
+	m_initialized = true;
 	ndUnsigned64 microSeconds0 = ndGetTimeInMicroseconds();
 	ndUnsigned64 deltaMicroSeconds = ndUnsigned64(1.0e6f / updateRate);
 	while (m_active.load())
@@ -314,16 +316,12 @@ uint32 NewtonWorld::Run()
 
 			microSeconds0 += deltaMicroSeconds;
 			//UE_LOG(LogTemp, Display, TEXT("loop time step %f(ms)  ticks %d"), ndFloat32 (microSecondStep) * 1.0e-3f, thicks1 - thicks0);
-			//thicks0 = thicks1;
+			thicks0 = thicks1;
 		}
 
-		//thicks1++;
-		FPlatformProcess::Sleep(0.0f);
+		thicks1++;
+		FPlatformProcess::YieldThread();
 	}
-
-	// one more update to clean up all pending objects
-	//ndWorld::Update(timestep);
-	//Sync();
 	return 0;
 }
 
@@ -348,8 +346,12 @@ void NewtonWorld::ApplySettings() const
 
 	m_world->SelectSolver(mode);
 	m_world->SetSubSteps(m_owner->SolverPasses);
-	m_world->SetThreadCount(m_owner->ParallelThreads);
 	m_world->SetSolverIterations(m_owner->SolverIterations);
+	if (m_world->GetThreadCount() != m_owner->ParallelThreads)
+	{
+		check(0);
+		m_world->SetThreadCount(m_owner->ParallelThreads);
+	}
 
 	const ndBodyListView& bodyList = m_world->GetBodyList();
 	for (ndBodyListView::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
