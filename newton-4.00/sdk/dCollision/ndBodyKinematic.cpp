@@ -284,6 +284,25 @@ void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndShapeInstance& shape
 	SetMassMatrix(mass, inertia);
 }
 
+void ndBodyKinematic::SetIntrinsicMassMatrix(ndFloat32 mass, const ndShapeInstance& shapeInstance, bool fullInertia)
+{
+	const ndMatrix inertia(shapeInstance.CalculateInertia());
+	const ndVector saveCom(inertia.m_posit);
+	//SetCentreOfMass(inertia.m_posit);
+
+	ndShapeInstance instance(shapeInstance);
+	ndMatrix matrix(instance.GetLocalMatrix());
+	matrix.m_posit = ndVector::m_wOne;
+	if (instance.GetShape()->GetAsShapeConvexHull())
+	{
+		matrix.m_posit = saveCom * ndVector::m_negOne;
+		matrix.m_posit.m_w = ndFloat32 (1.0f);
+	}
+	instance.SetLocalMatrix(matrix);
+	SetMassMatrix(mass, instance, fullInertia);
+	SetCentreOfMass(saveCom);
+}
+
 void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia)
 {
 	mass = ndAbs(mass);

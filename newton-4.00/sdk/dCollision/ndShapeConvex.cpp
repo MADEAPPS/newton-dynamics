@@ -190,9 +190,16 @@ ndFloat32 ndShapeConvex::CalculateMassProperties(const ndMatrix& offset, ndVecto
 
 ndMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const
 {
-	if ((ndAbs(localScale.m_x - localScale.m_y) < ndFloat32(1.0e-5f)) && 
-		(ndAbs(localScale.m_x - localScale.m_z) < ndFloat32(1.0e-5f)) && 
-		(ndAbs(localScale.m_y - localScale.m_z) < ndFloat32(1.0e-5f)))
+	bool implicitTest = true;
+	implicitTest = implicitTest && (ndAbs(localScale.m_x - localScale.m_y) < ndFloat32(1.0e-5f));
+	implicitTest = implicitTest && (ndAbs(localScale.m_x - localScale.m_z) < ndFloat32(1.0e-5f));
+	implicitTest = implicitTest && (ndAbs(localScale.m_y - localScale.m_z) < ndFloat32(1.0e-5f));
+	implicitTest = ((ndShape*)this)->GetAsShapeConvexHull() ? false : true;
+
+	//if ((ndAbs(localScale.m_x - localScale.m_y) < ndFloat32(1.0e-5f)) && 
+	//	(ndAbs(localScale.m_x - localScale.m_z) < ndFloat32(1.0e-5f)) && 
+	//	(ndAbs(localScale.m_y - localScale.m_z) < ndFloat32(1.0e-5f)))
+	if (implicitTest)
 	{
 		ndAssert(alignMatrix.TestIdentity());
 	
