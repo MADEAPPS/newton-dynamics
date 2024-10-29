@@ -55,7 +55,7 @@ class ndSceneTreeNotiFy : public ndClassAlloc
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
-class ndScene : public ndClassAlloc, public ndThreadPool
+class ndScene : public ndThreadPool
 {
 	protected:
 	class ndContactPairs

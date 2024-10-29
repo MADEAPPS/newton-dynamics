@@ -31,18 +31,8 @@
 #pragma warning( disable : 4355)
 #endif
 
-ndThreadInterface::ndThreadInterface()
-	:ndClassAlloc()
-{
-}
-
-ndThreadInterface::~ndThreadInterface()
-{
-}
-
-
 ndThread::ndThread()
-	:ndThreadInterface()
+	:ndClassAlloc()
 	,ndSemaphore()
 #ifndef D_USE_THREAD_EMULATION
 	,ndAtomic<bool>(true)
