@@ -33,7 +33,6 @@
 
 ndThreadInterface::ndThreadInterface()
 	:ndClassAlloc()
-	,ndSemaphore()
 {
 }
 
@@ -44,6 +43,7 @@ ndThreadInterface::~ndThreadInterface()
 
 ndThread::ndThread()
 	:ndThreadInterface()
+	,ndSemaphore()
 #ifndef D_USE_THREAD_EMULATION
 	,ndAtomic<bool>(true)
 	,std::condition_variable()

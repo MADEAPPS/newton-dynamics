@@ -36,7 +36,7 @@ class ndThreadName
 	char m_name[32];
 };
 
-class ndThreadInterface: public ndClassAlloc, public ndSemaphore
+class ndThreadInterface: public ndClassAlloc
 {
 	public:
 	D_CORE_API ndThreadInterface();
@@ -53,8 +53,9 @@ class ndThreadInterface: public ndClassAlloc, public ndSemaphore
 };
 
 /// Base class for for all multi thread functionality.
-class ndThread
+class ndThread 
 	:public ndThreadInterface
+	,public ndSemaphore
 #ifndef D_USE_THREAD_EMULATION
 	,public ndAtomic<bool>
 	,public std::condition_variable

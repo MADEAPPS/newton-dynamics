@@ -165,7 +165,7 @@ ndWorld::~ndWorld()
 void ndWorld::CleanUp()
 {
 	Sync();
-	m_scene->m_backgroundThread.Terminate();
+	//m_scene->m_backgroundThread.Terminate();
 	m_scene->PrepareCleanup();
 
 	m_activeSkeletons.Resize(256);
@@ -230,7 +230,12 @@ ndInt32 ndWorld::GetThreadCount() const
 void ndWorld::SetThreadCount(ndInt32 count)
 {
 	m_scene->SetThreadCount(count);
-	m_scene->m_backgroundThread.SetThreadCount(count);
+
+	if (m_scene->m_backgroundThread)
+	{
+		m_scene->m_backgroundThread->Terminate();
+		m_scene->m_backgroundThread->SetThreadCount(count);
+	}
 }
 
 ndInt32 ndWorld::GetSubSteps() const

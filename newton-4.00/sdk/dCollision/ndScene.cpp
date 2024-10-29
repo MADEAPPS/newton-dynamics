@@ -56,12 +56,12 @@ ndScene::ndScene()
 	,m_sceneBodyArray(1024)
 	,m_activeConstraintArray(1024)
 	,m_specialUpdateList()
-	,m_backgroundThread()
 	,m_newPairs(1024)
 	,m_lock()
 	,m_rootNode(nullptr)
 	,m_sentinelBody(nullptr)
 	,m_contactNotifyCallback(new ndContactNotify(nullptr))
+	,m_backgroundThread(nullptr)
 	,m_timestep(ndFloat32 (0.0f))
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_frameNumber(0)
@@ -88,12 +88,12 @@ ndScene::ndScene(const ndScene& src)
 	,m_sceneBodyArray()
 	,m_activeConstraintArray()
 	,m_specialUpdateList()
-	,m_backgroundThread()
 	,m_newPairs(1024)
 	,m_lock()
 	,m_rootNode(nullptr)
 	,m_sentinelBody(nullptr)
 	,m_contactNotifyCallback(nullptr)
+	,m_backgroundThread(nullptr)
 	,m_timestep(ndFloat32(0.0f))
 	,m_lru(src.m_lru)
 	,m_frameNumber(src.m_frameNumber)
@@ -103,7 +103,7 @@ ndScene::ndScene(const ndScene& src)
 	ndScene* const stealData = (ndScene*)&src;
 
 	SetThreadCount(src.GetThreadCount());
-	m_backgroundThread.SetThreadCount(m_backgroundThread.GetThreadCount());
+	//m_backgroundThread.SetThreadCount(m_backgroundThread.GetThreadCount());
 
 	m_scratchBuffer.Swap(stealData->m_scratchBuffer);
 	m_sceneBodyArray.Swap(stealData->m_sceneBodyArray);
@@ -1188,7 +1188,10 @@ void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback, const ndVector& minBo
 void ndScene::Cleanup()
 {
 	Sync();
-	m_backgroundThread.Terminate();
+	if (m_backgroundThread)
+	{
+		m_backgroundThread->Terminate();
+	}
 	PrepareCleanup();
 	
 	m_frameNumber = 0;
@@ -1268,7 +1271,15 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& co
 
 void ndScene::SendBackgroundTask(ndBackgroundTask* const job)
 {
-	m_backgroundThread.SendTask(job);
+	if (m_backgroundThread)
+	{
+		m_backgroundThread->SendTask(job);
+	}
+	else
+	{
+		ndAssert(0);
+		delete job;
+	}
 }
 
 void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndInt32 threadId)
