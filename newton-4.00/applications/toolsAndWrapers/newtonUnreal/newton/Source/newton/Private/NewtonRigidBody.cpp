@@ -225,9 +225,9 @@ void UNewtonRigidBody::ClearDebug()
 void UNewtonRigidBody::ActivateDebug()
 {
 	ShowDebug = true;
-	ShowCenterOfMass = true;
+	//ShowCenterOfMass = true;
 	m_propertyChanged = true;
-	Inertia.ShowPrincipalAxis = true;
+	//Inertia.ShowPrincipalAxis = true;
 
 	ndFixSizeArray<USceneComponent*, 1024> stack;
 	stack.PushBack(this);
@@ -248,145 +248,63 @@ void UNewtonRigidBody::ActivateDebug()
 	}
 }
 
-ndMatrix UNewtonRigidBody::CalculateInertiaMatrix() const
-{
-	ndMatrix inertia(ndGetZeroMatrix());
-	ndArray<ndShapeInstance*> instances;
-	ndFixSizeArray<const USceneComponent*, 1024> stack;
-	stack.PushBack(this);
-
-	bool isDynamics = true;
-	const ndMatrix bodyMatrix(ToNewtonMatrix(GetComponentToWorld()));
-	while (stack.GetCount())
-	{
-		const USceneComponent* const component = stack.Pop();
-		const UNewtonCollision* const collisionComponent = Cast<UNewtonCollision>(component);
-		if (collisionComponent)
-		{
-			check(collisionComponent->m_shape);
-			isDynamics = isDynamics || (!collisionComponent->m_shape->GetAsShapeStaticMesh()) ? true : false;
-
-			ndShapeInstance* const instance = collisionComponent->CreateBodyInstanceShape(bodyMatrix);
-			instances.PushBack(instance);
-		}
-		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
-		for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
-		{
-			stack.PushBack(childrenComp[i].Get());
-		}
-	}
-	if (instances.GetCount() == 1)
-	{
-		if (isDynamics)
-		{
-			inertia = instances[0]->CalculateInertia();
-		}
-		delete instances[0];
-	}
-	else if (instances.GetCount())
-	{
-		ndShapeInstance compoundInstance(new ndShapeCompound());
-		ndShapeCompound* const compound = compoundInstance.GetShape()->GetAsShapeCompound();
-		compound->BeginAddRemove();
-		for (ndInt32 i = ndInt32(instances.GetCount()) - 1; i >= 0; --i)
-		{
-			ndShapeInstance* const subShape = instances[i];
-			if (isDynamics)
-			{
-				compound->AddCollision(subShape);
-			}
-			delete subShape;
-		}
-		compound->EndAddRemove();
-		if (isDynamics)
-		{
-			inertia = compoundInstance.CalculateInertia();
-		}
-	}
-
-	return inertia;
-}
-
 void UNewtonRigidBody::DrawGizmo(float timestep)
 {
-	if (Inertia.ShowPrincipalAxis)
+	if (Inertia.ShowPrincipalAxis && (Mass > 0.0f))
 	{
-		ndMatrix inertiaMatrix(CalculateInertiaMatrix());
-		const ndVector saveCom(inertiaMatrix.m_posit);
-		inertiaMatrix.EigenVectors();
+		ndBodyKinematic body;
+		const ndMatrix matrix(ToNewtonMatrix(m_globalTransform));
+		body.SetMatrix(matrix);
+		ndSharedPtr<ndShapeInstance> shape(CreateCollision(matrix));
 
-		const ndVector centerOfMass(
-			ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM),
-			ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM),
-			ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM),
-			ndFloat32(0.0f));
-		inertiaMatrix.m_posit = saveCom + centerOfMass;
+		FTransform tranform;
+		tranform.SetRotation(FQuat(Inertia.PrincipalInertiaAxis));
+		const ndMatrix shapeMatrix(ToNewtonMatrix(tranform));
+		shape->SetLocalMatrix(shapeMatrix * shape->GetLocalMatrix());
 
-		const FTransform tranform(GetComponentToWorld());
-		const ndMatrix matrix(ToNewtonMatrix(tranform));
+		bool fullInertia = ndAbs(Inertia.PrincipalInertiaAxis.Pitch) > 0.1f;
+		fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Yaw) > 0.1f);
+		fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Roll) > 0.1f);
+		body.SetIntrinsicMassMatrix(Mass, **shape, fullInertia);
 
-		FTransform offsetInertia;
-		offsetInertia.SetRotation(Inertia.PrincipalInertiaAxis.Quaternion());
-		const ndMatrix offsetMatrix(ToNewtonMatrix(offsetInertia));
+		ndVector centerOfGravity(body.GetCentreOfMass());
+		centerOfGravity += ndVector(ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
+		centerOfGravity = matrix.TransformVector(centerOfGravity);
 
-		const ndMatrix axisMatrix(offsetMatrix * inertiaMatrix * matrix);
-		const FTransform inertiaAxisTransform (ToUnRealTransform(axisMatrix));
-		const FVector axisLoc(inertiaAxisTransform.GetLocation());
-		const FRotator axisRot(inertiaAxisTransform.GetRotation());
+		body.SetMatrix(ndGetIdentityMatrix());
+		ndMatrix inertia(body.CalculateInertiaMatrix());
+		inertia.EigenVectors();
+		const ndMatrix axisMatrix(inertia * matrix);
+		const FTransform axisTranform(ToUnRealTransform(axisMatrix));
+		const FRotator axisRot(axisTranform.GetRotation());
+		const FVector axisLoc(centerOfGravity.m_x * UNREAL_UNIT_SYSTEM, centerOfGravity.m_y * UNREAL_UNIT_SYSTEM, centerOfGravity.m_z * UNREAL_UNIT_SYSTEM);
 		DrawDebugCoordinateSystem(GetWorld(), axisLoc, axisRot, DebugScale * UNREAL_UNIT_SYSTEM, false, timestep);
 	}
 
-	if (ShowCenterOfMass)
+	if (ShowCenterOfMass && (Mass > 0.0f))
 	{
-		ndVector positVolume(ndFloat32(0.0f));
-		if (m_body)
-		{
-			positVolume = m_body->GetCentreOfMass();
-		}
-		else
-		{
-			ndFixSizeArray<USceneComponent*, 1024> stack;
-			stack.PushBack(this);
+		ndBodyKinematic body;
+		ndMatrix matrix(ToNewtonMatrix(m_globalTransform));
+		body.SetMatrix(matrix);
+		ndSharedPtr<ndShapeInstance> shape(CreateCollision(matrix));
 
-			const FTransform tranform(GetComponentToWorld());
-			const ndMatrix bodyMatrix(ToNewtonMatrix(tranform));
+		//FTransform tranform;
+		//tranform.SetRotation(FQuat(Inertia.PrincipalInertiaAxis));
+		//const ndMatrix shapeMatrix(ToNewtonMatrix(tranform));
+		//shape->SetLocalMatrix(shapeMatrix * shape->GetLocalMatrix());
 
-			ndFloat32 volume = ndFloat32(0.0f);
-			while (stack.GetCount())
-			{
-				const USceneComponent* const component = stack.Pop();
-				const UNewtonCollision* const shape = Cast<UNewtonCollision>(component);
-				if (shape)
-				{
-					const ndVector pv(shape->GetVolumePosition(bodyMatrix));
-					volume += pv.m_w;
-					positVolume += pv.Scale (pv.m_w);
-				}
+		bool fullInertia = ndAbs(Inertia.PrincipalInertiaAxis.Pitch) > 0.1f;
+		fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Yaw) > 0.1f);
+		fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Roll) > 0.1f);
 
-				const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
-				for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
-				{
-					stack.PushBack(childrenComp[i].Get());
-				}
-			}
-			volume = ndMax (volume, ndFloat32(1.0e-3f));
-			positVolume = positVolume.Scale(ndFloat32(1.0f) / volume);
+		body.SetIntrinsicMassMatrix(Mass, **shape, fullInertia);
+		ndVector centerOfGravity(body.GetCentreOfMass());
+		centerOfGravity += ndVector(ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
+		centerOfGravity = matrix.TransformVector(centerOfGravity);
 
-			const ndVector centerOfMass(
-				ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), 
-				ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), 
-				ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM),
-				ndFloat32(0.0f));
-			positVolume += centerOfMass;
-			positVolume.m_w = ndFloat32(1.0f);
-		}
-
-		const FTransform tranform(GetComponentToWorld());
-		const ndMatrix matrix(ToNewtonMatrix(tranform));
-		positVolume = matrix.TransformVector(positVolume);
-
+		const FTransform tranform(ToUnRealTransform(matrix));
 		const FRotator axisRot(tranform.GetRotation());
-		const FVector axisLoc(positVolume.m_x * UNREAL_UNIT_SYSTEM, positVolume.m_y * UNREAL_UNIT_SYSTEM, positVolume.m_z * UNREAL_UNIT_SYSTEM);
+		const FVector axisLoc(centerOfGravity.m_x * UNREAL_UNIT_SYSTEM, centerOfGravity.m_y * UNREAL_UNIT_SYSTEM, centerOfGravity.m_z * UNREAL_UNIT_SYSTEM);
 		DrawDebugCoordinateSystem(GetWorld(), axisLoc, axisRot, DebugScale * UNREAL_UNIT_SYSTEM, false, timestep);
 	}
 
@@ -486,13 +404,8 @@ void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool
 	m_body = new ndBodyDynamic();
 	m_body->SetMatrix(matrix);
 
-	ndShapeInstance* const shape = CreateCollision(matrix);
-	m_body->SetCollisionShape(*shape);
-
-	if (shape->GetShape()->GetAsShapeSphere())
-	{
-		shape->GetShape()->GetAsShapeSphere();
-	}
+	ndSharedPtr<ndShapeInstance> shape(CreateCollision(matrix));
+	m_body->SetCollisionShape(**shape);
 
 	FTransform tranform;
 	tranform.SetRotation(FQuat(Inertia.PrincipalInertiaAxis));
@@ -502,9 +415,20 @@ void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool
 	bool fullInertia = ndAbs(Inertia.PrincipalInertiaAxis.Pitch) > 0.1f;
 	fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Yaw) > 0.1f);
 	fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Roll) > 0.1f);
-	m_body->SetMassMatrix(Mass, *shape, fullInertia);
+
 	m_body->SetAutoSleep(AutoSleepMode && overrideAutoSleep);
 	m_body->SetNotifyCallback(new NotifyCallback(this, ndVector(ndFloat32(Gravity.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Gravity.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Gravity.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f))));
+
+	// Unreal meshes tend to have the origin at the zero value in the z direction,
+	// this causes SetMassMatrix to generate an skew inertia because of the 
+	// perpendicular axis theorem central. 
+	// when in reality the com is a the geometric center 
+	// and the inertia is relative to that point.
+	// SetIntrinsicMassMatrix does that.   
+	m_body->SetIntrinsicMassMatrix(Mass, **shape, fullInertia);
+	ndVector centerOfGravity(m_body->GetCentreOfMass());
+	centerOfGravity += ndVector(ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
+	m_body->SetCentreOfMass(centerOfGravity);
 
 	m_body->SetLinearDamping(LinearDamp);
 	m_body->SetAngularDamping(ndVector(AngularDamp));
@@ -514,13 +438,8 @@ void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool
 	m_body->SetOmega(matrix.RotateVector(omega));
 	m_body->SetVelocity(matrix.RotateVector(veloc));
 
-	ndVector centerOfGravity(m_body->GetCentreOfMass());
-	centerOfGravity += ndVector(ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
-	m_body->SetCentreOfMass(centerOfGravity);
-
-	ndWorld* world = m_newtonWorld->GetNewtonWorld();
+	ndWorld* const world = m_newtonWorld->GetNewtonWorld();
 	world->AddBody(m_body);
-	delete shape;
 
 	AActor* const actor = GetOwner();
 	m_sleeping = false;
@@ -598,11 +517,28 @@ void UNewtonRigidBody::ApplyPropertyChanges()
 	m_localScale = m_localTransform.GetScale3D();
 	m_globalScale = m_globalTransform.GetScale3D();
 
-	const ndMatrix inertiaMatrix(CalculateInertiaMatrix());
-	//float scale = UNREAL_UNIT_SYSTEM * UNREAL_UNIT_SYSTEM * Mass;
-	//show it in MKS units 
-	//(not in centimeters because it is usually too big number)
-	float scale = Mass;
-	const FVector inertia(inertiaMatrix[0][0] * scale, inertiaMatrix[1][1] * scale, inertiaMatrix[2][2] * scale);
-	Inertia.PrincipalInertia = inertia * Inertia.PrincipalInertiaScaler;
+	Inertia.PrincipalInertia = FVector(0.0f, 0.0f, 0.0f);
+	if (Mass > 0.0f)
+	{
+		ndBodyKinematic body;
+		const ndMatrix matrix(ToNewtonMatrix(m_globalTransform));
+		body.SetMatrix(matrix);
+		ndSharedPtr<ndShapeInstance> shape(CreateCollision(matrix));
+
+		FTransform tranform;
+		tranform.SetRotation(FQuat(Inertia.PrincipalInertiaAxis));
+		const ndMatrix shapeMatrix(ToNewtonMatrix(tranform));
+		shape->SetLocalMatrix(shapeMatrix * shape->GetLocalMatrix());
+
+		bool fullInertia = ndAbs(Inertia.PrincipalInertiaAxis.Pitch) > 0.1f;
+		fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Yaw) > 0.1f);
+		fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Roll) > 0.1f);
+
+		body.SetIntrinsicMassMatrix(Mass, **shape, fullInertia);
+		//ndVector centerOfGravity(body->GetCentreOfMass());
+		//centerOfGravity += ndVector(ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
+		ndVector massMatrix(body.GetMassMatrix());
+		ndFloat32 scale2 = UNREAL_UNIT_SYSTEM * UNREAL_UNIT_SYSTEM;
+		Inertia.PrincipalInertia = FVector(massMatrix.m_x * scale2, massMatrix.m_y * scale2, massMatrix.m_z * scale2);
+	}
 }

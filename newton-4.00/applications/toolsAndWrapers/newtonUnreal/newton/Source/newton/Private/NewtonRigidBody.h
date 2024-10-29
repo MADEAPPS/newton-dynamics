@@ -67,7 +67,6 @@ class UNewtonRigidBody : public USceneComponent
 	virtual void ClearDebug();
 	virtual void ActivateDebug();
 	virtual void ApplyPropertyChanges();
-	ndMatrix CalculateInertiaMatrix() const;
 
 	virtual ndShapeInstance* CreateCollision(const ndMatrix& bodyMatrix) const;
 

@@ -39,14 +39,14 @@ class ndShapeCylinder;
 class ndShapeCompound;
 class ndRayCastNotify;
 class ndShapeInstance;
+class ndShapeConvexHull;
 class ndShapeStatic_bvh;
 class ndShapeStaticMesh;
 class ndShapeHeightfield;
-class ndShapeConvexPolygon;
 class ndShapeDebugNotify;
+class ndShapeConvexPolygon;
 class ndShapeChamferCylinder;
 class ndShapeStaticProceduralMesh;
-
 
 enum ndShapeID
 {
@@ -233,6 +233,7 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	virtual ndShapeCompound* GetAsShapeCompound() { return nullptr; }
 	virtual ndShapeStatic_bvh* GetAsShapeStaticBVH() { return nullptr; }
 	virtual ndShapeStaticMesh* GetAsShapeStaticMesh() { return nullptr; }
+	virtual ndShapeConvexHull* GetAsShapeConvexHull() { return nullptr; }
 	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return nullptr; }
 	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon() { return nullptr; }
 	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return nullptr; }
