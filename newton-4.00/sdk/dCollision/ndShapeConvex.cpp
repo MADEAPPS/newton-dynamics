@@ -67,8 +67,10 @@ void ndShapeConvex::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debug
 	ndAssert(m_edgeCount < D_MAX_EDGE_COUNT);
 	ndAssert(m_vertexCount < D_MAX_EDGE_COUNT);
 
-	memset(mark, 0, sizeof(mark));
-	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
+	//memset(mark, 0, sizeof(mark));
+	ndMemSet(mark, ndInt8(0), D_MAX_EDGE_COUNT);
+	//memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
+	ndMemSet(edgeType, ndShapeDebugNotify::m_shared, D_MAX_EDGE_COUNT);
 	matrix.TransformTriplex(&tmp[0].m_x, sizeof(ndVector), &m_vertex[0].m_x, sizeof(ndVector), m_vertexCount);
 	for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 	{
@@ -94,13 +96,15 @@ void ndShapeConvex::SetVolumeAndCG()
 {
 	ndVector faceVertex[D_MAX_EDGE_COUNT];
 	ndInt8* const edgeMarks = ndAlloca(ndInt8, m_edgeCount + 32);
-	memset(&edgeMarks[0], 0, sizeof(ndInt8) * m_edgeCount);
+	//memset(&edgeMarks[0], 0, sizeof(ndInt8) * m_edgeCount);
+	ndMemSet(edgeMarks, ndInt8(0), m_edgeCount);
 
 	ndPolyhedraMassProperties localData;
 	for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 	{
 		ndConvexSimplexEdge* const face = &m_simplex[i];
-		if (!edgeMarks[i]) {
+		if (!edgeMarks[i]) 
+		{
 			ndConvexSimplexEdge* edge = face;
 			ndInt32 count = 0;
 			do 
@@ -194,7 +198,7 @@ ndMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const ndMatrix& alignMat
 	implicitTest = implicitTest && (ndAbs(localScale.m_x - localScale.m_y) < ndFloat32(1.0e-5f));
 	implicitTest = implicitTest && (ndAbs(localScale.m_x - localScale.m_z) < ndFloat32(1.0e-5f));
 	implicitTest = implicitTest && (ndAbs(localScale.m_y - localScale.m_z) < ndFloat32(1.0e-5f));
-	implicitTest = ((ndShape*)this)->GetAsShapeConvexHull() ? false : true;
+	implicitTest = implicitTest && (((ndShape*)this)->GetAsShapeConvexHull() ? false : true);
 
 	//if ((ndAbs(localScale.m_x - localScale.m_y) < ndFloat32(1.0e-5f)) && 
 	//	(ndAbs(localScale.m_x - localScale.m_z) < ndFloat32(1.0e-5f)) && 
@@ -298,7 +302,8 @@ ndVector ndShapeConvex::SupportVertex(const ndVector& dir) const
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
 	ndInt16 cache[16];
-	memset(cache, -1, sizeof(cache));
+	//memset(cache, -1, sizeof(cache));
+	ndMemSet(cache, ndInt16(-1), 16);
 	ndConvexSimplexEdge* edge = &m_simplex[0];
 
 	ndInt32 index = edge->m_vertex;
@@ -865,7 +870,8 @@ ndVector ndShapeConvex::CalculateVolumeIntegral(const ndPlane& plane) const
 	ndConvexSimplexEdge* capEdge = nullptr;
 
 	ndVector cg(ndVector::m_zero);
-	memset(mark, 0, m_edgeCount);
+	//memset(mark, 0, m_edgeCount);
+	ndMemSet(mark, ndInt8(0), m_edgeCount);
 	for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 	{
 		if (!mark[i]) 

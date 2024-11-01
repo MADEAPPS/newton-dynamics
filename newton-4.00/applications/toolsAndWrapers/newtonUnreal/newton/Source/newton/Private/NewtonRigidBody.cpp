@@ -271,10 +271,19 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 		centerOfGravity += ndVector(ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
 		centerOfGravity = matrix.TransformVector(centerOfGravity);
 
+		const ndVector massMatrix(body.GetMassMatrix());
+		const ndMatrix hygenAxis(fullInertia ? body.GetPrincipalAxis() : ndGetIdentityMatrix());
+		ndMatrix diagonal(ndGetIdentityMatrix());
+		diagonal[0][0] = massMatrix[0] * Inertia.PrincipalInertiaScaler.X;
+		diagonal[1][1] = massMatrix[1] * Inertia.PrincipalInertiaScaler.Y;
+		diagonal[2][2] = massMatrix[2] * Inertia.PrincipalInertiaScaler.Z;
+		const ndMatrix fullScaledIntertia(hygenAxis.OrthoInverse() * diagonal * hygenAxis);
+		body.SetMassMatrix(Mass, fullScaledIntertia);
+
 		body.SetMatrix(ndGetIdentityMatrix());
-		ndMatrix inertia(body.CalculateInertiaMatrix());
-		inertia.EigenVectors();
-		const ndMatrix axisMatrix(inertia * matrix);
+		ndMatrix inertiaMatrix(body.CalculateInertiaMatrix());
+		inertiaMatrix.EigenVectors();
+		const ndMatrix axisMatrix(inertiaMatrix * matrix);
 		const FTransform axisTranform(ToUnRealTransform(axisMatrix));
 		const FRotator axisRot(axisTranform.GetRotation());
 		const FVector axisLoc(centerOfGravity.m_x * UNREAL_UNIT_SYSTEM, centerOfGravity.m_y * UNREAL_UNIT_SYSTEM, centerOfGravity.m_z * UNREAL_UNIT_SYSTEM);
@@ -415,10 +424,6 @@ void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool
 	bool fullInertia = ndAbs(Inertia.PrincipalInertiaAxis.Pitch) > 0.1f;
 	fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Yaw) > 0.1f);
 	fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Roll) > 0.1f);
-
-	m_body->SetAutoSleep(AutoSleepMode && overrideAutoSleep);
-	m_body->SetNotifyCallback(new NotifyCallback(this, ndVector(ndFloat32(Gravity.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Gravity.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Gravity.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f))));
-
 	// Unreal meshes tend to have the origin at the zero value in the z direction,
 	// this causes SetMassMatrix to generate an skew inertia because of the 
 	// perpendicular axis theorem central. 
@@ -426,9 +431,22 @@ void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool
 	// and the inertia is relative to that point.
 	// SetIntrinsicMassMatrix does that.   
 	m_body->SetIntrinsicMassMatrix(Mass, **shape, fullInertia);
+
+	const ndVector massMatrix(m_body->GetMassMatrix());
+	const ndMatrix hygenAxis(fullInertia ? m_body->GetPrincipalAxis() : ndGetIdentityMatrix());
+	ndMatrix diagonal(ndGetIdentityMatrix());
+	diagonal[0][0] = massMatrix[0] * Inertia.PrincipalInertiaScaler.X;
+	diagonal[1][1] = massMatrix[1] * Inertia.PrincipalInertiaScaler.Y;
+	diagonal[2][2] = massMatrix[2] * Inertia.PrincipalInertiaScaler.Z;
+	const ndMatrix fullScaledIntertia(hygenAxis.OrthoInverse() * diagonal * hygenAxis);
+	m_body->SetMassMatrix(Mass, fullScaledIntertia);
+
 	ndVector centerOfGravity(m_body->GetCentreOfMass());
 	centerOfGravity += ndVector(ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
 	m_body->SetCentreOfMass(centerOfGravity);
+
+	m_body->SetAutoSleep(AutoSleepMode && overrideAutoSleep);
+	m_body->SetNotifyCallback(new NotifyCallback(this, ndVector(ndFloat32(Gravity.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Gravity.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Gravity.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f))));
 
 	m_body->SetLinearDamping(LinearDamp);
 	m_body->SetAngularDamping(ndVector(AngularDamp));
@@ -535,10 +553,18 @@ void UNewtonRigidBody::ApplyPropertyChanges()
 		fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Roll) > 0.1f);
 
 		body.SetIntrinsicMassMatrix(Mass, **shape, fullInertia);
-		//ndVector centerOfGravity(body->GetCentreOfMass());
-		//centerOfGravity += ndVector(ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
-		ndVector massMatrix(body.GetMassMatrix());
+
+		const ndVector massMatrix(body.GetMassMatrix());
+		const ndMatrix hygenAxis(fullInertia ? body.GetPrincipalAxis() : ndGetIdentityMatrix());
+		ndMatrix diagonal(ndGetIdentityMatrix());
+		diagonal[0][0] = massMatrix[0] * Inertia.PrincipalInertiaScaler.X;
+		diagonal[1][1] = massMatrix[1] * Inertia.PrincipalInertiaScaler.Y;
+		diagonal[2][2] = massMatrix[2] * Inertia.PrincipalInertiaScaler.Z;
+		const ndMatrix fullScaledIntertia(hygenAxis.OrthoInverse() * diagonal * hygenAxis);
+		body.SetMassMatrix(Mass, fullScaledIntertia);
+
+		const ndVector scaledMassMatrix(body.GetMassMatrix());
 		ndFloat32 scale2 = UNREAL_UNIT_SYSTEM * UNREAL_UNIT_SYSTEM;
-		Inertia.PrincipalInertia = FVector(massMatrix.m_x * scale2, massMatrix.m_y * scale2, massMatrix.m_z * scale2);
+		Inertia.PrincipalInertia = FVector(scaledMassMatrix.m_x * scale2, scaledMassMatrix.m_y * scale2, scaledMassMatrix.m_z * scale2);
 	}
 }
