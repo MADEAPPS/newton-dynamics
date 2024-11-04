@@ -121,8 +121,6 @@ void UNewtonCollision::OnUnregister()
 
 void UNewtonCollision::SetTransform(const USceneComponent* const meshComponent)
 {
-	//const AActor* const owner = GetOwner();
-	//check(owner);
 	FTransform bodyTransform(GetComponentTransform());
 	for (USceneComponent* parent = GetAttachParent(); parent; parent = parent->GetAttachParent())
 	{
@@ -138,7 +136,6 @@ void UNewtonCollision::SetTransform(const USceneComponent* const meshComponent)
 	SetComponentToWorld(globalTransform);
 
 	// for some reason, this does not work in the unreal editor
-	//SetRelativeTransform(localTransform);
 	SetRelativeScale3D_Direct(localTransform.GetScale3D());
 	SetRelativeRotation_Direct(FRotator(localTransform.GetRotation()));
 	SetRelativeLocation_Direct(localTransform.GetLocation());

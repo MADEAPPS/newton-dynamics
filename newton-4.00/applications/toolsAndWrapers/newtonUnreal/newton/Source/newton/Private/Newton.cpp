@@ -136,6 +136,9 @@ class FnewtonModule::ResourceCache
 	ndTree<ndShape*, long long> m_shapeCache;
 	Cache<ndConvexHullSet> m_convexVhacdCache;
 	Cache<UE::Geometry::FDynamicMesh3> m_visualMeshCache;
+
+	ndMovingAverage<16> m_renderTime;
+	ndMovingAverage<16> m_physicsTime;
 };
 
 void FnewtonModule::StartupModule()
@@ -529,12 +532,18 @@ bool FnewtonModule::Tick(float timestep)
 	ANewtonWorldActor* const newtonWorld = FindNewtonWorldActor();
 	if (newtonWorld)
 	{
-		char tmp[256];
+		char tmp0[256];
+		char tmp1[256];
 		float simTime = newtonWorld->GetSimTime();
-		snprintf(tmp, sizeof(tmp), "timestep:%f(ms)   physicsTime:%f(ms)", timestep * 1.0e3f, simTime * 1.0e3f);
+		m_resourceCache->m_physicsTime.Update(simTime * 1.0e3f);
+		m_resourceCache->m_renderTime.Update(timestep * 1.0e3f);
+		snprintf(tmp1, sizeof(tmp1), "physicsTime: %g(ms)", m_resourceCache->m_physicsTime.GetAverage());
+		snprintf(tmp0, sizeof(tmp0), "renderTime:  %g(ms)", m_resourceCache->m_renderTime.GetAverage());
 
-		FString msg(tmp);
-		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 0.0f, FColor::Yellow, msg);
+		FString msg0(tmp0);
+		FString msg1(tmp1);
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 0.0f, FColor::Yellow, msg1);
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 0.0f, FColor::Yellow, msg0);
 
 		CleanupDebugLines(newtonWorld->GetWorld(), timestep);
 		if (newtonWorld->m_beginPlay)

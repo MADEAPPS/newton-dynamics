@@ -16,7 +16,7 @@ UNewtonCollisionWheel::UNewtonCollisionWheel()
 
 ndShape* UNewtonCollisionWheel::CreateShape() const
 {
-	return new ndShapeChamferCylinder(0.25f, 0.5f);
+	return new ndShapeChamferCylinder(0.5f, 1.0f);
 }
 
 long long UNewtonCollisionWheel::CalculateHash() const
@@ -66,8 +66,10 @@ ndShapeInstance* UNewtonCollisionWheel::CreateBodyInstanceShape(const ndMatrix& 
 {
 	ndShapeInstance* const instance = Super::CreateBodyInstanceShape(bodyMatrix);
 
-	const ndVector scale(ndFloat32(Width * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Radio * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Radio * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
-	instance->SetScale(scale);
+	const FVector uScale(GetComponentTransform().GetScale3D());
+	const ndVector scale1(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(1.0f));
+	const ndVector scale2(ndFloat32(Width * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Radio * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Radio * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
+	instance->SetScale(scale1 * scale2);
 
 	const ndMatrix aligment(ndYawMatrix(ndPi * 0.5f));
 	instance->SetLocalMatrix(aligment * instance->GetLocalMatrix());

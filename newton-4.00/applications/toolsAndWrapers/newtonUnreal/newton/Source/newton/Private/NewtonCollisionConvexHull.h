@@ -29,6 +29,7 @@ class UNewtonCollisionConvexHull : public UNewtonCollision
 	virtual void ApplyPropertyChanges() override;
 	virtual ndShape* CreateShape() const override;
 	virtual long long CalculateHash() const override;
+	void SetTransform(const USceneComponent* const meshComponent) override;
 
 	void GenerateMesh(const USceneComponent* const meshComponent);
 	virtual ndShapeInstance* CreateInstanceShape() const override;

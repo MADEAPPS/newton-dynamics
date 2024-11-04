@@ -67,8 +67,10 @@ void ndShapeConvex::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debug
 	ndAssert(m_edgeCount < D_MAX_EDGE_COUNT);
 	ndAssert(m_vertexCount < D_MAX_EDGE_COUNT);
 
-	memset(mark, 0, sizeof(mark));
-	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
+	//memset(mark, 0, sizeof(mark));
+	ndMemSet(mark, ndInt8(0), D_MAX_EDGE_COUNT);
+	//memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
+	ndMemSet(edgeType, ndShapeDebugNotify::m_shared, D_MAX_EDGE_COUNT);
 	matrix.TransformTriplex(&tmp[0].m_x, sizeof(ndVector), &m_vertex[0].m_x, sizeof(ndVector), m_vertexCount);
 	for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 	{
@@ -94,13 +96,15 @@ void ndShapeConvex::SetVolumeAndCG()
 {
 	ndVector faceVertex[D_MAX_EDGE_COUNT];
 	ndInt8* const edgeMarks = ndAlloca(ndInt8, m_edgeCount + 32);
-	memset(&edgeMarks[0], 0, sizeof(ndInt8) * m_edgeCount);
+	//memset(&edgeMarks[0], 0, sizeof(ndInt8) * m_edgeCount);
+	ndMemSet(edgeMarks, ndInt8(0), m_edgeCount);
 
 	ndPolyhedraMassProperties localData;
 	for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 	{
 		ndConvexSimplexEdge* const face = &m_simplex[i];
-		if (!edgeMarks[i]) {
+		if (!edgeMarks[i]) 
+		{
 			ndConvexSimplexEdge* edge = face;
 			ndInt32 count = 0;
 			do 
@@ -190,11 +194,12 @@ ndFloat32 ndShapeConvex::CalculateMassProperties(const ndMatrix& offset, ndVecto
 
 ndMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const
 {
+#if 0
 	bool implicitTest = true;
 	implicitTest = implicitTest && (ndAbs(localScale.m_x - localScale.m_y) < ndFloat32(1.0e-5f));
 	implicitTest = implicitTest && (ndAbs(localScale.m_x - localScale.m_z) < ndFloat32(1.0e-5f));
 	implicitTest = implicitTest && (ndAbs(localScale.m_y - localScale.m_z) < ndFloat32(1.0e-5f));
-	implicitTest = ((ndShape*)this)->GetAsShapeConvexHull() ? false : true;
+	implicitTest = implicitTest && (((ndShape*)this)->GetAsShapeConvexHull() ? false : true);
 
 	//if ((ndAbs(localScale.m_x - localScale.m_y) < ndFloat32(1.0e-5f)) && 
 	//	(ndAbs(localScale.m_x - localScale.m_z) < ndFloat32(1.0e-5f)) && 
@@ -272,6 +277,42 @@ ndMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const ndMatrix& alignMat
 		inertia[3] = centerOfMass;
 		return inertia;
 	}
+#else
+
+	//not using implicit shapes for mass propeties.
+	ndVector inertiaII;
+	ndVector crossInertia;
+	ndVector centerOfMass;
+	ndMatrix scaledMatrix(matrix);
+	scaledMatrix[0] = scaledMatrix[0].Scale(localScale.m_x);
+	scaledMatrix[1] = scaledMatrix[1].Scale(localScale.m_y);
+	scaledMatrix[2] = scaledMatrix[2].Scale(localScale.m_z);
+	scaledMatrix = alignMatrix * scaledMatrix;
+
+	ndFloat32 volume = CalculateMassProperties(scaledMatrix, inertiaII, crossInertia, centerOfMass);
+	if (volume < D_MAX_MIN_VOLUME)
+	{
+		volume = D_MAX_MIN_VOLUME;
+	}
+
+	ndFloat32 invVolume = ndFloat32(1.0f) / volume;
+	centerOfMass = centerOfMass.Scale(invVolume);
+	centerOfMass.m_w = ndFloat32(1.0f);
+	inertiaII = inertiaII.Scale(invVolume);
+	crossInertia = crossInertia.Scale(invVolume);
+	ndMatrix inertia(ndGetIdentityMatrix());
+	inertia[0][0] = inertiaII[0];
+	inertia[1][1] = inertiaII[1];
+	inertia[2][2] = inertiaII[2];
+	inertia[0][1] = crossInertia[2];
+	inertia[1][0] = crossInertia[2];
+	inertia[0][2] = crossInertia[1];
+	inertia[2][0] = crossInertia[1];
+	inertia[1][2] = crossInertia[0];
+	inertia[2][1] = crossInertia[0];
+	inertia[3] = centerOfMass;
+	return inertia;
+#endif
 }
 
 void ndShapeConvex::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const
@@ -298,7 +339,8 @@ ndVector ndShapeConvex::SupportVertex(const ndVector& dir) const
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
 	ndInt16 cache[16];
-	memset(cache, -1, sizeof(cache));
+	//memset(cache, -1, sizeof(cache));
+	ndMemSet(cache, ndInt16(-1), 16);
 	ndConvexSimplexEdge* edge = &m_simplex[0];
 
 	ndInt32 index = edge->m_vertex;
@@ -865,7 +907,8 @@ ndVector ndShapeConvex::CalculateVolumeIntegral(const ndPlane& plane) const
 	ndConvexSimplexEdge* capEdge = nullptr;
 
 	ndVector cg(ndVector::m_zero);
-	memset(mark, 0, m_edgeCount);
+	//memset(mark, 0, m_edgeCount);
+	ndMemSet(mark, ndInt8(0), m_edgeCount);
 	for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 	{
 		if (!mark[i]) 

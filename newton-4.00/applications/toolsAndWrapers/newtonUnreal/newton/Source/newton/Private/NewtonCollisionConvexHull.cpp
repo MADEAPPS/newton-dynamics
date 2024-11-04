@@ -58,7 +58,7 @@ void UNewtonCollisionConvexHull::GenerateMesh(const USceneComponent* const meshC
 	const FStaticMeshRenderData* const renderData = staticMesh->GetRenderData();
 	const FStaticMeshLODResourcesArray& renderResource = renderData->LODResources;
 
-	const FVector uScale(GetComponentTransform().GetScale3D());
+	const FVector uScale(meshComponent->GetComponentTransform().GetScale3D());
 	const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
 	const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
 
@@ -66,26 +66,12 @@ void UNewtonCollisionConvexHull::GenerateMesh(const USceneComponent* const meshC
 	const FStaticMeshVertexBuffers& staticMeshVertexBuffer = renderLOD.VertexBuffers;;
 	const FPositionVertexBuffer& positBuffer = staticMeshVertexBuffer.PositionVertexBuffer;
 
-	FTransform bodyTransform(meshComponent->GetComponentToWorld());
-	for (USceneComponent* parent = GetAttachParent(); parent; parent = parent->GetAttachParent())
-	{
-		bodyTransform = parent->GetComponentTransform();
-		if (Cast<UNewtonRigidBody>(parent))
-		{
-			break;
-		}
-	}
-
-	const FTransform globalTransform(GetComponentToWorld());
-	const FTransform localTransform(globalTransform * bodyTransform.Inverse());
-	const ndMatrix localMatrix(ToNewtonMatrix(localTransform));
-
 	ndArray<ndBigVector> points;
 	for (ndInt32 i = positBuffer.GetNumVertices() - 1; i >= 0; --i)
 	{
 		const FVector3f p(positBuffer.VertexPosition(i));
 		const ndVector q(ndFloat32(p.X), ndFloat32(p.Y), ndFloat32(p.Z), ndFloat32(1.0f));
-		points.PushBack(localMatrix.TransformVector(q * bakedScale));
+		points.PushBack(q * bakedScale);
 	}
 	ndConvexHull3d convexHull(&points[0].m_x, sizeof(ndBigVector), points.GetCount(), Tolerance, MaxVertexCount);
 	const ndArray<ndBigVector>& convexVertex = convexHull.GetVertexPool();
@@ -97,18 +83,11 @@ void UNewtonCollisionConvexHull::GenerateMesh(const USceneComponent* const meshC
 	}
 }
 
-void UNewtonCollisionConvexHull::InitStaticMeshCompoment(const USceneComponent* const meshComponent)
+void UNewtonCollisionConvexHull::SetTransform(const USceneComponent* const meshComponent)
 {
-	SetTransform(meshComponent);
-	GenerateMesh(meshComponent);
-}
-
-ndShapeInstance* UNewtonCollisionConvexHull::CreateInstanceShape() const
-{
-	ndShapeInstance* const instance = new ndShapeInstance(m_shape);
-	//ndShapeInstance* const instance = new ndShapeInstance(new ndShapeSphere(0.5f));
-
-	FTransform bodyTransform(GetComponentToWorld());
+	//AActor* xxx0 = GetOwner();
+	//AActor* xxx1 = meshComponent->GetOwner();
+	FTransform bodyTransform(GetComponentTransform());
 	for (USceneComponent* parent = GetAttachParent(); parent; parent = parent->GetAttachParent())
 	{
 		bodyTransform = parent->GetComponentTransform();
@@ -117,25 +96,22 @@ ndShapeInstance* UNewtonCollisionConvexHull::CreateInstanceShape() const
 			break;
 		}
 	}
+	FTransform meshGlobalTransform(meshComponent->GetComponentToWorld());
+	meshGlobalTransform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
+	const FTransform localTransform(meshGlobalTransform * bodyTransform.Inverse());
 
-	const FTransform globalTransform(GetComponentToWorld());
-	const FTransform localTransform(globalTransform * bodyTransform.Inverse());
-	const ndMatrix localMatrix(ToNewtonMatrix(localTransform));
+	SetComponentToWorld(meshGlobalTransform);
 
-	const FVector uScale(GetComponentTransform().GetScale3D());
-	const ndVector invScale(ndFloat32(1.0f/uScale.X), ndFloat32(1.0f/uScale.Y), ndFloat32(1.0f / uScale.Z), ndFloat32(0.0f));
-
-	instance->SetScale(invScale);
-	instance->SetLocalMatrix(localMatrix.OrthoInverse());
-	return instance;
+	// for some reason, this does not work in the unreal editor
+	SetRelativeScale3D_Direct(localTransform.GetScale3D());
+	SetRelativeRotation_Direct(FRotator(localTransform.GetRotation()));
+	SetRelativeLocation_Direct(localTransform.GetLocation());
 }
 
-ndShapeInstance* UNewtonCollisionConvexHull::CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const
+void UNewtonCollisionConvexHull::InitStaticMeshCompoment(const USceneComponent* const meshComponent)
 {
-	ndShapeInstance* const instance = new ndShapeInstance(m_shape);
-	instance->SetScale(ndVector(ndFloat32(1.0f)));
-	instance->SetLocalMatrix(ndGetIdentityMatrix());
-	return instance;
+	SetTransform(meshComponent);
+	GenerateMesh(meshComponent);
 }
 
 void UNewtonCollisionConvexHull::ApplyPropertyChanges()
@@ -160,4 +136,24 @@ void UNewtonCollisionConvexHull::ApplyPropertyChanges()
 
 	BuildNewtonShape();
 	Super::ApplyPropertyChanges();
+}
+
+ndShapeInstance* UNewtonCollisionConvexHull::CreateInstanceShape() const
+{
+	ndShapeInstance* const instance = new ndShapeInstance(m_shape);
+	instance->SetScale(ndVector(ndFloat32(1.0f)));
+	instance->SetLocalMatrix(ndGetIdentityMatrix());
+	return instance;
+}
+
+ndShapeInstance* UNewtonCollisionConvexHull::CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const
+{
+	ndShapeInstance* const instance = new ndShapeInstance(m_shape);
+
+	const FTransform transform(GetComponentToWorld());
+	const ndMatrix matrix(ToNewtonMatrix(transform) * bodyMatrix.OrthoInverse());
+
+	instance->SetLocalMatrix(matrix);
+	instance->SetScale(ndVector(ndFloat32(1.0f)));
+	return instance;
 }

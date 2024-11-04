@@ -50,7 +50,7 @@ class UNewtonCollision : public UDynamicMeshComponent
 	virtual long long CalculateHash() const;
 	virtual ndShapeInstance* CreateInstanceShape() const;
 	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const;
-	void SetTransform(const USceneComponent* const meshComponent);
+	virtual void SetTransform(const USceneComponent* const meshComponent);
 
 	//public:	
 	long long m_hash;
