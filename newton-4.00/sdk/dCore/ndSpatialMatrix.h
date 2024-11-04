@@ -64,6 +64,8 @@ class ndSpatialMatrix
 	}
 
 	D_CORE_API ndSpatialMatrix Inverse(ndInt32 rows) const;
+	D_CORE_API ndSpatialMatrix CholeskyFactorization(ndInt32 rows) const;
+	D_CORE_API ndSpatialMatrix InversePositiveDefinite(ndInt32 rows) const;
 
 	inline ndSpatialVector VectorTimeMatrix(const ndSpatialVector& jacobian) const
 	{

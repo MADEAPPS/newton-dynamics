@@ -196,6 +196,9 @@ void ndSkeletonContainer::ndNode::CalculateJointDiagonal(const ndSpatialMatrix* 
 	}
 
 	ndSpatialMatrix& jointInvMass = m_data.m_joint.m_invMass;
+
+	// can't use CholeskyFactorization because neither bodyMass or jointMass
+	// are guarantee to be PSD
 	jointInvMass = jointMass.Inverse(m_dof);
 }
 
@@ -266,6 +269,11 @@ ndInt32 ndSkeletonContainer::ndNode::Factorize(const ndLeftHandSide* const leftH
 		{
 			CalculateBodyDiagonal(child, bodyMassArray, jointMassArray);
 		}
+
+		// can't use CholeskyFactorization because neither bodyMass or jointMass
+		// are guarantee to be PSD
+		//ndSpatialMatrix xxx0(bodyMass.Inverse(6));
+		//ndSpatialMatrix xxx1(bodyMass.InversePositiveDefinite(6));
 		bodyInvMass = bodyMass.Inverse(6);
 	}
 	else 
