@@ -194,6 +194,7 @@ ndFloat32 ndShapeConvex::CalculateMassProperties(const ndMatrix& offset, ndVecto
 
 ndMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const
 {
+#if 0
 	bool implicitTest = true;
 	implicitTest = implicitTest && (ndAbs(localScale.m_x - localScale.m_y) < ndFloat32(1.0e-5f));
 	implicitTest = implicitTest && (ndAbs(localScale.m_x - localScale.m_z) < ndFloat32(1.0e-5f));
@@ -276,6 +277,42 @@ ndMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const ndMatrix& alignMat
 		inertia[3] = centerOfMass;
 		return inertia;
 	}
+#else
+
+	//not using implicit shapes for mass propeties.
+	ndVector inertiaII;
+	ndVector crossInertia;
+	ndVector centerOfMass;
+	ndMatrix scaledMatrix(matrix);
+	scaledMatrix[0] = scaledMatrix[0].Scale(localScale.m_x);
+	scaledMatrix[1] = scaledMatrix[1].Scale(localScale.m_y);
+	scaledMatrix[2] = scaledMatrix[2].Scale(localScale.m_z);
+	scaledMatrix = alignMatrix * scaledMatrix;
+
+	ndFloat32 volume = CalculateMassProperties(scaledMatrix, inertiaII, crossInertia, centerOfMass);
+	if (volume < D_MAX_MIN_VOLUME)
+	{
+		volume = D_MAX_MIN_VOLUME;
+	}
+
+	ndFloat32 invVolume = ndFloat32(1.0f) / volume;
+	centerOfMass = centerOfMass.Scale(invVolume);
+	centerOfMass.m_w = ndFloat32(1.0f);
+	inertiaII = inertiaII.Scale(invVolume);
+	crossInertia = crossInertia.Scale(invVolume);
+	ndMatrix inertia(ndGetIdentityMatrix());
+	inertia[0][0] = inertiaII[0];
+	inertia[1][1] = inertiaII[1];
+	inertia[2][2] = inertiaII[2];
+	inertia[0][1] = crossInertia[2];
+	inertia[1][0] = crossInertia[2];
+	inertia[0][2] = crossInertia[1];
+	inertia[2][0] = crossInertia[1];
+	inertia[1][2] = crossInertia[0];
+	inertia[2][1] = crossInertia[0];
+	inertia[3] = centerOfMass;
+	return inertia;
+#endif
 }
 
 void ndShapeConvex::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const
