@@ -351,7 +351,6 @@ ndConvexHull3dAABBTreeNode* ndConvexHull3d::BuildTree (ndConvexHull3dAABBTreeNod
 		clump->m_left = nullptr;
 		clump->m_right = nullptr;
 		tree = clump;
-
 	} 
 	else 
 	{
@@ -977,8 +976,8 @@ void ndConvexHull3d::CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTr
 		ndConvexHull3dFace* const face = &faceNode->GetInfo();
 		ndBigPlane planeEquation (face->GetPlaneEquation (&m_points[0], isvalid));
 
-		int index = 0;
-		double dist = 0;
+		ndInt32 index = 0;
+		ndFloat64 dist = 0;
 		ndBigVector p;
 
 		if (isvalid)
@@ -1123,7 +1122,8 @@ void ndConvexHull3d::CalculateVolumeAndSurfaceArea (ndFloat64& volume, ndFloat64
 {
 	ndFloat64 areaAcc = ndFloat32 (0.0f);
 	ndFloat64  volumeAcc = ndFloat32 (0.0f);
-	for (ndNode* node = GetFirst(); node; node = node->GetNext()) {
+	for (ndNode* node = GetFirst(); node; node = node->GetNext()) 
+	{
 		const ndConvexHull3dFace* const face = &node->GetInfo();
 		ndInt32 i0 = face->m_index[0];
 		ndInt32 i1 = face->m_index[1];
@@ -1156,7 +1156,8 @@ ndFloat64 ndConvexHull3d::RayCast (const ndBigVector& localP0, const ndBigVector
 	ndAssert(dS.m_w == ndFloat32(0.0f));
 	ndInt32 hasHit = 0;
 
-	for (ndNode* node = GetFirst(); node; node = node->GetNext()) {
+	for (ndNode* node = GetFirst(); node; node = node->GetNext()) 
+	{
 		const ndConvexHull3dFace* const face = &node->GetInfo();
 
 		ndInt32 i0 = face->m_index[0];
@@ -1174,33 +1175,44 @@ ndFloat64 ndConvexHull3d::RayCast (const ndBigVector& localP0, const ndBigVector
 		ndFloat64 D =  normal.DotProduct(dS).GetScalar();
 		ndFloat64 N = -normal.DotProduct(localP0 - p0).GetScalar();
 
-		if (fabs(D) < ndFloat64 (1.0e-12f)) { //
-			if (N < ndFloat64 (0.0f)) {
+		if (fabs(D) < ndFloat64 (1.0e-12f)) 
+		{ //
+			if (N < ndFloat64 (0.0f)) 
+			{
 				return ndFloat64 (1.2f);
-			} else {
+			} 
+			else 
+			{
 				continue;
 			}
 		}
 
 		ndFloat64 t = N / D;
-		if (D < ndFloat64 (0.0f)) {
-			if (t > tE) {
+		if (D < ndFloat64 (0.0f)) 
+		{
+			if (t > tE) 
+			{
 				tE = t;
 				hasHit = 1;
 			}
-			if (tE > tL) {
+			if (tE > tL) 
+			{
 				return ndFloat64 (1.2f);
 			}
-		} else {
+		} 
+		else 
+		{
 			ndAssert (D >= ndFloat64 (0.0f));
 			tL = ndMin (tL, t);
-			if (tL < tE) {
+			if (tL < tE) 
+			{
 				return ndFloat64 (1.2f);
 			}
 		}
 	}
 
-	if (hasHit) {
+	if (hasHit) 
+	{
 		interset = tE;
 	}
 

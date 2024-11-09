@@ -88,7 +88,7 @@ GLuint ndShaderCache::CreateShaderEffect (const char* const vertexShaderName, co
 	GLuint program = glCreateProgram();
 
 	// load and compile vertex shader
-	sprintf (tmpName, "shaders/%s.vtx", vertexShaderName);
+	snprintf (tmpName, sizeof (tmpName), "shaders/%s.vtx", vertexShaderName);
 	LoadShaderCode (tmpName, buffer);
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
@@ -107,7 +107,7 @@ GLuint ndShaderCache::CreateShaderEffect (const char* const vertexShaderName, co
 	GLuint geometryShader = 0;
 	if (geometryShaderName)
 	{
-		sprintf(tmpName, "shaders/%s.gs", geometryShaderName);
+		snprintf(tmpName, sizeof(tmpName), "shaders/%s.gs", geometryShaderName);
 		LoadShaderCode(tmpName, buffer);
 		geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
 
@@ -123,7 +123,7 @@ GLuint ndShaderCache::CreateShaderEffect (const char* const vertexShaderName, co
 		glAttachShader(program, geometryShader);
 	}
 
-	sprintf (tmpName, "shaders/%s.ps", pixelShaderName);
+	snprintf (tmpName, sizeof(tmpName), "shaders/%s.ps", pixelShaderName);
 	LoadShaderCode (tmpName, buffer);
 	GLuint pixelShader = glCreateShader(GL_FRAGMENT_SHADER);
 
