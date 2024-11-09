@@ -46,7 +46,7 @@
 #include <ndBodyListView.h>
 #include <ndContactArray.h>
 #include <ndBodySphFluid.h>
-#include "ndBodySphFluid_New.h"
+#include <ndBodySphFluid_New.h>
 #include <ndShapeCapsule.h>
 #include <ndShapeCylinder.h>
 #include <ndBodyKinematic.h>
@@ -65,10 +65,11 @@
 #include <ndConvexCastNotify.h>
 #include <ndBodyPlayerCapsule.h>
 #include <ndBodyTriggerVolume.h>
+#include <ndBodyKinematicBase.h>
 #include <ndBodiesInAabbNotify.h>
 #include <ndShapeConvexPolygon.h>
-#include <ndBodyKinematicBase.h>
 #include <ndShapeChamferCylinder.h>
+#include <ndShapeUserDefinedImplicit.h>
 #include <ndJointBilateralConstraint.h>
 #include <ndShapeStaticProceduralMesh.h>
 

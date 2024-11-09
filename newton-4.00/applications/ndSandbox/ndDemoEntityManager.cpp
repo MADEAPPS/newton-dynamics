@@ -41,7 +41,7 @@
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
-//#define DEFAULT_SCENE	4		// conservation of momentum 
+#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
 //#define DEFAULT_SCENE	7		// object Placement
@@ -57,7 +57,7 @@
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
 //#define DEFAULT_SCENE	18		// cart pole continue controller
 //#define DEFAULT_SCENE	19		// unit cycle controller
-#define DEFAULT_SCENE	20		// simple industrial robot
+//#define DEFAULT_SCENE	20		// simple industrial robot
 //#define DEFAULT_SCENE	21		// advanced industrial robot
 //#define DEFAULT_SCENE	22		// quadruped test 1
 //#define DEFAULT_SCENE	23		// quadruped test 2
@@ -579,7 +579,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_showJointDebugInfo = true;
 	m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
-	//m_collisionDisplayMode = 2;	
+	m_collisionDisplayMode = 2;	
 	//m_collisionDisplayMode = 3;		// solid wire frame
 	m_synchronousPhysicsUpdate = true;
 	m_synchronousParticlesUpdate = true;

@@ -12,6 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
+#include "ndMeshLoader.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
@@ -19,6 +20,67 @@
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"
+
+static void TippeTop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 angularSpeed, const ndVector& origin)
+{
+	class TippeTopShape : public ndShapeUserDefinedImplicit
+	{
+		public:
+		TippeTopShape()
+			:ndShapeUserDefinedImplicit()
+		{
+		}
+	};
+
+
+	//ndMatrix matrix(ndGetIdentityMatrix());
+	ndMatrix matrix(ndPitchMatrix(15.0f * ndDegreeToRad));
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+	matrix.m_posit.m_y += 1.0f;
+	
+	ndMeshLoader loader;
+	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("tippeTop.fbx", scene));
+
+	ndSharedPtr<ndDemoMeshInterface> mesh (modelMesh->GetFirstChild()->GetMesh());
+	ndArray<ndVector> meshPoints;
+	((ndDemoMesh*)(*mesh))->GetVertexArray(meshPoints);
+	//ndArray<ndBigVector> points;
+	//for (ndInt32 i = ndInt32 (meshPoints.GetCount() - 1); i >= 0; --i)
+	//{
+	//	points.PushBack(meshPoints[i]);
+	//}
+	//ndConvexHull3d hull(&points[0].m_x, sizeof(ndBigVector), ndInt32 (points.GetCount()), 1.0e-3f);
+	//ndShapeInstance shape(new ndShapeSphere(0.64f));
+	//ndShapeInstance shape (new TippeTopShape());
+	ndShapeInstance shape(new ndShapeConvexHull(ndInt32 (meshPoints.GetCount()), sizeof (ndVector), 0.0f, &meshPoints[0].m_x));
+	
+	ndVector omega(matrix.m_up.Scale (angularSpeed));
+	ndBodyKinematic* const body = new ndBodyDynamic();
+	ndDemoEntity* const entity = modelMesh->CreateClone();
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	
+	body->SetOmega(omega);
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(shape);
+	body->SetMassMatrix(mass, shape);
+
+	ndVector inertia (body->GetMassMatrix());
+	inertia.m_y *= .5f;
+	//inertia.m_x *= 1.75f;
+	//inertia.m_z *= 1.75f;
+	body->SetMassMatrix(inertia);
+
+	ndVector com(body->GetCentreOfMass());
+	com.m_y -= 0.2f;
+	body->SetCentreOfMass(com);
+	
+	ndSharedPtr<ndBody> bodyPtr(body);
+	
+	ndPhysicsWorld* const world = scene->GetWorld();
+	world->AddBody(bodyPtr);
+	scene->AddEntity(entity);
+}
 
 static void DzhanibekovEffect(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 angularSpeed, const ndVector& origin)
 {
@@ -214,10 +276,13 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	PrecessingTop(scene, ndVector(5.0f, 0.0f, -4.0f, 0.0f));
 	PrecessingTop(scene, ndVector(5.0f, 0.0f, 0.0f, 0.0f));
 	PrecessingTop(scene, ndVector(5.0f, 0.0f, 4.0f, 0.0f));
-
+	
 	RattleBack(scene, 10.0f, -5.0f, ndVector(0.0f, 0.0f, -4.0f, 0.0f));
 	RattleBack(scene, 10.0f, 5.0f, ndVector(0.0f, 0.0f, 0.0f, 0.0f));
 	RattleBack(scene, 10.0f, -5.0f, ndVector(0.0f, 0.0f,  4.0f, 0.0f));
+
+	// I can't get this to work.
+	//TippeTop(scene, 10.0f, 50.0f, ndVector(0.0f, 0.0f, -4.0f, 0.0f));
 	
 	scene->GetCameraManager()->SetPickMode(true);
 	

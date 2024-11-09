@@ -46,6 +46,7 @@ class ndShapeHeightfield;
 class ndShapeDebugNotify;
 class ndShapeConvexPolygon;
 class ndShapeChamferCylinder;
+class ndShapeUserDefinedImplicit;
 class ndShapeStaticProceduralMesh;
 
 enum ndShapeID
@@ -57,6 +58,7 @@ enum ndShapeID
 	m_capsule,
 	m_cylinder,
 	m_chamferCylinder,
+	m_userDefinedImplicit,
 	m_convexHull, // this must be the last convex shape ID
 
 	// special and non convex collisions.
@@ -237,6 +239,7 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return nullptr; }
 	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon() { return nullptr; }
 	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return nullptr; }
+	virtual ndShapeUserDefinedImplicit* GetAsShapeUserDefinedImplicit() { return nullptr; }
 	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return nullptr; }
 
 	D_COLLISION_API virtual ndInt32 GetConvexVertexCount() const;
