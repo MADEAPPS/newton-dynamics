@@ -1085,3 +1085,17 @@ ndInt32 ndShapeConvex::BuildCylinderCapPoly(ndFloat32 radius, const ndMatrix& tr
 	return count;
 }
 
+ndVector ndShapeConvex::SupportVertexSpecial(const ndVector& dir, ndFloat32) const
+{
+	return SupportVertex(dir);
+}
+
+ndVector ndShapeConvex::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const
+{
+	return point;
+}
+
+const ndShapeConvex::ndConvexSimplexEdge** ndShapeConvex::GetVertexToEdgeMapping() const
+{
+	return nullptr;
+}

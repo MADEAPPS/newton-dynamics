@@ -51,14 +51,18 @@ class ndShapeConvex: public ndShape
 
 	D_COLLISION_API void SetVolumeAndCG();
 	D_COLLISION_API virtual void MassProperties();
-	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	D_COLLISION_API virtual ndFloat32 CalculateMassProperties(const ndMatrix& offset, ndVector& inertia, ndVector& crossInertia, ndVector& centerOfMass) const;
-	D_COLLISION_API virtual ndMatrix CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const;
-
+	D_COLLISION_API virtual ndFloat32 GetVolume() const;
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
+	D_COLLISION_API virtual ndFloat32 GetBoxMinRadius() const;
+	D_COLLISION_API virtual ndFloat32 GetBoxMaxRadius() const;
 	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir) const;
+	D_COLLISION_API virtual const ndConvexSimplexEdge** GetVertexToEdgeMapping() const;
+	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
+	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
+	D_COLLISION_API virtual ndVector SupportFeatureVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
+	D_COLLISION_API virtual ndMatrix CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const;
+	D_COLLISION_API virtual ndFloat32 CalculateMassProperties(const ndMatrix& offset, ndVector& inertia, ndVector& crossInertia, ndVector& centerOfMass) const;
 	D_COLLISION_API virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& globalPlane, const ndShapeInstance& parentScale) const;
 	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
@@ -68,12 +72,6 @@ class ndShapeConvex: public ndShape
 	virtual ndInt32 GetConvexVertexCount() const { return m_vertexCount; }
 	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32) const;
 	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const;
-	virtual const ndConvexSimplexEdge** GetVertexToEdgeMapping() const;
-
-	virtual ndFloat32 GetVolume() const;
-	virtual ndFloat32 GetBoxMinRadius() const;
-	virtual ndFloat32 GetBoxMaxRadius() const;
-	virtual ndVector SupportFeatureVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 
 	ndVector CalculateVolumeIntegral(const ndPlane& plane) const;
 	ndInt32 BuildCylinderCapPoly (ndFloat32 radius, const ndMatrix& transform, ndVector* const vertexOut) const;
@@ -89,22 +87,6 @@ class ndShapeConvex: public ndShape
 	friend class ndMeshEffect;
 	friend class ndContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;
-
-inline ndVector ndShapeConvex::SupportVertexSpecial(const ndVector& dir, ndFloat32) const
-{
-	return SupportVertex(dir);
-}
-
-inline ndVector ndShapeConvex::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const
-{
-	return point;
-}
-
-inline const ndShapeConvex::ndConvexSimplexEdge** ndShapeConvex::GetVertexToEdgeMapping() const
-{
-	return nullptr;
-}
-
 
 #endif 
 
