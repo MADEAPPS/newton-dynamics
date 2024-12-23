@@ -22,6 +22,7 @@
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndScene.h"
+#include "ndWorld.h"
 #include "ndShapeNull.h"
 #include "ndBodyNotify.h"
 #include "ndShapeCompound.h"
@@ -1373,14 +1374,6 @@ void ndScene::UpdateBodyList()
 	if (m_bodyList.UpdateView())
 	{
 		ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
-		// allow for bodies with null shape to be part of the simulation.
-		//#ifdef _DEBUG
-		//for (ndInt32 i = 0; i < view.GetCount(); ++i)
-		//{
-		//	ndBodyKinematic* const body = view[i];
-		//	ndAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
-		//}
-		//#endif
 		view.PushBack(m_sentinelBody);
 	}
 }
@@ -1717,4 +1710,52 @@ void ndScene::ParticleUpdate(ndFloat32 timestep)
 		ndBodyParticleSet* const body = node->GetInfo()->GetAsBodyParticleSet();
 		body->Update(this, timestep);
 	}
+}
+
+bool ndScene::ValidateScene()
+{
+	m_bodyList.m_listIsDirty = true;
+	UpdateBodyList();
+
+	ndTree<const ndBodyKinematic*, const ndBodyKinematic*> filter;
+
+	ndInt32 index = 0;
+	const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
+	if (view[view.GetCount() - 1] != m_sentinelBody)
+	{
+		return false;
+	}
+	for (ndBodyListView::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
+	{
+		const ndBodyKinematic* const body = node->GetInfo()->GetAsBodyKinematic();
+		if (body != view[index])
+		{
+			return false;
+		}
+		filter.Insert(body, body);
+		index++;
+	}
+
+	if (index != ndInt32(view.GetCount() - 1))
+	{
+		return false;
+	}
+
+	filter.Insert(m_sentinelBody, m_sentinelBody);
+	for (ndJointList::ndNode* node = GetWorld()->GetJointList().GetFirst(); node; node = node->GetNext())
+	{
+		const ndConstraint* const joint = *node->GetInfo();
+		const ndBodyKinematic* const body0 = joint->GetBody0();
+		const ndBodyKinematic* const body1 = joint->GetBody1();
+		if (!filter.Find(body0))
+		{
+			return false;
+		}
+		if (!filter.Find(body1))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }

@@ -59,6 +59,7 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API virtual ~ndWorld();
 
 	D_NEWTON_API virtual void CleanUp();
+	D_NEWTON_API bool ValidateScene() const;
 
 	D_NEWTON_API ndInt32 GetEngineVersion() const;
 

@@ -1202,6 +1202,8 @@ void ndDemoEntityManager::LoadDemo(ndInt32 menu)
 	glfwSetWindowTitle(m_mainFrame, newTitle);
 	ApplyMenuOptions();
 	ResetTimer();
+
+	ndAssert (m_world->ValidateScene());
 }
 
 void ndDemoEntityManager::ErrorCallback(ndInt32 error, const char* description)

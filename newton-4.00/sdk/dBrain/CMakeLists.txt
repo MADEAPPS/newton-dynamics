@@ -77,6 +77,6 @@ if (NEWTON_ENABLE_VULKAN_SDK)
 endif()
 
 if (MSVC)
-	set_target_properties(${projectName} PROPERTIES FOLDER "deepLearning")
+	set_target_properties(${projectName} PROPERTIES FOLDER "deepLearningSDK")
 endif()
 

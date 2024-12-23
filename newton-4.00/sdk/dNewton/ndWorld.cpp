@@ -730,17 +730,6 @@ void ndWorld::UpdateSkeletons()
 			}
 		}
 	
-		//// reset of all bodies dirty state
-		//const ndArray<ndBodyKinematic*>& bodyArray = m_scene->GetActiveBodyArray();
-		//for (ndInt32 i = ndInt32(bodyArray.GetCount()) - 1; i >= 0; i--)
-		//{
-		//	ndBodyKinematic* const body = bodyArray[i];
-		//	body->m_index = -1;
-		//	body->m_skeletonMark = 0;
-		//	body->m_skeletonMark0 = 0;
-		//	body->m_skeletonMark1 = 0;
-		//}
-	
 		// find all root nodes for all independent joint arrangements
 		ndInt32 inslandCount = 0;
 		solverUpdate.m_leftHandSide.SetCount(ndMax(ndInt32 (bodyArray.GetCount()) + 256, 1024));
@@ -1165,4 +1154,9 @@ void ndWorld::CalculateJointContacts(ndContact* const contact)
 	body1->UpdateCollisionMatrix();
 
 	m_scene->CalculateJointContacts(0, contact);
+}
+
+bool ndWorld::ValidateScene() const
+{
+	return m_scene->ValidateScene();
 }
