@@ -171,10 +171,12 @@ void ndThreadPool::SetThreadCount(ndInt32 count)
 void ndThreadPool::Begin()
 {
 	D_TRACKTIME();
+	#ifndef	D_USE_THREAD_EMULATION
 	for (ndInt32 i = 0; i < m_count; ++i)
 	{
 		m_workers[i].Signal();
 	}
+	#endif
 
 	auto BeginJobs = ndMakeObject::ndFunction([this](ndInt32, ndInt32)
 	{

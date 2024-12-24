@@ -552,10 +552,10 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	m_scene->m_lru = m_scene->m_lru + 1;
 	m_scene->SetTimestep(timestep);
 
+	m_scene->BalanceScene();
 	// update skeletons topologies
 	UpdateSkeletons();
 
-	m_scene->BalanceScene();
 	m_scene->ApplyExtForce();
 	m_scene->InitBodyArray();
 
@@ -923,12 +923,12 @@ void ndWorld::UpdateSkeletons()
 			}
 		}
 	
-		for (ndInt32 i = ndInt32(bodyArray.GetCount()) - 1; i >= 0; i--)
-		{
-			ndBodyKinematic* const body = bodyArray[i];
-			body->PrepareStep(i);
-			ndAssert (bodyArray[i] == body);
-		}
+		//for (ndInt32 i = ndInt32(bodyArray.GetCount()) - 1; i >= 0; i--)
+		//{
+		//	ndBodyKinematic* const body = bodyArray[i];
+		//	body->PrepareStep(i);
+		//	ndAssert (bodyArray[i] == body);
+		//}
 	
 		m_activeSkeletons.SetCount(0);
 		ndSkeletonList::Iterator iter(m_skeletonList);

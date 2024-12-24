@@ -53,6 +53,7 @@ TEST(BilateralJoints, CreateWorld)
 	world->AddJoint(jp1);
 
 	world->Update(0.02);
+	world->Sync();
 
 	//std::cout << "started";
 
