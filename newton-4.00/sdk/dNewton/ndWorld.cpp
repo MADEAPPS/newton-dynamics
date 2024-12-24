@@ -552,6 +552,9 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	m_scene->m_lru = m_scene->m_lru + 1;
 	m_scene->SetTimestep(timestep);
 
+	// update skeletons topologies
+	UpdateSkeletons();
+
 	m_scene->BalanceScene();
 	m_scene->ApplyExtForce();
 	m_scene->InitBodyArray();
@@ -567,9 +570,6 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 
 	// Update Particle base physics
 	//ParticleUpdate();
-
-	// update skeletons topologies
-	UpdateSkeletons();
 
 	// Update all models
 	ModelUpdate();

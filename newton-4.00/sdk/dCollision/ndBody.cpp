@@ -50,6 +50,7 @@ ndBody::ndBody()
 	,m_isConstrained(0)
 	,m_sceneForceUpdate(1)
 	,m_sceneEquilibrium(0)
+	,m_skeletonSelfCollision(0)
 {
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;
@@ -94,6 +95,77 @@ ndBody::~ndBody()
 	{
 		delete m_notifyCallback;
 	}
+}
+
+bool ndBody::GetSeletonSelfCollision() const
+{
+	return m_skeletonSelfCollision ? true : false;
+}
+
+void ndBody::SetSeletonSelfCollision(bool state)
+{
+	m_skeletonSelfCollision = state ? 1 : 0;
+}
+
+ndUnsigned32 ndBody::GetId() const
+{
+	return m_uniqueId;
+}
+
+ndBodyNotify* ndBody::GetNotifyCallback() const
+{
+	return m_notifyCallback;
+}
+
+ndMatrix ndBody::GetMatrix() const
+{
+	return m_matrix;
+}
+
+ndVector ndBody::GetPosition() const
+{
+	return m_matrix.m_posit;
+}
+
+ndQuaternion ndBody::GetRotation() const
+{
+	return m_rotation;
+}
+
+ndVector ndBody::GetGlobalGetCentreOfMass() const
+{
+	return m_globalCentreOfMass;
+}
+
+ndVector ndBody::GetVelocity() const
+{
+	return m_veloc;
+}
+
+ndVector ndBody::GetOmega() const
+{
+	return m_omega;
+}
+
+void ndBody::GetAABB(ndVector& p0, ndVector& p1) const
+{
+	p0 = m_minAabb;
+	p1 = m_maxAabb;
+}
+
+const ndVector& ndBody::GetCentreOfMass() const
+{
+	return m_localCentreOfMass;
+}
+
+ndVector ndBody::GetVelocityAtPoint(const ndVector& point) const
+{
+	return m_veloc + m_omega.CrossProduct(point - m_globalCentreOfMass);
+}
+
+ndFloat32 ndBody::GetInvMass() const
+{
+	return ndFloat32(0.0f);
 }
 
 void ndBody::SetCentreOfMass(const ndVector& com)

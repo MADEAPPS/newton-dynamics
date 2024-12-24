@@ -164,6 +164,301 @@ ndBodyKinematic::~ndBodyKinematic()
 	ndAssert(m_spetialUpdateNode == nullptr);
 }
 
+ndUnsigned32 ndBodyKinematic::GetIndex() const
+{
+	return ndUnsigned32(m_index);
+}
+
+ndFloat32 ndBodyKinematic::GetInvMass() const
+{
+	return m_invMass.m_w;
+}
+
+const ndVector ndBodyKinematic::GetInvInertia() const
+{
+	return m_invMass & ndVector::m_triplexMask;
+}
+
+const ndVector& ndBodyKinematic::GetMassMatrix() const
+{
+	return m_mass;
+}
+
+const ndMatrix& ndBodyKinematic::GetInvInertiaMatrix() const
+{
+	return m_invWorldInertiaMatrix;
+}
+
+ndVector ndBodyKinematic::GetGyroAlpha() const
+{
+	return m_gyroAlpha;
+}
+
+ndVector ndBodyKinematic::GetGyroTorque() const
+{
+	return m_gyroTorque;
+}
+
+void ndBodyKinematic::GetMassMatrix(ndFloat32& Ixx, ndFloat32& Iyy, ndFloat32& Izz, ndFloat32& mass)
+{
+	Ixx = m_mass.m_x;
+	Iyy = m_mass.m_y;
+	Izz = m_mass.m_z;
+	mass = m_mass.m_w;
+}
+
+void ndBodyKinematic::SetMassMatrix(const ndVector& massMatrix)
+{
+	ndMatrix inertia(ndGetIdentityMatrix());
+	inertia[0][0] = massMatrix.m_x;
+	inertia[1][1] = massMatrix.m_y;
+	inertia[2][2] = massMatrix.m_z;
+	SetMassMatrix(massMatrix.m_w, inertia);
+}
+
+void ndBodyKinematic::SetMassMatrix(ndFloat32 Ixx, ndFloat32 Iyy, ndFloat32 Izz, ndFloat32 mass)
+{
+	SetMassMatrix(ndVector(Ixx, Iyy, Izz, mass));
+}
+
+ndMatrix ndBodyKinematic::GetPrincipalAxis() const
+{
+	return m_inertiaPrincipalAxis;
+}
+
+ndBodyKinematic* ndBodyKinematic::GetAsBodyKinematic()
+{
+	return this;
+}
+
+ndScene* ndBodyKinematic::GetScene() const
+{
+	return m_scene;
+}
+
+void ndBodyKinematic::SetSceneNodes(ndScene* const scene, ndBodyListView::ndNode* const node)
+{
+	m_scene = scene;
+	m_sceneNode = node;
+}
+
+ndVector ndBodyKinematic::GetForce() const
+{
+	return ndVector::m_zero;
+}
+
+ndVector ndBodyKinematic::GetTorque() const
+{
+	return ndVector::m_zero;
+}
+
+void ndBodyKinematic::SetForce(const ndVector&)
+{
+}
+
+void ndBodyKinematic::SetTorque(const ndVector&)
+{
+}
+
+ndVector ndBodyKinematic::GetAccel() const
+{
+	return m_accel;
+}
+
+void ndBodyKinematic::SetAccel(const ndVector& accel)
+{
+	m_accel = accel;
+}
+
+ndVector ndBodyKinematic::GetAlpha() const
+{
+	return m_alpha;
+}
+
+void ndBodyKinematic::SetAlpha(const ndVector& alpha)
+{
+	m_alpha = alpha;
+}
+
+void ndBodyKinematic::AddDampingAcceleration(ndFloat32)
+{
+}
+
+void ndBodyKinematic::SetAccel(const ndJacobian& accel)
+{
+	SetAccel(accel.m_linear);
+	SetAlpha(accel.m_angular);
+}
+
+void ndBodyKinematic::PrepareStep(ndInt32 index)
+{
+	m_index = index;
+	m_isJointFence0 = 1;
+	m_isJointFence1 = 1;
+	m_isConstrained = 0;
+	m_buildSkelIndex = 0;
+	m_islandParent = this;
+	m_weigh = ndFloat32(0.0f);
+	m_isStatic = ndUnsigned8(m_invMass.m_w == ndFloat32(0.0f));
+	m_equilibrium = ndUnsigned8(m_isStatic | m_equilibrium);
+	m_equilibrium0 = m_equilibrium;
+}
+
+ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap()
+{
+	return m_contactList;
+}
+
+const ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap() const
+{
+	return m_contactList;
+}
+
+ndBodyKinematic::ndJointList& ndBodyKinematic::GetJointList()
+{
+	return m_jointList;
+}
+
+const ndBodyKinematic::ndJointList& ndBodyKinematic::GetJointList() const
+{
+	return m_jointList;
+}
+
+ndShapeInstance& ndBodyKinematic::GetCollisionShape()
+{
+	return (ndShapeInstance&)m_shapeInstance;
+}
+
+const ndShapeInstance& ndBodyKinematic::GetCollisionShape() const
+{
+	return m_shapeInstance;
+}
+
+bool ndBodyKinematic::GetAutoSleep() const
+{
+	return m_autoSleep ? true : false;
+}
+
+bool ndBodyKinematic::GetSleepState() const
+{
+	return m_equilibrium ? true : false;
+}
+
+void ndBodyKinematic::RestoreSleepState(bool state)
+{
+	m_equilibrium = ndUnsigned8(state ? 1 : 0);
+}
+
+void ndBodyKinematic::SetAutoSleep(bool state)
+{
+	m_autoSleep = ndUnsigned8(state ? 1 : 0);
+	SetSleepState(false);
+}
+
+ndSkeletonContainer* ndBodyKinematic::GetSkeleton() const
+{
+	return m_skeletonContainer;
+}
+
+void ndBodyKinematic::SetSkeleton(ndSkeletonContainer* const skeleton)
+{
+	m_skeletonContainer = skeleton;
+}
+
+ndFloat32 ndBodyKinematic::GetMaxLinearStep() const
+{
+	return m_maxLinearStep;
+}
+
+ndFloat32 ndBodyKinematic::GetMaxAngularStep() const
+{
+	return m_maxAngleStep;
+}
+
+void ndBodyKinematic::SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32 angleInRadian, ndFloat32 stepInUnitPerSeconds)
+{
+	m_maxLinearStep = ndMax(ndAbs(stepInUnitPerSeconds), ndFloat32(1.0f));
+	m_maxAngleStep = ndMax(ndAbs(angleInRadian), ndFloat32(90.0f) * ndDegreeToRad);
+}
+
+void ndBodyKinematic::SetLinearDamping(ndFloat32)
+{
+}
+
+ndFloat32 ndBodyKinematic::GetLinearDamping() const
+{
+	return ndFloat32(0.0f);
+}
+
+void ndBodyKinematic::SetAngularDamping(const ndVector&)
+{
+}
+
+ndVector ndBodyKinematic::GetAngularDamping() const
+{
+	return ndVector::m_zero;
+}
+
+ndVector ndBodyKinematic::GetCachedDamping() const
+{
+	return ndVector::m_one;
+}
+
+void ndBodyKinematic::UpdateInvInertiaMatrix()
+{
+	ndAssert(m_invWorldInertiaMatrix[0][3] == ndFloat32(0.0f));
+	ndAssert(m_invWorldInertiaMatrix[1][3] == ndFloat32(0.0f));
+	ndAssert(m_invWorldInertiaMatrix[2][3] == ndFloat32(0.0f));
+	ndAssert(m_invWorldInertiaMatrix[3][3] == ndFloat32(1.0f));
+
+	m_invWorldInertiaMatrix = CalculateInvInertiaMatrix();
+
+	ndAssert(m_invWorldInertiaMatrix[0][3] == ndFloat32(0.0f));
+	ndAssert(m_invWorldInertiaMatrix[1][3] == ndFloat32(0.0f));
+	ndAssert(m_invWorldInertiaMatrix[2][3] == ndFloat32(0.0f));
+	ndAssert(m_invWorldInertiaMatrix[3][3] == ndFloat32(1.0f));
+}
+
+void ndBodyKinematic::IntegrateGyroSubstep(const ndVector&)
+{
+}
+
+ndJacobian ndBodyKinematic::IntegrateForceAndToque(const ndVector&, const ndVector&, const ndVector&) const
+{
+	ndJacobian step;
+	step.m_linear = ndVector::m_zero;
+	step.m_angular = ndVector::m_zero;
+	return step;
+}
+
+void ndBodyKinematic::AddImpulse(const ndVector&, const ndVector&, ndFloat32)
+{
+}
+
+void ndBodyKinematic::ApplyImpulsePair(const ndVector&, const ndVector&, ndFloat32)
+{
+}
+
+void ndBodyKinematic::ApplyImpulsesAtPoint(ndInt32, const ndVector* const, const ndVector* const, ndFloat32)
+{
+}
+
+void ndBodyKinematic::SpecialUpdate(ndFloat32)
+{
+	ndAssert(0);
+}
+
+void ndBodyKinematic::ApplyExternalForces(ndInt32, ndFloat32)
+{
+}
+
+void ndBodyKinematic::SetAcceleration(const ndVector&, const ndVector&)
+{
+	m_accel = ndVector::m_zero;
+	m_alpha = ndVector::m_zero;
+}
+
+
 void ndBodyKinematic::SetSleepState(bool state)
 {
 	m_equilibrium = ndUnsigned8 (state ? 1 : 0);
@@ -558,7 +853,6 @@ ndFloat32 ndBodyKinematic::TotalEnergy() const
 
 void ndBodyKinematic::ClearMemory()
 {
-
 }
 
 void ndBodyKinematic::IntegrateVelocity(ndFloat32 timestep)

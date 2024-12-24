@@ -381,12 +381,9 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 		ndAssert(count == checkConnection);
 		#endif
 
-		//const ndFloat32 acc2 = D_SOLVER_MAX_ACCEL_ERROR * D_SOLVER_MAX_ACCEL_ERROR;
-		//const ndFloat32 maxAccNorm2 = (count > 1) ? acc2 : acc2 * ndFloat32(0.0625f);
-		//const ndFloat32 maxAccNorm2 = m_autoSleep ? ((count > 1) ? acc2 : acc2 * ndFloat32(0.0625f)) : ndFloat32((1.0e-3f));
 		const ndVector maxAccNorm2 ((count > 1) ? m_sleepAccelTest2 : m_sleepAccelTest2 * m_sleepAccelTestScale2);
 
-		ndVector accelTest((m_accel.DotProduct(m_accel) > maxAccNorm2) | (m_alpha.DotProduct(m_alpha) > maxAccNorm2));
+		const ndVector accelTest((m_accel.DotProduct(m_accel) > maxAccNorm2) | (m_alpha.DotProduct(m_alpha) > maxAccNorm2));
 		m_accel = m_accel & accelTest;
 		m_alpha = m_alpha & accelTest;
 

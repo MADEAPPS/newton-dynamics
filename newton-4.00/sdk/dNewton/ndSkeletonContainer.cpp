@@ -394,6 +394,21 @@ ndSkeletonContainer::~ndSkeletonContainer()
 	m_nodeList.RemoveAll();
 }
 
+ndInt32 ndSkeletonContainer::GetId() const
+{
+	return m_id;
+}
+
+ndSkeletonContainer::ndNode* ndSkeletonContainer::GetRoot() const
+{
+	return m_skeleton;
+}
+
+const ndSkeletonContainer::ndNodeList& ndSkeletonContainer::GetNodeList() const
+{
+	return m_nodeList;
+}
+
 void ndSkeletonContainer::Clear()
 {
 	for (ndInt32 i = 0; i < m_loopCount; ++i)
@@ -547,6 +562,26 @@ void ndSkeletonContainer::CheckSleepState()
 		}
 	}
 	m_isResting = equilibrium;
+}
+
+ndInt32 ndSkeletonContainer::FindBoneIndex(const ndBodyKinematic* const body) const
+{
+	if (body->GetInvMass() == ndFloat32(0.0f))
+	{
+		return (m_nodesOrder[m_nodeList.GetCount() - 1]->m_body == body) ? m_nodeList.GetCount() - 1 : -1;
+	}
+	else
+	{
+		for (ndInt32 i = m_nodeList.GetCount() - 1; i >= 0; --i)
+		{
+			const ndNode* const node = m_nodesOrder[i];
+			if (node->m_body == body)
+			{
+				return i;
+			}
+		}
+	}
+	return -1;
 }
 
 void ndSkeletonContainer::CalculateBufferSizeInBytes()
