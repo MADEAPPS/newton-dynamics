@@ -104,7 +104,7 @@ bool ndBody::GetSeletonSelfCollision() const
 
 void ndBody::SetSeletonSelfCollision(bool state)
 {
-	m_skeletonSelfCollision = state ? 1 : 0;
+	m_skeletonSelfCollision = ndUnsigned8(state ? 1 : 0);
 }
 
 ndUnsigned32 ndBody::GetId() const

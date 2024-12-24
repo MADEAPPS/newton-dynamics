@@ -297,9 +297,9 @@ ndVector ndShapeConvexPolygon::CalculateGlobalNormal(const ndShapeInstance* cons
 {
 	const ndVector& invScale = parentMesh->GetInvScale();
 	const ndMatrix& globalMatrix = parentMesh->GetGlobalMatrix();
-	const ndMatrix& aligmentMatrix = parentMesh->GetAlignmentMatrix();
+	const ndMatrix& alignmentMatrix = parentMesh->GetAlignmentMatrix();
 
-	ndVector normal(aligmentMatrix.RotateVector(localNormal));
+	ndVector normal(alignmentMatrix.RotateVector(localNormal));
 	normal = normal * invScale;
 	ndAssert(normal.m_w == ndFloat32(0.0f));
 	normal = normal.Normalize();
